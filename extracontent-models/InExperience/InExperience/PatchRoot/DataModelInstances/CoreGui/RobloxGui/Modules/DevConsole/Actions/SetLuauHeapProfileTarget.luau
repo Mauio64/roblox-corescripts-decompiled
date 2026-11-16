@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)(script.Name, function(b1: boolean) -- line: 4
-	return {
-		isClientView = b1
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action(script.Name, function(isClientView: boolean)
+	return { isClientView = isClientView }
 end)

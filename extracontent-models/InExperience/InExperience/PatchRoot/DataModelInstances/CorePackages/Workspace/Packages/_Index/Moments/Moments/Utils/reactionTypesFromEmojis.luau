@@ -1,10 +1,12 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local MomentsCommon = require(Parent.MomentsCommon)
+local parent = script:FindFirstAncestor("Moments").Parent
 
-require(Parent.MomentsTypes)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.MomentsTypes)
 
 local ReactionType = MomentsCommon.Enums.ReactionType
-local t1 = {
+local defineFastFlag = game:DefineFastFlag("MomentsUpdateReactionTrayOrder", false)
+
+local set = {
 	[ReactionType.ThumbsUp] = true,
 	[ReactionType.Heart] = true,
 	[ReactionType.LaughJoy] = true,
@@ -13,7 +15,8 @@ local t1 = {
 	[ReactionType.Fire] = true,
 	[ReactionType.Skull] = true
 }
-local t2 = {
+
+local v = {
 	ReactionType.ThumbsUp,
 	ReactionType.Heart,
 	ReactionType.LaughJoy,
@@ -23,36 +26,39 @@ local t2 = {
 	ReactionType.Skull
 }
 
-local function normalizeEmojiName(s1: string) -- line: 37
-	local v8 = string.gsub(string.lower(s1), "%-", "")
-
-	if v8 == "crying" then
-		return "cry"
-	end
-
-	return v8
+local function normalizeEmojiName(name: string) -- 1 equivalent call inferred from this helper
+	local v2 = string.gsub(string.lower(name), "%-", "")
+	return if v2 == "crying" then "cry" else v2
 end
 
 return {
-	reactionTypesFromEmojis = function(t3: {[any]: any}) -- line: 47
-		-- upvalues: t1 (copy), t2 (copy)
-		local t4 = {}
+	reactionTypesFromEmojis = function(items)
+		local result = {}
 
-		for _, v12 in t3 do
-			local name = v12.name
-			local v14 = string.gsub(string.lower(name), "%-", "")
-			local v15 = if v14 ~= "crying" then v14 else "cry"
+		local emojiNameSet = {}
 
-			if t1[v15] then
-				table.insert(t4, v15)
+		for _, item in items do
+			local emojiName = normalizeEmojiName(item.name) -- inferred equivalent call
+
+			if not set[emojiName] then
+				continue
+			end
+
+			table.insert(result, emojiName)
+			emojiNameSet[emojiName] = true
+		end
+
+		if defineFastFlag then
+			result = {}
+
+			for _, v2 in v do
+				if emojiNameSet[v2] then
+					table.insert(result, v2)
+				end
 			end
 		end
 
-		if #t4 == 0 then
-			return t2
-		end
-
-		return t4
+		return if #result == 0 then v else result
 	end,
-	FALLBACK_PICKER_REACTIONS = t2
+	PICKER_REACTION_ORDER = v
 }

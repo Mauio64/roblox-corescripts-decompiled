@@ -1,181 +1,173 @@
 local Players = game:GetService("Players")
 local AvatarEditorService = game:GetService("AvatarEditorService")
-local Parent = script:FindFirstAncestor("AvatarSwitcher").Parent
-local t1 = {}
-local v5 = game:DefineFastString("AvatarSwitcherEmoteIds", "3344650532,3344585679,5911729486")
-local FFlagAvatarSwitcherAccurateAvatarWarning = require(Parent.AvatarExperienceFlags).FFlagAvatarSwitcherAccurateAvatarWarning
-local v7 = game:DefineFastFlag("AvatarSwitcherMakeupSupport", false)
 
-function t1.buildOutfitModel(n1: number, p1) -- line: 17
-	-- upvalues: Players (copy), AvatarEditorService (copy), FFlagAvatarSwitcherAccurateAvatarWarning (copy)
-	if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-		local HumanoidDescriptionFromOutfitIdAsync = Players:GetHumanoidDescriptionFromOutfitIdAsync(n1)
-		local v13 = AvatarEditorService:ConformToAvatarRulesAsync(HumanoidDescriptionFromOutfitIdAsync)
-		local v14 = Players:CreateHumanoidModelFromDescriptionAsync(v13, p1)
+local parent = script:FindFirstAncestor("AvatarSwitcher").Parent
 
-		if FFlagAvatarSwitcherAccurateAvatarWarning then
-			return v14, v13
-		end
+local OutfitViewportUtils = {}
 
-		return v14
-	end
+local defineFastString = game:DefineFastString("AvatarSwitcherEmoteIds", "3344650532,3344585679,5911729486")
 
-	local HumanoidDescriptionFromOutfitId = Players:GetHumanoidDescriptionFromOutfitId(n1)
-	local v16 = AvatarEditorService:ConformToAvatarRules(HumanoidDescriptionFromOutfitId)
-	local v17 = Players:CreateHumanoidModelFromDescription(v16, p1)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAvatarSwitcherAccurateAvatarWarning = AvatarExperienceFlags.FFlagAvatarSwitcherAccurateAvatarWarning
+local defineFastFlag = game:DefineFastFlag("AvatarSwitcherMakeupSupport", false)
+
+function OutfitViewportUtils.buildOutfitModel(p: number, p2)
+	local conformToAvatarRulesAsync = AvatarEditorService:ConformToAvatarRulesAsync((Players:GetHumanoidDescriptionFromOutfitIdAsync(p)))
+	local humanoidModelFromDescriptionAsync = Players:CreateHumanoidModelFromDescriptionAsync(
+		conformToAvatarRulesAsync,
+		p2
+	)
 
 	if FFlagAvatarSwitcherAccurateAvatarWarning then
-		return v17, v16
+		return humanoidModelFromDescriptionAsync, conformToAvatarRulesAsync
 	end
 
-	return v17
+	return humanoidModelFromDescriptionAsync
 end
-function t1.getCameraDistance(p2, n2: number) -- line: 40
-	local _, v21 = p2:GetBoundingBox()
 
-	return (v21 / 2).Magnitude / math.sin((math.rad(n2 / 2)))
+function OutfitViewportUtils.getCameraDistance(instance, p: number)
+	local _, v = instance:GetBoundingBox()
+	return (v / 2).Magnitude / math.sin((math.rad(p / 2)))
 end
-function t1.loadIdleAnimationForAvatar(p3) -- line: 48
-	local Humanoid = p3:FindFirstChildOfClass("Humanoid")
-	local v24 = Humanoid and Humanoid:FindFirstChildOfClass("Animator")
 
-	if not v24 then
+function OutfitViewportUtils.loadIdleAnimationForAvatar(instance)
+	local humanoid = instance:FindFirstChildOfClass("Humanoid")
+	local animator = humanoid and humanoid:FindFirstChildOfClass("Animator")
+
+	if not animator then
 		return nil
 	end
 
-	local Animate = p3:FindFirstChild("Animate")
+	local animate = instance:FindFirstChild("Animate")
 
-	if not Animate then
+	if not animate then
 		return nil
 	end
 
-	local idle = Animate:FindFirstChild("idle")
+	local idle = animate:FindFirstChild("idle")
 
 	if not idle then
 		return nil
 	end
 
-	local Animation = idle:FindFirstChildOfClass("Animation")
+	local animation = idle:FindFirstChildOfClass("Animation")
 
-	if not Animation then
+	if not animation then
 		return nil
 	end
 
-	local track = v24:LoadAnimation(Animation)
-
+	local track = animator:LoadAnimation(animation)
 	track.Looped = true
-
 	return track
 end
-function t1.loadAnimationTrackForAvatar(s1: string, p4) -- line: 76
-	local Humanoid = p4:FindFirstChildOfClass("Humanoid")
-	local v32 = Humanoid and Humanoid:FindFirstChildOfClass("Animator")
 
-	if not v32 then
+function OutfitViewportUtils.loadAnimationTrackForAvatar(p: string, instance)
+	local humanoid = instance:FindFirstChildOfClass("Humanoid")
+	local animator = humanoid and humanoid:FindFirstChildOfClass("Animator")
+
+	if not animator then
 		return nil
 	end
 
-	local Animation = Instance.new("Animation")
-
-	Animation.AnimationId = "rbxassetid://" .. s1
-
-	return (v32:LoadAnimation(Animation))
+	local animation = Instance.new("Animation")
+	animation.AnimationId = "rbxassetid://" .. p
+	return (animator:LoadAnimation(animation))
 end
 
-local u8 = nil
+local v = nil
+function OutfitViewportUtils.playRandomEmote(instance)
+	local humanoid = instance:FindFirstChildOfClass("Humanoid")
+	local v2 = humanoid and humanoid.RigType == Enum.HumanoidRigType.R15
 
-function t1.playRandomEmote(p5) -- line: 91
-	-- upvalues: v5 (copy), u8 (ref), t1 (copy)
-	local Humanoid = p5:FindFirstChildOfClass("Humanoid")
-	local v36 = Humanoid and Humanoid.RigType == Enum.HumanoidRigType.R15
-	local u37 = nil
-	local ok, result = pcall(function() -- line: 96
-		-- upvalues: v5 (copy)
-		return string.split(v5)
+	local success, result = pcall(function()
+		return string.split(defineFastString)
 	end)
+	local v3
 
-	if v36 and (ok and #result > 0) then
-		local v40
+	if v2 and success and #result > 0 then
+		local v4
 
 		repeat
-			v40 = result[math.random(#result)]
-		until v40 ~= u8 or #result == 1
+			v4 = result[math.random(#result)]
+		until v4 ~= v or #result == 1
 
-		u37 = t1.loadAnimationTrackForAvatar(v40, p5)
-		u8 = v40
+		v3 = OutfitViewportUtils.loadAnimationTrackForAvatar(v4, instance)
+		v = v4
+	else
+		v3 = nil
 	end
 
-	task.spawn(function() -- line: 111
-		-- upvalues: u37 (ref), p5 (copy), t1 (copy)
-		if u37 then
-			u37.Looped = false
-			u37:Play()
-			u37.Stopped:Wait()
+	task.spawn(function()
+		if v3 then
+			v3.Looped = false
+			v3:Play()
+			v3.Stopped:Wait()
 		end
 
-		if p5.Parent == nil then
+		if instance.Parent == nil then
 			return
 		end
 
-		local v56 = t1.loadIdleAnimationForAvatar(p5)
+		local idleAnimationForAvatar = OutfitViewportUtils.loadIdleAnimationForAvatar(instance)
 
-		if v56 then
-			v56.Looped = true
-			v56:Play()
+		if idleAnimationForAvatar then
+			idleAnimationForAvatar.Looped = true
+			idleAnimationForAvatar:Play()
 		end
 	end)
 end
-function t1.hasMissingAccessoriesInHumanoid(p6, p7) -- line: 135
-	local Accessories = p7:GetAccessories(true)
-	local Accessories2 = p6:GetAccessories()
 
-	return #Accessories > #Accessories2
+function OutfitViewportUtils.hasMissingAccessoriesInHumanoid(object, object2): boolean
+	local accessories = object2:GetAccessories(true)
+	local accessories2 = object:GetAccessories()
+
+	return #accessories > #accessories2
 end
 
-local function getAssetIdsInHumanoidDescription(p8) -- line: 147
-	-- upvalues: v7 (copy)
-	local t2 = {}
+local function getAssetIdsInHumanoidDescription(instance)
+	local assetIdsInHumanoidDescription = {}
 
-	for _, v48 in p8:GetAccessories(true) do
-		t2[v48.AssetId] = true
+	for _, v2 in instance:GetAccessories(true) do
+		assetIdsInHumanoidDescription[v2.AssetId] = true
 	end
 
-	t2[p8.Face] = true
-	t2[p8.Head] = true
-	t2[p8.Torso] = true
-	t2[p8.LeftArm] = true
-	t2[p8.RightArm] = true
-	t2[p8.LeftLeg] = true
-	t2[p8.RightLeg] = true
-	t2[p8.GraphicTShirt] = true
-	t2[p8.Pants] = true
-	t2[p8.Shirt] = true
-	t2[p8.ClimbAnimation] = true
-	t2[p8.FallAnimation] = true
-	t2[p8.IdleAnimation] = true
-	t2[p8.JumpAnimation] = true
-	t2[p8.MoodAnimation] = true
-	t2[p8.RunAnimation] = true
-	t2[p8.SwimAnimation] = true
-	t2[p8.WalkAnimation] = true
+	assetIdsInHumanoidDescription[instance.Face] = true
+	assetIdsInHumanoidDescription[instance.Head] = true
+	assetIdsInHumanoidDescription[instance.Torso] = true
+	assetIdsInHumanoidDescription[instance.LeftArm] = true
+	assetIdsInHumanoidDescription[instance.RightArm] = true
+	assetIdsInHumanoidDescription[instance.LeftLeg] = true
+	assetIdsInHumanoidDescription[instance.RightLeg] = true
 
-	if v7 then
-		for _, child in p8:GetChildren() do
-			if child:IsA("MakeupDescription") then
-				t2[child.AssetId] = true
+	assetIdsInHumanoidDescription[instance.GraphicTShirt] = true
+	assetIdsInHumanoidDescription[instance.Pants] = true
+	assetIdsInHumanoidDescription[instance.Shirt] = true
+
+	assetIdsInHumanoidDescription[instance.ClimbAnimation] = true
+	assetIdsInHumanoidDescription[instance.FallAnimation] = true
+	assetIdsInHumanoidDescription[instance.IdleAnimation] = true
+	assetIdsInHumanoidDescription[instance.JumpAnimation] = true
+	assetIdsInHumanoidDescription[instance.MoodAnimation] = true
+	assetIdsInHumanoidDescription[instance.RunAnimation] = true
+	assetIdsInHumanoidDescription[instance.SwimAnimation] = true
+	assetIdsInHumanoidDescription[instance.WalkAnimation] = true
+
+	if defineFastFlag then
+		for _, makeupDescription in instance:GetChildren() do
+			if makeupDescription:IsA("MakeupDescription") then
+				assetIdsInHumanoidDescription[makeupDescription.AssetId] = true
 			end
 		end
 	end
 
-	return t2
+	return assetIdsInHumanoidDescription
 end
 
-function t1.hasMissingAssetsInDescription(p9, t3: {[any]: any}) -- line: 188
-	-- upvalues: getAssetIdsInHumanoidDescription (copy)
-	local v53 = getAssetIdsInHumanoidDescription(p9)
+function OutfitViewportUtils.hasMissingAssetsInDescription(p, items): boolean
+	local assetIdsInHumanoidDescription = getAssetIdsInHumanoidDescription(p)
 
-	for _, v55 in t3 do
-		if not v53[v55] then
+	for _, item in items do
+		if not assetIdsInHumanoidDescription[item] then
 			return true
 		end
 	end
@@ -183,4 +175,4 @@ function t1.hasMissingAssetsInDescription(p9, t3: {[any]: any}) -- line: 188
 	return false
 end
 
-return t1
+return OutfitViewportUtils

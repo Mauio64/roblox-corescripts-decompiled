@@ -1,19 +1,13 @@
-local Parent = script:FindFirstAncestor("NetworkingCurrentlyWearing").Parent
-local Dash = require(Parent.Dash)
+local parent = script:FindFirstAncestor("NetworkingCurrentlyWearing").Parent
+local Dash = require(parent.Dash)
+
 local CATALOG_URL = require(script.Parent.Parent.CATALOG_URL)
 
-return function(p1) -- line: 11
-	-- upvalues: CATALOG_URL (copy), Dash (copy)
-	return p1.roduxNetworking.POST({
-		Name = "GetItemDetails"
-	}, function(p2, p3) -- line: 14
-		-- upvalues: CATALOG_URL (copy), Dash (copy)
-		return p2(CATALOG_URL):path("v1"):path("catalog"):path("items"):path("details"):body({
-			items = Dash.map(p3, function(p4) -- line: 16
-				return {
-					itemType = "Asset",
-					id = p4
-				}
+return function(p)
+	return p.roduxNetworking.POST({ Name = "GetItemDetails" }, function(callback, p2)
+		return callback(CATALOG_URL):path("v1"):path("catalog"):path("items"):path("details"):body({
+			items = Dash.map(p2, function(id)
+				return { itemType = "Asset", id = id }
 			end)
 		})
 	end)

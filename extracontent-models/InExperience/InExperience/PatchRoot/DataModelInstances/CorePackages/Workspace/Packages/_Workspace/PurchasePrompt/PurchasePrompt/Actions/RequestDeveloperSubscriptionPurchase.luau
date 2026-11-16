@@ -1,1 +1,3 @@
-return require(script.Parent.makeActionCreator)(script.Name, "subscriptionId", "expectedPrice")
+local makeActionCreator = require(script.Parent.makeActionCreator)
+
+return makeActionCreator(script.Name, "subscriptionId", "expectedPrice")

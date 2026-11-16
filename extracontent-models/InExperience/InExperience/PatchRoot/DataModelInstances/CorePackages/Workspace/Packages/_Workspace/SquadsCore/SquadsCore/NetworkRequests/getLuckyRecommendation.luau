@@ -1,76 +1,85 @@
 local HttpService = game:GetService("HttpService")
+
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local UrlBuilder = require(SquadsCoreParent.UrlBuilder)
+local parent = SquadsCore.Parent
+
+local UrlBuilder = require(parent.UrlBuilder)
+
 local Logger = require(SquadsCore.Logger)
 local serializeTable = require(SquadsCore.Utils.serializeTable)
 local SquadLuckyRecommendationError = require(SquadsCore.Enums.SquadLuckyRecommendationError)
-
 require(SquadsCore.Types)
 
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local urlBuilder = UrlBuilder.UrlBuilder
 local UrlBase = UrlBuilder.UrlBase
 
-return function(s1: string, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 20
-	-- upvalues: UrlBuilder2 (copy), UrlBase (copy), HttpService (copy), Logger (copy), serializeTable (copy), SquadLuckyRecommendationError (copy)
-	local v13 = UrlBuilder2.new({
-		path = "group-up/v1/get-lucky-recommendation",
-		base = UrlBase.APIS,
-		query = {
-			pickRequestId = s1
-		}
-	})()
-	local v14 = HttpService:RequestInternal({
+return function(pickRequestId: string, callback, callback2)
+	local internal = HttpService:RequestInternal({
+		Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
 		Method = "GET",
-		Headers = {
-			["Content-Type"] = "application/json",
-			Accept = "application/json"
-		},
-		Url = v13
+		Url = urlBuilder.new({
+			base = UrlBase.APIS,
+			path = "group-up/v1/get-lucky-recommendation",
+			query = { pickRequestId = pickRequestId }
+		})()
 	})
-	local u15 = false
 
-	v14:Start(function(_, p4) -- line: 44
-		-- upvalues: u15 (ref), HttpService (copy), Logger (copy), serializeTable (copy), p2 (copy), SquadLuckyRecommendationError (copy), p1 (copy)
-		if u15 then
+	local flag = false
+
+	internal:Start(function(_, data)
+		if flag then
 			return
 		end
 
-		if p4 ~= nil and p4.StatusCode == 200 then
-			local recommendations = HttpService:JSONDecode(p4.Body).recommendations
-			local v19 = if not recommendations then nil else recommendations[1]
+		if data == nil or data.StatusCode ~= 200 then
+			local statusCode
 
-			Logger:debug("Response: {}", serializeTable(p4.Body))
+			if data ~= nil then
+				statusCode = data.StatusCode
+			end
 
-			if v19 == nil then
-				if p2 then
-					p2(SquadLuckyRecommendationError.NoRecommendations)
+			if callback2 then
+				local v
 
-					return
+				if statusCode == 404 then
+					v = SquadLuckyRecommendationError.NoRecommendations
+				else
+					v = SquadLuckyRecommendationError.Failed
 				end
-			elseif p1 then
-				p1({
-					universeId = v19.universeId,
-					rootPlaceId = v19.rootPlaceId,
-					universeName = v19.universeName
-				})
 
-				return
+				callback2(v)
 			end
+
+			Logger:error(
+				"Error getting lucky recommendation: {}",
+				data == nil and "request aborted" or data.StatusMessage
+			)
 		else
-			local v20 = if p4 == nil then nil else p4.StatusCode
+			local recommendations = HttpService:JSONDecode(data.Body).recommendations
+			local v
 
-			if p2 then
-				p2(if v20 ~= 404 then SquadLuckyRecommendationError.Failed else SquadLuckyRecommendationError.NoRecommendations)
+			if recommendations then
+				v = recommendations[1]
 			end
 
-			Logger:error("Error getting lucky recommendation: {}", p4 == nil and "request aborted" or p4.StatusMessage)
+			Logger:debug("Response: {}", serializeTable(data.Body))
+
+			if v == nil then
+				if callback2 then
+					callback2(SquadLuckyRecommendationError.NoRecommendations)
+				end
+			elseif callback then
+				callback({
+					universeId = v.universeId,
+					rootPlaceId = v.rootPlaceId,
+					universeName = v.universeName
+				})
+			end
 		end
 	end)
 
-	return function() -- line: 84
-		-- upvalues: u15 (ref), v14 (copy)
-		u15 = true
-		v14:Cancel()
+	return function()
+		flag = true
+		internal:Cancel()
 	end
 end

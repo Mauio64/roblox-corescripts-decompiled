@@ -1,18 +1,16 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
-local RoactRodux = require(Parent.PurchasePromptDeps).RoactRodux
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local RoactRodux = PurchasePromptDeps.RoactRodux
 
-local function connectToStore(p1, p2) -- line: 12
-	-- upvalues: RoactRodux (copy)
-	return function(p3) -- line: 13
-		-- upvalues: RoactRodux (copy), p1 (copy), p2 (copy)
-		local v7 = RoactRodux.UNSTABLE_connect2(p1, p2)(p3)
+local function connectToStore(p, p2)
+	return function(unconnected)
+		local v = RoactRodux.UNSTABLE_connect2(p, p2)(unconnected)
 
-		function v7.getUnconnected() -- line: 16
-			-- upvalues: p3 (copy)
-			return p3
+		function v.getUnconnected()
+			return unconnected
 		end
 
-		return v7
+		return v
 	end
 end
 

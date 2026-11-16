@@ -1,19 +1,30 @@
-local function determineAppealsState(t1: {[any]: any}) -- line: 30
-	local v3 = if not t1.beginDate or t1.beginDate == "" then nil else DateTime.fromIsoDate(t1.beginDate)
-	local v4 = if not t1.endDate or t1.endDate == "" then nil else DateTime.fromIsoDate(t1.endDate)
+local FFlagUFRAppealsAndModNoteFix = require(script.Parent.Parent.Flags.FFlagUFRAppealsAndModNoteFix)
 
-	if v3 and v4 then
-		local v5 = v4.UnixTimestamp - v3.UnixTimestamp > 1800
+local function determineAppealsState(data)
+	local dateTime
 
+	if data.beginDate and data.beginDate ~= "" then
+		dateTime = DateTime.fromIsoDate(data.beginDate)
+	end
+
+	local dateTime2
+
+	if data.endDate and data.endDate ~= "" then
+		dateTime2 = DateTime.fromIsoDate(data.endDate)
+	end
+
+	if dateTime and dateTime2 then
+		local shouldOpenAppealsPortal = dateTime2.UnixTimestamp - dateTime.UnixTimestamp > 1800
+			or FFlagUFRAppealsAndModNoteFix and data.acknowledgeable
 		return {
-			isAppealable = v5 or t1.onAppeal ~= nil,
-			shouldOpenAppealsPortal = v5
+			isAppealable = shouldOpenAppealsPortal or data.onAppeal ~= nil,
+			shouldOpenAppealsPortal = shouldOpenAppealsPortal
 		}
 	end
 
 	return {
-		isAppealable = t1.onAppeal ~= nil or t1.acknowledgeable,
-		shouldOpenAppealsPortal = t1.acknowledgeable
+		isAppealable = data.onAppeal ~= nil or data.acknowledgeable,
+		shouldOpenAppealsPortal = data.acknowledgeable
 	}
 end
 

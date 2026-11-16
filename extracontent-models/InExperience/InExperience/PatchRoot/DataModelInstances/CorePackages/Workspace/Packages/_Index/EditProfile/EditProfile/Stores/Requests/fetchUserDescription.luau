@@ -1,27 +1,43 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
-local Http = require(EditProfileParent.Http)
-local HttpRequest = require(EditProfileParent.HttpRequest)
+local parent = EditProfile.Parent
 
-require(EditProfileParent.DataHydration)
-
+local Http = require(parent.Http)
+local HttpRequest = require(parent.HttpRequest)
+require(parent.DataHydration)
 local Enums = require(EditProfile.Common.Enums)
+local HttpService = game:GetService("HttpService")
+local FFlagEditProfileUseProfilePlatformBio = require(EditProfile.Flags.FFlagEditProfileUseProfilePlatformBio)
+
 local Url = Http.Url
-local v7 = HttpRequest.config({
-	requestFunction = function(s1: string, p1, p2) -- line: 16
-		-- upvalues: HttpRequest (copy)
-		return HttpRequest.requestFunctions.RequestInternal(s1, p1, p2)
+
+local config = HttpRequest.config({
+	requestFunction = function(p: string, p2, p3)
+		return HttpRequest.requestFunctions.RequestInternal(p, p2, p3)
 	end
 })
 
-local function fetchUserDescription(s2: string) -- line: 21
-	-- upvalues: Url (copy), v7 (copy), Enums (copy)
-	local v13 = string.format("%s/users/%s", Url.USERS_URL, s2)
+local function fetchUserDescription(profileId: string)
+	if FFlagEditProfileUseProfilePlatformBio then
+		return config(Url.APIS_URL .. "profile-platform-api/v1/profiles/get", Enums.RequestMethods.POST, {
+			postBody = HttpService:JSONEncode({
+				profileType = "User",
+				profileId = profileId,
+				components = {
+					{ component = "About" }
+				},
+				includeComponentOrdering = false
+			})
+		}):andThen(function(p)
+			local components = p.responseBody.components
+			local about = components and components.About
+			return about and about.description or ""
+		end)
+	end
 
-	return v7(v13, Enums.RequestMethods.GET):andThen(function(p3) -- line: 25
-		return p3.responseBody.description or ""
-	end):catch(function(p4) -- line: 28
-		error(p4)
+	return config(string.format("%s/users/%s", Url.USERS_URL, profileId), Enums.RequestMethods.GET):andThen(function(p)
+		return p.responseBody.description or ""
+	end):catch(function(message)
+		error(message)
 	end)
 end
 

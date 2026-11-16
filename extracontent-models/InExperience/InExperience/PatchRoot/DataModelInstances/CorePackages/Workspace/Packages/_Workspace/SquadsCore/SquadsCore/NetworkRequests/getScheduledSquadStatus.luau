@@ -1,52 +1,44 @@
 local HttpService = game:GetService("HttpService")
+
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local UrlBuilder = require(SquadsCoreParent.UrlBuilder)
+local parent = SquadsCore.Parent
+
+local UrlBuilder = require(parent.UrlBuilder)
+
 local Logger = require(SquadsCore.Logger)
 local serializeTable = require(SquadsCore.Utils.serializeTable)
-
 require(SquadsCore.Types)
 
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local urlBuilder = UrlBuilder.UrlBuilder
 local UrlBase = UrlBuilder.UrlBase
 
-return function(n1: number, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 17
-	-- upvalues: UrlBuilder2 (copy), UrlBase (copy), HttpService (copy), Logger (copy), serializeTable (copy)
-	local v12 = UrlBuilder2.new({
-		path = "group-up/v1/get-scheduled-group-up-status",
-		base = UrlBase.APIS,
-		query = {
-			scheduledGroupUpId = n1
-		}
-	})()
-
+return function(scheduledGroupUpId: number, callback, callback2)
 	return HttpService:RequestInternal({
+		Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
 		Method = "GET",
-		Headers = {
-			["Content-Type"] = "application/json",
-			Accept = "application/json"
-		},
-		Url = v12
-	}):Start(function(_, p4) -- line: 38
-		-- upvalues: p1 (copy), HttpService (copy), Logger (copy), serializeTable (copy), p2 (copy)
-		if p4.StatusCode == 200 then
-			local Body = p4.Body
+		Url = urlBuilder.new({
+			base = UrlBase.APIS,
+			path = "group-up/v1/get-scheduled-group-up-status",
+			query = { scheduledGroupUpId = scheduledGroupUpId }
+		})()
+	}):Start(function(_, data)
+		if data.StatusCode == 200 then
+			local body = data.Body
 
-			if p1 then
-				p1(HttpService:JSONDecode(Body).scheduledGroupUp)
+			if callback then
+				callback(HttpService:JSONDecode(body).scheduledGroupUp)
 			end
 
-			Logger:debug("Response: {}", serializeTable(Body))
-
-			return p4
+			Logger:debug("Response: {}", serializeTable(body))
+			return data
 		end
 
-		if p2 then
-			p2()
+		if callback2 then
+			callback2()
 		end
 
-		Logger:error("Error getting scheduled squad status: {}", p4.StatusMessage)
+		Logger:error("Error getting scheduled squad status: {}", data.StatusMessage)
 
-		return p4
+		return data
 	end)
 end

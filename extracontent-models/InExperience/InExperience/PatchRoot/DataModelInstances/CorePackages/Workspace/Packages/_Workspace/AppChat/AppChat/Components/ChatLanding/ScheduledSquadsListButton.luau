@@ -1,52 +1,68 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Foundation = require(AppChatParent.Foundation)
-local React = require(AppChatParent.React)
-local SquadExternalContractProvider = require(AppChatParent.SquadsCore.SquadExternalContractProvider)
+local parent = AppChat.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+
 local DomLocators = require(AppChat.Utils.DomLocators)
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
-local ScheduledSquadActionEnum = require(AppChatParent.Squads.Enums).ScheduledSquadActionEnum
-local EventNames = require(AppChatParent.SquadsCore.EventNames)
+
+local Enums = require(parent.Squads.Enums)
+local ScheduledSquadActionEnum = Enums.ScheduledSquadActionEnum
+
+local EventNames = require(parent.SquadsCore.EventNames)
 local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
-local useCurrentSquadId = require(AppChatParent.SquadsCore.Hooks).useCurrentSquadId
+local Hooks = require(parent.SquadsCore.Hooks)
+local useCurrentSquadId = Hooks.useCurrentSquadId
+
 local IconButton = Foundation.IconButton
-local ScheduledSquadsListSheet = require(AppChatParent.Squads.Components).ScheduledSquadsListSheet
 
-return function(t1: {[any]: any}) -- line: 32
-	-- upvalues: useCurrentSquadId (copy), React (copy), SquadExternalContractContext (copy), EventNames (copy), ScheduledSquadActionEnum (copy), IconButton (copy), Foundation (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ScheduledSquadsListSheet (copy)
-	local v15 = useCurrentSquadId()
-	local v16 = React.useContext(SquadExternalContractContext)
-	local v17, v18 = React.useState(false)
-	local v19 = React.useCallback(function() -- line: 38
-		-- upvalues: v16 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), t1 (copy), v15 (copy), v18 (copy)
-		v16.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
+local Components = require(parent.Squads.Components)
+local ScheduledSquadsListSheet = Components.ScheduledSquadsListSheet
+
+return function(p)
+	local squadId = useCurrentSquadId()
+	local v = React.useContext(SquadExternalContractContext)
+
+	local state, setState = React.useState(false)
+
+	local onActivated = React.useCallback(function()
+		v.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
 			actionType = ScheduledSquadActionEnum.ViewSubscribedScheduledSquadsList,
-			source = t1.source,
-			squadId = v15,
-			squadLocation = v16.squadLocation
+			source = p.source,
+			squadId = squadId,
+			squadLocation = v.squadLocation
 		})
-		v18(true)
-	end, {
-		v15,
-		v18,
-		v16.fireSquadAnalytics,
-		v16.squadLocation
-	})
-	local v20 = React.useCallback(function() -- line: 54
-		-- upvalues: v18 (copy)
-		v18(false)
-	end, { v18 })
 
-	return React.createElement(React.Fragment, nil, {
-		ScheduledSquadsListButton = React.createElement(IconButton, {
-			icon = Foundation.Enums.IconName.Calendar,
-			LayoutOrder = t1.layoutOrder,
-			onActivated = v19,
-			testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingTopBarIconButton("scheduledSquads")
-		}),
+		setState(true)
+	end, { squadId, setState, v.fireSquadAnalytics, v.squadLocation })
+
+	local onClose = React.useCallback(function()
+		setState(false)
+	end, { setState })
+
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local createElement2 = React.createElement
+	local v2 = {
+		icon = Foundation.Enums.IconName.Calendar,
+		LayoutOrder = p.layoutOrder,
+		onActivated = onActivated,
+		testId = 0
+	}
+	local testId
+
+	if FFlagDebugAppChatEnableDomLocators then
+		testId = DomLocators.chatLandingTopBarIconButton("scheduledSquads")
+	end
+
+	v2.testId = testId
+	return createElement(fragment, nil, {
+		ScheduledSquadsListButton = createElement2(IconButton, v2),
 		ScheduledSquadsListSheet = React.createElement(ScheduledSquadsListSheet, {
-			isOpen = v17,
-			onClose = v20
+			isOpen = state,
+			onClose = onClose
 		})
 	})
 end

@@ -1,28 +1,28 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
-local useDesignTokens = require(Parent.Style).useDesignTokens
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
 
-local function LineItemLayout(t1: {[any]: any}) -- line: 12
-	-- upvalues: useDesignTokens (copy), React (copy)
-	local v6 = useDesignTokens()
-	local v7, v8 = React.useBinding(Vector2.new(0, 0))
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+
+local function LineItemLayout(props)
+	local v = useDesignTokens()
+	local v2, v3 = React.useBinding(Vector2.new(0, 0))
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.LayoutOrder
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = props.LayoutOrder
 	}, {
 		Start = React.createElement("Frame", {
+			AnchorPoint = Vector2.new(0, 0),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			AnchorPoint = Vector2.new(0, 0),
-			Size = v7:map(function(vector2: Vector2) -- line: 27
-				-- upvalues: v6 (copy)
-				return UDim2.new(1, -(vector2.X + v6.Size.Size_400), 1, 0)
+			Size = v2:map(function(vector2: Vector2)
+				return UDim2.new(1, -(vector2.X + v.Size.Size_400), 1, 0)
 			end)
-		}, t1.startSlot),
+		}, props.startSlot),
 		End = React.createElement("Frame", {
 			AnchorPoint = Vector2.new(1, 0),
 			BackgroundTransparency = 1,
@@ -30,11 +30,10 @@ local function LineItemLayout(t1: {[any]: any}) -- line: 12
 			Size = UDim2.new(0, 0, 1, 0),
 			Position = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.X,
-			[React.Change.AbsoluteSize] = function(p1) -- line: 38
-				-- upvalues: v8 (copy)
-				v8(p1.AbsoluteSize)
+			[React.Change.AbsoluteSize] = function(p)
+				v3(p.AbsoluteSize)
 			end
-		}, t1.endSlot)
+		}, props.endSlot)
 	})
 end
 

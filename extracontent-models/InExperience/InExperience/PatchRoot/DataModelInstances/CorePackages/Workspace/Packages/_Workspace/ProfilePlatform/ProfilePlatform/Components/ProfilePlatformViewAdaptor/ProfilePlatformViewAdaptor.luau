@@ -1,9 +1,11 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local InputUi = require(ProfilePlatformParent.InputUi)
-local RoactUtils = require(ProfilePlatformParent.RoactUtils)
-local RobloxAppHooks = require(ProfilePlatformParent.RobloxAppHooks)
+local parent = ProfilePlatform.Parent
+
+local React = require(parent.React)
+local InputUi = require(parent.InputUi)
+local RoactUtils = require(parent.RoactUtils)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+
 local useScreenSize = RobloxAppHooks.useScreenSize
 local useTopBarHeight = RobloxAppHooks.useTopBarHeight
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
@@ -12,7 +14,8 @@ local useProfileFormFactor = require(ProfilePlatform.Hooks.useProfileFormFactor)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 local useProfileScrollContext = require(ProfilePlatform.Contexts.ProfileScrollContext.useProfileScrollContext)
 local useProfileCardWidth = require(ProfilePlatform.Hooks.useProfileCardWidth)
-local useProfileCardWidth2 = require(ProfilePlatformParent.ProfilePlatformCommon).Hooks.useProfileCardWidth
+local ProfilePlatformCommon = require(parent.ProfilePlatformCommon)
+local useProfileCardWidth2 = ProfilePlatformCommon.Hooks.useProfileCardWidth
 local getPeekViewOpenHeightByProfileType = require(ProfilePlatform.Utils.getPeekViewOpenHeightByProfileType)
 local getSafeAreaSize = InputUi.getSafeAreaSize
 local useProfilePeekViewHeight = require(ProfilePlatform.Hooks.useProfilePeekViewHeight)
@@ -24,141 +27,230 @@ local convertPresenceEnum = require(ProfilePlatform.Utils.convertPresenceEnum)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffectOnMount = RoactUtils.Hooks.useEffectOnMount
 local Enums = require(ProfilePlatform.Common.Enums)
+
 local ProfileModalView = require(script.Parent.ProfileModalView)
 local ProfileFullView = require(script.Parent.ProfileFullView)
 local ProfilePlatformPage = require(ProfilePlatform.Components.ProfilePlatformPage)
 local ProfilePeekView = require(script.Parent.ProfilePeekView)
-local FFlagProfilePlatformNewProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
-local FFlagSwitchProfileWidthHookToSocialCommon = require(ProfilePlatformParent.SharedFlags).FFlagSwitchProfileWidthHookToSocialCommon
-local FFlagEnableMobileGameJoinCard = require(ProfilePlatformParent.SharedFlags).FFlagEnableMobileGameJoinCard
-local FFlagProfilePlatformPresenceStoreMigration = require(ProfilePlatform.Flags.FFlagProfilePlatformPresenceStoreMigration)
-local v35 = if not FFlagProfilePlatformPresenceStoreMigration then nil else require(ProfilePlatformParent.FriendsCommon).Hooks.useGetPresenceByUserId
-local v36 = if not FFlagProfilePlatformPresenceStoreMigration then nil else require(ProfilePlatformParent.DataHydration).Presence.PresenceStore.get()
-local FFlagEnableSplitPane = require(ProfilePlatformParent.SharedFlags).FFlagEnableSplitPane
-local v38 = if not FFlagEnableSplitPane then nil else require(ProfilePlatformParent.SplitPane).SplitPaneStore
-local useSignalState = require(ProfilePlatformParent.SignalsReact).useSignalState
-local t1 = {
-	skipFetch = true
-}
+local isPeekViewStateFullyOpen = require(ProfilePlatform.Utils.isPeekViewStateFullyOpen)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfileInspectAvatarSlideIn = SharedFlags.FFlagProfileInspectAvatarSlideIn
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfileInspectAvatarShopChip = SharedFlags2.FFlagProfileInspectAvatarShopChip
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagProfilePlatformNewProfileHeader = SharedFlags3.FFlagProfilePlatformNewProfileHeader
 
-return function(_: {[any]: any}) -- line: 56
-	-- upvalues: useProfileWrapperContext (copy), useProfileScrollContext (copy), useScreenSize (copy), useTopBarHeight (copy), FFlagEnableMobileGameJoinCard (copy), React (copy), useSelector (copy), useProfileFormFactor (copy), Enums (copy), FFlagEnableSplitPane (copy), useSignalState (copy), v38 (copy), ProfilePlatformPage (copy), ProfileTopBar (copy), getSafeAreaSize (copy), FFlagProfilePlatformNewProfileHeader (copy), FFlagSwitchProfileWidthHookToSocialCommon (copy), useProfileCardWidth2 (copy), useProfileCardWidth (copy), Constants (copy), FFlagProfilePlatformPresenceStoreMigration (copy), useEffectOnMount (copy), v36 (copy), v35 (copy), t1 (copy), convertPresenceEnum (copy), Presence (copy), useDispatch (copy), NetworkingPresence (copy), useShouldShowContextualInformation (copy), useProfilePeekViewHeight (copy), getPeekViewOpenHeightByProfileType (copy), ProfileFullView (copy), ProfileModalView (copy), ProfilePeekView (copy)
-	local v42 = useProfileWrapperContext()
-	local v43 = useProfileScrollContext()
-	local profileType = v42.profileType
-	local previousView = v42.navigateTo.previousView
-	local v46 = useScreenSize()
-	local v47 = useTopBarHeight()
-	local v48 = not not FFlagEnableMobileGameJoinCard and (v42.mountAsFullView or false)
-	local v49 = React.useCallback(function() -- line: 67
-		-- upvalues: previousView (copy)
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagSwitchProfileWidthHookToSocialCommon = SharedFlags4.FFlagSwitchProfileWidthHookToSocialCommon
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagEnableMobileGameJoinCard = SharedFlags5.FFlagEnableMobileGameJoinCard
+
+local FFlagProfilePlatformPresenceStoreMigration = require(ProfilePlatform.Flags.FFlagProfilePlatformPresenceStoreMigration)
+local useGetPresenceByUserId
+
+if FFlagProfilePlatformPresenceStoreMigration then
+	local FriendsCommon = require(parent.FriendsCommon)
+	useGetPresenceByUserId = FriendsCommon.Hooks.useGetPresenceByUserId
+else
+	useGetPresenceByUserId = nil
+end
+
+local v
+
+if FFlagProfilePlatformPresenceStoreMigration then
+	local DataHydration = require(parent.DataHydration)
+	v = DataHydration.Presence.PresenceStore.get()
+else
+	v = nil
+end
+
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagEnableSplitPane = SharedFlags6.FFlagEnableSplitPane
+local SplitPane
+
+if FFlagEnableSplitPane then
+	SplitPane = require(parent.SplitPane)
+else
+	SplitPane = nil
+end
+
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
+local v2 = { skipFetch = true }
+
+return function(_)
+	local v3 = useProfileWrapperContext()
+	local v4 = useProfileScrollContext()
+	local profileType = v3.profileType
+	local previousView = v3.navigateTo.previousView
+	local v5 = useScreenSize()
+	local topBarHeight = useTopBarHeight()
+	local mountAsFullView
+
+	if FFlagEnableMobileGameJoinCard then
+		mountAsFullView = v3.mountAsFullView or false
+	else
+		mountAsFullView = false
+	end
+
+	local navigateBack = React.useCallback(function()
 		previousView(false)
 	end, { previousView })
-	local v50 = React.useCallback(function() -- line: 72
-		-- upvalues: previousView (copy)
+
+	local onClosed = React.useCallback(function()
 		previousView(true)
 	end, { previousView })
-	local v51 = useSelector(function(p1) -- line: 77
-		return p1.GlobalGuiInset
+
+	local v6 = useSelector(function(p)
+		return p.GlobalGuiInset
 	end)
-	local v52 = useProfileFormFactor()
-	local v53 = v52.formFactor == Enums.ProfileFormFactor.Wide
-	local v54 = not not FFlagEnableSplitPane and useSignalState(v38.getStore().getIsSplitEnabled)
-	local v55 = React.useCallback(function() -- line: 88
-		-- upvalues: React (copy), ProfilePlatformPage (copy)
+
+	local v7 = useProfileFormFactor()
+	local v8 = v7.formFactor == Enums.ProfileFormFactor.Wide
+	local fillPane
+
+	if FFlagEnableSplitPane then
+		local v9 = useSignalState(SplitPane.SplitPaneStore.getStore().getSupportPaneModeIfActive)
+
+		if v9 == nil then
+			fillPane = false
+		else
+			fillPane = SplitPane.SplitPaneVariant.getProfileSplitPaneEligibility(v9) ~= nil
+		end
+	else
+		fillPane = false
+	end
+
+	local renderContent = React.useCallback(function()
 		return React.createElement(ProfilePlatformPage, {})
 	end, {})
-	local v56 = FFlagEnableSplitPane and v54
-	local v57 = React.useCallback(function() -- line: 94
-		-- upvalues: React (copy), ProfileTopBar (copy), v49 (copy), FFlagEnableSplitPane (copy), v56 (copy)
-		return React.createElement(ProfileTopBar, {
+
+	local v9 = FFlagEnableSplitPane and fillPane
+
+	local renderTopBar = React.useCallback(function()
+		local createElement = React.createElement
+		local v10 = {
+			navigateBack = navigateBack,
 			transparentBackground = true,
 			backgroundTransparency = nil,
-			navigateBack = v49,
-			hideNavigationButton = if not FFlagEnableSplitPane then nil else v56
-		})
-	end, if not FFlagEnableSplitPane then {} else {
-		v49,
-		v56
-	})
-	local v58 = getSafeAreaSize(v46, v51)
-	local v59 = if not FFlagProfilePlatformNewProfileHeader then math.min(v58.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH) else if not FFlagSwitchProfileWidthHookToSocialCommon then useProfileCardWidth(v53) else useProfileCardWidth2()
-	local v60 = nil
+			hideNavigationButton = nil
+		}
+		local hideNavigationButton
 
-	if FFlagProfilePlatformNewProfileHeader then
-		local profileId = v42.profileId
-		local v63
-
-		if FFlagProfilePlatformPresenceStoreMigration then
-			useEffectOnMount(function() -- line: 116
-				-- upvalues: v36 (copy), profileId (copy)
-				v36.RefreshPresenceByUserId((tostring(profileId)))
-			end)
-
-			local v62 = v35(profileId, t1)
-
-			v63 = convertPresenceEnum(v62 and v62.userPresenceType or Presence.Enums.PresenceType.Offline, v62 and (v62.universeId ~= "" and tonumber(v62.universeId)) or nil)
-		else
-			local v64 = useDispatch()
-
-			useEffectOnMount(function() -- line: 127
-				-- upvalues: v64 (copy), NetworkingPresence (copy), profileId (copy)
-				v64(NetworkingPresence.GetPresencesFromUserIds.API({ profileId })):catch(function(_) -- line: 128
-				end)
-			end)
-
-			local v65 = useSelector(function(p3) -- line: 131
-				-- upvalues: Presence (copy), profileId (copy)
-				return Presence.Selectors.getUserPresenceByUserId(p3, profileId) or {
-					lastLocation = "",
-					userPresenceType = Presence.Enums.PresenceType.Offline
-				}
-			end)
-
-			v63 = convertPresenceEnum(v65.userPresenceType, v65.universeId)
+		if FFlagEnableSplitPane then
+			hideNavigationButton = v9
 		end
 
-		local v66 = useShouldShowContextualInformation(v63)
+		v10.hideNavigationButton = hideNavigationButton
+		return createElement(ProfileTopBar, v10)
+	end, FFlagEnableSplitPane and { navigateBack, v9 } or {})
 
-		v60 = useProfilePeekViewHeight(v59, v66)
+	local safeAreaSize = getSafeAreaSize(v5, v6)
+	local viewWidth
+
+	if FFlagProfilePlatformNewProfileHeader then
+		if FFlagSwitchProfileWidthHookToSocialCommon then
+			viewWidth = useProfileCardWidth2()
+		else
+			viewWidth = useProfileCardWidth(v8)
+		end
+	else
+		viewWidth = math.min(safeAreaSize.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH)
 	end
 
-	local v67 = if not FFlagProfilePlatformNewProfileHeader or profileType ~= Enums.ProfileTypes.User then getPeekViewOpenHeightByProfileType(profileType) else v60
-	local v68 = if not (v67 > v58.Y.Offset - v47) then UDim.new(0, v67) else UDim.new(1, 0)
+	local v10
 
-	if v52.isFullView then
+	if FFlagProfilePlatformNewProfileHeader then
+		local profileId = v3.profileId
+		local v11
+
+		if FFlagProfilePlatformPresenceStoreMigration then
+			useEffectOnMount(function()
+				v.RefreshPresenceByUserId((tostring(profileId)))
+			end)
+			local v12 = useGetPresenceByUserId(profileId, v2)
+
+			local userPresenceType = v12 and v12.userPresenceType or Presence.Enums.PresenceType.Offline
+			local v13
+
+			if v12 and v12.universeId ~= "" then
+				v13 = tonumber(v12.universeId) or nil
+			end
+
+			v11 = convertPresenceEnum(userPresenceType, v13)
+		else
+			local v12 = useDispatch()
+
+			useEffectOnMount(function()
+				v12(NetworkingPresence.GetPresencesFromUserIds.API({ profileId })):catch(function(_) end)
+			end)
+
+			local v13 = useSelector(function(p)
+				return Presence.Selectors.getUserPresenceByUserId(p, profileId)
+					or { userPresenceType = Presence.Enums.PresenceType.Offline, lastLocation = "" }
+			end)
+
+			v11 = convertPresenceEnum(v13.userPresenceType, v13.universeId)
+		end
+
+		v10 = useProfilePeekViewHeight(viewWidth, (useShouldShowContextualInformation(v11)))
+	end
+
+	if not FFlagProfilePlatformNewProfileHeader or profileType ~= Enums.ProfileTypes.User then
+		v10 = getPeekViewOpenHeightByProfileType(profileType)
+	end
+
+	local udim
+
+	if safeAreaSize.Y.Offset - topBarHeight < v10 then
+		udim = UDim.new(1, 0)
+	else
+		udim = UDim.new(0, v10)
+	end
+
+	if v7.isFullView then
 		return React.createElement(ProfileFullView, {
-			renderContent = v55,
-			navigateBack = v49
+			renderContent = renderContent,
+			navigateBack = navigateBack
 		})
 	end
 
-	if v53 then
+	if v8 then
 		return React.createElement(ProfileModalView, {
-			renderContent = v55,
-			renderTopBar = v57,
-			topBarHeight = v47,
-			viewWidth = v59,
-			fillPane = v54,
-			navigateBack = v49
+			renderContent = renderContent,
+			renderTopBar = renderTopBar,
+			topBarHeight = topBarHeight,
+			viewWidth = viewWidth,
+			fillPane = fillPane,
+			navigateBack = navigateBack
 		})
 	end
 
-	return React.createElement(ProfilePeekView, {
+	local createElement = React.createElement
+	local v11 = {
 		bottomDockedContainerHeight = 0,
-		onViewStateChanged = nil,
-		briefViewContentHeight = v68,
-		contentSlot = v55(),
+		briefViewContentHeight = udim,
+		contentSlot = renderContent(),
 		fullViewContentHeight = UDim.new(1, 0),
-		mountAsFullView = v48,
-		onClosed = v50,
-		topBarHeight = v47,
-		topBarSlot = v57(),
-		viewWidth = UDim.new(0, v58.X.Offset),
-		transitionPercentCallback = function(n1: number) -- line: 189
-			-- upvalues: v43 (copy)
-			v43.setPeekViewOpenPercent(n1)
+		mountAsFullView = mountAsFullView,
+		onClosed = onClosed,
+		onViewStateChanged = (FFlagProfileInspectAvatarSlideIn or FFlagProfileInspectAvatarShopChip) and function(p)
+			v4.setIsPeekViewFullyOpen(isPeekViewStateFullyOpen(p))
+		end or nil,
+		topBarHeight = topBarHeight,
+		topBarSlot = renderTopBar(),
+		viewWidth = UDim.new(0, safeAreaSize.X.Offset),
+		transitionPercentCallback = function(p: number)
+			v4.setPeekViewOpenPercent(p)
 		end,
-		profileType = if not FFlagProfilePlatformNewProfileHeader then nil else profileType
-	})
+		profileType = 0
+	}
+
+	if not FFlagProfilePlatformNewProfileHeader then
+		profileType = nil
+	end
+
+	v11.profileType = profileType
+	return createElement(ProfilePeekView, v11)
 end

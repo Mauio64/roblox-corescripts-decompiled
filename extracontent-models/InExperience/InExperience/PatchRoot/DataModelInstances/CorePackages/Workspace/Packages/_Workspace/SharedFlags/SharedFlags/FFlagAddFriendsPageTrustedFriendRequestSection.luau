@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagAddFriendsUserListEnabled) and game:DefineFastFlag("AddFriendsPageTrustedFriendRequestSection_v10", false)
+local FFlagAddFriendsUserListEnabled = require(script.Parent.FFlagAddFriendsUserListEnabled)
+
+return FFlagAddFriendsUserListEnabled and game:DefineFastFlag("AddFriendsPageTrustedFriendRequestSection_v10", false)

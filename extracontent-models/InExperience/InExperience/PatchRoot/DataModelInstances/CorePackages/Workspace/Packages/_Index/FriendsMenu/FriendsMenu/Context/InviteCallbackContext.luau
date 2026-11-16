@@ -1,8 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 
-return (require(ParentParent.React).createContext({
-	inviteSingleFriend = function() -- line: 14
-	end,
-	inviteMultiFriends = function() -- line: 15
-	end
+return (React.createContext({
+	inviteSingleFriend = function() end,
+	inviteMultiFriends = function() end
 }))

@@ -1,111 +1,122 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
+local parent = MomentsCommon.Parent
+
 local ContentProvider = game:GetService("ContentProvider")
-local Foundation = require(MomentsCommonParent.Foundation)
-local React = require(MomentsCommonParent.React)
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local Skeleton = Foundation.Skeleton
 local View = Foundation.View
+
 local LoadingState = require(MomentsCommon.Enums.LoadingState)
 local getCropSize = require(MomentsCommon.Utils.getCropSize)
 local getFitSize = require(MomentsCommon.Utils.getFitSize)
 
-return function(t1: {[any]: any}) -- line: 38
-	-- upvalues: React (copy), LoadingState (copy), ContentProvider (copy), View (copy), getFitSize (copy), getCropSize (copy), Skeleton (copy)
-	local v12, v13 = React.useState(Vector2.new(0, 0))
-	local v14, v15 = React.useState(LoadingState.Loading)
-	local v16, v17 = React.useState(Vector2.new(0, 0))
+return function(props)
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(LoadingState.Loading)
+	local state3, setState3 = React.useState(Vector2.new(0, 0))
 
-	React.useEffect(function() -- line: 43
-		-- upvalues: t1 (copy), ContentProvider (copy), v15 (copy), LoadingState (copy)
-		if t1.Video == nil or t1.Video == "" then
+	React.useEffect(function()
+		if props.Video == nil or props.Video == "" then
 			return
 		end
 
-		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(t1.Video):Connect(function(p1) -- line: 49
-			-- upvalues: v15 (copy), LoadingState (copy)
-			if p1 == Enum.AssetFetchStatus.Failure then
-				v15(LoadingState.Failed)
+		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(props.Video):Connect(function(p)
+			if p == Enum.AssetFetchStatus.Failure then
+				setState2(LoadingState.Failed)
 			end
 		end)
 
-		return function() -- line: 55
-			-- upvalues: connection (copy), v15 (copy), LoadingState (copy)
+		return function()
 			connection:Disconnect()
-			v15(LoadingState.Loading)
+			setState2(LoadingState.Loading)
 		end
-	end, { t1.Video })
+	end, { props.Video })
 
-	local v18 = React.useCallback(function(p2) -- line: 61
-		-- upvalues: v13 (copy), t1 (copy)
-		v13(p2.AbsoluteSize)
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize)
 
-		if t1.onAbsoluteSizeChanged then
-			t1.onAbsoluteSizeChanged(p2)
+		if props.onAbsoluteSizeChanged then
+			props.onAbsoluteSizeChanged(p)
 		end
-	end, {
-		t1.onAbsoluteSizeChanged,
-		v13
-	})
-	local v19 = React.useCallback(function(p3) -- line: 69
-		-- upvalues: v17 (copy), t1 (copy)
-		local Resolution = p3.Resolution
+	end, { props.onAbsoluteSizeChanged, setState })
 
-		v17(Resolution)
+	local v = React.useCallback(function(p)
+		local resolution = p.Resolution
+		setState3(resolution)
 
-		if t1.onResolutionChanged then
-			t1.onResolutionChanged(Resolution)
+		if props.onResolutionChanged then
+			props.onResolutionChanged(resolution)
 		end
-	end, {
-		t1.onResolutionChanged,
-		v17
-	})
-	local v20 = React.useCallback(function(p4) -- line: 78
-		-- upvalues: v14 (copy), LoadingState (copy), v15 (copy), t1 (copy)
-		if v14 == LoadingState.Loading then
-			v15(LoadingState.Finished)
+	end, { props.onResolutionChanged, setState3 })
+
+	local v2 = React.useCallback(function(p)
+		if state2 == LoadingState.Loading then
+			setState2(LoadingState.Finished)
 		end
 
-		t1.onLoaded(p4)
-	end, {
-		v14,
-		t1.onLoaded
-	})
+		props.onLoaded(p)
+	end, { state2, props.onLoaded })
 
-	if v14 == LoadingState.Failed then
-		return t1.renderOnFailed()
+	if state2 == LoadingState.Failed then
+		return props.renderOnFailed()
 	end
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v3 = {
+		AnchorPoint = props.AnchorPoint,
+		BackgroundTransparency = props.BackgroundTransparency,
+		ClipsDescendants = props.ClipsDescendants ~= false,
 		isDisabled = true,
-		AnchorPoint = t1.AnchorPoint,
-		BackgroundTransparency = t1.BackgroundTransparency,
-		ClipsDescendants = t1.ClipsDescendants ~= false,
-		onAbsoluteSizeChanged = v18,
-		Position = t1.Position,
-		Size = t1.Size,
-		ZIndex = t1.ZIndex
-	}, {
-		VideoFrame = React.createElement("VideoFrame", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 1,
-			Looped = t1.Looped == nil or t1.Looped,
-			Playing = t1.Playing,
-			Position = UDim2.fromScale(0.5, 0.5),
-			ref = t1.videoRef,
-			Size = if t1.scaleType ~= Enum.ScaleType.Fit then getCropSize(v12, v16) else getFitSize(v12, v16),
-			Video = t1.Video,
-			VideoContent = t1.VideoContent,
-			Visible = v16.X > 0 and v16.Y > 0,
-			[React.Change.Resolution] = v19,
-			[React.Event.Loaded] = v20
-		}, {
-			Corner = if not t1.cornerRadius then nil else React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, t1.cornerRadius)
-			})
-		}),
-		Shimmer = if v14 == LoadingState.Finished then nil else React.createElement(Skeleton, {
-			ZIndex = 2,
-			Size = UDim2.fromScale(1, 1)
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+		Position = props.Position,
+		Size = props.Size,
+		ZIndex = props.ZIndex
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {}
+	v4.AnchorPoint = Vector2.new(0.5, 0.5)
+	v4.BackgroundTransparency = 1
+	v4.Looped = props.Looped == nil or props.Looped
+	v4.Playing = props.Playing
+	v4.Position = UDim2.fromScale(0.5, 0.5)
+	v4.ref = props.videoRef
+	local size
+
+	if props.scaleType == Enum.ScaleType.Fit then
+		size = getFitSize(state, state3)
+	else
+		size = getCropSize(state, state3)
+	end
+
+	v4.Size = size
+
+	v4.Video = props.Video
+	v4.VideoContent = props.VideoContent
+	v4.Visible = state3.X > 0 and state3.Y > 0
+	v4[React.Change.Resolution] = v
+	v4[React.Event.Loaded] = v2
+	local corner
+
+	if props.cornerRadius then
+		corner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, props.cornerRadius)
 		})
-	})
+	end
+
+	local v5 = {
+		VideoFrame = createElement2("VideoFrame", v4, { Corner = corner }),
+		Shimmer = 0
+	}
+	local shimmer
+
+	if state2 ~= LoadingState.Finished then
+		shimmer = React.createElement(Skeleton, { Size = UDim2.fromScale(1, 1), ZIndex = 2 })
+	end
+
+	v5.Shimmer = shimmer
+	return createElement(View, v3, v5)
 end

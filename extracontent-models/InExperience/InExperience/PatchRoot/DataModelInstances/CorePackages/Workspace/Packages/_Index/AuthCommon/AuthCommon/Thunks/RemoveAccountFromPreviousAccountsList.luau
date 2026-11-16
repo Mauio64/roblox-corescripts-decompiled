@@ -1,13 +1,12 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
 local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
 
-return function(s1: string) -- line: 4
-	-- upvalues: AppStorageUtilities (copy)
-	local v4 = AppStorageUtilities.getPreviousAccountsList()
+return function(p: string)
+	local previousAccountsList = AppStorageUtilities.getPreviousAccountsList()
 
-	if v4[s1] ~= nil then
-		v4[s1] = nil
-		AppStorageUtilities.setPreviousAccountsList(v4)
+	if previousAccountsList[p] ~= nil then
+		previousAccountsList[p] = nil
+		AppStorageUtilities.setPreviousAccountsList(previousAccountsList)
 		AppStorageUtilities.flush()
 	end
 end

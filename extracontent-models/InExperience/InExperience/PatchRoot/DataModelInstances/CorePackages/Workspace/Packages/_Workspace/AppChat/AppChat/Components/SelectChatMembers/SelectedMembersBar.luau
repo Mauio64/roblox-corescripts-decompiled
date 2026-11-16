@@ -1,64 +1,71 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Foundation = require(AppChatParent.Foundation)
-local useStyle = require(AppChatParent.UIBlox).Core.Style.useStyle
-local useSignalState = require(AppChatParent.SignalsReact).useSignalState
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local UIBlox = require(parent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
 local FriendCountLabel = require(script.Parent.FriendCountLabel)
 local MemberEntry = require(script.Parent.MemberEntry)
 local GetSelectedUsersStore = require(AppChat.Stores.GetSelectedUsersStore)
 
-local function SelectedMembersBar(t1: {[any]: any}) -- line: 20
-	-- upvalues: useStyle (copy), React (copy), GetSelectedUsersStore (copy), useSignalState (copy), MemberEntry (copy), Foundation (copy), FriendCountLabel (copy)
-	local v12 = useStyle()
-	local v13 = React.useRef(nil)
-	local v14 = GetSelectedUsersStore(false)
-	local v15 = useSignalState(v14.getMaxSize())
-	local v16 = React.useMemo(function() -- line: 27
-		-- upvalues: v15 (copy), React (copy), MemberEntry (copy), v12 (copy)
-		local t2 = {}
+local function SelectedMembersBar(p)
+	local style = useStyle()
+	local ref = React.useRef(nil)
 
-		for i = 1, v15 do
-			t2[`user-{ i }`] = React.createElement(MemberEntry, {
-				index = i,
-				style = v12
-			})
+	local v = useSignalState(GetSelectedUsersStore(false).getMaxSize())
+
+	local v2 = React.useMemo(function()
+		local children = {}
+
+		for i = 1, v do
+			children[`user-{i}`] = React.createElement(MemberEntry, { index = i, style = style })
 		end
 
-		return t2
-	end, { v15 })
+		return children
+	end, { v })
 
-	React.useEffect(function() -- line: 39
-		-- upvalues: v13 (copy)
-		if v13.current then
-			v13.current.ScrollBarThickness = 0
-			v13.current.Selectable = false
+	React.useEffect(function()
+		if ref.current then
+			ref.current.ScrollBarThickness = 0
+			ref.current.Selectable = false
 		end
-	end, { v13 })
+	end, { ref })
 
-	return React.createElement(Foundation.View, {
-		tag = "row size-full-0 auto-y flex-y-fill padding-x-small gap-medium",
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		FriendCountContainer = React.createElement(Foundation.View, {
-			tag = "auto-xy padding-y-small",
-			LayoutOrder = 1
-		}, {
-			FriendCount = React.createElement(FriendCountLabel)
-		}),
-		UserScrollBar = React.createElement(Foundation.ScrollView, {
-			tag = "fill auto-y",
-			LayoutOrder = 2,
-			scroll = {
-				scrollBarVisibility = Foundation.Enums.ScrollBarVisibility.None,
-				ScrollingDirection = Enum.ScrollingDirection.X,
-				AutomaticCanvasSize = Enum.AutomaticSize.XY
-			},
-			scrollingFrameRef = v13
-		}, React.createElement(Foundation.View, {
-			tag = "row size-full padding-x-xsmall gap-medium align-y-center"
-		}, v16))
-	})
+	return React.createElement(
+		Foundation.View,
+		{
+			LayoutOrder = p.LayoutOrder,
+			tag = "row size-full-0 auto-y flex-y-fill padding-x-small gap-medium"
+		},
+		{
+			FriendCountContainer = React.createElement(
+				Foundation.View,
+				{ tag = "auto-xy padding-y-small", LayoutOrder = 1 },
+				{
+					FriendCount = React.createElement(FriendCountLabel)
+				}
+			),
+			UserScrollBar = React.createElement(Foundation.ScrollView, {
+				tag = "fill auto-y",
+				LayoutOrder = 2,
+				scroll = {
+					scrollBarVisibility = Foundation.Enums.ScrollBarVisibility.None,
+					ScrollingDirection = Enum.ScrollingDirection.X,
+					AutomaticCanvasSize = Enum.AutomaticSize.XY
+				},
+				scrollingFrameRef = ref
+			}, React.createElement(
+				Foundation.View,
+				{ tag = "row size-full padding-x-xsmall gap-medium align-y-center" },
+				v2
+			))
+		}
+	)
 end
 
 return React.memo(SelectedMembersBar)

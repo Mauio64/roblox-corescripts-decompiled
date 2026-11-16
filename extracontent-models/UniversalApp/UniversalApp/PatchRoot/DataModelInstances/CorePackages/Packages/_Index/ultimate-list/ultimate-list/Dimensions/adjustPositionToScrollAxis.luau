@@ -1,17 +1,15 @@
-local ancestor = script:FindFirstAncestor("ultimate-list")
-local exhaustiveMatch = require(ancestor.Util.exhaustiveMatch)
+local ultimatelist = script:FindFirstAncestor("ultimate-list")
 
-local function adjustPositionToScrollAxis(uDim2: UDim2, n1: number, s1: string) -- line: 5
-	-- upvalues: exhaustiveMatch (copy)
-	if s1 == "x" then
-		return UDim2.new(0, uDim2.X.Offset - n1, uDim2.Y.Scale, uDim2.Y.Offset)
+local exhaustiveMatch = require(ultimatelist.Util.exhaustiveMatch)
+
+local function adjustPositionToScrollAxis(udim: UDim2, p: number, p2: string)
+	if p2 == "x" then
+		return UDim2.new(0, udim.X.Offset - p, udim.Y.Scale, udim.Y.Offset)
+	elseif p2 == "y" then
+		return UDim2.new(udim.X.Scale, udim.X.Offset, 0, udim.Y.Offset - p)
 	end
 
-	if s1 == "y" then
-		return UDim2.new(uDim2.X.Scale, uDim2.X.Offset, 0, uDim2.Y.Offset - n1)
-	end
-
-	return exhaustiveMatch(s1)
+	return exhaustiveMatch(p2)
 end
 
 return adjustPositionToScrollAxis

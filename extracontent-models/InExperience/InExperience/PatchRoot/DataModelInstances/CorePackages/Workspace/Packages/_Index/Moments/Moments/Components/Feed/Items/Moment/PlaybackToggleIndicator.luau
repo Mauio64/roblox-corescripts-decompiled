@@ -1,150 +1,183 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local ReactOtter = require(Parent.ReactOtter)
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
+local Moments = script:FindFirstAncestor("Moments")
+local parent = Moments.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local SharedFlags = require(parent.SharedFlags)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
 local MomentContext = require(script.Parent.MomentContext)
 local playbackToggleIndicatorMachine = require(script.Parent.playbackToggleIndicatorMachine)
+local useIsPlaying = require(Moments.Hooks.useIsPlaying)
+
+local FFlagMomentsAutoplayAmpPolicy = SharedFlags.FFlagMomentsAutoplayAmpPolicy
+local useSignalState = SignalsReact.useSignalState
+
 local Icon = Foundation.Icon
 local View = Foundation.View
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
 local usePreferences = Foundation.Hooks.usePreferences
-local useSignalState = SignalsReact.useSignalState
-local t1 = {
-	frequency = 4,
-	dampingRatio = 1
-}
-local t2 = {
-	duration = 0.15,
-	easingStyle = Enum.EasingStyle.Quad
-}
 
-local function defaultSchedule(n1: number, p1: ((...any) -> ...any)) -- line: 57
-	local thread = task.delay(n1 / 1000, p1)
+local v = { frequency = 4, dampingRatio = 1 }
+local v2 = { duration = 0.15, easingStyle = Enum.EasingStyle.Quad }
 
-	return function() -- line: 59
-		-- upvalues: thread (copy)
+local function defaultSchedule(p: number, callback)
+	local thread = task.delay(p / 1000, callback)
+	return function()
 		task.cancel(thread)
 	end
 end
-local function PlaybackToggleIndicator(t3: {[any]: any}) -- line: 70
-	-- upvalues: MomentContext (copy), useTokens (copy), usePreferences (copy), React (copy), ReactOtter (copy), Signals (copy), useSignalState (copy), t1 (copy), t2 (copy), defaultSchedule (copy), playbackToggleIndicatorMachine (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy)
+
+local function PlaybackToggleIndicator(p)
 	local controller = MomentContext.useMoment().controller
-	local v25 = useTokens()
+	local v3 = useTokens()
 	local reducedMotion = usePreferences().reducedMotion
-	local v27, v28 = React.useState(false)
-	local v29, v30 = ReactOtter.useAnimatedBinding(0)
-	local v31 = React.useMemo(function() -- line: 82
-		-- upvalues: Signals (copy), controller (copy)
-		return Signals.createComputed(function(p2) -- line: 83
-			-- upvalues: controller (copy)
-			if controller == nil then
-				return false
-			end
 
-			return controller.getState(p2).isPlaying
-		end)
-	end, { controller })
-	local v32 = useSignalState(v31)
-	local v33 = React.useRef(nil)
+	local state, setState = React.useState(false)
+	local v4, v5 = ReactOtter.useAnimatedBinding(0)
 
-	function v33.current(p3) -- line: 95
-		-- upvalues: reducedMotion (copy), ReactOtter (copy), t1 (copy), t2 (copy), v30 (copy)
-		local v39 = if not reducedMotion then if p3 ~= "enter" then ReactOtter.ease(0, t2) else ReactOtter.spring(1, t1) else ReactOtter.instant(p3 ~= "enter" and 0 or 1)
+	local v6 = useIsPlaying()
+	local v7
 
-		v30(v39)
+	if FFlagMomentsAutoplayAmpPolicy then
+		v7 = React.useMemo(function()
+			return Signals.createComputed(function(p2)
+				if controller == nil then
+					return "Idle"
+				end
+
+				return controller.getState(p2).readiness
+			end)
+		end, { controller })
 	end
 
-	local v34 = React.useRef(nil)
+	local v8
 
-	v34.current = t3.scheduleOverride or defaultSchedule
+	if FFlagMomentsAutoplayAmpPolicy then
+		v8 = useSignalState(v7)
+	end
 
-	local v35 = React.useMemo(function() -- line: 113
-		-- upvalues: playbackToggleIndicatorMachine (copy), v34 (copy), v28 (copy), v33 (copy)
-		return playbackToggleIndicatorMachine({
-			dwellMs = 800,
-			exitDurationMs = 150
-		}, {
-			schedule = function(n2: number, p4: ((...any) -> ...any)) -- line: 118
-				-- upvalues: v34 (copy)
-				return v34.current(n2, p4)
+	local ref = React.useRef(nil)
+	function ref.current(p2)
+		local v9
+
+		if reducedMotion then
+			v9 = ReactOtter.instant(p2 == "enter" and 1 or 0)
+		elseif p2 == "enter" then
+			v9 = ReactOtter.spring(1, v)
+		else
+			v9 = ReactOtter.ease(0, v2)
+		end
+
+		v5(v9)
+	end
+
+	local ref2 = React.useRef(nil)
+	ref2.current = p.scheduleOverride or defaultSchedule
+
+	local v9 = React.useMemo(function()
+		return playbackToggleIndicatorMachine({ dwellMs = 800, exitDurationMs = 150 }, {
+			schedule = function(p2: number, callback)
+				return ref2.current(p2, callback)
 			end,
-			setMounted = v28,
-			animate = function(p5) -- line: 122
-				-- upvalues: v33 (copy)
-				v33.current(p5)
+			setMounted = setState,
+			animate = function(p2)
+				ref.current(p2)
 			end
 		})
 	end, {})
 
-	React.useEffect(function() -- line: 130
-		-- upvalues: v35 (copy)
-		return function() -- line: 131
-			-- upvalues: v35 (copy)
-			v35.dispose()
+	React.useEffect(function()
+		return function()
+			v9.dispose()
 		end
-	end, { v35 })
-	React.useEffect(function() -- line: 139
-		-- upvalues: controller (copy), Signals (copy), v35 (copy)
+	end, { v9 })
+
+	React.useEffect(function()
 		if controller == nil then
 			return
 		end
 
-		local u40 = nil
+		local v10 = nil
+		return (Signals.createEffect(function(p2)
+			local userToggleNonce = controller.getUserToggleNonce(p2)
 
-		return (Signals.createEffect(function(p6) -- line: 144
-			-- upvalues: controller (copy), u40 (ref), v35 (copy)
-			local v48 = controller.getUserToggleNonce(p6)
-
-			if u40 == nil then
-				u40 = v48
-
+			if v10 == nil then
+				v10 = userToggleNonce
 				return
 			end
 
-			if v48 == u40 then
+			if userToggleNonce == v10 then
 				return
 			end
 
-			u40 = v48
-			v35.notifyUserToggle()
+			v10 = userToggleNonce
+			v9.notifyUserToggle()
 		end))
-	end, {
-		controller,
-		v35
-	})
+	end, { controller, v9 })
+	local v10
 
-	if not v27 then
+	if FFlagMomentsAutoplayAmpPolicy then
+		if v8 == "Ready" then
+			v10 = not v6
+		else
+			v10 = false
+		end
+	else
+		v10 = nil
+	end
+
+	if not (state or FFlagMomentsAutoplayAmpPolicy and v10) then
 		return nil
 	end
 
-	local v36 = v29:map(function(n3: number) -- line: 163
-		return n3 * 0.25 + 0.75
-	end)
-	local v37 = v29:map(function(n4: number) -- line: 166
-		return 1 - n4
+	local mapped = v4:map(function(p2: number)
+		if FFlagMomentsAutoplayAmpPolicy and v10 then
+			return 1
+		end
+
+		return p2 * 0.25 + 0.75
 	end)
 
-	return React.createElement(View, {
+	local mapped2 = v4:map(function(p2: number)
+		if FFlagMomentsAutoplayAmpPolicy and v10 then
+			return 0
+		end
+
+		return 1 - p2
+	end)
+
+	local createElement = React.createElement
+	local v11 = {
 		tag = "position-center-center anchor-center-center",
-		BackgroundTransparency = 1,
-		ZIndex = 3,
 		Size = UDim2.fromOffset(64, 64),
-		scale = v36
-	}, {
-		Circle = React.createElement(View, {
-			tag = "row align-x-center align-y-center size-full radius-circle clip bg-over-media-0",
-			GroupTransparency = v37
-		}, {
-			Glyph = React.createElement(Icon, {
-				name = if not v32 then IconName.PlayLarge else IconName.PauseLarge,
-				size = IconSize.Large,
-				style = v25.Color.Content.Emphasis
-			})
-		})
+		BackgroundTransparency = 1,
+		scale = mapped,
+		ZIndex = 3
+	}
+
+	local createElement2 = React.createElement
+
+	local createElement3 = React.createElement
+	local name = if v6 then IconName.PauseLarge else IconName.PlayLarge
+	return createElement(View, v11, {
+		Circle = createElement2(
+			View,
+			{
+				tag = "row align-x-center align-y-center size-full radius-circle clip bg-over-media-0",
+				GroupTransparency = mapped2
+			},
+			{
+				Glyph = createElement3(Icon, {
+					name = name,
+					size = IconSize.Large,
+					style = v3.Color.Content.Emphasis
+				})
+			}
+		)
 	})
 end
 

@@ -1,204 +1,313 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Dash = require(DataHydrationParent.Dash)
-local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+local parent = DataHydration.Parent
+local Dash = require(parent.Dash)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
 local logResponseError = DiscoveryUtils.logResponseError
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
 
 local fetchGameDetails = require(script.Parent.fetchGameDetails)
 local GameInfoStoreTypes = require(script.Parent.GameInfoStoreTypes)
-local trim = require(DataHydrationParent.LuauPolyfill).String.trim
-local FFlagLuaAppInExperienceDetailsPrompt = require(DataHydrationParent.SharedFlags).FFlagLuaAppInExperienceDetailsPrompt
-local FFlagLuaAppDataHydrationPlayerCountGameInfoStore = require(DataHydrationParent.SharedFlags).FFlagLuaAppDataHydrationPlayerCountGameInfoStore
-local GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds = require(DataHydrationParent.SharedFlags).GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds
-local FFlagLuaAppDataHydrationUpdateItem = require(DataHydrationParent.SharedFlags).FFlagLuaAppDataHydrationUpdateItem
-local FFlagSduiExperienceDetailsSupport = require(DataHydrationParent.SharedFlags).FFlagSduiExperienceDetailsSupport
-local FFlagLuaAppDataHydrationSanitizeItem = require(DataHydrationParent.SharedFlags).FFlagLuaAppDataHydrationSanitizeItem
-local v18 = if not FFlagLuaAppInExperienceDetailsPrompt then nil else GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds()
 
-local function sanitizeGameInfo(p1) -- line: 37
-	-- upvalues: trim (copy)
-	if p1.name then
-		p1.name = trim(p1.name)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local trim = LuauPolyfill.String.trim
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppInExperienceDetailsPrompt = SharedFlags.FFlagLuaAppInExperienceDetailsPrompt
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppDataHydrationPlayerCountGameInfoStore = SharedFlags2.FFlagLuaAppDataHydrationPlayerCountGameInfoStore
+
+local SharedFlags3 = require(parent.SharedFlags)
+local GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds = SharedFlags3.GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppDataHydrationUpdateItem = SharedFlags4.FFlagLuaAppDataHydrationUpdateItem
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagMigrateGameInfoToStore = SharedFlags5.FFlagMigrateGameInfoToStore
+local v
+
+if FFlagLuaAppInExperienceDetailsPrompt then
+	v = GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds()
+else
+	v = nil
+end
+
+local function sanitizeGameInfo(p)
+	if p.name then
+		p.name = trim(p.name)
 	end
 
-	return p1
+	return p
 end
-local function createGameInfoStore() -- line: 44
-	-- upvalues: FFlagLuaAppInExperienceDetailsPrompt (copy), createDataCache (copy), v18 (copy), FFlagLuaAppDataHydrationSanitizeItem (copy), sanitizeGameInfo (copy), createDataResolver (copy), logResponseError (copy), DiscoveryEventErrorLogger (copy), Dash (copy), fetchGameDetails (copy), GameInfoStoreTypes (copy), FFlagLuaAppDataHydrationPlayerCountGameInfoStore (copy), FFlagLuaAppDataHydrationUpdateItem (copy), FFlagSduiExperienceDetailsSupport (copy)
-	local v22 = if not FFlagLuaAppInExperienceDetailsPrompt then createDataCache(nil, nil, if not FFlagLuaAppDataHydrationSanitizeItem then nil else {
-		sanitizeItem = sanitizeGameInfo
-	}) else createDataCache(v18, nil, if not FFlagLuaAppDataHydrationSanitizeItem then nil else {
-		sanitizeItem = sanitizeGameInfo
-	})
-	local v23 = createDataResolver({
-		cache = v22,
-		logError = if not FFlagLuaAppInExperienceDetailsPrompt then nil else function(p2) -- line: 59
-			-- upvalues: logResponseError (copy), DiscoveryEventErrorLogger (copy)
-			if type(p2) == "table" then
-				if p2.responseCode then
+
+local function createGameInfoStore()
+	local v2 = {}
+
+	local function indexPlaceId(p: string, p2) -- 3 equivalent calls inferred from this helper
+		if p2 and p2.rootPlaceId then
+			v2[tostring(p2.rootPlaceId)] = p
+		end
+	end
+
+	local cache
+
+	if FFlagLuaAppInExperienceDetailsPrompt then
+		cache = createDataCache(v, nil, { sanitizeItem = sanitizeGameInfo })
+	else
+		cache = createDataCache(nil, nil, { sanitizeItem = sanitizeGameInfo })
+	end
+
+	local dataResolver = createDataResolver({
+		cache = cache,
+		logError = FFlagLuaAppInExperienceDetailsPrompt and function(data)
+			if type(data) == "table" then
+				if data.responseCode then
 					logResponseError("v1/games/universeIds", {
-						StatusCode = tonumber(p2.responseCode)
+						StatusCode = tonumber(data.responseCode)
 					})
 				end
 
-				if p2.errorType and p2.errorMessage then
-					DiscoveryEventErrorLogger.reportError(p2.errorType, p2.errorMessage, p2.customFields)
-
-					return
+				if data.errorType and data.errorMessage then
+					DiscoveryEventErrorLogger.reportError(data.errorType, data.errorMessage, data.customFields)
 				end
 			else
-				DiscoveryEventErrorLogger.reportError("FetchGameDetailsError", (tostring(p2)))
+				DiscoveryEventErrorLogger.reportError("FetchGameDetailsError", (tostring(data)))
 			end
-		end,
-		fetchFn = function(t1: {[any]: any}) -- line: 77
-			-- upvalues: Dash (copy), fetchGameDetails (copy), FFlagLuaAppInExperienceDetailsPrompt (copy), GameInfoStoreTypes (copy), FFlagLuaAppDataHydrationPlayerCountGameInfoStore (copy)
-			local v29 = Dash.keys(t1)
-
-			return fetchGameDetails(v29):andThen(function(p3) -- line: 82
-				-- upvalues: FFlagLuaAppInExperienceDetailsPrompt (copy), v29 (copy), GameInfoStoreTypes (copy), FFlagLuaAppDataHydrationPlayerCountGameInfoStore (copy), Dash (copy)
+		end or nil,
+		fetchFn = function(p)
+			local keys = Dash.keys(p)
+			return fetchGameDetails(keys):andThen(function(data)
 				if FFlagLuaAppInExperienceDetailsPrompt then
-					if not p3 or not p3.responseBody then
+					if not (data and data.responseBody) then
 						error({
+							responseCode = data and data.responseCode,
 							errorType = "FetchGameDetailsResponseError",
-							responseCode = p3 and p3.responseCode,
-							errorMessage = not p3 and "No response" or "Missing response body",
-							customFields = {
-								universeIds = v29
-							}
+							errorMessage = data and "Missing response body" or "No response",
+							customFields = { universeIds = keys }
 						})
 					end
 				else
-					if not p3 then
+					if not data then
 						error("No response")
 					end
 
-					if not p3.responseBody or not p3.responseBody.data then
-						error(`Response Code: { p3.reponseCode }`)
+					if not (data.responseBody and data.responseBody.data) then
+						error(`Response Code: {data.reponseCode}`)
 					end
 				end
 
 				if FFlagLuaAppInExperienceDetailsPrompt then
-					local v41, v42 = GameInfoStoreTypes.gameInfoResponseValidator(p3.responseBody)
+					local gameInfoResponseValidator, errorMessage = GameInfoStoreTypes.gameInfoResponseValidator(data.responseBody)
 
-					if not v41 then
+					if not gameInfoResponseValidator then
 						error({
+							responseCode = data.responseCode,
 							errorType = "FetchGameDetailsResponseInvalidInterface",
-							responseCode = p3.responseCode,
-							errorMessage = v42,
-							customFields = {
-								universeIds = v29
-							}
+							errorMessage = errorMessage,
+							customFields = { universeIds = keys }
 						})
 					end
 				end
 
-				local t2 = {}
-				local data = p3.responseBody.data
+				local result = {}
+				local data2 = data.responseBody.data
 
 				if FFlagLuaAppInExperienceDetailsPrompt then
-					for _, v46 in data do
-						if v46 then
-							t2[tostring(v46.id)] = {
-								name = v46.name,
-								rootPlaceId = tostring(v46.rootPlaceId),
-								universeId = tostring(v46.id),
-								description = v46.description,
-								creator = if not v46.creator then nil else {
-									id = tostring(v46.creator.id),
-									name = v46.creator.name,
-									hasVerifiedBadge = v46.creator.hasVerifiedBadge
-								},
-								playerCount = if not FFlagLuaAppDataHydrationPlayerCountGameInfoStore then nil else v46.playing
-							}
+					for _, v3 in data2 do
+						if not v3 then
+							continue
 						end
+
+						local id = tostring(v3.id)
+						local v4 = {
+							name = v3.name,
+							rootPlaceId = tostring(v3.rootPlaceId),
+							universeId = tostring(v3.id),
+							description = v3.description,
+							creator = v3.creator and {
+								id = tostring(v3.creator.id),
+								name = v3.creator.name,
+								hasVerifiedBadge = v3.creator.hasVerifiedBadge
+							} or nil,
+							playerCount = 0,
+							totalVisits = 0
+						}
+						local playerCount
+
+						if FFlagLuaAppDataHydrationPlayerCountGameInfoStore then
+							playerCount = v3.playing
+						end
+
+						v4.playerCount = playerCount
+
+						v4.totalVisits = v3.visits
+						result[id] = v4
 					end
 
-					for _, v48 in v29 do
-						if not t2[tostring(v48)] then
-							t2[tostring(v48)] = {
-								isUnavailable = true
-							}
+					for _, key in keys do
+						if not result[tostring(key)] then
+							result[tostring(key)] = { isUnavailable = true }
 						end
 					end
+				else
+					Dash.forEach(data2, function(data3)
+						local id = tostring(data3.id)
+						local v3 = {
+							name = data3.name,
+							rootPlaceId = tostring(data3.rootPlaceId),
+							universeId = tostring(data3.id),
+							playerCount = 0,
+							totalVisits = 0
+						}
+						local playerCount
 
-					return t2
+						if FFlagLuaAppDataHydrationPlayerCountGameInfoStore then
+							playerCount = data3.playing
+						end
+
+						v3.playerCount = playerCount
+
+						v3.totalVisits = data3.visits
+						result[id] = v3
+					end)
 				end
 
-				Dash.forEach(data, function(p4) -- line: 145
-					-- upvalues: t2 (copy), FFlagLuaAppDataHydrationPlayerCountGameInfoStore (copy)
-					t2[tostring(p4.id)] = {
-						name = p4.name,
-						rootPlaceId = tostring(p4.rootPlaceId),
-						universeId = tostring(p4.id),
-						playerCount = if not FFlagLuaAppDataHydrationPlayerCountGameInfoStore then nil else p4.playing
-					}
-				end)
+				if FFlagMigrateGameInfoToStore then
+					for k, v3 in result do
+						indexPlaceId(k, v3) -- inferred equivalent call
+					end
+				end
 
-				return t2
-			end):catch(function(p5) -- line: 159
-				error(p5)
+				return result
+			end):catch(function(message)
+				error(message)
 			end)
 		end
 	})
 
-	local function applyVoteChange(s1: string, b1: boolean?, b2: boolean?) -- line: 165
-		-- upvalues: v23 (copy), v22 (copy)
-		local v33 = v23.getCachedItem(s1)
-		local v34 = v33 and v33.data(false)
+	local function updateGameInfo(p: string, p2, flag: boolean?)
+		indexPlaceId(p, p2) -- inferred equivalent call
 
-		if not v34 or v34.totalUpVotes == nil then
+		if FFlagMigrateGameInfoToStore then
+			cache.updateItem(p, p2, flag)
+		else
+			cache.updateItem(p, p2)
+		end
+	end
+
+	local function updateGameInfos(items, flag: boolean?)
+		for k, item in items do
+			indexPlaceId(k, item) -- inferred equivalent call
+		end
+
+		if FFlagMigrateGameInfoToStore then
+			cache.updateItems(items, flag)
+		else
+			cache.updateItems(items)
+		end
+	end
+
+	local function getUniverseIdForPlaceId(p)
+		return v2[tostring(p)]
+	end
+
+	local function clear()
+		if not FFlagLuaAppInExperienceDetailsPrompt then
+			cache.clear()
+			dataResolver.clear()
+		end
+	end
+
+	local function dispose()
+		if not FFlagLuaAppInExperienceDetailsPrompt then
+			cache.dispose()
+			dataResolver.dispose()
+		end
+	end
+
+	local gameInfoStore = {
+		fetchGameInfo = dataResolver.fetchItem,
+		fetchGameInfos = dataResolver.fetchItems,
+		getGameInfo = dataResolver.getCachedItem,
+		getGameInfos = dataResolver.getCachedItems,
+		getAndFetchGameInfo = dataResolver.getAndFetchItem,
+		getAndFetchGameInfos = dataResolver.getAndFetchItems,
+		updateGameInfo = 0,
+		updateGameInfos = 0,
+		getUniverseIdForPlaceId = 0,
+		applyVoteChange = 0,
+		clear = 0,
+		dispose = 0
+	}
+
+	if FFlagLuaAppDataHydrationUpdateItem then
+		if not FFlagMigrateGameInfoToStore then
+			updateGameInfo = cache.updateItem
+		end
+	else
+		updateGameInfo = nil
+	end
+
+	gameInfoStore.updateGameInfo = updateGameInfo
+
+	if not FFlagMigrateGameInfoToStore then
+		updateGameInfos = cache.updateItems
+	end
+
+	gameInfoStore.updateGameInfos = updateGameInfos
+
+	if not FFlagMigrateGameInfoToStore then
+		getUniverseIdForPlaceId = nil
+	end
+
+	gameInfoStore.getUniverseIdForPlaceId = getUniverseIdForPlaceId
+
+	function gameInfoStore.applyVoteChange(p: string, flag: boolean?, flag2: boolean?)
+		local cachedItem = dataResolver.getCachedItem(p)
+		local v3 = cachedItem and cachedItem.data(false)
+
+		if not v3 or v3.totalUpVotes == nil then
 			return nil
 		end
 
-		local v35 = tonumber(v34.totalUpVotes) or 0
-		local v36 = tonumber(v34.totalDownVotes) or 0
-		local t3 = {
-			totalUpVotes = v34.totalUpVotes,
-			totalDownVotes = v34.totalDownVotes
-		}
-		local v38 = (b2 ~= true and 0 or 1) - (b1 ~= true and 0 or 1)
-		local v39 = (b2 ~= false and 0 or 1) - (b1 ~= false and 0 or 1)
+		local totalUpVotes = tonumber(v3.totalUpVotes) or 0
+		local totalDownVotes = tonumber(v3.totalDownVotes) or 0
+		local v4 = { totalUpVotes = v3.totalUpVotes, totalDownVotes = v3.totalDownVotes }
 
-		v22.updateItem(s1, {
-			totalUpVotes = tostring((math.max(0, v35 + v38))),
-			totalDownVotes = tostring((math.max(0, v36 + v39)))
+		local v5 = (flag2 == true and 1 or 0) - (flag == true and 1 or 0)
+		local v6 = (flag2 == false and 1 or 0) - (flag == false and 1 or 0)
+
+		if FFlagMigrateGameInfoToStore then
+			cache.updateItem(p, {
+				totalUpVotes = tostring((math.max(0, totalUpVotes + v5))),
+				totalDownVotes = tostring((math.max(0, totalDownVotes + v6)))
+			}, false)
+			return v4
+		end
+
+		cache.updateItem(p, {
+			totalUpVotes = tostring((math.max(0, totalUpVotes + v5))),
+			totalDownVotes = tostring((math.max(0, totalDownVotes + v6)))
 		})
 
-		return t3
-	end
-	local function clear() -- line: 191
-		-- upvalues: FFlagLuaAppInExperienceDetailsPrompt (copy), v22 (copy), v23 (copy)
-		if not FFlagLuaAppInExperienceDetailsPrompt then
-			v22.clear()
-			v23.clear()
-		end
-	end
-	local function dispose() -- line: 198
-		-- upvalues: FFlagLuaAppInExperienceDetailsPrompt (copy), v22 (copy), v23 (copy)
-		if not FFlagLuaAppInExperienceDetailsPrompt then
-			v22.dispose()
-			v23.dispose()
-		end
+		return v4
 	end
 
-	return {
-		fetchGameInfo = v23.fetchItem,
-		fetchGameInfos = v23.fetchItems,
-		getGameInfo = v23.getCachedItem,
-		getGameInfos = v23.getCachedItems,
-		getAndFetchGameInfo = v23.getAndFetchItem,
-		getAndFetchGameInfos = v23.getAndFetchItems,
-		updateGameInfo = if not FFlagLuaAppDataHydrationUpdateItem then nil else v22.updateItem,
-		updateGameInfos = v22.updateItems,
-		applyVoteChange = if not FFlagSduiExperienceDetailsSupport then nil else applyVoteChange,
-		clear = if not FFlagLuaAppInExperienceDetailsPrompt then clear else v23.clear,
-		dispose = if not FFlagLuaAppInExperienceDetailsPrompt then dispose else v23.dispose
-	}
+	if FFlagLuaAppInExperienceDetailsPrompt then
+		clear = dataResolver.clear
+	end
+
+	gameInfoStore.clear = clear
+
+	if FFlagLuaAppInExperienceDetailsPrompt then
+		dispose = dataResolver.dispose
+	end
+
+	gameInfoStore.dispose = dispose
+	return gameInfoStore
 end
 
 return createGameInfoStore

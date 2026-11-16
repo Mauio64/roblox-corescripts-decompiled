@@ -1,12 +1,14 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local Foundation = require(MomentsCommonParent.Foundation)
-local React = require(MomentsCommonParent.React)
-local ReactRoblox = require(MomentsCommonParent.Dev.ReactRoblox)
-local t1 = {
-	Default = Foundation.Enums.Theme.Dark,
-	Light = Foundation.Enums.Theme.Light,
-	Dark = Foundation.Enums.Theme.Dark
+local parent = MomentsCommon.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local ReactRoblox = require(parent.Dev.ReactRoblox)
+
+local v = {
+	Default = Foundation.Enums.ColorMode.Dark,
+	Light = Foundation.Enums.ColorMode.Light,
+	Dark = Foundation.Enums.ColorMode.Dark
 }
 
 return {
@@ -14,16 +16,11 @@ return {
 	roact = React,
 	reactRoblox = ReactRoblox,
 	storyRoot = MomentsCommon,
-	mapStory = function(p1) -- line: 19
-		-- upvalues: t1 (copy), React (copy), Foundation (copy)
-		return function(p2) -- line: 20
-			-- upvalues: t1 (copy), React (copy), Foundation (copy), p1 (copy)
-			local v9 = p2 and t1[p2.theme] or t1.Default
-
-			return React.createElement(Foundation.FoundationProvider, {
-				theme = v9
-			}, {
-				Child = React.createElement(p1, p2)
+	mapStory = function(p)
+		return function(p2)
+			local colorMode = p2 and v[p2.theme] or v.Default
+			return React.createElement(Foundation.FoundationProvider, { colorMode = colorMode }, {
+				Child = React.createElement(p, p2)
 			})
 		end
 	end

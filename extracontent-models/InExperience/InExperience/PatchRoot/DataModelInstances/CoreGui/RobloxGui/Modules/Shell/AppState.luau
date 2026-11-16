@@ -1,16 +1,13 @@
 local CorePackages = game:GetService("CorePackages")
-
 game:GetService("CoreGui")
 
 local AppShellReducer = require(script.Parent.Reducers.AppShellReducer)
 local Rodux = require(CorePackages.Packages.Rodux)
-local t1 = {
-	Destruct = function(p1) -- line: 12
-		p1.store:destruct()
-	end
+
+local v = { Rodux.thunkMiddleware }
+return {
+	Destruct = function(p)
+		p.store:destruct()
+	end,
+	store = Rodux.Store.new(AppShellReducer, {}, v, nil)
 }
-local t2 = { Rodux.thunkMiddleware }
-
-t1.store = Rodux.Store.new(AppShellReducer, {}, t2, nil)
-
-return t1

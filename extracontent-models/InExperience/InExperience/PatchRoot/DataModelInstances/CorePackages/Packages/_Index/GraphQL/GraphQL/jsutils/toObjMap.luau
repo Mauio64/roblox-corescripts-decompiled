@@ -1,13 +1,13 @@
 require(script.Parent.ObjMap)
 
 return {
-	toObjMap = function(p1) -- line: 12
-		local t1 = {}
+	toObjMap = function(items)
+		local objMap = {}
 
-		for k, v in pairs(p1) do
-			t1[k] = v
+		for k, item in pairs(items) do
+			objMap[k] = item
 		end
 
-		return t1
+		return objMap
 	end
 }

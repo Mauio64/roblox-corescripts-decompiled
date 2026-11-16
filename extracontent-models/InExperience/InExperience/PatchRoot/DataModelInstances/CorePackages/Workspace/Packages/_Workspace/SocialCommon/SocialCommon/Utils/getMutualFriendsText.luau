@@ -1,11 +1,11 @@
-return function(t1: {[any]: any}) -- line: 14
-	if t1.mutualFriendsCount == 0 then
+return function(p)
+	if p.mutualFriendsCount == 0 then
 		return ""
 	end
 
-	if t1.mutualFriendsCount == 1 then
-		return t1.localized.singularMutualConnection
+	if p.mutualFriendsCount == 1 then
+		return p.localized.singularMutualConnection
 	end
 
-	return t1.localized.mutualConnections
+	return p.localized.mutualConnections
 end

@@ -1,5 +1,1 @@
-return {
-	React = "React",
-	Switch = "Switch",
-	Unreact = "Unreact"
-}
+return { React = "React", Switch = "Switch", Unreact = "Unreact" }

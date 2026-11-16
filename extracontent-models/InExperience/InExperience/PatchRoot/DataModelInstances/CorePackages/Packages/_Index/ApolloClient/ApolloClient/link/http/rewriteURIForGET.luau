@@ -1,83 +1,72 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local encodeURIComponent = require(ParentParent.luaUtils.encodeURIComponent)
-local t1 = {}
-local serializeFetchParameter = require(script.Parent.serializeFetchParameter).serializeFetchParameter
 
+local encodeURIComponent = require(parent.luaUtils.encodeURIComponent)
+
+local RewriteURIForGET = {}
+
+local serializeFetchParameter = require(script.Parent.serializeFetchParameter)
+local serializeFetchParameter2 = serializeFetchParameter.serializeFetchParameter
 require(script.Parent.selectHttpOptionsAndBody)
 
-function t1.rewriteURIForGET(s1: string, p1) -- line: 29
-	-- upvalues: encodeURIComponent (copy), Array (copy), Object (copy), Boolean (copy), serializeFetchParameter (copy)
-	local t2 = {}
-
-	local function addQueryParam(s2: string, s3: string) -- line: 39
-		-- upvalues: t2 (copy), encodeURIComponent (copy)
-		table.insert(t2, ("%s=%s"):format(s2, encodeURIComponent(s3)))
+function RewriteURIForGET.rewriteURIForGET(value: string, data)
+	local v = {}
+	local function addQueryParam(p: string, p2: string) -- 4 equivalent calls inferred from this helper
+		table.insert(v, ("%s=%s"):format(p, encodeURIComponent(p2)))
 	end
 
-	if Array.indexOf(Object.keys(p1), "query") ~= -1 then
-		local query = p1.query
-
-		table.insert(t2, ("%s=%s"):format("query", encodeURIComponent(query)))
+	if Array.indexOf(Object.keys(data), "query") ~= -1 then
+		addQueryParam("query", data.query) -- inferred equivalent call
 	end
 
-	if Boolean.toJSBoolean(p1.operationName) then
-		local operationName = p1.operationName
-
-		table.insert(t2, ("%s=%s"):format("operationName", encodeURIComponent(operationName)))
+	if Boolean.toJSBoolean(data.operationName) then
+		addQueryParam("operationName", data.operationName) -- inferred equivalent call
 	end
 
-	if Boolean.toJSBoolean(p1.variables) then
-		local u16 = nil
-		local ok, result = pcall(function() -- line: 51
-			-- upvalues: u16 (ref), serializeFetchParameter (copy), p1 (copy)
-			u16 = serializeFetchParameter(p1.variables, "Variables map", true)
+	if Boolean.toJSBoolean(data.variables) then
+		local v2 = nil
+		local success, result = pcall(function()
+			v2 = serializeFetchParameter2(data.variables, "Variables map", true)
 		end)
 
-		if not ok then
-			return {
-				parseError = result
-			}
+		if not success then
+			return { parseError = result }
 		end
 
-		local v19 = u16
-
-		table.insert(t2, ("%s=%s"):format("variables", encodeURIComponent(v19)))
+		addQueryParam("variables", v2) -- inferred equivalent call
 	end
 
-	if Boolean.toJSBoolean(p1.extensions) then
-		local u20 = nil
-		local ok, result = pcall(function() -- line: 62
-			-- upvalues: u20 (ref), serializeFetchParameter (copy), p1 (copy)
-			u20 = serializeFetchParameter(p1.extensions, "Extensions map")
+	if Boolean.toJSBoolean(data.extensions) then
+		local v2 = nil
+		local success, result = pcall(function()
+			v2 = serializeFetchParameter2(data.extensions, "Extensions map")
 		end)
 
-		if not ok then
-			return {
-				parseError = result
-			}
+		if not success then
+			return { parseError = result }
 		end
 
-		local v23 = u20
-
-		table.insert(t2, ("%s=%s"):format("extensions", encodeURIComponent(v23)))
+		addQueryParam("extensions", v2) -- inferred equivalent call
 	end
 
-	local s4 = ""
-	local v25 = string.find(s1, "#")
+	local v2 = string.find(value, "#")
+	local v3
 
-	if v25 ~= nil then
-		s4 = string.sub(s1, v25)
-		s1 = string.sub(s1, 1, v25 - 1)
+	if v2 == nil then
+		v3 = ""
+	else
+		v3 = string.sub(value, v2)
+		value = string.sub(value, 1, v2 - 1)
 	end
 
 	return {
-		newURI = s1 .. (string.find(s1, "?") ~= nil and "&" or "?") .. Array.join(t2, "&") .. s4
+		newURI = value .. (string.find(value, "?") == nil and "?" or "&") .. Array.join(v, "&") .. v3
 	}
 end
 
-return t1
+return RewriteURIForGET

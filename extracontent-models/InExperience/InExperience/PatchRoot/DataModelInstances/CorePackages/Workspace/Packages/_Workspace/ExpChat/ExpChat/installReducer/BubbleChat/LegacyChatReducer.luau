@@ -1,42 +1,41 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Rodux = require(ExpChatParent.Rodux)
-local Dictionary = require(ExpChatParent.llama).Dictionary
+local parent = ExpChat.Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+
 local Actions = ExpChat.Actions
 local LegacyBubbleChatEnabledChanged = require(Actions.LegacyBubbleChatEnabledChanged)
 local LegacyBubbleChatSettingsChanged = require(Actions.LegacyBubbleChatSettingsChanged)
+
 local LegacyDefaultSettings = require(script.Parent.LegacyDefaultSettings)
 
 return Rodux.createReducer(LegacyDefaultSettings, {
-	[LegacyBubbleChatEnabledChanged.name] = function(p1, p2) -- line: 14
-		-- upvalues: Dictionary (copy)
-		return Dictionary.join(p1, {
-			Enabled = p2.value
-		})
+	[LegacyBubbleChatEnabledChanged.name] = function(p, p2)
+		return dictionary.join(p, { Enabled = p2.value })
 	end,
-	[LegacyBubbleChatSettingsChanged.name] = function(_, p4) -- line: 20
-		-- upvalues: Dictionary (copy), LegacyDefaultSettings (copy)
-		local chatSettings = p4.chatSettings
+	[LegacyBubbleChatSettingsChanged.name] = function(_, p)
+		local chatSettings = p.chatSettings
 
 		if chatSettings.Transparency then
 			chatSettings.BackgroundTransparency = chatSettings.Transparency
 		end
 
-		local v14 = Dictionary.join(LegacyDefaultSettings, chatSettings)
+		local joined = dictionary.join(LegacyDefaultSettings, chatSettings)
 
 		if chatSettings and chatSettings.UserSpecificSettings then
-			for k, v in pairs(chatSettings.UserSpecificSettings) do
-				local v17 = Dictionary.copyDeep(LegacyDefaultSettings)
+			for k, userSpecificSetting in pairs(chatSettings.UserSpecificSettings) do
+				local copyDeep = dictionary.copyDeep(LegacyDefaultSettings)
 
-				if v.Transparency then
-					v.BackgroundTransparency = v.Transparency
+				if userSpecificSetting.Transparency then
+					userSpecificSetting.BackgroundTransparency = userSpecificSetting.Transparency
 				end
 
-				v17.UserSpecificSettings = nil
-				v14.UserSpecificSettings[k] = Dictionary.join(v17, v)
+				copyDeep.UserSpecificSettings = nil
+				joined.UserSpecificSettings[k] = dictionary.join(copyDeep, userSpecificSetting)
 			end
 		end
 
-		return v14
+		return joined
 	end
 })

@@ -1,126 +1,211 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
+local parent = AppChat.Parent
+
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 local createBackFunc = require(script.Parent.createBackFunc)
-local Foundation = require(AppChatParent.Foundation)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local React = require(AppChatParent.React)
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
-local UIBlox = require(AppChatParent.UIBlox)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
-local AppNavBar = require(AppChatParent.AppNavBar)
+local AppNavBar = require(parent.AppNavBar)
 local VisibilityControl = AppNavBar.VisibilityControl
-local FFlagAppIaScrollAway = require(AppChatParent.SharedFlags).FFlagAppIaScrollAway
-local HeaderBar = UIBlox.App.Bar.HeaderBar
-local AppHeaderBar = require(AppChatParent.AppHeaderBar)
-local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
-local useSignalState = require(AppChatParent.SignalsReact).useSignalState
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppIaScrollAway = SharedFlags.FFlagAppIaScrollAway
 
-local function noOp() -- line: 34
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local AppHeaderBar = require(parent.AppHeaderBar)
+local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
+local SignalsReact = require(parent.SignalsReact)
+local ThemeBackground = require(parent.ThemeBackground)
+local FFlagAppThemeHalloween2026ChatBackground = require(AppChat.Flags.FFlagAppThemeHalloween2026ChatBackground)
+
+local useSignalState = SignalsReact.useSignalState
+
+local function noOp(): nil
 	return nil
 end
-local function ChatTopBarBase(t1: {[any]: any}) -- line: 50
-	-- upvalues: FFlagAppChatTopBarConfigDriven (copy), React (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), GetTopBarStore (copy), useSignalState (copy), FFlagAppIaScrollAway (copy), AppHeaderBar (copy), useLocalization (copy), useStyle (copy), useTokens (copy), noOp (copy), createBackFunc (copy), AppNavBar (copy), VisibilityControl (copy), Foundation (copy), HeaderBar (copy)
-	if not FFlagAppChatTopBarConfigDriven() then
-		return nil
-	end
 
-	React.useEffect(function() -- line: 55
-		-- upvalues: FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy)
+local function ChatTopBarBase(props)
+	React.useEffect(function()
 		if FFlagAppChatPerfTracking then
 			AppChatPerfTracker.finish(AppChatPerfTracker.Events.TopBarRenderInterval)
 		end
 	end, {})
 
-	local screenName = t1.screenName
-	local navigation = t1.navigation
-	local v25 = GetTopBarStore(false).getScreenTopBar(screenName)
-	local v26 = useSignalState(v25)
-	local v27 = if not FFlagAppIaScrollAway then nil else navigation.getScreenProps("isInExperience", false)
-	local v28 = navigation.getScreenProps("topBarHeight", 0)
-	local v29 = navigation.getScreenProps("navigateToRootStack", nil)
-	local v30 = v26.headerText or {}
-	local backButtonEnabled = v26.backButtonEnabled
-	local closeButtonEnabled = v26.closeButtonEnabled
-	local isRoot = v26.isRoot
-	local shouldBoldHeader = v26.shouldBoldHeader
-	local isTitleLeftAligned = v26.isTitleLeftAligned
-	local leftPaddingOverride = v26.leftPaddingOverride
-	local rightPaddingOverride = v26.rightPaddingOverride
-	local closeInputBar = v26.closeInputBar
-	local isSecondary = v26.isSecondary
+	local screenName = props.screenName
+	local navigation = props.navigation
+
+	local v = useSignalState((GetTopBarStore(false).getScreenTopBar(screenName)))
+	local v2
+
+	if FFlagAppIaScrollAway then
+		v2 = navigation.getScreenProps("isInExperience", false)
+	end
+
+	local screenProps = navigation.getScreenProps("topBarHeight", 0)
+	local screenProps2 = navigation.getScreenProps("navigateToRootStack", nil)
+
+	local headerText = v.headerText or {}
+	local backButtonEnabled = v.backButtonEnabled
+	local closeButtonEnabled = v.closeButtonEnabled
+	local isRoot = v.isRoot
+	local shouldBoldHeader = v.shouldBoldHeader
+	local isTitleLeftAligned = v.isTitleLeftAligned
+	local v3 = v.leftPaddingOverride
+	local rightPaddingOverride = v.rightPaddingOverride
+	local closeInputBar = v.closeInputBar
+	local isSecondary = v.isSecondary
+
 	local makeBackButton = AppHeaderBar.makeBackButton
 	local makeCloseButton = AppHeaderBar.makeCloseButton
-	local v42 = useLocalization({
-		headerText = v30.shouldLocalize and v30.raw or nil
-	})
-	local v43 = v30.shouldLocalize and v42.headerText or (v30.raw or "")
-	local v44 = useStyle()
-	local v45 = useTokens()
-	local v46 = if not t1.renderRight then noOp else t1.renderRight
-	local v47 = if not t1.renderCenter then nil else t1.renderCenter
+	local headerText3
 
-	if v47 then
-		v46 = nil
+	if headerText.shouldLocalize then
+		headerText3 = headerText.raw or nil
 	end
 
-	local v48
+	local v4 = useLocalization({ headerText = headerText3 })
 
-	if v47 then
-		v48 = nil
-	elseif t1.renderLeft then
-		v48 = t1.renderLeft
+	local headerText2 = headerText.shouldLocalize and v4.headerText or headerText.raw or ""
+
+	local v5 = useStyle()
+	local v6 = useTokens()
+	local renderRight
+
+	if props.renderRight then
+		renderRight = props.renderRight
 	else
-		local v49 = createBackFunc({
-			navigation = navigation,
-			navigateToRootStack = v29,
-			isRoot = isRoot,
-			closeInputBar = closeInputBar
-		})
-
-		v48 = if not backButtonEnabled then if not closeButtonEnabled then noOp else makeCloseButton(v49) else makeBackButton(v49)
+		renderRight = noOp
 	end
 
-	local v50 = not backButtonEnabled and (not closeButtonEnabled and v47 == nil)
+	local renderCenter
 
-	if shouldBoldHeader and v48 == noOp then
-		v48 = nil
+	if props.renderCenter then
+		renderCenter = props.renderCenter
 	end
 
-	local Medium = v45.Padding.Medium
-	local uDim = UDim.new(0, if leftPaddingOverride == nil then Medium else leftPaddingOverride)
-	local uDim2 = UDim.new(0, if rightPaddingOverride == nil then Medium else rightPaddingOverride)
-	local v54 = if not FFlagAppIaScrollAway or (v27 or not AppNavBar.getScrollAwayEnabled()) then nil else VisibilityControl.getHeaderBinding():map(function(n1: number) -- line: 137
-		-- upvalues: v28 (copy)
-		local v58 = (n1 - 1) * (v28 + 36)
+	if renderCenter then
+		renderRight = nil
+	end
 
-		return UDim2.new(0, 0, 0, v58)
-	end)
-	local v55 = if not v47 then if not t1.renderLeft and not v29 then not v50 and v48 or nil else v48 else nil
-	local v56 = if not v47 and not t1.hideTitle then v43 else nil
+	local renderLeft
 
-	return React.createElement(Foundation.View, {
+	if not renderCenter then
+		if props.renderLeft then
+			renderLeft = props.renderLeft
+		else
+			local backFunc = createBackFunc({
+				navigation = navigation,
+				navigateToRootStack = screenProps2,
+				isRoot = isRoot,
+				closeInputBar = closeInputBar
+			})
+
+			if backButtonEnabled then
+				renderLeft = makeBackButton(backFunc)
+			elseif closeButtonEnabled then
+				renderLeft = makeCloseButton(backFunc)
+			else
+				renderLeft = noOp
+			end
+		end
+	end
+
+	local v7 = not backButtonEnabled and not closeButtonEnabled and renderCenter == nil
+
+	if shouldBoldHeader and renderLeft == noOp then
+		renderLeft = nil
+	end
+
+	local v8 = v6.Padding.Medium
+
+	if v3 == nil then
+		v3 = v8
+	end
+
+	local udim = UDim.new(0, v3)
+
+	if rightPaddingOverride ~= nil then
+		v8 = rightPaddingOverride
+	end
+
+	local udim2 = UDim.new(0, v8)
+	local position
+
+	if FFlagAppIaScrollAway and not v2 and AppNavBar.getScrollAwayEnabled() then
+		position = VisibilityControl.getHeaderBinding():map(function(p: number)
+			local v9 = (p - 1) * (screenProps + 36)
+			return UDim2.new(0, 0, 0, v9)
+		end)
+	end
+
+	if renderCenter then
+		renderLeft = nil
+	elseif not (props.renderLeft or screenProps2) and (v7 or not renderLeft) then
+		renderLeft = nil
+	end
+
+	if renderCenter or props.hideTitle then
+		headerText2 = nil
+	end
+
+	local v9
+
+	if FFlagAppThemeHalloween2026ChatBackground then
+		v9 = ThemeBackground.useThemeBackground()
+	end
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v10 = {
 		tag = "size-full-0",
+		Size = UDim2.new(1, 0, 0, screenProps),
 		LayoutOrder = -1,
-		Size = UDim2.new(1, 0, 0, v28),
-		ZIndex = if not FFlagAppIaScrollAway then nil else 2,
-		Position = if not FFlagAppIaScrollAway then nil else v54
-	}, {
-		headerBar = React.createElement(HeaderBar, {
-			title = v56,
-			barHeight = v28,
-			renderLeft = v55,
-			isSecondary = isSecondary,
-			renderCenter = v47,
-			renderRight = v46,
-			paddingLeft = uDim,
-			paddingRight = uDim2,
-			isTitleCentered = not isTitleLeftAligned,
-			contentPaddingRight = UDim.new(0, 0),
-			backgroundTransparency = if not FFlagAppIaScrollAway or v27 then v44.Tokens.Color.None.Transparency else nil
-		})
+		ZIndex = FFlagAppIaScrollAway and 2 or nil,
+		Position = 0
+	}
+
+	if not FFlagAppIaScrollAway then
+		position = nil
+	end
+
+	v10.Position = position
+	local backgroundSlot
+
+	if v9 then
+		backgroundSlot = React.createElement(ThemeBackground.ThemeBackgroundHeaderSlot)
+	end
+
+	local createElement2 = React.createElement
+	local v11 = {
+		title = headerText2,
+		barHeight = screenProps,
+		renderLeft = renderLeft,
+		isSecondary = isSecondary,
+		renderCenter = renderCenter,
+		renderRight = renderRight,
+		paddingLeft = udim,
+		paddingRight = udim2,
+		isTitleCentered = not isTitleLeftAligned,
+		contentPaddingRight = UDim.new(0, 0),
+		backgroundTransparency = 0
+	}
+	local backgroundTransparency
+
+	if v9 then
+		backgroundTransparency = 1
+	elseif not (FFlagAppIaScrollAway and not v2) then
+		backgroundTransparency = v5.Tokens.Color.None.Transparency
+	end
+
+	v11.backgroundTransparency = backgroundTransparency
+	return createElement(view, v10, {
+		BackgroundSlot = backgroundSlot,
+		headerBar = createElement2(HeaderBar, v11)
 	})
 end
 

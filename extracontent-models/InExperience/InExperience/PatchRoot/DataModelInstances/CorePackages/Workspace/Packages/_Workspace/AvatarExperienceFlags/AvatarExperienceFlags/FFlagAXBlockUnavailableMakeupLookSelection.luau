@@ -1,0 +1,3 @@
+local FFlagAXPendingLookModerationStatus = require(script.Parent.FFlagAXPendingLookModerationStatus)
+
+return game:DefineFastFlag("AXBlockUnavailableMakeupLookSelection", false) and FFlagAXPendingLookModerationStatus

@@ -1,7 +1,7 @@
+local makeDefaultReadPolicy = require(script.Parent.utils.makeDefaultReadPolicy)
+
 return {
 	fields = {
-		contentMetadata = {
-			read = require(script.Parent.utils.makeDefaultReadPolicy)({})
-		}
+		contentMetadata = { read = makeDefaultReadPolicy({}) }
 	}
 }

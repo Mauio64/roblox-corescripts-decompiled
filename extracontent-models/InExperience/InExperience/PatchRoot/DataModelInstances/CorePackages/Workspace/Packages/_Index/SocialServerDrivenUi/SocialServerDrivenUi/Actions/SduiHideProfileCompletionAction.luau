@@ -1,47 +1,50 @@
-local Parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
-local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
+
+local SduiCoreSystem = require(parent.SduiCoreSystem)
 local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
 local SduiActionType = SduiCoreSystem.SduiActionType
-local createProfileCompletionPromptsConfig = require(Parent.ProfilePlatformCommon).Utils.createProfileCompletionPromptsConfig
-local ServerTriggeredModals = require(Parent.ServerTriggeredModals)
+
+local ProfilePlatformCommon = require(parent.ProfilePlatformCommon)
+local createProfileCompletionPromptsConfig = ProfilePlatformCommon.Utils.createProfileCompletionPromptsConfig
+
+local ServerTriggeredModals = require(parent.ServerTriggeredModals)
 local fetchPrompts = ServerTriggeredModals.fetchPrompts
 local reportPromptImpression = ServerTriggeredModals.reportPromptImpression
-local SetCurrentToastMessage = require(Parent.ToastRodux).Actions.SetCurrentToastMessage
 
-return function(p1, _, p3, _) -- line: 21
-	-- upvalues: SduiErrorType (copy), SduiActionType (copy), reportPromptImpression (copy), fetchPrompts (copy), createProfileCompletionPromptsConfig (copy), SetCurrentToastMessage (copy)
-	local v14 = p1 and p1.actionParams or nil
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
 
-	if v14 == nil then
-		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
-			message = "Missing actionParams",
-			name = SduiActionType.HideProfileCompletion
-		}, p3.appPage)
+return function(p, _, p2, _)
+	local actionParams = p and p.actionParams or nil
 
+	if actionParams == nil then
+		p2.dependencies.logger.reportError(
+			SduiErrorType.InvalidActionParams,
+			{ name = SduiActionType.HideProfileCompletion, message = "Missing actionParams" },
+			p2.appPage
+		)
 		return
 	end
 
-	local promptType = v14.promptType
+	local promptType = actionParams.promptType
 
 	if promptType == nil then
-		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
-			message = "Missing actionParam: promptType",
-			propName = "promptType",
-			name = SduiActionType.HideProfileCompletion
-		}, p3.appPage)
-
-		return
+		p2.dependencies.logger.reportError(
+			SduiErrorType.InvalidActionParams,
+			{
+				name = SduiActionType.HideProfileCompletion,
+				message = "Missing actionParam: promptType",
+				propName = "promptType"
+			},
+			p2.appPage
+		)
+	else
+		reportPromptImpression(promptType, actionParams.promptId):andThen(function()
+			fetchPrompts(createProfileCompletionPromptsConfig(), true)
+		end):catch(function()
+			p2.dependencies.dispatch(SetCurrentToastMessage({
+				toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong"
+			}))
+		end)
 	end
-
-	local promptId = v14.promptId
-
-	reportPromptImpression(promptType, promptId):andThen(function() -- line: 49
-		-- upvalues: fetchPrompts (copy), createProfileCompletionPromptsConfig (copy)
-		fetchPrompts(createProfileCompletionPromptsConfig(), true)
-	end):catch(function() -- line: 52
-		-- upvalues: p3 (copy), SetCurrentToastMessage (copy)
-		p3.dependencies.dispatch(SetCurrentToastMessage({
-			toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong"
-		}))
-	end)
 end

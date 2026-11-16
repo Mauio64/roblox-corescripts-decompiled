@@ -1,286 +1,264 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 58
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		id = if t3 ~= nil and t3.id ~= nil then t3.id else "",
-		name = if t3 ~= nil and t3.name ~= nil then t3.name else "",
-		description = if t3 ~= nil and t3.description ~= nil then t3.description else "",
-		image_asset_id = if t3 ~= nil and t3.image_asset_id ~= nil then t3.image_asset_id else 0,
-		price_display = if t3 ~= nil and t3.price_display ~= nil then t3.price_display else "",
-		period_type = if t3 ~= nil and t3.period_type ~= nil then t3.period_type else "",
-		is_subscribed = t3 ~= nil and (t3.is_subscribed ~= nil and t3.is_subscribed),
-		price_in_robux = if t3 ~= nil and t3.price_in_robux ~= nil then t3.price_in_robux else 0,
-		price_tier = if t3 ~= nil and t3.price_tier ~= nil then t3.price_tier else 0
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local v2 = {
+		id = (data == nil or data.id == nil) and "" or data.id,
+		name = (data == nil or data.name == nil) and "" or data.name,
+		description = (data == nil or data.description == nil) and "" or data.description,
+		image_asset_id = (data == nil or data.image_asset_id == nil) and 0 or data.image_asset_id,
+		price_display = (data == nil or data.price_display == nil) and "" or data.price_display,
+		period_type = (data == nil or data.period_type == nil) and "" or data.period_type,
+		is_subscribed = data ~= nil and data.is_subscribed ~= nil and data.is_subscribed,
+		price_in_robux = (data == nil or data.price_in_robux == nil) and 0 or data.price_in_robux,
+		price_tier = (data == nil or data.price_tier == nil) and 0 or data.price_tier
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 72
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.id ~= nil and p1.id ~= "" then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v9, v10, p1.id)
+	if data.id ~= nil and data.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.id)
 	end
 
-	if p1.name ~= nil and p1.name ~= "" then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.name)
+	if data.name ~= nil and data.name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.name)
 	end
 
-	if p1.description ~= nil and p1.description ~= "" then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v13, v14, p1.description)
+	if data.description ~= nil and data.description ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.description)
 	end
 
-	if p1.image_asset_id ~= nil and p1.image_asset_id ~= 0 then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v15, v16, p1.image_asset_id)
+	if data.image_asset_id ~= nil and data.image_asset_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.image_asset_id)
 	end
 
-	if p1.price_display ~= nil and p1.price_display ~= "" then
-		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v17, v18, p1.price_display)
+	if data.price_display ~= nil and data.price_display ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.price_display)
 	end
 
-	if p1.period_type ~= nil and p1.period_type ~= "" then
-		local v19, v20 = proto.writeTag(buf, n1, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v19, v20, p1.period_type)
+	if data.period_type ~= nil and data.period_type ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.period_type)
 	end
 
-	if p1.is_subscribed then
-		local v21, v22 = proto.writeTag(buf, n1, 7, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v21, v22, not p1.is_subscribed and 0 or 1)
+	if data.is_subscribed then
+		local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_subscribed and 1 or 0)
 	end
 
-	if p1.price_in_robux ~= nil and p1.price_in_robux ~= 0 then
-		local v23, v24 = proto.writeTag(buf, n1, 8, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v23, v24, p1.price_in_robux)
+	if data.price_in_robux ~= nil and data.price_in_robux ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.price_in_robux)
 	end
 
-	if p1.price_tier ~= nil and p1.price_tier ~= 0 then
-		local v25, v26 = proto.writeTag(buf, n1, 9, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v25, v26, p1.price_tier)
+	if data.price_tier ~= nil and data.price_tier ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.price_tier)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 126
-	-- upvalues: t2 (copy), proto (copy)
-	local v29 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v31, v32
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v31, v32, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v32 == proto.wireTypes.varint then
-			if v31 == 4 then
-				local v33
-
-				v33, n2 = proto.readVarIntI64(p2, n2)
-				v29.image_asset_id = v33
-			elseif v31 == 7 then
-				local v34
-
-				v34, n2 = proto.readVarInt(p2, n2)
-				v29.is_subscribed = v34 ~= 0
-			elseif v31 == 8 then
-				local v35
-
-				v35, n2 = proto.readVarIntI64(p2, n2)
-				v29.price_in_robux = v35
-			elseif v31 == 9 then
-				local v36
-
-				v36, n2 = proto.readVarIntI64(p2, n2)
-				v29.price_tier = v36
+		if v4 == proto.wireTypes.varint then
+			if v3 == 4 then
+				local image_asset_id
+				image_asset_id, v2 = proto.readVarIntI64(buf, v2)
+				result.image_asset_id = image_asset_id
+			elseif v3 == 7 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_subscribed = v5 ~= 0
+			elseif v3 == 8 then
+				local price_in_robux
+				price_in_robux, v2 = proto.readVarIntI64(buf, v2)
+				result.price_in_robux = price_in_robux
+			elseif v3 == 9 then
+				local price_tier
+				price_tier, v2 = proto.readVarIntI64(buf, v2)
+				result.price_tier = price_tier
 			else
-				local v37
-
-				v37, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v32 == proto.wireTypes.lengthDelimited then
-			if v31 == 1 then
-				local v38
-
-				v38, n2 = proto.readBuffer(p2, n2)
-				v29.id = buffer.tostring(v38)
-			elseif v31 == 2 then
-				local v39
-
-				v39, n2 = proto.readBuffer(p2, n2)
-				v29.name = buffer.tostring(v39)
-			elseif v31 == 3 then
-				local v40
-
-				v40, n2 = proto.readBuffer(p2, n2)
-				v29.description = buffer.tostring(v40)
-			elseif v31 == 5 then
-				local v41
-
-				v41, n2 = proto.readBuffer(p2, n2)
-				v29.price_display = buffer.tostring(v41)
-			elseif v31 == 6 then
-				local v42
-
-				v42, n2 = proto.readBuffer(p2, n2)
-				v29.period_type = buffer.tostring(v42)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.name = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.description = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.price_display = buffer.tostring(v5)
+			elseif v3 == 6 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.period_type = buffer.tostring(v5)
 			else
-				local v43, v44 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v44 + v43
+				v2 = v5 + varInt
 			end
-		elseif v32 == proto.wireTypes.i32 then
-			local v45
-
-			v45, n2 = proto.readFixed32(p2, n2)
-		elseif v32 == proto.wireTypes.i64 then
-			local v46
-
-			v46, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v32)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v29
-end
-function t2.jsonEncode(p3) -- line: 209
-	local t4 = {}
-
-	if p3.id ~= nil and p3.id ~= "" then
-		t4.id = p3.id
-	end
-
-	if p3.name ~= nil and p3.name ~= "" then
-		t4.name = p3.name
-	end
-
-	if p3.description ~= nil and p3.description ~= "" then
-		t4.description = p3.description
-	end
-
-	if p3.image_asset_id ~= nil and p3.image_asset_id ~= 0 then
-		t4.imageAssetId = p3.image_asset_id
-	end
-
-	if p3.price_display ~= nil and p3.price_display ~= "" then
-		t4.priceDisplay = p3.price_display
-	end
-
-	if p3.period_type ~= nil and p3.period_type ~= "" then
-		t4.periodType = p3.period_type
-	end
-
-	if p3.is_subscribed then
-		t4.isSubscribed = p3.is_subscribed
-	end
-
-	if p3.price_in_robux ~= nil and p3.price_in_robux ~= 0 then
-		t4.priceInRobux = p3.price_in_robux
-	end
-
-	if p3.price_tier ~= nil and p3.price_tier ~= 0 then
-		t4.priceTier = p3.price_tier
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 251
-	-- upvalues: t2 (copy)
-	local v50 = t2.new()
-
-	if t5.id ~= nil then
-		v50.id = t5.id
-	end
-
-	if t5.name ~= nil then
-		v50.name = t5.name
-	end
-
-	if t5.description ~= nil then
-		v50.description = t5.description
-	end
-
-	if t5.image_asset_id ~= nil then
-		v50.image_asset_id = t5.image_asset_id
-	end
-
-	if t5.imageAssetId ~= nil then
-		v50.image_asset_id = t5.imageAssetId
-	end
-
-	if t5.price_display ~= nil then
-		v50.price_display = t5.price_display
-	end
-
-	if t5.priceDisplay ~= nil then
-		v50.price_display = t5.priceDisplay
-	end
-
-	if t5.period_type ~= nil then
-		v50.period_type = t5.period_type
-	end
-
-	if t5.periodType ~= nil then
-		v50.period_type = t5.periodType
-	end
-
-	if t5.is_subscribed ~= nil then
-		v50.is_subscribed = t5.is_subscribed
-	end
-
-	if t5.isSubscribed ~= nil then
-		v50.is_subscribed = t5.isSubscribed
-	end
-
-	if t5.price_in_robux ~= nil then
-		v50.price_in_robux = t5.price_in_robux
-	end
-
-	if t5.priceInRobux ~= nil then
-		v50.price_in_robux = t5.priceInRobux
-	end
-
-	if t5.price_tier ~= nil then
-		v50.price_tier = t5.price_tier
-	end
-
-	if t5.priceTier ~= nil then
-		v50.price_tier = t5.priceTier
-	end
-
-	return v50
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.id ~= nil and data.id ~= "" then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil and data.name ~= "" then
+		v2.name = data.name
+	end
+
+	if data.description ~= nil and data.description ~= "" then
+		v2.description = data.description
+	end
+
+	if data.image_asset_id ~= nil and data.image_asset_id ~= 0 then
+		v2.imageAssetId = data.image_asset_id
+	end
+
+	if data.price_display ~= nil and data.price_display ~= "" then
+		v2.priceDisplay = data.price_display
+	end
+
+	if data.period_type ~= nil and data.period_type ~= "" then
+		v2.periodType = data.period_type
+	end
+
+	if data.is_subscribed then
+		v2.isSubscribed = data.is_subscribed
+	end
+
+	if data.price_in_robux ~= nil and data.price_in_robux ~= 0 then
+		v2.priceInRobux = data.price_in_robux
+	end
+
+	if data.price_tier ~= nil and data.price_tier ~= 0 then
+		v2.priceTier = data.price_tier
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil then
+		v2.name = data.name
+	end
+
+	if data.description ~= nil then
+		v2.description = data.description
+	end
+
+	if data.image_asset_id ~= nil then
+		v2.image_asset_id = data.image_asset_id
+	end
+
+	if data.imageAssetId ~= nil then
+		v2.image_asset_id = data.imageAssetId
+	end
+
+	if data.price_display ~= nil then
+		v2.price_display = data.price_display
+	end
+
+	if data.priceDisplay ~= nil then
+		v2.price_display = data.priceDisplay
+	end
+
+	if data.period_type ~= nil then
+		v2.period_type = data.period_type
+	end
+
+	if data.periodType ~= nil then
+		v2.period_type = data.periodType
+	end
+
+	if data.is_subscribed ~= nil then
+		v2.is_subscribed = data.is_subscribed
+	end
+
+	if data.isSubscribed ~= nil then
+		v2.is_subscribed = data.isSubscribed
+	end
+
+	if data.price_in_robux ~= nil then
+		v2.price_in_robux = data.price_in_robux
+	end
+
+	if data.priceInRobux ~= nil then
+		v2.price_in_robux = data.priceInRobux
+	end
+
+	if data.price_tier ~= nil then
+		v2.price_tier = data.price_tier
+	end
+
+	if data.priceTier ~= nil then
+		v2.price_tier = data.priceTier
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "GameSubscriptionData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.GameSubscriptionData"
 }
-t1.GameSubscriptionData = t2
-typeRegistry.default:register(t1.GameSubscriptionData)
 
-return {
-	GameSubscriptionData = t1.GameSubscriptionData
-}
+v.GameSubscriptionData = class
+
+typeRegistry.default:register(v.GameSubscriptionData)
+
+return { GameSubscriptionData = v.GameSubscriptionData }

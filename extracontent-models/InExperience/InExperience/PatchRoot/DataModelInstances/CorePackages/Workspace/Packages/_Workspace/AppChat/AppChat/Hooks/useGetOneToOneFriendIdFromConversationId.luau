@@ -1,31 +1,19 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
+local parent = AppChat.Parent
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 local useGetConversationFromId = require(AppChat.Hooks.useGetConversationFromId)
 local getOtherParticipants = require(AppChat.Conversations.getOtherParticipants)
 
-return function(s1: string?) -- line: 8
-	-- upvalues: useLocalUserId (copy), useGetConversationFromId (copy), getOtherParticipants (copy)
-	local v7 = useLocalUserId()
-	local v8 = useGetConversationFromId(s1)
+return function(p: string?)
+	local v = useLocalUserId()
+	local v2 = useGetConversationFromId(p)
 
-	if not s1 or not v7 then
+	if not (p and v and v2 and v2.type == "one_to_one") then
 		return nil
 	end
 
-	if not v8 then
-		return nil
-	end
-
-	if v8.type ~= "one_to_one" then
-		return nil
-	end
-
-	local v9 = getOtherParticipants(v8, v7)
-
-	if #v9 ~= 1 then
-		return nil
-	end
-
-	return v9[1]
+	local otherParticipants = getOtherParticipants(v2, v)
+	return if #otherParticipants == 1 then otherParticipants[1] else nil
 end

@@ -1,53 +1,46 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local UserListPeekView = require(script.Parent.UserListPeekView)
-local AppFormFactor = require(UserList.Common.Enums).AppFormFactor
-local View = require(UserListParent.Foundation).View
-local useListFormFactor = require(UserList.Hooks.useListFormFactor)
+local parent = UserList.Parent
 
+local React = require(parent.React)
+local UserListPeekView = require(script.Parent.UserListPeekView)
+local Enums = require(UserList.Common.Enums)
+local AppFormFactor = Enums.AppFormFactor
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local useListFormFactor = require(UserList.Hooks.useListFormFactor)
 require(UserList.Common.Types)
 
-local t1 = {
+local v = {
 	position = UDim2.fromScale(0, 0),
 	size = UDim2.fromScale(1, 1),
 	anchorPoint = Vector2.new(0, 0)
 }
 
-local function UserListViewAdaptor(t2: {[any]: any}) -- line: 28
-	-- upvalues: useListFormFactor (copy), AppFormFactor (copy), React (copy), t1 (copy), View (copy), UserListPeekView (copy)
-	local v11 = useListFormFactor()
-	local v12 = v11.formFactor == AppFormFactor.Compact
-	local v13 = not v12 and t2.wideModePeekViewLayout ~= nil
-	local v14 = React.useMemo(function() -- line: 32
-		-- upvalues: v13 (copy), t2 (copy), t1 (copy)
-		if v13 then
-			return t2.wideModePeekViewLayout
-		end
+local function UserListViewAdaptor(props)
+	local v2 = useListFormFactor()
+	local v3 = v2.formFactor == AppFormFactor.Compact
+	local v4 = not v3 and props.wideModePeekViewLayout ~= nil
+	local v5 = React.useMemo(function()
+		return if v4 then props.wideModePeekViewLayout else v
+	end, { v2.formFactor, props.wideModePeekViewLayout })
 
-		return t1
-	end, {
-		v11.formFactor,
-		t2.wideModePeekViewLayout
-	})
-
-	if not v12 and not v13 then
-		return nil
+	if v3 or v4 then
+		return React.createElement(View, {
+			Size = v5.size,
+			Position = v5.position,
+			AnchorPoint = v5.anchorPoint
+		}, {
+			UserListPeekView = React.createElement(UserListPeekView, {
+				users = props.users,
+				title = props.title,
+				onLoadMore = props.onLoadMore,
+				onUserSelected = props.onUserSelected,
+				hasMore = props.hasMore
+			})
+		})
 	end
 
-	return React.createElement(View, {
-		Size = v14.size,
-		Position = v14.position,
-		AnchorPoint = v14.anchorPoint
-	}, {
-		UserListPeekView = React.createElement(UserListPeekView, {
-			users = t2.users,
-			title = t2.title,
-			onLoadMore = t2.onLoadMore,
-			onUserSelected = t2.onUserSelected,
-			hasMore = t2.hasMore
-		})
-	})
+	return nil
 end
 
 return UserListViewAdaptor

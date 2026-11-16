@@ -1,275 +1,248 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local Signals = require(MomentsCreationParent.Signals)
+local parent = MomentsCreation.Parent
+
+local Signals = require(parent.Signals)
 
 require(MomentsCreation.Types.CreationFlowTypes)
 
 local createSignal = Signals.createSignal
 
-local function createCapturePreviewController(t1: {[any]: any}, p1, p2) -- line: 63
-	-- upvalues: createSignal (copy)
-	local v9, v10 = createSignal(0)
-	local v11, v12 = createSignal(0)
-	local v13, v14 = createSignal(0)
-	local v15, v16 = createSignal(true)
-	local v17, v18 = createSignal(false)
-	local v19, v20 = createSignal("Loading")
-	local v21, v22 = createSignal(nil)
-	local u23 = nil
+local function createCapturePreviewController(p, callback, callback2)
+	local signal, setPosition = createSignal(0)
+	local signal2, setDuration = createSignal(0)
+	local signal3, setTimeLength = createSignal(0)
+	local signal4, setIsPlaying = createSignal(true)
+	local signal5, v = createSignal(false)
+	local signal6, setReadiness = createSignal("Loading")
 
-	local function play() -- line: 168
-		-- upvalues: v21 (copy), v15 (copy), v16 (copy), u23 (ref)
-		local v43 = v21(false)
+	local signal7, setMediaController = createSignal(nil)
 
-		if v43 ~= nil then
-			if not v43.getState(false).isPlaying then
-				v43.play()
+	local v2 = nil
+
+	local function bindEngine(p2)
+		v2 = p2
+
+		if p2 ~= nil then
+			if signal4(false) then
+				p2.play()
+			else
+				p2.pause()
+			end
+		end
+	end
+
+	local function play()
+		local v3 = signal7(false)
+
+		if v3 == nil then
+			if signal4(false) then
+				return
 			end
 
+			setIsPlaying(true)
+
+			if v2 ~= nil then
+				v2.play()
+			end
+		elseif not v3.getState(false).isPlaying then
+			v3.play()
+		end
+	end
+
+	local function pause() -- 1 equivalent call inferred from this helper
+		local v3 = signal7(false)
+
+		if v3 ~= nil then
+			v3.pause()
 			return
 		end
 
-		if v15(false) then
+		if not signal4(false) then
 			return
 		end
 
-		v16(true)
+		setIsPlaying(false)
 
-		if u23 ~= nil then
-			u23.play()
+		if v2 ~= nil then
+			v2.pause()
+		end
+	end
+
+	local function toggle()
+		local v3 = signal7(false)
+
+		if v3 ~= nil then
+			v3.toggle()
+		elseif signal4(false) then
+			pause() -- inferred equivalent call
+		else
+			play()
+		end
+	end
+
+	local function setMuted(flag: boolean) -- 1 equivalent call inferred from this helper
+		local v3 = signal7(false)
+
+		if v3 ~= nil then
+			v3.audio.setMasterMuted(flag)
+			return
+		end
+
+		v(flag)
+
+		if v2 ~= nil and v2.setMuted ~= nil then
+			v2.setMuted(flag)
+		end
+	end
+
+	local function toggleMute()
+		local v3 = signal7(false)
+		local v4
+
+		if v3 == nil then
+			v4 = signal5(false)
+		else
+			v4 = v3.getState(false).isMuted
+		end
+
+		setMuted(not v4) -- inferred equivalent call
+	end
+
+	local function seek(p2: number)
+		local v3 = signal7(false)
+
+		if v3 ~= nil then
+			v3.seek(p2)
+			return
+		end
+
+		local v4
+
+		if callback ~= nil then
+			v4 = callback(false)
+		end
+
+		local v5 = p2 + (v4 == nil and 0 or v4.startTime)
+		setPosition(v5)
+
+		if v2 ~= nil then
+			v2.seek(v5)
 		end
 	end
 
 	return {
-		getCapture = t1.getSelectedCapture,
-		getReadiness = function(p3) -- line: 160
-			-- upvalues: v21 (copy), v19 (copy)
-			local v42 = v21(p3)
+		getCapture = p.getSelectedCapture,
+		getReadiness = function(p2)
+			local v3 = signal7(p2)
 
-			if v42 ~= nil then
-				return v42.getState(p3).readiness
+			if v3 == nil then
+				return signal6(p2)
 			end
 
-			return v19(p3)
+			return v3.getState(p2).readiness
 		end,
 		playback = {
-			getPosition = function(p4) -- line: 131
-				-- upvalues: v21 (copy), p1 (copy), v9 (copy)
-				local v34 = v21(p4)
+			getPosition = function(p2)
+				local v3 = signal7(p2)
 
-				if v34 ~= nil then
-					return v34.getPosition(p4)
+				if v3 ~= nil then
+					return v3.getPosition(p2)
 				end
 
-				local v35 = if p1 == nil then nil else p1(p4)
+				local v4
 
-				if v35 ~= nil then
-					local v36 = math.max(0, v35.endTime - v35.startTime)
-
-					return (math.clamp(v9(p4) - v35.startTime, 0, v36))
+				if callback ~= nil then
+					v4 = callback(p2)
 				end
 
-				return v9(p4)
+				if v4 == nil then
+					return signal(p2)
+				end
+
+				local v5 = math.max(0, v4.endTime - v4.startTime)
+				return (math.clamp(signal(p2) - v4.startTime, 0, v5))
 			end,
-			getDuration = function(p5) -- line: 108
-				-- upvalues: v21 (copy), p1 (copy), v11 (copy)
-				local v29 = v21(p5)
+			getDuration = function(p2)
+				local v3 = signal7(p2)
 
-				if v29 ~= nil then
-					return v29.getState(p5).duration
+				if v3 ~= nil then
+					return v3.getState(p2).duration
 				end
 
-				local v30 = if p1 == nil then nil else p1(p5)
+				local v4
 
-				if v30 ~= nil then
-					return (math.max(0, v30.endTime - v30.startTime))
+				if callback ~= nil then
+					v4 = callback(p2)
 				end
 
-				return v11(p5)
+				if v4 == nil then
+					return signal2(p2)
+				end
+
+				return (math.max(0, v4.endTime - v4.startTime))
 			end,
-			getTimeLength = function(p6) -- line: 121
-				-- upvalues: v21 (copy), v13 (copy)
-				local v32 = v21(p6)
+			getTimeLength = function(p2)
+				local v3 = signal7(p2)
 
-				if v32 ~= nil then
-					return v32.getState(p6).timeLength
+				if v3 == nil then
+					return signal3(p2)
 				end
 
-				return v13(p6)
+				return v3.getState(p2).timeLength
 			end,
-			getRegion = function(p7) -- line: 97
-				-- upvalues: p1 (copy)
-				if p1 ~= nil then
-					return (p1(p7))
+			getRegion = function(p2)
+				if callback == nil then
+					return nil
 				end
 
-				return nil
+				return (callback(p2))
 			end,
-			getMusic = function(p8) -- line: 102
-				-- upvalues: p2 (copy)
-				if p2 ~= nil then
-					return (p2(p8))
+			getMusic = function(p2)
+				if callback2 == nil then
+					return nil
 				end
 
-				return nil
+				return (callback2(p2))
 			end,
-			getIsPlaying = function(p9) -- line: 144
-				-- upvalues: v21 (copy), v15 (copy)
-				local v38 = v21(p9)
+			getIsPlaying = function(p2)
+				local v3 = signal7(p2)
 
-				if v38 ~= nil then
-					return v38.getState(p9).isPlaying
+				if v3 == nil then
+					return signal4(p2)
 				end
 
-				return v15(p9)
+				return v3.getState(p2).isPlaying
 			end,
-			getIsMuted = function(p10) -- line: 152
-				-- upvalues: v21 (copy), v17 (copy)
-				local v40 = v21(p10)
+			getIsMuted = function(p2)
+				local v3 = signal7(p2)
 
-				if v40 ~= nil then
-					return v40.getState(p10).isMuted
+				if v3 == nil then
+					return signal5(p2)
 				end
 
-				return v17(p10)
+				return v3.getState(p2).isMuted
 			end,
 			play = play,
-			pause = function() -- line: 187
-				-- upvalues: v21 (copy), v15 (copy), v16 (copy), u23 (ref)
-				local v44 = v21(false)
-
-				if v44 ~= nil then
-					v44.pause()
-
-					return
-				end
-
-				if not v15(false) then
-					return
-				end
-
-				v16(false)
-
-				if u23 ~= nil then
-					u23.pause()
-				end
-			end,
-			toggle = function() -- line: 202
-				-- upvalues: v21 (copy), v15 (copy), v16 (copy), u23 (ref), play (copy)
-				local v45 = v21(false)
-
-				if v45 ~= nil then
-					v45.toggle()
-
-					return
-				end
-
-				if v15(false) then
-					local v46 = v21(false)
-
-					if v46 ~= nil then
-						v46.pause()
-
-						return
-					end
-
-					if not v15(false) then
-						return
-					end
-
-					v16(false)
-
-					if u23 ~= nil then
-						u23.pause()
-
-						return
-					end
-				else
-					play()
-				end
-			end,
-			seek = function(n1: number) -- line: 231
-				-- upvalues: v21 (copy), p1 (copy), v10 (copy), u23 (ref)
-				local v53 = v21(false)
-
-				if v53 ~= nil then
-					v53.seek(n1)
-
-					return
-				end
-
-				local v54 = if p1 == nil then nil else p1(false)
-				local v55 = n1 + (v54 == nil and 0 or v54.startTime)
-
-				v10(v55)
-
-				if u23 ~= nil then
-					u23.seek(v55)
-				end
-			end,
-			setMuted = function(b1: boolean) -- line: 215
-				-- upvalues: v21 (copy), v18 (copy), u23 (ref)
-				local v48 = v21(false)
-
-				if v48 ~= nil then
-					v48.audio.setMasterMuted(b1)
-
-					return
-				end
-
-				v18(b1)
-
-				if u23 ~= nil and u23.setMuted ~= nil then
-					u23.setMuted(b1)
-				end
-			end,
-			toggleMute = function() -- line: 227
-				-- upvalues: v21 (copy), v17 (copy), v18 (copy), u23 (ref)
-				local v49 = v21(false)
-				local v50 = not if v49 == nil then v17(false) else v49.getState(false).isMuted
-				local v51 = v21(false)
-
-				if v51 ~= nil then
-					v51.audio.setMasterMuted(v50)
-
-					return
-				end
-
-				v18(v50)
-
-				if u23 ~= nil and u23.setMuted ~= nil then
-					u23.setMuted(v50)
-				end
-			end
+			pause = pause,
+			toggle = toggle,
+			seek = seek,
+			setMuted = setMuted,
+			toggleMute = toggleMute
 		},
-		setMediaController = v22,
-		setRegion = function(t2: {[any]: any}?) -- line: 252
-			-- upvalues: v21 (copy)
-			local v57 = v21(false)
+		setMediaController = setMediaController,
+		setRegion = function(p2)
+			local v3 = signal7(false)
 
-			if v57 ~= nil then
-				v57.setRegion(t2)
+			if v3 ~= nil then
+				v3.setRegion(p2)
 			end
 		end,
-		bindEngine = function(t3: {[any]: any}?) -- line: 85
-			-- upvalues: u23 (ref), v15 (copy)
-			u23 = t3
-
-			if t3 ~= nil then
-				if v15(false) then
-					t3.play()
-
-					return
-				end
-
-				t3.pause()
-			end
-		end,
-		setPosition = v10,
-		setDuration = v12,
-		setTimeLength = v14,
-		setIsPlaying = v16,
-		setReadiness = v20
+		bindEngine = bindEngine,
+		setPosition = setPosition,
+		setDuration = setDuration,
+		setTimeLength = setTimeLength,
+		setIsPlaying = setIsPlaying,
+		setReadiness = setReadiness
 	}
 end
 

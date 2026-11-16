@@ -1,32 +1,28 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Types = ParentParent.Types
-local Rodux = require(ParentParentParent.Rodux)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local types = parent.Types
+local Rodux = require(parent2.Rodux)
+require(types.ReducerTypes)
+require(types.ActionTypes)
+local Actions = require(parent.Actions)
+local DeviceContactsReceived = Actions.DeviceContactsReceived
+local Dash = require(parent2.Dash)
+local DeviceContact = require(parent.Models.DeviceContact)
 
-require(Types.ReducerTypes)
-require(Types.ActionTypes)
+local v = {}
 
-local DeviceContactsReceived = require(ParentParent.Actions).DeviceContactsReceived
-local Dash = require(ParentParentParent.Dash)
-local DeviceContact = require(ParentParent.Models.DeviceContact)
-local t1 = {}
+return function(_)
+	return Rodux.createReducer(v, {
+		[DeviceContactsReceived.name] = function(_, p)
+			local payload = p.payload
+			local formatFromDevicesById = {}
+			Dash.forEach(payload, function(p2)
+				local formatFromDevice = DeviceContact.formatFromDevice(p2)
 
-return function(_) -- line: 14
-	-- upvalues: Rodux (copy), t1 (copy), DeviceContactsReceived (copy), Dash (copy), DeviceContact (copy)
-	return Rodux.createReducer(t1, {
-		[DeviceContactsReceived.name] = function(_, p3) -- line: 16
-			-- upvalues: Dash (copy), DeviceContact (copy)
-			local payload = p3.payload
-			local t2 = {}
-
-			Dash.forEach(payload, function(p4) -- line: 22
-				-- upvalues: DeviceContact (copy), t2 (copy)
-				local v15 = DeviceContact.formatFromDevice(p4)
-
-				t2[v15.id] = v15
+				formatFromDevicesById[formatFromDevice.id] = formatFromDevice
 			end)
 
-			return t2
+			return formatFromDevicesById
 		end
 	})
 end

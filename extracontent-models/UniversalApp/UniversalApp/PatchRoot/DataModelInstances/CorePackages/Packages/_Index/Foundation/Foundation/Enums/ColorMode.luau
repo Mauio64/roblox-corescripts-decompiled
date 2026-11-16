@@ -1,4 +1,1 @@
-return {
-	Dark = "Dark",
-	Light = "Light"
-}
+return { Dark = "Dark", Light = "Light" }

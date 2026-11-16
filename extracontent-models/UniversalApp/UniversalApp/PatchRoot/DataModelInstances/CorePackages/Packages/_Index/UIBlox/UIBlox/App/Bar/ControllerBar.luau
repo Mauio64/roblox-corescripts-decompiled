@@ -1,129 +1,139 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local Cryo = require(ParentParentParentParent.Cryo)
-local withStyle = require(ParentParentParent.Core.Style.withStyle)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local Cryo = require(parent3.Cryo)
+
+local withStyle = require(parent2.Core.Style.withStyle)
+
 local ControllerBarHint = require(script.Parent.ControllerBarHint)
-local GetTextSize = require(ParentParentParent.Core.Text.GetTextSize)
-local ControllerBarHintInternalPadding = require(script.Parent.BarConstants).ControllerBarHintInternalPadding
-local DefaultKeyLabelSize = require(ParentParent.Menu.MenuConstants).DefaultKeyLabelSize
-local v12 = Roact.PureComponent:extend("ControllerBar")
-local v13 = t.strictInterface({
-	keyCode = t.enum(Enum.KeyCode),
-	text = t.string
+
+local GetTextSize = require(parent2.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent2.Core.Text.GetFontFromFontStyle)
+
+local BarConstants = require(script.Parent.BarConstants)
+local ControllerBarHintInternalPadding = BarConstants.ControllerBarHintInternalPadding
+local MenuConstants = require(parent.Menu.MenuConstants)
+local DefaultKeyLabelSize = MenuConstants.DefaultKeyLabelSize
+
+local extended = Roact.PureComponent:extend("ControllerBar")
+
+local strictInterface = t.strictInterface({ keyCode = t.enum(Enum.KeyCode), text = t.string })
+
+extended.validateProps = t.strictInterface({
+	leftHint = strictInterface,
+	rightHints = t.optional(t.map(t.number, strictInterface))
 })
 
-v12.validateProps = t.strictInterface({
-	leftHint = v13,
-	rightHints = t.optional(t.map(t.number, v13))
-})
-
-function v12.init(p1) -- line: 46
-	p1.state = {
+function extended:init()
+	self.state = {
 		controllerBarWidth = 0,
 		hintStringsConcat = nil,
 		requiredSpace = nil,
 		hintRatios = nil
 	}
 end
-function v12.calculateHintRatios(p2, p3) -- line: 56
-	-- upvalues: Cryo (copy), GetTextSize (copy), DefaultKeyLabelSize (copy), ControllerBarHintInternalPadding (copy)
-	local n1 = 84
-	local s1 = ""
-	local t1 = {}
-	local n2 = 0
-	local v21 = Cryo.List.join({ p2 }, p3 or {})
 
-	for _, v in ipairs(v21) do
-		t1[v.text] = GetTextSize(v.text, 17, Enum.Font.ArialBold, Vector2.new(10000, 10000)).X
-		n2 += t1[v.text]
-		n1 = n1 + DefaultKeyLabelSize + ControllerBarHintInternalPadding
-		s1 ..= v.text
+function extended.calculateHintRatios(p, options)
+	local joined = Cryo.List.join({ p }, options or {})
+	local result = {}
+	local total = 0
+	local v = 84
+	local v2 = ""
+
+	for _, v3 in ipairs(joined) do
+		result[v3.text] = GetTextSize(v3.text, 17, Enum.Font.ArialBold, Vector2.new(10000, 10000)).X
+
+		total += result[v3.text]
+
+		v = v + DefaultKeyLabelSize + ControllerBarHintInternalPadding
+
+		v2 ..= v3.text
 	end
 
-	for k, v in pairs(t1) do
-		t1[k] = v / n2
+	for k, v3 in pairs(result) do
+		result[k] = v3 / total
 	end
 
-	return t1, n1 + math.max(#v21 - 2, 0) * 40, s1
+	return result, v + math.max(#joined - 2, 0) * 40, v2
 end
-function v12.getDerivedStateFromProps(p4) -- line: 92
-	-- upvalues: v12 (copy)
-	local v27, v28, v29 = v12.calculateHintRatios(p4.leftHint, p4.rightHints)
+
+function extended.getDerivedStateFromProps(p)
+	local hintRatios, requiredSpace, hintStringsConcat = extended.calculateHintRatios(p.leftHint, p.rightHints)
 
 	return {
-		hintRatios = v27,
-		requiredSpace = v28,
-		hintStringsConcat = v29
+		hintRatios = hintRatios,
+		requiredSpace = requiredSpace,
+		hintStringsConcat = hintStringsConcat
 	}
 end
-function v12.calculateHintSize(p5, p6, p7) -- line: 103
-	-- upvalues: GetTextSize (copy)
-	local v33 = p6 - p5.state.requiredSpace
-	local v34 = p7.Header2.RelativeSize * p7.BaseSize
-	local v35 = p7.Header2.RelativeMinSize * p7.BaseSize
-	local X = GetTextSize(p5.state.hintStringsConcat, v35, p7.Header2.Font, Vector2.new(10000, 10000)).X
 
-	if X <= v33 then
-		local X2 = GetTextSize(p5.state.hintStringsConcat, v34, p7.Header2.Font, Vector2.new(10000, 10000)).X
-		local v38 = (v34 - v35) / (X2 - X)
-		local v39 = v34 - v38 * X2
+function extended:calculateHintSize(p, p2)
+	local v = p - self.state.requiredSpace
 
-		return nil, (math.clamp(v33 * v38 + v39, v35, v34))
-	end
+	local v2 = p2.Header2.RelativeSize * p2.BaseSize
+	local v3 = p2.Header2.RelativeMinSize * p2.BaseSize
 
-	local t2 = {}
+	local x = GetTextSize(self.state.hintStringsConcat, v3, GetFontFromFontStyle(p2.Header2), Vector2.new(10000, 10000)).X
 
-	for k, v in pairs(p5.state.hintRatios) do
-		t2[k] = v * v33
-	end
+	if x <= v then
+		local x2 = GetTextSize(
+			self.state.hintStringsConcat,
+			v2,
+			GetFontFromFontStyle(p2.Header2),
+			Vector2.new(10000, 10000)
+		).X
+		local v4 = (v2 - v3) / (x2 - x)
+		local v5 = v2 - v4 * x2
 
-	return t2
-end
-function v12.render(p8) -- line: 142
-	-- upvalues: withStyle (copy), Cryo (copy), Roact (copy), ControllerBarHint (copy)
-	return withStyle(function(p9) -- line: 143
-		-- upvalues: p8 (copy), Cryo (copy), Roact (copy), ControllerBarHint (copy)
-		local Theme = p9.Theme
-		local v46, v47 = p8:calculateHintSize(p8.state.controllerBarWidth, p9.Font)
+		return nil, (math.clamp(v * v4 + v5, v3, v2))
+	else
+		local result = {}
 
-		local function makeHint(p10, p11) -- line: 148
-			-- upvalues: Cryo (copy), v47 (copy), v46 (copy), Roact (copy), ControllerBarHint (copy)
-			local v52 = Cryo.Dictionary.join(p10, {
-				key = "Hint" .. tostring(p11),
-				hintTextSize = v47,
-				maxWidth = v46 and v46[p10.text] or nil
-			})
-
-			return Roact.createElement(ControllerBarHint, v52)
+		for k, hintRatio in pairs(self.state.hintRatios) do
+			result[k] = hintRatio * v
 		end
 
-		local v49 = nil
+		return result
+	end
+end
 
-		if p8.props.rightHints then
-			v49 = Roact.createFragment(Cryo.List.map(p8.props.rightHints, makeHint))
+function extended:render()
+	return withStyle(function(p)
+		local theme = p.Theme
+
+		local hintSize, hintTextSize = self:calculateHintSize(self.state.controllerBarWidth, p.Font)
+
+		local function makeHint(leftHint, p2)
+			local joined = Cryo.Dictionary.join(leftHint, {
+				key = "Hint" .. tostring(p2),
+				hintTextSize = hintTextSize,
+				maxWidth = hintSize and hintSize[leftHint.text] or nil
+			})
+
+			return Roact.createElement(ControllerBarHint, joined)
+		end
+
+		local rightHints
+
+		if self.props.rightHints then
+			rightHints = Roact.createFragment(Cryo.List.map(self.props.rightHints, makeHint))
 		end
 
 		return Roact.createElement("Frame", {
 			BorderSizePixel = 0,
-			BackgroundTransparency = Theme.BackgroundUIContrast.Transparency,
-			BackgroundColor3 = Theme.BackgroundUIContrast.Color,
+			BackgroundTransparency = theme.BackgroundUIContrast.Transparency,
+			BackgroundColor3 = theme.BackgroundUIContrast.Color,
 			Size = UDim2.new(1, 0, 0, 72),
 			Position = UDim2.fromScale(0, 1),
 			AnchorPoint = Vector2.new(0, 1),
-			[Roact.Change.AbsoluteSize] = function(p12) -- line: 171
-				-- upvalues: p8 (copy)
-				p8:setState({
-					controllerBarWidth = p12.AbsoluteSize.X
-				})
+			[Roact.Change.AbsoluteSize] = function(p2)
+				self:setState({ controllerBarWidth = p2.AbsoluteSize.X })
 			end,
-			[Roact.Event.AncestryChanged] = function(p13) -- line: 176
-				-- upvalues: p8 (copy)
-				p8:setState({
-					controllerBarWidth = p13.AbsoluteSize.X
-				})
+			[Roact.Event.AncestryChanged] = function(p2)
+				self:setState({ controllerBarWidth = p2.AbsoluteSize.X })
 			end
 		}, {
 			Padding = Roact.createElement("UIPadding", {
@@ -142,25 +152,29 @@ function v12.render(p8) -- line: 142
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					Padding = UDim.new(0, 40)
 				}),
-				makeHint(p8.props.leftHint, "Left")
+				makeHint(self.props.leftHint, "Left")
 			}),
-			RightFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(0.5, 1),
-				Position = UDim2.fromScale(1, 0),
-				AnchorPoint = Vector2.new(1, 0)
-			}, {
-				Layout = Roact.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Right,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					Padding = UDim.new(0, 40)
-				}),
-				RightHints = v49
-			})
+			RightFrame = Roact.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(0.5, 1),
+					Position = UDim2.fromScale(1, 0),
+					AnchorPoint = Vector2.new(1, 0)
+				},
+				{
+					Layout = Roact.createElement("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Right,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						Padding = UDim.new(0, 40)
+					}),
+					RightHints = rightHints
+				}
+			)
 		})
 	end)
 end
 
-return v12
+return extended

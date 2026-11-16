@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("IntervalPerformanceTracker").Parent
-
-return (require(Parent.Loggers).Logger:new("IntervalPerformanceTracker"))
+local parent = script:FindFirstAncestor("IntervalPerformanceTracker").Parent
+local Loggers = require(parent.Loggers)
+return (Loggers.Logger:new("IntervalPerformanceTracker"))

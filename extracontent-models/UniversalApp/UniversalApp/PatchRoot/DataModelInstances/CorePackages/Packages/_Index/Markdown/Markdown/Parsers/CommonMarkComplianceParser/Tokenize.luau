@@ -1,338 +1,541 @@
 local Markdown = script:FindFirstAncestor("Markdown")
-
 require(Markdown.Types)
 
 local Constants = require(script.Parent.Parent.Constants)
 local PostProcessTokens = require(script.Parent.PostProcessTokens)
 local Utils = require(script.Parent.Utils)
+local MarkdownCore = require(Markdown.Parent.MarkdownCore)
+local Flags = MarkdownCore.Flags
+
 local insert = table.insert
-local t1 = {
-	{
-		"BREAK",
-		"^\\\n"
-	},
-	{
-		"ESCAPE",
-		"^\\(%p)"
-	}
-}
-local t2 = {{
-	"IMAGE",
-	"^!%[([^%]]+)%]%(([^%)]+)%)"
-}}
-local t3 = {
-	{
-		"OPEN_CLOSE",
-		"^<([%w-]+)%s?([^>]*)/>"
-	},
-	{
-		"CLOSE",
-		"^</([%w-]+)%s?([^>]*)>"
-	},
-	{
-		"OPEN",
-		"^<([%w-]+)%s?([^>]*)>"
-	}
-}
-local t4 = {
-	{
-		"BOLD_2",
-		"^%*%*"
-	},
-	{
-		"BOLD",
-		"^%*"
-	}
-}
-local t5 = {
-	{
-		"ITALIC_2",
-		"^__"
-	},
-	{
-		"ITALIC",
-		"^_"
-	}
-}
-local t6 = {{
-	"STRIKE",
-	"^~"
-}}
-local t7 = {{
-	"INLINE_CODE",
-	"^`"
-}}
-local t8 = {
-	["\\"] = t1,
-	["!"] = t2,
-	["<"] = t3,
-	["*"] = t4,
-	_ = t5,
-	["~"] = t6,
-	["`"] = t7
-}
-local t9 = {
-	["\n"] = {
-		{
-			"LINE_BREAK",
-			"^\n",
-			1
-		},
-		{
-			"HEADING",
-			"^ ? ? ?(##?#?#?#?#?)[ \t]+",
-			1
-		},
-		{
-			"HEADING",
-			"^ ? ? ?(##?#?#?#?#?)\n",
-			1
-		},
-		{
-			"DIVIDER",
-			"^ ? ? ?%-[ \t]*%-[ \t]*%-[ \t]*[%- \t]*\n",
-			1
-		},
-		{
-			"DIVIDER",
-			"^ ? ? ?%*[ \t]*%*[ \t]*%*[ \t]*[%* \t]*\n",
-			1
-		},
-		{
-			"DIVIDER",
-			"^ ? ? ?_[ \t]*_[ \t]*_[ \t]*[_ \t]*\n",
-			1
-		},
-		{
-			"BULLET_LIST_ITEM",
-			"^(%s*)(%* )"
-		},
-		{
-			"BULLET_LIST_ITEM_2",
-			"^(%s*)(- )"
-		},
-		{
-			"CODE_BLOCK",
-			"^```[ \t]*([^\n]*)[ \t]*\n(.-)```"
-		},
-		{
-			"CODE_BLOCK",
-			"^```[ \t]*([^\n]*)[ \t]*\n(.+)$"
-		},
-		{
-			"CODE_BLOCK",
-			"^~~~[ \t]*([^\n]*)[ \t]*\n(.-)~~~"
-		},
-		{
-			"CODE_BLOCK",
-			"^~~~[ \t]*([^\n]*)[ \t]*\n(.+)$"
-		},
-		{
-			"QUOTE",
-			"^%s*>"
-		},
-		{
-			"ORDERED_LIST_ITEM",
-			"^(%s*)([0-9A-Za-z]+)%."
-		},
-		{
-			"TABLE_ROW",
-			"^|"
-		}
-	},
-	["\\"] = t1,
-	["-"] = {{
-		"TABLE_HEADER",
-		"^[-]+"
-	}},
-	["="] = {{
-		"TABLE_HEADER_2",
-		"^[=]+"
-	}},
-	["!"] = t2,
-	["|"] = {{
-		"TABLE_DIVIDER",
-		"^|"
-	}},
-	["<"] = t3,
-	["*"] = t4,
-	_ = t5,
-	["~"] = t6,
-	["["] = {
-		{
-			"LINK",
-			"^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]\"([^\n]+)\"[ \t]*%)"
-		},
-		{
-			"LINK",
-			"^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]'([^\n]+)'[ \t]*%)"
-		},
-		{
-			"LINK",
-			"^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]%(([^\n]+)%)[ \t]*%)"
-		},
-		{
-			"LINK",
-			"^%[([^%]]*)%]%([ \t]*%)"
-		},
-		{
-			"LINK",
-			"^%[([^%]]*)%]%([ \t]*<>[ \t]*%)"
-		},
-		{
-			"LINK",
-			"^%[([^%]]*)%]%([ \t]*<([^\n\t]+)>[ \t]*%)"
-		},
-		{
-			"LINK",
-			"^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]*%)"
-		},
-		{
-			"ACTION",
-			"^%[%[([^%]]+)%]%]"
-		}
-	},
-	["`"] = t7
-}
-local t10 = {
-	LINK = {
-		startToken = "LINK_START",
-		endToken = "LINK_END",
-		textStartOffset = 1,
-		mapToText = function(p1) -- line: 102
-			return p1.capture and p1.capture[1] or ""
-		end
-	}
-}
-local t11 = {{
-	"HEADING",
-	"^  ? ?(#+)%s*\n",
-	1
-}}
 
-local function tokenizeTextSpan(s1: string, n1: number, b1: boolean, p2) -- line: 116
-	-- upvalues: t8 (copy), t9 (copy), t11 (copy), Utils (copy), Constants (copy), insert (copy), PostProcessTokens (copy)
-	local n2 = 0
-	local n3 = 0
-	local n4 = 0
-	local t12 = {}
+local v = { ACTION = true, OPEN = true, CLOSE = true, OPEN_CLOSE = true }
 
-	while n2 <= #s1 do
-		local v28 = if n2 ~= 0 or b1 then string.sub(s1, n2, n2) else "\n"
-		local v29 = if not b1 then t9[v28] or t11 else t8[v28] or {}
-		local v30 = false
-		local n5 = 0
+local function createInlineCodeTracker(value: string)
+	local v2 = -1
+	local v3 = nil
+	local count = 0
+	local v4 = -1
+	local v5 = nil
 
-		if v28 == "\n" and not b1 then
-			n5 = 1
-			n4 = n2
+	local function finishRun() -- 3 equivalent calls inferred from this helper
+		if count == 0 then
+			return
 		end
 
-		for _, v33 in v29 do
-			local v34 = v33[2]
-			local start, stop = string.find(s1, v34, n2 + n5)
+		if v3 == nil then
+			v3 = count
+		elseif v3 == count then
+			v3 = nil
+		end
 
-			if not start or not stop then
-				continue
+		count = 0
+		v5 = nil
+	end
+
+	local function startLine(p: number) -- 3 equivalent calls inferred from this helper
+		if p ~= v2 then
+			v2 = p
+			v3 = nil
+			count = 0
+			v4 = -1
+			v5 = nil
+		end
+	end
+
+	return {
+		addBacktick = function(p: number, p2: number)
+			startLine(p) -- inferred equivalent call
+
+			if p2 ~= v4 + 1 then
+				finishRun() -- inferred equivalent call
 			end
 
-			local v37 = string.sub(s1, start, stop)
-			local v38 = v33[1]
-			local v39 = v33[3] or 0
-			local v40 = #v37 - v39
-			local v41 = nil
+			count += 1
+			v4 = p2
+		end,
+		isInside = function(p: number): boolean
+			startLine(p) -- inferred equivalent call
+			finishRun() -- inferred equivalent call
+			return v3 ~= nil
+		end,
+		isInsideClosed = function(p: number, p2: number)
+			startLine(p) -- inferred equivalent call
+			finishRun() -- inferred equivalent call
 
-			if not b1 then
-				local _, stop2 = string.find(v37, "\n[^\n]*$")
+			if v3 == nil then
+				return false
+			end
 
-				if stop2 then
-					n4 = stop2 + start
+			if v5 ~= nil then
+				return v5
+			end
+
+			v5 = false
+			local v6 = string.find(value, "\n", p2, true) or #value + 1
+
+			for k in string.gmatch(string.sub(value, p2, v6 - 1), "`+") do
+				if #k == v3 then
+					v5 = true
+					break
 				end
 			end
 
-			if v38 == "ESCAPE" and Utils.isInsideInlineCode(t12, n4) then
+			return v5
+		end
+	}
+end
+
+local v2 = {
+	{ "TABLE_ROW", "^[ \t]*|?" }
+}
+
+local function getTableRowCells(value: string)
+	local v3 = string.match(value, "^%s*(.-)%s*$") or ""
+	local v4 = string.gsub(v3, "^|", "")
+	local v5 = string.gsub(v4, "|$", "")
+	local v6 = string.gsub(v5, "\\|", "")
+
+	local tableRowCells = {}
+
+	for k in string.gmatch(v6 .. "|", "([^|]*)|") do
+		insert(tableRowCells, k)
+	end
+
+	return tableRowCells
+end
+
+local function isDelimiterRow(value: string): boolean
+	if not string.find(value, "|", 1, true) then
+		return false
+	end
+
+	for _, v3 in getTableRowCells(value) do
+		if not string.match(v3, "^%s*:?%-+:?%s*$") then
+			return false
+		end
+	end
+
+	return true
+end
+
+local v3 = {
+	"^ ? ? ?##?#?#?#?#?[ \t]",
+	"^ ? ? ?##?#?#?#?#?$",
+	"^ ? ? ?%-[ \t]*%-[ \t]*%-[ \t]*[%- \t]*$",
+	"^ ? ? ?%*[ \t]*%*[ \t]*%*[ \t]*[%* \t]*$",
+	"^ ? ? ?_[ \t]*_[ \t]*_[ \t]*[_ \t]*$",
+	"^%s*[%*%-] ",
+	"^%s*```",
+	"^%s*~~~",
+	"^%s*>",
+	"^%s*[0-9]+%.[ \t]",
+	"^%s*[A-Za-z]%.[ \t]"
+}
+
+local function startsOtherBlock(value: string): boolean -- 2 equivalent calls inferred from this helper
+	for _, v4 in v3 do
+		if string.find(value, v4) then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function couldBecomeDelimiterRow(value: string, count: number): boolean -- 1 equivalent call inferred from this helper
+	return string.find(value, "^[%s|:%-]*$") ~= nil and #getTableRowCells(value) <= count
+end
+
+local function isTableRow(value: string, p: number, flag: boolean, flag2: boolean)
+	local v4 = string.find(value, "\n", p, true)
+	local v5
+
+	if v4 then
+		v5 = v4 - 1
+	else
+		v5 = #value
+	end
+
+	local v6 = string.sub(value, p, v5)
+
+	if flag then
+		return string.find(v6, "%S") ~= nil and (isDelimiterRow(v6) or not startsOtherBlock(v6)) -- inferred equivalent call
+	else
+		if not string.find(v6, "|", 1, true) then
+			return false
+		end
+
+		if startsOtherBlock(v6) then -- inferred equivalent call
+			return false
+		end
+
+		local v7 = flag2 and string.sub(v6, 1, 1) == "|"
+
+		if not v4 then
+			return v7
+		end
+
+		local v8 = string.find(value, "\n", v4 + 1, true)
+		local v9 = v4 + 1
+		local v10
+
+		if v8 then
+			v10 = v8 - 1
+		else
+			v10 = #value
+		end
+
+		local v11 = string.sub(value, v9, v10)
+		local count = #getTableRowCells(v6)
+
+		if isDelimiterRow(v11) and #getTableRowCells(v11) == count then
+			return true
+		end
+
+		return v7 and not v8 and couldBecomeDelimiterRow(v11, count) -- inferred equivalent call
+	end
+end
+
+local v4 = {
+	{ "BREAK", "^\\\n" },
+	{ "ESCAPE", "^\\(%p)" }
+}
+
+local v5 = {
+	{ "IMAGE", "^!%[([^%]]+)%]%(([^%)]+)%)" }
+}
+
+local v6 = {
+	{ "OPEN_CLOSE", "^<([%w-]+)%s?([^>]*)/>" },
+	{ "CLOSE", "^</([%w-]+)%s?([^>]*)>" },
+	{ "OPEN", "^<([%w-]+)%s?([^>]*)>" }
+}
+
+local v7 = {
+	{ "BOLD_2", "^%*%*" },
+	{ "BOLD", "^%*" }
+}
+
+local v8 = {
+	{ "ITALIC_2", "^__" },
+	{ "ITALIC", "^_" }
+}
+
+local v9 = {
+	{ "STRIKE", "^~" }
+}
+
+local v10 = {
+	{ "INLINE_CODE", "^`" }
+}
+
+local v11 = {
+	["\\"] = v4,
+	["!"] = v5,
+	["<"] = v6,
+	["*"] = v7,
+	_ = v8,
+	["~"] = v9,
+	["`"] = v10
+}
+
+local v12 = {
+	["\n"] = {
+		{ "LINE_BREAK", "^\n", 1 },
+		{ "HEADING", "^ ? ? ?(##?#?#?#?#?)[ \t]+", 1 },
+		{ "HEADING", "^ ? ? ?(##?#?#?#?#?)\n", 1 },
+		{ "DIVIDER", "^ ? ? ?%-[ \t]*%-[ \t]*%-[ \t]*[%- \t]*\n", 1 },
+		{ "DIVIDER", "^ ? ? ?%*[ \t]*%*[ \t]*%*[ \t]*[%* \t]*\n", 1 },
+		{ "DIVIDER", "^ ? ? ?_[ \t]*_[ \t]*_[ \t]*[_ \t]*\n", 1 },
+		{ "BULLET_LIST_ITEM", "^(%s*)(%* )" },
+		{ "BULLET_LIST_ITEM_2", "^(%s*)(- )" },
+		{ "CODE_BLOCK", "^```[ \t]*([^\n]*)[ \t]*\n(.-)```" },
+		{ "CODE_BLOCK", "^```[ \t]*([^\n]*)[ \t]*\n(.+)$" },
+		{ "CODE_BLOCK", "^~~~[ \t]*([^\n]*)[ \t]*\n(.-)~~~" },
+		{ "CODE_BLOCK", "^~~~[ \t]*([^\n]*)[ \t]*\n(.+)$" },
+		{ "QUOTE", "^%s*>" },
+		{ "ORDERED_LIST_ITEM", "^(%s*)([0-9]+)%.[ \t]+" },
+		{ "ORDERED_LIST_ITEM", "^(%s*)([A-Za-z])%.[ \t]+" },
+		{ "TABLE_ROW", "^|" }
+	},
+	["\\"] = v4,
+	["-"] = {
+		{ "TABLE_HEADER", "^[-]+" }
+	},
+	["="] = {
+		{ "TABLE_HEADER_2", "^[=]+" }
+	},
+	["!"] = v5,
+	["|"] = {
+		{ "TABLE_DIVIDER", "^|" }
+	},
+	["<"] = v6,
+	["*"] = v7,
+	_ = v8,
+	["~"] = v9,
+	["["] = {
+		{ "LINK", "^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]\"([^\n]+)\"[ \t]*%)" },
+		{ "LINK", "^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]'([^\n]+)'[ \t]*%)" },
+		{ "LINK", "^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]%(([^\n]+)%)[ \t]*%)" },
+		{ "LINK", "^%[([^%]]*)%]%([ \t]*%)" },
+		{ "LINK", "^%[([^%]]*)%]%([ \t]*<>[ \t]*%)" },
+		{ "LINK", "^%[([^%]]*)%]%([ \t]*<([^\n\t]+)>[ \t]*%)" },
+		{ "LINK", "^%[([^%]]*)%]%([ \t]*([^\n\t ]+)[ \t]*%)" },
+		{ "ACTION", "^%[%[([^%]]+)%]%]" }
+	},
+	["`"] = v10
+}
+
+local v13 = {
+	{ "LINE_BREAK", "^[ \t\r]+\n", 1 }
+}
+table.move(v12["\n"], 1, #v12["\n"], #v13 + 1, v13)
+
+local function withoutTableRow(items)
+	local result = {}
+
+	for _, item in items do
+		if item[1] ~= "TABLE_ROW" then
+			insert(result, item)
+		end
+	end
+
+	return result
+end
+
+local v14 = withoutTableRow(v12["\n"])
+local v15 = withoutTableRow(v13)
+
+local v16 = {
+	LINK = {
+		mapToText = function(p)
+			return p.capture and p.capture[1] or ""
+		end,
+		startToken = "LINK_START",
+		endToken = "LINK_END",
+		textStartOffset = 1
+	}
+}
+
+local v17 = {
+	{ "HEADING", "^  ? ?(#+)%s*\n", 1 }
+}
+
+local function tokenizeTextSpan(value: string, p: number, flag: boolean, p2)
+	local total = 0
+	local v18 = 0
+	local v19 = 0
+	local v20 = {}
+
+	local v21 = nil
+	local v22 = false
+	local v23 = Flags.FFlagMarkdownTables and p2.isStreaming == true
+	local v24
+
+	if Flags.FFlagMarkdownTagFallbacks then
+		v24 = createInlineCodeTracker(value)
+	end
+
+	while total <= #value do
+		local v25 = total == 0 and not flag and "\n" or string.sub(value, total, total)
+		local v26
+
+		if v25 == "\n" then
+			v26 = not flag
+		else
+			v26 = false
+		end
+
+		local v27 = Flags.FFlagMarkdownTables
+			and v26
+			and isTableRow(
+				value,
+				total + 1,
+				v22,
+				v23 and (total <= 1 or string.sub(value, total - 1, total - 1) == "\n")
+			)
+
+		local v28 = Flags.FFlagMarkdownTables and v26 and not v27
+		local v29
+
+		if flag then
+			v29 = v11[v25] or {}
+		elseif v25 == "\n" and v21 == "QUOTE" then
+			v29 = if v28 then v15 else v13
+		elseif v27 then
+			v29 = v2
+		elseif v28 then
+			v29 = v14
+		else
+			v29 = v12[v25] or v17
+		end
+
+		local v30 = false
+		local v31 = nil
+		local v32
+
+		if v25 == "\n" and not flag then
+			v19 = total
+			v32 = 1
+		else
+			v32 = 0
+		end
+
+		for _, v34 in v29 do
+			local v35 = v34[2]
+			local v36, v37 = string.find(value, v35, total + v32)
+
+			if not (v36 and v37) then
 				continue
 			end
 
-			if Constants.STYLED_TEXT[v38] then
-				v41 = Utils.getCharacterContext(s1, n2, n5 + v40)
+			local text = string.sub(value, v36, v37)
+			local name = v34[1]
+
+			local v40 = v34[3] or 0
+			local v41 = #text - v40
+			local context = nil
+
+			if not flag then
+				local _, v43 = string.find(text, "\n[^\n]*$")
+
+				if v43 then
+					v19 = v43 + v36
+				end
 			end
 
-			local t13 = { string.match(s1, v34, n2 + n5) }
+			local v43 = Flags.FFlagMarkdownTables
 
-			if not b1 or v28 ~= "<" or not (#t13 > 0) or p2.inlineTags[t13[1]] then
-				if n2 ~= n3 then
-					insert(t12, {
+			if v43 then
+				if v21 == "TABLE_ROW" then
+					v43 = text == "\\|"
+				else
+					v43 = false
+				end
+			end
+
+			if name == "ESCAPE" and not v43 then
+				local v44
+
+				if v24 then
+					v44 = v24.isInside(v19)
+				else
+					v44 = Utils.isInsideInlineCode(v20, v19)
+				end
+
+				if v44 then
+					continue
+				end
+			end
+
+			if v24 and v[name] and v24.isInsideClosed(v19, total) then
+				continue
+			end
+
+			if Constants.STYLED_TEXT[name] then
+				context = Utils.getCharacterContext(value, total, v32 + v41)
+			end
+
+			local capture = { string.match(value, v35, total + v32) }
+
+			if not flag or v25 ~= "<" or not (#capture > 0) or p2.inlineTags[capture[1]] then
+				if total ~= v18 then
+					insert(v20, {
 						name = "TEXT",
-						text = string.sub(s1, n3, n2 - 1),
-						offset = n3 + n1
+						text = string.sub(value, v18, total - 1),
+						offset = v18 + p
 					})
 				end
 
-				insert(t12, {
-					name = v38,
-					text = v37,
-					capture = if not (#t13 > 0) then nil else t13,
-					isBlock = not b1 and v28 == "\n",
-					offset = n2 + n1,
-					context = v41
-				})
-				n2 += n5 + v40
-				n3 = n2
-				v30 = true
+				local isBlock = not flag and v25 == "\n"
 
+				if isBlock then
+					v21 = name
+				end
+
+				if not (#capture > 0) then
+					capture = nil
+				end
+
+				insert(v20, {
+					name = name,
+					text = text,
+					capture = capture,
+					isBlock = isBlock,
+					offset = total + p,
+					context = context
+				})
+
+				if v24 and name == "INLINE_CODE" then
+					v24.addBacktick(v19, total)
+				end
+
+				total += v32 + v41
+				v18 = total
+				v31 = name
+				v30 = true
 				break
 			end
 		end
 
 		if not v30 then
-			n2 += 1
+			total += 1
+		end
+
+		if Flags.FFlagMarkdownTables and v26 then
+			v22 = v31 == "TABLE_ROW"
 		end
 	end
 
-	if n2 ~= n3 then
-		insert(t12, {
+	if total ~= v18 then
+		insert(v20, {
 			name = "TEXT",
-			text = string.sub(s1, n3, n2 - 1),
-			offset = n3 + n1
+			text = string.sub(value, v18, total - 1),
+			offset = v18 + p
 		})
 	end
 
-	return PostProcessTokens(t12)
+	return PostProcessTokens(v20)
 end
-local function tokenize(s2: string, p3) -- line: 218
-	-- upvalues: tokenizeTextSpan (copy), t10 (copy), insert (copy)
-	local t14 = {}
 
-	for _, v49 in (tokenizeTextSpan(s2, 0, false, p3)) do
-		local v50 = t10[v49.name]
+local function tokenize(value: string, p)
+	local v18 = tokenizeTextSpan(value, 0, false, p)
 
-		if v50 then
-			local t15 = {{
-				name = v50.startToken,
-				offset = v49.offset,
-				text = string.sub(s2, v49.offset, v49.offset + v50.textStartOffset - 1),
-				capture = v49.capture
-			}}
-			local v52 = v50.mapToText(v49)
-			local v53 = tokenizeTextSpan(v52, v49.offset + v50.textStartOffset, true, p3)
+	local result = {}
 
-			table.move(v53, 1, #v53, 2, t15)
+	for _, v19 in v18 do
+		local v20 = v16[v19.name]
 
-			local v54 = v49.offset + v50.textStartOffset + #v52
+		if v20 then
+			local v21 = {
+				{
+					name = v20.startToken,
+					offset = v19.offset,
+					text = string.sub(value, v19.offset, v19.offset + v20.textStartOffset - 1),
+					capture = v19.capture
+				}
+			}
 
-			insert(t15, {
-				name = v50.endToken,
-				offset = v54,
-				text = string.sub(s2, v54, v49.offset + #v49.text - 1)
+			local mapToText = v20.mapToText(v19)
+
+			local v22 = tokenizeTextSpan(mapToText, v19.offset + v20.textStartOffset, true, p)
+			table.move(v22, 1, #v22, 2, v21)
+
+			local offset = v19.offset + v20.textStartOffset + #mapToText
+			insert(v21, {
+				name = v20.endToken,
+				offset = offset,
+				text = string.sub(value, offset, v19.offset + #v19.text - 1)
 			})
-			table.move(t15, 1, #t15, #t14 + 1, t14)
+
+			table.move(v21, 1, #v21, #result + 1, result)
 		else
-			insert(t14, v49)
+			insert(result, v19)
 		end
 	end
 
-	return t14
+	return result
 end
 
 return tokenize

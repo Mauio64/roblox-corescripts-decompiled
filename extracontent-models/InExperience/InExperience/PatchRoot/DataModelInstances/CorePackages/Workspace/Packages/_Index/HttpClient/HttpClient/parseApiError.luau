@@ -1,22 +1,18 @@
 require(script.Parent.types)
 
-local function parseApiError(p1) -- line: 6
-	if typeof(p1) ~= "table" then
+local function parseApiError(data)
+	if typeof(data) ~= "table" then
 		return nil
 	end
 
-	local code = p1.code
-	local message = p1.message
+	local code = data.code
+	local message = data.message
 
-	if typeof(code) ~= "number" or typeof(message) ~= "string" then
-		return nil
+	if typeof(code) == "number" and typeof(message) == "string" then
+		return { code = code, message = message, details = data.details }
 	end
 
-	return {
-		code = code,
-		message = message,
-		details = p1.details
-	}
+	return nil
 end
 
 return parseApiError

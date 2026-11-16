@@ -1,14 +1,16 @@
-return (require(script.Parent.createEnum)("RequestType", {
+local createEnum = require(script.Parent.createEnum)
+
+return (createEnum("RequestType", {
 	"None",
 	"Asset",
 	"Bundle",
 	"GamePass",
 	"Product",
-	"Premium",
 	"Subscription",
 	"AvatarCreationFee",
 	"Experience",
 	"Look",
 	"DeveloperSubscription",
-	"RobuxUpsell"
+	"RobuxUpsell",
+	"VIPServer"
 }))

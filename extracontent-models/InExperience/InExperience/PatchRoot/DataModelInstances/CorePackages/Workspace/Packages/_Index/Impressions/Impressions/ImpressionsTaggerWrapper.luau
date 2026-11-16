@@ -1,21 +1,24 @@
-local Parent = script:FindFirstAncestor("Impressions").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Impressions").Parent
+
+local React = require(parent.React)
+
 local useImpressionsTagger = require(script.Parent.useImpressionsTagger)
 
-local function ImpressionsTagWrapper(t1: {[any]: any}) -- line: 14
-	-- upvalues: React (copy), useImpressionsTagger (copy)
-	local v6 = React.useRef(nil)
+local function ImpressionsTagWrapper(props)
+	local ref = React.useRef(nil)
 
-	useImpressionsTagger(v6, t1.impressionsTag, t1.impressionsIndex)
+	useImpressionsTagger(ref, props.impressionsTag, props.impressionsIndex)
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		LayoutOrder = t1.impressionsIndex,
-		ref = v6
-	}, {
-		ComponentWithImpressionsTag = t1.renderComponent()
-	})
+	return React.createElement(
+		"Frame",
+		{
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			LayoutOrder = props.impressionsIndex,
+			ref = ref
+		},
+		{ ComponentWithImpressionsTag = props.renderComponent() }
+	)
 end
 
 return ImpressionsTagWrapper

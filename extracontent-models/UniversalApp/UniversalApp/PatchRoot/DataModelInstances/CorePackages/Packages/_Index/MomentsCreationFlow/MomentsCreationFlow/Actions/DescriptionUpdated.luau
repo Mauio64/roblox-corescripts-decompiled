@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
+local parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(s1: string) -- line: 10
-	return {
-		description = s1
-	}
+local Rodux = require(parent.Rodux)
+
+return Rodux.makeActionCreator(script.Name, function(description: string)
+	return { description = description }
 end)

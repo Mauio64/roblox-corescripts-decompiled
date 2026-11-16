@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
-
-require(Parent.Dash)
+local parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+require(parent.Dash)
 
 return {}

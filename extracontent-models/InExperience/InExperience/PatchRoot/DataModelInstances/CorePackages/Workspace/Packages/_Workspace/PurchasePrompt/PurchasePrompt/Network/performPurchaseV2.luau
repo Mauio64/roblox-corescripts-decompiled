@@ -1,47 +1,40 @@
-local ParentParent = script.Parent.Parent
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
-local Constants = require(ParentParent.Misc.Constants)
-local Promise = require(ParentParent.Promise)
-local isGenericChallengeResponse = require(ParentParent.Utils.isGenericChallengeResponse)
-local ParentParentParent = ParentParent.Parent
-local isEconomicRestrictionResponse = require(ParentParentParent.IAPExperience).Utility.isEconomicRestrictionResponse
-local FFlagEnablePriceChangedErrorHandling = require(ParentParent.Flags.FFlagEnablePriceChangedErrorHandling)
+local parent = script.Parent.Parent
 
-local function performPurchaseV2(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) -- line: 17
-	-- upvalues: Promise (copy), Constants (copy), PurchaseError (copy), isGenericChallengeResponse (copy), isEconomicRestrictionResponse (copy), FFlagEnablePriceChangedErrorHandling (copy)
-	return p1.performPurchaseV2(p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12):andThen(function(p13) -- line: 45
-		-- upvalues: Promise (copy), Constants (copy), PurchaseError (copy), isGenericChallengeResponse (copy), isEconomicRestrictionResponse (copy), FFlagEnablePriceChangedErrorHandling (copy)
-		if p13.purchased or p13.reason == "AlreadyOwned" then
-			return Promise.resolve(p13)
+local PurchaseError = require(parent.Enums.PurchaseError)
+local Constants = require(parent.Misc.Constants)
+local Promise = require(parent.Promise)
+local isGenericChallengeResponse = require(parent.Utils.isGenericChallengeResponse)
+
+local parent2 = parent.Parent
+local IAPExperience = require(parent2.IAPExperience)
+local isEconomicRestrictionResponse = IAPExperience.Utility.isEconomicRestrictionResponse
+
+local FFlagEnablePriceChangedErrorHandling = require(parent.Flags.FFlagEnablePriceChangedErrorHandling)
+
+local function performPurchaseV2(p, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)
+	return p.performPurchaseV2(p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12):andThen(function(data)
+		if data.purchased or data.reason == "AlreadyOwned" then
+			return Promise.resolve(data)
 		end
 
-		if p13.reason == Constants.PurchaseFailureReason.EconomyDisabled then
+		if data.reason == Constants.PurchaseFailureReason.EconomyDisabled then
 			return Promise.reject(PurchaseError.PurchaseDisabled)
 		end
 
-		if p13.reason == Constants.PurchaseFailureReason.TwoStepVerificationRequired then
+		if not (data.reason ~= Constants.PurchaseFailureReason.TwoStepVerificationRequired and data.transactionStatus ~= 24) then
 			return Promise.reject(PurchaseError.TwoFactorNeeded)
 		end
 
-		if p13.transactionStatus == 24 then
-			return Promise.reject(PurchaseError.TwoFactorNeeded)
+		if isGenericChallengeResponse(data) or isEconomicRestrictionResponse(data) then
+			return Promise.reject(data)
 		end
 
-		if isGenericChallengeResponse(p13) then
-			return Promise.reject(p13)
-		end
-
-		if isEconomicRestrictionResponse(p13) then
-			return Promise.reject(p13)
-		end
-
-		if FFlagEnablePriceChangedErrorHandling and p13.reason == Constants.PurchaseFailureReason.PriceChanged then
+		if FFlagEnablePriceChangedErrorHandling and data.reason == Constants.PurchaseFailureReason.PriceChanged then
 			return Promise.reject(PurchaseError.PriceChanged)
 		end
 
 		return Promise.reject(PurchaseError.UnknownFailure)
-	end, function(_) -- line: 73
-		-- upvalues: Promise (copy), PurchaseError (copy)
+	end, function(_)
 		return Promise.reject(PurchaseError.UnknownFailure)
 	end)
 end

@@ -1,366 +1,471 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local AppCommonLib = require(ParentParentParent.AppCommonLib)
-local CapturesCommon = require(ParentParentParent.CapturesCommon)
-local React = require(ParentParentParent.React)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
-local UIBlox = require(ParentParentParent.UIBlox)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local AppCommonLib = require(parent2.AppCommonLib)
+local CapturesCommon = require(parent2.CapturesCommon)
+local React = require(parent2.React)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local UIBlox = require(parent2.UIBlox)
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
+
 local memoize = AppCommonLib.memoize
+
 local useScreenSize = RobloxAppHooks.useScreenSize
 local useStyle = UIBlox.Core.Style.useStyle
-local CaptureType = require(ParentParent.Enums.CaptureType)
+
+local CaptureType = require(parent.Enums.CaptureType)
 local getContentFromObject = CapturesCommon.Utils.getContentFromObject
-local getCaptureSize = require(ParentParent.Utils.getCaptureSize)
+local getCaptureSize = require(parent.Utils.getCaptureSize)
 local MediaPlayer = CapturesCommon.Components.MediaPlayer
+require(parent.Types)
 
-require(ParentParent.Types)
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagUseMediaPlayerInCarousel = SharedFlags.FFlagUseMediaPlayerInCarousel
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
 
-local FFlagUseMediaPlayerInCarousel = require(ParentParentParent.SharedFlags).FFlagUseMediaPlayerInCarousel
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
-local v19 = memoize(function(vector2: Vector2, vector2_2: Vector2) -- line: 33
-	local v26 = vector2.X / vector2.Y
-	local vector2_2X = vector2_2.X
-	local v28 = math.floor(vector2_2X / v26)
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
 
-	if v28 > vector2_2.Y then
-		v28 = vector2_2.Y
-		vector2_2X = math.floor(v28 * v26)
+local v = memoize(function(vector2: Vector2, vector2_2: Vector2)
+	local v = vector2.X / vector2.Y
+
+	local v2 = vector2_2.X
+	local v3 = math.floor(v2 / v)
+
+	if vector2_2.Y < v3 then
+		v3 = vector2_2.Y
+		v2 = math.floor(v3 * v)
 	end
 
-	return Vector2.new(vector2_2X, v28)
+	return Vector2.new(v2, v3)
 end)
 
-local function getDeleteTransitionSize(p1) -- line: 47
-	return UDim2.fromScale(p1, p1)
+local function getDeleteTransitionSize(p) -- 1 equivalent call inferred from this helper
+	return UDim2.fromScale(p, p)
 end
-local function getDeleteTransitionTransparency(p2) -- line: 51
-	-- upvalues: UserGameSettings (copy)
-	if UserGameSettings.ReducedMotion then
-		return p2
-	end
 
-	return 1
+local function getDeleteTransitionTransparency(p)
+	return if UserGameSettings.ReducedMotion then p else 1
 end
-local function getCapturesItemSize(p3) -- line: 55
-	-- upvalues: UserGameSettings (copy)
+
+local function getCapturesItemSize(p)
 	if UserGameSettings.ReducedMotion then
 		return (UDim2.fromScale(1, 1))
 	end
 
-	return (UDim2.fromScale(p3, p3))
+	return (getDeleteTransitionSize(p)) -- inferred equivalent call
 end
-local function getFullScreenSize(p4, p5) -- line: 59
-	local v34 = p4.X / p4.Y
-	local v35 = p5.X / v34
 
-	if v35 <= p5.Y then
-		return UDim2.fromOffset(p5.X, v35)
+local function getFullScreenSize(state, p) -- 1 equivalent call inferred from this helper
+	local v2 = state.X / state.Y
+
+	local v3 = p.X / v2
+
+	if v3 <= p.Y then
+		return UDim2.fromOffset(p.X, v3)
 	end
 
-	local v36 = p5.Y * v34
-
-	return UDim2.fromOffset(v36, p5.Y)
+	local v4 = p.Y * v2
+	return UDim2.fromOffset(v4, p.Y)
 end
 
-return function(t1: {[any]: any}) -- line: 85
-	-- upvalues: useStyle (copy), React (copy), useScreenSize (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy), getCaptureSize (copy), v19 (copy), UserGameSettings (copy), getContentFromObject (copy), getCapturesItemSize (copy), FFlagUseMediaPlayerInCarousel (copy), MediaPlayer (copy), FFlagUseRbxstorageInGallery (copy), getDeleteTransitionTransparency (copy)
-	local v38 = useStyle()
-	local itemSize = t1.itemSize
-	local v40, v41 = React.useBinding(0)
-	local v42, v43 = React.useState(Vector2.new(0, 0))
-	local v44 = useScreenSize()
-	local v45 = React.useRef(nil)
-	local v46 = React.useRef(nil)
-	local v47, v48 = React.useState(false)
-	local imagePadding = t1.imagePadding
-	local itemIndex = t1.itemIndex
-	local v51 = React.useCallback(function(p6) -- line: 99
-		-- upvalues: v41 (copy)
-		v41(p6.AbsolutePosition.X)
-	end, { v41 })
+return function(props)
+	local v2 = useStyle()
 
-	React.useEffect(function() -- line: 103
-		-- upvalues: v46 (copy)
-		return function() -- line: 104
-			-- upvalues: v46 (copy)
-			if v46.current then
-				v46.current.Video = ""
+	local itemSize = props.itemSize
+	local absoluteXPosition2, v3 = React.useBinding(0)
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local v4 = useScreenSize()
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local state2, setState2 = React.useState(false)
+
+	local imagePadding = props.imagePadding
+	local itemIndex = props.itemIndex
+
+	local v5 = React.useCallback(function(p)
+		v3(p.AbsolutePosition.X)
+	end, { v3 })
+
+	React.useEffect(function()
+		return function()
+			if ref2.current then
+				ref2.current.Video = ""
 			end
 		end
 	end, {})
-	React.useEffect(function() -- line: 111
-		-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), t1 (copy), v43 (copy), itemSize (copy), CaptureType (copy), getCaptureSize (copy)
+
+	React.useEffect(function()
 		if FFlagEnableCapturesGalleryRetrievalCoreScript then
-			if t1.capture.CaptureType == Enum.CaptureType.Screenshot then
-				v43(itemSize)
+			if props.capture.CaptureType == Enum.CaptureType.Screenshot then
+				setState(itemSize)
 			end
-
-			return
-		end
-
-		if t1.capture.type == CaptureType.Video then
-			return
-		end
-
-		task.spawn(function() -- line: 123
-			-- upvalues: getCaptureSize (copy), t1 (copy), v43 (copy), itemSize (copy)
-			local v110 = getCaptureSize(t1.capture.contentId)
-
-			if v110 then
-				v43(v110)
-
+		else
+			if props.capture.type == CaptureType.Video then
 				return
 			end
 
-			v43(itemSize)
-		end)
-	end, {
-		itemSize,
-		t1.capture
-	})
+			task.spawn(function()
+				local captureSize = getCaptureSize(props.capture.contentId)
 
-	local v52 = React.useCallback(function(p7) -- line: 134
-		-- upvalues: v46 (copy), v43 (copy)
-		v46.current = p7
+				if captureSize then
+					setState(captureSize)
+				else
+					setState(itemSize)
+				end
+			end)
+		end
+	end, { itemSize, props.capture })
 
-		local Resolution = p7.Resolution
-
-		v43(Vector2.new(Resolution.X, Resolution.Y))
+	local onLoaded = React.useCallback(function(current)
+		ref2.current = current
+		local resolution = current.Resolution
+		setState(Vector2.new(resolution.X, resolution.Y))
 	end, {})
-	local v53 = React.useCallback(function(n1: number) -- line: 140
-		-- upvalues: itemSize (copy), v44 (copy)
-		local v79 = itemSize.X / 2
-		local v80 = v44.X / 2
-		local v81 = n1 + v79
-		local v82 = math.abs(v80 - v81)
-		local v83 = if not (v82 < 25) then v82 - 25 else 0
 
-		return math.sign(v80 - v81), (math.min(1, v83 / (itemSize.X - 25)))
-	end, {
-		itemSize,
-		itemIndex,
-		v44
-	})
-	local v54 = React.useCallback(function(n2: number) -- line: 158
-		-- upvalues: v53 (copy), v19 (copy), v42 (copy), itemSize (copy), t1 (copy)
-		local _, v86 = v53(n2)
-		local v87 = v19(v42, itemSize)
+	local v6 = React.useCallback(function(p: number)
+		local v6 = itemSize.X / 2
+		local v7 = v4.X / 2
+		local v8 = p + v6
 
-		if v86 == 0 then
-			return UDim2.fromOffset(v87.X, v87.Y)
+		local v9 = math.abs(v7 - v8)
+		local v10 = v9 < 25 and 0 or v9 - 25
+
+		return math.sign(v7 - v8), (math.min(1, v10 / (itemSize.X - 25)))
+	end, { itemSize, itemIndex, v4 })
+
+	local v7 = React.useCallback(function(p: number)
+		local _, v7 = v6(p)
+		local v8 = v(state, itemSize)
+
+		if v7 == 0 then
+			return UDim2.fromOffset(v8.X, v8.Y)
 		end
 
-		local v88 = 1 - v86 * (1 - t1.unfocusedSizeMultiplier)
-		local v89 = v87.Y * v88
-		local v90 = v87.X * v88
-		local v91 = math.floor(v89)
-		local v92 = math.floor(v90)
+		local v9 = 1 - v7 * (1 - props.unfocusedSizeMultiplier)
 
-		return UDim2.fromOffset(v92, v91)
-	end, {
-		v42,
-		itemSize,
-		t1.unfocusedSizeMultiplier,
-		v53
-	})
-	local v55 = React.useCallback(function(n3: number) -- line: 177
-		-- upvalues: v53 (copy), v54 (copy), itemSize (copy), imagePadding (copy)
-		local v94, v95 = v53(n3)
+		local v10 = v8.Y * v9
+		local v11 = v8.X * v9
 
-		if v95 == 0 then
+		local v12 = math.floor(v10)
+		local v13 = math.floor(v11)
+
+		return UDim2.fromOffset(v13, v12)
+	end, { state, itemSize, props.unfocusedSizeMultiplier, v6 })
+
+	local v8 = React.useCallback(function(p: number)
+		local v8, v9 = v6(p)
+
+		if v9 == 0 then
 			return UDim2.fromScale(0.5, 0.5)
 		end
 
-		local XOffset = v54(n3).X.Offset
-		local v97 = (itemSize.X / 2 - imagePadding - XOffset / 2) * v95
+		local offset = v7(p).X.Offset
+		local v10 = (itemSize.X / 2 - imagePadding - offset / 2) * v9
 
-		return UDim2.new(0.5, v97 * v94, 0.5, 0)
-	end, {
-		v42,
-		imagePadding,
-		itemSize,
-		v44,
-		v53,
-		v54
-	})
-	local OverlayTransparency = v38.Theme.Overlay.Transparency
-	local v57 = React.useCallback(function(n4: number) -- line: 198
-		-- upvalues: v53 (copy), OverlayTransparency (copy)
-		local _, v100 = v53(n4)
+		return UDim2.new(0.5, v10 * v8, 0.5, 0)
+	end, { state, imagePadding, itemSize, v4, v6, v7 })
 
-		return 1 - (1 - OverlayTransparency) * v100
-	end, {
-		OverlayTransparency,
-		v53
-	})
-	local v58 = React.useCallback(function(p8) -- line: 203
-		-- upvalues: UserGameSettings (copy), v57 (copy)
-		local absoluteXPosition = p8.absoluteXPosition
-		local fadeOutBinding = p8.fadeOutBinding
+	local transparency = v2.Theme.Overlay.Transparency
+
+	local v9 = React.useCallback(function(p: number)
+		local _, v9 = v6(p)
+		return 1 - (1 - transparency) * v9
+	end, { transparency, v6 })
+
+	local v10 = React.useCallback(function(p)
+		local absoluteXPosition = p.absoluteXPosition
+		local fadeOutBinding = p.fadeOutBinding
 
 		if UserGameSettings.ReducedMotion and fadeOutBinding then
 			return 1
 		end
 
 		if fadeOutBinding then
-			return (math.min(v57(absoluteXPosition), fadeOutBinding))
+			return (math.min(v9(absoluteXPosition), fadeOutBinding))
 		end
 
-		return v57(absoluteXPosition)
-	end, { v57 })
-	local v59 = React.useCallback(function() -- line: 217
-		-- upvalues: t1 (copy), v48 (copy), v47 (copy)
-		if t1.onExpandCallback then
-			t1.onExpandCallback(t1.itemIndex)
+		return v9(absoluteXPosition)
+	end, { v9 })
+
+	local onExpandCallback = React.useCallback(function()
+		if props.onExpandCallback then
+			props.onExpandCallback(props.itemIndex)
 		end
 
-		v48(not v47)
-	end, {
-		v47,
-		t1.onExpandCallback,
-		t1.itemIndex
-	})
-	local v60 = React.useCallback(function() -- line: 224
-		-- upvalues: t1 (copy)
-		if t1.onMuteCallback then
-			t1.onMuteCallback()
+		setState2(not state2)
+	end, { state2, props.onExpandCallback, props.itemIndex })
+
+	local onMuteCallback = React.useCallback(function()
+		if props.onMuteCallback then
+			props.onMuteCallback()
 		end
-	end, { t1.onMuteCallback })
-	local v61 = React.useCallback(function() -- line: 230
-		-- upvalues: React (copy)
-		return (React.createElement("Frame", {
-			Size = UDim2.fromScale(1, 1)
-		}))
+	end, { props.onMuteCallback })
+
+	local renderOnFailed = React.useCallback(function()
+		return (React.createElement("Frame", { Size = UDim2.fromScale(1, 1) }))
 	end, {})
-	local v62 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.type == CaptureType.Screenshot else t1.capture.CaptureType == Enum.CaptureType.Screenshot
-	local v63 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.type == CaptureType.Video else t1.capture.CaptureType == Enum.CaptureType.Video
-	local v64 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.contentId else getContentFromObject(t1.capture)
-	local v65 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.videoCapture else t1.capture
+	local v11
+
+	if FFlagEnableCapturesGalleryRetrievalCoreScript then
+		v11 = props.capture.CaptureType == Enum.CaptureType.Screenshot
+	else
+		v11 = props.capture.type == CaptureType.Screenshot
+	end
+
+	local v12
+
+	if FFlagEnableCapturesGalleryRetrievalCoreScript then
+		v12 = props.capture.CaptureType == Enum.CaptureType.Video
+	else
+		v12 = props.capture.type == CaptureType.Video
+	end
+
+	local imageContent
+
+	if FFlagEnableCapturesGalleryRetrievalCoreScript then
+		imageContent = getContentFromObject(props.capture)
+	else
+		imageContent = props.capture.contentId
+	end
+
+	local v13
+
+	if FFlagEnableCapturesGalleryRetrievalCoreScript then
+		v13 = props.capture
+	else
+		v13 = props.capture.videoCapture
+	end
+
 	local createElement = React.createElement
-	local t2 = {
+	local v14 = {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = 1,
 		Position = UDim2.fromScale(0.5, 0.5),
 		Size = UDim2.fromScale(1, 1),
-		[React.Change.AbsolutePosition] = v51
+		[React.Change.AbsolutePosition] = v5
 	}
-	local t3 = {
+	local v15 = {
 		FullScreenOffset = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, not v47 and 0 or 16)
-		})
+			PaddingTop = UDim.new(0, state2 and 16 or 0)
+		}),
+		CaptureContainer = 0
 	}
+
 	local createElement2 = React.createElement
-	local t4 = {
-		BackgroundTransparency = 1,
+	local v16 = {
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = if not v47 then v40:map(v55) else UDim2.fromScale(0.5, 0.5)
+		BackgroundTransparency = 1,
+		Position = 0,
+		Size = 0
 	}
-	local uDim2
+	local position
 
-	if v47 then
-		local v71 = v42.X / v42.Y
-		local v72 = v44.X / v71
-
-		if v72 <= v44.Y then
-			uDim2 = UDim2.fromOffset(v44.X, v72)
-		else
-			local v74 = v44.Y * v71
-
-			uDim2 = UDim2.fromOffset(v74, v44.Y)
-		end
+	if state2 then
+		position = UDim2.fromScale(0.5, 0.5)
 	else
-		uDim2 = v40:map(v54)
+		position = absoluteXPosition2:map(v8)
 	end
 
-	t4.Size = uDim2
-	t3.CaptureContainer = createElement2("Frame", t4, {
-		CaptureImage = if not v62 then nil else React.createElement("ImageLabel", {
-			BorderSizePixel = 0,
-			ZIndex = 1,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
-			BackgroundTransparency = not FFlagEnableCapturesGalleryRetrievalCoreScript and 1 or 0,
-			Image = if not FFlagEnableCapturesGalleryRetrievalCoreScript then v64 else nil,
-			ImageContent = if not FFlagEnableCapturesGalleryRetrievalCoreScript then nil else v64,
-			Position = UDim2.fromScale(0.5, 0.5),
-			ScaleType = if not FFlagEnableCapturesGalleryRetrievalCoreScript then Enum.ScaleType.Crop else Enum.ScaleType.Fit,
-			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize),
-			Visible = v42 ~= Vector2.new(0, 0)
-		}),
-		CaptureVideo = if not v63 then nil else if not FFlagUseMediaPlayerInCarousel then React.createElement("VideoFrame", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 1,
-			Playing = v40:map(function(p9) -- line: 321
-				-- upvalues: v53 (copy)
-				local _, v109 = v53(p9)
+	v16.Position = position
+	local size
 
-				return v109 < 0.5
-			end),
-			Position = UDim2.fromScale(0.5, 0.5),
-			Looped = true,
-			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize),
-			Video = if FFlagUseRbxstorageInGallery then nil else t1.capture.contentId,
-			VideoContent = if not FFlagUseRbxstorageInGallery then nil else getContentFromObject(t1.capture.videoCapture),
-			Volume = 0,
-			ZIndex = 1,
-			[React.Event.Loaded] = v52
-		}) else React.createElement(MediaPlayer, {
-			BorderSizePixel = 0,
-			Looped = true,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
-			BackgroundTransparency = not FFlagEnableCapturesGalleryRetrievalCoreScript and 1 or 0,
-			isOverlayDisabled = not t1.isSelected or t1.isDisabled,
-			isTimeHidden = v44.X > v44.Y and (v42.Y > v42.X and not v47),
-			onExpandCallback = v59,
-			onMuteCallback = v60,
-			onLoaded = v52,
-			Playing = t1.isSelected and v40:map(function(p10) -- line: 305
-				-- upvalues: v53 (copy)
-				local _, v106 = v53(p10)
+	if state2 then
+		size = getFullScreenSize(state, v4) -- inferred equivalent call
+	else
+		size = absoluteXPosition2:map(v7)
+	end
 
-				return v106 < 0.5
-			end),
-			Position = UDim2.fromScale(0.5, 0.5),
-			renderOnFailed = v61,
-			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize),
-			VideoContent = getContentFromObject(v65),
-			videoRef = v45,
-			ZIndex = not v47 and 1 or 5
-		}),
-		Overlay = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			ZIndex = 2,
+	v16.Size = size
+	local captureImage
+
+	if v11 then
+		local createElement3 = React.createElement
+		local v17 = {
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = v38.Theme.Overlay.Color,
-			BackgroundTransparency = React.joinBindings({
-				absoluteXPosition = v40,
-				fadeOutBinding = t1.fadeOutBinding
-			}):map(v58),
-			Position = UDim2.fromScale(0.5, 0.5),
-			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize)
-		}),
+			BackgroundColor3 = v2.Theme.BackgroundContrast.Color,
+			BackgroundTransparency = FFlagEnableCapturesGalleryRetrievalCoreScript and 0 or 1,
+			BorderSizePixel = 0,
+			Image = 0,
+			ImageContent = 0,
+			Position = 0,
+			ScaleType = 0,
+			Size = 0,
+			Visible = 0,
+			ZIndex = 1
+		}
+		local image
+
+		if not FFlagEnableCapturesGalleryRetrievalCoreScript then
+			image = imageContent
+		end
+
+		v17.Image = image
+
+		if not FFlagEnableCapturesGalleryRetrievalCoreScript then
+			imageContent = nil
+		end
+
+		v17.ImageContent = imageContent
+		v17.Position = UDim2.fromScale(0.5, 0.5)
+		local scaleType
+
+		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+			scaleType = Enum.ScaleType.Fit
+		else
+			scaleType = Enum.ScaleType.Crop
+		end
+
+		v17.ScaleType = scaleType
+		local size2
+
+		if props.fadeOutBinding then
+			size2 = props.fadeOutBinding:map(getCapturesItemSize)
+		else
+			size2 = UDim2.fromScale(1, 1)
+		end
+
+		v17.Size = size2
+
+		v17.Visible = state ~= Vector2.new(0, 0)
+		captureImage = createElement3("ImageLabel", v17)
+	end
+
+	local captureVideo
+
+	if v12 then
+		if FFlagUseMediaPlayerInCarousel then
+			local createElement3 = React.createElement
+			local v17 = {
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				BackgroundColor3 = v2.Theme.BackgroundContrast.Color,
+				BackgroundTransparency = FFlagEnableCapturesGalleryRetrievalCoreScript and 0 or 1,
+				BorderSizePixel = 0,
+				isOverlayDisabled = not props.isSelected or props.isDisabled,
+				isTimeHidden = v4.X > v4.Y and state.Y > state.X and not state2,
+				Looped = true,
+				onExpandCallback = onExpandCallback,
+				onMuteCallback = onMuteCallback,
+				onLoaded = onLoaded,
+				Playing = props.isSelected and absoluteXPosition2:map(function(p): boolean
+					local _, v17 = v6(p)
+					return v17 < 0.5
+				end),
+				Position = UDim2.fromScale(0.5, 0.5),
+				renderOnFailed = renderOnFailed,
+				Size = 0,
+				VideoContent = 0,
+				videoRef = 0,
+				ZIndex = 0
+			}
+			local size2
+
+			if props.fadeOutBinding then
+				size2 = props.fadeOutBinding:map(getCapturesItemSize)
+			else
+				size2 = UDim2.fromScale(1, 1)
+			end
+
+			v17.Size = size2
+
+			v17.VideoContent = getContentFromObject(v13)
+			v17.videoRef = ref
+			v17.ZIndex = state2 and 5 or 1
+			captureVideo = createElement3(MediaPlayer, v17)
+		else
+			local createElement3 = React.createElement
+			local v17 = {}
+			v17.AnchorPoint = Vector2.new(0.5, 0.5)
+			v17.BackgroundTransparency = 1
+			v17.Playing = absoluteXPosition2:map(function(p): boolean
+				local _, v18 = v6(p)
+				return v18 < 0.5
+			end)
+
+			v17.Position = UDim2.fromScale(0.5, 0.5)
+			v17.Looped = true
+			local size2
+
+			if props.fadeOutBinding then
+				size2 = props.fadeOutBinding:map(getCapturesItemSize)
+			else
+				size2 = UDim2.fromScale(1, 1)
+			end
+
+			v17.Size = size2
+			local video
+
+			if not FFlagUseRbxstorageInGallery then
+				video = props.capture.contentId
+			end
+
+			v17.Video = video
+			local videoContent
+
+			if FFlagUseRbxstorageInGallery then
+				videoContent = getContentFromObject(props.capture.videoCapture)
+			end
+
+			v17.VideoContent = videoContent
+
+			v17.Volume = 0
+			v17.ZIndex = 1
+			v17[React.Event.Loaded] = onLoaded
+			captureVideo = createElement3("VideoFrame", v17)
+		end
+	end
+
+	local createElement3 = React.createElement
+	local v17 = {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundColor3 = v2.Theme.Overlay.Color,
+		BackgroundTransparency = React.joinBindings({
+			absoluteXPosition = absoluteXPosition2,
+			fadeOutBinding = props.fadeOutBinding
+		}):map(v10),
+		BorderSizePixel = 0,
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = 0,
+		ZIndex = 2
+	}
+	local size2
+
+	if props.fadeOutBinding then
+		size2 = props.fadeOutBinding:map(getCapturesItemSize)
+	else
+		size2 = UDim2.fromScale(1, 1)
+	end
+
+	v17.Size = size2
+	local children = {
+		CaptureImage = captureImage,
+		CaptureVideo = captureVideo,
+		Overlay = createElement3("Frame", v17),
 		TransitionOverlay = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			ZIndex = 3,
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
-			BackgroundTransparency = not t1.transitionBinding and 1 or t1.transitionBinding:map(getDeleteTransitionTransparency),
+			BackgroundColor3 = v2.Theme.BackgroundContrast.Color,
+			BackgroundTransparency = not props.transitionBinding and 1 or props.transitionBinding:map(getDeleteTransitionTransparency),
+			BorderSizePixel = 0,
 			Position = UDim2.fromScale(0.5, 0.5),
-			Size = UDim2.fromScale(1, 1)
+			Size = UDim2.fromScale(1, 1),
+			ZIndex = 3
 		}),
-		FullScreenBackground = if not FFlagUseMediaPlayerInCarousel or not v47 then nil else React.createElement("Frame", {
+		FullScreenBackground = 0
+	}
+	local fullScreenBackground
+
+	if FFlagUseMediaPlayerInCarousel and state2 then
+		fullScreenBackground = React.createElement("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = v2.Theme.BackgroundContrast.Color,
 			BackgroundTransparency = 0,
 			BorderSizePixel = 0,
-			ZIndex = 4,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
 			Position = UDim2.fromScale(0.5, 0.5),
-			Size = UDim2.fromOffset(v44.X, v44.Y)
+			Size = UDim2.fromOffset(v4.X, v4.Y),
+			ZIndex = 4
 		})
-	})
+	end
 
-	return createElement("Frame", t2, t3)
+	children.FullScreenBackground = fullScreenBackground
+	v15.CaptureContainer = createElement2("Frame", v16, children)
+	return createElement("Frame", v14, v15)
 end

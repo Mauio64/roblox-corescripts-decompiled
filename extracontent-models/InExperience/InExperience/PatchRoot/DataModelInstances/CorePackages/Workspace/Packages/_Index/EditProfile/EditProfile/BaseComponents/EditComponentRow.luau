@@ -1,1 +1,3 @@
-return (require(script.EditComponentRow))
+local EditComponentRow = require(script.EditComponentRow)
+
+return EditComponentRow

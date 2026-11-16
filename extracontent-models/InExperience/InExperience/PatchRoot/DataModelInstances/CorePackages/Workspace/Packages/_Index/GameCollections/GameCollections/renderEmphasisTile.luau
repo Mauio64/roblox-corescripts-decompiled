@@ -1,45 +1,65 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local GameCollectionItemTypes = require(Parent.DiscoveryTypes).GameCollectionItemTypes
-local FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone = require(Parent.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone
-local React = require(Parent.React)
-local EmphasisGameTile = require(Parent.GameTile).EmphasisGameTile
+local parent = script:FindFirstAncestor("GameCollections").Parent
 
-require(Parent.VideoUtils)
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local GameCollectionItemTypes = DiscoveryTypes.GameCollectionItemTypes
 
-local v6 = React.memo(function(t1: {[any]: any}) -- line: 49
-	-- upvalues: React (copy), EmphasisGameTile (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy)
-	return React.createElement(EmphasisGameTile, {
-		size = t1.item.sizeOverride,
-		index = t1.index,
-		layoutOrder = t1.index,
-		SelectionOrder = t1.SelectionOrder,
-		isDisabled = t1.isDisabled,
-		onSelectionGained = t1.onHoldableFocused,
-		onSelectionLost = t1.onHoldableUnfocused,
-		entry = t1.item,
-		topicId = t1.topicId,
-		source = t1.source,
-		referralSource = t1.referralSource,
-		playerCountStyle = t1.playerCountStyle,
-		hideGameStats = t1.hideGameStats,
-		gameTileLayoutType = t1.gameTileLayoutType,
-		useHoverTile = t1.hoverTileEnabled,
-		isContained = t1.isContained,
-		reportGameDetailOpened = t1.reportGameDetailOpened,
-		reportExperienceLaunched = t1.reportExperienceLaunched,
-		launchExperienceEventContext = t1.launchExperienceEventContext,
-		onPeekViewClosed = t1.onPeekViewClosed,
-		navigateToGameDetails = t1.navigateToGameDetails,
-		impressionsTag = t1.impressionsTag,
-		textSizeOffset = t1.textSizeOffset,
-		showDescription = t1.item.showDescription,
-		zIndex = t1.zIndex,
-		onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone then nil else t1.onTileImageLoaded,
-		videoPlaybackContext = t1.videoPlaybackContext
-	})
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEmphasisGameTileVideo = SharedFlags.FFlagLuaAppEmphasisGameTileVideo
+
+local React = require(parent.React)
+local GameTile = require(parent.GameTile)
+local EmphasisGameTile = GameTile.EmphasisGameTile
+require(parent.VideoUtils)
+
+local memo = React.memo(function(props)
+	local createElement = React.createElement
+	local v = {
+		size = props.item.sizeOverride,
+		index = props.index,
+		layoutOrder = props.index,
+		SelectionOrder = props.SelectionOrder,
+		isDisabled = props.isDisabled,
+		onSelectionGained = props.onHoldableFocused,
+		onSelectionLost = props.onHoldableUnfocused,
+		entry = props.item,
+		topicId = props.topicId,
+		source = props.source,
+		referralSource = props.referralSource,
+		playerCountStyle = props.playerCountStyle,
+		hideGameStats = props.hideGameStats,
+		gameTileLayoutType = props.gameTileLayoutType,
+		useHoverTile = props.hoverTileEnabled,
+		isContained = props.isContained,
+		reportGameDetailOpened = props.reportGameDetailOpened,
+		reportExperienceLaunched = props.reportExperienceLaunched,
+		launchExperienceEventContext = props.launchExperienceEventContext,
+		onPeekViewClosed = props.onPeekViewClosed,
+		navigateToGameDetails = props.navigateToGameDetails,
+		impressionsTag = props.impressionsTag,
+		textSizeOffset = props.textSizeOffset,
+		showDescription = props.item.showDescription,
+		zIndex = props.zIndex,
+		videoPlaybackContext = props.videoPlaybackContext,
+		appPage = 0,
+		videoAnalytics = 0
+	}
+	local appPage
+
+	if FFlagLuaAppEmphasisGameTileVideo then
+		appPage = props.appPage
+	end
+
+	v.appPage = appPage
+	local videoAnalytics
+
+	if FFlagLuaAppEmphasisGameTileVideo then
+		videoAnalytics = props.videoAnalytics
+	end
+
+	v.videoAnalytics = videoAnalytics
+	return createElement(EmphasisGameTile, v)
 end)
 
-return function(t2: {[any]: any}) -- line: 82
-	-- upvalues: React (copy), v6 (copy), GameCollectionItemTypes (copy)
-	return React.createElement(v6, t2), GameCollectionItemTypes.GameCollectionItemType.EmphasisTile
+return function(p)
+	return React.createElement(memo, p), GameCollectionItemTypes.GameCollectionItemType.EmphasisTile
 end

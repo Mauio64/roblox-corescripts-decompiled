@@ -1,60 +1,68 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local BaseMenu = require(Foundation.Components.BaseMenu)
-local Flags = require(Foundation.Utility.Flags)
 local Popover = require(Foundation.Components.Popover)
-
 require(Foundation.Components.Types)
-
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local InputSize = require(Foundation.Enums.InputSize)
 local PopoverAlign = require(Foundation.Enums.PopoverAlign)
 local PopoverSide = require(Foundation.Enums.PopoverSide)
 local Radius = require(Foundation.Enums.Radius)
-local t1 = {
-	testId = "--foundation-menu",
+
+local v = {
 	size = InputSize.Medium,
 	side = PopoverSide.Bottom,
-	align = PopoverAlign.Start
+	align = PopoverAlign.Start,
+	testId = "--foundation-menu"
 }
 
-local function Menu(p1, p2) -- line: 67
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), Popover (copy), withCommonProps (copy), Flags (copy), Radius (copy), BaseMenu (copy)
-	local v18 = withDefaults(p1, t1)
-	local v19 = useTokens()
-	local Standard = v19.Stroke.Standard
+local function Menu(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local standard = v3.Stroke.Standard
 
-	return React.createElement(Popover.Root, {
-		isOpen = v18.isOpen,
-		testId = v18.testId
-	}, {
-		Anchor = React.createElement(Popover.Anchor, withCommonProps(v18, {
-			anchorRef = v18.anchorRef
-		}), if not v18.anchorRef then v18.children else nil),
+	local createElement = React.createElement
+	local root = Popover.Root
+	local v4 = { isOpen = v2.isOpen, testId = v2.testId }
+
+	local createElement2 = React.createElement
+	local anchor = Popover.Anchor
+	local v5 = withCommonProps(v2, { anchorRef = v2.anchorRef })
+	local v6
+
+	if not v2.anchorRef then
+		v6 = v2.children
+	end
+
+	return createElement(root, v4, {
+		Anchor = createElement2(anchor, v5, v6),
 		Content = React.createElement(Popover.Content, {
-			hasArrow = false,
 			side = {
-				position = v18.side,
-				offset = Standard + v19.Padding.Small
+				position = v2.side,
+				offset = standard + v3.Padding.Small
 			},
-			align = v18.align,
-			onPressedOutside = v18.onPressedOutside,
-			backgroundStyle = if not Flags.FoundationBaseMenuBeta then v19.Color.Surface.Surface_100 else v19.Color.Surface.Surface_200,
+			align = v2.align,
+			hasArrow = false,
+			onPressedOutside = v2.onPressedOutside,
+			backgroundStyle = v3.Color.Surface.Surface_200,
 			radius = Radius.Medium,
-			ref = p2,
-			selection = v18.selection,
-			selectionGroup = v18.selectionGroup
+			ref = ref,
+			selection = v2.selection,
+			selectionGroup = v2.selectionGroup
 		}, React.createElement(React.Fragment, nil, {
 			Menu = React.createElement(BaseMenu.Root, {
-				items = v18.items,
-				size = v18.size,
-				width = v18.width,
-				maxHeight = v18.maxHeight,
-				onActivated = v18.onActivated,
-				onNestedLeafActivated = v18.onPressedOutside,
+				items = v2.items,
+				size = v2.size,
+				width = v2.width,
+				maxHeight = v2.maxHeight,
+				onActivated = v2.onActivated,
+				onNestedLeafActivated = v2.onPressedOutside,
 				radius = Radius.Medium
 			})
 		}))

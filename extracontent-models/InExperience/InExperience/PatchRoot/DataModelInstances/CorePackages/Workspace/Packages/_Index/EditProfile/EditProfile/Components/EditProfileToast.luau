@@ -1,1 +1,3 @@
-return (require(script.EditProfileToastScreen))
+local EditProfileToastScreen = require(script.EditProfileToastScreen)
+
+return EditProfileToastScreen

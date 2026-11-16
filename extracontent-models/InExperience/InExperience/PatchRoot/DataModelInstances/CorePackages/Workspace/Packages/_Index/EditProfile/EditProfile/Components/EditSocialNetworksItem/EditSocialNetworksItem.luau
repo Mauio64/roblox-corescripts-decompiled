@@ -1,146 +1,229 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
+local parent = EditProfile.Parent
 local UserInputService = game:GetService("UserInputService")
-local React = require(EditProfileParent.React)
-local UIBlox = require(EditProfileParent.UIBlox)
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
 local IconSize = UIBlox.App.Constant.IconSize
 local SocialNetworksInEditProfileIXP = require(EditProfile.Flags.SocialNetworksInEditProfileIXP)
-local useScreenSize = require(EditProfileParent.RobloxAppHooks).useScreenSize
-local CallbackInputBox = require(EditProfileParent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Components.CallbackInputBox
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useScreenSize = RobloxAppHooks.useScreenSize
 
-local function EditSocialNetworksItem(t1: {[any]: any}) -- line: 34
-	-- upvalues: React (copy), useStyle (copy), useScreenSize (copy), SocialNetworksInEditProfileIXP (copy), UserInputService (copy), ImageSetLabel (copy), Images (copy), CallbackInputBox (copy), IconSize (copy)
-	local v15 = React.useRef(nil)
-	local v16 = useStyle()
-	local Font = v16.Font
-	local Theme = v16.Theme
-	local v19 = Font.BaseSize * Font.Body.RelativeSize
-	local v20 = useScreenSize()
-	local v21 = SocialNetworksInEditProfileIXP.useGetExperimentVariant({
-		isExposureEnabled = true
-	})
-	local v22 = if not v21 then nil else v21 == SocialNetworksInEditProfileIXP.Variants.VisibilityFirst and t1.isVisibilityNoOne
-	local v23 = React.useCallback(function() -- line: 48
-		-- upvalues: UserInputService (copy), v15 (copy), t1 (copy)
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local callbackInputBox = LuaSocialLibrariesDeps.SocialLibraries.config({}).Components.CallbackInputBox
+
+local function EditSocialNetworksItem(props)
+	local ref = React.useRef(nil)
+
+	local v = useStyle()
+	local font = v.Font
+	local theme = v.Theme
+	local v2 = font.BaseSize * font.Body.RelativeSize
+	local v3 = useScreenSize()
+
+	local v4 = SocialNetworksInEditProfileIXP.useGetExperimentVariant({ isExposureEnabled = true })
+	local v5
+
+	if v4 then
+		if v4 == SocialNetworksInEditProfileIXP.Variants.VisibilityFirst then
+			v5 = props.isVisibilityNoOne
+		else
+			v5 = false
+		end
+	end
+
+	local v6 = React.useCallback(function()
 		if UserInputService.OnScreenKeyboardVisible then
-			if v15.current and v15.current:IsFocused() then
-				local v24 = UserInputService.OnScreenKeyboardPosition.Y - (v15.current.AbsolutePosition.Y + v15.current.AbsoluteSize.Y)
+			if ref.current and ref.current:IsFocused() then
+				local v6 = UserInputService.OnScreenKeyboardPosition.Y - (ref.current.AbsolutePosition.Y + ref.current.AbsoluteSize.Y)
 
-				if v24 < 0 then
-					t1.setKeyboardOffset(v24)
-
-					return
+				if v6 < 0 then
+					props.setKeyboardOffset(v6)
+				else
+					props.setKeyboardOffset(0)
 				end
-
-				t1.setKeyboardOffset(0)
-
-				return
 			end
 		else
-			t1.setKeyboardOffset(0)
+			props.setKeyboardOffset(0)
 		end
-	end, {
-		v20,
-		t1.setKeyboardOffset
-	})
+	end, { v3, props.setKeyboardOffset })
 
-	React.useEffect(function() -- line: 64
-		-- upvalues: UserInputService (copy), v23 (copy), t1 (copy), v15 (copy)
-		local t2 = {
-			UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(v23),
-			UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(v23)
+	React.useEffect(function()
+		local v7 = {
+			UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(v6),
+			UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(v6)
 		}
 
-		if t1.focusOn then
-			task.spawn(function() -- line: 71
-				-- upvalues: v15 (copy)
-				if v15 and v15.current then
-					v15.current:captureFocus()
+		if props.focusOn then
+			task.spawn(function()
+				if ref and ref.current then
+					ref.current:captureFocus()
 				end
 			end)
 		end
 
-		return function() -- line: 78
-			-- upvalues: t2 (copy)
-			for _, v27 in t2 do
-				v27:Disconnect()
+		return function()
+			for _, connection in v7 do
+				connection:Disconnect()
 			end
 		end
-	end, { v23 })
+	end, { v6 })
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v7 = {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.layoutOrder,
-		Interactable = not v22
-	}, {
+		LayoutOrder = props.layoutOrder,
+		Interactable = not v5
+	}
+
+	local children = {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 12)
 		}),
-		Padding = React.createElement("UIPadding", {
-			PaddingTop = if v21 ~= SocialNetworksInEditProfileIXP.Variants.VisibilityFirst then nil else UDim.new(0, 12),
-			PaddingBottom = if v21 ~= SocialNetworksInEditProfileIXP.Variants.VisibilityLast then nil else UDim.new(0, 12)
-		}),
-		NetworkLabel = React.createElement("TextLabel", {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			RichText = true,
-			Font = Font.Body.Font,
-			Text = t1.networkTitle,
-			TextSize = v19,
-			TextColor3 = Theme.TextDefault.Color,
-			AutomaticSize = Enum.AutomaticSize.XY
-		}),
-		InputBackground = React.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
-			LayoutOrder = 3,
-			Size = UDim2.new(1, 0, 0, v19 + 20),
-			Image = Images["component_assets/circle_21"],
-			ImageColor3 = Theme.UIMuted.Color,
-			ImageTransparency = Theme.UIMuted.Transparency,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(8, 8, 9, 9)
-		}, {
-			InputBorder = React.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				Size = UDim2.new(1, 0, 0, v19 + 20),
-				Image = Images["component_assets/circle_21_stroke_1"],
-				ImageColor3 = Theme.Divider.Color,
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = Rect.new(8, 8, 9, 9)
-			}, {
-				Padding = React.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, 12),
-					PaddingRight = UDim.new(0, 12)
-				}),
-				TextBox = React.createElement(CallbackInputBox, {
-					clearButtonDisabled = false,
-					captureFocusOnMount = t1.focusOn,
-					clearButtonSize = IconSize.Small,
-					clearIcon = Images["icons/actions/edit/clear_small"],
-					clearIconColor3 = Theme.IconEmphasis.Color,
-					clearIconTransparency = if not v22 then nil else Theme.PlaceHolder.Transparency,
-					initialInputText = t1.initialText,
-					inputBoxRef = v15,
-					inputTextColor3 = Theme.TextDefault.Color,
-					inputTextSize = v19,
-					inputTextTransparency = if not v22 then Theme.TextDefault.Transparency else Theme.PlaceHolder.Transparency,
-					inputTextXAlignment = Enum.TextXAlignment.Left,
-					placeholderText = t1.placeholderText,
-					placeholderTextColor3 = Theme.TextDefault.Color,
-					placeholderTextTransparency = if not v22 then nil else Theme.PlaceHolder.Transparency,
-					textChangedCallback = t1.textChanged
-				})
-			})
-		})
+		Padding = 0,
+		NetworkLabel = 0,
+		InputBackground = 0
+	}
+
+	local createElement2 = React.createElement
+	local paddingTop
+
+	if v4 == SocialNetworksInEditProfileIXP.Variants.VisibilityFirst then
+		paddingTop = UDim.new(0, 12)
+	end
+
+	local paddingBottom
+
+	if v4 == SocialNetworksInEditProfileIXP.Variants.VisibilityLast then
+		paddingBottom = UDim.new(0, 12)
+	end
+
+	children.Padding = createElement2("UIPadding", {
+		PaddingTop = paddingTop,
+		PaddingBottom = paddingBottom
 	})
+
+	local createElement3 = React.createElement
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Body.Font
+	end
+
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
+	end
+
+	children.NetworkLabel = createElement3("TextLabel", {
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		Font = font2,
+		FontFace = fontFace,
+		Text = props.networkTitle,
+		TextSize = v2,
+		TextColor3 = theme.TextDefault.Color,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		RichText = true
+	})
+
+	local createElement4 = React.createElement
+	local v8 = {
+		Size = UDim2.new(1, 0, 0, v2 + 20),
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Image = Images["component_assets/circle_21"],
+		ImageColor3 = theme.UIMuted.Color,
+		ImageTransparency = theme.UIMuted.Transparency,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(8, 8, 9, 9)
+	}
+
+	local createElement5 = React.createElement
+	local v9 = {
+		Size = UDim2.new(1, 0, 0, v2 + 20),
+		BackgroundTransparency = 1,
+		LayoutOrder = 1,
+		Image = Images["component_assets/circle_21_stroke_1"],
+		ImageColor3 = theme.Divider.Color,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(8, 8, 9, 9)
+	}
+	local v10 = {
+		Padding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, 12),
+			PaddingRight = UDim.new(0, 12)
+		}),
+		TextBox = 0
+	}
+
+	local createElement6 = React.createElement
+	local v11 = {
+		captureFocusOnMount = props.focusOn,
+		clearButtonDisabled = false,
+		clearButtonSize = IconSize.Small,
+		clearIcon = Images["icons/actions/edit/clear_small"],
+		clearIconColor3 = theme.IconEmphasis.Color,
+		clearIconTransparency = 0,
+		initialInputText = 0,
+		inputBoxRef = 0,
+		inputTextColor3 = 0,
+		inputTextSize = 0,
+		inputTextTransparency = 0,
+		inputTextXAlignment = 0,
+		placeholderText = 0,
+		placeholderTextColor3 = 0,
+		placeholderTextTransparency = 0,
+		textChangedCallback = 0
+	}
+	local clearIconTransparency
+
+	if v5 then
+		clearIconTransparency = theme.PlaceHolder.Transparency
+	end
+
+	v11.clearIconTransparency = clearIconTransparency
+	v11.initialInputText = props.initialText
+	v11.inputBoxRef = ref
+	v11.inputTextColor3 = theme.TextDefault.Color
+	v11.inputTextSize = v2
+	local inputTextTransparency
+
+	if v5 then
+		inputTextTransparency = theme.PlaceHolder.Transparency
+	else
+		inputTextTransparency = theme.TextDefault.Transparency
+	end
+
+	v11.inputTextTransparency = inputTextTransparency
+
+	v11.inputTextXAlignment = Enum.TextXAlignment.Left
+	v11.placeholderText = props.placeholderText
+	v11.placeholderTextColor3 = theme.TextDefault.Color
+	local placeholderTextTransparency
+
+	if v5 then
+		placeholderTextTransparency = theme.PlaceHolder.Transparency
+	end
+
+	v11.placeholderTextTransparency = placeholderTextTransparency
+	v11.textChangedCallback = props.textChanged
+	v10.TextBox = createElement6(callbackInputBox, v11)
+	children.InputBackground = createElement4(ImageSetLabel, v8, {
+		InputBorder = createElement5(ImageSetLabel, v9, v10)
+	})
+	return createElement("Frame", v7, children)
 end
 
 return EditSocialNetworksItem

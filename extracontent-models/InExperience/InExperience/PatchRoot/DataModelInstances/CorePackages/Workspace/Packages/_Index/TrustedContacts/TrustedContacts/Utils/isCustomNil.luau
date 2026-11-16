@@ -1,3 +1,9 @@
-return function(p1) -- line: 2
-	return p1 == nil or (p1 == "" or (p1 == -1 or typeof(p1) == "table" and next(p1) == nil))
+return function(items): boolean
+	if items == nil or items == "" or items == -1 then
+		return true
+	elseif typeof(items) == "table" then
+		return next(items) == nil
+	else
+		return false
+	end
 end

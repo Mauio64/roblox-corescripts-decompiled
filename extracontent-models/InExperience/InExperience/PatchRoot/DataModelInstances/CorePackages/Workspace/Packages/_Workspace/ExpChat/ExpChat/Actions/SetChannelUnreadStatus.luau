@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(s1: string, b1: boolean) -- line: 10
-	return {
-		channelName = s1,
-		hasUnreadMessages = b1
-	}
+return Rodux.makeActionCreator(script.Name, function(channelName: string, hasUnreadMessages: boolean)
+	return { channelName = channelName, hasUnreadMessages = hasUnreadMessages }
 end)

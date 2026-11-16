@@ -1,10 +1,11 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local HeaderBarContext = require(Foundation.Components.HeaderBar.HeaderBarContext)
 
-local function useHeaderBarContext() -- line: 8
-	-- upvalues: React (copy), HeaderBarContext (copy)
+local function useHeaderBarContext()
 	return React.useContext(HeaderBarContext.Context)
 end
 

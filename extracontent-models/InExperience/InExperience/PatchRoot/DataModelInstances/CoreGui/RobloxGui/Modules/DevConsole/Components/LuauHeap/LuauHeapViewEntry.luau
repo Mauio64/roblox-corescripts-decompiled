@@ -1,5 +1,7 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
+
 local Components = script.Parent.Parent.Parent.Components
 local CellLabel = require(Components.CellLabel)
 local BannerButton = require(Components.BannerButton)
@@ -10,98 +12,96 @@ require(script.Parent.LuauHeapTypes)
 local Constants = require(script.Parent.Parent.Parent.Constants)
 local LineWidth = Constants.GeneralFormatting.LineWidth
 local LineColor = Constants.GeneralFormatting.LineColor
+
 local GraphEntryFrameHeight = Constants.LuauHeapFormatting.GraphEntryFrameHeight
 local DepthIndent = Constants.LuauHeapFormatting.DepthIndent
 local ValueCellWidth = Constants.LuauHeapFormatting.ValueCellWidth
 local CellPadding = Constants.LuauHeapFormatting.CellPadding
 local ValuePadding = Constants.LuauHeapFormatting.ValuePadding
-local v15 = Roact.PureComponent:extend("LuauHeapViewEntry")
 
-local function BorderedCellLabel(t1: {[any]: any}) -- line: 32
-	-- upvalues: Roact (copy), CellLabel (copy), LineWidth (copy), ValuePadding (copy), LineColor (copy)
+local extended = Roact.PureComponent:extend("LuauHeapViewEntry")
+
+local function BorderedCellLabel(props)
 	return Roact.createFragment({
 		Label = Roact.createElement(CellLabel, {
-			richText = true,
-			text = t1.text,
-			size = t1.size,
-			pos = t1.pos
+			text = props.text,
+			size = props.size,
+			pos = props.pos,
+			richText = true
 		}),
 		LeftBorder = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = UDim2.new(UDim.new(0, LineWidth), t1.size.Y),
-			Position = UDim2.fromOffset(-ValuePadding, 0) + t1.pos,
+			Size = UDim2.new(UDim.new(0, LineWidth), props.size.Y),
+			Position = UDim2.fromOffset(-ValuePadding, 0) + props.pos,
 			AnchorPoint = Vector2.new(0, 0),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		})
 	})
 end
 
-function v15.init(p1) -- line: 50
-	p1.state = {
+function extended:init()
+	self.state = {
+		expanded = self.props.depth == 0,
 		expandedEllipsis = false,
 		showTooltip = false,
-		expanded = p1.props.depth == 0,
 		tooltipPos = UDim2.fromOffset(0, 0)
 	}
 
-	function p1.onButtonPress() -- line: 58
-		-- upvalues: p1 (copy)
-		p1:setState(function(p2) -- line: 59
+	function self.onButtonPress()
+		self:setState(function(p)
 			return {
-				expanded = not p2.expanded
+				expanded = not p.expanded
 			}
 		end)
 	end
-	function p1.onExpandEllipsis() -- line: 66
-		-- upvalues: p1 (copy)
-		p1:setState({
-			expandedEllipsis = true
-		})
+
+	function self.onExpandEllipsis()
+		self:setState({ expandedEllipsis = true })
 	end
-	function p1.onMouseEnter(_, p4, p5) -- line: 72
-		-- upvalues: p1 (copy)
-		p1:setState({
-			showTooltip = true,
-			tooltipPos = UDim2.fromOffset(p4, p5)
-		})
+
+	function self.onMouseEnter(_, p, p2)
+		self:setState({ showTooltip = true, tooltipPos = UDim2.fromOffset(p, p2) })
 	end
-	function p1.onMouseMove(_, p7, p8) -- line: 79
-		-- upvalues: p1 (copy)
-		p1:setState({
-			showTooltip = true,
-			tooltipPos = UDim2.fromOffset(p7, p8)
-		})
+
+	function self.onMouseMove(_, p, p2)
+		self:setState({ showTooltip = true, tooltipPos = UDim2.fromOffset(p, p2) })
 	end
-	function p1.onMouseLeave() -- line: 86
-		-- upvalues: p1 (copy)
-		p1:setState({
-			showTooltip = false
-		})
+
+	function self.onMouseLeave()
+		self:setState({ showTooltip = false })
 	end
 end
-function v15.renderChildren(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}?) -- line: 93
-	-- upvalues: Roact (copy), v15 (copy)
-	if not t2.state.expanded then
+
+function extended:renderChildren(list, list2)
+	if not self.state.expanded then
 		return {}
 	end
 
-	if #t3 == 0 and (t4 == nil or #t4 == 0) then
+	local v
+
+	if #list == 0 then
+		if list2 == nil then
+			v = false
+		else
+			v = #list2 ~= 0
+		end
+	else
+		v = true
+	end
+
+	if not v then
 		return {}
 	end
 
-	local t5 = {}
-	local TotalSize = t2.props.data.TotalSize
-	local v24 = t2.props.depth + 1
-	local n1 = 0
-	local n2 = 0
-	local n3 = 0
+	local totalSize = self.props.data.TotalSize
 
-	local function getCompareInfo(p9) -- line: 117
-		-- upvalues: t4 (copy)
-		if t4 then
-			for _, v in ipairs(t4) do
-				if p9.Name == v.Name then
-					return v
+	local depth = self.props.depth + 1
+
+	local function getCompareInfo(p)
+		if list2 then
+			for _, item in ipairs(list2) do
+				if p.Name == item.Name then
+					return item
 				end
 			end
 		end
@@ -109,174 +109,238 @@ function v15.renderChildren(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}
 		return nil
 	end
 
-	local g34 = nil
-	local v33 = nil
+	local count = 0
+	local children = {}
+	local total = 0
+	local total2 = 0
 
-	for _, v in ipairs(t3) do
-		if t4 then
-			for _, v2 in ipairs(t4) do
-				if v.Name == v2.Name then
-					v33 = v2
-					g34 = true
-				end
+	for _, item in ipairs(list) do
+		local compare
 
-				if g34 then
+		if list2 then
+			local flag = true
+
+			for _, item2 in ipairs(list2) do
+				if item.Name == item2.Name then
+					compare = item2
+					flag = false
 					break
 				end
 			end
-		end
 
-		if not g34 then
-			v33 = nil
-		end
-
-		g34 = false
-
-		if v.TotalSize <= 128 and #t3 > 4 and not t2.state.expandedEllipsis then
-			n1 += v.TotalSize
-
-			if v33 then
-				n2 += v33.TotalSize
+			if flag then
+				compare = nil
 			end
 		else
-			n3 += 1
-			t5[n3] = Roact.createElement(v15, {
-				layoutOrder = TotalSize - v.TotalSize,
-				depth = v24,
-				data = v,
-				compare = v33
+			local item2 = nil
+			compare = item2
+		end
+
+		if item.TotalSize <= 128 and #list > 4 and not self.state.expandedEllipsis then
+			total += item.TotalSize
+
+			if compare then
+				total2 += compare.TotalSize
+			end
+		else
+			count += 1
+
+			children[count] = Roact.createElement(extended, {
+				layoutOrder = totalSize - item.TotalSize,
+				depth = depth,
+				data = item,
+				compare = compare
 			})
 		end
 	end
 
-	if n1 > 0 then
-		n3 += 1
-		t5[n3] = Roact.createElement(v15, {
-			layoutOrder = TotalSize,
-			depth = v24,
-			data = {
-				Name = "...",
-				Size = n1,
-				TotalSize = n1,
-				Children = {}
-			},
-			compare = if not t4 then nil else {
-				Name = "...",
-				Size = n2,
-				TotalSize = n2,
-				Children = {}
-			},
-			customButtonPress = t2.onExpandEllipsis
+	if total > 0 then
+		count += 1
+
+		children[count] = Roact.createElement(extended, {
+			layoutOrder = totalSize,
+			depth = depth,
+			data = { Size = total, TotalSize = total, Name = "...", Children = {} },
+			compare = list2 and { Size = total2, TotalSize = total2, Name = "...", Children = {} } or nil,
+			customButtonPress = self.onExpandEllipsis
 		})
 	end
 
-	if t4 then
-		for _, v in ipairs(t4) do
-			local v37 = false
+	if not list2 then
+		return children
+	end
 
-			for _, v3 in ipairs(t3) do
-				if v3.Name == v.Name then
-					v37 = true
+	for _, item in ipairs(list2) do
+		local v2 = false
 
-					break
-				end
-			end
-
-			if not v37 then
-				local t6 = {
-					Size = 0,
-					TotalSize = 0,
-					Name = v.Name,
-					Source = v.Source,
-					Children = {}
-				}
-
-				n3 += 1
-				t5[n3] = Roact.createElement(v15, {
-					layoutOrder = TotalSize,
-					depth = v24,
-					data = t6,
-					compare = v
-				})
+		for _, item2 in ipairs(list) do
+			if item2.Name == item.Name then
+				v2 = true
+				break
 			end
 		end
-	end
 
-	return t5
-end
-function v15.renderValues(_, p11) -- line: 223
-	-- upvalues: ValueCellWidth (copy), ValuePadding (copy), GraphEntryFrameHeight (copy), Roact (copy), BorderedCellLabel (copy)
-	local t7 = {}
-	local uDim2 = UDim2.new(ValueCellWidth, -ValuePadding, 0, GraphEntryFrameHeight)
-	local uDim2_2 = UDim2.new(1 - ValueCellWidth * #p11, ValuePadding, 0, 0)
+		if v2 then
+			continue
+		end
 
-	for i, v in ipairs(p11) do
-		t7[tostring(i)] = Roact.createElement(BorderedCellLabel, {
-			text = tostring(v),
-			size = uDim2,
-			pos = uDim2_2 + UDim2.fromScale(ValueCellWidth * (i - 1), 0)
+		local v3 = {
+			Size = 0,
+			TotalSize = 0,
+			["Name"] = item.Name,
+			Source = item.Source,
+			Children = {}
+		}
+
+		count += 1
+
+		children[count] = Roact.createElement(extended, {
+			layoutOrder = totalSize,
+			depth = depth,
+			data = v3,
+			compare = item
 		})
 	end
 
-	return t7
+	return children
 end
-function v15.render(p12) -- line: 238
-	-- upvalues: GraphEntryFrameHeight (copy), DepthIndent (copy), ValueCellWidth (copy), CellPadding (copy), Roact (copy), Tooltip (copy), BannerButton (copy), CellLabel (copy)
-	local props = p12.props
-	local v50 = props.size or UDim2.new(1, 0, 0, GraphEntryFrameHeight)
+
+function extended:renderValues(list)
+	local udim = UDim2.new(ValueCellWidth, -ValuePadding, 0, GraphEntryFrameHeight)
+	local udim2 = UDim2.new(1 - ValueCellWidth * #list, ValuePadding, 0, 0)
+	local children = {}
+
+	for i, item in ipairs(list) do
+		children[tostring(i)] = Roact.createElement(BorderedCellLabel, {
+			text = tostring(item),
+			size = udim,
+			pos = udim2 + UDim2.fromScale(ValueCellWidth * (i - 1), 0)
+		})
+	end
+
+	return children
+end
+
+function extended:render()
+	local props = self.props
+
+	local size = props.size or UDim2.new(1, 0, 0, GraphEntryFrameHeight)
 	local depth = props.depth
-	local v52 = props.layoutOrder or 0
-	local v53 = depth * DepthIndent
+	local layoutOrder = props.layoutOrder or 0
+	local inset = depth * DepthIndent
+
 	local data = props.data
 	local compare = props.compare
-	local t8 = {
-		if not compare or compare.TotalSize == data.TotalSize then string.format("%.0f", data.TotalSize) else string.format("%d <font color=\"#%s\">(%s%d)</font>", data.TotalSize, not (compare.TotalSize > data.TotalSize) and "f00" or "0f0", not (compare.TotalSize > data.TotalSize) and "+" or "", data.TotalSize - compare.TotalSize),
-		if not compare or compare.Size == data.Size then string.format("%.0f", data.Size) else string.format("%d <font color=\"#%s\">(%s%d)</font>", data.Size, not (compare.Size > data.Size) and "f00" or "0f0", not (compare.Size > data.Size) and "+" or "", data.Size - compare.Size)
-	}
-	local v57 = depth ~= 0 and "<anonymous>" or "<root>"
-	local v58 = if not not data.Name and #data.Name ~= 0 then data.Name else v57
-	local v59 = if not not data.Source and #data.Source ~= 0 then data.Source else v58
-	local uDim = UDim.new(1 - ValueCellWidth * #t8, -(CellPadding + v53))
-	local v61 = #data.Children ~= 0 or (compare ~= nil and #compare.Children ~= 0 or props.customButtonPress ~= nil)
-	local v62 = if not props.customButtonPress then p12.onButtonPress else props.customButtonPress
+	local v
 
-	return Roact.createElement("Frame", {
+	if compare and compare.TotalSize ~= data.TotalSize then
+		v = string.format(
+			"%d <font color=\"#%s\">(%s%d)</font>",
+			data.TotalSize,
+			compare.TotalSize > data.TotalSize and "0f0" or "f00",
+			compare.TotalSize > data.TotalSize and "" or "+",
+			data.TotalSize - compare.TotalSize
+		)
+	else
+		v = string.format("%.0f", data.TotalSize)
+	end
+
+	local v2
+
+	if compare and compare.Size ~= data.Size then
+		v2 = string.format(
+			"%d <font color=\"#%s\">(%s%d)</font>",
+			data.Size,
+			compare.Size > data.Size and "0f0" or "f00",
+			compare.Size > data.Size and "" or "+",
+			data.Size - compare.Size
+		)
+	else
+		v2 = string.format("%.0f", data.Size)
+	end
+
+	local v3 = { v, v2 }
+
+	local text = depth == 0 and "<root>" or "<anonymous>"
+
+	if data.Name and #data.Name ~= 0 then
+		text = data.Name
+	end
+
+	local text2
+
+	if data.Source and #data.Source ~= 0 then
+		text2 = data.Source
+	else
+		text2 = text
+	end
+
+	local udim = UDim.new(1 - ValueCellWidth * #v3, -(CellPadding + inset))
+
+	local isExpandable = #data.Children ~= 0
+		or compare ~= nil and #compare.Children ~= 0
+		or props.customButtonPress ~= nil
+	local onButtonPress
+
+	if props.customButtonPress then
+		onButtonPress = props.customButtonPress
+	else
+		onButtonPress = self.onButtonPress
+	end
+
+	local createElement = Roact.createElement
+	local v4 = {
+		Size = size,
 		BackgroundTransparency = 1,
-		Size = v50,
-		LayoutOrder = v52,
+		LayoutOrder = layoutOrder,
 		AutomaticSize = Enum.AutomaticSize.Y
-	}, {
-		tooltip = if not p12.state.showTooltip then nil else Roact.createElement(Tooltip, {
-			text = v59,
-			pos = p12.state.tooltipPos
-		}),
+	}
+	local tooltip
+
+	if self.state.showTooltip then
+		tooltip = Roact.createElement(Tooltip, { text = text2, pos = self.state.tooltipPos })
+	end
+
+	local children = {
+		tooltip = tooltip,
 		layout = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Right,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
 		button = Roact.createElement(BannerButton, {
-			layoutOrder = -1,
 			size = UDim2.new(1, 0, 0, GraphEntryFrameHeight),
-			inset = v53,
-			isExpanded = p12.state.expanded,
-			isExpandable = v61,
-			onButtonPress = v62,
-			onMouseEnter = p12.onMouseEnter,
-			onMouseLeave = p12.onMouseLeave,
-			onMouseMove = p12.onMouseMove
+			inset = inset,
+			isExpanded = self.state.expanded,
+			isExpandable = isExpandable,
+			onButtonPress = onButtonPress,
+			onMouseEnter = self.onMouseEnter,
+			onMouseLeave = self.onMouseLeave,
+			onMouseMove = self.onMouseMove,
+			layoutOrder = -1
 		}, {
 			name = Roact.createElement(CellLabel, {
-				textWrapped = false,
-				text = v58,
-				size = UDim2.new(uDim, UDim.new(1, 0)),
-				pos = UDim2.new(0, CellPadding + v53, 0, 0),
-				textTruncate = Enum.TextTruncate.SplitWord
+				text = text,
+				size = UDim2.new(udim, UDim.new(1, 0)),
+				pos = UDim2.new(0, CellPadding + inset, 0, 0),
+				textTruncate = Enum.TextTruncate.SplitWord,
+				textWrapped = false
 			}),
-			values = Roact.createFragment(p12:renderValues(t8))
+			values = Roact.createFragment(self:renderValues(v3))
 		}),
-		children = Roact.createFragment(p12:renderChildren(data.Children, if not compare then nil else compare.Children))
-	})
+		children = 0
+	}
+
+	local createFragment = Roact.createFragment
+	local children2 = data.Children
+	local v5
+
+	if compare then
+		v5 = compare.Children
+	end
+
+	children.children = createFragment(self:renderChildren(children2, v5))
+	return createElement("Frame", v4, children)
 end
 
-return v15
+return extended

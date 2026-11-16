@@ -1,3 +1,1 @@
-return {
-	TraversalHistory = "TraversalHistory"
-}
+return { TraversalHistory = "TraversalHistory" }

@@ -1,90 +1,67 @@
-local CollectionViews = script:FindFirstAncestor("CollectionViews")
-local CollectionViewsParent = CollectionViews.Parent
-local React = require(CollectionViewsParent.React)
-local ArgCheck = require(CollectionViewsParent.ArgCheck)
-local calculateSpacePerItem = require(CollectionViews.calculateSpacePerItem)
+local parent = script:FindFirstAncestor("CollectionViews").Parent
+local React = require(parent.React)
+local ArgCheck = require(parent.ArgCheck)
 
-require(CollectionViews.Carousel.calculateCarouselSpacingMetrics)
-
-local FFlagCollectionViewMathChanges = require(CollectionViewsParent.SharedFlags).FFlagCollectionViewMathChanges
-
-local function RowOfCollectionItems(t1: {[any]: any}) -- line: 52
-	-- upvalues: React (copy), FFlagCollectionViewMathChanges (copy), calculateSpacePerItem (copy), ArgCheck (copy)
-	local v9 = React.useMemo(function() -- line: 54
-		-- upvalues: t1 (copy), FFlagCollectionViewMathChanges (copy), calculateSpacePerItem (copy), React (copy), ArgCheck (copy)
-		if t1.numToRender == 0 or if not FFlagCollectionViewMathChanges then t1.numItemsForSizing == 0 else t1.numColumns == 0 then
+local function RowOfCollectionItems(props)
+	local v = React.useMemo(function()
+		if props.numToRender == 0 or props.numItemsForSizing == 0 then
 			return nil
 		end
 
-		local v10 = t1.startingIndex - 1
-		local t2 = {}
-		local uDim2, adjustedGap
+		local v = props.startingIndex - 1
 
-		if FFlagCollectionViewMathChanges then
-			local numColumns = t1.numColumns
-			local v13 = calculateSpacePerItem(numColumns, t1.columnGap)
+		local numItemsForSizing = props.numItemsForSizing
+		local v2 = numItemsForSizing - 1
 
-			uDim2 = UDim2.new(1 / numColumns, -v13.gapOffsetPerItem, 1, 0)
-			adjustedGap = v13.adjustedGap
-		else
-			local numItemsForSizing = t1.numItemsForSizing
-			local v17 = numItemsForSizing - 1
-			local v18 = math.floor(v17 / numItemsForSizing * t1.columnGap)
+		local v3 = math.floor(v2 / numItemsForSizing * props.columnGap)
+		local udim = UDim2.new(1 / numItemsForSizing, -v3, 1, 0)
 
-			uDim2 = UDim2.new(1 / numItemsForSizing, -v18, 1, 0)
+		local v4 = v3 * numItemsForSizing - props.columnGap * v2
+		local v5 = props.columnGap + v4 / v2
+		local children = {}
 
-			local v19 = v18 * numItemsForSizing - t1.columnGap * v17
-
-			adjustedGap = t1.columnGap + v19 / v17
-		end
-
-		t2.Layout = React.createElement("UIListLayout", {
+		children.Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
-			Padding = UDim.new(0, adjustedGap),
+			Padding = UDim.new(0, v5),
 			HorizontalAlignment = Enum.HorizontalAlignment.Left
 		})
 
-		if v10 > 0 then
-			t2.Padding = React.createElement("Frame", {
+		if v > 0 then
+			children.Padding = React.createElement("Frame", {
 				BackgroundTransparency = 1,
-				LayoutOrder = 0,
-				Size = if not FFlagCollectionViewMathChanges then UDim2.new(v10 * uDim2.X.Scale, (v10 - 1) * adjustedGap + v10 * uDim2.X.Offset, 0, 0) else t1.spacingMetricsBinding:map(function(p1) -- line: 100
-					-- upvalues: v10 (copy)
-					local v25 = v10 * p1.stride - p1.renderedGap
-
-					return UDim2.fromOffset(math.max(0, v25), 0)
-				end)
+				Size = UDim2.new(v * udim.X.Scale, (v - 1) * v5 + v * udim.X.Offset, 0, 0),
+				LayoutOrder = 0
 			})
 		end
 
-		ArgCheck.assert(t1.startingIndex >= 1 and t1.startingIndex <= #t1.items)
-		ArgCheck.assert(t1.endingIndex >= t1.startingIndex and t1.endingIndex <= #t1.items)
+		ArgCheck.assert(props.startingIndex >= 1 and props.startingIndex <= #props.items)
+		ArgCheck.assert(props.endingIndex >= props.startingIndex and props.endingIndex <= #props.items)
 
-		for i = t1.startingIndex, t1.endingIndex do
-			if i >= 1 and i <= #t1.items then
-				local v21 = t1.items[i]
-				local v22, v23 = t1.renderItem(v21, i, uDim2)
-
-				t2[v23 .. tostring(i % t1.numToRender + 1)] = v22
+		for i = props.startingIndex, props.endingIndex do
+			if not (i >= 1 and i <= #props.items) then
+				continue
 			end
+
+			local item = props.items[i]
+			local item2, v6 = props.renderItem(item, i, udim)
+			children[v6 .. tostring(i % props.numToRender + 1)] = item2
 		end
 
-		return t2
+		return children
 	end, {
-		t1.columnGap,
-		t1.startingIndex,
-		t1.endingIndex,
-		t1.items,
-		t1.numToRender,
-		t1.renderItem,
-		t1.sideMargin,
-		t1.totalItemsOnCanvas,
-		if not FFlagCollectionViewMathChanges then t1.numItemsForSizing else t1.numColumns,
-		if not FFlagCollectionViewMathChanges then nil else t1.spacingMetricsBinding
+		props.columnGap,
+		props.startingIndex,
+		props.endingIndex,
+		props.items,
+		props.numToRender,
+		props.renderItem,
+		props.sideMargin,
+		props.totalItemsOnCanvas,
+		props.numItemsForSizing
 	})
 
-	return React.createElement(React.Fragment, nil, v9)
+	return React.createElement(React.Fragment, nil, v)
 end
 
 return React.memo(RowOfCollectionItems)

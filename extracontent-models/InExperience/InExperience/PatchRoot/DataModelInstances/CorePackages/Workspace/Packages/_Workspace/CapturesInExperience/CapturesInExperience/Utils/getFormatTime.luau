@@ -1,8 +1,7 @@
-local function getFormatTime(n1: number) -- line: 1
-	local v3 = math.floor(n1 / 60)
-	local v4 = math.floor(n1 % 60)
-
-	return string.format("%01d:%02d", v3, v4)
+local function getFormatTime(p: number)
+	local v = math.floor(p / 60)
+	local v2 = math.floor(p % 60)
+	return string.format("%01d:%02d", v, v2)
 end
 
 return getFormatTime

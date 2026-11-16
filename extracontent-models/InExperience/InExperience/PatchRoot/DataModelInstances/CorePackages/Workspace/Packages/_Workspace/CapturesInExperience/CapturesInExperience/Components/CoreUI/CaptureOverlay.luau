@@ -1,52 +1,57 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
 local RunService = game:GetService("RunService")
-local React = require(ParentParentParent.React)
-local ReactOtter = require(ParentParentParent.ReactOtter)
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local Constants = require(ParentParent.Constants)
+
+local React = require(parent2.React)
+local ReactOtter = require(parent2.ReactOtter)
+local RoactUtils = require(parent2.RoactUtils)
+
+local Constants = require(parent.Constants)
+
 local useAnimatedBinding = ReactOtter.useAnimatedBinding
-local useBindCaptureShortcut = require(ParentParent.Hooks.useBindCaptureShortcut)
+local useBindCaptureShortcut = require(parent.Hooks.useBindCaptureShortcut)
 local useEffect = React.useEffect
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local useShowFlashOverlay = require(ParentParent.Hooks.useShowFlashOverlay)
-local useTopbarInsetHeight = require(ParentParent.Hooks.useTopbarInsetHeight)
+local useShowFlashOverlay = require(parent.Hooks.useShowFlashOverlay)
+local useTopbarInsetHeight = require(parent.Hooks.useTopbarInsetHeight)
+
 local instant = ReactOtter.instant
 local spring = ReactOtter.spring
 
-return function(_: {[any]: any}) -- line: 26
-	-- upvalues: useBindCaptureShortcut (copy), useTopbarInsetHeight (copy), useSelector (copy), Constants (copy), useShowFlashOverlay (copy), useAnimatedBinding (copy), useEffect (copy), instant (copy), RunService (copy), spring (copy), React (copy)
+return function(_)
 	useBindCaptureShortcut()
 
-	local v17 = useTopbarInsetHeight()
-	local v18 = useSelector(function(p1) -- line: 31
-		-- upvalues: Constants (copy)
-		return p1[Constants.RoduxKey].IsOverlayActive
-	end)
-	local v19, v20 = useShowFlashOverlay()
-	local v21, v22 = useAnimatedBinding(1)
+	local v = useTopbarInsetHeight()
 
-	useEffect(function() -- line: 38
-		-- upvalues: v19 (copy), v20 (copy), v22 (copy), instant (copy), RunService (copy), spring (copy)
-		if v19 then
-			v20()
-			v22((instant(0)))
-			task.defer(function() -- line: 48
-				-- upvalues: RunService (copy), v22 (copy), spring (copy)
+	local visible = useSelector(function(p)
+		return p[Constants.RoduxKey].IsOverlayActive
+	end)
+
+	local v2, v3 = useShowFlashOverlay()
+	local v4, v5 = useAnimatedBinding(1)
+
+	useEffect(function()
+		if v2 then
+			v3()
+
+			v5((instant(0)))
+
+			task.defer(function()
 				RunService.RenderStepped:Wait()
 				RunService.RenderStepped:Wait()
-				v22(spring(1))
+				v5(spring(1))
 			end)
 		end
-	end, { v19 })
+	end, { v2 })
 
 	return React.createElement("Frame", {
 		Active = false,
 		BackgroundColor3 = Color3.new(0, 0, 0),
-		BackgroundTransparency = not v19 and 1 or v21,
-		Position = UDim2.fromOffset(0, -v17),
-		Size = UDim2.new(1, 0, 1, v17),
-		Visible = v18,
+		BackgroundTransparency = not v2 and 1 or v4,
+		Position = UDim2.fromOffset(0, -v),
+		Size = UDim2.new(1, 0, 1, v),
+		Visible = visible,
 		ZIndex = Constants.ZIndex.Entrypoint
 	}, {})
 end

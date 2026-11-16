@@ -1,69 +1,72 @@
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
 local CrossExperienceVoice = require(CorePackages.Workspace.Packages.CrossExperienceVoice)
-local GetFFlagEnableCrossExpVoice = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableCrossExpVoice
-local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
+
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
+
 local Service = require(Chrome.Service)
 local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
 local PartyMicIcon = require(Chrome.Integrations.Party.PartyMicIcon)
 local Constants = require(Chrome.Integrations.Party.Constants)
-local Signal = require(CorePackages.Workspace.Packages.AppCommonLib).Signal
-local FFlagChromeActivatedMappedSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeActivatedMappedSignal
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Signal = AppCommonLib.Signal
 local MappedSignal = ChromeUtils.MappedSignal
+
 local default = CrossExperienceVoice.CrossExperienceVoiceManager.default
-local u15 = nil
-local u16 = false
-local v17 = Signal.new()
-local v18 = Signal.new()
 
-v17:connect(function(p1) -- line: 30
-	-- upvalues: u15 (ref)
-	u15 = p1
-end)
-v18:connect(function(p2) -- line: 34
-	-- upvalues: u16 (ref)
-	u16 = p2
+local v = nil
+local v2 = false
+
+local isLocalPlayerMutedSignal = Signal.new()
+local isVoiceConnectedSignal = Signal.new()
+
+isLocalPlayerMutedSignal:connect(function(p)
+	v = p
 end)
 
-local v19 = if not FFlagChromeActivatedMappedSignal then nil else MappedSignal.new(v17, function() -- line: 39
-	-- upvalues: u16 (ref), u15 (ref)
-	return u16 and u15 == false
+isVoiceConnectedSignal:connect(function(p)
+	v2 = p
 end)
+
+local isActivated = MappedSignal.new(isLocalPlayerMutedSignal, function()
+	return v2 and v == false
+end)
+
 local FFlagChangeToggleMicText = require(Chrome.Flags.FFlagChangeToggleMicText)
-local v21 = nil
+local v3
 
 if GetFFlagEnableCrossExpVoice() then
-	v21 = Service:register({
+	return (Service:register({
 		id = Constants.TOGGLE_MIC_INTEGRATION_ID,
-		label = not FFlagChangeToggleMicText and "CoreScripts.TopBar.ToggleMic" or "CoreScripts.TopBar.Mic",
+		label = FFlagChangeToggleMicText and "CoreScripts.TopBar.Mic" or "CoreScripts.TopBar.ToggleMic",
 		sideSheetPlacement = SideSheetPlacement.Unibar,
-		isActivated = if not FFlagChromeActivatedMappedSignal then nil else v19,
-		activated = function() -- line: 54
-			-- upvalues: Players (copy), u16 (ref), u15 (ref), default (copy)
-			local v24 = Players and (not not Players.LocalPlayer and Players.LocalPlayer.UserId) or -1
+		isActivated = isActivated,
+		activated = function()
+			local userId = Players and Players.LocalPlayer and Players.LocalPlayer.UserId or -1
 
-			if v24 ~= -1 and (u16 and u15 ~= nil) then
-				if u15 then
-					default:unmuteVoiceParticipant(v24)
-
-					return
+			if userId ~= -1 and v2 and v ~= nil then
+				if v then
+					default:unmuteVoiceParticipant(userId)
+				else
+					default:muteVoiceParticipant(userId)
 				end
-
-				default:muteVoiceParticipant(v24)
 			end
 		end,
 		components = {
-			Icon = function() -- line: 65
-				-- upvalues: PartyMicIcon (copy), v17 (copy), v18 (copy)
+			Icon = function()
 				return PartyMicIcon({
-					isLocalPlayerMutedSignal = v17,
-					isVoiceConnectedSignal = v18
+					isLocalPlayerMutedSignal = isLocalPlayerMutedSignal,
+					isVoiceConnectedSignal = isVoiceConnectedSignal
 				})
 			end
 		},
 		initialAvailability = Service.AvailabilitySignal.Unavailable
-	})
+	}))
 end
 
-return v21
+return v3

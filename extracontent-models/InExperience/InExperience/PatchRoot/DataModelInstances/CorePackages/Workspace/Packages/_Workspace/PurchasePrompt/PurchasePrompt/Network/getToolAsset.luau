@@ -1,17 +1,17 @@
-local function getToolAsset(p1, p2) -- line: 2
-	return p1.loadAssetForEquip(p2):andThen(function(p3) -- line: 5
-		if p3:IsA("Tool") then
-			return p3
+local function getToolAsset(p, p2)
+	return p.loadAssetForEquip(p2):andThen(function(tool)
+		if tool:IsA("Tool") then
+			return tool
 		end
 
-		local children = p3:GetChildren()
+		local children = tool:GetChildren()
 
-		for _, v in ipairs(children) do
-			if v:IsA("Tool") then
-				return v
+		for _, tool2 in ipairs(children) do
+			if tool2:IsA("Tool") then
+				return tool2
 			end
 		end
-	end):catch(function(_) -- line: 17
+	end):catch(function(_): nil
 		return nil
 	end)
 end

@@ -1,11 +1,14 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+local parent = Foundation.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
 
 require(Foundation.Components.Types)
 
 local InputSize = require(Foundation.Enums.InputSize)
+
 local InputVariant = require(Foundation.Enums.InputVariant)
+
 local IconSize = require(Foundation.Enums.IconSize)
 
 require(Foundation.Enums.Radius)
@@ -18,98 +21,112 @@ require(Foundation.Providers.Style.Tokens)
 
 local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 
-local function computeProps(t1: {[any]: any}) -- line: 62
+local function computeProps(data)
 	return {
 		container = {
-			minHeight = t1.minContainerHeight,
-			horizontalPadding = UDim.new(0, t1.horizontalPadding),
-			radius = t1.radius,
-			tag = t1.containerTag
+			minHeight = data.minContainerHeight,
+			horizontalPadding = UDim.new(0, data.horizontalPadding),
+			radius = data.radius,
+			tag = data.containerTag
 		},
-		textBox = {
-			fontStyle = t1.typography
-		},
-		icon = {
-			size = t1.iconSize
-		},
-		clearButton = {
-			icon = t1.clearButtonIcon,
-			padding = t1.clearButtonPadding
-		}
-	}
-end
-local function variantsFactory(p1) -- line: 92
-	-- upvalues: InputSize (copy), computeProps (copy), IconSize (copy), BuilderIcons (copy), Flags (copy)
-	local t2 = {
-		container = {
-			tag = "row",
-			strokeStyle = p1.Color.Stroke.Emphasis,
-			strokeThickness = p1.Stroke.Standard
-		},
-		textBox = {
-			tag = "text-align-x-left text-align-y-center clip content-emphasis gui-object-defaults"
-		},
-		icon = {
-			style = p1.Color.Content.Muted
-		},
-		clearButton = {
-			tag = "auto-xy"
-		}
-	}
-	local t3 = {
-		[InputSize.XSmall] = computeProps({
-			containerTag = "size-full-600 gap-small",
-			radius = p1.Radius.Small,
-			horizontalPadding = p1.Padding.XSmall,
-			typography = p1.Typography.BodySmall,
-			iconSize = IconSize.XSmall,
-			minContainerHeight = p1.Size.Size_600,
-			clearButtonIcon = BuilderIcons.Icon.XSmall,
-			clearButtonPadding = p1.Padding.XSmall
-		}),
-		[InputSize.Small] = computeProps({
-			containerTag = "size-full-800 gap-medium",
-			radius = p1.Radius.Medium,
-			horizontalPadding = p1.Padding.Small,
-			typography = p1.Typography.BodyMedium,
-			iconSize = IconSize.XSmall,
-			minContainerHeight = p1.Size.Size_800,
-			clearButtonIcon = BuilderIcons.Icon.XSmall,
-			clearButtonPadding = p1.Size.Size_150
-		}),
-		[InputSize.Medium] = computeProps({
-			containerTag = "size-full-1000 gap-large",
-			radius = p1.Radius.Medium,
-			horizontalPadding = if not Flags.FoundationNumberInputBeta then p1.Padding.Small else p1.Padding.Medium,
-			typography = p1.Typography.BodyMedium,
-			iconSize = IconSize.Small,
-			minContainerHeight = p1.Size.Size_1000,
-			clearButtonIcon = BuilderIcons.Icon.X,
-			clearButtonPadding = p1.Padding.Small
-		}),
-		[InputSize.Large] = computeProps({
-			containerTag = "size-full-1200 gap-large",
-			radius = p1.Radius.Medium,
-			horizontalPadding = p1.Padding.Medium,
-			typography = p1.Typography.BodyLarge,
-			iconSize = IconSize.Small,
-			minContainerHeight = p1.Size.Size_1200,
-			clearButtonIcon = BuilderIcons.Icon.X,
-			clearButtonPadding = p1.Padding.Small
-		})
-	}
-
-	return {
-		common = t2,
-		sizes = t3
+		textBox = { fontStyle = data.typography },
+		icon = { size = data.iconSize },
+		clearButton = { icon = data.clearButtonIcon, padding = data.clearButtonPadding }
 	}
 end
 
-return function(p2, p3, p4, p5, b1: boolean?, b2: boolean?) -- line: 159
-	-- upvalues: VariantsContext (copy), variantsFactory (copy), getInputVariantsFactory (copy), InputVariant (copy), composeStyleVariant (copy)
-	local v23 = VariantsContext.useVariants("TextInput", variantsFactory, p2)
-	local v24 = VariantsContext.useVariants("InputField", getInputVariantsFactory, p2)
-	local v25 = v24.variants[p4 or InputVariant.Standard]
+local function variantsFactory(data)
+	local fgStyle
 
-	return composeStyleVariant(v23.common, v24.sizes[p3], v23.sizes[p3], if p4 == InputVariant.Utility then {} else v25, if not p5 then v24.defaultRadius[p3] else v24.radius[p5], if b1 == nil then {} else v24.focusedState[b1], if b2 == nil then {} else v24.errorState[b2], if p4 ~= InputVariant.Utility then {} else v25)
+	if Flags.FoundationFixColorOnScrubbableNumberInput then
+		fgStyle = data.Color.Shift.Shift_200
+	end
+
+	return {
+		common = {
+			container = {
+				fgStyle = fgStyle,
+				strokeStyle = data.Color.Stroke.Emphasis,
+				strokeThickness = data.Stroke.Standard,
+				tag = "row"
+			},
+			textBox = {
+				tag = "text-align-x-left text-align-y-center clip content-emphasis gui-object-defaults"
+			},
+			icon = { style = data.Color.Content.Muted },
+			clearButton = { tag = "auto-xy" }
+		},
+		sizes = {
+			[InputSize.XSmall] = computeProps({
+				radius = data.Radius.Small,
+				containerTag = "size-full-600 gap-small",
+				horizontalPadding = data.Padding.XSmall,
+				typography = data.Typography.BodySmall,
+				iconSize = IconSize.XSmall,
+				minContainerHeight = data.Size.Size_600,
+				clearButtonIcon = BuilderIcons.Icon.XSmall,
+				clearButtonPadding = data.Padding.XSmall
+			}),
+			[InputSize.Small] = computeProps({
+				radius = data.Radius.Medium,
+				containerTag = "size-full-800 gap-medium",
+				horizontalPadding = data.Padding.Small,
+				typography = data.Typography.BodyMedium,
+				iconSize = IconSize.XSmall,
+				minContainerHeight = data.Size.Size_800,
+				clearButtonIcon = BuilderIcons.Icon.XSmall,
+				clearButtonPadding = data.Size.Size_150
+			}),
+			[InputSize.Medium] = computeProps({
+				radius = data.Radius.Medium,
+				containerTag = "size-full-1000 gap-large",
+				horizontalPadding = data.Padding.Medium,
+				typography = data.Typography.BodyMedium,
+				iconSize = IconSize.Small,
+				minContainerHeight = data.Size.Size_1000,
+				clearButtonIcon = BuilderIcons.Icon.X,
+				clearButtonPadding = data.Padding.Small
+			}),
+			[InputSize.Large] = computeProps({
+				radius = data.Radius.Medium,
+				containerTag = "size-full-1200 gap-large",
+				horizontalPadding = data.Padding.Medium,
+				typography = data.Typography.BodyLarge,
+				iconSize = IconSize.Small,
+				minContainerHeight = data.Size.Size_1200,
+				clearButtonIcon = BuilderIcons.Icon.X,
+				clearButtonPadding = data.Padding.Small
+			})
+		}
+	}
+end
+
+return function(p, p2, p3, p4, flag: boolean?, flag2: boolean?)
+	local v = VariantsContext.useVariants("TextInput", variantsFactory, p)
+	local v2 = VariantsContext.useVariants("InputField", getInputVariantsFactory, p)
+
+	local variant = v2.variants[p3 or InputVariant.Standard]
+
+	local common = v.common
+	local siz = v2.sizes[p2]
+	local siz2 = v.sizes[p2]
+	local v3 = p3 == InputVariant.Utility and {} or variant
+	local v4
+
+	if p4 then
+		v4 = v2.radius[p4]
+	else
+		v4 = v2.defaultRadius[p2]
+	end
+
+	return composeStyleVariant(
+		common,
+		siz,
+		siz2,
+		v3,
+		v4,
+		flag == nil and {} or v2.focusedState[flag],
+		flag2 == nil and {} or v2.errorState[flag2],
+		p3 ~= InputVariant.Utility and {} or variant
+	)
 end

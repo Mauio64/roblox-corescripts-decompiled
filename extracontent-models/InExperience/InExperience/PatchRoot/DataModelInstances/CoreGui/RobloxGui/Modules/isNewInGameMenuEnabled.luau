@@ -1,42 +1,38 @@
 local Players = game:GetService("Players")
 local VRService = game:GetService("VRService")
 local CorePackages = game:GetService("CorePackages")
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 
 game:DefineFastInt("NewInGameMenuPercentRollout3", 0)
 game:DefineFastString("NewInGameMenuForcedUserIds", "")
 game:DefineFastFlag("NewInGameMenuDisabledInVR", false)
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
 
-local _ = SharedFlags.isSubjectToDesktopPolicies
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 
-return function() -- line: 20
-	-- upvalues: VRService (copy), isInExperienceUIVREnabled (copy), Players (copy)
+local isSubjectToDesktopPolicies = SharedFlags.isSubjectToDesktopPolicies
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
+
+return function(): boolean
 	if VRService.VREnabled then
-		if isInExperienceUIVREnabled then
-			return false
+		return not isInExperienceUIVREnabled
+	else
+		local localPlayer = Players.LocalPlayer
+
+		while not localPlayer do
+			Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+			localPlayer = Players.LocalPlayer
 		end
 
-		return true
-	end
-
-	local LocalPlayer = Players.LocalPlayer
-
-	while not LocalPlayer do
-		Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-		LocalPlayer = Players.LocalPlayer
-	end
-
-	for match in game:GetFastString("NewInGameMenuForcedUserIds"):gmatch("%d+") do
-		if tonumber(match) == LocalPlayer.UserId then
-			return true
+		for k in game:GetFastString("NewInGameMenuForcedUserIds"):gmatch("%d+") do
+			if tonumber(k) == localPlayer.UserId then
+				return true
+			end
 		end
-	end
 
-	if game:GetFastInt("NewInGameMenuPercentRollout3") > LocalPlayer.UserId % 100 then
-		return true
+		return game:GetFastInt("NewInGameMenuPercentRollout3") > localPlayer.UserId % 100
 	end
-
-	return false
 end

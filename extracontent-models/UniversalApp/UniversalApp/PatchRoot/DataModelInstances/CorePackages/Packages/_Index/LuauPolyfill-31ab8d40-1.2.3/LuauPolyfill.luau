@@ -1,22 +1,20 @@
-local scriptParent = script.Parent
-local Boolean = require(scriptParent.Boolean)
-local Collections = require(scriptParent.Collections)
-local Console = require(scriptParent.Console)
-local Math = require(scriptParent.Math)
-local Number = require(scriptParent.Number)
-local String = require(scriptParent.String)
-local Symbol = require(scriptParent.Symbol)
-local Timers = require(scriptParent.Timers)
+local parent = script.Parent
 
-require(scriptParent.ES7Types)
+local Boolean = require(parent.Boolean)
+local Collections = require(parent.Collections)
+local Console = require(parent.Console)
+local Math = require(parent.Math)
+local Number = require(parent.Number)
+local String = require(parent.String)
+local Symbol = require(parent.Symbol)
+local Timers = require(parent.Timers)
+require(parent.ES7Types)
 
 local AssertionError = require(script.AssertionError)
 local Error = require(script.Error)
-
 require(script.Promise)
-
 local extends = require(script.extends)
-local InstanceOf = require(scriptParent.InstanceOf)
+local InstanceOf = require(parent.InstanceOf)
 
 return {
 	Array = Collections.Array,
@@ -40,7 +38,5 @@ return {
 	clearTimeout = Timers.clearTimeout,
 	setInterval = Timers.setInterval,
 	clearInterval = Timers.clearInterval,
-	util = {
-		inspect = Collections.inspect
-	}
+	util = { inspect = Collections.inspect }
 }

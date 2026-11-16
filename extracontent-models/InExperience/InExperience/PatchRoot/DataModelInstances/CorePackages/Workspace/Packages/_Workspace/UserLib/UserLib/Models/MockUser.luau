@@ -1,39 +1,44 @@
 local User = require(script.Parent.User)
-local n1 = 0
-local t1 = {}
 
-t1.__index = t1
+local count = 0
 
-function t1.new() -- line: 15
-	-- upvalues: User (copy), n1 (ref)
-	local v4 = User.new()
+local MockUser = {}
+MockUser.__index = MockUser
 
-	n1 += 1
-	v4.id = tostring(n1)
-	v4.isFetching = false
-	v4.isFriend = false
-	v4.friendRank = 0
-	v4.lastLocation = nil
-	v4.name = "USER NAME"
-	v4.universeId = nil
-	v4.placeId = nil
-	v4.rootPlaceId = nil
-	v4.gameInstanceId = nil
-	v4.presence = User.PresenceType.OFFLINE
-	v4.membership = nil
-	v4.thumbnails = nil
-	v4.lastOnline = nil
-	v4.displayName = "DN+" .. v4.name
-	v4.externalAppDisplayName = "EXTERNAL APP DISPLAY NAME"
-	v4.hasVerifiedBadge = false
-	v4.hasRobloxSubscription = false
-	setmetatable(v4, {
-		__index = User
-	})
-
-	return v4
+local function fn() -- 1 equivalent call inferred from this helper
+	count += 1
+	return (tostring(count))
 end
-function t1.mockEndpointResponse() -- line: 45
+
+function MockUser.new()
+	local v = User.new()
+
+	v.id = fn() -- inferred equivalent call
+
+	v.isFetching = false
+	v.isFriend = false
+	v.friendRank = 0
+	v.lastLocation = nil
+	v.name = "USER NAME"
+	v.universeId = nil
+	v.placeId = nil
+	v.rootPlaceId = nil
+	v.gameInstanceId = nil
+	v.presence = User.PresenceType.OFFLINE
+	v.membership = nil
+	v.thumbnails = nil
+	v.lastOnline = nil
+	v.displayName = "DN+" .. v.name
+	v.externalAppDisplayName = "EXTERNAL APP DISPLAY NAME"
+	v.hasVerifiedBadge = false
+	v.hasRobloxSubscription = false
+
+	setmetatable(v, { __index = User })
+
+	return v
+end
+
+function MockUser.mockEndpointResponse()
 	return {
 		created = "0001-01-01T06:00:00Z",
 		displayName = "DN+12345",
@@ -49,4 +54,4 @@ function t1.mockEndpointResponse() -- line: 45
 	}
 end
 
-return t1
+return MockUser

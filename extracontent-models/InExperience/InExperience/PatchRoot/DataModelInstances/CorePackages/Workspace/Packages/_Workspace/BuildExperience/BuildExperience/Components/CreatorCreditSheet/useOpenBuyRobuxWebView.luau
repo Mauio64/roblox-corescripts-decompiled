@@ -1,67 +1,63 @@
 local AppLifecycleObserverService = game:GetService("AppLifecycleObserverService")
 local ContentProvider = game:GetService("ContentProvider")
+
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
-local useOpenWebView = require(BuildExperienceParent.WebViewUtils).useOpenWebView
+local parent = BuildExperience.Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local WebViewUtils = require(parent.WebViewUtils)
+local useOpenWebView = WebViewUtils.useOpenWebView
+
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
-local function getPurchaseRobuxUrl() -- line: 16
-	-- upvalues: ContentProvider (copy)
-	local v10 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
-
-	return string.gsub(v10, "http:", "https:") .. "upgrades/robux?ctx=navpopover"
+local function getPurchaseRobuxUrl() -- 1 equivalent call inferred from this helper
+	local v = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
+	return `{string.gsub(v, "http:", "https:")}upgrades/robux?ctx=build-uapp`
 end
-local function useOpenBuyRobuxWebView(p1: ((...any) -> ...any)?, t1: {[any]: any}?) -- line: 22
-	-- upvalues: useOpenWebView (copy), React (copy), AppLifecycleObserverService (copy), ContentProvider (copy), LocalizationStrings (copy)
-	local v13 = useOpenWebView()
-	local v14 = React.useRef(false)
-	local v15 = React.useCallback(function() -- line: 28
-		-- upvalues: v14 (copy), p1 (copy)
-		if not v14.current then
+
+local function useOpenBuyRobuxWebView(callback, p)
+	local title = useLocalization({
+		title = LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_SHEET_TITLE
+	}).title
+	local v = useOpenWebView()
+	local ref = React.useRef(false)
+	local v2 = React.useCallback(function()
+		if not ref.current then
 			return
 		end
 
-		v14.current = false
+		ref.current = false
 
-		if p1 then
-			p1()
+		if callback then
+			callback()
 		end
-	end, { p1 })
+	end, { callback })
 
-	React.useEffect(function() -- line: 38
-		-- upvalues: p1 (copy), t1 (copy), AppLifecycleObserverService (copy), v15 (copy), v14 (copy)
-		if p1 == nil then
-			return function() -- line: 40
-			end
+	React.useEffect(function()
+		if callback == nil then
+			return function() end
 		end
 
-		local connection = (t1 or AppLifecycleObserverService).OnUnhide:Connect(v15)
-
-		return function() -- line: 44
-			-- upvalues: v14 (copy), connection (copy)
-			v14.current = false
-			connection:Disconnect()
+		local onUnhideConnection = (p or AppLifecycleObserverService).OnUnhide:Connect(v2)
+		return function()
+			ref.current = false
+			onUnhideConnection:Disconnect()
 		end
-	end, {
-		t1,
-		v15,
-		p1
-	})
+	end, { p, v2, callback })
 
-	return React.useCallback(function() -- line: 50
-		-- upvalues: v14 (copy), p1 (copy), v13 (copy), ContentProvider (copy), LocalizationStrings (copy), v15 (copy)
-		v14.current = p1 ~= nil
+	return React.useCallback(function()
+		ref.current = callback ~= nil
+		local purchaseRobuxUrl = getPurchaseRobuxUrl() -- inferred equivalent call
+		local v3
 
-		local v17 = v13
-		local v18 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
+		if callback ~= nil then
+			v3 = v2
+		end
 
-		v17(string.gsub(v18, "http:", "https:") .. "upgrades/robux?ctx=navpopover", LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_SHEET_TITLE, if p1 == nil then nil else v15)
-	end, {
-		v15,
-		p1,
-		v13
-	})
+		v(purchaseRobuxUrl, title, v3)
+	end, { v2, callback, v, title })
 end
 
 return useOpenBuyRobuxWebView

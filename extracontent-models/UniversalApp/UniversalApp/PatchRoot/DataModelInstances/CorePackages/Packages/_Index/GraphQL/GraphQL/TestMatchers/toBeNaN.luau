@@ -1,18 +1,16 @@
-local Number = require(script.Parent.Parent.Parent.LuauPolyfill).Number
+local LuauPolyfill = require(script.Parent.Parent.Parent.LuauPolyfill)
+local Number = LuauPolyfill.Number
 
-local function toBeNaN(p1) -- line: 17
-	-- upvalues: Number (copy)
-	local v4 = Number.isNaN(p1)
+local function toBeNaN(p)
+	local naN = Number.isNaN(p)
 
-	if v4 then
-		return {
-			pass = v4
-		}
+	if naN then
+		return { pass = naN }
 	end
 
 	return {
 		pass = false,
-		message = ("expected: NaN (number), got: \"%s\" (%s) instead"):format(tostring(p1), (typeof(p1)))
+		message = ("expected: NaN (number), got: \"%s\" (%s) instead"):format(tostring(p), (typeof(p)))
 	}
 end
 

@@ -27,14 +27,20 @@ return {
 	Actions = {
 		DeregisterCustomGetStateForAction = require(script.NavigationActions.DeregisterCustomGetStateForAction),
 		RegisterCustomGetStateForAction = RegisterCustomGetStateForAction,
-		ClearScreens = require(script.NavigationActions.ClearScreens)
+		ClearScreens = require(script.NavigationActions.ClearScreens),
+		AvatarExperienceActions = require(script.NavigationActions.AvatarExperienceActions)
 	},
+	BackHandlerRegistry = require(script.BackHandlerRegistry),
 	Debug = {
 		logOnOverlayClosed = require(script.Debug.logOnOverlayClosed)
 	},
 	withMappedNavigationParams = require(script.withMappedNavigationParams),
 	Thunks = {
-		NavigateWithLock = require(script.Thunks.NavigateWithLock)
+		NavigateWithLock = require(script.Thunks.NavigateWithLock),
+		NavigateDownToAvatarScreen = require(script.Thunks.NavigateDownToAvatarScreen)
+	},
+	Utils = {
+		closeGiftSendFlow = require(script.Utils.closeGiftSendFlow)
 	},
 	["jest.config"] = script["jest.config"]
 }

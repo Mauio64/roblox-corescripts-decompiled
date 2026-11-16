@@ -1,44 +1,54 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent
+
+local React = require(parent.React)
 local Message = require(script.Parent.Message)
 local MessageWriterContext = require(script.Parent.MessageWriterContext)
-local useInExperienceLocalization = require(script.Parent.useInExperienceLocalization)
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+local useInExperienceLocalization = ChatUIPrimitives.Hooks.useInExperienceLocalization
+local FFlagExpChatMemoizeSystemMessage = require(script.Parent.Flags.FFlagExpChatMemoizeSystemMessage)
 
-local function useRobloxSystemMessage() -- line: 17
-	-- upvalues: MessageWriterContext (copy), useInExperienceLocalization (copy), React (copy), Message (copy)
-	local v7 = MessageWriterContext.useMessageWriter()
-	local v8 = useInExperienceLocalization()
-	local v9 = React.useCallback(function(s1: string, s2: string) -- line: 21
-		-- upvalues: v7 (copy), v8 (copy), Message (copy)
-		if not v7 then
+local function useRobloxSystemMessage()
+	local v = MessageWriterContext.useMessageWriter()
+	local v2 = useInExperienceLocalization()
+
+	local displayRobloxSystemMessage = React.useCallback(function(p: string, p2: string)
+		if not v then
 			return
 		end
 
-		local v13 = v8(s1)
+		local v3 = v2(p)
 
-		if v13 == "" then
-			v13 = s2
+		if v3 == "" then
+			v3 = p2
 		end
 
-		if v13 == "" then
+		if v3 == "" then
 			return
 		end
 
-		v7.write(Message.createSystemMessage(v13, "Roblox.ChatDisabled.Info"))
-	end, {
-		v7,
-		v8
-	})
-	local v10 = React.useCallback(function() -- line: 35
-		-- upvalues: v7 (copy)
-		if v7 then
-			v7.remove("Roblox.ChatDisabled.Info")
+		v.write(Message.createSystemMessage(v3, "Roblox.ChatDisabled.Info"))
+	end, { v, v2 })
+
+	local clearAvailabilityMessage = React.useCallback(function()
+		if v then
+			v.remove("Roblox.ChatDisabled.Info")
 		end
-	end, { v7 })
+	end, { v })
+
+	local v3 = React.useMemo(function()
+		return {
+			displayRobloxSystemMessage = displayRobloxSystemMessage,
+			clearAvailabilityMessage = clearAvailabilityMessage
+		}
+	end, { displayRobloxSystemMessage, clearAvailabilityMessage })
+
+	if FFlagExpChatMemoizeSystemMessage then
+		return v3
+	end
 
 	return {
-		displayRobloxSystemMessage = v9,
-		clearAvailabilityMessage = v10
+		displayRobloxSystemMessage = displayRobloxSystemMessage,
+		clearAvailabilityMessage = clearAvailabilityMessage
 	}
 end
 

@@ -1,7 +1,5 @@
-local Parent = script:FindFirstAncestor("VoiceChat").Parent
-
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
-	return {
-		isUserOptIn = p1
-	}
+local parent = script:FindFirstAncestor("VoiceChat").Parent
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(isUserOptIn)
+	return { isUserOptIn = isUserOptIn }
 end)

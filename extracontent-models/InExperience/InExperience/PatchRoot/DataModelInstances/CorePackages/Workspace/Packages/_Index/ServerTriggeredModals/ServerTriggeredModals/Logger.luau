@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
+local parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
 
-return (require(Parent.Loggers).Logger:new("ServerTriggeredModals"))
+local Loggers = require(parent.Loggers)
+return (Loggers.Logger:new("ServerTriggeredModals"))

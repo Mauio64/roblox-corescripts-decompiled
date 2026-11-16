@@ -1,144 +1,176 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
 local CoreGui = game:GetService("CoreGui")
-local Localization = require(ParentParentParent.Localization)
-local React = require(ParentParentParent.React)
-local UIBlox = require(ParentParentParent.UIBlox)
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+
+local Localization = require(parent2.Localization)
+local React = require(parent2.React)
+local UIBlox = require(parent2.UIBlox)
+local Foundation = require(parent2.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
+local useAnalytics = require(parent.Analytics.useAnalytics)
 local useLocalization = Localization.Hooks.useLocalization
 local useStyle = UIBlox.Core.Style.useStyle
+
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local EventNames = require(ParentParent.Analytics.EventNames)
-local v13 = game:DefineFastFlag("CapturesAddLegacyVideoRecordingLogging_v2", false)
+local EventNames = require(parent.Analytics.EventNames)
 
-return function(t1: {[any]: any}) -- line: 32
-	-- upvalues: useAnalytics (copy), useStyle (copy), useLocalization (copy), React (copy), v13 (copy), EventNames (copy), CoreGui (copy), Button (copy), ButtonType (copy)
-	local v15 = useAnalytics()
-	local v16 = useStyle()
-	local v17 = useLocalization({
+return function(p)
+	local v = useAnalytics()
+	local v2 = useStyle()
+
+	local v3 = useLocalization({
 		videoCTATitle = "Feature.Captures.Title.VideoCTA",
 		videoEducationalText = "Feature.Captures.Label.VideoEducationalText",
 		startRecording = "Feature.Captures.Control.StartRecordingVideo",
 		stopRecording = "Feature.Captures.Control.StopRecordingVideo"
 	})
-	local v18, v19 = React.useState(false)
-	local v20 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 46
-		-- upvalues: v13 (copy), v20 (copy), v15 (copy), EventNames (copy), v19 (copy)
-		local u30 = nil
-		local v31 = settings():FindFirstChild("Game Options")
+	local state, setState = React.useState(false)
 
-		if v31 then
-			u30 = v31.VideoRecordingChangeRequest:connect(function(p1) -- line: 50
-				-- upvalues: v13 (copy), v20 (copy), v15 (copy), EventNames (copy), v19 (copy)
-				if v13 then
-					if p1 then
-						v20.current = os.clock()
-						v15.fireEvent(EventNames.CapturesLegacyVideoRecordBeginSignalFired)
-					else
-						if v20.current then
-							local v33 = os.clock() - v20.current
+	React.useEffect(function()
+		local gameOptions = settings():FindFirstChild("Game Options")
+		local videoRecordingChangeRequestConnection
 
-							v15.fireEvent(EventNames.CapturesLegacyVideoRecordingDuration, {
-								statValue = v33
-							})
-						end
-
-						v15.fireEvent(EventNames.CapturesLegacyVideoRecordEndSignalFired)
-					end
-				end
-
-				v19(p1)
+		if gameOptions then
+			videoRecordingChangeRequestConnection = gameOptions.VideoRecordingChangeRequest:connect(function(p2)
+				setState(p2)
 			end)
+		else
+			videoRecordingChangeRequestConnection = nil
 		end
 
-		return function() -- line: 70
-			-- upvalues: u30 (ref)
-			if u30 then
-				u30:disconnect()
+		return function()
+			if videoRecordingChangeRequestConnection then
+				videoRecordingChangeRequestConnection:disconnect()
 			end
 		end
-	end, { v15.fireEvent })
+	end, { v.fireEvent })
 
-	local v21 = React.useCallback(function() -- line: 77
-		-- upvalues: v18 (copy), t1 (copy), v15 (copy), EventNames (copy), CoreGui (copy)
-		if not v18 then
-			t1.closeSettingsMenu()
-			v15.fireEvent(EventNames.CapturesMigratedLegacyVideoRecordActivated)
+	local onActivated = React.useCallback(function()
+		if state then
+			v.fireEvent(EventNames.CapturesMigratedLegacyVideoRecordDeactivated)
 		else
-			v15.fireEvent(EventNames.CapturesMigratedLegacyVideoRecordDeactivated)
+			p.closeSettingsMenu()
+			v.fireEvent(EventNames.CapturesMigratedLegacyVideoRecordActivated)
 		end
 
 		CoreGui:ToggleRecording()
-	end, {
-		v15.fireEvent,
-		v18,
-		t1.closeSettingsMenu
-	})
-	local BackgroundDefaultColor = v16.Theme.BackgroundDefault.Color
-	local BackgroundDefaultTransparency = v16.Theme.BackgroundDefault.Transparency
-	local TextDefaultColor = v16.Theme.TextDefault.Color
-	local CaptionBodyFont = v16.Font.CaptionBody.Font
-	local v26 = v16.Font.BaseSize * v16.Font.CaptionBody.RelativeSize
-	local TextEmphasisColor = v16.Theme.TextEmphasis.Color
-	local Header2Font = v16.Font.Header2.Font
-	local v29 = v16.Font.BaseSize * v16.Font.Header2.RelativeSize
+	end, { v.fireEvent, state, p.closeSettingsMenu })
 
-	return React.createElement("Frame", {
+	local color = v2.Theme.BackgroundDefault.Color
+	local transparency = v2.Theme.BackgroundDefault.Transparency
+
+	local color2 = v2.Theme.TextDefault.Color
+	local font = v2.Font.CaptionBody.Font
+	local textSize = v2.Font.BaseSize * v2.Font.CaptionBody.RelativeSize
+
+	local color3 = v2.Theme.TextEmphasis.Color
+	local font2 = v2.Font.Header2.Font
+	local textSize2 = v2.Font.BaseSize * v2.Font.Header2.RelativeSize
+
+	local createElement = React.createElement
+	local v4 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundColor3 = color,
+		BackgroundTransparency = transparency,
 		BorderSizePixel = 0,
 		LayoutOrder = 3,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = BackgroundDefaultColor,
-		BackgroundTransparency = BackgroundDefaultTransparency,
 		Size = UDim2.fromScale(1, 0)
-	}, {
-		TextFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.fromScale(0.7, 0)
-		}, {
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Top
-			}),
-			Title = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				Font = Header2Font,
-				Size = UDim2.new(1, 0, 0, 30),
-				Text = v17.videoCTATitle,
-				TextColor3 = TextEmphasisColor,
-				TextSize = v29,
-				TextXAlignment = Enum.TextXAlignment.Left
-			}),
-			EducationalLabel = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				TextWrapped = true,
-				Font = CaptionBodyFont,
-				Size = UDim2.new(1, 0, 0, 40),
-				Text = v17.videoEducationalText,
-				TextColor3 = TextDefaultColor,
-				TextSize = v26,
-				TextXAlignment = Enum.TextXAlignment.Left
-			})
+	}
+
+	local createElement2 = React.createElement
+	local v5 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(0.7, 0)
+	}
+	local children2 = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Top
 		}),
-		CapturesToggleFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.fromScale(1, 0.5),
-			Size = UDim2.fromOffset(224, 44)
-		}, {
-			RecordButton = React.createElement(Button, {
-				buttonType = ButtonType.Secondary,
-				onActivated = v21,
-				size = UDim2.fromScale(1, 1),
-				text = if not v18 then v17.startRecording else v17.stopRecording
-			})
-		})
+		Title = 0,
+		EducationalLabel = 0
+	}
+
+	local createElement3 = React.createElement
+
+	if FoundationFontFaceMigration then
+		font2 = nil
+	end
+
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font)
+	end
+
+	children2.Title = createElement3("TextLabel", {
+		BackgroundTransparency = 1,
+		Font = font2,
+		FontFace = fontFace,
+		LayoutOrder = 1,
+		Size = UDim2.new(1, 0, 0, 30),
+		Text = v3.videoCTATitle,
+		TextColor3 = color3,
+		TextSize = textSize2,
+		TextXAlignment = Enum.TextXAlignment.Left
 	})
+
+	local createElement4 = React.createElement
+
+	if FoundationFontFaceMigration then
+		font = nil
+	end
+
+	local fontFace2
+
+	if FoundationFontFaceMigration then
+		fontFace2 = normalizeFontFace(v2.Tokens.Typography.BodySmall.Font)
+	end
+
+	children2.EducationalLabel = createElement4("TextLabel", {
+		BackgroundTransparency = 1,
+		Font = font,
+		FontFace = fontFace2,
+		LayoutOrder = 2,
+		Size = UDim2.new(1, 0, 0, 40),
+		Text = v3.videoEducationalText,
+		TextColor3 = color2,
+		TextSize = textSize,
+		TextWrapped = true,
+		TextXAlignment = Enum.TextXAlignment.Left
+	})
+	local children = {
+		TextFrame = createElement2("Frame", v5, children2),
+		CapturesToggleFrame = 0
+	}
+
+	local createElement5 = React.createElement
+	local v6 = {
+		AnchorPoint = Vector2.new(1, 0.5),
+		BackgroundTransparency = 1,
+		Position = UDim2.fromScale(1, 0.5),
+		Size = UDim2.fromOffset(224, 44)
+	}
+
+	local createElement6 = React.createElement
+	local v7 = {
+		buttonType = ButtonType.Secondary,
+		onActivated = onActivated,
+		size = UDim2.fromScale(1, 1),
+		text = 0
+	}
+	local text = if state then v3.stopRecording else v3.startRecording
+	v7.text = text
+	children.CapturesToggleFrame = createElement5("Frame", v6, {
+		RecordButton = createElement6(Button, v7)
+	})
+	return createElement("Frame", v4, children)
 end

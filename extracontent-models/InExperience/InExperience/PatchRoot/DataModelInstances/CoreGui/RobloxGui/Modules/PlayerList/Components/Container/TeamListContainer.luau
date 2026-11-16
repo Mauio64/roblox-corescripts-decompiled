@@ -1,101 +1,107 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent.Parent
+
+local parent = script.Parent.Parent.Parent
+
 local React = require(CorePackages.Packages.React)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
 local LeaderboardStore = require(CorePackages.Workspace.Packages.LeaderboardStore)
-
 require(CorePackages.Workspace.Packages.PlayerIconInfoStore)
 
 local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
-local TeamListView = require(ParentParent.Components.PresentationCommon.TeamListView)
+
+local TeamListView = require(parent.Components.PresentationCommon.TeamListView)
+
 local FFlagPlayerListUseFocusNavHook = PlayerList.Flags.FFlagPlayerListUseFocusNavHook
 
-local function TeamListContainer(t1: {[any]: any}) -- line: 60
-	-- upvalues: useLeaderboardStore (copy), SignalsReact (copy), React (copy), LeaderboardStore (copy), FFlagPlayerListUseFocusNavHook (copy), TeamListView (copy)
+local function TeamListContainer(props)
 	local getCount = useLeaderboardStore().getTeamList().getCount
-	local v15 = SignalsReact.useSignalState(getCount)
-	local v16 = SignalsReact.useSignalState(t1.teamData.players.getCount)
-	local v17 = SignalsReact.useSignalBinding(t1.teamData.order)
-	local v18 = React.useMemo(function() -- line: 70
-		-- upvalues: t1 (copy), LeaderboardStore (copy), v15 (copy), v16 (copy)
-		if t1.teamData.name(false) == LeaderboardStore.SpecialNeutralTeamName then
-			if v15 == 1 then
-				return false
-			end
 
-			if v16 == 0 then
-				return false
-			end
+	local v = SignalsReact.useSignalState(getCount)
+	local teamPlayersCount = SignalsReact.useSignalState(props.teamData.players.getCount)
+
+	local layoutOrder = SignalsReact.useSignalBinding(props.teamData.order)
+
+	local showTeamEntry = React.useMemo(function(): boolean
+		if props.teamData.name(false) ~= LeaderboardStore.SpecialNeutralTeamName then
+			return true
 		end
 
-		return true
-	end, {
-		v15,
-		v16,
-		t1.teamData.name
-	})
-	local v19 = nil
-	local v20 = nil
+		return v ~= 1 and teamPlayersCount ~= 0
+	end, { v, teamPlayersCount, props.teamData.name })
+	local registerPlayerInstance, unregisterPlayerInstance
 
 	if FFlagPlayerListUseFocusNavHook then
-		v19, v20 = React.useMemo(function() -- line: 86
-			-- upvalues: t1 (copy)
-			if t1.registerTeamInstance and t1.teamId then
-				local v22 = t1.registerTeamInstance(t1.teamId, t1.teamData.order)
-
-				return v22.registerPlayerInstance, v22.unregisterPlayerInstance
+		registerPlayerInstance, unregisterPlayerInstance = React.useMemo(function()
+			if props.registerTeamInstance and props.teamId then
+				local teamInstance = props.registerTeamInstance(props.teamId, props.teamData.order)
+				return teamInstance.registerPlayerInstance, teamInstance.unregisterPlayerInstance
 			end
 
 			return nil, nil
-		end, {
-			t1.registerTeamInstance,
-			t1.teamId,
-			t1.teamData
-		})
+		end, { props.registerTeamInstance, props.teamId, props.teamData })
 	end
 
 	if FFlagPlayerListUseFocusNavHook then
-		React.useEffect(function() -- line: 97
-			-- upvalues: t1 (copy)
-			return function() -- line: 98
-				-- upvalues: t1 (copy)
-				if t1.unregisterTeamInstance and t1.teamId then
-					t1.unregisterTeamInstance(t1.teamId)
+		React.useEffect(function()
+			return function()
+				if props.unregisterTeamInstance and props.teamId then
+					props.unregisterTeamInstance(props.teamId)
 				end
 			end
-		end, {
-			t1.unregisterTeamInstance,
-			t1.teamId
-		})
+		end, { props.unregisterTeamInstance, props.teamId })
 	end
 
-	return React.createElement(TeamListView, {
-		layoutOrder = v17,
-		showTeamEntry = v18,
-		teamPlayersCount = v16,
-		entrySizeX = t1.entrySizeX,
-		teamData = t1.teamData,
-		playerIconInfos = t1.playerIconInfos,
-		playerRelationships = t1.playerRelationships,
-		firstPlayerRef = t1.firstPlayerRef,
-		setDropDownPlayerDimensionY = t1.setDropDownPlayerDimensionY,
-		prevFocusedEntry = t1.prevFocusedEntry,
-		destroyedFocusedPlayerId = t1.destroyedFocusedPlayerId,
-		registerPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else v19,
-		unregisterPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else v20,
-		setSelectedPlayerId = if not FFlagPlayerListUseFocusNavHook then nil else t1.setSelectedPlayerId,
-		isSmallTouchDevice = t1.isSmallTouchDevice,
-		isDirectionalPreferred = t1.isDirectionalPreferred
-	})
+	local createElement = React.createElement
+	local v2 = {
+		layoutOrder = layoutOrder,
+		showTeamEntry = showTeamEntry,
+		teamPlayersCount = teamPlayersCount,
+		entrySizeX = props.entrySizeX,
+		teamData = props.teamData,
+		playerIconInfos = props.playerIconInfos,
+		playerRelationships = props.playerRelationships,
+		firstPlayerRef = props.firstPlayerRef,
+		setDropDownPlayerDimensionY = props.setDropDownPlayerDimensionY,
+		prevFocusedEntry = props.prevFocusedEntry,
+		destroyedFocusedPlayerId = props.destroyedFocusedPlayerId,
+		registerPlayerInstance = 0,
+		unregisterPlayerInstance = 0,
+		setSelectedPlayerId = 0,
+		isSmallTouchDevice = 0,
+		isDirectionalPreferred = 0
+	}
+
+	if not FFlagPlayerListUseFocusNavHook then
+		registerPlayerInstance = nil
+	end
+
+	v2.registerPlayerInstance = registerPlayerInstance
+
+	if not FFlagPlayerListUseFocusNavHook then
+		unregisterPlayerInstance = nil
+	end
+
+	v2.unregisterPlayerInstance = unregisterPlayerInstance
+	local setSelectedPlayerId
+
+	if FFlagPlayerListUseFocusNavHook then
+		setSelectedPlayerId = props.setSelectedPlayerId
+	end
+
+	v2.setSelectedPlayerId = setSelectedPlayerId
+	v2.isSmallTouchDevice = props.isSmallTouchDevice
+	v2.isDirectionalPreferred = props.isDirectionalPreferred
+	return createElement(TeamListView, v2)
 end
-local function mapStateToProps(p1) -- line: 127
+
+local function mapStateToProps(data)
 	return {
-		isSmallTouchDevice = p1.displayOptions.isSmallTouchDevice,
-		isDirectionalPreferred = p1.displayOptions.isTenFootInterface,
-		playerIconInfo = p1.playerIconInfo,
-		playerRelationship = p1.playerRelationship
+		isSmallTouchDevice = data.displayOptions.isSmallTouchDevice,
+		isDirectionalPreferred = data.displayOptions.isTenFootInterface,
+		playerIconInfo = data.playerIconInfo,
+		playerRelationship = data.playerRelationship
 	}
 end
 

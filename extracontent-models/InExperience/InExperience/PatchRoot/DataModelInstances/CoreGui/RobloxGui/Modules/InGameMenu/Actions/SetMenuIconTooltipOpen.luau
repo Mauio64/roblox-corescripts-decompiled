@@ -1,7 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator("SET_MENU_ICON_TOOLTIP_OPEN", function(p1) -- line: 5
-	return {
-		menuIconTooltipOpen = p1
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("SET_MENU_ICON_TOOLTIP_OPEN", function(menuIconTooltipOpen)
+	return { menuIconTooltipOpen = menuIconTooltipOpen }
 end)

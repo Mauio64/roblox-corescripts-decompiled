@@ -1,13 +1,6 @@
 return {
-	SplitVariant = {
-		SplitRight = "split-right",
-		SplitLeft = "split-left"
-	},
-	PaneResizable = {
-		None = "none",
-		Horizontal = "horizontal",
-		Vertical = "vertical"
-	},
+	SplitVariant = { SplitRight = "split-right", SplitLeft = "split-left" },
+	PaneResizable = { None = "none", Horizontal = "horizontal", Vertical = "vertical" },
 	SupportPaneMode = {
 		Normal = "normal",
 		Expanding = "expanding",
@@ -15,9 +8,5 @@ return {
 		Collapsing = "collapsing",
 		Collapsed = "collapsed"
 	},
-	SplitPaneSlot = {
-		Content = "content",
-		Navigation = "navigation",
-		Support = "support"
-	}
+	SplitPaneSlot = { Content = "content", Navigation = "navigation", Support = "support" }
 }

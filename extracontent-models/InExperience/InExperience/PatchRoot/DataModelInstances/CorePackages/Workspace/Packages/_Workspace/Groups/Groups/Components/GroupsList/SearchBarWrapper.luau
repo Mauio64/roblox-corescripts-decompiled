@@ -1,64 +1,54 @@
-local Parent = script:FindFirstAncestor("Groups").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("Groups").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local TextInput = Foundation.TextInput
 local IconName = Foundation.Enums.IconName
 
-local function SearchBar(t1: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), TextInput (copy), IconName (copy)
-	local v8, v9 = React.useState("")
-	local v10 = React.useRef(nil)
-	local v11 = React.useCallback(function() -- line: 28
-		-- upvalues: v10 (copy)
-		if v10.current then
-			task.cancel(v10.current)
-			v10.current = nil
+local function SearchBar(p)
+	local state, setState = React.useState("")
+	local ref = React.useRef(nil)
+
+	local v = React.useCallback(function()
+		if ref.current then
+			task.cancel(ref.current)
+			ref.current = nil
 		end
 	end, {})
-	local v12 = React.useCallback(function(s1: string) -- line: 35
-		-- upvalues: v9 (copy), v11 (copy), v10 (copy), t1 (copy)
-		v9(s1)
-		v11()
-		v10.current = task.delay(0.4, function() -- line: 39
-			-- upvalues: t1 (copy), s1 (copy)
-			if t1.onTextChanged then
-				t1.onTextChanged(s1)
+
+	local onChanged = React.useCallback(function(p2: string)
+		setState(p2)
+		v()
+
+		ref.current = task.delay(0.4, function()
+			if p.onTextChanged then
+				p.onTextChanged(p2)
 			end
 		end)
-	end, {
-		t1.onTextChanged,
-		v11
-	})
+	end, { p.onTextChanged, v })
 
-	React.useEffect(function() -- line: 46
-		-- upvalues: v11 (copy)
-		return v11
+	React.useEffect(function()
+		return v
 	end, {})
 
-	local v13 = React.useCallback(function() -- line: 50
-		-- upvalues: v11 (copy), v9 (copy), t1 (copy)
-		v11()
-		v9("")
+	local onActivated = React.useCallback(function()
+		v()
+		setState("")
 
-		if t1.onTextChanged then
-			t1.onTextChanged("")
+		if p.onTextChanged then
+			p.onTextChanged("")
 		end
-	end, {
-		t1.onTextChanged,
-		v11
-	})
+	end, { p.onTextChanged, v })
 
 	return React.createElement(TextInput, {
 		label = "",
-		leadingIcon = "icons/common/search",
-		text = v8,
+		text = state,
 		width = UDim.new(1, 0),
-		placeholder = t1.placeholderText or "",
-		onChanged = v12,
-		iconTrailing = if v8 == "" then nil else {
-			name = IconName.CircleX,
-			onActivated = v13
-		}
+		placeholder = p.placeholderText or "",
+		leadingIcon = "icons/common/search",
+		onChanged = onChanged,
+		iconTrailing = state ~= "" and { name = IconName.CircleX, onActivated = onActivated } or nil
 	})
 end
 

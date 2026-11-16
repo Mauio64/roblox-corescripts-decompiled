@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("Components").Parent
+local parent = script:FindFirstAncestor("Components").Parent
 
-return (require(Parent.Parent.Dash).Symbol.new("InlineLayoutHardBreak"))
+local Dash = require(parent.Parent.Dash)
+
+return (Dash.Symbol.new("InlineLayoutHardBreak"))

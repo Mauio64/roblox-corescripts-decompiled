@@ -1,59 +1,43 @@
 local MediaPlayback = script:FindFirstAncestor("MediaPlayback")
+
 local Signals = require(MediaPlayback.Parent.Signals)
 
 require(MediaPlayback.Stores.getAudioPlaybackStore.types)
 
 local createSignal = Signals.createSignal
 
-local function createPlaylistStore() -- line: 9
-	-- upvalues: createSignal (copy)
-	local v5, v6 = createSignal({})
-	local v7, v8 = createSignal({})
+local function createPlaylistStore()
+	local signal, v = createSignal({})
+	local signal2, v2 = createSignal({})
 
-	local function getRelativeIndex(p1, n1: number) -- line: 13
-		-- upvalues: v7 (copy), v5 (copy)
-		local v12 = v7(false)[tostring(p1)]
+	local function getRelativeIndex(p, p2: number) -- 2 equivalent calls inferred from this helper
+		local v3 = signal2(false)[tostring(p)]
 
-		if v12 then
-			return v5(false)[v12 + n1]
+		if v3 then
+			return signal(false)[v3 + p2]
 		end
 
 		return nil
 	end
 
 	return {
-		get = v5,
-		set = function(t1: {[any]: any}) -- line: 22
-			-- upvalues: v6 (copy), v8 (copy)
-			v6(t1)
+		get = signal,
+		set = function(items)
+			v(items)
 
-			local t2 = {}
+			local v3 = {}
 
-			for v15, v16 in t1 do
-				t2[tostring(v16)] = v15
+			for k, item in items do
+				v3[tostring(item)] = k
 			end
 
-			v8(t2)
+			v2(v3)
 		end,
-		getNext = function(p2) -- line: 32
-			-- upvalues: v7 (copy), v5 (copy)
-			local v18 = v7(false)[tostring(p2)]
-
-			if v18 then
-				return v5(false)[v18 + 1]
-			end
-
-			return nil
+		getNext = function(p)
+			return getRelativeIndex(p, 1) -- inferred equivalent call
 		end,
-		getPrev = function(p3) -- line: 36
-			-- upvalues: v7 (copy), v5 (copy)
-			local v20 = v7(false)[tostring(p3)]
-
-			if v20 then
-				return v5(false)[v20 + -1]
-			end
-
-			return nil
+		getPrev = function(p)
+			return getRelativeIndex(p, -1) -- inferred equivalent call
 		end
 	}
 end

@@ -1,6 +1,1 @@
-return {
-	InGame = "inGame",
-	InStudio = "inStudio",
-	Offline = "offline",
-	Online = "online"
-}
+return { InGame = "inGame", InStudio = "inStudio", Offline = "offline", Online = "online" }

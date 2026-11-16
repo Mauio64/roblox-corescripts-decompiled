@@ -1,18 +1,16 @@
-local u1 = "id-" .. tostring(math.random(100000, 1000000))
-local n1 = 0
+local v = "id-" .. tostring(math.random(100000, 1000000))
+local count = 0
+local KeyGenerator = {}
 
-return {
-	_TESTING_ONLY_normalize_keys = function() -- line: 9
-		-- upvalues: u1 (ref), n1 (ref)
-		u1 = "id-"
-		n1 = 0
-	end,
-	generateKey = function() -- line: 15
-		-- upvalues: u1 (ref), n1 (ref)
-		local v3 = u1 .. tostring(n1)
+function KeyGenerator._TESTING_ONLY_normalize_keys()
+	v = "id-"
+	count = 0
+end
 
-		n1 += 1
+function KeyGenerator.generateKey()
+	local key = v .. tostring(count)
+	count += 1
+	return key
+end
 
-		return v3
-	end
-}
+return KeyGenerator

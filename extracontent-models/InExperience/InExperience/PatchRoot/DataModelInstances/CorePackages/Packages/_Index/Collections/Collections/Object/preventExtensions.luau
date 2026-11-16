@@ -1,18 +1,17 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.ES7Types)
+require(parent.ES7Types)
 
-local function preventExtensions(p1) -- line: 26
-	local str = tostring(p1)
+local function preventExtensions(p)
+	local v = tostring(p)
 
-	return (setmetatable(p1, {
-		__metatable = false,
-		__newindex = function(_, p3, _) -- line: 31
-			-- upvalues: str (copy)
-			local v8 = ("%q (%s) is not a valid member of %s"):format(tostring(p3), typeof(p3), str)
+	return (setmetatable(p, {
+		__newindex = function(_, p2, _)
+			local formatted = ("%q (%s) is not a valid member of %s"):format(tostring(p2), typeof(p2), v)
 
-			error(v8, 2)
-		end
+			error(formatted, 2)
+		end,
+		__metatable = false
 	}))
 end
 

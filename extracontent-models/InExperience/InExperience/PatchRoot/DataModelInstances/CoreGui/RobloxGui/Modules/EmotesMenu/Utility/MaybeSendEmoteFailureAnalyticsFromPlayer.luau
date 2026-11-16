@@ -1,48 +1,47 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
 
-local function MaybeSendEmoteFailureAnalyticsFromPlayer(p1, p2) -- line: 16
-	-- upvalues: Constants (copy)
-	local Character = p1.Character
+local Constants = require(parent.Constants)
 
-	if not Character then
-		p2(Constants.ErrorTypes.TemporarilyUnavailable)
+local function MaybeSendEmoteFailureAnalyticsFromPlayer(player, callback): boolean
+	local character = player.Character
 
+	if not character then
+		callback(Constants.ErrorTypes.TemporarilyUnavailable)
 		return true
 	end
 
-	local v7 = Character and Character:FindFirstChildOfClass("Humanoid") or nil
+	local humanoid
 
-	if not v7 then
-		p2(Constants.ErrorTypes.TemporarilyUnavailable)
+	if character then
+		humanoid = character:FindFirstChildOfClass("Humanoid") or nil
+	end
 
+	if not humanoid then
+		callback(Constants.ErrorTypes.TemporarilyUnavailable)
 		return true
 	end
 
-	if v7 and v7.RigType ~= Enum.HumanoidRigType.R15 then
-		p2(Constants.ErrorTypes.SwitchToR15)
-
+	if humanoid and humanoid.RigType ~= Enum.HumanoidRigType.R15 then
+		callback(Constants.ErrorTypes.SwitchToR15)
 		return true
 	end
 
-	local v8 = Character and Character:FindFirstChild("Animate") or nil
-	local v9 = v7 and v7:FindFirstChildOfClass("HumanoidDescription") or nil
+	local animate = character and character:FindFirstChild("Animate") or nil
+	local humanoidDescription = humanoid and humanoid:FindFirstChildOfClass("HumanoidDescription") or nil
 
-	if not v8 or not v9 then
-		p2(Constants.ErrorTypes.NotSupported)
-
+	if not (animate and humanoidDescription) then
+		callback(Constants.ErrorTypes.NotSupported)
 		return true
 	end
 
-	local v10 = v8 and v8:FindFirstChild("PlayEmote") or nil
+	local playEmote = animate and animate:FindFirstChild("PlayEmote") or nil
 
-	if not v10 or not v10:IsA("BindableFunction") then
-		p2(Constants.ErrorTypes.NotSupported)
-
-		return true
+	if playEmote and playEmote:IsA("BindableFunction") then
+		return false
 	end
 
-	return false
+	callback(Constants.ErrorTypes.NotSupported)
+	return true
 end
 
 return MaybeSendEmoteFailureAnalyticsFromPlayer

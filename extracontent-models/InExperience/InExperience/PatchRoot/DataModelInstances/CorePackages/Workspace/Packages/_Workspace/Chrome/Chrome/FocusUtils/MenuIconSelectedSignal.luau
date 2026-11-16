@@ -1,33 +1,34 @@
-local ParentParent = script.Parent.Parent.Parent
-local Signal = require(ParentParent.AppCommonLib).Signal
-local t1 = {}
+local parent = script.Parent.Parent.Parent
 
-t1.__index = t1
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
-function t1.new() -- line: 17
-	-- upvalues: Signal (copy), t1 (copy)
-	return (setmetatable({
-		_value = false,
-		_changeSignal = Signal.new()
-	}, t1))
+local class = {}
+class.__index = class
+
+function class.new()
+	return (setmetatable({ _value = false, _changeSignal = Signal.new() }, class))
 end
-function t1.get(p1) -- line: 24
-	return p1._value
+
+function class:get()
+	return self._value
 end
-function t1.set(t2: {[any]: any}, b1: boolean) -- line: 28
-	if b1 ~= t2._value then
-		t2._value = b1
-		t2._changeSignal:fire(b1)
+
+function class:set(flag: boolean)
+	if self._value ~= flag then
+		self._value = flag
+		self._changeSignal:fire(flag)
 	end
 end
-function t1.connect(p2, p3, p4) -- line: 35
-	local v10 = p2._changeSignal:connect(p3)
 
-	if p4 == true then
-		p3(p2._value)
+function class:connect(callback, p)
+	local connection = self._changeSignal:connect(callback)
+
+	if p == true then
+		callback(self._value)
 	end
 
-	return v10
+	return connection
 end
 
-return t1.new()
+return class.new()

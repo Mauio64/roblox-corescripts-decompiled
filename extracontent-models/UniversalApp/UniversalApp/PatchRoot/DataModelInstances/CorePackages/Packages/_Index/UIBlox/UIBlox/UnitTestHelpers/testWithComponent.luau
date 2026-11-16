@@ -1,43 +1,44 @@
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local FoundationProvider = require(ParentParent.Foundation).FoundationProvider
-local Roact = require(ParentParent.Roact)
-local dumpInstanceTree = require(scriptParent.dumpInstanceTree)
 
-local function TestApp(p1) -- line: 34
-	-- upvalues: Roact (copy)
-	return Roact.createElement("ScreenGui", {
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, p1[Roact.Children])
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+
+local Foundation = require(parent2.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+
+local Roact = require(parent2.Roact)
+
+local dumpInstanceTree = require(parent.dumpInstanceTree)
+
+local function TestApp(props)
+	return Roact.createElement("ScreenGui", { ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, props[Roact.Children])
 end
-local function testWithComponent(p2, p3) -- line: 40
-	-- upvalues: Roact (copy), TestApp (copy), FoundationProvider (copy), HttpService (copy), CoreGui (copy), dumpInstanceTree (copy)
-	local v13 = Roact.createElement(TestApp, nil, {
-		FoundationProvider = Roact.createElement(FoundationProvider, {
-			theme = "Dark"
-		}, {
-			TestComponent = p2
+
+local function testWithComponent(testComponent, callback)
+	local element = Roact.createElement(TestApp, nil, {
+		FoundationProvider = Roact.createElement(FoundationProvider, { theme = "Dark" }, {
+			TestComponent = testComponent
 		})
 	})
-	local v14 = ("TestApp-%s"):format(HttpService:GenerateGUID(false))
-	local v15 = Roact.mount(v13, CoreGui, v14)
-	local v16 = ("game.CoreGui.%s.TestComponent"):format(v14)
-	local ok, result = pcall(function() -- line: 51
-		-- upvalues: p3 (copy), v16 (copy)
-		p3(v16)
+
+	local formatted = ("TestApp-%s"):format(HttpService:GenerateGUID(false))
+	local v = Roact.mount(element, CoreGui, formatted)
+	local formatted2 = ("game.CoreGui.%s.TestComponent"):format(formatted)
+
+	local success, result = pcall(function()
+		callback(formatted2)
 	end)
 
-	if not ok then
+	if not success then
 		print("Test instance tree:")
-		dumpInstanceTree(CoreGui:FindFirstChild(v14))
+		dumpInstanceTree(CoreGui:FindFirstChild(formatted))
 		print("Test instance tree end\n")
 	end
 
-	Roact.unmount(v15)
+	Roact.unmount(v)
 
-	if not ok then
+	if not success then
 		error(result)
 	end
 end

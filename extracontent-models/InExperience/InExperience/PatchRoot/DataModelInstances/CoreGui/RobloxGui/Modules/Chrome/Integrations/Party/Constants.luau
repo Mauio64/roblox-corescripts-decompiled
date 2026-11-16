@@ -1,3 +1,1 @@
-return {
-	TOGGLE_MIC_INTEGRATION_ID = "party_mic"
-}
+return { TOGGLE_MIC_INTEGRATION_ID = "party_mic" }

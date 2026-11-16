@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("VerifiedParentalConsentDialog").Parent
+local parent = script:FindFirstAncestor("VerifiedParentalConsentDialog").Parent
+local React = require(parent.React)
 
-return require(Parent.React).createContext(Vector2.new(0, 0))
+return React.createContext(Vector2.new(0, 0))

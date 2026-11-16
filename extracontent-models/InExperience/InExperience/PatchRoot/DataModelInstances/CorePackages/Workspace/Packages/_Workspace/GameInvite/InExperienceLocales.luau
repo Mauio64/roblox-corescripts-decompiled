@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.InExperienceLocales.InExperienceLocales))
+local InExperienceLocales = require(Workspace.InExperienceLocales.InExperienceLocales)
+
+return InExperienceLocales

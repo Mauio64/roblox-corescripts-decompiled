@@ -1,40 +1,42 @@
-local Parent = script:FindFirstAncestor("StreamNotifications").Parent
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("StreamNotifications").Parent
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagStreamNotificationUXSettingsHeader = SharedFlags.FFlagStreamNotificationUXSettingsHeader
 local GetFStringNotificationsStreamNotificationUXLayer = SharedFlags.GetFStringNotificationsStreamNotificationUXLayer
-local ixpHelper = require(Parent.NotificationsCommon).ixpHelper
-local v6 = game:DefineFastString("StreamNotificationUXSettingsGearVariant", "enableStreamSettingsGear")
+local NotificationsCommon = require(parent.NotificationsCommon)
+local ixpHelper = NotificationsCommon.ixpHelper
 
-local function getLayerVariables() -- line: 17
-	-- upvalues: ixpHelper (copy), GetFStringNotificationsStreamNotificationUXLayer (copy)
+local defineFastString = game:DefineFastString("StreamNotificationUXSettingsGearVariant", "enableStreamSettingsGear")
+
+local function getLayerVariables() -- 2 equivalent calls inferred from this helper
 	return ixpHelper.getIxpLayerData(GetFStringNotificationsStreamNotificationUXLayer())
 end
-local function getIsUserInTreatment() -- line: 21
-	-- upvalues: ixpHelper (copy), GetFStringNotificationsStreamNotificationUXLayer (copy), v6 (copy)
-	local v9 = ixpHelper.getIxpLayerData(GetFStringNotificationsStreamNotificationUXLayer())
 
-	if v9 and v9[v6] ~= nil then
-		return v9[v6] == true
+local function getIsUserInTreatment(): boolean
+	local layerVariables = getLayerVariables() -- inferred equivalent call
+
+	if layerVariables and layerVariables[defineFastString] ~= nil then
+		return layerVariables[defineFastString] == true
 	end
 
 	return false
 end
 
 return {
-	getSettingsGearEnabled = function() -- line: 31
-		-- upvalues: FFlagStreamNotificationUXSettingsHeader (copy), ixpHelper (copy), GetFStringNotificationsStreamNotificationUXLayer (copy), v6 (copy)
-		local v10 = FFlagStreamNotificationUXSettingsHeader
+	getSettingsGearEnabled = function()
+		local v = FFlagStreamNotificationUXSettingsHeader
 
-		if v10 then
-			local v11 = ixpHelper.getIxpLayerData(GetFStringNotificationsStreamNotificationUXLayer())
-
-			if v11 and v11[v6] ~= nil then
-				return v11[v6] == true
-			end
-
-			v10 = false
+		if not v then
+			return v
 		end
 
-		return v10
+		local layerVariables = getLayerVariables() -- inferred equivalent call
+
+		if layerVariables and layerVariables[defineFastString] ~= nil then
+			return layerVariables[defineFastString] == true
+		end
+
+		v = false
+		return false
 	end
 }

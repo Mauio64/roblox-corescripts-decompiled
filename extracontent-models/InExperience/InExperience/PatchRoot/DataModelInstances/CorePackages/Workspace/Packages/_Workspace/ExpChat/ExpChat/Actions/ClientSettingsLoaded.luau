@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 10
+return Rodux.makeActionCreator(script.Name, function(p)
 	return {
 		value = {
-			preferredTransparency = p1.preferredTransparency or 1
+			preferredTransparency = p.preferredTransparency or 1
 		}
 	}
 end)

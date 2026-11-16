@@ -1,23 +1,27 @@
 local CorePackages = game:GetService("CorePackages")
+
 local t = require(CorePackages.Packages.t)
-local t1 = {
-	IMessage = t.strictInterface({
-		id = t.string,
-		name = t.string,
-		text = t.string,
-		userId = t.string,
-		timestamp = t.number,
-		adornee = t.union(t.instanceIsA("BasePart"), t.instanceOf("Model"))
-	}),
-	IMessageData = t.interface({
-		ID = t.number,
-		SpeakerUserId = t.number,
-		FromSpeaker = t.string,
-		Time = t.number,
-		Message = t.optional(t.string)
-	})
-}
-local t2 = {
+
+local Types = {}
+
+Types.IMessage = t.strictInterface({
+	id = t.string,
+	name = t.string,
+	text = t.string,
+	userId = t.string,
+	timestamp = t.number,
+	adornee = t.union(t.instanceIsA("BasePart"), t.instanceOf("Model"))
+})
+
+Types.IMessageData = t.interface({
+	ID = t.number,
+	SpeakerUserId = t.number,
+	FromSpeaker = t.string,
+	Time = t.number,
+	Message = t.optional(t.string)
+})
+
+local v = {
 	BubbleDuration = t.optional(t.number),
 	MaxBubbles = t.optional(t.number),
 	BackgroundColor3 = t.optional(t.Color3),
@@ -63,17 +67,17 @@ local t2 = {
 	MinimizeDistance = t.optional(t.number),
 	MaxDistance = t.optional(t.number),
 	AdorneeName = t.optional(t.string),
-	Voice = t.optional(t.strictInterface({
-		ShowIndicator = t.optional(t.boolean)
-	}))
+	Voice = t.optional(t.strictInterface({ ShowIndicator = t.optional(t.boolean) }))
 }
-local t3 = {}
 
-for k, v in pairs(t2) do
-	t3[k] = v
+local v2 = {}
+
+for k, v3 in pairs(v) do
+	v2[k] = v3
 end
 
-t2.UserSpecificSettings = t.optional(t.map(t.string, t.strictInterface(t3)))
-t1.IChatSettings = t.strictInterface(t2)
+v.UserSpecificSettings = t.optional(t.map(t.string, t.strictInterface(v2)))
 
-return t1
+Types.IChatSettings = t.strictInterface(v)
+
+return Types

@@ -1,8 +1,13 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local EnumIgrsRating = require(Parent.DiscoveryTypes).EnumIgrsRating
-local FFlagLuaAppAddIgrsImages = require(Parent.SharedFlags).FFlagLuaAppAddIgrsImages
-local t1 = {
+local parent = script:FindFirstAncestor("DataHydration").Parent
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local EnumIgrsRating = DiscoveryTypes.EnumIgrsRating
+local SharedFlags = require(parent.SharedFlags)
+
+local FFlagLuaAppAddIgrsImages = SharedFlags.FFlagLuaAppAddIgrsImages
+
+local v = {
 	[EnumIgrsRating.IgrsThirteenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-13.png",
 	[EnumIgrsRating.IgrsFifteenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-15.png",
 	[EnumIgrsRating.IgrsEighteenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-18.png",
@@ -11,23 +16,21 @@ local t1 = {
 
 if FFlagLuaAppAddIgrsImages then
 	if EnumIgrsRating.IgrsThreePlus then
-		t1[EnumIgrsRating.IgrsThreePlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-3.png"
+		v[EnumIgrsRating.IgrsThreePlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-3.png"
 	end
 
 	if EnumIgrsRating.IgrsSevenPlus then
-		t1[EnumIgrsRating.IgrsSevenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-7.png"
+		v[EnumIgrsRating.IgrsSevenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-7.png"
 	end
 end
 
 return {
-	getIgrsImage = function(p1) -- line: 31
-		-- upvalues: t1 (copy), DiscoveryEventErrorLogger (copy)
-		if not t1[p1] then
-			DiscoveryEventErrorLogger.reportError("getIgrsImage", `Invalid IGRS rating: { p1 }`)
-
-			return nil
+	getIgrsImage = function(p)
+		if v[p] then
+			return v[p]
 		end
 
-		return t1[p1]
+		DiscoveryEventErrorLogger.reportError("getIgrsImage", `Invalid IGRS rating: {p}`)
+		return nil
 	end
 }

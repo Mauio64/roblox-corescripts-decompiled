@@ -1,15 +1,14 @@
-local ParentParent = script.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
-local React = require(ParentParent2.React)
-local ControlState = require(ParentParent.Control.Enum.ControlState)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent.Parent
 
-local function useControlState() -- line: 20
-	-- upvalues: React (copy), ControlState (copy)
-	local v6, v7 = React.useState(ControlState.Initialize)
+local React = require(parent2.React)
+local ControlState = require(parent.Control.Enum.ControlState)
 
-	return v6, (React.useCallback(function(_, p2) -- line: 23
-		-- upvalues: v7 (copy)
-		v7(p2)
+local function useControlState()
+	local state, setState = React.useState(ControlState.Initialize)
+
+	return state, (React.useCallback(function(_, p)
+		setState(p)
 	end, {}))
 end
 

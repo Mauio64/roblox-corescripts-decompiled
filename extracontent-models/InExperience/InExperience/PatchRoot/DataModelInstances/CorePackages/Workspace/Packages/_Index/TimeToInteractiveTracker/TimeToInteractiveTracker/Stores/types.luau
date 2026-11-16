@@ -1,7 +1,8 @@
 local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
-local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
+local parent = TimeToInteractiveTracker.Parent
 
-require(TimeToInteractiveTrackerParent.Signals)
+require(parent.Signals)
+
 require(TimeToInteractiveTracker.Milestones.types)
 
 return {}

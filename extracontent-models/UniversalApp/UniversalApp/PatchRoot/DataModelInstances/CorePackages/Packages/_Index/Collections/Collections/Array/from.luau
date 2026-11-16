@@ -1,40 +1,38 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local Set = require(scriptParentParent.Set)
-local Map = require(scriptParentParent.Map.Map)
-local isArray = require(scriptParent.isArray)
-local InstanceOf = require(scriptParentParentParent.InstanceOf)
-
-require(scriptParentParentParent.ES7Types)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local Set = require(parent2.Set)
+local Map = require(parent2.Map.Map)
+local isArray = require(parent.isArray)
+local InstanceOf = require(parent3.InstanceOf)
+require(parent3.ES7Types)
 
 local fromString = require(script.fromString)
 local fromSet = require(script.fromSet)
 local fromMap = require(script.fromMap)
 local fromArray = require(script.fromArray)
 
-return function(p1, p2: ((...any) -> ...any)?, p3) -- line: 37
-	-- upvalues: isArray (copy), fromArray (copy), InstanceOf (copy), Set (copy), fromSet (copy), Map (copy), fromMap (copy), fromString (copy)
-	if p1 == nil then
+return function(p, callback, p2)
+	if p == nil then
 		error("cannot create array from a nil value")
 	end
 
-	local v15 = typeof(p1)
+	local typeName = typeof(p)
 
-	if v15 == "table" and isArray(p1) then
-		return (fromArray(p1, p2, p3))
+	if typeName == "table" and isArray(p) then
+		return (fromArray(p, callback, p2))
 	end
 
-	if InstanceOf(p1, Set) then
-		return (fromSet(p1, p2, p3))
+	if InstanceOf(p, Set) then
+		return (fromSet(p, callback, p2))
 	end
 
-	if InstanceOf(p1, Map) then
-		return (fromMap(p1, p2, p3))
+	if InstanceOf(p, Map) then
+		return (fromMap(p, callback, p2))
 	end
 
-	if v15 == "string" then
-		return (fromString(p1, p2, p3))
+	if typeName == "string" then
+		return (fromString(p, callback, p2))
 	end
 
 	return {}

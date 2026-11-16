@@ -1,82 +1,100 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local useBreakpoint = require(Parent.Foundation).Hooks.useBreakpoint
-local useResponsive = require(Parent.Foundation).Hooks.useResponsive
-local ResponsiveProvider = require(Parent.Foundation).ResponsiveProvider
-local Cryo = require(Parent.Cryo)
-local v8 = game:DefineFastFlag("LuaAppInfoTableResponsiveProviderOverride", false)
-local v9 = game:DefineFastFlag("LuaAppInfoTableWorkaroundGridJank2", false) and v8
-local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Foundation2 = require(parent.Foundation)
+local useBreakpoint = Foundation2.Hooks.useBreakpoint
+local Foundation3 = require(parent.Foundation)
+local useResponsive = Foundation3.Hooks.useResponsive
+local Foundation4 = require(parent.Foundation)
+local ResponsiveProvider = Foundation4.ResponsiveProvider
+local Cryo = require(parent.Cryo)
+
+local SharedFlags = require(parent.SharedFlags)
+
+local defineFastFlag = game:DefineFastFlag("LuaAppInfoTableResponsiveProviderOverride", false)
+local FFlagInfoTableStableItemKeys = SharedFlags.FFlagInfoTableStableItemKeys
+
 local Breakpoint = Foundation.Enums.Breakpoint
 
-local function buildColumnMajorChildren(t1: {[any]: any}, n1: number, n2: number) -- line: 27
-	-- upvalues: React (copy), Foundation (copy)
-	local v17 = #t1
-	local v18 = math.ceil(v17 / n1)
-	local t2 = {}
-	local n3 = 0
+local function buildColumnMajorChildren(items, p: number, size: number)
+	local count = #items
+	local v = math.ceil(count / p)
+	local count2 = 0
+	local children = {}
 
-	for i = 1, v18 do
-		for j = 1, n1 do
-			n3 += 1
+	for i = 1, v do
+		for j = 1, p do
+			count2 += 1
+			local v2 = (j - 1) * v + i
+			local v3
 
-			local v23 = (j - 1) * v18 + i
-			local v24 = if not (v23 <= v17) then React.createElement(Foundation.View, {
-				tag = "size-full-0 auto-y",
-				BackgroundTransparency = 1
-			}) else t1[v23]
+			if v2 <= count then
+				v3 = items[v2]
+			else
+				v3 = React.createElement(Foundation.View, {
+					tag = "size-full-0 auto-y",
+					BackgroundTransparency = 1
+				})
+			end
 
-			t2[`Cell_{ n3 }`] = React.createElement(Foundation.Grid.Cell, {
-				tag = "size-full-0 auto-y",
-				size = n2,
-				LayoutOrder = n3
-			}, v24)
+			local v4
+
+			if FFlagInfoTableStableItemKeys then
+				if v2 <= count then
+					v4 = `Cell_{v2}`
+				else
+					v4 = `Placeholder_{count2}`
+				end
+			else
+				v4 = `Cell_{count2}`
+			end
+
+			children[v4] = React.createElement(
+				Foundation.Grid.Cell,
+				{ size = size, tag = "size-full-0 auto-y", LayoutOrder = count2 },
+				v3
+			)
 		end
 	end
 
-	return t2
+	return children
 end
-local function InfoTable(t3: {[any]: any}) -- line: 75
-	-- upvalues: v9 (copy), React (copy), FFlagSduiExperienceDetailsSupport (copy), buildColumnMajorChildren (copy), Foundation (copy), v8 (copy), useResponsive (copy), Cryo (copy), Breakpoint (copy), useBreakpoint (copy), ResponsiveProvider (copy)
-	local v26 = (not t3.numColumns or not (t3.numColumns > 0)) and 1 or t3.numColumns
-	local v27 = nil
-	local u28 = nil
-	local v29 = nil
-	local v30 = nil
 
-	if v9 then
-		local v31
+local function InfoTable(props)
+	local v = not (props.numColumns and props.numColumns > 0) and 1 or props.numColumns
+	local state, setState, state2, setState2
 
-		v27, v31 = React.useState(false)
-		u28 = v31
-		v29, v30 = React.useState(nil)
+	if defineFastFlag then
+		state, setState = React.useState(false)
+		state2, setState2 = React.useState(nil)
+	else
+		setState = nil
 	end
 
-	local t4 = {}
-	local v33 = 12 / v26
+	local children = {}
+	local size = 12 / v
 
-	if not v9 or v27 then
-		if FFlagSduiExperienceDetailsSupport and v26 > 1 then
-			t4 = buildColumnMajorChildren(t3.items, v26, v33)
+	if not defineFastFlag or state then
+		if v > 1 then
+			children = buildColumnMajorChildren(props.items, v, size)
 		else
-			for v34, v35 in t3.items do
-				t4[`Cell_{ v34 }`] = React.createElement(Foundation.Grid.Cell, {
-					tag = "size-full-0 auto-y",
-					size = v33,
-					LayoutOrder = v34
-				}, v35)
+			for k, item in props.items do
+				children[`Cell_{k}`] = React.createElement(
+					Foundation.Grid.Cell,
+					{ size = size, tag = "size-full-0 auto-y", LayoutOrder = k },
+					item
+				)
 			end
 		end
 	end
 
-	local v36 = nil
+	local config
 
-	if v8 then
-		local v37 = useResponsive()
-
-		v36 = Cryo.Dictionary.join(v37.config, {
-			grid = Cryo.Dictionary.join(v37.config.grid, {
+	if defineFastFlag then
+		local v2 = useResponsive()
+		config = Cryo.Dictionary.join(v2.config, {
+			grid = Cryo.Dictionary.join(v2.config.grid, {
 				margins = {
 					[Breakpoint.XSmall] = 0,
 					[Breakpoint.Small] = 0,
@@ -89,57 +107,62 @@ local function InfoTable(t3: {[any]: any}) -- line: 75
 		})
 	end
 
-	if v9 then
-		local _, v39 = useBreakpoint(v29)
+	if defineFastFlag then
+		local _, v2 = useBreakpoint(state2)
 
-		React.useEffect(function() -- line: 120
-			-- upvalues: v39 (copy), u28 (ref)
-			if v39.X > 0 then
-				task.defer(function() -- line: 122
-					-- upvalues: u28 (ref)
-					u28(true)
+		React.useEffect(function()
+			if v2.X > 0 then
+				task.defer(function()
+					setState(true)
 				end)
 			end
-		end, { v39.X })
+		end, { v2.X })
 
 		return React.createElement("Frame", {
-			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = t3.LayoutOrder,
-			ref = v30
+			BackgroundTransparency = 1,
+			LayoutOrder = props.LayoutOrder,
+			ref = setState2
 		}, {
-			ContentFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				LayoutOrder = t3.LayoutOrder
-			}, {
-				Grid = React.createElement(ResponsiveProvider, {
-					config = v36
-				}, React.createElement(Foundation.Grid.Root, {
-					tag = t3.gridTag,
-					testId = t3.testId
-				}, t4))
-			})
+			ContentFrame = React.createElement(
+				"Frame",
+				{
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					LayoutOrder = props.LayoutOrder
+				},
+				{
+					Grid = React.createElement(
+						ResponsiveProvider,
+						{ config = config },
+						React.createElement(
+							Foundation.Grid.Root,
+							{ tag = props.gridTag, testId = props.testId },
+							children
+						)
+					)
+				}
+			)
 		})
+	elseif defineFastFlag then
+		return React.createElement(
+			ResponsiveProvider,
+			{ config = config },
+			React.createElement(
+				Foundation.Grid.Root,
+				{ tag = props.gridTag, LayoutOrder = props.LayoutOrder, testId = props.testId },
+				children
+			)
+		)
+	else
+		return React.createElement(
+			Foundation.Grid.Root,
+			{ tag = props.gridTag, LayoutOrder = props.LayoutOrder, testId = props.testId },
+			children
+		)
 	end
-
-	if v8 then
-		return React.createElement(ResponsiveProvider, {
-			config = v36
-		}, React.createElement(Foundation.Grid.Root, {
-			tag = t3.gridTag,
-			LayoutOrder = t3.LayoutOrder,
-			testId = t3.testId
-		}, t4))
-	end
-
-	return React.createElement(Foundation.Grid.Root, {
-		tag = t3.gridTag,
-		LayoutOrder = t3.LayoutOrder,
-		testId = t3.testId
-	}, t4)
 end
 
 return React.memo(InfoTable)

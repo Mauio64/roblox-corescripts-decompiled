@@ -1,34 +1,35 @@
-local function getIsInstanceVisible(p1, p2, n1: number) -- line: 1
-	if not p1 then
+local function getIsInstanceVisible(p, p2, p3: number): boolean
+	if not p then
 		return false
 	end
 
-	local AbsoluteSize = p1.AbsoluteSize
+	local absoluteSize = p.AbsoluteSize
 
-	if AbsoluteSize.X <= 0 or AbsoluteSize.Y <= 0 then
+	if absoluteSize.X <= 0 or absoluteSize.Y <= 0 then
 		return false
 	end
 
-	local AbsolutePosition = p1.AbsolutePosition
-	local v7 = AbsolutePosition + AbsoluteSize
-	local v8 = math.max(AbsolutePosition.X, p2.min.X)
-	local v9 = math.min(v7.X, p2.max.X) - v8
+	local absolutePosition = p.AbsolutePosition
+	local v = absolutePosition + absoluteSize
 
-	if v9 <= 0 then
+	local v2 = math.max(absolutePosition.X, p2.min.X)
+	local v3 = math.min(v.X, p2.max.X) - v2
+
+	if v3 <= 0 then
 		return false
 	end
 
-	local v10 = math.max(AbsolutePosition.Y, p2.min.Y)
-	local v11 = math.min(v7.Y, p2.max.Y) - v10
+	local v4 = math.max(absolutePosition.Y, p2.min.Y)
+	local v5 = math.min(v.Y, p2.max.Y) - v4
 
-	if v11 <= 0 then
+	if v5 <= 0 then
 		return false
 	end
 
-	local v12 = v9 * v11
-	local v13 = AbsoluteSize.X * AbsoluteSize.Y
+	local v6 = v3 * v5
+	local v7 = absoluteSize.X * absoluteSize.Y
 
-	return n1 <= v12 * 100 / v13
+	return p3 <= v6 * 100 / v7
 end
 
 return getIsInstanceVisible

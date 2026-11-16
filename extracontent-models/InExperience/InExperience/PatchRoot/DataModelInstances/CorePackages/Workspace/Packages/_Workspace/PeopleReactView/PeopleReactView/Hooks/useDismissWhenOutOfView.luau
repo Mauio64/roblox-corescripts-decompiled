@@ -1,82 +1,79 @@
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local React = require(PeopleReactViewParent.React)
-local Signals = require(PeopleReactViewParent.Signals)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local parent = PeopleReactView.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
 local GetScrollingFrameStore = require(PeopleReactView.Stores.GetScrollingFrameStore)
 
-local function isGuiObjectOutOfScrollingFrameView(n1: number, n2: number, n3: number, n4: number) -- line: 10
-	local v13 = n3 + n4
+local function isGuiObjectOutOfScrollingFrameView(y: number, y2: number, p: number, absoluteSizeY: number): boolean -- 1 equivalent call inferred from this helper
+	local v = p + absoluteSizeY
 
-	return n3 > n1 + n2 or v13 < n1
+	return y + y2 < p or v < y
 end
-local function useDismissWhenOutOfView(b1: boolean, p1: ((...any) -> ...any), p2) -- line: 24
-	-- upvalues: SignalsReact (copy), GetScrollingFrameStore (copy), React (copy), Signals (copy)
-	local v17 = SignalsReact.useSignalState(GetScrollingFrameStore)
 
-	React.useEffect(function() -- line: 27
-		-- upvalues: b1 (copy), p2 (copy), v17 (copy), p1 (copy), Signals (copy)
-		if not b1 then
+local function useDismissWhenOutOfView(flag: boolean, callback, p)
+	local v = SignalsReact.useSignalState(GetScrollingFrameStore)
+
+	React.useEffect(function()
+		if not flag then
 			return
 		end
 
-		local u18 = false
+		local flag2 = false
 
-		local function dismissIfOutOfView() -- line: 34
-			-- upvalues: u18 (ref), p2 (copy), v17 (copy), p1 (copy)
-			if u18 then
+		local function dismissIfOutOfView()
+			if flag2 then
 				return
 			end
 
-			local current = p2.current
+			local current = p.current
 
 			if not current then
 				return
 			end
 
-			local v23 = v17.getAbsoluteSizeY(false)
+			local absoluteSizeY = v.getAbsoluteSizeY(false)
 
-			if v23 <= 0 then
+			if absoluteSizeY <= 0 then
 				return
 			end
 
-			local AbsolutePositionY = current.AbsolutePosition.Y
-			local AbsoluteSizeY = current.AbsoluteSize.Y
-			local v26 = v17.getAbsolutePositionY(false)
-			local v27 = v26 + v23
-
-			if v26 > AbsolutePositionY + AbsoluteSizeY or v27 < AbsolutePositionY then
-				u18 = true
-				p1()
+			if isGuiObjectOutOfScrollingFrameView( -- inferred equivalent call
+				current.AbsolutePosition.Y,
+				current.AbsoluteSize.Y,
+				v.getAbsolutePositionY(false),
+				absoluteSizeY
+			) then
+				flag2 = true
+				callback()
 			end
 		end
 
-		local v20 = Signals.createEffect(function(p3) -- line: 62
-			-- upvalues: v17 (copy), dismissIfOutOfView (copy)
-			v17.getCanvasPositionY(p3)
-			v17.getAbsolutePositionY(p3)
-			v17.getAbsoluteSizeY(p3)
+		local effect = Signals.createEffect(function(p2)
+			v.getCanvasPositionY(p2)
+			v.getAbsolutePositionY(p2)
+			v.getAbsoluteSizeY(p2)
+
 			dismissIfOutOfView()
 		end)
-		local connection = nil
+		local absolutePositionChangedConnection
 
-		if p2.current then
-			connection = p2.current:GetPropertyChangedSignal("AbsolutePosition"):Connect(dismissIfOutOfView)
+		if p.current then
+			absolutePositionChangedConnection = p.current:GetPropertyChangedSignal("AbsolutePosition"):Connect(dismissIfOutOfView)
+		else
+			absolutePositionChangedConnection = nil
 		end
 
-		return function() -- line: 77
-			-- upvalues: v20 (copy), connection (ref)
-			v20()
+		return function()
+			effect()
 
-			if connection then
-				connection:Disconnect()
+			if absolutePositionChangedConnection then
+				absolutePositionChangedConnection:Disconnect()
 			end
 		end
-	end, {
-		b1,
-		p1,
-		v17
-	})
+	end, { flag, callback, v })
 end
 
 return useDismissWhenOutOfView

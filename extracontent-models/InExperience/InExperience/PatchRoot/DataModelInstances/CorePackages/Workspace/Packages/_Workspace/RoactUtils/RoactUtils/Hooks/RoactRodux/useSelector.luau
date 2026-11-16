@@ -1,141 +1,111 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local React = require(Parent.React)
-local Dash = require(Parent.Dash)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+local ArgCheck = require(parent.ArgCheck)
+local React = require(parent.React)
+local Dash = require(parent.Dash)
+
 local useStore = require(script.Parent.useStore)
 
-local function v6(p1, p2) -- line: 52
-	return p1 == p2
+local function fn(p, p2): boolean
+	return p == p2
 end
 
-function useSelectorWithStore(p3: ((...any) -> ...any), p4: ((...any) -> ...any), p5) -- line: 56
-	-- upvalues: React (copy)
-	local _, v13 = React.useReducer(function(n1: number) -- line: 61
-		return n1 + 1
+function useSelectorWithStore(current, callback, object)
+	local _, v = React.useReducer(function(p: number)
+		return p + 1
 	end, 0)
-	local v14 = React.useRef(nil)
-	local v15 = React.useRef(nil)
-	local v16 = React.useRef(nil)
-	local v17 = React.useRef(nil)
-	local v18 = p5:getState()
-	local u19 = nil
-	local ok, result = pcall(function() -- line: 73
-		-- upvalues: p3 (copy), v15 (copy), v18 (copy), v16 (copy), v14 (copy), v17 (copy), p4 (copy), u19 (ref)
-		if p3 ~= v15.current or (v18 ~= v16.current or v14.current) then
-			local v27 = p3(v18)
 
-			if v17.current == nil or not p4(v27, v17.current) then
-				u19 = v27
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+	local ref4 = React.useRef(nil)
 
-				return
-			end
+	local state = object:getState()
+	local current4 = nil
 
-			u19 = v17.current
+	local success, result = pcall(function()
+		if current == ref2.current and state == ref3.current and not ref.current then
+			current4 = ref4.current
 
 			return
 		end
 
-		u19 = v17.current
+		local v2 = current(state)
+
+		if ref4.current == nil or not callback(v2, ref4.current) then
+			current4 = v2
+		else
+			current4 = ref4.current
+		end
 	end)
 
-	if not ok then
-		if v14.current then
-			result = string.format("%s\nThe error may be correlated with this previous error:\n%s\n\n", tostring(result), (tostring(v14.current)))
+	if not success then
+		if ref.current then
+			result = string.format(
+				"%s\nThe error may be correlated with this previous error:\n%s\n\n",
+				tostring(result),
+				(tostring(ref.current))
+			)
 		end
 
 		error(result)
 	end
 
-	React.useLayoutEffect(function() -- line: 103
-		-- upvalues: v15 (copy), p3 (copy), v16 (copy), v18 (copy), v17 (copy), u19 (ref), v14 (copy)
-		v15.current = p3
-		v16.current = v18
-		v17.current = u19
-		v14.current = nil
+	React.useLayoutEffect(function()
+		ref2.current = current
+		ref3.current = state
+		ref4.current = current4
+		ref.current = nil
 	end)
-	React.useLayoutEffect(function() -- line: 110
-		-- upvalues: v16 (copy), v15 (copy), p4 (copy), v17 (copy), v14 (copy), v13 (copy), p5 (copy)
-		local function checkForUpdates(p6) -- line: 111
-			-- upvalues: v16 (copy), v15 (copy), p4 (copy), v17 (copy), v14 (copy), v13 (copy)
-			local ok2, result2 = pcall(function() -- line: 112
-				-- upvalues: p6 (copy), v16 (copy), v15 (copy), p4 (copy), v17 (copy)
-				if p6 == v16.current then
+
+	React.useLayoutEffect(function()
+		local function checkForUpdates(current2) -- 1 equivalent call inferred from this helper
+			local success2, result2 = pcall(function(): boolean
+				if current2 == ref3.current then
 					return false
 				end
 
-				assert(v15.current, "latestSelector")
+				assert(ref2.current, "latestSelector")
+				local current3 = ref2.current(current2)
 
-				local v37 = v15.current(p6)
-
-				if p4(v37, v17.current) then
+				if callback(current3, ref4.current) then
 					return false
 				end
 
-				v17.current = v37
-				v16.current = p6
-
+				ref4.current = current3
+				ref3.current = current2
 				return true
 			end)
 
-			if not ok2 then
+			if not success2 then
 				result2 = result2 or "Error"
-				v14.current = result2
+
+				ref.current = result2
 			end
 
 			if result2 then
-				v13(nil)
+				v(nil)
 			end
 		end
+		local changedConnection = object.changed:connect(checkForUpdates)
 
-		local v29 = p5.changed:connect(checkForUpdates)
-		local v30 = p5:getState()
-		local ok3, result3 = pcall(function() -- line: 112
-			-- upvalues: v30 (copy), v16 (copy), v15 (copy), p4 (copy), v17 (copy)
-			if v30 == v16.current then
-				return false
-			end
+		checkForUpdates(object:getState()) -- inferred equivalent call
 
-			assert(v15.current, "latestSelector")
-
-			local v36 = v15.current(v30)
-
-			if p4(v36, v17.current) then
-				return false
-			end
-
-			v17.current = v36
-			v16.current = v30
-
-			return true
-		end)
-
-		if not ok3 then
-			result3 = result3 or "Error"
-			v14.current = result3
+		return function()
+			changedConnection:disconnect()
 		end
+	end, { object })
 
-		if result3 then
-			v13(nil)
-		end
-
-		return function() -- line: 146
-			-- upvalues: v29 (copy)
-			v29:disconnect()
-		end
-	end, { p5 })
-
-	return u19
+	return current4
 end
-function useSelector(p7: ((...any) -> ...any), p8: ((...any) -> ...any)?) -- line: 154
-	-- upvalues: ArgCheck (copy), Dash (copy), v6 (copy), useStore (copy)
-	ArgCheck.isNotNil(p7, "selector")
-	ArgCheck.assert(Dash.isCallable(p7), "useSelector expects 'selector' to be callable")
-	ArgCheck.isTypeOrNil(p8, "function", "equalityFn")
 
-	local v24 = p8 or v6
-	local v25 = useStore()
+function useSelector(callback, callback2)
+	ArgCheck.isNotNil(callback, "selector")
+	ArgCheck.assert(Dash.isCallable(callback), "useSelector expects 'selector' to be callable")
+	ArgCheck.isTypeOrNil(callback2, "function", "equalityFn")
 
-	return (useSelectorWithStore(p7, v24, v25))
+	local v = useStore()
+
+	return (useSelectorWithStore(callback, callback2 or fn, v))
 end
 
 return useSelector

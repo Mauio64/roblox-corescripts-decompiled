@@ -1,239 +1,227 @@
-local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local ContentProvider = game:GetService("ContentProvider")
 local UserInputService = game:GetService("UserInputService")
-local AppLifecycleObserverService = nil
 
-pcall(function() -- line: 10
-	-- upvalues: AppLifecycleObserverService (ref)
-	AppLifecycleObserverService = game:GetService("AppLifecycleObserverService")
+local v = nil
+pcall(function()
+	local AppLifecycleObserverService = game:GetService("AppLifecycleObserverService")
+	v = AppLifecycleObserverService
 end)
 
-local React = require(ProfilePlatformParent.React)
-local Signals = require(ProfilePlatformParent.Signals)
-local enableAudioPlaybackInApp = require(ProfilePlatformParent.MediaPlayback).enableAudioPlaybackInApp
-local useAppPolicy = require(ProfilePlatformParent.UniversalAppPolicy).useAppPolicy
-local Media = require(ProfilePlatformParent.MomentsCommon).Media
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local MediaPlayback = require(parent.MediaPlayback)
+local enableAudioPlaybackInApp = MediaPlayback.enableAudioPlaybackInApp
 
-require(ProfilePlatformParent.DataHydration.MomentsStoreTypes)
-
-local ToMediaItem = require(ProfilePlatformParent.Moments.ToMediaItem)
-local SharedFlags = require(ProfilePlatformParent.SharedFlags)
+local MomentsCommon = require(parent.MomentsCommon)
+local Media = MomentsCommon.Media
+local GetMomentsCapabilities = MomentsCommon.Stores.GetMomentsCapabilities
+require(parent.DataHydration.MomentsStoreTypes)
+local ToMediaItem = require(parent.Moments.ToMediaItem)
+local SharedFlags = require(parent.SharedFlags)
 local FFlagMomentsAutoplayAmpPolicy = SharedFlags.FFlagMomentsAutoplayAmpPolicy
-local FFlagProfileMomentsVideoPlaybackFix = SharedFlags.FFlagProfileMomentsVideoPlaybackFix
-local FFlagProfileMomentsMuteCarouselAudio = require(ProfilePlatform.Flags.FFlagProfileMomentsMuteCarouselAudio)
+local FFlagProfileMomentSceneOutfitPoster = SharedFlags.FFlagProfileMomentSceneOutfitPoster
 
-local function shouldPauseWhenAppHidden() -- line: 43
-	-- upvalues: UserInputService (copy)
+local useSignalState = SignalsReact.useSignalState
+
+local function shouldPauseWhenAppHidden(): boolean -- 1 equivalent call inferred from this helper
 	return UserInputService:GetDeviceType() ~= Enum.DeviceType.Desktop
 end
-local function defaultCreateCoordinator(p1, n1: number?) -- line: 47
-	-- upvalues: enableAudioPlaybackInApp (copy), CoreGui (copy), FFlagProfileMomentsVideoPlaybackFix (copy), RunService (copy), ContentProvider (copy), Media (copy)
+
+local function defaultCreateCoordinator(p, masterVolume: number?)
 	enableAudioPlaybackInApp()
 
-	local AudioDeviceOutput = Instance.new("AudioDeviceOutput")
+	local profileMomentsAudioOutput = Instance.new("AudioDeviceOutput")
+	profileMomentsAudioOutput.Name = "ProfileMomentsAudioOutput"
+	profileMomentsAudioOutput.Parent = CoreGui
 
-	AudioDeviceOutput.Name = "ProfileMomentsAudioOutput"
-	AudioDeviceOutput.Parent = CoreGui
+	local profileMomentsMediaHost = Instance.new("Folder")
 
-	local v24 = if not FFlagProfileMomentsVideoPlaybackFix then nil else Instance.new("Folder")
-
-	if v24 ~= nil then
-		v24.Name = "ProfileMomentsMediaHost"
-		v24.Parent = CoreGui
+	if profileMomentsMediaHost ~= nil then
+		profileMomentsMediaHost.Name = "ProfileMomentsMediaHost"
+		profileMomentsMediaHost.Parent = CoreGui
 	end
 
-	local t1 = {
-		runService = RunService,
-		contentProvider = ContentProvider
-	}
-	local v26 = Media.createMediaPreloadCoordinator(p1, Media.selectPreloadPolicy(), Media.mediaTelemetry.noopSink, AudioDeviceOutput, t1, {
-		parent = v24,
-		masterVolume = n1
-	})
+	local mediaPreloadCoordinator = Media.createMediaPreloadCoordinator(
+		p,
+		Media.selectPreloadPolicy(),
+		Media.mediaTelemetry.noopSink,
+		profileMomentsAudioOutput,
+		{ runService = RunService, contentProvider = ContentProvider },
+		{ parent = profileMomentsMediaHost, masterVolume = masterVolume }
+	)
+
+	local flag = false
 
 	return {
-		provider = v26,
-		dispose = function() -- line: 80
-			-- upvalues: v26 (copy), AudioDeviceOutput (copy), v24 (copy)
-			v26.dispose()
-			AudioDeviceOutput:Destroy()
+		provider = mediaPreloadCoordinator,
+		dispose = function()
+			if flag then
+				return
+			end
 
-			if v24 ~= nil then
-				v24:Destroy()
+			flag = true
+			mediaPreloadCoordinator.dispose()
+			profileMomentsAudioOutput:Destroy()
+
+			if profileMomentsMediaHost ~= nil then
+				profileMomentsMediaHost:Destroy()
 			end
 		end
 	}
 end
-local function MomentsCarouselMediaProvider(t2: {[any]: any}) -- line: 100
-	-- upvalues: FFlagMomentsAutoplayAmpPolicy (copy), useAppPolicy (copy), React (copy), Signals (copy), UserInputService (copy), AppLifecycleObserverService (ref), ToMediaItem (copy), defaultCreateCoordinator (copy), FFlagProfileMomentsMuteCarouselAudio (copy), Media (copy)
-	local activeIndex = t2.activeIndex
-	local playbackActive = t2.playbackActive
-	local v30 = if not FFlagMomentsAutoplayAmpPolicy then nil else useAppPolicy(function(p2) -- line: 104
-		return p2.getMomentsCanAutoPlay()
-	end)
-	local v31 = React.useMemo(function() -- line: 111
-		-- upvalues: Signals (copy), activeIndex (copy)
-		local v42, v43 = Signals.createSignal(activeIndex)
 
-		return {
-			get = v42,
-			set = v43
-		}
-	end, {})
-	local v32 = React.useMemo(function() -- line: 116
-		-- upvalues: Signals (copy), playbackActive (copy)
-		local v44, v45 = Signals.createSignal(playbackActive)
-
-		return {
-			get = v44,
-			set = v45
-		}
-	end, {})
-	local v33 = if not FFlagMomentsAutoplayAmpPolicy then nil else React.useMemo(function() -- line: 122
-		-- upvalues: Signals (copy), v30 (copy)
-		local v46, v47 = Signals.createSignal(v30)
-
-		return {
-			get = v46,
-			set = v47
-		}
-	end, {})
-	local v34 = React.useMemo(function() -- line: 129
-		-- upvalues: Signals (copy)
-		local v48, v49 = Signals.createSignal(true)
-
-		return {
-			get = v48,
-			set = v49
-		}
-	end, {})
-
-	React.useEffect(function() -- line: 134
-		-- upvalues: v31 (copy), activeIndex (copy)
-		v31.set(activeIndex)
-	end, {
-		activeIndex,
-		v31
-	})
-	React.useEffect(function() -- line: 138
-		-- upvalues: v32 (copy), playbackActive (copy)
-		v32.set(playbackActive)
-	end, {
-		playbackActive,
-		v32
-	})
+local function MomentsCarouselMediaProvider(props)
+	local activeIndex = props.activeIndex
+	local playbackActive = props.playbackActive
+	local v2
 
 	if FFlagMomentsAutoplayAmpPolicy then
-		React.useEffect(function() -- line: 143
-			-- upvalues: v33 (copy), v30 (copy)
-			v33.set(v30)
-		end, {
-			v30,
-			v33
-		})
+		v2 = useSignalState(GetMomentsCapabilities(false).getIsAutoPlayEnabled)
+	else
+		v2 = nil
 	end
 
-	React.useEffect(function() -- line: 148
-		-- upvalues: UserInputService (copy), AppLifecycleObserverService (ref), v34 (copy)
-		if UserInputService:GetDeviceType() == Enum.DeviceType.Desktop or AppLifecycleObserverService == nil then
+	local v3 = React.useMemo(function()
+		local signal, set = Signals.createSignal(activeIndex)
+		return { get = signal, set = set }
+	end, {})
+
+	local v4 = React.useMemo(function()
+		local signal, set = Signals.createSignal(playbackActive)
+		return { get = signal, set = set }
+	end, {})
+	local v5
+
+	if FFlagMomentsAutoplayAmpPolicy then
+		v5 = React.useMemo(function()
+			local signal, set = Signals.createSignal(v2)
+			return { get = signal, set = set }
+		end, {})
+	else
+		v5 = nil
+	end
+
+	local v6 = React.useMemo(function()
+		local signal, set = Signals.createSignal(true)
+		return { get = signal, set = set }
+	end, {})
+
+	React.useEffect(function()
+		v3.set(activeIndex)
+	end, { activeIndex, v3 })
+
+	React.useEffect(function()
+		v4.set(playbackActive)
+	end, { playbackActive, v4 })
+
+	if FFlagMomentsAutoplayAmpPolicy then
+		React.useEffect(function()
+			v5.set(v2)
+		end, { v2, v5 })
+	end
+
+	React.useEffect(function()
+		if not shouldPauseWhenAppHidden() or v == nil then -- inferred equivalent call
 			return
 		end
 
-		local function onHidden() -- line: 152
-			-- upvalues: v34 (copy)
-			v34.set(false)
+		local function onHidden()
+			v6.set(false)
 		end
-		local function onShown() -- line: 155
-			-- upvalues: v34 (copy)
-			v34.set(true)
+		local function onShown()
+			v6.set(true)
 		end
+		local v7 = { v.OnHide:Connect(onHidden), v.OnUnhide:Connect(onShown) }
 
-		local t3 = {
-			AppLifecycleObserverService.OnHide:Connect(onHidden),
-			AppLifecycleObserverService.OnUnhide:Connect(onShown)
-		}
-
-		return function() -- line: 162
-			-- upvalues: t3 (copy)
-			for _, v58 in t3 do
-				v58:Disconnect()
+		return function()
+			for _, connection in v7 do
+				connection:Disconnect()
 			end
 		end
-	end, { v34 })
+	end, { v6 })
 
-	local v35 = React.useMemo(function() -- line: 169
-		-- upvalues: t2 (copy), ToMediaItem (copy)
-		local t4 = {}
+	local items = React.useMemo(function()
+		local result = {}
 
-		for _, v55 in t2.moments do
-			local v56 = ToMediaItem({
-				kind = "moment",
-				moment = v55
-			})
+		for _, moment in props.moments do
+			local toMediaItem = ToMediaItem({ kind = "moment", moment = moment })
 
-			if v56 ~= nil then
-				v56.cornerRadius = t2.mediaCornerRadius
-				table.insert(t4, v56)
+			if toMediaItem == nil then
+				continue
 			end
+
+			toMediaItem.cornerRadius = props.mediaCornerRadius
+
+			if FFlagProfileMomentSceneOutfitPoster and moment.metadata.isMomentScene == true then
+				toMediaItem.captureType = Enum.CaptureType.Screenshot
+				toMediaItem.posterContent = nil
+			end
+
+			table.insert(result, toMediaItem)
 		end
 
-		return t4
-	end, {
-		t2.moments,
-		t2.mediaCornerRadius
-	})
-	local v36 = React.useMemo(function() -- line: 183
-		-- upvalues: v32 (copy), v34 (copy)
-		return function(p3) -- line: 184
-			-- upvalues: v32 (copy), v34 (copy)
-			return v32.get(p3) and v34.get(p3)
+		return result
+	end, { props.moments, props.mediaCornerRadius })
+
+	local getPlaybackActive = React.useMemo(function()
+		return function(p)
+			return v4.get(p) and v6.get(p)
 		end
-	end, {
-		v32,
-		v34
-	})
-	local v37 = React.useMemo(function() -- line: 189
-		-- upvalues: v31 (copy), v35 (copy), v36 (copy), FFlagMomentsAutoplayAmpPolicy (copy), v33 (copy)
-		return {
-			getActiveIndex = v31.get,
-			getItems = function(_) -- line: 192
-				-- upvalues: v35 (copy)
-				return v35
+	end, { v4, v6 })
+
+	local useMemo = React.useMemo
+	local function fn()
+		local v7 = {
+			getActiveIndex = v3.get,
+			getItems = function(_)
+				return items
 			end,
-			getPlaybackActive = v36,
-			getCanAutoPlay = if not FFlagMomentsAutoplayAmpPolicy then nil else v33.get
+			getPlaybackActive = getPlaybackActive,
+			getCanAutoPlay = 0
 		}
-	end, {
-		v35,
-		v31,
-		v36,
-		if not FFlagMomentsAutoplayAmpPolicy then nil else v33
-	})
-	local v38 = t2.createCoordinator or defaultCreateCoordinator
-	local v39 = if not FFlagProfileMomentsMuteCarouselAudio then nil else 0
-	local v40 = React.useMemo(function() -- line: 210
-		-- upvalues: v38 (copy), v37 (copy), v39 (copy)
-		return v38(v37, v39)
-	end, {
-		v37,
-		v38,
-		v39
-	})
+		local getCanAutoPlay
 
-	React.useEffect(function() -- line: 214
-		-- upvalues: v40 (copy)
-		return function() -- line: 215
-			-- upvalues: v40 (copy)
-			v40.dispose()
+		if FFlagMomentsAutoplayAmpPolicy then
+			getCanAutoPlay = v5.get
 		end
-	end, { v40 })
 
-	return React.createElement(Media.MediaPreloadProvider.Provider, {
-		controllerProvider = v40.provider
-	}, t2.children)
+		v7.getCanAutoPlay = getCanAutoPlay
+		return v7
+	end
+
+	local v7
+
+	if FFlagMomentsAutoplayAmpPolicy then
+		v7 = v5
+	end
+
+	local v8 = useMemo(fn, { items, v3, getPlaybackActive, v7 })
+
+	local createCoordinator = props.createCoordinator or defaultCreateCoordinator
+
+	local v9 = React.useMemo(function()
+		return createCoordinator(v8, 0)
+	end, { v8, createCoordinator, 0 })
+
+	React.useEffect(function()
+		return function()
+			v9.dispose()
+		end
+	end, { v9 })
+	React.useImperativeHandle(props.handoffRef, function()
+		return { release = v9.dispose }
+	end, { v9 })
+
+	return React.createElement(
+		Media.MediaPreloadProvider.Provider,
+		{ controllerProvider = v9.provider },
+		props.children
+	)
 end
 
 return MomentsCarouselMediaProvider

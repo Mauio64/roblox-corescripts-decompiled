@@ -1,3 +1,1 @@
-return {
-	AltTextCard = require(script.AltTextCard)
-}
+return { AltTextCard = require(script.AltTextCard) }

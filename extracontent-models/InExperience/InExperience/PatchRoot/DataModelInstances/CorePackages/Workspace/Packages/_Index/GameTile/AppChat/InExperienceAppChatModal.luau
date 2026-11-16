@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local InExperienceAppChatModal = require(Workspace.AppChat.AppChat.App.InExperienceAppChatModal)
 
-return (require(_Workspace.AppChat.AppChat.App.InExperienceAppChatModal))
+return InExperienceAppChatModal

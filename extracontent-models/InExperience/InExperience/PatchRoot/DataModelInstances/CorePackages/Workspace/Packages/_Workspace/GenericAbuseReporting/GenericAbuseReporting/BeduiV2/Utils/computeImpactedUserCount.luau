@@ -1,33 +1,36 @@
 local Players = game:GetService("Players")
 
-local function computeImpactedUserCount(p1, s1: string) -- line: 11
-	-- upvalues: Players (copy)
-	if not p1 or not p1.participants then
+local function computeImpactedUserCount(p, p2: string)
+	if not (p and p.participants) then
 		return 0
 	end
 
-	local PlayerByUserId = Players:GetPlayerByUserId((tonumber(s1)))
+	local playerByUserId = Players:GetPlayerByUserId((tonumber(p2)))
 
-	if not PlayerByUserId or not PlayerByUserId.Character or not PlayerByUserId.Character.PrimaryPart then
+	if not (playerByUserId and playerByUserId.Character and playerByUserId.Character.PrimaryPart) then
 		return 0
 	end
 
-	local PrimaryPartPosition = PlayerByUserId.Character.PrimaryPart.Position
-	local n1 = 0
+	local position = playerByUserId.Character.PrimaryPart.Position
+	local count = 0
 
-	for k in pairs(p1.participants) do
-		local num = tonumber(k)
+	for k in pairs(p.participants) do
+		local v = tonumber(k)
 
-		if num and num ~= PlayerByUserId.UserId then
-			local PlayerByUserId2 = Players:GetPlayerByUserId(num)
-
-			if PlayerByUserId2 and PlayerByUserId2.Character and PlayerByUserId2.Character.PrimaryPart and (PlayerByUserId2.Character.PrimaryPart.Position - PrimaryPartPosition).Magnitude <= 160 then
-				n1 += 1
-			end
+		if not (v and v ~= playerByUserId.UserId) then
+			continue
 		end
+
+		local playerByUserId2 = Players:GetPlayerByUserId(v)
+
+		if not (playerByUserId2 and playerByUserId2.Character and playerByUserId2.Character.PrimaryPart and (playerByUserId2.Character.PrimaryPart.Position - position).Magnitude <= 160) then
+			continue
+		end
+
+		count += 1
 	end
 
-	return n1
+	return count
 end
 
 return computeImpactedUserCount

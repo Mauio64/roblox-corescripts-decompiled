@@ -1,29 +1,32 @@
 local CorePackages = game:GetService("CorePackages")
-local CoreScriptsRootProvider = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).CoreScriptsRootProvider
-local FocusRoot = require(CorePackages.Workspace.Packages.FocusNavigationUtils).FocusRoot
+local CoreScriptsRoactCommon = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon)
+local CoreScriptsRootProvider = CoreScriptsRoactCommon.CoreScriptsRootProvider
+
+local FocusNavigationUtils = require(CorePackages.Workspace.Packages.FocusNavigationUtils)
+local FocusRoot = FocusNavigationUtils.FocusRoot
+
 local React = require(CorePackages.Packages.React)
 local RobloxAppEnums = require(CorePackages.Workspace.Packages.RobloxAppEnums)
-local FocusNavigableSurfaceIdentifierEnum = require(CorePackages.Workspace.Packages.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
+
+local FocusNavigationUtils2 = require(CorePackages.Workspace.Packages.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils2.FocusNavigableSurfaceIdentifierEnum
+
 local DeviceType = RobloxAppEnums.DeviceType
 
-function OverscanWrapper(p1) -- line: 15
-	-- upvalues: DeviceType (copy), React (copy), CoreScriptsRootProvider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	return function(p2) -- line: 16
-		-- upvalues: DeviceType (copy), React (copy), CoreScriptsRootProvider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), p1 (copy)
-		local t1 = {
-			deviceType = DeviceType.Console
-		}
+function OverscanWrapper(p)
+	return function(p2)
+		local styleOverride = { deviceType = DeviceType.Console }
 
-		return React.createElement(CoreScriptsRootProvider, {
-			styleOverride = t1
-		}, {
-			FocusNavigationCoreScriptsWrapper = React.createElement(FocusRoot, {
-				isIsolated = true,
-				isAutoFocusRoot = true,
-				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
-			}, {
-				Overscan = React.createElement(p1, p2)
-			})
+		return React.createElement(CoreScriptsRootProvider, { styleOverride = styleOverride }, {
+			FocusNavigationCoreScriptsWrapper = React.createElement(
+				FocusRoot,
+				{
+					surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+					isIsolated = true,
+					isAutoFocusRoot = true
+				},
+				{ Overscan = React.createElement(p, p2) }
+			)
 		})
 	end
 end

@@ -1,149 +1,139 @@
 local AssetFavorites = script:FindFirstAncestor("AssetFavorites")
+
 local Cryo = require(AssetFavorites.Parent.Cryo)
 local React = require(AssetFavorites.Parent.React)
-local StatusCodes = require(AssetFavorites.Parent.Http).StatusCodes
+local Http = require(AssetFavorites.Parent.Http)
+local StatusCodes = Http.StatusCodes
 local HttpRequest = require(AssetFavorites.Parent.HttpRequest)
-local FFlagLuaAppDefaultHttpRetry = require(AssetFavorites.Parent.SharedFlags).FFlagLuaAppDefaultHttpRetry
+
+local SharedFlags = require(AssetFavorites.Parent.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
 local useLocalUserId = require(AssetFavorites.Hooks.useLocalUserId)
 local GetFavoriteForAsset = require(AssetFavorites.Requests.GetFavoriteForAsset)
 local PostFavoriteForAsset = require(AssetFavorites.Requests.PostFavoriteForAsset)
 local DeleteFavoriteForAsset = require(AssetFavorites.Requests.DeleteFavoriteForAsset)
-
 require(AssetFavorites.Parent.LuauPolyfill)
-
 local Promise = require(AssetFavorites.Parent.Promise)
 local logger = require(AssetFavorites.logger)
+
 local useCallback = React.useCallback
 local useEffect = React.useEffect
 local useState = React.useState
 local useRef = React.useRef
 local useMemo = React.useMemo
-local v18 = HttpRequest.config({
-	requestFunction = HttpRequest.requestFunctions.RequestInternal,
-	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("UseAssetFavoritingHttpRetryCount", 4)
-})
 
-local function useAssetFavoriting(t1: {[any]: any}) -- line: 32
-	-- upvalues: useLocalUserId (copy), useState (copy), useRef (copy), useCallback (copy), logger (copy), Promise (copy), DeleteFavoriteForAsset (copy), v18 (copy), PostFavoriteForAsset (copy), useMemo (copy), Cryo (copy), useEffect (copy), GetFavoriteForAsset (copy), StatusCodes (copy)
-	local v21 = useLocalUserId()
-	local v22, v23 = useState({})
-	local v24 = useRef({})
-	local v25 = useCallback(function(n1: number?) -- line: 42
-		-- upvalues: logger (copy), v21 (copy)
-		if not n1 then
+local config = HttpRequest.config
+local v = { requestFunction = HttpRequest.requestFunctions.RequestInternal, maxRetryCount = 0 }
+local maxRetryCount
+
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("UseAssetFavoritingHttpRetryCount", 4)
+end
+
+v.maxRetryCount = maxRetryCount
+local v2 = config(v)
+
+local function useAssetFavoriting(p)
+	local v3 = useLocalUserId()
+	local state, setState = useState({})
+	local v4 = useRef({})
+
+	local v5 = useCallback(function(p2: number?): boolean
+		if not p2 then
 			return false
 		end
 
-		if n1 <= 0 or n1 % 1 ~= 0 then
-			logger:warning(`validation failed (assetId must be a positive int, got { n1 })`)
-
+		if p2 <= 0 or p2 % 1 ~= 0 then
+			logger:warning(`validation failed (assetId must be a positive int, got {p2})`)
 			return false
 		end
 
-		if not v21 or v21 <= 0 then
-			logger:warning(`validation failed (userId must be a positive int, got { v21 })`)
-
-			return false
+		if v3 and not (v3 <= 0) then
+			return true
 		end
 
-		return true
-	end, { v21 })
-	local v26 = useCallback(function() -- line: 62
-		-- upvalues: v22 (copy)
-		return v22
-	end, { v22 })
-	local v27 = useCallback(function(n2: number) -- line: 66
-		-- upvalues: v22 (copy)
-		local v35 = v22[tostring(n2)]
-
-		if v35 ~= nil then
-			return v35
-		end
-
+		logger:warning(`validation failed (userId must be a positive int, got {v3})`)
 		return false
-	end, { v22 })
-	local v28 = useCallback(function(n3: number) -- line: 71
-		-- upvalues: v22 (copy)
-		return v22[tostring(n3)] ~= nil
-	end, { v22 })
-	local v29 = useCallback(function(n4: number) -- line: 75
-		-- upvalues: v24 (copy)
-		return v24.current[tostring(n4)] ~= nil
+	end, { v3 })
+
+	local getAll = useCallback(function()
+		return state
+	end, { state })
+
+	local getByAssetId = useCallback(function(p2: number)
+		local v6 = state[tostring(p2)]
+		return v6 ~= nil and v6
+	end, { state })
+
+	local v6 = useCallback(function(p2: number): boolean
+		return state[tostring(p2)] ~= nil
+	end, { state })
+
+	local isLoading = useCallback(function(p2: number): boolean
+		return v4.current[tostring(p2)] ~= nil
 	end, {})
-	local v30 = useCallback(function(n5: number, b1: boolean) -- line: 79
-		-- upvalues: v23 (copy)
-		v23(function(p1) -- line: 80
-			-- upvalues: n5 (copy), b1 (copy)
-			local v46 = table.clone(p1)
 
-			v46[tostring(n5)] = b1
-
-			return v46
+	local v7 = useCallback(function(p2: number, flag: boolean)
+		setState(function(p3)
+			local clone = table.clone(p3)
+			clone[tostring(p2)] = flag
+			return clone
 		end)
 	end, {})
-	local v31 = useCallback(function(n6: number) -- line: 87
-		-- upvalues: v25 (copy), Promise (copy), v27 (copy), v30 (copy), DeleteFavoriteForAsset (copy), v18 (copy), v21 (copy), PostFavoriteForAsset (copy), logger (copy)
-		if not v25(n6) then
+
+	local toggleFavorite = useCallback(function(p2: number)
+		if not v5(p2) then
 			return Promise.resolve(nil)
 		end
 
-		local v41 = v27(n6)
+		local v8 = getByAssetId(p2)
 
-		v30(n6, not v41)
+		v7(p2, not v8)
+		local v9
 
-		return ((if not v41 then PostFavoriteForAsset(v18, tostring(v21), (tostring(n6))) else DeleteFavoriteForAsset(v18, tostring(v21), (tostring(n6))))):catch(function(p2) -- line: 106
-			-- upvalues: v30 (copy), n6 (copy), v41 (copy), logger (copy)
-			v30(n6, v41)
-			logger:warning(p2.StatusMessage)
-		end):andThenReturn(not v41)
-	end, {
-		v21,
-		v25,
-		v27
-	})
-	local v32 = useMemo(function() -- line: 114
-		-- upvalues: Cryo (copy), t1 (copy), v25 (copy), v28 (copy), v29 (copy)
-		return Cryo.List.filter(t1, function(n7: number) -- line: 115
-			-- upvalues: v25 (copy), v28 (copy), v29 (copy)
-			return v25(n7) and (not v28(n7) and not v29(n7))
+		if v8 then
+			v9 = DeleteFavoriteForAsset(v2, tostring(v3), (tostring(p2)))
+		else
+			v9 = PostFavoriteForAsset(v2, tostring(v3), (tostring(p2)))
+		end
+
+		return v9:catch(function(p3)
+			v7(p2, v8)
+			logger:warning(p3.StatusMessage)
+		end):andThenReturn(not v8)
+	end, { v3, v5, getByAssetId })
+
+	local v8 = useMemo(function()
+		return Cryo.List.filter(p, function(p2: number)
+			return v5(p2) and not (v6(p2) or isLoading(p2))
 		end)
-	end, Cryo.List.join(t1, {
-		v28,
-		v29,
-		v25
-	}))
+	end, Cryo.List.join(p, { v6, isLoading, v5 }))
 
-	useEffect(function() -- line: 120
-		-- upvalues: v32 (copy), v24 (copy), v30 (copy), logger (copy), GetFavoriteForAsset (copy), v18 (copy), v21 (copy), StatusCodes (copy)
-		for _, v43 in v32 do
-			local str = tostring(v43)
+	useEffect(function()
+		for _, v9 in v8 do
+			local v10 = tostring(v9)
 
-			v24.current[str] = true
-			v30(v43, false)
-			logger:debug(`fetching initial favorite status for asset { v43 }`)
-			GetFavoriteForAsset(v18, tostring(v21), str):andThen(function(p3) -- line: 129
-				-- upvalues: StatusCodes (copy), v30 (copy), v43 (copy)
-				if p3.responseCode == StatusCodes.OK and p3.responseBody then
-					v30(v43, true)
+			v4.current[v10] = true
+			v7(v9, false)
+			logger:debug(`fetching initial favorite status for asset {v9}`)
+
+			GetFavoriteForAsset(v2, tostring(v3), v10):andThen(function(p2)
+				if p2.responseCode == StatusCodes.OK and p2.responseBody then
+					v7(v9, true)
 				end
-			end):catch(function(p4) -- line: 138
-				-- upvalues: logger (copy)
-				logger:warning(p4.StatusMessage)
-			end):finally(function() -- line: 141
-				-- upvalues: v24 (copy), str (copy)
-				v24.current[str] = nil
+			end):catch(function(p2)
+				logger:warning(p2.StatusMessage)
+			end):finally(function()
+				v4.current[v10] = nil
 			end)
 		end
-	end, {
-		v32,
-		v21
-	})
+	end, { v8, v3 })
 
 	return {
-		getAll = v26,
-		getByAssetId = v27,
-		toggleFavorite = v31,
-		isLoading = v29
+		getAll = getAll,
+		getByAssetId = getByAssetId,
+		toggleFavorite = toggleFavorite,
+		isLoading = isLoading
 	}
 end
 

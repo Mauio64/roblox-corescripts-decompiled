@@ -1,48 +1,62 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Roact = require(Parent.Roact)
-local withStyle = require(Parent.UIBlox).Style.withStyle
-local UIBlox = require(Parent.UIBlox)
-local Foundation = require(Parent.Foundation)
-local EnumsRadius = Foundation.Enums.Radius
-local Skeleton = Foundation.Skeleton
-local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local Images = UIBlox.App.ImageSet.Images
-local v10 = Roact.PureComponent:extend("LoadingAvatar")
-local v11 = game:DefineFastFlag("AppChatLoadingIndicatorTransparency", false)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-v10.defaultProps = {
+local Roact = require(parent.Roact)
+local UIBlox = require(parent.UIBlox)
+local withStyle = UIBlox.Style.withStyle
+
+local UIBlox2 = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Radius = Foundation.Enums.Radius
+local Skeleton = Foundation.Skeleton
+
+local ImageSetLabel = UIBlox2.Core.ImageSet.ImageSetLabel
+local Images = UIBlox2.App.ImageSet.Images
+
+local extended = Roact.PureComponent:extend("LoadingAvatar")
+local defineFastFlag = game:DefineFastFlag("AppChatLoadingIndicatorTransparency", false)
+
+extended.defaultProps = {
+	avatarImage = Images["component_assets/circle_49_mask"],
 	cellHeight = 64,
 	avatarSize = 36,
-	LayoutOrder = 0,
-	avatarImage = Images["component_assets/circle_49_mask"]
+	LayoutOrder = 0
 }
 
-function v10.render(p1) -- line: 25
-	-- upvalues: withStyle (copy), Roact (copy), Skeleton (copy), EnumsRadius (copy), v11 (copy), ImageSetLabel (copy)
-	local v13 = p1.props.cellHeight / 2 - p1.props.avatarSize / 2
+function extended.render(p)
+	local v = p.props.cellHeight / 2 - p.props.avatarSize / 2
 
-	return withStyle(function(p2) -- line: 28
-		-- upvalues: Roact (copy), p1 (copy), Skeleton (copy), v13 (copy), EnumsRadius (copy), v11 (copy), ImageSetLabel (copy)
-		return Roact.createElement("Frame", {
+	return withStyle(function(p2)
+		local createElement = Roact.createElement
+		local v2 = {
+			Size = UDim2.new(0, p.props.cellHeight, 0, p.props.cellHeight),
 			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(0, p1.props.cellHeight, 0, p1.props.cellHeight),
-			LayoutOrder = p1.props.LayoutOrder
-		}, {
+			LayoutOrder = p.props.LayoutOrder,
+			BorderSizePixel = 0
+		}
+
+		local v3 = {
 			avatarShimmer = Roact.createElement(Skeleton, {
-				Size = UDim2.fromOffset(p1.props.avatarSize, p1.props.avatarSize),
-				Position = UDim2.fromOffset(v13, v13),
-				radius = EnumsRadius.Circle
+				Size = UDim2.fromOffset(p.props.avatarSize, p.props.avatarSize),
+				Position = UDim2.fromOffset(v, v),
+				radius = Radius.Circle
 			}),
-			avatarMask = if not v11 then Roact.createElement(ImageSetLabel, {
+			avatarMask = 0
+		}
+		local avatarMask
+
+		if not defineFastFlag then
+			avatarMask = Roact.createElement(ImageSetLabel, {
+				Size = UDim2.fromOffset(p.props.avatarSize, p.props.avatarSize),
+				Position = UDim2.fromOffset(v, v),
+				Image = p.props.avatarImage,
 				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(p1.props.avatarSize, p1.props.avatarSize),
-				Position = UDim2.fromOffset(v13, v13),
-				Image = p1.props.avatarImage,
 				ImageColor3 = p2.Theme.BackgroundDefault.Color
-			}) else nil
-		})
+			})
+		end
+
+		v3.avatarMask = avatarMask
+		return createElement("Frame", v2, v3)
 	end)
 end
 
-return v10
+return extended

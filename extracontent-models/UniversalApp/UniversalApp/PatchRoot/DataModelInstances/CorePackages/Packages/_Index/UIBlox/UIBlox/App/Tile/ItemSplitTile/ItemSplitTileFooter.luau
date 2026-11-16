@@ -1,64 +1,80 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local Foundation = require(ParentParentParentParent.Foundation)
-local withStyle = require(ParentParentParent.Core.Style.withStyle)
-local Images = require(ParentParentParent.App.ImageSet.Images)
-local Skeleton = Foundation.Skeleton
-local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
-local IconSize = require(ParentParent.ImageSet.Enum.IconSize)
-local getIconSizeUDim2 = require(ParentParent.ImageSet.getIconSizeUDim2)
-local v13 = Roact.PureComponent:extend("ItemSplitTileFooter")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-v13.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local Foundation = require(parent3.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+
+local withStyle = require(parent2.Core.Style.withStyle)
+local Images = require(parent2.App.ImageSet.Images)
+
+local Skeleton = Foundation.Skeleton
+local ImageSetComponent = require(parent2.Core.ImageSet.ImageSetComponent)
+local IconSize = require(parent.ImageSet.Enum.IconSize)
+local getIconSizeUDim2 = require(parent.ImageSet.getIconSizeUDim2)
+
+local extended = Roact.PureComponent:extend("ItemSplitTileFooter")
+
+extended.validateProps = t.strictInterface({
 	priceText = t.optional(t.string),
 	isOwned = t.optional(t.boolean),
 	layoutOrder = t.optional(t.number)
 })
 
-function v13.render(p1) -- line: 33
-	-- upvalues: Images (copy), withStyle (copy), getIconSizeUDim2 (copy), IconSize (copy), Roact (copy), Skeleton (copy), ImageSetComponent (copy)
-	local priceText = p1.props.priceText
-	local isOwned = p1.props.isOwned
-	local v17 = if not isOwned then Images["icons/common/robux_small"] else Images["icons/status/item/owned"]
+function extended.render(p)
+	local priceText = p.props.priceText
+	local isOwned = p.props.isOwned
+	local image
 
-	return withStyle(function(p2) -- line: 38
-		-- upvalues: priceText (copy), isOwned (copy), getIconSizeUDim2 (copy), IconSize (copy), Roact (copy), p1 (copy), Skeleton (copy), ImageSetComponent (copy), v17 (copy)
-		local BodyFont = p2.Font.Body.Font
-		local v20 = p2.Font.BaseSize * p2.Font.Body.RelativeSize
-		local Theme = p2.Theme
-		local v22 = priceText and tonumber(priceText:sub(1, 1)) or priceText == "--"
-		local v23 = priceText and (v22 or isOwned)
-		local v24 = getIconSizeUDim2(IconSize.Small)
-		local v25 = not v23 and 0 or v24.Width.Offset + 4
+	if isOwned then
+		image = Images["icons/status/item/owned"]
+	else
+		image = Images["icons/common/robux_small"]
+	end
 
-		return Roact.createElement("Frame", {
+	return withStyle(function(p2)
+		local font = p2.Font.Body.Font
+		local textSize = p2.Font.BaseSize * p2.Font.Body.RelativeSize
+		local theme = p2.Theme
+
+		local v = priceText and tonumber(priceText:sub(1, 1)) or priceText == "--"
+		local v2 = priceText and (v or isOwned)
+		local iconSizeUDim2 = getIconSizeUDim2(IconSize.Small)
+		local v3 = not v2 and 0 or iconSizeUDim2.Width.Offset + 4
+
+		local createElement = Roact.createElement
+		local v4 = {
+			Size = UDim2.new(1, 0, 0, textSize),
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, v20),
-			LayoutOrder = p1.props.layoutOrder
-		}, {
-			Shimmer = if priceText then nil else Roact.createElement(Skeleton, {
-				Size = UDim2.new(0.8, 0, 0, v20)
-			}),
-			Icon = v23 and Roact.createElement(ImageSetComponent.Label, {
+			LayoutOrder = p.props.layoutOrder
+		}
+		local shimmer
+
+		if not priceText then
+			shimmer = Roact.createElement(Skeleton, { Size = UDim2.new(0.8, 0, 0, textSize) })
+		end
+
+		return createElement("Frame", v4, {
+			Shimmer = shimmer,
+			Icon = v2 and Roact.createElement(ImageSetComponent.Label, {
 				BackgroundTransparency = 1,
-				Image = v17,
-				ImageColor3 = Theme.TextMuted.Color,
-				ImageTransparency = Theme.TextMuted.Transparency,
-				Size = v24,
+				Image = image,
+				ImageColor3 = theme.TextMuted.Color,
+				ImageTransparency = theme.TextMuted.Transparency,
+				Size = iconSizeUDim2,
 				Position = UDim2.new(0, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0, 0.5)
 			}),
 			TextLabel = priceText and Roact.createElement("TextLabel", {
 				BackgroundTransparency = 1,
-				Position = UDim2.new(0, v25, 0, 0),
-				Size = UDim2.new(1, -v25, 1, 0),
-				Font = BodyFont,
-				TextColor3 = Theme.TextMuted.Color,
-				TextTransparency = Theme.TextMuted.Transparency,
-				TextSize = v20,
+				Position = UDim2.new(0, v3, 0, 0),
+				Size = UDim2.new(1, -v3, 1, 0),
+				FontFace = normalizeFontFace(font),
+				TextColor3 = theme.TextMuted.Color,
+				TextTransparency = theme.TextMuted.Transparency,
+				TextSize = textSize,
 				Text = priceText,
 				TextTruncate = Enum.TextTruncate.AtEnd,
 				TextXAlignment = Enum.TextXAlignment.Left,
@@ -68,4 +84,4 @@ function v13.render(p1) -- line: 33
 	end)
 end
 
-return v13
+return extended

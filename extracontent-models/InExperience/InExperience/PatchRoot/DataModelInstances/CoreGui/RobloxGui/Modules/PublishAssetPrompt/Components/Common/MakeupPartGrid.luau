@@ -4,11 +4,15 @@ local UIBlox = require(CorePackages.Packages.UIBlox)
 local GridMetrics = UIBlox.App.Grid.GridMetrics
 local DefaultMetricsGridView = UIBlox.App.Grid.DefaultMetricsGridView
 local ItemTile = UIBlox.Tile.ItemTile
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
 local AvatarItemCard = require(script.Parent.Parent.PublishAvatarPrompt.AvatarParts.AvatarItemCard)
+
 local GetFFlagUploadMakeupSupport = require(script.Parent.Parent.Parent.Flags.GetFFlagUploadMakeupSupport)
+
 local vector2 = Vector2.new(20, 20)
-local t1 = {
+
+local v = {
 	[Enum.AvatarAssetType.FaceMakeup] = "Face Makeup",
 	[Enum.AvatarAssetType.LipMakeup] = "Lip Makeup",
 	[Enum.AvatarAssetType.EyeMakeup] = "Eye Makeup",
@@ -16,186 +20,187 @@ local t1 = {
 	[Enum.AvatarAssetType.EyelashAccessory] = "Eyelash"
 }
 
-local function getItemsFromFolder(p1, s1: string, t2: {[any]: any}?, b1: boolean) -- line: 42
-	-- upvalues: GetFFlagUploadMakeupSupport (copy), t1 (copy)
-	local t3 = {}
-	local children = p1:GetChildren()
+local function getItemsFromFolder(makeupFolder, name: string, makeupEntries, flag: boolean)
+	local children = makeupFolder:GetChildren()
+	local items = {}
 
-	for i, v in ipairs(children) do
-		if v:IsA("Decal") or v:IsA("Accessory") then
-			local v22 = nil
-			local v23 = s1
-			local assetType = nil
-
-			if t2 and t2[i] then
-				assetType = t2[i].assetType
-			end
-
-			if b1 then
-				if GetFFlagUploadMakeupSupport() then
-					local vName = v.Name
-
-					if assetType and t1[assetType] then
-						vName = t1[assetType]
-					end
-
-					v23 = s1 .. " - " .. vName
-				else
-					v22 = s1
-					v23 = v.Name
-
-					if assetType and t1[assetType] then
-						v23 = t1[assetType]
-					end
-				end
-			end
-
-			local v26 = i
-
-			if t2 and t2[i] and t2[i].sortOrder then
-				v26 = t2[i].sortOrder
-			end
-
-			table.insert(t3, {
-				asset = v,
-				assetType = assetType,
-				bodyName = v22,
-				partName = v23,
-				LayoutOrder = v26
-			})
+	for sortOrder, instance in ipairs(children) do
+		if not (instance:IsA("Decal") or instance:IsA("Accessory")) then
+			continue
 		end
+
+		local bodyName = nil
+		local assetType
+
+		if makeupEntries and makeupEntries[sortOrder] then
+			assetType = makeupEntries[sortOrder].assetType
+		end
+
+		local partName
+
+		if flag then
+			if GetFFlagUploadMakeupSupport() then
+				local v2 = instance.Name
+
+				if assetType and v[assetType] then
+					v2 = v[assetType]
+				end
+
+				partName = name .. " - " .. v2
+			else
+				partName = instance.Name
+
+				if assetType and v[assetType] then
+					partName = v[assetType]
+				end
+
+				bodyName = name
+			end
+		else
+			partName = name
+		end
+
+		if makeupEntries and makeupEntries[sortOrder] and makeupEntries[sortOrder].sortOrder then
+			sortOrder = makeupEntries[sortOrder].sortOrder
+		end
+
+		table.insert(items, {
+			asset = instance,
+			assetType = assetType,
+			bodyName = bodyName,
+			partName = partName,
+			LayoutOrder = sortOrder
+		})
 	end
 
-	table.sort(t3, function(p2, p3) -- line: 92
-		return (p2.LayoutOrder or 0) < (p3.LayoutOrder or 0)
+	table.sort(items, function(a, b): boolean
+		return (a.LayoutOrder or 0) < (b.LayoutOrder or 0)
 	end)
 
-	return t3
+	return items
 end
-local function MakeupPartGrid(t4: {[any]: any}) -- line: 99
-	-- upvalues: React (copy), getItemsFromFolder (copy), t1 (copy), GetFFlagUploadMakeupSupport (copy), Constants (copy), AvatarItemCard (copy), ItemTile (copy), DefaultMetricsGridView (copy), GridMetrics (copy), vector2 (copy)
-	local v28, v29 = React.useState({})
-	local v30 = t4.showAssetTypeInLabel == nil or t4.showAssetTypeInLabel
 
-	React.useEffect(function() -- line: 104
-		-- upvalues: t4 (copy), v29 (copy), getItemsFromFolder (copy), v30 (copy), t1 (copy)
-		if t4.makeupFolder then
-			v29((getItemsFromFolder(t4.makeupFolder, t4.name, t4.makeupEntries, v30)))
+local function MakeupPartGrid(props)
+	local state, setState = React.useState({})
 
-			return
-		end
+	local v2 = props.showAssetTypeInLabel == nil or props.showAssetTypeInLabel
 
-		if t4.singleDecal then
-			local name = nil
-			local name2 = t4.name
-			local singleAssetType = t4.singleAssetType
+	React.useEffect(function()
+		if props.makeupFolder then
+			setState(getItemsFromFolder(props.makeupFolder, props.name, props.makeupEntries, v2))
+		elseif props.singleDecal then
+			local partName = props.name
+			local singleAssetType = props.singleAssetType
+			local name
 
-			if v30 then
-				name = t4.name
-				name2 = t4.singleDecal.Name
+			if v2 then
+				name = props.name
+				partName = props.singleDecal.Name
 
-				if singleAssetType and t1[singleAssetType] then
-					name2 = t1[singleAssetType]
+				if singleAssetType and v[singleAssetType] then
+					partName = v[singleAssetType]
 				end
 			end
 
-			v29({{
-				LayoutOrder = 1,
-				asset = t4.singleDecal,
-				assetType = singleAssetType,
-				bodyName = name,
-				partName = name2
-			}})
+			setState({
+				{
+					asset = props.singleDecal,
+					assetType = singleAssetType,
+					bodyName = name,
+					partName = partName,
+					LayoutOrder = 1
+				}
+			})
+		else
+			local v3 = {}
 
-			return
+			v3[1] = {}
+			v3[2] = {}
+
+			setState(v3)
 		end
+	end, { props.makeupFolder, props.singleDecal })
 
-		local t5 = {
-			[1] = {},
-			[2] = {}
-		}
+	React.useEffect(function()
+		if state[1] and state[1].asset then
+			local v3 = {}
 
-		v29(t5)
-	end, {
-		t4.makeupFolder,
-		t4.singleDecal
-	})
-	React.useEffect(function() -- line: 139
-		-- upvalues: v28 (copy), GetFFlagUploadMakeupSupport (copy), v30 (copy), t1 (copy), t4 (copy), v29 (copy)
-		if v28[1] and v28[1].asset then
-			local t6 = {}
-
-			for v40, v41 in v28 do
-				local bodyName = v41.bodyName
-				local partName = v41.partName
+			for k, v4 in state do
+				local bodyName = v4.bodyName
+				local partName = v4.partName
 
 				if GetFFlagUploadMakeupSupport() then
-					if v30 then
-						local v44 = v41.assetType and t1[v41.assetType] or ""
-
-						partName = t4.name .. " - " .. v44
+					if v2 then
+						local v5 = v4.assetType and v[v4.assetType] or ""
+						partName = props.name .. " - " .. v5
 					else
-						partName = t4.name
+						partName = props.name
 					end
 
 					bodyName = nil
-				elseif v30 then
-					bodyName = t4.name
+				elseif v2 then
+					bodyName = props.name
 				else
-					partName = t4.name
+					partName = props.name
 				end
 
-				t6[v40] = {
-					asset = v41.asset,
-					assetType = v41.assetType,
+				v3[k] = {
+					asset = v4.asset,
+					assetType = v4.assetType,
 					bodyName = bodyName,
 					partName = partName,
-					LayoutOrder = v41.LayoutOrder
+					LayoutOrder = v4.LayoutOrder
 				}
 			end
 
-			v29(t6)
+			setState(v3)
 		end
-	end, { t4.name })
+	end, { props.name })
+	local v3
 
-	local v31 = if not (t4.screenSize.Y > t4.screenSize.X) then Constants.ItemCardWidthLandscape else Constants.ItemCardWidthPortrait
-	local v32 = React.useCallback(function(p4) -- line: 177
-		-- upvalues: React (copy), AvatarItemCard (copy), v31 (copy), ItemTile (copy)
-		if p4.asset then
+	if props.screenSize.Y > props.screenSize.X then
+		v3 = Constants.ItemCardWidthPortrait
+	else
+		v3 = Constants.ItemCardWidthLandscape
+	end
+
+	local renderItem = React.useCallback(function(props2)
+		if props2.asset then
 			return React.createElement(AvatarItemCard, {
-				asset = p4.asset,
-				assetType = p4.assetType,
-				bodyName = p4.bodyName,
-				partName = p4.partName,
-				viewportSize = v31
+				asset = props2.asset,
+				assetType = props2.assetType,
+				bodyName = props2.bodyName,
+				partName = props2.partName,
+				viewportSize = v3
 			})
 		end
 
 		return React.createElement(ItemTile)
-	end, {
-		v31,
-		t4.name
-	})
+	end, { v3, props.name })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t4.LayoutOrder
-	}, {
-		Grid = React.createElement(DefaultMetricsGridView, {
-			getItemHeight = function(n1: number) -- line: 198
-				return n1 * 1.3333333333333333
-			end,
-			getItemMetrics = GridMetrics.makeCustomMetricsGetter({
-				minimumItemsPerRow = 2,
-				minimumItemWidth = v31
-			}),
-			renderItem = v32,
-			itemPadding = vector2,
-			items = v28
-		})
-	})
+	return React.createElement(
+		"Frame",
+		{
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = props.LayoutOrder,
+			BackgroundTransparency = 1
+		},
+		{
+			Grid = React.createElement(DefaultMetricsGridView, {
+				getItemHeight = function(p: number)
+					return p * (4 / 3)
+				end,
+				getItemMetrics = GridMetrics.makeCustomMetricsGetter({
+					minimumItemsPerRow = 2,
+					minimumItemWidth = v3
+				}),
+				renderItem = renderItem,
+				itemPadding = vector2,
+				items = state
+			})
+		}
+	)
 end
 
 return MakeupPartGrid

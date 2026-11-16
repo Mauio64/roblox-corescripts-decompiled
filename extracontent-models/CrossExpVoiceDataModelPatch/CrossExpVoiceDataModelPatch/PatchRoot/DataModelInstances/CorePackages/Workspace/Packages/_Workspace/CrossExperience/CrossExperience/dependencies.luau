@@ -1,16 +1,10 @@
-local Parent = script:FindFirstAncestor("CrossExperience").Parent
-local Promise = require(Parent.Promise)
-local Rodux = require(Parent.Rodux)
-local t = require(Parent.t)
-local Cryo = require(Parent.Cryo)
-local Lumberyak = require(Parent.Lumberyak)
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("CrossExperience").Parent
 
 return {
-	Promise = Promise,
-	Rodux = Rodux,
-	t = t,
-	Cryo = Cryo,
-	Lumberyak = Lumberyak,
-	SharedFlags = SharedFlags
+	Promise = require(parent.Promise),
+	Rodux = require(parent.Rodux),
+	t = require(parent.t),
+	Cryo = require(parent.Cryo),
+	Lumberyak = require(parent.Lumberyak),
+	SharedFlags = require(parent.SharedFlags)
 }

@@ -1,7 +1,7 @@
-local function destroyMakeupDescriptions(p1) -- line: 5
-	for _, child in p1:GetChildren() do
-		if child:IsA("MakeupDescription") then
-			child:Destroy()
+local function destroyMakeupDescriptions(instance)
+	for _, makeupDescription in instance:GetChildren() do
+		if makeupDescription:IsA("MakeupDescription") then
+			makeupDescription:Destroy()
 		end
 	end
 end

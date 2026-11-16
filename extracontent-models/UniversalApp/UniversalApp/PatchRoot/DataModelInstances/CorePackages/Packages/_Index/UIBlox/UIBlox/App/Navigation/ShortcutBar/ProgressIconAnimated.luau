@@ -1,215 +1,164 @@
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local ParentParent = script.Parent.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
 
+local parent = script.Parent.Parent.Parent.Parent.Parent
+
+local React = require(parent.React)
 require(script.Parent.Types)
-
 local ProgressIcon = require(script.Parent.ProgressIcon)
 
-local function useRenderStepped(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 33
-	-- upvalues: React (copy), RunService (copy)
-	local v11 = React.useRef(0)
-	local v12 = React.useRef(0)
-	local isAnimationRunning = t1.isAnimationRunning
-	local isKeyPressed = t1.isKeyPressed
-	local isKeyHolding = t1.isKeyHolding
-	local onKeyHolding = t2.onKeyHolding
-	local onAnimationRunning = t2.onAnimationRunning
-	local onComplete = t2.onComplete
-	local onReset = t2.onReset
-	local animationTriggerTime = t3.animationTriggerTime
-	local animationKeyHoldingTime = t3.animationKeyHoldingTime
-	local animationCoolDownTime = t3.animationCoolDownTime
-	local v23 = React.useCallback(function(n1: number) -- line: 54
-		-- upvalues: v12 (copy), animationTriggerTime (copy), onKeyHolding (copy)
-		v12.current = v12.current + n1
+local function useRenderStepped(data, data2, data3)
+	local ref = React.useRef(0)
+	local ref2 = React.useRef(0)
 
-		if v12.current >= animationTriggerTime then
+	local isAnimationRunning = data.isAnimationRunning
+	local isKeyPressed = data.isKeyPressed
+	local isKeyHolding = data.isKeyHolding
+
+	local onKeyHolding = data2.onKeyHolding
+	local onAnimationRunning = data2.onAnimationRunning
+	local onComplete = data2.onComplete
+	local onReset = data2.onReset
+
+	local animationTriggerTime = data3.animationTriggerTime
+	local animationKeyHoldingTime = data3.animationKeyHoldingTime
+	local animationCoolDownTime = data3.animationCoolDownTime
+
+	local v = React.useCallback(function(p: number)
+		ref2.current += p
+
+		if animationTriggerTime <= ref2.current then
 			onKeyHolding()
 		end
-	end, {
-		onKeyHolding,
-		animationTriggerTime
-	})
-	local v24 = React.useCallback(function(n2: number) -- line: 61
-		-- upvalues: v11 (copy), animationKeyHoldingTime (copy), onAnimationRunning (copy), onComplete (copy)
-		v11.current = math.clamp(v11.current + n2 / animationKeyHoldingTime, 0, 1)
-		onAnimationRunning(v11.current)
+	end, { onKeyHolding, animationTriggerTime })
 
-		if v11.current >= 1 then
+	local v2 = React.useCallback(function(p: number)
+		ref.current = math.clamp(ref.current + p / animationKeyHoldingTime, 0, 1)
+		onAnimationRunning(ref.current)
+
+		if ref.current >= 1 then
 			onComplete()
 		end
-	end, {
-		onAnimationRunning,
-		animationKeyHoldingTime,
-		onComplete
-	})
-	local v25 = React.useCallback(function(n3: number) -- line: 69
-		-- upvalues: v11 (copy), animationCoolDownTime (copy), onAnimationRunning (copy), onReset (copy)
-		v11.current = math.clamp(v11.current - n3 / animationCoolDownTime, 0, 1)
-		onAnimationRunning(v11.current)
+	end, { onAnimationRunning, animationKeyHoldingTime, onComplete })
 
-		if v11.current <= 0 then
+	local v3 = React.useCallback(function(p: number)
+		ref.current = math.clamp(ref.current - p / animationCoolDownTime, 0, 1)
+		onAnimationRunning(ref.current)
+
+		if ref.current <= 0 then
 			onReset()
 		end
-	end, {
-		onAnimationRunning,
-		animationCoolDownTime,
-		onReset
-	})
+	end, { onAnimationRunning, animationCoolDownTime, onReset })
 
-	React.useEffect(function() -- line: 77
-		-- upvalues: isKeyHolding (copy), v11 (copy), v24 (copy), isKeyPressed (copy), v23 (copy), isAnimationRunning (copy), v25 (copy), RunService (copy), v12 (copy)
-		local connection = nil
-		local v47 = nil
+	React.useEffect(function()
+		local renderSteppedConnection = nil
+		local v4 = nil
 
 		if isKeyHolding then
-			v11.current = 0
-			v47 = v24
+			ref.current = 0
+			v4 = v2
 		elseif isKeyPressed then
-			v47 = v23
+			v4 = v
 		elseif isAnimationRunning then
-			v47 = v25
+			v4 = v3
 		end
 
-		if v47 then
-			connection = RunService.RenderStepped:Connect(v47)
+		if v4 then
+			renderSteppedConnection = RunService.RenderStepped:Connect(v4)
 		end
 
-		if connection then
-			return function() -- line: 94
-				-- upvalues: isKeyPressed (copy), v12 (copy), connection (ref)
+		if renderSteppedConnection then
+			return function()
 				if isKeyPressed then
-					v12.current = 0
+					ref2.current = 0
 				end
 
-				connection:Disconnect()
+				renderSteppedConnection:Disconnect()
 			end
 		end
 
-		return function() -- line: 102
-		end
-	end, {
-		isKeyPressed,
-		isKeyHolding,
-		isAnimationRunning,
-		v23,
-		v24,
-		v25
-	})
+		return function() end
+	end, { isKeyPressed, isKeyHolding, isAnimationRunning, v, v2, v3 })
 end
-local function ProgressIconAnimated(p1) -- line: 113
-	-- upvalues: React (copy), useRenderStepped (copy), UserInputService (copy), ProgressIcon (copy)
-	local v27, v28 = React.useState(false)
-	local v29, v30 = React.useState(false)
-	local v31, v32 = React.useState(false)
-	local v33, v34 = React.useState(false)
-	local v35, v36 = React.useBinding(nil)
-	local v37 = React.useCallback(function() -- line: 121
-		-- upvalues: v30 (copy), v32 (copy)
-		v30(true)
-		v32(true)
-	end, {})
-	local v38 = React.useCallback(function(p2) -- line: 126
-		-- upvalues: v36 (copy)
-		v36(p2)
-	end, {})
-	local v39 = React.useCallback(function() -- line: 130
-		-- upvalues: v28 (copy), v30 (copy), v32 (copy), v34 (copy), p1 (copy)
-		v28(false)
-		v30(false)
-		v32(false)
-		v34(true)
 
-		if p1.onHoldComplete then
-			p1.onHoldComplete()
-		end
-	end, { p1.onHoldComplete })
-	local v40 = React.useCallback(function() -- line: 140
-		-- upvalues: v32 (copy), v36 (copy)
-		v32(false)
-		v36(nil)
-	end, {})
+local function ProgressIconAnimated(props)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
+	local state4, setState4 = React.useState(false)
 
-	useRenderStepped({
-		isKeyPressed = v27,
-		isKeyHolding = v29,
-		isAnimationRunning = v31
+	local v, v2 = React.useBinding(nil)
+
+	useRenderStepped({ isKeyPressed = state, isKeyHolding = state2, isAnimationRunning = state3 }, {
+		onKeyHolding = React.useCallback(function()
+			setState2(true)
+			setState3(true)
+		end, {}),
+		onAnimationRunning = React.useCallback(function(p)
+			v2(p)
+		end, {}),
+		onComplete = React.useCallback(function()
+			setState(false)
+			setState2(false)
+			setState3(false)
+			setState4(true)
+
+			if props.onHoldComplete then
+				props.onHoldComplete()
+			end
+		end, { props.onHoldComplete }),
+		onReset = React.useCallback(function()
+			setState3(false)
+			v2(nil)
+		end, {})
 	}, {
-		onKeyHolding = v37,
-		onAnimationRunning = v38,
-		onComplete = v39,
-		onReset = v40
-	}, {
-		animationTriggerTime = p1.animationTriggerTime,
-		animationKeyHoldingTime = p1.animationKeyHoldingTime,
-		animationCoolDownTime = p1.animationCoolDownTime
+		animationTriggerTime = props.animationTriggerTime,
+		animationKeyHoldingTime = props.animationKeyHoldingTime,
+		animationCoolDownTime = props.animationCoolDownTime
 	})
 
-	local v41 = React.useCallback(function(p3) -- line: 160
-		-- upvalues: p1 (copy), v28 (copy), v34 (copy), v31 (copy), v30 (copy), v36 (copy)
-		if p3.UserInputType ~= Enum.UserInputType.Keyboard and p3.UserInputType ~= Enum.UserInputType.Gamepad1 then
+	local v3 = React.useCallback(function(data)
+		if data.UserInputType ~= Enum.UserInputType.Keyboard and data.UserInputType ~= Enum.UserInputType.Gamepad1 then
 			return
 		end
 
-		if p3.KeyCode == p1.keyCode then
-			if p3.UserInputState == Enum.UserInputState.Begin then
-				v28(true)
-				v34(false)
+		if data.KeyCode == props.keyCode then
+			if data.UserInputState == Enum.UserInputState.Begin then
+				setState(true)
+				setState4(false)
 
-				if v31 then
-					v30(true)
-
-					return
+				if state3 then
+					setState2(true)
+				else
+					v2(nil)
 				end
-
-				v36(nil)
-
-				return
-			end
-
-			if p3.UserInputState == Enum.UserInputState.End then
-				v28(false)
-				v30(false)
+			elseif data.UserInputState == Enum.UserInputState.End then
+				setState(false)
+				setState2(false)
 			end
 		end
-	end, {
-		p1.keyCode,
-		v31
-	})
+	end, { props.keyCode, state3 })
 
-	React.useEffect(function() -- line: 184
-		-- upvalues: p1 (copy), UserInputService (copy), v41 (copy)
-		if p1.progress then
-			return function() -- line: 186
-			end
+	React.useEffect(function()
+		if props.progress then
+			return function() end
 		end
 
-		local connection = UserInputService.InputBegan:Connect(v41)
-		local connection2 = UserInputService.InputEnded:Connect(v41)
-
-		return function() -- line: 191
-			-- upvalues: connection (copy), connection2 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+		local inputBeganConnection = UserInputService.InputBegan:Connect(v3)
+		local inputEndedConnection = UserInputService.InputEnded:Connect(v3)
+		return function()
+			inputBeganConnection:Disconnect()
+			inputEndedConnection:Disconnect()
 		end
-	end, {
-		v41,
-		p1.progress
-	})
+	end, { v3, props.progress })
 
-	local v42 = false
-
-	if p1.progress or (v29 or v31 or v33) then
-		v42 = true
-	end
+	local isHolding = (props.progress or state2 or state3 or state4) and true or false
 
 	return React.createElement(ProgressIcon, {
-		progress = p1.progress or v35,
-		icon = p1.icon,
-		iconHolding = p1.iconHolding,
-		isHolding = v42
+		progress = props.progress or v,
+		icon = props.icon,
+		iconHolding = props.iconHolding,
+		isHolding = isHolding
 	})
 end
 

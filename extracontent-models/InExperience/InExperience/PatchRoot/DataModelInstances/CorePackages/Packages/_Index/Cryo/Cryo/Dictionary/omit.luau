@@ -1,11 +1,11 @@
-local function omit(t1: {[any]: any}, ...) -- line: 6
-	local v3 = table.clone(t1)
+local function omit(p, ...)
+	local clone = table.clone(p)
 
-	for _, v5 in { ... } do
-		v3[v5] = nil
+	for _, v in { ... } do
+		clone[v] = nil
 	end
 
-	return v3
+	return clone
 end
 
 return omit

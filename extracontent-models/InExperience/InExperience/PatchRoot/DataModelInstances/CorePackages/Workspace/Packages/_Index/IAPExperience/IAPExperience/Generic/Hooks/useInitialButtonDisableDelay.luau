@@ -1,31 +1,29 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local useTokens = require(ParentParent.Foundation).Hooks.useTokens
+local parent = script.Parent.Parent.Parent.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
 
-local function useInitialButtonDisableDelay(b1: boolean?, n1: number?) -- line: 7
-	-- upvalues: useTokens (copy), React (copy)
-	local v7 = useTokens()
-	local v8 = n1 or v7.Time.Time_300
-	local v9, v10 = React.useState(true)
+local function useInitialButtonDisableDelay(flag: boolean?, p: number?)
+	local v = useTokens()
 
-	React.useEffect(function() -- line: 13
-		-- upvalues: v8 (copy), v10 (copy)
-		local u11 = false
+	local v2 = p or v.Time.Time_300
+	local state, setState = React.useState(true)
 
-		task.delay(v8, function() -- line: 16
-			-- upvalues: u11 (ref), v10 (copy)
-			if not u11 then
-				v10(false)
+	React.useEffect(function()
+		local v3 = false
+
+		task.delay(v2, function()
+			if not v3 then
+				setState(false)
 			end
 		end)
 
-		return function() -- line: 22
-			-- upvalues: u11 (ref)
-			u11 = true
+		return function()
+			v3 = true
 		end
-	end, { v8 })
+	end, { v2 })
 
-	return b1 or v9
+	return flag or state
 end
 
 return useInitialButtonDisableDelay

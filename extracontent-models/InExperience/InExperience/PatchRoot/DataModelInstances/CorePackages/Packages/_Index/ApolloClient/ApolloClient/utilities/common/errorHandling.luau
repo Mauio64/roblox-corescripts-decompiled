@@ -1,12 +1,12 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Boolean = require(ParentParent.LuauPolyfill).Boolean
+local ErrorHandling = {}
+local parent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
 
-require(ParentParent.GraphQL)
+require(parent.GraphQL)
 
-function t1.graphQLResultHasError(p1) -- line: 18
-	-- upvalues: Boolean (copy)
-	return not not Boolean.toJSBoolean(p1.errors) and (#p1.errors > 0 or false)
+function ErrorHandling.graphQLResultHasError(p)
+	return Boolean.toJSBoolean(p.errors) and #p.errors > 0 and true or false
 end
 
-return t1
+return ErrorHandling

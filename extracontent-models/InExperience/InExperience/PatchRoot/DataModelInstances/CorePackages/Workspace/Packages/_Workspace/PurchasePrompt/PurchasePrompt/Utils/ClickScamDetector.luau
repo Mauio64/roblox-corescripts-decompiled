@@ -1,60 +1,63 @@
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
-local Cryo = require(Parent.PurchasePromptDeps).Cryo
-local t1 = {}
 
-t1.__index = t1
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local Cryo = PurchasePromptDeps.Cryo
 
-function t1.new(p1) -- line: 25
-	-- upvalues: Cryo (copy), t1 (copy), UserInputService (copy)
-	local v6 = Cryo.Dictionary.join({
-		clickSpeedThreshold = 3,
-		clickTimeWindow = 1,
-		initialDelay = 1,
-		buttonInput = nil
-	}, p1 or {})
-	local t2 = {
-		_inputConnection = nil,
-		_clickCount = 0,
-		_startTime = tick(),
-		_options = v6
-	}
+local ClickScamDetector = {}
+ClickScamDetector.__index = ClickScamDetector
 
-	setmetatable(t2, t1)
-	t2._inputConnection = UserInputService.InputBegan:Connect(function(input) -- line: 50
-		-- upvalues: t2 (copy)
-		t2:_onInput(input)
+function ClickScamDetector.new(options)
+	local joined = Cryo.Dictionary.join(
+		{ clickSpeedThreshold = 3, clickTimeWindow = 1, initialDelay = 1, buttonInput = nil },
+		options or {}
+	)
+
+	local v = { _inputConnection = nil, _clickCount = 0, _startTime = tick(), _options = joined }
+
+	setmetatable(v, ClickScamDetector)
+
+	v._inputConnection = UserInputService.InputBegan:Connect(function(input)
+		v:_onInput(input)
 	end)
 
-	return t2
+	return v
 end
-function t1._onInput(p2, p3) -- line: 63
-	local UserInputType = p3.UserInputType
-	local v11 = p2._options.buttonInput ~= nil and p3.KeyCode == p2._options.buttonInput
-	local v12 = UserInputType == Enum.UserInputType.MouseButton1 or UserInputType == Enum.UserInputType.Touch
 
-	if v11 or v12 then
-		p2._clickCount = p2._clickCount + 1
-		delay(p2._options.clickTimeWindow, function() -- line: 73
-			-- upvalues: p2 (copy)
-			p2._clickCount = p2._clickCount - 1
+function ClickScamDetector:_onInput(p)
+	local userInputType = p.UserInputType
+	local v
+
+	if self._options.buttonInput == nil then
+		v = false
+	else
+		v = p.KeyCode == self._options.buttonInput
+	end
+
+	local v2 = userInputType == Enum.UserInputType.MouseButton1 or userInputType == Enum.UserInputType.Touch
+
+	if v or v2 then
+		self._clickCount += 1
+
+		delay(self._options.clickTimeWindow, function()
+			self._clickCount -= 1
 		end)
 	end
 end
-function t1.isClickValid(p4) -- line: 83
-	-- upvalues: UserInputService (copy)
-	if UserInputService.MouseBehavior == Enum.MouseBehavior.LockCurrentPosition then
+
+function ClickScamDetector:isClickValid(): boolean
+	if
+		UserInputService.MouseBehavior == Enum.MouseBehavior.LockCurrentPosition
+		or tick() - self._startTime < self._options.initialDelay
+	then
 		return false
 	end
 
-	if tick() - p4._startTime < p4._options.initialDelay then
-		return false
-	end
-
-	return p4._clickCount / p4._options.clickTimeWindow < p4._options.clickSpeedThreshold
-end
-function t1.destroy(p5) -- line: 105
-	p5._inputConnection:Disconnect()
+	return self._clickCount / self._options.clickTimeWindow < self._options.clickSpeedThreshold
 end
 
-return t1
+function ClickScamDetector:destroy()
+	self._inputConnection:Disconnect()
+end
+
+return ClickScamDetector

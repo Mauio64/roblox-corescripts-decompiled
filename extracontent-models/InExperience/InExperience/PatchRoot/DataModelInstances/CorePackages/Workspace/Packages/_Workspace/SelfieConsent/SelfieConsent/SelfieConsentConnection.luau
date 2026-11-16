@@ -1,47 +1,55 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
+
 local AvatarCreationService = game:GetService("AvatarCreationService")
-local FocusNavigationUtils = require(scriptParentParent.FocusNavigationUtils)
-local ReactUtils = require(scriptParentParent.ReactUtils)
-local React = require(scriptParentParent.React)
-local SelfieConsentPrompt = require(scriptParent.SelfieConsentPrompt)
+
+local FocusNavigationUtils = require(parent2.FocusNavigationUtils)
+local ReactUtils = require(parent2.ReactUtils)
+local React = require(parent2.React)
+
+local SelfieConsentPrompt = require(parent.SelfieConsentPrompt)
+
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+
 local useEventConnection = ReactUtils.useEventConnection
 
-local function v11(t1: {[any]: any}) -- line: 21
-	-- upvalues: React (copy), useEventConnection (copy), AvatarCreationService (copy)
-	local v13 = React.useCallback(function() -- line: 22
-		-- upvalues: t1 (copy)
-		t1.displaySelfieConsent(true)
+local function fn(p)
+	local v = React.useCallback(function()
+		p.displaySelfieConsent(true)
 	end)
-
-	useEventConnection(AvatarCreationService.OpenSelfieConsent, v13)
-
+	useEventConnection(AvatarCreationService.OpenSelfieConsent, v)
 	return React.createElement(React.Fragment, {}, {})
 end
 
-return function(_: {[any]: any}) -- line: 29
-	-- upvalues: React (copy), SelfieConsentPrompt (copy), v11 (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v15, v16 = React.useState(false)
-	local v17 = nil
+return function(_)
+	local state, setState = React.useState(false)
+	local prompt
 
-	if v15 then
-		v17 = React.createElement(SelfieConsentPrompt, {
-			displaySelfieConsent = v16
-		})
+	if state then
+		prompt = React.createElement(SelfieConsentPrompt, { displaySelfieConsent = setState })
 	end
 
-	return React.createElement(React.Fragment, {}, {
-		EventListener = React.createElement(v11, {
-			displaySelfieConsent = v16
-		}),
-		FocusNavigationCoreScriptsWrapper = if v17 == nil then nil else React.createElement(FocusRoot, {
-			isIsolated = true,
-			isAutoFocusRoot = true,
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
-		}, {
-			Prompt = v17
-		})
-	})
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v = {
+		EventListener = React.createElement(fn, { displaySelfieConsent = setState }),
+		FocusNavigationCoreScriptsWrapper = 0
+	}
+	local focusNavigationCoreScriptsWrapper
+
+	if prompt ~= nil then
+		focusNavigationCoreScriptsWrapper = React.createElement(
+			FocusRoot,
+			{
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+				isIsolated = true,
+				isAutoFocusRoot = true
+			},
+			{ Prompt = prompt }
+		)
+	end
+
+	v.FocusNavigationCoreScriptsWrapper = focusNavigationCoreScriptsWrapper
+	return createElement(fragment, {}, v)
 end

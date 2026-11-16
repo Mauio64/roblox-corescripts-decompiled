@@ -1,577 +1,705 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local Cryo = require(MomentsCommonParent.Cryo)
-local Signals = require(MomentsCommonParent.Signals)
+local parent = MomentsCommon.Parent
 
-require(MomentsCommonParent.MomentsTypes)
+local Cryo = require(parent.Cryo)
+local Signals = require(parent.Signals)
+
+require(parent.MomentsTypes)
 require(MomentsCommon.Media.MediaTypes)
-
 local createAudioGraph = require(MomentsCommon.Media.createAudioGraph)
 local mediaRoot = require(MomentsCommon.Media.mediaRoot)
-
 require(MomentsCommon.Media.mediaNodeRegistry)
-
 local defaultMediaNodeRegistry = require(MomentsCommon.Media.defaultMediaNodeRegistry)
 local preloadConstants = require(MomentsCommon.Media.Preload.preloadConstants)
-local FFlagMomentsLoopOnEndSeek = require(MomentsCommon.Flags.FFlagMomentsLoopOnEndSeek)
+local FFlagMomentsVideoPermissionContextFix = require(MomentsCommon.Flags.FFlagMomentsVideoPermissionContextFix)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags2.FFlagMomentsRenderAvatarPostsInFeed
 
 require(MomentsCommon.Media.Nodes.createVideoNode)
 require(MomentsCommon.Media.Nodes.createScreenshotNode)
 require(MomentsCommon.Media.Nodes.createMusicNode)
+require(MomentsCommon.Media.Nodes.createTtsNode)
 
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
+
 local GetFFlagMomentsStickerButton = require(MomentsCommon.Flags.GetFFlagMomentsStickerButton)
+
 local loopEpsilonSeconds = preloadConstants.loopEpsilonSeconds
 
-local function createMomentMediaController(p1, t1: {[any]: any}) -- line: 102
-	-- upvalues: defaultMediaNodeRegistry (copy), mediaRoot (copy), createAudioGraph (copy), GetFFlagMomentsStickerButton (copy), createSignal (copy), createComputed (copy), Cryo (copy), loopEpsilonSeconds (copy), FFlagMomentsLoopOnEndSeek (copy)
-	local services = t1.services
-	local v18 = t1.registry or defaultMediaNodeRegistry()
-	local v19 = p1.captureType == Enum.CaptureType.Video
-	local v20 = mediaRoot(p1.momentId, t1.parent)
-	local folder = v20.folder
-	local v22 = createAudioGraph(folder, t1.audioDeviceOutput, t1.masterVolume)
-	local edits = p1.edits
-	local t2 = {}
-	local t3 = {}
+local function createMomentMediaController(data, data2)
+	local services = data2.services
+	local registry = data2.registry or defaultMediaNodeRegistry()
+	local hasVideoPreview = data.captureType == Enum.CaptureType.Video
 
-	local function addNode(p2) -- line: 118
-		-- upvalues: t2 (copy), t3 (copy)
-		table.insert(t2, p2)
-		t3[p2.id] = p2
+	local edits = data.edits
+	local ttsAudios
+
+	if edits ~= nil then
+		ttsAudios = edits.ttsAudios
 	end
 
-	local u27 = nil
-	local u28 = nil
+	local v = false
 
-	if v19 then
-		local v29 = v18.create("video", {
+	if ttsAudios ~= nil then
+		for _, ttsAudio in ttsAudios do
+			if ttsAudio.assetId ~= nil then
+				v = true
+				break
+			end
+		end
+	end
+
+	local localTts = data.localTts
+	local enableDucking = localTts ~= nil or v
+	local v2 = mediaRoot(data.momentId, data2.parent)
+	local folder = v2.folder
+	local audioGraph = createAudioGraph(folder, data2.audioDeviceOutput, {
+		masterVolume = data2.masterVolume,
+		enableDucking = enableDucking
+	})
+
+	local v3 = {}
+	local v4 = {}
+
+	local function addNode(p) -- 7 equivalent calls inferred from this helper
+		table.insert(v3, p)
+		v4[p.id] = p
+	end
+
+	local v5 = nil
+	local v6 = nil
+
+	if hasVideoPreview then
+		local create = registry.create
+		local v7 = {
 			id = "video",
 			kind = "video",
+			content = data.content,
+			preloadContent = 0,
+			region = 0,
+			parent = 0,
 			zIndex = 0,
-			content = p1.content,
-			region = if edits == nil then nil else edits.trim,
-			parent = folder,
-			cornerRadius = p1.cornerRadius
-		}, services)
+			cornerRadius = 0
+		}
+		local preloadContent
 
-		u27 = v29
-		table.insert(t2, v29)
-		t3[v29.id] = v29
+		if FFlagMomentsVideoPermissionContextFix then
+			preloadContent = data.preloadContent
+		end
+
+		v7.preloadContent = preloadContent
+		local region
+
+		if edits ~= nil then
+			region = edits.trim
+		end
+
+		v7.region = region
+		v7.parent = folder
+
+		v7.cornerRadius = data.cornerRadius
+		v5 = create("video", v7, services)
+		addNode(v5) -- inferred equivalent call
 	else
-		local v30 = v18.create("screenshot", {
+		local create = registry.create
+		local image
+
+		if not (FFlagMomentsRenderAvatarPostsInFeed and data.isExternalBase == true) then
+			image = data.content.Uri
+		end
+
+		local imageContent
+
+		if
+			FFlagMomentsRenderAvatarPostsInFeed and data.isExternalBase == true
+			or FFlagMomentsOptimisticProfilePending
+		then
+			imageContent = data.content
+		end
+
+		local poster
+
+		if data.posterContent ~= nil then
+			poster = data.posterContent.Uri
+		end
+
+		local posterContent
+
+		if FFlagMomentsOptimisticProfilePending then
+			posterContent = data.posterContent
+		end
+
+		v6 = create("screenshot", {
 			id = "screenshot",
 			kind = "screenshot",
-			image = p1.content.Uri,
-			poster = if p1.posterContent == nil then nil else p1.posterContent.Uri,
+			image = image,
+			imageContent = imageContent,
+			poster = poster,
+			posterContent = posterContent,
 			parent = folder
 		}, services)
-
-		u28 = v30
-		table.insert(t2, v30)
-		t3[v30.id] = v30
+		addNode(v6) -- inferred equivalent call
 	end
 
-	local u31 = nil
+	local v7
 
-	if edits ~= nil and edits.music ~= nil then
-		local v32 = v18.create("music", {
+	if edits == nil or edits.music == nil then
+		v7 = nil
+	else
+		v7 = registry.create("music", {
 			id = "music",
 			kind = "music",
 			assetId = edits.music.assetId,
 			startTime = edits.music.startTime,
 			parent = folder
 		}, services)
-
-		u31 = v32
-		table.insert(t2, v32)
-		t3[v32.id] = v32
+		addNode(v7) -- inferred equivalent call
 	end
 
-	local v33 = u31 ~= nil
+	local v8 = v7 ~= nil
+	local v9 = {}
 
-	if edits ~= nil and edits.textOverlays ~= nil then
-		for v34, v35 in edits.textOverlays do
-			local v36 = `text:{ v34 - 1 }`
-			local v37 = v18.create("text", {
-				kind = "text",
-				id = v36,
-				overlay = v35
+	if ttsAudios ~= nil then
+		for k, ttsAudio in ttsAudios do
+			if ttsAudio.assetId == nil then
+				continue
+			end
+
+			local v10 = registry.create("tts", {
+				id = `tts:{k - 1}`,
+				kind = "tts",
+				assetId = ttsAudio.assetId,
+				assetAccessContext = ttsAudio.assetAccessContext,
+				startTime = ttsAudio.startTime,
+				parent = folder
 			}, services)
 
-			table.insert(t2, v37)
-			t3[v37.id] = v37
+			table.insert(v9, v10)
+			addNode(v10) -- inferred equivalent call
+		end
+	end
+
+	if localTts ~= nil then
+		local v10 = registry.create("tts", {
+			id = `tts:{#v9}`,
+			kind = "tts",
+			text = localTts.text,
+			voiceId = localTts.voiceId,
+			startTime = localTts.startTime,
+			parent = folder
+		}, services)
+
+		table.insert(v9, v10)
+		addNode(v10) -- inferred equivalent call
+	end
+
+	if edits ~= nil and edits.textOverlays ~= nil then
+		for k, textOverlay in edits.textOverlays do
+			local formatted = `text:{k - 1}`
+			addNode(registry.create("text", { id = formatted, kind = "text", overlay = textOverlay }, services)) -- inferred equivalent call
 		end
 	end
 
 	if GetFFlagMomentsStickerButton() and edits ~= nil and edits.stickerOverlays ~= nil then
-		for v38, v39 in edits.stickerOverlays do
-			local v40 = `sticker:{ v38 - 1 }`
-			local v41 = v18.create("sticker", {
+		for k, stickerOverlay in edits.stickerOverlays do
+			local formatted = `sticker:{k - 1}`
+			addNode(registry.create("sticker", { -- inferred equivalent call
+				id = formatted,
 				kind = "sticker",
-				id = v40,
-				overlay = v39
-			}, services)
-
-			table.insert(t2, v41)
-			t3[v41.id] = v41
+				overlay = stickerOverlay
+			}, services))
 		end
 	end
 
-	local t4 = {}
+	local v10 = {}
 
-	for _, v44 in t2 do
-		if v44.usesDecoder then
-			table.insert(t4, v44)
+	for _, v11 in v3 do
+		if v11.usesDecoder then
+			table.insert(v10, v11)
 		end
 	end
 
-	local t5 = {}
+	local v11 = {}
 
-	for _, v47 in t2 do
-		local render = v47.render
+	for _, v12 in v3 do
+		local render = v12.render
 
 		if render ~= nil then
-			table.insert(t5, {
-				id = v47.id,
-				zIndex = v47.zIndex or 0,
+			table.insert(v11, {
+				id = v12.id,
+				zIndex = v12.zIndex or 0,
 				render = render
 			})
 		end
 	end
 
-	table.sort(t5, function(p3, p4) -- line: 220
-		return p3.zIndex < p4.zIndex
+	table.sort(v11, function(a, b): boolean
+		return a.zIndex < b.zIndex
 	end)
 
-	local v49 = createSignal(t5)
-	local t6 = {}
+	local signal = createSignal(v11)
 
-	local function addStem(p5) -- line: 232
-		-- upvalues: t6 (copy), v22 (copy)
-		local audioStem = p5.audioStem
-		local getAudioSource = p5.getAudioSource
+	local v12 = {}
+	local function addStem(p)
+		local audioStem = p.audioStem
+		local getAudioSource = p.getAudioSource
 
-		if audioStem == nil or (getAudioSource == nil or t6[audioStem.stemId] ~= nil) then
+		if audioStem == nil or getAudioSource == nil or v12[audioStem.stemId] ~= nil then
 			return
 		end
 
-		t6[audioStem.stemId] = v22.addStem(audioStem.stemId, getAudioSource(), audioStem.defaultVolume)
+		v12[audioStem.stemId] = audioGraph.addStem(
+			audioStem.stemId,
+			getAudioSource(),
+			audioStem.defaultVolume,
+			audioStem.role
+		)
 	end
-	local function removeStem(p6) -- line: 240
-		-- upvalues: t6 (copy)
-		local audioStem = p6.audioStem
+	local function removeStem(p) -- 1 equivalent call inferred from this helper
+		local audioStem = p.audioStem
 
 		if audioStem == nil then
 			return
 		end
 
-		local v87 = t6[audioStem.stemId]
+		local v13 = v12[audioStem.stemId]
 
-		if v87 ~= nil then
-			v87()
-			t6[audioStem.stemId] = nil
+		if v13 ~= nil then
+			v13()
+			v12[audioStem.stemId] = nil
 		end
 	end
 
-	for _, v54 in t2 do
-		if v54.getAudioSource ~= nil and not v54.usesDecoder then
-			local audioStem = v54.audioStem
-			local getAudioSource = v54.getAudioSource
+	for _, v13 in v3 do
+		if v13.getAudioSource == nil or v13.usesDecoder then
+			continue
+		end
 
-			if audioStem ~= nil and getAudioSource ~= nil and t6[audioStem.stemId] == nil then
-				t6[audioStem.stemId] = v22.addStem(audioStem.stemId, getAudioSource(), audioStem.defaultVolume)
-			end
+		local audioStem = v13.audioStem
+		local getAudioSource = v13.getAudioSource
+
+		if audioStem ~= nil and getAudioSource ~= nil and v12[audioStem.stemId] == nil then
+			v12[audioStem.stemId] = audioGraph.addStem(
+				audioStem.stemId,
+				getAudioSource(),
+				audioStem.defaultVolume,
+				audioStem.role
+			)
 		end
 	end
 
-	local v57, v58 = createSignal(false)
-	local v59, v60 = createSignal(false)
-	local v61, v62 = createSignal(false)
-	local v63, v64 = createSignal(0)
-	local v65, v66 = createSignal(false)
-	local u67 = false
-	local u68 = nil
-	local v69 = if u27 == nil then u28.getPosition else u27.getPosition
-	local v70 = createComputed(function(p7) -- line: 285
-		-- upvalues: v61 (copy), v59 (copy), v57 (copy)
-		if v61(p7) then
+	local signal2, v13 = createSignal(false)
+	local signal3, v14 = createSignal(false)
+	local signal4, v15 = createSignal(false)
+	local signal5, v16 = createSignal("Loading")
+	local signal6, v17 = createSignal(nil)
+
+	local signal7, v18 = createSignal(0)
+
+	local signal8, v19 = createSignal(false)
+
+	local flag = false
+
+	local v20 = nil
+	local getPosition
+
+	if v5 == nil then
+		getPosition = v6.getPosition
+	else
+		getPosition = v5.getPosition
+	end
+
+	local getResourceLevel = createComputed(function(p): string
+		if signal4(p) then
 			return "Playing"
 		end
 
-		if v59(p7) then
+		if signal3(p) then
 			return "Decoded"
 		end
 
-		if v57(p7) then
-			return "Downloaded"
-		end
-
-		return "Idle"
+		return if signal2(p) then "Downloaded" else "Idle"
 	end)
-	local v71 = createComputed(function(p8) -- line: 299
-		-- upvalues: u27 (ref), v59 (copy), v57 (copy), u28 (ref), v61 (copy), v65 (copy)
-		local v90 = nil
-		local v91, v92, v93, v94
 
-		if u27 ~= nil then
-			v91 = u27.getFailureReason(p8)
-			v92 = if v91 == nil then if not u27.getIsLoaded(p8) then not v59(p8) and not v57(p8) and "Idle" or "Loading" else "Ready" else "Failed"
-			v90 = u27.getResolution(p8)
-			v93 = u27.getDuration(p8)
-			v94 = u27.getTimeLength(p8)
+	local getState = createComputed(function(p)
+		local resolution = nil
+		local readiness, failureReason, duration, timeLength
+
+		if v5 == nil then
+			local v21 = v6
+
+			if FFlagMomentsRenderAvatarPostsInFeed and data.isExternalBase == true then
+				readiness = signal5(p)
+				failureReason = signal6(p)
+			else
+				failureReason = v21.getFailureReason(p)
+				readiness = failureReason == nil and (v21.getIsImageLoaded(p) and "Ready" or "Loading") or "Failed"
+			end
+
+			duration = v21.getDuration()
+			timeLength = v21.getDuration()
 		else
-			local v95 = u28
+			failureReason = v5.getFailureReason(p)
+			readiness = failureReason == nil
+				and (v5.getIsLoaded(p) and "Ready" or (signal3(p) or signal2(p)) and "Loading" or "Idle")
+				or "Failed"
 
-			v91 = v95.getFailureReason(p8)
-			v92 = if v91 == nil then not v95.getIsImageLoaded(p8) and "Loading" or "Ready" else "Failed"
-			v93 = v95.getDuration()
-			v94 = v95.getDuration()
+			resolution = v5.getResolution(p)
+			duration = v5.getDuration(p)
+			timeLength = v5.getTimeLength(p)
 		end
 
 		return {
-			readiness = v92,
-			resolution = v90,
-			duration = v93,
-			timeLength = v94,
-			isPlaying = v61(p8),
-			isMuted = v65(p8),
-			failureReason = v91
+			readiness = readiness,
+			resolution = resolution,
+			duration = duration,
+			timeLength = timeLength,
+			isPlaying = signal4(p),
+			isMuted = signal8(p),
+			failureReason = failureReason
 		}
 	end, Cryo.Dictionary.equals)
-	local connection = nil
-	local n1 = 0
 
-	local function startRealignLoop() -- line: 352
-		-- upvalues: connection (ref), u31 (ref), n1 (ref), v69 (copy), services (copy), u67 (ref), loopEpsilonSeconds (copy)
-		if connection ~= nil or u31 == nil then
+	local renderSteppedConnection = nil
+	local v21 = 0
+	local function startRealignLoop()
+		if renderSteppedConnection ~= nil or v7 == nil and #v9 == 0 then
 			return
 		end
 
-		n1 = v69(false)
-		connection = services.runService.RenderStepped:Connect(function() -- line: 357
-			-- upvalues: u67 (ref), v69 (copy), n1 (ref), loopEpsilonSeconds (copy), u31 (ref)
-			if u67 then
+		v21 = getPosition(false)
+		renderSteppedConnection = services.runService.RenderStepped:Connect(function()
+			if flag then
 				return
 			end
 
-			local v138 = v69(false)
+			local position = getPosition(false)
 
-			if v138 < n1 - loopEpsilonSeconds then
-				u31.realignToRegionStart()
+			if position < v21 - loopEpsilonSeconds then
+				if v7 ~= nil then
+					v7.realignToRegionStart()
+				end
+
+				for _, v22 in v9 do
+					v22.realignToRegionStart()
+				end
 			end
 
-			n1 = v138
+			for _, v22 in v9 do
+				v22.syncToClock(position)
+			end
+
+			v21 = position
 		end)
 	end
-	local function stopRealignLoop() -- line: 368
-		-- upvalues: connection (ref)
-		if connection ~= nil then
-			connection:Disconnect()
-			connection = nil
+	local function stopRealignLoop() -- 2 equivalent calls inferred from this helper
+		if renderSteppedConnection ~= nil then
+			renderSteppedConnection:Disconnect()
+			renderSteppedConnection = nil
 		end
 	end
-	local function play() -- line: 431
-		-- upvalues: u67 (ref), u68 (ref), u31 (ref), u28 (ref), t2 (copy), v62 (copy), connection (ref), n1 (ref), v69 (copy), services (copy), loopEpsilonSeconds (copy)
-		if u67 then
+
+	local function isVideoReadyForPlayback()
+		return v5 == nil or v5.isPlaybackReady()
+	end
+
+	local function play()
+		if flag or v5 ~= nil and not v5.isPlaybackReady() then
 			return
 		end
 
-		local v108 = u68
+		local v22 = v20
+		v20 = nil
 
-		u68 = nil
-
-		if u31 ~= nil then
-			u31.realignToRegionStart()
+		if v7 ~= nil then
+			v7.realignToRegionStart()
 		end
 
-		if u28 ~= nil then
-			u28.seek(0)
+		for _, v23 in v9 do
+			v23.realignToRegionStart()
 		end
 
-		for _, v110 in t2 do
-			local play2 = v110.play
+		if v6 ~= nil then
+			v6.seek(0)
+		end
+
+		for _, v23 in v3 do
+			local play2 = v23.play
 
 			if play2 ~= nil then
 				play2()
 			end
 		end
 
-		if v108 ~= nil and v108 > 0 then
-			for _, v113 in t2 do
-				local seek = v113.seek
+		if v22 ~= nil and v22 > 0 then
+			for _, v23 in v3 do
+				local seek = v23.seek
 
 				if seek ~= nil then
-					seek(v108)
+					seek(v22)
 				end
 			end
 		end
 
-		v62(true)
+		for _, v23 in v9 do
+			v23.syncToClock(getPosition(false))
+		end
 
-		if connection == nil then
-			if u31 == nil then
+		v15(true)
+
+		if renderSteppedConnection == nil then
+			if v7 == nil and #v9 == 0 then
 				return
 			end
 
-			n1 = v69(false)
-			connection = services.runService.RenderStepped:Connect(function() -- line: 357
-				-- upvalues: u67 (ref), v69 (copy), n1 (ref), loopEpsilonSeconds (copy), u31 (ref)
-				if u67 then
+			v21 = getPosition(false)
+			renderSteppedConnection = services.runService.RenderStepped:Connect(function()
+				if flag then
 					return
 				end
 
-				local v139 = v69(false)
+				local position = getPosition(false)
 
-				if v139 < n1 - loopEpsilonSeconds then
-					u31.realignToRegionStart()
+				if position < v21 - loopEpsilonSeconds then
+					if v7 ~= nil then
+						v7.realignToRegionStart()
+					end
+
+					for _, v23 in v9 do
+						v23.realignToRegionStart()
+					end
 				end
 
-				n1 = v139
+				for _, v23 in v9 do
+					v23.syncToClock(position)
+				end
+
+				v21 = position
 			end)
 		end
 	end
-	local function pauseAndRemember(n2: number) -- line: 475
-		-- upvalues: u67 (ref), u27 (ref), u68 (ref), v69 (copy), t2 (copy), v62 (copy), connection (ref)
-		if u67 then
+
+	local function pauseAndRemember(p: number)
+		if flag then
 			return
 		end
 
-		if u27 ~= nil then
-			u68 = math.max(0, v69(false) - n2)
+		if v5 ~= nil then
+			v20 = math.max(0, getPosition(false) - p)
 		end
 
-		for _, v117 in t2 do
-			local pause = v117.pause
+		for _, v22 in v3 do
+			local pause = v22.pause
 
 			if pause ~= nil then
 				pause()
 			end
 		end
 
-		v62(false)
-
-		if connection ~= nil then
-			connection:Disconnect()
-			connection = nil
-		end
+		v15(false)
+		stopRealignLoop() -- inferred equivalent call
 	end
 
-	local t7 = {
-		setVolume = function(s1: string, n3: number) -- line: 578
-			-- upvalues: u67 (ref), v22 (copy)
-			if not u67 then
-				v22.setVolume(s1, n3)
-			end
-		end,
-		setMuted = function(s2: string, b1: boolean) -- line: 583
-			-- upvalues: u67 (ref), v22 (copy)
-			if not u67 then
-				v22.setMuted(s2, b1)
-			end
-		end,
-		setMasterMuted = function(b2: boolean) -- line: 545
-			-- upvalues: u67 (ref), v22 (copy), v66 (copy)
-			if u67 then
-				return
-			end
-
-			v22.setMasterMuted(b2)
-			v66(b2)
+	local function setMasterMuted(flag2: boolean) -- 1 equivalent call inferred from this helper
+		if flag then
+			return
 		end
-	}
+
+		audioGraph.setMasterMuted(flag2)
+		v19(flag2)
+	end
 
 	return {
-		getState = v71,
-		getPosition = v69,
-		getUserToggleNonce = v63,
-		getVisualLayers = v49,
-		getResourceLevel = v70,
-		audio = t7,
-		download = function() -- line: 375
-			-- upvalues: u67 (ref), t2 (copy), v58 (copy)
-			if u67 then
+		getState = getState,
+		getPosition = getPosition,
+		getUserToggleNonce = signal7,
+		getVisualLayers = signal,
+		getResourceLevel = getResourceLevel,
+		audio = {
+			setVolume = function(p: string, p2: number)
+				if not flag then
+					audioGraph.setVolume(p, p2)
+				end
+			end,
+			setMuted = function(p: string, flag2: boolean)
+				if not flag then
+					audioGraph.setMuted(p, flag2)
+				end
+			end,
+			setMasterMuted = setMasterMuted
+		},
+		download = function()
+			if flag then
 				return
 			end
 
-			for _, v97 in t2 do
-				v97.download()
+			for _, v22 in v3 do
+				v22.download()
 			end
 
-			if u67 then
+			if flag then
 				return
 			end
 
-			v58(true)
+			v13(true)
 		end,
-		decode = function() -- line: 393
-			-- upvalues: u67 (ref), t4 (copy), t6 (copy), v22 (copy), v33 (copy), v60 (copy)
-			if u67 then
+		decode = function()
+			if flag then
 				return
 			end
 
-			for _, v99 in t4 do
-				local decode = v99.decode
+			for _, v22 in v10 do
+				local decode = v22.decode
 
 				if decode ~= nil then
 					decode()
 				end
 
-				local audioStem = v99.audioStem
-				local getAudioSource = v99.getAudioSource
+				local audioStem = v22.audioStem
+				local getAudioSource = v22.getAudioSource
 
-				if audioStem ~= nil and getAudioSource ~= nil and t6[audioStem.stemId] == nil then
-					t6[audioStem.stemId] = v22.addStem(audioStem.stemId, getAudioSource(), audioStem.defaultVolume)
+				if audioStem ~= nil and getAudioSource ~= nil and v12[audioStem.stemId] == nil then
+					v12[audioStem.stemId] = audioGraph.addStem(
+						audioStem.stemId,
+						getAudioSource(),
+						audioStem.defaultVolume,
+						audioStem.role
+					)
 				end
 			end
 
-			if v33 and t6.video ~= nil then
-				v22.setMuted("video", true)
+			if v8 and v12.video ~= nil then
+				audioGraph.setMuted("video", true)
 			end
 
-			v60(true)
+			v14(true)
 		end,
-		releaseDecoder = function() -- line: 414
-			-- upvalues: u67 (ref), t4 (copy), t6 (copy), v60 (copy), v62 (copy)
-			if u67 then
+		releaseDecoder = function()
+			if flag then
 				return
 			end
 
-			for _, v104 in t4 do
-				local audioStem = v104.audioStem
-
-				if audioStem ~= nil then
-					local v106 = t6[audioStem.stemId]
-
-					if v106 ~= nil then
-						v106()
-						t6[audioStem.stemId] = nil
-					end
-				end
-
-				local releaseDecoder = v104.releaseDecoder
+			for _, v22 in v10 do
+				removeStem(v22) -- inferred equivalent call
+				local releaseDecoder = v22.releaseDecoder
 
 				if releaseDecoder ~= nil then
 					releaseDecoder()
 				end
 			end
 
-			v60(false)
-			v62(false)
+			v14(false)
+			v15(false)
 		end,
 		play = play,
-		pause = function(n4: number?) -- line: 495
-			-- upvalues: pauseAndRemember (copy)
-			pauseAndRemember(n4 or 2)
+		pause = function(value: number?)
+			pauseAndRemember(value or 2)
 		end,
-		toggle = function() -- line: 499
-			-- upvalues: u67 (ref), v61 (copy), pauseAndRemember (copy), play (copy), v64 (copy), v63 (copy)
-			if u67 then
+		toggle = function()
+			if flag or not signal4(false) and v5 ~= nil and not v5.isPlaybackReady() then
 				return
 			end
 
-			if v61(false) then
+			if signal4(false) then
 				pauseAndRemember(0)
 			else
 				play()
 			end
 
-			v64(v63(false) + 1)
+			v18(signal7(false) + 1)
 		end,
-		seek = function(n5: number) -- line: 516
-			-- upvalues: u67 (ref), FFlagMomentsLoopOnEndSeek (copy), v61 (copy), v71 (copy), t2 (copy)
-			if u67 then
+		seek = function(p: number)
+			if flag then
 				return
 			end
 
-			if FFlagMomentsLoopOnEndSeek and v61(false) then
-				local duration = v71(false).duration
-
-				if duration > 0 and duration <= n5 then
-					n5 = 0
-				end
+			if signal4(false) then
+				local duration = getState(false).duration
+				p = duration > 0 and duration <= p and 0 or p
 			end
 
-			for _, v123 in t2 do
-				local seek = v123.seek
+			for _, v22 in v3 do
+				local seek = v22.seek
 
 				if seek ~= nil then
-					seek(n5)
+					seek(p)
 				end
 			end
 		end,
-		setRegion = function(p9) -- line: 536
-			-- upvalues: u67 (ref), u27 (ref)
-			if u67 then
+		setRegion = function(p)
+			if flag then
 				return
 			end
 
-			if u27 ~= nil then
-				u27.setRegion(p9)
+			if v5 ~= nil then
+				v5.setRegion(p)
 			end
 		end,
-		setActive = function(b3: boolean) -- line: 555
-			-- upvalues: u68 (ref), u67 (ref), v22 (copy), v66 (copy)
-			if b3 then
-				u68 = nil
+		setActive = function(flag2: boolean)
+			if flag2 then
+				v20 = nil
 			end
 
-			local v128 = not b3
-
-			if u67 then
+			setMasterMuted(not flag2) -- inferred equivalent call
+		end,
+		setExternalBaseReadiness = function(p, p2: string?)
+			if flag or not FFlagMomentsRenderAvatarPostsInFeed or data.isExternalBase ~= true then
 				return
 			end
 
-			v22.setMasterMuted(v128)
-			v66(v128)
+			if p ~= "Failed" then
+				p2 = nil
+			end
+
+			v17(p2)
+			v16(p)
 		end,
-		setSurface = function(s3: string, p10) -- line: 567
-			-- upvalues: u67 (ref), t3 (copy)
-			if u67 then
+		setSurface = function(p: string, p2)
+			if flag then
 				return
 			end
 
-			local v131 = t3[s3]
+			local v22 = v4[p]
 
-			if v131 ~= nil and v131.setSurface ~= nil then
-				v131.setSurface(p10)
+			if v22 ~= nil and v22.setSurface ~= nil then
+				v22.setSurface(p2)
 			end
 		end,
-		getVideoPreviewSource = function() -- line: 609
-			-- upvalues: v19 (copy), p1 (copy), edits (copy)
-			if not v19 then
+		getVideoPreviewSource = function()
+			if not hasVideoPreview then
 				return nil
 			end
 
-			return {
-				content = p1.content,
-				region = if edits == nil then nil else edits.trim
-			}
+			local v22 = { content = data.content, region = 0 }
+			local region
+
+			if edits ~= nil then
+				region = edits.trim
+			end
+
+			v22.region = region
+			return v22
 		end,
-		getHasVideoPreview = function() -- line: 619
-			-- upvalues: v19 (copy)
-			return v19
+		getHasVideoPreview = function()
+			return hasVideoPreview
 		end,
-		dispose = function() -- line: 591
-			-- upvalues: u67 (ref), connection (ref), t2 (copy), v22 (copy), v20 (copy)
-			if u67 then
+		dispose = function()
+			if flag then
 				return
 			end
 
-			u67 = true
+			flag = true
+			stopRealignLoop() -- inferred equivalent call
 
-			if connection ~= nil then
-				connection:Disconnect()
-				connection = nil
+			for _, v22 in v3 do
+				v22.dispose()
 			end
 
-			for _, v137 in t2 do
-				v137.dispose()
-			end
-
-			v22.dispose()
-			v20.dispose()
+			audioGraph.dispose()
+			v2.dispose()
 		end
 	}
 end

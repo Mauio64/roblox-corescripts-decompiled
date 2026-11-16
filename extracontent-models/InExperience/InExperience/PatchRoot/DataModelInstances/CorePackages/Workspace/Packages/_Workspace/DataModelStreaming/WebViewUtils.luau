@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.WebViewUtils.WebViewUtils))
+local WebViewUtils = require(index.WebViewUtils.WebViewUtils)
+
+return WebViewUtils

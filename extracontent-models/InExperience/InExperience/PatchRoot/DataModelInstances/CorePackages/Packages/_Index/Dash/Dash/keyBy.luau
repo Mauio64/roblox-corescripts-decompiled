@@ -1,11 +1,17 @@
-local scriptParent = script.Parent
-local collect = require(scriptParent.collect)
+local parent = script.Parent
+local collect = require(parent.collect)
 
-local function keyBy(t1: {[any]: any}, p1) -- line: 15
-	-- upvalues: collect (copy)
-	return collect(t1, function(p2, p3) -- line: 16
-		-- upvalues: p1 (copy)
-		return if typeof(p1) ~= "function" then p3[p1] else p1(p3, p2), p3
+local function keyBy(p, callback)
+	return collect(p, function(p2, p3)
+		local v
+
+		if typeof(callback) == "function" then
+			v = callback(p3, p2)
+		else
+			v = p3[callback]
+		end
+
+		return v, p3
 	end)
 end
 

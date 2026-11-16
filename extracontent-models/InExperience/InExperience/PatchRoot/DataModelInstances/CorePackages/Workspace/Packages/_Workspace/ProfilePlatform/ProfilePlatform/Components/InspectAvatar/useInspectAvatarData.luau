@@ -1,16 +1,20 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Dash = require(ProfilePlatformParent.Dash)
-local Promise = require(ProfilePlatformParent.Promise)
-local RobloxAppHooks = require(ProfilePlatformParent.RobloxAppHooks)
-local CatalogNetworking = require(ProfilePlatformParent.CatalogNetworking)
-local useSignalState = require(ProfilePlatformParent.SignalsReact).useSignalState
+local parent = ProfilePlatform.Parent
+
+local React = require(parent.React)
+local Dash = require(parent.Dash)
+local Promise = require(parent.Promise)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local CatalogNetworking = require(parent.CatalogNetworking)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
 local useLocalUserId = RobloxAppHooks.useLocalUserId
+
 local Enums = require(ProfilePlatform.Common.Enums)
 local myRoduxNetworkingImpl = require(ProfilePlatform.Networking.myRoduxNetworkingImpl)
-local InspectAvatarUtils = require(script.Parent.InspectAvatarUtils)
 
+local InspectAvatarUtils = require(script.Parent.InspectAvatarUtils)
 require(ProfilePlatform.Common.Types)
 
 local PurchaseDetailsStore = CatalogNetworking.PurchaseDetailsStore
@@ -18,323 +22,347 @@ local CollectibleProductIdStore = CatalogNetworking.CollectibleProductIdStore
 local BundleOwnershipStore = CatalogNetworking.BundleOwnershipStore
 local ItemDetailsStore = CatalogNetworking.ItemDetailsStore
 
-local function useLookApiData(t1: {[any]: any}) -- line: 42
-	-- upvalues: useSignalState (copy), PurchaseDetailsStore (copy), React (copy), Dash (copy), Enums (copy), myRoduxNetworkingImpl (copy)
-	local v21 = useSignalState(PurchaseDetailsStore.getCache)
-	local v22, v23 = React.useState({})
-	local v24, v25 = React.useState(true)
+local function useLookApiData(list)
+	local cache = useSignalState(PurchaseDetailsStore.getCache)
+	local state, setState = React.useState({})
+	local state2, setState2 = React.useState(true)
 
-	React.useEffect(function() -- line: 47
-		-- upvalues: t1 (copy), v25 (copy), Dash (copy), Enums (copy), v23 (copy), PurchaseDetailsStore (copy), myRoduxNetworkingImpl (copy)
-		if #t1 == 0 then
-			v25(false)
-
+	React.useEffect(function()
+		if #list == 0 then
+			setState2(false)
 			return
 		end
 
-		local v39 = Dash.collectArray(t1, function(_, p2) -- line: 52
-			-- upvalues: Enums (copy)
-			if p2.itemType ~= Enums.ItemTypes.Bundle then
-				return {
-					id = tonumber(p2.assetId) or p2.assetId
-				}
+		local array = Dash.collectArray(list, function(_, p)
+			if p.itemType == Enums.ItemTypes.Bundle then
+				return nil
 			end
 
-			return nil
+			return {
+				id = tonumber(p.assetId) or p.assetId
+			}
 		end)
 
-		if #v39 == 0 then
-			v25(false)
-
+		if #array == 0 then
+			setState2(false)
 			return
 		end
 
-		v25(true)
-		v23({})
-		PurchaseDetailsStore.fetchAll(myRoduxNetworkingImpl, v39):andThen(function(p3) -- line: 66
-			-- upvalues: Dash (copy), v23 (copy)
-			if p3 and (p3.look and p3.look.items) then
-				local v99 = Dash.map(p3.look.items, function(p4) -- line: 68
-					return (tostring(p4.id))
-				end)
-
-				v23(v99)
+		setState2(true)
+		setState({})
+		PurchaseDetailsStore.fetchAll(myRoduxNetworkingImpl, array):andThen(function(p)
+			if p and p.look and p.look.items then
+				setState((Dash.map(p.look.items, function(p2)
+					return (tostring(p2.id))
+				end)))
 			end
-		end, function(p5) -- line: 73
-			warn("[useInspectAvatarData] Failed to fetch purchase details:", (tostring(p5)))
-		end):finally(function() -- line: 76
-			-- upvalues: v25 (copy)
-			v25(false)
+		end, function(p)
+			warn("[useInspectAvatarData] Failed to fetch purchase details:", (tostring(p)))
+		end):finally(function()
+			setState2(false)
 		end)
-	end, { t1 })
+	end, { list })
+
+	return { responseIds = state, cache = cache, isLoading = state2 }
+end
+
+local function useCatalogEnrichment(p, list)
+	local catalogDetails = useSignalState(ItemDetailsStore.getCache)
+	local state, setState = React.useState(true)
+	local collectibleCache = useSignalState(CollectibleProductIdStore.getCache)
+	local ownershipCache = useSignalState(BundleOwnershipStore.getCache)
+
+	React.useEffect(function()
+		if p.isLoading then
+			return
+		end
+
+		if #list == 0 then
+			setState(false)
+			return
+		end
+
+		local itemTypesByAssetId = {}
+		local assetIds = {}
+
+		for _, item in list do
+			itemTypesByAssetId[tostring(item.assetId)] = item.itemType or "Asset"
+
+			if item.itemType ~= Enums.ItemTypes.Bundle then
+				continue
+			end
+
+			local assetId = tonumber(item.assetId)
+
+			if assetId then
+				table.insert(assetIds, assetId)
+			end
+		end
+
+		local set = {}
+		local v = {}
+
+		for _, responseId in p.responseIds do
+			local id = tonumber(responseId)
+
+			if not id or set[responseId] then
+				continue
+			end
+
+			set[responseId] = true
+			table.insert(v, {
+				id = id,
+				itemType = itemTypesByAssetId[responseId] or "Bundle"
+			})
+		end
+
+		for _, item in list do
+			local assetId = tostring(item.assetId)
+			local assetId2 = tonumber(item.assetId)
+
+			if not assetId2 or set[assetId] then
+				continue
+			end
+
+			set[assetId] = true
+			table.insert(v, {
+				id = assetId2,
+				itemType = item.itemType or "Asset"
+			})
+		end
+
+		if #v == 0 and #assetIds == 0 then
+			setState(false)
+			return
+		end
+
+		setState(true)
+		local v2
+
+		if #v > 0 then
+			v2 = ItemDetailsStore.fetchAndCache(myRoduxNetworkingImpl, v)
+		else
+			v2 = Promise.resolve()
+		end
+
+		local v3
+
+		if #assetIds > 0 then
+			v3 = BundleOwnershipStore.fetchAndCache(myRoduxNetworkingImpl, assetIds):catch(function(p2)
+				warn("[useInspectAvatarData] Failed to fetch bundle ownership:", (tostring(p2)))
+			end)
+		else
+			v3 = Promise.resolve()
+		end
+
+		Promise.all({ v2, v3 }):andThen(function()
+			setState(false)
+		end):catch(function(p2)
+			warn("[useInspectAvatarData] Failed to fetch catalog details:", (tostring(p2)))
+			setState(false)
+		end)
+	end, { p.responseIds, p.isLoading, list })
+
+	React.useEffect(function()
+		local collectibleItemIdSet = {}
+		local collectibleItemIds = {}
+
+		for _, item in list do
+			local v = catalogDetails[tostring(item.assetId)]
+
+			if not (v and v.collectibleItemId) then
+				continue
+			end
+
+			local collectibleItemId = v.collectibleItemId
+
+			if collectibleItemIdSet[collectibleItemId] then
+				continue
+			end
+
+			local v2
+
+			if item.itemType == Enums.ItemTypes.Bundle then
+				v2 = not v.isOffSale
+			else
+				v2 = false
+			end
+
+			local hasResellers = v.hasResellers == true
+
+			if not (v2 or hasResellers) then
+				continue
+			end
+
+			collectibleItemIdSet[collectibleItemId] = true
+			table.insert(collectibleItemIds, collectibleItemId)
+		end
+
+		for _, responseId in p.responseIds do
+			local v = catalogDetails[responseId]
+
+			if not (v and v.collectibleItemId) then
+				continue
+			end
+
+			local collectibleItemId = v.collectibleItemId
+
+			if collectibleItemIdSet[collectibleItemId] or v.hasResellers ~= true then
+				continue
+			end
+
+			collectibleItemIdSet[collectibleItemId] = true
+			table.insert(collectibleItemIds, collectibleItemId)
+		end
+
+		if #collectibleItemIds == 0 then
+			return
+		end
+
+		CollectibleProductIdStore.fetchAndCache(myRoduxNetworkingImpl, collectibleItemIds):catch(function(p2)
+			warn("[useInspectAvatarData] Failed to fetch collectible product IDs:", (tostring(p2)))
+		end)
+	end, { catalogDetails, list, p.responseIds })
 
 	return {
-		responseIds = v22,
-		cache = v21,
-		isLoading = v24
+		catalogDetails = catalogDetails,
+		isCatalogLoading = state,
+		ownershipCache = ownershipCache,
+		collectibleCache = collectibleCache
 	}
 end
-local function useCatalogEnrichment(t2: {[any]: any}, t3: {[any]: any}) -- line: 92
-	-- upvalues: useSignalState (copy), ItemDetailsStore (copy), React (copy), CollectibleProductIdStore (copy), BundleOwnershipStore (copy), Enums (copy), myRoduxNetworkingImpl (copy), Promise (copy)
-	local v28 = useSignalState(ItemDetailsStore.getCache)
-	local v29, v30 = React.useState(true)
-	local v31 = useSignalState(CollectibleProductIdStore.getCache)
-	local v32 = useSignalState(BundleOwnershipStore.getCache)
 
-	React.useEffect(function() -- line: 100
-		-- upvalues: t2 (copy), t3 (copy), v30 (copy), Enums (copy), ItemDetailsStore (copy), myRoduxNetworkingImpl (copy), Promise (copy), BundleOwnershipStore (copy)
-		if t2.isLoading then
-			return
-		end
+local function useInspectAvatarData(list)
+	local localUserId = useLocalUserId()
+	local v = useLookApiData(list)
+	local v2 = useCatalogEnrichment(v, list)
 
-		if #t3 == 0 then
-			v30(false)
-
-			return
-		end
-
-		local t4 = {}
-		local t5 = {}
-
-		for _, v43 in t3 do
-			t4[tostring(v43.assetId)] = v43.itemType or "Asset"
-
-			if v43.itemType == Enums.ItemTypes.Bundle then
-				local num = tonumber(v43.assetId)
-
-				if num then
-					table.insert(t5, num)
-				end
-			end
-		end
-
-		local t6 = {}
-		local t7 = {}
-
-		for _, v48 in t2.responseIds do
-			local num = tonumber(v48)
-
-			if num and not t7[v48] then
-				t7[v48] = true
-				table.insert(t6, {
-					id = num,
-					itemType = t4[v48] or "Bundle"
-				})
-			end
-		end
-
-		for _, v51 in t3 do
-			local str = tostring(v51.assetId)
-			local num = tonumber(v51.assetId)
-
-			if num and not t7[str] then
-				t7[str] = true
-				table.insert(t6, {
-					id = num,
-					itemType = v51.itemType or "Asset"
-				})
-			end
-		end
-
-		if #t6 == 0 and #t5 == 0 then
-			v30(false)
-
-			return
-		end
-
-		v30(true)
-
-		local v54 = if not (#t6 > 0) then Promise.resolve() else ItemDetailsStore.fetchAndCache(myRoduxNetworkingImpl, t6)
-		local v55 = if not (#t5 > 0) then Promise.resolve() else BundleOwnershipStore.fetchAndCache(myRoduxNetworkingImpl, t5):catch(function(p6) -- line: 159
-			warn("[useInspectAvatarData] Failed to fetch bundle ownership:", (tostring(p6)))
-		end)
-
-		Promise.all({
-			v54,
-			v55
-		}):andThen(function() -- line: 165
-			-- upvalues: v30 (copy)
-			v30(false)
-		end):catch(function(p7) -- line: 168
-			-- upvalues: v30 (copy)
-			warn("[useInspectAvatarData] Failed to fetch catalog details:", (tostring(p7)))
-			v30(false)
-		end)
-	end, {
-		t2.responseIds,
-		t2.isLoading,
-		t3
-	})
-	React.useEffect(function() -- line: 175
-		-- upvalues: t3 (copy), v28 (copy), Enums (copy), t2 (copy), CollectibleProductIdStore (copy), myRoduxNetworkingImpl (copy)
-		local t8 = {}
-		local t9 = {}
-
-		for _, v59 in t3 do
-			local v60 = v28[tostring(v59.assetId)]
-
-			if v60 and v60.collectibleItemId then
-				local collectibleItemId = v60.collectibleItemId
-
-				if not t9[collectibleItemId] then
-					local v62 = v59.itemType == Enums.ItemTypes.Bundle and not v60.isOffSale
-					local v63 = v60.hasResellers == true
-
-					if v62 or v63 then
-						t9[collectibleItemId] = true
-						table.insert(t8, collectibleItemId)
-					end
-				end
-			end
-		end
-
-		for _, v65 in t2.responseIds do
-			local v66 = v28[v65]
-
-			if v66 and v66.collectibleItemId then
-				local collectibleItemId = v66.collectibleItemId
-
-				if not t9[collectibleItemId] and v66.hasResellers == true then
-					t9[collectibleItemId] = true
-					table.insert(t8, collectibleItemId)
-				end
-			end
-		end
-
-		if #t8 == 0 then
-			return
-		end
-
-		CollectibleProductIdStore.fetchAndCache(myRoduxNetworkingImpl, t8):catch(function(p8) -- line: 213
-			warn("[useInspectAvatarData] Failed to fetch collectible product IDs:", (tostring(p8)))
-		end)
-	end, {
-		v28,
-		t3,
-		t2.responseIds
-	})
-
-	return {
-		catalogDetails = v28,
-		isCatalogLoading = v29,
-		ownershipCache = v32,
-		collectibleCache = v31
-	}
-end
-local function useInspectAvatarData(t10: {[any]: any}) -- line: 229
-	-- upvalues: useLocalUserId (copy), useLookApiData (copy), useCatalogEnrichment (copy), React (copy), InspectAvatarUtils (copy)
-	local v34 = useLocalUserId()
-	local v35 = useLookApiData(t10)
-	local v36 = useCatalogEnrichment(v35, t10)
-	local v37 = React.useMemo(function() -- line: 235
-		-- upvalues: t10 (copy), InspectAvatarUtils (copy), v35 (copy), v36 (copy)
-		if #t10 == 0 then
+	local displayItems = React.useMemo(function()
+		if #list == 0 then
 			return {}
 		end
 
-		local t11 = {}
+		local assetIdSet = {}
 
-		for _, v70 in t10 do
-			t11[tostring(v70.assetId)] = true
+		for _, item in list do
+			assetIdSet[tostring(item.assetId)] = true
 		end
 
-		local v71 = InspectAvatarUtils.collectBundleComponentIds(v35.responseIds, v35.cache)
-		local t12 = {}
-		local t13 = {}
+		local bundleComponentIds = InspectAvatarUtils.collectBundleComponentIds(v.responseIds, v.cache)
 
-		for _, v75 in v35.responseIds do
-			local v76 = v35.cache[v75]
+		local responseIdSet = {}
+		local v3 = {}
 
-			if v76 then
-				t13[v75] = true
+		for _, responseId in v.responseIds do
+			local v4 = v.cache[responseId]
 
-				if v76.assetsInBundle or not v71[v75] then
-					local v77 = v36.catalogDetails[v75]
+			if not v4 then
+				continue
+			end
 
-					if v77 then
-						local v78 = nil
+			responseIdSet[responseId] = true
 
-						if v77.collectibleItemId then
-							local v79 = v36.collectibleCache[v77.collectibleItemId]
+			if not (v4.assetsInBundle or not bundleComponentIds[responseId]) then
+				continue
+			end
 
-							v78 = if not v79 then nil else v79.resaleProductId
-						end
+			local catalogDetail = v2.catalogDetails[responseId]
 
-						table.insert(t12, InspectAvatarUtils.buildItemData(v77, v76, t11, nil, nil, v78))
-					end
+			if not catalogDetail then
+				continue
+			end
+
+			local resaleProductId
+
+			if catalogDetail.collectibleItemId then
+				local v5 = v2.collectibleCache[catalogDetail.collectibleItemId]
+
+				if v5 then
+					resaleProductId = v5.resaleProductId
 				end
 			end
+
+			table.insert(v3, InspectAvatarUtils.buildItemData(catalogDetail, v4, assetIdSet, nil, nil, resaleProductId))
 		end
 
-		for _, v81 in t10 do
-			local str = tostring(v81.assetId)
+		for _, item in list do
+			local assetId = tostring(item.assetId)
 
-			if not t13[str] and not v71[str] then
-				local v83 = v36.catalogDetails[str]
+			if responseIdSet[assetId] or bundleComponentIds[assetId] then
+				continue
+			end
 
-				if v83 then
-					local productId = nil
-					local resaleProductId = nil
+			local catalogDetail = v2.catalogDetails[assetId]
 
-					if v83.collectibleItemId then
-						local v86 = v36.collectibleCache[v83.collectibleItemId]
+			if not catalogDetail then
+				continue
+			end
 
-						if v86 then
-							productId = v86.productId
-							resaleProductId = v86.resaleProductId
-						end
-					end
+			local productId = nil
+			local resaleProductId = nil
 
-					local v87 = v36.ownershipCache[str]
+			if catalogDetail.collectibleItemId then
+				local v4 = v2.collectibleCache[catalogDetail.collectibleItemId]
 
-					table.insert(t12, InspectAvatarUtils.buildItemData(v83, nil, t11, productId, v87, resaleProductId))
+				if v4 then
+					productId = v4.productId
+					resaleProductId = v4.resaleProductId
 				end
 			end
+
+			local v4 = v2.ownershipCache[assetId]
+			table.insert(
+				v3,
+				InspectAvatarUtils.buildItemData(catalogDetail, nil, assetIdSet, productId, v4, resaleProductId)
+			)
 		end
 
-		return InspectAvatarUtils.sortDisplayItems(t12)
-	end, {
-		v35.responseIds,
-		v35.cache,
-		t10,
-		v36.catalogDetails,
-		v36.collectibleCache,
-		v36.ownershipCache
-	})
-	local v38 = React.useMemo(function() -- line: 316
-		-- upvalues: v37 (copy), InspectAvatarUtils (copy)
-		local t14 = {}
-		local t15 = {}
-
-		for _, v91 in v37 do
-			if v91.isOwned then
-				if #v91.bundleAssetIds > 0 then
-					for _, v93 in v91.bundleAssetIds do
-						if not t15[v93] then
-							t15[v93] = true
-							table.insert(t14, v93)
-						end
-					end
-				else
-					local num = tonumber(v91.id)
-					local v95 = if not v91.itemSubType then nil else tonumber(v91.itemSubType)
-
-					if num and ((not v95 or InspectAvatarUtils.isWearableAssetType(v95)) and not t15[num]) then
-						t15[num] = true
-						table.insert(t14, num)
-					end
-				end
-			end
-		end
-
-		return t14
-	end, { v37 })
+		return InspectAvatarUtils.sortDisplayItems(v3)
+	end, { v.responseIds, v.cache, list, v2.catalogDetails, v2.collectibleCache, v2.ownershipCache })
 
 	return {
-		displayItems = v37,
-		ownedAssetIds = v38,
-		localUserId = v34,
-		isLoading = v35.isLoading or v36.isCatalogLoading
+		displayItems = displayItems,
+		ownedAssetIds = React.useMemo(function()
+			local set = {}
+			local result = {}
+
+			for _, v3 in displayItems do
+				if not v3.isOwned then
+					continue
+				end
+
+				if #v3.bundleAssetIds > 0 then
+					for _, bundleAssetId in v3.bundleAssetIds do
+						if set[bundleAssetId] then
+							continue
+						end
+
+						set[bundleAssetId] = true
+						table.insert(result, bundleAssetId)
+					end
+				else
+					local id = tonumber(v3.id)
+					local itemSubType
+
+					if v3.itemSubType then
+						itemSubType = tonumber(v3.itemSubType)
+					end
+
+					if
+						id
+						and (not itemSubType or InspectAvatarUtils.isWearableAssetType(itemSubType))
+						and not set[id]
+					then
+						set[id] = true
+						table.insert(result, id)
+					end
+				end
+			end
+
+			return result
+		end, { displayItems }),
+		localUserId = localUserId,
+		isLoading = v.isLoading or v2.isCatalogLoading
 	}
 end
 

@@ -1,20 +1,17 @@
-local Parent = script:FindFirstAncestor("StreamNotifications").Parent
-local React = require(Parent.React)
-local useTCStreamNotificationEventHandler = require(Parent.TrustedContacts).EventHandlers.useTCStreamNotificationEventHandler
+local parent = script:FindFirstAncestor("StreamNotifications").Parent
+local React = require(parent.React)
 
-local function useClientTriggerEventHandler() -- line: 7
-	-- upvalues: useTCStreamNotificationEventHandler (copy), React (copy)
-	local v5 = useTCStreamNotificationEventHandler()
+local TrustedContacts = require(parent.TrustedContacts)
+local useTCStreamNotificationEventHandler = TrustedContacts.EventHandlers.useTCStreamNotificationEventHandler
 
-	return (React.useCallback(function(s1: string?, p1) -- line: 10
-		-- upvalues: v5 (copy)
-		if s1 == "TrustedContactsDoubleOptInModal" then
-			v5({
-				clientEventsPayload = p1.clientEventsPayload,
-				callback = p1.callback
-			})
+local function useClientTriggerEventHandler()
+	local v = useTCStreamNotificationEventHandler()
+
+	return (React.useCallback(function(p: string?, p2)
+		if p == "TrustedContactsDoubleOptInModal" then
+			v({ clientEventsPayload = p2.clientEventsPayload, callback = p2.callback })
 		end
-	end, { v5 }))
+	end, { v }))
 end
 
 return useClientTriggerEventHandler

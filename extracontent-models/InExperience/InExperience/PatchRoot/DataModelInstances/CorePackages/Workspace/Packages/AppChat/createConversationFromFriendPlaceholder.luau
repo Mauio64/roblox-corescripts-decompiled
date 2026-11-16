@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local createConversationFromFriendPlaceholder = require(Workspace.AppChat.AppChat.Conversations.createConversationFromFriendPlaceholder)
 
-return (require(_Workspace.AppChat.AppChat.Conversations.createConversationFromFriendPlaceholder))
+return createConversationFromFriendPlaceholder

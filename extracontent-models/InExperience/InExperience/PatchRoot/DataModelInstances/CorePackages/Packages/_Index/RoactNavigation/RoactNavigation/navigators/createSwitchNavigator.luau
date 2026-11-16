@@ -1,15 +1,10 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local createNavigator = require(script.Parent.createNavigator)
-local SwitchRouter = require(ParentParent.routers.SwitchRouter)
-local SwitchView = require(ParentParent.views.SwitchView.SwitchView)
+local SwitchRouter = require(parent.routers.SwitchRouter)
+local SwitchView = require(parent.views.SwitchView.SwitchView)
 
-return function(p1, p2) -- line: 7
-	-- upvalues: SwitchRouter (copy), createNavigator (copy), SwitchView (copy)
-	if p2 == nil then
-		p2 = {}
-	end
+return function(p, p2)
+	local v = p2 == nil and {} or p2
 
-	local v7 = SwitchRouter(p1, p2)
-
-	return createNavigator(SwitchView, v7, p2)
+	return createNavigator(SwitchView, SwitchRouter(p, v), v)
 end

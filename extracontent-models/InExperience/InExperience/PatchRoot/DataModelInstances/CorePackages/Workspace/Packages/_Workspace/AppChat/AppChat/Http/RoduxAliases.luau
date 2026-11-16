@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return require(Parent.LuaSocialLibrariesDeps).RoduxAliases.config({
-	keyPath = "ChatAppReducer.Aliases"
-})
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+return LuaSocialLibrariesDeps.RoduxAliases.config({ keyPath = "ChatAppReducer.Aliases" })

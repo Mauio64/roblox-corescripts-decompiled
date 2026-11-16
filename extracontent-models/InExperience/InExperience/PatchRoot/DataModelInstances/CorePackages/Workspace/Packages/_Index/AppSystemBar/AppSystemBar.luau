@@ -1,4 +1,1 @@
-return {
-	Enum = require(script.Enum),
-	Constants = require(script.Constants)
-}
+return { Enum = require(script.Enum), Constants = require(script.Constants) }

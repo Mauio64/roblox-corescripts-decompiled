@@ -1,414 +1,599 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
 
-local Promise = require(DataHydrationParent.Promise)
-local Cryo = require(DataHydrationParent.Cryo)
+local Promise = require(parent.Promise)
+local Cryo = require(parent.Cryo)
+
 local Requests = require(DataHydration.TrustedConnections.Requests)
 local TrustedConnectionStatus = require(DataHydration.TrustedConnections.Enums.TrustedConnectionStatus)
+
 local createTrustedConnectionEventListener = require(DataHydration.TrustedConnections.createTrustedConnectionEventListener)
 local createFriendshipEventListener = require(DataHydration.TrustedConnections.createFriendshipEventListener)
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
-local mergeListsWithoutDuplicates = require(DataHydration.DataHydrationUtils).mergeListsWithoutDuplicates
-local FFlagTCShareLinkReceiverUI = require(DataHydrationParent.SharedFlags).FFlagTCShareLinkReceiverUI
-local FFlagConnectionManagementChips = require(DataHydrationParent.SharedFlags).FFlagConnectionManagementChips
-local FFlagAddFriendsPageTrustedFriendRequestSection = require(DataHydrationParent.SharedFlags).FFlagAddFriendsPageTrustedFriendRequestSection
-local FIntTrustedFriendRequestsPageSize = require(DataHydrationParent.SharedFlags).FIntTrustedFriendRequestsPageSize
-local v17 = game:DefineFastInt("TrustedConnectionsStoreDataTtlSec", 0)
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
+local DataHydrationUtils2 = require(DataHydration.DataHydrationUtils)
+local mergeListsWithoutDuplicates = DataHydrationUtils2.mergeListsWithoutDuplicates
+local SharedFlags = require(parent.SharedFlags)
+local FFlagTCShareLinkReceiverUI = SharedFlags.FFlagTCShareLinkReceiverUI
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagConnectionManagementChips = SharedFlags2.FFlagConnectionManagementChips
+
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagAddFriendsPageTrustedFriendRequestSection = SharedFlags3.FFlagAddFriendsPageTrustedFriendRequestSection
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagAddFriendsPageHighlightUnseenTrustedRequests = SharedFlags4.FFlagAddFriendsPageHighlightUnseenTrustedRequests
+
+local SharedFlags5 = require(parent.SharedFlags)
+local FIntTrustedFriendRequestsPageSize = SharedFlags5.FIntTrustedFriendRequestsPageSize
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagProfileTFCardUseQrScanContext = SharedFlags6.FFlagProfileTFCardUseQrScanContext
+
+local defineFastInt = game:DefineFastInt("TrustedConnectionsStoreDataTtlSec", 0)
 
 game:DefineFastInt("TrustedConnectionsStoreProcessDelaySec", 1)
+
 game:DefineFastInt("TrustedConnectionsStoreIncomingRequestsProcessDelaySec", 0)
 
-local function createTrustedConnectionsStore() -- line: 77
-	-- upvalues: v17 (copy), createDataCache (copy), FFlagConnectionManagementChips (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), getLocalPlayerUserId (copy), mergeListsWithoutDuplicates (copy), Cryo (copy), createDataResolver (copy), Requests (copy), createTrustedConnectionEventListener (copy), TrustedConnectionStatus (copy), createFriendshipEventListener (copy), Promise (copy), FIntTrustedFriendRequestsPageSize (copy), FFlagTCShareLinkReceiverUI (copy)
-	local v19 = not (v17 > 0) and 1e999 or v17
-	local v20 = createDataCache(v19)
-	local v21 = createDataCache(v19)
-	local v22 = if not FFlagConnectionManagementChips then nil else createDataCache(v19)
-	local v23 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else createDataCache(v19)
-	local v24 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else createDataCache(v19)
-	local u25 = false
-	local v26 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function(s1: string) -- line: 94
-		-- upvalues: getLocalPlayerUserId (copy), v23 (copy), mergeListsWithoutDuplicates (copy), v24 (copy)
-		local str = tostring(getLocalPlayerUserId())
-		local v44 = v23.getItem(str).data(false)
+local function fn() -- 3 equivalent calls inferred from this helper
+	return game:GetFastInt("TrustedConnectionsStoreProcessDelaySec")
+end
 
-		if not v44 then
-			return
-		end
+local function fn2() -- 2 equivalent calls inferred from this helper
+	return game:GetFastInt("TrustedConnectionsStoreIncomingRequestsProcessDelaySec")
+end
 
-		local v45 = mergeListsWithoutDuplicates(v44.senderIds, { s1 })
+local function createTrustedConnectionsStore()
+	local v = not (defineFastInt > 0) and 1e999 or defineFastInt
+	local dataCache = createDataCache(v)
+	local dataCache2 = createDataCache(v)
+	local cache
 
-		if #v45 == #v44.senderIds then
-			return
-		end
-
-		v23.replaceItem(str, {
-			senderIds = v45,
-			nextPageCursor = v44.nextPageCursor,
-			hasMore = v44.hasMore
-		})
-
-		local v46 = v24.getItem(str).data(false)
-
-		if v46 then
-			v24.replaceItem(str, (math.max(v46 + 1, 0)))
-		end
+	if FFlagConnectionManagementChips then
+		cache = createDataCache(v)
+	else
+		cache = nil
 	end
-	local v27 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function(s2: string) -- line: 120
-		-- upvalues: getLocalPlayerUserId (copy), v23 (copy), Cryo (copy), v24 (copy)
-		local str = tostring(getLocalPlayerUserId())
-		local v49 = v23.getItem(str).data(false)
 
-		if not v49 then
-			return
-		end
+	local cache2
 
-		local v50 = Cryo.List.removeValue(v49.senderIds, s2)
-
-		if #v50 == #v49.senderIds then
-			return
-		end
-
-		v23.replaceItem(str, {
-			senderIds = v50,
-			nextPageCursor = v49.nextPageCursor,
-			hasMore = v49.hasMore
-		})
-
-		local v51 = v24.getItem(str).data(false)
-
-		if v51 then
-			v24.replaceItem(str, (math.max(v51 - 1, 0)))
-		end
+	if FFlagAddFriendsPageTrustedFriendRequestSection then
+		cache2 = createDataCache(v)
+	else
+		cache2 = nil
 	end
-	local v28 = if not FFlagConnectionManagementChips then nil else createDataResolver({
-		supportsMultiGet = false,
-		replaceItems = true,
-		cache = v22,
-		queueProcessDelaySec = game:GetFastInt("TrustedConnectionsStoreProcessDelaySec"),
-		fetchFn = function(s3: string) -- line: 152
-			-- upvalues: Requests (copy), Cryo (copy)
-			return Requests.GetUserTrustedConnections(s3):andThen(function(p1) -- line: 153
-				-- upvalues: Cryo (copy)
-				local v88 = p1.PageItems or {}
 
-				return Cryo.List.map(v88, function(p2) -- line: 155
-					return {
-						id = tostring(p2.id)
-					}
-				end)
-			end)
-		end
-	})
-	local v29 = createTrustedConnectionEventListener(function(s4: string, p3) -- line: 166
-		-- upvalues: v20 (copy), v21 (copy), TrustedConnectionStatus (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), v26 (copy), FFlagConnectionManagementChips (copy), getLocalPlayerUserId (copy), v28 (copy)
-		v20.updateItems({
-			[s4] = p3
-		})
-		v21.updateItems({
-			[s4] = p3 == TrustedConnectionStatus.TrustedFriends
-		})
+	local cache3
 
-		if FFlagAddFriendsPageTrustedFriendRequestSection and p3 == TrustedConnectionStatus.RequestReceived then
-			v26(s4)
+	if FFlagAddFriendsPageTrustedFriendRequestSection then
+		cache3 = createDataCache(v)
+	else
+		cache3 = nil
+	end
+
+	local flag = false
+
+	local fn3 = FFlagAddFriendsPageTrustedFriendRequestSection and function(id: string)
+		local v2 = tostring(getLocalPlayerUserId())
+		local data = cache2.getItem(v2).data(false)
+
+		if not data then
+			return
 		end
 
-		if FFlagConnectionManagementChips then
-			local v55 = getLocalPlayerUserId()
+		if FFlagAddFriendsPageHighlightUnseenTrustedRequests then
+			local requests = data.requests
 
-			if v55 then
-				v28.fetchItem((tostring(v55)))
+			if not requests then
+				return
 			end
+
+			local requests2 = mergeListsWithoutDuplicates({
+				{ id = id, isUnseen = true }
+			}, requests, "id")
+
+			if #requests2 == #requests then
+				return
+			end
+
+			cache2.replaceItem(v2, {
+				senderIds = nil,
+				requests = requests2,
+				nextPageCursor = data.nextPageCursor,
+				hasMore = data.hasMore
+			})
+		else
+			local senderIds = mergeListsWithoutDuplicates(data.senderIds, { id })
+
+			if #senderIds == #data.senderIds then
+				return
+			end
+
+			cache2.replaceItem(v2, {
+				senderIds = senderIds,
+				nextPageCursor = data.nextPageCursor,
+				hasMore = data.hasMore
+			})
+		end
+
+		local data2 = cache3.getItem(v2).data(false)
+
+		if data2 then
+			cache3.replaceItem(v2, (math.max(data2 + 1, 0)))
+		end
+	end or nil
+
+	local fn4 = FFlagAddFriendsPageTrustedFriendRequestSection and function(p: string)
+		local v2 = tostring(getLocalPlayerUserId())
+		local data = cache2.getItem(v2).data(false)
+
+		if not data then
+			return
+		end
+
+		if FFlagAddFriendsPageHighlightUnseenTrustedRequests then
+			local requests = data.requests
+
+			if not requests then
+				return
+			end
+
+			local filtered = Cryo.List.filter(requests, function(p2): boolean
+				return p2.id ~= p
+			end)
+
+			if #filtered == #requests then
+				return
+			end
+
+			cache2.replaceItem(v2, {
+				senderIds = nil,
+				requests = filtered,
+				nextPageCursor = data.nextPageCursor,
+				hasMore = data.hasMore
+			})
+		else
+			local senderIds = Cryo.List.removeValue(data.senderIds, p)
+
+			if #senderIds == #data.senderIds then
+				return
+			end
+
+			cache2.replaceItem(v2, {
+				senderIds = senderIds,
+				nextPageCursor = data.nextPageCursor,
+				hasMore = data.hasMore
+			})
+		end
+
+		local data2 = cache3.getItem(v2).data(false)
+
+		if data2 then
+			cache3.replaceItem(v2, (math.max(data2 - 1, 0)))
+		end
+	end or nil
+	local v2
+
+	if FFlagConnectionManagementChips then
+		v2 = createDataResolver({
+			cache = cache,
+			supportsMultiGet = false,
+			queueProcessDelaySec = fn(), -- inferred equivalent call
+			replaceItems = true,
+			fetchFn = function(p: string)
+				return Requests.GetUserTrustedConnections(p):andThen(function(p2)
+					local pageItems = p2.PageItems or {}
+					return Cryo.List.map(pageItems, function(p3)
+						return { id = tostring(p3.id) }
+					end)
+				end)
+			end
+		})
+	else
+		v2 = nil
+	end
+
+	local trustedConnectionEventListener = createTrustedConnectionEventListener(function(p: string, p2)
+		dataCache.updateItems({ [p] = p2 })
+
+		dataCache2.updateItems({
+			[p] = p2 == TrustedConnectionStatus.TrustedFriends
+		})
+
+		if FFlagAddFriendsPageTrustedFriendRequestSection and p2 == TrustedConnectionStatus.RequestReceived then
+			fn3(p)
+		end
+
+		local v3 = FFlagConnectionManagementChips and getLocalPlayerUserId()
+
+		if v3 then
+			v2.fetchItem((tostring(v3)))
 		end
 	end)
-	local v30 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else createFriendshipEventListener(function(s5: string, p4) -- line: 192
-		-- upvalues: v20 (copy), v21 (copy), TrustedConnectionStatus (copy), v27 (copy)
-		v20.updateItems({
-			[s5] = p4
-		})
-		v21.updateItems({
-			[s5] = p4 == TrustedConnectionStatus.TrustedFriends
-		})
+	local v3
 
-		if p4 == TrustedConnectionStatus.NotFriends then
-			v27(s5)
-		end
-	end)
-	local v31 = createDataResolver({
-		cache = v21,
-		queueProcessDelaySec = game:GetFastInt("TrustedConnectionsStoreProcessDelaySec"),
-		fetchFn = function(t1: {[any]: any}) -- line: 210
-			-- upvalues: Cryo (copy), Requests (copy)
-			local v59 = Cryo.Dictionary.keys(t1)
+	if FFlagAddFriendsPageTrustedFriendRequestSection then
+		v3 = createFriendshipEventListener(function(p: string, p2)
+			dataCache.updateItems({ [p] = p2 })
 
-			return Requests.MultiGetUsersAreTrustedConnections(v59):andThen(function(p5) -- line: 212
-				-- upvalues: Cryo (copy), v59 (copy)
-				local v90 = Cryo.List.foldLeft(p5, function(p6, p7) -- line: 213
-					p6[tostring(p7)] = true
+			dataCache2.updateItems({
+				[p] = p2 == TrustedConnectionStatus.TrustedFriends
+			})
 
-					return p6
+			if p2 == TrustedConnectionStatus.NotFriends then
+				fn4(p)
+			end
+		end)
+	else
+		v3 = nil
+	end
+
+	local dataResolver = createDataResolver({
+		cache = dataCache2,
+		queueProcessDelaySec = fn(), -- inferred equivalent call
+		fetchFn = function(p)
+			local keys = Cryo.Dictionary.keys(p)
+			return Requests.MultiGetUsersAreTrustedConnections(keys):andThen(function(p2)
+				local foldLeft = Cryo.List.foldLeft(p2, function(p3, p4)
+					p3[tostring(p4)] = true
+					return p3
 				end, {})
 
-				return Cryo.List.foldLeft(v59, function(p8, p9) -- line: 218
-					-- upvalues: v90 (copy)
-					p8[tostring(p9)] = v90[p9] or false
-
-					return p8
+				return Cryo.List.foldLeft(keys, function(p3, p4)
+					p3[tostring(p4)] = foldLeft[p4] or false
+					return p3
 				end, {})
 			end)
 		end
 	})
-	local v32 = createDataResolver({
-		cache = v20,
-		queueProcessDelaySec = game:GetFastInt("TrustedConnectionsStoreProcessDelaySec"),
-		fetchFn = function(t2: {[any]: any}) -- line: 229
-			-- upvalues: Cryo (copy), Requests (copy), Promise (copy)
-			local v61 = Cryo.Dictionary.keys(t2)
-			local v62 = Cryo.List.foldLeft(v61, function(p10, p11) -- line: 231
-				-- upvalues: Requests (copy)
-				table.insert(p10, Requests.GetUserTrustedConnectionStatus(p11):andThen(function(p12) -- line: 235
-					-- upvalues: p11 (copy)
-					return {
-						[p11] = p12
-					}
+
+	local dataResolver2 = createDataResolver({
+		cache = dataCache,
+		queueProcessDelaySec = fn(), -- inferred equivalent call
+		fetchFn = function(p)
+			local keys = Cryo.Dictionary.keys(p)
+			local foldLeft = Cryo.List.foldLeft(keys, function(list, p2)
+				table.insert(list, Requests.GetUserTrustedConnectionStatus(p2):andThen(function(p3)
+					return { [p2] = p3 }
 				end))
 
-				return p10
+				return list
 			end, {})
 
-			return Promise.all(v62):andThen(function(p13) -- line: 242
-				-- upvalues: Cryo (copy)
-				return Cryo.Dictionary.join(table.unpack(p13))
+			return Promise.all(foldLeft):andThen(function(list)
+				return Cryo.Dictionary.join(table.unpack(list))
 			end)
 		end
 	})
-	local v33 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else createDataResolver({
-		supportsMultiGet = false,
-		replaceItems = true,
-		cache = v23,
-		queueProcessDelaySec = game:GetFastInt("TrustedConnectionsStoreIncomingRequestsProcessDelaySec"),
-		fetchFn = function(_: string, p14) -- line: 254
-			-- upvalues: u25 (ref), Requests (copy), FIntTrustedFriendRequestsPageSize (copy), Cryo (copy), mergeListsWithoutDuplicates (copy)
-			local v65 = if not u25 then p14.data(false) else nil
+	local v4
 
-			u25 = false
+	if FFlagAddFriendsPageTrustedFriendRequestSection then
+		v4 = createDataResolver({
+			cache = cache2,
+			supportsMultiGet = false,
+			replaceItems = true,
+			queueProcessDelaySec = fn2(), -- inferred equivalent call
+			fetchFn = function(_: string, p)
+				local v5
 
-			local v66 = if not v65 then nil else v65.nextPageCursor
-
-			return Requests.GetTrustedFriendRequests(v66, FIntTrustedFriendRequestsPageSize):andThen(function(p15) -- line: 261
-				-- upvalues: Cryo (copy), v65 (copy), mergeListsWithoutDuplicates (copy)
-				local v95 = if not p15 then nil else p15.data
-				local v96 = Cryo.List.map(v95 or {}, function(p16) -- line: 263
-					return (tostring(p16.senderId))
-				end)
-				local v97 = if not v65 then nil else v65.senderIds
-				local v98 = if not p15 then nil else p15.nextPageCursor
-
-				return {
-					senderIds = mergeListsWithoutDuplicates(v97, v96),
-					nextPageCursor = v98,
-					hasMore = v98 ~= nil
-				}
-			end)
-		end
-	})
-	local v34 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else createDataResolver({
-		supportsMultiGet = false,
-		replaceItems = true,
-		cache = v24,
-		queueProcessDelaySec = game:GetFastInt("TrustedConnectionsStoreIncomingRequestsProcessDelaySec"),
-		fetchFn = function(_: string) -- line: 286
-			-- upvalues: Requests (copy)
-			return Requests.GetTrustedFriendRequestsCount():andThen(function(p17) -- line: 287
-				if p17 then
-					return p17.count
+				if flag then
+					v5 = nil
+				else
+					v5 = p.data(false)
 				end
 
-				return 0
-			end)
+				flag = false
+				local v6
+
+				if v5 then
+					v6 = v5.nextPageCursor
+				end
+
+				return Requests.GetTrustedFriendRequests(v6, FIntTrustedFriendRequestsPageSize):andThen(function(p2)
+					if FFlagAddFriendsPageHighlightUnseenTrustedRequests then
+						local v7
+
+						if p2 then
+							v7 = p2.data
+						end
+
+						local mapped = Cryo.List.map(v7 or {}, function(p3)
+							return { id = tostring(p3.senderId), isUnseen = p3.isUnseen }
+						end)
+						local requests
+
+						if v5 then
+							requests = v5.requests
+						end
+
+						local nextPageCursor
+
+						if p2 then
+							nextPageCursor = p2.nextPageCursor
+						end
+
+						return {
+							senderIds = nil,
+							requests = mergeListsWithoutDuplicates(requests, mapped, "id"),
+							nextPageCursor = nextPageCursor,
+							hasMore = nextPageCursor ~= nil
+						}
+					else
+						local v7
+
+						if p2 then
+							v7 = p2.data
+						end
+
+						local mapped = Cryo.List.map(v7 or {}, function(p3)
+							return (tostring(p3.senderId))
+						end)
+						local senderIds
+
+						if v5 then
+							senderIds = v5.senderIds
+						end
+
+						local nextPageCursor
+
+						if p2 then
+							nextPageCursor = p2.nextPageCursor
+						end
+
+						return {
+							senderIds = mergeListsWithoutDuplicates(senderIds, mapped),
+							nextPageCursor = nextPageCursor,
+							hasMore = nextPageCursor ~= nil
+						}
+					end
+				end)
+			end
+		})
+	else
+		v4 = nil
+	end
+
+	local v5
+
+	if FFlagAddFriendsPageTrustedFriendRequestSection then
+		v5 = createDataResolver({
+			cache = cache3,
+			supportsMultiGet = false,
+			replaceItems = true,
+			queueProcessDelaySec = fn2(), -- inferred equivalent call
+			fetchFn = function(_: string)
+				return Requests.GetTrustedFriendRequestsCount():andThen(function(p)
+					return if p then p.count else 0
+				end)
+			end
+		})
+	else
+		v5 = nil
+	end
+
+	local fn5 = FFlagConnectionManagementChips and function()
+		local localPlayerUserId = getLocalPlayerUserId()
+		return v2.getAndFetchItem((tostring(localPlayerUserId)))
+	end or nil
+
+	local fn6 = FFlagAddFriendsPageTrustedFriendRequestSection and function()
+		local v6 = tostring(getLocalPlayerUserId())
+		v5.fetchItem(v6)
+	end or nil
+
+	local fn7 = FFlagAddFriendsPageTrustedFriendRequestSection and function(p)
+		if FFlagAddFriendsPageHighlightUnseenTrustedRequests and p and p.forceFetch then
+			fn6()
 		end
-	})
-	local v35 = if not FFlagConnectionManagementChips then nil else function() -- line: 303
-		-- upvalues: getLocalPlayerUserId (copy), v28 (copy)
-		local v70 = getLocalPlayerUserId()
 
-		return v28.getAndFetchItem((tostring(v70)))
-	end
-	local v36 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function() -- line: 310
-		-- upvalues: getLocalPlayerUserId (copy), v33 (copy)
-		local v71 = getLocalPlayerUserId()
+		local localPlayerUserId = getLocalPlayerUserId()
+		return v5.getAndFetchItem((tostring(localPlayerUserId)))
+	end or nil
 
-		return v33.getAndFetchItem((tostring(v71)))
-	end
-	local v37 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function() -- line: 317
-		-- upvalues: getLocalPlayerUserId (copy), v34 (copy)
-		local v72 = getLocalPlayerUserId()
+	local fn8 = FFlagAddFriendsPageTrustedFriendRequestSection and function()
+		local v6 = tostring(getLocalPlayerUserId())
+		local data = cache2.getItem(v6).data(false)
 
-		return v34.getAndFetchItem((tostring(v72)))
-	end
-	local v38 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function() -- line: 324
-		-- upvalues: getLocalPlayerUserId (copy), v23 (copy), v33 (copy)
-		local str = tostring(getLocalPlayerUserId())
-		local v74 = v23.getItem(str).data(false)
-
-		if v74 and not v74.hasMore then
+		if data and not data.hasMore then
 			return
 		end
 
-		v33.fetchItem(str)
-	end
-	local v39 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function() -- line: 335
-		-- upvalues: u25 (ref), getLocalPlayerUserId (copy), v33 (copy)
-		u25 = true
+		v4.fetchItem(v6)
+	end or nil
 
-		local str = tostring(getLocalPlayerUserId())
+	local fn9 = FFlagAddFriendsPageTrustedFriendRequestSection and function()
+		flag = true
 
-		v33.fetchItem(str)
-	end
-	local v40 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function() -- line: 344
-		-- upvalues: getLocalPlayerUserId (copy), v34 (copy)
-		local str = tostring(getLocalPlayerUserId())
+		local v6 = tostring(getLocalPlayerUserId())
+		v4.fetchItem(v6)
+	end or nil
 
-		v34.fetchItem(str)
-	end
-	local v41 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else function() -- line: 387
-		-- upvalues: Requests (copy), getLocalPlayerUserId (copy), v23 (copy), v24 (copy)
-		return Requests.PostUserIgnoreAllTrustedFriendRequests():andThen(function() -- line: 388
-			-- upvalues: getLocalPlayerUserId (copy), v23 (copy), v24 (copy)
-			local str = tostring(getLocalPlayerUserId())
+	local fn10 = FFlagAddFriendsPageTrustedFriendRequestSection and function(p)
+		if FFlagAddFriendsPageHighlightUnseenTrustedRequests and p and p.forceFetch then
+			fn9()
+		end
 
-			v23.replaceItem(str, {
-				nextPageCursor = nil,
-				hasMore = false,
-				senderIds = {}
-			})
-			v24.replaceItem(str, 0)
+		local localPlayerUserId = getLocalPlayerUserId()
+		return v4.getAndFetchItem((tostring(localPlayerUserId)))
+	end or nil
+
+	local function fn11(p: string, p2: string?)
+		return Requests.PostUserSendTrustedConnectionRequest(p, p2):andThen(function(p3)
+			if FFlagProfileTFCardUseQrScanContext and p3 and p3.responseBody and p3.responseBody.success == false then
+				return Promise.reject("Trusted connection request was not sent")
+			end
+
+			dataCache.updateItems({ [p] = TrustedConnectionStatus.RequestSent })
+
+			return nil
 		end)
 	end
 
+	local function fn12(p: string)
+		return Requests.PostUserAcceptTrustedConnectionRequest(p):andThen(function()
+			dataCache.updateItems({ [p] = TrustedConnectionStatus.TrustedFriends })
+
+			dataCache2.updateItems({ [p] = true })
+
+			if FFlagAddFriendsPageTrustedFriendRequestSection then
+				fn4(p)
+			end
+		end)
+	end
+
+	local function fn13(p: string)
+		return Requests.PostUserIgnoreTrustedConnectionRequest(p):andThen(function()
+			dataCache.updateItems({ [p] = TrustedConnectionStatus.RequestIgnored })
+
+			if FFlagAddFriendsPageTrustedFriendRequestSection then
+				fn4(p)
+			end
+		end)
+	end
+
+	local fn14 = FFlagAddFriendsPageTrustedFriendRequestSection and function()
+		return Requests.PostUserIgnoreAllTrustedFriendRequests():andThen(function()
+			local v6 = tostring(getLocalPlayerUserId())
+
+			if FFlagAddFriendsPageHighlightUnseenTrustedRequests then
+				cache2.replaceItem(v6, {
+					senderIds = nil,
+					requests = {},
+					nextPageCursor = nil,
+					hasMore = false
+				})
+			else
+				cache2.replaceItem(v6, { senderIds = {}, nextPageCursor = nil, hasMore = false })
+			end
+
+			cache3.replaceItem(v6, 0)
+		end)
+	end or nil
+
+	local function fn15(p: string)
+		return Requests.PostUserRemoveTrustedConnection(p):andThen(function()
+			dataCache.updateItems({ [p] = TrustedConnectionStatus.RequestReceived })
+
+			dataCache2.updateItems({ [p] = false })
+		end)
+	end
+
+	local function fn16(p: string)
+		return Requests.PostUserCreateTrustedFriendLink(p)
+	end
+
+	local function fn17(p: string, p2)
+		return Requests.PostUserValidateTrustedFriendLink(p, p2)
+	end
+
+	local function fn18(p: string, p2)
+		return Requests.PostUserAddTrustedFriendFromLink(p, p2)
+	end
+
+	if not FFlagConnectionManagementChips then
+		fn5 = nil
+	end
+
+	if not FFlagAddFriendsPageTrustedFriendRequestSection then
+		fn10 = nil
+	end
+
+	if not FFlagAddFriendsPageTrustedFriendRequestSection then
+		fn7 = nil
+	end
+
+	if not FFlagAddFriendsPageTrustedFriendRequestSection then
+		fn8 = nil
+	end
+
+	local refetchTrustedFriendRequests
+
+	if FFlagAddFriendsPageTrustedFriendRequestSection then
+		refetchTrustedFriendRequests = fn9
+	end
+
+	local refetchTrustedFriendRequestsCount
+
+	if FFlagAddFriendsPageTrustedFriendRequestSection then
+		refetchTrustedFriendRequestsCount = fn6
+	end
+
+	if not FFlagAddFriendsPageTrustedFriendRequestSection then
+		fn14 = nil
+	end
+
+	if not FFlagTCShareLinkReceiverUI then
+		fn17 = nil
+	end
+
+	if not FFlagTCShareLinkReceiverUI then
+		fn18 = nil
+	end
+
 	return {
-		getStatus = function(s8: string) -- line: 294
-			-- upvalues: v32 (copy)
-			return v32.getAndFetchItem(s8)
+		getStatus = function(p: string)
+			return dataResolver2.getAndFetchItem(p)
 		end,
-		getIsTrustedConnection = function(s9: string) -- line: 298
-			-- upvalues: v31 (copy)
-			return v31.getAndFetchItem(s9)
+		getIsTrustedConnection = function(p: string)
+			return dataResolver.getAndFetchItem(p)
 		end,
-		getUserTrustedConnections = if not FFlagConnectionManagementChips then nil else v35,
-		getTrustedFriendRequests = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else v36,
-		getTrustedFriendRequestsCount = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else v37,
-		loadMoreTrustedFriendRequests = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else v38,
-		refetchTrustedFriendRequests = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else v39,
-		refetchTrustedFriendRequestsCount = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else v40,
-		sendTrustedConnectionRequest = function(s10: string, s11: string?) -- line: 350
-			-- upvalues: Requests (copy), v20 (copy), TrustedConnectionStatus (copy)
-			return Requests.PostUserSendTrustedConnectionRequest(s10, s11):andThen(function() -- line: 351
-				-- upvalues: v20 (copy), s10 (copy), TrustedConnectionStatus (copy)
-				v20.updateItems({
-					[s10] = TrustedConnectionStatus.RequestSent
-				})
-			end)
-		end,
-		acceptTrustedConnectionRequest = function(s12: string) -- line: 358
-			-- upvalues: Requests (copy), v20 (copy), TrustedConnectionStatus (copy), v21 (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), v27 (copy)
-			return Requests.PostUserAcceptTrustedConnectionRequest(s12):andThen(function() -- line: 359
-				-- upvalues: v20 (copy), s12 (copy), TrustedConnectionStatus (copy), v21 (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), v27 (copy)
-				v20.updateItems({
-					[s12] = TrustedConnectionStatus.TrustedFriends
-				})
-				v21.updateItems({
-					[s12] = true
-				})
-
-				if FFlagAddFriendsPageTrustedFriendRequestSection then
-					v27(s12)
-				end
-			end)
-		end,
-		ignoreTrustedConnectionRequest = function(s13: string) -- line: 374
-			-- upvalues: Requests (copy), v20 (copy), TrustedConnectionStatus (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), v27 (copy)
-			return Requests.PostUserIgnoreTrustedConnectionRequest(s13):andThen(function() -- line: 375
-				-- upvalues: v20 (copy), s13 (copy), TrustedConnectionStatus (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), v27 (copy)
-				v20.updateItems({
-					[s13] = TrustedConnectionStatus.RequestIgnored
-				})
-
-				if FFlagAddFriendsPageTrustedFriendRequestSection then
-					v27(s13)
-				end
-			end)
-		end,
-		ignoreAllTrustedFriendRequests = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else v41,
-		removeTrustedConnectionRequest = function(s14: string) -- line: 400
-			-- upvalues: Requests (copy), v20 (copy), TrustedConnectionStatus (copy), v21 (copy)
-			return Requests.PostUserRemoveTrustedConnection(s14):andThen(function() -- line: 401
-				-- upvalues: v20 (copy), s14 (copy), TrustedConnectionStatus (copy), v21 (copy)
-				v20.updateItems({
-					[s14] = TrustedConnectionStatus.RequestReceived
-				})
-				v21.updateItems({
-					[s14] = false
-				})
-			end)
-		end,
-		createTrustedFriendLink = function(s15: string) -- line: 412
-			-- upvalues: Requests (copy)
-			return Requests.PostUserCreateTrustedFriendLink(s15)
-		end,
-		validateTrustedFriendLink = if not FFlagTCShareLinkReceiverUI then nil else function(s16: string, t3: {[any]: any}) -- line: 416
-			-- upvalues: Requests (copy)
-			return Requests.PostUserValidateTrustedFriendLink(s16, t3)
-		end,
-		addTrustedFriendFromLink = if not FFlagTCShareLinkReceiverUI then nil else function(s17: string, t4: {[any]: any}) -- line: 420
-			-- upvalues: Requests (copy)
-			return Requests.PostUserAddTrustedFriendFromLink(s17, t4)
-		end,
-		clear = function() -- line: 424
-			-- upvalues: v20 (copy), v21 (copy), v31 (copy), v32 (copy), FFlagConnectionManagementChips (copy), v22 (copy), v28 (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), v23 (copy), v33 (copy), v24 (copy), v34 (copy)
-			v20.clear()
-			v21.clear()
-			v31.clear()
-			v32.clear()
+		getUserTrustedConnections = fn5,
+		getTrustedFriendRequests = fn10,
+		getTrustedFriendRequestsCount = fn7,
+		loadMoreTrustedFriendRequests = fn8,
+		refetchTrustedFriendRequests = refetchTrustedFriendRequests,
+		refetchTrustedFriendRequestsCount = refetchTrustedFriendRequestsCount,
+		sendTrustedConnectionRequest = fn11,
+		acceptTrustedConnectionRequest = fn12,
+		ignoreTrustedConnectionRequest = fn13,
+		ignoreAllTrustedFriendRequests = fn14,
+		removeTrustedConnectionRequest = fn15,
+		createTrustedFriendLink = fn16,
+		validateTrustedFriendLink = fn17,
+		addTrustedFriendFromLink = fn18,
+		clear = function()
+			dataCache.clear()
+			dataCache2.clear()
+			dataResolver.clear()
+			dataResolver2.clear()
 
 			if FFlagConnectionManagementChips then
-				v22.clear()
-				v28.clear()
+				cache.clear()
+				v2.clear()
 			end
 
 			if FFlagAddFriendsPageTrustedFriendRequestSection then
-				v23.clear()
-				v33.clear()
-				v24.clear()
-				v34.clear()
+				cache2.clear()
+				v4.clear()
+				cache3.clear()
+				v5.clear()
 			end
 		end,
-		dispose = function() -- line: 443
-			-- upvalues: v20 (copy), v21 (copy), v31 (copy), v32 (copy), v29 (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), v30 (copy), FFlagConnectionManagementChips (copy), v22 (copy), v28 (copy), v23 (copy), v33 (copy), v24 (copy), v34 (copy)
-			v20.dispose()
-			v21.dispose()
-			v31.dispose()
-			v32.dispose()
-			v29()
+		dispose = function()
+			dataCache.dispose()
+			dataCache2.dispose()
+			dataResolver.dispose()
+			dataResolver2.dispose()
+			trustedConnectionEventListener()
 
 			if FFlagAddFriendsPageTrustedFriendRequestSection then
-				v30()
+				v3()
 			end
 
 			if FFlagConnectionManagementChips then
-				v22.dispose()
-				v28.dispose()
+				cache.dispose()
+				v2.dispose()
 			end
 
 			if FFlagAddFriendsPageTrustedFriendRequestSection then
-				v23.dispose()
-				v33.dispose()
-				v24.dispose()
-				v34.dispose()
+				cache2.dispose()
+				v4.dispose()
+				cache3.dispose()
+				v5.dispose()
 			end
 		end
 	}

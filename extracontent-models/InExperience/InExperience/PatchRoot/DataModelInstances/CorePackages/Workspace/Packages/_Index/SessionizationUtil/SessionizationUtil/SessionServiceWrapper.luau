@@ -1,66 +1,67 @@
-local Parent = script:FindFirstAncestor("SessionizationUtil").Parent
+local parent = script:FindFirstAncestor("SessionizationUtil").Parent
+
 local SessionService = game:GetService("SessionService")
+local AppCommonLib = require(parent.AppCommonLib)
+local SessionServiceWrapper = { SessionChangedSignal = AppCommonLib.Signal.new() }
 
-return {
-	SessionChangedSignal = require(Parent.AppCommonLib).Signal.new(),
-	GetRootSID = function(_) -- line: 15
-		-- upvalues: SessionService (copy)
-		return SessionService:GetRootSID()
-	end,
-	SetSession = function(p2, p3, p4, p5) -- line: 19
-		-- upvalues: SessionService (copy)
-		local SessionTag = SessionService:GetSessionTag(p4)
+function SessionServiceWrapper:GetRootSID()
+	return SessionService:GetRootSID()
+end
 
-		SessionService:SetSession(p3, p4, p5)
+function SessionServiceWrapper:SetSession(p, p2, p3)
+	local sessionTag = SessionService:GetSessionTag(p2)
 
-		local SessionTag2 = SessionService:GetSessionTag(p4)
+	SessionService:SetSession(p, p2, p3)
 
-		if SessionTag2 ~= SessionTag then
-			p2.SessionChangedSignal:fire(p4, SessionTag2)
-		end
-	end,
-	ReplaceSession = function(p6, p7, p8) -- line: 31
-		-- upvalues: SessionService (copy)
-		local SessionTag = SessionService:GetSessionTag(p7)
+	local sessionTag2 = SessionService:GetSessionTag(p2)
 
-		SessionService:ReplaceSession(p7, p8)
-
-		local SessionTag3 = SessionService:GetSessionTag(p7)
-
-		if SessionTag3 ~= SessionTag then
-			p6.SessionChangedSignal:fire(p7, SessionTag3)
-		end
-	end,
-	RemoveSession = function(_, p10) -- line: 43
-		-- upvalues: SessionService (copy)
-		SessionService:RemoveSession(p10)
-	end,
-	RemoveSessionsWithMetadataKey = function(_, p12) -- line: 47
-		-- upvalues: SessionService (copy)
-		SessionService:RemoveSessionsWithMetadataKey(p12)
-	end,
-	GetMetadata = function(_, p14, p15) -- line: 51
-		-- upvalues: SessionService (copy)
-		return SessionService:GetMetadata(p14, p15)
-	end,
-	SetMetadata = function(_, p17, p18, p19) -- line: 55
-		-- upvalues: SessionService (copy)
-		SessionService:SetMetadata(p17, p18, p19)
-	end,
-	RemoveMetadata = function(_, p21, p22) -- line: 59
-		-- upvalues: SessionService (copy)
-		SessionService:RemoveMetadata(p21, p22)
-	end,
-	SessionExists = function(_, p24) -- line: 63
-		-- upvalues: SessionService (copy)
-		return SessionService:SessionExists(p24)
-	end,
-	GetSessionTag = function(_, p26) -- line: 67
-		-- upvalues: SessionService (copy)
-		return SessionService:GetSessionTag(p26)
-	end,
-	generateSessionInfoString = function(_, p28, p29, p30, p31) -- line: 71
-		-- upvalues: SessionService (copy)
-		return SessionService:GenerateSessionInfoString(p28, p29, p30, p31)
+	if sessionTag2 ~= sessionTag then
+		self.SessionChangedSignal:fire(p2, sessionTag2)
 	end
-}
+end
+
+function SessionServiceWrapper:ReplaceSession(p, p2)
+	local sessionTag = SessionService:GetSessionTag(p)
+
+	SessionService:ReplaceSession(p, p2)
+
+	local sessionTag2 = SessionService:GetSessionTag(p)
+
+	if sessionTag2 ~= sessionTag then
+		self.SessionChangedSignal:fire(p, sessionTag2)
+	end
+end
+
+function SessionServiceWrapper:RemoveSession(p)
+	SessionService:RemoveSession(p)
+end
+
+function SessionServiceWrapper:RemoveSessionsWithMetadataKey(p)
+	SessionService:RemoveSessionsWithMetadataKey(p)
+end
+
+function SessionServiceWrapper:GetMetadata(p, p2)
+	return SessionService:GetMetadata(p, p2)
+end
+
+function SessionServiceWrapper:SetMetadata(p, p2, p3)
+	SessionService:SetMetadata(p, p2, p3)
+end
+
+function SessionServiceWrapper:RemoveMetadata(p, p2)
+	SessionService:RemoveMetadata(p, p2)
+end
+
+function SessionServiceWrapper:SessionExists(p)
+	return SessionService:SessionExists(p)
+end
+
+function SessionServiceWrapper:GetSessionTag(p)
+	return SessionService:GetSessionTag(p)
+end
+
+function SessionServiceWrapper.generateSessionInfoString(_, p, p2, p3, p4)
+	return SessionService:GenerateSessionInfoString(p, p2, p3, p4)
+end
+
+return SessionServiceWrapper

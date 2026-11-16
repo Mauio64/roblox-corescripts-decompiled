@@ -1,21 +1,22 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local v2 = require(Parent.AppCommonLib).Symbol.named("NilDependency")
+local parent = script:FindFirstAncestor("RoactUtils").Parent
 
-local function dependencyArray(...) -- line: 22
-	-- upvalues: v2 (copy)
-	local t1 = {}
+local AppCommonLib = require(parent.AppCommonLib)
+local named = AppCommonLib.Symbol.named("NilDependency")
+
+local function dependencyArray(...)
+	local result = {}
 
 	for i = 1, select("#", ...) do
-		local v6 = select(i, ...)
+		local v = select(i, ...)
 
-		if v6 == nil then
-			v6 = v2
+		if v == nil then
+			v = named
 		end
 
-		t1[i] = v6
+		result[i] = v
 	end
 
-	return t1
+	return result
 end
 
 return dependencyArray

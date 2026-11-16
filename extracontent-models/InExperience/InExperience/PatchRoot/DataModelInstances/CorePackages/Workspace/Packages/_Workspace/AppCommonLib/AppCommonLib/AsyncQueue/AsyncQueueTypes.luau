@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("AppCommonLib").Parent
-
-require(Parent.LuauPolyfill)
+local parent = script:FindFirstAncestor("AppCommonLib").Parent
+require(parent.LuauPolyfill)
 
 return nil

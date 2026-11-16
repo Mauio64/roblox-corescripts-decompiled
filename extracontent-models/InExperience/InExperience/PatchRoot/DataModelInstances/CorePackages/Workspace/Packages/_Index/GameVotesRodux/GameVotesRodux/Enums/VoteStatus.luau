@@ -1,5 +1,1 @@
-return {
-	VotedUp = "VotedUp",
-	VotedDown = "VotedDown",
-	NotVoted = "NotVoted"
-}
+return { VotedUp = "VotedUp", VotedDown = "VotedDown", NotVoted = "NotVoted" }

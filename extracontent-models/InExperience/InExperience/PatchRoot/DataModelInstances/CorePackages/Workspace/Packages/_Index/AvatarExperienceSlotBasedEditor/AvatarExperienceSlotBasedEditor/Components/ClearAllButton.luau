@@ -1,51 +1,77 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 local Constants = require(script.Parent.Parent.Constants)
-local FoundationText = Foundation.Text
-local FFlagAXMigrateBuilderIcons = require(Parent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
+local Text = Foundation.Text
 
-local function ClearCategoryButton(t1: {[any]: any}) -- line: 33
-	-- upvalues: useTokens (copy), React (copy), Icon (copy), FFlagAXMigrateBuilderIcons (copy), Constants (copy), IconSize (copy), FoundationText (copy)
-	local v12 = useTokens()
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
 
-	return React.createElement("Frame", {
+local function ClearCategoryButton(props)
+	local v = useTokens()
+
+	local createElement = React.createElement
+	local v2 = {
+		Size = props.Size or UDim2.fromOffset(v.Size.Size_2500, v.Size.Size_2500),
 		BackgroundTransparency = 1,
-		Size = t1.Size or UDim2.fromOffset(v12.Size.Size_2500, v12.Size.Size_2500),
-		LayoutOrder = t1.LayoutOrder,
+		LayoutOrder = props.LayoutOrder,
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5)
-	}, { React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1)
-	}, {
+	}
+
+	local createElement2 = React.createElement
+	local v3 = { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) }
+	local v4 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, -v12.Padding.XSmall)
+			Padding = UDim.new(0, -v.Padding.XSmall)
 		}),
-		Icon = React.createElement(Icon, {
-			name = if not FFlagAXMigrateBuilderIcons then Constants.Icons.Reset else Constants.Icons.Reset.name,
-			variant = if not FFlagAXMigrateBuilderIcons then nil else Constants.Icons.Reset.variant,
-			size = IconSize.Medium,
-			style = {
-				Transparency = 0,
-				Color3 = v12.Color.Content.Muted.Color3
-			}
-		}),
-		Text = if not t1.text then nil else React.createElement(FoundationText, {
+		Icon = 0,
+		Text = 0
+	}
+
+	local createElement3 = React.createElement
+	local name
+
+	if FFlagAXMigrateBuilderIcons then
+		name = Constants.Icons.Reset.name
+	else
+		name = Constants.Icons.Reset
+	end
+
+	local variant
+
+	if FFlagAXMigrateBuilderIcons then
+		variant = Constants.Icons.Reset.variant
+	end
+
+	v4.Icon = createElement3(Icon, {
+		name = name,
+		variant = variant,
+		size = IconSize.Medium,
+		style = { Color3 = v.Color.Content.Muted.Color3, Transparency = 0 }
+	})
+	local text
+
+	if props.text then
+		text = React.createElement(Text, {
+			Size = props.textStyles and props.textStyles.Size or UDim2.fromScale(1, 0),
+			Text = props.text,
 			TextWrapped = true,
-			Size = t1.textStyles and t1.textStyles.Size or UDim2.fromScale(1, 0),
-			Text = t1.text,
 			AutomaticSize = Enum.AutomaticSize.Y,
-			fontStyle = t1.textStyles and t1.textStyles.fontStyle or v12.Typography.CaptionMedium,
-			padding = UDim.new(0, v12.Padding.Small)
+			fontStyle = props.textStyles and props.textStyles.fontStyle or v.Typography.CaptionMedium,
+			padding = UDim.new(0, v.Padding.Small)
 		})
-	}) })
+	end
+
+	v4.Text = text
+	return createElement("Frame", v2, { createElement2("Frame", v3, v4) })
 end
 
 return ClearCategoryButton

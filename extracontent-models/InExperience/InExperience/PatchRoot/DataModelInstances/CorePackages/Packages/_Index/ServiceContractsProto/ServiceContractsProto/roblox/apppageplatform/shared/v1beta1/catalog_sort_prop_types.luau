@@ -1,3098 +1,2928 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
+
+local v = {}
+
 local background_layer = require(script.Parent.background_layer)
 local catalog_sort_data = require(script.Parent.catalog_sort_data)
 local hydration_data_spec = require(script.Parent.hydration_data_spec)
 local prop_condition = require(script.Parent.prop_condition)
 local prop_types = require(script.Parent.prop_types)
-local t2 = {}
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.new(t3: {[any]: any}?) -- line: 689
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		content_type = if t3 ~= nil and t3.content_type ~= nil then t3.content_type else nil
-	}, t2))
-end
-function t2.encode(p1) -- line: 695
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
+function class.new(p)
+	local content_type
 
-	if p1.content_type ~= nil then
-		local v35 = p1.content_type:encode()
-		local v36, v37 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v36, v37, v35, buffer.len(v35))
+	if not (p == nil or p.content_type == nil) then
+		content_type = p.content_type
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	return (setmetatable({ content_type = content_type }, class))
 end
-function t2.decode(p2: buffer) -- line: 710
-	-- upvalues: t2 (copy), proto (copy), prop_types (copy)
-	local v40 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v42, v43
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		v42, v43, n2 = proto.readTag(p2, n2)
+	if self.content_type ~= nil then
+		local encoded = self.content_type:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-		if v43 == proto.wireTypes.varint then
-			local v44
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
 
-			v44, n2 = proto.readVarInt(p2, n2)
-		elseif v43 == proto.wireTypes.lengthDelimited then
-			if v42 == 1 then
-				local v45
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-				v45, n2 = proto.readBuffer(p2, n2)
-				v40.content_type = prop_types.StringProp.decode(v45)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.content_type = prop_types.StringProp.decode(v5)
 			else
-				local v46, v47 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v47 + v46
+				v2 = v5 + varInt
 			end
-		elseif v43 == proto.wireTypes.i32 then
-			local v48
-
-			v48, n2 = proto.readFixed32(p2, n2)
-		elseif v43 == proto.wireTypes.i64 then
-			local v49
-
-			v49, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v43)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v40
-end
-function t2.jsonEncode(p3) -- line: 753
-	local t4 = {}
-
-	if p3.content_type ~= nil then
-		t4.contentType = p3.content_type:jsonEncode()
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 763
-	-- upvalues: t2 (copy), prop_types (copy)
-	local v53 = t2.new()
-
-	if t5.content_type ~= nil then
-		v53.content_type = prop_types.StringProp.jsonDecode(t5.content_type)
-	end
-
-	if t5.contentType ~= nil then
-		v53.content_type = prop_types.StringProp.jsonDecode(t5.contentType)
-	end
-
-	return v53
+	return result
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.content_type ~= nil then
+		v2.contentType = self.content_type:jsonEncode()
+	end
+
+	return v2
+end
+
+function class.jsonDecode(p)
+	local v2 = class.new()
+
+	if p.content_type ~= nil then
+		v2.content_type = prop_types.StringProp.jsonDecode(p.content_type)
+	end
+
+	if p.contentType ~= nil then
+		v2.content_type = prop_types.StringProp.jsonDecode(p.contentType)
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "ItemFooter",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ItemFooter"
 }
-t1.ItemFooter = t2
-typeRegistry.default:register(t1.ItemFooter)
 
-local t6 = {}
+v.ItemFooter = class
 
-t6.__index = t6
+typeRegistry.default:register(v.ItemFooter)
 
-function t6.new(t7: {[any]: any}?) -- line: 793
-	-- upvalues: t6 (copy)
-	return (setmetatable({
-		kind = if t7 ~= nil and t7.kind ~= nil then t7.kind else nil
-	}, t6))
+local class2 = {}
+class2.__index = class2
+
+function class2.new(p)
+	local kind
+
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
+
+	return (setmetatable({ kind = kind }, class2))
 end
-function t6.encode(p4) -- line: 799
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n3 = 0
 
-	if p4.kind ~= nil then
-		if p4.kind.type == "literal" then
-			local v58 = p4.kind.value:encode()
-			local v59, v60 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n3 = proto.writeBuffer(v59, v60, v58, buffer.len(v58))
-		elseif p4.kind.type == "binding_path" then
-			local v61, v62 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n3 = proto.writeString(v61, v62, p4.kind.value)
-		elseif p4.kind.type == "conditional" then
-			local v63 = p4.kind.value:encode()
-			local v64, v65 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n3 = proto.writeBuffer(v64, v65, v63, buffer.len(v63))
-		elseif p4.kind.type == "array_map" then
-			local v66 = p4.kind.value:encode()
-			local v67, v68 = proto.writeTag(buf, n3, 4, proto.wireTypes.lengthDelimited)
-
-			buf, n3 = proto.writeBuffer(v67, v68, v66, buffer.len(v66))
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
+		elseif self.kind.type == "conditional" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "array_map" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf3 = buffer.create(n3)
-
-	buffer.copy(buf3, 0, buf, 0, n3)
-
-	return buf3
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t6.decode(p5: buffer) -- line: 827
-	-- upvalues: t6 (copy), proto (copy), t1 (copy)
-	local v71 = t6.new()
-	local n4 = 0
 
-	while n4 < buffer.len(p5) do
-		local v73, v74
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
 
-		v73, v74, n4 = proto.readTag(p5, n4)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v74 == proto.wireTypes.varint then
-			local v75
-
-			v75, n4 = proto.readVarInt(p5, n4)
-		elseif v74 == proto.wireTypes.lengthDelimited then
-			if v73 == 1 then
-				local v76
-
-				v76, n4 = proto.readBuffer(p5, n4)
-				v71.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "literal",
-					value = t1.ArrayOfItemFooterProp_ArrayOfItemFooter.decode(v76)
+					value = v.ArrayOfItemFooterProp_ArrayOfItemFooter.decode(v5)
 				}
-			elseif v73 == 2 then
-				local v77
-
-				v77, n4 = proto.readBuffer(p5, n4)
-				v71.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v77)
-				}
-			elseif v73 == 3 then
-				local v78
-
-				v78, n4 = proto.readBuffer(p5, n4)
-				v71.kind = {
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "conditional",
-					value = t1.ArrayOfItemFooterProp_ConditionalOptions.decode(v78)
+					value = v.ArrayOfItemFooterProp_ConditionalOptions.decode(v5)
 				}
-			elseif v73 == 4 then
-				local v79
-
-				v79, n4 = proto.readBuffer(p5, n4)
-				v71.kind = {
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "array_map",
-					value = t1.ArrayOfItemFooterProp_ArrayMap.decode(v79)
+					value = v.ArrayOfItemFooterProp_ArrayMap.decode(v5)
 				}
 			else
-				local v80, v81 = proto.readVarInt(p5, n4)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n4 = v81 + v80
+				v2 = v5 + varInt
 			end
-		elseif v74 == proto.wireTypes.i32 then
-			local v82
-
-			v82, n4 = proto.readFixed32(p5, n4)
-		elseif v74 == proto.wireTypes.i64 then
-			local v83
-
-			v83, n4 = proto.readFixed64(p5, n4)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v74)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v71
+	return result
 end
-function t6.jsonEncode(p6) -- line: 889
-	local t8 = {}
 
-	if p6.kind ~= nil then
-		if p6.kind.type == "literal" then
-			t8.literal = p6.kind.value:jsonEncode()
+function class2:jsonEncode()
+	local v2 = {}
 
-			return t8
-		end
-
-		if p6.kind.type == "binding_path" then
-			t8.bindingPath = p6.kind.value
-
-			return t8
-		end
-
-		if p6.kind.type == "conditional" then
-			t8.conditional = p6.kind.value:jsonEncode()
-
-			return t8
-		end
-
-		if p6.kind.type == "array_map" then
-			t8.arrayMap = p6.kind.value:jsonEncode()
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t8
-end
-function t6.jsonDecode(t9: {[any]: any}) -- line: 907
-	-- upvalues: t6 (copy), t1 (copy)
-	local v87 = t6.new()
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	end
 
-	if t9.literal ~= nil then
-		v87.kind = {
+	if self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+		return v2
+	end
+
+	if self.kind.type == "conditional" then
+		v2.conditional = self.kind.value:jsonEncode()
+		return v2
+	end
+
+	if self.kind.type == "array_map" then
+		v2.arrayMap = self.kind.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class2.jsonDecode(data)
+	local v2 = class2.new()
+
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.ArrayOfItemFooterProp_ArrayOfItemFooter.jsonDecode(t9.literal)
+			value = v.ArrayOfItemFooterProp_ArrayOfItemFooter.jsonDecode(data.literal)
 		}
 	end
 
-	if t9.binding_path ~= nil then
-		v87.kind = {
-			type = "binding_path",
-			value = t9.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t9.bindingPath ~= nil then
-		v87.kind = {
-			type = "binding_path",
-			value = t9.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	if t9.conditional ~= nil then
-		v87.kind = {
+	if data.conditional ~= nil then
+		v2.kind = {
 			type = "conditional",
-			value = t1.ArrayOfItemFooterProp_ConditionalOptions.jsonDecode(t9.conditional)
+			value = v.ArrayOfItemFooterProp_ConditionalOptions.jsonDecode(data.conditional)
 		}
 	end
 
-	if t9.array_map ~= nil then
-		v87.kind = {
+	if data.array_map ~= nil then
+		v2.kind = {
 			type = "array_map",
-			value = t1.ArrayOfItemFooterProp_ArrayMap.jsonDecode(t9.array_map)
+			value = v.ArrayOfItemFooterProp_ArrayMap.jsonDecode(data.array_map)
 		}
 	end
 
-	if t9.arrayMap ~= nil then
-		v87.kind = {
+	if data.arrayMap ~= nil then
+		v2.kind = {
 			type = "array_map",
-			value = t1.ArrayOfItemFooterProp_ArrayMap.jsonDecode(t9.arrayMap)
+			value = v.ArrayOfItemFooterProp_ArrayMap.jsonDecode(data.arrayMap)
 		}
 	end
 
-	return v87
+	return v2
 end
 
-t6.descriptor = {
+class2.descriptor = {
 	name = "ArrayOfItemFooterProp",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfItemFooterProp"
 }
-t1.ArrayOfItemFooterProp = t6
-typeRegistry.default:register(t1.ArrayOfItemFooterProp)
 
-local t10 = {}
+v.ArrayOfItemFooterProp = class2
 
-t10.__index = t10
+typeRegistry.default:register(v.ArrayOfItemFooterProp)
 
-function t10.new(t11: {[any]: any}?) -- line: 957
-	-- upvalues: t10 (copy)
-	return (setmetatable({
-		condition = if t11 ~= nil and t11.condition ~= nil then t11.condition else nil,
-		kind = if t11 ~= nil and t11.kind ~= nil then t11.kind else nil
-	}, t10))
-end
-function t10.encode(p7) -- line: 966
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n5 = 0
+local class3 = {}
+class3.__index = class3
 
-	if p7.condition ~= nil then
-		local v92 = p7.condition:encode()
-		local v93, v94 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+function class3.new(p)
+	local condition
 
-		buf, n5 = proto.writeBuffer(v93, v94, v92, buffer.len(v92))
+	if not (p == nil or p.condition == nil) then
+		condition = p.condition
 	end
 
-	if p7.kind ~= nil then
-		if p7.kind.type == "literal" then
-			local v95 = p7.kind.value:encode()
-			local v96, v97 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
+	local kind
 
-			buf, n5 = proto.writeBuffer(v96, v97, v95, buffer.len(v95))
-		elseif p7.kind.type == "binding_path" then
-			local v98, v99 = proto.writeTag(buf, n5, 3, proto.wireTypes.lengthDelimited)
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
 
-			buf, n5 = proto.writeString(v98, v99, p7.kind.value)
+	return (setmetatable({ condition = condition, kind = kind }, class3))
+end
+
+function class3:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.condition ~= nil then
+		local encoded = self.condition:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
 		end
 	end
 
-	local buf4 = buffer.create(n5)
-
-	buffer.copy(buf4, 0, buf, 0, n5)
-
-	return buf4
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t10.decode(p8: buffer) -- line: 992
-	-- upvalues: t10 (copy), proto (copy), prop_condition (copy), t1 (copy)
-	local v102 = t10.new()
-	local n6 = 0
 
-	while n6 < buffer.len(p8) do
-		local v104, v105
+function class3.decode(buf: buffer)
+	local result = class3.new()
+	local v2 = 0
 
-		v104, v105, n6 = proto.readTag(p8, n6)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v105 == proto.wireTypes.varint then
-			local v106
-
-			v106, n6 = proto.readVarInt(p8, n6)
-		elseif v105 == proto.wireTypes.lengthDelimited then
-			if v104 == 1 then
-				local v107
-
-				v107, n6 = proto.readBuffer(p8, n6)
-				v102.condition = prop_condition.PropCondition.decode(v107)
-			elseif v104 == 2 then
-				local v108
-
-				v108, n6 = proto.readBuffer(p8, n6)
-				v102.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.condition = prop_condition.PropCondition.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "literal",
-					value = t1.ArrayOfItemFooterProp_ArrayOfItemFooter.decode(v108)
+					value = v.ArrayOfItemFooterProp_ArrayOfItemFooter.decode(v5)
 				}
-			elseif v104 == 3 then
-				local v109
-
-				v109, n6 = proto.readBuffer(p8, n6)
-				v102.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v109)
-				}
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
 			else
-				local v110, v111 = proto.readVarInt(p8, n6)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n6 = v111 + v110
+				v2 = v5 + varInt
 			end
-		elseif v105 == proto.wireTypes.i32 then
-			local v112
-
-			v112, n6 = proto.readFixed32(p8, n6)
-		elseif v105 == proto.wireTypes.i64 then
-			local v113
-
-			v113, n6 = proto.readFixed64(p8, n6)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v105)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v102
+	return result
 end
-function t10.jsonEncode(p9) -- line: 1046
-	local t12 = {}
 
-	if p9.condition ~= nil then
-		t12.condition = p9.condition:jsonEncode()
+function class3:jsonEncode()
+	local v2 = {}
+
+	if self.condition ~= nil then
+		v2.condition = self.condition:jsonEncode()
 	end
 
-	if p9.kind ~= nil then
-		if p9.kind.type == "literal" then
-			t12.literal = p9.kind.value:jsonEncode()
-
-			return t12
-		end
-
-		if p9.kind.type == "binding_path" then
-			t12.bindingPath = p9.kind.value
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t12
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	elseif self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+	end
+
+	return v2
 end
-function t10.jsonDecode(t13: {[any]: any}) -- line: 1064
-	-- upvalues: t10 (copy), prop_condition (copy), t1 (copy)
-	local v117 = t10.new()
 
-	if t13.condition ~= nil then
-		v117.condition = prop_condition.PropCondition.jsonDecode(t13.condition)
+function class3.jsonDecode(data)
+	local v2 = class3.new()
+
+	if data.condition ~= nil then
+		v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
 	end
 
-	if t13.literal ~= nil then
-		v117.kind = {
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.ArrayOfItemFooterProp_ArrayOfItemFooter.jsonDecode(t13.literal)
+			value = v.ArrayOfItemFooterProp_ArrayOfItemFooter.jsonDecode(data.literal)
 		}
 	end
 
-	if t13.binding_path ~= nil then
-		v117.kind = {
-			type = "binding_path",
-			value = t13.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t13.bindingPath ~= nil then
-		v117.kind = {
-			type = "binding_path",
-			value = t13.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	return v117
+	return v2
 end
 
-t10.descriptor = {
+class3.descriptor = {
 	name = "ArrayOfItemFooterProp_ConditionalOption",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 }
-t1.ArrayOfItemFooterProp_ConditionalOption = t10
-typeRegistry.default:register(t1.ArrayOfItemFooterProp_ConditionalOption)
 
-local t14 = {}
+v.ArrayOfItemFooterProp_ConditionalOption = class3
 
-t14.__index = t14
+typeRegistry.default:register(v.ArrayOfItemFooterProp_ConditionalOption)
 
-function t14.new(t15: {[any]: any}?) -- line: 1104
-	-- upvalues: t14 (copy)
+local class4 = {}
+class4.__index = class4
+
+function class4.new(p)
 	return (setmetatable({
-		options = if t15 ~= nil and t15.options ~= nil then t15.options else {}
-	}, t14))
+		options = (p == nil or p.options == nil) and {} or p.options
+	}, class4))
 end
-function t14.encode(p10) -- line: 1112
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n7 = 0
 
-	if p10.options ~= nil and #p10.options > 0 then
-		for _, v123 in p10.options do
-			local v124 = v123:encode()
-			local v125, v126 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+function class4:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n7 = proto.writeBuffer(v125, v126, v124, buffer.len(v124))
+	if self.options ~= nil and #self.options > 0 then
+		for _, option in self.options do
+			local encoded = option:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf5 = buffer.create(n7)
-
-	buffer.copy(buf5, 0, buf, 0, n7)
-
-	return buf5
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t14.decode(p11: buffer) -- line: 1131
-	-- upvalues: t14 (copy), proto (copy), t1 (copy)
-	local v129 = t14.new()
-	local n8 = 0
 
-	while n8 < buffer.len(p11) do
-		local v131, v132
+function class4.decode(buf: buffer)
+	local v2 = class4.new()
+	local v3 = 0
 
-		v131, v132, n8 = proto.readTag(p11, n8)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v132 == proto.wireTypes.varint then
-			local v133
-
-			v133, n8 = proto.readVarInt(p11, n8)
-		elseif v132 == proto.wireTypes.lengthDelimited then
-			if v131 == 1 then
-				local v134
-
-				v134, n8 = proto.readBuffer(p11, n8)
-				table.insert(v129.options, t1.ArrayOfItemFooterProp_ConditionalOption.decode(v134))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.options, v.ArrayOfItemFooterProp_ConditionalOption.decode(v6))
 			else
-				local v135, v136 = proto.readVarInt(p11, n8)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n8 = v136 + v135
+				v3 = v6 + varInt
 			end
-		elseif v132 == proto.wireTypes.i32 then
-			local v137
-
-			v137, n8 = proto.readFixed32(p11, n8)
-		elseif v132 == proto.wireTypes.i64 then
-			local v138
-
-			v138, n8 = proto.readFixed64(p11, n8)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v132)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v129
+	return v2
 end
-function t14.jsonEncode(p12) -- line: 1176
-	local t16 = {}
 
-	if p12.options ~= nil and #p12.options > 0 then
-		local t17 = {}
+function class4:jsonEncode()
+	local v2 = {}
 
-		for _, v143 in p12.options do
-			table.insert(t17, v143:jsonEncode())
-		end
-
-		t16.options = t17
+	if self.options == nil or not (#self.options > 0) then
+		return v2
 	end
 
-	return t16
-end
-function t14.jsonDecode(t18: {[any]: any}) -- line: 1192
-	-- upvalues: t14 (copy), t1 (copy)
-	local v145 = t14.new()
+	local options = {}
 
-	if t18.options ~= nil then
-		local t19 = {}
-
-		for _, v148 in t18.options do
-			table.insert(t19, t1.ArrayOfItemFooterProp_ConditionalOption.jsonDecode(v148))
-		end
-
-		v145.options = t19
+	for _, option in self.options do
+		table.insert(options, option:jsonEncode())
 	end
 
-	return v145
+	v2.options = options
+
+	return v2
 end
 
-t14.descriptor = {
+function class4.jsonDecode(p)
+	local v2 = class4.new()
+
+	if p.options == nil then
+		return v2
+	end
+
+	local options = {}
+
+	for _, option in p.options do
+		table.insert(options, v.ArrayOfItemFooterProp_ConditionalOption.jsonDecode(option))
+	end
+
+	v2.options = options
+
+	return v2
+end
+
+class4.descriptor = {
 	name = "ArrayOfItemFooterProp_ConditionalOptions",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 }
-t1.ArrayOfItemFooterProp_ConditionalOptions = t14
-typeRegistry.default:register(t1.ArrayOfItemFooterProp_ConditionalOptions)
 
-local t20 = {}
+v.ArrayOfItemFooterProp_ConditionalOptions = class4
 
-t20.__index = t20
+typeRegistry.default:register(v.ArrayOfItemFooterProp_ConditionalOptions)
 
-function t20.new(t21: {[any]: any}?) -- line: 1223
-	-- upvalues: t20 (copy)
+local class5 = {}
+class5.__index = class5
+
+function class5.new(p)
 	return (setmetatable({
-		array = if t21 ~= nil and t21.array ~= nil then t21.array else {}
-	}, t20))
+		array = (p == nil or p.array == nil) and {} or p.array
+	}, class5))
 end
-function t20.encode(p13) -- line: 1231
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n9 = 0
 
-	if p13.array ~= nil and #p13.array > 0 then
-		for _, v154 in p13.array do
-			local v155 = v154:encode()
-			local v156, v157 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
+function class5:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n9 = proto.writeBuffer(v156, v157, v155, buffer.len(v155))
+	if self.array ~= nil and #self.array > 0 then
+		for _, item in self.array do
+			local encoded = item:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf6 = buffer.create(n9)
-
-	buffer.copy(buf6, 0, buf, 0, n9)
-
-	return buf6
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t20.decode(p14: buffer) -- line: 1248
-	-- upvalues: t20 (copy), proto (copy), t1 (copy)
-	local v160 = t20.new()
-	local n10 = 0
 
-	while n10 < buffer.len(p14) do
-		local v162, v163
+function class5.decode(buf: buffer)
+	local v2 = class5.new()
+	local v3 = 0
 
-		v162, v163, n10 = proto.readTag(p14, n10)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v163 == proto.wireTypes.varint then
-			local v164
-
-			v164, n10 = proto.readVarInt(p14, n10)
-		elseif v163 == proto.wireTypes.lengthDelimited then
-			if v162 == 1 then
-				local v165
-
-				v165, n10 = proto.readBuffer(p14, n10)
-				table.insert(v160.array, t1.ItemFooter.decode(v165))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.array, v.ItemFooter.decode(v6))
 			else
-				local v166, v167 = proto.readVarInt(p14, n10)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n10 = v167 + v166
+				v3 = v6 + varInt
 			end
-		elseif v163 == proto.wireTypes.i32 then
-			local v168
-
-			v168, n10 = proto.readFixed32(p14, n10)
-		elseif v163 == proto.wireTypes.i64 then
-			local v169
-
-			v169, n10 = proto.readFixed64(p14, n10)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v163)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v160
+	return v2
 end
-function t20.jsonEncode(p15) -- line: 1291
-	local t22 = {}
 
-	if p15.array ~= nil and #p15.array > 0 then
-		local t23 = {}
+function class5:jsonEncode()
+	local v2 = {}
 
-		for _, v174 in p15.array do
-			table.insert(t23, v174:jsonEncode())
-		end
-
-		t22.array = t23
+	if self.array == nil or not (#self.array > 0) then
+		return v2
 	end
 
-	return t22
-end
-function t20.jsonDecode(t24: {[any]: any}) -- line: 1305
-	-- upvalues: t20 (copy), t1 (copy)
-	local v176 = t20.new()
+	local array = {}
 
-	if t24.array ~= nil then
-		local t25 = {}
-
-		for _, v179 in t24.array do
-			table.insert(t25, t1.ItemFooter.jsonDecode(v179))
-		end
-
-		v176.array = t25
+	for _, item in self.array do
+		table.insert(array, item:jsonEncode())
 	end
 
-	return v176
+	v2.array = array
+
+	return v2
 end
 
-t20.descriptor = {
+function class5.jsonDecode(p)
+	local v2 = class5.new()
+
+	if p.array == nil then
+		return v2
+	end
+
+	local array = {}
+
+	for _, item in p.array do
+		table.insert(array, v.ItemFooter.jsonDecode(item))
+	end
+
+	v2.array = array
+
+	return v2
+end
+
+class5.descriptor = {
 	name = "ArrayOfItemFooterProp_ArrayOfItemFooter",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfItemFooter"
 }
-t1.ArrayOfItemFooterProp_ArrayOfItemFooter = t20
-typeRegistry.default:register(t1.ArrayOfItemFooterProp_ArrayOfItemFooter)
 
-local t26 = {}
+v.ArrayOfItemFooterProp_ArrayOfItemFooter = class5
 
-t26.__index = t26
+typeRegistry.default:register(v.ArrayOfItemFooterProp_ArrayOfItemFooter)
 
-function t26.new(t27: {[any]: any}?) -- line: 1336
-	-- upvalues: t26 (copy)
-	return (setmetatable({
-		kind = if t27 ~= nil and t27.kind ~= nil then t27.kind else nil,
-		item_hydration_specs = if t27 ~= nil and t27.item_hydration_specs ~= nil then t27.item_hydration_specs else {},
-		field_map = if t27 ~= nil and t27.field_map ~= nil then t27.field_map else nil
-	}, t26))
+local class6 = {}
+class6.__index = class6
+
+function class6.new(data)
+	local kind
+
+	if not (data == nil or data.kind == nil) then
+		kind = data.kind
+	end
+
+	local v2 = {
+		kind = kind,
+		item_hydration_specs = (data == nil or data.item_hydration_specs == nil) and {} or data.item_hydration_specs,
+		field_map = 0
+	}
+	local field_map
+
+	if not (data == nil or data.field_map == nil) then
+		field_map = data.field_map
+	end
+
+	v2.field_map = field_map
+	return (setmetatable(v2, class6))
 end
-function t26.encode(p16) -- line: 1348
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n11 = 0
 
-	if p16.kind ~= nil then
-		if p16.kind.type == "binding_path" then
-			local v184, v185 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
+function class6:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n11 = proto.writeString(v184, v185, p16.kind.value)
-		elseif p16.kind.type == "literal" then
-			local v186 = p16.kind.value:encode()
-			local v187, v188 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n11 = proto.writeBuffer(v187, v188, v186, buffer.len(v186))
+	if self.kind ~= nil then
+		if self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
+		elseif self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	if p16.item_hydration_specs ~= nil and #p16.item_hydration_specs > 0 then
-		for _, v190 in p16.item_hydration_specs do
-			local v191 = v190:encode()
-			local v192, v193 = proto.writeTag(buf, n11, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n11 = proto.writeBuffer(v192, v193, v191, buffer.len(v191))
+	if self.item_hydration_specs ~= nil and #self.item_hydration_specs > 0 then
+		for _, item_hydration_spec in self.item_hydration_specs do
+			local encoded = item_hydration_spec:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	if p16.field_map ~= nil then
-		local v194 = p16.field_map:encode()
-		local v195, v196 = proto.writeTag(buf, n11, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n11 = proto.writeBuffer(v195, v196, v194, buffer.len(v194))
+	if self.field_map ~= nil then
+		local encoded = self.field_map:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf7 = buffer.create(n11)
-
-	buffer.copy(buf7, 0, buf, 0, n11)
-
-	return buf7
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t26.decode(p17: buffer) -- line: 1382
-	-- upvalues: t26 (copy), proto (copy), t1 (copy), hydration_data_spec (copy)
-	local v199 = t26.new()
-	local n12 = 0
 
-	while n12 < buffer.len(p17) do
-		local v201, v202
+function class6.decode(buf: buffer)
+	local result = class6.new()
+	local v2 = 0
 
-		v201, v202, n12 = proto.readTag(p17, n12)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v202 == proto.wireTypes.varint then
-			local v203
-
-			v203, n12 = proto.readVarInt(p17, n12)
-		elseif v202 == proto.wireTypes.lengthDelimited then
-			if v201 == 1 then
-				local v204
-
-				v204, n12 = proto.readBuffer(p17, n12)
-				v199.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v204)
-				}
-			elseif v201 == 2 then
-				local v205
-
-				v205, n12 = proto.readBuffer(p17, n12)
-				v199.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "literal",
-					value = t1.ArrayOfItemFooterProp_ArrayMap_LiteralItems.decode(v205)
+					value = v.ArrayOfItemFooterProp_ArrayMap_LiteralItems.decode(v5)
 				}
-			elseif v201 == 3 then
-				local v206
-
-				v206, n12 = proto.readBuffer(p17, n12)
-				table.insert(v199.item_hydration_specs, hydration_data_spec.HydrationDataSpec.decode(v206))
-			elseif v201 == 4 then
-				local v207
-
-				v207, n12 = proto.readBuffer(p17, n12)
-				v199.field_map = t1.ItemFooter.decode(v207)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.item_hydration_specs, hydration_data_spec.HydrationDataSpec.decode(v5))
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.field_map = v.ItemFooter.decode(v5)
 			else
-				local v208, v209 = proto.readVarInt(p17, n12)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n12 = v209 + v208
+				v2 = v5 + varInt
 			end
-		elseif v202 == proto.wireTypes.i32 then
-			local v210
-
-			v210, n12 = proto.readFixed32(p17, n12)
-		elseif v202 == proto.wireTypes.i64 then
-			local v211
-
-			v211, n12 = proto.readFixed64(p17, n12)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v202)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v199
+	return result
 end
-function t26.jsonEncode(p18) -- line: 1444
-	local t28 = {}
 
-	if p18.kind ~= nil then
-		if p18.kind.type == "binding_path" then
-			t28.bindingPath = p18.kind.value
-		elseif p18.kind.type == "literal" then
-			t28.literal = p18.kind.value:jsonEncode()
+function class6:jsonEncode()
+	local v2 = {}
+
+	if self.kind ~= nil then
+		if self.kind.type == "binding_path" then
+			v2.bindingPath = self.kind.value
+		elseif self.kind.type == "literal" then
+			v2.literal = self.kind.value:jsonEncode()
 		end
 	end
 
-	if p18.item_hydration_specs ~= nil and #p18.item_hydration_specs > 0 then
-		local t29 = {}
+	if self.item_hydration_specs ~= nil and #self.item_hydration_specs > 0 then
+		local itemHydrationSpecs = {}
 
-		for _, v216 in p18.item_hydration_specs do
-			table.insert(t29, v216:jsonEncode())
+		for _, item_hydration_spec in self.item_hydration_specs do
+			table.insert(itemHydrationSpecs, item_hydration_spec:jsonEncode())
 		end
 
-		t28.itemHydrationSpecs = t29
+		v2.itemHydrationSpecs = itemHydrationSpecs
 	end
 
-	if p18.field_map ~= nil then
-		t28.fieldMap = p18.field_map:jsonEncode()
+	if self.field_map ~= nil then
+		v2.fieldMap = self.field_map:jsonEncode()
 	end
 
-	return t28
+	return v2
 end
-function t26.jsonDecode(t30: {[any]: any}) -- line: 1470
-	-- upvalues: t26 (copy), t1 (copy), hydration_data_spec (copy)
-	local v218 = t26.new()
 
-	if t30.binding_path ~= nil then
-		v218.kind = {
-			type = "binding_path",
-			value = t30.binding_path
-		}
+function class6.jsonDecode(data)
+	local v2 = class6.new()
+
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t30.bindingPath ~= nil then
-		v218.kind = {
-			type = "binding_path",
-			value = t30.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	if t30.literal ~= nil then
-		v218.kind = {
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.ArrayOfItemFooterProp_ArrayMap_LiteralItems.jsonDecode(t30.literal)
+			value = v.ArrayOfItemFooterProp_ArrayMap_LiteralItems.jsonDecode(data.literal)
 		}
 	end
 
-	if t30.item_hydration_specs ~= nil then
-		local t31 = {}
+	if data.item_hydration_specs ~= nil then
+		local item_hydration_specs = {}
 
-		for _, v221 in t30.item_hydration_specs do
-			table.insert(t31, hydration_data_spec.HydrationDataSpec.jsonDecode(v221))
+		for _, item_hydration_spec in data.item_hydration_specs do
+			table.insert(item_hydration_specs, hydration_data_spec.HydrationDataSpec.jsonDecode(item_hydration_spec))
 		end
 
-		v218.item_hydration_specs = t31
+		v2.item_hydration_specs = item_hydration_specs
 	end
 
-	if t30.itemHydrationSpecs ~= nil then
-		local t32 = {}
+	if data.itemHydrationSpecs ~= nil then
+		local item_hydration_specs = {}
 
-		for _, v224 in t30.itemHydrationSpecs do
-			table.insert(t32, hydration_data_spec.HydrationDataSpec.jsonDecode(v224))
+		for _, itemHydrationSpec in data.itemHydrationSpecs do
+			table.insert(item_hydration_specs, hydration_data_spec.HydrationDataSpec.jsonDecode(itemHydrationSpec))
 		end
 
-		v218.item_hydration_specs = t32
+		v2.item_hydration_specs = item_hydration_specs
 	end
 
-	if t30.field_map ~= nil then
-		v218.field_map = t1.ItemFooter.jsonDecode(t30.field_map)
+	if data.field_map ~= nil then
+		v2.field_map = v.ItemFooter.jsonDecode(data.field_map)
 	end
 
-	if t30.fieldMap ~= nil then
-		v218.field_map = t1.ItemFooter.jsonDecode(t30.fieldMap)
+	if data.fieldMap ~= nil then
+		v2.field_map = v.ItemFooter.jsonDecode(data.fieldMap)
 	end
 
-	return v218
+	return v2
 end
 
-t26.descriptor = {
+class6.descriptor = {
 	name = "ArrayOfItemFooterProp_ArrayMap",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ArrayMap"
 }
-t1.ArrayOfItemFooterProp_ArrayMap = t26
-typeRegistry.default:register(t1.ArrayOfItemFooterProp_ArrayMap)
 
-local t33 = {}
+v.ArrayOfItemFooterProp_ArrayMap = class6
 
-t33.__index = t33
+typeRegistry.default:register(v.ArrayOfItemFooterProp_ArrayMap)
 
-function t33.new(t34: {[any]: any}?) -- line: 1537
-	-- upvalues: t33 (copy)
+local class7 = {}
+class7.__index = class7
+
+function class7.new(p)
 	return (setmetatable({
-		items = if t34 ~= nil and t34.items ~= nil then t34.items else {}
-	}, t33))
+		items = (p == nil or p.items == nil) and {} or p.items
+	}, class7))
 end
-function t33.encode(p19) -- line: 1545
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n13 = 0
 
-	if p19.items ~= nil and #p19.items > 0 then
-		for _, v230 in p19.items do
-			local v231 = v230:encode()
-			local v232, v233 = proto.writeTag(buf, n13, 1, proto.wireTypes.lengthDelimited)
+function class7:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n13 = proto.writeBuffer(v232, v233, v231, buffer.len(v231))
+	if self.items ~= nil and #self.items > 0 then
+		for _, item in self.items do
+			local encoded = item:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf8 = buffer.create(n13)
-
-	buffer.copy(buf8, 0, buf, 0, n13)
-
-	return buf8
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t33.decode(p20: buffer) -- line: 1564
-	-- upvalues: t33 (copy), proto (copy), catalog_sort_data (copy)
-	local v236 = t33.new()
-	local n14 = 0
 
-	while n14 < buffer.len(p20) do
-		local v238, v239
+function class7.decode(buf: buffer)
+	local v2 = class7.new()
+	local v3 = 0
 
-		v238, v239, n14 = proto.readTag(p20, n14)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v239 == proto.wireTypes.varint then
-			local v240
-
-			v240, n14 = proto.readVarInt(p20, n14)
-		elseif v239 == proto.wireTypes.lengthDelimited then
-			if v238 == 1 then
-				local v241
-
-				v241, n14 = proto.readBuffer(p20, n14)
-				table.insert(v236.items, catalog_sort_data.CatalogSortCardItemFooter.decode(v241))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.items, catalog_sort_data.CatalogSortCardItemFooter.decode(v6))
 			else
-				local v242, v243 = proto.readVarInt(p20, n14)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n14 = v243 + v242
+				v3 = v6 + varInt
 			end
-		elseif v239 == proto.wireTypes.i32 then
-			local v244
-
-			v244, n14 = proto.readFixed32(p20, n14)
-		elseif v239 == proto.wireTypes.i64 then
-			local v245
-
-			v245, n14 = proto.readFixed64(p20, n14)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v239)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v236
+	return v2
 end
-function t33.jsonEncode(p21) -- line: 1612
-	local t35 = {}
 
-	if p21.items ~= nil and #p21.items > 0 then
-		local t36 = {}
+function class7:jsonEncode()
+	local v2 = {}
 
-		for _, v250 in p21.items do
-			table.insert(t36, v250:jsonEncode())
-		end
-
-		t35.items = t36
+	if self.items == nil or not (#self.items > 0) then
+		return v2
 	end
 
-	return t35
-end
-function t33.jsonDecode(t37: {[any]: any}) -- line: 1628
-	-- upvalues: t33 (copy), catalog_sort_data (copy)
-	local v252 = t33.new()
+	local items = {}
 
-	if t37.items ~= nil then
-		local t38 = {}
-
-		for _, v255 in t37.items do
-			table.insert(t38, catalog_sort_data.CatalogSortCardItemFooter.jsonDecode(v255))
-		end
-
-		v252.items = t38
+	for _, item in self.items do
+		table.insert(items, item:jsonEncode())
 	end
 
-	return v252
+	v2.items = items
+
+	return v2
 end
 
-t33.descriptor = {
+function class7.jsonDecode(p)
+	local v2 = class7.new()
+
+	if p.items == nil then
+		return v2
+	end
+
+	local items = {}
+
+	for _, item in p.items do
+		table.insert(items, catalog_sort_data.CatalogSortCardItemFooter.jsonDecode(item))
+	end
+
+	v2.items = items
+
+	return v2
+end
+
+class7.descriptor = {
 	name = "ArrayOfItemFooterProp_ArrayMap_LiteralItems",
 	fullName = "roblox.apppageplatform.shared.v1beta1.LiteralItems"
 }
-t1.ArrayOfItemFooterProp_ArrayMap_LiteralItems = t33
-typeRegistry.default:register(t1.ArrayOfItemFooterProp_ArrayMap_LiteralItems)
 
-local t39 = {}
+v.ArrayOfItemFooterProp_ArrayMap_LiteralItems = class7
 
-t39.__index = t39
+typeRegistry.default:register(v.ArrayOfItemFooterProp_ArrayMap_LiteralItems)
 
-function t39.new(t40: {[any]: any}?) -- line: 1662
-	-- upvalues: t39 (copy)
-	return (setmetatable({
-		thumbnail_aspect_ratio = if t40 ~= nil and t40.thumbnail_aspect_ratio ~= nil then t40.thumbnail_aspect_ratio else nil,
-		background_layers = if t40 ~= nil and t40.background_layers ~= nil then t40.background_layers else nil
-	}, t39))
-end
-function t39.encode(p22) -- line: 1671
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n15 = 0
+local class8 = {}
+class8.__index = class8
 
-	if p22.thumbnail_aspect_ratio ~= nil then
-		local v260 = p22.thumbnail_aspect_ratio:encode()
-		local v261, v262 = proto.writeTag(buf, n15, 1, proto.wireTypes.lengthDelimited)
+function class8.new(p)
+	local thumbnail_aspect_ratio
 
-		buf, n15 = proto.writeBuffer(v261, v262, v260, buffer.len(v260))
+	if not (p == nil or p.thumbnail_aspect_ratio == nil) then
+		thumbnail_aspect_ratio = p.thumbnail_aspect_ratio
 	end
 
-	if p22.background_layers ~= nil then
-		local v263 = p22.background_layers:encode()
-		local v264, v265 = proto.writeTag(buf, n15, 2, proto.wireTypes.lengthDelimited)
+	local background_layers
 
-		buf, n15 = proto.writeBuffer(v264, v265, v263, buffer.len(v263))
+	if not (p == nil or p.background_layers == nil) then
+		background_layers = p.background_layers
 	end
 
-	local buf9 = buffer.create(n15)
-
-	buffer.copy(buf9, 0, buf, 0, n15)
-
-	return buf9
+	return (setmetatable(
+		{ thumbnail_aspect_ratio = thumbnail_aspect_ratio, background_layers = background_layers },
+		class8
+	))
 end
-function t39.decode(p23: buffer) -- line: 1692
-	-- upvalues: t39 (copy), proto (copy), prop_types (copy), background_layer (copy)
-	local v268 = t39.new()
-	local n16 = 0
 
-	while n16 < buffer.len(p23) do
-		local v270, v271
+function class8:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		v270, v271, n16 = proto.readTag(p23, n16)
+	if self.thumbnail_aspect_ratio ~= nil then
+		local encoded = self.thumbnail_aspect_ratio:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-		if v271 == proto.wireTypes.varint then
-			local v272
+	if self.background_layers ~= nil then
+		local encoded = self.background_layers:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-			v272, n16 = proto.readVarInt(p23, n16)
-		elseif v271 == proto.wireTypes.lengthDelimited then
-			if v270 == 1 then
-				local v273
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
 
-				v273, n16 = proto.readBuffer(p23, n16)
-				v268.thumbnail_aspect_ratio = prop_types.StringProp.decode(v273)
-			elseif v270 == 2 then
-				local v274
+function class8.decode(buf: buffer)
+	local result = class8.new()
+	local v2 = 0
 
-				v274, n16 = proto.readBuffer(p23, n16)
-				v268.background_layers = background_layer.ArrayOfBackgroundLayerProp.decode(v274)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.thumbnail_aspect_ratio = prop_types.StringProp.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.background_layers = background_layer.ArrayOfBackgroundLayerProp.decode(v5)
 			else
-				local v275, v276 = proto.readVarInt(p23, n16)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n16 = v276 + v275
+				v2 = v5 + varInt
 			end
-		elseif v271 == proto.wireTypes.i32 then
-			local v277
-
-			v277, n16 = proto.readFixed32(p23, n16)
-		elseif v271 == proto.wireTypes.i64 then
-			local v278
-
-			v278, n16 = proto.readFixed64(p23, n16)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v271)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v268
-end
-function t39.jsonEncode(p24) -- line: 1742
-	local t41 = {}
-
-	if p24.thumbnail_aspect_ratio ~= nil then
-		t41.thumbnailAspectRatio = p24.thumbnail_aspect_ratio:jsonEncode()
-	end
-
-	if p24.background_layers ~= nil then
-		t41.backgroundLayers = p24.background_layers:jsonEncode()
-	end
-
-	return t41
-end
-function t39.jsonDecode(t42: {[any]: any}) -- line: 1756
-	-- upvalues: t39 (copy), prop_types (copy), background_layer (copy)
-	local v282 = t39.new()
-
-	if t42.thumbnail_aspect_ratio ~= nil then
-		v282.thumbnail_aspect_ratio = prop_types.StringProp.jsonDecode(t42.thumbnail_aspect_ratio)
-	end
-
-	if t42.thumbnailAspectRatio ~= nil then
-		v282.thumbnail_aspect_ratio = prop_types.StringProp.jsonDecode(t42.thumbnailAspectRatio)
-	end
-
-	if t42.background_layers ~= nil then
-		v282.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(t42.background_layers)
-	end
-
-	if t42.backgroundLayers ~= nil then
-		v282.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(t42.backgroundLayers)
-	end
-
-	return v282
+	return result
 end
 
-t39.descriptor = {
+function class8:jsonEncode()
+	local v2 = {}
+
+	if self.thumbnail_aspect_ratio ~= nil then
+		v2.thumbnailAspectRatio = self.thumbnail_aspect_ratio:jsonEncode()
+	end
+
+	if self.background_layers ~= nil then
+		v2.backgroundLayers = self.background_layers:jsonEncode()
+	end
+
+	return v2
+end
+
+function class8.jsonDecode(data)
+	local v2 = class8.new()
+
+	if data.thumbnail_aspect_ratio ~= nil then
+		v2.thumbnail_aspect_ratio = prop_types.StringProp.jsonDecode(data.thumbnail_aspect_ratio)
+	end
+
+	if data.thumbnailAspectRatio ~= nil then
+		v2.thumbnail_aspect_ratio = prop_types.StringProp.jsonDecode(data.thumbnailAspectRatio)
+	end
+
+	if data.background_layers ~= nil then
+		v2.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(data.background_layers)
+	end
+
+	if data.backgroundLayers ~= nil then
+		v2.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(data.backgroundLayers)
+	end
+
+	return v2
+end
+
+class8.descriptor = {
 	name = "CardStyle",
 	fullName = "roblox.apppageplatform.shared.v1beta1.CardStyle"
 }
-t1.CardStyle = t39
-typeRegistry.default:register(t1.CardStyle)
 
-local t43 = {}
+v.CardStyle = class8
 
-t43.__index = t43
+typeRegistry.default:register(v.CardStyle)
 
-function t43.new(t44: {[any]: any}?) -- line: 1800
-	-- upvalues: t43 (copy)
-	return (setmetatable({
-		kind = if t44 ~= nil and t44.kind ~= nil then t44.kind else nil
-	}, t43))
+local class9 = {}
+class9.__index = class9
+
+function class9.new(p)
+	local kind
+
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
+
+	return (setmetatable({ kind = kind }, class9))
 end
-function t43.encode(p25) -- line: 1806
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n17 = 0
 
-	if p25.kind ~= nil then
-		if p25.kind.type == "literal" then
-			local v287 = p25.kind.value:encode()
-			local v288, v289 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
+function class9:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n17 = proto.writeBuffer(v288, v289, v287, buffer.len(v287))
-		elseif p25.kind.type == "binding_path" then
-			local v290, v291 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n17 = proto.writeString(v290, v291, p25.kind.value)
-		elseif p25.kind.type == "conditional" then
-			local v292 = p25.kind.value:encode()
-			local v293, v294 = proto.writeTag(buf, n17, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n17 = proto.writeBuffer(v293, v294, v292, buffer.len(v292))
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
+		elseif self.kind.type == "conditional" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf10 = buffer.create(n17)
-
-	buffer.copy(buf10, 0, buf, 0, n17)
-
-	return buf10
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t43.decode(p26: buffer) -- line: 1830
-	-- upvalues: t43 (copy), proto (copy), t1 (copy)
-	local v297 = t43.new()
-	local n18 = 0
 
-	while n18 < buffer.len(p26) do
-		local v299, v300
+function class9.decode(buf: buffer)
+	local result = class9.new()
+	local v2 = 0
 
-		v299, v300, n18 = proto.readTag(p26, n18)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v300 == proto.wireTypes.varint then
-			local v301
-
-			v301, n18 = proto.readVarInt(p26, n18)
-		elseif v300 == proto.wireTypes.lengthDelimited then
-			if v299 == 1 then
-				local v302
-
-				v302, n18 = proto.readBuffer(p26, n18)
-				v297.kind = {
-					type = "literal",
-					value = t1.CardStyle.decode(v302)
-				}
-			elseif v299 == 2 then
-				local v303
-
-				v303, n18 = proto.readBuffer(p26, n18)
-				v297.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v303)
-				}
-			elseif v299 == 3 then
-				local v304
-
-				v304, n18 = proto.readBuffer(p26, n18)
-				v297.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "literal", value = v.CardStyle.decode(v5) }
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "conditional",
-					value = t1.CardStyleProp_ConditionalOptions.decode(v304)
+					value = v.CardStyleProp_ConditionalOptions.decode(v5)
 				}
 			else
-				local v305, v306 = proto.readVarInt(p26, n18)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n18 = v306 + v305
+				v2 = v5 + varInt
 			end
-		elseif v300 == proto.wireTypes.i32 then
-			local v307
-
-			v307, n18 = proto.readFixed32(p26, n18)
-		elseif v300 == proto.wireTypes.i64 then
-			local v308
-
-			v308, n18 = proto.readFixed64(p26, n18)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v300)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v297
+	return result
 end
-function t43.jsonEncode(p27) -- line: 1884
-	local t45 = {}
 
-	if p27.kind ~= nil then
-		if p27.kind.type == "literal" then
-			t45.literal = p27.kind.value:jsonEncode()
+function class9:jsonEncode()
+	local v2 = {}
 
-			return t45
-		end
-
-		if p27.kind.type == "binding_path" then
-			t45.bindingPath = p27.kind.value
-
-			return t45
-		end
-
-		if p27.kind.type == "conditional" then
-			t45.conditional = p27.kind.value:jsonEncode()
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t45
-end
-function t43.jsonDecode(t46: {[any]: any}) -- line: 1900
-	-- upvalues: t43 (copy), t1 (copy)
-	local v312 = t43.new()
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	end
 
-	if t46.literal ~= nil then
-		v312.kind = {
+	if self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+		return v2
+	end
+
+	if self.kind.type == "conditional" then
+		v2.conditional = self.kind.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class9.jsonDecode(data)
+	local v2 = class9.new()
+
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.CardStyle.jsonDecode(t46.literal)
+			value = v.CardStyle.jsonDecode(data.literal)
 		}
 	end
 
-	if t46.binding_path ~= nil then
-		v312.kind = {
-			type = "binding_path",
-			value = t46.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t46.bindingPath ~= nil then
-		v312.kind = {
-			type = "binding_path",
-			value = t46.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	if t46.conditional ~= nil then
-		v312.kind = {
+	if data.conditional ~= nil then
+		v2.kind = {
 			type = "conditional",
-			value = t1.CardStyleProp_ConditionalOptions.jsonDecode(t46.conditional)
+			value = v.CardStyleProp_ConditionalOptions.jsonDecode(data.conditional)
 		}
 	end
 
-	return v312
+	return v2
 end
 
-t43.descriptor = {
+class9.descriptor = {
 	name = "CardStyleProp",
 	fullName = "roblox.apppageplatform.shared.v1beta1.CardStyleProp"
 }
-t1.CardStyleProp = t43
-typeRegistry.default:register(t1.CardStyleProp)
 
-local t47 = {}
+v.CardStyleProp = class9
 
-t47.__index = t47
+typeRegistry.default:register(v.CardStyleProp)
 
-function t47.new(t48: {[any]: any}?) -- line: 1939
-	-- upvalues: t47 (copy)
-	return (setmetatable({
-		condition = if t48 ~= nil and t48.condition ~= nil then t48.condition else nil,
-		kind = if t48 ~= nil and t48.kind ~= nil then t48.kind else nil
-	}, t47))
-end
-function t47.encode(p28) -- line: 1948
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n19 = 0
+local class10 = {}
+class10.__index = class10
 
-	if p28.condition ~= nil then
-		local v317 = p28.condition:encode()
-		local v318, v319 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
+function class10.new(p)
+	local condition
 
-		buf, n19 = proto.writeBuffer(v318, v319, v317, buffer.len(v317))
+	if not (p == nil or p.condition == nil) then
+		condition = p.condition
 	end
 
-	if p28.kind ~= nil then
-		if p28.kind.type == "literal" then
-			local v320 = p28.kind.value:encode()
-			local v321, v322 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
+	local kind
 
-			buf, n19 = proto.writeBuffer(v321, v322, v320, buffer.len(v320))
-		elseif p28.kind.type == "binding_path" then
-			local v323, v324 = proto.writeTag(buf, n19, 3, proto.wireTypes.lengthDelimited)
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
 
-			buf, n19 = proto.writeString(v323, v324, p28.kind.value)
+	return (setmetatable({ condition = condition, kind = kind }, class10))
+end
+
+function class10:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.condition ~= nil then
+		local encoded = self.condition:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
 		end
 	end
 
-	local buf11 = buffer.create(n19)
-
-	buffer.copy(buf11, 0, buf, 0, n19)
-
-	return buf11
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t47.decode(p29: buffer) -- line: 1974
-	-- upvalues: t47 (copy), proto (copy), prop_condition (copy), t1 (copy)
-	local v327 = t47.new()
-	local n20 = 0
 
-	while n20 < buffer.len(p29) do
-		local v329, v330
+function class10.decode(buf: buffer)
+	local result = class10.new()
+	local v2 = 0
 
-		v329, v330, n20 = proto.readTag(p29, n20)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v330 == proto.wireTypes.varint then
-			local v331
-
-			v331, n20 = proto.readVarInt(p29, n20)
-		elseif v330 == proto.wireTypes.lengthDelimited then
-			if v329 == 1 then
-				local v332
-
-				v332, n20 = proto.readBuffer(p29, n20)
-				v327.condition = prop_condition.PropCondition.decode(v332)
-			elseif v329 == 2 then
-				local v333
-
-				v333, n20 = proto.readBuffer(p29, n20)
-				v327.kind = {
-					type = "literal",
-					value = t1.CardStyle.decode(v333)
-				}
-			elseif v329 == 3 then
-				local v334
-
-				v334, n20 = proto.readBuffer(p29, n20)
-				v327.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v334)
-				}
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.condition = prop_condition.PropCondition.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "literal", value = v.CardStyle.decode(v5) }
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
 			else
-				local v335, v336 = proto.readVarInt(p29, n20)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n20 = v336 + v335
+				v2 = v5 + varInt
 			end
-		elseif v330 == proto.wireTypes.i32 then
-			local v337
-
-			v337, n20 = proto.readFixed32(p29, n20)
-		elseif v330 == proto.wireTypes.i64 then
-			local v338
-
-			v338, n20 = proto.readFixed64(p29, n20)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v330)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v327
+	return result
 end
-function t47.jsonEncode(p30) -- line: 2027
-	local t49 = {}
 
-	if p30.condition ~= nil then
-		t49.condition = p30.condition:jsonEncode()
+function class10:jsonEncode()
+	local v2 = {}
+
+	if self.condition ~= nil then
+		v2.condition = self.condition:jsonEncode()
 	end
 
-	if p30.kind ~= nil then
-		if p30.kind.type == "literal" then
-			t49.literal = p30.kind.value:jsonEncode()
-
-			return t49
-		end
-
-		if p30.kind.type == "binding_path" then
-			t49.bindingPath = p30.kind.value
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t49
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	elseif self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+	end
+
+	return v2
 end
-function t47.jsonDecode(t50: {[any]: any}) -- line: 2045
-	-- upvalues: t47 (copy), prop_condition (copy), t1 (copy)
-	local v342 = t47.new()
 
-	if t50.condition ~= nil then
-		v342.condition = prop_condition.PropCondition.jsonDecode(t50.condition)
+function class10.jsonDecode(data)
+	local v2 = class10.new()
+
+	if data.condition ~= nil then
+		v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
 	end
 
-	if t50.literal ~= nil then
-		v342.kind = {
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.CardStyle.jsonDecode(t50.literal)
+			value = v.CardStyle.jsonDecode(data.literal)
 		}
 	end
 
-	if t50.binding_path ~= nil then
-		v342.kind = {
-			type = "binding_path",
-			value = t50.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t50.bindingPath ~= nil then
-		v342.kind = {
-			type = "binding_path",
-			value = t50.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	return v342
+	return v2
 end
 
-t47.descriptor = {
+class10.descriptor = {
 	name = "CardStyleProp_ConditionalOption",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 }
-t1.CardStyleProp_ConditionalOption = t47
-typeRegistry.default:register(t1.CardStyleProp_ConditionalOption)
 
-local t51 = {}
+v.CardStyleProp_ConditionalOption = class10
 
-t51.__index = t51
+typeRegistry.default:register(v.CardStyleProp_ConditionalOption)
 
-function t51.new(t52: {[any]: any}?) -- line: 2082
-	-- upvalues: t51 (copy)
+local class11 = {}
+class11.__index = class11
+
+function class11.new(p)
 	return (setmetatable({
-		options = if t52 ~= nil and t52.options ~= nil then t52.options else {}
-	}, t51))
+		options = (p == nil or p.options == nil) and {} or p.options
+	}, class11))
 end
-function t51.encode(p31) -- line: 2090
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n21 = 0
 
-	if p31.options ~= nil and #p31.options > 0 then
-		for _, v348 in p31.options do
-			local v349 = v348:encode()
-			local v350, v351 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
+function class11:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n21 = proto.writeBuffer(v350, v351, v349, buffer.len(v349))
+	if self.options ~= nil and #self.options > 0 then
+		for _, option in self.options do
+			local encoded = option:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf12 = buffer.create(n21)
-
-	buffer.copy(buf12, 0, buf, 0, n21)
-
-	return buf12
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t51.decode(p32: buffer) -- line: 2107
-	-- upvalues: t51 (copy), proto (copy), t1 (copy)
-	local v354 = t51.new()
-	local n22 = 0
 
-	while n22 < buffer.len(p32) do
-		local v356, v357
+function class11.decode(buf: buffer)
+	local v2 = class11.new()
+	local v3 = 0
 
-		v356, v357, n22 = proto.readTag(p32, n22)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v357 == proto.wireTypes.varint then
-			local v358
-
-			v358, n22 = proto.readVarInt(p32, n22)
-		elseif v357 == proto.wireTypes.lengthDelimited then
-			if v356 == 1 then
-				local v359
-
-				v359, n22 = proto.readBuffer(p32, n22)
-				table.insert(v354.options, t1.CardStyleProp_ConditionalOption.decode(v359))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.options, v.CardStyleProp_ConditionalOption.decode(v6))
 			else
-				local v360, v361 = proto.readVarInt(p32, n22)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n22 = v361 + v360
+				v3 = v6 + varInt
 			end
-		elseif v357 == proto.wireTypes.i32 then
-			local v362
-
-			v362, n22 = proto.readFixed32(p32, n22)
-		elseif v357 == proto.wireTypes.i64 then
-			local v363
-
-			v363, n22 = proto.readFixed64(p32, n22)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v357)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v354
+	return v2
 end
-function t51.jsonEncode(p33) -- line: 2150
-	local t53 = {}
 
-	if p33.options ~= nil and #p33.options > 0 then
-		local t54 = {}
+function class11:jsonEncode()
+	local v2 = {}
 
-		for _, v368 in p33.options do
-			table.insert(t54, v368:jsonEncode())
-		end
-
-		t53.options = t54
+	if self.options == nil or not (#self.options > 0) then
+		return v2
 	end
 
-	return t53
-end
-function t51.jsonDecode(t55: {[any]: any}) -- line: 2164
-	-- upvalues: t51 (copy), t1 (copy)
-	local v370 = t51.new()
+	local options = {}
 
-	if t55.options ~= nil then
-		local t56 = {}
-
-		for _, v373 in t55.options do
-			table.insert(t56, t1.CardStyleProp_ConditionalOption.jsonDecode(v373))
-		end
-
-		v370.options = t56
+	for _, option in self.options do
+		table.insert(options, option:jsonEncode())
 	end
 
-	return v370
+	v2.options = options
+
+	return v2
 end
 
-t51.descriptor = {
+function class11.jsonDecode(p)
+	local v2 = class11.new()
+
+	if p.options == nil then
+		return v2
+	end
+
+	local options = {}
+
+	for _, option in p.options do
+		table.insert(options, v.CardStyleProp_ConditionalOption.jsonDecode(option))
+	end
+
+	v2.options = options
+
+	return v2
+end
+
+class11.descriptor = {
 	name = "CardStyleProp_ConditionalOptions",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 }
-t1.CardStyleProp_ConditionalOptions = t51
-typeRegistry.default:register(t1.CardStyleProp_ConditionalOptions)
 
-local t57 = {}
+v.CardStyleProp_ConditionalOptions = class11
 
-t57.__index = t57
+typeRegistry.default:register(v.CardStyleProp_ConditionalOptions)
 
-function t57.new(t58: {[any]: any}?) -- line: 2195
-	-- upvalues: t57 (copy)
-	return (setmetatable({
-		id = if t58 ~= nil and t58.id ~= nil then t58.id else nil,
-		type = if t58 ~= nil and t58.type ~= nil then t58.type else nil
-	}, t57))
-end
-function t57.encode(p34) -- line: 2202
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n23 = 0
+local class12 = {}
+class12.__index = class12
 
-	if p34.id ~= nil then
-		local v378 = p34.id:encode()
-		local v379, v380 = proto.writeTag(buf, n23, 1, proto.wireTypes.lengthDelimited)
+function class12.new(p)
+	local id
 
-		buf, n23 = proto.writeBuffer(v379, v380, v378, buffer.len(v378))
+	if not (p == nil or p.id == nil) then
+		id = p.id
 	end
 
-	if p34.type ~= nil then
-		local v381 = p34.type:encode()
-		local v382, v383 = proto.writeTag(buf, n23, 2, proto.wireTypes.lengthDelimited)
+	local v2
 
-		buf, n23 = proto.writeBuffer(v382, v383, v381, buffer.len(v381))
+	if not (p == nil or p.type == nil) then
+		v2 = p.type
 	end
 
-	local buf13 = buffer.create(n23)
-
-	buffer.copy(buf13, 0, buf, 0, n23)
-
-	return buf13
+	return (setmetatable({ id = id, type = v2 }, class12))
 end
-function t57.decode(p35: buffer) -- line: 2223
-	-- upvalues: t57 (copy), proto (copy), prop_types (copy)
-	local v386 = t57.new()
-	local n24 = 0
 
-	while n24 < buffer.len(p35) do
-		local v388, v389
+function class12:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		v388, v389, n24 = proto.readTag(p35, n24)
+	if self.id ~= nil then
+		local encoded = self.id:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-		if v389 == proto.wireTypes.varint then
-			local v390
+	if self.type ~= nil then
+		local encoded = self.type:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-			v390, n24 = proto.readVarInt(p35, n24)
-		elseif v389 == proto.wireTypes.lengthDelimited then
-			if v388 == 1 then
-				local v391
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
 
-				v391, n24 = proto.readBuffer(p35, n24)
-				v386.id = prop_types.StringProp.decode(v391)
-			elseif v388 == 2 then
-				local v392
+function class12.decode(buf: buffer)
+	local result = class12.new()
+	local v2 = 0
 
-				v392, n24 = proto.readBuffer(p35, n24)
-				v386.type = prop_types.StringProp.decode(v392)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = prop_types.StringProp.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.type = prop_types.StringProp.decode(v5)
 			else
-				local v393, v394 = proto.readVarInt(p35, n24)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n24 = v394 + v393
+				v2 = v5 + varInt
 			end
-		elseif v389 == proto.wireTypes.i32 then
-			local v395
-
-			v395, n24 = proto.readFixed32(p35, n24)
-		elseif v389 == proto.wireTypes.i64 then
-			local v396
-
-			v396, n24 = proto.readFixed64(p35, n24)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v389)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v386
-end
-function t57.jsonEncode(p36) -- line: 2271
-	local t59 = {}
-
-	if p36.id ~= nil then
-		t59.id = p36.id:jsonEncode()
-	end
-
-	if p36.type ~= nil then
-		t59.type = p36.type:jsonEncode()
-	end
-
-	return t59
-end
-function t57.jsonDecode(t60: {[any]: any}) -- line: 2285
-	-- upvalues: t57 (copy), prop_types (copy)
-	local v400 = t57.new()
-
-	if t60.id ~= nil then
-		v400.id = prop_types.StringProp.jsonDecode(t60.id)
-	end
-
-	if t60.type ~= nil then
-		v400.type = prop_types.StringProp.jsonDecode(t60.type)
-	end
-
-	return v400
+	return result
 end
 
-t57.descriptor = {
+function class12:jsonEncode()
+	local v2 = {}
+
+	if self.id ~= nil then
+		v2.id = self.id:jsonEncode()
+	end
+
+	if self.type ~= nil then
+		v2.type = self.type:jsonEncode()
+	end
+
+	return v2
+end
+
+function class12.jsonDecode(p)
+	local v2 = class12.new()
+
+	if p.id ~= nil then
+		v2.id = prop_types.StringProp.jsonDecode(p.id)
+	end
+
+	if p.type ~= nil then
+		v2.type = prop_types.StringProp.jsonDecode(p.type)
+	end
+
+	return v2
+end
+
+class12.descriptor = {
 	name = "CatalogSortContent",
 	fullName = "roblox.apppageplatform.shared.v1beta1.CatalogSortContent"
 }
-t1.CatalogSortContent = t57
-typeRegistry.default:register(t1.CatalogSortContent)
 
-local t61 = {}
+v.CatalogSortContent = class12
 
-t61.__index = t61
+typeRegistry.default:register(v.CatalogSortContent)
 
-function t61.new(t62: {[any]: any}?) -- line: 2313
-	-- upvalues: t61 (copy)
-	return (setmetatable({
-		kind = if t62 ~= nil and t62.kind ~= nil then t62.kind else nil
-	}, t61))
+local class13 = {}
+class13.__index = class13
+
+function class13.new(p)
+	local kind
+
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
+
+	return (setmetatable({ kind = kind }, class13))
 end
-function t61.encode(p37) -- line: 2321
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n25 = 0
 
-	if p37.kind ~= nil then
-		if p37.kind.type == "literal" then
-			local v405 = p37.kind.value:encode()
-			local v406, v407 = proto.writeTag(buf, n25, 1, proto.wireTypes.lengthDelimited)
+function class13:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n25 = proto.writeBuffer(v406, v407, v405, buffer.len(v405))
-		elseif p37.kind.type == "binding_path" then
-			local v408, v409 = proto.writeTag(buf, n25, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n25 = proto.writeString(v408, v409, p37.kind.value)
-		elseif p37.kind.type == "conditional" then
-			local v410 = p37.kind.value:encode()
-			local v411, v412 = proto.writeTag(buf, n25, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n25 = proto.writeBuffer(v411, v412, v410, buffer.len(v410))
-		elseif p37.kind.type == "array_map" then
-			local v413 = p37.kind.value:encode()
-			local v414, v415 = proto.writeTag(buf, n25, 4, proto.wireTypes.lengthDelimited)
-
-			buf, n25 = proto.writeBuffer(v414, v415, v413, buffer.len(v413))
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
+		elseif self.kind.type == "conditional" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "array_map" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf14 = buffer.create(n25)
-
-	buffer.copy(buf14, 0, buf, 0, n25)
-
-	return buf14
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t61.decode(p38: buffer) -- line: 2349
-	-- upvalues: t61 (copy), proto (copy), t1 (copy)
-	local v418 = t61.new()
-	local n26 = 0
 
-	while n26 < buffer.len(p38) do
-		local v420, v421
+function class13.decode(buf: buffer)
+	local result = class13.new()
+	local v2 = 0
 
-		v420, v421, n26 = proto.readTag(p38, n26)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v421 == proto.wireTypes.varint then
-			local v422
-
-			v422, n26 = proto.readVarInt(p38, n26)
-		elseif v421 == proto.wireTypes.lengthDelimited then
-			if v420 == 1 then
-				local v423
-
-				v423, n26 = proto.readBuffer(p38, n26)
-				v418.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "literal",
-					value = t1.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.decode(v423)
+					value = v.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.decode(v5)
 				}
-			elseif v420 == 2 then
-				local v424
-
-				v424, n26 = proto.readBuffer(p38, n26)
-				v418.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v424)
-				}
-			elseif v420 == 3 then
-				local v425
-
-				v425, n26 = proto.readBuffer(p38, n26)
-				v418.kind = {
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "conditional",
-					value = t1.ArrayOfCatalogSortContentProp_ConditionalOptions.decode(v425)
+					value = v.ArrayOfCatalogSortContentProp_ConditionalOptions.decode(v5)
 				}
-			elseif v420 == 4 then
-				local v426
-
-				v426, n26 = proto.readBuffer(p38, n26)
-				v418.kind = {
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "array_map",
-					value = t1.ArrayOfCatalogSortContentProp_ArrayMap.decode(v426)
+					value = v.ArrayOfCatalogSortContentProp_ArrayMap.decode(v5)
 				}
 			else
-				local v427, v428 = proto.readVarInt(p38, n26)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n26 = v428 + v427
+				v2 = v5 + varInt
 			end
-		elseif v421 == proto.wireTypes.i32 then
-			local v429
-
-			v429, n26 = proto.readFixed32(p38, n26)
-		elseif v421 == proto.wireTypes.i64 then
-			local v430
-
-			v430, n26 = proto.readFixed64(p38, n26)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v421)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v418
+	return result
 end
-function t61.jsonEncode(p39) -- line: 2414
-	local t63 = {}
 
-	if p39.kind ~= nil then
-		if p39.kind.type == "literal" then
-			t63.literal = p39.kind.value:jsonEncode()
+function class13:jsonEncode()
+	local v2 = {}
 
-			return t63
-		end
-
-		if p39.kind.type == "binding_path" then
-			t63.bindingPath = p39.kind.value
-
-			return t63
-		end
-
-		if p39.kind.type == "conditional" then
-			t63.conditional = p39.kind.value:jsonEncode()
-
-			return t63
-		end
-
-		if p39.kind.type == "array_map" then
-			t63.arrayMap = p39.kind.value:jsonEncode()
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t63
-end
-function t61.jsonDecode(t64: {[any]: any}) -- line: 2432
-	-- upvalues: t61 (copy), t1 (copy)
-	local v434 = t61.new()
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	end
 
-	if t64.literal ~= nil then
-		v434.kind = {
+	if self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+		return v2
+	end
+
+	if self.kind.type == "conditional" then
+		v2.conditional = self.kind.value:jsonEncode()
+		return v2
+	end
+
+	if self.kind.type == "array_map" then
+		v2.arrayMap = self.kind.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class13.jsonDecode(data)
+	local v2 = class13.new()
+
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.jsonDecode(t64.literal)
+			value = v.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.jsonDecode(data.literal)
 		}
 	end
 
-	if t64.binding_path ~= nil then
-		v434.kind = {
-			type = "binding_path",
-			value = t64.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t64.bindingPath ~= nil then
-		v434.kind = {
-			type = "binding_path",
-			value = t64.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	if t64.conditional ~= nil then
-		v434.kind = {
+	if data.conditional ~= nil then
+		v2.kind = {
 			type = "conditional",
-			value = t1.ArrayOfCatalogSortContentProp_ConditionalOptions.jsonDecode(t64.conditional)
+			value = v.ArrayOfCatalogSortContentProp_ConditionalOptions.jsonDecode(data.conditional)
 		}
 	end
 
-	if t64.array_map ~= nil then
-		v434.kind = {
+	if data.array_map ~= nil then
+		v2.kind = {
 			type = "array_map",
-			value = t1.ArrayOfCatalogSortContentProp_ArrayMap.jsonDecode(t64.array_map)
+			value = v.ArrayOfCatalogSortContentProp_ArrayMap.jsonDecode(data.array_map)
 		}
 	end
 
-	if t64.arrayMap ~= nil then
-		v434.kind = {
+	if data.arrayMap ~= nil then
+		v2.kind = {
 			type = "array_map",
-			value = t1.ArrayOfCatalogSortContentProp_ArrayMap.jsonDecode(t64.arrayMap)
+			value = v.ArrayOfCatalogSortContentProp_ArrayMap.jsonDecode(data.arrayMap)
 		}
 	end
 
-	return v434
+	return v2
 end
 
-t61.descriptor = {
+class13.descriptor = {
 	name = "ArrayOfCatalogSortContentProp",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogSortContentProp"
 }
-t1.ArrayOfCatalogSortContentProp = t61
-typeRegistry.default:register(t1.ArrayOfCatalogSortContentProp)
 
-local t65 = {}
+v.ArrayOfCatalogSortContentProp = class13
 
-t65.__index = t65
+typeRegistry.default:register(v.ArrayOfCatalogSortContentProp)
 
-function t65.new(t66: {[any]: any}?) -- line: 2488
-	-- upvalues: t65 (copy)
-	return (setmetatable({
-		condition = if t66 ~= nil and t66.condition ~= nil then t66.condition else nil,
-		kind = if t66 ~= nil and t66.kind ~= nil then t66.kind else nil
-	}, t65))
-end
-function t65.encode(p40) -- line: 2497
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n27 = 0
+local class14 = {}
+class14.__index = class14
 
-	if p40.condition ~= nil then
-		local v439 = p40.condition:encode()
-		local v440, v441 = proto.writeTag(buf, n27, 1, proto.wireTypes.lengthDelimited)
+function class14.new(p)
+	local condition
 
-		buf, n27 = proto.writeBuffer(v440, v441, v439, buffer.len(v439))
+	if not (p == nil or p.condition == nil) then
+		condition = p.condition
 	end
 
-	if p40.kind ~= nil then
-		if p40.kind.type == "literal" then
-			local v442 = p40.kind.value:encode()
-			local v443, v444 = proto.writeTag(buf, n27, 2, proto.wireTypes.lengthDelimited)
+	local kind
 
-			buf, n27 = proto.writeBuffer(v443, v444, v442, buffer.len(v442))
-		elseif p40.kind.type == "binding_path" then
-			local v445, v446 = proto.writeTag(buf, n27, 3, proto.wireTypes.lengthDelimited)
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
 
-			buf, n27 = proto.writeString(v445, v446, p40.kind.value)
+	return (setmetatable({ condition = condition, kind = kind }, class14))
+end
+
+function class14:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.condition ~= nil then
+		local encoded = self.condition:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
 		end
 	end
 
-	local buf15 = buffer.create(n27)
-
-	buffer.copy(buf15, 0, buf, 0, n27)
-
-	return buf15
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t65.decode(p41: buffer) -- line: 2525
-	-- upvalues: t65 (copy), proto (copy), prop_condition (copy), t1 (copy)
-	local v449 = t65.new()
-	local n28 = 0
 
-	while n28 < buffer.len(p41) do
-		local v451, v452
+function class14.decode(buf: buffer)
+	local result = class14.new()
+	local v2 = 0
 
-		v451, v452, n28 = proto.readTag(p41, n28)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v452 == proto.wireTypes.varint then
-			local v453
-
-			v453, n28 = proto.readVarInt(p41, n28)
-		elseif v452 == proto.wireTypes.lengthDelimited then
-			if v451 == 1 then
-				local v454
-
-				v454, n28 = proto.readBuffer(p41, n28)
-				v449.condition = prop_condition.PropCondition.decode(v454)
-			elseif v451 == 2 then
-				local v455
-
-				v455, n28 = proto.readBuffer(p41, n28)
-				v449.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.condition = prop_condition.PropCondition.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "literal",
-					value = t1.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.decode(v455)
+					value = v.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.decode(v5)
 				}
-			elseif v451 == 3 then
-				local v456
-
-				v456, n28 = proto.readBuffer(p41, n28)
-				v449.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v456)
-				}
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
 			else
-				local v457, v458 = proto.readVarInt(p41, n28)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n28 = v458 + v457
+				v2 = v5 + varInt
 			end
-		elseif v452 == proto.wireTypes.i32 then
-			local v459
-
-			v459, n28 = proto.readFixed32(p41, n28)
-		elseif v452 == proto.wireTypes.i64 then
-			local v460
-
-			v460, n28 = proto.readFixed64(p41, n28)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v452)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v449
+	return result
 end
-function t65.jsonEncode(p42) -- line: 2583
-	local t67 = {}
 
-	if p42.condition ~= nil then
-		t67.condition = p42.condition:jsonEncode()
+function class14:jsonEncode()
+	local v2 = {}
+
+	if self.condition ~= nil then
+		v2.condition = self.condition:jsonEncode()
 	end
 
-	if p42.kind ~= nil then
-		if p42.kind.type == "literal" then
-			t67.literal = p42.kind.value:jsonEncode()
-
-			return t67
-		end
-
-		if p42.kind.type == "binding_path" then
-			t67.bindingPath = p42.kind.value
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t67
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	elseif self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+	end
+
+	return v2
 end
-function t65.jsonDecode(t68: {[any]: any}) -- line: 2603
-	-- upvalues: t65 (copy), prop_condition (copy), t1 (copy)
-	local v464 = t65.new()
 
-	if t68.condition ~= nil then
-		v464.condition = prop_condition.PropCondition.jsonDecode(t68.condition)
+function class14.jsonDecode(data)
+	local v2 = class14.new()
+
+	if data.condition ~= nil then
+		v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
 	end
 
-	if t68.literal ~= nil then
-		v464.kind = {
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.jsonDecode(t68.literal)
+			value = v.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent.jsonDecode(data.literal)
 		}
 	end
 
-	if t68.binding_path ~= nil then
-		v464.kind = {
-			type = "binding_path",
-			value = t68.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t68.bindingPath ~= nil then
-		v464.kind = {
-			type = "binding_path",
-			value = t68.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	return v464
+	return v2
 end
 
-t65.descriptor = {
+class14.descriptor = {
 	name = "ArrayOfCatalogSortContentProp_ConditionalOption",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 }
-t1.ArrayOfCatalogSortContentProp_ConditionalOption = t65
-typeRegistry.default:register(t1.ArrayOfCatalogSortContentProp_ConditionalOption)
 
-local t69 = {}
+v.ArrayOfCatalogSortContentProp_ConditionalOption = class14
 
-t69.__index = t69
+typeRegistry.default:register(v.ArrayOfCatalogSortContentProp_ConditionalOption)
 
-function t69.new(t70: {[any]: any}?) -- line: 2647
-	-- upvalues: t69 (copy)
+local class15 = {}
+class15.__index = class15
+
+function class15.new(p)
 	return (setmetatable({
-		options = if t70 ~= nil and t70.options ~= nil then t70.options else {}
-	}, t69))
+		options = (p == nil or p.options == nil) and {} or p.options
+	}, class15))
 end
-function t69.encode(p43) -- line: 2658
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n29 = 0
 
-	if p43.options ~= nil and #p43.options > 0 then
-		for _, v470 in p43.options do
-			local v471 = v470:encode()
-			local v472, v473 = proto.writeTag(buf, n29, 1, proto.wireTypes.lengthDelimited)
+function class15:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n29 = proto.writeBuffer(v472, v473, v471, buffer.len(v471))
+	if self.options ~= nil and #self.options > 0 then
+		for _, option in self.options do
+			local encoded = option:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf16 = buffer.create(n29)
-
-	buffer.copy(buf16, 0, buf, 0, n29)
-
-	return buf16
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t69.decode(p44: buffer) -- line: 2677
-	-- upvalues: t69 (copy), proto (copy), t1 (copy)
-	local v476 = t69.new()
-	local n30 = 0
 
-	while n30 < buffer.len(p44) do
-		local v478, v479
+function class15.decode(buf: buffer)
+	local v2 = class15.new()
+	local v3 = 0
 
-		v478, v479, n30 = proto.readTag(p44, n30)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v479 == proto.wireTypes.varint then
-			local v480
-
-			v480, n30 = proto.readVarInt(p44, n30)
-		elseif v479 == proto.wireTypes.lengthDelimited then
-			if v478 == 1 then
-				local v481
-
-				v481, n30 = proto.readBuffer(p44, n30)
-				table.insert(v476.options, t1.ArrayOfCatalogSortContentProp_ConditionalOption.decode(v481))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.options, v.ArrayOfCatalogSortContentProp_ConditionalOption.decode(v6))
 			else
-				local v482, v483 = proto.readVarInt(p44, n30)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n30 = v483 + v482
+				v3 = v6 + varInt
 			end
-		elseif v479 == proto.wireTypes.i32 then
-			local v484
-
-			v484, n30 = proto.readFixed32(p44, n30)
-		elseif v479 == proto.wireTypes.i64 then
-			local v485
-
-			v485, n30 = proto.readFixed64(p44, n30)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v479)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v476
+	return v2
 end
-function t69.jsonEncode(p45) -- line: 2722
-	local t71 = {}
 
-	if p45.options ~= nil and #p45.options > 0 then
-		local t72 = {}
+function class15:jsonEncode()
+	local v2 = {}
 
-		for _, v490 in p45.options do
-			table.insert(t72, v490:jsonEncode())
-		end
-
-		t71.options = t72
+	if self.options == nil or not (#self.options > 0) then
+		return v2
 	end
 
-	return t71
-end
-function t69.jsonDecode(t73: {[any]: any}) -- line: 2738
-	-- upvalues: t69 (copy), t1 (copy)
-	local v492 = t69.new()
+	local options = {}
 
-	if t73.options ~= nil then
-		local t74 = {}
-
-		for _, v495 in t73.options do
-			table.insert(t74, t1.ArrayOfCatalogSortContentProp_ConditionalOption.jsonDecode(v495))
-		end
-
-		v492.options = t74
+	for _, option in self.options do
+		table.insert(options, option:jsonEncode())
 	end
 
-	return v492
+	v2.options = options
+
+	return v2
 end
 
-t69.descriptor = {
+function class15.jsonDecode(p)
+	local v2 = class15.new()
+
+	if p.options == nil then
+		return v2
+	end
+
+	local options = {}
+
+	for _, option in p.options do
+		table.insert(options, v.ArrayOfCatalogSortContentProp_ConditionalOption.jsonDecode(option))
+	end
+
+	v2.options = options
+
+	return v2
+end
+
+class15.descriptor = {
 	name = "ArrayOfCatalogSortContentProp_ConditionalOptions",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 }
-t1.ArrayOfCatalogSortContentProp_ConditionalOptions = t69
-typeRegistry.default:register(t1.ArrayOfCatalogSortContentProp_ConditionalOptions)
 
-local t75 = {}
+v.ArrayOfCatalogSortContentProp_ConditionalOptions = class15
 
-t75.__index = t75
+typeRegistry.default:register(v.ArrayOfCatalogSortContentProp_ConditionalOptions)
 
-function t75.new(t76: {[any]: any}?) -- line: 2771
-	-- upvalues: t75 (copy)
+local class16 = {}
+class16.__index = class16
+
+function class16.new(p)
 	return (setmetatable({
-		array = if t76 ~= nil and t76.array ~= nil then t76.array else {}
-	}, t75))
+		array = (p == nil or p.array == nil) and {} or p.array
+	}, class16))
 end
-function t75.encode(p46) -- line: 2782
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n31 = 0
 
-	if p46.array ~= nil and #p46.array > 0 then
-		for _, v501 in p46.array do
-			local v502 = v501:encode()
-			local v503, v504 = proto.writeTag(buf, n31, 1, proto.wireTypes.lengthDelimited)
+function class16:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n31 = proto.writeBuffer(v503, v504, v502, buffer.len(v502))
+	if self.array ~= nil and #self.array > 0 then
+		for _, item in self.array do
+			local encoded = item:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf17 = buffer.create(n31)
-
-	buffer.copy(buf17, 0, buf, 0, n31)
-
-	return buf17
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t75.decode(p47: buffer) -- line: 2801
-	-- upvalues: t75 (copy), proto (copy), t1 (copy)
-	local v507 = t75.new()
-	local n32 = 0
 
-	while n32 < buffer.len(p47) do
-		local v509, v510
+function class16.decode(buf: buffer)
+	local v2 = class16.new()
+	local v3 = 0
 
-		v509, v510, n32 = proto.readTag(p47, n32)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v510 == proto.wireTypes.varint then
-			local v511
-
-			v511, n32 = proto.readVarInt(p47, n32)
-		elseif v510 == proto.wireTypes.lengthDelimited then
-			if v509 == 1 then
-				local v512
-
-				v512, n32 = proto.readBuffer(p47, n32)
-				table.insert(v507.array, t1.CatalogSortContent.decode(v512))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.array, v.CatalogSortContent.decode(v6))
 			else
-				local v513, v514 = proto.readVarInt(p47, n32)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n32 = v514 + v513
+				v3 = v6 + varInt
 			end
-		elseif v510 == proto.wireTypes.i32 then
-			local v515
-
-			v515, n32 = proto.readFixed32(p47, n32)
-		elseif v510 == proto.wireTypes.i64 then
-			local v516
-
-			v516, n32 = proto.readFixed64(p47, n32)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v510)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v507
+	return v2
 end
-function t75.jsonEncode(p48) -- line: 2846
-	local t77 = {}
 
-	if p48.array ~= nil and #p48.array > 0 then
-		local t78 = {}
+function class16:jsonEncode()
+	local v2 = {}
 
-		for _, v521 in p48.array do
-			table.insert(t78, v521:jsonEncode())
-		end
-
-		t77.array = t78
+	if self.array == nil or not (#self.array > 0) then
+		return v2
 	end
 
-	return t77
-end
-function t75.jsonDecode(t79: {[any]: any}) -- line: 2862
-	-- upvalues: t75 (copy), t1 (copy)
-	local v523 = t75.new()
+	local array = {}
 
-	if t79.array ~= nil then
-		local t80 = {}
-
-		for _, v526 in t79.array do
-			table.insert(t80, t1.CatalogSortContent.jsonDecode(v526))
-		end
-
-		v523.array = t80
+	for _, item in self.array do
+		table.insert(array, item:jsonEncode())
 	end
 
-	return v523
+	v2.array = array
+
+	return v2
 end
 
-t75.descriptor = {
+function class16.jsonDecode(p)
+	local v2 = class16.new()
+
+	if p.array == nil then
+		return v2
+	end
+
+	local array = {}
+
+	for _, item in p.array do
+		table.insert(array, v.CatalogSortContent.jsonDecode(item))
+	end
+
+	v2.array = array
+
+	return v2
+end
+
+class16.descriptor = {
 	name = "ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ArrayOfCatalogSortContent"
 }
-t1.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent = t75
-typeRegistry.default:register(t1.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent)
 
-local t81 = {}
+v.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent = class16
 
-t81.__index = t81
+typeRegistry.default:register(v.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent)
 
-function t81.new(t82: {[any]: any}?) -- line: 2894
-	-- upvalues: t81 (copy)
-	return (setmetatable({
-		kind = if t82 ~= nil and t82.kind ~= nil then t82.kind else nil,
-		item_hydration_specs = if t82 ~= nil and t82.item_hydration_specs ~= nil then t82.item_hydration_specs else {},
-		field_map = if t82 ~= nil and t82.field_map ~= nil then t82.field_map else nil
-	}, t81))
+local class17 = {}
+class17.__index = class17
+
+function class17.new(data)
+	local kind
+
+	if not (data == nil or data.kind == nil) then
+		kind = data.kind
+	end
+
+	local v2 = {
+		kind = kind,
+		item_hydration_specs = (data == nil or data.item_hydration_specs == nil) and {} or data.item_hydration_specs,
+		field_map = 0
+	}
+	local field_map
+
+	if not (data == nil or data.field_map == nil) then
+		field_map = data.field_map
+	end
+
+	v2.field_map = field_map
+	return (setmetatable(v2, class17))
 end
-function t81.encode(p49) -- line: 2906
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n33 = 0
 
-	if p49.kind ~= nil then
-		if p49.kind.type == "binding_path" then
-			local v531, v532 = proto.writeTag(buf, n33, 1, proto.wireTypes.lengthDelimited)
+function class17:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n33 = proto.writeString(v531, v532, p49.kind.value)
-		elseif p49.kind.type == "literal" then
-			local v533 = p49.kind.value:encode()
-			local v534, v535 = proto.writeTag(buf, n33, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n33 = proto.writeBuffer(v534, v535, v533, buffer.len(v533))
+	if self.kind ~= nil then
+		if self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
+		elseif self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	if p49.item_hydration_specs ~= nil and #p49.item_hydration_specs > 0 then
-		for _, v537 in p49.item_hydration_specs do
-			local v538 = v537:encode()
-			local v539, v540 = proto.writeTag(buf, n33, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n33 = proto.writeBuffer(v539, v540, v538, buffer.len(v538))
+	if self.item_hydration_specs ~= nil and #self.item_hydration_specs > 0 then
+		for _, item_hydration_spec in self.item_hydration_specs do
+			local encoded = item_hydration_spec:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	if p49.field_map ~= nil then
-		local v541 = p49.field_map:encode()
-		local v542, v543 = proto.writeTag(buf, n33, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n33 = proto.writeBuffer(v542, v543, v541, buffer.len(v541))
+	if self.field_map ~= nil then
+		local encoded = self.field_map:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf18 = buffer.create(n33)
-
-	buffer.copy(buf18, 0, buf, 0, n33)
-
-	return buf18
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t81.decode(p50: buffer) -- line: 2940
-	-- upvalues: t81 (copy), proto (copy), t1 (copy), hydration_data_spec (copy)
-	local v546 = t81.new()
-	local n34 = 0
 
-	while n34 < buffer.len(p50) do
-		local v548, v549
+function class17.decode(buf: buffer)
+	local result = class17.new()
+	local v2 = 0
 
-		v548, v549, n34 = proto.readTag(p50, n34)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v549 == proto.wireTypes.varint then
-			local v550
-
-			v550, n34 = proto.readVarInt(p50, n34)
-		elseif v549 == proto.wireTypes.lengthDelimited then
-			if v548 == 1 then
-				local v551
-
-				v551, n34 = proto.readBuffer(p50, n34)
-				v546.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v551)
-				}
-			elseif v548 == 2 then
-				local v552
-
-				v552, n34 = proto.readBuffer(p50, n34)
-				v546.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "literal",
-					value = t1.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems.decode(v552)
+					value = v.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems.decode(v5)
 				}
-			elseif v548 == 3 then
-				local v553
-
-				v553, n34 = proto.readBuffer(p50, n34)
-				table.insert(v546.item_hydration_specs, hydration_data_spec.HydrationDataSpec.decode(v553))
-			elseif v548 == 4 then
-				local v554
-
-				v554, n34 = proto.readBuffer(p50, n34)
-				v546.field_map = t1.CatalogSortContent.decode(v554)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.item_hydration_specs, hydration_data_spec.HydrationDataSpec.decode(v5))
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.field_map = v.CatalogSortContent.decode(v5)
 			else
-				local v555, v556 = proto.readVarInt(p50, n34)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n34 = v556 + v555
+				v2 = v5 + varInt
 			end
-		elseif v549 == proto.wireTypes.i32 then
-			local v557
-
-			v557, n34 = proto.readFixed32(p50, n34)
-		elseif v549 == proto.wireTypes.i64 then
-			local v558
-
-			v558, n34 = proto.readFixed64(p50, n34)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v549)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v546
+	return result
 end
-function t81.jsonEncode(p51) -- line: 3004
-	local t83 = {}
 
-	if p51.kind ~= nil then
-		if p51.kind.type == "binding_path" then
-			t83.bindingPath = p51.kind.value
-		elseif p51.kind.type == "literal" then
-			t83.literal = p51.kind.value:jsonEncode()
+function class17:jsonEncode()
+	local v2 = {}
+
+	if self.kind ~= nil then
+		if self.kind.type == "binding_path" then
+			v2.bindingPath = self.kind.value
+		elseif self.kind.type == "literal" then
+			v2.literal = self.kind.value:jsonEncode()
 		end
 	end
 
-	if p51.item_hydration_specs ~= nil and #p51.item_hydration_specs > 0 then
-		local t84 = {}
+	if self.item_hydration_specs ~= nil and #self.item_hydration_specs > 0 then
+		local itemHydrationSpecs = {}
 
-		for _, v563 in p51.item_hydration_specs do
-			table.insert(t84, v563:jsonEncode())
+		for _, item_hydration_spec in self.item_hydration_specs do
+			table.insert(itemHydrationSpecs, item_hydration_spec:jsonEncode())
 		end
 
-		t83.itemHydrationSpecs = t84
+		v2.itemHydrationSpecs = itemHydrationSpecs
 	end
 
-	if p51.field_map ~= nil then
-		t83.fieldMap = p51.field_map:jsonEncode()
+	if self.field_map ~= nil then
+		v2.fieldMap = self.field_map:jsonEncode()
 	end
 
-	return t83
+	return v2
 end
-function t81.jsonDecode(t85: {[any]: any}) -- line: 3030
-	-- upvalues: t81 (copy), t1 (copy), hydration_data_spec (copy)
-	local v565 = t81.new()
 
-	if t85.binding_path ~= nil then
-		v565.kind = {
-			type = "binding_path",
-			value = t85.binding_path
-		}
+function class17.jsonDecode(data)
+	local v2 = class17.new()
+
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t85.bindingPath ~= nil then
-		v565.kind = {
-			type = "binding_path",
-			value = t85.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	if t85.literal ~= nil then
-		v565.kind = {
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems.jsonDecode(t85.literal)
+			value = v.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems.jsonDecode(data.literal)
 		}
 	end
 
-	if t85.item_hydration_specs ~= nil then
-		local t86 = {}
+	if data.item_hydration_specs ~= nil then
+		local item_hydration_specs = {}
 
-		for _, v568 in t85.item_hydration_specs do
-			table.insert(t86, hydration_data_spec.HydrationDataSpec.jsonDecode(v568))
+		for _, item_hydration_spec in data.item_hydration_specs do
+			table.insert(item_hydration_specs, hydration_data_spec.HydrationDataSpec.jsonDecode(item_hydration_spec))
 		end
 
-		v565.item_hydration_specs = t86
+		v2.item_hydration_specs = item_hydration_specs
 	end
 
-	if t85.itemHydrationSpecs ~= nil then
-		local t87 = {}
+	if data.itemHydrationSpecs ~= nil then
+		local item_hydration_specs = {}
 
-		for _, v571 in t85.itemHydrationSpecs do
-			table.insert(t87, hydration_data_spec.HydrationDataSpec.jsonDecode(v571))
+		for _, itemHydrationSpec in data.itemHydrationSpecs do
+			table.insert(item_hydration_specs, hydration_data_spec.HydrationDataSpec.jsonDecode(itemHydrationSpec))
 		end
 
-		v565.item_hydration_specs = t87
+		v2.item_hydration_specs = item_hydration_specs
 	end
 
-	if t85.field_map ~= nil then
-		v565.field_map = t1.CatalogSortContent.jsonDecode(t85.field_map)
+	if data.field_map ~= nil then
+		v2.field_map = v.CatalogSortContent.jsonDecode(data.field_map)
 	end
 
-	if t85.fieldMap ~= nil then
-		v565.field_map = t1.CatalogSortContent.jsonDecode(t85.fieldMap)
+	if data.fieldMap ~= nil then
+		v2.field_map = v.CatalogSortContent.jsonDecode(data.fieldMap)
 	end
 
-	return v565
+	return v2
 end
 
-t81.descriptor = {
+class17.descriptor = {
 	name = "ArrayOfCatalogSortContentProp_ArrayMap",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ArrayMap"
 }
-t1.ArrayOfCatalogSortContentProp_ArrayMap = t81
-typeRegistry.default:register(t1.ArrayOfCatalogSortContentProp_ArrayMap)
 
-local t88 = {}
+v.ArrayOfCatalogSortContentProp_ArrayMap = class17
 
-t88.__index = t88
+typeRegistry.default:register(v.ArrayOfCatalogSortContentProp_ArrayMap)
 
-function t88.new(t89: {[any]: any}?) -- line: 3100
-	-- upvalues: t88 (copy)
+local class18 = {}
+class18.__index = class18
+
+function class18.new(p)
 	return (setmetatable({
-		items = if t89 ~= nil and t89.items ~= nil then t89.items else {}
-	}, t88))
+		items = (p == nil or p.items == nil) and {} or p.items
+	}, class18))
 end
-function t88.encode(p52) -- line: 3111
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n35 = 0
 
-	if p52.items ~= nil and #p52.items > 0 then
-		for _, v577 in p52.items do
-			local v578 = v577:encode()
-			local v579, v580 = proto.writeTag(buf, n35, 1, proto.wireTypes.lengthDelimited)
+function class18:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n35 = proto.writeBuffer(v579, v580, v578, buffer.len(v578))
+	if self.items ~= nil and #self.items > 0 then
+		for _, item in self.items do
+			local encoded = item:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf19 = buffer.create(n35)
-
-	buffer.copy(buf19, 0, buf, 0, n35)
-
-	return buf19
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t88.decode(p53: buffer) -- line: 3130
-	-- upvalues: t88 (copy), proto (copy), catalog_sort_data (copy)
-	local v583 = t88.new()
-	local n36 = 0
 
-	while n36 < buffer.len(p53) do
-		local v585, v586
+function class18.decode(buf: buffer)
+	local v2 = class18.new()
+	local v3 = 0
 
-		v585, v586, n36 = proto.readTag(p53, n36)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v586 == proto.wireTypes.varint then
-			local v587
-
-			v587, n36 = proto.readVarInt(p53, n36)
-		elseif v586 == proto.wireTypes.lengthDelimited then
-			if v585 == 1 then
-				local v588
-
-				v588, n36 = proto.readBuffer(p53, n36)
-				table.insert(v583.items, catalog_sort_data.CatalogSortContentData.decode(v588))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.items, catalog_sort_data.CatalogSortContentData.decode(v6))
 			else
-				local v589, v590 = proto.readVarInt(p53, n36)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n36 = v590 + v589
+				v3 = v6 + varInt
 			end
-		elseif v586 == proto.wireTypes.i32 then
-			local v591
-
-			v591, n36 = proto.readFixed32(p53, n36)
-		elseif v586 == proto.wireTypes.i64 then
-			local v592
-
-			v592, n36 = proto.readFixed64(p53, n36)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v586)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v583
+	return v2
 end
-function t88.jsonEncode(p54) -- line: 3178
-	local t90 = {}
 
-	if p54.items ~= nil and #p54.items > 0 then
-		local t91 = {}
+function class18:jsonEncode()
+	local v2 = {}
 
-		for _, v597 in p54.items do
-			table.insert(t91, v597:jsonEncode())
-		end
-
-		t90.items = t91
+	if self.items == nil or not (#self.items > 0) then
+		return v2
 	end
 
-	return t90
-end
-function t88.jsonDecode(t92: {[any]: any}) -- line: 3194
-	-- upvalues: t88 (copy), catalog_sort_data (copy)
-	local v599 = t88.new()
+	local items = {}
 
-	if t92.items ~= nil then
-		local t93 = {}
-
-		for _, v602 in t92.items do
-			table.insert(t93, catalog_sort_data.CatalogSortContentData.jsonDecode(v602))
-		end
-
-		v599.items = t93
+	for _, item in self.items do
+		table.insert(items, item:jsonEncode())
 	end
 
-	return v599
+	v2.items = items
+
+	return v2
 end
 
-t88.descriptor = {
+function class18.jsonDecode(p)
+	local v2 = class18.new()
+
+	if p.items == nil then
+		return v2
+	end
+
+	local items = {}
+
+	for _, item in p.items do
+		table.insert(items, catalog_sort_data.CatalogSortContentData.jsonDecode(item))
+	end
+
+	v2.items = items
+
+	return v2
+end
+
+class18.descriptor = {
 	name = "ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems",
 	fullName = "roblox.apppageplatform.shared.v1beta1.LiteralItems"
 }
-t1.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems = t88
-typeRegistry.default:register(t1.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems)
 
-local t94 = {}
+v.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems = class18
 
-t94.__index = t94
+typeRegistry.default:register(v.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems)
 
-function t94.new(t95: {[any]: any}?) -- line: 3229
-	-- upvalues: t94 (copy)
-	return (setmetatable({
-		background_layers = if t95 ~= nil and t95.background_layers ~= nil then t95.background_layers else nil
-	}, t94))
-end
-function t94.encode(p55) -- line: 3235
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n37 = 0
+local class19 = {}
+class19.__index = class19
 
-	if p55.background_layers ~= nil then
-		local v607 = p55.background_layers:encode()
-		local v608, v609 = proto.writeTag(buf, n37, 1, proto.wireTypes.lengthDelimited)
+function class19.new(p)
+	local background_layers
 
-		buf, n37 = proto.writeBuffer(v608, v609, v607, buffer.len(v607))
+	if not (p == nil or p.background_layers == nil) then
+		background_layers = p.background_layers
 	end
 
-	local buf20 = buffer.create(n37)
-
-	buffer.copy(buf20, 0, buf, 0, n37)
-
-	return buf20
+	return (setmetatable({ background_layers = background_layers }, class19))
 end
-function t94.decode(p56: buffer) -- line: 3250
-	-- upvalues: t94 (copy), proto (copy), background_layer (copy)
-	local v612 = t94.new()
-	local n38 = 0
 
-	while n38 < buffer.len(p56) do
-		local v614, v615
+function class19:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		v614, v615, n38 = proto.readTag(p56, n38)
+	if self.background_layers ~= nil then
+		local encoded = self.background_layers:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-		if v615 == proto.wireTypes.varint then
-			local v616
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
 
-			v616, n38 = proto.readVarInt(p56, n38)
-		elseif v615 == proto.wireTypes.lengthDelimited then
-			if v614 == 1 then
-				local v617
+function class19.decode(buf: buffer)
+	local result = class19.new()
+	local v2 = 0
 
-				v617, n38 = proto.readBuffer(p56, n38)
-				v612.background_layers = background_layer.ArrayOfBackgroundLayerProp.decode(v617)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.background_layers = background_layer.ArrayOfBackgroundLayerProp.decode(v5)
 			else
-				local v618, v619 = proto.readVarInt(p56, n38)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n38 = v619 + v618
+				v2 = v5 + varInt
 			end
-		elseif v615 == proto.wireTypes.i32 then
-			local v620
-
-			v620, n38 = proto.readFixed32(p56, n38)
-		elseif v615 == proto.wireTypes.i64 then
-			local v621
-
-			v621, n38 = proto.readFixed64(p56, n38)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v615)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v612
-end
-function t94.jsonEncode(p57) -- line: 3294
-	local t96 = {}
-
-	if p57.background_layers ~= nil then
-		t96.backgroundLayers = p57.background_layers:jsonEncode()
-	end
-
-	return t96
-end
-function t94.jsonDecode(t97: {[any]: any}) -- line: 3304
-	-- upvalues: t94 (copy), background_layer (copy)
-	local v625 = t94.new()
-
-	if t97.background_layers ~= nil then
-		v625.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(t97.background_layers)
-	end
-
-	if t97.backgroundLayers ~= nil then
-		v625.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(t97.backgroundLayers)
-	end
-
-	return v625
+	return result
 end
 
-t94.descriptor = {
+function class19:jsonEncode()
+	local v2 = {}
+
+	if self.background_layers ~= nil then
+		v2.backgroundLayers = self.background_layers:jsonEncode()
+	end
+
+	return v2
+end
+
+function class19.jsonDecode(p)
+	local v2 = class19.new()
+
+	if p.background_layers ~= nil then
+		v2.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(p.background_layers)
+	end
+
+	if p.backgroundLayers ~= nil then
+		v2.background_layers = background_layer.ArrayOfBackgroundLayerProp.jsonDecode(p.backgroundLayers)
+	end
+
+	return v2
+end
+
+class19.descriptor = {
 	name = "WidgetStyle",
 	fullName = "roblox.apppageplatform.shared.v1beta1.WidgetStyle"
 }
-t1.WidgetStyle = t94
-typeRegistry.default:register(t1.WidgetStyle)
 
-local t98 = {}
+v.WidgetStyle = class19
 
-t98.__index = t98
+typeRegistry.default:register(v.WidgetStyle)
 
-function t98.new(t99: {[any]: any}?) -- line: 3338
-	-- upvalues: t98 (copy)
-	return (setmetatable({
-		kind = if t99 ~= nil and t99.kind ~= nil then t99.kind else nil
-	}, t98))
+local class20 = {}
+class20.__index = class20
+
+function class20.new(p)
+	local kind
+
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
+
+	return (setmetatable({ kind = kind }, class20))
 end
-function t98.encode(p58) -- line: 3344
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n39 = 0
 
-	if p58.kind ~= nil then
-		if p58.kind.type == "literal" then
-			local v630 = p58.kind.value:encode()
-			local v631, v632 = proto.writeTag(buf, n39, 1, proto.wireTypes.lengthDelimited)
+function class20:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n39 = proto.writeBuffer(v631, v632, v630, buffer.len(v630))
-		elseif p58.kind.type == "binding_path" then
-			local v633, v634 = proto.writeTag(buf, n39, 2, proto.wireTypes.lengthDelimited)
-
-			buf, n39 = proto.writeString(v633, v634, p58.kind.value)
-		elseif p58.kind.type == "conditional" then
-			local v635 = p58.kind.value:encode()
-			local v636, v637 = proto.writeTag(buf, n39, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n39 = proto.writeBuffer(v636, v637, v635, buffer.len(v635))
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
+		elseif self.kind.type == "conditional" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf21 = buffer.create(n39)
-
-	buffer.copy(buf21, 0, buf, 0, n39)
-
-	return buf21
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t98.decode(p59: buffer) -- line: 3368
-	-- upvalues: t98 (copy), proto (copy), t1 (copy)
-	local v640 = t98.new()
-	local n40 = 0
 
-	while n40 < buffer.len(p59) do
-		local v642, v643
+function class20.decode(buf: buffer)
+	local result = class20.new()
+	local v2 = 0
 
-		v642, v643, n40 = proto.readTag(p59, n40)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v643 == proto.wireTypes.varint then
-			local v644
-
-			v644, n40 = proto.readVarInt(p59, n40)
-		elseif v643 == proto.wireTypes.lengthDelimited then
-			if v642 == 1 then
-				local v645
-
-				v645, n40 = proto.readBuffer(p59, n40)
-				v640.kind = {
-					type = "literal",
-					value = t1.WidgetStyle.decode(v645)
-				}
-			elseif v642 == 2 then
-				local v646
-
-				v646, n40 = proto.readBuffer(p59, n40)
-				v640.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v646)
-				}
-			elseif v642 == 3 then
-				local v647
-
-				v647, n40 = proto.readBuffer(p59, n40)
-				v640.kind = {
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "literal", value = v.WidgetStyle.decode(v5) }
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = {
 					type = "conditional",
-					value = t1.WidgetStyleProp_ConditionalOptions.decode(v647)
+					value = v.WidgetStyleProp_ConditionalOptions.decode(v5)
 				}
 			else
-				local v648, v649 = proto.readVarInt(p59, n40)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n40 = v649 + v648
+				v2 = v5 + varInt
 			end
-		elseif v643 == proto.wireTypes.i32 then
-			local v650
-
-			v650, n40 = proto.readFixed32(p59, n40)
-		elseif v643 == proto.wireTypes.i64 then
-			local v651
-
-			v651, n40 = proto.readFixed64(p59, n40)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v643)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v640
+	return result
 end
-function t98.jsonEncode(p60) -- line: 3422
-	local t100 = {}
 
-	if p60.kind ~= nil then
-		if p60.kind.type == "literal" then
-			t100.literal = p60.kind.value:jsonEncode()
+function class20:jsonEncode()
+	local v2 = {}
 
-			return t100
-		end
-
-		if p60.kind.type == "binding_path" then
-			t100.bindingPath = p60.kind.value
-
-			return t100
-		end
-
-		if p60.kind.type == "conditional" then
-			t100.conditional = p60.kind.value:jsonEncode()
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t100
-end
-function t98.jsonDecode(t101: {[any]: any}) -- line: 3438
-	-- upvalues: t98 (copy), t1 (copy)
-	local v655 = t98.new()
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	end
 
-	if t101.literal ~= nil then
-		v655.kind = {
+	if self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+		return v2
+	end
+
+	if self.kind.type == "conditional" then
+		v2.conditional = self.kind.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class20.jsonDecode(data)
+	local v2 = class20.new()
+
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.WidgetStyle.jsonDecode(t101.literal)
+			value = v.WidgetStyle.jsonDecode(data.literal)
 		}
 	end
 
-	if t101.binding_path ~= nil then
-		v655.kind = {
-			type = "binding_path",
-			value = t101.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t101.bindingPath ~= nil then
-		v655.kind = {
-			type = "binding_path",
-			value = t101.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	if t101.conditional ~= nil then
-		v655.kind = {
+	if data.conditional ~= nil then
+		v2.kind = {
 			type = "conditional",
-			value = t1.WidgetStyleProp_ConditionalOptions.jsonDecode(t101.conditional)
+			value = v.WidgetStyleProp_ConditionalOptions.jsonDecode(data.conditional)
 		}
 	end
 
-	return v655
+	return v2
 end
 
-t98.descriptor = {
+class20.descriptor = {
 	name = "WidgetStyleProp",
 	fullName = "roblox.apppageplatform.shared.v1beta1.WidgetStyleProp"
 }
-t1.WidgetStyleProp = t98
-typeRegistry.default:register(t1.WidgetStyleProp)
 
-local t102 = {}
+v.WidgetStyleProp = class20
 
-t102.__index = t102
+typeRegistry.default:register(v.WidgetStyleProp)
 
-function t102.new(t103: {[any]: any}?) -- line: 3477
-	-- upvalues: t102 (copy)
-	return (setmetatable({
-		condition = if t103 ~= nil and t103.condition ~= nil then t103.condition else nil,
-		kind = if t103 ~= nil and t103.kind ~= nil then t103.kind else nil
-	}, t102))
-end
-function t102.encode(p61) -- line: 3486
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n41 = 0
+local class21 = {}
+class21.__index = class21
 
-	if p61.condition ~= nil then
-		local v660 = p61.condition:encode()
-		local v661, v662 = proto.writeTag(buf, n41, 1, proto.wireTypes.lengthDelimited)
+function class21.new(p)
+	local condition
 
-		buf, n41 = proto.writeBuffer(v661, v662, v660, buffer.len(v660))
+	if not (p == nil or p.condition == nil) then
+		condition = p.condition
 	end
 
-	if p61.kind ~= nil then
-		if p61.kind.type == "literal" then
-			local v663 = p61.kind.value:encode()
-			local v664, v665 = proto.writeTag(buf, n41, 2, proto.wireTypes.lengthDelimited)
+	local kind
 
-			buf, n41 = proto.writeBuffer(v664, v665, v663, buffer.len(v663))
-		elseif p61.kind.type == "binding_path" then
-			local v666, v667 = proto.writeTag(buf, n41, 3, proto.wireTypes.lengthDelimited)
+	if not (p == nil or p.kind == nil) then
+		kind = p.kind
+	end
 
-			buf, n41 = proto.writeString(v666, v667, p61.kind.value)
+	return (setmetatable({ condition = condition, kind = kind }, class21))
+end
+
+function class21:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.condition ~= nil then
+		local encoded = self.condition:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.kind ~= nil then
+		if self.kind.type == "literal" then
+			local encoded = self.kind.value:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		elseif self.kind.type == "binding_path" then
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, self.kind.value)
 		end
 	end
 
-	local buf22 = buffer.create(n41)
-
-	buffer.copy(buf22, 0, buf, 0, n41)
-
-	return buf22
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t102.decode(p62: buffer) -- line: 3512
-	-- upvalues: t102 (copy), proto (copy), prop_condition (copy), t1 (copy)
-	local v670 = t102.new()
-	local n42 = 0
 
-	while n42 < buffer.len(p62) do
-		local v672, v673
+function class21.decode(buf: buffer)
+	local result = class21.new()
+	local v2 = 0
 
-		v672, v673, n42 = proto.readTag(p62, n42)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v673 == proto.wireTypes.varint then
-			local v674
-
-			v674, n42 = proto.readVarInt(p62, n42)
-		elseif v673 == proto.wireTypes.lengthDelimited then
-			if v672 == 1 then
-				local v675
-
-				v675, n42 = proto.readBuffer(p62, n42)
-				v670.condition = prop_condition.PropCondition.decode(v675)
-			elseif v672 == 2 then
-				local v676
-
-				v676, n42 = proto.readBuffer(p62, n42)
-				v670.kind = {
-					type = "literal",
-					value = t1.WidgetStyle.decode(v676)
-				}
-			elseif v672 == 3 then
-				local v677
-
-				v677, n42 = proto.readBuffer(p62, n42)
-				v670.kind = {
-					type = "binding_path",
-					value = buffer.tostring(v677)
-				}
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.condition = prop_condition.PropCondition.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "literal", value = v.WidgetStyle.decode(v5) }
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.kind = { type = "binding_path", value = buffer.tostring(v5) }
 			else
-				local v678, v679 = proto.readVarInt(p62, n42)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n42 = v679 + v678
+				v2 = v5 + varInt
 			end
-		elseif v673 == proto.wireTypes.i32 then
-			local v680
-
-			v680, n42 = proto.readFixed32(p62, n42)
-		elseif v673 == proto.wireTypes.i64 then
-			local v681
-
-			v681, n42 = proto.readFixed64(p62, n42)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v673)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v670
+	return result
 end
-function t102.jsonEncode(p63) -- line: 3565
-	local t104 = {}
 
-	if p63.condition ~= nil then
-		t104.condition = p63.condition:jsonEncode()
+function class21:jsonEncode()
+	local v2 = {}
+
+	if self.condition ~= nil then
+		v2.condition = self.condition:jsonEncode()
 	end
 
-	if p63.kind ~= nil then
-		if p63.kind.type == "literal" then
-			t104.literal = p63.kind.value:jsonEncode()
-
-			return t104
-		end
-
-		if p63.kind.type == "binding_path" then
-			t104.bindingPath = p63.kind.value
-		end
+	if self.kind == nil then
+		return v2
 	end
 
-	return t104
+	if self.kind.type == "literal" then
+		v2.literal = self.kind.value:jsonEncode()
+		return v2
+	elseif self.kind.type == "binding_path" then
+		v2.bindingPath = self.kind.value
+	end
+
+	return v2
 end
-function t102.jsonDecode(t105: {[any]: any}) -- line: 3583
-	-- upvalues: t102 (copy), prop_condition (copy), t1 (copy)
-	local v685 = t102.new()
 
-	if t105.condition ~= nil then
-		v685.condition = prop_condition.PropCondition.jsonDecode(t105.condition)
+function class21.jsonDecode(data)
+	local v2 = class21.new()
+
+	if data.condition ~= nil then
+		v2.condition = prop_condition.PropCondition.jsonDecode(data.condition)
 	end
 
-	if t105.literal ~= nil then
-		v685.kind = {
+	if data.literal ~= nil then
+		v2.kind = {
 			type = "literal",
-			value = t1.WidgetStyle.jsonDecode(t105.literal)
+			value = v.WidgetStyle.jsonDecode(data.literal)
 		}
 	end
 
-	if t105.binding_path ~= nil then
-		v685.kind = {
-			type = "binding_path",
-			value = t105.binding_path
-		}
+	if data.binding_path ~= nil then
+		v2.kind = { type = "binding_path", value = data.binding_path }
 	end
 
-	if t105.bindingPath ~= nil then
-		v685.kind = {
-			type = "binding_path",
-			value = t105.bindingPath
-		}
+	if data.bindingPath ~= nil then
+		v2.kind = { type = "binding_path", value = data.bindingPath }
 	end
 
-	return v685
+	return v2
 end
 
-t102.descriptor = {
+class21.descriptor = {
 	name = "WidgetStyleProp_ConditionalOption",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOption"
 }
-t1.WidgetStyleProp_ConditionalOption = t102
-typeRegistry.default:register(t1.WidgetStyleProp_ConditionalOption)
 
-local t106 = {}
+v.WidgetStyleProp_ConditionalOption = class21
 
-t106.__index = t106
+typeRegistry.default:register(v.WidgetStyleProp_ConditionalOption)
 
-function t106.new(t107: {[any]: any}?) -- line: 3622
-	-- upvalues: t106 (copy)
+local class22 = {}
+class22.__index = class22
+
+function class22.new(p)
 	return (setmetatable({
-		options = if t107 ~= nil and t107.options ~= nil then t107.options else {}
-	}, t106))
+		options = (p == nil or p.options == nil) and {} or p.options
+	}, class22))
 end
-function t106.encode(p64) -- line: 3630
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n43 = 0
 
-	if p64.options ~= nil and #p64.options > 0 then
-		for _, v691 in p64.options do
-			local v692 = v691:encode()
-			local v693, v694 = proto.writeTag(buf, n43, 1, proto.wireTypes.lengthDelimited)
+function class22:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n43 = proto.writeBuffer(v693, v694, v692, buffer.len(v692))
+	if self.options ~= nil and #self.options > 0 then
+		for _, option in self.options do
+			local encoded = option:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf23 = buffer.create(n43)
-
-	buffer.copy(buf23, 0, buf, 0, n43)
-
-	return buf23
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t106.decode(p65: buffer) -- line: 3647
-	-- upvalues: t106 (copy), proto (copy), t1 (copy)
-	local v697 = t106.new()
-	local n44 = 0
 
-	while n44 < buffer.len(p65) do
-		local v699, v700
+function class22.decode(buf: buffer)
+	local v2 = class22.new()
+	local v3 = 0
 
-		v699, v700, n44 = proto.readTag(p65, n44)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v700 == proto.wireTypes.varint then
-			local v701
-
-			v701, n44 = proto.readVarInt(p65, n44)
-		elseif v700 == proto.wireTypes.lengthDelimited then
-			if v699 == 1 then
-				local v702
-
-				v702, n44 = proto.readBuffer(p65, n44)
-				table.insert(v697.options, t1.WidgetStyleProp_ConditionalOption.decode(v702))
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
+				table.insert(v2.options, v.WidgetStyleProp_ConditionalOption.decode(v6))
 			else
-				local v703, v704 = proto.readVarInt(p65, n44)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n44 = v704 + v703
+				v3 = v6 + varInt
 			end
-		elseif v700 == proto.wireTypes.i32 then
-			local v705
-
-			v705, n44 = proto.readFixed32(p65, n44)
-		elseif v700 == proto.wireTypes.i64 then
-			local v706
-
-			v706, n44 = proto.readFixed64(p65, n44)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v700)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v697
+	return v2
 end
-function t106.jsonEncode(p66) -- line: 3690
-	local t108 = {}
 
-	if p66.options ~= nil and #p66.options > 0 then
-		local t109 = {}
+function class22:jsonEncode()
+	local v2 = {}
 
-		for _, v711 in p66.options do
-			table.insert(t109, v711:jsonEncode())
-		end
-
-		t108.options = t109
+	if self.options == nil or not (#self.options > 0) then
+		return v2
 	end
 
-	return t108
-end
-function t106.jsonDecode(t110: {[any]: any}) -- line: 3704
-	-- upvalues: t106 (copy), t1 (copy)
-	local v713 = t106.new()
+	local options = {}
 
-	if t110.options ~= nil then
-		local t111 = {}
-
-		for _, v716 in t110.options do
-			table.insert(t111, t1.WidgetStyleProp_ConditionalOption.jsonDecode(v716))
-		end
-
-		v713.options = t111
+	for _, option in self.options do
+		table.insert(options, option:jsonEncode())
 	end
 
-	return v713
+	v2.options = options
+
+	return v2
 end
 
-t106.descriptor = {
+function class22.jsonDecode(p)
+	local v2 = class22.new()
+
+	if p.options == nil then
+		return v2
+	end
+
+	local options = {}
+
+	for _, option in p.options do
+		table.insert(options, v.WidgetStyleProp_ConditionalOption.jsonDecode(option))
+	end
+
+	v2.options = options
+
+	return v2
+end
+
+class22.descriptor = {
 	name = "WidgetStyleProp_ConditionalOptions",
 	fullName = "roblox.apppageplatform.shared.v1beta1.ConditionalOptions"
 }
-t1.WidgetStyleProp_ConditionalOptions = t106
-typeRegistry.default:register(t1.WidgetStyleProp_ConditionalOptions)
+
+v.WidgetStyleProp_ConditionalOptions = class22
+
+typeRegistry.default:register(v.WidgetStyleProp_ConditionalOptions)
 
 return {
-	ItemFooter = t1.ItemFooter,
-	ArrayOfItemFooterProp = t1.ArrayOfItemFooterProp,
-	ArrayOfItemFooterProp_ConditionalOption = t1.ArrayOfItemFooterProp_ConditionalOption,
-	ArrayOfItemFooterProp_ConditionalOptions = t1.ArrayOfItemFooterProp_ConditionalOptions,
-	ArrayOfItemFooterProp_ArrayOfItemFooter = t1.ArrayOfItemFooterProp_ArrayOfItemFooter,
-	ArrayOfItemFooterProp_ArrayMap = t1.ArrayOfItemFooterProp_ArrayMap,
-	ArrayOfItemFooterProp_ArrayMap_LiteralItems = t1.ArrayOfItemFooterProp_ArrayMap_LiteralItems,
-	CardStyle = t1.CardStyle,
-	CardStyleProp = t1.CardStyleProp,
-	CardStyleProp_ConditionalOption = t1.CardStyleProp_ConditionalOption,
-	CardStyleProp_ConditionalOptions = t1.CardStyleProp_ConditionalOptions,
-	CatalogSortContent = t1.CatalogSortContent,
-	ArrayOfCatalogSortContentProp = t1.ArrayOfCatalogSortContentProp,
-	ArrayOfCatalogSortContentProp_ConditionalOption = t1.ArrayOfCatalogSortContentProp_ConditionalOption,
-	ArrayOfCatalogSortContentProp_ConditionalOptions = t1.ArrayOfCatalogSortContentProp_ConditionalOptions,
-	ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent = t1.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent,
-	ArrayOfCatalogSortContentProp_ArrayMap = t1.ArrayOfCatalogSortContentProp_ArrayMap,
-	ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems = t1.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems,
-	WidgetStyle = t1.WidgetStyle,
-	WidgetStyleProp = t1.WidgetStyleProp,
-	WidgetStyleProp_ConditionalOption = t1.WidgetStyleProp_ConditionalOption,
-	WidgetStyleProp_ConditionalOptions = t1.WidgetStyleProp_ConditionalOptions
+	ItemFooter = v.ItemFooter,
+	ArrayOfItemFooterProp = v.ArrayOfItemFooterProp,
+	ArrayOfItemFooterProp_ConditionalOption = v.ArrayOfItemFooterProp_ConditionalOption,
+	ArrayOfItemFooterProp_ConditionalOptions = v.ArrayOfItemFooterProp_ConditionalOptions,
+	ArrayOfItemFooterProp_ArrayOfItemFooter = v.ArrayOfItemFooterProp_ArrayOfItemFooter,
+	ArrayOfItemFooterProp_ArrayMap = v.ArrayOfItemFooterProp_ArrayMap,
+	ArrayOfItemFooterProp_ArrayMap_LiteralItems = v.ArrayOfItemFooterProp_ArrayMap_LiteralItems,
+	CardStyle = v.CardStyle,
+	CardStyleProp = v.CardStyleProp,
+	CardStyleProp_ConditionalOption = v.CardStyleProp_ConditionalOption,
+	CardStyleProp_ConditionalOptions = v.CardStyleProp_ConditionalOptions,
+	CatalogSortContent = v.CatalogSortContent,
+	ArrayOfCatalogSortContentProp = v.ArrayOfCatalogSortContentProp,
+	ArrayOfCatalogSortContentProp_ConditionalOption = v.ArrayOfCatalogSortContentProp_ConditionalOption,
+	ArrayOfCatalogSortContentProp_ConditionalOptions = v.ArrayOfCatalogSortContentProp_ConditionalOptions,
+	ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent = v.ArrayOfCatalogSortContentProp_ArrayOfCatalogSortContent,
+	ArrayOfCatalogSortContentProp_ArrayMap = v.ArrayOfCatalogSortContentProp_ArrayMap,
+	ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems = v.ArrayOfCatalogSortContentProp_ArrayMap_LiteralItems,
+	WidgetStyle = v.WidgetStyle,
+	WidgetStyleProp = v.WidgetStyleProp,
+	WidgetStyleProp_ConditionalOption = v.WidgetStyleProp_ConditionalOption,
+	WidgetStyleProp_ConditionalOptions = v.WidgetStyleProp_ConditionalOptions
 }

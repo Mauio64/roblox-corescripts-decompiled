@@ -1,9 +1,12 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParentParent.GraphQL)
-require(ParentParent.jsutils.typedDocumentNode)
+require(parent2.GraphQL)
+
+require(parent.jsutils.typedDocumentNode)
+
 require(script.Parent.DataProxy)
+
 require(script.Parent.common)
 
 return {}

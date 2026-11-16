@@ -1,11 +1,18 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
+local parent = BuildExperience.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceInGameShell = SharedFlags.FFlagBuildExperienceInGameShell
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
 local GetAssistantBuildStore = require(BuildExperience.Stores.GetAssistantBuildStore)
 local GetPlayButtonStore = require(BuildExperience.Stores.GetPlayButtonStore)
+
 local EducationalTooltip = Foundation.EducationalTooltip
 local IconButton = Foundation.IconButton
 local IconName = Foundation.Enums.IconName
@@ -14,77 +21,113 @@ local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local View = Foundation.View
 
-local function AssistantBuild(t1: {[any]: any}) -- line: 28
-	-- upvalues: GetAssistantBuildStore (copy), GetPlayButtonStore (copy), SignalsReact (copy), React (copy), IconButton (copy), IconName (copy), InputSize (copy), View (copy), EducationalTooltip (copy), PopoverAlign (copy), PopoverSide (copy), LocalizationStrings (copy)
-	local v18 = GetAssistantBuildStore()
-	local v19 = GetPlayButtonStore()
-	local v20 = SignalsReact.useSignalState(v18.getIsDisabled)
-	local v21 = SignalsReact.useSignalState(v18.getIsDisabledTooltipOpen)
-	local v22 = React.useCallback(function() -- line: 34
-		-- upvalues: v20 (copy), v18 (copy), v21 (copy), v19 (copy)
-		if v20 then
-			v18.setIsDisabledTooltipOpen(not v21)
+local function AssistantBuild(props)
+	local v = useLocalization({
+		disabledTitle = LocalizationStrings.CHAT_ASSISTANT_DISABLED,
+		portraitRequired = LocalizationStrings.CHAT_PORTRAIT_REQUIRED
+	})
 
+	local assistantBuildStore = GetAssistantBuildStore()
+	local playButtonStore = GetPlayButtonStore()
+	local isDisabled = SignalsReact.useSignalState(assistantBuildStore.getIsDisabled)
+	local isOpen = SignalsReact.useSignalState(assistantBuildStore.getIsDisabledTooltipOpen)
+	local v2
+
+	if FFlagBuildExperienceInGameShell then
+		v2 = SignalsReact.useSignalState(assistantBuildStore.getIsOverlayVisible)
+	end
+
+	local onActivated = React.useCallback(function()
+		if isDisabled then
+			assistantBuildStore.setIsDisabledTooltipOpen(not isOpen)
 			return
 		end
 
-		v18.setIsDisabledTooltipOpen(false)
-		v19.setIsActive(true)
-	end, {
-		v18,
-		v20,
-		v21,
-		v19
-	})
+		assistantBuildStore.setIsDisabledTooltipOpen(false)
+		playButtonStore.setIsActive(true)
+	end, { assistantBuildStore, isDisabled, isOpen, playButtonStore })
+	local onPressedOutside = React.useCallback(function()
+		assistantBuildStore.setIsDisabledTooltipOpen(false)
+	end, { assistantBuildStore })
 
-	React.useEffect(function() -- line: 43
-		-- upvalues: v20 (copy), v19 (copy), v18 (copy)
-		if v20 then
-			v19.setIsActive(false)
-
-			return
+	React.useEffect(function()
+		if isDisabled then
+			playButtonStore.setIsActive(false)
+		else
+			assistantBuildStore.setIsDisabledTooltipOpen(false)
 		end
+	end, { assistantBuildStore, isDisabled, playButtonStore })
 
-		v18.setIsDisabledTooltipOpen(false)
-	end, {
-		v18,
-		v20,
-		v19
-	})
+	local createElement = React.createElement
+	local icon
 
-	local v23 = React.createElement(IconButton, {
-		isCircular = true,
-		testId = "build-header-play-button",
-		icon = IconName.Nebula,
-		variant = t1.variant,
+	if FFlagBuildExperienceInGameShell then
+		if v2 then
+			icon = IconName.TwoArrowsFromCenter
+		else
+			icon = IconName.TwoArrowsToCenter
+		end
+	else
+		icon = IconName.Nebula
+	end
+
+	local v3 = {
+		icon = icon,
+		variant = props.variant,
 		size = InputSize.Medium,
-		isDisabled = v20,
-		onActivated = v22
-	})
-	local v24 = React.createElement(View, {
-		tag = "auto-xy",
-		testId = "build-header-play-button-disabled",
-		onActivated = v22
-	}, {
-		Button = v23
-	})
+		isCircular = true,
+		isDisabled = isDisabled,
+		onActivated = 0,
+		testId = "build-header-play-button"
+	}
+	local onActivated2
 
-	return React.createElement(View, {
+	if FFlagBuildExperienceInGameShell then
+		onActivated2 = assistantBuildStore.activate
+	else
+		onActivated2 = onActivated
+	end
+
+	v3.onActivated = onActivated2
+	local element = createElement(IconButton, v3)
+
+	local createElement2 = React.createElement
+
+	if FFlagBuildExperienceInGameShell then
+		onActivated = assistantBuildStore.activate
+	end
+
+	local element2 = createElement2(
+		View,
+		{ onActivated = onActivated, tag = "auto-xy", testId = "build-header-play-button-disabled" },
+		{ Button = element }
+	)
+
+	local createElement3 = React.createElement
+	local v4 = {
+		LayoutOrder = props.layoutOrder,
 		tag = "auto-xy",
-		LayoutOrder = t1.layoutOrder,
-		testId = t1.testId or "assistant-build"
-	}, {
-		Tooltip = if not v20 then nil else React.createElement(EducationalTooltip, {
+		testId = props.testId or "assistant-build"
+	}
+	local tooltip
+
+	if isDisabled then
+		tooltip = React.createElement(EducationalTooltip, {
 			align = PopoverAlign.Start,
-			isOpen = v21,
+			isOpen = isOpen,
+			onPressedOutside = onPressedOutside,
 			side = PopoverSide.Bottom,
-			text = LocalizationStrings.CHAT_PORTRAIT_REQUIRED,
-			title = LocalizationStrings.CHAT_ASSISTANT_DISABLED
-		}, {
-			Button = v24
-		}),
-		Button = if v20 then nil else v23
-	})
+			text = v.portraitRequired,
+			testId = "build-assistant-disabled-tooltip",
+			title = v.disabledTitle
+		}, { Button = element2 })
+	end
+
+	if isDisabled then
+		element = nil
+	end
+
+	return createElement3(View, v4, { Tooltip = tooltip, Button = element })
 end
 
 return React.memo(AssistantBuild)

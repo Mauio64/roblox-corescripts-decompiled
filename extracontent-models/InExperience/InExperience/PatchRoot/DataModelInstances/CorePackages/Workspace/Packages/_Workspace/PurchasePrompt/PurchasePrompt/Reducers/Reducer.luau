@@ -1,12 +1,12 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local PurchasePromptDeps = require(PurchasePromptParent.PurchasePromptDeps)
-local ToastLite = require(PurchasePromptParent.ToastLite)
+local parent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local ToastLite = require(parent.ToastLite)
 local Rodux = PurchasePromptDeps.Rodux
+
 local PromptRequestReducer = require(script.Parent.PromptRequestReducer)
 local PurchaseFlowReducer = require(script.Parent.PurchaseFlowReducer)
 local ProductInfoReducer = require(script.Parent.ProductInfoReducer)
-local PremiumProductsReducer = require(script.Parent.PremiumProductsReducer)
 local NativeUpsellSuggestionsReducer = require(script.Parent.NativeUpsellSuggestionsReducer)
 local PromptStateReducer = require(script.Parent.PromptStateReducer)
 local PurchaseFlowUUIDReducer = require(script.Parent.PurchaseFlowUUIDReducer)
@@ -29,17 +29,25 @@ local PurchaseAnalyticsMetadataReducer = require(script.Parent.PurchaseAnalytics
 local PurchaseOptionsReducer = require(script.Parent.PurchaseOptionsReducer)
 local RobloxSubscriptionProductsReducer = require(script.Parent.RobloxSubscriptionProductsReducer)
 local CartPricingReducer = require(script.Parent.CartPricingReducer)
-local GetFFlagEnableToastLiteRender = require(PurchasePrompt.Flags.GetFFlagEnableToastLiteRender)
-local FFlagEnableUnifiedProductPurchaseFlow = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
-local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = require(PurchasePrompt.Parent.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
-local FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal
-local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
 
-return (Rodux.combineReducers({
+local GetFFlagEnableToastLiteRender = require(PurchasePrompt.Flags.GetFFlagEnableToastLiteRender)
+
+local SharedFlags = require(PurchasePrompt.Parent.SharedFlags)
+local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = SharedFlags.FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
+local combineReducers = Rodux.combineReducers
+
+if not GetFFlagEnableToastLiteRender() then
+	CurrentToastMessagesReducer = nil
+end
+
+if not FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow then
+	PurchaseOptionsReducer = nil
+end
+
+return (combineReducers({
 	promptRequest = PromptRequestReducer,
 	purchaseFlow = PurchaseFlowReducer,
 	productInfo = ProductInfoReducer,
-	premiumProductInfo = PremiumProductsReducer,
 	robuxUpsellSuggestions = NativeUpsellSuggestionsReducer,
 	promptState = PromptStateReducer,
 	purchaseFlowUUID = PurchaseFlowUUIDReducer,
@@ -53,13 +61,13 @@ return (Rodux.combineReducers({
 	windowState = WindowStateReducer,
 	buttonState = ButtonStateReducer,
 	subscriptionPurchaseInfo = SubscriptionPurchaseInfoReducer,
-	currentToastMessages = if not GetFFlagEnableToastLiteRender() then nil else CurrentToastMessagesReducer,
-	purchaseCallbacks = if not FFlagEnableUnifiedProductPurchaseFlow then nil else PurchaseCallbacksReducer,
-	postPurchaseActions = if not FFlagEnableUnifiedProductPurchaseFlow then nil else PostPurchaseActionsReducer,
-	productPayload = if not FFlagEnableUnifiedProductPurchaseFlow then nil else ProductPayloadReducer,
-	isUserEligibleForUnifiedPurchaseFlow = if not FFlagEnableUnifiedProductPurchaseFlow then nil else UnifiedPurchaseEligibilityReducer,
-	purchaseAnalyticsMetadata = if not FFlagEnableUnifiedProductPurchaseFlow then nil else PurchaseAnalyticsMetadataReducer,
-	purchaseOptions = if not FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow then nil else PurchaseOptionsReducer,
-	robloxSubscriptionProducts = if not FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then nil else RobloxSubscriptionProductsReducer,
-	cartPricing = if not FFlagPurchasePromptCartPricingEnabled then nil else CartPricingReducer
+	currentToastMessages = CurrentToastMessagesReducer,
+	purchaseCallbacks = PurchaseCallbacksReducer,
+	postPurchaseActions = PostPurchaseActionsReducer,
+	productPayload = ProductPayloadReducer,
+	isUserEligibleForUnifiedPurchaseFlow = UnifiedPurchaseEligibilityReducer,
+	purchaseAnalyticsMetadata = PurchaseAnalyticsMetadataReducer,
+	purchaseOptions = PurchaseOptionsReducer,
+	robloxSubscriptionProducts = RobloxSubscriptionProductsReducer,
+	cartPricing = CartPricingReducer
 }))

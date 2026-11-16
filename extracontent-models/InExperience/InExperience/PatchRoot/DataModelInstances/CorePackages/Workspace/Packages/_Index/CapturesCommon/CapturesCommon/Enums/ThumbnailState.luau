@@ -1,5 +1,1 @@
-return {
-	Completed = "Completed",
-	Error = "Error",
-	Pending = "Pending"
-}
+return { Completed = "Completed", Error = "Error", Pending = "Pending" }

@@ -1,13 +1,7 @@
 local LegacyFriendsRodux = script:FindFirstAncestor("LegacyFriendsRodux")
-local SetFriendCount = require(LegacyFriendsRodux.Actions).SetFriendCount
+local Actions = require(LegacyFriendsRodux.Actions)
+local SetFriendCount = Actions.SetFriendCount
 
-return function(p1, p2) -- line: 5
-	-- upvalues: SetFriendCount (copy)
-	local v5 = p1 or 0
-
-	if p2.type == SetFriendCount.name then
-		v5 = p2.count
-	end
-
-	return v5
+return function(value, p)
+	return p.type ~= SetFriendCount.name and (value or 0) or p.count
 end

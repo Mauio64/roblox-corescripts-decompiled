@@ -1,18 +1,16 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Rodux = require(parent2.Rodux)
+require(parent.roduxFriendsTypes)
 
-require(ParentParent.roduxFriendsTypes)
-
-return function(p1) -- line: 8
-	-- upvalues: Rodux (copy)
-	local friendsNetworking = p1.friendsNetworking
+return function(p)
+	local friendsNetworking = p.friendsNetworking
 
 	return Rodux.createReducer(nil, {
-		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(_, p3) -- line: 12
-			return p3.responseBody.nextPageCursor
+		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(_, p2)
+			return p2.responseBody.nextPageCursor
 		end,
-		[friendsNetworking.DeclineAllFriendRequests.Succeeded.name] = function(_, _) -- line: 21
+		[friendsNetworking.DeclineAllFriendRequests.Succeeded.name] = function(_, _): nil
 			return nil
 		end
 	})

@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local List = require(Parent.llama).List
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local llama = require(parent.llama)
+local list = llama.List
 
-return function(p1) -- line: 5
-	-- upvalues: List (copy)
-	return List.sort(p1)
+return function(p)
+	return list.sort(p)
 end

@@ -1,3 +1,1 @@
-return {
-	version = "local"
-}
+return { version = "local" }

@@ -1,43 +1,42 @@
 local ReactSceneUnderstanding = script:FindFirstAncestor("ReactSceneUnderstanding")
-local React = require(ReactSceneUnderstanding.Parent.React)
 
+local React = require(ReactSceneUnderstanding.Parent.React)
 require(ReactSceneUnderstanding.Parent.SceneUnderstanding)
 
 local useState = React.useState
-local v4 = React.createContext(nil)
 
-local function SceneAnalysisProvider(t1: {[any]: any}) -- line: 102
-	-- upvalues: useState (copy), React (copy), v4 (copy)
-	local v7, v8 = useState({})
-	local v9, v10 = useState({})
-	local v11, v12 = useState({})
-	local v13, v14 = useState({})
+local context = React.createContext(nil)
 
-	return React.createElement(v4.Provider, {
+local function SceneAnalysisProvider(props)
+	local state, setState = useState({})
+	local state2, setState2 = useState({})
+	local state3, setState3 = useState({})
+	local state4, setState4 = useState({})
+
+	return React.createElement(context.Provider, {
 		value = {
-			rangeQueryOptions = t1.rangeQueryOptions,
-			viewportQueryOptions = t1.viewportQueryOptions,
-			dataModelTraversalOptions = t1.dataModelTraversalOptions,
-			sourceAssets = v7,
-			setSourceAssets = v8,
-			assetsInView = v9,
-			setAssetsInView = v10,
-			assetsInRange = v11,
-			setAssetsInRange = v12,
-			audibleSounds = v13,
-			setAudibleSounds = v14
+			rangeQueryOptions = props.rangeQueryOptions,
+			viewportQueryOptions = props.viewportQueryOptions,
+			dataModelTraversalOptions = props.dataModelTraversalOptions,
+			sourceAssets = state,
+			setSourceAssets = setState,
+			assetsInView = state2,
+			setAssetsInView = setState2,
+			assetsInRange = state3,
+			setAssetsInRange = setState3,
+			audibleSounds = state4,
+			setAudibleSounds = setState4
 		}
-	}, t1.children)
+	}, props.children)
 end
 
 return {
 	Provider = SceneAnalysisProvider,
-	use = function() -- line: 129
-		-- upvalues: React (copy), v4 (copy)
-		local v15 = React.useContext(v4)
+	use = function()
+		local v = React.useContext(context)
 
-		if v15 then
-			return v15
+		if v then
+			return v
 		end
 
 		error("attempt to use SceneAnalysisContext with no provider. Add `ReactSceneUnderstanding.SceneAnalysisProvider` to the React tree and try again")

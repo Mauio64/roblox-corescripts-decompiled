@@ -1,73 +1,63 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local NetworkingUserSettings = dependencies.NetworkingUserSettings
-local NetworkingAccountInformation = dependencies.NetworkingAccountInformation
-local PermissionsProtocol = dependencies.PermissionsProtocol
-local Promise = dependencies.Promise
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+local networkingUserSettings = dependencies.NetworkingUserSettings
+local networkingAccountInformation = dependencies.NetworkingAccountInformation
+local permissionsProtocol = dependencies.PermissionsProtocol
+local promise = dependencies.Promise
 local llama = dependencies.llama
-local contactImporterModalInfo = require(ParentParent.Utils.contactImporterModalInfo)
+local contactImporterModalInfo = require(parent.Utils.contactImporterModalInfo)
 local updateOptedInUsers = dependencies.SocialModalsCommon.Utils.updateOptedInUsers
-local contactImporterOSPermissions = require(ParentParent.Utils.contactImporterOSPermissions)
-local Constants = require(ParentParent.Common.Constants)
-local SetContactImporterDisplayLogic = require(ParentParent.Actions.SetContactImporterDisplayLogic)
+local contactImporterOSPermissions = require(parent.Utils.contactImporterOSPermissions)
+local Constants = require(parent.Common.Constants)
+local SetContactImporterDisplayLogic = require(parent.Actions.SetContactImporterDisplayLogic)
 
-local function v13(_) -- line: 14
-end
+local function fn(_) end
 
-return function(s1: string, p2, p3) -- line: 18
-	-- upvalues: NetworkingUserSettings (copy), Promise (copy), v13 (copy), NetworkingAccountInformation (copy), PermissionsProtocol (copy), updateOptedInUsers (copy), llama (copy), contactImporterModalInfo (copy), Constants (copy), SetContactImporterDisplayLogic (copy), contactImporterOSPermissions (copy)
-	return function(p4) -- line: 19
-		-- upvalues: NetworkingUserSettings (copy), Promise (copy), v13 (copy), NetworkingAccountInformation (copy), p2 (copy), PermissionsProtocol (copy), updateOptedInUsers (copy), p3 (copy), llama (copy), contactImporterModalInfo (copy), s1 (copy), Constants (copy), SetContactImporterDisplayLogic (copy), contactImporterOSPermissions (copy)
-		local t1 = {
-			p4:dispatch(NetworkingUserSettings.GetUserSettings.API({})):andThen(function(p5) -- line: 22
-				-- upvalues: Promise (copy), v13 (copy)
-				return Promise.resolve({
-					phoneNumberDiscoverability = p5.responseBody.phoneNumberDiscoverability
-				}, v13)
+return function(p: string, object, p2)
+	return function(object2)
+		local v = {
+			object2:dispatch(networkingUserSettings.GetUserSettings.API({})):andThen(function(p3)
+				return promise.resolve({
+					phoneNumberDiscoverability = p3.responseBody.phoneNumberDiscoverability
+				}, fn)
 			end),
-			p4:dispatch(NetworkingAccountInformation.GetPhoneInformation.API()):andThen(function(p6) -- line: 27
-				-- upvalues: Promise (copy), v13 (copy)
-				return Promise.resolve({
-					isPhoneVerified = p6.responseBody.isVerified
-				}, v13)
+			object2:dispatch(networkingAccountInformation.GetPhoneInformation.API()):andThen(function(p3)
+				return promise.resolve({ isPhoneVerified = p3.responseBody.isVerified }, fn)
 			end),
-			p2:hasPermissions({ PermissionsProtocol.Permissions.CONTACTS_ACCESS }):andThen(function(p7) -- line: 32
-				-- upvalues: PermissionsProtocol (copy), updateOptedInUsers (copy), p3 (copy), Promise (copy)
-				local v23 = p7 and p7.status == PermissionsProtocol.Status.AUTHORIZED
+			object:hasPermissions({ permissionsProtocol.Permissions.CONTACTS_ACCESS }):andThen(function(p3)
+				local hasOSPermissions = p3 and p3.status == permissionsProtocol.Status.AUTHORIZED
 
-				if not v23 then
-					updateOptedInUsers:clearLocalStorage(p3)
+				if not hasOSPermissions then
+					updateOptedInUsers:clearLocalStorage(p2)
 				end
 
-				return Promise.resolve({
-					hasOSPermissions = v23
-				})
-			end, v13)
+				return promise.resolve({ hasOSPermissions = hasOSPermissions })
+			end, fn)
 		}
 
-		Promise.all(t1):andThen(function(p8) -- line: 41
-			-- upvalues: llama (copy), contactImporterModalInfo (copy), p3 (copy), s1 (copy), Constants (copy), p4 (copy), SetContactImporterDisplayLogic (copy), contactImporterOSPermissions (copy)
-			local t2 = {}
+		promise.all(v):andThen(function(items)
+			local joined = {}
 
-			for _, v27 in p8 do
-				t2 = llama.Dictionary.join(t2, v27)
+			for _, item in items do
+				joined = llama.Dictionary.join(joined, item)
 			end
 
-			local v28 = contactImporterModalInfo:isUserOptedInLocalStorage(p3, s1)
-			local v29 = contactImporterModalInfo:shouldUserSeeModalPotentiallyAgain(p3, s1)
+			local userOptedInLocalStorage = contactImporterModalInfo:isUserOptedInLocalStorage(p2, p)
 
-			t2[Constants.SHOULD_SHOW_CONTACT_IMPORTER_UPSELL_AGAIN] = v29
-			t2[Constants.IS_USER_OPTED_IN_LOCAL_STORAGE] = v28
-			p4:dispatch(SetContactImporterDisplayLogic(t2))
+			local shouldUserSeeModalPotentiallyAgain = contactImporterModalInfo:shouldUserSeeModalPotentiallyAgain(
+				p2,
+				p
+			)
+			joined[Constants.SHOULD_SHOW_CONTACT_IMPORTER_UPSELL_AGAIN] = shouldUserSeeModalPotentiallyAgain
 
-			local v30 = contactImporterOSPermissions:getLastOSPermissionSettings(p3)
-			local hasOSPermissions = t2.hasOSPermissions
+			joined[Constants.IS_USER_OPTED_IN_LOCAL_STORAGE] = userOptedInLocalStorage
+			object2:dispatch(SetContactImporterDisplayLogic(joined))
 
-			if v30 == hasOSPermissions then
-			end
+			local lastOSPermissionSettings = contactImporterOSPermissions:getLastOSPermissionSettings(p2)
+			local hasOSPermissions = joined.hasOSPermissions
+			local _ = lastOSPermissionSettings == hasOSPermissions
 
-			contactImporterOSPermissions:updateOSPermissionSettings(p3, hasOSPermissions)
-		end):catch(function() -- line: 64
-		end)
+			contactImporterOSPermissions:updateOSPermissionSettings(p2, hasOSPermissions)
+		end):catch(function() end)
 	end
 end

@@ -1,16 +1,13 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function(p1) -- line: 7
-	-- upvalues: useDispatch (copy), React (copy)
-	local v5 = useDispatch()
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local React = require(parent.React)
 
-	return React.useMemo(function() -- line: 10
-		-- upvalues: p1 (copy), v5 (copy)
-		return p1(v5)
-	end, {
-		v5,
-		p1
-	})
+return function(callback)
+	local v = useDispatch()
+
+	return React.useMemo(function()
+		return callback(v)
+	end, { v, callback })
 end

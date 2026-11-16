@@ -1,20 +1,20 @@
 local HttpService = game:GetService("HttpService")
-local ParentParent = script.Parent.Parent.Parent
-local Url = require(ParentParent.Network.Url)
 
-return function(p1, p2, p3, p4) -- line: 7
-	-- upvalues: HttpService (copy), Url (copy)
-	assert(p1, "requestImpl is required")
-	assert(p2, "conversationId is required")
-	assert(p3, "universeId is required")
+local parent = script.Parent.Parent.Parent
+local Url = require(parent.Network.Url)
 
-	local json = HttpService:JSONEncode({
-		conversationId = p2,
-		universeId = p3,
-		decorators = p4
+return function(callback, conversationId, universeId, decorators)
+	assert(callback, "requestImpl is required")
+	assert(conversationId, "conversationId is required")
+	assert(universeId, "universeId is required")
+
+	local jsonEncode = HttpService:JSONEncode({
+		conversationId = conversationId,
+		universeId = universeId,
+		decorators = decorators
 	})
 
-	return p1(string.format("%s/send-game-link-message", Url.CHAT_URL), "POST", {
-		postBody = json
+	return callback(string.format("%s/send-game-link-message", Url.CHAT_URL), "POST", {
+		postBody = jsonEncode
 	})
 end

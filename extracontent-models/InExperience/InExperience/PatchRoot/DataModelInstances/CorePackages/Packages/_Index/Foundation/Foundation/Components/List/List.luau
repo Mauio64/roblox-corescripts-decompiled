@@ -1,60 +1,76 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
 
 require(Foundation.Enums.InputSize)
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local ListContext = require(script.Parent.ListContext)
-local t1 = {
-	testId = "--foundation-list",
-	hasDivider = {
-		hasDivider = true,
-		isInset = true
-	},
-	isContained = {
-		isContained = false,
-		hasMargin = true
-	}
+
+local v = {
+	hasDivider = { hasDivider = true, isInset = true },
+	isContained = { isContained = false, hasMargin = true },
+	testId = "--foundation-list"
 }
 
-local function List(p1, p2) -- line: 31
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), View (copy), withCommonProps (copy), ListContext (copy)
-	local v12 = withDefaults(p1, t1)
-	local n1 = 0
+local function List(p, ref)
+	local v2 = withDefaults(p, v)
+	local hasDivider
 
-	React.Children.forEach(v12.children, function(p3) -- line: 35
-		-- upvalues: n1 (ref)
-		if p3 and (p3.props and p3.props.LayoutOrder) then
-			n1 = math.max(n1, p3.props.LayoutOrder)
-		end
-	end)
+	if type(v2.hasDivider) == "boolean" then
+		hasDivider = v2.hasDivider
+	else
+		hasDivider = v2.hasDivider.hasDivider
+	end
 
-	local v14 = if type(v12.isContained) ~= "boolean" then v12.isContained.isContained else v12.isContained
-	local v15 = not not v14 or (type(v12.isContained) ~= "table" or v12.isContained.hasMargin)
-	local v16 = if type(v12.hasDivider) ~= "boolean" then v12.hasDivider.isInset else v12.hasDivider
+	local maxLayoutOrder = 0
 
-	return React.createElement(View, withCommonProps(v12, {
-		tag = {
-			["col size-full-0 auto-y"] = true,
-			["stroke-default radius-large"] = v14
-		},
-		ref = p2
+	if hasDivider then
+		React.Children.forEach(v2.children, function(p2)
+			if p2 and p2.props and p2.props.LayoutOrder then
+				maxLayoutOrder = math.max(maxLayoutOrder, p2.props.LayoutOrder)
+			end
+		end)
+	end
+
+	local isContained
+
+	if type(v2.isContained) == "boolean" then
+		isContained = v2.isContained
+	else
+		isContained = v2.isContained.isContained
+	end
+
+	local hasMargin = isContained and true or type(v2.isContained) ~= "table" or v2.isContained.hasMargin
+	local isInset
+
+	if type(v2.hasDivider) == "boolean" then
+		isInset = v2.hasDivider
+	else
+		isInset = v2.hasDivider.isInset
+	end
+
+	local v3 = React.useMemo(function()
+		return {
+			hasDivider = v2.hasDivider,
+			isContained = isContained,
+			isInset = isInset,
+			hasMargin = hasMargin,
+			lastLayoutOrder = maxLayoutOrder,
+			size = v2.size,
+			testId = v2.testId
+		}
+	end, { hasDivider, isContained, isInset, hasMargin, maxLayoutOrder, v2.size, v2.testId })
+
+	return React.createElement(View, withCommonProps(v2, {
+		tag = { ["col size-full-0 auto-y"] = true, ["stroke-default radius-large"] = isContained },
+		ref = ref
 	}), {
-		ListContext = React.createElement(ListContext.Provider, {
-			value = {
-				hasDivider = v12.hasDivider,
-				isContained = v14,
-				isInset = v16,
-				hasMargin = v15,
-				lastLayoutOrder = n1,
-				size = v12.size,
-				testId = v12.testId
-			}
-		}, v12.children)
+		ListContext = React.createElement(ListContext.Provider, { value = v3 }, v2.children)
 	})
 end
 

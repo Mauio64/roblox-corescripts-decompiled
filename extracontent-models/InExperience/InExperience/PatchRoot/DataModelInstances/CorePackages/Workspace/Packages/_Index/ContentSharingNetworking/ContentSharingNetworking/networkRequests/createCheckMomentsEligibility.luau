@@ -1,15 +1,11 @@
-local ParentParent = script.Parent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
+local API_URL = require(parent.API_URL)
 
-return function(t1: {[any]: any}) -- line: 13
-	-- upvalues: API_URL (copy)
-	return t1.roduxNetworking.GET({
-		Name = "CheckMomentsEligibility"
-	}, function(p1, t2: {[any]: any}) -- line: 16
-		-- upvalues: API_URL (copy)
-		return p1(API_URL):path("content-captures-api"):path("v1"):path("check-moments-eligibility"):queryArgs({
-			contentType = t2.contentType,
-			experienceId = t2.experienceId
+return function(p)
+	return p.roduxNetworking.GET("CheckMomentsEligibility", function(callback, p2)
+		return callback(API_URL):path("content-captures-api"):path("v1"):path("check-moments-eligibility"):queryArgs({
+			contentType = p2.contentType,
+			experienceId = p2.experienceId
 		})
 	end)
 end

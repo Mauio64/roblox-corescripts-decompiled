@@ -1,17 +1,17 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
+
+local React = require(parent.React)
+
 local OverlayContext = require(script.Parent.OverlayContext)
 
-local function useScreen() -- line: 8
-	-- upvalues: React (copy), OverlayContext (copy)
-	local v5 = React.useContext(OverlayContext)
+local function useScreen()
+	local v = React.useContext(OverlayContext)
 
-	React.useLayoutEffect(function() -- line: 11
-		-- upvalues: v5 (copy)
-		v5.requestOverlay()
-	end, { v5.requestOverlay })
+	React.useLayoutEffect(function()
+		v.requestOverlay()
+	end, { v.requestOverlay })
 
-	return v5.screen
+	return v.screen
 end
 
 return useScreen

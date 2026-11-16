@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
 
-return require(Parent.Dev.JestConfigs).createBenchmarkConfig("ExpChatBenchmarks")
+local JestConfigs = require(parent.Dev.JestConfigs)
+
+return JestConfigs.createBenchmarkConfig("ExpChatBenchmarks")

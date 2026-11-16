@@ -1,23 +1,21 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+require(parent.Shared)
 
-require(ParentParent.Shared)
-
-local function createMutableSource(p1, p2) -- line: 18
-	-- upvalues: ReactGlobals (copy)
-	local t1 = {
+local function createMutableSource(source, getVersion)
+	local mutableSource = {
+		_getVersion = getVersion,
+		_source = source,
 		_workInProgressVersionPrimary = nil,
-		_workInProgressVersionSecondary = nil,
-		_getVersion = p2,
-		_source = p1
+		_workInProgressVersionSecondary = nil
 	}
 
 	if ReactGlobals.__DEV__ then
-		t1._currentPrimaryRenderer = nil
-		t1._currentSecondaryRenderer = nil
+		mutableSource._currentPrimaryRenderer = nil
+		mutableSource._currentSecondaryRenderer = nil
 	end
 
-	return t1
+	return mutableSource
 end
 
 return createMutableSource

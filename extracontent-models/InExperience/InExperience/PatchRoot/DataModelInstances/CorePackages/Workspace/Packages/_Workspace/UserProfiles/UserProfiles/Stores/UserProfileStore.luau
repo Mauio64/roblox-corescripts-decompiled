@@ -1,40 +1,43 @@
-local Parent = script:FindFirstAncestor("UserProfiles").Parent
-local Lumberyak = require(Parent.Lumberyak)
-local SharedFlags = require(Parent.SharedFlags)
-local Signals = require(Parent.Signals)
+local UserProfiles = script:FindFirstAncestor("UserProfiles")
+local parent = UserProfiles.Parent
+local Lumberyak = require(parent.Lumberyak)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserProfilePlatformProfile = SharedFlags.FFlagUserProfilePlatformProfile
+local PlatformProfileRequest = require(parent.GraphQLServer.PlatformProfileRequest)
+local Signals = require(parent.Signals)
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
-local v7 = game:DefineFastString("UserProfileStoreMaxLoggingLevel", Lumberyak.Logger.Levels.Error)
-local v8 = game:DefineFastInt("UserProfileStoreHttpTimeout", 1500)
-local v9 = game:DefineFastInt("UserProfileStoreBatchSize", 50)
-local v10 = game:DefineFastInt("UserProfileStoreQueueProcessDelay", 1)
+
+local defineFastString = game:DefineFastString("UserProfileStoreMaxLoggingLevel", Lumberyak.Logger.Levels.Error)
+local defineFastInt = game:DefineFastInt("UserProfileStoreHttpTimeout", 1500)
+local FIntUserProfileStoreBatchSize = SharedFlags.FIntUserProfileStoreBatchSize
+local defineFastInt2 = game:DefineFastInt("UserProfileStoreQueueProcessDelay", 1)
 local FFlagEnableVerifiedBadgeStore = SharedFlags.FFlagEnableVerifiedBadgeStore
 local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
-local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
 local UserProfileModel = require(script.Parent.UserProfileModel)
-local v15 = createComputed(function(_) -- line: 36
-	-- upvalues: Parent (copy), Lumberyak (copy), v7 (copy), v8 (copy), FFlagEnableVerifiedBadgeStore (copy), FFlagEnableBlackbirdCheck (copy), UserProfileModel (copy), v9 (copy), createSignal (copy), v10 (copy), FFlagSduiExperienceDetailsSupport (copy)
-	local UrlBuilder = require(Parent.UrlBuilder)
-	local UrlBuilder2 = UrlBuilder.UrlBuilder
-	local UrlBase = UrlBuilder.UrlBase
-	local v20 = Lumberyak.Logger.new(nil, "UserProfileStore")
+local FFlagUserProfileStoreSplitPlatformFields = require(UserProfiles.Flags.FFlagUserProfileStoreSplitPlatformFields)
+local v = FFlagUserProfilePlatformProfile and FFlagUserProfileStoreSplitPlatformFields
 
-	v20:setContext({
-		prefix = "[UserProfileStore] "
-	})
-	v20:addSink({
-		maxLevel = v7,
-		log = function(_, _, _) -- line: 54
-		end
+local computed = createComputed(function(_)
+	local UrlBuilder = require(parent.UrlBuilder)
+	local urlBuilder = UrlBuilder.UrlBuilder
+	local urlBase = UrlBuilder.UrlBase
+
+	local logger = Lumberyak.Logger.new(nil, "UserProfileStore")
+	logger:setContext({ prefix = "[UserProfileStore] " })
+	logger:addSink({
+		maxLevel = defineFastString,
+		log = function(_, _, _) end
 	})
 
 	local HttpService = game:GetService("HttpService")
-	local v22 = UrlBuilder2.new({
-		path = "user-profile-api/v1/user/profiles/get-profiles",
-		base = UrlBase.APIS
+	local url = urlBuilder.new({
+		base = urlBase.APIS,
+		path = "user-profile-api/v1/user/profiles/get-profiles"
 	})()
-	local v23 = v8
-	local t1 = {
+	local timeout = defineFastInt
+
+	local v2 = {
 		USERNAME = "names.username",
 		DISPLAY_NAME = "names.displayName",
 		COMBINED_NAME = "names.combinedName",
@@ -43,371 +46,461 @@ local v15 = createComputed(function(_) -- line: 36
 		CONTACT_NAME = "names.contactName",
 		ALIAS = "names.alias",
 		PLATFORM_PROFILE_ID = "platformProfileId",
-		IS_VERIFIED = if not FFlagEnableVerifiedBadgeStore then nil else "isVerified",
-		HAS_ROBLOX_SUBSCRIPTION = if not FFlagEnableBlackbirdCheck then nil else "hasRobloxSubscription"
+		IS_VERIFIED = FFlagEnableVerifiedBadgeStore and "isVerified" or nil,
+		HAS_ROBLOX_SUBSCRIPTION = FFlagEnableBlackbirdCheck and "hasRobloxSubscription" or nil
 	}
-	local t2 = {}
-	local t3 = {}
-	local t4 = {}
-	local u28 = false
 
-	local function getOrCreateByUserId(s1: string) -- line: 85
-		-- upvalues: t2 (copy), v20 (copy), UserProfileModel (copy)
-		local v40 = t2[s1]
+	local v3 = {}
+	local v4 = {}
+	local v5 = {}
+	local v6 = false
 
-		if v40 ~= nil then
-			v20:trace("Found profile: {}", s1)
+	local function getOrCreateByUserId(p: string)
+		local v7 = v3[p]
 
-			return v40
+		if v7 ~= nil then
+			logger:trace("Found profile: {}", p)
+			return v7
 		end
 
-		v20:trace("Creating profile: {}", s1)
-
-		local v41 = UserProfileModel.create(s1)
-
-		t2[s1] = v41
-
-		return v41
+		logger:trace("Creating profile: {}", p)
+		local v8 = UserProfileModel.create(p)
+		v3[p] = v8
+		return v8
 	end
-	local function performBatchFetch(t5: {[any]: any}, s2: string, t6: {[any]: any}, b1: boolean) -- line: 98
-		-- upvalues: v20 (copy), t3 (copy), v9 (copy), HttpService (copy), v22 (copy), v23 (copy), t2 (copy), UserProfileModel (copy), performBatchFetch (copy)
-		if #t5 == 0 then
-			v20:trace("No more ids to fetch. Setting result.")
 
-			for _, v in ipairs(t6) do
-				local t7 = {}
-				local v49 = t3[s2]
+	local v7 = { v2.PLATFORM_NAME, v2.PLATFORM_PROFILE_ID }
+	local clone = table.clone(v7)
+	table.sort(clone)
+	local joined = table.concat(clone, ",")
+	local function performBatchFetch(userIds, value: string, clone2, flag: boolean)
+		if #userIds == 0 then
+			logger:trace("No more ids to fetch. Setting result.")
 
-				for _, v51 in v.userIds do
-					local v52 = v49[v51]
+			for _, item in ipairs(clone2) do
+				local v8 = v4[value]
+				local v9 = {}
 
-					if v52 then
-						v20:trace("Found cached profile: {}", v51)
-						table.insert(t7, v52)
+				for _, userId in item.userIds do
+					local v10 = v8[userId]
+
+					if v10 then
+						logger:trace("Found cached profile: {}", userId)
+						table.insert(v9, v10)
 					else
-						v20:debug("Expected cached profile: {}", v51)
+						logger:debug("Expected cached profile: {}", userId)
 					end
 				end
 
-				local t8 = {
-					status = not b1 and "failed" or "success",
-					data = t7
+				local v10 = {
+					status = flag and "success" or "failed",
+					data = v9
 				}
 
-				v.setResult(t8)
-
-				local callback = v.callback
+				item.setResult(v10)
+				local callback = item.callback
 
 				if callback ~= nil then
-					callback(t8)
+					callback(v10)
 				end
 			end
-
-			return
-		end
-
-		local t9 = {}
-		local t10
-
-		if #t5 > v9 then
-			t10 = {}
-
-			for i = 1, v9 do
-				table.insert(t10, t5[i])
-			end
-
-			for i = v9 + 1, #t5 do
-				table.insert(t9, t5[i])
-			end
 		else
-			t10 = t5
-		end
+			local v8 = {}
+			local userIds2
 
-		local parts = string.split(s2, ",")
-		local json = HttpService:JSONEncode({
-			userIds = t10,
-			fields = parts
-		})
+			if FIntUserProfileStoreBatchSize < #userIds then
+				userIds2 = {}
 
-		v20:debug("Fetching: {}", json)
+				for i = 1, FIntUserProfileStoreBatchSize do
+					table.insert(userIds2, userIds[i])
+				end
 
-		local v61 = v22
+				for i = FIntUserProfileStoreBatchSize + 1, #userIds do
+					table.insert(v8, userIds[i])
+				end
+			else
+				userIds2 = userIds
+			end
 
-		HttpService:RequestInternal({
-			Method = "POST",
-			Priority = 0,
-			Url = v61,
-			Body = json,
-			Timeout = v23,
-			CachePolicy = Enum.HttpCachePolicy.None,
-			Headers = {
-				["Content-Type"] = "application/json",
-				Accept = "application/json"
-			},
-			RequestType = Enum.HttpRequestType.Default
-		}):Start(function(p5, p6) -- line: 168
-			-- upvalues: HttpService (copy), v20 (copy), json (copy), t3 (copy), s2 (copy), t2 (copy), UserProfileModel (copy), performBatchFetch (copy), t9 (copy), t6 (copy), b1 (copy)
-			if p5 == true then
-				local Body = p6.Body
+			local fields = string.split(value, ",")
 
-				if Body ~= nil then
-					local _, result = pcall(function() -- line: 172
-						-- upvalues: HttpService (copy), Body (copy)
-						return HttpService:JSONDecode(Body)
-					end)
+			local jsonEncode = HttpService:JSONEncode({
+				userIds = userIds2,
+				fields = fields,
+				includePlatformProfile = FFlagUserProfilePlatformProfile and PlatformProfileRequest.hasPlatformFields(fields) and true or nil
+			})
 
-					if result ~= nil then
-						v20:trace("Fetched: {}\nresponse: {}", json, Body)
+			logger:debug("Fetching: {}", jsonEncode)
 
-						local profileDetails = result.profileDetails
+			HttpService:RequestInternal({
+				Url = url,
+				Method = "POST",
+				Body = jsonEncode,
+				Timeout = timeout,
+				CachePolicy = Enum.HttpCachePolicy.None,
+				Priority = 0,
+				Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
+				RequestType = Enum.HttpRequestType.Default
+			}):Start(function(p, p2)
+				if p == true then
+					local body = p2.Body
 
-						if profileDetails ~= nil then
-							local v109 = t3[s2]
+					if body ~= nil then
+						local _, result = pcall(function()
+							return HttpService:JSONDecode(body)
+						end)
 
-							for _, v in ipairs(profileDetails) do
-								local str = tostring(v.userId)
-								local v113 = t2[str]
+						if result ~= nil then
+							logger:trace("Fetched: {}\nresponse: {}", jsonEncode, body)
+							local profileDetails = result.profileDetails
 
-								if v113 ~= nil then
-									v20:trace("Found profile: {}", str)
-								else
-									v20:trace("Creating profile: {}", str)
-									v113 = UserProfileModel.create(str)
-									t2[str] = v113
+							if profileDetails ~= nil then
+								if FFlagUserProfilePlatformProfile then
+									profileDetails = PlatformProfileRequest.normalizeProfiles(profileDetails, fields)
 								end
 
-								if v then
-									v20:trace("Updating profile: {}", str)
-									UserProfileModel.update(v113, v)
+								local v9 = v4[value]
+
+								for _, profileDetail in ipairs(profileDetails) do
+									local userId = tostring(profileDetail.userId)
+									local v10 = v3[userId]
+
+									if v10 == nil then
+										logger:trace("Creating profile: {}", userId)
+										v10 = UserProfileModel.create(userId)
+										v3[userId] = v10
+									else
+										logger:trace("Found profile: {}", userId)
+									end
+
+									if profileDetail then
+										logger:trace("Updating profile: {}", userId)
+										UserProfileModel.update(v10, profileDetail)
+									end
+
+									v9[userId] = v10
 								end
 
-								v109[str] = v113
+								if v and value == joined then
+									for _, userId in userIds2 do
+										if v9[userId] ~= nil then
+											continue
+										end
+
+										local v10 = v3[userId]
+
+										if v10 == nil then
+											logger:trace("Creating profile: {}", userId)
+											v10 = UserProfileModel.create(userId)
+											v3[userId] = v10
+										else
+											logger:trace("Found profile: {}", userId)
+										end
+
+										UserProfileModel.update(v10, PlatformProfileRequest.normalizeProfiles({
+											{ userId = userId }
+										}, fields)[1])
+
+										v9[userId] = v10
+									end
+								end
 							end
 						end
 					end
+				else
+					logger:error("Error fetching")
 				end
-			else
-				v20:error("Error fetching")
-			end
 
-			performBatchFetch(t9, s2, t6, p5 ~= false and b1)
-		end)
+				performBatchFetch(v8, value, clone2, p ~= false and flag)
+			end)
+		end
 	end
-	local function processQueuedRequests() -- line: 200
-		-- upvalues: t4 (ref), v20 (copy), t3 (copy), performBatchFetch (copy)
-		for k, v in pairs(t4) do
-			v20:trace("Processing requests ({}) for fields: {}", #v, k)
 
-			local t11 = {}
-			local t12 = {}
-			local v66 = t3[k]
+	local function processQueuedRequests()
+		for k, list in pairs(v5) do
+			logger:trace("Processing requests ({}) for fields: {}", #list, k)
 
-			for _, v2 in ipairs(v) do
-				for _, v3 in ipairs(v2.userIds) do
-					if t11[v3] == nil then
-						t11[v3] = v3
+			local v8 = v4[k]
+			local userIdsByUserId = {}
+			local userIds = {}
 
-						if v66[v3] == nil then
-							table.insert(t12, v3)
-						end
+			for _, item in ipairs(list) do
+				for _, userId in ipairs(item.userIds) do
+					if userIdsByUserId[userId] ~= nil then
+						continue
+					end
+
+					userIdsByUserId[userId] = userId
+
+					if v8[userId] == nil then
+						table.insert(userIds, userId)
 					end
 				end
 			end
 
-			performBatchFetch(t12, k, table.clone(v), true)
+			performBatchFetch(userIds, k, table.clone(list), true)
 		end
 
-		t4 = {}
+		v5 = {}
 	end
-	local function fetchByUserIds(t13: {[any]: any}, t14: {[any]: any}, p7: ((...any) -> ...any)?) -- line: 222
-		-- upvalues: t3 (copy), t2 (copy), v20 (copy), UserProfileModel (copy), createSignal (copy), t4 (ref), u28 (ref), FFlagEnableBlackbirdCheck (copy), processQueuedRequests (copy), v10 (copy)
-		table.sort(t14)
 
-		local v74 = table.concat(t14, ",")
-		local v75 = t3[v74]
+	local function fetchByUserIds(userIds, list, callback)
+		table.sort(list)
+		local joined2 = table.concat(list, ",")
 
-		if v75 == nil then
-			v75 = {}
-			t3[v74] = v75
+		local v8 = v4[joined2]
+
+		if v8 == nil then
+			v8 = {}
+			v4[joined2] = v8
 		end
 
-		local t15 = {}
-		local v77 = false
+		local v9 = false
+		local v10 = {}
 
-		for _, v79 in t13 do
-			local v80 = v75[v79]
+		for _, item in userIds do
+			local v11 = v8[item]
+			v9 = v11 == nil and v9 == false or v9
 
-			if v80 == nil and v77 == false then
-				v77 = true
-			end
+			if not v11 then
+				v11 = v3[item]
 
-			if not v80 then
-				v80 = t2[v79]
-
-				if v80 ~= nil then
-					v20:trace("Found profile: {}", v79)
+				if v11 == nil then
+					logger:trace("Creating profile: {}", item)
+					v11 = UserProfileModel.create(item)
+					v3[item] = v11
 				else
-					v20:trace("Creating profile: {}", v79)
-					v80 = UserProfileModel.create(v79)
-					t2[v79] = v80
+					logger:trace("Found profile: {}", item)
 				end
 			end
 
-			table.insert(t15, v80)
+			table.insert(v10, v11)
 		end
 
-		if v77 == false then
-			v20:trace("All requested profiles are cached. Calling back early")
+		if v9 == false then
+			logger:trace("All requested profiles are cached. Calling back early")
 
-			local t16 = {
-				status = "success",
-				data = t15
-			}
-			local v82 = createSignal(t16)
+			local v11 = { status = "success", data = v10 }
 
-			if p7 ~= nil then
-				p7(t16)
+			local signal = createSignal(v11)
+
+			if callback ~= nil then
+				callback(v11)
 			end
 
-			return v82
-		end
+			return signal
+		else
+			local v11 = { status = "fetching", data = v10 }
 
-		local t17 = {
-			status = "fetching",
-			data = t15
-		}
-		local v84, v85 = createSignal(t17)
-		local v86 = t4[v74]
+			local signal, setResult = createSignal(v11)
 
-		if v86 == nil then
-			v86 = {}
-			t4[v74] = v86
-		end
+			local v12 = v5[joined2]
 
-		table.insert(v86, {
-			userIds = t13,
-			getResult = v84,
-			setResult = v85,
-			callback = p7
-		})
-
-		if not u28 then
-			u28 = true
-
-			if FFlagEnableBlackbirdCheck then
-				task.defer(function() -- line: 285
-					-- upvalues: processQueuedRequests (copy), u28 (ref)
-					processQueuedRequests()
-					u28 = false
-				end)
-			else
-				task.delay(v10, function() -- line: 290
-					-- upvalues: processQueuedRequests (copy), u28 (ref)
-					processQueuedRequests()
-					u28 = false
-				end)
-			end
-		end
-
-		if p7 ~= nil then
-			p7(t17)
-		end
-
-		return v84
-	end
-	local function updateFromHydration(t18: {[any]: any}) -- line: 328
-		-- upvalues: t2 (copy), v20 (copy), UserProfileModel (copy)
-		for v91, v92 in t18 do
-			local v93 = if v92.userId == nil then v91 else tostring(v92.userId)
-			local v94 = t2[v93]
-
-			if v94 ~= nil then
-				v20:trace("Found profile: {}", v93)
-			else
-				v20:trace("Creating profile: {}", v93)
-				v94 = UserProfileModel.create(v93)
-				t2[v93] = v94
+			if v12 == nil then
+				v12 = {}
+				v5[joined2] = v12
 			end
 
-			UserProfileModel.update(v94, {
-				names = {
-					username = v92.username,
-					displayName = v92.displayName
-				},
-				isVerified = v92.isVerified
+			table.insert(v12, {
+				userIds = userIds,
+				getResult = signal,
+				setResult = setResult,
+				callback = callback
 			})
-		end
-	end
-	local function invalidateCachedProfiles(t19: {[any]: any}, t20: {[any]: any}?) -- line: 342
-		-- upvalues: t3 (copy)
-		table.sort(t19)
 
-		local v97 = t3[table.concat(t19, ",")]
+			if not v6 then
+				v6 = true
 
-		if v97 == nil then
-			return
-		end
-
-		if t20 ~= nil then
-			for _, v99 in t20 do
-				v97[v99] = nil
+				if FFlagEnableBlackbirdCheck then
+					task.defer(function()
+						processQueuedRequests()
+						v6 = false
+					end)
+				else
+					task.delay(defineFastInt2, function()
+						processQueuedRequests()
+						v6 = false
+					end)
+				end
 			end
 
-			return
+			if callback ~= nil then
+				callback(v11)
+			end
+
+			return signal
 		end
 	end
-	local function getProfileByUserId(s3: string) -- line: 374
-		-- upvalues: t2 (copy)
-		return t2[s3]
+
+	local function getNameFields(flag: boolean?)
+		local nameFields = {
+			v2.COMBINED_NAME,
+			v2.DISPLAY_NAME,
+			v2.USERNAME,
+			v2.IN_EXPERIENCE_COMBINED_NAME,
+			v2.CONTACT_NAME,
+			v2.ALIAS
+		}
+
+		if not FFlagUserProfilePlatformProfile or flag and not v then
+			table.insert(nameFields, v2.PLATFORM_NAME)
+			table.insert(nameFields, v2.PLATFORM_PROFILE_ID)
+		end
+
+		if FFlagEnableVerifiedBadgeStore then
+			table.insert(nameFields, v2.IS_VERIFIED)
+		end
+
+		if FFlagEnableBlackbirdCheck then
+			table.insert(nameFields, v2.HAS_ROBLOX_SUBSCRIPTION)
+		end
+
+		return nameFields
+	end
+
+	local function getPlatformFields() -- 2 equivalent calls inferred from this helper
+		return table.clone(v7)
+	end
+
+	local function combineFetchResults(p, p2) -- 4 equivalent calls inferred from this helper
+		return {
+			status = (p.status == "fetching" or p2.status == "fetching") and "fetching" or (p.status == "failed" or p2.status == "failed") and "failed" or "success",
+			data = p.data
+		}
+	end
+
+	local function fetchNamesAndPlatformFieldsByUserIds(userIds, callback)
+		local v8 = nil
+		local v9 = nil
+		local status = nil
+		local function report()
+			if callback == nil or v8 == nil or v9 == nil then
+				return
+			end
+
+			local v10 = combineFetchResults(v8, v9) -- inferred equivalent call
+
+			if v10.status ~= status then
+				status = v10.status
+				callback(v10)
+			end
+		end
+
+		local v10 = fetchByUserIds(userIds, getNameFields(false), function(p)
+			v8 = p
+
+			if callback ~= nil and v8 ~= nil then
+				if v9 == nil then
+					return
+				end
+
+				local v10 = combineFetchResults(v8, v9) -- inferred equivalent call
+
+				if v10.status ~= status then
+					status = v10.status
+					callback(v10)
+				end
+			end
+		end)
+		local v11 = fetchByUserIds(userIds, getPlatformFields(), function(p) -- inferred equivalent call
+			v9 = p
+
+			if callback ~= nil and v8 ~= nil then
+				if v9 == nil then
+					return
+				end
+
+				local v11 = combineFetchResults(v8, v9) -- inferred equivalent call
+
+				if v11.status ~= status then
+					status = v11.status
+					callback(v11)
+				end
+			end
+		end)
+
+		return createComputed(function(p)
+			return combineFetchResults(v10(p), v11(p)) -- inferred equivalent call
+		end)
+	end
+
+	local function invalidateCachedProfiles(list, items)
+		table.sort(list)
+		local v8 = v4[table.concat(list, ",")]
+
+		if not (v8 ~= nil and items ~= nil) then
+			return
+		end
+
+		for _, item in items do
+			v8[item] = nil
+		end
 	end
 
 	return {
-		fetchNamesByUserIds = function(t21: {[any]: any}, p8: ((...any) -> ...any)?) -- line: 302
-			-- upvalues: t1 (copy), FFlagEnableVerifiedBadgeStore (copy), FFlagEnableBlackbirdCheck (copy), fetchByUserIds (copy)
-			local t22 = {
-				t1.COMBINED_NAME,
-				t1.DISPLAY_NAME,
-				t1.USERNAME,
-				t1.IN_EXPERIENCE_COMBINED_NAME,
-				t1.CONTACT_NAME,
-				t1.ALIAS,
-				t1.PLATFORM_NAME,
-				t1.PLATFORM_PROFILE_ID
-			}
-
-			if FFlagEnableVerifiedBadgeStore then
-				table.insert(t22, t1.IS_VERIFIED)
+		fetchNamesByUserIds = function(userIds, callback, flag: boolean?)
+			if v and flag then
+				return fetchNamesAndPlatformFieldsByUserIds(userIds, callback)
 			end
 
-			if FFlagEnableBlackbirdCheck then
-				table.insert(t22, t1.HAS_ROBLOX_SUBSCRIPTION)
-			end
-
-			return (fetchByUserIds(t21, t22, p8))
+			return fetchByUserIds(userIds, getNameFields(flag), callback)
 		end,
-		updateFromHydration = if not FFlagSduiExperienceDetailsSupport then nil else updateFromHydration,
-		getProfileByUserId = if not FFlagSduiExperienceDetailsSupport then nil else getProfileByUserId,
-		invalidateCachedNamesForUserIds = function(t23: {[any]: any}) -- line: 360
-			-- upvalues: t1 (copy), invalidateCachedProfiles (copy)
-			local t24 = {
-				t1.COMBINED_NAME,
-				t1.DISPLAY_NAME,
-				t1.USERNAME,
-				t1.IN_EXPERIENCE_COMBINED_NAME,
-				t1.CONTACT_NAME,
-				t1.ALIAS,
-				t1.PLATFORM_NAME,
-				t1.PLATFORM_PROFILE_ID
-			}
+		updateFromHydration = function(items)
+			for userId, item in items do
+				if item.userId ~= nil then
+					userId = tostring(item.userId)
+				end
 
-			invalidateCachedProfiles(t24, t23)
+				local v8 = v3[userId]
+
+				if v8 == nil then
+					logger:trace("Creating profile: {}", userId)
+					v8 = UserProfileModel.create(userId)
+					v3[userId] = v8
+				else
+					logger:trace("Found profile: {}", userId)
+				end
+
+				UserProfileModel.update(v8, {
+					names = { username = item.username, displayName = item.displayName },
+					isVerified = item.isVerified
+				})
+			end
+		end,
+		getProfileByUserId = function(p: string)
+			return v3[p]
+		end,
+		invalidateCachedNamesForUserIds = function(p)
+			if v then
+				invalidateCachedProfiles(getNameFields(false), p)
+				invalidateCachedProfiles(getPlatformFields(), p) -- inferred equivalent call
+			else
+				if not FFlagUserProfilePlatformProfile then
+					invalidateCachedProfiles(
+						{
+							v2.COMBINED_NAME,
+							v2.DISPLAY_NAME,
+							v2.USERNAME,
+							v2.IN_EXPERIENCE_COMBINED_NAME,
+							v2.CONTACT_NAME,
+							v2.ALIAS,
+							v2.PLATFORM_NAME,
+							v2.PLATFORM_PROFILE_ID
+						},
+						p
+					)
+					return
+				end
+
+				invalidateCachedProfiles(getNameFields(false), p)
+				invalidateCachedProfiles(getNameFields(true), p)
+			end
 		end
 	}
 end)
 
 return {
-	get = function() -- line: 387
-		-- upvalues: v15 (copy)
-		return v15(false)
+	get = function()
+		return computed(false)
 	end
 }

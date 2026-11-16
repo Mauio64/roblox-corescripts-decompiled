@@ -1,32 +1,30 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+require(parent2.LuauPolyfill)
 
-require(ParentParentParent.LuauPolyfill)
+local devAssert = require(parent.jsutils.devAssert)
+local devAssert2 = devAssert.devAssert
+require(parent.language.location)
 
-local devAssert = require(ParentParent.jsutils.devAssert).devAssert
-
-require(ParentParent.language.location)
 require(script.Parent.GraphQLError)
 
 return {
-	formatError = function(p1) -- line: 25
-		-- upvalues: devAssert (copy)
-		devAssert(p1, "Received nil error.")
+	formatError = function(data)
+		devAssert2(data, "Received nil error.")
 
-		local v5 = (not p1.message or not (string.len(p1.message) > 0)) and "An unknown error occurred." or p1.message
-		local locations = p1.locations
-		local path = p1.path
-		local extensions = p1.extensions
+		local message = not (data.message and string.len(data.message) > 0) and "An unknown error occurred."
+			or data.message
+
+		local locations = data.locations
+		local path = data.path
+		local extensions = data.extensions
 
 		return extensions and {
-			message = v5,
-			locations = locations,
-			path = path,
-			extensions = extensions
-		} or {
-			message = v5,
-			locations = locations,
-			path = path
-		}
+				message = message,
+				locations = locations,
+				path = path,
+				extensions = extensions
+			}
+			or { message = message, locations = locations, path = path }
 	end
 }

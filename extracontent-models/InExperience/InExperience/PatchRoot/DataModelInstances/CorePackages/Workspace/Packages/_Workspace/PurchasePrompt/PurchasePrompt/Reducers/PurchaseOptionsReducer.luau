@@ -1,18 +1,14 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
-local SetPurchaseOptions = require(PurchasePrompt.Actions.SetPurchaseOptions)
-local _ = require(PurchasePromptParent.SharedFlags).FFlagUnifiedPurchaseGamepassAddProductUniverseId
+local parent = PurchasePrompt.Parent
 
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local Rodux = PurchasePromptDeps.Rodux
+
+local SetPurchaseOptions = require(PurchasePrompt.Actions.SetPurchaseOptions)
 require(PurchasePrompt.types)
 
-local t1 = {
-	shouldSkipOwnershipCheck = false,
-	shouldFetchCartPricing = false
-}
-
-return (Rodux.createReducer(t1, {
-	[SetPurchaseOptions.name] = function(_, p2) -- line: 18
-		return p2.purchaseOptions
+return (Rodux.createReducer({ shouldSkipOwnershipCheck = false, shouldFetchCartPricing = false }, {
+	[SetPurchaseOptions.name] = function(_, p)
+		return p.purchaseOptions
 	end
 }))

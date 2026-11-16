@@ -1,17 +1,13 @@
 return {
-	new = function(s1: string?) -- line: 29
-		local v2 = newproxy(true)
-		local s2 = "Symbol()"
+	new = function(p: string?)
+		local v = newproxy(true)
 
-		if s1 then
-			s2 = ("Symbol(%s)"):format(s1)
+		local v2 = not p and "Symbol()" or ("Symbol(%s)"):format(p)
+
+		getmetatable(v).__tostring = function()
+			return v2
 		end
 
-		getmetatable(v2).__tostring = function() -- line: 37
-			-- upvalues: s2 (ref)
-			return s2
-		end
-
-		return v2
+		return v
 	end
 }

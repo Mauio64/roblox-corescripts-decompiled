@@ -1,3 +1,1 @@
-return {
-	Auth = "auth"
-}
+return { Auth = "auth" }

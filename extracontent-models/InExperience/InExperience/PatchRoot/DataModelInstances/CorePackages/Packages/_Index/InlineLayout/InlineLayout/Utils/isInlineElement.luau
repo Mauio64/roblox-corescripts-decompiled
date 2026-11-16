@@ -1,20 +1,19 @@
-local Parent = script:FindFirstAncestor("Utils").Parent
-local HardBreakElement = require(Parent.Components.InlineLayout.InlineLayoutElements.HardBreakElement)
-local InlineElementType = require(Parent.Utils.InlineElementType)
+local parent = script:FindFirstAncestor("Utils").Parent
 
-local function isInlineElement(p1) -- line: 6
-	-- upvalues: HardBreakElement (copy), InlineElementType (copy)
-	if p1 == HardBreakElement then
+local HardBreakElement = require(parent.Components.InlineLayout.InlineLayoutElements.HardBreakElement)
+local InlineElementType = require(parent.Utils.InlineElementType)
+
+local function isInlineElement(p): boolean
+	if p == HardBreakElement then
 		return true
 	end
 
-	if type(p1) == "table" then
-		local mt = getmetatable(p1)
-
-		return mt ~= nil and mt.__type == InlineElementType
+	if type(p) ~= "table" then
+		return false
 	end
 
-	return false
+	local metatable = getmetatable(p)
+	return metatable ~= nil and metatable.__type == InlineElementType
 end
 
 return isInlineElement

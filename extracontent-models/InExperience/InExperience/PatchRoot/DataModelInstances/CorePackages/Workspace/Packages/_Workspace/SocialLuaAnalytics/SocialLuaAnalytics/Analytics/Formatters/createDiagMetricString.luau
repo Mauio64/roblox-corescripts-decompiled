@@ -1,18 +1,19 @@
 local SocialLuaAnalytics = script:FindFirstAncestor("SocialLuaAnalytics")
-local SocialLuaAnalyticsParent = SocialLuaAnalytics.Parent
-local Cryo = require(SocialLuaAnalyticsParent.Cryo)
-local EventTypes = require(SocialLuaAnalytics.Analytics.Enums).EventTypes
+local parent = SocialLuaAnalytics.Parent
 
-local function createDiagMetricString(s1: string?, t1: {[any]: any}?) -- line: 16
-	-- upvalues: EventTypes (copy), Cryo (copy)
-	local v8 = s1 or EventTypes.LoadingTime
-	local v9 = t1 or {}
+local Cryo = require(parent.Cryo)
+local Enums = require(SocialLuaAnalytics.Analytics.Enums)
+local EventTypes = Enums.EventTypes
+
+local function createDiagMetricString(p: string?, options)
+	local v = p or EventTypes.LoadingTime
+	local v2 = options or {}
 
 	return table.concat(Cryo.Dictionary.values({
-		v8,
-		v9.fetch,
-		if not v9.nextPage then nil else "nextPage",
-		v9.status
+		v,
+		v2.fetch,
+		v2.nextPage and "nextPage" or nil,
+		v2.status
 	}), "_")
 end
 

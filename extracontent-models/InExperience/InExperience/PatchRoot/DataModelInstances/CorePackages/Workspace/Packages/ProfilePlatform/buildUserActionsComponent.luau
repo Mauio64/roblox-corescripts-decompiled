@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local buildUserActionsComponent = require(Workspace.ProfilePlatform.ProfilePlatform.Hooks.buildUserActionsComponent)
 
-return (require(_Workspace.ProfilePlatform.ProfilePlatform.Hooks.buildUserActionsComponent))
+return buildUserActionsComponent

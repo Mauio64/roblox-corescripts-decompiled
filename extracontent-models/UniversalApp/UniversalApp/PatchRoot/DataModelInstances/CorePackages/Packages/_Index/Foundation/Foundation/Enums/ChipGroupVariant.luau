@@ -1,4 +1,1 @@
-return {
-	Row = "Row",
-	Wrap = "Wrap"
-}
+return { Row = "Row", Wrap = "Wrap" }

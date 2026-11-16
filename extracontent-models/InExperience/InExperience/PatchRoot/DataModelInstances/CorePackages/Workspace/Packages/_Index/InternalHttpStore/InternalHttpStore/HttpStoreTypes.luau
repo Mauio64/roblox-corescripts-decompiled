@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.Signals)
-require(ParentParent.HttpSignals)
+require(parent.Signals)
+require(parent.HttpSignals)
 
 return {
 	HttpResponseStatus = table.freeze({

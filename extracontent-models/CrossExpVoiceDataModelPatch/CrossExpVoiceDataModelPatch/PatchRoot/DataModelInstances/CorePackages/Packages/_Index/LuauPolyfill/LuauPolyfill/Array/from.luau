@@ -1,38 +1,38 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local isArray = require(scriptParent.isArray)
-local instanceof = require(scriptParentParent.instanceof)
-local Set = require(scriptParentParent.Set)
-local Map = require(scriptParentParent.Map)
+local parent = script.Parent
+local parent2 = parent.Parent
+local isArray = require(parent.isArray)
+local instanceof = require(parent2.instanceof)
+local Set = require(parent2.Set)
+local Map = require(parent2.Map)
+
 local fromString = require(script.fromString)
 local fromSet = require(script.fromSet)
 local fromMap = require(script.fromMap)
 local fromArray = require(script.fromArray)
 
-require(scriptParentParent.types)
+require(parent2.types)
 
-return function(p1, p2: ((...any) -> ...any)?, p3) -- line: 23
-	-- upvalues: isArray (copy), fromArray (copy), instanceof (copy), Set (copy), fromSet (copy), Map (copy), fromMap (copy), fromString (copy)
-	if p1 == nil then
+return function(p, callback, p2)
+	if p == nil then
 		error("cannot create array from a nil value")
 	end
 
-	local v14 = typeof(p1)
+	local typeName = typeof(p)
 
-	if v14 == "table" and isArray(p1) then
-		return (fromArray(p1, p2, p3))
+	if typeName == "table" and isArray(p) then
+		return (fromArray(p, callback, p2))
 	end
 
-	if instanceof(p1, Set) then
-		return (fromSet(p1, p2, p3))
+	if instanceof(p, Set) then
+		return (fromSet(p, callback, p2))
 	end
 
-	if instanceof(p1, Map) then
-		return (fromMap(p1, p2, p3))
+	if instanceof(p, Map) then
+		return (fromMap(p, callback, p2))
 	end
 
-	if v14 == "string" then
-		return (fromString(p1, p2, p3))
+	if typeName == "string" then
+		return (fromString(p, callback, p2))
 	end
 
 	return {}

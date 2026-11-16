@@ -1,4 +1,5 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local ApolloClient = require(VirtualEvents.Parent.ApolloClient)
 local GraphQLServer = require(VirtualEvents.Parent.GraphQLServer)
 local React = require(VirtualEvents.Parent.React)
@@ -8,100 +9,120 @@ local RoactRodux = require(VirtualEvents.Parent.RoactRodux)
 local RobloxAppLocales = require(VirtualEvents.Parent.RobloxAppLocales)
 local Localization = require(VirtualEvents.Parent.Localization)
 local UIBlox = require(VirtualEvents.Parent.UIBlox)
-local DesignTokenProvider = require(VirtualEvents.Parent.Style).DesignTokenProvider
+local Style = require(VirtualEvents.Parent.Style)
+local DesignTokenProvider = Style.DesignTokenProvider
 local VirtualEventsState = require(VirtualEvents.Parent.VirtualEventsState)
 local MockContentProvider = UIBlox.UnitTestHelpers.MockContentProvider
-local FoundationProvider = require(VirtualEvents.Parent.Foundation).FoundationProvider
+local Foundation = require(VirtualEvents.Parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+local ColorMode = Foundation.Enums.ColorMode
+
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 local Constants = UIBlox.App.Style.Constants
 local ContentProvider = UIBlox.App.Context.ContentProvider
-local v18 = Rodux.combineReducers({
+
+local combineReducers = Rodux.combineReducers({
 	VirtualEvents = VirtualEventsState.installReducer()
 })
 
-local function withMockProviders(t1: {[any]: any}, t2: {[any]: any}?) -- line: 32
-	-- upvalues: Rodux (copy), v18 (copy), React (copy), RoactRodux (copy), ContentProvider (copy), MockContentProvider (copy), Localization (copy), RobloxAppLocales (copy), FoundationProvider (copy), AppStyleProvider (copy), Constants (copy), RoactNavigation (copy), DesignTokenProvider (copy), GraphQLServer (copy), ApolloClient (copy)
-	local v22 = ((if not t2 then nil else t2.store)) or Rodux.Store.new(v18, if not t2 then nil else t2.initialStoreState, { Rodux.thunkMiddleware })
-	local t3 = {
-		StoreProvider = React.createElement(RoactRodux.StoreProvider, {
-			store = v22
-		}, {
+local function withMockProviders(p, props)
+	local store
+
+	if props then
+		store = props.store
+	end
+
+	if not store then
+		local new = Rodux.Store.new
+		local v
+
+		if props then
+			v = props.initialStoreState
+		end
+
+		store = new(combineReducers, v, { Rodux.thunkMiddleware })
+	end
+
+	local v = {
+		StoreProvider = React.createElement(RoactRodux.StoreProvider, { store = store }, {
 			ContentProvider = React.createElement(ContentProvider.Provider, {
 				value = MockContentProvider.new()
 			}, {
-				LocalizationProvider = React.createElement(Localization.LocalizationProvider, {
-					localization = RobloxAppLocales.Localization.new("en-us")
-				}, {
-					FoundationProvider = React.createElement(FoundationProvider, {
-						theme = "Dark"
-					}, {
-						StyleProvider = React.createElement(AppStyleProvider, {
-							style = {
-								themeName = Constants.ThemeName.Dark,
-								fontName = Constants.FontName.Gotham
-							}
+				LocalizationProvider = React.createElement(
+					Localization.LocalizationProvider,
+					{
+						localization = RobloxAppLocales.Localization.new("en-us")
+					},
+					{
+						FoundationProvider = React.createElement(FoundationProvider, {
+							colorMode = ColorMode.Dark
 						}, {
-							NavigationProvider = React.createElement(RoactNavigation.Provider, {
-								value = {
-									isFocused = function() -- line: 61
-										return true
-									end,
-									goBack = function() -- line: 64
-									end,
-									addListener = function() -- line: 65
-										return {
-											remove = function() -- line: 67
-											end
-										}
-									end
+							StyleProvider = React.createElement(AppStyleProvider, {
+								style = {
+									themeName = ColorMode.Dark,
+									fontName = Constants.FontName.Gotham
 								}
 							}, {
-								DesignTokenProvider = React.createElement(DesignTokenProvider, {
-									tokenMappers = {}
+								NavigationProvider = React.createElement(RoactNavigation.Provider, {
+									value = {
+										isFocused = function(): boolean
+											return true
+										end,
+										goBack = function() end,
+										addListener = function()
+											return {
+												remove = function() end
+											}
+										end
+									}
 								}, {
-									Children = React.createElement(React.Fragment, nil, t1)
+									DesignTokenProvider = React.createElement(
+										DesignTokenProvider,
+										{ tokenMappers = {} },
+										{
+											Children = React.createElement(React.Fragment, nil, p)
+										}
+									)
 								})
 							})
 						})
-					})
-				})
+					}
+				)
 			})
 		})
 	}
 
-	if t2 then
-		if t2.mockResolvers then
-			local v24 = GraphQLServer.GraphQLServer.new({
-				mockResolvers = t2.mockResolvers
+	if props then
+		if props.mockResolvers then
+			local graphQLServer = GraphQLServer.GraphQLServer.new({
+				mockResolvers = props.mockResolvers
 			})
-			local v25 = ApolloClient.ApolloClient.new({
+
+			local apolloClient = ApolloClient.ApolloClient.new({
 				cache = ApolloClient.InMemoryCache.new({}),
 				link = ApolloClient.HttpLink.new({
 					uri = "/api",
-					fetch = function(_, p2) -- line: 95
-						-- upvalues: v24 (copy)
-						return v24:fetchLocal(p2)
+					fetch = function(_, p2)
+						return graphQLServer:fetchLocal(p2)
 					end
 				})
 			})
 
-			t3 = {
+			v = {
 				ApolloProvider = React.createElement(ApolloClient.ApolloProvider, {
-					client = v25
-				}, t3)
+					client = apolloClient
+				}, v)
 			}
 		end
 
-		if t2.mockNavigation then
-			t3 = {
-				NavigationProvider = React.createElement(RoactNavigation.Provider, {
-					value = t2.mockNavigation
-				}, t3)
-			}
-		end
+		v = props.mockNavigation and {
+			NavigationProvider = React.createElement(RoactNavigation.Provider, {
+				value = props.mockNavigation
+			}, v)
+		} or v
 	end
 
-	return React.createElement(React.Fragment, nil, t3)
+	return React.createElement(React.Fragment, nil, v)
 end
 
 return withMockProviders

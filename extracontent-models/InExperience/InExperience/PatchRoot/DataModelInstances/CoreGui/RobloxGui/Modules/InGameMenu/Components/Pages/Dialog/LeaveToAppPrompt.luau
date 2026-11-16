@@ -1,78 +1,88 @@
 local RunService = game:GetService("RunService")
 local CorePackages = game:GetService("CorePackages")
-local LinkingProtocol = require(CorePackages.Workspace.Packages.LinkingProtocol).LinkingProtocol
+
+local LinkingProtocol = require(CorePackages.Workspace.Packages.LinkingProtocol)
+local DeepLinkSource = LinkingProtocol.Enums.DeepLinkSource
+local linkingProtocol = LinkingProtocol.LinkingProtocol
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local t = InGameMenuDependencies.t
-local LeavePrompt = require(script.Parent.LeavePrompt)
-local ParentParent = script.Parent.Parent.Parent.Parent
-local withLocalization = require(ParentParent.Localization.withLocalization)
-local CloseMenu = require(ParentParent.Thunks.CloseMenu)
-local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
-local Constants = require(ParentParent.Resources.Constants)
-local v14 = Roact.PureComponent:extend("LeaveToAppPrompt")
 
-v14.validateProps = t.strictInterface({
+local LeavePrompt = require(script.Parent.LeavePrompt)
+
+local parent = script.Parent.Parent.Parent.Parent
+local withLocalization = require(parent.Localization.withLocalization)
+
+local CloseMenu = require(parent.Thunks.CloseMenu)
+local SendAnalytics = require(parent.Utility.SendAnalytics)
+local Constants = require(parent.Resources.Constants)
+
+local extended = Roact.PureComponent:extend("LeaveToAppPrompt")
+
+extended.validateProps = t.strictInterface({
 	closeMenu = t.callback,
 	canGamepadCaptureFocus = t.optional(t.boolean),
 	canKeyboardCaptureFocus = t.optional(t.boolean),
 	onConfirm = t.optional(t.callback),
 	linkingProtocol = t.table
 })
-v14.defaultProps = {
-	linkingProtocol = LinkingProtocol.default
-}
 
-function v14.init(p1) -- line: 35
-	-- upvalues: SendAnalytics (copy), Constants (copy), RunService (copy)
-	function p1.goToHomePage() -- line: 36
-		-- upvalues: SendAnalytics (copy), Constants (copy), RunService (copy), p1 (copy)
+extended.defaultProps = { linkingProtocol = linkingProtocol.default }
+
+function extended:init()
+	function self.goToHomePage()
 		SendAnalytics(Constants.AnalyticsLeaveToHomeName, Constants.AnalyticsLeaveToHomeName, {
 			confirmed = Constants.AnalyticsLeaveToHomeName
 		})
-		RunService.Heartbeat:Wait()
-		p1.props.linkingProtocol:detectURL("roblox://navigation/home")
+
+		if self.props.linkingProtocol:isInternalDlicEnabled() then
+			local internalDlic = self.props.linkingProtocol:createInternalDlic(
+				"roblox://navigation/home",
+				DeepLinkSource.LuaInternal
+			)
+
+			RunService.Heartbeat:Wait()
+			self.props.linkingProtocol:detectDeeplinkIntent(internalDlic)
+		else
+			RunService.Heartbeat:Wait()
+			self.props.linkingProtocol:detectURL("roblox://navigation/home")
+		end
+
 		game:Shutdown()
 	end
 end
-function v14.render(p2) -- line: 57
-	-- upvalues: withLocalization (copy), Roact (copy), LeavePrompt (copy)
+
+function extended.render(p)
 	return withLocalization({
 		titleText = "CoreScripts.InGameMenu.Prompt.LeaveGameTitle",
 		bodyText = "CoreScripts.InGameMenu.Prompt.LeaveGameBodyText",
 		confirmText = "CoreScripts.InGameMenu.Prompt.BackToHome",
 		cancelText = "CoreScripts.InGameMenu.Prompt.ResumeGame"
-	})(function(p3) -- line: 63
-		-- upvalues: Roact (copy), LeavePrompt (copy), p2 (copy)
+	})(function(props)
 		return Roact.createElement(LeavePrompt, {
-			titleText = p3.titleText,
-			bodyText = p3.bodyText,
-			confirmText = p3.confirmText,
-			cancelText = p3.cancelText,
-			onConfirm = p2.props.onConfirm or p2.goToHomePage,
-			onCancel = p2.props.closeMenu,
-			canGamepadCaptureFocus = p2.props.canGamepadCaptureFocus,
-			canKeyboardCaptureFocus = p2.props.canKeyboardCaptureFocus
+			titleText = props.titleText,
+			bodyText = props.bodyText,
+			confirmText = props.confirmText,
+			cancelText = props.cancelText,
+			onConfirm = p.props.onConfirm or p.goToHomePage,
+			onCancel = p.props.closeMenu,
+			canGamepadCaptureFocus = p.props.canGamepadCaptureFocus,
+			canKeyboardCaptureFocus = p.props.canKeyboardCaptureFocus
 		})
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p4, _) -- line: 77
-	-- upvalues: Constants (copy)
-	local v19 = p4.menuPage == Constants.LeaveToAppPromptPageKey and (p4.displayOptions.inputType == Constants.InputType.Gamepad and (not p4.respawn.dialogOpen and p4.currentZone == 1))
-	local v20 = p4.menuPage == Constants.LeaveToAppPromptPageKey and (p4.displayOptions.inputType == Constants.InputType.MouseAndKeyboard and not p4.respawn.dialogOpen)
-
+return RoactRodux.UNSTABLE_connect2(function(data, _)
 	return {
-		canGamepadCaptureFocus = v19,
-		canKeyboardCaptureFocus = v20
+		canGamepadCaptureFocus = data.menuPage == Constants.LeaveToAppPromptPageKey and data.displayOptions.inputType == Constants.InputType.Gamepad and not data.respawn.dialogOpen and data.currentZone == 1,
+		canKeyboardCaptureFocus = data.menuPage == Constants.LeaveToAppPromptPageKey and data.displayOptions.inputType == Constants.InputType.MouseAndKeyboard and not data.respawn.dialogOpen
 	}
-end, function(p6) -- line: 91
-	-- upvalues: CloseMenu (copy)
+end, function(callback)
 	return {
-		closeMenu = function() -- line: 93
-			-- upvalues: p6 (copy), CloseMenu (copy)
-			p6(CloseMenu)
+		closeMenu = function()
+			callback(CloseMenu)
 		end
 	}
-end)(v14)
+end)(extended)

@@ -1,30 +1,25 @@
-local Parent = script:FindFirstAncestor("ExpChatShared").Parent
-local v2 = require(Parent.Lumberyak).Logger.new(nil, "ExpChat")
-local ok, result = pcall(function() -- line: 29
+local parent = script:FindFirstAncestor("ExpChatShared").Parent
+local Lumberyak = require(parent.Lumberyak)
+
+local logger = Lumberyak.Logger.new(nil, "ExpChat")
+
+local success, result = pcall(function()
 	return {
 		level = game:DefineFastString("DebugLuaLogLevel", ""),
 		pattern = game:DefineFastString("DebugLuaLogPattern", "")
 	}
 end)
 
-if not ok then
-	result = {
-		level = "debug",
-		pattern = ""
-	}
-end
+local v = not success and { level = "debug", pattern = "" } or result
 
-v2:setContext({
-	prefix = "[{loggerName} ({level})] - "
-})
-v2:addSink({
-	maxLevel = v2.Levels.fromString(result.level),
-	log = function(_, p2, _) -- line: 46
-		-- upvalues: result (ref)
-		if string.match(p2, result.pattern) then
-			print(p2)
+logger:setContext({ prefix = "[{loggerName} ({level})] - " })
+logger:addSink({
+	maxLevel = logger.Levels.fromString(v.level),
+	log = function(_, value, _)
+		if string.match(value, v.pattern) then
+			print(value)
 		end
 	end
 })
 
-return v2
+return logger

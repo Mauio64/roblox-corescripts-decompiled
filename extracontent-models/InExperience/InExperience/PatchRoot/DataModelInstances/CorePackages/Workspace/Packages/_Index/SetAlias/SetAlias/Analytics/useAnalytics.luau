@@ -1,8 +1,8 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local SetAliasAnalyticsContext = require(script.Parent.SetAliasAnalyticsContext)
-local React = require(ParentParent.dependencies).React
+local dependencies = require(parent.dependencies)
+local react = dependencies.React
 
-return function() -- line: 8
-	-- upvalues: React (copy), SetAliasAnalyticsContext (copy)
-	return React.useContext(SetAliasAnalyticsContext)
+return function()
+	return react.useContext(SetAliasAnalyticsContext)
 end

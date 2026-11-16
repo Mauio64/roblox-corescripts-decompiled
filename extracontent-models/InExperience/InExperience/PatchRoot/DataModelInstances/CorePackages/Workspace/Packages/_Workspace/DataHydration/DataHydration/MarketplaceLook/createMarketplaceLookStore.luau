@@ -1,31 +1,34 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Promise = require(DataHydrationParent.Promise)
-local createDataCache = require(DataHydration.createDataCache)
+local parent = DataHydration.Parent
+local Promise = require(parent.Promise)
 
+local createDataCache = require(DataHydration.createDataCache)
 require(DataHydration.DataHydrationTypes)
 require(script.Parent.MarketplaceLookStoreTypes)
-
 local createDataResolver = require(DataHydration.createDataResolver)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDataHydrationAccountReset = SharedFlags.FFlagDataHydrationAccountReset
 
-local function createMarketplaceLookStore() -- line: 10
-	-- upvalues: createDataCache (copy), createDataResolver (copy), Promise (copy)
-	local v7 = createDataCache()
-	local v8 = createDataResolver({
-		cache = v7,
-		fetchFn = function(_: {[any]: any}) -- line: 15
-			-- upvalues: Promise (copy)
+local function createMarketplaceLookStore()
+	local dataCache = createDataCache(nil, nil, FFlagDataHydrationAccountReset and {
+		observeLocalUser = false
+	} or nil)
+
+	local dataResolver = createDataResolver({
+		cache = dataCache,
+		fetchFn = function(_)
 			return Promise.resolve({})
-		end
+		end,
+		keepCacheOnAccountReset = FFlagDataHydrationAccountReset and true or nil
 	})
 
 	return {
-		getMarketplaceLookInfo = v8.getCachedItem,
-		getMarketplaceLookInfos = v8.getCachedItems,
-		updateMarketplaceLookInfo = v7.updateItem,
-		updateMarketplaceLookInfos = v7.updateItems,
-		clear = v7.clear,
-		dispose = v7.dispose
+		getMarketplaceLookInfo = dataResolver.getCachedItem,
+		getMarketplaceLookInfos = dataResolver.getCachedItems,
+		updateMarketplaceLookInfo = dataCache.updateItem,
+		updateMarketplaceLookInfos = dataCache.updateItems,
+		clear = dataCache.clear,
+		dispose = dataCache.dispose
 	}
 end
 

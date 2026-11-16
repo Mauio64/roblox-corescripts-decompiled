@@ -1,36 +1,40 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local v2 = require(ParentParent.UIBlox.Core.Utility.GetEngineFeatureSafe)("EnablePreferredTextSizeSetting")
-local t1 = {
-	ThemeName = {
-		Dark = "Dark",
-		Light = "Light"
-	},
-	FontName = {
-		Gotham = "Gotham"
-	},
-	DeviceType = {
-		Desktop = "Desktop",
-		Tablet = "Tablet",
-		Phone = "Phone",
-		Console = "Console",
-		VR = "VR",
-		Unknown = "Unknown"
-	},
-	Layout = {
-		ActionBar = {
-			PositionOffset = 24
-		}
-	}
+local parent = script.Parent.Parent.Parent.Parent
+local GetEngineFeatureSafe = require(parent.UIBlox.Core.Utility.GetEngineFeatureSafe)
+local engineFeatureSafe = GetEngineFeatureSafe("EnablePreferredTextSizeSetting")
+
+local Constants = {}
+
+Constants.ThemeName = { Dark = "Dark", Light = "Light" }
+
+Constants.FontName = { Gotham = "Gotham", Classic = "Classic" }
+Constants.ComicNeueFontFamily = "rbxassetid://127896232205472"
+Constants.DeviceType = {
+	Desktop = "Desktop",
+	Tablet = "Tablet",
+	Phone = "Phone",
+	Console = "Console",
+	VR = "VR",
+	Unknown = "Unknown"
 }
 
-t1.DefaultThemeName = t1.ThemeName.Light
-t1.DefaultFontName = t1.FontName.Gotham
-t1.DefaultDeviceType = t1.DeviceType.Desktop
-t1.DefaultSettings = {
+Constants.Layout = {
+	ActionBar = { PositionOffset = 24 }
+}
+
+Constants.DefaultThemeName = Constants.ThemeName.Light
+Constants.DefaultFontName = Constants.FontName.Gotham
+Constants.DefaultDeviceType = Constants.DeviceType.Desktop
+local preferredTextSize
+
+if engineFeatureSafe then
+	preferredTextSize = Enum.PreferredTextSize.Medium
+end
+
+Constants.DefaultSettings = {
 	preferredTransparency = 1,
 	reducedMotion = false,
-	scale = 1,
-	preferredTextSize = if not v2 then nil else Enum.PreferredTextSize.Medium
+	preferredTextSize = preferredTextSize,
+	scale = 1
 }
 
-return t1
+return Constants

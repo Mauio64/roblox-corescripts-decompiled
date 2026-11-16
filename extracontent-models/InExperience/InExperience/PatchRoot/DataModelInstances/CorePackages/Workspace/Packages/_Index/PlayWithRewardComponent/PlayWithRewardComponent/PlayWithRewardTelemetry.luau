@@ -1,434 +1,314 @@
 local TelemetryService = game:GetService("TelemetryService")
-local t1 = {
-	"addOSInfo",
-	"addSessionInfo",
-	"addSessionId"
-}
-local t2 = { "addOSInfo" }
-local t3 = {
+
+local parent = script:FindFirstAncestor("PlayWithRewardComponent").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiPlayWithRewardRefactor = SharedFlags.FFlagSduiPlayWithRewardRefactor
+
+local standardizedFields = { "addOSInfo", "addSessionInfo", "addSessionId" }
+local standardizedFields2 = { "addOSInfo" }
+
+local v = {
 	eventName = "PlayWithRewardAdRequested",
-	description = "        This is fired when a Play with Reward ad is requested.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardAdRequestedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 26, 9, 28 },
+	description = "        This is fired when a Play with Reward ad is requested.\n    "
 }
-local t4 = {
+
+local v2 = {
 	eventName = "PlayWithRewardAdReceived",
-	description = "        This is fired when a Play with Reward ad is received.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardAdReceivedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 26, 9, 30 },
+	description = "        This is fired when a Play with Reward ad is received.\n    "
 }
-local t5 = {
+
+local v3 = {
 	eventName = "PlayWithRewardBannerShown",
-	description = "        This is fired when a Play with Reward banner is shown on an EDP.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardBannerShownTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		26,
-		4,
-		27
-	}
+	lastUpdated = { 26, 4, 27 },
+	description = "        This is fired when a Play with Reward banner is shown on an EDP.\n    "
 }
-local t6 = {
+
+local v4 = {
 	eventName = "PlayWithRewardButtonClicked",
-	description = "        This is fired when a Play with Reward button is clicked on an EDP.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardButtonClickedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "        This is fired when a Play with Reward button is clicked on an EDP.\n    "
 }
-local t7 = {
+
+local v5 = {
 	eventName = "PlayWithRewardAdPlaybackAttempted",
-	description = "        This is fired when a Play with Reward ad starts playing.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardAdPlaybackAttemptedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "        This is fired when a Play with Reward ad starts playing.\n    "
 }
-local t8 = {
+
+local v6 = {
 	eventName = "PlayWithRewardAdPlaybackStopped",
-	description = "        This is fired when a Play with Reward ad stops playing.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardAdPlaybackStoppedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "        This is fired when a Play with Reward ad stops playing.\n    "
 }
-local t9 = {
+
+local v7 = {
 	eventName = "PlayWithRewardGameJoinInitiated",
-	description = "        This is fired when a Play with Reward game join is initiated from an EDP.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardGameJoinInitiatedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "        This is fired when a Play with Reward game join is initiated from an EDP.\n    "
 }
-local t10 = {
+
+local v8 = {
 	eventName = "PlayWithRewardBlackoutCurtain",
-	description = "        This is fired when the Play with Reward blackout curtain state changes (shown or hidden).\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardBlackoutCurtainTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		26,
-		4,
-		3
-	}
+	lastUpdated = { 26, 4, 3 },
+	description = "        This is fired when the Play with Reward blackout curtain state changes (shown or hidden).\n    "
 }
-local t11 = {
+
+local v9 = {
 	eventName = "PlayWithRewardShimmerShown",
-	description = "        This is fired when the Play with Reward shimmer is shown.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardShimmerShownTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		26,
-		4,
-		28
-	}
+	lastUpdated = { 26, 4, 28 },
+	description = "        This is fired when the Play with Reward shimmer is shown.\n    "
 }
-local t12 = {
+
+local v10 = {
 	eventName = "PlayWithRewardCoachmark",
-	description = "        This is fired when a Play with Reward coachmark is shown or dismissed on an EDP.\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("PlayWithRewardCoachmarkTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		26,
-		4,
-		21
-	}
+	lastUpdated = { 26, 4, 21 },
+	description = "        This is fired when a Play with Reward coachmark is shown or dismissed on an EDP.\n    "
 }
-local t13 = {
+
+local v11 = {
 	eventName = "PlayWithRewardAdRequestedCounter",
-	description = "\t        Counter for PlayWithRewardAdRequested events.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "\t        Counter for PlayWithRewardAdRequested events.\n\t    "
 }
-local t14 = {
+
+local v12 = {
 	eventName = "PlayWithRewardAdReceivedCounter",
-	description = "\t        Counter for PlayWithRewardAdReceived events with status.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "\t        Counter for PlayWithRewardAdReceived events with status.\n\t    "
 }
-local t15 = {
+
+local v13 = {
 	eventName = "PlayWithRewardBannerShownCounter",
-	description = "\t        Counter for PlayWithRewardBannerShown events.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		26,
-		4,
-		27
-	}
+	lastUpdated = { 26, 4, 27 },
+	description = "\t        Counter for PlayWithRewardBannerShown events.\n\t    "
 }
-local t16 = {
+
+local v14 = {
 	eventName = "PlayWithRewardButtonClickedCounter",
-	description = "\t        Counter for PlayWithRewardButtonClicked events.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "\t        Counter for PlayWithRewardButtonClicked events.\n\t    "
 }
-local t17 = {
+
+local v15 = {
 	eventName = "PlayWithRewardAdPlaybackAttemptedCounter",
-	description = "\t        Counter for PlayWithRewardAdPlaybackAttempted events.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "\t        Counter for PlayWithRewardAdPlaybackAttempted events.\n\t    "
 }
-local t18 = {
+
+local v16 = {
 	eventName = "PlayWithRewardAdPlaybackStoppedCounter",
-	description = "\t        Counter for PlayWithRewardAdPlaybackStopped events with status.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "\t        Counter for PlayWithRewardAdPlaybackStopped events with status.\n\t    "
 }
-local t19 = {
+
+local v17 = {
 	eventName = "PlayWithRewardGameJoinInitiatedCounter",
-	description = "\t        Counter for PlayWithRewardGameJoinInitiated events.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "\t        Counter for PlayWithRewardGameJoinInitiated events.\n\t    "
 }
-local t20 = {
+
+local v18 = {
 	eventName = "PlayWithRewardCoachmarkCounter",
-	description = "\t        Counter for PlayWithRewardCoachmark events, split by action.\n\t    ",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		26,
-		4,
-		21
-	}
+	lastUpdated = { 26, 4, 21 },
+	description = "\t        Counter for PlayWithRewardCoachmark events, split by action.\n\t    "
 }
-local t21 = {
+
+local v19 = {
 	eventName = "PlayWithRewardAdReceivedSuccessfully",
-	description = "\t        Stats for successful PlayWithRewardAdReceived events.\n\t    ",
 	backends = { "RobloxTelemetryStat" },
-	lastUpdated = {
-		25,
-		9,
-		24
-	}
+	lastUpdated = { 25, 9, 24 },
+	description = "\t        Stats for successful PlayWithRewardAdReceived events.\n\t    "
 }
-local t22 = {}
 
-local function getCoachmarkCustomFields(s1: string, s2: string, s3: string, s4: string) -- line: 237
+local function getCoachmarkCustomFields(action: string, playWithRewardFlowId: string, universeId: string, productId: string) -- 1 equivalent call inferred from this helper
 	return {
-		action = s1,
-		playWithRewardFlowId = s2,
-		universeId = s3,
-		productId = s4
+		action = action,
+		playWithRewardFlowId = playWithRewardFlowId,
+		universeId = universeId,
+		productId = productId
 	}
 end
 
-function t22.logPlayWithRewardAdRequested(s5: string, s6: string) -- line: 246
-	-- upvalues: TelemetryService (copy), t3 (copy), t1 (copy), t13 (copy), t2 (copy)
-	local t23 = {
-		playWithRewardFlowId = s5,
-		universeId = s6
-	}
+local PlayWithRewardTelemetry = {}
 
-	TelemetryService:LogEvent(t3, {
-		standardizedFields = t1,
-		customFields = t23
-	})
-	TelemetryService:LogCounter(t13, {
-		standardizedFields = t2,
-		customFields = {}
-	}, 1)
-end
-function t22.logPlayWithRewardAdReceived(s7: string, s8: string, b1: boolean, s9: string?, n1: number, s10: string?) -- line: 266
-	-- upvalues: TelemetryService (copy), t4 (copy), t1 (copy), t14 (copy), t2 (copy), t21 (copy)
-	local t24 = {
-		playWithRewardFlowId = s7,
-		universeId = s8,
-		isSuccessful = b1,
-		adAvailabilityResult = s9,
-		fetchLatencyMs = n1,
-		productId = s10
-	}
+function PlayWithRewardTelemetry.logPlayWithRewardAdRequested(playWithRewardFlowId: string, universeId: string, experimentUiVariant: string?)
+	if not FFlagSduiPlayWithRewardRefactor then
+		experimentUiVariant = nil
+	end
 
-	TelemetryService:LogEvent(t4, {
-		standardizedFields = t1,
-		customFields = t24
-	})
-	TelemetryService:LogCounter(t14, {
-		standardizedFields = t2,
+	TelemetryService:LogEvent(v, {
+		standardizedFields = standardizedFields,
 		customFields = {
-			isSuccessful = b1,
-			adAvailabilityResult = s9
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			experimentUiVariant = experimentUiVariant
 		}
+	})
+
+	TelemetryService:LogCounter(v11, { standardizedFields = standardizedFields2, customFields = {} }, 1)
+end
+
+function PlayWithRewardTelemetry.logPlayWithRewardAdReceived(playWithRewardFlowId: string, universeId: string, isSuccessful: boolean, adAvailabilityResult: string?, fetchLatencyMs: number, productId: string?, experimentUiVariant: string?)
+	if not FFlagSduiPlayWithRewardRefactor then
+		experimentUiVariant = nil
+	end
+
+	TelemetryService:LogEvent(v2, {
+		standardizedFields = standardizedFields,
+		customFields = {
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			isSuccessful = isSuccessful,
+			adAvailabilityResult = adAvailabilityResult,
+			fetchLatencyMs = fetchLatencyMs,
+			productId = productId,
+			experimentUiVariant = experimentUiVariant
+		}
+	})
+
+	TelemetryService:LogCounter(v12, {
+		standardizedFields = standardizedFields2,
+		customFields = { isSuccessful = isSuccessful, adAvailabilityResult = adAvailabilityResult }
 	}, 1)
 
-	if b1 then
-		TelemetryService:LogStat(t21, {
-			standardizedFields = t2,
-			customFields = {
-				adAvailabilityResult = s9
-			}
-		}, n1)
+	if isSuccessful then
+		TelemetryService:LogStat(v19, {
+			standardizedFields = standardizedFields2,
+			customFields = { adAvailabilityResult = adAvailabilityResult }
+		}, fetchLatencyMs)
 	end
 end
-function t22.logPlayWithRewardBannerShown(s11: string, s12: string, s13: string, s14: string, s15: string) -- line: 309
-	-- upvalues: TelemetryService (copy), t5 (copy), t1 (copy), t15 (copy), t2 (copy)
-	local t25 = {
-		playWithRewardFlowId = s11,
-		universeId = s12,
-		showState = s13,
-		productId = s14,
-		experimentUiVariant = s15
-	}
 
-	TelemetryService:LogEvent(t5, {
-		standardizedFields = t1,
-		customFields = t25
-	})
-	TelemetryService:LogCounter(t15, {
-		standardizedFields = t2,
-		customFields = {}
-	}, 1)
-end
-function t22.logPlayWithRewardButtonClicked(s16: string, s17: string, s18: string) -- line: 338
-	-- upvalues: TelemetryService (copy), t6 (copy), t1 (copy), t16 (copy), t2 (copy)
-	local t26 = {
-		playWithRewardFlowId = s16,
-		universeId = s17,
-		productId = s18
-	}
-
-	TelemetryService:LogEvent(t6, {
-		standardizedFields = t1,
-		customFields = t26
-	})
-	TelemetryService:LogCounter(t16, {
-		standardizedFields = t2,
-		customFields = {}
-	}, 1)
-end
-function t22.logPlayWithRewardAdPlaybackAttempted(s19: string, s20: string, s21: string) -- line: 359
-	-- upvalues: TelemetryService (copy), t7 (copy), t1 (copy), t17 (copy), t2 (copy)
-	local t27 = {
-		playWithRewardFlowId = s19,
-		universeId = s20,
-		productId = s21
-	}
-
-	TelemetryService:LogEvent(t7, {
-		standardizedFields = t1,
-		customFields = t27
-	})
-	TelemetryService:LogCounter(t17, {
-		standardizedFields = t2,
-		customFields = {}
-	}, 1)
-end
-function t22.logPlayWithRewardAdPlaybackStopped(s22: string, s23: string, s24: string, s25: string) -- line: 384
-	-- upvalues: TelemetryService (copy), t8 (copy), t1 (copy), t18 (copy), t2 (copy)
-	local t28 = {
-		playWithRewardFlowId = s22,
-		universeId = s23,
-		adPlaybackStatus = s24,
-		productId = s25
-	}
-
-	TelemetryService:LogEvent(t8, {
-		standardizedFields = t1,
-		customFields = t28
-	})
-	TelemetryService:LogCounter(t18, {
-		standardizedFields = t2,
+function PlayWithRewardTelemetry.logPlayWithRewardBannerShown(playWithRewardFlowId: string, universeId: string, showState: string, productId: string, experimentUiVariant: string)
+	TelemetryService:LogEvent(v3, {
+		standardizedFields = standardizedFields,
 		customFields = {
-			adPlaybackStatus = s24
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			showState = showState,
+			productId = productId,
+			experimentUiVariant = experimentUiVariant
 		}
-	}, 1)
-end
-function t22.logPlayWithRewardGameJoinInitiated(s26: string, s27: string, s28: string) -- line: 411
-	-- upvalues: TelemetryService (copy), t9 (copy), t1 (copy), t19 (copy), t2 (copy)
-	local t29 = {
-		playWithRewardFlowId = s26,
-		universeId = s27,
-		productId = s28
-	}
-
-	TelemetryService:LogEvent(t9, {
-		standardizedFields = t1,
-		customFields = t29
 	})
-	TelemetryService:LogCounter(t19, {
-		standardizedFields = t2,
-		customFields = {}
-	}, 1)
-end
-function t22.logPlayWithRewardBlackoutCurtainAction(s29: string, s30: string, s31: string, s32: string) -- line: 436
-	-- upvalues: TelemetryService (copy), t10 (copy), t1 (copy)
-	local t30 = {
-		playWithRewardFlowId = s29,
-		universeId = s30,
-		action = s31,
-		productId = s32
-	}
 
-	TelemetryService:LogEvent(t10, {
-		standardizedFields = t1,
-		customFields = t30
-	})
+	TelemetryService:LogCounter(v13, { standardizedFields = standardizedFields2, customFields = {} }, 1)
 end
-function t22.logPlayWithRewardShimmerShown(s33: string, s34: string) -- line: 455
-	-- upvalues: TelemetryService (copy), t11 (copy), t1 (copy)
-	local t31 = {
-		playWithRewardFlowId = s33,
-		universeId = s34
-	}
 
-	TelemetryService:LogEvent(t11, {
-		standardizedFields = t1,
-		customFields = t31
-	})
-end
-function t22.logPlayWithRewardCoachmark(s35: string, s36: string, s37: string, s38: string) -- line: 467
-	-- upvalues: TelemetryService (copy), t12 (copy), t1 (copy), t20 (copy), t2 (copy)
-	local t32 = {
-		action = s35,
-		playWithRewardFlowId = s36,
-		universeId = s37,
-		productId = s38
-	}
-
-	TelemetryService:LogEvent(t12, {
-		standardizedFields = t1,
-		customFields = t32
-	})
-	TelemetryService:LogCounter(t20, {
-		standardizedFields = t2,
+function PlayWithRewardTelemetry.logPlayWithRewardButtonClicked(playWithRewardFlowId: string, universeId: string, productId: string)
+	TelemetryService:LogEvent(v4, {
+		standardizedFields = standardizedFields,
 		customFields = {
-			action = s35
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			productId = productId
 		}
+	})
+
+	TelemetryService:LogCounter(v14, { standardizedFields = standardizedFields2, customFields = {} }, 1)
+end
+
+function PlayWithRewardTelemetry.logPlayWithRewardAdPlaybackAttempted(playWithRewardFlowId: string, universeId: string, productId: string)
+	TelemetryService:LogEvent(v5, {
+		standardizedFields = standardizedFields,
+		customFields = {
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			productId = productId
+		}
+	})
+
+	TelemetryService:LogCounter(v15, { standardizedFields = standardizedFields2, customFields = {} }, 1)
+end
+
+function PlayWithRewardTelemetry.logPlayWithRewardAdPlaybackStopped(playWithRewardFlowId: string, universeId: string, adPlaybackStatus: string, productId: string)
+	TelemetryService:LogEvent(v6, {
+		standardizedFields = standardizedFields,
+		customFields = {
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			adPlaybackStatus = adPlaybackStatus,
+			productId = productId
+		}
+	})
+
+	TelemetryService:LogCounter(v16, {
+		standardizedFields = standardizedFields2,
+		customFields = { adPlaybackStatus = adPlaybackStatus }
 	}, 1)
 end
 
-return t22
+function PlayWithRewardTelemetry.logPlayWithRewardGameJoinInitiated(playWithRewardFlowId: string, universeId: string, productId: string)
+	TelemetryService:LogEvent(v7, {
+		standardizedFields = standardizedFields,
+		customFields = {
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			productId = productId
+		}
+	})
+
+	TelemetryService:LogCounter(v17, { standardizedFields = standardizedFields2, customFields = {} }, 1)
+end
+
+function PlayWithRewardTelemetry.logPlayWithRewardBlackoutCurtainAction(playWithRewardFlowId: string, universeId: string, action: string, productId: string)
+	TelemetryService:LogEvent(v8, {
+		standardizedFields = standardizedFields,
+		customFields = {
+			playWithRewardFlowId = playWithRewardFlowId,
+			universeId = universeId,
+			action = action,
+			productId = productId
+		}
+	})
+end
+
+function PlayWithRewardTelemetry.logPlayWithRewardShimmerShown(playWithRewardFlowId: string, universeId: string)
+	TelemetryService:LogEvent(v9, {
+		standardizedFields = standardizedFields,
+		customFields = { playWithRewardFlowId = playWithRewardFlowId, universeId = universeId }
+	})
+end
+
+function PlayWithRewardTelemetry.logPlayWithRewardCoachmark(action: string, playWithRewardFlowId: string, universeId: string, productId: string)
+	TelemetryService:LogEvent(v10, {
+		standardizedFields = standardizedFields,
+		customFields = getCoachmarkCustomFields(action, playWithRewardFlowId, universeId, productId) -- inferred equivalent call
+	})
+
+	TelemetryService:LogCounter(v18, {
+		standardizedFields = standardizedFields2,
+		customFields = { action = action }
+	}, 1)
+end
+
+return PlayWithRewardTelemetry

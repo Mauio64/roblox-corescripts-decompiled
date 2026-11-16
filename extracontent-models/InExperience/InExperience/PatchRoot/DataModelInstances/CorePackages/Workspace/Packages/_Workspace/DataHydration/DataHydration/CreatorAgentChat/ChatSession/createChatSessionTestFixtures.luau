@@ -1,377 +1,287 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
-local function makeRequestHandle() -- line: 14
-	-- upvalues: Signals (copy)
-	local v5, v6 = Signals.createSignal({
-		status = "pending"
-	})
+local Signals = require(parent.Signals)
 
-	local function succeed(p1) -- line: 16
-		-- upvalues: v6 (copy)
-		v6({
-			status = "succeeded",
-			result = p1
-		})
+local function makeRequestHandle()
+	local signal, v = Signals.createSignal({ status = "pending" })
+	local function succeed(p)
+		v({ status = "succeeded", result = p })
 	end
-	local function fail(s1: string) -- line: 19
-		-- upvalues: v6 (copy)
-		v6({
-			status = "failed",
-			error = s1
-		})
+	local function fail(err: string)
+		v({ status = "failed", error = err })
 	end
-
 	return {
-		state = v5,
-		dispose = function() -- line: 24
-		end
+		state = signal,
+		dispose = function() end
 	}, succeed, fail
 end
-local function makeTurnHandle(s2: string) -- line: 51
-	-- upvalues: Signals (copy)
-	local t1 = {
+
+local function makeImmediateSuccess(p) -- 5 equivalent calls inferred from this helper
+	local requestHandle, v = makeRequestHandle()
+	v(p)
+	return requestHandle
+end
+
+local function makeTurnHandle(sessionId: string)
+	local signal, v = Signals.createSignal({
+		sessionId = sessionId,
 		requestId = nil,
 		status = "queued",
 		assistantText = "",
+		assistantMessages = {},
+		assistantMessageOrder = {},
 		pendingAgentMessageId = nil,
+		pendingAgentMessageContent = {},
 		pendingAgentMessageSequenceIndex = nil,
+		activitySlots = {},
+		activityItems = {},
+		toolCalls = {},
 		toolCallCount = 0,
 		infoUpdate = nil,
 		stopReason = nil,
 		error = nil,
 		errorCode = nil,
-		isDone = false,
-		sessionId = s2,
-		assistantMessages = {},
-		assistantMessageOrder = {},
-		pendingAgentMessageContent = {},
-		activitySlots = {},
-		activityItems = {},
-		toolCalls = {}
-	}
-	local v20, v21 = Signals.createSignal(t1)
-	local u22 = false
-	local t2 = {}
-	local n1 = 0
-	local t3 = {}
-	local u26 = nil
-	local u27 = nil
-	local n2 = 0
-	local t4 = {
-		state = v20,
-		onNotification = function(p2) -- line: 102
-			-- upvalues: n1 (ref), t2 (copy)
-			n1 += 1
+		isDone = false
+	})
+	local signal2, v2 = Signals.createSignal(false)
+	local v3 = false
+	local turnId = nil
+	local v4 = {}
+	local count = 0
+	local set = {}
+	local latestProcessedSequenceNumber = nil
+	local v5 = nil
+	local v6 = 0
 
-			local v51 = n1
-
-			t2[v51] = p2
-
-			return function() -- line: 106
-				-- upvalues: t2 (copy), v51 (copy)
-				t2[v51] = nil
-			end
-		end,
-		getLatestProcessedSequenceNumber = function() -- line: 110
-			-- upvalues: u26 (ref)
-			return u26
-		end,
-		hasSequenceGap = function() -- line: 113
-			-- upvalues: n2 (ref)
-			return n2 > 0
-		end,
-		noteProcessedSequenceNumber = function(n3: number) -- line: 81
-			-- upvalues: t3 (copy), u26 (ref), u27 (ref), n2 (ref)
-			if t3[n3] == true then
-				return
-			end
-
-			t3[n3] = true
-
-			if u26 == nil then
-				u26 = n3
-				u27 = n3
-
-				return
-			end
-
-			if n3 > u26 then
-				n2 += n3 - u26 - 1
-				u26 = n3
-
-				return
-			end
-
-			if n3 < u27 then
-				n2 += u27 - n3 - 1
-				u27 = n3
-
-				return
-			end
-
-			n2 -= 1
-		end,
-		cancel = function() -- line: 117
-			-- upvalues: u22 (ref), v20 (copy), v21 (copy)
-			u22 = true
-
-			local v52 = table.clone(v20(false))
-
-			v52.status = "cancelled"
-			v52.isDone = true
-			v21(v52)
+	local function noteProcessedSequenceNumber(p: number) -- 1 equivalent call inferred from this helper
+		if set[p] == true then
+			return
 		end
-	}
 
-	local function finish(p3) -- line: 126
-		-- upvalues: v20 (copy), v21 (copy)
-		if p3 ~= nil then
+		set[p] = true
+
+		if latestProcessedSequenceNumber == nil then
+			latestProcessedSequenceNumber = p
+			v5 = p
+		elseif latestProcessedSequenceNumber < p then
+			v6 += p - latestProcessedSequenceNumber - 1
+			latestProcessedSequenceNumber = p
+		elseif p < v5 then
+			v6 += v5 - p - 1
+			v5 = p
 		else
-			p3 = table.clone(v20(false))
-			p3.status = "succeeded"
-			p3.isDone = true
-		end
-
-		v21(p3)
-	end
-
-	function t4.wasCancelled() -- line: 138
-		-- upvalues: u22 (ref)
-		return u22
-	end
-	function t4.setLatestProcessedSequenceNumber(n4: number) -- line: 141
-		-- upvalues: t3 (copy), u26 (ref), u27 (ref), n2 (ref)
-		if t3[n4] == true then
-			return
-		end
-
-		t3[n4] = true
-
-		if u26 == nil then
-			u26 = n4
-			u27 = n4
-
-			return
-		end
-
-		if n4 > u26 then
-			n2 += n4 - u26 - 1
-			u26 = n4
-
-			return
-		end
-
-		if n4 < u27 then
-			n2 += u27 - n4 - 1
-			u27 = n4
-
-			return
-		end
-
-		n2 -= 1
-	end
-	function t4.emitNotification() -- line: 144
-		-- upvalues: t2 (copy)
-		for _, v56 in t2 do
-			v56()
+			v6 -= 1
 		end
 	end
 
-	return t4, finish
+	local v7 = {
+		state = signal,
+		getTurnId = function()
+			return turnId
+		end,
+		onNotification = function(p)
+			count += 1
+			local v7 = count
+			v4[v7] = p
+			return function()
+				v4[v7] = nil
+			end
+		end,
+		getLatestProcessedSequenceNumber = function()
+			return latestProcessedSequenceNumber
+		end,
+		hasSequenceGap = function(): boolean
+			return v6 > 0
+		end,
+		noteProcessedSequenceNumber = noteProcessedSequenceNumber,
+		isAccepted = signal2,
+		cancel = function()
+			v3 = true
+			local clone = table.clone(signal(false))
+			clone.status = "cancelled"
+			clone.isDone = true
+			v(clone)
+		end
+	}
+
+	local function finish(p)
+		if p == nil then
+			p = table.clone(signal(false))
+			p.status = "succeeded"
+			p.isDone = true
+		end
+
+		v(p)
+	end
+
+	function v7.wasCancelled()
+		return v3
+	end
+
+	function v7.setTurnId(p: number?)
+		turnId = p
+	end
+	function v7.setLatestProcessedSequenceNumber(p: number)
+		noteProcessedSequenceNumber(p) -- inferred equivalent call
+	end
+	function v7.emitNotification()
+		for _, v8 in v4 do
+			v8()
+		end
+	end
+	function v7.markStreaming()
+		local clone = table.clone(signal(false))
+		clone.status = "streaming"
+		v(clone)
+	end
+	function v7.markAccepted()
+		v2(true)
+	end
+	function v7.fail()
+		local clone = table.clone(signal(false))
+		clone.status = "failed"
+		clone.isDone = true
+		v(clone)
+	end
+	return v7, finish
 end
 
-return {
-	Types = require(script.Parent.Parent.types),
-	makeRequestHandle = makeRequestHandle,
-	makeImmediateSuccess = function(p4) -- line: 29
-		-- upvalues: makeRequestHandle (copy)
-		local v10, v11 = makeRequestHandle()
+local CreateChatSessionTestFixtures = {}
+CreateChatSessionTestFixtures.Types = require(script.Parent.Parent.types)
+CreateChatSessionTestFixtures.makeRequestHandle = makeRequestHandle
+CreateChatSessionTestFixtures.makeImmediateSuccess = makeImmediateSuccess
 
-		v11(p4)
+function CreateChatSessionTestFixtures.makeImmediateFailure(p: string)
+	local requestHandle, _, v = makeRequestHandle()
+	v(p)
+	return requestHandle
+end
 
-		return v10
-	end,
-	makeImmediateFailure = function(s3: string) -- line: 35
-		-- upvalues: makeRequestHandle (copy)
-		local v13, _, v15 = makeRequestHandle()
+function CreateChatSessionTestFixtures.makeImmediateFailureWithCode(err: string, errorCode: number)
+	return {
+		state = Signals.createSignal({ status = "failed", error = err, errorCode = errorCode }),
+		dispose = function() end
+	}
+end
 
-		v15(s3)
+CreateChatSessionTestFixtures.makeTurnHandle = makeTurnHandle
 
-		return v13
-	end,
-	makeImmediateFailureWithCode = function(s4: string, n5: number) -- line: 41
-		-- upvalues: Signals (copy)
-		return {
-			state = Signals.createSignal({
-				status = "failed",
-				error = s4,
-				errorCode = n5
-			}),
-			dispose = function() -- line: 46
-			end
-		}
-	end,
-	makeTurnHandle = makeTurnHandle,
-	defaultDeps = function() -- line: 152
-		-- upvalues: makeRequestHandle (copy), makeTurnHandle (copy)
-		local t5 = {}
-		local t6 = {}
-		local t7 = {}
-		local t8 = {}
-		local t9 = {}
-		local t10 = {}
-		local t11 = {}
-		local t12 = {}
-		local t13 = {}
-		local t14 = {}
+function CreateChatSessionTestFixtures.defaultDeps()
+	local initializeCalls = {}
+	local sessionNewCalls = {}
+	local sessionLoadCalls = {}
+	local sessionLoadResults = {}
+	local sessionPromptCalls = {}
+	local ingestSessionHistoryCalls = {}
+	local ingestSessionHistoryResults = {}
+	local sequenceIdSet = {}
+	local turnHandles = {}
+	local v = {}
 
-		return {
-			deps = {
-				rpcTimeoutSeconds = 5,
-				initialize = function(_) -- line: 178
-					-- upvalues: t5 (copy), makeRequestHandle (copy)
-					table.insert(t5, #t5 + 1)
+	return {
+		deps = {
+			initialize = function(_)
+				table.insert(initializeCalls, #initializeCalls + 1)
+				return makeImmediateSuccess({ protocolVersion = 2 }) -- inferred equivalent call
+			end,
+			sessionNew = function(p)
+				table.insert(sessionNewCalls, p)
+				return makeImmediateSuccess({ sessionId = "cas-session-1" }) -- inferred equivalent call
+			end,
+			sessionLoad = function(sessionId, params)
+				table.insert(sessionLoadCalls, { sessionId = sessionId, params = params })
+				local history = sessionLoadResults[#sessionLoadCalls] or {}
 
-					local t15 = {
-						protocolVersion = 2
-					}
-					local v59, v60 = makeRequestHandle()
-
-					v60(t15)
-
-					return v59
-				end,
-				sessionNew = function(p6) -- line: 182
-					-- upvalues: t6 (copy), makeRequestHandle (copy)
-					table.insert(t6, p6)
-
-					local t16 = {
-						sessionId = "cas-session-1"
-					}
-					local v63, v64 = makeRequestHandle()
-
-					v64(t16)
-
-					return v63
-				end,
-				sessionLoad = function(p7, p8) -- line: 186
-					-- upvalues: t7 (copy), t8 (copy), makeRequestHandle (copy)
-					table.insert(t7, {
-						sessionId = p7,
-						params = p8
-					})
-
-					local v67 = t8[#t7] or {}
-
-					if v67.history ~= nil or v67.nextHistoryPageToken ~= nil then
-						local v68, v69 = makeRequestHandle()
-
-						v69(v67)
-
-						return v68
-					end
-
-					local t17 = {
-						history = v67
-					}
-					local v71, v72 = makeRequestHandle()
-
-					v72(t17)
-
-					return v71
-				end,
-				sessionPrompt = function(p9) -- line: 194
-					-- upvalues: t9 (copy), makeTurnHandle (copy), t13 (copy), t14 (copy)
-					table.insert(t9, p9)
-
-					local v74, v75 = makeTurnHandle(p9.sessionId)
-
-					table.insert(t13, v74)
-					table.insert(t14, v75)
-
-					return v74
-				end,
-				ingestSessionHistory = function(p10, p11, p12) -- line: 201
-					-- upvalues: t10 (copy), t11 (copy), t12 (copy), t13 (copy)
-					table.insert(t10, {
-						sessionId = p10,
-						history = p11,
-						afterSequenceId = p12
-					})
-
-					local v79 = t11[#t10]
-
-					if v79 ~= nil then
-						return v79
-					end
-
-					local t18 = {}
-
-					for _, v82 in p11 do
-						local sequenceId = v82.sequenceId
-
-						if typeof(sequenceId) == "number" and (p12 == nil or p12 < sequenceId) then
-							if t12[sequenceId] ~= true then
-								t12[sequenceId] = true
-								table.insert(t18, sequenceId)
-							end
-
-							local v84 = t13[#t13]
-
-							if v84 ~= nil and v84.noteProcessedSequenceNumber ~= nil then
-								v84.noteProcessedSequenceNumber(sequenceId)
-							end
-						end
-					end
-
-					return t18
-				end,
-				submitToolResult = function(_) -- line: 227
-					-- upvalues: makeRequestHandle (copy)
-					local v86, v87 = makeRequestHandle()
-
-					v87(nil)
-
-					return v86
-				end,
-				getActiveTurnHandle = function(_) -- line: 230
-					-- upvalues: t13 (copy)
-					return t13[#t13]
-				end,
-				onCasSessionIdChanged = function(_) -- line: 233
+				if history.history == nil and history.nextHistoryPageToken == nil then
+					return makeImmediateSuccess({ history = history }) -- inferred equivalent call
 				end
-			},
-			initializeCalls = t5,
-			sessionNewCalls = t6,
-			sessionLoadCalls = t7,
-			sessionLoadResults = t8,
-			sessionPromptCalls = t9,
-			ingestSessionHistoryCalls = t10,
-			ingestSessionHistoryResults = t11,
-			turnHandles = t13,
-			finishLastTurn = function(p16) -- line: 247
-				-- upvalues: t14 (copy)
-				local v91 = t14[#t14]
 
-				if v91 ~= nil then
-					v91(p16)
+				return makeImmediateSuccess(history) -- inferred equivalent call
+			end,
+			sessionPrompt = function(p)
+				table.insert(sessionPromptCalls, p)
+				local turnHandle, finish = makeTurnHandle(p.sessionId)
+				table.insert(turnHandles, turnHandle)
+				table.insert(v, finish)
+				return turnHandle
+			end,
+			ingestSessionHistory = function(sessionId, history, afterSequenceId)
+				table.insert(ingestSessionHistoryCalls, {
+					sessionId = sessionId,
+					history = history,
+					afterSequenceId = afterSequenceId
+				})
+
+				local v2 = ingestSessionHistoryResults[#ingestSessionHistoryCalls]
+
+				if v2 ~= nil then
+					return v2
 				end
+
+				local sequenceIds = {}
+
+				for _, item in history do
+					local sequenceId = item.sequenceId
+
+					if not (typeof(sequenceId) == "number" and (afterSequenceId == nil or afterSequenceId < sequenceId)) then
+						continue
+					end
+
+					if sequenceIdSet[sequenceId] ~= true then
+						sequenceIdSet[sequenceId] = true
+						table.insert(sequenceIds, sequenceId)
+					end
+
+					local v3 = turnHandles[#turnHandles]
+
+					if v3 ~= nil and v3.noteProcessedSequenceNumber ~= nil then
+						v3.noteProcessedSequenceNumber(sequenceId)
+					end
+				end
+
+				return sequenceIds
+			end,
+			submitToolResult = function(_)
+				return makeImmediateSuccess(nil) -- inferred equivalent call
+			end,
+			getActiveTurnHandle = function(_)
+				return turnHandles[#turnHandles]
+			end,
+			onCasSessionIdChanged = function(_) end,
+			rpcTimeoutSeconds = 5
+		},
+		initializeCalls = initializeCalls,
+		sessionNewCalls = sessionNewCalls,
+		sessionLoadCalls = sessionLoadCalls,
+		sessionLoadResults = sessionLoadResults,
+		sessionPromptCalls = sessionPromptCalls,
+		ingestSessionHistoryCalls = ingestSessionHistoryCalls,
+		ingestSessionHistoryResults = ingestSessionHistoryResults,
+		turnHandles = turnHandles,
+		finishLastTurn = function(p)
+			local v2 = v[#v]
+
+			if v2 ~= nil then
+				v2(p)
 			end
-		}
-	end,
-	awaitTurnHandle = function(p17, n6: number?) -- line: 256
-		local v43 = os.clock() + (n6 or 3)
-
-		while p17.getTurnHandle(false) == nil and p17.getSetupError(false) == nil and not (v43 < os.clock()) do
-			task.wait()
 		end
-	end,
-	waitFor = function(p18: ((...any) -> ...any), n7: number?) -- line: 266
-		local v46 = os.clock() + (n7 or 3)
+	}
+end
 
-		while not p18() and not (v46 < os.clock()) do
-			task.wait()
-		end
+function CreateChatSessionTestFixtures.awaitTurnHandle(p, value: number?)
+	local v = os.clock() + (value or 3)
+
+	while p.getTurnHandle(false) == nil and p.getSetupError(false) == nil and not (v < os.clock()) do
+		task.wait()
 	end
-}
+end
+
+function CreateChatSessionTestFixtures.waitFor(callback, value: number?)
+	local v = os.clock() + (value or 3)
+
+	while not (callback() or v < os.clock()) do
+		task.wait()
+	end
+end
+
+return CreateChatSessionTestFixtures

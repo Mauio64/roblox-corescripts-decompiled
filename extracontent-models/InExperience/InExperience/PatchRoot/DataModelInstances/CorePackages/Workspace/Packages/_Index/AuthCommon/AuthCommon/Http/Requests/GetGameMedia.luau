@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+local Http = require(parent.Http)
+local Url = Http.Url
 
-return function(p1, s1: string) -- line: 10
-	-- upvalues: Url (copy)
-	return p1(string.format("%sv2/games/%s/media", Url.GAME_URL, s1), "GET")
+return function(callback, p: string)
+	return callback(string.format("%sv2/games/%s/media", Url.GAME_URL, p), "GET")
 end

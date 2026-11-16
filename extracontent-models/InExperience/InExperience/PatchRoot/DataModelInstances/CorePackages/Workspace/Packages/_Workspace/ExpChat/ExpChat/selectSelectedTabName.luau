@@ -1,18 +1,15 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local FFlagExpChatUseChannelTabsStore = require(ExpChatParent.SharedFlags).FFlagExpChatUseChannelTabsStore
-local getFFlagExpChatEnableChannelTabsUI = require(ExpChat.Flags.getFFlagExpChatEnableChannelTabsUI)
+local parent = ExpChat.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
+
 local GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
 
-return function(p1) -- line: 13
-	-- upvalues: FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy), getFFlagExpChatEnableChannelTabsUI (copy)
+return function(p)
 	if FFlagExpChatUseChannelTabsStore then
 		return GetChannelTabsStore(false).getSelectedTabName(false)
 	end
 
-	if getFFlagExpChatEnableChannelTabsUI() and p1 ~= nil then
-		return p1.ChannelTabs.selectedTabName
-	end
-
-	return nil
+	return if p ~= nil then p.ChannelTabs.selectedTabName else nil
 end

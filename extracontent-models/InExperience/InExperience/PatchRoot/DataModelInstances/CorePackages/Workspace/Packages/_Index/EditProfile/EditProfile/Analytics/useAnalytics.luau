@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("EditProfile").Parent
+local parent = script:FindFirstAncestor("EditProfile").Parent
 local EditProfileAnalyticsContext = require(script.Parent.EditProfileAnalyticsContext)
-local React = require(Parent.React)
+local React = require(parent.React)
 
-return function() -- line: 8
-	-- upvalues: React (copy), EditProfileAnalyticsContext (copy)
+return function()
 	return React.useContext(EditProfileAnalyticsContext)
 end

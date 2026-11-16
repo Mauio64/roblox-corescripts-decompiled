@@ -1,21 +1,24 @@
-local ParentParent = script:FindFirstAncestor("Components").Parent.Parent
+local parent = script:FindFirstAncestor("Components").Parent.Parent
 local InlineLayoutElements = script:FindFirstAncestor("InlineLayoutElements")
-local Dash = require(ParentParent.Dash)
-local Foundation = require(ParentParent.Foundation)
-local BaseTextElement = require(InlineLayoutElements.BaseTextElement)
-local FoundationText = Foundation.Text
-local t1 = {}
 
-function mapProps(p1) -- line: 17
-	-- upvalues: Dash (copy)
-	return Dash.omit(p1, {
-		"id",
-		"EngineTags"
+local Dash = require(parent.Dash)
+local Foundation = require(parent.Foundation)
+
+local BaseTextElement = require(InlineLayoutElements.BaseTextElement)
+local Text = Foundation.Text
+
+local TextElement = {}
+
+function mapProps(p)
+	return Dash.join(Dash.omit(p, { "id", "EngineTags" }), {
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y
 	})
 end
-function t1.new(p2) -- line: 21
-	-- upvalues: BaseTextElement (copy), FoundationText (copy)
-	return BaseTextElement.new(FoundationText, p2, mapProps)
+
+function TextElement.new(p)
+	return BaseTextElement.new(Text, p, mapProps)
 end
 
-return t1
+return TextElement

@@ -1,188 +1,276 @@
 local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
-local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
-local React = require(AvatarExperienceControlBarParent.React)
-local Foundation = require(AvatarExperienceControlBarParent.Foundation)
-local Navigation = require(AvatarExperienceControlBarParent.Navigation)
-local AvatarExperienceNavigation = require(AvatarExperienceControlBarParent.AvatarExperienceNavigation)
-local useSelector = require(AvatarExperienceControlBarParent.RoactUtils).Hooks.RoactRodux.useSelector
-local AvatarExperienceCommon = require(AvatarExperienceControlBarParent.AvatarExperienceCommon)
-local AvatarExperienceAnalytics = require(AvatarExperienceControlBarParent.AvatarExperienceAnalytics)
+
+local parent = AvatarExperienceControlBar.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Navigation = require(parent.Navigation)
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
+
 local selectColorAdjustmentButtonColor = AvatarExperienceCommon.State.Selectors.selectColorAdjustmentButtonColor
 local selectHasDynamicHead = AvatarExperienceCommon.State.Selectors.selectHasDynamicHead
 local SlotBasedEditorAnalytics = AvatarExperienceAnalytics.Surfaces.SlotBasedEditorAnalytics
+
 local useTokens = Foundation.Hooks.useTokens
 local useNavigation = Navigation.useNavigation
 local useAvatarRoute = AvatarExperienceNavigation.AvatarRoute.Hooks.useAvatarRoute
-local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
-local MenuItemEnum = require(AvatarExperienceControlBar.Enums.MenuItemEnum)
 
+local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
+
+local MenuItemEnum = require(AvatarExperienceControlBar.Enums.MenuItemEnum)
 require(AvatarExperienceControlBar.ControlBarTypes)
 
 local IconName = Foundation.Enums.IconName
 local IconVariant = Foundation.Enums.IconVariant
-local AvatarExperienceFlags = require(AvatarExperienceControlBarParent.AvatarExperienceFlags)
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
 local FFlagAXHideHeadAdjustmentForDefaultHead = AvatarExperienceFlags.FFlagAXHideHeadAdjustmentForDefaultHead
 
-local function useAdvancedCustomizationControlBarProps(p1) -- line: 37
-	-- upvalues: useTokens (copy), useNavigation (copy), useAvatarRoute (copy), useSelector (copy), selectColorAdjustmentButtonColor (copy), React (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy), FFlagAXHideHeadAdjustmentForDefaultHead (copy), selectHasDynamicHead (copy), FFlagAXMigrateBuilderIcons (copy), IconName (copy), IconVariant (copy)
-	local v25 = useTokens()
-	local v26 = useNavigation()
-	local v27 = useAvatarRoute()
-	local v28 = useSelector(selectColorAdjustmentButtonColor)
-	local Size_600 = v25.Size.Size_600
-	local v30 = p1.avatarRoute and (p1.avatarRoute.opaque and p1.avatarRoute.opaque.name)
-	local v31 = React.useCallback(function() -- line: 48
-		-- upvalues: v26 (copy), AvatarScreen (copy), v27 (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
-		v26.navigate(AvatarScreen.AccessoryAdjustment)
+local function useAdvancedCustomizationControlBarProps(p)
+	local v = useTokens()
+	local v2 = useNavigation()
+	local v3 = useAvatarRoute()
 
-		if v27 and v27.opaque then
-			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(MenuItemEnum.AvatarRefinement.AdjustAccessory, v27.opaque.name)
-		end
-	end, {
-		v26,
-		v27
-	})
-	local v32 = React.useCallback(function() -- line: 58
-		-- upvalues: v26 (copy), AvatarScreen (copy), v27 (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
-		v26.navigate(AvatarScreen.BodyShape)
+	local v4 = useSelector(selectColorAdjustmentButtonColor)
 
-		if v27 and v27.opaque then
-			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(MenuItemEnum.AvatarRefinement.BodyScale, v27.opaque.name)
-		end
-	end, {
-		v26,
-		v27
-	})
-	local v33 = React.useCallback(function() -- line: 68
-		-- upvalues: v26 (copy), AvatarScreen (copy), v27 (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
-		v26.navigate(AvatarScreen.HeadRefinement)
+	local size_600 = v.Size.Size_600
 
-		if v27 and v27.opaque then
-			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(MenuItemEnum.AvatarRefinement.CustomizeHead, v27.opaque.name)
-		end
-	end, {
-		v26,
-		v27
-	})
-	local v34 = React.useCallback(function() -- line: 78
-		-- upvalues: v27 (copy), AvatarScreen (copy), v26 (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
-		if v27 and (v27.current and v27.current.name == AvatarScreen.LayeredMakeupSort) then
-			v26.pop()
-		end
+	local name = p.avatarRoute and p.avatarRoute.opaque and p.avatarRoute.opaque.name
 
-		v26.navigate(AvatarScreen.LayeredClothingSort)
+	local onActivated = React.useCallback(function()
+		v2.navigate(AvatarScreen.AccessoryAdjustment)
 
-		if v27 and v27.opaque then
-			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(MenuItemEnum.AvatarRefinement.ClothingLayers, v27.opaque.name)
+		if v3 and v3.opaque then
+			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(
+				MenuItemEnum.AvatarRefinement.AdjustAccessory,
+				v3.opaque.name
+			)
 		end
-	end, {
-		v26,
-		v27
-	})
-	local v35 = React.useCallback(function() -- line: 93
-		-- upvalues: v27 (copy), AvatarScreen (copy), v26 (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
-		if v27 and (v27.current and v27.current.name == AvatarScreen.LayeredClothingSort) then
-			v26.pop()
+	end, { v2, v3 })
+
+	local onActivated2 = React.useCallback(function()
+		v2.navigate(AvatarScreen.BodyShape)
+
+		if v3 and v3.opaque then
+			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(
+				MenuItemEnum.AvatarRefinement.BodyScale,
+				v3.opaque.name
+			)
+		end
+	end, { v2, v3 })
+
+	local onActivated3 = React.useCallback(function()
+		v2.navigate(AvatarScreen.HeadRefinement)
+
+		if v3 and v3.opaque then
+			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(
+				MenuItemEnum.AvatarRefinement.CustomizeHead,
+				v3.opaque.name
+			)
+		end
+	end, { v2, v3 })
+
+	local onActivated4 = React.useCallback(function()
+		if v3 and v3.current and v3.current.name == AvatarScreen.LayeredMakeupSort then
+			v2.pop()
 		end
 
-		v26.navigate(AvatarScreen.LayeredMakeupSort)
+		v2.navigate(AvatarScreen.LayeredClothingSort)
 
-		if v27 and v27.opaque then
-			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(MenuItemEnum.AvatarRefinement.MakeupLayers, v27.opaque.name)
+		if v3 and v3.opaque then
+			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(
+				MenuItemEnum.AvatarRefinement.ClothingLayers,
+				v3.opaque.name
+			)
 		end
-	end, {
-		v26,
-		v27
-	})
-	local v36 = React.useCallback(function() -- line: 108
-		-- upvalues: v26 (copy), AvatarScreen (copy), v27 (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
-		v26.navigate(AvatarScreen.ColorAdjustment)
+	end, { v2, v3 })
 
-		if v27 and v27.opaque then
-			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(MenuItemEnum.AvatarRefinement.ColorAdjustment, v27.opaque.name)
+	local onActivated5 = React.useCallback(function()
+		if v3 and v3.current and v3.current.name == AvatarScreen.LayeredClothingSort then
+			v2.pop()
 		end
-	end, {
-		v26,
-		v27
-	})
-	local v37 = if not FFlagAXHideHeadAdjustmentForDefaultHead then nil else useSelector(selectHasDynamicHead)
+
+		v2.navigate(AvatarScreen.LayeredMakeupSort)
+
+		if v3 and v3.opaque then
+			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(
+				MenuItemEnum.AvatarRefinement.MakeupLayers,
+				v3.opaque.name
+			)
+		end
+	end, { v2, v3 })
+
+	local onActivated6 = React.useCallback(function()
+		v2.navigate(AvatarScreen.ColorAdjustment)
+
+		if v3 and v3.opaque then
+			SlotBasedEditorAnalytics.trackAdvancedCustomizationControlBarClickFromSurface(
+				MenuItemEnum.AvatarRefinement.ColorAdjustment,
+				v3.opaque.name
+			)
+		end
+	end, { v2, v3 })
+	local v5
+
+	if FFlagAXHideHeadAdjustmentForDefaultHead then
+		v5 = useSelector(selectHasDynamicHead)
+	else
+		v5 = nil
+	end
+
+	local useMemo = React.useMemo
+	local function fn()
+		local v6 = {
+			type = "icon",
+			id = MenuItemEnum.AvatarRefinement.AdjustAccessory,
+			icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/hats_off" or IconName.HatFedora,
+			activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/hats_on" or IconName.HatFedora,
+			activeIconVariant = 0,
+			onActivated = 0,
+			isActive = 0,
+			iconSize = 0
+		}
+		local activeIconVariant
+
+		if FFlagAXMigrateBuilderIcons then
+			activeIconVariant = IconVariant.Filled
+		end
+
+		v6.activeIconVariant = activeIconVariant
+		v6.onActivated = onActivated
+		v6.isActive = name == AvatarScreen.AccessoryAdjustment
+		v6.iconSize = size_600
+
+		local v7 = {
+			type = "icon",
+			id = MenuItemEnum.AvatarRefinement.BodyScale,
+			icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/build_off" or IconName.PersonStandingDualArrowsVertical,
+			activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/build_on" or IconName.PersonStandingDualArrowsVertical,
+			activeIconVariant = 0,
+			onActivated = 0,
+			isActive = 0,
+			iconSize = 0
+		}
+		local activeIconVariant2
+
+		if FFlagAXMigrateBuilderIcons then
+			activeIconVariant2 = IconVariant.Filled
+		end
+
+		v7.activeIconVariant = activeIconVariant2
+		v7.onActivated = onActivated2
+		v7.isActive = name == AvatarScreen.BodyShape
+		v7.iconSize = size_600
+
+		local v8 = {
+			type = "icon",
+			id = MenuItemEnum.AvatarRefinement.CustomizeHead,
+			icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicHead_off" or IconName.HeadBlank,
+			activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicHead_on" or IconName.HeadBlank,
+			activeIconVariant = 0,
+			onActivated = 0,
+			isActive = 0,
+			iconSize = 0,
+			visible = 0
+		}
+		local activeIconVariant3
+
+		if FFlagAXMigrateBuilderIcons then
+			activeIconVariant3 = IconVariant.Filled
+		end
+
+		v8.activeIconVariant = activeIconVariant3
+		v8.onActivated = onActivated3
+		v8.isActive = name == AvatarScreen.HeadRefinement
+		v8.iconSize = size_600
+		local visible
+
+		if FFlagAXHideHeadAdjustmentForDefaultHead then
+			visible = v5
+		end
+
+		v8.visible = visible
+
+		local v9 = {
+			type = "icon",
+			id = MenuItemEnum.AvatarRefinement.ClothingLayers,
+			icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/clothing_off" or IconName.ClothesHanger,
+			activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/clothing_on" or IconName.ClothesHanger,
+			activeIconVariant = 0,
+			onActivated = 0,
+			isActive = 0,
+			iconSize = 0
+		}
+		local activeIconVariant4
+
+		if FFlagAXMigrateBuilderIcons then
+			activeIconVariant4 = IconVariant.Filled
+		end
+
+		v9.activeIconVariant = activeIconVariant4
+		v9.onActivated = onActivated4
+		v9.isActive = name == AvatarScreen.LayeredClothingSort
+		v9.iconSize = size_600
+
+		local v10 = {
+			type = "icon",
+			id = MenuItemEnum.AvatarRefinement.MakeupLayers,
+			icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/eyelash_on" or IconName.LipsLipstickMakeupBrush,
+			activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/eyelash_off" or IconName.LipsLipstickMakeupBrush,
+			activeIconVariant = 0,
+			onActivated = 0,
+			isActive = 0,
+			iconSize = 0
+		}
+		local activeIconVariant5
+
+		if FFlagAXMigrateBuilderIcons then
+			activeIconVariant5 = IconVariant.Filled
+		end
+
+		v10.activeIconVariant = activeIconVariant5
+		v10.onActivated = onActivated5
+		v10.isActive = name == AvatarScreen.LayeredMakeupSort
+		v10.iconSize = size_600
+		return {
+			v6,
+			v7,
+			v8,
+			v9,
+			v10,
+			v4 and {
+				type = "color",
+				id = MenuItemEnum.AvatarRefinement.ColorAdjustment,
+				colorSize = size_600,
+				colors = { v4 },
+				onActivated = onActivated6,
+				isActive = name == AvatarScreen.ColorAdjustment,
+				Selectable = true
+			} or nil
+		}
+	end
+
+	local v6
+
+	if FFlagAXHideHeadAdjustmentForDefaultHead then
+		v6 = v5
+	end
 
 	return {
-		config = React.useMemo(function() -- line: 121
-			-- upvalues: MenuItemEnum (copy), FFlagAXMigrateBuilderIcons (copy), IconName (copy), IconVariant (copy), v31 (copy), v30 (copy), AvatarScreen (copy), Size_600 (copy), v32 (copy), v33 (copy), FFlagAXHideHeadAdjustmentForDefaultHead (copy), v37 (copy), v34 (copy), v35 (copy), v28 (copy), v36 (copy)
-			return {
-				{
-					type = "icon",
-					id = MenuItemEnum.AvatarRefinement.AdjustAccessory,
-					icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/hats_off" or IconName.HatFedora,
-					activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/hats_on" or IconName.HatFedora,
-					activeIconVariant = if not FFlagAXMigrateBuilderIcons then nil else IconVariant.Filled,
-					onActivated = v31,
-					isActive = v30 == AvatarScreen.AccessoryAdjustment,
-					iconSize = Size_600
-				},
-				{
-					type = "icon",
-					id = MenuItemEnum.AvatarRefinement.BodyScale,
-					icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/build_off" or IconName.PersonStandingDualArrowsVertical,
-					activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/build_on" or IconName.PersonStandingDualArrowsVertical,
-					activeIconVariant = if not FFlagAXMigrateBuilderIcons then nil else IconVariant.Filled,
-					onActivated = v32,
-					isActive = v30 == AvatarScreen.BodyShape,
-					iconSize = Size_600
-				},
-				{
-					type = "icon",
-					id = MenuItemEnum.AvatarRefinement.CustomizeHead,
-					icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicHead_off" or IconName.HeadBlank,
-					activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicHead_on" or IconName.HeadBlank,
-					activeIconVariant = if not FFlagAXMigrateBuilderIcons then nil else IconVariant.Filled,
-					onActivated = v33,
-					isActive = v30 == AvatarScreen.HeadRefinement,
-					iconSize = Size_600,
-					visible = if not FFlagAXHideHeadAdjustmentForDefaultHead then nil else v37
-				},
-				{
-					type = "icon",
-					id = MenuItemEnum.AvatarRefinement.ClothingLayers,
-					icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/clothing_off" or IconName.ClothesHanger,
-					activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/clothing_on" or IconName.ClothesHanger,
-					activeIconVariant = if not FFlagAXMigrateBuilderIcons then nil else IconVariant.Filled,
-					onActivated = v34,
-					isActive = v30 == AvatarScreen.LayeredClothingSort,
-					iconSize = Size_600
-				},
-				{
-					type = "icon",
-					id = MenuItemEnum.AvatarRefinement.MakeupLayers,
-					icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/eyelash_on" or IconName.LipsLipstickMakeupBrush,
-					activeIcon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/eyelash_off" or IconName.LipsLipstickMakeupBrush,
-					activeIconVariant = if not FFlagAXMigrateBuilderIcons then nil else IconVariant.Filled,
-					onActivated = v35,
-					isActive = v30 == AvatarScreen.LayeredMakeupSort,
-					iconSize = Size_600
-				},
-				if not v28 then nil else {
-					type = "color",
-					Selectable = true,
-					id = MenuItemEnum.AvatarRefinement.ColorAdjustment,
-					colorSize = Size_600,
-					colors = { v28 },
-					onActivated = v36,
-					isActive = v30 == AvatarScreen.ColorAdjustment
-				}
-			}
-		end, {
-			v30,
-			v31,
-			v32,
-			v33,
-			v34,
-			v35,
-			v36,
-			v28,
-			if not FFlagAXHideHeadAdjustmentForDefaultHead then nil else v37
+		config = useMemo(fn, {
+			name,
+			onActivated,
+			onActivated2,
+			onActivated3,
+			onActivated4,
+			onActivated5,
+			onActivated6,
+			v4,
+			v6
 		})
 	}
 end

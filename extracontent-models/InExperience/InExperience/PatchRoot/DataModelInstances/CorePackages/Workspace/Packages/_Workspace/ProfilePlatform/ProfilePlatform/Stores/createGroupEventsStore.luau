@@ -1,144 +1,140 @@
 local HttpService = game:GetService("HttpService")
+
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local UrlBuilder = require(ProfilePlatformParent.UrlBuilder).UrlBuilder
-local Signals = require(ProfilePlatformParent.Signals)
-local HttpStore = require(ProfilePlatformParent.HttpStore)
-local FFlagLuaAppUseAppHttpStore = require(ProfilePlatformParent.SharedFlags).FFlagLuaAppUseAppHttpStore
-local InternalHttpStore = require(ProfilePlatformParent.InternalHttpStore)
+local parent = ProfilePlatform.Parent
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local Signals = require(parent.Signals)
+local HttpStore = require(parent.HttpStore)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppUseAppHttpStore = SharedFlags.FFlagLuaAppUseAppHttpStore
+local InternalHttpStore = require(parent.InternalHttpStore)
 
 require(ProfilePlatform.Parent.GraphQLServer)
 
-local v9 = UrlBuilder.fromString("apis:virtual-events/v1/virtual-events/groups/{id}")
-local v10 = UrlBuilder.fromString("apis:virtual-events/v1/virtual-events/{eventId}/rsvps")
+local v = urlBuilder.fromString("apis:virtual-events/v1/virtual-events/groups/{id}")
+local v2 = urlBuilder.fromString("apis:virtual-events/v1/virtual-events/{eventId}/rsvps")
+
 local FFlagEnableCommunityProfileLoadingSkeletons = require(ProfilePlatform.Flags.FFlagEnableCommunityProfileLoadingSkeletons)
-local t1 = {}
 
-local function createGroupEventsStore(n1: number) -- line: 22
-	-- upvalues: InternalHttpStore (copy), FFlagLuaAppUseAppHttpStore (copy), HttpStore (copy), Signals (copy), v9 (copy), t1 (copy), HttpService (copy), FFlagEnableCommunityProfileLoadingSkeletons (copy), v10 (copy)
-	local u15 = InternalHttpStore.GetHttpStore()
+local v3 = {}
 
-	if FFlagLuaAppUseAppHttpStore then
-		local v16 = HttpStore.Instance.get()
+local function createGroupEventsStore(id2: number)
+	local v4 = InternalHttpStore.GetHttpStore()
 
-		if v16 then
-			u15 = v16
-		end
-	end
+	v4 = FFlagLuaAppUseAppHttpStore and HttpStore.Instance.get() or v4
 
-	local v17, v18 = Signals.createSignal(0)
-	local t2 = {}
-	local v20, v21 = Signals.createSignal(t2)
-	local v22 = Signals.createComputed(function(p1) -- line: 45
-		-- upvalues: v17 (copy), n1 (copy), v9 (copy), u15 (ref)
-		local v30 = v17(p1)
-		local v31 = string.format("GetEvents_%d_%d", n1, v30)
-		local t3 = {
-			Method = "GET",
-			Url = v9({
-				id = n1
-			})
+	local signal, v5 = Signals.createSignal(0)
+
+	local v6 = {}
+	local signal2, v7 = Signals.createSignal(v6)
+
+	local computed = Signals.createComputed(function(p)
+		local v8 = signal(p)
+		local v9 = string.format("GetEvents_%d_%d", id2, v8)
+		local v10 = {
+			Url = v({ id = id2 }),
+			Method = "GET"
 		}
 
-		return u15.fetch(v31, t3)
+		return v4.fetch(v9, v10)
 	end)
-	local u23 = t1
-	local u24 = nil
 
-	return {
-		getEvents = Signals.createComputed(function(p2) -- line: 59
-			-- upvalues: v22 (copy), v20 (copy), HttpService (copy), u23 (ref)
-			local v34 = v22(p2)(p2)
-			local v35 = v20(p2)
+	local v8 = v3
+	local v9 = nil
 
-			if v34.status == "Success" then
-				local t4 = {}
-				local ok, result = pcall(HttpService.JSONDecode, HttpService, v34.response.Body)
+	local groupEventsStore = {
+		getEvents = Signals.createComputed(function(p)
+			local v10 = computed(p)(p)
+			local v11 = signal2(p)
 
-				if ok then
-					for k, v in pairs(result.data) do
-						v.universeId = tostring(v.universeId)
+			if v10.status == "Success" then
+				local result = {}
+				local success, result2 = pcall(HttpService.JSONDecode, HttpService, v10.response.Body)
 
-						local v41 = v35[v.id]
+				if success and result2 ~= nil and result2.data ~= nil then
+					for k, v12 in pairs(result2.data) do
+						v12.universeId = tostring(v12.universeId)
 
-						if v41 ~= nil then
-							v.userRsvpStatus = v41
+						local userRsvpStatus = v11[v12.id]
+
+						if userRsvpStatus ~= nil then
+							v12.userRsvpStatus = userRsvpStatus
 						end
 
-						t4[k] = v
+						result[k] = v12
 					end
 				end
 
-				u23 = t4
-
-				return t4
-			end
-
-			if v34.status == "Failed" then
+				v8 = result
+				return result
+			elseif v10.status == "Failed" then
 				return {}
+			else
+				return v8
 			end
-
-			return u23
 		end),
-		isLoading = if not FFlagEnableCommunityProfileLoadingSkeletons then nil else Signals.createComputed(function(p3) -- line: 94
-			-- upvalues: v22 (copy)
-			return v22(p3)(p3).status == "Fetching"
-		end),
-		updateRsvpStatus = function(p4, p5) -- line: 101
-			-- upvalues: v10 (copy), HttpService (copy), u15 (ref), t2 (ref), v21 (copy), u24 (ref), Signals (copy)
-			local v45 = string.format("UpdateEventRsvpStatus_%s_%s", p4.id, p5)
-			local t5 = {
-				Method = "POST",
-				Url = v10({
-					eventId = p4.id
-				}),
-				Body = HttpService:JSONEncode({
-					rsvpStatus = p5
-				}),
-				Headers = {
-					["Content-Type"] = "application/json"
-				}
-			}
-			local v47 = u15.fetch(v45, t5)
-			local v48 = t2[p4.id]
-			local id = p4.id
-			local v50 = t2
-			local v51 = table.clone(v50)
-
-			v51[id] = p5
-			v21(v51)
-			t2 = v51
-
-			if u24 then
-				u24()
-			end
-
-			u24 = Signals.createEffect(function(p6) -- line: 118
-				-- upvalues: v47 (copy), p4 (copy), v48 (copy), t2 (ref), v21 (copy)
-				if v47(p6).status == "Failed" then
-					local id2 = p4.id
-					local v54 = v48
-					local v55 = t2
-					local v56 = table.clone(v55)
-
-					v56[id2] = v54
-					v21(v56)
-					t2 = v56
-				end
-			end)
-
-			return v47
-		end,
-		refetch = function() -- line: 129
-			-- upvalues: v18 (copy), v21 (copy)
-			v18(function(p7) -- line: 131
-				return p7 + 1
-			end)
-			v21(function(_) -- line: 135
-				return {}
-			end)
-		end
+		isLoading = 0,
+		updateRsvpStatus = 0,
+		refetch = 0
 	}
+	local isLoading
+
+	if FFlagEnableCommunityProfileLoadingSkeletons then
+		isLoading = Signals.createComputed(function(p): boolean
+			return computed(p)(p).status == "Fetching"
+		end)
+	end
+
+	groupEventsStore.isLoading = isLoading
+
+	local function fn(id, p) -- 2 equivalent calls inferred from this helper
+		local v10 = v6
+		local clone = table.clone(v10)
+		clone[id] = p
+		v7(clone)
+		v6 = clone
+	end
+
+	function groupEventsStore.updateRsvpStatus(p, rsvpStatus)
+		local v10 = string.format("UpdateEventRsvpStatus_%s_%s", p.id, rsvpStatus)
+		local v11 = {
+			Url = v2({ eventId = p.id }),
+			Method = "POST",
+			Body = HttpService:JSONEncode({ rsvpStatus = rsvpStatus }),
+			Headers = { ["Content-Type"] = "application/json" }
+		}
+
+		local fetched = v4.fetch(v10, v11)
+
+		local v12 = v6[p.id]
+		fn(p.id, rsvpStatus) -- inferred equivalent call
+
+		if v9 then
+			v9()
+		end
+
+		v9 = Signals.createEffect(function(p2)
+			if fetched(p2).status == "Failed" then
+				fn(p.id, v12) -- inferred equivalent call
+			end
+		end)
+
+		return fetched
+	end
+
+	function groupEventsStore.refetch()
+		v5(function(p)
+			return p + 1
+		end)
+
+		v7(function(_)
+			return {}
+		end)
+	end
+
+	return groupEventsStore
 end
 
 return createGroupEventsStore

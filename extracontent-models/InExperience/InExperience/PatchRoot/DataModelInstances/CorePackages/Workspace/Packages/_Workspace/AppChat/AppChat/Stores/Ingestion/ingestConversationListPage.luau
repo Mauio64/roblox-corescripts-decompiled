@@ -1,88 +1,120 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
-require(AppChatParent.AppChatNetworking)
+require(parent.AppChatNetworking)
+local Cryo = require(parent.Cryo)
+local SignalsExperimental = require(parent.SignalsExperimental)
 
-local Cryo = require(AppChatParent.Cryo)
 local ConversationChannels = require(AppChat.Models.ConversationChannels)
-
 require(AppChat.Stores.GetConversationStore)
-
 local getResponseBody = require(script.Parent.getResponseBody)
+local buildValidMessages = require(script.Parent.buildValidMessages)
+local ingestBatch = require(script.Parent.ingestBatch)
+local IngestOperation = require(script.Parent.IngestOperation)
+local FFlagAppChatIngestConversationMessages = require(AppChat.Flags.FFlagAppChatIngestConversationMessages)
+local searchIntroducedConversationIds = require(AppChat.Stores.searchIntroducedConversationIds)
+local FFlagAppChatAnyServerSideConversationSearch = require(AppChat.Flags.FFlagAppChatAnyServerSideConversationSearch)
 
-local function isInitialCursor(s1: string?) -- line: 18
-	return s1 == nil or s1 == ""
+local function isInitialCursor(p: string?): boolean -- 1 equivalent call inferred from this helper
+	return p == nil or p == ""
 end
-local function upsertConversationResponse(p1, p2) -- line: 22
-	-- upvalues: ConversationChannels (copy)
-	if p2 == nil or p2.status == "failed" then
+
+local function upsertConversationResponse(p, conversation)
+	if conversation == nil or conversation.status == "failed" then
 		return
 	end
 
-	if p2.source == ConversationChannels.Source.Channels and p2.type == ConversationChannels.Type.OneToOne and p2.participant_user_ids ~= nil then
-		p1.removeConversation(ConversationChannels.getFriendConversationId(p2.participant_user_ids))
+	if
+		conversation.source == ConversationChannels.Source.Channels
+		and conversation.type == ConversationChannels.Type.OneToOne
+		and conversation.participant_user_ids ~= nil
+	then
+		p.removeConversation(ConversationChannels.getFriendConversationId(conversation.participant_user_ids))
 	end
 
-	p1.upsertConversation(ConversationChannels.fromChannelsApi(p2))
-end
-local function upsertConversationResponses(p3, p4) -- line: 43
-	-- upvalues: upsertConversationResponse (copy)
-	if p4 == nil or p4.conversations == nil then
-		return
+	local v = ConversationChannels.fromChannelsApi(conversation)
+
+	if FFlagAppChatAnyServerSideConversationSearch then
+		SignalsExperimental.batch(function()
+			p.upsertConversation(v)
+
+			searchIntroducedConversationIds.remove(v.id)
+		end)
+	else
+		p.upsertConversation(v)
 	end
 
-	for _, v15 in p4.conversations do
-		upsertConversationResponse(p3, v15)
-	end
-end
+	if FFlagAppChatIngestConversationMessages then
+		local validMessages = buildValidMessages(v.id, conversation.messages or {})
 
-return {
-	beginFetch = function(p5, s2: string?) -- line: 56
-		-- upvalues: Cryo (copy)
-		p5.setListStatus({
-			isFetchingConversations = true,
-			isFetchingNextPage = not (s2 == nil or s2 == ""),
-			error = Cryo.None
-		})
-	end,
-	ingestSuccess = function(p6, s3: string?, p7) -- line: 64
-		-- upvalues: getResponseBody (copy), upsertConversationResponse (copy), Cryo (copy)
-		local v21 = getResponseBody(p7)
-		local v22 = if v21 == nil then nil else v21.next_cursor
-		local v23 = (v21 == nil or v21.conversations == nil) and 0 or #v21.conversations
-		local v24 = v22 == nil or v22 == ""
-		local v25 = p6.getListStatus(false)
-
-		if v21 ~= nil and v21.conversations ~= nil then
-			for _, v27 in v21.conversations do
-				upsertConversationResponse(p6, v27)
-			end
+		if #validMessages > 0 then
+			ingestBatch(v.id, validMessages, IngestOperation.Prepend)
 		end
+	end
+end
 
-		p6.setListStatus({
-			isFetchingConversations = false,
-			isFetchingNextPage = false,
-			hasFetchedInitialPage = not not (s3 == nil or s3 == "") or v25.hasFetchedInitialPage,
-			oldestConversationIsFetched = v24,
-			isExhausted = v24,
-			nextCursor = if not v24 then v22 else Cryo.None,
-			error = Cryo.None
-		})
+local function upsertConversationResponses(p, responseBody) -- 1 equivalent call inferred from this helper
+	if responseBody == nil or responseBody.conversations == nil then
+		return
+	end
 
-		return {
-			cursor = s3,
-			nextCursor = v22,
-			conversationCount = v23,
-			responseBody = v21
-		}
-	end,
-	ingestFailure = function(p8, p9) -- line: 96
-		p8.setListStatus({
-			isFetchingConversations = false,
-			isFetchingNextPage = false,
-			error = p9
-		})
-	end,
-	ingestConversationResponses = upsertConversationResponses,
-	ingestConversationDetails = upsertConversationResponse
-}
+	for _, conversation in responseBody.conversations do
+		upsertConversationResponse(p, conversation)
+	end
+end
+
+local IngestConversationListPage = {}
+
+function IngestConversationListPage.beginFetch(p, p2: string?)
+	p.setListStatus({
+		isFetchingConversations = true,
+		isFetchingNextPage = p2 ~= nil and p2 ~= "",
+		error = Cryo.None
+	})
+end
+
+function IngestConversationListPage.ingestSuccess(p, cursor: string?, p2)
+	local responseBody = getResponseBody(p2)
+	local next_cursor
+
+	if responseBody ~= nil then
+		next_cursor = responseBody.next_cursor
+	end
+
+	local conversationCount = (responseBody == nil or responseBody.conversations == nil) and 0
+		or #responseBody.conversations
+
+	local v = next_cursor == nil or next_cursor == ""
+	local listStatus = p.getListStatus(false)
+	upsertConversationResponses(p, responseBody) -- inferred equivalent call
+	local setListStatus = p.setListStatus
+	local v2 = {
+		isFetchingConversations = false,
+		isFetchingNextPage = false,
+		hasFetchedInitialPage = isInitialCursor(cursor) and true or listStatus.hasFetchedInitialPage, -- inferred equivalent call
+		oldestConversationIsFetched = v,
+		isExhausted = v,
+		nextCursor = 0,
+		error = 0
+	}
+
+	local nextCursor = if v then Cryo.None else next_cursor
+	v2.nextCursor = nextCursor
+	v2.error = Cryo.None
+	setListStatus(v2)
+
+	return {
+		cursor = cursor,
+		nextCursor = next_cursor,
+		conversationCount = conversationCount,
+		responseBody = responseBody
+	}
+end
+
+function IngestConversationListPage.ingestFailure(p, err)
+	p.setListStatus({ isFetchingConversations = false, isFetchingNextPage = false, error = err })
+end
+
+IngestConversationListPage.ingestConversationResponses = upsertConversationResponses
+IngestConversationListPage.ingestConversationDetails = upsertConversationResponse
+return IngestConversationListPage

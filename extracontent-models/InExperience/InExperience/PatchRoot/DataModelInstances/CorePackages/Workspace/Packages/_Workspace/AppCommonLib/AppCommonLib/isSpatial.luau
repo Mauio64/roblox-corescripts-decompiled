@@ -1,14 +1,11 @@
-local Parent = script:FindFirstAncestor("AppCommonLib").Parent
-local VRService = require(Parent.MockableProxyServices).VRService
+local parent = script:FindFirstAncestor("AppCommonLib").Parent
+
+local MockableProxyServices = require(parent.MockableProxyServices)
+local VRService = MockableProxyServices.VRService
 local isVRModeInStudio = require(script.Parent.isVRModeInStudio)
 
-local function isSpatial() -- line: 7
-	-- upvalues: isVRModeInStudio (copy), VRService (copy)
-	if isVRModeInStudio() then
-		return true
-	end
-
-	return VRService.VREnabled
+local function isSpatial()
+	return if isVRModeInStudio() then true else VRService.VREnabled
 end
 
 return isSpatial

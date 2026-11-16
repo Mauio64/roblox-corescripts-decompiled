@@ -1,18 +1,16 @@
 local UiShellEvents = script:FindFirstAncestor("UiShellEvents")
-local UiShellEventsParent = UiShellEvents.Parent
-local t = require(UiShellEventsParent.t)
+local parent = UiShellEvents.Parent
+local t = require(parent.t)
 local Logger = require(UiShellEvents.Logger)
-local v5 = t.strictInterface({
-	page = t.string
-})
 
-return function(p1, s1: string, t1: {[any]: any}) -- line: 14
-	-- upvalues: v5 (copy), Logger (copy)
-	local v9, v10 = v5(t1)
+local strictInterface = t.strictInterface({ page = t.string })
 
-	if not v9 then
-		Logger:error(v10)
+return function(object, p: string, p2)
+	local v, v2 = strictInterface(p2)
+
+	if not v then
+		Logger:error(v2)
 	end
 
-	p1:sendEventDeferred(s1, "uiShellStatusBarTapped", t1)
+	object:sendEventDeferred(p, "uiShellStatusBarTapped", p2)
 end

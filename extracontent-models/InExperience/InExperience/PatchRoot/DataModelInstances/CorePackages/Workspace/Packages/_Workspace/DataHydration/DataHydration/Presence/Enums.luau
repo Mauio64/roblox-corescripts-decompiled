@@ -1,3 +1,1 @@
-return {
-	PresenceType = require(script.PresenceType)
-}
+return { LocationType = require(script.LocationType), PresenceType = require(script.PresenceType) }

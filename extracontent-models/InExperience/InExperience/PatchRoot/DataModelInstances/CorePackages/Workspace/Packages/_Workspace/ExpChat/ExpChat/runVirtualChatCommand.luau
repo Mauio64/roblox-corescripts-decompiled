@@ -1,63 +1,55 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local SharedFlags = require(ExpChatParent.SharedFlags)
+local parent = ExpChat.Parent
+local ExpChatShared = require(parent.ExpChatShared)
+local SharedFlags = require(parent.SharedFlags)
+
 local GetMessagesStore = require(ExpChat.Stores.GetMessagesStore)
 local GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
-local UniverseChatSystemMessageAdded = require(ExpChat.Actions.UniverseChatSystemMessageAdded)
-local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
+
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
+
 local Analytics = ExpChatShared.Analytics
 local FFlagExpChatReportVirtualCommandTelemetry = ExpChatShared.Flags.FFlagExpChatReportVirtualCommandTelemetry
 local context = ExpChatShared.context
-local v13 = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
+local v = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
 
-return function(s1: string, n1: number, t1: {[any]: any}, s2: string) -- line: 23
-	-- upvalues: context (copy), v13 (copy), FFlagExpChatReportVirtualCommandTelemetry (copy), Analytics (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy), UniverseChatSystemMessageAdded (copy)
+return function(value: string, p: number, list, p2: string): boolean
 	if not context.translator then
-		v13:warning("context.translator is nil, cannot execute command")
-
+		v:warning("context.translator is nil, cannot execute command")
 		return false
 	end
 
-	for _, v in ipairs(t1) do
-		for _, v2 in ipairs(v.alias) do
-			if s1 == v2 or string.find(s1, "^" .. v2 .. "%s") ~= nil then
+	for _, item in ipairs(list) do
+		for _, alia in ipairs(item.alias) do
+			if value == alia or string.find(value, "^" .. alia .. "%s") ~= nil then
 				if FFlagExpChatReportVirtualCommandTelemetry then
-					Analytics:reportTextChatCommandClientSent(v.name)
+					Analytics:reportTextChatCommandClientSent(item.name)
 				end
 
-				task.spawn(function() -- line: 40
-					-- upvalues: v (copy), context (copy), n1 (copy), s1 (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), s2 (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy), UniverseChatSystemMessageAdded (copy)
-					local v22 = v.clientRun(context.store, n1, s1, context)
+				task.spawn(function()
+					local clientRun = item.clientRun(context.store, p, value, context)
 
-					if v22 ~= nil then
-						local key = v22.key
-						local v24 = nil
+					if clientRun ~= nil then
+						local key = clientRun.key
+						local v2 = nil
 
 						if type(key) == "string" and key ~= "" then
-							v24 = context.translator:FormatByKey(key, v22.args)
+							v2 = context.translator:FormatByKey(key, clientRun.args)
 						elseif type(key) == "table" and #key > 0 then
-							local t2 = {}
+							local v3 = {}
 
-							for _, v27 in key do
-								table.insert(t2, context.translator:FormatByKey(v27, v22.args))
+							for _, item2 in key do
+								table.insert(v3, context.translator:FormatByKey(item2, clientRun.args))
 							end
 
-							v24 = table.concat(t2, "\n")
+							v2 = table.concat(v3, "\n")
 						end
 
-						if v24 then
-							if FFlagExpChatUseMessagesStore then
-								GetMessagesStore(false).addSystemMessage(v24, s2, v22.metadata)
+						if v2 then
+							GetMessagesStore(false).addSystemMessage(v2, p2, clientRun.metadata)
 
-								if FFlagExpChatUseChannelTabsStore then
-									GetChannelTabsStore(false).markChannelUnread(s2)
-
-									return
-								end
-							else
-								context.store:dispatch(UniverseChatSystemMessageAdded(v24, s2, v22.metadata))
+							if FFlagExpChatUseChannelTabsStore then
+								GetChannelTabsStore(false).markChannelUnread(p2)
 							end
 						end
 					end

@@ -1,7 +1,7 @@
-return function(p1) -- line: 1
-	if p1 ~= nil and (p1.errors ~= nil and p1.errors[1] and p1.errors[1].fieldData) then
-		return p1.errors[1].fieldData
+return function(p)
+	if p == nil or p.errors == nil or not (p.errors[1] and p.errors[1].fieldData) then
+		return ""
 	end
 
-	return ""
+	return p.errors[1].fieldData
 end

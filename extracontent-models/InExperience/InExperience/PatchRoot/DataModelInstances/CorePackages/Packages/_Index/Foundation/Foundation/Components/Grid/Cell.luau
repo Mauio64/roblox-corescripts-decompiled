@@ -1,1 +1,3 @@
-return (require(script.GridCell))
+local GridCell = require(script.GridCell)
+
+return GridCell

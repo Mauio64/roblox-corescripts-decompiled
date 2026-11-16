@@ -1,61 +1,58 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local FFlagLuaAppDefaultHttpRetry = require(AppChatParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
-local Http = require(AppChatParent.Http)
-local HttpRequest = require(AppChatParent.HttpRequest)
-local Promise = require(AppChatParent.Promise)
+local parent = AppChat.Parent
 
-require(AppChatParent.LuauPolyfill)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
+local Http = require(parent.Http)
+local HttpRequest = require(parent.HttpRequest)
+local Promise = require(parent.Promise)
+require(parent.LuauPolyfill)
 
 local SendTextMessage = require(script.Parent.SendTextMessage)
-local v8 = require(AppChat.Logger):new(script.Name)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
+
 local Url = Http.Url
-local v10 = HttpRequest.config({
-	requestFunction = function(s1: string, s2: string, p1) -- line: 25
-		-- upvalues: HttpRequest (copy)
-		return HttpRequest.requestFunctions.HttpRbxApi(s1, s2, p1)
+
+local config = HttpRequest.config
+local v2 = {
+	requestFunction = function(p: string, p2: string, p3)
+		return HttpRequest.requestFunctions.HttpRbxApi(p, p2, p3)
 	end,
-	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("SendGameLinkMessageHttpRetryCount", 4)
-})
+	maxRetryCount = 0
+}
+local maxRetryCount
 
-local function fetchRootPlaceId(n1: number) -- line: 33
-	-- upvalues: Url (copy), v10 (copy)
-	local v16 = `{ Url.GAME_URL }v1/games?universeIds={ n1 }`
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("SendGameLinkMessageHttpRetryCount", 4)
+end
 
-	return v10(v16, "GET"):andThen(function(p2) -- line: 36
-		local v20 = p2 and (p2.responseBody and p2.responseBody.data)
-		local v21 = v20 and v20[1]
+v2.maxRetryCount = maxRetryCount
+local v3 = config(v2)
 
-		return v21 and v21.rootPlaceId or nil
+local function fetchRootPlaceId(p: number)
+	return v3(`{Url.GAME_URL}v1/games?universeIds={p}`, "GET"):andThen(function(p2)
+		local data = p2 and p2.responseBody and p2.responseBody.data
+		local v4 = data and data[1]
+		return v4 and v4.rootPlaceId or nil
 	end)
 end
 
-return function(s3: string, n2: number) -- line: 43
-	-- upvalues: Url (copy), v10 (copy), Promise (copy), SendTextMessage (copy), v8 (copy)
-	return function(p3) -- line: 44
-		-- upvalues: n2 (copy), Url (copy), v10 (copy), Promise (copy), SendTextMessage (copy), s3 (copy), v8 (copy)
-		local v23 = n2
-		local v24 = `{ Url.GAME_URL }v1/games?universeIds={ v23 }`
-
-		return v10(v24, "GET"):andThen(function(p4) -- line: 36
-			local v26 = p4 and (p4.responseBody and p4.responseBody.data)
-			local v27 = v26 and v26[1]
-
-			return v27 and v27.rootPlaceId or nil
-		end):andThen(function(n3: number?) -- line: 46
-			-- upvalues: Promise (copy), n2 (copy), Url (copy), p3 (copy), SendTextMessage (copy), s3 (copy)
-			if not n3 then
-				return Promise.reject(`no root place id for universe { n2 }`)
+return function(p: string, p2: number)
+	return function(object)
+		return v3(`{Url.GAME_URL}v1/games?universeIds={p2}`, "GET"):andThen(function(p3)
+			local data = p3 and p3.responseBody and p3.responseBody.data
+			local v4 = data and data[1]
+			return v4 and v4.rootPlaceId or nil
+		end):andThen(function(p3: number?)
+			if p3 then
+				return object:dispatch(SendTextMessage(p, `{Url.BASE_URL}games/{p3}`, nil))
 			end
 
-			local v29 = `{ Url.BASE_URL }games/{ n3 }`
-
-			return p3:dispatch(SendTextMessage(s3, v29, nil))
-		end):catch(function(p5) -- line: 55
-			-- upvalues: v8 (copy), n2 (copy), Promise (copy)
-			v8:warning(`SendGameLinkMessage failed for universe { n2 }: { tostring(p5) }`)
-
-			return Promise.reject(p5)
+			return Promise.reject(`no root place id for universe {p2}`)
+		end):catch(function(p3)
+			v:warning(`SendGameLinkMessage failed for universe {p2}: {tostring(p3)}`)
+			return Promise.reject(p3)
 		end)
 	end
 end

@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	month = {
 		singular = "Feature.RobloxSubscription.Label.month",
 		plural = "Feature.RobloxSubscription.Label.months"
@@ -8,24 +8,20 @@ local t1 = {
 		plural = "Feature.RobloxSubscription.Label.years"
 	},
 	week = {
-		singular = "Feature.RobloxSubscription.Label.week",
-		plural = "Feature.RobloxSubscription.Label.weeks"
+		singular = "Feature.RobloxSubscription.label.week",
+		plural = "Feature.RobloxSubscription.label.weeks"
 	}
 }
-local t2 = {
+
+local v2 = {
 	singular = "Feature.RobloxSubscription.Label.month",
 	plural = "Feature.RobloxSubscription.Label.months"
 }
 
-local function getPeriodTypeDisplayLabel(s1: string, b1: boolean) -- line: 35
-	-- upvalues: t1 (copy), t2 (copy)
-	local v6 = t1[string.lower(s1)] or t2
+local function getPeriodTypeDisplayLabel(value: string, flag: boolean)
+	local v3 = v[string.lower(value)] or v2
 
-	if b1 then
-		return v6.plural
-	end
-
-	return v6.singular
+	return if flag then v3.plural else v3.singular
 end
 
 return getPeriodTypeDisplayLabel

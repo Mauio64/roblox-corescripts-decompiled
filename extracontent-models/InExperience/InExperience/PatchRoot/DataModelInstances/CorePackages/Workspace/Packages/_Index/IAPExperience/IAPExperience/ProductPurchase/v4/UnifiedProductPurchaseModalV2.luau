@@ -1,284 +1,327 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local BlackbirdUpsellBanner = require(ParentParentParent.RobloxSubscriptionPurchaseApp).Components.BlackbirdUpsellBanner
-local Foundation = require(ParentParentParent.Foundation)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+
+local RobloxSubscriptionPurchaseApp = require(parent2.RobloxSubscriptionPurchaseApp)
+local BlackbirdUpsellBanner = RobloxSubscriptionPurchaseApp.Components.BlackbirdUpsellBanner
+
+local Foundation = require(parent2.Foundation)
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Dialog = Foundation.Dialog
 local Checkbox = Foundation.Checkbox
 local View = Foundation.View
 local DialogSize = Foundation.Enums.DialogSize
-local ProductDetailsContainer = require(ParentParent.Generic.ProductDetailsContainer)
+
+require(parent.Generic.ProductDetailsContainer)
 local CartPricingProductDetails = require(script.Parent.CartPricingProductDetails)
 local buildCartPricingOfferCheckboxes = require(script.Parent.buildCartPricingOfferCheckboxes)
 local useCartPricing = require(script.Parent.useCartPricing)
-local useFocusNavigationRefs = require(ParentParent.Generic.Hooks.useFocusNavigationRefs)
+
+local useFocusNavigationRefs = require(parent.Generic.Hooks.useFocusNavigationRefs)
+
 local LocalizationService = game:GetService("LocalizationService")
-local Localization = require(ParentParentParent.AppLocales).Localization
-local Localization2 = require(ParentParentParent.Localization)
+local AppLocales = require(parent2.AppLocales)
+local Localization = AppLocales.Localization
+local Localization2 = require(parent2.Localization)
 local LocalizationProvider = Localization2.LocalizationProvider
 local useLocalization = Localization2.Hooks.useLocalization
-local UrlBuilder = require(ParentParentParent.UrlBuilder).UrlBuilder
+
+local UrlBuilder = require(parent2.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+
 local SubtitleComponentMap = require(script.Parent.SubtitleComponentMap)
 
 require(script.Parent.Parent.v3.UnifiedProductPurchaseModalTypes)
+local UnifiedPurchaseModalTypeEnum = require(parent.Enums.UnifiedPurchaseModalTypeEnum)
 
-local UnifiedPurchaseModalTypeEnum = require(ParentParent.Enums.UnifiedPurchaseModalTypeEnum)
-local FFlagUnifiedPurchaseFlowMarketplaceUIImprovements = require(ParentParent.Parent.SharedFlags).FFlagUnifiedPurchaseFlowMarketplaceUIImprovements
-local FFlagUnifiedPurchaseAddSkeleton = require(ParentParent.Parent.SharedFlags).FFlagUnifiedPurchaseAddSkeleton
-local FFlagEnableUnifiedPurchaseFlowForDevSubs = require(ParentParent.Parent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs
-local FFlagPurchasePromptFetchCartPricing = require(ParentParent.Parent.SharedFlags).FFlagPurchasePromptFetchCartPricing
+local SharedFlags = require(parent.Parent.SharedFlags)
+local FFlagUnifiedPurchaseFlowMarketplaceUIImprovements = SharedFlags.FFlagUnifiedPurchaseFlowMarketplaceUIImprovements
+local SharedFlags2 = require(parent.Parent.SharedFlags)
+local FFlagUnifiedPurchaseAddSkeleton = SharedFlags2.FFlagUnifiedPurchaseAddSkeleton
+
+local SharedFlags3 = require(parent.Parent.SharedFlags)
+local FFlagEnableUnifiedPurchaseFlowForDevSubs = SharedFlags3.FFlagEnableUnifiedPurchaseFlowForDevSubs
+
+local SharedFlags4 = require(parent.Parent.SharedFlags)
+local FFlagOffersOnlyAffordableLock = SharedFlags4.FFlagOffersOnlyAffordableLock
 
 require(script.Parent.cartPricingResponseLineItem)
 
-local function UnifiedProductPurchaseModalV2(t1: {[any]: any}) -- line: 102
-	-- upvalues: useLocalization (copy), FFlagUnifiedPurchaseFlowMarketplaceUIImprovements (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy), UrlBuilder (copy), UnifiedPurchaseModalTypeEnum (copy), FFlagPurchasePromptFetchCartPricing (copy), useCartPricing (copy), React (copy), useFocusNavigationRefs (copy), FFlagUnifiedPurchaseAddSkeleton (copy), Checkbox (copy), SubtitleComponentMap (copy), ProductDetailsContainer (copy), CartPricingProductDetails (copy), buildCartPricingOfferCheckboxes (copy), View (copy), ButtonVariant (copy), Foundation (copy), Dialog (copy), DialogSize (copy), BlackbirdUpsellBanner (copy)
-	local v31 = useLocalization({
+local function UnifiedProductPurchaseModalV2(props)
+	local v = useLocalization({
 		Buy = "IAPExperience.PurchasePrompt.Action.Buy",
 		Subscribe = "Feature.Subscription.Action.Subscribe",
 		BuyItem = "IAPExperience.PurchasePrompt.Title.BuyItem",
+		BuyItemV2 = FFlagUnifiedPurchaseFlowMarketplaceUIImprovements and "IAPExperience.PurchasePrompt.Title.BuyItemV2" or nil,
 		GetSubscription = "IAPExperience.SubscriptionPurchasePrompt.Label.GetSubscription",
 		BuyExperience = "IAPExperience.PurchasePrompt.Title.BuyExperience",
 		BuyItems = "IAPExperience.PurchasePrompt.Title.BuyItems",
+		BuyAvatar = FFlagUnifiedPurchaseFlowMarketplaceUIImprovements and "IAPExperience.PurchasePrompt.Header.BuyAvatar" or nil,
 		TestPurchaseDisclaimer = "IAPExperience.PurchasePrompt.Text.TestPurchase",
-		BuyItemV2 = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then nil else "IAPExperience.PurchasePrompt.Title.BuyItemV2",
-		BuyAvatar = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then nil else "IAPExperience.PurchasePrompt.Header.BuyAvatar",
-		PerMonth = if not FFlagEnableUnifiedPurchaseFlowForDevSubs then nil else "Feature.Subscription.Text.PerMonth",
-		SubscribeTermsAgreement = if not FFlagEnableUnifiedPurchaseFlowForDevSubs then nil else {
+		PerMonth = FFlagEnableUnifiedPurchaseFlowForDevSubs and "Feature.Subscription.Text.PerMonth" or nil,
+		SubscribeTermsAgreement = FFlagEnableUnifiedPurchaseFlowForDevSubs and {
 			"Feature.Subscription.Footer.PurchasePromptLegalText",
 			SubscribeButtonTitle = "\"Subscribe\"",
-			tosUrl = UrlBuilder.static.about.terms()
+			tosUrl = urlBuilder.static.about.terms()
+		} or nil
+	})
+	local perMonth
+
+	if
+		FFlagEnableUnifiedPurchaseFlowForDevSubs
+		and props.purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	then
+		perMonth = v.PerMonth
+	end
+
+	local cartPricing = useCartPricing({
+		product = props.product,
+		purchaseModalType = props.purchaseModalType,
+		cartPricingResponse = props.cartPricingResponse,
+		onCartOfferAppliedChanged = props.onCartOfferAppliedChanged
+	})
+
+	local state, setState = React.useState(props.postPurchaseActions or {})
+
+	local purchaseModalType = props.purchaseModalType
+	local text
+
+	if
+		FFlagEnableUnifiedPurchaseFlowForDevSubs
+		and purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	then
+		text = v.GetSubscription
+	elseif purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem then
+		text = v.BuyAvatar
+	elseif purchaseModalType == UnifiedPurchaseModalTypeEnum.Experience then
+		text = v.BuyExperience
+	else
+		text = v.BuyItemV2
+	end
+
+	local ref, ref2 = useFocusNavigationRefs(props.buttons.cancelActivated, props.onBuyItemButtonMounted)
+
+	local onActivated = React.useCallback(function()
+		if state and props.setPostPurchaseActions then
+			props.setPostPurchaseActions(state)
+		end
+
+		props.buttons.buyItemActivated()
+	end, { props.buttons.buyItemActivated, state })
+
+	React.useEffect(function()
+		setState(props.postPurchaseActions or {})
+	end, { props.postPurchaseActions })
+
+	local isDisabled = props.buttons.isDisabled
+		or props.isCartPricingLoading == true
+		or FFlagUnifiedPurchaseAddSkeleton and props.isLoading == true
+
+	local priceWithoutOffersDiscounts = cartPricing.priceWithoutOffersDiscounts
+	local priceAfterOffersDiscounts = cartPricing.priceAfterOffersDiscounts
+	local v2
+
+	if priceWithoutOffersDiscounts == nil then
+		v2 = false
+	else
+		v2 = props.robuxBalanceAmount < priceWithoutOffersDiscounts
+	end
+
+	local v3 = priceAfterOffersDiscounts ~= nil and priceAfterOffersDiscounts <= props.robuxBalanceAmount
+
+	local v4 = cartPricing.showCartOfferUi and #cartPricing.cartPricingOffers or 0
+
+	local v5 = React.useMemo(function()
+		local children = {}
+
+		for k, v5 in state do
+			children[v5.actionKey] = React.createElement(Checkbox, {
+				LayoutOrder = v4 + k,
+				size = "XSmall",
+				label = v5.label,
+				isChecked = v5.isActionSelected,
+				isDisabled = isDisabled,
+				onActivated = function()
+					setState(function(p)
+						local clone = table.clone(p)
+						clone[k] = {
+							label = v5.label,
+							isActionSelected = not v5.isActionSelected,
+							actionKey = v5.actionKey
+						}
+
+						return clone
+					end)
+				end
+			})
+		end
+
+		return children
+	end, { state, v4, isDisabled })
+
+	local subtitleView = nil
+
+	if props.subtitleView then
+		local subtitleComponent = SubtitleComponentMap[props.subtitleView.componentName]
+
+		if subtitleComponent then
+			subtitleView = React.createElement(subtitleComponent, props.subtitleView.props)
+		end
+	end
+
+	local element = React.createElement(CartPricingProductDetails, {
+		cartPricing = cartPricing,
+		purchaseModalType = props.purchaseModalType,
+		subtitleView = subtitleView,
+		priceSuffix = perMonth,
+		isLoading = props.isLoading,
+		isCartPricingLoading = props.isCartPricingLoading
+	})
+
+	local cartPricingOfferCheckboxes = buildCartPricingOfferCheckboxes({
+		cartPricing = cartPricing,
+		isDisabled = isDisabled or v2 and (not FFlagOffersOnlyAffordableLock or v3)
+	})
+
+	local clone = table.clone(cartPricingOfferCheckboxes)
+
+	for k, v6 in pairs(v5) do
+		clone[k] = v6
+	end
+
+	local postPurchaseActions
+
+	if next(cartPricingOfferCheckboxes) or next(v5) then
+		postPurchaseActions = React.createElement(
+			View,
+			{
+				tag = "col gap-medium auto-y size-full-0 align-x-start align-y-start",
+				LayoutOrder = 1
+			},
+			clone
+		)
+	end
+
+	local text2
+
+	if
+		FFlagEnableUnifiedPurchaseFlowForDevSubs
+		and props.purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	then
+		text2 = v.Subscribe
+	else
+		text2 = v.Buy
+	end
+
+	local actions = {
+		{
+			text = text2,
+			variant = ButtonVariant.Emphasis,
+			onActivated = onActivated,
+			isDisabled = isDisabled,
+			ref = ref2,
+			inputDelay = props.buttons.buyItemEnableInputDelayed and not props.buttons.isDisabled and 2.5 or 0
 		}
-	})
-	local v32 = if not FFlagEnableUnifiedPurchaseFlowForDevSubs or t1.purchaseModalType ~= UnifiedPurchaseModalTypeEnum.DeveloperSubscription then nil else v31.PerMonth
-	local v33 = nil
+	}
+	local subscribeTerms
 
-	if FFlagPurchasePromptFetchCartPricing then
-		v33 = useCartPricing({
-			product = t1.product,
-			purchaseModalType = t1.purchaseModalType,
-			cartPricingResponse = t1.cartPricingResponse,
-			onCartOfferAppliedChanged = t1.onCartOfferAppliedChanged
-		})
-	end
-
-	local v34, v35 = React.useState(t1.postPurchaseActions or {})
-	local purchaseModalType = t1.purchaseModalType
-	local v37 = if not FFlagEnableUnifiedPurchaseFlowForDevSubs or purchaseModalType ~= UnifiedPurchaseModalTypeEnum.DeveloperSubscription then if purchaseModalType ~= UnifiedPurchaseModalTypeEnum.MultiItem then if purchaseModalType ~= UnifiedPurchaseModalTypeEnum.Experience then v31.BuyItemV2 else v31.BuyExperience else v31.BuyAvatar else v31.GetSubscription
-	local v38, v39 = useFocusNavigationRefs(t1.buttons.cancelActivated, t1.onBuyItemButtonMounted)
-	local v40 = React.useCallback(function() -- line: 160
-		-- upvalues: v34 (copy), t1 (copy)
-		if v34 and t1.setPostPurchaseActions then
-			t1.setPostPurchaseActions(v34)
-		end
-
-		t1.buttons.buyItemActivated()
-	end, {
-		t1.buttons.buyItemActivated,
-		v34
-	})
-
-	React.useEffect(function() -- line: 168
-		-- upvalues: v35 (copy), t1 (copy)
-		v35(t1.postPurchaseActions or {})
-	end, { t1.postPurchaseActions })
-
-	local u41 = nil
-	local n1 = 0
-
-	if FFlagPurchasePromptFetchCartPricing then
-		u41 = t1.buttons.isDisabled or (FFlagPurchasePromptFetchCartPricing and t1.isCartPricingLoading == true or FFlagUnifiedPurchaseAddSkeleton and t1.isLoading == true)
-		n1 = not v33.showCartOfferUi and 0 or #v33.cartPricingOffers
-	end
-
-	local v43 = if FFlagPurchasePromptFetchCartPricing then React.useMemo(function() -- line: 213
-		-- upvalues: v34 (copy), React (copy), Checkbox (copy), n1 (ref), u41 (ref), v35 (copy)
-		local t2 = {}
-
-		for v61, v62 in v34 do
-			t2[v62.actionKey] = React.createElement(Checkbox, {
-				size = "XSmall",
-				LayoutOrder = n1 + v61,
-				label = v62.label,
-				isChecked = v62.isActionSelected,
-				isDisabled = u41,
-				onActivated = function() -- line: 222
-					-- upvalues: v35 (copy), v61 (copy), v62 (copy)
-					v35(function(p1) -- line: 223
-						-- upvalues: v61 (copy), v62 (copy)
-						local v66 = table.clone(p1)
-
-						v66[v61] = {
-							label = v62.label,
-							isActionSelected = not v62.isActionSelected,
-							actionKey = v62.actionKey
-						}
-
-						return v66
-					end)
-				end
-			})
-		end
-
-		return t2
-	end, {
-		v34,
-		n1,
-		u41
-	}) else React.useMemo(function() -- line: 185
-		-- upvalues: v34 (copy), React (copy), Checkbox (copy), t1 (copy), FFlagUnifiedPurchaseAddSkeleton (copy), v35 (copy)
-		local t3 = {}
-
-		for i, v in ipairs(v34 or {}) do
-			t3["PostPurchaseActionCheckBox_" .. tostring(i)] = React.createElement(Checkbox, {
-				size = "XSmall",
-				LayoutOrder = i,
-				label = v.label,
-				isChecked = v.isActionSelected,
-				isDisabled = t1.buttons.isDisabled or if not FFlagUnifiedPurchaseAddSkeleton then nil else t1.isLoading,
-				onActivated = function() -- line: 196
-					-- upvalues: v35 (copy), i (copy), v (copy)
-					v35(function(p2) -- line: 197
-						-- upvalues: i (copy), v (copy)
-						local v64 = table.clone(p2)
-
-						v64[i] = {
-							label = v.label,
-							isActionSelected = not v.isActionSelected,
-							actionKey = v.actionKey
-						}
-
-						return v64
-					end)
-				end
-			})
-		end
-
-		return t3
-	end, {
-		v34,
-		if not FFlagUnifiedPurchaseAddSkeleton then nil else t1.isLoading
-	})
-	local v44 = nil
-
-	if t1.subtitleView then
-		local v45 = SubtitleComponentMap[t1.subtitleView.componentName]
-
-		if v45 then
-			v44 = React.createElement(v45, t1.subtitleView.props)
-		end
-	end
-
-	local v46 = React.createElement(ProductDetailsContainer, {
-		purchaseModalType = t1.purchaseModalType,
-		product = t1.product,
-		subtitleView = v44,
-		priceSuffix = v32,
-		isLoading = if not FFlagUnifiedPurchaseAddSkeleton then nil else t1.isLoading
-	})
-
-	if FFlagPurchasePromptFetchCartPricing then
-		v46 = React.createElement(CartPricingProductDetails, {
-			cartPricing = v33,
-			purchaseModalType = t1.purchaseModalType,
-			subtitleView = v44,
-			priceSuffix = v32,
-			isLoading = t1.isLoading,
-			isCartPricingLoading = t1.isCartPricingLoading
-		})
-	end
-
-	local v47 = nil
-	local v48 = nil
-
-	if FFlagPurchasePromptFetchCartPricing then
-		v47 = buildCartPricingOfferCheckboxes({
-			cartPricing = v33,
-			isDisabled = u41
-		})
-		v48 = table.clone(v47)
-
-		for k, v in pairs(v43) do
-			v48[k] = v
-		end
-	end
-
-	local v51 = if not (not not FFlagPurchasePromptFetchCartPricing and (next(v47) or next(v43))) and (FFlagPurchasePromptFetchCartPricing or not next(v43)) then nil else React.createElement(View, {
-		tag = "col gap-medium auto-y size-full-0 align-x-start align-y-start",
-		LayoutOrder = 1
-	}, if not FFlagPurchasePromptFetchCartPricing then { v43 } else v48)
-	local t4 = {{
-		text = if not FFlagEnableUnifiedPurchaseFlowForDevSubs or t1.purchaseModalType ~= UnifiedPurchaseModalTypeEnum.DeveloperSubscription then v31.Buy else v31.Subscribe,
-		variant = ButtonVariant.Emphasis,
-		onActivated = v40,
-		isDisabled = if not FFlagPurchasePromptFetchCartPricing then t1.buttons.isDisabled or if not FFlagUnifiedPurchaseAddSkeleton then nil else t1.isLoading else u41,
-		ref = v39,
-		inputDelay = (not t1.buttons.buyItemEnableInputDelayed or t1.buttons.isDisabled) and 0 or 2.5
-	}}
-	local v53 = nil
-
-	if FFlagEnableUnifiedPurchaseFlowForDevSubs and t1.purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription then
-		local v54 = string.gsub(v31.SubscribeTermsAgreement or "", "<a.->(.-)</a>", "%1")
-		local v55 = string.gsub(v54, "<.->", "")
-
-		v53 = React.createElement(Foundation.Text, {
+	if
+		FFlagEnableUnifiedPurchaseFlowForDevSubs
+		and props.purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	then
+		local v6 = string.gsub(v.SubscribeTermsAgreement or "", "<a.->(.-)</a>", "%1")
+		local text3 = string.gsub(v6, "<.->", "")
+		subscribeTerms = React.createElement(Foundation.Text, {
 			LayoutOrder = 6,
-			tag = "wrap size-full-0 auto-y text-caption-small text-wrap text-align-x-left",
-			Text = v55
+			Text = text3,
+			tag = "wrap size-full-0 auto-y text-caption-small text-wrap text-align-x-left"
 		})
 	end
 
-	return React.createElement(Dialog.Root, {
-		disablePortal = false,
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v6 = {
 		size = DialogSize.Medium,
-		onClose = t1.buttons.cancelActivated,
-		ref = v38
+		onClose = props.buttons.cancelActivated,
+		ref = ref,
+		disablePortal = false
+	}
+
+	local v7 = {
+		DialogTitle = React.createElement(Dialog.Title, { text = text }),
+		DialogContent = React.createElement(
+			View,
+			{
+				tag = "col gap-medium auto-y size-full-0 align-x-center align-y-center",
+				LayoutOrder = 1
+			},
+			{ ProductDetailsContainer = element }
+		),
+		ActionsSection = 0,
+		TestDisclaimer = 0,
+		SubscribeTerms = 0
+	}
+
+	local createElement2 = React.createElement
+
+	local createElement3 = React.createElement
+
+	local v8 = {
+		DialogActions = React.createElement(Dialog.Actions, {
+			LayoutOrder = 1,
+			orientation = Foundation.Enums.Orientation.Horizontal,
+			actions = actions
+		}),
+		BlackbirdUpsellBanner = 0
+	}
+	local blackbirdUpsellBanner
+
+	if props.BlackbirdUpsellBannerProductInfo and props.onBlackbirdUpsellActivated then
+		blackbirdUpsellBanner = React.createElement(BlackbirdUpsellBanner, {
+			productInfo = props.BlackbirdUpsellBannerProductInfo,
+			onActivated = props.onBlackbirdUpsellActivated,
+			LayoutOrder = 2
+		})
+	end
+
+	v8.BlackbirdUpsellBanner = blackbirdUpsellBanner
+	v7.ActionsSection = createElement2(View, {
+		tag = "col size-full-0 auto-y gap-xlarge",
+		LayoutOrder = 3
 	}, {
-		DialogTitle = React.createElement(Dialog.Title, {
-			text = v37
-		}),
-		DialogContent = React.createElement(View, {
-			tag = "col gap-medium auto-y size-full-0 align-x-center align-y-center",
-			LayoutOrder = 1
-		}, {
-			ProductDetailsContainer = v46
-		}),
-		ActionsSection = React.createElement(View, {
-			tag = "col size-full-0 auto-y gap-xlarge",
-			LayoutOrder = 3
-		}, {
-			PostPurchaseActions = v51,
-			BuyAndUpsell = React.createElement(View, {
-				tag = "col size-full-0 auto-y gap-medium",
-				LayoutOrder = 2
-			}, {
-				DialogActions = React.createElement(Dialog.Actions, {
-					LayoutOrder = 1,
-					orientation = Foundation.Enums.Orientation.Horizontal,
-					actions = t4
-				}),
-				BlackbirdUpsellBanner = if not t1.BlackbirdUpsellBannerProductInfo or not t1.onBlackbirdUpsellActivated then nil else React.createElement(BlackbirdUpsellBanner, {
-					LayoutOrder = 2,
-					productInfo = t1.BlackbirdUpsellBannerProductInfo,
-					onActivated = t1.onBlackbirdUpsellActivated
-				})
-			})
-		}),
-		TestDisclaimer = if not t1.isTestPurchase then nil else React.createElement(Foundation.Text, {
+		PostPurchaseActions = postPurchaseActions,
+		BuyAndUpsell = createElement3(View, {
+			tag = "col size-full-0 auto-y gap-medium",
+			LayoutOrder = 2
+		}, v8)
+	})
+	local testDisclaimer
+
+	if props.isTestPurchase then
+		testDisclaimer = React.createElement(Foundation.Text, {
 			LayoutOrder = 5,
-			tag = "auto-y size-full-0 text-caption-small text-align-x-center text-wrap wrap",
-			Text = v31.TestPurchaseDisclaimer
-		}),
-		SubscribeTerms = v53
-	})
+			Text = v.TestPurchaseDisclaimer,
+			tag = "auto-y size-full-0 text-caption-small text-align-x-center text-wrap wrap"
+		})
+	end
+
+	v7.TestDisclaimer = testDisclaimer
+
+	v7.SubscribeTerms = subscribeTerms
+	return createElement(root, v6, v7)
 end
-local function UnifiedProductPurchaseModalV2Container(t5: {[any]: any}) -- line: 379
-	-- upvalues: React (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), UnifiedProductPurchaseModalV2 (copy)
-	return React.createElement(LocalizationProvider, {
-		localization = Localization.new(LocalizationService.RobloxLocaleId)
-	}, {
-		ProductPurchaseModal = React.createElement(UnifiedProductPurchaseModalV2, t5)
-	})
+
+local function UnifiedProductPurchaseModalV2Container(p)
+	return React.createElement(
+		LocalizationProvider,
+		{
+			localization = Localization.new(LocalizationService.RobloxLocaleId)
+		},
+		{
+			ProductPurchaseModal = React.createElement(UnifiedProductPurchaseModalV2, p)
+		}
+	)
 end
 
 return UnifiedProductPurchaseModalV2Container

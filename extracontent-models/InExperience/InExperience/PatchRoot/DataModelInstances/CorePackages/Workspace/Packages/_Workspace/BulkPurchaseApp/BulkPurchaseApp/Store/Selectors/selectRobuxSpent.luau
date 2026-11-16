@@ -2,18 +2,18 @@ local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
 
 require(BulkPurchaseApp.Store.Types)
 
-local function selectRobuxSpent(p1) -- line: 7
-	local n1 = 0
+local function selectRobuxSpent(p)
+	local robuxSpent = 0
 
-	if p1.itemData and p1.itemStatuses then
-		for _, v6 in p1.itemData do
-			if p1.itemStatuses[v6.id] == Enum.MarketplaceItemPurchaseStatus.Success then
-				n1 += v6.priceRobux
+	if p.itemData and p.itemStatuses then
+		for _, v in p.itemData do
+			if p.itemStatuses[v.id] == Enum.MarketplaceItemPurchaseStatus.Success then
+				robuxSpent += v.priceRobux
 			end
 		end
 	end
 
-	return n1
+	return robuxSpent
 end
 
 return selectRobuxSpent

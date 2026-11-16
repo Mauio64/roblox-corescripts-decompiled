@@ -1,19 +1,8 @@
-local CurrentExperienceInviteUpdated = require(script.CurrentExperienceInviteUpdated)
-local CurrentExperienceInviteDismissed = require(script.CurrentExperienceInviteDismissed)
-local CurrentExperienceInviteReceived = require(script.CurrentExperienceInviteReceived)
-local CurrentExperienceInviteStatusUpdated = require(script.CurrentExperienceInviteStatusUpdated)
-local CurrentSquadUpdated = require(script.CurrentSquadUpdated)
-local PartialSquadAdded = require(script.PartialSquadAdded)
-local PartialSquadRemoved = require(script.PartialSquadRemoved)
-local SelfPermissionUpdated = require(script.SelfPermissionUpdated)
-
 return {
-	CurrentExperienceInviteUpdated = CurrentExperienceInviteUpdated,
-	CurrentExperienceInviteDismissed = CurrentExperienceInviteDismissed,
-	CurrentExperienceInviteReceived = CurrentExperienceInviteReceived,
-	CurrentExperienceInviteStatusUpdated = CurrentExperienceInviteStatusUpdated,
-	CurrentSquadUpdated = CurrentSquadUpdated,
-	PartialSquadAdded = PartialSquadAdded,
-	PartialSquadRemoved = PartialSquadRemoved,
-	SelfPermissionUpdated = SelfPermissionUpdated
+	CurrentExperienceInviteUpdated = require(script.CurrentExperienceInviteUpdated),
+	CurrentExperienceInviteDismissed = require(script.CurrentExperienceInviteDismissed),
+	CurrentExperienceInviteReceived = require(script.CurrentExperienceInviteReceived),
+	CurrentExperienceInviteStatusUpdated = require(script.CurrentExperienceInviteStatusUpdated),
+	CurrentSquadUpdated = require(script.CurrentSquadUpdated),
+	SelfPermissionUpdated = require(script.SelfPermissionUpdated)
 }

@@ -1,11 +1,11 @@
-local Parent = script:FindFirstAncestor("GamePlayButton").Parent
-local CentralOverlayType = require(Parent.RobloxAppEnums).CentralOverlayType
-local SetCentralOverlay = require(Parent.CentralOverlay).Actions.SetCentralOverlay
+local parent = script:FindFirstAncestor("GamePlayButton").Parent
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local CentralOverlayType = RobloxAppEnums.CentralOverlayType
+local CentralOverlay = require(parent.CentralOverlay)
+local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
 
-return function(p1) -- line: 6
-	-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
-	return function(p2) -- line: 7
-		-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy), p1 (copy)
-		p2:dispatch(SetCentralOverlay(CentralOverlayType.UnifiedProductPurchaseModal, p1))
+return function(p)
+	return function(object)
+		object:dispatch(SetCentralOverlay(CentralOverlayType.UnifiedProductPurchaseModal, p))
 	end
 end

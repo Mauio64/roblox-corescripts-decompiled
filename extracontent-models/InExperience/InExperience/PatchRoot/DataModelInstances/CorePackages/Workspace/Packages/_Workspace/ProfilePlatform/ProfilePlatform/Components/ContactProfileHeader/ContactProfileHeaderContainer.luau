@@ -1,18 +1,18 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+
 local Enums = require(ProfilePlatform.Common.Enums)
 local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
 local ContactProfileHeader = require(ProfilePlatform.Components.ContactProfileHeader.ContactProfileHeader)
 
-local function ContactProfileHeaderContainer(t1: {[any]: any}) -- line: 18
-	-- upvalues: useProfileJsonComponent (copy), Enums (copy), React (copy), ContactProfileHeader (copy)
-	local v9 = useProfileJsonComponent(Enums.Components.ContactProfileHeader)
-	local contactName = v9.contactName
-	local avatarThumbnailUrl = v9.avatarThumbnailUrl
+local function ContactProfileHeaderContainer(p)
+	local v = useProfileJsonComponent(Enums.Components.ContactProfileHeader)
+	local contactName = v.contactName
+	local avatarThumbnailUrl = v.avatarThumbnailUrl
 
 	return React.createElement(ContactProfileHeader, {
-		layoutOrder = t1.layoutOrder,
+		layoutOrder = p.layoutOrder,
 		contactName = contactName,
 		avatarThumbnailUrl = avatarThumbnailUrl
 	})

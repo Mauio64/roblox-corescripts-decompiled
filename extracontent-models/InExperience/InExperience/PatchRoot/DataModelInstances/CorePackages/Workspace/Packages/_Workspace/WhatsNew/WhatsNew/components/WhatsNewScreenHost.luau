@@ -1,26 +1,22 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
-local WhatsNewParent = WhatsNew.Parent
-local React = require(WhatsNewParent.React)
+local parent = WhatsNew.Parent
+
+local React = require(parent.React)
 local GetWhatsNewStore = require(WhatsNew.store.GetWhatsNewStore)
 local ensureWhatsNewStoreInitialized = require(WhatsNew.store.ensureWhatsNewStoreInitialized)
-
 require(WhatsNew.registry.ScopeActions)
-
 local WhatsNewTourtip = require(script.Parent.WhatsNewTourtip)
 
-local function WhatsNewScreenHost(t1: {[any]: any}) -- line: 26
-	-- upvalues: GetWhatsNewStore (copy), React (copy), ensureWhatsNewStoreInitialized (copy), WhatsNewTourtip (copy)
-	local screenScopeId = t1.screenScopeId
-	local scopeActions = t1.scopeActions
-	local v11 = t1.isEnabled == true
-	local onReady = t1.onReady
-	local v13 = GetWhatsNewStore()
+local function WhatsNewScreenHost(props)
+	local screenScopeId = props.screenScopeId
+	local scopeActions = props.scopeActions
+	local isEnabled = props.isEnabled == true
+	local onReady = props.onReady
+	local whatsNewStore = GetWhatsNewStore()
 
-	React.useEffect(function() -- line: 33
-		-- upvalues: v11 (copy), v13 (copy), ensureWhatsNewStoreInitialized (copy), scopeActions (copy), onReady (copy), screenScopeId (copy)
-		if not v11 then
-			v13.stopTour()
-
+	React.useEffect(function()
+		if not isEnabled then
+			whatsNewStore.stopTour()
 			return
 		end
 
@@ -32,22 +28,15 @@ local function WhatsNewScreenHost(t1: {[any]: any}) -- line: 26
 			onReady()
 		end
 
-		v13.startEligibleTour(screenScopeId)
+		whatsNewStore.startEligibleTour(screenScopeId)
 
-		return function() -- line: 49
-			-- upvalues: v13 (copy)
-			v13.stopTour()
+		return function()
+			whatsNewStore.stopTour()
 		end
-	end, {
-		v11,
-		onReady,
-		screenScopeId,
-		scopeActions,
-		v13
-	})
+	end, { isEnabled, onReady, screenScopeId, scopeActions, whatsNewStore })
 
 	return React.createElement(React.Fragment, nil, {
-		Children = React.createElement(React.Fragment, nil, t1.children),
+		Children = React.createElement(React.Fragment, nil, props.children),
 		Tooltip = React.createElement(WhatsNewTourtip)
 	})
 end

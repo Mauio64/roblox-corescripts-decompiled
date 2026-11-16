@@ -1,75 +1,50 @@
 local UserInputService = game:GetService("UserInputService")
-local t1 = {}
 
-local function update() -- line: 18
-	-- upvalues: t1 (copy), UserInputService (copy)
-	local v4 = t1[#t1]
+local v = {}
 
-	if v4 then
-		UserInputService.OverrideMouseIconBehavior = v4[2]
+local function update() -- 2 equivalent calls inferred from this helper
+	local v2 = v[#v]
 
-		return
+	if v2 then
+		UserInputService.OverrideMouseIconBehavior = v2[2]
+	else
+		UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
 	end
-
-	UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
 end
 
-return {
-	push = function(s1: string, p1) -- line: 28
-		-- upvalues: t1 (copy), UserInputService (copy)
-		assert(type(s1) == "userdata" or type(s1) == "string", "key")
-		assert(typeof(p1) == "EnumItem", "behavior")
-		assert(p1.EnumType == Enum.OverrideMouseIconBehavior, "behavior.EnumType")
+local MouseIconOverrideService = {}
 
-		for i, v in ipairs(t1) do
-			if s1 == v[1] then
-				table.remove(t1, i)
+function MouseIconOverrideService.push(value: string, p)
+	assert(type(value) == "userdata" or type(value) == "string", "key")
+	assert(typeof(p) == "EnumItem", "behavior")
+	assert(p.EnumType == Enum.OverrideMouseIconBehavior, "behavior.EnumType")
 
-				break
-			end
+	for i, v2 in ipairs(v) do
+		if v2[1] == value then
+			table.remove(v, i)
+			break
 		end
-
-		table.insert(t1, {
-			s1,
-			p1
-		})
-
-		local v9 = t1[#t1]
-
-		if v9 then
-			UserInputService.OverrideMouseIconBehavior = v9[2]
-
-			return
-		end
-
-		UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
-	end,
-	pop = function(p2) -- line: 43
-		-- upvalues: t1 (copy), UserInputService (copy)
-		assert(type(p2) == "userdata" or type(p2) == "string", "key")
-
-		local v11 = nil
-
-		for i, v in ipairs(t1) do
-			if p2 == v[1] then
-				v11 = i
-
-				break
-			end
-		end
-
-		if v11 then
-			table.remove(t1, v11)
-		end
-
-		local v14 = t1[#t1]
-
-		if v14 then
-			UserInputService.OverrideMouseIconBehavior = v14[2]
-
-			return
-		end
-
-		UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
 	end
-}
+
+	table.insert(v, { value, p })
+	update() -- inferred equivalent call
+end
+function MouseIconOverrideService.pop(value)
+	assert(type(value) == "userdata" or type(value) == "string", "key")
+	local v2 = nil
+
+	for i, v3 in ipairs(v) do
+		if v3[1] == value then
+			v2 = i
+			break
+		end
+	end
+
+	if v2 then
+		table.remove(v, v2)
+	end
+
+	update() -- inferred equivalent call
+end
+
+return MouseIconOverrideService

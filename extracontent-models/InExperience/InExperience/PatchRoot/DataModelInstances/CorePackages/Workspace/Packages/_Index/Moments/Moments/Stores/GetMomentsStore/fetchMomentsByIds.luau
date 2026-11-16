@@ -1,15 +1,9 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local SharedFlags = require(Parent.SharedFlags)
-local MomentsGetMomentsStore = require(Parent.DataHydration.MomentsGetMomentsStore)
-local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
+local parent = script:FindFirstAncestor("Moments").Parent
 
-local function fetchMomentsByIds(t1: {[any]: any}, s1: string?) -- line: 9
-	-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy), MomentsGetMomentsStore (copy)
-	if FFlagMomentsPassFeedItemIdToBackendApis then
-		return (MomentsGetMomentsStore(false).getMomentsByIds(t1, s1))
-	end
+local MomentsGetMomentsStore = require(parent.DataHydration.MomentsGetMomentsStore)
 
-	return (MomentsGetMomentsStore(false).getMomentsByIds(t1))
+local function fetchMomentsByIds(p, p2: string?)
+	return MomentsGetMomentsStore(false).getMomentsByIds(p, p2)
 end
 
 return fetchMomentsByIds

@@ -1,50 +1,73 @@
 local HttpService = game:GetService("HttpService")
 local MessageBusService = game:GetService("MessageBusService")
 local NotificationService = game:GetService("NotificationService")
+
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
-local default = require(BuildExperienceParent.LinkingProtocol).LinkingProtocol.default
-local React = require(BuildExperienceParent.React)
-local RealtimeDelivery = require(BuildExperienceParent.RealtimeDelivery)
-local ToastNotification = require(BuildExperienceParent.ToastNotification)
-local ToastNotificationsProtocol = require(BuildExperienceParent.ToastNotificationsProtocol)
+local parent = BuildExperience.Parent
+
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local React = require(parent.React)
+local RealtimeDelivery = require(parent.RealtimeDelivery)
+local ToastNotification = require(parent.ToastNotification)
+local ToastNotificationsProtocol = require(parent.ToastNotificationsProtocol)
+
 local GetCreatorAgentResumeStore = require(BuildExperience.Stores.GetCreatorAgentResumeStore)
 local GetPlayButtonStore = require(BuildExperience.Stores.GetPlayButtonStore)
 local getCurrentExperienceProject = require(BuildExperience.utils.getCurrentExperienceProject)
-local leaveExperience = require(BuildExperience.utils.leaveExperience)
+local AdsCampaignNotification = require(BuildExperience.utils.AdsCampaignNotification)
+local openDeepLink = require(parent.BuildExperiencePlaytestLaunch.openDeepLink)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildAdUpsell = SharedFlags.FFlagBuildAdUpsell
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagBuildExperienceLibrary = SharedFlags2.FFlagBuildExperienceLibrary
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagConnectionRelaunchBuildPlaytest = SharedFlags3.FFlagConnectionRelaunchBuildPlaytest
+local PlaytestRejoin
+
+if FFlagBuildExperienceLibrary or FFlagConnectionRelaunchBuildPlaytest then
+	PlaytestRejoin = require(parent.BuildExperiencePlaytestLaunch.PlaytestRejoin)
+else
+	PlaytestRejoin = nil
+end
+
 local ResumeNotification = CreatorAgentChat.ResumeNotification
 local LifecycleEvents = ToastNotification.LifecycleEvents
-local default2 = ToastNotificationsProtocol.ToastNotificationProtocol.default
+local default = ToastNotificationsProtocol.ToastNotificationProtocol.default
 local ToastNotificationProtocolConstants = ToastNotificationsProtocol.ToastNotificationProtocolConstants
 
-local function disconnect(p1) -- line: 38
-	if p1 == nil then
+local function disconnect(connection) -- 1 equivalent call inferred from this helper
+	if connection == nil then
 		return
 	end
 
-	if typeof(p1.Disconnect) == "function" then
-		p1:Disconnect()
-
-		return
-	end
-
-	if typeof(p1.disconnect) == "function" then
-		p1:disconnect()
+	if typeof(connection.Disconnect) == "function" then
+		connection:Disconnect()
+	elseif typeof(connection.disconnect) == "function" then
+		connection:disconnect()
 	end
 end
-local function decodeActionParams(p2) -- line: 49
-	-- upvalues: HttpService (copy)
-	local v27 = if typeof(p2) ~= "table" then nil else p2.visualItem
-	local v28 = if typeof(v27) ~= "table" then nil else v27.actionEventParams
 
-	if typeof(v28) ~= "string" or v28 == "" then
+local function decodeActionParams(data)
+	local visualItem
+
+	if typeof(data) == "table" then
+		visualItem = data.visualItem
+	end
+
+	local actionEventParams
+
+	if typeof(visualItem) == "table" then
+		actionEventParams = visualItem.actionEventParams
+	end
+
+	if typeof(actionEventParams) ~= "string" or actionEventParams == "" then
 		return nil
 	end
 
-	local ok, result = pcall(HttpService.JSONDecode, HttpService, v28)
+	local success, result = pcall(HttpService.JSONDecode, HttpService, actionEventParams)
 
-	if not ok or typeof(result) ~= "table" then
+	if not success or typeof(result) ~= "table" then
 		return nil
 	end
 
@@ -62,125 +85,119 @@ local function decodeActionParams(p2) -- line: 49
 
 	local universeId = result.universeId
 
-	return {
-		kind = kind,
-		sessionId = sessionId,
-		universeId = if typeof(universeId) ~= "number" then nil else universeId
-	}
-end
-local function publishToast(t1: {[any]: any}) -- line: 79
-	-- upvalues: MessageBusService (copy), ToastNotificationProtocolConstants (copy), ResumeNotification (copy)
-	MessageBusService:Publish(ToastNotificationProtocolConstants.MESSAGE_DISPLAY_TOAST_NOTIF, ResumeNotification.buildToastNotification(t1))
-end
-local function routeToBuildChat(t2: {[any]: any}, b1: boolean, b2: boolean) -- line: 86
-	-- upvalues: getCurrentExperienceProject (copy), GetPlayButtonStore (copy), ResumeNotification (copy), leaveExperience (copy), default (copy)
-	if b1 and b2 then
-		local v38 = getCurrentExperienceProject()
+	if typeof(universeId) ~= "number" then
+		universeId = nil
+	end
 
-		if t2.universeId ~= nil and v38.universeId == t2.universeId then
-			local v39 = GetPlayButtonStore()
+	return { kind = kind, sessionId = sessionId, universeId = universeId }
+end
 
-			v39.setResumeTarget({
-				universeId = t2.universeId,
-				placeId = v38.placeId,
-				sessionId = t2.sessionId
+local function publishToast(classifyRtnDetail) -- 1 equivalent call inferred from this helper
+	MessageBusService:Publish(
+		ToastNotificationProtocolConstants.MESSAGE_DISPLAY_TOAST_NOTIF,
+		ResumeNotification.buildToastNotification(classifyRtnDetail)
+	)
+end
+
+local function routeToBuildChat(p, isInExperience: boolean, isBuildModeActive: boolean)
+	if isInExperience and isBuildModeActive then
+		local currentExperienceProject = getCurrentExperienceProject()
+
+		if p.universeId ~= nil and currentExperienceProject.universeId == p.universeId then
+			local playButtonStore = GetPlayButtonStore()
+			playButtonStore.setResumeTarget({
+				universeId = p.universeId,
+				placeId = currentExperienceProject.placeId,
+				sessionId = p.sessionId
 			})
-			v39.setIsActive(true)
 
+			playButtonStore.setIsActive(true)
 			return
 		end
 	end
 
-	local v40 = ResumeNotification.getResumeDeepLink(t2)
+	openDeepLink(ResumeNotification.getResumeDeepLink(p), isInExperience)
+end
 
-	if b1 then
-		leaveExperience(function() -- line: 103
-			-- upvalues: default (copy), v40 (copy)
-			default:detectURL(v40)
-		end)
+local function BuildEventReceiver(data): nil
+	local creatorAgentResumeStore = GetCreatorAgentResumeStore()
+	local v = React.useMemo(function()
+		return data.RobloxEventReceiver or RealtimeDelivery.RobloxEventReceiver.new(NotificationService)
+	end, { data.RobloxEventReceiver })
 
-		return
+	local isInExperience = data.isInExperience == true
+	local isBuildModeActive = data.isBuildModeActive == true
+
+	React.useEffect(function()
+		if PlaytestRejoin == nil or isInExperience then
+			return nil
+		end
+
+		return (PlaytestRejoin.listen())
+	end, { isInExperience })
+
+	if FFlagBuildAdUpsell then
+		React.useEffect(function()
+			return AdsCampaignNotification.connect(LifecycleEvents, function(p)
+				openDeepLink(p, isInExperience)
+			end, function(p)
+				default:dismissNotification(p)
+			end)
+		end, { isInExperience })
 	end
 
-	default:detectURL(v40)
-end
-local function BuildEventReceiver(t3: {[any]: any}) -- line: 111
-	-- upvalues: GetCreatorAgentResumeStore (copy), React (copy), RealtimeDelivery (copy), NotificationService (copy), ResumeNotification (copy), MessageBusService (copy), ToastNotificationProtocolConstants (copy), LifecycleEvents (copy), decodeActionParams (copy), default2 (copy), routeToBuildChat (copy)
-	local v42 = GetCreatorAgentResumeStore()
-	local v43 = React.useMemo(function() -- line: 113
-		-- upvalues: t3 (copy), RealtimeDelivery (copy), NotificationService (copy)
-		return t3.RobloxEventReceiver or RealtimeDelivery.RobloxEventReceiver.new(NotificationService)
-	end, { t3.RobloxEventReceiver })
-	local v44 = t3.isInExperience == true
-	local v45 = t3.isBuildModeActive == true
+	React.useEffect(function()
+		local v2 = v:observeEvent(ResumeNotification.CapRtnNamespace, function(p)
+			local classifyRtnDetail = ResumeNotification.classifyRtnDetail(p)
 
-	React.useEffect(function() -- line: 120
-		-- upvalues: v43 (copy), ResumeNotification (copy), v42 (copy), MessageBusService (copy), ToastNotificationProtocolConstants (copy)
-		local v46 = v43:observeEvent(ResumeNotification.CapRtnNamespace, function(p3) -- line: 121
-			-- upvalues: ResumeNotification (copy), v42 (copy), MessageBusService (copy), ToastNotificationProtocolConstants (copy)
-			local v49 = ResumeNotification.classifyRtnDetail(p3)
-
-			if v49 == nil then
+			if classifyRtnDetail == nil then
 				return
 			end
 
-			local v50 = v42.getActiveTarget(false)
+			local activeTarget = creatorAgentResumeStore.getActiveTarget(false)
 
-			if ResumeNotification.targetMatchesNotification(v50, v49) then
+			if ResumeNotification.targetMatchesNotification(activeTarget, classifyRtnDetail) then
 				return
 			end
 
-			MessageBusService:Publish(ToastNotificationProtocolConstants.MESSAGE_DISPLAY_TOAST_NOTIF, ResumeNotification.buildToastNotification(v49))
+			publishToast(classifyRtnDetail) -- inferred equivalent call
 		end)
 
-		return function() -- line: 135
-			-- upvalues: v46 (copy)
-			local v51 = v46
-
-			if v51 == nil then
-				return
-			end
-
-			if typeof(v51.Disconnect) == "function" then
-				v51:Disconnect()
-
-				return
-			end
-
-			if typeof(v51.disconnect) == "function" then
-				v51:disconnect()
-			end
+		return function()
+			disconnect(v2) -- inferred equivalent call
 		end
-	end, {
-		v43,
-		v42
-	})
-	React.useEffect(function() -- line: 140
-		-- upvalues: LifecycleEvents (copy), ResumeNotification (copy), decodeActionParams (copy), default2 (copy), routeToBuildChat (copy), v44 (copy), v45 (copy)
-		local v47 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, ResumeNotification.NotificationType, function(p4) -- line: 144
-			-- upvalues: ResumeNotification (copy), decodeActionParams (copy), default2 (copy), routeToBuildChat (copy), v44 (copy), v45 (copy)
-			if typeof(p4) ~= "table" or (p4.userActionType ~= "click" or typeof(p4.visualItem) ~= "table" or p4.visualItem.eventName ~= ResumeNotification.ResumeEventName or typeof(p4.notificationData) ~= "table") then
-				return
+	end, { v, creatorAgentResumeStore })
+
+	React.useEffect(function()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.UserAction,
+			ResumeNotification.NotificationType,
+			function(data2)
+				if
+					typeof(data2) ~= "table"
+					or data2.userActionType ~= "click"
+					or typeof(data2.visualItem) ~= "table"
+					or data2.visualItem.eventName ~= ResumeNotification.ResumeEventName
+					or typeof(data2.notificationData) ~= "table"
+				then
+					return
+				end
+
+				local v2 = decodeActionParams(data2)
+
+				if v2 == nil then
+					return
+				end
+
+				default:dismissNotification(data2.notificationData.id)
+				routeToBuildChat(v2, isInExperience, isBuildModeActive)
 			end
+		)
 
-			local v53 = decodeActionParams(p4)
-
-			if v53 == nil then
-				return
-			end
-
-			default2:dismissNotification(p4.notificationData.id)
-			routeToBuildChat(v53, v44, v45)
-		end)
-
-		return function() -- line: 165
-			-- upvalues: v47 (copy)
-			v47()
+		return function()
+			callback()
 		end
-	end, {
-		v44,
-		v45
-	})
+	end, { isInExperience, isBuildModeActive })
 
 	return nil
 end

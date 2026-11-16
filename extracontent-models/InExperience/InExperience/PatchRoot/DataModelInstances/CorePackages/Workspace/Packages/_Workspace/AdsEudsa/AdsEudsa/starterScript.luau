@@ -1,10 +1,11 @@
 local CoreGui = game:GetService("CoreGui")
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
+
+local parent = script.Parent.Parent
+local Roact = require(parent.Roact)
+
 local AdsEuDsaPromptHandler = require(script.Parent.AdsEuDsaPromptHandler)
 
-local function starterScript() -- line: 9
-	-- upvalues: Roact (copy), AdsEuDsaPromptHandler (copy), CoreGui (copy)
+local function starterScript()
 	Roact.mount(Roact.createElement(AdsEuDsaPromptHandler), CoreGui, "AdsEuDsaPromptHandler")
 end
 

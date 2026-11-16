@@ -1,23 +1,17 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
 
+local React = require(parent.React)
 require(Foundation.Components.Types)
 
 local useBindable = require(Foundation.Utility.useBindable)
 
-local function useCumulativeBackground(p1, p2) -- line: 11
-	-- upvalues: useBindable (copy), React (copy)
-	local v8 = useBindable(p1)
-	local v9 = useBindable(p2)
-
-	return React.joinBindings({
-		v8,
-		v9
-	}):map(function(p3) -- line: 18
+local function useCumulativeBackground(p, p2)
+	local v = { useBindable(p), (useBindable(p2)) }
+	return React.joinBindings(v):map(function(list)
 		return {
-			Transparency = 0,
-			Color3 = p3[2].Color3:Lerp(p3[1].Color3, p3[2].Transparency)
+			Color3 = list[2].Color3:Lerp(list[1].Color3, list[2].Transparency),
+			Transparency = 0
 		}
 	end)
 end

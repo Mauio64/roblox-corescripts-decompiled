@@ -1,1 +1,2 @@
-return game:DefineFastFlag("ExpChatEnableCrossAgeChatActivity", false) and game:GetEngineFeature("TextChatUserMessageIntentSent")
+return game:DefineFastFlag("ExpChatEnableCrossAgeChatActivity", false)
+	and game:GetEngineFeature("TextChatUserMessageIntentSent")

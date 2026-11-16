@@ -1,9 +1,11 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
-local RoactNetworking = require(Parent.RoactServiceTags).RoactNetworking
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 
-local function useNetworking() -- line: 8
-	-- upvalues: useRoactService (copy), RoactNetworking (copy)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+
+local function useNetworking()
 	return useRoactService(RoactNetworking)
 end
 

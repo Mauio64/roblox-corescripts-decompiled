@@ -1,16 +1,16 @@
-return function(p1, p2, b1: boolean?) -- line: 1
-	if not p1 then
+return function(list, p, flag: boolean?): boolean
+	if not list then
 		return false
 	end
 
-	local v4 = #p1
+	local count = #list
 
-	if b1 then
-		v4 -= 1
+	if flag then
+		count -= 1
 	end
 
-	for i = 1, v4 do
-		if p2 == p1[i].name then
+	for i = 1, count do
+		if list[i].name == p then
 			return true
 		end
 	end

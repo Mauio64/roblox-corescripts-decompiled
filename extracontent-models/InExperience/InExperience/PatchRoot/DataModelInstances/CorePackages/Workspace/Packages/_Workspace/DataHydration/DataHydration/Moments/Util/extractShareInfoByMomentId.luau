@@ -2,42 +2,38 @@ local DataHydration = script:FindFirstAncestor("DataHydration")
 
 require(DataHydration.Moments.MomentsStoreTypes)
 
-local function extractShareInfo(p1) -- line: 13
-	local stats = p1.stats
+local function extractShareInfo(item) -- 1 equivalent call inferred from this helper
+	local stats = item.stats
 
 	if stats == nil or type(stats.shareCount) ~= "number" then
 		return nil
 	end
 
-	return {
-		hasShared = false,
-		shareCount = math.max(stats.shareCount, 0)
-	}
+	return { shareCount = math.max(stats.shareCount, 0), hasShared = false }
 end
-local function extractShareInfoByMomentId(t1: {[any]: any}?) -- line: 25
-	local t2 = {}
 
-	if t1 == nil then
-		return t2
+local function extractShareInfoByMomentId(items)
+	local shareInfoByMomentId = {}
+
+	if items == nil then
+		return shareInfoByMomentId
 	end
 
-	for _, v9 in t1 do
-		local v10 = v9.entityId or v9.id
+	for _, item in items do
+		local entityId = item.entityId or item.id
 
-		if v10 ~= nil then
-			local stats = v9.stats
-			local v12 = if stats ~= nil and type(stats.shareCount) == "number" then {
-				hasShared = false,
-				shareCount = math.max(stats.shareCount, 0)
-			} else nil
+		if entityId == nil then
+			continue
+		end
 
-			if v12 ~= nil then
-				t2[v10] = v12
-			end
+		local shareInfo = extractShareInfo(item) -- inferred equivalent call
+
+		if shareInfo ~= nil then
+			shareInfoByMomentId[entityId] = shareInfo
 		end
 	end
 
-	return t2
+	return shareInfoByMomentId
 end
 
 return extractShareInfoByMomentId

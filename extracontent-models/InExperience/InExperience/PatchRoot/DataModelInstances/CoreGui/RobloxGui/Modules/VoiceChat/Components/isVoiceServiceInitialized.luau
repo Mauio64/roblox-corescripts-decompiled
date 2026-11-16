@@ -1,11 +1,11 @@
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local CorePackages = game:GetService("CorePackages")
-
 require(CorePackages.Packages.Promise)
 
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 
-return function() -- line: 10
-	-- upvalues: default (copy)
+return function()
 	return default:asyncInit()
 end

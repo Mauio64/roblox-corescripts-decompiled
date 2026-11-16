@@ -1,233 +1,247 @@
 local UserInputService = game:GetService("UserInputService")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local React = require(ParentParentParentParent.React)
 
-require(ParentParent.Style.StyleTypes)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
+local React = require(parent3.React)
+require(parent.Style.StyleTypes)
 
-require(ParentParent.ImageSet.ImagesTypes)
+local ImageSetComponent = require(parent2.Core.ImageSet.ImageSetComponent)
+require(parent.ImageSet.ImagesTypes)
 
-local function ScrollBar(t1: {[any]: any}) -- line: 55
-	-- upvalues: React (copy), UserInputService (copy), ImageSetComponent (copy)
-	local userInteractionEnabled = t1.userInteractionEnabled
-	local width = t1.width
-	local anchorPoint = t1.anchorPoint
-	local position = t1.position
-	local zIndex = t1.zIndex
-	local transparency = t1.transparency
-	local backgroundColor = t1.backgroundColor
-	local paddingStartEnd = t1.paddingStartEnd
-	local handleWidth = t1.handleWidth
-	local handleColor = t1.handleColor
-	local handleCornerRadius = t1.handleCornerRadius
-	local handleIcon = t1.handleIcon
-	local handleIconSize = t1.handleIconSize
-	local handleIconColor = t1.handleIconColor
-	local onDragging = t1.onDragging
-	local viewSize = t1.viewSize
-	local canvasSize = t1.canvasSize
-	local canvasPosition = t1.canvasPosition
-	local v27, v28 = React.useState(false)
-	local v29, v30 = React.useBinding(0)
-	local v31, v32 = React.useState(false)
-	local v33 = React.useRef(0)
-	local v34 = React.useRef(0)
-	local v35 = React.useCallback(function(p1) -- line: 83
-		-- upvalues: v30 (copy)
-		v30(p1.AbsoluteSize.Y)
-	end, { v30 })
-	local v36 = React.useCallback(function(p2) -- line: 87
-		-- upvalues: v28 (copy)
-		local p2Parent = p2.Parent
+local function ScrollBar(props)
+	local userInteractionEnabled = props.userInteractionEnabled
+	local width = props.width
+	local anchorPoint = props.anchorPoint
+	local position = props.position
+	local zIndex = props.zIndex
+	local transparency = props.transparency
+	local backgroundColor = props.backgroundColor
+	local paddingStartEnd = props.paddingStartEnd
 
-		if p2Parent ~= nil and math.ceil(p2.AbsoluteSize.Y) < p2Parent.AbsoluteSize.Y then
-			v28(true)
+	local handleWidth = props.handleWidth
+	local handleColor = props.handleColor
+	local handleCornerRadius = props.handleCornerRadius
+	local handleIcon = props.handleIcon
+	local handleIconSize = props.handleIconSize
+	local handleIconColor = props.handleIconColor
+	local onDragging = props.onDragging
 
-			return
+	local viewSize = props.viewSize
+	local canvasSize = props.canvasSize
+	local canvasPosition = props.canvasPosition
+
+	local state, setState = React.useState(false)
+	local v, v2 = React.useBinding(0)
+	local state2, setState2 = React.useState(false)
+	local ref = React.useRef(0)
+	local ref2 = React.useRef(0)
+
+	local v3 = React.useCallback(function(p)
+		v2(p.AbsoluteSize.Y)
+	end, { v2 })
+
+	local v4 = React.useCallback(function(p)
+		local parent4 = p.Parent
+
+		if parent4 == nil or not (math.ceil(p.AbsoluteSize.Y) < parent4.AbsoluteSize.Y) then
+			setState(false)
+		else
+			setState(true)
 		end
+	end, { setState })
 
-		v28(false)
-	end, { v28 })
-	local v37 = React.useMemo(function() -- line: 96
-		-- upvalues: React (copy), viewSize (copy), canvasSize (copy), handleWidth (copy)
-		return React.joinBindings({
-			viewSize = viewSize,
-			canvasSize = canvasSize
-		}):map(function(p3) -- line: 100
-			-- upvalues: handleWidth (copy)
-			local v58 = math.clamp(p3.viewSize.Y / p3.canvasSize.Y, 0, 1)
-
-			return UDim2.new(0, handleWidth, v58, 0)
+	local size = React.useMemo(function()
+		return React.joinBindings({ viewSize = viewSize, canvasSize = canvasSize }):map(function(p)
+			local v5 = math.clamp(p.viewSize.Y / p.canvasSize.Y, 0, 1)
+			return UDim2.new(0, handleWidth, v5, 0)
 		end)
-	end, {
-		handleWidth,
-		viewSize,
-		canvasSize
-	})
-	local v38 = React.useMemo(function() -- line: 108
-		-- upvalues: React (copy), canvasPosition (copy), canvasSize (copy)
-		return React.joinBindings({
-			canvasPosition = canvasPosition,
-			canvasSize = canvasSize
-		}):map(function(p4) -- line: 112
-			local v60 = p4.canvasPosition.Y / p4.canvasSize.Y
+	end, { handleWidth, viewSize, canvasSize })
 
-			return UDim2.fromScale(0.5, v60)
+	local position2 = React.useMemo(function()
+		return React.joinBindings({ canvasPosition = canvasPosition, canvasSize = canvasSize }):map(function(p)
+			local v5 = p.canvasPosition.Y / p.canvasSize.Y
+			return UDim2.fromScale(0.5, v5)
 		end)
-	end, {
-		canvasSize,
-		canvasPosition
-	})
-	local v39 = React.useCallback(function(_, p6) -- line: 120
-		-- upvalues: v27 (copy), userInteractionEnabled (copy), v31 (copy), v33 (copy), v34 (copy), canvasPosition (copy), v32 (copy)
-		if not v27 or (not userInteractionEnabled or v31) then
+	end, { canvasSize, canvasPosition })
+
+	local v5 = React.useCallback(function(_, p)
+		if not state or not userInteractionEnabled or state2 then
 			return
 		end
 
-		if p6 and p6.UserInputType == Enum.UserInputType.MouseButton1 then
-			v33.current = p6.Position.Y
-			v34.current = canvasPosition:getValue().Y
-			v32(true)
+		if p and p.UserInputType == Enum.UserInputType.MouseButton1 then
+			ref.current = p.Position.Y
+			ref2.current = canvasPosition:getValue().Y
+
+			setState2(true)
 		end
-	end, {
-		v27,
-		userInteractionEnabled,
-		v31,
-		v33,
-		v34,
-		canvasPosition,
-		v32
-	})
-	local v40 = React.useCallback(function(p7) -- line: 141
-		-- upvalues: userInteractionEnabled (copy), v31 (copy), v33 (copy), v29 (copy), paddingStartEnd (copy), viewSize (copy), v34 (copy), canvasSize (copy), onDragging (copy)
-		if not userInteractionEnabled or not v31 then
+	end, { state, userInteractionEnabled, state2, ref, ref2, canvasPosition, setState2 })
+
+	local v6 = React.useCallback(function(p)
+		if not (userInteractionEnabled and state2 and p.UserInputType == Enum.UserInputType.MouseMovement) then
 			return
 		end
 
-		if p7.UserInputType ~= Enum.UserInputType.MouseMovement then
-			return
-		end
+		local v6 = (p.Position.Y - ref.current) / (v:getValue() - paddingStartEnd)
 
-		local v48 = (p7.Position.Y - v33.current) / (v29:getValue() - paddingStartEnd)
-		local Y = viewSize:getValue().Y
-		local current = v34.current
-		local Y2 = canvasSize:getValue().Y
-		local v52 = math.clamp(current + v48 * Y2, 0, Y2 - Y)
-
-		onDragging(v52)
+		local y = viewSize:getValue().Y
+		local current = ref2.current
+		local y2 = canvasSize:getValue().Y
+		onDragging((math.clamp(current + v6 * y2, 0, y2 - y)))
 	end, {
 		userInteractionEnabled,
-		v31,
-		v33,
-		v29,
+		state2,
+		ref,
+		v,
 		paddingStartEnd,
 		viewSize,
-		v34,
+		ref2,
 		canvasSize,
 		onDragging
 	})
-	local v41 = React.useCallback(function(p8) -- line: 172
-		-- upvalues: userInteractionEnabled (copy), v31 (copy), v32 (copy)
-		if not userInteractionEnabled or not v31 then
+
+	local v7 = React.useCallback(function(p)
+		if not (userInteractionEnabled and state2) or p and p.UserInputType ~= Enum.UserInputType.MouseButton1 then
 			return
 		end
 
-		if p8 and p8.UserInputType ~= Enum.UserInputType.MouseButton1 then
-			return
+		setState2(false)
+	end, { userInteractionEnabled, state2, setState2 })
+
+	React.useEffect(function()
+		if not (state and state2) then
+			return function() end
 		end
 
-		v32(false)
-	end, {
-		userInteractionEnabled,
-		v31,
-		v32
-	})
+		local inputChangedConnection = UserInputService.InputChanged:Connect(v6)
+		local inputEndedConnection = UserInputService.InputEnded:Connect(v7)
+		local windowFocusReleasedConnection = UserInputService.WindowFocusReleased:Connect(v7)
 
-	React.useEffect(function() -- line: 184
-		-- upvalues: v27 (copy), v31 (copy), UserInputService (copy), v40 (copy), v41 (copy)
-		if not v27 or not v31 then
-			return function() -- line: 186
-			end
+		return function()
+			inputChangedConnection:Disconnect()
+			inputEndedConnection:Disconnect()
+			windowFocusReleasedConnection:Disconnect()
 		end
+	end, { state, state2, v6, v7 })
 
-		local connection = UserInputService.InputChanged:Connect(v40)
-		local connection2 = UserInputService.InputEnded:Connect(v41)
-		local connection3 = UserInputService.WindowFocusReleased:Connect(v41)
-
-		return function() -- line: 193
-			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
-			connection3:Disconnect()
-		end
-	end, {
-		v27,
-		v31,
-		v40,
-		v41
-	})
-
-	if not v27 then
-		transparency = 1
-	elseif v31 then
-		transparency = 0
-	end
-
-	return React.createElement("CanvasGroup", {
+	local createElement = React.createElement
+	local v8 = {
 		Selectable = false,
-		BorderSizePixel = 0,
 		Size = UDim2.new(0, width, 1, 0),
 		AnchorPoint = anchorPoint,
 		Position = position,
-		GroupTransparency = transparency,
-		BackgroundColor3 = if not backgroundColor then nil else backgroundColor.Color,
-		BackgroundTransparency = not backgroundColor and 1 or backgroundColor.Transparency,
-		ZIndex = zIndex
-	}, {
-		Padding = if not paddingStartEnd then nil else React.createElement("UIPadding", {
+		GroupTransparency = not state and 1 or state2 and 0 or transparency,
+		BackgroundColor3 = 0,
+		BackgroundTransparency = 0,
+		BorderSizePixel = 0,
+		ZIndex = 0
+	}
+	local backgroundColor2
+
+	if backgroundColor then
+		backgroundColor2 = backgroundColor.Color
+	end
+
+	v8.BackgroundColor3 = backgroundColor2
+	v8.BackgroundTransparency = not backgroundColor and 1 or backgroundColor.Transparency
+
+	v8.ZIndex = zIndex
+	local padding
+
+	if paddingStartEnd then
+		padding = React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, paddingStartEnd),
 			PaddingBottom = UDim.new(0, paddingStartEnd)
-		}),
-		Track = React.createElement("Frame", {
+		})
+	end
+
+	local createElement2 = React.createElement
+	local v9 = {
+		Selectable = false,
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ClipsDescendants = true,
+		[React.Change.AbsoluteSize] = v3
+	}
+	local trackUICorner
+
+	if handleCornerRadius then
+		trackUICorner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, handleCornerRadius)
+		})
+	end
+
+	local createElement3 = React.createElement
+	local v10 = {
+		["Active"] = nil,
+		["Active"] = nil,
+		["Active"] = nil,
+		["Active"] = nil,
+		Active = state and userInteractionEnabled,
+		Selectable = false,
+		Size = size,
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = position2
+	}
+	local backgroundColor3
+
+	if handleColor then
+		backgroundColor3 = handleColor.Color
+	end
+
+	v10.BackgroundColor3 = backgroundColor3
+	v10.BackgroundTransparency = not handleColor and 0 or handleColor.Transparency
+	v10.BorderSizePixel = 0
+	v10[React.Change.AbsoluteSize] = v4
+	v10[React.Event.InputBegan] = v5
+	local handleUICorner
+
+	if handleCornerRadius then
+		handleUICorner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, handleCornerRadius)
+		})
+	end
+
+	local icon
+
+	if handleIcon then
+		local createElement4 = React.createElement
+		local label = ImageSetComponent.Label
+		local v11 = {
 			Selectable = false,
-			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			ClipsDescendants = true,
-			[React.Change.AbsoluteSize] = v35
-		}, {
-			TrackUICorner = if not handleCornerRadius then nil else React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, handleCornerRadius)
-			}),
-			Handle = React.createElement("Frame", {
-				Active = v27 and userInteractionEnabled,
-				Selectable = false,
-				Size = v37,
-				AnchorPoint = Vector2.new(0.5, 0),
-				Position = v38,
-				BackgroundColor3 = if not handleColor then nil else handleColor.Color,
-				BackgroundTransparency = not handleColor and 0 or handleColor.Transparency,
-				BorderSizePixel = 0,
-				[React.Change.AbsoluteSize] = v36,
-				[React.Event.InputBegan] = v39
-			}, {
-				HandleUICorner = if not handleCornerRadius then nil else React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, handleCornerRadius)
-				}),
-				Icon = if not handleIcon then nil else React.createElement(ImageSetComponent.Label, {
-					Selectable = false,
-					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(handleIconSize, handleIconSize),
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.fromScale(0.5, 0.5),
-					Image = handleIcon,
-					ImageColor3 = if not handleIconColor then nil else handleIconColor.Color,
-					ImageTransparency = if not handleIconColor then nil else handleIconColor.Transparency
-				})
-			})
+			Size = UDim2.fromOffset(handleIconSize, handleIconSize),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Image = handleIcon,
+			ImageColor3 = 0,
+			ImageTransparency = 0,
+			BackgroundTransparency = 1
+		}
+		local imageColor
+
+		if handleIconColor then
+			imageColor = handleIconColor.Color
+		end
+
+		v11.ImageColor3 = imageColor
+		local imageTransparency
+
+		if handleIconColor then
+			imageTransparency = handleIconColor.Transparency
+		end
+
+		v11.ImageTransparency = imageTransparency
+		icon = createElement4(label, v11)
+	end
+
+	return createElement("CanvasGroup", v8, {
+		Padding = padding,
+		Track = createElement2("Frame", v9, {
+			TrackUICorner = trackUICorner,
+			Handle = createElement3("Frame", v10, { HandleUICorner = handleUICorner, Icon = icon })
 		})
 	})
 end

@@ -1,79 +1,76 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
 local dependencies = require(SocialLibraries.dependencies)
-local RoduxPresence = dependencies.RoduxPresence
-local UserModel = dependencies.UserModel
+local roduxPresence = dependencies.RoduxPresence
+local userModel = dependencies.UserModel
 local t = dependencies.t
-local PresenceType = RoduxPresence.Enums.PresenceType
-local _ = {
-	InGame = 3,
-	Online = 2,
-	InStudio = 1,
-	Offline = 0
-}
-local t1 = {
-	[PresenceType.InGame.rawValue()] = 3,
-	[PresenceType.Online.rawValue()] = 2,
-	[PresenceType.InStudio.rawValue()] = 1,
-	[PresenceType.Offline.rawValue()] = 0
-}
-local t2 = {
-	[UserModel.PresenceType.IN_GAME] = 3,
-	[UserModel.PresenceType.ONLINE] = 2,
-	[UserModel.PresenceType.IN_STUDIO] = 1,
-	[UserModel.PresenceType.OFFLINE] = 0
+local presenceType = roduxPresence.Enums.PresenceType
+
+local _ = { InGame = 3, Online = 2, InStudio = 1, Offline = 0 }
+
+local v = {
+	[presenceType.InGame.rawValue()] = 3,
+	[presenceType.Online.rawValue()] = 2,
+	[presenceType.InStudio.rawValue()] = 1,
+	[presenceType.Offline.rawValue()] = 0
 }
 
-return function(t3: {[any]: any}, t4: {[any]: any}) -- line: 94
-	-- upvalues: PresenceType (copy), t (copy), t1 (copy), UserModel (copy), t2 (copy)
-	local n1 = 0
-	local n2 = 0
+local v2 = {
+	[userModel.PresenceType.IN_GAME] = 3,
+	[userModel.PresenceType.ONLINE] = 2,
+	[userModel.PresenceType.IN_STUDIO] = 1,
+	[userModel.PresenceType.OFFLINE] = 0
+}
 
-	if t3.userPresenceType and t4.userPresenceType then
-		local userPresenceType = t3.userPresenceType
-		local v47 = t3.lastLocation or ""
-		local v48 = if userPresenceType ~= PresenceType.InGame and userPresenceType ~= PresenceType.InStudio or #v47 ~= 0 then userPresenceType.rawValue() else PresenceType.Online.rawValue()
+local function fn(p, p2) -- 1 equivalent call inferred from this helper
+	local v3 = 0
+	local v4 = 0
 
-		n1 = t.number(v48) and t1[v48] or t1[PresenceType.Offline]
+	if p.userPresenceType and p2.userPresenceType then
+		v3 = UNNAMED_122(p) -- inferred equivalent call
+		local v5 = UNNAMED_120(p2) -- inferred equivalent call
+		v4 = t.number(v5) and v[v5]
 
-		local userPresenceType2 = t4.userPresenceType
-		local v50 = t4.lastLocation or ""
-		local v51 = if userPresenceType2 ~= PresenceType.InGame and userPresenceType2 ~= PresenceType.InStudio or #v50 ~= 0 then userPresenceType2.rawValue() else PresenceType.Online.rawValue()
+		if v4 then
+			return v3, v4
+		end
 
-		n2 = t.number(v51) and t1[v51] or t1[PresenceType.Offline]
-	elseif t3.presence and t4.presence then
-		local presence = t3.presence
-		local v53 = t3.lastLocation or ""
-		local v54 = if presence ~= UserModel.PresenceType.IN_GAME and presence ~= UserModel.PresenceType.IN_STUDIO or #v53 ~= 0 then presence else UserModel.PresenceType.ONLINE
-
-		n1 = t.string(v54) and t2[v54] or t2[UserModel.PresenceType.OFFLINE]
-
-		local presence2 = t4.presence
-		local v56 = t4.lastLocation or ""
-		local v57 = if presence2 ~= UserModel.PresenceType.IN_GAME and presence2 ~= UserModel.PresenceType.IN_STUDIO or #v56 ~= 0 then presence2 else UserModel.PresenceType.ONLINE
-
-		n2 = t.string(v57) and t2[v57] or t2[UserModel.PresenceType.OFFLINE]
+		return v3, v[presenceType.Offline]
 	end
 
-	if n1 ~= n2 then
-		return n2 < n1
+	if p.presence and p2.presence then
+		v3 = UNNAMED_123(p) -- inferred equivalent call
+		local v5 = UNNAMED_121(p2) -- inferred equivalent call
+		v4 = t.string(v5) and v2[v5] or v2[userModel.PresenceType.OFFLINE]
 	end
 
-	local v58 = t.number(t3.friendRank) and t3.friendRank or 0
-	local v59 = t.number(t4.friendRank) and t4.friendRank or 0
+	return v3, v4
+end
 
-	if v58 ~= v59 then
-		return v58 < v59
+local function fn2(p, p2) -- 1 equivalent call inferred from this helper
+	return p.username or p.name or "", p2.username or p2.name or ""
+end
+
+return function(p, p2): boolean
+	local v3, v4 = fn(p, p2) -- inferred equivalent call
+
+	if v3 ~= v4 then
+		return v4 < v3
 	end
 
-	local v60 = t.string(t3.displayName) and t3.displayName or ""
-	local v61 = t.string(t4.displayName) and t4.displayName or ""
+	local friendRank = t.number(p.friendRank) and p.friendRank or 0
+	local friendRank2 = t.number(p2.friendRank) and p2.friendRank or 0
 
-	if string.lower(v60) ~= string.lower(v61) then
-		return string.lower(v60) < string.lower(v61)
+	if friendRank ~= friendRank2 then
+		return friendRank < friendRank2
 	end
 
-	local v62 = t3.username or (t3.name or "")
-	local v63 = t4.username or (t4.name or "")
+	local displayName = t.string(p.displayName) and p.displayName or ""
+	local displayName2 = t.string(p2.displayName) and p2.displayName or ""
 
-	return string.lower(v62) < string.lower(v63)
+	if string.lower(displayName) ~= string.lower(displayName2) then
+		return string.lower(displayName) < string.lower(displayName2)
+	end
+
+	local v5, v6 = fn2(p, p2) -- inferred equivalent call
+	return string.lower(v5) < string.lower(v6)
 end

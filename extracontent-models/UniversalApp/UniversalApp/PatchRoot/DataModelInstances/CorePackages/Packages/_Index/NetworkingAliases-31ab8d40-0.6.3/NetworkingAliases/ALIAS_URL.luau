@@ -1,3 +1,3 @@
-local ParentParent = script.Parent.Parent
-
-return require(ParentParent.Util).buildApiSiteUrl("contacts")
+local parent = script.Parent.Parent
+local Util = require(parent.Util)
+return Util.buildApiSiteUrl("contacts")

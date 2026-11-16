@@ -1,11 +1,11 @@
-return function(b1: boolean?, s1: string?, s2: string?) -- line: 1
-	if s1 == nil or s1 == "" then
-		return s2 or ""
+return function(flag: boolean?, value: string?, value2: string?)
+	if value == nil or value == "" then
+		return value2 or ""
 	end
 
-	if b1 then
-		return s1 or ""
+	if flag then
+		return value or ""
 	end
 
-	return s2 or ""
+	return value2 or ""
 end

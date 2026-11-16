@@ -1,119 +1,108 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent
+
+local parent = script.Parent.Parent
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
-local UtilityFunctions = require(ParentParent.UtilityFunctions)
-local GetAssetFavoriteCount = require(ParentParent.Thunks.GetAssetFavoriteCount)
-local GetBundleFavoriteCount = require(ParentParent.Thunks.GetBundleFavoriteCount)
-local GotCurrentFavoriteCount = require(ParentParent.Selectors.GotCurrentFavoriteCount)
-local getSelectionImageObjectRegular = require(ParentParent.getSelectionImageObjectRegular)
-local v11 = Roact.PureComponent:extend("Favorites")
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
+local UtilityFunctions = require(parent.UtilityFunctions)
+local GetAssetFavoriteCount = require(parent.Thunks.GetAssetFavoriteCount)
+local GetBundleFavoriteCount = require(parent.Thunks.GetBundleFavoriteCount)
+local GotCurrentFavoriteCount = require(parent.Selectors.GotCurrentFavoriteCount)
+local getSelectionImageObjectRegular = require(parent.getSelectionImageObjectRegular)
 
-function v11.setText(p1) -- line: 22
-	-- upvalues: UtilityFunctions (copy)
-	local v13 = p1.props.assetInfo or {}
-	local v14 = v13.parentBundleId ~= nil
-	local bundleInfo = p1.props.bundleInfo
+local extended = Roact.PureComponent:extend("Favorites")
 
-	if v14 then
-		local v16 = UtilityFunctions.getBundleId(v13)
+function extended:setText()
+	local assetInfo = self.props.assetInfo or {}
+	local v = assetInfo.parentBundleId ~= nil
 
-		if bundleInfo[v16] then
-			p1.numFavorites = bundleInfo[v16].numFavorites
+	local bundleInfo = self.props.bundleInfo
 
-			return
+	if v then
+		local bundleId = UtilityFunctions.getBundleId(assetInfo)
+
+		if bundleInfo[bundleId] then
+			self.numFavorites = bundleInfo[bundleId].numFavorites
 		end
-	elseif v13 then
-		p1.numFavorites = v13.numFavorites
+	elseif assetInfo then
+		self.numFavorites = assetInfo.numFavorites
 	end
 end
-function v11.init(p2) -- line: 38
-	-- upvalues: getSelectionImageObjectRegular (copy)
-	p2.numFavorites = ""
-	p2.selectionImageObject = getSelectionImageObjectRegular()
+
+function extended:init()
+	self.numFavorites = ""
+	self.selectionImageObject = getSelectionImageObjectRegular()
 end
-function v11.willUpdate(p3, p4) -- line: 43
-	-- upvalues: UtilityFunctions (copy)
-	local getAssetFavoriteCount = p3.props.getAssetFavoriteCount
-	local getBundleFavoriteCount = p3.props.getBundleFavoriteCount
 
-	if p4.assetInfo then
-		local assetInfo = p4.assetInfo
-		local v23 = assetInfo.parentBundleId ~= nil
+function extended.willUpdate(p, p2)
+	local getAssetFavoriteCount = p.props.getAssetFavoriteCount
+	local getBundleFavoriteCount = p.props.getBundleFavoriteCount
 
-		if not p4.gotCurrentFavoriteCount then
-			coroutine.wrap(function() -- line: 58
-				-- upvalues: v23 (copy), getAssetFavoriteCount (copy), assetInfo (copy), UtilityFunctions (copy), getBundleFavoriteCount (copy)
-				if not v23 then
+	if p2.assetInfo then
+		local assetInfo = p2.assetInfo
+		local v = assetInfo.parentBundleId ~= nil
+
+		if not p2.gotCurrentFavoriteCount then
+			coroutine.wrap(function()
+				if v then
+					getBundleFavoriteCount((UtilityFunctions.getBundleId(assetInfo)))
+				else
 					getAssetFavoriteCount(assetInfo.assetId)
-
-					return
 				end
-
-				local v31 = UtilityFunctions.getBundleId(assetInfo)
-
-				getBundleFavoriteCount(v31)
 			end)()
 		end
 	end
 end
-function v11.render(p5) -- line: 70
-	-- upvalues: Roact (copy), AppFonts (copy)
-	p5:setText()
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = 3,
-		Size = UDim2.new(1, 0, 0, 16)
-	}, {
-		FavoriteIcon = Roact.createElement("ImageButton", {
-			Selectable = false,
-			BackgroundTransparency = 1,
-			Image = "rbxasset://textures/ui/InspectMenu/ico_favorite.png",
-			Size = UDim2.new(0, 16, 0, 16),
-			SelectionImageObject = p5.selectionImageObject
-		}),
-		FavoriteText = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			TextSize = 12,
-			Size = UDim2.new(1, -16, 1, 0),
-			Position = UDim2.new(0, 21, 0, 0),
-			Text = p5.numFavorites or "",
-			Font = AppFonts.default:getDefault(),
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextColor3 = Color3.new(1, 1, 1)
-		})
-	})
-end
-function v11.shouldUpdate(_, p7) -- line: 98
-	if not p7.detailsInformation.viewingDetails then
-		return false
-	end
+function extended:render()
+	self:setText()
 
-	return true
+	return Roact.createElement(
+		"Frame",
+		{ Size = UDim2.new(1, 0, 0, 16), BackgroundTransparency = 1, LayoutOrder = 3 },
+		{
+			FavoriteIcon = Roact.createElement("ImageButton", {
+				Selectable = false,
+				Size = UDim2.new(0, 16, 0, 16),
+				BackgroundTransparency = 1,
+				Image = "rbxasset://textures/ui/InspectMenu/ico_favorite.png",
+				SelectionImageObject = self.selectionImageObject
+			}),
+			FavoriteText = Roact.createElement("TextLabel", {
+				Size = UDim2.new(1, -16, 1, 0),
+				Position = UDim2.new(0, 21, 0, 0),
+				BackgroundTransparency = 1,
+				Text = self.numFavorites or "",
+				Font = AppFonts.default:getDefault(),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextSize = 12,
+				TextColor3 = Color3.new(1, 1, 1)
+			})
+		}
+	)
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p8, _) -- line: 106
-	-- upvalues: GotCurrentFavoriteCount (copy)
-	local assetId = p8.detailsInformation.assetId
+function extended.shouldUpdate(_, p): boolean
+	return if p.detailsInformation.viewingDetails then true else false
+end
+
+return RoactRodux.UNSTABLE_connect2(function(data, _)
+	local assetId = data.detailsInformation.assetId
 
 	return {
-		detailsInformation = p8.detailsInformation,
-		assetInfo = p8.assets[assetId],
-		bundleInfo = p8.bundles,
-		gotCurrentFavoriteCount = GotCurrentFavoriteCount(p8)
+		detailsInformation = data.detailsInformation,
+		assetInfo = data.assets[assetId],
+		bundleInfo = data.bundles,
+		gotCurrentFavoriteCount = GotCurrentFavoriteCount(data)
 	}
-end, function(p10) -- line: 115
-	-- upvalues: GetAssetFavoriteCount (copy), GetBundleFavoriteCount (copy)
+end, function(callback)
 	return {
-		getAssetFavoriteCount = function(p11) -- line: 117
-			-- upvalues: p10 (copy), GetAssetFavoriteCount (copy)
-			p10(GetAssetFavoriteCount(p11))
+		getAssetFavoriteCount = function(p)
+			callback(GetAssetFavoriteCount(p))
 		end,
-		getBundleFavoriteCount = function(p12) -- line: 120
-			-- upvalues: p10 (copy), GetBundleFavoriteCount (copy)
-			p10(GetBundleFavoriteCount(p12))
+		getBundleFavoriteCount = function(p)
+			callback(GetBundleFavoriteCount(p))
 		end
 	}
-end)(v11)
+end)(extended)

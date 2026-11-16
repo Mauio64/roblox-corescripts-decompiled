@@ -1,150 +1,141 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local CoreGui = require(Foundation.Utility.Wrappers).Services.CoreGui
-local GuiService = require(Foundation.Utility.Wrappers).Services.GuiService
-local Dash = require(FoundationParent.Dash)
-local React = require(FoundationParent.React)
-local useRefCache = require(FoundationParent.ReactUtils).useRefCache
+local parent = Foundation.Parent
+
+local Wrappers = require(Foundation.Utility.Wrappers)
+local CoreGui = Wrappers.Services.CoreGui
+local Wrappers2 = require(Foundation.Utility.Wrappers)
+local GuiService = Wrappers2.Services.GuiService
+
+local Dash = require(parent.Dash)
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useRefCache = ReactUtils.useRefCache
 local isPluginSecurity = require(Foundation.Utility.isPluginSecurity)
+
 local Cursor = require(script.Parent.Cursors.Cursor)
 local CursorComponent = require(script.Parent.CursorComponent)
 local CursorContext = require(script.Parent.CursorContext)
-
 require(Foundation.Enums.CursorType)
-
 local KeyUtilities = require(script.Parent.KeyUtilities)
 
 require(Foundation.Enums.ColorNamespace)
-require(Foundation.Components.Types)
 
+require(Foundation.Components.Types)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 
-local function CursorProvider(t1: {[any]: any}) -- line: 28
-	-- upvalues: React (copy), useRefCache (copy), useTokens (copy), KeyUtilities (copy), Dash (copy), Cursor (copy), CursorComponent (copy), isPluginSecurity (copy), CoreGui (copy), GuiService (copy), CursorContext (copy)
-	local v16, v17 = React.useState({})
-	local v18 = React.useRef(nil)
-	local v19, v20 = React.useState(nil)
-	local v21 = useRefCache()
-	local v22 = useTokens()
-	local v23 = React.useMemo(function() -- line: 35
-		-- upvalues: v21 (copy), v17 (copy), KeyUtilities (copy), v22 (copy), Dash (copy)
-		return {
-			refCache = v21,
-			setMountedCursors = v17,
-			getCursor = function(p1) -- line: 39
-				-- upvalues: KeyUtilities (copy), v22 (copy), v17 (copy), Dash (copy), v21 (copy)
-				local v40 = KeyUtilities.mapCursorToKey(p1, v22)
+local function CursorProvider(p)
+	local state, setState = React.useState({})
+	local ref = React.useRef(nil)
+	local state2, setState2 = React.useState(nil)
+	local refCache = useRefCache()
+	local v = useTokens()
 
-				v17(function(p2) -- line: 42
-					-- upvalues: v40 (copy), Dash (copy)
-					if p2[v40] == nil then
-						return Dash.union(p2, {
-							[v40] = true
-						})
+	local v2 = React.useMemo(function()
+		return {
+			refCache = refCache,
+			setMountedCursors = setState,
+			getCursor = function(p2)
+				local mapCursorToKey = KeyUtilities.mapCursorToKey(p2, v)
+
+				setState(function(p3)
+					if p3[mapCursorToKey] == nil then
+						return Dash.union(p3, { [mapCursorToKey] = true })
 					end
 
-					return p2
+					return p3
 				end)
 
-				return v21[v40]
+				return refCache[mapCursorToKey]
 			end
 		}
-	end, {
-		v21,
-		v17,
-		v22
-	})
+	end, { refCache, setState, v })
 
-	React.useEffect(function() -- line: 93
-		-- upvalues: v18 (copy), isPluginSecurity (copy), CoreGui (copy), GuiService (copy), v20 (copy)
-		if v18.current == nil or not game:IsAncestorOf(v18.current) then
+	local function fn()
+		local children = {}
+
+		for k, _ in state do
+			local isVisible
+
+			if refCache[k] == nil or state2 == nil then
+				isVisible = false
+			else
+				isVisible = refCache[k].current == state2
+			end
+
+			local v3 = string.split(k, " ")
+
+			if #v3 == 2 then
+				local decodeCursorTypeKey, colorNamespace = KeyUtilities.decodeCursorTypeKey(v3)
+
+				children[k] = React.createElement(Cursor, {
+					ref = refCache[k],
+					isVisible = isVisible,
+					cursorType = decodeCursorTypeKey,
+					colorNamespace = colorNamespace
+				})
+			else
+				local decodeKey, offset, borderWidth, colorNamespace = KeyUtilities.decodeKey(v3)
+
+				children[k] = React.createElement(CursorComponent, {
+					ref = refCache[k],
+					isVisible = isVisible,
+					cornerRadius = decodeKey,
+					offset = offset,
+					borderWidth = borderWidth,
+					colorNamespace = colorNamespace
+				})
+			end
+		end
+
+		return children
+	end
+
+	React.useEffect(function()
+		if ref.current == nil or not game:IsAncestorOf(ref.current) then
 			return
 		end
 
-		local v35 = isPluginSecurity() and v18.current:IsDescendantOf(CoreGui)
+		local v3 = isPluginSecurity() and ref.current:IsDescendantOf(CoreGui)
 
-		local function setUpSelectionImageObjectConnection() -- line: 100
-			-- upvalues: v35 (copy), GuiService (copy), v20 (copy)
-			if v35 then
-				return GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 105
-					-- upvalues: GuiService (copy), v20 (copy)
+		local function setUpSelectionImageObjectConnection()
+			if v3 then
+				return GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function()
 					if GuiService.SelectedCoreObject == nil then
-						v20(nil)
-
-						return
+						setState2(nil)
+					else
+						setState2(GuiService.SelectedCoreObject.SelectionImageObject)
 					end
-
-					v20(GuiService.SelectedCoreObject.SelectionImageObject)
 				end)
 			end
 
-			return GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(function() -- line: 113
-				-- upvalues: GuiService (copy), v20 (copy)
+			return GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(function()
 				if GuiService.SelectedObject == nil then
-					v20(nil)
-
-					return
+					setState2(nil)
+				else
+					setState2(GuiService.SelectedObject.SelectionImageObject)
 				end
-
-				v20(GuiService.SelectedObject.SelectionImageObject)
 			end)
 		end
 
-		local u37 = setUpSelectionImageObjectConnection()
-		local connection = v18.current.AncestryChanged:Connect(function() -- line: 124
-			-- upvalues: u37 (ref), setUpSelectionImageObjectConnection (copy)
-			u37:Disconnect()
-			u37 = setUpSelectionImageObjectConnection()
+		local connection = setUpSelectionImageObjectConnection()
+		local ancestryChangedConnection = ref.current.AncestryChanged:Connect(function()
+			connection:Disconnect()
+			connection = setUpSelectionImageObjectConnection()
 		end)
 
-		return function() -- line: 134
-			-- upvalues: u37 (ref), connection (copy)
-			u37:Disconnect()
+		return function()
 			connection:Disconnect()
+			ancestryChangedConnection:Disconnect()
 		end
 	end, {})
 
-	return React.createElement(CursorContext.Provider, {
-		value = v23
-	}, {
-		Children = React.createElement(React.Fragment, {}, t1.children),
-		FoundationCursorContainer = React.createElement("Frame", {
-			Visible = false,
-			Size = UDim2.new(0, 0, 0, 0),
-			ref = v18
-		}, ((function() -- line: 56
-			-- upvalues: v16 (copy), v21 (copy), v19 (copy), KeyUtilities (copy), React (copy), Cursor (copy), CursorComponent (copy)
-			local t2 = {}
-
-			for v25, _ in v16 do
-				local v27 = v21[v25] ~= nil and (v19 ~= nil and v21[v25].current == v19)
-				local parts = string.split(v25, " ")
-
-				if #parts == 2 then
-					local v29, v30 = KeyUtilities.decodeCursorTypeKey(parts)
-
-					t2[v25] = React.createElement(Cursor, {
-						ref = v21[v25],
-						isVisible = v27,
-						cursorType = v29,
-						colorNamespace = v30
-					})
-				else
-					local v31, v32, v33, v34 = KeyUtilities.decodeKey(parts)
-
-					t2[v25] = React.createElement(CursorComponent, {
-						ref = v21[v25],
-						isVisible = v27,
-						cornerRadius = v31,
-						offset = v32,
-						borderWidth = v33,
-						colorNamespace = v34
-					})
-				end
-			end
-
-			return t2
-		end)()))
+	return React.createElement(CursorContext.Provider, { value = v2 }, {
+		Children = React.createElement(React.Fragment, {}, p.children),
+		FoundationCursorContainer = React.createElement(
+			"Frame",
+			{ Size = UDim2.new(0, 0, 0, 0), Visible = false, ref = ref },
+			fn()
+		)
 	})
 end
 

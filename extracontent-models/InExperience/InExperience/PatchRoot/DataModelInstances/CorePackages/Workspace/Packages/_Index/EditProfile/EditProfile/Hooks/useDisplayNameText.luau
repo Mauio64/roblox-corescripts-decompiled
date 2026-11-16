@@ -1,11 +1,15 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
+local parent = EditProfile.Parent
 local TextKeys = require(EditProfile.Common.TextKeys)
 local RealNamesInDisplayNamesIXP = require(EditProfile.Flags.RealNamesInDisplayNamesIXP)
+
 local FFlagEditProfileDisplayNameUseUnder17Description = require(EditProfile.Flags.FFlagEditProfileDisplayNameUseUnder17Description)
 local useRealNamesInDisplayNamesEnabled = require(script.Parent.useRealNamesInDisplayNamesEnabled)
-local useLocalization = require(EditProfileParent.Localization).Hooks.useLocalization
-local t1 = {
+local Localization = require(parent.Localization)
+
+local useLocalization = Localization.Hooks.useLocalization
+
+local v = {
 	displayNameCaption = TextKeys.DisplayNameCaption,
 	displayNameChangeError = TextKeys.DisplayNameError,
 	displayNameChangeMixedCharactersError = TextKeys.DisplayNameError,
@@ -23,7 +27,8 @@ local t1 = {
 	nameNotAvailableError = TextKeys.NameNotAvailableError,
 	searchForFriendsPrompt = TextKeys.SearchForFriendPrompt
 }
-local t2 = {
+
+local v2 = {
 	displayNameCaption = TextKeys.AgedUpDisplayNameConnectionsCaption,
 	displayNameChangeError = TextKeys.AgedUpDisplayNameError,
 	displayNameChangeMixedCharactersError = TextKeys.AgedUpDisplayNameMixedCharactersError,
@@ -42,18 +47,21 @@ local t2 = {
 	searchForFriendsPrompt = TextKeys.AgedUpSearchForFriendsPrompt
 }
 
-return function() -- line: 55
-	-- upvalues: useRealNamesInDisplayNamesEnabled (copy), RealNamesInDisplayNamesIXP (copy), t2 (copy), t1 (copy), FFlagEditProfileDisplayNameUseUnder17Description (copy), useLocalization (copy)
-	local v10 = useRealNamesInDisplayNamesEnabled()
-	local v11 = if not RealNamesInDisplayNamesIXP.useIsExperimentEnabled({
-		isExposureEnabled = true
-	}) or not v10 then t1 else t2
+return function()
+	local v3 = useRealNamesInDisplayNamesEnabled()
+	local v4
 
-	if FFlagEditProfileDisplayNameUseUnder17Description then
-		v11 = table.clone(v11)
-		v11.displayNameCaption = t1.displayNameCaption
-		v11.displayNameModalCaption = t1.displayNameModalCaption
+	if RealNamesInDisplayNamesIXP.useIsExperimentEnabled({ isExposureEnabled = true }) and v3 then
+		v4 = v2
+	else
+		v4 = v
 	end
 
-	return useLocalization(v11)
+	if FFlagEditProfileDisplayNameUseUnder17Description then
+		v4 = table.clone(v4)
+		v4.displayNameCaption = v.displayNameCaption
+		v4.displayNameModalCaption = v.displayNameModalCaption
+	end
+
+	return useLocalization(v4)
 end

@@ -1,4 +1,1 @@
-return {
-	Start = "Start",
-	End = "End"
-}
+return { Start = "Start", End = "End" }

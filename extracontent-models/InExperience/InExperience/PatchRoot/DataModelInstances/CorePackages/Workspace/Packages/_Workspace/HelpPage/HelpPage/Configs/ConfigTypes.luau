@@ -1,6 +1,5 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent.Enums.ExtraKeysEnum)
-require(ParentParent.Enums.TouchControlsEnum)
+local parent = script.Parent.Parent
+require(parent.Enums.ExtraKeysEnum)
+require(parent.Enums.TouchControlsEnum)
 
 return {}

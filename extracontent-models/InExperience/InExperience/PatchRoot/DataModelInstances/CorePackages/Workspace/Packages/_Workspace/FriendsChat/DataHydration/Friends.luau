@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Friends = require(Workspace.DataHydration.DataHydration.Friends)
 
-return (require(_Workspace.DataHydration.DataHydration.Friends))
+return Friends

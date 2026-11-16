@@ -1,9 +1,9 @@
-local function foldRight(p1, p2, p3) -- line: 4
-	for i = #p1, 1, -1 do
-		p3 = p2(p3, p1[i], i)
+local function foldRight(list, callback, p)
+	for i = #list, 1, -1 do
+		p = callback(p, list[i], i)
 	end
 
-	return p3
+	return p
 end
 
 return foldRight

@@ -1,4 +1,1 @@
-return {
-	DarkTheme = require(script.DarkTheme),
-	LightTheme = require(script.LightTheme)
-}
+return { DarkTheme = require(script.DarkTheme), LightTheme = require(script.LightTheme) }

@@ -1,3 +1,1 @@
-return {
-	isCustomNil = require(script.isCustomNil)
-}
+return { isCustomNil = require(script.isCustomNil) }

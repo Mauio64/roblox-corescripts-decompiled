@@ -1,221 +1,226 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
+local parent = Moments.Parent
+
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local ContentProvider = game:GetService("ContentProvider")
 local UserInputService = game:GetService("UserInputService")
-local AppLifecycleObserverService = nil
 
-pcall(function() -- line: 30
-	-- upvalues: AppLifecycleObserverService (ref)
-	AppLifecycleObserverService = game:GetService("AppLifecycleObserverService")
+local v = nil
+pcall(function()
+	local AppLifecycleObserverService = game:GetService("AppLifecycleObserverService")
+	v = AppLifecycleObserverService
 end)
 
-local React = require(MomentsParent.React)
-local SharedFlags = require(MomentsParent.SharedFlags)
-local Signals = require(MomentsParent.Signals)
-local useAppPolicy = require(MomentsParent.UniversalAppPolicy).useAppPolicy
-local enableAudioPlaybackInApp = require(MomentsParent.MediaPlayback).enableAudioPlaybackInApp
-local Media = require(MomentsParent.MomentsCommon).Media
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local Signals = require(parent.Signals)
+
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
+local MediaPlayback = require(parent.MediaPlayback)
+local enableAudioPlaybackInApp = MediaPlayback.enableAudioPlaybackInApp
+
+local MomentsCommon = require(parent.MomentsCommon)
+local Media = MomentsCommon.Media
+local GetMomentsCapabilities = MomentsCommon.Stores.GetMomentsCapabilities
 local FFlagMomentsAutoplayAmpPolicy = SharedFlags.FFlagMomentsAutoplayAmpPolicy
 
 require(Moments.Components.Feed.FeedTypes)
-
 local createFeedMediaSource = require(script.Parent.createFeedMediaSource)
 
-local function shouldPauseWhenAppHidden() -- line: 87
-	-- upvalues: UserInputService (copy)
+local function shouldPauseWhenAppHidden(): boolean -- 1 equivalent call inferred from this helper
 	return UserInputService:GetDeviceType() ~= Enum.DeviceType.Desktop
 end
-local function defaultCreateCoordinator(p1) -- line: 92
-	-- upvalues: enableAudioPlaybackInApp (copy), CoreGui (copy), HttpService (copy), RunService (copy), ContentProvider (copy), Media (copy)
+
+local function defaultCreateCoordinator(p)
 	enableAudioPlaybackInApp()
 
-	local AudioDeviceOutput = Instance.new("AudioDeviceOutput")
+	local momentMediaAudioOutput = Instance.new("AudioDeviceOutput")
+	momentMediaAudioOutput.Name = "MomentMediaAudioOutput"
+	momentMediaAudioOutput.Parent = CoreGui
 
-	AudioDeviceOutput.Name = "MomentMediaAudioOutput"
-	AudioDeviceOutput.Parent = CoreGui
+	local folder = Instance.new("Folder")
+	folder.Name = "MomentMediaRoot_" .. HttpService:GenerateGUID(false)
+	folder.Parent = CoreGui
 
-	local Folder = Instance.new("Folder")
-
-	Folder.Name = "MomentMediaRoot_" .. HttpService:GenerateGUID(false)
-	Folder.Parent = CoreGui
-
-	local t1 = {
-		runService = RunService,
-		contentProvider = ContentProvider
-	}
-	local v24 = Media.createMediaPreloadCoordinator(p1, Media.selectPreloadPolicy(), Media.mediaTelemetry.noopSink, AudioDeviceOutput, t1, {
-		parent = Folder
-	})
+	local mediaPreloadCoordinator = Media.createMediaPreloadCoordinator(
+		p,
+		Media.selectPreloadPolicy(),
+		Media.mediaTelemetry.noopSink,
+		momentMediaAudioOutput,
+		{ runService = RunService, contentProvider = ContentProvider },
+		{ parent = folder }
+	)
 
 	return {
-		provider = v24,
-		dispose = function() -- line: 130
-			-- upvalues: v24 (copy), AudioDeviceOutput (copy), Folder (copy)
-			v24.dispose()
-			AudioDeviceOutput:Destroy()
-			Folder:Destroy()
+		provider = mediaPreloadCoordinator,
+		dispose = function()
+			mediaPreloadCoordinator.dispose()
+			momentMediaAudioOutput:Destroy()
+			folder:Destroy()
 		end
 	}
 end
-local function MomentMediaCoordinatorProvider(t2: {[any]: any}) -- line: 138
-	-- upvalues: FFlagMomentsAutoplayAmpPolicy (copy), useAppPolicy (copy), defaultCreateCoordinator (copy), React (copy), Signals (copy), UserInputService (copy), AppLifecycleObserverService (ref), createFeedMediaSource (copy), Media (copy)
-	local pager = t2.pager
-	local v27 = if not FFlagMomentsAutoplayAmpPolicy then nil else useAppPolicy(function(p2) -- line: 141
-		return p2.getMomentsCanAutoPlay()
-	end)
-	local playbackActive = t2.playbackActive
-	local v29 = t2.createCoordinator or defaultCreateCoordinator
-	local v30 = React.useMemo(function() -- line: 162
-		-- upvalues: Signals (copy), playbackActive (copy)
-		local v36, v37 = Signals.createSignal(playbackActive)
 
-		return {
-			get = v36,
-			set = v37
-		}
-	end, {})
-	local v31 = if not FFlagMomentsAutoplayAmpPolicy then nil else React.useMemo(function() -- line: 168
-		-- upvalues: Signals (copy), v27 (copy)
-		local v38, v39 = Signals.createSignal(v27)
-
-		return {
-			get = v38,
-			set = v39
-		}
-	end, {})
-	local v32 = React.useMemo(function() -- line: 173
-		-- upvalues: Signals (copy)
-		local v40, v41 = Signals.createSignal(true)
-
-		return {
-			get = v40,
-			set = v41
-		}
-	end, {})
-
-	React.useEffect(function() -- line: 178
-		-- upvalues: v30 (copy), playbackActive (copy)
-		v30.set(playbackActive)
-	end, {
-		playbackActive,
-		v30
-	})
+local function MomentMediaCoordinatorProvider(props)
+	local pager = props.pager
+	local v2
 
 	if FFlagMomentsAutoplayAmpPolicy then
-		React.useEffect(function() -- line: 182
-			-- upvalues: v31 (copy), v27 (copy)
-			v31.set(v27)
-		end, {
-			v27,
-			v31
-		})
+		v2 = useSignalState(GetMomentsCapabilities(false).getIsAutoPlayEnabled)
+	else
+		v2 = nil
 	end
 
-	React.useEffect(function() -- line: 190
-		-- upvalues: UserInputService (copy), v32 (copy), AppLifecycleObserverService (ref)
-		if UserInputService:GetDeviceType() == Enum.DeviceType.Desktop then
+	local playbackActive = props.playbackActive
+	local createCoordinator = props.createCoordinator or defaultCreateCoordinator
+
+	local v3 = React.useMemo(function()
+		local signal, set = Signals.createSignal(playbackActive)
+		return { get = signal, set = set }
+	end, {})
+	local v4
+
+	if FFlagMomentsAutoplayAmpPolicy then
+		v4 = React.useMemo(function()
+			local signal, set = Signals.createSignal(v2)
+			return { get = signal, set = set }
+		end, {})
+	else
+		v4 = nil
+	end
+
+	local v5 = React.useMemo(function()
+		local signal, set = Signals.createSignal(true)
+		return { get = signal, set = set }
+	end, {})
+
+	React.useEffect(function()
+		v3.set(playbackActive)
+	end, { playbackActive, v3 })
+
+	if FFlagMomentsAutoplayAmpPolicy then
+		React.useEffect(function()
+			v4.set(v2)
+		end, { v2, v4 })
+	end
+
+	React.useEffect(function()
+		if not shouldPauseWhenAppHidden() then -- inferred equivalent call
 			return
 		end
 
-		local function onHidden() -- line: 194
-			-- upvalues: v32 (copy)
-			v32.set(false)
+		local function onHidden()
+			v5.set(false)
 		end
-		local function onShown() -- line: 197
-			-- upvalues: v32 (copy)
-			v32.set(true)
+		local function onShown()
+			v5.set(true)
 		end
+		local connections = {}
 
-		local t3 = {}
-
-		if AppLifecycleObserverService ~= nil then
-			table.insert(t3, AppLifecycleObserverService.OnHide:Connect(onHidden))
-			table.insert(t3, AppLifecycleObserverService.OnUnhide:Connect(onShown))
+		if v ~= nil then
+			table.insert(connections, v.OnHide:Connect(onHidden))
+			table.insert(connections, v.OnUnhide:Connect(onShown))
 		end
 
-		return function() -- line: 205
-			-- upvalues: t3 (copy)
-			for _, v51 in t3 do
-				v51:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, { v32 })
+	end, { v5 })
 
-	local v33 = React.useMemo(function() -- line: 216
-		-- upvalues: v30 (copy), v32 (copy)
-		return function(p3) -- line: 217
-			-- upvalues: v30 (copy), v32 (copy)
-			return v30.get(p3) and v32.get(p3)
+	local v6 = React.useMemo(function()
+		return function(p)
+			return v3.get(p) and v5.get(p)
 		end
-	end, {
-		v30,
-		v32
-	})
-	local v34 = React.useMemo(function() -- line: 225
-		-- upvalues: createFeedMediaSource (copy), pager (copy), v33 (copy), FFlagMomentsAutoplayAmpPolicy (copy), v31 (copy), v29 (copy)
-		local v45 = createFeedMediaSource(pager, v33, if not FFlagMomentsAutoplayAmpPolicy then nil else v31.get)
+	end, { v3, v5 })
 
-		return v29(v45)
-	end, {
-		pager,
-		v29,
-		v33,
-		if not FFlagMomentsAutoplayAmpPolicy then nil else v31
-	})
+	local useMemo = React.useMemo
+	local function fn()
+		local v7
 
-	React.useEffect(function() -- line: 241
-		-- upvalues: v34 (copy)
-		return function() -- line: 242
-			-- upvalues: v34 (copy)
-			v34.dispose()
+		if FFlagMomentsAutoplayAmpPolicy then
+			v7 = v4.get
 		end
-	end, { v34 })
-	React.useEffect(function() -- line: 247
-		-- upvalues: t2 (copy), Signals (copy), v34 (copy)
-		local onMediaItemFailed = t2.onMediaItemFailed
 
-		if onMediaItemFailed == nil then
+		return createCoordinator((createFeedMediaSource(pager, v6, v7)))
+	end
+
+	local v7
+
+	if FFlagMomentsAutoplayAmpPolicy then
+		v7 = v4
+	end
+
+	local v8 = useMemo(fn, { pager, createCoordinator, v6, v7 })
+
+	React.useEffect(function()
+		return function()
+			v8.dispose()
+		end
+	end, { v8 })
+
+	React.useEffect(function()
+		local onMediaItemLoadAttempted = props.onMediaItemLoadAttempted
+		local onMediaItemFailed = props.onMediaItemFailed
+
+		if onMediaItemLoadAttempted == nil and onMediaItemFailed == nil then
 			return
 		end
 
-		local t4 = {}
-		local u48 = false
-		local v49 = Signals.createEffect(function(p4) -- line: 255
-			-- upvalues: v34 (copy), t4 (copy), u48 (ref), onMediaItemFailed (copy)
-			for v54, v55 in (v34.provider.getControllerMap(p4)) do
-				local v56 = v55.getState(p4)
+		local set = {}
+		local set2 = {}
+		local v9 = false
+		local effect = Signals.createEffect(function(p)
+			local controllerMap = v8.provider.getControllerMap(p)
 
-				if v56.readiness == "Failed" and not t4[v54] then
-					t4[v54] = true
+			for k, controller in controllerMap do
+				if onMediaItemLoadAttempted ~= nil and not set[k] then
+					set[k] = true
 
-					local failureReason = v56.failureReason
-
-					task.defer(function() -- line: 262
-						-- upvalues: u48 (ref), onMediaItemFailed (copy), v54 (copy), failureReason (copy)
-						if not u48 then
-							onMediaItemFailed(v54, failureReason)
+					task.defer(function()
+						if not v9 then
+							onMediaItemLoadAttempted(k)
 						end
 					end)
 				end
+
+				local v10
+
+				if onMediaItemFailed ~= nil then
+					v10 = controller.getState(p)
+				end
+
+				if v10 == nil or v10.readiness ~= "Failed" or set2[k] then
+					continue
+				end
+
+				set2[k] = true
+
+				local failureReason = v10.failureReason
+				task.defer(function()
+					if not v9 then
+						onMediaItemFailed(k, failureReason)
+					end
+				end)
 			end
 		end)
 
-		return function() -- line: 271
-			-- upvalues: u48 (ref), v49 (copy)
-			u48 = true
-			v49()
+		return function()
+			v9 = true
+			effect()
 		end
-	end, {
-		v34,
-		t2.onMediaItemFailed
-	})
+	end, { v8, props.onMediaItemLoadAttempted, props.onMediaItemFailed })
 
-	return React.createElement(Media.MediaPreloadProvider.Provider, {
-		controllerProvider = v34.provider
-	}, t2.children)
+	return React.createElement(
+		Media.MediaPreloadProvider.Provider,
+		{ controllerProvider = v8.provider },
+		props.children
+	)
 end
 
 return MomentMediaCoordinatorProvider

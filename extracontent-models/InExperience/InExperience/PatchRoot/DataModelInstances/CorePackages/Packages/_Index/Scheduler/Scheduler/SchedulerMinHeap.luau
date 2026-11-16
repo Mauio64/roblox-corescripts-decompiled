@@ -1,93 +1,87 @@
-local t1 = {}
-local u2 = nil
-local u3 = nil
-local u4 = nil
+local fn
+local fn2
+local fn3
+local SchedulerMinHeap = {
+	push = function(self, p)
+		local v = #self + 1
+		self[v] = p
 
-function t1.push(t2: {[any]: any}, t3: {[any]: any}) -- line: 22
-	-- upvalues: u3 (ref)
-	local v7 = #t2 + 1
+		fn2(self, p, v)
+	end,
+	peek = function(list)
+		return list[1]
+	end,
+	pop = function(self)
+		local item = self[1]
 
-	t2[v7] = t3
-	u3(t2, t3, v7)
-end
-function t1.peek(t4: {[any]: any}) -- line: 29
-	return t4[1]
-end
-function t1.pop(t5: {[any]: any}) -- line: 33
-	-- upvalues: u4 (ref)
-	local v10 = t5[1]
-
-	if v10 ~= nil then
-		local v11 = t5[#t5]
-
-		t5[#t5] = nil
-
-		if v11 ~= v10 then
-			t5[1] = v11
-			u4(t5, v11, 1)
+		if item == nil then
+			return nil
 		end
 
-		return v10
+		local item2 = self[#self]
+		self[#self] = nil
+
+		if item2 ~= item then
+			self[1] = item2
+			fn3(self, item2, 1)
+		end
+
+		return item
 	end
+}
 
-	return nil
-end
-function u3(t6: {[any]: any}, t7: {[any]: any}, n1: number) -- line: 49
-	-- upvalues: u2 (ref)
+fn2 = function(list, p, p2: number)
 	while true do
-		local v15 = math.floor(n1 / 2)
-		local v16 = t6[v15]
+		local v = math.floor(p2 / 2)
+		local v2 = list[v]
 
-		if v16 == nil or not (u2(v16, t7) > 0) then
+		if v2 == nil or not (fn(v2, p) > 0) then
 			break
 		end
 
-		t6[v15] = t7
-		t6[n1] = v16
-		n1 = v15
+		list[v] = p
+		list[p2] = v2
+		p2 = v
 	end
 end
-function u4(t8: {[any]: any}, t9: {[any]: any}, n2: number) -- line: 65
-	-- upvalues: u2 (ref)
-	local v20 = #t8
 
-	while n2 < v20 do
-		local v21 = n2 * 2
-		local v22 = t8[v21]
-		local v23 = v21 + 1
-		local v24 = t8[v23]
+fn3 = function(list, item, p: number)
+	local v = #list
 
-		if v22 ~= nil and u2(v22, t9) < 0 then
-			if v24 ~= nil and u2(v24, v22) < 0 then
-				t8[n2] = v24
-				t8[v23] = t9
-				n2 = v23
-			else
-				t8[n2] = v22
-				t8[v21] = t9
-				n2 = v21
+	while p < v do
+		local v2 = p * 2
+		local item2 = list[v2]
+		local v3 = v2 + 1
+		local item3 = list[v3]
+
+		if item2 == nil or not (fn(item2, item) < 0) then
+			if item3 == nil or not (fn(item3, item) < 0) then
+				break
 			end
 
-			continue
+			list[p] = item3
+			list[v3] = item
+			p = v3
+		elseif item3 == nil or not (fn(item3, item2) < 0) then
+			list[p] = item2
+			list[v2] = item
+			p = v2
+		else
+			list[p] = item3
+			list[v3] = item
+			p = v3
 		end
-
-		if v24 == nil or not (u2(v24, t9) < 0) then
-			return
-		end
-
-		t8[n2] = v24
-		t8[v23] = t9
-		n2 = v23
 	end
 end
-function u2(t10: {[any]: any}, t11: {[any]: any}) -- line: 95
-	local v27 = t10.sortIndex - t11.sortIndex
 
-	if v27 == 0 then
-		return t10.id - t11.id
+fn = function(p, p2)
+	local v = p.sortIndex - p2.sortIndex
+
+	if v == 0 then
+		return p.id - p2.id
 	end
 
-	return v27
+	return v
 end
 
-return t1
+return SchedulerMinHeap

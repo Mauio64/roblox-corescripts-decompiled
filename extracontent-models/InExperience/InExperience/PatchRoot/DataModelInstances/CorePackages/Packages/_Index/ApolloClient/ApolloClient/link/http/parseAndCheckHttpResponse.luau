@@ -1,56 +1,63 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Error = LuauPolyfill.Error
 
-require(ParentParent.luaUtils.Response)
+require(parent.luaUtils.Response)
 
 local HttpService = game:GetService("HttpService")
-local t1 = {}
+
+local ParseAndCheckHttpResponse = {}
 
 require(script.Parent.Parent.core.types)
 
-local throwServerError = require(script.Parent.Parent.utils).throwServerError
-local hasOwnProperty = require(ParentParent.luaUtils.hasOwnProperty)
+local utils = require(script.Parent.Parent.utils)
+local throwServerError = utils.throwServerError
+local hasOwnProperty = require(parent.luaUtils.hasOwnProperty)
 
-function t1.parseAndCheckHttpResponse(p1) -- line: 34
-	-- upvalues: HttpService (copy), Error (copy), throwServerError (copy), Array (copy), hasOwnProperty (copy)
-	return function(p2) -- line: 35
-		-- upvalues: HttpService (copy), Error (copy), throwServerError (copy), Array (copy), hasOwnProperty (copy), p1 (copy)
-		return p2:text():andThen(function(s1: string) -- line: 38
-			-- upvalues: HttpService (copy), Error (copy), p2 (copy)
-			local ok, result = pcall(function() -- line: 39
-				-- upvalues: HttpService (copy), s1 (copy)
-				return HttpService:JSONDecode(s1), true
+function ParseAndCheckHttpResponse.parseAndCheckHttpResponse(p)
+	return function(response)
+		return response:text():andThen(function(bodyText: string)
+			local success, result = pcall(function()
+				return HttpService:JSONDecode(bodyText), true
 			end)
 
-			if not ok then
-				local v15 = Error.new(result)
-
-				v15.name = "ServerParseError"
-				v15.response = p2
-				v15.statusCode = p2.status
-				v15.bodyText = s1
-				error(v15)
+			if success then
+				return result
 			end
+
+			local v = Error.new(result)
+			v.name = "ServerParseError"
+			v.response = response
+			v.statusCode = response.status
+			v.bodyText = bodyText
+			error(v)
 
 			return result
-		end):andThen(function(p3) -- line: 54
-			-- upvalues: p2 (copy), throwServerError (copy), Array (copy), hasOwnProperty (copy), p1 (copy)
-			if p2.status ~= nil and p2.status >= 300 then
-				throwServerError(p2, p3, ("Response not successful: Received status code %s"):format((tostring(p2.status))))
+		end):andThen(function(p2)
+			if response.status ~= nil and response.status >= 300 then
+				throwServerError(
+					response,
+					p2,
+					("Response not successful: Received status code %s"):format((tostring(response.status)))
+				)
 			end
 
-			if not Array.isArray(p3) and not hasOwnProperty(p3, "data") and not hasOwnProperty(p3, "errors") then
-				throwServerError(p2, p3, ("Server response was missing for query '%s'."):format(Array.isArray(p1) and Array.join(Array.map(p1, function(p4) -- line: 77
-					return p4.operationName
-				end), ", ") or p1.operationName))
+			if not (Array.isArray(p2) or hasOwnProperty(p2, "data") or hasOwnProperty(p2, "errors")) then
+				throwServerError(
+					response,
+					p2,
+					("Server response was missing for query '%s'."):format(Array.isArray(p) and Array.join(Array.map(p, function(p3)
+						return p3.operationName
+					end), ", ") or p.operationName)
+				)
 			end
 
-			return p3
+			return p2
 		end)
 	end
 end
 
-return t1
+return ParseAndCheckHttpResponse

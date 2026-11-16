@@ -1,5 +1,5 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "DiscoverabilityModal",

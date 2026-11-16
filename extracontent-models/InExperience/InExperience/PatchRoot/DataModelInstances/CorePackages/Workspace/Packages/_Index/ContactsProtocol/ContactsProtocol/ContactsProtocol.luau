@@ -1,16 +1,18 @@
-local ParentParent = script.Parent.Parent
-local MessageBus = require(ParentParent.MessageBus).MessageBus
-local Promise = require(ParentParent.Promise)
-local t = require(ParentParent.t)
+local parent = script.Parent.Parent
+local MessageBus = require(parent.MessageBus)
+local messageBus = MessageBus.MessageBus
+local Promise = require(parent.Promise)
+local t = require(parent.t)
 
 require(script.Parent.ContactsProtocolTypes)
 
-local v5 = t.strictInterface({
+local strictInterface = t.strictInterface({
 	firstName = t.optional(t.string),
 	lastName = t.optional(t.string),
 	phoneNumbers = t.optional(t.table)
 })
-local t1 = {
+
+local ContactsProtocol = {
 	GET_CONTACTS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
 		protocolName = "ContactsProtocol",
 		methodName = "getContacts",
@@ -19,7 +21,7 @@ local t1 = {
 	GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
 		protocolName = "ContactsProtocol",
 		methodName = "getContacts",
-		validateParams = v5
+		validateParams = strictInterface
 	},
 	SUPPORTS_CONTACTS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
 		protocolName = "ContactsProtocol",
@@ -33,53 +35,54 @@ local t1 = {
 	}
 }
 
-t1.__index = t1
+ContactsProtocol.__index = ContactsProtocol
 
-function t1.new() -- line: 55
-	-- upvalues: MessageBus (copy), t1 (copy)
-	return (setmetatable({
-		subscriber = MessageBus.Subscriber.new()
-	}, t1))
+function ContactsProtocol.new()
+	return (setmetatable({ subscriber = messageBus.Subscriber.new() }, ContactsProtocol))
 end
-function t1.getContacts(p1) -- line: 68
-	-- upvalues: Promise (copy), MessageBus (copy)
-	local v8 = Promise.new(function(resolve, _) -- line: 69
-		-- upvalues: p1 (copy)
-		local GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p1.GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
 
-		p1.subscriber:subscribeProtocolMethodResponse(GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, function(p3) -- line: 71
-			-- upvalues: p1 (copy), GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR (copy), resolve (copy)
-			p1.subscriber:unsubscribeToProtocolMethodResponse(GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
-			resolve(p3)
-		end)
+function ContactsProtocol.getContacts(data)
+	local contacts = Promise.new(function(callback, _)
+		local GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = data.GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		data.subscriber:subscribeProtocolMethodResponse(
+			GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+			function(p)
+				data.subscriber:unsubscribeToProtocolMethodResponse(GET_CONTACTS_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
+				callback(p)
+			end
+		)
 	end)
 
-	MessageBus.publishProtocolMethodRequest(p1.GET_CONTACTS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-		includeVariable = false
-	}, {})
+	messageBus.publishProtocolMethodRequest(
+		data.GET_CONTACTS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+		{ includeVariable = false },
+		{}
+	)
 
-	return v8
+	return contacts
 end
-function t1.supportsContacts(p4) -- line: 96
-	-- upvalues: Promise (copy), MessageBus (copy)
-	local v10 = Promise.new(function(resolve, _) -- line: 97
-		-- upvalues: p4 (copy)
-		local SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p4.SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
 
-		p4.subscriber:subscribeProtocolMethodResponse(SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, function(t2: {[any]: any}) -- line: 99
-			-- upvalues: p4 (copy), SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR (copy), resolve (copy)
-			p4.subscriber:unsubscribeToProtocolMethodResponse(SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
-			resolve(t2.support)
-		end)
+function ContactsProtocol.supportsContacts(data)
+	local v = Promise.new(function(callback, _)
+		local SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = data.SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		data.subscriber:subscribeProtocolMethodResponse(
+			SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+			function(p)
+				data.subscriber:unsubscribeToProtocolMethodResponse(SUPPORTS_CONTACTS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
+				callback(p.support)
+			end
+		)
 	end)
 
-	MessageBus.publishProtocolMethodRequest(p4.SUPPORTS_CONTACTS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-		includeStatus = false
-	}, {})
+	messageBus.publishProtocolMethodRequest(
+		data.SUPPORTS_CONTACTS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+		{ includeStatus = false },
+		{}
+	)
 
-	return v10
+	return v
 end
 
-t1.default = t1.new()
+ContactsProtocol.default = ContactsProtocol.new()
 
-return t1
+return ContactsProtocol

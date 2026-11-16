@@ -1,19 +1,16 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-
-require(FoundationParent.React)
-
-local ReactIs = require(FoundationParent.ReactIs)
+local parent = Foundation.Parent
+require(parent.React)
+local ReactIs = require(parent.ReactIs)
 
 require(Foundation.Components.Types)
 
-local function getBindableValue(p1) -- line: 10
-	-- upvalues: ReactIs (copy)
-	if ReactIs.isBinding(p1) then
-		return p1:getValue()
+local function getBindableValue(object)
+	if ReactIs.isBinding(object) then
+		return object:getValue()
 	end
 
-	return p1
+	return object
 end
 
 return getBindableValue

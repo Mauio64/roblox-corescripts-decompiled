@@ -1,19 +1,22 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local DsaIllegalContentReporting = require(GenericAbuseReportingParent.DsaIllegalContentReporting)
-local FocusNavigationUtils = require(GenericAbuseReportingParent.FocusNavigationUtils)
-local React = require(GenericAbuseReportingParent.React)
-local ReactFocusNavigation = require(GenericAbuseReportingParent.ReactFocusNavigation)
-local SharedFlags = require(GenericAbuseReportingParent.SharedFlags)
-local UIBlox = require(GenericAbuseReportingParent.UIBlox)
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local useLocalization = require(GenericAbuseReportingParent.Localization).Hooks.useLocalization
+local parent = GenericAbuseReporting.Parent
+
+local DsaIllegalContentReporting = require(parent.DsaIllegalContentReporting)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local SharedFlags = require(parent.SharedFlags)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local useLocalizedStrings = require(GenericAbuseReporting.LocalizationKeys.useLocalizedStrings)
 local CommentTextField = require(GenericAbuseReporting.Common.CommentTextField)
 local Frame = require(GenericAbuseReporting.Common.Frame)
 local UIListLayout = require(GenericAbuseReporting.Common.UIListLayout)
 local ReasonDropdown = require(GenericAbuseReporting.Common.ReasonDropdown)
 local MODAL_POSITION_OFFSET = require(GenericAbuseReporting.Common.MODAL_POSITION_OFFSET)
+
 local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
 local CloseButtonIcon = UIBlox.App.Dialog.Enum.CloseButtonIcon
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
@@ -23,359 +26,420 @@ local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
 local ScrollView = Foundation.ScrollView
 local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
+
 local GenericReportLink = DsaIllegalContentReporting.GenericReportLink
-local v28 = DsaIllegalContentReporting.isShowGenericIllegalContentReportingLink()
+local showGenericIllegalContentReportingLink = DsaIllegalContentReporting.isShowGenericIllegalContentReportingLink()
 local TakeItDownReportLink = DsaIllegalContentReporting.TakeItDownReportLink
 local getTakeItDownReportLinkVisibility = DsaIllegalContentReporting.getTakeItDownReportLinkVisibility
+
 local useAnalyticsDispatch = require(GenericAbuseReporting.Analytics.useAnalyticsDispatch)
 local OnFormCommentUpdated = require(GenericAbuseReporting.Analytics.Actions.OnFormCommentUpdated)
 local OnFormReasonSelected = require(GenericAbuseReporting.Analytics.Actions.OnFormReasonSelected)
-local createNextOrder = require(GenericAbuseReportingParent.ReactUtils).createNextOrder
-local FFlagChatLineReportingFocusFixesEnabled = SharedFlags.FFlagChatLineReportingFocusFixesEnabled
+
+local ReactUtils = require(parent.ReactUtils)
+local createNextOrder = ReactUtils.createNextOrder
 local FFlagAddAbuseReportOffsetForLandscape = SharedFlags.FFlagAddAbuseReportOffsetForLandscape
 local FFlagAddTakeItDownReportLinkToSurfaces = SharedFlags.FFlagAddTakeItDownReportLinkToSurfaces
 
-local function getScreenSizeOffset(vector2: Vector2) -- line: 72
-	-- upvalues: FFlagAddAbuseReportOffsetForLandscape (copy)
-	if FFlagAddAbuseReportOffsetForLandscape then
-		if vector2.X > vector2.Y then
-			return 180
-		end
-
+local function getScreenSizeOffset(absoluteSize: Vector2): number -- 1 equivalent call inferred from this helper
+	if not FFlagAddAbuseReportOffsetForLandscape then
 		return 100
 	end
 
-	return 100
+	return if absoluteSize.X > absoluteSize.Y then 180 else 100
 end
-local function getContentRightPadding(vector2: Vector2, vector2_2: Vector2) -- line: 81
-	if vector2.Y > vector2_2.Y then
-		return 16
+
+local function getContentRightPadding(state: Vector2, state2: Vector2): number -- 1 equivalent call inferred from this helper
+	return if state.Y > state2.Y then 16 else 1
+end
+
+local function SubmitDialog(props)
+	local v = useAnalyticsDispatch()
+	local v2 = ReactFocusNavigation.useFocusGuiObject()
+	local v3 = FocusNavigationUtils.useLastInputMode()
+	local v4 = useTokens()
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState("")
+	local state3, setState3 = React.useState("")
+	local state4, setState4 = React.useState("")
+	local ref = React.useRef(nil)
+	local state5, setState5 = React.useState(Vector2.zero)
+	local state6, setState6 = React.useState(Vector2.zero)
+	local state7, setState7 = React.useState(0)
+	local state8, setState8 = React.useState(0)
+	local ref2 = React.useRef(nil)
+	local state9, setState9 = React.useState(0)
+	local ref3 = React.useRef(nil)
+	local state10, setState10 = React.useState(0)
+	local state11, setState11 = React.useState(96)
+
+	local v5 = useLayerCollector()
+	local absoluteSize = v5.absoluteSize
+
+	React.useEffect(function()
+		setState11((math.max(96, state5.Y - (state9 - state8) - state7 - 20)))
+	end, { state5.Y, state9, state8, state7 })
+
+	React.useEffect(function()
+		if ref2.current then
+			setState7(ref2.current.AbsoluteSize.Y)
+			setState9(ref2.current.AbsolutePosition.Y)
+		end
+	end, { ref2.current, absoluteSize })
+
+	React.useEffect(function()
+		if not ref.current then
+			setState5(Vector2.zero)
+
+			return
+		end
+
+		local scrollingFrame = ref.current:FindFirstChildWhichIsA("ScrollingFrame")
+
+		if scrollingFrame then
+			scrollingFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function()
+				setState6(scrollingFrame.AbsoluteWindowSize)
+				setState5(scrollingFrame.AbsoluteCanvasSize)
+			end)
+			scrollingFrame.Selectable = false
+		end
+
+		setState8(ref.current.AbsolutePosition.Y)
+	end, { ref.current, absoluteSize })
+
+	React.useEffect(function()
+		if ref3.current then
+			setState10(ref3.current.AbsoluteContentSize.Y)
+		end
+	end, { ref3.current })
+
+	local onActivated = React.useCallback(function()
+		if state2 ~= "" then
+			props.onSubmit(state2, state4)
+		elseif props.reportCategoryDefaultKey == nil then
+			setState(true)
+		else
+			props.onSubmit(props.reportCategoryDefaultKey, state4)
+		end
+	end, { props.onSubmit, state2, state4, setState })
+
+	local onSelectedAbuseType = React.useCallback(function(reason_selection)
+		setState2(reason_selection)
+		v(OnFormReasonSelected({ reason_selection = reason_selection }))
+
+		if v3 == "Focus" and ref2.current then
+			local spawnButton = ref2.current:FindFirstChild("SpawnButton", true)
+
+			if spawnButton and spawnButton:IsA("GuiObject") then
+				v2(spawnButton)
+			end
+		end
+	end, { v, v2, v3 })
+
+	local onUpdate = React.useCallback(function(list: string)
+		setState4(list)
+		v(OnFormCommentUpdated({
+			comment_added = #list > 0
+		}))
+	end, { v })
+	local v6
+
+	if props.localizationKeys then
+		v6 = useLocalization(props.localizationKeys)
+	else
+		v6 = useLocalizedStrings()
 	end
 
-	return 1
-end
-local function SubmitDialog(t1: {[any]: any}) -- line: 85
-	-- upvalues: useAnalyticsDispatch (copy), ReactFocusNavigation (copy), FocusNavigationUtils (copy), useTokens (copy), React (copy), useLayerCollector (copy), FFlagChatLineReportingFocusFixesEnabled (copy), OnFormReasonSelected (copy), OnFormCommentUpdated (copy), useLocalization (copy), useLocalizedStrings (copy), createNextOrder (copy), ReasonDropdown (copy), UIListLayout (copy), View (copy), FoundationText (copy), v28 (copy), GenericReportLink (copy), FFlagAddTakeItDownReportLinkToSurfaces (copy), getTakeItDownReportLinkVisibility (copy), TakeItDownReportLink (copy), PartialPageModal (copy), MODAL_POSITION_OFFSET (copy), ButtonType (copy), CloseButtonIcon (copy), ScrollView (copy), FFlagAddAbuseReportOffsetForLandscape (copy), ScrollBarVisibility (copy), Frame (copy), StyledTextLabel (copy), CommentTextField (copy)
-	local v45 = useAnalyticsDispatch()
-	local v46 = ReactFocusNavigation.useFocusGuiObject()
-	local v47 = FocusNavigationUtils.useLastInputMode()
-	local v48 = useTokens()
-	local v49, v50 = React.useState(false)
-	local v51, v52 = React.useState("")
-	local v53, v54 = React.useState("")
-	local v55, v56 = React.useState("")
-	local v57 = React.useRef(nil)
-	local v58, v59 = React.useState(Vector2.zero)
-	local v60, v61 = React.useState(Vector2.zero)
-	local v62, v63 = React.useState(0)
-	local v64, v65 = React.useState(0)
-	local v66 = React.useRef(nil)
-	local v67, v68 = React.useState(0)
-	local v69 = React.useRef(nil)
-	local v70, v71 = React.useState(0)
-	local v72, v73 = React.useState(96)
-	local v74 = useLayerCollector()
-	local absoluteSize = v74.absoluteSize
-
-	React.useEffect(function() -- line: 108
-		-- upvalues: v73 (copy), v58 (copy), v67 (copy), v64 (copy), v62 (copy)
-		v73((math.max(96, v58.Y - (v67 - v64) - v62 - 20)))
-	end, {
-		v58.Y,
-		v67,
-		v64,
-		v62
-	})
-	React.useEffect(function() -- line: 117
-		-- upvalues: v66 (copy), v63 (copy), v68 (copy)
-		if v66.current then
-			v63(v66.current.AbsoluteSize.Y)
-			v68(v66.current.AbsolutePosition.Y)
-		end
-	end, {
-		v66.current,
-		absoluteSize
-	})
-	React.useEffect(function() -- line: 124
-		-- upvalues: v57 (copy), v61 (copy), v59 (copy), FFlagChatLineReportingFocusFixesEnabled (copy), v65 (copy)
-		if v57.current then
-			local ScrollingFrame = v57.current:FindFirstChildWhichIsA("ScrollingFrame")
-
-			if ScrollingFrame then
-				ScrollingFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() -- line: 128
-					-- upvalues: v61 (copy), ScrollingFrame (copy), v59 (copy)
-					v61(ScrollingFrame.AbsoluteWindowSize)
-					v59(ScrollingFrame.AbsoluteCanvasSize)
-				end)
-
-				if FFlagChatLineReportingFocusFixesEnabled then
-					ScrollingFrame.Selectable = false
-				end
-			end
-
-			v65(v57.current.AbsolutePosition.Y)
-
-			return
-		end
-
-		v59(Vector2.zero)
-	end, {
-		v57.current,
-		absoluteSize
-	})
-	React.useEffect(function() -- line: 142
-		-- upvalues: v69 (copy), v71 (copy)
-		if v69.current then
-			v71(v69.current.AbsoluteContentSize.Y)
-		end
-	end, { v69.current })
-
-	local v76 = React.useCallback(function() -- line: 148
-		-- upvalues: v51 (copy), t1 (copy), v55 (copy), v50 (copy)
-		if v51 ~= "" then
-			t1.onSubmit(v51, v55)
-
-			return
-		end
-
-		if t1.reportCategoryDefaultKey ~= nil then
-			t1.onSubmit(t1.reportCategoryDefaultKey, v55)
-
-			return
-		end
-
-		v50(true)
-	end, {
-		t1.onSubmit,
-		v51,
-		v55,
-		v50
-	})
-	local v77 = React.useCallback(function(p1) -- line: 161
-		-- upvalues: v52 (copy), v45 (copy), OnFormReasonSelected (copy), FFlagChatLineReportingFocusFixesEnabled (copy), v47 (copy), v66 (copy), v46 (copy)
-		v52(p1)
-		v45(OnFormReasonSelected({
-			reason_selection = p1
-		}))
-
-		if FFlagChatLineReportingFocusFixesEnabled and (v47 == "Focus" and v66.current) then
-			local SpawnButton = v66.current:FindFirstChild("SpawnButton", true)
-
-			if SpawnButton and SpawnButton:IsA("GuiObject") then
-				v46(SpawnButton)
-			end
-		end
-	end, if not FFlagChatLineReportingFocusFixesEnabled then { v45 } else {
-		v45,
-		v46,
-		v47
-	})
-	local v78 = React.useCallback(function(s1: string) -- line: 183
-		-- upvalues: v56 (copy), v45 (copy), OnFormCommentUpdated (copy)
-		v56(s1)
-		v45(OnFormCommentUpdated({
-			comment_added = #s1 > 0
-		}))
-	end, { v45 })
-	local v79 = if not t1.localizationKeys then useLocalizedStrings() else useLocalization(t1.localizationKeys)
-	local v80 = useLocalization({
+	local v7 = useLocalization({
 		submitDialogReasonSubheading = "Feature.ReportAbuse.Label.WhatWasWrong",
 		selectOnePrompt = "Feature.ReportAbuse.Label.PleaseSelectOne",
 		submitDialogCommentSubheading = "Feature.ReportAbuse.Label.TellUsWhatHappened",
 		submitDialogTextBoxPlaceholder = "Feature.SettingsHub.Label.ReportComment",
-		defaultKey = t1.reportCategories[1].localizationKey
+		defaultKey = props.reportCategories[1].localizationKey
 	})
-	local v81 = createNextOrder()
-	local v82 = React.createElement(ReasonDropdown, {
-		menuItemHeight = 48,
-		options = t1.reportCategories,
+
+	local nextOrder = createNextOrder()
+
+	local reportReasonPrompt = React.createElement(ReasonDropdown, {
+		options = props.reportCategories,
 		screenSize = absoluteSize,
-		maxHeight = v72,
-		isDropdownError = v49,
-		setDropdownError = v50,
-		onSelectedAbuseType = v77,
-		reportCategoryDefaultKey = t1.reportCategoryDefaultKey,
-		setDescription = v54,
-		isDisabled = t1.isDisabled
+		maxHeight = state11,
+		menuItemHeight = 48,
+		isDropdownError = state,
+		setDropdownError = setState,
+		onSelectedAbuseType = onSelectedAbuseType,
+		reportCategoryDefaultKey = props.reportCategoryDefaultKey,
+		setDescription = setState3,
+		isDisabled = props.isDisabled
 	})
-	local v83 = React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = v81()
-	}, {
-		Layout = React.createElement(UIListLayout, {
-			Padding = UDim.new(0, 7),
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left
-		}),
-		Padding = React.createElement("UIPadding", {
-			PaddingBottom = UDim.new(0, 15)
-		}),
-		TextFrame = React.createElement(View, {
-			tag = "radius-medium stroke-standard stroke-system-neutral padding-left-small",
-			Size = UDim2.new(1, 0, 0, 48)
-		}, {
-			Text = React.createElement(FoundationText, {
-				tag = "size-full content-muted",
-				Text = v80.defaultKey,
-				TextXAlignment = Enum.TextXAlignment.Left
-			})
-		})
-	})
-	local v84 = React.useMemo(function() -- line: 244
-		-- upvalues: React (copy), View (copy), v28 (copy), GenericReportLink (copy)
-		return function() -- line: 245
-			-- upvalues: React (copy), View (copy), v28 (copy), GenericReportLink (copy)
-			return React.createElement(View, {
+
+	local element = React.createElement(
+		"Frame",
+		{
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			LayoutOrder = nextOrder()
+		},
+		{
+			Layout = React.createElement(UIListLayout, {
+				Padding = UDim.new(0, 7),
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left
+			}),
+			Padding = React.createElement("UIPadding", { PaddingBottom = UDim.new(0, 15) }),
+			TextFrame = React.createElement(
+				View,
+				{
+					Size = UDim2.new(1, 0, 0, 48),
+					tag = "radius-medium stroke-standard stroke-system-neutral padding-left-small"
+				},
+				{
+					Text = React.createElement(Text, {
+						Text = v7.defaultKey,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						tag = "size-full content-muted"
+					})
+				}
+			)
+		}
+	)
+
+	local v8 = React.useMemo(function()
+		return function()
+			local createElement = React.createElement
+			local genericReportingLink
+
+			if showGenericIllegalContentReportingLink then
+				genericReportingLink = React.createElement(GenericReportLink, { layoutOrder = 2 })
+			end
+
+			return createElement(View, {
 				tag = "size-full-0 auto-y col padding-x-xlarge padding-top-small"
 			}, {
-				GenericReportingLink = if not v28 then nil else React.createElement(GenericReportLink, {
-					layoutOrder = 2
-				})
+				GenericReportingLink = genericReportingLink
 			})
 		end
 	end, {})
-	local v85 = nil
+	local v9
 
 	if FFlagAddTakeItDownReportLinkToSurfaces then
-		v85 = React.useMemo(function() -- line: 260
-			-- upvalues: React (copy), View (copy), v28 (copy), GenericReportLink (copy), getTakeItDownReportLinkVisibility (copy), TakeItDownReportLink (copy)
-			return function() -- line: 261
-				-- upvalues: React (copy), View (copy), v28 (copy), GenericReportLink (copy), getTakeItDownReportLinkVisibility (copy), TakeItDownReportLink (copy)
-				return React.createElement(View, {
-					tag = "col gap-medium size-full-0 auto-y padding-x-xlarge padding-top-small"
-				}, {
-					GenericReportLink = if not v28 then nil else React.createElement(GenericReportLink),
-					TakeItDownReportLink = if not getTakeItDownReportLinkVisibility() then nil else React.createElement(TakeItDownReportLink, {
+		v9 = React.useMemo(function()
+			return function()
+				local createElement = React.createElement
+				local genericReportLink
+
+				if showGenericIllegalContentReportingLink then
+					genericReportLink = React.createElement(GenericReportLink)
+				end
+
+				local takeItDownReportLink
+
+				if getTakeItDownReportLinkVisibility() then
+					takeItDownReportLink = React.createElement(TakeItDownReportLink, {
 						layoutOrder = 2
 					})
-				})
+				end
+
+				return createElement(
+					View,
+					{ tag = "col gap-medium size-full-0 auto-y padding-x-xlarge padding-top-small" },
+					{
+						GenericReportLink = genericReportLink,
+						TakeItDownReportLink = takeItDownReportLink
+					}
+				)
 			end
 		end, {})
 	end
 
-	local v86 = FFlagAddTakeItDownReportLinkToSurfaces and (v28 or getTakeItDownReportLinkVisibility())
+	local v10 = FFlagAddTakeItDownReportLinkToSurfaces
+		and (showGenericIllegalContentReportingLink or getTakeItDownReportLinkVisibility())
 
-	return React.createElement(PartialPageModal, {
-		screenSize = Vector2.new(absoluteSize.X * (t1.scaleDialog and t1.scaleDialog.X or 1), (absoluteSize.Y - v74.insets.top) * (t1.scaleDialog and t1.scaleDialog.Y or 1)),
-		position = UDim2.new(0.5, 0, 0, v74.insets.top + MODAL_POSITION_OFFSET),
+	local createElement = React.createElement
+	local v11 = {
+		screenSize = Vector2.new(
+			absoluteSize.X * (props.scaleDialog and props.scaleDialog.X or 1),
+			(absoluteSize.Y - v5.insets.top) * (props.scaleDialog and props.scaleDialog.Y or 1)
+		),
+		position = UDim2.new(0.5, 0, 0, v5.insets.top + MODAL_POSITION_OFFSET),
 		anchorPoint = Vector2.new(0.5, 0),
-		title = v79.formTitle,
-		onCloseClicked = t1.onAbandon,
+		title = v6.formTitle,
+		onCloseClicked = props.onAbandon,
 		buttonStackProps = {
-			buttons = {{
-				buttonType = ButtonType.PrimaryContextual,
-				props = {
-					onActivated = v76,
-					text = v79.formSubmit
+			buttons = {
+				{
+					buttonType = ButtonType.PrimaryContextual,
+					props = { onActivated = onActivated, text = v6.formSubmit }
 				}
-			}}
+			}
 		},
-		footerContent = if not FFlagAddTakeItDownReportLinkToSurfaces then t1.footerContent or (v28 and v84 or nil) else t1.footerContent or (v86 and v85 or nil),
-		closeButtonIcon = if not t1.useBackButton then nil else CloseButtonIcon.Back
-	}, {
-		SubmitContainer = React.createElement("Frame", {
-			BackgroundTransparency = 1,
+		footerContent = 0,
+		closeButtonIcon = 0
+	}
+	local footerContent
+
+	if FFlagAddTakeItDownReportLinkToSurfaces then
+		footerContent = props.footerContent or v10 and v9 or nil
+	else
+		footerContent = props.footerContent or showGenericIllegalContentReportingLink and v8 or nil
+	end
+
+	v11.footerContent = footerContent
+	local closeButtonIcon
+
+	if props.useBackButton then
+		closeButtonIcon = CloseButtonIcon.Back
+	end
+
+	v11.closeButtonIcon = closeButtonIcon
+
+	local createElement2 = React.createElement
+	local v12 = {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.fromScale(1, 0)
+	}
+
+	local createElement3 = React.createElement
+	local v13 = {
+		Size = UDim2.new(
+			1,
+			0,
+			0,
+			(math.min(
+				absoluteSize.Y - v5.insets.top - getScreenSizeOffset(absoluteSize) - (props.footerContent == nil and showGenericIllegalContentReportingLink and 25 or 0), -- inferred equivalent call
+				state10 + 50 + 50
+			))
+		),
+		scroll = {
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			CanvasSize = UDim2.fromOffset(0, 0),
+			scrollBarVisibility = ScrollBarVisibility.Always,
+			ScrollingDirection = Enum.ScrollingDirection.Y
+		},
+		ref = ref
+	}
+
+	local children = {
+		Layout = React.createElement(UIListLayout, {
+			Padding = UDim.new(0, 16),
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			Ref = ref3
+		}),
+		Padding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 16),
+			PaddingBottom = UDim.new(0, 16),
+			PaddingLeft = UDim.new(0, 1),
+			PaddingRight = UDim.new(0, getContentRightPadding(state5, state6)) -- inferred equivalent call
+		}),
+		TopCustomComponent = props.topCustomComponent,
+		ReportReasonFrame = 0,
+		ReportCommentFrame = 0
+	}
+	local createElement4 = React.createElement
+	local v14 = {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		ZIndex = 2,
+		LayoutOrder = nextOrder()
+	}
+	local v15 = {
+		Layout = React.createElement(UIListLayout, {
+			Padding = UDim.new(0, 14),
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left
+		}),
+		ReportReasonSubheading = React.createElement(StyledTextLabel, {
+			text = "1. " .. v7.submitDialogReasonSubheading,
+			fontStyle = v4.Typography.TitleLarge,
+			colorStyle = v4.Color.Content.Default,
+			layoutOrder = nextOrder(),
+			automaticSize = Enum.AutomaticSize.XY
+		}),
+		DropdownPosition = 0,
+		ReportReasonSubtext = 0,
+		Padding = 0
+	}
+
+	local createElement5 = React.createElement
+	local v16 = {
+		AutomaticSize = Enum.AutomaticSize.None,
+		Size = UDim2.new(1, 0, 0, 48),
+		ZIndex = 2,
+		LayoutOrder = nextOrder(),
+		ref = ref2
+	}
+
+	if props.isReportCategoryReadonly then
+		reportReasonPrompt = element
+	end
+
+	v15.DropdownPosition = createElement5(Frame, v16, { ReportReasonPrompt = reportReasonPrompt })
+	local reportReasonSubtext
+
+	if state then
+		reportReasonSubtext = React.createElement(StyledTextLabel, {
+			text = v7.selectOnePrompt,
+			fontStyle = v4.Typography.BodySmall,
+			colorStyle = v4.Color.System.Alert,
+			layoutOrder = nextOrder(),
+			automaticSize = Enum.AutomaticSize.XY
+		})
+	elseif state3 ~= "" then
+		reportReasonSubtext = React.createElement(StyledTextLabel, {
+			text = state3,
+			fontStyle = v4.Typography.BodySmall,
+			colorStyle = v4.Color.Content.Default,
+			layoutOrder = nextOrder(),
+			automaticSize = Enum.AutomaticSize.XY
+		})
+	end
+
+	v15.ReportReasonSubtext = reportReasonSubtext
+	local padding
+
+	if not (state3 == "" and not state) then
+		padding = React.createElement("UIPadding", { PaddingBottom = UDim.new(0, 10) })
+	end
+
+	v15.Padding = padding
+	children.ReportReasonFrame = createElement4(Frame, v14, v15)
+
+	children.ReportCommentFrame = React.createElement(
+		Frame,
+		{
+			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.fromScale(1, 0)
-		}, {
-			SubmitReportFrame = React.createElement(ScrollView, {
-				Size = UDim2.new(1, 0, 0, (math.min(absoluteSize.Y - v74.insets.top - (not FFlagAddAbuseReportOffsetForLandscape and 100 or (not (absoluteSize.X > absoluteSize.Y) and 100 or 180)) - ((t1.footerContent ~= nil or not v28) and 0 or 25), v70 + 50 + 50))),
-				scroll = {
-					AutomaticCanvasSize = Enum.AutomaticSize.Y,
-					CanvasSize = UDim2.fromOffset(0, 0),
-					scrollBarVisibility = ScrollBarVisibility.Always,
-					ScrollingDirection = Enum.ScrollingDirection.Y
-				},
-				ref = v57
-			}, {
-				Layout = React.createElement(UIListLayout, {
-					Padding = UDim.new(0, 16),
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					Ref = v69
-				}),
-				Padding = React.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, 16),
-					PaddingBottom = UDim.new(0, 16),
-					PaddingLeft = UDim.new(0, 1),
-					PaddingRight = UDim.new(0, not (v58.Y > v60.Y) and 1 or 16)
-				}),
-				TopCustomComponent = t1.topCustomComponent,
-				ReportReasonFrame = React.createElement(Frame, {
-					ZIndex = 2,
-					Size = UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y,
-					LayoutOrder = v81()
-				}, {
-					Layout = React.createElement(UIListLayout, {
-						Padding = UDim.new(0, 14),
-						FillDirection = Enum.FillDirection.Vertical,
-						HorizontalAlignment = Enum.HorizontalAlignment.Left
-					}),
-					ReportReasonSubheading = React.createElement(StyledTextLabel, {
-						text = "1. " .. v80.submitDialogReasonSubheading,
-						fontStyle = v48.Typography.TitleLarge,
-						colorStyle = v48.Color.Content.Default,
-						layoutOrder = v81(),
-						automaticSize = Enum.AutomaticSize.XY
-					}),
-					DropdownPosition = React.createElement(Frame, {
-						ZIndex = 2,
-						AutomaticSize = Enum.AutomaticSize.None,
-						Size = UDim2.new(1, 0, 0, 48),
-						LayoutOrder = v81(),
-						ref = v66
-					}, {
-						ReportReasonPrompt = if not t1.isReportCategoryReadonly then v82 else v83
-					}),
-					ReportReasonSubtext = if not v49 then if v53 == "" then nil else React.createElement(StyledTextLabel, {
-						text = v53,
-						fontStyle = v48.Typography.BodySmall,
-						colorStyle = v48.Color.Content.Default,
-						layoutOrder = v81(),
-						automaticSize = Enum.AutomaticSize.XY
-					}) else React.createElement(StyledTextLabel, {
-						text = v80.selectOnePrompt,
-						fontStyle = v48.Typography.BodySmall,
-						colorStyle = v48.Color.System.Alert,
-						layoutOrder = v81(),
-						automaticSize = Enum.AutomaticSize.XY
-					}),
-					Padding = if v53 == "" and not v49 then nil else React.createElement("UIPadding", {
-						PaddingBottom = UDim.new(0, 10)
-					})
-				}),
-				ReportCommentFrame = React.createElement(Frame, {
-					Size = UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y,
-					LayoutOrder = v81()
-				}, {
-					Layout = React.createElement(UIListLayout, {
-						Padding = UDim.new(0, 14),
-						FillDirection = Enum.FillDirection.Vertical,
-						HorizontalAlignment = Enum.HorizontalAlignment.Left
-					}),
-					Padding = React.createElement("UIPadding", {
-						PaddingBottom = UDim.new(0, 15)
-					}),
-					ReportCommentSubheading = React.createElement(StyledTextLabel, {
-						text = "2. " .. v80.submitDialogCommentSubheading,
-						fontStyle = v48.Typography.TitleLarge,
-						colorStyle = v48.Color.Content.Default,
-						layoutOrder = v81(),
-						automaticSize = Enum.AutomaticSize.XY
-					}),
-					CommentTextField = React.createElement(CommentTextField, {
-						layoutOrder = v81(),
-						text = v55,
-						placeholderText = v80.submitDialogTextBoxPlaceholder,
-						onUpdate = v78
-					})
-				})
+			LayoutOrder = nextOrder()
+		},
+		{
+			Layout = React.createElement(UIListLayout, {
+				Padding = UDim.new(0, 14),
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left
+			}),
+			Padding = React.createElement("UIPadding", { PaddingBottom = UDim.new(0, 15) }),
+			ReportCommentSubheading = React.createElement(StyledTextLabel, {
+				text = "2. " .. v7.submitDialogCommentSubheading,
+				fontStyle = v4.Typography.TitleLarge,
+				colorStyle = v4.Color.Content.Default,
+				layoutOrder = nextOrder(),
+				automaticSize = Enum.AutomaticSize.XY
+			}),
+			CommentTextField = React.createElement(CommentTextField, {
+				layoutOrder = nextOrder(),
+				text = state4,
+				placeholderText = v7.submitDialogTextBoxPlaceholder,
+				onUpdate = onUpdate
 			})
+		}
+	)
+	return createElement(PartialPageModal, v11, {
+		SubmitContainer = createElement2("Frame", v12, {
+			SubmitReportFrame = createElement3(ScrollView, v13, children)
 		})
 	})
 end

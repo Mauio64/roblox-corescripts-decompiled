@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
 
 require(script.Parent.ReplyingToMessageContext)
 
-return React.createContext(function(_) -- line: 9
-end)
+return React.createContext(function(_) end)

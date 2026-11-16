@@ -1,30 +1,39 @@
-local ParentParent = script.Parent.Parent
-local Object = require(ParentParent.Parent.LuauPolyfill).Object
-local invariant = require(ParentParent.jsutils.invariant).invariant
+local parent = script.Parent.Parent
 
-require(ParentParent.type.schema)
+local LuauPolyfill = require(parent.Parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
-local parse = require(ParentParent.language.parser).parse
-local executeSync = require(ParentParent.execution.execute).executeSync
-local getIntrospectionQuery = require(script.Parent.getIntrospectionQuery).getIntrospectionQuery
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
+
+require(parent.type.schema)
+
+local parser = require(parent.language.parser)
+local parse = parser.parse
+
+local execute = require(parent.execution.execute)
+local executeSync = execute.executeSync
+
+local getIntrospectionQuery = require(script.Parent.getIntrospectionQuery)
+
+local getIntrospectionQuery2 = getIntrospectionQuery.getIntrospectionQuery
 
 return {
-	introspectionFromSchema = function(p1, p2) -- line: 37
-		-- upvalues: Object (copy), parse (copy), getIntrospectionQuery (copy), executeSync (copy), invariant (copy)
-		local v9 = Object.assign({
-			specifiedByUrl = true,
-			directiveIsRepeatable = true,
-			schemaDescription = true,
-			inputValueDeprecation = true
-		}, p2)
-		local v10 = parse(getIntrospectionQuery(v9))
-		local v11 = executeSync({
-			schema = p1,
-			document = v10
+	introspectionFromSchema = function(schema, p)
+		local v = executeSync({
+			schema = schema,
+			document = parse(getIntrospectionQuery2((Object.assign(
+				{
+					specifiedByUrl = true,
+					directiveIsRepeatable = true,
+					schemaDescription = true,
+					inputValueDeprecation = true
+				},
+				p
+			))))
 		})
+		invariant2(not v.errors and v.data)
 
-		invariant(not v11.errors and v11.data)
-
-		return v11.data
+		return v.data
 	end
 }

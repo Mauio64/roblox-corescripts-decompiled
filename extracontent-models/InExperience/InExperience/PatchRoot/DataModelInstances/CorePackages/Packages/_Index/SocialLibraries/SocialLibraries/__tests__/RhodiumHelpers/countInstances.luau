@@ -1,11 +1,11 @@
-return function(p1, p2) -- line: 7
-	local n1 = 0
+return function(instance, className)
+	local count = 0
 
-	for _, child in pairs(p1:GetChildren()) do
-		if not p2 or child:IsA(p2) then
-			n1 += 1
+	for _, child in pairs(instance:GetChildren()) do
+		if not className or child:IsA(className) then
+			count += 1
 		end
 	end
 
-	return n1
+	return count
 end

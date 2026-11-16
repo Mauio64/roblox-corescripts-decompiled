@@ -1,13 +1,19 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local BuilderIcons = require(FoundationParent.BuilderIcons)
-local BuilderIconsFont = BuilderIcons.Font
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
+local BuilderIcons = require(parent.BuilderIcons)
+local Font = BuilderIcons.Font
 local IconVariant = BuilderIcons.IconVariant
+
 local IconSize = require(Foundation.Enums.IconSize)
 local Image = require(Foundation.Components.Image)
 local Text = require(Foundation.Components.Text)
+
+local Flags = require(Foundation.Utility.Flags)
 local Logger = require(Foundation.Utility.Logger)
+local devAssert = require(Foundation.Utility.devAssert)
 local isBuilderIcon = require(Foundation.Utility.isBuilderIcon)
 local migrateFontSize = require(script.Parent.migrateFontSize)
 local migrateIconName = require(script.Parent.migrateIconName)
@@ -19,66 +25,82 @@ local withDefaults = require(Foundation.Utility.withDefaults)
 
 require(Foundation.Components.Types)
 
-local t1 = {
-	testId = "--foundation-icon",
-	size = IconSize.Medium,
-	variant = IconVariant.Regular
-}
+local v = { size = IconSize.Medium, variant = IconVariant.Regular, testId = "--foundation-icon" }
 
-local function Icon(p1, p2) -- line: 46
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextSizeOffset (copy), migrateIconName (copy), useIconSize (copy), isBuilderIcon (copy), migrateFontSize (copy), Logger (copy), React (copy), Image (copy), withCommonProps (copy), Text (copy), BuilderIconsFont (copy)
-	local v23 = withDefaults(p1, t1)
-	local v24 = useTokens()
-	local v25 = useTextSizeOffset()
-	local v26 = migrateIconName(v23.name)
-	local v27 = useIconSize(v23.size, isBuilderIcon(v23.name))
-	local variant = v23.variant
-	local name = v23.name
-	local v30 = if typeof(v27) ~= "table" then v27.Y.Offset else nil
+local function Icon(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local v4 = useTextSizeOffset()
+	local v5 = migrateIconName(v2.name)
+	local size = useIconSize(v2.size, isBuilderIcon(v2.name))
 
-	if not isBuilderIcon(name) and v26 then
-		if typeof(v27) == "table" then
-			error("Binding size isn't supported when migrating a UIBlox icon, use Builder Icons directly")
-		end
+	local variant = v2.variant
+	local name = v2.name
+	local offset
 
-		variant = v26.variant or variant
-		name = v26.name
-		v30 = migrateFontSize(v30, v24)
+	if typeof(size) ~= "table" then
+		offset = size.Y.Offset
 	end
 
-	local v31 = v23.style or v24.Color.Content.Default
+	local v6 = false
 
-	if not isBuilderIcon(name) and not v26 then
-		if p1.variant ~= nil then
-			Logger:warning("variant is not supported when using FoundationImages, consider using BuilderIcons")
+	if not isBuilderIcon(name) and v5 then
+		if typeof(size) == "table" then
+			if Flags.FoundationDevOnlyPropAsserts then
+				devAssert(
+					false,
+					"Binding size isn't supported when migrating a UIBlox icon, use Builder Icons directly"
+				)
+			else
+				error("Binding size isn't supported when migrating a UIBlox icon, use Builder Icons directly")
+			end
+		else
+			variant = v5.variant or variant
+			name = v5.name
+			offset = migrateFontSize(offset, v3)
+			v6 = true
 		end
-
-		return (React.createElement(Image, withCommonProps(v23, {
-			imageStyle = v31,
-			Image = name,
-			Size = v27,
-			ref = p2,
-			Rotation = v23.Rotation
-		}), v23.children))
 	end
 
-	return React.createElement(Text, withCommonProps(v23, {
-		textStyle = v31,
-		Text = name,
-		fontStyle = {
-			Font = BuilderIconsFont[variant],
-			FontSize = v30
-		},
-		TextScaled = typeof(v27) == "table",
-		Size = v27,
-		ref = p2,
-		Rotation = v23.Rotation
-	}), {
-		UITextSizeConstraint = if not (v25 > 0) or not v30 then nil else React.createElement("UITextSizeConstraint", {
-			MaxTextSize = v30
-		}),
-		Children = React.createElement(React.Fragment, nil, v23.children)
-	})
+	local style = v2.style or v3.Color.Content.Default
+
+	if isBuilderIcon(name) or v6 then
+		local createElement = React.createElement
+
+		local v7 = withCommonProps(v2, {
+			textStyle = style,
+			Text = name,
+			fontStyle = { Font = Font[variant], FontSize = offset },
+			TextScaled = typeof(size) == "table",
+			Size = size,
+			ref = ref,
+			Rotation = v2.Rotation
+		})
+		local uiTextSizeConstraint
+
+		if v4 > 0 and offset then
+			uiTextSizeConstraint = React.createElement("UITextSizeConstraint", {
+				MaxTextSize = offset
+			})
+		end
+
+		return createElement(Text, v7, {
+			UITextSizeConstraint = uiTextSizeConstraint,
+			Children = React.createElement(React.Fragment, nil, v2.children)
+		})
+	end
+
+	if p.variant ~= nil then
+		Logger:warning("variant is not supported when using FoundationImages, consider using BuilderIcons")
+	end
+
+	return (React.createElement(Image, withCommonProps(v2, {
+		imageStyle = style,
+		Image = name,
+		Size = size,
+		ref = ref,
+		Rotation = v2.Rotation
+	}), v2.children))
 end
 
 return React.memo(React.forwardRef(Icon))

@@ -1,174 +1,222 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Services = require(Foundation.Utility.Wrappers.Services)
+
 local SliderStepDirection = require(script.Parent.SliderStepDirection)
+
 local SliderStepSize = require(script.Parent.SliderStepSize)
+
+local Flags = require(Foundation.Utility.Flags)
+local calculateAdjacentStepValue = require(script.Parent.calculateAdjacentStepValue)
 local calculateDirectionalStepValue = require(script.Parent.calculateDirectionalStepValue)
+local constants = require(script.Parent.constants)
 
-local function getStepForKeyCode(p1) -- line: 28
-	-- upvalues: SliderStepSize (copy)
-	if p1 == Enum.KeyCode.Right or p1 == Enum.KeyCode.DPadRight then
-		return {
-			sign = 1,
-			size = SliderStepSize.Step
-		}
+local function getStepForKeyCode(keyCode, flag: boolean)
+	if not Flags.FoundationSliderCapture then
+		if table.find(constants.coarseIncrement, keyCode) then
+			return { sign = 1, size = SliderStepSize.Page }
+		end
+
+		if table.find(constants.coarseDecrement, keyCode) then
+			return { sign = -1, size = SliderStepSize.Page }
+		end
 	end
 
-	if p1 == Enum.KeyCode.Left or p1 == Enum.KeyCode.DPadLeft then
-		return {
-			sign = -1,
-			size = SliderStepSize.Step
-		}
+	local v = flag and "vertical" or "horizontal"
+
+	if table.find(constants.stepIncrement[v], keyCode) then
+		return { sign = 1, size = SliderStepSize.Step }
 	end
 
-	if p1 == Enum.KeyCode.ButtonR1 then
-		return {
-			sign = 1,
-			size = SliderStepSize.Page
-		}
-	end
-
-	if p1 == Enum.KeyCode.ButtonL1 then
-		return {
-			sign = -1,
-			size = SliderStepSize.Page
-		}
+	if table.find(constants.stepDecrement[v], keyCode) then
+		return { sign = -1, size = SliderStepSize.Step }
 	end
 
 	return nil
 end
-local function useSliderDirectionalInput(b1: boolean, n1: number?, numberRange: NumberRange, t1: {[any]: any}) -- line: 47
-	-- upvalues: React (copy), SliderStepSize (copy), calculateDirectionalStepValue (copy), SliderStepDirection (copy), getStepForKeyCode (copy), Services (copy)
-	local v15 = React.useRef({
-		step = n1,
-		range = numberRange,
-		handlers = t1
-	})
 
-	v15.current = {
-		step = n1,
-		range = numberRange,
-		handlers = t1
-	}
-	React.useEffect(function() -- line: 60
-		-- upvalues: b1 (copy), SliderStepSize (copy), v15 (copy), calculateDirectionalStepValue (copy), SliderStepDirection (copy), getStepForKeyCode (copy), Services (copy)
-		if not b1 then
+local function isExitKey(keyCode): boolean -- 1 equivalent call inferred from this helper
+	return table.find(constants.exit, keyCode) ~= nil
+end
+
+local function getRepeatInterval(count: number, step: number?): number -- 1 equivalent call inferred from this helper
+	if not Flags.FoundationSliderCapture or step ~= nil and step > 0 then
+		return 0.1
+	end
+
+	if count >= 15 then
+		return 0.03
+	end
+
+	return if count >= 5 then 0.06 else 0.1
+end
+
+local function useSliderDirectionalInput(flag: boolean, step: number?, range: NumberRange, flag2: boolean, handlers)
+	local ref = React.useRef({ step = step, range = range, handlers = handlers })
+
+	ref.current = { step = step, range = range, handlers = handlers }
+
+	React.useEffect(function()
+		if not flag then
 			return
 		end
 
-		local u16 = nil
-		local n2 = 0
-		local Step = SliderStepSize.Step
-		local u19 = nil
+		local v = nil
+		local v2 = 0
+		local v3 = SliderStepSize.Step
+		local thread = nil
+		local v4 = 0
+		local v5 = 0
 
-		local function performStep(n3: number, p2) -- line: 70
-			-- upvalues: v15 (copy), calculateDirectionalStepValue (copy), SliderStepDirection (copy)
-			local current = v15.current
+		local function performStep(p: number, p2)
+			local current = ref.current
+			local v6
 
-			current.handlers.onStep(calculateDirectionalStepValue(current.handlers.getValue(), if not (n3 > 0) then SliderStepDirection.Decrement else SliderStepDirection.Increment, current.range, current.step, p2))
+			if p > 0 then
+				v6 = SliderStepDirection.Increment
+			else
+				v6 = SliderStepDirection.Decrement
+			end
+
+			local onStep = current.handlers.onStep
+			local v7
+
+			if Flags.FoundationSliderCapture then
+				v7 = calculateAdjacentStepValue(current.handlers.getValue(), v6, current.range, current.step, p2)
+			else
+				v7 = calculateDirectionalStepValue(current.handlers.getValue(), v6, current.range, current.step, p2)
+			end
+
+			onStep(v7)
 		end
-		local function stopStepping(p3) -- line: 83
-			-- upvalues: u16 (ref), n2 (ref), u19 (ref)
-			if p3 ~= nil and p3 ~= u16 then
+
+		local function stopStepping(p) -- 3 equivalent calls inferred from this helper
+			if p ~= nil and p ~= v then
 				return
 			end
 
-			u16 = nil
-			n2 = 0
+			v = nil
+			v2 = 0
 
-			if u19 then
-				task.cancel(u19)
-				u19 = nil
+			if thread then
+				task.cancel(thread)
+				thread = nil
 			end
 		end
-		local function startStepping(p4, n4: number, p5) -- line: 95
-			-- upvalues: u16 (ref), n2 (ref), Step (ref), u19 (ref), v15 (copy), calculateDirectionalStepValue (copy), SliderStepDirection (copy)
-			if p4 == u16 and (n4 == n2 and p5 == Step) then
+
+		local function startStepping(p, p2: number, p3)
+			if p == v and p2 == v2 and p3 == v3 then
 				return
 			end
 
-			u16 = nil
-			n2 = 0
+			v = nil
+			v2 = 0
 
-			if u19 then
-				task.cancel(u19)
-				u19 = nil
+			if thread then
+				task.cancel(thread)
+				thread = nil
 			end
 
-			u16 = p4
-			n2 = n4
-			Step = p5
+			v = p
+			v2 = p2
+			v3 = p3
 
-			local current = v15.current
+			performStep(p2, p3)
 
-			current.handlers.onStep(calculateDirectionalStepValue(current.handlers.getValue(), if not (n4 > 0) then SliderStepDirection.Decrement else SliderStepDirection.Increment, current.range, current.step, p5))
-			u19 = task.spawn(function() -- line: 107
-				-- upvalues: u16 (ref), p4 (copy), n2 (ref), n4 (copy), Step (ref), p5 (copy), v15 (copy), calculateDirectionalStepValue (copy), SliderStepDirection (copy)
+			thread = task.spawn(function()
 				task.wait(0.4)
+				local count = 0
 
-				while u16 == p4 and n2 == n4 and Step == p5 do
-					local v37 = n4
-					local v38 = p5
-					local current2 = v15.current
-
-					current2.handlers.onStep(calculateDirectionalStepValue(current2.handlers.getValue(), if not (v37 > 0) then SliderStepDirection.Decrement else SliderStepDirection.Increment, current2.range, current2.step, v38))
-					task.wait(0.1)
+				while v == p and v2 == p2 and v3 == p3 do
+					performStep(p2, p3)
+					count += 1
+					task.wait(getRepeatInterval(count, ref.current.step)) -- inferred equivalent call
 				end
 			end)
 		end
-		local function evaluateInput(p6) -- line: 119
-			-- upvalues: getStepForKeyCode (copy), startStepping (copy), SliderStepSize (copy), u16 (ref), n2 (ref), u19 (ref)
-			local v34 = getStepForKeyCode(p6.KeyCode)
 
-			if v34 then
-				startStepping(p6, v34.sign, v34.size)
+		local function evaluateInput(p)
+			if Flags.FoundationSliderCapture and isExitKey(p.KeyCode) then -- inferred equivalent call
+				local onExit = ref.current.handlers.onExit
+
+				if onExit then
+					onExit()
+				end
 
 				return
 			end
 
-			if p6.KeyCode == Enum.KeyCode.Thumbstick1 then
-				if math.abs(p6.Position.X) >= 0.8 then
-					startStepping(p6, not (p6.Position.X > 0) and -1 or 1, SliderStepSize.Step)
+			local stepForKeyCode = getStepForKeyCode(p.KeyCode, flag2)
 
-					return
+			if stepForKeyCode then
+				startStepping(p, stepForKeyCode.sign, stepForKeyCode.size)
+			elseif table.find(constants.analogStep, p.KeyCode) then
+				local v6
+
+				if flag2 then
+					v6 = p.Position.Y
+				else
+					v6 = p.Position.X
 				end
 
-				if p6 ~= nil and p6 ~= u16 then
-					return
-				end
+				if math.abs(v6) >= constants.thumbstickDeadzone then
+					local v7 = v6 > 0 and 1 or -1
+					local v8
 
-				u16 = nil
-				n2 = 0
+					if v4 == 0 then
+						v8 = false
+					else
+						v8 = v7 ~= v4
+					end
 
-				if u19 then
-					task.cancel(u19)
-					u19 = nil
+					v5 = not v8 and 0 or v5 + 1
+
+					if Flags.FoundationSliderCapture and v8 and v5 < 3 then
+						stopStepping(p) -- inferred equivalent call
+					else
+						v4 = v7
+						startStepping(p, v7, SliderStepSize.Step)
+					end
+				else
+					v4 = 0
+					v5 = 0
+					stopStepping(p) -- inferred equivalent call
 				end
 			end
 		end
 
-		local t2 = {
+		local function handleInputEnded(p)
+			if table.find(constants.analogStep, p.KeyCode) then
+				v4 = 0
+				v5 = 0
+			end
+
+			stopStepping(p) -- inferred equivalent call
+		end
+
+		local v6 = {
 			Services.UserInputService.InputBegan:Connect(evaluateInput),
 			Services.UserInputService.InputChanged:Connect(evaluateInput),
-			Services.UserInputService.InputEnded:Connect(stopStepping)
+			Services.UserInputService.InputEnded:Connect(handleInputEnded)
 		}
 
-		return function() -- line: 141
-			-- upvalues: u16 (ref), n2 (ref), u19 (ref), t2 (copy)
-			u16 = nil
-			n2 = 0
+		return function()
+			v = nil
+			v2 = 0
 
-			if u19 then
-				task.cancel(u19)
-				u19 = nil
+			if thread then
+				task.cancel(thread)
+				thread = nil
 			end
 
-			for _, v36 in t2 do
-				v36:Disconnect()
+			for _, connection in v6 do
+				connection:Disconnect()
 			end
 		end
-	end, { b1 })
+	end, { flag, flag2 })
 end
 
 return useSliderDirectionalInput

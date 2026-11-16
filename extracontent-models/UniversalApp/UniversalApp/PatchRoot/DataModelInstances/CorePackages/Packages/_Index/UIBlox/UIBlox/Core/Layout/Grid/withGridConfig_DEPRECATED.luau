@@ -1,32 +1,31 @@
-local scriptParent = script.Parent
-local Responsive = scriptParent.Parent.Responsive
-local ParentParent = scriptParent.Parent.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local ResponsiveLayoutContext = require(Responsive.ResponsiveLayoutContext)
-local ResponsiveLayoutConfigReader = require(Responsive.ResponsiveLayoutConfigReader)
+local parent = script.Parent
+local responsive = parent.Parent.Responsive
+local parent2 = parent.Parent.Parent.Parent.Parent
 
-return function(p1, p2) -- line: 27
-	-- upvalues: Roact (copy), ResponsiveLayoutContext (copy), ResponsiveLayoutConfigReader (copy)
-	return function(p3) -- line: 28
-		-- upvalues: Roact (copy), ResponsiveLayoutContext (copy), p1 (copy), ResponsiveLayoutConfigReader (copy), p2 (copy)
+local Roact = require(parent2.Roact)
+
+local ResponsiveLayoutContext = require(responsive.ResponsiveLayoutContext)
+local ResponsiveLayoutConfigReader = require(responsive.ResponsiveLayoutConfigReader)
+
+return function(items, p)
+	return function(callback)
 		return Roact.createElement(ResponsiveLayoutContext.Consumer, {
-			render = function(p4) -- line: 30
-				-- upvalues: p1 (copy), ResponsiveLayoutConfigReader (copy), p2 (copy), p3 (copy)
-				local t1 = {}
+			render = function(data)
+				local v = {}
 
-				for k, v in pairs(p1) do
-					t1[k] = ResponsiveLayoutConfigReader.getValue({
-						config = p4.config,
-						breakpoint = p4.breakpoint,
-						kind = p2 or p4.kind
+				for k, item in pairs(items) do
+					v[k] = ResponsiveLayoutConfigReader.getValue({
+						config = data.config,
+						breakpoint = data.breakpoint,
+						kind = p or data.kind
 					}, k)
 
-					if t1[k] == nil then
-						t1[k] = v
+					if v[k] == nil then
+						v[k] = item
 					end
 				end
 
-				return p3(t1)
+				return callback(v)
 			end
 		})
 	end

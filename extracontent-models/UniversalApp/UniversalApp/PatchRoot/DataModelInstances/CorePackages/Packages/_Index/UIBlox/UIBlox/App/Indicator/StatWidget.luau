@@ -1,49 +1,52 @@
 local App = script:FindFirstAncestor("App")
-local AppParent = App.Parent
-local AppParentParent = AppParent.Parent
-local React = require(AppParentParent.React)
-local Cryo = require(AppParentParent.Cryo)
+local parent = App.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
 
 require(App.ImageSet.ImagesTypes)
 require(App.Style.StyleTypes)
 
 local IconSize = require(App.ImageSet.Enum.IconSize)
 local getIconSize = require(App.ImageSet.getIconSize)
-local Label = require(AppParent.Core.ImageSet.ImageSetComponent).Label
-local GenericTextLabel = require(AppParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local useStyle = require(AppParent.Core.Style.useStyle)
-local t1 = {
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
+local Label = ImageSetComponent.Label
+local GenericTextLabel = require(parent.Core.Text.GenericTextLabel.GenericTextLabel)
+local useStyle = require(parent.Core.Style.useStyle)
+
+local v = {
 	containerPaddingLeft = 12,
 	containerPaddingRight = 12,
 	containerGap = 12,
-	dataGap = 0,
-	iconSize = getIconSize(IconSize.Large)
+	iconSize = getIconSize(IconSize.Large),
+	dataGap = 0
 }
 
-local function StatWidget(t2: {[any]: any}) -- line: 65
-	-- upvalues: useStyle (copy), Cryo (copy), t1 (copy), React (copy), Label (copy), GenericTextLabel (copy)
-	local v14 = useStyle()
-	local v15 = Cryo.Dictionary.join(t1, t2.styleProps or {})
-	local containerPaddingLeft = v15.containerPaddingLeft
-	local containerPaddingRight = v15.containerPaddingRight
-	local containerGap = v15.containerGap
-	local iconSize = v15.iconSize
-	local v20 = v15.iconContentColor or v14.Theme.IconEmphasis
-	local dataGap = v15.dataGap
-	local v22 = v15.dataContentColor or v14.Theme.TextEmphasis
-	local v23 = v15.dataLabelContentColor or v14.Theme.TextEmphasis
+local function StatWidget(props)
+	local v2 = useStyle()
+
+	local joined = Cryo.Dictionary.join(v, props.styleProps or {})
+	local containerPaddingLeft = joined.containerPaddingLeft
+	local containerPaddingRight = joined.containerPaddingRight
+	local containerGap = joined.containerGap
+	local iconSize = joined.iconSize
+	local iconContentColor = joined.iconContentColor or v2.Theme.IconEmphasis
+	local dataGap = joined.dataGap
+	local dataContentColor = joined.dataContentColor or v2.Theme.TextEmphasis
+	local dataLabelContentColor = joined.dataLabelContentColor or v2.Theme.TextEmphasis
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Position = t2.position,
-		AnchorPoint = t2.anchorPoint,
-		Size = t2.size,
+		Position = props.position,
+		AnchorPoint = props.anchorPoint,
+		Size = props.size,
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t2.layoutOrder
+		BackgroundTransparency = 1,
+		LayoutOrder = props.layoutOrder
 	}, {
 		ListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = t2.horizontalAlignment,
+			HorizontalAlignment = props.horizontalAlignment,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			Padding = UDim.new(0, containerGap)
 		}),
@@ -52,16 +55,16 @@ local function StatWidget(t2: {[any]: any}) -- line: 65
 			PaddingRight = UDim.new(0, containerPaddingRight)
 		}),
 		Icon = React.createElement(Label, {
-			BackgroundTransparency = 1,
 			Size = UDim2.new(0, iconSize, 0, iconSize),
-			Image = t2.icon,
-			ImageColor3 = v20.Color,
-			Position = UDim2.new(0, 0, 0, 0)
+			Image = props.icon,
+			ImageColor3 = iconContentColor.Color,
+			Position = UDim2.new(0, 0, 0, 0),
+			BackgroundTransparency = 1
 		}),
 		TextSection = React.createElement("Frame", {
-			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY,
+			BackgroundTransparency = 1,
 			Position = UDim2.new(0, iconSize + containerGap, 0, 0)
 		}, {
 			ListLayout = React.createElement("UIListLayout", {
@@ -70,30 +73,30 @@ local function StatWidget(t2: {[any]: any}) -- line: 65
 				Padding = UDim.new(0, dataGap)
 			}),
 			Number = React.createElement(GenericTextLabel, {
-				LayoutOrder = 1,
-				fluidSizing = true,
-				TextWrapped = false,
-				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(0, 0),
 				AutomaticSize = Enum.AutomaticSize.XY,
-				Text = t2.countText,
+				LayoutOrder = 1,
+				Text = props.countText,
+				fluidSizing = true,
+				TextWrapped = false,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				colorStyle = v22,
-				fontStyle = v14.Font.Title,
-				TextTruncate = Enum.TextTruncate.AtEnd
+				colorStyle = dataContentColor,
+				fontStyle = v2.Font.Title,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				BackgroundTransparency = 1
 			}),
 			Label = React.createElement(GenericTextLabel, {
-				LayoutOrder = 2,
-				fluidSizing = true,
-				TextWrapped = false,
-				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(0, 0),
 				AutomaticSize = Enum.AutomaticSize.XY,
-				Text = t2.labelText,
+				LayoutOrder = 2,
+				Text = props.labelText,
+				fluidSizing = true,
+				TextWrapped = false,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				colorStyle = v23,
-				fontStyle = v14.Font.CaptionHeader,
-				TextTruncate = Enum.TextTruncate.AtEnd
+				colorStyle = dataLabelContentColor,
+				fontStyle = v2.Font.CaptionHeader,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				BackgroundTransparency = 1
 			})
 		})
 	})

@@ -1,7 +1,6 @@
-local function isFeedContentScrollable(n1: number, n2: number, n3: number) -- line: 13
-	local v5 = n2 - n3 * 2
-
-	return n1 > 0 and (v5 > 0 and v5 < n1)
+local function isFeedContentScrollable(p: number, p2: number, p3: number): boolean
+	local v = p2 - p3 * 2
+	return p > 0 and v > 0 and v < p
 end
 
 return isFeedContentScrollable

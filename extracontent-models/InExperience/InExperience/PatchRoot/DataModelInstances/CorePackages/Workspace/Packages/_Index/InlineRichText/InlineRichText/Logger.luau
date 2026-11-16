@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("InlineRichText").Parent
-
-return (require(Parent.Loggers).Logger:new("InlineRichText"))
+local parent = script:FindFirstAncestor("InlineRichText").Parent
+local Loggers = require(parent.Loggers)
+return (Loggers.Logger:new("InlineRichText"))

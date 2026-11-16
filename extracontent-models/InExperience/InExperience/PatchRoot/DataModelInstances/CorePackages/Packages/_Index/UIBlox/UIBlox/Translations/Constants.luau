@@ -1,3 +1,1 @@
-return {
-	LOCALIZATION_TABLE_NAME = "UIBloxLocalization"
-}
+return { LOCALIZATION_TABLE_NAME = "UIBloxLocalization" }

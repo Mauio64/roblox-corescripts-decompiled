@@ -1,4 +1,5 @@
 local UserLib = script:FindFirstAncestor("UserLib")
+
 local User = require(UserLib.Models.User)
 
 return {

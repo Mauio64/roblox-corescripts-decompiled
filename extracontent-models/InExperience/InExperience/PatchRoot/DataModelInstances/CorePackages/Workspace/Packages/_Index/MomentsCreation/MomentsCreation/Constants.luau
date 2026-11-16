@@ -1,6 +1,4 @@
 return {
-	ScreenshotMusicDuration = 10,
-	RadialFillImage = "rbxasset://textures/ui/Controls/RadialFill.png",
 	AudioWaveform = {
 		SamplesPerSecond = 4,
 		WaveformWidth = 2,
@@ -8,18 +6,17 @@ return {
 		WaveformMinHeight = 4,
 		SegmentSelectorWidth = 150
 	},
-	SearchMusicCreatorFilter = { 7462718749 },
+	SearchMusicCreatorDenylist = {},
+	ScreenshotMusicDuration = 10,
 	BottomBarSizeConstraint = Vector2.new(400, 1e999),
+	RadialFillImage = "rbxasset://textures/ui/Controls/RadialFill.png",
 	TextOverlay = {
 		MinFontSize = 10,
 		MaxFontSize = 32,
 		DefaultFontSize = 16,
 		TreatmentMaxFontSize = 64,
-		TreatmentDefaultFontSize = 32
+		TreatmentDefaultFontSize = 32,
+		PickerRowHeight = 48
 	},
-	StickerOverlay = {
-		MinStickerSize = 50,
-		MaxStickerSize = 200,
-		DefaultStickerSize = 100
-	}
+	StickerOverlay = { MinStickerSize = 50, MaxStickerSize = 200, DefaultStickerSize = 100 }
 }

@@ -1,3 +1,3 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-return require(ParentParent.Promise)
+return require(parent.Promise)

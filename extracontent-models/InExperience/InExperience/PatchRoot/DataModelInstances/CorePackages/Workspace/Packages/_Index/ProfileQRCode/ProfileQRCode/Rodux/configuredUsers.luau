@@ -1,14 +1,14 @@
-local Parent = script:FindFirstAncestor("ProfileQRCode").Parent
-local convertActions = require(Parent.SocialReducerAdaptors).convertActions
-local usersActionAdaptor = require(Parent.SocialReducerAdaptors).usersActionAdaptor
+local parent = script:FindFirstAncestor("ProfileQRCode").Parent
+local SocialReducerAdaptors = require(parent.SocialReducerAdaptors)
+local convertActions = SocialReducerAdaptors.convertActions
+local SocialReducerAdaptors2 = require(parent.SocialReducerAdaptors)
+local usersActionAdaptor = SocialReducerAdaptors2.usersActionAdaptor
 local RoduxUsers = require(script.Parent.RoduxUsers)
-local t1 = {
-	byUserId = {},
-	byUsername = {}
-}
-local v6 = RoduxUsers.installReducer()
 
-return function() -- line: 14
-	-- upvalues: convertActions (copy), v6 (copy), usersActionAdaptor (copy), RoduxUsers (copy), t1 (copy)
-	return convertActions(v6, usersActionAdaptor(RoduxUsers), t1)
+local v = { byUserId = {}, byUsername = {} }
+
+local v2 = RoduxUsers.installReducer()
+
+return function()
+	return convertActions(v2, usersActionAdaptor(RoduxUsers), v)
 end

@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local ReportToDiagByCountryCode = require(Parent.Analytics).ReportToDiagByCountryCode
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function(p1, p2, n1: number) -- line: 6
-	-- upvalues: ReportToDiagByCountryCode (copy)
-	ReportToDiagByCountryCode(p1, p2, n1 * 1000, 100)
+local Analytics = require(parent.Analytics)
+local reportToDiagByCountryCode = Analytics.ReportToDiagByCountryCode
+
+return function(p, p2, p3: number)
+	reportToDiagByCountryCode(p, p2, p3 * 1000, 100)
 end

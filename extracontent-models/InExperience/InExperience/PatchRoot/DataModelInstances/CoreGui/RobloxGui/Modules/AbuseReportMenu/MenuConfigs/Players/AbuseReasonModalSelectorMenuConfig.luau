@@ -1,46 +1,44 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
 local CorePackages = game:GetService("CorePackages")
 local Constants = require(AbuseReportMenu.Components.Constants)
-
 require(AbuseReportMenu.Components.Types)
-
 local Cryo = require(CorePackages.Packages.Cryo)
+local AbuseReasonModalSelectorMenuConfig = {}
+AbuseReasonModalSelectorMenuConfig.componentType = "modalSelector"
 
-return {
-	componentType = "modalSelector",
-	fieldLabel = "ReasonForAbuse",
-	componentName = "AbuseReason",
-	getIsVisible = function(_) -- line: 9
-		return true
-	end,
-	getMenuItems = function(p2, p3) -- line: 12
-		-- upvalues: Constants (copy), Cryo (copy)
-		local v8 = if p2.methodOfAbuse ~= Constants.AbuseMethods.VoiceChat then Constants.PlayerAbuseTypes else Constants.PlayerVoiceAbuseTypes
-		local v9 = Cryo.Dictionary.values(v8)
+function AbuseReasonModalSelectorMenuConfig.getIsVisible(_): boolean
+	return true
+end
 
-		return Cryo.List.map(v9, function(p4) -- line: 17
-			-- upvalues: p3 (copy)
-			return {
-				label = p3[p4],
-				identifier = p4
-			}
-		end)
-	end,
-	getSelectedValue = function(p5) -- line: 24
-		return p5.abuseReason
-	end,
-	onUpdateSelectedOption = function(p6, _, p8, p9) -- line: 27
-		-- upvalues: Constants (copy)
-		p9.analyticsDispatch({
-			type = Constants.AnalyticsActions.IncrementReasonChanged
-		})
-		p9.analyticsDispatch({
-			type = Constants.AnalyticsActions.SetReasonSelection,
-			selection = p6.identifier
-		})
-		p8({
-			type = Constants.PlayerMenuActions.UpdateAbuseReason,
-			abuseReason = p6.identifier
-		})
+function AbuseReasonModalSelectorMenuConfig.getMenuItems(p, p2)
+	local v
+
+	if p.methodOfAbuse == Constants.AbuseMethods.VoiceChat then
+		v = Constants.PlayerVoiceAbuseTypes
+	else
+		v = Constants.PlayerAbuseTypes
 	end
-}
+
+	local values = Cryo.Dictionary.values(v)
+	return Cryo.List.map(values, function(identifier)
+		return { label = p2[identifier], identifier = identifier }
+	end)
+end
+
+function AbuseReasonModalSelectorMenuConfig.getSelectedValue(p)
+	return p.abuseReason
+end
+
+function AbuseReasonModalSelectorMenuConfig.onUpdateSelectedOption(p, _, callback, p2)
+	p2.analyticsDispatch({ type = Constants.AnalyticsActions.IncrementReasonChanged })
+	p2.analyticsDispatch({
+		type = Constants.AnalyticsActions.SetReasonSelection,
+		selection = p.identifier
+	})
+
+	callback({ type = Constants.PlayerMenuActions.UpdateAbuseReason, abuseReason = p.identifier })
+end
+
+AbuseReasonModalSelectorMenuConfig.fieldLabel = "ReasonForAbuse"
+AbuseReasonModalSelectorMenuConfig.componentName = "AbuseReason"
+return AbuseReasonModalSelectorMenuConfig

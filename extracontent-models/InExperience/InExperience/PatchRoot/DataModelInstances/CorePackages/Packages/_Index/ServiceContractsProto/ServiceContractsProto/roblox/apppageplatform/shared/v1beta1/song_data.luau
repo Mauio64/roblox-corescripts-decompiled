@@ -1,257 +1,236 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 53
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		id = if t3 ~= nil and t3.id ~= nil then t3.id else "",
-		media_asset_id = if t3 ~= nil and t3.media_asset_id ~= nil then t3.media_asset_id else "",
-		title = if t3 ~= nil and t3.title ~= nil then t3.title else "",
-		artist = if t3 ~= nil and t3.artist ~= nil then t3.artist else "",
-		album = if t3 ~= nil and t3.album ~= nil then t3.album else "",
-		album_art_asset_id = if t3 ~= nil and t3.album_art_asset_id ~= nil then t3.album_art_asset_id else 0,
-		is_private = t3 ~= nil and (t3.is_private ~= nil and t3.is_private),
-		duration = if t3 ~= nil and t3.duration ~= nil then t3.duration else 0
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local v2 = {
+		id = (data == nil or data.id == nil) and "" or data.id,
+		media_asset_id = (data == nil or data.media_asset_id == nil) and "" or data.media_asset_id,
+		title = (data == nil or data.title == nil) and "" or data.title,
+		artist = (data == nil or data.artist == nil) and "" or data.artist,
+		album = (data == nil or data.album == nil) and "" or data.album,
+		album_art_asset_id = (data == nil or data.album_art_asset_id == nil) and 0 or data.album_art_asset_id,
+		is_private = data ~= nil and data.is_private ~= nil and data.is_private,
+		duration = (data == nil or data.duration == nil) and 0 or data.duration
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 66
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.id ~= nil and p1.id ~= "" then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v9, v10, p1.id)
+	if data.id ~= nil and data.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.id)
 	end
 
-	if p1.media_asset_id ~= nil and p1.media_asset_id ~= "" then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.media_asset_id)
+	if data.media_asset_id ~= nil and data.media_asset_id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.media_asset_id)
 	end
 
-	if p1.title ~= nil and p1.title ~= "" then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v13, v14, p1.title)
+	if data.title ~= nil and data.title ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.title)
 	end
 
-	if p1.artist ~= nil and p1.artist ~= "" then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v15, v16, p1.artist)
+	if data.artist ~= nil and data.artist ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.artist)
 	end
 
-	if p1.album ~= nil and p1.album ~= "" then
-		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v17, v18, p1.album)
+	if data.album ~= nil and data.album ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.album)
 	end
 
-	if p1.album_art_asset_id ~= nil and p1.album_art_asset_id ~= 0 then
-		local v19, v20 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v19, v20, p1.album_art_asset_id)
+	if data.album_art_asset_id ~= nil and data.album_art_asset_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.album_art_asset_id)
 	end
 
-	if p1.is_private then
-		local v21, v22 = proto.writeTag(buf, n1, 7, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v21, v22, not p1.is_private and 0 or 1)
+	if data.is_private then
+		local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_private and 1 or 0)
 	end
 
-	if p1.duration ~= nil and p1.duration ~= 0 then
-		local v23, v24 = proto.writeTag(buf, n1, 8, proto.wireTypes.i64)
-
-		buf, n1 = proto.writeDouble(v23, v24, p1.duration)
+	if data.duration ~= nil and data.duration ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.i64)
+		v2, v3 = proto.writeDouble(v4, v5, data.duration)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 115
-	-- upvalues: t2 (copy), proto (copy)
-	local v27 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v29, v30
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v29, v30, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v30 == proto.wireTypes.varint then
-			if v29 == 6 then
-				local v31
-
-				v31, n2 = proto.readVarIntI64(p2, n2)
-				v27.album_art_asset_id = v31
-			elseif v29 == 7 then
-				local v32
-
-				v32, n2 = proto.readVarInt(p2, n2)
-				v27.is_private = v32 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 6 then
+				local album_art_asset_id
+				album_art_asset_id, v2 = proto.readVarIntI64(buf, v2)
+				result.album_art_asset_id = album_art_asset_id
+			elseif v3 == 7 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_private = v5 ~= 0
 			else
-				local v33
-
-				v33, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v30 == proto.wireTypes.lengthDelimited then
-			if v29 == 1 then
-				local v34
-
-				v34, n2 = proto.readBuffer(p2, n2)
-				v27.id = buffer.tostring(v34)
-			elseif v29 == 2 then
-				local v35
-
-				v35, n2 = proto.readBuffer(p2, n2)
-				v27.media_asset_id = buffer.tostring(v35)
-			elseif v29 == 3 then
-				local v36
-
-				v36, n2 = proto.readBuffer(p2, n2)
-				v27.title = buffer.tostring(v36)
-			elseif v29 == 4 then
-				local v37
-
-				v37, n2 = proto.readBuffer(p2, n2)
-				v27.artist = buffer.tostring(v37)
-			elseif v29 == 5 then
-				local v38
-
-				v38, n2 = proto.readBuffer(p2, n2)
-				v27.album = buffer.tostring(v38)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.media_asset_id = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.title = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.artist = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.album = buffer.tostring(v5)
 			else
-				local v39, v40 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v40 + v39
+				v2 = v5 + varInt
 			end
-		elseif v30 == proto.wireTypes.i32 then
-			local v41
-
-			v41, n2 = proto.readFixed32(p2, n2)
-		elseif v30 == proto.wireTypes.i64 then
-			if v29 == 8 then
-				local v42
-
-				v42, n2 = proto.readDouble(p2, n2)
-				v27.duration = v42
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			if v3 == 8 then
+				local duration
+				duration, v2 = proto.readDouble(buf, v2)
+				result.duration = duration
 			else
-				local v43
-
-				v43, n2 = proto.readFixed64(p2, n2)
+				local _
+				_, v2 = proto.readFixed64(buf, v2)
 			end
 		else
-			error("Unsupported wire type: " .. v30)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v27
-end
-function t2.jsonEncode(p3) -- line: 193
-	-- upvalues: proto (copy)
-	local t4 = {}
-
-	if p3.id ~= nil and p3.id ~= "" then
-		t4.id = p3.id
-	end
-
-	if p3.media_asset_id ~= nil and p3.media_asset_id ~= "" then
-		t4.mediaAssetId = p3.media_asset_id
-	end
-
-	if p3.title ~= nil and p3.title ~= "" then
-		t4.title = p3.title
-	end
-
-	if p3.artist ~= nil and p3.artist ~= "" then
-		t4.artist = p3.artist
-	end
-
-	if p3.album ~= nil and p3.album ~= "" then
-		t4.album = p3.album
-	end
-
-	if p3.album_art_asset_id ~= nil and p3.album_art_asset_id ~= 0 then
-		t4.albumArtAssetId = p3.album_art_asset_id
-	end
-
-	if p3.is_private then
-		t4.isPrivate = p3.is_private
-	end
-
-	if p3.duration ~= nil and p3.duration ~= 0 then
-		t4.duration = proto.json.serializeNumber(p3.duration)
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 231
-	-- upvalues: t2 (copy), proto (copy)
-	local v47 = t2.new()
-
-	if t5.id ~= nil then
-		v47.id = t5.id
-	end
-
-	if t5.media_asset_id ~= nil then
-		v47.media_asset_id = t5.media_asset_id
-	end
-
-	if t5.mediaAssetId ~= nil then
-		v47.media_asset_id = t5.mediaAssetId
-	end
-
-	if t5.title ~= nil then
-		v47.title = t5.title
-	end
-
-	if t5.artist ~= nil then
-		v47.artist = t5.artist
-	end
-
-	if t5.album ~= nil then
-		v47.album = t5.album
-	end
-
-	if t5.album_art_asset_id ~= nil then
-		v47.album_art_asset_id = t5.album_art_asset_id
-	end
-
-	if t5.albumArtAssetId ~= nil then
-		v47.album_art_asset_id = t5.albumArtAssetId
-	end
-
-	if t5.is_private ~= nil then
-		v47.is_private = t5.is_private
-	end
-
-	if t5.isPrivate ~= nil then
-		v47.is_private = t5.isPrivate
-	end
-
-	if t5.duration ~= nil then
-		v47.duration = proto.json.deserializeNumber(t5.duration)
-	end
-
-	return v47
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.id ~= nil and data.id ~= "" then
+		v2.id = data.id
+	end
+
+	if data.media_asset_id ~= nil and data.media_asset_id ~= "" then
+		v2.mediaAssetId = data.media_asset_id
+	end
+
+	if data.title ~= nil and data.title ~= "" then
+		v2.title = data.title
+	end
+
+	if data.artist ~= nil and data.artist ~= "" then
+		v2.artist = data.artist
+	end
+
+	if data.album ~= nil and data.album ~= "" then
+		v2.album = data.album
+	end
+
+	if data.album_art_asset_id ~= nil and data.album_art_asset_id ~= 0 then
+		v2.albumArtAssetId = data.album_art_asset_id
+	end
+
+	if data.is_private then
+		v2.isPrivate = data.is_private
+	end
+
+	if data.duration ~= nil and data.duration ~= 0 then
+		v2.duration = proto.json.serializeNumber(data.duration)
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.media_asset_id ~= nil then
+		v2.media_asset_id = data.media_asset_id
+	end
+
+	if data.mediaAssetId ~= nil then
+		v2.media_asset_id = data.mediaAssetId
+	end
+
+	if data.title ~= nil then
+		v2.title = data.title
+	end
+
+	if data.artist ~= nil then
+		v2.artist = data.artist
+	end
+
+	if data.album ~= nil then
+		v2.album = data.album
+	end
+
+	if data.album_art_asset_id ~= nil then
+		v2.album_art_asset_id = data.album_art_asset_id
+	end
+
+	if data.albumArtAssetId ~= nil then
+		v2.album_art_asset_id = data.albumArtAssetId
+	end
+
+	if data.is_private ~= nil then
+		v2.is_private = data.is_private
+	end
+
+	if data.isPrivate ~= nil then
+		v2.is_private = data.isPrivate
+	end
+
+	if data.duration ~= nil then
+		v2.duration = proto.json.deserializeNumber(data.duration)
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "SongData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.SongData"
 }
-t1.SongData = t2
-typeRegistry.default:register(t1.SongData)
 
-return {
-	SongData = t1.SongData
-}
+v.SongData = class
+
+typeRegistry.default:register(v.SongData)
+
+return { SongData = v.SongData }

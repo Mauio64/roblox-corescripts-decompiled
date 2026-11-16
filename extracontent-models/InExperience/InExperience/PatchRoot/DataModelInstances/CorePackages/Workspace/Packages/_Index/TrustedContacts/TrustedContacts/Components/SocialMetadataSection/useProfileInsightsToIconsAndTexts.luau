@@ -1,13 +1,25 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedContactsParent = TrustedContacts.Parent
-local FriendRequestOriginSource = require(TrustedContactsParent.ApolloProfileInsights).Enums.FriendRequestOriginSource
+local parent = TrustedContacts.Parent
+
+local ApolloProfileInsights = require(parent.ApolloProfileInsights)
+
+local FriendRequestOriginSource = ApolloProfileInsights.Enums.FriendRequestOriginSource
+
 local LocalizationService = game:GetService("LocalizationService")
-local React = require(TrustedContactsParent.React)
-local useLocalization = require(TrustedContactsParent.Localization).Hooks.useLocalization
-local Icon = require(TrustedContactsParent.BuilderIcons).Icon
-local FFlagConnectionsToFriendsRename = require(TrustedContactsParent.SharedFlags).FFlagConnectionsToFriendsRename
+
+local React = require(parent.React)
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local BuilderIcons = require(parent.BuilderIcons)
+local Icon = BuilderIcons.Icon
+
 local FFlagTFNonFriendsPermitted = require(TrustedContacts.Flags.FFlagTFNonFriendsPermitted)
-local t1 = {
+local SharedFlags = require(parent.SharedFlags)
+local FFlagTFClassmatesProfileInsight = SharedFlags.FFlagTFClassmatesProfileInsight
+
+local v = {
 	mutualFriends = Icon.TwoPeople,
 	friendshipAgeUnixSeconds = Icon.Calendar,
 	qrCode = Icon.SquaresGridQr,
@@ -15,174 +27,182 @@ local t1 = {
 	contacts = Icon.SmartphonePortrait,
 	accountCreationDateUnixSeconds = Icon.CircleI,
 	localizedCountryName = Icon.GlobeDetailed,
-	notAFriend = if not FFlagTFNonFriendsPermitted then nil else Icon.TriangleExclamation,
-	noMutualFriends = if not FFlagTFNonFriendsPermitted then nil else Icon.TriangleExclamation
+	isClassmate = 0,
+	notAFriend = 0,
+	noMutualFriends = 0
 }
+local isClassmate
 
-local function v11(p1, p2, p3) -- line: 56
-	-- upvalues: FriendRequestOriginSource (copy)
-	local joinedInYear = nil
+if FFlagTFClassmatesProfileInsight then
+	isClassmate = Icon.PersonGraduate
+end
 
-	if p1 == "friendshipAgeUnixSeconds" then
-		return p3.connectedDuration
+v.isClassmate = isClassmate
+local notAFriend
+
+if FFlagTFNonFriendsPermitted then
+	notAFriend = Icon.TriangleExclamation
+end
+
+v.notAFriend = notAFriend
+local noMutualFriends
+
+if FFlagTFNonFriendsPermitted then
+	noMutualFriends = Icon.TriangleExclamation
+end
+
+v.noMutualFriends = noMutualFriends
+
+local function fn(k, list, data)
+	local v2 = nil
+
+	if k == "friendshipAgeUnixSeconds" then
+		return data.connectedDuration
 	end
 
-	if p1 == "friendRequestOriginSource" then
-		if p2 == FriendRequestOriginSource.QrCode then
-			return p3.fromQrCode
+	if k == "friendRequestOriginSource" then
+		if list == FriendRequestOriginSource.QrCode then
+			return data.fromQrCode
 		end
 
-		if p2 == FriendRequestOriginSource.PhoneContactImporter then
-			return p3.fromContacts
+		if list == FriendRequestOriginSource.PhoneContactImporter then
+			return data.fromContacts
 		end
 
-		if p2 == FriendRequestOriginSource.PlayerSearch then
-			return p3.fromSearch
+		if list == FriendRequestOriginSource.PlayerSearch then
+			return data.fromSearch
 		end
-	elseif p1 == "mutualFriends" then
-		if #p2 > 1 then
-			return p3.mutualConnections
+	elseif k == "mutualFriends" then
+		if #list > 1 then
+			return data.mutualConnections
 		end
 
-		if #p2 == 1 then
-			return p3.singularMutualConnection
+		if #list == 1 then
+			return data.singularMutualConnection
 		end
 	else
-		if p1 == "localizedCountryName" then
-			return p2
+		if k == "localizedCountryName" then
+			return list
+		elseif k == "accountCreationDateUnixSeconds" then
+			return data.joinedInYear
 		end
 
-		if p1 == "accountCreationDateUnixSeconds" then
-			joinedInYear = p3.joinedInYear
+		if not FFlagTFClassmatesProfileInsight or k ~= "isClassmate" then
+			return v2
+		end
+
+		if list then
+			return data.classmates
 		end
 	end
 
-	return joinedInYear
+	return v2
 end
-local function useProfileInsightsToIconsAndTexts(t2: {[any]: any}) -- line: 85
-	-- upvalues: React (copy), FFlagConnectionsToFriendsRename (copy), LocalizationService (copy), useLocalization (copy), FFlagTFNonFriendsPermitted (copy), FriendRequestOriginSource (copy), t1 (copy), v11 (copy)
-	local v21 = React.useMemo(function() -- line: 88
-		-- upvalues: t2 (copy), FFlagConnectionsToFriendsRename (copy)
-		if t2.friendshipAgeUnixSeconds then
-			local v25 = DateTime.now().UnixTimestamp - t2.friendshipAgeUnixSeconds or 0
-			local v26 = math.floor(v25 / 31536000)
-			local v27 = math.floor(v25 / 2592000)
-			local v28 = math.floor(v25 / 86400)
 
-			if v26 > 1 then
-				return {
-					"Feature.Friends.Label.ConnectedNumYears",
-					num = v26
-				}
-			end
+local function fn2(k, p) -- 1 equivalent call inferred from this helper
+	if k == "friendRequestOriginSource" then
+		return v[p == FriendRequestOriginSource.QrCode and "qrCode" or p == FriendRequestOriginSource.PhoneContactImporter and "contacts" or p == FriendRequestOriginSource.PlayerSearch and "search" or nil]
+	end
 
-			if v26 == 1 then
-				return "Feature.Friends.Label.ConnectedOneYear"
-			end
+	return v[k]
+end
 
-			if v27 > 1 then
-				return {
-					"Feature.Friends.Label.ConnectedNumMonths",
-					num = v27
-				}
-			end
-
-			if v27 == 1 then
-				return "Feature.Friends.Label.ConnectedOneMonth"
-			end
-
-			if v28 > 1 then
-				return {
-					"Feature.Friends.Label.ConnectedNumDays",
-					num = v28
-				}
-			end
-
-			if v28 == 1 then
-				return "Feature.Friends.Label.ConnectedOneDay"
-			end
-
-			if FFlagConnectionsToFriendsRename then
-				return "Feature.Friends.Label.NewFriend"
-			end
-
-			return "Feature.Friends.Label.NewConnection"
+local function useProfileInsightsToIconsAndTexts(p)
+	local connectedDuration = React.useMemo(function()
+		if not p.friendshipAgeUnixSeconds then
+			return nil
 		end
 
-		return nil
-	end, { t2.friendshipAgeUnixSeconds })
-	local v22 = DateTime.fromUnixTimestamp(t2.accountCreationDateUnixSeconds or 0):FormatLocalTime("YYYY", LocalizationService.RobloxLocaleId)
-	local v23 = useLocalization({
+		local v2 = DateTime.now().UnixTimestamp - p.friendshipAgeUnixSeconds or 0
+		local num = math.floor(v2 / 31536000)
+		local num2 = math.floor(v2 / 2592000)
+		local num3 = math.floor(v2 / 86400)
+
+		if num > 1 then
+			return {
+				"Feature.Friends.Label.ConnectedNumYears",
+				num = num
+			}
+		end
+
+		if num == 1 then
+			return "Feature.Friends.Label.ConnectedOneYear"
+		end
+
+		if num2 > 1 then
+			return {
+				"Feature.Friends.Label.ConnectedNumMonths",
+				num = num2
+			}
+		end
+
+		if num2 == 1 then
+			return "Feature.Friends.Label.ConnectedOneMonth"
+		end
+
+		if num3 > 1 then
+			return {
+				"Feature.Friends.Label.ConnectedNumDays",
+				num = num3
+			}
+		end
+
+		if num3 == 1 then
+			return "Feature.Friends.Label.ConnectedOneDay"
+		end
+
+		return "Feature.Friends.Label.NewFriend"
+	end, { p.friendshipAgeUnixSeconds })
+
+	local formatLocalTime = DateTime.fromUnixTimestamp(p.accountCreationDateUnixSeconds or 0):FormatLocalTime(
+		"YYYY",
+		LocalizationService.RobloxLocaleId
+	)
+
+	local v2 = useLocalization({
 		singularMutualConnection = "Feature.Friends.Label.MutualFriendTitle",
-		fromQrCode = "Feature.Friends.Description.FromQrCode",
-		fromContacts = "Feature.Friends.Description.FromContacts",
-		fromSearch = "Feature.PlayerSearchResults.Label.FromSearch",
 		mutualConnections = {
-			not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.MutualConnections" or "Feature.Friends.Label.MutualFriendsTitle",
-			numConnections = t2.mutualFriends and #t2.mutualFriends or 0
+			"Feature.Friends.Label.MutualFriendsTitle",
+			numConnections = p.mutualFriends and #p.mutualFriends or 0
 		},
 		joinedInYear = {
 			"Feature.Friends.Label.JoinedInYear",
-			year = v22
+			year = formatLocalTime
 		},
-		connectedDuration = v21,
-		notAFriend = if not FFlagTFNonFriendsPermitted then nil else "Feature.Friends.Description.NotAFriend",
-		noMutualFriends = if not FFlagTFNonFriendsPermitted then nil else "Feature.Friends.Description.NoMutualFriends"
+		connectedDuration = connectedDuration,
+		fromQrCode = "Feature.Friends.Description.FromQrCode",
+		fromContacts = "Feature.Friends.Description.FromContacts",
+		fromSearch = "Feature.PlayerSearchResults.Label.FromSearch",
+		classmates = FFlagTFClassmatesProfileInsight and "Feature.Schools.Label.Classmates" or nil,
+		notAFriend = FFlagTFNonFriendsPermitted and "Feature.Friends.Description.NotAFriend" or nil,
+		noMutualFriends = FFlagTFNonFriendsPermitted and "Feature.Friends.Description.NoMutualFriends" or nil
 	})
-	local t3 = {}
 
-	return React.useMemo(function() -- line: 140
-		-- upvalues: t2 (copy), FriendRequestOriginSource (copy), t1 (copy), v11 (copy), v23 (copy), t3 (copy), FFlagTFNonFriendsPermitted (copy)
-		for v29, v30 in t2 do
-			local v32
+	local result = {}
+	return React.useMemo(function()
+		for k, v3 in p do
+			local icon = fn2(k, v3) -- inferred equivalent call
+			local text = fn(k, v3, v2)
 
-			if v29 == "friendRequestOriginSource" then
-				local s1 = nil
-
-				if v30 == FriendRequestOriginSource.QrCode then
-					s1 = "qrCode"
-				elseif v30 == FriendRequestOriginSource.PhoneContactImporter then
-					s1 = "contacts"
-				elseif v30 == FriendRequestOriginSource.PlayerSearch then
-					s1 = "search"
-				end
-
-				v32 = t1[s1]
-			else
-				v32 = t1[v29]
-			end
-
-			local v33 = v11(v29, v30, v23)
-
-			if v32 and v33 then
-				table.insert(t3, {
-					icon = v32,
-					text = v33
-				})
+			if icon and text then
+				table.insert(result, { icon = icon, text = text })
 			end
 		end
 
-		if FFlagTFNonFriendsPermitted then
-			if t2.friendshipAgeUnixSeconds == nil then
-				table.insert(t3, {
-					icon = t1.notAFriend,
-					text = v23.notAFriend
-				})
-			end
-
-			if t2.mutualFriends == nil or next(t2.mutualFriends) == nil then
-				table.insert(t3, {
-					icon = t1.noMutualFriends,
-					text = v23.noMutualFriends
-				})
-			end
+		if not FFlagTFNonFriendsPermitted then
+			return result
 		end
 
-		return t3
-	end, {
-		v23,
-		t2
-	})
+		if p.friendshipAgeUnixSeconds == nil then
+			table.insert(result, { icon = v.notAFriend, text = v2.notAFriend })
+		end
+
+		if p.mutualFriends == nil or next(p.mutualFriends) == nil then
+			table.insert(result, { icon = v.noMutualFriends, text = v2.noMutualFriends })
+		end
+
+		return result
+	end, { v2, p })
 end
 
 return useProfileInsightsToIconsAndTexts

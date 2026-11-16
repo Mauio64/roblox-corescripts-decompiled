@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("ExpChatIntegration").Parent
+local parent = script:FindFirstAncestor("ExpChatIntegration").Parent
 
-require(Parent.Signals)
+require(parent.Signals)
 
 return {}

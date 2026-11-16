@@ -1,6 +1,12 @@
-local Parent = script:FindFirstAncestor("UnifiedLogging").Parent
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local t1 = {
+local parent = script:FindFirstAncestor("UnifiedLogging").Parent
+
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUnifiedLoggingCoerceMetadataFieldValues = SharedFlags.FFlagUnifiedLoggingCoerceMetadataFieldValues
+
+local v = {
 	collectionId = true,
 	collectionPosition = true,
 	contentType = true,
@@ -11,50 +17,62 @@ local t1 = {
 	totalNumberOfItems = true
 }
 
-local function shouldIgnoreKey(s1: string) -- line: 17
-	-- upvalues: t1 (copy)
-	return t1[s1]
+local function shouldIgnoreKey(k: string) -- 1 equivalent call inferred from this helper
+	return v[k]
 end
-local function buildItemMetadataFields(t2: {[any]: any}, t3: {[any]: any}, p1) -- line: 21
-	-- upvalues: t1 (copy), DiscoveryEventErrorLogger (copy)
-	local t4 = {}
 
-	for v11, v12 in t2 do
-		local v13 = t3 and t3[v12] or nil
+local function buildItemMetadataFields(list, p, collectionId)
+	local v2 = {}
 
-		if v13 ~= nil then
-			for v14, v15 in v13 do
-				if not t1[v14] then
-					if t4[v14] == nil then
-						t4[v14] = {}
-					end
+	for k, item in list do
+		local v3
 
-					t4[v14][v11] = v15
+		if p then
+			v3 = p[item] or nil
+		end
+
+		if v3 == nil then
+			DiscoveryEventErrorLogger.reportError(
+				"buildMetadataFields",
+				"Entry was nil when building item metadataFields for collection",
+				{ entryIndex = item, collectionId = collectionId }
+			)
+		else
+			for k2, v4 in v3 do
+				if shouldIgnoreKey(k2) then -- inferred equivalent call
+					continue
+				end
+
+				if v2[k2] == nil then
+					v2[k2] = {}
+				end
+
+				local v5 = v2[k2]
+
+				if FFlagUnifiedLoggingCoerceMetadataFieldValues then
+					v5[k] = tostring(v4)
+				else
+					v5[k] = v4
 				end
 			end
-		else
-			DiscoveryEventErrorLogger.reportError("buildMetadataFields", "Entry was nil when building item metadataFields for collection", {
-				entryIndex = v12,
-				collectionId = p1
-			})
 		end
 	end
 
-	for v16, _ in t4 do
-		for i = 1, #t2 do
-			if t4[v16][i] == nil then
-				t4[v16][i] = ""
+	for k, _ in v2 do
+		for i = 1, #list do
+			if v2[k][i] == nil then
+				v2[k][i] = ""
 			end
 		end
 	end
 
-	local t5 = {}
+	local itemMetadataFields = {}
 
-	for v20, v21 in t4 do
-		t5[`{ v20 }_arr`] = table.concat(v21, ",")
+	for k, list2 in v2 do
+		itemMetadataFields[`{k}_arr`] = table.concat(list2, ",")
 	end
 
-	return t5
+	return itemMetadataFields
 end
 
 return buildItemMetadataFields

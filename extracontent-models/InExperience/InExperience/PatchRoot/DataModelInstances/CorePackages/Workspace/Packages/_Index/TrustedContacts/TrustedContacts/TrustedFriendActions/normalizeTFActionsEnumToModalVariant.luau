@@ -1,7 +1,10 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedConnectionStatus = require(TrustedContacts.Enums).TrustedConnectionStatus
+
+local Enums = require(TrustedContacts.Enums)
+local TrustedConnectionStatus = Enums.TrustedConnectionStatus
 local TFActionsEnum = require(script.Parent.TFActionsEnum)
-local t1 = {
+
+local v = {
 	[TFActionsEnum.RemoveTrustedConnection] = TrustedConnectionStatus.TrustedFriends,
 	[TFActionsEnum.AddTrustedConnectionViaLink] = TrustedConnectionStatus.Friends,
 	[TFActionsEnum.AddTrustedFriendDoubleOptin] = TrustedConnectionStatus.Friends,
@@ -15,9 +18,8 @@ local t1 = {
 	[TFActionsEnum.PendingIncomingTrustedConnection] = TrustedConnectionStatus.RequestReceived
 }
 
-local function normalizeTFActionsEnumToModalVariant(p1) -- line: 24
-	-- upvalues: t1 (copy)
-	return t1[p1]
+local function normalizeTFActionsEnumToModalVariant(p)
+	return v[p]
 end
 
 return normalizeTFActionsEnumToModalVariant

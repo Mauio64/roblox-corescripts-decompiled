@@ -1,153 +1,156 @@
-local Parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local useMenuItemCursor = require(script.Parent.useMenuItemCursor)
-local v5 = game:DefineFastInt("ChatAutocompleteMaxVisibleEntries", 3)
 
-local function ChatAutocompleteDropdown(t1: {[any]: any}) -- line: 38
-	-- upvalues: Foundation (copy), useMenuItemCursor (copy), React (copy), v5 (copy)
-	local v8 = Foundation.Hooks.useTokens()
-	local v9 = useMenuItemCursor()
-	local v10 = React.useRef(nil)
-	local v11, v12 = React.useState(0)
+local defineFastInt = game:DefineFastInt("ChatAutocompleteMaxVisibleEntries", 3)
 
-	React.useEffect(function() -- line: 45
-		-- upvalues: t1 (copy), v12 (copy)
-		local current = t1.anchorRef.current
+local function ChatAutocompleteDropdown(props)
+	local v = Foundation.Hooks.useTokens()
+	local cursor = useMenuItemCursor()
+	local ref = React.useRef(nil)
 
-		if not current or not current:IsA("GuiObject") then
+	local state, setState = React.useState(0)
+	React.useEffect(function()
+		local current = props.anchorRef.current
+
+		if current and current:IsA("GuiObject") then
+			setState(current.AbsoluteSize.X)
+			local absoluteSizeChangedConnection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				setState(current.AbsoluteSize.X)
+			end)
+			return function()
+				absoluteSizeChangedConnection:Disconnect()
+			end
+		end
+	end, { props.anchorRef })
+
+	local xxSmall = v.Padding.XXSmall
+	React.useEffect(function()
+		local current = ref.current
+
+		if not current or not props.isOpen or props.keyboardIndex < 1 then
 			return
 		end
 
-		v12(current.AbsoluteSize.X)
+		local v2 = (props.keyboardIndex - 1) * (40 + xxSmall)
+		local v3 = v2 + 40
+		local y = current.AbsoluteWindowSize.Y
+		local y2 = current.CanvasPosition.Y
 
-		local connection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 51
-			-- upvalues: v12 (copy), current (copy)
-			v12(current.AbsoluteSize.X)
-		end)
-
-		return function() -- line: 54
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		if y2 + y < v3 then
+			current.CanvasPosition = Vector2.new(0, v3 - y)
+		elseif v2 < y2 then
+			current.CanvasPosition = Vector2.new(0, v2)
 		end
-	end, { t1.anchorRef })
+	end, { props.keyboardIndex, props.isOpen, xxSmall })
 
-	local XXSmall = v8.Padding.XXSmall
+	local v2 = React.useMemo(function()
+		local children = {}
 
-	React.useEffect(function() -- line: 65
-		-- upvalues: v10 (copy), t1 (copy), XXSmall (copy)
-		local current = v10.current
-
-		if not current or (not t1.isOpen or t1.keyboardIndex < 1) then
-			return
+		if not (props.isOpen and props.renderEntry) then
+			return children
 		end
 
-		local v23 = (t1.keyboardIndex - 1) * (40 + XXSmall)
-		local v24 = v23 + 40
-		local AbsoluteWindowSizeY = current.AbsoluteWindowSize.Y
-		local CanvasPositionY = current.CanvasPosition.Y
+		local renderEntry = props.renderEntry
 
-		if v24 > CanvasPositionY + AbsoluteWindowSizeY then
-			current.CanvasPosition = Vector2.new(0, v24 - AbsoluteWindowSizeY)
+		for k, result in props.results do
+			local v2 = k == props.selectedIndex
 
-			return
-		end
-
-		if v23 < CanvasPositionY then
-			current.CanvasPosition = Vector2.new(0, v23)
-		end
-	end, {
-		t1.keyboardIndex,
-		t1.isOpen,
-		XXSmall
-	})
-
-	local v14 = React.useMemo(function() -- line: 83
-		-- upvalues: t1 (copy), React (copy), Foundation (copy), v8 (copy), v9 (copy)
-		local t2 = {}
-
-		if not t1.isOpen or not t1.renderEntry then
-			return t2
-		end
-
-		local renderEntry = t1.renderEntry
-
-		for v29, v30 in t1.results do
-			local v31 = v29 == t1.selectedIndex
-
-			t2["entry_" .. tostring(v29)] = React.createElement(Foundation.View, {
+			local v3 = "entry_" .. tostring(k)
+			local createElement = React.createElement
+			local view = Foundation.View
+			local v4 = {
 				Size = UDim2.new(1, 0, 0, 40),
-				LayoutOrder = v29,
-				cornerRadius = UDim.new(0, v8.Radius.Medium),
-				backgroundStyle = if not v31 then nil else v8.Color.ActionSoftEmphasis.Background,
-				stateLayer = {
-					affordance = Foundation.Enums.StateLayerAffordance.None
-				},
-				selection = {
-					Selectable = true
-				},
-				cursor = v9,
-				padding = {
-					left = UDim.new(0, 12),
-					right = UDim.new(0, 12),
-					top = UDim.new(0, 10),
-					bottom = UDim.new(0, 10)
-				},
-				onActivated = function() -- line: 111
-					-- upvalues: t1 (copy), v29 (copy)
-					t1.onSelect(v29)
-				end,
-				onStateChanged = function(p1) -- line: 114
-					-- upvalues: t1 (copy), v29 (copy)
-					if p1 == "Hover" then
-						t1.onHover(v29)
-					end
+				LayoutOrder = k,
+				cornerRadius = UDim.new(0, v.Radius.Medium),
+				backgroundStyle = 0,
+				stateLayer = 0,
+				selection = 0,
+				cursor = 0,
+				padding = 0,
+				onActivated = 0,
+				onStateChanged = 0
+			}
+			local backgroundStyle
+
+			if v2 then
+				backgroundStyle = v.Color.ActionSoftEmphasis.Background
+			end
+
+			v4.backgroundStyle = backgroundStyle
+
+			v4.stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None }
+
+			v4.selection = { Selectable = true }
+			v4.cursor = cursor
+			v4.padding = {
+				left = UDim.new(0, 12),
+				right = UDim.new(0, 12),
+				top = UDim.new(0, 10),
+				bottom = UDim.new(0, 10)
+			}
+
+			function v4.onActivated()
+				props.onSelect(k)
+			end
+			function v4.onStateChanged(p)
+				if p == "Hover" then
+					props.onHover(k)
 				end
-			}, {
-				content = renderEntry(v30, v31)
-			})
+			end
+
+			children[v3] = createElement(view, v4, { content = renderEntry(result, v2) })
 		end
 
-		return t2
+		return children
 	end, {
-		t1.isOpen,
-		t1.results,
-		t1.selectedIndex,
-		t1.renderEntry,
-		t1.onSelect,
-		t1.onHover,
-		v9,
-		v8
+		props.isOpen,
+		props.results,
+		props.selectedIndex,
+		props.renderEntry,
+		props.onSelect,
+		props.onHover,
+		cursor,
+		v
 	})
-	local v15 = v5
-	local v16 = math.min(#t1.results, v15)
-	local v17 = v15 < #t1.results
-	local v18 = if t1.isOpen then if not v17 then v16 * 40 + math.max(0, v16 - 1) * XXSmall else v16 * 40 + v16 * XXSmall + 20 else 0
-	local v19 = not (v11 > 0) and 280 or v11
 
-	return React.createElement(Foundation.Popover.Root, {
-		isOpen = t1.isOpen
-	}, {
-		Anchor = React.createElement(Foundation.Popover.Anchor, {
-			anchorRef = t1.anchorRef
-		}),
+	local v3 = defineFastInt
+	local v4 = math.min(#props.results, v3)
+	local v5 = v3 < #props.results
+	local v6
+
+	if props.isOpen then
+		if v5 then
+			v6 = v4 * 40 + v4 * xxSmall + 20
+		else
+			v6 = v4 * 40 + math.max(0, v4 - 1) * xxSmall
+		end
+	else
+		v6 = 0
+	end
+
+	local v7 = not (state > 0) and 280 or state
+	return React.createElement(Foundation.Popover.Root, { isOpen = props.isOpen }, {
+		Anchor = React.createElement(Foundation.Popover.Anchor, { anchorRef = props.anchorRef }),
 		Content = React.createElement(Foundation.Popover.Content, {
-			hasArrow = false,
 			side = {
-				offset = 0,
-				position = t1.side or Foundation.Enums.PopoverSide.Top
+				position = props.side or Foundation.Enums.PopoverSide.Top,
+				offset = 0
 			},
 			align = Foundation.Enums.PopoverAlign.Center,
-			backgroundStyle = v8.Color.Surface.Surface_200,
+			hasArrow = false,
+			backgroundStyle = v.Color.Surface.Surface_200,
 			radius = Foundation.Enums.Radius.Medium,
-			onPressedOutside = t1.onDismiss
+			onPressedOutside = props.onDismiss
 		}, React.createElement(Foundation.View, {
 			tag = "padding-small",
-			Size = UDim2.fromOffset(v19, v18 + 16)
+			Size = UDim2.fromOffset(v7, v6 + 16)
 		}, {
 			scrollView = React.createElement(Foundation.ScrollView, {
-				Size = UDim2.new(1, 0, 0, v18),
-				scrollingFrameRef = v10,
+				Size = UDim2.new(1, 0, 0, v6),
+				scrollingFrameRef = ref,
 				scroll = {
 					AutomaticCanvasSize = Enum.AutomaticSize.Y,
 					CanvasSize = UDim2.fromScale(0, 0),
@@ -155,13 +158,14 @@ local function ChatAutocompleteDropdown(t1: {[any]: any}) -- line: 38
 					VerticalScrollBarInset = Enum.ScrollBarInset.Always
 				}
 			}, {
-				list = React.createElement(Foundation.View, {
-					tag = "col gap-xxsmall auto-y",
-					Size = UDim2.fromScale(1, 0)
-				}, v14)
+				list = React.createElement(
+					Foundation.View,
+					{ tag = "col gap-xxsmall auto-y", Size = UDim2.fromScale(1, 0) },
+					v2
+				)
 			})
 		}))
 	})
 end
 
-return React.memo(ChatAutocompleteDropdown)
+return (React.memo(ChatAutocompleteDropdown))

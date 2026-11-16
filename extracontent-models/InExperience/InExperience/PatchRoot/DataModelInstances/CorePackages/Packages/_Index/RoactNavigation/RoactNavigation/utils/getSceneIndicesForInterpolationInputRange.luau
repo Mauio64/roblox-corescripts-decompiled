@@ -1,43 +1,43 @@
-local ParentParent = script.Parent.Parent.Parent
-local Array = require(ParentParent.LuauPolyfill).Array
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-local function getSceneIndicesForInterpolationInputRange(p1) -- line: 5
-	-- upvalues: Array (copy)
-	local scene = p1.scene
-	local scenes = p1.scenes
+local function getSceneIndicesForInterpolationInputRange(p)
+	local scene = p.scene
+	local scenes = p.scenes
+
 	local index = scene.index
-	local v8 = #scenes
+	local count = #scenes
 
-	if not scenes[v8].isActive then
-		local v9 = Array.indexOf(scenes, scene)
-		local v10 = nil
+	if not scenes[count].isActive then
+		local index2 = Array.indexOf(scenes, scene)
+		local v = nil
 
-		for v11, v12 in scenes do
-			if v12.isActive then
-				v10 = v11
-
+		for k, scene2 in scenes do
+			if scene2.isActive then
+				v = k
 				break
 			end
 		end
 
-		local index2 = scenes[v10].index
-		local index3 = scenes[v8].index
+		local index3 = scenes[v].index
+		local index4 = scenes[count].index
 
-		if index ~= index2 and v9 == v8 then
+		if index ~= index3 and index2 == count then
 			return {
-				first = math.min(index2, index - 1),
+				first = math.min(index3, index - 1),
 				last = index + 1
 			}
 		end
 
-		if index == index2 and v9 == v10 then
+		if index == index3 and index2 == v then
 			return {
 				first = index - 1,
-				last = math.max(index3, index + 1)
+				last = math.max(index4, index + 1)
 			}
 		end
 
-		if index == index2 or v10 < v9 then
+		if index == index3 or v < index2 then
 			return nil
 		end
 	end

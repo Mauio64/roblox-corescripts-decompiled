@@ -1,17 +1,17 @@
-local function getCommonItemStatus(t1: {[any]: any}) -- line: 3
-	local v3 = nil
+local function getCommonItemStatus(items)
+	local v = nil
 
-	for _, v5 in t1 do
-		if v3 ~= nil and v5 ~= v3 then
+	for _, item in items do
+		if v ~= nil and item ~= v then
 			return nil
 		end
 
-		if v3 == nil then
-			v3 = v5
+		if v == nil then
+			v = item
 		end
 	end
 
-	return v3
+	return v
 end
 
 return getCommonItemStatus

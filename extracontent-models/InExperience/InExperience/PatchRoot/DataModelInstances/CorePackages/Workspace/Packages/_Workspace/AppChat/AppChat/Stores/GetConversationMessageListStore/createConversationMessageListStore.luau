@@ -1,209 +1,469 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local createProxy = require(AppChatParent.SignalsExperimental).createProxy
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local Signals = require(parent.Signals)
+local SignalsExperimental = require(parent.SignalsExperimental)
+local createProxy = SignalsExperimental.createProxy
+
 local ArraySet = require(AppChat.DataStructures.ArraySet)
+local FFlagAppChatBatchMessageListPagePublication = require(AppChat.Flags.FFlagAppChatBatchMessageListPagePublication)
+local FFlagAppChatIncrementalPaginationProjection = require(AppChat.Flags.FFlagAppChatIncrementalPaginationProjection)
+local FFlagAppChatGroupedVariantNeighbourIds = require(AppChat.Flags.FFlagAppChatGroupedVariantNeighbourIds)
 
-local function newConversationOrdering() -- line: 90
-	-- upvalues: ArraySet (copy)
-	return {
-		messageIds = ArraySet.new({})
-	}
+local function newConversationOrdering() -- 1 equivalent call inferred from this helper
+	return { messageIds = ArraySet.new({}) }
 end
-local function newMessagePaginationMetadata() -- line: 96
-	return {
-		nextPageCursor = nil,
-		isLoading = false,
-		fetchedOldest = false
-	}
+
+local function newMessagePaginationMetadata() -- 1 equivalent call inferred from this helper
+	return { nextPageCursor = nil, isLoading = false, fetchedOldest = false }
 end
-local function createConversationMessageListStore() -- line: 104
-	-- upvalues: createProxy (copy), ArraySet (copy), Cryo (copy)
-	local v9 = createProxy({})
-	local v10 = createProxy({})
 
-	local function getOrDefaultOrdering(s1: string) -- line: 112
-		-- upvalues: v9 (copy), ArraySet (copy)
-		local v16 = v9[s1]
+local function createConversationMessageListStore()
+	local proxy = createProxy({})
 
-		if v16 ~= nil then
-			return v16
+	local proxy2 = createProxy({})
+
+	local proxy3 = createProxy({})
+	local proxy4 = createProxy({})
+
+	local signals = {}
+	local v = {}
+	local count = 0
+	local v2 = 0
+	local v3 = {}
+	local v4 = {}
+
+	local function publishMutation(p: string, operation: string, p2, p3, boundaryMessageId: string?)
+		count += 1
+
+		if signals[p] == nil then
+			local signal, v5 = Signals.createSignal(nil)
+			signals[p] = signal
+			v[p] = v5
 		end
 
-		return {
-			messageIds = ArraySet.new({})
+		local v5 = {
+			operation = operation,
+			messageIds = table.clone(p2),
+			insertedIds = table.clone(p3),
+			boundaryMessageId = boundaryMessageId,
+			revision = count
 		}
-	end
-	local function getOrDefaultMetadata(s2: string) -- line: 120
-		-- upvalues: v10 (copy)
-		local v18 = v10[s2]
 
-		if v18 ~= nil then
-			return v18
-		end
-
-		return {
-			nextPageCursor = nil,
-			isLoading = false,
-			fetchedOldest = false
-		}
-	end
-	local function appendMessages(s3: string, t1: {[any]: any}) -- line: 143
-		-- upvalues: v9 (copy), ArraySet (copy)
-		local v25 = v9[s3]
-		local v26 = if v25 == nil then {
-			messageIds = ArraySet.new({})
-		} else v25
-		local v27 = false
-
-		for _, v29 in t1 do
-			if v26.messageIds:add(v29) then
-				v27 = true
-			end
-		end
-
-		if not v27 then
+		if not (v2 > 0) then
+			v[p](v5)
 			return
 		end
 
-		v9[s3] = table.clone(v26)
-	end
-	local function updatePagination(s4: string, s5: string?, b1: boolean) -- line: 181
-		-- upvalues: v10 (copy), Cryo (copy)
-		local v40 = v10[s4]
-		local v41 = if v40 == nil then {
-			nextPageCursor = nil,
-			isLoading = false,
-			fetchedOldest = false
-		} else v40
+		local v6 = v4[p]
 
-		v10[s4] = Cryo.Dictionary.union(v41, {
+		if v6 == nil then
+			v6 = {}
+			v4[p] = v6
+			table.insert(v3, p)
+		end
+
+		table.insert(v6, v5)
+	end
+
+	local function publishQueuedMutations()
+		local v5 = v3
+		local v6 = v4
+		v3 = {}
+		v4 = {}
+
+		for _, v7 in v5 do
+			local mutations = v6[v7]
+
+			if #mutations == 1 then
+				v[v7](mutations[1])
+			else
+				v[v7]({
+					operation = "Batch",
+					messageIds = {},
+					insertedIds = {},
+					boundaryMessageId = nil,
+					revision = mutations[#mutations].revision,
+					mutations = mutations
+				})
+			end
+		end
+	end
+
+	local function addTraceback(value)
+		if type(value) == "string" then
+			return debug.traceback(value, 2)
+		end
+
+		return value
+	end
+
+	local function batchMutations(callback) -- 2 equivalent calls inferred from this helper
+		local success = nil
+		local result = nil
+		SignalsExperimental.batch(function()
+			v2 += 1
+
+			success, result = xpcall(callback, addTraceback)
+			v2 -= 1
+
+			if v2 == 0 then
+				publishQueuedMutations()
+			end
+		end)
+
+		if not success then
+			error(result, 0)
+		end
+	end
+
+	local function getOrDefaultOrdering(p: string) -- 2 equivalent calls inferred from this helper
+		local v5 = proxy[p]
+
+		if v5 == nil then
+			return newConversationOrdering() -- inferred equivalent call
+		end
+
+		return v5
+	end
+
+	local function getOrDefaultMetadata(p: string) -- 2 equivalent calls inferred from this helper
+		local v5 = proxy2[p]
+
+		if v5 == nil then
+			return newMessagePaginationMetadata() -- inferred equivalent call
+		end
+
+		return v5
+	end
+
+	local function getNeighbourKey(p: string, p2: string) -- 3 equivalent calls inferred from this helper
+		return p .. "\0" .. p2
+	end
+
+	local function writeNeighbourIds(p: string, p2, p3: number, p4: number)
+		for i = (math.max)(p3, 1), math.min(p4, p2.messageIds:size()) do
+			local neighbourKey = getNeighbourKey(p, p2.messageIds:at(i)) -- inferred equivalent call
+			proxy3[neighbourKey] = p2.messageIds:at(i - 1)
+			proxy4[neighbourKey] = p2.messageIds:at(i + 1)
+		end
+	end
+
+	local function clearNeighbourIds(p: string, items) -- 3 equivalent calls inferred from this helper
+		for _, item in items do
+			local neighbourKey = getNeighbourKey(p, item) -- inferred equivalent call
+			proxy3[neighbourKey] = nil
+			proxy4[neighbourKey] = nil
+		end
+	end
+
+	local function runOrderingWrite(callback) -- 5 equivalent calls inferred from this helper
+		if not FFlagAppChatGroupedVariantNeighbourIds then
+			callback()
+
+			return
+		end
+
+		batchMutations(callback) -- inferred equivalent call
+	end
+
+	local function prependMessagesInternal(p: string, list)
+		local defaultOrdering = getOrDefaultOrdering(p) -- inferred equivalent call
+		local size = defaultOrdering.messageIds:size()
+
+		local v5 = {}
+		local v6
+
+		if FFlagAppChatIncrementalPaginationProjection then
+			v6 = defaultOrdering.messageIds:at(1)
+			local set = {}
+
+			for _, item in list do
+				if defaultOrdering.messageIds:has(item) or set[item] then
+					continue
+				end
+
+				set[item] = true
+				table.insert(v5, item)
+			end
+		end
+
+		if defaultOrdering.messageIds:prependAll(list) then
+			proxy[p] = table.clone(defaultOrdering)
+
+			if FFlagAppChatGroupedVariantNeighbourIds then
+				writeNeighbourIds(p, defaultOrdering, 1, defaultOrdering.messageIds:size() - size + 1)
+			end
+
+			if FFlagAppChatIncrementalPaginationProjection then
+				publishMutation(p, "Prepend", list, v5, v6)
+			end
+		elseif FFlagAppChatIncrementalPaginationProjection and #list > 0 then
+			publishMutation(p, "Prepend", list, {}, nil)
+		end
+	end
+
+	local function appendMessagesInternal(p: string, items)
+		local defaultOrdering = getOrDefaultOrdering(p) -- inferred equivalent call
+		local size = defaultOrdering.messageIds:size()
+		local v5 = defaultOrdering.messageIds:at(size)
+
+		local result = {}
+
+		for _, item in items do
+			if defaultOrdering.messageIds:add(item) then
+				table.insert(result, item)
+			end
+		end
+
+		if #result > 0 then
+			proxy[p] = table.clone(defaultOrdering)
+		end
+
+		if FFlagAppChatGroupedVariantNeighbourIds and #result > 0 then
+			writeNeighbourIds(p, defaultOrdering, size, defaultOrdering.messageIds:size())
+		end
+
+		return result, v5
+	end
+
+	local function appendMessagesAndPublish(p: string, list) -- 1 equivalent call inferred from this helper
+		local v5, boundaryMessageId = appendMessagesInternal(p, list)
+
+		if FFlagAppChatIncrementalPaginationProjection and #list > 0 then
+			publishMutation(p, "Append", list, v5, boundaryMessageId)
+		end
+	end
+
+	local function removeMessageInternal(p: string, p2: string)
+		local v5 = proxy[p]
+
+		if v5 == nil then
+			return
+		end
+
+		local index = v5.messageIds:indexOf(p2)
+
+		if index == nil or not v5.messageIds:remove(p2) then
+			return
+		end
+
+		proxy[p] = table.clone(v5)
+
+		if FFlagAppChatGroupedVariantNeighbourIds then
+			clearNeighbourIds(p, { p2 }) -- inferred equivalent call
+
+			writeNeighbourIds(p, v5, index - 1, index)
+		end
+
+		if FFlagAppChatIncrementalPaginationProjection then
+			publishMutation(p, "Remove", { p2 }, {}, nil)
+		end
+	end
+
+	local function updatePagination(p: string, nextPageCursor: string?, fetchedOldest: boolean)
+		local defaultMetadata = getOrDefaultMetadata(p) -- inferred equivalent call
+		local union = Cryo.Dictionary.union
+
+		if not nextPageCursor or nextPageCursor == "" then
+			nextPageCursor = defaultMetadata.nextPageCursor
+		end
+
+		proxy2[p] = union(defaultMetadata, {
+			nextPageCursor = nextPageCursor,
 			isLoading = false,
-			nextPageCursor = if not s5 or s5 == "" then v41.nextPageCursor else s5,
-			fetchedOldest = b1
+			fetchedOldest = fetchedOldest
 		})
 	end
 
+	local function receivePageInternal(p: string, p2, p3: string?) -- 3 equivalent calls inferred from this helper
+		local v5, boundaryMessageId = appendMessagesInternal(p, p2)
+		updatePagination(p, p3, p3 == nil or p3 == "")
+
+		if FFlagAppChatIncrementalPaginationProjection then
+			publishMutation(p, "AppendAndAdvanceCursor", p2, v5, boundaryMessageId)
+		end
+	end
+
+	local function clearConversationInternal(p: string)
+		if FFlagAppChatGroupedVariantNeighbourIds then
+			local v5 = proxy[p]
+
+			if v5 ~= nil then
+				clearNeighbourIds(p, v5.messageIds:values()) -- inferred equivalent call
+			end
+		end
+
+		proxy[p] = nil
+		proxy2[p] = nil
+
+		if FFlagAppChatIncrementalPaginationProjection then
+			publishMutation(p, "Reset", {}, {}, nil)
+		end
+	end
+
+	local function clearInternal()
+		local v5 = {}
+		local set = {}
+
+		for k, v6 in proxy do
+			table.insert(v5, k)
+			set[k] = true
+
+			if FFlagAppChatGroupedVariantNeighbourIds and v6 ~= nil then
+				clearNeighbourIds(k, v6.messageIds:values()) -- inferred equivalent call
+			end
+
+			proxy[k] = nil
+		end
+
+		for k in proxy2 do
+			proxy2[k] = nil
+		end
+
+		if FFlagAppChatIncrementalPaginationProjection then
+			for k in signals do
+				if not set[k] then
+					table.insert(v5, k)
+				end
+			end
+
+			for _, v6 in v5 do
+				publishMutation(v6, "Reset", {}, {}, nil)
+			end
+		end
+	end
+
 	return {
-		conversations = v9,
-		metadata = v10,
-		prependMessages = function(s6: string, t2: {[any]: any}) -- line: 130
-			-- upvalues: v9 (copy), ArraySet (copy)
-			local v21 = v9[s6]
-			local v22 = if v21 == nil then {
-				messageIds = ArraySet.new({})
-			} else v21
+		conversations = proxy,
+		metadata = proxy2,
+		getMutation = function(p: string)
+			local v5 = signals[p]
 
-			if not v22.messageIds:prependAll(t2) then
-				return
+			if v5 ~= nil then
+				return v5
 			end
 
-			v9[s6] = table.clone(v22)
+			local signal, v6 = Signals.createSignal(nil)
+			signals[p] = signal
+			v[p] = v6
+			return signal
 		end,
-		appendMessages = appendMessages,
-		removeMessage = function(s7: string, s8: string) -- line: 161
-			-- upvalues: v9 (copy)
-			local v32 = v9[s7]
-
-			if v32 == nil then
-				return
+		batchMutations = batchMutations,
+		prependMessages = function(p: string, p2)
+			local function fn()
+				prependMessagesInternal(p, p2)
 			end
 
-			if not v32.messageIds:remove(s8) then
-				return
-			end
-
-			v9[s7] = table.clone(v32)
+			runOrderingWrite(fn) -- inferred equivalent call
 		end,
-		setLoading = function(s9: string, b2: boolean) -- line: 173
-			-- upvalues: v10 (copy), Cryo (copy)
-			local v35 = v10[s9]
-			local v36 = if v35 == nil then {
-				nextPageCursor = nil,
-				isLoading = false,
-				fetchedOldest = false
-			} else v35
+		appendMessages = function(p: string, list)
+			local function fn()
+				appendMessagesAndPublish(p, list) -- inferred equivalent call
+			end
 
-			v10[s9] = Cryo.Dictionary.union(v36, {
-				isLoading = b2
-			})
+			runOrderingWrite(fn) -- inferred equivalent call
+		end,
+		removeMessage = function(p: string, p2: string)
+			local function fn()
+				removeMessageInternal(p, p2)
+			end
+
+			runOrderingWrite(fn) -- inferred equivalent call
+		end,
+		publishMessageUpdates = function(p: string, list)
+			if #list > 0 then
+				publishMutation(p, "Update", list, {}, nil)
+			end
+		end,
+		setLoading = function(p: string, isLoading: boolean)
+			local defaultMetadata = getOrDefaultMetadata(p) -- inferred equivalent call
+			proxy2[p] = Cryo.Dictionary.union(defaultMetadata, { isLoading = isLoading })
 		end,
 		updatePagination = updatePagination,
-		receivePage = function(s10: string, t3: {[any]: any}, s11: string?) -- line: 191
-			-- upvalues: appendMessages (copy), updatePagination (copy)
-			appendMessages(s10, t3)
-			updatePagination(s10, s11, s11 == nil or s11 == "")
-		end,
-		clearConversation = function(s12: string) -- line: 196
-			-- upvalues: v9 (copy), v10 (copy)
-			v9[s12] = nil
-			v10[s12] = nil
-		end,
-		clear = function() -- line: 201
-			-- upvalues: v9 (copy), v10 (copy)
-			for v46 in v9 do
-				v9[v46] = nil
-			end
+		receivePage = function(p: string, p2, p3: string?)
+			if FFlagAppChatGroupedVariantNeighbourIds then
+				local function fn()
+					receivePageInternal(p, p2, p3) -- inferred equivalent call
+				end
 
-			for v47 in v10 do
-				v10[v47] = nil
+				batchMutations(fn) -- inferred equivalent call
+			else
+				if FFlagAppChatBatchMessageListPagePublication then
+					SignalsExperimental.batch(function()
+						receivePageInternal(p, p2, p3) -- inferred equivalent call
+					end)
+					return
+				end
+
+				receivePageInternal(p, p2, p3) -- inferred equivalent call
 			end
 		end,
-		getIndex = function(s13: string, s14: string, p1) -- line: 210
-			-- upvalues: v9 (copy)
-			local v51 = v9(p1)[s13]
+		clearConversation = function(p: string)
+			local function fn()
+				clearConversationInternal(p)
+			end
 
-			if v51 == nil then
+			runOrderingWrite(fn) -- inferred equivalent call
+		end,
+		clear = function()
+			runOrderingWrite(clearInternal) -- inferred equivalent call
+		end,
+		getIndex = function(p: string, p2: string, p3)
+			local v5 = proxy(p3)[p]
+
+			if v5 == nil then
 				return nil
 			end
 
-			return v51.messageIds:indexOf(s14)
+			return v5.messageIds:indexOf(p2)
 		end,
-		getOrderedIds = function(s15: string, p2) -- line: 218
-			-- upvalues: v9 (copy)
-			local v54 = v9(p2)[s15]
+		getOrderedIds = function(p: string, p2)
+			local v5 = proxy(p2)[p]
 
-			if v54 == nil then
+			if v5 == nil then
 				return {}
 			end
 
-			return v54.messageIds:values()
+			return v5.messageIds:values()
 		end,
-		getPrevId = function(s16: string, s17: string, p3) -- line: 226
-			-- upvalues: v9 (copy)
-			local v58 = v9(p3)[s16]
+		getPrevId = function(p: string, p2: string, p3)
+			local v5 = proxy(p3)[p]
 
-			if v58 == nil then
+			if v5 == nil then
 				return nil
 			end
 
-			local v59 = v58.messageIds:indexOf(s17)
+			local index = v5.messageIds:indexOf(p2)
 
-			if v59 == nil or v59 <= 1 then
+			if index == nil or index <= 1 then
 				return nil
 			end
 
-			return v58.messageIds:at(v59 - 1)
+			return v5.messageIds:at(index - 1)
 		end,
-		getNextId = function(s18: string, s19: string, p4) -- line: 238
-			-- upvalues: v9 (copy)
-			local v63 = v9(p4)[s18]
+		getNextId = function(p: string, p2: string, p3)
+			local v5 = proxy(p3)[p]
 
-			if v63 == nil then
+			if v5 == nil then
 				return nil
 			end
 
-			local v64 = v63.messageIds:indexOf(s19)
+			local index = v5.messageIds:indexOf(p2)
 
-			if v64 == nil or v64 >= v63.messageIds:size() then
+			if index == nil or v5.messageIds:size() <= index then
 				return nil
 			end
 
-			return v63.messageIds:at(v64 + 1)
+			return v5.messageIds:at(index + 1)
 		end,
-		getMetadata = function(s20: string, p5) -- line: 250
-			-- upvalues: v10 (copy)
-			return v10(p5)[s20]
+		getNeighbourIds = function(p: string, p2: string, p3)
+			local neighbourKey = getNeighbourKey(p, p2) -- inferred equivalent call
+			return { prevId = proxy3(p3)[neighbourKey], nextId = proxy4(p3)[neighbourKey] }
+		end,
+		getMetadata = function(p: string, p2)
+			return proxy2(p2)[p]
 		end
 	}
 end

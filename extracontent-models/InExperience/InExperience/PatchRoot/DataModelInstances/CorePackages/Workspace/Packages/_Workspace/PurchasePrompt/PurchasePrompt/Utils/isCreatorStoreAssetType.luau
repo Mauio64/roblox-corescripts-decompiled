@@ -1,20 +1,12 @@
-local _ = script.Parent.Parent
+local parent = script.Parent.Parent
 
-function isCreatorStoreAssetType(s1: string) -- line: 3
-	if s1 == nil or type(s1) ~= "string" then
+function isCreatorStoreAssetType(value: string): boolean
+	if value == nil or type(value) ~= "string" then
 		return false
 	end
 
-	for _, v4 in {
-		"Model",
-		"Plugin",
-		"Audio",
-		"Decal",
-		"FontFamily",
-		"MeshPart",
-		"Video"
-	} do
-		if s1 == v4 then
+	for _, v in { "Model", "Plugin", "Audio", "Decal", "FontFamily", "MeshPart", "Video" } do
+		if value == v then
 			return true
 		end
 	end

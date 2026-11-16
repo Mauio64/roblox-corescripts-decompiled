@@ -1,14 +1,9 @@
 require(script.Types)
-
-local AvatarEditorCategories = require(script.Enums.AvatarEditorCategories)
-local AvatarEditorSubcategories = require(script.Enums.AvatarEditorSubcategories)
 local Categories = require(script.Enums.Categories)
 local ScreenLayout = require(script.Enums.ScreenLayout)
 local ItemView = require(script.Enums.ItemView)
 local NavigationParams = require(script.Enums.NavigationParams)
-
 require(script.Hooks.useSlotItemCardBreakpoints)
-
 local InventorySorts = require(script.Enums.InventorySorts)
 local InventoryFilters = require(script.Enums.InventoryFilters)
 local InventoryItemAvailability = require(script.Enums.InventoryItemAvailability)
@@ -56,8 +51,6 @@ return {
 	},
 	Enums = {
 		ScreenLayout = ScreenLayout,
-		AvatarEditorCategories = AvatarEditorCategories,
-		AvatarEditorSubcategories = AvatarEditorSubcategories,
 		Categories = Categories,
 		ItemView = ItemView,
 		NavigationParams = NavigationParams,

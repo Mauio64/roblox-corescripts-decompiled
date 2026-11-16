@@ -1,20 +1,28 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local valueToString = require(script.Parent.valueToString)
-local floatEquals = require(ParentParent.util.floatEquals)
+local floatEquals = require(parent.util.floatEquals)
+local CFrameUtils = {}
 
-return {
-	fuzzyEq = function(cFrame: CFrame, cFrame2: CFrame, n1: number?) -- line: 7
-		-- upvalues: floatEquals (copy)
-		local v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 = cFrame:GetComponents()
-		local v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30 = cFrame2:GetComponents()
+function CFrameUtils.fuzzyEq(cframe: CFrame, cframe2: CFrame, p: number?)
+	local components, v, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11 = cframe:GetComponents()
+	local components2, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22 = cframe2:GetComponents()
+	return floatEquals(components, components2, p)
+		and floatEquals(v, v12, p)
+		and floatEquals(v2, v13, p)
+		and floatEquals(v3, v14, p)
+		and floatEquals(v4, v15, p)
+		and floatEquals(v5, v16, p)
+		and floatEquals(v6, v17, p)
+		and floatEquals(v7, v18, p)
+		and floatEquals(v8, v19, p)
+		and floatEquals(v9, v20, p)
+		and floatEquals(v10, v21, p)
+		and floatEquals(v11, v22, p)
+end
 
-		return floatEquals(v7, v19, n1) and (floatEquals(v8, v20, n1) and (floatEquals(v9, v21, n1) and (floatEquals(v10, v22, n1) and (floatEquals(v11, v23, n1) and (floatEquals(v12, v24, n1) and (floatEquals(v13, v25, n1) and (floatEquals(v14, v26, n1) and (floatEquals(v15, v27, n1) and (floatEquals(v16, v28, n1) and (floatEquals(v17, v29, n1) and floatEquals(v18, v30, n1)))))))))))
-	end,
-	getRotationString = function(cFrame: CFrame) -- line: 24
-		-- upvalues: valueToString (copy)
-		local vector3 = Vector3.new(cFrame:ToOrientation())
-		local vector3_2 = Vector3.new(math.deg(vector3.X), math.deg(vector3.Y), (math.deg(vector3.Z)))
+function CFrameUtils.getRotationString(cframe: CFrame)
+	local vector3 = Vector3.new(cframe:ToOrientation())
+	return valueToString((Vector3.new(math.deg(vector3.X), math.deg(vector3.Y), (math.deg(vector3.Z)))))
+end
 
-		return valueToString(vector3_2)
-	end
-}
+return CFrameUtils

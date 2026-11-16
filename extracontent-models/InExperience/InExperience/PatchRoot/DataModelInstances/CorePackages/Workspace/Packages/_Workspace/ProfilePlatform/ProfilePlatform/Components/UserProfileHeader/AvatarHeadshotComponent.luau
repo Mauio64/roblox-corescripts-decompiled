@@ -1,100 +1,232 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Foundation = require(ProfilePlatformParent.Foundation)
-local UserTile = require(ProfilePlatformParent.UserTile).UserTile
-local LayoutMode = require(ProfilePlatformParent.UserTile).LayoutMode
-local v7 = require(ProfilePlatformParent.FoundationImages).Images["icons/actions/edit/copy"]
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local UserTile = require(parent.UserTile)
+local userTile = UserTile.UserTile
+local UserTile2 = require(parent.UserTile)
+local LayoutMode = UserTile2.LayoutMode
+local FoundationImages = require(parent.FoundationImages)
+local iconsactionseditcopy = FoundationImages.Images["icons/actions/edit/copy"]
 local Constants = require(ProfilePlatform.Common.Constants)
-local convertToFoundationPresenceEnum = require(ProfilePlatformParent.SocialCommon).Utils.convertToFoundationPresenceEnum
+local Enums = require(ProfilePlatform.Common.Enums)
+local useCurrentProfileFriendStatus = require(ProfilePlatform.Hooks.useCurrentProfileFriendStatus)
+local SocialCommon = require(parent.SocialCommon)
+local convertToFoundationPresenceEnum = SocialCommon.Utils.convertToFoundationPresenceEnum
 local useDynamicSizeMargin = require(ProfilePlatform.Hooks.useDynamicSizeMargin)
 local useTokens = Foundation.Hooks.useTokens
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
-local useDispatch = require(ProfilePlatformParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
-local default = require(ProfilePlatformParent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
-local Contexts = require(ProfilePlatformParent.SocialLuaAnalytics).Analytics.Enums.Contexts
-local SetCurrentToastMessage = require(ProfilePlatformParent.ToastRodux).Actions.SetCurrentToastMessage
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+
+local ExternalContentSharingProtocol = require(parent.ExternalContentSharingProtocol)
+local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Contexts = SocialLuaAnalytics.Analytics.Enums.Contexts
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
-local FFlagEnableFontStylisticAlternativesOnSocialScreens = require(ProfilePlatformParent.SharedFlags).FFlagEnableFontStylisticAlternativesOnSocialScreens
-local FFlagUserTileTextTCIndicator = require(ProfilePlatformParent.SharedFlags).FFlagUserTileTextTCIndicator
-local FFlagAddPlatformNameToProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagAddPlatformNameToProfileHeader
-local FFlagEnableBlackbirdCheck = require(ProfilePlatformParent.SharedFlags).FFlagEnableBlackbirdCheck
-local FFlagDisableCopyUsernameOnConsole = require(ProfilePlatformParent.SharedFlags).FFlagDisableCopyUsernameOnConsole
-local Responsive = require(ProfilePlatformParent.Responsive)
-local useIsRobloxSubscriber = require(ProfilePlatformParent.UserProfiles).Hooks.useIsRobloxSubscriber
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableFontStylisticAlternativesOnSocialScreens = SharedFlags.FFlagEnableFontStylisticAlternativesOnSocialScreens
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAddPlatformNameToProfileHeader = SharedFlags2.FFlagAddPlatformNameToProfileHeader
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags3.FFlagEnableBlackbirdCheck
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagDisableCopyUsernameOnConsole = SharedFlags4.FFlagDisableCopyUsernameOnConsole
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagEnableUserRecentActivityEntryPoint = SharedFlags5.FFlagEnableUserRecentActivityEntryPoint
+local Responsive = require(parent.Responsive)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+
+local UserProfiles = require(parent.UserProfiles)
+local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
+
 local getBuilderIconForCurrentPlatform = Foundation.Utility.getBuilderIconForCurrentPlatform
 
-local function AvatarHeadshotComponent(t1: {[any]: any}) -- line: 49
-	-- upvalues: useTokens (copy), useDynamicSizeMargin (copy), useLocalUserId (copy), convertToFoundationPresenceEnum (copy), FFlagEnableFontStylisticAlternativesOnSocialScreens (copy), useDispatch (copy), useLocalization (copy), TextKeys (copy), React (copy), FFlagAddPlatformNameToProfileHeader (copy), getBuilderIconForCurrentPlatform (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), FFlagDisableCopyUsernameOnConsole (copy), Responsive (copy), default (copy), Contexts (copy), SetCurrentToastMessage (copy), v7 (copy), Constants (copy), UserTile (copy), LayoutMode (copy), FFlagUserTileTextTCIndicator (copy)
-	local v29 = useTokens()
-	local v30, v31 = useDynamicSizeMargin()
-	local v32 = useLocalUserId()
-	local userId = t1.userId
-	local v34 = if userId ~= tostring(v32) and t1.userPresenceType then convertToFoundationPresenceEnum(t1.userPresenceType) else nil
-	local v35 = (not t1.username or t1.username == "") and "" or if not FFlagEnableFontStylisticAlternativesOnSocialScreens then "@" .. t1.username else `<font features="zero, ss03">@{ t1.username }</font>`
-	local v36 = useDispatch()
-	local v37 = useLocalization({
-		usernameCopied = TextKeys.UsernameCopied
+local function AvatarHeadshotComponent(props)
+	local v = useTokens()
+	local v2, v3 = useDynamicSizeMargin()
+	local v4 = useLocalUserId()
+
+	local userId = props.userId
+	local v5 = userId == tostring(v4)
+	local userPresenceType
+
+	if not (v5 or not props.userPresenceType) then
+		userPresenceType = convertToFoundationPresenceEnum(props.userPresenceType)
+	end
+
+	local subtitle
+
+	if props.username and props.username ~= "" then
+		if FFlagEnableFontStylisticAlternativesOnSocialScreens then
+			subtitle = `<font features="zero, ss03">@{props.username}</font>`
+		else
+			subtitle = "@" .. props.username
+		end
+	else
+		subtitle = ""
+	end
+
+	local v6 = useDispatch()
+	local v7 = useLocalization({
+		usernameCopied = TextKeys.UsernameCopied,
+		viewRecentActivity = TextKeys.ViewRecentActivity
 	})
-	local v38 = React.useMemo(function() -- line: 72
-		-- upvalues: FFlagAddPlatformNameToProfileHeader (copy), getBuilderIconForCurrentPlatform (copy)
+
+	local contextualInfoIcon = React.useMemo(function()
 		if FFlagAddPlatformNameToProfileHeader then
 			return (getBuilderIconForCurrentPlatform())
 		end
 
 		return nil
 	end, {})
-	local v39 = nil
+	local isRobloxSubscriber
 
 	if FFlagEnableBlackbirdCheck then
-		v39 = useIsRobloxSubscriber(userId)
+		isRobloxSubscriber = useIsRobloxSubscriber(userId)
 	end
 
-	local v40 = not not FFlagDisableCopyUsernameOnConsole and Responsive.usePreferredInput() == Responsive.Input.Directional
-	local v41 = React.useCallback(function() -- line: 85
-		-- upvalues: default (copy), Contexts (copy), t1 (copy), v36 (copy), SetCurrentToastMessage (copy), v37 (copy), v7 (copy)
-		default:setClipboardText({
-			context = Contexts.ProfileCard,
-			text = t1.username
-		})
-		v36(SetCurrentToastMessage({
+	local v8
+
+	if FFlagDisableCopyUsernameOnConsole then
+		v8 = Responsive.usePreferredInput() == Responsive.Input.Directional
+	else
+		v8 = false
+	end
+
+	local v9
+
+	if FFlagEnableUserRecentActivityEntryPoint then
+		v9 = useCurrentProfileFriendStatus()
+	end
+
+	local v10
+
+	if FFlagEnableUserRecentActivityEntryPoint then
+		v10 = v5 or v9 == Enums.FriendStatus.Friends
+	else
+		v10 = false
+	end
+
+	local v11
+
+	if FFlagEnableUserRecentActivityEntryPoint then
+		v11 = useNavigation()
+	else
+		v11 = nil
+	end
+
+	local onExtraInfoClicked
+
+	if FFlagEnableUserRecentActivityEntryPoint then
+		onExtraInfoClicked = React.useCallback(function()
+			v11.navigate(AppPage.UserRecentActivity, {
+				userId = props.userId,
+				primaryName = props.primaryName
+			})
+		end, { v11, props.userId, props.primaryName })
+	end
+
+	local onSubtitleClicked = React.useCallback(function()
+		default:setClipboardText({ context = Contexts.ProfileCard, text = props.username })
+
+		v6(SetCurrentToastMessage({
+			toastMessage = v7.usernameCopied,
 			isLocalized = true,
-			toastMessage = v37.usernameCopied,
-			toastIcon = v7
+			toastIcon = iconsactionseditcopy
 		}))
 	end)
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v12 = {
 		Size = UDim2.new(1, 0, 0, Constants.AVATAR_HEADSHOT_HEIGHT),
-		Position = UDim2.new(0, 0, 0, -(Constants.AVATAR_HEADSHOT_HEIGHT / 2) - v29.Gap.Large),
-		LayoutOrder = t1.layoutOrder,
+		Position = UDim2.new(0, 0, 0, -(Constants.AVATAR_HEADSHOT_HEIGHT / 2) - v.Gap.Large),
+		LayoutOrder = props.layoutOrder,
 		BackgroundTransparency = 1,
-		[React.Change.AbsoluteSize] = v31
-	}, {
+		[React.Change.AbsoluteSize] = v3
+	}
+	local v13 = {
 		UIPadding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, v30),
-			PaddingRight = UDim.new(0, v30)
+			PaddingLeft = UDim.new(0, v2),
+			PaddingRight = UDim.new(0, v2)
 		}),
-		UserTile = React.createElement(UserTile, {
-			layoutOrder = 1,
-			userId = t1.userId,
-			title = t1.primaryName,
-			isVerified = t1.isVerified,
-			isPremium = t1.isPremium,
-			isRobloxAdmin = t1.isRobloxAdmin,
-			subtitle = v35,
-			contextualInfo = if not FFlagAddPlatformNameToProfileHeader then nil else t1.platformName,
-			contextualInfoIcon = if not FFlagAddPlatformNameToProfileHeader then nil else v38,
-			layoutMode = LayoutMode.wide,
-			userPresenceType = v34,
-			titleStyle = v29.Typography.HeadingSmall,
-			subtitleStyle = v29.Typography.BodyMedium,
-			onSubtitleClicked = if not v40 then v41 else nil,
-			trustedConnectionIndicatorEnabled = not not FFlagUserTileTextTCIndicator or nil,
-			isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v39
-		})
-	})
+		UserTile = 0
+	}
+
+	local createElement2 = React.createElement
+	local v14 = {
+		layoutOrder = 1,
+		userId = props.userId,
+		title = props.primaryName,
+		isVerified = props.isVerified,
+		isPremium = props.isPremium,
+		isRobloxAdmin = props.isRobloxAdmin,
+		subtitle = subtitle,
+		contextualInfo = 0,
+		contextualInfoIcon = 0,
+		layoutMode = 0,
+		userPresenceType = 0,
+		titleStyle = 0,
+		subtitleStyle = 0,
+		onSubtitleClicked = 0,
+		trustedConnectionIndicatorEnabled = true,
+		isRobloxSubscriber = 0,
+		extraInfo = 0,
+		onExtraInfoClicked = 0
+	}
+	local contextualInfo
+
+	if FFlagAddPlatformNameToProfileHeader then
+		contextualInfo = props.platformName
+	end
+
+	v14.contextualInfo = contextualInfo
+
+	if not FFlagAddPlatformNameToProfileHeader then
+		contextualInfoIcon = nil
+	end
+
+	v14.contextualInfoIcon = contextualInfoIcon
+	v14.layoutMode = LayoutMode.wide
+	v14.userPresenceType = userPresenceType
+	v14.titleStyle = v.Typography.HeadingSmall
+	v14.subtitleStyle = v.Typography.BodyMedium
+
+	if v8 then
+		onSubtitleClicked = nil
+	end
+
+	v14.onSubtitleClicked = onSubtitleClicked
+
+	if not FFlagEnableBlackbirdCheck then
+		isRobloxSubscriber = nil
+	end
+
+	v14.isRobloxSubscriber = isRobloxSubscriber
+	local extraInfo
+
+	if v10 then
+		extraInfo = v7.viewRecentActivity
+	end
+
+	v14.extraInfo = extraInfo
+
+	if not v10 then
+		onExtraInfoClicked = nil
+	end
+
+	v14.onExtraInfoClicked = onExtraInfoClicked
+	v13.UserTile = createElement2(userTile, v14)
+	return createElement("Frame", v12, v13)
 end
 
 return AvatarHeadshotComponent

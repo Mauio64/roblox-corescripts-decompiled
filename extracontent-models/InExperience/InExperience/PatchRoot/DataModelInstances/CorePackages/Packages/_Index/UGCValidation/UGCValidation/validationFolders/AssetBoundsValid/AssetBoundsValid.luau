@@ -1,244 +1,228 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local BoundsCalculator = require(parent.util.BoundsCalculator)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local BoundsCalculator = require(ParentParent.util.BoundsCalculator)
-local getFFlagUGCValidateMigrateBodyPartBounds = require(ParentParent.flags.getFFlagUGCValidateMigrateBodyPartBounds)
-local t1 = {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
-		ValidationEnums.UploadCategory.FULL_BODY
-	},
-	requiredData = {
-		ValidationEnums.SharedDataMember.rootInstance,
-		ValidationEnums.SharedDataMember.uploadEnum
-	},
-	conditionalData = { ValidationEnums.SharedDataMember.renderMeshesData },
-	fflag = getFFlagUGCValidateMigrateBodyPartBounds,
-	expectedFailures = {}
+local AssetBoundsValid = {}
+
+AssetBoundsValid.categories = {
+	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
+	ValidationEnums.UploadCategory.DYNAMIC_HEAD,
+	ValidationEnums.UploadCategory.FULL_BODY
 }
 
-local function getScaleTypeFromInstance(p1) -- line: 28
-	-- upvalues: Constants (copy)
-	local AvatarPartScaleType = p1:FindFirstChild("AvatarPartScaleType")
+AssetBoundsValid.requiredData = {
+	ValidationEnums.SharedDataMember.rootInstance,
+	ValidationEnums.SharedDataMember.uploadEnum
+}
 
-	if AvatarPartScaleType and Constants.AvatarPartScaleTypes[AvatarPartScaleType.Value] then
-		return AvatarPartScaleType.Value
+AssetBoundsValid.conditionalData = { ValidationEnums.SharedDataMember.renderMeshesData }
+
+AssetBoundsValid.expectedFailures = {}
+
+local function getScaleTypeFromInstance(instance) -- 2 equivalent calls inferred from this helper
+	local avatarPartScaleType = instance:FindFirstChild("AvatarPartScaleType")
+
+	if avatarPartScaleType and Constants.AvatarPartScaleTypes[avatarPartScaleType.Value] then
+		return avatarPartScaleType.Value
 	end
 
 	return nil
 end
-local function getConsistentScaleType(p2, p3, p4) -- line: 36
-	-- upvalues: Constants (copy), ErrorSourceStrings (copy)
-	local v19 = Constants.ASSET_TYPE_INFO[p3]
-	local v20 = nil
 
-	if p3 == Enum.AssetType.DynamicHead then
-		local AvatarPartScaleType = p2:FindFirstChild("AvatarPartScaleType")
+local function getConsistentScaleType(rootInstance, assetType, object)
+	local v = Constants.ASSET_TYPE_INFO[assetType]
+	local v2 = nil
 
-		if AvatarPartScaleType and Constants.AvatarPartScaleTypes[AvatarPartScaleType.Value] then
-			return AvatarPartScaleType.Value
-		end
-
-		return nil
+	if Enum.AssetType.DynamicHead == assetType then
+		return getScaleTypeFromInstance(rootInstance) -- inferred equivalent call
 	end
 
-	for k in pairs(v19.subParts) do
-		local k2 = p2:FindFirstChild(k)
+	for childName in pairs(v.subParts) do
+		local child = rootInstance:FindFirstChild(childName)
 
-		if not k2 then
+		if not child then
 			continue
 		end
 
-		local AvatarPartScaleType = k2:FindFirstChild("AvatarPartScaleType")
-		local v25 = if not AvatarPartScaleType or not Constants.AvatarPartScaleTypes[AvatarPartScaleType.Value] then nil else AvatarPartScaleType.Value
+		local scaleTypeFromInstance = getScaleTypeFromInstance(child) -- inferred equivalent call
 
-		if not v25 then
+		if not scaleTypeFromInstance then
 			continue
 		end
 
-		if v20 ~= nil then
-			if v20 == v25 then
-				continue
-			end
+		if v2 == nil then
+			v2 = scaleTypeFromInstance
+		elseif v2 ~= scaleTypeFromInstance then
+			object:fail(ErrorSourceStrings.Keys.AssetBounds_InconsistentScaleType, nil, rootInstance)
+			return nil
+		end
+	end
 
-			p4:fail(ErrorSourceStrings.Keys.AssetBounds_InconsistentScaleType, nil, p2)
+	return v2
+end
+
+local function validateMinBounds(minSize: Vector3, assetName: string, p, object, rootInstance)
+	local v = p.maxMeshCorner - p.minMeshCorner
+
+	for _, axis in { "X", "Y", "Z" } do
+		local v2 = v[axis]
+		local v3 = minSize[axis]
+
+		if v2 < v3 then
+			object:fail(
+				ErrorSourceStrings.Keys.AssetBounds_TooSmall,
+				{
+					assetName = assetName,
+					axis = axis,
+					currentSize = string.format("%.2f", v2),
+					minSize = string.format("%.2f", v3)
+				},
+				rootInstance
+			)
+		end
+	end
+end
+
+local function validateMaxBounds(maxSize: Vector3, assetName: string, p, object, rootInstance)
+	local v = p.maxOverall - p.minOverall
+
+	for _, axis in { "X", "Y", "Z" } do
+		local v2 = v[axis]
+		local v3 = maxSize[axis]
+
+		if v3 < v2 then
+			object:fail(
+				ErrorSourceStrings.Keys.AssetBounds_TooLarge,
+				{
+					assetName = assetName,
+					axis = axis,
+					currentSize = string.format("%.2f", v2),
+					maxSize = string.format("%.2f", v3)
+				},
+				rootInstance
+			)
+		end
+	end
+end
+
+local function createAllBodyPartsFromRootInstance(rootInstance)
+	local partsByName = {}
+
+	for _, part in rootInstance:GetChildren() do
+		if part:IsA("MeshPart") then
+			partsByName[part.Name] = part
+		end
+	end
+
+	return partsByName
+end
+
+local function getFullBodyConsistentScaleType(allBodyPartsFromRootInstance, object, rootInstance)
+	local v = nil
+
+	for _, item in allBodyPartsFromRootInstance do
+		local avatarPartScaleType = item:FindFirstChild("AvatarPartScaleType")
+
+		if not avatarPartScaleType then
+			continue
+		end
+
+		if not Constants.AvatarPartScaleTypes[avatarPartScaleType.Value] then
+			object:fail(ErrorSourceStrings.Keys.ScaleTypeInvalid, { ParentName = item.Name }, item)
 
 			return nil
 		end
 
-		v20 = v25
-	end
+		local value = avatarPartScaleType.Value
 
-	return v20
-end
-local function validateMinBounds(vector3: Vector3, s1: string, p5, p6, p7) -- line: 67
-	-- upvalues: ErrorSourceStrings (copy)
-	local v31 = p5.maxMeshCorner - p5.minMeshCorner
-
-	for _, v33 in {
-		"X",
-		"Y",
-		"Z"
-	} do
-		local v34 = v31[v33]
-		local v35 = vector3[v33]
-
-		if v34 < v35 then
-			p6:fail(ErrorSourceStrings.Keys.AssetBounds_TooSmall, {
-				assetName = s1,
-				axis = v33,
-				currentSize = string.format("%.2f", v34),
-				minSize = string.format("%.2f", v35)
-			}, p7)
-		end
-	end
-end
-local function validateMaxBounds(vector3: Vector3, s2: string, p8, p9, p10) -- line: 89
-	-- upvalues: ErrorSourceStrings (copy)
-	local v41 = p8.maxOverall - p8.minOverall
-
-	for _, v43 in {
-		"X",
-		"Y",
-		"Z"
-	} do
-		local v44 = v41[v43]
-		local v45 = vector3[v43]
-
-		if v45 < v44 then
-			p9:fail(ErrorSourceStrings.Keys.AssetBounds_TooLarge, {
-				assetName = s2,
-				axis = v43,
-				currentSize = string.format("%.2f", v44),
-				maxSize = string.format("%.2f", v45)
-			}, p10)
-		end
-	end
-end
-local function createAllBodyPartsFromRootInstance(p11) -- line: 111
-	local t2 = {}
-
-	for _, child in p11:GetChildren() do
-		if child:IsA("MeshPart") then
-			t2[child.Name] = child
-		end
-	end
-
-	return t2
-end
-local function getFullBodyConsistentScaleType(p12, p13, p14) -- line: 121
-	-- upvalues: Constants (copy), ErrorSourceStrings (copy)
-	local v53 = nil
-
-	for _, v55 in p12 do
-		local AvatarPartScaleType = v55:FindFirstChild("AvatarPartScaleType")
-
-		if not AvatarPartScaleType then
-			continue
-		end
-
-		if not Constants.AvatarPartScaleTypes[AvatarPartScaleType.Value] then
-			p13:fail(ErrorSourceStrings.Keys.ScaleTypeInvalid, {
-				ParentName = v55.Name
-			}, v55)
-
+		if v == nil then
+			v = value
+		elseif v ~= value then
+			object:fail(ErrorSourceStrings.Keys.AssetBounds_InconsistentScaleType, nil, rootInstance)
 			return nil
 		end
-
-		local AvatarPartScaleTypeValue = AvatarPartScaleType.Value
-
-		if v53 ~= nil then
-			if v53 == AvatarPartScaleTypeValue then
-				continue
-			end
-
-			p13:fail(ErrorSourceStrings.Keys.AssetBounds_InconsistentScaleType, nil, p14)
-
-			return nil
-		end
-
-		v53 = AvatarPartScaleTypeValue
 	end
 
-	return v53
+	return v
 end
 
-function t1.run(p15, p16) -- line: 149
-	-- upvalues: ValidationEnums (copy), createAllBodyPartsFromRootInstance (copy), getFullBodyConsistentScaleType (copy), Constants (copy), BoundsCalculator (copy), validateMinBounds (copy), validateMaxBounds (copy), getConsistentScaleType (copy)
-	local rootInstance = p16.rootInstance
-	local renderMeshesData = p16.renderMeshesData
+function AssetBoundsValid.run(object, data)
+	local rootInstance = data.rootInstance
+	local renderMeshesData = data.renderMeshesData
 
-	if p16.uploadCategory == ValidationEnums.UploadCategory.FULL_BODY then
+	if data.uploadCategory == ValidationEnums.UploadCategory.FULL_BODY then
 		if not renderMeshesData then
 			return
 		end
 
-		local v62 = createAllBodyPartsFromRootInstance(rootInstance)
+		local allBodyPartsFromRootInstance = createAllBodyPartsFromRootInstance(rootInstance)
 
-		if not next(v62) then
+		if not next(allBodyPartsFromRootInstance) then
 			return
 		end
 
-		local v63 = getFullBodyConsistentScaleType(v62, p15, rootInstance)
+		local fullBodyConsistentScaleType = getFullBodyConsistentScaleType(
+			allBodyPartsFromRootInstance,
+			object,
+			rootInstance
+		)
 
-		if not v63 then
+		if not fullBodyConsistentScaleType then
 			return
 		end
 
-		local v64 = Constants.FULL_BODY_BOUNDS[v63]
+		local v = Constants.FULL_BODY_BOUNDS[fullBodyConsistentScaleType]
 
-		if not v64 then
+		if not v then
 			return
 		end
 
-		local v65, _, v67 = BoundsCalculator.calculateFullBodyBoundsFromData(v62, renderMeshesData)
+		local fullBodyBoundsFromData, _, v2 = BoundsCalculator.calculateFullBodyBoundsFromData(
+			allBodyPartsFromRootInstance,
+			renderMeshesData
+		)
 
-		if not v65 then
-			p15:fetchError("Failed to calculate full body bounds")
-
+		if not fullBodyBoundsFromData then
+			object:fetchError("Failed to calculate full body bounds")
 			return
 		end
 
-		validateMinBounds(v64.minSize, "Full body", v67, p15, rootInstance)
-		validateMaxBounds(v64.maxSize, "Full body", v67, p15, rootInstance)
+		validateMinBounds(v.minSize, "Full body", v2, object, rootInstance)
+		validateMaxBounds(v.maxSize, "Full body", v2, object, rootInstance)
+	else
+		local assetType = data.uploadEnum.assetType
 
-		return
+		local consistentScaleType = getConsistentScaleType(rootInstance, assetType, object)
+
+		if not consistentScaleType then
+			return
+		end
+
+		local v = Constants.ASSET_TYPE_INFO[assetType]
+
+		if not (v and v.bounds and v.bounds[consistentScaleType] and renderMeshesData) then
+			return
+		end
+
+		local assetBoundsFromData, _, v2 = BoundsCalculator.calculateAssetBoundsFromData(
+			rootInstance,
+			assetType,
+			renderMeshesData
+		)
+
+		if not assetBoundsFromData then
+			object:fetchError("Failed to calculate asset bounds for " .. assetType.Name)
+			return
+		end
+
+		local name = assetType.Name
+		validateMinBounds(v.bounds[consistentScaleType].minSize, name, v2, object, rootInstance)
+		validateMaxBounds(v.bounds[consistentScaleType].maxSize, name, v2, object, rootInstance)
 	end
-
-	local assetType = p16.uploadEnum.assetType
-	local v69 = getConsistentScaleType(rootInstance, assetType, p15)
-
-	if not v69 then
-		return
-	end
-
-	local v70 = Constants.ASSET_TYPE_INFO[assetType]
-
-	if not v70 or not v70.bounds or not v70.bounds[v69] then
-		return
-	end
-
-	if not renderMeshesData then
-		return
-	end
-
-	local v71, _, v73 = BoundsCalculator.calculateAssetBoundsFromData(rootInstance, assetType, renderMeshesData)
-
-	if not v71 then
-		p15:fetchError("Failed to calculate asset bounds for " .. assetType.Name)
-
-		return
-	end
-
-	local assetTypeName = assetType.Name
-
-	validateMinBounds(v70.bounds[v69].minSize, assetTypeName, v73, p15, rootInstance)
-	validateMaxBounds(v70.bounds[v69].maxSize, assetTypeName, v73, p15, rootInstance)
 end
 
-return t1
+return AssetBoundsValid

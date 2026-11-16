@@ -1,150 +1,218 @@
 local MemStorageService = game:GetService("MemStorageService")
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("InputUi").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("InputUi").Parent
+local React = require(parent.React)
+
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useDesignTokens = require(Parent.Style).useDesignTokens
-
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
 require(script.Parent.GamepadDisconnectTokenMapper)
 
-local EngineFeature = game:GetEngineFeature("GamepadMessageKeyEngineFeature")
+local engineFeature = game:GetEngineFeature("GamepadMessageKeyEngineFeature")
 
-return function(p1) -- line: 23
-	-- upvalues: useDesignTokens (copy), EngineFeature (copy), MemStorageService (copy), useLocalization (copy), UserInputService (copy), React (copy), ImageSetLabel (copy), Images (copy)
-	local v12 = useDesignTokens()
-	local EmphasisColor3 = v12.Color.Content.Emphasis.Color3
-	local EmphasisTransparency = v12.Color.Content.Emphasis.Transparency
-	local GamepadDisconnect = v12.LuaApps.GamepadDisconnect
-	local designWidth = GamepadDisconnect.designWidth
-	local imageWidth = GamepadDisconnect.imageWidth
-	local imageHeight = GamepadDisconnect.imageHeight
-	local textContainerWidth = GamepadDisconnect.textContainerWidth
-	local horizontalInnerPadding = GamepadDisconnect.horizontalInnerPadding
-	local verticalPadding = GamepadDisconnect.verticalPadding
-	local Item
+return function(p)
+	local v = useDesignTokens()
+	local color3 = v.Color.Content.Emphasis.Color3
+	local transparency = v.Color.Content.Emphasis.Transparency
 
-	if EngineFeature then
-		Item = MemStorageService:GetItem("GamepadDisconnectMessageKey")
+	local gamepadDisconnect = v.LuaApps.GamepadDisconnect
+	local designWidth = gamepadDisconnect.designWidth
+	local imageWidth = gamepadDisconnect.imageWidth
+	local imageHeight = gamepadDisconnect.imageHeight
+	local textContainerWidth = gamepadDisconnect.textContainerWidth
+	local horizontalInnerPadding = gamepadDisconnect.horizontalInnerPadding
+	local verticalPadding = gamepadDisconnect.verticalPadding
+	local message
 
-		if Item == "" then
-			Item = "Feature.GamepadDisconnect.Label.MessageGeneric"
-		end
+	if engineFeature then
+		local item = MemStorageService:GetItem("GamepadDisconnectMessageKey")
+		message = item == "" and "Feature.GamepadDisconnect.Label.MessageGeneric" or item
 	else
-		Item = "Feature.GamepadDisconnect.Label.Message"
+		message = "Feature.GamepadDisconnect.Label.Message"
 	end
 
-	local v23 = useLocalization({
+	local v2 = useLocalization({
 		title = "Feature.GamepadDisconnect.Label.Title",
-		message = Item
+		message = message
 	})
-	local v24 = string.format(v23.message, p1.username, UserInputService:GetStringForKeyCode(Enum.KeyCode.A))
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Active = true,
+	local text = string.format(v2.message, p.username, UserInputService:GetStringForKeyCode(Enum.KeyCode.A))
+
+	local createElement = React.createElement
+	local v3 = {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
-		Modal = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5),
-			Size = UDim2.new(1, 0, 1, -verticalPadding * 2),
-			BackgroundTransparency = v12.Color.OverMedia.OverMedia_0.Transparency,
-			BackgroundColor3 = v12.Color.OverMedia.OverMedia_0.Color3
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Active = true
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.new(1, 0, 1, -verticalPadding * 2),
+		BackgroundTransparency = v.Color.OverMedia.OverMedia_0.Transparency,
+		BackgroundColor3 = v.Color.OverMedia.OverMedia_0.Color3,
+		BorderSizePixel = 0
+	}
+
+	local createElement3 = React.createElement
+	local v5 = {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.new(1, 0, 0, imageHeight),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0
+	}
+
+	local v6 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(horizontalInnerPadding / designWidth, 0)
+		}),
+		ControllerImage = React.createElement("ImageLabel", {
+			Image = "rbxasset://textures/ui/Gamepad/Controller.png",
+			Size = UDim2.new(imageWidth / designWidth, 0, 0, imageHeight),
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			ScaleType = Enum.ScaleType.Fit
 		}, {
-			Content = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Size = UDim2.new(1, 0, 0, imageHeight)
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					Padding = UDim.new(horizontalInnerPadding / designWidth, 0)
-				}),
-				ControllerImage = React.createElement("ImageLabel", {
-					Image = "rbxasset://textures/ui/Gamepad/Controller.png",
-					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					Size = UDim2.new(imageWidth / designWidth, 0, 0, imageHeight),
-					ScaleType = Enum.ScaleType.Fit
-				}, {
-					UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
-						AspectRatio = imageWidth / imageHeight
-					}),
-					UISizeConstraint = React.createElement("UISizeConstraint", {
-						MaxSize = Vector2.new(imageWidth, imageHeight),
-						MinSize = Vector2.new(imageWidth * 0.5, imageHeight * 0.5)
-					})
-				}),
-				TextContainer = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(textContainerWidth / designWidth, 0, 0, imageHeight)
-				}, {
-					UIListLayout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						HorizontalAlignment = Enum.HorizontalAlignment.Left,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						Padding = UDim.new(0, v12.Size.Size_800)
-					}),
-					TitleRow = React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 1,
-						AutomaticSize = Enum.AutomaticSize.Y,
-						Size = UDim2.fromScale(1, 0)
-					}, {
-						UIListLayout = React.createElement("UIListLayout", {
-							FillDirection = Enum.FillDirection.Horizontal,
-							SortOrder = Enum.SortOrder.LayoutOrder,
-							VerticalAlignment = Enum.VerticalAlignment.Center,
-							HorizontalAlignment = Enum.HorizontalAlignment.Left,
-							Padding = UDim.new(24 / textContainerWidth, 0)
-						}),
-						Icon = React.createElement(ImageSetLabel, {
-							BackgroundTransparency = 1,
-							LayoutOrder = 1,
-							Image = Images["icons/menu/about_large"],
-							Size = UDim2.fromOffset(v12.Size.Size_1200, v12.Size.Size_1200)
-						}),
-						Title = React.createElement("TextLabel", {
-							BackgroundTransparency = 1,
-							LayoutOrder = 2,
-							Text = v23.title,
-							TextColor3 = EmphasisColor3,
-							TextTransparency = EmphasisTransparency,
-							TextSize = v12.Typography.HeadingLarge.FontSize,
-							Font = v12.Typography.HeadingLarge.Font,
-							TextXAlignment = Enum.TextXAlignment.Left
-						})
-					}),
-					Message = React.createElement("TextLabel", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 2,
-						TextWrapped = true,
-						Text = v24,
-						AutomaticSize = Enum.AutomaticSize.XY,
-						Size = UDim2.fromOffset(0, 0),
-						TextColor3 = EmphasisColor3,
-						TextTransparency = EmphasisTransparency,
-						TextSize = v12.Typography.TitleLarge.FontSize,
-						Font = v12.Typography.TitleLarge.Font,
-						TextXAlignment = Enum.TextXAlignment.Left
-					})
-				})
+			UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+				AspectRatio = imageWidth / imageHeight
+			}),
+			UISizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(imageWidth, imageHeight),
+				MinSize = Vector2.new(imageWidth * 0.5, imageHeight * 0.5)
 			})
+		}),
+		TextContainer = 0
+	}
+
+	local createElement4 = React.createElement
+	local v7 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.new(textContainerWidth / designWidth, 0, 0, imageHeight),
+		BackgroundTransparency = 1,
+		LayoutOrder = 2
+	}
+
+	local children = {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(0, v.Size.Size_800)
+		}),
+		TitleRow = 0,
+		Message = 0
+	}
+
+	local createElement5 = React.createElement
+	local v8 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.fromScale(1, 0),
+		BackgroundTransparency = 1,
+		LayoutOrder = 1
+	}
+
+	local v9 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			Padding = UDim.new(24 / textContainerWidth, 0)
+		}),
+		Icon = React.createElement(ImageSetLabel, {
+			Image = Images["icons/menu/about_large"],
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.fromOffset(v.Size.Size_1200, v.Size.Size_1200)
+		}),
+		Title = 0
+	}
+
+	local createElement6 = React.createElement
+	local v10 = {
+		Text = v2.title,
+		BackgroundTransparency = 1,
+		TextColor3 = color3,
+		TextTransparency = transparency,
+		TextSize = v.Typography.HeadingLarge.FontSize,
+		Font = 0,
+		FontFace = 0,
+		LayoutOrder = 2,
+		TextXAlignment = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = v.Typography.HeadingLarge.Font
+	end
+
+	v10.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v.Typography.HeadingLarge.Font)
+	end
+
+	v10.FontFace = fontFace
+
+	v10.TextXAlignment = Enum.TextXAlignment.Left
+	v9.Title = createElement6("TextLabel", v10)
+	children.TitleRow = createElement5("Frame", v8, v9)
+
+	local createElement7 = React.createElement
+	local v11 = {
+		Text = text,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		Size = UDim2.fromOffset(0, 0),
+		BackgroundTransparency = 1,
+		TextColor3 = color3,
+		TextTransparency = transparency,
+		TextSize = v.Typography.TitleLarge.FontSize,
+		Font = 0,
+		FontFace = 0,
+		LayoutOrder = 2,
+		TextWrapped = true,
+		TextXAlignment = 0
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = v.Typography.TitleLarge.Font
+	end
+
+	v11.Font = font2
+	local fontFace2
+
+	if FoundationFontFaceMigration then
+		fontFace2 = normalizeFontFace(v.Typography.TitleLarge.Font)
+	end
+
+	v11.FontFace = fontFace2
+
+	v11.TextXAlignment = Enum.TextXAlignment.Left
+	children.Message = createElement7("TextLabel", v11)
+	v6.TextContainer = createElement4("Frame", v7, children)
+	return createElement("Frame", v3, {
+		Modal = createElement2("Frame", v4, {
+			Content = createElement3("Frame", v5, v6)
 		})
 	})
 end

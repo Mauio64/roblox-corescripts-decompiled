@@ -1,91 +1,88 @@
 local RunService = game:GetService("RunService")
+
 local createSignal = require(script.Parent.createSignal)
-local t1 = {
-	prototype = {}
-}
 
-t1.__index = t1.prototype
+local v = {}
+v.prototype = {}
+v.__index = v.prototype
 
-local function createSingleMotor(p1) -- line: 9
-	-- upvalues: createSignal (copy), t1 (copy)
-	assert(typeof(p1) == "number")
+local function createSingleMotor(value)
+	assert(typeof(value) == "number")
 
-	local t2 = {
+	local singleMotor = {
 		__goal = nil,
-		__running = false,
-		__state = {
-			complete = true,
-			value = p1
-		},
+		__state = { value = value, complete = true },
 		__onComplete = createSignal(),
-		__onStep = createSignal()
+		__onStep = createSignal(),
+		__running = false
 	}
 
-	setmetatable(t2, t1)
+	setmetatable(singleMotor, v)
 
-	return t2
+	return singleMotor
 end
 
-function t1.prototype.start(p2) -- line: 28
-	-- upvalues: RunService (copy)
-	if p2.__running then
+function v.prototype:start()
+	if self.__running then
 		return
 	end
 
-	p2.__connection = RunService.Heartbeat:Connect(function(dt) -- line: 33
-		-- upvalues: p2 (copy)
-		p2:step(dt)
+	self.__connection = RunService.Heartbeat:Connect(function(dt)
+		self:step(dt)
 	end)
-	p2.__running = true
+
+	self.__running = true
 end
-function t1.prototype.stop(p3) -- line: 40
-	if p3.__connection ~= nil then
-		p3.__connection:Disconnect()
+
+function v.prototype:stop()
+	if self.__connection ~= nil then
+		self.__connection:Disconnect()
 	end
 
-	p3.__running = false
+	self.__running = false
 end
-function t1.prototype.step(p4, p5) -- line: 48
-	assert(typeof(p5) == "number")
 
-	if p4.__state.complete then
+function v.prototype:step(value)
+	assert(typeof(value) == "number")
+
+	if self.__state.complete or self.__goal == nil then
 		return
 	end
 
-	if p4.__goal == nil then
-		return
+	local state = self.__goal:step(self.__state, value)
+
+	if state ~= nil then
+		self.__state = state
 	end
 
-	local v11 = p4.__goal:step(p4.__state, p5)
+	self.__onStep:fire(self.__state.value)
 
-	if v11 ~= nil then
-		p4.__state = v11
-	end
-
-	p4.__onStep:fire(p4.__state.value)
-
-	if p4.__state.complete and p4.__running then
-		p4:stop()
-		p4.__onComplete:fire(p4.__state.value)
+	if self.__state.complete and self.__running then
+		self:stop()
+		self.__onComplete:fire(self.__state.value)
 	end
 end
-function t1.prototype.setGoal(p6, p7) -- line: 73
-	p6.__goal = p7
-	p6.__state.complete = false
-	p6:start()
-end
-function t1.prototype.onStep(p8, p9) -- line: 79
-	assert(typeof(p9) == "function")
 
-	return p8.__onStep:subscribe(p9)
+function v.prototype:setGoal(goal)
+	self.__goal = goal
+	self.__state.complete = false
+	self:start()
 end
-function t1.prototype.onComplete(p10, p11) -- line: 85
-	assert(typeof(p11) == "function")
 
-	return p10.__onComplete:subscribe(p11)
+function v.prototype:onStep(callback)
+	assert(typeof(callback) == "function")
+
+	return self.__onStep:subscribe(callback)
 end
-function t1.prototype.destroy(p12) -- line: 91
-	p12:stop()
+
+function v.prototype:onComplete(callback)
+	assert(typeof(callback) == "function")
+
+	return self.__onComplete:subscribe(callback)
+end
+
+function v.prototype:destroy()
+	self:stop()
 end
 
 return createSingleMotor

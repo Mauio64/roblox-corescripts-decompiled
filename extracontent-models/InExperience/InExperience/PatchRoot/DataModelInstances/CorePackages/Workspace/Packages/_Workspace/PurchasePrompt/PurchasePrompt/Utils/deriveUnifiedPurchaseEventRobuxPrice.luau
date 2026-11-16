@@ -1,20 +1,19 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
-local deriveCartPricingView = require(Parent.IAPExperience).deriveCartPricingView
-local FFlagPurchasePromptUnifiedEventsUseOfferAdjustedPrice = require(Parent.SharedFlags).FFlagPurchasePromptUnifiedEventsUseOfferAdjustedPrice
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
 
-local function deriveUnifiedPurchaseEventRobuxPrice(p1, n1: number?) -- line: 21
-	-- upvalues: FFlagPurchasePromptUnifiedEventsUseOfferAdjustedPrice (copy), deriveCartPricingView (copy)
+local IAPExperience = require(parent.IAPExperience)
+
+local deriveCartPricingView = IAPExperience.deriveCartPricingView
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPurchasePromptUnifiedEventsUseOfferAdjustedPrice = SharedFlags.FFlagPurchasePromptUnifiedEventsUseOfferAdjustedPrice
+
+local function deriveUnifiedPurchaseEventRobuxPrice(p, p2: number?)
 	if not FFlagPurchasePromptUnifiedEventsUseOfferAdjustedPrice then
-		return n1
+		return p2
 	end
 
-	local v7 = deriveCartPricingView(p1)
-
-	if v7 == nil then
-		return n1
-	end
-
-	return v7.priceAfterDiscount
+	local v = deriveCartPricingView(p)
+	return if v == nil then p2 else v.priceAfterDiscount
 end
 
 return deriveUnifiedPurchaseEventRobuxPrice

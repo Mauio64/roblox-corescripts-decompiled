@@ -1,72 +1,55 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local t = require(ParentParent.t)
-local t1 = {
-	minimumItemsPerRow = 2,
-	minimumItemWidth = 160
-}
-local t2 = {
-	minimumItemsPerRow = 1,
-	minimumItemWidth = 332
-}
+local parent = script.Parent.Parent.Parent.Parent
+local t = require(parent.t)
 
-local function getItemMetrics(p1, p2, p3) -- line: 24
-	local v12 = math.floor((p1 + p2) / (p3.minimumItemWidth + p2))
-	local v13 = math.max(p3.minimumItemsPerRow, v12)
-	local v14 = math.floor((p1 - (v13 - 1) * p2) / v13)
-
+local function getItemMetrics(p, p2, p3) -- 1 equivalent call inferred from this helper
+	local v = math.floor((p + p2) / (p3.minimumItemWidth + p2))
+	local itemsPerRow = math.max(p3.minimumItemsPerRow, v)
 	return {
-		itemsPerRow = v13,
-		itemWidth = v14
+		itemsPerRow = itemsPerRow,
+		itemWidth = math.floor((p - (itemsPerRow - 1) * p2) / itemsPerRow)
 	}
 end
 
-local t3 = {}
-local v7 = t.strictInterface({
+local GridMetrics = {}
+
+local strictInterface = t.strictInterface({
 	minimumItemsPerRow = t.intersection(t.integer, t.numberMin(1)),
 	minimumItemWidth = t.numberMin(0)
 })
-local v8 = t.tuple(t.numberMin(0), t.number)
 
-function t3.makeCustomMetricsGetter(p4) -- line: 48
-	-- upvalues: v7 (copy), v8 (copy)
-	assert(v7(p4))
+local tuple = t.tuple(t.numberMin(0), t.number)
 
-	return function(p5, p6) -- line: 51
-		-- upvalues: v8 (copy), p4 (copy)
-		assert(v8(p5, p6))
+function GridMetrics.makeCustomMetricsGetter(p)
+	assert(strictInterface(p))
 
-		local v26 = p4
-		local v27 = math.floor((p5 + p6) / (v26.minimumItemWidth + p6))
-		local v28 = math.max(v26.minimumItemsPerRow, v27)
-		local v29 = math.floor((p5 - (v28 - 1) * p6) / v28)
-
-		return {
-			itemsPerRow = v28,
-			itemWidth = v29
-		}
+	return function(p2, p3)
+		assert(tuple(p2, p3))
+		return getItemMetrics(p2, p3, p) -- inferred equivalent call
 	end
 end
 
-t3.getLargeMetrics = t3.makeCustomMetricsGetter(t2)
-t3.getMediumMetrics = t3.makeCustomMetricsGetter(t1)
+GridMetrics.getLargeMetrics = GridMetrics.makeCustomMetricsGetter({
+	minimumItemsPerRow = 1,
+	minimumItemWidth = 332
+})
+GridMetrics.getMediumMetrics = GridMetrics.makeCustomMetricsGetter({
+	minimumItemsPerRow = 2,
+	minimumItemWidth = 160
+})
 
-function t3.getSmallMetrics(p7, p8) -- line: 60
-	-- upvalues: t3 (copy)
-	local v18 = t3.getMediumMetrics(p7, p8).itemsPerRow + 1
-	local v19 = math.floor((p7 - (v18 - 1) * p8) / v18)
-
+function GridMetrics.getSmallMetrics(p, p2)
+	local itemsPerRow = GridMetrics.getMediumMetrics(p, p2).itemsPerRow + 1
 	return {
-		itemsPerRow = v18,
-		itemWidth = v19
-	}
-end
-function t3.getMetricsForFixedColumns(p9, p10, p11) -- line: 73
-	local v23 = math.floor((p9 - (p11 - 1) * p10) / p11)
-
-	return {
-		itemsPerRow = p11,
-		itemWidth = v23
+		itemsPerRow = itemsPerRow,
+		itemWidth = math.floor((p - (itemsPerRow - 1) * p2) / itemsPerRow)
 	}
 end
 
-return t3
+function GridMetrics.getMetricsForFixedColumns(p, p2, itemsPerRow)
+	return {
+		itemsPerRow = itemsPerRow,
+		itemWidth = math.floor((p - (itemsPerRow - 1) * p2) / itemsPerRow)
+	}
+end
+
+return GridMetrics

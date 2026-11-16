@@ -1,81 +1,72 @@
 local HttpService = game:GetService("HttpService")
-local ParentParent = script.Parent.Parent
-local Promise = require(ParentParent.Promise)
+local parent = script.Parent.Parent
 
-require(ParentParent.LuauPolyfill)
+local Promise = require(parent.Promise)
 
-local t1 = {}
+require(parent.LuauPolyfill)
 
-t1.__index = t1
+local class = {}
+class.__index = class
 
-function t1.new(s1: string?) -- line: 37
-	-- upvalues: t1 (copy)
-	local t2 = {}
+function class.new(body: string?)
+	local v = {}
 
-	if type(s1) == "string" then
-		t2.body = s1
-	elseif s1 == nil then
-		t2.body = nil
+	if type(body) == "string" then
+		v.body = body
+	elseif body == nil then
+		v.body = nil
 	else
-		error(string.format("Expected string or nil as the first argument to Body.new(), but got: %s", (type(s1))))
+		error(string.format("Expected string or nil as the first argument to Body.new(), but got: %s", (type(body))))
 	end
 
-	t2.bodyUsed = false
-	setmetatable(t2, t1)
+	v.bodyUsed = false
+	setmetatable(v, class)
+	return v
+end
 
-	return t2
-end
-function t1.arrayBuffer(_) -- line: 53
-	-- upvalues: Promise (copy)
-	return Promise.new(function(_, reject) -- line: 54
-		reject("arrayBuffer not implemented")
+function class.arrayBuffer(_)
+	return Promise.new(function(_, callback)
+		callback("arrayBuffer not implemented")
 	end)
 end
-function t1.blob(_) -- line: 60
-	-- upvalues: Promise (copy)
-	return Promise.new(function(_, reject) -- line: 61
-		reject("blob not implemented")
-	end)
-end
-function t1.formData(_) -- line: 67
-	-- upvalues: Promise (copy)
-	return Promise.new(function(_, reject) -- line: 68
-		reject("formData not implemented")
-	end)
-end
-function t1.json(p7) -- line: 74
-	-- upvalues: Promise (copy), HttpService (copy)
-	return Promise.new(function(resolve, reject) -- line: 75
-		-- upvalues: p7 (copy), HttpService (copy)
-		if p7._json then
-			resolve(p7._json)
 
+function class.blob(_)
+	return Promise.new(function(_, callback)
+		callback("blob not implemented")
+	end)
+end
+
+function class.formData(_)
+	return Promise.new(function(_, callback)
+		callback("formData not implemented")
+	end)
+end
+
+function class:json()
+	return Promise.new(function(callback, callback2)
+		if self._json then
+			callback(self._json)
 			return
 		end
 
-		local ok, result = pcall(function() -- line: 81
-			-- upvalues: HttpService (copy), p7 (copy)
-			return HttpService:JSONDecode(p7.body)
+		local success, result = pcall(function()
+			return HttpService:JSONDecode(self.body)
 		end)
 
-		if not ok then
-			reject("Failed to decode response body as JSON. JSON decoding is only supported for Content-Type = application/json")
-
+		if not success then
+			callback2("Failed to decode response body as JSON. JSON decoding is only supported for Content-Type = application/json")
 			return
 		end
 
-		p7._json = result
-		resolve(result)
-	end)
-end
-function t1.text(p8) -- line: 97
-	-- upvalues: Promise (copy)
-	return Promise.new(function(resolve, _) -- line: 98
-		-- upvalues: p8 (copy)
-		resolve(p8.body or "")
+		self._json = result
+		callback(result)
 	end)
 end
 
-return {
-	Body = t1
-}
+function class.text(p)
+	return Promise.new(function(callback, _)
+		callback(p.body or "")
+	end)
+end
+
+return { Body = class }

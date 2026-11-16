@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
 local ProfileWrapperContext = require(script.Parent.ProfileWrapperContext)
-local React = require(Parent.React)
+local React = require(parent.React)
 
-return function() -- line: 6
-	-- upvalues: React (copy), ProfileWrapperContext (copy)
+return function()
 	return React.useContext(ProfileWrapperContext)
 end

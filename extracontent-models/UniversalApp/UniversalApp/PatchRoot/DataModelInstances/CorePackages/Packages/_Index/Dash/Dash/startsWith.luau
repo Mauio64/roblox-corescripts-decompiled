@@ -1,5 +1,5 @@
-local function startsWith(s1: string, s2: string) -- line: 16
-	return s2 == s1:sub(1, s2:len())
+local function startsWith(value: string, value2: string): boolean
+	return value:sub(1, value2:len()) == value2
 end
 
 return startsWith

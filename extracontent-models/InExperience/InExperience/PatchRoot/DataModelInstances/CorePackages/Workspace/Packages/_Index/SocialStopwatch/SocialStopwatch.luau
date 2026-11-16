@@ -1,14 +1,12 @@
 local Events = require(script.Events)
-
 require(script.Types)
 
-local v2 = require(script.initializeStopwatch)()
+local initializeStopwatch = require(script.initializeStopwatch)
+local stopwatch = initializeStopwatch()
 
 return {
 	["jest.config"] = script["jest.config"],
 	Events = Events,
-	Stopwatch = v2,
-	TestUtils = {
-		resetStopwatchState = v2._unsafeClearEventLog
-	}
+	Stopwatch = stopwatch,
+	TestUtils = { resetStopwatchState = stopwatch._unsafeClearEventLog }
 }

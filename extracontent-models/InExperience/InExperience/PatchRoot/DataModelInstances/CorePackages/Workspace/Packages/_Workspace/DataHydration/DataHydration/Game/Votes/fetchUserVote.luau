@@ -1,24 +1,22 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Http = require(Parent.Http)
-local HttpRequest = require(Parent.HttpRequest)
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Http = require(parent.Http)
+local HttpRequest = require(parent.HttpRequest)
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+
 local Url = Http.Url
 
-local function requestUserVote(s1: string) -- line: 12
-	-- upvalues: UrlBuilder (copy), Url (copy), HttpRequest (copy)
-	local v8 = UrlBuilder.new({
-		path = "v1/games/{universeId}/votes/user",
-		base = Url.GAME_URL
-	})({
-		universeId = s1
+local function requestUserVote(universeId: string)
+	local v = urlBuilder.new({ base = Url.GAME_URL, path = "v1/games/{universeId}/votes/user" })({
+		universeId = universeId
 	})
 
 	return HttpRequest.config({
-		requestFunction = function(s2: string, s3: string, p1) -- line: 21
-			-- upvalues: HttpRequest (copy)
-			return HttpRequest.requestFunctions.HttpRbxApi(s2, s3, p1)
+		requestFunction = function(p: string, p2: string, p3)
+			return HttpRequest.requestFunctions.HttpRbxApi(p, p2, p3)
 		end
-	})(v8, "GET")
+	})(v, "GET")
 end
 
 return requestUserVote

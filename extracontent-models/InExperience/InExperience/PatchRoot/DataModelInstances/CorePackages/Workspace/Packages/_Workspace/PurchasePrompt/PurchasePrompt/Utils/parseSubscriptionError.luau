@@ -1,48 +1,33 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
+local parent = PurchasePrompt.Parent
 local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
-local isErrorReasonPrefixWithEconomicRestrictions = require(PurchasePromptParent.IAPExperience).Utility.isErrorReasonPrefixWithEconomicRestrictions
 
-local function parseSubscriptionError(p1) -- line: 8
-	-- upvalues: PurchaseError (copy), isErrorReasonPrefixWithEconomicRestrictions (copy)
-	if p1 == "UserHasSpendLimitSet" then
+local IAPExperience = require(parent.IAPExperience)
+local isErrorReasonPrefixWithEconomicRestrictions = IAPExperience.Utility.isErrorReasonPrefixWithEconomicRestrictions
+
+local function parseSubscriptionError(p)
+	if p == "UserHasSpendLimitSet" then
 		return PurchaseError.SubscriptionExceededUserSpendLimit
-	end
-
-	if p1 == "UnsupportedLocale" then
+	elseif p == "UnsupportedLocale" then
 		return PurchaseError.SubscriptionUnsupportedLocale
-	end
-
-	if p1 == "RestrictedUser" then
+	elseif p == "RestrictedUser" then
 		return PurchaseError.RestrictedUser
-	end
-
-	if p1 == "PurchasePlatformNotSupported" then
+	elseif p == "PurchasePlatformNotSupported" then
 		return PurchaseError.SubscriptionPurchasePlatformNotSupported
-	end
-
-	if p1 == "InvalidSaleLocation" then
+	elseif p == "InvalidSaleLocation" then
 		return PurchaseError.SubscriptionInvalidSaleLocation
-	end
-
-	if p1 == "UserAlreadySubscribed" then
+	elseif p == "UserAlreadySubscribed" then
 		return PurchaseError.AlreadySubscribed
-	end
-
-	if p1 == "ProductNotForSale" then
+	elseif p == "ProductNotForSale" then
 		return PurchaseError.SubscriptionNotForSale
-	end
-
-	if p1 == "VpcRequired" then
+	elseif p == "VpcRequired" then
 		return PurchaseError.VpcRequired
-	end
-
-	if p1 == "ExceedParentalSpendLimit" then
+	elseif p == "ExceedParentalSpendLimit" then
 		return PurchaseError.ExceedParentalSpendLimit
 	end
 
-	if isErrorReasonPrefixWithEconomicRestrictions(p1) then
-		return p1
+	if isErrorReasonPrefixWithEconomicRestrictions(p) then
+		return p
 	end
 
 	return PurchaseError.UnknownFailure

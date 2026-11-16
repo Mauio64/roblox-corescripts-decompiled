@@ -1,58 +1,49 @@
-local Parent = script:FindFirstAncestor("AppCommonLib").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("AppCommonLib").Parent
+local Promise = require(parent.Promise)
 
 require(script.Parent.AsyncQueueTypes)
 
-local t1 = {}
+local AsyncQueue = {}
 
-t1.__index = t1
+AsyncQueue.__index = AsyncQueue
 
-function t1.new() -- line: 26
-	-- upvalues: Promise (copy), t1 (copy)
-	local t2 = {
-		head = Promise.resolve()
-	}
+function AsyncQueue.new()
+	local v = { head = Promise.resolve() }
 
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v, AsyncQueue)
+	return v
 end
-function t1.request(t3: {[any]: any}, p1: ((...any) -> ...any)) -- line: 34
-	-- upvalues: Promise (copy)
-	local BindableEvent = Instance.new("BindableEvent")
-	local u8 = false
-	local u9 = false
 
-	t3.head = t3.head:andThen(function() -- line: 39
-		-- upvalues: Promise (copy), u8 (ref), p1 (copy), u9 (ref), BindableEvent (copy)
-		return Promise.new(function(resolve) -- line: 40
-			-- upvalues: u8 (ref), p1 (copy), u9 (ref), BindableEvent (copy)
-			if not u8 then
-				pcall(p1)
+function AsyncQueue:request(callback)
+	local bindableEvent = Instance.new("BindableEvent")
+	local v = false
+	local flag = false
+
+	self.head = self.head:andThen(function()
+		return Promise.new(function(callback2)
+			if not v then
+				pcall(callback)
 			end
 
-			if not u8 then
-				u9 = true
-				BindableEvent.Event:Wait()
+			if not v then
+				flag = true
+				bindableEvent.Event:Wait()
 			end
 
-			BindableEvent:Destroy()
-			resolve()
+			bindableEvent:Destroy()
+			callback2()
 		end)
 	end)
 
-	local function release() -- line: 53
-		-- upvalues: u9 (ref), BindableEvent (copy), u8 (ref)
-		if u9 then
-			BindableEvent:Fire()
-
-			return
+	local function release()
+		if flag then
+			bindableEvent:Fire()
+		else
+			v = true
 		end
-
-		u8 = true
 	end
 
 	return release
 end
 
-return t1
+return AsyncQueue

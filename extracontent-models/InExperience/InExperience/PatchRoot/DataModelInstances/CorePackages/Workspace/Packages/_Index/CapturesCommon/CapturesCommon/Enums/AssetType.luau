@@ -1,3 +1,1 @@
-return {
-	Screenshot = "Screenshot"
-}
+return { Screenshot = "Screenshot" }

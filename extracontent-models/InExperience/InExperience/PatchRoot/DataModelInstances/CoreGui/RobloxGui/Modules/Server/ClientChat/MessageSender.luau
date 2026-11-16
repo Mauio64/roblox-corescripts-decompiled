@@ -1,22 +1,23 @@
-local t1 = {}
-local _ = script.Parent
-local t2 = {}
+local v = {}
 
-t2.__index = t2
+local parent = script.Parent
 
-function t2.SendMessage(p1, p2, p3) -- line: 15
-	p1.SayMessageRequest:FireServer(p2, p3)
+local class = {}
+class.__index = class
+
+function class.SendMessage(p, p2, p3)
+	p.SayMessageRequest:FireServer(p2, p3)
 end
-function t2.RegisterSayMessageFunction(p4, p5) -- line: 19
-	p4.SayMessageRequest = p5
-end
-function t1.new() -- line: 26
-	-- upvalues: t2 (copy)
-	local self = setmetatable({}, t2)
 
+function class:RegisterSayMessageFunction(sayMessageRequest)
+	self.SayMessageRequest = sayMessageRequest
+end
+
+function v.new()
+	local self = setmetatable({}, class)
 	self.SayMessageRequest = nil
 
 	return self
 end
 
-return t1.new()
+return v.new()

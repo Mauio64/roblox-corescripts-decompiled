@@ -1,238 +1,228 @@
-local scriptParent = script.Parent
-local Cryo = require(scriptParent.Cryo)
-local t1 = {}
+local parent = script.Parent
+local Cryo = require(parent.Cryo)
 
-t1.__index = t1
+local class = {}
+class.__index = class
 
-function t1.new(p1, p2, p3) -- line: 7
-	-- upvalues: t1 (copy)
-	return (setmetatable({
-		ids = t1.makeArray(p2),
-		delimiter = p3
-	}, p1))
+function class:new(p, delimiter)
+	return (setmetatable({ ids = class.makeArray(p), delimiter = delimiter }, self))
 end
-function t1.setIds(p4, p5) -- line: 14
-	-- upvalues: t1 (copy)
-	p4.ids = t1.makeArray(p5)
+
+function class:setIds(p)
+	self.ids = class.makeArray(p)
 end
-function t1.makeArray(p6) -- line: 18
-	if type(p6) == "table" then
-		return p6
+
+function class.makeArray(p)
+	if type(p) == "table" then
+		return p
 	end
 
-	return { p6 }
-end
-function t1.__tostring(p7) -- line: 25
-	return table.concat(p7.ids, p7.delimiter)
+	return { p }
 end
 
-local t2 = {}
+function class.__tostring(p)
+	return table.concat(p.ids, p.delimiter)
+end
 
-t2.__index = t2
+local RequestBuilder = {}
+RequestBuilder.__index = RequestBuilder
 
-function t2.new(s1: string, p8) -- line: 54
-	-- upvalues: t2 (copy)
-	local v15 = s1:gsub("/*$", "")
-	local t3 = {
-		configurableIds = nil,
-		idsDelimiter = ",",
-		statusIds = nil,
-		baseUrl = v15,
+function RequestBuilder:new(options)
+	local v = {
+		baseUrl = self:gsub("/*$", ""),
 		args = {},
 		pathElements = {},
+		configurableIds = nil,
 		namedIds = {},
-		options = {
-			queryArgs = nil,
-			postBody = nil,
-			headers = nil
-		},
+		idsDelimiter = ",",
+		options = { queryArgs = nil, postBody = nil, headers = nil },
 		useExpandedForm = {},
-		additionalData = p8 or {}
+		statusIds = nil,
+		additionalData = options or {}
 	}
 
-	setmetatable(t3, t2)
+	setmetatable(v, RequestBuilder)
 
-	return t3
+	return v
 end
-function t2.path(p9, s2: string) -- line: 80
-	local v19 = s2:gsub("^/", ""):gsub("/$", "")
 
-	table.insert(p9.pathElements, v19)
-
-	return p9
+function RequestBuilder.path(p, value: string)
+	local v = value:gsub("^/", ""):gsub("/$", "")
+	table.insert(p.pathElements, v)
+	return p
 end
-function t2.id(p10, p11, p12) -- line: 87
-	-- upvalues: t1 (copy)
-	if not p12 and #p10.pathElements < 1 then
+
+function RequestBuilder:id(p, p2)
+	if not p2 and #self.pathElements < 1 then
 		warn("Cannot name id or ids because there is no leading path segment and no name is provided")
 	end
 
-	local v23 = p12 or p10.pathElements[#p10.pathElements]
+	local v = p2 or self.pathElements[#self.pathElements]
+	self.namedIds[v] = p
 
-	p10.namedIds[v23] = p11
-	p10.configurableIds = t1:new(p11, p10.idsDelimiter)
-	table.insert(p10.pathElements, p10.configurableIds)
-
-	return p10
+	self.configurableIds = class:new(p, self.idsDelimiter)
+	table.insert(self.pathElements, self.configurableIds)
+	return self
 end
-function t2.queryArgWithIds(p13, p14, p15) -- line: 99
-	-- upvalues: Cryo (copy), t1 (copy)
-	local v27 = Cryo.List.join(p15, p13.namedIds[p14] or {})
 
-	p13.namedIds[p14] = v27
-	p13.configurableIds = t1:new(v27, p13.idsDelimiter)
-	p13.args = Cryo.Dictionary.join(p13.args, {
-		[p14] = p13.configurableIds
-	})
+function RequestBuilder:queryArgWithIds(p, p2)
+	local joined = Cryo.List.join(p2, self.namedIds[p] or {})
+	self.namedIds[p] = joined
+	self.configurableIds = class:new(joined, self.idsDelimiter)
+	self.args = Cryo.Dictionary.join(self.args, { [p] = self.configurableIds })
 
-	return p13
+	return self
 end
-function t2.expandedQueryArgsWithIds(p16, p17, p18) -- line: 109
-	p16.useExpandedForm[p17] = true
-	p16:queryArgWithIds(p17, p18)
 
-	return p16
+function RequestBuilder:expandedQueryArgsWithIds(p, p2)
+	self.useExpandedForm[p] = true
+	self:queryArgWithIds(p, p2)
+	return self
 end
-function t2.queryArgs(p19, p20) -- line: 115
-	-- upvalues: Cryo (copy)
-	p19.args = Cryo.Dictionary.join(p19.args, p20)
-	p19.options.queryArgs = Cryo.Dictionary.join(p20, p19.options.queryArgs or {})
 
-	return p19
+function RequestBuilder:queryArgs(p)
+	self.args = Cryo.Dictionary.join(self.args, p)
+	self.options.queryArgs = Cryo.Dictionary.join(p, self.options.queryArgs or {})
+	return self
 end
-function t2.body(p21, p22) -- line: 121
-	p21.options.postBody = p22
 
-	return p21
+function RequestBuilder.body(p, postBody)
+	p.options.postBody = postBody
+	return p
 end
-function t2.headers(p23, t4: {[any]: any}) -- line: 126
-	p23.options.headers = t4
 
-	return p23
+function RequestBuilder.headers(p, headers)
+	p.options.headers = headers
+	return p
 end
-function t2.makeKeyMapper(p24) -- line: 131
-	return function(p25) -- line: 132
-		-- upvalues: p24 (copy)
-		return p24:getStatusIds() and p24:makeStatusUrl(p25) or p24:makeNamedIdsUrl(p25)
+
+function RequestBuilder:makeKeyMapper()
+	return function(p)
+		return self:getStatusIds() and self:makeStatusUrl(p) or self:makeNamedIdsUrl(p)
 	end
 end
-function t2._normalize(_, p27) -- line: 139
-	return p27:gsub("/+", "/")
-end
-function t2.makeUri(p28) -- line: 143
-	local s3 = ""
 
-	for _, v in ipairs(p28.pathElements) do
-		s3 ..= "/" .. tostring(v)
+function RequestBuilder:_normalize(value)
+	return value:gsub("/+", "/")
+end
+
+function RequestBuilder:makeUri()
+	local v = ""
+
+	for _, pathElement in ipairs(self.pathElements) do
+		v ..= "/" .. tostring(pathElement)
 	end
 
-	return p28:_normalize(s3)
+	return self:_normalize(v)
 end
 
-local function concatArguments(s4: string, s5: string, p29, b1: boolean?) -- line: 151
-	-- upvalues: concatArguments (copy)
-	if b1 then
-		for _, v in pairs(p29.ids) do
-			s4 = concatArguments(s4, s5, v)
+local function concatArguments(value: string, k: string, arg, flag: boolean?)
+	if flag then
+		for _, id in pairs(arg.ids) do
+			value = concatArguments(value, k, id)
 		end
 
-		return s4
+		return value
+	else
+		local v = tostring(k) .. "=" .. tostring(arg)
+
+		if value:len() > 1 then
+			return value .. "&" .. v
+		end
+
+		return v
 	end
-
-	local v50 = tostring(s5) .. "=" .. tostring(p29)
-
-	if s4:len() > 1 then
-		return s4 .. "&" .. v50
-	end
-
-	return v50
 end
 
-function t2.makeQueryArgs(p30, p31, b2: boolean?) -- line: 168
-	-- upvalues: concatArguments (copy)
-	p30:_plugInConfigurableIds(p31)
+function RequestBuilder:makeQueryArgs(p, flag: boolean?)
+	self:_plugInConfigurableIds(p)
+	local v = ""
 
-	local s6 = ""
-
-	for k, v in pairs(p30.args) do
-		if b2 and p30.namedIds[k] or not b2 then
-			s6 = concatArguments(s6, k, v, p30.useExpandedForm[k])
+	for k, arg in pairs(self.args) do
+		if flag and self.namedIds[k] or not flag then
+			v = concatArguments(v, k, arg, self.useExpandedForm[k])
 		end
 	end
 
-	if s6:len() > 1 then
-		return "?" .. s6
+	if v:len() > 1 then
+		return "?" .. v
 	end
 
 	return ""
 end
-function t2.makeUrl(p32, p33, b3: boolean?) -- line: 184
-	p32:_plugInConfigurableIds(p33)
 
-	return p32.baseUrl .. p32:makeUri() .. p32:makeQueryArgs(p33, b3)
+function RequestBuilder:makeUrl(p, flag: boolean?)
+	self:_plugInConfigurableIds(p)
+	return self.baseUrl .. self:makeUri() .. self:makeQueryArgs(p, flag)
 end
-function t2.makeStatusUrl(p34, p35) -- line: 190
-	local v62 = p34.baseUrl .. p34:makeUri()
 
-	if not p35 then
-		return v62
+function RequestBuilder:makeStatusUrl(p)
+	local v = self.baseUrl .. self:makeUri()
+
+	if not p then
+		return v
 	end
 
-	local v63 = type(p35) == "table" and p35 or { p35 }
-	local s7 = ""
+	local v2 = type(p) == "table" and p or { p }
+	local v3 = ""
 
-	for k, v in pairs(v63) do
-		s7 = k > 1 and s7 .. "&" .. v or v
+	for k, v4 in pairs(v2) do
+		if k > 1 then
+			v3 = v3 .. "&" .. v4 or v4
+		else
+			v3 = v4
+		end
 	end
 
-	return v62 .. "?" .. s7
+	return v .. "?" .. v3
 end
-function t2.makeNamedIdsUrl(p36, p37) -- line: 205
-	return p36:makeUrl(p37, true)
+
+function RequestBuilder:makeNamedIdsUrl(p)
+	return self:makeUrl(p, true)
 end
-function t2.makeOptions(p38) -- line: 209
-	return p38.options
+
+function RequestBuilder.makeOptions(p)
+	return p.options
 end
-function t2._plugInConfigurableIds(p39, p40) -- line: 213
-	if p40 ~= nil and p39.configurableIds then
-		p39.configurableIds:setIds(p40)
+
+function RequestBuilder:_plugInConfigurableIds(p)
+	if p ~= nil and self.configurableIds then
+		self.configurableIds:setIds(p)
 	end
 end
-function t2.getIds(p41) -- line: 219
-	if p41.configurableIds and p41.configurableIds.ids then
-		return p41.configurableIds.ids
+
+function RequestBuilder.getIds(p)
+	if p.configurableIds and p.configurableIds.ids then
+		return p.configurableIds.ids
 	end
 
-	if p41.statusIds then
-		return p41.statusIds
+	if p.statusIds then
+		return p.statusIds
 	end
 
 	return {}
 end
-function t2.getNamedIds(p42) -- line: 229
-	return p42.namedIds
+
+function RequestBuilder.getNamedIds(p)
+	return p.namedIds
 end
-function t2.setStatusIds(p43, p44) -- line: 233
-	-- upvalues: Cryo (copy)
-	if p43.configurableIds then
+
+function RequestBuilder:setStatusIds(p)
+	if self.configurableIds then
 		warn("Cannot set statusIds because ids already provided in URl")
-
-		return p43
+		return self
 	end
 
-	p43.statusIds = Cryo.List.join(p43.statusIds or {}, p44)
-
-	return p43
-end
-function t2.getStatusIds(p45) -- line: 242
-	if p45.configurableIds then
-		return nil
-	end
-
-	return p45.statusIds
-end
-function t2.getAdditionalData(p46) -- line: 250
-	return p46.additionalData or {}
+	self.statusIds = Cryo.List.join(self.statusIds or {}, p)
+	return self
 end
 
-return t2
+function RequestBuilder:getStatusIds()
+	return if not self.configurableIds then self.statusIds else nil
+end
+
+function RequestBuilder.getAdditionalData(p)
+	return p.additionalData or {}
+end
+
+return RequestBuilder

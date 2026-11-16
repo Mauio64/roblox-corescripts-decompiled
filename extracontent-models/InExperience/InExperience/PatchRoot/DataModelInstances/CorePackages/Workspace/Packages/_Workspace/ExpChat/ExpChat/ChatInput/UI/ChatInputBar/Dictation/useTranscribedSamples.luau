@@ -1,39 +1,31 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ExpChat").Parent
 
-local function useTranscribedSamples() -- line: 26
-	-- upvalues: React (copy)
-	local v4, v5 = React.useBinding({})
-	local v6 = React.useRef(nil)
+local React = require(parent.React)
+
+local function useTranscribedSamples()
+	local binding, v = React.useBinding({})
+	local ref = React.useRef(nil)
 
 	return {
-		binding = v4,
-		begin = function(n1: number) -- line: 32
-			-- upvalues: v6 (copy)
-			v6.current = v6.current or n1
+		binding = binding,
+		begin = function(p: number)
+			ref.current = ref.current or p
 		end,
-		commit = function(n2: number) -- line: 38
-			-- upvalues: v6 (copy), v4 (copy), v5 (copy)
-			local current = v6.current
+		commit = function(endIdx: number)
+			local current = ref.current
+			ref.current = nil
 
-			v6.current = nil
-
-			if current == nil or n2 < current then
+			if current == nil or endIdx < current then
 				return
 			end
 
-			local v10 = table.clone(v4:getValue())
-
-			table.insert(v10, {
-				startIdx = current,
-				endIdx = n2
-			})
-			v5(v10)
+			local clone = table.clone(binding:getValue())
+			table.insert(clone, { startIdx = current, endIdx = endIdx })
+			v(clone)
 		end,
-		reset = function() -- line: 49
-			-- upvalues: v6 (copy), v5 (copy)
-			v6.current = nil
-			v5({})
+		reset = function()
+			ref.current = nil
+			v({})
 		end
 	}
 end

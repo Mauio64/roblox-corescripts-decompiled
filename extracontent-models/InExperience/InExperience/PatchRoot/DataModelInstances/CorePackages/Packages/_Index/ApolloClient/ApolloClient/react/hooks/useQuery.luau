@@ -1,18 +1,20 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local UseQuery = {}
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParentParent.GraphQL)
-require(ParentParent.jsutils.typedDocumentNode)
+require(parent2.GraphQL)
+
+require(parent.jsutils.typedDocumentNode)
+
 require(script.Parent.Parent.types.types)
 
-local useBaseQuery = require(script.Parent.utils.useBaseQuery).useBaseQuery
+local useBaseQuery = require(script.Parent.utils.useBaseQuery)
+local useBaseQuery2 = useBaseQuery.useBaseQuery
 
-require(ParentParent.core)
+require(parent.core)
 
-function t1.useQuery(p1, p2) -- line: 27
-	-- upvalues: useBaseQuery (copy)
-	return useBaseQuery(p1, p2, false)
+function UseQuery.useQuery(p, p2)
+	return useBaseQuery2(p, p2, false)
 end
 
-return t1
+return UseQuery

@@ -1,7 +1,6 @@
 require(script.Analytics.Types)
 require(script.Analytics.Enums.Contexts)
 require(script.Analytics.Enums.PlatformSpecificity)
-
 local telemetryNewConfig = require(script.Telemetry.telemetryNewConfig)
 local Performance = require(script.Performance)
 

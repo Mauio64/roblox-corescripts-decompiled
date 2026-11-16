@@ -1,5 +1,1 @@
-return {
-	Arrow = "Arrow",
-	TextButton = "TextButton",
-	None = "None"
-}
+return { Arrow = "Arrow", TextButton = "TextButton", None = "None" }

@@ -1,5 +1,7 @@
 local CorePackages = game:GetService("CorePackages")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local Rodux = require(CorePackages.Packages.Rodux)
 local chatSettings = require(script.Parent.chatSettings)
 local messages = require(script.Parent.messages)

@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetTenFootInterface", function(p1) -- line: 5
-	return {
-		isTenFootInterface = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetTenFootInterface", function(isTenFootInterface)
+	return { isTenFootInterface = isTenFootInterface }
 end)

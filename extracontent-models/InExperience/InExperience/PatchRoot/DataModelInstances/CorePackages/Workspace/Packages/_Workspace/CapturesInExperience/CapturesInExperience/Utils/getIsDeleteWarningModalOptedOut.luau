@@ -1,18 +1,18 @@
 local AppStorageService = game:GetService("AppStorageService")
 local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local getLocalUserId = require(ParentParent.Utils.getLocalUserId)
-local getUserIdsFromString = require(ParentParent.Utils.getUserIdsFromString)
 
-return function() -- line: 10
-	-- upvalues: AppStorageService (copy), Constants (copy), getUserIdsFromString (copy), getLocalUserId (copy), Players (copy)
-	local ok, result = pcall(function() -- line: 11
-		-- upvalues: AppStorageService (copy), Constants (copy)
+local parent = script.Parent.Parent
+
+local Constants = require(parent.Constants)
+local getLocalUserId = require(parent.Utils.getLocalUserId)
+local getUserIdsFromString = require(parent.Utils.getUserIdsFromString)
+
+return function(): boolean
+	local success, result = pcall(function()
 		return AppStorageService:GetItem(Constants.DeleteWarningModalOptOutStorageKey)
 	end)
 
-	if ok and (result ~= "" and getUserIdsFromString(result)[getLocalUserId(Players) or ""]) then
+	if success and result ~= "" and getUserIdsFromString(result)[getLocalUserId(Players) or ""] then
 		return true
 	end
 

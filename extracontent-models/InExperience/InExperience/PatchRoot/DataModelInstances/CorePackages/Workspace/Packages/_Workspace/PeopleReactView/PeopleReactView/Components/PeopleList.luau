@@ -1,155 +1,135 @@
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local Foundation = require(PeopleReactViewParent.Foundation)
-local React = require(PeopleReactViewParent.React)
-local PeopleService = require(PeopleReactViewParent.PeopleService)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local parent = PeopleReactView.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local PeopleService = require(parent.PeopleService)
+local SignalsReact = require(parent.SignalsReact)
+
 local View = Foundation.View
 local useSignalState = SignalsReact.useSignalState
+
 local PersonRow = require(PeopleReactView.Components.List.PersonRow)
 local LazyPersonRow = require(PeopleReactView.Components.List.LazyPersonRow)
 
 require(PeopleReactView.Stores.GetScrollingFrameStore)
 
-local v11 = PeopleService.getService("Flags")
-local GetFFlagAddPeoplePageCardLayout = v11.GetFFlagAddPeoplePageCardLayout
-local FFlagEnablePeopleListLazyRender = v11.FFlagEnablePeopleListLazyRender
+local service = PeopleService.getService("Flags")
+local getFFlagAddPeoplePageCardLayout = service.GetFFlagAddPeoplePageCardLayout
+local fFlagEnablePeopleListLazyRender = service.FFlagEnablePeopleListLazyRender
 
-local function MemoizedPersonRow(t1: {[any]: any}) -- line: 32
-	-- upvalues: React (copy), FFlagEnablePeopleListLazyRender (copy), LazyPersonRow (copy), PersonRow (copy)
-	return React.useMemo(function() -- line: 37
-		-- upvalues: FFlagEnablePeopleListLazyRender (copy), React (copy), LazyPersonRow (copy), t1 (copy), PersonRow (copy)
-		if FFlagEnablePeopleListLazyRender then
+local function MemoizedPersonRow(data)
+	return React.useMemo(function()
+		if fFlagEnablePeopleListLazyRender then
 			return (React.createElement(LazyPersonRow, {
-				key = tostring(t1.person.UserId),
-				person = t1.person,
-				layoutOrder = t1.index,
-				scrollingFrameStore = t1.scrollingFrameStore
+				key = tostring(data.person.UserId),
+				person = data.person,
+				layoutOrder = data.index,
+				scrollingFrameStore = data.scrollingFrameStore
 			}))
 		end
 
 		return (React.createElement(PersonRow, {
-			key = tostring(t1.person.UserId),
-			person = t1.person,
-			layoutOrder = t1.index
+			key = tostring(data.person.UserId),
+			person = data.person,
+			layoutOrder = data.index
 		}))
-	end, {
-		t1.person.UserId,
-		t1.index,
-		t1.scrollingFrameStore
-	})
+	end, { data.person.UserId, data.index, data.scrollingFrameStore })
 end
-local function buildPersonRows(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}, p1) -- line: 57
-	-- upvalues: React (copy), MemoizedPersonRow (copy), FFlagEnablePeopleListLazyRender (copy)
-	local t5 = {}
-	local t6 = {}
-	local n1 = 0
-	local g30 = nil
-	local g34 = nil
-	local UserId = nil
-	local g31 = nil
 
-	if not next(t4) then
-		for v25, v26 in t2 do
-			t4[v26.UserId] = (v25 - 1) * math.floor(100000 / #t2)
+local function buildPersonRows(list, current, current2, p)
+	local children = {}
+	local result = {}
+	local v = 0
+
+	if not next(current2) then
+		for k, item in list do
+			current2[item.UserId] = (k - 1) * math.floor(100000 / #list)
 		end
 	end
 
-	for v27, v28 in t2 do
-		if not t3[v28.UserId] then
-			local n2 = 0
+	for k, item in list do
+		if current[item.UserId] then
+			children[item.UserId] = current[item.UserId]
+			result[item.UserId] = current2[item.UserId]
+			v = current2[item.UserId]
+		else
+			if k == 1 then
+				v = 0
+			else
+				local v2 = k + 1
+				local v3 = 100000
 
-			repeat
-				if g30 or v27 == 1 then
-					g30 = false
-					t5[v28.UserId] = React.createElement(MemoizedPersonRow, {
-						person = v28,
-						index = n2,
-						scrollingFrameStore = if not FFlagEnablePeopleListLazyRender then nil else p1
-					})
-					t6[v28.UserId] = n2
-					n1 = n2
-					g31 = true
+				while v2 <= #list do
+					local userId = list[v2].UserId
 
-					break
-				end
-
-				local v32 = v27 + 1
-				local n3 = 100000
-
-				repeat
-					while g34 or true do
-						if g34 or not (v32 <= #t2) then
-							g34 = false
-							n2 = math.floor((n1 + n3) / 2)
-							g30 = true
-						end
-
-						if g30 then
-							break
-						end
-
-						UserId = t2[v32].UserId
-
-						if t4[UserId] then
-							break
-						end
-
-						v32 += 1
-					end
-
-					if g30 then
+					if current2[userId] then
+						v3 = current2[userId]
 						break
 					end
 
-					n3 = t4[UserId]
-					g34 = true
-				until not g34
-			until not g30
+					v2 += 1
+				end
 
-			if g31 then
-				g31 = false
-
-				continue
+				v = math.floor((v + v3) / 2)
 			end
-		end
 
-		t5[v28.UserId] = t3[v28.UserId]
-		t6[v28.UserId] = t4[v28.UserId]
-		n1 = t4[v28.UserId]
+			local userId = item.UserId
+			local createElement = React.createElement
+			local scrollingFrameStore
+
+			if fFlagEnablePeopleListLazyRender then
+				scrollingFrameStore = p
+			end
+
+			children[userId] = createElement(MemoizedPersonRow, {
+				person = item,
+				index = v,
+				scrollingFrameStore = scrollingFrameStore
+			})
+
+			result[item.UserId] = v
+		end
 	end
 
-	return t5, t6
+	return children, result
 end
-local function PeopleList(t7: {[any]: any}) -- line: 122
-	-- upvalues: React (copy), PeopleService (copy), useSignalState (copy), buildPersonRows (copy), FFlagEnablePeopleListLazyRender (copy), View (copy), GetFFlagAddPeoplePageCardLayout (copy)
-	local v37 = React.useMemo(function() -- line: 123
-		-- upvalues: PeopleService (copy)
+
+local function PeopleList(p)
+	local v = useSignalState(React.useMemo(function()
 		return PeopleService.getService("PeopleListStore")
-	end, {})
-	local v38 = useSignalState(v37.people)
-	local v39 = React.useRef(nil)
-	local v40 = React.useRef({})
-	local v41 = React.useRef({})
-	local v42, v43 = buildPersonRows(v38, v40.current, v41.current, if not FFlagEnablePeopleListLazyRender then nil else t7.scrollingFrameStore)
+	end, {}).people)
+	local ref = React.useRef(nil)
 
-	v40.current = v42
-	v41.current = v43
+	local ref2 = React.useRef({})
+	local ref3 = React.useRef({})
 
-	local current = v40.current
+	local current = ref2.current
+	local current2 = ref3.current
+	local v2
+
+	if fFlagEnablePeopleListLazyRender then
+		v2 = p.scrollingFrameStore
+	end
+
+	local personRows, current4 = buildPersonRows(v, current, current2, v2)
+	ref2.current = personRows
+	ref3.current = current4
+
+	local current3 = ref2.current
 
 	return React.createElement(View, {
 		tag = "size-full-0 auto-y col gap-small",
-		LayoutOrder = not GetFFlagAddPeoplePageCardLayout() and 2 or t7.LayoutOrder
+		LayoutOrder = not getFFlagAddPeoplePageCardLayout() and 2 or p.LayoutOrder
 	}, {
 		PeopleList = React.createElement(View, {
 			tag = "size-full-0 col gap-small auto-y",
-			ref = v39
-		}, { current })
+			ref = ref
+		}, { current3 })
 	})
 end
 
-if v11.FFlagPeoplePageRemoveUseMemoElements then
+if service.FFlagPeoplePageRemoveUseMemoElements then
 	return React.memo(PeopleList)
 end
 

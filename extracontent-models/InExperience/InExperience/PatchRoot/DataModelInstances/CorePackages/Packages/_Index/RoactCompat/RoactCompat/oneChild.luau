@@ -1,29 +1,32 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local ReactGlobals = require(ParentParent.ReactGlobals)
+local parent = script.Parent.Parent
+local React = require(parent.React)
+local ReactGlobals = require(parent.ReactGlobals)
+
 local warnOnce = require(script.Parent.warnOnce)
 
-local function oneChild(p1) -- line: 22
-	-- upvalues: ReactGlobals (copy), warnOnce (copy), React (copy)
+local function oneChild(items)
 	if ReactGlobals.__DEV__ and ReactGlobals.__COMPAT_WARNINGS__ then
-		warnOnce("oneChild", "You likely don't need this at all! If you were assigning children via `React.oneChild(someChildren)`, you can simply use `someChildren` directly.")
+		warnOnce(
+			"oneChild",
+			"You likely don't need this at all! If you were assigning children via `React.oneChild(someChildren)`, you can simply use `someChildren` directly."
+		)
 	end
 
-	if not p1 then
+	if not items then
 		return nil
 	end
 
-	local v7, v8 = next(p1)
+	local v, v2 = next(items)
 
-	if not v8 then
+	if not v2 then
 		return nil
 	end
 
-	if next(p1, v7) then
+	if next(items, v) then
 		error("Expected at most one child, had more than one child.", 2)
 	end
 
-	return React.Children.only(v8)
+	return React.Children.only(v2)
 end
 
 return oneChild

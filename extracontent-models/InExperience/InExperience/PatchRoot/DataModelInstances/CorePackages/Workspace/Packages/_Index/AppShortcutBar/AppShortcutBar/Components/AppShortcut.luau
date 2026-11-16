@@ -1,7 +1,4 @@
-local AppShortcut = require(script.AppShortcut)
-local IconWithHoldAnimation = require(script.IconWithHoldAnimation)
-
 return {
-	AppShortcut = AppShortcut,
-	IconWithHoldAnimation = IconWithHoldAnimation
+	AppShortcut = require(script.AppShortcut),
+	IconWithHoldAnimation = require(script.IconWithHoldAnimation)
 }

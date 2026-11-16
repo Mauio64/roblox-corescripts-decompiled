@@ -1,10 +1,14 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local React = require(parent.React)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
-local StackActions = require(ParentParent.RoactNavigation).StackActions
-local FFlagLuaAppDerivedStackAndSwitchState = require(ParentParent.SharedFlags).FFlagLuaAppDerivedStackAndSwitchState
+local RoactNavigation = require(parent.RoactNavigation)
+local StackActions = RoactNavigation.StackActions
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDerivedStackAndSwitchState = SharedFlags.FFlagLuaAppDerivedStackAndSwitchState
+
 local ViewState = require(script.Parent.ViewState)
 
 require(script.Parent.types)
@@ -16,172 +20,125 @@ local _ = {
 	SetClosing = "SetClosing",
 	SetClosed = "SetClosed"
 }
-
-local function RouteViewStatesReducer(t1: {[any]: any}, p1) -- line: 73
-	-- upvalues: Array (copy), RouteViewStatesReducer (copy), ViewState (copy), Object (copy)
-	local v14 = Array.findIndex(t1, function(p2) -- line: 74
-		-- upvalues: p1 (copy)
-		return p2.descriptor.key == p1.key
+local function RouteViewStatesReducer(list, data)
+	local index = Array.findIndex(list, function(p): boolean
+		return p.descriptor.key == data.key
 	end)
 
-	if p1.type == "SetCurrent" then
-		for _, v16 in p1.navigationState.routes do
-			t1 = RouteViewStatesReducer(t1, {
+	if data.type == "SetCurrent" then
+		for _, route in data.navigationState.routes do
+			list = RouteViewStatesReducer(list, {
 				type = "SetOpening",
-				key = v16.key,
-				descriptor = p1.descriptors[v16.key]
+				key = route.key,
+				descriptor = data.descriptors[route.key]
 			})
 		end
 
-		for _, v18 in t1 do
-			if p1.descriptors[v18.descriptor.key] == nil then
-				t1 = RouteViewStatesReducer(t1, {
+		for _, item in list do
+			if data.descriptors[item.descriptor.key] == nil then
+				list = RouteViewStatesReducer(list, {
 					type = "SetClosing",
-					key = v18.descriptor.key
+					key = item.descriptor.key
 				})
 			end
 		end
 
-		return t1
-	end
-
-	if p1.type == "SetOpening" then
-		if v14 == -1 then
-			local v19 = table.clone(t1)
-
-			table.insert(v19, {
+		return list
+	elseif data.type == "SetOpening" then
+		if index == -1 then
+			local clone = table.clone(list)
+			table.insert(clone, { viewState = ViewState.Opening, descriptor = data.descriptor })
+			return clone
+		elseif list[index].viewState == ViewState.Closing then
+			local clone = table.clone(list)
+			clone[index] = Object.assign({}, clone[index], {
 				viewState = ViewState.Opening,
-				descriptor = p1.descriptor
+				descriptor = data.descriptor
 			})
+			return clone
+		else
+			if list[index].descriptor == data.descriptor then
+				return list
+			end
 
-			return v19
+			local clone = table.clone(list)
+			clone[index] = Object.assign({}, clone[index], { descriptor = data.descriptor })
+			return clone
+		end
+	elseif data.type == "SetOpened" then
+		if index == -1 or list[index].viewState ~= ViewState.Opening then
+			return list
 		end
 
-		if t1[v14].viewState == ViewState.Closing then
-			local v20 = table.clone(t1)
-
-			v20[v14] = Object.assign({}, v20[v14], {
-				viewState = ViewState.Opening,
-				descriptor = p1.descriptor
-			})
-
-			return v20
+		local clone = table.clone(list)
+		clone[index] = Object.assign({}, clone[index], { viewState = ViewState.Opened })
+		return clone
+	elseif data.type == "SetClosing" then
+		if index == -1 or list[index].viewState == ViewState.Closing then
+			return list
 		end
 
-		if t1[v14].descriptor ~= p1.descriptor then
-			local v21 = table.clone(t1)
-
-			v21[v14] = Object.assign({}, v21[v14], {
-				descriptor = p1.descriptor
-			})
-
-			return v21
+		local clone = table.clone(list)
+		clone[index] = Object.assign({}, clone[index], { viewState = ViewState.Closing })
+		return clone
+	else
+		if data.type == "SetClosed" and index ~= -1 and list[index].viewState == ViewState.Closing then
+			list = table.clone(list)
+			table.remove(list, index)
 		end
-	elseif p1.type == "SetOpened" then
-		if v14 ~= -1 and t1[v14].viewState == ViewState.Opening then
-			local v22 = table.clone(t1)
 
-			v22[v14] = Object.assign({}, v22[v14], {
-				viewState = ViewState.Opened
-			})
-
-			return v22
-		end
-	elseif p1.type == "SetClosing" then
-		if v14 ~= -1 and t1[v14].viewState ~= ViewState.Closing then
-			local v23 = table.clone(t1)
-
-			v23[v14] = Object.assign({}, v23[v14], {
-				viewState = ViewState.Closing
-			})
-
-			return v23
-		end
-	elseif p1.type == "SetClosed" and v14 ~= -1 and t1[v14].viewState == ViewState.Closing then
-		t1 = table.clone(t1)
-		table.remove(t1, v14)
+		return list
 	end
-
-	return t1
 end
-local function useStackScreens(t2: {[any]: any}) -- line: 147
-	-- upvalues: React (copy), RouteViewStatesReducer (copy), FFlagLuaAppDerivedStackAndSwitchState (copy), StackActions (copy), Array (copy), Object (copy)
-	local navigation = t2.navigation
+
+local function useStackScreens(p)
+	local navigation = p.navigation
 	local state = navigation.state
-	local descriptors = t2.descriptors
-	local v28, v29 = React.useReducer(RouteViewStatesReducer, {})
+	local descriptors = p.descriptors
+
+	local v, v2 = React.useReducer(RouteViewStatesReducer, {})
 
 	if FFlagLuaAppDerivedStackAndSwitchState then
-		React.useMemo(function() -- line: 158
-			-- upvalues: v29 (copy), state (copy), descriptors (copy)
-			v29({
-				type = "SetCurrent",
-				navigationState = state,
-				descriptors = descriptors
-			})
-		end, {
-			state,
-			descriptors
-		})
+		React.useMemo(function()
+			v2({ type = "SetCurrent", navigationState = state, descriptors = descriptors })
+		end, { state, descriptors })
 	else
-		React.useLayoutEffect(function() -- line: 166
-			-- upvalues: v29 (copy), state (copy), descriptors (copy)
-			v29({
-				type = "SetCurrent",
-				navigationState = state,
-				descriptors = descriptors
-			})
-		end, {
-			state,
-			descriptors
-		})
+		React.useLayoutEffect(function()
+			v2({ type = "SetCurrent", navigationState = state, descriptors = descriptors })
+		end, { state, descriptors })
 	end
 
-	local v30 = React.useCallback(function(s1: string) -- line: 175
-		-- upvalues: navigation (copy), StackActions (copy)
+	local v3 = React.useCallback(function(toChildKey: string)
 		if navigation.state.isTransitioning then
 			navigation.dispatch(StackActions.completeTransition({
 				key = navigation.state.key,
-				toChildKey = s1
+				toChildKey = toChildKey
 			}))
 		end
 	end, { navigation })
-	local v31 = React.useCallback(function(t3: {[any]: any}) -- line: 184
-		-- upvalues: v29 (copy), v30 (copy)
-		v29({
-			type = "SetOpened",
-			key = t3.descriptor.key
-		})
-		v30(t3.descriptor.key)
-	end, { v30 })
-	local v32 = React.useCallback(function(t4: {[any]: any}) -- line: 192
-		-- upvalues: v29 (copy)
-		v29({
-			type = "SetClosed",
-			key = t4.descriptor.key
-		})
+
+	local v4 = React.useCallback(function(p2)
+		v2({ type = "SetOpened", key = p2.descriptor.key })
+
+		v3(p2.descriptor.key)
+	end, { v3 })
+
+	local v5 = React.useCallback(function(p2)
+		v2({ type = "SetClosed", key = p2.descriptor.key })
 	end, {})
 
-	return (React.useMemo(function() -- line: 199
-		-- upvalues: Array (copy), v28 (copy), Object (copy), v31 (copy), v32 (copy)
-		return Array.map(v28, function(t5: {[any]: any}) -- line: 200
-			-- upvalues: Object (copy), v31 (copy), v32 (copy)
-			return Object.assign({}, t5, {
-				setOpened = function() -- line: 202
-					-- upvalues: v31 (copy), t5 (copy)
-					v31(t5)
+	return (React.useMemo(function()
+		return Array.map(v, function(p2)
+			return Object.assign({}, p2, {
+				setOpened = function()
+					v4(p2)
 				end,
-				setClosed = function() -- line: 205
-					-- upvalues: v32 (copy), t5 (copy)
-					v32(t5)
+				setClosed = function()
+					v5(p2)
 				end
 			})
 		end)
-	end, {
-		v28,
-		v31,
-		v32
-	}))
+	end, { v, v4, v5 }))
 end
 
 return useStackScreens

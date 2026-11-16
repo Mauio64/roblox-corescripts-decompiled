@@ -1,4 +1,4 @@
-local t1 = {
+local enum = {
 	XSmall = "XSmall",
 	Small = "Small",
 	Medium = "Medium",
@@ -8,208 +8,89 @@ local t1 = {
 	Landscape = "Landscape",
 	Portrait = "Portrait"
 }
-local t2 = {
-	[t1.XSmall] = {
-		minWidth = 320,
-		maxWidth = 360,
-		Key = t1.XSmall,
-		size = t1.XSmall
-	},
-	[t1.Small] = {
-		minWidth = 361,
-		maxWidth = 600,
-		Key = t1.Small,
-		size = t1.Small
-	},
-	[t1.Medium] = {
-		minWidth = 601,
-		maxWidth = 1140,
-		Key = t1.Medium,
-		size = t1.Medium
-	},
-	[t1.Large] = {
-		minWidth = 1141,
-		maxWidth = 1520,
-		Key = t1.Large,
-		size = t1.Large
-	},
-	[t1.XLarge] = {
-		minWidth = 1521,
-		maxWidth = 1920,
-		Key = t1.XLarge,
-		size = t1.XLarge
-	},
-	[t1.X2Large] = {
-		minWidth = 1920,
-		maxWidth = 4096,
-		Key = t1.X2Large,
-		size = t1.X2Large
-	}
-}
-local t3 = {
-	[t1.XSmall] = {
-		maxWidth = 360,
-		Key = t1.XSmall,
-		size = t1.XSmall
-	},
-	[t1.Small] = {
-		maxWidth = 600,
-		Key = t1.Small,
-		size = t1.Small
-	},
-	[t1.Medium] = {
-		maxWidth = 1140,
-		Key = t1.Medium,
-		size = t1.Medium
-	},
-	[t1.Large] = {
-		maxWidth = 1520,
-		Key = t1.Large,
-		size = t1.Large
-	},
-	[t1.XLarge] = {
-		maxWidth = 1920,
-		Key = t1.XLarge,
-		size = t1.XLarge
-	},
-	[t1.X2Large] = {
-		maxWidth = 4096,
-		Key = t1.X2Large,
-		size = t1.X2Large
-	}
-}
-local t4 = {
-	[t1.XSmall] = {
-		minHeight = 320,
-		maxHeight = 360,
-		Key = t1.XSmall,
-		size = t1.XSmall
-	},
-	[t1.Small] = {
-		minHeight = 361,
-		maxHeight = 600,
-		Key = t1.Small,
-		size = t1.Small
-	},
-	[t1.Medium] = {
-		minHeight = 601,
-		maxHeight = 1140,
-		Key = t1.Medium,
-		size = t1.Medium
-	},
-	[t1.Large] = {
-		minHeight = 1141,
-		maxHeight = 1520,
-		Key = t1.Large,
-		size = t1.Large
-	},
-	[t1.XLarge] = {
-		minHeight = 1521,
-		maxHeight = 1920,
-		Key = t1.XLarge,
-		size = t1.XLarge
-	},
-	[t1.X2Large] = {
-		minHeight = 1920,
-		maxHeight = 4096,
-		Key = t1.X2Large,
-		size = t1.X2Large
-	}
-}
-local t5 = {
-	[t1.XSmall] = {
-		maxHeight = 360,
-		Key = t1.XSmall,
-		size = t1.XSmall
-	},
-	[t1.Small] = {
-		maxHeight = 600,
-		Key = t1.Small,
-		size = t1.Small
-	},
-	[t1.Medium] = {
-		maxHeight = 1140,
-		Key = t1.Medium,
-		size = t1.Medium
-	},
-	[t1.Large] = {
-		maxHeight = 1520,
-		Key = t1.Large,
-		size = t1.Large
-	},
-	[t1.XLarge] = {
-		maxHeight = 1920,
-		Key = t1.XLarge,
-		size = t1.XLarge
-	},
-	[t1.X2Large] = {
-		maxHeight = 4096,
-		Key = t1.X2Large,
-		size = t1.X2Large
-	}
-}
-local t6 = {
-	{
-		minRatio = 1,
-		Key = t1.Landscape
-	},
-	{
-		minRatio = 0,
-		Key = t1.Portrait
-	}
-}
-local t7 = {
-	t3[t1.XSmall],
-	t3[t1.Small],
-	t3[t1.Medium],
-	t3[t1.Large],
-	t3[t1.XLarge],
-	t3[t1.X2Large]
-}
-local t8 = {
-	t5[t1.XSmall],
-	t5[t1.Small],
-	t5[t1.Medium],
-	t5[t1.Large],
-	t5[t1.XLarge],
-	t5[t1.X2Large]
-}
-local t9 = {}
 
-for v10, v11 in t7 do
-	t9[v11.Key] = v10
+local sizesMinMax = {
+	[enum.XSmall] = { Key = enum.XSmall, size = enum.XSmall, minWidth = 320, maxWidth = 360 },
+	[enum.Small] = { Key = enum.Small, size = enum.Small, minWidth = 361, maxWidth = 600 },
+	[enum.Medium] = { Key = enum.Medium, size = enum.Medium, minWidth = 601, maxWidth = 1140 },
+	[enum.Large] = { Key = enum.Large, size = enum.Large, minWidth = 1141, maxWidth = 1520 },
+	[enum.XLarge] = { Key = enum.XLarge, size = enum.XLarge, minWidth = 1521, maxWidth = 1920 },
+	[enum.X2Large] = { Key = enum.X2Large, size = enum.X2Large, minWidth = 1920, maxWidth = 4096 }
+}
+
+local sizes = {
+	[enum.XSmall] = { Key = enum.XSmall, size = enum.XSmall, maxWidth = 360 },
+	[enum.Small] = { Key = enum.Small, size = enum.Small, maxWidth = 600 },
+	[enum.Medium] = { Key = enum.Medium, size = enum.Medium, maxWidth = 1140 },
+	[enum.Large] = { Key = enum.Large, size = enum.Large, maxWidth = 1520 },
+	[enum.XLarge] = { Key = enum.XLarge, size = enum.XLarge, maxWidth = 1920 },
+	[enum.X2Large] = { Key = enum.X2Large, size = enum.X2Large, maxWidth = 4096 }
+}
+
+local sizesMinMaxY = {
+	[enum.XSmall] = { Key = enum.XSmall, size = enum.XSmall, minHeight = 320, maxHeight = 360 },
+	[enum.Small] = { Key = enum.Small, size = enum.Small, minHeight = 361, maxHeight = 600 },
+	[enum.Medium] = { Key = enum.Medium, size = enum.Medium, minHeight = 601, maxHeight = 1140 },
+	[enum.Large] = { Key = enum.Large, size = enum.Large, minHeight = 1141, maxHeight = 1520 },
+	[enum.XLarge] = { Key = enum.XLarge, size = enum.XLarge, minHeight = 1521, maxHeight = 1920 },
+	[enum.X2Large] = { Key = enum.X2Large, size = enum.X2Large, minHeight = 1920, maxHeight = 4096 }
+}
+
+local sizesY = {
+	[enum.XSmall] = { Key = enum.XSmall, size = enum.XSmall, maxHeight = 360 },
+	[enum.Small] = { Key = enum.Small, size = enum.Small, maxHeight = 600 },
+	[enum.Medium] = { Key = enum.Medium, size = enum.Medium, maxHeight = 1140 },
+	[enum.Large] = { Key = enum.Large, size = enum.Large, maxHeight = 1520 },
+	[enum.XLarge] = { Key = enum.XLarge, size = enum.XLarge, maxHeight = 1920 },
+	[enum.X2Large] = { Key = enum.X2Large, size = enum.X2Large, maxHeight = 4096 }
+}
+
+local orientation = {
+	{ Key = enum.Landscape, minRatio = 1 },
+	{ Key = enum.Portrait, minRatio = 0 }
+}
+
+local default = {
+	sizes[enum.XSmall],
+	sizes[enum.Small],
+	sizes[enum.Medium],
+	sizes[enum.Large],
+	sizes[enum.XLarge],
+	sizes[enum.X2Large]
+}
+
+local v = {
+	sizesY[enum.XSmall],
+	sizesY[enum.Small],
+	sizesY[enum.Medium],
+	sizesY[enum.Large],
+	sizesY[enum.XLarge],
+	sizesY[enum.X2Large]
+}
+
+local keyIndex = {}
+
+for k, v2 in default do
+	keyIndex[v2.Key] = k
 end
 
-return {
-	Enum = t1,
-	sizes = t3,
-	sizesMinMax = t2,
-	sizesY = t5,
-	sizesMinMaxY = t4,
-	rules = {
-		default = t7,
-		Y = t8,
-		Orientation = t6
-	},
-	keyIndex = t9,
-	getMinWidthFor = function(p1) -- line: 86
-		-- upvalues: t2 (copy)
-		local v13 = t2[p1]
+local StandardBreakpoints = {}
+StandardBreakpoints.Enum = enum
+StandardBreakpoints.sizes = sizes
+StandardBreakpoints.sizesMinMax = sizesMinMax
+StandardBreakpoints.sizesY = sizesY
+StandardBreakpoints.sizesMinMaxY = sizesMinMaxY
+StandardBreakpoints.rules = { default = default, Y = v, Orientation = orientation }
+StandardBreakpoints.keyIndex = keyIndex
 
-		if v13 == nil then
-			return 0
-		end
+function StandardBreakpoints.getMinWidthFor(p)
+	local v2 = sizesMinMax[p]
+	return if v2 == nil then 0 else v2.minWidth
+end
 
-		return v13.minWidth
-	end,
-	getMinHeightFor = function(p2) -- line: 93
-		-- upvalues: t4 (copy)
-		local v15 = t4[p2]
+function StandardBreakpoints.getMinHeightFor(p)
+	local v2 = sizesMinMaxY[p]
+	return if v2 == nil then 0 else v2.minHeight
+end
 
-		if v15 == nil then
-			return 0
-		end
-
-		return v15.minHeight
-	end
-}
+return StandardBreakpoints

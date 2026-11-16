@@ -1,36 +1,52 @@
-local Parent = script:FindFirstAncestor("IAPExperience").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local parent = script:FindFirstAncestor("IAPExperience").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Icon = Foundation.Icon
 local Enums = Foundation.Enums
 
-local function WearTimePurchaseSubtitleText(t1: {[any]: any}) -- line: 18
-	-- upvalues: useLocalization (copy), React (copy), View (copy), Icon (copy), Enums (copy), FoundationText (copy)
-	local timedOptionDays = t1.timedOptionDays
-	local v12 = useLocalization({
-		infinite = "Feature.Durables.ItemDetails.WearTimeOptions.Button.Infinite",
+local function WearTimePurchaseSubtitleText(p)
+	local timedOptionDays = p.timedOptionDays
+
+	local v = useLocalization({
 		timedOptionText = {
 			"Feature.Durables.UnifiedBuyModal.Subtitle.TimedOptionText",
 			days = timedOptionDays or 0
-		}
+		},
+		infinite = "Feature.Durables.ItemDetails.WearTimeOptions.Button.Infinite"
 	})
 
-	return React.createElement(View, {
-		tag = "row auto-xy align-y-center gap-xsmall",
-		LayoutOrder = 2
-	}, {
-		ClockIcon = if not timedOptionDays then nil else React.createElement(Icon, {
+	local createElement = React.createElement
+	local clockIcon
+
+	if timedOptionDays then
+		clockIcon = React.createElement(Icon, {
 			LayoutOrder = 1,
 			name = Enums.IconName.Clock,
 			size = Enums.IconSize.Small
-		}),
-		DurationText = React.createElement(FoundationText, {
+		})
+	end
+
+	local createElement2 = React.createElement
+	local text
+
+	if timedOptionDays and timedOptionDays ~= 0 then
+		text = v.timedOptionText
+	else
+		text = v.infinite
+	end
+
+	return createElement(View, { tag = "row auto-xy align-y-center gap-xsmall", LayoutOrder = 2 }, {
+		ClockIcon = clockIcon,
+		DurationText = createElement2(Text, {
 			LayoutOrder = 2,
-			tag = "auto-xy text-title-small content-default",
-			Text = if not timedOptionDays or timedOptionDays == 0 then v12.infinite else v12.timedOptionText
+			Text = text,
+			tag = "auto-xy text-title-small content-default"
 		})
 	})
 end

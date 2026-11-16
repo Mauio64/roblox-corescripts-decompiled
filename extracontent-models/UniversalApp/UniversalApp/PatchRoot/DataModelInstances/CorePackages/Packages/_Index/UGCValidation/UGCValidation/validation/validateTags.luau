@@ -1,39 +1,26 @@
 local CollectionService = game:GetService("CollectionService")
-local ParentParent = script.Parent.Parent
-local getFFlagUGCValidationEnableFolderStructure = require(ParentParent.flags.getFFlagUGCValidationEnableFolderStructure)
-local getFFlagUGCValidationCombineEntrypointResults = require(ParentParent.flags.getFFlagUGCValidationCombineEntrypointResults)
-local Analytics = require(ParentParent.Analytics)
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent
+local Analytics = require(parent.Analytics)
 
-local function validateTags(p1, p2) -- line: 10
-	-- upvalues: CollectionService (copy), Analytics (copy), getFFlagUGCValidationEnableFolderStructure (copy), getFFlagUGCValidationCombineEntrypointResults (copy)
-	local descendants = p1:GetDescendants()
+require(parent.util.Types)
 
-	table.insert(descendants, p1)
+local function validateTags(folder, p)
+	local descendants = folder:GetDescendants()
+	table.insert(descendants, folder)
 
-	local t1 = {}
+	local descendants2 = {}
 
-	for _, v in ipairs(descendants) do
-		if #CollectionService:GetTags(v) > 0 then
-			table.insert(t1, v)
+	for _, descendant in ipairs(descendants) do
+		if #CollectionService:GetTags(descendant) > 0 then
+			table.insert(descendants2, descendant)
 		end
 	end
 
-	if #t1 > 0 then
-		local t2 = { "Found the following instance tags which are not allowed:" }
+	if #descendants2 > 0 then
+		Analytics.reportFailure(Analytics.ErrorType.validateTags, nil, p)
 
-		for _, v in ipairs(t1) do
-			table.insert(t2, v:GetFullName())
-		end
-
-		Analytics.reportFailure(Analytics.ErrorType.validateTags, nil, p2)
-
-		if getFFlagUGCValidationEnableFolderStructure() and getFFlagUGCValidationCombineEntrypointResults() then
-			return false, {}
-		end
-
-		return false, t2
+		return false, {}
 	end
 
 	return true

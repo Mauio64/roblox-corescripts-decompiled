@@ -1,31 +1,31 @@
 local IXPService = game:GetService("IXPService")
-local CorePackages = game:GetService("CorePackages")
-local v3 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
-local GetFFlagVoiceChatDisruptiveVoiceNudgeForceUseNewDACopy = require(script.Parent.Parent.Flags.GetFFlagVoiceChatDisruptiveVoiceNudgeForceUseNewDACopy)
-local v5 = game:DefineFastString("DisruptiveVoiceNudgeVariantIXPLayerName", "Voice.CivilityAndSafety")
-local v6 = game:DefineFastString("DisruptiveVoiceNudgeVariantIXPVariableName", "UseNewDACopy")
 
-local function VoiceNudgeUseNewDACopy() -- line: 11
-	-- upvalues: GetFFlagVoiceChatDisruptiveVoiceNudgeForceUseNewDACopy (copy), IXPService (copy), v5 (copy), v6 (copy), v3 (copy)
+local CorePackages = game:GetService("CorePackages")
+local CoreScriptsInitializer = require(CorePackages.Workspace.Packages.CoreScriptsInitializer)
+local v = CoreScriptsInitializer.CoreLogger:new(script.Name)
+
+local GetFFlagVoiceChatDisruptiveVoiceNudgeForceUseNewDACopy = require(script.Parent.Parent.Flags.GetFFlagVoiceChatDisruptiveVoiceNudgeForceUseNewDACopy)
+
+local defineFastString = game:DefineFastString("DisruptiveVoiceNudgeVariantIXPLayerName", "Voice.CivilityAndSafety")
+local defineFastString2 = game:DefineFastString("DisruptiveVoiceNudgeVariantIXPVariableName", "UseNewDACopy")
+
+local function VoiceNudgeUseNewDACopy()
 	if GetFFlagVoiceChatDisruptiveVoiceNudgeForceUseNewDACopy() then
 		return true
 	end
 
-	local ok, result = pcall(function() -- line: 15
-		-- upvalues: IXPService (copy), v5 (copy)
-		return IXPService:GetUserLayerVariables(v5)
+	local success, result = pcall(function()
+		return IXPService:GetUserLayerVariables(defineFastString)
 	end)
 
-	if not ok or not result or result[v6] == nil then
-		v3:debug("Failed to get IXP data for layer: " .. v5 .. " with variable: " .. v6)
-
+	if not success or not result or result[defineFastString2] == nil then
+		v:debug("Failed to get IXP data for layer: " .. defineFastString .. " with variable: " .. defineFastString2)
 		return false
 	end
 
-	IXPService:LogUserLayerExposure(v5)
-	v3:debug("Experiment variant for " .. v6 .. ": " .. tostring(result[v6]))
-
-	return result[v6]
+	IXPService:LogUserLayerExposure(defineFastString)
+	v:debug("Experiment variant for " .. defineFastString2 .. ": " .. tostring(result[defineFastString2]))
+	return result[defineFastString2]
 end
 
 return VoiceNudgeUseNewDACopy

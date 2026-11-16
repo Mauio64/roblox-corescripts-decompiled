@@ -1,5 +1,1 @@
-return {
-	Prepend = "Prepend",
-	Append = "Append",
-	AppendAndAdvanceCursor = "AppendAndAdvanceCursor"
-}
+return { Prepend = "Prepend", Append = "Append", AppendAndAdvanceCursor = "AppendAndAdvanceCursor" }

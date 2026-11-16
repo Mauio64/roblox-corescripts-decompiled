@@ -1,14 +1,16 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local t = require(ParentParent.t)
-local Cryo = require(ParentParent.Cryo)
-local withStyle = require(ParentParent.UIBlox.Core.Style.withStyle)
-local Images = require(ParentParent.UIBlox.App.ImageSet.Images)
-local InputButton = require(ParentParent.UIBlox.Core.InputButton.InputButton)
-local RoactGamepad = require(ParentParent.RoactGamepad)
-local v9 = Roact.PureComponent:extend("RadioButton")
+local parent = script.Parent.Parent.Parent.Parent
 
-v9.validateProps = t.strictInterface({
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+local Cryo = require(parent.Cryo)
+local withStyle = require(parent.UIBlox.Core.Style.withStyle)
+local Images = require(parent.UIBlox.App.ImageSet.Images)
+local InputButton = require(parent.UIBlox.Core.InputButton.InputButton)
+local RoactGamepad = require(parent.RoactGamepad)
+
+local extended = Roact.PureComponent:extend("RadioButton")
+
+extended.validateProps = t.strictInterface({
 	text = t.string,
 	isSelected = t.optional(t.boolean),
 	isDisabled = t.optional(t.boolean),
@@ -24,7 +26,8 @@ v9.validateProps = t.strictInterface({
 	isRoactGamepadEnabled = t.optional(t.boolean),
 	forwardRef = t.optional(t.table)
 })
-v9.defaultProps = {
+
+extended.defaultProps = {
 	text = "RadioButton Text",
 	isSelected = false,
 	isDisabled = false,
@@ -32,71 +35,73 @@ v9.defaultProps = {
 	isRoactGamepadEnabled = true
 }
 
-function v9.init(p1) -- line: 52
-	function p1.onSetValue() -- line: 53
-		-- upvalues: p1 (copy)
-		if not p1.props.isDisabled then
-			p1.props.onActivated(p1.props.id)
+function extended:init()
+	function self.onSetValue()
+		if not self.props.isDisabled then
+			self.props.onActivated(self.props.id)
 		end
 	end
 end
-function v9.render(p2) -- line: 60
-	-- upvalues: withStyle (copy), Images (copy), RoactGamepad (copy), InputButton (copy), Roact (copy)
-	return withStyle(function(p3) -- line: 61
-		-- upvalues: Images (copy), p2 (copy), RoactGamepad (copy), InputButton (copy), Roact (copy)
-		local Theme = p3.Theme
-		local v16 = Images["component_assets/circle_24_stroke_1"]
-		local TextDefaultColor = Theme.TextDefault.Color
-		local v18 = Images["component_assets/circle_16"]
-		local TextDefaultColor2 = Theme.TextDefault.Color
-		local isSelected = p2.props.isSelected
-		local TextDefaultColor3 = Theme.TextDefault.Color
-		local TextDefaultTransparency = Theme.TextDefault.Transparency
 
-		if p2.props.isDisabled then
-			TextDefaultTransparency = 0.5
-		end
+function extended.render(p)
+	return withStyle(function(p2)
+		local theme = p2.Theme
 
-		local uDim2
+		local component_assetscircle_24_stroke_1 = Images["component_assets/circle_24_stroke_1"]
+		local color = theme.TextDefault.Color
+
+		local component_assetscircle_16 = Images["component_assets/circle_16"]
+		local color2 = theme.TextDefault.Color
+
+		local isSelected = p.props.isSelected
+
+		local color3 = theme.TextDefault.Color
+		local transparency = theme.TextDefault.Transparency
+
+		local transparency2 = p.props.isDisabled and 0.5 or transparency
+		local udim
 
 		if isSelected then
-			uDim2 = UDim2.new(0, 18, 0, 18)
-			TextDefaultColor2 = Theme.SystemPrimaryDefault.Color
-			TextDefaultColor = Theme.SystemPrimaryDefault.Color
+			udim = UDim2.new(0, 18, 0, 18)
+			color2 = theme.SystemPrimaryDefault.Color
+			color = theme.SystemPrimaryDefault.Color
 		else
-			uDim2 = UDim2.new(0, 0, 0, 0)
+			udim = UDim2.new(0, 0, 0, 0)
 		end
 
-		local v24 = if not p2.props.isRoactGamepadEnabled then InputButton else RoactGamepad.Focusable[InputButton]
+		local v
 
-		return Roact.createElement(v24, {
-			text = p2.props.text,
-			onActivated = p2.onSetValue,
-			size = p2.props.size,
-			image = v16,
-			imageColor = TextDefaultColor,
-			fillImage = v18,
-			fillImageSize = uDim2,
-			fillImageColor = TextDefaultColor2,
-			selectedColor = Theme.SystemPrimaryDefault.Color,
-			textColor = TextDefaultColor3,
-			transparency = TextDefaultTransparency,
-			layoutOrder = p2.props.layoutOrder,
-			isDisabled = p2.props.isDisabled,
-			isRoactGamepadEnabled = p2.props.isRoactGamepadEnabled,
-			[Roact.Ref] = p2.props.forwardRef,
-			NextSelectionUp = p2.props.NextSelectionUp,
-			NextSelectionDown = p2.props.NextSelectionDown,
-			NextSelectionLeft = p2.props.NextSelectionLeft,
-			NextSelectionRight = p2.props.NextSelectionRight,
-			SelectionImageObject = p2.props.SelectionImageObject
+		if p.props.isRoactGamepadEnabled then
+			v = RoactGamepad.Focusable[InputButton]
+		else
+			v = InputButton
+		end
+
+		return Roact.createElement(v, {
+			text = p.props.text,
+			onActivated = p.onSetValue,
+			size = p.props.size,
+			image = component_assetscircle_24_stroke_1,
+			imageColor = color,
+			fillImage = component_assetscircle_16,
+			fillImageSize = udim,
+			fillImageColor = color2,
+			selectedColor = theme.SystemPrimaryDefault.Color,
+			textColor = color3,
+			transparency = transparency2,
+			layoutOrder = p.props.layoutOrder,
+			isDisabled = p.props.isDisabled,
+			isRoactGamepadEnabled = p.props.isRoactGamepadEnabled,
+			[Roact.Ref] = p.props.forwardRef,
+			NextSelectionUp = p.props.NextSelectionUp,
+			NextSelectionDown = p.props.NextSelectionDown,
+			NextSelectionLeft = p.props.NextSelectionLeft,
+			NextSelectionRight = p.props.NextSelectionRight,
+			SelectionImageObject = p.props.SelectionImageObject
 		})
 	end)
 end
 
-return Roact.forwardRef(function(p4, p5) -- line: 117
-	-- upvalues: Roact (copy), v9 (copy), Cryo (copy)
-	return Roact.createElement(v9, Cryo.Dictionary.join(p4, {
-		forwardRef = p5
-	}))
+return Roact.forwardRef(function(p, forwardRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { forwardRef = forwardRef }))
 end)

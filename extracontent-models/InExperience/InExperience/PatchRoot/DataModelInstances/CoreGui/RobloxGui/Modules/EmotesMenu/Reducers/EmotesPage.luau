@@ -1,51 +1,48 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Cryo = require(CorePackages.Packages.Cryo)
 local Rodux = require(CorePackages.Packages.Rodux)
+
 local Actions = script.Parent.Parent.Actions
+
 local EmotesChanged = require(Actions.EmotesChanged)
 local EquippedEmotesChanged = require(Actions.EquippedEmotesChanged)
 local NumberEmotesLoadedChanged = require(Actions.NumberEmotesLoadedChanged)
-local t1 = {
-	numberEmotesLoaded = -1,
-	emotesInfo = {},
-	equippedEmotes = {},
-	currentEmotes = {}
-}
 
-local function createCurrentEmotes(p1, p2) -- line: 24
-	local t2 = {}
+local function createCurrentEmotes(p, equippedEmotes)
+	local namesBySlot = {}
 
-	for _, v in ipairs(p2) do
-		local Slot = v.Slot
-		local vName = v.Name
+	for _, item in ipairs(equippedEmotes) do
+		local slot = item.Slot
+		local name = item.Name
 
-		if Slot and vName and p1[vName] then
-			t2[Slot] = vName
+		if slot and name and p[name] then
+			namesBySlot[slot] = name
 		end
 	end
 
-	return t2
+	return namesBySlot
 end
 
-return Rodux.createReducer(t1, {
-	[EmotesChanged.name] = function(p3, p4) -- line: 42
-		-- upvalues: Cryo (copy), createCurrentEmotes (copy)
-		return Cryo.Dictionary.join(p3, {
-			emotesInfo = p4.emotes,
-			currentEmotes = createCurrentEmotes(p4.emotes, p3.equippedEmotes)
+return Rodux.createReducer({
+	emotesInfo = {},
+	equippedEmotes = {},
+	numberEmotesLoaded = -1,
+	currentEmotes = {}
+}, {
+	[EmotesChanged.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, {
+			emotesInfo = p2.emotes,
+			currentEmotes = createCurrentEmotes(p2.emotes, p.equippedEmotes)
 		})
 	end,
-	[EquippedEmotesChanged.name] = function(p5, p6) -- line: 49
-		-- upvalues: Cryo (copy), createCurrentEmotes (copy)
-		return Cryo.Dictionary.join(p5, {
-			equippedEmotes = p6.equippedEmotes,
-			currentEmotes = createCurrentEmotes(p5.emotesInfo, p6.equippedEmotes)
+	[EquippedEmotesChanged.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, {
+			equippedEmotes = p2.equippedEmotes,
+			currentEmotes = createCurrentEmotes(p.emotesInfo, p2.equippedEmotes)
 		})
 	end,
-	[NumberEmotesLoadedChanged.name] = function(p7, p8) -- line: 56
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p7, {
-			numberEmotesLoaded = p8.numberEmotesLoaded
-		})
+	[NumberEmotesLoadedChanged.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { numberEmotesLoaded = p2.numberEmotesLoaded })
 	end
 })

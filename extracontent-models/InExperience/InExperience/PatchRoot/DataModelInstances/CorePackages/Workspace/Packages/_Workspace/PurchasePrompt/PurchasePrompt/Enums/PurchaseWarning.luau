@@ -1,4 +1,6 @@
-return (require(script.Parent.createEnum)("PurchaseWarning", {
+local createEnum = require(script.Parent.createEnum)
+
+return (createEnum("PurchaseWarning", {
 	"NoAction",
 	"U13PaymentModal",
 	"U13MonthlyThreshold1Modal",

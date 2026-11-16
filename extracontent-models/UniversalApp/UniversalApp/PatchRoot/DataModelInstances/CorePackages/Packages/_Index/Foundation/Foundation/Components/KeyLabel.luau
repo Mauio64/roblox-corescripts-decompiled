@@ -1,1 +1,3 @@
-return (require(script.KeyLabel))
+local KeyLabel = require(script.KeyLabel)
+
+return KeyLabel

@@ -1,42 +1,44 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
-local CatalogRowItemCard = require(Parent.AvatarExperienceCommon).Components.CatalogItemCard.CatalogRowItemCard
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local CatalogRowItemCard = AvatarExperienceCommon.Components.CatalogItemCard.CatalogRowItemCard
 
-local function ItemList(t1: {[any]: any}) -- line: 17
-	-- upvalues: useTokens (copy), React (copy), CatalogRowItemCard (copy)
-	local v7 = useTokens()
-	local t2 = {
+local function ItemList(p)
+	local v = useTokens()
+	local children = {
 		Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Bottom,
-			Padding = UDim.new(0, v7.Gap.Medium)
+			Padding = UDim.new(0, v.Gap.Medium)
 		})
 	}
-	local Size_1200 = v7.Size.Size_1200
 
-	for v10, v11 in t1.items do
-		local t3 = {
-			LayoutOrder = v10,
-			title = v11.title,
-			presentationSlot = v11.presentationSlot,
-			priceLineContent = v11.priceLineContent,
-			headerSize = UDim2.fromOffset(Size_1200, Size_1200),
+	local size_1200 = v.Size.Size_1200
+
+	for k, item in p.items do
+		local v2 = {
+			LayoutOrder = k,
+			title = item.title,
+			presentationSlot = item.presentationSlot,
+			priceLineContent = item.priceLineContent,
+			headerSize = UDim2.fromOffset(size_1200, size_1200),
 			footerSize = UDim2.new(1, 0, 1, 0),
 			AutomaticSize = Enum.AutomaticSize.XY
 		}
 
-		t2[v11.id] = React.createElement(CatalogRowItemCard, t3)
+		children[item.id] = React.createElement(CatalogRowItemCard, v2)
 	end
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		LayoutOrder = t1.LayoutOrder,
+		LayoutOrder = p.LayoutOrder,
 		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, t2)
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0
+	}, children)
 end
 
 return ItemList

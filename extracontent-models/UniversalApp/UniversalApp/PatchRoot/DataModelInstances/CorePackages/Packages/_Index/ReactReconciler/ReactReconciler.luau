@@ -1,13 +1,15 @@
 require(script.ReactInternalTypes)
 require(script.ReactRootTags)
+
 require(script.ReactFiberHostConfig)
+
 require(script["ReactFiberHotReloading.new"])
 
-local function initialize(p1) -- line: 39
+local function initialize(items)
 	local ReactFiberHostConfig = require(script.ReactFiberHostConfig)
 
-	for v4, v5 in p1 do
-		ReactFiberHostConfig[v4] = v5
+	for k, item in items do
+		ReactFiberHostConfig[k] = item
 	end
 
 	return require(script.ReactFiberReconciler)

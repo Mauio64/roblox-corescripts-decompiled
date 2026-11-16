@@ -1,17 +1,14 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.networkingChatTypes)
+local CHAT_URL = require(parent.CHAT_URL)
 
-require(ParentParent.networkingChatTypes)
-
-local CHAT_URL = require(ParentParent.CHAT_URL)
-
-return function(p1) -- line: 6
-	-- upvalues: CHAT_URL (copy)
-	return p1.roduxNetworking.GET({
-		Name = "GetUnreadMessages"
-	}, function(p2, p3, p4) -- line: 9
-		-- upvalues: CHAT_URL (copy)
-		return p2(CHAT_URL):path("v2"):path("get-unread-messages"):queryArgs({
-			pageSize = p4
-		}):expandedQueryArgsWithIds("conversationIds", p3)
+return function(p)
+	return p.roduxNetworking.GET({ Name = "GetUnreadMessages" }, function(callback, p2, pageSize)
+		return callback(CHAT_URL):path("v2"):path("get-unread-messages"):queryArgs({
+			pageSize = pageSize
+		}):expandedQueryArgsWithIds(
+			"conversationIds",
+			p2
+		)
 	end)
 end

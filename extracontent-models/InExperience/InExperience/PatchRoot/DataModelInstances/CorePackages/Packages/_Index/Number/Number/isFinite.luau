@@ -1,3 +1,3 @@
-return function(p1) -- line: 16
-	return typeof(p1) == "number" and (p1 == p1 and (p1 ~= 1e999 and p1 ~= -1e999))
+return function(value): boolean
+	return typeof(value) == "number" and value == value and value ~= 1e999 and value ~= -1e999
 end

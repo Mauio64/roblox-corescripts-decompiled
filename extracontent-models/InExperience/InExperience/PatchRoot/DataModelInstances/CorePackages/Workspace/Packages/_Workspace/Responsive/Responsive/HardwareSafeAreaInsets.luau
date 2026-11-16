@@ -1,9 +1,13 @@
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
-local ParentParent = script.Parent.Parent
-local Signal = require(ParentParent.AppCommonLib).Signal
-local FFlagEnableLeftNavOnConsole = require(ParentParent.SharedFlags).FFlagEnableLeftNavOnConsole
-local t1 = {
+
+local parent = script.Parent.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+
+local Signal = AppCommonLib.Signal
+
+local set = {
 	[Enum.Platform.XBoxOne] = true,
 	[Enum.Platform.XBox360] = true,
 	[Enum.Platform.WiiU] = true,
@@ -13,117 +17,105 @@ local t1 = {
 	[Enum.Platform.Ouya] = true,
 	[Enum.Platform.AndroidTV] = true
 }
-local u7 = false
-local v8 = Signal.new()
-local ScreenGui = nil
-local ScreenGui2 = nil
-local t2 = {
-	left = 0,
-	top = 0,
-	right = 0,
-	bottom = 0
-}
 
-function diffInsets(p1, p2) -- line: 43
-	return p1.top ~= p2.top or (p1.bottom ~= p2.bottom or (p1.left ~= p2.left or p1.right ~= p2.right))
+local flag = false
+local v = Signal.new()
+local fullscreenTestGui = nil
+local deviceTestGui = nil
+local v2 = { left = 0, top = 0, right = 0, bottom = 0 }
+
+function diffInsets(data, data2): boolean
+	return data.top ~= data2.top or data.bottom ~= data2.bottom or data.left ~= data2.left or data.right ~= data2.right
 end
 
-local u12 = nil
+local thread = nil
+function handleSizeChange()
+	local hardwareSafeAreaInsets = getHardwareSafeAreaInsets()
 
-function handleSizeChange() -- line: 48
-	-- upvalues: t2 (ref), u12 (ref), v8 (copy)
-	local v15 = getHardwareSafeAreaInsets()
+	if diffInsets(hardwareSafeAreaInsets, v2) then
+		v2 = hardwareSafeAreaInsets
 
-	if diffInsets(v15, t2) then
-		t2 = v15
-
-		if u12 then
-			task.cancel(u12)
+		if thread then
+			task.cancel(thread)
 		end
 
-		u12 = task.defer(function() -- line: 55
-			-- upvalues: u12 (ref), v8 (copy), v15 (copy)
-			u12 = nil
-			v8:fire(v15)
+		thread = task.defer(function()
+			thread = nil
+			v:fire(hardwareSafeAreaInsets)
 		end)
 	end
 end
-function init() -- line: 62
-	-- upvalues: u7 (ref), ScreenGui (ref), CoreGui (copy), ScreenGui2 (ref)
-	if u7 then
+
+function init()
+	if flag then
 		return
 	end
 
-	if not ScreenGui then
-		ScreenGui = Instance.new("ScreenGui")
-		ScreenGui.Name = "_FullscreenTestGui"
-		ScreenGui.Parent = CoreGui
-		ScreenGui.ScreenInsets = Enum.ScreenInsets.None
-		ScreenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(handleSizeChange)
-		ScreenGui:GetPropertyChangedSignal("AbsolutePosition"):Connect(handleSizeChange)
+	if not fullscreenTestGui then
+		fullscreenTestGui = Instance.new("ScreenGui")
+		fullscreenTestGui.Name = "_FullscreenTestGui"
+		fullscreenTestGui.Parent = CoreGui
+		fullscreenTestGui.ScreenInsets = Enum.ScreenInsets.None
+		fullscreenTestGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(handleSizeChange)
+		fullscreenTestGui:GetPropertyChangedSignal("AbsolutePosition"):Connect(handleSizeChange)
 	end
 
-	if not ScreenGui2 then
-		ScreenGui2 = Instance.new("ScreenGui")
-		ScreenGui2.Name = "_DeviceTestGui"
-		ScreenGui2.Parent = CoreGui
-		ScreenGui2.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
-		ScreenGui2:GetPropertyChangedSignal("AbsoluteSize"):Connect(handleSizeChange)
-		ScreenGui2:GetPropertyChangedSignal("AbsolutePosition"):Connect(handleSizeChange)
+	if not deviceTestGui then
+		deviceTestGui = Instance.new("ScreenGui")
+		deviceTestGui.Name = "_DeviceTestGui"
+		deviceTestGui.Parent = CoreGui
+		deviceTestGui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+		deviceTestGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(handleSizeChange)
+		deviceTestGui:GetPropertyChangedSignal("AbsolutePosition"):Connect(handleSizeChange)
 	end
 
 	handleSizeChange()
-	u7 = true
+	flag = true
 end
-function getHardwareSafeAreaInsets() -- line: 89
-	-- upvalues: ScreenGui (ref), ScreenGui2 (ref), t1 (copy), UserInputService (copy)
-	local AbsolutePosition = ScreenGui.AbsolutePosition
-	local AbsoluteSize = ScreenGui.AbsoluteSize
-	local AbsolutePosition2 = ScreenGui2.AbsolutePosition
-	local v19 = AbsolutePosition2 - AbsolutePosition
-	local v20 = AbsolutePosition + ScreenGui.AbsoluteSize - (AbsolutePosition2 + ScreenGui2.AbsoluteSize)
 
-	if t1[UserInputService:GetPlatform()] then
-		local v21 = AbsoluteSize * 0.05
+function getHardwareSafeAreaInsets()
+	local absolutePosition = fullscreenTestGui.AbsolutePosition
+	local absoluteSize = fullscreenTestGui.AbsoluteSize
+	local absolutePosition2 = deviceTestGui.AbsolutePosition
 
-		v19 += v21
-		v20 += v21
+	local v3 = absolutePosition2 - absolutePosition
+	local v4 = absolutePosition + fullscreenTestGui.AbsoluteSize - (absolutePosition2 + deviceTestGui.AbsoluteSize)
+
+	if set[UserInputService:GetPlatform()] then
+		local v5 = absoluteSize * 0.05
+		v3 += v5
+		v4 += v5
 	end
 
 	return {
-		left = math.round(v19.X),
-		top = math.round(v19.Y),
-		right = math.round(v20.X),
-		bottom = math.round(v20.Y)
+		left = math.round(v3.X),
+		top = math.round(v3.Y),
+		right = math.round(v4.X),
+		bottom = math.round(v4.Y)
 	}
 end
 
-return {
-	connect = function(_, p4) -- line: 113
-		-- upvalues: v8 (copy)
-		init()
+local HardwareSafeAreaInsets = {}
 
-		return v8:connect(p4)
-	end,
-	deviceInsets = function() -- line: 117
-		-- upvalues: t2 (ref)
-		init()
+function HardwareSafeAreaInsets:connect(p)
+	init()
+	return v:connect(p)
+end
 
-		return t2
-	end,
-	diffInsets = diffInsets,
-	hasExtraPlatformInset = function() -- line: 122
-		-- upvalues: FFlagEnableLeftNavOnConsole (copy), t1 (copy), UserInputService (copy)
-		if FFlagEnableLeftNavOnConsole then
-			return false
-		end
+function HardwareSafeAreaInsets.deviceInsets()
+	init()
+	return v2
+end
 
-		return t1[UserInputService:GetPlatform()]
-	end,
-	fullscreenGui = function() -- line: 128
-		-- upvalues: ScreenGui (ref)
-		init()
+HardwareSafeAreaInsets.diffInsets = diffInsets
 
-		return ScreenGui
-	end
-}
+function HardwareSafeAreaInsets.hasExtraPlatformInset(): boolean
+	return false
+end
+
+function HardwareSafeAreaInsets.fullscreenGui()
+	init()
+	return fullscreenTestGui
+end
+
+return HardwareSafeAreaInsets

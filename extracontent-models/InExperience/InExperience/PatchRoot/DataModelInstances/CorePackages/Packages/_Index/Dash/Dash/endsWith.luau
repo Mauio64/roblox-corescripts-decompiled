@@ -1,5 +1,5 @@
-local function endsWith(s1: string, s2: string) -- line: 14
-	return s2 == s1:sub(-s2:len())
+local function endsWith(value: string, value2: string): boolean
+	return value:sub(-value2:len()) == value2
 end
 
 return endsWith

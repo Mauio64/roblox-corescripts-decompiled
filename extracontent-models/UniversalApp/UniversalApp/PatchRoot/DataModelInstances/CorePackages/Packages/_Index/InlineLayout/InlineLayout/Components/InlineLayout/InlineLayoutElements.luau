@@ -1,19 +1,10 @@
-local RenderableInlineElement = require(script.RenderableInlineElement)
-local BaseTextElement = require(script.BaseTextElement)
-local HoverContext = require(script.HoverContext)
-local TextElement = require(script.TextElement)
-local LinkElement = require(script.LinkElement)
-local ImageElement = require(script.ImageElement)
-local HardBreakElement = require(script.HardBreakElement)
-local SelectableTextElement = require(script.SelectableTextElement)
-
 return {
-	RenderableInlineElement = RenderableInlineElement,
-	BaseTextElement = BaseTextElement,
-	HoverContext = HoverContext,
-	TextElement = TextElement,
-	LinkElement = LinkElement,
-	ImageElement = ImageElement,
-	HardBreakElement = HardBreakElement,
-	SelectableTextElement = SelectableTextElement
+	RenderableInlineElement = require(script.RenderableInlineElement),
+	BaseTextElement = require(script.BaseTextElement),
+	HoverContext = require(script.HoverContext),
+	TextElement = require(script.TextElement),
+	LinkElement = require(script.LinkElement),
+	ImageElement = require(script.ImageElement),
+	HardBreakElement = require(script.HardBreakElement),
+	SelectableTextElement = require(script.SelectableTextElement)
 }

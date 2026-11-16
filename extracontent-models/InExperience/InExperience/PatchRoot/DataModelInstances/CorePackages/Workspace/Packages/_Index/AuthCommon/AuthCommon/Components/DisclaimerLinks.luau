@@ -1,170 +1,362 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Roact = require(AuthCommonParent.Roact)
-local RoactRodux = require(AuthCommonParent.RoactRodux)
-local UIBlox = require(AuthCommonParent.UIBlox)
-local Text = require(AuthCommonParent.AppCommonLib).Text
+local parent = AuthCommon.Parent
+
+local Roact = require(parent.Roact)
+local RoactRodux = require(parent.RoactRodux)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local AppCommonLib = require(parent.AppCommonLib)
+local Text = AppCommonLib.Text
 local LinkButton = UIBlox.App.Button.LinkButton
 local ContextualMenu = UIBlox.App.Menu.ContextualMenu
 local MenuDirection = UIBlox.App.Menu.MenuDirection
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local AppLinking = require(AuthCommonParent.RoactServiceTags).AppLinking
-local RoactServices = require(AuthCommonParent.RoactServices).RoactServices
-local RoactAppPolicy = require(AuthCommonParent.UniversalAppPolicy).RoactAppPolicy
-local Cryo = require(AuthCommonParent.Cryo)
-local useDesignTokens = require(AuthCommonParent.Style).useDesignTokens
-local UiMode = require(AuthCommonParent.RobloxAppEnums).UiMode
-local useUiModeInfo = require(AuthCommonParent.RobloxAppHooks).useUiModeInfo
-local FFlagFoundationStylingOnSignUp = require(AuthCommonParent.SharedFlags).FFlagFoundationStylingOnSignUp
+
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppLinking = RoactServiceTags.AppLinking
+local RoactServices = require(parent.RoactServices)
+local roactServices = RoactServices.RoactServices
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local RoactAppPolicy = UniversalAppPolicy.RoactAppPolicy
+local Cryo = require(parent.Cryo)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local useDesignTokens = Style.useDesignTokens
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local UiMode = RobloxAppEnums.UiMode
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useUiModeInfo = RobloxAppHooks.useUiModeInfo
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFoundationStylingOnSignUp = SharedFlags.FFlagFoundationStylingOnSignUp
 local DisclaimerLinksVariant = require(AuthCommon.Enums.DisclaimerLinksVariant)
+
 local FitChildren = require(AuthCommon.Components.FitChildren)
-local NavigateDown = require(AuthCommonParent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(AuthCommonParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v23 = if not FFlagSignalsNavP3Dispatch then nil else require(AuthCommonParent.RobloxAppNavigation).NavigationCommands
-local AppPage = require(AuthCommonParent.RobloxAppEnums).AppPage
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags2.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local RobloxAppEnums2 = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums2.AppPage
+
 local TransitionAnimation = require(AuthCommon.Enums.TransitionAnimation)
-local withLocalization = require(AuthCommonParent.Localization).withLocalization
+
+local Localization = require(parent.Localization)
+local withLocalization = Localization.withLocalization
 local withStyle = UIBlox.Style.withStyle
+
 local OpenExternalBrowser = require(AuthCommon.Thunks.OpenExternalBrowser)
-local UrlBuilder = require(AuthCommonParent.UrlBuilder).UrlBuilder
-local AuthAnalytics = require(AuthCommonParent.AuthAnalytics)
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local AuthAnalytics = require(parent.AuthAnalytics)
 local authFormInteraction = AuthAnalytics.Events.authFormInteraction
 local EventStreamConstants = AuthAnalytics.EventStreamConstants
+
 local DisclaimerLinkButtons = require(script.Parent.DisclaimerLinkButtons)
+
 local RegisterAuditContent = require(AuthCommon.Components.RegisterAuditContent)
 local RegisterAdditionalAuditContent = require(AuthCommon.Components.RegisterAdditionalAuditContent)
-local GetFFlagEnableAuditForSinglePageSignUp = require(AuthCommonParent.SharedFlags).GetFFlagEnableAuditForSinglePageSignUp
-local t1 = {
-	[DisclaimerLinksVariant.Default] = "TextDefault",
-	[DisclaimerLinksVariant.Link] = nil
-}
-local v38 = Roact.PureComponent:extend("DisclaimerLinks")
 
-function v38.init(p1) -- line: 62
-	-- upvalues: OpenExternalBrowser (copy), AppPage (copy), TransitionAnimation (copy), UrlBuilder (copy), authFormInteraction (copy), EventStreamConstants (copy)
-	function p1.openDisclaimerLink(p2) -- line: 63
-		-- upvalues: p1 (copy), OpenExternalBrowser (copy), AppPage (copy), TransitionAnimation (copy)
-		if p1.props.useExternalBrowserForDisclaimerLinks then
-			OpenExternalBrowser(p1.props.linking, p2)
+local SharedFlags3 = require(parent.SharedFlags)
+local GetFFlagEnableAuditForSinglePageSignUp = SharedFlags3.GetFFlagEnableAuditForSinglePageSignUp
 
-			return
-		end
+local v = { [DisclaimerLinksVariant.Default] = "TextDefault", [DisclaimerLinksVariant.Link] = nil }
 
-		p1.props.navigateDown({
-			name = AppPage.GenericWebPage,
-			detail = p2,
-			extraProps = {
-				title = "",
-				transitionAnimation = TransitionAnimation.SlideInFromRight
+local stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None }
+
+local function createFoundationLink(text, onActivated, layoutOrder, underlineLinks, underlinedLinkTextTag)
+	if underlineLinks then
+		return Roact.createElement(
+			Foundation.View,
+			{
+				tag = "auto-xy padding-small",
+				onActivated = onActivated,
+				stateLayer = stateLayer,
+				LayoutOrder = layoutOrder
+			},
+			{
+				Label = Roact.createElement(Foundation.Text, {
+					Text = `<u>{text}</u>`,
+					RichText = true,
+					tag = `auto-xy content-emphasis {underlinedLinkTextTag or "text-caption-small"}`
+				})
 			}
-		})
+		)
 	end
-	function p1.openTermsLink() -- line: 78
-		-- upvalues: UrlBuilder (copy), p1 (copy), authFormInteraction (copy), EventStreamConstants (copy)
-		local v55 = UrlBuilder.static.about.terms()
 
-		if p1.props.ctx then
-			authFormInteraction(p1.props.ctx, EventStreamConstants.Field.TermsOfService, p1.props.state)
+	return Roact.createElement(Foundation.Button, {
+		text = text,
+		variant = Foundation.Enums.ButtonVariant.Utility,
+		size = Foundation.Enums.ButtonSize.Small,
+		onActivated = onActivated,
+		LayoutOrder = layoutOrder
+	})
+end
+
+local extended = Roact.PureComponent:extend("DisclaimerLinks")
+
+function extended:init()
+	function self.openDisclaimerLink(detail)
+		if self.props.useExternalBrowserForDisclaimerLinks then
+			OpenExternalBrowser(self.props.linking, detail)
+		else
+			self.props.navigateDown({
+				name = AppPage.GenericWebPage,
+				detail = detail,
+				extraProps = {
+					title = "",
+					transitionAnimation = TransitionAnimation.SlideInFromRight
+				}
+			})
+		end
+	end
+
+	function self.openTermsLink()
+		local terms = urlBuilder.static.about.terms()
+
+		if self.props.ctx then
+			authFormInteraction(self.props.ctx, EventStreamConstants.Field.TermsOfService, self.props.state)
 		end
 
-		p1.openDisclaimerLink(v55)
+		self.openDisclaimerLink(terms)
 	end
-	function p1.openPrivacyLink() -- line: 86
-		-- upvalues: UrlBuilder (copy), p1 (copy), authFormInteraction (copy), EventStreamConstants (copy)
-		local v56 = UrlBuilder.static.about.privacy()
 
-		if p1.props.ctx then
-			authFormInteraction(p1.props.ctx, EventStreamConstants.Field.PrivacyPolicy, p1.props.state)
+	function self.openPrivacyLink()
+		local privacy = urlBuilder.static.about.privacy()
+
+		if self.props.ctx then
+			authFormInteraction(self.props.ctx, EventStreamConstants.Field.PrivacyPolicy, self.props.state)
 		end
 
-		p1.openDisclaimerLink(v56)
+		self.openDisclaimerLink(privacy)
 	end
 end
-function v38.render(p3) -- line: 95
-	-- upvalues: withLocalization (copy), withStyle (copy), UiMode (copy), FFlagFoundationStylingOnSignUp (copy), t1 (copy), Text (copy), FitChildren (copy), Roact (copy), ImageSetLabel (copy), GetFFlagEnableAuditForSinglePageSignUp (copy), RegisterAuditContent (copy), RegisterAdditionalAuditContent (copy), UrlBuilder (copy), ContextualMenu (copy), MenuDirection (copy), LinkButton (copy), Cryo (copy), DisclaimerLinkButtons (copy)
-	local isDualLayout = p3.props.isDualLayout
-	local LoginView = p3.props.tokens.LuaApps.LoginView
-	local v46 = not LoginView and 4 or LoginView.boxPadding
+
+function extended.render(data)
+	local isDualLayout = data.props.isDualLayout
+
+	local loginView = data.props.tokens.LuaApps.LoginView
+	local v2 = not loginView and 4 or loginView.boxPadding
 
 	return withLocalization({
 		termsOfUseText = "CommonUI.Features.Label.Terms",
 		termsOfUseTextLong = "CommonUI.Features.Label.TermsOfUse",
 		privacyPolicyText = "CommonUI.Features.Label.Privacy",
 		privacyPolicyTextLong = "CommonUI.Features.Label.PrivacyPolicy"
-	})(function(p4) -- line: 106
-		-- upvalues: withStyle (copy), p3 (copy), UiMode (copy), FFlagFoundationStylingOnSignUp (copy), t1 (copy), isDualLayout (copy), Text (copy), v46 (copy), FitChildren (copy), Roact (copy), ImageSetLabel (copy), LoginView (copy), GetFFlagEnableAuditForSinglePageSignUp (copy), RegisterAuditContent (copy), RegisterAdditionalAuditContent (copy), UrlBuilder (copy), ContextualMenu (copy), MenuDirection (copy), LinkButton (copy), Cryo (copy), DisclaimerLinkButtons (copy)
-		return withStyle(function(p5) -- line: 107
-			-- upvalues: p3 (copy), UiMode (copy), FFlagFoundationStylingOnSignUp (copy), t1 (copy), isDualLayout (copy), p4 (copy), Text (copy), v46 (copy), FitChildren (copy), Roact (copy), ImageSetLabel (copy), LoginView (copy), GetFFlagEnableAuditForSinglePageSignUp (copy), RegisterAuditContent (copy), RegisterAdditionalAuditContent (copy), UrlBuilder (copy), ContextualMenu (copy), MenuDirection (copy), LinkButton (copy), Cryo (copy), DisclaimerLinkButtons (copy)
-			local v60 = p3.props.uiModeInfo.uiMode == UiMode.TenFoot
-			local propsLayoutOrder = p3.props.LayoutOrder
-			local v62 = if not FFlagFoundationStylingOnSignUp then nil else t1[p3.props.variant]
-			local BaseSize = p5.Font.BaseSize
-			local v64 = not isDualLayout and "CommonUI.Features.Label.Terms" or "CommonUI.Features.Label.TermsOfUse"
-			local v65 = not isDualLayout and "CommonUI.Features.Label.Privacy" or "CommonUI.Features.Label.PrivacyPolicy"
-			local v66 = if not isDualLayout then p4.termsOfUseText else p4.termsOfUseTextLong
-			local v67 = if not isDualLayout then "<b>" .. p4.privacyPolicyText .. "</b>" else p4.privacyPolicyTextLong
-			local Header2Font = p5.Font.Header2.Font
-			local v69 = Text.GetTextWidth(" ", Header2Font, BaseSize) / 2
-			local v70 = Text.GetTextWidth("-", Header2Font, BaseSize)
-			local v71 = Text.GetTextHeight(p4.privacyPolicyText, Header2Font, BaseSize) + v46
+	})(function(data2)
+		return withStyle(function(props)
+			local v3 = data.props.uiModeInfo.uiMode == UiMode.TenFoot
+			local layoutOrder = data.props.LayoutOrder
+			local v4
 
-			if isDualLayout then
-				v71 = 2 * (Text.GetTextHeight(p4.privacyPolicyText, Header2Font, BaseSize) + 2 * v46)
+			if FFlagFoundationStylingOnSignUp then
+				v4 = v[data.props.variant]
+			else
+				v4 = nil
 			end
 
-			local v72 = if not isDualLayout then FitChildren.FitFrame else "Frame"
+			local baseSize = props.Font.BaseSize
+			local translationKey = isDualLayout and "CommonUI.Features.Label.TermsOfUse"
+				or "CommonUI.Features.Label.Terms"
+			local translationKey2 = isDualLayout and "CommonUI.Features.Label.PrivacyPolicy"
+				or "CommonUI.Features.Label.Privacy"
+			local v5
 
-			local function v73() -- line: 141
-				-- upvalues: Roact (copy), ImageSetLabel (copy), LoginView (copy), p5 (copy)
+			if isDualLayout then
+				v5 = data2.termsOfUseTextLong
+			else
+				v5 = data2.termsOfUseText
+			end
+
+			local v6
+
+			if isDualLayout then
+				v6 = data2.privacyPolicyTextLong
+			else
+				v6 = "<b>" .. data2.privacyPolicyText .. "</b>"
+			end
+
+			local font = props.Font.Header2.Font
+			local v7
+
+			if FoundationFontFaceMigration then
+				v7 = GetTextSize(" ", baseSize, props.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X / 2
+			else
+				v7 = Text.GetTextWidth(" ", font, baseSize) / 2
+			end
+
+			local v8
+
+			if FoundationFontFaceMigration then
+				v8 = GetTextSize("-", baseSize, props.Tokens.Typography.TitleLarge.Font, Vector2.new(10000, 10000)).X
+			else
+				v8 = Text.GetTextWidth("-", font, baseSize)
+			end
+
+			local y
+
+			if FoundationFontFaceMigration then
+				y = GetTextSize(
+					data2.privacyPolicyText,
+					baseSize,
+					props.Tokens.Typography.TitleLarge.Font,
+					Vector2.new(10000, 10000)
+				).Y
+			end
+
+			local v9
+
+			if FoundationFontFaceMigration then
+				v9 = y + v2
+			else
+				v9 = Text.GetTextHeight(data2.privacyPolicyText, font, baseSize) + v2
+			end
+
+			if isDualLayout then
+				if FoundationFontFaceMigration then
+					v9 = 2 * (y + 2 * v2)
+				else
+					v9 = 2 * (Text.GetTextHeight(data2.privacyPolicyText, font, baseSize) + 2 * v2)
+				end
+			end
+
+			local v10 = isDualLayout and "Frame" or FitChildren.FitFrame
+
+			local function fn()
 				return {
 					Image = Roact.createElement(ImageSetLabel, {
+						Size = UDim2.new(0, loginView.disclaimerIconSize, 0, loginView.disclaimerIconSize),
+						Position = UDim2.fromOffset(0, 0),
 						BackgroundTransparency = 1,
 						LayoutOrder = 1,
-						ImageTransparency = 0,
-						Size = UDim2.new(0, LoginView.disclaimerIconSize, 0, LoginView.disclaimerIconSize),
-						Position = UDim2.fromOffset(0, 0),
 						ScaleType = Enum.ScaleType.Fit,
-						Image = LoginView.linkIcon,
-						ImageColor3 = p5.Theme.UIEmphasis.Color
+						Image = loginView.linkIcon,
+						ImageColor3 = props.Theme.UIEmphasis.Color,
+						ImageTransparency = 0
 					})
 				}
 			end
-			local function v74() -- line: 156
-				-- upvalues: p3 (copy), GetFFlagEnableAuditForSinglePageSignUp (copy), RegisterAuditContent (copy), v66 (copy), Roact (copy), v64 (copy), v67 (copy), v65 (copy), isDualLayout (copy), p4 (copy), RegisterAdditionalAuditContent (copy), UrlBuilder (copy)
-				if not p3.props.enableAuditContentCapture or not GetFFlagEnableAuditForSinglePageSignUp() then
+
+			local function fn2()
+				if not (data.props.enableAuditContentCapture and GetFFlagEnableAuditForSinglePageSignUp()) then
 					return {}
 				end
 
-				return {
-					TermsAuditContent = RegisterAuditContent and (v66 and Roact.createElement(RegisterAuditContent, {
-						translationKey = v64,
-						translatedSourceString = v66
-					})),
-					PrivacyAuditContent = RegisterAuditContent and (v67 and Roact.createElement(RegisterAuditContent, {
-						translationKey = v65,
-						translatedSourceString = if not isDualLayout then p4.privacyPolicyText else p4.privacyPolicyTextLong
-					})),
-					TermsLinkAuditContent = RegisterAdditionalAuditContent and Roact.createElement(RegisterAdditionalAuditContent, {
-						contentKey = "termsLink",
-						value = UrlBuilder.static.about.terms()
+				local v11 = {
+					TermsAuditContent = RegisterAuditContent and v5 and Roact.createElement(RegisterAuditContent, {
+						translationKey = translationKey,
+						translatedSourceString = v5
 					}),
-					PrivacyLinkAuditContent = RegisterAdditionalAuditContent and Roact.createElement(RegisterAdditionalAuditContent, {
-						contentKey = "privacyLink",
-						value = UrlBuilder.static.about.privacy()
-					})
+					PrivacyAuditContent = 0,
+					TermsLinkAuditContent = 0,
+					PrivacyLinkAuditContent = 0
 				}
+
+				local privacyAuditContent = RegisterAuditContent and v6
+
+				if privacyAuditContent then
+					local createElement = Roact.createElement
+					local v12 = { translationKey = translationKey2, translatedSourceString = 0 }
+					local translatedSourceString
+
+					if isDualLayout then
+						translatedSourceString = data2.privacyPolicyTextLong
+					else
+						translatedSourceString = data2.privacyPolicyText
+					end
+
+					v12.translatedSourceString = translatedSourceString
+					privacyAuditContent = createElement(RegisterAuditContent, v12)
+				end
+
+				v11.PrivacyAuditContent = privacyAuditContent
+
+				v11.TermsLinkAuditContent = RegisterAdditionalAuditContent
+					and Roact.createElement(RegisterAdditionalAuditContent, {
+						contentKey = "termsLink",
+						value = urlBuilder.static.about.terms()
+					})
+
+				v11.PrivacyLinkAuditContent = RegisterAdditionalAuditContent
+					and Roact.createElement(RegisterAdditionalAuditContent, {
+						contentKey = "privacyLink",
+						value = urlBuilder.static.about.privacy()
+					})
+				return v11
 			end
-			local function v75() -- line: 189
-				-- upvalues: Roact (copy), v69 (copy), isDualLayout (copy), ContextualMenu (copy), v66 (copy), p5 (copy), p3 (copy), LoginView (copy), v73 (copy), v67 (copy), MenuDirection (copy), LinkButton (copy), v62 (copy), v70 (copy), Header2Font (copy), BaseSize (copy)
-				return {
-					UIListLayout = Roact.createElement("UIListLayout", {
-						Padding = UDim.new(0, v69),
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						FillDirection = if not isDualLayout then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical,
-						HorizontalAlignment = if not isDualLayout then Enum.HorizontalAlignment.Center else Enum.HorizontalAlignment.Left,
-						VerticalAlignment = Enum.VerticalAlignment.Center
-					}),
-					ContextualMenu = if not isDualLayout then nil else Roact.createElement(ContextualMenu, {
+
+			local function fn3()
+				local createElement = Roact.createElement
+				local v11 = {
+					Padding = UDim.new(0, v7),
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = 0,
+					HorizontalAlignment = 0,
+					VerticalAlignment = 0
+				}
+				local fillDirection
+
+				if isDualLayout then
+					fillDirection = Enum.FillDirection.Vertical
+				else
+					fillDirection = Enum.FillDirection.Horizontal
+				end
+
+				v11.FillDirection = fillDirection
+				local horizontalAlignment
+
+				if isDualLayout then
+					horizontalAlignment = Enum.HorizontalAlignment.Left
+				else
+					horizontalAlignment = Enum.HorizontalAlignment.Center
+				end
+
+				v11.HorizontalAlignment = horizontalAlignment
+
+				v11.VerticalAlignment = Enum.VerticalAlignment.Center
+				local v12 = {
+					UIListLayout = createElement("UIListLayout", v11),
+					ContextualMenu = 0,
+					TermsOfUse = 0,
+					Hyphen = 0,
+					PrivacyPolicy = 0
+				}
+				local contextualMenu
+
+				if isDualLayout then
+					contextualMenu = Roact.createElement(ContextualMenu, {
+						buttonProps = {
+							{
+								text = v5,
+								fontStyle = props.Font.Header1,
+								onActivated = data.openTermsLink,
+								rightSideGadgetSize = Vector2.new(
+									loginView.disclaimerIconSize + loginView.disclaimerPadding,
+									loginView.disclaimerIconSize
+								),
+								renderRightSideGadget = fn
+							},
+							{
+								text = v6,
+								fontStyle = props.Font.Header1,
+								onActivated = data.openPrivacyLink,
+								rightSideGadgetSize = Vector2.new(
+									loginView.disclaimerIconSize + loginView.disclaimerPadding,
+									loginView.disclaimerIconSize
+								),
+								renderRightSideGadget = fn
+							}
+						},
 						open = true,
 						stayOnActivated = true,
 						isElementBackgroundVisible = false,
@@ -172,136 +364,225 @@ function v38.render(p3) -- line: 95
 						closeBackgroundVisible = false,
 						topElementRounded = false,
 						bottomElementRounded = false,
-						buttonProps = {
-							{
-								text = v66,
-								fontStyle = p5.Font.Header1,
-								onActivated = p3.openTermsLink,
-								rightSideGadgetSize = Vector2.new(LoginView.disclaimerIconSize + LoginView.disclaimerPadding, LoginView.disclaimerIconSize),
-								renderRightSideGadget = v73
-							},
-							{
-								text = v67,
-								fontStyle = p5.Font.Header1,
-								onActivated = p3.openPrivacyLink,
-								rightSideGadgetSize = Vector2.new(LoginView.disclaimerIconSize + LoginView.disclaimerPadding, LoginView.disclaimerIconSize),
-								renderRightSideGadget = v73
-							}
-						},
 						horizontalAlignment = Enum.HorizontalAlignment.Center,
 						menuDirection = MenuDirection.Down,
 						contextMenuWidthOverride = UDim.new(1, 0),
-						elementHeight = LoginView.disclaimerElementHeight,
+						elementHeight = loginView.disclaimerElementHeight,
 						openPositionX = UDim.new(0, 0),
 						openPositionY = UDim.new(0, 0),
 						screenSize = Vector2.new(0, 0)
-					}),
-					TermsOfUse = if isDualLayout then nil else Roact.createElement(LinkButton, {
+					})
+				end
+
+				v12.ContextualMenu = contextualMenu
+				local termsOfUse
+
+				if not isDualLayout then
+					local createElement2 = Roact.createElement
+					local v13 = {
+						text = v5,
+						size = 0,
 						fontStyle = "Header2",
 						layoutOrder = 1,
 						underlineAlwaysEnabled = true,
-						text = v66,
-						size = if not isDualLayout then UDim2.new(0, 0, 1, 0) else UDim2.new(1, 0, 0.5, 0),
-						onActivated = p3.openTermsLink,
-						colorStyleDefault = v62,
-						colorStyleHover = v62
-					}),
-					Hyphen = if isDualLayout then nil else Roact.createElement("TextLabel", {
+						onActivated = 0,
+						colorStyleDefault = 0,
+						colorStyleHover = 0
+					}
+					local size
+
+					if isDualLayout then
+						size = UDim2.new(1, 0, 0.5, 0)
+					else
+						size = UDim2.new(0, 0, 1, 0)
+					end
+
+					v13.size = size
+
+					v13.onActivated = data.openTermsLink
+					v13.colorStyleDefault = v4
+					v13.colorStyleHover = v4
+					termsOfUse = createElement2(LinkButton, v13)
+				end
+
+				v12.TermsOfUse = termsOfUse
+				local hyphen
+
+				if not isDualLayout then
+					local createElement2 = Roact.createElement
+					local v13 = {
 						BackgroundTransparency = 1,
 						Text = " ",
-						LayoutOrder = 2,
-						Size = UDim2.new(0, v70, 1, 0),
-						Font = Header2Font,
-						TextColor3 = p5.Theme.TextEmphasis.Color,
-						TextTransparency = p5.Theme.TextEmphasis.Transparency,
-						TextSize = BaseSize
-					}),
-					PrivacyPolicy = if isDualLayout then nil else Roact.createElement(LinkButton, {
+						Size = UDim2.new(0, v8, 1, 0),
+						Font = 0,
+						FontFace = 0,
+						TextColor3 = 0,
+						TextTransparency = 0,
+						TextSize = 0,
+						LayoutOrder = 2
+					}
+					local font2
+
+					if not FoundationFontFaceMigration then
+						font2 = font
+					end
+
+					v13.Font = font2
+					local fontFace
+
+					if FoundationFontFaceMigration then
+						fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
+					end
+
+					v13.FontFace = fontFace
+
+					v13.TextColor3 = props.Theme.TextEmphasis.Color
+					v13.TextTransparency = props.Theme.TextEmphasis.Transparency
+					v13.TextSize = baseSize
+					hyphen = createElement2("TextLabel", v13)
+				end
+
+				v12.Hyphen = hyphen
+				local privacyPolicy
+
+				if not isDualLayout then
+					local createElement2 = Roact.createElement
+					local v13 = {
+						text = v6,
+						size = 0,
 						fontStyle = "Header2",
 						layoutOrder = 3,
 						underlineAlwaysEnabled = true,
-						text = v67,
-						size = if not isDualLayout then UDim2.new(0, 0, 1, 0) else UDim2.new(1, 0, 0.5, 0),
-						onActivated = p3.openPrivacyLink,
-						colorStyleDefault = v62,
-						colorStyleHover = v62
-					})
-				}
+						onActivated = 0,
+						colorStyleDefault = 0,
+						colorStyleHover = 0
+					}
+					local size
+
+					if isDualLayout then
+						size = UDim2.new(1, 0, 0.5, 0)
+					else
+						size = UDim2.new(0, 0, 1, 0)
+					end
+
+					v13.size = size
+
+					v13.onActivated = data.openPrivacyLink
+					v13.colorStyleDefault = v4
+					v13.colorStyleHover = v4
+					privacyPolicy = createElement2(LinkButton, v13)
+				end
+
+				v12.PrivacyPolicy = privacyPolicy
+				return v12
 			end
 
-			if v60 then
+			if data.props.variant == DisclaimerLinksVariant.Foundation and not (isDualLayout or v3) then
+				return Roact.createElement(
+					"Frame",
+					{
+						Size = UDim2.new(0, 0, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.XY,
+						BackgroundTransparency = 1,
+						LayoutOrder = layoutOrder
+					},
+					Cryo.Dictionary.join({
+						UIListLayout = Roact.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Horizontal,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							SortOrder = Enum.SortOrder.LayoutOrder
+						}),
+						TermsOfUse = createFoundationLink(
+							data2.termsOfUseText,
+							data.openTermsLink,
+							1,
+							data.props.underlineLinks,
+							data.props.underlinedLinkTextTag
+						),
+						PrivacyPolicy = createFoundationLink(
+							data2.privacyPolicyText,
+							data.openPrivacyLink,
+							2,
+							data.props.underlineLinks,
+							data.props.underlinedLinkTextTag
+						)
+					}, fn2())
+				)
+			end
+
+			if v3 then
 				if GetFFlagEnableAuditForSinglePageSignUp() then
 					return Roact.createFragment(Cryo.Dictionary.join({
 						DisclaimerLinkButtons = Roact.createElement(DisclaimerLinkButtons, {
-							textTos = v66,
-							activatedTos = p3.openTermsLink,
-							textPrivacy = v67,
-							activatedPrivacy = p3.openPrivacyLink,
-							fillDirection = p3.props.fillDirection,
-							layoutOrder = propsLayoutOrder,
-							tokens = LoginView
+							textTos = v5,
+							activatedTos = data.openTermsLink,
+							textPrivacy = v6,
+							activatedPrivacy = data.openPrivacyLink,
+							fillDirection = data.props.fillDirection,
+							layoutOrder = layoutOrder,
+							tokens = loginView
 						})
-					}, (v74())))
+					}, fn2()))
 				end
 
 				return Roact.createElement(DisclaimerLinkButtons, {
-					textTos = v66,
-					activatedTos = p3.openTermsLink,
-					textPrivacy = v67,
-					activatedPrivacy = p3.openPrivacyLink,
-					fillDirection = p3.props.fillDirection,
-					layoutOrder = propsLayoutOrder,
-					tokens = LoginView
+					textTos = v5,
+					activatedTos = data.openTermsLink,
+					textPrivacy = v6,
+					activatedPrivacy = data.openPrivacyLink,
+					fillDirection = data.props.fillDirection,
+					layoutOrder = layoutOrder,
+					tokens = loginView
 				})
+			else
+				local fitAxis
+
+				if not isDualLayout then
+					fitAxis = FitChildren.FitAxis.Width
+				end
+
+				local v11 = {
+					fitAxis = fitAxis,
+					Size = UDim2.new(1, 0, 0, v9),
+					BackgroundTransparency = 1,
+					LayoutOrder = layoutOrder
+				}
+
+				if GetFFlagEnableAuditForSinglePageSignUp() then
+					return Roact.createElement(v10, v11, Cryo.Dictionary.join(fn3(), fn2()))
+				end
+
+				return Roact.createElement(v10, v11, fn3())
 			end
-
-			local t2 = {
-				BackgroundTransparency = 1,
-				fitAxis = if isDualLayout then nil else FitChildren.FitAxis.Width,
-				Size = UDim2.new(1, 0, 0, v71),
-				LayoutOrder = propsLayoutOrder
-			}
-
-			if GetFFlagEnableAuditForSinglePageSignUp() then
-				return Roact.createElement(v72, t2, Cryo.Dictionary.join(v75(), (v74())))
-			end
-
-			return Roact.createElement(v72, t2, (v75()))
 		end)
 	end)
 end
 
-local v39 = RoactRodux.connect(function(_, _) -- line: 328
+local v2 = RoactRodux.connect(function(_, _)
 	return {}
-end, function(p8) -- line: 330
-	-- upvalues: FFlagSignalsNavP3Dispatch (copy), v23 (copy), NavigateDown (copy)
+end, function(callback)
 	return {
-		navigateDown = function(p9) -- line: 332
-			-- upvalues: FFlagSignalsNavP3Dispatch (copy), v23 (copy), p8 (copy), NavigateDown (copy)
+		navigateDown = function(p)
 			if FFlagSignalsNavP3Dispatch then
-				return v23.down(v23.fromLegacyPage(p9))
+				return navigationCommands.down(navigationCommands.fromLegacyPage(p))
 			end
 
-			return p8(NavigateDown(p9))
+			return callback(NavigateDown(p))
 		end
 	}
-end)(v38)
-local v40 = RoactAppPolicy.connect(function(p10) -- line: 342
+end)(extended)
+
+local v3 = RoactAppPolicy.connect(function(p)
 	return {
-		useExternalBrowserForDisclaimerLinks = p10.shouldUseExternalBrowserForDisclaimerLinks()
+		useExternalBrowserForDisclaimerLinks = p.shouldUseExternalBrowserForDisclaimerLinks()
 	}
-end)(v39)
-local v41 = RoactServices.connect({
-	linking = AppLinking
-})(v40)
+end)(v2)
 
-return function(p11) -- line: 353
-	-- upvalues: useDesignTokens (copy), useUiModeInfo (copy), Roact (copy), v41 (copy), Cryo (copy)
-	local v52 = useDesignTokens()
-	local v53 = useUiModeInfo()
+local v4 = roactServices.connect({ linking = AppLinking })(v3)
 
-	return Roact.createElement(v41, Cryo.Dictionary.join({
-		tokens = v52,
-		uiModeInfo = v53
-	}, p11))
+return function(p)
+	local tokens = useDesignTokens()
+	local uiModeInfo = useUiModeInfo()
+
+	return Roact.createElement(v4, Cryo.Dictionary.join({ tokens = tokens, uiModeInfo = uiModeInfo }, p))
 end

@@ -1,26 +1,21 @@
 local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
 local dependencies = require(CrossExperienceVoice.dependencies)
+
 local useSelector = dependencies.RoactUtils.Hooks.RoactRodux.useSelector
-local GetFFlagEnableCrossExpVoice = dependencies.SharedFlags.GetFFlagEnableCrossExpVoice
+local getFFlagEnableCrossExpVoice = dependencies.SharedFlags.GetFFlagEnableCrossExpVoice
 
-return function(n1: number) -- line: 8
-	-- upvalues: GetFFlagEnableCrossExpVoice (copy), useSelector (copy)
-	if not GetFFlagEnableCrossExpVoice() then
-		return nil
-	end
-
-	return useSelector(function(p1) -- line: 12
-		-- upvalues: n1 (copy)
-		if p1 and (p1.Squad and p1.Squad.CrossExperienceVoice) then
-			local v7 = p1.Squad.CrossExperienceVoice.Participants.participants[n1]
-
-			if v7 then
-				return v7.isMuted
+return function(p: number)
+	if getFFlagEnableCrossExpVoice() then
+		return useSelector(function(p2)
+			if not (p2 and p2.Squad and p2.Squad.CrossExperienceVoice) then
+				return nil
 			end
 
-			return nil
-		end
+			local participant = p2.Squad.CrossExperienceVoice.Participants.participants[p]
 
-		return nil
-	end)
+			return if participant then participant.isMuted else nil
+		end)
+	end
+
+	return nil
 end

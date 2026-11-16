@@ -1,4 +1,1 @@
-return {
-	Small = "Small",
-	Medium = "Medium"
-}
+return { Small = "Small", Medium = "Medium" }

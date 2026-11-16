@@ -1,4 +1,1 @@
-return {
-	Default = "Default",
-	SwipedRight = "SwipedRight"
-}
+return { Default = "Default", SwipedRight = "SwipedRight" }

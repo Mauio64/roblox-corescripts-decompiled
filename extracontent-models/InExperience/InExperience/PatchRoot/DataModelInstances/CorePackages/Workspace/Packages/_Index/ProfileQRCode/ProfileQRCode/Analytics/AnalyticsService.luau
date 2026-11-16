@@ -1,10 +1,13 @@
-local Parent = script:FindFirstAncestor("ProfileQRCode").Parent
+local parent = script:FindFirstAncestor("ProfileQRCode").Parent
 local EventIngestService = game:GetService("EventIngestService")
-local v3 = require(Parent.Analytics).Analytics.new(game:GetService("RbxAnalyticsService"))
+
+local Analytics = require(parent.Analytics)
+local analytics = Analytics.Analytics.new(game:GetService("RbxAnalyticsService"))
+local setupSetRbxEventStream = require(script.Parent.setupSetRbxEventStream)
 
 return {
 	EventStream = {
-		setRBXEventStream = require(script.Parent.setupSetRbxEventStream)(EventIngestService)
+		setRBXEventStream = setupSetRbxEventStream(EventIngestService)
 	},
-	Diag = v3.Diag
+	Diag = analytics.Diag
 }

@@ -1,7 +1,5 @@
 require(script.App.App)
-
 local Constants = require(script.Constants)
-
 require(script.Types)
 
 return {

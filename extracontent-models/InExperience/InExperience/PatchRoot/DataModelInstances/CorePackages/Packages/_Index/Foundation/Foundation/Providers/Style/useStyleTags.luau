@@ -1,28 +1,23 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local TagsContext = require(scriptParent.TagsContext)
+local parent2 = Foundation.Parent
+
+local React = require(parent2.React)
+local TagsContext = require(parent.TagsContext)
 local getFormattedTags = require(Foundation.Utility.getFormattedTags)
 
 require(Foundation.Components.Types)
 
-local function useStyleTags(p1) -- line: 12
-	-- upvalues: getFormattedTags (copy), React (copy), TagsContext (copy)
-	local v9 = getFormattedTags(p1)
-	local v10 = React.useContext(TagsContext)
+local function useStyleTags(p)
+	local formattedTags = getFormattedTags(p)
 
-	React.useLayoutEffect(function() -- line: 16
-		-- upvalues: v9 (copy), v10 (copy)
-		if v9 ~= nil then
-			v10(string.split(v9, " "))
+	local v = React.useContext(TagsContext)
+	React.useLayoutEffect(function()
+		if formattedTags ~= nil then
+			v(string.split(formattedTags, " "))
 		end
-	end, {
-		v9,
-		v10
-	})
-
-	return v9
+	end, { formattedTags, v })
+	return formattedTags
 end
 
 return useStyleTags

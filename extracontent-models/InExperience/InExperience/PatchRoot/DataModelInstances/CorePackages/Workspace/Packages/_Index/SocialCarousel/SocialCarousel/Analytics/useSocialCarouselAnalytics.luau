@@ -1,172 +1,302 @@
 local HttpService = game:GetService("HttpService")
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local React = require(SocialCarouselParent.React)
-local UIBlox = require(SocialCarouselParent.UIBlox)
+local parent = SocialCarousel.Parent
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local UIBlox = require(parent.UIBlox)
+
 local useSocialCarouselContext = require(SocialCarousel.Contexts.useSocialCarouselContext)
 local initializeSocialCarouselAnalytics = require(SocialCarousel.Analytics.initializeSocialCarouselAnalytics)
 local EventNames = require(SocialCarousel.Analytics.EventNames)
-local Tile = require(SocialCarousel.Common.Enums).Tile
-
+local getFriendStatusFromTileType = require(SocialCarousel.Analytics.getFriendStatusFromTileType)
 require(SocialCarousel.Common.Types)
 
 local RetrievalStatus = UIBlox.App.Loading.Enum.RetrievalStatus
-local FFlagSocialCarouselEnableUserSeenEvents = require(SocialCarousel.Flags).FFlagSocialCarouselEnableUserSeenEvents
-local FFlagLuaAppAddSortDataToSocialCarouselClicks = require(SocialCarouselParent.SharedFlags).FFlagLuaAppAddSortDataToSocialCarouselClicks
-local FFlagSocialCarouselShareQREnabled = require(SocialCarouselParent.SharedFlags).FFlagSocialCarouselShareQREnabled
+local Flags = require(SocialCarousel.Flags)
+local FFlagSocialCarouselEnableUserSeenEvents = Flags.FFlagSocialCarouselEnableUserSeenEvents
 
-return function() -- line: 22
-	-- upvalues: FFlagLuaAppAddSortDataToSocialCarouselClicks (copy), useSocialCarouselContext (copy), React (copy), initializeSocialCarouselAnalytics (copy), EventNames (copy), Tile (copy), HttpService (copy), FFlagSocialCarouselEnableUserSeenEvents (copy), FFlagSocialCarouselShareQREnabled (copy), RetrievalStatus (copy)
-	local u14, u15
+local FFlagSocialCarouselLogNewFriendRequestsBadge = require(SocialCarousel.Flags.FFlagSocialCarouselLogNewFriendRequestsBadge)
+local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
+local FFlagLuaAppUserSeenCollectionUnifiedFields = SharedFlags.FFlagLuaAppUserSeenCollectionUnifiedFields
 
-	if FFlagLuaAppAddSortDataToSocialCarouselClicks then
-		u14 = useSocialCarouselContext()
-		u15 = React.useMemo(function() -- line: 28
-			-- upvalues: u14 (ref), initializeSocialCarouselAnalytics (copy)
-			local sortAnalyticsData = u14.sortAnalyticsData
+local repeatValue = SocialLuaAnalytics.Analytics.Formatters.repeatValue
 
-			return initializeSocialCarouselAnalytics({
-				infoForAllEvents = {
-					rowNumber = 1,
-					sortIndex = sortAnalyticsData and sortAnalyticsData.sortIndex or nil,
-					sortId = sortAnalyticsData and sortAnalyticsData.sortId or nil,
-					appPage = sortAnalyticsData and sortAnalyticsData.appPage or nil,
-					feedRowNumber = sortAnalyticsData and sortAnalyticsData.startRow or nil
-				}
-			})
-		end, { u14.sortAnalyticsData })
-	else
-		u15 = initializeSocialCarouselAnalytics()
-		u14 = useSocialCarouselContext()
+return function()
+	local v = useSocialCarouselContext()
+
+	local v2 = React.useMemo(function()
+		local sortAnalyticsData = v.sortAnalyticsData
+		local sortIndex
+
+		if sortAnalyticsData then
+			sortIndex = sortAnalyticsData.sortIndex or nil
+		end
+
+		local sortId
+
+		if sortAnalyticsData then
+			sortId = sortAnalyticsData.sortId or nil
+		end
+
+		local appPage
+
+		if sortAnalyticsData then
+			appPage = sortAnalyticsData.appPage or nil
+		end
+
+		return initializeSocialCarouselAnalytics({
+			infoForAllEvents = {
+				sortIndex = sortIndex,
+				sortId = sortId,
+				appPage = appPage,
+				rowNumber = 1,
+				feedRowNumber = sortAnalyticsData and sortAnalyticsData.startRow or nil
+			}
+		})
+	end, { v.sortAnalyticsData })
+
+	local source = v.source or ""
+
+	local userPressed = React.useCallback(function(data, p)
+		local fireAnalyticsEvent = v2.fireAnalyticsEvent
+		local userPressed = EventNames.UserPressed
+		local v3 = {
+			presence = not data.presence and "Offline" or data.presence.userPresenceType,
+			absolutePosition = p.absolutePosition,
+			positionInRow = p.absolutePosition,
+			friendId = data.id,
+			friendStatus = getFriendStatusFromTileType(data.tileType),
+			recommendationContextType = data.contextType,
+			recommendationRank = data.rank,
+			isRecommendation = data.contextType and true or false,
+			universeId = 0,
+			source = 0,
+			interactionUuid = 0
+		}
+		local universeId
+
+		if data.presence then
+			universeId = data.presence.universeId
+		end
+
+		v3.universeId = universeId
+		v3.source = source
+		v3.interactionUuid = HttpService:GenerateGUID(false)
+		fireAnalyticsEvent(userPressed, v3)
+	end, { source, v2 })
+	local userSeen2
+
+	if FFlagSocialCarouselEnableUserSeenEvents then
+		userSeen2 = React.useCallback(function(data, p)
+			local fireAnalyticsEvent = v2.fireAnalyticsEvent
+			local userSeen = EventNames.UserSeen
+			local v3 = {
+				userId = data.id,
+				presence = not data.presence and "Offline" or data.presence.userPresenceType,
+				absolutePosition = p.absolutePosition,
+				friendStatus = getFriendStatusFromTileType(data.tileType),
+				recommendationContextType = data.contextType,
+				recommendationRank = 0,
+				isRecommendation = 0,
+				source = 0,
+				universeId = 0
+			}
+			local recommendationRank
+
+			if data.contextType then
+				recommendationRank = data.rank
+			end
+
+			v3.recommendationRank = recommendationRank
+			v3.isRecommendation = data.contextType and true or false
+			v3.source = source
+			local universeId
+
+			if data.presence then
+				universeId = data.presence.universeId
+			end
+
+			v3.universeId = universeId
+			fireAnalyticsEvent(userSeen, v3)
+		end, { source })
 	end
 
-	local v16 = u14.source or ""
-	local v17 = React.useCallback(function(p1, p2) -- line: 53
-		-- upvalues: u15 (ref), EventNames (copy), FFlagLuaAppAddSortDataToSocialCarouselClicks (copy), Tile (copy), v16 (copy), HttpService (copy)
-		u15.fireAnalyticsEvent(EventNames.UserPressed, {
-			presence = not p1.presence and "Offline" or p1.presence.userPresenceType,
-			absolutePosition = p2.absolutePosition,
-			positionInRow = if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else p2.absolutePosition,
-			friendId = p1.id,
-			friendStatus = if p1.tileType ~= Tile.Friend then Enum.FriendStatus.NotFriend else Enum.FriendStatus.Friend,
-			recommendationContextType = p1.contextType,
-			recommendationRank = p1.rank,
-			isRecommendation = not not p1.contextType,
-			universeId = if not p1.presence then nil else p1.presence.universeId,
-			source = v16,
-			interactionUuid = HttpService:GenerateGUID(false)
-		})
-	end, {
-		v16,
-		if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else u15
-	})
-	local v18 = if not FFlagSocialCarouselEnableUserSeenEvents then nil else React.useCallback(function(p3, p4) -- line: 79
-		-- upvalues: u15 (ref), EventNames (copy), Tile (copy), v16 (copy)
-		u15.fireAnalyticsEvent(EventNames.UserSeen, {
-			userId = p3.id,
-			presence = not p3.presence and "Offline" or p3.presence.userPresenceType,
-			absolutePosition = p4.absolutePosition,
-			friendStatus = if p3.tileType ~= Tile.Friend then Enum.FriendStatus.NotFriend else Enum.FriendStatus.Friend,
-			recommendationContextType = p3.contextType,
-			recommendationRank = if not p3.contextType then nil else p3.rank,
-			isRecommendation = not not p3.contextType,
-			source = v16,
-			universeId = if not p3.presence then nil else p3.presence.universeId
-		})
-	end, { v16 })
-	local v19 = React.useCallback(function(t1: {[any]: any}) -- line: 97
-		-- upvalues: u15 (ref), EventNames (copy), v16 (copy)
-		u15.fireAnalyticsEvent(EventNames.TilesSeenCollection, {
-			userId = t1.userIds,
-			absolutePosition = t1.absolutePositions,
-			presence = t1.presences,
-			recommendationRank = t1.recommendationRanks,
-			friendStatus = t1.friendStatuses,
-			recommendationContextType = t1.recommendationContextTypes,
-			isRecommendation = t1.isRecommendations,
-			universeId = t1.universeIds,
-			tileCount = t1.tileCount,
-			source = v16,
-			sessionEventCount = t1.sessionEventCount
-		})
-	end, {
-		v16,
-		if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else u15
-	})
-	local v20 = React.useCallback(function(n1: number) -- line: 130
-		-- upvalues: u15 (ref), EventNames (copy), v16 (copy)
-		u15.fireAnalyticsEvent(EventNames.StartSquadPressed, {
-			absolutePosition = n1,
-			source = v16
-		})
-	end, {
-		v16,
-		if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else u15
-	})
-	local v21 = if not FFlagSocialCarouselShareQREnabled then nil else React.useCallback(function(n2: number) -- line: 144
-		-- upvalues: u15 (ref), EventNames (copy), v16 (copy)
-		u15.fireAnalyticsEvent(EventNames.ShareQRPressed, {
-			absolutePosition = n2,
-			source = v16
-		})
-	end, {
-		v16,
-		u15
-	})
-	local v22 = React.useCallback(function(n3: number) -- line: 158
-		-- upvalues: u15 (ref), EventNames (copy), u14 (ref), v16 (copy), HttpService (copy)
-		u15.fireAnalyticsEvent(EventNames.ViewAddFriends, {
-			friendCount = u14.friendCount,
-			absolutePosition = n3,
-			positionInRow = n3,
-			recommendationCount = u14.recommendationCount,
-			requestCount = u14.friendRequestCount,
-			source = v16,
-			interactionUuid = HttpService:GenerateGUID(false)
-		})
-	end, {
-		u14.friendCount,
-		u14.recommendationCount,
-		u14.friendRequestCount,
-		v16,
-		if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else u15
-	})
-	local v23 = React.useCallback(function() -- line: 179
-		-- upvalues: u15 (ref), EventNames (copy), u14 (ref), v16 (copy)
-		u15.fireAnalyticsEvent(EventNames.ViewAllFriends, {
-			friendCount = u14.friendCount,
-			recommendationCount = u14.recommendationCount,
-			source = v16
-		})
-	end, {
-		u14.friendCount,
-		u14.recommendationCount,
-		v16,
-		if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else u15
-	})
-	local v24 = React.useCallback(function(s1: string, n4: number) -- line: 195
-		-- upvalues: u15 (ref), EventNames (copy), RetrievalStatus (copy), v16 (copy)
-		local v36 = if not not n4 and (typeof(n4) == "number" and not (n4 < 0)) then n4 else 0
+	local tilesSeenCollection = React.useCallback(function(data)
+		local sortAnalyticsData
 
-		u15.fireAnalyticsEvent(EventNames.FriendsCarouselUILoadingTime, {
-			loadingTime = v36,
-			fetch = s1,
-			status = RetrievalStatus.Done.rawValue(),
-			source = v16
+		if FFlagLuaAppUserSeenCollectionUnifiedFields then
+			sortAnalyticsData = v.sortAnalyticsData
+		end
+
+		local startRow
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields and sortAnalyticsData then
+			startRow = sortAnalyticsData.startRow
+		end
+
+		local fireAnalyticsEvent = v2.fireAnalyticsEvent
+		local tilesSeenCollection = EventNames.TilesSeenCollection
+		local v3 = {
+			userId = data.userIds,
+			absolutePosition = data.absolutePositions,
+			presence = data.presences,
+			recommendationRank = data.recommendationRanks,
+			friendStatus = data.friendStatuses,
+			recommendationContextType = data.recommendationContextTypes,
+			isRecommendation = data.isRecommendations,
+			universeId = data.universeIds,
+			tileCount = data.tileCount,
+			source = source,
+			sessionEventCount = data.sessionEventCount,
+			contentType = 0,
+			interactionUuid = 0,
+			collectionId = 0,
+			collectionPosition = 0,
+			positionsInRow = 0,
+			rowNumbers = 0,
+			feedRowNumbers = 0,
+			totalNumberOfItems = 0
+		}
+		local contentType
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields then
+			contentType = data.contentType
+		end
+
+		v3.contentType = contentType
+		local interactionUuid
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields then
+			interactionUuid = HttpService:GenerateGUID(false)
+		end
+
+		v3.interactionUuid = interactionUuid
+		local collectionId
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields and sortAnalyticsData then
+			collectionId = sortAnalyticsData.sortId
+		end
+
+		v3.collectionId = collectionId
+		local collectionPosition
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields and sortAnalyticsData then
+			collectionPosition = sortAnalyticsData.sortIndex
+		end
+
+		v3.collectionPosition = collectionPosition
+		local positionsInRow
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields then
+			positionsInRow = data.absolutePositions
+		end
+
+		v3.positionsInRow = positionsInRow
+		local rowNumbers
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields then
+			rowNumbers = repeatValue(1, data.tileCount)
+		end
+
+		v3.rowNumbers = rowNumbers
+		local feedRowNumbers
+
+		if FFlagLuaAppUserSeenCollectionUnifiedFields and startRow then
+			feedRowNumbers = repeatValue(startRow, data.tileCount)
+		end
+
+		v3.feedRowNumbers = feedRowNumbers
+
+		v3.totalNumberOfItems = FFlagLuaAppUserSeenCollectionUnifiedFields and #v.tiles or nil
+		fireAnalyticsEvent(tilesSeenCollection, v3)
+	end, { source, v2, v.sortAnalyticsData, v.tiles })
+
+	local startSquadPressed = React.useCallback(function(absolutePosition: number)
+		v2.fireAnalyticsEvent(EventNames.StartSquadPressed, {
+			absolutePosition = absolutePosition,
+			source = source
 		})
-	end, {
-		v16,
-		if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else u15
-	})
+	end, { source, v2 })
+	local shareQRPressed
+
+	if FFlagSocialCarouselShareQREnabled then
+		shareQRPressed = React.useCallback(function(absolutePosition: number)
+			v2.fireAnalyticsEvent(EventNames.ShareQRPressed, {
+				absolutePosition = absolutePosition,
+				source = source
+			})
+		end, { source, v2 })
+	end
+
+	local addFriendsPressed = React.useCallback(function(p: number)
+		v2.fireAnalyticsEvent(EventNames.ViewAddFriends, {
+			friendCount = v.friendCount,
+			absolutePosition = p,
+			positionInRow = p,
+			recommendationCount = v.recommendationCount,
+			requestCount = v.friendRequestCount,
+			source = source,
+			interactionUuid = HttpService:GenerateGUID(false)
+		})
+	end, { v.friendCount, v.recommendationCount, v.friendRequestCount, source, v2 })
+	local addFriendsTileSeen
+
+	if FFlagSocialCarouselLogNewFriendRequestsBadge then
+		addFriendsTileSeen = React.useCallback(function(data)
+			v2.fireAnalyticsEvent(EventNames.AddFriendsTileSeen, {
+				newRequestCount = data.newRequestCount,
+				previousCount = data.previousCount,
+				trigger = data.trigger,
+				badgeEnabled = data.badgeEnabled,
+				badgeShown = data.badgeShown,
+				badgeCapped = data.badgeCapped,
+				absolutePosition = data.absolutePosition,
+				source = source
+			})
+		end, { source, v2 })
+	end
+
+	local friendsHeaderPressed = React.useCallback(function()
+		v2.fireAnalyticsEvent(EventNames.ViewAllFriends, {
+			friendCount = v.friendCount,
+			recommendationCount = v.recommendationCount,
+			source = source
+		})
+	end, { v.friendCount, v.recommendationCount, source, v2 })
+
+	local reportLoadingEvent = React.useCallback(function(fetch: string, value: number)
+		local loadingTime = (not value or typeof(value) ~= "number" or value < 0) and 0 or value
+
+		v2.fireAnalyticsEvent(EventNames.FriendsCarouselUILoadingTime, {
+			loadingTime = loadingTime,
+			fetch = fetch,
+			status = RetrievalStatus.Done.rawValue(),
+			source = source
+		})
+	end, { source, v2 })
+
+	if not FFlagSocialCarouselEnableUserSeenEvents then
+		userSeen2 = nil
+	end
+
+	if not FFlagSocialCarouselLogNewFriendRequestsBadge then
+		addFriendsTileSeen = nil
+	end
+
+	if not FFlagSocialCarouselShareQREnabled then
+		shareQRPressed = nil
+	end
 
 	return {
-		userPressed = v17,
-		userSeen = if not FFlagSocialCarouselEnableUserSeenEvents then nil else v18,
-		tilesSeenCollection = v19,
-		addFriendsPressed = v22,
-		friendsHeaderPressed = v23,
-		reportLoadingEvent = v24,
-		startSquadPressed = v20,
-		shareQRPressed = if not FFlagSocialCarouselShareQREnabled then nil else v21
+		userPressed = userPressed,
+		userSeen = userSeen2,
+		tilesSeenCollection = tilesSeenCollection,
+		addFriendsPressed = addFriendsPressed,
+		addFriendsTileSeen = addFriendsTileSeen,
+		friendsHeaderPressed = friendsHeaderPressed,
+		reportLoadingEvent = reportLoadingEvent,
+		startSquadPressed = startSquadPressed,
+		shareQRPressed = shareQRPressed
 	}
 end

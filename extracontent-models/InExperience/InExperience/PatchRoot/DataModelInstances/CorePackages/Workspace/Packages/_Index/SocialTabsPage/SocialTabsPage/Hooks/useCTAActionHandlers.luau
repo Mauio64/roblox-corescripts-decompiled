@@ -1,32 +1,37 @@
 local GuiService = game:GetService("GuiService")
+
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local React = require(SocialTabsPageParent.React)
-local RoactUtils = require(SocialTabsPageParent.RoactUtils)
-local RobloxAppHooks = require(SocialTabsPageParent.RobloxAppHooks)
-local SocialCommon = require(SocialTabsPageParent.SocialCommon)
-local Localization = require(SocialTabsPageParent.Localization)
-local FriendsNetworking = require(SocialTabsPageParent.FriendsNetworking)
+local parent = SocialTabsPage.Parent
+
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local SocialCommon = require(parent.SocialCommon)
+local Localization = require(parent.Localization)
+local FriendsNetworking = require(parent.FriendsNetworking)
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useLocalUserId = RobloxAppHooks.useLocalUserId
 local useLocalization = Localization.Hooks.useLocalization
-local EnteredChatFromEntryPoint = require(SocialTabsPageParent.AppChat.EnteredChatFromEntryPoint)
+local EnteredChatFromEntryPoint = require(parent.AppChat.EnteredChatFromEntryPoint)
 local ChatEntryPointNames = SocialCommon.Enums.ChatEntryPointNames
 local FriendshipOriginSourceType = FriendsNetworking.Enums.FriendshipOriginSourceType
-local ButtonTypes = require(SocialTabsPageParent.UserList).Enums.ButtonTypes
+
+local UserList = require(parent.UserList)
+local ButtonTypes = UserList.Enums.ButtonTypes
+
 local TextKeys = require(SocialTabsPage.Common.TextKeys)
-
 require(SocialTabsPage.Common.Types)
-
 local friendingActions = require(SocialTabsPage.Utils.friendingActions)
-local NotificationTypeList = GuiService:GetNotificationTypeList()
 
-local function useCTAActionHandlers() -- line: 31
-	-- upvalues: useDispatch (copy), useLocalUserId (copy), React (copy), useLocalization (copy), TextKeys (copy), ButtonTypes (copy), EnteredChatFromEntryPoint (copy), ChatEntryPointNames (copy), GuiService (copy), NotificationTypeList (copy), friendingActions (copy), FriendshipOriginSourceType (copy)
-	local v21 = useDispatch()
-	local v22 = useLocalUserId()
-	local v23 = React.useRef({})
-	local v24 = useLocalization({
+local notificationTypeList = GuiService:GetNotificationTypeList()
+
+local function useCTAActionHandlers()
+	local dispatch = useDispatch()
+	local currentUserId = useLocalUserId()
+	local ref = React.useRef({})
+
+	local localized = useLocalization({
 		friendRequestSent = TextKeys.FriendRequestSent,
 		friendAdded = TextKeys.FriendAdded,
 		invalidTargetUserError = TextKeys.InvalidTargetUserError,
@@ -41,55 +46,47 @@ local function useCTAActionHandlers() -- line: 31
 		defaultFriendingError = TextKeys.DefaultFriendingError
 	})
 
-	return React.useMemo(function() -- line: 51
-		-- upvalues: ButtonTypes (copy), v21 (copy), EnteredChatFromEntryPoint (copy), ChatEntryPointNames (copy), GuiService (copy), NotificationTypeList (copy), v23 (copy), friendingActions (copy), v22 (copy), FriendshipOriginSourceType (copy), v24 (copy)
+	return React.useMemo(function()
 		return {
-			[ButtonTypes.Chat] = function(s1: string) -- line: 53
-				-- upvalues: v21 (copy), EnteredChatFromEntryPoint (copy), ChatEntryPointNames (copy), GuiService (copy), NotificationTypeList (copy)
-				v21(EnteredChatFromEntryPoint(ChatEntryPointNames.SocialTab))
-				GuiService:BroadcastNotification(s1, NotificationTypeList.LAUNCH_CONVERSATION)
+			[ButtonTypes.Chat] = function(p: string)
+				dispatch(EnteredChatFromEntryPoint(ChatEntryPointNames.SocialTab))
+				GuiService:BroadcastNotification(p, notificationTypeList.LAUNCH_CONVERSATION)
 			end,
-			[ButtonTypes.Add] = function(s2: string) -- line: 58
-				-- upvalues: v23 (copy), friendingActions (copy), v21 (copy), v22 (copy), FriendshipOriginSourceType (copy), v24 (copy)
-				if v23.current[s2] then
+			[ButtonTypes.Add] = function(targetUserId: string)
+				if ref.current[targetUserId] then
 					return
 				end
 
-				v23.current[s2] = true
+				ref.current[targetUserId] = true
+
 				friendingActions.executeAddFriend({
-					dispatch = v21,
-					currentUserId = v22,
-					targetUserId = s2,
+					dispatch = dispatch,
+					currentUserId = currentUserId,
+					targetUserId = targetUserId,
 					friendshipOriginSourceType = FriendshipOriginSourceType.UserProfile.rawValue(),
-					localized = v24
-				}):finally(function() -- line: 71
-					-- upvalues: v23 (copy), s2 (copy)
-					v23.current[s2] = nil
+					localized = localized
+				}):finally(function()
+					ref.current[targetUserId] = nil
 				end)
 			end,
-			[ButtonTypes.Accept] = function(s3: string) -- line: 76
-				-- upvalues: v23 (copy), friendingActions (copy), v21 (copy), v22 (copy), v24 (copy)
-				if v23.current[s3] then
+			[ButtonTypes.Accept] = function(targetUserId: string)
+				if ref.current[targetUserId] then
 					return
 				end
 
-				v23.current[s3] = true
+				ref.current[targetUserId] = true
+
 				friendingActions.executeAcceptFriendRequest({
-					dispatch = v21,
-					currentUserId = v22,
-					targetUserId = s3,
-					localized = v24
-				}):finally(function() -- line: 88
-					-- upvalues: v23 (copy), s3 (copy)
-					v23.current[s3] = nil
+					dispatch = dispatch,
+					currentUserId = currentUserId,
+					targetUserId = targetUserId,
+					localized = localized
+				}):finally(function()
+					ref.current[targetUserId] = nil
 				end)
 			end
 		}
-	end, {
-		v21,
-		v22,
-		v24
-	})
+	end, { dispatch, currentUserId, localized })
 end
 
 return useCTAActionHandlers

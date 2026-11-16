@@ -1,130 +1,212 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
 require(AppChat.types)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local UIBlox = require(AppChatParent.UIBlox)
+local UIBlox = require(parent.UIBlox)
 local useEffect = React.useEffect
 local useMemo = React.useMemo
 local useStyle = UIBlox.Core.Style.useStyle
 local ButtonStack = UIBlox.App.Button.ButtonStack
-local Enum2 = UIBlox.App.Button.Enum
-local useTokens = require(AppChatParent.Foundation).Hooks.useTokens
+local enum = UIBlox.App.Button.Enum
+
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
-local t1 = {
+
+local v = {
 	bodyText = "Placeholder body",
+	onHeightChanged = function(_) end,
 	onAccepted = nil,
-	onDenied = nil,
-	onHeightChanged = function(_) -- line: 43
-	end
+	onDenied = nil
 }
 
-local function ConversationModal(t2: {[any]: any}) -- line: 51
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useTokens (copy), useIsInExperience (copy), useChatPagePadding (copy), useEffect (copy), useMemo (copy), Enum2 (copy), React (copy), ButtonStack (copy)
-	local v18 = Cryo.Dictionary.join(t1, t2)
-	local v19 = useStyle()
-	local v20 = v18.style or v19
-	local v21 = useTokens()
-	local v22 = useIsInExperience()
-	local Size_1000 = v20.Tokens.Size.Size_1000
-	local Size_500 = v20.Tokens.Size.Size_500
-	local v25 = useChatPagePadding()
+local function ConversationModal(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local v2 = useStyle()
+	local style = joined.style or v2
+	local v3 = useTokens()
+	local v4 = useIsInExperience()
 
-	useEffect(function() -- line: 62
-		-- upvalues: v18 (copy)
-		return function() -- line: 63
-			-- upvalues: v18 (copy)
-			v18.onHeightChanged(0)
+	local size_1000 = style.Tokens.Size.Size_1000
+	local v5 = style.Tokens.Size.Size_500
+	local v6 = useChatPagePadding()
+
+	useEffect(function()
+		return function()
+			joined.onHeightChanged(0)
 		end
 	end, {})
 
-	local v26 = useMemo(function() -- line: 68
-		-- upvalues: v18 (copy), Enum2 (copy)
-		local t3 = {}
+	local buttons = useMemo(function()
+		local v7 = {}
 
-		if v18.denyText then
-			table.insert(t3, {
-				buttonType = Enum2.ButtonType.Secondary,
+		if joined.denyText then
+			table.insert(v7, {
+				buttonType = enum.ButtonType.Secondary,
 				props = {
-					onActivated = v18.onDenied,
-					text = v18.denyText,
-					isDisabled = v18.loading
+					onActivated = joined.onDenied,
+					text = joined.denyText,
+					isDisabled = joined.loading
 				}
 			})
 		end
 
-		if v18.acceptText then
-			table.insert(t3, {
-				buttonType = Enum2.ButtonType.PrimarySystem,
+		if joined.acceptText then
+			table.insert(v7, {
+				buttonType = enum.ButtonType.PrimarySystem,
 				props = {
-					onActivated = v18.onAccepted,
-					text = v18.acceptText,
-					isDisabled = v18.loading
+					onActivated = joined.onAccepted,
+					text = joined.acceptText,
+					isDisabled = joined.loading
 				}
 			})
 		end
 
-		return t3
-	end, {
-		v18.acceptText,
-		v18.denyText,
-		v18.loading,
-		v18.onDenied,
-		v18.onAccepted
-	})
+		return v7
+	end, { joined.acceptText, joined.denyText, joined.loading, joined.onDenied, joined.onAccepted })
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local backgroundTransparency
+
+	if v4 then
+		backgroundTransparency = v3.Color.OverMedia.OverMedia_100.Transparency
+	else
+		backgroundTransparency = style.Theme.SystemPrimaryContent.Transparency
+	end
+
+	local backgroundColor
+
+	if v4 then
+		backgroundColor = v3.Color.OverMedia.OverMedia_100.Color3
+	else
+		backgroundColor = style.Theme.SystemPrimaryContent.Color
+	end
+
+	local v7 = {
 		Name = "ConversationModal",
-		BackgroundTransparency = if not v22 then v20.Theme.SystemPrimaryContent.Transparency else v21.Color.OverMedia.OverMedia_100.Transparency,
-		BackgroundColor3 = if not v22 then v20.Theme.SystemPrimaryContent.Color else v21.Color.OverMedia.OverMedia_100.Color3,
+		BackgroundTransparency = backgroundTransparency,
+		BackgroundColor3 = backgroundColor,
 		BorderSizePixel = 0,
-		LayoutOrder = v18.layoutOrder,
+		LayoutOrder = joined.layoutOrder,
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		[React.Change.AbsoluteSize] = function(p2) -- line: 105
-			-- upvalues: v18 (copy)
-			v18.onHeightChanged(p2.AbsoluteSize.Y)
+		[React.Change.AbsoluteSize] = function(p2)
+			joined.onHeightChanged(p2.AbsoluteSize.Y)
 		end
-	}, {
-		ContentPadding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, if v18.paddingTop == nil then Size_500 else v18.paddingTop),
-			PaddingBottom = UDim.new(0, if v18.paddingBottom == nil then Size_500 else v18.paddingBottom),
-			PaddingLeft = UDim.new(0, v25.left),
-			PaddingRight = UDim.new(0, v25.right)
-		}),
-		UIListLayout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			Padding = UDim.new(0, if v18.verticalSpacing == nil then Size_500 else v18.verticalSpacing),
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			VerticalAlignment = Enum.VerticalAlignment.Top
-		}),
-		Body = React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			TextWrapped = true,
-			TextSize = v20.Tokens.FontSize.FontSize_300,
-			Font = v20.Font.Body.Font,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Text = v18.bodyText,
-			TextColor3 = v20.Theme.TextDefault.Color,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Center
-		}),
-		Buttons = if not (#v26 > 0) then nil else React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, Size_1000)
-		}, {
-			ButtonStack = React.createElement(ButtonStack, {
-				forcedFillDirection = Enum.FillDirection.Horizontal,
-				buttons = v26
-			})
-		})
-	})
+	}
+
+	local createElement2 = React.createElement
+	local v8
+
+	if joined.paddingTop == nil then
+		v8 = v5
+	else
+		v8 = joined.paddingTop
+	end
+
+	local v9 = {
+		PaddingTop = UDim.new(0, v8),
+		PaddingBottom = 0,
+		PaddingLeft = 0,
+		PaddingRight = 0
+	}
+	local v10
+
+	if joined.paddingBottom == nil then
+		v10 = v5
+	else
+		v10 = joined.paddingBottom
+	end
+
+	v9.PaddingBottom = UDim.new(0, v10)
+	v9.PaddingLeft = UDim.new(0, v6.left)
+	v9.PaddingRight = UDim.new(0, v6.right)
+	local children = {
+		ContentPadding = createElement2("UIPadding", v9),
+		UIListLayout = 0,
+		Body = 0,
+		Buttons = 0
+	}
+
+	local createElement3 = React.createElement
+	local v11 = {
+		FillDirection = Enum.FillDirection.Vertical,
+		Padding = 0,
+		SortOrder = 0,
+		VerticalAlignment = 0
+	}
+
+	if joined.verticalSpacing ~= nil then
+		v5 = joined.verticalSpacing
+	end
+
+	v11.Padding = UDim.new(0, v5)
+	v11.SortOrder = Enum.SortOrder.LayoutOrder
+	v11.VerticalAlignment = Enum.VerticalAlignment.Top
+	children.UIListLayout = createElement3("UIListLayout", v11)
+
+	local createElement4 = React.createElement
+	local v12 = {
+		BackgroundTransparency = 1,
+		TextSize = style.Tokens.FontSize.FontSize_300,
+		Font = 0,
+		FontFace = 0,
+		LayoutOrder = 1,
+		Size = 0,
+		AutomaticSize = 0,
+		Text = 0,
+		TextWrapped = true,
+		TextColor3 = 0,
+		TextXAlignment = 0,
+		TextYAlignment = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = style.Font.Body.Font
+	end
+
+	v12.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v3.Typography.BodyLarge.Font)
+	end
+
+	v12.FontFace = fontFace
+
+	v12.Size = UDim2.new(1, 0, 0, 0)
+	v12.AutomaticSize = Enum.AutomaticSize.Y
+	v12.Text = joined.bodyText
+
+	v12.TextColor3 = style.Theme.TextDefault.Color
+	v12.TextXAlignment = Enum.TextXAlignment.Left
+	v12.TextYAlignment = Enum.TextYAlignment.Center
+	children.Body = createElement4("TextLabel", v12)
+	local buttons2
+
+	if #buttons > 0 then
+		buttons2 = React.createElement(
+			"Frame",
+			{ BackgroundTransparency = 1, LayoutOrder = 2, Size = UDim2.new(1, 0, 0, size_1000) },
+			{
+				ButtonStack = React.createElement(ButtonStack, {
+					forcedFillDirection = Enum.FillDirection.Horizontal,
+					buttons = buttons
+				})
+			}
+		)
+	end
+
+	children.Buttons = buttons2
+	return createElement("Frame", v7, children)
 end
 
 return ConversationModal

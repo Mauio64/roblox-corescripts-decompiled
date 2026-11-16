@@ -1,8 +1,8 @@
-local ParentParent = script.Parent.Parent.Parent
-local console = require(ParentParent.LuauPolyfill).console
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local console = LuauPolyfill.console
 
-local function infoLog(...) -- line: 18
-	-- upvalues: console (copy)
+local function infoLog(...)
 	return console.log(...)
 end
 

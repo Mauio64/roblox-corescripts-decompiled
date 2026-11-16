@@ -1,19 +1,26 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local FFlagAXColorAdjustmentButtonShouldAccountForTryOns = require(Parent.AvatarExperienceFlags).FFlagAXColorAdjustmentButtonShouldAccountForTryOns
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXColorAdjustmentButtonShouldAccountForTryOns = AvatarExperienceFlags.FFlagAXColorAdjustmentButtonShouldAccountForTryOns
+
 local selectAvatarPreviewColors = require(script.Parent.selectAvatarPreviewColors)
 
-local function selectColorAdjustmentButtonColor(p1) -- line: 8
-	-- upvalues: FFlagAXColorAdjustmentButtonShouldAccountForTryOns (copy), selectAvatarPreviewColors (copy)
-	local v6 = if not FFlagAXColorAdjustmentButtonShouldAccountForTryOns then p1.AvatarExperience.AvatarEditor.Character.BodyColor3s else selectAvatarPreviewColors(p1)
+local function selectColorAdjustmentButtonColor(p)
+	local v
 
-	if v6 then
-		local headColor3 = v6.headColor3
-		local torsoColor3 = v6.torsoColor3
-
-		return headColor3 or (torsoColor3 or Color3.new())
+	if FFlagAXColorAdjustmentButtonShouldAccountForTryOns then
+		v = selectAvatarPreviewColors(p)
+	else
+		v = p.AvatarExperience.AvatarEditor.Character.BodyColor3s
 	end
 
-	return Color3.new()
+	if not v then
+		return Color3.new()
+	end
+
+	local headColor3 = v.headColor3
+	local torsoColor3 = v.torsoColor3
+	return headColor3 or torsoColor3 or Color3.new()
 end
 
 return selectColorAdjustmentButtonColor

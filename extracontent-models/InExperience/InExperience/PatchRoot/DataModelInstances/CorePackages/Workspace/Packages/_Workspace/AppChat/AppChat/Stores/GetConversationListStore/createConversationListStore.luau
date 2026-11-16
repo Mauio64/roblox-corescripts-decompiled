@@ -1,13 +1,18 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Signals = require(AppChatParent.Signals)
+local parent = AppChat.Parent
 
+local Signals = require(parent.Signals)
 require(AppChat.Stores.GetConversationStore.createConversationStore)
 
+require(AppChat.Stores.GetConversationViewModelStore.createConversationViewModelStore)
 local getConversationIds = require(AppChat.Utils.getConversationIds)
+local searchIntroducedConversationIds = require(AppChat.Stores.searchIntroducedConversationIds)
+local FFlagAppChatAnyServerSideConversationSearch = require(AppChat.Flags.FFlagAppChatAnyServerSideConversationSearch)
 
-local function getLastUpdatedUnixTime(p1) -- line: 23
-	local lastUpdated = p1.lastUpdated
+local FFlagAppChatDerivedConversationLatestActivity = require(AppChat.Flags.FFlagAppChatDerivedConversationLatestActivity)
+
+local function getLastUpdatedUnixTime(p) -- 2 equivalent calls inferred from this helper
+	local lastUpdated = p.lastUpdated
 
 	if lastUpdated == nil then
 		return nil
@@ -23,102 +28,123 @@ local function getLastUpdatedUnixTime(p1) -- line: 23
 
 	return nil
 end
-local function conversationSortPredicate(p2, p3) -- line: 37
-	local lastUpdated = p2.lastUpdated
-	local v15 = if lastUpdated ~= nil then if typeof(lastUpdated) ~= "DateTime" then if type(lastUpdated) ~= "table" or lastUpdated.GetUnixTimestamp == nil then nil else lastUpdated:GetUnixTimestamp() else lastUpdated.UnixTimestamp else nil
-	local lastUpdated2 = p3.lastUpdated
-	local v17 = if lastUpdated2 ~= nil then if typeof(lastUpdated2) ~= "DateTime" then if type(lastUpdated2) ~= "table" or lastUpdated2.GetUnixTimestamp == nil then nil else lastUpdated2:GetUnixTimestamp() else lastUpdated2.UnixTimestamp else nil
 
-	if v15 ~= nil and v17 ~= nil then
-		return v17 < v15
+local function compareConversations(p, p2, p3: number?, p4: number?): boolean -- 2 equivalent calls inferred from this helper
+	if p3 ~= nil and p4 ~= nil then
+		return p4 < p3
 	end
 
-	if v15 == nil and v17 == nil then
-		return string.lower(p2.title or "") < string.lower(p3.title or "")
+	if p3 == nil and p4 == nil then
+		return string.lower(p.title or "") < string.lower(p2.title or "")
 	end
 
-	return v15 ~= nil
+	return p3 ~= nil
 end
-local function containsAllFrozenConversations(t1: {[any]: any}, t2: {[any]: any}) -- line: 48
-	for _, v21 in t2 do
-		if table.find(t1, v21) == nil then
+
+local function compareByServerLastUpdated(p, p2)
+	return compareConversations(p, p2, getLastUpdatedUnixTime(p), getLastUpdatedUnixTime(p2)) -- inferred equivalent call
+end
+
+local function sortByLatestActivity(conversations, p, p2)
+	local v = {}
+
+	for _, item in conversations do
+		v[item.id] = p.getUnixTime(item.id)(p2)
+	end
+
+	table.sort(conversations, function(a, b)
+		return compareConversations(a, b, v[a.id], v[b.id]) -- inferred equivalent call
+	end)
+end
+
+local function containsAllFrozenConversations(conversationIds, items): boolean
+	for _, item in items do
+		if table.find(conversationIds, item) == nil then
 			return false
 		end
 	end
 
 	return true
 end
-local function getSortedConversations(p4, p5) -- line: 57
-	-- upvalues: conversationSortPredicate (copy)
-	local v24 = p4.getConversations(p5)
 
-	table.sort(v24, conversationSortPredicate)
+local function excludeSearchIntroduced(conversations)
+	local result = {}
 
-	return v24
+	for _, item in conversations do
+		if not searchIntroducedConversationIds.has(item.id) then
+			table.insert(result, item)
+		end
+	end
+
+	return result
 end
-local function createConversationListStore(p6) -- line: 63
-	-- upvalues: Signals (copy), conversationSortPredicate (copy), getConversationIds (copy), containsAllFrozenConversations (copy)
-	local u26 = nil
-	local v27, v28 = Signals.createSignal(false)
 
-	p6.addClearListener(function() -- line: 67
-		-- upvalues: u26 (ref), v28 (copy)
-		u26 = nil
-		v28(false)
+local function getSortedConversations(data, p, p2) -- 1 equivalent call inferred from this helper
+	local conversations = data.getConversations(p2)
+
+	if FFlagAppChatAnyServerSideConversationSearch then
+		conversations = excludeSearchIntroduced(conversations)
+	end
+
+	if FFlagAppChatDerivedConversationLatestActivity then
+		sortByLatestActivity(conversations, p, p2)
+		return conversations
+	end
+
+	table.sort(conversations, compareByServerLastUpdated)
+	return conversations
+end
+
+local function createConversationListStore(data, p)
+	local v = nil
+	local signal, v2 = Signals.createSignal(false)
+
+	data.addClearListener(function()
+		v = nil
+		v2(false)
 	end)
 
-	local function getOrderedConversationIds(p7) -- line: 72
-		-- upvalues: p6 (copy), conversationSortPredicate (copy), getConversationIds (copy), v27 (copy), u26 (ref), containsAllFrozenConversations (copy)
-		local v31 = p6.getConversations(p7)
+	local function getOrderedConversationIds(p2)
+		local conversationIds = getConversationIds(getSortedConversations(data, p, p2)) -- inferred equivalent call
 
-		table.sort(v31, conversationSortPredicate)
-
-		local v32 = getConversationIds(v31)
-
-		if v27(p7) == true and u26 ~= nil then
-			if #v32 == 0 then
-				u26 = nil
-
-				return {}
-			end
-
-			if not containsAllFrozenConversations(v32, u26) then
-				u26 = v32
-
-				return v32
-			end
-
-			return u26
+		if signal(p2) ~= true or v == nil then
+			v = conversationIds
+			return conversationIds
 		end
 
-		u26 = v32
+		if #conversationIds == 0 then
+			v = nil
+			return {}
+		end
 
-		return v32
+		if containsAllFrozenConversations(conversationIds, v) then
+			return v
+		end
+
+		v = conversationIds
+		return conversationIds
 	end
 
 	return {
 		getOrderedConversationIds = getOrderedConversationIds,
-		getConversations = function(p8) -- line: 93
-			-- upvalues: getOrderedConversationIds (copy), p6 (copy)
-			local t3 = {}
+		getConversations = function(p2)
+			local conversations = {}
 
-			for _, v36 in getOrderedConversationIds(p8) do
-				local v37 = p6.getConversation(v36, p8)
+			for _, v3 in getOrderedConversationIds(p2) do
+				local conversation = data.getConversation(v3, p2)
 
-				if v37 ~= nil then
-					table.insert(t3, v37)
+				if conversation ~= nil then
+					table.insert(conversations, conversation)
 				end
 			end
 
-			return t3
+			return conversations
 		end,
-		getListStatus = function(p9) -- line: 104
-			-- upvalues: p6 (copy)
-			return p6.getListStatus(p9)
+		getListStatus = function(p2)
+			return data.getListStatus(p2)
 		end,
-		setLatestMessagesFetching = function(b1: boolean) -- line: 108
-			-- upvalues: v28 (copy)
-			v28(b1)
+		setLatestMessagesFetching = function(flag: boolean)
+			v2(flag)
 		end
 	}
 end

@@ -1,18 +1,15 @@
-local GuiService = game:GetService("GuiService")
-local Parent = script:FindFirstAncestor("Responsive").Parent
-local GetFFlagApplyResolutionScale = require(Parent.SharedFlags).GetFFlagApplyResolutionScale
+local parent = script:FindFirstAncestor("Responsive").Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local isTenFootInterface = AppCommonLib.isTenFootInterface
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagApplyResolutionScale = SharedFlags.GetFFlagApplyResolutionScale
 
-function getVirtualResolutionScale() -- line: 8
-	-- upvalues: GetFFlagApplyResolutionScale (copy), GuiService (copy)
+function getVirtualResolutionScale(): nil | number
 	if not GetFFlagApplyResolutionScale() then
 		return nil
 	end
 
-	if GuiService:IsTenFootInterface() then
-		return 1.5
-	end
-
-	return 1
+	return if isTenFootInterface() then 1.5 else 1
 end
 
 return getVirtualResolutionScale

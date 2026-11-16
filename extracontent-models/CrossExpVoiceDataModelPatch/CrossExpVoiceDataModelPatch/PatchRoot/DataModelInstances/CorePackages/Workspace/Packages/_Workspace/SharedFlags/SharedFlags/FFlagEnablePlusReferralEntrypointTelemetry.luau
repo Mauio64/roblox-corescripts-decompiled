@@ -1,0 +1,3 @@
+local FFlagEnablePlusReferralLandingSheet = require(script.Parent.FFlagEnablePlusReferralLandingSheet)
+
+return game:DefineFastFlag("EnablePlusReferralEntrypointTelemetry", false) and FFlagEnablePlusReferralLandingSheet

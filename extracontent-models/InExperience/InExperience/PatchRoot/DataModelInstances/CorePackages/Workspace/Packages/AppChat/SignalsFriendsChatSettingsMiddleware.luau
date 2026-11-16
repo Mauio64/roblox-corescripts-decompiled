@@ -1,3 +1,3 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
 
-return require(_Workspace.AppChat.AppChat.Middleware.SignalsFriendsChatSettingsMiddleware)
+return require(Workspace.AppChat.AppChat.Middleware.SignalsFriendsChatSettingsMiddleware)

@@ -1,264 +1,369 @@
 local SessionService = game:GetService("SessionService")
+
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
 
-require(AppChatParent.ReactFocusNavigation)
-
-local Responsive = require(AppChatParent.Responsive)
-local UIBlox = require(AppChatParent.UIBlox)
-local UserLib = require(AppChatParent.UserLib)
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local React = require(parent.React)
+require(parent.ReactFocusNavigation)
+local Responsive = require(parent.Responsive)
+local UIBlox = require(parent.UIBlox)
+local UserLib = require(parent.UserLib)
+local RoactUtils = require(parent.RoactUtils)
+local SocialCommon = require(parent.SocialCommon)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local Constants = UIBlox.App.Style.Constants
-local AppSessionService = require(AppChatParent.RoactServiceTags).AppSessionService
-local RoactServices = require(AppChatParent.RoactServices).RoactServices
+
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppSessionService = RoactServiceTags.AppSessionService
+local RoactServices = require(parent.RoactServices)
+local roactServices = RoactServices.RoactServices
+
 local SetAppLoaded = require(AppChat.Actions.SetAppLoaded)
+local GetAppLoadedStore = require(AppChat.Stores.GetAppLoadedStore)
+local FFlagAppChatUseSignalsForAppLoaded = require(AppChat.Flags.FFlagAppChatUseSignalsForAppLoaded)
+local EnteredChatFromEntryPoint = require(AppChat.Actions.EnteredChatFromEntryPoint)
+
 local InExperienceAppChatContainer = require(AppChat.App.InExperienceAppChatContainer)
 local getAllFriendsAsync = require(AppChat.Conversations.Thunks.getAllFriendsAsync)
 local getLocalUserFriendsCount = require(AppChat.Conversations.Thunks.getLocalUserFriendsCount)
 local GetLocalUser = UserLib.Thunks.GetLocalUser
+
 local LayerCollectorProvider = UIBlox.Core.Layout.LayerCollector.LayerCollectorProvider
+
 local AppChatToastManagerInExp = require(AppChat.App.AppChatToastManagerInExp)
 local AppChatPersistentEventReceivers = require(AppChat.Components.EventReceivers.AppChatPersistentEventReceivers)
 local useIsAppChatVisible = require(AppChat.App.Hooks.useIsAppChatVisible)
 local usePreventExperienceControls = require(AppChat.App.Hooks.usePreventExperienceControls)
 local useAppChatUpdateSession = require(AppChat.Hooks.useAppChatUpdateSession)
-local Style = require(AppChatParent.Style)
+local usePartyChatReactiveFeatureRestriction = require(AppChat.Hooks.usePartyChatReactiveFeatureRestriction)
+
+local Style = require(parent.Style)
 local UiModeStyleProvider = Style.UiModeStyleProvider
 local DesignTokenProvider = Style.DesignTokenProvider
-local SquadEventReceiver = require(AppChatParent.SquadsCore.SquadEventReceiver)
-local SquadOverlay = require(AppChatParent.SquadsCore.SquadOverlay)
+local SquadEventReceiver = require(parent.SquadsCore.SquadEventReceiver)
+local SquadOverlay = require(parent.SquadsCore.SquadOverlay)
+
 local useParentContainerVisibilitySignal = require(AppChat.App.Hooks.useParentContainerVisibilitySignal)
 local ParentContainerContext = require(AppChat.Contexts.ParentContainer.ParentContainerContext)
-local Foundation = require(AppChatParent.Foundation)
+local Foundation = require(parent.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
 local OverlayHost = require(AppChat.Components.OSA.OverlayHost)
-local v32 = game:DefineFastFlag("DebugAppChatDisplayOnJoin", false)
-local v33 = game:DefineFastInt("AppChatInExperienceDisplayOrder", 5)
-local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
-local GetFFlagAppChatInExpToastSnoozeMenuDismissFix = require(AppChatParent.SharedFlags).GetFFlagAppChatInExpToastSnoozeMenuDismissFix
-local PartyPageCarouselExperimentation = require(AppChatParent.SocialExperiments).PartyPageCarouselExperimentation
-local FFlagEnableAppChatSnoozeMenuFocus = require(AppChatParent.SharedFlags).FFlagEnableAppChatSnoozeMenuFocus
-local getFFlagAppChatRequestedRoute = require(AppChat.Flags.getFFlagAppChatRequestedRoute)
-local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
+
+local defineFastFlag = game:DefineFastFlag("DebugAppChatDisplayOnJoin", false)
+local defineFastInt = game:DefineFastInt("AppChatInExperienceDisplayOrder", 5)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags2.GetFFlagIsSquadEnabled
+local FFlagAppChatGateInExpSquadEventReceiver = require(AppChat.Flags.FFlagAppChatGateInExpSquadEventReceiver)
+
+local SharedFlags3 = require(parent.SharedFlags)
+local GetFFlagAppChatInExpToastSnoozeMenuDismissFix = SharedFlags3.GetFFlagAppChatInExpToastSnoozeMenuDismissFix
+local SocialExperiments = require(parent.SocialExperiments)
+local PartyPageCarouselExperimentation = SocialExperiments.PartyPageCarouselExperimentation
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagEnableAppChatSnoozeMenuFocus = SharedFlags4.FFlagEnableAppChatSnoozeMenuFocus
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagExpChatEnableFriendsTab = SharedFlags5.FFlagExpChatEnableFriendsTab
+local isSideSheetEnabled = require(parent.InExperienceSideSheetUtils.isSideSheetEnabled)
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagSideSheetFocusNav = SharedFlags6.FFlagSideSheetFocusNav
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagEnableDrawerAnimatingHook = SharedFlags7.FFlagEnableDrawerAnimatingHook
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local FocusRoot = FocusNavigationUtils.FocusRoot
-local InputHandlers = require(AppChatParent.InputHandlers)
-local NotificationSnoozeMenuVisibleSignal = require(AppChatParent.ToastNotification).Signals.NotificationSnoozeMenuVisibleSignal
-local useAppPolicy = require(AppChatParent.UniversalAppPolicy).useAppPolicy
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local v47 = game:DefineFastFlag("AppChatFixCloseVisibilityLinger", false)
-local t1 = {
+local InputHandlers = require(parent.InputHandlers)
+
+local ToastNotification = require(parent.ToastNotification)
+local NotificationSnoozeMenuVisibleSignal = ToastNotification.Signals.NotificationSnoozeMenuVisibleSignal
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
+
+local Drawer = require(parent.Drawer)
+local useDrawerVisible = Drawer.Hooks.useDrawerVisible
+local useDrawerAnimating = Drawer.Hooks.useDrawerAnimating
+
+local navigateBacks = {
 	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
 	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack
 }
 
-function wrapWithFocusRoot(p1, p2, p3) -- line: 72
-	-- upvalues: React (copy), FocusRoot (copy), t1 (copy), FFlagEnableAppChatSnoozeMenuFocus (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+function wrapWithFocusRoot(p, eventHandlers, p2)
 	return React.createElement(FocusRoot, {
+		eventHandlers = eventHandlers,
+		eventMap = navigateBacks,
+		isAutoFocusRoot = not FFlagEnableAppChatSnoozeMenuFocus or p2,
 		isIsolated = true,
-		eventHandlers = p2,
-		eventMap = t1,
-		isAutoFocusRoot = not FFlagEnableAppChatSnoozeMenuFocus or p3,
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
-	}, p1)
+	}, p)
 end
-function InExperienceAppChat() -- line: 82
-	-- upvalues: React (copy), useDispatch (copy), useIsAppChatVisible (copy), v32 (copy), ParentContainerContext (copy), getFFlagAppChatRequestedRoute (copy), useParentContainerVisibilitySignal (copy), useAppChatUpdateSession (copy), usePreventExperienceControls (copy), SetAppLoaded (copy), getAllFriendsAsync (copy), PartyPageCarouselExperimentation (copy), getLocalUserFriendsCount (copy), GetLocalUser (copy), v47 (copy), GetFFlagIsSquadEnabled (copy), useSelector (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useAppPolicy (copy), FFlagEnableAppChatSnoozeMenuFocus (copy), NotificationSnoozeMenuVisibleSignal (copy), SquadEventReceiver (copy), AppChatPersistentEventReceivers (copy), AppChatToastManagerInExp (copy), GetFFlagAppChatInExpToastSnoozeMenuDismissFix (copy), UiModeStyleProvider (copy), Constants (copy), DesignTokenProvider (copy), v33 (copy), SquadOverlay (copy), LayerCollectorProvider (copy), Responsive (copy), RoactServices (copy), AppSessionService (copy), SessionService (copy), InExperienceAppChatContainer (copy), OverlayHost (copy), Foundation (copy)
-	local v52 = React.useRef(nil)
-	local v53 = useDispatch()
-	local v54, v55 = useIsAppChatVisible(v32)
-	local v56 = React.useContext(ParentContainerContext)
-	local showParentContainer = v56.showParentContainer
-	local hideParentContainer = v56.hideParentContainer
-	local updateCurrentSquadId = v56.updateCurrentSquadId
-	local visibilitySignal = v56.visibilitySignal
-	local requestedRouteSignal = v56.requestedRouteSignal
-	local getRequestedRoute = v56.getRequestedRoute
-	local clearRequestedRoute = v56.clearRequestedRoute
-	local v64, v65 = React.useState("")
-	local v66 = getFFlagAppChatRequestedRoute()
-	local v67 = nil
-	local u68 = nil
 
-	if v66 then
-		local v69
+function InExperienceAppChat()
+	local ref = React.useRef(nil)
+	local v = useDispatch()
+	local v2, hideAppChat = useIsAppChatVisible(defineFastFlag)
+	local v3 = React.useContext(ParentContainerContext)
+	local showParentContainer = v3.showParentContainer
+	local hideParentContainer = v3.hideParentContainer
+	local updateCurrentSquadId = v3.updateCurrentSquadId
+	local visibilitySignal = v3.visibilitySignal
+	local requestedRouteSignal = v3.requestedRouteSignal
+	local getRequestedRoute = v3.getRequestedRoute
+	local clearRequestedRoute = v3.clearRequestedRoute
+	local state, setState = React.useState("")
+	local state2, setState2 = React.useState(getRequestedRoute())
+	local state3, setState3 = React.useState(true)
+	local v4, v5
 
-		v67, v69 = React.useState(getRequestedRoute())
-		u68 = v69
+	if isSideSheetEnabled and FFlagSideSheetFocusNav and FFlagEnableDrawerAnimatingHook then
+		v4 = useDrawerVisible()
+		v5 = useDrawerAnimating()
+	else
+		v4 = nil
+		v5 = nil
 	end
-
-	local v70, v71 = React.useState(true)
 
 	useParentContainerVisibilitySignal()
-	useAppChatUpdateSession(v54)
-	usePreventExperienceControls(v54)
-	React.useEffect(function() -- line: 108
-		-- upvalues: v54 (copy), v53 (copy), SetAppLoaded (copy), getAllFriendsAsync (copy), PartyPageCarouselExperimentation (copy), getLocalUserFriendsCount (copy)
-		if v54 then
-			v53(SetAppLoaded(true))
-			v53(getAllFriendsAsync(true))
+	useAppChatUpdateSession(v2)
+	usePreventExperienceControls(v2)
+
+	if FFlagAppChatReactiveFeatureRestrictions then
+		usePartyChatReactiveFeatureRestriction(v2)
+	end
+
+	React.useEffect(function()
+		if v2 then
+			if FFlagAppChatUseSignalsForAppLoaded then
+				GetAppLoadedStore(false).setAppLoaded(true)
+			else
+				v(SetAppLoaded(true))
+			end
+
+			v(getAllFriendsAsync(true))
 
 			if PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then
-				v53(getLocalUserFriendsCount())
+				v(getLocalUserFriendsCount())
 			end
 		end
-	end, {
-		v53,
-		v54
-	})
-	React.useEffect(function() -- line: 119
-		-- upvalues: v53 (copy), GetLocalUser (copy)
-		v53(GetLocalUser())
-	end, { v53 })
+	end, { v, v2 })
 
-	if v47 then
-		React.useEffect(function() -- line: 126
-			-- upvalues: visibilitySignal (copy), v52 (copy)
-			local v78 = visibilitySignal:connect(function(p4) -- line: 127
-				-- upvalues: v52 (copy)
-				if not p4 and v52.current then
-					v52.current.Enabled = false
-				end
-			end)
-
-			return function() -- line: 133
-				-- upvalues: v78 (copy)
-				v78:disconnect()
+	React.useEffect(function()
+		v(GetLocalUser())
+	end, { v })
+	React.useEffect(function()
+		local connection = visibilitySignal:connect(function(p)
+			if not p and ref.current then
+				ref.current.Enabled = false
 			end
-		end, { visibilitySignal })
-	end
+		end)
 
-	if v66 then
-		React.useEffect(function() -- line: 141
-			-- upvalues: requestedRouteSignal (copy), u68 (ref)
-			local v79 = requestedRouteSignal:connect(function(p5) -- line: 142
-				-- upvalues: u68 (ref)
-				u68(p5)
-			end)
+		return function()
+			connection:disconnect()
+		end
+	end, { visibilitySignal })
 
-			return function() -- line: 146
-				-- upvalues: v79 (copy)
-				v79:disconnect()
-			end
-		end, { requestedRouteSignal })
-	end
+	React.useEffect(function()
+		local connection = requestedRouteSignal:connect(function(p)
+			setState2(p)
+		end)
+
+		return function()
+			connection:disconnect()
+		end
+	end, { requestedRouteSignal })
 
 	if GetFFlagIsSquadEnabled() then
-		local v72 = useSelector(function(p6) -- line: 153
-			local v81 = p6.Squad and (p6.Squad.Squad and p6.Squad.Squad.currentSquad)
+		local v6 = useSelector(function(p)
+			local currentSquad = p.Squad and p.Squad.Squad and p.Squad.Squad.currentSquad
 
-			if v81 and v81.squadId then
-				return v81.squadId
+			if currentSquad and currentSquad.squadId then
+				return currentSquad.squadId
 			end
 
 			return ""
 		end)
 
-		React.useEffect(function() -- line: 158
-			-- upvalues: updateCurrentSquadId (copy), v72 (copy)
-			updateCurrentSquadId(v72)
-		end, {
-			v72,
-			updateCurrentSquadId
-		})
+		React.useEffect(function()
+			updateCurrentSquadId(v6)
+		end, { v6, updateCurrentSquadId })
 	end
 
-	local v73 = if not GetFFlagIsSquadEnabled() then nil else useSelector(function(p7) -- line: 164
-		return p7.Squad.SquadPrompt.arguments
-	end)
-	local v74 = React.useMemo(function() -- line: 169
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), hideParentContainer (copy)
-		return {
-			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(p8) -- line: 172
-					-- upvalues: hideParentContainer (copy)
-					hideParentContainer()
-					p8:cancel()
-				end)
-			}
+	local v6
+
+	if GetFFlagIsSquadEnabled() then
+		v6 = useSelector(function(p)
+			return p.Squad.SquadPrompt.arguments
+		end)
+	end
+
+	local v7 = React.useMemo(function()
+		local v7 = {}
+		v7[FocusNavigationEventNameEnum.NavigateBack] = {
+			handler = InputHandlers.onRelease(function(object)
+				hideParentContainer()
+				object:cancel()
+			end)
 		}
+
+		return v7
 	end, { hideParentContainer })
-	local v75 = useAppPolicy(function(p9) -- line: 180
-		return p9.getCanAccessParty()
+
+	local v8 = useAppPolicy(function(p)
+		return p.getCanAccessParty()
 	end)
-	local v76 = GetFFlagIsSquadEnabled() and (v73 and v73.promptType)
+
+	local promptType = GetFFlagIsSquadEnabled() and v6 and v6.promptType
 
 	if FFlagEnableAppChatSnoozeMenuFocus then
-		React.useEffect(function() -- line: 187
-			-- upvalues: NotificationSnoozeMenuVisibleSignal (copy), v71 (copy)
-			local v84 = NotificationSnoozeMenuVisibleSignal:connect(function(t2: {[any]: any}) -- line: 188
-				-- upvalues: v71 (copy)
-				v71(not t2.visible)
+		React.useEffect(function()
+			local connection = NotificationSnoozeMenuVisibleSignal:connect(function(p)
+				setState3(not p.visible)
 			end)
-
-			return function() -- line: 192
-				-- upvalues: v84 (copy)
-				v84:disconnect()
+			return function()
+				connection:disconnect()
 			end
 		end, {})
 	end
 
-	local t3 = {
-		SquadEventReceiver = if not v75 then nil else React.createElement(SquadEventReceiver),
+	local navigateToChat = React.useCallback(function(p: string)
+		local function openLegacyAppChat() -- 2 equivalent calls inferred from this helper
+			showParentContainer()
+			setState(p)
+			v(EnteredChatFromEntryPoint(SocialCommon.Enums.ChatEntryPointNames.ToastInExp))
+		end
+
+		if FFlagExpChatEnableFriendsTab then
+			return v3.openFriendsChatConversation(p):andThen(function(p2)
+				if not p2 then
+					openLegacyAppChat() -- inferred equivalent call
+				end
+
+				return p2
+			end)
+		end
+
+		openLegacyAppChat() -- inferred equivalent call
+		return nil
+	end, { v, v3.openFriendsChatConversation, showParentContainer })
+
+	if isSideSheetEnabled and FFlagSideSheetFocusNav and FFlagEnableDrawerAnimatingHook then
+		React.useEffect(function()
+			setState3(not (v4 or v5))
+		end, { v4, v5 })
+	end
+
+	if FFlagAppChatGateInExpSquadEventReceiver then
+		v8 = GetFFlagIsSquadEnabled() and v8
+	end
+
+	local squadEventReceiver
+
+	if v8 then
+		squadEventReceiver = React.createElement(SquadEventReceiver)
+	end
+
+	local children = {
+		SquadEventReceiver = squadEventReceiver,
 		AppChatPersistentEventReceivers = React.createElement(AppChatPersistentEventReceivers, {
 			isInExperience = true
 		}),
-		AppChatToastManagerInExp = React.createElement(AppChatToastManagerInExp, {
-			hideAllChatToasts = if not GetFFlagAppChatInExpToastSnoozeMenuDismissFix() then v54 else nil,
-			isAppChatVisible = if not GetFFlagAppChatInExpToastSnoozeMenuDismissFix() then nil else v54,
-			navigateToChat = function(p10) -- line: 206
-				-- upvalues: showParentContainer (copy), v65 (copy)
-				showParentContainer()
-				v65(p10)
-			end
-		}),
-		AppChatContainer = React.createElement(UiModeStyleProvider, {
-			style = {
-				themeName = Constants.ThemeName.Dark,
-				fontName = Constants.FontName.Gotham
-			}
-		}, { React.createElement(DesignTokenProvider, {
-			tokenMappers = {}
-		}, {
-			AppChatScreenGui = if not v54 and not v76 then nil else React.createElement("ScreenGui", {
-				ResetOnSpawn = false,
-				ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-				ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets,
-				DisplayOrder = v33,
-				ref = v52
-			}, wrapWithFocusRoot({
-				SquadOverlay = if not v76 then nil else React.createElement(SquadOverlay),
-				AppChat = if not v54 then nil else React.createElement(LayerCollectorProvider, {}, {
-					containerRef = React.createElement(Responsive.ContainerRef.Provider, {
-						value = v52
-					}, { React.createElement(RoactServices.ServiceProvider, {
-						services = {
-							[AppSessionService] = SessionService
-						}
-					}, {
-						InExperienceAppChatContainer = React.createElement(InExperienceAppChatContainer, {
-							hideAppChat = v55,
-							initialConversationId = v64,
-							setInitialConversationId = v65,
-							requestedRoute = if not v66 then nil else v67,
-							clearRequestedRoute = if not v66 then nil else clearRequestedRoute
-						})
-					}) })
-				})
-			}, v74, v70))
-		}) }),
-		OverlayHost = React.createElement(OverlayHost, {
-			providers = {{
-				class = Foundation.FoundationProvider,
-				props = {
-					theme = Foundation.Enums.Theme.Dark
-				}
-			}}
-		})
+		AppChatToastManagerInExp = 0,
+		AppChatContainer = 0
 	}
 
-	return React.createElement(React.Fragment, {}, t3)
+	local createElement = React.createElement
+	local hideAllChatToasts
+
+	if not GetFFlagAppChatInExpToastSnoozeMenuDismissFix() then
+		hideAllChatToasts = v2
+	end
+
+	local isAppChatVisible
+
+	if GetFFlagAppChatInExpToastSnoozeMenuDismissFix() then
+		isAppChatVisible = v2
+	end
+
+	children.AppChatToastManagerInExp = createElement(AppChatToastManagerInExp, {
+		hideAllChatToasts = hideAllChatToasts,
+		isAppChatVisible = isAppChatVisible,
+		navigateToChat = navigateToChat
+	})
+
+	local createElement2 = React.createElement
+	local v9 = {
+		style = { themeName = ColorMode.Dark, fontName = Constants.FontName.Gotham }
+	}
+
+	local createElement3 = React.createElement
+	local appChatScreenGui
+
+	if v2 or promptType then
+		local createElement4 = React.createElement
+
+		local v10 = {
+			ResetOnSpawn = false,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets,
+			DisplayOrder = defineFastInt,
+			ref = ref
+		}
+
+		local wrapWithFocusRoot = wrapWithFocusRoot
+		local squadOverlay
+
+		if promptType then
+			squadOverlay = React.createElement(SquadOverlay)
+		end
+
+		local appChat
+
+		if v2 then
+			appChat = React.createElement(LayerCollectorProvider, {}, {
+				containerRef = React.createElement(Responsive.ContainerRef.Provider, { value = ref }, {
+					React.createElement(roactServices.ServiceProvider, {
+						services = { [AppSessionService] = SessionService }
+					}, {
+						InExperienceAppChatContainer = React.createElement(InExperienceAppChatContainer, {
+							hideAppChat = hideAppChat,
+							initialConversationId = state,
+							setInitialConversationId = setState,
+							requestedRoute = state2,
+							clearRequestedRoute = clearRequestedRoute
+						})
+					})
+				})
+			})
+		end
+
+		appChatScreenGui = createElement4(
+			"ScreenGui",
+			v10,
+			wrapWithFocusRoot({ SquadOverlay = squadOverlay, AppChat = appChat }, v7, state3)
+		)
+	end
+
+	children.AppChatContainer = createElement2(UiModeStyleProvider, v9, {
+		createElement3(DesignTokenProvider, { tokenMappers = {} }, {
+			AppChatScreenGui = appChatScreenGui
+		})
+	})
+
+	children.OverlayHost = React.createElement(OverlayHost, {
+		providers = {
+			{
+				class = Foundation.FoundationProvider,
+				props = { colorMode = ColorMode.Dark }
+			}
+		}
+	})
+
+	return React.createElement(React.Fragment, {}, children)
 end
 
 return InExperienceAppChat

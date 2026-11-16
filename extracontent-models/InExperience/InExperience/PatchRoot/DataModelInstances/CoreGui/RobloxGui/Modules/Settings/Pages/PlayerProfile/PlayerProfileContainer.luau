@@ -1,92 +1,88 @@
 local CorePackages = game:GetService("CorePackages")
+
 local React = require(CorePackages.Packages.React)
 local Rodux = require(CorePackages.Packages.Rodux)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local View = require(CorePackages.Packages.Foundation).View
+
+local Foundation = require(CorePackages.Packages.Foundation)
+local View = Foundation.View
+
 local Responsive = require(CorePackages.Workspace.Packages.Responsive)
-local CoreScriptsRootProvider = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).CoreScriptsRootProvider
-local RoactAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy).RoactAppPolicy
-local AppFeaturePolicies = require(CorePackages.Workspace.Packages.UniversalAppPolicy).AppFeaturePolicies
-local ChatPolicies = require(CorePackages.Workspace.Packages.SocialPolicies).ChatPolicies
-local AvatarPolicies = require(CorePackages.Workspace.Packages.AvatarPolicies).AvatarPolicies
-local SharePolicies = require(CorePackages.Workspace.Packages.SocialPolicies).SharePolicies
-local ShareTargetGamePolicies = require(CorePackages.Workspace.Packages.SocialPolicies).ShareTargetGamePolicies
+
+local CoreScriptsRoactCommon = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon)
+local CoreScriptsRootProvider = CoreScriptsRoactCommon.CoreScriptsRootProvider
+
+local UniversalAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy)
+local RoactAppPolicy = UniversalAppPolicy.RoactAppPolicy
+local UniversalAppPolicy2 = require(CorePackages.Workspace.Packages.UniversalAppPolicy)
+local AppFeaturePolicies = UniversalAppPolicy2.AppFeaturePolicies
+local SocialPolicies = require(CorePackages.Workspace.Packages.SocialPolicies)
+local ChatPolicies = SocialPolicies.ChatPolicies
+local AvatarPolicies = require(CorePackages.Workspace.Packages.AvatarPolicies)
+local avatarPolicies = AvatarPolicies.AvatarPolicies
+local SocialPolicies2 = require(CorePackages.Workspace.Packages.SocialPolicies)
+local SharePolicies = SocialPolicies2.SharePolicies
+local SocialPolicies3 = require(CorePackages.Workspace.Packages.SocialPolicies)
+local ShareTargetGamePolicies = SocialPolicies3.ShareTargetGamePolicies
 local Enums = require(CorePackages.Workspace.Packages.ProfilePlatform.Enums)
 local installReducer = require(CorePackages.Workspace.Packages.ProfilePlatform.installReducer)
+
 local Constants = require(CorePackages.Workspace.Packages.ProfilePlatform.Constants)
 local ProfileTypes = Enums.ProfileTypes
 local ProfileWrapperContext = require(CorePackages.Workspace.Packages.ProfilePlatform.ProfileWrapperContext)
+
 local PlayerProfile = require(script.Parent.PlayerProfile)
 
-local function createStore(p1) -- line: 29
-	-- upvalues: Rodux (copy), Constants (copy), installReducer (copy)
-	local v23 = Rodux.combineReducers({
-		[Constants.RODUX_KEY] = installReducer()
-	})
+local function createStore(options)
+	local v = Rodux.combineReducers({ [Constants.RODUX_KEY] = installReducer() })
 
-	return Rodux.Store.new(v23, p1 or {}, { Rodux.thunkMiddleware })
+	return Rodux.Store.new(v, options or {}, { Rodux.thunkMiddleware })
 end
-local function PlayerProfileContainer(t1: {[any]: any}) -- line: 42
-	-- upvalues: React (copy), RoactAppPolicy (copy), AppFeaturePolicies (copy), ChatPolicies (copy), AvatarPolicies (copy), SharePolicies (copy), ShareTargetGamePolicies (copy), ProfileWrapperContext (copy), ProfileTypes (copy), Enums (copy), CoreScriptsRootProvider (copy), RoactRodux (copy), createStore (copy), Responsive (copy), View (copy), PlayerProfile (copy)
-	local v25 = React.useRef(nil)
+
+local function PlayerProfileContainer(props)
+	local ref = React.useRef(nil)
 
 	return React.createElement(RoactAppPolicy.Provider, {
 		policy = {
 			AppFeaturePolicies,
 			ChatPolicies,
-			AvatarPolicies,
+			avatarPolicies,
 			SharePolicies,
 			ShareTargetGamePolicies
 		}
 	}, {
 		ProfileWrapperProvider = React.createElement(ProfileWrapperContext.Provider, {
 			value = {
-				profileId = tostring(t1.userId),
+				profileId = tostring(props.userId),
 				profileType = ProfileTypes.User,
-				sourceInfo = {
-					contextualInfoType = "",
-					source = Enums.Sources.InExperienceProfile
-				},
+				sourceInfo = { source = Enums.Sources.InExperienceProfile, contextualInfoType = "" },
 				navigateTo = {
-					qRCodePage = function() -- line: 63
-					end,
-					previousView = function(_: boolean) -- line: 64
-					end,
-					itemDetails = function(_) -- line: 65
-					end,
-					itemOrBundleDetails = function(_, _) -- line: 66
-					end,
-					catalogSearch = function(_) -- line: 67
-					end,
-					tryOnItem = function(_: string, _: string, _: string?, _: string?) -- line: 68
-					end,
-					inspectAvatar = t1.inspectAvatar,
-					editUsername = function() -- line: 76
-					end,
-					openLeaveRobloxAlertUIBlox = function(_: ((...any) -> ...any)) -- line: 77
-					end,
-					closeLeaveRobloxAlert = function() -- line: 78
-					end
+					qRCodePage = function() end,
+					previousView = function(_: boolean) end,
+					itemDetails = function(_) end,
+					itemOrBundleDetails = function(_, _) end,
+					catalogSearch = function(_) end,
+					tryOnItem = function(_: string, _: string, _: string?, _: string?) end,
+					inspectAvatar = props.inspectAvatar,
+					editUsername = function() end,
+					openLeaveRobloxAlertUIBlox = function(_) end,
+					closeLeaveRobloxAlert = function() end
 				},
-				externalAnalytics = {
-					catalogAnalytics = {}
-				}
+				externalAnalytics = { catalogAnalytics = {} }
 			}
 		}, {
 			CoreScriptsRootProvider = React.createElement(CoreScriptsRootProvider, {}, {
-				RoduxStore = React.createElement(RoactRodux.StoreProvider, {
-					store = createStore()
-				}, {
+				RoduxStore = React.createElement(RoactRodux.StoreProvider, { store = createStore() }, {
 					ResponsiveProvider = React.createElement(Responsive.ContainerRef.Provider, {
-						value = v25
+						value = ref
 					}, {
 						PlayerProfileContainer = React.createElement(View, {
 							tag = "size-full",
-							ref = v25
+							ref = ref
 						}, {
 							PlayerProfile = React.createElement(PlayerProfile, {
-								userId = t1.userId,
-								closePage = t1.closePage
+								userId = props.userId,
+								closePage = props.closePage
 							})
 						})
 					})

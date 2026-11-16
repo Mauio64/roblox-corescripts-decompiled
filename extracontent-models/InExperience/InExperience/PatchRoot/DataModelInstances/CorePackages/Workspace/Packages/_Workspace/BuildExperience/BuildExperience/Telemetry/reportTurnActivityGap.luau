@@ -1,45 +1,47 @@
 local TelemetryService = game:GetService("TelemetryService")
 
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+
+local sendBuildExperienceStat = require(BuildExperience.Telemetry.sendBuildExperienceStat)
+
+local FFlagBuildExperiencePromptFailureTelemetry = SharedFlags.FFlagBuildExperiencePromptFailureTelemetry
+
 game:DefineFastInt("BuildExperienceTurnActivityGapMsThrottleHundredthsPercent", 0)
 
-local t1 = {
+local v = {
 	eventName = "buildExperienceTurnActivityGapMs",
-	description = "Milliseconds between visible chat-turn UI updates during a live CAS turn.",
 	backends = { "RobloxTelemetryStat" },
-	lastUpdated = {
-		2026,
-		6,
-		30
-	}
+	lastUpdated = { 2026, 6, 30 },
+	description = "Milliseconds between visible chat-turn UI updates during a live CAS turn."
 }
 
-local function shouldSample(n1: number) -- line: 14
-	if n1 <= 0 then
-		return false
-	end
-
-	if n1 >= 10000 then
-		return true
-	end
-
-	return n1 >= math.random(1, 10000)
+local function shouldSample(fastInt: number): boolean -- 1 equivalent call inferred from this helper
+	return not (fastInt <= 0) and (fastInt >= 10000 or math.random(1, 10000) <= fastInt)
 end
 
 return {
-	log = function(n2: number, b1: boolean, n3: number?) -- line: 24
-		-- upvalues: TelemetryService (copy), t1 (copy)
-		local FastInt = game:GetFastInt("BuildExperienceTurnActivityGapMsThrottleHundredthsPercent")
+	log = function(p: number, isFirstActivity: boolean, universeId: number?)
+		if FFlagBuildExperiencePromptFailureTelemetry then
+			sendBuildExperienceStat({
+				config = v,
+				sampleHundredthsPercent = game:GetFastInt("BuildExperienceTurnActivityGapMsThrottleHundredthsPercent"),
+				value = math.max(0, (math.round(p))),
+				customFields = { universeId = universeId, isFirstActivity = isFirstActivity }
+			})
 
-		if FastInt <= 0 or not (FastInt >= 10000) and not (FastInt >= math.random(1, 10000)) then
 			return
 		end
 
-		TelemetryService:LogStat(t1, {
-			customFields = {
-				universeId = n3,
-				isFirstActivity = b1
-			}
-		}, (math.max(0, (math.floor(n2 + 0.5)))))
+		if not shouldSample(game:GetFastInt("BuildExperienceTurnActivityGapMsThrottleHundredthsPercent")) then -- inferred equivalent call
+			return
+		end
+
+		TelemetryService:LogStat(v, {
+			customFields = { universeId = universeId, isFirstActivity = isFirstActivity }
+		}, (math.max(0, (math.floor(p + 0.5)))))
 	end,
-	TurnActivityGapStatConfig = t1
+	TurnActivityGapStatConfig = v
 }

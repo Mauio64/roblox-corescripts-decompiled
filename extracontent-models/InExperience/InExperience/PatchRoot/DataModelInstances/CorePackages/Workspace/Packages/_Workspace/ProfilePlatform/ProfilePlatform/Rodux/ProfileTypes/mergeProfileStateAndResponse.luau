@@ -1,26 +1,38 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local Cryo = require(ProfilePlatformParent.Cryo)
+local parent = ProfilePlatform.Parent
+local Cryo = require(parent.Cryo)
 
+require(ProfilePlatform.Common.Enums)
 require(ProfilePlatform.Common.Types)
-
 local getDeepValue = require(ProfilePlatform.Utils.getDeepValue)
+
 local FFlagProfilePlatformEnableLazyLoadingComponents = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableLazyLoadingComponents)
 
-return function(p1, p2) -- line: 11
-	-- upvalues: getDeepValue (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy), Cryo (copy)
-	local v8 = getDeepValue(p1, `{ p2.profileId }`) or {}
-	local v9 = if not FFlagProfilePlatformEnableLazyLoadingComponents or not p2.onlyEssentialComponents then p2.componentOrdering or v8.componentOrdering else v8.componentOrdering or p2.componentOrdering
-	local v10 = v8.components or {}
-	local v11 = Cryo.Dictionary.join(v10, p2.components)
-	local t1 = {
-		profileType = p2.profileType,
-		profileId = p2.profileId,
-		componentOrdering = v9,
-		components = v11
+return function(p, data, options)
+	local v = getDeepValue(p, `{data.profileId}`) or {}
+	local componentOrdering
+
+	if FFlagProfilePlatformEnableLazyLoadingComponents and data.onlyEssentialComponents then
+		componentOrdering = v.componentOrdering or data.componentOrdering
+	else
+		componentOrdering = data.componentOrdering or v.componentOrdering
+	end
+
+	local components = v.components or {}
+	local nones = {}
+
+	for _, v2 in options or {} do
+		nones[v2] = Cryo.None
+	end
+
+	local joined = Cryo.Dictionary.join(components, data.components, nones)
+
+	local v2 = {
+		profileType = data.profileType,
+		profileId = data.profileId,
+		componentOrdering = componentOrdering,
+		components = joined
 	}
 
-	return Cryo.Dictionary.join(p1, {
-		[p2.profileId] = t1
-	})
+	return Cryo.Dictionary.join(p, { [data.profileId] = v2 })
 end

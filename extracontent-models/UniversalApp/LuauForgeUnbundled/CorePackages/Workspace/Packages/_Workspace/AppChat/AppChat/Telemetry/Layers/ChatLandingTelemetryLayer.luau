@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/AppChat/AppChat/Telemetry/createReactTelemetryLayer")(require("@game/CorePackages/Workspace/Packages/_Workspace/AppChat/AppChat/Telemetry/Layers/AppTelemetryLayer").Context, {})

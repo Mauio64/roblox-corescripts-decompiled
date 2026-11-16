@@ -1,22 +1,20 @@
-local scriptParent = script.Parent
-
-require(scriptParent.Types)
+local parent = script.Parent
+require(parent.Types)
 
 local insert = table.insert
 
-local function collectArray(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 18
-	-- upvalues: insert (copy)
-	local t2 = {}
+local function collectArray(items, callback)
+	local array = {}
 
-	for v7, v8 in t1 do
-		local v9 = p1(v7, v8)
+	for k, item in items do
+		local v = callback(k, item)
 
-		if v9 ~= nil then
-			insert(t2, v9)
+		if v ~= nil then
+			insert(array, v)
 		end
 	end
 
-	return t2
+	return array
 end
 
 return collectArray

@@ -1,68 +1,60 @@
-local t1 = {}
-local Mouse = game:GetService("Players").LocalPlayer:GetMouse()
+local Players = game:GetService("Players")
+local mouse = Players.LocalPlayer:GetMouse()
+
 local TweenService = game:GetService("TweenService")
+return {
+	setupControl = function(data)
+		local lastTime = os.time()
+		local v = false
+		local flag = false
 
-function t1.setupControl(p1) -- line: 10
-	-- upvalues: Mouse (copy), TweenService (copy)
-	local timestamp = os.time()
-	local u6 = false
-	local u7 = false
+		mouse.Move:Connect(function()
+			lastTime = os.time()
+		end)
 
-	Mouse.Move:Connect(function() -- line: 15
-		-- upvalues: timestamp (ref)
-		timestamp = os.time()
-	end)
-	p1.ControlBarContainer.MouseEnter:Connect(function() -- line: 19
-		-- upvalues: u6 (ref)
-		u6 = true
-	end)
-	p1.ControlBarContainer.MouseLeave:Connect(function() -- line: 23
-		-- upvalues: u6 (ref)
-		u6 = false
-	end)
+		data.ControlBarContainer.MouseEnter:Connect(function()
+			v = true
+		end)
 
-	local tween = nil
+		data.ControlBarContainer.MouseLeave:Connect(function()
+			v = false
+		end)
 
-	local function createTween() -- line: 29
-		-- upvalues: tween (ref), TweenService (copy), p1 (copy), createTween (copy)
-		tween = TweenService:Create(p1.ControlBarContainer, TweenInfo.new(2), {
-			Position = p1.ControlBarContainerNonVisiblePosition
-		})
+		local v2 = nil
+		local function createTween()
+			v2 = TweenService:Create(data.ControlBarContainer, TweenInfo.new(2), {
+				Position = data.ControlBarContainerNonVisiblePosition
+			})
 
-		if tween then
-			tween.Completed:Connect(function() -- line: 36
-				-- upvalues: createTween (copy)
-				createTween()
-			end)
-
-			return
-		end
-
-		error("Failed to create tween for control visibility")
-	end
-
-	createTween()
-	task.spawn(function() -- line: 45
-		-- upvalues: tween (ref), u6 (ref), timestamp (ref), u7 (ref), p1 (copy)
-		while true do
-			if not tween then
-				error("No current tween for control visibility")
+			if v2 then
+				v2.Completed:Connect(function()
+					createTween()
+				end)
+			else
+				error("Failed to create tween for control visibility")
 			end
+		end
+		createTween()
 
-			if not u6 and os.time() - timestamp > 2 then
-				if not u7 then
-					u7 = true
-					tween:Play()
+		task.spawn(function()
+			while true do
+				if not v2 then
+					error("No current tween for control visibility")
 				end
-			elseif u7 then
-				u7 = false
-				tween:Cancel()
-				p1.ControlBarContainer.Position = p1.ControlBarContainerVisiblePosition
+
+				if v or not (os.time() - lastTime > 2) then
+					if flag then
+						flag = false
+						v2:Cancel()
+						data.ControlBarContainer.Position = data.ControlBarContainerVisiblePosition
+					end
+				elseif not flag then
+					flag = true
+					v2:Play()
+				end
+
+				task.wait(0.1)
 			end
-
-			task.wait(0.1)
-		end
-	end)
-end
-
-return t1
+		end)
+	end
+}

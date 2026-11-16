@@ -1,3 +1,1 @@
-return {
-	RODUX_KEY = "AuthCommon"
-}
+return { RODUX_KEY = "AuthCommon" }

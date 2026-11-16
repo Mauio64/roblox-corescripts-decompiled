@@ -1,4 +1,1 @@
-return {
-	ExitCreationConfirmation = "ExitCreationConfirmation",
-	TextFiltered = "TextFiltered"
-}
+return { ExitCreationConfirmation = "ExitCreationConfirmation", TextFiltered = "TextFiltered" }

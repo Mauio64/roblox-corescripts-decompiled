@@ -1,4 +1,1 @@
-return {
-	Horizontal = "Horizontal",
-	Vertical = "Vertical"
-}
+return { Horizontal = "Horizontal", Vertical = "Vertical" }

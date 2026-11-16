@@ -1,15 +1,15 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local CollectionViews = require(Parent.CollectionViews)
-local GameTileViewConfig = require(Parent.GameTile).GameTileViewConfig
-local CollectionLayoutCalculators = CollectionViews.CollectionLayoutCalculators
+local parent = script:FindFirstAncestor("GameCollections").Parent
 
-require(Parent.Style)
+local CollectionViews = require(parent.CollectionViews)
+local GameTile = require(parent.GameTile)
+local GameTileViewConfig = GameTile.GameTileViewConfig
+local CollectionLayoutCalculators = CollectionViews.CollectionLayoutCalculators
+require(parent.Style)
 
 return {
 	calculateNumColumns = CollectionLayoutCalculators.calculateNumColumns,
-	calculateTileHeightFromWidth = function(n1: number, _: boolean?, p1, p2, b2: boolean?, b3: boolean?, b4: boolean?, n2: number?, n3: number?, n4: number?, n5: number?) -- line: 15
-		-- upvalues: GameTileViewConfig (copy)
-		return GameTileViewConfig.getTileHeight(p2, n1, p1, b2, b3, b4, n2, n3, n4, n5)
+	calculateTileHeightFromWidth = function(p: number, _: boolean?, p2, p3, flag: boolean?, flag2: boolean?, flag3: boolean?, p4: number?, p5: number?, p6: number?, p7: number?)
+		return GameTileViewConfig.getTileHeight(p3, p, p2, flag, flag2, flag3, p4, p5, p6, p7)
 	end,
 	calculateSideMargin = CollectionLayoutCalculators.calculateSideMargin,
 	calculateColumnGap = CollectionLayoutCalculators.calculateColumnGap,

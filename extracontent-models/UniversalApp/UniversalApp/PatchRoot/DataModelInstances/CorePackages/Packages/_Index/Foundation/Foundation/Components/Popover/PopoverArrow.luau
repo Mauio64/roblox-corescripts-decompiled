@@ -1,21 +1,20 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
 
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 
-local function PopoverArrow(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy), View (copy)
+local function PopoverArrow(props)
 	return React.createElement(View, {
+		Size = UDim2.fromOffset(props.size, props.size),
+		Position = props.position,
 		Rotation = 45,
+		ZIndex = props.ZIndex,
+		backgroundStyle = props.backgroundStyle,
 		tag = "anchor-center-center",
-		Size = UDim2.fromOffset(t1.size, t1.size),
-		Position = t1.position,
-		ZIndex = t1.ZIndex,
-		backgroundStyle = t1.backgroundStyle,
-		testId = t1.testId
+		testId = props.testId
 	})
 end
 

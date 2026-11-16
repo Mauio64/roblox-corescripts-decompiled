@@ -1,34 +1,29 @@
-local function bindingValidator(p1) -- line: 4
-	return function(p2) -- line: 5
-		-- upvalues: p1 (copy)
-		local match = string.match(tostring(p2), "RoactBinding")
+local function bindingValidator(callback)
+	return function(object): boolean
+		local v = string.match(tostring(object), "RoactBinding")
 
-		if typeof(p2) ~= "table" or not match then
-			warn(string.format("RoactBinding expected, got %s", (typeof(p2))))
-
+		if typeof(object) ~= "table" or not v then
+			warn(string.format("RoactBinding expected, got %s", (typeof(object))))
 			return false
 		end
 
-		local ok, result = pcall(function() -- line: 13
-			-- upvalues: p2 (copy)
-			return p2:getValue()
+		local success, result = pcall(function()
+			return object:getValue()
 		end)
 
-		if not ok then
+		if not success then
 			warn("getValue() not defined")
-
 			return false
 		end
 
-		local v7, v8 = p1(result)
+		local v2, v3 = callback(result)
 
-		if not v7 then
-			warn(string.format("RoactBinding value: %s", v8))
-
-			return false
+		if v2 then
+			return true
 		end
 
-		return true
+		warn(string.format("RoactBinding value: %s", v3))
+		return false
 	end
 end
 

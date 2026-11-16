@@ -1,32 +1,26 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local Dash = require(Parent.Dash)
-local t1 = {
-	rotation = 90,
-	offset = Vector2.new(),
-	transparency = NumberSequence.new(0)
-}
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(parent.React)
+local Dash = require(parent.Dash)
 
-local function BackgroundGradient(t2: {[any]: any}) -- line: 22
-	-- upvalues: Dash (copy), t1 (copy), React (copy)
-	local v7 = Dash.join(t1, t2)
+local v = { offset = Vector2.new(), rotation = 90, transparency = NumberSequence.new(0) }
+
+local function BackgroundGradient(p)
+	local joined = Dash.join(v, p)
 
 	return React.createElement("Frame", {
 		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundTransparency = 0,
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 		BorderSizePixel = 0,
-		ZIndex = v7.ZIndex,
-		[React.Tag] = v7.tag
+		ZIndex = joined.ZIndex,
+		[React.Tag] = joined.tag
 	}, {
-		CornerRadius = React.createElement("UICorner", {
-			CornerRadius = v7.cornerRadius
-		}),
+		CornerRadius = React.createElement("UICorner", { CornerRadius = joined.cornerRadius }),
 		UIGradient = React.createElement("UIGradient", {
-			Color = v7.colorSequence,
-			Offset = v7.offset,
-			Rotation = v7.rotation,
-			Transparency = v7.transparency
+			Color = joined.colorSequence,
+			Offset = joined.offset,
+			Rotation = joined.rotation,
+			Transparency = joined.transparency
 		})
 	})
 end

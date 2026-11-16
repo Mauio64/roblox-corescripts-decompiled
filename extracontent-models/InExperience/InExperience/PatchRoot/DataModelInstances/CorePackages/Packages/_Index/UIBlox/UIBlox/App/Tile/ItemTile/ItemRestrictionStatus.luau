@@ -1,117 +1,107 @@
-local ParentParent = script.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
-local ParentParent2Parent = ParentParent2.Parent
-local Roact = require(ParentParent2Parent.Roact)
-local t = require(ParentParent2Parent.t)
-local withStyle = require(ParentParent2.Core.Style.withStyle)
-local GetTextSize = require(ParentParent2.Core.Text.GetTextSize)
-local Images = require(ParentParent2.App.ImageSet.Images)
-local ImageSetComponent = require(ParentParent2.Core.ImageSet.ImageSetComponent)
-local ItemTileEnums = require(ParentParent.Enum.ItemTileEnums)
-local v11 = Roact.PureComponent:extend("ItemRestrictionStatus")
+local parent = script.Parent.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local Foundation = require(parent3.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local withStyle = require(parent2.Core.Style.withStyle)
+
+local GetTextSize = require(parent2.Core.Text.GetTextSize)
+local Images = require(parent2.App.ImageSet.Images)
+local ImageSetComponent = require(parent2.Core.ImageSet.ImageSetComponent)
+
+local ItemTileEnums = require(parent.Enum.ItemTileEnums)
+
+local extended = Roact.PureComponent:extend("ItemRestrictionStatus")
+
 local vector2 = Vector2.new(50, 20)
 local vector2_2 = Vector2.new(8, 8)
 
-v11.validateProps = t.strictInterface({
+extended.validateProps = t.strictInterface({
 	restrictionTypes = t.map(ItemTileEnums.Restriction.isEnumValue, t.boolean),
 	restrictionInfo = t.optional(t.table)
 })
 
-local function getAdditionalText(p1, p2) -- line: 33
-	-- upvalues: ItemTileEnums (copy)
-	local s1 = ""
+local function getAdditionalText(restrictionTypes, restrictionInfo) -- 1 equivalent call inferred from this helper
+	local v = restrictionTypes[ItemTileEnums.Restriction.LimitedUnique] and "#" or ""
 
-	if p1[ItemTileEnums.Restriction.LimitedUnique] then
-		s1 = "#"
-	end
-
-	if p1[ItemTileEnums.Restriction.Collectible] then
+	if restrictionTypes[ItemTileEnums.Restriction.Collectible] then
 		return "#"
 	end
 
-	if p2 and p2.limitedSerialNumber then
-		s1 ..= " " .. p2.limitedSerialNumber
+	if restrictionInfo and restrictionInfo.limitedSerialNumber then
+		return v .. " " .. restrictionInfo.limitedSerialNumber
 	end
 
-	return s1
+	return v
 end
-local function getRestrictionIcon(p3) -- line: 51
-	-- upvalues: ItemTileEnums (copy), Images (copy)
-	if p3[ItemTileEnums.Restriction.Collectible] then
-		return Images["icons/status/item/limited"]
-	end
 
-	if p3[ItemTileEnums.Restriction.Limited] or p3[ItemTileEnums.Restriction.LimitedUnique] then
+local function getRestrictionIcon(restrictionTypes) -- 1 equivalent call inferred from this helper
+	if
+		restrictionTypes[ItemTileEnums.Restriction.Collectible]
+		or (restrictionTypes[ItemTileEnums.Restriction.Limited] or restrictionTypes[ItemTileEnums.Restriction.LimitedUnique])
+	then
 		return Images["icons/status/item/limited"]
 	end
 
 	return nil
 end
 
-function v11.render(p4) -- line: 66
-	-- upvalues: withStyle (copy), ItemTileEnums (copy), GetTextSize (copy), vector2 (copy), Images (copy), vector2_2 (copy), Roact (copy), ImageSetComponent (copy)
-	return withStyle(function(p5) -- line: 67
-		-- upvalues: p4 (copy), ItemTileEnums (copy), GetTextSize (copy), vector2 (copy), Images (copy), vector2_2 (copy), Roact (copy), ImageSetComponent (copy)
-		local Theme = p5.Theme
-		local p5Font = p5.Font
-		local Tokens = p5.Tokens
-		local restrictionInfo = p4.props.restrictionInfo
-		local restrictionTypes = p4.props.restrictionTypes
-		local s2 = ""
+function extended.render(p)
+	return withStyle(function(props)
+		local theme = props.Theme
+		local font = props.Font
+		local tokens = props.Tokens
 
-		if restrictionTypes[ItemTileEnums.Restriction.LimitedUnique] then
-			s2 = "#"
-		end
+		local restrictionInfo = p.props.restrictionInfo
+		local restrictionTypes = p.props.restrictionTypes
+		local additionalText = getAdditionalText(restrictionTypes, restrictionInfo) -- inferred equivalent call
+		local font2 = font.CaptionHeader.Font
+		local textSize = font.BaseSize * font.CaptionHeader.RelativeSize
+		local textSize2 = GetTextSize(additionalText, textSize, font2, vector2)
+		local restrictionIcon = getRestrictionIcon(restrictionTypes) -- inferred equivalent call
+		local v = restrictionIcon and restrictionIcon.ImageRectSize / Images.ImagesResolutionScale or Vector2.new(0, 0)
 
-		if restrictionTypes[ItemTileEnums.Restriction.Collectible] then
-			s2 = "#"
-		elseif restrictionInfo and restrictionInfo.limitedSerialNumber then
-			s2 ..= " " .. restrictionInfo.limitedSerialNumber
-		end
-
-		local CaptionHeaderFont = p5Font.CaptionHeader.Font
-		local v29 = p5Font.BaseSize * p5Font.CaptionHeader.RelativeSize
-		local v30 = GetTextSize(s2, v29, CaptionHeaderFont, vector2)
-		local v31 = if not restrictionTypes[ItemTileEnums.Restriction.Collectible] then if not restrictionTypes[ItemTileEnums.Restriction.Limited] and not restrictionTypes[ItemTileEnums.Restriction.LimitedUnique] then nil else Images["icons/status/item/limited"] else Images["icons/status/item/limited"]
-		local v32 = v31 and v31.ImageRectSize / Images.ImagesResolutionScale or Vector2.new(0, 0)
-		local v33 = v32.X + v30.X + vector2_2.X
-		local v34 = math.max(v32.Y, v30.Y) + vector2_2.Y
+		local v2 = v.X + textSize2.X + vector2_2.X
+		local v3 = math.max(v.Y, textSize2.Y) + vector2_2.Y
 
 		return Roact.createElement(ImageSetComponent.Label, {
-			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0, 1),
+			BackgroundTransparency = 1,
 			Image = Images["component_assets/circle_17"],
-			ImageColor3 = Theme.UIDefault.Color,
-			ImageTransparency = Theme.UIDefault.Transparency,
+			ImageColor3 = theme.UIDefault.Color,
+			ImageTransparency = theme.UIDefault.Transparency,
 			ScaleType = Enum.ScaleType.Slice,
 			SliceCenter = Rect.new(8, 8, 9, 9),
-			Position = UDim2.new(0, Tokens.Global.Size_100, 1, -Tokens.Global.Size_100),
-			Size = UDim2.new(0, v33, 0, v34)
+			Position = UDim2.new(0, tokens.Size.Size_200, 1, -tokens.Size.Size_200),
+			Size = UDim2.new(0, v2, 0, v3)
 		}, {
-			Icon = v31 and Roact.createElement(ImageSetComponent.Label, {
-				BackgroundTransparency = 1,
+			Icon = restrictionIcon and Roact.createElement(ImageSetComponent.Label, {
 				AnchorPoint = Vector2.new(0, 0.5),
-				Image = v31,
-				ImageColor3 = Theme.IconEmphasis.Color,
-				ImageTransparency = Theme.IconEmphasis.Transparency,
+				BackgroundTransparency = 1,
+				Image = restrictionIcon,
+				ImageColor3 = theme.IconEmphasis.Color,
+				ImageTransparency = theme.IconEmphasis.Transparency,
 				Position = UDim2.new(0, vector2_2.X / 2, 0.5, 0),
-				Size = UDim2.new(0, v32.X, 0, v32.Y)
+				Size = UDim2.new(0, v.X, 0, v.Y)
 			}),
 			Text = Roact.createElement("TextLabel", {
 				BackgroundTransparency = 1,
-				Font = CaptionHeaderFont,
-				TextSize = v29,
-				Text = s2,
-				TextColor3 = Theme.TextMuted.Color,
-				TextTransparency = Theme.TextMuted.TextTransparency,
+				FontFace = normalizeFontFace(font2),
+				TextSize = textSize,
+				Text = additionalText,
+				TextColor3 = theme.TextMuted.Color,
+				TextTransparency = theme.TextMuted.TextTransparency,
 				TextTruncate = Enum.TextTruncate.AtEnd,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				Position = UDim2.new(0, v32.X, 0, 0),
-				Size = UDim2.new(0, v30.X + 10, 1, 0)
+				Position = UDim2.new(0, v.X, 0, 0),
+				Size = UDim2.new(0, textSize2.X + 10, 1, 0)
 			})
 		})
 	end)
 end
 
-return v11
+return extended

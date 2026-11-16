@@ -1,25 +1,29 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
-local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
-local LoggingProtocol = require(RobloxSubscriptionPurchaseAppParent.LoggingProtocol)
+local parent = RobloxSubscriptionPurchaseApp.Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
 local SurfaceName = require(RobloxSubscriptionPurchaseApp.Enums.SurfaceName)
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
-
 require(RobloxSubscriptionPurchaseApp.types)
 
-function logRobloxSubscriptionUpsellTelemetryEvent(p1, t1: {[any]: any}?) -- line: 12
-	-- upvalues: RobloxSubscriptionStore (copy), SurfaceName (copy), LoggingProtocol (copy)
-	local v8 = RobloxSubscriptionStore.get().getEntryContext()
-	local t2 = {
-		surface = if not v8 then SurfaceName.Unspecified else v8.surfaceName
-	}
+function logRobloxSubscriptionUpsellTelemetryEvent(p, items)
+	local entryContext = RobloxSubscriptionStore.get().getEntryContext()
+	local surface
 
-	if t1 then
-		for v10, v11 in t1 do
-			t2[v10] = v11
+	if entryContext then
+		surface = entryContext.surfaceName
+	else
+		surface = SurfaceName.Unspecified
+	end
+
+	local v = { surface = surface }
+
+	if items then
+		for k, item in items do
+			v[k] = item
 		end
 	end
 
-	LoggingProtocol.default:logRobloxTelemetryEvent(p1, {}, t2)
+	LoggingProtocol.default:logRobloxTelemetryEvent(p, {}, v)
 end
 
 return logRobloxSubscriptionUpsellTelemetryEvent

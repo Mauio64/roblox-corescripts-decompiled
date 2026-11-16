@@ -1,16 +1,18 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "ExpChat-MockDataModel",
-	mockDataModel = true,
 	testMatch = {
 		"**/GetChatModerationStore/**/*.test",
-		"**/GetUserChatSettingsStore/**/*.test"
+		"**/GetUserChatSettingsStore/**/*.test",
+		"**/useDictationAudioPipeline.test"
 	},
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.LogHandler,
 		JestConfigs.setupFiles.UIBloxInitializer,
 		JestConfigs.setupFiles.createPromiseRejectionHandler()
-	}
+	},
+	mockDataModel = true
 }

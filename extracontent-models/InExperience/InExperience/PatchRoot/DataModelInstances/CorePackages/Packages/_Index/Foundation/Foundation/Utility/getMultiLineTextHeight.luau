@@ -1,26 +1,27 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+
 local FontScales = require(Foundation.Components.Text.FontScales)
 
-return function(n1: number, n2: number, n3: number) -- line: 5
-	-- upvalues: FontScales (copy)
-	if n1 <= 0 or n2 <= 0 then
+return function(p: number, p2: number, p3: number)
+	if p <= 0 or p2 <= 0 then
 		return 0
 	end
 
-	if n3 <= 1 then
-		n3 = 1
+	local v = p3 <= 1 and 1 or p3
+
+	local v2 = math.floor(p)
+
+	local fontScale = FontScales[Font.fromEnum(Enum.Font.BuilderSans).Family]
+	local v3 = fontScale == nil and 0 or (v2 / fontScale * (v * fontScale) - v2) / 2
+
+	local v4 = math.ceil((p2 - 1) * v * v2)
+	local v5
+
+	if v3 >= 1 then
+		v5 = math.ceil(v3)
+	else
+		v5 = math.floor(v3)
 	end
 
-	local v6 = math.floor(n1)
-	local n4 = 0
-	local v8 = FontScales[Font.fromEnum(Enum.Font.BuilderSans).Family]
-
-	if v8 ~= nil then
-		n4 = (v6 / v8 * (n3 * v8) - v6) / 2
-	end
-
-	local v9 = math.ceil((n2 - 1) * n3 * v6)
-	local v10 = if not (n4 >= 1) then math.floor(n4) else math.ceil(n4)
-
-	return v9 + v6 + v10
+	return v4 + v2 + v5
 end

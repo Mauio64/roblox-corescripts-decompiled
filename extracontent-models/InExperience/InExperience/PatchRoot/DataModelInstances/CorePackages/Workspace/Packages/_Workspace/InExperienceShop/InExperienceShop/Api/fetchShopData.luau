@@ -1,14 +1,11 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
+local parent = InExperienceShop.Parent
 
-require(InExperienceShopParent.Promise)
-
+require(parent.Promise)
 local MockShopData = require(InExperienceShop.Mocks.MockShopData)
-
 require(InExperienceShop.Types)
 
-local function fetchShopData() -- line: 12
-	-- upvalues: MockShopData (copy)
+local function fetchShopData()
 	return MockShopData.getShopData()
 end
 

@@ -1,16 +1,16 @@
-local function canPopParentStack(p1) -- line: 6
-	if not p1 or not p1._dangerouslyGetParent then
+local function canPopParentStack(p): boolean
+	if not (p and p._dangerouslyGetParent) then
 		return false
 	end
 
-	local v3 = p1._dangerouslyGetParent()
-	local v4 = v3 and v3.state
+	local dangerouslyGetParent = p._dangerouslyGetParent()
+	local state = dangerouslyGetParent and dangerouslyGetParent.state
 
-	if not v4 or not v4.routes then
-		return false
+	if state and state.routes then
+		return #state.routes > 1
 	end
 
-	return #v4.routes > 1
+	return false
 end
 
 return canPopParentStack

@@ -2,104 +2,103 @@ local CorePackages = game:GetService("CorePackages")
 local VRService = game:GetService("VRService")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 local Players = game:GetService("Players")
-local AvatarUtil = require(CorePackages.Workspace.Packages.CoreScriptsCommon).AvatarUtil
-local t1 = {}
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local AvatarUtil = CoreScriptsCommon.AvatarUtil
 
-t1.__index = t1
+local class = {}
+class.__index = class
 
-function t1.new() -- line: 13
-	-- upvalues: t1 (copy), AvatarUtil (copy), VRService (copy), UserGameSettings (copy)
-	local self = setmetatable({}, t1)
+function class.new()
+	local object = setmetatable({}, class)
 
-	self.avatarUtil = AvatarUtil.new()
-	VRService:GetPropertyChangedSignal("AutomaticScaling"):Connect(function() -- line: 17
-		-- upvalues: self (copy)
-		self:onScalingChanged()
+	object.avatarUtil = AvatarUtil.new()
+	VRService:GetPropertyChangedSignal("AutomaticScaling"):Connect(function()
+		object:onScalingChanged()
 	end)
-	UserGameSettings:GetPropertyChangedSignal("PlayerHeight"):Connect(function() -- line: 20
-		-- upvalues: self (copy)
-		self:onPlayerHeightChanged()
+	UserGameSettings:GetPropertyChangedSignal("PlayerHeight"):Connect(function()
+		object:onPlayerHeightChanged()
 	end)
-	VRService.UserCFrameChanged:Connect(function(p1, _) -- line: 23
-		-- upvalues: self (copy)
-		if p1 == Enum.UserCFrame.Floor then
-			self:onPlayerHeightChanged()
+	VRService.UserCFrameChanged:Connect(function(p, _)
+		if p == Enum.UserCFrame.Floor then
+			object:onPlayerHeightChanged()
 		end
 	end)
-	self:onScalingChanged()
 
-	return self
+	object:onScalingChanged()
+	return object
 end
-function t1.setHeadScale(p3, p4) -- line: 35
-	-- upvalues: VRService (copy), UserGameSettings (copy)
+
+function class:setHeadScale(p)
 	if VRService.AutomaticScaling ~= Enum.VRScaling.World then
 		return
 	end
 
-	local SubjectHeight = p3:GetSubjectHeight(p4)
+	local subjectHeight = self:GetSubjectHeight(p)
 
-	if not SubjectHeight or SubjectHeight <= 0 then
+	if not subjectHeight or subjectHeight <= 0 then
 		return
 	end
 
-	local v11 = -VRService:GetUserCFrame(Enum.UserCFrame.Floor).Position.Y
-	local v12 = if not (v11 < 0.8 * UserGameSettings.PlayerHeight) then SubjectHeight / v11 else SubjectHeight / UserGameSettings.PlayerHeight
-	local CurrentCamera = workspace.CurrentCamera
+	local v = -VRService:GetUserCFrame(Enum.UserCFrame.Floor).Position.Y
+	local headScale
 
-	if not CurrentCamera then
+	if v < 0.8 * UserGameSettings.PlayerHeight then
+		headScale = subjectHeight / UserGameSettings.PlayerHeight
+	else
+		headScale = subjectHeight / v
+	end
+
+	local currentCamera = workspace.CurrentCamera
+
+	if not currentCamera then
 		return
 	end
 
-	CurrentCamera.HeadScale = v12
+	currentCamera.HeadScale = headScale
 end
-function t1.GetSubjectHeight(_, p6) -- line: 64
-	local Humanoid = p6:FindFirstChild("Humanoid")
 
-	if Humanoid and Humanoid:GetState() == Enum.HumanoidStateType.Dead then
+function class:GetSubjectHeight(instance)
+	local humanoid = instance:FindFirstChild("Humanoid")
+
+	if humanoid and humanoid:GetState() == Enum.HumanoidStateType.Dead then
 		return
 	end
 
-	local v17 = Humanoid and Humanoid.RootPart or p6:FindFirstChild("HumanoidRootPart")
+	local rootPart = humanoid and humanoid.RootPart or instance:FindFirstChild("HumanoidRootPart")
 
-	if v17 and Humanoid then
-		local HipHeight = Humanoid.HipHeight
-
-		if Humanoid.RigType == Enum.HumanoidRigType.R6 then
-			HipHeight = 2
-		end
-
-		if Humanoid.AutomaticScalingEnabled then
-			local v19 = v17.Size.Y / 2 + 0.5
-
-			return v17.Size.Y / 2 + HipHeight + v19 + Humanoid.CameraOffset.Y
-		end
-
-		return v17.Size.Y / 2 + HipHeight + 2 + Humanoid.CameraOffset.Y
+	if not (rootPart and humanoid) then
+		return nil
 	end
 
-	return nil
+	local hipHeight = humanoid.HipHeight
+
+	local v = humanoid.RigType == Enum.HumanoidRigType.R6 and 2 or hipHeight
+
+	if not humanoid.AutomaticScalingEnabled then
+		return rootPart.Size.Y / 2 + v + 2 + humanoid.CameraOffset.Y
+	end
+
+	local v2 = rootPart.Size.Y / 2 + 0.5
+	return rootPart.Size.Y / 2 + v + v2 + humanoid.CameraOffset.Y
 end
-function t1.onPlayerHeightChanged(p7) -- line: 93
-	-- upvalues: Players (copy)
+
+function class:onPlayerHeightChanged()
 	if Players.LocalPlayer and Players.LocalPlayer.Character then
-		p7:setHeadScale(Players.LocalPlayer.Character)
+		self:setHeadScale(Players.LocalPlayer.Character)
 	end
 end
-function t1.onScalingChanged(p8) -- line: 100
-	-- upvalues: VRService (copy)
+
+function class:onScalingChanged()
 	if VRService.AutomaticScaling == Enum.VRScaling.World then
-		if not p8.characterChangedConnection then
-			p8.characterChangedConnection = p8.avatarUtil:connectLocalCharacterChanges(function(p9) -- line: 104
-				-- upvalues: p8 (copy)
-				p8:setHeadScale(p9)
+		if not self.characterChangedConnection then
+			self.characterChangedConnection = self.avatarUtil:connectLocalCharacterChanges(function(p)
+				self:setHeadScale(p)
 			end)
-
-			return
 		end
-	elseif p8.characterChangedConnection then
-		p8.characterChangedConnection:Disconnect()
-		p8.characterChangedConnection = nil
+	elseif self.characterChangedConnection then
+		self.characterChangedConnection:Disconnect()
+		self.characterChangedConnection = nil
 	end
 end
 
-return t1.new()
+return class.new()

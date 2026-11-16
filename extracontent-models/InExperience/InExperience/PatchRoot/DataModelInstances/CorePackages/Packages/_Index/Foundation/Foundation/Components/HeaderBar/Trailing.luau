@@ -1,1 +1,3 @@
-return (require(script.HeaderBarTrailing))
+local HeaderBarTrailing = require(script.HeaderBarTrailing)
+
+return HeaderBarTrailing

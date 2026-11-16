@@ -1,20 +1,28 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local VerticalUserListSection = require(UserList.Components.VerticalUserList).VerticalUserListSection
-local HorizontalUserList = require(UserList.Components.HorizontalUserList).HorizontalUserList
-local Enums = require(UserList.Common.Enums)
+local parent = UserList.Parent
 
+local React = require(parent.React)
+
+local VerticalUserList = require(UserList.Components.VerticalUserList)
+local VerticalUserListSection = VerticalUserList.VerticalUserListSection
+local HorizontalUserList = require(UserList.Components.HorizontalUserList)
+local horizontalUserList = HorizontalUserList.HorizontalUserList
+local Enums = require(UserList.Common.Enums)
 require(UserList.Common.Types)
 
-local function UserListLayoutAdaptor(t1: {[any]: any}) -- line: 38
-	-- upvalues: Enums (copy), VerticalUserListSection (copy), HorizontalUserList (copy), React (copy)
-	local v9 = if t1.layoutMode ~= Enums.LayoutMode.Vertical then HorizontalUserList else VerticalUserListSection
-	local v10 = table.clone(t1)
+local function UserListLayoutAdaptor(p)
+	local v
 
-	v10.layoutMode = nil
+	if p.layoutMode == Enums.LayoutMode.Vertical then
+		v = VerticalUserListSection
+	else
+		v = horizontalUserList
+	end
 
-	return React.createElement(v9, v10)
+	local clone = table.clone(p)
+	clone.layoutMode = nil
+
+	return React.createElement(v, clone)
 end
 
 return React.memo(UserListLayoutAdaptor)

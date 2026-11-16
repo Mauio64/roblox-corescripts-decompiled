@@ -1,5 +1,4 @@
 local EventNames = require(script.Parent.EventNames)
-
 require(script.Parent.Parent.FireEvent.Types)
 
 return {
@@ -7,7 +6,10 @@ return {
 		name = game:DefineFastString("SocialNavigationHomePageAddFriends", "HomePageAddFriends")
 	},
 	[EventNames.HomePage_Carousel_LuaProfile] = {
-		name = game:DefineFastString("SocialNavigationHomePageCarouselLuaProfile", "LuaProfileEntryHomePageFriendsCarousel")
+		name = game:DefineFastString(
+			"SocialNavigationHomePageCarouselLuaProfile",
+			"LuaProfileEntryHomePageFriendsCarousel"
+		)
 	},
 	[EventNames.HomePage_Carousel_FriendsLanding] = {
 		name = game:DefineFastString("SocialNavigationHomePageFriendsLanding", "HomePageNavigationFriendsLanding")

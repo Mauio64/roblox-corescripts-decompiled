@@ -1,15 +1,16 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Error = LuauPolyfill.Error
 local Object = LuauPolyfill.Object
-local t1 = {}
-local GraphQL = require(ParentParent.GraphQL)
+
+local GraphQL = require(parent.GraphQL)
 local GraphQLEnumType = GraphQL.GraphQLEnumType
 local GraphQLInputObjectType = GraphQL.GraphQLInputObjectType
 local GraphQLInterfaceType = GraphQL.GraphQLInterfaceType
 local GraphQLObjectType = GraphQL.GraphQLObjectType
+
 local GraphQLScalarType = GraphQL.GraphQLScalarType
 local GraphQLUnionType = GraphQL.GraphQLUnionType
 local isEnumType = GraphQL.isEnumType
@@ -18,124 +19,193 @@ local isInputObjectType = GraphQL.isInputObjectType
 local isObjectType = GraphQL.isObjectType
 local isScalarType = GraphQL.isScalarType
 local isUnionType = GraphQL.isUnionType
+return {
+	renameType = function(object, name: string)
+		if Boolean.toJSBoolean(isObjectType(object)) then
+			local new = GraphQLObjectType.new
+			local assign = Object.assign
+			local config = object:toConfig()
+			local v = { name = name, astNode = 0, extensionASTNodes = 0 }
+			local astNode
 
-function t1.renameType(p1, s1: string) -- line: 52
-	-- upvalues: Boolean (copy), isObjectType (copy), GraphQLObjectType (copy), Object (copy), Array (copy), isInterfaceType (copy), GraphQLInterfaceType (copy), isUnionType (copy), GraphQLUnionType (copy), isInputObjectType (copy), GraphQLInputObjectType (copy), isEnumType (copy), GraphQLEnumType (copy), isScalarType (copy), GraphQLScalarType (copy), Error (copy)
-	if Boolean.toJSBoolean(isObjectType(p1)) then
-		return GraphQLObjectType.new(Object.assign({}, p1:toConfig(), {
-			name = s1,
-			astNode = if p1.astNode ~= nil then Object.assign({}, p1.astNode, {
-				name = Object.assign({}, p1.astNode.name, {
-					value = s1
+			if object.astNode == nil then
+				astNode = object.astNode
+			else
+				astNode = Object.assign({}, object.astNode, {
+					name = Object.assign({}, object.astNode.name, { value = name })
 				})
-			}) else p1.astNode,
-			extensionASTNodes = if p1.extensionASTNodes ~= nil then Array.map(p1.extensionASTNodes, function(p2) -- line: 68
-				-- upvalues: Object (copy), s1 (copy)
-				return Object.assign({}, p2, {
-					name = Object.assign({}, p2.name, {
-						value = s1
+			end
+
+			v.astNode = astNode
+			local extensionASTNodes
+
+			if object.extensionASTNodes == nil then
+				extensionASTNodes = object.extensionASTNodes
+			else
+				extensionASTNodes = Array.map(object.extensionASTNodes, function(p)
+					return Object.assign({}, p, {
+						name = Object.assign({}, p.name, { value = name })
 					})
-				})
-			end) else p1.extensionASTNodes
-		}))
-	end
+				end)
+			end
 
-	if Boolean.toJSBoolean(isInterfaceType(p1)) then
-		return GraphQLInterfaceType.new(Object.assign({}, p1:toConfig(), {
-			name = s1,
-			astNode = if p1.astNode ~= nil then Object.assign({}, p1.astNode, {
-				name = Object.assign({}, p1.astNode.name, {
-					value = s1
+			v.extensionASTNodes = extensionASTNodes
+			return new(assign({}, config, v))
+		elseif Boolean.toJSBoolean(isInterfaceType(object)) then
+			local new = GraphQLInterfaceType.new
+			local assign = Object.assign
+			local config = object:toConfig()
+			local v = { name = name, astNode = 0, extensionASTNodes = 0 }
+			local astNode
+
+			if object.astNode == nil then
+				astNode = object.astNode
+			else
+				astNode = Object.assign({}, object.astNode, {
+					name = Object.assign({}, object.astNode.name, { value = name })
 				})
-			}) else p1.astNode,
-			extensionASTNodes = if p1.extensionASTNodes ~= nil then Array.map(p1.extensionASTNodes, function(p3) -- line: 88
-				-- upvalues: Object (copy), s1 (copy)
-				return Object.assign({}, p3, {
-					name = Object.assign({}, p3.name, {
-						value = s1
+			end
+
+			v.astNode = astNode
+			local extensionASTNodes
+
+			if object.extensionASTNodes == nil then
+				extensionASTNodes = object.extensionASTNodes
+			else
+				extensionASTNodes = Array.map(object.extensionASTNodes, function(p)
+					return Object.assign({}, p, {
+						name = Object.assign({}, p.name, { value = name })
 					})
-				})
-			end) else p1.extensionASTNodes
-		}))
-	end
+				end)
+			end
 
-	if Boolean.toJSBoolean(isUnionType(p1)) then
-		return GraphQLUnionType.new(Object.assign({}, p1:toConfig(), {
-			name = s1,
-			astNode = if p1.astNode ~= nil then Object.assign({}, p1.astNode, {
-				name = Object.assign({}, p1.astNode.name, {
-					value = s1
+			v.extensionASTNodes = extensionASTNodes
+			return new(assign({}, config, v))
+		elseif Boolean.toJSBoolean(isUnionType(object)) then
+			local new = GraphQLUnionType.new
+			local assign = Object.assign
+			local config = object:toConfig()
+			local v = { name = name, astNode = 0, extensionASTNodes = 0 }
+			local astNode
+
+			if object.astNode == nil then
+				astNode = object.astNode
+			else
+				astNode = Object.assign({}, object.astNode, {
+					name = Object.assign({}, object.astNode.name, { value = name })
 				})
-			}) else p1.astNode,
-			extensionASTNodes = if p1.extensionASTNodes ~= nil then Array.map(p1.extensionASTNodes, function(p4) -- line: 108
-				-- upvalues: Object (copy), s1 (copy)
-				return Object.assign({}, p4, {
-					name = Object.assign({}, p4.name, {
-						value = s1
+			end
+
+			v.astNode = astNode
+			local extensionASTNodes
+
+			if object.extensionASTNodes == nil then
+				extensionASTNodes = object.extensionASTNodes
+			else
+				extensionASTNodes = Array.map(object.extensionASTNodes, function(p)
+					return Object.assign({}, p, {
+						name = Object.assign({}, p.name, { value = name })
 					})
-				})
-			end) else p1.extensionASTNodes
-		}))
-	end
+				end)
+			end
 
-	if Boolean.toJSBoolean(isInputObjectType(p1)) then
-		return GraphQLInputObjectType.new(Object.assign({}, p1:toConfig(), {
-			name = s1,
-			astNode = if p1.astNode ~= nil then Object.assign({}, p1.astNode, {
-				name = Object.assign({}, p1.astNode.name, {
-					value = s1
+			v.extensionASTNodes = extensionASTNodes
+			return new(assign({}, config, v))
+		elseif Boolean.toJSBoolean(isInputObjectType(object)) then
+			local new = GraphQLInputObjectType.new
+			local assign = Object.assign
+			local config = object:toConfig()
+			local v = { name = name, astNode = 0, extensionASTNodes = 0 }
+			local astNode
+
+			if object.astNode == nil then
+				astNode = object.astNode
+			else
+				astNode = Object.assign({}, object.astNode, {
+					name = Object.assign({}, object.astNode.name, { value = name })
 				})
-			}) else p1.astNode,
-			extensionASTNodes = if p1.extensionASTNodes ~= nil then Array.map(p1.extensionASTNodes, function(p5) -- line: 128
-				-- upvalues: Object (copy), s1 (copy)
-				return Object.assign({}, p5, {
-					name = Object.assign({}, p5.name, {
-						value = s1
+			end
+
+			v.astNode = astNode
+			local extensionASTNodes
+
+			if object.extensionASTNodes == nil then
+				extensionASTNodes = object.extensionASTNodes
+			else
+				extensionASTNodes = Array.map(object.extensionASTNodes, function(p)
+					return Object.assign({}, p, {
+						name = Object.assign({}, p.name, { value = name })
 					})
-				})
-			end) else p1.extensionASTNodes
-		}))
-	end
+				end)
+			end
 
-	if Boolean.toJSBoolean(isEnumType(p1)) then
-		return GraphQLEnumType.new(Object.assign({}, p1:toConfig(), {
-			name = s1,
-			astNode = if p1.astNode ~= nil then Object.assign({}, p1.astNode, {
-				name = Object.assign({}, p1.astNode.name, {
-					value = s1
+			v.extensionASTNodes = extensionASTNodes
+			return new(assign({}, config, v))
+		elseif Boolean.toJSBoolean(isEnumType(object)) then
+			local new = GraphQLEnumType.new
+			local assign = Object.assign
+			local config = object:toConfig()
+			local v = { name = name, astNode = 0, extensionASTNodes = 0 }
+			local astNode
+
+			if object.astNode == nil then
+				astNode = object.astNode
+			else
+				astNode = Object.assign({}, object.astNode, {
+					name = Object.assign({}, object.astNode.name, { value = name })
 				})
-			}) else p1.astNode,
-			extensionASTNodes = if p1.extensionASTNodes ~= nil then Array.map(p1.extensionASTNodes, function(p6) -- line: 148
-				-- upvalues: Object (copy), s1 (copy)
-				return Object.assign({}, p6, {
-					name = Object.assign({}, p6.name, {
-						value = s1
+			end
+
+			v.astNode = astNode
+			local extensionASTNodes
+
+			if object.extensionASTNodes == nil then
+				extensionASTNodes = object.extensionASTNodes
+			else
+				extensionASTNodes = Array.map(object.extensionASTNodes, function(p)
+					return Object.assign({}, p, {
+						name = Object.assign({}, p.name, { value = name })
 					})
-				})
-			end) else p1.extensionASTNodes
-		}))
-	end
+				end)
+			end
 
-	if Boolean.toJSBoolean(isScalarType(p1)) then
-		return GraphQLScalarType.new(Object.assign({}, p1:toConfig(), {
-			name = s1,
-			astNode = if p1.astNode ~= nil then Object.assign({}, p1.astNode, {
-				name = Object.assign({}, p1.astNode.name, {
-					value = s1
+			v.extensionASTNodes = extensionASTNodes
+			return new(assign({}, config, v))
+		else
+			if not Boolean.toJSBoolean(isScalarType(object)) then
+				error(Error.new(("Unknown type %s."):format((tostring(object)))))
+				return
+			end
+
+			local new = GraphQLScalarType.new
+			local assign = Object.assign
+			local config = object:toConfig()
+			local v = { name = name, astNode = 0, extensionASTNodes = 0 }
+			local astNode
+
+			if object.astNode == nil then
+				astNode = object.astNode
+			else
+				astNode = Object.assign({}, object.astNode, {
+					name = Object.assign({}, object.astNode.name, { value = name })
 				})
-			}) else p1.astNode,
-			extensionASTNodes = if p1.extensionASTNodes ~= nil then Array.map(p1.extensionASTNodes, function(p7) -- line: 168
-				-- upvalues: Object (copy), s1 (copy)
-				return Object.assign({}, p7, {
-					name = Object.assign({}, p7.name, {
-						value = s1
+			end
+
+			v.astNode = astNode
+			local extensionASTNodes
+
+			if object.extensionASTNodes == nil then
+				extensionASTNodes = object.extensionASTNodes
+			else
+				extensionASTNodes = Array.map(object.extensionASTNodes, function(p)
+					return Object.assign({}, p, {
+						name = Object.assign({}, p.name, { value = name })
 					})
-				})
-			end) else p1.extensionASTNodes
-		}))
+				end)
+			end
+
+			v.extensionASTNodes = extensionASTNodes
+			return new(assign({}, config, v))
+		end
 	end
-
-	error(Error.new(("Unknown type %s."):format((tostring(p1)))))
-end
-
-return t1
+}

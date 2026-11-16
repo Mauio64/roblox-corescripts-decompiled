@@ -1,9 +1,9 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "InExperienceShop-MockDataModel",
-	mockDataModel = true,
 	testMatch = {
 		"**/Mocks/**/*.test",
 		"**/Mocks/*.test",
@@ -12,10 +12,13 @@ return {
 		"**/Stores/**/*.test",
 		"**/Stores/*.test",
 		"**/Internal/whenJoinSettles.test",
-		"**/initShopGlobalIcon.test"
+		"**/Hooks/useCloseOnCoreMenu.test",
+		"**/initShopGlobalIcon.test",
+		"**/submitFreeTrialMenuBadge.test",
+		"**/submitFreeTrialTooltips.test"
 	},
+	mockDataModel = true,
 	setupFilesAfterEnv = {
-		JestConfigs.setupFiles.ErrorLogHandler,
 		JestConfigs.setupFiles.UIBloxInitializer,
 		JestConfigs.setupFiles.createPromiseRejectionHandler(),
 		JestConfigs.setupFiles.RetryTimes

@@ -1,6 +1,7 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+local React = require(parent.React)
+
 local BrickColorPicker = require(Foundation.Components.ColorPicker.BrickColorPicker)
 local ColorInputMode = require(Foundation.Enums.ColorInputMode)
 local ColorInputs = require(Foundation.Components.ColorPicker.ColorInputs)
@@ -8,6 +9,7 @@ local ColorSlider = require(Foundation.Components.ColorPicker.ColorSlider)
 local ColorSliderType = require(Foundation.Enums.ColorSliderType)
 local SVPicker = require(Foundation.Components.ColorPicker.SVPicker)
 local View = require(Foundation.Components.View)
+
 local colorUtils = require(Foundation.Components.ColorPicker.colorUtils)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
@@ -15,182 +17,217 @@ local withDefaults = require(Foundation.Utility.withDefaults)
 
 require(Foundation.Components.Types)
 
-local t1 = {
+local v = {
 	initialAlpha = 1,
-	testId = "--foundation-color-picker",
-	initialMode = ColorInputMode.RGB
+	initialMode = ColorInputMode.RGB,
+	testId = "--foundation-color-picker"
 }
 
-local function resolveInitialHSV(p1) -- line: 40
-	if type(p1) == "table" then
-		return p1.H / 360, (p1.S or 100) / 100, (p1.V or 100) / 100
+local function resolveInitialHSV(data)
+	if type(data) == "table" then
+		return data.H / 360, (data.S or 100) / 100, (data.V or 100) / 100
 	end
 
-	return p1:ToHSV()
+	return data:ToHSV()
 end
-local function ColorPicker(p2) -- line: 48
-	-- upvalues: ColorInputMode (copy), withDefaults (copy), t1 (copy), useTokens (copy), React (copy), colorUtils (copy), View (copy), withCommonProps (copy), ColorInputs (copy), BrickColorPicker (copy), SVPicker (copy), ColorSlider (copy), ColorSliderType (copy)
-	local v20 = p2.availableModes or {
-		ColorInputMode.RGB,
-		ColorInputMode.HSV,
-		ColorInputMode.Hex,
-		ColorInputMode.Brick
-	}
-	local v21 = withDefaults(p2, t1)
-	local Magenta_700Color3 = useTokens().Color.Extended.Magenta.Magenta_700.Color3
-	local v23 = v21.initialColor or Magenta_700Color3
-	local v24, v25 = React.useBinding(v23)
-	local v26, v27, v28
 
-	if type(v23) == "table" then
-		v26 = v23.H / 360
-		v27 = (v23.S or 100) / 100
-		v28 = (v23.V or 100) / 100
+local function ColorPicker(p)
+	local availableModes = p.availableModes
+		or { ColorInputMode.RGB, ColorInputMode.HSV, ColorInputMode.Hex, ColorInputMode.Brick }
+
+	local v2 = withDefaults(p, v)
+	local color3 = useTokens().Color.Extended.Magenta.Magenta_700.Color3
+
+	local initialColor = v2.initialColor or color3
+
+	local color2, v3 = React.useBinding(initialColor)
+	local v4, v5, v6
+
+	if type(initialColor) == "table" then
+		v4 = initialColor.H / 360
+		v5 = (initialColor.S or 100) / 100
+		v6 = (initialColor.V or 100) / 100
 	else
-		v26, v27, v28 = v23:ToHSV()
+		v4, v5, v6 = initialColor:ToHSV()
 	end
 
-	local v29, v30 = React.useBinding(v26)
-	local v31, v32 = React.useBinding(v27)
-	local v33, v34 = React.useBinding(v28)
-	local v35, v36 = React.useBinding(v21.initialAlpha or 1)
-	local v37, v38 = React.useState(v21.initialMode or ColorInputMode.RGB)
-	local v39 = v24:map(colorUtils.toColor3)
-	local v40 = v24:map(function(p3) -- line: 70
-		-- upvalues: colorUtils (copy)
-		return not colorUtils.isPartialHSV(p3)
-	end)
-	local v41 = React.useRef(false)
+	local hue, v7 = React.useBinding(v4)
+	local saturation, v8 = React.useBinding(v5)
+	local v9, v10 = React.useBinding(v6)
+	local alpha, v11 = React.useBinding(v2.initialAlpha or 1)
+	local state, setState = React.useState(v2.initialMode or ColorInputMode.RGB)
 
-	React.useEffect(function() -- line: 76
-		-- upvalues: v21 (copy), v20 (copy), v38 (copy)
-		local initialMode = v21.initialMode
+	local mapped = color2:map(colorUtils.toColor3)
+
+	local mapped2 = color2:map(function(p2): boolean
+		return not colorUtils.isPartialHSV(p2)
+	end)
+
+	local ref = React.useRef(false)
+
+	React.useEffect(function()
+		local initialMode = v2.initialMode
 
 		if initialMode then
-			local v51 = false
+			local v12 = false
 
-			for _, v53 in v20 do
-				if v53 == initialMode then
-					v51 = true
-
+			for _, availableMode in availableModes do
+				if availableMode == initialMode then
+					v12 = true
 					break
 				end
 			end
 
-			if not v51 then
-				warn(`ColorPicker: initialMode { initialMode } is not in availableModes. Using first available mode.`)
-				v38(v20[1])
+			if not v12 then
+				warn(`ColorPicker: initialMode {initialMode} is not in availableModes. Using first available mode.`)
+				setState(availableModes[1])
 			end
 		end
-	end, { v21.initialMode })
+	end, { v2.initialMode })
 
-	local v42 = React.useCallback(function(color3: Color3, p4) -- line: 95
-		-- upvalues: v25 (copy), v21 (copy)
-		v25(color3)
-		v21.onColorChanged(color3, p4)
-	end, { v21.onColorChanged })
-	local v43 = React.useCallback(function(p5) -- line: 100
-		-- upvalues: v36 (copy), v21 (copy)
-		v36(p5)
+	local v12 = React.useCallback(function(color: Color3, p2)
+		v3(color)
+		v2.onColorChanged(color, p2)
+	end, { v2.onColorChanged })
 
-		if v21.onAlphaChanged then
-			v21.onAlphaChanged(p5)
+	local onValueChanged = React.useCallback(function(p2)
+		v11(p2)
+
+		if v2.onAlphaChanged then
+			v2.onAlphaChanged(p2)
 		end
-	end, { v21.onAlphaChanged })
-	local v44 = React.useCallback(function(p6) -- line: 107
-		-- upvalues: v42 (copy)
-		v42(p6.Color, p6)
-	end, { v42 })
-	local v45 = v21.onAlphaChanged ~= nil
-	local v46 = React.useCallback(function(p7) -- line: 113
-		-- upvalues: v42 (copy)
-		v42(p7, nil)
-	end, { v42 })
-	local v47 = React.useCallback(colorUtils.createHSVUpdateHandler(v30, v32, v34, v46, v41), {
-		v46,
-		v30,
-		v32,
-		v34,
-		v25
-	})
-	local v48 = React.useCallback(colorUtils.createColorInputChangeHandler(v46, v41, v30, v32, v34), {
-		v46,
-		v41,
-		v30,
-		v32,
-		v34
+	end, { v2.onAlphaChanged })
+
+	local onBrickColorChanged = React.useCallback(function(p2)
+		v12(p2.Color, p2)
+	end, { v12 })
+
+	local v13 = v2.onAlphaChanged ~= nil
+
+	local v14 = React.useCallback(function(p2)
+		v12(p2, nil)
+	end, { v12 })
+
+	local v15 = React.useCallback(colorUtils.createHSVUpdateHandler(v7, v8, v10, v14, ref), {
+		v14,
+		v7,
+		v8,
+		v10,
+		v3
 	})
 
-	React.useEffect(function() -- line: 139
-		-- upvalues: v39 (copy), v30 (copy), v32 (copy), v34 (copy)
-		local v59, v60, v61 = v39:getValue():ToHSV()
+	local onColorChanged = React.useCallback(colorUtils.createColorInputChangeHandler(v14, ref, v7, v8, v10), {
+		v14,
+		ref,
+		v7,
+		v8,
+		v10
+	})
 
-		v30(v59)
-		v32(v60)
-		v34(v61)
+	React.useEffect(function()
+		local hsv, v16, v17 = mapped:getValue():ToHSV()
+		v7(hsv)
+		v8(v16)
+		v10(v17)
 	end, {})
 
-	return React.createElement(View, withCommonProps(v21, {
-		tag = "col gap-small size-full-0 auto-y padding-small"
-	}), {
-		ColorInputs = React.createElement(ColorInputs, {
+	local createElement = React.createElement
+
+	local v16 = withCommonProps(v2, { tag = "col gap-small size-full-0 auto-y padding-small" })
+
+	local createElement2 = React.createElement
+	local onAlphaChanged
+
+	if v13 then
+		onAlphaChanged = onValueChanged
+	end
+
+	local v17 = {
+		ColorInputs = createElement2(ColorInputs, {
+			color = color2,
+			alpha = alpha,
+			onColorChanged = onColorChanged,
+			onAlphaChanged = onAlphaChanged,
+			mode = state,
+			onModeChanged = setState,
+			availableModes = availableModes,
 			LayoutOrder = 1,
-			color = v24,
-			alpha = v35,
-			onColorChanged = v48,
-			onAlphaChanged = if not v45 then nil else v43,
-			mode = v37,
-			onModeChanged = v38,
-			availableModes = v20,
-			testId = `{ v21.testId }--input`
+			testId = `{v2.testId}--input`
 		}),
-		BrickPicker = if v37 ~= ColorInputMode.Brick then nil else React.createElement(BrickColorPicker, {
+		BrickPicker = 0,
+		SVPickerContainer = 0,
+		HueSlider = 0,
+		AlphaSlider = 0
+	}
+	local brickPicker
+
+	if state == ColorInputMode.Brick then
+		brickPicker = React.createElement(BrickColorPicker, {
+			selectedColor = mapped,
+			onBrickColorChanged = onBrickColorChanged,
 			LayoutOrder = 2,
-			selectedColor = v39,
-			onBrickColorChanged = v44,
-			testId = `{ v21.testId }--brick-picker`
-		}),
-		SVPickerContainer = if v37 == ColorInputMode.Brick then nil else React.createElement(View, {
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, 156)
+			testId = `{v2.testId}--brick-picker`
+		})
+	end
+
+	v17.BrickPicker = brickPicker
+	local svPickerContainer
+
+	if state ~= ColorInputMode.Brick then
+		svPickerContainer = React.createElement(View, {
+			Size = UDim2.new(1, 0, 0, 156),
+			LayoutOrder = 2
 		}, {
 			SVPicker = React.createElement(SVPicker, {
-				hue = v29,
-				saturation = v31,
-				value = v33,
-				onChanged = function(p8, p9) -- line: 182
-					-- upvalues: v47 (copy), v29 (copy)
-					v47(v29:getValue(), p8, p9)
+				hue = hue,
+				saturation = saturation,
+				value = v9,
+				onChanged = function(p2, p3)
+					v15(hue:getValue(), p2, p3)
 				end,
-				onDragStarted = v21.onDragStarted,
-				onDragEnded = v21.onDragEnded,
-				showSelectionKnob = v40:getValue(),
-				testId = `{ v21.testId }--sv-picker`
+				onDragStarted = v2.onDragStarted,
+				onDragEnded = v2.onDragEnded,
+				showSelectionKnob = mapped2:getValue(),
+				testId = `{v2.testId}--sv-picker`
 			})
-		}),
-		HueSlider = if v37 == ColorInputMode.Brick then nil else React.createElement(ColorSlider, {
-			LayoutOrder = 3,
-			sliderType = ColorSliderType.Hue,
-			value = v29,
-			onValueChanged = function(p10) -- line: 197
-				-- upvalues: v47 (copy), v31 (copy), v33 (copy)
-				v47(p10, v31:getValue(), v33:getValue())
-			end,
-			onDragStarted = v21.onDragStarted,
-			onDragEnded = v21.onDragEnded,
-			testId = `{ v21.testId }--hue-slider`
-		}),
-		AlphaSlider = if not v45 then nil else React.createElement(ColorSlider, {
-			LayoutOrder = 4,
-			sliderType = ColorSliderType.Alpha,
-			value = v35,
-			baseColor = v39,
-			onValueChanged = v43,
-			onDragStarted = v21.onDragStarted,
-			onDragEnded = v21.onDragEnded,
-			testId = `{ v21.testId }--alpha-slider`
 		})
-	})
+	end
+
+	v17.SVPickerContainer = svPickerContainer
+	local hueSlider
+
+	if state ~= ColorInputMode.Brick then
+		hueSlider = React.createElement(ColorSlider, {
+			sliderType = ColorSliderType.Hue,
+			value = hue,
+			onValueChanged = function(p2)
+				v15(p2, saturation:getValue(), v9:getValue())
+			end,
+			onDragStarted = v2.onDragStarted,
+			onDragEnded = v2.onDragEnded,
+			LayoutOrder = 3,
+			testId = `{v2.testId}--hue-slider`
+		})
+	end
+
+	v17.HueSlider = hueSlider
+	local alphaSlider
+
+	if v13 then
+		alphaSlider = React.createElement(ColorSlider, {
+			sliderType = ColorSliderType.Alpha,
+			value = alpha,
+			baseColor = mapped,
+			onValueChanged = onValueChanged,
+			onDragStarted = v2.onDragStarted,
+			onDragEnded = v2.onDragEnded,
+			LayoutOrder = 4,
+			testId = `{v2.testId}--alpha-slider`
+		})
+	end
+
+	v17.AlphaSlider = alphaSlider
+	return createElement(View, v16, v17)
 end
 
 return ColorPicker

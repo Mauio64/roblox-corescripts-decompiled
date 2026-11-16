@@ -1,80 +1,115 @@
 local TelemetryService = game:GetService("TelemetryService")
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
-local SduiErrors = require(Parent.SduiCoreSystem).SduiErrors
-local v5 = game:DefineFastInt("SduiPlayerTileImpressionsThrottlingHundredthsPercent", 10000)
 
-local function SduiPlayerTileImpressionsHandler(p1, t1: {[any]: any}, t2: {[any]: any}, p2, n1: number?) -- line: 18
-	-- upvalues: SduiErrors (copy), TelemetryService (copy), v5 (copy), LocalizationService (copy)
-	if not p2 then
-		p1.dependencies.logger.reportError(SduiErrors.SduiErrorType.FailedToLogPlayerTileImpressions, {
-			name = "SduiPlayerTileImpressionsHandler",
-			message = "Missing collectionAnalyticsData"
-		}, p1.appPage)
+local parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
 
+local SduiCoreSystem = require(parent.SduiCoreSystem)
+local SduiErrors = SduiCoreSystem.SduiErrors
+
+local defineFastInt = game:DefineFastInt("SduiPlayerTileImpressionsThrottlingHundredthsPercent", 10000)
+
+local function SduiPlayerTileImpressionsHandler(p, list, list2, data, value: number?)
+	if not data then
+		p.dependencies.logger.reportError(
+			SduiErrors.SduiErrorType.FailedToLogPlayerTileImpressions,
+			{
+				name = "SduiPlayerTileImpressionsHandler",
+				message = "Missing collectionAnalyticsData"
+			},
+			p.appPage
+		)
 		return
 	end
 
-	if #t1 == 0 or #t2 == 0 then
+	if #list == 0 or #list2 == 0 then
 		return
 	end
 
-	local t3 = {}
-	local t4 = {}
-	local t5 = {}
-	local t6 = {}
-	local itemsPerRow = p2.itemsPerRow
+	local itemsPerRow = data.itemsPerRow
+	local v = {}
+	local playerIds = {}
+	local playerNames = {}
+	local v2 = {}
 
-	for _, v18 in t1 do
-		local v19 = t2[v18]
-		local v20 = if not v19 then nil else v19.playerId
+	for _, item in list do
+		local item2 = list2[item]
+		local playerId
 
-		if v20 ~= nil then
-			table.insert(t3, v18)
-			table.insert(t4, v20)
-			table.insert(t5, v19.playerName or (v19.name or (v19.username or "")))
-
-			if typeof(n1) == "number" and typeof(itemsPerRow) == "number" and itemsPerRow > 0 then
-				table.insert(t6, n1 + math.ceil(v18 / itemsPerRow) - 1)
-			end
+		if item2 then
+			playerId = item2.playerId
 		end
+
+		if playerId == nil then
+			continue
+		end
+
+		table.insert(v, item)
+		table.insert(playerIds, playerId)
+		table.insert(playerNames, item2.playerName or item2.name or item2.username or "")
+
+		if not (typeof(value) == "number" and typeof(itemsPerRow) == "number" and itemsPerRow > 0) then
+			continue
+		end
+
+		table.insert(v2, value + math.ceil(item / itemsPerRow) - 1)
 	end
 
-	if #t4 == 0 then
+	if #playerIds == 0 then
 		return
 	end
 
-	local userSearchSessionId = p2.userSearchSessionId
+	local userSearchSessionId = data.userSearchSessionId
 
+	local v3 = {
+		eventContext = data.eventContext or "playerSearch",
+		standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" },
+		customFields = 0
+	}
+
+	local customFields = {
+		tilePos = table.concat(v, ","),
+		playerId = table.concat(playerIds, ","),
+		playerName = table.concat(playerNames, ","),
+		userSearchSessionId = 0,
+		sortId = 0,
+		sortPosition = 0,
+		pageContext = 0,
+		rowInSort = 0,
+		locale = 0
+	}
+	local userSearchSessionId2
+
+	if userSearchSessionId ~= nil then
+		userSearchSessionId2 = tostring(userSearchSessionId)
+	end
+
+	customFields.userSearchSessionId = userSearchSessionId2
+	local sortId
+
+	if data.collectionId ~= nil then
+		sortId = tostring(data.collectionId)
+	end
+
+	customFields.sortId = sortId
+
+	customFields.sortPosition = data.collectionPosition
+	customFields.pageContext = data.pageContext or p.appPage
+	local rowInSort
+
+	if #v2 > 0 then
+		rowInSort = table.concat(v2, ",")
+	end
+
+	customFields.rowInSort = rowInSort
+	customFields.locale = LocalizationService.RobloxLocaleId
+	v3.customFields = customFields
 	TelemetryService:LogEvent({
 		eventName = "playerTileImpressions",
-		description = "Fired when player tiles are visible in an SDUI collection",
 		backends = { "EventIngest" },
-		throttlingPercentage = v5,
-		lastUpdated = {
-			26,
-			7,
-			17
-		}
-	}, {
-		eventContext = p2.eventContext or "playerSearch",
-		standardizedFields = {
-			"addSessionInfo",
-			"addSessionId",
-			"addOSInfo"
-		},
-		customFields = {
-			tilePos = table.concat(t3, ","),
-			playerId = table.concat(t4, ","),
-			playerName = table.concat(t5, ","),
-			userSearchSessionId = if userSearchSessionId == nil then nil else tostring(userSearchSessionId),
-			sortId = if p2.collectionId == nil then nil else tostring(p2.collectionId),
-			sortPosition = p2.collectionPosition,
-			pageContext = p2.pageContext or p1.appPage,
-			rowInSort = if not (#t6 > 0) then nil else table.concat(t6, ","),
-			locale = LocalizationService.RobloxLocaleId
-		}
-	})
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 26, 7, 17 },
+		description = "Fired when player tiles are visible in an SDUI collection"
+	}, v3)
 end
 
 return SduiPlayerTileImpressionsHandler

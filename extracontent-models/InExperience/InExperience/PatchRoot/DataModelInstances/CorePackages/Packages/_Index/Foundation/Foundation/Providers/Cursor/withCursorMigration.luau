@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
+
+local React = require(parent.React)
+
 local CursorContext = require(script.Parent.CursorContext)
 
-local function withCursorMigration(p1) -- line: 8
-	-- upvalues: React (copy), CursorContext (copy)
+local function withCursorMigration(callback)
 	return React.createElement(CursorContext.Consumer, {
-		render = function(p2) -- line: 10
-			-- upvalues: p1 (copy)
-			return p1(p2.getCursor)
+		render = function(p)
+			return callback(p.getCursor)
 		end
 	})
 end

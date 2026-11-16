@@ -1,62 +1,56 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local DateTime = require(AppChatParent.Time).DateTime
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Time = require(parent.Time)
+local DateTime = Time.DateTime
 local getConversationTimestamp = require(AppChat.Utils.getConversationTimestamp)
 
-local function computeTimestamp(n1: number?) -- line: 10
-	-- upvalues: getConversationTimestamp (copy), DateTime (copy)
-	if n1 == nil then
+local function computeTimestamp(p: number?)
+	if p == nil then
 		return ""
 	end
 
-	return getConversationTimestamp(DateTime.fromUnixTimestamp(n1))
+	return getConversationTimestamp(DateTime.fromUnixTimestamp(p))
 end
-local function useRelativeTimestampBinding(n2: number?) -- line: 17
-	-- upvalues: React (copy), computeTimestamp (copy)
-	local v10, v11 = React.useBinding(computeTimestamp(n2))
 
-	React.useEffect(function() -- line: 20
-		-- upvalues: v11 (copy), computeTimestamp (copy), n2 (copy)
-		v11(computeTimestamp(n2))
+local function useRelativeTimestampBinding(p: number?)
+	local v, v2 = React.useBinding(computeTimestamp(p))
 
-		if n2 == nil then
-			return function() -- line: 24
-			end
+	React.useEffect(function()
+		v2(computeTimestamp(p))
+
+		if p == nil then
+			return function() end
 		end
 
-		local u12 = false
-
-		local function scheduleUpdate() -- line: 29
-			-- upvalues: u12 (ref), v11 (copy), computeTimestamp (copy), n2 (copy), scheduleUpdate (copy)
-			task.delay(30, function() -- line: 30
-				-- upvalues: u12 (ref), v11 (copy), computeTimestamp (copy), n2 (copy), scheduleUpdate (copy)
-				if u12 then
+		local flag = false
+		local function scheduleUpdate()
+			task.delay(30, function()
+				if flag then
 					return
 				end
 
-				v11(computeTimestamp(n2))
+				v2(computeTimestamp(p))
 				scheduleUpdate()
 			end)
 		end
 
-		task.delay(30, function() -- line: 30
-			-- upvalues: u12 (ref), v11 (copy), computeTimestamp (copy), n2 (copy), scheduleUpdate (copy)
-			if u12 then
+		task.delay(30, function()
+			if flag then
 				return
 			end
 
-			v11(computeTimestamp(n2))
+			v2(computeTimestamp(p))
 			scheduleUpdate()
 		end)
 
-		return function() -- line: 41
-			-- upvalues: u12 (ref)
-			u12 = true
+		return function()
+			flag = true
 		end
-	end, { n2 })
+	end, { p })
 
-	return v10
+	return v
 end
 
 return useRelativeTimestampBinding

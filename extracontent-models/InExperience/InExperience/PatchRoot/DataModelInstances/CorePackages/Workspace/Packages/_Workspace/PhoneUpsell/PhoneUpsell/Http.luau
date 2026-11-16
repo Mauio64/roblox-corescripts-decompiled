@@ -1,3 +1,1 @@
-return {
-	Requests = require(script.Requests)
-}
+return { Requests = require(script.Requests) }

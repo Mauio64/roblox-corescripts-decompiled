@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.EnhancedVideo.EnhancedVideo))
+local EnhancedVideo = require(Workspace.EnhancedVideo.EnhancedVideo)
+
+return EnhancedVideo

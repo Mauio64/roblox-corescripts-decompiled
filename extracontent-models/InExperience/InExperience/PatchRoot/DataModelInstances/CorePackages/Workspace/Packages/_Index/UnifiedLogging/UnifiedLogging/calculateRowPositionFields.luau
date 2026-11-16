@@ -1,27 +1,31 @@
-local function calculateRowOnPage(n1: number, p1) -- line: 1
-	if not p1 or typeof(p1) ~= "number" then
-		return -1
+local function calculateRowOnPage(p: number, value) -- 1 equivalent call inferred from this helper
+	if value and typeof(value) == "number" then
+		return value + p - 1
 	end
 
-	return p1 + n1 - 1
+	return -1
 end
-local function calculateRowPositionFields(p2, p3, p4) -- line: 15
-	if not p2 or (typeof(p2) ~= "number" or p2 <= 0 or not p3 or typeof(p3) ~= "number" or p3 <= 0) then
-		return {
-			positionInRow = -1,
-			rowInSort = -1,
-			rowOnPage = -1
-		}
+
+local function calculateRowPositionFields(value, value2, value3)
+	if
+		not value
+		or typeof(value) ~= "number"
+		or value <= 0
+		or not value2
+		or typeof(value2) ~= "number"
+		or value2 <= 0
+	then
+		return { positionInRow = -1, rowInSort = -1, rowOnPage = -1 }
 	end
 
-	local v8 = (p2 - 1) % p3 + 1
-	local v9 = math.ceil(p2 / p3)
-	local v10 = if not not p4 and typeof(p4) == "number" then p4 + v9 - 1 else -1
+	local positionInRow = (value - 1) % value2 + 1
+
+	local rowInSort = math.ceil(value / value2)
 
 	return {
-		positionInRow = v8,
-		rowInSort = v9,
-		rowOnPage = v10
+		positionInRow = positionInRow,
+		rowInSort = rowInSort,
+		rowOnPage = calculateRowOnPage(rowInSort, value3) -- inferred equivalent call
 	}
 end
 

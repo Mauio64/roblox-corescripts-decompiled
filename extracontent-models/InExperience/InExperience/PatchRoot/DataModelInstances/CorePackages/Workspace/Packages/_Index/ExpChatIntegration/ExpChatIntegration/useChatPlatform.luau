@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("ExpChatIntegration").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ExpChatIntegration").Parent
+
+local React = require(parent.React)
+
 local ChatPlatformContext = require(script.Parent.ChatPlatformContext)
 
-local function useChatPlatform() -- line: 14
-	-- upvalues: React (copy), ChatPlatformContext (copy)
+local function useChatPlatform()
 	return React.useContext(ChatPlatformContext)
 end
 

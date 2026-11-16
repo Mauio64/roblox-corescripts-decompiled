@@ -1,4 +1,4 @@
-local function waitForEvents() -- line: 6
+local function waitForEvents()
 	task.defer(coroutine.running())
 	coroutine.yield()
 end

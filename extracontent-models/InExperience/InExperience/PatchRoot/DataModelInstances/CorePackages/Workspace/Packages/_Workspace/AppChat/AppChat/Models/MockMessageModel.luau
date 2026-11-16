@@ -1,35 +1,38 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local DateTime = require(Parent.Time).DateTime
-local GenerateStringId = require(Parent.AppCommonLib).GenerateStringId
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local Time = require(parent.Time)
+local DateTime = Time.DateTime
+local AppCommonLib = require(parent.AppCommonLib)
+local GenerateStringId = AppCommonLib.GenerateStringId
+
 local MessageModel = require(script.Parent.MessageModel)
-local t1 = {
-	mock = function(p1) -- line: 11
-		-- upvalues: MessageModel (copy), GenerateStringId (copy), DateTime (copy)
-		local v7 = MessageModel.new()
 
-		v7.id = GenerateStringId()
-		v7.senderTargetId = GenerateStringId()
-		v7.conversationId = GenerateStringId()
-		v7.senderType = MessageModel.SenderTypes.User
-		v7.content = "MESSAGE CONTENT"
-		v7.messageType = MessageModel.MessageTypes.PlainText
-		v7.read = false
-		v7.sent = DateTime.now()
-		v7.previousMessageId = nil
-		v7.filteredForReceivers = false
+local MockMessageModel = {
+	mock = function(items)
+		local result = MessageModel.new()
 
-		if p1 ~= nil then
-			for k, v in pairs(p1) do
-				v7[k] = v
+		result.id = GenerateStringId()
+		result.senderTargetId = GenerateStringId()
+		result.conversationId = GenerateStringId()
+		result.senderType = MessageModel.SenderTypes.User
+		result.content = "MESSAGE CONTENT"
+		result.messageType = MessageModel.MessageTypes.PlainText
+
+		result.read = false
+		result.sent = DateTime.now()
+		result.previousMessageId = nil
+		result.filteredForReceivers = false
+
+		if items ~= nil then
+			for k, item in pairs(items) do
+				result[k] = item
 			end
 		end
 
-		return v7
+		return result
 	end
 }
 
-setmetatable(t1, {
-	__index = MessageModel
-})
+setmetatable(MockMessageModel, { __index = MessageModel })
 
-return t1
+return MockMessageModel

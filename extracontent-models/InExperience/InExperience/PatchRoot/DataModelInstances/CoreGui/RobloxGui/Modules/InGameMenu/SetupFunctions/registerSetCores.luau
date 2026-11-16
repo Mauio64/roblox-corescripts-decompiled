@@ -1,25 +1,24 @@
 local StarterGui = game:GetService("StarterGui")
-local ParentParent = script.Parent.Parent
-local SetRespawnBehavior = require(ParentParent.Actions.SetRespawnBehavior)
 
-local function registerSetCores(p1) -- line: 8
-	-- upvalues: StarterGui (copy), SetRespawnBehavior (copy)
-	StarterGui:RegisterSetCore("ResetButtonCallback", function(p2) -- line: 9
-		-- upvalues: p1 (copy), SetRespawnBehavior (copy)
-		local v7 = true
-		local v8 = nil
+local parent = script.Parent.Parent
 
-		if typeof(p2) == "boolean" then
-			v7 = p2
-			v8 = nil
-		elseif typeof(p2) == "Instance" and p2:IsA("BindableEvent") then
-			v7 = true
-			v8 = p2
+local SetRespawnBehavior = require(parent.Actions.SetRespawnBehavior)
+
+local function registerSetCores(object)
+	StarterGui:RegisterSetCore("ResetButtonCallback", function(bindableEvent)
+		local v = true
+		local v2 = nil
+
+		if typeof(bindableEvent) == "boolean" then
+			v = bindableEvent
+		elseif typeof(bindableEvent) == "Instance" and bindableEvent:IsA("BindableEvent") then
+			v2 = bindableEvent
+			v = true
 		else
 			error("ResetButtonCallback must be set to a BindableEvent or a boolean", 0)
 		end
 
-		p1:dispatch(SetRespawnBehavior(v7, v8))
+		object:dispatch(SetRespawnBehavior(v, v2))
 	end)
 end
 

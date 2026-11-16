@@ -2,38 +2,35 @@ local CorePackages = game:GetService("CorePackages")
 local Cryo = require(CorePackages.Packages.Cryo)
 local React = require(CorePackages.Packages.React)
 
-local function AudioDeviceInputDebugger(t1: {[any]: any}) -- line: 5
-	-- upvalues: React (copy), Cryo (copy)
-	local v6, v7 = React.useState(true)
-	local instances = t1.instances
-	local mutedPlayers = t1.mutedPlayers
-	local v10 = Cryo.List.map(Cryo.Dictionary.keys(instances), function(p1, n1: number) -- line: 15
-		-- upvalues: mutedPlayers (copy), React (copy)
-		local p1Active = p1.Active
-		local v14 = p1.Player and p1.Player.Name or "(no player)"
-		local v15 = not p1Active and "inactive" or "active"
-		local v16 = (not p1.Player or not mutedPlayers[p1.Player.UserId]) and "unmuted" or "muted"
-		local v17 = not p1.MutedByLocalUser and "not-mutedByLocalUser" or "mutedByLocalUser"
+local function AudioDeviceInputDebugger(p)
+	local state, setState = React.useState(true)
+	local instances = p.instances
+	local mutedPlayers = p.mutedPlayers
 
+	local mapped = Cryo.List.map(Cryo.Dictionary.keys(instances), function(props, layoutOrder: number)
+		local active = props.Active
+		local name = props.Player and props.Player.Name or "(no player)"
+
+		local v = props.Player and mutedPlayers[props.Player.UserId] and "muted" or "unmuted"
+		local v2 = props.MutedByLocalUser and "mutedByLocalUser" or "not-mutedByLocalUser"
 		return React.createElement("TextLabel", {
-			RichText = true,
-			BackgroundTransparency = 1,
-			TextSize = 18,
-			Text = string.format("<b>%s</b>: %s, %s, %s", v14, v15, v16, v17),
+			Text = string.format("<b>%s</b>: %s, %s, %s", name, active and "active" or "inactive", v, v2),
 			Size = UDim2.fromOffset(20, 25),
+			RichText = true,
 			AutomaticSize = Enum.AutomaticSize.X,
-			LayoutOrder = n1,
+			LayoutOrder = layoutOrder,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextColor3 = Color3.fromRGB(255, 255, 255),
-			Font = Enum.Font.SourceSans
+			BackgroundTransparency = 1,
+			Font = Enum.Font.SourceSans,
+			TextSize = 18
 		})
 	end)
 
-	v10.Title = React.createElement("TextButton", {
+	mapped.Title = React.createElement("TextButton", {
 		Text = "<b>AudioDeviceInputs</b>",
-		[React.Event.Activated] = function() -- line: 37
-			-- upvalues: v7 (copy), v6 (copy)
-			v7(not v6)
+		[React.Event.Activated] = function()
+			setState(not state)
 		end,
 		TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
 		TextStrokeTransparency = 0.5,
@@ -47,11 +44,13 @@ local function AudioDeviceInputDebugger(t1: {[any]: any}) -- line: 5
 		Font = Enum.Font.SourceSansBold,
 		TextSize = 20
 	})
-	v10.UIListLayout = React.createElement("UIListLayout", {
+
+	mapped.UIListLayout = React.createElement("UIListLayout", {
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		Padding = UDim.new(0, 3)
 	})
-	v10.UIPadding = React.createElement("UIPadding", {
+
+	mapped.UIPadding = React.createElement("UIPadding", {
 		PaddingTop = UDim.new(0, 3),
 		PaddingBottom = UDim.new(0, 3),
 		PaddingLeft = UDim.new(0, 3),
@@ -65,17 +64,17 @@ local function AudioDeviceInputDebugger(t1: {[any]: any}) -- line: 5
 		OnTopOfCoreBlur = true,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	}, React.createElement("ScrollingFrame", {
-		Active = true,
-		BorderSizePixel = 0,
-		ScrollBarThickness = 6,
-		Size = UDim2.new(0.3333333333333333, 0, not v6 and 0 or 0.3333333333333333, not v6 and 25 or 0),
+		Size = UDim2.new(1 / 3, 0, state and 1 / 3 or 0, state and 0 or 25),
 		Position = UDim2.new(0, 0, 1, 0),
 		AnchorPoint = Vector2.new(0, 1),
+		Active = true,
 		AutomaticCanvasSize = Enum.AutomaticSize.XY,
 		BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+		BorderSizePixel = 0,
 		CanvasSize = UDim2.new(0, 0, 0, #Cryo.Dictionary.keys(instances) * 28),
-		BackgroundTransparency = not v6 and 1 or 0.2
-	}, v10))
+		ScrollBarThickness = 6,
+		BackgroundTransparency = state and 0.2 or 1
+	}, mapped))
 end
 
 return AudioDeviceInputDebugger

@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local UniverseConfiguration = require(Workspace.DataHydration.DataHydration.UniverseConfiguration)
 
-return (require(_Workspace.DataHydration.DataHydration.UniverseConfiguration))
+return UniverseConfiguration

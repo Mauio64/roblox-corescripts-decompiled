@@ -1,3 +1,5 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-return require(ParentParent.NavigationSymbol)("NullPath")
+local NavigationSymbol = require(parent.NavigationSymbol)
+
+return NavigationSymbol("NullPath")

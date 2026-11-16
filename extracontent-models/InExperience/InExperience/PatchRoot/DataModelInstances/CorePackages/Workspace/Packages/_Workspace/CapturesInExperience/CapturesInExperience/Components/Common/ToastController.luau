@@ -1,110 +1,118 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local ReactOtter = require(ParentParent.ReactOtter)
-local Foundation = require(ParentParent.Foundation)
+local parent = script.Parent.Parent.Parent.Parent
+
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local Foundation = require(parent.Foundation)
+
 local Toast = Foundation.Toast
 local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
-local t1 = {
-	dampingRatio = 1,
-	frequency = 3
-}
-local uDim = UDim.new(0, 296)
 
-local function ToastController(t2: {[any]: any}) -- line: 36
-	-- upvalues: React (copy), ReactOtter (copy), t1 (copy), ButtonVariant (copy), View (copy), Toast (copy), uDim (copy)
-	local v12, v13 = React.useState(false)
-	local v14 = React.useCallback(function() -- line: 39
-		-- upvalues: v12 (copy), t2 (copy)
-		if not v12 then
-			t2.onDismissed()
+local ToastWithIconAction = require(script.Parent.ToastWithIconAction)
+
+local v = { dampingRatio = 1, frequency = 3 }
+
+local udim = UDim.new(0, 296)
+
+local function ToastController(props)
+	local state, setState = React.useState(false)
+
+	local v2 = React.useCallback(function()
+		if not state then
+			props.onDismissed()
 		end
-	end, {
-		v12,
-		t2.onDismissed
-	})
-	local v15, v16 = ReactOtter.useAnimatedBinding(-200, v14)
-	local v17 = React.useCallback(function() -- line: 47
-		-- upvalues: v13 (copy), v16 (copy), ReactOtter (copy), t1 (copy)
-		v13(false)
-		v16(ReactOtter.spring(-200, t1))
-	end, { v16 })
+	end, { state, props.onDismissed })
 
-	React.useEffect(function() -- line: 52
-		-- upvalues: t2 (copy), v13 (copy), v16 (copy), ReactOtter (copy), t1 (copy), v17 (copy)
-		if t2.show then
-			v13(true)
-			v16(ReactOtter.spring(20, t1))
+	local v3, v4 = ReactOtter.useAnimatedBinding(-200, v2)
+
+	local v5 = React.useCallback(function()
+		setState(false)
+		v4(ReactOtter.spring(-200, v))
+	end, { v4 })
+
+	React.useEffect(function()
+		if not props.show then
+			v5()
 
 			return
 		end
 
-		v17()
-	end, {
-		t2.show,
-		v16,
-		v17
-	})
-	React.useEffect(function() -- line: 61
-		-- upvalues: t2 (copy), v17 (copy)
-		if t2.show and t2.duration > 0 then
-			local thread = task.delay(t2.duration, function() -- line: 63
-				-- upvalues: v17 (copy)
-				v17()
-			end)
+		setState(true)
+		v4(ReactOtter.spring(20, v))
+	end, { props.show, v4, v5 })
 
-			return function() -- line: 66
-				-- upvalues: thread (copy)
+	React.useEffect(function()
+		if props.show and props.duration > 0 then
+			local thread = task.delay(props.duration, function()
+				v5()
+			end)
+			return function()
 				task.cancel(thread)
 			end
 		end
 
 		return nil
-	end, {
-		t2.show,
-		t2.duration,
-		v17
-	})
+	end, { props.show, props.duration, v5 })
 
-	local onAction = t2.onAction
-	local v19 = React.useMemo(function() -- line: 74
-		-- upvalues: t2 (copy), onAction (copy), v17 (copy), ButtonVariant (copy)
-		if not t2.actionText then
-			return nil
+	local onAction = props.onAction
+	local actions = React.useMemo(function()
+		if props.actionText then
+			return {
+				{
+					text = props.actionText,
+					onActivated = function()
+						if onAction then
+							onAction()
+						end
+
+						v5()
+					end,
+					variant = ButtonVariant.Emphasis
+				}
+			}
 		end
 
-		return {{
-			text = t2.actionText,
-			onActivated = function() -- line: 81
-				-- upvalues: onAction (copy), v17 (copy)
-				if onAction then
-					onAction()
-				end
+		return nil
+	end, { props.actionText, onAction, v5 })
 
-				v17()
-			end,
-			variant = ButtonVariant.Emphasis
-		}}
-	end, {
-		t2.actionText,
-		onAction,
-		v17
-	})
-	local v20 = v15:map(function(p1) -- line: 92
-		return UDim2.new(0.5, 0, 0, p1)
+	local iconAction = props.iconAction
+
+	local mapped = v3:map(function(p)
+		return UDim2.new(0.5, 0, 0, p)
 	end)
 
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y col align-x-center anchor-top-center",
-		Position = v20
-	}, {
-		Toast = React.createElement(Toast, {
-			title = t2.title,
-			text = t2.text,
-			icon = t2.icon,
-			actions = v19,
-			width = uDim
+	local createElement = React.createElement
+	local toast
+
+	if iconAction and actions then
+		toast = React.createElement(ToastWithIconAction, {
+			title = props.title,
+			text = props.text,
+			icon = props.icon,
+			actionText = actions[1].text,
+			onAction = actions[1].onActivated,
+			iconActionIcon = iconAction.icon,
+			onIconAction = function()
+				iconAction.onActivated()
+				v5()
+			end,
+			width = udim
 		})
+	else
+		toast = React.createElement(Toast, {
+			title = props.title,
+			text = props.text,
+			icon = props.icon,
+			actions = actions,
+			width = udim
+		})
+	end
+
+	return createElement(View, {
+		tag = "size-full-0 auto-y col align-x-center anchor-top-center",
+		Position = mapped
+	}, {
+		Toast = toast
 	})
 end
 

@@ -1,171 +1,201 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
 
 require(script.Parent.Parent.types)
+local SharedFlags = require(parent.SharedFlags)
 
-local SharedFlags = require(Parent.SharedFlags)
 local FFlagHideLookDiscountPercentWithIneligibleItems = require(script.Parent.Parent.Flags.FFlagHideLookDiscountPercentWithIneligibleItems)
 local FFlagPurchasePromptFetchCartPricingForLooks = SharedFlags.FFlagPurchasePromptFetchCartPricingForLooks
 local FIntBlackbirdUpsellMinPriceForDiscountInclusive = SharedFlags.FIntBlackbirdUpsellMinPriceForDiscountInclusive
 local FIntBlackbirdUpsellMaxPriceForDiscountInclusive = SharedFlags.FIntBlackbirdUpsellMaxPriceForDiscountInclusive
 
-local function handleLooksProductInfoResult(p1, t1: {[any]: any}) -- line: 37
-	-- upvalues: FFlagPurchasePromptFetchCartPricingForLooks (copy), FIntBlackbirdUpsellMaxPriceForDiscountInclusive (copy), FIntBlackbirdUpsellMinPriceForDiscountInclusive (copy), FFlagHideLookDiscountPercentWithIneligibleItems (copy)
-	if not p1 or (not p1.look or not p1.look.items) then
+local function handleLooksProductInfoResult(p, options)
+	if not (p and p.look and p.look.items) then
 		return nil
 	end
 
-	local look = p1.look
-	local v11 = t1 or {}
-	local t2 = {}
+	local look = p.look
+	local v = options or {}
 
-	for _, v in ipairs(v11.excludedAssetIds or {}) do
-		t2[tostring(v)] = true
+	local set = {}
+
+	for _, v2 in ipairs(v.excludedAssetIds or {}) do
+		set[tostring(v2)] = true
 	end
 
-	local t3 = {}
+	local set2 = {}
 
-	for _, v in ipairs(v11.excludedBundleIds or {}) do
-		t3[tostring(v)] = true
+	for _, v2 in ipairs(v.excludedBundleIds or {}) do
+		set2[tostring(v2)] = true
 	end
 
-	local t4 = {}
+	local days = {}
 
-	for _, v in ipairs(v11.timedOptions or {}) do
-		t4[v.itemType .. ":" .. tostring(v.itemId)] = v.days
+	for _, v2 in ipairs(v.timedOptions or {}) do
+		days[v2.itemType .. ":" .. tostring(v2.itemId)] = v2.days
 	end
 
-	local n1 = 0
-	local n2 = 0
-	local t5 = {}
-	local t6 = {}
-	local v25 = false
-	local v26 = false
-	local t7 = {}
-	local t8 = {}
+	local total = 0
+	local total2 = 0
+	local v2 = {}
 
-	for _, v in ipairs(look.items) do
-		local str = tostring(v.id)
+	local localizedDiscountAttributionsByDiscountCampaign = {}
 
-		if (v.itemType ~= "Asset" or not t2[str]) and (v.itemType ~= "Bundle" or not t3[str]) then
-			local v32 = t4[v.itemType .. ":" .. str]
+	local collectibleItemIds = {}
+	local cartPricingRequestedItems = {}
+	local v3 = false
+	local v4 = false
+
+	for _, item in ipairs(look.items) do
+		local id = tostring(item.id)
+
+		if not ((item.itemType ~= "Asset" or not set[id]) and (item.itemType ~= "Bundle" or not set2[id])) then
+			continue
+		end
+
+		local rentalDays = days[item.itemType .. ":" .. id]
+
+		if FFlagPurchasePromptFetchCartPricingForLooks then
+			local collectibleItemId = item.collectibleItemId or item.CollectibleItemId or item.collectible_item_id
+
+			if type(collectibleItemId) == "string" and collectibleItemId ~= "" then
+				table.insert(collectibleItemIds, collectibleItemId)
+				local v5 = { collectibleItemId = collectibleItemId }
+
+				if type(rentalDays) == "number" and rentalDays > 0 then
+					v5.rentalDays = rentalDays
+				else
+					v5.isPermanent = true
+				end
+
+				table.insert(cartPricingRequestedItems, v5)
+			end
+		end
+
+		local v5 = nil
+		local discountInformation = nil
+
+		if rentalDays and item.timedOptions then
+			local v6 = false
+
+			for _, timedOption in ipairs(item.timedOptions) do
+				if timedOption.days == rentalDays then
+					v5 = timedOption.price or 0
+					discountInformation = timedOption.discountInformation
+					v6 = true
+					break
+				end
+			end
+
+			if not v6 then
+				v5 = item.priceInRobux or 0
+				discountInformation = item.discountInformation
+			end
+		else
+			v5 = item.priceInRobux or 0
+			discountInformation = item.discountInformation
+		end
+
+		total += v5
+		local v6
+
+		if discountInformation then
+			v6 = discountInformation.originalPrice or v5
+		else
+			v6 = v5
+		end
+
+		local fIntBlackbirdUpsellMaxPriceForDiscountInclusive = FIntBlackbirdUpsellMaxPriceForDiscountInclusive
+		local v7
+
+		if v6 <= FIntBlackbirdUpsellMinPriceForDiscountInclusive then
+			v7 = true
+		elseif fIntBlackbirdUpsellMaxPriceForDiscountInclusive == 0 then
+			v7 = false
+		else
+			v7 = fIntBlackbirdUpsellMaxPriceForDiscountInclusive <= v6
+		end
+
+		if discountInformation and not v7 then
+			v3 = true
+		else
+			v4 = true
+		end
+
+		if discountInformation then
+			total2 += discountInformation.originalPrice or v5
+
+			for _, v8 in ipairs(discountInformation.discounts or {}) do
+				local discountCampaign = v8.discountCampaign
+
+				if not discountCampaign then
+					continue
+				end
+
+				v2[discountCampaign] = (v2[discountCampaign] or 0) + (v8.robuxDiscountAmount or 0)
+
+				if not (FFlagPurchasePromptFetchCartPricingForLooks and localizedDiscountAttributionsByDiscountCampaign[discountCampaign] == nil) then
+					continue
+				end
+
+				local localizedDiscountAttribution = v8.localizedDiscountAttribution
+
+				if localizedDiscountAttribution ~= "" then
+					localizedDiscountAttributionsByDiscountCampaign[discountCampaign] = localizedDiscountAttribution
+				end
+			end
+		else
+			total2 += v5
+		end
+	end
+
+	local v5 = FFlagHideLookDiscountPercentWithIneligibleItems and v3 and v4
+	local priceDiscountDetails = {}
+
+	if total2 > 0 then
+		for k, amountInRobux in pairs(v2) do
+			if not (amountInRobux > 0) then
+				continue
+			end
+
+			local v6 = {
+				Type = k,
+				AmountInRobux = amountInRobux,
+				Percent = v5 and 0 or math.round(amountInRobux / total2 * 100),
+				LocalizedDiscountAttribution = 0
+			}
+			local localizedDiscountAttribution
 
 			if FFlagPurchasePromptFetchCartPricingForLooks then
-				local v33 = v.collectibleItemId or (v.CollectibleItemId or v.collectible_item_id)
-
-				if type(v33) == "string" and v33 ~= "" then
-					table.insert(t7, v33)
-
-					local t9 = {
-						collectibleItemId = v33
-					}
-
-					if type(v32) == "number" and v32 > 0 then
-						t9.rentalDays = v32
-					else
-						t9.isPermanent = true
-					end
-
-					table.insert(t8, t9)
-				end
+				localizedDiscountAttribution = localizedDiscountAttributionsByDiscountCampaign[k]
 			end
 
-			local v35 = nil
-			local discountInformation = nil
-
-			if v32 and v.timedOptions then
-				local v37 = false
-
-				for _, v2 in ipairs(v.timedOptions) do
-					if v32 == v2.days then
-						v35 = v2.price or 0
-						discountInformation = v2.discountInformation
-						v37 = true
-
-						break
-					end
-				end
-
-				if not v37 then
-					v35 = v.priceInRobux or 0
-					discountInformation = v.discountInformation
-				end
-			else
-				v35 = v.priceInRobux or 0
-				discountInformation = v.discountInformation
-			end
-
-			n1 += v35
-
-			local v40 = if not discountInformation then v35 else discountInformation.originalPrice or v35
-			local v41 = FIntBlackbirdUpsellMaxPriceForDiscountInclusive
-			local v42 = v40 <= FIntBlackbirdUpsellMinPriceForDiscountInclusive or v41 ~= 0 and v41 <= v40
-
-			if discountInformation and not v42 then
-				v25 = true
-			else
-				v26 = true
-			end
-
-			if discountInformation then
-				n2 += discountInformation.originalPrice or v35
-
-				for _, v3 in ipairs(discountInformation.discounts or {}) do
-					local discountCampaign = v3.discountCampaign
-
-					if discountCampaign then
-						t5[discountCampaign] = (t5[discountCampaign] or 0) + (v3.robuxDiscountAmount or 0)
-
-						if FFlagPurchasePromptFetchCartPricingForLooks and t6[discountCampaign] == nil then
-							local localizedDiscountAttribution = v3.localizedDiscountAttribution
-
-							if localizedDiscountAttribution ~= "" then
-								t6[discountCampaign] = localizedDiscountAttribution
-							end
-						end
-					end
-				end
-			else
-				n2 += v35
-			end
+			v6.LocalizedDiscountAttribution = localizedDiscountAttribution
+			table.insert(priceDiscountDetails, v6)
 		end
 	end
 
-	local v47 = FFlagHideLookDiscountPercentWithIneligibleItems and (v25 and v26)
-	local t10 = {}
-
-	if n2 > 0 then
-		for k, v in pairs(t5) do
-			if v > 0 then
-				table.insert(t10, {
-					Type = k,
-					AmountInRobux = v,
-					Percent = if not v47 then math.round(v / n2 * 100) else 0,
-					LocalizedDiscountAttribution = if not FFlagPurchasePromptFetchCartPricingForLooks then nil else t6[k]
-				})
-			end
-		end
-	end
-
-	local t11 = {
+	local looks = {
+		PriceInRobux = total,
+		UserBasePriceInRobux = total2,
+		PriceDiscountDetails = priceDiscountDetails,
 		IsForSale = true,
-		Name = "Looks",
-		PriceInRobux = n1,
-		UserBasePriceInRobux = n2,
-		PriceDiscountDetails = t10
+		Name = "Looks"
 	}
 
-	if FFlagPurchasePromptFetchCartPricingForLooks then
-		if #t7 > 0 then
-			t11.CollectibleItemIds = t7
-			t11.CollectibleItemId = t7[1]
-		end
-
-		if #t8 > 0 then
-			t11.CartPricingRequestedItems = t8
-		end
+	if not FFlagPurchasePromptFetchCartPricingForLooks then
+		return looks
 	end
 
-	return t11
+	if #collectibleItemIds > 0 then
+		looks.CollectibleItemIds = collectibleItemIds
+		looks.CollectibleItemId = collectibleItemIds[1]
+	end
+
+	if #cartPricingRequestedItems > 0 then
+		looks.CartPricingRequestedItems = cartPricingRequestedItems
+	end
+
+	return looks
 end
 
 return handleLooksProductInfoResult

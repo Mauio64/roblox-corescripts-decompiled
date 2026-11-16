@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("AvatarSwitcher").Parent
+local parent = script:FindFirstAncestor("AvatarSwitcher").Parent
 
-require(Parent.AvatarExperienceSlotBasedEditor)
+require(parent.AvatarExperienceSlotBasedEditor)
 
 return {}

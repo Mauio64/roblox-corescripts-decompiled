@@ -1,27 +1,21 @@
-local PlayWithRewardState = script:FindFirstAncestor("PlayWithRewardState")
-local SetPlayWithRewardState = require(PlayWithRewardState.SetPlayWithRewardState)
+local playWithRewardState = script:FindFirstAncestor("PlayWithRewardState")
 
-require(PlayWithRewardState.PlayWithRewardAdData)
+local SetPlayWithRewardState = require(playWithRewardState.SetPlayWithRewardState)
+require(playWithRewardState.PlayWithRewardAdData)
 
-local t1 = {
-	flowId = "",
-	universeId = "",
-	isAdDataExpected = false,
-	adData = nil
-}
+local v = { flowId = "", universeId = "", isAdDataExpected = false, adData = nil }
 
-return function(p1, p2) -- line: 24
-	-- upvalues: t1 (copy), SetPlayWithRewardState (copy)
-	local v6 = p1 or table.clone(t1)
+return function(p, data)
+	local v2 = p or table.clone(v)
 
-	if p2.type == SetPlayWithRewardState.name then
+	if data.type == SetPlayWithRewardState.name then
 		return {
-			flowId = p2.flowId,
-			universeId = p2.universeId,
-			isAdDataExpected = p2.isAdDataExpected,
-			adData = p2.adData
+			flowId = data.flowId,
+			universeId = data.universeId,
+			isAdDataExpected = data.isAdDataExpected,
+			adData = data.adData
 		}
 	end
 
-	return v6
+	return v2
 end

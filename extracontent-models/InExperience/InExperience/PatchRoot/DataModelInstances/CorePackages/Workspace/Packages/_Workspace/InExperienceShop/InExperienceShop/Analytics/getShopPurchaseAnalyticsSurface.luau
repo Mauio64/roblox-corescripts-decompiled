@@ -1,14 +1,16 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local ProductPurchaseSurface = require(Parent.PurchasePromptLite).Enums.ProductPurchaseSurface
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
+
+local PurchasePromptLite = require(parent.PurchasePromptLite)
+local ProductPurchaseSurface = PurchasePromptLite.Enums.ProductPurchaseSurface
+
 local Constants = require(script.Parent.Constants)
 
-local function getShopPurchaseAnalyticsSurface(s1: string) -- line: 16
-	-- upvalues: Constants (copy), ProductPurchaseSurface (copy)
-	if s1 == Constants.ShopPageType.Home then
+local function getShopPurchaseAnalyticsSurface(p: string)
+	if p == Constants.ShopPageType.Home then
 		return ProductPurchaseSurface.InExperienceShopHome
 	end
 
-	if s1 == Constants.ShopPageType.Search then
+	if p == Constants.ShopPageType.Search then
 		return ProductPurchaseSurface.InExperienceShopSearch
 	end
 

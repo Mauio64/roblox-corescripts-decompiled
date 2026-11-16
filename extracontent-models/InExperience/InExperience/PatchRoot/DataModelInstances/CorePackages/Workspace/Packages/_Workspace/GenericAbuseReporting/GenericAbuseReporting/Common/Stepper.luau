@@ -1,151 +1,163 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local Button = Foundation.Button
 local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
 
-local function validateSteps(t1: {[any]: any}) -- line: 58
-	if not t1 or type(t1) ~= "table" then
+local function validateSteps(steps)
+	if not steps or type(steps) ~= "table" then
 		return "Steps must not be nil and be a table", false
 	end
 
-	for k, v in pairs(t1) do
-		if k ~= v.stepId then
-			return `Step id mismatch: key { k } does not match step.stepId { v.stepId }`, false
+	for k, item in pairs(steps) do
+		if k ~= item.stepId then
+			return `Step id mismatch: key {k} does not match step.stepId {item.stepId}`, false
 		end
 	end
 
 	return "", true
 end
-local function Stepper(t2: {[any]: any}) -- line: 70
-	-- upvalues: React (copy), validateSteps (copy), Cryo (copy), View (copy), Button (copy), ButtonVariant (copy)
-	local v14, v15 = React.useState(t2.currentStep)
-	local v16, v17 = React.useState({ t2.currentStep })
-	local v18 = React.useCallback(function(p1) -- line: 74
-		-- upvalues: t2 (copy)
-		if t2.onErrorCallback then
-			t2.onErrorCallback(p1)
 
-			return
+local function Stepper(props)
+	local state, setState = React.useState(props.currentStep)
+	local state2, setState2 = React.useState({ props.currentStep })
+
+	local v = React.useCallback(function(p)
+		if props.onErrorCallback then
+			props.onErrorCallback(p)
+		else
+			warn(p)
 		end
+	end, { props.onErrorCallback })
 
-		warn(p1)
-	end, { t2.onErrorCallback })
+	React.useEffect(function()
+		local v2, v3 = validateSteps(props.steps)
 
-	React.useEffect(function() -- line: 82
-		-- upvalues: validateSteps (copy), t2 (copy), v18 (copy)
-		local v24, v25 = validateSteps(t2.steps)
-
-		if not v25 then
-			v18(v24)
+		if not v3 then
+			v(v2)
 		end
-	end, {
-		t2.steps,
-		t2.onErrorCallback,
-		v18
-	})
+	end, { props.steps, props.onErrorCallback, v })
 
-	local v19 = React.useMemo(function() -- line: 89
-		-- upvalues: t2 (copy), v14 (copy)
-		return t2.steps and t2.steps[v14]
-	end, {
-		v14,
-		t2.steps
-	})
-	local v20 = React.useCallback(function(p2) -- line: 95
-		-- upvalues: t2 (copy), v15 (copy), v16 (copy), v17 (copy), Cryo (copy)
-		if not t2.steps[p2] then
+	local v2 = React.useMemo(function()
+		return props.steps and props.steps[state]
+	end, { state, props.steps })
+
+	local v3 = React.useCallback(function(p): boolean
+		if not props.steps[p] then
 			return false
 		end
 
-		v15(p2)
+		setState(p)
 
-		local v27 = table.find(v16, p2)
+		local index = table.find(state2, p)
 
-		if v27 then
-			v17(function(p3) -- line: 105
-				-- upvalues: Cryo (copy), v27 (copy)
-				if #p3 == 0 then
-					return p3
+		if index then
+			setState2(function(list)
+				if #list == 0 then
+					return list
 				end
 
-				return Cryo.List.removeRange(p3, v27 + 1, #p3)
+				return Cryo.List.removeRange(list, index + 1, #list)
 			end)
 		else
-			v17(function(p4) -- line: 112
-				-- upvalues: p2 (copy)
-				local v31 = table.clone(p4)
-
-				table.insert(v31, p2)
-
-				return v31
+			setState2(function(p2)
+				local clone = table.clone(p2)
+				table.insert(clone, p)
+				return clone
 			end)
 		end
 
 		return true
-	end, {
-		t2.steps,
-		v16
-	})
-	local v21 = React.useCallback(function() -- line: 122
-		-- upvalues: v19 (copy), v20 (copy)
-		if not v19 or v19.validateState and not v19.validateState() then
-			return
-		end
+	end, { props.steps, state2 })
 
-		if v20(v19.predefinedNextStepId) and v19.onStepContinue then
-			v19.onStepContinue()
+	local onActivated = React.useCallback(function()
+		if
+			v2
+			and (not v2.validateState or v2.validateState())
+			and v3(v2.predefinedNextStepId)
+			and v2.onStepContinue
+		then
+			v2.onStepContinue()
 		end
-	end, {
-		v19,
-		v20
-	})
-	local v22 = React.useCallback(function() -- line: 136
-		-- upvalues: v16 (copy), v20 (copy), v19 (copy)
-		local v28 = v16[#v16 - 1]
+	end, { v2, v3 })
 
-		if v28 and (v20(v28) and v19 and v19.onStepCancel) then
-			v19.onStepCancel()
+	local onActivated2 = React.useCallback(function()
+		local v4 = state2[#state2 - 1]
+
+		if v4 and v3(v4) and v2 and v2.onStepCancel then
+			v2.onStepCancel()
 		end
-	end, {
-		v16,
-		v19,
-		v20
-	})
+	end, { state2, v2, v3 })
 
-	if v19 == nil then
+	if v2 == nil then
 		return nil
 	end
 
-	return (React.createElement(View, {
-		tag = "auto-xy col flex-between"
-	}, {
-		ContentContainer = React.createElement(View, {
-			tag = "size-full-0 auto-y",
+	local createElement = React.createElement
+
+	local v4 = {
+		ContentContainer = React.createElement(View, { tag = "size-full-0 auto-y", LayoutOrder = 0 }, v2.content),
+		ButtonRow = 0,
+		FooterContainer = 0
+	}
+	local createElement2 = React.createElement
+	local v5 = {
+		tag = `size-full-0 auto-y padding-y-small gap-small row {v2.stepStyle and v2.stepStyle.buttonXAlignment}`,
+		LayoutOrder = 1
+	}
+	local backButton
+
+	if v2.labels and v2.labels.backButton then
+		local createElement3 = React.createElement
+		local v6 = {
+			onActivated = onActivated2,
+			text = v2.labels.backButton,
+			variant = v2.stepStyle and v2.stepStyle.backButton and v2.stepStyle.backButton.variant or ButtonVariant.Text,
+			fillBehavior = 0,
 			LayoutOrder = 0
-		}, v19.content),
-		ButtonRow = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = `size-full-0 auto-y padding-y-small gap-small row { v19.stepStyle and v19.stepStyle.buttonXAlignment }`
-		}, {
-			BackButton = if not v19.labels or not v19.labels.backButton then nil else React.createElement(Button, {
-				LayoutOrder = 0,
-				onActivated = v22,
-				text = v19.labels.backButton,
-				variant = v19.stepStyle and (not not v19.stepStyle.backButton and v19.stepStyle.backButton.variant) or ButtonVariant.Text,
-				fillBehavior = v19.stepStyle and (not not v19.stepStyle.backButton and v19.stepStyle.backButton.fillBehavior) or nil
-			}),
-			ContinueButton = if not v19.labels or not v19.labels.continueButton then nil else React.createElement(Button, {
-				LayoutOrder = 1,
-				onActivated = v21,
-				text = v19.labels.continueButton,
-				variant = v19.stepStyle and (not not v19.stepStyle.continueButton and v19.stepStyle.continueButton.variant) or ButtonVariant.Standard,
-				fillBehavior = v19.stepStyle and (not not v19.stepStyle.continueButton and v19.stepStyle.continueButton.fillBehavior) or nil
-			})
-		}),
-		FooterContainer = if not v19.footer then nil else React.createElement(View, {
+		}
+		local fillBehavior
+
+		if v2.stepStyle and v2.stepStyle.backButton then
+			fillBehavior = v2.stepStyle.backButton.fillBehavior or nil
+		end
+
+		v6.fillBehavior = fillBehavior
+		backButton = createElement3(Button, v6)
+	end
+
+	local continueButton
+
+	if v2.labels and v2.labels.continueButton then
+		local createElement3 = React.createElement
+		local v6 = {
+			onActivated = onActivated,
+			text = v2.labels.continueButton,
+			variant = v2.stepStyle and v2.stepStyle.continueButton and v2.stepStyle.continueButton.variant or ButtonVariant.Standard,
+			fillBehavior = 0,
+			LayoutOrder = 1
+		}
+		local fillBehavior
+
+		if v2.stepStyle and v2.stepStyle.continueButton then
+			fillBehavior = v2.stepStyle.continueButton.fillBehavior or nil
+		end
+
+		v6.fillBehavior = fillBehavior
+		continueButton = createElement3(Button, v6)
+	end
+
+	v4.ButtonRow = createElement2(View, v5, {
+		BackButton = backButton,
+		ContinueButton = continueButton
+	})
+	local footerContainer
+
+	if v2.footer then
+		footerContainer = React.createElement(View, {
 			tag = "size-full-0 auto-y col",
 			LayoutOrder = 2
 		}, {
@@ -153,11 +165,12 @@ local function Stepper(t2: {[any]: any}) -- line: 70
 				tag = "size-full-50 bg-shift-100 padding-bottom-medium",
 				LayoutOrder = 0
 			}),
-			Footer = React.createElement(View, {
-				tag = "auto-xy padding-top-medium"
-			}, v19.footer)
+			Footer = React.createElement(View, { tag = "auto-xy padding-top-medium" }, v2.footer)
 		})
-	}))
+	end
+
+	v4.FooterContainer = footerContainer
+	return (createElement(View, { tag = "auto-xy col flex-between" }, v4))
 end
 
 return React.memo(Stepper)

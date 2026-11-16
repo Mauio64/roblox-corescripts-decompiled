@@ -1,231 +1,268 @@
 local CoreGui = game:GetService("CoreGui")
 local GuiService = game:GetService("GuiService")
+
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local UIBlox = require(AppChatParent.UIBlox)
+local parent = AppChat.Parent
+
+local UIBlox = require(parent.UIBlox)
 local Tokens = UIBlox.App.Style.Tokens
-local Constants = UIBlox.App.Style.Constants
-local SharedFlags = require(AppChatParent.SharedFlags)
+local Foundation = require(parent.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-local v10 = SharedFlags.getFFlagSettingsHubIndependentBackgroundVisibility()
+local fFlagSettingsHubIndependentBackgroundVisibility = SharedFlags.getFFlagSettingsHubIndependentBackgroundVisibility()
 local getFFlagAppChatInExperienceTabBarAdjustment = require(AppChat.Flags.getFFlagAppChatInExperienceTabBarAdjustment)
 local EnumScreens = require(AppChat.EnumScreens)
-local t1 = {}
 
-t1.__index = t1
+local ChatSessionRefCount = require(AppChat.Hooks.ChatSessionRefCount)
 
-local function getFFlagAppChatEnableRootedNavigation() -- line: 22
-	-- upvalues: AppChat (copy)
-	return require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)()
-end
-local function getRootedNavigationStore() -- line: 26
-	-- upvalues: AppChat (copy)
-	return require(AppChat.Stores.GetRootedNavigationStore)(false)
-end
-local function isSupportedRootedRoute(t2: {[any]: any}) -- line: 40
-	-- upvalues: EnumScreens (copy)
-	local params = t2.params
-	local v19 = if not params then nil else params.conversationId
+local InExperienceAppChatModal = {}
+InExperienceAppChatModal.__index = InExperienceAppChatModal
 
-	return t2.screen == EnumScreens.ChatDetails and (params ~= nil and (params.rooted == true and (type(v19) == "string" and v19 ~= "")))
+local function getFFlagAppChatEnableRootedNavigation() -- 2 equivalent calls inferred from this helper
+	local getFFlagAppChatEnableRootedNavigation2 = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
+	return getFFlagAppChatEnableRootedNavigation2()
 end
 
-function t1._new() -- line: 89
-	-- upvalues: t1 (copy)
-	local t3 = {
+local function getRootedNavigationStore() -- 2 equivalent calls inferred from this helper
+	local GetRootedNavigationStore = require(AppChat.Stores.GetRootedNavigationStore)
+	return GetRootedNavigationStore(false)
+end
+
+local function isSupportedRootedRoute(p): boolean -- 1 equivalent call inferred from this helper
+	local params = p.params
+	local conversationId
+
+	if params then
+		conversationId = params.conversationId
+	end
+
+	return p.screen == EnumScreens.ChatDetails
+		and params ~= nil
+		and params.rooted == true
+		and type(conversationId) == "string"
+		and conversationId ~= ""
+end
+
+function InExperienceAppChatModal._new()
+	local v = {
 		_visible = false,
 		_wasVisible = false,
-		unreadCount = 0,
-		hasReceivedInitialUnreadCount = false,
-		currentSquadId = "",
-		requestedRoute = nil,
-		topMargin = 12,
 		visibilitySignal = Instance.new("BindableEvent"),
+		unreadCount = 0,
 		unreadCountSignal = Instance.new("BindableEvent"),
+		hasReceivedInitialUnreadCount = false,
 		initialUnreadCountSignal = Instance.new("BindableEvent"),
+		currentSquadId = "",
 		currentSquadIdSignal = Instance.new("BindableEvent"),
-		requestedRouteSignal = Instance.new("BindableEvent")
+		requestedRoute = nil,
+		requestedRouteSignal = Instance.new("BindableEvent"),
+		_reserveChatSessionOnClose = false,
+		topMargin = 12
 	}
 
-	setmetatable(t3, t1)
-
-	return t3
+	setmetatable(v, InExperienceAppChatModal)
+	return v
 end
-function t1.initialize(p1, n1: number?, p2, p3, p4, p5) -- line: 109
-	-- upvalues: Tokens (copy), Constants (copy), getFFlagAppChatInExperienceTabBarAdjustment (copy)
-	if n1 then
-		p1.topMargin = n1
+
+function InExperienceAppChatModal:initialize(topMargin: number?, settingsHub, viewportUtil, chatSelector, playerListManager)
+	if topMargin then
+		self.topMargin = topMargin
 	end
 
-	p1.settingsHub = p2
-	p1._foundationTokens = Tokens.getFoundationTokensDefaultScale(Constants.ThemeName.Dark)
+	self.settingsHub = settingsHub
+	self._foundationTokens = Tokens.getFoundationTokensDefaultScale(ColorMode.Dark)
 
 	if getFFlagAppChatInExperienceTabBarAdjustment() then
-		p1.viewportUtil = p3
+		self.viewportUtil = viewportUtil
 	end
 
-	p1.chatSelector = p4
-	p1.playerListManager = p5
+	self.chatSelector = chatSelector
+	self.playerListManager = playerListManager
 end
-function t1.setVisible(p6, b1: boolean, s1: string?) -- line: 133
-	-- upvalues: AppChat (copy), CoreGui (copy), getFFlagAppChatInExperienceTabBarAdjustment (copy), GuiService (copy), v10 (copy)
-	if not b1 and require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)() then
-		require(AppChat.Stores.GetRootedNavigationStore)(false).cancelNavigation()
+
+function InExperienceAppChatModal:setVisible(visible: boolean, p: string?)
+	if not visible and getFFlagAppChatEnableRootedNavigation() then -- inferred equivalent call
+		getRootedNavigationStore().cancelNavigation() -- inferred equivalent call
 	end
 
-	if b1 == p6._visible then
+	if visible == self._visible then
 		return
 	end
 
-	p6._visible = b1
-	p6.visibilitySignal:Fire(b1, s1)
+	if FFlagExpChatEnableFriendsTab and not visible and self._reserveChatSessionOnClose then
+		self._reserveChatSessionOnClose = false
 
-	if b1 then
-		if p6.chatSelector then
-			p6.chatSelector:HideTemp("AppChat", true)
+		if ChatSessionRefCount.getReservations() == 0 then
+			ChatSessionRefCount.reserve()
+		end
+	end
+
+	self._visible = visible
+	self.visibilitySignal:Fire(visible, p)
+
+	if visible then
+		if self.chatSelector then
+			self.chatSelector:HideTemp("AppChat", true)
 		end
 
-		if p6.playerListManager then
-			p6.playerListManager:HideTemp("AppChat", true)
+		if self.playerListManager then
+			self.playerListManager:HideTemp("AppChat", true)
 		end
 
-		local ScreenGui = Instance.new("ScreenGui")
+		local inExperienceAppChatModal = Instance.new("ScreenGui")
+		inExperienceAppChatModal.DisplayOrder = game:DefineFastInt(
+			"AppChatInExperienceStandaloneContainerDisplayOrder",
+			4
+		)
+		inExperienceAppChatModal.Parent = CoreGui
+		inExperienceAppChatModal.Name = "InExperienceAppChatModal"
 
-		ScreenGui.DisplayOrder = game:DefineFastInt("AppChatInExperienceStandaloneContainerDisplayOrder", 4)
-		ScreenGui.Parent = CoreGui
-		ScreenGui.Name = "InExperienceAppChatModal"
+		local uiPadding = Instance.new("UIPadding")
+		uiPadding.PaddingTop = UDim.new(0, self.topMargin)
+		uiPadding.PaddingRight = UDim.new(0, 12)
+		uiPadding.PaddingBottom = UDim.new(0, 0)
+		uiPadding.PaddingLeft = UDim.new(0, 12)
+		uiPadding.Parent = inExperienceAppChatModal
 
-		local UIPadding = Instance.new("UIPadding")
+		local uiListLayout = Instance.new("UIListLayout")
+		uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+		uiListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+		uiListLayout.Parent = inExperienceAppChatModal
 
-		UIPadding.PaddingTop = UDim.new(0, p6.topMargin)
-		UIPadding.PaddingRight = UDim.new(0, 12)
-		UIPadding.PaddingBottom = UDim.new(0, 0)
-		UIPadding.PaddingLeft = UDim.new(0, 12)
-		UIPadding.Parent = ScreenGui
+		local imageButton = Instance.new("ImageButton")
+		imageButton.BorderSizePixel = 0
+		imageButton.AutoButtonColor = false
+		imageButton.Modal = true
+		imageButton.BackgroundTransparency = self._foundationTokens.Color.OverMedia.OverMedia_0.Transparency
+		imageButton.BackgroundColor3 = self._foundationTokens.Color.OverMedia.OverMedia_0.Color3
+		imageButton.Size = UDim2.fromScale(1, 1)
+		imageButton.Visible = true
+		imageButton.Parent = inExperienceAppChatModal
 
-		local UIListLayout = Instance.new("UIListLayout")
+		if getFFlagAppChatInExperienceTabBarAdjustment() and self.viewportUtil then
+			local function fn()
+				local v = self.viewportUtil.screenSize:get()
 
-		UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-		UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-		UIListLayout.Parent = ScreenGui
-
-		local ImageButton = Instance.new("ImageButton")
-
-		ImageButton.BorderSizePixel = 0
-		ImageButton.AutoButtonColor = false
-		ImageButton.Modal = true
-		ImageButton.BackgroundTransparency = p6._foundationTokens.Color.OverMedia.OverMedia_0.Transparency
-		ImageButton.BackgroundColor3 = p6._foundationTokens.Color.OverMedia.OverMedia_0.Color3
-		ImageButton.Size = UDim2.fromScale(1, 1)
-		ImageButton.Visible = true
-		ImageButton.Parent = ScreenGui
-
-		if getFFlagAppChatInExperienceTabBarAdjustment() and p6.viewportUtil then
-			local function v34() -- line: 182
-				-- upvalues: p6 (copy), UIPadding (copy), GuiService (copy)
-				local v53 = p6.viewportUtil.screenSize:get()
-
-				if not v53 or (not v53.X or not v53.Y) then
+				if not (v and v.X and v.Y) then
 					return
 				end
 
-				if v53.Y > v53.X then
-					UIPadding.PaddingBottom = UDim.new(0, 0)
-
-					return
+				if v.Y > v.X then
+					uiPadding.PaddingBottom = UDim.new(0, 0)
+				else
+					uiPadding.PaddingBottom = UDim.new(0, GuiService:GetSafeZoneOffsets().bottom)
 				end
-
-				UIPadding.PaddingBottom = UDim.new(0, GuiService:GetSafeZoneOffsets().bottom)
 			end
 
-			p6.viewportUtil.screenSize:connect(v34)
-			v34()
+			self.viewportUtil.screenSize:connect(fn)
+
+			fn()
 		end
 
-		local UISizeConstraint = Instance.new("UISizeConstraint")
+		local uiSizeConstraint = Instance.new("UISizeConstraint")
+		uiSizeConstraint.MaxSize = Vector2.new(850, 780)
+		uiSizeConstraint.Parent = imageButton
 
-		UISizeConstraint.MaxSize = Vector2.new(850, 780)
-		UISizeConstraint.Parent = ImageButton
+		local uiCorner = Instance.new("UICorner")
+		uiCorner.CornerRadius = UDim.new(0, 8)
+		uiCorner.Parent = imageButton
 
-		local UICorner = Instance.new("UICorner")
-
-		UICorner.CornerRadius = UDim.new(0, 8)
-		UICorner.Parent = ImageButton
-		p6.frame = ImageButton
+		self.frame = imageButton
 	else
-		if p6.frame and p6.frame.Parent then
-			p6.frame.Parent:Destroy()
-			p6.frame = nil
+		if self.frame and self.frame.Parent then
+			self.frame.Parent:Destroy()
+			self.frame = nil
 		end
 
-		if p6.chatSelector then
-			p6.chatSelector:HideTemp("AppChat", false)
+		if self.chatSelector then
+			self.chatSelector:HideTemp("AppChat", false)
 		end
 
-		if p6.playerListManager then
-			p6.playerListManager:HideTemp("AppChat", false)
+		if self.playerListManager then
+			self.playerListManager:HideTemp("AppChat", false)
 		end
 	end
 
-	if p6.settingsHub and v10 then
-		p6.settingsHub:SetBackgroundVisibility(b1, false)
+	if self.settingsHub and fFlagSettingsHubIndependentBackgroundVisibility then
+		self.settingsHub:SetBackgroundVisibility(visible, false)
 	end
 end
-function t1.toggleVisibility(p7) -- line: 233
-	if p7.default then
-		local _visible = p7.default._visible
 
-		p7.default:setVisible(not _visible)
+function InExperienceAppChatModal.toggleVisibility(p)
+	if p.default then
+		local v = not p.default._visible
+		p.default:setVisible(v)
 	end
 end
-function t1.getVisible(p8) -- line: 241
-	return p8.default._visible
+
+function InExperienceAppChatModal.getVisible(p)
+	return p.default._visible
 end
-function t1.setUnreadCount(t4: {[any]: any}, n2: number) -- line: 246
-	t4.default.unreadCount = n2
-	t4.default.unreadCountSignal:Fire(n2)
+
+function InExperienceAppChatModal.setUnreadCount(p, unreadCount: number)
+	p.default.unreadCount = unreadCount
+	p.default.unreadCountSignal:Fire(unreadCount)
 end
-function t1.markInitialUnreadCountReceived(t5: {[any]: any}, n3: number) -- line: 254
-	if t5.default.hasReceivedInitialUnreadCount then
+
+function InExperienceAppChatModal.markInitialUnreadCountReceived(p, p2: number)
+	if p.default.hasReceivedInitialUnreadCount then
 		return
 	end
 
-	t5.default.hasReceivedInitialUnreadCount = true
-	t5.default.initialUnreadCountSignal:Fire(n3)
+	p.default.hasReceivedInitialUnreadCount = true
+	p.default.initialUnreadCountSignal:Fire(p2)
 end
-function t1.setCurrentSquadId(t6: {[any]: any}, s2: string) -- line: 262
-	t6.default.currentSquadId = s2
-	t6.default.currentSquadIdSignal:Fire(s2)
+
+function InExperienceAppChatModal.setCurrentSquadId(p, currentSquadId: string)
+	p.default.currentSquadId = currentSquadId
+	p.default.currentSquadIdSignal:Fire(currentSquadId)
 end
-function t1.openToScreen(p9, t7: {[any]: any}) -- line: 267
-	-- upvalues: AppChat (copy), EnumScreens (copy), FFlagExpChatEnableFriendsTab (copy)
-	if require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)() then
-		local v48 = require(AppChat.Stores.GetRootedNavigationStore)(false)
-		local params = t7.params
-		local v50 = if not params then nil else params.conversationId
 
-		if t7.screen == EnumScreens.ChatDetails and (params ~= nil and (params.rooted == true and (type(v50) == "string" and v50 ~= ""))) then
-			local v51 = table.clone(t7.params)
+function InExperienceAppChatModal:reserveChatSessionOnClose()
+	self._reserveChatSessionOnClose = true
+end
 
-			v51.rootedNavigationRequestId = v48.beginNavigation()
-			t7 = {
-				screen = t7.screen,
-				params = v51
-			}
+function InExperienceAppChatModal:openToScreen(p)
+	local requestedRoute
+
+	if getFFlagAppChatEnableRootedNavigation() then -- inferred equivalent call
+		local rootedNavigationStore = getRootedNavigationStore() -- inferred equivalent call
+
+		if isSupportedRootedRoute(p) then -- inferred equivalent call
+			local clone = table.clone(p.params)
+			clone.rootedNavigationRequestId = rootedNavigationStore.beginNavigation()
+			requestedRoute = { screen = p.screen, params = clone }
 		else
-			v48.cancelNavigation()
+			rootedNavigationStore.cancelNavigation()
+			requestedRoute = p
 		end
+	else
+		requestedRoute = p
 	end
 
-	p9.requestedRoute = t7
-	p9.requestedRouteSignal:Fire(t7)
-	p9:setVisible(true, if not FFlagExpChatEnableFriendsTab or not t7.params then nil else t7.params.entryPoint)
-end
-function t1.clearRequestedRoute(p10) -- line: 291
-	p10.requestedRoute = nil
-	p10.requestedRouteSignal:Fire(nil)
+	self.requestedRoute = requestedRoute
+	self.requestedRouteSignal:Fire(requestedRoute)
+
+	if FFlagExpChatEnableFriendsTab and p.params and p.params.rooted == true then
+		self:reserveChatSessionOnClose()
+	end
+
+	local v
+
+	if FFlagExpChatEnableFriendsTab and requestedRoute.params then
+		v = requestedRoute.params.entryPoint
+	end
+
+	self:setVisible(true, v)
 end
 
-t1.default = t1._new()
+function InExperienceAppChatModal:clearRequestedRoute()
+	self.requestedRoute = nil
+	self.requestedRouteSignal:Fire(nil)
+end
 
-return t1
+InExperienceAppChatModal.default = InExperienceAppChatModal._new()
+
+return InExperienceAppChatModal

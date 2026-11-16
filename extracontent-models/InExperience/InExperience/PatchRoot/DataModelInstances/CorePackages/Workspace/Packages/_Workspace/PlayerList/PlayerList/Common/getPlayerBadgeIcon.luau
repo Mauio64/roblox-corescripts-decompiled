@@ -1,70 +1,72 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local builderIcon = require(ParentParent.Common.builderIcon)
-local SharedFlags = require(ParentParentParent.SharedFlags)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local builderIcon = require(parent.Common.builderIcon)
+local SharedFlags = require(parent2.SharedFlags)
 local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
 local FFlagHidePremiumIconography = SharedFlags.FFlagHidePremiumIconography
-local t1 = {
+
+local v = {
 	[Enum.FriendStatus.Friend] = builderIcon("two-people", "Filled"),
 	[Enum.FriendStatus.FriendRequestReceived] = builderIcon("person-clock", "Filled")
 }
-local v8 = builderIcon("circle-slash")
-local v9 = builderIcon("hammer-code", "Filled")
-local v10 = builderIcon("person-check", "Filled")
-local v11 = builderIcon("premium")
 
-local function getSocialIcon(p1) -- line: 20
-	-- upvalues: v8 (copy), t1 (copy)
-	if not p1 then
+local v2 = builderIcon("circle-slash")
+local v3 = builderIcon("hammer-code", "Filled")
+local v4 = builderIcon("person-check", "Filled")
+local v5 = builderIcon("premium")
+
+local function getSocialIcon(p) -- 1 equivalent call inferred from this helper
+	if not p then
 		return nil
 	end
 
-	if p1.isBlocked then
-		return v8
+	if p.isBlocked then
+		return v2
 	end
 
-	return t1[p1.friendStatus]
+	return v[p.friendStatus]
 end
-local function getPlayerBadgeIcon(p2, p3, p4, p5) -- line: 30
-	-- upvalues: v8 (copy), t1 (copy), v9 (copy), v10 (copy), FFlagEnableBlackbirdCheck (copy), FFlagHidePremiumIconography (copy), v11 (copy)
-	if not p2 then
+
+local function getPlayerBadgeIcon(p, data, p2, p3)
+	if not p then
 		return nil
 	end
 
-	local v19 = if p5 then if not p5.isBlocked then t1[p5.friendStatus] else v8 else nil
+	local socialIcon = getSocialIcon(p3) -- inferred equivalent call
 
-	if v19 then
-		return v19
+	if socialIcon then
+		return socialIcon
 	end
 
-	if p4 and p4.isPlaceOwner then
-		return v9
+	if p2 and p2.isPlaceOwner then
+		return v3
 	end
 
-	if p2.CustomPlayerIcons and p2.CustomPlayerIcons[p3.UserId] then
-		return p2.CustomPlayerIcons[p3.UserId]
+	if p.CustomPlayerIcons and p.CustomPlayerIcons[data.UserId] then
+		return p.CustomPlayerIcons[data.UserId]
 	end
 
-	if p4 and p4.specialGroupIcon then
-		return p4.specialGroupIcon
+	if p2 and p2.specialGroupIcon then
+		return p2.specialGroupIcon
 	end
 
-	if p5 and p5.isFollowing then
-		return v10
+	if p3 and p3.isFollowing then
+		return v4
 	end
 
-	local v20 = p3.MembershipType == Enum.MembershipType.Premium
+	local v6 = data.MembershipType == Enum.MembershipType.Premium
 
 	if FFlagEnableBlackbirdCheck then
-		if game:GetEngineFeature("ReadHasRobloxSubscriptionLua") and p3.HasRobloxSubscription then
-			return p2.SubscriptionIcon
+		if game:GetEngineFeature("ReadHasRobloxSubscriptionLua") and data.HasRobloxSubscription then
+			return p.SubscriptionIcon
 		end
 
-		if not FFlagHidePremiumIconography and v20 then
-			return v11
+		if not FFlagHidePremiumIconography and v6 then
+			return v5
 		end
-	elseif v20 then
-		return v11
+	elseif v6 then
+		return v5
 	end
 
 	return nil

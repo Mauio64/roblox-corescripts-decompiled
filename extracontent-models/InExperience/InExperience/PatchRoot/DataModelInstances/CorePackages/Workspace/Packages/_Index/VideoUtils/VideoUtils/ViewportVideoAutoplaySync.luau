@@ -1,49 +1,50 @@
 local VideoUtils = script:FindFirstAncestor("VideoUtils")
-local VideoUtilsParent = VideoUtils.Parent
-local React = require(VideoUtilsParent.React)
-local useViewportBounds = require(VideoUtilsParent.ViewportUtils).useViewportBounds
+local parent = VideoUtils.Parent
+
+local React = require(parent.React)
+local ViewportUtils = require(parent.ViewportUtils)
+local useViewportBounds = ViewportUtils.useViewportBounds
 
 require(VideoUtils.ViewportVideoAutoplayController)
+local Enums = require(VideoUtils.Analytics.Enums)
+local VideoEndReason = Enums.VideoEndReason
 
-local VideoEndReason = require(VideoUtils.Analytics.Enums).VideoEndReason
-local v6 = game:DefineFastInt("LuaAppVideoAutoplayWinnerLineOffsetFromTopBarPx", 240)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppOneByTwoHoverIdleAutoplay = SharedFlags.FFlagLuaAppOneByTwoHoverIdleAutoplay
 
-local function ViewportVideoAutoplaySync(t1: {[any]: any}) -- line: 20
-	-- upvalues: useViewportBounds (copy), React (copy), v6 (copy), VideoEndReason (copy)
-	local v9 = useViewportBounds(t1.scrollingFrameRef)
+local defineFastInt = game:DefineFastInt("LuaAppVideoAutoplayWinnerLineOffsetFromTopBarPx", 240)
 
-	React.useEffect(function() -- line: 25
-		-- upvalues: t1 (copy), v6 (copy), v9 (copy)
-		local viewportAutoplayController = t1.viewportAutoplayController
+local function ViewportVideoAutoplaySync(p): nil
+	local v = useViewportBounds(p.scrollingFrameRef)
 
-		if not viewportAutoplayController then
-			return
-		end
-
-		viewportAutoplayController:setWinnerLineOffsetFromTopBarPx(v6)
-		viewportAutoplayController:setFeedScopeRef(t1.scrollingFrameRef)
-		viewportAutoplayController:setViewPortBounds(v9)
-	end, {
-		t1.viewportAutoplayController,
-		t1.scrollingFrameRef,
-		v9
-	})
-	React.useEffect(function() -- line: 45
-		-- upvalues: t1 (copy), VideoEndReason (copy)
-		local viewportAutoplayController = t1.viewportAutoplayController
+	React.useEffect(function()
+		local viewportAutoplayController = p.viewportAutoplayController
 
 		if not viewportAutoplayController then
 			return
 		end
 
-		return function() -- line: 51
-			-- upvalues: viewportAutoplayController (copy), VideoEndReason (copy)
-			viewportAutoplayController:setFeedScopeRef({
-				current = nil
-			})
-			viewportAutoplayController:reset(VideoEndReason.Unmounted)
+		viewportAutoplayController:setWinnerLineOffsetFromTopBarPx(defineFastInt)
+
+		viewportAutoplayController:setFeedScopeRef(p.scrollingFrameRef)
+		viewportAutoplayController:setViewPortBounds(v)
+	end, { p.viewportAutoplayController, p.scrollingFrameRef, v })
+
+	React.useEffect(function()
+		local viewportAutoplayController = p.viewportAutoplayController
+
+		if viewportAutoplayController then
+			return function()
+				viewportAutoplayController:setFeedScopeRef({ current = nil })
+
+				if FFlagLuaAppOneByTwoHoverIdleAutoplay then
+					viewportAutoplayController:clearUserIntentCandidate()
+				end
+
+				viewportAutoplayController:reset(VideoEndReason.Unmounted)
+			end
 		end
-	end, { t1.viewportAutoplayController })
+	end, { p.viewportAutoplayController })
 
 	return nil
 end

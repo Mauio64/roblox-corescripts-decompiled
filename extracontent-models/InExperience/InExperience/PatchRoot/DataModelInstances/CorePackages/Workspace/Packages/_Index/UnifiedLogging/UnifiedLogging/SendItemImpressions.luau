@@ -1,288 +1,322 @@
 local AppStorageService = game:GetService("AppStorageService")
 local UnifiedLogging = script:FindFirstAncestor("UnifiedLogging")
-local UnifiedLoggingParent = UnifiedLogging.Parent
-local ArgCheck = require(UnifiedLoggingParent.ArgCheck)
-local Cryo = require(UnifiedLoggingParent.Cryo)
-local DiscoveryEventErrorLogger = require(UnifiedLoggingParent.DiscoveryUtils).DiscoveryEventErrorLogger
+local parent = UnifiedLogging.Parent
+
+local ArgCheck = require(parent.ArgCheck)
+local Cryo = require(parent.Cryo)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
 local ContentType = require(UnifiedLogging.ContentType)
 local itemImpressionsEvent = require(UnifiedLogging.itemImpressionsEvent)
 local sduiCustomImpressionsEvent = require(UnifiedLogging.sduiCustomImpressionsEvent)
 local userEntryUtils = require(UnifiedLogging.userEntryUtils)
 local buildItemMetadataFields = require(UnifiedLogging.buildItemMetadataFields)
 local buildGameMetadataFields = require(UnifiedLogging.buildGameMetadataFields)
-
 require(UnifiedLogging.SduiAnalyticsTypes)
 
-local FFlagLuaAppDesktopFriendCarouselClicks = require(UnifiedLoggingParent.SharedFlags).FFlagLuaAppDesktopFriendCarouselClicks
-local FFlagProfilePlatformEnableImpressions = require(UnifiedLoggingParent.SharedFlags).FFlagProfilePlatformEnableImpressions
-local FFlagItemImpressionsAddGameMetadata = require(UnifiedLoggingParent.SharedFlags).FFlagItemImpressionsAddGameMetadata
-local FFlagEnableTopSongsSort = require(UnifiedLoggingParent.SharedFlags).FFlagEnableTopSongsSort
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDesktopFriendCarouselClicks = SharedFlags.FFlagLuaAppDesktopFriendCarouselClicks
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableImpressions = SharedFlags2.FFlagProfilePlatformEnableImpressions
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagItemImpressionsAddGameMetadata = SharedFlags3.FFlagItemImpressionsAddGameMetadata
+local SharedFlags4 = require(parent.SharedFlags)
 
-local function v17(p1, p2, s1: string, n1: number, n2: number, p3, n3: number?, s2: string?, s3: string?, n4: number?) -- line: 25
-	-- upvalues: ArgCheck (copy), DiscoveryEventErrorLogger (copy), FFlagProfilePlatformEnableImpressions (copy)
-	local t1 = {}
-	local t2 = {}
-	local t3 = {}
-	local t4 = {}
-	local t5 = {}
-	local t6 = {}
+local function fn(items, list, contentType: string, p: number, collectionPosition: number, collectionId, p2: number?, collectionComponentType: string?, collectionIdStr: string?, p3: number?)
+	local ids = {}
+	local v = {}
 
-	for _, v36 in p1 do
-		local v37 = p2 and p2[v36] or nil
+	local v2 = {}
+	local v3 = {}
 
-		if v37 ~= nil then
-			table.insert(t1, v37.id)
-			table.insert(t2, v36)
-			table.insert(t4, v36)
+	local v4 = {}
+	local v5 = {}
 
-			local v38, v39
+	for _, item in items do
+		local v6
 
-			if n1 and n1 > 0 then
-				v38 = math.ceil(v36 / n1)
-				v39 = v36 % n1
+		if list then
+			v6 = list[item] or nil
+		end
 
-				if v39 == 0 then
-					v39 = n1
+		if v6 == nil then
+			DiscoveryEventErrorLogger.reportError(
+				"SendItemImpressionsEventNilEntry",
+				`Entry at index {item} was nil when sending item impressions for collection {collectionId}`,
+				{ entryIndex = item, collectionId = collectionId }
+			)
+		else
+			table.insert(ids, v6.id)
+			table.insert(v, item)
+			table.insert(v2, item)
+			local v7
+
+			if p and p > 0 then
+				v7 = math.ceil(item / p)
+				item %= p
+
+				if item == 0 then
+					item = p
 				end
 
-				table.insert(t3, v38)
+				table.insert(v3, v7)
 			else
-				ArgCheck.assert(n1 ~= 0)
-				v38 = 1
-				v39 = v36
+				ArgCheck.assert(p ~= 0)
+				v7 = 1
 			end
 
-			if n4 then
-				table.insert(t5, n4 + v38 - 1)
-				table.insert(t6, v39)
+			if p3 then
+				table.insert(v4, p3 + v7 - 1)
+				table.insert(v5, item)
 			end
-		else
-			DiscoveryEventErrorLogger.reportError("SendItemImpressionsEventNilEntry", `Entry at index { v36 } was nil when sending item impressions for collection { p3 }`, {
-				entryIndex = v36,
-				collectionId = p3
-			})
 		end
 	end
 
-	local v40 = #t1
+	local count = #ids
+	ArgCheck.assert(count == #v)
 
-	ArgCheck.assert(v40 == #t2)
-
-	if #t3 > 0 then
-		ArgCheck.assert(v40 == #t3)
+	if #v3 > 0 then
+		ArgCheck.assert(count == #v3)
 	end
 
-	if #t5 > 0 then
-		ArgCheck.assert(v40 == #t5)
+	if #v4 > 0 then
+		ArgCheck.assert(count == #v4)
 	end
 
-	if #t6 > 0 then
-		ArgCheck.assert(v40 == #t6)
+	if #v5 > 0 then
+		ArgCheck.assert(count == #v5)
 	end
 
-	local t7 = {
-		contentType = s1,
-		itemIds = table.concat(t1, ","),
-		itemPositions = table.concat(t2, ","),
-		positionsInTopic = table.concat(t4, ","),
-		collectionPosition = n2,
-		collectionId = p3,
-		totalNumberOfItems = if not n3 then not p2 and 0 or #p2 else n3,
-		collectionComponentType = s2,
-		collectionIdStr = if not FFlagProfilePlatformEnableImpressions then nil else s3
+	local v6 = {
+		contentType = contentType,
+		itemIds = table.concat(ids, ","),
+		itemPositions = table.concat(v, ","),
+		positionsInTopic = table.concat(v2, ","),
+		collectionPosition = collectionPosition,
+		collectionId = collectionId,
+		totalNumberOfItems = p2 or list and #list or 0,
+		collectionComponentType = collectionComponentType,
+		collectionIdStr = 0
 	}
 
-	if #t3 > 0 then
-		t7.rowNumbers = table.concat(t3, ",")
+	if not FFlagProfilePlatformEnableImpressions then
+		collectionIdStr = nil
 	end
 
-	if #t5 > 0 then
-		t7.feedRowNumbers = table.concat(t5, ",")
+	v6.collectionIdStr = collectionIdStr
+
+	if #v3 > 0 then
+		v6.rowNumbers = table.concat(v3, ",")
 	end
 
-	if #t6 > 0 then
-		t7.positionsInRow = table.concat(t6, ",")
+	if #v4 > 0 then
+		v6.feedRowNumbers = table.concat(v4, ",")
 	end
 
-	return t7
+	if #v5 > 0 then
+		v6.positionsInRow = table.concat(v5, ",")
+	end
+
+	return v6
 end
-local function v18(p4, p5, s4: string) -- line: 125
-	-- upvalues: FFlagLuaAppDesktopFriendCarouselClicks (copy), userEntryUtils (copy)
-	local t8 = {}
-	local t9 = {}
-	local t10 = {}
 
-	for _, v49 in p4 do
-		local v50 = p5 and p5[v49] or nil
+local function fn2(items, list, sourceCarousel: string)
+	local v = {}
+	local v2 = {}
+	local v3 = {}
 
-		if v50 ~= nil then
-			if FFlagLuaAppDesktopFriendCarouselClicks then
-				local v51 = userEntryUtils.extractFieldsFromUserEntry(v50)
+	for _, item in items do
+		local v4
 
-				table.insert(t8, v51.presence)
-				table.insert(t9, v51.friendStatus)
-				table.insert(t10, v51.presenceUniverseId)
-			else
-				table.insert(t8, v50.presence and v50.presence.userPresenceType or "")
-				table.insert(t9, not v50.isFriend and "notFriend" or "friend")
-				table.insert(t10, (not v50.presence or (not v50.presence.universeId or v50.presence.universeId == "")) and "-1" or v50.presence.universeId)
-			end
+		if list then
+			v4 = list[item] or nil
+		end
+
+		if v4 == nil then
+			continue
+		end
+
+		if FFlagLuaAppDesktopFriendCarouselClicks then
+			local fieldsFromUserEntry = userEntryUtils.extractFieldsFromUserEntry(v4)
+
+			table.insert(v, fieldsFromUserEntry.presence)
+			table.insert(v2, fieldsFromUserEntry.friendStatus)
+			table.insert(v3, fieldsFromUserEntry.presenceUniverseId)
+		else
+			table.insert(v, v4.presence and v4.presence.userPresenceType or "")
+
+			table.insert(v2, v4.isFriend and "friend" or "notFriend")
+
+			table.insert(
+				v3,
+				(not v4.presence or not v4.presence.universeId or v4.presence.universeId == "") and "-1" or v4.presence.universeId
+			)
 		end
 	end
 
 	return {
-		sourceCarousel = s4,
-		presences = table.concat(t8, ","),
-		friendStatuses = table.concat(t9, ","),
-		presenceUniverseIds = table.concat(t10, ",")
+		sourceCarousel = sourceCarousel,
+		presences = table.concat(v, ","),
+		friendStatuses = table.concat(v2, ","),
+		presenceUniverseIds = table.concat(v3, ",")
 	}
 end
 
-return {
-	sendFromFriendsCarousel = function(p6, p7, p8, p9, p10, n5: number, p11, s5: string) -- line: 166
-		-- upvalues: FFlagLuaAppDesktopFriendCarouselClicks (copy), DiscoveryEventErrorLogger (copy), ContentType (copy), v17 (copy), v18 (copy), Cryo (copy), itemImpressionsEvent (copy)
-		if not p6 or not p7 then
-			if FFlagLuaAppDesktopFriendCarouselClicks then
-				DiscoveryEventErrorLogger.reportError("SendItemImpressionsService", `Event Ingest or App Analytics was nil when trying to send itemImpressions for collection { p11 }`, {
-					eventIngest = p6,
-					appAnalytics = p7,
-					sortId = p11
-				})
+local SendItemImpressions = {
+	sendFromFriendsCarousel = function(eventIngest, appAnalytics, list, list2, p, p2: number, sortId, sourceCarousel: string)
+		if eventIngest and appAnalytics then
+			if not list or #list == 0 or (not list2 or #list2 == 0) then
+				return
 			end
 
-			return
+			local v = #list2
+			local user = ContentType.User
+
+			local v2 = fn(list, list2, user, v, p2, sortId)
+
+			local v3 = fn2(list, list2, sourceCarousel)
+
+			itemImpressionsEvent(eventIngest, p, user, (Cryo.Dictionary.union(v2, v3)))
+		elseif FFlagLuaAppDesktopFriendCarouselClicks then
+			DiscoveryEventErrorLogger.reportError(
+				"SendItemImpressionsService",
+				`Event Ingest or App Analytics was nil when trying to send itemImpressions for collection {sortId}`,
+				{ eventIngest = eventIngest, appAnalytics = appAnalytics, sortId = sortId }
+			)
 		end
-
-		if not p8 or #p8 == 0 then
-			return
-		end
-
-		if not p9 or #p9 == 0 then
-			return
-		end
-
-		local v60 = #p9
-		local User = ContentType.User
-		local v62 = v17(p8, p9, User, v60, n5, p11)
-		local v63 = v18(p8, p9, s5)
-		local v64 = Cryo.Dictionary.union(v62, v63)
-
-		itemImpressionsEvent(p6, p10, User, v64)
 	end,
-	sendFromItemCollection = if not FFlagEnableTopSongsSort then nil else function(p12, p13, p14, t11: {[any]: any}, n6: number, p15, n7: number, s6: string, n8: number, n9: number?, s7: string?) -- line: 346
-		-- upvalues: DiscoveryEventErrorLogger (copy), v17 (copy), FFlagItemImpressionsAddGameMetadata (copy), ContentType (copy), buildGameMetadataFields (copy), Cryo (copy), itemImpressionsEvent (copy)
-		if not p12 or not p13 then
-			DiscoveryEventErrorLogger.reportError("SendItemImpressionsService", `Event Ingest or App Analytics was nil when trying to send itemImpressions for collection { n9 }`, {
-				eventIngest = p12,
-				appAnalytics = p13,
-				sortId = n9
-			})
+	sendFromItemCollection = SharedFlags4.FFlagEnableTopSongsSort and function(eventIngest, appAnalytics, list, list2, p: number, p2, p3: number, p4: string, p5: number, sortId: number?, p6: string?)
+		if not (eventIngest and appAnalytics) then
+			DiscoveryEventErrorLogger.reportError(
+				"SendItemImpressionsService",
+				`Event Ingest or App Analytics was nil when trying to send itemImpressions for collection {sortId}`,
+				{ eventIngest = eventIngest, appAnalytics = appAnalytics, sortId = sortId }
+			)
 
 			return
 		end
 
-		if not p14 or #p14 == 0 then
+		if not list or #list == 0 or (not list2 or #list2 == 0) then
 			return
 		end
 
-		if not t11 or #t11 == 0 then
-			return
-		end
+		local v = fn(list, list2, p4, p, p3, sortId, p5, nil, p6)
 
-		local v102 = v17(p14, t11, s6, n6, n7, n9, n8, nil, s7)
-
-		if FFlagItemImpressionsAddGameMetadata then
-			if s6 == ContentType.Game then
-				local v103 = buildGameMetadataFields(p14, t11, s7)
-
-				v102 = Cryo.Dictionary.union(v102, v103)
-			end
-
-			itemImpressionsEvent(p12, p15, s6, v102)
+		if not FFlagItemImpressionsAddGameMetadata then
+			itemImpressionsEvent(eventIngest, p2, p4, v)
 
 			return
 		end
 
-		itemImpressionsEvent(p12, p15, s6, v102)
-	end,
-	sendFromProfile = if not FFlagProfilePlatformEnableImpressions then nil else if not FFlagProfilePlatformEnableImpressions then nil else function(p16, p17, t12: {[any]: any}, t13: {[any]: any}, n10: number, s8: string, s9: string, n11: number, s10: string) -- line: 214
-		-- upvalues: DiscoveryEventErrorLogger (copy), v17 (copy), FFlagItemImpressionsAddGameMetadata (copy), ContentType (copy), buildGameMetadataFields (copy), Cryo (copy), itemImpressionsEvent (copy)
-		if not p16 or not p17 then
-			DiscoveryEventErrorLogger.reportError("SendItemImpressionsFromProfile", `Event Ingest or App Analytics was nil when trying to send itemImpressions for collection { s10 } on Profile Platform`, {
-				eventIngest = p16,
-				appAnalytics = p17,
-				collectionIdStr = s10
-			})
-
-			return
+		if p4 == ContentType.Game then
+			local gameMetadataFields = buildGameMetadataFields(list, list2, p6)
+			v = Cryo.Dictionary.union(v, gameMetadataFields)
 		end
 
-		if not t12 or #t12 == 0 then
-			return
-		end
-
-		if not t13 or #t13 == 0 then
-			return
-		end
-
-		local v74 = v17(t12, t13, s9, n10, n11, nil, #t13, nil, s10)
-
-		if FFlagItemImpressionsAddGameMetadata then
-			if s9 == ContentType.Game then
-				local v75 = buildGameMetadataFields(t12, t13, s10)
-
-				v74 = Cryo.Dictionary.union(v74, v75)
-			end
-
-			itemImpressionsEvent(p16, s8, s9, v74)
-
-			return
-		end
-
-		itemImpressionsEvent(p16, s8, s9, v74)
-	end,
-	sendFromServerDrivenUi = function(p18, t14: {[any]: any}, t15: {[any]: any}, p19, s11: string, p20, s12: string, n12: number, n13: number, n14: number?, s13: string?) -- line: 273
-		-- upvalues: DiscoveryEventErrorLogger (copy), v17 (copy), buildItemMetadataFields (copy), Cryo (copy), AppStorageService (copy), sduiCustomImpressionsEvent (copy), itemImpressionsEvent (copy)
-		if not p18 then
-			DiscoveryEventErrorLogger.reportError("SendItemImpressionsFromSduiNilService", `Event Ingest was nil when trying to send itemImpressions for collection { p20 }`, {
-				collectionId = p20
-			})
-
-			return
-		end
-
-		if not t14 or #t14 == 0 then
-			return
-		end
-
-		if not t15 or #t15 == 0 then
-			return
-		end
-
-		if not p19 then
-			return
-		end
-
-		local v87 = v17(t14, t15, s12, n12, n13, p20, p19.totalNumberOfItems, p19.collectionComponentType, nil, n14)
-		local v88 = buildItemMetadataFields(t14, t15, p20)
-		local v89 = Cryo.Dictionary.join(p19, v88, v87)
-		local Item = AppStorageService:GetItem("MobileAdvertisingId")
-
-		if Item and Item ~= "" then
-			v89.mobileAdvertisingId = Item
-		end
-
-		if v89.collectionId and type(v89.collectionId) == "string" and type((tonumber(v89.collectionId))) ~= "number" then
-			v89.collectionIdStr = v89.collectionId
-			v89.collectionId = nil
-		end
-
-		if s13 then
-			sduiCustomImpressionsEvent(s13, s11, v89)
-
-			return
-		end
-
-		itemImpressionsEvent(p18, s11, s12, v89)
-	end
+		itemImpressionsEvent(eventIngest, p2, p4, v)
+	end or nil,
+	sendFromProfile = 0,
+	sendFromServerDrivenUi = 0
 }
+local sendFromProfile
+
+if FFlagProfilePlatformEnableImpressions then
+	sendFromProfile = FFlagProfilePlatformEnableImpressions
+		and function(eventIngest, appAnalytics, list, list2, p: number, p2: string, p3: string, p4: number, collectionIdStr: string)
+			if not (eventIngest and appAnalytics) then
+				DiscoveryEventErrorLogger.reportError(
+					"SendItemImpressionsFromProfile",
+					`Event Ingest or App Analytics was nil when trying to send itemImpressions for collection {collectionIdStr} on Profile Platform`,
+					{
+						eventIngest = eventIngest,
+						appAnalytics = appAnalytics,
+						collectionIdStr = collectionIdStr
+					}
+				)
+
+				return
+			end
+
+			if not list or #list == 0 or (not list2 or #list2 == 0) then
+				return
+			end
+
+			local v = fn(list, list2, p3, p, p4, nil, #list2, nil, collectionIdStr)
+
+			if not FFlagItemImpressionsAddGameMetadata then
+				itemImpressionsEvent(eventIngest, p2, p3, v)
+
+				return
+			end
+
+			if p3 == ContentType.Game then
+				local gameMetadataFields = buildGameMetadataFields(list, list2, collectionIdStr)
+				v = Cryo.Dictionary.union(v, gameMetadataFields)
+			end
+
+			itemImpressionsEvent(eventIngest, p2, p3, v)
+		end
+		or nil
+end
+
+SendItemImpressions.sendFromProfile = sendFromProfile
+
+function SendItemImpressions.sendFromServerDrivenUi(p, list, list2, p2, p3: string, collectionId, contentType: string, p4: number, collectionPosition: number, p5: number?, p6: string?)
+	if not p then
+		DiscoveryEventErrorLogger.reportError(
+			"SendItemImpressionsFromSduiNilService",
+			`Event Ingest was nil when trying to send itemImpressions for collection {collectionId}`,
+			{ collectionId = collectionId }
+		)
+
+		return
+	end
+
+	if not list or #list == 0 or (not list2 or #list2 == 0) then
+		return
+	end
+
+	if not p2 then
+		return
+	end
+
+	local v = fn(
+		list,
+		list2,
+		contentType,
+		p4,
+		collectionPosition,
+		collectionId,
+		p2.totalNumberOfItems,
+		p2.collectionComponentType,
+		nil,
+		p5
+	)
+
+	local itemMetadataFields = buildItemMetadataFields(list, list2, collectionId)
+
+	local joined = Cryo.Dictionary.join(p2, itemMetadataFields, v)
+
+	local item = AppStorageService:GetItem("MobileAdvertisingId")
+
+	if item and item ~= "" then
+		joined.mobileAdvertisingId = item
+	end
+
+	if
+		joined.collectionId
+		and type(joined.collectionId) == "string"
+		and type((tonumber(joined.collectionId))) ~= "number"
+	then
+		joined.collectionIdStr = joined.collectionId
+		joined.collectionId = nil
+	end
+
+	if p6 then
+		sduiCustomImpressionsEvent(p6, p3, joined)
+	else
+		itemImpressionsEvent(p, p3, contentType, joined)
+	end
+end
+return SendItemImpressions

@@ -1,45 +1,48 @@
 local Immutable = require(script.Parent.Parent.Immutable)
+
 local SetActiveTab = require(script.Parent.Parent.Actions.SetActiveTab)
 local SetTabList = require(script.Parent.Parent.Actions.SetTabList)
 
-return function(t1: {[any]: any}?, t2: {[any]: any}) -- line: 14
-	-- upvalues: SetActiveTab (copy), Immutable (copy), SetTabList (copy)
-	local v6 = t1 or {
+local FFlagDevConsoleTabReselectKeepsClientView = require(script.Parent.Flags.FFlagDevConsoleTabReselectKeepsClientView)
+
+return function(p, data)
+	local v = p or {
 		isDeveloperView = false,
 		isClientView = true,
-		currTabIndex = nil,
-		tabList = {}
+		tabList = {},
+		currTabIndex = nil
 	}
 
-	if t2.type == SetActiveTab.name then
-		if v6.tabList[t2.newTabIndex] then
-			local t3 = {
-				currTabIndex = t2.newTabIndex,
-				isClientView = t2.isClientView
-			}
+	if data.type == SetActiveTab.name then
+		if v.tabList[data.newTabIndex] then
+			local v2 = { currTabIndex = data.newTabIndex, isClientView = data.isClientView }
 
-			if v6.currTabIndex ~= t2.newTabIndex then
-				t3.isClientView = true
+			if v.currTabIndex ~= data.newTabIndex then
+				v2.isClientView = true
 			end
 
-			local v8 = Immutable.JoinDictionaries(v6, t3)
-
-			if t3.isClientView == nil then
-				v8 = Immutable.RemoveFromDictionary(v8, "isClientView")
+			if FFlagDevConsoleTabReselectKeepsClientView and v2.isClientView == nil then
+				v2.isClientView = true
 			end
 
-			return v8
+			local joinDictionaries = Immutable.JoinDictionaries(v, v2)
+
+			if v2.isClientView == nil then
+				joinDictionaries = Immutable.RemoveFromDictionary(joinDictionaries, "isClientView")
+			end
+
+			return joinDictionaries
 		end
-	elseif t2.type == SetTabList.name and t2.tabList[t2.initIndex] then
-		local t4 = {
-			isClientView = true,
-			currTabIndex = t2.initIndex,
-			tabList = t2.tabList,
-			isDeveloperView = t2.isDeveloperView
+	elseif data.type == SetTabList.name and data.tabList[data.initIndex] then
+		local v2 = {
+			currTabIndex = data.initIndex,
+			tabList = data.tabList,
+			isDeveloperView = data.isDeveloperView,
+			isClientView = true
 		}
 
-		return Immutable.JoinDictionaries(v6, t4)
+		return Immutable.JoinDictionaries(v, v2)
 	end
 
-	return v6
+	return v
 end

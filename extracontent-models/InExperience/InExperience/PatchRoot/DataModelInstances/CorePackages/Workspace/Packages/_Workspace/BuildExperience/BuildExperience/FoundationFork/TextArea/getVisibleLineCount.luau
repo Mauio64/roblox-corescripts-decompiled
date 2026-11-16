@@ -1,13 +1,13 @@
-local function getVisibleLineCount(s1: string, n1: number) -- line: 1
-	local n2 = 1
+local function getVisibleLineCount(value: string, max: number)
+	local v = 1
 
-	if s1 ~= "" then
-		for _ in string.gmatch(s1, "\n") do
-			n2 += 1
+	if value ~= "" then
+		for _ in string.gmatch(value, "\n") do
+			v += 1
 		end
 	end
 
-	return (math.clamp(n2, 1, n1))
+	return (math.clamp(v, 1, max))
 end
 
 return getVisibleLineCount

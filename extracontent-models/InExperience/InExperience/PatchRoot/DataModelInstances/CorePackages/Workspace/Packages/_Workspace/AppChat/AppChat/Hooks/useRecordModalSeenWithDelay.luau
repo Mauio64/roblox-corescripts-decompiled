@@ -1,83 +1,72 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local React = require(AppChatParent.React)
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local LuauPolyfill = require(AppChatParent.LuauPolyfill)
+local parent = AppChat.Parent
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local LuauPolyfill = require(parent.LuauPolyfill)
 local clearTimeout = LuauPolyfill.clearTimeout
 local setTimeout = LuauPolyfill.setTimeout
-local StatusCodes = require(AppChatParent.Http).StatusCodes
+local Http = require(parent.Http)
+local StatusCodes = Http.StatusCodes
 local Logger = require(AppChat.Logger)
+
 local useRecordModalSequenceResponseForConversation = require(AppChat.Hooks.useRecordModalSequenceResponseForConversation)
-local FFlagAppChatEnableDoubleOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableDoubleOptIn
 
-local function useRecordModalSeenWithDelay(t1: {[any]: any}) -- line: 26
-	-- upvalues: useDispatch (copy), React (copy), useRecordModalSequenceResponseForConversation (copy), FFlagAppChatEnableDoubleOptIn (copy), AppChatNetworking (copy), StatusCodes (copy), Logger (copy), setTimeout (copy), clearTimeout (copy)
-	local v15 = useDispatch()
-	local v16, v17 = React.useState(false)
-	local v18 = useRecordModalSequenceResponseForConversation(t1.conversationId)
+local function useRecordModalSeenWithDelay(data)
+	local v = useDispatch()
+	local state, setState = React.useState(false)
 
-	React.useEffect(function() -- line: 32
-		-- upvalues: v17 (copy)
-		v17(false)
-	end, {
-		t1.modalSequence,
-		t1.modalId,
-		t1.conversationId,
-		if not FFlagAppChatEnableDoubleOptIn then nil else t1.modalVariant
-	})
+	local v2 = useRecordModalSequenceResponseForConversation(data.conversationId)
+	React.useEffect(function()
+		setState(false)
+	end, { data.modalSequence, data.modalId, data.conversationId, data.modalVariant })
 
-	local u19 = t1.canRecordAction and (not v16 and (t1.actionToRecord and (t1.modalSequence and t1.modalId)))
+	local modalId = data.canRecordAction
+		and not state
+		and data.actionToRecord
+		and data.modalSequence
+		and (data.modalId or data.modalVariant)
+	local v3 = React.useCallback(function()
+		local actionToRecord = data.actionToRecord
+		local v3
 
-	if FFlagAppChatEnableDoubleOptIn then
-		u19 = t1.canRecordAction and (not v16 and (t1.actionToRecord and (t1.modalSequence and (t1.modalId or t1.modalVariant))))
-	end
+		if data.conversationId then
+			v3 = v2(actionToRecord, data.modalSequence, data.modalId, data.modalVariant)
+		else
+			v3 = v(AppChatNetworking.rodux.RecordModalSequenceResponse.API(
+				actionToRecord,
+				data.modalSequence,
+				data.modalId
+			))
+		end
 
-	local v20 = React.useCallback(function() -- line: 56
-		-- upvalues: t1 (copy), v18 (copy), v15 (copy), AppChatNetworking (copy), StatusCodes (copy), v17 (copy), Logger (copy)
-		local actionToRecord = t1.actionToRecord;
-
-		((if not t1.conversationId then v15(AppChatNetworking.rodux.RecordModalSequenceResponse.API(actionToRecord, t1.modalSequence, t1.modalId)) else v18(actionToRecord, t1.modalSequence, t1.modalId, t1.modalVariant))):andThen(function(p1) -- line: 74
-			-- upvalues: StatusCodes (copy), v17 (copy)
-			if p1 and p1.responseCode == StatusCodes.OK then
-				v17(true)
+		v3:andThen(function(p)
+			if p and p.responseCode == StatusCodes.OK then
+				setState(true)
 			end
-		end):catch(function(p2) -- line: 79
-			-- upvalues: Logger (copy), t1 (copy)
-			Logger:warning(`Error in { t1.modalSequence } { t1.modalId } -> RecordModalSequenceResponse seen: { tostring(p2) }`)
+		end):catch(function(p)
+			Logger:warning(`Error in {data.modalSequence} {data.modalId} -> RecordModalSequenceResponse seen: {tostring(p)}`)
 		end)
-	end, {
-		v15,
-		t1.actionToRecord,
-		t1.modalId,
-		t1.modalSequence,
-		t1.conversationId,
-		v18
-	})
+	end, { v, data.actionToRecord, data.modalId, data.modalSequence, data.conversationId, v2 })
 
-	React.useEffect(function() -- line: 97
-		-- upvalues: u19 (ref), t1 (copy), setTimeout (copy), v20 (copy), clearTimeout (copy)
-		local u22 = nil
+	React.useEffect(function()
+		local v4 = nil
 
-		if u19 then
-			if t1.delayMs and t1.delayMs > 0 then
-				u22 = setTimeout(v20, t1.delayMs)
+		if modalId then
+			if data.delayMs and data.delayMs > 0 then
+				v4 = setTimeout(v3, data.delayMs)
 			else
-				v20()
+				v3()
 			end
 		end
 
-		return function() -- line: 106
-			-- upvalues: u22 (ref), clearTimeout (copy)
-			if u22 then
-				clearTimeout(u22)
+		return function()
+			if v4 then
+				clearTimeout(v4)
 			end
 		end
-	end, {
-		t1.delayMs,
-		v20,
-		u19
-	})
+	end, { data.delayMs, v3, modalId })
 end
-
 return useRecordModalSeenWithDelay

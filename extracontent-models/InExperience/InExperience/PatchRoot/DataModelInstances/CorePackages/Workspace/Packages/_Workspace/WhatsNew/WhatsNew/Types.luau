@@ -1,6 +1,5 @@
-local Parent = script:FindFirstAncestor("WhatsNew").Parent
-
-require(Parent.Foundation)
-require(Parent.Signals)
+local parent = script:FindFirstAncestor("WhatsNew").Parent
+require(parent.Foundation)
+require(parent.Signals)
 
 return {}

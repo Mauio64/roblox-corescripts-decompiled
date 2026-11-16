@@ -1,13 +1,26 @@
 local TiltLoadingScreen = script:FindFirstAncestor("TiltLoadingScreen")
-local ParentParent = TiltLoadingScreen.Parent.Parent
-local React = require(ParentParent.React)
-local Motion = require(ParentParent.Motion)
+local parent = TiltLoadingScreen.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Motion = require(parent2.Motion)
+require(parent.LoadingScreenMilestones.Types)
+local Constants = require(parent.LoadingScreenMilestones.Constants)
+local ContentId = Constants.ContentId
+
 local RunService = game:GetService("RunService")
-local Constants = require(TiltLoadingScreen.Constants)
-local ANIMATION = Constants.ANIMATION
-local LOCKUP = Constants.LOCKUP
-local TILT_DEGREES = Constants.KEYART.TILT_DEGREES
-local v10 = Motion.createState({
+
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagLoadingScreenMilestones = SharedFlags.FFlagLoadingScreenMilestones
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagTiltLoadingScreenEnterExitHold = SharedFlags2.FFlagTiltLoadingScreenEnterExitHold
+
+local Constants2 = require(TiltLoadingScreen.Constants)
+local animation = Constants2.ANIMATION
+local lockup = Constants2.LOCKUP
+local TILT_DEGREES = Constants2.KEYART.TILT_DEGREES
+
+local state = Motion.createState({
 	keyart = 0,
 	frame = 0,
 	title = 0,
@@ -15,346 +28,364 @@ local v10 = Motion.createState({
 	verified = 0
 })
 
-local function revealed(p1, n1: number) -- line: 23
-	-- upvalues: Motion (copy)
-	return Motion.createState(p1, {
-		default = Motion.transition({
-			duration = n1
-		})
+local function revealed(p, duration: number)
+	return Motion.createState(p, {
+		default = Motion.transition({ duration = duration })
 	})
 end
 
-local v12 = revealed({
-	keyart = 1
-}, ANIMATION.artDur)
-local v13 = revealed({
-	frame = 1
-}, ANIMATION.artDur)
-local v14 = revealed({
-	title = 1
-}, ANIMATION.textDur)
-local v15 = revealed({
-	creator = 1,
-	verified = 1
-}, ANIMATION.textDur)
-local v16 = Motion.createState({
+local v = revealed({ keyart = 1 }, animation.artDur)
+local v2 = revealed({ frame = 1 }, animation.artDur)
+local v3 = revealed({ title = 1 }, animation.textDur)
+local v4 = revealed({ creator = 1, verified = 1 }, animation.textDur)
+
+local state2 = Motion.createState({
 	keyart = 0,
 	frame = 0,
 	title = 0,
 	creator = 0,
 	verified = 0
 }, {
-	default = Motion.transition({
-		duration = ANIMATION.closeDur
-	})
+	default = Motion.transition({ duration = animation.closeDur })
 })
-local v17 = Motion.createState({
+
+local state3 = Motion.createState({
 	keyart = 1,
 	frame = 1,
 	title = 1,
 	creator = 1,
 	verified = 1
 }, {
-	default = Motion.transition({
-		duration = 0
-	})
+	default = Motion.transition({ duration = 0 })
 })
 
-local function clamp01(n2: number) -- line: 52
-	return (math.clamp(n2, 0, 1))
+local function clamp01(value: number) -- 5 equivalent calls inferred from this helper
+	return (math.clamp(value, 0, 1))
 end
-local function scaleFromReveal(n3: number) -- line: 56
-	return (math.min(1, math.clamp(n3, 0, 1) * 0.5 + 0.5))
+
+local function scaleFromReveal(value: number)
+	return (math.min(1, clamp01(value) * 0.5 + 0.5)) -- inferred equivalent call
 end
-local function slideFromReveal(n4: number, n5: number) -- line: 60
-	return UDim.new(0, (1 - math.clamp(n4, 0, 1)) * n5)
+
+local function slideFromReveal(value: number, p: number)
+	return UDim.new(0, (1 - clamp01(value)) * p) -- inferred equivalent call
 end
 
 require(TiltLoadingScreen.Types)
 
-local function useLoadingScreenAnimation(t1: {[any]: any}) -- line: 73
-	-- upvalues: Motion (copy), v10 (copy), React (copy), v15 (copy), v14 (copy), ANIMATION (copy), v12 (copy), v13 (copy), v16 (copy), v17 (copy), RunService (copy), TILT_DEGREES (copy), scaleFromReveal (copy), clamp01 (copy), slideFromReveal (copy), LOCKUP (copy)
-	local v29, v30 = Motion.useMotion(v10)
-	local v31 = React.useRef(v30)
+local function useLoadingScreenAnimation(current)
+	local v5, current3 = Motion.useMotion(state)
+	local ref = React.useRef(current3)
+	ref.current = current3
+	local ref2
 
-	v31.current = v30
+	if FFlagLoadingScreenMilestones then
+		ref2 = React.useRef({})
+	else
+		ref2 = nil
+	end
 
-	local v32 = React.useRef(t1)
+	local ref3
 
-	v32.current = t1
+	if FFlagLoadingScreenMilestones then
+		ref3 = React.useRef(current.onContentRevealComplete)
+	else
+		ref3 = nil
+	end
 
-	local v33 = React.useRef({})
-	local v34 = React.useRef({
+	if FFlagLoadingScreenMilestones then
+		React.useLayoutEffect(function()
+			if ref3 then
+				ref3.current = current.onContentRevealComplete
+			end
+
+			return function()
+				if ref3 then
+					ref3.current = nil
+				end
+			end
+		end, { current.onContentRevealComplete })
+	end
+
+	local ref4 = React.useRef(current)
+	ref4.current = current
+
+	local ref5 = React.useRef(current.onEnterComplete)
+	ref5.current = current.onEnterComplete
+
+	local ref6 = React.useRef({})
+
+	local ref7 = React.useRef({
 		timeline = false,
 		cascade = false,
 		title = false,
-		creator = false
+		creator = false,
+		enterComplete = false
 	})
-	local v35, v36 = React.useBinding(0)
-	local v37, v38 = React.useBinding(t1.reducedMotion)
+	local elapsed2, v6 = React.useBinding(0)
+	local shouldReduceMotion, v7 = React.useBinding(current.reducedMotion)
 
-	React.useEffect(function() -- line: 86
-		-- upvalues: v38 (copy), t1 (copy)
-		v38(t1.reducedMotion)
-	end, { t1.reducedMotion })
+	React.useEffect(function()
+		v7(current.reducedMotion)
+	end, { current.reducedMotion })
 
-	local function cancelScheduled() -- line: 90
-		-- upvalues: v33 (copy)
-		for _, v49 in v33.current do
-			pcall(task.cancel, v49)
+	local function cancelScheduled()
+		for _, v8 in ref6.current do
+			pcall(task.cancel, v8)
 		end
 
-		v33.current = {}
+		ref6.current = {}
 	end
-	local function schedule(n6: number, p2: ((...any) -> ...any)) -- line: 97
-		-- upvalues: v33 (copy)
-		local thread = task.delay(n6, p2)
 
-		table.insert(v33.current, thread)
+	local function schedule(duration: number, callback) -- 5 equivalent calls inferred from this helper
+		local thread = task.delay(duration, callback)
+		table.insert(ref6.current, thread)
 	end
-	local function canAnimate() -- line: 102
-		-- upvalues: v32 (copy)
-		local current = v32.current
 
-		return not current.reducedMotion and not current.isDismissing
+	local function canAnimate(): boolean -- 4 equivalent calls inferred from this helper
+		local current2 = ref4.current
+		return not (current2.reducedMotion or current2.isDismissing)
 	end
-	local function startCreator() -- line: 107
-		-- upvalues: v34 (copy), v32 (copy), v31 (copy), v15 (copy)
-		if not v34.current.creator then
-			local current = v32.current
 
-			if not current.reducedMotion and not current.isDismissing then
-				v34.current.creator = true
-				v31.current(v15)
+	local function fireEnterComplete() -- 2 equivalent calls inferred from this helper
+		if ref7.current.enterComplete then
+			return
+		end
 
-				return
-			end
+		ref7.current.enterComplete = true
+
+		if ref5.current then
+			ref5.current()
 		end
 	end
-	local function startTitle() -- line: 115
-		-- upvalues: v34 (copy), v32 (copy), v31 (copy), v14 (copy), ANIMATION (copy), startCreator (copy), v33 (copy)
-		if not v34.current.title and v32.current.contentReady then
-			local current = v32.current
 
-			if not current.reducedMotion and not current.isDismissing then
-				v34.current.title = true
-				v31.current(v14)
+	local function animateContentReveal(p, items)
+		local v8 = ref2
+		local v9 = {}
 
-				local titleDelay = ANIMATION.titleDelay
-				local v57 = startCreator
-				local thread = task.delay(titleDelay, v57)
-
-				table.insert(v33.current, thread)
-
-				return
-			end
+		for _, item in items do
+			v8.current[item] = v9
 		end
-	end
-	local function startTimeline() -- line: 124
-		-- upvalues: v34 (copy), v32 (copy), v31 (copy), v12 (copy), ANIMATION (copy), v13 (copy), v33 (copy), v14 (copy), startCreator (copy)
-		if not v34.current.timeline then
-			local current = v32.current
 
-			if not current.reducedMotion and not current.isDismissing then
-				v34.current.timeline = true
-				v31.current(v12)
+		ref.current(p, {
+			onAnimationComplete = function(p2)
+				if p2 ~= true or ref4.current.isDismissing then
+					return
+				end
 
-				local artDelay = ANIMATION.artDelay
-				local thread = task.delay(artDelay, function() -- line: 130
-					-- upvalues: v32 (copy), v31 (copy), v13 (copy)
-					local current2 = v32.current
+				local current2
 
-					if not current2.reducedMotion and not current2.isDismissing then
-						v31.current(v13)
-					end
-				end)
+				if ref3 then
+					current2 = ref3.current
+				end
 
-				table.insert(v33.current, thread)
-
-				local cascade = ANIMATION.cascade
-				local thread3 = task.delay(cascade, function() -- line: 135
-					-- upvalues: v34 (copy), v32 (copy), v31 (copy), v14 (copy), ANIMATION (copy), startCreator (copy), v33 (copy)
-					v34.current.cascade = true
-
-					if not v34.current.title and v32.current.contentReady then
-						local current3 = v32.current
-
-						if current3.reducedMotion or current3.isDismissing then
-							return
+				if current2 then
+					for _, item in items do
+						if v8.current[item] == v9 then
+							current2(item)
 						end
-
-						v34.current.title = true
-						v31.current(v14)
-
-						local titleDelay = ANIMATION.titleDelay
-						local v81 = startCreator
-						local thread2 = task.delay(titleDelay, v81)
-
-						table.insert(v33.current, thread2)
 					end
-				end)
+				end
+			end
+		})
+	end
 
-				table.insert(v33.current, thread3)
+	local function startCreator()
+		if not ref7.current.creator and canAnimate() then -- inferred equivalent call
+			ref7.current.creator = true
 
-				return
+			if FFlagLoadingScreenMilestones then
+				animateContentReveal(v4, { ContentId.Creator })
+			else
+				ref.current(v4)
+			end
+
+			if FFlagTiltLoadingScreenEnterExitHold then
+				schedule(animation.textDur, fireEnterComplete) -- inferred equivalent call
 			end
 		end
 	end
-	local function startExitTimeline() -- line: 141
-		-- upvalues: v31 (copy), v16 (copy)
-		v31.current(v16)
+
+	local function startTitle()
+		if not ref7.current.title and ref4.current.contentReady and canAnimate() then -- inferred equivalent call
+			ref7.current.title = true
+
+			if FFlagLoadingScreenMilestones then
+				animateContentReveal(v3, { ContentId.Title })
+			else
+				ref.current(v3)
+			end
+
+			schedule(animation.titleDelay, startCreator) -- inferred equivalent call
+		end
 	end
-	local function freeze() -- line: 145
-		-- upvalues: v31 (copy), Motion (copy), v29 (copy)
-		v31.current(Motion.createState({
-			keyart = v29.keyart:getValue(),
-			frame = v29.frame:getValue(),
-			title = v29.title:getValue(),
-			creator = v29.creator:getValue(),
-			verified = v29.verified:getValue()
+
+	local function startTimeline()
+		if not ref7.current.timeline and canAnimate() then -- inferred equivalent call
+			ref7.current.timeline = true
+
+			if FFlagLoadingScreenMilestones then
+				animateContentReveal(v, { ContentId.Thumbnail })
+			else
+				ref.current(v)
+			end
+
+			local function fn()
+				if canAnimate() then -- inferred equivalent call
+					ref.current(v2)
+				end
+			end
+
+			schedule(animation.artDelay, fn) -- inferred equivalent call
+
+			local function fn2()
+				ref7.current.cascade = true
+				startTitle()
+			end
+
+			schedule(animation.cascade, fn2) -- inferred equivalent call
+
+			if FFlagTiltLoadingScreenEnterExitHold then
+				local function fn3()
+					if not ref7.current.title then
+						fireEnterComplete() -- inferred equivalent call
+					end
+				end
+
+				schedule(animation.artDur, fn3) -- inferred equivalent call
+			end
+		end
+	end
+
+	local function startExitTimeline() -- 1 equivalent call inferred from this helper
+		ref.current(state2)
+	end
+
+	local function freeze()
+		ref.current(Motion.createState({
+			keyart = v5.keyart:getValue(),
+			frame = v5.frame:getValue(),
+			title = v5.title:getValue(),
+			creator = v5.creator:getValue(),
+			verified = v5.verified:getValue()
 		}, {
-			default = Motion.transition({
-				duration = 0
-			})
+			default = Motion.transition({ duration = 0 })
 		}))
 	end
 
-	React.useEffect(function() -- line: 157
-		-- upvalues: t1 (copy), cancelScheduled (copy), v31 (copy), v10 (copy), v16 (copy), v34 (copy), v17 (copy), startTimeline (copy), v32 (copy), v14 (copy), ANIMATION (copy), startCreator (copy), v33 (copy)
-		if t1.isDismissing then
-			cancelScheduled()
-
-			if t1.reducedMotion then
-				v31.current(v10)
-
-				return
-			end
-
-			v31.current(v16)
-
-			return
+	React.useEffect(function()
+		if FFlagLoadingScreenMilestones and ref2 and (current.isDismissing or current.reducedMotion) then
+			ref2.current = {}
 		end
 
-		if t1.reducedMotion then
+		if current.isDismissing then
 			cancelScheduled()
-			v34.current = {
+
+			if current.reducedMotion then
+				ref.current(state)
+			else
+				startExitTimeline() -- inferred equivalent call
+			end
+		elseif current.reducedMotion then
+			cancelScheduled()
+			ref7.current = {
 				timeline = true,
 				cascade = true,
 				title = true,
-				creator = true
+				creator = true,
+				enterComplete = false
 			}
-			v31.current(v17)
 
-			return
-		end
-
-		startTimeline()
-
-		if t1.contentReady and v34.current.cascade and not v34.current.title and v32.current.contentReady then
-			local current = v32.current
-
-			if current.reducedMotion or current.isDismissing then
-				return
+			if FFlagLoadingScreenMilestones then
+				animateContentReveal(state3, { ContentId.Title, ContentId.Creator, ContentId.Thumbnail })
+			else
+				ref.current(state3)
 			end
 
-			v34.current.title = true
-			v31.current(v14)
+			if FFlagTiltLoadingScreenEnterExitHold then
+				fireEnterComplete() -- inferred equivalent call
+			end
+		else
+			startTimeline()
 
-			local titleDelay = ANIMATION.titleDelay
-			local v66 = startCreator
-			local thread = task.delay(titleDelay, v66)
-
-			table.insert(v33.current, thread)
+			if current.contentReady and ref7.current.cascade then
+				startTitle()
+			end
 		end
-	end, {
-		t1.contentReady,
-		t1.isDismissing,
-		t1.reducedMotion
-	})
-	React.useEffect(function() -- line: 177
-		-- upvalues: t1 (copy), RunService (copy), v36 (copy)
-		if t1.reducedMotion or t1.isDismissing then
+	end, { current.contentReady, current.isDismissing, current.reducedMotion })
+
+	React.useEffect(function()
+		if current.reducedMotion or current.isDismissing then
 			return
 		end
 
-		local elapsed = os.clock()
-		local connection = RunService.Heartbeat:Connect(function() -- line: 183
-			-- upvalues: v36 (copy), elapsed (copy)
-			v36(os.clock() - elapsed)
+		local lastTime = os.clock()
+		local heartbeatConnection = RunService.Heartbeat:Connect(function()
+			v6(os.clock() - lastTime)
 		end)
 
-		return function() -- line: 187
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			heartbeatConnection:Disconnect()
 		end
-	end, {
-		t1.isDismissing,
-		t1.reducedMotion
-	})
-	React.useEffect(function() -- line: 192
-		-- upvalues: cancelScheduled (copy), freeze (copy)
-		return function() -- line: 193
-			-- upvalues: cancelScheduled (copy), freeze (copy)
+	end, { current.isDismissing, current.reducedMotion })
+
+	React.useEffect(function()
+		return function()
+			if FFlagLoadingScreenMilestones and ref2 then
+				ref2.current = {}
+			end
+
 			cancelScheduled()
 			freeze()
 		end
 	end, {})
 
-	local v47 = React.useRef(nil)
+	local ref8 = React.useRef(nil)
 
-	if v47.current == nil then
-		v47.current = {
+	if ref8.current == nil then
+		ref8.current = {
 			keyart = {
-				rotation = v29.keyart:map(function(n7: number) -- line: 203
-					-- upvalues: TILT_DEGREES (copy)
-					return TILT_DEGREES * math.clamp(n7, 0, 1)
+				rotation = v5.keyart:map(function(value: number)
+					return TILT_DEGREES * clamp01(value) -- inferred equivalent call
 				end),
-				sizeScale = v29.keyart:map(scaleFromReveal),
-				coverTransparency = v29.keyart:map(clamp01)
+				sizeScale = v5.keyart:map(scaleFromReveal),
+				coverTransparency = v5.keyart:map(clamp01)
 			},
 			frame = {
 				rotation = React.joinBindings({
-					reveal = v29.frame,
-					elapsed = v35,
-					shouldReduceMotion = v37
-				}):map(function(p3) -- line: 214
-					-- upvalues: ANIMATION (copy), TILT_DEGREES (copy)
-					local reveal = p3.reveal
-					local elapsed = p3.elapsed
-					local n8 = 0
+					reveal = v5.frame,
+					elapsed = elapsed2,
+					shouldReduceMotion = shouldReduceMotion
+				}):map(function(data)
+					local reveal = data.reveal
+					local elapsed = data.elapsed
+					local v8 = data.shouldReduceMotion and 0
+						or math.sin(elapsed * animation.wobbleSpeed * 2 * 3.141592653589793 * 0.28 + 0.9) * animation.wobbleAngle * 1.4 * clamp01(reveal) -- inferred equivalent call
 
-					if not p3.shouldReduceMotion then
-						n8 = math.sin(elapsed * ANIMATION.wobbleSpeed * 2 * 3.141592653589793 * 0.28 + 0.9) * ANIMATION.wobbleAngle * 1.4 * math.clamp(reveal, 0, 1)
-					end
-
-					return -TILT_DEGREES * reveal + n8
+					return -TILT_DEGREES * reveal + v8
 				end),
-				sizeScale = v29.frame:map(scaleFromReveal),
-				groupTransparency = v29.frame:map(function(n9: number) -- line: 228
-					return (math.min(1, (1 - math.clamp(n9, 0, 1)) * 2))
+				sizeScale = v5.frame:map(scaleFromReveal),
+				groupTransparency = v5.frame:map(function(value: number)
+					return (math.min(1, (1 - clamp01(value)) * 2)) -- inferred equivalent call
 				end)
 			},
 			title = {
-				reveal = v29.title,
-				slide = v29.title:map(function(n10: number) -- line: 234
-					-- upvalues: slideFromReveal (copy), LOCKUP (copy)
-					return slideFromReveal(n10, LOCKUP.TITLE_SLIDE)
+				reveal = v5.title,
+				slide = v5.title:map(function(p: number)
+					return slideFromReveal(p, lockup.TITLE_SLIDE)
 				end)
 			},
 			creator = {
-				reveal = v29.creator,
-				slide = v29.creator:map(function(n11: number) -- line: 240
-					-- upvalues: slideFromReveal (copy), LOCKUP (copy)
-					return slideFromReveal(n11, LOCKUP.SUB_SLIDE)
+				reveal = v5.creator,
+				slide = v5.creator:map(function(p: number)
+					return slideFromReveal(p, lockup.SUB_SLIDE)
 				end)
 			},
-			verified = {
-				reveal = v29.verified
-			}
+			verified = { reveal = v5.verified }
 		}
 	end
 
-	return v47.current
+	return ref8.current
 end
 
 return useLoadingScreenAnimation

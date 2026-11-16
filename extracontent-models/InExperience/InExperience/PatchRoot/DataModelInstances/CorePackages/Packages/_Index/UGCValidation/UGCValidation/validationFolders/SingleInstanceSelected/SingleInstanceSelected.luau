@@ -1,73 +1,74 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
+local Constants = require(parent.Constants)
+require(parent.util.Types)
 
-require(ParentParent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local t1 = {}
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local getEngineFeatureEngineUGCValidateInstanceTreesEquivalent = require(parent.flags.getEngineFeatureEngineUGCValidateInstanceTreesEquivalent)
 
-t1.categories = Constants.AllAssetUploadCategories
-t1.requiredData = {
+local UGCValidationService = game:GetService("UGCValidationService")
+local SingleInstanceSelected = {}
+
+SingleInstanceSelected.categories = Constants.AllAssetUploadCategories
+SingleInstanceSelected.requiredData = {
 	ValidationEnums.SharedDataMember.entrypointInput,
 	ValidationEnums.SharedDataMember.consumerConfig,
 	ValidationEnums.SharedDataMember.uploadEnum
 }
 
-local function deepEquals(_, _) -- line: 16
+local function deepEquals(r15ArtistIntent, r15Fixed, consumerEnv) -- 1 equivalent call inferred from this helper
+	if
+		getEngineFeatureEngineUGCValidateInstanceTreesEquivalent()
+		and consumerEnv == ValidationEnums.ConsumerEnv.Backend
+	then
+		return UGCValidationService:AreInstanceTreesEquivalent(r15ArtistIntent, r15Fixed)
+	end
+
 	return true
 end
-local function getFoldersMapping(t2: {[any]: any}) -- line: 21
-	local t3 = {
-		R15ArtistIntent = true,
-		R15Fixed = true,
-		R6 = true
-	}
-	local t4 = {}
 
-	for _, v14 in t2 do
-		if v14:IsA("Folder") and t3[v14.Name] then
-			t4[v14.Name] = v14
+local function getFoldersMapping(entrypointInput)
+	local v = { R15ArtistIntent = true, R15Fixed = true, R6 = true }
+
+	local foldersByName = {}
+
+	for _, folder in entrypointInput do
+		if folder:IsA("Folder") and v[folder.Name] then
+			foldersByName[folder.Name] = folder
 		end
 	end
 
-	return t4
+	return foldersByName
 end
 
-function t1.run(p3, p4) -- line: 38
-	-- upvalues: Constants (copy), ErrorSourceStrings (copy), getFoldersMapping (copy)
-	local entrypointInput = p4.entrypointInput
-	local consumerConfig = p4.consumerConfig
-	local assetType = p4.uploadEnum.assetType
+function SingleInstanceSelected.run(object, data)
+	local entrypointInput = data.entrypointInput
+	local consumerConfig = data.consumerConfig
+	local assetType = data.uploadEnum.assetType
 
 	if Constants.AssetUploadsWithFolderStructure[assetType] and consumerConfig.enforceR15FolderStructure then
 		if #entrypointInput ~= 3 then
-			p3:fail(ErrorSourceStrings.Keys.FolderStructureMismatch)
-
+			object:fail(ErrorSourceStrings.Keys.FolderStructureMismatch)
 			return
 		end
 
-		local v20 = getFoldersMapping(entrypointInput)
-		local g21 = nil
+		local foldersMapping = getFoldersMapping(entrypointInput)
 
-		repeat
-			if g21 or (not v20.R15ArtistIntent or not v20.R15Fixed or not v20.R6 or #v20.R6:GetChildren() ~= 0) then
-				g21 = false
-				p3:fail(ErrorSourceStrings.Keys.FolderStructureMismatch)
+		if
+			foldersMapping.R15ArtistIntent
+			and foldersMapping.R15Fixed
+			and foldersMapping.R6
+			and #foldersMapping.R6:GetChildren() == 0
+			and deepEquals(foldersMapping.R15ArtistIntent, foldersMapping.R15Fixed, consumerConfig.consumerEnv) -- inferred equivalent call
+		then
+			return
+		end
 
-				return
-			end
-
-			local _ = v20.R15ArtistIntent
-			local _ = v20.R15Fixed
-
-			if not true then
-				g21 = true
-			end
-		until not g21
+		object:fail(ErrorSourceStrings.Keys.FolderStructureMismatch)
 	elseif #entrypointInput ~= 1 then
-		p3:fail(ErrorSourceStrings.Keys.SelectionCountNotOne)
+		object:fail(ErrorSourceStrings.Keys.SelectionCountNotOne)
 	end
 end
 
-return t1
+return SingleInstanceSelected

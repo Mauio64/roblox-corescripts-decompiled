@@ -1,22 +1,20 @@
-local Parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
-local Logger = require(Parent.Loggers).Logger
+local parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
+local Loggers = require(parent.Loggers)
+local Logger = Loggers.Logger
 local HttpService = game:GetService("HttpService")
+local RobloxSubscriptionLogger = {}
 
-return {
-	debug = function(t1: {[any]: any}) -- line: 8
-		-- upvalues: Logger (copy), HttpService (copy)
-		Logger:debug(HttpService:JSONEncode(t1))
-	end,
-	info = function(t2: {[any]: any}) -- line: 11
-		-- upvalues: Logger (copy), HttpService (copy)
-		Logger:info(HttpService:JSONEncode(t2))
-	end,
-	warn = function(t3: {[any]: any}) -- line: 14
-		-- upvalues: Logger (copy), HttpService (copy)
-		Logger:warn(HttpService:JSONEncode(t3))
-	end,
-	error = function(t4: {[any]: any}) -- line: 17
-		-- upvalues: Logger (copy), HttpService (copy)
-		Logger:error(HttpService:JSONEncode(t4))
-	end
-}
+function RobloxSubscriptionLogger:debug()
+	Logger:debug(HttpService:JSONEncode(self))
+end
+function RobloxSubscriptionLogger:info()
+	Logger:info(HttpService:JSONEncode(self))
+end
+function RobloxSubscriptionLogger:warn()
+	Logger:warn(HttpService:JSONEncode(self))
+end
+function RobloxSubscriptionLogger:error()
+	Logger:error(HttpService:JSONEncode(self))
+end
+
+return RobloxSubscriptionLogger

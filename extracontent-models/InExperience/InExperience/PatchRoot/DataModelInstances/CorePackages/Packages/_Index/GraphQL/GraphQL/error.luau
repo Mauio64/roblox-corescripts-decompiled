@@ -1,10 +1,16 @@
 local GraphQLError = require(script.GraphQLError)
 local formatError = require(script.formatError)
 
-return {
+local Error = {
 	GraphQLError = GraphQLError.GraphQLError,
 	printError = GraphQLError.printError,
-	syntaxError = require(script.syntaxError).syntaxError,
-	locatedError = require(script.locatedError).locatedError,
-	formatError = formatError.formatError
+	syntaxError = 0,
+	locatedError = 0,
+	formatError = 0
 }
+local syntaxError = require(script.syntaxError)
+Error.syntaxError = syntaxError.syntaxError
+local locatedError = require(script.locatedError)
+Error.locatedError = locatedError.locatedError
+Error.formatError = formatError.formatError
+return Error

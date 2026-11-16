@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return require(Parent.FriendsRodux).config({
-	keyPath = "ChatAppReducer.Friends"
-})
+local FriendsRodux = require(parent.FriendsRodux)
+
+return FriendsRodux.config({ keyPath = "ChatAppReducer.Friends" })

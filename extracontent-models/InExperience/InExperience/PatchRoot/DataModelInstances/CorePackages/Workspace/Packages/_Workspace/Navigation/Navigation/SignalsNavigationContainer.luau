@@ -1,22 +1,20 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local Context = require(ParentParent.RoactNavigation).Context
-local useSignalState = require(ParentParent.SignalsReact).useSignalState
+local parent = script.Parent.Parent
+local React = require(parent.React)
+local RoactNavigation = require(parent.RoactNavigation)
+local Context = RoactNavigation.Context
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
 
 require(script.Parent.createSignalsNavigationObject)
 
-local function SignalsNavigationContainer(t1: {[any]: any}) -- line: 15
-	-- upvalues: useSignalState (copy), React (copy), Context (copy)
-	local v7 = useSignalState(t1.navigation.getNavigation)
+local function SignalsNavigationContainer(p)
+	local v = useSignalState(p.navigation.getNavigation)
 
-	React.useEffect(function() -- line: 19
-		-- upvalues: t1 (copy)
-		t1.navigation.notifyEvents()
+	React.useEffect(function()
+		p.navigation.notifyEvents()
 	end)
 
-	return React.createElement(Context.Provider, {
-		value = v7
-	}, t1.children)
+	return React.createElement(Context.Provider, { value = v }, p.children)
 end
 
 return SignalsNavigationContainer

@@ -1,40 +1,45 @@
 local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
 local EventIngestService = game:GetService("EventIngestService")
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local getPlatformTarget
 
-if require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagShareGetPlatformTargetImpl() then
-	getPlatformTarget = require(CorePackages.Workspace.Packages.Analytics).getPlatformTarget
+if SharedFlags.GetFFlagShareGetPlatformTargetImpl() then
+	local Analytics = require(CorePackages.Workspace.Packages.Analytics)
+	getPlatformTarget = Analytics.getPlatformTarget
 else
-	function getPlatformTarget() -- line: 12
-		-- upvalues: UserInputService (copy)
-		local None = Enum.Platform.None
+	getPlatformTarget = function()
+		local v = Enum.Platform.None
 
-		pcall(function() -- line: 18
-			-- upvalues: None (ref), UserInputService (copy)
-			None = UserInputService:GetPlatform()
+		pcall(function()
+			v = UserInputService:GetPlatform()
 		end)
 
-		local v6 = None == Enum.Platform.Windows or None == Enum.Platform.OSX
-		local v7 = None == Enum.Platform.IOS or None == Enum.Platform.Android or None == Enum.Platform.UWP
-		local v8 = None == Enum.Platform.XBox360 or None == Enum.Platform.XBoxOne or (None == Enum.Platform.PS3 or None == Enum.Platform.PS4) or None == Enum.Platform.WiiU
+		local v2 = v == Enum.Platform.Windows or v == Enum.Platform.OSX
 
-		return if not v6 then if not v7 then if not v8 then "unknownLua" .. tostring(None) else "console" else "mobile" else "client"
+		local v3 = v == Enum.Platform.IOS or v == Enum.Platform.Android or v == Enum.Platform.UWP
+
+		local v4 = v == Enum.Platform.XBox360
+			or v == Enum.Platform.XBoxOne
+			or v == Enum.Platform.PS3
+			or v == Enum.Platform.PS4
+			or v == Enum.Platform.WiiU
+
+		return v2 and "client" or v3 and "mobile" or v4 and "console" or "unknownLua" .. tostring(v)
 	end
 end
 
-return function(p1, p2, p3) -- line: 49
-	-- upvalues: getPlatformTarget (ref), EventIngestService (copy)
-	assert(type(p1) == "string", "Expected eventContext to be a string")
-	assert(type(p2) == "string", "Expected eventName to be a string")
-	assert(type(p3) == "table", "Expected eventTable to be a table")
+return function(value, value2, options)
+	assert(type(value) == "string", "Expected eventContext to be a string")
+	assert(type(value2) == "string", "Expected eventName to be a string")
+	assert(type(options) == "table", "Expected eventTable to be a table")
 
-	local v12 = getPlatformTarget()
+	local platformTarget = getPlatformTarget()
 
-	if not p3 then
-		p3 = {}
-	end
+	options = options or {}
 
-	p3.universeId = tostring(game.GameId)
-	EventIngestService:sendEventDeferred(v12, p1, p2, p3)
+	options.universeId = tostring(game.GameId)
+
+	EventIngestService:sendEventDeferred(platformTarget, value, value2, options)
 end

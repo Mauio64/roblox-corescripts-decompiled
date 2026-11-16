@@ -1,111 +1,100 @@
-local ParentParent = script.Parent.Parent
-local RoactNavigation = require(ParentParent.RoactNavigation)
+local parent = script.Parent.Parent
+local RoactNavigation = require(parent.RoactNavigation)
 local getNavigation = RoactNavigation.getNavigation
 local Actions = RoactNavigation.Actions
-local Signals = require(ParentParent.Signals)
+local Signals = require(parent.Signals)
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
-local SignalsExperimental = require(ParentParent.SignalsExperimental)
+local SignalsExperimental = require(parent.SignalsExperimental)
 
 require(script.Parent.types)
 
-local v9 = _G.__DEV__ or _G.__TESTEZ_RUNNING_TEST__
+local __DEV__ = _G.__DEV__ or _G.__TESTEZ_RUNNING_TEST__
 
-local function createProjectedNavigationObject(p1) -- line: 44
-	-- upvalues: createSignal (copy), Actions (copy), SignalsExperimental (copy), v9 (copy), createComputed (copy), getNavigation (copy)
-	local t1 = {}
-	local v13, v14 = createSignal(false)
-	local v15, v16 = createSignal(function() -- line: 52
-		-- upvalues: p1 (copy), Actions (copy)
-		return (p1.getStateForAction(Actions.init()))
+local function createProjectedNavigationObject(p)
+	local v = {}
+	local signal, v2 = createSignal(false)
+
+	local signal2, v3 = createSignal(function()
+		return (p.getStateForAction(Actions.init()))
 	end)
-	local u17 = nil
-	local t2 = {}
 
-	local function dispatch(p2) -- line: 94
-		-- upvalues: v9 (copy), SignalsExperimental (copy), v16 (copy), p1 (copy), Actions (copy), v14 (copy), u17 (ref), v15 (copy), t2 (ref)
-		if v9 and p2.type == "RESET_NAVIGATION_FOR_TESTING_ONLY__DO_NOT_USE_IN_PRODUCTION" then
-			SignalsExperimental.batch(function() -- line: 96
-				-- upvalues: v16 (copy), p1 (copy), Actions (copy), v14 (copy)
-				v16((p1.getStateForAction(Actions.init())))
-				v14(false)
-			end)
+	local v4 = nil
+	local v5 = {}
 
-			return true
-		end
+	local function setDispatch(callback)
+		v4 = callback
 
-		if u17 == nil then
-			local v28 = v15(false)
-			local v29 = p1.getStateForAction(p2, v28)
+		if #v5 > 0 then
+			local v6 = v5
+			v5 = {}
 
-			if v29 ~= nil and v29 ~= v28 then
-				v16(v29)
+			for _, v7 in v6 do
+				callback(v7)
 			end
+		end
+	end
 
-			table.insert(t2, p2)
+	local function clearDispatch()
+		v4 = nil
+	end
 
+	local function dispatch(p2): boolean
+		if __DEV__ and p2.type == "RESET_NAVIGATION_FOR_TESTING_ONLY__DO_NOT_USE_IN_PRODUCTION" then
+			SignalsExperimental.batch(function()
+				v3((p.getStateForAction(Actions.init())))
+				v2(false)
+			end)
 			return true
 		end
 
-		u17(p2)
+		if v4 ~= nil then
+			v4(p2)
+			return true
+		end
 
+		local v6 = signal2(false)
+		local stateForAction = p.getStateForAction(p2, v6)
+
+		if stateForAction ~= nil and stateForAction ~= v6 then
+			v3(stateForAction)
+		end
+
+		table.insert(v5, p2)
 		return true
 	end
-	local function u20() -- line: 123
+
+	local function v6(): nil
 		return nil
 	end
 
-	local v21 = createComputed(function(p3) -- line: 126
-		-- upvalues: v15 (copy), getNavigation (copy), p1 (copy), dispatch (copy), t1 (copy), u20 (ref)
-		local v31 = v15(p3)
-
-		return getNavigation(p1, v31, dispatch, t1, function(_, p5) -- line: 128
-			return p5
-		end, function() -- line: 130
-			-- upvalues: u20 (ref)
-			return u20()
+	local getNavigation2 = createComputed(function(p2)
+		return getNavigation(p, signal2(p2), dispatch, v, function(_, p3)
+			return p3
+		end, function()
+			return v6()
 		end)
 	end)
 
-	u20 = v21
-
+	v6 = getNavigation2
 	return {
 		dispatch = dispatch,
-		notifyEvents = function() -- line: 118
-		end,
-		getState = v15,
-		getNavigation = v21,
-		getIsNavigating = v13,
-		update = function(p6) -- line: 79
-			-- upvalues: SignalsExperimental (copy), v16 (copy), v14 (copy)
-			if p6 == nil then
+		notifyEvents = function() end,
+		getState = signal2,
+		getNavigation = getNavigation2,
+		getIsNavigating = signal,
+		update = function(p2)
+			if p2 == nil then
 				return
 			end
 
-			SignalsExperimental.batch(function() -- line: 83
-				-- upvalues: v16 (copy), p6 (copy), v14 (copy)
-				v16(p6)
-				v14(p6.isTransitioning == true)
+			SignalsExperimental.batch(function()
+				v3(p2)
+				v2(p2.isTransitioning == true)
 			end)
 		end,
-		setDispatch = function(p7: ((...any) -> ...any)) -- line: 61
-			-- upvalues: u17 (ref), t2 (ref)
-			u17 = p7
-
-			if #t2 > 0 then
-				local v23 = t2
-
-				t2 = {}
-
-				for _, v25 in v23 do
-					p7(v25)
-				end
-			end
-		end,
-		clearDispatch = function() -- line: 72
-			-- upvalues: u17 (ref)
-			u17 = nil
-		end
+		setDispatch = setDispatch,
+		clearDispatch = clearDispatch
 	}
 end
 

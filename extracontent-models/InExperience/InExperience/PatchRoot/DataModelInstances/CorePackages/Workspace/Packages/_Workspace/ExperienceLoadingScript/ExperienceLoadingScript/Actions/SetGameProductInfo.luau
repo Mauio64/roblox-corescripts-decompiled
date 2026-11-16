@@ -1,12 +1,9 @@
-local Parent = script:FindFirstAncestor("ExperienceLoadingScript").Parent
-local Rodux = require(Parent.Rodux)
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("ExperienceLoadingScript").Parent
 
-return Rodux.makeActionCreator(script.Name, function(p1) -- line: 7
-	-- upvalues: ArgCheck (copy)
-	ArgCheck.isType(p1, "table", "SetGameProductInfo action expects productInfo to be a table")
+local Rodux = require(parent.Rodux)
+local ArgCheck = require(parent.ArgCheck)
 
-	return {
-		productInfo = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(productInfo)
+	ArgCheck.isType(productInfo, "table", "SetGameProductInfo action expects productInfo to be a table")
+	return { productInfo = productInfo }
 end)

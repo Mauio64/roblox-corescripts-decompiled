@@ -1,0 +1,13 @@
+local viewerRelationshipUtils = require("@game/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform/ProfilePlatform/Components/ProfilePlatformPage/viewerRelationshipUtils")
+
+local function getIsTrustedConnectionsStatusFromProfileResponse(p2)
+	local viewerRelationshipFromProfileResponse = viewerRelationshipUtils.getViewerRelationshipFromProfileResponse(p2)
+
+	if viewerRelationshipFromProfileResponse then
+		return viewerRelationshipUtils.isViewerTrustedFriendsFromViewerRelationship(viewerRelationshipFromProfileResponse)
+	end
+
+	return false
+end
+
+return getIsTrustedConnectionsStatusFromProfileResponse

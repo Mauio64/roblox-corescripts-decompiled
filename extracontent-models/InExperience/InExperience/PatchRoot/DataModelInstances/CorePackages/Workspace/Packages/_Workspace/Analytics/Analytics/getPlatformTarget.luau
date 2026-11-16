@@ -1,3 +1,5 @@
 local UserInputService = game:GetService("UserInputService")
 
-return require(script.Parent["getPlatformTarget.impl"])(UserInputService)
+local getPlatformTargetimpl = require(script.Parent["getPlatformTarget.impl"])
+
+return getPlatformTargetimpl(UserInputService)

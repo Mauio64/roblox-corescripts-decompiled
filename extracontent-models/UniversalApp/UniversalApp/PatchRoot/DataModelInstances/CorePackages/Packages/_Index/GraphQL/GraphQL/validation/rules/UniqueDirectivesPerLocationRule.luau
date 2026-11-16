@@ -1,70 +1,79 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local language = ParentParent.language
-local Kind = require(language.kinds).Kind
+local parent = script.Parent.Parent.Parent
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local language = parent.language
+local kinds = require(language.kinds)
+local kind = kinds.Kind
 local predicates = require(language.predicates)
 local isTypeDefinitionNode = predicates.isTypeDefinitionNode
 local isTypeExtensionNode = predicates.isTypeExtensionNode
-local specifiedDirectives = require(ParentParent.type.directives).specifiedDirectives
+local directives = require(parent.type.directives)
+local specifiedDirectives = directives.specifiedDirectives
 
 return {
-	UniqueDirectivesPerLocationRule = function(p1) -- line: 27
-		-- upvalues: specifiedDirectives (copy), Kind (copy), isTypeDefinitionNode (copy), isTypeExtensionNode (copy), GraphQLError (copy)
-		local t1 = {}
-		local v11 = p1:getSchema()
-		local v12 = if not v11 then specifiedDirectives else v11:getDirectives()
+	UniqueDirectivesPerLocationRule = function(object)
+		local v = {}
 
-		for _, v in ipairs(v12) do
-			t1[v.name] = not v.isRepeatable
+		local schema = object:getSchema()
+		local v2
+
+		if schema then
+			v2 = schema:getDirectives()
+		else
+			v2 = specifiedDirectives
 		end
 
-		local definitions = p1:getDocument().definitions
+		for _, v3 in ipairs(v2) do
+			v[v3.name] = not v3.isRepeatable
+		end
 
-		for _, v in ipairs(definitions) do
-			if v.kind == Kind.DIRECTIVE_DEFINITION then
-				t1[v.name.value] = not v.repeatable
+		local definitions = object:getDocument().definitions
+
+		for _, definition in ipairs(definitions) do
+			if definition.kind == kind.DIRECTIVE_DEFINITION then
+				v[definition.name.value] = not definition.repeatable
 			end
 		end
 
-		local t2 = {}
-		local t3 = {}
+		local v3 = {}
+		local v4 = {}
 
 		return {
-			enter = function(_, p3) -- line: 50
-				-- upvalues: Kind (copy), t2 (copy), isTypeDefinitionNode (copy), isTypeExtensionNode (copy), t3 (copy), t1 (copy), p1 (copy), GraphQLError (copy)
-				if p3.directives == nil then
+			enter = function(_, data)
+				if data.directives == nil then
 					return
 				end
 
-				local v22
+				local directives2
 
-				if p3.kind == Kind.SCHEMA_DEFINITION or p3.kind == Kind.SCHEMA_EXTENSION then
-					v22 = t2
-				elseif isTypeDefinitionNode(p3) or isTypeExtensionNode(p3) then
-					local value = p3.name.value
+				if data.kind == kind.SCHEMA_DEFINITION or data.kind == kind.SCHEMA_EXTENSION then
+					directives2 = v3
+				elseif isTypeDefinitionNode(data) or isTypeExtensionNode(data) then
+					local value = data.name.value
+					directives2 = v4[value]
 
-					v22 = t3[value]
-
-					if v22 == nil then
-						v22 = {}
-						t3[value] = v22
+					if directives2 == nil then
+						directives2 = {}
+						v4[value] = directives2
 					end
 				else
-					v22 = {}
+					directives2 = {}
 				end
 
-				for _, v in ipairs(p3.directives) do
-					local value = v.name.value
+				for _, directive in ipairs(data.directives) do
+					local value = directive.name.value
 
-					if t1[value] then
-						if v22[value] then
-							p1:reportError(GraphQLError.new(("The directive \"@%s\" can only be used once at this location."):format(value), {
-								v22[value],
-								v
-							}))
-						else
-							v22[value] = v
-						end
+					if not v[value] then
+						continue
+					end
+
+					if directives2[value] then
+						object:reportError(graphQLError.new(
+							("The directive \"@%s\" can only be used once at this location."):format(value),
+							{ directives2[value], directive }
+						))
+					else
+						directives2[value] = directive
 					end
 				end
 			end

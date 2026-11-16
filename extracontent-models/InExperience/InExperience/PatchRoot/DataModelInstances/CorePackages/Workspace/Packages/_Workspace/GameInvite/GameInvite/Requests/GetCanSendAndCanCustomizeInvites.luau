@@ -1,13 +1,17 @@
-local Parent = script:FindFirstAncestor("GameInvite").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("GameInvite").Parent
 
-return function(p1, p2, p3) -- line: 6
-	-- upvalues: Url (copy)
-	local v6 = Url:makeQueryString({
-		RecipientUserId = p3,
-		Trigger = p2,
+local Http = require(parent.Http)
+local Url = Http.Url
+
+return function(callback, trigger, recipientUserId)
+	local queryString = Url:makeQueryString({
+		RecipientUserId = recipientUserId,
+		Trigger = trigger,
 		PlaceId = game.PlaceId
 	})
 
-	return p1(string.format("%snotifications/v1/can-prompt-experience-invite?%s", Url.APIS_URL, v6), "GET")
+	return callback(
+		string.format("%snotifications/v1/can-prompt-experience-invite?%s", Url.APIS_URL, queryString),
+		"GET"
+	)
 end

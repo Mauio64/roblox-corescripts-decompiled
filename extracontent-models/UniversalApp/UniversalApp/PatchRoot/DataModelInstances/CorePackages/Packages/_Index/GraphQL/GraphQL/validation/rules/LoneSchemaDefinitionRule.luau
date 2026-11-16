@@ -1,47 +1,49 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local isNillish = require(ParentParent.luaUtils.isNillish)
+local parent = script.Parent.Parent.Parent
+
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+
+local isNillish = require(parent.luaUtils.isNillish)
 local isNillish2 = isNillish.isNillish
 local isNotNillish = isNillish.isNotNillish
 
 return {
-	LoneSchemaDefinitionRule = function(p1) -- line: 24
-		-- upvalues: isNillish2 (copy), isNotNillish (copy), GraphQLError (copy)
-		local v7 = p1:getSchema()
-		local astNode = nil
+	LoneSchemaDefinitionRule = function(object)
+		local schema = object:getSchema()
+		local v
 
-		if v7 then
-			astNode = v7.astNode
+		if schema then
+			v = schema.astNode
 
-			if isNillish2(astNode) then
-				astNode = v7:getQueryType()
+			if isNillish2(v) then
+				v = schema:getQueryType()
 			end
 
-			if isNillish2(astNode) then
-				astNode = v7:getMutationType()
+			if isNillish2(v) then
+				v = schema:getMutationType()
 			end
 
-			if isNillish2(astNode) then
-				astNode = v7:getSubscriptionType()
+			if isNillish2(v) then
+				v = schema:getSubscriptionType()
 			end
+		else
+			v = nil
 		end
 
-		local n1 = 0
-
+		local count = 0
 		return {
-			SchemaDefinition = function(_, p3) -- line: 42
-				-- upvalues: isNotNillish (copy), astNode (ref), p1 (copy), GraphQLError (copy), n1 (ref)
-				if isNotNillish(astNode) then
-					p1:reportError(GraphQLError.new("Cannot define a new schema within a schema extension.", p3))
+			SchemaDefinition = function(_, p)
+				if isNotNillish(v) then
+					object:reportError(graphQLError.new("Cannot define a new schema within a schema extension.", p))
 
 					return
 				end
 
-				if n1 > 0 then
-					p1:reportError(GraphQLError.new("Must provide only one schema definition.", p3))
+				if count > 0 then
+					object:reportError(graphQLError.new("Must provide only one schema definition.", p))
 				end
 
-				n1 += 1
+				count += 1
 			end
 		}
 	end

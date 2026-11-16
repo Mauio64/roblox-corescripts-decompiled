@@ -1,7 +1,5 @@
-return require(script.Parent.Parent.Action)(script.Name, function(p1, p2, p3) -- line: 4
-	return {
-		rootNode = p1,
-		rootFunc = p2,
-		rootNodeName = p3
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action(script.Name, function(rootNode, rootFunc, rootNodeName)
+	return { rootNode = rootNode, rootFunc = rootFunc, rootNodeName = rootNodeName }
 end)

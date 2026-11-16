@@ -1,13 +1,21 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Rodux = require(AppChatParent.Rodux)
+local parent = AppChat.Parent
 
-require(AppChatParent.SocialCommon)
-
+local Rodux = require(parent.Rodux)
+require(parent.SocialCommon)
 local EnteredChatFromEntryPoint = require(AppChat.Actions.EnteredChatFromEntryPoint)
 
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSharedChatEntryPointAction = SharedFlags.FFlagSharedChatEntryPointAction
+local trackChatLanding = require(AppChat.Telemetry.trackChatLanding)
+
 return Rodux.createReducer("NotSet", {
-	[EnteredChatFromEntryPoint.name] = function(_, p2) -- line: 11
-		return p2.entryPoint
+	[EnteredChatFromEntryPoint.name] = function(_, p)
+		if FFlagSharedChatEntryPointAction and FFlagAppChatPerfTracking then
+			trackChatLanding(p.entryPoint)
+		end
+
+		return p.entryPoint
 	end
 })

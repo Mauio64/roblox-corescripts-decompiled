@@ -1,78 +1,75 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local DiscoveryEventErrorLogger = require(DataHydrationParent.DiscoveryUtils).DiscoveryEventErrorLogger
+local parent = DataHydration.Parent
+
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
-
 local fetchGameMedia = require(script.Parent.fetchGameMedia)
 local GameMediaStoreTypes = require(script.Parent.GameMediaStoreTypes)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMyStatsMediaSelector = SharedFlags.FFlagMyStatsMediaSelector
 
-local function createGameMediaStore() -- line: 16
-	-- upvalues: createDataCache (copy), createDataResolver (copy), DiscoveryEventErrorLogger (copy), fetchGameMedia (copy), GameMediaStoreTypes (copy)
-	local v9 = createDataCache()
-	local v10 = createDataResolver({
+local function createGameMediaStore()
+	local dataResolver = createDataResolver({
+		cache = createDataCache(),
 		supportsMultiGet = false,
-		cache = v9,
-		logError = function(p1) -- line: 21
-			-- upvalues: DiscoveryEventErrorLogger (copy)
-			if type(p1) == "table" and p1.errorType then
-				DiscoveryEventErrorLogger.reportError(p1.errorType, p1.errorMessage)
-
-				return
+		replaceItems = FFlagMyStatsMediaSelector,
+		logError = function(p)
+			if type(p) == "table" and p.errorType then
+				DiscoveryEventErrorLogger.reportError(p.errorType, p.errorMessage)
+			else
+				DiscoveryEventErrorLogger.reportError("FetchGameMediaError", (tostring(p)))
 			end
-
-			DiscoveryEventErrorLogger.reportError("FetchGameMediaError", (tostring(p1)))
 		end,
-		fetchFn = function(s1: string, _) -- line: 28
-			-- upvalues: fetchGameMedia (copy), GameMediaStoreTypes (copy)
-			return fetchGameMedia(s1):andThen(function(p3) -- line: 29
-				-- upvalues: GameMediaStoreTypes (copy)
-				if not p3 or not p3.responseBody then
+		fetchFn = function(p: string, _)
+			return fetchGameMedia(p):andThen(function(p2)
+				if not (p2 and p2.responseBody) then
 					error({
 						errorType = "FetchGameMediaResponseError",
-						errorMessage = not p3 and "No response" or "Missing response body"
+						errorMessage = p2 and "Missing response body" or "No response"
 					})
 				end
 
-				local v15, v16 = GameMediaStoreTypes.gameMediaResponseValidator(p3.responseBody)
+				local gameMediaResponseValidator, errorMessage = GameMediaStoreTypes.gameMediaResponseValidator(p2.responseBody)
 
-				if not v15 then
+				if not gameMediaResponseValidator then
 					error({
 						errorType = "FetchGameMediaResponseInvalidInterface",
-						errorMessage = v16
+						errorMessage = errorMessage
 					})
 				end
 
-				local t1 = {}
-				local data = p3.responseBody.data
+				local result = {}
+				local data = p2.responseBody.data
 
 				if data then
-					for _, v20 in data do
-						if v20.imageId then
-							table.insert(t1, {
-								imageId = v20.imageId,
-								assetTypeId = v20.assetTypeId,
-								videoId = v20.videoId,
-								videoHash = v20.videoHash,
-								videoTitle = v20.videoTitle
+					for _, v in data do
+						if v.imageId then
+							table.insert(result, {
+								imageId = v.imageId,
+								assetTypeId = v.assetTypeId,
+								videoId = v.videoId,
+								videoHash = v.videoHash,
+								videoTitle = v.videoTitle
 							})
 						end
 					end
 				end
 
-				return t1
+				return result
 			end)
 		end
 	})
 
 	return {
-		getAndFetchGameMedia = v10.getAndFetchItem,
-		getGameMedia = v10.getCachedItem,
-		fetchGameMedia = v10.fetchItem,
-		clear = v10.clear,
-		dispose = v10.dispose
+		getAndFetchGameMedia = dataResolver.getAndFetchItem,
+		getGameMedia = dataResolver.getCachedItem,
+		fetchGameMedia = dataResolver.fetchItem,
+		clear = dataResolver.clear,
+		dispose = dataResolver.dispose
 	}
 end
 

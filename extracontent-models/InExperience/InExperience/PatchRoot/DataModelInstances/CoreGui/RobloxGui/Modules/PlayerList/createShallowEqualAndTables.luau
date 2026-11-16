@@ -1,42 +1,37 @@
-local function createShallowEqualAndTables(t1: {[any]: any}) -- line: 2
-	local t2 = {}
+local function createShallowEqualAndTables(items)
+	local set = {}
 
-	for _, v5 in t1 do
-		t2[v5] = true
+	for _, item in items do
+		set[item] = true
 	end
 
-	return function(p1, p2) -- line: 8
-		-- upvalues: t2 (copy)
-		for v8, v9 in p1 do
-			local v10 = p2[v8]
+	return function(items2, items3): boolean
+		for k, item in items2 do
+			local item2 = items3[k]
 
-			if not t2[v8] then
-				if v9 == v10 then
-					continue
-				end
-
-				return false
-			end
-
-			if typeof(v9) ~= "table" or typeof(v10) ~= "table" then
-				return false
-			end
-
-			for v11, v12 in v9 do
-				if v12 ~= v10[v11] then
+			if set[k] then
+				if typeof(item) ~= "table" or typeof(item2) ~= "table" then
 					return false
 				end
-			end
 
-			for v13, _ in v10 do
-				if v9[v13] == nil then
-					return false
+				for k2, v in item do
+					if v ~= item2[k2] then
+						return false
+					end
 				end
+
+				for k2, _ in item2 do
+					if item[k2] == nil then
+						return false
+					end
+				end
+			elseif item ~= item2 then
+				return false
 			end
 		end
 
-		for v15, _ in p2 do
-			if p1[v15] == nil then
+		for k, _ in items3 do
+			if items2[k] == nil then
 				return false
 			end
 		end

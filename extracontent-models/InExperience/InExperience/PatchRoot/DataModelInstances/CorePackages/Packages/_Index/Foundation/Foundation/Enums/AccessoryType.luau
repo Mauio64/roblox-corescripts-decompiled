@@ -1,5 +1,1 @@
-return {
-	Icon = "Icon",
-	Media = "Media",
-	Avatar = "Avatar"
-}
+return { Icon = "Icon", Media = "Media", Avatar = "Avatar" }

@@ -1,98 +1,117 @@
 local PeopleService = script:FindFirstAncestor("PeopleService")
-local PeopleServiceParent = PeopleService.Parent
+local parent = PeopleService.Parent
+
 local Players = game:GetService("Players")
-local Signals = require(PeopleServiceParent.Signals)
-local BlockingUtility = require(PeopleServiceParent.BlockingUtility)
+
+local Signals = require(parent.Signals)
+local BlockingUtility = require(parent.BlockingUtility)
+
 local Constants = require(PeopleService.Constants)
+
 local PeopleBlockingModalManager = require(PeopleService.Integration.PeopleBlockingModalManager)
 local PeopleAnalyticsManager = require(PeopleService.Analytics.PeopleAnalyticsManager)
-local GetFFlagAddPeoplePageCardLayout = require(PeopleService.Flags).GetFFlagAddPeoplePageCardLayout
 
-local function createPeopleBlockStatusStore() -- line: 31
-	-- upvalues: Signals (copy), BlockingUtility (copy), PeopleBlockingModalManager (copy), GetFFlagAddPeoplePageCardLayout (copy), Constants (copy), Players (copy), PeopleAnalyticsManager (copy)
-	local t1 = {}
+local Flags = require(PeopleService.Flags)
+local GetFFlagAddPeoplePageCardLayout = Flags.GetFFlagAddPeoplePageCardLayout
+
+local function createPeopleBlockStatusStore()
+	local v = {}
+
 	local connection = nil
 
-	local function onBlockStatusChanged(n1: number, b1: boolean) -- line: 66
-		-- upvalues: t1 (ref)
-		if t1[n1] then
-			t1[n1].setter(b1)
+	local function getPlayerBlockStatus(p: number)
+		if not p then
+			return Signals.createSignal(false)
+		end
+
+		if v[p] then
+			return v[p].getter
+		end
+
+		local isPlayerBlockedByUserId = BlockingUtility:IsPlayerBlockedByUserId(p)
+
+		local signal, setter = Signals.createSignal(isPlayerBlockedByUserId)
+
+		v[p] = { getter = signal, setter = setter }
+
+		return signal
+	end
+
+	local function onBlockStatusChanged(p: number, flag: boolean)
+		if v[p] then
+			v[p].setter(flag)
 		end
 	end
-	local function initializeBlockStatusListener() -- line: 120
-		-- upvalues: BlockingUtility (copy), connection (ref), onBlockStatusChanged (copy)
+
+	local function blockPlayer(p, p2: string?)
+		local v2 = {
+			onBlockingSuccess = function()
+				if v[p.UserId] then
+					v[p.UserId].setter(true)
+				end
+			end
+		}
+
+		local openModal = PeopleBlockingModalManager.openModal
+
+		if not GetFFlagAddPeoplePageCardLayout() then
+			p2 = Constants.ANALYTICS.IN_GAME_MENU_NAME
+		end
+
+		local v3 = openModal(p, p2, v2)
+
+		if v3 then
+			v3:catch(function(p3)
+				warn("Block modal promise error:", p3)
+			end)
+		end
+	end
+
+	local function unblockPlayer(p, p2: string?)
+		if not p then
+			return
+		end
+
+		if BlockingUtility:UnblockPlayerAsync(p) then
+			local localPlayer = Players.LocalPlayer
+
+			if localPlayer then
+				local userId = p.UserId
+				local userId2 = localPlayer.UserId
+
+				if not GetFFlagAddPeoplePageCardLayout() then
+					p2 = nil
+				end
+
+				PeopleAnalyticsManager:trackUnblockUser(userId, userId2, p2)
+			end
+
+			if v[p.UserId] then
+				v[p.UserId].setter(false)
+			end
+		end
+	end
+
+	local function initializeBlockStatusListener() -- 1 equivalent call inferred from this helper
 		connection = BlockingUtility:GetBlockedStatusChangedEvent():Connect(onBlockStatusChanged)
 	end
 
-	connection = BlockingUtility:GetBlockedStatusChangedEvent():Connect(onBlockStatusChanged)
-
-	return {
-		getPlayerBlockStatus = function(n2: number) -- line: 39
-			-- upvalues: Signals (copy), t1 (ref), BlockingUtility (copy)
-			if not n2 then
-				return Signals.createSignal(false)
-			end
-
-			if t1[n2] then
-				return t1[n2].getter
-			end
-
-			local v16 = BlockingUtility:IsPlayerBlockedByUserId(n2)
-			local v17, v18 = Signals.createSignal(v16)
-
-			t1[n2] = {
-				getter = v17,
-				setter = v18
-			}
-
-			return v17
-		end,
-		unblockPlayer = function(p1, s1: string?) -- line: 95
-			-- upvalues: BlockingUtility (copy), Players (copy), PeopleAnalyticsManager (copy), GetFFlagAddPeoplePageCardLayout (copy), t1 (ref)
-			if not p1 then
-				return
-			end
-
-			if BlockingUtility:UnblockPlayerAsync(p1) then
-				local LocalPlayer = Players.LocalPlayer
-
-				if LocalPlayer then
-					PeopleAnalyticsManager:trackUnblockUser(p1.UserId, LocalPlayer.UserId, if not GetFFlagAddPeoplePageCardLayout() then nil else s1)
-				end
-
-				if t1[p1.UserId] then
-					t1[p1.UserId].setter(false)
-				end
-			end
-		end,
-		blockPlayer = function(p2, s2: string?) -- line: 73
-			-- upvalues: t1 (ref), PeopleBlockingModalManager (copy), GetFFlagAddPeoplePageCardLayout (copy), Constants (copy)
-			local t2 = {
-				onBlockingSuccess = function() -- line: 75
-					-- upvalues: t1 (ref), p2 (copy)
-					if t1[p2.UserId] then
-						t1[p2.UserId].setter(true)
-					end
-				end
-			}
-			local v24 = PeopleBlockingModalManager.openModal(p2, if not GetFFlagAddPeoplePageCardLayout() then Constants.ANALYTICS.IN_GAME_MENU_NAME else s2, t2)
-
-			if v24 then
-				v24:catch(function(p3) -- line: 88
-					warn("Block modal promise error:", p3)
-				end)
-			end
-		end,
-		cleanup = function() -- line: 126
-			-- upvalues: connection (ref), t1 (ref)
-			if connection then
-				connection:Disconnect()
-				connection = nil
-			end
-
-			t1 = {}
+	local function cleanup()
+		if connection then
+			connection:Disconnect()
+			connection = nil
 		end
+
+		v = {}
+	end
+
+	initializeBlockStatusListener() -- inferred equivalent call
+	return {
+		getPlayerBlockStatus = getPlayerBlockStatus,
+		unblockPlayer = unblockPlayer,
+		blockPlayer = blockPlayer,
+		cleanup = cleanup
 	}
 end
 
-return (createPeopleBlockStatusStore())
+return createPeopleBlockStatusStore()

@@ -1,3 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
 
-return (require(CorePackages.Workspace.Packages.SettingsService).SettingsService.new())
+local SettingsService = require(CorePackages.Workspace.Packages.SettingsService)
+
+return (SettingsService.SettingsService.new())

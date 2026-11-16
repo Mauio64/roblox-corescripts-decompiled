@@ -1,7 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerFriendStatus", function(p1, p2) -- line: 4
-	return {
-		player = p1,
-		userId = p1.UserId,
-		friendStatus = p2
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetPlayerFriendStatus", function(player, friendStatus)
+	return { player = player, userId = player.UserId, friendStatus = friendStatus }
 end)

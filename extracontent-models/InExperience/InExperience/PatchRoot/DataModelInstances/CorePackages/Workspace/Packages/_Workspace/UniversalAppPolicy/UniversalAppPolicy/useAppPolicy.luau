@@ -1,3 +1,4 @@
 local UniversalAppGetPolicy = require(script.Parent.UniversalAppGetPolicy)
+local makeUseAppPolicy = require(script.Parent.makeUseAppPolicy)
 
-return (require(script.Parent.makeUseAppPolicy)(UniversalAppGetPolicy))
+return (makeUseAppPolicy(UniversalAppGetPolicy))

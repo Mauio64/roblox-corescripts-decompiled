@@ -1,58 +1,65 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParseContentIds = require(ParentParent.util.ParseContentIds)
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local ParseContentIds = require(parent.util.ParseContentIds)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+require(parent.util.Types)
+
+local getFFlagUGCValidateVersionedContentIds = require(parent.flags.getFFlagUGCValidateVersionedContentIds)
 
 return {
-	getData = function(p1, p2) -- line: 9
-		-- upvalues: ValidationEnums (copy), ParseContentIds (copy)
-		if p2.consumerEnv == ValidationEnums.ConsumerEnv.IEC then
+	getData = function(folder, p)
+		if p.consumerEnv == ValidationEnums.ConsumerEnv.IEC then
 			return {}
 		end
 
-		local t1 = {}
-		local descendants = p1:GetDescendants()
+		local descendants = folder:GetDescendants()
+		table.insert(descendants, folder)
+		local result = {}
 
-		table.insert(descendants, p1)
-
-		for _, v9 in descendants do
-			if not v9:IsA("WrapLayer") then
+		for _, wrapLayer in descendants do
+			if not wrapLayer:IsA("WrapLayer") then
 				continue
 			end
 
-			local HSRAssetId = v9.HSRAssetId
+			local hsrAssetId = wrapLayer.HSRAssetId
 
-			if not HSRAssetId or HSRAssetId == "" then
+			if not (hsrAssetId and hsrAssetId ~= "") then
 				continue
 			end
 
-			local v11 = ParseContentIds.tryGetAssetIdFromContentId(HSRAssetId)
+			local v
 
-			if not v11 or t1[v11] then
+			if getFFlagUGCValidateVersionedContentIds() then
+				local v2, v3 = ParseContentIds.tryParseContentId(hsrAssetId)
+
+				if v2 then
+					v = ParseContentIds.getReferenceKey(v2, v3)
+				end
+			else
+				v = ParseContentIds.tryGetAssetIdFromContentId(hsrAssetId)
+			end
+
+			if not v or result[v] then
 				continue
 			end
 
-			local v12 = p2.preloadedHsrAssets[v11]
+			local preloadedHsrAsset = p.preloadedHsrAssets[v]
 
-			if not v12 then
-				local ok, result = pcall(function() -- line: 48
-					-- upvalues: HSRAssetId (copy)
-					return game:GetObjectsAllOrNone(HSRAssetId)
+			if preloadedHsrAsset then
+				result[v] = preloadedHsrAsset
+			else
+				local success, result2 = pcall(function()
+					return game:GetObjectsAllOrNone(hsrAssetId)
 				end)
 
-				if not ok then
+				if not success then
 					return nil
 				end
 
-				t1[v11] = result or {}
-
-				continue
+				result[v] = result2 or {}
 			end
-
-			t1[v11] = v12
 		end
 
-		return t1
+		return result
 	end
 }

@@ -1,206 +1,310 @@
-local ancestor = script:FindFirstAncestor("ultimate-list")
-local DataSourceMethods = require(ancestor.DataSources.DataSourceMethods)
+local ultimatelist = script:FindFirstAncestor("ultimate-list")
 
-require(ancestor.DataSources)
-require(ancestor.Dimensions)
-
-local DimensionsMethods = require(ancestor.Dimensions.DimensionsMethods)
+local DataSourceMethods = require(ultimatelist.DataSources.DataSourceMethods)
+require(ultimatelist.DataSources)
+require(ultimatelist.Dimensions)
+local DimensionsMethods = require(ultimatelist.Dimensions.DimensionsMethods)
 local binarySearchIndexRangeInView = require(script.binarySearchIndexRangeInView)
-local createDebugLogger = require(ancestor.Util.createDebugLogger)
-local exhaustiveMatch = require(ancestor.Util.exhaustiveMatch)
-local v7 = createDebugLogger("createVirtualizedListController")
+local createDebugLogger = require(ultimatelist.Util.createDebugLogger)
+local exhaustiveMatch = require(ultimatelist.Util.exhaustiveMatch)
 
-local function createVirtualizedListController(p1, p2, s1: string) -- line: 42
-	-- upvalues: DimensionsMethods (copy), exhaustiveMatch (copy), v7 (copy), binarySearchIndexRangeInView (copy), DataSourceMethods (copy)
-	local t1 = {
+local debugLogger = createDebugLogger("createVirtualizedListController")
+
+local function createVirtualizedListController(dataSource, lastDimensions, p: string)
+	local v = {
+		range = 0,
+		canvasSize = 0,
+		windowSize = 0,
+		lastDimensions = 0,
 		scrollSizeAxis = 0,
-		range = Vector3.new(),
-		canvasSize = UDim2.new(),
-		windowSize = Vector2.new(),
-		lastDimensions = p2,
-		cachedLastResult = {},
-		dataSource = p1
+		cachedLastResult = 0,
+		dataSource = 0
 	}
-	local n1 = 0
-	local n2 = 0
-	local vector2 = Vector2.new()
+	v.range = Vector3.new()
+	v.canvasSize = UDim2.new()
+	v.windowSize = Vector2.new()
+	v.lastDimensions = lastDimensions
 
-	local function getIndexRangeInViewForSize(n3: number) -- line: 62
-		-- upvalues: n1 (ref), n2 (ref)
-		return (Vector3.new(n1 // n3 + 1, (n1 + n2) // n3 + 1))
+	v.cachedLastResult = {}
+	v.dataSource = dataSource
+
+	local v2 = 0
+
+	local v3 = 0
+	local windowSize = Vector2.new()
+	local v4 = 0
+
+	local function getRangeAxes() -- 2 equivalent calls inferred from this helper
+		local v5 = math.max(0, v2 - v4)
+		return v5, v2 + v3 + v4 - v5
 	end
-	local function getIndexRangeInViewForUDim2(uDim2: UDim2) -- line: 69
-		-- upvalues: DimensionsMethods (copy), vector2 (ref), s1 (copy), exhaustiveMatch (copy), n1 (ref), n2 (ref), v7 (copy)
-		local v27 = DimensionsMethods.getAmountPerNonDominantInGrid(uDim2, vector2, s1)
-		local v28 = if s1 ~= "x" then if s1 ~= "y" then exhaustiveMatch(s1) else uDim2.Y.Offset else uDim2.X.Offset
-		local v29 = 1 + n1 // v28 * v27
-		local v30 = (1 + (n1 + n2) // v28) * v27
 
-		v7("getIndexRangeInView: amountPerNonDominant = %d, scrollAxis = %d, dominantSize = %d. Going from %d to %d", v27, n1, v28, v29, v30)
-
-		return (Vector3.new(v29, v30))
+	local function getIndexRangeInViewForSize(p2: number, rangeAxes: number, p3: number) -- 2 equivalent calls inferred from this helper
+		return (Vector3.new(rangeAxes // p2 + 1, (rangeAxes + p3) // p2 + 1))
 	end
-	local function getIndexRangeInView() -- line: 97
-		-- upvalues: p2 (ref), getIndexRangeInViewForUDim2 (copy), n1 (ref), n2 (ref), binarySearchIndexRangeInView (copy), p1 (ref), s1 (copy), exhaustiveMatch (copy)
-		if p2.type == "consistentUDim2" then
-			return (getIndexRangeInViewForUDim2(p2.udim2))
+
+	local function getIndexRangeInViewForUDim2(udim: UDim2, rangeAxes: number, p2: number)
+		local amountPerNonDominantInGrid = DimensionsMethods.getAmountPerNonDominantInGrid(udim, windowSize, p)
+		local v5
+
+		if p == "x" then
+			v5 = udim.X.Offset
+		elseif p == "y" then
+			v5 = udim.Y.Offset
+		else
+			v5 = exhaustiveMatch(p)
 		end
 
-		if p2.type == "consistentSize" then
-			local size = p2.size
+		local v6 = 1 + rangeAxes // v5 * amountPerNonDominantInGrid
+		local v7 = (1 + (rangeAxes + p2) // v5) * amountPerNonDominantInGrid
 
-			return (Vector3.new(n1 // size + 1, (n1 + n2) // size + 1))
+		debugLogger(
+			"getIndexRangeInView: amountPerNonDominant = %d, scrollAxis = %d, dominantSize = %d. Going from %d to %d",
+			amountPerNonDominantInGrid,
+			rangeAxes,
+			v5,
+			v6,
+			v7
+		)
+
+		return (Vector3.new(v6, v7))
+	end
+
+	local function getIndexRangeInView()
+		local rangeAxes, v5 = getRangeAxes() -- inferred equivalent call
+
+		if lastDimensions.type == "consistentUDim2" then
+			return getIndexRangeInViewForUDim2(lastDimensions.udim2, rangeAxes, v5)
 		end
 
-		if p2.type == "getter" then
-			return binarySearchIndexRangeInView(p1, p2.callback, n1, n2, s1)
+		if lastDimensions.type == "consistentSize" then
+			return getIndexRangeInViewForSize(lastDimensions.size, rangeAxes, v5) -- inferred equivalent call
 		end
 
-		if p2.type == "spaced" then
-			if p2.inner.type == "consistentSize" then
-				local v32 = p2.inner.size + p2.spacing
+		if lastDimensions.type == "getter" then
+			return binarySearchIndexRangeInView(dataSource, lastDimensions.callback, rangeAxes, v5, p)
+		end
 
-				return (Vector3.new(n1 // v32 + 1, (n1 + n2) // v32 + 1))
-			end
+		if lastDimensions.type ~= "spaced" then
+			return exhaustiveMatch(lastDimensions.type)
+		end
 
-			if p2.inner.type == "consistentUDim2" then
-				return (getIndexRangeInViewForUDim2(p2.inner.udim2 + UDim2.fromOffset(s1 ~= "x" and 0 or p2.spacing, s1 ~= "y" and 0 or p2.spacing)))
-			end
+		if lastDimensions.inner.type == "consistentSize" then
+			return getIndexRangeInViewForSize(lastDimensions.inner.size + lastDimensions.spacing, rangeAxes, v5) -- inferred equivalent call
+		end
 
-			if p2.inner.type == "spaced" or p2.inner.type == "getter" then
-				error("Unsupported spaced dimensions")
+		if lastDimensions.inner.type == "consistentUDim2" then
+			return getIndexRangeInViewForUDim2(
+				lastDimensions.inner.udim2 + UDim2.fromOffset(
+					p ~= "x" and 0 or lastDimensions.spacing,
+					p ~= "y" and 0 or lastDimensions.spacing
+				),
+				rangeAxes,
+				v5
+			)
+		end
 
+		if lastDimensions.inner.type ~= "spaced" and lastDimensions.inner.type ~= "getter" then
+			return exhaustiveMatch(lastDimensions.inner.type)
+		end
+
+		error("Unsupported spaced dimensions")
+	end
+
+	local v5 = {}
+
+	local function callUpdateCallbacks() -- 2 equivalent calls inferred from this helper
+		for k in v5 do
+			k()
+		end
+	end
+
+	local function update()
+		local rangeAxes, v6 = getRangeAxes() -- inferred equivalent call
+
+		if v.offsetBoundaries ~= nil and v.offsetBoundaries.X <= rangeAxes then
+			local y = v.offsetBoundaries.Y
+
+			if
+				v6 + rangeAxes <= y
+				and v.windowSize == windowSize
+				and v.dataSource == dataSource
+				and v.lastDimensions == lastDimensions
+			then
 				return
 			end
-
-			return exhaustiveMatch(p2.inner.type)
 		end
 
-		return exhaustiveMatch(p2.type)
-	end
+		local indexRangeInView = getIndexRangeInView()
+		local cachedLastResult = DataSourceMethods.getByRange(dataSource, indexRangeInView)
 
-	local t2 = {}
+		if #cachedLastResult == 0 then
+			debugLogger("View changed, but no items in list")
 
-	local function callUpdateCallbacks() -- line: 127
-		-- upvalues: t2 (copy)
-		for v33 in t2 do
-			v33()
-		end
-	end
-	local function update() -- line: 133
-		-- upvalues: t1 (ref), n1 (ref), n2 (ref), vector2 (ref), p1 (ref), p2 (ref), getIndexRangeInView (copy), DataSourceMethods (copy), v7 (copy), t2 (copy), DimensionsMethods (copy), s1 (copy), exhaustiveMatch (copy)
-		if t1.offsetBoundaries ~= nil and (t1.offsetBoundaries.X <= n1 and t1.offsetBoundaries.Y >= n2 + n1 and t1.windowSize == vector2 and t1.dataSource == p1 and t1.lastDimensions == p2) then
-			return
-		end
-
-		local v34 = getIndexRangeInView()
-		local v35 = DataSourceMethods.getByRange(p1, v34)
-
-		if #v35 == 0 then
-			v7("View changed, but no items in list")
-			t1 = {
-				range = v34,
-				canvasSize = UDim2.new(),
-				windowSize = vector2,
-				lastDimensions = p2,
+			v = {
+				range = indexRangeInView,
+				canvasSize = DimensionsMethods.getCanvasSize(lastDimensions, dataSource, windowSize, p),
+				windowSize = windowSize,
+				lastDimensions = lastDimensions,
 				cachedLastResult = {},
-				offsetBoundaries = Vector3.new(n1, n2 + n1),
-				dataSource = p1
+				offsetBoundaries = Vector3.new(rangeAxes, v6 + rangeAxes),
+				dataSource = dataSource
 			}
+			callUpdateCallbacks() -- inferred equivalent call
+		else
+			local udimRect = DimensionsMethods.getUDimRect(
+				lastDimensions,
+				cachedLastResult[1],
+				indexRangeInView.X,
+				windowSize,
+				p
+			)
 
-			for v36 in t2 do
-				v36()
+			local udimRect2 = DimensionsMethods.getUDimRect(
+				lastDimensions,
+				cachedLastResult[#cachedLastResult],
+				indexRangeInView.Y,
+				windowSize,
+				p
+			)
+
+			debugLogger(
+				"View changed: %d..%d (scroll axis: %d, window axis: %d, offset boundaries: %* - %*)",
+				indexRangeInView.X,
+				indexRangeInView.Y,
+				v2,
+				v3,
+				v.offsetBoundaries and v.offsetBoundaries.X,
+				v.offsetBoundaries and v.offsetBoundaries.Y
+			)
+
+			local v7 = {
+				range = indexRangeInView,
+				canvasSize = DimensionsMethods.getCanvasSize(lastDimensions, dataSource, windowSize, p),
+				windowSize = windowSize,
+				lastDimensions = lastDimensions,
+				cachedLastResult = cachedLastResult,
+				offsetBoundaries = 0,
+				dataSource = 0
+			}
+			local v8
+
+			if p == "x" then
+				v8 = udimRect.position.X.Offset
+			elseif p == "y" then
+				v8 = udimRect.position.Y.Offset
+			else
+				v8 = exhaustiveMatch(p)
 			end
 
-			return
-		end
+			local v9
 
-		local v37 = DimensionsMethods.getUDimRect(p2, v35[1], v34.X, vector2, s1)
-		local v38 = DimensionsMethods.getUDimRect(p2, v35[#v35], v34.Y, vector2, s1)
+			if p == "x" then
+				v9 = udimRect2.position.X.Offset + udimRect2.size.X.Offset
+			elseif p == "y" then
+				v9 = udimRect2.position.Y.Offset + udimRect2.size.Y.Offset
+			else
+				v9 = exhaustiveMatch(p)
+			end
 
-		v7("View changed: %d..%d (scroll axis: %d, window axis: %d, offset boundaries: %* - %*)", v34.X, v34.Y, n1, n2, t1.offsetBoundaries and t1.offsetBoundaries.X, t1.offsetBoundaries and t1.offsetBoundaries.Y)
-		t1 = {
-			range = v34,
-			canvasSize = DimensionsMethods.getCanvasSize(p2, p1, vector2, s1),
-			windowSize = vector2,
-			lastDimensions = p2,
-			cachedLastResult = v35,
-			offsetBoundaries = Vector3.new(if s1 ~= "x" then if s1 ~= "y" then exhaustiveMatch(s1) else v37.position.Y.Offset else v37.position.X.Offset, if s1 ~= "x" then if s1 ~= "y" then exhaustiveMatch(s1) else v38.position.Y.Offset + v38.size.Y.Offset else v38.position.X.Offset + v38.size.X.Offset),
-			dataSource = p1
-		}
+			v7.offsetBoundaries = Vector3.new(v8, v9)
 
-		for v39 in t2 do
-			v39()
+			v7.dataSource = dataSource
+			v = v7
+			callUpdateCallbacks() -- inferred equivalent call
 		end
 	end
 
-	local v24 = if p1.type ~= "mutableSource" then nil else p1.methods.bindToChanged(update)
+	local function setScrollAxis(p2: number)
+		v2 = p2
+		update()
+	end
+
+	local function setDataSource(p2)
+		assert(dataSource.type == p2.type, "Data source type changed, you must keep it the same")
+
+		if DataSourceMethods.equals(dataSource, p2) then
+			return
+		end
+
+		dataSource = p2
+		update()
+	end
+
+	local function setDimensions(p2)
+		if DimensionsMethods.equals(lastDimensions, p2) then
+			return
+		end
+
+		lastDimensions = p2
+		update()
+	end
+
+	local function setWindowSize(vector2: Vector2)
+		if windowSize == vector2 then
+			return
+		end
+
+		windowSize = vector2
+		v3 = DimensionsMethods.getDominantAxis(vector2, p)
+
+		update()
+	end
+
+	local function getWindowSize()
+		return windowSize
+	end
+
+	local function setOverscan(p2: number)
+		assert(p2 >= 0, "overscan must not be negative")
+
+		if v4 == p2 then
+			return
+		end
+
+		v4 = p2
+		update()
+	end
+
+	local function get()
+		return v.cachedLastResult
+	end
+
+	local function getCanvasSize()
+		return v.canvasSize
+	end
+
+	local function getRange()
+		return v.range
+	end
+
+	local v6
+
+	if dataSource.type == "mutableSource" then
+		v6 = dataSource.methods.bindToChanged(update)
+	else
+		v6 = nil
+	end
 
 	return {
-		setScrollAxis = function(n4: number) -- line: 208
-			-- upvalues: n1 (ref), update (copy)
-			n1 = n4
-			update()
-		end,
-		setDataSource = function(p3) -- line: 213
-			-- upvalues: p1 (ref), DataSourceMethods (copy), update (copy)
-			assert(p1.type == p3.type, "Data source type changed, you must keep it the same")
-
-			if DataSourceMethods.equals(p1, p3) then
-				return
-			end
-
-			p1 = p3
-			update()
-		end,
-		setDimensions = function(p4) -- line: 224
-			-- upvalues: DimensionsMethods (copy), p2 (ref), update (copy)
-			if DimensionsMethods.equals(p2, p4) then
-				return
-			end
-
-			p2 = p4
-			update()
-		end,
-		setWindowSize = function(vector2_2: Vector2) -- line: 233
-			-- upvalues: vector2 (ref), n2 (ref), DimensionsMethods (copy), s1 (copy), update (copy)
-			if vector2_2 == vector2 then
-				return
-			end
-
-			vector2 = vector2_2
-			n2 = DimensionsMethods.getDominantAxis(vector2_2, s1)
-			update()
-		end,
-		getWindowSize = function() -- line: 244
-			-- upvalues: vector2 (ref)
-			return vector2
-		end,
-		get = function() -- line: 248
-			-- upvalues: t1 (ref)
-			return t1.cachedLastResult
-		end,
-		getCanvasSize = function() -- line: 252
-			-- upvalues: t1 (ref)
-			return t1.canvasSize
-		end,
-		getRange = function() -- line: 256
-			-- upvalues: t1 (ref)
-			return t1.range
-		end,
-		bindToUpdate = function(p5: ((...any) -> ...any)) -- line: 260
-			-- upvalues: t2 (copy)
-			t2[p5] = true
-
-			return function() -- line: 262
-				-- upvalues: t2 (copy), p5 (copy)
-				t2[p5] = nil
+		setScrollAxis = setScrollAxis,
+		setDataSource = setDataSource,
+		setDimensions = setDimensions,
+		setWindowSize = setWindowSize,
+		getWindowSize = getWindowSize,
+		setOverscan = setOverscan,
+		get = get,
+		getCanvasSize = getCanvasSize,
+		getRange = getRange,
+		bindToUpdate = function(callback)
+			v5[callback] = true
+			return function()
+				v5[callback] = nil
 			end
 		end,
-		destroy = function() -- line: 271
-			-- upvalues: v24 (copy)
-			if v24 ~= nil then
-				v24()
+		destroy = function()
+			if v6 ~= nil then
+				v6()
 			end
 		end
 	}

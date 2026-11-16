@@ -1,20 +1,13 @@
-local InAppAchievementManager = require(script.InAppAchievementManager)
-local InExpAchievementManager = require(script.InExpAchievementManager)
-local LocalUserGameVoteCounter = require(script.Reducers.LocalUserGameVoteCounter)
-local GetUserRecentExperiences = require(script.Requests.GetUserRecentExperiences)
-local GetUserVoteCount = require(script.Requests.GetUserVoteCount)
-local GetXboxLoginConsecutiveDays = require(script.Requests.GetXboxLoginConsecutiveDays)
-
 return {
-	InAppAchievementManager = InAppAchievementManager,
-	InExpAchievementManager = InExpAchievementManager,
+	InAppAchievementManager = require(script.InAppAchievementManager),
+	InExpAchievementManager = require(script.InExpAchievementManager),
 	Reducers = {
-		LocalUserGameVoteCounter = LocalUserGameVoteCounter
+		LocalUserGameVoteCounter = require(script.Reducers.LocalUserGameVoteCounter)
 	},
 	Requests = {
-		GetUserRecentExperiences = GetUserRecentExperiences,
-		GetUserVoteCount = GetUserVoteCount,
-		GetXboxLoginConsecutiveDays = GetXboxLoginConsecutiveDays
+		GetUserRecentExperiences = require(script.Requests.GetUserRecentExperiences),
+		GetUserVoteCount = require(script.Requests.GetUserVoteCount),
+		GetXboxLoginConsecutiveDays = require(script.Requests.GetXboxLoginConsecutiveDays)
 	},
 	["jest.config"] = script["jest.config"]
 }

@@ -1,18 +1,41 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Enums = require(ParentParentParent.Foundation).Enums
-local BadgeType = require(ParentParent.Enums.BadgeType)
-local GetFFlagIAPExperienceEnableBestValueBadge = require(ParentParent.Flags.GetFFlagIAPExperienceEnableBestValueBadge)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local function getUpsellBadgeInfo(p1, t1: {[any]: any}) -- line: 24
-	-- upvalues: BadgeType (copy), GetFFlagIAPExperienceEnableBestValueBadge (copy), Enums (copy)
-	local v9 = if p1 ~= BadgeType.Popular then if p1 ~= BadgeType.LastPurchased then if p1 ~= BadgeType.ForYou then if p1 ~= BadgeType.BetterValue then if p1 ~= BadgeType.BestValue or not GetFFlagIAPExperienceEnableBestValueBadge() then nil else t1.BestValue else t1.BetterValue else t1.ForYouItem else t1.LastPurchased else t1.Popular
-	local v10 = if p1 ~= BadgeType.Popular then if p1 ~= BadgeType.ForYou then if p1 ~= BadgeType.BetterValue then if p1 ~= BadgeType.BestValue or not GetFFlagIAPExperienceEnableBestValueBadge() then nil else Enums.IconName.Pig else Enums.IconName.Tag else Enums.IconName.CircleStar else Enums.IconName.Flame
+local Foundation = require(parent2.Foundation)
+local Enums = Foundation.Enums
 
-	return {
-		text = v9,
-		icon = v10
-	}
+local BadgeType = require(parent.Enums.BadgeType)
+
+local GetFFlagIAPExperienceEnableBestValueBadge = require(parent.Flags.GetFFlagIAPExperienceEnableBestValueBadge)
+
+local function getUpsellBadgeInfo(p, data)
+	local text
+
+	if p == BadgeType.Popular then
+		text = data.Popular
+	elseif p == BadgeType.LastPurchased then
+		text = data.LastPurchased
+	elseif p == BadgeType.ForYou then
+		text = data.ForYouItem
+	elseif p == BadgeType.BetterValue then
+		text = data.BetterValue
+	elseif p == BadgeType.BestValue and GetFFlagIAPExperienceEnableBestValueBadge() then
+		text = data.BestValue
+	end
+
+	local icon
+
+	if p == BadgeType.Popular then
+		icon = Enums.IconName.Flame
+	elseif p == BadgeType.ForYou then
+		icon = Enums.IconName.CircleStar
+	elseif p == BadgeType.BetterValue then
+		icon = Enums.IconName.Tag
+	elseif p == BadgeType.BestValue and GetFFlagIAPExperienceEnableBestValueBadge() then
+		icon = Enums.IconName.Pig
+	end
+
+	return { text = text, icon = icon }
 end
 
 return getUpsellBadgeInfo

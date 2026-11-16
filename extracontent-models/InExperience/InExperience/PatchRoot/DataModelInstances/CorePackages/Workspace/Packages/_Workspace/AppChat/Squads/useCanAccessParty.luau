@@ -1,3 +1,3 @@
-local _Index = script.Parent.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent.Parent._Index
 
-return require(_Index.Squads.Squads.Hooks.useCanAccessParty)
+return require(index.Squads.Squads.Hooks.useCanAccessParty)

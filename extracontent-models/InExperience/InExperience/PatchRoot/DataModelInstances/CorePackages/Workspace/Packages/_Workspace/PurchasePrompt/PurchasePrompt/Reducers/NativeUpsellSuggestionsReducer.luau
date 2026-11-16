@@ -1,14 +1,17 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local parent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local Rodux = PurchasePromptDeps.Rodux
+
 local PromptNativeUpsellSuggestions = require(PurchasePrompt.Actions.PromptNativeUpsellSuggestions)
 
 return Rodux.createReducer({}, {
-	[PromptNativeUpsellSuggestions.name] = function(_, p2) -- line: 9
+	[PromptNativeUpsellSuggestions.name] = function(_, data)
 		return {
-			products = p2.products,
-			selection = p2.selection,
-			virtualItemBadgeType = p2.virtualItemBadgeType
+			products = data.products,
+			selection = data.selection,
+			virtualItemBadgeType = data.virtualItemBadgeType,
+			experimentVariant = data.experimentVariant
 		}
 	end
 })

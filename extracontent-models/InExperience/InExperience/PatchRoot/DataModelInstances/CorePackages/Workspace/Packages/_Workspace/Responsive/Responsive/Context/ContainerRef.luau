@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("Responsive").Parent
+local parent = script:FindFirstAncestor("Responsive").Parent
+local React = require(parent.React)
 
-return require(Parent.React).createContext(nil)
+return React.createContext(nil)

@@ -1,69 +1,66 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
 local Logger = require(FriendsLanding.Logger)
 local dependencies = require(FriendsLanding.dependencies)
-local AppStyleProvider = dependencies.UIBlox.App.Style.AppStyleProvider
-local Roact = dependencies.Roact
-local UniversalAppPolicy = dependencies.UniversalAppPolicy
+local appStyleProvider = dependencies.UIBlox.App.Style.AppStyleProvider
+local roact = dependencies.Roact
+local universalAppPolicy = dependencies.UniversalAppPolicy
 local llama = dependencies.llama
-local FriendsLandingParent = FriendsLanding.Parent
-local mockLocale = require(FriendsLandingParent.Dev.SocialTestHelpers).StoryHelpers.mockLocale
-local v10 = dependencies.Lumberyak.Logger.new()
 
-v10:addSink({
-	maxLevel = v10.Levels.fromString("info"),
-	log = function(_, p2, _) -- line: 25
-		print(p2)
+local parent = FriendsLanding.Parent
+local SocialTestHelpers = require(parent.Dev.SocialTestHelpers)
+local mockLocale = SocialTestHelpers.StoryHelpers.mockLocale
+
+local Foundation = require(parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+local ColorMode = Foundation.Enums.ColorMode
+
+local logger = dependencies.Lumberyak.Logger.new()
+
+logger:addSink({
+	maxLevel = logger.Levels.fromString("info"),
+	log = function(_, p, _)
+		print(p)
 	end
 })
-Logger:setParent(v10)
 
-local t1 = {
-	Default = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Light = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Dark = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	}
-}
-local t2 = {
-	language = "en-us"
+Logger:setParent(logger)
+
+local v = {
+	Default = { themeName = "Light", fontName = "Gotham" },
+	Light = { themeName = "Light", fontName = "Gotham" },
+	Dark = { themeName = "Dark", fontName = "Gotham" }
 }
 
-return {
-	mapDefinition = function(p4) -- line: 52
-		-- upvalues: llama (copy), t2 (copy)
-		local v17 = llama.Dictionary.join(t2, p4.controls or {})
+local v2 = { Light = ColorMode.Light, Dark = ColorMode.Dark }
 
-		return llama.Dictionary.join(p4, {
-			controls = v17
+local v3 = { language = "en-us" }
+local Storybook = {}
+
+function Storybook.mapDefinition(p)
+	local joined = llama.Dictionary.join(v3, p.controls or {})
+	return llama.Dictionary.join(p, { controls = joined })
+end
+
+Storybook.roact = roact
+
+function Storybook.mapStory(p)
+	return function(p2)
+		local style = p2 and v[p2.theme] or v.Default
+
+		return roact.createElement(FoundationProvider, { colorMode = v2[style.themeName] }, {
+			AppStyle = roact.createElement(appStyleProvider, { style = style }, {
+				roact.createElement(universalAppPolicy.Provider, {
+					policy = { function()
+							return {
+								getShowDisplayName = function()
+									return p2.controls.getShowDisplayName
+								end
+							}
+						end }
+				}, { Child = mockLocale(p, p2) })
+			})
 		})
-	end,
-	roact = Roact,
-	mapStory = function(p5) -- line: 57
-		-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), UniversalAppPolicy (copy), mockLocale (copy)
-		return function(p6) -- line: 58
-			-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), UniversalAppPolicy (copy), mockLocale (copy), p5 (copy)
-			return Roact.createElement(AppStyleProvider, {
-				style = p6 and t1[p6.theme] or t1.Default
-			}, { Roact.createElement(UniversalAppPolicy.Provider, {
-				policy = { function() -- line: 64
-					-- upvalues: p6 (copy)
-					return {
-						getShowDisplayName = function() -- line: 66
-							-- upvalues: p6 (copy)
-							return p6.controls.getShowDisplayName
-						end
-					}
-				end }
-			}, {
-				Child = mockLocale(p5, p6)
-			}) })
-		end
 	end
-}
+end
+
+return Storybook

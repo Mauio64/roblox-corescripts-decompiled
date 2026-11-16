@@ -1,11 +1,13 @@
 local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
-local v2 = require(CrossExperienceVoice.dependencies).Lumberyak.Logger.new(nil, "CrossExperienceVoice")
 
-v2:addSink({
-	maxLevel = v2.Levels.Info,
-	log = function(_, p2, _) -- line: 10
-		print(p2)
+local dependencies = require(CrossExperienceVoice.dependencies)
+local logger = dependencies.Lumberyak.Logger.new(nil, "CrossExperienceVoice")
+
+logger:addSink({
+	maxLevel = logger.Levels.Info,
+	log = function(_, p, _)
+		print(p)
 	end
 })
 
-return v2
+return logger

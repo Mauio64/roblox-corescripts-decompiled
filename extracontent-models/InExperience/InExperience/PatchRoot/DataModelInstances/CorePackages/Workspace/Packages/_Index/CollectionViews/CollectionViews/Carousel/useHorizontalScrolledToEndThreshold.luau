@@ -1,75 +1,57 @@
-local Parent = script:FindFirstAncestor("CollectionViews").Parent
-local React = require(Parent.React)
-local FFlagCollectionViewMathChanges = require(Parent.SharedFlags).FFlagCollectionViewMathChanges
+local parent = script:FindFirstAncestor("CollectionViews").Parent
+local React = require(parent.React)
 
-local function useHorizontalScrolledToEndThreshold(t1: {[any]: any}, n1: number?, p1: ((...any) -> ...any)?, b1: boolean) -- line: 9
-	-- upvalues: React (copy), FFlagCollectionViewMathChanges (copy)
-	local v9 = React.useRef(false)
+local function useHorizontalScrolledToEndThreshold(p, p2: number?, callback, flag: boolean)
+	local ref = React.useRef(false)
 
-	React.useEffect(function() -- line: 24
-		-- upvalues: b1 (copy), t1 (copy), FFlagCollectionViewMathChanges (copy), p1 (copy), n1 (copy), v9 (copy)
-		if not b1 then
+	React.useEffect(function()
+		if not flag then
 			return nil
 		end
 
-		local t2 = {}
+		local connections = {}
+		local v
 
-		if t1.current ~= nil and (FFlagCollectionViewMathChanges or p1 ~= nil and n1 ~= nil) then
-			local current = t1.current
-
-			local function checkThreshold() -- line: 35
-				-- upvalues: current (copy), FFlagCollectionViewMathChanges (copy), n1 (copy), v9 (copy), p1 (copy)
-				local v13 = current.AbsoluteCanvasSize.X - current.AbsoluteWindowSize.X - if not FFlagCollectionViewMathChanges then n1 else n1 or 0
-				local CanvasPositionX = current.CanvasPosition.X
-
-				if CanvasPositionX < v13 and v9.current then
-					v9.current = false
-
-					return
-				end
-
-				if v13 < CanvasPositionX and not v9.current then
-					v9.current = true
-
-					if FFlagCollectionViewMathChanges then
-						if p1 then
-							p1()
-
-							return
-						end
-					else
-						p1()
-					end
-				end
-			end
-
-			table.insert(t2, current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() -- line: 55
-				-- upvalues: checkThreshold (copy)
-				checkThreshold()
-			end))
-			table.insert(t2, current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function() -- line: 62
-				-- upvalues: checkThreshold (copy)
-				checkThreshold()
-			end))
-			table.insert(t2, current:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 68
-				-- upvalues: checkThreshold (copy)
-				checkThreshold()
-			end))
-			checkThreshold()
+		if p.current == nil or callback == nil then
+			v = false
+		else
+			v = p2 ~= nil
 		end
 
-		return function() -- line: 74
-			-- upvalues: t2 (copy)
-			for _, v16 in t2 do
-				v16:Disconnect()
+		if v then
+			local current = p.current
+
+			local function checkThreshold() -- 4 equivalent calls inferred from this helper
+				local v2 = current.AbsoluteCanvasSize.X - current.AbsoluteWindowSize.X - p2
+				local x = current.CanvasPosition.X
+
+				if x < v2 and ref.current then
+					ref.current = false
+				elseif v2 < x and not ref.current then
+					ref.current = true
+					callback()
+				end
+			end
+			table.insert(connections, current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function()
+				checkThreshold() -- inferred equivalent call
+			end))
+
+			table.insert(connections, current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function()
+				checkThreshold() -- inferred equivalent call
+			end))
+
+			table.insert(connections, current:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+				checkThreshold() -- inferred equivalent call
+			end))
+			checkThreshold() -- inferred equivalent call
+		end
+
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, {
-		t1,
-		b1,
-		n1,
-		p1
-	})
+	end, { p, flag, p2, callback })
 end
 
 return useHorizontalScrolledToEndThreshold

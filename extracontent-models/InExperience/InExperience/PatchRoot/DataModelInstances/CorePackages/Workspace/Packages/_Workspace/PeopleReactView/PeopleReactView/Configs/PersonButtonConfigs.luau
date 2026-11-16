@@ -1,264 +1,393 @@
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
+
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local PeopleService = require(PeopleReactViewParent.PeopleService)
-local React = require(PeopleReactViewParent.React)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local parent = PeopleReactView.Parent
 
-require(PeopleReactViewParent.Signals)
+local PeopleService = require(parent.PeopleService)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+require(parent.Signals)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Foundation = require(parent.Foundation)
 
-local RobloxAppHooks = require(PeopleReactViewParent.RobloxAppHooks)
-local RobloxAppEnums = require(PeopleReactViewParent.RobloxAppEnums)
-local useLocalization = require(PeopleReactViewParent.Localization).Hooks.useLocalization
-local ButtonVariant = require(PeopleReactViewParent.Foundation).Enums.ButtonVariant
+local ButtonVariant = Foundation.Enums.ButtonVariant
+
 local useSignalState = SignalsReact.useSignalState
 local useDeviceOrientation = RobloxAppHooks.useDeviceOrientation
-local Constants = require(PeopleReactView.Constants)
-local v16 = PeopleService.getService("Constants")
-local v17 = PeopleService.getService("Flags")
-local GetFFlagNewPeopleButtonOrder = v17.GetFFlagNewPeopleButtonOrder
-local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
-local GetFFlagNewPeoplePageIcons = v17.GetFFlagNewPeoplePageIcons
-local GetFFlagAddPeoplePageCardLayout = v17.GetFFlagAddPeoplePageCardLayout
-local FFlagConnectionsToFriendsRename = require(PeopleReactViewParent.SharedFlags).FFlagConnectionsToFriendsRename
-local FFlagStandardizeSafetyIcon = require(PeopleReactViewParent.SharedFlags).FFlagStandardizeSafetyIcon
 
-local function getPlaySessionId() -- line: 42
-	-- upvalues: EngineFeature (copy), RbxAnalyticsService (copy)
-	if EngineFeature then
+local Constants = require(PeopleReactView.Constants)
+local service = PeopleService.getService("Constants")
+
+local service2 = PeopleService.getService("Flags")
+local getFFlagNewPeopleButtonOrder = service2.GetFFlagNewPeopleButtonOrder
+
+local engineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+local getFFlagNewPeoplePageIcons = service2.GetFFlagNewPeoplePageIcons
+local getFFlagAddPeoplePageCardLayout = service2.GetFFlagAddPeoplePageCardLayout
+local SharedFlags = require(parent.SharedFlags)
+local FFlagStandardizeSafetyIcon = SharedFlags.FFlagStandardizeSafetyIcon
+local FFlagPeopleListButtonOverflow = require(PeopleReactView.Flags.FFlagPeopleListButtonOverflow)
+
+local function getPlaySessionId()
+	if engineFeature then
 		return RbxAnalyticsService:GetPlaySessionId()
 	end
 
 	return ""
 end
-local function usePersonButtonConfigs(n1: number?) -- line: 67
-	-- upvalues: PeopleService (copy), useDeviceOrientation (copy), RobloxAppEnums (copy), useLocalization (copy), Constants (copy), FFlagConnectionsToFriendsRename (copy), React (copy), Players (copy), getPlaySessionId (copy), useSignalState (copy), GetFFlagAddPeoplePageCardLayout (copy), v16 (copy), GetFFlagNewPeopleButtonOrder (copy), GetFFlagNewPeoplePageIcons (copy), ButtonVariant (copy), FFlagStandardizeSafetyIcon (copy), GuiService (copy)
-	local v27 = PeopleService.getService("PeopleVoiceChatStore")
-	local v28 = PeopleService.getService("PeopleReportAbuseMenu")
-	local v29 = PeopleService.getService("PeopleAnalyticsManager")
-	local v30 = PeopleService.getService("SettingsHubService")
-	local v31 = PeopleService.getService("FriendStatusStore")
-	local v32 = PeopleService.getService("PeopleBlockStatusStore")
-	local v33 = PeopleService.getService("PeopleUtility")
-	local v34 = useDeviceOrientation() == RobloxAppEnums.DeviceOrientationMode.Portrait
-	local v35 = useLocalization({
+
+local function usePersonButtonConfigs(p: number?, flag: boolean?)
+	local service3 = PeopleService.getService("PeopleVoiceChatStore")
+	local service4 = PeopleService.getService("PeopleReportAbuseMenu")
+	local service5 = PeopleService.getService("PeopleAnalyticsManager")
+	local service6 = PeopleService.getService("SettingsHubService")
+	local service7 = PeopleService.getService("FriendStatusStore")
+	local service8 = PeopleService.getService("PeopleBlockStatusStore")
+	local service9 = PeopleService.getService("PeopleUtility")
+
+	local v = useDeviceOrientation() == RobloxAppEnums.DeviceOrientationMode.Portrait
+		or FFlagPeopleListButtonOverflow and flag == true
+
+	local v2 = useLocalization({
 		requestSent = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.REQUEST_SENT,
-		friend = if not FFlagConnectionsToFriendsRename then nil else Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.FRIEND,
-		addFriend = if not FFlagConnectionsToFriendsRename then nil else Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.ADD_FRIEND,
-		connection = if not FFlagConnectionsToFriendsRename then Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.CONNECTION else nil,
-		addConnection = if not FFlagConnectionsToFriendsRename then Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.ADD_CONNECTION else nil,
+		friend = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.FRIEND,
+		addFriend = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.ADD_FRIEND,
 		unblock = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.UNBLOCK
 	})
-	local v36 = React.useMemo(function() -- line: 101
-		-- upvalues: FFlagConnectionsToFriendsRename (copy), v35 (copy)
-		return {
-			isFriend = if not FFlagConnectionsToFriendsRename then v35.connection else v35.friend,
-			addPerson = if not FFlagConnectionsToFriendsRename then v35.addConnection else v35.addFriend,
-			requestSent = v35.requestSent
-		}
-	end, { v35 })
-	local v37 = React.useMemo(function() -- line: 111
-		-- upvalues: n1 (copy), Players (copy)
-		if n1 then
-			return (Players:GetPlayerByUserId(n1))
+
+	local v3 = React.useMemo(function()
+		return { isFriend = v2.friend, addPerson = v2.addFriend, requestSent = v2.requestSent }
+	end, { v2 })
+
+	local v4 = React.useMemo(function()
+		if p then
+			return (Players:GetPlayerByUserId(p))
 		end
 
 		return nil
-	end, { n1 })
-	local v38 = React.useMemo(getPlaySessionId, {})
-	local v39 = v27.getPlayerMuteState(n1)
-	local v40 = v27.getPlayerAnimatedIcon(n1)
-	local v41 = v27.getPlayerIsLocalMuted(n1)
-	local v42 = useSignalState(v27.getPlayerShouldShowMuteButton(n1))
-	local v43 = useSignalState(v31.getShouldShowFriendButton(n1, v37))
-	local v44 = if not GetFFlagAddPeoplePageCardLayout() then v31.getFriendStatus(n1) else React.useMemo(function() -- line: 125
-		-- upvalues: v31 (copy), n1 (copy)
-		return v31.getFriendStatus(n1)
-	end, { n1 })
-	local v45 = if not GetFFlagAddPeoplePageCardLayout() then v31.getFriendButtonText(n1, v36) else React.useMemo(function() -- line: 132
-		-- upvalues: v31 (copy), n1 (copy), v36 (copy)
-		return v31.getFriendButtonText(n1, v36)
-	end, {
-		n1,
-		v36
-	})
-	local v46 = if not GetFFlagAddPeoplePageCardLayout() then v31.getFriendButtonVariant(n1) else React.useMemo(function() -- line: 139
-		-- upvalues: v31 (copy), n1 (copy)
-		return v31.getFriendButtonVariant(n1)
-	end, { n1 })
-	local v47 = React.useMemo(function() -- line: 145
-		-- upvalues: n1 (copy), v32 (copy)
-		if n1 then
-			return (v32.getPlayerBlockStatus(n1))
+	end, { p })
+
+	local v5 = React.useMemo(getPlaySessionId, {})
+
+	local playerMuteState = service3.getPlayerMuteState(p)
+	local playerAnimatedIcon = service3.getPlayerAnimatedIcon(p)
+	local playerIsLocalMuted = service3.getPlayerIsLocalMuted(p)
+	local v6 = useSignalState(service3.getPlayerShouldShowMuteButton(p))
+	local v7 = useSignalState(service7.getShouldShowFriendButton(p, v4))
+	local buttonState
+
+	if getFFlagAddPeoplePageCardLayout() then
+		buttonState = React.useMemo(function()
+			return service7.getFriendStatus(p)
+		end, { p })
+	else
+		buttonState = service7.getFriendStatus(p)
+	end
+
+	local v8
+
+	if getFFlagAddPeoplePageCardLayout() then
+		v8 = React.useMemo(function()
+			return service7.getFriendButtonText(p, v3)
+		end, { p, v3 })
+	else
+		v8 = service7.getFriendButtonText(p, v3)
+	end
+
+	local v9
+
+	if getFFlagAddPeoplePageCardLayout() then
+		v9 = React.useMemo(function()
+			return service7.getFriendButtonVariant(p)
+		end, { p })
+	else
+		v9 = service7.getFriendButtonVariant(p)
+	end
+
+	local v10 = useSignalState((React.useMemo(function()
+		if p then
+			return (service8.getPlayerBlockStatus(p))
 		end
 
 		return nil
-	end, { n1 })
-	local v48 = useSignalState(v47)
-	local v49 = React.useMemo(function() -- line: 150
-		-- upvalues: v33 (copy), v37 (copy), n1 (copy)
-		return v33.showPersonButtons(v37, n1)
-	end, { n1 })
+	end, { p })))
 
-	return (React.useMemo(function() -- line: 155
-		-- upvalues: v16 (copy), v40 (copy), v39 (copy), v42 (copy), v29 (copy), n1 (copy), v41 (copy), GetFFlagAddPeoplePageCardLayout (copy), v27 (copy), GetFFlagNewPeopleButtonOrder (copy), v48 (copy), v35 (copy), GetFFlagNewPeoplePageIcons (copy), Constants (copy), v49 (copy), v37 (copy), v32 (copy), ButtonVariant (copy), v34 (copy), v45 (copy), v44 (copy), v46 (copy), v43 (copy), v31 (copy), FFlagStandardizeSafetyIcon (copy), v28 (copy), GuiService (copy), v38 (copy), v30 (copy)
-		local t1 = {}
-		local t2 = {
-			isBuilderIcon = false,
-			id = v16.PERSON_BUTTONS.MUTE_PLAYER,
-			animatedIcon = v40,
-			buttonState = v39,
-			shouldShow = function() -- line: 163
-				-- upvalues: v42 (copy)
-				return v42
+	local v11 = React.useMemo(function()
+		return service9.showPersonButtons(v4, p)
+	end, { p })
+
+	return (React.useMemo(function()
+		local v12 = {}
+
+		local v13 = {
+			id = service.PERSON_BUTTONS.MUTE_PLAYER,
+			animatedIcon = playerAnimatedIcon,
+			buttonState = playerMuteState,
+			shouldShow = function()
+				return v6
 			end,
-			onActivated = function(s1: string?) -- line: 166
-				-- upvalues: v29 (copy), n1 (copy), v41 (copy), GetFFlagAddPeoplePageCardLayout (copy), v27 (copy)
-				v29:trackToggleMutePlayer(n1, v41(false), if not GetFFlagAddPeoplePageCardLayout() then nil else s1)
-				v27.togglePlayerMute(n1)
+			onActivated = function(p2: string?)
+				local v13 = playerIsLocalMuted(false)
+
+				if not getFFlagAddPeoplePageCardLayout() then
+					p2 = nil
+				end
+
+				service5:trackToggleMutePlayer(p, v13, p2)
+
+				service3.togglePlayerMute(p)
 			end,
-			layoutOrder = not GetFFlagNewPeopleButtonOrder() and 10 or 30,
-			isGrayedOut = v41
+			layoutOrder = getFFlagNewPeopleButtonOrder() and 30 or 10,
+			isGrayedOut = playerIsLocalMuted,
+			isBuilderIcon = false
 		}
 
-		if GetFFlagAddPeoplePageCardLayout() then
-			t1[v16.PERSON_BUTTONS.MUTE_PLAYER] = t2
+		if getFFlagAddPeoplePageCardLayout() then
+			v12[service.PERSON_BUTTONS.MUTE_PLAYER] = v13
 		else
-			table.insert(t1, t2)
+			table.insert(v12, v13)
 		end
 
-		local t3 = {
-			id = v16.PERSON_BUTTONS.BLOCK_PLAYER,
-			text = if not v48 then nil else v35.unblock,
-			onIcon = if not v48 then if not GetFFlagNewPeoplePageIcons() then Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.BLOCK_LEGACY else Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.BLOCK_NEW else nil,
-			shouldShow = function() -- line: 196
-				-- upvalues: v49 (copy)
-				return v49
-			end,
-			onActivated = function(s2: string?) -- line: 199
-				-- upvalues: v37 (copy), v48 (copy), v32 (copy), GetFFlagAddPeoplePageCardLayout (copy)
-				if v37 then
-					if v48 then
-						v32.unblockPlayer(v37, if not GetFFlagAddPeoplePageCardLayout() then nil else s2)
+		local v14 = {
+			id = service.PERSON_BUTTONS.BLOCK_PLAYER,
+			text = 0,
+			onIcon = 0,
+			shouldShow = 0,
+			onActivated = 0,
+			buttonVariant = 0,
+			layoutOrder = 0,
+			isBuilderIcon = 0
+		}
+		local text
 
-						return
+		if v10 then
+			text = v2.unblock
+		end
+
+		v14.text = text
+		local onIcon
+
+		if not v10 then
+			if getFFlagNewPeoplePageIcons() then
+				onIcon = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.BLOCK_NEW
+			else
+				onIcon = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.BLOCK_LEGACY
+			end
+		end
+
+		v14.onIcon = onIcon
+
+		function v14.shouldShow()
+			return v11
+		end
+
+		function v14.onActivated(p2: string?)
+			if v4 then
+				if v10 then
+					local unblockPlayer = service8.unblockPlayer
+
+					if not getFFlagAddPeoplePageCardLayout() then
+						p2 = nil
 					end
 
-					v32.blockPlayer(v37, if not GetFFlagAddPeoplePageCardLayout() then nil else s2)
-				end
-			end,
-			buttonVariant = if not v48 then nil else ButtonVariant.Subtle,
-			layoutOrder = not GetFFlagNewPeopleButtonOrder() and 40 or 10,
-			isBuilderIcon = GetFFlagNewPeoplePageIcons()
-		}
+					unblockPlayer(v4, p2)
+				else
+					local blockPlayer = service8.blockPlayer
 
-		if GetFFlagAddPeoplePageCardLayout() then
-			t1[v16.PERSON_BUTTONS.BLOCK_PLAYER] = t3
-		else
-			table.insert(t1, t3)
+					if not getFFlagAddPeoplePageCardLayout() then
+						p2 = nil
+					end
+
+					blockPlayer(v4, p2)
+				end
+			end
 		end
 
-		local t4 = {
+		local buttonVariant
+
+		if v10 then
+			buttonVariant = ButtonVariant.Subtle
+		end
+
+		v14.buttonVariant = buttonVariant
+		v14.layoutOrder = getFFlagNewPeopleButtonOrder() and 10 or 40
+		v14.isBuilderIcon = getFFlagNewPeoplePageIcons()
+
+		if getFFlagAddPeoplePageCardLayout() then
+			v12[service.PERSON_BUTTONS.BLOCK_PLAYER] = v14
+		else
+			table.insert(v12, v14)
+		end
+
+		local v15 = {
+			id = service.PERSON_BUTTONS.ADD_FRIEND,
+			text = 0,
+			onIcon = 0,
+			offIcon = 0,
+			buttonState = 0,
+			buttonVariant = 0,
+			shouldShow = 0,
+			onActivated = 0,
 			layoutOrder = 60,
-			id = v16.PERSON_BUTTONS.ADD_FRIEND,
-			text = if not v34 then v45 else nil,
-			onIcon = if v34 then if not GetFFlagNewPeoplePageIcons() then Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.ADD_FRIEND_LEGACY else Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.ADD_FRIEND_NEW else nil,
-			offIcon = if v34 then if not GetFFlagNewPeoplePageIcons() then Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.FRIEND_LEGACY else Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.FRIEND_NEW else nil,
-			buttonState = v44,
-			buttonVariant = if not v34 then v46 else nil,
-			shouldShow = function() -- line: 239
-				-- upvalues: v43 (copy)
-				return v43
-			end,
-			onActivated = function(s3: string?) -- line: 242
-				-- upvalues: v29 (copy), GetFFlagAddPeoplePageCardLayout (copy), v31 (copy), v37 (copy)
-				v29:trackRequestFriendship(if not GetFFlagAddPeoplePageCardLayout() then nil else s3)
-				v31.sendFriendRequest(v37)
-			end,
-			isDisabled = v31.getIsFriendButtonDisabled(n1),
-			isGrayedOut = v31.getIsFriendButtonGrayedOut(n1),
-			isBuilderIcon = GetFFlagNewPeoplePageIcons()
+			isDisabled = 0,
+			isGrayedOut = 0,
+			isBuilderIcon = 0
 		}
+		local text2
 
-		if GetFFlagAddPeoplePageCardLayout() then
-			t1[v16.PERSON_BUTTONS.ADD_FRIEND] = t4
-		else
-			table.insert(t1, t4)
+		if not v then
+			text2 = v8
 		end
 
-		local t5 = {
-			id = v16.PERSON_BUTTONS.REPORT_PLAYER,
-			onIcon = if not FFlagStandardizeSafetyIcon then if not GetFFlagNewPeoplePageIcons() then Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.REPORT_PLAYER_LEGACY else Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.REPORT_PLAYER_NEW else Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.REPORT_PLAYER_FLAG,
-			shouldShow = function() -- line: 270
-				-- upvalues: v49 (copy)
-				return v49
-			end,
-			onActivated = function(s4: string?) -- line: 273
-				-- upvalues: v37 (copy), v28 (copy), GetFFlagAddPeoplePageCardLayout (copy)
-				if v37 then
-					v28:ReportPlayer(v37, not GetFFlagAddPeoplePageCardLayout() and "MenuPlayerList" or s4)
-				end
-			end,
-			layoutOrder = not GetFFlagNewPeopleButtonOrder() and 30 or 40,
-			isBuilderIcon = GetFFlagNewPeoplePageIcons()
-		}
+		v15.text = text2
+		local onIcon2
 
-		if GetFFlagAddPeoplePageCardLayout() then
-			t1[v16.PERSON_BUTTONS.REPORT_PLAYER] = t5
-		else
-			table.insert(t1, t5)
+		if v then
+			if getFFlagNewPeoplePageIcons() then
+				onIcon2 = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.ADD_FRIEND_NEW
+			else
+				onIcon2 = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.ADD_FRIEND_LEGACY
+			end
 		end
 
-		local t6 = {
+		v15.onIcon = onIcon2
+		local offIcon
+
+		if v then
+			if getFFlagNewPeoplePageIcons() then
+				offIcon = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.FRIEND_NEW
+			else
+				offIcon = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.FRIEND_LEGACY
+			end
+		end
+
+		v15.offIcon = offIcon
+
+		v15.buttonState = buttonState
+		local buttonVariant2
+
+		if not v then
+			buttonVariant2 = v9
+		end
+
+		v15.buttonVariant = buttonVariant2
+		function v15.shouldShow()
+			return v7
+		end
+
+		function v15.onActivated(p2: string?)
+			if not getFFlagAddPeoplePageCardLayout() then
+				p2 = nil
+			end
+
+			service5:trackRequestFriendship(p2)
+
+			service7.sendFriendRequest(v4)
+		end
+
+		v15.isDisabled = service7.getIsFriendButtonDisabled(p)
+		v15.isGrayedOut = service7.getIsFriendButtonGrayedOut(p)
+		v15.isBuilderIcon = getFFlagNewPeoplePageIcons()
+
+		if getFFlagAddPeoplePageCardLayout() then
+			v12[service.PERSON_BUTTONS.ADD_FRIEND] = v15
+		else
+			table.insert(v12, v15)
+		end
+
+		local v16 = {
+			id = service.PERSON_BUTTONS.REPORT_PLAYER,
+			onIcon = 0,
+			shouldShow = 0,
+			onActivated = 0,
+			layoutOrder = 0,
+			isBuilderIcon = 0
+		}
+		local onIcon3
+
+		if FFlagStandardizeSafetyIcon then
+			onIcon3 = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.REPORT_PLAYER_FLAG
+		elseif getFFlagNewPeoplePageIcons() then
+			onIcon3 = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.REPORT_PLAYER_NEW
+		else
+			onIcon3 = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.REPORT_PLAYER_LEGACY
+		end
+
+		v16.onIcon = onIcon3
+
+		function v16.shouldShow()
+			return v11
+		end
+
+		function v16.onActivated(p2: string?)
+			if v4 then
+				service4:ReportPlayer(v4, not getFFlagAddPeoplePageCardLayout() and "MenuPlayerList" or p2)
+			end
+		end
+		v16.layoutOrder = getFFlagNewPeopleButtonOrder() and 40 or 30
+		v16.isBuilderIcon = getFFlagNewPeoplePageIcons()
+
+		if getFFlagAddPeoplePageCardLayout() then
+			v12[service.PERSON_BUTTONS.REPORT_PLAYER] = v16
+		else
+			table.insert(v12, v16)
+		end
+
+		local v17 = {
+			id = service.PERSON_BUTTONS.INSPECT,
+			onIcon = 0,
+			shouldShow = 0,
+			onActivated = 0,
 			layoutOrder = 20,
-			id = v16.PERSON_BUTTONS.INSPECT,
-			onIcon = if not GetFFlagNewPeoplePageIcons() then Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.INSPECT_LEGACY else Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.INSPECT_NEW,
-			shouldShow = function() -- line: 297
-				-- upvalues: GuiService (copy)
-				return GuiService:GetInspectMenuEnabled()
-			end,
-			onActivated = function(s5: string?) -- line: 300
-				-- upvalues: v37 (copy), GetFFlagAddPeoplePageCardLayout (copy), v29 (copy), v38 (copy), GuiService (copy), v30 (copy)
-				if v37 then
-					if GetFFlagAddPeoplePageCardLayout() then
-						v29:trackInspectButton(game.GameId, v38, s5)
-					else
-						v29:trackInspectButton(game.GameId, v38)
-					end
-
-					GuiService:InspectPlayerFromUserIdWithCtx(v37.UserId, "escapeMenu")
-
-					local v61 = v30.hubRef()
-
-					if v61 then
-						v61:SetVisibility(false)
-					end
-				end
-			end,
-			isBuilderIcon = GetFFlagNewPeoplePageIcons()
+			isBuilderIcon = 0
 		}
+		local onIcon4
 
-		if GetFFlagAddPeoplePageCardLayout() then
-			t1[v16.PERSON_BUTTONS.INSPECT] = t6
-
-			return t1
+		if getFFlagNewPeoplePageIcons() then
+			onIcon4 = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.INSPECT_NEW
+		else
+			onIcon4 = Constants.PEOPLEPAGE.PERSON_BUTTONS.ICON.INSPECT_LEGACY
 		end
 
-		table.insert(t1, t6)
+		v17.onIcon = onIcon4
 
-		return t1
-	end, {
-		v42,
-		v43,
-		v49,
-		v48,
-		v34,
-		v45,
-		v46,
-		v44
-	}))
+		function v17.shouldShow()
+			return GuiService:GetInspectMenuEnabled()
+		end
+
+		function v17.onActivated(p2: string?)
+			if v4 then
+				if getFFlagAddPeoplePageCardLayout() then
+					service5:trackInspectButton(game.GameId, v5, p2)
+				else
+					service5:trackInspectButton(game.GameId, v5)
+				end
+
+				GuiService:InspectPlayerFromUserIdWithCtx(v4.UserId, "escapeMenu")
+				local hubRef = service6.hubRef()
+
+				if hubRef then
+					hubRef:SetVisibility(false)
+				end
+			end
+		end
+
+		v17.isBuilderIcon = getFFlagNewPeoplePageIcons()
+
+		if getFFlagAddPeoplePageCardLayout() then
+			v12[service.PERSON_BUTTONS.INSPECT] = v17
+			return v12
+		end
+
+		table.insert(v12, v17)
+
+		return v12
+	end, { v6, v7, v11, v10, v, v8, v9, buttonState }))
 end
 
 return usePersonButtonConfigs

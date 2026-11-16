@@ -1,48 +1,65 @@
 local Chrome = script:FindFirstAncestor("Chrome")
 local CorePackages = game:GetService("CorePackages")
+
 local Service = require(Chrome.Service)
 local CommonIcon = require(Chrome.Integrations.CommonIcon)
-local CapturesPolicy = require(CorePackages.Workspace.Packages.CapturesInExperience).CapturesPolicy
-local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
-local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
+
+local CapturesInExperience = require(CorePackages.Workspace.Packages.CapturesInExperience)
+local CapturesPolicy = CapturesInExperience.CapturesPolicy
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagFixSpatialUICaptures = SharedFlags.FFlagFixSpatialUICaptures
-local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
-local v12 = game:DefineFastFlag("UpdateGalleryIcon", false)
-local InGameMenuIntegrationUtils = require(script.Parent.InGameMenuIntegrationUtils)
-local v14 = CapturesPolicy.PolicyImplementation.read()
-local v15 = not not v14 and CapturesPolicy.Mapper(v14).eligibleForCapturesFeature()
-local v16 = isInExperienceUIVREnabled and FFlagFixSpatialUICaptures
-local v17 = v15 and (not v16 or not isSpatial())
 
-if not v17 then
+local defineFastFlag = game:DefineFastFlag("UpdateGalleryIcon", false)
+
+local InGameMenuIntegrationUtils = require(script.Parent.InGameMenuIntegrationUtils)
+
+local v = CapturesPolicy.PolicyImplementation.read()
+local v2
+
+if v then
+	v2 = CapturesPolicy.Mapper(v).eligibleForCapturesFeature()
+else
+	v2 = false
+end
+
+local v3 = v2 and (not (isInExperienceUIVREnabled and FFlagFixSpatialUICaptures) or not isSpatial())
+
+if not v3 then
 	return nil
 end
 
-local v18 = InGameMenuIntegrationUtils.createPageOpenSignal("CapturesPage")
+local pageOpenSignal = InGameMenuIntegrationUtils.createPageOpenSignal("CapturesPage")
+local initialAvailability
+
+if v3 then
+	initialAvailability = Service.AvailabilitySignal.Available
+else
+	initialAvailability = Service.AvailabilitySignal.Unavailable
+end
 
 return Service:register({
+	initialAvailability = initialAvailability,
 	id = "gallery",
 	label = "Feature.Captures.Title.Gallery",
-	initialAvailability = if not v17 then Service.AvailabilitySignal.Unavailable else Service.AvailabilitySignal.Available,
-	sideSheetPlacement = SideSheetPlacement.Page,
-	activated = function(_) -- line: 39
-		-- upvalues: InGameMenuIntegrationUtils (copy), v18 (copy)
-		InGameMenuIntegrationUtils.toggleIGMPage("CapturesPage", v18:get())
+	sideSheetPlacement = SideSheetPlacement.BelowFold,
+	activated = function(_)
+		InGameMenuIntegrationUtils.toggleIGMPage("CapturesPage", pageOpenSignal:get())
 	end,
-	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 44
-		-- upvalues: v18 (copy)
-		return v18:get()
-	end or v18,
+	isActivated = pageOpenSignal,
 	components = {
-		Icon = function(_) -- line: 48
-			-- upvalues: v12 (copy), CommonIcon (copy), v18 (copy)
-			if v12 then
-				return CommonIcon("Image", nil, v18)
+		Icon = function(_)
+			if defineFastFlag then
+				return CommonIcon("Image", nil, pageOpenSignal)
 			end
 
-			return CommonIcon("icons/controls/cameraOff", "icons/controls/cameraOn", v18)
+			return CommonIcon("icons/controls/cameraOff", "icons/controls/cameraOn", pageOpenSignal)
 		end
 	}
 })

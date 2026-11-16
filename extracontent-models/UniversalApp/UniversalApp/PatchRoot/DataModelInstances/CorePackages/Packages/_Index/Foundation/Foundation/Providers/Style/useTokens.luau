@@ -1,13 +1,12 @@
-local scriptParent = script.Parent
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script.Parent
+local parent2 = script:FindFirstAncestor("Foundation").Parent
 
-require(scriptParent.Tokens)
+require(parent.Tokens)
+local TokensContext = require(parent.TokensContext)
 
-local TokensContext = require(scriptParent.TokensContext)
-local React = require(Parent.React)
+local React = require(parent2.React)
 
-local function useTokens() -- line: 10
-	-- upvalues: React (copy), TokensContext (copy)
+local function useTokens()
 	return (React.useContext(TokensContext))
 end
 

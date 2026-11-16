@@ -1,16 +1,13 @@
-local Parent = script:FindFirstAncestor("DiscoveryAvailability").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("DiscoveryAvailability").Parent
+
+local Signals = require(parent.Signals)
 
 require(script.Parent.CacheStoreTypes)
 
-local function createCacheStore() -- line: 15
-	-- upvalues: Signals (copy)
-	local v4, v5 = Signals.createSignal(nil)
+local function createCacheStore()
+	local signal, setHomePageDataSource = Signals.createSignal(nil)
 
-	return {
-		getHomePageDataSource = v4,
-		setHomePageDataSource = v5
-	}
+	return { getHomePageDataSource = signal, setHomePageDataSource = setHomePageDataSource }
 end
 
 return Signals.createComputed(createCacheStore)

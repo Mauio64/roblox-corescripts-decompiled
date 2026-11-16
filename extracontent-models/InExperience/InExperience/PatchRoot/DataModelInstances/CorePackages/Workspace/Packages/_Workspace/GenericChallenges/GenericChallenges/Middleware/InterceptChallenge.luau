@@ -1,22 +1,18 @@
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
 local RenderChallenge = require(script.Parent.RenderChallenge)
-
 require(script.Parent.InitializeHybridCallback)
 
-local GenericChallengesParent = GenericChallenges.Parent
-local Promise = require(GenericChallengesParent.Promise)
+local parent = GenericChallenges.Parent
+local Promise = require(parent.Promise)
+require(parent.LuauPolyfill)
 
-require(GenericChallengesParent.LuauPolyfill)
-
-return function(t1: {[any]: any}) -- line: 21
-	-- upvalues: Promise (copy), RenderChallenge (copy)
-	return Promise.new(function(resolve, reject) -- line: 22
-		-- upvalues: RenderChallenge (copy), t1 (copy)
+return function(data)
+	return Promise.new(function(resolve, reject)
 		RenderChallenge({
-			title = t1.title,
-			rawResponseHeaders = t1.rawResponseHeaders,
-			retryRequestCallback = t1.retryRequestCallback,
-			challengeErrorCallback = t1.challengeErrorCallback,
+			title = data.title,
+			rawResponseHeaders = data.rawResponseHeaders,
+			retryRequestCallback = data.retryRequestCallback,
+			challengeErrorCallback = data.challengeErrorCallback,
 			resolve = resolve,
 			reject = reject
 		})

@@ -1,6 +1,5 @@
-local function createAccessorySchema(p1) -- line: 2
-	assert(p1, "attachmentName cannot be nil")
-
+local function createAccessorySchema(name)
+	assert(name, "attachmentName cannot be nil")
 	return {
 		ClassName = "Accessory",
 		_children = {
@@ -9,36 +8,18 @@ local function createAccessorySchema(p1) -- line: 2
 				ClassName = "Configuration",
 				_optional = true,
 				_children = {
-					{
-						Name = "ThumbnailCameraTarget",
-						ClassName = "ObjectValue"
-					},
-					{
-						Name = "ThumbnailCameraValue",
-						ClassName = "CFrameValue"
-					}
+					{ Name = "ThumbnailCameraTarget", ClassName = "ObjectValue" },
+					{ Name = "ThumbnailCameraValue", ClassName = "CFrameValue" }
 				}
 			},
 			{
 				Name = "Handle",
 				ClassName = "Part",
 				_children = {
-					{
-						ClassName = "Attachment",
-						Name = p1
-					},
-					{
-						ClassName = "SpecialMesh"
-					},
-					{
-						ClassName = "StringValue",
-						Name = "AvatarPartScaleType",
-						_optional = true
-					},
-					{
-						ClassName = "TouchTransmitter",
-						_optional = true
-					}
+					{ Name = name, ClassName = "Attachment" },
+					{ ClassName = "SpecialMesh" },
+					{ ClassName = "StringValue", Name = "AvatarPartScaleType", _optional = true },
+					{ ClassName = "TouchTransmitter", _optional = true }
 				}
 			}
 		}

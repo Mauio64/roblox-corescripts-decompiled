@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.ProfilePlatform.ProfilePlatform))
+local ProfilePlatform = require(Workspace.ProfilePlatform.ProfilePlatform)
+
+return ProfilePlatform

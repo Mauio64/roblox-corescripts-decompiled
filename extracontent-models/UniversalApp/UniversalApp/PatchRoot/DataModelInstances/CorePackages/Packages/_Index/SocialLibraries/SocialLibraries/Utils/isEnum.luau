@@ -1,7 +1,3 @@
-return function(p1) -- line: 3
-	if type(p1) == "userdata" and p1.rawValue then
-		return true
-	end
-
-	return false
+return function(p): boolean
+	return if type(p) == "userdata" and p.rawValue then true else false
 end

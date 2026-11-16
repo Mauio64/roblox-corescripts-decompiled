@@ -1,0 +1,1 @@
+return { config = require("@game/CorePackages/Workspace/Packages/_Index/FriendsNetworking/FriendsNetworking/createRequestThunks"), Enums = require("@game/CorePackages/Packages/_Index/NetworkingFriends/NetworkingFriends/Enums") }

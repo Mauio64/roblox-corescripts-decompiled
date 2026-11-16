@@ -5,117 +5,113 @@ local CoreGui = game:GetService("CoreGui")
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local Promise = require(CorePackages.Packages.Promise)
 local Roact = require(CorePackages.Packages.Roact)
+
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
-local v9 = require(RobloxGui.Modules.Common.httpRequest)(HttpRbxApiService)
-local EngineFeature = game:GetEngineFeature("TeleportHistoryButtons")
+local httpRequest = require(RobloxGui.Modules.Common.httpRequest)
+local v = httpRequest(HttpRbxApiService)
+
+local engineFeature = game:GetEngineFeature("TeleportHistoryButtons")
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local GetGameNameAndDescription = require(CorePackages.Workspace.Packages.GameDetailRodux).GetGameNameAndDescription
-local u13 = false
-local n1 = 0
-local v15, v16 = AdService:GetAdTeleportInfo()
+local GameDetailRodux = require(CorePackages.Workspace.Packages.GameDetailRodux)
+local GetGameNameAndDescription = GameDetailRodux.GetGameNameAndDescription
+local flag = false
 
-if v15 > 0 and (v16 == 0 or v16 == game.GameId) then
-	n1 = v15
+local v2, v3 = AdService:GetAdTeleportInfo()
 
-	if EngineFeature then
-		u13 = true
+if v2 > 0 and (v3 == 0 or v3 == game.GameId) then
+	if engineFeature then
+		flag = true
 	end
+else
+	v2 = 0
 end
 
-if EngineFeature and n1 == 0 then
-	local v17, _ = TeleportService:GetThirdPartyTeleportInfo(false)
+if engineFeature and v2 == 0 then
+	local thirdPartyTeleportInfo, _ = TeleportService:GetThirdPartyTeleportInfo(false)
 
-	if v17 > 0 then
-		n1 = v17
+	if thirdPartyTeleportInfo > 0 then
+		v2 = thirdPartyTeleportInfo
 	end
 
-	u13 = false
+	flag = false
 end
 
-local function truncateWithEllipsis(p1, p2) -- line: 37
-	if p2 < #p1 then
-		return string.sub(p1, 1, p2 - 3) .. "..."
+local function truncateWithEllipsis(value, p)
+	if p < #value then
+		return string.sub(value, 1, p - 3) .. "..."
 	end
 
-	return p1
+	return value
 end
 
-local p4Name = nil
-local v21 = Promise.defer(function(p3) -- line: 46
-	-- upvalues: n1 (ref), GetGameNameAndDescription (copy), v9 (copy), p4Name (ref), EngineFeature (copy)
-	if n1 > 0 then
-		GetGameNameAndDescription(v9, n1):andThen(function(p4) -- line: 48
-			-- upvalues: p4Name (ref), EngineFeature (copy)
-			p4Name = p4.Name
+local placeName = nil
+local v4 = Promise.defer(function(callback)
+	if v2 > 0 then
+		GetGameNameAndDescription(v, v2):andThen(function(p)
+			placeName = p.Name
 
-			if EngineFeature then
-				local p4Name2 = p4.Name
+			if engineFeature then
+				local v4 = p.Name
 
-				p4Name = if not (#p4Name2 > 30) then p4Name2 else string.sub(p4Name2, 1, 27) .. "..."
+				if #v4 > 30 then
+					v4 = string.sub(v4, 1, 27) .. "..."
+				end
+
+				placeName = v4
 			end
 		end):await()
-		p3()
-
-		return
 	end
 
-	p3()
+	callback()
 end)
-local t1 = {
-	getTooltipText = function() -- line: 62
-		-- upvalues: p4Name (ref), RobloxTranslator (copy)
-		if p4Name == nil then
-			return RobloxTranslator:FormatByKey("InGame.CommonUI.Label.ReturnFallback")
-		end
 
-		return RobloxTranslator:FormatByKey("InGame.CommonUI.Label.ReturnTo", {
-			placeName = p4Name
-		})
-	end
-}
+local BackButtonController = {}
 
-function t1.getTooltipTextTimeout() -- line: 72
-	-- upvalues: p4Name (ref), Promise (copy), v21 (copy), t1 (copy)
-	if p4Name == nil then
-		Promise.any({
-			v21,
-			Promise.delay(1)
-		}):await()
+function BackButtonController.getTooltipText()
+	if placeName == nil then
+		return RobloxTranslator:FormatByKey("InGame.CommonUI.Label.ReturnFallback")
 	end
 
-	return t1.getTooltipText()
+	return RobloxTranslator:FormatByKey("InGame.CommonUI.Label.ReturnTo", { placeName = placeName })
 end
-function t1.getMenuText() -- line: 79
-	-- upvalues: Roact (copy), t1 (copy), p4Name (ref), v21 (copy)
-	local v26, v27 = Roact.createBinding(t1.getTooltipText())
 
-	if p4Name == nil then
-		pcall(function() -- line: 82
-			-- upvalues: v21 (copy), v27 (copy), t1 (copy)
-			v21:andThen(function() -- line: 83
-				-- upvalues: v27 (copy), t1 (copy)
-				v27(t1.getTooltipText())
+function BackButtonController.getTooltipTextTimeout()
+	if placeName == nil then
+		Promise.any({ v4, Promise.delay(1) }):await()
+	end
+
+	return BackButtonController.getTooltipText()
+end
+
+function BackButtonController.getMenuText()
+	local binding, v5 = Roact.createBinding(BackButtonController.getTooltipText())
+
+	if placeName == nil then
+		pcall(function()
+			v4:andThen(function()
+				v5(BackButtonController.getTooltipText())
 			end)
 		end)
 	end
 
-	return v26
+	return binding
 end
-function t1.initiateBackButtonTeleport(p5) -- line: 91
-	-- upvalues: EngineFeature (copy), u13 (ref), AdService (copy), TeleportService (copy)
-	if EngineFeature then
-		if u13 then
-			AdService:ReturnToPublisherExperience(p5)
+
+function BackButtonController.initiateBackButtonTeleport(p)
+	if engineFeature then
+		if flag then
+			AdService:ReturnToPublisherExperience(p)
 		else
 			TeleportService:TeleportTrustedBackForth(false)
 		end
 	end
 
-	AdService:ReturnToPublisherExperience(p5)
-end
-function t1.hasReturnUniverse() -- line: 102
-	-- upvalues: n1 (ref)
-	return n1 > 0
+	AdService:ReturnToPublisherExperience(p)
 end
 
-return t1
+function BackButtonController.hasReturnUniverse(): boolean
+	return v2 > 0
+end
+
+return BackButtonController

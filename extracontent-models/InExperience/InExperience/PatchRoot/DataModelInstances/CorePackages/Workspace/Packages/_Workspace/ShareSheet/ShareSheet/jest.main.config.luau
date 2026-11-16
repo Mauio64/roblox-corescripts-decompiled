@@ -1,0 +1,14 @@
+local parent = script:FindFirstAncestor("ShareSheet").Parent
+local JestConfigs = require(parent.Dev.JestConfigs)
+
+return {
+	displayName = "ShareSheet",
+	testMatch = { "**/*.test" },
+	testPathIgnorePatterns = { "/telemetry/" },
+	setupFilesAfterEnv = {
+		JestConfigs.setupFiles.LogHandler,
+		JestConfigs.setupFiles.UIBloxInitializer,
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		JestConfigs.setupFiles.RetryTimes
+	}
+}

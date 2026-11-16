@@ -3,33 +3,38 @@ game:DefineFastFlag("InGameLargerRobuxUpsellIXPRolledOut", false)
 game:DefineFastFlag("InGameLargerRobuxUpsellEnabled", false)
 game:DefineFastString("InGameLargerRobuxUpsellIXPLayerParam", "isInExperiment")
 
-local function isRolledOut() -- line: 20
-	return game:GetFastFlag("InGameLargerRobuxUpsellEnabled") or game:GetFastFlag("InGameLargerRobuxUpsellIXPRolledOut")
+local function isEnabledForAll() -- 3 equivalent calls inferred from this helper
+	return game:GetFastFlag("InGameLargerRobuxUpsellEnabled")
+end
+
+local function isRolledOut() -- 1 equivalent call inferred from this helper
+	return isEnabledForAll() or game:GetFastFlag("InGameLargerRobuxUpsellIXPRolledOut") -- inferred equivalent call
+end
+
+local function isEnabled() -- 1 equivalent call inferred from this helper
+	return isEnabledForAll() or game:GetFastFlag("InGameLargerRobuxUpsellIXP") -- inferred equivalent call
 end
 
 return {
-	isEnabled = function() -- line: 24
-		return game:GetFastFlag("InGameLargerRobuxUpsellEnabled") or game:GetFastFlag("InGameLargerRobuxUpsellIXP")
-	end,
-	isEnabledForAll = function() -- line: 16
-		return game:GetFastFlag("InGameLargerRobuxUpsellEnabled")
-	end,
-	isUserEnrolled = function(p1) -- line: 28
-		if game:GetFastFlag("InGameLargerRobuxUpsellEnabled") then
+	isEnabled = isEnabled,
+	isEnabledForAll = isEnabledForAll,
+	isUserEnrolled = function(options)
+		if isEnabledForAll() then -- inferred equivalent call
 			return true
 		end
 
-		if not game:GetFastFlag("InGameLargerRobuxUpsellEnabled") and not game:GetFastFlag("InGameLargerRobuxUpsellIXP") then
+		if not isEnabled() then -- inferred equivalent call
 			return false
 		end
 
-		local v3 = p1 or {}
-		local FastString = game:GetFastString("InGameLargerRobuxUpsellIXPLayerParam")
+		local v = options or {}
 
-		if v3[FastString] == nil then
-			return game:GetFastFlag("InGameLargerRobuxUpsellEnabled") or game:GetFastFlag("InGameLargerRobuxUpsellIXPRolledOut")
+		local fastString = game:GetFastString("InGameLargerRobuxUpsellIXPLayerParam")
+
+		if v[fastString] == nil then
+			return isRolledOut() -- inferred equivalent call
 		end
 
-		return v3[FastString]
+		return v[fastString]
 	end
 }

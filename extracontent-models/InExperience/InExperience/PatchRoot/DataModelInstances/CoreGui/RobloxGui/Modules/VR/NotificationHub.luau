@@ -3,738 +3,723 @@ local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local Utility = require(RobloxGui.Modules.Settings.Utility)
-local Panel3D = require(CorePackages.Workspace.Packages.VrCommon).Panel3D
-local VRHub = require(CorePackages.Workspace.Packages.VrCommon).VRHub
-local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local VrCommon = require(CorePackages.Workspace.Packages.VrCommon)
+local Panel3D = VrCommon.Panel3D
+local VrCommon2 = require(CorePackages.Workspace.Packages.VrCommon)
+local VRHub = VrCommon2.VRHub
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Create = AppCommonLib.Create
+
 local _ = CFrame.Angles(-0.08726646259971647, 0, 0) * CFrame.new(0, 4, 0) * CFrame.Angles(-0.2617993877991494, 0, 0)
-local color3 = Color3.new(0.3058823529411765, 0.32941176470588235, 0.3764705882352941)
-local color3_2 = Color3.new(0.3215686274509804, 0.396078431372549, 0.5529411764705883)
-local color3_3 = Color3.new(0.0784313725490196, 0.0784313725490196, 0.0784313725490196)
-local color3_4 = Color3.new(0.2, 0.2, 0.2)
-local v14 = Create("ImageLabel")({
-	BackgroundTransparency = 1,
-	Image = ""
-})
-local color3_5 = Color3.new(1, 1, 1)
-local t1 = {
-	ModuleName = "Notifications",
-	KeepVRTopbarOpen = true,
-	VRIsExclusive = true,
-	VRClosesNonExclusive = true,
-	UnreadCountChanged = function(...) -- line: 79
-	end,
-	SetVisible = nil
-}
 
-VRHub:RegisterModule(t1)
+local color = Color3.new(78 / 255, 84 / 255, 96 / 255)
+local color2 = Color3.new(82 / 255, 101 / 255, 141 / 255)
+local color3 = Color3.new(20 / 255, 20 / 255, 20 / 255)
 
-local v17 = Panel3D.Get("Notifications")
-local v18 = Panel3D.Get("NotificationDetails")
+local color4 = Color3.new(0.2, 0.2, 0.2)
 
-local function IsDeveloperGroupEnabled() -- line: 88
+local selectionImageObject = Create("ImageLabel")({ BackgroundTransparency = 1, Image = "" })
+
+local color5 = Color3.new(1, 1, 1)
+
+local NotificationHub = {}
+NotificationHub.ModuleName = "Notifications"
+NotificationHub.KeepVRTopbarOpen = true
+NotificationHub.VRIsExclusive = true
+NotificationHub.VRClosesNonExclusive = true
+
+function NotificationHub.UnreadCountChanged(...) end
+
+NotificationHub.SetVisible = nil
+VRHub:RegisterModule(NotificationHub)
+
+local notifications = Panel3D.Get("Notifications")
+
+local notificationDetails = Panel3D.Get("NotificationDetails")
+
+local function IsDeveloperGroupEnabled(): boolean
 	return false
 end
 
-local t2 = {}
-local t3 = {}
-local t4 = {
-	__index = t2
-}
+local v = {}
 
-function t2.new(p1, p2, p3) -- line: 96
-	-- upvalues: t3 (copy), Create (copy), color3 (copy), color3_5 (copy), color3_3 (copy), t4 (copy)
-	local t5 = {}
-
-	table.insert(t3, t5)
-	t5.zeroCF = p1.localCF
-	t5.zOffset = 0
-	t5.isPopping = false
-	t5.isAnimating = false
-	t5.tweener = nil
-	t5.panel = p1
-	t5.SetPopOut = nil
-
-	function t5.panel.OnMouseEnter() -- line: 106
-		-- upvalues: t3 (copy), t5 (copy)
-		for _, v in pairs(t3) do
-			if v ~= t5 then
-				v:SetPopOut(false)
+local classes = {}
+local v2 = { __index = v }
+function v.new(panel, parent, text)
+	local class = {}
+	table.insert(classes, class)
+	class.zeroCF = panel.localCF
+	class.zOffset = 0
+	class.isPopping = false
+	class.isAnimating = false
+	class.tweener = nil
+	class.panel = panel
+	class.SetPopOut = nil
+	function class.panel.OnMouseEnter()
+		for _, v3 in pairs(classes) do
+			if v3 ~= class then
+				v3:SetPopOut(false)
 			end
 		end
 
-		t5:SetPopOut(true)
+		class:SetPopOut(true)
 	end
 
-	t5.titlebar = Create("ImageLabel")({
+	class.titlebar = Create("ImageLabel")({
+		Parent = parent,
 		Name = "TitlebarBackground",
-		BackgroundTransparency = 1,
-		Image = "rbxasset://textures/ui/VR/rectBackgroundWhite.png",
-		Parent = p2,
 		Position = UDim2.new(0, -1, 0, -1),
 		Size = UDim2.new(1, 2, 0, 74),
-		ImageColor3 = color3,
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(10, 10, 10, 10)
-	})
-	t5.titleText = Create("TextLabel")({
-		Name = "TitleText",
-		BackgroundTransparency = 1,
-		Parent = t5.titlebar,
-		Position = UDim2.new(0, 1, 0, 1),
-		Size = UDim2.new(1, -2, 1, -2),
-		Text = p3,
-		TextColor3 = color3_5,
-		Font = Enum.Font.SourceSans,
-		FontSize = Enum.FontSize.Size36
-	})
-	t5.content = Create("ImageLabel")({
-		Name = "ContentFrame",
 		BackgroundTransparency = 1,
 		Image = "rbxasset://textures/ui/VR/rectBackgroundWhite.png",
-		ImageTransparency = 0.5,
-		Parent = p2,
-		Position = UDim2.new(0, -1, 0, 74),
-		Size = UDim2.new(1, 2, 1, -76),
-		ImageColor3 = color3_3,
+		ImageColor3 = color,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(10, 10, 10, 10)
 	})
 
-	return (setmetatable(t5, t4))
-end
-function t2.SetTitle(p4, p5) -- line: 163
-	p4.titleText.Text = p5
-end
-function t2.AddCloseButton(p6, p7) -- line: 167
-	-- upvalues: Create (copy)
-	p6.closeButton = Create("ImageButton")({
-		Name = "CloseButton",
+	class.titleText = Create("TextLabel")({
+		Parent = class.titlebar,
+		Name = "TitleText",
+		Position = UDim2.new(0, 1, 0, 1),
+		Size = UDim2.new(1, -2, 1, -2),
+		Text = text,
+		TextColor3 = color5,
+		Font = Enum.Font.SourceSans,
+		FontSize = Enum.FontSize.Size36,
+		BackgroundTransparency = 1
+	})
+
+	class.content = Create("ImageLabel")({
+		Parent = parent,
+		Name = "ContentFrame",
+		Position = UDim2.new(0, -1, 0, 74),
+		Size = UDim2.new(1, 2, 1, -76),
 		BackgroundTransparency = 1,
-		Image = "rbxasset://textures/ui/Keyboard/close_button_icon.png",
-		Parent = p6.titlebar,
+		Image = "rbxasset://textures/ui/VR/rectBackgroundWhite.png",
+		ImageColor3 = color3,
+		ImageTransparency = 0.5,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(10, 10, 10, 10)
+	})
+
+	return (setmetatable(class, v2))
+end
+
+function v:SetTitle(text)
+	self.titleText.Text = text
+end
+
+function v:AddCloseButton(p)
+	self.closeButton = Create("ImageButton")({
+		Parent = self.titlebar,
+		Name = "CloseButton",
 		Position = UDim2.new(0, 22, 0, 22),
 		Size = UDim2.new(0, 32, 0, 32),
+		BackgroundTransparency = 1,
+		Image = "rbxasset://textures/ui/Keyboard/close_button_icon.png",
 		SelectionImageObject = Create("ImageButton")({
 			Name = "CloseButtonHover",
-			BackgroundTransparency = 1,
-			Image = "rbxasset://textures/ui/Keyboard/close_button_selection.png",
 			Position = UDim2.new(0, -11, 0, -11),
-			Size = UDim2.new(1, 22, 1, 22)
+			Size = UDim2.new(1, 22, 1, 22),
+			BackgroundTransparency = 1,
+			Image = "rbxasset://textures/ui/Keyboard/close_button_selection.png"
 		})
 	})
-	p6.closeButton.MouseButton1Click:connect(p7)
+
+	self.closeButton.MouseButton1Click:connect(p)
 end
-function t2.TweenZOffsetTo(p8, p9, p10, p11, p12) -- line: 189
-	-- upvalues: Utility (copy)
-	if p8.tweener and not p8.tweener:IsFinished() then
-		p8.tweener:Cancel()
+
+function v:TweenZOffsetTo(p, p2, p3, p4)
+	if self.tweener and not self.tweener:IsFinished() then
+		self.tweener:Cancel()
 	end
 
-	p8.tweener = Utility:TweenProperty(p8, "zOffset", p8.zOffset, p9, p10, p11, p12)
+	self.tweener = Utility:TweenProperty(self, "zOffset", self.zOffset, p, p2, p3, p4)
 end
-function t2.AnimateOut(p13, p14) -- line: 196
-	-- upvalues: Utility (copy)
-	p13.isAnimating = true
-	p13:TweenZOffsetTo(-100, 0.25, Utility:GetEaseInOutQuad(), function() -- line: 198
-		-- upvalues: p14 (copy), p13 (copy)
-		if p14 then
-			p14()
+
+function v:AnimateOut(callback)
+	self.isAnimating = true
+	self:TweenZOffsetTo(-100, 0.25, Utility:GetEaseInOutQuad(), function()
+		if callback then
+			callback()
 		end
 
-		p13.isAnimating = false
+		self.isAnimating = false
 	end)
 end
-function t2.AnimateIn(p15, p16) -- line: 204
-	-- upvalues: Utility (copy)
-	p15.zOffset = -100
-	p15:OnUpdate(0)
-	p15.isAnimating = true
-	p15:TweenZOffsetTo(0, 0.25, Utility:GetEaseInOutQuad(), function() -- line: 208
-		-- upvalues: p16 (copy), p15 (copy)
-		if p16 then
-			p16()
+
+function v:AnimateIn(callback)
+	self.zOffset = -100
+	self:OnUpdate(0)
+	self.isAnimating = true
+	self:TweenZOffsetTo(0, 0.25, Utility:GetEaseInOutQuad(), function()
+		if callback then
+			callback()
 		end
 
-		p15.isAnimating = false
+		self.isAnimating = false
 	end)
 end
-function t2.SetPopOut(p17, p18) -- line: 214
-	-- upvalues: Utility (copy)
-	if p17.isAnimating then
+
+function v:SetPopOut(p)
+	if self.isAnimating then
 		return
 	end
 
-	if p18 then
-		p17.isPopping = true
-		p17:TweenZOffsetTo(0.25, 0.25, Utility:GetEaseInOutQuad(), function() -- line: 221
-			-- upvalues: p17 (copy)
-			p17.isPopping = false
+	if p then
+		self.isPopping = true
+		self:TweenZOffsetTo(0.25, 0.25, Utility:GetEaseInOutQuad(), function()
+			self.isPopping = false
 		end)
-
-		return
-	end
-
-	p17.isPopping = true
-	p17:TweenZOffsetTo(0, 0.25, Utility:GetEaseInOutQuad(), function() -- line: 226
-		-- upvalues: p17 (copy)
-		p17.isPopping = false
-	end)
-end
-function t2.OnUpdate(p19, _) -- line: 232
-	-- upvalues: color3 (copy), color3_2 (copy)
-	p19.panel.localCF = p19.zeroCF * CFrame.new(0, 0, p19.zOffset)
-	p19.panel.needsLocalPositionUpdate = p19.isAnimating or p19.isPopping
-
-	if p19.isPopping then
-		local v62 = math.max(0, (math.min(1, p19.zOffset / 0.25)))
-
-		p19.titlebar.ImageColor3 = color3:lerp(color3_2, v62)
+	else
+		self.isPopping = true
+		self:TweenZOffsetTo(0, 0.25, Utility:GetEaseInOutQuad(), function()
+			self.isPopping = false
+		end)
 	end
 end
 
-v17:SetType(Panel3D.Type.Standard)
-v17:SetVisible(false)
-v17:SetCanFade(false)
-v17:ResizeStuds(2.277333324, 3.5, 150)
+function v:OnUpdate(_)
+	self.panel.localCF = self.zeroCF * CFrame.new(0, 0, self.zOffset)
+	self.panel.needsLocalPositionUpdate = self.isAnimating or self.isPopping
 
-local v23 = Create("TextButton")({
+	if self.isPopping then
+		local v3 = math.max(0, (math.min(1, self.zOffset / 0.25)))
+		self.titlebar.ImageColor3 = color:lerp(color2, v3)
+	end
+end
+
+notifications:SetType(Panel3D.Type.Standard)
+notifications:SetVisible(false)
+notifications:SetCanFade(false)
+notifications:ResizeStuds(2.277333324, 3.5, 150)
+local v3 = Create("TextButton")({
+	Parent = notifications:GetGUI(),
 	Name = "NotificationsListFrame",
-	BackgroundTransparency = 1,
-	Text = "",
-	Selectable = true,
-	Parent = v17:GetGUI(),
 	Position = UDim2.new(0, 0, 0, 0),
 	Size = UDim2.new(1, -4, 1, 0),
-	SelectionImageObject = v14
-})
-local u24 = t2.new(v17, v23, "Notifications")
-
-u24:AddCloseButton(function() -- line: 263
-	-- upvalues: t1 (copy)
-	t1:SetVisible(false)
-end)
-
-function v17.OnUpdate(_, p22) -- line: 266
-	-- upvalues: u24 (ref)
-	u24:OnUpdate(p22)
-end
-
-v18:SetType(Panel3D.Type.Standard)
-v18:SetVisible(false)
-v18:SetCanFade(false)
-v18:ResizeStuds(3.4159999859999997, 3.5, 150)
-
-local v25 = Create("TextButton")({
-	Name = "NotificationsDetailFrame",
 	BackgroundTransparency = 1,
 	Text = "",
 	Selectable = true,
-	Parent = v18:GetGUI(),
+	SelectionImageObject = selectionImageObject
+})
+
+local v4 = v.new(notifications, v3, "Notifications")
+v4:AddCloseButton(function()
+	NotificationHub:SetVisible(false)
+end)
+function notifications:OnUpdate(p)
+	v4:OnUpdate(p)
+end
+
+notificationDetails:SetType(Panel3D.Type.Standard)
+notificationDetails:SetVisible(false)
+notificationDetails:SetCanFade(false)
+notificationDetails:ResizeStuds(3.4159999859999997, 3.5, 150)
+local v5 = Create("TextButton")({
+	Parent = notificationDetails:GetGUI(),
+	Name = "NotificationsDetailFrame",
 	Position = UDim2.new(0, 0, 0, 0),
 	Size = UDim2.new(1, 0, 1, 0),
-	SelectionImageObject = v14
+	BackgroundTransparency = 1,
+	Text = "",
+	Selectable = true,
+	SelectionImageObject = selectionImageObject
 })
-local u26 = t2.new(v18, v25, "Friend Requests")
 
-function v18.OnUpdate(_, p24) -- line: 291
-	-- upvalues: u26 (ref)
-	u26:OnUpdate(p24)
+local v6 = v.new(notificationDetails, v5, "Friend Requests")
+function notificationDetails:OnUpdate(p)
+	v6:OnUpdate(p)
 end
 
-local t6 = {}
-local t7 = {}
-
-local function groupSort(p25, p26) -- line: 298
-	return p25.order < p26.order
+local v7 = {}
+local v8 = {}
+local function groupSort(p, p2): boolean
+	return p.order < p2.order
 end
 
-local u30 = nil
+local v9 = nil
 
-local function layoutNotificationsGroups() -- line: 303
-	-- upvalues: t7 (copy), v17 (copy), u30 (ref)
-	local n1 = 20
+local function layoutNotificationsGroups()
+	local v10 = 20
 
-	for _, v in ipairs(t7) do
-		if #v.notifications > 0 then
-			local v72 = (math.min(3, #v.notifications) - 1) * 20 + 80
+	for _, v11 in ipairs(v8) do
+		if not (#v11.notifications > 0) then
+			continue
+		end
 
-			v.frame.Position = UDim2.new(0.07500000000000001, 0, 0, n1)
-			v.frame.Size = UDim2.new(0.85, -40, 0, v72)
-			n1 = n1 + v72 + 20
+		local v12 = (math.min(3, #v11.notifications) - 1) * 20 + 80
 
-			if v.notificationsDirty then
-				v.notificationsDirty = false
+		v11.frame.Position = UDim2.new(0.07500000000000001, 0, 0, v10)
+		v11.frame.Size = UDim2.new(0.85, -40, 0, v12)
+		v10 = v10 + v12 + 20
 
-				local n2 = 0
-				local n3 = 0
-				local v75 = #v.notifications
+		if not v11.notificationsDirty then
+			continue
+		end
 
-				if v75 > 0 then
-					local v76 = math.max(1, v75 - 3 + 1)
+		v11.notificationsDirty = false
 
-					for i = 1, v75 do
-						local v78 = v.notifications[i]
+		local total = 0
+		local total2 = 0
 
-						if v76 <= i then
-							v78.frame.Visible = true
-							v78.frame.Position = UDim2.new(0, n2, 0, n2)
-							n2 += 20
-							v17:SetSubpanelDepth(v78.frame, n3)
-							n3 += 0.25
-						else
-							v78.frame.Visible = false
-						end
-					end
+		local count = #v11.notifications
 
-					if v == u30 then
-						local v79 = math.max(1, v75 - 2 + 1)
-						local n4 = 0
+		if not (count > 0) then
+			continue
+		end
 
-						for i = 1, v75 do
-							local v82 = v.notifications[i]
+		local v13 = math.max(1, count - 3 + 1)
 
-							if v79 <= i then
-								v82.detailsFrame.Visible = true
-								v82.detailsFrame.Position = UDim2.new(0, 20, n4, 20)
-								v82.detailsFrame.Size = UDim2.new(1, -40, 0.5, -40)
-								n4 += 0.5
-							else
-								v82.detailsFrame.Visible = false
-							end
-						end
-					end
-				end
+		for i = 1, count do
+			local notification = v11.notifications[i]
+
+			if v13 <= i then
+				notification.frame.Visible = true
+				notification.frame.Position = UDim2.new(0, total, 0, total)
+				total += 20
+
+				notifications:SetSubpanelDepth(notification.frame, total2)
+				total2 += 0.25
+			else
+				notification.frame.Visible = false
+			end
+		end
+
+		if v9 ~= v11 then
+			continue
+		end
+
+		local v14 = math.max(1, count - 2 + 1)
+		local total3 = 0
+
+		for i = 1, count do
+			local notification = v11.notifications[i]
+
+			if v14 <= i then
+				notification.detailsFrame.Visible = true
+				notification.detailsFrame.Position = UDim2.new(0, 20, total3, 20)
+				notification.detailsFrame.Size = UDim2.new(1, -40, 0.5, -40)
+
+				total3 += 0.5
+			else
+				notification.detailsFrame.Visible = false
 			end
 		end
 	end
 end
 
-local t8 = {}
-local t9 = {
-	__index = t8
-}
+local v10 = {}
 
-function t8.new(p27, p28, p29) -- line: 362
-	-- upvalues: t9 (copy), Create (copy), u24 (ref), t6 (copy), t7 (copy)
-	local self = setmetatable({}, t9)
+local v11 = { __index = v10 }
+function v10.new(p, title, order)
+	local self = setmetatable({}, v11)
 
-	self.key = p27
-	self.title = p28
-	self.order = p29
+	self.key = p
+	self.title = title
+	self.order = order
 	self.notifications = {}
 	self.notificationsDirty = false
 	self.frame = Create("Frame")({
+		Parent = v4.content,
 		Name = "NotificationGroup",
-		BackgroundTransparency = 1,
-		Parent = u24.content
+		BackgroundTransparency = 1
 	})
+
 	self.detailsFrame = Create("Frame")({
 		Parent = nil,
 		BackgroundTransparency = 1,
 		Position = UDim2.new(0, 0, 0, 0),
 		Size = UDim2.new(1, 0, 1, 0)
 	})
-	t6[p27] = self
-	table.insert(t7, self)
+
+	v7[p] = self
+	table.insert(v8, self)
 
 	return self
 end
-function t8.Deactivate(p30) -- line: 389
-	-- upvalues: v18 (copy)
-	p30.detailsFrame.Parent = nil
 
-	for _, child in pairs(p30.detailsFrame:GetChildren()) do
-		v18:RemoveSubpanel(child)
+function v10:Deactivate()
+	self.detailsFrame.Parent = nil
+
+	for _, child in pairs(self.detailsFrame:GetChildren()) do
+		notificationDetails:RemoveSubpanel(child)
 	end
 end
-function t8.SwitchTo(p31) -- line: 396
-	-- upvalues: u26 (ref), t6 (copy), u30 (ref)
-	u26:SetTitle(p31.title)
 
-	for _, v in pairs(t6) do
-		if v ~= p31 then
-			v:Deactivate()
+function v10:SwitchTo()
+	v6:SetTitle(self.title)
+
+	for _, v12 in pairs(v7) do
+		if v12 ~= self then
+			v12:Deactivate()
 		end
 	end
 
-	p31.detailsFrame.Parent = u26.content
-	u30 = p31
-	p31.notificationsDirty = true
+	self.detailsFrame.Parent = v6.content
+
+	v9 = self
+	self.notificationsDirty = true
 end
-function t8.BringNotificationToFront(p32, p33) -- line: 409
-	-- upvalues: u30 (ref), layoutNotificationsGroups (copy)
-	if p32 ~= u30 then
-		p32:SwitchTo()
+
+function v10:BringNotificationToFront(p)
+	if v9 ~= self then
+		self:SwitchTo()
 	end
 
-	if #p32.notifications ~= 0 and p33 == p32.notifications[#p32.notifications] then
+	if #self.notifications ~= 0 and p == self.notifications[#self.notifications] then
 		layoutNotificationsGroups()
-
 		return
 	end
 
-	for i, v in ipairs(p32.notifications) do
-		if v == p33 then
-			table.remove(p32.notifications, i)
-
+	for i, notification in ipairs(self.notifications) do
+		if notification == p then
+			table.remove(self.notifications, i)
 			break
 		end
 	end
 
-	table.insert(p32.notifications, p33)
-	p32.notificationsDirty = true
+	table.insert(self.notifications, p)
+	self.notificationsDirty = true
 	layoutNotificationsGroups()
 end
-function t8.RemoveNotification(p34, p35) -- line: 432
-	-- upvalues: v17 (copy), v18 (copy), layoutNotificationsGroups (copy)
-	for i, v in ipairs(p34.notifications) do
-		if v == p35 then
-			table.remove(p34.notifications, i)
-			v17:RemoveSubpanel(p35.frame)
-			v18:RemoveSubpanel(p35.detailsFrame)
-			p35.detailsFrame:Destroy()
-			p35.frame:Destroy()
-			p34.notificationsDirty = true
-			layoutNotificationsGroups()
 
-			return
+function v10:RemoveNotification(p)
+	for i, notification in ipairs(self.notifications) do
+		if notification == p then
+			table.remove(self.notifications, i)
+			notifications:RemoveSubpanel(p.frame)
+			notificationDetails:RemoveSubpanel(p.detailsFrame)
+			p.detailsFrame:Destroy()
+			p.frame:Destroy()
+
+			self.notificationsDirty = true
+			layoutNotificationsGroups()
+			break
 		end
 	end
 end
-function t8.GetTopNotification(p36) -- line: 448
-	local v102 = #p36.notifications
 
-	if v102 <= 0 then
+function v10.GetTopNotification(p)
+	local count = #p.notifications
+
+	if count <= 0 then
 		return nil
 	end
 
-	return p36.notifications[v102]
+	return p.notifications[count]
 end
 
-t8.new("Friends", "Friends", 1)
-t8.new("BadgeAwards", "Badges", 2)
-t8.new("PlayerPoints", "Points", 3)
+v10.new("Friends", "Friends", 1)
+v10.new("BadgeAwards", "Badges", 2)
+v10.new("PlayerPoints", "Points", 3)
 
-if false then
-	t8.new("Developer", "Other", 4)
+table.sort(v8, groupSort)
+
+local function doCallback(callback, ...)
+	if not callback then
+		return
+	end
+
+	if type(callback) == "function" then
+		callback(...)
+		return
+	end
+
+	if callback:IsA("BindableEvent") then
+		callback:Fire(...)
+		return
+	end
+
+	if not callback:IsA("BindableFunction") then
+		return
+	end
+
+	callback:Invoke(...)
 end
 
-table.sort(t7, groupSort)
+local v12 = {}
 
-local function doCallback(p37, ...) -- line: 465
-	if not p37 then
-		return
-	end
-
-	if type(p37) == "function" then
-		p37(...)
-
-		return
-	end
-
-	if p37:IsA("BindableEvent") then
-		p37:Fire(...)
-
-		return
-	end
-
-	if p37:IsA("BindableFunction") then
-		p37:Invoke(...)
-
-		return
-	end
-end
-
-local t10 = {}
-local t11 = {
-	__index = t10
-}
-
-function t10.new(p38, p39) -- line: 487
-	-- upvalues: t11 (copy), Create (copy), v14 (copy), color3_4 (copy), color3_5 (copy), v18 (copy), doCallback (copy), layoutNotificationsGroups (copy)
-	local self = setmetatable({}, t11)
-
-	self.group = p38
-	self.frame = Create("ImageButton")({
-		BackgroundTransparency = 1,
-		Parent = p38.frame,
+local v13 = { __index = v12 }
+function v12:new(data)
+	local object = setmetatable({}, v13)
+	object.group = self
+	object.frame = Create("ImageButton")({
+		Parent = self.frame,
 		Size = UDim2.new(1, 0, 0, 80),
-		SelectionImageObject = v14
+		SelectionImageObject = selectionImageObject,
+		BackgroundTransparency = 1
 	})
-	self.frame.MouseButton1Click:connect(function() -- line: 498
-		-- upvalues: self (copy)
-		self:OnClicked()
+
+	object.frame.MouseButton1Click:connect(function()
+		object:OnClicked()
 	end)
-	self.background = Create("ImageLabel")({
+	object.background = Create("ImageLabel")({
+		Parent = object.frame,
+		Position = UDim2.new(0, -1, 0, -1),
+		Size = UDim2.new(1, 2, 1, 2),
 		BackgroundTransparency = 1,
 		Image = "rbxasset://textures/ui/vr/rectBackgroundWhite.png",
+		ImageColor3 = color4,
 		ImageTransparency = 0.1,
-		Parent = self.frame,
-		Position = UDim2.new(0, -1, 0, -1),
-		Size = UDim2.new(1, 2, 1, 2),
-		ImageColor3 = color3_4,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(10, 10, 10, 10)
 	})
-	self.imageBackground = Create("ImageLabel")({
-		BackgroundTransparency = 1,
-		Image = "rbxasset://textures/ui/VR/circleWhite.png",
-		Parent = self.frame,
+
+	object.imageBackground = Create("ImageLabel")({
+		Parent = object.frame,
 		Position = UDim2.new(0, 5, 0, 5),
 		Size = UDim2.new(0, 70, 0, 70),
-		ImageColor3 = p39.imgBackgroundColor or Color3.new(1, 1, 1)
-	})
-	self.image = Create("ImageLabel")({
 		BackgroundTransparency = 1,
-		Parent = self.imageBackground,
+		Image = "rbxasset://textures/ui/VR/circleWhite.png",
+		ImageColor3 = data.imgBackgroundColor or Color3.new(1, 1, 1)
+	})
+
+	object.image = Create("ImageLabel")({
+		Parent = object.imageBackground,
 		Position = UDim2.new(0, 0, 0, 0),
 		Size = UDim2.new(1, 0, 1, 0),
-		Image = p39.Image
+		BackgroundTransparency = 1,
+		Image = data.Image
 	})
 
-	local p39Text = p39.Text
+	local text = data.Text
 
-	if p39.Title and p39.Text then
-		p39Text = ("%s\n%s"):format(p39.Title, p39.Text)
+	if data.Title and data.Text then
+		text = ("%s\n%s"):format(data.Title, data.Text)
 	end
 
-	self.text = Create("TextLabel")({
-		BackgroundTransparency = 1,
-		TextWrapped = true,
-		Parent = self.frame,
+	object.text = Create("TextLabel")({
+		Parent = object.frame,
 		Position = UDim2.new(0, 80, 0, 0),
 		Size = UDim2.new(1, -80, 1, 0),
+		BackgroundTransparency = 1,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = p39Text,
+		Text = text,
+		TextWrapped = true,
 		Font = Enum.Font.SourceSans,
 		FontSize = Enum.FontSize.Size18,
-		TextColor3 = color3_5
+		TextColor3 = color5
 	})
-	self.detailsFrame = Create("Frame")({
-		BackgroundTransparency = 1,
-		Parent = p38.detailsFrame
-	})
-	self.detailsFrame.MouseEnter:connect(function() -- line: 558
-		-- upvalues: v18 (copy), self (copy)
-		v18:SetSubpanelDepth(self.detailsFrame, 0.25)
+
+	object.detailsFrame = Create("Frame")({ Parent = self.detailsFrame, BackgroundTransparency = 1 })
+
+	object.detailsFrame.MouseEnter:connect(function()
+		notificationDetails:SetSubpanelDepth(object.detailsFrame, 0.25)
 	end)
-	self.detailsFrame.MouseLeave:connect(function() -- line: 561
-		-- upvalues: v18 (copy), self (copy)
-		v18:SetSubpanelDepth(self.detailsFrame, 0)
+	object.detailsFrame.MouseLeave:connect(function()
+		notificationDetails:SetSubpanelDepth(object.detailsFrame, 0)
 	end)
-	self.detailsBackground = Create("ImageLabel")({
-		BackgroundTransparency = 1,
-		Image = "rbxasset://textures/ui/VR/rectBackgroundWhite.png",
-		ImageTransparency = 0.1,
-		Parent = self.detailsFrame,
+	object.detailsBackground = Create("ImageLabel")({
+		Parent = object.detailsFrame,
 		Position = UDim2.new(0, -1, 0, -1),
 		Size = UDim2.new(1, 2, 1, 2),
+		BackgroundTransparency = 1,
+		Image = "rbxasset://textures/ui/VR/rectBackgroundWhite.png",
 		ImageColor3 = Color3.new(0.2, 0.2, 0.2),
+		ImageTransparency = 0.1,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(10, 10, 10, 10)
 	})
-	self.detailsIconBackground = Create("ImageLabel")({
-		BackgroundTransparency = 1,
-		Image = "rbxasset://textures/ui/VR/circleWhite.png",
-		Parent = self.detailsFrame,
+
+	object.detailsIconBackground = Create("ImageLabel")({
+		Parent = object.detailsFrame,
 		Position = UDim2.new(0, 20, 0, 10),
 		Size = UDim2.new(0, 80, 0, 80),
-		ImageColor3 = p39.imgBackgroundColor or Color3.new(1, 1, 1)
-	})
-	self.detailsIcon = Create("ImageLabel")({
 		BackgroundTransparency = 1,
-		Parent = self.detailsIconBackground,
+		Image = "rbxasset://textures/ui/VR/circleWhite.png",
+		ImageColor3 = data.imgBackgroundColor or Color3.new(1, 1, 1)
+	})
+
+	object.detailsIcon = Create("ImageLabel")({
+		Parent = object.detailsIconBackground,
 		Position = UDim2.new(0, 0, 0, 0),
 		Size = UDim2.new(1, 0, 1, 0),
-		Image = p39.Image
+		BackgroundTransparency = 1,
+		Image = data.Image
 	})
 
-	local v108 = p39.DetailText or p39.Title
-
-	self.detailsText = Create("TextLabel")({
-		BackgroundTransparency = 1,
-		TextWrapped = true,
-		Parent = self.detailsFrame,
+	local detailText = data.DetailText or data.Title
+	object.detailsText = Create("TextLabel")({
+		Parent = object.detailsFrame,
 		Position = UDim2.new(0, 110, 0, 10),
 		Size = UDim2.new(1, -120, 0, 90),
-		Text = v108,
-		TextColor3 = color3_5,
+		BackgroundTransparency = 1,
+		Text = detailText,
+		TextWrapped = true,
+		TextColor3 = color5,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		Font = Enum.Font.SourceSansBold,
 		FontSize = Enum.FontSize.Size36
 	})
 
-	local function createButton(p40, p41, p42) -- line: 614
-		-- upvalues: Create (copy), self (copy), v14 (copy), color3_5 (copy)
-		local v136 = Create("ImageButton")({
+	local function createButton(p, p2, text2)
+		local parent = Create("ImageButton")({
+			Parent = object.detailsFrame,
+			Position = UDim2.new(p, 0, 0.55, 0),
+			Size = UDim2.new(p2, 0, 0.29, 0),
 			BackgroundTransparency = 1,
 			Image = "rbxasset://textures/ui/Settings/MenuBarAssets/MenuButton.png",
-			Parent = self.detailsFrame,
-			Position = UDim2.new(p40, 0, 0.55, 0),
-			Size = UDim2.new(p41, 0, 0.29, 0),
 			ScaleType = Enum.ScaleType.Slice,
 			SliceCenter = Rect.new(8, 6, 46, 44),
-			SelectionImageObject = v14
+			SelectionImageObject = selectionImageObject
 		})
-		local v137 = Create("TextLabel")({
-			BackgroundTransparency = 1,
+
+		local v14 = Create("TextLabel")({
 			Position = UDim2.new(0, 0, 0, 0),
 			Size = UDim2.new(1, 0, 1, -6),
-			Text = p42,
-			TextColor3 = color3_5,
+			BackgroundTransparency = 1,
+			Text = text2,
+			TextColor3 = color5,
 			Font = Enum.Font.SourceSansBold,
 			FontSize = Enum.FontSize.Size24
 		})
 
-		v137.Parent = v136
-		v136.SelectionGained:connect(function() -- line: 640
-			-- upvalues: v136 (copy)
-			v136.Image = "rbxasset://textures/ui/Settings/MenuBarAssets/MenuButtonSelected.png"
-		end)
-		v136.SelectionLost:connect(function() -- line: 643
-			-- upvalues: v136 (copy)
-			v136.Image = "rbxasset://textures/ui/Settings/MenuBarAssets/MenuButton.png"
-		end)
+		v14.Parent = parent
 
-		return v136, v137
+		parent.SelectionGained:connect(function()
+			parent.Image = "rbxasset://textures/ui/Settings/MenuBarAssets/MenuButtonSelected.png"
+		end)
+		parent.SelectionLost:connect(function()
+			parent.Image = "rbxasset://textures/ui/Settings/MenuBarAssets/MenuButton.png"
+		end)
+		return parent, v14
 	end
 
-	if p39.Button1Text and p39.Button2Text then
-		local v110, v111 = createButton(0.07, 0.415, p39.Button1Text)
+	if data.Button1Text and data.Button2Text then
+		local button, detailsButton1Text = createButton(0.07, 0.415, data.Button1Text)
+		object.detailsButton1 = button
+		object.detailsButton1Text = detailsButton1Text
+		local button2, detailsButton2Text = createButton(0.511, 0.415, data.Button2Text)
+		object.detailsButton2 = button2
+		object.detailsButton2Text = detailsButton2Text
 
-		self.detailsButton1 = v110
-		self.detailsButton1Text = v111
-
-		local v112, v113 = createButton(0.511, 0.415, p39.Button2Text)
-
-		self.detailsButton2 = v112
-		self.detailsButton2Text = v113
-		self.detailsButton1.MouseButton1Click:connect(function() -- line: 653
-			-- upvalues: doCallback (copy), p39 (copy), self (copy)
-			doCallback(p39.Callback, p39.Button1Text)
-			self:Dismiss()
+		object.detailsButton1.MouseButton1Click:connect(function()
+			doCallback(data.Callback, data.Button1Text)
+			object:Dismiss()
 		end)
-		self.detailsButton2.MouseButton1Click:connect(function() -- line: 657
-			-- upvalues: doCallback (copy), p39 (copy), self (copy)
-			doCallback(p39.Callback, p39.Button2Text)
-			self:Dismiss()
+		object.detailsButton2.MouseButton1Click:connect(function()
+			doCallback(data.Callback, data.Button2Text)
+			object:Dismiss()
 		end)
-	elseif not p39.button2Text then
-		local v114, v115 = createButton(0.07, 0.86, p39.Button1Text or "Dismiss")
-
-		self.detailsButton1 = v114
-		self.detailsButton1Text = v115
-		self.detailsButton1.MouseButton1Click:connect(function() -- line: 664
-			-- upvalues: doCallback (copy), p39 (copy), self (copy)
-			doCallback(p39.Callback, p39.Button1Text)
-			self:Dismiss()
+	elseif not data.button2Text then
+		local button, detailsButton1Text = createButton(0.07, 0.86, data.Button1Text or "Dismiss")
+		object.detailsButton1 = button
+		object.detailsButton1Text = detailsButton1Text
+		object.detailsButton1.MouseButton1Click:connect(function()
+			doCallback(data.Callback, data.Button1Text)
+			object:Dismiss()
 		end)
 	end
 
-	table.insert(p38.notifications, self)
-	p38.notificationsDirty = true
+	table.insert(self.notifications, object)
+	self.notificationsDirty = true
 	layoutNotificationsGroups()
 
-	return self
+	return object
 end
-function t10.OnClicked(p43) -- line: 677
-	-- upvalues: layoutNotificationsGroups (copy)
-	p43.group:SwitchTo()
+
+function v12:OnClicked()
+	self.group:SwitchTo()
 	layoutNotificationsGroups()
 end
-function t10.Dismiss(p44) -- line: 685
-	p44.group:RemoveNotification(p44)
+
+function v12:Dismiss()
+	self.group:RemoveNotification(self)
 end
 
-local t12 = {}
-local u38 = false
-local n5 = 0
+local v14 = {}
+local v15 = false
+local count = 0
 
-RobloxGui:WaitForChild("SendNotificationInfo").Event:connect(function(p45) -- line: 697
-	-- upvalues: t6 (copy), t10 (copy), u38 (ref), n5 (ref), t1 (copy)
-	local v119 = p45.GroupName and t6[p45.GroupName]
+RobloxGui:WaitForChild("SendNotificationInfo").Event:connect(function(p)
+	local v16 = p.GroupName and v7[p.GroupName]
 
-	if not v119 then
-		if not false then
-			return
-		end
-
-		v119 = t6.Developer
-	end
-
-	t10.new(v119, p45)
-
-	if not u38 then
-		n5 += 1
-		t1.UnreadCountChanged(n5)
-	end
-end)
-
-local function onMenuCloseShortcut(_, p47, _) -- line: 716
-	-- upvalues: t1 (copy)
-	if p47 == Enum.UserInputState.Begin then
-		t1:SetVisible(false)
-	end
-end
-
-t1.VisibilityStateChanged = Create("BindableEvent")({
-	Name = "VisibilityStateChanged"
-})
-
-function t1.GetNumberOfPendingNotifications(_) -- line: 726
-	-- upvalues: t12 (copy)
-	return #t12
-end
-function t1.IsVisible(_) -- line: 730
-	-- upvalues: u38 (ref)
-	return u38
-end
-function t1.SetVisible(_, p52) -- line: 734
-	-- upvalues: u38 (ref), Panel3D (copy), n5 (ref), t1 (copy), v17 (copy), u24 (ref), v18 (copy), u26 (ref), ContextActionService (copy), onMenuCloseShortcut (copy), VRHub (copy)
-	if p52 == u38 then
+	if not v16 then
 		return
 	end
 
-	u38 = p52
-	Panel3D.Get("Topbar3D"):SetCanFade(not p52)
+	v12.new(v16, p)
 
-	if p52 then
-		n5 = 0
-		t1.UnreadCountChanged(n5)
-		v17.localCF = CFrame.new(-1.7079999929999998, 0, 0)
-		u24.zeroCF = v17.localCF
-		u24:AnimateIn(nil)
-		v18.localCF = CFrame.new(1.138666662, 0, 0)
-		u26.zeroCF = v18.localCF
-		u26:AnimateIn(nil)
-		v17:SetVisible(true)
-		v18:SetVisible(true)
-		ContextActionService:BindCoreAction("NotificationsMenuCloseShortcut", onMenuCloseShortcut, false, Enum.KeyCode.ButtonB, Enum.KeyCode.ButtonStart)
-		VRHub:FireModuleOpened(t1.ModuleName)
-	else
-		spawn(function() -- line: 766
-			-- upvalues: u24 (ref), v17 (copy), u26 (ref), v18 (copy)
-			u24:AnimateOut(function() -- line: 767
-				-- upvalues: v17 (copy)
-				v17:SetVisible(false)
-			end)
-			u26:AnimateOut(function() -- line: 770
-				-- upvalues: v18 (copy)
-				v18:SetVisible(false)
-			end)
-		end)
-		ContextActionService:UnbindCoreAction("NotificationsMenuCloseShortcut")
-		VRHub:FireModuleClosed(t1.ModuleName)
-	end
-
-	t1.VisibilityStateChanged:Fire(p52)
-end
-
-VRHub.ModuleOpened.Event:connect(function(p53, _, _, _) -- line: 788
-	-- upvalues: t1 (copy)
-	if p53 ~= t1.ModuleName then
-		t1:SetVisible(false)
+	if not v15 then
+		count += 1
+		NotificationHub.UnreadCountChanged(count)
 	end
 end)
 
-return t1
+local function onMenuCloseShortcut(_, p, _)
+	if p == Enum.UserInputState.Begin then
+		NotificationHub:SetVisible(false)
+	end
+end
+
+NotificationHub.VisibilityStateChanged = Create("BindableEvent")({ Name = "VisibilityStateChanged" })
+
+function NotificationHub.GetNumberOfPendingNotifications(_)
+	return #v14
+end
+
+function NotificationHub.IsVisible(_)
+	return v15
+end
+
+function NotificationHub:SetVisible(p)
+	if v15 == p then
+		return
+	end
+
+	v15 = p
+
+	Panel3D.Get("Topbar3D"):SetCanFade(not p)
+
+	if p then
+		count = 0
+		NotificationHub.UnreadCountChanged(count)
+
+		notifications.localCF = CFrame.new(-1.7079999929999998, 0, 0)
+		v4.zeroCF = notifications.localCF
+
+		v4:AnimateIn(nil)
+
+		notificationDetails.localCF = CFrame.new(1.138666662, 0, 0)
+		v6.zeroCF = notificationDetails.localCF
+
+		v6:AnimateIn(nil)
+
+		notifications:SetVisible(true)
+		notificationDetails:SetVisible(true)
+
+		ContextActionService:BindCoreAction(
+			"NotificationsMenuCloseShortcut",
+			onMenuCloseShortcut,
+			false,
+			Enum.KeyCode.ButtonB,
+			Enum.KeyCode.ButtonStart
+		)
+
+		VRHub:FireModuleOpened(NotificationHub.ModuleName)
+	else
+		spawn(function()
+			v4:AnimateOut(function()
+				notifications:SetVisible(false)
+			end)
+			v6:AnimateOut(function()
+				notificationDetails:SetVisible(false)
+			end)
+		end)
+
+		ContextActionService:UnbindCoreAction("NotificationsMenuCloseShortcut")
+
+		VRHub:FireModuleClosed(NotificationHub.ModuleName)
+	end
+
+	NotificationHub.VisibilityStateChanged:Fire(p)
+end
+
+VRHub.ModuleOpened.Event:connect(function(p, _, _, _)
+	if p ~= NotificationHub.ModuleName then
+		NotificationHub:SetVisible(false)
+	end
+end)
+
+return NotificationHub

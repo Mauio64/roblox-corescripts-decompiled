@@ -1,72 +1,141 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local SharedFlags = require(PurchasePromptParent.SharedFlags)
-local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
+local parent = PurchasePrompt.Parent
+local SharedFlags = require(parent.SharedFlags)
+
+local types = require(PurchasePrompt.types)
+local productTypeEnum = types.ProductTypeEnum
 local initiatePurchase = require(PurchasePrompt.Thunks.initiatePurchase)
 local initiateBundlePurchase = require(PurchasePrompt.Thunks.initiateBundlePurchase)
+
 local FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell = require(PurchasePrompt.Flags.FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell)
 local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags.FFlagLuaAppsEnablePromptVIPServerPurchase
 
-local function dispatchPurchaseForProductPayload(p1: ((...any) -> ...any), p2, _, b1: boolean) -- line: 18
-	-- upvalues: ProductTypeEnum (copy), initiatePurchase (copy), initiateBundlePurchase (copy), FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell (copy), FFlagAXMISWithBlackbird (copy)
-	if p2.kind == ProductTypeEnum.Asset then
-		p1(initiatePurchase(p2.id, Enum.InfoType.Asset, p2.equipIfPurchased, p2.isRobloxPurchase, p2.idempotencyKey, nil, p2.collectibleItemId, p2.collectibleItemInstanceId, p2.collectibleProductId, p2.expectedPrice, nil, b1))
+local function dispatchPurchaseForProductPayload(callback, data, _, flag: boolean)
+	if data.kind == productTypeEnum.Asset then
+		callback(initiatePurchase(
+			data.id,
+			Enum.InfoType.Asset,
+			data.equipIfPurchased,
+			data.isRobloxPurchase,
+			data.idempotencyKey,
+			nil,
+			data.collectibleItemId,
+			data.collectibleItemInstanceId,
+			data.collectibleProductId,
+			data.expectedPrice,
+			nil,
+			flag
+		))
+	elseif data.kind == productTypeEnum.Gamepass then
+		callback(initiatePurchase(data.id, Enum.InfoType.GamePass, nil, nil, nil, nil, nil, nil, nil, nil, nil, flag))
+	elseif data.kind == productTypeEnum.Product then
+		callback(initiatePurchase(
+			data.id,
+			Enum.InfoType.Product,
+			data.equipIfPurchased,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			flag
+		))
+	elseif data.kind == productTypeEnum.Bundle then
+		callback(initiateBundlePurchase(
+			data.id,
+			data.idempotencyKey,
+			nil,
+			data.collectibleItemId,
+			data.collectibleItemInstanceId,
+			data.collectibleProductId,
+			data.expectedPrice,
+			flag
+		))
+	elseif data.kind == productTypeEnum.Experience then
+		callback(initiatePurchase(
+			data.universeId,
+			productTypeEnum.Experience,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			{ name = data.experienceName, imageUrl = data.experienceIconUrl },
+			flag
+		))
+	elseif data.kind == productTypeEnum.Look then
+		local id = data.id
+		local look = productTypeEnum.Look
+		local v
 
-		return
-	end
+		if FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell then
+			v = {
+				excludedAssetIds = data.excludedAssetIds,
+				excludedBundleIds = data.excludedBundleIds,
+				timedOptions = data.timedOptions
+			}
+		else
+			v = { expectedPrice = data.expectedPrice }
+		end
 
-	if p2.kind == ProductTypeEnum.Gamepass then
-		p1(initiatePurchase(p2.id, Enum.InfoType.GamePass, nil, nil, nil, nil, nil, nil, nil, nil, nil, b1))
-
-		return
-	end
-
-	if p2.kind == ProductTypeEnum.Product then
-		p1(initiatePurchase(p2.id, Enum.InfoType.Product, p2.equipIfPurchased, nil, nil, nil, nil, nil, nil, nil, nil, b1))
-
-		return
-	end
-
-	if p2.kind == ProductTypeEnum.Bundle then
-		p1(initiateBundlePurchase(p2.id, p2.idempotencyKey, nil, p2.collectibleItemId, p2.collectibleItemInstanceId, p2.collectibleProductId, p2.expectedPrice, b1))
-
-		return
-	end
-
-	if p2.kind == ProductTypeEnum.Experience then
-		p1(initiatePurchase(p2.universeId, ProductTypeEnum.Experience, nil, nil, nil, nil, nil, nil, nil, nil, {
-			name = p2.experienceName,
-			imageUrl = p2.experienceIconUrl
-		}, b1))
-
-		return
-	end
-
-	if p2.kind == ProductTypeEnum.Look then
-		p1(initiatePurchase(p2.id, ProductTypeEnum.Look, nil, nil, nil, nil, nil, nil, nil, nil, if not FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell then {
-			expectedPrice = p2.expectedPrice
-		} else {
-			excludedAssetIds = p2.excludedAssetIds,
-			excludedBundleIds = p2.excludedBundleIds,
-			timedOptions = p2.timedOptions
-		}, b1))
-
-		return
-	end
-
-	if FFlagAXMISWithBlackbird and p2.kind == ProductTypeEnum.RobuxUpsell then
-		p1(initiatePurchase(p2.id, ProductTypeEnum.RobuxUpsell, nil, nil, nil, nil, nil, nil, nil, nil, nil, false))
-
-		return
-	end
-
-	if p2.kind == ProductTypeEnum.DeveloperSubscription then
-		p1(initiatePurchase(p2.subscriptionId, ProductTypeEnum.DeveloperSubscription, nil, nil, nil, nil, nil, nil, nil, p2.expectedPrice, {
-			expectedPrice = p2.expectedPrice,
-			name = p2.name,
-			iconImageAssetId = p2.iconImageAssetId,
-			displayPrice = p2.displayPrice
-		}, b1))
+		callback(initiatePurchase(id, look, nil, nil, nil, nil, nil, nil, nil, nil, v, flag))
+	elseif FFlagAXMISWithBlackbird and data.kind == productTypeEnum.RobuxUpsell then
+		callback(initiatePurchase(
+			data.id,
+			productTypeEnum.RobuxUpsell,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			false
+		))
+	elseif data.kind == productTypeEnum.DeveloperSubscription then
+		callback(initiatePurchase(
+			data.subscriptionId,
+			productTypeEnum.DeveloperSubscription,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			data.expectedPrice,
+			{
+				expectedPrice = data.expectedPrice,
+				name = data.name,
+				iconImageAssetId = data.iconImageAssetId,
+				displayPrice = data.displayPrice
+			},
+			flag
+		))
+	elseif FFlagLuaAppsEnablePromptVIPServerPurchase and data.kind == productTypeEnum.VIPServer then
+		callback(initiatePurchase(
+			data.universeId,
+			productTypeEnum.VIPServer,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			flag
+		))
 	end
 end
 

@@ -1,11 +1,19 @@
-local scriptParent = script.Parent
-local v2 = `rbxassetid://{ require(scriptParent.BuilderIconsFallback) }`
+local parent = script.Parent
+local BuilderIconsFallback = require(parent.BuilderIconsFallback)
+
+local formatted = `rbxassetid://{BuilderIconsFallback}`
 
 return {
-	Regular = Font.new("rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json", Enum.FontWeight.Regular),
-	Filled = Font.new("rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json", Enum.FontWeight.Bold),
+	Regular = Font.new(
+		"rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json",
+		Enum.FontWeight.Regular
+	),
+	Filled = Font.new(
+		"rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json",
+		Enum.FontWeight.Bold
+	),
 	Fallback = {
-		Regular = Font.new(v2, Enum.FontWeight.Regular),
-		Filled = Font.new(v2, Enum.FontWeight.Bold)
+		Regular = Font.new(formatted, Enum.FontWeight.Regular),
+		Filled = Font.new(formatted, Enum.FontWeight.Bold)
 	}
 }

@@ -1,11 +1,7 @@
 local GameModel = require(script.GameModel)
-local CreatorModel = require(script.CreatorModel)
-local ProductModel = require(script.ProductModel)
-local GameMediaModel = require(script.GameMediaModel)
-
 return {
-	CreatorModel = CreatorModel,
+	CreatorModel = require(script.CreatorModel),
 	GameModel = GameModel,
-	ProductModel = ProductModel,
-	GameMediaModel = GameMediaModel
+	ProductModel = require(script.ProductModel),
+	GameMediaModel = require(script.GameMediaModel)
 }

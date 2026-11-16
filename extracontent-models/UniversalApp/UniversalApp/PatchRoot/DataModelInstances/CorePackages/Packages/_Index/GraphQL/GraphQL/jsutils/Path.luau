@@ -1,23 +1,21 @@
-local ParentParent = script.Parent.Parent.Parent
-local Array = require(ParentParent.LuauPolyfill).Array
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Path = {}
 
-return {
-	addPath = function(t1: {[any]: any}?, p1, s1: string?) -- line: 21
-		return {
-			prev = t1,
-			key = p1,
-			typename = s1
-		}
-	end,
-	pathToArray = function(t2: {[any]: any}?) -- line: 29
-		-- upvalues: Array (copy)
-		local t3 = {}
+function Path.addPath(prev, p, typename: string?)
+	return { prev = prev, key = p, typename = typename }
+end
 
-		while t2 do
-			table.insert(t3, t2.key)
-			t2 = t2.prev
-		end
+function Path.pathToArray(p)
+	local v = {}
 
-		return Array.reverse(t3)
+	while p do
+		table.insert(v, p.key)
+		p = p.prev
 	end
-}
+
+	return Array.reverse(v)
+end
+
+return Path

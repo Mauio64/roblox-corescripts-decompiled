@@ -1,9 +1,11 @@
 return {
+	MarqueePlayStatus = { Playing = "Playing", Paused = "Paused", Idle = "Idle" },
 	Tile = {
 		Friend = "Friend",
 		AddFriends = "AddFriends",
 		FriendsHint = "FriendsHint",
 		Recommendation = "Recommendation",
+		FriendRequest = "FriendRequest",
 		StartSquad = "StartSquad",
 		ShareQR = "ShareQR",
 		Skeleton = "Skeleton"
@@ -12,6 +14,7 @@ return {
 		FriendsList = "FriendsList",
 		AddFriends = "AddFriends",
 		FriendsListWithRecommendations = "FriendsListWithRecommendations",
+		FriendRequests = "FriendRequests",
 		StartSquad = "StartSquad"
 	},
 	OldPresence = {

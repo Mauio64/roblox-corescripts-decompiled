@@ -1,1 +1,5 @@
-return require(script.Parent.setupCreateOrGetProfileShareUrl).setupRequest((require(script.Parent.configuredRoduxNetworking)))
+local setupCreateOrGetProfileShareUrl = require(script.Parent.setupCreateOrGetProfileShareUrl)
+local setupRequest = setupCreateOrGetProfileShareUrl.setupRequest
+local configuredRoduxNetworking = require(script.Parent.configuredRoduxNetworking)
+
+return setupRequest(configuredRoduxNetworking)

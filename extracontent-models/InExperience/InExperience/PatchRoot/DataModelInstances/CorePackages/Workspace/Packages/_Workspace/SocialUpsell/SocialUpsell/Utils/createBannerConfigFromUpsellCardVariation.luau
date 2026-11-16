@@ -1,73 +1,93 @@
 local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
-local SocialUpsellParent = SocialUpsell.Parent
-local getDeepValue = require(SocialUpsellParent.SocialCommon).Utils.getDeepValue
+local parent = SocialUpsell.Parent
+
+local SocialCommon = require(parent.SocialCommon)
+
+local getDeepValue = SocialCommon.Utils.getDeepValue
 local createCommonSocialUpsellBannerConfig = require(script.Parent.createCommonSocialUpsellBannerConfig)
 
 require(SocialUpsell.Types)
-
 local Constants = require(SocialUpsell.Constants)
 local SocialUpsellType = require(SocialUpsell.Enum.SocialUpsellType)
-local SharedFlags = require(SocialUpsellParent.SharedFlags)
+local SharedFlags = require(parent.SharedFlags)
 local FFlagAgeBasedUXHomepageVerificationBannerLockIcon = SharedFlags.FFlagAgeBasedUXHomepageVerificationBannerLockIcon
+
 local FFlagAgeBasedUXHomepageVerificationBannerGreyButton = SharedFlags.FFlagAgeBasedUXHomepageVerificationBannerGreyButton
-local t1 = {
-	OpenFaeUpsell = Constants.UPSELL_BUTTON_ACTION.Primary,
+
+local v = {
+	["OpenFaeUpsell"] = Constants.UPSELL_BUTTON_ACTION.Primary,
 	OpenFaeViewDetails = Constants.UPSELL_BUTTON_ACTION.Secondary,
 	Dismiss = Constants.UPSELL_BUTTON_ACTION.Dismiss
 }
-local t2 = {
-	Fae = SocialUpsellType.FacialAgeEstimation
-}
 
-local function getButtonAction(t3: {[any]: any}) -- line: 69
-	-- upvalues: t1 (copy)
-	if t3.action and t3.action.type then
-		return t1[t3.action.type]
+local v2 = { Fae = SocialUpsellType.FacialAgeEstimation }
+
+local function getButtonAction(button) -- 1 equivalent call inferred from this helper
+	if button.action and button.action.type then
+		return v[button.action.type]
 	end
 
 	return nil
 end
 
-return function(t4: {[any]: any}, t5: {[any]: any}?) -- line: 76
-	-- upvalues: t2 (copy), SocialUpsellType (copy), Constants (copy), t1 (copy), FFlagAgeBasedUXHomepageVerificationBannerGreyButton (copy), createCommonSocialUpsellBannerConfig (copy), getDeepValue (copy), FFlagAgeBasedUXHomepageVerificationBannerLockIcon (copy)
-	local v16 = t2[t4.upsellCardType] or SocialUpsellType.Unknown
-	local upsellCardV2Config = t4.upsellCardV2Config
-	local t6 = {}
-	local t7 = {}
+return function(p, p2)
+	local v3 = v2[p.upsellCardType] or SocialUpsellType.Unknown
+	local upsellCardV2Config = p.upsellCardV2Config
+
+	local labelItems = {}
+	local buttons = {}
 
 	if upsellCardV2Config.label_items then
-		for _, v21 in upsellCardV2Config.label_items do
-			if v21.type == "Countdown" and v21.metadata and v21.metadata.countdown_text then
-				table.insert(t6, {
+		for _, label_item in upsellCardV2Config.label_items do
+			if label_item.type == "Countdown" and label_item.metadata and label_item.metadata.countdown_text then
+				table.insert(labelItems, {
 					type = Constants.UPSELL_LABEL_ITEM_TYPE_COUNTDOWN,
-					text = v21.metadata.countdown_text
+					text = label_item.metadata.countdown_text
 				})
 			end
 		end
 	end
 
 	if upsellCardV2Config.buttons then
-		for _, v23 in upsellCardV2Config.buttons do
-			local v24 = if not v23.action or not v23.action.type then nil else t1[v23.action.type]
+		for _, button in upsellCardV2Config.buttons do
+			local buttonAction = getButtonAction(button) -- inferred equivalent call
 
-			if v24 then
-				table.insert(t7, {
-					text = v23.text,
-					action = v24,
-					variantOverride = if not FFlagAgeBasedUXHomepageVerificationBannerGreyButton or (not t5 or v24 ~= Constants.UPSELL_BUTTON_ACTION.Primary) then nil else t5.primaryButtonVariantOverride
-				})
+			if not buttonAction then
+				continue
 			end
+
+			local v4 = { text = button.text, action = buttonAction, variantOverride = 0 }
+			local variantOverride
+
+			if
+				FFlagAgeBasedUXHomepageVerificationBannerGreyButton
+				and p2
+				and buttonAction == Constants.UPSELL_BUTTON_ACTION.Primary
+			then
+				variantOverride = p2.primaryButtonVariantOverride
+			end
+
+			v4.variantOverride = variantOverride
+			table.insert(buttons, v4)
 		end
 	end
 
-	return createCommonSocialUpsellBannerConfig({
-		type = v16,
+	local v4 = {
+		type = v3,
 		title = getDeepValue(upsellCardV2Config, "header.text"),
 		body = getDeepValue(upsellCardV2Config, "body.text"),
 		image = getDeepValue(upsellCardV2Config, "image"),
 		isDismissable = getDeepValue(upsellCardV2Config, "dismissable"),
-		labelItems = t6,
-		buttons = t7,
-		icon = if not FFlagAgeBasedUXHomepageVerificationBannerLockIcon or not t5 then nil else t5.iconOverride
-	})
+		labelItems = labelItems,
+		buttons = buttons,
+		icon = 0
+	}
+	local icon
+
+	if FFlagAgeBasedUXHomepageVerificationBannerLockIcon and p2 then
+		icon = p2.iconOverride
+	end
+
+	v4.icon = icon
+	return createCommonSocialUpsellBannerConfig(v4)
 end

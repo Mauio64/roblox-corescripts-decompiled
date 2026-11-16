@@ -1,61 +1,72 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
+
+local GetArgumentsWithDirectives = {}
 
 require(script.Parent.types)
 
-local GraphQL = require(ParentParent.GraphQL)
+local GraphQL = require(parent.GraphQL)
+
 local Kind = GraphQL.Kind
+
 local valueFromASTUntyped = GraphQL.valueFromASTUntyped
 
-local function isTypeWithFields(p1) -- line: 31
-	-- upvalues: Kind (copy)
-	return p1.kind == Kind.OBJECT_TYPE_DEFINITION or p1.kind == Kind.OBJECT_TYPE_EXTENSION
+local function isTypeWithFields(p): boolean
+	return p.kind == Kind.OBJECT_TYPE_DEFINITION or p.kind == Kind.OBJECT_TYPE_EXTENSION
 end
 
-function t1.getArgumentsWithDirectives(p2) -- line: 38
-	-- upvalues: Array (copy), isTypeWithFields (copy), Boolean (copy), Object (copy), valueFromASTUntyped (copy)
-	local t2 = {}
+function GetArgumentsWithDirectives.getArgumentsWithDirectives(p)
+	local filtered = Array.filter(p.definitions, isTypeWithFields)
+	local arguments = {}
 
-	for _, v15 in (Array.filter(p2.definitions, isTypeWithFields)) do
-		if v15.fields ~= nil then
-			for _, v17 in v15.fields do
-				local v18 = if typeof(v17.arguments) ~= "table" then nil else v17.arguments
-				local v19 = if v18 == nil then nil else Array.filter(v18, function(p3) -- line: 62
-					-- upvalues: Boolean (copy)
-					return Boolean.toJSBoolean(if typeof(p3.directives) ~= "table" then nil else #p3.directives)
+	for _, v in filtered do
+		if v.fields == nil then
+			continue
+		end
+
+		for _, field in v.fields do
+			local arguments2
+
+			if typeof(field.arguments) == "table" then
+				arguments2 = field.arguments
+			end
+
+			local filtered2
+
+			if arguments2 ~= nil then
+				filtered2 = Array.filter(arguments2, function(p2)
+					return Boolean.toJSBoolean(typeof(p2.directives) == "table" and #p2.directives or nil)
+				end)
+			end
+
+			if not Boolean.toJSBoolean(typeof(filtered2) == "table" and #filtered2 or nil) then
+				continue
+			end
+
+			arguments[tostring(("%s.%s"):format(tostring(v.name.value), (tostring(field.name.value))))] = {}
+
+			local argument = arguments[tostring(("%s.%s"):format(tostring(v.name.value), (tostring(field.name.value))))]
+
+			for _, v2 in filtered2 do
+				local mapped = Array.map(v2.directives, function(p2)
+					return {
+						name = p2.name.value,
+						args = Array.reduce(Boolean.toJSBoolean(p2.arguments) and p2.arguments or {}, function(p3, p4)
+							return Object.assign({}, p3, {
+								[p4.name.value] = valueFromASTUntyped(p4.value, {})
+							})
+						end, {})
+					}
 				end)
 
-				if Boolean.toJSBoolean(if typeof(v19) ~= "table" then nil else #v19) then
-					t2[tostring(("%s.%s"):format(tostring(v15.name.value), (tostring(v17.name.value))))] = {}
-
-					local v20 = t2[tostring(("%s.%s"):format(tostring(v15.name.value), (tostring(v17.name.value))))]
-
-					for _, v22 in v19 do
-						local v23 = Array.map(v22.directives, function(p4) -- line: 84
-							-- upvalues: Array (copy), Boolean (copy), Object (copy), valueFromASTUntyped (copy)
-							return {
-								name = p4.name.value,
-								args = Array.reduce(Boolean.toJSBoolean(p4.arguments) and p4.arguments or {}, function(p5, p6) -- line: 91
-									-- upvalues: Object (copy), valueFromASTUntyped (copy)
-									return Object.assign({}, p5, {
-										[p6.name.value] = valueFromASTUntyped(p6.value, {})
-									})
-								end, {})
-							}
-						end)
-
-						v20[tostring(v22.name.value)] = v23
-					end
-				end
+				argument[tostring(v2.name.value)] = mapped
 			end
 		end
 	end
 
-	return t2
+	return arguments
 end
-
-return t1
+return GetArgumentsWithDirectives

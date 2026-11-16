@@ -1,17 +1,21 @@
 local Squads = script:FindFirstAncestor("Squads")
-local SquadsParent = Squads.Parent
-local React = require(Squads.dependencies).React
-local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
-local useAppPolicy = require(SquadsParent.UniversalAppPolicy).useAppPolicy
+local parent = Squads.Parent
+local dependencies = require(Squads.dependencies)
 
-return function(t1: {[any]: any}) -- line: 16
-	-- upvalues: React (copy), SquadExternalContractContext (copy), useAppPolicy (copy)
-	local v7 = React.useContext(SquadExternalContractContext).useParentChannelHasSquadAccess(t1.parentChannelId)
+local react = dependencies.React
 
-	if useAppPolicy(function(p1) -- line: 20
-		return p1.getCanAccessParty()
-	end) and v7 then
-		return t1.children
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+
+return function(p)
+	local v = react.useContext(SquadExternalContractContext).useParentChannelHasSquadAccess(p.parentChannelId)
+
+	if useAppPolicy(function(p2)
+		return p2.getCanAccessParty()
+	end) and v then
+		return p.children
 	end
 
 	return nil

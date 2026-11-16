@@ -1,1 +1,3 @@
-return (require(script.StatusIndicator))
+local StatusIndicator = require(script.StatusIndicator)
+
+return StatusIndicator

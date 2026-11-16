@@ -1,9 +1,9 @@
-return function(p1, p2) -- line: 1
-	local LocalUserId = p1.LocalUserId
+return function(p, list)
+	local localUserId = p.LocalUserId
 
-	for _, v in ipairs(p2) do
-		if v ~= LocalUserId then
-			return v
+	for _, item in ipairs(list) do
+		if item ~= localUserId then
+			return item
 		end
 	end
 end

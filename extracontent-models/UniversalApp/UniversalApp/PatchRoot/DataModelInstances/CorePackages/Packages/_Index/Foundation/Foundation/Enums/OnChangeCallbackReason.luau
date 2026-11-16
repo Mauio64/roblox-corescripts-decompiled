@@ -1,6 +1,1 @@
-return {
-	Drag = "Drag",
-	Activate = "Activate",
-	Keyboard = "Keyboard",
-	FocusLost = "FocusLost"
-}
+return { Drag = "Drag", Activate = "Activate", Keyboard = "Keyboard", FocusLost = "FocusLost" }

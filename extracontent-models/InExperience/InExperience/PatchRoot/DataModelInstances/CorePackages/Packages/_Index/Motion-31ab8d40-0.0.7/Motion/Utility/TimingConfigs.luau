@@ -1,58 +1,36 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.Types)
+local TransitionPreset = require(parent.Enums.TransitionPreset)
+local TimingConfigs = {}
 
-require(ParentParent.Types)
-
-local TransitionPreset = require(ParentParent.Enums.TransitionPreset)
-local t1 = {
-	presets = {
-		[TransitionPreset.Default] = {
-			duration = 0.3,
-			delay = 0,
-			easingStyle = {
-				0.2,
-				0,
-				0,
-				1
-			}
-		},
-		[TransitionPreset.Quick] = {
-			duration = 0.05,
-			delay = 0,
-			easingStyle = {
-				0.2,
-				0,
-				0,
-				1
-			}
-		},
-		[TransitionPreset.Slow] = {
-			duration = 1,
-			delay = 0,
-			easingStyle = {
-				0.2,
-				0,
-				0,
-				1
-			}
-		}
+TimingConfigs.presets = {
+	[TransitionPreset.Default] = {
+		duration = 0.3,
+		easingStyle = { 0.2, 0, 0, 1 },
+		delay = 0
+	},
+	[TransitionPreset.Quick] = {
+		duration = 0.05,
+		easingStyle = { 0.2, 0, 0, 1 },
+		delay = 0
+	},
+	[TransitionPreset.Slow] = {
+		duration = 1,
+		easingStyle = { 0.2, 0, 0, 1 },
+		delay = 0
 	}
 }
 
-function t1.getDefaultTransition() -- line: 28
-	-- upvalues: t1 (copy), TransitionPreset (copy)
-	local v4 = t1.presets[TransitionPreset.Default]
+function TimingConfigs.getDefaultTransition()
+	local preset = TimingConfigs.presets[TransitionPreset.Default]
 
-	return {
-		duration = v4.duration,
-		easingStyle = v4.easingStyle,
-		delay = v4.delay
-	}
+	return { duration = preset.duration, easingStyle = preset.easingStyle, delay = preset.delay }
 end
-function t1.createDefaultTransitionState() -- line: 39
-	-- upvalues: t1 (copy)
+
+function TimingConfigs.createDefaultTransitionState()
 	return {
-		default = t1.getDefaultTransition()
+		default = TimingConfigs.getDefaultTransition()
 	}
 end
 
-return t1
+return TimingConfigs

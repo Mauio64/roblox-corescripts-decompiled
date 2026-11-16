@@ -1,12 +1,13 @@
 local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
-local useCrossExperienceVoice = require(CrossExperienceVoice.Hooks.useCrossExperienceVoice)
-local FFlagEnableCEVForceInitialize = require(CrossExperienceVoice.Flags).FFlagEnableCEVForceInitialize
 
-local function CrossExperienceVoiceComponent() -- line: 6
-	-- upvalues: useCrossExperienceVoice (copy), FFlagEnableCEVForceInitialize (copy)
+local useCrossExperienceVoice = require(CrossExperienceVoice.Hooks.useCrossExperienceVoice)
+local Flags = require(CrossExperienceVoice.Flags)
+local FFlagEnableCEVForceInitialize = Flags.FFlagEnableCEVForceInitialize
+
+local function CrossExperienceVoiceComponent(): nil
 	useCrossExperienceVoice({
 		handleRCCConnectionTimeout = nil,
-		forceInitializeStoreOnMount = not not FFlagEnableCEVForceInitialize or nil
+		forceInitializeStoreOnMount = FFlagEnableCEVForceInitialize and true or nil
 	})
 
 	return nil

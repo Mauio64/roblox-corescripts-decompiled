@@ -1,73 +1,56 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local CurveAnimBoneHierarchyUtils = require(parent.util.CurveAnimBoneHierarchyUtils)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local CurveAnimBoneHierarchyUtils = require(ParentParent.util.CurveAnimBoneHierarchyUtils)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local getFFlagUGCValidateEmotesBonesAllowed = require(ParentParent.flags.getFFlagUGCValidateEmotesBonesAllowed)
-local getFFlagUGCValidateCurveAnimRigDataR15Plus = require(ParentParent.flags.getFFlagUGCValidateCurveAnimRigDataR15Plus)
-local getEngineFeatureIsValidR15Plus = require(ParentParent.flags.getEngineFeatureIsValidR15Plus)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
-}
+local getEngineFeatureIsValidR15Plus = require(parent.flags.getEngineFeatureIsValidR15Plus)
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+return {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = { ValidationEnums.SharedDataMember.curveAnimations },
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
+	run = function(object, p)
+		for _, curveAnimation in p.curveAnimations do
+			local count = 0
 
-t1.requiredData = { ValidationEnums.SharedDataMember.curveAnimations }
-t1.fflag = getFFlagUGCValidateMigrateCurveAnim
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
+			for _, animationRigData in curveAnimation:GetChildren() do
+				if not animationRigData:IsA("AnimationRigData") then
+					continue
+				end
 
-function t1.run(p1, p2) -- line: 27
-	-- upvalues: ErrorSourceStrings (copy), getFFlagUGCValidateEmotesBonesAllowed (copy), CurveAnimBoneHierarchyUtils (copy), getFFlagUGCValidateCurveAnimRigDataR15Plus (copy), getEngineFeatureIsValidR15Plus (copy)
-	for _, v14 in p2.curveAnimations do
-		local n1 = 0
+				count += 1
 
-		for _, child in v14:GetChildren() do
-			if not child:IsA("AnimationRigData") then
-				continue
+				if count > 1 then
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_MultipleRigData)
+					return
+				end
 			end
 
-			n1 += 1
-
-			if n1 > 1 then
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_MultipleRigData)
-
-				return
+			if count == 0 then
+				object:fail(ErrorSourceStrings.Keys.CurveAnim_NoRigData)
+				break
 			end
-		end
 
-		if n1 == 0 then
-			p1:fail(ErrorSourceStrings.Keys.CurveAnim_NoRigData)
-
-			return
-		end
-
-		if getFFlagUGCValidateEmotesBonesAllowed() and CurveAnimBoneHierarchyUtils.hasBoneFolders(v14) then
-			if getFFlagUGCValidateCurveAnimRigDataR15Plus() and getEngineFeatureIsValidR15Plus() then
-				for _, child in v14:GetChildren() do
-					if child:IsA("AnimationRigData") and not child:IsValidR15Plus() then
-						p1:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidRigDataR15Plus)
-
+			if CurveAnimBoneHierarchyUtils.hasBoneFolders(curveAnimation) then
+				if getEngineFeatureIsValidR15Plus() then
+					for _, animationRigData in curveAnimation:GetChildren() do
+						if animationRigData:IsA("AnimationRigData") and not animationRigData:IsValidR15Plus() then
+							object:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidRigDataR15Plus)
+							return
+						end
+					end
+				end
+			else
+				for _, animationRigData in curveAnimation:GetChildren() do
+					if animationRigData:IsA("AnimationRigData") and not animationRigData:IsValidR15() then
+						object:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidRigData)
 						return
 					end
 				end
 			end
-		else
-			for _, child in v14:GetChildren() do
-				if child:IsA("AnimationRigData") and not child:IsValidR15() then
-					p1:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidRigData)
-
-					return
-				end
-			end
 		end
 	end
-end
-
-return t1
+}

@@ -1,97 +1,112 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
+
 local TransferDirection = require(CurrencyTransfers.Enums.TransferDirection)
 local PromptState = require(CurrencyTransfers.Enums.PromptState)
 
-local function applyRobuxTransferFlowIngestStubs(t1: {[any]: any}, t2: {[any]: any}?) -- line: 15
-	-- upvalues: TransferDirection (copy), PromptState (copy)
-	local v7 = if not t2 or t2.direction == nil then TransferDirection.Send else t2.direction
+local function applyRobuxTransferFlowIngestStubs(p, p2)
+	local v
 
-	local function stubIfNil(s1: string, p1: ((...any) -> ...any)) -- line: 18
-		-- upvalues: t1 (copy)
-		if t1[s1] == nil then
-			t1[s1] = p1
+	if p2 and p2.direction ~= nil then
+		v = p2.direction
+	else
+		v = TransferDirection.Send
+	end
+
+	local function stubIfNil(p3: string, fn) -- 15 equivalent calls inferred from this helper
+		if p[p3] == nil then
+			p[p3] = fn
 		end
 	end
 
-	if t1.getDirection == nil then
-		function t1.getDirection() -- line: 24
-			-- upvalues: v7 (copy)
-			return v7
-		end
+	local function fn()
+		return v
 	end
 
-	if t1.getRecipient == nil then
-		function t1.getRecipient() -- line: 27
-			return nil
-		end
+	stubIfNil("getDirection", fn) -- inferred equivalent call
+
+	local function fn2(): nil
+		return nil
 	end
 
-	if t1.getRecipientUserId == nil then
-		function t1.getRecipientUserId() -- line: 30
-			return 0
-		end
+	stubIfNil("getRecipient", fn2) -- inferred equivalent call
+
+	local function fn3(): number
+		return 0
 	end
 
-	if t1.getSender == nil then
-		function t1.getSender() -- line: 33
-			return nil
-		end
+	stubIfNil("getRecipientUserId", fn3) -- inferred equivalent call
+
+	local function fn4(): nil
+		return nil
 	end
 
-	if t1.getTransferRequestId == nil then
-		function t1.getTransferRequestId() -- line: 36
-			return nil
-		end
+	stubIfNil("getSender", fn4) -- inferred equivalent call
+
+	local function fn5(): nil
+		return nil
 	end
 
-	if t1.getSelectedAmount == nil then
-		function t1.getSelectedAmount() -- line: 39
-			return nil
-		end
+	stubIfNil("getTransferRequestId", fn5) -- inferred equivalent call
+
+	local function fn6(): nil
+		return nil
 	end
 
-	if t1.getRobuxTransfer == nil then
-		function t1.getRobuxTransfer() -- line: 42
-			return nil
-		end
+	stubIfNil("getSelectedAmount", fn6) -- inferred equivalent call
+
+	local function fn7(): nil
+		return nil
 	end
 
-	if t1.getTransferOrigination == nil then
-		function t1.getTransferOrigination() -- line: 45
-			return nil
-		end
+	stubIfNil("getRobuxTransfer", fn7) -- inferred equivalent call
+
+	local function fn8(): nil
+		return nil
 	end
 
-	if t1.getPromptState == nil then
-		function t1.getPromptState() -- line: 48
-			-- upvalues: PromptState (copy)
-			return PromptState.Unspecified
-		end
+	stubIfNil("getTransferOrigination", fn8) -- inferred equivalent call
+
+	local function fn9()
+		return PromptState.Unspecified
 	end
 
-	if t1.getTransferClientSessionId == nil then
-		function t1.getTransferClientSessionId() -- line: 51
-			return ""
-		end
+	stubIfNil("getPromptState", fn9) -- inferred equivalent call
+
+	local function fn10(): string
+		return ""
 	end
 
-	if t1.getBalanceReceivedFromApi == nil then
-		function t1.getBalanceReceivedFromApi() -- line: 54
-			return false
-		end
+	stubIfNil("getTransferClientSessionId", fn10) -- inferred equivalent call
+
+	local function fn11(): boolean
+		return false
 	end
 
-	if t1.getRobuxBalanceAmount == nil then
-		function t1.getRobuxBalanceAmount() -- line: 57
-			return 0
-		end
+	stubIfNil("getBalanceReceivedFromApi", fn11) -- inferred equivalent call
+
+	local function fn12(): number
+		return 0
 	end
 
-	if t1.getNetworkImpl == nil then
-		function t1.getNetworkImpl() -- line: 60
-			return nil
-		end
+	stubIfNil("getRobuxBalanceAmount", fn12) -- inferred equivalent call
+
+	local function fn13(): nil
+		return nil
 	end
+
+	stubIfNil("getNetworkImpl", fn13) -- inferred equivalent call
+
+	local function fn14(): nil
+		return nil
+	end
+
+	stubIfNil("triggerOnPromptOptimisticHide", fn14) -- inferred equivalent call
+
+	local function fn15(): nil
+		return nil
+	end
+
+	stubIfNil("triggerOnPromptDismissCommitted", fn15) -- inferred equivalent call
 end
 
 return applyRobuxTransferFlowIngestStubs

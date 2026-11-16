@@ -1,56 +1,79 @@
 local HttpService = game:GetService("HttpService")
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Promise = require(DataHydrationParent.Promise)
-local Url = require(DataHydrationParent.Http).Url
-local FFlagFriendsSignalMigrationTelemetry = require(DataHydrationParent.SharedFlags).FFlagFriendsSignalMigrationTelemetry
+local parent = DataHydration.Parent
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
+local Url = Http.Url
+local SharedFlags = require(parent.SharedFlags)
+
+local FFlagFriendsSignalMigrationTelemetry = SharedFlags.FFlagFriendsSignalMigrationTelemetry
+local FFlagFriendsSkipInvalidUserIdFetches = require(DataHydration.Flags.FFlagFriendsSkipInvalidUserIdFetches)
 local Friends = DataHydration.Friends
+local isInvalidUserId = require(Friends.isInvalidUserId)
 local myHttpRequest = require(Friends.Networking.myHttpRequest)
 local FriendsRequestTelemetry = require(script.Parent.FriendsRequestTelemetry)
 
-local function collectFriendIdsFromResponse(t1: {[any]: any}?) -- line: 34
-	local t2 = {}
+local function collectFriendIdsFromResponse(responseBody)
+	local ids = {}
 
-	for _, v14 in t1 and t1.PageItems or {} do
-		if v14.id ~= nil then
-			table.insert(t2, (tostring(v14.id)))
+	for _, v in responseBody and responseBody.PageItems or {} do
+		if v.id ~= nil then
+			table.insert(ids, (tostring(v.id)))
 		end
 	end
 
-	return t2
+	return ids
 end
 
-return function(p1, t3: {[any]: any}) -- line: 44
-	-- upvalues: Promise (copy), Url (copy), HttpService (copy), FFlagFriendsSignalMigrationTelemetry (copy), FriendsRequestTelemetry (copy), myHttpRequest (copy), collectFriendIdsFromResponse (copy)
-	if p1 == nil or tostring(p1) == "" then
+return function(p, data)
+	if FFlagFriendsSkipInvalidUserIdFetches then
+		if isInvalidUserId(p) then
+			return Promise.reject(`GetFindFriendsPage called with invalid userId: {p}`)
+		end
+	elseif p == nil or tostring(p) == "" then
 		return Promise.reject("GetFindFriendsPage called with nil userId")
 	end
 
-	local limit = t3.limit
-	local v18 = string.format("%s/users/%s/friends/find?limit=%d", Url.FRIEND_URL, tostring(p1), limit)
-	local cursor = t3.cursor
+	local limit = data.limit
+	local v = string.format("%s/users/%s/friends/find?limit=%d", Url.FRIEND_URL, tostring(p), limit)
+
+	local cursor = data.cursor
 
 	if cursor and cursor ~= "" then
-		v18 = string.format("%s&cursor=%s", v18, HttpService:UrlEncode(cursor))
+		v = string.format("%s&cursor=%s", v, HttpService:UrlEncode(cursor))
 	end
 
-	local sort = t3.sort
+	local sort = data.sort
 
 	if sort ~= nil then
-		v18 = string.format("%s&userSort=%d", v18, sort)
+		v = string.format("%s&userSort=%d", v, sort)
 	end
 
-	local v21 = if not FFlagFriendsSignalMigrationTelemetry then nil else FriendsRequestTelemetry.generateRequestId()
-	local v22 = if not FFlagFriendsSignalMigrationTelemetry then nil else FriendsRequestTelemetry.getRequestOptions(v21)
+	local v2
 
-	return myHttpRequest(v18, "GET", v22):andThen(function(p2) -- line: 70
-		-- upvalues: FFlagFriendsSignalMigrationTelemetry (copy), v21 (copy), FriendsRequestTelemetry (copy), collectFriendIdsFromResponse (copy)
-		local v24 = if not p2 then nil else p2.responseBody
+	if FFlagFriendsSignalMigrationTelemetry then
+		v2 = FriendsRequestTelemetry.generateRequestId()
+	else
+		v2 = nil
+	end
 
-		if FFlagFriendsSignalMigrationTelemetry and (v21 and v24) then
-			FriendsRequestTelemetry.emitFindFriendsResponse(v21, (collectFriendIdsFromResponse(v24)))
+	local v3
+
+	if FFlagFriendsSignalMigrationTelemetry then
+		v3 = FriendsRequestTelemetry.getRequestOptions(v2)
+	end
+
+	return myHttpRequest(v, "GET", v3):andThen(function(p2)
+		local responseBody
+
+		if p2 then
+			responseBody = p2.responseBody
 		end
 
-		return v24
+		if FFlagFriendsSignalMigrationTelemetry and v2 and responseBody then
+			FriendsRequestTelemetry.emitFindFriendsResponse(v2, collectFriendIdsFromResponse(responseBody))
+		end
+
+		return responseBody
 	end)
 end

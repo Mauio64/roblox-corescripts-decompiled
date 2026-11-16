@@ -1,7 +1,21 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local UrlBase = require(Parent.UrlBuilder).UrlBase
-local v3 = game:DefineFastString("MyStatsExperienceStatsPath", "/my-stats-service/v1")
-local t1 = {
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
+require(script.Parent.Parent.Types.model)
+
+local defineFastString = game:DefineFastString("MyStatsExperienceStatsPath", "/my-stats-service/v1")
+local AcpProtocol = {}
+
+function AcpProtocol.acpUrl()
+	return UrlBase.APIS .. defineFastString
+end
+
+AcpProtocol.ACP_PATH = defineFastString
+AcpProtocol.ProtocolVersion = 2
+AcpProtocol.Methods = {
 	Initialize = "initialize",
 	SessionNew = "session/new",
 	SessionList = "session/list",
@@ -12,15 +26,16 @@ local t1 = {
 	SessionDelete = "_roblox/session/delete",
 	SessionUpdateInfo = "_roblox/session/update_info",
 	SessionReadTasks = "_roblox/session/read_tasks",
-	SessionSaveAndPublish = "_roblox/session/save_and_publish"
+	SessionSaveAndPublish = "_roblox/session/save_and_publish",
+	AdCampaignEligibility = "_roblox/ad_campaign/eligibility",
+	AdCampaignCheckFunds = "_roblox/ad_campaign/check_funds",
+	AdCampaignCreate = "_roblox/ad_campaign/create",
+	AdCampaignToolCallStatus = "_roblox/ad_campaign/tool_call_status"
 }
-local t2 = {
-	Name = "ask_tool"
-}
-local t3 = {
-	SessionUpdate = "session/update"
-}
-local t4 = {
+
+AcpProtocol.Notifications = { SessionUpdate = "session/update" }
+
+AcpProtocol.ErrorCodes = {
 	ParseError = -32700,
 	InvalidRequest = -32600,
 	MethodNotFound = -32601,
@@ -32,50 +47,87 @@ local t4 = {
 	Conflict = -32003,
 	UpstreamUnavailable = -32004,
 	Gone = -32005,
-	OutOfCredits = -32006
+	OutOfCredits = -32006,
+	PayloadTooLarge = -32007,
+	InsufficientFunds = -32008,
+	MissingThumbnail = -32009
 }
+AcpProtocol.AskTool = { Name = "ask_tool" }
+AcpProtocol.CapRtnNamespace = "AssistantPlugin"
 
-return {
-	ProtocolVersion = 2,
-	CapRtnNamespace = "AssistantPlugin",
-	acpUrl = function() -- line: 12
-		-- upvalues: UrlBase (copy), v3 (copy)
-		return UrlBase.APIS .. v3
-	end,
-	ACP_PATH = v3,
-	Methods = t1,
-	Notifications = t3,
-	ErrorCodes = t4,
-	AskTool = t2,
-	extractSessionNewProject = function(p1) -- line: 52
-		if typeof(p1) ~= "table" then
-			return nil
-		end
-
-		local v9 = p1._meta and p1._meta._roblox
-
-		if typeof(v9) == "table" and typeof(v9.universeId) == "number" and typeof(v9.placeId) == "number" then
-			return v9
-		end
-
+function AcpProtocol.extractSessionNewProject(p)
+	if typeof(p) ~= "table" then
 		return nil
-	end,
-	buildSessionNewWireParams = function(t5: {[any]: any}) -- line: 63
-		local t6 = {
-			universeId = t5.project.universeId,
-			placeId = t5.project.placeId
-		}
+	end
 
-		if t5.experiment ~= nil then
-			t6.experiment = t5.experiment
+	local roblox = p._meta and p._meta._roblox
+
+	if typeof(roblox) == "table" and typeof(roblox.universeId) == "number" and typeof(roblox.placeId) == "number" then
+		return roblox
+	end
+
+	return nil
+end
+
+function AcpProtocol.buildSessionNewWireParams(data)
+	local roblox = { universeId = data.project.universeId, placeId = data.project.placeId }
+
+	if data.experiment ~= nil then
+		roblox.experiment = data.experiment
+	end
+
+	if FFlagBuildExperienceModelPickerData and data.model ~= nil then
+		roblox.model = data.model
+	end
+
+	if data.application ~= nil then
+		roblox.application = data.application
+	end
+
+	return {
+		cwd = data.cwd,
+		mcpServers = data.mcpServers,
+		_meta = { _roblox = roblox }
+	}
+end
+
+function AcpProtocol.buildSessionPromptWireParams(data)
+	local sessionPromptWireParams = { sessionId = data.sessionId, prompt = data.prompt }
+
+	if FFlagBuildExperienceModelPickerData and (data.model ~= nil or data.experiment ~= nil) then
+		local meta = data.meta == nil and {} or table.clone(data.meta)
+		local roblox = meta._roblox == nil and {} or table.clone(meta._roblox)
+
+		if data.model ~= nil then
+			roblox.model = data.model
 		end
 
-		return {
-			cwd = t5.cwd,
-			mcpServers = t5.mcpServers,
-			_meta = {
-				_roblox = t6
-			}
-		}
+		if data.experiment ~= nil then
+			roblox.experiment = data.experiment
+		end
+
+		meta._roblox = roblox
+		sessionPromptWireParams._meta = meta
+		return sessionPromptWireParams
+	elseif data.experiment == nil then
+		if data.meta ~= nil then
+			sessionPromptWireParams._meta = data.meta
+		end
+
+		return sessionPromptWireParams
+	else
+		local roblox = {}
+
+		if data.meta ~= nil and data.meta._roblox ~= nil then
+			for k, v in data.meta._roblox do
+				roblox[k] = v
+			end
+		end
+
+		roblox.experiment = data.experiment
+		sessionPromptWireParams._meta = { _roblox = roblox }
+		return sessionPromptWireParams
 	end
-}
+end
+
+return AcpProtocol

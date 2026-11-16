@@ -1,102 +1,115 @@
-local ParentParent = script.Parent.Parent.Parent
-local jsutils = ParentParent.jsutils
-local ParentParentParent = ParentParent.Parent
-local Array = require(ParentParentParent.LuauPolyfill).Array
-local didYouMean = require(jsutils.didYouMean).didYouMean
-local suggestionList = require(jsutils.suggestionList).suggestionList
-local naturalCompare = require(jsutils.naturalCompare).naturalCompare
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local definition = require(ParentParent.type.definition)
+local parent = script.Parent.Parent.Parent
+local jsutils = parent.jsutils
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Array = LuauPolyfill.Array
+
+local didYouMean = require(jsutils.didYouMean)
+local didYouMean2 = didYouMean.didYouMean
+local suggestionList = require(jsutils.suggestionList)
+local suggestionList2 = suggestionList.suggestionList
+local naturalCompare = require(jsutils.naturalCompare)
+local naturalCompare2 = naturalCompare.naturalCompare
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local definition = require(parent.type.definition)
 local isObjectType = definition.isObjectType
 local isInterfaceType = definition.isInterfaceType
 local isAbstractType = definition.isAbstractType
-local getSuggestedFieldNames = nil
-local getSuggestedTypeNames = nil
-local t1 = {
-	FieldsOnCorrectTypeRule = function(p1) -- line: 36
-		-- upvalues: didYouMean (copy), getSuggestedTypeNames (ref), getSuggestedFieldNames (ref), GraphQLError (copy)
+
+local getSuggestedFieldNames
+local getSuggestedTypeNames
+
+local FieldsOnCorrectTypeRule = {
+	FieldsOnCorrectTypeRule = function(object)
 		return {
-			Field = function(_, p3) -- line: 38
-				-- upvalues: p1 (copy), didYouMean (copy), getSuggestedTypeNames (ref), getSuggestedFieldNames (ref), GraphQLError (copy)
-				local v34 = p1:getParentType()
+			Field = function(_, p)
+				local parentType = object:getParentType()
 
-				if v34 and not p1:getFieldDef() then
-					local v35 = p1:getSchema()
-					local value = p3.name.value
-					local v37 = didYouMean("to use an inline fragment on", getSuggestedTypeNames(v35, v34, value))
+				if parentType and not object:getFieldDef() then
+					local schema = object:getSchema()
+					local value = p.name.value
 
-					if v37 == "" then
-						v37 = didYouMean(getSuggestedFieldNames(v34, value))
+					local v = didYouMean2(
+						"to use an inline fragment on",
+						getSuggestedTypeNames(schema, parentType, value)
+					)
+
+					if v == "" then
+						v = didYouMean2(getSuggestedFieldNames(parentType, value))
 					end
 
-					p1:reportError(GraphQLError.new(("Cannot query field \"%s\" on type \"%s\"."):format(value, v34.name) .. v37, p3))
+					object:reportError(graphQLError.new(
+						("Cannot query field \"%s\" on type \"%s\"."):format(value, parentType.name) .. v,
+						p
+					))
 				end
 			end
 		}
 	end
 }
 
-function getSuggestedTypeNames(p4, p5, p6) -- line: 77
-	-- upvalues: isAbstractType (copy), Array (copy), isInterfaceType (copy), naturalCompare (copy)
-	if not isAbstractType(p5) then
+getSuggestedTypeNames = function(schema, parentType, value)
+	if not isAbstractType(parentType) then
 		return {}
 	end
 
-	local t2 = {}
-	local t3 = {}
+	local set = {}
+	local v = {}
 
-	for _, v in ipairs(p4:getPossibleTypes(p5)) do
-		if v:getFields():get(p6) then
-			t2[v] = true
-			t3[v.name] = 1
+	for _, v2 in ipairs(schema:getPossibleTypes(parentType)) do
+		if not v2:getFields():get(value) then
+			continue
+		end
 
-			for _, v2 in ipairs(v:getInterfaces()) do
-				if v2:getFields():get(p6) then
-					t2[v2] = true
-					t3[v2.name] = (t3[v2.name] or 0) + 1
-				end
+		set[v2] = true
+		v[v2.name] = 1
+
+		for _, v3 in ipairs(v2:getInterfaces()) do
+			if not v3:getFields():get(value) then
+				continue
 			end
+
+			set[v3] = true
+			v[v3.name] = (v[v3.name] or 0) + 1
 		end
 	end
 
-	local t4 = {}
+	local v2 = {}
 
-	for k, _ in pairs(t2) do
-		table.insert(t4, k)
+	for k, _ in pairs(set) do
+		table.insert(v2, k)
 	end
 
-	Array.sort(t4, function(p7, p8) -- line: 114
-		-- upvalues: t3 (copy), isInterfaceType (copy), p4 (copy), naturalCompare (copy)
-		local v40 = t3[p8.name] - t3[p7.name]
+	Array.sort(v2, function(p, p2)
+		local v3 = v[p2.name] - v[p.name]
 
-		if v40 ~= 0 then
-			return v40
+		if v3 ~= 0 then
+			return v3
 		end
 
-		if isInterfaceType(p7) and p4:isSubType(p7, p8) then
+		if isInterfaceType(p) and schema:isSubType(p, p2) then
 			return -1
 		end
 
-		if isInterfaceType(p8) and p4:isSubType(p8, p7) then
+		if isInterfaceType(p2) and schema:isSubType(p2, p) then
 			return 1
 		end
 
-		return naturalCompare(p7.name, p8.name)
+		return naturalCompare2(p.name, p2.name)
 	end)
 
-	return Array.map(t4, function(p9) -- line: 131
-		return p9.name
+	return Array.map(v2, function(p)
+		return p.name
 	end)
 end
-function getSuggestedFieldNames(p10, p11) -- line: 140
-	-- upvalues: isObjectType (copy), isInterfaceType (copy), suggestionList (copy)
-	if isObjectType(p10) or isInterfaceType(p10) then
-		local v31 = p10:getFields():keys()
 
-		return suggestionList(p11, v31)
+getSuggestedFieldNames = function(parentType, value)
+	if isObjectType(parentType) or isInterfaceType(parentType) then
+		return suggestionList2(value, (parentType:getFields():keys()))
 	end
 
 	return {}
 end
 
-return t1
+return FieldsOnCorrectTypeRule

@@ -1,1 +1,3 @@
-return (require(script.OptionSelectorGroupItem))
+local OptionSelectorGroupItem = require(script.OptionSelectorGroupItem)
+
+return OptionSelectorGroupItem

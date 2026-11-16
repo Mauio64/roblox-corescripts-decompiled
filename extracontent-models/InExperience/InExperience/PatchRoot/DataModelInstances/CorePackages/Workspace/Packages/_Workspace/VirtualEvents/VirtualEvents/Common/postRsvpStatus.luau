@@ -1,20 +1,17 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local HttpService = game:GetService("HttpService")
-local VirtualEventsParent = VirtualEvents.Parent
-local UrlBuilder = require(VirtualEventsParent.UrlBuilder).UrlBuilder
 
-return function(p1, p2, p3) -- line: 8
-	-- upvalues: UrlBuilder (copy), HttpService (copy)
-	local v8 = UrlBuilder.fromString("apis:virtual-events/v1/virtual-events/{id}/rsvps")
-	local json = HttpService:JSONEncode({
-		rsvpStatus = p3
-	})
+local parent = VirtualEvents.Parent
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 
-	return p1(v8({
-		id = p2
-	}), "POST", {
-		postBody = json
-	}):andThen(function(p4) -- line: 17
-		return p4.responseBody
+return function(callback, id, rsvpStatus)
+	local v = urlBuilder.fromString("apis:virtual-events/v1/virtual-events/{id}/rsvps")
+
+	local jsonEncode = HttpService:JSONEncode({ rsvpStatus = rsvpStatus })
+
+	return callback(v({ id = id }), "POST", { postBody = jsonEncode }):andThen(function(p)
+		return p.responseBody
 	end)
 end

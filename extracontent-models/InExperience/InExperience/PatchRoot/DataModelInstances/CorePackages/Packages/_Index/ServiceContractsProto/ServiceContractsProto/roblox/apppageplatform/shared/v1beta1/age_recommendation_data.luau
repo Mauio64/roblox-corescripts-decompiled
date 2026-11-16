@@ -1,352 +1,361 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 82
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		name = if t3 ~= nil and t3.name ~= nil then t3.name else "",
-		display_name = if t3 ~= nil and t3.display_name ~= nil then t3.display_name else "",
-		contains = t3 ~= nil and (t3.contains ~= nil and t3.contains)
-	}, t2))
+require(script.Parent.custom_options)
+
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local v2 = {
+		name = (data == nil or data.name == nil) and "" or data.name,
+		display_name = (data == nil or data.display_name == nil) and "" or data.display_name,
+		contains = data ~= nil and data.contains ~= nil and data.contains
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 92
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.name ~= nil and p1.name ~= "" then
-		local v10, v11 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v10, v11, p1.name)
+	if self.name ~= nil and self.name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.name)
 	end
 
-	if p1.display_name ~= nil and p1.display_name ~= "" then
-		local v12, v13 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v12, v13, p1.display_name)
+	if self.display_name ~= nil and self.display_name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.display_name)
 	end
 
-	if p1.contains then
-		local v14, v15 = proto.writeTag(buf, n1, 3, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v14, v15, not p1.contains and 0 or 1)
+	if self.contains then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.contains and 1 or 0)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 116
-	-- upvalues: t2 (copy), proto (copy)
-	local v18 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v20, v21
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v20, v21, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v21 == proto.wireTypes.varint then
-			if v20 == 3 then
-				local v22
-
-				v22, n2 = proto.readVarInt(p2, n2)
-				v18.contains = v22 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 3 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.contains = v5 ~= 0
 			else
-				local v23
-
-				v23, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v21 == proto.wireTypes.lengthDelimited then
-			if v20 == 1 then
-				local v24
-
-				v24, n2 = proto.readBuffer(p2, n2)
-				v18.name = buffer.tostring(v24)
-			elseif v20 == 2 then
-				local v25
-
-				v25, n2 = proto.readBuffer(p2, n2)
-				v18.display_name = buffer.tostring(v25)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.name = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_name = buffer.tostring(v5)
 			else
-				local v26, v27 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v27 + v26
+				v2 = v5 + varInt
 			end
-		elseif v21 == proto.wireTypes.i32 then
-			local v28
-
-			v28, n2 = proto.readFixed32(p2, n2)
-		elseif v21 == proto.wireTypes.i64 then
-			local v29
-
-			v29, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v21)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v18
-end
-function t2.jsonEncode(p3) -- line: 169
-	local t4 = {}
-
-	if p3.name ~= nil and p3.name ~= "" then
-		t4.name = p3.name
-	end
-
-	if p3.display_name ~= nil and p3.display_name ~= "" then
-		t4.displayName = p3.display_name
-	end
-
-	if p3.contains then
-		t4.contains = p3.contains
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 187
-	-- upvalues: t2 (copy)
-	local v33 = t2.new()
-
-	if t5.name ~= nil then
-		v33.name = t5.name
-	end
-
-	if t5.display_name ~= nil then
-		v33.display_name = t5.display_name
-	end
-
-	if t5.displayName ~= nil then
-		v33.display_name = t5.displayName
-	end
-
-	if t5.contains ~= nil then
-		v33.contains = t5.contains
-	end
-
-	return v33
+	return result
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.name ~= nil and self.name ~= "" then
+		v2.name = self.name
+	end
+
+	if self.display_name ~= nil and self.display_name ~= "" then
+		v2.displayName = self.display_name
+	end
+
+	if self.contains then
+		v2.contains = self.contains
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.name ~= nil then
+		v2.name = data.name
+	end
+
+	if data.display_name ~= nil then
+		v2.display_name = data.display_name
+	end
+
+	if data.displayName ~= nil then
+		v2.display_name = data.displayName
+	end
+
+	if data.contains ~= nil then
+		v2.contains = data.contains
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "AgeRecommendationDescriptor",
 	fullName = "roblox.apppageplatform.shared.v1beta1.AgeRecommendationDescriptor"
 }
-t1.AgeRecommendationDescriptor = t2
-typeRegistry.default:register(t1.AgeRecommendationDescriptor)
 
-local t6 = {}
+v.AgeRecommendationDescriptor = class
 
-t6.__index = t6
+typeRegistry.default:register(v.AgeRecommendationDescriptor)
 
-function t6.new(t7: {[any]: any}?) -- line: 223
-	-- upvalues: t6 (copy)
-	return (setmetatable({
-		display_name = if t7 ~= nil and t7.display_name ~= nil then t7.display_name else "",
-		display_name_with_header_short = if t7 ~= nil and t7.display_name_with_header_short ~= nil then t7.display_name_with_header_short else "",
-		igrs_rating = if t7 ~= nil and t7.igrs_rating ~= nil then t7.igrs_rating else "",
-		igrs_rating_display_message = if t7 ~= nil and t7.igrs_rating_display_message ~= nil then t7.igrs_rating_display_message else "",
-		descriptors = if t7 ~= nil and t7.descriptors ~= nil then t7.descriptors else {}
-	}, t6))
+local class2 = {}
+class2.__index = class2
+
+function class2.new(data)
+	local v2 = {
+		display_name = (data == nil or data.display_name == nil) and "" or data.display_name,
+		display_name_with_header_short = (data == nil or data.display_name_with_header_short == nil) and "" or data.display_name_with_header_short,
+		igrs_rating = (data == nil or data.igrs_rating == nil) and "" or data.igrs_rating,
+		igrs_rating_display_message = (data == nil or data.igrs_rating_display_message == nil) and "" or data.igrs_rating_display_message,
+		descriptors = (data == nil or data.descriptors == nil) and {} or data.descriptors,
+		minimum_age_display = 0
+	}
+	local minimum_age_display
+
+	if not (data == nil or data.minimum_age_display == nil) then
+		minimum_age_display = data.minimum_age_display
+	end
+
+	v2.minimum_age_display = minimum_age_display
+	return (setmetatable(v2, class2))
 end
-function t6.encode(p4) -- line: 237
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n3 = 0
 
-	if p4.display_name ~= nil and p4.display_name ~= "" then
-		local v38, v39 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n3 = proto.writeString(v38, v39, p4.display_name)
+	if self.display_name ~= nil and self.display_name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.display_name)
 	end
 
-	if p4.display_name_with_header_short ~= nil and p4.display_name_with_header_short ~= "" then
-		local v40, v41 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v40, v41, p4.display_name_with_header_short)
+	if self.display_name_with_header_short ~= nil and self.display_name_with_header_short ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.display_name_with_header_short)
 	end
 
-	if p4.igrs_rating ~= nil and p4.igrs_rating ~= "" then
-		local v42, v43 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v42, v43, p4.igrs_rating)
+	if self.igrs_rating ~= nil and self.igrs_rating ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.igrs_rating)
 	end
 
-	if p4.igrs_rating_display_message ~= nil and p4.igrs_rating_display_message ~= "" then
-		local v44, v45 = proto.writeTag(buf, n3, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v44, v45, p4.igrs_rating_display_message)
+	if self.igrs_rating_display_message ~= nil and self.igrs_rating_display_message ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.igrs_rating_display_message)
 	end
 
-	if p4.descriptors ~= nil and #p4.descriptors > 0 then
-		for _, v47 in p4.descriptors do
-			local v48 = v47:encode()
-			local v49, v50 = proto.writeTag(buf, n3, 5, proto.wireTypes.lengthDelimited)
-
-			buf, n3 = proto.writeBuffer(v49, v50, v48, buffer.len(v48))
+	if self.descriptors ~= nil and #self.descriptors > 0 then
+		for _, descriptor in self.descriptors do
+			local encoded = descriptor:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf3 = buffer.create(n3)
+	if self.minimum_age_display ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.minimum_age_display)
+	end
 
-	buffer.copy(buf3, 0, buf, 0, n3)
-
-	return buf3
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t6.decode(p5: buffer) -- line: 274
-	-- upvalues: t6 (copy), proto (copy), t1 (copy)
-	local v53 = t6.new()
-	local n4 = 0
 
-	while n4 < buffer.len(p5) do
-		local v55, v56
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
 
-		v55, v56, n4 = proto.readTag(p5, n4)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v56 == proto.wireTypes.varint then
-			local v57
-
-			v57, n4 = proto.readVarInt(p5, n4)
-		elseif v56 == proto.wireTypes.lengthDelimited then
-			if v55 == 1 then
-				local v58
-
-				v58, n4 = proto.readBuffer(p5, n4)
-				v53.display_name = buffer.tostring(v58)
-			elseif v55 == 2 then
-				local v59
-
-				v59, n4 = proto.readBuffer(p5, n4)
-				v53.display_name_with_header_short = buffer.tostring(v59)
-			elseif v55 == 3 then
-				local v60
-
-				v60, n4 = proto.readBuffer(p5, n4)
-				v53.igrs_rating = buffer.tostring(v60)
-			elseif v55 == 4 then
-				local v61
-
-				v61, n4 = proto.readBuffer(p5, n4)
-				v53.igrs_rating_display_message = buffer.tostring(v61)
-			elseif v55 == 5 then
-				local v62
-
-				v62, n4 = proto.readBuffer(p5, n4)
-				table.insert(v53.descriptors, t1.AgeRecommendationDescriptor.decode(v62))
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_name = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_name_with_header_short = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.igrs_rating = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.igrs_rating_display_message = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.descriptors, v.AgeRecommendationDescriptor.decode(v5))
+			elseif v3 == 6 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.minimum_age_display = buffer.tostring(v5)
 			else
-				local v63, v64 = proto.readVarInt(p5, n4)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n4 = v64 + v63
+				v2 = v5 + varInt
 			end
-		elseif v56 == proto.wireTypes.i32 then
-			local v65
-
-			v65, n4 = proto.readFixed32(p5, n4)
-		elseif v56 == proto.wireTypes.i64 then
-			local v66
-
-			v66, n4 = proto.readFixed64(p5, n4)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v56)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v53
+	return result
 end
-function t6.jsonEncode(p6) -- line: 337
-	local t8 = {}
 
-	if p6.display_name ~= nil and p6.display_name ~= "" then
-		t8.displayName = p6.display_name
+function class2:jsonEncode()
+	local v2 = {}
+
+	if self.display_name ~= nil and self.display_name ~= "" then
+		v2.displayName = self.display_name
 	end
 
-	if p6.display_name_with_header_short ~= nil and p6.display_name_with_header_short ~= "" then
-		t8.displayNameWithHeaderShort = p6.display_name_with_header_short
+	if self.display_name_with_header_short ~= nil and self.display_name_with_header_short ~= "" then
+		v2.displayNameWithHeaderShort = self.display_name_with_header_short
 	end
 
-	if p6.igrs_rating ~= nil and p6.igrs_rating ~= "" then
-		t8.igrsRating = p6.igrs_rating
+	if self.igrs_rating ~= nil and self.igrs_rating ~= "" then
+		v2.igrsRating = self.igrs_rating
 	end
 
-	if p6.igrs_rating_display_message ~= nil and p6.igrs_rating_display_message ~= "" then
-		t8.igrsRatingDisplayMessage = p6.igrs_rating_display_message
+	if self.igrs_rating_display_message ~= nil and self.igrs_rating_display_message ~= "" then
+		v2.igrsRatingDisplayMessage = self.igrs_rating_display_message
 	end
 
-	if p6.descriptors ~= nil and #p6.descriptors > 0 then
-		local t9 = {}
+	if self.descriptors ~= nil and #self.descriptors > 0 then
+		local descriptors = {}
 
-		for _, v71 in p6.descriptors do
-			table.insert(t9, v71:jsonEncode())
+		for _, descriptor in self.descriptors do
+			table.insert(descriptors, descriptor:jsonEncode())
 		end
 
-		t8.descriptors = t9
+		v2.descriptors = descriptors
 	end
 
-	return t8
+	if self.minimum_age_display ~= nil then
+		v2.minimumAgeDisplay = self.minimum_age_display
+	end
+
+	return v2
 end
-function t6.jsonDecode(t10: {[any]: any}) -- line: 367
-	-- upvalues: t6 (copy), t1 (copy)
-	local v73 = t6.new()
 
-	if t10.display_name ~= nil then
-		v73.display_name = t10.display_name
+function class2.jsonDecode(data)
+	local v2 = class2.new()
+
+	if data.display_name ~= nil then
+		v2.display_name = data.display_name
 	end
 
-	if t10.displayName ~= nil then
-		v73.display_name = t10.displayName
+	if data.displayName ~= nil then
+		v2.display_name = data.displayName
 	end
 
-	if t10.display_name_with_header_short ~= nil then
-		v73.display_name_with_header_short = t10.display_name_with_header_short
+	if data.display_name_with_header_short ~= nil then
+		v2.display_name_with_header_short = data.display_name_with_header_short
 	end
 
-	if t10.displayNameWithHeaderShort ~= nil then
-		v73.display_name_with_header_short = t10.displayNameWithHeaderShort
+	if data.displayNameWithHeaderShort ~= nil then
+		v2.display_name_with_header_short = data.displayNameWithHeaderShort
 	end
 
-	if t10.igrs_rating ~= nil then
-		v73.igrs_rating = t10.igrs_rating
+	if data.igrs_rating ~= nil then
+		v2.igrs_rating = data.igrs_rating
 	end
 
-	if t10.igrsRating ~= nil then
-		v73.igrs_rating = t10.igrsRating
+	if data.igrsRating ~= nil then
+		v2.igrs_rating = data.igrsRating
 	end
 
-	if t10.igrs_rating_display_message ~= nil then
-		v73.igrs_rating_display_message = t10.igrs_rating_display_message
+	if data.igrs_rating_display_message ~= nil then
+		v2.igrs_rating_display_message = data.igrs_rating_display_message
 	end
 
-	if t10.igrsRatingDisplayMessage ~= nil then
-		v73.igrs_rating_display_message = t10.igrsRatingDisplayMessage
+	if data.igrsRatingDisplayMessage ~= nil then
+		v2.igrs_rating_display_message = data.igrsRatingDisplayMessage
 	end
 
-	if t10.descriptors ~= nil then
-		local t11 = {}
+	if data.descriptors ~= nil then
+		local descriptors = {}
 
-		for _, v76 in t10.descriptors do
-			table.insert(t11, t1.AgeRecommendationDescriptor.jsonDecode(v76))
+		for _, descriptor in data.descriptors do
+			table.insert(descriptors, v.AgeRecommendationDescriptor.jsonDecode(descriptor))
 		end
 
-		v73.descriptors = t11
+		v2.descriptors = descriptors
 	end
 
-	return v73
+	if data.minimum_age_display ~= nil then
+		v2.minimum_age_display = data.minimum_age_display
+	end
+
+	if data.minimumAgeDisplay ~= nil then
+		v2.minimum_age_display = data.minimumAgeDisplay
+	end
+
+	return v2
 end
 
-t6.descriptor = {
+class2.descriptor = {
 	name = "AgeRecommendationData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.AgeRecommendationData"
 }
-t1.AgeRecommendationData = t6
-typeRegistry.default:register(t1.AgeRecommendationData)
+
+v.AgeRecommendationData = class2
+
+typeRegistry.default:register(v.AgeRecommendationData)
 
 return {
-	AgeRecommendationDescriptor = t1.AgeRecommendationDescriptor,
-	AgeRecommendationData = t1.AgeRecommendationData
+	AgeRecommendationDescriptor = v.AgeRecommendationDescriptor,
+	AgeRecommendationData = v.AgeRecommendationData
 }

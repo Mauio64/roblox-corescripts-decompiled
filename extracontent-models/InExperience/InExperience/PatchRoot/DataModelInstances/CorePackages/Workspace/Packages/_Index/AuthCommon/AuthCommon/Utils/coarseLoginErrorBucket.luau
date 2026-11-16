@@ -1,8 +1,11 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
+local parent = AuthCommon.Parent
+
 local LoginErrorCodes = require(AuthCommon.Enums.LoginErrorCodes)
-local StatusCodes = require(AuthCommonParent.Http).StatusCodes
-local t1 = {
+local Http = require(parent.Http)
+local StatusCodes = Http.StatusCodes
+
+local v = {
 	[LoginErrorCodes.IncorrectCValueOrPassword] = "invalidCredentials",
 	[LoginErrorCodes.MultipleUsersPerCredential] = "invalidCredentials",
 	[LoginErrorCodes.AccountLocked] = "passwordReset",
@@ -10,7 +13,8 @@ local t1 = {
 	[LoginErrorCodes.CValueAndPasswordRequired] = "badRequest",
 	[LoginErrorCodes.SecurityQuestions] = "securityQuestions"
 }
-local t2 = {
+
+local v2 = {
 	[StatusCodes.TOO_MANY_REQUESTS] = "throttled",
 	[StatusCodes.REQUEST_TIMEOUT] = "timeout",
 	[StatusCodes.BAD_REQUEST] = "badRequest",
@@ -18,20 +22,19 @@ local t2 = {
 	[StatusCodes.INTERNAL_SERVER_ERROR] = "serverError"
 }
 
-local function coarseLoginErrorBucket(p1) -- line: 25
-	-- upvalues: t1 (copy), t2 (copy)
-	if typeof(p1) ~= "table" then
+local function coarseLoginErrorBucket(data)
+	if typeof(data) ~= "table" then
 		return "unknown"
 	end
 
-	local v9 = t1[p1.errorCode]
+	local v3 = v[data.errorCode]
 
-	if v9 then
-		return v9
+	if v3 then
+		return v3
 	end
 
-	if p1.HttpError == Enum.HttpError.OK then
-		return t2[p1.StatusCode] or "unknown"
+	if data.HttpError == Enum.HttpError.OK then
+		return v2[data.StatusCode] or "unknown"
 	end
 
 	return "unknown"

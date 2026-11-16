@@ -1,27 +1,28 @@
-local lib = require(script.Parent["Symbol.roblox"])
-local v2 = newproxy(true)
-local t1 = {}
+local Symbolroblox = require(script.Parent["Symbol.roblox"])
 
-local function addType(p1) -- line: 32
-	-- upvalues: t1 (copy), lib (copy)
-	t1[p1] = lib.named("Roact" .. p1)
+local v = newproxy(true)
+
+local v2 = {}
+
+local function addType(p) -- 2 equivalent calls inferred from this helper
+	v2[p] = Symbolroblox.named("Roact" .. p)
 end
 
-t1.HostChangeEvent = lib.named("RoactHostChangeEvent")
-t1.HostEvent = lib.named("RoactHostEvent")
+addType("HostChangeEvent") -- inferred equivalent call
+addType("HostEvent") -- inferred equivalent call
 
-function t1.of(p2) -- line: 39
-	-- upvalues: v2 (copy)
-	if typeof(p2) ~= "table" then
-		return nil
+function v2.of(p)
+	if typeof(p) == "table" then
+		return p[v]
 	end
 
-	return p2[v2]
+	return nil
 end
 
-getmetatable(v2).__index = t1
-getmetatable(v2).__tostring = function() -- line: 49
+getmetatable(v).__index = v2
+
+getmetatable(v).__tostring = function(): string
 	return "RoactType"
 end
 
-return v2
+return v

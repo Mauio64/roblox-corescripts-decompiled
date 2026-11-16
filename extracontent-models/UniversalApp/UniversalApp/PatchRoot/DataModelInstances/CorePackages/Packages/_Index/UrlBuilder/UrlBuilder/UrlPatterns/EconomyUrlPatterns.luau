@@ -1,40 +1,41 @@
-return function(p1) -- line: 1
+return function(p)
 	return {
 		paymentsGateway = {
-			getUpsellProduct = p1.fromString("apis:payments-gateway/v1/products/get-upsell-product"),
-			preparePayment = p1.fromString("apis:payments-gateway/v1/prepare-payment"),
-			checkUserPurchaseSettings = p1.fromString("apis:payments-gateway/v1/check-user-purchase-settings")
+			getUpsellProduct = p.fromString("apis:payments-gateway/v1/products/get-upsell-product"),
+			preparePayment = p.fromString("apis:payments-gateway/v1/prepare-payment"),
+			checkUserPurchaseSettings = p.fromString("apis:payments-gateway/v1/check-user-purchase-settings")
 		},
 		purchaseWarning = {
-			getPurchaseWarning = function(s1: string?, n1: number?, b1: boolean?) -- line: 9
-				-- upvalues: p1 (copy)
-				local v5
+			getPurchaseWarning = function(p2: string?, p3: number?, flag: boolean?)
+				local v
 
-				if s1 ~= nil then
-					v5 = string.format("%s?mobileProductId=%s", "apis:purchase-warning/v1/purchase-warnings", s1)
-				else
-					if n1 == nil then
-						warn(string.format("%s - Invalid parameters, needs mobileProductId or productId", (tostring(script.Name))))
-
+				if p2 == nil then
+					if p3 == nil then
+						warn(string.format(
+							"%s - Invalid parameters, needs mobileProductId or productId",
+							(tostring(script.Name))
+						))
 						return nil
 					end
 
-					v5 = string.format("%s?productId=%d", "apis:purchase-warning/v1/purchase-warnings", n1)
+					v = string.format("%s?productId=%d", "apis:purchase-warning/v1/purchase-warnings", p3)
+				else
+					v = string.format("%s?mobileProductId=%s", "apis:purchase-warning/v1/purchase-warnings", p2)
 				end
 
-				if b1 then
-					v5 = string.format("%s&is13To17ScaryModalEnabled=True", v5)
+				if flag then
+					v = string.format("%s&is13To17ScaryModalEnabled=True", v)
 				end
 
-				return p1.fromString(v5)()
+				return p.fromString(v)()
 			end,
-			ackPurchaseWarning = p1.fromString("apis:purchase-warning/v1/purchase-warnings/acknowledge")
+			ackPurchaseWarning = p.fromString("apis:purchase-warning/v1/purchase-warnings/acknowledge")
 		},
 		vngPayments = {
-			getVngShopUrl = p1.fromString("apis:vng-payments/v1/getVngShopUrl")
+			getVngShopUrl = p.fromString("apis:vng-payments/v1/getVngShopUrl")
 		},
 		info = {
-			developerProduct = p1.fromString("www:developer-product/{universeId}/product/{productId}")
+			developerProduct = p.fromString("www:developer-product/{universeId}/product/{productId}")
 		}
 	}
 end

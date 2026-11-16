@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.ReactSceneUnderstanding.ReactSceneUnderstanding))
+local ReactSceneUnderstanding = require(index.ReactSceneUnderstanding.ReactSceneUnderstanding)
+
+return ReactSceneUnderstanding

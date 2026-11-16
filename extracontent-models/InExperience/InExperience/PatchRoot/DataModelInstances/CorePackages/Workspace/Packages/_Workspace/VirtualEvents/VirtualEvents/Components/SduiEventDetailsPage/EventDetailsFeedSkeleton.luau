@@ -1,72 +1,90 @@
-local Parent = script:FindFirstAncestor("VirtualEvents").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("VirtualEvents").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local useTokens = Foundation.Hooks.useTokens
+
 local EventDetailsActionBarSkeleton = require(script.Parent.EventDetailsActionBarSkeleton)
-local FFlagLuaAppSduiEventDetailsActionBarInFeed = require(Parent.SharedFlags).FFlagLuaAppSduiEventDetailsActionBarInFeed
 
-local function EventDetailsFeedSkeleton() -- line: 19
-	-- upvalues: useTokens (copy), React (copy), View (copy), Skeleton (copy), EnumsRadius (copy), FFlagLuaAppSduiEventDetailsActionBarInFeed (copy), EventDetailsActionBarSkeleton (copy)
-	local v11 = useTokens()
-	local Size_1400 = v11.Size.Size_1400
-	local v13 = v11.Typography.CaptionLarge.LineHeight * v11.Typography.CaptionLarge.FontSize
-	local v14 = v11.Typography.HeadingSmall.LineHeight * v11.Typography.HeadingSmall.FontSize
-	local v15 = v11.Typography.CaptionMedium.LineHeight * v11.Typography.CaptionMedium.FontSize * 3
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppSduiEventDetailsActionBarInFeed = SharedFlags.FFlagLuaAppSduiEventDetailsActionBarInFeed
 
-	return React.createElement(View, {
-		tag = "col gap-large size-full auto-y padding-top-medium",
-		testId = "--event-details-feed-skeleton"
-	}, {
-		AttributionRow = React.createElement(View, {
-			tag = "row align-y-center gap-medium size-full-0 auto-y",
-			LayoutOrder = 1
-		}, {
-			Icon = React.createElement(Skeleton, {
-				LayoutOrder = 1,
-				Size = UDim2.fromOffset(Size_1400, Size_1400),
-				radius = EnumsRadius.Medium
-			}),
-			TextColumn = React.createElement(View, {
-				tag = "col fill gap-small auto-xy",
-				LayoutOrder = 2
-			}, {
-				Title = React.createElement(Skeleton, {
-					LayoutOrder = 1,
-					Size = UDim2.fromOffset(v11.Size.Size_2800 * 2, v13),
-					radius = EnumsRadius.Small
+local function EventDetailsFeedSkeleton()
+	local v = useTokens()
+
+	local size_1400 = v.Size.Size_1400
+	local v2 = v.Typography.CaptionLarge.LineHeight * v.Typography.CaptionLarge.FontSize
+	local v3 = v.Typography.HeadingSmall.LineHeight * v.Typography.HeadingSmall.FontSize
+	local v4 = v.Typography.CaptionMedium.LineHeight * v.Typography.CaptionMedium.FontSize * 3
+
+	local createElement = React.createElement
+
+	local v5 = {
+		AttributionRow = React.createElement(
+			View,
+			{ tag = "row align-y-center gap-medium size-full-0 auto-y", LayoutOrder = 1 },
+			{
+				Icon = React.createElement(Skeleton, {
+					Size = UDim2.fromOffset(size_1400, size_1400),
+					radius = Radius.Medium,
+					LayoutOrder = 1
 				}),
-				Host = React.createElement(Skeleton, {
-					LayoutOrder = 2,
-					Size = UDim2.fromOffset(v11.Size.Size_2800, v13),
-					radius = EnumsRadius.Small
+				TextColumn = React.createElement(View, {
+					tag = "col fill gap-small auto-xy",
+					LayoutOrder = 2
+				}, {
+					Title = React.createElement(Skeleton, {
+						Size = UDim2.fromOffset(v.Size.Size_2800 * 2, v2),
+						radius = Radius.Small,
+						LayoutOrder = 1
+					}),
+					Host = React.createElement(Skeleton, {
+						Size = UDim2.fromOffset(v.Size.Size_2800, v2),
+						radius = Radius.Small,
+						LayoutOrder = 2
+					})
 				})
-			})
-		}),
-		ActionBar = if not FFlagLuaAppSduiEventDetailsActionBarInFeed then nil else React.createElement(View, {
-			tag = "size-full-0 auto-y",
-			LayoutOrder = 2
-		}, {
+			}
+		),
+		ActionBar = 0,
+		Description = 0
+	}
+	local actionBar
+
+	if FFlagLuaAppSduiEventDetailsActionBarInFeed then
+		actionBar = React.createElement(View, { tag = "size-full-0 auto-y", LayoutOrder = 2 }, {
 			Skeleton = React.createElement(EventDetailsActionBarSkeleton)
+		})
+	end
+
+	v5.ActionBar = actionBar
+
+	v5.Description = React.createElement(View, {
+		tag = "col gap-medium size-full-0 auto-y",
+		LayoutOrder = 3
+	}, {
+		Header = React.createElement(Skeleton, {
+			Size = UDim2.fromOffset(v.Size.Size_2800 * 2, v3),
+			radius = Radius.Small,
+			LayoutOrder = 1
 		}),
-		Description = React.createElement(View, {
-			tag = "col gap-medium size-full-0 auto-y",
-			LayoutOrder = 3
-		}, {
-			Header = React.createElement(Skeleton, {
-				LayoutOrder = 1,
-				Size = UDim2.fromOffset(v11.Size.Size_2800 * 2, v14),
-				radius = EnumsRadius.Small
-			}),
-			Text = React.createElement(Skeleton, {
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v15),
-				radius = EnumsRadius.Small
-			})
+		Text = React.createElement(Skeleton, {
+			Size = UDim2.new(1, 0, 0, v4),
+			radius = Radius.Small,
+			LayoutOrder = 2
 		})
 	})
+	return createElement(
+		View,
+		{
+			tag = "col gap-large size-full auto-y padding-top-medium",
+			testId = "--event-details-feed-skeleton"
+		},
+		v5
+	)
 end
 
 return React.memo(EventDetailsFeedSkeleton)

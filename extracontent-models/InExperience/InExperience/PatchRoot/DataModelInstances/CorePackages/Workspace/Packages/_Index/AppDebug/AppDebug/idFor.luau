@@ -1,23 +1,20 @@
-local n1 = 1
-local self = setmetatable({}, {
-	__mode = "k"
-})
+local v = 1
+local object = setmetatable({}, { __mode = "k" })
 
-local function idFor(p1) -- line: 15
-	-- upvalues: self (copy), n1 (ref)
-	if p1 == nil then
+local function idFor(p)
+	if p == nil then
 		return 0
 	end
 
-	local v5 = self[p1]
+	local v2 = object[p]
 
-	if not v5 then
-		v5 = n1
-		n1 += 1
-		self[p1] = v5
+	if not v2 then
+		v2 = v
+		v += 1
+		object[p] = v2
 	end
 
-	return v5
+	return v2
 end
 
 return idFor

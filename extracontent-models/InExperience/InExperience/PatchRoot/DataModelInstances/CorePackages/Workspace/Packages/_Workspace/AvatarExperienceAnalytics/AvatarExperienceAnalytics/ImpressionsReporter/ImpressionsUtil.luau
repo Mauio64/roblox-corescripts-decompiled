@@ -1,125 +1,128 @@
-return {
-	writeItemAttributes = function(t1: {[any]: any}, p1, t2: {[any]: any}) -- line: 58
-		if not t1 then
-			warn("Impressions schema is nil")
+local ImpressionsUtil = {}
 
-			return
+function ImpressionsUtil.writeItemAttributes(p, instance, p2)
+	if not p then
+		warn("Impressions schema is nil")
+		return
+	end
+
+	for k, v in p.mapping do
+		local v2 = p2[k]
+
+		if v2 then
+			instance:SetAttribute(v.attribute, v2)
 		end
+	end
+end
 
-		for v4, v5 in t1.mapping do
-			local v6 = t2[v4]
+function ImpressionsUtil.buildSchema(p: string, data)
+	local groupBy = data.groupBy
+	local mapping = {}
 
-			if v6 then
-				p1:SetAttribute(v5.attribute, v6)
-			end
-		end
-	end,
-	buildSchema = function(s1: string, t3: {[any]: any}) -- line: 74
-		local t4 = {}
-		local groupBy = t3.groupBy
-
-		for _, v12 in t3.mapping do
-			local v13 = not not groupBy and table.find(groupBy, v12.out) ~= nil
-
-			t4[v12.prop] = {
-				attribute = string.format("%s_%s", s1, v12.prop),
-				out = v12.out,
-				isGrouping = v13
-			}
-		end
+	for _, v in data.mapping do
+		local isGrouping
 
 		if groupBy then
-			for _, v15 in groupBy do
-				local v16 = false
-
-				for _, v18 in t3.mapping do
-					if v15 == v18.out then
-						v16 = true
-					end
-
-					if v16 then
-						break
-					end
-				end
-
-				if not v16 then
-					error(string.format("Impression schema groupBy field '%s' not specified in output mapping", v15))
-				end
-			end
+			isGrouping = table.find(groupBy, v.out) ~= nil
+		else
+			isGrouping = false
 		end
 
-		return {
-			mapping = t4,
-			enumMap = t3.enumMap,
-			surfaceSpecificAnalyticsMetadata = t3.surfaceSpecificAnalyticsMetadata
+		mapping[v.prop] = {
+			attribute = string.format("%s_%s", p, v.prop),
+			out = v.out,
+			isGrouping = isGrouping
 		}
-	end,
-	packEvents = function(t5: {[any]: any}, t6: {[any]: any}) -- line: 116
-		if not t5 then
-			warn("Impressions schema nil")
-
-			return
-		end
-
-		local t7 = {}
-		local t8 = {}
-
-		for v23, v24 in t6 do
-			local Attributes = v24:GetAttributes()
-			local s2 = ""
-
-			for _, v28 in t5.mapping do
-				if v28.isGrouping then
-					s2 ..= Attributes[v28.attribute] or "_"
-				end
-			end
-
-			local v29 = t7[s2] or {}
-
-			t7[s2] = v29
-
-			for _, v31 in t5.mapping do
-				local v32 = Attributes[v31.attribute]
-				local out = v31.out
-
-				if v31.isGrouping then
-					v29[out] = v32
-				else
-					local v34 = v29[out] or {}
-
-					v29[out] = v34
-					v34[v23] = v32 or ""
-
-					if t5.enumMap and t5.enumMap[out] then
-						v34[v23] = t5.enumMap[out][v32]
-					end
-				end
-			end
-		end
-
-		for _, v36 in t7 do
-			local t9 = {}
-
-			table.insert(t8, t9)
-
-			for _, v39 in t5.mapping do
-				local out = v39.out
-				local v41 = v36[out]
-
-				if typeof(v41) == "table" then
-					for _, v43 in v41 do
-						if t9[out] then
-							t9[out] = t9[out] .. "," .. tostring(v43)
-						else
-							t9[out] = tostring(v43)
-						end
-					end
-				else
-					t9[out] = v41
-				end
-			end
-		end
-
-		return t8
 	end
-}
+
+	if groupBy then
+		for _, v in groupBy do
+			local v2 = false
+
+			for _, v3 in data.mapping do
+				v2 = v3.out == v or v2
+
+				if v2 then
+					break
+				end
+			end
+
+			if not v2 then
+				error(string.format("Impression schema groupBy field '%s' not specified in output mapping", v))
+			end
+		end
+	end
+
+	return {
+		mapping = mapping,
+		enumMap = data.enumMap,
+		surfaceSpecificAnalyticsMetadata = data.surfaceSpecificAnalyticsMetadata
+	}
+end
+
+function ImpressionsUtil.packEvents(p, items)
+	if not p then
+		warn("Impressions schema nil")
+		return
+	end
+
+	local v = {}
+	local result = {}
+
+	for k, item in items do
+		local attributes = item:GetAttributes()
+		local v2 = ""
+
+		for _, v3 in p.mapping do
+			if v3.isGrouping then
+				v2 ..= attributes[v3.attribute] or "_"
+			end
+		end
+
+		local v3 = v[v2] or {}
+		v[v2] = v3
+
+		for _, v4 in p.mapping do
+			local attribute = attributes[v4.attribute]
+			local out = v4.out
+
+			if v4.isGrouping then
+				v3[out] = attribute
+			else
+				local v5 = v3[out] or {}
+				v3[out] = v5
+				v5[k] = attribute or ""
+
+				if p.enumMap and p.enumMap[out] then
+					v5[k] = p.enumMap[out][attribute]
+				end
+			end
+		end
+	end
+
+	for _, v2 in v do
+		local v3 = {}
+		table.insert(result, v3)
+
+		for _, v4 in p.mapping do
+			local out = v4.out
+			local v5 = v2[out]
+
+			if typeof(v5) == "table" then
+				for _, v6 in v5 do
+					if v3[out] then
+						v3[out] ..= "," .. tostring(v6)
+					else
+						v3[out] = tostring(v6)
+					end
+				end
+			else
+				v3[out] = v5
+			end
+		end
+	end
+
+	return result
+end
+
+return ImpressionsUtil

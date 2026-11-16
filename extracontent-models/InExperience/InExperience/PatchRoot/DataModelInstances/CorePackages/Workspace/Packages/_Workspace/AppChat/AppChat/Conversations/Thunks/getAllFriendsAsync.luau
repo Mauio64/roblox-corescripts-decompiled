@@ -1,89 +1,85 @@
 local Players = game:GetService("Players")
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local NetworkingFriends = require(AppChat.Http.NetworkingFriends)
 local NetworkingPresence = require(AppChat.Http.NetworkingPresence)
-local Promise = require(AppChatParent.Promise)
+local Promise = require(parent.Promise)
 local RoduxNetworking = require(AppChat.Http.RoduxNetworking)
-local AddUsers = require(AppChatParent.UserLib).Actions.AddUsers
-local SetUserIsFriend = require(AppChatParent.UserLib).Actions.SetUserIsFriend
-local UserModel = require(AppChatParent.UserLib).Models.UserModel
-local llama = require(AppChatParent.LuaSocialLibrariesDeps).llama
-local receiveUsersPresence = require(AppChatParent.UserLib).Utils.receiveUsersPresence
+local UserLib = require(parent.UserLib)
+local AddUsers = UserLib.Actions.AddUsers
+local UserLib2 = require(parent.UserLib)
+local SetUserIsFriend = UserLib2.Actions.SetUserIsFriend
+local UserLib3 = require(parent.UserLib)
+local UserModel = UserLib3.Models.UserModel
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local llama = LuaSocialLibrariesDeps.llama
+local UserLib4 = require(parent.UserLib)
+local receiveUsersPresence = UserLib4.Utils.receiveUsersPresence
 local FFlagAppChatPresenceStoreMigration = require(AppChat.Flags.FFlagAppChatPresenceStoreMigration)
 
-return function(b1: boolean?) -- line: 17
-	-- upvalues: Players (copy), NetworkingFriends (copy), RoduxNetworking (copy), Promise (copy), UserModel (copy), SetUserIsFriend (copy), llama (copy), AddUsers (copy), FFlagAppChatPresenceStoreMigration (copy), NetworkingPresence (copy), receiveUsersPresence (copy)
-	return function(p1) -- line: 18
-		-- upvalues: Players (copy), NetworkingFriends (copy), RoduxNetworking (copy), Promise (copy), b1 (copy), UserModel (copy), SetUserIsFriend (copy), llama (copy), AddUsers (copy), FFlagAppChatPresenceStoreMigration (copy), NetworkingPresence (copy), receiveUsersPresence (copy)
-		local LocalPlayer = Players.LocalPlayer
+return function(flag: boolean?)
+	return function(object)
+		local localPlayer = Players.LocalPlayer
 
-		assert(LocalPlayer, "Local Player not found")
+		assert(localPlayer, "Local Player not found")
+		local userId = localPlayer.UserId
 
-		local UserId = LocalPlayer.UserId
-
-		if NetworkingFriends.GetFriendsFromUserId.getStatus(p1:getState(), UserId) == RoduxNetworking.Enum.NetworkStatus.Fetching then
+		if NetworkingFriends.GetFriendsFromUserId.getStatus(object:getState(), userId) == RoduxNetworking.Enum.NetworkStatus.Fetching then
 			return Promise.resolve({})
 		end
 
-		return p1:dispatch(NetworkingFriends.GetFriendsFromUserId.API(UserId)):andThen(function(p2) -- line: 31
-			-- upvalues: p1 (copy), b1 (copy), UserModel (copy), SetUserIsFriend (copy), llama (copy), AddUsers (copy), FFlagAppChatPresenceStoreMigration (copy), NetworkingPresence (copy), receiveUsersPresence (copy)
-			local data = p2.responseBody.data
-			local v20 = p1:getState().Users or {}
-			local t1 = {}
-			local t2 = nil
+		return object:dispatch(NetworkingFriends.GetFriendsFromUserId.API(userId)):andThen(function(p)
+			local data = p.responseBody.data
+			local users = object:getState().Users or {}
 
-			if b1 then
-				t2 = {}
-			end
+			local ids = flag and {} or nil
+			local v = {}
 
-			for _, v in ipairs(data) do
-				local str = tostring(v.id)
+			for _, v2 in ipairs(data) do
+				local id = tostring(v2.id)
 
-				if b1 then
-					table.insert(t2, str)
+				if flag then
+					table.insert(ids, id)
 				end
 
-				if v20[str] == nil then
-					t1[str] = UserModel.fromDataTable({
-						isFriend = true,
-						id = v.id,
-						name = v.name,
-						displayName = v.displayName
+				if users[id] == nil then
+					v[id] = UserModel.fromDataTable({
+						id = v2.id,
+						name = v2.name,
+						displayName = v2.displayName,
+						isFriend = true
 					})
 				else
-					p1:dispatch(SetUserIsFriend(str, true))
+					object:dispatch(SetUserIsFriend(id, true))
 				end
 			end
 
-			local v26 = llama.Dictionary.keys(t1)
+			local keys = llama.Dictionary.keys(v)
 
-			p1:dispatch(AddUsers(t1))
+			object:dispatch(AddUsers(v))
 
-			if not FFlagAppChatPresenceStoreMigration then
-				if b1 then
-					p1:dispatch(NetworkingPresence.GetPresencesFromUserIds.API(t2)):andThen(function(p3) -- line: 69
-						-- upvalues: receiveUsersPresence (copy), p1 (copy)
-						local userPresences = p3.responseBody.userPresences
+			if FFlagAppChatPresenceStoreMigration then
+				return p
+			end
 
-						receiveUsersPresence(userPresences, p1)
-
-						return p3
-					end):catch(function(p4) -- line: 74
-						warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(p4))
-					end)
-
+			if flag then
+				object:dispatch(NetworkingPresence.GetPresencesFromUserIds.API(ids)):andThen(function(p2)
+					receiveUsersPresence(p2.responseBody.userPresences, object)
 					return p2
-				end
-
-				p1:dispatch(NetworkingPresence.GetPresencesFromUserIds.API(v26)):catch(function(p5) -- line: 80
-					warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(p5))
+				end):catch(function(p2)
+					warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(p2))
 				end)
+				return p
 			end
 
-			return p2
-		end):catch(function(p6) -- line: 88
-			warn("NetworkingFriends failure in getAllFriendsAsync, Status: " .. tostring(p6))
+			object:dispatch(NetworkingPresence.GetPresencesFromUserIds.API(keys)):catch(function(p2)
+				warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(p2))
+			end)
+
+			return p
+		end):catch(function(p)
+			warn("NetworkingFriends failure in getAllFriendsAsync, Status: " .. tostring(p))
 		end)
 	end
 end

@@ -1,14 +1,19 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
-local Foundation = require(BuildExperienceParent.Foundation)
+local parent = BuildExperience.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
-local FoundationImage = Foundation.Image
+
+local Image = Foundation.Image
 local View = Foundation.View
 local Icon = Foundation.Icon
 local IconButton = Foundation.IconButton
 local Badge = Foundation.Badge
 local Menu = Foundation.Menu
+
 local BadgeVariant = Foundation.Enums.BadgeVariant
 local BadgeShape = Foundation.Enums.BadgeShape
 local BadgeSize = Foundation.Enums.BadgeSize
@@ -18,144 +23,180 @@ local IconSize = Foundation.Enums.IconSize
 local InputSize = Foundation.Enums.InputSize
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
+
 local useTokens = Foundation.Hooks.useTokens
 
 require(script.Parent.types)
 
-local function FilmstripSlot(t1: {[any]: any}) -- line: 47
-	-- upvalues: useTokens (copy), React (copy), Menu (copy), PopoverSide (copy), PopoverAlign (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), InputSize (copy), FoundationImage (copy), IconButton (copy), Badge (copy), IconPosition (copy), LocalizationStrings (copy), BadgeVariant (copy), BadgeShape (copy), BadgeSize (copy)
-	local v24 = useTokens()
-	local v25 = if not t1.isSelected then v24.Color.Stroke.Default.Color3 else v24.Color.Content.Emphasis.Color3
-	local v26 = if not t1.isSelected then v24.Color.Stroke.Default.Transparency else 0
-	local v27 = if not t1.isSelected then v24.Stroke.Standard else v24.Stroke.Thick
+local function FilmstripSlot(props)
+	local video = useLocalization({ video = LocalizationStrings.MEDIA_SELECTION_VIDEO }).video
+	local v = useTokens()
+	local color3
 
-	if not t1.isFilled then
-		return React.createElement(Menu, {
-			tag = "size-full",
-			isOpen = t1.isMenuOpen or false,
-			items = t1.menuItems or {{
-				items = {}
-			}},
+	if props.isSelected then
+		color3 = v.Color.Content.Emphasis.Color3
+	else
+		color3 = v.Color.Stroke.Default.Color3
+	end
+
+	local transparency = props.isSelected and 0 or v.Color.Stroke.Default.Transparency
+	local thickness
+
+	if props.isSelected then
+		thickness = v.Stroke.Thick
+	else
+		thickness = v.Stroke.Standard
+	end
+
+	if props.isFilled then
+		local createElement = React.createElement
+
+		local v2 = {
+			isOpen = props.isMenuOpen or false,
+			items = props.menuItems or {
+				{ items = {} }
+			},
 			side = PopoverSide.Top,
 			align = PopoverAlign.Center,
-			onPressedOutside = t1.onMenuClose,
-			onActivated = t1.onMenuActivated,
-			LayoutOrder = t1.LayoutOrder
-		}, React.createElement(View, {
+			onPressedOutside = props.onMenuClose,
+			onActivated = props.onMenuActivated,
+			size = InputSize.Medium,
+			LayoutOrder = props.LayoutOrder
+		}
+
+		local createElement2 = React.createElement
+		local v3 = {
 			tag = {
 				["radius-large"] = true,
-				["bg-surface-200"] = true,
-				["size-full-2400"] = true,
-				["aspect-1-1"] = t1.aspectRatio == "square",
-				["aspect-16-9"] = t1.aspectRatio == "wide"
-			}
-		}, {
+				["size-full-2700"] = true,
+				["aspect-1-1"] = props.aspectRatio == "square",
+				["aspect-16-9"] = props.aspectRatio == "wide"
+			},
+			LayoutOrder = props.LayoutOrder
+		}
+		local v4 = {
 			Stroke = React.createElement("UIStroke", {
-				Color = v25,
-				Transparency = v26,
-				Thickness = v27,
+				Color = color3,
+				Transparency = transparency,
+				Thickness = thickness,
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			}),
 			TouchArea = React.createElement("TextButton", {
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
 				Text = "",
-				ZIndex = 1,
-				[React.Event.Activated] = t1.onEmptySlotPressed or function() -- line: 88
-				end
+				ZIndex = 2,
+				[React.Event.Activated] = props.onSelect
 			}),
-			PlusIcon = React.createElement(View, {
-				tag = "align-x-center align-y-center",
-				Size = UDim2.fromScale(1, 1)
+			ImageClip = 0,
+			EditButton = 0,
+			VideoBadge = 0
+		}
+		local imageClip
+
+		if props.isLoading then
+			imageClip = React.createElement(View, { tag = "size-full radius-large bg-surface-200" })
+		elseif props.assetSource and props.mediaType == "video" then
+			imageClip = React.createElement("VideoFrame", {
+				Size = UDim2.fromScale(1, 1),
+				Video = props.assetSource,
+				Looped = false,
+				Playing = false,
+				Volume = 0,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0
 			}, {
-				IconElement = React.createElement(Icon, {
-					tag = "auto-xy content-default",
-					name = IconName.PlusSmall,
-					size = IconSize.Medium
+				UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 12) })
+			})
+		elseif props.assetSource then
+			imageClip = React.createElement(View, { tag = "size-full radius-large clip" }, {
+				Thumbnail = React.createElement(Image, {
+					Image = props.assetSource,
+					tag = "size-full radius-large",
+					ScaleType = Enum.ScaleType.Crop
 				})
 			})
-		}))
+		end
+
+		v4.ImageClip = imageClip
+		local editButton
+
+		if props.isSelected and props.onEditPressed then
+			editButton = React.createElement(View, {
+				tag = "auto-xy radius-circle bg-over-media-0 padding-xxsmall",
+				Position = UDim2.new(1, -v.Gap.Small, 0, v.Gap.Small),
+				AnchorPoint = Vector2.new(1, 0),
+				ZIndex = 3
+			}, {
+				Button = React.createElement(IconButton, {
+					icon = IconName.Pencil,
+					size = InputSize.XSmall,
+					onActivated = props.onEditPressed
+				})
+			})
+		end
+
+		v4.EditButton = editButton
+		local videoBadge
+
+		if props.mediaType == "video" then
+			videoBadge = React.createElement(Badge, {
+				Position = UDim2.fromOffset(v.Gap.Small, v.Gap.Small),
+				ZIndex = 3,
+				icon = { name = IconName.PlaySmall, position = IconPosition.Left },
+				text = video,
+				variant = BadgeVariant.OverMedia,
+				shape = BadgeShape.Pill,
+				size = BadgeSize.Small
+			})
+		end
+
+		v4.VideoBadge = videoBadge
+		return createElement(Menu, v2, createElement2(View, v3, v4))
 	end
 
 	return React.createElement(Menu, {
-		isOpen = t1.isMenuOpen or false,
-		items = t1.menuItems or {{
-			items = {}
-		}},
+		tag = "size-full",
+		isOpen = props.isMenuOpen or false,
+		items = props.menuItems or {
+			{ items = {} }
+		},
 		side = PopoverSide.Top,
 		align = PopoverAlign.Center,
-		onPressedOutside = t1.onMenuClose,
-		onActivated = t1.onMenuActivated,
-		size = InputSize.Medium,
-		LayoutOrder = t1.LayoutOrder
+		onPressedOutside = props.onMenuClose,
+		onActivated = props.onMenuActivated,
+		LayoutOrder = props.LayoutOrder
 	}, React.createElement(View, {
 		tag = {
 			["radius-large"] = true,
-			["size-full-2400"] = true,
-			["aspect-1-1"] = t1.aspectRatio == "square",
-			["aspect-16-9"] = t1.aspectRatio == "wide"
-		},
-		LayoutOrder = t1.LayoutOrder
+			["bg-surface-200"] = true,
+			["size-full-2700"] = true,
+			["aspect-1-1"] = props.aspectRatio == "square",
+			["aspect-16-9"] = props.aspectRatio == "wide"
+		}
 	}, {
 		Stroke = React.createElement("UIStroke", {
-			Color = v25,
-			Transparency = v26,
-			Thickness = v27,
+			Color = color3,
+			Transparency = transparency,
+			Thickness = thickness,
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		}),
 		TouchArea = React.createElement("TextButton", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			Text = "",
-			ZIndex = 2,
-			[React.Event.Activated] = t1.onSelect
+			ZIndex = 1,
+			[React.Event.Activated] = props.onEmptySlotPressed or function() end
 		}),
-		ImageClip = if not t1.isLoading then if not t1.assetSource or t1.mediaType ~= "video" then if not t1.assetSource then nil else React.createElement(View, {
-			tag = "size-full radius-large clip"
-		}, {
-			Thumbnail = React.createElement(FoundationImage, {
-				tag = "size-full radius-large",
-				Image = t1.assetSource,
-				ScaleType = Enum.ScaleType.Crop
-			})
-		}) else React.createElement("VideoFrame", {
-			Looped = false,
-			Playing = false,
-			Volume = 0,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
+		PlusIcon = React.createElement(View, {
 			Size = UDim2.fromScale(1, 1),
-			Video = t1.assetSource
+			tag = "align-x-center align-y-center"
 		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 12)
+			IconElement = React.createElement(Icon, {
+				name = IconName.PlusSmall,
+				size = IconSize.Medium,
+				tag = "auto-xy content-default"
 			})
-		}) else React.createElement(View, {
-			tag = "size-full radius-large bg-surface-200"
-		}),
-		EditButton = if not t1.isSelected or not t1.onEditPressed then nil else React.createElement(View, {
-			tag = "auto-xy radius-circle bg-over-media-0 padding-xxsmall",
-			ZIndex = 3,
-			Position = UDim2.new(1, -v24.Gap.Small, 0, v24.Gap.Small),
-			AnchorPoint = Vector2.new(1, 0)
-		}, {
-			Button = React.createElement(IconButton, {
-				icon = IconName.Pencil,
-				size = InputSize.XSmall,
-				onActivated = t1.onEditPressed
-			})
-		}),
-		VideoBadge = if t1.mediaType ~= "video" then nil else React.createElement(Badge, {
-			ZIndex = 3,
-			Position = UDim2.fromOffset(v24.Gap.Small, v24.Gap.Small),
-			icon = {
-				name = IconName.PlaySmall,
-				position = IconPosition.Left
-			},
-			text = LocalizationStrings.MEDIA_SELECTION_VIDEO,
-			variant = BadgeVariant.OverMedia,
-			shape = BadgeShape.Pill,
-			size = BadgeSize.Small
 		})
 	}))
 end

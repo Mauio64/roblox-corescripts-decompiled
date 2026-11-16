@@ -1,7 +1,7 @@
 local useAppFocusRoot = require(script.useAppFocusRoot)
+local useAnyDescendantHasFocus = require(script.useAnyDescendantHasFocus)
 local useAutoFocus = require(script.useAutoFocus)
 local useDescendantHasFocus = require(script.useDescendantHasFocus)
-local useDisableAutoFocus = require(script.useDisableAutoFocus)
 local useFirstFocusableDescendantRef = require(script.useFirstFocusableDescendantRef)
 local useFocusedTextBox = require(script.useFocusedTextBox)
 local useFocusRoot = require(script.useFocusRoot)
@@ -18,21 +18,28 @@ local FocusNavigationEventNameEnum = require(script.FocusNavigationEventNameEnum
 local FocusRoot = require(script.FocusRoot)
 local getFirstFocusableDescendant = require(script.getFirstFocusableDescendant)
 local useLastInputMethod = require(script.useLastInputMethod)
+local getInputMethod = require(script.getInputMethod)
 local useLastInputMode = require(script.useLastInputMode)
 local useButtonHold = require(script.useButtonHold)
 local ButtonHoldStateEnum = require(script.ButtonHoldStateEnum)
+local ButtonHoldCompletedSignal = require(script.ButtonHoldCompletedSignal)
 local useFocusOnMount = require(script.useFocusOnMount)
+local useActivationOnFocus = require(script.useActivationOnFocus)
+local PendingActivationOnFocus = require(script.PendingActivationOnFocus)
+local useGamepadCursorEnabled = require(script.useGamepadCursorEnabled)
 
 return {
 	["jest.config"] = script["jest.config"],
 	useAppFocusRoot = useAppFocusRoot,
+	useAnyDescendantHasFocus = useAnyDescendantHasFocus,
 	useAutoFocus = useAutoFocus,
 	useDescendantHasFocus = useDescendantHasFocus,
-	useDisableAutoFocus = useDisableAutoFocus,
 	useFirstFocusableDescendantRef = useFirstFocusableDescendantRef,
 	useFocusNavigableSurfaceRegistryConnection = useFocusNavigableSurfaceRegistryConnection,
 	useFocusedTextBox = useFocusedTextBox,
 	useFocusOnMount = useFocusOnMount,
+	useActivationOnFocus = useActivationOnFocus,
+	flushPendingActivationOnFocus = PendingActivationOnFocus.flush,
 	useFocusRoot = useFocusRoot,
 	useDefaultAppEventHandlers = useDefaultAppEventHandlers,
 	useDefaultFocusNavigationBindings = useDefaultFocusNavigationBindings,
@@ -46,7 +53,10 @@ return {
 	FocusRoot = FocusRoot,
 	getFirstFocusableDescendant = getFirstFocusableDescendant,
 	useLastInputMode = useLastInputMode,
+	useGamepadCursorEnabled = useGamepadCursorEnabled,
 	useLastInputMethod = useLastInputMethod,
+	getInputMethod = getInputMethod,
 	useButtonHold = useButtonHold,
-	ButtonHoldStateEnum = ButtonHoldStateEnum
+	ButtonHoldStateEnum = ButtonHoldStateEnum,
+	ButtonHoldCompletedSignal = ButtonHoldCompletedSignal
 }

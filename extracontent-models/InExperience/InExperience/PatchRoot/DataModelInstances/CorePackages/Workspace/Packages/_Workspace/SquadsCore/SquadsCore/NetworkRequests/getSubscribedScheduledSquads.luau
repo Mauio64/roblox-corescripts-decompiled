@@ -1,48 +1,45 @@
 local HttpService = game:GetService("HttpService")
+
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local UrlBuilder = require(SquadsCoreParent.UrlBuilder)
+local parent = SquadsCore.Parent
+
+local UrlBuilder = require(parent.UrlBuilder)
+
 local Logger = require(SquadsCore.Logger)
 local serializeTable = require(SquadsCore.Utils.serializeTable)
-
 require(SquadsCore.Types)
 
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local urlBuilder = UrlBuilder.UrlBuilder
 local UrlBase = UrlBuilder.UrlBase
-local v9 = UrlBuilder2.new({
-	path = "group-up/v1/get-subscribed-scheduled-group-ups",
-	base = UrlBase.APIS
+
+local url = urlBuilder.new({
+	base = UrlBase.APIS,
+	path = "group-up/v1/get-subscribed-scheduled-group-ups"
 })()
 
-return function(p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 22
-	-- upvalues: HttpService (copy), v9 (copy), Logger (copy), serializeTable (copy)
+return function(callback, callback2)
 	return HttpService:RequestInternal({
+		Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
 		Method = "GET",
-		Headers = {
-			["Content-Type"] = "application/json",
-			Accept = "application/json"
-		},
-		Url = v9
-	}):Start(function(_, p4) -- line: 35
-		-- upvalues: p1 (copy), HttpService (copy), Logger (copy), serializeTable (copy), p2 (copy)
-		if p4.StatusCode == 200 then
-			local Body = p4.Body
+		Url = url
+	}):Start(function(_, data)
+		if data.StatusCode == 200 then
+			local body = data.Body
 
-			if p1 then
-				p1(HttpService:JSONDecode(Body))
+			if callback then
+				callback(HttpService:JSONDecode(body))
 			end
 
-			Logger:debug("Response: {}", serializeTable(Body))
-
-			return p4
+			Logger:debug("Response: {}", serializeTable(body))
+			return data
 		end
 
-		if p2 then
-			p2()
+		if callback2 then
+			callback2()
 		end
 
-		Logger:error("Error getting subscribed scheduled squads: {}", p4.StatusMessage)
+		Logger:error("Error getting subscribed scheduled squads: {}", data.StatusMessage)
 
-		return p4
+		return data
 	end)
 end

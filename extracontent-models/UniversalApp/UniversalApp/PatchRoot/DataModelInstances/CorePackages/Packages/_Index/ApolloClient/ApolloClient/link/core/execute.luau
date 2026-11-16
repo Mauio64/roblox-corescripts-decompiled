@@ -1,3 +1,2 @@
-return {
-	execute = require(script.Parent.ApolloLink).ApolloLink.execute
-}
+local ApolloLink = require(script.Parent.ApolloLink)
+return { execute = ApolloLink.ApolloLink.execute }

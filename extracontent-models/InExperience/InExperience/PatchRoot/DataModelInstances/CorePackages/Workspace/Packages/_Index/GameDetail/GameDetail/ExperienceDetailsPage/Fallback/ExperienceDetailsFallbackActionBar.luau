@@ -1,94 +1,108 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("GameDetail").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local ButtonSize = Foundation.Enums.ButtonSize
 local useTokens = Foundation.Hooks.useTokens
-local GamePlayButton = require(Parent.GamePlayButton)
+local GamePlayButton = require(parent.GamePlayButton)
 local useGameInfo = require(script.Parent.Parent.useGameInfo)
 local PlayButton = GamePlayButton.PlayButton
-local SharedFlags = require(Parent.SharedFlags)
-local FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox = SharedFlags.FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox
-local FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox = SharedFlags.FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagSduiEdpPersistentActionBarPlayButton = SharedFlags.FFlagSduiEdpPersistentActionBarPlayButton
 local FFlagLuaAppLaunchWhenLoadingEdp = SharedFlags.FFlagLuaAppLaunchWhenLoadingEdp
-local FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp = SharedFlags.FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp
+local FFlagEnableGameJoinEarlyAccess = SharedFlags.FFlagEnableGameJoinEarlyAccess
 
-local function ExperienceDetailsActionBarSkeleton(t1: {[any]: any}) -- line: 34
-	-- upvalues: useTokens (copy), React (copy), View (copy), FFlagSduiEdpPersistentActionBarPlayButton (copy), Skeleton (copy), EnumsRadius (copy), PlayButton (copy), FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox (copy), FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox (copy), ButtonSize (copy), Foundation (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy)
-	local Size_1200 = useTokens().Size.Size_1200
+local function ExperienceDetailsActionBarSkeleton(props)
+	local size_1200 = useTokens().Size.Size_1200
 
-	return React.createElement(View, {
-		testId = "--edp-fallback-action-bar-skeleton",
-		tag = not FFlagSduiEdpPersistentActionBarPlayButton and "row align-y-center gap-small size-full-0 auto-y padding-x-medium padding-top-medium bg-surface-0 stroke-default" or "row align-y-center gap-small auto-xy"
-	}, {
+	local createElement = React.createElement
+
+	local v = {
 		IconButtonSkeleton1 = React.createElement(Skeleton, {
-			LayoutOrder = 1,
-			Size = UDim2.fromOffset(Size_1200, Size_1200),
-			radius = EnumsRadius.Medium
+			Size = UDim2.fromOffset(size_1200, size_1200),
+			radius = Radius.Medium,
+			LayoutOrder = 1
 		}),
 		IconButtonSkeleton2 = React.createElement(Skeleton, {
-			LayoutOrder = 2,
-			Size = UDim2.fromOffset(Size_1200, Size_1200),
-			radius = EnumsRadius.Medium
+			Size = UDim2.fromOffset(size_1200, size_1200),
+			radius = Radius.Medium,
+			LayoutOrder = 2
 		}),
-		PlayBtnContainer = if not FFlagSduiEdpPersistentActionBarPlayButton then React.createElement(View, {
-			tag = "grow auto-y",
-			LayoutOrder = 3
-		}, {
+		PlayBtnContainer = 0
+	}
+	local playBtnContainer
+
+	if not FFlagSduiEdpPersistentActionBarPlayButton then
+		playBtnContainer = React.createElement(View, { tag = "grow auto-y", LayoutOrder = 3 }, {
 			PlayBtn = React.createElement(PlayButton, {
-				testId = "--edp-fallback-play-button",
-				universeId = t1.universeId,
-				referralSource = t1.referralSource,
-				launchSource = t1.launchSource,
-				experienceJoinData = t1.experienceJoinData,
-				placeId = t1.placeIdOverride,
-				useUIBloxButton = if not FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox then nil else FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox,
+				universeId = props.universeId,
+				referralSource = props.referralSource,
+				launchSource = props.launchSource,
+				experienceJoinData = props.experienceJoinData,
+				placeId = props.placeIdOverride,
+				useUIBloxButton = true,
 				buttonSize = ButtonSize.Large,
 				fillBehavior = Foundation.Enums.FillBehavior.Fill,
-				launchWhenLoading = not not FFlagLuaAppLaunchWhenLoadingEdp or nil,
-				launchOnReleaseAfterUnmount = not not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp or nil
-			})
-		}) else nil
-	})
-end
-local function ExperienceDetailsActionBarError(t2: {[any]: any}) -- line: 79
-	-- upvalues: useGameInfo (copy), FFlagSduiEdpPersistentActionBarPlayButton (copy), React (copy), View (copy), PlayButton (copy), FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox (copy), FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox (copy), ButtonSize (copy), Foundation (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy)
-	local v23 = useGameInfo(t2.universeId)
-
-	if v23 ~= nil and v23.isUnavailable == true then
-		return nil
-	end
-
-	if FFlagSduiEdpPersistentActionBarPlayButton then
-		return nil
-	end
-
-	return React.createElement(View, {
-		tag = "row align-y-center gap-small size-full-0 auto-y padding-x-medium padding-top-medium bg-surface-0 stroke-default",
-		testId = "--edp-fallback-action-bar-error"
-	}, {
-		PlayBtnContainer = React.createElement(View, {
-			tag = "grow auto-y",
-			LayoutOrder = 1
-		}, {
-			PlayBtn = React.createElement(PlayButton, {
-				testId = "--edp-fallback-play-button",
-				universeId = t2.universeId,
-				referralSource = t2.referralSource,
-				launchSource = t2.launchSource,
-				experienceJoinData = t2.experienceJoinData,
-				placeId = t2.placeIdOverride,
-				useUIBloxButton = not FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox or FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox,
-				buttonSize = ButtonSize.Large,
-				fillBehavior = Foundation.Enums.FillBehavior.Fill,
-				launchWhenLoading = not not FFlagLuaAppLaunchWhenLoadingEdp or nil,
-				launchOnReleaseAfterUnmount = not not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp or nil
+				launchWhenLoading = FFlagLuaAppLaunchWhenLoadingEdp and true or nil,
+				launchOnReleaseAfterUnmount = true,
+				enableEarlyAccessPlusTooltip = FFlagEnableGameJoinEarlyAccess and true or nil,
+				enableEarlyAccessState = FFlagEnableGameJoinEarlyAccess and true or nil,
+				testId = "--edp-fallback-play-button"
 			})
 		})
-	})
+	end
+
+	v.PlayBtnContainer = playBtnContainer
+	return createElement(View, {
+		tag = FFlagSduiEdpPersistentActionBarPlayButton and "row align-y-center gap-small auto-xy" or "row align-y-center gap-small size-full-0 auto-y padding-x-medium padding-top-medium bg-surface-0 stroke-default",
+		testId = "--edp-fallback-action-bar-skeleton"
+	}, v)
+end
+
+local function ExperienceDetailsActionBarError(props)
+	local v = useGameInfo(props.universeId)
+	local v2
+
+	if v == nil then
+		v2 = false
+	else
+		v2 = v.isUnavailable == true
+	end
+
+	if v2 or FFlagSduiEdpPersistentActionBarPlayButton then
+		return nil
+	end
+
+	return React.createElement(
+		View,
+		{
+			tag = "row align-y-center gap-small size-full-0 auto-y padding-x-medium padding-top-medium bg-surface-0 stroke-default",
+			testId = "--edp-fallback-action-bar-error"
+		},
+		{
+			PlayBtnContainer = React.createElement(View, { tag = "grow auto-y", LayoutOrder = 1 }, {
+				PlayBtn = React.createElement(PlayButton, {
+					universeId = props.universeId,
+					referralSource = props.referralSource,
+					launchSource = props.launchSource,
+					experienceJoinData = props.experienceJoinData,
+					placeId = props.placeIdOverride,
+					useUIBloxButton = true,
+					buttonSize = ButtonSize.Large,
+					fillBehavior = Foundation.Enums.FillBehavior.Fill,
+					launchWhenLoading = FFlagLuaAppLaunchWhenLoadingEdp and true or nil,
+					launchOnReleaseAfterUnmount = true,
+					enableEarlyAccessPlusTooltip = FFlagEnableGameJoinEarlyAccess and true or nil,
+					enableEarlyAccessState = FFlagEnableGameJoinEarlyAccess and true or nil,
+					testId = "--edp-fallback-play-button"
+				})
+			})
+		}
+	)
 end
 
 return {

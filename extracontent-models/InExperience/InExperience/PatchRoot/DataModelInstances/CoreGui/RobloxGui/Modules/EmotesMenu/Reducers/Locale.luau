@@ -1,12 +1,16 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local Actions = ParentParent.Actions
-local SetLocale = require(Actions.SetLocale)
-local Constants = require(ParentParent.Constants)
+
+local parent = script.Parent.Parent
+
+local actions = parent.Actions
+
+local SetLocale = require(actions.SetLocale)
+local Constants = require(parent.Constants)
 
 return Rodux.createReducer(Constants.FallbackLocale, {
-	[SetLocale.name] = function(_, p2) -- line: 14
-		return p2.locale
+	[SetLocale.name] = function(_, p)
+		return p.locale
 	end
 })

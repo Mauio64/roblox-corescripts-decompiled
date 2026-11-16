@@ -1,14 +1,12 @@
 require(script.Parent.types)
-
-local function getRouteKeyIsInNavigationState(s1: string, p1) -- line: 6
-	-- upvalues: getRouteKeyIsInNavigationState (copy)
-	if s1 == p1.key then
+local function getRouteKeyIsInNavigationState(p: string, route): boolean
+	if route.key == p then
 		return true
 	end
 
-	if p1.routes then
-		for _, v in pairs(p1.routes) do
-			if getRouteKeyIsInNavigationState(s1, v) then
+	if route.routes then
+		for _, route2 in pairs(route.routes) do
+			if getRouteKeyIsInNavigationState(p, route2) then
 				return true
 			end
 		end

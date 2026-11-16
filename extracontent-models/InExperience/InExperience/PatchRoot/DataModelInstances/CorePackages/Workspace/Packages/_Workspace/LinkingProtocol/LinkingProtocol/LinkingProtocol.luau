@@ -1,119 +1,149 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local MessageBusService = game:GetService("MessageBusService")
 
-require(ParentParent.MessageBus)
+require(parent.MessageBus)
+local Promise = require(parent.Promise)
 
-local Promise = require(ParentParent.Promise)
 local getFFlagEnableToSwitchToSettingsAppWithRouteLua = require(script.Parent.Flags.getFFlagEnableToSwitchToSettingsAppWithRouteLua)
+local getFFlagEnableAdConsentAttribution = require(script.Parent.Flags.getFFlagEnableAdConsentAttribution)
 
 require(script.Parent.LinkingProtocolTypes)
+local DeepLinkSource = require(script.Parent.Enums.DeepLinkSource)
 require(script.Parent.Enums.SettingsRoute)
 
-local LinkingService = require(ParentParent.MockableProxyServices).LinkingService
-local t1 = {}
+local MockableProxyServices = require(parent.MockableProxyServices)
+local LinkingService = MockableProxyServices.LinkingService
 
-t1.__index = t1
+local LinkingProtocol = {}
+LinkingProtocol.__index = LinkingProtocol
+LinkingProtocol.DeepLinkSource = DeepLinkSource
 
-function t1.new() -- line: 30
-	-- upvalues: t1 (copy)
+local function getEngineFeature(p: string)
+	return game:GetEngineFeature(p)
+end
+
+function LinkingProtocol.new(callback)
 	return (setmetatable({
+		_getEngineFeature = callback or getEngineFeature,
 		isListeningForURLs = false,
 		urlConnection = nil
-	}, t1))
+	}, LinkingProtocol))
 end
-function t1.registerURL(_: {[any]: any}, s1: string) -- line: 45
-	-- upvalues: LinkingService (copy)
-	LinkingService:RegisterLuaUrl(s1)
-end
-function t1.getUID(_) -- line: 60
-	-- upvalues: Promise (copy), MessageBusService (copy)
-	if not game:GetEngineFeature("EnableAppflyerUIDReporting") then
-		return Promise.resolve("")
+
+function LinkingProtocol:registerURL(p: string, p2)
+	local engineHandlingPolicy
+
+	if p2 then
+		engineHandlingPolicy = p2.engineHandlingPolicy
 	end
 
-	return Promise.new(function(resolve, _) -- line: 65
-		-- upvalues: MessageBusService (copy)
-		MessageBusService:MakeRequest("Linking", "getUID", {}, function(t3: {[any]: any}) -- line: 66
-			-- upvalues: resolve (copy)
-			resolve(t3.uid)
-		end, {})
-	end)
+	if engineHandlingPolicy and self._getEngineFeature("ExternalOriginOnlyUrlRegistration") then
+		LinkingService:RegisterLuaUrlWithPolicy(p, engineHandlingPolicy)
+	else
+		LinkingService:RegisterLuaUrl(p)
+	end
 end
-function t1.detectURL(_: {[any]: any}, s2: string) -- line: 79
-	-- upvalues: LinkingService (copy)
-	LinkingService:DetectUrl(s2)
+
+function LinkingProtocol.getUID(_)
+	if game:GetEngineFeature("EnableAppflyerUIDReporting") then
+		return Promise.new(function(callback, _)
+			MessageBusService:MakeRequest("Linking", "getUID", {}, function(p)
+				callback(p.uid)
+			end, {})
+		end)
+	end
+
+	return Promise.resolve("")
 end
-function t1.getLastLuaURL(_) -- line: 89
-	-- upvalues: LinkingService (copy)
+
+function LinkingProtocol.detectURL(_, p: string)
+	LinkingService:DetectUrl(p)
+end
+
+function LinkingProtocol:isInternalDlicEnabled()
+	return self._getEngineFeature("EnableDLICInternalIngressSeeding")
+end
+
+function LinkingProtocol.createInternalDlic(_, p: string, p2)
+	return LinkingService:CreateInternalDlic(p, p2)
+end
+
+function LinkingProtocol.detectDeeplinkIntent(_, p: string)
+	LinkingService:DetectDlic(p)
+end
+
+function LinkingProtocol.adConsentResolved(_, p)
+	if not getFFlagEnableAdConsentAttribution() then
+		return
+	end
+
+	MessageBusService:Publish("Linking.adConsentResolved", p)
+end
+
+function LinkingProtocol.getLastLuaURL(_)
 	return LinkingService:GetLastLuaUrl()
 end
-function t1.listenForLuaURLs(t5: {[any]: any}, p4: ((...any) -> ...any), _: boolean?) -- line: 101
-	-- upvalues: LinkingService (copy)
-	t5:stopListeningForLuaURLs()
-	t5.urlConnection = LinkingService.OnLuaUrl:Connect(function(p5, _, p7) -- line: 103
-		-- upvalues: p4 (copy)
-		p4(p5, p7)
+
+function LinkingProtocol:listenForLuaURLs(callback, _: boolean?)
+	self:stopListeningForLuaURLs()
+	self.urlConnection = LinkingService.OnLuaUrl:Connect(function(p, _, p2)
+		callback(p, p2)
 	end)
-	t5.isListeningForURLs = true
+	self.isListeningForURLs = true
+	local v = LinkingService:StartLuaUrlDelivery()
 
-	local v16 = LinkingService:StartLuaUrlDelivery()
-
-	if v16 and v16.url then
-		p4(v16.url, v16.attributionUrl)
+	if v and v.url then
+		callback(v.url, v.attributionUrl)
 	end
 end
-function t1.stopListeningForLuaURLs(p8) -- line: 118
-	-- upvalues: LinkingService (copy)
-	if p8.isListeningForURLs then
-		p8.urlConnection:Disconnect()
+
+function LinkingProtocol:stopListeningForLuaURLs()
+	if self.isListeningForURLs then
+		self.urlConnection:Disconnect()
 		LinkingService:StopLuaUrlDelivery()
-		p8.isListeningForURLs = false
+		self.isListeningForURLs = false
 	end
 end
-function t1.openURL(_: {[any]: any}, s3: string) -- line: 142
-	-- upvalues: Promise (copy), LinkingService (copy)
-	return Promise.new(function(resolve, _) -- line: 143
-		-- upvalues: LinkingService (copy), s3 (copy)
-		resolve(LinkingService:OpenUrl(s3))
+
+function LinkingProtocol.openURL(_, p: string)
+	return Promise.new(function(callback, _)
+		callback(LinkingService:OpenUrl(p))
 	end)
 end
-function t1.isURLRegistered(_: {[any]: any}, s4: string) -- line: 166
-	-- upvalues: Promise (copy), LinkingService (copy)
-	return Promise.new(function(resolve, _) -- line: 167
-		-- upvalues: LinkingService (copy), s4 (copy)
-		resolve(LinkingService:IsUrlRegistered(s4))
+
+function LinkingProtocol.isURLRegistered(_, p: string)
+	return Promise.new(function(callback, _)
+		callback(LinkingService:IsUrlRegistered(p))
 	end)
 end
-function t1.getAndClearLastPendingURL(_) -- line: 181
-	-- upvalues: Promise (copy), LinkingService (copy)
-	if not game:GetEngineFeature("LinkingProtocolGetLastPendingUrlEnabled") then
-		return Promise.resolve({
-			hasPendingUrl = false
-		})
+
+function LinkingProtocol.getAndClearLastPendingURL(_)
+	if game:GetEngineFeature("LinkingProtocolGetLastPendingUrlEnabled") then
+		return Promise.new(function(callback, _)
+			callback(LinkingService:GetAndClearLastPendingUrl())
+		end)
 	end
 
-	return Promise.new(function(resolve, _) -- line: 188
-		-- upvalues: LinkingService (copy)
-		resolve(LinkingService:GetAndClearLastPendingUrl())
-	end)
+	return Promise.resolve({ hasPendingUrl = false })
 end
-function t1.switchToSettingsApp(_, p14) -- line: 199
-	-- upvalues: getFFlagEnableToSwitchToSettingsAppWithRouteLua (copy), Promise (copy), LinkingService (copy)
-	local v25 = if not getFFlagEnableToSwitchToSettingsAppWithRouteLua() then nil else p14
 
-	return Promise.new(function(resolve, _) -- line: 201
-		-- upvalues: LinkingService (copy), v25 (copy)
-		resolve(LinkingService:SwitchToSettingsApp(v25))
-	end)
-end
-function t1.supportsSwitchToSettingsApp(_, _) -- line: 213
-	-- upvalues: Promise (copy), LinkingService (copy)
-	return Promise.new(function(resolve, _) -- line: 214
-		-- upvalues: LinkingService (copy)
-		resolve(LinkingService:SupportsSwitchToSettingsApp())
+function LinkingProtocol.switchToSettingsApp(_, p)
+	if not getFFlagEnableToSwitchToSettingsAppWithRouteLua() then
+		p = nil
+	end
+
+	return Promise.new(function(callback, _)
+		callback(LinkingService:SwitchToSettingsApp(p))
 	end)
 end
 
-t1.default = t1.new()
+function LinkingProtocol.supportsSwitchToSettingsApp(_, _)
+	return Promise.new(function(callback, _)
+		callback(LinkingService:SupportsSwitchToSettingsApp())
+	end)
+end
 
-return t1
+LinkingProtocol.default = LinkingProtocol.new()
+
+return LinkingProtocol

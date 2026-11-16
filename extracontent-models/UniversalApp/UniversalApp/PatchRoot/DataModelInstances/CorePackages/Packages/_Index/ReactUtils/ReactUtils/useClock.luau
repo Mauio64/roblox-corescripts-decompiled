@@ -1,28 +1,23 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(parent.React)
 
-local function useClock() -- line: 7
-	-- upvalues: React (copy)
-	local v4, v5 = React.useBinding(0)
+local function useClock()
+	local v, v2 = React.useBinding(0)
 
-	React.useEffect(function() -- line: 10
-		-- upvalues: v5 (copy), v4 (copy)
-		local thread = task.spawn(function() -- line: 11
-			-- upvalues: v5 (copy), v4 (copy)
+	React.useEffect(function()
+		local thread = task.spawn(function()
 			while true do
-				local elapsed = task.wait()
-
-				v5(v4:getValue() + elapsed)
+				local v3 = task.wait()
+				v2(v:getValue() + v3)
 			end
 		end)
 
-		return function() -- line: 18
-			-- upvalues: thread (copy)
+		return function()
 			task.cancel(thread)
 		end
 	end, {})
 
-	return v4
+	return v
 end
 
 return useClock

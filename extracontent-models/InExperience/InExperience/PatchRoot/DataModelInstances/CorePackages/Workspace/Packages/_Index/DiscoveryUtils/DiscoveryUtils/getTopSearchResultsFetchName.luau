@@ -1,5 +1,5 @@
-local function getFetchName(s1: string, s2: string) -- line: 1
-	return `search.{ s1 }.{ s2 }`
+local function getFetchName(p: string, p2: string)
+	return `search.{p}.{p2}`
 end
 
 return getFetchName

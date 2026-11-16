@@ -1,23 +1,24 @@
-local ParentParent = script.Parent.Parent.Parent
-local Signals = require(ParentParent.Signals)
-local v3 = require(ParentParent.LeaderboardStore).createLeaderboardStore()
-local v4, v5 = Signals.createSignal(nil)
-local u6 = v4
-local u7 = v5
+local parent = script.Parent.Parent.Parent
+local Signals = require(parent.Signals)
+local LeaderboardStore = require(parent.LeaderboardStore)
+local leaderboardStore = LeaderboardStore.createLeaderboardStore()
 
-return {
-	createLeaderboardStoreInstance = function() -- line: 13
-		-- upvalues: u7 (ref), v3 (copy)
-		u7(v3())
-	end,
-	getLeaderboardStoreInstance = u6,
-	cleanUpInstance = function() -- line: 17
-		-- upvalues: u6 (ref), u7 (ref)
-		local v8 = u6(false)
+local signal, v = Signals.createSignal(nil)
+local LeaderboardStoreInstanceManager = {}
 
-		if v8 ~= nil then
-			v8.cleanUp()
-			u7(nil)
-		end
+function LeaderboardStoreInstanceManager.createLeaderboardStoreInstance()
+	v(leaderboardStore())
+end
+
+LeaderboardStoreInstanceManager.getLeaderboardStoreInstance = signal
+
+function LeaderboardStoreInstanceManager.cleanUpInstance()
+	local v2 = signal(false)
+
+	if v2 ~= nil then
+		v2.cleanUp()
+		v(nil)
 	end
-}
+end
+
+return LeaderboardStoreInstanceManager

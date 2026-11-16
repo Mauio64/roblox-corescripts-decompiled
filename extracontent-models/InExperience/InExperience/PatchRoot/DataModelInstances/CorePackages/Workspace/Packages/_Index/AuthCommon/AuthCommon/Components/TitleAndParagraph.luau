@@ -1,173 +1,209 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Roact = require(AuthCommonParent.Roact)
-local RoactRodux = require(AuthCommonParent.RoactRodux)
-local withLocalization = require(AuthCommonParent.Localization).withLocalization
-local withStyle = require(AuthCommonParent.UIBlox).Style.withStyle
-local ArgCheck = require(AuthCommonParent.ArgCheck)
+local parent = AuthCommon.Parent
+
+local Roact = require(parent.Roact)
+local RoactRodux = require(parent.RoactRodux)
+local Localization = require(parent.Localization)
+local withLocalization = Localization.withLocalization
+
+local UIBlox = require(parent.UIBlox)
+local withStyle = UIBlox.Style.withStyle
+
+local ArgCheck = require(parent.ArgCheck)
 local FitChildren = require(AuthCommon.Components.FitChildren)
 local FitTextLabel = require(AuthCommon.Components.FitTextLabel)
-local FormFactor = require(AuthCommonParent.FormFactor).Enums.FormFactor
-local v11 = Roact.PureComponent:extend("TitleAndParagraph")
+local FormFactor = require(parent.FormFactor)
+local formFactor = FormFactor.Enums.FormFactor
+
+local extended = Roact.PureComponent:extend("TitleAndParagraph")
+
 local RegisterAuditContent = require(AuthCommon.Components.RegisterAuditContent)
-local SharedFlags = require(AuthCommonParent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local GetFFlagEnableAuditForSinglePageSignUp = SharedFlags.GetFFlagEnableAuditForSinglePageSignUp
 local GetFFlagEnableAuditForSso = SharedFlags.GetFFlagEnableAuditForSso
 
-v11.defaultProps = {
+extended.defaultProps = {
 	layoutOrder = 0,
 	textXAlignment = Enum.TextXAlignment.Left,
 	paragraphTextKeys = {},
 	paragraphTextArgs = {}
 }
 
-function v11.init(p1) -- line: 35
-	p1.parametersCache = {}
+function extended:init()
+	self.parametersCache = {}
 end
-function v11.getCachedParameters(t1: {[any]: any}, s1: string, p2) -- line: 40
-	if type(p2) ~= "table" then
+
+function extended:getCachedParameters(p: string, items)
+	if type(items) ~= "table" then
 		return nil
 	end
 
-	local v20 = t1.parametersCache[s1]
+	local v = self.parametersCache[p]
 
-	if v20 then
-		return v20
+	if v then
+		return v
 	end
 
-	local t2 = {}
+	local result = {}
 
-	for k, v in pairs(p2) do
+	for k, item in pairs(items) do
 		if type(k) == "string" then
-			t2[k] = tostring(v)
+			result[k] = tostring(item)
 		end
 	end
 
-	t1.parametersCache[s1] = t2
-
-	return t2
+	self.parametersCache[p] = result
+	return result
 end
-function v11.render(p3) -- line: 78
-	-- upvalues: ArgCheck (copy), GetFFlagEnableAuditForSso (copy), GetFFlagEnableAuditForSinglePageSignUp (copy), withLocalization (copy), withStyle (copy), FormFactor (copy), Roact (copy), FitTextLabel (copy), FitChildren (copy), RegisterAuditContent (copy)
-	local formFactor = p3.props.formFactor
-	local layoutOrder = p3.props.layoutOrder
-	local titleTextKey = p3.props.titleTextKey
-	local paragraphTextKeys = p3.props.paragraphTextKeys
-	local width = p3.props.width
-	local textXAlignment = p3.props.textXAlignment
+
+local function fn(i) -- 2 equivalent calls inferred from this helper
+	return "paragraphText" .. tostring(i)
+end
+
+local function fn2(i) -- 2 equivalent calls inferred from this helper
+	return "paragraphTextTemplate" .. tostring(i)
+end
+
+function extended:render()
+	local formFactor2 = self.props.formFactor
+
+	local layoutOrder = self.props.layoutOrder
+	local titleTextKey = self.props.titleTextKey
+	local paragraphTextKeys = self.props.paragraphTextKeys
+
+	local width = self.props.width
+	local textXAlignment = self.props.textXAlignment
 
 	ArgCheck.isType(paragraphTextKeys, "table", "TitleAndParagraph expects paragraphTextKeys to be a table.")
 
-	local uDim2 = UDim2.new(1, 0, 0, 0)
+	local udim = UDim2.new(1, 0, 0, 0)
 
 	if width then
-		uDim2 = UDim2.new(0, width, 0, 0)
+		udim = UDim2.new(0, width, 0, 0)
 	end
 
-	local t3 = {
-		titleText = titleTextKey
-	}
+	local v = { titleText = titleTextKey }
 
-	for i, v in ipairs(paragraphTextKeys) do
-		t3["paragraphText" .. tostring(i)] = v
+	for i, paragraphTextKey in ipairs(paragraphTextKeys) do
+		v[fn(i)] = paragraphTextKey -- inferred equivalent call
 
-		if GetFFlagEnableAuditForSso() and GetFFlagEnableAuditForSinglePageSignUp() and p3.props.enableAuditContentCapture and type(v) == "table" then
-			t3["paragraphTextTemplate" .. tostring(i)] = v[1]
+		if not (GetFFlagEnableAuditForSso() and GetFFlagEnableAuditForSinglePageSignUp() and self.props.enableAuditContentCapture and type(paragraphTextKey) == "table") then
+			continue
 		end
+
+		v[fn2(i)] = paragraphTextKey[1] -- inferred equivalent call
 	end
 
-	if not GetFFlagEnableAuditForSso() and GetFFlagEnableAuditForSinglePageSignUp() and p3.props.enableAuditContentCapture then
-		t3.verificationLinkingTextTemplate = "Authentication.SignUp.Description.VerificationLinkingText.VariableButtonName"
+	if
+		not GetFFlagEnableAuditForSso()
+		and GetFFlagEnableAuditForSinglePageSignUp()
+		and self.props.enableAuditContentCapture
+	then
+		v.verificationLinkingTextTemplate = "Authentication.SignUp.Description.VerificationLinkingText.VariableButtonName"
 	end
 
-	return withLocalization(t3)(function(p4) -- line: 122
-		-- upvalues: withStyle (copy), formFactor (copy), FormFactor (copy), Roact (copy), FitTextLabel (copy), textXAlignment (copy), FitChildren (copy), paragraphTextKeys (copy), GetFFlagEnableAuditForSinglePageSignUp (copy), p3 (copy), RegisterAuditContent (copy), GetFFlagEnableAuditForSso (copy), layoutOrder (copy), uDim2 (ref)
-		return withStyle(function(p5) -- line: 123
-			-- upvalues: formFactor (copy), FormFactor (copy), Roact (copy), p4 (copy), FitTextLabel (copy), textXAlignment (copy), FitChildren (copy), paragraphTextKeys (copy), GetFFlagEnableAuditForSinglePageSignUp (copy), p3 (copy), RegisterAuditContent (copy), GetFFlagEnableAuditForSso (copy), layoutOrder (copy), uDim2 (ref)
-			local v41 = p5.Font.BaseSize * p5.Font.Title.RelativeSize
-			local TitleFont = p5.Font.Title.Font
-			local n1 = 12
-			local v44 = p5.Font.BaseSize * p5.Font.Body.RelativeSize
-			local BodyFont = p5.Font.Body.Font
+	return withLocalization(v)(function(p)
+		return withStyle(function(p2)
+			local textSize = p2.Font.BaseSize * p2.Font.Title.RelativeSize
+			local font = p2.Font.Title.Font
 
-			if formFactor == FormFactor.COMPACT then
-				v41 = p5.Font.BaseSize * p5.Font.Title.RelativeMinSize
-				n1 = 5
-				v44 = p5.Font.BaseSize * p5.Font.Body.RelativeMinSize
+			local textSize2 = p2.Font.BaseSize * p2.Font.Body.RelativeSize
+			local font2 = p2.Font.Body.Font
+			local v2
+
+			if formFactor2 == formFactor.COMPACT then
+				textSize = p2.Font.BaseSize * p2.Font.Title.RelativeMinSize
+
+				textSize2 = p2.Font.BaseSize * p2.Font.Body.RelativeMinSize
+				v2 = 5
+			else
+				v2 = 12
 			end
 
-			local n2 = 0
-			local t4 = {
+			local count = 0
+			local children = {
 				Layout = Roact.createElement("UIListLayout", {
 					FillDirection = Enum.FillDirection.Vertical,
 					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, n1)
+					Padding = UDim.new(0, v2)
 				}),
-				Title = p4.titleText and Roact.createElement(FitTextLabel, {
+				Title = p.titleText and Roact.createElement(FitTextLabel, {
+					LayoutOrder = count,
 					BorderSizePixel = 0,
 					BackgroundTransparency = 1,
-					TextWrapped = true,
-					LayoutOrder = n2,
 					TextXAlignment = textXAlignment,
 					TextYAlignment = Enum.TextYAlignment.Top,
-					Text = p4.titleText,
-					TextSize = v41,
-					Font = TitleFont,
-					TextColor3 = p5.Theme.SystemPrimaryDefault.Color,
-					TextTransparency = p5.Theme.SystemPrimaryDefault.Transparency,
+					Text = p.titleText,
+					TextSize = textSize,
+					Font = font,
+					TextColor3 = p2.Theme.SystemPrimaryDefault.Color,
+					TextTransparency = p2.Theme.SystemPrimaryDefault.Transparency,
 					Size = UDim2.new(1, 0, 0, 0),
-					fitAxis = FitChildren.FitAxis.Height
+					fitAxis = FitChildren.FitAxis.Height,
+					TextWrapped = true
 				})
 			}
 
-			for i, v in ipairs(paragraphTextKeys) do
-				n2 += 1
-
-				local v50 = "paragraphText" .. tostring(i)
-				local v51 = p4[v50]
-
-				t4[v50] = Roact.createElement(FitTextLabel, {
+			for i, paragraphTextKey in ipairs(paragraphTextKeys) do
+				count += 1
+				local v3 = fn(i) -- inferred equivalent call
+				local v4 = p[v3]
+				children[v3] = Roact.createElement(FitTextLabel, {
+					LayoutOrder = count,
 					BorderSizePixel = 0,
 					BackgroundTransparency = 1,
-					TextWrapped = true,
-					LayoutOrder = n2,
 					TextXAlignment = textXAlignment,
 					TextYAlignment = Enum.TextYAlignment.Top,
-					Text = v51,
-					TextSize = v44,
-					Font = BodyFont,
-					TextColor3 = p5.Theme.TextDefault.Color,
-					TextTransparency = p5.Theme.TextDefault.Transparency,
+					Text = v4,
+					TextSize = textSize2,
+					Font = font2,
+					TextColor3 = p2.Theme.TextDefault.Color,
+					TextTransparency = p2.Theme.TextDefault.Transparency,
 					Size = UDim2.new(1, 0, 0, 0),
-					fitAxis = FitChildren.FitAxis.Height
+					fitAxis = FitChildren.FitAxis.Height,
+					TextWrapped = true
 				})
 
-				if GetFFlagEnableAuditForSinglePageSignUp() and p3.props.enableAuditContentCapture and RegisterAuditContent and v51 then
-					local v52 = "AuditContent_" .. v50
-					local v53 = if type(v) ~= "table" then v else v[1]
-					local v54 = if type(v) ~= "table" then v51 else if not GetFFlagEnableAuditForSso() then p4.verificationLinkingTextTemplate else p4["paragraphTextTemplate" .. tostring(i)]
-
-					t4[v52] = Roact.createElement(RegisterAuditContent, {
-						translationKey = v53,
-						translatedSourceString = v54,
-						parameters = p3:getCachedParameters(v52, v)
-					})
+				if not (GetFFlagEnableAuditForSinglePageSignUp() and self.props.enableAuditContentCapture and RegisterAuditContent and v4) then
+					continue
 				end
+
+				local v5 = "AuditContent_" .. v3
+				local translationKey
+
+				if type(paragraphTextKey) == "table" then
+					translationKey = paragraphTextKey[1]
+				else
+					translationKey = paragraphTextKey
+				end
+
+				if type(paragraphTextKey) == "table" then
+					if GetFFlagEnableAuditForSso() then
+						v4 = p[fn2(i)] -- inferred equivalent call
+					else
+						v4 = p.verificationLinkingTextTemplate
+					end
+				end
+
+				children[v5] = Roact.createElement(RegisterAuditContent, {
+					translationKey = translationKey,
+					translatedSourceString = v4,
+					parameters = self:getCachedParameters(v5, paragraphTextKey)
+				})
 			end
 
 			return Roact.createElement(FitChildren.FitFrame, {
-				BorderSizePixel = 0,
-				BackgroundTransparency = 1,
 				LayoutOrder = layoutOrder,
-				Size = uDim2,
-				fitAxis = FitChildren.FitAxis.Height
-			}, t4)
+				Size = udim,
+				fitAxis = FitChildren.FitAxis.Height,
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1
+			}, children)
 		end)
 	end)
 end
 
-return (RoactRodux.connect(function(p6, _) -- line: 223
-	return {
-		formFactor = p6.FormFactor
-	}
-end)(v11))
+return (RoactRodux.connect(function(p, _)
+	return { formFactor = p.FormFactor }
+end)(extended))

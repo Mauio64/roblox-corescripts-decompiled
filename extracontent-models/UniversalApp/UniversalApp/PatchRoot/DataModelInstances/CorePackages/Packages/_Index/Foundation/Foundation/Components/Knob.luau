@@ -1,1 +1,3 @@
-return (require(script.Knob))
+local Knob = require(script.Knob)
+
+return Knob

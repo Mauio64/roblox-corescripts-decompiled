@@ -1,26 +1,23 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local getFFlagUGCValidateAddObjectValueToAcceptableTypes = require(ParentParent.flags.getFFlagUGCValidateAddObjectValueToAcceptableTypes)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
+local getFFlagUGCValidateAddObjectValueToAcceptableTypes = require(parent.flags.getFFlagUGCValidateAddObjectValueToAcceptableTypes)
+
+local CurveAnimAllowedTypes = {}
+
+CurveAnimAllowedTypes.categories = {
+	ValidationEnums.UploadCategory.EMOTE_ANIMATION,
+	ValidationEnums.UploadCategory.ANIMATION
 }
+CurveAnimAllowedTypes.requiredData = { ValidationEnums.SharedDataMember.curveAnimations }
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+CurveAnimAllowedTypes.expectedFailures = {}
+CurveAnimAllowedTypes.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 
-t1.requiredData = { ValidationEnums.SharedDataMember.curveAnimations }
-t1.fflag = getFFlagUGCValidateMigrateCurveAnim
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
-
-local t2 = {
+local v = {
 	"MarkerCurve",
 	"AnimationRigData",
 	"Folder",
@@ -30,26 +27,24 @@ local t2 = {
 }
 
 if getFFlagUGCValidateAddObjectValueToAcceptableTypes() then
-	table.insert(t2, "ObjectValue")
+	table.insert(v, "ObjectValue")
 end
 
-function t1.run(p1, p2) -- line: 38
-	-- upvalues: t2 (copy), ErrorSourceStrings (copy)
-	for _, v12 in p2.curveAnimations do
-		for _, descendant in v12:GetDescendants() do
-			local v15 = false
+function CurveAnimAllowedTypes.run(object, p)
+	for _, folder in p.curveAnimations do
+		for _, descendant in folder:GetDescendants() do
+			local v2 = false
 
-			for _, v17 in t2 do
-				if descendant:IsA(v17) then
-					v15 = true
-
+			for _, className in v do
+				if descendant:IsA(className) then
+					v2 = true
 					break
 				end
 			end
 
-			if not v15 then
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidInstanceTypes, {
-					allowedTypes = table.concat(t2, ", ")
+			if not v2 then
+				object:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidInstanceTypes, {
+					allowedTypes = table.concat(v, ", ")
 				})
 
 				return
@@ -58,4 +53,4 @@ function t1.run(p1, p2) -- line: 38
 	end
 end
 
-return t1
+return CurveAnimAllowedTypes

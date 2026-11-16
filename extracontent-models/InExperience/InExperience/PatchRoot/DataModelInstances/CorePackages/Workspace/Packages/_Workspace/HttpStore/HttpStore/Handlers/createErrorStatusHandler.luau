@@ -1,27 +1,24 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Signals = require(ParentParentParent.Signals)
+local parent = script.Parent.Parent
 
-require(ParentParentParent.InternalHttpStore)
-require(ParentParent.Types)
+local parent2 = parent.Parent
+local Signals = require(parent2.Signals)
+require(parent2.InternalHttpStore)
+require(parent.Types)
 
-local function createErrorStatusHandler(p1) -- line: 11
-	-- upvalues: Signals (copy)
-	return function(p2) -- line: 12
-		-- upvalues: Signals (copy), p1 (copy)
-		return Signals.createComputed(function(p3) -- line: 13
-			-- upvalues: p2 (copy), p1 (copy)
-			local v8 = p2(p3)
+local function createErrorStatusHandler(p)
+	return function(callback)
+		return Signals.createComputed(function(p2)
+			local v = callback(p2)
 
-			if v8.status == "Success" then
-				local StatusCode = v8.response.StatusCode
+			if v.status == "Success" then
+				local statusCode = v.response.StatusCode
 
-				if p1[StatusCode] ~= nil then
-					p1[StatusCode](v8)
+				if p[statusCode] ~= nil then
+					p[statusCode](v)
 				end
 			end
 
-			return v8
+			return v
 		end)
 	end
 end

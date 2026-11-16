@@ -1,69 +1,59 @@
 local lib = script.lib
 local src = script.src
+
 local html = require(lib.html)
+
 local request = require(src.request)
 local session = require(src.session)
 local form = require(src.form)
 local ratelimit = require(src.ratelimit)
 local util = require(src.util)
 local fetch = require(src.fetch)
-local t1 = {
-	VERSION = "0.5.4",
-	Request = request.new,
-	Session = session.new,
-	FormData = form.FormData.new,
-	File = form.File.new,
-	cache = require(src.cache),
-	request = function(p1, p2, p3) -- line: 32
-		-- upvalues: request (copy)
-		local v16 = p3 or {}
 
-		return request.new(p1, p2, v16):send()
-	end
-}
+local RobloxRequests = {}
+RobloxRequests.VERSION = "0.5.4"
+RobloxRequests.Request = request.new
+RobloxRequests.Session = session.new
 
-t1.send = util.deprecate(t1.request, "0.5", "http.send")
+RobloxRequests.FormData = form.FormData.new
+RobloxRequests.File = form.File.new
 
-function t1.promise_request(p4, p5, p6) -- line: 50
-	-- upvalues: request (copy)
-	local v20 = p6 or {}
+RobloxRequests.cache = require(src.cache)
 
-	return request.new(p4, p5, v20):send(true)
+function RobloxRequests.request(p, p2, options)
+	return request.new(p, p2, options or {}):send()
 end
 
-t1.promise_send = util.deprecate(t1.promise_request, "0.5", "http.promise_send")
-t1.fetch = fetch(t1.promise_request)
+RobloxRequests.send = util.deprecate(RobloxRequests.request, "0.5", "http.send")
 
-for _, v in pairs({
-	"GET",
-	"POST",
-	"HEAD",
-	"OPTIONS",
-	"PUT",
-	"DELETE",
-	"PATCH"
-}) do
-	t1[v:lower()] = function(p7, p8) -- line: 65
-		-- upvalues: t1 (copy), v (copy)
-		return t1.request(v, p7, p8)
+function RobloxRequests.promise_request(p, p2, options)
+	return request.new(p, p2, options or {}):send(true)
+end
+
+RobloxRequests.promise_send = util.deprecate(RobloxRequests.promise_request, "0.5", "http.promise_send")
+
+RobloxRequests.fetch = fetch(RobloxRequests.promise_request)
+
+for _, v in pairs({ "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "PATCH" }) do
+	RobloxRequests[v:lower()] = function(p, p2)
+		return RobloxRequests.request(v, p, p2)
 	end
-	t1["promise_" .. v:lower()] = function(p9, p10) -- line: 69
-		-- upvalues: t1 (copy), v (copy)
-		return t1.promise_request(v, p9, p10)
+
+	RobloxRequests["promise_" .. v:lower()] = function(p, p2)
+		return RobloxRequests.promise_request(v, p, p2)
 	end
 end
 
-function t1.set_ratelimit(p11, p12) -- line: 74
-	-- upvalues: ratelimit (copy)
-	local v27 = ratelimit.get("http", p11, p12)
+function RobloxRequests.set_ratelimit(p, p2)
+	local http = ratelimit.get("http", p, p2)
 
-	print("[http] RateLimiter settings changed: ", v27.rate, "reqs /", v27.window_size, "secs")
-end
-function t1.parse_html(p13, p14) -- line: 81
-	-- upvalues: html (copy)
-	return html.parse(p13, 100000, p14)
+	print("[http] RateLimiter settings changed: ", http.rate, "reqs /", http.window_size, "secs")
 end
 
-t1.parse_xml = t1.parse_html
+function RobloxRequests.parse_html(p, p2)
+	return html.parse(p, 100000, p2)
+end
 
-return t1
+RobloxRequests.parse_xml = RobloxRequests.parse_html
+
+return RobloxRequests

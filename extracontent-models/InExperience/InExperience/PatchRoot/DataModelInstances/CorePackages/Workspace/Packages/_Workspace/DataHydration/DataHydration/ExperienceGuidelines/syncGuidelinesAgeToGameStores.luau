@@ -1,42 +1,41 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
+
 local getGameInfoStore = require(DataHydration.Game.GameInfo.getGameInfoStore)
 local getAgeRecommendationStore = require(DataHydration.Game.AgeRecommendations.getAgeRecommendationStore)
-local FFlagLuaAppDataHydrationUpdateItem = require(DataHydrationParent.SharedFlags).FFlagLuaAppDataHydrationUpdateItem
-local FFlagSduiExperienceDetailsSupport = require(DataHydrationParent.SharedFlags).FFlagSduiExperienceDetailsSupport
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDataHydrationUpdateItem = SharedFlags.FFlagLuaAppDataHydrationUpdateItem
 
 require(script.Parent.ExperienceGuidelinesStoreTypes)
 
 return {
-	syncGuidelinesAgeToGameStores = function(n1: number, p1) -- line: 12
-		-- upvalues: FFlagLuaAppDataHydrationUpdateItem (copy), getGameInfoStore (copy), FFlagSduiExperienceDetailsSupport (copy), getAgeRecommendationStore (copy)
-		local ageRecommendationDetails = p1.ageRecommendationDetails
-		local v10 = ageRecommendationDetails and ageRecommendationDetails.ageRecommendationSummary
-		local v11 = v10 and v10.ageRecommendation
+	syncGuidelinesAgeToGameStores = function(p: number, p2)
+		local ageRecommendationDetails = p2.ageRecommendationDetails
+		local ageRecommendationSummary = ageRecommendationDetails and ageRecommendationDetails.ageRecommendationSummary
+		local ageRecommendation = ageRecommendationSummary and ageRecommendationSummary.ageRecommendation
 
-		if not v11 then
+		if not ageRecommendation then
 			return
 		end
 
-		local str = tostring(n1)
+		local v = tostring(p)
 
 		if FFlagLuaAppDataHydrationUpdateItem then
-			getGameInfoStore(false).updateGameInfo(str, {
-				gameMinimumAge = v11.minimumAge,
-				gameAgeDisplayName = v11.displayName,
-				contentMaturity = v11.contentMaturity
+			getGameInfoStore(false).updateGameInfo(v, {
+				gameMinimumAge = ageRecommendation.minimumAge,
+				gameAgeDisplayName = ageRecommendation.displayName,
+				contentMaturity = ageRecommendation.contentMaturity
 			})
 		end
 
-		if FFlagSduiExperienceDetailsSupport then
-			getAgeRecommendationStore(false).updateAgeRecommendations({
-				[str] = {
-					displayName = v11.displayName,
-					displayNameWithHeaderShort = v11.displayNameWithHeaderShort,
-					igrsRating = v11.igrsRating,
-					igrsRatingDisplayMessage = v11.igrsRatingDisplayMessage
-				}
-			})
-		end
+		getAgeRecommendationStore(false).updateAgeRecommendations({
+			[v] = {
+				displayName = ageRecommendation.displayName,
+				displayNameWithHeaderShort = ageRecommendation.displayNameWithHeaderShort,
+				igrsRating = ageRecommendation.igrsRating,
+				igrsRatingDisplayMessage = ageRecommendation.igrsRatingDisplayMessage
+			}
+		})
 	end
 }

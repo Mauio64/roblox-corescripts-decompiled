@@ -1,10 +1,23 @@
-local ParentParent = script.Parent.Parent.Parent.Parent.Parent
-local v2 = require(ParentParent.UIBlox.Core.Utility.GetEngineFeatureSafe)("EnablePreferredTextSizeSetting")
-local t = require(ParentParent.t)
+local parent = script.Parent.Parent.Parent.Parent.Parent
+local GetEngineFeatureSafe = require(parent.UIBlox.Core.Utility.GetEngineFeatureSafe)
+local engineFeatureSafe = GetEngineFeatureSafe("EnablePreferredTextSizeSetting")
 
-return (t.strictInterface({
+local t = require(parent.t)
+
+local strictInterface = t.strictInterface
+local v = {
 	PreferredTransparency = t.optional(t.number),
 	ReducedMotion = t.optional(t.boolean),
-	PreferredTextSize = if not v2 then nil else t.optional(t.enum(Enum.PreferredTextSize)),
-	Scale = t.optional(t.number)
-}))
+	PreferredTextSize = 0,
+	Scale = 0
+}
+local preferredTextSize
+
+if engineFeatureSafe then
+	preferredTextSize = t.optional(t.enum(Enum.PreferredTextSize))
+end
+
+v.PreferredTextSize = preferredTextSize
+
+v.Scale = t.optional(t.number)
+return (strictInterface(v))

@@ -1,47 +1,51 @@
 local HttpService = game:GetService("HttpService")
-local SelfieQr = script:FindFirstAncestor("SelfieQr")
-local SelfieQrParent = SelfieQr.Parent
-local CoreScriptsRootProvider = require(SelfieQrParent.CoreScriptsRoactCommon).CoreScriptsRootProvider
-local React = require(SelfieQrParent.React)
-local Roact = require(SelfieQrParent.Roact)
-local RoactNetworking = require(SelfieQrParent.RoactServiceTags).RoactNetworking
-local RoactServices = require(SelfieQrParent.RoactServices).RoactServices
-local SelfieQRConnection = require(SelfieQr.SelfieQRConnection)
-local requestInternalWrapper = require(SelfieQrParent.Http).NetworkLayers.requestInternalWrapper
-local t1 = {}
-local u12 = false
 
-local function v13(p1, t2: {[any]: any}) -- line: 18
-	-- upvalues: React (copy), CoreScriptsRootProvider (copy), RoactServices (copy), RoactNetworking (copy), requestInternalWrapper (copy), HttpService (copy), Roact (copy)
-	local v16 = React.createElement(CoreScriptsRootProvider, {}, {
-		RoactServicesProvider = React.createElement(RoactServices.ServiceProvider, {
+local SelfieQr = script:FindFirstAncestor("SelfieQr")
+local parent = SelfieQr.Parent
+
+local CoreScriptsRoactCommon = require(parent.CoreScriptsRoactCommon)
+local CoreScriptsRootProvider = CoreScriptsRoactCommon.CoreScriptsRootProvider
+local React = require(parent.React)
+local Roact = require(parent.Roact)
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+local RoactServices = require(parent.RoactServices)
+local roactServices = RoactServices.RoactServices
+local SelfieQRConnection = require(SelfieQr.SelfieQRConnection)
+
+local Http = require(parent.Http)
+local requestInternalWrapper = Http.NetworkLayers.requestInternalWrapper
+
+local flag = false
+
+local function fn(p, p2)
+	local element = React.createElement(CoreScriptsRootProvider, {}, {
+		RoactServicesProvider = React.createElement(roactServices.ServiceProvider, {
 			services = {
 				[RoactNetworking] = requestInternalWrapper(HttpService)
 			}
-		}, t2)
+		}, p2)
 	})
-	local v17 = React.createElement("Folder", nil, v16)
 
-	return Roact.mount(v17, p1, "SelfieQRRoot")
+	local element2 = React.createElement("Folder", nil, element)
+
+	return Roact.mount(element2, p, "SelfieQRRoot")
 end
 
-function t1.createFactory() -- line: 32
-	-- upvalues: u12 (ref), v13 (copy), React (copy), SelfieQRConnection (copy)
-	local t3 = {}
+return {
+	createFactory = function()
+		local factory = {}
+		function factory.mountCoreUI(p)
+			if flag then
+				return
+			end
 
-	function t3.mountCoreUI(p2) -- line: 34
-		-- upvalues: u12 (ref), t3 (copy), v13 (copy), React (copy), SelfieQRConnection (copy)
-		if u12 then
-			return
+			flag = true
+
+			factory._coreUiHandle = fn(p, {
+				SelfieQR = React.createElement(SelfieQRConnection, {})
+			})
 		end
-
-		u12 = true
-		t3._coreUiHandle = v13(p2, {
-			SelfieQR = React.createElement(SelfieQRConnection, {})
-		})
+		return factory
 	end
-
-	return t3
-end
-
-return t1
+}

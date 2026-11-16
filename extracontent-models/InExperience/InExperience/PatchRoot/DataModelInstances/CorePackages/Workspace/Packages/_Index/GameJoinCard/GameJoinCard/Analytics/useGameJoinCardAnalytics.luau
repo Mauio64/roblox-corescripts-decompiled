@@ -1,174 +1,169 @@
 local Players = game:GetService("Players")
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("GameJoinCard").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
-local AgeCheckUpsellOutcome = require(script.Parent.AnalyticsConstants).AgeCheckUpsellOutcome
-local v6 = game:DefineFastInt("GameJoinCardAnalyticsThrottleHundredthsPercent", 10000)
-local t1 = {
+
+local parent = script:FindFirstAncestor("GameJoinCard").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagGameJoinCardAnalyticsCardId = SharedFlags.FFlagGameJoinCardAnalyticsCardId
+local FFlagSocialCarouselBuildPresence = SharedFlags.FFlagSocialCarouselBuildPresence
+
+local AnalyticsConstants = require(script.Parent.AnalyticsConstants)
+local AgeCheckUpsellOutcome = AnalyticsConstants.AgeCheckUpsellOutcome
+
+local defineFastInt = game:DefineFastInt("GameJoinCardAnalyticsThrottleHundredthsPercent", 10000)
+
+local v = {
 	eventName = "buttonClick",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 4, 14 },
 	description = "Game join card button taps (GameJoinCardButtonEvents → buttonClick, ctx gameJoinCard)",
-	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_button_events.proto",
-	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
-	throttlingPercentage = v6,
-	lastUpdated = {
-		2026,
-		4,
-		14
-	}
-}
-local t2 = {
-	eventName = "luaPageLoad",
-	description = "Game join card surface shown (GameJoinCardPageLoadedEvent → luaPageLoad, ctx gameJoinCard)",
-	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_page_loaded.proto",
-	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
-	throttlingPercentage = v6,
-	lastUpdated = {
-		2026,
-		4,
-		14
-	}
-}
-local t3 = {
-	eventName = "joinCardAgeCheckUpsellImpression",
-	description = "Game join card age-check upsell shown to user (ctx gameJoinCard)",
-	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_age_check_upsell_impression.proto",
-	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
-	throttlingPercentage = v6,
-	lastUpdated = {
-		2026,
-		5,
-		19
-	}
-}
-local t4 = {
-	eventName = "joinCardAgeCheckVerificationOutcome",
-	description = "Outcome (success/cancelled/error) of the age-check verification flow opened from the game join card (ctx gameJoinCard)",
-	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_age_check_verification_outcome.proto",
-	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
-	throttlingPercentage = v6,
-	lastUpdated = {
-		2026,
-		5,
-		19
-	}
-}
-local t5 = {
-	eventName = "joinCardCtaLoadTime",
-	description = "Game join card carousel tap → CTA settled duration in ms, plus the ctaType rendered and whether playability was served from cache (ctx gameJoinCard)",
-	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_cta_load_time.proto",
-	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
-	throttlingPercentage = v6,
-	lastUpdated = {
-		2026,
-		5,
-		19
-	}
+	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_button_events.proto"
 }
 
-local function optionalInt64FromString(s1: string?) -- line: 76
-	if s1 == nil or s1 == "" then
+local v2 = {
+	eventName = "luaPageLoad",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 4, 14 },
+	description = "Game join card surface shown (GameJoinCardPageLoadedEvent → luaPageLoad, ctx gameJoinCard)",
+	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_page_loaded.proto"
+}
+
+local v3 = {
+	eventName = "joinCardAgeCheckUpsellImpression",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 5, 19 },
+	description = "Game join card age-check upsell shown to user (ctx gameJoinCard)",
+	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_age_check_upsell_impression.proto"
+}
+
+local v4 = {
+	eventName = "joinCardAgeCheckVerificationOutcome",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 5, 19 },
+	description = "Outcome (success/cancelled/error) of the age-check verification flow opened from the game join card (ctx gameJoinCard)",
+	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_age_check_verification_outcome.proto"
+}
+
+local v5 = {
+	eventName = "joinCardCtaLoadTime",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 5, 19 },
+	description = "Game join card carousel tap → CTA settled duration in ms, plus the ctaType rendered and whether playability was served from cache (ctx gameJoinCard)",
+	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/game_join_card/game_join_card_cta_load_time.proto"
+}
+
+local function optionalInt64FromString(universeId: string?) -- 3 equivalent calls inferred from this helper
+	if universeId == nil or universeId == "" then
 		return nil
 	end
 
-	return (tonumber(s1))
-end
-local function buildGameJoinCardCommonFields(t6: {[any]: any}) -- line: 84
-	-- upvalues: Players (copy)
-	local t7 = {}
-	local LocalPlayer = Players.LocalPlayer
-
-	if LocalPlayer then
-		t7.uid = LocalPlayer.UserId
-	end
-
-	if t6.friendId and t6.friendId ~= "" then
-		local num = tonumber(t6.friendId)
-
-		if num then
-			t7.cardUserId = num
-		end
-	end
-
-	local universeId = t6.universeId
-	local v20 = if universeId ~= nil and universeId ~= "" then tonumber(universeId) else nil
-
-	if v20 then
-		t7.universeId = v20
-	end
-
-	if t6.absolutePosition ~= nil then
-		t7.carouselAbsolutePosition = math.floor(t6.absolutePosition)
-	end
-
-	return t7
+	return (tonumber(universeId))
 end
 
-return {
-	logGameJoinCardButtonEvent = function(n1: number, t8: {[any]: any}?) -- line: 111
-		-- upvalues: buildGameJoinCardCommonFields (copy), TelemetryService (copy), t1 (copy)
-		local v23 = buildGameJoinCardCommonFields(t8 or {})
+local function buildGameJoinCardCommonFields(data)
+	local gameJoinCardCommonFields = {}
 
-		v23.buttonAction = n1
-		TelemetryService:LogEvent(t1, {
-			eventContext = "gameJoinCard",
-			customFields = v23,
-			standardizedFields = { "addSessionInfo" }
-		})
-	end,
-	logGameJoinCardPageLoaded = function(t9: {[any]: any}?) -- line: 122
-		-- upvalues: buildGameJoinCardCommonFields (copy), TelemetryService (copy), t2 (copy)
-		local v25 = buildGameJoinCardCommonFields(t9 or {})
+	local localPlayer = Players.LocalPlayer
 
-		TelemetryService:LogEvent(t2, {
-			eventContext = "gameJoinCard",
-			customFields = v25,
-			standardizedFields = { "addSessionInfo" }
-		})
-	end,
-	logJoinCardAgeCheckUpsellImpression = function(t10: {[any]: any}) -- line: 136
-		-- upvalues: TelemetryService (copy), t3 (copy)
-		local t11 = {}
-		local universeId = t10.universeId
-		local v29 = if universeId ~= nil and universeId ~= "" then tonumber(universeId) else nil
-
-		if v29 then
-			t11.universeId = v29
-		end
-
-		TelemetryService:LogEvent(t3, {
-			eventContext = "gameJoinCard",
-			customFields = t11,
-			standardizedFields = { "addSessionInfo" }
-		})
-	end,
-	logJoinCardAgeCheckVerificationOutcome = function(t12: {[any]: any}) -- line: 164
-		-- upvalues: AgeCheckUpsellOutcome (copy), TelemetryService (copy), t4 (copy)
-		local t13 = {
-			outcome = AgeCheckUpsellOutcome[t12.outcome]
-		}
-		local universeId = t12.universeId
-		local v33 = if universeId ~= nil and universeId ~= "" then tonumber(universeId) else nil
-
-		if v33 then
-			t13.universeId = v33
-		end
-
-		TelemetryService:LogEvent(t4, {
-			eventContext = "gameJoinCard",
-			customFields = t13,
-			standardizedFields = { "addSessionInfo" }
-		})
-	end,
-	logJoinCardCtaLoadTime = function(t14: {[any]: any}) -- line: 187
-		-- upvalues: TelemetryService (copy), t5 (copy)
-		TelemetryService:LogEvent(t5, {
-			eventContext = "gameJoinCard",
-			customFields = {
-				durationMs = math.max(0, (math.floor(t14.durationMs))),
-				ctaType = t14.ctaType,
-				wasCached = t14.wasCached
-			},
-			standardizedFields = { "addSessionInfo" }
-		})
+	if localPlayer then
+		gameJoinCardCommonFields.uid = localPlayer.UserId
 	end
-}
+
+	local friendId = data.friendId and data.friendId ~= "" and tonumber(data.friendId)
+
+	if friendId then
+		gameJoinCardCommonFields.cardUserId = friendId
+	end
+
+	local universeId = optionalInt64FromString(data.universeId) -- inferred equivalent call
+
+	if universeId then
+		gameJoinCardCommonFields.universeId = universeId
+	end
+
+	if data.absolutePosition ~= nil then
+		gameJoinCardCommonFields.carouselAbsolutePosition = math.floor(data.absolutePosition)
+	end
+
+	if FFlagGameJoinCardAnalyticsCardId and data.joinGameCardId and data.joinGameCardId ~= "" then
+		gameJoinCardCommonFields.joinGameCardId = data.joinGameCardId
+	end
+
+	if FFlagSocialCarouselBuildPresence and data.cardType ~= nil then
+		gameJoinCardCommonFields.cardType = data.cardType
+	end
+
+	return gameJoinCardCommonFields
+end
+
+local UseGameJoinCardAnalytics = {}
+
+function UseGameJoinCardAnalytics.logGameJoinCardButtonEvent(buttonAction: number, options)
+	local gameJoinCardCommonFields = buildGameJoinCardCommonFields(options or {})
+	gameJoinCardCommonFields.buttonAction = buttonAction
+
+	TelemetryService:LogEvent(v, {
+		eventContext = "gameJoinCard",
+		customFields = gameJoinCardCommonFields,
+		standardizedFields = { "addSessionInfo" }
+	})
+end
+
+function UseGameJoinCardAnalytics.logGameJoinCardPageLoaded(options)
+	TelemetryService:LogEvent(v2, {
+		eventContext = "gameJoinCard",
+		customFields = buildGameJoinCardCommonFields(options or {}),
+		standardizedFields = { "addSessionInfo" }
+	})
+end
+
+function UseGameJoinCardAnalytics.logJoinCardAgeCheckUpsellImpression(p)
+	local customFields = {}
+
+	local universeId = optionalInt64FromString(p.universeId) -- inferred equivalent call
+
+	if universeId then
+		customFields.universeId = universeId
+	end
+
+	TelemetryService:LogEvent(v3, {
+		eventContext = "gameJoinCard",
+		customFields = customFields,
+		standardizedFields = { "addSessionInfo" }
+	})
+end
+
+function UseGameJoinCardAnalytics.logJoinCardAgeCheckVerificationOutcome(p)
+	local customFields = { outcome = AgeCheckUpsellOutcome[p.outcome] }
+
+	local universeId = optionalInt64FromString(p.universeId) -- inferred equivalent call
+
+	if universeId then
+		customFields.universeId = universeId
+	end
+
+	TelemetryService:LogEvent(v4, {
+		eventContext = "gameJoinCard",
+		customFields = customFields,
+		standardizedFields = { "addSessionInfo" }
+	})
+end
+
+function UseGameJoinCardAnalytics.logJoinCardCtaLoadTime(data)
+	TelemetryService:LogEvent(v5, {
+		eventContext = "gameJoinCard",
+		customFields = {
+			durationMs = math.max(0, (math.floor(data.durationMs))),
+			ctaType = data.ctaType,
+			wasCached = data.wasCached
+		},
+		standardizedFields = { "addSessionInfo" }
+	})
+end
+
+return UseGameJoinCardAnalytics

@@ -1,36 +1,28 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-
 require(ProfilePlatform.Common.AssetInfo)
 
-local function sortCurrentlyWearingItems(p1, p2) -- line: 5
-	local t1 = {
-		isOffSale = p1.isOffSale or false,
-		price = p1.price or (p1.lowestResalePrice or 0),
-		favoriteCount = p1.favoriteCount or 0
-	}
-	local t2 = {
-		isOffSale = p2.isOffSale or false,
-		price = p2.price or (p2.lowestResalePrice or 0),
-		favoriteCount = p2.favoriteCount or 0
+local function sortCurrentlyWearingItems(data, data2): boolean
+	local v = {
+		isOffSale = data.isOffSale or false,
+		price = data.price or data.lowestResalePrice or 0,
+		favoriteCount = data.favoriteCount or 0
 	}
 
-	if t1.isOffSale ~= t2.isOffSale then
-		return not t1.isOffSale
+	local v2 = {
+		isOffSale = data2.isOffSale or false,
+		price = data2.price or data2.lowestResalePrice or 0,
+		favoriteCount = data2.favoriteCount or 0
+	}
+
+	if v.isOffSale ~= v2.isOffSale then
+		return not v.isOffSale
 	end
 
-	if t1.price ~= t2.price then
-		if t1.price == 0 then
-			return false
-		end
-
-		if t2.price == 0 then
-			return true
-		end
-
-		return t1.price > t2.price
+	if v.price == v2.price then
+		return (tonumber(data.id) or 0) < (tonumber(data2.id) or 0)
 	end
 
-	return (tonumber(p1.id) or 0) < (tonumber(p2.id) or 0)
+	return v.price ~= 0 and (v2.price == 0 or v.price > v2.price)
 end
 
 return sortCurrentlyWearingItems

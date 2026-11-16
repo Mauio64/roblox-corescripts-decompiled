@@ -1,4 +1,4 @@
-local t1 = {
+local httpStatusCode = {
 	BAD_REQUEST = 400,
 	UNAUTHORIZED = 401,
 	FORBIDDEN = 403,
@@ -7,7 +7,8 @@ local t1 = {
 	BAD_GATEWAY = 502,
 	SERVICE_UNAVAILABLE = 503
 }
-local t2 = {
+
+local errorType = {
 	TIMEOUT = "timeout",
 	AUTHENTICATION = "authentication",
 	PERMISSION = "permission",
@@ -16,74 +17,74 @@ local t2 = {
 	NETWORK = "network",
 	UNKNOWN = "unknown"
 }
-local t3 = {
-	[t2.TIMEOUT] = "Request timed out. Please try again.",
-	[t2.AUTHENTICATION] = "Authentication failed. Please log in again.",
-	[t2.PERMISSION] = "You don't have permission to update this profile.",
-	[t2.VALIDATION] = "Invalid request. Please check your input.",
-	[t2.SERVER_ERROR] = "Server error. Please try again later.",
-	[t2.NETWORK] = "Network error. Please check your connection and try again.",
-	[t2.UNKNOWN] = "An unexpected error occurred. Please try again."
+
+local v = {
+	[errorType.TIMEOUT] = "Request timed out. Please try again.",
+	[errorType.AUTHENTICATION] = "Authentication failed. Please log in again.",
+	[errorType.PERMISSION] = "You don't have permission to update this profile.",
+	[errorType.VALIDATION] = "Invalid request. Please check your input.",
+	[errorType.SERVER_ERROR] = "Server error. Please try again later.",
+	[errorType.NETWORK] = "Network error. Please check your connection and try again.",
+	[errorType.UNKNOWN] = "An unexpected error occurred. Please try again."
 }
-local t4 = {
+
+local v2 = {
 	SAVE_BACKGROUND = "Failed to save background",
 	LOAD_BACKGROUND = "Failed to load background",
 	UPDATE_PROFILE = "Failed to update profile"
 }
 
-local function getErrorType(p1) -- line: 37
-	-- upvalues: t2 (copy), t1 (copy)
-	if typeof(p1) == "table" then
-		if p1.message and string.find(string.lower(p1.message), "timeout") then
-			return t2.TIMEOUT
+local function getErrorType(value)
+	if typeof(value) == "table" then
+		if value.message and string.find(string.lower(value.message), "timeout") then
+			return errorType.TIMEOUT
 		end
 
-		local v7 = p1.StatusCode or p1.statusCode
+		local statusCode = value.StatusCode or value.statusCode
 
-		if v7 then
-			if v7 == t1.UNAUTHORIZED then
-				return t2.AUTHENTICATION
+		if statusCode then
+			if statusCode == httpStatusCode.UNAUTHORIZED then
+				return errorType.AUTHENTICATION
 			end
 
-			if v7 == t1.FORBIDDEN then
-				return t2.PERMISSION
+			if statusCode == httpStatusCode.FORBIDDEN then
+				return errorType.PERMISSION
 			end
 
-			if v7 == t1.BAD_REQUEST then
-				return t2.VALIDATION
+			if statusCode == httpStatusCode.BAD_REQUEST then
+				return errorType.VALIDATION
 			end
 
-			if v7 >= t1.INTERNAL_SERVER_ERROR then
-				return t2.SERVER_ERROR
+			if httpStatusCode.INTERNAL_SERVER_ERROR <= statusCode then
+				return errorType.SERVER_ERROR
 			end
 		end
-	elseif typeof(p1) == "string" then
-		if string.find(string.lower(p1), "timeout") then
-			return t2.TIMEOUT
+	elseif typeof(value) == "string" then
+		if string.find(string.lower(value), "timeout") then
+			return errorType.TIMEOUT
 		end
 
-		if string.find(string.lower(p1), "network") or string.find(string.lower(p1), "connection") then
-			return t2.NETWORK
+		if string.find(string.lower(value), "network") or string.find(string.lower(value), "connection") then
+			return errorType.NETWORK
 		end
 	end
 
-	return t2.UNKNOWN
+	return errorType.UNKNOWN
 end
 
 return {
-	HttpStatusCode = t1,
-	ErrorType = t2,
-	ERROR_MESSAGES = t3,
-	DEFAULT_ERROR_MESSAGES = t4,
+	HttpStatusCode = httpStatusCode,
+	ErrorType = errorType,
+	ERROR_MESSAGES = v,
+	DEFAULT_ERROR_MESSAGES = v2,
 	getErrorType = getErrorType,
-	getErrorMessage = function(p2, p3) -- line: 66
-		-- upvalues: getErrorType (copy), t3 (copy), t4 (copy)
-		local v10 = t3[getErrorType(p2)]
+	getErrorMessage = function(p, p2)
+		local v3 = v[getErrorType(p)]
 
-		if p3 and t4[p3] then
-			return v10 or t4[p3]
+		if p2 and v2[p2] then
+			return v3 or v2[p2]
 		end
 
-		return v10 or t4.SAVE_BACKGROUND
+		return v3 or v2.SAVE_BACKGROUND
 	end
 }

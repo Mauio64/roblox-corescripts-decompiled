@@ -3,111 +3,92 @@ local RunService = game:GetService("RunService")
 local ClientChatModules = Chat:WaitForChild("ClientChatModules")
 local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
 local ChatConstants = require(ClientChatModules:WaitForChild("ChatConstants"))
-local ChatLocalization = nil
 
-pcall(function() -- line: 14
-	-- upvalues: ChatLocalization (ref)
-	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+local v = nil
+
+pcall(function()
+	local Chat2 = game:GetService("Chat")
+	v = require(Chat2.ClientChatModules.ChatLocalization)
 end)
 
-if ChatLocalization == nil then
-	ChatLocalization = {}
+if v == nil then
+	v = {}
 end
 
-if not ChatLocalization.FormatMessageToSend or not ChatLocalization.LocalizeFormattedMessage then
-	function ChatLocalization.FormatMessageToSend(_, _, p3) -- line: 17
-		return p3
+if not (v.FormatMessageToSend and v.LocalizeFormattedMessage) then
+	function v:FormatMessageToSend(_, p)
+		return p
 	end
 end
 
-local t1 = {
-	"\n",
-	"\r",
-	"\t",
-	"\v",
-	"\f"
-}
+local v2 = not ChatSettings.DisallowedWhiteSpace and { "\n", "\r", "\t", "\11", "\f" }
+	or ChatSettings.DisallowedWhiteSpace
 
-if ChatSettings.DisallowedWhiteSpace then
-	t1 = ChatSettings.DisallowedWhiteSpace
-end
-
-local function isMessageValidServer(p4) -- line: 27
-	-- upvalues: ChatSettings (copy)
-	if p4:len() > ChatSettings.MaximumMessageLength * 6 then
+local function isMessageValidServer(value): boolean
+	if value:len() > ChatSettings.MaximumMessageLength * 6 or utf8.len(value) == nil then
 		return false
 	end
 
-	if utf8.len(p4) == nil then
-		return false
-	end
-
-	if utf8.len(utf8.nfcnormalize(p4)) > ChatSettings.MaximumMessageLength then
-		return false
-	end
-
-	return true
+	return not (utf8.len(utf8.nfcnormalize(value)) > ChatSettings.MaximumMessageLength)
 end
-local function CanUserChat(p5) -- line: 47
-	-- upvalues: RunService (copy), Chat (copy)
+
+local function CanUserChat(player) -- 1 equivalent call inferred from this helper
 	if RunService:IsStudio() then
 		return true
 	end
 
-	local ok, result = pcall(function() -- line: 51
-		-- upvalues: Chat (copy), p5 (copy)
-		return Chat:CanUserChatAsync(p5.UserId)
+	local success, result = pcall(function()
+		return Chat:CanUserChatAsync(player.UserId)
 	end)
 
-	return ok and result
+	return success and result
 end
-local function Run(p6) -- line: 57
-	-- upvalues: RunService (copy), Chat (copy), ChatLocalization (ref), isMessageValidServer (copy), t1 (ref), ChatConstants (copy)
-	local function ValidateChatFunction(p7, p8, p9) -- line: 58
-		-- upvalues: p6 (copy), RunService (copy), Chat (copy), ChatLocalization (ref), isMessageValidServer (copy), t1 (ref)
-		local Speaker = p6:GetSpeaker(p7)
-		local Player = Speaker:GetPlayer()
 
-		if not Speaker then
+local function Run(object)
+	local function ValidateChatFunction(p, value, p2): boolean
+		local speaker = object:GetSpeaker(p)
+		local player = speaker:GetPlayer()
+
+		if not (speaker and player) then
 			return false
 		end
 
-		if not Player then
-			return false
-		end
-
-		if not RunService:IsStudio() and Player.UserId < 1 then
+		if not RunService:IsStudio() and player.UserId < 1 then
 			return true
 		end
 
-		local v25
-
-		if RunService:IsStudio() then
-			v25 = true
-		else
-			local ok, result = pcall(function() -- line: 51
-				-- upvalues: Chat (copy), Player (copy)
-				return Chat:CanUserChatAsync(Player.UserId)
-			end)
-
-			v25 = ok and result
-		end
-
-		if not v25 then
-			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatMessageValidator_SettingsError", "Your chat settings prevent you from sending messages."), p9)
+		if not CanUserChat(player) then -- inferred equivalent call
+			speaker:SendSystemMessage(
+				v:FormatMessageToSend(
+					"GameChat_ChatMessageValidator_SettingsError",
+					"Your chat settings prevent you from sending messages."
+				),
+				p2
+			)
 
 			return true
 		end
 
-		if not isMessageValidServer(p8) then
-			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatMessageValidator_MaxLengthError", "Your message exceeds the maximum message length."), p9)
-
+		if not isMessageValidServer(value) then
+			speaker:SendSystemMessage(
+				v:FormatMessageToSend(
+					"GameChat_ChatMessageValidator_MaxLengthError",
+					"Your message exceeds the maximum message length."
+				),
+				p2
+			)
 			return true
 		end
 
-		for _, v in pairs(t1) do
-			if p8:find(v) then
-				Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatMessageValidator_WhitespaceError", "Your message contains whitespace that is not allowed."), p9)
+		for _, v3 in pairs(v2) do
+			if value:find(v3) then
+				speaker:SendSystemMessage(
+					v:FormatMessageToSend(
+						"GameChat_ChatMessageValidator_WhitespaceError",
+						"Your message contains whitespace that is not allowed."
+					),
+					p2
+				)
 
 				return true
 			end
@@ -116,7 +97,7 @@ local function Run(p6) -- line: 57
 		return false
 	end
 
-	p6:RegisterProcessCommandsFunction("message_validation", ValidateChatFunction, ChatConstants.VeryHighPriority)
+	object:RegisterProcessCommandsFunction("message_validation", ValidateChatFunction, ChatConstants.VeryHighPriority)
 end
 
 return Run

@@ -1,5 +1,5 @@
-local function isWhitespaceOnly(s1: string) -- line: 1
-	return string.find(s1, "%S") == nil
+local function isWhitespaceOnly(value: string): boolean
+	return string.find(value, "%S") == nil
 end
 
 return isWhitespaceOnly

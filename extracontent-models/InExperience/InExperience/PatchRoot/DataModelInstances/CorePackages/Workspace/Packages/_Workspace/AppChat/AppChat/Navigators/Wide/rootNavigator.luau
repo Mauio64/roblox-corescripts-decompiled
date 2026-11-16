@@ -1,23 +1,24 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Roact = require(AppChatParent.Roact)
-local RoactNavigation = require(AppChatParent.RoactNavigation)
+local parent = AppChat.Parent
+
+local Roact = require(parent.Roact)
+local RoactNavigation = require(parent.RoactNavigation)
+
 local EnumScreens = require(AppChat.EnumScreens)
 local ToastScreen = require(AppChat.Components.Toast.ToastScreen)
+local FFlagAppChatDisableAbsorbInputSelectable = require(AppChat.Flags.FFlagAppChatDisableAbsorbInputSelectable)
+
 local chatLandingWithDialogsNavigator = require(script.Parent.chatLandingWithDialogsNavigator)
-local v8 = Roact.Component:extend("ChatLandingWithDialogsNavigatorConnector")
 
-v8.router = chatLandingWithDialogsNavigator.router
+local extended = Roact.Component:extend("ChatLandingWithDialogsNavigatorConnector")
+extended.router = chatLandingWithDialogsNavigator.router
 
-function v8.render(p1) -- line: 15
-	-- upvalues: Roact (copy), chatLandingWithDialogsNavigator (copy)
-	return Roact.createElement(chatLandingWithDialogsNavigator, p1.props)
+function extended.render(p)
+	return Roact.createElement(chatLandingWithDialogsNavigator, p.props)
 end
 
 return RoactNavigation.createRobloxStackNavigator({
-	{
-		ChatLandingWithDialogs = v8
-	},
+	{ ChatLandingWithDialogs = extended },
 	{
 		[EnumScreens.RoactChatToast] = {
 			screen = ToastScreen,
@@ -29,5 +30,8 @@ return RoactNavigation.createRobloxStackNavigator({
 		}
 	}
 }, {
+	defaultNavigationOptions = FFlagAppChatDisableAbsorbInputSelectable and {
+		absorbInputSelectable = false
+	} or nil,
 	mode = RoactNavigation.StackPresentationStyle.Overlay
 })

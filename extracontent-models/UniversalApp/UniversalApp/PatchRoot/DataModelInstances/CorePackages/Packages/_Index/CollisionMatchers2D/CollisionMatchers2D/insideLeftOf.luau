@@ -1,21 +1,25 @@
 local toRect = require(script.Parent.toRect)
 local returnValue = require(script.Parent.returnValue)
 
-local function insideLeftOf(p1, p2, p3) -- line: 26
-	-- upvalues: toRect (copy), returnValue (copy)
-	local v7 = toRect(p1)
-	local v8 = toRect(p2)
-	local v9 = -(v7.Max - v8.Max)
+local function insideLeftOf(p, p2, value)
+	local v = toRect(p)
+	local v2 = toRect(p2)
 
-	if p3 then
-		if typeof(p3) == "number" then
-			p3 = NumberRange.new(p3)
-		end
+	local v3 = -(v.Max - v2.Max)
 
-		return returnValue(p3.Min <= v9.X and p3.Max >= v9.X, "Was within range", "Was not within range ( " .. tostring(p3) .. ")")
+	if not value then
+		return returnValue(v3.X >= 0, "Was not right of the element", "Was too far right of the element")
 	end
 
-	return returnValue(v9.X >= 0, "Was not right of the element", "Was too far right of the element")
+	if typeof(value) == "number" then
+		value = NumberRange.new(value)
+	end
+
+	return returnValue(
+		value.Min <= v3.X and value.Max >= v3.X,
+		"Was within range",
+		"Was not within range ( " .. tostring(value) .. ")"
+	)
 end
 
 return insideLeftOf

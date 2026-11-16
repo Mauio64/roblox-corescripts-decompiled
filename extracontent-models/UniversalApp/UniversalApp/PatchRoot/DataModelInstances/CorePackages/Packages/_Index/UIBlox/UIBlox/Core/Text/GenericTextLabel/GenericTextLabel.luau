@@ -1,98 +1,128 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local Cryo = require(ParentParentParent.Cryo)
-local t = require(ParentParentParent.t)
-local GetTextSize = require(ParentParent.Core.Text.GetTextSize)
-local validateFontInfo = require(ParentParent.Core.Style.Validator.validateFontInfo)
-local validateTypographyInfo = require(ParentParent.Core.Style.Validator.validateTypographyInfo)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local validateColorToken = require(ParentParent.Core.Style.Validator.validateColorToken)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local UIBloxConfig = require(ParentParent.UIBloxConfig)
-local v13 = Roact.PureComponent:extend("GenericTextLabel")
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Foundation = require(parent2.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
-v13.validateProps = t.interface({
+local Roact = require(parent2.Roact)
+local Cryo = require(parent2.Cryo)
+local t = require(parent2.t)
+
+local GetTextSize = require(parent.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent.Core.Text.GetFontFromFontStyle)
+local validateFontInfo = require(parent.Core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(parent.Core.Style.Validator.validateTypographyInfo)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+local validateColorToken = require(parent.Core.Style.Validator.validateColorToken)
+local withStyle = require(parent.Core.Style.withStyle)
+local UIBloxConfig = require(parent.UIBloxConfig)
+
+local extended = Roact.PureComponent:extend("GenericTextLabel")
+
+extended.validateProps = t.interface({
 	maxSize = t.optional(t.Vector2),
 	fontStyle = t.union(validateFontInfo, validateTypographyInfo),
 	colorStyle = t.union(validateColorInfo, validateColorToken),
 	fluidSizing = t.optional(t.boolean),
 	openTypeFeatures = t.optional(t.string)
 })
-v13.defaultProps = {
+
+extended.defaultProps = {
+	maxSize = Vector2.new(10000, 10000),
 	fluidSizing = false,
-	openTypeFeatures = nil,
-	maxSize = Vector2.new(10000, 10000)
+	openTypeFeatures = nil
 }
 
-function v13.render(p1) -- line: 48
-	-- upvalues: withStyle (copy), GetTextSize (copy), Cryo (copy), Roact (copy), UIBloxConfig (copy)
-	local propsText = p1.props.Text
-	local fluidSizing = p1.props.fluidSizing
+function extended.render(p)
+	local text = p.props.Text
+	local fluidSizing = p.props.fluidSizing
 
-	return withStyle(function(p2) -- line: 52
-		-- upvalues: p1 (copy), propsText (copy), GetTextSize (copy), Cryo (copy), Roact (copy), fluidSizing (copy), UIBloxConfig (copy)
-		local fontStyle = p1.props.fontStyle
-		local colorStyle = p1.props.colorStyle
-		local v20 = colorStyle.Color or colorStyle.Color3
-		local colorStyleTransparency = colorStyle.Transparency
-		local RichText = p1.props.RichText
-		local BaseSize = p2.Font.BaseSize
-		local v24 = if not fontStyle.RelativeMinSize then fontStyle.FontSize else BaseSize * fontStyle.RelativeMinSize
-		local v25 = if not fontStyle.RelativeSize then fontStyle.FontSize else BaseSize * fontStyle.RelativeSize
-		local fontStyleFont = fontStyle.Font
-		local propsSize = p1.props.Size
+	return withStyle(function(p2)
+		local fontStyle = p.props.fontStyle
+		local colorStyle = p.props.colorStyle
+		local color = colorStyle.Color or colorStyle.Color3
+		local transparency = colorStyle.Transparency
+		local richText = p.props.RichText
 
-		if propsSize == nil then
-			local v28 = propsText
+		local baseSize = p2.Font.BaseSize
+		local minTextSize
 
-			if p1.props.TextTruncate == Enum.TextTruncate.AtEnd then
-				v28 ..= "..."
-			end
-
-			local maxSize = p1.props.maxSize
-			local v30 = if not p1.props.LineHeight then v25 else v25 * p1.props.LineHeight
-			local v31 = GetTextSize(v28, v30, fontStyleFont, maxSize)
-
-			propsSize = UDim2.new(0, v31.X, 0, v31.Y)
+		if fontStyle.RelativeMinSize then
+			minTextSize = baseSize * fontStyle.RelativeMinSize
+		else
+			minTextSize = fontStyle.FontSize
 		end
 
-		local v32 = if p1.props.AutomaticSize ~= nil and p1.props.AutomaticSize ~= Enum.AutomaticSize.None then nil else propsSize
-		local v33 = p1.props.TextSize or v25
-		local v34 = p1.props.AutomaticSize or nil
-		local v35 = Cryo.Dictionary.join(p1.props, {
+		local maxTextSize
+
+		if fontStyle.RelativeSize then
+			maxTextSize = baseSize * fontStyle.RelativeSize
+		else
+			maxTextSize = fontStyle.FontSize
+		end
+
+		local fontFromFontStyle = GetFontFromFontStyle(fontStyle)
+
+		local size = p.props.Size
+
+		if size == nil then
+			local v = text
+
+			if p.props.TextTruncate == Enum.TextTruncate.AtEnd then
+				v ..= "..."
+			end
+
+			local maxSize = p.props.maxSize
+			local v2
+
+			if p.props.LineHeight then
+				v2 = maxTextSize * p.props.LineHeight
+			else
+				v2 = maxTextSize
+			end
+
+			local textSize = GetTextSize(v, v2, fontFromFontStyle, maxSize)
+			size = UDim2.new(0, textSize.X, 0, textSize.Y)
+		end
+
+		if p.props.AutomaticSize ~= nil and p.props.AutomaticSize ~= Enum.AutomaticSize.None then
+			size = nil
+		end
+
+		local textSize = p.props.TextSize or maxTextSize
+		local automaticSize = p.props.AutomaticSize or nil
+
+		local joined = Cryo.Dictionary.join(p.props, {
 			[Roact.Children] = Cryo.None,
 			fluidSizing = Cryo.None,
 			fontStyle = Cryo.None,
 			openTypeFeatures = Cryo.None,
 			colorStyle = Cryo.None,
 			maxSize = Cryo.None,
-			Size = v32,
-			Text = propsText,
-			Font = fontStyleFont,
-			TextSize = v33,
-			AutomaticSize = v34,
-			TextColor3 = v20,
-			TextTransparency = colorStyleTransparency,
-			TextWrapped = p1.props.TextWrapped == nil or p1.props.TextWrapped,
+			Size = size,
+			Text = text,
+			Font = Cryo.None,
+			FontFace = normalizeFontFace(fontFromFontStyle),
+			TextSize = textSize,
+			AutomaticSize = automaticSize,
+			TextColor3 = color,
+			TextTransparency = transparency,
+			TextWrapped = p.props.TextWrapped == nil or p.props.TextWrapped,
 			TextScaled = fluidSizing,
 			BackgroundTransparency = 1,
-			RichText = RichText
+			RichText = richText
 		})
 
-		if UIBloxConfig.enableOpenTypeSupport and p1.props.openTypeFeatures then
-			v35 = Cryo.Dictionary.join(v35, {
-				OpenTypeFeatures = p1.props.openTypeFeatures
-			})
+		if UIBloxConfig.enableOpenTypeSupport and p.props.openTypeFeatures then
+			joined = Cryo.Dictionary.join(joined, { OpenTypeFeatures = p.props.openTypeFeatures })
 		end
 
-		return Roact.createElement("TextLabel", v35, Cryo.Dictionary.join({
-			UITextSizeConstraint = fluidSizing and Roact.createElement("UITextSizeConstraint", {
-				MaxTextSize = v25,
-				MinTextSize = v24
-			} or nil)
-		}, p1.props[Roact.Children] or {}))
+		return Roact.createElement("TextLabel", joined, Cryo.Dictionary.join({
+			UITextSizeConstraint = fluidSizing and Roact.createElement(
+				"UITextSizeConstraint",
+				{ MaxTextSize = maxTextSize, MinTextSize = minTextSize } or nil
+			)
+		}, p.props[Roact.Children] or {}))
 	end)
 end
 
-return v13
+return extended

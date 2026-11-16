@@ -1,5 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
-local FFlagEnableConsoleExpControls = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
-local v3 = game:DefineFastFlag("AddTopBarScrim", false)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local defineFastFlag = game:DefineFastFlag("AddTopBarScrim", false)
 
-return FFlagEnableConsoleExpControls and v3
+return FFlagEnableConsoleExpControls and defineFastFlag

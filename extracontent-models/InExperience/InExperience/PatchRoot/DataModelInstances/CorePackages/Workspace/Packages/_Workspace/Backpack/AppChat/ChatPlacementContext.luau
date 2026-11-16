@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local ChatPlacementContext = require(Workspace.AppChat.AppChat.Contexts.ChatPlacementContext)
 
-return (require(_Workspace.AppChat.AppChat.Contexts.ChatPlacementContext))
+return ChatPlacementContext

@@ -1,11 +1,29 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local Rodux = require(Parent.Rodux)
-local GetFFlagExpChatUseVoiceParticipantsStore = require(Parent.SharedFlags).GetFFlagExpChatUseVoiceParticipantsStore
-local v4 = game:DefineFastFlag("EasierUnmutingVoiceParticipantsMutedReducer", false)
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
+local SharedFlags = require(parent.SharedFlags)
 
-return Rodux.combineReducers({
-	participants = if not GetFFlagExpChatUseVoiceParticipantsStore() then require(script.Parent.participants) else nil,
-	participantsMuted = if not v4 then Rodux.createReducer({}, {}) else require(script.Parent.participantsMuted),
+local GetFFlagExpChatUseVoiceParticipantsStore = SharedFlags.GetFFlagExpChatUseVoiceParticipantsStore
+
+local defineFastFlag = game:DefineFastFlag("EasierUnmutingVoiceParticipantsMutedReducer", false)
+
+local combineReducers = Rodux.combineReducers
+local participants
+
+if not GetFFlagExpChatUseVoiceParticipantsStore() then
+	participants = require(script.Parent.participants)
+end
+
+local participantsMuted
+
+if defineFastFlag then
+	participantsMuted = require(script.Parent.participantsMuted)
+else
+	participantsMuted = Rodux.createReducer({}, {})
+end
+
+return combineReducers({
+	participants = participants,
+	participantsMuted = participantsMuted,
 	isEnabled = require(script.Parent.isEnabled),
 	isVoiceUIVisible = require(script.Parent.isVoiceUIVisible)
 })

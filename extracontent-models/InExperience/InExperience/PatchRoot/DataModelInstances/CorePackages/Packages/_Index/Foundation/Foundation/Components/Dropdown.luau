@@ -1,3 +1,1 @@
-return {
-	Root = require(script.Dropdown)
-}
+return { Root = require(script.Dropdown) }

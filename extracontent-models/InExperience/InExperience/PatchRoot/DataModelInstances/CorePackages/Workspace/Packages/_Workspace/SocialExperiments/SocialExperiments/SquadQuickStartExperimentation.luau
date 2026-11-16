@@ -1,44 +1,47 @@
-local Parent = script:FindFirstAncestor("SocialExperiments").Parent
-local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
-local v3 = game:DefineFastString("SquadQuickStartExperimentLayer", "Party.Formation.Create.User")
-local v4 = game:DefineFastString("SquadEnablePartyQuickStartVariant", "enablePartyQuickStartChanges")
-local v5 = game:DefineFastFlag("EnablePartyQuickStartChanges2", false)
-local v6 = game:DefineFastFlag("PartyFormationCreateUserExposureEnabled", false)
+local parent = script:FindFirstAncestor("SocialExperiments").Parent
 
-local function getIsUserInTreatment(s1: string) -- line: 15
-	-- upvalues: ExperimentCacheManager (copy), v3 (copy)
-	local v9 = ExperimentCacheManager.default:getLayerVariables(v3)
+local ExperimentCacheManager = require(parent.ExperimentCacheManager)
+local experimentCacheManager = ExperimentCacheManager.ExperimentCacheManager
 
-	if v9 and v9[s1] ~= nil then
-		return v9[s1]
+local defineFastString = game:DefineFastString("SquadQuickStartExperimentLayer", "Party.Formation.Create.User")
+
+local defineFastString2 = game:DefineFastString("SquadEnablePartyQuickStartVariant", "enablePartyQuickStartChanges")
+local defineFastFlag = game:DefineFastFlag("EnablePartyQuickStartChanges2", false)
+
+local function getIsUserInTreatment(p: string)
+	local layerVariables = experimentCacheManager.default:getLayerVariables(defineFastString)
+
+	if layerVariables and layerVariables[p] ~= nil then
+		return layerVariables[p]
 	end
 
 	return false
 end
 
-return {
-	getPartyQuickStartChangesEnabled = function() -- line: 25
-		-- upvalues: v5 (copy), v4 (copy), ExperimentCacheManager (copy), v3 (copy)
-		local v10 = v5
+local SquadQuickStartExperimentation = {}
 
-		if not v10 then
-			local v11 = v4
-			local v12 = ExperimentCacheManager.default:getLayerVariables(v3)
+function SquadQuickStartExperimentation.getPartyQuickStartChangesEnabled()
+	local v = defineFastFlag
 
-			if v12 and v12[v11] ~= nil then
-				return v12[v11]
-			end
+	if v then
+		return v
+	end
 
-			v10 = false
-		end
+	local v2 = defineFastString2
+	local layerVariables = experimentCacheManager.default:getLayerVariables(defineFastString)
 
-		return v10
-	end,
-	logExposure = function() -- line: 29
-		-- upvalues: v6 (copy), ExperimentCacheManager (copy), v3 (copy)
-		if v6 and ExperimentCacheManager.default:getLayerVariables(v3) ~= nil then
-			ExperimentCacheManager.default:logLayerExposure(v3)
-		end
-	end,
-	isLogExposureEnabled = v6
-}
+	if layerVariables and layerVariables[v2] ~= nil then
+		return layerVariables[v2]
+	end
+
+	v = false
+	return false
+end
+
+function SquadQuickStartExperimentation.logExposure()
+	if experimentCacheManager.default:getLayerVariables(defineFastString) ~= nil then
+		experimentCacheManager.default:logLayerExposure(defineFastString)
+	end
+end
+
+return SquadQuickStartExperimentation

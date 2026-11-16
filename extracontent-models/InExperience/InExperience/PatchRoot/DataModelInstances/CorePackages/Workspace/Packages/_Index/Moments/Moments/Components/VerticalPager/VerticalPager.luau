@@ -1,352 +1,329 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
+local parent = Moments.Parent
+
 local UserInputService = game:GetService("UserInputService")
-local React = require(MomentsParent.React)
-local Signals = require(MomentsParent.Signals)
-local SignalsReact = require(MomentsParent.SignalsReact)
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
 local Constants = require(script.Parent.Constants)
-
 require(script.Parent.Types)
-
 local snapMath = require(script.Parent.snapMath)
 local usePagerController = require(script.Parent.usePagerController)
 local usePagerInputNavigation = require(script.Parent.usePagerInputNavigation)
-local GetFFlagMomentsDesktopWheelPaging = require(Moments.Flags.GetFFlagMomentsDesktopWheelPaging)
 local FFlagMomentsFeedSwipeSensitivityConfig = require(Moments.Flags.FFlagMomentsFeedSwipeSensitivityConfig)
 local FIntMomentsFeedSnapSensitivityMilli = require(Moments.Flags.FIntMomentsFeedSnapSensitivityMilli)
 local FIntMomentsFeedAnimationSpeed = require(Moments.Flags.FIntMomentsFeedAnimationSpeed)
+
 local VerticalPagerContext = require(script.Parent.VerticalPagerContext)
-local VerticalPagerContext2 = VerticalPagerContext.VerticalPagerContext
+local verticalPagerContext = VerticalPagerContext.VerticalPagerContext
 local PagerItemContext = VerticalPagerContext.PagerItemContext
 
-local function PagerItemProviderInner(t1: {[any]: any}) -- line: 59
-	-- upvalues: React (copy), Signals (copy), PagerItemContext (copy), snapMath (copy)
-	local index = t1.index
-	local getActiveIndex = t1.getActiveIndex
-	local v25 = React.useMemo(function() -- line: 63
-		-- upvalues: Signals (copy), getActiveIndex (copy), index (copy)
-		return Signals.createComputed(function(p1) -- line: 64
-			-- upvalues: getActiveIndex (copy), index (copy)
-			return getActiveIndex(p1) == index
+local function PagerItemProviderInner(props)
+	local index = props.index
+	local getActiveIndex = props.getActiveIndex
+
+	local getIsActive = React.useMemo(function()
+		return Signals.createComputed(function(p): boolean
+			return getActiveIndex(p) == index
 		end)
-	end, {
-		getActiveIndex,
-		index
-	})
-	local v26 = React.useMemo(function() -- line: 72
-		-- upvalues: Signals (copy), getActiveIndex (copy), index (copy)
-		return Signals.createComputed(function(p2) -- line: 73
-			-- upvalues: getActiveIndex (copy), index (copy)
-			return math.abs(getActiveIndex(p2) - index) <= 1
+	end, { getActiveIndex, index })
+
+	local getIsVisible = React.useMemo(function()
+		return Signals.createComputed(function(p): boolean
+			return math.abs(getActiveIndex(p) - index) <= 1
 		end)
-	end, {
-		getActiveIndex,
-		index
-	})
-	local v27 = React.useMemo(function() -- line: 78
-		-- upvalues: index (copy), t1 (copy), v25 (copy), v26 (copy)
+	end, { getActiveIndex, index })
+
+	local v = React.useMemo(function()
 		return {
 			index = index,
-			item = t1.item,
-			getIsActive = v25,
-			getIsVisible = v26
+			item = props.item,
+			getIsActive = getIsActive,
+			getIsVisible = getIsVisible
 		}
-	end, {
-		index,
-		t1.item,
-		v25,
-		v26
-	})
+	end, { index, props.item, getIsActive, getIsVisible })
 
-	return React.createElement(PagerItemContext.Provider, {
-		value = v27
-	}, {
-		Item = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset(0, snapMath.offsetForIndex(index, t1.stride)),
-			Size = UDim2.new(1, 0, 0, t1.itemHeight)
-		}, {
-			Content = t1.renderItem(t1.item, index)
-		})
+	return React.createElement(PagerItemContext.Provider, { value = v }, {
+		Item = React.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				Position = UDim2.fromOffset(0, snapMath.offsetForIndex(index, props.stride)),
+				Size = UDim2.new(1, 0, 0, props.itemHeight)
+			},
+			{
+				Content = props.renderItem(props.item, index)
+			}
+		)
 	})
 end
 
-local v19 = React.memo(PagerItemProviderInner)
+local memo = React.memo(PagerItemProviderInner)
 
-local function useNativeScrollEnabled() -- line: 123
-	-- upvalues: GetFFlagMomentsDesktopWheelPaging (copy), React (copy), UserInputService (copy)
-	local v28 = GetFFlagMomentsDesktopWheelPaging()
-
-	local function isNonTouch(p3) -- line: 128
-		return p3 == Enum.UserInputType.MouseWheel or (p3 == Enum.UserInputType.MouseButton1 or (p3 == Enum.UserInputType.MouseMovement or p3 == Enum.UserInputType.Keyboard))
+local function useNativeScrollEnabled()
+	local function isNonTouch(p): boolean -- 1 equivalent call inferred from this helper
+		return p == Enum.UserInputType.MouseWheel
+			or p == Enum.UserInputType.MouseButton1
+			or p == Enum.UserInputType.MouseMovement
+			or p == Enum.UserInputType.Keyboard
 	end
 
-	local v30, v31 = React.useState(function() -- line: 135
-		-- upvalues: v28 (copy), UserInputService (copy)
-		local v73 = v28
-
-		if v73 then
-			local LastInputType = UserInputService:GetLastInputType()
-
-			v73 = LastInputType == Enum.UserInputType.MouseWheel or (LastInputType == Enum.UserInputType.MouseButton1 or (LastInputType == Enum.UserInputType.MouseMovement or LastInputType == Enum.UserInputType.Keyboard))
-		end
-
-		return not v73
+	local state, setState = React.useState(function(): boolean
+		local lastInputType = UserInputService:GetLastInputType()
+		return lastInputType ~= Enum.UserInputType.MouseWheel
+			and lastInputType ~= Enum.UserInputType.MouseButton1
+			and lastInputType ~= Enum.UserInputType.MouseMovement
+			and lastInputType ~= Enum.UserInputType.Keyboard
 	end)
 
-	React.useEffect(function() -- line: 139
-		-- upvalues: v28 (copy), UserInputService (copy), v31 (copy)
-		if not v28 then
-			return
-		end
-
-		local connection = UserInputService.LastInputTypeChanged:Connect(function(p4) -- line: 143
-			-- upvalues: v31 (copy)
-			if p4 == Enum.UserInputType.Touch then
-				v31(true)
-
-				return
-			end
-
-			if p4 == Enum.UserInputType.MouseWheel or (p4 == Enum.UserInputType.MouseButton1 or (p4 == Enum.UserInputType.MouseMovement or p4 == Enum.UserInputType.Keyboard)) then
-				v31(false)
+	React.useEffect(function()
+		local lastInputTypeChangedConnection = UserInputService.LastInputTypeChanged:Connect(function(p)
+			if p == Enum.UserInputType.Touch then
+				setState(true)
+			elseif isNonTouch(p) then -- inferred equivalent call
+				setState(false)
 			end
 		end)
-
-		return function() -- line: 150
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			lastInputTypeChangedConnection:Disconnect()
 		end
-	end, { v28 })
+	end, {})
 
-	return v30
+	return state
 end
-local function VerticalPager(p5) -- line: 158
-	-- upvalues: Constants (copy), FFlagMomentsFeedSwipeSensitivityConfig (copy), FIntMomentsFeedSnapSensitivityMilli (copy), FIntMomentsFeedAnimationSpeed (copy), React (copy), useNativeScrollEnabled (copy), usePagerController (copy), usePagerInputNavigation (copy), SignalsReact (copy), snapMath (copy), v19 (copy), VerticalPagerContext2 (copy)
-	local store = p5.store
-	local renderItem = p5.renderItem
-	local keyExtractor = p5.keyExtractor
-	local analytics = p5.analytics
-	local v37 = p5.tuning or {}
-	local DEFAULT_SNAP_SENSITIVITY = Constants.DEFAULT_SNAP_SENSITIVITY
-	local DEFAULT_ANIMATION_SPEED = Constants.DEFAULT_ANIMATION_SPEED
+
+local function VerticalPager(props)
+	local store = props.store
+	local renderItem = props.renderItem
+	local keyExtractor = props.keyExtractor
+	local analytics = props.analytics
+	local tuning = props.tuning or {}
+
+	local v = Constants.DEFAULT_SNAP_SENSITIVITY
+	local v2 = Constants.DEFAULT_ANIMATION_SPEED
 
 	if FFlagMomentsFeedSwipeSensitivityConfig then
-		DEFAULT_SNAP_SENSITIVITY = FIntMomentsFeedSnapSensitivityMilli / 1000
-		DEFAULT_ANIMATION_SPEED = FIntMomentsFeedAnimationSpeed
+		v = FIntMomentsFeedSnapSensitivityMilli / 1000
+		v2 = FIntMomentsFeedAnimationSpeed
 	end
 
-	local v40 = v37.snapSensitivity or DEFAULT_SNAP_SENSITIVITY
-	local v41 = v37.animationSpeed or DEFAULT_ANIMATION_SPEED
-	local v42 = v37.overscan or Constants.DEFAULT_OVERSCAN
-	local onEndReached = p5.onEndReached
-	local v44 = v37.endReachedThreshold or Constants.DEFAULT_END_REACHED_THRESHOLD
-	local v45 = p5.active == nil or p5.active
-	local v46 = v37.gap or 0
-	local initialIndex = p5.initialIndex
-	local v48 = v37.keyboardNavigation or "global"
+	local snapSensitivity = tuning.snapSensitivity or v
+	local animationSpeed = tuning.animationSpeed or v2
+	local overscan = tuning.overscan or Constants.DEFAULT_OVERSCAN
+	local onEndReached = props.onEndReached
+	local endReachedThreshold = tuning.endReachedThreshold or Constants.DEFAULT_END_REACHED_THRESHOLD
+	local v3 = props.active == nil or props.active
+	local gap = tuning.gap or 0
+	local initialIndex = props.initialIndex
 
-	local function keyOf(p6, n1: number) -- line: 189
-		-- upvalues: keyExtractor (copy)
-		if keyExtractor ~= nil then
-			return (keyExtractor(p6, n1))
+	local keyboardNavigation = tuning.keyboardNavigation or "global"
+
+	local function keyOf(p, p2: number) -- 2 equivalent calls inferred from this helper
+		if keyExtractor == nil then
+			return (tostring(p2))
 		end
 
-		return (tostring(n1))
+		return (keyExtractor(p, p2))
 	end
 
-	local v50, v51 = React.useState(nil)
-	local v52, v53 = React.useState(0)
-	local v54 = React.useRef(nil)
-	local v55 = React.useRef({})
-	local v56 = React.useCallback(function(p7) -- line: 203
-		-- upvalues: v51 (copy), v53 (copy)
-		v51(p7)
+	local state, setState = React.useState(nil)
+	local state2, setState2 = React.useState(0)
 
-		if p7 then
-			v53(p7.AbsoluteSize.Y)
+	local ref = React.useRef(nil)
+
+	local ref2 = React.useRef({})
+
+	local ref4 = React.useCallback(function(p)
+		setState(p)
+
+		if p then
+			setState2(p.AbsoluteSize.Y)
 		end
 	end, {})
-	local v57 = React.useCallback(function(p8) -- line: 210
-		-- upvalues: v53 (copy)
-		v53(p8.AbsoluteSize.Y)
+
+	local v4 = React.useCallback(function(p)
+		setState2(p.AbsoluteSize.Y)
 	end, {})
-	local v58 = useNativeScrollEnabled()
-	local v59 = usePagerController({
-		scrollingFrame = v50,
+
+	local v5 = useNativeScrollEnabled()
+
+	local v6 = usePagerController({
+		scrollingFrame = state,
 		store = store,
-		itemHeight = v52,
-		gap = v46,
-		snapSensitivity = v40,
-		animationSpeed = v41,
-		active = v45,
-		nativeScrollEnabled = v58,
+		itemHeight = state2,
+		gap = gap,
+		snapSensitivity = snapSensitivity,
+		animationSpeed = animationSpeed,
+		active = v3,
+		nativeScrollEnabled = v5,
 		analytics = analytics
 	})
-	local v60 = usePagerInputNavigation({
-		active = v45,
-		keyboardNavigation = v48,
-		goNext = v59.next,
-		goPrevious = v59.previous
-	})
-	local v61 = SignalsReact.useSignalState(store.getCount)
-	local v62 = SignalsReact.useSignalState(store.getItems)
-	local v63 = SignalsReact.useSignalState(v59.getActiveIndex)
 
-	React.useEffect(function() -- line: 247
-		-- upvalues: onEndReached (copy), v61 (copy), v63 (copy), v44 (copy), v54 (copy), v62 (copy)
-		if onEndReached == nil or v61 <= 0 then
+	local ref5 = usePagerInputNavigation({
+		active = v3,
+		keyboardNavigation = keyboardNavigation,
+		goNext = v6.next,
+		goPrevious = v6.previous
+	})
+
+	local v7 = SignalsReact.useSignalState(store.getCount)
+	local current = SignalsReact.useSignalState(store.getItems)
+	local v8 = SignalsReact.useSignalState(v6.getActiveIndex)
+
+	React.useEffect(function()
+		if onEndReached == nil or v7 <= 0 then
 			return
 		end
 
-		if v63 >= v61 - v44 and v54.current ~= v62 then
-			v54.current = v62
+		if v7 - endReachedThreshold <= v8 and ref.current ~= current then
+			ref.current = current
 			onEndReached()
 		end
-	end, {
-		v63,
-		v61,
-		v62,
-		v44,
-		onEndReached
-	})
-	React.useEffect(function() -- line: 259
-		-- upvalues: analytics (copy), v61 (copy), v62 (copy), v63 (copy), keyExtractor (copy), v55 (copy)
-		local v80 = if analytics == nil then nil else analytics.onItemImpression
+	end, { v8, v7, current, endReachedThreshold, onEndReached })
 
-		if v80 == nil or v61 <= 0 then
+	React.useEffect(function()
+		local onItemImpression
+
+		if analytics ~= nil then
+			onItemImpression = analytics.onItemImpression
+		end
+
+		if onItemImpression == nil or v7 <= 0 then
 			return
 		end
 
-		local v81 = v62[v63]
+		local v9 = current[v8]
 
-		if v81 == nil then
+		if v9 == nil then
 			return
 		end
 
-		local v82 = v63
-		local v83 = if keyExtractor == nil then tostring(v82) else keyExtractor(v81, v82)
+		local v10 = keyOf(v9, v8) -- inferred equivalent call
 
-		if v55.current[v83] then
+		if ref2.current[v10] then
 			return
 		end
 
-		v55.current[v83] = true
-		v80(v63, v81)
-	end, {
-		v63,
-		v61,
-		v62,
-		analytics,
-		keyExtractor
-	})
+		ref2.current[v10] = true
+		onItemImpression(v8, v9)
+	end, { v8, v7, current, analytics, keyExtractor })
 
-	local v64 = React.useMemo(function() -- line: 276
-		-- upvalues: store (copy), v59 (copy), analytics (copy)
+	local v9 = React.useMemo(function()
 		return {
 			store = store,
-			getActiveIndex = v59.getActiveIndex,
-			getScrollState = v59.getScrollState,
-			scrollToIndex = v59.scrollToIndex,
-			next = v59.next,
-			previous = v59.previous,
-			removeItem = v59.removeItem,
+			getActiveIndex = v6.getActiveIndex,
+			getScrollState = v6.getScrollState,
+			scrollToIndex = v6.scrollToIndex,
+			next = v6.next,
+			previous = v6.previous,
+			removeItem = v6.removeItem,
 			analytics = analytics
 		}
-	end, {
-		store,
-		v59,
-		analytics
-	})
-	local v65 = React.useRef(false)
+	end, { store, v6, analytics })
 
-	React.useEffect(function() -- line: 295
-		-- upvalues: v65 (copy), initialIndex (copy), v61 (copy), store (copy)
-		if v65.current then
+	local ref3 = React.useRef(false)
+	React.useEffect(function()
+		if ref3.current then
 			return
 		end
 
 		if initialIndex == nil then
-			v65.current = true
-
+			ref3.current = true
 			return
 		end
 
-		if v61 < initialIndex then
+		if v7 < initialIndex then
 			return
 		end
 
-		v65.current = true
+		ref3.current = true
 
 		if initialIndex ~= store.getCurrentIndex(false) then
 			store.goToItem(initialIndex)
 		end
-	end, {
-		initialIndex,
-		v61,
-		store.getCurrentIndex,
-		store.goToItem
-	})
-	React.useImperativeHandle(p5.controllerRef, function() -- line: 314
-		-- upvalues: v59 (copy)
-		return v59
-	end, { v59 })
+	end, { initialIndex, v7, store.getCurrentIndex, store.goToItem })
 
-	local v66 = v52 + v46
-	local v67 = (not (v52 > 0) or not (v61 > 0)) and 0 or (v61 - 1) * v66 + v52
-	local t2 = {}
+	React.useImperativeHandle(props.controllerRef, function()
+		return v6
+	end, { v6 })
 
-	if v52 > 0 and v61 > 0 then
-		local v69 = snapMath.getVisibleWindow(v63, v42, v61)
+	local stride = state2 + gap
+	local v10 = not (state2 > 0 and v7 > 0) and 0 or (v7 - 1) * stride + state2
 
-		for i = v69.startIndex, v69.endIndex do
-			local v71 = v62[i]
+	local children = {}
 
-			if v71 ~= nil then
-				table.insert(t2, React.createElement(v19, {
-					key = if keyExtractor == nil then tostring(i) else keyExtractor(v71, i),
-					index = i,
-					item = v71,
-					itemHeight = v52,
-					stride = v66,
-					getActiveIndex = v59.getActiveIndex,
-					renderItem = renderItem
-				}))
+	if state2 > 0 and v7 > 0 then
+		local visibleWindow = snapMath.getVisibleWindow(v8, overscan, v7)
+
+		for i = visibleWindow.startIndex, visibleWindow.endIndex do
+			local v11 = current[i]
+
+			if v11 == nil then
+				continue
 			end
+
+			local createElement = React.createElement
+			local v12 = {
+				key = keyOf(v11, i), -- inferred equivalent call
+				index = i,
+				item = v11,
+				itemHeight = state2,
+				stride = stride,
+				getActiveIndex = v6.getActiveIndex,
+				renderItem = renderItem
+			}
+			table.insert(children, createElement(memo, v12))
 		end
 	end
 
-	return React.createElement(VerticalPagerContext2.Provider, {
-		value = v64
-	}, {
-		Container = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			SelectionGroup = true,
-			Active = v45,
-			AnchorPoint = p5.AnchorPoint,
-			LayoutOrder = p5.LayoutOrder,
-			Position = p5.Position,
-			Selectable = v45,
-			SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
-			SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
-			Size = p5.Size or UDim2.fromScale(1, 1),
-			ZIndex = p5.ZIndex,
-			ref = v60
-		}, {
-			Scroller = React.createElement("ScrollingFrame", {
-				AutomaticCanvasSize = Enum.AutomaticSize.None,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				CanvasSize = UDim2.new(1, 0, 0, v67),
-				ClipsDescendants = true,
-				ScrollBarThickness = 0,
-				ScrollingDirection = Enum.ScrollingDirection.Y,
-				ScrollingEnabled = v45 and (v61 > 1 and v58),
-				Selectable = false,
-				Size = UDim2.fromScale(1, 1),
-				ref = v56,
-				[React.Change.AbsoluteSize] = v57
-			}, t2)
+	local createElement = React.createElement
+	local provider = verticalPagerContext.Provider
+
+	local createElement2 = React.createElement
+	local v11 = {
+		Active = v3,
+		AnchorPoint = props.AnchorPoint,
+		BackgroundTransparency = 1,
+		LayoutOrder = props.LayoutOrder,
+		Position = props.Position,
+		Selectable = v3,
+		SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+		SelectionGroup = true,
+		Size = props.Size or UDim2.fromScale(1, 1),
+		ZIndex = props.ZIndex,
+		ref = ref5
+	}
+
+	local createElement3 = React.createElement
+	local v12 = {}
+	v12.AutomaticCanvasSize = Enum.AutomaticSize.None
+	v12.BackgroundTransparency = 1
+	v12.BorderSizePixel = 0
+	v12.CanvasSize = UDim2.new(1, 0, 0, v10)
+	v12.ClipsDescendants = true
+	v12.ScrollBarThickness = 0
+	v12.ScrollingDirection = Enum.ScrollingDirection.Y
+
+	if v3 then
+		if not (v7 > 1) then
+			v5 = false
+		end
+	else
+		v5 = v3
+	end
+
+	v12.ScrollingEnabled = v5
+
+	v12.Selectable = false
+	v12.Size = UDim2.fromScale(1, 1)
+	v12.ref = ref4
+	v12[React.Change.AbsoluteSize] = v4
+	return createElement(provider, { value = v9 }, {
+		Container = createElement2("Frame", v11, {
+			Scroller = createElement3("ScrollingFrame", v12, children)
 		})
 	})
 end

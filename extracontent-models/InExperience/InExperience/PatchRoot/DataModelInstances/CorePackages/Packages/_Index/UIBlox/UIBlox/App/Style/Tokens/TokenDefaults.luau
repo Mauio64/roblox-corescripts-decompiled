@@ -1,13 +1,6 @@
-local t1 = {
-	Transparency = 0,
-	Color3 = Color3.new()
-}
-local t2 = {
-	FontSize = 0,
-	LineHeight = 0,
-	LetterSpacing = 0,
-	Font = Enum.Font.Unknown
-}
+local v = { Color3 = Color3.new(), Transparency = 0 }
+
+local v2 = { Font = Enum.Font.Unknown, FontSize = 0, LineHeight = 0, LetterSpacing = 0 }
 
 return {
 	Global = {
@@ -64,19 +57,13 @@ return {
 		FontSize_800 = 0,
 		FontSize_900 = 0,
 		FontSize_1000 = 0,
-		Family = {
-			Standard = ""
-		},
+		Family = { Standard = "" },
 		Weight_300 = "",
 		Weight_400 = "",
 		Weight_600 = "",
 		Weight_700 = "",
 		Weight_900 = "",
-		LetterSpacing = {
-			Default = 0,
-			Tight = 0,
-			Loose = 0
-		},
+		LetterSpacing = { Default = 0, Tight = 0, Loose = 0 },
 		LineHeight_100 = 0,
 		LineHeight_200 = 0,
 		LineHeight_300 = 0,
@@ -99,129 +86,78 @@ return {
 		Opacity_92 = 0,
 		Opacity_100 = 0,
 		Color = {
-			Black = t1,
-			White = t1,
-			Green = t1,
-			Red = t1,
-			Blue = t1,
-			Carbon = t1,
-			Flint = t1,
-			Graphite = t1,
-			Obsidian = t1,
-			Pumice = t1,
-			Slate = t1,
-			Alabaster = t1,
-			Ash = t1,
-			Chalk = t1,
-			Smoke = t1,
-			None = t1
+			Black = v,
+			White = v,
+			Green = v,
+			Red = v,
+			Blue = v,
+			Carbon = v,
+			Flint = v,
+			Graphite = v,
+			Obsidian = v,
+			Pumice = v,
+			Slate = v,
+			Alabaster = v,
+			Ash = v,
+			Chalk = v,
+			Smoke = v,
+			None = v
 		}
 	},
 	Semantic = {
 		Typography = {
-			Title = t2,
-			Header = t2,
-			Subheader = t2,
-			Body = t2,
-			CaptionHeader = t2,
-			CaptionBody = t2,
-			Footer = t2
+			Title = v2,
+			Header = v2,
+			Subheader = v2,
+			Body = v2,
+			CaptionHeader = v2,
+			CaptionBody = v2,
+			Footer = v2
 		},
 		Color = {
 			Background = {
-				Default = t1,
-				Contrast = t1,
-				Muted = t1,
-				OnHover = t1,
-				OnPress = t1
+				Default = v,
+				Contrast = v,
+				Muted = v,
+				OnHover = v,
+				OnPress = v
 			},
-			BackgroundUi = {
-				Default = t1,
-				Contrast = t1
-			},
-			Ui = {
-				Default = t1,
-				Muted = t1,
-				Emphasis = t1
-			},
+			BackgroundUi = { Default = v, Contrast = v },
+			Ui = { Default = v, Muted = v, Emphasis = v },
 			Text = {
-				Default = t1,
-				Muted = t1,
-				Emphasis = t1,
-				Link = t1,
-				Inverse = t1
+				Default = v,
+				Muted = v,
+				Emphasis = v,
+				Link = v,
+				Inverse = v
 			},
-			Icon = {
-				Default = t1,
-				Emphasis = t1,
-				OnHover = t1
-			},
+			Icon = { Default = v, Emphasis = v, OnHover = v },
 			Action = {
-				Primary = {
-					Background = t1,
-					Border = t1,
-					Content = t1
-				},
-				PrimaryBrand = {
-					Background = t1,
-					Border = t1,
-					Content = t1
-				},
-				Secondary = {
-					Background = t1,
-					Border = t1,
-					Content = t1
-				},
-				Alert = {
-					Background = t1,
-					Border = t1,
-					Content = t1
-				},
-				Subtle = {
-					Background = t1,
-					Border = t1,
-					Content = t1
-				}
+				Primary = { Background = v, Border = v, Content = v },
+				PrimaryBrand = { Background = v, Border = v, Content = v },
+				Secondary = { Background = v, Border = v, Content = v },
+				Alert = { Background = v, Border = v, Content = v },
+				Subtle = { Background = v, Border = v, Content = v }
 			},
 			State = {
-				Standard = {
-					Default = t1,
-					Hover = t1,
-					Pressed = t1
-				},
-				Lighten = {
-					Default = t1,
-					Hover = t1,
-					Pressed = t1
-				},
-				Inverse = {
-					Default = t1,
-					Hover = t1,
-					Pressed = t1
-				},
-				Darken = {
-					Default = t1,
-					Hover = t1,
-					Pressed = t1
-				}
+				Standard = { Default = v, Hover = v, Pressed = v },
+				Lighten = { Default = v, Hover = v, Pressed = v },
+				Inverse = { Default = v, Hover = v, Pressed = v },
+				Darken = { Default = v, Hover = v, Pressed = v }
 			},
-			Focus = {
-				Start = t1,
-				End = t1,
-				Gradient = t1
-			},
+			Focus = { Start = v, End = v, Gradient = v },
 			Common = {
-				Divider = t1,
-				Overlay = t1,
-				DropShadow = t1,
-				NavigationBar = t1,
-				Badge = t1,
-				BadgeContent = t1,
-				Placeholder = t1,
-				Online = t1,
-				Offline = t1,
-				Alert = t1,
-				Success = t1
+				Divider = v,
+				Overlay = v,
+				DropShadow = v,
+				NavigationBar = v,
+				Badge = v,
+				BadgeContent = v,
+				Placeholder = v,
+				Online = v,
+				Offline = v,
+				Alert = v,
+				Success = v
 			}
 		},
 		Radius = {
@@ -241,26 +177,14 @@ return {
 				XxLarge = 0
 			}
 		},
-		Stroke = {
-			Input = 0,
-			Focus = 0
-		},
+		Stroke = { Input = 0, Focus = 0 },
 		Offset = {
-			Focus = {
-				Standard = 0,
-				Inset = 0
-			}
+			Focus = { Standard = 0, Inset = 0 }
 		},
 		Opacity = {
 			State = {
-				Lighten = {
-					Hover = 0,
-					Pressed = 0
-				},
-				Darken = {
-					Hover = 0,
-					Pressed = 0
-				}
+				Lighten = { Hover = 0, Pressed = 0 },
+				Darken = { Hover = 0, Pressed = 0 }
 			}
 		}
 	},
@@ -268,15 +192,10 @@ return {
 		VerticalTile = {
 			Base = {
 				Container = {
+					Background = v,
 					BorderWidth = 0,
-					Background = t1,
-					BorderColor = t1,
-					DropShadow = {
-						X = 0,
-						Y = 0,
-						Blur = 0,
-						Color = t1
-					},
+					BorderColor = v,
+					DropShadow = { X = 0, Y = 0, Blur = 0, Color = v },
 					BorderRadius = {
 						LeadingTop = 0,
 						TrailingTop = 0,
@@ -285,20 +204,10 @@ return {
 					}
 				},
 				ContentTop = {
-					Spacing = {
-						Top = 0,
-						Trailing = 0,
-						Bottom = 0,
-						Leading = 0
-					}
+					Spacing = { Top = 0, Trailing = 0, Bottom = 0, Leading = 0 }
 				},
 				ContentBottom = {
-					Spacing = {
-						Top = 0,
-						Trailing = 0,
-						Bottom = 0,
-						Leading = 0
-					}
+					Spacing = { Top = 0, Trailing = 0, Bottom = 0, Leading = 0 }
 				}
 			}
 		},
@@ -306,436 +215,231 @@ return {
 			Base = {
 				Container = {
 					Gap = 0,
-					Spacing = {
-						Top = 0,
-						Trailing = 0,
-						Bottom = 0,
-						Leading = 0
-					}
+					Spacing = { Top = 0, Trailing = 0, Bottom = 0, Leading = 0 }
 				},
 				Image = {
 					Size = 0,
+					BackgroundColor = v,
+					BorderColor = v,
 					BorderRadius = 0,
-					BorderWidth = 0,
-					BackgroundColor = t1,
-					BorderColor = t1
+					BorderWidth = 0
 				},
-				Status = {
-					Size = 0,
-					BorderWidth = 0,
-					BackgroundColor = t1,
-					BorderColor = t1
-				},
-				Content = {
-					Gap = 0,
-					Typography = t2,
-					ContentColor = t1
-				},
-				Icon = {
-					Size = 0
-				},
-				Presence = {
-					ContentColor = t1
-				}
+				Status = { Size = 0, BackgroundColor = v, BorderColor = v, BorderWidth = 0 },
+				Content = { Gap = 0, Typography = v2, ContentColor = v },
+				Icon = { Size = 0 },
+				Presence = { ContentColor = v }
 			}
 		},
 		Facepile = {
-			Container = {
-				Gap = 0
-			},
-			FaceGroup = {
-				Gap = 0
-			},
+			Container = { Gap = 0 },
+			FaceGroup = { Gap = 0 },
 			Face = {
+				BackgroundColor = v,
 				BorderWidth = 0,
+				BorderColor = v,
 				BorderRadius = 0,
 				Width = 0,
-				Height = 0,
-				BackgroundColor = t1,
-				BorderColor = t1
+				Height = 0
 			},
 			Badge = {
+				BackgroundColor = v,
 				BorderWidth = 0,
+				BorderColor = v,
 				BorderRadius = 0,
 				Spacing = 0,
 				Height = 0,
 				MinWidth = 0,
-				BackgroundColor = t1,
-				BorderColor = t1,
-				ContentColor = t1,
-				Typography = t2
+				ContentColor = v,
+				Typography = v2
 			},
-			Label = {
-				ContentColor = t1,
-				Typography = t2
-			}
+			Label = { ContentColor = v, Typography = v2 }
 		},
 		ControllerBar = {
-			Gap = 0,
-			BackgroundColor = t1,
+			BackgroundColor = v,
 			BorderRadius = {
 				LeadingTop = 0,
 				TrailingTop = 0,
 				TrailingBottom = 0,
 				LeadingBottom = 0
 			},
-			Spacing = {
-				Top = 0,
-				Trailing = 0,
-				Bottom = 0,
-				Leading = 0
-			}
+			Spacing = { Top = 0, Trailing = 0, Bottom = 0, Leading = 0 },
+			Gap = 0
 		},
 		ControllerBarShortcut = {
-			Container = {
-				Gap = 0,
-				ContentColor = t1
-			},
-			Icon = {
-				Size = 0
-			},
-			Label = {
-				Typography = t2
-			}
+			Container = { Gap = 0, ContentColor = v },
+			Icon = { Size = 0 },
+			Label = { Typography = v2 }
 		},
 		SelectionCursor = {
 			BorderWidth = 0,
 			Offset = 0,
 			Inset = 0,
-			Gradient = {
-				Start = t1,
-				End = t1
-			}
+			Gradient = { Start = v, End = v }
 		},
 		StateLayer = {
-			Base = {
-				BorderWidth = 0
-			},
+			Base = { BorderWidth = 0 },
 			Standard = {
-				Initialize = {
-					Color = t1
-				},
-				Default = {
-					Color = t1
-				},
-				Hover = {
-					Color = t1
-				},
-				Pressed = {
-					Color = t1
-				},
-				Selected = {
-					Color = t1
-				},
-				SelectedPressed = {
-					Color = t1
-				},
-				Disabled = {
-					Color = t1
-				}
+				Initialize = { Color = v },
+				Default = { Color = v },
+				Hover = { Color = v },
+				Pressed = { Color = v },
+				Selected = { Color = v },
+				SelectedPressed = { Color = v },
+				Disabled = { Color = v }
 			},
 			Lighten = {
-				Initialize = {
-					Color = t1
-				},
-				Default = {
-					Color = t1
-				},
-				Hover = {
-					Color = t1
-				},
-				Pressed = {
-					Color = t1
-				},
-				Selected = {
-					Color = t1
-				},
-				SelectedPressed = {
-					Color = t1
-				},
-				Disabled = {
-					Color = t1
-				}
+				Initialize = { Color = v },
+				Default = { Color = v },
+				Hover = { Color = v },
+				Pressed = { Color = v },
+				Selected = { Color = v },
+				SelectedPressed = { Color = v },
+				Disabled = { Color = v }
 			},
 			Inverse = {
-				Initialize = {
-					Color = t1
-				},
-				Default = {
-					Color = t1
-				},
-				Hover = {
-					Color = t1
-				},
-				Pressed = {
-					Color = t1
-				},
-				Selected = {
-					Color = t1
-				},
-				SelectedPressed = {
-					Color = t1
-				},
-				Disabled = {
-					Color = t1
-				}
+				Initialize = { Color = v },
+				Default = { Color = v },
+				Hover = { Color = v },
+				Pressed = { Color = v },
+				Selected = { Color = v },
+				SelectedPressed = { Color = v },
+				Disabled = { Color = v }
 			},
 			Darken = {
-				Initialize = {
-					Color = t1
-				},
-				Default = {
-					Color = t1
-				},
-				Hover = {
-					Color = t1
-				},
-				Pressed = {
-					Color = t1
-				},
-				Selected = {
-					Color = t1
-				},
-				SelectedPressed = {
-					Color = t1
-				},
-				Disabled = {
-					Color = t1
-				}
+				Initialize = { Color = v },
+				Default = { Color = v },
+				Hover = { Color = v },
+				Pressed = { Color = v },
+				Selected = { Color = v },
+				SelectedPressed = { Color = v },
+				Disabled = { Color = v }
 			}
 		},
 		MenuCell = {
 			Base = {
 				Container = {
 					Height = 0,
-					BorderWidth = 0,
-					ContentColor = t1,
-					BackgroundColor = t1,
-					BorderColor = t1,
+					ContentColor = v,
+					BackgroundColor = v,
+					BorderColor = v,
 					BorderRadius = {
 						TopLeading = 0,
 						TopTrailing = 0,
 						BottomTrailing = 0,
 						BottomLeading = 0
 					},
-					Spacing = {
-						Top = 0,
-						Trailing = 0,
-						Bottom = 0,
-						Leading = 0
-					}
+					BorderWidth = 0,
+					Spacing = { Top = 0, Trailing = 0, Bottom = 0, Leading = 0 }
 				},
-				IconFrame = {
-					Size = 0
-				},
+				IconFrame = { Size = 0 },
 				TextFrame = {
-					Spacing = {
-						Top = 0,
-						Trailing = 0,
-						Bottom = 0,
-						Leading = 0
-					}
+					Spacing = { Top = 0, Trailing = 0, Bottom = 0, Leading = 0 }
 				},
-				Text = {
-					Typography = t2
-				},
-				CheckFrame = {
-					Size = 0
-				}
+				Text = { Typography = v2 },
+				CheckFrame = { Size = 0 }
 			},
 			Divider = {
-				Container = {
-					BorderWidth = 0
-				}
+				Container = { BorderWidth = 0 }
 			},
 			Disabled = {
-				Container = {
-					ContentColor = t1
-				}
+				Container = { ContentColor = v }
 			},
 			HasRoundBottom = {
 				Container = {
-					BorderRadius = {
-						BottomTrailing = 0,
-						BottomLeading = 0
-					}
+					BorderRadius = { BottomTrailing = 0, BottomLeading = 0 }
 				}
 			},
 			HasRoundTop = {
 				Container = {
-					BorderRadius = {
-						TopLeading = 0,
-						TopTrailing = 0
-					}
+					BorderRadius = { TopLeading = 0, TopTrailing = 0 }
 				}
 			}
 		},
-		BaseMenu = {
-			BorderRadius = 0,
-			BackgroundColor = t1
-		},
-		StatGroup = {
-			Gap = 0
-		},
+		BaseMenu = { BorderRadius = 0, BackgroundColor = v },
+		StatGroup = { Gap = 0 },
 		StatItem = {
-			Container = {
-				Gap = 0,
-				ContentColor = t1
-			},
-			Icon = {
-				Size = 0
-			},
-			Label = {
-				Typography = t2
-			}
+			Container = { Gap = 0, ContentColor = v },
+			Icon = { Size = 0 },
+			Label = { Typography = v2 }
 		},
 		MediaTile = {
-			Container = {
-				BorderRadius = 0
-			},
-			Icon = {
-				Size = 0
-			}
+			Container = { BorderRadius = 0 },
+			Icon = { Size = 0 }
 		},
 		StatWidget = {
-			Container = {
-				Gap = 0,
-				ContentColor = t1
-			},
-			Icon = {
-				Size = 0
-			},
-			DataGroup = {
-				Gap = 0
-			},
-			Data = {
-				Typography = t2
-			},
-			Label = {
-				Typography = t2
-			}
+			Container = { Gap = 0, ContentColor = v },
+			Icon = { Size = 0 },
+			DataGroup = { Gap = 0 },
+			Data = { Typography = v2 },
+			Label = { Typography = v2 }
 		},
 		RateCount = {
-			Container = {
-				Spacing = 0,
-				Gap = 0,
-				BorderRadius = 0,
-				BackgroundColor = t1
-			},
-			ButtonGroup = {
-				Gap = 0
-			}
+			Container = { Spacing = 0, Gap = 0, BorderRadius = 0, BackgroundColor = v },
+			ButtonGroup = { Gap = 0 }
 		},
 		PlayerCount = {
-			Container = {
-				Spacing = 0,
-				BorderRadius = 0,
-				BackgroundColor = t1
-			}
+			Container = { Spacing = 0, BorderRadius = 0, BackgroundColor = v }
 		},
 		VerticalScrollView = {
 			Base = {
-				Handle = {
-					BorderRadius = 0,
-					BackgroundColor = t1,
-					ContentColor = t1
-				},
-				Icon = {
-					Size = 0
-				},
+				Handle = { BackgroundColor = v, ContentColor = v, BorderRadius = 0 },
+				Icon = { Size = 0 },
 				Track = {
 					Opacity = 0,
-					Spacing = {
-						Top = 0,
-						Bottom = 0
-					}
+					Spacing = { Top = 0, Bottom = 0 }
 				}
 			},
 			Compact = {
-				Handle = {
-					Width = 0
-				},
-				Track = {
-					Width = 0
-				}
+				Handle = { Width = 0 },
+				Track = { Width = 0 }
 			},
 			Wide = {
-				Handle = {
-					Width = 0
-				},
-				Track = {
-					Width = 0
-				}
+				Handle = { Width = 0 },
+				Track = { Width = 0 }
 			},
 			Gamepad = {
-				Handle = {
-					Width = 0
-				},
-				Track = {
-					Width = 0
-				}
+				Handle = { Width = 0 },
+				Track = { Width = 0 }
 			}
 		},
 		TextField = {
 			Base = {
 				Field = {
+					BorderColor = v,
 					BorderRadius = 0,
+					Typography = v2,
+					Spacing = { Leading = 0, Trailing = 0 },
 					Gap = 0,
-					Opacity = 0,
-					BorderColor = t1,
-					Typography = t2,
-					Spacing = {
-						Leading = 0,
-						Trailing = 0
-					}
+					Opacity = 0
 				},
-				PlaceholderText = {
-					ContentColor = t1
-				},
-				FieldValue = {
-					ContentColor = t1
-				},
-				IconLeading = {
-					Size = 0,
-					ContentColor = t1
-				}
+				PlaceholderText = { ContentColor = v },
+				FieldValue = { ContentColor = v },
+				IconLeading = { ContentColor = v, Size = 0 }
 			},
 			Error = {
-				Field = {
-					BorderColor = t1
-				}
+				Field = { BorderColor = v }
 			},
 			Disabled = {
-				Field = {
-					Opacity = 0
-				}
+				Field = { Opacity = 0 }
 			}
 		},
 		InputLabel = {
 			Base = {
-				Opacity = 0,
-				Typography = t2,
-				ContentColor = t1,
-				Spacing = {
-					Bottom = 0
-				}
-			},
-			Disabled = {
+				Typography = v2,
+				ContentColor = v,
+				Spacing = { Bottom = 0 },
 				Opacity = 0
-			}
+			},
+			Disabled = { Opacity = 0 }
 		},
 		HelperText = {
 			Base = {
-				Opacity = 0,
-				Typography = t2,
-				ContentColor = t1,
-				Padding = {
-					Top = 0
-				}
+				Typography = v2,
+				ContentColor = v,
+				Padding = { Top = 0 },
+				Opacity = 0
 			},
-			Error = {
-				ContentColor = t1
-			}
+			Error = { ContentColor = v }
 		}
 	}
 }

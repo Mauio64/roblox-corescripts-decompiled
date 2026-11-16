@@ -1,88 +1,112 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local Dash = require(MomentsCreationParent.Dash)
-local Foundation = require(MomentsCreationParent.Foundation)
-local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
-local React = require(MomentsCreationParent.React)
-local Signals = require(MomentsCreationParent.Signals)
-local SignalsReact = require(MomentsCreationParent.SignalsReact)
+local parent = MomentsCreation.Parent
+
+local Dash = require(parent.Dash)
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
 local View = Foundation.View
+
 local useCallback = React.useCallback
 local useMemo = React.useMemo
 local useSignalState = SignalsReact.useSignalState
+
 local OverlayDisplay = MomentsCommon.Components.OverlayDisplay
 local StickerOverlay = MomentsCommon.Components.StickerOverlay
+
 local CreationFlowState = require(MomentsCreation.Enums.CreationFlowState)
-
 require(MomentsCreation.Types.CreationFlowTypes)
-require(MomentsCreationParent.MomentsTypes)
+require(parent.MomentsTypes)
 
-local function StickerOverlayLayer(t1: {[any]: any}) -- line: 43
-	-- upvalues: useSignalState (copy), useMemo (copy), Signals (copy), CreationFlowState (copy), useCallback (copy), React (copy), View (copy), Foundation (copy), StickerOverlay (copy), Dash (copy), OverlayDisplay (copy)
-	local controller = t1.controller
-	local v19 = useSignalState(controller.getStep)
-	local v20 = useSignalState(t1.ctx.getItemSize)
+local function StickerOverlayLayer(props)
+	local controller = props.controller
+
+	local v = useSignalState(controller.getStep)
+	local itemSize = useSignalState(props.ctx.getItemSize)
 	local stickerOverlays = useSignalState(controller.getComposedEdits).stickerOverlays
-	local v22 = useMemo(function() -- line: 52
-		-- upvalues: Signals (copy), controller (copy)
-		return Signals.createComputed(function(p1) -- line: 53
-			-- upvalues: controller (copy)
-			local v31 = controller.getActiveSession(p1)
 
-			if v31 ~= nil then
-				return (v31.getDraft(p1))
+	local v2 = useSignalState((useMemo(function()
+		return Signals.createComputed(function(p)
+			local activeSession = controller.getActiveSession(p)
+
+			if activeSession == nil then
+				return nil
 			end
 
-			return nil
+			return (activeSession.getDraft(p))
 		end)
-	end, { controller })
-	local v23 = useSignalState(v22)
-	local v24 = v19 == CreationFlowState.StickerOverlay
-	local v25 = v23 and v23[1]
-	local v26 = useCallback(function() -- line: 63
-		-- upvalues: controller (copy)
+	end, { controller })))
+
+	local v3 = v == CreationFlowState.StickerOverlay
+	local v4 = v2 and v2[1]
+
+	local onOverlayActivated = useCallback(function()
 		controller.beginTool("sticker")
 	end, { controller })
-	local v27 = useCallback(function(t2: {[any]: any}?) -- line: 67
-		-- upvalues: controller (copy)
-		controller.updateCommittedEdit("sticker", t2)
+
+	local onOverlayDragEnd = useCallback(function(p)
+		controller.updateCommittedEdit("sticker", p)
 	end, { controller })
 
-	if v24 then
-		return React.createElement(View, {
+	if v3 then
+		local createElement = React.createElement
+		local v5 = {
+			stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
 			tag = "size-full bg-over-media-0",
-			stateLayer = {
-				affordance = Foundation.Enums.StateLayerAffordance.None
-			},
-			ZIndex = t1.zIndex or 1
-		}, {
-			ImageOverlay = if v25 == nil or v25.stickerURI == nil then nil else React.createElement(StickerOverlay, {
-				overlayEdit = Dash.joinDeep(v25, {
-					rotation = 0,
-					position = UDim2.fromScale(0.5, 0.5)
+			ZIndex = props.zIndex or 1
+		}
+		local imageOverlay
+
+		if not (v4 == nil or v4.stickerURI == nil) then
+			imageOverlay = React.createElement(StickerOverlay, {
+				overlayEdit = Dash.joinDeep(v4, {
+					position = UDim2.fromScale(0.5, 0.5),
+					rotation = 0
 				})
 			})
-		})
+		end
+
+		return createElement(View, v5, { ImageOverlay = imageOverlay })
+	else
+		if stickerOverlays == nil or #stickerOverlays == 0 then
+			return nil
+		end
+
+		local draggable = v == CreationFlowState.Preview
+
+		local createElement = React.createElement
+		local v5 = {
+			draggable = draggable,
+			editable = false,
+			itemResolution = nil,
+			itemSize = itemSize,
+			scaleType = Enum.ScaleType.Crop,
+			onOverlayActivated = 0,
+			onOverlayDragEnd = 0,
+			overlayEdits = 0,
+			overlayComponent = 0,
+			zIndex = 0
+		}
+
+		if not draggable then
+			onOverlayActivated = nil
+		end
+
+		v5.onOverlayActivated = onOverlayActivated
+
+		if not draggable then
+			onOverlayDragEnd = nil
+		end
+
+		v5.onOverlayDragEnd = onOverlayDragEnd
+		v5.overlayEdits = stickerOverlays
+		v5.overlayComponent = StickerOverlay
+		v5.zIndex = props.zIndex
+		return createElement(OverlayDisplay, v5)
 	end
-
-	if stickerOverlays == nil or #stickerOverlays == 0 then
-		return nil
-	end
-
-	local v28 = v19 == CreationFlowState.Preview
-
-	return React.createElement(OverlayDisplay, {
-		editable = false,
-		itemResolution = nil,
-		draggable = v28,
-		itemSize = v20,
-		scaleType = Enum.ScaleType.Crop,
-		onOverlayActivated = if not v28 then nil else v26,
-		onOverlayDragEnd = if not v28 then nil else v27,
-		overlayEdits = stickerOverlays,
-		overlayComponent = StickerOverlay,
-		zIndex = t1.zIndex
-	})
 end
 
 return StickerOverlayLayer

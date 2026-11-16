@@ -1,4 +1,4 @@
-local function createMakeupSchema() -- line: 2
+local function createMakeupSchema()
 	return {
 		ClassName = "Decal",
 		_children = {
@@ -6,15 +6,11 @@ local function createMakeupSchema() -- line: 2
 				Name = "ThumbnailConfiguration",
 				ClassName = "Configuration",
 				_optional = true,
-				_children = {{
-					Name = "SkinColorValue",
-					ClassName = "Color3Value"
-				}}
+				_children = {
+					{ Name = "SkinColorValue", ClassName = "Color3Value" }
+				}
 			},
-			{
-				Name = "WrapTextureTransfer",
-				ClassName = "WrapTextureTransfer"
-			}
+			{ Name = "WrapTextureTransfer", ClassName = "WrapTextureTransfer" }
 		}
 	}
 end

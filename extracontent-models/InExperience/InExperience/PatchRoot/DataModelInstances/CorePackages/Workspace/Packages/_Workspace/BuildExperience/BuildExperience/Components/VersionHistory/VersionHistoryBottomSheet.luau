@@ -1,146 +1,233 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
+local FIntBuildExperienceVersionHistoryLoadMoreViewportPercent = require(BuildExperience.Flags.FIntBuildExperienceVersionHistoryLoadMoreViewportPercent)
+local LatestVersionCardView = require(script.Parent.LatestVersionCard.LatestVersionCardView)
+local LiveVersionCardView = require(script.Parent.LiveVersionCard.LiveVersionCardView)
 local RestoreVersionDialog = require(script.Parent.RestoreVersionDialog)
 local VersionHistoryCard = require(script.Parent.VersionHistoryCard)
-local VersionHistoryUtils = require(script.Parent.VersionHistoryUtils)
-local FFlagEnableBuildExperienceScrollPerformanceTracking = require(BuildExperience.Flags.FFlagEnableBuildExperienceScrollPerformanceTracking)
-local v10 = if not FFlagEnableBuildExperienceScrollPerformanceTracking then nil else require(BuildExperience.Telemetry.useScrollPerformanceTracker)
+local VersionHistorySection = require(script.Parent.VersionHistorySection)
+local useScrollEndReached = require(script.Parent.useScrollEndReached)
+local useScrollPerformanceTracker = require(BuildExperience.Telemetry.useScrollPerformanceTracker)
+
 local Checkbox = Foundation.Checkbox
 local Sheet = Foundation.Sheet
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+local useScaledValue = Foundation.Hooks.useScaledValue
 
-local function VersionHistoryContent(t1: {[any]: any}) -- line: 44
-	-- upvalues: FFlagEnableBuildExperienceScrollPerformanceTracking (copy), v10 (copy), React (copy), Sheet (copy)
-	if FFlagEnableBuildExperienceScrollPerformanceTracking then
-		v10("LuaApp_Build_VersionHistory_Scroll", t1.scrollingFrameRef)
-	end
+local VERSION_HISTORY_VERSIONS_TITLE = LocalizationStrings.VERSION_HISTORY_VERSIONS_TITLE
 
-	return React.createElement(Sheet.Content, {
-		scrollingFrameRef = t1.scrollingFrameRef
-	}, t1.children)
+local function VersionHistoryContent(props)
+	useScrollPerformanceTracker("LuaApp_Build_VersionHistory_Scroll", props.scrollingFrameRef)
+	useScrollEndReached(
+		props.scrollingFrameRef,
+		FIntBuildExperienceVersionHistoryLoadMoreViewportPercent / 100,
+		props.onEndReached
+	)
+
+	return React.createElement(Sheet.Content, { scrollingFrameRef = props.scrollingFrameRef }, props.children)
 end
-local function VersionHistoryBottomSheet(t2: {[any]: any}) -- line: 58
-	-- upvalues: React (copy), VersionHistoryUtils (copy), VersionHistoryCard (copy), Sheet (copy), FoundationText (copy), LocalizationStrings (copy), VersionHistoryContent (copy), View (copy), Checkbox (copy), RestoreVersionDialog (copy)
-	local v19 = t2.testId or "version-history-bottom-sheet"
-	local v20 = React.useRef(nil)
-	local v21 = t2.scrollingFrameRef or v20
-	local v22, v23 = React.useState(nil)
-	local v24, v25 = React.useState(true)
-	local v26 = React.useCallback(function() -- line: 65
-		-- upvalues: v23 (copy), t2 (copy)
-		v23(nil)
-		t2.onClose()
-	end, { t2.onClose })
-	local v27 = React.useCallback(function(t3: {[any]: any}) -- line: 70
-		-- upvalues: v23 (copy)
-		v23(t3)
+
+local function VersionHistoryBottomSheet(props)
+	local testId = props.testId or "version-history-bottom-sheet"
+	local ref = React.useRef(nil)
+	local scrollingFrameRef = props.scrollingFrameRef or ref
+	local state, setState = React.useState(nil)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(true)
+	local v = useLocalization({
+		allVersions = LocalizationStrings.VERSION_HISTORY_ALL_VERSIONS,
+		hideAutosaved = LocalizationStrings.VERSION_HISTORY_HIDE_AUTOSAVED,
+		published = LocalizationStrings.VERSION_HISTORY_PUBLISHED,
+		title = VERSION_HISTORY_VERSIONS_TITLE
+	})
+
+	local hideAutosaved = v.hideAutosaved
+	local title = v.title
+	local onClose = React.useCallback(function()
+		setState(nil)
+		props.onClose()
+	end, { props.onClose })
+
+	local v2 = React.useCallback(function(p)
+		setState(p)
 	end, {})
-	local v28 = React.useCallback(function() -- line: 74
-		-- upvalues: v23 (copy)
-		v23(nil)
-	end, {})
-	local v29 = React.useCallback(function() -- line: 78
-		-- upvalues: v22 (copy), t2 (copy), v23 (copy)
-		if v22 and not t2.isRestoreDisabled then
-			t2.onRestore(v22)
+
+	local onCancel = React.useCallback(function()
+		if state2 then
+			return
 		end
 
-		v23(nil)
-	end, {
-		v22,
-		t2.isRestoreDisabled,
-		t2.onRestore
-	})
-	local v30 = React.useMemo(function() -- line: 86
-		-- upvalues: t2 (copy), VersionHistoryUtils (copy), v24 (copy), v19 (copy), React (copy), VersionHistoryCard (copy), v27 (copy)
-		local t4 = {}
+		setState(nil)
+	end, { state2 })
 
-		for v33, v34 in t2.entries do
-			if VersionHistoryUtils.shouldShowEntry(v34.badgeText, v24) then
-				local v35 = `{ v19 }-card-{ v34.id }`
+	local onRestore = React.useCallback(function()
+		if state == nil or (props.isRestoreDisabled or state2) then
+			return
+		end
 
-				t4[v34.id] = React.createElement(VersionHistoryCard, {
-					layoutOrder = v33,
-					versionLabel = v34.versionLabel,
-					title = v34.title,
-					description = v34.description,
-					badgeText = v34.badgeText,
-					isRestoreDisabled = t2.isRestoreDisabled,
-					onRestore = function() -- line: 98
-						-- upvalues: v27 (copy), v34 (copy)
-						v27(v34)
-					end,
-					testId = v35
-				})
+		setState2(true)
+		local v3 = props.onRestore(state)
+
+		if v3 == nil then
+			setState2(false)
+		else
+			v3:andThen(function()
+				setState2(false)
+				setState(nil)
+
+				if props.onRestoreStarted ~= nil then
+					props.onRestoreStarted()
+				end
+			end):catch(function()
+				setState2(false)
+			end)
+		end
+	end, { state, props.isRestoreDisabled, props.onRestore, props.onRestoreStarted, state2 })
+
+	local v3 = React.useMemo(function()
+		local children = {}
+
+		local v3 = props.latestVersion ~= nil
+
+		if v3 then
+			children.LatestVersionCard = React.createElement(LatestVersionCardView, props.latestVersion)
+		end
+
+		for k, entry in props.entries do
+			if not (not v3 or k ~= 1) or state3 and entry.isAutosaved then
+				continue
 			end
+
+			local formatted = `{testId}-card-{entry.id}`
+			children[entry.id] = React.createElement(VersionHistoryCard, {
+				layoutOrder = k,
+				versionLabel = entry.versionLabel,
+				title = entry.title,
+				description = entry.description,
+				badgeText = entry.badgeText,
+				isRestoreDisabled = props.isRestoreDisabled,
+				onRestore = function()
+					v2(entry)
+				end,
+				testId = formatted
+			})
 		end
 
-		return t4
-	end, {
-		t2.entries,
-		t2.isRestoreDisabled,
-		v24,
-		v27,
-		v19
-	})
+		return children
+	end, { props.entries, props.isRestoreDisabled, props.latestVersion, state3, v2, testId })
 
-	return React.createElement(React.Fragment, nil, {
-		Sheet = React.createElement(Sheet.Root, {
-			defaultSnapPointIndex = 2,
-			isOpen = t2.isOpen == nil or t2.isOpen,
-			snapPoints = {
-				0.5,
-				1
-			},
-			onClose = v26,
-			testId = v19
-		}, {
-			Header = React.createElement(Sheet.Header, {
-				hasCloseAffordance = true
-			}, {
-				Title = React.createElement(FoundationText, {
-					LayoutOrder = 1,
-					tag = "shrink auto-xy text-heading-small text-wrap text-align-x-left content-emphasis",
-					Text = LocalizationStrings.VERSION_HISTORY_TITLE
-				})
-			}),
-			Content = React.createElement(VersionHistoryContent, {
-				scrollingFrameRef = v21
-			}, {
-				AutosaveFilter = React.createElement(View, {
-					LayoutOrder = 1,
-					tag = "row size-full-0 auto-y"
-				}, {
-					Checkbox = React.createElement(Checkbox, {
-						label = LocalizationStrings.VERSION_HISTORY_HIDE_AUTOSAVED,
-						isChecked = v24,
-						onActivated = v25,
-						testId = `{ v19 }-autosave-filter`
-					})
-				}),
-				Status = if not t2.statusText then nil else React.createElement(FoundationText, {
-					LayoutOrder = 2,
-					tag = "size-full-0 auto-y padding-bottom-medium text-body-medium text-wrap text-align-x-left content-default",
-					Text = t2.statusText
-				}),
-				Cards = React.createElement(View, {
-					LayoutOrder = 3,
-					tag = "col gap-medium size-full-0 auto-y padding-bottom-large"
-				}, v30)
-			})
-		}),
-		RestoreDialog = if not v22 then nil else React.createElement(RestoreVersionDialog, {
-			isOpen = true,
-			title = v22.versionLabel,
-			description = v22.description,
-			onRestore = v29,
-			onCancel = v28
+	local element = React.createElement(View, { LayoutOrder = 1, tag = "row size-full-0 auto-y" }, {
+		Checkbox = React.createElement(Checkbox, {
+			label = hideAutosaved,
+			isChecked = state3,
+			onActivated = setState3,
+			testId = `{testId}-autosave-filter`
 		})
 	})
+	local status
+
+	if props.statusText then
+		status = React.createElement(Text, {
+			LayoutOrder = 2,
+			Text = props.statusText,
+			tag = "size-full-0 auto-y padding-bottom-medium text-body-medium text-wrap text-align-x-left content-default"
+		})
+	end
+
+	local v4 = {
+		AutosaveFilter = element,
+		Status = status,
+		Cards = React.createElement(
+			View,
+			{ LayoutOrder = 3, tag = "col gap-medium size-full-0 auto-y padding-bottom-large" },
+			v3
+		)
+	}
+
+	local allVersions = v.allVersions
+	local published = v.published
+	local v5 = useScaledValue(32)
+
+	local createElement = React.createElement
+	local v6 = {
+		layout = { FillDirection = Enum.FillDirection.Vertical, Padding = UDim.new(0, v5) },
+		tag = "col size-full-0 auto-y",
+		testId = `{testId}-sections`
+	}
+	local published2
+
+	if props.liveVersion then
+		published2 = React.createElement(
+			VersionHistorySection,
+			{ layoutOrder = 1, title = published, testId = `{testId}-published` },
+			{
+				LiveVersionCard = React.createElement(LiveVersionCardView, props.liveVersion)
+			}
+		)
+	end
+
+	local v7 = {
+		Sections = createElement(View, v6, {
+			Published = published2,
+			AllVersions = React.createElement(
+				VersionHistorySection,
+				{ layoutOrder = 2, title = allVersions, testId = `{testId}-all-versions` },
+				v4
+			)
+		})
+	}
+
+	local createElement2 = React.createElement
+	local fragment = React.Fragment
+	local v8 = {
+		Sheet = React.createElement(Sheet.Root, {
+			isOpen = props.isOpen == nil or props.isOpen,
+			snapPoints = { 0.5, 1 },
+			defaultSnapPointIndex = 2,
+			onClose = onClose,
+			testId = testId
+		}, {
+			Header = React.createElement(Sheet.Header, { hasCloseAffordance = true }, {
+				Title = React.createElement(Text, {
+					LayoutOrder = 1,
+					Text = title,
+					tag = {
+						["shrink auto-xy text-wrap text-align-x-left content-emphasis"] = true,
+						["text-heading-medium"] = true
+					}
+				})
+			}),
+			Content = React.createElement(
+				VersionHistoryContent,
+				{ scrollingFrameRef = scrollingFrameRef, onEndReached = props.onEndReached },
+				v7
+			)
+		}),
+		RestoreDialog = 0
+	}
+	local restoreDialog
+
+	if state then
+		restoreDialog = React.createElement(RestoreVersionDialog, {
+			isOpen = true,
+			title = state.versionLabel,
+			description = state.description,
+			isLoading = state2,
+			onRestore = onRestore,
+			onCancel = onCancel
+		})
+	end
+
+	v8.RestoreDialog = restoreDialog
+	return createElement2(fragment, nil, v8)
 end
 
 return VersionHistoryBottomSheet

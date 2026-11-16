@@ -1,30 +1,33 @@
 local HttpService = game:GetService("HttpService")
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local default = require(SquadsCoreParent.CrossExperienceVoice).CrossExperienceVoiceManager.default
-local SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY = require(SquadsCore.Common.Constants).SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY
-local SQUAD_VOICE_EU_MODAL_SEEN_KEY = require(SquadsCore.Common.Constants).SQUAD_VOICE_EU_MODAL_SEEN_KEY
-local SquadPromptType = require(SquadsCore.Enums.SquadPromptType)
-local setTableAppStorageKey = require(SquadsCore.Utils.appStorageAccess).setTableAppStorageKey
+local parent = SquadsCore.Parent
 
-return function(p1: ((...any) -> ...any), s1: string, t1: {[any]: any}, t2: {[any]: any}) -- line: 13
-	-- upvalues: SquadPromptType (copy), setTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), HttpService (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), default (copy)
-	return function(p2) -- line: 19
-		-- upvalues: p1 (copy), SquadPromptType (copy), t1 (copy), s1 (copy), t2 (copy), setTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), HttpService (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), default (copy)
-		p1(p2, {
+local CrossExperienceVoice = require(parent.CrossExperienceVoice)
+local default = CrossExperienceVoice.CrossExperienceVoiceManager.default
+
+local Constants = require(SquadsCore.Common.Constants)
+local SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY = Constants.SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY
+local Constants2 = require(SquadsCore.Common.Constants)
+local SQUAD_VOICE_EU_MODAL_SEEN_KEY = Constants2.SQUAD_VOICE_EU_MODAL_SEEN_KEY
+local SquadPromptType = require(SquadsCore.Enums.SquadPromptType)
+local appStorageAccess = require(SquadsCore.Utils.appStorageAccess)
+local setTableAppStorageKey = appStorageAccess.setTableAppStorageKey
+
+return function(callback, p: string, p2, p3)
+	return function(p4)
+		callback(p4, {
 			promptType = SquadPromptType.EuVoiceConsentPrompt,
-			onConfirm = function() -- line: 22
-				-- upvalues: t1 (copy), s1 (copy), t2 (copy), setTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), HttpService (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), default (copy)
-				t1[s1] = true
-				t2[s1] = true
-				setTableAppStorageKey(SQUAD_VOICE_EU_MODAL_SEEN_KEY, HttpService:JSONEncode(t1))
-				setTableAppStorageKey(SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY, HttpService:JSONEncode(t2))
+			onConfirm = function()
+				p2[p] = true
+				p3[p] = true
+				setTableAppStorageKey(SQUAD_VOICE_EU_MODAL_SEEN_KEY, HttpService:JSONEncode(p2))
+				setTableAppStorageKey(SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY, HttpService:JSONEncode(p3))
+
 				default.default.VoiceEuModalConsented:Fire()
 			end,
-			onCancel = function() -- line: 32
-				-- upvalues: t1 (copy), s1 (copy), setTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), HttpService (copy), default (copy)
-				t1[s1] = true
-				setTableAppStorageKey(SQUAD_VOICE_EU_MODAL_SEEN_KEY, HttpService:JSONEncode(t1))
+			onCancel = function()
+				p2[p] = true
+				setTableAppStorageKey(SQUAD_VOICE_EU_MODAL_SEEN_KEY, HttpService:JSONEncode(p2))
 				default.default.VoiceEuModalRefused:Fire()
 			end
 		})

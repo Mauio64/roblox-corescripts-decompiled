@@ -1,5 +1,5 @@
-local function isLayeredClothing(p1) -- line: 1
-	return p1:FindFirstChildWhichIsA("WrapLayer", true)
+local function isLayeredClothing(instance)
+	return instance:FindFirstChildWhichIsA("WrapLayer", true)
 end
 
 return isLayeredClothing

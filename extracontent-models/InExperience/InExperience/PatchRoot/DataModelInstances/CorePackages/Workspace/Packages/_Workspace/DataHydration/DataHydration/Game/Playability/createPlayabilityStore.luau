@@ -1,95 +1,86 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Dash = require(DataHydrationParent.Dash)
+local parent = DataHydration.Parent
+local Dash = require(parent.Dash)
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
-
 local fetchPlayability = require(script.Parent.fetchPlayability)
 local PlayabilityStoreTypes = require(script.Parent.PlayabilityStoreTypes)
-local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+
+local DiscoveryUtils = require(parent.DiscoveryUtils)
 local logResponseError = DiscoveryUtils.logResponseError
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
-local v11 = require(DataHydrationParent.SharedFlags).GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds()
 
-local function createPlayabilityStore() -- line: 23
-	-- upvalues: createDataCache (copy), v11 (copy), createDataResolver (copy), logResponseError (copy), DiscoveryEventErrorLogger (copy), Dash (copy), fetchPlayability (copy), PlayabilityStoreTypes (copy)
-	local v13 = createDataCache(v11)
-	local v14 = createDataResolver({
-		cache = v13,
-		logError = function(p1) -- line: 28
-			-- upvalues: logResponseError (copy), DiscoveryEventErrorLogger (copy)
-			if type(p1) == "table" then
-				if p1.responseCode then
+local SharedFlags = require(parent.SharedFlags)
+local fIntLuaAppThrottleRefreshPlayabilityIntervalSeconds = SharedFlags.GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds()
+
+local function createPlayabilityStore()
+	local dataCache = createDataCache(fIntLuaAppThrottleRefreshPlayabilityIntervalSeconds)
+	local dataResolver = createDataResolver({
+		cache = dataCache,
+		logError = function(data)
+			if type(data) == "table" then
+				if data.responseCode then
 					logResponseError("v1/games/multiget-playability-status", {
-						StatusCode = tonumber(p1.responseCode)
+						StatusCode = tonumber(data.responseCode)
 					})
 				end
 
-				if p1.errorType and p1.errorMessage then
-					DiscoveryEventErrorLogger.reportError(p1.errorType, p1.errorMessage, p1.customFields)
-
-					return
+				if data.errorType and data.errorMessage then
+					DiscoveryEventErrorLogger.reportError(data.errorType, data.errorMessage, data.customFields)
 				end
 			else
-				DiscoveryEventErrorLogger.reportError("FetchPlayabilityError", (tostring(p1)))
+				DiscoveryEventErrorLogger.reportError("FetchPlayabilityError", (tostring(data)))
 			end
 		end,
-		fetchFn = function(t1: {[any]: any}) -- line: 48
-			-- upvalues: Dash (copy), fetchPlayability (copy), PlayabilityStoreTypes (copy)
-			local v17 = Dash.keys(t1)
-
-			return fetchPlayability(v17):andThen(function(p2) -- line: 53
-				-- upvalues: v17 (copy), PlayabilityStoreTypes (copy)
-				if not p2 or not p2.responseBody then
+		fetchFn = function(p)
+			local keys = Dash.keys(p)
+			return fetchPlayability(keys):andThen(function(p2)
+				if not (p2 and p2.responseBody) then
 					error({
-						errorType = "FetchPlayabilityResponseError",
 						responseCode = p2 and p2.responseCode,
-						errorMessage = not p2 and "No response" or "Missing response body",
-						customFields = {
-							universeIds = v17
-						}
+						errorType = "FetchPlayabilityResponseError",
+						errorMessage = p2 and "Missing response body" or "No response",
+						customFields = { universeIds = keys }
 					})
 				end
 
-				local v19, v20 = PlayabilityStoreTypes.playabilityResponseValidator(p2.responseBody)
+				local playabilityResponseValidator, errorMessage = PlayabilityStoreTypes.playabilityResponseValidator(p2.responseBody)
 
-				if not v19 then
+				if not playabilityResponseValidator then
 					error({
-						errorType = "FetchPlayabilityResponseInvalidInterface",
 						responseCode = p2.responseCode,
-						errorMessage = v20,
-						customFields = {
-							universeIds = v17
-						}
+						errorType = "FetchPlayabilityResponseInvalidInterface",
+						errorMessage = errorMessage,
+						customFields = { universeIds = keys }
 					})
 				end
 
-				local t2 = {}
+				local result = {}
 
-				for _, v23 in p2.responseBody do
-					t2[tostring(v23.universeId)] = {
-						isPlayable = v23.isPlayable,
-						playabilityStatus = v23.playabilityStatus
+				for _, v in p2.responseBody do
+					result[tostring(v.universeId)] = {
+						isPlayable = v.isPlayable,
+						playabilityStatus = v.playabilityStatus
 					}
 				end
 
-				return t2
-			end):catch(function(p3) -- line: 85
-				error(p3)
+				return result
+			end):catch(function(message)
+				error(message)
 			end)
 		end
 	})
 
 	return {
-		fetchPlayability = v14.fetchItem,
-		getPlayability = v14.getCachedItem,
-		getAndFetchPlayability = v14.getAndFetchItem,
-		updatePlayability = v13.updateItem,
-		updatePlayabilities = v13.updateItems,
-		clear = v14.clear,
-		dispose = v14.dispose
+		fetchPlayability = dataResolver.fetchItem,
+		getPlayability = dataResolver.getCachedItem,
+		getAndFetchPlayability = dataResolver.getAndFetchItem,
+		updatePlayability = dataCache.updateItem,
+		updatePlayabilities = dataCache.updateItems,
+		clear = dataResolver.clear,
+		dispose = dataResolver.dispose
 	}
 end
 

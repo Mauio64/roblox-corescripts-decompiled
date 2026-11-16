@@ -1,5 +1,1 @@
-return {
-	None = "None",
-	Background = "Background",
-	Border = "Border"
-}
+return { None = "None", Background = "Background", Border = "Border" }

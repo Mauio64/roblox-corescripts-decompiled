@@ -1,5 +1,4 @@
 require(script.Parent.networkingChatTypes)
-
 local networkRequests = script.Parent.networkRequests
 local createAddToConversation = require(networkRequests.createAddToConversation)
 local createRemoveFromConversation = require(networkRequests.createRemoveFromConversation)
@@ -23,29 +22,28 @@ local createGetChatSettings = require(networkRequests.createGetChatSettings)
 local createGetRolloutSettings = require(networkRequests.createGetRolloutSettings)
 local createGetMetadata = require(networkRequests.createGetMetadata)
 
-return function(p1) -- line: 26
-	-- upvalues: createAddToConversation (copy), createRemoveFromConversation (copy), createRenameGroupConversation (copy), createStartGroupConversation (copy), createStartOneToOneConversation (copy), createSetConversationUniverse (copy), createResetConversationUniverse (copy), createSendMessage (copy), createSendGameLinkMessage (copy), createUpdateUserTypingStatus (copy), createMarkAsRead (copy), createMarkAsSeen (copy), createGetMessages (copy), createGetUserConversations (copy), createGetConversations (copy), createGetLatestMessages (copy), createGetUnreadConversationCount (copy), createGetUnreadMessages (copy), createGetChatSettings (copy), createGetRolloutSettings (copy), createGetMetadata (copy)
+return function(p)
 	return {
-		AddToConversation = createAddToConversation(p1),
-		RemoveFromConversation = createRemoveFromConversation(p1),
-		RenameGroupConversation = createRenameGroupConversation(p1),
-		StartGroupConversation = createStartGroupConversation(p1),
-		StartOneToOneConversation = createStartOneToOneConversation(p1),
-		SetConversationUniverse = createSetConversationUniverse(p1),
-		ResetConversationUniverse = createResetConversationUniverse(p1),
-		SendMessage = createSendMessage(p1),
-		SendGameLinkMessage = createSendGameLinkMessage(p1),
-		UpdateUserTypingStatus = createUpdateUserTypingStatus(p1),
-		MarkAsRead = createMarkAsRead(p1),
-		MarkAsSeen = createMarkAsSeen(p1),
-		GetMessages = createGetMessages(p1),
-		GetUserConversations = createGetUserConversations(p1),
-		GetConversations = createGetConversations(p1),
-		GetLatestMessages = createGetLatestMessages(p1),
-		GetUnreadConversationCount = createGetUnreadConversationCount(p1),
-		GetUnreadMessages = createGetUnreadMessages(p1),
-		GetChatSettings = createGetChatSettings(p1),
-		GetRolloutSettings = createGetRolloutSettings(p1),
-		GetMetadata = createGetMetadata(p1)
+		AddToConversation = createAddToConversation(p),
+		RemoveFromConversation = createRemoveFromConversation(p),
+		RenameGroupConversation = createRenameGroupConversation(p),
+		StartGroupConversation = createStartGroupConversation(p),
+		StartOneToOneConversation = createStartOneToOneConversation(p),
+		SetConversationUniverse = createSetConversationUniverse(p),
+		ResetConversationUniverse = createResetConversationUniverse(p),
+		SendMessage = createSendMessage(p),
+		SendGameLinkMessage = createSendGameLinkMessage(p),
+		UpdateUserTypingStatus = createUpdateUserTypingStatus(p),
+		MarkAsRead = createMarkAsRead(p),
+		MarkAsSeen = createMarkAsSeen(p),
+		GetMessages = createGetMessages(p),
+		GetUserConversations = createGetUserConversations(p),
+		GetConversations = createGetConversations(p),
+		GetLatestMessages = createGetLatestMessages(p),
+		GetUnreadConversationCount = createGetUnreadConversationCount(p),
+		GetUnreadMessages = createGetUnreadMessages(p),
+		GetChatSettings = createGetChatSettings(p),
+		GetRolloutSettings = createGetRolloutSettings(p),
+		GetMetadata = createGetMetadata(p)
 	}
 end

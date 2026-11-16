@@ -1,14 +1,12 @@
-local Parent = script:FindFirstAncestor("VoiceChat").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("VoiceChat").Parent
+local Http = require(parent.Http)
+local Url = Http.Url
 local HttpService = game:GetService("HttpService")
 
-return function(p1, p2) -- line: 11
-	-- upvalues: HttpService (copy), Url (copy)
-	assert(type(p2) == "string", "PostRecordUserSeenGeneralModal request expects modalId to be a string")
+return function(callback, modalId)
+	assert(type(modalId) == "string", "PostRecordUserSeenGeneralModal request expects modalId to be a string")
 
-	local json = HttpService:JSONEncode({
-		modalId = p2
-	})
+	local jsonEncode = HttpService:JSONEncode({ modalId = modalId })
 
-	return p1(string.format("%s/v1/settings/record-user-seen-modal", Url.VOICE_URL), "POST", json)
+	return callback(string.format("%s/v1/settings/record-user-seen-modal", Url.VOICE_URL), "POST", jsonEncode)
 end

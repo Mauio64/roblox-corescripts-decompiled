@@ -1,169 +1,190 @@
+local parent = script:FindFirstAncestor("DataHydration").Parent
+local SignalsUtils = require(parent.SignalsUtils)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
+
 local createChatSession = require(script.Parent.Parent.createChatSession)
+local v
+
+if FFlagBuildExperienceModelPickerData then
+	local experimentOverride = require(script.Parent.Parent.experimentOverride)
+	v = experimentOverride.isEnabled()
+else
+	v = FFlagBuildExperienceModelPickerData
+end
 
 require(script.Parent.Parent.ChatSession.sessionDeps)
 require(script.Parent.Parent.types)
 
-return {
-	createSessionRegistry = function(p1) -- line: 20
-		-- upvalues: createChatSession (copy)
-		local t1 = {}
-		local t2 = {}
-		local t3 = {}
+local function createAccountRegistry(data)
+	local v2 = {}
+	local v3 = {}
+	local v4 = {}
 
-		local function projectKey(n1: number?, n2: number?, s1: string?) -- line: 45
-			if typeof(s1) == "string" and s1 ~= "" and (n1 == nil or n2 == nil) then
-				return `session:{ s1 }`
-			end
-
-			if n1 == nil or n2 == nil then
-				return "anonymous"
-			end
-
-			return `{ n1 }:{ n2 }`
+	local function registerCasSession(chatSession, value: string?) -- 1 equivalent call inferred from this helper
+		if typeof(value) ~= "string" or value == "" then
+			return
 		end
 
-		return {
-			getSessionForProject = function(n3: number?, n4: number?, s2: string?) -- line: 55
-				-- upvalues: t2 (copy), t1 (copy), t3 (copy), createChatSession (copy), p1 (copy)
-				local v17 = if typeof(s2) ~= "string" or (s2 == "" or n3 ~= nil and n4 ~= nil) then if n3 ~= nil and n4 ~= nil then `{ n3 }:{ n4 }` else "anonymous" else `session:{ s2 }`
+		local v5 = v4[chatSession]
 
-				if typeof(s2) == "string" and s2 ~= "" then
-					local v18 = t2[s2]
+		if v5 ~= nil and v5 ~= value and v3[v5] == chatSession then
+			v3[v5] = nil
+		end
 
-					if v18 ~= nil and s2 == v18.getCasSessionId() then
-						v18.universeId = n3 or v18.universeId
-						v18.placeId = n4 or v18.placeId
-						t1[v17] = v18
+		local v6 = v3[value]
 
-						return v18
+		if v6 ~= nil and v6 ~= chatSession then
+			v4[v6] = nil
+		end
+
+		v3[value] = chatSession
+		v4[chatSession] = value
+	end
+
+	local function projectKey(p: number?, p2: number?, value: string?) -- 1 equivalent call inferred from this helper
+		if typeof(value) == "string" and value ~= "" and (v or p == nil or p2 == nil) then
+			return `session:{value}`
+		end
+
+		if p == nil or p2 == nil then
+			return "anonymous"
+		end
+
+		return `{p}:{p2}`
+	end
+
+	return {
+		getSessionForProject = function(p: number?, p2: number?, value: string?)
+			local v5 = projectKey(p, p2, value) -- inferred equivalent call
+
+			if typeof(value) == "string" and value ~= "" then
+				local v6 = v3[value]
+
+				if v6 ~= nil and v6.getCasSessionId() == value then
+					v6.universeId = p or v6.universeId
+					v6.placeId = p2 or v6.placeId
+					v2[v5] = v6
+
+					if v and p ~= nil and p2 ~= nil then
+						v2[(p == nil or p2 == nil) and "anonymous" or `{p}:{p2}`] = v6
 					end
+
+					return v6
 				end
+			end
 
-				local v19 = t1[v17]
+			local v6 = v2[v5]
 
-				if v19 ~= nil then
-					if typeof(s2) ~= "string" or s2 == "" then
-						return v19
-					end
+			if v6 == nil then
+				local v7 = nil
+				local chatSession = createChatSession({
+					initialize = data.initialize,
+					sessionNew = data.sessionNew,
+					sessionLoad = data.sessionLoad,
+					sessionPrompt = data.sessionPrompt,
+					ingestSessionHistory = data.ingestSessionHistory,
+					submitToolResult = data.submitToolResult,
+					getActiveTurnHandle = data.getActiveTurnHandle,
+					onCasSessionIdChanged = function(value2)
+						if v7 ~= nil then
+							local v8 = v7
 
-					v19.setCasSessionId(s2)
-
-					if typeof(s2) == "string" then
-						if s2 == "" then
-							return v19
-						end
-
-						local v20 = t3[v19]
-
-						if v20 ~= nil and v20 ~= s2 and v19 == t2[v20] then
-							t2[v20] = nil
-						end
-
-						local v21 = t2[s2]
-
-						if v21 ~= nil and v21 ~= v19 then
-							t3[v21] = nil
-						end
-
-						t2[s2] = v19
-						t3[v19] = s2
-					end
-
-					return v19
-				end
-
-				local u22 = nil
-				local v23 = createChatSession({
-					initialize = p1.initialize,
-					sessionNew = p1.sessionNew,
-					sessionLoad = p1.sessionLoad,
-					sessionPrompt = p1.sessionPrompt,
-					ingestSessionHistory = p1.ingestSessionHistory,
-					submitToolResult = p1.submitToolResult,
-					getActiveTurnHandle = p1.getActiveTurnHandle,
-					onCasSessionIdChanged = function(p2) -- line: 85
-						-- upvalues: u22 (ref), t3 (copy), t2 (copy)
-						if u22 ~= nil then
-							local v29 = u22
-
-							if typeof(p2) == "string" then
-								if p2 == "" then
+							if typeof(value2) == "string" then
+								if value2 == "" then
 									return
 								end
 
-								local v30 = t3[v29]
+								local v9 = v4[v8]
 
-								if v30 ~= nil and v30 ~= p2 and v29 == t2[v30] then
-									t2[v30] = nil
+								if v9 ~= nil and v9 ~= value2 and v3[v9] == v8 then
+									v3[v9] = nil
 								end
 
-								local v31 = t2[p2]
+								local v10 = v3[value2]
 
-								if v31 ~= nil and v31 ~= v29 then
-									t3[v31] = nil
+								if v10 ~= nil and v10 ~= v8 then
+									v4[v10] = nil
 								end
 
-								t2[p2] = v29
-								t3[v29] = p2
+								v3[value2] = v8
+								v4[v8] = value2
 							end
 						end
 					end
-				}, n3, n4, s2)
+				}, p, p2, value)
 
-				u22 = v23
-				t1[v17] = v23
+				v7 = chatSession
+				v2[v5] = chatSession
 
-				if typeof(s2) == "string" and s2 ~= "" then
-					local v24 = t3[v23]
-
-					if v24 ~= nil and v24 ~= s2 and v23 == t2[v24] then
-						t2[v24] = nil
-					end
-
-					local v25 = t2[s2]
-
-					if v25 ~= nil and v25 ~= v23 then
-						t3[v25] = nil
-					end
-
-					t2[s2] = v23
-					t3[v23] = s2
+				if v and p ~= nil and p2 ~= nil then
+					v2[(p == nil or p2 == nil) and "anonymous" or `{p}:{p2}`] = chatSession
 				end
 
-				return v23
+				registerCasSession(chatSession, value) -- inferred equivalent call
+				return chatSession
+			else
+				if typeof(value) ~= "string" or value == "" then
+					return v6
+				end
+
+				v6.setCasSessionId(value)
+
+				if not (typeof(value) == "string" and value ~= "") then
+					return v6
+				end
+
+				local v7 = v4[v6]
+
+				if v7 ~= nil and v7 ~= value and v3[v7] == v6 then
+					v3[v7] = nil
+				end
+
+				local v8 = v3[value]
+
+				if v8 ~= nil and v8 ~= v6 then
+					v4[v8] = nil
+				end
+
+				v3[value] = v6
+				v4[v6] = value
+
+				return v6
+			end
+		end,
+		registerCasSession = registerCasSession,
+		getSessionByCasSessionId = function(p: string)
+			local v5 = v3[p]
+
+			if v5 == nil or v5.getCasSessionId() == p then
+				return v5
+			end
+
+			v3[p] = nil
+			return nil
+		end
+	}
+end
+
+return {
+	createSessionRegistry = function(p)
+		if not FFlagBuildExperienceModelPickerData then
+			return createAccountRegistry(p)
+		end
+
+		local sessionScopedSignal = SignalsUtils.createSessionScopedSignal(function()
+			return createAccountRegistry(p)
+		end)
+
+		return {
+			getSessionForProject = function(p2, p3, p4)
+				return sessionScopedSignal(false).getSessionForProject(p2, p3, p4)
 			end,
-			registerCasSession = function(p3, s3: string?) -- line: 25
-				-- upvalues: t3 (copy), t2 (copy)
-				if typeof(s3) ~= "string" or s3 == "" then
-					return
-				end
-
-				local v9 = t3[p3]
-
-				if v9 ~= nil and v9 ~= s3 and p3 == t2[v9] then
-					t2[v9] = nil
-				end
-
-				local v10 = t2[s3]
-
-				if v10 ~= nil and v10 ~= p3 then
-					t3[v10] = nil
-				end
-
-				t2[s3] = p3
-				t3[p3] = s3
+			registerCasSession = function(p2, p3)
+				sessionScopedSignal(false).registerCasSession(p2, p3)
 			end,
-			getSessionByCasSessionId = function(s4: string) -- line: 100
-				-- upvalues: t2 (copy)
-				local v27 = t2[s4]
-
-				if v27 ~= nil and s4 ~= v27.getCasSessionId() then
-					t2[s4] = nil
-
-					return nil
-				end
-
-				return v27
+			getSessionByCasSessionId = function(p2)
+				return sessionScopedSignal(false).getSessionByCasSessionId(p2)
 			end
 		}
 	end

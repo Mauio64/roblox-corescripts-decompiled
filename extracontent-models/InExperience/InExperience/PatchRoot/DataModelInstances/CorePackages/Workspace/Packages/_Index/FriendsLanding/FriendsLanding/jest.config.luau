@@ -1,6 +1,6 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local JestConfigs = require(scriptParentParent.Dev.JestConfigs)
+local parent = script.Parent
+local parent2 = parent.Parent
+local JestConfigs = require(parent2.Dev.JestConfigs)
 
 return {
 	displayName = "FriendsLanding",
@@ -9,8 +9,8 @@ return {
 		JestConfigs.setupFiles.LogHandler,
 		JestConfigs.setupFiles.UIBloxInitializer,
 		JestConfigs.setupFiles.createPromiseRejectionHandler(),
-		scriptParent.TestHelpers.CollisionMatchersSetup,
-		scriptParent.TestHelpers.NetworkImplHandler,
+		parent.TestHelpers.CollisionMatchersSetup,
+		parent.TestHelpers.NetworkImplHandler,
 		JestConfigs.setupFiles.RetryTimes
 	}
 }

@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-require(CorePackages.Workspace.Packages.SystemScrim).renderSystemScrim()
+local SystemScrim = require(CorePackages.Workspace.Packages.SystemScrim)
+SystemScrim.renderSystemScrim()

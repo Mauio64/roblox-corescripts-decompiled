@@ -1,116 +1,126 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local ParseContentIds = require(ParentParent.util.ParseContentIds)
-local pcallDeferred = require(ParentParent.util.pcallDeferred)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local getFFlagUGCValidateHSRMeshIds = require(ParentParent.flags.getFFlagUGCValidateHSRMeshIds)
-local t1 = {
+local getEngineFeatureUGCValidateHSRMeshIds = require(parent.flags.getEngineFeatureUGCValidateHSRMeshIds)
+local getFFlagUGCValidateVersionedContentIds = require(parent.flags.getFFlagUGCValidateVersionedContentIds)
+
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local ParseContentIds = require(parent.util.ParseContentIds)
+local pcallDeferred = require(parent.util.pcallDeferred)
+
+local HSRMeshIdsMatch = {
 	categories = {
 		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
-		ValidationEnums.UploadCategory.LAYERED_CLOTHING
+		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH
 	},
 	requiredData = {
 		ValidationEnums.SharedDataMember.rootInstance,
 		ValidationEnums.SharedDataMember.consumerConfig,
 		ValidationEnums.SharedDataMember.hsrAssets
 	},
-	fflag = getFFlagUGCValidateMigrateSchemaProperties,
 	expectedFailures = {}
 }
 
-local function validateHSRStructure(t2: {[any]: any}, p1, p2) -- line: 29
-	-- upvalues: ErrorSourceStrings (copy)
-	if #t2 ~= 1 then
-		p2:fail(ErrorSourceStrings.Keys.HSRAssetInvalidRoot, {
-			InstancePath = p1:GetFullName()
+local function validateHSRStructure(hsrAsset, wrapLayer, object)
+	if #hsrAsset ~= 1 then
+		object:fail(ErrorSourceStrings.Keys.HSRAssetInvalidRoot, {
+			InstancePath = wrapLayer:GetFullName()
 		})
 
 		return nil
 	end
 
-	local v14 = t2[1]
+	local hiddenSurfaceRemovalAsset = hsrAsset[1]
 
-	if not v14:IsA("HiddenSurfaceRemovalAsset") then
-		p2:fail(ErrorSourceStrings.Keys.HSRAssetInvalidRoot, {
-			InstancePath = p1:GetFullName()
+	if not hiddenSurfaceRemovalAsset:IsA("HiddenSurfaceRemovalAsset") then
+		object:fail(ErrorSourceStrings.Keys.HSRAssetInvalidRoot, {
+			InstancePath = wrapLayer:GetFullName()
 		})
 
 		return nil
 	end
 
-	if #v14:GetDescendants() > 0 then
-		p2:fail(ErrorSourceStrings.Keys.HSRAssetHasChildren, {
-			InstancePath = p1:GetFullName()
+	if #hiddenSurfaceRemovalAsset:GetDescendants() > 0 then
+		object:fail(ErrorSourceStrings.Keys.HSRAssetHasChildren, {
+			InstancePath = wrapLayer:GetFullName()
 		})
 
 		return nil
 	end
 
-	return v14
+	return hiddenSurfaceRemovalAsset
 end
 
-function t1.run(p3, p4) -- line: 59
-	-- upvalues: ValidationEnums (copy), getFFlagUGCValidateHSRMeshIds (copy), ErrorSourceStrings (copy), ParseContentIds (copy), validateHSRStructure (copy), pcallDeferred (copy), UGCValidationService (copy)
-	if p4.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.IEC then
+function HSRMeshIdsMatch.run(object, data)
+	if data.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.IEC then
 		return
 	end
 
-	local v17 = p4.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend
-	local v18 = getFFlagUGCValidateHSRMeshIds()
-	local descendants = p4.rootInstance:GetDescendants()
+	local v = data.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend
 
-	table.insert(descendants, p4.rootInstance)
+	local descendants = data.rootInstance:GetDescendants()
+	table.insert(descendants, data.rootInstance)
 
-	for _, v21 in descendants do
-		if v21:IsA("WrapLayer") then
-			local HSRAssetId = v21.HSRAssetId
+	for _, wrapLayer in descendants do
+		if not wrapLayer:IsA("WrapLayer") then
+			continue
+		end
 
-			if not HSRAssetId or HSRAssetId == "" then
-				if v17 then
-					p3:fail(ErrorSourceStrings.Keys.HSRAssetIdRequired, {
-						InstancePath = v21:GetFullName()
-					})
+		local hsrAssetId = wrapLayer.HSRAssetId
+
+		if hsrAssetId and hsrAssetId ~= "" then
+			local v2
+
+			if getFFlagUGCValidateVersionedContentIds() then
+				local v3, v4 = ParseContentIds.tryParseContentId(hsrAssetId)
+
+				if v3 then
+					v2 = ParseContentIds.getReferenceKey(v3, v4)
 				end
 			else
-				local v23 = ParseContentIds.tryGetAssetIdFromContentId(HSRAssetId)
+				v2 = ParseContentIds.tryGetAssetIdFromContentId(hsrAssetId)
+			end
 
-				if not v23 then
-					p3:fail(ErrorSourceStrings.Keys.HSRAssetIdInvalidUrl, {
-						InstancePath = v21:GetFullName()
-					})
-				else
-					local v24 = p4.hsrAssets[v23]
+			if v2 then
+				local hsrAsset = data.hsrAssets[v2]
 
-					if v24 then
-						local v25 = validateHSRStructure(v24, v21, p3)
+				if hsrAsset then
+					local v3 = validateHSRStructure(hsrAsset, wrapLayer, object)
 
-						if v25 and v18 then
-							local v26, v27 = pcallDeferred(function() -- line: 109
-								-- upvalues: UGCValidationService (copy), v21 (copy), v25 (copy)
-								return UGCValidationService:ValidateHSRMeshIds(v21, v25)
-							end, {})
+					if v3 and getEngineFeatureUGCValidateHSRMeshIds() then
+						local v4, v5 = pcallDeferred(function()
+							return UGCValidationService:ValidateHSRMeshIds(wrapLayer, v3)
+						end, {})
 
-							if not v26 then
-								p3:fail(ErrorSourceStrings.Keys.HSRMeshIdValidationError, {
-									InstancePath = v21:GetFullName()
-								})
-							elseif not v27 then
-								p3:fail(ErrorSourceStrings.Keys.HSRMeshIdsMismatch, {
-									InstancePath = v21:GetFullName()
+						if v4 then
+							if not v5 then
+								object:fail(ErrorSourceStrings.Keys.HSRMeshIdsMismatch, {
+									InstancePath = wrapLayer:GetFullName()
 								})
 							end
+						else
+							object:fail(ErrorSourceStrings.Keys.HSRMeshIdValidationError, {
+								InstancePath = wrapLayer:GetFullName()
+							})
 						end
 					end
 				end
+			else
+				object:fail(ErrorSourceStrings.Keys.HSRAssetIdInvalidUrl, {
+					InstancePath = wrapLayer:GetFullName()
+				})
 			end
+		elseif v then
+			object:fail(ErrorSourceStrings.Keys.HSRAssetIdRequired, {
+				InstancePath = wrapLayer:GetFullName()
+			})
 		end
 	end
 end
 
-return t1
+return HSRMeshIdsMatch

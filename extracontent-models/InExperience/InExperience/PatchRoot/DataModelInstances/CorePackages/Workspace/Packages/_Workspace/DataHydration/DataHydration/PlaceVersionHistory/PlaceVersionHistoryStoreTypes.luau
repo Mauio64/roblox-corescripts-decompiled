@@ -1,19 +1,10 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
+local parent = DataHydration.Parent
 
 require(DataHydration.DataHydrationTypes)
-
-local t1 = {
-	Null = 0,
-	AutoSave = 1,
-	ManualSave = 2
-}
-local t2 = {
-	NotPublished = 0,
-	Live = 1,
-	PreviouslyPublished = 2
-}
+require(parent.Signals)
 
 return {
-	SaveType = t1,
-	PublishStatus = t2
+	SaveType = { Null = 0, AutoSave = 1, ManualSave = 2 },
+	PublishStatus = { NotPublished = 0, Live = 1, PreviouslyPublished = 2 }
 }

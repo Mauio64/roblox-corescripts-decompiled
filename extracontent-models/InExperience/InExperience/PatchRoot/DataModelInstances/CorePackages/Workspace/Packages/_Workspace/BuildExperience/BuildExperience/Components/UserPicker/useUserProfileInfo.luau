@@ -1,22 +1,23 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
-local UserProfile = require(Parent.DataHydration.UserProfile)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function useUserProfileInfo(n1: number) -- line: 21
-	-- upvalues: React (copy), UserProfile (copy), SignalsReact (copy)
-	local v7 = React.useMemo(function() -- line: 22
-		-- upvalues: UserProfile (copy), n1 (copy)
-		return UserProfile.getAndFetchUserInfo(n1)
-	end, { n1 })
-	local v8 = SignalsReact.useSignalState(v7.info)
-	local v9 = SignalsReact.useSignalState(v7.status)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local UserProfile = require(parent.DataHydration.UserProfile)
+
+local function useUserProfileInfo(p: number)
+	local v = React.useMemo(function()
+		return UserProfile.getAndFetchUserInfo(p)
+	end, { p })
+
+	local v2 = SignalsReact.useSignalState(v.info)
+	local v3 = SignalsReact.useSignalState(v.status)
 
 	return {
-		displayName = v8 == nil and "" or v8.displayName,
-		username = v8 == nil and "" or v8.username,
-		hasVerifiedBadge = v8 ~= nil and v8.hasVerifiedBadge,
-		isLoading = v9 ~= "Ready"
+		displayName = v2 == nil and "" or v2.displayName,
+		username = v2 == nil and "" or v2.username,
+		hasVerifiedBadge = v2 ~= nil and v2.hasVerifiedBadge,
+		isLoading = v3 ~= "Ready"
 	}
 end
 

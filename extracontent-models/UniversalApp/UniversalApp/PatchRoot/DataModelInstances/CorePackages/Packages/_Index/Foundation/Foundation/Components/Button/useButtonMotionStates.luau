@@ -1,29 +1,26 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-require(Parent.React)
+require(parent.React)
 
-local Motion = require(Parent.Motion)
+local Motion = require(parent.Motion)
 local TransitionPreset = Motion.TransitionPreset
 
-local function useButtonMotionStates(n1: number?, n2: number) -- line: 27
-	-- upvalues: Motion (copy), TransitionPreset (copy)
+local function useButtonMotionStates(value: number?, p: number)
 	return {
 		Default = Motion.createState({
-			iconScale = 1,
-			transparency = n1 or 0,
-			textTransparency = n1 or 0
+			transparency = value or 0,
+			textTransparency = value or 0,
+			iconScale = 1
 		}, {
 			iconTransparency = Motion.transition(TransitionPreset.Default, {
-				duration = 0.5,
-				easingStyle = Enum.EasingStyle.Linear
+				easingStyle = Enum.EasingStyle.Linear,
+				duration = 0.5
 			}),
 			transparency = Motion.transition({
-				duration = 0.2,
-				easingStyle = Enum.EasingStyle.Linear
-			}),
-			default = Motion.transition(TransitionPreset.Default, {
+				easingStyle = Enum.EasingStyle.Linear,
 				duration = 0.2
-			})
+			}),
+			default = Motion.transition(TransitionPreset.Default, { duration = 0.2 })
 		}),
 		Loading = Motion.createState({
 			transparency = 0,
@@ -32,21 +29,13 @@ local function useButtonMotionStates(n1: number?, n2: number) -- line: 27
 			iconScale = 0
 		}, {
 			iconTransparency = Motion.transition(TransitionPreset.Default, {
-				duration = 0.2,
-				easingStyle = Enum.EasingStyle.Linear
-			}),
-			default = Motion.transition(TransitionPreset.Default, {
+				easingStyle = Enum.EasingStyle.Linear,
 				duration = 0.2
-			})
+			}),
+			default = Motion.transition(TransitionPreset.Default, { duration = 0.2 })
 		}),
-		Disabled = Motion.createState({
-			transparency = n2,
-			textTransparency = n2
-		}, {
-			default = Motion.transition({
-				duration = 0.1,
-				easingStyle = Enum.EasingStyle.Linear
-			})
+		Disabled = Motion.createState({ transparency = p, textTransparency = p }, {
+			default = Motion.transition({ easingStyle = Enum.EasingStyle.Linear, duration = 0.1 })
 		})
 	}
 end

@@ -1,18 +1,17 @@
 local RoduxCall = script:FindFirstAncestor("RoduxCall")
-local RoduxCallParent = RoduxCall.Parent
-local Rodux = require(RoduxCallParent.Rodux)
-local CallStateModel = require(RoduxCall.Models).CallStateModel
-local UpdateCall = require(RoduxCall.Actions).UpdateCall
+local parent = RoduxCall.Parent
+local Rodux = require(parent.Rodux)
+local Models = require(RoduxCall.Models)
+local CallStateModel = Models.CallStateModel
+local Actions = require(RoduxCall.Actions)
+local UpdateCall = Actions.UpdateCall
 
 require(script.Parent.Parent.roduxCallTypes)
 
-return function() -- line: 11
-	-- upvalues: Rodux (copy), UpdateCall (copy), CallStateModel (copy)
+return function()
 	return Rodux.createReducer(nil, {
-		[UpdateCall.name] = function(_, p2) -- line: 13
-			-- upvalues: CallStateModel (copy)
-			local call = p2.payload.call
-
+		[UpdateCall.name] = function(_, p)
+			local call = p.payload.call
 			return CallStateModel.format(call)
 		end
 	})

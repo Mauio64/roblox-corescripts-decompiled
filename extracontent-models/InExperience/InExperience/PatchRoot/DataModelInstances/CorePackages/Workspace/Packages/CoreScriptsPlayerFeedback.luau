@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.CoreScriptsPlayerFeedback.CoreScriptsPlayerFeedback))
+local CoreScriptsPlayerFeedback = require(Workspace.CoreScriptsPlayerFeedback.CoreScriptsPlayerFeedback)
+
+return CoreScriptsPlayerFeedback

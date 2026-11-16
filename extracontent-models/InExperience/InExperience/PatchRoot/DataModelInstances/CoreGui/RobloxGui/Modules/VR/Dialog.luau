@@ -1,18 +1,20 @@
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
-
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local CorePackages = game:GetService("CorePackages")
-local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
-local Panel3D = require(CorePackages.Workspace.Packages.VrCommon).Panel3D
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Create = AppCommonLib.Create
+local VrCommon = require(CorePackages.Workspace.Packages.VrCommon)
+local Panel3D = VrCommon.Panel3D
 
 Color3.new(0.2, 0.2, 0.2)
 
-local _ = Enum.FontSize.Size36
+local Size36 = Enum.FontSize.Size36
 
 Color3.new(1, 1, 1)
 
-local v7 = CFrame.new(0, 0, -7) * CFrame.Angles(0, 3.141592653589793, 0)
+local localCF = CFrame.new(0, 0, -7) * CFrame.Angles(0, 3.141592653589793, 0)
 
 Create("ImageLabel")({
 	Name = "EmptySelectionImage",
@@ -21,195 +23,171 @@ Create("ImageLabel")({
 	ImageTransparency = 1
 })
 
-local v8 = Panel3D.Get("Dialog")
+local dialog = Panel3D.Get("Dialog")
+dialog:SetType(Panel3D.Type.Fixed)
+dialog.localCF = localCF
+dialog:SetCanFade(true)
 
-v8:SetType(Panel3D.Type.Fixed)
-v8.localCF = v7
-v8:SetCanFade(true)
+local v = 0
+local v2 = {}
+local flag = false
+local v3 = 0
 
-local n1 = 0
-local t1 = {}
-local u11 = false
-local n2 = 0
-
-local function positionDialogPanel(p1) -- line: 46
-	-- upvalues: n1 (ref), UserInputService (copy), v8 (copy), v7 (copy)
-	n1 = p1
-
-	local p = UserInputService:GetUserCFrame(Enum.UserCFrame.Head).p
-
-	v8.localCF = CFrame.new(p) * CFrame.Angles(0, p1, 0) * v7
+local function positionDialogPanel(p) -- 1 equivalent call inferred from this helper
+	v = p
+	local p2 = UserInputService:GetUserCFrame(Enum.UserCFrame.Head).p
+	dialog.localCF = CFrame.new(p2) * CFrame.Angles(0, p, 0) * localCF
 end
 
-function v8.CalculateTransparency(_) -- line: 53
-	-- upvalues: UserInputService (copy), n2 (ref), n1 (ref), u11 (ref)
-	local UserCFrame = UserInputService:GetUserCFrame(Enum.UserCFrame.Head)
-	local v25 = UserCFrame.lookVector * Vector3.new(1, 0, 1)
-	local v26 = math.asin(UserCFrame.lookVector.Y)
-	local vector3 = Vector3.new(math.cos(n2 + n1 + 1.5707963267948966), 0, -math.sin(n2 + n1 + 1.5707963267948966))
+function dialog.CalculateTransparency(_)
+	local userCFrame = UserInputService:GetUserCFrame(Enum.UserCFrame.Head)
+	local vector = userCFrame.lookVector * Vector3.new(1, 0, 1)
+	local v4 = math.asin(userCFrame.lookVector.Y)
+	local vector3 = Vector3.new(math.cos(v3 + v + 1.5707963267948966), 0, -math.sin(v3 + v + 1.5707963267948966))
 
-	if math.abs(v26) > 0.767944870877505 then
-		u11 = true
+	if math.abs(v4) > 0.767944870877505 then
+		flag = true
 	end
 
-	return (math.min(math.max(0, (math.acos((v25:Dot(vector3))) - 0.6544984694978736) / 0.11344640137963136), 1))
+	return (math.min(math.max(0, (math.acos((vector:Dot(vector3))) - 0.6544984694978736) / 0.11344640137963136), 1))
 end
 
-local function updatePanelPosition() -- line: 69
-	-- upvalues: UserInputService (copy), n2 (ref), u11 (ref), n1 (ref), v8 (copy), v7 (copy)
-	local v28 = UserInputService:GetUserCFrame(Enum.UserCFrame.Head).lookVector * Vector3.new(1, 0, 1)
-	local v29 = (math.atan2(-v28.Z, v28.X) - 1.5707963267948966) % 6.283185307179586
-	local v30 = n2 + math.floor(v29 / 1.5707963267948966 + 0.5) * 1.5707963267948966
+local function updatePanelPosition()
+	local v4 = UserInputService:GetUserCFrame(Enum.UserCFrame.Head).lookVector * Vector3.new(1, 0, 1)
+	local v5 = (math.atan2(-v4.Z, v4.X) - 1.5707963267948966) % 6.283185307179586
+	local v6 = v3 + math.floor(v5 / 1.5707963267948966 + 0.5) * 1.5707963267948966
 
-	if u11 then
-		u11 = false
-		n2 = v29
+	if flag then
+		flag = false
+		v3 = v5
 	end
 
-	n1 = v30
-
-	local p = UserInputService:GetUserCFrame(Enum.UserCFrame.Head).p
-
-	v8.localCF = CFrame.new(p) * CFrame.Angles(0, v30, 0) * v7
+	positionDialogPanel(v6) -- inferred equivalent call
 end
 
-function dialogPanelRenderUpdate() -- line: 84
-	-- upvalues: v8 (copy), u11 (ref), updatePanelPosition (copy), t1 (ref)
-	if v8.transparency == 1 or u11 then
+function dialogPanelRenderUpdate()
+	if dialog.transparency == 1 or flag then
 		updatePanelPosition()
 	end
 
-	local v32 = 1 - v8.transparency
+	local v4 = 1 - dialog.transparency
 
-	for k, v in pairs(t1) do
-		local v35 = 1 - v * v32
+	for guiObject, v5 in pairs(v2) do
+		local v6 = 1 - v5 * v4
 
-		if k:IsA("TextLabel") or k:IsA("TextButton") then
-			k.TextTransparency = v35
-		elseif k:IsA("ImageLabel") or k:IsA("ImageButton") then
-			k.ImageTransparency = v35
-		elseif k:IsA("Frame") then
-			k.BackgroundTransparency = v35
+		if guiObject:IsA("TextLabel") or guiObject:IsA("TextButton") then
+			guiObject.TextTransparency = v6
+		elseif guiObject:IsA("ImageLabel") or guiObject:IsA("ImageButton") then
+			guiObject.ImageTransparency = v6
+		elseif guiObject:IsA("Frame") then
+			guiObject.BackgroundTransparency = v6
 		end
 	end
 end
 
-local t2 = {}
-local u16 = nil
-local u17 = nil
+local v4 = {}
 
-local function updatePanel() -- line: 107
-	-- upvalues: t2 (copy), u17 (ref), v8 (copy), t1 (ref), u16 (ref), u11 (ref), updatePanelPosition (copy)
-	local v36 = t2[1]
+local descendantAddedConnection = nil
+local v5 = nil
+local function updatePanel()
+	local v6 = v4[1]
 
-	if u17 and u17.content then
-		u17.content.Parent = nil
+	if v5 and v5.content then
+		v5.content.Parent = nil
 	end
 
-	if not v36 or not v36.content then
-		v8:SetVisible(false)
-		t1 = {}
+	if v6 and v6.content then
+		v6.content.Parent = dialog:GetGUI()
+		v5 = v6
 
-		if u16 then
-			u16:disconnect()
-			u16 = nil
+		local absoluteSize = v6.content.AbsoluteSize
+		dialog:ResizePixels(absoluteSize.X, absoluteSize.Y, 100)
 
-			return
-		end
-	else
-		v36.content.Parent = v8:GetGUI()
-		u17 = v36
-
-		local AbsoluteSize = v36.content.AbsoluteSize
-
-		v8:ResizePixels(AbsoluteSize.X, AbsoluteSize.Y, 100)
-		u11 = true
+		flag = true
 		updatePanelPosition()
-		v8:SetVisible(true)
-		t1 = {}
+		dialog:SetVisible(true)
 
-		local function search(p3) -- line: 131
-			-- upvalues: t1 (ref), search (copy)
-			if p3:IsA("ImageLabel") or p3:IsA("ImageButton") then
-				t1[p3] = 1 - p3.ImageTransparency
-			elseif p3:IsA("TextLabel") or p3:IsA("TextButton") then
-				t1[p3] = 1 - p3.TextTransparency
-			elseif p3:IsA("Frame") then
-				t1[p3] = 1 - p3.BackgroundTransparency
+		v2 = {}
+		local function search(guiObject)
+			if guiObject:IsA("ImageLabel") or guiObject:IsA("ImageButton") then
+				v2[guiObject] = 1 - guiObject.ImageTransparency
+			elseif guiObject:IsA("TextLabel") or guiObject:IsA("TextButton") then
+				v2[guiObject] = 1 - guiObject.TextTransparency
+			elseif guiObject:IsA("Frame") then
+				v2[guiObject] = 1 - guiObject.BackgroundTransparency
 			end
 
-			for _, child in pairs(p3:GetChildren()) do
+			for _, child in pairs(guiObject:GetChildren()) do
 				search(child)
 			end
 		end
+		search(dialog:GetGUI())
 
-		search(v8:GetGUI())
-
-		if u16 then
-			u16:disconnect()
-			u16 = nil
+		if descendantAddedConnection then
+			descendantAddedConnection:disconnect()
+			descendantAddedConnection = nil
 		end
 
-		u16 = v8:GetGUI().DescendantAdded:connect(function(p4) -- line: 148
-			-- upvalues: search (copy)
-			search(p4)
+		descendantAddedConnection = dialog:GetGUI().DescendantAdded:connect(function(p)
+			search(p)
 		end)
+	else
+		dialog:SetVisible(false)
+		v2 = {}
+
+		if descendantAddedConnection then
+			descendantAddedConnection:disconnect()
+			descendantAddedConnection = nil
+		end
 	end
 end
 
-local t3 = {}
-
-t3.__index = t3
-
-function t3.new(p5) -- line: 160
-	-- upvalues: t3 (copy)
-	local self = setmetatable({}, t3)
-
-	self.content = p5
-
+local Dialog = {}
+Dialog.__index = Dialog
+function Dialog.new(content)
+	local self = setmetatable({}, Dialog)
+	self.content = content
 	return self
 end
-function t3.SetContent(p6, p7) -- line: 166
-	if not p7 and p6.content then
-		p6.content.Parent = nil
+
+function Dialog:SetContent(content)
+	if not content and self.content then
+		self.content.Parent = nil
 	end
 
-	p6.content = p7
+	self.content = content
 end
 
-local u20 = false
-
-function t3.Show(p8, p9) -- line: 174
-	-- upvalues: u20 (ref), RunService (copy), t2 (copy), updatePanel (copy)
-	if not u20 then
-		u20 = true
+local v6 = false
+function Dialog.Show(p, p2)
+	if not v6 then
+		v6 = true
 		RunService:BindToRenderStep("DialogPanel", Enum.RenderPriority.First.Value, dialogPanelRenderUpdate)
 	end
 
-	if p9 then
-		table.insert(t2, 1, p8)
+	if p2 then
+		table.insert(v4, 1, p)
 	else
-		table.insert(t2, p8)
+		table.insert(v4, p)
 	end
 
 	updatePanel()
 end
-function t3.Close(p10) -- line: 187
-	-- upvalues: t2 (copy), u20 (ref), RunService (copy), updatePanel (copy)
-	for k, v in pairs(t2) do
-		if v == p10 then
-			table.remove(t2, k)
 
+function Dialog.Close(p)
+	for k, v7 in pairs(v4) do
+		if v7 == p then
+			table.remove(v4, k)
 			break
 		end
 	end
 
-	if u20 and #t2 == 0 then
-		u20 = false
+	if v6 and #v4 == 0 then
+		v6 = false
 		RunService:UnbindFromRenderStep("DialogPanel")
 	end
 
 	updatePanel()
 end
 
-return t3
+return Dialog

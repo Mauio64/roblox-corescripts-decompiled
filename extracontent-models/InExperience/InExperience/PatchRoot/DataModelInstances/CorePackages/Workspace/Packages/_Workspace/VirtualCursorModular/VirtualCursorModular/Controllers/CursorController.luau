@@ -1,13 +1,14 @@
 local VirtualCursorModular = script:FindFirstAncestor("VirtualCursorModular")
-local VirtualCursorModularParent = VirtualCursorModular.Parent
+local parent = VirtualCursorModular.Parent
+
 local TweenService = game:GetService("TweenService")
+
 local VRService = game:GetService("VRService")
 local CoreGui = game:GetService("CoreGui")
 local Properties = require(VirtualCursorModular.Properties)
-local getFFlagVirtualCursorDisplayOrder = require(VirtualCursorModularParent.SharedFlags).getFFlagVirtualCursorDisplayOrder
-local t1 = {}
 
-t1.__index = t1
+local CursorController = {}
+CursorController.__index = CursorController
 
 local _ = {
 	Default = "rbxasset://textures/ui/VirtualCursor/cursorDefault.png",
@@ -15,166 +16,163 @@ local _ = {
 	Pressed = "rbxasset://textures/ui/VirtualCursor/cursorPressed.png",
 	Arrow = "rbxasset://textures/ui/VirtualCursor/cursorArrow.png"
 }
-local t2 = {
-	Default = 2,
-	Hover = 2,
-	Pressed = 1.7,
-	Arrow = 2
-}
 
-function t1.new() -- line: 45
-	-- upvalues: getFFlagVirtualCursorDisplayOrder (copy), Properties (copy), CoreGui (copy), TweenService (copy), t1 (copy)
-	local ScreenGui = Instance.new("ScreenGui")
+local v = { Default = 2, Hover = 2, Pressed = 1.7, Arrow = 2 }
 
-	ScreenGui.Enabled = false
-	ScreenGui.IgnoreGuiInset = true
-	ScreenGui.DisplayOrder = not getFFlagVirtualCursorDisplayOrder() and 100 or 1e999
+function CursorController.new()
+	local cursorContainer = Instance.new("ScreenGui")
+	cursorContainer.Enabled = false
+	cursorContainer.IgnoreGuiInset = true
+	cursorContainer.DisplayOrder = 1e999
+	cursorContainer.OnTopOfCoreBlur = true
+	cursorContainer.Name = "CursorContainer"
 
-	if getFFlagVirtualCursorDisplayOrder() then
-		ScreenGui.OnTopOfCoreBlur = true
-	end
+	local imageLabel = Instance.new("ImageLabel")
+	imageLabel.Active = false
+	imageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	imageLabel.Size = UDim2.fromOffset(2 * Properties.CursorRadius, 2 * Properties.CursorRadius)
 
-	ScreenGui.Name = "CursorContainer"
+	imageLabel.Image = "rbxasset://textures/ui/VirtualCursor/cursorDefault.png"
+	imageLabel.Visible = false
+	imageLabel.BackgroundTransparency = 1
 
-	local ImageLabel = Instance.new("ImageLabel")
-
-	ImageLabel.Active = false
-	ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-	ImageLabel.Size = UDim2.fromOffset(2 * Properties.CursorRadius, 2 * Properties.CursorRadius)
-	ImageLabel.Image = "rbxasset://textures/ui/VirtualCursor/cursorDefault.png"
-	ImageLabel.Visible = false
-	ImageLabel.BackgroundTransparency = 1
-	ImageLabel.Parent = ScreenGui
-	ScreenGui.Parent = CoreGui
+	imageLabel.Parent = cursorContainer
+	cursorContainer.Parent = CoreGui
 
 	local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0)
-	local tween = TweenService:Create(ImageLabel, tweenInfo, {
-		Size = UDim2.fromOffset(1.7 * Properties.CursorRadius, 1.7 * Properties.CursorRadius)
-	})
-	local tween2 = TweenService:Create(ImageLabel, tweenInfo, {
-		Size = UDim2.fromOffset(2 * Properties.CursorRadius, 2 * Properties.CursorRadius)
-	})
-
 	return (setmetatable({
+		_cursor = imageLabel,
+		_cursorContainer = cursorContainer,
+		_activeSelectionTweenIn = TweenService:Create(imageLabel, tweenInfo, {
+			Size = UDim2.fromOffset(1.7 * Properties.CursorRadius, 1.7 * Properties.CursorRadius)
+		}),
+		_activeSelectionTweenOut = TweenService:Create(imageLabel, tweenInfo, {
+			Size = UDim2.fromOffset(2 * Properties.CursorRadius, 2 * Properties.CursorRadius)
+		}),
 		_activePreviewPositionTween = nil,
 		_activeOpacityTweenCompletedConnection = nil,
-		_enabled = false,
-		_cursor = ImageLabel,
-		_cursorContainer = ScreenGui,
-		_activeSelectionTweenIn = tween,
-		_activeSelectionTweenOut = tween2
-	}, t1))
+		_enabled = false
+	}, CursorController))
 end
-function t1.Destroy(p1) -- line: 96
-	p1._cursorContainer:Destroy()
-	p1._activeSelectionTweenIn:Destroy()
-	p1._activeSelectionTweenOut:Destroy()
 
-	if p1._activePreviewPositionTween then
-		p1._activePreviewPositionTween:Destroy()
+function CursorController:Destroy()
+	self._cursorContainer:Destroy()
+
+	self._activeSelectionTweenIn:Destroy()
+	self._activeSelectionTweenOut:Destroy()
+
+	if self._activePreviewPositionTween then
+		self._activePreviewPositionTween:Destroy()
 	end
 
-	local _activeOpacityTweenCompletedConnection = p1._activeOpacityTweenCompletedConnection
+	local activeOpacityTweenCompletedConnection = self._activeOpacityTweenCompletedConnection
 
-	if _activeOpacityTweenCompletedConnection then
-		_activeOpacityTweenCompletedConnection:Disconnect()
-		p1._activeOpacityTweenCompletedConnection = nil
+	if activeOpacityTweenCompletedConnection then
+		activeOpacityTweenCompletedConnection:Disconnect()
+		self._activeOpacityTweenCompletedConnection = nil
 	end
 end
-function t1.SetCursorSize(t3: {[any]: any}, s1: string) -- line: 113
-	-- upvalues: t2 (copy), Properties (copy)
-	local v20 = t2[s1] * Properties.CursorRadius
 
-	t3._cursor.Size = UDim2.fromOffset(v20, v20)
+function CursorController:SetCursorSize(p: string)
+	local v2 = v[p] * Properties.CursorRadius
+	self._cursor.Size = UDim2.fromOffset(v2, v2)
 end
-function t1.PlayTweenActivate(p2) -- line: 118
-	p2._activeSelectionTweenIn:Play()
-end
-function t1.PlayTweenDefault(p3) -- line: 122
-	p3._activeSelectionTweenOut:Play()
-end
-function t1.SetHighlight(t4: {[any]: any}, b1: boolean) -- line: 126
-	if b1 then
-		t4._cursor.Image = "rbxasset://textures/ui/VirtualCursor/cursorHover.png"
 
-		return
+function CursorController:PlayTweenActivate()
+	self._activeSelectionTweenIn:Play()
+end
+
+function CursorController:PlayTweenDefault()
+	self._activeSelectionTweenOut:Play()
+end
+
+function CursorController:SetHighlight(flag: boolean)
+	if flag then
+		self._cursor.Image = "rbxasset://textures/ui/VirtualCursor/cursorHover.png"
+	else
+		self._cursor.Image = "rbxasset://textures/ui/VirtualCursor/cursorDefault.png"
 	end
+end
 
-	t4._cursor.Image = "rbxasset://textures/ui/VirtualCursor/cursorDefault.png"
+function CursorController:SetPosition(vector2: Vector2)
+	self._cursor.Position = UDim2.fromOffset(vector2.X, vector2.Y)
 end
-function t1.SetPosition(t5: {[any]: any}, vector2: Vector2) -- line: 134
-	t5._cursor.Position = UDim2.fromOffset(vector2.X, vector2.Y)
+
+function CursorController:GetCursorScreenGuiOffset()
+	return self._cursorContainer.AbsolutePosition
 end
-function t1.GetCursorScreenGuiOffset(p4) -- line: 138
-	return p4._cursorContainer.AbsolutePosition
-end
-function t1.TweenPosition(t6: {[any]: any}, vector2: Vector2) -- line: 142
-	-- upvalues: TweenService (copy)
+
+function CursorController:TweenPosition(vector2: Vector2)
 	local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0)
-
-	t6._activePreviewPositionTween = TweenService:Create(t6._cursor, tweenInfo, {
+	self._activePreviewPositionTween = TweenService:Create(self._cursor, tweenInfo, {
 		Position = UDim2.fromOffset(vector2.X, vector2.Y)
 	})
-	t6._activePreviewPositionTween:Play()
+	self._activePreviewPositionTween:Play()
 end
-function t1.TweenOpacity(t7: {[any]: any}, b2: boolean) -- line: 149
-	-- upvalues: TweenService (copy)
-	local _activeOpacityTweenCompletedConnection = t7._activeOpacityTweenCompletedConnection
 
-	if _activeOpacityTweenCompletedConnection then
-		_activeOpacityTweenCompletedConnection:Disconnect()
-		t7._activeOpacityTweenCompletedConnection = nil
+function CursorController:TweenOpacity(flag: boolean)
+	local activeOpacityTweenCompletedConnection = self._activeOpacityTweenCompletedConnection
+
+	if activeOpacityTweenCompletedConnection then
+		activeOpacityTweenCompletedConnection:Disconnect()
+		self._activeOpacityTweenCompletedConnection = nil
 	end
 
 	local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0)
-	local tween = TweenService:Create(t7._cursor, tweenInfo, {
-		ImageTransparency = not b2 and 1 or 0
+	local tween = TweenService:Create(self._cursor, tweenInfo, {
+		ImageTransparency = flag and 0 or 1
 	})
 
-	t7._activeOpacityTweenCompletedConnection = tween.Completed:Connect(function() -- line: 162
-		-- upvalues: t7 (copy), b2 (copy)
-		t7._cursor.Visible = b2
-		t7._cursorContainer.Enabled = b2
+	self._activeOpacityTweenCompletedConnection = tween.Completed:Connect(function()
+		self._cursor.Visible = flag
+		self._cursorContainer.Enabled = flag
 	end)
+
 	tween:Play()
 end
-function t1.SetArrow(t8: {[any]: any}, n1: number, n2: number) -- line: 170
-	if n1 == -1 and n2 == 0 then
-		t8._cursor.Rotation = 90
-	elseif n2 == 0 then
-		t8._cursor.Rotation = 270
+
+function CursorController:SetArrow(p: number, p2: number)
+	if p == -1 and p2 == 0 then
+		self._cursor.Rotation = 90
+	elseif p2 == 0 then
+		self._cursor.Rotation = 270
 	end
 
-	if n1 == 0 and n2 == 1 then
-		t8._cursor.Rotation = 0
-	elseif n1 == 0 then
-		t8._cursor.Rotation = 180
+	if p == 0 and p2 == 1 then
+		self._cursor.Rotation = 0
+	elseif p == 0 then
+		self._cursor.Rotation = 180
 	end
 
-	t8._cursor.Image = "rbxasset://textures/ui/VirtualCursor/cursorArrow.png"
+	self._cursor.Image = "rbxasset://textures/ui/VirtualCursor/cursorArrow.png"
 end
-function t1.GetEnabled(p5) -- line: 186
-	return p5._enabled
+
+function CursorController:GetEnabled()
+	return self._enabled
 end
-function t1.Enable(t9: {[any]: any}, vector2: Vector2) -- line: 190
-	-- upvalues: VRService (copy)
+
+function CursorController:Enable(vector2: Vector2)
 	if VRService.VREnabled then
 		return
 	end
 
-	local v42 = not VRService.VREnabled
+	local v2 = not VRService.VREnabled
+	self._cursorContainer.Enabled = v2
+	self:SetCursorSize("Default")
+	self:SetPosition(vector2)
+	self._cursor.Visible = v2
 
-	t9._cursorContainer.Enabled = v42
-	t9:SetCursorSize("Default")
-	t9:SetPosition(vector2)
-	t9._cursor.Visible = v42
-	t9:TweenOpacity(true)
-	t9._enabled = true
-end
-function t1.Disable(p6) -- line: 206
-	p6:SetHighlight(false)
-	p6:TweenOpacity(false)
-	p6._enabled = false
+	self:TweenOpacity(true)
+
+	self._enabled = true
 end
 
-return t1
+function CursorController:Disable()
+	self:SetHighlight(false)
+
+	self:TweenOpacity(false)
+
+	self._enabled = false
+end
+
+return CursorController

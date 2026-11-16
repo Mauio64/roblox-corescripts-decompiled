@@ -1,13 +1,14 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
 
+local React = require(parent.React)
+
+require(Foundation.Enums.InputPlacement)
 require(Foundation.Enums.InputSize)
 require(Foundation.Components.Types)
 
 local AccordionContext = require(script.Parent.AccordionContext)
 
-return function() -- line: 22
-	-- upvalues: React (copy), AccordionContext (copy)
+return function()
 	return React.useContext(AccordionContext)
 end

@@ -1,56 +1,50 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local React = require(InExperienceShopParent.React)
+local parent = InExperienceShop.Parent
 
-require(InExperienceShopParent.GenericAbuseReporting.AbuseVector)
+local React = require(parent.React)
+
+require(parent.GenericAbuseReporting.AbuseVector)
 
 local shopOverflowConstants = require(InExperienceShop.Components.Shared.shopOverflowConstants)
 
 return {
-	useShopReportOverflow = function(t1: {[any]: any}) -- line: 31
-		-- upvalues: React (copy), shopOverflowConstants (copy)
-		local v6, v7 = React.useState(false)
-		local v8, v9 = React.useState(nil)
-		local v10 = React.useCallback(function() -- line: 36
-			-- upvalues: v7 (copy)
-			v7(function(p1) -- line: 37
-				return not p1
+	useShopReportOverflow = function(p)
+		local state, setState = React.useState(false)
+
+		local state2, setState2 = React.useState(nil)
+
+		local onOverflowActivated = React.useCallback(function()
+			setState(function(p2): boolean
+				return not p2
 			end)
 		end, {})
-		local v11 = React.useCallback(function() -- line: 42
-			-- upvalues: v7 (copy)
-			v7(false)
+
+		local onOverflowMenuClosed = React.useCallback(function()
+			setState(false)
 		end, {})
-		local v12 = React.useCallback(function(p2) -- line: 46
-			-- upvalues: v7 (copy), shopOverflowConstants (copy), t1 (copy), v9 (copy)
-			v7(false)
 
-			if tostring(p2) ~= shopOverflowConstants.REPORT_MENU_ITEM_ID then
+		local onMenuItemActivated = React.useCallback(function(p2)
+			setState(false)
+
+			if not (tostring(p2) == shopOverflowConstants.REPORT_MENU_ITEM_ID and p.isReportingEnabled) then
 				return
 			end
 
-			if not t1.isReportingEnabled then
-				return
-			end
+			setState2(p.buildReportSession())
+		end, { p.isReportingEnabled, p.buildReportSession })
 
-			v9(t1.buildReportSession())
-		end, {
-			t1.isReportingEnabled,
-			t1.buildReportSession
-		})
-		local v13 = React.useCallback(function() -- line: 60
-			-- upvalues: v9 (copy)
-			v9(nil)
+		local onReportClose = React.useCallback(function()
+			setState2(nil)
 		end, {})
 
 		return {
-			isOverflowMenuOpen = v6,
-			reportSession = v8,
-			isReportingEnabled = t1.isReportingEnabled,
-			onOverflowActivated = v10,
-			onOverflowMenuClosed = v11,
-			onMenuItemActivated = v12,
-			onReportClose = v13
+			isOverflowMenuOpen = state,
+			reportSession = state2,
+			isReportingEnabled = p.isReportingEnabled,
+			onOverflowActivated = onOverflowActivated,
+			onOverflowMenuClosed = onOverflowMenuClosed,
+			onMenuItemActivated = onMenuItemActivated,
+			onReportClose = onReportClose
 		}
 	end
 }

@@ -1,7 +1,8 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local PlatformEnum = require(parent.Enums.PlatformEnum)
 
 return {
-	[require(ParentParent.Enums.PlatformEnum).QuestVR] = {
+	[PlatformEnum.QuestVR] = {
 		FirstPersonToggleEvent = "FirstPersonToggleEvent",
 		MoveToGoalEvent = "MoveToGoalEvent",
 		HapticFeedbackEvent = "HapticFeedbackEvent",

@@ -1,21 +1,21 @@
 local UnifiedEventLogEnums = require(script.Parent.Parent.UnifiedEventLogEnums)
-local t1 = {
+
+local v = {
 	[0] = UnifiedEventLogEnums.MarketplaceTimedOption.PERMANENT,
 	[3] = UnifiedEventLogEnums.MarketplaceTimedOption.DAYS_3,
 	[7] = UnifiedEventLogEnums.MarketplaceTimedOption.DAYS_7,
 	[14] = UnifiedEventLogEnums.MarketplaceTimedOption.DAYS_14
 }
 
-function getTimedOptionForItemData(p1) -- line: 10
-	-- upvalues: t1 (copy), UnifiedEventLogEnums (copy)
-	if p1 and p1.timedOptions then
-		for _, v5 in p1.timedOptions do
-			if v5.selected then
-				return t1[v5.days]
-			end
-		end
-
+function getTimedOptionForItemData(p)
+	if not (p and p.timedOptions) then
 		return UnifiedEventLogEnums.MarketplaceTimedOption.PERMANENT
+	end
+
+	for _, timedOption in p.timedOptions do
+		if timedOption.selected then
+			return v[timedOption.days]
+		end
 	end
 
 	return UnifiedEventLogEnums.MarketplaceTimedOption.PERMANENT

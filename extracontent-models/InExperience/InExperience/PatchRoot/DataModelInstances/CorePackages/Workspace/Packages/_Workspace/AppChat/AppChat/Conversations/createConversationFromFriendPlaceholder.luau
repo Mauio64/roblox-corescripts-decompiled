@@ -1,39 +1,42 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local parent = AppChat.Parent
+
+local AppChatNetworking = require(parent.AppChatNetworking)
 local ConversationChannels = require(AppChat.Models.ConversationChannels)
-local SignalsExperimental = require(AppChatParent.SignalsExperimental)
+local SignalsExperimental = require(parent.SignalsExperimental)
 local getOtherParticipants = require(script.Parent.getOtherParticipants)
 local GetConversationStore = require(AppChat.Stores.GetConversationStore)
+local GetConversationSearchDataHydration = require(AppChat.Stores.GetConversationSearchDataHydration)
+local FFlagAppChatAnyServerSideConversationSearch = require(AppChat.Flags.FFlagAppChatAnyServerSideConversationSearch)
 
-return function(t1: {[any]: any}, n1: number) -- line: 17
-	-- upvalues: getOtherParticipants (copy), GetConversationStore (copy), AppChatNetworking (copy), ConversationChannels (copy), SignalsExperimental (copy)
-	local v10 = getOtherParticipants(t1, n1)
+return function(p, p2: number)
+	local otherParticipants = getOtherParticipants(p, p2)
 
-	if #v10 ~= 1 then
+	if #otherParticipants ~= 1 then
 		return nil
 	end
 
-	local v11 = v10[1]
-	local v12 = GetConversationStore(false)
+	local otherParticipant = otherParticipants[1]
 
-	return AppChatNetworking.http.CreateConversation(nil, "one_to_one", { v11 }):andThen(function(p1) -- line: 25
-		-- upvalues: ConversationChannels (copy), SignalsExperimental (copy), v12 (copy), t1 (copy)
-		local v14 = p1 and p1.responseBody
-		local v15 = v14 and (v14.conversations and v14.conversations[1])
+	local conversationStore = GetConversationStore(false)
+	return AppChatNetworking.http.CreateConversation(nil, "one_to_one", { otherParticipant }):andThen(function(p3)
+		local responseBody = p3 and p3.responseBody
+		local v = responseBody and responseBody.conversations and responseBody.conversations[1]
 
-		if v15 == nil or v15.status == "failed" then
+		if v == nil or v.status == "failed" then
 			return nil
 		end
 
-		local v16 = ConversationChannels.fromChannelsApi(v15)
-
-		SignalsExperimental.batch(function() -- line: 33
-			-- upvalues: v12 (copy), v16 (copy), t1 (copy)
-			v12.upsertConversation(v16, false)
-			v12.removeConversation(t1.id)
+		local v2 = ConversationChannels.fromChannelsApi(v)
+		SignalsExperimental.batch(function()
+			conversationStore.upsertConversation(v2, false)
+			conversationStore.removeConversation(p.id)
 		end)
 
-		return v16
+		if FFlagAppChatAnyServerSideConversationSearch then
+			GetConversationSearchDataHydration(false).invalidate()
+		end
+
+		return v2
 	end)
 end

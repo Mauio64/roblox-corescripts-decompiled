@@ -1,30 +1,30 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("GameDetail").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationImage = Foundation.Image
+local Image = Foundation.Image
+
 local useExperienceBannerImage = require(script.Parent.Parent.useExperienceBannerImage)
 local useGameInfo = require(script.Parent.Parent.useGameInfo)
 
-local function ExperienceDetailsBannerImageSkeleton() -- line: 12
-	-- upvalues: React (copy), View (copy)
-	return React.createElement(View, {
-		tag = "size-full bg-surface-100"
-	})
+local function ExperienceDetailsBannerImageSkeleton()
+	return React.createElement(View, { tag = "size-full bg-surface-100" })
 end
-local function ExperienceDetailsBannerImageError(t1: {[any]: any}) -- line: 18
-	-- upvalues: useGameInfo (copy), useExperienceBannerImage (copy), React (copy), ExperienceDetailsBannerImageSkeleton (copy), FoundationImage (copy)
-	local v11 = useGameInfo(t1.universeId)
-	local v12 = useExperienceBannerImage(t1.universeId)
-	local v13 = v11 and v11.isUnavailable == true
-	local v14 = v12.status == "Success" and v12.url
 
-	if v13 or not v14 then
+local function ExperienceDetailsBannerImageError(p)
+	local v = useGameInfo(p.universeId)
+	local v2 = useExperienceBannerImage(p.universeId)
+
+	local v3 = v and v.isUnavailable == true
+	local v4 = v2.status == "Success" and v2.url
+
+	if v3 or not v4 then
 		return React.createElement(ExperienceDetailsBannerImageSkeleton)
 	end
 
-	return React.createElement(FoundationImage, {
-		Image = v12.url,
+	return React.createElement(Image, {
+		Image = v2.url,
 		Size = UDim2.fromScale(1, 1),
 		ScaleType = Enum.ScaleType.Crop
 	})

@@ -1,0 +1,1 @@
+return { VirtualCursor = require("@game/CorePackages/Workspace/Packages/_Workspace/VirtualCursorModular/VirtualCursorModular/VirtualCursor") }

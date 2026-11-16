@@ -1,18 +1,17 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local DialogSize = require(Foundation.Enums.DialogSize)
+local parent = Foundation.Parent
 
-return require(FoundationParent.React).createContext({
+local DialogSize = require(Foundation.Enums.DialogSize)
+local React = require(parent.React)
+
+return React.createContext({
+	size = DialogSize.Small,
+	responsiveSize = DialogSize.Small,
+	setResponsiveSize = function(_) end,
 	hasHeroMedia = false,
+	setHasHeroMedia = function(_: boolean) end,
 	testId = "",
 	closeAffordanceRef = nil,
 	contentStartRef = nil,
-	size = DialogSize.Small,
-	responsiveSize = DialogSize.Small,
-	setResponsiveSize = function(_) -- line: 11
-	end,
-	setHasHeroMedia = function(_: boolean) -- line: 13
-	end,
-	setContentStartRef = function(_) -- line: 17
-	end
+	setContentStartRef = function(_) end
 })

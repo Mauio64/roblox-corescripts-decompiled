@@ -1,1 +1,3 @@
-return (require(script.Snackbar))
+local Snackbar = require(script.Snackbar)
+
+return Snackbar

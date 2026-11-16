@@ -1,130 +1,111 @@
 local MediaGallery = script:FindFirstAncestor("MediaGallery")
-local MediaGalleryParent = MediaGallery.Parent
-local Otter = require(MediaGalleryParent.Otter)
-local React = require(MediaGalleryParent.React)
+local parent = MediaGallery.Parent
 
-require(MediaGalleryParent.ReactOtter)
-require(MediaGalleryParent.AppCommonLib)
+local Otter = require(parent.Otter)
+local React = require(parent.React)
+require(parent.ReactOtter)
+require(parent.AppCommonLib)
 
-local MAX_VISIBLE_INDICATORS = require(MediaGallery.MediaGalleryConstants).MAX_VISIBLE_INDICATORS
+local MediaGalleryConstants = require(MediaGallery.MediaGalleryConstants)
 
-local function getFirstVisibleIndex(n1: number, n2: number, s1: string) -- line: 21
-	-- upvalues: MAX_VISIBLE_INDICATORS (copy)
-	if n1 <= MAX_VISIBLE_INDICATORS then
+local MAX_VISIBLE_INDICATORS = MediaGalleryConstants.MAX_VISIBLE_INDICATORS
+
+local function getFirstVisibleIndex(numberOfItems: number, p: number, p2: string) -- 1 equivalent call inferred from this helper
+	if numberOfItems <= MAX_VISIBLE_INDICATORS then
 		return 1
 	end
 
-	if s1 == "Right" then
-		return (math.max(1, math.min(n2, n1 - 2) - MAX_VISIBLE_INDICATORS + 2 + 1))
+	if p2 == "Right" then
+		return (math.max(1, math.min(p, numberOfItems - 2) - MAX_VISIBLE_INDICATORS + 2 + 1))
 	end
 
-	return (math.min(n1 - MAX_VISIBLE_INDICATORS + 1, math.max(n2, 3) - 2))
+	return (math.min(numberOfItems - MAX_VISIBLE_INDICATORS + 1, math.max(p, 3) - 2))
 end
-local function useIndicatorScrollAnimation(t1: {[any]: any}) -- line: 54
-	-- upvalues: React (copy), MAX_VISIBLE_INDICATORS (copy), Otter (copy)
-	local v12, v13 = React.useState(t1.startIndex)
-	local v14, v15 = React.useState(t1.startIndex)
-	local v16, v17 = React.useState(1)
-	local v18, v19 = React.useBinding(Vector2.new(0, 0))
-	local v20, v21 = React.useState(false)
-	local v22, v23 = React.useBinding(0)
-	local v24 = React.useCallback(function(n3: number) -- line: 63
-		-- upvalues: t1 (copy)
-		return Vector2.new((n3 - 1) * (t1.indicatorSize + t1.indicatorPadding), 0)
-	end, {
-		t1.indicatorSize,
-		t1.indicatorPadding
-	})
 
-	React.useEffect(function() -- line: 70
-		-- upvalues: t1 (copy), MAX_VISIBLE_INDICATORS (copy), v19 (copy), v24 (copy), v17 (copy), v23 (copy), v15 (copy), v13 (copy)
-		local numberOfItems = t1.numberOfItems
-		local startIndex = t1.startIndex
-		local v28 = if not (numberOfItems <= MAX_VISIBLE_INDICATORS) then math.max(1, math.min(startIndex, numberOfItems - 2) - MAX_VISIBLE_INDICATORS + 2 + 1) else 1
+local function useIndicatorScrollAnimation(data)
+	local state, setState = React.useState(data.startIndex)
+	local state2, setState2 = React.useState(data.startIndex)
+	local state3, setState3 = React.useState(1)
 
-		v19(v24(v28))
-		v17(v28)
-		v23(1)
-		v15(t1.startIndex)
-		v13(t1.startIndex)
-	end, {
-		t1.numberOfItems,
-		t1.startIndex,
-		v24
-	})
-	React.useEffect(function() -- line: 83
-		-- upvalues: t1 (copy), v13 (copy), v15 (copy), v17 (copy), MAX_VISIBLE_INDICATORS (copy), v21 (copy)
-		local u29 = t1.scrolledSignal:connect(function(n4: number) -- line: 84
-			-- upvalues: v13 (copy), v15 (copy), v17 (copy), t1 (copy), MAX_VISIBLE_INDICATORS (copy), v21 (copy)
-			v13(function(p1) -- line: 85
-				-- upvalues: n4 (copy), v15 (copy), v17 (copy), t1 (copy), MAX_VISIBLE_INDICATORS (copy), v21 (copy)
-				local v36 = not (p1 < n4) and "Left" or "Right"
+	local canvasPositionBinding, v = React.useBinding(Vector2.new(0, 0))
+	local state4, setState4 = React.useState(false)
+	local animationProgressBinding, v2 = React.useBinding(0)
 
-				v15(p1)
+	local v3 = React.useCallback(function(p: number)
+		return Vector2.new((p - 1) * (data.indicatorSize + data.indicatorPadding), 0)
+	end, { data.indicatorSize, data.indicatorPadding })
 
-				local v37 = v17
-				local numberOfItems = t1.numberOfItems
-				local v39 = n4
+	React.useEffect(function()
+		local numberOfItems = data.numberOfItems
+		local startIndex = data.startIndex
+		local v4 = numberOfItems <= MAX_VISIBLE_INDICATORS and 1
+			or math.max(1, math.min(startIndex, numberOfItems - 2) - MAX_VISIBLE_INDICATORS + 2 + 1)
 
-				v37(if not (numberOfItems <= MAX_VISIBLE_INDICATORS) then if v36 ~= "Right" then math.min(numberOfItems - MAX_VISIBLE_INDICATORS + 1, math.max(v39, 3) - 2) else math.max(1, math.min(v39, numberOfItems - 2) - MAX_VISIBLE_INDICATORS + 2 + 1) else 1)
-				v21(true)
+		v(v3(v4))
+		setState3(v4)
+		v2(1)
+		setState2(data.startIndex)
+		setState(data.startIndex)
+	end, { data.numberOfItems, data.startIndex, v3 })
 
-				return n4
+	React.useEffect(function()
+		local scrolledSignalConnection = data.scrolledSignal:connect(function(p: number)
+			setState(function(p2)
+				local v4 = p2 < p and "Right" or "Left"
+				setState2(p2)
+				setState3(getFirstVisibleIndex(data.numberOfItems, p, v4)) -- inferred equivalent call
+				setState4(true)
+				return p
 			end)
 		end)
 
-		return function() -- line: 94
-			-- upvalues: u29 (ref)
-			if u29 ~= nil then
-				u29:disconnect()
-				u29 = nil
+		return function()
+			if scrolledSignalConnection ~= nil then
+				scrolledSignalConnection:disconnect()
+				scrolledSignalConnection = nil
 			end
 		end
-	end, {
-		t1.numberOfItems,
-		t1.scrolledSignal
-	})
-	React.useEffect(function() -- line: 107
-		-- upvalues: v20 (copy), Otter (copy), t1 (copy), v18 (copy), v24 (copy), v16 (copy), v23 (copy), v19 (copy), v21 (copy)
-		if not v20 then
+	end, { data.numberOfItems, data.scrolledSignal })
+
+	React.useEffect(function()
+		if not state4 then
 			return
 		end
 
-		local v30 = Otter.createSingleMotor(0)
+		local singleMotor = Otter.createSingleMotor(0)
+		local v4
 
-		v30:setGoal(if not t1.useSpring then Otter.instant(1) else Otter.spring(1, t1.springConfig))
-
-		local v31 = v18:getValue()
-		local v32 = v24(v16)
-
-		v30:onStep(function(n5: number) -- line: 118
-			-- upvalues: v23 (copy), v19 (copy), v31 (copy), v32 (copy)
-			v23(n5)
-			v19(v31:Lerp(v32, n5))
-		end)
-		v30:onComplete(function() -- line: 123
-			-- upvalues: v21 (copy)
-			v21(false)
-		end)
-
-		return function() -- line: 127
-			-- upvalues: v30 (copy)
-			v30:destroy()
+		if data.useSpring then
+			v4 = Otter.spring(1, data.springConfig)
+		else
+			v4 = Otter.instant(1)
 		end
-	end, {
-		t1.useSpring,
-		t1.springConfig,
-		v20,
-		v16,
-		v24
-	})
+
+		singleMotor:setGoal(v4)
+
+		local value = canvasPositionBinding:getValue()
+		local v5 = v3(state3)
+
+		singleMotor:onStep(function(p: number)
+			v2(p)
+			v(value:Lerp(v5, p))
+		end)
+
+		singleMotor:onComplete(function()
+			setState4(false)
+		end)
+
+		return function()
+			singleMotor:destroy()
+		end
+	end, { data.useSpring, data.springConfig, state4, state3, v3 })
 
 	return {
-		currentItemIndex = v12,
-		previousItemIndex = v14,
-		firstVisibleIndex = v16,
-		animationProgressBinding = v22,
-		canvasPositionBinding = v18
+		currentItemIndex = state,
+		previousItemIndex = state2,
+		firstVisibleIndex = state3,
+		animationProgressBinding = animationProgressBinding,
+		canvasPositionBinding = canvasPositionBinding
 	}
 end
 

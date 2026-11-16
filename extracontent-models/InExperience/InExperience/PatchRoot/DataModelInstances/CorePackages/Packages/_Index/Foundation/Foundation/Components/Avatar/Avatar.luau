@@ -1,72 +1,85 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local Dash = require(FoundationParent.Dash)
-local Flags = require(Foundation.Utility.Flags)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Image = require(Foundation.Components.Image)
-local Indicator = require(script.Parent.Indicator)
 local StatusIndicator = require(Foundation.Components.StatusIndicator)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local mapBindable = require(Foundation.Utility.mapBindable)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local ThumbnailSize = require(Foundation.Enums.ThumbnailSize)
 local ThumbnailType = require(Foundation.Enums.ThumbnailType)
 local getRbxThumb = require(Foundation.Utility.getRbxThumb)
+
 local useAvatarVariants = require(script.Parent.useAvatarVariants)
 local useTokens = require(Foundation.Providers.Style.useTokens)
-local usePresentationContext = require(Foundation.Providers.Style.PresentationContext).usePresentationContext
+local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
+local usePresentationContext = PresentationContext.usePresentationContext
+
 local AvatarSize = require(Foundation.Enums.AvatarSize)
+
 local UserPresence = require(Foundation.Enums.UserPresence)
+
 local getAvatarSize = require(script.Parent.getAvatarSize)
-local t1 = {
-	testId = "--foundation-avatar",
+
+local v = {
 	size = AvatarSize.Medium,
-	userPresence = UserPresence.None
+	userPresence = UserPresence.None,
+	testId = "--foundation-avatar"
 }
 
-local function Avatar(p1, p2) -- line: 52
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), useAvatarVariants (copy), getAvatarSize (copy), React (copy), View (copy), withCommonProps (copy), Image (copy), Flags (copy), mapBindable (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), Dash (copy), StatusIndicator (copy), Indicator (copy)
-	local v26 = withDefaults(p1, t1)
-	local v27 = useTokens()
-	local v28 = usePresentationContext()
-	local v29 = useAvatarVariants(v27, v26.size, v26.userPresence, v26.backplateStyle, v28.isIconSize)
-	local v30 = getAvatarSize(v27, v26.size, v28.isIconSize)
+local function Avatar(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local v4 = usePresentationContext()
 
-	return React.createElement(View, withCommonProps(v26, {
-		tag = v29.container.tag,
-		ref = p2,
-		backgroundStyle = v29.container.backgroundStyle,
-		stroke = v29.container.stroke,
-		Size = UDim2.fromOffset(v30, v30)
-	}), {
+	local v5 = useAvatarVariants(v3, v2.size, v2.userPresence, v2.backplateStyle, v4.isIconSize)
+	local avatarSize = getAvatarSize(v3, v2.size, v4.isIconSize)
+
+	local createElement = React.createElement
+
+	local v6 = withCommonProps(v2, {
+		tag = v5.container.tag,
+		ref = ref,
+		backgroundStyle = v5.container.backgroundStyle,
+		stroke = v5.container.stroke,
+		Size = UDim2.fromOffset(avatarSize, avatarSize)
+	})
+
+	local v7 = {
 		Image = React.createElement(Image, {
-			Image = if not Flags.FoundationAvatarBindableUserId then getRbxThumb(ThumbnailType.AvatarHeadShot, v26.userId, ThumbnailSize.Medium, if not Flags.FoundationAvatarIncludeProfileFrame then nil else {
-				includeProfileFrame = v26.includeProfileFrame
-			}) else mapBindable(v26.userId, function(p3) -- line: 73
-				-- upvalues: getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), Flags (copy), v26 (copy)
-				return getRbxThumb(ThumbnailType.AvatarHeadShot, p3, ThumbnailSize.Medium, if not Flags.FoundationAvatarIncludeProfileFrame then nil else {
-					includeProfileFrame = v26.includeProfileFrame
+			Image = mapBindable(v2.userId, function(p2)
+				return getRbxThumb(ThumbnailType.AvatarHeadShot, p2, ThumbnailSize.Medium, {
+					includeProfileFrame = v2.includeProfileFrame
 				})
 			end),
-			tag = v29.avatar.tag,
-			backgroundStyle = v26.backgroundStyle,
-			testId = if not Flags.FoundationAvatarBindableUserId then nil else `{ v26.testId }--image`
+			tag = v5.avatar.tag,
+			backgroundStyle = v2.backgroundStyle,
+			testId = `{v2.testId}--image`
 		}),
-		Indicator = if not Flags.FoundationAvatarBeta then if not v29.indicator.isVisible then nil else React.createElement(View, Dash.join(v29.indicatorBackplate, {
-			testId = `{ v26.testId }--indicator`
-		}), React.createElement(Indicator, v29.indicator)) else if not v29.statusIndicator.isVisible then nil else React.createElement(View, Dash.join(v29.statusIndicatorBackplate, {
-			testId = `{ v26.testId }--indicator-backplate`
-		}), React.createElement(StatusIndicator, {
-			testId = `{ v26.testId }--status-indicator`,
-			variant = v29.statusIndicator.variant,
-			shape = v29.statusIndicator.shape,
-			size = v29.statusIndicator.size
-		}))
-	})
+		Indicator = 0
+	}
+	local indicator
+
+	if v5.statusIndicator.isVisible then
+		indicator = React.createElement(StatusIndicator, {
+			testId = `{v2.testId}--status-indicator`,
+			variant = v5.statusIndicator.variant,
+			shape = v5.statusIndicator.shape,
+			size = v5.statusIndicator.size,
+			mask = v5.statusIndicatorMask.mask,
+			ZIndex = v5.statusIndicatorMask.ZIndex,
+			AnchorPoint = v5.statusIndicatorMask.AnchorPoint,
+			Position = v5.statusIndicatorMask.Position
+		})
+	end
+
+	v7.Indicator = indicator
+	return createElement(View, v6, v7)
 end
 
 return React.memo(React.forwardRef(Avatar))

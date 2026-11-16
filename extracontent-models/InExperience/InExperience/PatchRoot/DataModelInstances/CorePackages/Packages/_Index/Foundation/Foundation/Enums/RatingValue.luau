@@ -1,5 +1,1 @@
-return {
-	None = "None",
-	ThumbUp = "ThumbUp",
-	ThumbDown = "ThumbDown"
-}
+return { None = "None", ThumbUp = "ThumbUp", ThumbDown = "ThumbDown" }

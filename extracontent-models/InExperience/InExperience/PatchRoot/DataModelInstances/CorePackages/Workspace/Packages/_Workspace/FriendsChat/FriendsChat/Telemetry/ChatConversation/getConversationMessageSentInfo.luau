@@ -1,51 +1,45 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local SendMessageError = require(Parent.AppChat.SendMessageError)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
 
-local function getConversationMessageSentInfo(p1, s1: string) -- line: 27
-	-- upvalues: SendMessageError (copy)
-	local t1 = {
+local SendMessageError = require(parent.AppChat.SendMessageError)
+
+local function getConversationMessageSentInfo(data, recipientIds: string)
+	local conversationMessageSentInfo = {
 		messageSentResult = SendMessageError.OtherFailure,
-		recipientIds = s1
+		recipientIds = recipientIds
 	}
 
-	if p1 == nil then
-		t1.messageSentResult = SendMessageError.NoResponse
-
-		return t1
+	if data == nil then
+		conversationMessageSentInfo.messageSentResult = SendMessageError.NoResponse
+		return conversationMessageSentInfo
 	end
 
-	if (p1.StatusCode or p1.responseCode) == 409 then
-		t1.messageSentResult = SendMessageError.Conflict
-
-		return t1
+	if (data.StatusCode or data.responseCode) == 409 then
+		conversationMessageSentInfo.messageSentResult = SendMessageError.Conflict
+		return conversationMessageSentInfo
 	end
 
-	if p1.responseBody == nil then
-		t1.messageSentResult = SendMessageError.NoResponseBody
-
-		return t1
+	if data.responseBody == nil then
+		conversationMessageSentInfo.messageSentResult = SendMessageError.NoResponseBody
+		return conversationMessageSentInfo
 	end
 
-	local messages = p1.responseBody.messages
+	local messages = data.responseBody.messages
 
 	if messages == nil or #messages == 0 then
-		t1.messageSentResult = SendMessageError.NoMessages
-
-		return t1
+		conversationMessageSentInfo.messageSentResult = SendMessageError.NoMessages
+		return conversationMessageSentInfo
 	end
 
-	local v8 = messages[1]
+	local message = messages[1]
 
-	if v8.status == nil then
-		t1.messageSentResult = SendMessageError.NoMessageStatus
-
-		return t1
+	if message.status == nil then
+		conversationMessageSentInfo.messageSentResult = SendMessageError.NoMessageStatus
+		return conversationMessageSentInfo
 	end
 
-	t1.messageSentResult = v8.status
-	t1.messageId = v8.id
-
-	return t1
+	conversationMessageSentInfo.messageSentResult = message.status
+	conversationMessageSentInfo.messageId = message.id
+	return conversationMessageSentInfo
 end
 
 return getConversationMessageSentInfo

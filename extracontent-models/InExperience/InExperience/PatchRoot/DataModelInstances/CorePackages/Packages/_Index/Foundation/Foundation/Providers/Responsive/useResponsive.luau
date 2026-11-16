@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
+
+local React = require(parent.React)
+
 local ResponsiveContext = require(script.Parent.ResponsiveContext)
 
-local function useResponsive() -- line: 9
-	-- upvalues: React (copy), ResponsiveContext (copy)
+local function useResponsive()
 	return React.useContext(ResponsiveContext)
 end
 

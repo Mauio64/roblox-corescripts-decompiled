@@ -1,247 +1,405 @@
 local Players = game:GetService("Players")
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Cryo = require(DataHydrationParent.Cryo)
-local Signals = require(DataHydrationParent.Signals)
-local SignalsExperimental = require(DataHydrationParent.SignalsExperimental)
-local DataStatus = require(DataHydration.DataHydrationTypes).DataStatus
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
-local v9 = game:DefineFastFlag("LuaAppDataCacheBatch", false)
-local SharedFlags = require(DataHydrationParent.SharedFlags)
-local FFlagLuaAppDataHydrationSanitizeItem = SharedFlags.FFlagLuaAppDataHydrationSanitizeItem
-local FFlagLuaAppDataHydrationOptimisticMutationLayer = SharedFlags.FFlagLuaAppDataHydrationOptimisticMutationLayer
-local v13 = game:DefineFastInt("LuaAppDefaultDataTtlSec", 3600)
-local v14 = game:DefineFastInt("LuaAppDefaultFailedDataTtlSec", 60)
+local parent = DataHydration.Parent
+local Cryo = require(parent.Cryo)
+local Signals = require(parent.Signals)
+local SignalsExperimental = require(parent.SignalsExperimental)
 
-local function createDataCache(n1: number?, n2: number?, p1) -- line: 29
-	-- upvalues: v13 (copy), v14 (copy), FFlagLuaAppDataHydrationSanitizeItem (copy), Signals (copy), DataStatus (copy), v9 (copy), SignalsExperimental (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), Cryo (copy), getLocalPlayerUserId (copy), Players (copy)
-	local v19 = n1 or v13
-	local v20 = n2 or v14
-	local v21 = if not FFlagLuaAppDataHydrationSanitizeItem or not p1 then nil else p1.sanitizeItem
-	local t1 = {}
-	local t2 = {}
-	local t3 = {}
-	local t4 = {}
+local DataHydrationTypes = require(DataHydration.DataHydrationTypes)
+local DataStatus = DataHydrationTypes.DataStatus
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
+local observeLocalPlayerUserId = DataHydrationUtils.observeLocalPlayerUserId
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
+local FFlagDataHydrationAccountReset = SharedFlags.FFlagDataHydrationAccountReset
+local FFlagDataHydrationStaleTime = SharedFlags.FFlagDataHydrationStaleTime
+local FFlagSduiReleaseSearchResultsPageState = SharedFlags.FFlagSduiReleaseSearchResultsPageState
 
-	local function getOrCreateSignals(s1: string) -- line: 41
-		-- upvalues: t1 (ref), t2 (ref), Signals (copy), t3 (ref), DataStatus (copy)
-		if t1[s1] == nil or t2[s1] == nil then
-			t1[s1] = {}
+local FFlagDataHydrationPreserveIncompleteCatalogResults = require(DataHydration.Flags.FFlagDataHydrationPreserveIncompleteCatalogResults)
 
-			local v32 = t1[s1]
-			local v33 = t2
-			local v34, v35 = Signals.createSignal(nil)
+local defineFastInt = game:DefineFastInt("LuaAppDefaultDataTtlSec", 3600)
 
-			v32.data = v34
-			v33[s1] = v35
+local defineFastInt2 = game:DefineFastInt("LuaAppDefaultFailedDataTtlSec", 60)
 
-			local v36 = t1[s1]
-			local v37 = t3
-			local v38, v39 = Signals.createSignal(DataStatus.NotReady)
+local function createDataCache(p: number?, p2: number?, data)
+	local v = p or defineFastInt
+	local v2 = p2 or defineFastInt2
+	local sanitizeItem
 
-			v36.status = v38
-			v37[s1] = v39
-		end
-
-		return t1[s1], t2[s1]
-	end
-	local function getItem(s2: string, p2: ((...any) -> ...any)?) -- line: 53
-		-- upvalues: getOrCreateSignals (copy), t4 (ref), DataStatus (copy)
-		local v42 = getOrCreateSignals(s2)
-		local v43 = true
-
-		if t4[s2] and os.clock() < t4[s2] then
-			local v44 = v42.data(false)
-			local v45 = v42.status(false)
-
-			if v44 ~= nil or v45 == DataStatus.Failed then
-				if p2 then
-					return v42, (p2(v44))
-				end
-
-				v43 = false
-			end
-		end
-
-		return v42, v43
-	end
-	local function clear() -- line: 221
-		-- upvalues: t4 (ref), t1 (ref), t2 (ref), t3 (ref)
-		t4 = {}
-		t1 = {}
-		t2 = {}
-		t3 = {}
+	if data then
+		sanitizeItem = data.sanitizeItem
+	else
+		sanitizeItem = nil
 	end
 
-	local u29 = getLocalPlayerUserId()
-	local connection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 229
-		-- upvalues: getLocalPlayerUserId (copy), u29 (ref), clear (copy)
-		local v91 = getLocalPlayerUserId()
+	local ttlSecondsForItem
 
-		if v91 ~= u29 then
-			u29 = v91
-			clear()
+	if FFlagDataHydrationPreserveIncompleteCatalogResults and data then
+		ttlSecondsForItem = data.ttlSecondsForItem
+	else
+		ttlSecondsForItem = nil
+	end
+
+	local v3 = {}
+	local v4 = {}
+	local v5 = {}
+	local v6 = {}
+
+	local v7 = {}
+
+	local function expiryFor(p3, p4: number) -- 6 equivalent calls inferred from this helper
+		if ttlSecondsForItem then
+			return os.clock() + (ttlSecondsForItem(p3) or v)
 		end
-	end)
 
-	return {
-		getItem = getItem,
-		getItems = function(t5: {[any]: any}, p3: ((...any) -> ...any)?) -- line: 75
-			-- upvalues: getItem (copy)
-			local t6 = {}
-			local t7 = {}
+		return p4
+	end
 
-			if not t5 then
-				return t6, t7
-			end
+	local function getOrCreateSignals(p3: string)
+		if v3[p3] ~= nil and v4[p3] ~= nil then
+			return v3[p3], v4[p3]
+		end
 
-			for _, v51 in t5 do
-				local v52, v53 = getItem(v51, p3)
+		v3[p3] = {}
+		local v8 = v3[p3]
+		local v9 = v4
+		local signal, v10 = Signals.createSignal(nil)
+		v8.data = signal
+		v9[p3] = v10
+		local v11 = v3[p3]
+		local v12 = v5
+		local signal2, v13 = Signals.createSignal(DataStatus.NotReady)
+		v11.status = signal2
+		v12[p3] = v13
 
-				t6[v51] = v52
-				t7[v51] = v53
-			end
+		return v3[p3], v4[p3]
+	end
 
-			return t6, t7
-		end,
-		updateItems = function(t8: {[any]: any}) -- line: 117
-			-- upvalues: v19 (copy), v9 (copy), getOrCreateSignals (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), Cryo (copy), v21 (copy), t3 (ref), DataStatus (copy), t4 (ref), SignalsExperimental (copy)
-			local v62 = os.clock() + v19
+	local function getItem(item: string, callback, p3: number?)
+		local signals = getOrCreateSignals(item)
 
-			if v9 then
-				local function batchUpdate() -- line: 121
-					-- upvalues: t8 (copy), getOrCreateSignals (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), Cryo (copy), v21 (copy), t3 (ref), DataStatus (copy), t4 (ref), v62 (copy)
-					for v96, v97 in t8 do
-						local v98, v99 = getOrCreateSignals(v96)
-						local v100 = v98.data(false)
-						local v101 = if not v100 or (type(v100) ~= "table" or type(v97) ~= "table") then v97 else if not FFlagLuaAppDataHydrationOptimisticMutationLayer then Cryo.Dictionary.union(v100, v97) else Cryo.Dictionary.join(v100, v97)
+		if FFlagDataHydrationStaleTime and p3 ~= nil then
+			local data2 = signals.data(false)
 
-						v99(if not v21 then v101 else v21(v101))
-						t3[v96](DataStatus.Ready)
-						t4[v96] = v62
-					end
+			if signals.status(false) ~= DataStatus.Failed then
+				local v8 = v7[item]
+				local v9
+
+				if data2 == nil or v8 == nil then
+					v9 = false
+				else
+					v9 = os.clock() - v8 < p3
 				end
 
-				SignalsExperimental.batch(batchUpdate)
-
-				return
-			end
-
-			for v64, v65 in t8 do
-				local v66, v67 = getOrCreateSignals(v64)
-				local v68 = v66.data(false)
-				local v69 = if not v68 or (type(v68) ~= "table" or type(v65) ~= "table") then v65 else if not FFlagLuaAppDataHydrationOptimisticMutationLayer then Cryo.Dictionary.union(v68, v65) else Cryo.Dictionary.join(v68, v65)
-
-				v67(if not v21 then v69 else v21(v69))
-				t3[v64](DataStatus.Ready)
-				t4[v64] = v62
-			end
-		end,
-		updateItem = function(s3: string, p4) -- line: 159
-			-- upvalues: getOrCreateSignals (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), Cryo (copy), v21 (copy), t3 (ref), DataStatus (copy), t4 (ref), v19 (copy)
-			local v72, v73 = getOrCreateSignals(s3)
-			local v74 = v72.data(false)
-			local v75 = if not v74 or (type(v74) ~= "table" or type(p4) ~= "table") then p4 else if not FFlagLuaAppDataHydrationOptimisticMutationLayer then Cryo.Dictionary.union(v74, p4) else Cryo.Dictionary.join(v74, p4)
-
-			v73(if not v21 then v75 else v21(v75))
-			t3[s3](DataStatus.Ready)
-			t4[s3] = os.clock() + v19
-		end,
-		replaceItems = function(t9: {[any]: any}) -- line: 94
-			-- upvalues: v19 (copy), v9 (copy), getOrCreateSignals (copy), v21 (copy), t3 (ref), DataStatus (copy), t4 (ref), SignalsExperimental (copy)
-			local v55 = os.clock() + v19
-
-			if v9 then
-				local function batchUpdate() -- line: 98
-					-- upvalues: t9 (copy), getOrCreateSignals (copy), v21 (copy), t3 (ref), DataStatus (copy), t4 (ref), v55 (copy)
-					for v92, v93 in t9 do
-						local _, v95 = getOrCreateSignals(v92)
-
-						v95(if not v21 then v93 else v21(v93))
-						t3[v92](DataStatus.Ready)
-						t4[v92] = v55
-					end
+				if v9 and callback then
+					return signals, callback(data2)
 				end
 
-				SignalsExperimental.batch(batchUpdate)
-
-				return
+				return signals, not v9
 			end
+		end
 
-			for v57, v58 in t9 do
-				local _, v60 = getOrCreateSignals(v57)
+		local v8 = true
 
-				v60(if not v21 then v58 else v21(v58))
-				t3[v57](DataStatus.Ready)
-				t4[v57] = v55
+		if not (v6[item] and os.clock() < v6[item]) then
+			return signals, true
+		end
+
+		local data2 = signals.data(false)
+		local status = signals.status(false)
+
+		if data2 == nil and status ~= DataStatus.Failed then
+			return signals, v8
+		end
+
+		if callback then
+			return signals, (callback(data2))
+		end
+
+		v8 = false
+		return signals, false
+	end
+
+	local function getItems(items, callback, p3: number?)
+		local result = {}
+		local result2 = {}
+
+		if not items then
+			return result, result2
+		end
+
+		for _, item in items do
+			local item2, v8 = getItem(item, callback, p3)
+			result[item] = item2
+			result2[item] = v8
+		end
+
+		return result, result2
+	end
+
+	local function replaceItems(items)
+		local now = os.clock()
+		local v8 = now + v
+		local function batchUpdate()
+			for k, item in items do
+				local _, v9 = getOrCreateSignals(k)
+				local v10
+
+				if sanitizeItem then
+					v10 = sanitizeItem(item)
+				else
+					v10 = item
+				end
+
+				v9(v10)
+				v5[k](DataStatus.Ready)
+				v6[k] = expiryFor(item, v8) -- inferred equivalent call
+
+				if FFlagDataHydrationStaleTime then
+					v7[k] = now
+				end
 			end
-		end,
-		replaceItem = function(s4: string, p5) -- line: 175
-			-- upvalues: getOrCreateSignals (copy), v21 (copy), t3 (ref), DataStatus (copy), t4 (ref), v19 (copy)
-			local _, v79 = getOrCreateSignals(s4)
+		end
+		SignalsExperimental.batch(batchUpdate)
+	end
 
-			v79(if not v21 then p5 else v21(p5))
-			t3[s4](DataStatus.Ready)
-			t4[s4] = os.clock() + v19
-		end,
-		markItemsAsFailed = function(t10: {[any]: any}) -- line: 199
-			-- upvalues: v20 (copy), v9 (copy), t3 (ref), DataStatus (copy), t4 (ref), SignalsExperimental (copy)
-			local v87 = os.clock() + v20
+	local function updateItems(items, flag: boolean?)
+		local now = os.clock()
+		local v8 = now + v
+		local function batchUpdate()
+			for k, joined in items do
+				local signals, v9 = getOrCreateSignals(k)
+				local data2 = signals.data(false)
 
-			if v9 then
-				local function batchUpdate() -- line: 202
-					-- upvalues: t10 (copy), t3 (ref), DataStatus (copy), t4 (ref), v87 (copy)
-					for _, v103 in t10 do
-						if t3[v103] then
-							t3[v103](DataStatus.Failed)
+				if data2 and type(data2) == "table" and type(joined) == "table" then
+					joined = Cryo.Dictionary.join(data2, joined)
+				end
+
+				local v10
+
+				if sanitizeItem then
+					v10 = sanitizeItem(joined)
+				else
+					v10 = joined
+				end
+
+				v9(v10)
+
+				v5[k](DataStatus.Ready)
+
+				if FFlagMigrateGameInfoToStore then
+					if flag ~= false then
+						v6[k] = expiryFor(joined, v8) -- inferred equivalent call
+
+						if FFlagDataHydrationStaleTime then
+							v7[k] = now
 						end
+					end
+				else
+					v6[k] = expiryFor(joined, v8) -- inferred equivalent call
 
-						t4[v103] = v87
+					if FFlagDataHydrationStaleTime then
+						v7[k] = now
 					end
 				end
-
-				SignalsExperimental.batch(batchUpdate)
-
-				return
 			end
-
-			for _, v90 in t10 do
-				if t3[v90] then
-					t3[v90](DataStatus.Failed)
-				end
-
-				t4[v90] = v87
-			end
-		end,
-		resetFailedItem = function(s5: string) -- line: 186
-			-- upvalues: t1 (ref), DataStatus (copy), t3 (ref)
-			local v81 = t1[s5]
-
-			if v81 and v81.status(false) == DataStatus.Failed then
-				t3[s5](DataStatus.NotReady)
-			end
-		end,
-		resetFailedItems = function(t11: {[any]: any}) -- line: 193
-			-- upvalues: t1 (ref), DataStatus (copy), t3 (ref)
-			for _, v84 in t11 do
-				local v85 = t1[v84]
-
-				if v85 and v85.status(false) == DataStatus.Failed then
-					t3[v84](DataStatus.NotReady)
-				end
-			end
-		end,
-		clear = clear,
-		dispose = function() -- line: 237
-			-- upvalues: connection (ref), clear (copy)
-			if connection then
-				connection:Disconnect()
-				connection = nil
-			end
-
-			clear()
 		end
+
+		SignalsExperimental.batch(batchUpdate)
+	end
+
+	local function updateItem(p3: string, p4, flag: boolean?)
+		local signals, v8 = getOrCreateSignals(p3)
+		local data2 = signals.data(false)
+
+		if data2 and type(data2) == "table" and type(p4) == "table" then
+			p4 = Cryo.Dictionary.join(data2, p4)
+		end
+
+		local v9
+
+		if sanitizeItem then
+			v9 = sanitizeItem(p4)
+		else
+			v9 = p4
+		end
+
+		v8(v9)
+
+		v5[p3](DataStatus.Ready)
+
+		if FFlagMigrateGameInfoToStore then
+			if flag ~= false then
+				v6[p3] = expiryFor(p4, os.clock() + v) -- inferred equivalent call
+
+				if FFlagDataHydrationStaleTime then
+					v7[p3] = os.clock()
+				end
+			end
+		else
+			v6[p3] = expiryFor(p4, os.clock() + v) -- inferred equivalent call
+
+			if FFlagDataHydrationStaleTime then
+				v7[p3] = os.clock()
+			end
+		end
+	end
+
+	local function replaceItem(p3: string, p4)
+		local _, v8 = getOrCreateSignals(p3)
+		local v9
+
+		if sanitizeItem then
+			v9 = sanitizeItem(p4)
+		else
+			v9 = p4
+		end
+
+		v8(v9)
+
+		v5[p3](DataStatus.Ready)
+		v6[p3] = expiryFor(p4, os.clock() + v) -- inferred equivalent call
+
+		if FFlagDataHydrationStaleTime then
+			v7[p3] = os.clock()
+		end
+	end
+
+	local function resetFailedItem(item: string) -- 1 equivalent call inferred from this helper
+		local v8 = v3[item]
+
+		if v8 and v8.status(false) == DataStatus.Failed then
+			v5[item](DataStatus.NotReady)
+		end
+	end
+
+	local function resetFailedItems(items)
+		for _, item in items do
+			resetFailedItem(item) -- inferred equivalent call
+		end
+	end
+
+	local function markItemsAsFailed(items)
+		local v8 = os.clock() + v2
+		local function batchUpdate()
+			for _, item in items do
+				if v5[item] then
+					v5[item](DataStatus.Failed)
+				end
+
+				v6[item] = v8
+			end
+		end
+		SignalsExperimental.batch(batchUpdate)
+	end
+
+	local function releaseEntries()
+		v6 = {}
+
+		if FFlagDataHydrationStaleTime then
+			v7 = {}
+		end
+
+		v3 = {}
+		v4 = {}
+		v5 = {}
+	end
+
+	local function removeItem(p3: string)
+		v3[p3] = nil
+		v4[p3] = nil
+		v5[p3] = nil
+		v6[p3] = nil
+		v7[p3] = nil
+	end
+
+	local function invalidateEntries() -- 1 equivalent call inferred from this helper
+		SignalsExperimental.batch(function()
+			table.clear(v6)
+
+			if FFlagDataHydrationStaleTime then
+				table.clear(v7)
+			end
+
+			for k in v3 do
+				v4[k](nil)
+				v5[k](DataStatus.NotReady)
+			end
+		end)
+	end
+
+	local function clear() -- 3 equivalent calls inferred from this helper
+		if FFlagDataHydrationAccountReset then
+			invalidateEntries() -- inferred equivalent call
+		else
+			releaseEntries()
+		end
+	end
+
+	local v8 = getLocalPlayerUserId()
+	local localPlayerChangedConnection = nil
+	local v9 = nil
+
+	if FFlagDataHydrationAccountReset then
+		if not data or data.observeLocalUser == nil or data.observeLocalUser then
+			v9 = observeLocalPlayerUserId(function(p3)
+				v8 = p3
+				clear() -- inferred equivalent call
+			end)
+		end
+	else
+		localPlayerChangedConnection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function()
+			local localPlayerUserId = getLocalPlayerUserId()
+
+			if localPlayerUserId ~= v8 then
+				v8 = localPlayerUserId
+				clear() -- inferred equivalent call
+			end
+		end)
+	end
+
+	local function dispose()
+		if FFlagDataHydrationAccountReset then
+			if v9 then
+				v9()
+				v9 = nil
+			end
+
+			releaseEntries()
+		else
+			if localPlayerChangedConnection then
+				localPlayerChangedConnection:Disconnect()
+				localPlayerChangedConnection = nil
+			end
+
+			clear() -- inferred equivalent call
+		end
+	end
+
+	local dataCache = {
+		getItem = getItem,
+		getItems = getItems,
+		updateItems = updateItems,
+		updateItem = updateItem,
+		replaceItems = replaceItems,
+		replaceItem = replaceItem,
+		markItemsAsFailed = markItemsAsFailed,
+		resetFailedItem = resetFailedItem,
+		resetFailedItems = resetFailedItems,
+		removeItem = nil,
+		clear = nil,
+		dispose = nil
 	}
+
+	if not FFlagSduiReleaseSearchResultsPageState then
+		removeItem = nil
+	end
+
+	dataCache.removeItem = removeItem
+	dataCache.clear = clear
+	dataCache.dispose = dispose
+	return dataCache
 end
 
 return createDataCache

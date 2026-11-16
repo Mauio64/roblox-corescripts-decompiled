@@ -1,311 +1,387 @@
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local EventIngestService = game:GetService("EventIngestService")
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local FFlagLuaAppDefaultHttpRetry = require(AppChatParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
+local parent = AppChat.Parent
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
 require(AppChat.types)
 
 local Constants = require(AppChat.Constants)
 local constructGameThumbnailUrl = require(AppChat.Utils.constructGameThumbnailUrl)
-local React = require(AppChatParent.React)
-local Cryo = require(AppChatParent.Cryo)
-local Signals = require(AppChatParent.Signals)
-local EventStream = require(AppChatParent.Analytics).AnalyticsReporters.EventStream
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local Signals = require(parent.Signals)
+
+local Analytics = require(parent.Analytics)
+local EventStream = Analytics.AnalyticsReporters.EventStream
 local memo = React.memo
 local useCallback = React.useCallback
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffect = React.useEffect
 local useIsExternalNavigationAvailable = require(AppChat.Hooks.useIsExternalNavigationAvailable)
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
 local useMemo = React.useMemo
-local useSignalState = require(AppChatParent.SignalsReact).useSignalState
-local v20 = require(AppChatParent.Loggers).Logger:new("GameCardContainer")
-local withLocalization = require(AppChatParent.Localization).withLocalization
-local GameParams = require(AppChatParent.ExperienceService).GameParams
-local EventIngest = require(AppChatParent.Analytics).AnalyticsReporters.EventIngest
-local ApiFetchGameDetails = require(AppChatParent.GameDetailRodux).GameDetails.ApiFetchGameDetails
-local ApiFetchPlayabilityStatus = require(AppChatParent.PlayabilityRodux).PlayabilityStatus.ApiFetchPlayabilityStatus
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
+local Loggers = require(parent.Loggers)
+local Logger = Loggers.Logger
+local v = Logger.new(Logger, "GameCardContainer")
+
+local Localization = require(parent.Localization)
+local withLocalization = Localization.withLocalization
+local ExperienceService = require(parent.ExperienceService)
+local GameParams = ExperienceService.GameParams
+local Analytics2 = require(parent.Analytics)
+local EventIngest = Analytics2.AnalyticsReporters.EventIngest
+
+local GameDetailRodux = require(parent.GameDetailRodux)
+local ApiFetchGameDetails = GameDetailRodux.GameDetails.ApiFetchGameDetails
+local PlayabilityRodux = require(parent.PlayabilityRodux)
+local ApiFetchPlayabilityStatus = PlayabilityRodux.PlayabilityStatus.ApiFetchPlayabilityStatus
 local ReportAnEvent = require(script.Parent.ReportAnEvent)
-local AppSessionService = require(AppChatParent.RoactServiceTags).AppSessionService
-local SessionType = require(AppChatParent.RobloxAppSessionization).SessionType
-local RoactServices = require(AppChatParent.RoactServices).RoactServices
-local RoactAnalyticsCommonGameEvents = require(AppChatParent.RoactServiceTags).RoactAnalyticsCommonGameEvents
+
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppSessionService = RoactServiceTags.AppSessionService
+local RobloxAppSessionization = require(parent.RobloxAppSessionization)
+local SessionType = RobloxAppSessionization.SessionType
+local RoactServices = require(parent.RoactServices)
+local roactServices = RoactServices.RoactServices
+local RoactServiceTags2 = require(parent.RoactServiceTags)
+local RoactAnalyticsCommonGameEvents = RoactServiceTags2.RoactAnalyticsCommonGameEvents
+
 local GameCardGroupable = require(script.Parent.GameCardGroupable)
-local DataHydration = require(AppChatParent.DataHydration)
+local GameAssetCard = require(script.Parent.GameAssetCard)
+require(AppChat.Components.ChatConversation.Grouping.MessageGroupShape)
+local DataHydration = require(parent.DataHydration)
 local RoundedVariant = require(AppChat.Enums.RoundedVariant)
+
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
 local ChatConversationTelemetryEvents = require(script.Parent.Parent.Parent.ChatConversationTelemetryEvents)
-local AppGame = RoactServices.AppGame
-local ExperienceService = require(AppChatParent.ExperienceService).ExperienceService
-local SetGamePlaySession = require(AppChatParent.RobloxAppSessionization).SetGamePlaySession
-local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
-local HttpRequest = require(AppChatParent.HttpRequest)
-local v42 = HttpRequest.config({
-	requestFunction = function(p1, p2, p3) -- line: 66
-		-- upvalues: v20 (copy), HttpRequest (copy)
-		v20:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
 
-		return HttpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+local AppGame = roactServices.AppGame
+local ExperienceService2 = require(parent.ExperienceService)
+local experienceService = ExperienceService2.ExperienceService
+
+local RobloxAppSessionization2 = require(parent.RobloxAppSessionization)
+local SetGamePlaySession = RobloxAppSessionization2.SetGamePlaySession
+
+local HttpRequest = require(parent.HttpRequest)
+local config = HttpRequest.config
+local v2 = {
+	requestFunction = function(p, p2, p3)
+		v:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p))
+		return HttpRequest.requestFunctions.HttpRbxApi(p, p2, p3)
 	end,
-	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("GameCardContainerHttpRetryCount", 4)
-})
+	maxRetryCount = 0
+}
+local maxRetryCount
+
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("GameCardContainerHttpRetryCount", 4)
+end
+
+v2.maxRetryCount = maxRetryCount
+local networkImpl2 = config(v2)
+
 local EnumScreens = require(AppChat.EnumScreens)
-local v44 = game:DefineFastFlag("AppChatShutdownBeforeLaunch", false)
-local getFFlagAppChatHidePlayButtonsInExp = require(AppChat.Flags.getFFlagAppChatHidePlayButtonsInExp)
-local t1 = {
+local defineFastFlag = game:DefineFastFlag("AppChatShutdownBeforeLaunch", false)
+local FFlagAppChatEarlyTestingLinks = require(AppChat.Flags.FFlagAppChatEarlyTestingLinks)
+
+local v3 = {
+	networkImpl = networkImpl2,
+	eventStream = EventStream.new(RbxAnalyticsService),
+	eventIngest = EventIngest.new(EventIngestService),
 	placeId = nil,
 	universeId = nil,
 	conversationId = nil,
 	luaChatPlayTogetherEnabled = nil,
-	networkImpl = v42,
-	eventStream = EventStream.new(RbxAnalyticsService),
-	eventIngest = EventIngest.new(EventIngestService),
-	onDetailsOpened = function() -- line: 111
-	end,
-	onPlayButtonActivated = function(p4) -- line: 113
-		-- upvalues: SetGamePlaySession (copy), SessionType (copy), ReportAnEvent (copy), Cryo (copy), GameParams (copy), v44 (copy), ExperienceService (copy)
-		local placeId = p4.placeId
-		local senderUserId = p4.senderUserId
+	onDetailsOpened = function() end,
+	onPlayButtonActivated = function(data)
+		local placeId = data.placeId
+		local senderUserId = data.senderUserId
 
-		SetGamePlaySession(p4.sessionService, SessionType.StructuralIdentifier.GamePlayFromChat, true)
-		ReportAnEvent(p4, "clickBtnFromLinkCardInChat", "touch")
+		SetGamePlaySession(data.sessionService, SessionType.StructuralIdentifier.GamePlayFromChat, true)
+
+		ReportAnEvent(data, "clickBtnFromLinkCardInChat", "touch")
 
 		if placeId then
-			local v56 = GameParams.fromParams({
-				userId = senderUserId,
-				placeId = placeId
-			})
+			local function fn(joinAttemptId: string?)
+				data = Cryo.Dictionary.join(data, { joinAttemptId = joinAttemptId })
 
-			if v44 then
+				ReportAnEvent(data, "gamePlayIntent", "PlayGameFromLinkCard")
+			end
+
+			local v3
+
+			if FFlagAppChatEarlyTestingLinks and data.isEarlyTesting then
+				v3 = GameParams.fromParams({ placeId = placeId, isEarlyTesting = true })
+			else
+				v3 = GameParams.fromParams({ userId = senderUserId, placeId = placeId })
+			end
+
+			if defineFastFlag then
 				game:Shutdown()
 			end
 
-			ExperienceService:LaunchExperience(v56, "PlayGameFromLinkCard", function(s1: string?) -- line: 122
-				-- upvalues: p4 (ref), Cryo (copy), ReportAnEvent (copy)
-				p4 = Cryo.Dictionary.join(p4, {
-					joinAttemptId = s1
-				})
-				ReportAnEvent(p4, "gamePlayIntent", "PlayGameFromLinkCard")
-			end)
+			experienceService:LaunchExperience(v3, "PlayGameFromLinkCard", fn)
 		end
 	end,
-	openDetails = function(p5) -- line: 140
-		-- upvalues: ReportAnEvent (copy)
-		local universeId = p5.universeId
-		local placeId = p5.placeId
+	openDetails = function(data)
+		local universeId = data.universeId
+		local placeId = data.placeId
 
-		ReportAnEvent(p5, "clickLinkCardInChat", "touch")
-		p5.onDetailsOpened()
-		p5.openGameDetailsPage(universeId, "LuaChatAssetCard")
+		ReportAnEvent(data, "clickLinkCardInChat", "touch")
+		data.onDetailsOpened()
 
-		local v60 = p5.analytics and p5.analytics.reportOpenGameDetailFromChat
+		data.openGameDetailsPage(universeId, "LuaChatAssetCard")
 
-		if v60 then
-			v60(placeId, p5.conversationId, universeId, "GameDetailFromLinkCard")
+		local reportOpenGameDetailFromChat = data.analytics and data.analytics.reportOpenGameDetailFromChat
+
+		if reportOpenGameDetailFromChat then
+			reportOpenGameDetailFromChat(placeId, data.conversationId, universeId, "GameDetailFromLinkCard")
 		end
 	end
 }
 
-local function getGameDetails(p6, p7) -- line: 157
-	return p6.GameDetails[p7] or {}
-end
-local function getGamePlayabilityStatus(p8, p9) -- line: 161
-	return p8.PlayabilityStatus[p9] or {}
+local function getGameDetails(p, universeId) -- 1 equivalent call inferred from this helper
+	return p.GameDetails[universeId] or {}
 end
 
-function GameCardContainer(p10) -- line: 165
-	-- upvalues: Cryo (copy), t1 (copy), useSelector (copy), useCallback (copy), constructGameThumbnailUrl (copy), Constants (copy), useIsExternalNavigationAvailable (copy), EnumScreens (copy), useDispatch (copy), ApiFetchGameDetails (copy), ApiFetchPlayabilityStatus (copy), DataHydration (copy), Signals (copy), useMemo (copy), useSignalState (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), useEffect (copy), ChatConversationTelemetryEvents (copy), RoundedVariant (copy), React (copy), GameCardGroupable (copy), useIsInExperience (copy), getFFlagAppChatHidePlayButtonsInExp (copy), withLocalization (copy)
-	local v66 = Cryo.Dictionary.join(t1, p10)
+local function getGamePlayabilityStatus(p, universeId) -- 1 equivalent call inferred from this helper
+	return p.PlayabilityStatus[universeId] or {}
+end
 
-	if not v66.universeId then
+function GameCardContainer(p)
+	local joined = Cryo.Dictionary.join(v3, p)
+
+	if not joined.universeId then
 		assert("universeId does not exist", "universeId does not exist")
 	end
 
-	local v67 = useSelector(useCallback(function(p11) -- line: 171
-		-- upvalues: v66 (copy)
-		local universeId = v66.universeId
+	local details = useSelector(useCallback(function(p2)
+		return getGameDetails(p2, joined.universeId) -- inferred equivalent call
+	end, { joined.universeId }))
 
-		return p11.GameDetails[universeId] or {}
-	end, { v66.universeId }))
-	local v68 = useSelector(useCallback(function(p12) -- line: 175
-		-- upvalues: v66 (copy)
-		local universeId = v66.universeId
+	local playabilityStatus = useSelector(useCallback(function(p2)
+		return getGamePlayabilityStatus(p2, joined.universeId) -- inferred equivalent call
+	end, { joined.universeId }))
 
-		return p12.PlayabilityStatus[universeId] or {}
-	end, { v66.universeId }))
-	local v69 = constructGameThumbnailUrl(v66.placeId, Constants.GameCard.THUMBNAIL_WIDTH, Constants.GameCard.THUMBNAIL_HEIGHT)
-	local v70 = `rbxthumb://type=GameIcon&id={ v66.universeId }&w={ 150 }&h={ 150 }`
-	local v71 = useIsExternalNavigationAvailable({ EnumScreens.GameDetail })
-	local v72 = v66.placeId or v67.rootPlaceId
-	local name = v67.name
-	local v74 = v67.description or ""
-	local v75 = v67.price or 0
-	local v76 = useDispatch()
+	local gameThumbnail = constructGameThumbnailUrl(
+		joined.placeId,
+		Constants.GameCard.THUMBNAIL_WIDTH,
+		Constants.GameCard.THUMBNAIL_HEIGHT
+	)
 
-	local function v77(p13, p14) -- line: 197
-		-- upvalues: v76 (copy), ApiFetchGameDetails (copy), ApiFetchPlayabilityStatus (copy)
-		v76(ApiFetchGameDetails.Fetch(p13, { p14 }))
-		v76(ApiFetchPlayabilityStatus.Fetch(p13, { p14 }))
+	local formatted = `rbxthumb://type=GameIcon&id={joined.universeId}&w={150}&h={150}`
+
+	local v4 = useIsExternalNavigationAvailable({ EnumScreens.GameDetail })
+
+	local placeId = joined.placeId or details.rootPlaceId
+	local name = details.name
+	local description = details.description or ""
+	local price = details.price or 0
+
+	local v5 = useDispatch()
+	local function fn(networkImpl, universeId)
+		v5(ApiFetchGameDetails.Fetch(networkImpl, { universeId }))
+		v5(ApiFetchPlayabilityStatus.Fetch(networkImpl, { universeId }))
 	end
 
-	local v78 = DataHydration.Game.getVotesStore(false)
-	local v79 = Signals.createSignal(nil)
-	local v80 = Signals.createSignal("NotReady")
-	local v81 = useMemo(function() -- line: 207
-		-- upvalues: v66 (copy), v79 (copy), v80 (copy), v78 (copy)
-		if not v66.universeId then
-			return {
-				data = v79,
-				status = v80
-			}
+	local votesStore = DataHydration.Game.getVotesStore(false)
+
+	local signal = Signals.createSignal(nil)
+	local signal2 = Signals.createSignal("NotReady")
+
+	local v6 = useMemo(function()
+		if joined.universeId then
+			return votesStore.getAndFetchVotes({ joined.universeId })[joined.universeId]
+				or { data = signal, status = signal2 }
 		end
 
-		return v78.getAndFetchVotes({ v66.universeId })[v66.universeId] or {
-			data = v79,
-			status = v80
-		}
-	end, {
-		v78,
-		v66.universeId
-	})
-	local v82 = useSignalState(v81.data)
-	local v83 = useSignalState(v81.status)
-	local v84 = useMemo(function() -- line: 227
-		-- upvalues: v82 (copy)
-		if v82 and (v82.upVotes and v82.downVotes) then
-			local v99 = v82.upVotes + v82.downVotes
+		return { data = signal, status = signal2 }
+	end, { votesStore, joined.universeId })
 
-			if v99 > 0 then
-				return tostring((math.floor(v82.upVotes / v99 * 100))) .. "%"
+	local v7 = useSignalState(v6.data)
+	local votesStatus = useSignalState(v6.status)
+
+	local gameRating = useMemo(function()
+		if v7 and v7.upVotes and v7.downVotes then
+			local v8 = v7.upVotes + v7.downVotes
+
+			if v8 > 0 then
+				return tostring((math.floor(v7.upVotes / v8 * 100))) .. "%"
 			end
 		end
 
 		return "--"
-	end, { v82 })
-	local v85 = useTelemetry(ChatConversationTelemetryLayer.Context)
+	end, { v7 })
 
-	useEffect(function() -- line: 239
-		-- upvalues: v66 (copy), v77 (copy)
-		local universeId = v66.universeId
+	local v8 = useTelemetry(ChatConversationTelemetryLayer.Context)
+
+	useEffect(function()
+		local universeId = joined.universeId
 
 		if not universeId then
 			return
 		end
 
-		v77(v66.networkImpl, universeId)
-	end, {
-		v66.universeId,
-		v66.networkImpl
-	})
+		fn(joined.networkImpl, universeId)
+	end, { joined.universeId, joined.networkImpl })
 
-	local v86 = useCallback(function() -- line: 249
-		-- upvalues: v85 (copy), ChatConversationTelemetryEvents (copy), v66 (copy), v72 (copy)
-		v85.emit(ChatConversationTelemetryEvents.GameCardThumbnailClicked, {
-			universeId = v66.universeId,
-			placeId = v72
+	local v9 = useCallback(function()
+		v8.emit(ChatConversationTelemetryEvents.GameCardThumbnailClicked, {
+			universeId = joined.universeId,
+			placeId = placeId
 		})
-		v66.openDetails(v66)
-	end, {
-		v85,
-		v66.openDetails,
-		v66.universeId,
-		v72
-	})
-	local v87 = useCallback(function() -- line: 257
-		-- upvalues: v85 (copy), ChatConversationTelemetryEvents (copy), v66 (copy), v72 (copy)
-		v85.emit(ChatConversationTelemetryEvents.GameCardPlayButtonClicked, {
-			universeId = v66.universeId,
-			placeId = v72
-		})
-		v66.onPlayButtonActivated(v66)
-	end, {
-		v85,
-		v66.onPlayButtonActivated,
-		v66.universeId,
-		v72
-	})
-	local v88 = useCallback(function() -- line: 265
-		-- upvalues: v85 (copy), ChatConversationTelemetryEvents (copy), v66 (copy), v72 (copy)
-		v85.emit(ChatConversationTelemetryEvents.GameCardMetadataClicked, {
-			universeId = v66.universeId,
-			placeId = v72
-		})
-		v66.openDetails(v66)
-	end, {
-		v85,
-		v66.openDetails,
-		v66.universeId,
-		v72
-	})
 
-	local function renderCard(p15) -- line: 273
-		-- upvalues: RoundedVariant (copy), v86 (copy), v87 (copy), v88 (copy), React (copy), GameCardGroupable (copy)
-		local v102 = not p15.universeId or (not p15.gameName or (not p15.gameThumbnail or (p15.votesStatus == "NotReady" or not p15.gamePlayerCount)))
-		local v103 = false
+		joined.openDetails(joined)
+	end, { v8, joined.openDetails, joined.universeId, placeId })
 
-		if p15.isPlayButtonEnabled and p15.playabilityStatus then
-			v103 = p15.playabilityStatus.isPlayable == true
+	local v10 = useCallback(function()
+		v8.emit(ChatConversationTelemetryEvents.GameCardPlayButtonClicked, {
+			universeId = joined.universeId,
+			placeId = placeId
+		})
+
+		joined.onPlayButtonActivated(joined)
+	end, { v8, joined.onPlayButtonActivated, joined.universeId, placeId, joined.isEarlyTesting })
+
+	local v11 = useCallback(function()
+		v8.emit(ChatConversationTelemetryEvents.GameCardMetadataClicked, {
+			universeId = joined.universeId,
+			placeId = placeId
+		})
+
+		joined.openDetails(joined)
+	end, { v8, joined.openDetails, joined.universeId, placeId })
+
+	local function renderCard(props)
+		local isLoading = not (props.universeId and props.gameName)
+			or not props.gameThumbnail
+			or props.votesStatus == "NotReady"
+			or not props.gamePlayerCount
+		local onThumbnailActivated
+
+		if props.openDetails then
+			onThumbnailActivated = v9
 		end
 
-		local v104 = if not p15.isStartOfGroup then if not p15.isIncoming then RoundedVariant.TopLeft else RoundedVariant.TopRight else RoundedVariant.Top
-		local v105 = if not p15.openDetails then nil else v86
-		local v106 = if not p15.onPlayButtonActivated then nil else v87
-		local v107 = if not p15.openDetails then nil else v88
+		local onPlayButtonActivated
+
+		if props.onPlayButtonActivated then
+			onPlayButtonActivated = v10
+		end
+
+		local onMetadataActivated
+
+		if props.openDetails then
+			onMetadataActivated = v11
+		end
+
+		if props.groupShape then
+			return React.createElement(GameAssetCard, {
+				gameName = props.gameName,
+				gameThumbnail = props.gameThumbnail,
+				gameRating = props.gameRating,
+				gamePlayerCount = props.gamePlayerCount,
+				isLoading = isLoading,
+				onPlayButtonActivated = onPlayButtonActivated,
+				playButtonLabel = props.playButtonLabel,
+				onThumbnailActivated = onThumbnailActivated,
+				onMetadataActivated = onMetadataActivated,
+				groupShape = props.groupShape,
+				mediaRef = props.mediaRef,
+				LayoutOrder = props.layoutOrder
+			})
+		end
+
+		local v12
+
+		if props.isPlayButtonEnabled and props.playabilityStatus then
+			v12 = props.playabilityStatus.isPlayable == true
+		else
+			v12 = false
+		end
+
+		local shouldShowPlayButton = FFlagAppChatEarlyTestingLinks
+			and props.isPlayButtonEnabled
+			and props.isEarlyTesting
+			and true
+			or v12
+		local thumbnailRoundedVariant
+
+		if props.isStartOfGroup then
+			thumbnailRoundedVariant = RoundedVariant.Top
+		elseif props.isIncoming then
+			thumbnailRoundedVariant = RoundedVariant.TopRight
+		else
+			thumbnailRoundedVariant = RoundedVariant.TopLeft
+		end
 
 		return React.createElement(GameCardGroupable, {
-			thumbnailAspectRatio = 1.7777777777777777,
-			gameName = p15.gameName,
-			gameDescription = p15.gameDescription,
-			gameThumbnail = p15.gameThumbnail,
-			gameRating = p15.gameRating,
-			gamePlayerCount = p15.gamePlayerCount,
-			thumbnailRoundedVariant = v104,
-			shouldShowPlayButton = v103,
-			onPlayButtonActivated = v106,
-			onThumbnailActivated = v105,
-			onMetadataActivated = v107,
-			isRepliedTo = p15.isRepliedTo,
-			isIncoming = p15.isIncoming,
-			isPending = p15.isPending,
-			isLoading = v102,
-			LayoutOrder = p15.layoutOrder
+			gameName = props.gameName,
+			gameDescription = props.gameDescription,
+			gameThumbnail = props.gameThumbnail,
+			gameRating = props.gameRating,
+			gamePlayerCount = props.gamePlayerCount,
+			thumbnailAspectRatio = 16 / 9,
+			thumbnailRoundedVariant = thumbnailRoundedVariant,
+			shouldShowPlayButton = shouldShowPlayButton,
+			onPlayButtonActivated = onPlayButtonActivated,
+			playButtonLabel = props.playButtonLabel,
+			onThumbnailActivated = onThumbnailActivated,
+			onMetadataActivated = onMetadataActivated,
+			isRepliedTo = props.isRepliedTo,
+			isIncoming = props.isIncoming,
+			isPending = props.isPending,
+			isLoading = isLoading,
+			LayoutOrder = props.layoutOrder
 		})
 	end
-
-	local v90 = useIsInExperience()
-	local v91 = not getFFlagAppChatHidePlayButtonsInExp() or not v90
 
 	return withLocalization({
 		purchaseGameText = "Feature.GameDetails.Heading.PurchaseGame",
 		viewDetailsText = "Feature.Chat.Action.ViewAssetDetails",
 		playText = "Common.VisitGame.Label.Play",
-		noDescriptionText = "Feature.Chat.Label.NoDescriptionYet"
-	})(function(_) -- line: 324
-		-- upvalues: Cryo (copy), v66 (copy), v67 (copy), v68 (copy), v70 (copy), v72 (copy), name (copy), v74 (copy), v75 (copy), v91 (copy), v71 (copy), EnumScreens (copy), v77 (copy), v69 (copy), v84 (copy), v83 (copy), renderCard (copy)
-		local v109 = Cryo.Dictionary.join(v66, {
-			details = v67,
-			playabilityStatus = v68,
-			gameIcon = v70,
-			placeId = v72,
+		noDescriptionText = "Feature.Chat.Label.NoDescriptionYet",
+		previewText = "Feature.ExperienceDetails.PlayButtonText.Playtest"
+	})(function(p2)
+		local join = Cryo.Dictionary.join
+		local v12 = {
+			details = details,
+			playabilityStatus = playabilityStatus,
+			gameIcon = formatted,
+			placeId = placeId,
 			gameName = name,
-			gameDescription = v74,
-			gamePrice = v75,
-			isPlayButtonEnabled = v91,
-			viewDetailsEnabled = v71[EnumScreens.GameDetail],
-			fetchGameData = v77,
-			gameThumbnail = v69,
-			gameRating = v84,
-			gamePlayerCount = v67.playing or 0,
-			votesStatus = v83
-		})
+			gameDescription = description,
+			gamePrice = price,
+			isPlayButtonEnabled = true,
+			viewDetailsEnabled = v4[EnumScreens.GameDetail],
+			fetchGameData = fn,
+			gameThumbnail = gameThumbnail,
+			gameRating = gameRating,
+			gamePlayerCount = details.playing or 0,
+			votesStatus = votesStatus,
+			playButtonLabel = 0
+		}
+		local playButtonLabel
 
-		return renderCard(v109)
+		if FFlagAppChatEarlyTestingLinks and joined.isEarlyTesting then
+			playButtonLabel = p2.previewText
+		end
+
+		v12.playButtonLabel = playButtonLabel
+		return renderCard(join(joined, v12))
 	end)
 end
 
-return RoactServices.connect({
+return roactServices.connect({
 	game = AppGame,
 	sessionService = AppSessionService,
 	analytics = RoactAnalyticsCommonGameEvents

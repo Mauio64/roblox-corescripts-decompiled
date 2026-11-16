@@ -1,23 +1,23 @@
-local function filter(p1, p2) -- line: 2
-	local v4 = type(p1)
+local function filter(list, callback)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+	local typeName2 = type(callback)
+	assert(typeName2 == "function", "expected a function for second argument, got " .. typeName2)
 
-	local v5 = type(p2)
+	local result = {}
+	local v = 1
 
-	assert(v5 == "function", "expected a function for second argument, got " .. v5)
-
-	local t1 = {}
-	local n1 = 1
-
-	for i = 1, #p1 do
-		if p2(p1[i], i) then
-			t1[n1] = p1[i]
-			n1 += 1
+	for i = 1, #list do
+		if not callback(list[i], i) then
+			continue
 		end
+
+		result[v] = list[i]
+		v += 1
 	end
 
-	return t1
+	return result
 end
 
 return filter

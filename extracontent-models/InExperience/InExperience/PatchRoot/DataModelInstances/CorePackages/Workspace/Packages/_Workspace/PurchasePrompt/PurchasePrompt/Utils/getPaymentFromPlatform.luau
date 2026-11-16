@@ -1,34 +1,44 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
+local parent = PurchasePrompt.Parent
+
 local PaymentPlatform = require(PurchasePrompt.Enums.PaymentPlatform)
 local GetFFlagEnablePalisadesPaymentsPlatform = require(PurchasePrompt.Flags.GetFFlagEnablePalisadesPaymentsPlatform)
-local FFlagEnableMicrosoftStorePaymentsPlatform = require(PurchasePromptParent.SharedFlags).FFlagEnableMicrosoftStorePaymentsPlatform
-local FFlagEnableMilkyWayPaymentsPlatformV2 = require(PurchasePromptParent.SharedFlags).FFlagEnableMilkyWayPaymentsPlatformV2
-local getAppFeaturePolicies = require(PurchasePromptParent.UniversalAppPolicy).getAppFeaturePolicies
+local FFlagEnablePioneerPaymentsPlatform = require(PurchasePrompt.Flags.FFlagEnablePioneerPaymentsPlatform)
+local getIsPioneerBuild = require(PurchasePrompt.Utils.getIsPioneerBuild)
 
-return function(p1, p2, p3, p4) -- line: 17
-	-- upvalues: PaymentPlatform (copy), FFlagEnableMicrosoftStorePaymentsPlatform (copy), getAppFeaturePolicies (copy), FFlagEnableMilkyWayPaymentsPlatformV2 (copy), GetFFlagEnablePalisadesPaymentsPlatform (copy)
-	if p1 == Enum.Platform.XBoxOne then
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableMicrosoftStorePaymentsPlatform = SharedFlags.FFlagEnableMicrosoftStorePaymentsPlatform
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnableMilkyWayPaymentsPlatformV2 = SharedFlags2.FFlagEnableMilkyWayPaymentsPlatformV2
+
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
+
+return function(p, p2, p3, p4)
+	if p == Enum.Platform.XBoxOne then
 		return PaymentPlatform.Xbox
 	end
 
-	if p1 == Enum.Platform.IOS then
+	if p == Enum.Platform.IOS then
 		if p2 then
 			return PaymentPlatform.Midas
 		end
 
 		return PaymentPlatform.Apple
-	end
+	elseif p == Enum.Platform.Windows or p == Enum.Platform.OSX or p == Enum.Platform.Linux then
+		if FFlagEnablePioneerPaymentsPlatform and getIsPioneerBuild() then
+			return PaymentPlatform.Pioneer
+		end
 
-	if p1 == Enum.Platform.Windows or p1 == Enum.Platform.OSX or p1 == Enum.Platform.Linux then
-		if FFlagEnableMicrosoftStorePaymentsPlatform and getAppFeaturePolicies().getUsePaymentPlatformMicrosoftStore() then
+		if
+			FFlagEnableMicrosoftStorePaymentsPlatform
+			and getAppFeaturePolicies().getUsePaymentPlatformMicrosoftStore()
+		then
 			return PaymentPlatform.Microsoft
 		end
 
 		return PaymentPlatform.Web
-	end
-
-	if p1 == Enum.Platform.Android then
+	elseif p == Enum.Platform.Android then
 		if p2 then
 			return PaymentPlatform.Midas
 		end
@@ -46,15 +56,15 @@ return function(p1, p2, p3, p4) -- line: 17
 		end
 
 		return PaymentPlatform.Google
-	end
+	else
+		if p == Enum.Platform.UWP then
+			return PaymentPlatform.UWP
+		end
 
-	if p1 == Enum.Platform.UWP then
-		return PaymentPlatform.UWP
-	end
+		if GetFFlagEnablePalisadesPaymentsPlatform() and (p == Enum.Platform.PS4 or p == Enum.Platform.PS5) then
+			return PaymentPlatform.Palisades
+		end
 
-	if GetFFlagEnablePalisadesPaymentsPlatform() and (p1 == Enum.Platform.PS4 or p1 == Enum.Platform.PS5) then
-		return PaymentPlatform.Palisades
+		return PaymentPlatform.None
 	end
-
-	return PaymentPlatform.None
 end

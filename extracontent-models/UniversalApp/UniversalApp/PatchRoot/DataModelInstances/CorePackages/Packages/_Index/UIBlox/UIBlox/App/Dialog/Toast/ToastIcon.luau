@@ -1,14 +1,17 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local Cryo = require(ParentParentParent.Cryo)
-local t = require(ParentParentParent.t)
-local ImageSetComponent = require(ParentParent.Core.ImageSet.ImageSetComponent)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local v9 = Roact.PureComponent:extend("ToastIcon")
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-v9.validateProps = t.interface({
+local Roact = require(parent2.Roact)
+local Cryo = require(parent2.Cryo)
+local t = require(parent2.t)
+
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+local withStyle = require(parent.Core.Style.withStyle)
+
+local extended = Roact.PureComponent:extend("ToastIcon")
+
+extended.validateProps = t.interface({
 	Image = t.union(t.table, t.string, t.callback),
 	Size = t.UDim2,
 	AnchorPoint = t.optional(t.Vector2),
@@ -16,31 +19,30 @@ v9.validateProps = t.interface({
 	LayoutOrder = t.optional(t.integer),
 	Position = t.optional(t.UDim2)
 })
-v9.defaultProps = {
-	BackgroundTransparency = 1
-}
 
-function v9.render(p1) -- line: 34
-	-- upvalues: withStyle (copy), Cryo (copy), Roact (copy), ImageSetComponent (copy)
-	return withStyle(function(p2) -- line: 35
-		-- upvalues: p1 (copy), Cryo (copy), Roact (copy), ImageSetComponent (copy)
-		local Theme = p2.Theme
-		local colorStyle = p1.props.colorStyle
+extended.defaultProps = { BackgroundTransparency = 1 }
 
-		if colorStyle == nil then
-			colorStyle = Theme.IconEmphasis
+function extended.render(p)
+	return withStyle(function(p2)
+		local theme = p2.Theme
+
+		local v = p.props.colorStyle
+
+		if v == nil then
+			v = theme.IconEmphasis
 		end
 
-		local colorStyleColor = colorStyle.Color
-		local colorStyleTransparency = colorStyle.Transparency
-		local v16 = Cryo.Dictionary.join(p1.props, {
+		local color = v.Color
+		local transparency = v.Transparency
+
+		local joined = Cryo.Dictionary.join(p.props, {
 			colorStyle = Cryo.None,
-			ImageColor3 = colorStyleColor,
-			ImageTransparency = colorStyleTransparency
+			ImageColor3 = color,
+			ImageTransparency = transparency
 		})
 
-		return Roact.createElement(ImageSetComponent.Label, v16)
+		return Roact.createElement(ImageSetComponent.Label, joined)
 	end)
 end
 
-return v9
+return extended

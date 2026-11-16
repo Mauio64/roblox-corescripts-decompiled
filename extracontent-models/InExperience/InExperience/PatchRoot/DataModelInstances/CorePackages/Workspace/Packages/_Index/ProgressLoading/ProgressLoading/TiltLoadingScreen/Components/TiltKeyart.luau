@@ -1,96 +1,134 @@
 local TiltLoadingScreen = script:FindFirstAncestor("TiltLoadingScreen")
-local ParentParent = TiltLoadingScreen.Parent.Parent
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
+local parent = TiltLoadingScreen.Parent.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationImage = Foundation.Image
+local Image = Foundation.Image
 local Skeleton = Foundation.Skeleton
 local useTokens = Foundation.Hooks.useTokens
-local TILT_DEGREES = require(TiltLoadingScreen.Constants).KEYART.TILT_DEGREES
+
+local Constants = require(TiltLoadingScreen.Constants)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLoadingScreenMilestones = SharedFlags.FFlagLoadingScreenMilestones
+local TILT_DEGREES = Constants.KEYART.TILT_DEGREES
 
 require(TiltLoadingScreen.Types)
 
-local t1 = {
+local v = {
 	rotation = React.createBinding(TILT_DEGREES),
 	sizeScale = React.createBinding(1),
 	coverTransparency = React.createBinding(1)
 }
-local t2 = {
+
+local v2 = {
 	rotation = React.createBinding(-TILT_DEGREES),
 	sizeScale = React.createBinding(1),
 	groupTransparency = React.createBinding(0)
 }
 
-local function TiltKeyart(p1) -- line: 29
-	-- upvalues: useTokens (copy), React (copy), t1 (copy), t2 (copy), TILT_DEGREES (copy), View (copy), Skeleton (copy), FoundationImage (copy)
-	local v14 = useTokens()
-	local v15, v16 = React.useState(false)
-	local v17 = p1.keyart or t1
-	local v18 = p1.frame or t2
-	local v19 = v14.Size.Size_2400 * 2
-	local v20 = v19 / (math.cos((math.rad(TILT_DEGREES))) + math.sin((math.rad(TILT_DEGREES))))
-	local v21 = React.useCallback(function(p2) -- line: 38
-		-- upvalues: v16 (copy)
-		if p2 == Enum.AssetFetchStatus.Success then
-			v16(true)
+local function TiltKeyart(props)
+	local v3 = useTokens()
+	local state, setState = React.useState(false)
+	local keyart = props.keyart or v
+	local frame = props.frame or v2
+
+	local v4 = v3.Size.Size_2400 * 2
+	local v5 = v4 / (math.cos((math.rad(TILT_DEGREES))) + math.sin((math.rad(TILT_DEGREES))))
+
+	local onLoaded = React.useCallback(function(p)
+		if p == Enum.AssetFetchStatus.Success then
+			setState(true)
 		end
 	end, {})
 
-	return React.createElement(View, {
-		testId = "tilt-keyart",
-		Size = UDim2.fromOffset(v19, v19)
-	}, {
+	if FFlagLoadingScreenMilestones then
+		React.useEffect(function()
+			local onThumbnailLoaded = props.onThumbnailLoaded
+
+			if not onThumbnailLoaded then
+				return
+			end
+
+			if state and props.thumbnailUrl ~= "" then
+				onThumbnailLoaded(props.thumbnailUrl)
+			end
+
+			return function()
+				onThumbnailLoaded(nil)
+			end
+		end, { state, props.thumbnailUrl, props.onThumbnailLoaded })
+	end
+
+	local createElement = React.createElement
+	local v6 = { Size = UDim2.fromOffset(v4, v4), testId = "tilt-keyart" }
+
+	local v7 = {
 		Square = React.createElement(View, {
 			tag = "position-center-center anchor-center-center stroke-standard stroke-system-neutral",
 			testId = "tilt-keyart-frame",
-			ZIndex = 1,
-			Size = v18.sizeScale:map(function(p3) -- line: 51
-				-- upvalues: v20 (copy)
-				return UDim2.fromOffset(v20 * p3, v20 * p3)
+			Size = frame.sizeScale:map(function(p)
+				return UDim2.fromOffset(v5 * p, v5 * p)
 			end),
-			Rotation = v18.rotation,
-			GroupTransparency = v18.groupTransparency,
-			Visible = v18.groupTransparency:map(function(p4) -- line: 56
-				return p4 < 1
-			end)
+			Rotation = frame.rotation,
+			GroupTransparency = frame.groupTransparency,
+			Visible = frame.groupTransparency:map(function(p): boolean
+				return p < 1
+			end),
+			ZIndex = 1
 		}),
-		Keyart = React.createElement(View, {
-			tag = "position-center-center anchor-center-center",
-			testId = "tilt-keyart-card",
+		Keyart = 0
+	}
+
+	local createElement2 = React.createElement
+	local v8 = {
+		tag = "position-center-center anchor-center-center",
+		testId = "tilt-keyart-card",
+		Size = keyart.sizeScale:map(function(p)
+			return UDim2.fromOffset(v5 * p, v5 * p)
+		end),
+		Rotation = keyart.rotation,
+		ZIndex = 2
+	}
+	local thumbnailSkeleton
+
+	if not state then
+		thumbnailSkeleton = React.createElement(Skeleton, {
+			tag = "size-full",
+			ZIndex = 1,
+			testId = "tilt-keyart-skeleton"
+		})
+	end
+
+	local thumbnail
+
+	if props.thumbnailUrl ~= "" then
+		thumbnail = React.createElement(Image, {
+			tag = "size-full radius-small",
+			Image = props.thumbnailUrl,
+			ScaleType = Enum.ScaleType.Crop,
+			ImageTransparency = state and 0 or 1,
+			onLoaded = onLoaded,
 			ZIndex = 2,
-			Size = v17.sizeScale:map(function(p5) -- line: 64
-				-- upvalues: v20 (copy)
-				return UDim2.fromOffset(v20 * p5, v20 * p5)
+			testId = "tilt-keyart-thumbnail"
+		})
+	end
+
+	v7.Keyart = createElement2(View, v8, {
+		ThumbnailSkeleton = thumbnailSkeleton,
+		Thumbnail = thumbnail,
+		RevealCover = React.createElement(View, {
+			tag = "size-full",
+			backgroundStyle = keyart.coverTransparency:map(function(transparency)
+				return {
+					Color3 = v3.Color.Extended.Black.Black_100.Color3,
+					Transparency = transparency
+				}
 			end),
-			Rotation = v17.rotation
-		}, {
-			ThumbnailSkeleton = if v15 then nil else React.createElement(Skeleton, {
-				tag = "size-full",
-				ZIndex = 1,
-				testId = "tilt-keyart-skeleton"
-			}),
-			Thumbnail = if p1.thumbnailUrl == "" then nil else React.createElement(FoundationImage, {
-				tag = "size-full radius-small",
-				ZIndex = 2,
-				testId = "tilt-keyart-thumbnail",
-				Image = p1.thumbnailUrl,
-				ScaleType = Enum.ScaleType.Crop,
-				ImageTransparency = not v15 and 1 or 0,
-				onLoaded = v21
-			}),
-			RevealCover = React.createElement(View, {
-				tag = "size-full",
-				ZIndex = 3,
-				backgroundStyle = v17.coverTransparency:map(function(p6) -- line: 90
-					-- upvalues: v14 (copy)
-					return {
-						Color3 = v14.Color.Extended.Black.Black_100.Color3,
-						Transparency = p6
-					}
-				end)
-			})
+			ZIndex = 3
 		})
 	})
+	return createElement(View, v6, v7)
 end
 
 return React.memo(TiltKeyart)

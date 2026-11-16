@@ -1,16 +1,14 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-require(Parent.AppChatNetworking)
+local Cryo = require(parent.Cryo)
+require(parent.AppChatNetworking)
 
 local buildConversationMessageFromApi = require(script.Parent.buildConversationMessageFromApi)
 
-local function buildValidMessages(s1: string, t1: {[any]: any}) -- line: 17
-	-- upvalues: Cryo (copy), buildConversationMessageFromApi (copy)
-	return Cryo.List.filterMap(t1, function(p1) -- line: 18
-		-- upvalues: buildConversationMessageFromApi (copy), s1 (copy)
-		if p1 and p1.id then
-			return buildConversationMessageFromApi(p1, s1)
+local function buildValidMessages(p: string, p2)
+	return Cryo.List.filterMap(p2, function(p3)
+		if p3 and p3.id then
+			return buildConversationMessageFromApi(p3, p)
 		end
 
 		return nil

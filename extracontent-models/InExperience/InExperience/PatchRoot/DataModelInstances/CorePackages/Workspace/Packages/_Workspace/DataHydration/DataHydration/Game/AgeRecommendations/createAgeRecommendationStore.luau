@@ -1,105 +1,114 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+local parent = DataHydration.Parent
+
+local DiscoveryUtils = require(parent.DiscoveryUtils)
 local logResponseError = DiscoveryUtils.logResponseError
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
-
 local fetchAgeRecommendation = require(script.Parent.fetchAgeRecommendation)
 local AgeRecommendationStoreTypes = require(script.Parent.AgeRecommendationStoreTypes)
-local FFlagSduiExperienceDetailsSupport = require(DataHydrationParent.SharedFlags).FFlagSduiExperienceDetailsSupport
 
-local function createAgeRecommendationStore() -- line: 18
-	-- upvalues: createDataCache (copy), createDataResolver (copy), logResponseError (copy), DiscoveryEventErrorLogger (copy), fetchAgeRecommendation (copy), AgeRecommendationStoreTypes (copy), FFlagSduiExperienceDetailsSupport (copy)
-	local v12 = createDataCache()
-	local v13 = createDataResolver({
+local SharedFlags = require(parent.SharedFlags)
+local FFlagShowGameAgeRating = SharedFlags.FFlagShowGameAgeRating
+
+local function createAgeRecommendationStore()
+	local dataCache = createDataCache()
+
+	local dataResolver = createDataResolver({
+		cache = dataCache,
 		requestBatchSize = 1,
-		cache = v12,
-		logError = function(p1) -- line: 25
-			-- upvalues: logResponseError (copy), DiscoveryEventErrorLogger (copy)
-			if type(p1) == "table" then
-				if p1.responseCode then
+		logError = function(data)
+			if type(data) == "table" then
+				if data.responseCode then
 					logResponseError("experience-guidelines-api/get-age-recommendation", {
-						StatusCode = tonumber(p1.responseCode)
+						StatusCode = tonumber(data.responseCode)
 					})
 				end
 
-				if p1.errorType and p1.errorMessage then
-					DiscoveryEventErrorLogger.reportError(p1.errorType, p1.errorMessage, p1.customFields)
-
-					return
+				if data.errorType and data.errorMessage then
+					DiscoveryEventErrorLogger.reportError(data.errorType, data.errorMessage, data.customFields)
 				end
 			else
-				DiscoveryEventErrorLogger.reportError("FetchAgeRecommendationError", (tostring(p1)))
+				DiscoveryEventErrorLogger.reportError("FetchAgeRecommendationError", (tostring(data)))
 			end
 		end,
-		fetchFn = function(t1: {[any]: any}) -- line: 45
-			-- upvalues: fetchAgeRecommendation (copy), AgeRecommendationStoreTypes (copy), FFlagSduiExperienceDetailsSupport (copy)
-			local v16 = next(t1)
+		fetchFn = function(items)
+			local universeId = next(items)
 
-			if not v16 then
+			if not universeId then
 				error({
 					errorType = "CreateAgeRecommendationStoreMissingUniverseId",
 					errorMessage = "CreateAgeRecommendationStore requires universeId",
-					customFields = {
-						universeId = v16
-					}
+					customFields = { universeId = universeId }
 				})
 			end
 
-			return fetchAgeRecommendation(v16):andThen(function(p2) -- line: 57
-				-- upvalues: v16 (copy), AgeRecommendationStoreTypes (copy), FFlagSduiExperienceDetailsSupport (copy)
-				if not p2 or not p2.responseBody then
+			return fetchAgeRecommendation(universeId):andThen(function(p)
+				if not (p and p.responseBody) then
 					error({
+						responseCode = p and p.responseCode,
 						errorType = "FetchAgeRecommendationResponseError",
-						responseCode = p2 and p2.responseCode,
-						errorMessage = not p2 and "No response" or "Missing response body",
-						customFields = {
-							universeId = v16
-						}
+						errorMessage = p and "Missing response body" or "No response",
+						customFields = { universeId = universeId }
 					})
 				end
 
-				local v18, v19 = AgeRecommendationStoreTypes.ageRecommendationResponseValidator(p2.responseBody)
+				local ageRecommendationResponseValidator, errorMessage = AgeRecommendationStoreTypes.ageRecommendationResponseValidator(p.responseBody)
 
-				if not v18 then
+				if not ageRecommendationResponseValidator then
 					error({
+						responseCode = p.responseCode,
 						errorType = "FetchAgeRecommendationResponseInvalidInterface",
-						responseCode = p2.responseCode,
-						errorMessage = v19,
-						customFields = {
-							universeId = v16
-						}
+						errorMessage = errorMessage,
+						customFields = { universeId = universeId }
 					})
 				end
 
-				local t2 = {}
-				local ageRecommendation = p2.responseBody.ageRecommendationDetails.summary.ageRecommendation
+				local v = {}
 
-				t2[v16] = {
+				local ageRecommendation = p.responseBody.ageRecommendationDetails.summary.ageRecommendation
+
+				if FFlagShowGameAgeRating and not ageRecommendation then
+					v[universeId] = {}
+					return v
+				end
+
+				local v2 = {
 					displayName = ageRecommendation.displayName,
 					displayNameWithHeaderShort = ageRecommendation.displayNameWithHeaderShort,
-					igrsRating = if not FFlagSduiExperienceDetailsSupport then nil else ageRecommendation.igrsRating,
-					igrsRatingDisplayMessage = if not FFlagSduiExperienceDetailsSupport then nil else ageRecommendation.igrsRatingDisplayMessage
+					minimumAgeDisplay = 0,
+					igrsRating = 0,
+					igrsRatingDisplayMessage = 0
 				}
+				local minimumAgeDisplay
 
-				return t2
-			end):catch(function(p3) -- line: 94
-				error(p3)
+				if FFlagShowGameAgeRating then
+					minimumAgeDisplay = ageRecommendation.minimumAgeDisplay
+				end
+
+				v2.minimumAgeDisplay = minimumAgeDisplay
+
+				v2.igrsRating = ageRecommendation.igrsRating
+				v2.igrsRatingDisplayMessage = ageRecommendation.igrsRatingDisplayMessage
+				v[universeId] = v2
+
+				return v
+			end):catch(function(message)
+				error(message)
 			end)
 		end
 	})
 
 	return {
-		fetchAgeRecommendation = v13.fetchItem,
-		getAgeRecommendation = v13.getCachedItem,
-		getAndFetchAgeRecommendation = v13.getAndFetchItem,
-		updateAgeRecommendations = if not FFlagSduiExperienceDetailsSupport then nil else v12.updateItems,
-		clear = v13.clear,
-		dispose = v13.dispose
+		fetchAgeRecommendation = dataResolver.fetchItem,
+		getAgeRecommendation = dataResolver.getCachedItem,
+		getAndFetchAgeRecommendation = dataResolver.getAndFetchItem,
+		updateAgeRecommendations = dataCache.updateItems,
+		clear = dataResolver.clear,
+		dispose = dataResolver.dispose
 	}
 end
 

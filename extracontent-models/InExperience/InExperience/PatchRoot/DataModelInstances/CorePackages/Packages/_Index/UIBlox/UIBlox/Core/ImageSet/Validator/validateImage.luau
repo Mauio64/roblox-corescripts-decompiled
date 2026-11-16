@@ -1,6 +1,8 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent.Parent
-local t = require(ParentParent.t)
-local validateImageSetData = require(scriptParent.validateImageSetData)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent.Parent
+
+local t = require(parent2.t)
+
+local validateImageSetData = require(parent.validateImageSetData)
 
 return t.union(t.string, validateImageSetData)

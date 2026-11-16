@@ -1,34 +1,30 @@
-local ParentParent = script.Parent.Parent
-local None = require(ParentParent.Object.None)
+local parent = script.Parent.Parent
+local None = require(parent.Object.None)
+require(parent.types)
 
-require(ParentParent.types)
-
-local function v3(p1, p2) -- line: 7
-	return type(p1) .. tostring(p1) < type(p2) .. tostring(p2)
+local function fn(p, p2): boolean
+	return type(p) .. tostring(p) < type(p2) .. tostring(p2)
 end
 
-return function(p3, p4: ((...any) -> ...any)?) -- line: 11
-	-- upvalues: v3 (copy), None (copy)
-	local v8 = v3
+return function(list, callback)
+	local v = fn
 
-	if p4 ~= nil and p4 ~= None then
-		if typeof(p4) ~= "function" then
+	if callback ~= nil and callback ~= None then
+		if typeof(callback) ~= "function" then
 			error("invalid argument to Array.sort: compareFunction must be a function")
 		end
 
-		function v8(p5, p6) -- line: 18
-			-- upvalues: p4 (copy)
-			local v11 = p4(p5, p6)
+		v = function(p, p2): boolean
+			local v2 = callback(p, p2)
 
-			if typeof(v11) ~= "number" then
-				error(("invalid result from compare function, expected number but got %s"):format((typeof(v11))))
+			if typeof(v2) ~= "number" then
+				error(("invalid result from compare function, expected number but got %s"):format((typeof(v2))))
 			end
 
-			return v11 < 0
+			return v2 < 0
 		end
 	end
 
-	table.sort(p3, v8)
-
-	return p3
+	table.sort(list, v)
+	return list
 end

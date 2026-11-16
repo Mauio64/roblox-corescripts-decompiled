@@ -1,82 +1,77 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local Constants = require(parent.Constants)
+local ConstantsInterface = require(parent.ConstantsInterface)
 
-local Constants = require(ParentParent.Constants)
-local ConstantsInterface = require(ParentParent.ConstantsInterface)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local isMeshPartAccessory = require(ParentParent.util.isMeshPartAccessory)
-local isLayeredClothing = require(ParentParent.util.isLayeredClothing)
-local validateLayeredClothingAccessory = require(ParentParent.validation.validateLayeredClothingAccessory)
-local validateLegacyAccessory = require(ParentParent.validation.validateLegacyAccessory)
-local validateMeshPartAccessory = require(ParentParent.validation.validateMeshPartAccessory)
-local validateMakeupAsset = require(ParentParent.validation.validateMakeupAsset)
-local validateLimbsAndTorso = require(ParentParent.validation.validateLimbsAndTorso)
-local validateDynamicHeadMeshPartFormat = require(ParentParent.validation.validateDynamicHeadMeshPartFormat)
-local validatePackage = require(ParentParent.validation.validatePackage)
-local ValidateEmoteAnimation = require(ParentParent.validation.ValidateEmoteAnimation)
+local isMeshPartAccessory = require(parent.util.isMeshPartAccessory)
+local isLayeredClothing = require(parent.util.isLayeredClothing)
 
-local function validateBodyPartInternal(p1) -- line: 21
-	-- upvalues: ConstantsInterface (copy), validateDynamicHeadMeshPartFormat (copy), validateLimbsAndTorso (copy)
-	local assetTypeEnum = p1.assetTypeEnum
+local validateLayeredClothingAccessory = require(parent.validation.validateLayeredClothingAccessory)
+local validateLegacyAccessory = require(parent.validation.validateLegacyAccessory)
+local validateMeshPartAccessory = require(parent.validation.validateMeshPartAccessory)
+local validateMakeupAsset = require(parent.validation.validateMakeupAsset)
+local validateLimbsAndTorso = require(parent.validation.validateLimbsAndTorso)
+local validateDynamicHeadMeshPartFormat = require(parent.validation.validateDynamicHeadMeshPartFormat)
+local validatePackage = require(parent.validation.validatePackage)
+local ValidateEmoteAnimation = require(parent.validation.ValidateEmoteAnimation)
 
+local function validateBodyPartInternal(data)
+	local assetTypeEnum = data.assetTypeEnum
 	assert(assetTypeEnum ~= nil, "assetTypeEnum is required in validateBodyPartInternal")
 	assert(ConstantsInterface.isBodyPart(assetTypeEnum))
 
-	if assetTypeEnum == Enum.AssetType.DynamicHead then
-		return validateDynamicHeadMeshPartFormat(p1)
+	if Enum.AssetType.DynamicHead == assetTypeEnum then
+		return validateDynamicHeadMeshPartFormat(data)
 	end
 
-	return validateLimbsAndTorso(p1)
+	return validateLimbsAndTorso(data)
 end
-local function validateInternal(p2) -- line: 32
-	-- upvalues: getFFlagUGCValidationAnimationPackSupport (copy), Constants (copy), ValidateEmoteAnimation (copy), ConstantsInterface (copy), validateMakeupAsset (copy), validateBodyPartInternal (copy), validatePackage (copy), isMeshPartAccessory (copy), isLayeredClothing (copy), validateLayeredClothingAccessory (copy), validateMeshPartAccessory (copy), validateLegacyAccessory (copy)
-	assert(p2.instances ~= nil, "instances required in validationContext for validateInternal")
-	assert(p2.assetTypeEnum ~= nil, "assetTypeEnum required in validationContext for validateInternal")
 
-	local instances = p2.instances
-	local assetTypeEnum = p2.assetTypeEnum
-	local validateMeshPartAccessories = p2.validateMeshPartAccessories
+local function validateInternal(data)
+	assert(data.instances ~= nil, "instances required in validationContext for validateInternal")
+	assert(data.assetTypeEnum ~= nil, "assetTypeEnum required in validationContext for validateInternal")
+	local instances = data.instances
+	local assetTypeEnum = data.assetTypeEnum
+	local validateMeshPartAccessories = data.validateMeshPartAccessories
 
-	if getFFlagUGCValidationAnimationPackSupport() and Constants.ANIMATION_ASSET_INFO and Constants.ANIMATION_ASSET_INFO[assetTypeEnum] then
+	if Constants.ANIMATION_ASSET_INFO and Constants.ANIMATION_ASSET_INFO[assetTypeEnum] then
 		return true
 	end
 
 	if assetTypeEnum == Enum.AssetType.EmoteAnimation then
-		return ValidateEmoteAnimation.validate(p2)
+		return ValidateEmoteAnimation.validate(data)
 	end
 
 	if ConstantsInterface.isMakeupAsset(assetTypeEnum) then
-		return validateMakeupAsset(p2)
+		return validateMakeupAsset(data)
 	end
 
 	if ConstantsInterface.isBodyPart(assetTypeEnum) then
-		return validateBodyPartInternal(p2)
+		return validateBodyPartInternal(data)
 	end
 
 	if assetTypeEnum == Enum.AssetType.Model then
-		return validatePackage(p2)
+		return validatePackage(data)
 	end
 
 	if validateMeshPartAccessories then
-		local v23 = instances[1]
+		local instance = instances[1]
 
-		if isMeshPartAccessory(v23) then
-			if isLayeredClothing(v23) then
-				return validateLayeredClothingAccessory(p2)
-			end
-
-			return validateMeshPartAccessory(p2)
+		if not isMeshPartAccessory(instance) then
+			return validateLegacyAccessory(data)
 		end
 
-		return validateLegacyAccessory(p2)
-	end
+		if isLayeredClothing(instance) then
+			return validateLayeredClothingAccessory(data)
+		end
 
-	if isLayeredClothing(instances[1]) then
-		return validateLayeredClothingAccessory(p2)
+		return validateMeshPartAccessory(data)
+	elseif isLayeredClothing(instances[1]) then
+		return validateLayeredClothingAccessory(data)
+	else
+		return validateLegacyAccessory(data)
 	end
-
-	return validateLegacyAccessory(p2)
 end
 
 return validateInternal

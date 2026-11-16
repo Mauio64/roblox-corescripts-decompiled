@@ -1,74 +1,84 @@
-local t1 = {}
+local TokenBucketRateLimiter = {}
+TokenBucketRateLimiter.__index = TokenBucketRateLimiter
 
-t1.__index = t1
+function TokenBucketRateLimiter.new(data)
+	local object = setmetatable({}, TokenBucketRateLimiter)
 
-function t1.new(t2: {[any]: any}) -- line: 36
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
+	object.maxTokens = data.maxTokens
+	object.refillRate = data.refillRate
+	object.refillIntervalSeconds = data.refillIntervalSeconds
+	object.currentTokens = data.initialTokens or data.maxTokens
+	object.lastRefillTime = tick()
 
-	self.maxTokens = t2.maxTokens
-	self.refillRate = t2.refillRate
-	self.refillIntervalSeconds = t2.refillIntervalSeconds
-	self.currentTokens = t2.initialTokens or t2.maxTokens
-	self.lastRefillTime = tick()
-
-	if self.currentTokens > self.maxTokens then
-		self.currentTokens = self.maxTokens
+	if object.currentTokens > object.maxTokens then
+		object.currentTokens = object.maxTokens
 	end
 
-	return self
+	return object
 end
-function t1.refill(p1) -- line: 58
-	local timestamp = tick()
-	local v6 = timestamp - p1.lastRefillTime
 
-	if v6 < 0 then
-		p1.lastRefillTime = timestamp
+function TokenBucketRateLimiter:refill()
+	local now = tick()
+	local v = now - self.lastRefillTime
 
+	if v < 0 then
+		self.lastRefillTime = now
 		return
 	end
 
-	local v7 = math.floor(v6 / p1.refillIntervalSeconds)
+	local v2 = math.floor(v / self.refillIntervalSeconds)
 
-	if v7 > 0 then
-		local v8 = v7 * p1.refillRate
+	if v2 > 0 then
+		local v3 = v2 * self.refillRate
 
-		p1.currentTokens = math.min(p1.maxTokens, p1.currentTokens + v8)
-		p1.lastRefillTime = p1.lastRefillTime + v7 * p1.refillIntervalSeconds
+		self.currentTokens = math.min(self.maxTokens, self.currentTokens + v3)
+
+		self.lastRefillTime += v2 * self.refillIntervalSeconds
 	end
 end
-function t1.consume(t3: {[any]: any}, n1: number?) -- line: 93
-	local v11 = n1 or 1
 
-	t3:refill()
+function TokenBucketRateLimiter:consume(value: number?): boolean
+	local v = value or 1
 
-	if v11 <= t3.currentTokens then
-		t3.currentTokens = t3.currentTokens - v11
+	self:refill()
 
+	if v <= self.currentTokens then
+		self.currentTokens -= v
 		return true
 	end
 
 	return false
 end
-function t1.getAvailableTokens(p2) -- line: 113
-	p2:refill()
 
-	return p2.currentTokens
-end
-function t1.getMaxTokens(p3) -- line: 123
-	return p3.maxTokens
-end
-function t1.hasTokensAvailable(p4) -- line: 132
-	return p4:getAvailableTokens() > 0
-end
-function t1.reset(p5) -- line: 139
-	p5.currentTokens = p5.maxTokens
-	p5.lastRefillTime = tick()
-end
-function t1.toString(p6) -- line: 149
-	p6:refill()
-
-	return string.format("TokenBucketRateLimiter{tokens=%d/%d, refillRate=%d/%ds, nextRefillIn=%.1fs}", p6.currentTokens, p6.maxTokens, p6.refillRate, p6.refillIntervalSeconds, p6.refillIntervalSeconds - (tick() - p6.lastRefillTime) % p6.refillIntervalSeconds)
+function TokenBucketRateLimiter:getAvailableTokens()
+	self:refill()
+	return self.currentTokens
 end
 
-return t1
+function TokenBucketRateLimiter.getMaxTokens(p)
+	return p.maxTokens
+end
+
+function TokenBucketRateLimiter:hasTokensAvailable(): boolean
+	return self:getAvailableTokens() > 0
+end
+
+function TokenBucketRateLimiter:reset()
+	self.currentTokens = self.maxTokens
+	self.lastRefillTime = tick()
+end
+
+function TokenBucketRateLimiter:toString()
+	self:refill()
+
+	return string.format(
+		"TokenBucketRateLimiter{tokens=%d/%d, refillRate=%d/%ds, nextRefillIn=%.1fs}",
+		self.currentTokens,
+		self.maxTokens,
+		self.refillRate,
+		self.refillIntervalSeconds,
+		self.refillIntervalSeconds - (tick() - self.lastRefillTime) % self.refillIntervalSeconds
+	)
+end
+
+return TokenBucketRateLimiter

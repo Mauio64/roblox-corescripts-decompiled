@@ -1,21 +1,33 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
 local CorePackages = game:GetService("CorePackages")
+
 local TnSAvatarIdentification = require(CorePackages.Workspace.Packages.TnSAvatarIdentification)
 local TnSAdIdentification = require(CorePackages.Workspace.Packages.TnSAdIdentification)
+
 local HttpService = game:GetService("HttpService")
+
 local getAvatarsForPoint = TnSAvatarIdentification.AvatarIdentification.getAvatarsForPoint
 local getAvatarsForRegion = TnSAvatarIdentification.AvatarIdentification.getAvatarsForRegion
-local getAdsForPoint = TnSAdIdentification.AdIdentification.getAdsForPoint
-local GetFFlagReportAnythingEnableAdReport = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagReportAnythingEnableAdReport
-local GetFFlagGetHumanoidDescription = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagGetHumanoidDescription
-local GetFFlagRAEnableCircleRegion = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagRAEnableCircleRegion
-local GetFFlagGetHumanoidDescriptionUpdatesV2E = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagGetHumanoidDescriptionUpdatesV2E
-local getHumanoidDescription = require(AbuseReportMenu.ReportAnything.Utility.GetHumanoidDescription).getHumanoidDescription
 
+local getAdsForPoint = TnSAdIdentification.AdIdentification.getAdsForPoint
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagReportAnythingEnableAdReport = SharedFlags.GetFFlagReportAnythingEnableAdReport
+
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagGetHumanoidDescription = SharedFlags2.GetFFlagGetHumanoidDescription
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagRAEnableCircleRegion = SharedFlags3.GetFFlagRAEnableCircleRegion
+
+local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagGetHumanoidDescriptionUpdatesV2E = SharedFlags4.GetFFlagGetHumanoidDescriptionUpdatesV2E
+
+local GetHumanoidDescription = require(AbuseReportMenu.ReportAnything.Utility.GetHumanoidDescription)
+local getHumanoidDescription = GetHumanoidDescription.getHumanoidDescription
 require(AbuseReportMenu.Components.Types)
 require(AbuseReportMenu.ReportAnything.Utility.ReportAnythingAnalytics)
 
-local t1 = {
+local constants = {
 	Variant = {
 		CS = "ra/cs",
 		Sampling = "ra/sampling",
@@ -27,424 +39,481 @@ local t1 = {
 	}
 }
 
-local function v15(t2: {[any]: any}) -- line: 96
-	local t3 = {}
+local function fn(list)
+	local result = {}
 
-	for _, v in ipairs(t2) do
-		t3[#t3 + 1] = {
-			v.X,
-			v.Y
-		}
+	for _, item in ipairs(list) do
+		result[#result + 1] = { item.X, item.Y }
 	end
 
-	return t3
+	return result
 end
-local function v16(p1) -- line: 104
-	local t4 = {}
 
-	for _, v in pairs(p1) do
-		t4[#t4 + 1] = {
-			assetId = v.assetId,
-			distance = v.distance,
+local function fn2(items)
+	local result = {}
+
+	for _, item in pairs(items) do
+		result[#result + 1] = {
+			assetId = item.assetId,
+			distance = item.distance,
 			boundingBox = {
-				minX = v.boundingBox.min.X,
-				minY = v.boundingBox.min.Y,
-				maxX = v.boundingBox.max.X,
-				maxY = v.boundingBox.max.Y
+				minX = item.boundingBox.min.X,
+				minY = item.boundingBox.min.Y,
+				maxX = item.boundingBox.max.X,
+				maxY = item.boundingBox.max.Y
 			},
-			adUnitName = v.adUnitName,
-			encryptedAdTrackingData = v.encryptedAdTrackingData,
-			encryptionMetadata = v.encryptionMetadata
+			adUnitName = item.adUnitName,
+			encryptedAdTrackingData = item.encryptedAdTrackingData,
+			encryptionMetadata = item.encryptionMetadata
 		}
 	end
 
-	return t4
+	return result
 end
-local function v17(p2) -- line: 125
-	-- upvalues: v15 (copy)
-	local t5 = {}
 
-	for k, v in pairs(p2) do
-		t5[#t5 + 1] = {
+local function fn3(identifiedAvatars)
+	local result = {}
+
+	for k, item in pairs(identifiedAvatars) do
+		result[#result + 1] = {
 			userId = tostring(k),
-			distance = v.distance,
+			distance = item.distance,
 			boundingBox = {
-				minX = v.boundingBox.min.X,
-				minY = v.boundingBox.min.Y,
-				maxX = v.boundingBox.max.X,
-				maxY = v.boundingBox.max.Y
+				minX = item.boundingBox.min.X,
+				minY = item.boundingBox.min.Y,
+				maxX = item.boundingBox.max.X,
+				maxY = item.boundingBox.max.Y
 			},
-			hitRate = v.hitRate,
-			convexHull = v15(v.convexHull)
+			hitRate = item.hitRate,
+			convexHull = fn(item.convexHull)
 		}
 
-		if v.pointProcessingStats ~= nil then
-			t5[#t5].pointProcessingStats = {
-				not v.pointProcessingStats.wasSkipped and 0 or 1,
-				v.pointProcessingStats.total,
-				v.pointProcessingStats.offScreenDiscardCount,
-				v.pointProcessingStats.tooCloseDiscardCount
+		if item.pointProcessingStats ~= nil then
+			result[#result].pointProcessingStats = {
+				item.pointProcessingStats.wasSkipped and 1 or 0,
+				item.pointProcessingStats.total,
+				item.pointProcessingStats.offScreenDiscardCount,
+				item.pointProcessingStats.tooCloseDiscardCount
 			}
 		end
 	end
 
-	return t5
+	return result
 end
-local function v18(p3) -- line: 177
-	-- upvalues: GetFFlagRAEnableCircleRegion (copy), getAvatarsForRegion (copy), getAvatarsForPoint (copy), GetFFlagReportAnythingEnableAdReport (copy), getAdsForPoint (copy)
-	local t6 = {}
-	local t7 = {}
-	local t8 = {}
-	local t9 = {}
 
-	for _, v in ipairs(p3.annotationPoints) do
-		local n1 = 1e999
-		local v47 = nil
-		local v48 = if not GetFFlagRAEnableCircleRegion() then getAvatarsForPoint(p3.identificationResults.identifiedAvatars, v) else getAvatarsForRegion(p3.identificationResults.identifiedAvatars, v, p3.annotationCircleRadius, p3.annotationAreaWidth, p3.annotationAreaHeight)
+local function fn4(data)
+	local set = {}
 
-		for k, _ in pairs(v48) do
-			local distance = p3.identificationResults.identifiedAvatars[k].distance
+	local result = {}
+	local set2 = {}
 
-			if distance < n1 then
-				n1 = distance
-				v47 = k
-			end
+	local players = {}
+
+	for _, annotationPoint in ipairs(data.annotationPoints) do
+		local v = 1e999
+		local v2 = nil
+		local v3
+
+		if GetFFlagRAEnableCircleRegion() then
+			v3 = getAvatarsForRegion(
+				data.identificationResults.identifiedAvatars,
+				annotationPoint,
+				data.annotationCircleRadius,
+				data.annotationAreaWidth,
+				data.annotationAreaHeight
+			)
+		else
+			v3 = getAvatarsForPoint(data.identificationResults.identifiedAvatars, annotationPoint)
 		end
 
-		local v52 = nil
+		for k, _ in pairs(v3) do
+			local distance = data.identificationResults.identifiedAvatars[k].distance
+
+			if not (distance < v) then
+				continue
+			end
+
+			v2 = k
+			v = distance
+		end
+
+		local v4 = nil
 
 		if GetFFlagReportAnythingEnableAdReport() then
-			local v53 = getAdsForPoint(p3.identificationResults.identifiedAds, v)
-			local n2 = 1e999
+			local adsForPoint = getAdsForPoint(data.identificationResults.identifiedAds, annotationPoint)
+			local v5 = 1e999
 
-			for k, _ in pairs(v53) do
-				local distance = p3.identificationResults.identifiedAds[k].distance
+			for k, _ in pairs(adsForPoint) do
+				local distance = data.identificationResults.identifiedAds[k].distance
 
-				if distance < n2 then
-					n2 = distance
-					v52 = k
+				if not (distance < v5) then
+					continue
 				end
+
+				v4 = k
+				v5 = distance
 			end
 		end
 
-		if v47 ~= nil and not t6[v47] then
-			t6[v47] = true
-			t8[#t8 + 1] = p3.identificationResults.identifiedAvatars[v47].player
-		elseif GetFFlagReportAnythingEnableAdReport() and v52 ~= nil and not t7[v52] then
-			t7[v52] = true
-			t9[#t9 + 1] = p3.identificationResults.identifiedAds[v52]
+		if v2 == nil or set2[v2] then
+			if GetFFlagReportAnythingEnableAdReport() and v4 ~= nil and not set[v4] then
+				set[v4] = true
+				result[#result + 1] = data.identificationResults.identifiedAds[v4]
+			end
+		else
+			set2[v2] = true
+			players[#players + 1] = data.identificationResults.identifiedAvatars[v2].player
 		end
 	end
 
-	return t8, t9
+	return players, result
 end
-local function v19(p4, _, t10: {[any]: any}) -- line: 242
-	-- upvalues: GetFFlagReportAnythingEnableAdReport (copy), HttpService (copy), v17 (copy), v16 (copy), v15 (copy)
-	local v61 = false
 
-	for _, _ in pairs(p4.identificationResults.identifiedAvatars) do
-		v61 = true
+local function fn5(data, _, p)
+	local flag = false
 
+	for _, _ in pairs(data.identificationResults.identifiedAvatars) do
+		flag = true
 		break
 	end
 
-	local v64 = false
+	local v = false
 
 	if GetFFlagReportAnythingEnableAdReport() then
-		for _, _ in pairs(p4.identificationResults.identifiedAds) do
-			v64 = true
-
+		for _, _ in pairs(data.identificationResults.identifiedAds) do
+			v = true
 			break
 		end
 	end
 
-	if v61 then
-		t10.tags.IDENTIFIED_AVATARS = {
-			valueList = {{
-				data = HttpService:JSONEncode((v17(p4.identificationResults.identifiedAvatars)))
-			}}
+	if flag then
+		p.tags.IDENTIFIED_AVATARS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(fn3(data.identificationResults.identifiedAvatars))
+				}
+			}
 		}
 	end
 
-	if p4.identificationResults.avatarIDStats then
-		t10.tags.AVATAR_ID_STATS = {
-			valueList = {{
-				data = HttpService:JSONEncode(p4.identificationResults.avatarIDStats)
-			}}
+	if data.identificationResults.avatarIDStats then
+		p.tags.AVATAR_ID_STATS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(data.identificationResults.avatarIDStats)
+				}
+			}
 		}
 	end
 
-	if v64 and GetFFlagReportAnythingEnableAdReport() then
-		t10.tags.IDENTIFIED_ADS = {
-			valueList = {{
-				data = HttpService:JSONEncode((v16(p4.identificationResults.identifiedAds)))
-			}}
+	if v and GetFFlagReportAnythingEnableAdReport() then
+		p.tags.IDENTIFIED_ADS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(fn2(data.identificationResults.identifiedAds))
+				}
+			}
 		}
 	end
 
-	if p4.identificationResults.adIDStats and GetFFlagReportAnythingEnableAdReport() then
-		t10.tags.AD_ID_STATS = {
-			valueList = {{
-				data = HttpService:JSONEncode(p4.identificationResults.adIDStats)
-			}}
+	if data.identificationResults.adIDStats and GetFFlagReportAnythingEnableAdReport() then
+		p.tags.AD_ID_STATS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(data.identificationResults.adIDStats)
+				}
+			}
 		}
 	end
 
-	if #p4.screenshotId > 0 then
-		t10.tags.SCREENSHOT_ID = {
-			valueList = {{
-				data = p4.screenshotId
-			}}
+	if #data.screenshotId > 0 then
+		p.tags.SCREENSHOT_ID = {
+			valueList = {
+				{ data = data.screenshotId }
+			}
 		}
 	end
 
-	if #p4.annotationPoints > 0 then
-		t10.tags.RA_ANNOTATION_POINTS = {
-			valueList = {{
-				data = HttpService:JSONEncode((v15(p4.annotationPoints)))
-			}}
+	if #data.annotationPoints > 0 then
+		p.tags.RA_ANNOTATION_POINTS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(fn(data.annotationPoints))
+				}
+			}
 		}
 	end
 
-	t10.tags.RA_ANNOTATION_OPTION_SEEN = {
-		valueList = {{
-			data = tostring(p4.annotationOptionSeen)
-		}}
+	p.tags.RA_ANNOTATION_OPTION_SEEN = {
+		valueList = {
+			{
+				data = tostring(data.annotationOptionSeen)
+			}
+		}
 	}
-	t10.tags.RA_ANNOTATION_PAGE_SEEN = {
-		valueList = {{
-			data = tostring(p4.annotationPageSeen)
-		}}
+
+	p.tags.RA_ANNOTATION_PAGE_SEEN = {
+		valueList = {
+			{
+				data = tostring(data.annotationPageSeen)
+			}
+		}
 	}
 end
 
-return {
-	buildExperienceReportRequest = function(t11: {[any]: any}, p6, p7) -- line: 338
-		-- upvalues: t1 (copy), v18 (copy), v19 (copy), GetFFlagReportAnythingEnableAdReport (copy), HttpService (copy), v16 (copy)
-		local t12 = {
-			tags = {
-				ENTRY_POINT = {
-					valueList = {{
-						data = "in-experience"
-					}}
-				},
-				SUBMITTER_USER_ID = {
-					valueList = {{
-						data = tostring(t11.localUserId)
-					}}
-				},
-				REPORTED_ABUSE_CATEGORY = {
-					valueList = {{
-						data = t11.abuseReason
-					}}
-				},
-				PLACE_ID = {
-					valueList = {{
-						data = tostring(t11.placeId)
-					}}
-				},
-				REPORTER_COMMENT = {
-					valueList = {{
-						data = t11.abuseComment
-					}}
-				},
-				REPORTED_ABUSE_VECTOR = {
-					valueList = {{
-						data = "place"
-					}}
-				},
-				IN_EXP_MENU_ENTRY_POINT = {
-					valueList = {{
-						data = t11.menuEntryPoint
-					}}
-				},
-				VARIANT = {
-					valueList = {{
-						data = t11.variant or t1.Variant.CS
-					}}
+local AbuseReportBuilder = {}
+
+function AbuseReportBuilder.buildExperienceReportRequest(data, p, p2)
+	local v = {
+		tags = {
+			ENTRY_POINT = {
+				valueList = {
+					{ data = "in-experience" }
 				}
-			}
-		}
-		local _, v72 = v18(p6)
-
-		v19(p6, p7, t12)
-
-		if #v72 > 0 and GetFFlagReportAnythingEnableAdReport() then
-			t12.tags.REPORT_TARGET_ADS = {
-				valueList = {{
-					data = HttpService:JSONEncode((v16(v72)))
-				}}
-			}
-		end
-
-		return HttpService:JSONEncode(t12)
-	end,
-	buildOtherReportRequest = function(t13: {[any]: any}, p8, p9) -- line: 417
-		-- upvalues: t1 (copy), v18 (copy), v19 (copy), GetFFlagGetHumanoidDescription (copy), GetFFlagGetHumanoidDescriptionUpdatesV2E (copy), getHumanoidDescription (copy), HttpService (copy)
-		local t14 = {
-			tags = {
-				ENTRY_POINT = {
-					valueList = {{
-						data = "in-experience"
-					}}
-				},
-				SUBMITTER_USER_ID = {
-					valueList = {{
-						data = tostring(t13.localUserId)
-					}}
-				},
-				REPORTED_ABUSE_CATEGORY = {
-					valueList = {{
-						data = t13.abuseReason
-					}}
-				},
-				REPORTER_COMMENT = {
-					valueList = {{
-						data = t13.abuseComment
-					}}
-				},
-				REPORTED_ABUSE_VECTOR = {
-					valueList = {{
-						data = "avatar"
-					}}
-				},
-				IN_EXP_MENU_ENTRY_POINT = {
-					valueList = {{
-						data = t13.menuEntryPoint
-					}}
-				},
-				VARIANT = {
-					valueList = {{
-						data = t13.variant or t1.Variant.Unknown
-					}}
+			},
+			SUBMITTER_USER_ID = {
+				valueList = {
+					{ data = tostring(data.localUserId) }
 				}
-			}
-		}
-		local v77, _ = v18(p8)
-
-		v19(p8, p9, t14)
-
-		if #v77 > 0 then
-			local str = tostring(v77[1].UserId)
-			local t15 = {}
-
-			for _, v in ipairs(v77) do
-				t15[#t15 + 1] = tostring(v.UserId)
-			end
-
-			if GetFFlagGetHumanoidDescription() then
-				local UserId = v77[1].UserId
-				local humanoidDescription, humanoidDescriptionStatus
-
-				if GetFFlagGetHumanoidDescriptionUpdatesV2E() then
-					local v84 = p8.identificationResults.identifiedAvatars[UserId]
-
-					if v84 and v84.humanoidDescription and v84.humanoidDescriptionStatus == "OK" then
-						humanoidDescription = v84.humanoidDescription
-						humanoidDescriptionStatus = v84.humanoidDescriptionStatus
-					else
-						humanoidDescription, humanoidDescriptionStatus = getHumanoidDescription(UserId)
-					end
-				else
-					humanoidDescription, humanoidDescriptionStatus = getHumanoidDescription(UserId)
-				end
-
-				t14.tags.REPORT_TARGET_HUMANOID_DESCRIPTION = {
-					valueList = {{
-						data = HttpService:JSONEncode(humanoidDescription)
-					}}
+			},
+			REPORTED_ABUSE_CATEGORY = {
+				valueList = {
+					{ data = data.abuseReason }
 				}
-				t14.tags.REPORT_TARGET_HUMANOID_DESCRIPTION_STATUS = {
-					valueList = {{
-						data = humanoidDescriptionStatus
-					}}
+			},
+			PLACE_ID = {
+				valueList = {
+					{ data = tostring(data.placeId) }
 				}
-
-				local t16 = {}
-
-				for _, v in ipairs(v77) do
-					local UserId2 = v.UserId
-					local humanoidDescription2, humanoidDescriptionStatus2
-
-					if GetFFlagGetHumanoidDescriptionUpdatesV2E() then
-						local v91 = p8.identificationResults.identifiedAvatars[UserId2]
-
-						if v91 and v91.humanoidDescription and v91.humanoidDescriptionStatus == "OK" then
-							humanoidDescription2 = v91.humanoidDescription
-							humanoidDescriptionStatus2 = v91.humanoidDescriptionStatus
-						else
-							humanoidDescription2, humanoidDescriptionStatus2 = getHumanoidDescription(UserId2)
-						end
-					else
-						humanoidDescription2, humanoidDescriptionStatus2 = getHumanoidDescription(UserId2)
-					end
-
-					t16[#t16 + 1] = {
-						humanoidDescription = humanoidDescription2,
-						outputMessage = humanoidDescriptionStatus2
+			},
+			REPORTER_COMMENT = {
+				valueList = {
+					{ data = data.abuseComment }
+				}
+			},
+			REPORTED_ABUSE_VECTOR = {
+				valueList = {
+					{ data = "place" }
+				}
+			},
+			IN_EXP_MENU_ENTRY_POINT = {
+				valueList = {
+					{ data = data.menuEntryPoint }
+				}
+			},
+			VARIANT = {
+				valueList = {
+					{
+						data = data.variant or constants.Variant.CS
 					}
-				end
-
-				t14.tags.RA_ALL_ANNOTATED_HUMANOID_DESCRIPTIONS = {
-					valueList = {{
-						data = HttpService:JSONEncode(t16)
-					}}
 				}
+			}
+		}
+	}
+
+	local _, v2 = fn4(p)
+	fn5(p, p2, v)
+
+	if #v2 > 0 and GetFFlagReportAnythingEnableAdReport() then
+		v.tags.REPORT_TARGET_ADS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(fn2(v2))
+				}
+			}
+		}
+	end
+
+	return HttpService:JSONEncode(v)
+end
+
+function AbuseReportBuilder.buildOtherReportRequest(data, p, p2)
+	local v = {
+		tags = {
+			ENTRY_POINT = {
+				valueList = {
+					{ data = "in-experience" }
+				}
+			},
+			SUBMITTER_USER_ID = {
+				valueList = {
+					{ data = tostring(data.localUserId) }
+				}
+			},
+			REPORTED_ABUSE_CATEGORY = {
+				valueList = {
+					{ data = data.abuseReason }
+				}
+			},
+			REPORTER_COMMENT = {
+				valueList = {
+					{ data = data.abuseComment }
+				}
+			},
+			REPORTED_ABUSE_VECTOR = {
+				valueList = {
+					{ data = "avatar" }
+				}
+			},
+			IN_EXP_MENU_ENTRY_POINT = {
+				valueList = {
+					{ data = data.menuEntryPoint }
+				}
+			},
+			VARIANT = {
+				valueList = {
+					{
+						data = data.variant or constants.Variant.Unknown
+					}
+				}
+			}
+		}
+	}
+
+	local v2, _ = fn4(p)
+	fn5(p, p2, v)
+
+	if #v2 > 0 then
+		local userId = tostring(v2[1].UserId)
+		local userIds = {}
+
+		for _, v3 in ipairs(v2) do
+			userIds[#userIds + 1] = tostring(v3.UserId)
+		end
+
+		if GetFFlagGetHumanoidDescription() then
+			local userId2 = v2[1].UserId
+			local v3, v4
+
+			if GetFFlagGetHumanoidDescriptionUpdatesV2E() then
+				local identifiedAvatar = p.identificationResults.identifiedAvatars[userId2]
+
+				if
+					identifiedAvatar
+					and identifiedAvatar.humanoidDescription
+					and identifiedAvatar.humanoidDescriptionStatus == "OK"
+				then
+					v3 = identifiedAvatar.humanoidDescription
+					v4 = identifiedAvatar.humanoidDescriptionStatus
+				else
+					v3, v4 = getHumanoidDescription(userId2)
+				end
+			else
+				v3, v4 = getHumanoidDescription(userId2)
 			end
 
-			t14.tags.REPORT_TARGET_USER_ID = {
-				valueList = {{
-					data = tostring(str)
-				}}
+			v.tags.REPORT_TARGET_HUMANOID_DESCRIPTION = {
+				valueList = {
+					{ data = HttpService:JSONEncode(v3) }
+				}
 			}
-			t14.tags.RA_ALL_ANNOTATED_USER_IDS = {
-				valueList = {{
-					data = HttpService:JSONEncode(t15)
-				}}
+
+			v.tags.REPORT_TARGET_HUMANOID_DESCRIPTION_STATUS = {
+				valueList = {
+					{ data = v4 }
+				}
 			}
-		elseif t13.formSelectedAbuserUserId then
-			if GetFFlagGetHumanoidDescription() then
-				local formSelectedAbuserUserId = t13.formSelectedAbuserUserId
-				local humanoidDescription, humanoidDescriptionStatus
+
+			local v5 = {}
+
+			for _, v6 in ipairs(v2) do
+				local userId3 = v6.UserId
+				local humanoidDescription, outputMessage
 
 				if GetFFlagGetHumanoidDescriptionUpdatesV2E() then
-					local v95 = p8.identificationResults.identifiedAvatars[formSelectedAbuserUserId]
+					local identifiedAvatar = p.identificationResults.identifiedAvatars[userId3]
 
-					if v95 and v95.humanoidDescription and v95.humanoidDescriptionStatus == "OK" then
-						humanoidDescription = v95.humanoidDescription
-						humanoidDescriptionStatus = v95.humanoidDescriptionStatus
+					if
+						identifiedAvatar
+						and identifiedAvatar.humanoidDescription
+						and identifiedAvatar.humanoidDescriptionStatus == "OK"
+					then
+						humanoidDescription = identifiedAvatar.humanoidDescription
+						outputMessage = identifiedAvatar.humanoidDescriptionStatus
 					else
-						humanoidDescription, humanoidDescriptionStatus = getHumanoidDescription(formSelectedAbuserUserId)
+						humanoidDescription, outputMessage = getHumanoidDescription(userId3)
 					end
 				else
-					humanoidDescription, humanoidDescriptionStatus = getHumanoidDescription(formSelectedAbuserUserId)
+					humanoidDescription, outputMessage = getHumanoidDescription(userId3)
 				end
 
-				t14.tags.REPORT_TARGET_HUMANOID_DESCRIPTION = {
-					valueList = {{
-						data = HttpService:JSONEncode(humanoidDescription)
-					}}
-				}
-				t14.tags.REPORT_TARGET_HUMANOID_DESCRIPTION_STATUS = {
-					valueList = {{
-						data = humanoidDescriptionStatus
-					}}
+				v5[#v5 + 1] = {
+					humanoidDescription = humanoidDescription,
+					outputMessage = outputMessage
 				}
 			end
 
-			t14.tags.REPORT_TARGET_USER_ID = {
-				valueList = {{
-					data = tostring(t13.formSelectedAbuserUserId)
-				}}
+			v.tags.RA_ALL_ANNOTATED_HUMANOID_DESCRIPTIONS = {
+				valueList = {
+					{ data = HttpService:JSONEncode(v5) }
+				}
 			}
 		end
 
-		if game:GetEngineFeature("WHAM2165") then
-			return t14
+		v.tags.REPORT_TARGET_USER_ID = {
+			valueList = {
+				{ data = tostring(userId) }
+			}
+		}
+
+		v.tags.RA_ALL_ANNOTATED_USER_IDS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(userIds)
+				}
+			}
+		}
+	elseif data.formSelectedAbuserUserId then
+		if GetFFlagGetHumanoidDescription() then
+			local formSelectedAbuserUserId = data.formSelectedAbuserUserId
+			local v3, v4
+
+			if GetFFlagGetHumanoidDescriptionUpdatesV2E() then
+				local identifiedAvatar = p.identificationResults.identifiedAvatars[formSelectedAbuserUserId]
+
+				if
+					identifiedAvatar
+					and identifiedAvatar.humanoidDescription
+					and identifiedAvatar.humanoidDescriptionStatus == "OK"
+				then
+					v3 = identifiedAvatar.humanoidDescription
+					v4 = identifiedAvatar.humanoidDescriptionStatus
+				else
+					v3, v4 = getHumanoidDescription(formSelectedAbuserUserId)
+				end
+			else
+				v3, v4 = getHumanoidDescription(formSelectedAbuserUserId)
+			end
+
+			v.tags.REPORT_TARGET_HUMANOID_DESCRIPTION = {
+				valueList = {
+					{ data = HttpService:JSONEncode(v3) }
+				}
+			}
+
+			v.tags.REPORT_TARGET_HUMANOID_DESCRIPTION_STATUS = {
+				valueList = {
+					{ data = v4 }
+				}
+			}
 		end
 
-		return HttpService:JSONEncode(t14)
-	end,
-	interpretAnnotations = v18,
-	Constants = t1
-}
+		v.tags.REPORT_TARGET_USER_ID = {
+			valueList = {
+				{
+					data = tostring(data.formSelectedAbuserUserId)
+				}
+			}
+		}
+	end
+
+	if game:GetEngineFeature("WHAM2165") then
+		return v
+	end
+
+	return HttpService:JSONEncode(v)
+end
+
+AbuseReportBuilder.interpretAnnotations = fn4
+AbuseReportBuilder.Constants = constants
+return AbuseReportBuilder

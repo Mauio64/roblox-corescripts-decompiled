@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("Navigation").Parent
-local React = require(Parent.React)
-local RoactNavigation = require(Parent.RoactNavigation)
+local parent = script:FindFirstAncestor("Navigation").Parent
 
-local function useNavigation() -- line: 11
-	-- upvalues: React (copy), RoactNavigation (copy)
+local React = require(parent.React)
+local RoactNavigation = require(parent.RoactNavigation)
+
+local function useNavigation()
 	return React.useContext(RoactNavigation.Context)
 end
 

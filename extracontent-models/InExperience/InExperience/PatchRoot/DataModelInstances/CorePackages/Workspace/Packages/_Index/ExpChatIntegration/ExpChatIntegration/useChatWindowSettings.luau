@@ -1,9 +1,7 @@
 local useChatPlatform = require(script.Parent.useChatPlatform)
-
 require(script.Parent.ChatPlatformContext)
 
-local function useChatWindowSettings() -- line: 8
-	-- upvalues: useChatPlatform (copy)
+local function useChatWindowSettings()
 	return useChatPlatform().chatWindowSettings
 end
 

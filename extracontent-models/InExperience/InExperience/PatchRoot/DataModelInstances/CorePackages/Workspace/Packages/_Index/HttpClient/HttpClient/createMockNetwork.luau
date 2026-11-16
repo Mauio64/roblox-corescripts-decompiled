@@ -2,71 +2,59 @@ local HttpService = game:GetService("HttpService")
 
 require(script.Parent.types)
 
-local function noopCancel() -- line: 12
+local function noopCancel() end
+
+local function normalizeResponse(result)
+	if typeof(result) == "string" then
+		return { statusCode = 200, responseBody = result }
+	end
+
+	if typeof(result) ~= "table" then
+		return { statusCode = 200, responseBody = nil }
+	end
+
+	if result.statusCode == nil then
+		return { statusCode = 200, responseBody = HttpService:JSONEncode(result) }
+	end
+
+	return result
 end
-local function normalizeResponse(p1) -- line: 14
-	-- upvalues: HttpService (copy)
-	if typeof(p1) == "string" then
-		return {
-			statusCode = 200,
-			responseBody = p1
-		}
-	end
 
-	if typeof(p1) ~= "table" then
-		return {
-			statusCode = 200,
-			responseBody = nil
-		}
-	end
-
-	if p1.statusCode == nil then
-		return {
-			statusCode = 200,
-			responseBody = HttpService:JSONEncode(p1)
-		}
-	end
-
-	return p1
-end
-local function createMockNetwork(p2) -- line: 27
-	-- upvalues: HttpService (copy), noopCancel (copy), normalizeResponse (copy)
-	local v7 = p2 or {}
-	local v8 = v7.routes or {}
+local function createMockNetwork(options)
+	local v = options or {}
+	local routes = v.routes or {}
 
 	return {
-		request = function(p3, p4: ((...any) -> ...any)) -- line: 31
-			-- upvalues: v8 (copy), v7 (copy), HttpService (copy), noopCancel (copy), normalizeResponse (copy)
+		request = function(p, callback)
 			local respond = nil
 
-			for _, v13 in v8 do
-				if string.find(p3.url, v13.pattern, 1, true) then
-					respond = v13.respond
-
+			for _, route in routes do
+				if string.find(p.url, route.pattern, 1, true) then
+					respond = route.respond
 					break
 				end
 			end
 
-			local v14 = respond or v7.fallback
+			local v2 = respond or v.fallback
 
-			if v14 == nil then
-				p4(true, {
+			if v2 == nil then
+				callback(true, {
 					statusCode = 404,
 					responseBody = HttpService:JSONEncode({
-						code = 5,
-						message = "createMockNetwork: no route matched " .. p3.url
+						message = "createMockNetwork: no route matched " .. p.url,
+						code = 5
 					})
 				})
 
 				return noopCancel
 			end
 
-			local ok, result = pcall(v14, p3)
+			local success, result = pcall(v2, p)
 
-			if not ok then
-				p4(false, (tostring(result)))
+			if success then
+				callback(true, normalizeResponse(result))
 			else
-				p4(true, (normalizeResponse(result)))
+				callback(false, (tostring(result)))
 			end
 
 			return noopCancel

@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
 local Context = require(script.Parent.Context)
 
-local function useChatPagePadding() -- line: 7
-	-- upvalues: React (copy), Context (copy)
+local function useChatPagePadding()
 	return React.useContext(Context)
 end
 

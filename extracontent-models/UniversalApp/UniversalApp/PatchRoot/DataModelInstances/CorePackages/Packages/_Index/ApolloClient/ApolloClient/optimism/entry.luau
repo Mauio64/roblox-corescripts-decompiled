@@ -1,390 +1,377 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Set = LuauPolyfill.Set
 local Map = LuauPolyfill.Map
 local Error = LuauPolyfill.Error
-local t1 = {}
-local v8 = newproxy(true)
 
-getmetatable(v8).__tostring = function() -- line: 34
+local v = newproxy(true)
+getmetatable(v).__tostring = function(): string
 	return "Value.None"
 end
 
-local rememberParent = nil
-local reallyRecompute = nil
-local recomputeNewValue = nil
-local mightBeDirty = nil
-local setClean = nil
-local reportDirty = nil
-local reportClean = nil
-local eachParent = nil
-local reportDirtyChild = nil
-local reportCleanChild = nil
-local removeDirtyChild = nil
-local forgetChildren = nil
-local forgetChild = nil
-local maybeSubscribe = nil
-local parentEntrySlot = require(script.Parent.context).parentEntrySlot
+local rememberParent
+local reallyRecompute
+local recomputeNewValue
+local mightBeDirty
+local setClean
+local reportDirty
+local reportClean
+local eachParent
+local reportDirtyChild
+local reportCleanChild
+local removeDirtyChild
+local forgetChildren
+local forgetChild
+local maybeSubscribe
 
+local context = require(script.Parent.context)
+local parentEntrySlot = context.parentEntrySlot
 require(script.Parent.initTypes)
+
 require(script.Parent.depTypes)
 
 local helpers = require(script.Parent.helpers)
 local maybeUnsubscribe = helpers.maybeUnsubscribe
 local toArray = helpers.toArray
-local t2 = {}
 
-local function assert(p1, s1: string?) -- line: 73
-	-- upvalues: Error (copy)
-	if not p1 then
-		error(Error.new(s1 or "assertion failure"))
+local v2 = {}
+
+local function assert(p, value: string?) -- 3 equivalent calls inferred from this helper
+	if not p then
+		error(Error.new(value or "assertion failure"))
 	end
 end
 
 require(script.Parent.entryTypes)
 require(script.Parent.anyEntryTypes)
 
-local function valueIs(p2, p3) -- line: 87
-	local v37 = #p2
+local function valueIs(list, value): boolean -- 1 equivalent call inferred from this helper
+	local count = #list
 
-	return v37 > 0 and (v37 == #p3 and p2[v37] == p3[v37])
+	return count > 0 and count == #value and list[count] == value[count]
 end
-local function valueGet(p4) -- line: 98
-	-- upvalues: v8 (copy), Error (copy)
-	if p4[2] ~= nil then
-		error(p4[2])
+
+local function valueGet(value)
+	if value[2] ~= nil then
+		error(value[2])
+		return
+	end
+
+	if value[1] == nil then
+		error(Error.new("unknown value"))
 
 		return
 	end
 
-	if p4[1] ~= nil then
-		if p4[1] == v8 then
-			return nil
-		end
-
-		return p4[1]
-	end
-
-	error(Error.new("unknown value"))
-end
-local function valueCopy(p5) -- line: 123
-	return (table.clone(p5))
+	return if value[1] ~= v then value[1] else nil
 end
 
-local t3 = {}
+local function valueCopy(value) -- 1 equivalent call inferred from this helper
+	return (table.clone(value))
+end
 
-t3.__index = t3
-t3.count = 0
+local class = {}
+class.__index = class
+class.count = 0
 
-function t3.new(p6: ((...any) -> ...any)) -- line: 138
-	-- upvalues: t3 (copy), Set (copy), Map (copy)
-	local self = setmetatable({}, t3)
+function class.new(fn)
+	local self = setmetatable({}, class)
 
 	self.parents = Set.new()
+
 	self.childValues = Map.new(nil)
+
 	self.dirtyChildren = nil
 	self.dirty = true
 	self.recomputing = false
 	self.value = {}
+
 	self.deps = nil
-	self.fn = p6
 
-	local v42 = t3
+	self.fn = fn
 
-	v42.count = v42.count + 1
+	class.count += 1
 
 	return self
 end
-function t3.peek(p7) -- line: 159
-	-- upvalues: mightBeDirty (ref), rememberParent (ref)
-	if #p7.value == 1 and not mightBeDirty(p7) then
-		rememberParent(p7)
 
-		return p7.value[1]
+function class.peek(p)
+	if #p.value ~= 1 or mightBeDirty(p) then
+		return nil
 	end
 
-	return nil
+	rememberParent(p)
+	return p.value[1]
 end
-function t3.recompute(p8, p9) -- line: 173
-	-- upvalues: Error (copy), rememberParent (ref), mightBeDirty (ref), reallyRecompute (ref), valueGet (copy)
-	if p8.recomputing then
+
+function class.recompute(p, p2)
+	if p.recomputing then
 		error(Error.new("already recomputing"))
 	end
 
-	rememberParent(p8)
+	rememberParent(p)
 
-	if mightBeDirty(p8) then
-		return reallyRecompute(p8, p9)
+	if mightBeDirty(p) then
+		return reallyRecompute(p, p2)
 	end
 
-	return valueGet(p8.value)
+	return valueGet(p.value)
 end
-function t3.setDirty(p10) -- line: 183
-	-- upvalues: reportDirty (ref), maybeUnsubscribe (copy)
-	if p10.dirty then
+
+function class:setDirty()
+	if self.dirty then
 		return
 	end
 
-	p10.dirty = true
-	p10.value = {}
-	reportDirty(p10)
-	maybeUnsubscribe(p10)
-end
-function t3.dispose(p11) -- line: 198
-	-- upvalues: forgetChildren (ref), eachParent (ref), forgetChild (ref)
-	p11:setDirty()
-	forgetChildren(p11)
-	eachParent(p11, function(p12, _) -- line: 216
-		-- upvalues: forgetChild (ref), p11 (copy)
-		p12:setDirty()
-		forgetChild(p12, p11)
+	self.dirty = true
 
+	self.value = {}
+
+	reportDirty(self)
+
+	maybeUnsubscribe(self)
+end
+
+function class:dispose()
+	self:setDirty()
+
+	forgetChildren(self)
+
+	eachParent(self, function(object, _): nil
+		object:setDirty()
+		forgetChild(object, self)
 		return nil
 	end)
 end
-function t3.forget(p14) -- line: 223
-	p14:dispose()
-end
-function t3.dependOn(p15, p16) -- line: 230
-	-- upvalues: t2 (copy), Set (copy)
-	p16:add(p15)
 
-	if not p15.deps then
-		p15.deps = table.remove(t2) or Set.new()
+function class:forget()
+	self:dispose()
+end
+
+function class:dependOn(object)
+	object:add(self)
+
+	if not self.deps then
+		self.deps = table.remove(v2) or Set.new()
 	end
 
-	p15.deps:add(p16)
+	self.deps:add(object)
 end
-function t3.forgetDeps(p17) -- line: 240
-	-- upvalues: Array (copy), toArray (copy), t2 (copy)
-	if p17.deps then
-		Array.forEach(toArray(p17.deps), function(p18) -- line: 244
-			-- upvalues: p17 (copy)
-			p18:delete(p17)
+
+function class:forgetDeps()
+	if self.deps then
+		Array.forEach(toArray(self.deps), function(object)
+			object:delete(self)
 		end)
-		p17.deps:clear()
-		table.insert(t2, p17.deps)
-		p17.deps = nil
+		self.deps:clear()
+		table.insert(v2, self.deps)
+		self.deps = nil
 	end
 end
 
-t1.Entry = t3
+rememberParent = function(p)
+	local value = parentEntrySlot:getValue()
 
-function rememberParent(p19) -- line: 255
-	-- upvalues: parentEntrySlot (copy), mightBeDirty (ref), reportDirtyChild (ref), reportCleanChild (ref)
-	local v53 = parentEntrySlot:getValue()
-
-	if v53 then
-		p19.parents:add(v53)
-
-		if not v53.childValues:has(p19) then
-			v53.childValues:set(p19, {})
-		end
-
-		if mightBeDirty(p19) then
-			reportDirtyChild(v53, p19)
-
-			return v53
-		end
-
-		reportCleanChild(v53, p19)
-
-		return v53
+	if not value then
+		return nil
 	end
 
-	return nil
-end
-function reallyRecompute(p20, p21) -- line: 281
-	-- upvalues: forgetChildren (ref), parentEntrySlot (copy), recomputeNewValue (ref), maybeSubscribe (ref), setClean (ref), valueGet (copy)
-	forgetChildren(p20)
-	parentEntrySlot:withValue(p20, recomputeNewValue, {
-		p20,
-		p21
-	})
+	p.parents:add(value)
 
-	if maybeSubscribe(p20, p21) then
-		setClean(p20)
+	if not value.childValues:has(p) then
+		value.childValues:set(p, {})
 	end
 
-	return valueGet(p20.value)
+	if mightBeDirty(p) then
+		reportDirtyChild(value, p)
+		return value
+	end
+
+	reportCleanChild(value, p)
+
+	return value
 end
-function recomputeNewValue(_, p23, p24) -- line: 298
-	-- upvalues: v8 (copy)
-	p23.recomputing = true
-	table.clear(p23.value)
 
-	local ok, result = pcall(p23.fn, table.unpack(p24))
+reallyRecompute = function(p, p2)
+	forgetChildren(p)
 
-	if ok then
-		p23.value[1] = result
+	parentEntrySlot:withValue(p, recomputeNewValue, { p, p2 })
 
-		if p23.value[1] == nil then
-			p23.value[1] = v8
+	if maybeSubscribe(p, p2) then
+		setClean(p)
+	end
+
+	return valueGet(p.value)
+end
+
+recomputeNewValue = function(_, state, list)
+	state.recomputing = true
+
+	table.clear(state.value)
+
+	local success, result = pcall(state.fn, table.unpack(list))
+
+	if success then
+		state.value[1] = result
+
+		if state.value[1] == nil then
+			state.value[1] = v
 		end
 	end
 
-	if not ok then
-		p23.value[2] = result
+	if not success then
+		state.value[2] = result
 	end
 
-	p23.recomputing = false
+	state.recomputing = false
 end
-function mightBeDirty(p25) -- line: 321
-	return p25.dirty or p25.dirtyChildren ~= nil and p25.dirtyChildren.size > 0
-end
-function setClean(p26) -- line: 327
-	-- upvalues: mightBeDirty (ref), reportClean (ref)
-	p26.dirty = false
 
-	if mightBeDirty(p26) then
+mightBeDirty = function(p)
+	local dirty = p.dirty
+
+	if not dirty then
+		if p.dirtyChildren == nil then
+			return false
+		end
+
+		return p.dirtyChildren.size > 0
+	end
+
+	return dirty
+end
+
+setClean = function(p)
+	p.dirty = false
+
+	if mightBeDirty(p) then
 		return
 	end
 
-	reportClean(p26)
+	reportClean(p)
 end
-function reportDirty(p27) -- line: 339
-	-- upvalues: eachParent (ref), reportDirtyChild (ref)
-	eachParent(p27, reportDirtyChild)
+
+reportDirty = function(p)
+	eachParent(p, reportDirtyChild)
 end
-function reportClean(p28) -- line: 343
-	-- upvalues: eachParent (ref), reportCleanChild (ref)
-	eachParent(p28, reportCleanChild)
+
+reportClean = function(p)
+	eachParent(p, reportCleanChild)
 end
-function eachParent(p29, p30: ((...any) -> ...any)) -- line: 347
-	-- upvalues: toArray (copy)
-	local size = p29.parents.size
+
+eachParent = function(p, callback)
+	local size = p.parents.size
 
 	if size then
-		local v68 = toArray(p29.parents)
+		local v3 = toArray(p.parents)
 
 		for i = 1, size do
-			p30(v68[i], p29)
+			callback(v3[i], p)
 		end
 	end
 end
-function reportDirtyChild(p31, p32) -- line: 360
-	-- upvalues: Error (copy), mightBeDirty (ref), t2 (copy), Set (copy), reportDirty (ref)
+
+reportDirtyChild = function(value, p)
 	if _G.__DEV__ then
-		local v72, v73 = p31.childValues:has(p32)
-
-		if not v72 then
-			error(Error.new(v73 or "assertion failure"))
-		end
-
-		local v74, v75 = mightBeDirty(p32)
-
-		if not v74 then
-			error(Error.new(v75 or "assertion failure"))
-		end
+		local has, v3 = value.childValues:has(p)
+		assert(has, v3) -- inferred equivalent call
+		local v4, v5 = mightBeDirty(p)
+		assert(v4, v5) -- inferred equivalent call
 	end
 
-	local v76 = mightBeDirty(p31)
+	local v3 = not mightBeDirty(value)
 
-	if not p31.dirtyChildren then
-		p31.dirtyChildren = table.remove(t2) or Set.new()
-	elseif p31.dirtyChildren:has(p32) then
-		return
+	if value.dirtyChildren then
+		if value.dirtyChildren:has(p) then
+			return
+		end
+	else
+		value.dirtyChildren = table.remove(v2) or Set.new()
 	end
 
-	p31.dirtyChildren:add(p32)
+	value.dirtyChildren:add(p)
 
-	if not v76 then
-		reportDirty(p31)
+	if v3 then
+		reportDirty(value)
 	end
 end
-function reportCleanChild(p33, p34) -- line: 394
-	-- upvalues: Error (copy), mightBeDirty (ref), removeDirtyChild (ref), reportClean (ref)
+
+reportCleanChild = function(value, p)
 	if _G.__DEV__ then
-		local v79, v80 = p33.childValues:has(p34)
+		local has, v3 = value.childValues:has(p)
+		assert(has, v3) -- inferred equivalent call
 
-		if not v79 then
-			error(Error.new(v80 or "assertion failure"))
-		end
-
-		if mightBeDirty(p34) then
+		if mightBeDirty(p) then
 			error(Error.new("assertion failure"))
 		end
 	end
 
-	local v81 = p33.childValues:get(p34)
+	local v3 = value.childValues:get(p)
 
-	if #v81 == 0 then
-		local childValues = p33.childValues
-		local value = p34.value
-
-		childValues:set(p34, (table.clone(value)))
-	else
-		local value = p34.value
-		local v85 = #v81
-
-		if not (v85 > 0) or (v85 ~= #value or v81[v85] ~= value[v85]) then
-			p33:setDirty()
-		end
+	if #v3 == 0 then
+		value.childValues:set(p, valueCopy(p.value)) -- inferred equivalent call
+	elseif not valueIs(v3, p.value) then -- inferred equivalent call
+		value:setDirty()
 	end
 
-	removeDirtyChild(p33, p34)
+	removeDirtyChild(value, p)
 
-	if mightBeDirty(p33) then
+	if mightBeDirty(value) then
 		return
 	end
 
-	reportClean(p33)
+	reportClean(value)
 end
-function removeDirtyChild(p35, p36) -- line: 421
-	-- upvalues: t2 (copy)
-	local dirtyChildren = p35.dirtyChildren
+
+removeDirtyChild = function(p, p2)
+	local dirtyChildren = p.dirtyChildren
 
 	if dirtyChildren ~= nil then
-		dirtyChildren:delete(p36)
+		dirtyChildren:delete(p2)
 
 		if dirtyChildren.size == 0 then
-			if #t2 < 100 then
-				table.insert(t2, dirtyChildren)
+			if #v2 < 100 then
+				table.insert(v2, dirtyChildren)
 			end
 
-			p35.dirtyChildren = nil
+			p.dirtyChildren = nil
 		end
 	end
 end
-function forgetChildren(p37) -- line: 436
-	-- upvalues: Array (copy), forgetChild (ref), Error (copy)
-	if p37.childValues.size > 0 then
-		local v90 = table.clone(p37.childValues:keys())
 
-		Array.forEach(v90, function(p38) -- line: 444
-			-- upvalues: forgetChild (ref), p37 (copy)
-			forgetChild(p37, p38)
+forgetChildren = function(object)
+	if object.childValues.size > 0 then
+		local clone = table.clone(object.childValues:keys())
+		Array.forEach(clone, function(p)
+			forgetChild(object, p)
 		end)
 	end
 
-	p37:forgetDeps()
+	object:forgetDeps()
 
-	if p37.dirtyChildren ~= nil then
+	if object.dirtyChildren ~= nil then
 		error(Error.new("assertion failure"))
 	end
 end
-function forgetChild(p39, p40) -- line: 458
-	-- upvalues: removeDirtyChild (ref)
-	p40.parents:delete(p39)
-	p39.childValues:delete(p40)
-	removeDirtyChild(p39, p40)
-end
-function maybeSubscribe(p41, p42) -- line: 464
-	-- upvalues: maybeUnsubscribe (copy)
-	if typeof(p41.subscribe) == "function" and not pcall(function() -- line: 466
-		-- upvalues: maybeUnsubscribe (copy), p41 (copy), p42 (copy)
-		maybeUnsubscribe(p41)
-		p41.unsubscribe = p41.subscribe(table.unpack(p42))
 
+forgetChild = function(object, p)
+	p.parents:delete(object)
+	object.childValues:delete(p)
+	removeDirtyChild(object, p)
+end
+
+maybeSubscribe = function(object, list): boolean
+	if typeof(object.subscribe) ~= "function" or pcall(function(): (nil, boolean)
+		maybeUnsubscribe(object)
+		object.unsubscribe = object.subscribe(table.unpack(list))
 		return nil, false
 	end) then
-		p41:setDirty()
-
-		return false
+		return true
 	end
 
-	return true
+	object:setDirty()
+	return false
 end
 
-return t1
+return { Entry = class }

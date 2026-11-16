@@ -1,32 +1,32 @@
-local ParentParent = script:FindFirstAncestor("TiltLoadingScreen").Parent.Parent
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
+local parent = script:FindFirstAncestor("TiltLoadingScreen").Parent.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Icon = Foundation.Icon
 local Enums = Foundation.Enums
 
-local function VerifiedBadge(t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), View (copy), Icon (copy), Enums (copy)
-	return React.createElement(View, {
-		tag = "auto-xy",
-		testId = "tilt-verified-badge",
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		Backplate = React.createElement(Icon, {
-			name = "verified-backplate",
-			ZIndex = 1,
-			variant = Enums.IconVariant.Filled,
-			size = Enums.IconSize.Small,
-			style = t1.backplateStyle
-		}),
-		Check = React.createElement(Icon, {
-			name = "verified-check",
-			ZIndex = 2,
-			variant = Enums.IconVariant.Filled,
-			size = Enums.IconSize.Small,
-			style = t1.checkStyle
-		})
-	})
+local function VerifiedBadge(props)
+	return React.createElement(
+		View,
+		{ tag = "auto-xy", LayoutOrder = props.LayoutOrder, testId = "tilt-verified-badge" },
+		{
+			Backplate = React.createElement(Icon, {
+				name = "verified-backplate",
+				variant = Enums.IconVariant.Filled,
+				size = Enums.IconSize.Small,
+				style = props.backplateStyle,
+				ZIndex = 1
+			}),
+			Check = React.createElement(Icon, {
+				name = "verified-check",
+				variant = Enums.IconVariant.Filled,
+				size = Enums.IconSize.Small,
+				style = props.checkStyle,
+				ZIndex = 2
+			})
+		}
+	)
 end
 
 return VerifiedBadge

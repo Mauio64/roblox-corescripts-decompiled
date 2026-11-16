@@ -1,9 +1,11 @@
-local scriptParent = script.Parent
-local Flags = require(scriptParent.Flags)
-local t1 = {}
+local parent = script.Parent
+local Flags = require(parent.Flags)
 
-for _, v5 in (string.split(Flags.FoundationImagesWhitelistedIconAssets, ",")) do
-	t1[v5] = true
+local v = string.split(Flags.FoundationImagesWhitelistedIconAssets, ",")
+local WhitelistedIconAssets = {}
+
+for _, v2 in v do
+	WhitelistedIconAssets[v2] = true
 end
 
-return t1
+return WhitelistedIconAssets

@@ -1,38 +1,42 @@
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local Responsive = require(Parent.Responsive)
-local useFocusGuiObject = require(Parent.ReactFocusNavigation).useFocusGuiObject
-local v7 = Responsive.GetInputModeStore(false)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
+local inputModeStore = Responsive.GetInputModeStore(false)
 
-local function useFocusOnMountEffect(p1, n1: number?) -- line: 20
-	-- upvalues: useFocusGuiObject (copy), Responsive (copy), React (copy), v7 (copy), UserInputService (copy), GuiService (copy)
-	local v11 = useFocusGuiObject()
-	local v12 = Responsive.useIsSpatial()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaSupportMicroGamepadPreferredInput = SharedFlags.FFlagLuaSupportMicroGamepadPreferredInput
 
-	React.useEffect(function() -- line: 24
-		-- upvalues: n1 (copy), v7 (copy), Responsive (copy), UserInputService (copy), p1 (copy), v11 (copy), v12 (copy), GuiService (copy)
-		local v13 = not n1 and 0 or n1
-		local thread = task.delay(v13, function() -- line: 26
-			-- upvalues: v7 (copy), Responsive (copy), UserInputService (copy), p1 (copy), v11 (copy), v12 (copy), GuiService (copy)
-			local v15 = v7.getLastInputType(false) == Responsive.Input.Directional
-			local v16 = UserInputService.PreferredInput == Enum.PreferredInput.Gamepad or v15
+local function useFocusOnMountEffect(p, p2: number?)
+	local v = useFocusGuiObject()
+	local v2 = Responsive.useIsSpatial()
 
-			if p1.current and (v16 and v11 and not v12) then
-				local SelectedCoreObject = GuiService.SelectedCoreObject
+	React.useEffect(function()
+		local thread = task.delay(not p2 and 0 or p2, function()
+			local v3 = inputModeStore.getLastInputType(false) == Responsive.Input.Directional
+			local v4 = UserInputService.PreferredInput == Enum.PreferredInput.Gamepad
+				or FFlagLuaSupportMicroGamepadPreferredInput
+				and UserInputService.PreferredInput == Enum.PreferredInput.MicroGamepad
 
-				if SelectedCoreObject ~= p1.current and (not SelectedCoreObject or not SelectedCoreObject:IsDescendantOf(p1.current)) and p1.current:IsDescendantOf(game) then
-					v11(p1.current)
+			if p.current and (v4 or v3) and v and not v2 then
+				local selectedCoreObject = GuiService.SelectedCoreObject
+
+				if
+					selectedCoreObject ~= p.current
+					and not (selectedCoreObject and selectedCoreObject:IsDescendantOf(p.current))
+					and p.current:IsDescendantOf(game)
+				then
+					v(p.current)
 				end
 			end
 		end)
 
-		return function() -- line: 42
-			-- upvalues: thread (copy)
+		return function()
 			task.cancel(thread)
 		end
 	end, {})
 end
-
 return useFocusOnMountEffect

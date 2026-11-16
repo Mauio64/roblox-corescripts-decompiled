@@ -1,32 +1,80 @@
 local CoreGui = game:GetService("CoreGui")
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local parent = BulkPurchaseApp.Parent
 local FIntAXGuiObjectIsObscuredPadding = require(BulkPurchaseApp.Flags.FIntAXGuiObjectIsObscuredPadding)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFixBulkPurchaseTopBarObfuscation = SharedFlags.FFlagFixBulkPurchaseTopBarObfuscation
 
-local function getGuiObjectIsObscuredAtPosition(p1, n1: number, n2: number) -- line: 5
-	-- upvalues: CoreGui (copy)
-	for _, v10 in (CoreGui:GetGuiObjectsAtPosition(n1, n2)) do
-		if (not v10:IsA("Frame") or v10.Active ~= false or v10.BackgroundTransparency ~= 1) and not v10:IsDescendantOf(p1) then
-			if v10 == p1 then
-				return false
+local function isTransparentImageLabel(image)
+	return FFlagFixBulkPurchaseTopBarObfuscation and image:IsA("ImageLabel") and image.ImageTransparency == 1
+end
+
+local function hasDefaultTransparency(guiObject) -- 1 equivalent call inferred from this helper
+	local fFlagFixBulkPurchaseTopBarObfuscation = FFlagFixBulkPurchaseTopBarObfuscation
+
+	if fFlagFixBulkPurchaseTopBarObfuscation then
+		if guiObject.BackgroundTransparency == 0 then
+			return guiObject:HasTag("gui-object-defaults") and not guiObject:HasTag("x-default-transparency")
+		end
+
+		return false
+	end
+
+	return fFlagFixBulkPurchaseTopBarObfuscation
+end
+
+local function getGuiObjectIsObscuredAtPosition(ancestor, p: number, p2: number): boolean
+	local guiObjectsAtPosition = CoreGui:GetGuiObjectsAtPosition(p, p2)
+
+	for _, guiObject in guiObjectsAtPosition do
+		if
+			(guiObject:IsA("Frame") or FFlagFixBulkPurchaseTopBarObfuscation and guiObject:IsA("ImageLabel") and guiObject.ImageTransparency == 1)
+			and guiObject.Active == false
+		then
+			if guiObject.BackgroundTransparency == 1 or hasDefaultTransparency(guiObject) then -- inferred equivalent call
+				continue
 			end
+		end
 
-			return true
+		if not guiObject:IsDescendantOf(ancestor) then
+			return guiObject ~= ancestor
 		end
 	end
 
 	return false
 end
-local function getGuiObjectIsObscured(p2) -- line: 21
-	-- upvalues: getGuiObjectIsObscuredAtPosition (copy), FIntAXGuiObjectIsObscuredPadding (copy)
-	local AbsolutePosition = p2.AbsolutePosition
-	local AbsoluteSize = p2.AbsoluteSize
-	local v14 = AbsolutePosition + AbsoluteSize * 0.5
-	local v15 = AbsolutePosition + AbsoluteSize
-	local v16 = AbsolutePosition + Vector2.new(AbsoluteSize.X, 0)
-	local v17 = AbsolutePosition + Vector2.new(0, AbsoluteSize.Y)
-	local v18 = AbsolutePosition + AbsoluteSize * Vector2.new(math.random(1, 9) / 10, math.random(1, 9) / 10)
 
-	return getGuiObjectIsObscuredAtPosition(p2, v14.X, v14.Y) or (getGuiObjectIsObscuredAtPosition(p2, AbsolutePosition.X + FIntAXGuiObjectIsObscuredPadding, AbsolutePosition.Y + FIntAXGuiObjectIsObscuredPadding) or (getGuiObjectIsObscuredAtPosition(p2, v17.X + FIntAXGuiObjectIsObscuredPadding, v17.Y - FIntAXGuiObjectIsObscuredPadding) or (getGuiObjectIsObscuredAtPosition(p2, v16.X - FIntAXGuiObjectIsObscuredPadding, v16.Y + FIntAXGuiObjectIsObscuredPadding) or (getGuiObjectIsObscuredAtPosition(p2, v15.X - FIntAXGuiObjectIsObscuredPadding, v15.Y - FIntAXGuiObjectIsObscuredPadding) or getGuiObjectIsObscuredAtPosition(p2, math.floor(v18.X), (math.floor(v18.Y)))))))
+local function getGuiObjectIsObscured(p)
+	local absolutePosition = p.AbsolutePosition
+	local absoluteSize = p.AbsoluteSize
+	local v = absolutePosition + absoluteSize * 0.5
+
+	local v2 = absolutePosition + absoluteSize
+	local v3 = absolutePosition + Vector2.new(absoluteSize.X, 0)
+	local v4 = absolutePosition + Vector2.new(0, absoluteSize.Y)
+	local v5 = absolutePosition + absoluteSize * Vector2.new(math.random(1, 9) / 10, math.random(1, 9) / 10)
+	return getGuiObjectIsObscuredAtPosition(p, v.X, v.Y)
+		or getGuiObjectIsObscuredAtPosition(
+			p,
+			absolutePosition.X + FIntAXGuiObjectIsObscuredPadding,
+			absolutePosition.Y + FIntAXGuiObjectIsObscuredPadding
+		)
+		or getGuiObjectIsObscuredAtPosition(
+			p,
+			v4.X + FIntAXGuiObjectIsObscuredPadding,
+			v4.Y - FIntAXGuiObjectIsObscuredPadding
+		)
+		or getGuiObjectIsObscuredAtPosition(
+			p,
+			v3.X - FIntAXGuiObjectIsObscuredPadding,
+			v3.Y + FIntAXGuiObjectIsObscuredPadding
+		)
+		or getGuiObjectIsObscuredAtPosition(
+			p,
+			v2.X - FIntAXGuiObjectIsObscuredPadding,
+			v2.Y - FIntAXGuiObjectIsObscuredPadding
+		)
+		or getGuiObjectIsObscuredAtPosition(p, math.floor(v5.X), math.floor(v5.Y))
 end
 
 return getGuiObjectIsObscured

@@ -1,11 +1,11 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 
-local function useActiveDialog() -- line: 8
-	-- upvalues: React (copy)
-	local v4, v5 = React.useState("Form")
+local React = require(parent.React)
 
-	return v4, v5
+local function useActiveDialog()
+	local state, setState = React.useState("Form")
+
+	return state, setState
 end
 
 return useActiveDialog

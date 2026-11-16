@@ -1,43 +1,98 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local RealtimeDelivery = require(AppChatParent.RealtimeDelivery)
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local partyChatTimeoutReceivedSignal = require(AppChatParent.InterventionShared).Signals.partyChatTimeoutReceivedSignal
+local parent = AppChat.Parent
+local React = require(parent.React)
+local RealtimeDelivery = require(parent.RealtimeDelivery)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local ChatModerationStatusRefreshCoordinator = require(AppChat.Stores.ChatModerationStatusRefreshCoordinator)
 local getContainsChatSetting = require(AppChat.Utils.getContainsChatSetting)
-local v9 = require(AppChat.Logger):new(script.Name)
+local InterventionShared = require(parent.InterventionShared)
+local partyChatTimeoutReceivedSignal = InterventionShared.Signals.partyChatTimeoutReceivedSignal
 
-local function AppChatInterventionEventReceiver(_: {[any]: any}) -- line: 15
-	-- upvalues: useDispatch (copy), RealtimeDelivery (copy), getContainsChatSetting (copy), AppChatNetworking (copy), v9 (copy), React (copy), partyChatTimeoutReceivedSignal (copy)
-	local v12 = useDispatch()
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 
-	RealtimeDelivery.useRealtimeNamespace("UserSettingsChanged", function(p1) -- line: 17
-		-- upvalues: getContainsChatSetting (copy), v12 (copy), AppChatNetworking (copy), v9 (copy)
-		if p1.SettingsChanged and getContainsChatSetting(p1.SettingsChanged) then
-			v12(AppChatNetworking.rodux.GetChatModerationStatuses.API()):catch(function(p2) -- line: 20
-				-- upvalues: v9 (copy)
-				v9:warning("NetworkingChat failure in UserSettingsChanged->GetChatModerationStatuses, Status: " .. tostring(p2))
-			end)
-		end
-	end, { v12 })
-	React.useEffect(function() -- line: 29
-		-- upvalues: partyChatTimeoutReceivedSignal (copy), v12 (copy), AppChatNetworking (copy), v9 (copy)
-		local v14 = partyChatTimeoutReceivedSignal:connect(function(p3) -- line: 30
-			-- upvalues: v12 (copy), AppChatNetworking (copy), v9 (copy)
-			v12(AppChatNetworking.rodux.GetChatModerationStatuses.API((if not p3 then {} else { p3 }))):catch(function(p4) -- line: 33
-				-- upvalues: v9 (copy)
-				v9:warning("NetworkingChat failure in partyChatTimeoutReceivedSignal->GetChatModerationStatuses, Status: " .. tostring(p4))
-			end)
-		end)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
 
-		return function() -- line: 40
-			-- upvalues: v14 (copy)
-			if v14 then
-				v14:disconnect()
+local function AppChatInterventionEventReceiver(_): nil
+	local v2 = useDispatch()
+	local v3
+
+	if FFlagAppChatReactiveFeatureRestrictions then
+		v3 = React.useMemo(function()
+			return ChatModerationStatusRefreshCoordinator.createOwner()
+		end, { v2 })
+	else
+		v3 = nil
+	end
+
+	local useRealtimeNamespace = RealtimeDelivery.useRealtimeNamespace
+
+	local function fn(p)
+		if p.SettingsChanged and getContainsChatSetting(p.SettingsChanged) then
+			if FFlagAppChatReactiveFeatureRestrictions then
+				ChatModerationStatusRefreshCoordinator.enqueue(v3, function()
+					return v2(AppChatNetworking.rodux.GetChatModerationStatuses.API())
+				end).promise:catch(function(p2)
+					v:warning("NetworkingChat failure in UserSettingsChanged->GetChatModerationStatuses, Status: " .. tostring(p2))
+				end)
+			else
+				v2(AppChatNetworking.rodux.GetChatModerationStatuses.API()):catch(function(p2)
+					v:warning("NetworkingChat failure in UserSettingsChanged->GetChatModerationStatuses, Status: " .. tostring(p2))
+				end)
 			end
 		end
-	end, { v12 })
+	end
+
+	local v4
+
+	if FFlagAppChatReactiveFeatureRestrictions then
+		v4 = v3
+	else
+		v4 = v2
+	end
+
+	useRealtimeNamespace("UserSettingsChanged", fn, { v4, v2 })
+
+	local useEffect = React.useEffect
+	local function fn2()
+		local connection = partyChatTimeoutReceivedSignal:connect(function(p)
+			if FFlagAppChatReactiveFeatureRestrictions then
+				ChatModerationStatusRefreshCoordinator.enqueue(v3, function()
+					return v2(AppChatNetworking.rodux.GetChatModerationStatuses.API(p and { p } or {}))
+				end).promise:catch(function(p2)
+					v:warning("NetworkingChat failure in partyChatTimeoutReceivedSignal->GetChatModerationStatuses, Status: " .. tostring(p2))
+				end)
+			else
+				v2(AppChatNetworking.rodux.GetChatModerationStatuses.API(p and { p } or {})):catch(function(p2)
+					v:warning("NetworkingChat failure in partyChatTimeoutReceivedSignal->GetChatModerationStatuses, Status: " .. tostring(p2))
+				end)
+			end
+		end)
+
+		return function()
+			if connection then
+				connection:disconnect()
+			end
+
+			if FFlagAppChatReactiveFeatureRestrictions then
+				ChatModerationStatusRefreshCoordinator.cancelOwner(v3)
+			end
+		end
+	end
+
+	local v5
+
+	if FFlagAppChatReactiveFeatureRestrictions then
+		v5 = v3
+	else
+		v5 = v2
+	end
+
+	useEffect(fn2, { v5, v2 })
 
 	return nil
 end

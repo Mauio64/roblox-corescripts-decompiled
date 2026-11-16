@@ -1,46 +1,45 @@
-local t1 = {}
+local ConnectionUtil = {}
+ConnectionUtil.__index = ConnectionUtil
 
-t1.__index = t1
-
-function t1.new() -- line: 21
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
-
+function ConnectionUtil.new()
+	local self = setmetatable({}, ConnectionUtil)
 	self.connections = {}
-
 	return self
 end
-function t1.connect(p1, p2, p3, p4) -- line: 27
-	if p1.connections[p2] then
-		p1.connections[p2]()
+
+function ConnectionUtil.connect(p, p2, object, p3)
+	if p.connections[p2] then
+		p.connections[p2]()
 	end
 
-	local connection = p3:Connect(p4)
+	local connection = object:Connect(p3)
 
-	p1.connections[p2] = function() -- line: 33
-		-- upvalues: connection (copy)
+	p.connections[p2] = function()
 		connection:Disconnect()
 	end
 end
-function t1.connectManual(p5, p6, p7) -- line: 38
-	if p5.connections[p6] then
-		p5.connections[p6]()
+
+function ConnectionUtil.connectManual(p, p2, p3)
+	if p.connections[p2] then
+		p.connections[p2]()
 	end
 
-	p5.connections[p6] = p7
-end
-function t1.disconnect(p8, p9) -- line: 45
-	if p8.connections[p9] then
-		p8.connections[p9]()
-		p8.connections[p9] = nil
-	end
-end
-function t1.disconnectAll(p10) -- line: 52
-	for _, v in pairs(p10.connections) do
-		v()
-	end
-
-	p10.connections = {}
+	p.connections[p2] = p3
 end
 
-return t1
+function ConnectionUtil.disconnect(p, p2)
+	if p.connections[p2] then
+		p.connections[p2]()
+		p.connections[p2] = nil
+	end
+end
+
+function ConnectionUtil:disconnectAll()
+	for _, connection in pairs(self.connections) do
+		connection()
+	end
+
+	self.connections = {}
+end
+
+return ConnectionUtil

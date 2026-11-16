@@ -1,5 +1,5 @@
-local function getModalWindowWidth(n1: number) -- line: 5
-	return n1 < 540 and n1 or 540
+local function getModalWindowWidth(p: number)
+	return p < 540 and p or 540
 end
 
 return getModalWindowWidth

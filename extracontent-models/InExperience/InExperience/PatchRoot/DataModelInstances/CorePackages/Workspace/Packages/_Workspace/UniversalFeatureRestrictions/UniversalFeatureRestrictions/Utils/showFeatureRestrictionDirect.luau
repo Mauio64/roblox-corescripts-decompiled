@@ -1,18 +1,15 @@
 local UniversalFeatureRestrictions = script:FindFirstAncestor("UniversalFeatureRestrictions")
-local UniversalFeatureRestrictionsParent = UniversalFeatureRestrictions.Parent
+local parent = UniversalFeatureRestrictions.Parent
 
 require(UniversalFeatureRestrictions.Common.AbuseVector)
-
 local featureRestrictionDisplayDirectSignal = require(UniversalFeatureRestrictions.Signals.featureRestrictionDisplayDirectSignal)
+require(parent.ModerationCommon.Types)
 
-require(UniversalFeatureRestrictionsParent.ModerationCommon.Types)
-
-local function showFeatureRestrictionDirect(p1, p2, t1: {[any]: any}?) -- line: 23
-	-- upvalues: featureRestrictionDisplayDirectSignal (copy)
+local function showFeatureRestrictionDirect(abuseVector, moderationDetail, options)
 	featureRestrictionDisplayDirectSignal:fire({
-		abuseVector = p1,
-		moderationDetail = p2,
-		options = t1
+		abuseVector = abuseVector,
+		moderationDetail = moderationDetail,
+		options = options
 	})
 end
 

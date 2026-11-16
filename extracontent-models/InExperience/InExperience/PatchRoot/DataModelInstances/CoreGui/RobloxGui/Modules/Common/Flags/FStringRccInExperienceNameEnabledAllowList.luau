@@ -1,19 +1,19 @@
-local v1 = game:DefineFastString("RccInExperienceNameSettingsEnabledAllowList", "")
-local t1 = nil
+local defineFastString = game:DefineFastString("RccInExperienceNameSettingsEnabledAllowList", "")
+
+local set = nil
 
 return {
-	isAllowListedUserId = function(p1) -- line: 7
-		-- upvalues: t1 (ref), v1 (copy)
-		local str = tostring(p1)
+	isAllowListedUserId = function(p): boolean
+		local v = tostring(p)
 
-		if t1 == nil then
-			t1 = {}
+		if set == nil then
+			set = {}
 
-			for match in string.gmatch(v1, "[^,]+") do
-				t1[match] = true
+			for k in string.gmatch(defineFastString, "[^,]+") do
+				set[k] = true
 			end
 		end
 
-		return t1[str] == true
+		return set[v] == true
 	end
 }

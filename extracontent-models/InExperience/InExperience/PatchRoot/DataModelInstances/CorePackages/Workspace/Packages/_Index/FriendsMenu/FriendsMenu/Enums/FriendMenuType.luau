@@ -1,4 +1,1 @@
-return {
-	SingleSelect = "SingleSelect",
-	MultiSelect = "MultiSelect"
-}
+return { SingleSelect = "SingleSelect", MultiSelect = "MultiSelect" }

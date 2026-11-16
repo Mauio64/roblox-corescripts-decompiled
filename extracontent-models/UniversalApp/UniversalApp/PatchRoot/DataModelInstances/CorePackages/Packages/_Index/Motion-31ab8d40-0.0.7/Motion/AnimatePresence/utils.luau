@@ -1,46 +1,39 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
+local Utils = {}
 
-return {
-	getChildKey = function(p1) -- line: 28
-		if p1 == nil then
-			return nil
-		end
-
-		if type(p1) ~= "table" then
-			return nil
-		end
-
-		if p1.key ~= nil then
-			return p1.key
-		end
-
-		if p1.props and p1.props.key ~= nil then
-			return p1.props.key
-		end
-
+function Utils.getChildKey(p)
+	if not (p ~= nil and type(p) == "table") then
 		return nil
-	end,
-	onlyElements = function(p2) -- line: 65
-		-- upvalues: React (copy)
-		local t1 = {}
-
-		React.Children.forEach(p2, function(p3) -- line: 68
-			-- upvalues: React (copy), t1 (copy)
-			if React.isValidElement(p3) then
-				table.insert(t1, p3)
-			end
-		end)
-
-		return t1
-	end,
-	useIdFallback = function() -- line: 53
-		local str = tostring(math.random(1000000))
-
-		if str == nil then
-			return "id-" .. str
-		end
-
-		return str
 	end
-}
+
+	if p.key ~= nil then
+		return p.key
+	end
+
+	return if p.props and p.props.key ~= nil then p.props.key else nil
+end
+
+function Utils.onlyElements(p)
+	local v = {}
+
+	React.Children.forEach(p, function(p2)
+		if React.isValidElement(p2) then
+			table.insert(v, p2)
+		end
+	end)
+
+	return v
+end
+
+function Utils.useIdFallback()
+	local v = tostring(math.random(1000000))
+
+	if v == nil then
+		return "id-" .. nil
+	end
+
+	return v
+end
+
+return Utils

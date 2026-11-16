@@ -1,35 +1,49 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local Icon = Foundation.Icon
 local Enums = Foundation.Enums
-local FFlagAXCategoryPillPositionAnimation = require(Parent.AvatarExperienceFlags).FFlagAXCategoryPillPositionAnimation
 
-local function CategoryPillCloseButton(t1: {[any]: any}) -- line: 28
-	-- upvalues: useTokens (copy), React (copy), Foundation (copy), FFlagAXCategoryPillPositionAnimation (copy), Icon (copy), Enums (copy)
-	local ActionStandard = useTokens().Color.ActionStandard
-	local v11 = React.useRef(nil)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXCategoryPillPositionAnimation = AvatarExperienceFlags.FFlagAXCategoryPillPositionAnimation
 
-	React.useEffect(function() -- line: 35
-		-- upvalues: v11 (copy), t1 (copy)
-		if v11.current then
-			t1.categoryButtonRefs["X-Button"] = v11
-			t1.navButtonRefs[t1.pillIndex] = v11
+local function CategoryPillCloseButton(props)
+	local actionStandard = useTokens().Color.ActionStandard
+
+	local ref = React.useRef(nil)
+
+	React.useEffect(function()
+		if ref.current then
+			props.categoryButtonRefs["X-Button"] = ref
+			props.navButtonRefs[props.pillIndex] = ref
 		end
 	end, {})
 
-	return React.createElement(Foundation.View, {
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v = {
 		tag = "auto-xy radius-circle padding-small align-x-center align-y-center",
-		backgroundStyle = ActionStandard.Background,
-		onActivated = t1.onActivated,
-		LayoutOrder = if not FFlagAXCategoryPillPositionAnimation then t1.layoutOrder else nil,
-		ref = v11
-	}, {
+		backgroundStyle = actionStandard.Background,
+		onActivated = props.onActivated,
+		LayoutOrder = 0,
+		ref = 0
+	}
+	local layoutOrder
+
+	if not FFlagAXCategoryPillPositionAnimation then
+		layoutOrder = props.layoutOrder
+	end
+
+	v.LayoutOrder = layoutOrder
+	v.ref = ref
+	return createElement(view, v, {
 		CloseIcon = React.createElement(Icon, {
 			name = "x-small",
 			size = Enums.IconSize.Medium,
-			style = ActionStandard.Foreground
+			style = actionStandard.Foreground
 		})
 	})
 end

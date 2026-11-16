@@ -1,9 +1,8 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 local NavigationContext = require(script.Parent.NavigationContext)
 
-local function useNavigation() -- line: 8
-	-- upvalues: React (copy), NavigationContext (copy)
+local function useNavigation()
 	return React.useContext(NavigationContext)
 end
 

@@ -1,34 +1,44 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local IconName = require(ParentParentParent.Foundation).Enums.IconName
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.ProductPurchase.PricingTypes)
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local IconName = Foundation.Enums.IconName
 
-local function useDiscountAccordionConfig(t1: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), IconName (copy)
-	local itemPrice = t1.itemPrice
-	local hasSubscriptionDiscount = t1.hasSubscriptionDiscount
-	local blackbirdSummaryText = t1.blackbirdSummaryText
-	local savingsSummary = t1.savingsSummary
-	local v11 = itemPrice.basePriceInRobux > itemPrice.priceInRobux and (hasSubscriptionDiscount or #itemPrice.discounts >= 2)
-	local v12 = React.useMemo(function() -- line: 33
-		-- upvalues: savingsSummary (copy), blackbirdSummaryText (copy)
-		if savingsSummary ~= nil and savingsSummary ~= "" then
-			return savingsSummary
+require(parent.ProductPurchase.PricingTypes)
+
+local function useDiscountAccordionConfig(data)
+	local itemPrice = data.itemPrice
+	local hasSubscriptionDiscount = data.hasSubscriptionDiscount
+	local blackbirdSummaryText = data.blackbirdSummaryText
+	local savingsSummary = data.savingsSummary
+	local showAccordion
+
+	if itemPrice.basePriceInRobux > itemPrice.priceInRobux then
+		showAccordion = hasSubscriptionDiscount or #itemPrice.discounts >= 2
+	else
+		showAccordion = false
+	end
+
+	local accordionHeaderText = React.useMemo(function()
+		if savingsSummary == nil or savingsSummary == "" then
+			return blackbirdSummaryText
 		end
 
-		return blackbirdSummaryText
-	end, {
-		savingsSummary,
-		blackbirdSummaryText
-	})
-	local v13 = if hasSubscriptionDiscount then IconName.RobloxPlus else IconName.Tag
+		return savingsSummary
+	end, { savingsSummary, blackbirdSummaryText })
+	local accordionLeadingIcon
+
+	if hasSubscriptionDiscount then
+		accordionLeadingIcon = IconName.RobloxPlus
+	else
+		accordionLeadingIcon = IconName.Tag
+	end
 
 	return {
-		showAccordion = v11,
-		accordionHeaderText = v12,
-		accordionLeadingIcon = v13
+		showAccordion = showAccordion,
+		accordionHeaderText = accordionHeaderText,
+		accordionLeadingIcon = accordionLeadingIcon
 	}
 end
 

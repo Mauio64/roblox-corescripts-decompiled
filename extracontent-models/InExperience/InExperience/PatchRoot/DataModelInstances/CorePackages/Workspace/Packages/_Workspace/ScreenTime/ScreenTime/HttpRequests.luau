@@ -1,17 +1,19 @@
-local Parent = script:FindFirstAncestor("ScreenTime").Parent
-local Url = require(Parent.Http).Url
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
-local Logging = require(Parent.AppCommonLib).Logging
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("ScreenTime").Parent
+local Http = require(parent.Http)
+local Url = Http.Url
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local AppCommonLib = require(parent.AppCommonLib)
+local Logging = AppCommonLib.Logging
+local ArgCheck = require(parent.ArgCheck)
+
 local _ = {
 	GET_INSTRUCTIONS = "timed-entertainment-allowance/v1/instructions",
 	REPORT_EXECUTION = "timed-entertainment-allowance/v1/reportExecute"
 }
-local t1 = {
-	GET_INSTRUCTIONS = {
-		errorCode = "number",
-		instructions = "table"
-	},
+
+local v = {
+	GET_INSTRUCTIONS = { errorCode = "number", instructions = "table" },
 	INSTRUCTION = {
 		type = "number",
 		instructionName = "string",
@@ -22,155 +24,137 @@ local t1 = {
 		modalType = "number",
 		data = "string"
 	},
-	REPORT_EXECUTION = {
-		errorCode = "number"
-	}
+	REPORT_EXECUTION = { errorCode = "number" }
 }
-local v8 = UrlBuilder.new({
-	path = "timed-entertainment-allowance/v1/instructions",
-	base = Url.APIS_URL
-})()
-local v9 = UrlBuilder.new({
-	path = "timed-entertainment-allowance/v1/reportExecute",
-	base = Url.APIS_URL
-})()
-local v10 = UrlBuilder.new({
-	path = "v1/logout",
-	base = Url.AUTH_URL
+
+local url = urlBuilder.new({
+	base = Url.APIS_URL,
+	path = "timed-entertainment-allowance/v1/instructions"
 })()
 
-local function checkFormat(p1, p2) -- line: 60
-	for k, v in pairs(p1) do
-		assert(p2[k] ~= nil, "Missing key")
-		assert(v == type(p2[k]), "Wrong type")
+local url2 = urlBuilder.new({
+	base = Url.APIS_URL,
+	path = "timed-entertainment-allowance/v1/reportExecute"
+})()
+
+local url3 = urlBuilder.new({ base = Url.AUTH_URL, path = "v1/logout" })()
+
+local function checkFormat(items, p)
+	for k, item in pairs(items) do
+		assert(p[k] ~= nil, "Missing key")
+		assert(type(p[k]) == item, "Wrong type")
 	end
 end
 
-return {
-	httpService = nil,
-	new = function(p3, p4) -- line: 77
-		-- upvalues: ArgCheck (copy)
-		ArgCheck.isNotNil(p4, "httpService")
+local HttpRequests = { httpService = nil }
 
-		local t2 = {
-			httpService = p4
-		}
+function HttpRequests:new(httpService)
+	ArgCheck.isNotNil(httpService, "httpService")
+	local v2 = { httpService = httpService }
 
-		setmetatable(t2, p3)
-		p3.__index = p3
+	setmetatable(v2, self)
+	self.__index = self
+	return v2
+end
 
-		return t2
-	end,
-	getInstructions = function(p5, p6) -- line: 99
-		-- upvalues: ArgCheck (copy), v8 (copy), checkFormat (copy), t1 (copy), Logging (copy)
-		ArgCheck.isNotNil(p5.httpService, "httpService")
-		ArgCheck.isNotNil(p6, "callback")
-		p5.httpService:RequestInternal({
-			Method = "GET",
-			Url = v8
-		}):Start(function(p7, p8) -- line: 106
-			-- upvalues: p5 (copy), checkFormat (copy), t1 (copy), Logging (copy), v8 (copy), p6 (copy)
-			local v31 = false
-			local t3 = {}
-			local v33, s1
+function HttpRequests.getInstructions(p, callback)
+	ArgCheck.isNotNil(p.httpService, "httpService")
+	ArgCheck.isNotNil(callback, "callback")
+	p.httpService:RequestInternal({ Url = url, Method = "GET" }):Start(function(p2, p3)
+		local v2 = false
+		local v3 = {}
+		local success, result
 
-			if not p7 then
-				v33 = false
-				s1 = "Connection error"
-			elseif p8.StatusCode == 401 then
-				v33 = false
-				v31 = true
-				s1 = "Unauthorized"
-			elseif p8.StatusCode < 200 or p8.StatusCode >= 400 then
-				v33 = false
-				s1 = "Status code: " .. p8.StatusCode
+		if p2 then
+			if p3.StatusCode == 401 then
+				success = false
+				v2 = true
+				result = "Unauthorized"
+			elseif p3.StatusCode < 200 or p3.StatusCode >= 400 then
+				result = "Status code: " .. p3.StatusCode
+				success = false
 			else
-				v33, s1 = pcall(function() -- line: 123
-					-- upvalues: p5 (copy), p8 (copy), checkFormat (copy), t1 (copy), t3 (ref)
-					local data = p5.httpService:JSONDecode(p8.Body)
+				success, result = pcall(function()
+					local jsonDecode = p.httpService:JSONDecode(p3.Body)
+					checkFormat(v.GET_INSTRUCTIONS, jsonDecode)
+					assert(jsonDecode.errorCode == 0, "Error code is not 0")
 
-					checkFormat(t1.GET_INSTRUCTIONS, data)
-					assert(data.errorCode == 0, "Error code is not 0")
-
-					for _, v in ipairs(data.instructions) do
-						checkFormat(t1.INSTRUCTION, v)
+					for _, instruction in ipairs(jsonDecode.instructions) do
+						checkFormat(v.INSTRUCTION, instruction)
 					end
 
-					t3 = data.instructions
+					v3 = jsonDecode.instructions
 				end)
 			end
+		else
+			success = false
+			result = "Connection error"
+		end
 
-			if not v33 then
-				Logging.warn("HttpRequests" .. " getInstructions failed: " .. v8 .. ", " .. s1)
-			end
+		if not success then
+			Logging.warn("HttpRequests" .. " getInstructions failed: " .. url .. ", " .. result)
+		end
 
-			p6(v33, v31, t3)
-		end)
-	end,
-	reportExecution = function(p9, p10, p11, p12) -- line: 148
-		-- upvalues: ArgCheck (copy), v9 (copy), checkFormat (copy), t1 (copy), Logging (copy)
-		ArgCheck.isNotNil(p9.httpService, "httpService")
+		callback(success, v2, v3)
+	end)
+end
 
-		local v25 = os.date("%Y-%m-%dT%H:%M:%SZ")
-		local json = p9.httpService:JSONEncode({
-			instructionName = p10,
-			serialId = p11,
-			execTime = v25
-		})
+function HttpRequests.reportExecution(p, instructionName, serialId, callback)
+	ArgCheck.isNotNil(p.httpService, "httpService")
 
-		p9.httpService:RequestInternal({
-			Method = "POST",
-			Url = v9,
-			Headers = {
-				["Content-Type"] = "application/json"
-			},
-			Body = json
-		}):Start(function(p13, p14) -- line: 165
-			-- upvalues: p9 (copy), checkFormat (copy), t1 (copy), Logging (copy), v9 (copy), p12 (copy)
-			local v37, s2
+	local execTime = os.date("%Y-%m-%dT%H:%M:%SZ")
+	local jsonEncode = p.httpService:JSONEncode({
+		instructionName = instructionName,
+		serialId = serialId,
+		execTime = execTime
+	})
 
-			if not p13 then
-				v37 = false
-				s2 = "Connection error"
-			elseif p14.StatusCode < 200 and p14.StatusCode >= 400 then
-				v37 = false
-				s2 = "Status code: " .. p14.StatusCode
+	p.httpService:RequestInternal({
+		Url = url2,
+		Method = "POST",
+		Headers = { ["Content-Type"] = "application/json" },
+		Body = jsonEncode
+	}):Start(function(p2, p3)
+		local result, success
+
+		if p2 then
+			if p3.StatusCode < 200 and p3.StatusCode >= 400 then
+				result = "Status code: " .. p3.StatusCode
+				success = false
 			else
-				v37, s2 = pcall(function() -- line: 176
-					-- upvalues: p9 (copy), p14 (copy), checkFormat (copy), t1 (copy)
-					local data = p9.httpService:JSONDecode(p14.Body)
-
-					checkFormat(t1.REPORT_EXECUTION, data)
-					assert(data.errorCode == 0, "Error code is not 0")
+				success, result = pcall(function()
+					local jsonDecode = p.httpService:JSONDecode(p3.Body)
+					checkFormat(v.REPORT_EXECUTION, jsonDecode)
+					assert(jsonDecode.errorCode == 0, "Error code is not 0")
 				end)
 			end
+		else
+			success = false
+			result = "Connection error"
+		end
 
-			if not v37 then
-				Logging.warn("HttpRequests" .. " reportExecution failed: " .. v9 .. ", " .. s2)
-			end
+		if not success then
+			Logging.warn("HttpRequests" .. " reportExecution failed: " .. url2 .. ", " .. result)
+		end
 
-			if p12 ~= nil then
-				p12(v37)
-			end
-		end)
-	end,
-	logout = function(p15) -- line: 191
-		-- upvalues: ArgCheck (copy), v10 (copy)
-		ArgCheck.isNotNil(p15.httpService, "httpService")
+		if callback ~= nil then
+			callback(success)
+		end
+	end)
+end
 
-		local v28 = p15.httpService:RequestInternal({
-			Method = "POST",
-			Body = "",
-			Url = v10,
-			Headers = {
-				["Content-Type"] = "application/json"
-			}
-		})
+function HttpRequests.logout(p)
+	ArgCheck.isNotNil(p.httpService, "httpService")
+	local internal = p.httpService:RequestInternal({
+		Url = url3,
+		Method = "POST",
+		Headers = { ["Content-Type"] = "application/json" },
+		Body = ""
+	})
 
-		pcall(function() -- line: 201
-			-- upvalues: v28 (copy)
-			v28:Start(function(_, _) -- line: 202
-			end)
-		end)
-	end
-}
+	pcall(function()
+		internal:Start(function(_, _) end)
+	end)
+end
+
+return HttpRequests

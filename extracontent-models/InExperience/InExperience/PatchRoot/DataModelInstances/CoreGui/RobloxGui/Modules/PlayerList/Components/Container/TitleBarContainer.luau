@@ -1,34 +1,47 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent.Parent
+
+local parent = script.Parent.Parent.Parent
+
 local React = require(CorePackages.Packages.React)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-
 require(CorePackages.Workspace.Packages.LeaderboardStore)
 
 local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
-local TitleBarView = require(ParentParent.Components.PresentationCommon.TitleBarView)
-local FFlagPlayerListFixLeaderstatsStacking = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking
 
-local function TitleBarContainer(t1: {[any]: any}) -- line: 41
-	-- upvalues: useLeaderboardStore (copy), FFlagPlayerListFixLeaderstatsStacking (copy), SignalsReact (copy), React (copy), TitleBarView (copy)
-	local v11 = useLeaderboardStore().getGameStatsList()
-	local v12 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(v11.getCount) else nil
+local TitleBarView = require(parent.Components.PresentationCommon.TitleBarView)
 
-	return React.createElement(TitleBarView, {
-		gameStats = v11,
-		gameStatsCount = if not FFlagPlayerListFixLeaderstatsStacking then v12 else nil,
-		size = t1.size,
-		entrySizeX = t1.entrySizeX,
-		layoutOrder = t1.layoutOrder,
-		contentsVisible = t1.contentsVisible,
-		isSmallTouchDevice = t1.isSmallTouchDevice,
-		showDivider = t1.showDivider,
-		showBackground = t1.showBackground,
-		backgroundTransparency = t1.backgroundTransparency,
-		useCustomTextColor = t1.useCustomTextColor,
-		customTextColor = t1.customTextColor,
-		headerPaddingLeft = t1.headerPaddingLeft
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagPlayerListFixLeaderstatsStacking = SharedFlags.FFlagPlayerListFixLeaderstatsStacking
+
+local function TitleBarContainer(props)
+	local gameStatsList = useLeaderboardStore().getGameStatsList()
+	local gameStatsCount
+
+	if not FFlagPlayerListFixLeaderstatsStacking then
+		gameStatsCount = SignalsReact.useSignalState(gameStatsList.getCount)
+	end
+
+	local createElement = React.createElement
+
+	if FFlagPlayerListFixLeaderstatsStacking then
+		gameStatsCount = nil
+	end
+
+	return createElement(TitleBarView, {
+		gameStats = gameStatsList,
+		gameStatsCount = gameStatsCount,
+		size = props.size,
+		entrySizeX = props.entrySizeX,
+		layoutOrder = props.layoutOrder,
+		contentsVisible = props.contentsVisible,
+		isSmallTouchDevice = props.isSmallTouchDevice,
+		showDivider = props.showDivider,
+		showBackground = props.showBackground,
+		backgroundTransparency = props.backgroundTransparency,
+		useCustomTextColor = props.useCustomTextColor,
+		customTextColor = props.customTextColor,
+		headerPaddingLeft = props.headerPaddingLeft
 	})
 end
 

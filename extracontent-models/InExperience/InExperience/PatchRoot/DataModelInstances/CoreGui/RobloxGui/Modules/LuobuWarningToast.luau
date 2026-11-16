@@ -1,23 +1,25 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
+
 local Roact = require(CorePackages.Packages.Roact)
+
 local LuobuWarningToastComponent = require(script.LuobuWarningToastComponent)
-local t1 = {}
+local class = {}
 
-t1.__index = t1
+class.__index = class
 
-function t1.new() -- line: 11
-	-- upvalues: t1 (copy), Roact (copy), LuobuWarningToastComponent (copy), CoreGui (copy)
-	local self = setmetatable({}, t1)
+function class.new()
+	local object = setmetatable({}, class)
 
-	self.element = Roact.createElement(LuobuWarningToastComponent)
-	self.root = Roact.mount(self.element, CoreGui, "LuobuWarningToast")
-	task.delay(10, function() -- line: 18
-		-- upvalues: Roact (copy), self (copy)
-		Roact.unmount(self.root)
+	object.element = Roact.createElement(LuobuWarningToastComponent)
+
+	object.root = Roact.mount(object.element, CoreGui, "LuobuWarningToast")
+
+	task.delay(10, function()
+		Roact.unmount(object.root)
 	end)
 
-	return self
+	return object
 end
 
-return t1.new()
+return class.new()

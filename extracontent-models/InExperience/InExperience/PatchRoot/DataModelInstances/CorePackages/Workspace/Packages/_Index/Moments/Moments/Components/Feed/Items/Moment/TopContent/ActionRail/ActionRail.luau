@@ -1,106 +1,224 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
-local ReactUtils = require(MomentsParent.ReactUtils)
-local SignalsReact = require(MomentsParent.SignalsReact)
-local BuilderIcons = require(MomentsParent.BuilderIcons)
-local Foundation = require(MomentsParent.Foundation)
+local parent = Moments.Parent
 
-require(MomentsParent.MomentsTypes)
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local SignalsReact = require(parent.SignalsReact)
 
-local SharedFlags = require(MomentsParent.SharedFlags)
+local BuilderIcons = require(parent.BuilderIcons)
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.MomentsTypes)
+local SharedFlags = require(parent.SharedFlags)
+
 local View = Foundation.View
+
+local GetMomentsCapabilities = MomentsCommon.Stores.GetMomentsCapabilities
 local useSignalBinding = SignalsReact.useSignalBinding
 local useSignalState = SignalsReact.useSignalState
+
 local MomentContext = require(script.Parent.Parent.Parent.MomentContext)
 local RailItem = require(script.Parent.RailItem)
 local ReactionButton = require(script.Parent.ReactionButton)
 local ContextualMenu = require(Moments.Components.Feed.ContextualMenu)
-local useMomentsSession = require(Moments.Stores.GetMomentsStore.MomentsSessionContext).useMomentsSession
+local MomentsSessionContext = require(Moments.Stores.GetMomentsStore.MomentsSessionContext)
+local useMomentsSession = MomentsSessionContext.useMomentsSession
 local GetMomentsPreferencesStore = require(Moments.Stores.GetMomentsPreferencesStore)
-local FFlagMomentsFixFeedShareArrowIcon = require(Moments.Flags.FFlagMomentsFixFeedShareArrowIcon)
-local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
-local GetFFlagMomentsMusicButton = require(Moments.Flags.GetFFlagMomentsMusicButton)
+local useCommentCapabilities = require(Moments.Components.Comments.useCommentCapabilities)
+local FFlagMomentsActionRailNarrowWidth = require(Moments.Flags.FFlagMomentsActionRailNarrowWidth)
+local FFlagMomentsActionRailSpacing = require(Moments.Flags.FFlagMomentsActionRailSpacing)
+local FFlagMomentsCreatorAnalytics = require(Moments.Flags.FFlagMomentsCreatorAnalytics)
+local FFlagMomentsRecommendationContentType = require(Moments.Flags.FFlagMomentsRecommendationContentType)
+local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
+local FFlagMomentsComments = SharedFlags.FFlagMomentsComments
+local FFlagMomentsCommentsIxpEnabled = SharedFlags.FFlagMomentsCommentsIxpEnabled
+local FFlagMomentsReactFeatureGate = SharedFlags.FFlagMomentsReactFeatureGate
+local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
+local FFlagMomentsEngagementMetricsFeature = MomentsCommon.Flags.FFlagMomentsEngagementMetricsFeature
 local useConfiguration = require(Moments.Hooks.useConfiguration)
 local useShareMoment = require(Moments.Share.useShareMoment)
-local PaperAirplane = BuilderIcons.Icon.PaperAirplane
+local useCommentActionImpression = require(script.Parent.useCommentActionImpression)
+
 local ArrowThickToRight = BuilderIcons.Icon.ArrowThickToRight
+local SpeechBubbleAlignLeft = BuilderIcons.Icon.SpeechBubbleAlignLeft
 
-local function ActionRail(t1: {[any]: any}) -- line: 55
-	-- upvalues: ReactUtils (copy), MomentContext (copy), useShareMoment (copy), useSignalBinding (copy), useSignalState (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), useConfiguration (copy), useMomentsSession (copy), GetMomentsPreferencesStore (copy), React (copy), ReactionButton (copy), RailItem (copy), FFlagMomentsFixFeedShareArrowIcon (copy), ArrowThickToRight (copy), PaperAirplane (copy), GetFFlagMomentsMusicButton (copy), ContextualMenu (copy), View (copy)
-	local v27 = ReactUtils.createNextOrder()
-	local v28 = MomentContext.useMoment()
-	local store = v28.store
-	local v30 = store.getData(false).kind == "ad"
-	local v31 = useShareMoment(t1.moment)
-	local animationRatio = v28.animationRatio
-	local v33 = useSignalBinding(store.getShareCount)
-	local v34 = useSignalState(store.getIsModerated)
-	local v35 = if t1.moment == nil or t1.moment.recommendationMetadata == nil then nil else t1.moment.recommendationMetadata.feedItemId
-	local v36 = v34 or FFlagMomentsPassFeedItemIdToBackendApis and (v35 == nil or v35 == "")
-	local v37 = useConfiguration("feed_mute_enabled", false)
-	local v38 = useConfiguration("feed_mute_button_analytics_enabled", false)
-	local v39 = useMomentsSession()
-	local v40 = GetMomentsPreferencesStore(false)
-	local v41 = useSignalState(v39.getHideDetails)
-	local v42 = useSignalState(v40.getFeedGlobalMute)
-	local v43 = React.useMemo(function() -- line: 91
-		-- upvalues: v42 (copy), v40 (copy)
-		return {
-			isMuted = v42,
-			toggle = v40.toggleFeedGlobalMute
-		}
-	end, {
-		v42,
-		v40.toggleFeedGlobalMute
-	})
-	local t2 = {}
+local function ActionRail(props)
+	local nextOrder = ReactUtils.createNextOrder()
 
-	if not v41 then
-		if not v30 then
-			t2.React = React.createElement(ReactionButton, {
-				animationRatio = animationRatio,
-				isDisabled = v34,
-				LayoutOrder = v27()
-			})
-		end
+	local v = MomentContext.useMoment()
+	local store = v.store
+	local data = store.getData(false)
+	local v2 = data.kind == "ad"
+	local v3
 
-		t2.Share = React.createElement(RailItem, {
-			LayoutOrder = v27(),
-			slot = if not FFlagMomentsFixFeedShareArrowIcon then PaperAirplane else ArrowThickToRight,
-			count = v33,
-			animationRatio = animationRatio,
-			isDisabled = v36,
-			onActivated = v31.onShareActivated
-		})
+	if FFlagMomentsEngagementMetricsFeature then
+		v3 = useSignalState(GetMomentsCapabilities(false).getIsEngagementMetricsEnabled)
+	end
 
-		if GetFFlagMomentsMusicButton() then
-			local MusicButton = require(script.Parent.MusicButton)
+	local v4 = not FFlagMomentsReactFeatureGate or useSignalState(GetMomentsCapabilities(false).getCanReactToMoments)
 
-			t2.Music = React.createElement(MusicButton, {
-				LayoutOrder = v27(),
-				moment = t1.moment,
-				animationRatio = animationRatio,
-				isDisabled = v34
-			})
+	local v5 = useShareMoment(props.moment)
+
+	local animationRatio = v.animationRatio
+	local count = useSignalBinding(store.getShareCount)
+	local count2
+
+	if FFlagMomentsComments then
+		count2 = useSignalBinding(store.getCommentCount)
+	end
+
+	local isDisabled = useSignalState(store.getIsModerated)
+	local v6 = FFlagMomentsOptimisticProfilePending and data.isPending == true
+	local isDisabled2 = isDisabled or v6
+	local feedItemId
+
+	if props.moment == nil or props.moment.recommendationMetadata == nil then
+		feedItemId = nil
+	else
+		feedItemId = props.moment.recommendationMetadata.feedItemId
+	end
+
+	local isDisabled3 = isDisabled2 or feedItemId == nil or feedItemId == ""
+
+	local isFeedMuteEnabled = useConfiguration("feed_mute_enabled", false)
+	local isFeedMuteButtonAnalyticsEnabled = useConfiguration("feed_mute_button_analytics_enabled", false)
+
+	local v7 = useMomentsSession()
+	local momentsPreferencesStore = GetMomentsPreferencesStore(false)
+
+	local v8 = useSignalState(v7.getHideDetails)
+	local comments
+
+	if props.moment ~= nil then
+		comments = props.moment.comments
+	end
+
+	local canRead = useCommentCapabilities().canRead
+	local v9 = FFlagMomentsServeEDPVideos
+
+	if v9 then
+		if props.moment == nil then
+			v9 = false
+		else
+			v9 = props.moment.entityType == "edpVideo"
 		end
 	end
 
-	if t1.moment ~= nil then
-		t2.ContextualMenu = React.createElement(ContextualMenu, {
-			isFeedMuteEnabled = v37,
-			isFeedMuteButtonAnalyticsEnabled = v38,
-			isDisabled = v34,
-			layoutOrder = v27(),
-			moment = t1.moment,
-			playbackVolume = v43
+	local v10 = canRead and not (v8 or v2) and not v9 and (comments == nil or comments.viewerCanRead)
+
+	if FFlagMomentsComments or FFlagMomentsCommentsIxpEnabled then
+		useCommentActionImpression(v10 and props.moment ~= nil)
+	end
+
+	local isMuted = useSignalState(momentsPreferencesStore.getFeedGlobalMute)
+	local playbackVolume = React.useMemo(function()
+		return { isMuted = isMuted, toggle = momentsPreferencesStore.toggleFeedGlobalMute }
+	end, { isMuted, momentsPreferencesStore.toggleFeedGlobalMute })
+
+	local children = {}
+
+	if v4 and not (v8 or v2) then
+		children.React = React.createElement(ReactionButton, {
+			animationRatio = animationRatio,
+			isDisabled = isDisabled2,
+			LayoutOrder = nextOrder()
 		})
+	end
+
+	if FFlagMomentsComments and v10 then
+		local createElement = React.createElement
+		local v11 = {
+			LayoutOrder = nextOrder(),
+			slot = SpeechBubbleAlignLeft,
+			count = 0,
+			countIsCapped = 0,
+			animationRatio = 0,
+			isDisabled = 0,
+			onActivated = 0,
+			testId = "moments-comment-button"
+		}
+
+		if FFlagMomentsEngagementMetricsFeature and not v3 then
+			count2 = nil
+		end
+
+		v11.count = count2
+		v11.countIsCapped = comments ~= nil and comments.countIsCapped == true
+		v11.animationRatio = animationRatio
+		v11.isDisabled = isDisabled2
+		function v11.onActivated()
+			if not isDisabled2 and feedItemId ~= nil and feedItemId ~= "" and props.onOpenComments ~= nil then
+				props.onOpenComments()
+			end
+		end
+
+		children.Comment = createElement(RailItem, v11)
+	end
+
+	if not v8 then
+		local createElement = React.createElement
+		local v11 = {
+			LayoutOrder = nextOrder(),
+			slot = ArrowThickToRight,
+			count = 0,
+			animationRatio = 0,
+			isDisabled = 0,
+			onActivated = 0
+		}
+
+		if FFlagMomentsEngagementMetricsFeature and not v3 then
+			count = nil
+		end
+
+		v11.count = count
+		v11.animationRatio = animationRatio
+		v11.isDisabled = isDisabled3
+		v11.onActivated = v5.onShareActivated
+		children.Share = createElement(RailItem, v11)
+
+		local MusicButton = require(script.Parent.MusicButton)
+		children.Music = React.createElement(MusicButton, {
+			LayoutOrder = nextOrder(),
+			moment = props.moment,
+			animationRatio = animationRatio,
+			isDisabled = isDisabled
+		})
+	end
+
+	if props.moment ~= nil then
+		local createElement = React.createElement
+		local v11 = {
+			isFeedMuteEnabled = isFeedMuteEnabled,
+			isFeedMuteButtonAnalyticsEnabled = isFeedMuteButtonAnalyticsEnabled,
+			isDisabled = isDisabled,
+			layoutOrder = nextOrder(),
+			moment = props.moment,
+			contentType = 0,
+			momentStore = 0,
+			playbackVolume = 0
+		}
+		local contentType
+
+		if FFlagMomentsRecommendationContentType then
+			contentType = data.contentType
+		end
+
+		v11.contentType = contentType
+
+		if not FFlagMomentsCreatorAnalytics then
+			store = nil
+		end
+
+		v11.momentStore = store
+		v11.playbackVolume = playbackVolume
+		children.ContextualMenu = createElement(ContextualMenu, v11)
 	end
 
 	return React.createElement(View, {
-		tag = "col size-1200-0 auto-y",
-		LayoutOrder = t1.LayoutOrder
-	}, t2)
+		LayoutOrder = props.LayoutOrder,
+		tag = FFlagMomentsActionRailNarrowWidth and (FFlagMomentsActionRailSpacing and "col align-x-center gap-large size-1000-0 auto-y" or "col align-x-center size-1000-0 auto-y") or FFlagMomentsActionRailSpacing and "col align-x-center gap-large size-1200-0 auto-y" or "col size-1200-0 auto-y",
+		testId = (FFlagMomentsActionRailSpacing or FFlagMomentsActionRailNarrowWidth) and "moments-action-rail" or nil
+	}, children)
 end
 
 return React.memo(ActionRail)

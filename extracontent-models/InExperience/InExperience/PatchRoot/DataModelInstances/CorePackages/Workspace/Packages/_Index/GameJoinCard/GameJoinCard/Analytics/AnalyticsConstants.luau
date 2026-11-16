@@ -1,27 +1,5 @@
-local t1 = {
-	Thumbnail = "thumbnail",
-	Title = "title"
-}
-local t2 = {
-	UserTile = "userTile",
-	ViewProfileButton = "viewProfileButton"
-}
-local t3 = {
-	Join = "Join",
-	AgeCheckUnlock = "AgeCheckUnlock"
-}
-local t4 = {
-	Unspecified = 0,
-	Success = 1,
-	Cancelled = 2,
-	Error = 3
-}
-
 return {
-	Btns = {
-		OpenGameJoinCard = "openGameJoinCard",
-		GameJoinCardButton = "gameJoinCardButton"
-	},
+	Btns = { OpenGameJoinCard = "openGameJoinCard", GameJoinCardButton = "gameJoinCardButton" },
 	GameJoinCardButtonAction = {
 		Invalid = 0,
 		JoinGame = 1,
@@ -30,14 +8,14 @@ return {
 		ViewExperienceDetailsFromTitle = 4,
 		ViewExperienceDetailsFromThumbnail = 5,
 		Chat = 6,
-		AgeCheckUnlock = 7
+		AgeCheckUnlock = 7,
+		PlayExperience = 8,
+		CreateInBuild = 9
 	},
-	GameJoinCardSurface = {
-		Desktop = "desktop",
-		Mobile = "mobile"
-	},
-	CtaType = t3,
-	AgeCheckUpsellOutcome = t4,
-	viewEDPsourceValues = t1,
-	viewProfileSourceValues = t2
+	JoinCardType = { Build = 2 },
+	GameJoinCardSurface = { Desktop = "desktop", Mobile = "mobile" },
+	CtaType = { Join = "Join", Play = "Play", AgeCheckUnlock = "AgeCheckUnlock" },
+	AgeCheckUpsellOutcome = { Unspecified = 0, Success = 1, Cancelled = 2, Error = 3 },
+	viewEDPsourceValues = { Thumbnail = "thumbnail", Title = "title" },
+	viewProfileSourceValues = { UserTile = "userTile", ViewProfileButton = "viewProfileButton" }
 }

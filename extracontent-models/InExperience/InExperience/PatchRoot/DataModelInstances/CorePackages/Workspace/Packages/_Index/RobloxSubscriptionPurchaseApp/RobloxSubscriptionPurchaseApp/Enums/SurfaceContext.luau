@@ -1,6 +1,1 @@
-return {
-	Unspecified = "Unspecified",
-	InApp = "InApp",
-	InGame = "InGame",
-	Web = "Web"
-}
+return { Unspecified = "Unspecified", InApp = "InApp", InGame = "InGame", Web = "Web" }

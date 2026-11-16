@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+local React = require(parent.React)
+
 local OutfitDetailsActionBar = require(script.Parent.OutfitDetailsActionBar)
 local useOutfitDetailsActionBarProps = require(script.Parent.useOutfitDetailsActionBarProps)
 
-local function OutfitDetailsActionBarContainer(p1) -- line: 9
-	-- upvalues: useOutfitDetailsActionBarProps (copy), React (copy), OutfitDetailsActionBar (copy)
-	local v7 = useOutfitDetailsActionBarProps(p1)
-
-	return React.createElement(OutfitDetailsActionBar, v7)
+local function OutfitDetailsActionBarContainer(p)
+	local v = useOutfitDetailsActionBarProps(p)
+	return React.createElement(OutfitDetailsActionBar, v)
 end
 
 return OutfitDetailsActionBarContainer

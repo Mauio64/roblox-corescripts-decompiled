@@ -1,34 +1,60 @@
-local Parent = script:FindFirstAncestor("AvatarSwitcher").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarSwitcher").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local FFlagAvatarSwitcherExpiredItemsWarning = require(Parent.AvatarExperienceFlags).FFlagAvatarSwitcherExpiredItemsWarning
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-local function AvatarCompatibilityWarning(t1: {[any]: any}) -- line: 21
-	-- upvalues: useTokens (copy), useLocalization (copy), FFlagAvatarSwitcherExpiredItemsWarning (copy), React (copy), Foundation (copy)
-	local v9 = useTokens()
-	local v10 = useLocalization({
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAvatarSwitcherExpiredItemsWarning = AvatarExperienceFlags.FFlagAvatarSwitcherExpiredItemsWarning
+
+local function AvatarCompatibilityWarning(p)
+	local v = useTokens()
+	local v2 = {
 		partiallyUnsupported = not FFlagAvatarSwitcherExpiredItemsWarning and "Feature.AvatarSwitcher.Message.PartiallyUnsupported" or nil,
-		message = if not FFlagAvatarSwitcherExpiredItemsWarning then nil else t1.message
-	})
+		message = 0
+	}
+	local message
 
-	return React.createElement(Foundation.View, {
-		tag = "size-full-0 auto-y",
-		LayoutOrder = t1.LayoutOrder
-	}, {
+	if FFlagAvatarSwitcherExpiredItemsWarning then
+		message = p.message
+	end
+
+	v2.message = message
+	local v3 = useLocalization(v2)
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v4 = { tag = "size-full-0 auto-y", LayoutOrder = p.LayoutOrder }
+	local v5 = {
 		InfoIcon = React.createElement(Foundation.Image, {
 			Image = "icons/actions/info",
-			LayoutOrder = 1,
-			Size = UDim2.fromOffset(v9.Size.Size_500, v9.Size.Size_500)
+			Size = UDim2.fromOffset(v.Size.Size_500, v.Size.Size_500),
+			LayoutOrder = 1
 		}),
-		CompatibilityWarning = React.createElement(Foundation.Text, {
-			tag = "auto-y position-top-right anchor-top-right text-caption-small text-wrap text-align-x-left padding-top-xsmall",
-			LayoutOrder = 2,
-			Size = UDim2.new(1, -v9.Size.Size_500 - v9.Gap.Small, 0, 0),
-			Text = if not FFlagAvatarSwitcherExpiredItemsWarning then v10.partiallyUnsupported else v10.message
-		})
-	})
+		CompatibilityWarning = 0
+	}
+
+	local createElement2 = React.createElement
+	local text = Foundation.Text
+	local v6 = {
+		tag = "auto-y position-top-right anchor-top-right text-caption-small text-wrap text-align-x-left padding-top-xsmall",
+		Size = UDim2.new(1, -v.Size.Size_500 - v.Gap.Small, 0, 0),
+		Text = 0,
+		LayoutOrder = 2
+	}
+	local text2
+
+	if FFlagAvatarSwitcherExpiredItemsWarning then
+		text2 = v3.message
+	else
+		text2 = v3.partiallyUnsupported
+	end
+
+	v6.Text = text2
+	v5.CompatibilityWarning = createElement2(text, v6)
+	return createElement(view, v4, v5)
 end
 
 return AvatarCompatibilityWarning

@@ -1,50 +1,49 @@
 local Settings = script:FindFirstAncestor("Settings")
 local CorePackages = game:GetService("CorePackages")
-local GameSettings = UserSettings().GameSettings
+local gameSettings = UserSettings().GameSettings
 local GuiService = game:GetService("GuiService")
+
 local SettingsService = require(CorePackages.Workspace.Packages.SettingsService)
 local ValueChangedSignal = SettingsService.ValueChangedSignal
 local AvailabilitySignal = SettingsService.AvailabilitySignal
 local SettingEnum = SettingsService.SettingEnum
 local Constants = require(Settings.Integrations.Constants)
 local Utils = require(Settings.Integrations.Utils)
+
 local LAYOUT_ORDER = Constants.GAMESETTINGS.LAYOUT_ORDER
 
-local function FullScreenValue() -- line: 24
-	-- upvalues: ValueChangedSignal (copy), GameSettings (copy), GuiService (copy)
-	local v16 = ValueChangedSignal.new(GameSettings:InFullScreen())
+local function FullScreenValue()
+	local v = ValueChangedSignal.new(gameSettings:InFullScreen())
 
-	v16:connect(function(p1) -- line: 27
-		-- upvalues: GameSettings (copy), GuiService (copy)
-		if p1 == GameSettings:InFullScreen() then
+	v:connect(function(p)
+		if p == gameSettings:InFullScreen() then
 			return
 		end
 
 		GuiService:ToggleFullscreen()
 	end, true)
-	GameSettings.FullscreenChanged:Connect(function(p2) -- line: 35
-		-- upvalues: v16 (copy)
-		v16:set(p2)
+
+	gameSettings.FullscreenChanged:Connect(function(p)
+		v:set(p)
 	end)
 
-	return v16
+	return v
 end
 
-local v13 = FullScreenValue()
+local onChanged = FullScreenValue()
 
-local function initAvailability() -- line: 45
-	-- upvalues: Utils (copy)
+local function initAvailability(): boolean -- 1 equivalent call inferred from this helper
 	return Utils.getDeviceType() == Utils.DeviceTypes.Desktop or Utils.getDeviceType() == Utils.DeviceTypes.Unknown
 end
 
-local v15 = AvailabilitySignal.new(Utils.getDeviceType() == Utils.DeviceTypes.Desktop or Utils.getDeviceType() == Utils.DeviceTypes.Unknown)
+local availability = AvailabilitySignal.new(initAvailability()) -- inferred equivalent call
 
 return {
 	id = "fullscreen",
-	label = "CoreScripts.InGameMenu.GameSettings.FullScreen",
-	alreadyLocalized = false,
 	field_type = SettingEnum.Toggle,
+	label = "CoreScripts.InGameMenu.GameSettings.FullScreen",
 	layoutOrder = LAYOUT_ORDER.FullScreenFrame,
-	onChanged = v13,
-	availability = v15
+	onChanged = onChanged,
+	alreadyLocalized = false,
+	availability = availability
 }

@@ -1,141 +1,110 @@
-local ParentParent = script.Parent.Parent
-local Cryo = require(ParentParent.Cryo)
+local parent = script.Parent.Parent
+
+local Cryo = require(parent.Cryo)
 local Regex = require(script.Parent.Regex)
-local RegExp = require(ParentParent.RegExp)
-local StringUtilities = require(ParentParent.StringUtilities)
+local RegExp = require(parent.RegExp)
+
+local StringUtilities = require(parent.StringUtilities)
 local StringSplit = StringUtilities.StringSplit
 local StringTrim = StringUtilities.StringTrim
 local ParseQuery = StringUtilities.ParseQuery
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatEarlyTestingLinks = SharedFlags.FFlagAppChatEarlyTestingLinks
+
 require(script.Parent.Types)
 
-local function filterParams(t1: {[any]: any}, b1: boolean) -- line: 19
-	-- upvalues: Cryo (copy)
-	return Cryo.List.filter(t1, function(p1) -- line: 20
-		-- upvalues: b1 (copy)
-		return p1.optional == b1 or not b1 and p1.optional == nil
+local function filterParams(p, flag: boolean) -- 3 equivalent calls inferred from this helper
+	return Cryo.List.filter(p, function(p2): boolean
+		return p2.optional == flag or not flag and p2.optional == nil
 	end)
 end
-local function requiredParams(t2: {[any]: any}) -- line: 25
-	-- upvalues: filterParams (copy)
-	return filterParams(t2, false)
-end
-local function optionalParams(t3: {[any]: any}) -- line: 29
-	-- upvalues: filterParams (copy)
-	return filterParams(t3, true)
-end
-local function mapValidToArgName(t4: {[any]: any}) -- line: 33
-	-- upvalues: Regex (copy), RegExp (copy)
-	return function(p2) -- line: 34
-		-- upvalues: Regex (copy), t4 (copy), RegExp (copy)
-		local v55 = Regex.matchWhole(Regex.oneOrMore(p2.pattern))
-		local v56 = t4[p2.name]
 
-		if v56 ~= nil and RegExp(v55):exec(v56) then
-			return p2.name
+local function requiredParams(p)
+	return filterParams(p, false)
+end
+
+local function optionalParams(p)
+	return filterParams(p, true)
+end
+
+local function mapValidToArgName(p) -- 1 equivalent call inferred from this helper
+	return function(p2)
+		local matchWhole = Regex.matchWhole(Regex.oneOrMore(p2.pattern))
+		local v = p[p2.name]
+
+		if FFlagAppChatEarlyTestingLinks and type(v) ~= "string" or (v == nil or not RegExp(matchWhole):exec(v)) then
+			return nil
 		end
 
-		return nil
+		return p2.name
 	end
 end
-local function validateParams(t5: {[any]: any}?, t6: {[any]: any}) -- line: 44
-	-- upvalues: Cryo (copy), Regex (copy), RegExp (copy)
-	local v23 = t5 or {}
-	local v24 = false
-	local v25 = Cryo.List.filter(t6, function(p3) -- line: 20
-		-- upvalues: v24 (copy)
-		return p3.optional == v24 or not v24 and p3.optional == nil
-	end)
 
-	local function v26(p4) -- line: 34
-		-- upvalues: Regex (copy), v23 (copy), RegExp (copy)
-		local v59 = Regex.matchWhole(Regex.oneOrMore(p4.pattern))
-		local v60 = v23[p4.name]
+local function validateParams(mapped, p)
+	local v = mapped or {}
+	local v2 = filterParams(p, false) -- inferred equivalent call
+	local v3 = mapValidToArgName(v) -- inferred equivalent call
+	local filterMap = Cryo.List.filterMap(v2, v3)
 
-		if v60 ~= nil and RegExp(v59):exec(v60) then
-			return p4.name
-		end
-
-		return nil
-	end
-
-	local v27 = Cryo.List.filterMap(v25, v26)
-
-	if #v27 ~= #v25 then
+	if #filterMap ~= #v2 then
 		return false, {}
 	end
 
-	local v28 = true
-	local v29 = Cryo.List.filter(t6, function(p5) -- line: 20
-		-- upvalues: v28 (copy)
-		return p5.optional == v28 or not v28 and p5.optional == nil
-	end)
-	local v30 = Cryo.List.filterMap(v29, v26)
-	local v31 = Cryo.List.join(v27, v30)
-	local v32 = Cryo.List.toSet(v31)
-
-	return true, (Cryo.Dictionary.filter(v23, function(_, p7) -- line: 59
-		-- upvalues: v32 (copy)
-		return v32[p7] ~= nil
+	local v4 = filterParams(p, true) -- inferred equivalent call
+	local filterMap2 = Cryo.List.filterMap(v4, v3)
+	local joined = Cryo.List.join(filterMap, filterMap2)
+	local set = Cryo.List.toSet(joined)
+	return true, (Cryo.Dictionary.filter(v, function(_, p2): boolean
+		return set[p2] ~= nil
 	end))
 end
-local function validatePathParams(t7: {[any]: any}, t8: {[any]: any}) -- line: 65
-	-- upvalues: Cryo (copy), validateParams (copy)
-	local v35 = false
 
-	if #t7 < #Cryo.List.filter(t8, function(p8) -- line: 20
-		-- upvalues: v35 (copy)
-		return p8.optional == v35 or not v35 and p8.optional == nil
-	end) then
+local function validatePathParams(list, pathParams)
+	if #list < #filterParams(pathParams, false) then -- inferred equivalent call
 		return false, {}
 	end
 
-	local v36 = Cryo.Dictionary.map(t8, function(p9, p10) -- line: 73
-		-- upvalues: t7 (copy)
-		return t7[p10], p9.name
-	end)
-
-	return validateParams(v36, t8)
+	return validateParams(Cryo.Dictionary.map(pathParams, function(p, p2)
+		return list[p2], p.name
+	end), pathParams)
 end
-local function validateUrlParams(p11, p12) -- line: 79
-	-- upvalues: StringTrim (copy), StringSplit (copy), ParseQuery (copy), Cryo (copy), validatePathParams (copy), validateParams (copy)
-	local v39 = not p11.path and "" or StringTrim(p11.path, "/")
-	local v40 = if v39 == "" then {} else StringSplit(v39, "/")
-	local v41 = ParseQuery(p11.query)
-	local v42 = Cryo.Dictionary.map(v41, function(p13) -- line: 84
-		if #p13 == 1 then
-			return p13[1]
-		end
 
-		return p13
+local function validateUrlParams(url, item)
+	local v = not url.path and "" or StringTrim(url.path, "/")
+	local v2 = v == "" and {} or StringSplit(v, "/")
+
+	local parseQuery = ParseQuery(url.query)
+	local mapped = Cryo.Dictionary.map(parseQuery, function(list)
+		return if #list == 1 then list[1] else list
 	end)
-	local v43, v44 = validatePathParams(v40, p12.pathParams or {})
 
-	if not v43 then
+	local v3, v4 = validatePathParams(v2, item.pathParams or {})
+
+	if not v3 then
 		return false, {}
 	end
 
-	local v45, v46 = validateParams(v42, p12.queryParams or {})
+	local v5, v6 = validateParams(mapped, item.queryParams or {})
 
-	if not v45 then
-		return false, {}
+	if v5 then
+		return true, Cryo.Dictionary.union(v4, v6)
 	end
 
-	return true, Cryo.Dictionary.union(v44, v46)
+	return false, {}
 end
 
 return {
-	validateUrlMatch = function(p14, p15) -- line: 101
-		-- upvalues: RegExp (copy), validateUrlParams (copy)
-		for v49, v50 in p15 do
-			if not RegExp(v49, "i"):test(p14.matchedPath) then
+	validateUrlMatch = function(p, items)
+		for k, item in items do
+			if not RegExp(k, "i"):test(p.matchedPath) then
 				continue
 			end
 
-			local v51, v52 = validateUrlParams(p14.url, v50)
+			local v, v2 = validateUrlParams(p.url, item)
 
-			if v51 then
-				return v51, v50.paramCallback(v52)
+			if v then
+				return v, item.paramCallback(v2)
 			end
 		end
 

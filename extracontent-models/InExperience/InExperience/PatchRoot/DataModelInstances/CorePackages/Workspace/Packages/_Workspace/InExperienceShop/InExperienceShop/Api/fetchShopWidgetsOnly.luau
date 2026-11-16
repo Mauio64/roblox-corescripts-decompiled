@@ -1,20 +1,16 @@
 local HttpService = game:GetService("HttpService")
+
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
+local parent = InExperienceShop.Parent
 
-require(InExperienceShopParent.Promise)
+require(parent.Promise)
 require(InExperienceShop.Types)
-
 local fetchShopItemIds = require(script.Parent.fetchShopItemIds)
 local buildShopDataFromWidgets = require(script.Parent.buildShopDataFromWidgets)
 
-local function fetchShopWidgetsOnly() -- line: 30
-	-- upvalues: HttpService (copy), fetchShopItemIds (copy), buildShopDataFromWidgets (copy)
-	local guid = HttpService:GenerateGUID(false)
-
-	return fetchShopItemIds(guid):andThen(function(p1) -- line: 35
-		-- upvalues: buildShopDataFromWidgets (copy)
-		return buildShopDataFromWidgets(p1, nil)
+local function fetchShopWidgetsOnly()
+	return fetchShopItemIds((HttpService:GenerateGUID(false))):andThen(function(p)
+		return buildShopDataFromWidgets(p, nil)
 	end)
 end
 

@@ -1,10 +1,13 @@
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
-local Parent = script:FindFirstAncestor("Impressions").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("Impressions").Parent
+
+local Cryo = require(parent.Cryo)
 local Constants = require(script.Parent.Constants)
-local v6 = game:DefineFastFlag("DebugEnableImpressionsVisualizer", false)
-local t1 = {
+
+local defineFastFlag = game:DefineFastFlag("DebugEnableImpressionsVisualizer", false)
+
+local v = {
 	Color3.new(0.941176, 0.941176, 0.015686),
 	Color3.new(0.890196, 0.058823, 0.058823),
 	Color3.new(0.031372, 0.870588, 0.031372),
@@ -13,278 +16,275 @@ local t1 = {
 	Color3.new(0.882352, 0.556862, 0.035294),
 	Color3.new(0.729411, 0.043137, 0.835294)
 }
-local n1 = 1
-local _ = {
-	None = "None",
-	Highlight = "Highlight",
-	FadeOut = "FadeOut"
-}
-local t2 = {
-	BackgroundTransparency = 0,
-	BorderSizePixel = 15,
-	ZIndex = 100,
+
+local v2 = 1
+
+local _ = { None = "None", Highlight = "Highlight", FadeOut = "FadeOut" }
+
+local v3 = {
 	BackgroundColor3 = Color3.new(1, 1, 1),
 	BorderColor3 = Color3.new(1, 1, 1),
-	BorderMode = Enum.BorderMode.Outline
+	BackgroundTransparency = 0,
+	BorderMode = Enum.BorderMode.Outline,
+	BorderSizePixel = 15,
+	ZIndex = 100
 }
-local t3 = {
-	BackgroundTransparency = 0.65,
-	BorderSizePixel = 8
-}
-local t4 = {}
 
-t4.__index = t4
+local v4 = { BackgroundTransparency = 0.65, BorderSizePixel = 8 }
 
-local function getTaggedInstances(p1) -- line: 82
-	-- upvalues: CollectionService (copy), Constants (copy)
-	local t5 = {}
-	local p1_2 = CollectionService:GetTagged(p1)
+local ImpressionsVisualizer = {}
+ImpressionsVisualizer.__index = ImpressionsVisualizer
 
-	for _, v in ipairs(p1_2) do
-		local ConstantsItemIndex = v:GetAttribute(Constants.ItemIndex)
+local function getTaggedInstances(impressionsTag)
+	local tagged = CollectionService:GetTagged(impressionsTag)
+	local guiObjectsByAttribute = {}
 
-		if ConstantsItemIndex and v:IsA("GuiObject") then
-			t5[ConstantsItemIndex] = v
+	for _, guiObject in ipairs(tagged) do
+		local attribute = guiObject:GetAttribute(Constants.ItemIndex)
+
+		if attribute and guiObject:IsA("GuiObject") then
+			guiObjectsByAttribute[attribute] = guiObject
 		end
 	end
 
-	return t5
+	return guiObjectsByAttribute
 end
 
-function t4.new(p2, p3) -- line: 95
-	-- upvalues: t1 (copy), n1 (ref), t4 (copy), v6 (copy), RunService (copy)
-	local t6 = {
-		impressionsTag = p2,
+function ImpressionsVisualizer.new(impressionsTag, p)
+	local v5 = {
+		impressionsTag = impressionsTag,
 		highlightedInstances = {},
 		originalInstances = {},
-		highlightColor = t1[n1],
-		customKeyMapper = p3 or function(p4) -- line: 101
-			return p4
+		highlightColor = v[v2],
+		customKeyMapper = p or function(p2)
+			return p2
 		end
 	}
 
-	setmetatable(t6, t4)
+	setmetatable(v5, ImpressionsVisualizer)
 
-	if v6 then
-		n1 += 1
-
-		if n1 > #t1 then
-			n1 %= #t1
-		end
-
-		if p2 then
-			local connection = nil
-
-			connection = RunService.RenderStepped:Connect(function(dt) -- line: 115
-				-- upvalues: t6 (copy), connection (ref)
-				if t6 then
-					t6:_step(dt)
-
-					return
-				end
-
-				if connection then
-					connection:Disconnect()
-				end
-			end)
-			t6.renderConnection = connection
-		end
+	if not defineFastFlag then
+		return v5
 	end
 
-	return t6
+	v2 += 1
+
+	if v2 > #v then
+		v2 %= #v
+	end
+
+	if impressionsTag then
+		local renderSteppedConnection = nil
+		renderSteppedConnection = RunService.RenderStepped:Connect(function(dt)
+			if v5 then
+				v5:_step(dt)
+			elseif renderSteppedConnection then
+				renderSteppedConnection:Disconnect()
+			end
+		end)
+		v5.renderConnection = renderSteppedConnection
+	end
+
+	return v5
 end
-function t4.destroy(p5) -- line: 131
-	if p5.renderConnection then
-		p5.renderConnection:Disconnect()
+
+function ImpressionsVisualizer.destroy(p)
+	if p.renderConnection then
+		p.renderConnection:Disconnect()
 	end
 end
-function t4._startHighlightState(p6, p7, p8, p9, p10, p11) -- line: 137
-	local v31 = p6.highlightedInstances[p7]
 
-	if v31 == nil then
-		p6.highlightedInstances[p7] = {
-			highlightState = p8,
-			currentFields = {}
-		}
-		v31 = p6.highlightedInstances[p7]
+function ImpressionsVisualizer:_startHighlightState(p, highlightState, p2, items, doLerp)
+	local v5 = self.highlightedInstances[p]
+
+	if v5 == nil then
+		self.highlightedInstances[p] = { highlightState = highlightState, currentFields = {} }
+
+		v5 = self.highlightedInstances[p]
 	else
-		v31.highlightState = p8
+		v5.highlightState = highlightState
 	end
 
-	v31.totalDuration = p9
-	v31.duration = p9
-	v31.doLerp = p11
+	v5.totalDuration = p2
+	v5.duration = p2
+	v5.doLerp = doLerp
 
-	if p11 then
-		local t7 = {}
-		local t8 = {}
+	if doLerp then
+		local startFields = {}
+		local targetFields = {}
 
-		for k, v in pairs(p10) do
-			t7[k] = v31.currentFields[k]
-			t8[k] = v
+		for k, item in pairs(items) do
+			startFields[k] = v5.currentFields[k]
+			targetFields[k] = item
 		end
 
-		v31.startFields = t7
-		v31.targetFields = t8
+		v5.startFields = startFields
+		v5.targetFields = targetFields
 	else
-		v31.startFields = nil
-		v31.targetFields = nil
+		v5.startFields = nil
+		v5.targetFields = nil
 
-		for k, v in pairs(p10) do
-			v31.currentFields[k] = v
+		for k, item in pairs(items) do
+			v5.currentFields[k] = item
 		end
 	end
 
-	p6.highlightedInstances[p7] = v31
+	self.highlightedInstances[p] = v5
 end
-function t4._step(p12, p13) -- line: 172
-	-- upvalues: t3 (copy), getTaggedInstances (copy), t2 (copy)
-	assert(p12.impressionsTag, "impressionsTag is nil")
 
-	for k, v in pairs(p12.highlightedInstances) do
-		if v.doLerp and v.duration ~= nil and v.totalDuration ~= nil then
-			assert(v.startFields, "startFields is nil")
-			assert(v.targetFields, "targetFields is nil")
+function ImpressionsVisualizer:_step(p)
+	assert(self.impressionsTag, "impressionsTag is nil")
 
-			if v.duration <= 0 then
-				v.doLerp = nil
-				v.duration = nil
+	for k, highlightedInstance in pairs(self.highlightedInstances) do
+		if
+			highlightedInstance.doLerp
+			and highlightedInstance.duration ~= nil
+			and highlightedInstance.totalDuration ~= nil
+		then
+			assert(highlightedInstance.startFields, "startFields is nil")
+			assert(highlightedInstance.targetFields, "targetFields is nil")
 
-				for k2, v2 in pairs(v.targetFields) do
-					v.currentFields[k2] = v2
+			if highlightedInstance.duration <= 0 then
+				highlightedInstance.doLerp = nil
+				highlightedInstance.duration = nil
+
+				for k2, targetField in pairs(highlightedInstance.targetFields) do
+					highlightedInstance.currentFields[k2] = targetField
 				end
 			else
-				local v44 = math.clamp((v.totalDuration - v.duration) / v.totalDuration, 0, 1)
+				local v5 = math.clamp(
+					(highlightedInstance.totalDuration - highlightedInstance.duration) / highlightedInstance.totalDuration,
+					0,
+					1
+				)
 
-				for k3, v3 in pairs(v.targetFields) do
-					local v47 = v.startFields[k3]
-					local v48 = v47 + (v3 - v47) * v44
+				for k2, targetField in pairs(highlightedInstance.targetFields) do
+					local startField = highlightedInstance.startFields[k2]
+					local v6 = startField + (targetField - startField) * v5
 
-					v.currentFields[k3] = v48
+					highlightedInstance.currentFields[k2] = v6
 				end
 			end
 		end
 
-		if v.highlightState == "Highlight" then
-			assert(v.duration ~= nil, "duration is nil")
+		if highlightedInstance.highlightState == "Highlight" then
+			assert(highlightedInstance.duration ~= nil, "duration is nil")
 
-			if v.duration <= 0 then
-				p12:_startHighlightState(k, "FadeOut", 2.5, t3, true)
+			if highlightedInstance.duration <= 0 then
+				self:_startHighlightState(k, "FadeOut", 2.5, v4, true)
 			end
 		end
 
-		if v.duration then
-			v.duration = v.duration - p13
+		if highlightedInstance.duration then
+			highlightedInstance.duration -= p
 		end
 	end
 
-	local v49 = getTaggedInstances(p12.impressionsTag)
+	local taggedInstances = getTaggedInstances(self.impressionsTag)
 
-	for k, v in pairs(v49) do
-		if v ~= nil then
-			if p12.originalInstances[v] == nil then
-				p12.originalInstances[v] = {}
+	for k, taggedInstance in pairs(taggedInstances) do
+		if taggedInstance == nil then
+			continue
+		end
 
-				for k4, _ in pairs(t2) do
-					p12.originalInstances[v][k4] = v[k4]
-				end
+		if self.originalInstances[taggedInstance] == nil then
+			self.originalInstances[taggedInstance] = {}
+
+			for k2, _ in pairs(v3) do
+				self.originalInstances[taggedInstance][k2] = taggedInstance[k2]
+			end
+		end
+
+		local customKeyMapper = self.customKeyMapper(k)
+		local v5 = self.highlightedInstances[customKeyMapper]
+
+		if v5 == nil then
+			assert(self.originalInstances[taggedInstance], "self.originalInstances[instance] is nil")
+			v5 = { highlightState = "None", currentFields = {} }
+
+			for k2, v6 in pairs(self.originalInstances[taggedInstance]) do
+				v5.currentFields[k2] = v6
 			end
 
-			local v54 = p12.customKeyMapper(k)
-			local v55 = p12.highlightedInstances[v54]
+			self.highlightedInstances[customKeyMapper] = v5
+		end
 
-			if v55 == nil then
-				v55 = {
-					highlightState = "None",
-					currentFields = {}
-				}
-				assert(p12.originalInstances[v], "self.originalInstances[instance] is nil")
+		assert(v5 ~= nil, "stateData is nil")
 
-				for k5, v4 in pairs(p12.originalInstances[v]) do
-					v55.currentFields[k5] = v4
-				end
+		if not v5.currentFields then
+			continue
+		end
 
-				p12.highlightedInstances[v54] = v55
-			end
-
-			assert(v55 ~= nil, "stateData is nil")
-
-			if v55.currentFields then
-				for k6, v5 in pairs(v55.currentFields) do
-					v[k6] = v5
-				end
-			end
+		for k2, currentField in pairs(v5.currentFields) do
+			taggedInstance[k2] = currentField
 		end
 	end
 end
-function t4._highlightImpression(p14, p15) -- line: 260
-	-- upvalues: Cryo (copy), t2 (copy)
-	if p14.highlightedInstances[p15] ~= nil and p14.highlightedInstances[p15].highlightState ~= "None" then
+
+function ImpressionsVisualizer:_highlightImpression(p)
+	if self.highlightedInstances[p] ~= nil and self.highlightedInstances[p].highlightState ~= "None" then
 		return
 	end
 
-	p14:_startHighlightState(p15, "Highlight", 1, Cryo.Dictionary.join(t2, {
-		BackgroundColor3 = p14.highlightColor,
-		BorderColor3 = p14.highlightColor
-	}), false)
+	self:_startHighlightState(
+		p,
+		"Highlight",
+		1,
+		Cryo.Dictionary.join(v3, {
+			BackgroundColor3 = self.highlightColor,
+			BorderColor3 = self.highlightColor
+		}),
+		false
+	)
 end
-function t4._clearImpression(p16, p17) -- line: 275
-	p16.highlightedInstances[p17] = nil
+
+function ImpressionsVisualizer:_clearImpression(p)
+	self.highlightedInstances[p] = nil
 end
-function t4.onSendImpressions(p18, p19) -- line: 279
-	-- upvalues: v6 (copy)
-	if not v6 then
+
+function ImpressionsVisualizer:onSendImpressions(list)
+	if not defineFastFlag or (not self.impressionsTag or list == nil or #list <= 0) then
 		return
 	end
 
-	if not p18.impressionsTag or p19 == nil or #p19 <= 0 then
-		return
-	end
-
-	for _, v in ipairs(p19) do
-		p18:_highlightImpression((p18.customKeyMapper(v)))
-	end
-end
-function t4.onClearImpressions(p20, p21) -- line: 294
-	-- upvalues: v6 (copy)
-	if not v6 then
-		return
-	end
-
-	if not p20.impressionsTag or p21 == nil or #p21 <= 0 then
-		return
-	end
-
-	for _, v in ipairs(p21) do
-		p20:_clearImpression((p20.customKeyMapper(v)))
+	for _, item in ipairs(list) do
+		self:_highlightImpression((self.customKeyMapper(item)))
 	end
 end
-function t4.onClearAllImpressions(p22) -- line: 309
-	-- upvalues: v6 (copy)
-	if not v6 then
+
+function ImpressionsVisualizer:onClearImpressions(list)
+	if not defineFastFlag or (not self.impressionsTag or list == nil or #list <= 0) then
 		return
 	end
 
-	if not p22.impressionsTag then
+	for _, item in ipairs(list) do
+		self:_clearImpression((self.customKeyMapper(item)))
+	end
+end
+
+function ImpressionsVisualizer:onClearAllImpressions()
+	if not (defineFastFlag and self.impressionsTag) then
 		return
 	end
 
-	for k, v in pairs(p22.originalInstances) do
-		for k7, v7 in pairs(v) do
-			k[k7] = v7
+	for k, originalInstance in pairs(self.originalInstances) do
+		for k2, v5 in pairs(originalInstance) do
+			k[k2] = v5
 		end
 	end
 
-	p22.highlightedInstances = {}
-	p22.originalInstances = {}
-end
-function t4.setCustomKeyMapper(p23, p24) -- line: 329
-	p23.customKeyMapper = p24 or function(p25) -- line: 330
-		return p25
-	end
-end
-function t4.setImpressionsTag(p26, p27) -- line: 335
-	p26.impressionsTag = p27
+	self.highlightedInstances = {}
+	self.originalInstances = {}
 end
 
-return t4
+function ImpressionsVisualizer:setCustomKeyMapper(p)
+	self.customKeyMapper = p or function(p2)
+		return p2
+	end
+end
+
+function ImpressionsVisualizer:setImpressionsTag(impressionsTag)
+	self.impressionsTag = impressionsTag
+end
+
+return ImpressionsVisualizer

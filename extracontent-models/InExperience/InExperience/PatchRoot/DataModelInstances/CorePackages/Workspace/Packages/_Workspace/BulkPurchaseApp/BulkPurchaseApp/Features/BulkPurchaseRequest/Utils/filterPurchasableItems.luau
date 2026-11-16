@@ -1,20 +1,18 @@
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
 
 require(BulkPurchaseApp.Store.Types)
-
 local PurchasableStateEnum = require(BulkPurchaseApp.Enums.PurchasableStateEnum)
 
-local function filterPurchasableItems(t1: {[any]: any}) -- line: 8
-	-- upvalues: PurchasableStateEnum (copy)
-	local t2 = {}
+local function filterPurchasableItems(items)
+	local result = {}
 
-	for _, v7 in t1 do
-		if v7.purchasableState == PurchasableStateEnum.Purchasable then
-			table.insert(t2, v7)
+	for _, item in items do
+		if item.purchasableState == PurchasableStateEnum.Purchasable then
+			table.insert(result, item)
 		end
 	end
 
-	return t2
+	return result
 end
 
 return filterPurchasableItems

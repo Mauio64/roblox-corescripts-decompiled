@@ -1,89 +1,103 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 
-require(ParentParentParent.GraphQL)
+require(parent2.GraphQL)
 
-local invariant = require(ParentParent.jsutils.invariant).invariant
-local Map = LuauPolyfill.Map
-local t2 = {
-	Query = 0,
-	Mutation = 1,
-	Subscription = 2
-}
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
 
-t1.DocumentType = t2
-
-local v10 = Map.new(nil)
-
-function t1.operationName(n1: number) -- line: 36
-	-- upvalues: t2 (copy)
-	local s1 = nil
-
-	if n1 == t2.Query then
+local documentType = { Query = 0, Mutation = 1, Subscription = 2 }
+local Parser = {}
+Parser.DocumentType = documentType
+local v = LuauPolyfill.Map.new(nil)
+function Parser.operationName(p: number): nil | boolean | string
+	if p == documentType.Query then
 		return "Query"
 	end
 
-	if n1 == t2.Mutation then
+	if p == documentType.Mutation then
 		return "Mutation"
 	end
 
-	if n1 == t2.Subscription then
-		s1 = "Subscription"
-	end
-
-	return s1
+	return p == documentType.Subscription and "Subscription" or nil
 end
-function t1.parser(p1) -- line: 51
-	-- upvalues: v10 (copy), invariant (copy), Boolean (copy), Array (copy), t2 (copy)
-	local v14 = v10:get(p1)
 
-	if v14 ~= nil then
-		return v14
+function Parser.parser(p)
+	local v2 = v:get(p)
+
+	if v2 ~= nil then
+		return v2
 	end
 
-	invariant(Boolean.toJSBoolean(p1) and Boolean.toJSBoolean(p1.kind), ("Argument of %s passed to parser was not a valid GraphQL "):format((tostring(p1))) .. "DocumentNode. You may need to use 'graphql-tag' or another method " .. "to convert your operation into a document")
+	invariant2(
+		Boolean.toJSBoolean(p) and Boolean.toJSBoolean(p.kind),
+		("Argument of %s passed to parser was not a valid GraphQL "):format((tostring(p))) .. "DocumentNode. You may need to use 'graphql-tag' or another method to convert your operation into a document"
+	)
 
-	local v15 = Array.filter(p1.definitions, function(p2) -- line: 63
+	local filtered = Array.filter(p.definitions, function(p2): boolean
 		return p2.kind == "FragmentDefinition"
 	end)
-	local v16 = Array.filter(p1.definitions, function(p3) -- line: 67
-		return p3.kind == "OperationDefinition" and p3.operation == "query"
-	end)
-	local v17 = Array.filter(p1.definitions, function(p4) -- line: 72
-		return p4.kind == "OperationDefinition" and p4.operation == "mutation"
-	end)
-	local v18 = Array.filter(p1.definitions, function(p5) -- line: 77
-		return p5.kind == "OperationDefinition" and p5.operation == "subscription"
+
+	local filtered2 = Array.filter(p.definitions, function(p2): boolean
+		return p2.kind == "OperationDefinition" and p2.operation == "query"
 	end)
 
-	invariant(#v15 == 0 or (#v16 ~= 0 or (#v17 ~= 0 or #v18 ~= 0)), "Passing only a fragment to 'graphql' is not yet supported. You must include a query, subscription or mutation as well")
-	invariant(#v16 + #v17 + #v18 <= 1, "react-apollo only supports a query, subscription, or a mutation per HOC. " .. ("%s had %s queries, %s "):format(tostring(p1), tostring(#v16), (tostring(#v18))) .. ("subscriptions and %s mutations. "):format((tostring(#v17))) .. "You can use 'compose' to join multiple operation types to a component")
+	local filtered3 = Array.filter(p.definitions, function(p2): boolean
+		return p2.kind == "OperationDefinition" and p2.operation == "mutation"
+	end)
 
-	local v19 = if #v16 == 0 then t2.Mutation else t2.Query
+	local v3 = Array.filter(p.definitions, function(p2): boolean
+		return p2.kind == "OperationDefinition" and p2.operation == "subscription"
+	end)
 
-	if #v16 == 0 and #v17 == 0 then
-		v19 = t2.Subscription
+	invariant2(
+		#filtered == 0 or #filtered2 ~= 0 or #filtered3 ~= 0 or #v3 ~= 0,
+		"Passing only a fragment to 'graphql' is not yet supported. You must include a query, subscription or mutation as well"
+	)
+
+	invariant2(
+		#filtered2 + #filtered3 + #v3 <= 1,
+		"react-apollo only supports a query, subscription, or a mutation per HOC. " .. ("%s had %s queries, %s "):format(
+			tostring(p),
+			tostring(#filtered2),
+			(tostring(#v3))
+		) .. ("subscriptions and %s mutations. "):format((tostring(#filtered3))) .. "You can use 'compose' to join multiple operation types to a component"
+	)
+	local v4
+
+	if #filtered2 == 0 then
+		v4 = documentType.Mutation
+	else
+		v4 = documentType.Query
 	end
 
-	local v20 = if not (#v16 > 0) then if not (#v17 > 0) then v18 else v17 else v16
+	if #filtered2 == 0 and #filtered3 == 0 then
+		v4 = documentType.Subscription
+	end
 
-	invariant(#v20 == 1, ("react-apollo only supports one definition per HOC. %s had "):format((tostring(p1))) .. ("%s definitions. "):format((tostring(#v20))) .. "You can use 'compose' to join multiple operation types to a component")
+	if #filtered2 > 0 then
+		v3 = filtered2
+	elseif #filtered3 > 0 then
+		v3 = filtered3
+	end
 
-	local v21 = v20[1]
-	local v22 = v21.variableDefinitions and v21.variableDefinitions or {}
-	local t3 = {
-		name = (not v21.name or v21.name.kind ~= "Name") and "data" or v21.name.value,
-		type = v19,
-		variables = v22
+	invariant2(
+		#v3 == 1,
+		("react-apollo only supports one definition per HOC. %s had "):format((tostring(p))) .. ("%s definitions. "):format((tostring(#v3))) .. "You can use 'compose' to join multiple operation types to a component"
+	)
+
+	local v5 = v3[1]
+	local variableDefinitions = v5.variableDefinitions and v5.variableDefinitions or {}
+	local v6 = {
+		name = (not v5.name or v5.name.kind ~= "Name") and "data" or v5.name.value,
+		type = v4,
+		variables = variableDefinitions
 	}
-
-	v10:set(p1, t3)
-
-	return t3
+	v:set(p, v6)
+	return v6
 end
 
-return t1
+return Parser

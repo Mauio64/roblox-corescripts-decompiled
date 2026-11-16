@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("InlineRichText").Parent
+local parent = script:FindFirstAncestor("InlineRichText").Parent
 
-require(Parent.Foundation)
-require(Parent.InlineLayout)
+require(parent.Foundation)
+require(parent.InlineLayout)
 require(script.Parent.Enums.TokenName)
 require(script.Parent.Enums.NodeType)
 require(script.Parent.Enums.LinkType)

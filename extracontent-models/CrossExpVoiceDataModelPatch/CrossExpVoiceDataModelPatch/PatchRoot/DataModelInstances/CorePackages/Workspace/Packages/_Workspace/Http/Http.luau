@@ -1,8 +1,9 @@
+local parent = script.Parent
+
 local Requests = require(script.Requests)
 local Reducers = require(script.Reducers)
 local PerformFetch = require(script.PerformFetch)
 local createPerformFetchMiddleware = require(script.createPerformFetchMiddleware)
-
 require(script.RequestTypes)
 
 return {
@@ -13,6 +14,7 @@ return {
 	Reducers = Reducers,
 	PerformFetch = PerformFetch,
 	StatusCodes = require(script.StatusCodes),
+	MrRouterHeaders = require(parent.MrRouterHeaders),
 	createPerformFetchMiddleware = createPerformFetchMiddleware,
 	NetworkLayers = require(script.NetworkLayers),
 	NetworkProfiler = require(script.NetworkProfiler),

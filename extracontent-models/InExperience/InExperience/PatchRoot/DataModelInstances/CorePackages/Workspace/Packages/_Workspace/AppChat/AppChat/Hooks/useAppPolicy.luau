@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return require(Parent.UniversalAppPolicy).useAppPolicy
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+return UniversalAppPolicy.useAppPolicy

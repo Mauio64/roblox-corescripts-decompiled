@@ -1,5 +1,1 @@
-return {
-	AvatarChatEnabled = false,
-	ChromeEnabled = false,
-	JoinWithoutMicPermissions = false
-}
+return { AvatarChatEnabled = false, ChromeEnabled = false, JoinWithoutMicPermissions = false }

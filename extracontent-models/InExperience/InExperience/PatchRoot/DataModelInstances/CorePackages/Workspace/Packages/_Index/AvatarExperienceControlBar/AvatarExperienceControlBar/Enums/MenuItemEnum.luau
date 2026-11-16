@@ -1,7 +1,4 @@
 return {
-	UndoRedoDivider = "UndoRedoDivider",
-	Undo = "Undo",
-	Redo = "Redo",
 	Main = {
 		AvatarSwitcher = "AvatarSwitcher",
 		AvatarRefinement = "AvatarRefinement",
@@ -27,15 +24,13 @@ return {
 		MultiTryOn = "MultiTryOn",
 		ProfilePhoto = "ProfilePhoto"
 	},
-	Photobooth = {
-		Photobooth = "Photobooth",
-		Animations = "PhotoboothAnimations",
-		Scenes = "PhotoboothScenes",
-		Screenshot = "PhotoboothScreenshot"
+	PhotoboothMoments = {
+		MyAvatars = "PhotoboothMomentsMyAvatars",
+		Backgrounds = "PhotoboothMomentsBackgrounds",
+		Emotes = "PhotoboothMomentsEmotes"
 	},
-	Reset = {
-		Reset = "Reset",
-		RestoreLastSaved = "RestoreLastSaved",
-		ClearOutfit = "ClearOutfit"
-	}
+	UndoRedoDivider = "UndoRedoDivider",
+	Undo = "Undo",
+	Redo = "Redo",
+	Reset = { Reset = "Reset", RestoreLastSaved = "RestoreLastSaved", ClearOutfit = "ClearOutfit" }
 }

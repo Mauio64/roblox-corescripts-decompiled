@@ -1,17 +1,16 @@
-local Parent = script:FindFirstAncestor("PeopleService").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("PeopleService").Parent
 
-function createPersonStore(p1) -- line: 14
-	-- upvalues: Signals (copy)
-	local v4, v5 = Signals.createSignal(0)
+local Signals = require(parent.Signals)
+
+function createPersonStore(person)
+	local signal, setOrder = Signals.createSignal(0)
 
 	return {
-		getPerson = function() -- line: 18
-			-- upvalues: p1 (copy)
-			return p1
+		getPerson = function()
+			return person
 		end,
-		getOrder = v4,
-		setOrder = v5
+		getOrder = signal,
+		setOrder = setOrder
 	}
 end
 

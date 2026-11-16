@@ -1,85 +1,97 @@
 local WebViewService = game:GetService("WebViewService")
 local BrowserService = game:GetService("BrowserService")
 local HttpService = game:GetService("HttpService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local React = require(scriptParentParent.React)
-local Foundation = require(scriptParentParent.Foundation)
-local Localization = require(scriptParentParent.Localization)
+
+local parent = script.Parent
+local parent2 = parent.Parent
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local Localization = require(parent2.Localization)
 local Dialog = Foundation.Dialog
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
-local AdDisclosureTelemetry = require(scriptParent.AdDisclosureTelemetry)
-local FStringLuaAppAdPreferencesUrl = require(scriptParentParent.SharedFlags).FStringLuaAppAdPreferencesUrl
-local GetFFlagEnableUnifiedWebViews = require(scriptParentParent.SharedFlags).GetFFlagEnableUnifiedWebViews
+local AdDisclosureTelemetry = require(parent.AdDisclosureTelemetry)
+
+local SharedFlags = require(parent2.SharedFlags)
+local FStringLuaAppAdPreferencesUrl = SharedFlags.FStringLuaAppAdPreferencesUrl
+local SharedFlags2 = require(parent2.SharedFlags)
+local GetFFlagEnableUnifiedWebViews = SharedFlags2.GetFFlagEnableUnifiedWebViews
+
 local useLocalization = Localization.Hooks.useLocalization
 
-local function WhyThisAdModal(t1: {[any]: any}) -- line: 26
-	-- upvalues: useLocalization (copy), useTokens (copy), React (copy), Dialog (copy), View (copy), FoundationText (copy), AdDisclosureTelemetry (copy), GetFFlagEnableUnifiedWebViews (copy), WebViewService (copy), FStringLuaAppAdPreferencesUrl (copy), HttpService (copy), BrowserService (copy)
-	local v19 = useLocalization({
+local function WhyThisAdModal(props)
+	local v = useLocalization({
 		whyThisAd = "Feature.GameDetails.Label.WhyThisAd",
 		adPreferences = "Feature.GameDetails.Message.AdPreferences"
 	})
-	local v20 = useTokens()
 
-	return React.createElement(Dialog.Root, {
-		hasBackdrop = true,
-		disablePortal = false,
-		onClose = t1.onClose
-	}, {
-		DialogTitle = React.createElement(Dialog.Title, {
-			text = v19.whyThisAd
+	local v2 = useTokens()
+
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v3 = { onClose = props.onClose, hasBackdrop = true, disablePortal = false }
+
+	local v4 = {
+		DialogTitle = React.createElement(Dialog.Title, { text = v.whyThisAd }),
+		DialogContent = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Dialog.Content
+	local createElement3 = React.createElement
+
+	local v5 = {
+		DialogText = React.createElement(Dialog.Text, {
+			Text = props.adDisclosureBody,
+			LayoutOrder = 1
 		}),
-		DialogContent = React.createElement(Dialog.Content, {}, {
-			ContentView = React.createElement(View, {
-				tag = "col auto-xy gap-small"
-			}, {
-				DialogText = React.createElement(Dialog.Text, {
-					LayoutOrder = 1,
-					Text = t1.adDisclosureBody
-				}),
-				AdPreferences = if not t1.showAdPreferencesUrl then nil else React.createElement(FoundationText, {
-					tag = "auto-xy",
-					LayoutOrder = 2,
-					Text = v19.adPreferences,
-					textStyle = v20.Color.Content.Link,
-					fontStyle = v20.Typography.BodyMedium,
-					onActivated = function() -- line: 57
-						-- upvalues: AdDisclosureTelemetry (copy), GetFFlagEnableUnifiedWebViews (copy), WebViewService (copy), FStringLuaAppAdPreferencesUrl (copy), v19 (copy), HttpService (copy), BrowserService (copy)
-						AdDisclosureTelemetry.logAdPreferencesLinkClicked()
+		AdPreferences = 0
+	}
+	local adPreferences
 
-						if GetFFlagEnableUnifiedWebViews() then
-							local u21 = nil
+	if props.showAdPreferencesUrl then
+		adPreferences = React.createElement(Text, {
+			Text = v.adPreferences,
+			textStyle = v2.Color.Content.Link,
+			fontStyle = v2.Typography.BodyMedium,
+			tag = "auto-xy",
+			onActivated = function()
+				AdDisclosureTelemetry.logAdPreferencesLinkClicked()
 
-							u21 = WebViewService.OnWindowClosed:Connect(function() -- line: 62
-								-- upvalues: WebViewService (copy), u21 (ref)
-								WebViewService:CloseWindow()
+				if not GetFFlagEnableUnifiedWebViews() then
+					BrowserService:SendCommand((HttpService:JSONEncode({
+						command = "open",
+						url = FStringLuaAppAdPreferencesUrl,
+						title = v.adPreferences,
+						visible = true,
+						isGenericWebview = true
+					})))
 
-								if u21 then
-									u21:Disconnect()
-									u21 = nil
-								end
-							end)
-							WebViewService:OpenWindow(FStringLuaAppAdPreferencesUrl, v19.adPreferences, true)
+					return
+				end
 
-							return
-						end
+				local onWindowClosedConnection = nil
+				onWindowClosedConnection = WebViewService.OnWindowClosed:Connect(function()
+					WebViewService:CloseWindow()
 
-						local json = HttpService:JSONEncode({
-							command = "open",
-							visible = true,
-							isGenericWebview = true,
-							url = FStringLuaAppAdPreferencesUrl,
-							title = v19.adPreferences
-						})
-
-						BrowserService:SendCommand(json)
+					if onWindowClosedConnection then
+						onWindowClosedConnection:Disconnect()
+						onWindowClosedConnection = nil
 					end
-				})
-			})
+				end)
+
+				WebViewService:OpenWindow(FStringLuaAppAdPreferencesUrl, v.adPreferences, true)
+			end,
+			LayoutOrder = 2
 		})
+	end
+
+	v5.AdPreferences = adPreferences
+	v4.DialogContent = createElement2(content, {}, {
+		ContentView = createElement3(View, { tag = "col auto-xy gap-small" }, v5)
 	})
+	return createElement(root, v3, v4)
 end
 
 return React.memo(WhyThisAdModal)

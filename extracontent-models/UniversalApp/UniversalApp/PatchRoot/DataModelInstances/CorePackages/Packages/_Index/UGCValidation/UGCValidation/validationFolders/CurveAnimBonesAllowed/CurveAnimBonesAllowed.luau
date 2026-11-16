@@ -1,86 +1,63 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+
 local HttpService = game:GetService("HttpService")
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local APIUtil = require(parent.util.APIUtil)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local APIUtil = require(ParentParent.util.APIUtil)
-local getFFlagUGCValidateEmotesBonesAllowed = require(ParentParent.flags.getFFlagUGCValidateEmotesBonesAllowed)
-local getFFlagUGCValidateEmotesBoneUserVerification = require(ParentParent.flags.getFFlagUGCValidateEmotesBoneUserVerification)
-local getFFlagUGCValidateAnimBonesSupport = require(ParentParent.flags.getFFlagUGCValidateAnimBonesSupport)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
+local CurveAnimBonesAllowed = {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = { ValidationEnums.SharedDataMember.consumerConfig },
+	conditionalData = { ValidationEnums.SharedDataMember.curveAnimBoneData },
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 }
 
-if getFFlagUGCValidateAnimBonesSupport() and getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+local function checkTrustedCreatorPermission()
+	local v = string.format(
+		"https://itemconfiguration.%s/v1/permissions/action-allowed-for-item-type?trustedCreatorCheck=true&action=1&assetType=61",
+		APIUtil.getBaseDomain()
+	)
 
-t1.requiredData = { ValidationEnums.SharedDataMember.consumerConfig }
-t1.conditionalData = { ValidationEnums.SharedDataMember.curveAnimBoneData }
+	local requestAndRetryGet, v2 = APIUtil.requestAndRetryGet(v)
 
-function t1.fflag() -- line: 24
-	-- upvalues: getFFlagUGCValidateEmotesBonesAllowed (copy), getFFlagUGCValidateAnimBonesSupport (copy)
-	return getFFlagUGCValidateEmotesBonesAllowed() or getFFlagUGCValidateAnimBonesSupport()
-end
-
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
-
-local function checkTrustedCreatorPermission() -- line: 30
-	-- upvalues: APIUtil (copy), HttpService (copy)
-	local v12 = string.format("https://itemconfiguration.%s/v1/permissions/action-allowed-for-item-type?trustedCreatorCheck=true&action=1&assetType=61", APIUtil.getBaseDomain())
-	local v13, v14 = APIUtil.requestAndRetryGet(v12)
-
-	if not v13 then
-		return false, "Failed to check trusted creator permission: " .. tostring(v14)
+	if not requestAndRetryGet then
+		return false, "Failed to check trusted creator permission: " .. tostring(v2)
 	end
 
-	local ok, result = pcall(function() -- line: 41
-		-- upvalues: HttpService (copy), v14 (copy)
-		return HttpService:JSONDecode(v14)
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(v2)
 	end)
 
-	if not ok then
-		return false, "Failed to decode permission response"
+	if success then
+		return result.isActionAllowed == true, nil
 	end
 
-	return result.isActionAllowed == true, nil
+	return false, "Failed to decode permission response"
 end
 
-function t1.run(p1, p2) -- line: 51
-	-- upvalues: getFFlagUGCValidateEmotesBoneUserVerification (copy), ValidationEnums (copy), ErrorSourceStrings (copy), checkTrustedCreatorPermission (copy)
-	if not getFFlagUGCValidateEmotesBoneUserVerification() then
-		return
-	end
+function CurveAnimBonesAllowed.run(object, p)
+	local validationEnv = p.consumerConfig.validationEnv
 
-	local consumerEnv = p2.consumerConfig.consumerEnv
+	if validationEnv == ValidationEnums.ValidationEnv.IEC then
+		object:fail(ErrorSourceStrings.Keys.CurveAnim_BonesNotAllowed)
+	elseif validationEnv == ValidationEnums.ValidationEnv.Backend then
+		if not p.consumerConfig.backendConfigs.isUserInTrustedCreatorProgram then
+			object:fail(ErrorSourceStrings.Keys.CurveAnim_BonesNotAllowed)
+		end
+	else
+		local v, v2 = checkTrustedCreatorPermission()
 
-	if consumerEnv == ValidationEnums.ConsumerEnv.IEC then
-		p1:fail(ErrorSourceStrings.Keys.CurveAnim_BonesNotAllowed)
-
-		return
-	end
-
-	if consumerEnv == ValidationEnums.ConsumerEnv.Backend then
-		if not p2.consumerConfig.backendConfigs.isUserInTrustedCreatorProgram then
-			p1:fail(ErrorSourceStrings.Keys.CurveAnim_BonesNotAllowed)
+		if v2 then
+			object:forceError(v2)
 		end
 
-		return
-	end
-
-	local v20, v21 = checkTrustedCreatorPermission()
-
-	if v21 then
-		p1:forceError(v21)
-	end
-
-	if not v20 then
-		p1:fail(ErrorSourceStrings.Keys.CurveAnim_BonesNotAllowed)
+		if not v then
+			object:fail(ErrorSourceStrings.Keys.CurveAnim_BonesNotAllowed)
+		end
 	end
 end
 
-return t1
+return CurveAnimBonesAllowed

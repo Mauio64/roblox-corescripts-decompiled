@@ -1,7 +1,4 @@
-local OptionSelectorGroup = require(script.OptionSelectorGroup)
-local Item = require(script.Item)
-
 return {
-	Root = OptionSelectorGroup,
-	Item = Item
+	Root = require(script.OptionSelectorGroup),
+	Item = require(script.Item)
 }

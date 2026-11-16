@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("Achievements").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("Achievements").Parent
 
-return function(p1) -- line: 18
-	-- upvalues: Url (copy)
-	return p1(string.format("%sv1/xbox/get-login-consecutive-days", Url.AUTH_URL), "GET")
+local Http = require(parent.Http)
+local Url = Http.Url
+
+return function(callback)
+	return callback(string.format("%sv1/xbox/get-login-consecutive-days", Url.AUTH_URL), "GET")
 end

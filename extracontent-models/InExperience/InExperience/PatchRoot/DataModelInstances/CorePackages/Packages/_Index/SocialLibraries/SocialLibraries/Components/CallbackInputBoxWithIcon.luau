@@ -1,83 +1,89 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-local Roact = require(SocialLibraries.dependencies).Roact
-local CallbackInputBox = require(script.Parent.CallbackInputBox)
-local v4 = Roact.PureComponent:extend("CallbackInputBoxWithIcon")
+local dependencies = require(SocialLibraries.dependencies)
 
-v4.defaultProps = {
+local roact = dependencies.Roact
+
+local CallbackInputBox = require(script.Parent.CallbackInputBox)
+local extended = roact.PureComponent:extend("CallbackInputBoxWithIcon")
+
+extended.defaultProps = {
 	backgroundTransparency = 0,
+	backgroundColor3 = Color3.new(1, 1, 1),
 	borderColor = nil,
 	borderThickness = 0,
 	borderTransparency = 1,
 	cornerRadius = 0,
 	iconCellWidth = 60,
 	iconSize = 24,
+	iconColor3 = Color3.new(1, 1, 1),
 	iconTransparency = 0,
 	iconImage = "rbxasset://textures/ui/LuaChat/icons/ic-search.png",
-	inputTextSize = 14,
-	inputTextTransparency = 0,
-	placeholderTextTransparency = 0.6,
-	placeholderText = "Test placeholder text",
-	clearIcon = "rbxasset://textures/ui/LuaChat/icons/ic-close-white.png",
-	clearButtonDisabled = nil,
-	textChangedCallback = nil,
-	backgroundColor3 = Color3.new(1, 1, 1),
-	iconColor3 = Color3.new(1, 1, 1),
 	inputTextFont = Enum.Font.BuilderSans,
 	inputTextColor3 = Color3.new(1, 0, 1),
+	inputTextSize = 14,
 	inputTextYAlignment = Enum.TextYAlignment.Center,
 	inputTextXAlignment = Enum.TextXAlignment.Left,
+	inputTextTransparency = 0,
+	placeholderTextTransparency = 0.6,
 	placeholderTextColor3 = Color3.new(1, 0, 0),
-	clearIconColor3 = Color3.new(1, 1, 0)
+	placeholderText = "Test placeholder text",
+	clearIconColor3 = Color3.new(1, 1, 0),
+	clearIcon = "rbxasset://textures/ui/LuaChat/icons/ic-close-white.png",
+	clearButtonDisabled = nil,
+	textChangedCallback = nil
 }
 
-function v4.render(p1) -- line: 40
-	-- upvalues: Roact (copy), CallbackInputBox (copy)
-	local iconCellWidth = p1.props.iconCellWidth
-	local iconSize = p1.props.iconSize
+function extended.render(p)
+	local iconCellWidth = p.props.iconCellWidth
+	local iconSize = p.props.iconSize
 
-	return Roact.createElement("Frame", {
-		BorderSizePixel = 0,
-		BackgroundTransparency = p1.props.backgroundTransparency,
-		BackgroundColor3 = p1.props.backgroundColor3,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
-		UIStroke = Roact.createElement("UIStroke", {
-			Thickness = p1.props.borderThickness,
-			Color = p1.props.borderColor,
-			Transparency = p1.props.borderTransparency
-		}),
-		UICorner = Roact.createElement("UICorner", {
-			CornerRadius = UDim.new(0, p1.props.cornerRadius)
-		}),
-		layout = Roact.createElement("UIListLayout", {
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			FillDirection = Enum.FillDirection.Horizontal,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, iconCellWidth / 4)
-		}),
-		padding = Roact.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, iconCellWidth / 4)
-		}),
-		icon = Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Size = UDim2.new(0, iconSize, 0, iconSize),
-			ImageColor3 = p1.props.iconColor3,
-			ImageTransparency = p1.props.iconTransparency,
-			Image = p1.props.iconImage
-		}),
-		inputBoxContainer = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, -iconSize - iconCellWidth / 4, 1, 0)
-		}, {
-			padding = Roact.createElement("UIPadding", {
-				PaddingRight = UDim.new(0, iconCellWidth / 4)
+	return roact.createElement(
+		"Frame",
+		{
+			BackgroundTransparency = p.props.backgroundTransparency,
+			BackgroundColor3 = p.props.backgroundColor3,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0)
+		},
+		{
+			UIStroke = roact.createElement("UIStroke", {
+				Thickness = p.props.borderThickness,
+				Color = p.props.borderColor,
+				Transparency = p.props.borderTransparency
 			}),
-			inputBox = Roact.createElement(CallbackInputBox, p1.props)
-		})
-	})
+			UICorner = roact.createElement("UICorner", {
+				CornerRadius = UDim.new(0, p.props.cornerRadius)
+			}),
+			layout = roact.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, iconCellWidth / 4)
+			}),
+			padding = roact.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, iconCellWidth / 4)
+			}),
+			icon = roact.createElement("ImageLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, iconSize, 0, iconSize),
+				ImageColor3 = p.props.iconColor3,
+				ImageTransparency = p.props.iconTransparency,
+				Image = p.props.iconImage,
+				LayoutOrder = 1
+			}),
+			inputBoxContainer = roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -iconSize - iconCellWidth / 4, 1, 0),
+				LayoutOrder = 2
+			}, {
+				padding = roact.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, iconCellWidth / 4)
+				}),
+				inputBox = roact.createElement(CallbackInputBox, p.props)
+			})
+		}
+	)
 end
 
-return v4
+return extended

@@ -1,139 +1,99 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local FocusNavigableSurfaceIdentifierEnum = require(AppChatParent.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
-local React = require(AppChatParent.React)
-local RoactNavigation = require(AppChatParent.RoactNavigation)
-local Foundation = require(AppChatParent.Foundation)
-local Responsive = require(AppChatParent.Responsive)
+local parent = AppChat.Parent
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local React = require(parent.React)
+local RoactNavigation = require(parent.RoactNavigation)
+local Foundation = require(parent.Foundation)
+local Responsive = require(parent.Responsive)
+
 local EnumScreens = require(AppChat.EnumScreens)
-local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
 local SystemMenuTopBar = require(AppChat.Components.TopBar.SystemMenuTopBar)
 local configureTopBarWithNavigationOptions = require(AppChat.configureTopBarWithNavigationOptions)
 local isolatedAutoFocusNavigation = require(AppChat.Navigators.isolatedAutoFocusNavigation)
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+local FFlagFixPaginatedChatMembersCutoff = require(AppChat.Flags.FFlagFixPaginatedChatMembersCutoff)
 
-local function getActiveRouteName(p1) -- line: 25
-	local v18 = p1 and p1.state
+local function getActiveRouteName(navigation)
+	local v = navigation and navigation.state
 
-	if not v18 or (not v18.routes or not v18.index) then
+	if not (v and v.routes and v.index) then
 		return nil
 	end
 
-	while v18 and v18.routes and v18.index do
-		v18 = v18.routes[v18.index]
+	while true do
+		v = v and v.routes and v.index and v.routes[v.index]
 
-		if not v18 then
+		if not v then
 			return nil
 		end
 
-		if not v18.routes or not v18.index then
-			return v18.routeName
+		if not (v.routes and v.index) then
+			return v.routeName
 		end
 	end
-
-	return nil
 end
-local function wrapInOverlay(p2) -- line: 52
-	-- upvalues: Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), React (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy)
-	return function(p3) -- line: 53
-		-- upvalues: Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), React (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy), p2 (copy)
-		local v25 = Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
-		local v26 = Responsive.useBreakpointYOrSmaller(Responsive.Keys.Small)
-		local v27 = not v25 and -360 or -24
-		local v28 = not v26 and -72 or -24
-		local uDim2 = UDim2.new(1, v27, 1, v28)
-		local v30 = nil
 
-		if FFlagAppChatTopBarConfigDriven() then
-			if FFlagAppChatPerfTracking then
-				AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
-			end
+local function wrapInOverlay(robloxStackNavigator) -- 1 equivalent call inferred from this helper
+	return function(p)
+		local v = Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
+		local v2 = Responsive.useBreakpointYOrSmaller(Responsive.Keys.Small) and -24 or -72
 
-			local v31 = getActiveRouteName(p3.navigation)
+		local udim = UDim2.new(1, v and -24 or -360, 1, v2)
 
-			if v31 == EnumScreens.CreateNewChat or v31 == EnumScreens.EditChatMembers or v31 == EnumScreens.QuickStartSquadInviteFriends then
-				v30 = React.createElement(SystemMenuTopBar, {
-					screenName = v31,
-					navigation = p3.navigation
-				})
-			end
+		local v3 = nil
+
+		if FFlagAppChatPerfTracking then
+			AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
 		end
 
-		if not v30 then
-			v30 = configureTopBarWithNavigationOptions(p3.navigation)
+		local activeRouteName = getActiveRouteName(p.navigation)
+
+		if
+			activeRouteName == EnumScreens.CreateNewChat
+			or activeRouteName == EnumScreens.EditChatMembers
+			or activeRouteName == EnumScreens.QuickStartSquadInviteFriends
+		then
+			v3 = React.createElement(SystemMenuTopBar, {
+				screenName = activeRouteName,
+				navigation = p.navigation
+			})
 		end
+
+		local topBar = v3 or configureTopBarWithNavigationOptions(p.navigation)
 
 		return React.createElement(Foundation.View, {
-			tag = "col position-center-center anchor-center-center clip bg-surface-0 radius-large",
-			Size = uDim2
+			tag = "col position-center-center anchor-center-center radius-large clip bg-surface-0",
+			Size = udim,
+			sizeConstraint = { MaxSize = Vector2.new(1000, 800), MinSize = Vector2.new(0, 0) }
 		}, {
-			sizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(1000, 800),
-				MinSize = Vector2.new(0, 0)
-			}),
-			topBar = v30,
-			overlayContent = React.createElement(p2, p3)
+			topBar = topBar,
+			overlayContent = React.createElement(robloxStackNavigator, p)
 		})
 	end
 end
 
-return function(p4) -- line: 100
-	-- upvalues: RoactNavigation (copy), React (copy), isolatedAutoFocusNavigation (copy), Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v21 = RoactNavigation.createRobloxStackNavigator(p4, {
+return function(p)
+	local robloxStackNavigator = RoactNavigation.createRobloxStackNavigator(p, {
 		defaultNavigationOptions = {
-			isDialog = true
+			isDialog = true,
+			absorbInputSelectable = not FFlagFixPaginatedChatMembersCutoff and nil
 		}
 	})
-	local v22 = React.PureComponent:extend("OverlayNavigatorConnector")
 
-	v22.router = v21.router
+	local extended = React.PureComponent:extend("OverlayNavigatorConnector")
+	extended.router = robloxStackNavigator.router
 
-	local v23 = isolatedAutoFocusNavigation(function(p5) -- line: 53
-		-- upvalues: Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), React (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy), v21 (copy)
-		local v33 = Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
-		local v34 = Responsive.useBreakpointYOrSmaller(Responsive.Keys.Small)
-		local v35 = not v33 and -360 or -24
-		local v36 = not v34 and -72 or -24
-		local uDim2 = UDim2.new(1, v35, 1, v36)
-		local v38 = nil
+	local v = isolatedAutoFocusNavigation(
+		wrapInOverlay(robloxStackNavigator), -- inferred equivalent call
+		FocusNavigableSurfaceIdentifierEnum.PopUp
+	)
 
-		if FFlagAppChatTopBarConfigDriven() then
-			if FFlagAppChatPerfTracking then
-				AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
-			end
-
-			local v39 = getActiveRouteName(p5.navigation)
-
-			if v39 == EnumScreens.CreateNewChat or v39 == EnumScreens.EditChatMembers or v39 == EnumScreens.QuickStartSquadInviteFriends then
-				v38 = React.createElement(SystemMenuTopBar, {
-					screenName = v39,
-					navigation = p5.navigation
-				})
-			end
-		end
-
-		if not v38 then
-			v38 = configureTopBarWithNavigationOptions(p5.navigation)
-		end
-
-		return React.createElement(Foundation.View, {
-			tag = "col position-center-center anchor-center-center clip bg-surface-0 radius-large",
-			Size = uDim2
-		}, {
-			sizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(1000, 800),
-				MinSize = Vector2.new(0, 0)
-			}),
-			topBar = v38,
-			overlayContent = React.createElement(v21, p5)
-		})
-	end, FocusNavigableSurfaceIdentifierEnum.PopUp)
-
-	function v22.render(p6) -- line: 109
-		-- upvalues: React (copy), v23 (copy)
-		return React.createElement(v23, p6.props)
+	function extended.render(p2)
+		return React.createElement(v, p2.props)
 	end
 
-	return v22
+	return extended
 end

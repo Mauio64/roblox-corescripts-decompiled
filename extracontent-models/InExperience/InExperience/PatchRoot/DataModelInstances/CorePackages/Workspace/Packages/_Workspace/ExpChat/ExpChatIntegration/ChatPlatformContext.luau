@@ -1,3 +1,4 @@
-local _Index = script.Parent.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent.Parent._Index
+local ChatPlatformContext = require(index.ExpChatIntegration.ExpChatIntegration.ChatPlatformContext)
 
-return (require(_Index.ExpChatIntegration.ExpChatIntegration.ChatPlatformContext))
+return ChatPlatformContext

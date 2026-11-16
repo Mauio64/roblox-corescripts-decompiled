@@ -1,24 +1,23 @@
-local t1 = {}
+local MockAppStorageService = {}
+MockAppStorageService.__index = MockAppStorageService
 
-t1.__index = t1
+function MockAppStorageService.new(p)
+	return (setmetatable({ _privateValues = table.clone(p) }, MockAppStorageService))
+end
 
-function t1.new(p1) -- line: 4
-	-- upvalues: t1 (copy)
-	return (setmetatable({
-		_privateValues = table.clone(p1)
-	}, t1))
+function MockAppStorageService:GetItem(p)
+	return self._privateValues[p]
 end
-function t1.GetItem(p2, p3) -- line: 12
-	return p2._privateValues[p3]
+
+function MockAppStorageService:SetItem(p, p2)
+	self._privateValues[p] = p2
 end
-function t1.SetItem(p4, p5, p6) -- line: 16
-	p4._privateValues[p5] = p6
-end
-function t1.Flush(_) -- line: 20
-end
-function t1._DeepEquals(p8, p9) -- line: 23
-	for v11, v12 in p9 do
-		if v12 ~= p8._privateValues[v11] then
+
+function MockAppStorageService.Flush(_) end
+
+function MockAppStorageService:_DeepEquals(items): boolean
+	for k, item in items do
+		if self._privateValues[k] ~= item then
 			return false
 		end
 	end
@@ -26,4 +25,4 @@ function t1._DeepEquals(p8, p9) -- line: 23
 	return true
 end
 
-return t1
+return MockAppStorageService

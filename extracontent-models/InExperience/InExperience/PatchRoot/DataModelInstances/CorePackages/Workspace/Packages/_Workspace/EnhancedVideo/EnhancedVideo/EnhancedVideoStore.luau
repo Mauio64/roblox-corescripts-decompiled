@@ -1,95 +1,107 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Signals = require(scriptParentParent.Signals)
-local t = require(scriptParentParent.t)
-local Loggers = require(scriptParentParent.Loggers)
-local EnhancedVideoTelemetry = require(scriptParent.EnhancedVideoTelemetry)
-local FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline = require(scriptParent.FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline)
+local parent = script.Parent
+local parent2 = parent.Parent
+local Signals = require(parent2.Signals)
+local t = require(parent2.t)
+local Loggers = require(parent2.Loggers)
+
+local EnhancedVideoTelemetry = require(parent.EnhancedVideoTelemetry)
+
+local FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline = require(parent.FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline)
+
 local flaggedMutedError = Loggers.flaggedMutedError
 local createSignal = Signals.createSignal
-local serveEnhancedVideo = require(scriptParent.serveEnhancedVideo)
 
-require(scriptParent.Types)
+local serveEnhancedVideo = require(parent.serveEnhancedVideo)
+require(parent.Types)
 
-local v11 = t.interface({
+local interface = t.interface
+local v = {
 	adDisclosureText = t.string,
 	showAdPreferencesUrl = t.boolean,
 	videoAssetId = t.string,
-	timelineJson = if not FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then nil else t.optional(t.string)
-})
+	timelineJson = 0
+}
+local timelineJson2
 
-function createEnhancedVideoStore() -- line: 40
-	-- upvalues: createSignal (copy), FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline (copy), serveEnhancedVideo (copy), v11 (copy), flaggedMutedError (copy), EnhancedVideoTelemetry (copy)
-	local v12, v13 = createSignal("")
-	local v14, v15 = createSignal(false)
-	local v16, v17 = createSignal("")
-	local v18 = nil
-	local u19 = nil
+if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
+	timelineJson2 = t.optional(t.string)
+end
+
+v.timelineJson = timelineJson2
+local v2 = interface(v)
+
+function createEnhancedVideoStore()
+	local signal, v3 = createSignal("")
+	local signal2, v4 = createSignal(false)
+	local signal3, v5 = createSignal("")
+	local getTimelineJson, v6
 
 	if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-		local v20
-
-		v18, v20 = createSignal("")
-		u19 = v20
+		getTimelineJson, v6 = createSignal("")
+	else
+		v6 = nil
 	end
 
-	local v21 = not FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline and function(p1, n1: number) -- line: 78
-		-- upvalues: serveEnhancedVideo (copy), v11 (copy), flaggedMutedError (copy), v13 (copy), v15 (copy), v17 (copy), EnhancedVideoTelemetry (copy)
-		serveEnhancedVideo(p1, n1):andThen(function(p2) -- line: 80
-			-- upvalues: v11 (copy), flaggedMutedError (copy), n1 (copy), v13 (copy), v15 (copy), v17 (copy)
-			local responseBody = p2.responseBody
+	local fn
 
-			if not v11(responseBody) then
-				flaggedMutedError("EnhancedVideo_InvalidResponseSchema", `Response does not match expected schema for universe ${ n1 }`)
+	if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
+		fn = function(p, p2: number)
+			return serveEnhancedVideo(p, p2):andThen(function(p3)
+				local responseBody = p3.responseBody
 
-				return
-			end
+				if not v2(responseBody) then
+					flaggedMutedError(
+						"EnhancedVideo_InvalidResponseSchema",
+						`Response does not match expected schema for universe {p2}`
+					)
 
-			v13(responseBody.adDisclosureText)
-			v15(responseBody.showAdPreferencesUrl)
-			v17(responseBody.videoAssetId)
-		end):catch(function(p3) -- line: 93
-			-- upvalues: EnhancedVideoTelemetry (copy)
-			EnhancedVideoTelemetry.logServeEnhancedVideoError((tostring(p3)))
-		end)
-	end or function(p4, n2: number) -- line: 51
-		-- upvalues: serveEnhancedVideo (copy), v11 (copy), flaggedMutedError (copy), v13 (copy), v15 (copy), v17 (copy), u19 (ref), EnhancedVideoTelemetry (copy)
-		return serveEnhancedVideo(p4, n2):andThen(function(p5) -- line: 53
-			-- upvalues: v11 (copy), flaggedMutedError (copy), n2 (copy), v13 (copy), v15 (copy), v17 (copy), u19 (ref)
-			local responseBody = p5.responseBody
+					return nil
+				end
 
-			if not v11(responseBody) then
-				flaggedMutedError("EnhancedVideo_InvalidResponseSchema", `Response does not match expected schema for universe { n2 }`)
-
+				v3(responseBody.adDisclosureText)
+				v4(responseBody.showAdPreferencesUrl)
+				v5(responseBody.videoAssetId)
+				local timelineJson = responseBody.timelineJson or ""
+				v6(timelineJson)
+				return { videoAssetId = responseBody.videoAssetId, timelineJson = timelineJson }
+			end):catch(function(p3): nil
+				EnhancedVideoTelemetry.logServeEnhancedVideoError((tostring(p3)))
 				return nil
-			end
+			end)
+		end
+	else
+		fn = function(p, p2: number)
+			serveEnhancedVideo(p, p2):andThen(function(p3)
+				local responseBody = p3.responseBody
 
-			v13(responseBody.adDisclosureText)
-			v15(responseBody.showAdPreferencesUrl)
-			v17(responseBody.videoAssetId)
+				if not v2(responseBody) then
+					flaggedMutedError(
+						"EnhancedVideo_InvalidResponseSchema",
+						`Response does not match expected schema for universe ${p2}`
+					)
 
-			local v28 = responseBody.timelineJson or ""
+					return
+				end
 
-			u19(v28)
+				v3(responseBody.adDisclosureText)
+				v4(responseBody.showAdPreferencesUrl)
+				v5(responseBody.videoAssetId)
+			end):catch(function(p3)
+				EnhancedVideoTelemetry.logServeEnhancedVideoError((tostring(p3)))
+			end)
+		end
+	end
 
-			return {
-				videoAssetId = responseBody.videoAssetId,
-				timelineJson = v28
-			}
-		end):catch(function(p6) -- line: 72
-			-- upvalues: EnhancedVideoTelemetry (copy)
-			EnhancedVideoTelemetry.logServeEnhancedVideoError((tostring(p6)))
-
-			return nil
-		end)
+	if not FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
+		getTimelineJson = nil
 	end
 
 	return {
-		getAdDisclosureText = v12,
-		getShowAdPreferencesUrl = v14,
-		getVideoAssetId = v16,
-		getTimelineJson = if not FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then nil else v18,
-		fetchInitialData = v21
+		getAdDisclosureText = signal,
+		getShowAdPreferencesUrl = signal2,
+		getVideoAssetId = signal3,
+		getTimelineJson = getTimelineJson,
+		fetchInitialData = fn
 	}
 end
 

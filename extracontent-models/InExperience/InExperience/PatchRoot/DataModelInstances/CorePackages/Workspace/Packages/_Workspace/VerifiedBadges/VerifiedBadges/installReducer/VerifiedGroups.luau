@@ -1,53 +1,54 @@
 local VerifiedBadges = script:FindFirstAncestor("VerifiedBadges")
+
 local Rodux = require(VerifiedBadges.Parent.Rodux)
 local Cryo = require(VerifiedBadges.Parent.Cryo)
-local FFlagLuaAppEdpBackendV2HydrateLegacyDefault = require(VerifiedBadges.Parent.SharedFlags).FFlagLuaAppEdpBackendV2HydrateLegacyDefault
-local FFlagLuaAppEdpBackendV2HydrateLegacyIxp = require(VerifiedBadges.Parent.SharedFlags).FFlagLuaAppEdpBackendV2HydrateLegacyIxp
+
+local SharedFlags = require(VerifiedBadges.Parent.SharedFlags)
+local FFlagLuaAppEdpBackendV2HydrateLegacyDefault = SharedFlags.FFlagLuaAppEdpBackendV2HydrateLegacyDefault
+
+local SharedFlags2 = require(VerifiedBadges.Parent.SharedFlags)
+local FFlagLuaAppEdpBackendV2HydrateLegacyIxp = SharedFlags2.FFlagLuaAppEdpBackendV2HydrateLegacyIxp
 
 return Rodux.createReducer({}, {
-	AddGameDetails = function(t1: {[any]: any}, p1) -- line: 16
-		-- upvalues: Cryo (copy)
-		local t2 = {}
+	AddGameDetails = function(p, p2)
+		local v = {}
 
-		for _, v in pairs(p1.gameDetails) do
-			local str = tostring(v.creator.id)
-			local type = v.creator.type
-			local hasVerifiedBadge = v.creator.hasVerifiedBadge
+		for _, gameDetail in pairs(p2.gameDetails) do
+			local id = tostring(gameDetail.creator.id)
+			local kind = gameDetail.creator.type
+			local hasVerifiedBadge = gameDetail.creator.hasVerifiedBadge
 
-			if type == Enum.CreatorType.Group.Name then
-				t2[str] = not not hasVerifiedBadge or Cryo.None
+			if kind == Enum.CreatorType.Group.Name then
+				v[id] = hasVerifiedBadge and true or Cryo.None
 			end
 		end
 
-		return Cryo.Dictionary.join(t1, t2)
+		return Cryo.Dictionary.join(p, v)
 	end,
-	AddGameDetailsV2 = if not FFlagLuaAppEdpBackendV2HydrateLegacyDefault and not FFlagLuaAppEdpBackendV2HydrateLegacyIxp then nil else function(t3: {[any]: any}, p2) -- line: 33
-		-- upvalues: Cryo (copy)
-		local t4 = {}
+	AddGameDetailsV2 = (FFlagLuaAppEdpBackendV2HydrateLegacyDefault or FFlagLuaAppEdpBackendV2HydrateLegacyIxp) and function(p, p2)
+		local v = {}
 
-		for _, v in pairs(p2.gameDetails) do
-			local str = tostring(v.creator.id)
-			local type = v.creator.type
-			local hasVerifiedBadge = v.creator.hasVerifiedBadge
+		for _, gameDetail in pairs(p2.gameDetails) do
+			local id = tostring(gameDetail.creator.id)
+			local kind = gameDetail.creator.type
+			local hasVerifiedBadge = gameDetail.creator.hasVerifiedBadge
 
-			if type == Enum.CreatorType.Group.Name then
-				t4[str] = not not hasVerifiedBadge or Cryo.None
+			if kind == Enum.CreatorType.Group.Name then
+				v[id] = hasVerifiedBadge and true or Cryo.None
 			end
 		end
 
-		return Cryo.Dictionary.join(t3, t4)
-	end,
-	SetAssetInfoFromCatalogItemAction = function(t5: {[any]: any}, p3) -- line: 48
-		-- upvalues: Cryo (copy)
-		if p3.assetData.creatorType ~= Enum.CreatorType.Group.Name then
-			return t5
+		return Cryo.Dictionary.join(p, v)
+	end or nil,
+	SetAssetInfoFromCatalogItemAction = function(p, p2)
+		if p2.assetData.creatorType ~= Enum.CreatorType.Group.Name then
+			return p
 		end
 
-		local str = tostring(p3.assetData.creatorTargetId)
-		local creatorHasVerifiedBadge = p3.assetData.creatorHasVerifiedBadge
-
-		return Cryo.Dictionary.join(t5, {
-			[str] = not not creatorHasVerifiedBadge or Cryo.None
+		local creatorTargetId = tostring(p2.assetData.creatorTargetId)
+		local creatorHasVerifiedBadge = p2.assetData.creatorHasVerifiedBadge
+		return Cryo.Dictionary.join(p, {
+			[creatorTargetId] = creatorHasVerifiedBadge and true or Cryo.None
 		})
 	end
 })

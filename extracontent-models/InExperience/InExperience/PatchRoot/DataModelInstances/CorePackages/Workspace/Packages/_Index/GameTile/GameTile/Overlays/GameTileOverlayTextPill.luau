@@ -1,73 +1,98 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local React = require(Parent.React)
-local Style = require(Parent.Style)
+local parent = script:FindFirstAncestor("GameTile").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local Style = require(parent.Style)
 local Colors = Style.Colors
 local LightTheme = Style.Themes.LightTheme
 local GetTextSize = Style.GetTextSize
 local useDesignTokens = Style.useDesignTokens
 
-local function GameTileOverlayTextPill(t1: {[any]: any}) -- line: 19
-	-- upvalues: useDesignTokens (copy), React (copy), GetTextSize (copy), Colors (copy), LightTheme (copy)
-	if not t1.text or string.len(t1.text) == 0 then
+local function GameTileOverlayTextPill(props)
+	if not props.text or string.len(props.text) == 0 then
 		return nil
 	end
 
-	local v10 = useDesignTokens()
-	local Size_200 = v10.Size.Size_200
-	local Size_150 = v10.Size.Size_150
-	local HeadingLargeFont = v10.Typography.HeadingLarge.Font
-	local FontSize_300 = v10.FontSize.FontSize_300
-	local v15 = React.useMemo(function() -- line: 32
-		-- upvalues: GetTextSize (copy), t1 (copy), FontSize_300 (copy), HeadingLargeFont (copy)
-		return GetTextSize(t1.text, FontSize_300, HeadingLargeFont, Vector2.new(1e999, 1e999))
-	end, {
-		t1.text,
-		FontSize_300,
-		HeadingLargeFont
-	})
+	local v = useDesignTokens()
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 0.1,
+	local size_200 = v.Size.Size_200
+	local size_150 = v.Size.Size_150
+
+	local font = v.Typography.HeadingLarge.Font
+	local fontSize_300 = v.FontSize.FontSize_300
+
+	local v2 = React.useMemo(function()
+		return GetTextSize(props.text, fontSize_300, font, Vector2.new(1e999, 1e999))
+	end, { props.text, fontSize_300, font })
+
+	local createElement = React.createElement
+	local v3 = {
 		BackgroundColor3 = Colors.White,
-		Position = t1.Position,
-		AnchorPoint = t1.AnchorPoint,
+		BackgroundTransparency = 0.1,
+		Position = props.Position,
+		AnchorPoint = props.AnchorPoint,
 		AutomaticSize = Enum.AutomaticSize.XY
-	}, {
-		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(1, 0)
-		}),
+	}
+	local v4 = {
+		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
 		UIPadding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, Size_150),
-			PaddingLeft = UDim.new(0, Size_200),
-			PaddingBottom = UDim.new(0, Size_150),
-			PaddingRight = UDim.new(0, Size_200)
+			PaddingTop = UDim.new(0, size_150),
+			PaddingLeft = UDim.new(0, size_200),
+			PaddingBottom = UDim.new(0, size_150),
+			PaddingRight = UDim.new(0, size_200)
 		}),
-		TextLabel = React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			TextWrapped = false,
-			Size = UDim2.fromOffset(v15.X, v15.Y),
-			Text = t1.text,
-			TextColor3 = LightTheme.TextEmphasis.Color3,
-			Font = HeadingLargeFont,
-			TextSize = FontSize_300,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center,
-			TextTruncate = Enum.TextTruncate.AtEnd
-		}, {
-			UISizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = t1.maxWidthBinding:map(function(n1: number) -- line: 65
-					-- upvalues: Size_200 (copy), v15 (copy)
-					local v17 = n1 - Size_200 * 2
+		TextLabel = 0
+	}
 
-					if v17 > 0 then
-						return (Vector2.new(v17, v15.Y))
-					end
+	local createElement2 = React.createElement
+	local v5 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(v2.X, v2.Y),
+		Text = props.text,
+		TextColor3 = LightTheme.TextEmphasis.Color3,
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextXAlignment = 0,
+		TextYAlignment = 0,
+		TextWrapped = false,
+		TextTruncate = 0
+	}
+	local font2
 
-					return nil
-				end)
-			})
+	if not FoundationFontFaceMigration then
+		font2 = font
+	end
+
+	v5.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(font)
+	end
+
+	v5.FontFace = fontFace
+	v5.TextSize = fontSize_300
+	v5.TextXAlignment = Enum.TextXAlignment.Center
+	v5.TextYAlignment = Enum.TextYAlignment.Center
+
+	v5.TextTruncate = Enum.TextTruncate.AtEnd
+	v4.TextLabel = createElement2("TextLabel", v5, {
+		UISizeConstraint = React.createElement("UISizeConstraint", {
+			MaxSize = props.maxWidthBinding:map(function(p: number)
+				local v6 = p - size_200 * 2
+
+				if v6 > 0 then
+					return (Vector2.new(v6, v2.Y))
+				end
+
+				return nil
+			end)
 		})
 	})
+	return createElement("Frame", v3, v4)
 end
 
 return GameTileOverlayTextPill

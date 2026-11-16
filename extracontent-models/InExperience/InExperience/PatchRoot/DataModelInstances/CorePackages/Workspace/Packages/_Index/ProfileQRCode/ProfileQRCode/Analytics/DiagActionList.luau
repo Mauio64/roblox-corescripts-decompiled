@@ -17,9 +17,15 @@ return {
 		name = game:DefineFastString("ProfileQRPageFriendRequestBannerShown", "ProfileQRPageFriendRequestBannerShown")
 	},
 	[EventNames.QRPageFriendRequestBannerAccepted] = {
-		name = game:DefineFastString("ProfileQRPageFriendRequestBannerAccepted", "ProfileQRPageFriendRequestBannerAccepted")
+		name = game:DefineFastString(
+			"ProfileQRPageFriendRequestBannerAccepted",
+			"ProfileQRPageFriendRequestBannerAccepted"
+		)
 	},
 	[EventNames.QRPageFriendRequestBannerDismissed] = {
-		name = game:DefineFastString("ProfileQRPageFriendRequestBannerDismissed", "ProfileQRPageFriendRequestBannerDismissed")
+		name = game:DefineFastString(
+			"ProfileQRPageFriendRequestBannerDismissed",
+			"ProfileQRPageFriendRequestBannerDismissed"
+		)
 	}
 }

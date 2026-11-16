@@ -1,104 +1,136 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local GetFFlagEnableUnifiedWebViews = require(AuthCommonParent.SharedFlags).GetFFlagEnableUnifiedWebViews
+local parent = AuthCommon.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnableUnifiedWebViews = SharedFlags.GetFFlagEnableUnifiedWebViews
+
 local HttpService = game:GetService("HttpService")
 local BrowserService = game:GetService("BrowserService")
-local v6 = if not GetFFlagEnableUnifiedWebViews() then nil else game:GetService("WebViewService")
-local NavigateSideways = require(AuthCommonParent.NavigationRodux).Thunks.NavigateSideways
-local FFlagSignalsNavP3Dispatch = require(AuthCommonParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v9 = if not FFlagSignalsNavP3Dispatch then nil else require(AuthCommonParent.RobloxAppNavigation).NavigationCommands
+local WebViewService
+
+if GetFFlagEnableUnifiedWebViews() then
+	WebViewService = game:GetService("WebViewService")
+else
+	WebViewService = nil
+end
+
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateSideways = NavigationRodux.Thunks.NavigateSideways
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags2.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
 local HandleAuthTicket = require(AuthCommon.Thunks.HandleAuthTicket)
-local LaunchContext = require(AuthCommonParent.AppStartup).Enums.LaunchContext
-local AppPage = require(AuthCommonParent.RobloxAppEnums).AppPage
-local v13 = game:DefineFastFlag("EnableJoinV2PreAuthDeepLink", false)
-local v14 = game:DefineFastFlag("EnableAccountRecoveryPreAuthDeepLink2", true)
-local v15 = game:DefineFastInt("WaitAfterCloseChallengeWebViewSeconds", 500)
-local t1 = {{
-	regexPattern = "roblox.*//testing/preauth.*",
-	preauthOnly = false,
-	handler = function(p1, p2) -- line: 62
-		print("preauth deeplink example called with query params:")
+local AppStartup = require(parent.AppStartup)
+local LaunchContext = AppStartup.Enums.LaunchContext
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 
-		for k, v in pairs(p1) do
-			print(k, "=", v)
-		end
+local defineFastFlag = game:DefineFastFlag("EnableJoinV2PreAuthDeepLink", false)
+local defineFastFlag2 = game:DefineFastFlag("EnableAccountRecoveryPreAuthDeepLink2", true)
 
-		print("context:")
+local defineFastInt = game:DefineFastInt("WaitAfterCloseChallengeWebViewSeconds", 500)
 
-		for k, v in pairs(p2) do
-			print(k, "=", v)
-		end
+local PreAuthDeepLinkMap = {
+	{
+		regexPattern = "roblox.*//testing/preauth.*",
+		handler = function(items, items2): boolean
+			print("preauth deeplink example called with query params:")
 
-		return true
-	end
-}}
+			for k, item in pairs(items) do
+				print(k, "=", item)
+			end
 
-if v13 then
-	table.insert(t1, {
+			print("context:")
+
+			for k, item in pairs(items2) do
+				print(k, "=", item)
+			end
+
+			return true
+		end,
+		preauthOnly = false
+	}
+}
+
+if defineFastFlag then
+	table.insert(PreAuthDeepLinkMap, {
 		regexPattern = "roblox.*://join_v2/join.*",
-		preauthOnly = false,
-		handler = function(p3, p4) -- line: 82
-			-- upvalues: LaunchContext (copy), HandleAuthTicket (copy)
-			return HandleAuthTicket(p4.networking, p3.ticket, p3.placelauncherurl, function() -- line: 83
-				-- upvalues: p4 (copy), LaunchContext (copy)
-				return p4.dispatch(p4.launchApp(p4.networking, p4.omniRecommendationsRequest, p4.analytics, p4.appPolicy, LaunchContext.Login))
-			end, function() -- line: 95
-				-- upvalues: p4 (copy)
-				return p4.dispatch(p4.resetAppState())
+		handler = function(p, data)
+			local function fn()
+				return data.dispatch(data.launchApp(
+					data.networking,
+					data.omniRecommendationsRequest,
+					data.analytics,
+					data.appPolicy,
+					LaunchContext.Login
+				))
+			end
+
+			return HandleAuthTicket(data.networking, p.ticket, p.placelauncherurl, fn, function()
+				return data.dispatch(data.resetAppState())
 			end)
-		end
+		end,
+		preauthOnly = false
 	})
 end
 
-if v14 then
-	table.insert(t1, {
+if defineFastFlag2 then
+	table.insert(PreAuthDeepLinkMap, {
 		regexPattern = "roblox.*://navigation/account_recovery.*",
-		preauthOnly = false,
-		handler = function(p5, p6) -- line: 114
-			-- upvalues: GetFFlagEnableUnifiedWebViews (copy), v6 (copy), BrowserService (copy), v15 (copy), AppPage (copy), HttpService (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateSideways (copy)
-			local origin = p5.origin
-			local t2 = {}
+		handler = function(data, p)
+			local origin = data.origin
+			local v = {}
+			local extraProps
 
 			if origin == "login2SV" then
-				t2 = {
+				extraProps = {
 					continuingRecovery = false,
 					recover2sv = true,
 					recoverPassword = false,
-					identifier = p5.username
+					identifier = data.username
 				}
-			elseif origin == "passwordReset2SV" then
-				t2 = {
+			else
+				extraProps = origin == "passwordReset2SV" and {
 					continuingRecovery = true,
 					recover2sv = true,
 					recoverPassword = true,
-					recoverySessionID = p5.recoverysessionid,
-					identifier = p5.username
-				}
+					recoverySessionID = data.recoverysessionid,
+					identifier = data.username
+				} or v
 			end
 
 			if GetFFlagEnableUnifiedWebViews() then
-				v6:CloseWindow()
+				WebViewService:CloseWindow()
 			else
 				BrowserService:CloseBrowserWindow()
 			end
 
 			if origin == "login2SV" then
-				task.wait(v15 / 1000)
+				task.wait(defineFastInt / 1000)
 			end
 
-			local t3 = {
+			local v2 = {
 				name = AppPage.AccountRecovery,
 				detail = HttpService:GenerateGUID(false):lower(),
-				extraProps = t2
+				extraProps = extraProps
 			}
 
 			if FFlagSignalsNavP3Dispatch then
-				return v9.sideways(v9.fromLegacyPage(t3))
+				return navigationCommands.sideways(navigationCommands.fromLegacyPage(v2))
 			end
 
-			return p6.dispatch(NavigateSideways(t3))
-		end
+			return p.dispatch(NavigateSideways(v2))
+		end,
+		preauthOnly = false
 	})
 end
 
-return t1
+return PreAuthDeepLinkMap

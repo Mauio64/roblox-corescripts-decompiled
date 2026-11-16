@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.GraphqlTag.GraphqlTag))
+local GraphqlTag = require(index.GraphqlTag.GraphqlTag)
+
+return GraphqlTag

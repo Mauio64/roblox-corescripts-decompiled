@@ -1,30 +1,33 @@
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
-local u3 = false
 
-task.spawn(function() -- line: 12
-	-- upvalues: Players (copy), LocalizationService (copy), u3 (ref)
-	local LocalPlayer = Players.LocalPlayer
+local v = false
 
-	while not LocalPlayer do
+task.spawn(function()
+	local localPlayer = Players.LocalPlayer
+
+	while not localPlayer do
 		Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-		LocalPlayer = Players.LocalPlayer
+		localPlayer = Players.LocalPlayer
 	end
 
-	local ok, result = pcall(LocalizationService.GetCountryRegionForPlayerAsync, LocalizationService, LocalPlayer)
+	local success, countryRegionForPlayerAsync = pcall(
+		LocalizationService.GetCountryRegionForPlayerAsync,
+		LocalizationService,
+		localPlayer
+	)
 
-	if not ok then
+	if not success then
 		return
 	end
 
-	if result == "GB" then
-		u3 = true
+	if countryRegionForPlayerAsync == "GB" then
+		v = true
 	end
 end)
 
-local function isShowUKOSAIllegalContentReportingLink() -- line: 31
-	-- upvalues: u3 (ref)
-	return u3
+local function isShowUKOSAIllegalContentReportingLink()
+	return v
 end
 
 return isShowUKOSAIllegalContentReportingLink

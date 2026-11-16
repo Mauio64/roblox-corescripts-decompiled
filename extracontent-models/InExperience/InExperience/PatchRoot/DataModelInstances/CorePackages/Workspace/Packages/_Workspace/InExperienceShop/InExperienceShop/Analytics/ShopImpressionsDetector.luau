@@ -1,144 +1,125 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local React = require(InExperienceShopParent.React)
+local parent = InExperienceShop.Parent
+
+local React = require(parent.React)
+
 local FIntScanFrequencyInExperienceShop = require(InExperienceShop.Flags.FIntScanFrequencyInExperienceShop)
 local isShopInstanceVisible = require(script.Parent.isShopInstanceVisible)
 
-local function ShopImpressionsDetector(t1: {[any]: any}) -- line: 25
-	-- upvalues: React (copy), FIntScanFrequencyInExperienceShop (copy), isShopInstanceVisible (copy)
-	local v8 = React.useRef(true)
-	local v9 = React.useRef(nil)
-	local v10 = React.useRef(nil)
-	local v11 = t1.scanDebounceSeconds or FIntScanFrequencyInExperienceShop
-	local v12 = React.useCallback(function() -- line: 32
-		-- upvalues: t1 (copy)
-		if t1.getViewPortBounds then
-			return t1.getViewPortBounds()
+local function ShopImpressionsDetector(data): nil
+	local ref = React.useRef(true)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+
+	local scanDebounceSeconds = data.scanDebounceSeconds or FIntScanFrequencyInExperienceShop
+
+	local v = React.useCallback(function()
+		if data.getViewPortBounds then
+			return data.getViewPortBounds()
 		end
 
-		return t1.viewPortBounds
-	end, {
-		t1.getViewPortBounds,
-		t1.viewPortBounds
-	})
-	local v13 = React.useCallback(function() -- line: 40
-		-- upvalues: v8 (copy), t1 (copy), v12 (copy), isShopInstanceVisible (copy), v9 (copy)
-		if not v8.current then
+		return data.viewPortBounds
+	end, { data.getViewPortBounds, data.viewPortBounds })
+
+	local v2 = React.useCallback(function()
+		if not ref.current or data.pageFilter and not data.pageFilter(nil) then
 			return
 		end
 
-		if t1.pageFilter and not t1.pageFilter(nil) then
+		local v2 = v()
+
+		if v2 == nil then
 			return
 		end
 
-		local v15 = v12()
+		local current = data.parentRef and data.parentRef.current
 
-		if v15 == nil then
+		if not (current and isShopInstanceVisible(current, v2)) then
 			return
 		end
 
-		local v16 = t1.parentRef and t1.parentRef.current
+		ref2.current = tick()
+		local guiObjects = {}
+		local collectObjectsFunc = data.collectObjectsFunc
+		local v3
 
-		if not v16 or not isShopInstanceVisible(v16, v15) then
-			return
+		if collectObjectsFunc then
+			v3 = collectObjectsFunc(current)
+		else
+			v3 = current:GetChildren()
 		end
 
-		v9.current = tick()
-
-		local t2 = {}
-		local collectObjectsFunc = t1.collectObjectsFunc
-
-		for _, v20 in if not collectObjectsFunc then v16:GetChildren() else collectObjectsFunc(v16) do
-			if v20:IsA("GuiObject") and isShopInstanceVisible(v20, v15) and (t1.filterImpressionFunc == nil or t1.filterImpressionFunc(v20)) then
-				table.insert(t2, v20)
+		for _, guiObject in v3 do
+			if not (guiObject:IsA("GuiObject") and isShopInstanceVisible(guiObject, v2) and (data.filterImpressionFunc == nil or data.filterImpressionFunc(guiObject))) then
+				continue
 			end
+
+			table.insert(guiObjects, guiObject)
 		end
 
-		if #t2 > 0 then
-			t1.onImpressionsDetected(t2)
+		if #guiObjects > 0 then
+			data.onImpressionsDetected(guiObjects)
 		end
 	end, {
-		t1.parentRef,
-		t1.pageFilter,
-		t1.collectObjectsFunc,
-		t1.filterImpressionFunc,
-		t1.onImpressionsDetected,
-		v12
+		data.parentRef,
+		data.pageFilter,
+		data.collectObjectsFunc,
+		data.filterImpressionFunc,
+		data.onImpressionsDetected,
+		v
 	})
-	local v14 = React.useCallback(function() -- line: 90
-		-- upvalues: v8 (copy), v10 (copy), t1 (copy), v9 (copy), v11 (copy), v13 (copy)
-		if not v8.current then
+
+	local v3 = React.useCallback(function()
+		if not (ref.current and ref3.current == nil and (data.parentRef and data.parentRef.current)) then
 			return
 		end
 
-		if v10.current ~= nil then
-			return
+		local current = ref2.current
+		local v3
+
+		if current == nil then
+			v3 = 0
+		else
+			local current2 = current + scanDebounceSeconds
+			ref3.current = current2
+			v3 = current2 - tick()
 		end
 
-		if not t1.parentRef or not t1.parentRef.current then
-			return
-		end
-
-		local n1 = 0
-		local current = v9.current
-
-		if current ~= nil then
-			local v23 = current + v11
-
-			v10.current = v23
-			n1 = v23 - tick()
-		end
-
-		if n1 > 0 then
-			task.delay(n1, function() -- line: 112
-				-- upvalues: v8 (copy), v10 (copy), v13 (copy)
-				if not v8.current then
+		if v3 > 0 then
+			task.delay(v3, function()
+				if not ref.current then
 					return
 				end
 
-				if v10.current ~= nil and tick() > v10.current then
-					v10.current = nil
-					v13()
+				if ref3.current ~= nil and tick() > ref3.current then
+					ref3.current = nil
+					v2()
 				end
 			end)
-
 			return
 		end
 
-		v10.current = nil
-		v13()
-	end, {
-		t1.parentRef,
-		v11,
-		v13
-	})
+		ref3.current = nil
+		v2()
+	end, { data.parentRef, scanDebounceSeconds, v2 })
 
-	React.useEffect(function() -- line: 127
-		-- upvalues: v8 (copy), v14 (copy), t1 (copy)
-		v8.current = true
-		v14()
+	React.useEffect(function()
+		ref.current = true
+		v3()
 
-		local v24 = t1.onRequestImpressionsSignal:connect(function() -- line: 131
-			-- upvalues: v14 (copy)
-			v14()
+		local onRequestImpressionsSignalConnection = data.onRequestImpressionsSignal:connect(function()
+			v3()
 		end)
 
-		return function() -- line: 135
-			-- upvalues: v8 (copy), v24 (copy)
-			v8.current = false
-			v24:disconnect()
+		return function()
+			ref.current = false
+			onRequestImpressionsSignalConnection:disconnect()
 		end
-	end, {
-		t1.onRequestImpressionsSignal,
-		v14
-	})
-	React.useEffect(function() -- line: 141
-		-- upvalues: v14 (copy)
-		v14()
-	end, {
-		v12,
-		v14
-	})
+	end, { data.onRequestImpressionsSignal, v3 })
+
+	React.useEffect(function()
+		v3()
+	end, { v, v3 })
 
 	return nil
 end

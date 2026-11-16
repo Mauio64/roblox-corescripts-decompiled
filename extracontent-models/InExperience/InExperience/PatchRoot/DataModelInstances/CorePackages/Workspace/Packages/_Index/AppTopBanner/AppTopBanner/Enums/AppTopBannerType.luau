@@ -1,4 +1,1 @@
-return {
-	None = "None",
-	ActiveSquad = "ActiveSquad"
-}
+return { None = "None", ActiveSquad = "ActiveSquad" }

@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local ExperienceGuidelines = require(Workspace.DataHydration.DataHydration.ExperienceGuidelines)
 
-return (require(_Workspace.DataHydration.DataHydration.ExperienceGuidelines))
+return ExperienceGuidelines

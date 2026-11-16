@@ -1,5 +1,5 @@
-local function getBadgesSeeAllPageKey(s1: string) -- line: 1
-	return `BadgesSeeAll_{ s1 }`
+local function getBadgesSeeAllPageKey(p: string)
+	return `BadgesSeeAll_{p}`
 end
 
 return getBadgesSeeAllPageKey

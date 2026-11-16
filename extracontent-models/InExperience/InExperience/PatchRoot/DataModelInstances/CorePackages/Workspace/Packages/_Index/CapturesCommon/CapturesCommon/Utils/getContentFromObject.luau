@@ -1,6 +1,6 @@
-local function getContentFromObject(p1) -- line: 1
-	if typeof(p1) == "Object" then
-		return Content.fromObject(p1)
+local function getContentFromObject(p)
+	if typeof(p) == "Object" then
+		return Content.fromObject(p)
 	end
 
 	return Content.none

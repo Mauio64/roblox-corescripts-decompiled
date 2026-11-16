@@ -1,97 +1,80 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local R15plusUtils = require(parent.util.R15plusUtils)
+local CurveAnimBoneHierarchyUtils = require(parent.util.CurveAnimBoneHierarchyUtils)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local CurveAnimBoneHierarchyUtils = require(ParentParent.util.CurveAnimBoneHierarchyUtils)
-local getFFlagUGCValidateEmotesBonesAllowed = require(ParentParent.flags.getFFlagUGCValidateEmotesBonesAllowed)
-local getFFlagUGCValidateAnimBonesSupport = require(ParentParent.flags.getFFlagUGCValidateAnimBonesSupport)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
+local CurveAnimBonesHaveValidParents = {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = { ValidationEnums.SharedDataMember.curveAnimations },
+	conditionalData = { ValidationEnums.SharedDataMember.curveAnimBoneData },
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 }
 
-if getFFlagUGCValidateAnimBonesSupport() and getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+local v = { "Head", "UpperTorso", "LeftFoot", "RightFoot", "LeftHand", "RightHand" }
 
-t1.requiredData = { ValidationEnums.SharedDataMember.curveAnimations }
-t1.conditionalData = { ValidationEnums.SharedDataMember.curveAnimBoneData }
+local v2 = nil
 
-function t1.fflag() -- line: 23
-	-- upvalues: getFFlagUGCValidateEmotesBonesAllowed (copy), getFFlagUGCValidateAnimBonesSupport (copy)
-	return getFFlagUGCValidateEmotesBonesAllowed() or getFFlagUGCValidateAnimBonesSupport()
-end
-
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
-
-local t2 = {
-	"Head",
-	"UpperTorso",
-	"LeftFoot",
-	"RightFoot",
-	"LeftHand",
-	"RightHand"
-}
-local u11 = nil
-
-local function getParentMap() -- line: 33
-	-- upvalues: u11 (ref), t2 (copy), R15plusUtils (copy)
-	if u11 then
-		return u11
+local function getParentMap()
+	if v2 then
+		return v2
 	end
 
-	local t3 = {}
+	local result = {}
 
-	for _, v15 in t2 do
-		local v16 = R15plusUtils.getAvatarBoneSchema(v15)
-		local v17 = R15plusUtils.getSchemaFlatHierarchyList(v16, { v15 })
+	for _, v3 in v do
+		local avatarBoneSchema = R15plusUtils.getAvatarBoneSchema(v3)
+		local schemaFlatHierarchyList = R15plusUtils.getSchemaFlatHierarchyList(avatarBoneSchema, { v3 })
 
-		for v18, v19 in v17 do
-			if v19.ClassName == "Bone" then
-				local path = v19.path
-				local v21 = path[#path - 1]
-				local v22 = v17[v21]
+		for k, schemaFlatHierarchy in schemaFlatHierarchyList do
+			if schemaFlatHierarchy.ClassName ~= "Bone" then
+				continue
+			end
 
-				if v22 and v22.ClassName == "Bone" then
-					t3[v18] = v21
-				end
+			local path = schemaFlatHierarchy.path
+			local v4 = path[#path - 1]
+			local schemaFlatHierarchy2 = schemaFlatHierarchyList[v4]
+
+			if schemaFlatHierarchy2 and schemaFlatHierarchy2.ClassName == "Bone" then
+				result[k] = v4
 			end
 		end
 	end
 
-	u11 = t3
-
-	return t3
+	v2 = result
+	return result
 end
 
-function t1.run(p1, p2) -- line: 61
-	-- upvalues: getParentMap (copy), CurveAnimBoneHierarchyUtils (copy), ErrorSourceStrings (copy)
-	local v25 = getParentMap()
+function CurveAnimBonesHaveValidParents.run(object, p)
+	local parentMap = getParentMap()
 
-	for _, v27 in p2.curveAnimations do
-		local t4 = {}
+	for _, folder in p.curveAnimations do
+		local nameSet = {}
 
-		for _, descendant in v27:GetDescendants() do
-			if descendant:IsA("Folder") and CurveAnimBoneHierarchyUtils.isBoneFolderName(descendant.Name) then
-				t4[descendant.Name] = true
+		for _, folder2 in folder:GetDescendants() do
+			if not (folder2:IsA("Folder") and CurveAnimBoneHierarchyUtils.isBoneFolderName(folder2.Name)) then
+				continue
 			end
+
+			nameSet[folder2.Name] = true
 		end
 
-		for v31 in t4 do
-			local v32 = v25[v31]
+		for k in nameSet do
+			local parent2 = parentMap[k]
 
-			if v32 ~= nil and not t4[v32] then
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_BoneRequiresParent, {
-					boneName = v31,
-					parentBoneName = v32
-				})
+			if parent2 == nil or nameSet[parent2] then
+				continue
 			end
+
+			object:fail(ErrorSourceStrings.Keys.CurveAnim_BoneRequiresParent, {
+				boneName = k,
+				parentBoneName = parent2
+			})
 		end
 	end
 end
 
-return t1
+return CurveAnimBonesHaveValidParents

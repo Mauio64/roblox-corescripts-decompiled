@@ -1,24 +1,36 @@
-local Parent = script:FindFirstAncestor("AdPlayer").Parent
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AdPlayer").Parent
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local FoundationText = Foundation.Text
-local t1 = {
+local Text = Foundation.Text
+
+local v = {
 	eligibleDisclaimer = "CoreScripts.Ads.Label.RewardedVideoEligibleDisclaimer",
 	ineligibleDisclaimer = "CoreScripts.Ads.Label.RewardedVideoIneligibleDisclaimer"
 }
 
-local function TestAdDisclaimerComponent(t2: {[any]: any}) -- line: 18
-	-- upvalues: useLocalization (copy), t1 (copy), useTokens (copy), React (copy), FoundationText (copy)
-	local v10 = useLocalization(t1)
-	local v11 = useTokens()
+local function TestAdDisclaimerComponent(p)
+	local v2 = useLocalization(v)
+	local v3 = useTokens()
 
-	return React.createElement(FoundationText, {
+	local createElement = React.createElement
+	local v4 = {
 		tag = "bg-over-media-0 padding-medium radius-medium auto-xy text-body-large anchor-top-center",
-		Position = UDim2.new(0.5, 0, 0, v11.Gap.XLarge),
-		Text = if not t2.isEligible then v10.ineligibleDisclaimer else v10.eligibleDisclaimer
-	})
+		Position = UDim2.new(0.5, 0, 0, v3.Gap.XLarge),
+		Text = 0
+	}
+	local text
+
+	if p.isEligible then
+		text = v2.eligibleDisclaimer
+	else
+		text = v2.ineligibleDisclaimer
+	end
+
+	v4.Text = text
+	return createElement(Text, v4)
 end
 
 return TestAdDisclaimerComponent

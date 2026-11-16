@@ -1,9 +1,8 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
+local parent = Foundation.Parent
 local Constants = require(Foundation.Constants)
-
 require(Foundation.Enums.DialogSize)
-require(FoundationParent.React)
+require(parent.React)
 
 return {
 	nonSelectable = Constants.MODAL.DISABLE_SELECTION,

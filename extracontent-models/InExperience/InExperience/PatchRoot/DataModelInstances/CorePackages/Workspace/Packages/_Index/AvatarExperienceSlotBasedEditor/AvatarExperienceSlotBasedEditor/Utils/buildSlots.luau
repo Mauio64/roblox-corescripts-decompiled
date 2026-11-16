@@ -1,222 +1,187 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
 require(script.Parent.Parent.Types)
-
 local SlotType = require(script.Parent.Parent.Enums.SlotType)
-local FFlagEnableSlotsHeadShapeThumbnail = require(Parent.AvatarExperienceFlags).FFlagEnableSlotsHeadShapeThumbnail
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagEnableSlotsHeadShapeThumbnail = AvatarExperienceFlags.FFlagEnableSlotsHeadShapeThumbnail
 
-local function buildSlotSubcategory(p1, s1: string?, p2) -- line: 21
+local function buildSlotSubcategory(data, thumbnailUrl: string?, currentAssetType) -- 4 equivalent calls inferred from this helper
 	return {
-		nameTranslationKey = p1.nameTranslationKey,
-		icon = p1.icon,
-		thumbnailUrl = s1,
-		assetTypes = p1.assetTypes,
-		editorSubcategory = p1.editorSubcategory,
-		eligibleSubcategories = p1.eligibleSubcategories,
-		currentAssetType = p2,
-		hide = p1.hide,
-		deselectable = p1.deselectable
+		nameTranslationKey = data.nameTranslationKey,
+		icon = data.icon,
+		thumbnailUrl = thumbnailUrl,
+		assetTypes = data.assetTypes,
+		editorSubcategory = data.editorSubcategory,
+		eligibleSubcategories = data.eligibleSubcategories,
+		currentAssetType = currentAssetType,
+		hide = data.hide,
+		deselectable = data.deselectable
 	}
 end
-local function buildLayeredSlotSubcategory(p3, s2: string?, p4, n1: number) -- line: 35
-	-- upvalues: SlotType (copy)
-	return {
-		nameTranslationKey = p3.nameTranslationKey,
-		icon = p3.icon,
-		thumbnailUrl = s2,
-		assetTypes = p3.assetTypes,
-		editorSubcategory = p3.editorSubcategory,
-		eligibleSubcategories = p3.eligibleSubcategories,
-		currentAssetType = p4,
-		hide = p3.hide,
-		deselectable = p3.deselectable,
-		slotType = SlotType.LayeredSlot,
-		layerLimit = p3.layerLimit,
-		layerIndex = n1
-	}
+
+local function buildLayeredSlotSubcategory(item, thumbnailUrl: string?, assetType, layerIndex: number) -- 2 equivalent calls inferred from this helper
+	local slotSubcategory = buildSlotSubcategory(item, thumbnailUrl, assetType) -- inferred equivalent call
+	slotSubcategory.slotType = SlotType.LayeredSlot
+	slotSubcategory.layerLimit = item.layerLimit
+	slotSubcategory.layerIndex = layerIndex
+
+	return slotSubcategory
 end
-local function getHeadShapeFromEquippedAssets(t1: {[any]: any}) -- line: 50
-	local v17 = t1[tostring(Enum.AvatarAssetType.DynamicHead.Value)]
 
-	if v17 then
-		for _, v19 in v17 do
-			if v19.headShape == "Default" then
-				return nil
-			end
+local function getHeadShapeFromEquippedAssets(p)
+	local v = p[tostring(Enum.AvatarAssetType.DynamicHead.Value)]
 
-			return v19.headShape
+	if not v then
+		return nil
+	end
+
+	for _, v2 in v do
+		return if v2.headShape ~= "Default" then v2.headShape else nil
+	end
+
+	return nil
+end
+
+local function getClassicFaceOrDynamicHeadThumbnail(p, flag: boolean)
+	local v
+
+	if flag then
+		v = tostring(Enum.AvatarAssetType.DynamicHead.Value)
+	else
+		v = tostring(Enum.AvatarAssetType.Face.Value)
+	end
+
+	local v2 = p[v]
+
+	if v2 then
+		for k, _ in v2 do
+			return `rbxthumb://type=Asset&id={k}&w=150&h=150`
 		end
 	end
 
 	return nil
 end
-local function getClassicFaceOrDynamicHeadThumbnail(t2: {[any]: any}, b1: boolean) -- line: 63
-	local v22 = t2[if not b1 then tostring(Enum.AvatarAssetType.Face.Value) else tostring(Enum.AvatarAssetType.DynamicHead.Value)]
 
-	if v22 then
-		for v23, _ in v22 do
-			return `rbxthumb://type=Asset&id={ v23 }&w=150&h=150`
-		end
-	end
+local function buildSlots(items, p)
+	local slots = {}
+	local v = false
+	local v2 = false
 
-	return nil
-end
-local function buildSlots(t3: {[any]: any}, t4: {[any]: any}) -- line: 80
-	-- upvalues: SlotType (copy), FFlagEnableSlotsHeadShapeThumbnail (copy), getClassicFaceOrDynamicHeadThumbnail (copy)
-	local t5 = {}
-	local v28 = false
-	local v29 = false
-	local g52 = nil
-	local v51 = nil
+	for _, item in items do
+		if item.slotType == SlotType.LayeredSlot then
+			for i = 0, item.layerLimit - 1 do
+				local v3 = false
 
-	for _, v31 in t3 do
-		if v31.slotType == SlotType.LayeredSlot then
-			for i = 0, v31.layerLimit - 1 do
-				local v33 = false
+				for _, assetType in item.assetTypes do
+					local v4 = p[tostring(assetType.Value)]
+					local v5
 
-				for _, v35 in v31.assetTypes do
-					local v36 = t4[tostring(v35.Value)]
+					if v4 == nil then
+						v5 = false
+					else
+						v5 = next(v4)
+					end
 
-					if v36 ~= nil and next(v36) then
-						for v37, v38 in v36 do
-							if i == v38.order then
-								local v39 = `rbxthumb://type=Asset&id={ v37 }&w=150&h=150`
+					if not v5 then
+						continue
+					end
 
-								table.insert(t5, {
-									nameTranslationKey = v31.nameTranslationKey,
-									icon = v31.icon,
-									thumbnailUrl = v39,
-									assetTypes = v31.assetTypes,
-									editorSubcategory = v31.editorSubcategory,
-									eligibleSubcategories = v31.eligibleSubcategories,
-									currentAssetType = v35,
-									hide = v31.hide,
-									deselectable = v31.deselectable,
-									slotType = SlotType.LayeredSlot,
-									layerLimit = v31.layerLimit,
-									layerIndex = i
-								})
-								v33 = true
-
-								break
-							end
+					for k, v6 in v4 do
+						if v6.order == i then
+							table.insert(
+								slots,
+								buildLayeredSlotSubcategory( -- inferred equivalent call
+									item,
+									`rbxthumb://type=Asset&id={k}&w=150&h=150`,
+									assetType,
+									i
+								)
+							)
+							v3 = true
+							break
 						end
 					end
 				end
 
-				if not v33 then
-					table.insert(t5, {
-						thumbnailUrl = nil,
-						currentAssetType = nil,
-						nameTranslationKey = v31.nameTranslationKey,
-						icon = v31.icon,
-						assetTypes = v31.assetTypes,
-						editorSubcategory = v31.editorSubcategory,
-						eligibleSubcategories = v31.eligibleSubcategories,
-						hide = v31.hide,
-						deselectable = v31.deselectable,
-						slotType = SlotType.LayeredSlot,
-						layerLimit = v31.layerLimit,
-						layerIndex = i
-					})
+				if not v3 then
+					table.insert(slots, buildLayeredSlotSubcategory(item, nil, nil, i)) -- inferred equivalent call
 				end
 			end
 		else
-			local assetTypes = v31.assetTypes
-			local v41 = false
+			local assetTypes = item.assetTypes
+			local v3 = false
 
-			for _, v43 in assetTypes do
-				local v44 = t4[tostring(v43.Value)]
+			for _, assetType in assetTypes do
+				local v4 = p[tostring(assetType.Value)]
+				local v5
 
-				if v44 ~= nil and next(v44) then
-					if v43 == Enum.AvatarAssetType.Face then
-						v29 = true
-					else
-						if v43 == Enum.AvatarAssetType.DynamicHead then
-							v28 = true
-						end
+				if v4 == nil then
+					v5 = false
+				else
+					v5 = next(v4)
+				end
 
-						for v45, _ in v44 do
-							local v47 = `rbxthumb://type=Asset&id={ v45 }&w=150&h=150`
+				if not v5 then
+					continue
+				end
 
-							if v28 and FFlagEnableSlotsHeadShapeThumbnail then
-								local v48 = t4[tostring(Enum.AvatarAssetType.DynamicHead.Value)]
+				if assetType == Enum.AvatarAssetType.Face then
+					v2 = true
+				else
+					v = assetType == Enum.AvatarAssetType.DynamicHead or v
 
-								if v48 then
-									for _, v50 in v48 do
-										v51 = if v50.headShape ~= "Default" then v50.headShape else nil
-										g52 = true
+					for k, _ in v4 do
+						local v6 = `rbxthumb://type=Asset&id={k}&w=150&h=150`
 
-										if g52 then
-											break
-										end
+						if v and FFlagEnableSlotsHeadShapeThumbnail then
+							local v7 = p[tostring(Enum.AvatarAssetType.DynamicHead.Value)]
+							local headShape
+
+							if v7 then
+								local flag = true
+
+								for _, v8 in v7 do
+									if v8.headShape == "Default" then
+										headShape = nil
+									else
+										headShape = v8.headShape
 									end
+
+									flag = false
+									break
 								end
 
-								if not g52 then
-									v51 = nil
-								end
-
-								g52 = false
-
-								if v51 then
-									v47 = `rbxthumb://type=Asset&id={ v45 }&headshape={ v51 }&w=150&h=150`
+								if flag then
+									headShape = nil
 								end
 							end
 
-							table.insert(t5, {
-								nameTranslationKey = v31.nameTranslationKey,
-								icon = v31.icon,
-								thumbnailUrl = v47,
-								assetTypes = v31.assetTypes,
-								editorSubcategory = v31.editorSubcategory,
-								eligibleSubcategories = v31.eligibleSubcategories,
-								currentAssetType = v43,
-								hide = v31.hide,
-								deselectable = v31.deselectable
-							})
-							v41 = true
+							if headShape then
+								v6 = `rbxthumb://type=Asset&id={k}&headshape={headShape}&w=150&h=150`
+							end
 						end
+
+						table.insert(slots, buildSlotSubcategory(item, v6, assetType)) -- inferred equivalent call
+						v3 = true
 					end
 				end
 			end
 
-			for _, v54 in assetTypes do
-				if v54 == Enum.AvatarAssetType.Face and (v28 or v29) then
-					local v55 = getClassicFaceOrDynamicHeadThumbnail(t4, v28)
-
-					table.insert(t5, {
-						nameTranslationKey = v31.nameTranslationKey,
-						icon = v31.icon,
-						thumbnailUrl = v55,
-						assetTypes = v31.assetTypes,
-						editorSubcategory = v31.editorSubcategory,
-						eligibleSubcategories = v31.eligibleSubcategories,
-						currentAssetType = v54,
-						hide = v31.hide,
-						deselectable = v31.deselectable
-					})
-					v41 = true
+			for _, assetType in assetTypes do
+				if not (assetType == Enum.AvatarAssetType.Face and (v or v2)) then
+					continue
 				end
+
+				table.insert(slots, buildSlotSubcategory(item, getClassicFaceOrDynamicHeadThumbnail(p, v), assetType)) -- inferred equivalent call
+				v3 = true
 			end
 
-			if not v41 then
-				table.insert(t5, {
-					thumbnailUrl = nil,
-					currentAssetType = nil,
-					nameTranslationKey = v31.nameTranslationKey,
-					icon = v31.icon,
-					assetTypes = v31.assetTypes,
-					editorSubcategory = v31.editorSubcategory,
-					eligibleSubcategories = v31.eligibleSubcategories,
-					hide = v31.hide,
-					deselectable = v31.deselectable
-				})
+			if not v3 then
+				table.insert(slots, buildSlotSubcategory(item)) -- inferred equivalent call
 			end
 		end
 	end
 
-	return t5
+	return slots
 end
 
 return buildSlots

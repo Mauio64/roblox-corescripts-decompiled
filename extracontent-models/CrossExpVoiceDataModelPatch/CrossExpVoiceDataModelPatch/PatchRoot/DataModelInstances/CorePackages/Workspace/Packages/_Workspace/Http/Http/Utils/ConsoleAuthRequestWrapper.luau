@@ -1,31 +1,36 @@
 local MessageBusService = game:GetService("MessageBusService")
+
 local Http = script:FindFirstAncestor("Http")
-local HttpParent = Http.Parent
-local Promise = require(HttpParent.Promise)
-local Cryo = require(HttpParent.Cryo)
-local Logging = require(HttpParent.AppCommonLib).Logging
+local parent = Http.Parent
+local Promise = require(parent.Promise)
+local Cryo = require(parent.Cryo)
+local AppCommonLib = require(parent.AppCommonLib)
+local Logging = AppCommonLib.Logging
 
 require(Http.RequestTypes)
+local FFlagEnableStrictConsoleAuthCredentialHeaders = require(Http.Flags.FFlagEnableStrictConsoleAuthCredentialHeaders)
 
-return function(p1, s1: string, s2: string, p2) -- line: 16
-	-- upvalues: Promise (copy), MessageBusService (copy), Logging (copy), Cryo (copy)
-	return Promise.new(function(resolve, reject) -- line: 17
-		-- upvalues: s1 (copy), s2 (copy), MessageBusService (copy), Logging (copy), p2 (copy), Cryo (copy), p1 (copy)
-		local t1 = {
-			url = s1,
-			method = s2
-		}
+return function(callback, url: string, method: string, p, flag: boolean?)
+	return Promise.new(function(p2, callback2)
+		MessageBusService:MakeRequest(
+			"CredentialsProtocol",
+			"getHeaders",
+			{ ["url"] = url, method = method },
+			function(p3)
+				if not (p3 and p3.success) then
+					Logging.warn("credential headers error")
 
-		MessageBusService:MakeRequest("CredentialsProtocol", "getHeaders", t1, function(t2: {[any]: any}) -- line: 22
-			-- upvalues: Logging (copy), reject (copy), p2 (copy), Cryo (copy), p1 (copy), s1 (copy), s2 (copy), resolve (copy)
-			if not t2 or not t2.success then
-				Logging.warn("credential headers error")
-				reject({})
-			end
+					callback2({})
 
-			p2.headers = Cryo.Dictionary.join(p2.headers or {}, t2.headers or {})
+					if FFlagEnableStrictConsoleAuthCredentialHeaders and flag then
+						return
+					end
+				end
 
-			return p1(s1, s2, p2):andThen(resolve):catch(reject)
-		end, {})
+				p.headers = Cryo.Dictionary.join(p.headers or {}, p3.headers or {})
+				return callback(url, method, p):andThen(p2):catch(callback2)
+			end,
+			{}
+		)
 	end)
 end

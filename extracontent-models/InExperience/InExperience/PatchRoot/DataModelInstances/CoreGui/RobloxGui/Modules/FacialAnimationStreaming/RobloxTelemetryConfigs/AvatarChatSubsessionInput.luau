@@ -5,13 +5,9 @@ game:DefineFastInt("AvatarChatSubsessionInputEventThrottleHundrethsPercent", 0)
 
 return {
 	eventName = "avatarChatSubsessionInput",
-	description = "Report user camera/mic settings for Avatar Chat to EventIngest.",
-	links = "https://roblox.atlassian.net/wiki/spaces/DA/pages/1857851197/Logging+Specs+Subsession+Analytics",
 	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
 	throttlingPercentage = game:GetFastInt("AvatarChatSubsessionInputEventThrottleHundrethsPercent"),
-	lastUpdated = {
-		22,
-		10,
-		17
-	}
+	lastUpdated = { 22, 10, 17 },
+	description = "Report user camera/mic settings for Avatar Chat to EventIngest.",
+	links = "https://roblox.atlassian.net/wiki/spaces/DA/pages/1857851197/Logging+Specs+Subsession+Analytics"
 }

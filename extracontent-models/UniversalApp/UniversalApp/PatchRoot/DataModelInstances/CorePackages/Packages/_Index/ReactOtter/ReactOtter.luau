@@ -1,10 +1,7 @@
 local Otter = require(script.Parent.Otter)
-local useAnimatedBinding = require(script.useAnimatedBinding)
-local useMotor = require(script.useMotor)
-
 return {
-	useAnimatedBinding = useAnimatedBinding,
-	useMotor = useMotor,
+	useAnimatedBinding = require(script.useAnimatedBinding),
+	useMotor = require(script.useMotor),
 	ease = Otter.ease,
 	spring = Otter.spring,
 	instant = Otter.instant

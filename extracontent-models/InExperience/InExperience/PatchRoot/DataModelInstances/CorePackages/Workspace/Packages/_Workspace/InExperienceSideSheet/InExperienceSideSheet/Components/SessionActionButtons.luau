@@ -1,54 +1,68 @@
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
-local React = require(InExperienceSideSheetParent.React)
-local SignalsReact = require(InExperienceSideSheetParent.SignalsReact)
-local View = require(InExperienceSideSheetParent.Foundation).View
-local FFlagEnableWhatsNew = require(InExperienceSideSheetParent.SharedFlags).FFlagEnableWhatsNew
-local v7 = if not FFlagEnableWhatsNew then nil else require(InExperienceSideSheetParent.WhatsNew).WhatsNewAnchor
-local ShortcutButton = require(InExperienceSideSheet.Components.ShortcutButton)
-local GetSideSheetConfigStore = require(InExperienceSideSheet.Stores.GetSideSheetConfigStore)
+local parent = InExperienceSideSheet.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableWhatsNew = SharedFlags.FFlagEnableWhatsNew
+local FFlagShowSwitchServerButton = SharedFlags.FFlagShowSwitchServerButton
+local PioneerUtils = require(parent.PioneerUtils)
+local isPioneerLaunch = PioneerUtils.isPioneerLaunch
+local whatsNewAnchor
+
+if FFlagEnableWhatsNew then
+	local WhatsNew = require(parent.WhatsNew)
+	whatsNewAnchor = WhatsNew.WhatsNewAnchor
+else
+	whatsNewAnchor = nil
+end
+
 local GetSessionActionButtonsStore = require(InExperienceSideSheet.Stores.GetSessionActionButtonsStore)
 
-local function getIsHeightSmall(p1) -- line: 26
-	-- upvalues: GetSideSheetConfigStore (copy)
-	return GetSideSheetConfigStore(p1).getIsHeightSmall(p1)
-end
-local function getSessionActionButtonConfigs(p2) -- line: 30
-	-- upvalues: GetSessionActionButtonsStore (copy)
-	return GetSessionActionButtonsStore(p2).sessionActionButtonConfigs
-end
-local function SessionActionButtons(t1: {[any]: any}) -- line: 34
-	-- upvalues: SignalsReact (copy), getIsHeightSmall (copy), getSessionActionButtonConfigs (copy), React (copy), ShortcutButton (copy), View (copy), FFlagEnableWhatsNew (copy), v7 (copy)
-	local v17 = SignalsReact.useSignalState(getIsHeightSmall)
-	local t2 = {}
+local buildSessionActionButtonLayout = require(InExperienceSideSheet.Utils.buildSessionActionButtonLayout)
 
-	for v19, v20 in (SignalsReact.useSignalState(getSessionActionButtonConfigs)) do
-		t2[v20.name] = React.createElement(ShortcutButton, {
-			label = v20.label,
-			getShortcutIcon = v20.getShortcutIcon,
-			getOnActivated = v20.getOnActivated,
-			getIsEnabled = v20.getIsEnabled,
-			isEmphasis = v20.isEmphasis,
-			isSmall = v17,
-			layoutOrder = v19
-		})
+local function getSessionActionButtonConfigs(p)
+	return GetSessionActionButtonsStore(p).sessionActionButtonConfigs
+end
+
+local function SessionActionButtons(p)
+	local v = SignalsReact.useSignalState(getSessionActionButtonConfigs)
+	local v2
+
+	if FFlagShowSwitchServerButton or isPioneerLaunch() then
+		v2 = {}
+
+		for _, v3 in v do
+			if v3.getIsHidden == nil or not v3.getIsHidden() then
+				table.insert(v2, v3)
+			end
+		end
+	else
+		v2 = v
 	end
 
-	local v21 = React.createElement(View, {
-		tag = "size-full-0 auto-y row gap-small",
-		LayoutOrder = t1.layoutOrder
-	}, t2)
+	local sessionActionButtonLayout = buildSessionActionButtonLayout(v2)
+
+	local element = React.createElement(
+		View,
+		{ tag = "col gap-small size-full-0 auto-y", LayoutOrder = p.layoutOrder },
+		sessionActionButtonLayout
+	)
 
 	if FFlagEnableWhatsNew then
-		return React.createElement(v7, {
+		return React.createElement(whatsNewAnchor, {
 			anchorId = "LeaveRespawn",
-			LayoutOrder = t1.layoutOrder
+			LayoutOrder = p.layoutOrder
 		}, {
-			SessionActions = v21
+			SessionActions = element
 		})
 	end
 
-	return v21
+	return element
 end
 
 return React.memo(SessionActionButtons)

@@ -1,10 +1,6 @@
 require(script.sponsoredAdViewabilityRegistry)
-
-local useSponsoredAdViewabilityDetector = require(script.useSponsoredAdViewabilityDetector)
-local useTagAsSponsoredAdViewabilityCandidate = require(script.useTagAsSponsoredAdViewabilityCandidate)
-
 return {
-	useSponsoredAdViewabilityDetector = useSponsoredAdViewabilityDetector,
-	useTagAsSponsoredAdViewabilityCandidate = useTagAsSponsoredAdViewabilityCandidate,
+	useSponsoredAdViewabilityDetector = require(script.useSponsoredAdViewabilityDetector),
+	useTagAsSponsoredAdViewabilityCandidate = require(script.useTagAsSponsoredAdViewabilityCandidate),
 	["jest.config"] = script["jest.config"]
 }

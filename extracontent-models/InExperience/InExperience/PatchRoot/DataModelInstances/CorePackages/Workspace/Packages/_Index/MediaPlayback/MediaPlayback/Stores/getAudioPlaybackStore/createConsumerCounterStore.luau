@@ -1,39 +1,34 @@
 local MediaPlayback = script:FindFirstAncestor("MediaPlayback")
+
 local Cryo = require(MediaPlayback.Parent.Cryo)
 local Signals = require(MediaPlayback.Parent.Signals)
 
-local function createConsumerCounterStore() -- line: 19
-	-- upvalues: Signals (copy), Cryo (copy)
-	local v5, v6 = Signals.createSignal({})
+local function createConsumerCounterStore()
+	local signal, v = Signals.createSignal({})
 
 	return {
-		subscribe = function(s1: string) -- line: 22
-			-- upvalues: v6 (copy), Cryo (copy)
-			v6(function(p1) -- line: 23
-				-- upvalues: s1 (copy), Cryo (copy)
-				local v11 = p1[s1] or 0
-
-				return Cryo.Dictionary.join(p1, {
-					[s1] = v11 + 1
-				})
-			end)
-		end,
-		unsubscribe = function(s2: string) -- line: 31
-			-- upvalues: v6 (copy), Cryo (copy)
-			local u9 = nil
-
-			v6(function(p2) -- line: 34
-				-- upvalues: s2 (copy), u9 (ref), Cryo (copy)
-				u9 = math.max(0, (p2[s2] or 0) - 1)
-
+		subscribe = function(p: string)
+			v(function(p2)
+				local v2 = p2[p] or 0
 				return Cryo.Dictionary.join(p2, {
-					[s2] = if not (u9 > 0) then Cryo.None else u9
+					[p] = v2 + 1
 				})
 			end)
-
-			return u9
 		end,
-		getConsumerCounts = v5
+		unsubscribe = function(p: string)
+			local v2 = nil
+
+			v(function(p2)
+				v2 = math.max(0, (p2[p] or 0) - 1)
+
+				local join = Cryo.Dictionary.join
+				local v3 = if v2 > 0 then v2 else Cryo.None
+				return join(p2, { [p] = v3 })
+			end)
+
+			return v2
+		end,
+		getConsumerCounts = signal
 	}
 end
 

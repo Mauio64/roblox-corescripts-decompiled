@@ -1,16 +1,16 @@
 require(script.Parent.Parent.Types)
 require(script.Parent.Parent.Enums.Categories)
 
-local function buildSlotCategoryLocalizationKeys(t1: {[any]: any}) -- line: 8
-	local t2 = {}
+local function buildSlotCategoryLocalizationKeys(items)
+	local nameTranslationKeysByNameTranslationKey = {}
 
-	for _, v5 in t1 do
-		if not v5.hide then
-			t2[v5.nameTranslationKey] = v5.nameTranslationKey
+	for _, item in items do
+		if not item.hide then
+			nameTranslationKeysByNameTranslationKey[item.nameTranslationKey] = item.nameTranslationKey
 		end
 	end
 
-	return t2
+	return nameTranslationKeysByNameTranslationKey
 end
 
 return buildSlotCategoryLocalizationKeys

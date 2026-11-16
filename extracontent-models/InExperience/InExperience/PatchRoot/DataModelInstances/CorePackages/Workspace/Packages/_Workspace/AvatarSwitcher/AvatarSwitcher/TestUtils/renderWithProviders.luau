@@ -1,24 +1,20 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
-local React = require(AvatarSwitcherParent.React)
-local ReactRoblox = require(AvatarSwitcherParent.ReactRoblox)
+local parent = AvatarSwitcher.Parent
+
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+
 local ContextProviders = require(AvatarSwitcher.Internal.ContextProviders)
 
-local function renderWithProviders(p1, p2) -- line: 9
-	-- upvalues: ReactRoblox (copy), React (copy), ContextProviders (copy)
-	local Frame = Instance.new("Frame")
-	local v10 = ReactRoblox.createRoot(Frame)
-
-	ReactRoblox.act(function() -- line: 12
-		-- upvalues: v10 (copy), React (copy), ContextProviders (copy), p1 (copy), p2 (copy)
-		v10:render(React.createElement(ContextProviders, {
-			theme = "Dark"
-		}, {
-			Child = React.createElement(p1, p2)
+local function renderWithProviders(p, p2)
+	local frame = Instance.new("Frame")
+	local root = ReactRoblox.createRoot(frame)
+	ReactRoblox.act(function()
+		root:render(React.createElement(ContextProviders, { theme = "Dark" }, {
+			Child = React.createElement(p, p2)
 		}))
 	end)
-
-	return Frame, v10
+	return frame, root
 end
 
 return renderWithProviders

@@ -1,7 +1,1 @@
-local ItemInfoRow = require(script.ItemInfoRow)
-local ItemInfoList = require(script.ItemInfoList)
-
-return {
-	ItemInfoRow = ItemInfoRow,
-	ItemInfoList = ItemInfoList
-}
+return { ItemInfoRow = require(script.ItemInfoRow), ItemInfoList = require(script.ItemInfoList) }

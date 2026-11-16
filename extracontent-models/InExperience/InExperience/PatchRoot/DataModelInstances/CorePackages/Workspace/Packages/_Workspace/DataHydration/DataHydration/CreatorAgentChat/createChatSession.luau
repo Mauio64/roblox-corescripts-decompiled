@@ -1,9 +1,15 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
-local AcpProtocol = require(script.Parent.Acp.AcpProtocol)
-local experimentOverride = require(script.Parent.experimentOverride)
-local sessionHistoryMerge = require(script.Parent.sessionHistoryMerge)
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
+local Signals = require(parent.Signals)
+local SharedFlags = require(parent.SharedFlags)
+
+local AcpProtocol = require(script.Parent.Acp.AcpProtocol)
+local classifyRequestFailure = require(script.Parent.classifyRequestFailure)
+local experimentOverride = require(script.Parent.experimentOverride)
+local getFundingError = require(script.Parent.getFundingError)
+local sendConfiguration = require(script.Parent.sendConfiguration)
+local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
+local sessionHistoryMerge = require(script.Parent.sessionHistoryMerge)
 require(script.Parent.types)
 
 local constants = require(script.Parent.ChatSession.constants)
@@ -13,376 +19,1132 @@ local historyPolling = require(script.Parent.ChatSession.historyPolling)
 local sendPrompt = require(script.Parent.ChatSession.sendPrompt)
 local sessionHistoryCache = require(script.Parent.ChatSession.sessionHistoryCache)
 local sessionScalarState = require(script.Parent.ChatSession.sessionScalarState)
-
 require(script.Parent.ChatSession.sessionDeps)
+local FFlagBuildExperiencePromptFailureTelemetry = SharedFlags.FFlagBuildExperiencePromptFailureTelemetry
 
-local function createChatSession(p1, n1: number?, n2: number?, s1: string?) -- line: 34
-	-- upvalues: sessionScalarState (copy), constants (copy), sessionHistoryCache (copy), sessionHistoryMerge (copy), Signals (copy), historyPageUtils (copy), historyLoader (copy), historyPolling (copy), AcpProtocol (copy), experimentOverride (copy), sendPrompt (copy)
-	local t1 = {}
-	local t2 = {}
-	local v20 = sessionScalarState.createSessionScalarState(s1)
-	local u21 = nil
-	local v22 = p1.rpcTimeoutSeconds or constants.getRpcTimeoutSeconds()
-	local v23 = sessionHistoryCache.createSessionHistoryCache()
-	local n3 = 0
+local function createChatSession(deps, universeId: number?, placeId: number?, p: string?)
+	local loaded = {}
+	local overlay = {}
 
-	local function buildMergedHistory() -- line: 49
-		-- upvalues: sessionHistoryMerge (copy), t1 (ref), t2 (ref)
-		return sessionHistoryMerge.orderMergedHistoryItems(t1, t2)
+	local sessionScalarState2 = sessionScalarState.createSessionScalarState(p)
+	local v = nil
+	local rpcTimeoutSeconds = deps.rpcTimeoutSeconds or constants.getRpcTimeoutSeconds()
+	local sessionHistoryCache2 = sessionHistoryCache.createSessionHistoryCache()
+	local count = 0
+	local count2 = 0
+	local v2 = 0
+
+	local v3 = nil
+
+	local v4 = nil
+
+	local function getExperimentKey() -- 3 equivalent calls inferred from this helper
+		return experimentOverride.getKey(sessionScalarState2.getCasSessionId(false)) or v3
 	end
 
-	local v26, v27 = Signals.createSignal(buildMergedHistory())
+	local function captureSessionNewExperiment() -- 2 equivalent calls inferred from this helper
+		local v5
 
-	local function notifySessionStateChanged() -- line: 57
-		-- upvalues: v27 (copy), buildMergedHistory (copy)
-		v27(buildMergedHistory())
+		if experimentOverride.isEnabled() then
+			v5 = experimentOverride.getExperiment(getExperimentKey()) -- inferred equivalent call
+		end
+
+		v4 = v5
 	end
-	local function snapshotActiveSession() -- line: 72
-		-- upvalues: v20 (copy), t1 (ref), t2 (ref)
-		local v42 = v20.getCasSessionId(false)
 
-		if v42 == nil or v42 == "" then
+	local function buildMergedHistory()
+		return sessionHistoryMerge.orderMergedHistoryItems(loaded, overlay)
+	end
+
+	local signal, v5 = Signals.createSignal(buildMergedHistory())
+
+	local function notifySessionStateChanged() -- 4 equivalent calls inferred from this helper
+		v5(buildMergedHistory())
+	end
+
+	local function noteHistorySequenceIds(p2) -- 2 equivalent calls inferred from this helper
+		sessionScalarState2.noteHistorySequenceId(historyPageUtils.getMaxHistorySequenceId(p2))
+	end
+
+	local function noteTurnSequenceIds(p2)
+		local getLatestProcessedSequenceNumber = p2.getLatestProcessedSequenceNumber
+
+		if getLatestProcessedSequenceNumber ~= nil then
+			sessionScalarState2.noteHistorySequenceId(getLatestProcessedSequenceNumber())
+		end
+	end
+
+	local function snapshotActiveSession()
+		local casSessionId = sessionScalarState2.getCasSessionId(false)
+
+		if casSessionId == nil or casSessionId == "" then
 			return nil
 		end
 
 		return {
-			loadedBySequenceId = t1,
-			overlayBySequenceId = t2,
-			hasLoadedHistory = v20.getHasLoadedHistory(false),
-			nextHistoryPageToken = v20.getNextHistoryPageToken(false),
-			latestObservedHistorySequenceId = v20.getLatestObservedHistorySequenceId(false)
+			loadedBySequenceId = loaded,
+			overlayBySequenceId = overlay,
+			hasLoadedHistory = sessionScalarState2.getHasLoadedHistory(false),
+			nextHistoryPageToken = sessionScalarState2.getNextHistoryPageToken(false),
+			latestObservedHistorySequenceId = sessionScalarState2.getLatestObservedHistorySequenceId(false)
 		}
 	end
-	local function saveActiveSessionToCache() -- line: 86
-		-- upvalues: v20 (copy), snapshotActiveSession (copy), v23 (copy)
-		local v43 = v20.getCasSessionId(false)
 
-		if v43 == nil or (v43 == "" or not v20.getHasLoadedHistory(false)) then
+	local function saveActiveSessionToCache() -- 1 equivalent call inferred from this helper
+		local casSessionId = sessionScalarState2.getCasSessionId(false)
+
+		if casSessionId == nil or casSessionId == "" or not sessionScalarState2.getHasLoadedHistory(false) then
 			return
 		end
 
-		local v44 = snapshotActiveSession()
+		local v6 = snapshotActiveSession()
 
-		if v44 ~= nil then
-			v23.save(v43, v44)
+		if v6 ~= nil then
+			sessionHistoryCache2.save(casSessionId, v6)
 		end
 	end
-	local function restoreSessionFromCache(s2: string) -- line: 97
-		-- upvalues: v23 (copy), t1 (ref), t2 (ref), v20 (copy), v27 (copy), buildMergedHistory (copy)
-		local v46 = v23.restore(s2)
 
-		if v46 == nil then
+	local function restoreSessionFromCache(p2: string): boolean -- 1 equivalent call inferred from this helper
+		local v6 = sessionHistoryCache2.restore(p2)
+
+		if v6 == nil then
 			return false
 		end
 
-		t1 = v46.loadedBySequenceId
-		t2 = v46.overlayBySequenceId
-		v20.setHasLoadedHistory(v46.hasLoadedHistory)
-		v20.setNextHistoryPageToken(v46.nextHistoryPageToken)
-		v20.setLatestObservedHistorySequenceId(v46.latestObservedHistorySequenceId)
-		v27(buildMergedHistory())
-
+		loaded = v6.loadedBySequenceId
+		overlay = v6.overlayBySequenceId
+		sessionScalarState2.setHasLoadedHistory(v6.hasLoadedHistory)
+		sessionScalarState2.setNextHistoryPageToken(v6.nextHistoryPageToken)
+		sessionScalarState2.setLatestObservedHistorySequenceId(v6.latestObservedHistorySequenceId)
+		notifySessionStateChanged() -- inferred equivalent call
 		return true
 	end
-	local function clearActiveSessionState() -- line: 111
-		-- upvalues: t1 (ref), t2 (ref), v20 (copy), v27 (copy), buildMergedHistory (copy)
-		t1 = {}
-		t2 = {}
-		v20.setHasLoadedHistory(false)
-		v20.setNextHistoryPageToken(nil)
-		v20.setHistoryLoadInFlight(false)
-		v20.setLatestObservedHistorySequenceId(nil)
-		v27(buildMergedHistory())
+
+	local function clearActiveSessionState()
+		loaded = {}
+		overlay = {}
+		sessionScalarState2.setHasLoadedHistory(false)
+		sessionScalarState2.setNextHistoryPageToken(nil)
+		sessionScalarState2.setHistoryLoadInFlight(false)
+		sessionScalarState2.setLatestObservedHistorySequenceId(nil)
+		notifySessionStateChanged() -- inferred equivalent call
 	end
-	local function setCasSessionIdInternal(s3: string) -- line: 121
-		-- upvalues: v20 (copy), n3 (ref), snapshotActiveSession (copy), v23 (copy), t1 (ref), t2 (ref), v27 (copy), buildMergedHistory (copy), p1 (copy), clearActiveSessionState (copy)
-		if s3 == "" then
+
+	local function setCasSessionIdInternal(sessionId: string)
+		if not (sessionId ~= "" and sessionScalarState2.getCasSessionId(false) ~= sessionId) then
 			return
 		end
 
-		if s3 == v20.getCasSessionId(false) then
-			return
+		count += 1
+
+		if FFlagBuildExperienceModelPickerData then
+			sessionScalarState2.setModels(nil)
+			sessionScalarState2.setHasObservedModels(false)
 		end
 
-		n3 += 1
+		saveActiveSessionToCache() -- inferred equivalent call
+		sessionScalarState2.setCasSessionId(sessionId)
 
-		local v48 = v20.getCasSessionId(false)
-
-		if v48 ~= nil and v48 ~= "" and v20.getHasLoadedHistory(false) then
-			local v49 = snapshotActiveSession()
-
-			if v49 ~= nil then
-				v23.save(v48, v49)
-			end
+		if FFlagBuildExperienceModelPickerData and experimentOverride.isEnabled() then
+			experimentOverride.move(v3, experimentOverride.getKey(sessionId))
 		end
 
-		v20.setCasSessionId(s3)
-		v20.setHistoryLoadInFlight(false)
+		sessionScalarState2.setHistoryLoadInFlight(false)
 
-		local v50 = v23.restore(s3)
-		local v51
-
-		if v50 == nil then
-			v51 = false
-		else
-			t1 = v50.loadedBySequenceId
-			t2 = v50.overlayBySequenceId
-			v20.setHasLoadedHistory(v50.hasLoadedHistory)
-			v20.setNextHistoryPageToken(v50.nextHistoryPageToken)
-			v20.setLatestObservedHistorySequenceId(v50.latestObservedHistorySequenceId)
-			v27(buildMergedHistory())
-			v51 = true
-		end
-
-		if v51 then
-			p1.onCasSessionIdChanged(s3)
-
+		if restoreSessionFromCache(sessionId) then -- inferred equivalent call
+			deps.onCasSessionIdChanged(sessionId)
 			return
 		end
 
 		clearActiveSessionState()
-		p1.onCasSessionIdChanged(s3)
-	end
-	local function mergeHistoryPage(t3: {[any]: any}, s4: string?) -- line: 140
-		-- upvalues: sessionHistoryMerge (copy), t1 (ref), t2 (ref), v20 (copy), historyPageUtils (copy), v27 (copy), buildMergedHistory (copy)
-		sessionHistoryMerge.mergeHistoryIntoMap(t1, t3, t2)
-		v20.setNextHistoryPageToken(s4)
-		v20.noteHistorySequenceId(historyPageUtils.getMaxHistorySequenceId(t3))
-		v27(buildMergedHistory())
+		deps.onCasSessionIdChanged(sessionId)
 	end
 
-	local v35 = historyLoader.createHistoryLoader({
-		deps = p1,
-		rpcTimeoutSeconds = v22,
-		getCasSessionId = function() -- line: 157
-			-- upvalues: v20 (copy)
-			return v20.getCasSessionId(false)
+	local function mergeHistoryPage(p2, p3: string?)
+		sessionHistoryMerge.mergeHistoryIntoMap(loaded, p2, overlay)
+		sessionScalarState2.setNextHistoryPageToken(p3)
+		noteHistorySequenceIds(p2) -- inferred equivalent call
+		notifySessionStateChanged() -- inferred equivalent call
+	end
+
+	local function ingestRealtimeUpdate(p2, p3: number)
+		if sessionHistoryMerge.ingestOverlayUpdate(overlay, loaded, p2, p3) then
+			sessionScalarState2.noteHistorySequenceId(p3)
+			notifySessionStateChanged() -- inferred equivalent call
+		end
+	end
+
+	local function awaitRequest(p2, callback, p3: number?) -- 3 equivalent calls inferred from this helper
+		local v6 = historyPageUtils.awaitRequestState(p2.state, p3 or os.clock() + rpcTimeoutSeconds, callback)
+
+		if callback ~= nil then
+			p2.dispose()
+		end
+
+		return v6
+	end
+
+	local function publishModels(result) -- 2 equivalent calls inferred from this helper
+		local roblox
+
+		if result and result._meta then
+			roblox = result._meta._roblox
+		end
+
+		local setModels = sessionScalarState2.setModels
+		local v6
+
+		if roblox then
+			v6 = roblox.models
+		end
+
+		setModels(v6)
+		sessionScalarState2.setHasObservedModels(true)
+	end
+
+	local function publishExperiment(p2: string, result)
+		if not experimentOverride.isEnabled() then
+			return
+		end
+
+		local key = experimentOverride.getKey(p2)
+
+		if
+			experimentOverride.isPending(key)
+			or FFlagBuildExperienceModelPickerData and experimentOverride.hasInternalEdit(key)
+		then
+			return
+		end
+
+		local experiment
+
+		if not (result == nil or result._meta == nil or result._meta._roblox == nil) then
+			experiment = result._meta._roblox.experiment
+		end
+
+		if experiment == nil then
+			experimentOverride.clear(key)
+
+			return
+		end
+
+		local hydrate = experimentOverride.hydrate
+
+		local specVersion = experiment.specVersion
+
+		if not FFlagBuildExperienceModelPickerData then
+			experiment = nil
+		end
+
+		hydrate(key, specVersion, experiment)
+	end
+
+	local function loadSession(casSessionId: string, historyPageToken: string?, isCancelled, p2: number?)
+		local v6 = count
+		count2 += 1
+		local v7 = count2
+		local function isStale() -- 2 equivalent calls inferred from this helper
+			return isCancelled() or v6 ~= count or sessionScalarState2.getCasSessionId(false) ~= casSessionId
+		end
+
+		if isStale() then -- inferred equivalent call
+			return { status = "pending" }
+		end
+
+		local v8 = awaitRequest(deps.sessionLoad(casSessionId, { -- inferred equivalent call
+			historyPageToken = historyPageToken
+		}), isStale, p2)
+
+		if isStale() then -- inferred equivalent call
+			return { status = "pending" }
+		end
+
+		if v8.status == "succeeded" and v2 < v7 then
+			v2 = v7
+			publishModels(v8.result) -- inferred equivalent call
+			publishExperiment(casSessionId, v8.result)
+		end
+
+		return v8
+	end
+
+	local v6 = {
+		deps = deps,
+		rpcTimeoutSeconds = rpcTimeoutSeconds,
+		getCasSessionId = function()
+			return sessionScalarState2.getCasSessionId(false)
 		end,
-		getHistoryLoadInFlight = function() -- line: 160
-			-- upvalues: v20 (copy)
-			return v20.getHistoryLoadInFlight(false)
+		getHistoryLoadInFlight = function()
+			return sessionScalarState2.getHistoryLoadInFlight(false)
 		end,
-		setHistoryLoadInFlight = v20.setHistoryLoadInFlight,
-		getNextHistoryPageToken = function() -- line: 164
-			-- upvalues: v20 (copy)
-			return v20.getNextHistoryPageToken(false)
+		setHistoryLoadInFlight = sessionScalarState2.setHistoryLoadInFlight,
+		getNextHistoryPageToken = function()
+			return sessionScalarState2.getNextHistoryPageToken(false)
 		end,
-		setNextHistoryPageToken = v20.setNextHistoryPageToken,
-		getLoadedBySequenceId = function() -- line: 168
-			-- upvalues: t1 (ref)
-			return t1
+		setNextHistoryPageToken = sessionScalarState2.setNextHistoryPageToken,
+		getLoadedBySequenceId = function()
+			return loaded
 		end,
-		setLoadedBySequenceId = function(t4: {[any]: any}) -- line: 171
-			-- upvalues: t1 (ref)
-			t1 = t4
+		setLoadedBySequenceId = function(p2)
+			loaded = p2
 		end,
-		getOverlayBySequenceId = function() -- line: 174
-			-- upvalues: t2 (ref)
-			return t2
+		getOverlayBySequenceId = function()
+			return overlay
 		end,
-		setOverlayBySequenceId = function(t5: {[any]: any}) -- line: 177
-			-- upvalues: t2 (ref)
-			t2 = t5
+		setOverlayBySequenceId = function(p2)
+			overlay = p2
 		end,
 		buildMergedHistory = buildMergedHistory,
 		mergeHistoryPage = mergeHistoryPage,
-		noteHistorySequenceIds = function(t6: {[any]: any}) -- line: 61
-			-- upvalues: v20 (copy), historyPageUtils (copy)
-			v20.noteHistorySequenceId(historyPageUtils.getMaxHistorySequenceId(t6))
-		end,
+		noteHistorySequenceIds = noteHistorySequenceIds,
 		notifyMergedHistoryChanged = notifySessionStateChanged,
-		markHistoryLoaded = v20.markHistoryLoaded,
-		getRefreshGeneration = function() -- line: 185
-			-- upvalues: n3 (ref)
-			return n3
-		end
-	})
-	local v36 = historyPolling.createHistoryPolling({
-		deps = p1,
-		rpcTimeoutSeconds = v22,
-		getCasSessionId = function() -- line: 193
-			-- upvalues: v20 (copy)
-			return v20.getCasSessionId(false)
+		markHistoryLoaded = sessionScalarState2.markHistoryLoaded,
+		getRefreshGeneration = function()
+			return count
 		end,
-		getNextHistoryPageToken = function() -- line: 196
-			-- upvalues: v20 (copy)
-			return v20.getNextHistoryPageToken(false)
-		end,
-		mergeHistoryPage = mergeHistoryPage
-	})
+		onInitialSessionLoad = publishExperiment
+	}
 
-	local function ensureInitialized() -- line: 202
-		-- upvalues: v20 (copy), p1 (copy), AcpProtocol (copy), historyPageUtils (copy), v22 (copy)
-		if v20.getInitialized(false) then
-			return true, nil
-		end
+	local createHistoryLoader = historyLoader.createHistoryLoader
+	local v7
 
-		local v58 = p1.initialize({
-			protocolVersion = AcpProtocol.ProtocolVersion
-		})
-		local v59 = historyPageUtils.awaitRequestState(v58.state, os.clock() + v22)
-
-		if v59.status ~= "succeeded" then
-			return false, v59.errorCode
-		end
-
-		v20.setInitialized(true)
-
-		return true, nil
+	if FFlagBuildExperienceModelPickerData then
+		v7 = loadSession
 	end
 
-	local v38 = sendPrompt.createSendPrompt({
-		ensureInitialized = ensureInitialized,
-		ensureCasSession = function() -- line: 215
-			-- upvalues: v20 (copy), n1 (copy), n2 (copy), ensureInitialized (copy), p1 (copy), experimentOverride (copy), historyPageUtils (copy), v22 (copy), setCasSessionIdInternal (copy)
-			local v60 = v20.getCasSessionId(false)
+	local historyLoader2 = createHistoryLoader(v6, v7)
 
-			if v60 ~= nil then
-				return v60, nil
-			end
+	local createHistoryPolling = historyPolling.createHistoryPolling
+	local v8
 
-			if n1 == nil or n2 == nil then
-				return nil, {
-					stage = "missing_project"
-				}
-			end
+	if FFlagBuildExperienceModelPickerData then
+		v8 = loadSession
+	end
 
-			local v61, v62 = ensureInitialized()
-
-			if not v61 then
-				return nil, {
-					stage = "initialize",
-					errorCode = v62
-				}
-			end
-
-			local v63 = p1.sessionNew({
-				project = {
-					universeId = n1,
-					placeId = n2
-				},
-				experiment = experimentOverride.getExperiment()
-			})
-			local v64 = historyPageUtils.awaitRequestState(v63.state, os.clock() + v22)
-
-			if v64.status ~= "succeeded" then
-				return nil, {
-					stage = "session_new",
-					errorCode = v64.errorCode
-				}
-			end
-
-			local result = v64.result
-			local v66 = if typeof(result) ~= "table" then nil else result.sessionId
-
-			if typeof(v66) ~= "string" or v66 == "" then
-				return nil, {
-					stage = "session_new"
-				}
-			end
-
-			setCasSessionIdInternal(v66)
-
-			return v66, nil
+	local historyPolling2 = createHistoryPolling({
+		deps = deps,
+		rpcTimeoutSeconds = rpcTimeoutSeconds,
+		getCasSessionId = function()
+			return sessionScalarState2.getCasSessionId(false)
 		end,
-		getLatestObservedHistorySequenceId = function() -- line: 247
-			-- upvalues: v20 (copy)
-			return v20.getLatestObservedHistorySequenceId(false)
+		getNextHistoryPageToken = function()
+			return sessionScalarState2.getNextHistoryPageToken(false)
 		end,
-		noteTurnSequenceIds = function(p2) -- line: 65
-			-- upvalues: v20 (copy)
-			local getLatestProcessedSequenceNumber = p2.getLatestProcessedSequenceNumber
+		mergeHistoryPage = mergeHistoryPage
+	}, v8)
 
-			if getLatestProcessedSequenceNumber ~= nil then
-				v20.noteHistorySequenceId(getLatestProcessedSequenceNumber())
-			end
-		end,
-		startPollingTurnFromHistory = v36.startPollingTurnFromHistory,
-		getAssistantTurnSequence = function() -- line: 252
-			-- upvalues: v20 (copy)
-			return v20.getAssistantTurnSequence(false)
-		end,
-		incrementAssistantTurnSequence = v20.incrementAssistantTurnSequence,
-		sessionPrompt = p1.sessionPrompt,
-		setActiveStop = function(p3: ((...any) -> ...any)?) -- line: 257
-			-- upvalues: u21 (ref)
-			u21 = p3
+	local function ensureInitialized(callback)
+		if sessionScalarState2.getInitialized(false) then
+			return true, nil, nil
 		end
-	})
 
-	return {
-		universeId = n1,
-		placeId = n2,
-		getCasSessionId = function() -- line: 298
-			-- upvalues: v20 (copy)
-			return v20.getCasSessionId(false)
-		end,
-		setCasSessionId = setCasSessionIdInternal,
-		hasLoadedHistory = function() -- line: 302
-			-- upvalues: v20 (copy)
-			return v20.getHasLoadedHistory(false)
-		end,
-		markHistoryLoaded = v20.markHistoryLoaded,
-		getNextHistoryPageToken = function() -- line: 306
-			-- upvalues: v20 (copy)
-			return v20.getNextHistoryPageToken(false)
-		end,
-		getMergedHistory = v26,
-		ingestRealtimeUpdate = function(p4, n4: number) -- line: 147
-			-- upvalues: sessionHistoryMerge (copy), t2 (ref), t1 (ref), v20 (copy), v27 (copy), buildMergedHistory (copy)
-			if sessionHistoryMerge.ingestOverlayUpdate(t2, t1, p4, n4) then
-				v20.noteHistorySequenceId(n4)
-				v27(buildMergedHistory())
-			end
-		end,
-		mergeHistoryPage = mergeHistoryPage,
-		refreshSession = v35.refreshSession,
-		loadOlderHistory = v35.loadOlderHistory,
-		sendPrompt = v38.sendPrompt,
-		stopActiveTurn = function() -- line: 289
-			-- upvalues: u21 (ref)
-			if u21 ~= nil then
-				u21()
-			end
-		end,
-		submitActiveToolResult = function(t7: {[any]: any}, b1: boolean?, n5: number?, s5: string?) -- line: 270
-			-- upvalues: v20 (copy), p1 (copy)
-			local v73 = v20.getCasSessionId(false)
+		local v9 = awaitRequest(deps.initialize({ protocolVersion = AcpProtocol.ProtocolVersion }), callback) -- inferred equivalent call
 
-			if v73 == nil then
-				return nil
+		if callback ~= nil and callback() then
+			return false, nil, nil
+		end
+
+		if v9.status == "succeeded" then
+			sessionScalarState2.setInitialized(true)
+			return true, nil, nil
+		end
+
+		local v10 = false
+		local errorCode = v9.errorCode
+
+		if FFlagBuildExperiencePromptFailureTelemetry then
+			return false, errorCode, (classifyRequestFailure(v9))
+		end
+
+		return v10, errorCode, nil
+	end
+
+	local function createCasSession(model, callback, p2, callback2)
+		local v9 = count
+		local function isStale()
+			if v9 == count then
+				if callback == nil then
+					return false
+				end
+
+				return (callback())
 			end
 
-			return p1.submitToolResult({
-				sessionId = v73,
-				turnId = n5,
-				referenceId = s5,
-				content = t7,
-				isError = b1 ~= nil and b1
-			})
-		end,
-		getActiveTurnHandle = function() -- line: 262
-			-- upvalues: v20 (copy), p1 (copy)
-			local v68 = v20.getCasSessionId(false)
+			return true
+		end
 
-			if v68 == nil then
-				return nil
+		local v10
+
+		if FFlagBuildExperienceModelPickerData and p2 ~= nil then
+			v10 = p2.experiment
+		else
+			v10 = v4
+		end
+
+		local casSessionId = sessionScalarState2.getCasSessionId(false)
+
+		if casSessionId ~= nil and not FFlagBuildExperienceModelPickerData then
+			return casSessionId, nil
+		end
+
+		if casSessionId == nil and (universeId == nil or placeId == nil) then
+			return nil, { stage = "missing_project" }
+		end
+
+		local v11
+
+		if FFlagBuildExperienceModelPickerData then
+			v11 = isStale
+		else
+			v11 = callback
+		end
+
+		local v12, errorCode, requestFailure = ensureInitialized(v11)
+
+		if FFlagBuildExperienceModelPickerData then
+			local v13
+
+			if v9 == count then
+				if callback == nil then
+					v13 = false
+				else
+					v13 = callback()
+				end
+			else
+				v13 = true
 			end
 
-			return p1.getActiveTurnHandle(v68)
-		end,
-		startPollingActiveTurn = function(p5) -- line: 318
-			-- upvalues: v20 (copy), v36 (copy)
-			local v75 = v20.getCasSessionId(false)
+			if v13 then
+				return nil, nil
+			end
+		end
 
-			if v75 == nil then
-				return function() -- line: 321
+		if v12 then
+			if casSessionId ~= nil then
+				return casSessionId, nil
+			end
+
+			if callback2 ~= nil and callback2() then
+				return nil, nil
+			end
+
+			local sessionNew = deps.sessionNew
+			local v13 = {
+				project = { universeId = universeId, placeId = placeId },
+				experiment = 0,
+				model = 0,
+				application = "build"
+			}
+			local experiment
+
+			if FFlagBuildExperienceModelPickerData then
+				experiment = v10
+			else
+				experiment = v4
+			end
+
+			v13.experiment = experiment
+
+			if not FFlagBuildExperienceModelPickerData then
+				model = nil
+			end
+
+			v13.model = model
+			local v14 = sessionNew(v13)
+
+			if not FFlagBuildExperienceModelPickerData then
+				isStale = callback
+			end
+
+			local v15 = awaitRequest(v14, isStale) -- inferred equivalent call
+
+			if FFlagBuildExperienceModelPickerData then
+				local v16
+
+				if v9 == count then
+					if callback == nil then
+						v16 = false
+					else
+						v16 = callback()
+					end
+				else
+					v16 = true
+				end
+
+				if v16 then
+					return nil, nil
 				end
 			end
 
-			return v36.startPollingActiveTurn(v75, p5)
+			if v15.status == "succeeded" then
+				local result = v15.result
+				local sessionId
+
+				if typeof(result) == "table" then
+					sessionId = result.sessionId
+				end
+
+				if typeof(sessionId) ~= "string" or sessionId == "" then
+					return nil, { stage = "session_new" }
+				end
+
+				if experimentOverride.isEnabled() then
+					local key = experimentOverride.getKey(sessionId)
+
+					if not FFlagBuildExperienceModelPickerData then
+						v10 = v4
+					end
+
+					if experimentOverride.has(v3) then
+						experimentOverride.move(v3, key)
+					elseif v10 ~= nil then
+						experimentOverride.hydrate(key, v10.specVersion)
+					end
+
+					if
+						not FFlagBuildExperienceModelPickerData
+						or p2 == nil
+						or sendConfiguration.sameExperiment(experimentOverride.getPromptExperiment(key), v10)
+					then
+						experimentOverride.consumePending(key)
+					end
+				end
+
+				setCasSessionIdInternal(sessionId)
+
+				if FFlagBuildExperienceModelPickerData then
+					if sessionScalarState2.getCasSessionId(false) ~= sessionId then
+						return nil, nil
+					end
+
+					publishModels(result) -- inferred equivalent call
+				end
+
+				return sessionId, nil
+			else
+				local fundingReason, fundingDetails
+
+				if FFlagBuildExperienceModelPickerData then
+					fundingReason, fundingDetails = getFundingError(v15)
+				end
+
+				local message
+
+				if FFlagBuildExperienceModelPickerData then
+					message = v15.error
+				end
+
+				local v16 = {
+					stage = "session_new",
+					message = message,
+					errorCode = v15.errorCode,
+					fundingReason = fundingReason,
+					fundingDetails = fundingDetails,
+					requestFailure = 0
+				}
+				local requestFailure2
+
+				if FFlagBuildExperiencePromptFailureTelemetry then
+					requestFailure2 = classifyRequestFailure(v15)
+				end
+
+				v16.requestFailure = requestFailure2
+				return nil, v16
+			end
+		else
+			if not FFlagBuildExperiencePromptFailureTelemetry then
+				requestFailure = nil
+			end
+
+			return nil, {
+				stage = "initialize",
+				errorCode = errorCode,
+				requestFailure = requestFailure
+			}
 		end
+	end
+
+	local v9 = nil
+
+	local function newSetup(model, p2)
+		local setup = {
+			generation = count,
+			model = model,
+			experiment = 0,
+			abandoners = 0,
+			persistent = false,
+			committed = false,
+			done = false
+		}
+
+		local experiment = if p2 == nil then v4 else p2.experiment
+		setup.experiment = experiment
+		setup.abandoners = {}
+		return setup
+	end
+
+	local function canAbandon(p2): boolean -- 4 equivalent calls inferred from this helper
+		if p2.persistent then
+			return false
+		end
+
+		for k in p2.abandoners do
+			if not k() then
+				return false
+			end
+		end
+
+		return true
+	end
+
+	local function isReplaceable(data)
+		local v10 = not (data.committed or data.done)
+
+		if not v10 then
+			return v10
+		end
+
+		if data.persistent then
+			return false
+		end
+
+		for k in data.abandoners do
+			if not k() then
+				return false
+			end
+		end
+
+		v10 = true
+		return true
+	end
+
+	local function ensureCasSession(model, isCancelled, p2, flag: boolean?)
+		if
+			not FFlagBuildExperienceModelPickerData
+			or sessionScalarState2.getCasSessionId(false) ~= nil and sessionScalarState2.getInitialized(false)
+		then
+			return createCasSession(model, isCancelled, p2)
+		end
+
+		local function callerCancelled()
+			return isCancelled ~= nil and isCancelled()
+		end
+
+		local v10
+
+		if isCancelled == nil then
+			v10 = false
+		else
+			v10 = isCancelled()
+		end
+
+		if v10 then
+			return nil, nil
+		end
+
+		local v11 = v9
+
+		-- [DEDUP] synthesized from 2 duplicated terminal regions
+		local function deduplicatedTail()
+			local v12
+
+			if isCancelled == nil then
+				v12 = false
+			else
+				v12 = isCancelled()
+			end
+
+			if v12 or v11.sessionId ~= nil and v11.sessionId ~= sessionScalarState2.getCasSessionId(false) then
+				return nil, nil
+			end
+
+			return v11.sessionId, v11.error
+		end
+
+		local v12 = v11 == nil or v11.generation ~= count
+
+		if v12 then
+			v11 = newSetup(model, p2)
+			v9 = v11
+		end
+
+		local v13
+
+		if sessionScalarState2.getCasSessionId(false) == nil and v11.model ~= nil and model ~= nil then
+			v13 = model ~= v11.model
+		else
+			v13 = false
+		end
+
+		local v14
+
+		if sessionScalarState2.getCasSessionId(false) == nil and p2 ~= nil then
+			v14 = v11.model ~= p2.tier or not sendConfiguration.sameExperiment(v11.experiment, p2.experiment)
+		else
+			v14 = false
+		end
+
+		local v15, _
+
+		if v12 or not (v13 or v14) then
+			if v13 then
+				return
+					nil,
+					{
+						stage = "session_new",
+						message = "session creation already started with a different model"
+					}
+			end
+
+			if v14 then
+				return
+					nil,
+					{
+						stage = "session_new",
+						message = "session creation already started with a different send configuration"
+					}
+			end
+
+			if flag and isCancelled ~= nil then
+				v11.abandoners[callerCancelled] = true
+			else
+				v11.persistent = true
+			end
+
+			if v12 then
+				task.spawn(function()
+					local success, result, v18 = pcall(createCasSession, model, nil, p2, function(): boolean
+						if canAbandon(v11) then -- inferred equivalent call
+							return true
+						end
+
+						v11.committed = true
+						return false
+					end)
+
+					local v19 = v11
+					local v20
+
+					if success then
+						v20 = result
+					end
+
+					v19.sessionId = v20
+					v11.error = not success and {
+						stage = "session_new",
+						message = tostring(result)
+					} or v18
+					v11.done = true
+
+					if v9 == v11 then
+						v9 = nil
+					end
+				end)
+			end
+
+			while not v11.done do
+				if isCancelled == nil then
+					v15 = false
+				else
+					v15 = isCancelled()
+				end
+
+				if v15 then
+					break
+				end
+
+				task.wait()
+			end
+
+			return deduplicatedTail()
+		else
+			local v16 = not v11.committed
+
+			if v16 then
+				v16 = not v11.done and canAbandon(v11) -- inferred equivalent call
+			end
+
+			if v16 then
+				v12 = true
+				v11 = newSetup(model, p2)
+				v9 = v11
+			else
+				if v13 then
+					return
+						nil,
+						{
+							stage = "session_new",
+							message = "session creation already started with a different model"
+						}
+				end
+
+				if v14 then
+					return
+						nil,
+						{
+							stage = "session_new",
+							message = "session creation already started with a different send configuration"
+						}
+				end
+			end
+
+			if flag and isCancelled ~= nil then
+				v11.abandoners[callerCancelled] = true
+			else
+				v11.persistent = true
+			end
+
+			if v12 then
+				task.spawn(function()
+					local success, result, v18 = pcall(createCasSession, model, nil, p2, function(): boolean
+						if canAbandon(v11) then -- inferred equivalent call
+							return true
+						end
+
+						v11.committed = true
+						return false
+					end)
+
+					local v19 = v11
+					local v20
+
+					if success then
+						v20 = result
+					end
+
+					v19.sessionId = v20
+					v11.error = not success and {
+						stage = "session_new",
+						message = tostring(result)
+					} or v18
+					v11.done = true
+
+					if v9 == v11 then
+						v9 = nil
+					end
+				end)
+			end
+
+			while not v11.done do
+				if isCancelled == nil then
+					v15 = false
+				else
+					v15 = isCancelled()
+				end
+
+				if v15 then
+					break
+				end
+
+				task.wait()
+			end
+
+			return deduplicatedTail()
+		end
+	end
+
+	local function prepareSession(data)
+		local v10
+
+		if not (data == nil or data.sendConfiguration == nil) then
+			v10 = sendConfiguration.capture(data.sendConfiguration.tier, data.sendConfiguration.experiment)
+		end
+
+		local v11
+
+		if v10 == nil then
+			if data ~= nil then
+				v11 = data.model
+			end
+		else
+			v11 = v10.tier
+		end
+
+		assert(v10 == nil or data == nil or data.model == nil or data.model == v11, "conflicting model tiers")
+
+		local v12 = count
+		local function isCancelled() -- 3 equivalent calls inferred from this helper
+			if v12 == count then
+				if data == nil or data.isCancelled == nil then
+					return false
+				end
+
+				return (data.isCancelled())
+			end
+
+			return true
+		end
+
+		if isCancelled() then -- inferred equivalent call
+			return nil, nil
+		end
+
+		if v10 == nil then
+			captureSessionNewExperiment() -- inferred equivalent call
+		end
+
+		local casSessionId = sessionScalarState2.getCasSessionId(false)
+
+		if casSessionId == nil then
+			if v9 ~= nil and v9.generation == v12 and v11 ~= nil and v11 ~= v9.model then
+				local v13 = v9
+				local v14 = not v13.committed
+
+				if v14 then
+					v14 = not v13.done and canAbandon(v13) -- inferred equivalent call
+				end
+
+				if not v14 then
+					return
+						nil,
+						{
+							stage = "session_new",
+							message = "session creation already started with a different model"
+						}
+				end
+			end
+
+			local v13
+
+			if data ~= nil then
+				v13 = data.isCancelled
+			end
+
+			return ensureCasSession(v11, v13, v10, v10 ~= nil)
+		else
+			local casSession, v13 = ensureCasSession(nil, isCancelled, v10)
+
+			if isCancelled() then -- inferred equivalent call
+				return nil, nil
+			end
+
+			if casSession == nil then
+				return nil, v13
+			end
+
+			local v14 = loadSession(casSessionId, nil, isCancelled)
+
+			if isCancelled() then -- inferred equivalent call
+				return nil, nil
+			end
+
+			if v14.status == "succeeded" then
+				noteHistorySequenceIds(historyPageUtils.getSessionLoadHistory(v14.result)) -- inferred equivalent call
+				return casSessionId, nil
+			else
+				local fundingReason, fundingDetails
+
+				if FFlagBuildExperienceModelPickerData then
+					fundingReason, fundingDetails = getFundingError(v14)
+				end
+
+				local v15 = {
+					stage = "session_load",
+					message = v14.error,
+					errorCode = v14.errorCode,
+					fundingReason = fundingReason,
+					fundingDetails = fundingDetails,
+					requestFailure = 0
+				}
+				local requestFailure
+
+				if FFlagBuildExperiencePromptFailureTelemetry then
+					requestFailure = classifyRequestFailure(v14)
+				end
+
+				v15.requestFailure = requestFailure
+				return nil, v15
+			end
+		end
+	end
+
+	local sendPrompt2 = sendPrompt.createSendPrompt({
+		ensureInitialized = ensureInitialized,
+		ensureCasSession = ensureCasSession,
+		getLatestObservedHistorySequenceId = function()
+			return sessionScalarState2.getLatestObservedHistorySequenceId(false)
+		end,
+		noteTurnSequenceIds = noteTurnSequenceIds,
+		startPollingTurnFromHistory = historyPolling2.startPollingTurnFromHistory,
+		getAssistantTurnSequence = function()
+			return sessionScalarState2.getAssistantTurnSequence(false)
+		end,
+		incrementAssistantTurnSequence = sessionScalarState2.incrementAssistantTurnSequence,
+		sessionPrompt = function(data, p2)
+			local experiment
+
+			if FFlagBuildExperienceModelPickerData and p2 ~= nil then
+				experiment = p2.experiment
+			elseif experimentOverride.isEnabled() then
+				experiment = experimentOverride.getPromptExperiment(getExperimentKey()) -- inferred equivalent call
+			else
+				experiment = nil
+			end
+
+			local sessionPrompt = deps.sessionPrompt
+			local v10 = {
+				sessionId = data.sessionId,
+				prompt = data.prompt,
+				model = 0,
+				_meta = 0,
+				experiment = 0
+			}
+			local model
+
+			if FFlagBuildExperienceModelPickerData then
+				model = data.model
+			end
+
+			v10.model = model
+			v10._meta = data._meta
+			v10.experiment = experiment
+			local v11 = sessionPrompt(v10)
+
+			if FFlagBuildExperienceModelPickerData then
+				local key = experimentOverride.getKey(data.sessionId)
+
+				if experiment == nil then
+					return v11, nil
+				end
+
+				return v11, function()
+					if
+						(v11.isCurrentOwner == nil or v11.isCurrentOwner())
+						and sendConfiguration.sameExperiment(experimentOverride.getPromptExperiment(key), experiment)
+					then
+						experimentOverride.consumePending(key)
+					end
+				end
+			end
+
+			if experiment ~= nil then
+				experimentOverride.consumePending(getExperimentKey()) -- inferred equivalent call
+			end
+
+			return v11, nil
+		end,
+		setActiveStop = function(callback)
+			v = callback
+		end
+	})
+
+	local function stopActiveTurn()
+		if v ~= nil then
+			v()
+		end
+	end
+
+	local chatSession = {
+		getModels = sessionScalarState2.getModels,
+		hasObservedModels = sessionScalarState2.hasObservedModels,
+		prepareSession = 0,
+		universeId = 0,
+		placeId = 0,
+		getCasSessionId = 0,
+		setCasSessionId = 0,
+		setPendingExperimentKey = 0,
+		hasLoadedHistory = 0,
+		markHistoryLoaded = 0,
+		getNextHistoryPageToken = 0,
+		getMergedHistory = 0,
+		ingestRealtimeUpdate = 0,
+		mergeHistoryPage = 0,
+		refreshSession = 0,
+		loadOlderHistory = 0,
+		requestOlderHistoryWhile = 0,
+		sendPrompt = 0,
+		stopActiveTurn = 0,
+		submitActiveToolResult = 0,
+		getActiveTurnHandle = 0,
+		startPollingActiveTurn = 0
 	}
+
+	if not FFlagBuildExperienceModelPickerData then
+		prepareSession = nil
+	end
+
+	chatSession.prepareSession = prepareSession
+	chatSession.universeId = universeId
+	chatSession.placeId = placeId
+	function chatSession.getCasSessionId()
+		return sessionScalarState2.getCasSessionId(false)
+	end
+
+	chatSession.setCasSessionId = setCasSessionIdInternal
+	function chatSession.setPendingExperimentKey(p2: string?)
+		v3 = p2
+
+		if FFlagBuildExperienceModelPickerData and experimentOverride.isEnabled() then
+			experimentOverride.move(p2, experimentOverride.getKey(sessionScalarState2.getCasSessionId(false)))
+		end
+	end
+	function chatSession.hasLoadedHistory()
+		return sessionScalarState2.getHasLoadedHistory(false)
+	end
+
+	chatSession.markHistoryLoaded = sessionScalarState2.markHistoryLoaded
+	function chatSession.getNextHistoryPageToken()
+		return sessionScalarState2.getNextHistoryPageToken(false)
+	end
+
+	chatSession.getMergedHistory = signal
+	chatSession.ingestRealtimeUpdate = ingestRealtimeUpdate
+	chatSession.mergeHistoryPage = mergeHistoryPage
+	chatSession.refreshSession = historyLoader2.refreshSession
+	chatSession.loadOlderHistory = historyLoader2.loadOlderHistory
+	chatSession.requestOlderHistoryWhile = historyLoader2.requestOlderHistoryWhile
+	function chatSession.sendPrompt(p2)
+		if not FFlagBuildExperienceModelPickerData or p2.sendConfiguration == nil then
+			captureSessionNewExperiment() -- inferred equivalent call
+		end
+
+		return sendPrompt2.sendPrompt(p2)
+	end
+
+	chatSession.stopActiveTurn = stopActiveTurn
+
+	function chatSession.submitActiveToolResult(content, isError: boolean?, turnId: number?, referenceId: string?)
+		local casSessionId = sessionScalarState2.getCasSessionId(false)
+
+		if casSessionId == nil then
+			return nil
+		end
+
+		local submitToolResult = deps.submitToolResult
+
+		if isError == nil then
+			isError = false
+		end
+
+		return submitToolResult({
+			sessionId = casSessionId,
+			turnId = turnId,
+			referenceId = referenceId,
+			content = content,
+			isError = isError
+		})
+	end
+
+	function chatSession.getActiveTurnHandle()
+		local casSessionId = sessionScalarState2.getCasSessionId(false)
+
+		if casSessionId == nil then
+			return nil
+		end
+
+		return deps.getActiveTurnHandle(casSessionId)
+	end
+	function chatSession.startPollingActiveTurn(p2)
+		local casSessionId = sessionScalarState2.getCasSessionId(false)
+
+		if casSessionId == nil then
+			return function() end
+		end
+
+		return historyPolling2.startPollingActiveTurn(casSessionId, p2)
+	end
+
+	return chatSession
 end
 
 return createChatSession

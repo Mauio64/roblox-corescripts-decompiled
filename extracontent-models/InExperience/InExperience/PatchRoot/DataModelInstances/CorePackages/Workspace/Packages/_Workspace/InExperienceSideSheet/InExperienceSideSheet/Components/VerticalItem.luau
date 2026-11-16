@@ -1,56 +1,103 @@
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
-local React = require(InExperienceSideSheetParent.React)
-local Foundation = require(InExperienceSideSheetParent.Foundation)
+
+local parent = InExperienceSideSheet.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
+
 local AnalyticsConstants = require(InExperienceSideSheet.Analytics.AnalyticsConstants)
 local SidesheetAnalytics = require(InExperienceSideSheet.Analytics.SidesheetAnalytics)
-local toggleSideSheet = require(InExperienceSideSheet.Utils.toggleSideSheet)
-local FFlagSideSheetFocusNav = require(InExperienceSideSheetParent.SharedFlags).FFlagSideSheetFocusNav
 
-local function VerticalItem(t1: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), toggleSideSheet (copy), SidesheetAnalytics (copy), AnalyticsConstants (copy), FFlagSideSheetFocusNav (copy), View (copy), FoundationText (copy)
-	local v13 = React.useCallback(function() -- line: 31
-		-- upvalues: t1 (copy), toggleSideSheet (copy), SidesheetAnalytics (copy), AnalyticsConstants (copy)
-		t1.onActivated()
+local closePeoplePageOpenedWithSideSheet = require(InExperienceSideSheet.Utils.closePeoplePageOpenedWithSideSheet)
+local toggleSideSheet = require(InExperienceSideSheet.Utils.toggleSideSheet)
+
+local Flags = require(InExperienceSideSheet.Flags)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSideSheetOpenPeoplePage = Flags.FFlagSideSheetOpenPeoplePage
+local FFlagSideSheetFocusNav = SharedFlags.FFlagSideSheetFocusNav
+
+local function VerticalItem(props)
+	local onActivated = React.useCallback(function()
+		props.onActivated()
+
+		if FFlagSideSheetOpenPeoplePage then
+			closePeoplePageOpenedWithSideSheet()
+		end
+
 		toggleSideSheet(false)
 		SidesheetAnalytics.logSidesheetClosed(AnalyticsConstants.Source.ItemSelected)
-	end, { t1.onActivated })
-	local v14 = if not FFlagSideSheetFocusNav then nil else React.useRef(nil)
-	local v15 = if not FFlagSideSheetFocusNav then nil else React.useCallback(function(p1) -- line: 39
-		-- upvalues: v14 (copy), t1 (copy)
-		if v14 then
-			v14.current = p1
+	end, { props.onActivated })
+	local ref
+
+	if FFlagSideSheetFocusNav then
+		ref = React.useRef(nil)
+	else
+		ref = nil
+	end
+
+	local ref2
+
+	if FFlagSideSheetFocusNav then
+		ref2 = React.useCallback(function(current)
+			if ref then
+				ref.current = current
+			end
+
+			if current and props.firstIntegrationToFocusCallback then
+				props.firstIntegrationToFocusCallback(current)
+			end
+		end, { props.firstIntegrationToFocusCallback })
+	end
+
+	local createElement = React.createElement
+	local v = {
+		tag = "row align-y-center gap-none size-full-1000 padding-left-xsmall radius-medium",
+		LayoutOrder = props.layoutOrder,
+		onActivated = onActivated,
+		selection = 0,
+		ref = 0
+	}
+	local selection
+
+	if FFlagSideSheetFocusNav and props.disableGamepadDirections then
+		selection = { NextSelectionRight = 0, NextSelectionLeft = 0 }
+		local nextSelectionRight
+
+		if props.disableGamepadDirections.right then
+			nextSelectionRight = ref
 		end
 
-		if p1 and t1.firstIntegrationToFocusCallback then
-			t1.firstIntegrationToFocusCallback(p1)
-		end
-	end, { t1.firstIntegrationToFocusCallback })
+		selection.NextSelectionRight = nextSelectionRight
+		local nextSelectionLeft
 
-	return React.createElement(View, {
-		tag = "row align-y-center gap-small size-full-0 auto-y radius-medium",
-		LayoutOrder = t1.layoutOrder,
-		onActivated = v13,
-		selection = if not FFlagSideSheetFocusNav or not t1.disableGamepadDirections then nil else {
-			NextSelectionRight = if not t1.disableGamepadDirections.right then nil else v14,
-			NextSelectionLeft = if not t1.disableGamepadDirections.left then nil else v14
-		},
-		ref = if not FFlagSideSheetFocusNav then nil else v15
-	}, {
-		IconContainer = React.createElement(View, {
-			tag = "align-x-center align-y-center size-1000 auto-xy",
-			LayoutOrder = 1
-		}, {
-			Icon = t1.icon({
-				visible = true
-			})
-		}),
-		Label = React.createElement(FoundationText, {
+		if props.disableGamepadDirections.left then
+			nextSelectionLeft = ref
+		end
+
+		selection.NextSelectionLeft = nextSelectionLeft
+	end
+
+	v.selection = selection
+
+	if not FFlagSideSheetFocusNav then
+		ref2 = nil
+	end
+
+	v.ref = ref2
+	return createElement(View, v, {
+		IconContainer = React.createElement(
+			View,
+			{ tag = "align-x-center align-y-center size-1000", LayoutOrder = 1 },
+			{
+				Icon = props.icon({ visible = true })
+			}
+		),
+		Label = React.createElement(Text, {
 			LayoutOrder = 2,
-			tag = "auto-xy padding-y-small text-title-medium text-align-x-left text-truncate-split content-emphasis",
-			Text = t1.label
+			Text = props.label,
+			tag = "auto-xy padding-x-small text-label-medium text-align-x-left text-truncate-split content-emphasis"
 		})
 	})
 end

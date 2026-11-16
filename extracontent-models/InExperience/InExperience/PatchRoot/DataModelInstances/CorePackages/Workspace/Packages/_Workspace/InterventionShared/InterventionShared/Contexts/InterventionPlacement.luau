@@ -1,5 +1,7 @@
 local InterventionShared = script:FindFirstAncestor("InterventionShared")
-local InterventionSharedParent = InterventionShared.Parent
-local Constants = require(InterventionShared.Utils.Constants)
+local parent = InterventionShared.Parent
 
-return (require(InterventionSharedParent.React).createContext(Constants.InterventionPlacementType.Unknown))
+local Constants = require(InterventionShared.Utils.Constants)
+local React = require(parent.React)
+
+return (React.createContext(Constants.InterventionPlacementType.Unknown))

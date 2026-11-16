@@ -1,74 +1,71 @@
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local Rodux = require(CorePackages.Packages.Rodux)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 local Constants = UIBlox.App.Style.Constants
 
-local function dumpInstanceTree(p1, p2) -- line: 14
-	-- upvalues: dumpInstanceTree (copy)
-	local v13 = p2 or ""
+local Foundation = require(CorePackages.Packages.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
+local function dumpInstanceTree(instance, value)
+	value = value or ""
 
-	if p1 == nil then
-		print(v13 .. "[nil Instance]")
-
+	if instance == nil then
+		print(value .. "[nil Instance]")
 		return
 	end
 
-	print(v13 .. p1.Name)
+	print(value .. instance.Name)
+	local v = value .. "  "
 
-	local v14 = v13 .. "  "
-
-	for _, child in ipairs(p1:GetChildren()) do
-		dumpInstanceTree(child, v14)
+	for _, child in ipairs(instance:GetChildren()) do
+		dumpInstanceTree(child, v)
 	end
 end
 
-return function(p3, p4, p5, p6, p7) -- line: 41
-	-- upvalues: Rodux (copy), Roact (copy), RoactRodux (copy), AppStyleProvider (copy), Constants (copy), HttpService (copy), CoreGui (copy), dumpInstanceTree (copy)
-	local v22 = p6 or {}
-	local v23 = p7 or {}
-	local v24 = Rodux.Store.new(p5, v22, { Rodux.thunkMiddleware })
-	local v25 = Roact.createElement(RoactRodux.StoreProvider, {
-		store = v24
-	}, {
+return function(callback, p, p2, options, options2)
+	local store = Rodux.Store.new(p2, options or {}, { Rodux.thunkMiddleware })
+	local element = Roact.createElement(RoactRodux.StoreProvider, { store = store }, {
 		AppStyleProvider = Roact.createElement(AppStyleProvider, {
-			style = {
-				themeName = Constants.ThemeName.Dark,
-				fontName = Constants.FontName.Gotham
-			}
+			style = { themeName = ColorMode.Dark, fontName = Constants.FontName.Gotham }
 		}, {
 			Folder = Roact.createElement("Folder", {}, {
-				Root = Roact.createElement(p4, v23)
+				Root = Roact.createElement(p, options2 or {})
 			})
 		})
 	})
-	local str = tostring(p4)
-	local v27 = Roact.createElement("ScreenGui", {
+
+	local v = tostring(p)
+
+	local element2 = Roact.createElement("ScreenGui", {
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	}, {
-		[str] = v25
+		[v] = element
 	})
-	local v28 = "Test-" .. HttpService:GenerateGUID(false)
-	local v29 = Roact.mount(v27, CoreGui, v28)
-	local v30 = ("game.CoreGui.%s.*[ClassName=Folder].*"):format(v28)
-	local ok, result = pcall(function() -- line: 74
-		-- upvalues: p3 (copy), v30 (copy)
-		p3(v30)
+
+	local v2 = "Test-" .. HttpService:GenerateGUID(false)
+	local v3 = Roact.mount(element2, CoreGui, v2)
+
+	local formatted = ("game.CoreGui.%s.*[ClassName=Folder].*"):format(v2)
+
+	local success, result = pcall(function()
+		callback(formatted)
 	end)
 
-	if not ok then
+	if not success then
 		print("Test instance tree:\n")
-		dumpInstanceTree(CoreGui:FindFirstChild(v28))
+		dumpInstanceTree(CoreGui:FindFirstChild(v2))
 		print()
 	end
 
-	Roact.unmount(v29)
+	Roact.unmount(v3)
 
-	if not ok then
+	if not success then
 		error(result)
 	end
 end

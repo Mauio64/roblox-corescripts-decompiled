@@ -1,17 +1,15 @@
 local Players = game:GetService("Players")
 
-local function sendMediaGalleryMediaChanged(t1: {[any]: any}, s1: string, t2: {[any]: any}, s2: string?, b1: boolean?, b2: boolean?, s3: string?) -- line: 12
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
-
-	t1:setRBXEventStream(s1, "mediaGalleryMediaChanged", {
-		uid = not LocalPlayer and "" or tostring(LocalPlayer.UserId),
-		placeId = s3,
-		universeId = s2,
-		imageAssetId = t2.imageId,
-		videoAssetId = t2.videoId,
-		isYouTubeVideo = b2,
-		autoAdvance = b1
+local function sendMediaGalleryMediaChanged(object, p: string, p2, universeId: string?, autoAdvance: boolean?, isYouTubeVideo: boolean?, placeId: string?)
+	local localPlayer = Players.LocalPlayer
+	object:setRBXEventStream(p, "mediaGalleryMediaChanged", {
+		uid = not localPlayer and "" or tostring(localPlayer.UserId),
+		placeId = placeId,
+		universeId = universeId,
+		imageAssetId = p2.imageId,
+		videoAssetId = p2.videoId,
+		isYouTubeVideo = isYouTubeVideo,
+		autoAdvance = autoAdvance
 	})
 end
 

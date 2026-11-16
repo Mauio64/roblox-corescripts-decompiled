@@ -1,93 +1,102 @@
 local CoreGui = game:GetService("CoreGui")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Cryo = require(ParentParentParent.Cryo)
-local Foundation = require(ParentParentParent.Foundation)
-local Label = require(ParentParent.Core.ImageSet.ImageSetComponent).Label
-local useStyle = require(ParentParent.Core.Style.useStyle)
 
-require(ParentParent.App.ImageSet.ImagesTypes)
-require(ParentParent.App.Style.StyleTypes)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-local withHoverTooltip = require(ParentParent.App.Dialog.TooltipV2.Controllers).withHoverTooltip
-local TooltipOrientation = require(ParentParent.App.Dialog.Tooltip.Enum.TooltipOrientation)
-local StateLayer = require(ParentParent.Core.Control.StateLayer)
-local BadgeVariant = require(ParentParent.App.Indicator.Enum.BadgeVariant)
-local migrateBadgeVariant = require(ParentParent.Utility.migrateBadgeVariant)
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
+local Foundation = require(parent2.Foundation)
+
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
+local Label = ImageSetComponent.Label
+local useStyle = require(parent.Core.Style.useStyle)
+require(parent.App.ImageSet.ImagesTypes)
+require(parent.App.Style.StyleTypes)
+local Controllers = require(parent.App.Dialog.TooltipV2.Controllers)
+local withHoverTooltip = Controllers.withHoverTooltip
+local TooltipOrientation = require(parent.App.Dialog.Tooltip.Enum.TooltipOrientation)
+local StateLayer = require(parent.Core.Control.StateLayer)
+local BadgeVariant = require(parent.App.Indicator.Enum.BadgeVariant)
+
+local migrateBadgeVariant = require(parent.Utility.migrateBadgeVariant)
+
 local StatusIndicator = Foundation.StatusIndicator
-local t1 = {
-	disableOutset = false,
-	onMedia = false,
+
+local v = {
 	badgeVariant = BadgeVariant.Alert,
-	tooltipTarget = CoreGui
+	tooltipTarget = CoreGui,
+	disableOutset = false,
+	onMedia = false
 }
 
-local function UtilityActionIcon(t2: {[any]: any}, p1) -- line: 60
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), React (copy), withHoverTooltip (copy), TooltipOrientation (copy), StateLayer (copy), Label (copy), StatusIndicator (copy), migrateBadgeVariant (copy)
-	local v19 = Cryo.Dictionary.join(t1, t2)
-	local anchorPoint = v19.anchorPoint
-	local position = v19.position
-	local layoutOrder = v19.layoutOrder
-	local icon = v19.icon
-	local badgeValue = v19.badgeValue
-	local badgeVariant = v19.badgeVariant
-	local tooltipText = v19.tooltipText
-	local tooltipTarget = v19.tooltipTarget
-	local disableOutset = v19.disableOutset
-	local onMedia = v19.onMedia
-	local onActivated = v19.onActivated
-	local Tokens = useStyle().Tokens
-	local Size_500 = Tokens.Global.Size_500
-	local Medium = Tokens.Semantic.Icon.Size.Medium
-	local v34 = if not onMedia then Tokens.Semantic.Color.Icon.Emphasis else Tokens.Global.Color.White
-	local v35 = if not v19.iconColor then v34 else v19.iconColor
-	local v36 = not onMedia and "Standard" or "Darken"
+local function UtilityActionIcon(p, ref)
+	local joined = Cryo.Dictionary.join(v, p)
+	local anchorPoint = joined.anchorPoint
+	local position = joined.position
+	local layoutOrder = joined.layoutOrder
+	local icon = joined.icon
+	local badgeValue = joined.badgeValue
+	local badgeVariant = joined.badgeVariant
+	local tooltipText = joined.tooltipText
+	local tooltipTarget = joined.tooltipTarget
+	local disableOutset = joined.disableOutset
+	local onMedia = joined.onMedia
+	local onActivated = joined.onActivated
+
+	local tokens = useStyle().Tokens
+
+	local size_1000 = tokens.Size.Size_1000
+	local size_900 = tokens.Size.Size_900
+	local v2
+
+	if onMedia then
+		v2 = tokens.Color.Extended.White.White_100
+	else
+		v2 = tokens.Color.Content.Emphasis
+	end
+
+	if joined.iconColor then
+		v2 = joined.iconColor
+	end
+
+	local stateStyle = onMedia and "Darken" or "Standard"
 	local vector2 = Vector2.new(0, 1)
-	local uDim2 = UDim2.new(0.5, Tokens.Global.Size_25, 0.5, -Tokens.Global.Size_25)
-	local v39 = React.useMemo(function() -- line: 86
-		-- upvalues: disableOutset (copy), Tokens (copy)
+	local udim = UDim2.new(0.5, tokens.Size.Size_50, 0.5, -tokens.Size.Size_50)
+
+	local outset = React.useMemo(function()
 		if disableOutset then
 			return nil
 		end
 
 		return {
-			top = UDim.new(0, Tokens.Global.Size_50),
-			right = UDim.new(0, Tokens.Global.Size_50),
-			bottom = UDim.new(0, Tokens.Global.Size_50),
-			left = UDim.new(0, Tokens.Global.Size_50)
+			top = UDim.new(0, tokens.Size.Size_100),
+			right = UDim.new(0, tokens.Size.Size_100),
+			bottom = UDim.new(0, tokens.Size.Size_100),
+			left = UDim.new(0, tokens.Size.Size_100)
 		}
-	end, {
-		disableOutset,
-		Tokens
-	})
-	local v40 = React.useMemo(function() -- line: 97
-		-- upvalues: Size_500 (copy), v39 (copy)
-		local uDim = UDim.new(0, Size_500)
+	end, { disableOutset, tokens })
 
-		if v39 then
-			return (UDim2.new(uDim + v39.left + v39.right, uDim + v39.top + v39.bottom))
+	local size = React.useMemo(function()
+		local udim2 = UDim.new(0, size_1000)
+
+		if outset then
+			return (UDim2.new(udim2 + outset.left + outset.right, udim2 + outset.top + outset.bottom))
 		end
 
-		return (UDim2.new(uDim, uDim))
-	end, {
-		Size_500,
-		v39
-	})
+		return (UDim2.new(udim2, udim2))
+	end, { size_1000, outset })
 
-	return withHoverTooltip({
-		bodyText = tooltipText
-	}, {
-		DisplayOrder = 10,
+	return withHoverTooltip({ bodyText = tooltipText }, {
 		disabled = not tooltipText,
 		preferredOrientation = TooltipOrientation.Bottom,
 		guiTarget = tooltipTarget,
-		DEBUG_useTargetDirectly = v19._DEBUG_is_plugin
-	}, function(p2, p3) -- line: 112
-		-- upvalues: React (copy), v40 (copy), anchorPoint (copy), position (copy), layoutOrder (copy), p1 (copy), onMedia (copy), Size_500 (copy), Tokens (copy), StateLayer (copy), v36 (copy), v39 (copy), onActivated (copy), Label (copy), Medium (copy), icon (copy), v35 (copy), badgeValue (copy), StatusIndicator (copy), uDim2 (copy), vector2 (copy), migrateBadgeVariant (copy), badgeVariant (copy), v19 (copy)
-		return React.createElement("Frame", {
+		DEBUG_useTargetDirectly = joined._DEBUG_is_plugin,
+		DisplayOrder = 10
+	}, function(p2, onStateChanged)
+		local createElement = React.createElement
+		local v3 = {
 			Selectable = false,
-			Size = v40,
+			Size = size,
 			AnchorPoint = anchorPoint,
 			Position = position,
 			BorderSizePixel = 0,
@@ -95,56 +104,77 @@ local function UtilityActionIcon(t2: {[any]: any}, p1) -- line: 60
 			LayoutOrder = layoutOrder,
 			[React.Change.AbsoluteSize] = p2,
 			[React.Change.AbsolutePosition] = p2,
-			ref = p1
-		}, {
-			Background = if not onMedia then nil else React.createElement("Frame", {
+			ref = ref
+		}
+		local background
+
+		if onMedia then
+			background = React.createElement("Frame", {
 				Selectable = false,
-				BorderSizePixel = 0,
-				BackgroundTransparency = 0.5,
-				ZIndex = 1,
-				Size = UDim2.fromOffset(Size_500, Size_500),
+				Size = UDim2.fromOffset(size_1000, size_1000),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
-				BackgroundColor3 = Tokens.Global.Color.Black.Color3
+				BorderSizePixel = 0,
+				BackgroundColor3 = tokens.Color.Extended.Black.Black_100.Color3,
+				BackgroundTransparency = 0.5,
+				ZIndex = 1
 			}, {
 				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, Tokens.Semantic.Radius.Circle)
+					CornerRadius = UDim.new(0, tokens.Radius.Circle)
 				})
-			}),
+			})
+		end
+
+		local children = {
+			Background = background,
 			StateLayer = React.createElement(StateLayer, {
-				zIndex = 2,
-				size = UDim2.fromOffset(Size_500, Size_500),
+				size = UDim2.fromOffset(size_1000, size_1000),
 				anchorPoint = Vector2.new(0.5, 0.5),
 				position = UDim2.fromScale(0.5, 0.5),
-				cornerRadius = UDim.new(0, Tokens.Semantic.Radius.Circle),
-				stateStyle = v36,
-				outset = v39,
-				onStateChanged = p3,
+				cornerRadius = UDim.new(0, tokens.Radius.Circle),
+				zIndex = 2,
+				stateStyle = stateStyle,
+				outset = outset,
+				onStateChanged = onStateChanged,
 				onActivated = onActivated
 			}),
-			Icon = React.createElement(Label, {
-				Selectable = false,
-				BackgroundTransparency = 1,
-				ZIndex = 3,
-				Size = UDim2.fromOffset(Medium, Medium),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Image = icon,
-				ImageColor3 = v35.Color3,
-				ImageTransparency = v35.Transparency
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, Tokens.Semantic.Radius.Circle)
-				}),
-				Badge = if not badgeValue then nil else React.createElement(StatusIndicator, {
-					Position = uDim2,
-					AnchorPoint = vector2,
-					value = tonumber(badgeValue),
-					variant = migrateBadgeVariant(badgeVariant),
-					max = if not tonumber(badgeValue) then nil else 99
-				})
-			}, v19.children)
-		})
+			Icon = 0
+		}
+
+		local createElement2 = React.createElement
+		local v4 = {
+			Selectable = false,
+			Size = UDim2.fromOffset(size_900, size_900),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Image = icon,
+			ImageColor3 = v2.Color3,
+			ImageTransparency = v2.Transparency,
+			BackgroundTransparency = 1,
+			ZIndex = 3
+		}
+
+		local v5 = {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, tokens.Radius.Circle)
+			}),
+			Badge = 0
+		}
+		local badge
+
+		if badgeValue then
+			badge = React.createElement(StatusIndicator, {
+				Position = udim,
+				AnchorPoint = vector2,
+				value = tonumber(badgeValue),
+				variant = migrateBadgeVariant(badgeVariant),
+				max = tonumber(badgeValue) and 99 or nil
+			})
+		end
+
+		v5.Badge = badge
+		children.Icon = createElement2(Label, v4, v5, joined.children)
+		return createElement("Frame", v3, children)
 	end)
 end
 

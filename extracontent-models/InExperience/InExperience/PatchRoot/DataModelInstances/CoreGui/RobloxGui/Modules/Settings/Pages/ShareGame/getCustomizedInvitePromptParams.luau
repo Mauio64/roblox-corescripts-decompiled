@@ -1,34 +1,57 @@
-local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local Modules = CoreGui.RobloxGui.Modules
 local Constants = require(Modules.Settings.Pages.ShareGame.Constants)
 
-return function(p1, p2: ((...any) -> ...any)) -- line: 9
-	-- upvalues: Constants (copy)
-	local v5 = if not p1 or p1.InviteUser == 0 then nil else p1.InviteUser
-	local v6, v7 = p2(if not v5 then Constants.Triggers.DeveloperMultiple else Constants.Triggers.DeveloperSingle, v5)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagFixPromptGameInviteUIMissingDisplayName = SharedFlags.FFlagFixPromptGameInviteUIMissingDisplayName
 
-	if not v6 then
+return function(data, callback)
+	local inviteUser
+
+	if data and data.InviteUser ~= 0 then
+		inviteUser = data.InviteUser
+	end
+
+	local v
+
+	if inviteUser then
+		v = Constants.Triggers.DeveloperSingle
+	else
+		v = Constants.Triggers.DeveloperMultiple
+	end
+
+	local v2, v3 = callback(v, inviteUser)
+
+	if not v2 then
 		return nil
 	end
 
-	local t1 = {}
+	local v4 = {}
 
-	if v7 and p1 then
-		if p1.InviteMessageId ~= "" then
-			t1.inviteMessageId = p1.InviteMessageId
-		end
-
-		if p1.InviteUser ~= 0 then
-			t1.inviteUserId = p1.InviteUser
-		end
-
-		if p1.PromptMessage ~= "" then
-			t1.promptMessage = p1.PromptMessage
-		end
-
-		if p1.LaunchData ~= "" then
-			t1.launchData = p1.LaunchData
-		end
+	if FFlagFixPromptGameInviteUIMissingDisplayName and inviteUser then
+		v4.inviteUserId = inviteUser
 	end
 
-	return t1
+	if not (v3 and data) then
+		return v4
+	end
+
+	if data.InviteMessageId ~= "" then
+		v4.inviteMessageId = data.InviteMessageId
+	end
+
+	if data.InviteUser ~= 0 then
+		v4.inviteUserId = data.InviteUser
+	end
+
+	if data.PromptMessage ~= "" then
+		v4.promptMessage = data.PromptMessage
+	end
+
+	if data.LaunchData ~= "" then
+		v4.launchData = data.LaunchData
+	end
+
+	return v4
 end

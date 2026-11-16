@@ -1,24 +1,19 @@
 local VideoUtils = script:FindFirstAncestor("VideoUtils")
-local VideoUtilsParent = VideoUtils.Parent
-local React = require(VideoUtilsParent.React)
-local VideoEndReason = require(VideoUtils.Analytics.Enums).VideoEndReason
+local parent = VideoUtils.Parent
 
-local function VideoSelectionPlaybackDetector(t1: {[any]: any}) -- line: 14
-	-- upvalues: React (copy), VideoEndReason (copy)
-	React.useEffect(function() -- line: 16
-		-- upvalues: t1 (copy), VideoEndReason (copy)
-		if t1.isSelected then
-			t1.requestVideoPlayback(false)
+local React = require(parent.React)
 
-			return
+local Enums = require(VideoUtils.Analytics.Enums)
+local VideoEndReason = Enums.VideoEndReason
+
+local function VideoSelectionPlaybackDetector(data): nil
+	React.useEffect(function()
+		if data.isSelected then
+			data.requestVideoPlayback(false)
+		else
+			data.cancelVideoPlayback(VideoEndReason.Unselected)
 		end
-
-		t1.cancelVideoPlayback(VideoEndReason.Unselected)
-	end, {
-		t1.isSelected,
-		t1.requestVideoPlayback,
-		t1.cancelVideoPlayback
-	})
+	end, { data.isSelected, data.requestVideoPlayback, data.cancelVideoPlayback })
 
 	return nil
 end

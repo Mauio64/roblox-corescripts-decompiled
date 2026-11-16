@@ -1,25 +1,23 @@
 local GameTile = script:FindFirstAncestor("GameTile")
+
 local formatExperienceIcon = require(GameTile.formatExperienceIcon)
 local formatExperienceThumbnail = require(GameTile.formatExperienceThumbnail)
 local resolveWideAssetId = require(GameTile.resolveWideAssetId)
 
-local function resolveGameTileThumbnailUri(t1: {[any]: any}) -- line: 20
-	-- upvalues: resolveWideAssetId (copy), formatExperienceThumbnail (copy), formatExperienceIcon (copy)
-	if t1.useGridTile then
-		local v7 = resolveWideAssetId(t1.perEntryWideAssetId, t1.game, t1.topicId)
+local function resolveGameTileThumbnailUri(data)
+	if data.useGridTile then
+		local wideAssetId = resolveWideAssetId(data.perEntryWideAssetId, data.game, data.topicId)
 
-		if not v7 and not t1.placeId then
-			return nil
+		if wideAssetId or data.placeId then
+			return formatExperienceThumbnail(wideAssetId, data.placeId, data.isEmphasized)
 		end
 
-		return formatExperienceThumbnail(v7, t1.placeId, t1.isEmphasized)
+		return nil
+	elseif data.universeId then
+		return formatExperienceIcon(data.iconUrl, data.universeId)
+	else
+		return data.iconUrl
 	end
-
-	if not t1.universeId then
-		return t1.iconUrl
-	end
-
-	return formatExperienceIcon(t1.iconUrl, t1.universeId)
 end
 
 return resolveGameTileThumbnailUri

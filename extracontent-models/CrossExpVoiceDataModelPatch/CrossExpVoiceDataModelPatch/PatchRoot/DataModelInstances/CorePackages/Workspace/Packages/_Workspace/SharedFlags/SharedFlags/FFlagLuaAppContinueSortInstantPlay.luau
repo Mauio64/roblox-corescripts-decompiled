@@ -1,0 +1,3 @@
+local FFlagLuaAppGameTileExtractGameDetailsCallback = require(script.Parent.FFlagLuaAppGameTileExtractGameDetailsCallback)
+
+return game:DefineFastFlag("LuaAppContinueSortInstantPlay", false) and FFlagLuaAppGameTileExtractGameDetailsCallback

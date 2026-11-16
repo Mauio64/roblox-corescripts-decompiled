@@ -1,22 +1,19 @@
-return function(p1, p2) -- line: 9
-	local t1 = {}
+return function(p, items)
+	local v = {}
 
-	for k, v in pairs(p2) do
-		t1[p1[k]] = v
+	for k, item in pairs(items) do
+		v[p[k]] = item
 	end
 
-	local mt = getmetatable(p1)
-	local __index = mt.__index
-
-	function mt.__index(_, p4) -- line: 17
-		-- upvalues: t1 (copy), __index (copy)
-		if p4 == "toRawValue" then
-			return function(p5) -- line: 19
-				-- upvalues: t1 (copy)
-				return t1[p5]
+	local metatable = getmetatable(p)
+	local __index = metatable.__index
+	function metatable.__index(_, p2)
+		if p2 == "toRawValue" then
+			return function(p3)
+				return v[p3]
 			end
 		end
 
-		return __index[p4]
+		return __index[p2]
 	end
 end

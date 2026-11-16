@@ -1,9 +1,9 @@
 local InterventionShared = script:FindFirstAncestor("InterventionShared")
-local InterventionSharedParent = InterventionShared.Parent
-local InterventionPlacement = require(InterventionShared.Contexts.InterventionPlacement)
-local React = require(InterventionSharedParent.React)
+local parent = InterventionShared.Parent
 
-return function() -- line: 7
-	-- upvalues: React (copy), InterventionPlacement (copy)
+local InterventionPlacement = require(InterventionShared.Contexts.InterventionPlacement)
+local React = require(parent.React)
+
+return function()
 	return React.useContext(InterventionPlacement)
 end

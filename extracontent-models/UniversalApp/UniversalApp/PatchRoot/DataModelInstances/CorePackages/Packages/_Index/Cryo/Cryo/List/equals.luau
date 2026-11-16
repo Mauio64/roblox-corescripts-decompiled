@@ -1,35 +1,33 @@
 local equalObjects = require(script.Parent.Parent.equalObjects)
 
-local function compare(p1, p2) -- line: 3
-	if type(p1) ~= "table" or type(p2) ~= "table" then
-		return p1 == p2
+local function compare(list, list2): boolean
+	if type(list) ~= "table" or type(list2) ~= "table" then
+		return list == list2
 	end
 
-	if #p1 ~= #p2 then
+	if #list ~= #list2 then
 		return false
 	end
 
-	for i = 1, #p1 do
-		if p1[i] ~= p2[i] then
+	for i = 1, #list do
+		if list[i] ~= list2[i] then
 			return false
 		end
 	end
 
 	return true
 end
-local function equals(...) -- line: 21
-	-- upvalues: equalObjects (copy), compare (copy)
+
+local function equals(...): boolean
 	if equalObjects(...) then
 		return true
 	end
 
-	local v7 = select("#", ...)
-	local v8 = select(1, ...)
+	local v = select("#", ...)
+	local v2 = select(1, ...)
 
-	for i = 2, v7 do
-		local v10 = select(i, ...)
-
-		if not compare(v8, v10) then
+	for i = 2, v do
+		if not compare(v2, select(i, ...)) then
 			return false
 		end
 	end

@@ -1,288 +1,362 @@
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local FFlagAXVirtualizedFeedVerticalPadding = require(Parent.SharedFlags).FFlagAXVirtualizedFeedVerticalPadding
-local FFlagAXSduiFeedBackToTopAndNavClearance = require(Parent.AvatarExperienceFlags).FFlagAXSduiFeedBackToTopAndNavClearance
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAXVirtualizedFeedVerticalPadding = SharedFlags.FFlagAXVirtualizedFeedVerticalPadding
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXSduiFeedBackToTopAndNavClearance = AvatarExperienceFlags.FFlagAXSduiFeedBackToTopAndNavClearance
+local FFlagAXFixVirtualizedFeedUpdateDepth = require(script.Parent.FFlagAXFixVirtualizedFeedUpdateDepth)
+local Foundation = require(parent.Foundation)
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local View = Foundation.View
 local Loading = Foundation.Loading
 local IconSize = Foundation.Enums.IconSize
-local FlatList = require(Parent.VirtualizedList).FlatList
+local VirtualizedList = require(parent.VirtualizedList)
+local FlatList = VirtualizedList.FlatList
 local isFeedContentScrollable = require(script.Parent.isFeedContentScrollable)
-local t1 = {
-	BackgroundTransparency = 1,
-	BorderSizePixel = 0
-}
-local t2 = {
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagVirtualizedFeedFooterWrapperProp = SharedFlags2.FFlagVirtualizedFeedFooterWrapperProp
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagAXScrollTelemetryIntegration2 = SharedFlags3.FFlagAXScrollTelemetryIntegration2
+local useFlatListScrollPerformanceTracker = require(script.Parent.useFlatListScrollPerformanceTracker)
+
+local contentContainerStyle = { BackgroundTransparency = 1, BorderSizePixel = 0 }
+
+local style = {
 	Selectable = false,
 	BackgroundTransparency = 1,
 	ScrollBarThickness = 0,
 	BorderSizePixel = 0,
-	ClipsDescendants = false,
 	ElasticBehavior = Enum.ElasticBehavior.Always,
+	ClipsDescendants = false,
 	AutomaticCanvasSize = Enum.AutomaticSize.Y
 }
-local t3 = {
-	backToTop = "Feature.GamePage.Action.BackToTop"
-}
 
-local function getNativeScrollingFrameRef(t4: {[any]: any}) -- line: 50
-	if t4.current ~= nil then
-		local v24 = t4.current:getNativeScrollRef()
+local v = { backToTop = "Feature.GamePage.Action.BackToTop" }
 
-		if v24 ~= nil then
-			return v24._nativeRef
+local function getNativeScrollingFrameRef(ref) -- 1 equivalent call inferred from this helper
+	if ref.current ~= nil then
+		local nativeScrollRef = ref.current:getNativeScrollRef()
+
+		if nativeScrollRef ~= nil then
+			return nativeScrollRef._nativeRef
 		end
 	end
 
 	return nil
 end
-local function VirtualizedFeedBackToTopButton(t5: {[any]: any}) -- line: 65
-	-- upvalues: useLocalization (copy), t3 (copy), React (copy), Button (copy), ButtonVariant (copy)
-	local v26 = useLocalization(t3)
+
+local function VirtualizedFeedBackToTopButton(p)
+	local v2 = useLocalization(v)
 
 	return React.createElement(Button, {
-		text = t5.text or v26.backToTop,
+		text = p.text or v2.backToTop,
 		variant = ButtonVariant.Link,
-		onActivated = t5.onActivated
+		onActivated = p.onActivated
 	})
 end
 
-local v20 = not FFlagAXSduiFeedBackToTopAndNavClearance and "row align-y-center align-x-center padding-xlarge" or "row align-x-center align-y-center size-full-0 auto-y padding-xlarge"
+local tag = FFlagAXSduiFeedBackToTopAndNavClearance
+	and "row align-x-center align-y-center size-full-0 auto-y padding-xlarge"
+	or "row align-y-center align-x-center padding-xlarge"
 
-local function VirtualizedFeedFooterLayout(t6: {[any]: any}) -- line: 83
-	-- upvalues: React (copy), View (copy), v20 (copy)
-	return React.createElement(View, {
-		tag = v20
-	}, t6.children)
+local function VirtualizedFeedFooterLayout(p)
+	return React.createElement(View, { tag = tag }, p.children)
 end
-local function VirtualizedFeed(t7: {[any]: any}, p1) -- line: 135
-	-- upvalues: FFlagAXVirtualizedFeedVerticalPadding (copy), React (copy), FFlagAXSduiFeedBackToTopAndNavClearance (copy), UserGameSettings (copy), isFeedContentScrollable (copy), VirtualizedFeedBackToTopButton (copy), Loading (copy), IconSize (copy), View (copy), VirtualizedFeedFooterLayout (copy), FlatList (copy), t1 (copy), t2 (copy)
-	local v30 = t7.horizontalPadding or 0
-	local v31 = not FFlagAXVirtualizedFeedVerticalPadding and 0 or (t7.verticalPadding or 0)
-	local v32 = React.useRef(nil)
-	local v33 = React.useCallback(function(p2) -- line: 140
-		-- upvalues: v32 (copy), t7 (copy)
-		v32.current = p2
 
-		local flatListRef = t7.flatListRef
+local function createFooterComponent(p) -- 3 equivalent calls inferred from this helper
+	if p.shouldWrap then
+		return (React.createElement(VirtualizedFeedFooterLayout, {}, p.footerContent))
+	end
+
+	return p.footerContent
+end
+
+local function VirtualizedFeed(props, ref)
+	local horizontalPadding = props.horizontalPadding or 0
+	local verticalPadding = FFlagAXVirtualizedFeedVerticalPadding and props.verticalPadding or 0
+	local shouldWrap = not FFlagVirtualizedFeedFooterWrapperProp or props.shouldWrapFooter ~= false
+	local ref2 = React.useRef(nil)
+
+	local ref5 = React.useCallback(function(current)
+		ref2.current = current
+		local flatListRef = props.flatListRef
 
 		if flatListRef then
 			if typeof(flatListRef) == "function" then
-				flatListRef(p2)
-
-				return
-			end
-
-			if typeof(flatListRef) == "table" then
-				flatListRef.current = p2
+				flatListRef(current)
+			elseif typeof(flatListRef) == "table" then
+				flatListRef.current = current
 			end
 		end
-	end, { t7.flatListRef })
-	local v34, v35 = React.useState(false)
-	local v36 = nil
-	local u37 = nil
-	local v38 = nil
-	local u39 = nil
-	local v40 = nil
-	local g44 = nil
-	local g53 = nil
-	local v54 = nil
-	local _nativeRef = nil
+	end, { props.flatListRef })
 
-	if FFlagAXSduiFeedBackToTopAndNavClearance then
-		local v41
-
-		v36, v41 = React.useState(0)
-		u37 = v41
-
-		local v42
-
-		v38, v42 = React.useState(0)
-		u39 = v42
-		v40 = React.useCallback(function(_: number, n2: number) -- line: 170
-			-- upvalues: u37 (ref)
-			u37(n2)
-		end, {})
+	if FFlagAXScrollTelemetryIntegration2 then
+		useFlatListScrollPerformanceTracker(props.scrollPerformanceIntervalName, ref2)
 	end
 
-	local v43 = React.useCallback(function() -- line: 175
-		-- upvalues: v32 (copy), UserGameSettings (copy)
-		if v32.current then
-			v32.current:scrollToOffset({
+	local state, setState = React.useState(false)
+
+	local state2 = nil
+	local v2 = nil
+
+	local v3 = nil
+	local state3, setState2, onContentSizeChange
+
+	if FFlagAXSduiFeedBackToTopAndNavClearance and not FFlagAXFixVirtualizedFeedUpdateDepth then
+		local setState3
+		state2, setState3 = React.useState(0)
+		v2 = setState3
+		state3, setState2 = React.useState(0)
+		onContentSizeChange = React.useCallback(function(_: number, p: number)
+			v2(p)
+		end, {})
+	else
+		setState2 = nil
+	end
+
+	if FFlagAXSduiFeedBackToTopAndNavClearance and FFlagAXFixVirtualizedFeedUpdateDepth then
+		local ref3 = React.useRef(0)
+		local ref4 = React.useRef(0)
+		local v4 = React.useCallback(function()
+			setState(isFeedContentScrollable(ref3.current, ref4.current, verticalPadding))
+		end, { verticalPadding })
+		onContentSizeChange = React.useCallback(function(_: number, current: number)
+			ref3.current = current
+			v4()
+		end, { v4 })
+		v3 = React.useCallback(function(current: number)
+			ref4.current = current
+			v4()
+		end, { v4 })
+	end
+
+	local onActivated = React.useCallback(function()
+		if ref2.current then
+			ref2.current:scrollToOffset({
 				offset = 0,
 				animated = not UserGameSettings.ReducedMotion
 			})
 		end
 	end, {})
 
-	repeat
-		if g44 or FFlagAXSduiFeedBackToTopAndNavClearance then
-			g44 = false
+	if not FFlagAXSduiFeedBackToTopAndNavClearance then
+		local nativeScrollingFrameRef = getNativeScrollingFrameRef(ref2) -- inferred equivalent call
+		React.useEffect(function()
+			local connections = {}
 
-			local v45 = nil
-
-			if FFlagAXSduiFeedBackToTopAndNavClearance then
-				local v46 = isFeedContentScrollable(v36 or 0, v38 or 0, v31) and t7.isEndOfList == true
-				local v47 = if not t7.ListFooterComponent then if not v46 then if not t7.isLoading then nil else React.createElement(Loading, {
-					size = IconSize.Medium
-				}) else React.createElement(VirtualizedFeedBackToTopButton, {
-					text = t7.scrollToTopLabel,
-					onActivated = v43
-				}) else t7.ListFooterComponent
-				local v48 = t7.endOfListBottomPadding or 0
-				local v49 = React.useMemo(function() -- line: 236
-					-- upvalues: v48 (copy)
-					if v48 <= 0 then
-						return nil
-					end
-
-					return {
-						bottom = UDim.new(0, v48)
-					}
-				end, { v48 })
-
-				if v49 then
-					v45 = React.createElement(View, {
-						tag = "size-full-0 auto-y",
-						padding = v49
-					}, {
-						FooterContent = if not v47 then nil else React.createElement(VirtualizedFeedFooterLayout, {}, v47)
-					})
-				elseif v47 then
-					v45 = React.createElement(VirtualizedFeedFooterLayout, {}, v47)
+			local function sizeChangeHandler() -- 1 equivalent call inferred from this helper
+				if nativeScrollingFrameRef == nil or nativeScrollingFrameRef.current == nil then
+					return
 				end
-			else
-				local v50 = if not t7.ListFooterComponent then if not t7.isEndOfList or not v34 then if not t7.isLoading then nil else React.createElement(Loading, {
-					size = IconSize.Medium
-				}) else React.createElement(VirtualizedFeedBackToTopButton, {
-					text = t7.scrollToTopLabel,
-					onActivated = v43
-				}) else t7.ListFooterComponent
 
-				v45 = if not v50 then nil else React.createElement(VirtualizedFeedFooterLayout, {}, v50)
+				local current = nativeScrollingFrameRef.current
+				setState(current.AbsoluteCanvasSize.Y > current.AbsoluteWindowSize.Y)
 			end
 
-			local v51 = React.useCallback(function(p3) -- line: 277
-				-- upvalues: t7 (copy)
-				if t7.onScroll then
-					t7.onScroll(p3.CanvasPosition.Y)
-				end
-			end, { t7.onScroll })
-			local v52 = React.useCallback(function(p4) -- line: 283
-				-- upvalues: t7 (copy), FFlagAXSduiFeedBackToTopAndNavClearance (copy), u39 (ref)
-				if t7.onContainerWidthChanged then
-					t7.onContainerWidthChanged(p4.AbsoluteSize.X)
-				end
+			if nativeScrollingFrameRef and nativeScrollingFrameRef.current then
+				table.insert(
+					connections,
+					nativeScrollingFrameRef.current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(sizeChangeHandler)
+				)
 
-				if FFlagAXSduiFeedBackToTopAndNavClearance and u39 then
-					u39(p4.AbsoluteSize.Y)
-				end
-			end, { t7.onContainerWidthChanged })
+				table.insert(
+					connections,
+					nativeScrollingFrameRef.current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(sizeChangeHandler)
+				)
+				sizeChangeHandler() -- inferred equivalent call
+			end
 
-			return React.createElement("Frame", {
-				BackgroundColor3 = t7.backgroundColor,
-				BackgroundTransparency = if t7.backgroundTransparency == nil then not t7.backgroundColor and 1 or 0 else t7.backgroundTransparency,
-				BorderSizePixel = 0,
-				Size = t7.Size or UDim2.new(1, 0, 1, 0),
-				ClipsDescendants = t7.clipsDescendants == nil or t7.clipsDescendants,
-				LayoutOrder = t7.LayoutOrder,
-				[React.Change.AbsoluteSize] = v52,
-				ref = p1
-			}, {
-				UIPadding = if not (v30 > 0) and not (v31 > 0) then nil else React.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, v30),
-					PaddingRight = UDim.new(0, v30),
-					PaddingTop = UDim.new(0, v31),
-					PaddingBottom = UDim.new(0, v31)
-				}),
-				FeedFlatList = React.createElement(FlatList, {
-					UNSTABLE_forceSiblingLayoutUpdate = true,
-					showDefaultLoadingIndicators = true,
-					data = t7.data,
-					renderItem = t7.renderItem,
-					windowSize = t7.windowSize or 21,
-					initialNumToRender = t7.initialNumToRender or 8,
-					maxToRenderPerBatch = t7.maxToRenderPerBatch or 1,
-					updateCellsBatchingPeriod = t7.updateCellsBatchingPeriod or 30,
-					scrollEventThrottle = t7.scrollEventThrottle or 0,
-					ref = v33,
-					contentContainerStyle = t1,
-					style = t2,
-					onScroll = v51,
-					onContentSizeChange = if not FFlagAXSduiFeedBackToTopAndNavClearance then nil else v40,
-					onEndReachedThreshold = t7.onEndReachedThreshold,
-					onEndReached = t7.onEndReached,
-					ListHeaderComponent = t7.ListHeaderComponent,
-					ListFooterComponent = v45,
-					scrollEnabled = t7.scrollEnabled
-				})
-			})
+			return function()
+				for _, connection in connections do
+					connection:Disconnect()
+				end
+			end
+		end, { nativeScrollingFrameRef })
+	end
+
+	local listFooterComponent = nil
+
+	if FFlagAXSduiFeedBackToTopAndNavClearance then
+		if not FFlagAXFixVirtualizedFeedUpdateDepth then
+			state = isFeedContentScrollable(state2 or 0, state3 or 0, verticalPadding)
 		end
 
-		repeat
-			if g53 or v32.current ~= nil then
-				if not g53 then
-					v54 = v32.current:getNativeScrollRef()
-				end
+		local v4 = state and props.isEndOfList == true
+		local footerContent
 
-				if g53 or v54 ~= nil then
-					if not g53 then
-						_nativeRef = v54._nativeRef
-					end
+		if props.ListFooterComponent then
+			footerContent = props.ListFooterComponent
+		elseif v4 then
+			footerContent = React.createElement(VirtualizedFeedBackToTopButton, {
+				text = props.scrollToTopLabel,
+				onActivated = onActivated
+			})
+		elseif props.isLoading then
+			footerContent = React.createElement(Loading, { size = IconSize.Medium })
+		end
 
-					g53 = false
+		local endOfListBottomPadding = props.endOfListBottomPadding or 0
+		local padding = React.useMemo(function()
+			if endOfListBottomPadding <= 0 then
+				return nil
+			end
 
-					local v56 = _nativeRef
+			return {
+				bottom = UDim.new(0, endOfListBottomPadding)
+			}
+		end, { endOfListBottomPadding })
 
-					React.useEffect(function() -- line: 187
-						-- upvalues: v56 (copy), v35 (copy)
-						local t8 = {}
+		if padding then
+			local createElement = React.createElement
+			local footerContent2
 
-						local function sizeChangeHandler() -- line: 190
-							-- upvalues: v56 (copy), v35 (copy)
-							if v56 == nil or v56.current == nil then
-								return
-							end
-
-							local current = v56.current
-
-							v35(current.AbsoluteCanvasSize.Y > current.AbsoluteWindowSize.Y)
-						end
-
-						if v56 and v56.current then
-							table.insert(t8, v56.current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(sizeChangeHandler))
-							table.insert(t8, v56.current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(sizeChangeHandler))
-
-							if v56 ~= nil and v56.current ~= nil then
-								local current = v56.current
-
-								v35(current.AbsoluteCanvasSize.Y > current.AbsoluteWindowSize.Y)
-							end
-						end
-
-						return function() -- line: 208
-							-- upvalues: t8 (copy)
-							for _, v68 in t8 do
-								v68:Disconnect()
-							end
-						end
-					end, { v56 })
-					g44 = true
+			if footerContent then
+				if FFlagVirtualizedFeedFooterWrapperProp then
+					footerContent2 = createFooterComponent({ -- inferred equivalent call
+						footerContent = footerContent,
+						shouldWrap = shouldWrap
+					})
+				else
+					footerContent2 = React.createElement(VirtualizedFeedFooterLayout, {}, footerContent)
 				end
 			end
 
-			if g44 then
-				break
+			listFooterComponent = createElement(View, {
+				tag = "size-full-0 auto-y",
+				padding = padding
+			}, {
+				FooterContent = footerContent2
+			})
+		elseif footerContent then
+			if FFlagVirtualizedFeedFooterWrapperProp then
+				listFooterComponent = createFooterComponent({ -- inferred equivalent call
+					footerContent = footerContent,
+					shouldWrap = shouldWrap
+				})
+			else
+				listFooterComponent = React.createElement(VirtualizedFeedFooterLayout, {}, footerContent)
 			end
+		end
+	else
+		local footerContent
 
-			_nativeRef = nil
-			g53 = true
-		until not g53
-	until not g44
+		if props.ListFooterComponent then
+			footerContent = props.ListFooterComponent
+		elseif props.isEndOfList and state then
+			footerContent = React.createElement(VirtualizedFeedBackToTopButton, {
+				text = props.scrollToTopLabel,
+				onActivated = onActivated
+			})
+		elseif props.isLoading then
+			footerContent = React.createElement(Loading, { size = IconSize.Medium })
+		end
+
+		if footerContent then
+			if FFlagVirtualizedFeedFooterWrapperProp then
+				listFooterComponent = createFooterComponent({ -- inferred equivalent call
+					footerContent = footerContent,
+					shouldWrap = shouldWrap
+				})
+			else
+				listFooterComponent = React.createElement(VirtualizedFeedFooterLayout, {}, footerContent)
+			end
+		end
+	end
+
+	local onScroll = React.useCallback(function(p)
+		if props.onScroll then
+			props.onScroll(p.CanvasPosition.Y)
+		end
+	end, { props.onScroll })
+
+	local v4 = React.useCallback(function(p)
+		if props.onContainerWidthChanged then
+			props.onContainerWidthChanged(p.AbsoluteSize.X)
+		end
+
+		if FFlagAXSduiFeedBackToTopAndNavClearance and setState2 then
+			setState2(p.AbsoluteSize.Y)
+		end
+
+		if FFlagAXFixVirtualizedFeedUpdateDepth and v3 then
+			v3(p.AbsoluteSize.Y)
+		end
+	end, { props.onContainerWidthChanged, v3 })
+
+	local createElement = React.createElement
+	local v5 = {}
+	v5.BackgroundColor3 = props.backgroundColor
+	local backgroundTransparency
+
+	if props.backgroundTransparency == nil then
+		backgroundTransparency = props.backgroundColor and 0 or 1
+	else
+		backgroundTransparency = props.backgroundTransparency
+	end
+
+	v5.BackgroundTransparency = backgroundTransparency
+
+	v5.BorderSizePixel = 0
+	v5.Size = props.Size or UDim2.new(1, 0, 1, 0)
+	v5.ClipsDescendants = props.clipsDescendants == nil or props.clipsDescendants
+	v5.LayoutOrder = props.LayoutOrder
+	v5[React.Change.AbsoluteSize] = v4
+	v5.ref = ref
+	local uiPadding
+
+	if horizontalPadding > 0 or verticalPadding > 0 then
+		uiPadding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, horizontalPadding),
+			PaddingRight = UDim.new(0, horizontalPadding),
+			PaddingTop = UDim.new(0, verticalPadding),
+			PaddingBottom = UDim.new(0, verticalPadding)
+		})
+	end
+
+	local createElement2 = React.createElement
+	local v6 = {
+		data = props.data,
+		renderItem = props.renderItem,
+		windowSize = props.windowSize or 21,
+		initialNumToRender = props.initialNumToRender or 8,
+		maxToRenderPerBatch = props.maxToRenderPerBatch or 1,
+		updateCellsBatchingPeriod = props.updateCellsBatchingPeriod or 30,
+		scrollEventThrottle = props.scrollEventThrottle or 0,
+		UNSTABLE_forceSiblingLayoutUpdate = true,
+		ref = ref5,
+		contentContainerStyle = contentContainerStyle,
+		style = style,
+		onScroll = onScroll,
+		onContentSizeChange = 0,
+		onEndReachedThreshold = 0,
+		onEndReached = 0,
+		showDefaultLoadingIndicators = true,
+		ListHeaderComponent = 0,
+		ListFooterComponent = 0,
+		scrollEnabled = 0
+	}
+
+	if not FFlagAXSduiFeedBackToTopAndNavClearance then
+		onContentSizeChange = nil
+	end
+
+	v6.onContentSizeChange = onContentSizeChange
+	v6.onEndReachedThreshold = props.onEndReachedThreshold
+	v6.onEndReached = props.onEndReached
+
+	v6.ListHeaderComponent = props.ListHeaderComponent
+	v6.ListFooterComponent = listFooterComponent
+	v6.scrollEnabled = props.scrollEnabled
+	return createElement("Frame", v5, {
+		UIPadding = uiPadding,
+		FeedFlatList = createElement2(FlatList, v6)
+	})
 end
 
 return React.forwardRef(VirtualizedFeed)

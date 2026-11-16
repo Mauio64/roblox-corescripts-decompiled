@@ -1,198 +1,416 @@
-local Modules = game:GetService("CoreGui"):WaitForChild("RobloxGui").Modules
+local CoreGui = game:GetService("CoreGui")
+local modules = CoreGui:WaitForChild("RobloxGui").Modules
 local CorePackages = game:GetService("CorePackages")
-local EngineFeature = game:GetEngineFeature("PartyVoiceVolume")
-local GetFFlagEnablePlayerNamesEnabledSetting = require(Modules.Settings.Flags.GetFFlagEnablePlayerNamesEnabledSetting)
-local FFlagBadgeVisibilitySettingEnabled = require(CorePackages.Workspace.Packages.SharedFlags).FFlagBadgeVisibilitySettingEnabled
-local FFlagEnableModerateChatRemoteEvent = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableModerateChatRemoteEvent
-local FFlagIEMSettingsGroups = require(Modules.Settings.Flags.FFlagIEMSettingsGroups)
-local FFlagAIRephraseSettingEnabled = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAIRephraseSettingEnabled
-local v9 = game:DefineFastFlag("UpdateRephraseSettingUI", false)
-local FFlagChatSummariesSettingEnabled = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChatSummariesSettingEnabled
-local FFlagExpChatEnableFriendsTab = require(CorePackages.Workspace.Packages.SharedFlags).FFlagExpChatEnableFriendsTab
-local FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider = require(Modules.Settings.Flags.FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider)
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
+
+local engineFeature = game:GetEngineFeature("PartyVoiceVolume")
+local GetFFlagEnablePlayerNamesEnabledSetting = require(modules.Settings.Flags.GetFFlagEnablePlayerNamesEnabledSetting)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagBadgeVisibilitySettingEnabled = SharedFlags.FFlagBadgeVisibilitySettingEnabled
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableModerateChatRemoteEvent = SharedFlags2.FFlagEnableModerateChatRemoteEvent
+local FFlagIEMSettingsGroups = require(modules.Settings.Flags.FFlagIEMSettingsGroups)
+local engineFeature2 = game:GetEngineFeature("RUUserScalePreferenceAPI")
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagUIScaleEngineOptions = SharedFlags3.FFlagUIScaleEngineOptions
+local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagAIRephraseSettingEnabled = SharedFlags4.FFlagAIRephraseSettingEnabled
+local defineFastFlag = game:DefineFastFlag("UpdateRephraseSettingUI", false)
+local SharedFlags5 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagChatSummariesSettingEnabled = SharedFlags5.FFlagChatSummariesSettingEnabled
+local SharedFlags6 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagExpChatEnableFriendsTab = SharedFlags6.FFlagExpChatEnableFriendsTab
+
+local SharedFlags7 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagExpChatDictationVoiceTypingModeSetting = SharedFlags7.FFlagExpChatDictationVoiceTypingModeSetting
+
+local FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider = require(modules.Settings.Flags.FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider)
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
 local ReactUtils = require(CorePackages.Packages.ReactUtils)
-local v15 = game:DefineFastInt("ChatModerationFrameLayoutOrder", 9)
-local t1 = {
-	OverscanAdjustButton = 1
-}
+
+local defineFastInt = game:DefineFastInt("ChatModerationFrameLayoutOrder", 9)
+
+local v = {}
+v.MoreSettingsBanner = 0
+v.OverscanAdjustButton = 1
 
 if FFlagEnableModerateChatRemoteEvent then
-	t1.ChatModerationFrame = v15
+	v.ChatModerationFrame = defineFastInt
 end
 
-t1.ShiftLockFrame = 10
-t1.CameraModeFrame = 11
-t1.MovementModeFrame = 12
-t1.FramerateCap = 13
-t1.GamepadSensitivityFrame = 14
-t1.CameraInvertedFrame = 90
-t1.CameraDeviceFrame = 91
-t1.MouseAdvancedFrame = 50
-t1.VoiceConnectDisconnectSelector = 17
-t1.VoiceConnectFrame = 18
-t1.VoiceDisconnectFrame = 19
+v.ShiftLockFrame = 10
+v.CameraModeFrame = 11
+v.MovementModeFrame = 12
+v.FramerateCap = 13
+v.GamepadSensitivityFrame = 14
+v.CameraInvertedFrame = 90
+v.CameraDeviceFrame = 91
+
+v.MouseAdvancedFrame = 50
+
+v.VoiceConnectDisconnectSelector = 17
+v.VoiceConnectFrame = 18
+v.VoiceDisconnectFrame = 19
 
 if game:GetEngineFeature("InExperiencePlayerChoiceToggle") then
-	t1.PlayerChoiceTranslationFrame = 20
-	t1.LanguageSelectorFrame = 21
-	t1.ChatTranslationFrame = 30
-	t1.ChatLanguageSelectorFrame = 31
-	t1.ChatTranslationToggleFrame = 32
-	t1.FeedbackModeButton = 40
+	v.PlayerChoiceTranslationFrame = 20
+	v.LanguageSelectorFrame = 21
+
+	v.ChatTranslationFrame = 30
+	v.ChatLanguageSelectorFrame = 31
+	v.ChatTranslationToggleFrame = 32
+
+	v.FeedbackModeButton = 40
 else
-	t1.LanguageSelectorFrame = 20
-	t1.FeedbackModeButton = 30
-	t1.ChatTranslationFrame = 40
-	t1.ChatLanguageSelectorFrame = 41
-	t1.ChatTranslationToggleFrame = 42
+	v.LanguageSelectorFrame = 20
+
+	v.FeedbackModeButton = 30
+
+	v.ChatTranslationFrame = 40
+	v.ChatLanguageSelectorFrame = 41
+	v.ChatTranslationToggleFrame = 42
 end
 
 if FFlagExpChatEnableFriendsTab then
-	t1.ChatNotificationsFrame = 44
+	v.ChatNotificationsFrame = 44
 end
 
 if isInExperienceUIVREnabled then
-	t1.VRComfortSettingFrame = 54
-	t1.VRVignetteEnabledFrame = 55
-	t1.VRSteppedRotationEnabledFrame = 56
-	t1.VRThirdPersonFixedCamEnabledFrame = 57
-	t1.VRSafetyBubbleModeFrame = 58
+	v.VRComfortSettingFrame = 54
+	v.VRVignetteEnabledFrame = 55
+	v.VRSteppedRotationEnabledFrame = 56
+	v.VRThirdPersonFixedCamEnabledFrame = 57
+	v.VRSafetyBubbleModeFrame = 58
 end
 
-t1.DeviceFrameInput = 60
-t1.DeviceFrameOutput = 61
-t1.VolumeFrame = 62
+v.DeviceFrameInput = 60
+v.DeviceFrameOutput = 61
+v.VolumeFrame = 62
 
 if FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider then
-	t1.VoiceChatVolumeFrame = 63
+	v.VoiceChatVolumeFrame = 63
 
-	if EngineFeature then
-		t1.PartyVoiceVolumeFrame = 64
+	if engineFeature then
+		v.PartyVoiceVolumeFrame = 64
 	end
 
-	t1.HapticsFrame = not EngineFeature and 64 or 65
+	v.HapticsFrame = engineFeature and 65 or 64
 else
-	if EngineFeature then
-		t1.PartyVoiceVolumeFrame = 63
+	if engineFeature then
+		v.PartyVoiceVolumeFrame = 63
 	end
 
-	t1.HapticsFrame = not EngineFeature and 63 or 64
+	v.HapticsFrame = engineFeature and 64 or 63
 end
 
-t1.FullScreenFrame = 70
-t1.GraphicsEnablerFrame = 71
-t1.GraphicsQualityFrame = 72
-t1.ReducedMotionFrame = 73
-t1.PreferredTransparencyFrame = 74
-t1.PreferredTextSizeFrame = 75
-t1.UiNavigationKeyBindEnabledFrame = 76
-t1.PerformanceStatsFrame = 80
-t1.MicroProfilerFrame = 81
-t1.VREnabledFrame = 100
-t1.DeveloperConsoleButton = 101
+v.FullScreenFrame = 70
+v.GraphicsEnablerFrame = 71
+v.GraphicsQualityFrame = 72
+v.ReducedMotionFrame = 73
+
+v.PreferredTransparencyFrame = FFlagUIScaleEngineOptions and 77 or 74
+v.PreferredTextSizeFrame = FFlagUIScaleEngineOptions and 76 or 75
+
+if engineFeature2 then
+	v.UIScaleModeFrame = 76
+	v.UIScaleFrame = 77
+	v.UiNavigationKeyBindEnabledFrame = 78
+else
+	v.UiNavigationKeyBindEnabledFrame = 76
+end
+
+if FFlagUIScaleEngineOptions then
+	v.UIScaleEngineModeFrame = 74
+	v.UIScaleEngineFrame = 75
+end
+
+v.PerformanceStatsFrame = 80
+v.MicroProfilerFrame = 81
+
+v.VREnabledFrame = 100
+v.DeveloperConsoleButton = 101
 
 if GetFFlagEnablePlayerNamesEnabledSetting() then
-	t1.PlayerNamesEnabledFrame = 105
+	v.PlayerNamesEnabledFrame = 105
 end
 
 if FFlagBadgeVisibilitySettingEnabled then
-	t1.BadgeVisibilityFrame = 106
+	v.BadgeVisibilityFrame = 106
 end
 
 if FFlagAIRephraseSettingEnabled then
-	t1.AIRephraseFrame = not v9 and 43 or 20
+	v.AIRephraseFrame = defineFastFlag and 20 or 43
 end
 
 if FFlagChatSummariesSettingEnabled then
-	t1.ChatSummariesFrame = 20
+	v.ChatSummariesFrame = 20
 end
 
-t1.UiToggleRow = 200
-t1.UiToggleRowCustom = 200
-t1.UiToggleRowBillboards = 201
-t1.UiToggleRowNameplates = 202
-t1.FreecamToggleRow = 203
-t1.InformationFrame = 999
+if FFlagExpChatDictationVoiceTypingModeSetting then
+	v.VoiceTypingModeFrame = 16
+end
 
-local t2 = nil
+v.UiToggleRow = 200
+v.UiToggleRowCustom = 200
+v.UiToggleRowBillboards = 201
+v.UiToggleRowNameplates = 202
+v.FreecamToggleRow = 203
+v.InformationFrame = 999
+local v2
 
 if FFlagIEMSettingsGroups then
-	local v18 = ReactUtils.createNextOrder()
+	local nextOrder = ReactUtils.createNextOrder()
 
-	t2 = {
-		AudioHeader = v18(),
-		VolumeFrame = v18(),
-		VoiceChatVolumeFrame = if not FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider then nil else v18(),
-		PartyVoiceVolumeFrame = v18(),
-		DeviceFrameInput = v18(),
-		DeviceFrameOutput = v18(),
-		AudioDivider = v18(),
-		LanguageHeader = v18(),
-		ChatModerationFrame = v18(),
-		VoiceConnectDisconnectSelector = v18(),
-		VoiceConnectFrame = v18(),
-		VoiceDisconnectFrame = v18(),
-		ChatSummariesFrame = if not FFlagChatSummariesSettingEnabled then nil else v18(),
-		AIRephraseFrame = if not FFlagAIRephraseSettingEnabled then nil else v18(),
-		PlayerChoiceTranslationFrame = if not game:GetEngineFeature("InExperiencePlayerChoiceToggle") then nil else v18(),
-		LanguageSelectorFrame = v18(),
-		FeedbackModeButton = v18(),
-		ChatTranslationFrame = v18(),
-		ChatLanguageSelectorFrame = v18(),
-		ChatTranslationToggleFrame = v18(),
-		ChatNotificationsFrame = if not FFlagExpChatEnableFriendsTab then nil else v18(),
-		LanguageDivider = v18(),
-		DisplayHeader = v18(),
-		OverscanAdjustButton = v18(),
-		FullScreenFrame = v18(),
-		PreferredTransparencyFrame = v18(),
-		PreferredTextSizeFrame = v18(),
-		VRComfortSettingFrame = if not isInExperienceUIVREnabled then nil else v18(),
-		VRVignetteEnabledFrame = if not isInExperienceUIVREnabled then nil else v18(),
-		VRSteppedRotationEnabledFrame = if not isInExperienceUIVREnabled then nil else v18(),
-		VRThirdPersonFixedCamEnabledFrame = if not isInExperienceUIVREnabled then nil else v18(),
-		VRSafetyBubbleModeFrame = if not isInExperienceUIVREnabled then nil else v18(),
-		PerformanceStatsFrame = v18(),
-		MicroProfilerFrame = v18(),
-		GraphicsEnablerFrame = v18(),
-		GraphicsQualityFrame = v18(),
-		HapticsFrame = v18(),
-		ReducedMotionFrame = v18(),
-		FramerateCap = v18(),
-		VREnabledFrame = v18(),
-		DisplayDivider = v18(),
-		ViewAndControlsHeader = v18(),
-		CameraModeFrame = v18(),
-		CameraInvertedFrame = v18(),
-		CameraSensitivityFrame = v18(),
-		MouseAdvancedFrame = v18(),
-		GamepadSensitivityFrame = v18(),
-		MovementModeFrame = v18(),
-		ShiftLockFrame = v18(),
-		CameraDeviceFrame = v18(),
-		UiNavigationKeyBindEnabledFrame = v18(),
-		DeveloperConsoleButton = v18(),
-		PlayerNamesEnabledFrame = if not GetFFlagEnablePlayerNamesEnabledSetting() then nil else v18(),
-		BadgeVisibilityFrame = if not FFlagBadgeVisibilitySettingEnabled then nil else v18(),
-		UiToggleRow = v18(),
-		UiToggleRowCustom = v18(),
-		UiToggleRowBillboards = v18(),
-		UiToggleRowNameplates = v18(),
-		FreecamToggleRow = v18(),
-		InformationFrame = v18()
+	v2 = {
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		["MoreSettingsBanner"] = nil,
+		MoreSettingsBanner = nextOrder(),
+		AudioHeader = nextOrder(),
+		VolumeFrame = nextOrder()
 	}
-end
+	local voiceChatVolumeFrame
 
-local function getLayoutOrder() -- line: 211
-	-- upvalues: FFlagIEMSettingsGroups (copy), t2 (ref), t1 (copy)
-	if FFlagIEMSettingsGroups then
-		return t2
+	if FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider then
+		voiceChatVolumeFrame = nextOrder()
 	end
 
-	return t1
+	v2.VoiceChatVolumeFrame = voiceChatVolumeFrame
+	v2.PartyVoiceVolumeFrame = nextOrder()
+	v2.DeviceFrameInput = nextOrder()
+	v2.DeviceFrameOutput = nextOrder()
+	v2.AudioDivider = nextOrder()
+
+	v2.LanguageHeader = nextOrder()
+	local voiceTypingModeFrame
+
+	if FFlagExpChatDictationVoiceTypingModeSetting then
+		voiceTypingModeFrame = nextOrder()
+	end
+
+	v2.VoiceTypingModeFrame = voiceTypingModeFrame
+	v2.ChatModerationFrame = nextOrder()
+	v2.VoiceConnectDisconnectSelector = nextOrder()
+	v2.VoiceConnectFrame = nextOrder()
+	v2.VoiceDisconnectFrame = nextOrder()
+	local chatSummariesFrame
+
+	if FFlagChatSummariesSettingEnabled then
+		chatSummariesFrame = nextOrder()
+	end
+
+	v2.ChatSummariesFrame = chatSummariesFrame
+	local aiRephraseFrame
+
+	if FFlagAIRephraseSettingEnabled then
+		aiRephraseFrame = nextOrder()
+	end
+
+	v2.AIRephraseFrame = aiRephraseFrame
+	local playerChoiceTranslationFrame
+
+	if game:GetEngineFeature("InExperiencePlayerChoiceToggle") then
+		playerChoiceTranslationFrame = nextOrder()
+	end
+
+	v2.PlayerChoiceTranslationFrame = playerChoiceTranslationFrame
+	v2.LanguageSelectorFrame = nextOrder()
+	v2.FeedbackModeButton = nextOrder()
+	v2.ChatTranslationFrame = nextOrder()
+	v2.ChatLanguageSelectorFrame = nextOrder()
+	v2.ChatTranslationToggleFrame = nextOrder()
+	local chatNotificationsFrame
+
+	if FFlagExpChatEnableFriendsTab then
+		chatNotificationsFrame = nextOrder()
+	end
+
+	v2.ChatNotificationsFrame = chatNotificationsFrame
+	v2.LanguageDivider = nextOrder()
+
+	v2.DisplayHeader = nextOrder()
+	v2.OverscanAdjustButton = nextOrder()
+	v2.FullScreenFrame = nextOrder()
+	local uiScaleEngineModeFrame
+
+	if FFlagUIScaleEngineOptions then
+		uiScaleEngineModeFrame = nextOrder()
+	end
+
+	v2.UIScaleEngineModeFrame = uiScaleEngineModeFrame
+	local uiScaleEngineFrame
+
+	if FFlagUIScaleEngineOptions then
+		uiScaleEngineFrame = nextOrder()
+	end
+
+	v2.UIScaleEngineFrame = uiScaleEngineFrame
+	v2.PreferredTransparencyFrame = nextOrder()
+	v2.PreferredTextSizeFrame = nextOrder()
+	local uiScaleModeFrame
+
+	if engineFeature2 then
+		uiScaleModeFrame = nextOrder()
+	end
+
+	v2.UIScaleModeFrame = uiScaleModeFrame
+	local uiScaleFrame
+
+	if engineFeature2 then
+		uiScaleFrame = nextOrder()
+	end
+
+	v2.UIScaleFrame = uiScaleFrame
+	local vrComfortSettingFrame
+
+	if isInExperienceUIVREnabled then
+		vrComfortSettingFrame = nextOrder()
+	end
+
+	v2.VRComfortSettingFrame = vrComfortSettingFrame
+	local vrVignetteEnabledFrame
+
+	if isInExperienceUIVREnabled then
+		vrVignetteEnabledFrame = nextOrder()
+	end
+
+	v2.VRVignetteEnabledFrame = vrVignetteEnabledFrame
+	local vrSteppedRotationEnabledFrame
+
+	if isInExperienceUIVREnabled then
+		vrSteppedRotationEnabledFrame = nextOrder()
+	end
+
+	v2.VRSteppedRotationEnabledFrame = vrSteppedRotationEnabledFrame
+	local vrThirdPersonFixedCamEnabledFrame
+
+	if isInExperienceUIVREnabled then
+		vrThirdPersonFixedCamEnabledFrame = nextOrder()
+	end
+
+	v2.VRThirdPersonFixedCamEnabledFrame = vrThirdPersonFixedCamEnabledFrame
+	local vrSafetyBubbleModeFrame
+
+	if isInExperienceUIVREnabled then
+		vrSafetyBubbleModeFrame = nextOrder()
+	end
+
+	v2.VRSafetyBubbleModeFrame = vrSafetyBubbleModeFrame
+	v2.PerformanceStatsFrame = nextOrder()
+	v2.MicroProfilerFrame = nextOrder()
+	v2.GraphicsEnablerFrame = nextOrder()
+	v2.GraphicsQualityFrame = nextOrder()
+	v2.HapticsFrame = nextOrder()
+	v2.ReducedMotionFrame = nextOrder()
+	v2.FramerateCap = nextOrder()
+	v2.VREnabledFrame = nextOrder()
+	v2.DisplayDivider = nextOrder()
+
+	v2.ViewAndControlsHeader = nextOrder()
+	v2.CameraModeFrame = nextOrder()
+	v2.CameraInvertedFrame = nextOrder()
+	v2.CameraSensitivityFrame = nextOrder()
+	v2.MouseAdvancedFrame = nextOrder()
+	v2.GamepadSensitivityFrame = nextOrder()
+	v2.MovementModeFrame = nextOrder()
+	v2.ShiftLockFrame = nextOrder()
+	v2.CameraDeviceFrame = nextOrder()
+	v2.UiNavigationKeyBindEnabledFrame = nextOrder()
+	v2.DeveloperConsoleButton = nextOrder()
+	local playerNamesEnabledFrame
+
+	if GetFFlagEnablePlayerNamesEnabledSetting() then
+		playerNamesEnabledFrame = nextOrder()
+	end
+
+	v2.PlayerNamesEnabledFrame = playerNamesEnabledFrame
+	local badgeVisibilityFrame
+
+	if FFlagBadgeVisibilitySettingEnabled then
+		badgeVisibilityFrame = nextOrder()
+	end
+
+	v2.BadgeVisibilityFrame = badgeVisibilityFrame
+
+	v2.UiToggleRow = nextOrder()
+	v2.UiToggleRowCustom = nextOrder()
+	v2.UiToggleRowBillboards = nextOrder()
+	v2.UiToggleRowNameplates = nextOrder()
+	v2.FreecamToggleRow = nextOrder()
+	v2.InformationFrame = nextOrder()
+
+	if FFlagUIScaleEngineOptions then
+		local preferredTransparencyFrame = v2.PreferredTransparencyFrame
+		local preferredTextSizeFrame = v2.PreferredTextSizeFrame
+		v2.PreferredTextSizeFrame = preferredTransparencyFrame
+		v2.PreferredTransparencyFrame = preferredTextSizeFrame
+	end
+else
+	v2 = nil
 end
 
-return {
-	SETTINGS_MENU_LAYOUT_ORDER = if not FFlagIEMSettingsGroups then t1 else t2
-}
+local function getLayoutOrder() -- 1 equivalent call inferred from this helper
+	return if FFlagIEMSettingsGroups then v2 else v
+end
+
+return { SETTINGS_MENU_LAYOUT_ORDER = getLayoutOrder() } -- inferred equivalent call

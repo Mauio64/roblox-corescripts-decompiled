@@ -3,13 +3,13 @@ local CrossExperience = script:FindFirstAncestor("CrossExperience")
 require(CrossExperience.Types)
 
 local Logger = require(CrossExperience.Logger)
-local t1 = {}
 
-t1.__index = t1
+local EventQueue = {}
+EventQueue.__index = EventQueue
 
-local function getFirstKeyInTable(p1) -- line: 40
-	if p1 then
-		for k, _ in pairs(p1) do
+local function getFirstKeyInTable(items)
+	if items then
+		for k, _ in pairs(items) do
 			return k
 		end
 	end
@@ -17,108 +17,98 @@ local function getFirstKeyInTable(p1) -- line: 40
 	return nil
 end
 
-function t1.new(b1: boolean) -- line: 51
-	-- upvalues: t1 (copy)
-	local t2 = {
-		queues = {},
-		requiresEventsInOrder = b1
-	}
+function EventQueue.new(requiresEventsInOrder: boolean)
+	local v = { queues = {}, requiresEventsInOrder = requiresEventsInOrder }
 
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v, EventQueue)
+	return v
 end
-function t1.processNextEvent(t3: {[any]: any}, s1: string, t4: {[any]: any}?) -- line: 60
-	-- upvalues: Logger (copy)
-	local v13 = t3.queues[s1]
 
-	if not v13 then
-		Logger:error("EventQueue: queue not found for origin {} abort processing", s1)
+function EventQueue:processNextEvent(p: string, p2)
+	local queue = self.queues[p]
 
+	if not queue then
+		Logger:error("EventQueue: queue not found for origin {} abort processing", p)
 		return
 	end
 
-	if v13.nextSequenceNumber == nil then
-		local events = v13.events
-		local v15 = nil
+	if queue.nextSequenceNumber == nil then
+		local events = queue.events
+		local nextSequenceNumber = nil
 
 		if events then
 			for k, _ in pairs(events) do
-				v15 = k
-
+				nextSequenceNumber = k
 				break
 			end
 		end
 
-		if v15 ~= nil then
-			Logger:info("EventQueue: sequence for {} at {}", s1, v15)
-			v13.nextSequenceNumber = v15
+		if nextSequenceNumber ~= nil then
+			Logger:info("EventQueue: sequence for {} at {}", p, nextSequenceNumber)
+			queue.nextSequenceNumber = nextSequenceNumber
 		end
 	end
 
-	local v18 = v13.events[v13.nextSequenceNumber]
+	local event = queue.events[queue.nextSequenceNumber]
 
-	if v18 then
-		Logger:info("EventQueue: processing event {} seq {}", v18.event.NOTIFY, v18.params._seq)
+	if event then
+		Logger:info("EventQueue: processing event {} seq {}", event.event.NOTIFY, event.params._seq)
 
-		if not t4 then
-			Logger:info("EventQueue: event originally delayed {} seq {} ", v18.event.NOTIFY, v18.params._seq)
+		if not p2 then
+			Logger:info("EventQueue: event originally delayed {} seq {} ", event.event.NOTIFY, event.params._seq)
 		end
 
-		v18.callback(v18.params)
-		v13.events[v13.nextSequenceNumber] = nil
-		v13.nextSequenceNumber = v13.nextSequenceNumber + 1
-		t3:processNextEvent(s1)
+		event.callback(event.params)
+		queue.events[queue.nextSequenceNumber] = nil
+		queue.nextSequenceNumber += 1
+		self:processNextEvent(p)
+	elseif p2 then
+		Logger:info(
+			"EventQueue: delaying processing event {} seq {} expecting {}",
+			p2.event.NOTIFY,
+			p2.params._seq,
+			queue.nextSequenceNumber
+		)
+	end
+end
 
+function EventQueue:reset()
+	self.queues = {}
+end
+
+function EventQueue:process(event, params, callback)
+	if not params then
+		Logger:error("EventQueue: invalid event {} params missing", event.NOTIFY)
 		return
 	end
 
-	if t4 then
-		Logger:info("EventQueue: delaying processing event {} seq {} expecting {}", t4.event.NOTIFY, t4.params._seq, v13.nextSequenceNumber)
-	end
-end
-function t1.reset(p2) -- line: 98
-	p2.queues = {}
-end
-function t1.process(t5: {[any]: any}, p3, p4, p5: ((...any) -> ...any)?) -- line: 102
-	-- upvalues: Logger (copy)
-	if not p4 then
-		Logger:error("EventQueue: invalid event {} params missing", p3.NOTIFY)
+	local origin = params._origin
+	local seq = params._seq
 
-		return
-	end
-
-	local _origin = p4._origin
-	local _seq = p4._seq
-
-	if not _origin or not _seq or not t5.requiresEventsInOrder then
-		Logger:info("EventQueue: event {} processing immediately", p3.NOTIFY)
-
-		if p5 then
-			p5(p4)
+	if origin and seq and self.requiresEventsInOrder then
+		if not self.queues[origin] then
+			Logger:info("EventQueue: initiating queue {}", origin)
+			self.queues[origin] = { nextSequenceNumber = nil, events = {} }
 		end
 
-		return
+		Logger:info(
+			"EventQueue: new event {} seq {} current seq {}",
+			event.NOTIFY,
+			seq,
+			self.queues[origin].nextSequenceNumber
+		)
+
+		local v = { event = event, params = params, callback = callback }
+
+		self.queues[origin].events[seq] = v
+		self:processNextEvent(origin, v)
+	else
+		Logger:info("EventQueue: event {} processing immediately", event.NOTIFY)
+
+		if callback then
+			callback(params)
+		end
 	end
-
-	if not t5.queues[_origin] then
-		Logger:info("EventQueue: initiating queue {}", _origin)
-		t5.queues[_origin] = {
-			nextSequenceNumber = nil,
-			events = {}
-		}
-	end
-
-	Logger:info("EventQueue: new event {} seq {} current seq {}", p3.NOTIFY, _seq, t5.queues[_origin].nextSequenceNumber)
-
-	local t6 = {
-		event = p3,
-		params = p4,
-		callback = p5
-	}
-
-	t5.queues[_origin].events[_seq] = t6
-	t5:processNextEvent(_origin, t6)
 end
 
-return t1
+return EventQueue

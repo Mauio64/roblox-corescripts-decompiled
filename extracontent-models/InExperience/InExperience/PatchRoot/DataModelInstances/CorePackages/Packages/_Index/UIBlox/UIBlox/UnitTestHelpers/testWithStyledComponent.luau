@@ -1,38 +1,39 @@
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local Roact = require(scriptParentParentParent.Roact)
-local dumpInstanceTree = require(scriptParent.dumpInstanceTree)
-local mockStyleComponent = require(scriptParentParent.Utility.mockStyleComponent)
 
-local function testWithStyledComponent(p1, p2, p3) -- line: 33
-	-- upvalues: Roact (copy), mockStyleComponent (copy), HttpService (copy), CoreGui (copy), dumpInstanceTree (copy)
-	local v13 = Roact.createElement("ScreenGui", {
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+local dumpInstanceTree = require(parent.dumpInstanceTree)
+
+local mockStyleComponent = require(parent2.Utility.mockStyleComponent)
+
+local function testWithStyledComponent(p, p2, callback)
+	local element = Roact.createElement("ScreenGui", {
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	}, {
-		StyleProvider = mockStyleComponent({
-			TestComponent = Roact.createElement(p1, p2)
-		})
+		StyleProvider = mockStyleComponent({ TestComponent = Roact.createElement(p, p2) })
 	})
-	local v14 = ("TestApp-%s"):format(HttpService:GenerateGUID())
-	local v15 = Roact.mount(v13, CoreGui, v14)
-	local v16 = ("game.CoreGui.%s.Children.TestComponent"):format(v14)
-	local ok, result = pcall(function() -- line: 46
-		-- upvalues: p3 (copy), v16 (copy)
-		p3(v16)
+
+	local formatted = ("TestApp-%s"):format(HttpService:GenerateGUID())
+	local v = Roact.mount(element, CoreGui, formatted)
+	local formatted2 = ("game.CoreGui.%s.Children.TestComponent"):format(formatted)
+
+	local success, result = pcall(function()
+		callback(formatted2)
 	end)
 
-	if not ok then
+	if not success then
 		print("Test instance tree:")
-		dumpInstanceTree(CoreGui:FindFirstChild(v14))
+		dumpInstanceTree(CoreGui:FindFirstChild(formatted))
 		print("Test instance tree end\n")
 	end
 
-	Roact.unmount(v15)
+	Roact.unmount(v)
 
-	if not ok then
+	if not success then
 		error(result)
 	end
 end

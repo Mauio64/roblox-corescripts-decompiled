@@ -1,14 +1,11 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function createBuildPillMenuPortalStore() -- line: 11
-	-- upvalues: Signals (copy)
-	local v4, v5 = Signals.createSignal(nil)
+local Signals = require(parent.Signals)
 
-	return {
-		getPortalTarget = v4,
-		setPortalTarget = v5
-	}
+local function createBuildPillMenuPortalStore()
+	local signal, setPortalTarget = Signals.createSignal(nil)
+
+	return { getPortalTarget = signal, setPortalTarget = setPortalTarget }
 end
 
 return createBuildPillMenuPortalStore

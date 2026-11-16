@@ -1,117 +1,98 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
-local Foundation = require(Parent.Foundation)
-local SduiCoreSystem = require(Parent.SduiCoreSystem)
-local calculateItemWidth = require(Parent.CollectionViews).calculateItemWidth
-local AppPage = require(Parent.RobloxAppEnums).AppPage
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local Foundation = require(parent.Foundation)
+local SduiCoreSystem = require(parent.SduiCoreSystem)
+local CollectionViews = require(parent.CollectionViews)
+local calculateItemWidth = CollectionViews.calculateItemWidth
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 local useTokens = Foundation.Hooks.useTokens
+
 local getSduiServiceDependenciesStore = SduiCoreSystem.getSduiServiceDependenciesStore
 
-local function computePeekFraction(n1: number, n2: number, n3: number, n4: number, n5: number) -- line: 24
-	local v17 = n5 - n4
+local function computePeekFraction(p: number, p2: number, p3: number, p4: number, p5: number)
+	local v = p5 - p4
 
-	if v17 <= 0 then
+	if v <= 0 then
 		return 0
 	end
 
-	local v18 = n1 - n2 - (n3 - 1) * n4 - n5
+	local v2 = p - p2 - (p3 - 1) * p4 - p5
 
-	if v18 <= 0 then
+	if v2 <= 0 then
 		return 0
 	end
 
-	return (math.clamp(n3 * v17 / v18, 0, 0.5))
+	return (math.clamp(p3 * v / v2, 0, 0.5))
 end
-local function useProfileCompletionSduiContext(t1: {[any]: any}) -- line: 50
-	-- upvalues: useTokens (copy), React (copy), calculateItemWidth (copy), Signals (copy), AppPage (copy), getSduiServiceDependenciesStore (copy)
-	local v20 = useTokens()
-	local Medium = v20.Gap.Medium
-	local Size_1500 = v20.Size.Size_1500
-	local v23 = React.useMemo(function() -- line: 55
-		-- upvalues: t1 (copy), Medium (copy), Size_1500 (copy)
-		local containerWidth = t1.containerWidth
-		local sideMargin = t1.sideMargin
-		local v31 = Medium
-		local v32 = Size_1500
-		local v33 = v32 - v31
 
-		if v33 <= 0 then
+local function useProfileCompletionSduiContext(p)
+	local v = useTokens()
+	local medium = v.Gap.Medium
+	local size_1500 = v.Size.Size_1500
+
+	local fractionalItemAmount = React.useMemo(function()
+		local containerWidth = p.containerWidth
+		local sideMargin = p.sideMargin
+		local v2 = medium
+		local v3 = size_1500
+		local v4 = v3 - v2
+
+		if v4 <= 0 then
 			return 0
 		end
 
-		local v34 = containerWidth - sideMargin - v31 * 0 - v32
+		local v5 = containerWidth - sideMargin - v2 * 0 - v3
 
-		if v34 <= 0 then
+		if v5 <= 0 then
 			return 0
 		end
 
-		return (math.clamp(v33 * 1 / v34, 0, 0.5))
-	end, {
-		t1.containerWidth,
-		t1.sideMargin,
-		Medium,
-		Size_1500
-	})
-	local v24 = React.useMemo(function() -- line: 59
-		-- upvalues: calculateItemWidth (copy), Medium (copy), t1 (copy), v23 (copy)
-		return calculateItemWidth(1, Medium, t1.sideMargin, t1.containerWidth, v23)
-	end, {
-		Medium,
-		t1.sideMargin,
-		t1.containerWidth,
-		v23
-	})
-	local v25, v26 = React.useMemo(function() -- line: 63
-		-- upvalues: Signals (copy), v23 (copy), Medium (copy), t1 (copy), v24 (copy)
+		return (math.clamp(v4 * 1 / v5, 0, 0.5))
+	end, { p.containerWidth, p.sideMargin, medium, size_1500 })
+
+	local itemWidth = React.useMemo(function()
+		return calculateItemWidth(1, medium, p.sideMargin, p.containerWidth, fractionalItemAmount)
+	end, { medium, p.sideMargin, p.containerWidth, fractionalItemAmount })
+
+	local v2, v3 = React.useMemo(function()
 		return Signals.createSignal({
 			numColumns = 1,
+			fractionalItemAmount = fractionalItemAmount,
+			columnGap = medium,
+			sideMargin = p.sideMargin,
 			verticalPadding = 0,
-			fractionalItemAmount = v23,
-			columnGap = Medium,
-			sideMargin = t1.sideMargin,
-			itemWidth = v24
+			itemWidth = itemWidth
 		})
 	end, {})
 
-	React.useEffect(function() -- line: 74
-		-- upvalues: v26 (copy), v23 (copy), Medium (copy), t1 (copy), v24 (copy)
-		v26({
+	React.useEffect(function()
+		v3({
 			numColumns = 1,
+			fractionalItemAmount = fractionalItemAmount,
+			columnGap = medium,
+			sideMargin = p.sideMargin,
 			verticalPadding = 0,
-			fractionalItemAmount = v23,
-			columnGap = Medium,
-			sideMargin = t1.sideMargin,
-			itemWidth = v24
+			itemWidth = itemWidth
 		})
-	end, {
-		v23,
-		Medium,
-		t1.sideMargin,
-		v24,
-		v26
-	})
+	end, { fractionalItemAmount, medium, p.sideMargin, itemWidth, v3 })
 
-	local v27 = React.useCallback(function(_) -- line: 85
-		-- upvalues: Signals (copy), v25 (copy)
-		return Signals.createComputed(function(p2) -- line: 86
-			-- upvalues: v25 (copy)
-			return v25(p2)
+	local getPageLayoutConfig = React.useCallback(function(_)
+		return Signals.createComputed(function(p2)
+			return v2(p2)
 		end)
-	end, { v25 })
-	local ProfilePlatform = AppPage.ProfilePlatform
+	end, { v2 })
 
-	return (React.useMemo(function() -- line: 92
-		-- upvalues: getSduiServiceDependenciesStore (copy), ProfilePlatform (copy), v27 (copy)
+	local profilePlatform = AppPage.ProfilePlatform
+	return (React.useMemo(function()
 		return {
-			dependencies = getSduiServiceDependenciesStore().getDependencies(ProfilePlatform),
-			appPage = ProfilePlatform,
-			getPageLayoutConfig = v27
+			dependencies = getSduiServiceDependenciesStore().getDependencies(profilePlatform),
+			appPage = profilePlatform,
+			getPageLayoutConfig = getPageLayoutConfig
 		}
-	end, {
-		ProfilePlatform,
-		v27
-	}))
+	end, { profilePlatform, getPageLayoutConfig }))
 end
 
 return useProfileCompletionSduiContext

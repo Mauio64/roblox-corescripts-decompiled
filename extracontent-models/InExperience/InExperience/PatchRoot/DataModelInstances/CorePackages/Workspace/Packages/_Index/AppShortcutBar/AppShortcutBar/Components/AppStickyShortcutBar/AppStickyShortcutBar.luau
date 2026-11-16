@@ -1,131 +1,240 @@
 local AppShortcutBar = script:FindFirstAncestor("AppShortcutBar")
-local AppShortcutBarParent = AppShortcutBar.Parent
-local React = require(AppShortcutBarParent.React)
-local Foundation = require(AppShortcutBarParent.Foundation)
-local FocusNavigationUtils = require(AppShortcutBarParent.FocusNavigationUtils)
-local Responsive = require(AppShortcutBarParent.Responsive)
+local parent = AppShortcutBar.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Responsive = require(parent.Responsive)
+local Display = require(parent.Display)
+
 local useTokens = Foundation.Hooks.useTokens
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local useFocusedTextBox = FocusNavigationUtils.useFocusedTextBox
-local useSelector = require(AppShortcutBarParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useSignalState = require(AppShortcutBarParent.SignalsReact).useSignalState
-local LoginStatus = require(AppShortcutBarParent.RobloxAppEnums).LoginStatus
-local v13 = game:DefineFastFlag("DisallowStickyShortcutBarOnNotLoggedIn", false)
-local FFlagUseSignalsForAuthenticationStatus = require(AppShortcutBarParent.SharedFlags).FFlagUseSignalsForAuthenticationStatus
-local v15 = if not FFlagUseSignalsForAuthenticationStatus then nil else require(AppShortcutBarParent.AuthenticationStatus).GetAuthenticationStatusStore
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local LoginStatus = RobloxAppEnums.LoginStatus
+local defineFastFlag = game:DefineFastFlag("DisallowStickyShortcutBarOnNotLoggedIn", false)
 
-local function selectUserLoggedIn(p1) -- line: 24
-	-- upvalues: LoginStatus (copy)
-	return p1.AuthenticationStatus and p1.AuthenticationStatus.status == LoginStatus.LOGGED_IN
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUseSignalsForAuthenticationStatus = SharedFlags.FFlagUseSignalsForAuthenticationStatus
+local FFlagEnableStickyShortcutBarOnAllPlatforms = SharedFlags.FFlagEnableStickyShortcutBarOnAllPlatforms
+local FFlagUnifyShortcutBarUnifiedIXPExposure = SharedFlags.FFlagUnifyShortcutBarUnifiedIXPExposure
+
+local Flags = require(AppShortcutBar.Flags)
+local FFlagEnableStickyShortcutBarOnAllPlatformsIxpEnabled = Flags.FFlagEnableStickyShortcutBarOnAllPlatformsIxpEnabled
+local getAuthenticationStatusStore
+
+if FFlagUseSignalsForAuthenticationStatus then
+	local AuthenticationStatus = require(parent.AuthenticationStatus)
+	getAuthenticationStatusStore = AuthenticationStatus.GetAuthenticationStatusStore
+else
+	getAuthenticationStatusStore = nil
 end
 
-local useAppShortcutBarHeight = require(AppShortcutBar.Hooks).useAppShortcutBarHeight
+local function selectUserLoggedIn(p)
+	return p.AuthenticationStatus and p.AuthenticationStatus.status == LoginStatus.LOGGED_IN
+end
+
+local Hooks = require(AppShortcutBar.Hooks)
+local useAppShortcutBarHeight = Hooks.useAppShortcutBarHeight
+local Hooks2 = require(AppShortcutBar.Hooks)
+local useIsStickyShortcutBarEnabled = Hooks2.useIsStickyShortcutBarEnabled
 local GetShortcutBarStatusStore = require(AppShortcutBar.Stores.GetShortcutBarStatusStore)
-local AppShortcut = require(AppShortcutBar.Components.AppShortcut).AppShortcut
+local AppShortcut = require(AppShortcutBar.Components.AppShortcut)
+local appShortcut = AppShortcut.AppShortcut
+local useStickyShortcutBarExposureLogging = require(AppShortcutBar.Hooks.useStickyShortcutBarExposureLogging)
 
-function AppStickyShortcutBar(p2) -- line: 34
-	-- upvalues: GetShortcutBarStatusStore (copy), useTokens (copy), useAppShortcutBarHeight (copy), Responsive (copy), useFocusedTextBox (copy), v13 (copy), FFlagUseSignalsForAuthenticationStatus (copy), useSignalState (copy), v15 (copy), LoginStatus (copy), useSelector (copy), selectUserLoggedIn (copy), FocusNavigationEventNameEnum (copy), React (copy), AppShortcut (copy)
-	local v22 = GetShortcutBarStatusStore(false)
-	local v23 = useTokens()
-	local v24 = useAppShortcutBarHeight()
-	local v25 = Responsive.usePreferredInput() == Responsive.Input.Directional
-	local v26 = useFocusedTextBox()
-	local v27 = nil
+function AppStickyShortcutBar(props)
+	local shortcutBarStatusStore = GetShortcutBarStatusStore(false)
+	local v = useTokens()
+	local v2 = useAppShortcutBarHeight()
+	local v3 = Responsive.usePreferredInput() == Responsive.Input.Directional
+	local v4 = useFocusedTextBox()
+	local v5
 
-	if v13 then
-		v27 = if not FFlagUseSignalsForAuthenticationStatus then useSelector(selectUserLoggedIn) else useSignalState(v15(false).getStatus) == LoginStatus.LOGGED_IN
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		v5 = useIsStickyShortcutBarEnabled(props.currentPage)
 	end
 
-	local v28 = not p2.items or (#p2.items == 0 or (#p2.items == 1 and p2.items[1].eventName == FocusNavigationEventNameEnum.NavigateBack or (v26 or v13 and not v27)))
+	local v6
 
-	React.useEffect(function() -- line: 56
-		-- upvalues: v22 (copy), v28 (copy)
-		v22.setShortcutBarVisible(not v28)
-	end, { v28 })
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		v6 = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
+	end
 
-	if v28 then
+	local v7 = FFlagEnableStickyShortcutBarOnAllPlatforms
+		and {
+			left = math.ceil(v6.left),
+			top = math.ceil(v6.top),
+			right = math.ceil(v6.right),
+			bottom = math.ceil(v6.bottom)
+		}
+		or v6
+	local v8
+
+	if defineFastFlag then
+		if FFlagUseSignalsForAuthenticationStatus then
+			v8 = useSignalState(getAuthenticationStatusStore(false).getStatus) == LoginStatus.LOGGED_IN
+		else
+			v8 = useSelector(selectUserLoggedIn)
+		end
+	end
+
+	local v9 = not props.items
+		or #props.items == 0
+		or #props.items == 1 and props.items[1].eventName == FocusNavigationEventNameEnum.NavigateBack
+		or v4
+		or defineFastFlag and not v8
+
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		v9 = not v5
+	end
+
+	React.useEffect(function()
+		shortcutBarStatusStore.setShortcutBarVisible(not v9)
+	end, { v9 })
+
+	if FFlagEnableStickyShortcutBarOnAllPlatformsIxpEnabled and not FFlagUnifyShortcutBarUnifiedIXPExposure then
+		useStickyShortcutBarExposureLogging(not v9)
+	end
+
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		local v10 = math.max(v2 - v7.bottom, 0)
+
+		React.useEffect(function()
+			shortcutBarStatusStore.setShortcutBarReservedHeight(v9 and 0 or v10)
+		end, { v9, v10, shortcutBarStatusStore.setShortcutBarReservedHeight })
+
+		React.useEffect(function()
+			return function()
+				shortcutBarStatusStore.setShortcutBarReservedHeight(0)
+			end
+		end, { shortcutBarStatusStore.setShortcutBarReservedHeight })
+	end
+
+	if v9 then
 		return nil
 	end
 
-	local v29 = nil
-	local t1 = {
+	local backShortcut = nil
+	local children = {
 		UIListLayout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v23.Gap.Large)
+			Padding = UDim.new(0, v.Gap.Large)
 		})
 	}
-	local v31 = if not v25 then #p2.items else math.min(#p2.items, 4)
-	local n1 = 0
+	local items
 
-	for _, v34 in p2.items do
-		if n1 < v31 and v34.eventName ~= FocusNavigationEventNameEnum.NavigateBack then
-			n1 += 1
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		items = props.items or {}
+	else
+		items = props.items
+	end
 
-			local v35 = if not v25 then n1 else v31 - n1 + 1
+	local v10
 
-			t1["Item_" .. tostring(v35)] = React.createElement(AppShortcut, {
-				layoutOrder = v35,
-				item = v34
+	if v3 then
+		v10 = math.min(#items, 4)
+	else
+		v10 = #items
+	end
+
+	local count = 0
+
+	for _, item in items do
+		if count < v10 and item.eventName ~= FocusNavigationEventNameEnum.NavigateBack then
+			count += 1
+			local layoutOrder
+
+			if v3 then
+				layoutOrder = v10 - count + 1
+			else
+				layoutOrder = count
+			end
+
+			children["Item_" .. tostring(layoutOrder)] = React.createElement(appShortcut, {
+				layoutOrder = layoutOrder,
+				item = item
 			})
 		end
 
-		if v34.eventName == FocusNavigationEventNameEnum.NavigateBack then
-			v29 = React.createElement(AppShortcut, {
-				item = v34
-			})
+		if item.eventName == FocusNavigationEventNameEnum.NavigateBack then
+			backShortcut = React.createElement(appShortcut, { item = item })
 		end
 	end
 
+	local v11 = FFlagEnableStickyShortcutBarOnAllPlatforms and not props.isLeftNavVisible
+	local udim
+
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		udim = UDim2.new(1, v7.right + (not v11 and 0 or v7.left), 0, v2)
+	else
+		udim = UDim2.new(1, 0, 0, v2)
+	end
+
+	local position
+
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		position = UDim2.new(0, not v11 and 0 or -v7.left, 1, v7.bottom)
+	else
+		position = UDim2.fromScale(0, 1)
+	end
+
 	return React.createElement("ImageButton", {
+		BackgroundColor3 = v.Color.Surface.Surface_0.Color3,
+		BackgroundTransparency = v.Color.Surface.Surface_0.Transparency,
 		BorderSizePixel = 0,
-		Selectable = false,
-		AutoButtonColor = false,
-		BackgroundColor3 = v23.Color.Surface.Surface_0.Color3,
-		BackgroundTransparency = v23.Color.Surface.Surface_0.Transparency,
-		Size = UDim2.new(1, 0, 0, v24),
+		Size = udim,
 		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.fromScale(0, 1)
+		Position = position,
+		Selectable = false,
+		AutoButtonColor = false
 	}, {
 		Divider = React.createElement("Frame", {
+			BackgroundColor3 = v.Color.Stroke.Default.Color3,
+			BackgroundTransparency = v.Color.Stroke.Default.Transparency,
 			BorderSizePixel = 0,
-			BackgroundColor3 = v23.Color.Stroke.Default.Color3,
-			BackgroundTransparency = v23.Color.Stroke.Default.Transparency,
 			Size = UDim2.new(1, 0, 0, 1)
 		}),
-		ShortcutsFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1),
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.fromScale(0.5, 0)
-		}, {
-			UISizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(v23.Size.Size_3000 * 16, v24)
-			}),
-			Padding = React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v23.Size.Size_800),
-				PaddingTop = UDim.new(0, v23.Padding.XSmall),
-				PaddingRight = UDim.new(0, v23.Size.Size_800),
-				PaddingBottom = UDim.new(0, v23.Padding.XSmall)
-			}),
-			BackShortcutFrame = React.createElement("Frame", {
+		ShortcutsFrame = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(0, 1),
-				AnchorPoint = Vector2.new(0, 0.5),
-				Position = UDim2.fromScale(0, 0.5),
-				AutomaticSize = Enum.AutomaticSize.XY
-			}, {
-				BackShortcut = v29
-			}),
-			RightShortcutsFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(0, 1),
-				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.fromScale(1, 0.5),
-				AutomaticSize = Enum.AutomaticSize.X
-			}, t1)
-		})
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.fromScale(0.5, 0)
+			},
+			{
+				UISizeConstraint = React.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(v.Size.Size_3000 * 16, v2)
+				}),
+				Padding = React.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, v.Size.Size_800),
+					PaddingTop = UDim.new(0, v.Padding.XSmall),
+					PaddingRight = UDim.new(0, v.Size.Size_800),
+					PaddingBottom = UDim.new(0, v.Padding.XSmall)
+				}),
+				BackShortcutFrame = React.createElement("Frame", {
+					Size = UDim2.fromScale(0, 1),
+					AnchorPoint = Vector2.new(0, 0.5),
+					Position = UDim2.fromScale(0, 0.5),
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.XY
+				}, { BackShortcut = backShortcut }),
+				RightShortcutsFrame = React.createElement("Frame", {
+					Size = UDim2.fromScale(0, 1),
+					AnchorPoint = Vector2.new(1, 0.5),
+					Position = UDim2.fromScale(1, 0.5),
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.X
+				}, children)
+			}
+		)
 	})
 end
 

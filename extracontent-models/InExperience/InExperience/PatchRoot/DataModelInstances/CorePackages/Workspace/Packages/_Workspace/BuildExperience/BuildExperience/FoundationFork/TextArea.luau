@@ -1,1 +1,3 @@
-return (require(script.ChatTextArea))
+local ChatTextArea = require(script.ChatTextArea)
+
+return ChatTextArea

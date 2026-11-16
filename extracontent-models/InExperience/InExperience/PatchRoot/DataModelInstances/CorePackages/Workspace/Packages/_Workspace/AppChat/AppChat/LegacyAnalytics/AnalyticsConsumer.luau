@@ -1,3 +1,4 @@
 local AppChat = script:FindFirstAncestor("AppChat")
+local AnalyticsContext = require(AppChat.LegacyAnalytics.AnalyticsContext)
 
-return require(AppChat.LegacyAnalytics.AnalyticsContext).Consumer
+return AnalyticsContext.Consumer

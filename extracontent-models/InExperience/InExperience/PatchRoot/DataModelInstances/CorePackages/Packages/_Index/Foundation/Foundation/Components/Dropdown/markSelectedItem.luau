@@ -2,39 +2,31 @@ local Foundation = script:FindFirstAncestor("Foundation")
 
 require(Foundation.Components.BaseMenu)
 require(Foundation.Components.Types)
-
-local function markSelectedItem(p1, p2) -- line: 10
-	-- upvalues: markSelectedItem (copy)
-	if p2 == nil then
-		return p1, nil
+local function markSelectedItem(items, p)
+	if p == nil then
+		return items, nil
 	end
 
-	local t1 = {}
-	local v6 = nil
+	local result = {}
+	local v = nil
 
-	for _, v8 in p1 do
-		if v8.id then
-			local v9 = v8
-
-			if p2 == v8.id then
-				v9 = table.clone(v8)
-				v9.isChecked = true
-				v6 = v9
+	for _, clone in items do
+		if clone.id then
+			if clone.id == p then
+				clone = table.clone(clone)
+				clone.isChecked = true
+				v = clone
 			end
 
-			table.insert(t1, v9)
-		elseif v8.items then
-			local v10, v11 = markSelectedItem(v8.items, p2)
-
-			table.insert(t1, {
-				title = v8.title,
-				items = v10
-			})
-			v6 = v6 or v11
+			table.insert(result, clone)
+		elseif clone.items then
+			local items2, v2 = markSelectedItem(clone.items, p)
+			table.insert(result, { title = clone.title, items = items2 })
+			v = v or v2
 		end
 	end
 
-	return t1, v6
+	return result, v
 end
 
 return markSelectedItem

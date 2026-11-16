@@ -12,12 +12,8 @@ local LocalTextChannelParticipantRemoved = require(script.LocalTextChannelPartic
 local PlayerAdded = require(script.PlayerAdded)
 local PlayerRemoved = require(script.PlayerRemoved)
 local TargetTextChannelPropertyChanged = require(script.TargetTextChannelPropertyChanged)
+local TextChatChannelSelected = require(script.TextChatChannelSelected)
 local UniverseChatChannelSelected = require(script.UniverseChatChannelSelected)
-local TextChannelCreated = require(script.TextChannelCreated)
-local TextChannelRemoved = require(script.TextChannelRemoved)
-local UserMuted = require(script.UserMuted)
-local UserUnmuted = require(script.UserUnmuted)
-
 return {
 	CharacterAdded = CharacterAdded,
 	ChatInputBarActivatedTeamMode = ChatInputBarActivatedTeamMode,
@@ -33,9 +29,10 @@ return {
 	PlayerAdded = PlayerAdded,
 	PlayerRemoved = PlayerRemoved,
 	TargetTextChannelPropertyChanged = TargetTextChannelPropertyChanged,
-	TextChannelCreated = TextChannelCreated,
-	TextChannelRemoved = TextChannelRemoved,
+	TextChatChannelSelected = TextChatChannelSelected,
+	TextChannelCreated = require(script.TextChannelCreated),
+	TextChannelRemoved = require(script.TextChannelRemoved),
 	UniverseChatChannelSelected = UniverseChatChannelSelected,
-	UserMuted = UserMuted,
-	UserUnmuted = UserUnmuted
+	UserMuted = require(script.UserMuted),
+	UserUnmuted = require(script.UserUnmuted)
 }

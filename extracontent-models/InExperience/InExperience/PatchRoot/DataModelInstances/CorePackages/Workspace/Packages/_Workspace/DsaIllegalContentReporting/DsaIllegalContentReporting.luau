@@ -1,26 +1,15 @@
 local isSelectedDataDSAIllegalContent = require(script.Utility.isSelectedDataDSAIllegalContent)
-local isShowEUDSAIllegalContentReportingLink = require(script.Utility.isShowEUDSAIllegalContentReportingLink)
-local isInDSAFeaturesOverrideList = require(script.Utility.isInDSAFeaturesOverrideList)
-local DSAReportLink = require(script.Components.DSAReportLink)
-local Constants = require(script.Utility.Constants)
-local OSAReportLink = require(script.Components.OSAReportLink)
-local isShowUKOSAIllegalContentReportingLink = require(script.Utility.isShowUKOSAIllegalContentReportingLink)
-local GenericReportLink = require(script.Components.GenericReportLink)
-local isShowGenericIllegalContentReportingLink = require(script.Utility.isShowGenericIllegalContentReportingLink)
-local TakeItDownReportLink = require(script.Components.TakeItDownReportLink)
-local getTakeItDownReportLinkVisibility = require(script.Utility.getTakeItDownReportLinkVisibility)
-
 return {
-	isShowEUDSAIllegalContentReportingLink = isShowEUDSAIllegalContentReportingLink,
+	isShowEUDSAIllegalContentReportingLink = require(script.Utility.isShowEUDSAIllegalContentReportingLink),
 	isSelectedDataDSAIllegalContent = isSelectedDataDSAIllegalContent,
-	isInDSAFeaturesOverrideList = isInDSAFeaturesOverrideList,
-	DSAReportLink = DSAReportLink,
-	Constants = Constants,
-	OSAReportLink = OSAReportLink,
-	isShowUKOSAIllegalContentReportingLink = isShowUKOSAIllegalContentReportingLink,
-	GenericReportLink = GenericReportLink,
-	isShowGenericIllegalContentReportingLink = isShowGenericIllegalContentReportingLink,
-	TakeItDownReportLink = TakeItDownReportLink,
-	getTakeItDownReportLinkVisibility = getTakeItDownReportLinkVisibility,
+	isInDSAFeaturesOverrideList = require(script.Utility.isInDSAFeaturesOverrideList),
+	DSAReportLink = require(script.Components.DSAReportLink),
+	Constants = require(script.Utility.Constants),
+	OSAReportLink = require(script.Components.OSAReportLink),
+	isShowUKOSAIllegalContentReportingLink = require(script.Utility.isShowUKOSAIllegalContentReportingLink),
+	GenericReportLink = require(script.Components.GenericReportLink),
+	isShowGenericIllegalContentReportingLink = require(script.Utility.isShowGenericIllegalContentReportingLink),
+	TakeItDownReportLink = require(script.Components.TakeItDownReportLink),
+	getTakeItDownReportLinkVisibility = require(script.Utility.getTakeItDownReportLinkVisibility),
 	["jest.config"] = script["jest.config"]
 }

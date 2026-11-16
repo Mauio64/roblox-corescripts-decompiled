@@ -1,178 +1,181 @@
-local Parent = script:FindFirstAncestor("SessionizationUtil").Parent
-local Signal = require(Parent.AppCommonLib).Signal
-local t1 = {}
+local parent = script:FindFirstAncestor("SessionizationUtil").Parent
 
-t1.__index = t1
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
-function t1.new(s1: string, s2: string) -- line: 10
-	-- upvalues: t1 (copy)
-	local t2 = {
-		parent = nil,
-		sid = s1,
-		tag = s2,
+local v = {}
+v.__index = v
+
+function v.new(sid: string, tag: string)
+	local v2 = {
+		sid = sid,
+		tag = tag,
 		metadata = {},
 		children = {},
-		timestamp = tick()
+		timestamp = tick(),
+		parent = nil
 	}
 
-	setmetatable(t2, {
-		__index = t1
-	})
+	setmetatable(v2, { __index = v })
 
-	return t2
+	return v2
 end
-function t1.addChild(p1, p2, p3) -- line: 27
-	-- upvalues: t1 (copy)
-	local v11 = t1.new(p2, p3)
 
-	v11.parent = p1
-	p1.children[p2] = v11
+function v:addChild(p, p2)
+	local v2 = v.new(p, p2)
+	v2.parent = self
+	self.children[p] = v2
 end
-function t1.dump(p4, p5, p6) -- line: 34
-	local v15 = p6 .. `{ p5 } sid: { p4.sid }, tag: { p4.tag }\n`
-	local v16 = p5 .. "----"
 
-	for _, v18 in p4.children do
-		v15 = v18:dump(v16, v15)
+function v:dump(p, p2)
+	local v2 = p2 .. `{p} sid: {self.sid}, tag: {self.tag}\n`
+	local v3 = p .. "----"
+
+	for _, child in self.children do
+		v2 = child:dump(v3, v2)
 	end
 
-	return v15
+	return v2
 end
-function findSid(p7, p8) -- line: 44
-	if p8 == p7.sid then
-		return p7
+
+function findSid(p, p2)
+	if p.sid == p2 then
+		return p
 	end
 
-	for _, v22 in p7.children do
-		local v23 = findSid(v22, p8)
+	for _, child in p.children do
+		local sid = findSid(child, p2)
 
-		if v23 ~= nil then
-			return v23
+		if sid ~= nil then
+			return sid
 		end
 	end
 
 	return nil
 end
 
-local t3 = {
-	MOCK_ROOT_SID = "MOCK_ROOT_SID"
-}
+local MockSessionService = { MOCK_ROOT_SID = "MOCK_ROOT_SID" }
 
-t3.__index = t3
+MockSessionService.__index = MockSessionService
 
-function t3.new() -- line: 65
-	-- upvalues: t1 (copy), t3 (copy), Signal (copy)
-	local t4 = {
-		mockRootNode = t1.new(t3.MOCK_ROOT_SID, t3.MOCK_ROOT_SID),
+function MockSessionService.new()
+	local v2 = {
+		mockRootNode = v.new(MockSessionService.MOCK_ROOT_SID, MockSessionService.MOCK_ROOT_SID),
 		SessionChangedSignal = Signal.new()
 	}
 
-	setmetatable(t4, {
-		__index = t3
-	})
+	setmetatable(v2, { __index = MockSessionService })
 
-	return t4
+	return v2
 end
-function t3._resetMockData(p9) -- line: 78
-	-- upvalues: t1 (copy), t3 (copy)
-	p9.mockRootNode = t1.new(t3.MOCK_ROOT_SID, t3.MOCK_ROOT_SID)
+
+function MockSessionService:_resetMockData()
+	self.mockRootNode = v.new(MockSessionService.MOCK_ROOT_SID, MockSessionService.MOCK_ROOT_SID)
 end
-function t3._findSid(p10, p11) -- line: 82
-	return findSid(p10.mockRootNode, p11)
+
+function MockSessionService._findSid(p, p2)
+	return findSid(p.mockRootNode, p2)
 end
-function t3._dumpSessionTree(p12) -- line: 86
-	if p12.mockRootNode ~= nil then
-		return p12.mockRootNode:dump("", "")
+
+function MockSessionService._dumpSessionTree(p)
+	if p.mockRootNode == nil then
+		return "Root node is nil!"
 	end
 
-	return "Root node is nil!"
+	return p.mockRootNode:dump("", "")
 end
-function t3.GetRootSID(p13) -- line: 94
-	return p13.MOCK_ROOT_SID
-end
-function t3.SetSession(p14, p15, p16, p17) -- line: 98
-	(findSid(p14.mockRootNode, p15) or p14.mockRootNode):addChild(p16, p17)
-end
-function t3.ReplaceSession(p18, p19, p20) -- line: 104
-	local v37 = findSid(p18.mockRootNode, p19)
 
-	if v37 ~= nil and v37.parent ~= nil then
-		v37.parent.children[p19] = nil
-		v37.parent:addChild(p19, p20)
+function MockSessionService.GetRootSID(p)
+	return p.MOCK_ROOT_SID
+end
+
+function MockSessionService.SetSession(p, p2, p3, p4)
+	(findSid(p.mockRootNode, p2) or p.mockRootNode):addChild(p3, p4)
+end
+
+function MockSessionService.ReplaceSession(p, p2, p3)
+	local sid = findSid(p.mockRootNode, p2)
+
+	if sid ~= nil and sid.parent ~= nil then
+		sid.parent.children[p2] = nil
+		sid.parent:addChild(p2, p3)
 	end
 end
-function t3.RemoveSession(p21, p22) -- line: 114
-	local v40 = findSid(p21.mockRootNode, p22)
 
-	if v40 ~= nil then
-		local parent = v40.parent
+function MockSessionService:RemoveSession(p)
+	local sid = findSid(self.mockRootNode, p)
 
-		if parent ~= nil then
-			parent.children[p22] = nil
+	if sid ~= nil then
+		local parent2 = sid.parent
+
+		if parent2 ~= nil then
+			parent2.children[p] = nil
 		end
 	end
 end
-function t3.GetMetadata(p23, p24, p25) -- line: 124
-	local v45 = findSid(p23.mockRootNode, p24)
 
-	if v45 ~= nil then
-		return v45.metadata[p25]
+function MockSessionService.GetMetadata(p, p2, p3)
+	local sid = findSid(p.mockRootNode, p2)
+
+	if sid == nil then
+		return nil
 	end
 
-	return nil
+	return sid.metadata[p3]
 end
-function t3.SetMetadata(p26, p27, p28, p29) -- line: 133
-	local v50 = findSid(p26.mockRootNode, p27)
 
-	if v50 ~= nil then
-		v50.metadata[p28] = p29
+function MockSessionService.SetMetadata(p, p2, p3, p4)
+	local sid = findSid(p.mockRootNode, p2)
+
+	if sid ~= nil then
+		sid.metadata[p3] = p4
 	end
 end
-function t3.SessionExists(p30, p31) -- line: 140
-	return findSid(p30.mockRootNode, p31) ~= nil
+
+function MockSessionService.SessionExists(p, p2): boolean
+	return findSid(p.mockRootNode, p2) ~= nil
 end
-function t3.RemoveSessionsWithMetadataKey(p32, p33) -- line: 145
-	if p33 == nil then
+
+function MockSessionService:RemoveSessionsWithMetadataKey(p)
+	if p == nil then
 		return
 	end
 
-	local function findNodeWithMetadataKey(p34, p35) -- line: 150
-		-- upvalues: findNodeWithMetadataKey (copy)
-		if p35 ~= nil then
-			if p35.metadata[p34] ~= nil then
-				return p35
-			end
+	local function findNodeWithMetadataKey(p2, mockRootNode)
+		if mockRootNode == nil then
+			return nil
+		end
 
-			for _, v68 in p35.children do
-				local v69 = findNodeWithMetadataKey(p34, v68)
+		if mockRootNode.metadata[p2] ~= nil then
+			return mockRootNode
+		end
 
-				if v69 ~= nil then
-					return v69
-				end
+		for _, child in mockRootNode.children do
+			local v2 = findNodeWithMetadataKey(p2, child)
+
+			if v2 ~= nil then
+				return v2
 			end
 		end
 
 		return nil
 	end
 
-	local v56 = findNodeWithMetadataKey(p33, p32.mockRootNode)
+	local v2 = findNodeWithMetadataKey(p, self.mockRootNode)
 
-	while v56 ~= nil do
-		p32:RemoveSession(v56.sid)
-		v56 = findNodeWithMetadataKey(p33, p32.mockRootNode)
+	while v2 ~= nil do
+		self:RemoveSession(v2.sid)
+		v2 = findNodeWithMetadataKey(p, self.mockRootNode)
 	end
 end
-function t3.generateSessionInfoString(_, _, _, _, _) -- line: 174
-	return ""
-end
-function t3.GetSessionTag(p41, p42) -- line: 183
-	local v64 = findSid(p41.mockRootNode, p42)
 
-	if v64 ~= nil then
-		return v64.tag
-	end
-
+function MockSessionService.generateSessionInfoString(_, _, _, _, _): string
 	return ""
 end
 
-return t3
+function MockSessionService.GetSessionTag(p, p2)
+	local sid = findSid(p.mockRootNode, p2)
+	return if sid == nil then "" else sid.tag
+end
+
+return MockSessionService

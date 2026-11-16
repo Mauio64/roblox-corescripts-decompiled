@@ -1,85 +1,85 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local UIBlox = require(ParentParentParent.UIBlox)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local Roact = require(parent2.Roact)
+
+local UIBlox = require(parent2.UIBlox)
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Images = UIBlox.App.ImageSet.Images
-local MultiTextLocalizer = require(ParentParent.Locale.MultiTextLocalizer)
-local v9 = Roact.Component:extend(script.Name)
 
-v9.defaultProps = {
+local MultiTextLocalizer = require(parent.Locale.MultiTextLocalizer)
+
+local extended = Roact.Component:extend(script.Name)
+
+extended.defaultProps = {
 	anchorPoint = Vector2.new(0.5, 0.5),
 	position = UDim2.new(0.5, 0, 0.5, 0)
 }
 
-function v9.render(p1) -- line: 35
-	-- upvalues: Roact (copy), MultiTextLocalizer (copy)
+function extended:render()
 	return Roact.createElement(MultiTextLocalizer, {
 		keys = {
-			title = {
-				key = "Authentication.TwoStepVerification.Title.VerificationRequired"
-			},
-			message = {
-				key = "Authentication.TwoStepVerification.Label.TwoStepRequired"
-			},
-			cancel = {
-				key = "Authentication.TwoStepVerification.Action.Cancel"
-			},
-			backToGame = {
-				key = "IAPExperience.PurchaseSuccess.Action.BackToGame"
-			},
-			gotoSecurity = {
-				key = "Authentication.TwoStepVerification.Action.GoToSecurity"
-			}
+			title = { key = "Authentication.TwoStepVerification.Title.VerificationRequired" },
+			message = { key = "Authentication.TwoStepVerification.Label.TwoStepRequired" },
+			cancel = { key = "Authentication.TwoStepVerification.Action.Cancel" },
+			backToGame = { key = "IAPExperience.PurchaseSuccess.Action.BackToGame" },
+			gotoSecurity = { key = "Authentication.TwoStepVerification.Action.GoToSecurity" }
 		},
-		render = function(t1: {[any]: any}) -- line: 54
-			-- upvalues: p1 (copy)
-			return p1:renderAlert(t1)
+		render = function(p)
+			return self:renderAlert(p)
 		end
 	})
 end
-function v9.renderAlert(t2: {[any]: any}, t3: {[any]: any}) -- line: 60
-	-- upvalues: ButtonType (copy), Roact (copy), InteractiveAlert (copy), Images (copy)
-	local props = t2.props
-	local v14 = if not props.openSecuritySettings then {
-		buttons = {{
-			buttonType = ButtonType.PrimarySystem,
-			props = {
-				onActivated = props.closePrompt,
-				text = t3.backToGame,
-				inputIcon = props.doneControllerIcon
-			}
-		}}
-	} else {
-		buttons = {
-			{
-				props = {
-					onActivated = props.closePrompt,
-					text = t3.cancel,
-					inputIcon = props.cancelControllerIcon
-				}
-			},
-			{
-				buttonType = ButtonType.PrimarySystem,
-				props = {
-					onActivated = props.openSecuritySettings,
-					text = t3.gotoSecurity,
-					inputIcon = props.doneControllerIcon
+
+function extended:renderAlert(props)
+	local props2 = self.props
+	local buttonStackInfo
+
+	if props2.openSecuritySettings then
+		buttonStackInfo = {
+			buttons = {
+				{
+					props = {
+						onActivated = props2.closePrompt,
+						text = props.cancel,
+						inputIcon = props2.cancelControllerIcon
+					}
+				},
+				{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = props2.openSecuritySettings,
+						text = props.gotoSecurity,
+						inputIcon = props2.doneControllerIcon
+					}
 				}
 			}
 		}
-	}
+	else
+		buttonStackInfo = {
+			buttons = {
+				{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = props2.closePrompt,
+						text = props.backToGame,
+						inputIcon = props2.doneControllerIcon
+					}
+				}
+			}
+		}
+	end
 
 	return Roact.createElement(InteractiveAlert, {
-		anchorPoint = props.anchorPoint,
-		position = props.position,
-		screenSize = props.screenSize,
-		title = t3.title,
+		anchorPoint = props2.anchorPoint,
+		position = props2.position,
+		screenSize = props2.screenSize,
+		title = props.title,
 		titleIcon = Images["icons/status/error_large"],
-		bodyText = t3.message,
-		buttonStackInfo = v14
+		bodyText = props.message,
+		buttonStackInfo = buttonStackInfo
 	})
 end
 
-return v9
+return extended

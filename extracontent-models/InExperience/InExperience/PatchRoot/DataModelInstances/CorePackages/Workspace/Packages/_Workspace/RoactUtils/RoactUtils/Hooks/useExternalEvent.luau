@@ -1,31 +1,26 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local GetFFlagMigrateRoactUtilsToReactUtils = require(Parent.SharedFlags).GetFFlagMigrateRoactUtilsToReactUtils
-local ReactUtils = require(Parent.ReactUtils)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagMigrateRoactUtilsToReactUtils = SharedFlags.GetFFlagMigrateRoactUtilsToReactUtils
+local ReactUtils = require(parent.ReactUtils)
 
 if GetFFlagMigrateRoactUtilsToReactUtils() then
 	return ReactUtils.useEventConnection
 end
 
-local React = require(Parent.React)
+local React = require(parent.React)
 
-local function useExternalEvent(p1, p2: ((...any) -> ...any)) -- line: 17
-	-- upvalues: React (copy)
-	React.useEffect(function() -- line: 18
-		-- upvalues: p1 (copy), p2 (copy)
-		if p1 == nil then
+local function useExternalEvent(object, callback)
+	React.useEffect(function()
+		if object == nil then
 			return nil
 		end
 
-		local connection = p1:Connect(p2)
-
-		return function() -- line: 24
-			-- upvalues: connection (copy)
+		local connection = object:Connect(callback)
+		return function()
 			connection:Disconnect()
 		end
-	end, {
-		p1,
-		p2
-	})
+	end, { object, callback })
 end
 
 return useExternalEvent

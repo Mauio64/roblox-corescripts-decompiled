@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.RoactFitComponents.RoactFitComponents))
+local RoactFitComponents = require(index.RoactFitComponents.RoactFitComponents)
+
+return RoactFitComponents

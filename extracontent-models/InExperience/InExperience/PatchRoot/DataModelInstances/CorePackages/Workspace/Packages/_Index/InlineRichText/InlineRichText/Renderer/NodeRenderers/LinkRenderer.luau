@@ -1,7 +1,8 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
-local Cryo = require(InlineRichTextParent.Cryo)
-local InlineLayout = require(InlineRichTextParent.InlineLayout)
+local parent = InlineRichText.Parent
+
+local Cryo = require(parent.Cryo)
+local InlineLayout = require(parent.InlineLayout)
 local TextElement = InlineLayout.Components.InlineLayoutElements.TextElement
 local LinkElement = InlineLayout.Components.InlineLayoutElements.LinkElement
 local LinkBehavior = require(InlineRichText.Enums.LinkBehavior)
@@ -9,51 +10,50 @@ local InlineCustomRenderer = require(InlineRichText.Renderer.NodeRenderers.Inlin
 
 require(InlineRichText.Types)
 
-return function(p1, p2) -- line: 13
-	-- upvalues: Cryo (copy), LinkBehavior (copy), InlineCustomRenderer (copy), TextElement (copy), LinkElement (copy)
-	local t1 = {
-		showUnderline = true,
-		textStyle = p2.styles.textStyle
-	}
-	local v12 = Cryo.Dictionary.union(t1, p2.nodeProps or {})
-	local v13 = p1.attributes.href or ""
-	local v14 = p2.linker.evaluateLinkBehavior(v13)
+return function(p, data)
+	local v = { textStyle = data.styles.textStyle, showUnderline = true }
 
-	if v14 == LinkBehavior.Hide then
+	local union = Cryo.Dictionary.union(v, data.nodeProps or {})
+
+	local href = p.attributes.href or ""
+	local linkBehavior = data.linker.evaluateLinkBehavior(href)
+
+	if linkBehavior == LinkBehavior.Hide then
 		return {}
 	end
 
-	if v14 == LinkBehavior.Disable then
-		return InlineCustomRenderer(Cryo.Dictionary.join(p1, {
-			name = "TEXT_SPAN"
-		}), p2)
+	if linkBehavior == LinkBehavior.Disable then
+		return InlineCustomRenderer(Cryo.Dictionary.join(p, { name = "TEXT_SPAN" }), data)
 	end
 
-	local v15 = p2.processChildren(p1, p2)
-	local v16 = Cryo.List.map(v15, function(p3, p4) -- line: 30
-		-- upvalues: TextElement (copy), v12 (copy), Cryo (copy), p2 (copy), t1 (copy)
-		return TextElement.new({
-			LayoutOrder = p4,
-			EngineTags = if not v12.showUnderline then p3.engineTags else Cryo.List.join({{
-				name = "u",
-				attributes = {}
-			}}, p3.engineTags),
-			Text = p3.text,
-			fontStyle = p2.styles.fontStyle,
-			textStyle = Cryo.Dictionary.union(t1.textStyle, v12.textStyle)
+	local v2 = data.processChildren(p, data)
+	local mapped = Cryo.List.map(v2, function(p2, layoutOrder)
+		local new = TextElement.new
+		local engineTags
+
+		if union.showUnderline then
+			engineTags = Cryo.List.join({
+				{ name = "u", attributes = {} }
+			}, p2.engineTags)
+		else
+			engineTags = p2.engineTags
+		end
+
+		return new({
+			LayoutOrder = layoutOrder,
+			EngineTags = engineTags,
+			Text = p2.text,
+			fontStyle = data.styles.fontStyle,
+			textStyle = Cryo.Dictionary.union(v.textStyle, union.textStyle)
 		})
 	end)
 
-	if #v16 > 0 then
-		return { LinkElement.new(v16, {
-			onActivated = function() -- line: 44
-				-- upvalues: p2 (copy), v13 (copy), v14 (copy)
-				p2.linker.onActivated({
-					url = v13,
-					linkBehavior = v14
-				})
-			end
-		}) }
+	if #mapped > 0 then
+		return { LinkElement.new(mapped, {
+				onActivated = function()
+					data.linker.onActivated({ url = href, linkBehavior = linkBehavior })
+				end
+			}) }
 	end
 
 	return {}

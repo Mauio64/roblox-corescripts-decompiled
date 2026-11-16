@@ -1,1 +1,3 @@
-return (require(script.ButtonGroup))
+local ButtonGroup = require(script.ButtonGroup)
+
+return ButtonGroup

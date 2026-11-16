@@ -1,1 +1,3 @@
-return (require(script.SheetActions))
+local SheetActions = require(script.SheetActions)
+
+return SheetActions

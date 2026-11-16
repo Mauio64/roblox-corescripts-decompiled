@@ -1,26 +1,34 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 
+local Flags = require(Foundation.Utility.Flags)
 require(Foundation.Components.Types)
+local devAssert = require(Foundation.Utility.devAssert)
 
-local function getFormattedTags(p1) -- line: 6
-	if p1 ~= nil then
-		if typeof(p1) == "table" then
-			local t1 = {}
+local function getFormattedTags(value)
+	if value == nil then
+		return nil
+	end
 
-			for v5, v6 in p1 do
-				if v6 then
-					table.insert(t1, v5)
-				end
+	if typeof(value) == "table" then
+		local v = {}
+
+		for k, item in value do
+			if item then
+				table.insert(v, k)
 			end
-
-			return table.concat(t1, " ")
 		end
 
-		if typeof(p1) == "string" then
-			return p1
-		end
+		return table.concat(v, " ")
+	end
 
-		assert(false, "Invalid argument to useStyleTags. Expected a table or string, got " .. typeof(p1))
+	if typeof(value) == "string" then
+		return value
+	end
+
+	if Flags.FoundationDevOnlyPropAsserts then
+		devAssert(false, "Invalid argument to useStyleTags. Expected a table or string, got " .. typeof(value))
+	else
+		assert(false, "Invalid argument to useStyleTags. Expected a table or string, got " .. typeof(value))
 	end
 
 	return nil

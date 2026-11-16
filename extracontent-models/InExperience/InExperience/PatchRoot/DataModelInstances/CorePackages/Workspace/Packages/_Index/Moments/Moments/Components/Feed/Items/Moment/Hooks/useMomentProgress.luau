@@ -1,35 +1,32 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local Signals = require(parent.Signals)
+
 local MomentContext = require(script.Parent.Parent.MomentContext)
-local t1 = {
-	time = 0,
-	duration = 0,
-	ratio = 0
-}
 
-local function useMomentProgress() -- line: 20
-	-- upvalues: MomentContext (copy), Signals (copy), t1 (copy)
-	local v6 = MomentContext.useMoment()
+local v = { time = 0, duration = 0, ratio = 0 }
 
-	return (Signals.createComputed(function(p1) -- line: 23
-		-- upvalues: v6 (copy), t1 (copy)
-		local controller = v6.controller
+local function useMomentProgress()
+	local v2 = MomentContext.useMoment()
+
+	return (Signals.createComputed(function(p)
+		local controller = v2.controller
 
 		if controller == nil then
-			return t1
+			return v
 		end
 
-		local v9 = controller.getPosition(p1)
-		local duration = controller.getState(p1).duration
+		local position = controller.getPosition(p)
+		local duration = controller.getState(p).duration
 
 		if duration <= 0 then
-			return t1
+			return v
 		end
 
 		return {
-			time = v9,
+			time = position,
 			duration = duration,
-			ratio = v9 / duration
+			ratio = position / duration
 		}
 	end))
 end

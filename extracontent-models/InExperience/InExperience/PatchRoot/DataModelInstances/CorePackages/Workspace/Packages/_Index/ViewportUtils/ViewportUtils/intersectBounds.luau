@@ -1,24 +1,16 @@
-local v1 = table.freeze({
-	min = Vector2.zero,
-	max = Vector2.zero
-})
+local frozen = table.freeze({ min = Vector2.zero, max = Vector2.zero })
 
-local function intersectBounds(t1: {[any]: any}, t2: {[any]: any}) -- line: 8
-	-- upvalues: v1 (copy)
-	local t3 = {
-		min = Vector2.new(math.max(t1.min.X, t2.min.X), (math.max(t1.min.Y, t2.min.Y))),
-		max = Vector2.new(math.min(t1.max.X, t2.max.X), (math.min(t1.max.Y, t2.max.Y)))
+local function intersectBounds(p, p2)
+	local v = {
+		min = Vector2.new(math.max(p.min.X, p2.min.X), (math.max(p.min.Y, p2.min.Y))),
+		max = Vector2.new(math.min(p.max.X, p2.max.X), (math.min(p.max.Y, p2.max.Y)))
 	}
 
-	if t3.min.X >= t3.max.X then
-		return v1
+	if v.min.X >= v.max.X or v.min.Y >= v.max.Y then
+		return frozen
 	end
 
-	if t3.min.Y >= t3.max.Y then
-		return v1
-	end
-
-	return t3
+	return v
 end
 
 return intersectBounds

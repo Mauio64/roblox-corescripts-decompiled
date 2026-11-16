@@ -1,34 +1,31 @@
-local function charAt(s1: string, n1: number) -- line: 10
-	return s1:sub(n1, n1)
+local function charAt(text: string, p: number) -- 2 equivalent calls inferred from this helper
+	return text:sub(p, p)
 end
-local function truncateTextToCursor(p1) -- line: 27
-	local CursorPosition = p1.CursorPosition
 
-	if CursorPosition == -1 then
+local function truncateTextToCursor(data)
+	local cursorPosition = data.CursorPosition
+
+	if cursorPosition == -1 then
 		return ""
 	end
 
-	local p1Text = p1.Text
-	local v8 = p1.TextSize * p1.LineHeight / 1.4
-	local v9 = CursorPosition + p1.AbsoluteSize.X / v8
-	local v10 = string.find(p1Text, "\n", CursorPosition) or 1e999
-	local v11 = string.find(p1Text, "[ \t\f\v]", CursorPosition) or 1e999
-	local v12 = math.min(v10 - 1, v11, #p1Text)
-	local v13 = p1Text:sub(CursorPosition, CursorPosition):match("\n")
+	local text = data.Text
+	local v = data.TextSize * data.LineHeight / 1.4
+	local v2 = cursorPosition + data.AbsoluteSize.X / v
+	local v3 = string.find(text, "\n", cursorPosition) or 1e999
+	local v4 = string.find(text, "[ \t\f\11]", cursorPosition) or 1e999
+	local v5 = math.min(v3 - 1, v4, #text)
 
-	if v13 then
-		local v14 = CursorPosition - 1
-
-		v13 = p1Text:sub(v14, v14):match("\n") or CursorPosition == 1
+	if
+		charAt(text, cursorPosition):match("\n") -- inferred equivalent call
+		and (charAt(text, cursorPosition - 1):match("\n") or cursorPosition == 1) -- inferred equivalent call
+	then
+		v5 = cursorPosition - 1
+	elseif v2 < v5 then
+		v5 = cursorPosition
 	end
 
-	if v13 then
-		v12 = CursorPosition - 1
-	elseif v9 < v12 then
-		v12 = CursorPosition
-	end
-
-	return utf8.char(utf8.codepoint(p1Text, 1, v12))
+	return utf8.char(utf8.codepoint(text, 1, v5))
 end
 
 return truncateTextToCursor

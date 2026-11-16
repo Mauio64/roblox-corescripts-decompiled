@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.UrlMatching.UrlMatching))
+local UrlMatching = require(index.UrlMatching.UrlMatching)
+
+return UrlMatching

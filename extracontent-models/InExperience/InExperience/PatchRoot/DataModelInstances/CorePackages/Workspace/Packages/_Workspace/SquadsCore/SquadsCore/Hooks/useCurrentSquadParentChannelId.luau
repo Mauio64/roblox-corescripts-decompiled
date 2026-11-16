@@ -1,18 +1,22 @@
-local Parent = script:FindFirstAncestor("SquadsCore").Parent
-local React = require(Parent.React)
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("SquadsCore").Parent
 
-function useCurrentSquadParentChannelId() -- line: 7
-	-- upvalues: React (copy), useSelector (copy)
-	local v4 = React.useCallback(function(p1) -- line: 8
-		if p1.Squad and (p1.Squad.Squad and p1.Squad.Squad.currentSquad and p1.Squad.Squad.currentSquad.parentChannelId ~= "") then
-			return p1.Squad.Squad.currentSquad.parentChannelId
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+function useCurrentSquadParentChannelId()
+	return (useSelector((React.useCallback(function(p)
+		if
+			p.Squad
+			and p.Squad.Squad
+			and p.Squad.Squad.currentSquad
+			and p.Squad.Squad.currentSquad.parentChannelId ~= ""
+		then
+			return p.Squad.Squad.currentSquad.parentChannelId
 		end
 
 		return nil
-	end, {})
-
-	return (useSelector(v4))
+	end, {}))))
 end
 
 return useCurrentSquadParentChannelId

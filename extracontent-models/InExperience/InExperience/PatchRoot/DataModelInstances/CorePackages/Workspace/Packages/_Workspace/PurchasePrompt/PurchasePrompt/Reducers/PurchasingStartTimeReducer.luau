@@ -1,15 +1,13 @@
-local ParentParent = script.Parent.Parent
-local StartPurchase = require(ParentParent.Actions.StartPurchase)
+local parent = script.Parent.Parent
 
-local function PurchasingStartTimeReducer(p1, p2) -- line: 5
-	-- upvalues: StartPurchase (copy)
-	local v6 = p1 or -1
+local StartPurchase = require(parent.Actions.StartPurchase)
 
-	if p2.type == StartPurchase.name then
-		return p2.purchasingStartTime
+local function PurchasingStartTimeReducer(value, p)
+	if p.type == StartPurchase.name then
+		return p.purchasingStartTime
 	end
 
-	return v6
+	return value or -1
 end
 
 return PurchasingStartTimeReducer

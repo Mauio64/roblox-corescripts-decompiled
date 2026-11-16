@@ -1,85 +1,87 @@
 local RunService = game:GetService("RunService")
-local t1 = {}
 
-t1.__index = t1
+local FadeController = {}
+FadeController.__index = FadeController
 
-function t1.new() -- line: 6
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
-
+function FadeController.new()
+	local self = setmetatable({}, FadeController)
 	self.lastInputTimeSec = -1
 	self.subscriptions = {}
 	self.lastProgress = -1
 
 	return self
 end
-function t1.getCurrentProgress(p1) -- line: 15
-	local v5 = os.clock() - p1.lastInputTimeSec
 
-	if v5 < p1.dwellTimeSec then
+function FadeController:getCurrentProgress()
+	local v = os.clock() - self.lastInputTimeSec
+
+	if v < self.dwellTimeSec then
 		return 1
 	end
 
-	if v5 < p1.dwellTimeSec + p1.fadeDurationSec then
-		return 1 - (v5 - p1.dwellTimeSec) / p1.fadeDurationSec
+	if v < self.dwellTimeSec + self.fadeDurationSec then
+		return 1 - (v - self.dwellTimeSec) / self.fadeDurationSec
 	end
 
 	return 0
 end
-function t1.inProgress(p2) -- line: 26
-	return p2:getCurrentProgress() > 0
-end
-function t1.isFading(p3) -- line: 30
-	local v8 = os.clock() - p3.lastInputTimeSec
 
-	return v8 >= p3.dwellTimeSec and v8 < p3.dwellTimeSec + p3.fadeDurationSec
+function FadeController:inProgress(): boolean
+	return self:getCurrentProgress() > 0
 end
-function t1.updateLastInputTime(p4) -- line: 35
-	p4.lastInputTimeSec = os.clock()
+
+function FadeController:isFading(): boolean
+	local v = os.clock() - self.lastInputTimeSec
+	return self.dwellTimeSec <= v and v < self.dwellTimeSec + self.fadeDurationSec
 end
-function t1.skipToFade(p5) -- line: 39
-	if not p5:isFading() then
-		p5.lastInputTimeSec = os.clock() - p5.dwellTimeSec
+
+function FadeController:updateLastInputTime()
+	self.lastInputTimeSec = os.clock()
+end
+
+function FadeController:skipToFade()
+	if not self:isFading() then
+		self.lastInputTimeSec = os.clock() - self.dwellTimeSec
 	end
 end
-function t1.zeroOut(p6) -- line: 45
-	p6.lastInputTimeSec = -1
+
+function FadeController:zeroOut()
+	self.lastInputTimeSec = -1
 end
-function t1.subscribe(p7, p8) -- line: 49
-	-- upvalues: RunService (copy)
-	table.insert(p7.subscriptions, p8)
 
-	if not p7.heartbeatConnection then
-		p7.heartbeatConnection = RunService.RenderStepped:Connect(function() -- line: 53
-			-- upvalues: p7 (copy)
-			local v18 = p7:getCurrentProgress()
+function FadeController:subscribe(p)
+	table.insert(self.subscriptions, p)
 
-			if v18 ~= p7.lastProgress then
-				p7.lastProgress = v18
+	if not self.heartbeatConnection then
+		self.heartbeatConnection = RunService.RenderStepped:Connect(function()
+			local currentProgress = self:getCurrentProgress()
 
-				for _, v in ipairs(p7.subscriptions) do
-					v(v18)
+			if currentProgress ~= self.lastProgress then
+				self.lastProgress = currentProgress
+
+				for _, subscription in ipairs(self.subscriptions) do
+					subscription(currentProgress)
 				end
 			end
 		end)
 	end
 end
-function t1.unsubscribe(p9, p10) -- line: 65
-	for i, v in ipairs(p9.subscriptions) do
-		if v == p10 then
-			table.remove(p9.subscriptions, i)
 
+function FadeController:unsubscribe(p)
+	for i, subscription in ipairs(self.subscriptions) do
+		if subscription == p then
+			table.remove(self.subscriptions, i)
 			break
 		end
 	end
 
-	if #p9.subscriptions == 0 and p9.heartbeatConnection then
-		p9.heartbeatConnection:Disconnect()
-		p9.heartbeatConnection = nil
+	if #self.subscriptions == 0 and self.heartbeatConnection then
+		self.heartbeatConnection:Disconnect()
+		self.heartbeatConnection = nil
 	end
 end
 
-t1.fadeDurationSec = 1
-t1.dwellTimeSec = 1
+FadeController.fadeDurationSec = 1
+FadeController.dwellTimeSec = 1
 
-return t1
+return FadeController

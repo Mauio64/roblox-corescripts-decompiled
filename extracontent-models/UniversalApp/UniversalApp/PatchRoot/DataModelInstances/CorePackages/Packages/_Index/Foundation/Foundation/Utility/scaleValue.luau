@@ -1,21 +1,21 @@
-local function scaleValue(p1, n1: number?) -- line: 1
-	if n1 == nil then
-		return p1
+local function scaleValue(value, p: number?)
+	if p == nil then
+		return value
 	end
 
-	if typeof(p1) == "number" then
-		return p1 * n1
+	if typeof(value) == "number" then
+		return value * p
 	end
 
-	if typeof(p1) == "UDim" then
-		return UDim.new(p1.Scale, p1.Offset * n1)
+	if typeof(value) == "UDim" then
+		return UDim.new(value.Scale, value.Offset * p)
 	end
 
-	if typeof(p1) == "UDim2" then
-		return UDim2.new(p1.X.Scale, p1.X.Offset * n1, p1.Y.Scale, p1.Y.Offset * n1)
+	if typeof(value) == "UDim2" then
+		return UDim2.new(value.X.Scale, value.X.Offset * p, value.Y.Scale, value.Y.Offset * p)
 	end
 
-	return p1
+	return value
 end
 
 return scaleValue

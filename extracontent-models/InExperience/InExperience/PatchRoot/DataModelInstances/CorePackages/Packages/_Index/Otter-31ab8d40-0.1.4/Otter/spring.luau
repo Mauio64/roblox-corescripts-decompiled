@@ -1,103 +1,109 @@
 local assign = require(script.Parent.assign)
+
 local abs = math.abs
 local exp = math.exp
 local sin = math.sin
 local cos = math.cos
 local sqrt = math.sqrt
 
-local function step(p1, p2, p3) -- line: 20
-	-- upvalues: exp (copy), sqrt (copy), cos (copy), sin (copy), abs (copy)
-	local __dampingRatio = p1.__dampingRatio
-	local v13 = p1.__frequency * 2 * 3.141592653589793
-	local __goalPosition = p1.__goalPosition
-	local __restingVelocityLimit = p1.__restingVelocityLimit
-	local __restingPositionLimit = p1.__restingPositionLimit
-	local value = p2.value
-	local v18 = p2.velocity or 0
-	local v19 = value - __goalPosition
-	local v20 = exp(-p3 * __dampingRatio * v13)
-	local v21, v22
+local function step(data, p, p2)
+	local __dampingRatio = data.__dampingRatio
+	local v = data.__frequency * 2 * 3.141592653589793
+	local __goalPosition = data.__goalPosition
+	local __restingVelocityLimit = data.__restingVelocityLimit
+	local __restingPositionLimit = data.__restingPositionLimit
+
+	local value = p.value
+	local velocity = p.velocity or 0
+
+	local v2 = value - __goalPosition
+	local v3 = exp(-p2 * __dampingRatio * v)
+	local v4, velocity2
 
 	if __dampingRatio == 1 then
-		v21 = (v18 * p3 + v19 * (v13 * p3 + 1)) * v20 + __goalPosition
-		v22 = (v18 - v13 * p3 * (v19 * v13 + v18)) * v20
+		v4 = (velocity * p2 + v2 * (v * p2 + 1)) * v3 + __goalPosition
+		velocity2 = (velocity - v * p2 * (v2 * v + velocity)) * v3
 	elseif __dampingRatio < 1 then
-		local v23 = sqrt(1 - __dampingRatio * __dampingRatio)
-		local v24 = cos(v13 * v23 * p3)
-		local v25 = sin(v13 * v23 * p3)
-		local v26
+		local v5 = sqrt(1 - __dampingRatio * __dampingRatio)
 
-		if v23 > 0.0001 then
-			v26 = v25 / v23
+		local v6 = cos(v * v5 * p2)
+		local v7 = sin(v * v5 * p2)
+		local v8
+
+		if v5 > 0.0001 then
+			v8 = v7 / v5
 		else
-			local v27 = p3 * v13
-
-			v26 = v27 + (v27 * v27 * (v23 * v23) * (v23 * v23) / 20 - v23 * v23) * (v27 * v27 * v27) / 6
+			local v9 = p2 * v
+			v8 = v9 + (v9 * v9 * (v5 * v5) * (v5 * v5) / 20 - v5 * v5) * (v9 * v9 * v9) / 6
 		end
 
-		local v28
+		local v9
 
-		if v13 * v23 > 0.0001 then
-			v28 = v25 / (v13 * v23)
+		if v * v5 > 0.0001 then
+			v9 = v7 / (v * v5)
 		else
-			local v29 = v13 * v23
-
-			v28 = p3 + (p3 * p3 * (v29 * v29) * (v29 * v29) / 20 - v29 * v29) * (p3 * p3 * p3) / 6
+			local v10 = v * v5
+			v9 = p2 + (p2 * p2 * (v10 * v10) * (v10 * v10) / 20 - v10 * v10) * (p2 * p2 * p2) / 6
 		end
 
-		v21 = (v19 * (v24 + __dampingRatio * v26) + v18 * v28) * v20 + __goalPosition
-		v22 = (v18 * (v24 - v26 * __dampingRatio) - v19 * (v26 * v13)) * v20
+		v4 = (v2 * (v6 + __dampingRatio * v8) + velocity * v9) * v3 + __goalPosition
+		velocity2 = (velocity * (v6 - v8 * __dampingRatio) - v2 * (v8 * v)) * v3
 	else
-		local v30 = sqrt(__dampingRatio * __dampingRatio - 1)
-		local v31 = -v13 * (__dampingRatio - v30)
-		local v32 = -v13 * (__dampingRatio + v30)
-		local v33 = (v18 - v31 * v19) / (2 * v13 * v30)
-		local v34 = (v19 - v33) * exp(v31 * p3)
-		local v35 = v33 * exp(v32 * p3)
+		local v5 = sqrt(__dampingRatio * __dampingRatio - 1)
 
-		v21 = v34 + v35 + __goalPosition
-		v22 = v31 * v34 + v32 * v35
+		local v6 = -v * (__dampingRatio - v5)
+		local v7 = -v * (__dampingRatio + v5)
+
+		local v8 = (velocity - v6 * v2) / (2 * v * v5)
+		local v9 = (v2 - v8) * exp(v6 * p2)
+		local v10 = v8 * exp(v7 * p2)
+
+		v4 = v9 + v10 + __goalPosition
+		velocity2 = v6 * v9 + v7 * v10
 	end
 
-	local v36 = abs(v21 - p1.__goalPosition)
-	local v37 = __restingVelocityLimit > abs(v22) and v36 < __restingPositionLimit
+	local v5 = abs(v4 - data.__goalPosition)
+	local complete
 
-	if v37 then
-		v21 = p1.__goalPosition
-		v22 = 0
+	if abs(velocity2) < __restingVelocityLimit then
+		complete = v5 < __restingPositionLimit
+	else
+		complete = false
 	end
 
-	return {
-		value = v21,
-		velocity = v22,
-		complete = v37
-	}
+	if complete then
+		v4 = data.__goalPosition
+		velocity2 = 0
+	end
+
+	return { value = v4, velocity = velocity2, complete = complete }
 end
-local function spring(p4, p5) -- line: 117
-	-- upvalues: assign (copy), step (copy)
-	assert(typeof(p4) == "number")
 
-	local t1 = {
+local function spring(goalPosition, p)
+	assert(typeof(goalPosition) == "number")
+
+	local v = {
 		dampingRatio = 1,
 		frequency = 1,
 		restingVelocityLimit = 0.001,
 		restingPositionLimit = 0.01
 	}
 
-	if p5 ~= nil then
-		assert(typeof(p5) == "table")
-		assign(t1, p5)
+	if p ~= nil then
+		assert(typeof(p) == "table")
+		assign(v, p)
 	end
 
-	local dampingRatio = t1.dampingRatio
-	local frequency = t1.frequency
-	local restingVelocityLimit = t1.restingVelocityLimit
-	local restingPositionLimit = t1.restingPositionLimit
+	local dampingRatio = v.dampingRatio
+	local frequency = v.frequency
+	local restingVelocityLimit = v.restingVelocityLimit
+	local restingPositionLimit = v.restingPositionLimit
 
 	assert(typeof(dampingRatio) == "number")
 	assert(typeof(frequency) == "number")
 	assert(typeof(restingVelocityLimit) == "number")
 	assert(typeof(restingPositionLimit) == "number")
+
 	assert(restingVelocityLimit >= 0, "Expected restingVelocityLimit >= 0")
 	assert(restingPositionLimit >= 0, "Expected restingPositionLimit >= 0")
 
@@ -106,7 +112,7 @@ local function spring(p4, p5) -- line: 117
 		__frequency = frequency,
 		__restingVelocityLimit = restingVelocityLimit,
 		__restingPositionLimit = restingPositionLimit,
-		__goalPosition = p4,
+		__goalPosition = goalPosition,
 		step = step
 	}
 end

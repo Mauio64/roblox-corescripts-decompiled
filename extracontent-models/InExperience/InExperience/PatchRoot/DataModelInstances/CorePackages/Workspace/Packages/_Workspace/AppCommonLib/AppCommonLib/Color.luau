@@ -1,18 +1,17 @@
-local t1 = {
-	RgbFromHex = function(p1) -- line: 3
-		assert(p1 >= 0 and p1 <= 16777215, "RgbFromHex: Out of range")
+local Color = {}
 
-		local v3 = p1 % 256
-		local v4 = (p1 - v3) / 256
-		local v5 = v4 % 256
+function Color.RgbFromHex(p)
+	local v = p >= 0 and p <= 16777215
+	assert(v, "RgbFromHex: Out of range")
 
-		return (v4 - v5) / 256, v5, v3
-	end
-}
-
-function t1.Color3FromHex(p2) -- line: 15
-	-- upvalues: t1 (copy)
-	return Color3.fromRGB(t1.RgbFromHex(p2))
+	local v2 = p % 256
+	local v3 = (p - v2) / 256
+	local v4 = v3 % 256
+	return (v3 - v4) / 256, v4, v2
 end
 
-return t1
+function Color.Color3FromHex(p)
+	return Color3.fromRGB(Color.RgbFromHex(p))
+end
+
+return Color

@@ -1,36 +1,36 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
+local parent = InlineRichText.Parent
+
 local LinkType = require(InlineRichText.Enums.LinkType)
-local default = require(InlineRichTextParent.LinkingProtocol).LinkingProtocol.default
-local t1 = {
+local LinkingProtocol = require(parent.LinkingProtocol)
+local default = LinkingProtocol.LinkingProtocol.default
+
+local v = {
 	{
-		isLinkType = function(s1: string) -- line: 11
-			return string.match(s1, "^https://") ~= nil
+		isLinkType = function(value: string): boolean
+			return string.match(value, "^https://") ~= nil
 		end,
 		type = LinkType.Http
 	},
 	{
-		isLinkType = function(s2: string) -- line: 18
-			-- upvalues: default (copy)
-			local v9, v10 = default:isURLRegistered(s2):await()
-
-			return v9 and v10
+		isLinkType = function(p: string)
+			local v, v2 = default:isURLRegistered(p):await()
+			return v and v2
 		end,
 		type = LinkType.LinkingProtocolRegistered
 	},
 	{
-		isLinkType = function(_: string) -- line: 26
+		isLinkType = function(_: string): boolean
 			return true
 		end,
 		type = LinkType.Default
 	}
 }
 
-local function getLinkType(s4: string) -- line: 33
-	-- upvalues: t1 (copy), LinkType (copy)
-	for _, v14 in t1 do
-		if v14.isLinkType(s4) then
-			return v14.type
+local function getLinkType(p: string)
+	for _, v2 in v do
+		if v2.isLinkType(p) then
+			return v2.type
 		end
 	end
 

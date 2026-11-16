@@ -1,1 +1,3 @@
-return (require(script.DisplayQRCodeFromMatrix))
+local DisplayQRCodeFromMatrix = require(script.DisplayQRCodeFromMatrix)
+
+return DisplayQRCodeFromMatrix

@@ -1,7 +1,4 @@
-local useLocalization = require(script.useLocalization)
-local useAbbreviatedNumberLocalization = require(script.useAbbreviatedNumberLocalization)
-
 return {
-	useLocalization = useLocalization,
-	useAbbreviatedNumberLocalization = useAbbreviatedNumberLocalization
+	useLocalization = require(script.useLocalization),
+	useAbbreviatedNumberLocalization = require(script.useAbbreviatedNumberLocalization)
 }

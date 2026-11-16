@@ -1,53 +1,71 @@
 local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
-local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
-local Dash = require(AvatarExperienceSaveParent.Dash)
+local parent = AvatarExperienceSave.Parent
+
+local Dash = require(parent.Dash)
 
 require(AvatarExperienceSave.Context.AvatarSaveContext)
 
-local FFlagAXBackgroundsPersistence = require(AvatarExperienceSaveParent.AvatarExperienceFlags).FFlagAXBackgroundsPersistence
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 
-local function getSubstateToTrackForChanges(p1, b1: boolean?) -- line: 25
-	-- upvalues: Dash (copy), FFlagAXBackgroundsPersistence (copy)
-	local t1 = {}
+local FFlagAXBackgroundsPersistence = AvatarExperienceFlags.FFlagAXBackgroundsPersistence
 
-	if p1.tryOn.OutfitTryOn.TryOnItems then
-		for v9, v10 in p1.tryOn.OutfitTryOn.TryOnItems do
-			t1[v9] = if not b1 then v10 else Dash.omit(v10, { "order" })
+local function getSubstateToTrackForChanges(p, flag: boolean?)
+	local tryOnItems = {}
+
+	if p.tryOn.OutfitTryOn.TryOnItems then
+		for k, tryOnItem in p.tryOn.OutfitTryOn.TryOnItems do
+			if flag then
+				tryOnItem = Dash.omit(tryOnItem, { "order" })
+			end
+
+			tryOnItems[k] = tryOnItem
 		end
 	end
 
-	local t2 = {}
+	local equippedAssets = {}
 
-	if p1.equipped.EquippedAssets then
-		for v12, v13 in p1.equipped.EquippedAssets do
-			t2[v12] = {}
+	if p.equipped.EquippedAssets then
+		for k, equippedAsset in p.equipped.EquippedAssets do
+			equippedAssets[k] = {}
 
-			for v14, v15 in v13 do
-				t2[v12][v14] = if not b1 then v15 else Dash.omit(v15, { "order" })
+			for k2, v in equippedAsset do
+				local v2 = equippedAssets[k]
+
+				if flag then
+					v = Dash.omit(v, { "order" })
+				end
+
+				v2[k2] = v
 			end
 		end
 	end
 
-	return {
+	local substateToTrackForChanges = {
 		OutfitTryOn = {
-			TryOnItems = t1,
-			LookId = p1.tryOn.OutfitTryOn.LookId,
-			LookType = p1.tryOn.OutfitTryOn.LookType,
-			BodyColor3s = p1.tryOn.OutfitTryOn.BodyColor3s,
-			BodyPartColorRangeIds = p1.tryOn.OutfitTryOn.BodyPartColorRangeIds,
-			Scale = p1.tryOn.OutfitTryOn.Scale
+			TryOnItems = tryOnItems,
+			LookId = p.tryOn.OutfitTryOn.LookId,
+			LookType = p.tryOn.OutfitTryOn.LookType,
+			BodyColor3s = p.tryOn.OutfitTryOn.BodyColor3s,
+			BodyPartColorRangeIds = p.tryOn.OutfitTryOn.BodyPartColorRangeIds,
+			Scale = p.tryOn.OutfitTryOn.Scale
 		},
-		LastSavedTriedOnOutfit = p1.tryOn.LastSavedTriedOnOutfit,
-		AvatarType = p1.equipped.AvatarType,
-		AvatarScales = p1.equipped.AvatarScales,
-		BodyColor3s = p1.equipped.BodyColor3s,
-		BodyPartRangeIds = p1.equipped.BodyPartRangeIds,
-		EquippedAssets = t2,
-		EquippedEmotes = {
-			slotInfo = p1.equipped.EquippedEmotes.slotInfo
-		},
-		BackgroundAssetId = if not FFlagAXBackgroundsPersistence then nil else p1.equipped.BackgroundAssetId
+		LastSavedTriedOnOutfit = p.tryOn.LastSavedTriedOnOutfit,
+		AvatarType = p.equipped.AvatarType,
+		AvatarScales = p.equipped.AvatarScales,
+		BodyColor3s = p.equipped.BodyColor3s,
+		BodyPartRangeIds = p.equipped.BodyPartRangeIds,
+		EquippedAssets = equippedAssets,
+		EquippedEmotes = { slotInfo = p.equipped.EquippedEmotes.slotInfo },
+		BackgroundAssetId = 0
 	}
+	local backgroundAssetId
+
+	if FFlagAXBackgroundsPersistence then
+		backgroundAssetId = p.equipped.BackgroundAssetId
+	end
+
+	substateToTrackForChanges.BackgroundAssetId = backgroundAssetId
+	return substateToTrackForChanges
 end
 
 return getSubstateToTrackForChanges

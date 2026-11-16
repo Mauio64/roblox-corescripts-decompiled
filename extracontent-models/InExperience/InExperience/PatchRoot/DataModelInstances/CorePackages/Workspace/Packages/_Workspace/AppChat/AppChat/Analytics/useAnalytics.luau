@@ -1,8 +1,9 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+
+local React = require(parent.React)
+
 local RoactChatAnalyticsContext = require(script.Parent.RoactChatAnalyticsContext)
 
-return function() -- line: 8
-	-- upvalues: React (copy), RoactChatAnalyticsContext (copy)
+return function()
 	return React.useContext(RoactChatAnalyticsContext)
 end

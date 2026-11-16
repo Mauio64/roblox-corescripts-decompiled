@@ -1,17 +1,29 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
+local parent = BuildExperience.Parent
 
-require(BuildExperienceParent.DataHydration.CreatorAgentChat)
+require(parent.DataHydration.CreatorAgentChat)
 require(BuildExperience.Chat.chatTypes)
+local BuildNavigationParams = {}
+BuildNavigationParams.BUILD_CHAT_SCREEN = "BuildChat"
 
-return {
-	getTarget = function(p1) -- line: 15
-		return (p1.getParam("target"))
-	end,
-	getSubagentTaskState = function(p2) -- line: 19
-		return (p2.getParam("subagentTaskState"))
-	end,
-	getSubagentTaskGroupName = function(p3) -- line: 23
-		return (p3.getParam("subagentTaskGroupName"))
-	end
-}
+function BuildNavigationParams.getTarget(p)
+	return (p.getParam("target"))
+end
+
+function BuildNavigationParams.getSubagentTaskState(p)
+	return (p.getParam("subagentTaskState"))
+end
+
+function BuildNavigationParams.getSubagentTaskGroupName(p)
+	return (p.getParam("subagentTaskGroupName"))
+end
+
+function BuildNavigationParams.getInitialPrompt(p)
+	return (p.getParam("initialPrompt"))
+end
+
+function BuildNavigationParams.getShouldDismissOnBack(p): boolean
+	return p.getParam("dismissOnBack") == true
+end
+
+return BuildNavigationParams

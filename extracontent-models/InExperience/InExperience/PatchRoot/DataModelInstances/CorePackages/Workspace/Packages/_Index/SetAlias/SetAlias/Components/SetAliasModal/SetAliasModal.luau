@@ -1,309 +1,422 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local dependencies = require(ParentParent.dependencies)
-local TextKeys = require(ParentParent.Common.TextKeys)
-local Analytics = require(ParentParent.Analytics)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local dependencies = require(parent.dependencies)
+local TextKeys = require(parent.Common.TextKeys)
+local Analytics = require(parent.Analytics)
 local EventNames = Analytics.EventNames
 local useAnalytics = Analytics.useAnalytics
-local React = dependencies.React
-local UIBlox = dependencies.UIBlox
-local Foundation = dependencies.Foundation
-local EnumsRadius = Foundation.Enums.Radius
-local Skeleton = Foundation.Skeleton
-local RoactFitComponents = dependencies.RoactFitComponents
+
+local react = dependencies.React
+local uiBlox = dependencies.UIBlox
+local foundation = dependencies.Foundation
+local radius = foundation.Enums.Radius
+local skeleton = foundation.Skeleton
+
+local roactFitComponents = dependencies.RoactFitComponents
 local useLocalization = dependencies.Hooks.useLocalization
-local SocialLibraries = dependencies.SocialLibraries
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local FocusNavigationUtils = require(ParentParentParent.FocusNavigationUtils)
+local socialLibraries = dependencies.SocialLibraries
+local RoactUtils = require(parent2.RoactUtils)
+
+local FocusNavigationUtils = require(parent2.FocusNavigationUtils)
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
-local InputHandlers = require(ParentParentParent.InputHandlers)
+local InputHandlers = require(parent2.InputHandlers)
+require(parent2.ReactFocusNavigation)
 
-require(ParentParentParent.ReactFocusNavigation)
-
-local FitFrameVertical = RoactFitComponents.FitFrameVertical
-local FitTextLabel = RoactFitComponents.FitTextLabel
-local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local useStyle = UIBlox.Core.Style.useStyle
-local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local Images = UIBlox.App.ImageSet.Images
-local IconSize = UIBlox.App.Constant.IconSize
+local fitFrameVertical = roactFitComponents.FitFrameVertical
+local fitTextLabel = roactFitComponents.FitTextLabel
+local interactiveAlert = uiBlox.App.Dialog.Alert.InteractiveAlert
+local buttonType = uiBlox.App.Button.Enum.ButtonType
+local useStyle = uiBlox.Core.Style.useStyle
+local imageSetLabel = uiBlox.Core.ImageSet.ImageSetLabel
+local images = uiBlox.App.ImageSet.Images
+local iconSize = uiBlox.App.Constant.IconSize
 local useEffectOnce = RoactUtils.Hooks.useEffectOnce
-local CallbackInputBox = SocialLibraries.Components.CallbackInputBox
-local FFlagConnectionsToFriendsRename = require(ParentParentParent.SharedFlags).FFlagConnectionsToFriendsRename
-local FFlagSetAliasFixFocusNavigation = require(ParentParent.Flags.FFlagSetAliasFixFocusNavigation)
 
-return function(t1: {[any]: any}) -- line: 63
-	-- upvalues: React (copy), useEffectOnce (copy), useStyle (copy), useLocalization (copy), TextKeys (copy), FFlagConnectionsToFriendsRename (copy), useAnalytics (copy), EventNames (copy), FFlagSetAliasFixFocusNavigation (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), InteractiveAlert (copy), FitFrameVertical (copy), FitTextLabel (copy), Skeleton (copy), EnumsRadius (copy), ImageSetLabel (copy), Images (copy), CallbackInputBox (copy), IconSize (copy), ButtonType (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v35 = React.useRef(nil)
-	local v36, v37 = React.useState(Vector2.new(0, 0))
-	local v38, v39 = React.useState(t1.alias)
-	local v40 = not t1.alias and 0 or (utf8.len(t1.alias) or 0)
-	local v41, v42 = React.useState(v40)
+local callbackInputBox = socialLibraries.Components.CallbackInputBox
 
-	useEffectOnce(function() -- line: 70
-		-- upvalues: v39 (copy), t1 (copy), v42 (copy), v40 (copy)
-		v39(t1.alias)
-		v42(v40)
-	end, t1.isLoading == false)
+local FFlagSetAliasFixFocusNavigation = require(parent.Flags.FFlagSetAliasFixFocusNavigation)
 
-	local v43 = useStyle()
-	local Font = v43.Font
-	local Theme = v43.Theme
-	local v46 = Font.BaseSize * Font.Body.RelativeSize
-	local v47 = useLocalization({
+return function(props)
+	local ref = react.useRef(nil)
+	local state, setState = react.useState(Vector2.new(0, 0))
+	local state2, setState2 = react.useState(props.alias)
+	local v = props.alias and utf8.len(props.alias) or 0
+	local state3, setState3 = react.useState(v)
+
+	useEffectOnce(function()
+		setState2(props.alias)
+		setState3(v)
+	end, props.isLoading == false)
+
+	local v2 = useStyle()
+	local font = v2.Font
+	local theme = v2.Theme
+	local inputTextSize = font.BaseSize * font.Body.RelativeSize
+	local v3 = {
 		titleText = TextKeys.CUSTOMIZE_NAME_MODAL_TITLE,
 		cancelButtonText = TextKeys.CANCEL_BUTTON,
 		saveButtonText = TextKeys.SAVE_BUTTON,
-		descriptionText = if not t1.displayName then TextKeys.SET_CUSTOM_NAME_NO_DISPLAY_NAME_DESCRIPTION else {
+		descriptionText = 0,
+		recognizeFriendsByCustomNameText = 0,
+		customNamePlaceholderText = 0,
+		invalidAliasErrorText = 0
+	}
+	local descriptionText
+
+	if props.displayName then
+		descriptionText = {
 			TextKeys.SET_CUSTOM_NAME_DESCRIPTION,
-			displayName = t1.displayName
-		},
-		recognizeFriendsByCustomNameText = if not FFlagConnectionsToFriendsRename then TextKeys.RECOGNIZE_CONNECTIONS_BY_CUSTOM_NAME_DESCRIPTION else TextKeys.RECOGNIZE_FRIENDS_BY_CUSTOM_NAME_DESCRIPTION,
-		customNamePlaceholderText = TextKeys.CUSTOM_NAME_PLACEHOLDER,
-		invalidAliasErrorText = TextKeys.INVALID_ALIAS_ERROR
-	})
-	local v48 = useAnalytics()
-	local v49 = React.useRef(false)
-	local hasSaveAliasError = t1.hasSaveAliasError
-	local v51 = React.useCallback(function(p1) -- line: 100
-		-- upvalues: v36 (copy), v37 (copy)
-		if v36.X ~= p1.AbsoluteSize.X then
-			v37(p1.AbsoluteSize)
-		end
-	end, { v36 })
-
-	local function v52() -- line: 110
-		-- upvalues: v48 (copy), EventNames (copy), t1 (copy)
-		if v48 then
-			v48.fireAnalyticsEvent(EventNames.CustomizeNameModalClosed)
-		end
-
-		t1.cancelOnActivated()
+			displayName = props.displayName
+		}
+	else
+		descriptionText = TextKeys.SET_CUSTOM_NAME_NO_DISPLAY_NAME_DESCRIPTION
 	end
-	local function v53(s1: string) -- line: 117
-		-- upvalues: v41 (copy), v38 (copy), v35 (copy), v42 (copy), v39 (copy), t1 (copy), v48 (copy), EventNames (copy), v49 (copy)
-		local v58 = utf8.len(s1)
 
-		if v58 == nil then
+	v3.descriptionText = descriptionText
+
+	v3.recognizeFriendsByCustomNameText = TextKeys.RECOGNIZE_FRIENDS_BY_CUSTOM_NAME_DESCRIPTION
+	v3.customNamePlaceholderText = TextKeys.CUSTOM_NAME_PLACEHOLDER
+	v3.invalidAliasErrorText = TextKeys.INVALID_ALIAS_ERROR
+	local v4 = useLocalization(v3)
+
+	local v5 = useAnalytics()
+	local ref2 = react.useRef(false)
+
+	local v6 = not props.hasSaveAliasError
+
+	local v7 = react.useCallback(function(p)
+		if state.X ~= p.AbsoluteSize.X then
+			setState(p.AbsoluteSize)
+		end
+	end, { state })
+
+	local function onActivated()
+		props.saveOnActivated(state2)
+	end
+
+	local function onActivated2() -- 1 equivalent call inferred from this helper
+		if v5 then
+			v5.fireAnalyticsEvent(EventNames.CustomizeNameModalClosed)
+		end
+
+		props.cancelOnActivated()
+	end
+
+	local function fn(text: string)
+		local v8 = utf8.len(text)
+
+		if v8 == nil then
 			return
 		end
 
-		if v58 > 20 then
-			s1 = if v41 ~= 20 then string.sub(s1, 1, utf8.offset(s1, 21) - 1) else v38
-			v58 = 20
+		if v8 > 20 then
+			if state3 == 20 then
+				text = state2
+			else
+				text = string.sub(text, 1, utf8.offset(text, 21) - 1)
+			end
 
-			if v35 and v35.current then
-				v35.current.Text = s1
+			v8 = 20
+
+			if ref and ref.current then
+				ref.current.Text = text
 			end
 		end
 
-		v42(v58)
-		v39(s1)
+		setState3(v8)
+		setState2(text)
 
-		if t1.onTextChanged then
-			t1.onTextChanged()
+		if props.onTextChanged then
+			props.onTextChanged()
 		end
 
-		if v58 == 0 and v48 then
-			v48.fireAnalyticsEvent(EventNames.CustomizeNameClearedInput)
+		if v8 == 0 and v5 then
+			v5.fireAnalyticsEvent(EventNames.CustomizeNameClearedInput)
 		end
 
-		if v58 == 20 and v48 and not v49.current then
-			v49.current = true
-			v48.fireAnalyticsEvent(EventNames.CustomizeNameMaximumCharLimitTyped, {
-				alias = s1
-			})
+		if v8 == 20 and v5 and not ref2.current then
+			ref2.current = true
+			v5.fireAnalyticsEvent(EventNames.CustomizeNameMaximumCharLimitTyped, { alias = text })
 		end
 	end
 
-	local v54 = if not FFlagSetAliasFixFocusNavigation then nil else React.useMemo(function() -- line: 167
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v48 (copy), EventNames (copy), t1 (copy)
-		return {
-			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(p2) -- line: 170
-					-- upvalues: v48 (copy), EventNames (copy), t1 (copy)
-					if v48 then
-						v48.fireAnalyticsEvent(EventNames.CustomizeNameModalClosed)
-					end
+	local eventHandlers
 
-					t1.cancelOnActivated()
-					p2:cancel()
+	if FFlagSetAliasFixFocusNavigation then
+		eventHandlers = react.useMemo(function()
+			local v8 = {}
+			v8[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(function(object)
+					onActivated2() -- inferred equivalent call
+					object:cancel()
 				end)
 			}
-		}
-	end, { v52 })
-	local v55 = React.createElement(InteractiveAlert, {
-		title = v47.titleText,
-		screenSize = t1.screenSize,
+
+			return v8
+		end, { onActivated2 })
+	end
+
+	local element = react.createElement(interactiveAlert, {
+		title = v4.titleText,
+		screenSize = props.screenSize,
 		anchorPoint = Vector2.new(0.5, 0),
-		position = UDim2.new(0.5, 0, 0, v36.Y),
-		middleContent = function() -- line: 184
-			-- upvalues: React (copy), FitFrameVertical (copy), v51 (copy), FitTextLabel (copy), v36 (copy), Font (copy), v47 (copy), Theme (copy), t1 (copy), Skeleton (copy), v46 (copy), EnumsRadius (copy), ImageSetLabel (copy), Images (copy), CallbackInputBox (copy), IconSize (copy), v53 (copy), v35 (copy), v41 (copy)
-			return React.createElement(FitFrameVertical, {
+		position = UDim2.new(0.5, 0, 0, state.Y),
+		middleContent = function()
+			local createElement = react.createElement
+			local v8 = {
 				BackgroundTransparency = 1,
 				width = UDim.new(1, 0),
 				FillDirection = Enum.FillDirection.Vertical,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				contentPadding = UDim.new(0, 16),
-				[React.Change.AbsoluteSize] = v51
-			}, {
-				InputGroup = React.createElement("Frame", {
-					BackgroundTransparency = 1,
+				[react.Change.AbsoluteSize] = v7
+			}
+
+			local createElement2 = react.createElement
+			local v9 = {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 1
+			}
+
+			local v10 = {
+				UIListLayout = react.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				Description = react.createElement(fitTextLabel, {
 					LayoutOrder = 1,
-					Size = UDim2.fromScale(1, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}, {
-					UIListLayout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						SortOrder = Enum.SortOrder.LayoutOrder
-					}),
-					Description = React.createElement(FitTextLabel, {
-						LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					TextWrapped = true,
+					width = fitTextLabel.Width.FitToText,
+					maximumWidth = state.X,
+					Font = font.Body.Font,
+					Text = v4.descriptionText,
+					TextSize = font.BaseSize * font.Body.RelativeSize,
+					TextColor3 = theme.TextDefault.Color,
+					RichText = true
+				}),
+				RecognizeFriendsByCustomNameContainer = react.createElement(
+					"Frame",
+					{
 						BackgroundTransparency = 1,
-						TextWrapped = true,
-						RichText = true,
-						width = FitTextLabel.Width.FitToText,
-						maximumWidth = v36.X,
-						Font = Font.Body.Font,
-						Text = v47.descriptionText,
-						TextSize = Font.BaseSize * Font.Body.RelativeSize,
-						TextColor3 = Theme.TextDefault.Color
-					}),
-					RecognizeFriendsByCustomNameContainer = React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 2,
 						Size = UDim2.fromScale(1, 0),
-						AutomaticSize = Enum.AutomaticSize.Y
-					}, {
-						UIPadding = React.createElement("UIPadding", {
+						AutomaticSize = Enum.AutomaticSize.Y,
+						LayoutOrder = 2
+					},
+					{
+						UIPadding = react.createElement("UIPadding", {
 							PaddingTop = UDim.new(0, 2),
 							PaddingBottom = UDim.new(0, 24)
 						}),
-						RecognizeFriendsByCustomName = React.createElement(FitTextLabel, {
+						RecognizeFriendsByCustomName = react.createElement(fitTextLabel, {
 							LayoutOrder = 1,
 							BackgroundTransparency = 1,
 							TextWrapped = true,
-							width = FitTextLabel.Width.FitToText,
-							maximumWidth = v36.X,
-							Font = Font.CaptionBody.Font,
-							Text = v47.recognizeFriendsByCustomNameText,
-							TextSize = Font.BaseSize * Font.CaptionBody.RelativeSize,
-							TextColor3 = Theme.TextDefault.Color
+							width = fitTextLabel.Width.FitToText,
+							maximumWidth = state.X,
+							Font = font.CaptionBody.Font,
+							Text = v4.recognizeFriendsByCustomNameText,
+							TextSize = font.BaseSize * font.CaptionBody.RelativeSize,
+							TextColor3 = theme.TextDefault.Color
 						})
-					}),
-					LoadingShimmer = if not t1.isLoading then nil else React.createElement(Skeleton, {
-						LayoutOrder = 3,
-						Size = UDim2.new(1, 0, 0, v46 + 20),
-						radius = EnumsRadius.Medium
-					}),
-					InputBackground = if t1.isLoading then nil else React.createElement(ImageSetLabel, {
-						BackgroundTransparency = 1,
-						LayoutOrder = 3,
-						Size = UDim2.new(1, 0, 0, v46 + 20),
-						Image = Images["component_assets/circle_21"],
-						ImageColor3 = Theme.UIMuted.Color,
-						ImageTransparency = Theme.UIMuted.Transparency,
-						ScaleType = Enum.ScaleType.Slice,
-						SliceCenter = Rect.new(8, 8, 9, 9)
-					}, {
-						InputBorder = React.createElement(ImageSetLabel, {
-							BackgroundTransparency = 1,
-							LayoutOrder = 1,
-							Size = UDim2.new(1, 0, 0, v46 + 20),
-							Image = Images["component_assets/circle_21_stroke_1"],
-							ImageColor3 = if not t1.hasSaveAliasError then Theme.Divider.Color else Theme.Alert.Color,
-							ScaleType = Enum.ScaleType.Slice,
-							SliceCenter = Rect.new(8, 8, 9, 9)
-						}, {
-							Padding = React.createElement("UIPadding", {
-								PaddingLeft = UDim.new(0, 12),
-								PaddingRight = UDim.new(0, 12)
-							}),
-							Textbox = React.createElement(CallbackInputBox, {
-								captureFocusOnMount = true,
-								clearButtonDisabled = false,
-								inputTextXAlignment = Enum.TextXAlignment.Left,
-								inputTextColor3 = Theme.TextDefault.Color,
-								inputTextTransparency = Theme.TextDefault.Transparency,
-								inputTextSize = v46,
-								initialInputText = t1.alias,
-								placeholderText = v47.customNamePlaceholderText,
-								placeholderTextColor3 = Theme.TextDefault.Color,
-								clearIcon = Images["icons/actions/edit/clear_small"],
-								clearIconColor3 = Theme.IconEmphasis.Color,
-								clearIconTransparency = Theme.IconEmphasis.Transparency,
-								clearButtonSize = IconSize.Small,
-								textChangedCallback = v53,
-								inputBoxRef = v35
-							})
+					}
+				),
+				LoadingShimmer = 0,
+				InputBackground = 0
+			}
+			local loadingShimmer
+
+			if props.isLoading then
+				loadingShimmer = react.createElement(skeleton, {
+					Size = UDim2.new(1, 0, 0, inputTextSize + 20),
+					LayoutOrder = 3,
+					radius = radius.Medium
+				})
+			end
+
+			v10.LoadingShimmer = loadingShimmer
+			local inputBackground
+
+			if not props.isLoading then
+				local createElement3 = react.createElement
+				local v11 = {
+					Size = UDim2.new(1, 0, 0, inputTextSize + 20),
+					BackgroundTransparency = 1,
+					LayoutOrder = 3,
+					Image = images["component_assets/circle_21"],
+					ImageColor3 = theme.UIMuted.Color,
+					ImageTransparency = theme.UIMuted.Transparency,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(8, 8, 9, 9)
+				}
+
+				local createElement4 = react.createElement
+				local v12 = {
+					Size = UDim2.new(1, 0, 0, inputTextSize + 20),
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					Image = images["component_assets/circle_21_stroke_1"],
+					ImageColor3 = 0,
+					ScaleType = 0,
+					SliceCenter = 0
+				}
+				local imageColor
+
+				if props.hasSaveAliasError then
+					imageColor = theme.Alert.Color
+				else
+					imageColor = theme.Divider.Color
+				end
+
+				v12.ImageColor3 = imageColor
+
+				v12.ScaleType = Enum.ScaleType.Slice
+				v12.SliceCenter = Rect.new(8, 8, 9, 9)
+				inputBackground = createElement3(imageSetLabel, v11, {
+					InputBorder = createElement4(imageSetLabel, v12, {
+						Padding = react.createElement("UIPadding", {
+							PaddingLeft = UDim.new(0, 12),
+							PaddingRight = UDim.new(0, 12)
+						}),
+						Textbox = react.createElement(callbackInputBox, {
+							inputTextXAlignment = Enum.TextXAlignment.Left,
+							inputTextColor3 = theme.TextDefault.Color,
+							inputTextTransparency = theme.TextDefault.Transparency,
+							inputTextSize = inputTextSize,
+							initialInputText = props.alias,
+							placeholderText = v4.customNamePlaceholderText,
+							placeholderTextColor3 = theme.TextDefault.Color,
+							captureFocusOnMount = true,
+							clearIcon = images["icons/actions/edit/clear_small"],
+							clearIconColor3 = theme.IconEmphasis.Color,
+							clearIconTransparency = theme.IconEmphasis.Transparency,
+							clearButtonSize = iconSize.Small,
+							clearButtonDisabled = false,
+							textChangedCallback = fn,
+							inputBoxRef = ref
 						})
 					})
-				}),
-				Counter = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					Size = UDim2.fromScale(1, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}, { React.createElement(FitTextLabel, {
-					BackgroundTransparency = 1,
-					width = FitTextLabel.Width.FitToText,
-					maximumWidth = v36.X,
-					Font = Font.CaptionBody.Font,
-					Text = if not t1.hasSaveAliasError then string.format("%d/%d", v41, 20) else v47.invalidAliasErrorText,
-					TextSize = Font.BaseSize * Font.CaptionBody.RelativeSize,
-					TextColor3 = if v41 ~= 20 and not t1.hasSaveAliasError then Theme.TextMuted.Color else Theme.Alert.Color,
-					TextTransparency = if v41 ~= 20 and not t1.hasSaveAliasError then Theme.TextMuted.Transparency else Theme.Alert.Transparency,
-					AnchorPoint = if not t1.hasSaveAliasError then Vector2.new(1, 0.5) else Vector2.new(0, 0.5),
-					Position = if not t1.hasSaveAliasError then UDim2.fromScale(1, 0) else nil
-				}, {
-					UISizeConstraint = React.createElement("UISizeConstraint", {
-						MaxSize = Vector2.new(1e999, Font.BaseSize * Font.CaptionBody.RelativeSize * 2)
+				})
+			end
+
+			v10.InputBackground = inputBackground
+			local children = {
+				InputGroup = createElement2("Frame", v9, v10),
+				Counter = 0
+			}
+
+			local createElement3 = react.createElement
+			local v11 = {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 2
+			}
+
+			local createElement4 = react.createElement
+			local v12 = {
+				BackgroundTransparency = 1,
+				width = fitTextLabel.Width.FitToText,
+				maximumWidth = state.X,
+				Font = font.CaptionBody.Font,
+				Text = 0,
+				TextSize = 0,
+				TextColor3 = 0,
+				TextTransparency = 0,
+				AnchorPoint = 0,
+				Position = 0
+			}
+			local text
+
+			if props.hasSaveAliasError then
+				text = v4.invalidAliasErrorText
+			else
+				text = string.format("%d/%d", state3, 20)
+			end
+
+			v12.Text = text
+
+			v12.TextSize = font.BaseSize * font.CaptionBody.RelativeSize
+			local textColor
+
+			if state3 == 20 or props.hasSaveAliasError then
+				textColor = theme.Alert.Color
+			else
+				textColor = theme.TextMuted.Color
+			end
+
+			v12.TextColor3 = textColor
+			local textTransparency
+
+			if state3 == 20 or props.hasSaveAliasError then
+				textTransparency = theme.Alert.Transparency
+			else
+				textTransparency = theme.TextMuted.Transparency
+			end
+
+			v12.TextTransparency = textTransparency
+			local anchorPoint
+
+			if props.hasSaveAliasError then
+				anchorPoint = Vector2.new(0, 0.5)
+			else
+				anchorPoint = Vector2.new(1, 0.5)
+			end
+
+			v12.AnchorPoint = anchorPoint
+			local position
+
+			if not props.hasSaveAliasError then
+				position = UDim2.fromScale(1, 0)
+			end
+
+			v12.Position = position
+			children.Counter = createElement3("Frame", v11, { createElement4(fitTextLabel, v12, {
+					UISizeConstraint = react.createElement("UISizeConstraint", {
+						MaxSize = Vector2.new(1e999, font.BaseSize * font.CaptionBody.RelativeSize * 2)
 					})
 				}) })
-			})
+			return createElement(fitFrameVertical, v8, children)
 		end,
 		buttonStackInfo = {
-			buttonHeight = 48,
-			marginBetween = 6,
 			buttons = {
 				{
-					buttonType = ButtonType.Secondary,
-					props = {
-						onActivated = v52,
-						text = v47.cancelButtonText
-					}
+					buttonType = buttonType.Secondary,
+					props = { onActivated = onActivated2, text = v4.cancelButtonText }
 				},
 				{
-					buttonType = ButtonType.PrimarySystem,
+					buttonType = buttonType.PrimarySystem,
 					props = {
-						onActivated = function() -- line: 106
-							-- upvalues: t1 (copy), v38 (copy)
-							t1.saveOnActivated(v38)
-						end,
-						text = v47.saveButtonText,
-						isDisabled = not not hasSaveAliasError
+						onActivated = onActivated,
+						text = v4.saveButtonText,
+						isDisabled = not v6
 					}
 				}
 			},
+			buttonHeight = 48,
+			marginBetween = 6,
 			forcedFillDirection = Enum.FillDirection.Horizontal
 		}
 	})
 
 	if FFlagSetAliasFixFocusNavigation then
-		return React.createElement(FocusRoot, {
-			isAutoFocusRoot = true,
-			isIsolated = true,
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
-			eventHandlers = v54
-		}, {
-			Alert = v55
-		})
+		return react.createElement(
+			FocusRoot,
+			{
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+				isAutoFocusRoot = true,
+				isIsolated = true,
+				eventHandlers = eventHandlers
+			},
+			{ Alert = element }
+		)
 	end
 
-	return v55
+	return element
 end

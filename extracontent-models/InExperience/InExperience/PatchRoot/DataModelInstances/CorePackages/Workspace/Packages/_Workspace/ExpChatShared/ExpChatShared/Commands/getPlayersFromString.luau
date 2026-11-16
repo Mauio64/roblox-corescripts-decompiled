@@ -1,32 +1,35 @@
-local Parent = script:FindFirstAncestor("ExpChatShared").Parent
-local Dictionary = require(Parent.llama).Dictionary
+local parent = script:FindFirstAncestor("ExpChatShared").Parent
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
 
-local function getPlayersFromCommand(p1, s1: string?) -- line: 12
-	-- upvalues: Dictionary (copy)
-	if not s1 then
+local function getPlayersFromCommand(data, value: string?)
+	if not value then
 		return {}
 	end
 
-	assert(s1, "will exist")
+	assert(value, "will exist")
 
-	local v6 = string.lower(s1)
+	local v = string.lower(value)
 
-	if v6 and string.sub(v6, 1, 1) == "@" then
-		local v7 = string.sub(v6, 2)
-		local v8 = p1.byUsername[v7]
-
-		if v8 then
-			return { Dictionary.join(p1.byUserId[v8], {
-				nameToDisplay = "@" .. p1.byUserId[v8].username
-			}) }
-		end
+	if not v or string.sub(v, 1, 1) ~= "@" then
+		return dictionary.map(data.byDisplayName[v] or {}, function(p)
+			return dictionary.join(data.byUserId[p], {
+				nameToDisplay = data.byUserId[p].displayName
+			})
+		end)
 	end
 
-	return Dictionary.map(p1.byDisplayName[v6] or {}, function(p2) -- line: 28
-		-- upvalues: Dictionary (copy), p1 (copy)
-		return Dictionary.join(p1.byUserId[p2], {
-			nameToDisplay = p1.byUserId[p2].displayName
-		})
+	local v2 = string.sub(v, 2)
+	local v3 = data.byUsername[v2]
+
+	if v3 then
+		return { dictionary.join(data.byUserId[v3], {
+				nameToDisplay = "@" .. data.byUserId[v3].username
+			}) }
+	end
+
+	return dictionary.map(data.byDisplayName[v] or {}, function(p)
+		return dictionary.join(data.byUserId[p], { nameToDisplay = data.byUserId[p].displayName })
 	end)
 end
 

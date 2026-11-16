@@ -1,10 +1,11 @@
-local ParentParent = script.Parent.Parent
-local ReactCurrentBatchConfig = require(ParentParent.Shared).ReactSharedInternals.ReactCurrentBatchConfig
+local parent = script.Parent.Parent
+
+local Shared = require(parent.Shared)
+local ReactCurrentBatchConfig = Shared.ReactSharedInternals.ReactCurrentBatchConfig
 
 return {
 	NoTransition = 0,
-	requestCurrentTransition = function() -- line: 20
-		-- upvalues: ReactCurrentBatchConfig (copy)
+	requestCurrentTransition = function()
 		return ReactCurrentBatchConfig.transition
 	end
 }

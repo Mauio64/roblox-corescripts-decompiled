@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("ApolloLocalState").Parent
-local JestConfigs = require(Parent.Dev.JestConfigs)
+local parent = script:FindFirstAncestor("ApolloLocalState").Parent
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "ApolloLocalState",

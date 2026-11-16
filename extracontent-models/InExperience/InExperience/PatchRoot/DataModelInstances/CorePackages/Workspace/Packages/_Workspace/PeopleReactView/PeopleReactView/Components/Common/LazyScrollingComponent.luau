@@ -1,70 +1,80 @@
-local Parent = script:FindFirstAncestor("PeopleReactView").Parent
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
-local View = require(Parent.Foundation).View
-local FFlagEnablePeopleListLazyRender = require(Parent.PeopleService).getService("Flags").FFlagEnablePeopleListLazyRender
-local v6 = game:DefineFastInt("PeoplePageLazyRenderThreshold", 100)
+local parent = script:FindFirstAncestor("PeopleReactView").Parent
 
-function LazyScrollingComponent(t1: {[any]: any}) -- line: 29
-	-- upvalues: React (copy), v6 (copy), Signals (copy), View (copy), FFlagEnablePeopleListLazyRender (copy)
-	local v8, v9 = React.useState(false)
-	local v10 = React.useCallback(function(n1: number, n2: number, n3: number) -- line: 33
-		-- upvalues: v6 (copy)
-		return n1 < n2 + n3 + v6
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+
+local PeopleService = require(parent.PeopleService)
+
+local fFlagEnablePeopleListLazyRender = PeopleService.getService("Flags").FFlagEnablePeopleListLazyRender
+
+local defineFastInt = game:DefineFastInt("PeoplePageLazyRenderThreshold", 100)
+
+function LazyScrollingComponent(props)
+	local state, setState = React.useState(false)
+
+	local v = React.useCallback(function(p: number, p2: number, p3: number): boolean
+		return p < p2 + p3 + defineFastInt
 	end, {})
-	local v11 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 41
-		-- upvalues: v8 (copy), v11 (copy), v9 (copy), v10 (copy), t1 (copy), Signals (copy)
-		if v8 or not v11.current then
+	local ref = React.useRef(nil)
+
+	React.useEffect(function()
+		if state or not ref.current then
 			return
 		end
 
-		v9(v10(v11.current.AbsolutePosition.Y, t1.scrollingFrameAbsolutePositionY(false), t1.scrollingFrameAbsoluteSizeY(false)))
+		setState(v(
+			ref.current.AbsolutePosition.Y,
+			props.scrollingFrameAbsolutePositionY(false),
+			props.scrollingFrameAbsoluteSizeY(false)
+		))
 
-		local connection = v11.current:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 59
-			-- upvalues: v11 (copy), v9 (copy), v10 (copy), t1 (copy)
-			if not v11.current then
+		local absolutePositionChangedConnection = ref.current:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+			if not ref.current then
 				return
 			end
 
-			v9(v10(v11.current.AbsolutePosition.Y, t1.scrollingFrameAbsolutePositionY(false), t1.scrollingFrameAbsoluteSizeY(false)))
+			setState(v(
+				ref.current.AbsolutePosition.Y,
+				props.scrollingFrameAbsolutePositionY(false),
+				props.scrollingFrameAbsoluteSizeY(false)
+			))
 		end)
-		local v16 = Signals.createEffect(function(p1) -- line: 74
-			-- upvalues: t1 (copy), v11 (copy), v9 (copy), v10 (copy)
-			t1.scrollingFrameCanvasPositionY(p1)
 
-			local v18 = t1.scrollingFrameAbsolutePositionY(p1)
-			local v19 = t1.scrollingFrameAbsoluteSizeY(p1)
+		local effect = Signals.createEffect(function(p)
+			props.scrollingFrameCanvasPositionY(p)
 
-			if not v11.current then
+			local scrollingFrameAbsolutePositionY = props.scrollingFrameAbsolutePositionY(p)
+			local scrollingFrameAbsoluteSizeY = props.scrollingFrameAbsoluteSizeY(p)
+
+			if not ref.current then
 				return
 			end
 
-			v9(v10(v11.current.AbsolutePosition.Y, v18, v19))
+			setState(v(ref.current.AbsolutePosition.Y, scrollingFrameAbsolutePositionY, scrollingFrameAbsoluteSizeY))
 		end)
 
-		return function() -- line: 89
-			-- upvalues: connection (copy), v16 (copy)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if absolutePositionChangedConnection then
+				absolutePositionChangedConnection:Disconnect()
 			end
 
-			v16()
+			effect()
 		end
-	end, { v8 })
+	end, { state })
 
-	if not v8 then
-		return React.createElement(View, {
-			tag = not FFlagEnablePeopleListLazyRender and "auto-xy" or "size-full-0 auto-xy",
-			ref = v11,
-			LayoutOrder = t1.placeholderLayoutOrder
-		}, {
-			Placeholder = t1.placeholder
-		})
+	if state then
+		return props.children
 	end
 
-	return t1.children
+	return React.createElement(View, {
+		tag = fFlagEnablePeopleListLazyRender and "size-full-0 auto-xy" or "auto-xy",
+		ref = ref,
+		LayoutOrder = props.placeholderLayoutOrder
+	}, { Placeholder = props.placeholder })
 end
 
 return React.memo(LazyScrollingComponent)

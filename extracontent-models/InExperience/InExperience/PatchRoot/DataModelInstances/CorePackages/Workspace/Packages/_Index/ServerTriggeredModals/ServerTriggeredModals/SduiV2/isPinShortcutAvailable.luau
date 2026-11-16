@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
-local SduiCapabilities = require(Parent.SduiSharedUtilities).SduiCapabilities
+local parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
 
-local function isPinShortcutAvailable() -- line: 8
-	-- upvalues: SduiCapabilities (copy)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local SduiCapabilities = SduiSharedUtilities.SduiCapabilities
+
+local function isPinShortcutAvailable()
 	return SduiCapabilities.isEnabled("CAPABILITY_SUPPORTS_PIN_SHORTCUT_ACTION")
 end
 

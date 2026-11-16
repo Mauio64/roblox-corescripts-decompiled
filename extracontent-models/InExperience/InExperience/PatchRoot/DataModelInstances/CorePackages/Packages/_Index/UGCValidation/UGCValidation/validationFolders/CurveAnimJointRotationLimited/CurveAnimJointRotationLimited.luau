@@ -1,11 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFIntUGCValidateMaxAnimationFPS = require(ParentParent.flags.getFIntUGCValidateMaxAnimationFPS)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
+local getFIntUGCValidateMaxAnimationFPS = require(parent.flags.getFIntUGCValidateMaxAnimationFPS)
+
 local GetFStringUGCValidateMaxJointRotationPerPart = require(script.Parent.GetFStringUGCValidateMaxJointRotationPerPart)
 
 return {
@@ -14,65 +14,63 @@ return {
 		ValidationEnums.SharedDataMember.curveAnimations,
 		ValidationEnums.SharedDataMember.curveAnimComputedFrames
 	},
-	fflag = getFFlagUGCValidationAnimationPackSupport,
 	expectedFailures = {},
 	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
-	run = function(p1, p2) -- line: 23
-		-- upvalues: getFIntUGCValidateMaxAnimationFPS (copy), GetFStringUGCValidateMaxJointRotationPerPart (copy), ErrorSourceStrings (copy)
-		local curveAnimComputedFrames = p2.curveAnimComputedFrames
+	run = function(object, p)
+		local curveAnimComputedFrames = p.curveAnimComputedFrames
 		local animLength = curveAnimComputedFrames.animLength
 		local tracks = curveAnimComputedFrames.tracks
-		local v12 = 1 / getFIntUGCValidateMaxAnimationFPS()
-		local t1 = {}
+		local v = 1 / getFIntUGCValidateMaxAnimationFPS()
 
-		for v14, v15 in tracks do
-			if not v15.rot then
+		local v2 = {}
+
+		for k, track in tracks do
+			if not track.rot then
 				continue
 			end
 
-			local str = tostring(v14)
+			local bodyPart = tostring(k)
 
-			if not t1[str] then
-				t1[str] = GetFStringUGCValidateMaxJointRotationPerPart.asNumber(str)
+			if not v2[bodyPart] then
+				v2[bodyPart] = GetFStringUGCValidateMaxJointRotationPerPart.asNumber(bodyPart)
 			end
 
-			local v17 = t1[str]
-			local n1 = 0
+			local v3 = v2[bodyPart]
+			local total = 0
 
-			while n1 <= animLength do
-				local _, v20 = v15.rot:GetRotationAtTime(n1):ToAxisAngle()
-				local v21 = math.deg((math.abs(v20)))
+			while total <= animLength do
+				local _, v4 = track.rot:GetRotationAtTime(total):ToAxisAngle()
+				local v5 = math.deg((math.abs(v4)))
 
-				if v17 < v21 then
-					p1:fail(ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded, {
-						time = string.format("%.2f", n1),
-						bodyPart = str,
-						rotation = string.format("%.2f", v21),
-						maxRotation = tostring(v17)
+				if v3 < v5 then
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded, {
+						time = string.format("%.2f", total),
+						bodyPart = bodyPart,
+						rotation = string.format("%.2f", v5),
+						maxRotation = tostring(v3)
 					})
 
 					return
 				end
 
-				n1 += v12
+				total += v
 			end
 
-			if animLength >= 0 then
-				local _, v23 = v15.rot:GetRotationAtTime(animLength):ToAxisAngle()
-				local v24 = math.deg((math.abs(v23)))
+			if not (animLength >= 0) then
+				continue
+			end
 
-				if not (v17 < v24) then
-					continue
-				end
+			local _, v4 = track.rot:GetRotationAtTime(animLength):ToAxisAngle()
+			local v5 = math.deg((math.abs(v4)))
 
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded, {
+			if v3 < v5 then
+				object:fail(ErrorSourceStrings.Keys.CurveAnim_JointRotationExceeded, {
 					time = string.format("%.2f", animLength),
-					bodyPart = str,
-					rotation = string.format("%.2f", v24),
-					maxRotation = tostring(v17)
+					bodyPart = bodyPart,
+					rotation = string.format("%.2f", v5),
+					maxRotation = tostring(v3)
 				})
-
-				return
+				break
 			end
 		end
 	end

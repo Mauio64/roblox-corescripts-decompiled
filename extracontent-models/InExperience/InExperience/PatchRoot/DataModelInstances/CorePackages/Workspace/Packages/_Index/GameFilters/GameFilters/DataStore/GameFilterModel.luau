@@ -1,74 +1,94 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("GameFilters").Parent
+local ArgCheck = require(parent.ArgCheck)
+require(parent.DiscoveryTypes)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppChartsFilterOptionTextTag = SharedFlags.FFlagLuaAppChartsFilterOptionTextTag
 
-require(Parent.DiscoveryTypes)
+local GameFilterModel = {}
 
-local FFlagLuaAppChartsActiveFilterChips = require(Parent.SharedFlags).FFlagLuaAppChartsActiveFilterChips
-local FFlagLuaAppChartsFilterOptionTextTag = require(Parent.SharedFlags).FFlagLuaAppChartsFilterOptionTextTag
-local t1 = {
-	new = function() -- line: 12
-		return {}
+function GameFilterModel.new()
+	return {}
+end
+
+function GameFilterModel.mockFromExploreApi(filterId: string, value: string?)
+	local fromExploreJsonData = GameFilterModel.fromExploreJsonData
+
+	local v = {
+		optionId = filterId .. "_option",
+		optionDisplayName = "",
+		optionContextTag = 0
+	}
+	local optionContextTag
+
+	if FFlagLuaAppChartsFilterOptionTextTag then
+		optionContextTag = filterId .. "_context"
 	end
-}
 
-function t1.mockFromExploreApi(s1: string, s2: string?) -- line: 18
-	-- upvalues: t1 (copy), FFlagLuaAppChartsFilterOptionTextTag (copy), FFlagLuaAppChartsActiveFilterChips (copy)
-	local v8 = t1.fromExploreJsonData({
+	v.optionContextTag = optionContextTag
+	local v2 = fromExploreJsonData({
+		filterId = filterId,
 		filterType = "",
 		filterDisplayName = "",
-		filterId = s1,
-		filterOptions = {{
-			optionDisplayName = "",
-			optionId = s1 .. "_option",
-			optionContextTag = if not FFlagLuaAppChartsFilterOptionTextTag then nil else s1 .. "_context"
-		}},
-		defaultOptionId = s1 .. "_option",
-		selectedOptionId = s1 .. "_option",
-		inactiveOptionIds = if not FFlagLuaAppChartsActiveFilterChips then nil else { s1 .. "_option" }
+		filterOptions = { v },
+		defaultOptionId = filterId .. "_option",
+		selectedOptionId = filterId .. "_option",
+		inactiveOptionIds = { filterId .. "_option" }
 	})
 
-	v8.selectedOptionDisplayName = s2 or ""
+	v2.selectedOptionDisplayName = value or ""
 
-	return v8
-end
-function t1.fromExploreJsonData(p1) -- line: 40
-	-- upvalues: t1 (copy), FFlagLuaAppChartsActiveFilterChips (copy), FFlagLuaAppChartsFilterOptionTextTag (copy), ArgCheck (copy)
-	local v10 = t1.new()
-
-	v10.filterId = p1.filterId
-	v10.filterType = p1.filterType
-	v10.filterDisplayName = p1.filterDisplayName
-	v10.defaultOptionId = p1.defaultOptionId
-	v10.selectedOptionId = p1.selectedOptionId
-
-	if FFlagLuaAppChartsActiveFilterChips and p1.inactiveOptionIds then
-		local t2 = {}
-
-		for _, v13 in p1.inactiveOptionIds do
-			t2[v13] = true
-		end
-
-		v10.inactiveOptionIds = t2
-	end
-
-	local t3 = {}
-
-	for _, v in ipairs(p1.filterOptions) do
-		table.insert(t3, {
-			optionId = v.optionId,
-			optionDisplayName = v.optionDisplayName,
-			optionContextTag = if not FFlagLuaAppChartsFilterOptionTextTag then nil else v.optionContextTag
-		})
-
-		if v.optionId == p1.selectedOptionId then
-			ArgCheck.assert(v10.selectedOptionDisplayName == nil, "Multiple selected options found")
-			v10.selectedOptionDisplayName = v.optionDisplayName
-		end
-	end
-
-	v10.filterOptions = t3
-
-	return v10
+	return v2
 end
 
-return t1
+function GameFilterModel.fromExploreJsonData(data)
+	local result = GameFilterModel.new()
+
+	result.filterId = data.filterId
+	result.filterType = data.filterType
+	result.filterDisplayName = data.filterDisplayName
+	result.defaultOptionId = data.defaultOptionId
+	result.selectedOptionId = data.selectedOptionId
+
+	if data.inactiveOptionIds then
+		local inactiveOptionIdSet = {}
+
+		for _, inactiveOptionId in data.inactiveOptionIds do
+			inactiveOptionIdSet[inactiveOptionId] = true
+		end
+
+		result.inactiveOptionIds = inactiveOptionIdSet
+	end
+
+	local filterOptions = {}
+
+	for _, filterOption in ipairs(data.filterOptions) do
+		local v = {
+			optionId = filterOption.optionId,
+			optionDisplayName = filterOption.optionDisplayName,
+			optionContextTag = 0
+		}
+		local optionContextTag
+
+		if FFlagLuaAppChartsFilterOptionTextTag then
+			optionContextTag = filterOption.optionContextTag
+		end
+
+		v.optionContextTag = optionContextTag
+
+		table.insert(filterOptions, v)
+
+		if filterOption.optionId ~= data.selectedOptionId then
+			continue
+		end
+
+		ArgCheck.assert(result.selectedOptionDisplayName == nil, "Multiple selected options found")
+
+		result.selectedOptionDisplayName = filterOption.optionDisplayName
+	end
+
+	result.filterOptions = filterOptions
+
+	return result
+end
+
+return GameFilterModel

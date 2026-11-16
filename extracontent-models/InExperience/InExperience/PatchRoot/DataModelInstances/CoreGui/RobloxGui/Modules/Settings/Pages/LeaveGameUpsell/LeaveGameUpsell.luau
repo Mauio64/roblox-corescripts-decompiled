@@ -4,8 +4,11 @@ local ContextActionService = game:GetService("ContextActionService")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local GuiService = game:GetService("GuiService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 local Constants = require(RobloxGui.Modules.VoiceChat.Constants)
+
 local Roact = require(CorePackages.Packages.Roact)
 local React = require(CorePackages.Packages.React)
 local UIBlox = require(CorePackages.Packages.UIBlox)
@@ -14,395 +17,505 @@ local Button = UIBlox.App.Button.Button
 local ButtonStack = UIBlox.App.Button.ButtonStack
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local useStyle = UIBlox.Core.Style.useStyle
-local PhoneLegalDisclaimer = require(CorePackages.Workspace.Packages.PhoneUpsell).PhoneLegalDisclaimer
-local InExperienceProviderContainer = require(CorePackages.Workspace.Packages.InExperienceContainer).InExperienceProviderContainer
-local PostPhoneUpsellDisplayed = require(CorePackages.Workspace.Packages.PhoneUpsell).Http.Requests.PostPhoneUpsellDisplayed
-local PhoneUpsellController = require(CorePackages.Workspace.Packages.PhoneUpsell).PhoneUpsellController
-local Constants2 = require(CorePackages.Workspace.Packages.PhoneUpsell).Constants
-local RoactNetworking = require(CorePackages.Workspace.Packages.RoactServiceTags).RoactNetworking
-local useAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy).useAppPolicy
-local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
-local useRoactService = require(CorePackages.Workspace.Packages.RobloxAppHooks).useRoactService
-local useInputType = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.useInputType
-local InputTypeConstants = require(CorePackages.Workspace.Packages.InputType).InputTypeConstants
-local useEventConnection = require(CorePackages.Packages.ReactUtils).useEventConnection
-local getPlatformTarget = require(CorePackages.Workspace.Packages.Analytics).getPlatformTarget
-local EventStreamConstants = require(CorePackages.Workspace.Packages.AuthAnalytics).EventStreamConstants
+local PhoneUpsell = require(CorePackages.Workspace.Packages.PhoneUpsell)
+local PhoneLegalDisclaimer = PhoneUpsell.PhoneLegalDisclaimer
+local InExperienceContainer = require(CorePackages.Workspace.Packages.InExperienceContainer)
+local InExperienceProviderContainer = InExperienceContainer.InExperienceProviderContainer
+
+local PhoneUpsell2 = require(CorePackages.Workspace.Packages.PhoneUpsell)
+local PostPhoneUpsellDisplayed = PhoneUpsell2.Http.Requests.PostPhoneUpsellDisplayed
+local PhoneUpsell3 = require(CorePackages.Workspace.Packages.PhoneUpsell)
+local PhoneUpsellController = PhoneUpsell3.PhoneUpsellController
+local PhoneUpsell4 = require(CorePackages.Workspace.Packages.PhoneUpsell)
+local constants = PhoneUpsell4.Constants
+local RoactServiceTags = require(CorePackages.Workspace.Packages.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+local UniversalAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RobloxAppHooks = require(CorePackages.Workspace.Packages.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactUtils = require(CorePackages.Workspace.Packages.RoactUtils)
+local useInputType = RoactUtils.Hooks.useInputType
+local InputType = require(CorePackages.Workspace.Packages.InputType)
+local InputTypeConstants = InputType.InputTypeConstants
+local ReactUtils = require(CorePackages.Packages.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
+local Analytics = require(CorePackages.Workspace.Packages.Analytics)
+local getPlatformTarget = Analytics.getPlatformTarget
+local AuthAnalytics = require(CorePackages.Workspace.Packages.AuthAnalytics)
+local EventStreamConstants = AuthAnalytics.EventStreamConstants
 local leaveGame = require(RobloxGui.Modules.Settings.leaveGame)
-local GetFFlagDisablePVUpsellDataConsent = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagDisablePVUpsellDataConsent
-local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
-local GetFFlagAddMorePhoneUpsellEvents = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagAddMorePhoneUpsellEvents
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+
+local GetFFlagDisablePVUpsellDataConsent = SharedFlags.GetFFlagDisablePVUpsellDataConsent
+
+local engineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagAddMorePhoneUpsellEvents = SharedFlags2.GetFFlagAddMorePhoneUpsellEvents
 
 RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
 
-local Constants3 = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
+local Constants2 = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
+
 local _ = {
 	Incomplete = "Incomplete",
 	Completed = "Completed",
 	CompletedAndClosed = "CompletedAndClosed"
 }
 
-local function Initialize() -- line: 65
-	-- upvalues: RobloxGui (copy), EngineFeature (copy), RbxAnalyticsService (copy), Constants3 (copy), useStyle (copy), useLocalization (copy), Constants (copy), useAppPolicy (copy), React (copy), StyledTextLabel (copy), Button (copy), ButtonType (copy), GetFFlagAddMorePhoneUpsellEvents (copy), getPlatformTarget (copy), EventStreamConstants (copy), PhoneUpsellController (copy), default (copy), GetFFlagDisablePVUpsellDataConsent (copy), PhoneLegalDisclaimer (copy), Constants2 (copy), useRoactService (copy), RoactNetworking (copy), useInputType (copy), InputTypeConstants (copy), GuiService (copy), ContextActionService (copy), PostPhoneUpsellDisplayed (copy), useEventConnection (copy), ButtonStack (copy), leaveGame (copy), InExperienceProviderContainer (copy), Roact (copy)
-	local v39 = require(RobloxGui.Modules.Settings.SettingsPageFactory):CreateNewPage()
+local function Initialize()
+	local SettingsPageFactory = require(RobloxGui.Modules.Settings.SettingsPageFactory)
+	local newPage = SettingsPageFactory:CreateNewPage()
 
-	v39.playsessionid = ""
+	newPage.playsessionid = ""
 
-	if EngineFeature then
-		v39.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+	if engineFeature then
+		newPage.playsessionid = RbxAnalyticsService:GetPlaySessionId()
 	end
 
-	function v39.DontLeaveFunc(p1) -- line: 74
-		-- upvalues: v39 (copy), RbxAnalyticsService (copy), Constants3 (copy)
-		if v39.HubRef then
-			v39.HubRef:PopMenu(p1, true)
+	function newPage.DontLeaveFunc(p)
+		if newPage.HubRef then
+			newPage.HubRef:PopMenu(p, true)
 		end
 
-		RbxAnalyticsService:SetRBXEventStream(Constants3.AnalyticsTargetName, Constants3.AnalyticsInGameMenuName, Constants3.AnalyticsLeaveGameName, {
-			confirmed = Constants3.AnalyticsCancelledName,
-			universeid = tostring(game.GameId),
-			source = Constants3.AnalyticsLeaveGameSource,
-			playsessionid = v39.playsessionid
-		})
+		RbxAnalyticsService:SetRBXEventStream(
+			Constants2.AnalyticsTargetName,
+			Constants2.AnalyticsInGameMenuName,
+			Constants2.AnalyticsLeaveGameName,
+			{
+				confirmed = Constants2.AnalyticsCancelledName,
+				universeid = tostring(game.GameId),
+				source = Constants2.AnalyticsLeaveGameSource,
+				playsessionid = newPage.playsessionid
+			}
+		)
 	end
-	function v39.DontLeaveFromHotkey(_, p3, p4) -- line: 91
-		-- upvalues: v39 (copy)
-		if p3 == Enum.UserInputState.Begin then
-			local v47 = p4.UserInputType == Enum.UserInputType.Gamepad1 or (p4.UserInputType == Enum.UserInputType.Gamepad2 or (p4.UserInputType == Enum.UserInputType.Gamepad3 or p4.UserInputType == Enum.UserInputType.Gamepad4))
+	function newPage.DontLeaveFromHotkey(_, p, p2)
+		if p == Enum.UserInputState.Begin then
+			local v = p2.UserInputType == Enum.UserInputType.Gamepad1
+				or p2.UserInputType == Enum.UserInputType.Gamepad2
+				or p2.UserInputType == Enum.UserInputType.Gamepad3
+				or p2.UserInputType == Enum.UserInputType.Gamepad4
 
-			v39.DontLeaveFunc(v47)
+			newPage.DontLeaveFunc(v)
 		end
 	end
-	function v39.DontLeaveFromButton(p5) -- line: 101
-		-- upvalues: v39 (copy)
-		v39.DontLeaveFunc(p5)
+	function newPage.DontLeaveFromButton(p)
+		newPage.DontLeaveFunc(p)
 	end
 
-	v39.TabHeader = nil
-	v39.Page.Name = "LeaveGameUpsellPage"
-	v39.ShouldShowBottomBar = false
-	v39.ShouldShowHubBar = false
-	v39.DisableTopPadding = true
+	newPage.TabHeader = nil
 
-	function v39.UpsellComponent(p6) -- line: 114
-		-- upvalues: v39 (copy), useStyle (copy), useLocalization (copy), Constants (copy), useAppPolicy (copy), React (copy), StyledTextLabel (copy), Button (copy), ButtonType (copy), GetFFlagAddMorePhoneUpsellEvents (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), EventStreamConstants (copy), PhoneUpsellController (copy), default (copy), GetFFlagDisablePVUpsellDataConsent (copy), PhoneLegalDisclaimer (copy), Constants2 (copy)
-		local upsellType = v39.upsellType
-		local v51 = useStyle()
-		local v52 = useLocalization({
+	newPage.Page.Name = "LeaveGameUpsellPage"
+	newPage.ShouldShowBottomBar = false
+	newPage.ShouldShowHubBar = false
+	newPage.DisableTopPadding = true
+
+	function newPage.UpsellComponent(props)
+		local upsellType = newPage.upsellType
+		local v = useStyle()
+		local v2 = useLocalization({
+			headerKey = upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and "Feature.VerificationUpsell.Heading.UnlockVoiceChat" or "Feature.VerificationUpsell.Heading.DontLoseAccess",
+			bodyKey = upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and "Feature.VerificationUpsell.Description.UnlockVoiceChatBody" or "Feature.VerificationUpsell.Description.RecoverAccountEasily",
 			voiceConsent = "Feature.VerificationUpsell.Description.VoiceLegalConsent2",
 			voiceDisclaimer = "Feature.VerificationUpsell.Description.VoiceLegalDisclaimer2",
 			button = "Feature.VerificationUpsell.Action.AddPhoneNumber",
 			termsOfUse = "Feature.VerificationUpsell.Action.SMSTerms",
-			privacyPolicy = "Feature.VerificationUpsell.Action.Privacy",
-			headerKey = upsellType ~= Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and "Feature.VerificationUpsell.Heading.DontLoseAccess" or "Feature.VerificationUpsell.Heading.UnlockVoiceChat",
-			bodyKey = upsellType ~= Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and "Feature.VerificationUpsell.Description.RecoverAccountEasily" or "Feature.VerificationUpsell.Description.UnlockVoiceChatBody"
+			privacyPolicy = "Feature.VerificationUpsell.Action.Privacy"
 		})
 
-		v52.voiceDisclaimer = v52.voiceDisclaimer:gsub("{buttonText}", v52.button)
-
-		local v53 = useAppPolicy(function(p7) -- line: 131
-			-- upvalues: upsellType (copy), Constants (copy)
-			return upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and p7.RequireExplicitVoiceConsent()
+		v2.voiceDisclaimer = v2.voiceDisclaimer:gsub("{buttonText}", v2.button)
+		local showLegalTextCheckbox = useAppPolicy(function(p)
+			return upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and p.RequireExplicitVoiceConsent()
 		end)
-		local v54, v55 = React.useState(false)
 
-		return React.createElement("Frame", {
-			BackgroundTransparency = 1,
+		local state, setState = React.useState(false)
+
+		local createElement = React.createElement
+		local v3 = {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = p6.LayoutOrder
-		}, {
+			BackgroundTransparency = 1,
+			LayoutOrder = props.LayoutOrder
+		}
+		local v4 = {
 			ListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 12)
 			}),
 			Header = React.createElement(StyledTextLabel, {
-				layoutOrder = 1,
-				text = v52.headerKey,
-				fontStyle = v51.Font.Header2,
-				colorStyle = v51.Theme.TextEmphasis
+				text = v2.headerKey,
+				fontStyle = v.Font.Header2,
+				colorStyle = v.Theme.TextEmphasis,
+				layoutOrder = 1
 			}),
 			Body = React.createElement(StyledTextLabel, {
+				text = v2.bodyKey,
 				textWrapped = true,
-				lineHeight = 1.1,
-				layoutOrder = 2,
-				text = v52.bodyKey,
 				size = UDim2.new(1, 0, 0, 0),
 				automaticSize = Enum.AutomaticSize.Y,
-				fontStyle = v51.Font.Body,
-				colorStyle = v51.Theme.TextDefault
+				fontStyle = v.Font.Body,
+				lineHeight = 1.1,
+				colorStyle = v.Theme.TextDefault,
+				layoutOrder = 2
 			}),
 			Button = React.createElement(Button, {
-				layoutOrder = 3,
 				buttonType = ButtonType.Secondary,
-				size = UDim2.new(1, 0, 0, v51.Tokens.Size.Size_1200),
-				text = v52.button,
-				onActivated = function() -- line: 169
-					-- upvalues: v39 (copy), GetFFlagAddMorePhoneUpsellEvents (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), p6 (copy), EventStreamConstants (copy), PhoneUpsellController (copy), default (copy), upsellType (copy), Constants (copy)
-					v39.HubRef:SetVisibility(false, true)
+				size = UDim2.new(1, 0, 0, v.Tokens.Size.Size_1200),
+				layoutOrder = 3,
+				text = v2.button,
+				onActivated = function()
+					newPage.HubRef:SetVisibility(false, true)
 
 					if GetFFlagAddMorePhoneUpsellEvents() then
-						RbxAnalyticsService:SendEventDeferred(getPlatformTarget(), "verificationUpsell", "modalAction", {
-							origin = p6.origin,
-							btn = EventStreamConstants.Button.Continue,
-							section = p6.section
-						})
+						RbxAnalyticsService:SendEventDeferred(
+							getPlatformTarget(),
+							"verificationUpsell",
+							"modalAction",
+							{
+								origin = props.origin,
+								btn = EventStreamConstants.Button.Continue,
+								section = props.section
+							}
+						)
 					end
 
 					PhoneUpsellController.openPhoneUpsell({
+						origin = props.origin,
 						eventContext = "verificationUpsell",
-						origin = p6.origin,
-						onSuccessBeforeToast = function() -- line: 181
-							-- upvalues: default (copy), p6 (copy), v39 (copy)
+						onSuccessBeforeToast = function()
 							default:DisablePhoneVerificationUpsell()
-							p6.onUpsellComplete()
-							v39.HubRef:SetVisibility(true, false)
-							v39.HubRef:SwitchToPage(v39.HubRef.LeaveGameUpsellPage, true)
+							props.onUpsellComplete()
+							newPage.HubRef:SetVisibility(true, false)
+							newPage.HubRef:SwitchToPage(newPage.HubRef.LeaveGameUpsellPage, true)
 						end,
-						onSuccess = function() -- line: 187
-							-- upvalues: upsellType (copy), Constants (copy), default (copy), p6 (copy)
+						onSuccess = function()
 							if upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat then
 								default:EnableVoice()
-								p6.setVoiceEnabled(true)
+								props.setVoiceEnabled(true)
 							end
 						end
 					})
 				end,
-				isDisabled = v53 and not v54
+				isDisabled = showLegalTextCheckbox and not state
 			}),
-			PhoneLegalDisclaimer = if GetFFlagDisablePVUpsellDataConsent() then nil else React.createElement(PhoneLegalDisclaimer, {
-				showLegalButtons = true,
-				LayoutOrder = 4,
-				legalText = if not v53 then v52.voiceDisclaimer else v52.voiceConsent,
-				termsOfUse = v52.termsOfUse,
-				privacyPolicy = v52.privacyPolicy,
+			PhoneLegalDisclaimer = 0
+		}
+		local phoneLegalDisclaimer
+
+		if not GetFFlagDisablePVUpsellDataConsent() then
+			local createElement2 = React.createElement
+			local legalText
+
+			if showLegalTextCheckbox then
+				legalText = v2.voiceConsent
+			else
+				legalText = v2.voiceDisclaimer
+			end
+
+			phoneLegalDisclaimer = createElement2(PhoneLegalDisclaimer, {
+				legalText = legalText,
+				termsOfUse = v2.termsOfUse,
+				privacyPolicy = v2.privacyPolicy,
 				showLegalText = upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat,
-				showLegalTextCheckbox = v53,
-				legalTextChecked = v54,
-				setLegalTextChecked = function() -- line: 208
-					-- upvalues: v55 (copy), v54 (copy)
-					v55(not v54)
+				showLegalButtons = true,
+				showLegalTextCheckbox = showLegalTextCheckbox,
+				legalTextChecked = state,
+				setLegalTextChecked = function()
+					setState(not state)
 				end,
-				onTermsOfUseClick = function() -- line: 211
-					-- upvalues: GetFFlagAddMorePhoneUpsellEvents (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), p6 (copy), Constants2 (copy)
+				onTermsOfUseClick = function()
 					if GetFFlagAddMorePhoneUpsellEvents() then
-						RbxAnalyticsService:SendEventDeferred(getPlatformTarget(), "verificationUpsell", "modalAction", {
-							field = "termsOfService",
-							origin = p6.origin,
-							section = p6.section
-						})
+						RbxAnalyticsService:SendEventDeferred(
+							getPlatformTarget(),
+							"verificationUpsell",
+							"modalAction",
+							{
+								origin = props.origin,
+								field = "termsOfService",
+								section = props.section
+							}
+						)
 					end
 
-					p6.showWebpage(Constants2.TERMS_OF_SERVICE_URL)
+					props.showWebpage(constants.TERMS_OF_SERVICE_URL)
 				end,
-				onPrivacyPolicyClick = function() -- line: 222
-					-- upvalues: GetFFlagAddMorePhoneUpsellEvents (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), p6 (copy), Constants2 (copy)
+				onPrivacyPolicyClick = function()
 					if GetFFlagAddMorePhoneUpsellEvents() then
-						RbxAnalyticsService:SendEventDeferred(getPlatformTarget(), "verificationUpsell", "modalAction", {
-							field = "privacyPolicy",
-							origin = p6.origin,
-							section = p6.section
-						})
+						RbxAnalyticsService:SendEventDeferred(
+							getPlatformTarget(),
+							"verificationUpsell",
+							"modalAction",
+							{
+								origin = props.origin,
+								field = "privacyPolicy",
+								section = props.section
+							}
+						)
 					end
 
-					p6.showWebpage(Constants2.PRIVACY_POLICY_URL)
-				end
+					props.showWebpage(constants.PRIVACY_POLICY_URL)
+				end,
+				LayoutOrder = 4
 			})
-		})
+		end
+
+		v4.PhoneLegalDisclaimer = phoneLegalDisclaimer
+		return createElement("Frame", v3, v4)
 	end
-	function v39.LeaveGameComponent(p8) -- line: 239
-		-- upvalues: useStyle (copy), useLocalization (copy), React (copy), v39 (copy), Constants (copy), GetFFlagAddMorePhoneUpsellEvents (copy), useRoactService (copy), RoactNetworking (copy), useInputType (copy), InputTypeConstants (copy), GuiService (copy), ContextActionService (copy), PostPhoneUpsellDisplayed (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), EventStreamConstants (copy), useEventConnection (copy), RobloxGui (copy), ButtonStack (copy), ButtonType (copy), default (copy), leaveGame (copy)
-		local v57 = useStyle()
-		local v58 = useLocalization({
+
+	function newPage.LeaveGameComponent(props)
+		local v = useStyle()
+		local v2 = useLocalization({
 			confirmLeave = "Feature.VerificationUpsell.Action.ConfirmLeave",
 			dontLeave = "Feature.VerificationUpsell.Action.DontLeave",
 			returnWithVoice = "Feature.VerificationUpsell.Action.ReturnWithVoice"
 		})
-		local v59, v60 = React.useState("Incomplete")
-		local v61 = v59 == "Incomplete"
-		local upsellType = v39.upsellType
-		local v63 = upsellType ~= Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and "exitConfirmationScreenSecurity" or "exitConfirmationScreenVoice"
-		local v64 = if not GetFFlagAddMorePhoneUpsellEvents() then nil else v59 ~= "Incomplete" and "verifyPhoneSuccess" or "entry"
-		local v65 = React.useRef(nil)
-		local v66, v67 = React.useState(false)
-		local v68 = useRoactService(RoactNetworking)
-		local v69 = useInputType()
 
-		useEventConnection(v39.Displayed.Event, function() -- line: 262
-			-- upvalues: v69 (copy), InputTypeConstants (copy), GuiService (copy), v65 (copy), ContextActionService (copy), v39 (copy), PostPhoneUpsellDisplayed (copy), v68 (copy), Constants (copy), GetFFlagAddMorePhoneUpsellEvents (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), p8 (copy), EventStreamConstants (copy)
-			if v69 ~= InputTypeConstants.Touch then
-				GuiService.SelectedCoreObject = v65.current
+		local state, setState = React.useState("Incomplete")
+		local v3 = state == "Incomplete"
+		local upsellType = newPage.upsellType
+		local origin = upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat and "exitConfirmationScreenVoice"
+			or "exitConfirmationScreenSecurity"
+
+		local section = GetFFlagAddMorePhoneUpsellEvents()
+			and (state == "Incomplete" and "entry" or "verifyPhoneSuccess")
+			or nil
+
+		local ref = React.useRef(nil)
+		local state2, setState2 = React.useState(false)
+
+		local v4 = useRoactService(RoactNetworking)
+
+		local v5 = useInputType()
+
+		local function fn()
+			if v5 ~= InputTypeConstants.Touch then
+				GuiService.SelectedCoreObject = ref.current
 			end
 
-			ContextActionService:BindCoreAction("LeaveGameCancelAction", v39.DontLeaveFromHotkey, false, Enum.KeyCode.ButtonB)
+			ContextActionService:BindCoreAction(
+				"LeaveGameCancelAction",
+				newPage.DontLeaveFromHotkey,
+				false,
+				Enum.KeyCode.ButtonB
+			)
 
-			if not v39.postSent then
-				PostPhoneUpsellDisplayed(v68, Constants.EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER, os.time(), true, true):catch(function(_) -- line: 281
-				end)
+			if not newPage.postSent then
+				PostPhoneUpsellDisplayed(v4, Constants.EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER, os.time(), true, true):catch(function(_) end)
 
 				if GetFFlagAddMorePhoneUpsellEvents() then
 					RbxAnalyticsService:SendEventDeferred(getPlatformTarget(), "verificationUpsell", "modalAction", {
-						origin = p8.origin,
+						origin = props.origin,
 						aType = EventStreamConstants.ActionType.Shown,
-						section = p8.section
+						section = props.section
 					})
 				end
 
-				v39.postSent = true
+				newPage.postSent = true
 			end
-		end)
-		useEventConnection(v39.Hidden.Event, function() -- line: 296
-			-- upvalues: ContextActionService (copy), v59 (copy), v60 (copy)
+		end
+
+		local function fn2()
 			ContextActionService:UnbindCoreAction("LeaveGameCancelAction")
 
-			if v59 == "Completed" then
-				v60("CompletedAndClosed")
+			if state == "Completed" then
+				setState("CompletedAndClosed")
 			end
-		end)
+		end
 
-		local v70 = not (RobloxGui.AbsoluteSize.Y < 500) and not (RobloxGui.AbsoluteSize.X < 500) and 200 or 0
+		useEventConnection(newPage.Displayed.Event, fn)
+		useEventConnection(newPage.Hidden.Event, fn2)
 
-		return React.createElement("Frame", {
-			BackgroundTransparency = 1,
+		local v6 = (RobloxGui.AbsoluteSize.Y < 500 or RobloxGui.AbsoluteSize.X < 500) and 0 or 200
+
+		local createElement = React.createElement
+		local v7 = {
 			Size = UDim2.new(1, 0, 0, 0),
-			Position = UDim2.new(0, 0, 0, v70),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, {
+			Position = UDim2.new(0, 0, 0, v6),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1
+		}
+
+		local children = {
 			ListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			LeaveGame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				ListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					Padding = UDim.new(0, v57.Tokens.Size.Size_600),
-					SortOrder = Enum.SortOrder.LayoutOrder
-				}),
-				LeaveGameButtons = React.createElement(ButtonStack, {
-					disableGamepadRefs = true,
-					isRoactGamepadEnabled = false,
-					buttons = {
-						{
-							isDefaultChild = true,
-							buttonType = ButtonType.PrimarySystem,
-							props = {
-								layoutOrder = 1,
-								text = v58.confirmLeave,
-								onActivated = function() -- line: 340
-									-- upvalues: v66 (copy), v59 (copy), upsellType (copy), Constants (copy), default (copy), v67 (copy), GetFFlagAddMorePhoneUpsellEvents (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), v63 (copy), v64 (copy), leaveGame (copy)
-									if not v66 and ((v59 == "Completed" or v59 == "CompletedAndClosed") and upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat) then
-										default:EnableVoice()
-										v67(true)
-									end
+			LeaveGame = 0,
+			TopSpacer = 0,
+			UpsellComponents = 0
+		}
 
-									if GetFFlagAddMorePhoneUpsellEvents() then
-										RbxAnalyticsService:SendEventDeferred(getPlatformTarget(), "verificationUpsell", "formInteraction", {
-											btn = "confirmLeave",
-											origin = v63,
-											section = v64
-										})
-									end
+		local createElement2 = React.createElement
+		local v8 = {
+			Size = UDim2.new(1, 0, 0, 0),
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = 1
+		}
 
-									leaveGame(false)
-								end,
-								buttonRef = v65
-							}
-						},
-						{
-							buttonType = ButtonType.Secondary,
-							props = {
-								layoutOrder = 2,
-								text = if v59 ~= "Completed" or upsellType ~= Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat then v58.dontLeave else v58.returnWithVoice,
-								onActivated = function() -- line: 371
-									-- upvalues: GetFFlagAddMorePhoneUpsellEvents (copy), v59 (copy), upsellType (copy), Constants (copy), RbxAnalyticsService (copy), getPlatformTarget (copy), v63 (copy), v64 (copy), EventStreamConstants (copy), v39 (copy)
-									if GetFFlagAddMorePhoneUpsellEvents() then
-										if v59 == "Completed" and upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat then
-											RbxAnalyticsService:SendEventDeferred(getPlatformTarget(), "verificationUpsell", "formInteraction", {
-												btn = "returnWithVoice",
-												origin = v63,
-												section = v64
-											})
-										elseif v59 == "Incomplete" then
-											RbxAnalyticsService:SendEventDeferred(getPlatformTarget(), "verificationUpsell", "modalAction", {
-												origin = v63,
-												aType = EventStreamConstants.ActionType.Dismiss,
-												section = v64
-											})
-										end
-									end
-
-									v39.DontLeaveFromButton()
-								end
-							}
-						}
-					},
-					buttonHeight = v57.Tokens.Size.Size_1200
-				})
+		local v9 = {
+			ListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				Padding = UDim.new(0, v.Tokens.Size.Size_600),
+				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			TopSpacer = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v57.Tokens.Size.Size_600)
-			}),
-			UpsellComponents = if not v61 then nil else React.createElement(React.Fragment, {}, {
+			LeaveGameButtons = 0
+		}
+
+		local createElement3 = React.createElement
+
+		local v10 = {
+			buttonType = ButtonType.PrimarySystem,
+			isDefaultChild = true,
+			props = {
+				layoutOrder = 1,
+				text = v2.confirmLeave,
+				onActivated = function()
+					if
+						not state2
+						and (state == "Completed" or state == "CompletedAndClosed")
+						and upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat
+					then
+						default:EnableVoice()
+						setState2(true)
+					end
+
+					if GetFFlagAddMorePhoneUpsellEvents() then
+						RbxAnalyticsService:SendEventDeferred(
+							getPlatformTarget(),
+							"verificationUpsell",
+							"formInteraction",
+							{ origin = origin, btn = "confirmLeave", section = section }
+						)
+					end
+
+					leaveGame(false)
+				end,
+				buttonRef = ref
+			}
+		}
+
+		local v11 = { buttonType = ButtonType.Secondary, props = 0 }
+		local text
+
+		if state == "Completed" and upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat then
+			text = v2.returnWithVoice
+		else
+			text = v2.dontLeave
+		end
+
+		v11.props = {
+			layoutOrder = 2,
+			text = text,
+			onActivated = function()
+				if GetFFlagAddMorePhoneUpsellEvents() then
+					if state == "Completed" and upsellType == Constants.PHONE_UPSELL_VALUE_PROP.VoiceChat then
+						RbxAnalyticsService:SendEventDeferred(
+							getPlatformTarget(),
+							"verificationUpsell",
+							"formInteraction",
+							{ origin = origin, btn = "returnWithVoice", section = section }
+						)
+					elseif state == "Incomplete" then
+						RbxAnalyticsService:SendEventDeferred(
+							getPlatformTarget(),
+							"verificationUpsell",
+							"modalAction",
+							{
+								origin = origin,
+								aType = EventStreamConstants.ActionType.Dismiss,
+								section = section
+							}
+						)
+					end
+				end
+
+				newPage.DontLeaveFromButton()
+			end
+		}
+		v9.LeaveGameButtons = createElement3(ButtonStack, {
+			buttons = { v10, v11 },
+			buttonHeight = v.Tokens.Size.Size_1200,
+			disableGamepadRefs = true,
+			isRoactGamepadEnabled = false
+		})
+		children.LeaveGame = createElement2("Frame", v8, v9)
+
+		children.TopSpacer = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, v.Tokens.Size.Size_600)
+		})
+		local upsellComponents
+
+		if v3 then
+			upsellComponents = React.createElement(React.Fragment, {}, {
 				Divider = React.createElement("Frame", {
 					LayoutOrder = 3,
+					BackgroundColor3 = v.Tokens.Color.Stroke.Emphasis.Color3,
+					BackgroundTransparency = v.Tokens.Color.Stroke.Emphasis.Transparency,
 					BorderSizePixel = 0,
-					BackgroundColor3 = v57.Tokens.Color.Stroke.Emphasis.Color3,
-					BackgroundTransparency = v57.Tokens.Color.Stroke.Emphasis.Transparency,
 					Size = UDim2.new(1, 0, 0, 1)
 				}),
 				BottomSpacer = React.createElement("Frame", {
 					BackgroundTransparency = 1,
 					LayoutOrder = 4,
-					Size = UDim2.new(1, 0, 0, v57.Tokens.Size.Size_600)
+					Size = UDim2.new(1, 0, 0, v.Tokens.Size.Size_600)
 				}),
-				Upsell = React.createElement(v39.UpsellComponent, {
+				Upsell = React.createElement(newPage.UpsellComponent, {
+					origin = origin,
+					section = section,
 					LayoutOrder = 5,
-					origin = v63,
-					section = v64,
-					showWebpage = p8.showWebpage,
-					onUpsellComplete = function() -- line: 430
-						-- upvalues: v60 (copy)
-						v60("Completed")
+					showWebpage = props.showWebpage,
+					onUpsellComplete = function()
+						setState("Completed")
 					end,
-					setVoiceEnabled = v67
+					setVoiceEnabled = setState2
 				})
 			})
-		})
+		end
+
+		children.UpsellComponents = upsellComponents
+		return createElement("Frame", v7, children)
 	end
 
-	local v40 = React.createElement(InExperienceProviderContainer, {}, React.createElement(v39.LeaveGameComponent, {
-		showWebpage = function() -- line: 443
-		end
-	}, {}))
+	local element = React.createElement(
+		InExperienceProviderContainer,
+		{},
+		React.createElement(newPage.LeaveGameComponent, {
+			showWebpage = function() end
+		}, {})
+	)
 
-	v39.handle = Roact.mount(v40, v39.Page, "LeaveGameUpsell")
-	v39.Page.Size = UDim2.new(1, 0, 0, 0)
-	v39.Page.AutomaticSize = Enum.AutomaticSize.Y
+	newPage.handle = Roact.mount(element, newPage.Page, "LeaveGameUpsell")
 
-	return v39
+	newPage.Page.Size = UDim2.new(1, 0, 0, 0)
+	newPage.Page.AutomaticSize = Enum.AutomaticSize.Y
+
+	return newPage
 end
 
-local v38 = Initialize()
+local initialize = Initialize()
 
-function v38.SetUpsellProp(p10, p11) -- line: 457
-	-- upvalues: Constants (copy), Roact (copy), React (copy), InExperienceProviderContainer (copy)
-	if p11 == Constants.PHONE_UPSELL_VALUE_PROP.None then
+function initialize:SetUpsellProp(upsellType)
+	if upsellType == Constants.PHONE_UPSELL_VALUE_PROP.None then
 		return
 	end
 
-	p10.upsellType = p11
-	p10.handle = Roact.update(p10.handle, React.createElement(InExperienceProviderContainer, {}, React.createElement(p10.LeaveGameComponent, {
-		showWebpage = function() -- line: 470
-		end
-	}, {})))
+	self.upsellType = upsellType
+	self.handle = Roact.update(
+		self.handle,
+		React.createElement(InExperienceProviderContainer, {}, React.createElement(self.LeaveGameComponent, {
+			showWebpage = function() end
+		}, {}))
+	)
 end
 
-return v38
+return initialize

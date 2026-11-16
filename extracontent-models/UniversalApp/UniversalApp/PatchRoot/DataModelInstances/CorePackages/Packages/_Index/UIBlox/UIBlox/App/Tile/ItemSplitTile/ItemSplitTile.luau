@@ -1,22 +1,29 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParentParent.Core
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local withStyle = require(Core.Style.withStyle)
-local Interactable = require(Core.Control.Interactable)
-local ControlState = require(Core.Control.Enum.ControlState)
-local LoadableImage = require(ParentParentParent.App.Loading.LoadableImage)
-local Images = require(ParentParent.ImageSet.Images)
-local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
-local ItemSplitTileFooter = require(ParentParentParent.App.Tile.ItemSplitTile.ItemSplitTileFooter)
-local uDim = UDim.new(0, 8)
-local uDim2 = UDim.new(0, 8)
-local uDim3 = UDim.new(0, 12)
-local v17 = Roact.PureComponent:extend("ItemSplitTile")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local core = parent2.Core
+local parent3 = parent2.Parent
 
-v17.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local Foundation = require(parent3.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+
+local withStyle = require(core.Style.withStyle)
+local Interactable = require(core.Control.Interactable)
+local ControlState = require(core.Control.Enum.ControlState)
+local LoadableImage = require(parent2.App.Loading.LoadableImage)
+local Images = require(parent.ImageSet.Images)
+local ImageSetComponent = require(core.ImageSet.ImageSetComponent)
+local ItemSplitTileFooter = require(parent2.App.Tile.ItemSplitTile.ItemSplitTileFooter)
+
+local udim = UDim.new(0, 8)
+
+local udim2 = UDim.new(0, 8)
+local udim3 = UDim.new(0, 12)
+
+local extended = Roact.PureComponent:extend("ItemSplitTile")
+
+extended.validateProps = t.strictInterface({
 	itemName = t.optional(t.string),
 	priceText = t.optional(t.string),
 	isOwned = t.optional(t.boolean),
@@ -25,251 +32,365 @@ v17.validateProps = t.strictInterface({
 	onActivated = t.optional(t.callback),
 	thumbnail = t.optional(t.string)
 })
-v17.defaultProps = {
+
+extended.defaultProps = {
 	itemName = "--",
 	priceText = "--",
 	hasBackground = true,
 	isHovered = false
 }
 
-function v17.init(p1) -- line: 68
-	-- upvalues: ControlState (copy)
-	p1:setState({
-		controlState = ControlState.Initialize
-	})
+function extended:init()
+	self:setState({ controlState = ControlState.Initialize })
 
-	function p1.onStateChanged(_, p3) -- line: 73
-		-- upvalues: p1 (copy)
-		p1:setState({
-			controlState = p3
-		})
+	function self.onStateChanged(_, controlState)
+		self:setState({ controlState = controlState })
 	end
 end
-function v17.renderImageFrame(_, p5, p6, p7, p8) -- line: 80
-	-- upvalues: Roact (copy), ImageSetComponent (copy), uDim (copy), LoadableImage (copy)
-	local Theme = p8.Theme
-	local v25 = p7 or not p6
-	local v26 = typeof(p5) == "table"
 
-	return Roact.createElement("Frame", {
+function extended:renderImageFrame(image, p, p2, p3)
+	local theme = p3.Theme
+	local v = p2 or not p
+	local v2 = typeof(image) == "table"
+
+	local createElement = Roact.createElement
+	local v3 = {
+		Position = UDim2.fromScale(0, p and 0.5 or 0),
+		Size = UDim2.fromScale(1, p2 and 1 or 0.5),
 		ClipsDescendants = true,
-		BackgroundTransparency = 1,
-		Position = UDim2.fromScale(0, not p6 and 0 or 0.5),
-		Size = UDim2.fromScale(1, not p7 and 0.5 or 1)
-	}, {
-		Image = if not v26 then Roact.createElement(LoadableImage, {
-			BackgroundTransparency = 1,
-			showFailedStateWhenLoadingFailed = true,
-			useShimmerAnimationWhileLoading = true,
-			BackgroundColor3 = Theme.PlaceHolder.Color,
-			Image = p5,
-			Position = UDim2.fromScale(0.5, not p6 and 1 or 0),
-			Size = UDim2.fromScale(1, not p7 and 2 or 1),
-			AnchorPoint = Vector2.new(0.5, not p7 and 0.5 or 1),
-			cornerRadius = if not v25 then nil else uDim
-		}) else Roact.createElement(ImageSetComponent.Label, {
-			BackgroundTransparency = 1,
-			BackgroundColor3 = Theme.PlaceHolder.Color,
-			Image = p5,
-			Position = UDim2.fromScale(0, not p6 and 0 or -1),
-			Size = UDim2.fromScale(1, not p7 and 2 or 1)
-		}, {
-			UICorner = if not v25 then nil else Roact.createElement("UICorner", {
-				CornerRadius = uDim
-			})
-		})
-	})
-end
-function v17.renderTopContent(p9, p10) -- line: 119
-	-- upvalues: Images (copy), Roact (copy), ImageSetComponent (copy)
-	local hasBackground = p9.props.hasBackground
-	local isHovered = p9.props.isHovered
-	local v31 = not hasBackground
-	local Theme = p10.Theme
-	local v33 = Images[Theme.ItemBackgroundDefault.Image]
+		BackgroundTransparency = 1
+	}
+	local image2
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		ZIndex = 2,
+	if v2 then
+		local createElement2 = Roact.createElement
+		local label = ImageSetComponent.Label
+		local v4 = {
+			BackgroundColor3 = theme.PlaceHolder.Color,
+			BackgroundTransparency = 1,
+			Image = image,
+			Position = UDim2.fromScale(0, p and -1 or 0),
+			Size = UDim2.fromScale(1, p2 and 1 or 2)
+		}
+		local uiCorner
+
+		if v then
+			uiCorner = Roact.createElement("UICorner", { CornerRadius = udim })
+		end
+
+		image2 = createElement2(label, v4, { UICorner = uiCorner })
+	else
+		local createElement2 = Roact.createElement
+		local v4 = {
+			BackgroundColor3 = theme.PlaceHolder.Color,
+			BackgroundTransparency = 1,
+			Image = image,
+			Position = UDim2.fromScale(0.5, p and 0 or 1),
+			Size = UDim2.fromScale(1, p2 and 1 or 2),
+			AnchorPoint = Vector2.new(0.5, p2 and 1 or 0.5),
+			cornerRadius = 0,
+			showFailedStateWhenLoadingFailed = true,
+			useShimmerAnimationWhileLoading = true
+		}
+		local cornerRadius
+
+		if v then
+			cornerRadius = udim
+		end
+
+		v4.cornerRadius = cornerRadius
+		image2 = createElement2(LoadableImage, v4)
+	end
+
+	return createElement("Frame", v3, { Image = image2 })
+end
+
+function extended:renderTopContent(p)
+	local hasBackground = self.props.hasBackground
+	local isHovered = self.props.isHovered
+	local v = not hasBackground
+	local theme = p.Theme
+	local image = Images[theme.ItemBackgroundDefault.Image]
+
+	local createElement = Roact.createElement
+	local v2 = {
 		Size = UDim2.new(1, 0, 1, 0),
-		SizeConstraint = Enum.SizeConstraint.RelativeXX
-	}, {
-		BackgroundImage = if not p9.props.thumbnail then nil else Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, {
-			TopImageFrame = p9:renderImageFrame(v33, false, v31, p10),
-			BottomImageFrame = if v31 then nil else p9:renderImageFrame(v33, true, false, p10)
-		}),
-		ItemImage = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, {
-			TopImageFrame = p9:renderImageFrame(p9.props.thumbnail, false, v31, p10),
-			BottomImageFrame = if v31 then nil else p9:renderImageFrame(p9.props.thumbnail, true, false, p10)
-		}),
-		HoverShadow = if not isHovered or hasBackground then nil else Roact.createElement(ImageSetComponent.Label, {
+		BackgroundTransparency = 1,
+		SizeConstraint = Enum.SizeConstraint.RelativeXX,
+		ZIndex = 2
+	}
+	local backgroundImage
+
+	if self.props.thumbnail then
+		local createElement2 = Roact.createElement
+		local v3 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
+
+		local v4 = {
+			TopImageFrame = self:renderImageFrame(image, false, v, p),
+			BottomImageFrame = 0
+		}
+		local bottomImageFrame
+
+		if not v then
+			bottomImageFrame = self:renderImageFrame(image, true, false, p)
+		end
+
+		v4.BottomImageFrame = bottomImageFrame
+		backgroundImage = createElement2("Frame", v3, v4)
+	end
+
+	local createElement2 = Roact.createElement
+	local v3 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
+
+	local v5 = {
+		TopImageFrame = self:renderImageFrame(self.props.thumbnail, false, v, p),
+		BottomImageFrame = 0
+	}
+	local bottomImageFrame
+
+	if not v then
+		bottomImageFrame = self:renderImageFrame(self.props.thumbnail, true, false, p)
+	end
+
+	v5.BottomImageFrame = bottomImageFrame
+	local v4 = {
+		BackgroundImage = backgroundImage,
+		ItemImage = createElement2("Frame", v3, v5),
+		HoverShadow = 0
+	}
+	local hoverShadow
+
+	if isHovered and not hasBackground then
+		hoverShadow = Roact.createElement(ImageSetComponent.Label, {
 			ZIndex = 0,
-			BackgroundTransparency = 1,
 			Position = UDim2.new(0.5, 0, 0.5, 2),
 			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 12),
 			Image = Images["component_assets/dropshadow_24_6"],
-			ImageColor3 = Theme.DropShadow.Color,
-			ImageTransparency = Theme.DropShadow.Transparency,
+			ImageColor3 = theme.DropShadow.Color,
+			ImageTransparency = theme.DropShadow.Transparency,
 			ScaleType = Enum.ScaleType.Slice,
 			SliceCenter = Rect.new(18, 18, 18, 18)
 		})
-	})
-end
-function v17.renderBottomContent(p11, p12) -- line: 169
-	-- upvalues: ControlState (copy), uDim3 (copy), uDim2 (copy), Roact (copy), ItemSplitTileFooter (copy)
-	local itemName = p11.props.itemName
-	local hasBackground = p11.props.hasBackground
-	local p12Font = p12.Font
-	local v39 = math.ceil(p12.Font.BaseSize * p12.Font.Header2.RelativeSize)
-	local Theme = p12.Theme
-	local controlState = p11.state.controlState
-	local v42 = if not p11.props.isHovered and controlState ~= ControlState.Pressed or not hasBackground then uDim2 else uDim3
-	local v43 = v39 * 3 + uDim2.Offset + v42.Offset * 2
-	local TextEmphasis = Theme.TextEmphasis
+	end
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Size = UDim2.new(1, 0, 0, v43)
-	}, {
+	v4.HoverShadow = hoverShadow
+	return createElement("Frame", v2, v4)
+end
+
+function extended:renderBottomContent(p)
+	local itemName = self.props.itemName
+	local hasBackground = self.props.hasBackground
+
+	local font = p.Font
+	local textSize = math.ceil(p.Font.BaseSize * p.Font.Header2.RelativeSize)
+	local theme = p.Theme
+	local controlState = self.state.controlState
+	local paddingBottom
+
+	if (self.props.isHovered or controlState == ControlState.Pressed) and hasBackground then
+		paddingBottom = udim3
+	else
+		paddingBottom = udim2
+	end
+
+	local v = textSize * 3 + udim2.Offset + paddingBottom.Offset * 2
+
+	local textEmphasis = theme.TextEmphasis
+
+	local createElement = Roact.createElement
+	local v2 = { Size = UDim2.new(1, 0, 0, v), BackgroundTransparency = 1, LayoutOrder = 2 }
+
+	local children = {
 		UIListLayout = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = uDim2
+			Padding = udim2
 		}),
-		Padding = Roact.createElement("UIPadding", {
-			PaddingLeft = if not hasBackground then nil else v42,
-			PaddingRight = if not hasBackground then nil else v42,
-			PaddingTop = if not hasBackground then uDim2 else v42,
-			PaddingBottom = if not hasBackground then uDim2 else v42
-		}),
-		TitleArea = if not itemName or not (string.len(itemName) > 0) then nil else Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			TextWrapped = true,
-			LayoutOrder = 1,
+		Padding = 0,
+		TitleArea = 0,
+		Footer = 0
+	}
+
+	local createElement2 = Roact.createElement
+	local paddingLeft
+
+	if hasBackground then
+		paddingLeft = paddingBottom
+	end
+
+	local paddingRight
+
+	if hasBackground then
+		paddingRight = paddingBottom
+	end
+
+	local paddingTop = if hasBackground then paddingBottom else udim2
+
+	if not hasBackground then
+		paddingBottom = udim2
+	end
+
+	children.Padding = createElement2("UIPadding", {
+		PaddingLeft = paddingLeft,
+		PaddingRight = paddingRight,
+		PaddingTop = paddingTop,
+		PaddingBottom = paddingBottom
+	})
+	local titleArea
+
+	if itemName and string.len(itemName) > 0 then
+		titleArea = Roact.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
 			Text = itemName,
-			Font = p12Font.Header2.Font,
-			TextSize = v39,
-			TextTransparency = TextEmphasis.Transparency,
-			TextColor3 = TextEmphasis.Color,
+			FontFace = normalizeFontFace(font.Header2.Font),
+			TextSize = textSize,
+			TextTransparency = textEmphasis.Transparency,
+			TextColor3 = textEmphasis.Color,
+			TextWrapped = true,
 			TextTruncate = Enum.TextTruncate.AtEnd,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top
+			TextYAlignment = Enum.TextYAlignment.Top,
+			LayoutOrder = 1
 		}, {
 			UISizeConstraint = Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(1e999, v39 * 2)
+				MaxSize = Vector2.new(1e999, textSize * 2)
 			})
-		}),
-		Footer = Roact.createElement(ItemSplitTileFooter, {
-			layoutOrder = 2,
-			priceText = p11.props.priceText,
-			isOwned = p11.props.isOwned
 		})
-	})
-end
-function v17.renderTileContent(p13, p14) -- line: 237
-	-- upvalues: Roact (copy), uDim (copy), Interactable (copy)
-	local hasBackground = p13.props.hasBackground
-	local onActivated = p13.props.onActivated
-	local Theme = p14.Theme
-	local v50 = if not hasBackground then nil else Theme.BackgroundUIDefault.Color
-	local v51 = not hasBackground and 1 or Theme.BackgroundUIDefault.Transparency
+	end
 
-	return Roact.createElement("Frame", {
-		ClipsDescendants = true,
-		ZIndex = 1,
+	children.TitleArea = titleArea
+
+	children.Footer = Roact.createElement(ItemSplitTileFooter, {
+		priceText = self.props.priceText,
+		isOwned = self.props.isOwned,
+		layoutOrder = 2
+	})
+	return createElement("Frame", v2, children)
+end
+
+function extended:renderTileContent(p)
+	local hasBackground = self.props.hasBackground
+	local onActivated = self.props.onActivated
+	local theme = p.Theme
+	local color
+
+	if hasBackground then
+		color = theme.BackgroundUIDefault.Color
+	end
+
+	local backgroundTransparency = not hasBackground and 1 or theme.BackgroundUIDefault.Transparency
+
+	local createElement = Roact.createElement
+	local v = {
 		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = v50,
-		BackgroundTransparency = v51
-	}, {
-		UICorner = Roact.createElement("UICorner", {
-			CornerRadius = uDim
-		}),
+		BackgroundColor3 = color,
+		BackgroundTransparency = backgroundTransparency,
+		ClipsDescendants = true,
+		ZIndex = 1
+	}
+
+	local v2 = {
+		UICorner = Roact.createElement("UICorner", { CornerRadius = udim }),
 		Panel = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1
 		}, {
 			UIListLayout = Roact.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
 			TopContentPlaceholder = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
 				Size = UDim2.new(1, 0, 1, 0),
-				SizeConstraint = Enum.SizeConstraint.RelativeXX
-			}),
-			BottomContent = p13:renderBottomContent(p14)
-		}),
-		TopContent = p13:renderTopContent(p14),
-		TileOverlay = Roact.createElement(Interactable, {
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = 1,
-			onStateChanged = p13.onStateChanged,
-			[Roact.Event.Activated] = onActivated,
-			ZIndex = 3
-		}, {
-			UICorner = Roact.createElement("UICorner", {
-				CornerRadius = uDim
-			}),
-			BorderFrame = Roact.createElement("Frame", {
+				SizeConstraint = Enum.SizeConstraint.RelativeXX,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1, -2, 1, -2),
-				Position = UDim2.fromOffset(1, 1),
-				SizeConstraint = if hasBackground then nil else Enum.SizeConstraint.RelativeXX
-			}, {
-				UIStroke = Roact.createElement("UIStroke", {
-					Thickness = 1,
-					Color = Theme.Divider.Color,
-					Transparency = Theme.Divider.Transparency
-				}),
-				UICorner = Roact.createElement("UICorner", {
-					CornerRadius = uDim
-				})
-			})
-		})
+				LayoutOrder = 1
+			}),
+			BottomContent = self:renderBottomContent(p)
+		}),
+		TopContent = self:renderTopContent(p),
+		TileOverlay = 0
+	}
+	local createElement2 = Roact.createElement
+	local onActivatedsByActivated = {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		onStateChanged = self.onStateChanged,
+		[Roact.Event.Activated] = onActivated,
+		ZIndex = 3
+	}
+
+	local v3 = {
+		UICorner = Roact.createElement("UICorner", { CornerRadius = udim }),
+		BorderFrame = 0
+	}
+
+	local createElement3 = Roact.createElement
+	local v4 = {
+		Size = UDim2.new(1, -2, 1, -2),
+		Position = UDim2.fromOffset(1, 1),
+		BackgroundTransparency = 1,
+		SizeConstraint = 0
+	}
+	local sizeConstraint
+
+	if not hasBackground then
+		sizeConstraint = Enum.SizeConstraint.RelativeXX
+	end
+
+	v4.SizeConstraint = sizeConstraint
+	v3.BorderFrame = createElement3("Frame", v4, {
+		UIStroke = Roact.createElement("UIStroke", {
+			Color = theme.Divider.Color,
+			Transparency = theme.Divider.Transparency,
+			Thickness = 1
+		}),
+		UICorner = Roact.createElement("UICorner", { CornerRadius = udim })
 	})
+	v2.TileOverlay = createElement2(Interactable, onActivatedsByActivated, v3)
+	return createElement("Frame", v, v2)
 end
-function v17.render(p15) -- line: 300
-	-- upvalues: withStyle (copy), Roact (copy), ImageSetComponent (copy), Images (copy)
-	local hasBackground = p15.props.hasBackground
-	local isHovered = p15.props.isHovered
 
-	return withStyle(function(p16) -- line: 304
-		-- upvalues: Roact (copy), p15 (copy), isHovered (copy), hasBackground (copy), ImageSetComponent (copy), Images (copy)
-		local Theme = p16.Theme
+function extended:render()
+	local hasBackground = self.props.hasBackground
+	local isHovered = self.props.isHovered
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, {
+	return withStyle(function(p)
+		local theme = p.Theme
+
+		local createElement = Roact.createElement
+		local v = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
+
+		local v2 = {
 			UISizeConstraint = Roact.createElement("UISizeConstraint", {
 				MinSize = Vector2.new(146, 233)
 			}),
-			TileContent = p15:renderTileContent(p16),
-			HoverShadow = if not isHovered or not hasBackground then nil else Roact.createElement(ImageSetComponent.Label, {
+			TileContent = self:renderTileContent(p),
+			HoverShadow = 0
+		}
+		local hoverShadow
+
+		if isHovered and hasBackground then
+			hoverShadow = Roact.createElement(ImageSetComponent.Label, {
 				ZIndex = 0,
-				BackgroundTransparency = 1,
 				Position = UDim2.new(0.5, 0, 0.5, 2),
 				AnchorPoint = Vector2.new(0.5, 0.5),
+				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 10, 1, 12),
 				Image = Images["component_assets/dropshadow_24_6"],
-				ImageColor3 = Theme.DropShadow.Color,
-				ImageTransparency = Theme.DropShadow.Transparency,
+				ImageColor3 = theme.DropShadow.Color,
+				ImageTransparency = theme.DropShadow.Transparency,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(18, 18, 18, 18)
 			})
-		})
+		end
+
+		v2.HoverShadow = hoverShadow
+		return createElement("Frame", v, v2)
 	end)
 end
 
-return v17
+return extended

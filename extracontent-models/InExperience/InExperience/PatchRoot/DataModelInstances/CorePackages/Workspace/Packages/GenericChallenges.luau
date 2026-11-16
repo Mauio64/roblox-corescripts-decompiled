@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.GenericChallenges.GenericChallenges))
+local GenericChallenges = require(Workspace.GenericChallenges.GenericChallenges)
+
+return GenericChallenges

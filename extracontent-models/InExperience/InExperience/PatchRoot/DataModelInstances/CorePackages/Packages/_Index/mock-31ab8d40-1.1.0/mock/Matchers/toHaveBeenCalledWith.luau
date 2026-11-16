@@ -1,50 +1,52 @@
-local ParentParent = script.Parent.Parent
-local MagicMock = require(ParentParent.MagicMock)
-local Spy = require(ParentParent.Spy)
-local AnyCallMatches = require(ParentParent.AnyCallMatches)
-local fmtArgs = require(ParentParent.fmtArgs)
-local symbols = require(ParentParent.symbols)
+local parent = script.Parent.Parent
+local MagicMock = require(parent.MagicMock)
+local Spy = require(parent.Spy)
+local AnyCallMatches = require(parent.AnyCallMatches)
+local fmtArgs = require(parent.fmtArgs)
+local symbols = require(parent.symbols)
 
-local function getLiteralPredicate(p1) -- line: 8
-	return function(p2) -- line: 9
-		-- upvalues: p1 (copy)
-		return p2 == p1
-	end
-end
-local function isPredicate(p3) -- line: 14
-	-- upvalues: symbols (copy), MagicMock (copy)
-	if type(p3) == "table" and p3[symbols.isPredicate] then
-		return not MagicMock.is(p3)
+local function getLiteralPredicate(p) -- 1 equivalent call inferred from this helper
+	return function(p2): boolean
+		return p2 == p
 	end
 end
 
-return function(p4, ...) -- line: 20
-	-- upvalues: MagicMock (copy), Spy (copy), symbols (copy), AnyCallMatches (copy), fmtArgs (copy)
-	if not MagicMock.is(p4) and not Spy.is(p4) then
+local function isPredicate(p) -- 1 equivalent call inferred from this helper
+	if type(p) == "table" and p[symbols.isPredicate] then
+		return not MagicMock.is(p)
+	end
+end
+
+return function(p, ...)
+	if not (MagicMock.is(p) or Spy.is(p)) then
 		return {
 			pass = false,
-			message = string.format("expect(mock) must be a MagicMock or Spy when .toHaveBeenCalledWith is used. Given %s instead", (tostring(p4)))
+			message = string.format(
+				"expect(mock) must be a MagicMock or Spy when .toHaveBeenCalledWith is used. Given %s instead",
+				(tostring(p))
+			)
 		}
 	end
 
-	local v12 = table.pack(...)
-	local t1 = {}
+	local v = table.pack(...)
 
-	for _, v in ipairs(v12) do
-		if if type(v) ~= "table" or not v[symbols.isPredicate] then nil else not MagicMock.is(v) then
-			table.insert(t1, v.predicate)
+	local v2 = {}
+
+	for _, v3 in ipairs(v) do
+		if isPredicate(v3) then -- inferred equivalent call
+			table.insert(v2, v3.predicate)
 		else
-			table.insert(t1, function(p5) -- line: 9
-				-- upvalues: v (copy)
-				return p5 == v
-			end)
+			table.insert(v2, getLiteralPredicate(v3)) -- inferred equivalent call
 		end
 	end
 
-	local v16, v17 = AnyCallMatches.predicates(p4, table.unpack(t1))
-
+	local predicates, v3 = AnyCallMatches.predicates(p, table.unpack(v2))
 	return {
-		pass = v16,
-		message = v16 and string.format("Expected %s to never have been called with args: %s", tostring(p4), fmtArgs(v12)) or string.format("Expected %s to have been called with args: %s", tostring(p4), v17)
+		pass = predicates,
+		message = predicates and string.format(
+			"Expected %s to never have been called with args: %s",
+			tostring(p),
+			fmtArgs(v)
+		) or string.format("Expected %s to have been called with args: %s", tostring(p), v3)
 	}
 end

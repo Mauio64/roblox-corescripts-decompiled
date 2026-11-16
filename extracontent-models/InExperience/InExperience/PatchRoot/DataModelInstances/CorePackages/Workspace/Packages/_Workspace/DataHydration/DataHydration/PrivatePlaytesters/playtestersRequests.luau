@@ -1,98 +1,95 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local HttpClient = require(DataHydrationParent.HttpClient)
-local UrlBase = require(DataHydrationParent.UrlBuilder).UrlBase
+local parent = DataHydration.Parent
+
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
+
 local withCsrfRetry = require(DataHydration.withCsrfRetry)
+
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function playtestersUrl(s1: string, n1: number) -- line: 29
-	return ("%s/v1/universes/%d/configuration/playtesters"):format(s1, n1)
+local function playtestersUrl(p: string, p2: number) -- 3 equivalent calls inferred from this helper
+	return ("%s/v1/universes/%d/configuration/playtesters"):format(p, p2)
 end
-local function resolveBase(t1: {[any]: any}?) -- line: 33
-	-- upvalues: UrlBase (copy)
-	local v15 = t1 or {}
 
-	return v15.network, v15.baseUrl or UrlBase.new("develop")
+local function resolveBase(options) -- 2 equivalent calls inferred from this helper
+	local v = options or {}
+	return v.network, v.baseUrl or UrlBase.new("develop")
 end
-local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 39
-	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
-	return (t2 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
+
+local function resolveMutatingNetwork(options) -- 2 equivalent calls inferred from this helper
+	return (options or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
 end
-local function decodePlaytesterIds(p1) -- line: 46
-	local t3 = {}
-	local v19 = if type(p1) ~= "table" then nil else p1.playtesters
 
-	if type(v19) == "table" then
-		for _, v21 in v19 do
-			if type(v21) == "number" then
-				table.insert(t3, v21)
-			elseif type(v21) == "table" then
-				local v22 = v21.userId or v21.id
+local function decodePlaytesterIds(p)
+	local result = {}
+	local playtesters
 
-				if type(v22) == "number" then
-					table.insert(t3, v22)
-				end
+	if type(p) == "table" then
+		playtesters = p.playtesters
+	end
+
+	if type(playtesters) ~= "table" then
+		return result
+	end
+
+	for _, playtester in playtesters do
+		if type(playtester) == "number" then
+			table.insert(result, playtester)
+		elseif type(playtester) == "table" then
+			local userId = playtester.userId or playtester.id
+
+			if type(userId) == "number" then
+				table.insert(result, userId)
 			end
 		end
 	end
 
-	return t3
+	return result
 end
 
-return {
-	fetchPlaytesters = function(n2: number, t4: {[any]: any}?) -- line: 66
-		-- upvalues: UrlBase (copy), fetch (copy), decodePlaytesterIds (copy), asPromise (copy)
-		local v25 = t4 or {}
-		local network = v25.network
-		local v27 = v25.baseUrl or UrlBase.new("develop")
-		local v28 = fetch({
-			method = "GET",
-			analyticsKey = "private-playtesters.fetch",
-			legacy = true,
-			network = network,
-			url = ("%s/v1/universes/%d/configuration/playtesters"):format(v27, n2),
-			decode = decodePlaytesterIds
-		})
+local PlaytestersRequests = {}
 
-		return asPromise(v28)
-	end,
-	addPlaytester = function(n3: number, t5: {[any]: any}, t6: {[any]: any}?) -- line: 79
-		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), decodePlaytesterIds (copy), asPromise (copy)
-		local v32 = t6 or {}
-		local _ = v32.network
-		local v34 = v32.baseUrl or UrlBase.new("develop")
-		local v35 = fetch({
-			method = "POST",
-			analyticsKey = "private-playtesters.add",
-			legacy = true,
-			network = (t6 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
-			url = ("%s/v1/universes/%d/configuration/playtesters"):format(v34, n3),
-			body = {
-				playtesters = t5
-			},
-			decode = decodePlaytesterIds
-		})
+function PlaytestersRequests.fetchPlaytesters(p: number, options)
+	local v = options or {}
+	return asPromise((fetch({
+		network = v.network,
+		method = "GET",
+		url = playtestersUrl(v.baseUrl or UrlBase.new("develop"), p), -- inferred equivalent call
+		analyticsKey = "private-playtesters.fetch",
+		legacy = true,
+		decode = decodePlaytesterIds
+	})))
+end
 
-		return asPromise(v35)
-	end,
-	removePlaytester = function(n4: number, n5: number, t7: {[any]: any}?) -- line: 97
-		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), decodePlaytesterIds (copy), asPromise (copy)
-		local v39 = t7 or {}
-		local _ = v39.network
-		local v41 = v39.baseUrl or UrlBase.new("develop")
-		local v42 = fetch({
-			method = "DELETE",
-			analyticsKey = "private-playtesters.remove",
-			legacy = true,
-			network = (t7 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
-			url = ("%s/v1/universes/%d/configuration/playtesters"):format(v41, n4),
-			body = {
-				playtesters = { n5 }
-			},
-			decode = decodePlaytesterIds
-		})
+function PlaytestersRequests.addPlaytester(p: number, playtesters, options)
+	local _, v = resolveBase(options) -- inferred equivalent call
+	return asPromise((fetch({
+		network = resolveMutatingNetwork(options), -- inferred equivalent call
+		method = "POST",
+		url = playtestersUrl(v, p), -- inferred equivalent call
+		body = { playtesters = playtesters },
+		analyticsKey = "private-playtesters.add",
+		legacy = true,
+		decode = decodePlaytesterIds
+	})))
+end
 
-		return asPromise(v42)
-	end
-}
+function PlaytestersRequests.removePlaytester(p: number, p2: number, options)
+	local _, v = resolveBase(options) -- inferred equivalent call
+	return asPromise((fetch({
+		network = resolveMutatingNetwork(options), -- inferred equivalent call
+		method = "DELETE",
+		url = playtestersUrl(v, p), -- inferred equivalent call
+		body = {
+			playtesters = { p2 }
+		},
+		analyticsKey = "private-playtesters.remove",
+		legacy = true,
+		decode = decodePlaytesterIds
+	})))
+end
+
+return PlaytestersRequests

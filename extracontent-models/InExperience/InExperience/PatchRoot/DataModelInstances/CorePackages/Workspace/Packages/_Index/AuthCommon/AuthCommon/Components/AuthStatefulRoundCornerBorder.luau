@@ -1,76 +1,79 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Roact = require(Parent.Roact)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+
+local Roact = require(parent.Roact)
+
+local UIBlox = require(parent.UIBlox)
 local withStyle = UIBlox.Style.withStyle
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local GetImageData = require(Parent.RobloxAppAssets).GetImageData
-local t1 = {
-	Hover = "Hover",
-	Focused = "Focused",
-	Error = "Error",
-	Default = "Default"
-}
-local v8 = Roact.PureComponent:extend("AuthStatefulRoundCornerBorder")
+local RobloxAppAssets = require(parent.RobloxAppAssets)
+local GetImageData = RobloxAppAssets.GetImageData
 
-v8.defaultProps = {
-	borderState = t1.Default
-}
+local borderState2 = { Hover = "Hover", Focused = "Focused", Error = "Error", Default = "Default" }
 
-function v8.render(p1) -- line: 27
-	-- upvalues: withStyle (copy), Roact (copy), t1 (copy), ImageSetLabel (copy), GetImageData (copy)
-	return withStyle(function(p2) -- line: 28
-		-- upvalues: p1 (copy), Roact (copy), t1 (copy), ImageSetLabel (copy), GetImageData (copy)
-		local size = p1.props.size
-		local borderState = p1.props.borderState
-		local layoutOrder = p1.props.layoutOrder
-		local v14 = p1.props[Roact.Children] or {}
-		local UIDefaultColor = p2.Theme.UIDefault.Color
-		local UIDefaultTransparency = p2.Theme.UIDefault.Transparency
+local extended = Roact.PureComponent:extend("AuthStatefulRoundCornerBorder")
 
-		if borderState == t1.Focused then
-			UIDefaultColor = p2.Theme.IconEmphasis.Color
-			UIDefaultTransparency = p2.Theme.IconEmphasis.Transparency
-		elseif borderState == t1.Hover then
-			UIDefaultColor = p2.Theme.IconDefault.Color
-			UIDefaultTransparency = p2.Theme.IconDefault.Transparency
-		elseif borderState == t1.Error then
-			UIDefaultColor = p2.Theme.Alert.Color
-			UIDefaultTransparency = p2.Theme.Alert.Transparency
+extended.defaultProps = { borderState = borderState2.Default }
+
+function extended.render(p)
+	return withStyle(function(p2)
+		local size = p.props.size
+		local borderState = p.props.borderState
+		local layoutOrder = p.props.layoutOrder
+
+		local v = p.props[Roact.Children] or {}
+
+		local imageColor = p2.Theme.UIDefault.Color
+		local imageTransparency = p2.Theme.UIDefault.Transparency
+
+		if borderState == borderState2.Focused then
+			imageColor = p2.Theme.IconEmphasis.Color
+			imageTransparency = p2.Theme.IconEmphasis.Transparency
+		elseif borderState == borderState2.Hover then
+			imageColor = p2.Theme.IconDefault.Color
+			imageTransparency = p2.Theme.IconDefault.Transparency
+		elseif borderState == borderState2.Error then
+			imageColor = p2.Theme.Alert.Color
+			imageTransparency = p2.Theme.Alert.Transparency
 		end
 
-		if p1.props.borderColorOverride ~= nil then
-			UIDefaultColor = p1.props.borderColorOverride
+		if p.props.borderColorOverride ~= nil then
+			imageColor = p.props.borderColorOverride
 		end
 
-		if p1.props.borderTransparencyOverride ~= nil then
-			UIDefaultTransparency = p1.props.borderTransparencyOverride
+		if p.props.borderTransparencyOverride ~= nil then
+			imageTransparency = p.props.borderTransparencyOverride
 		end
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ClipsDescendants = true,
-			Size = size,
-			LayoutOrder = layoutOrder
-		}, {
-			Boundary = Roact.createElement(ImageSetLabel, {
-				ZIndex = 2,
+		return Roact.createElement(
+			"Frame",
+			{
+				Size = size,
+				LayoutOrder = layoutOrder,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0),
-				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = Rect.new(9, 9, 9, 9),
-				Image = GetImageData("LuaApp/buttons/buttonStroke") or "LuaApp/buttons/buttonStroke",
-				ImageColor3 = UIDefaultColor,
-				ImageTransparency = UIDefaultTransparency
-			}),
-			ContentWrapper = Roact.createElement("Frame", {
-				ZIndex = 1,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, v14)
-		})
+				ClipsDescendants = true
+			},
+			{
+				Boundary = Roact.createElement(ImageSetLabel, {
+					ZIndex = 2,
+					Size = UDim2.new(1, 0, 1, 0),
+					BackgroundTransparency = 1,
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(9, 9, 9, 9),
+					Image = GetImageData("LuaApp/buttons/buttonStroke") or "LuaApp/buttons/buttonStroke",
+					ImageColor3 = imageColor,
+					ImageTransparency = imageTransparency
+				}),
+				ContentWrapper = Roact.createElement(
+					"Frame",
+					{ ZIndex = 1, Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 },
+					v
+				)
+			}
+		)
 	end)
 end
 
-v8.BorderState = t1
+extended.BorderState = borderState2
 
-return v8
+return extended

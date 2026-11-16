@@ -1,212 +1,224 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
-
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local Constants = require(parent.Constants)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
 local RunService = game:GetService("RunService")
-local canPublishAssets = require(ParentParent.util.canPublishAssets)
-local getAssetCreationDetails = require(ParentParent.util.getAssetCreationDetails)
-local getAssetCreationDetailsRCC = require(ParentParent.util.getAssetCreationDetailsRCC)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local getFFlagUGCValidateForwardIECRestrictedUserIds = require(ParentParent.flags.getFFlagUGCValidateForwardIECRestrictedUserIds)
-local getFFlagUGCValidateBackendInExperienceViaCanPublish = require(ParentParent.flags.getFFlagUGCValidateBackendInExperienceViaCanPublish)
-local t1 = {
-	MODERATION_STATE_REVIEWING = true,
-	Reviewing = true
-}
-local t2 = {
-	MODERATION_STATE_APPROVED = true,
-	Approved = true
-}
 
-local function collectContentIdsArray(p1) -- line: 22
-	local t3 = {}
+local canPublishAssets = require(parent.util.canPublishAssets)
+local getAssetCreationDetails = require(parent.util.getAssetCreationDetails)
+local getAssetCreationDetailsRCC = require(parent.util.getAssetCreationDetailsRCC)
 
-	for v21, _ in p1 do
-		table.insert(t3, v21)
+local getFFlagUGCValidateForwardIECRestrictedUserIds = require(parent.flags.getFFlagUGCValidateForwardIECRestrictedUserIds)
+
+local getFFlagUGCValidateBackendInExperienceViaCanPublish = require(parent.flags.getFFlagUGCValidateBackendInExperienceViaCanPublish)
+local getFFlagUGCValidateMakeupCategoryParity = require(parent.flags.getFFlagUGCValidateMakeupCategoryParity)
+
+local v = { MODERATION_STATE_REVIEWING = true, Reviewing = true }
+local v2 = { MODERATION_STATE_APPROVED = true, Approved = true }
+
+local function collectContentIdsArray(items) -- 1 equivalent call inferred from this helper
+	local contentIdsArray = {}
+
+	for k, _ in items do
+		table.insert(contentIdsArray, k)
 	end
 
-	return t3
+	return contentIdsArray
 end
-local function runStudio(p2, p3, p4) -- line: 30
-	-- upvalues: getAssetCreationDetails (copy), ErrorSourceStrings (copy), Constants (copy)
-	local t4 = {}
 
-	for v27, _ in p4 do
-		table.insert(t4, v27)
-	end
+local function runStudio(object, rootInstance, contentIds)
+	local contentIdsArray = collectContentIdsArray(contentIds) -- inferred equivalent call
 
-	if #t4 == 0 then
+	if #contentIdsArray == 0 then
 		return
 	end
 
-	local v29, v30 = getAssetCreationDetails(t4)
+	local assetCreationDetails, v3 = getAssetCreationDetails(contentIdsArray)
 
-	if not v29 or #v30 ~= #t4 then
-		p2:fail(ErrorSourceStrings.Keys.DescendantIdFetchFailed, {
-			InstanceFullName = p3:GetFullName()
+	if not assetCreationDetails or #v3 ~= #contentIdsArray then
+		object:fail(ErrorSourceStrings.Keys.DescendantIdFetchFailed, {
+			InstanceFullName = rootInstance:GetFullName()
 		})
 
 		return
 	end
 
-	for _, v32 in v30 do
-		if v32.status == Constants.ASSET_STATUS.UNKNOWN or (v32.status == Constants.ASSET_STATUS.REVIEW_PENDING or v32.status == Constants.ASSET_STATUS.MODERATED) then
-			local str = tostring(v32.assetId)
-			local v34 = p4[str]
-			local v35 = if not v34 then str else string.format("%s.%s ( %s )", v34[1].instance:GetFullName(), v34[1].fieldName, str)
-
-			p2:fail(ErrorSourceStrings.Keys.DescendantIdNotApproved, {
-				ModerationMessages = v35
-			})
+	for _, v4 in v3 do
+		if not (v4.status == Constants.ASSET_STATUS.UNKNOWN or v4.status == Constants.ASSET_STATUS.REVIEW_PENDING or v4.status == Constants.ASSET_STATUS.MODERATED) then
+			continue
 		end
+
+		local assetId = tostring(v4.assetId)
+		local v5 = contentIds[assetId]
+
+		if v5 then
+			assetId = string.format("%s.%s ( %s )", v5[1].instance:GetFullName(), v5[1].fieldName, assetId)
+		end
+
+		object:fail(ErrorSourceStrings.Keys.DescendantIdNotApproved, {
+			ModerationMessages = assetId
+		})
 	end
 end
-local function buildOwnerLookup(p5) -- line: 68
-	local t5 = {}
 
-	for _, v39 in p5 do
-		t5[tonumber(v39.id)] = true
+local function buildOwnerLookup(restrictedUserIds) -- 1 equivalent call inferred from this helper
+	local idSet = {}
+
+	for _, item in restrictedUserIds do
+		idSet[tonumber(item.id)] = true
 	end
 
-	return t5
+	return idSet
 end
-local function runBackend(p6, p7, p8) -- line: 76
-	-- upvalues: getAssetCreationDetailsRCC (copy), ErrorSourceStrings (copy), t1 (copy), t2 (copy)
-	local restrictedUserIds = p8.restrictedUserIds
+
+local function runBackend(object, contentIds, backendConfigs)
+	local restrictedUserIds = backendConfigs.restrictedUserIds
 
 	if not restrictedUserIds or #restrictedUserIds == 0 then
 		return
 	end
 
-	local t6 = {}
+	local ownerLookup = buildOwnerLookup(restrictedUserIds) -- inferred equivalent call
 
-	for _, v46 in restrictedUserIds do
-		t6[tonumber(v46.id)] = true
-	end
+	for k, item in contentIds do
+		local v3 = item[1]
+		local assetCreationDetailsRCC, v4 = getAssetCreationDetailsRCC(k)
 
-	for v47, v48 in p7 do
-		local v49 = v48[1]
-		local v50, v51 = getAssetCreationDetailsRCC(v47)
-
-		if not v50 then
-			p6:forceError("Failed to load asset")
+		if not assetCreationDetailsRCC then
+			object:forceError("Failed to load asset")
 		end
 
-		local creator = v51.creationContext.creator
+		local creator = v4.creationContext.creator
+		local v5
 
-		if not t6[tonumber(if not creator.userId then creator.groupId else creator.userId)] then
-			p6:fail(ErrorSourceStrings.Keys.DescendantIdNotOwned, {
-				AssetId = v47,
-				InstanceFullName = v49.instance:GetFullName(),
-				FieldName = v49.fieldName
+		if creator.userId then
+			v5 = creator.userId
+		else
+			v5 = creator.groupId
+		end
+
+		if not ownerLookup[tonumber(v5)] then
+			object:fail(ErrorSourceStrings.Keys.DescendantIdNotOwned, {
+				AssetId = k,
+				InstanceFullName = v3.instance:GetFullName(),
+				FieldName = v3.fieldName
 			})
 		end
 
-		local moderationState = v51.moderationResult.moderationState
+		local moderationState = v4.moderationResult.moderationState
 
-		if t1[moderationState] then
-			p6:forceError("Failed to load asset " .. v49.instance:GetFullName() .. "." .. v49.fieldName .. " ( " .. v47 .. " ) that is still going through the review process. Please, wait for a notification of completion from the review process and try again.")
+		if v[moderationState] then
+			object:forceError("Failed to load asset " .. v3.instance:GetFullName() .. "." .. v3.fieldName .. " ( " .. k .. " ) that is still going through the review process. Please, wait for a notification of completion from the review process and try again.")
 		end
 
-		if not t2[moderationState] then
-			p6:fail(ErrorSourceStrings.Keys.DescendantIdNotApproved, {
-				ModerationMessages = string.format("%s.%s ( %s )", v49.instance:GetFullName(), v49.fieldName, v47)
+		if not v2[moderationState] then
+			object:fail(ErrorSourceStrings.Keys.DescendantIdNotApproved, {
+				ModerationMessages = string.format("%s.%s ( %s )", v3.instance:GetFullName(), v3.fieldName, k)
 			})
 		end
 	end
 end
-local function runCanPublishOwnershipCheck(p9, p10, p11, p12) -- line: 134
-	-- upvalues: getFFlagUGCValidateBackendInExperienceViaCanPublish (copy), getFFlagUGCValidateForwardIECRestrictedUserIds (copy), RunService (copy), canPublishAssets (copy), ErrorSourceStrings (copy)
-	local v58 = getFFlagUGCValidateBackendInExperienceViaCanPublish() and (p12.token == nil and p12.universeId ~= nil)
 
-	if not p12.token and not v58 or getFFlagUGCValidateForwardIECRestrictedUserIds() and RunService:IsStudio() then
+local function runCanPublishOwnershipCheck(object, rootInstance, contentIds, data)
+	local v3 = getFFlagUGCValidateBackendInExperienceViaCanPublish()
+
+	if v3 then
+		if data.token == nil then
+			v3 = data.universeId ~= nil
+		else
+			v3 = false
+		end
+	end
+
+	if not (data.token or v3) or getFFlagUGCValidateForwardIECRestrictedUserIds() and RunService:IsStudio() then
 		return
 	end
 
-	local v59 = if not getFFlagUGCValidateForwardIECRestrictedUserIds() and not v58 then {} else p12.restrictedUserIds or {}
-	local v60 = canPublishAssets(p11, v59, p12.token, p12.universeId, true)
+	local v4 = canPublishAssets(
+		contentIds,
+		(getFFlagUGCValidateForwardIECRestrictedUserIds() or v3) and data.restrictedUserIds or {},
+		data.token,
+		data.universeId,
+		true
+	)
 
-	if v60.status == "tooManyAssets" then
-		p9:fail(ErrorSourceStrings.Keys.DescendantIdsTooMany, {
-			InstanceFullName = p10:GetFullName()
+	if v4.status == "tooManyAssets" then
+		object:fail(ErrorSourceStrings.Keys.DescendantIdsTooMany, {
+			InstanceFullName = rootInstance:GetFullName()
+		})
+		return
+	end
+
+	if v4.status == "loadFailed" then
+		object:fail(ErrorSourceStrings.Keys.DescendantIdFetchFailed, {
+			InstanceFullName = rootInstance:GetFullName()
 		})
 
 		return
 	end
 
-	if v60.status == "loadFailed" then
-		p9:fail(ErrorSourceStrings.Keys.DescendantIdFetchFailed, {
-			InstanceFullName = p10:GetFullName()
-		})
-
-		return
-	end
-
-	local verdicts = v60.verdicts
+	local verdicts = v4.verdicts
 
 	if not verdicts then
 		return
 	end
 
-	for _, v63 in verdicts do
-		if not v63.allowed then
-			p9:fail(ErrorSourceStrings.Keys.DescendantIdNotOwned, {
-				AssetId = v63.assetId,
-				InstanceFullName = v63.entry.instance:GetFullName(),
-				FieldName = v63.entry.fieldName
+	for _, verdict in verdicts do
+		if not verdict.allowed then
+			object:fail(ErrorSourceStrings.Keys.DescendantIdNotOwned, {
+				AssetId = verdict.assetId,
+				InstanceFullName = verdict.entry.instance:GetFullName(),
+				FieldName = verdict.entry.fieldName
 			})
 		end
 	end
 end
 
+local categories
+
+if getFFlagUGCValidateMakeupCategoryParity() then
+	categories = Constants.AllAssetUploadCategories
+else
+	categories = Constants.AllAssetUploadCategoriesIncludingMakeup
+end
+
 return {
-	categories = Constants.AllAssetUploadCategoriesIncludingMakeup,
+	["categories"] = categories,
 	requiredData = {
 		ValidationEnums.SharedDataMember.rootInstance,
 		ValidationEnums.SharedDataMember.consumerConfig,
 		ValidationEnums.SharedDataMember.contentIds
 	},
-	fflag = getFFlagUGCValidateMigrateSchemaProperties,
 	expectedFailures = {},
-	run = function(p13, p14) -- line: 203
-		-- upvalues: ValidationEnums (copy), runStudio (copy), getFFlagUGCValidateBackendInExperienceViaCanPublish (copy), runCanPublishOwnershipCheck (copy), runBackend (copy)
-		local consumerConfig = p14.consumerConfig
+	run = function(p, data)
+		local consumerConfig = data.consumerConfig
 
 		if consumerConfig.source == "AutoSetup" then
 			return
 		end
 
-		local rootInstance = p14.rootInstance
-		local contentIds = p14.contentIds
+		local rootInstance = data.rootInstance
+		local contentIds = data.contentIds
 
-		if consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Studio then
-			runStudio(p13, rootInstance, contentIds)
+		local validationEnv = consumerConfig.validationEnv
 
-			return
-		end
-
-		if consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend then
+		if validationEnv == ValidationEnums.ValidationEnv.Studio then
+			runStudio(p, rootInstance, contentIds)
+		elseif validationEnv == ValidationEnums.ValidationEnv.Backend then
 			local backendConfigs = consumerConfig.backendConfigs
 
 			if getFFlagUGCValidateBackendInExperienceViaCanPublish() and backendConfigs.universeId then
-				runCanPublishOwnershipCheck(p13, rootInstance, contentIds, {
+				runCanPublishOwnershipCheck(p, rootInstance, contentIds, {
 					universeId = backendConfigs.universeId,
 					restrictedUserIds = backendConfigs.restrictedUserIds
 				})
-
-				return
+			else
+				runBackend(p, contentIds, backendConfigs)
 			end
-
-			runBackend(p13, contentIds, backendConfigs)
-
-			return
-		end
-
-		if consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.IEC then
-			runCanPublishOwnershipCheck(p13, rootInstance, contentIds, consumerConfig.iecConfigs)
+		elseif validationEnv == ValidationEnums.ValidationEnv.IEC then
+			runCanPublishOwnershipCheck(p, rootInstance, contentIds, consumerConfig.iecConfigs)
 		end
 	end
 }

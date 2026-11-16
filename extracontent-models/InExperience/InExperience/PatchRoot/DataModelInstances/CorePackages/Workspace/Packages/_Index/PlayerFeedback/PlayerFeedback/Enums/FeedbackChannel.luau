@@ -1,3 +1,1 @@
-return {
-	ExperienceDiscoveryPage = "experience-discovery-page"
-}
+return { ExperienceDiscoveryPage = "experience-discovery-page" }

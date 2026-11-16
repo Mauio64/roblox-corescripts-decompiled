@@ -1,25 +1,26 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-local Roact = require(SocialLibraries.dependencies).Roact
-local v3 = game:DefineFastFlag("SocialLibrariesSelectableAlertViewShim", false)
-local v4 = Roact.PureComponent:extend("AlertViewSoakArea")
+local dependencies = require(SocialLibraries.dependencies)
+local roact = dependencies.Roact
 
-v4.defaultProps = {
+local defineFastFlag = game:DefineFastFlag("SocialLibrariesSelectableAlertViewShim", false)
+
+local extended = roact.PureComponent:extend("AlertViewSoakArea")
+extended.defaultProps = {
 	Visible = true,
 	BackgroundTransparency = 0.75,
 	BackgroundColor3 = Color3.fromRGB(255, 0, 255)
 }
 
-function v4.render(p1) -- line: 14
-	-- upvalues: Roact (copy), v3 (copy)
-	return Roact.createElement("ImageButton", {
+function extended.render(p)
+	return roact.createElement("ImageButton", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = p.props.BackgroundTransparency,
+		BackgroundColor3 = p.props.BackgroundColor3,
 		Active = true,
 		AutoButtonColor = false,
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundTransparency = p1.props.BackgroundTransparency,
-		BackgroundColor3 = p1.props.BackgroundColor3,
-		Selectable = not v3 and nil,
-		Visible = p1.props.Visible
-	}, p1.props[Roact.Children])
+		Selectable = not defineFastFlag and nil,
+		Visible = p.props.Visible
+	}, p.props[roact.Children])
 end
 
-return v4
+return extended

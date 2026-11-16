@@ -1,39 +1,35 @@
 local Songbird = script:FindFirstAncestor("Songbird")
-local LoggingProtocol = require(Songbird.Parent.LoggingProtocol)
 
+local LoggingProtocol = require(Songbird.Parent.LoggingProtocol)
 require(Songbird.Analytics.AnalyticActions)
 
 local getFIntSongbirdTelemetryThrottle = require(Songbird.Flags.getFIntSongbirdTelemetryThrottle)
-local t1 = {
+
+local v = {
 	eventName = "AudioPlayerEvents",
-	description = " Analytics for AudioPlayer component to track playback, favoriting, and reporting flows ",
-	links = "",
 	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
 	throttlingPercentage = getFIntSongbirdTelemetryThrottle(),
-	lastUpdated = {
-		25,
-		10,
-		24
-	}
+	lastUpdated = { 25, 10, 24 },
+	description = " Analytics for AudioPlayer component to track playback, favoriting, and reporting flows ",
+	links = ""
 }
 
-local function createCounterEventConfig(s1: string) -- line: 23
-	-- upvalues: t1 (copy), LoggingProtocol (copy)
+local function createCounterEventConfig(action: string)
 	return {
-		eventName = `{ t1.eventName }_{ s1 }`,
+		eventName = `{v.eventName}_{action}`,
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		throttlingPercentage = t1.throttlingPercentage,
-		lastUpdated = t1.lastUpdated,
-		description = t1.description,
-		links = t1.links
+		throttlingPercentage = v.throttlingPercentage,
+		lastUpdated = v.lastUpdated,
+		description = v.description,
+		links = v.links
 	}
 end
-local function sendAudioPlayerAnalytics(t2: {[any]: any}) -- line: 45
-	-- upvalues: createCounterEventConfig (copy), LoggingProtocol (copy), t1 (copy)
-	local v9 = createCounterEventConfig(t2.action)
 
-	LoggingProtocol.default:logRobloxTelemetryEvent(t1, nil, t2)
-	LoggingProtocol.default:logRobloxTelemetryCounter(v9, 1)
+local function sendAudioPlayerAnalytics(p)
+	local counterEventConfig = createCounterEventConfig(p.action)
+
+	LoggingProtocol.default:logRobloxTelemetryEvent(v, nil, p)
+	LoggingProtocol.default:logRobloxTelemetryCounter(counterEventConfig, 1)
 end
 
 return sendAudioPlayerAnalytics

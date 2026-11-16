@@ -1,27 +1,37 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local ControlState = Foundation.Enums.ControlState
 local getIconRichText = Foundation.Utility.getIconRichText
 local IconName = Foundation.Enums.IconName
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 
-local function TextLink(t1: {[any]: any}) -- line: 21
-	-- upvalues: React (copy), getIconRichText (copy), IconName (copy), ControlState (copy), FoundationText (copy)
-	local v10, v11 = React.useState(false)
-	local v12 = getIconRichText(IconName.ArrowUpRightFromSquare)
-	local v13 = React.useCallback(function(p1) -- line: 25
-		-- upvalues: v11 (copy), ControlState (copy)
-		v11(p1 == ControlState.Hover)
+local function TextLink(props)
+	local state, setState = React.useState(false)
+	local iconRichText = getIconRichText(IconName.ArrowUpRightFromSquare)
+
+	local onStateChanged = React.useCallback(function(p)
+		setState(p == ControlState.Hover)
 	end, {})
 
-	return React.createElement(FoundationText, {
+	local createElement = React.createElement
+	local text
+
+	if state then
+		text = `<u>{props.text}</u> {iconRichText}`
+	else
+		text = `{props.text} {iconRichText}`
+	end
+
+	return createElement(Text, {
+		Text = text,
 		RichText = true,
-		Text = if not v10 then `{ t1.text } { v12 }` else `<u>{ t1.text }</u> { v12 }`,
-		onActivated = t1.onActivated,
-		onStateChanged = v13,
-		tag = t1.tag or "auto-xy text-body-medium text-wrap text-align-x-left radius-small content-emphasis",
-		LayoutOrder = t1.layoutOrder
+		onActivated = props.onActivated,
+		onStateChanged = onStateChanged,
+		tag = props.tag or "auto-xy text-body-medium text-wrap text-align-x-left radius-small content-emphasis",
+		LayoutOrder = props.layoutOrder
 	})
 end
 

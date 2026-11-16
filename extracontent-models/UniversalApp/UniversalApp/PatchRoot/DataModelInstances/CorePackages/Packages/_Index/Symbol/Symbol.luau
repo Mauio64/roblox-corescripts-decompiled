@@ -1,12 +1,13 @@
 local Symbol = require(script.Symbol)
-local lib = require(script["Registry.global"])
+
+local Registryglobal = require(script["Registry.global"])
+
 local self = setmetatable({}, {
-	__call = function(_, s1: string?) -- line: 29
-		-- upvalues: Symbol (copy)
-		return Symbol.new(s1)
+	__call = function(_, p: string?)
+		return Symbol.new(p)
 	end
 })
 
-self.for_ = lib.getOrInit
+self.for_ = Registryglobal.getOrInit
 
 return self

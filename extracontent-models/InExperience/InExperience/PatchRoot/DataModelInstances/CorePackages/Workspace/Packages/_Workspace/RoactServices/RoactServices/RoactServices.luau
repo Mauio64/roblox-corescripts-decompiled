@@ -1,107 +1,100 @@
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local Immutable = require(ParentParent.AppCommonLib).Immutable
-local Symbol = require(ParentParent.AppCommonLib).Symbol
-local RoactServicesContext = require(script.Parent.RoactServicesContext)
+local parent = script.Parent.Parent
+local Roact = require(parent.Roact)
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
+local AppCommonLib2 = require(parent.AppCommonLib)
+local Symbol = AppCommonLib2.Symbol
 
+local RoactServicesContext = require(script.Parent.RoactServicesContext)
 require(script.Parent.RoactServicesTypes)
 
-local v6 = Roact.PureComponent:extend("ServiceProvider")
-local t1 = {
-	ServiceProvider = v6
-}
+local extended = Roact.PureComponent:extend("ServiceProvider")
+local RoactServices = { ServiceProvider = extended }
 
-function v6.init(t2: {[any]: any}, t3: {[any]: any}) -- line: 36
-	local t4 = {}
+function extended.init(object, p)
+	local services = {}
 
-	if t3 and t3.services then
-		assert(t3.services, "Expected some services to connect, found none")
-		assert(type(t3.services) == "table", "Expected the provided services to be a map")
+	if p and p.services then
+		assert(p.services, "Expected some services to connect, found none")
+		assert(type(p.services) == "table", "Expected the provided services to be a map")
 
-		for k, v in pairs(t3.services) do
+		for k, service in pairs(p.services) do
 			if type(k) == "table" then
-				k.set(t4, v)
+				k.set(services, service)
 			end
 		end
 	end
 
-	t2:setState({
-		services = t4
-	})
+	object:setState({ services = services })
 end
-function v6.render(p1) -- line: 54
-	-- upvalues: Roact (copy), RoactServicesContext (copy)
-	return Roact.createElement(RoactServicesContext.Provider, {
-		value = p1.state.services
-	}, Roact.oneChild(p1.props[Roact.Children]))
-end
-function t1.createService(s1: string) -- line: 62
-	-- upvalues: Symbol (copy)
-	assert(type(s1) == "string", "Expected serviceName to be a string")
 
-	local v15 = Symbol.named(s1)
+function extended.render(p)
+	return Roact.createElement(
+		RoactServicesContext.Provider,
+		{ value = p.state.services },
+		Roact.oneChild(p.props[Roact.Children])
+	)
+end
+
+function RoactServices.createService(value: string)
+	assert(type(value) == "string", "Expected serviceName to be a string")
+	local named = Symbol.named(value)
 
 	return {
-		get = function(p2) -- line: 68
-			-- upvalues: v15 (copy)
-			if p2 then
-				return p2[v15]
+		get = function(p)
+			if p then
+				return p[named]
 			end
 
 			return nil
 		end,
-		set = function(p3, p4) -- line: 72
-			-- upvalues: v15 (copy)
-			p3[v15] = p4
+		set = function(p, p2)
+			p[named] = p2
 		end
 	}
 end
-function t1.connect(p5) -- line: 81
-	-- upvalues: Roact (copy), Immutable (copy), RoactServicesContext (copy)
-	assert(p5 ~= nil, "Expected some services to connect, found none.")
 
-	return function(p6) -- line: 83
-		-- upvalues: Roact (copy), p5 (copy), Immutable (copy), RoactServicesContext (copy)
-		assert(p6 ~= nil, "Expected a component to connect, found none.")
+function RoactServices.connect(items)
+	assert(items ~= nil, "Expected some services to connect, found none.")
+	return function(p)
+		assert(p ~= nil, "Expected a component to connect, found none.")
 
-		local t5 = {}
-		local v22 = ("Services(%s)"):format((tostring(p6)))
-		local v23 = Roact.PureComponent:extend(v22)
+		local v = {}
+		local formatted = ("Services(%s)"):format((tostring(p)))
 
-		function v23.init(_, p8) -- line: 91
-			-- upvalues: p5 (copy), t5 (copy)
-			for k, v in pairs(p5) do
+		local extended2 = Roact.PureComponent:extend(formatted)
+
+		function extended2.init(_, p2)
+			for k, item in pairs(items) do
 				assert(type(k) == "string", string.format("serviceMap must be indexed by strings, not %s", (type(k))))
-				assert(type(v) == "table", "serviceMap must have a service created by createService()")
-				assert(type(v.get) == "function", "serviceMap must have a service created by createService()")
-				assert(p8.innerProps[k] == nil, "Naming conflict with prop : " .. k)
-				t5[k] = v.get(p8.services)
+
+				assert(type(item) == "table", "serviceMap must have a service created by createService()")
+				assert(type(item.get) == "function", "serviceMap must have a service created by createService()")
+				assert(p2.innerProps[k] == nil, "Naming conflict with prop : " .. k)
+				v[k] = item.get(p2.services)
 			end
 		end
-		function v23.render(p9) -- line: 105
-			-- upvalues: Immutable (copy), t5 (copy), Roact (copy), p6 (copy)
-			local v30 = Immutable.JoinDictionaries(p9.props.innerProps, t5)
 
-			return Roact.createElement(p6, v30)
+		function extended2.render(p2)
+			local joinDictionaries = Immutable.JoinDictionaries(p2.props.innerProps, v)
+			return Roact.createElement(p, joinDictionaries)
 		end
 
-		local v24 = Roact.PureComponent:extend("ConnectionWrapper")
+		local extended3 = Roact.PureComponent:extend("ConnectionWrapper")
 
-		function v24.render(p10) -- line: 112
-			-- upvalues: Roact (copy), RoactServicesContext (copy), v23 (copy)
+		function extended3.render(p2)
 			return Roact.createElement(RoactServicesContext.Consumer, {
-				render = function(p11) -- line: 114
-					-- upvalues: Roact (copy), v23 (copy), p10 (copy)
-					return Roact.createElement(v23, {
-						innerProps = p10.props,
-						services = p11
+				render = function(services)
+					return Roact.createElement(extended2, {
+						innerProps = p2.props,
+						services = services
 					})
 				end
 			})
 		end
 
-		return v24
+		return extended3
 	end
 end
 
-return t1
+return RoactServices

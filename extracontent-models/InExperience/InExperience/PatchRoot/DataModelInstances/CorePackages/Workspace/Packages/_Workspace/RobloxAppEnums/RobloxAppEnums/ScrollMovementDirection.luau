@@ -1,4 +1,1 @@
-return {
-	Forward = "forward",
-	Backward = "backward"
-}
+return { Forward = "forward", Backward = "backward" }

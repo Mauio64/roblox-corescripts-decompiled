@@ -1,14 +1,15 @@
 local CorePackages = game:GetService("CorePackages")
-local FFlagTopBarSignalizeHealthBar = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeHealthBar
-local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeHealthBar = CoreGuiCommon.Flags.FFlagTopBarSignalizeHealthBar
+
+local Rodux = require(CorePackages.Packages.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
 
 if FFlagTopBarSignalizeHealthBar then
 	return nil
 end
 
-return (makeActionCreator(script.Name, function(p1, p2) -- line: 9
-	return {
-		health = p1,
-		maxHealth = p2
-	}
+return (makeActionCreator(script.Name, function(health, maxHealth)
+	return { health = health, maxHealth = maxHealth }
 end))

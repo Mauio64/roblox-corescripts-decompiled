@@ -1,204 +1,292 @@
 local StreamNotifications = script:FindFirstAncestor("StreamNotifications")
 local components = StreamNotifications.components
-local StreamNotificationsParent = StreamNotifications.Parent
-local React = require(StreamNotificationsParent.React)
+local parent = StreamNotifications.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local constants = require(StreamNotifications.constants)
-local ReactOtter = require(StreamNotificationsParent.ReactOtter)
-local NotificationsCommon = require(StreamNotificationsParent.NotificationsCommon)
+local ReactOtter = require(parent.ReactOtter)
+
+local NotificationsCommon = require(parent.NotificationsCommon)
 local StreamNotificationAnimationWrapper = require(components.StreamNotificationAnimationWrapper)
-local useLocalization = require(StreamNotificationsParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local NotificationHelper = NotificationsCommon.NotificationHelper
-local UIBlox = require(StreamNotificationsParent.UIBlox)
+
+local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
+local useTokens = Foundation.Hooks.useTokens
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v15 = Images["icons/actions/truncationExpand"]
-local v16 = Images["icons/actions/truncationCollapse"]
-local uDim = UDim.new(0, 12)
-local uDim2 = UDim.new(0, 24)
-local v19 = constants.DefaultPadding * 4
-local uDim2_2 = UDim2.fromOffset(24, 24)
-local EventStream = require(StreamNotifications.analytics.analyticsService).EventStream
-local analyticsConstants = require(StreamNotifications.analytics.analyticsConstants)
-local t1 = {
-	stiffness = 207,
-	damping = 24,
-	mass = 1
-}
+local iconsactionstruncationExpand = Images["icons/actions/truncationExpand"]
+local iconsactionstruncationCollapse = Images["icons/actions/truncationCollapse"]
 
-return function(t2: {[any]: any}) -- line: 54
-	-- upvalues: useStyle (copy), React (copy), ReactOtter (copy), useLocalization (copy), constants (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), t1 (copy), StreamNotificationAnimationWrapper (copy), uDim (copy), uDim2 (copy), ImageSetLabel (copy), uDim2_2 (copy), v16 (copy), v19 (copy), v15 (copy)
-	local v25 = useStyle()
-	local Font = v25.Font
-	local Header1Font = Font.Header1.Font
-	local v28 = Font.BaseSize * Font.CaptionHeader.RelativeSize
-	local v29, v30 = React.useState(true)
-	local v31, v32 = React.useState(74)
-	local v33, v34 = React.useState(true)
-	local v35, v36 = ReactOtter.useAnimatedBinding({
-		shadowHeight = 0,
-		shadowWidth = 1
-	})
-	local v37 = useLocalization({
+local udim = UDim.new(0, 12)
+local udim2 = UDim.new(0, 24)
+
+local v = constants.DefaultPadding * 4
+local udim3 = UDim2.fromOffset(24, 24)
+
+local analyticsService = require(StreamNotifications.analytics.analyticsService)
+local eventStream = analyticsService.EventStream
+local analyticsConstants = require(StreamNotifications.analytics.analyticsConstants)
+
+local v2 = { stiffness = 207, damping = 24, mass = 1 }
+
+return function(data)
+	local v3 = useStyle()
+	local v4
+
+	if FoundationFontFaceMigration then
+		v4 = useTokens()
+	end
+
+	local font = v3.Font
+	local font2
+
+	if FoundationFontFaceMigration then
+		font2 = nil
+	else
+		font2 = font.Header1.Font
+	end
+
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v4.Typography.TitleMedium.Font)
+	else
+		fontFace = nil
+	end
+
+	local textSize
+
+	if FoundationFontFaceMigration then
+		textSize = v4.Typography.TitleMedium.FontSize
+	else
+		textSize = font.BaseSize * font.CaptionHeader.RelativeSize
+	end
+
+	local state, setState = React.useState(true)
+	local state2, setState2 = React.useState(74)
+	local state3, setState3 = React.useState(true)
+
+	local v5, v6 = ReactOtter.useAnimatedBinding({ shadowHeight = 0, shadowWidth = 1 })
+
+	local v7 = useLocalization({
 		moreText = constants.Text.ShowMoreKey,
 		lessText = constants.Text.ShowLessKey
 	})
-	local v38 = React.useCallback(function(n1: number, n2: number) -- line: 77
-		-- upvalues: v29 (copy), v32 (copy)
-		if n1 == 1 and v29 then
-			v32(n2)
+
+	local onHeightChange = React.useCallback(function(p: number, p2: number)
+		if p == 1 and state then
+			setState2(p2)
 		end
 	end)
 
-	local function v39(p1) -- line: 83
-		local t3 = {}
+	local function fn(notifications)
+		local ids = {}
 
-		for _, v46 in p1 do
-			if v46.id then
-				table.insert(t3, v46.id)
+		for _, item in notifications do
+			if item.id then
+				table.insert(ids, item.id)
 			end
 		end
 
-		return t3
+		return ids
 	end
-	local function v40() -- line: 93
-		-- upvalues: v30 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), t2 (copy), v39 (copy)
-		v30(function(p2) -- line: 94
-			-- upvalues: NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), t2 (copy), v39 (copy)
-			NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, if not p2 then analyticsConstants.EventNames.bundleClosed else analyticsConstants.EventNames.bundleOpened, {
-				bundleKey = t2.notifications[1].content.bundleKey or nil,
-				totalNotifications = #t2.notifications or nil,
-				notificationIds = v39(t2.notifications) or nil
+
+	local function fn2()
+		setState(function(p): boolean
+			local fireEvent = NotificationHelper.fireEvent
+
+			local click = analyticsConstants.Context.click
+			local v8
+
+			if p then
+				v8 = analyticsConstants.EventNames.bundleOpened
+			else
+				v8 = analyticsConstants.EventNames.bundleClosed
+			end
+
+			fireEvent(eventStream, click, v8, {
+				bundleKey = data.notifications[1].content.bundleKey or nil,
+				totalNotifications = #data.notifications or nil,
+				notificationIds = fn(data.notifications) or nil
 			})
 
-			if p2 then
-				for v53, v54 in t2.notifications do
-					NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.seen, analyticsConstants.EventNames.notificationViewed, {
-						notificationId = v54.id or nil,
-						notificationType = v54.content.notificationType or nil,
-						bundlePosition = v53,
-						bundleKey = v54.content.bundleKey or nil,
-						clientEventsPayload = v54.content.clientEventsPayload or nil
-					})
+			if p then
+				for k, notification in data.notifications do
+					NotificationHelper.fireEvent(
+						eventStream,
+						analyticsConstants.Context.seen,
+						analyticsConstants.EventNames.notificationViewed,
+						{
+							notificationId = notification.id or nil,
+							notificationType = notification.content.notificationType or nil,
+							bundlePosition = k,
+							bundleKey = notification.content.bundleKey or nil,
+							clientEventsPayload = notification.content.clientEventsPayload or nil
+						}
+					)
 				end
 			end
 
-			return not p2
+			return not p
 		end)
 	end
 
-	React.useEffect(function() -- line: 132
-		-- upvalues: v36 (copy), ReactOtter (copy), v29 (copy), t1 (copy)
-		v36({
-			shadowHeight = ReactOtter.spring(not v29 and 1 or 0, t1),
-			shadowWidth = ReactOtter.spring(not v29 and 0 or 1, t1)
+	React.useEffect(function()
+		v6({
+			shadowHeight = ReactOtter.spring(state and 0 or 1, v2),
+			shadowWidth = ReactOtter.spring(state and 1 or 0, v2)
 		})
-	end, { v29 })
-	React.useEffect(function() -- line: 140
-		-- upvalues: v34 (copy), t2 (copy)
-		v34(#t2.notifications > 1)
-	end, { t2.notifications })
+	end, { state })
 
-	return (React.useMemo(function() -- line: 145
-		-- upvalues: t2 (copy), v29 (copy), v33 (copy), React (copy), StreamNotificationAnimationWrapper (copy), v38 (copy), v35 (copy), v31 (copy), constants (copy), v25 (copy), uDim (copy), Header1Font (copy), v28 (copy), v40 (copy), uDim2 (copy), v37 (copy), ImageSetLabel (copy), uDim2_2 (copy), v16 (copy), v19 (copy), v15 (copy)
-		local t4 = {}
+	React.useEffect(function()
+		setState3(#data.notifications > 1)
+	end, { data.notifications })
 
-		for i, v in ipairs(t2.notifications) do
-			local v50 = false
-			local v51 = if not t2.impressionMetadataByNotificationId then nil else t2.impressionMetadataByNotificationId[v.id]
+	local useMemo = React.useMemo
+	local function fn3()
+		local children = {}
 
-			if v29 and v33 then
-				v50 = true
+		for i, notification in ipairs(data.notifications) do
+			local v8
+
+			if data.impressionMetadataByNotificationId then
+				v8 = data.impressionMetadataByNotificationId[notification.id]
 			end
 
-			t4[v.id] = React.createElement(StreamNotificationAnimationWrapper, {
+			children[notification.id] = React.createElement(StreamNotificationAnimationWrapper, {
 				layoutOrder = i,
-				notification = v,
-				finishDismissNotification = t2.finishDismissNotification,
-				handleActions = t2.handleActions,
-				openMetaActions = t2.openMetaActions,
-				onHeightChange = v38,
-				collapsed = v50,
-				impressionsTag = t2.impressionsTag,
-				impressionIndex = v51 and v51.impressionIndex or nil
+				notification = notification,
+				finishDismissNotification = data.finishDismissNotification,
+				handleActions = data.handleActions,
+				openMetaActions = data.openMetaActions,
+				onHeightChange = onHeightChange,
+				collapsed = state and state3 and true or false,
+				impressionsTag = data.impressionsTag,
+				impressionIndex = v8 and v8.impressionIndex or nil
 			})
 		end
 
-		t4.UIPadding = React.createElement("UIPadding", {
-			PaddingTop = if v29 or not v33 then UDim.new(0, 0) else UDim.new(0, 40)
-		})
-		t4.UIListLayout = React.createElement("UIListLayout", {
+		local createElement = React.createElement
+		local paddingTop
+
+		if state or not state3 then
+			paddingTop = UDim.new(0, 0)
+		else
+			paddingTop = UDim.new(0, 40)
+		end
+
+		children.UIPadding = createElement("UIPadding", { PaddingTop = paddingTop })
+
+		children.UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center
 		})
-		t4.Shadow1 = if not v29 or not v33 then nil else React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = v35:map(function(t5: {[any]: any}) -- line: 185
-				-- upvalues: v31 (copy), constants (copy)
-				return UDim2.new(1, 0, 0, t5.shadowHeight * v31 + constants.DefaultPadding)
-			end),
-			LayoutOrder = #t2.notifications + 1,
-			ZIndex = -(#t2.notifications + 1)
-		}, { React.createElement("Frame", {
-			BackgroundTransparency = 0,
-			BorderSizePixel = 0,
-			Size = v35:map(function(t6: {[any]: any}) -- line: 194
-				-- upvalues: constants (copy), v31 (copy)
-				return UDim2.new(1, -(constants.DefaultPadding * 4 * t6.shadowWidth), 0, v31 - constants.DefaultPadding)
-			end),
-			BackgroundColor3 = v25.Theme.BackgroundDefault.Color,
-			Position = UDim2.new(0.5, 0, 0, 0),
-			AnchorPoint = Vector2.new(0.5, 0)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = uDim
-			})
-		}) })
-		t4.Shadow2 = if not v29 or not v33 then nil else React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = v35:map(function(t7: {[any]: any}) -- line: 219
-				-- upvalues: v31 (copy), constants (copy)
-				return UDim2.new(1, 0, 0, t7.shadowHeight * v31 + constants.DefaultPadding * 2)
-			end),
-			LayoutOrder = #t2.notifications + 2,
-			ZIndex = -(#t2.notifications + 2)
-		}, { React.createElement("Frame", {
-			BackgroundTransparency = 0,
-			BorderSizePixel = 0,
-			Size = v35:map(function(t8: {[any]: any}) -- line: 228
-				-- upvalues: constants (copy), v31 (copy)
-				return UDim2.new(1, -(constants.DefaultPadding * 6 * t8.shadowWidth), 0, v31 - constants.DefaultPadding)
-			end),
-			BackgroundColor3 = v25.Theme.BackgroundContrast.Color,
-			Position = UDim2.new(0.5, 0, 0, 0),
-			AnchorPoint = Vector2.new(0.5, 0)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = uDim
-			})
-		}) })
+		local shadow
 
-		return React.createElement("Frame", {
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
+		if state and state3 then
+			shadow = React.createElement("Frame", {
+				Size = v5:map(function(p)
+					return UDim2.new(1, 0, 0, p.shadowHeight * state2 + constants.DefaultPadding)
+				end),
+				LayoutOrder = #data.notifications + 1,
+				ZIndex = -(#data.notifications + 1),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0
+			}, { React.createElement("Frame", {
+					Size = v5:map(function(p)
+						return UDim2.new(
+							1,
+							-(constants.DefaultPadding * 4 * p.shadowWidth),
+							0,
+							state2 - constants.DefaultPadding
+						)
+					end),
+					BackgroundColor3 = v3.Theme.BackgroundDefault.Color,
+					BackgroundTransparency = 0,
+					BorderSizePixel = 0,
+					Position = UDim2.new(0.5, 0, 0, 0),
+					AnchorPoint = Vector2.new(0.5, 0)
+				}, {
+					UICorner = React.createElement("UICorner", { CornerRadius = udim })
+				}) })
+		end
+
+		children.Shadow1 = shadow
+		local shadow2
+
+		if state and state3 then
+			shadow2 = React.createElement("Frame", {
+				Size = v5:map(function(p)
+					return UDim2.new(1, 0, 0, p.shadowHeight * state2 + constants.DefaultPadding * 2)
+				end),
+				LayoutOrder = #data.notifications + 2,
+				BackgroundTransparency = 1,
+				ZIndex = -(#data.notifications + 2),
+				BorderSizePixel = 0
+			}, { React.createElement("Frame", {
+					Size = v5:map(function(p)
+						return UDim2.new(
+							1,
+							-(constants.DefaultPadding * 6 * p.shadowWidth),
+							0,
+							state2 - constants.DefaultPadding
+						)
+					end),
+					BackgroundColor3 = v3.Theme.BackgroundContrast.Color,
+					BackgroundTransparency = 0,
+					BorderSizePixel = 0,
+					Position = UDim2.new(0.5, 0, 0, 0),
+					AnchorPoint = Vector2.new(0.5, 0)
+				}, {
+					UICorner = React.createElement("UICorner", { CornerRadius = udim })
+				}) })
+		end
+
+		children.Shadow2 = shadow2
+
+		local createElement2 = React.createElement
+		local v8 = {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = t2.layoutOrder
-		}, {
-			UIPadding = React.createElement("UIPadding", {
-				PaddingBottom = if not v29 or not v33 then UDim.new(0, 0) else UDim.new(0, constants.DefaultPadding)
-			}),
-			ShowLessButton = if v29 or not v33 then nil else React.createElement("TextButton", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = data.layoutOrder
+		}
+
+		local createElement3 = React.createElement
+		local paddingBottom
+
+		if state and state3 then
+			paddingBottom = UDim.new(0, constants.DefaultPadding)
+		else
+			paddingBottom = UDim.new(0, 0)
+		end
+
+		local children2 = {
+			UIPadding = createElement3("UIPadding", { PaddingBottom = paddingBottom }),
+			ShowLessButton = 0,
+			InvisibleExpandButton = 0,
+			NumberMoreButton = 0,
+			ListOfNotifications = 0
+		}
+		local showLessButton
+
+		if not (state or not state3) then
+			showLessButton = React.createElement("TextButton", {
 				Size = UDim2.new(0, 160, 0, 40),
 				Text = "",
-				Font = Header1Font,
-				TextSize = v28,
-				[React.Event.Activated] = v40,
+				Font = font2,
+				FontFace = fontFace,
+				TextSize = textSize,
+				[React.Event.Activated] = fn2,
 				BackgroundTransparency = 1,
-				BackgroundColor3 = v25.Theme.BackgroundMuted.Color,
+				BackgroundColor3 = v3.Theme.BackgroundMuted.Color,
 				AutoButtonColor = false,
 				LayoutOrder = 1,
 				ZIndex = 4,
@@ -206,80 +294,84 @@ return function(t2: {[any]: any}) -- line: 54
 				AnchorPoint = Vector2.new(1, 0),
 				BorderSizePixel = 0
 			}, { React.createElement("Frame", {
-				BackgroundTransparency = 0,
-				ZIndex = 10,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, -constants.DefaultPadding, 1, -constants.DefaultPadding),
-				BackgroundColor3 = v25.Theme.BackgroundContrast.Color,
-				Position = UDim2.new(1, -constants.DefaultPadding, 0, 0),
-				AnchorPoint = Vector2.new(1, 0)
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = uDim2
-				}),
-				ShowLessTextAndIconFrame = React.createElement("Frame", {
-					BorderSizePixel = 0,
-					BackgroundTransparency = 1,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Position = UDim2.new(0.5, 0, 0.5, 0),
-					AnchorPoint = Vector2.new(0.5, 0.5)
+					Size = UDim2.new(1, -constants.DefaultPadding, 1, -constants.DefaultPadding),
+					BackgroundTransparency = 0,
+					BackgroundColor3 = v3.Theme.BackgroundContrast.Color,
+					Position = UDim2.new(1, -constants.DefaultPadding, 0, 0),
+					AnchorPoint = Vector2.new(1, 0),
+					ZIndex = 10,
+					BorderSizePixel = 0
 				}, {
-					UIListLayout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Horizontal,
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center
-					}),
-					ShowLessText = React.createElement("TextLabel", {
-						LayoutOrder = 1,
-						BackgroundTransparency = 1,
-						Text = v37 and v37.lessText,
-						Font = Header1Font,
-						TextSize = v28,
-						TextColor3 = v25.Theme.TextMuted.Color,
-						Size = UDim2.new(0, 0, 1, 0),
-						AutomaticSize = Enum.AutomaticSize.X
-					}, { React.createElement("UIPadding", {
-						PaddingRight = UDim.new(0, constants.DefaultPadding)
-					}) }),
-					CollapseIcon = React.createElement(ImageSetLabel, {
-						LayoutOrder = 2,
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
+					UICorner = React.createElement("UICorner", { CornerRadius = udim2 }),
+					ShowLessTextAndIconFrame = React.createElement("Frame", {
+						AutomaticSize = Enum.AutomaticSize.XY,
+						Position = UDim2.new(0.5, 0, 0.5, 0),
 						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = UDim2.fromScale(0.5, 0.5),
-						Size = uDim2_2,
-						Image = v16,
-						ImageColor3 = v25.Theme.UIEmphasis.Color
+						BorderSizePixel = 0,
+						BackgroundTransparency = 1
+					}, {
+						UIListLayout = React.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Horizontal,
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center
+						}),
+						ShowLessText = React.createElement("TextLabel", {
+							Text = v7 and v7.lessText,
+							LayoutOrder = 1,
+							Font = font2,
+							FontFace = fontFace,
+							TextSize = textSize,
+							BackgroundTransparency = 1,
+							TextColor3 = v3.Theme.TextMuted.Color,
+							Size = UDim2.new(0, 0, 1, 0),
+							AutomaticSize = Enum.AutomaticSize.X
+						}, { React.createElement("UIPadding", {
+								PaddingRight = UDim.new(0, constants.DefaultPadding)
+							}) }),
+						CollapseIcon = React.createElement(ImageSetLabel, {
+							LayoutOrder = 2,
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							Position = UDim2.fromScale(0.5, 0.5),
+							Size = udim3,
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							Image = iconsactionstruncationCollapse,
+							ImageColor3 = v3.Theme.UIEmphasis.Color
+						})
 					})
-				})
-			}) }),
-			InvisibleExpandButton = React.createElement("TextButton", {
-				Size = UDim2.new(1, 0, 0, (not v29 or not v33) and 0 or v31 + constants.DefaultPadding * 2),
-				BackgroundTransparency = 1,
-				Text = "",
-				[React.Event.Activated] = v40,
-				ZIndex = 5,
-				BorderSizePixel = 0,
-				AutoButtonColor = false
-			}),
-			NumberMoreButton = if v31 == 0 or (not v29 or not (#t2.notifications > 1)) then nil else React.createElement("Frame", {
-				ZIndex = 10,
-				BackgroundTransparency = 0,
-				Size = UDim2.new(0, 125, 0, v19),
+				}) })
+		end
+
+		children2.ShowLessButton = showLessButton
+
+		children2.InvisibleExpandButton = React.createElement("TextButton", {
+			Size = UDim2.new(1, 0, 0, not (state and state3) and 0 or state2 + constants.DefaultPadding * 2),
+			BackgroundTransparency = 1,
+			Text = "",
+			[React.Event.Activated] = fn2,
+			ZIndex = 5,
+			BorderSizePixel = 0,
+			AutoButtonColor = false
+		})
+		local numberMoreButton
+
+		if not (state2 == 0 or not (state and #data.notifications > 1)) then
+			numberMoreButton = React.createElement("Frame", {
+				Size = UDim2.new(0, 125, 0, v),
 				AutomaticSize = Enum.AutomaticSize.X,
 				Position = UDim2.new(0.5, 0, 1, 0),
 				AnchorPoint = Vector2.new(0.5, 1),
-				BackgroundColor3 = v25.Theme.BackgroundContrast.Color
+				ZIndex = 10,
+				BackgroundColor3 = v3.Theme.BackgroundContrast.Color,
+				BackgroundTransparency = 0
 			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = uDim2
-				}),
+				UICorner = React.createElement("UICorner", { CornerRadius = udim2 }),
 				NumberedMoreTextAndIconFrame = React.createElement("Frame", {
-					BorderSizePixel = 0,
-					BackgroundTransparency = 1,
 					AutomaticSize = Enum.AutomaticSize.XY,
 					Position = UDim2.new(0.5, 0, 0.5, 0),
-					AnchorPoint = Vector2.new(0.5, 0.5)
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1
 				}, {
 					UIListLayout = React.createElement("UIListLayout", {
 						FillDirection = Enum.FillDirection.Horizontal,
@@ -287,43 +379,72 @@ return function(t2: {[any]: any}) -- line: 54
 						HorizontalAlignment = Enum.HorizontalAlignment.Center
 					}),
 					NumberMoreText = React.createElement("TextLabel", {
+						Text = v7 and v7.moreText and string.gsub(
+							v7.moreText,
+							"{notificationCount}",
+							(tostring(#data.notifications - 1))
+						),
 						LayoutOrder = 1,
+						Font = font2,
+						FontFace = fontFace,
+						TextSize = textSize,
 						BackgroundTransparency = 1,
-						Text = v37 and (v37.moreText and string.gsub(v37.moreText, "{notificationCount}", (tostring(#t2.notifications - 1)))),
-						Font = Header1Font,
-						TextSize = v28,
-						TextColor3 = v25.Theme.TextMuted.Color,
+						TextColor3 = v3.Theme.TextMuted.Color,
 						Size = UDim2.new(0, 0, 1, 0),
 						AutomaticSize = Enum.AutomaticSize.X
 					}, { React.createElement("UIPadding", {
-						PaddingRight = UDim.new(0, constants.DefaultPadding)
-					}) }),
+							PaddingRight = UDim.new(0, constants.DefaultPadding)
+						}) }),
 					ExpandIcon = React.createElement(ImageSetLabel, {
 						LayoutOrder = 2,
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						Position = UDim2.fromScale(0.5, 0.5),
-						Size = uDim2_2,
-						Image = v15,
-						ImageColor3 = v25.Theme.UIEmphasis.Color
+						Size = udim3,
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						Image = iconsactionstruncationExpand,
+						ImageColor3 = v3.Theme.UIEmphasis.Color
 					})
 				})
-			}),
-			ListOfNotifications = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				ZIndex = 3,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, t4)
-		})
-	end, {
-		t2.notifications,
-		v29,
-		v31,
-		v33,
-		t2.impressionsTag,
-		t2.impressionMetadataByNotificationId
+			})
+		end
+
+		children2.NumberMoreButton = numberMoreButton
+
+		children2.ListOfNotifications = React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			ZIndex = 3,
+			BorderSizePixel = 0
+		}, children)
+		return createElement2("Frame", v8, children2)
+	end
+
+	local notifications = data.notifications
+
+	local impressionsTag = data.impressionsTag
+	local impressionMetadataByNotificationId = data.impressionMetadataByNotificationId
+	local v8
+
+	if FoundationFontFaceMigration then
+		v8 = fontFace
+	end
+
+	local v9
+
+	if FoundationFontFaceMigration then
+		v9 = textSize
+	end
+
+	return (useMemo(fn3, {
+		notifications,
+		state,
+		state2,
+		state3,
+		impressionsTag,
+		impressionMetadataByNotificationId,
+		v8,
+		v9
 	}))
 end

@@ -1,16 +1,14 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 
-return (require(ParentParent.React).createContext({
+return (React.createContext({
 	selectedFriendsSize = 0,
 	selectedFriends = {},
-	addFriend = function() -- line: 21
-	end,
-	removeFriend = function() -- line: 22
-	end,
-	isFriendSelected = function() -- line: 23
+	addFriend = function() end,
+	removeFriend = function() end,
+	isFriendSelected = function(): boolean
 		return false
 	end,
 	preselectedUsers = {},
-	onRemoveCallback = function() -- line: 27
-	end
+	onRemoveCallback = function() end
 }))

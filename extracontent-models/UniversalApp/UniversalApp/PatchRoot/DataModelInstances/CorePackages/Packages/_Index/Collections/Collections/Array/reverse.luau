@@ -1,20 +1,18 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.ES7Types)
 
-require(ParentParent.ES7Types)
+return function(list)
+	local count = #list
+	local v = 1
 
-return function(p1) -- line: 22
-	local v3 = #p1
-	local n1 = 1
-
-	while n1 < v3 do
-		local v5 = p1[v3]
-		local v6 = p1[n1]
-
-		p1[n1] = v5
-		p1[v3] = v6
-		n1 += 1
-		v3 -= 1
+	while v < count do
+		local item = list[count]
+		local item2 = list[v]
+		list[v] = item
+		list[count] = item2
+		v += 1
+		count -= 1
 	end
 
-	return p1
+	return list
 end

@@ -1,21 +1,23 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-require(scriptParent.Types)
+require(parent.Types)
+local Constants = require(parent.Constants)
+require(parent3.Style.Fonts)
+local Images = require(parent3.ImageSet.Images)
+local GetTextSize = require(parent4.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent4.Core.Text.GetFontFromFontStyle)
+local platformIconMap = require(parent2.platformIconMap)
 
-local Constants = require(scriptParent.Constants)
-
-require(scriptParentParentParent.Style.Fonts)
-
-local Images = require(scriptParentParentParent.ImageSet.Images)
-local GetTextSize = require(scriptParentParentParentParent.Core.Text.GetTextSize)
-local platformIconMap = require(scriptParentParent.platformIconMap)
 local UserInputService = game:GetService("UserInputService")
+
 local DIRECTIONAL_GAMEPAD_ICONS = platformIconMap.DIRECTIONAL_GAMEPAD_ICONS
+
 local GAMEPAD_ICONS = platformIconMap.GAMEPAD_ICONS
-local t1 = {
+
+local v = {
 	[Enum.KeyCode.Escape] = "Esc",
 	[Enum.KeyCode.Print] = "Prt Sc",
 	[Enum.KeyCode.ScrollLock] = "Sc Lock",
@@ -41,60 +43,69 @@ local t1 = {
 	[Enum.KeyCode.Right] = Images["icons/controls/keys/arrowRight"]
 }
 
-local function getKeyCodeContent(p1) -- line: 46
-	-- upvalues: DIRECTIONAL_GAMEPAD_ICONS (copy), GAMEPAD_ICONS (copy), UserInputService (copy), t1 (copy)
-	if type(p1) == "table" then
-		return {
-			inputType = "gamepad",
-			content = DIRECTIONAL_GAMEPAD_ICONS[p1.key][p1.axis]
-		}
+local function getKeyCodeContent(data)
+	if type(data) == "table" then
+		return { inputType = "gamepad", content = DIRECTIONAL_GAMEPAD_ICONS[data.key][data.axis] }
 	end
 
-	if GAMEPAD_ICONS[p1] then
-		return {
-			inputType = "gamepad",
-			content = GAMEPAD_ICONS[p1]
-		}
+	if GAMEPAD_ICONS[data] then
+		return { inputType = "gamepad", content = GAMEPAD_ICONS[data] }
 	end
 
-	local StringForKeyCode = UserInputService:GetStringForKeyCode(p1)
+	local stringForKeyCode = UserInputService:GetStringForKeyCode(data)
 
-	return {
-		inputType = "keyboard",
-		content = t1[p1] or if StringForKeyCode == "" then p1.Name else StringForKeyCode
-	}
+	local content = v[data]
+
+	if not content then
+		if stringForKeyCode == "" then
+			content = data.Name
+		else
+			content = stringForKeyCode
+		end
+	end
+
+	return { inputType = "keyboard", content = content }
 end
-local function getWidthFromContent(p2, p3) -- line: 63
-	-- upvalues: GetTextSize (copy), Constants (copy)
-	if p2.inputType == "keyboard" then
-		if type(p2.content) == "string" then
-			local BaseSize = p3.BaseSize
-			local CaptionBody = p3.CaptionBody
-			local v21 = BaseSize * CaptionBody.RelativeSize
-			local X = GetTextSize(p2.content, v21, CaptionBody.Font, Vector2.zero).X
 
-			if X + 2 * Constants.MIN_SIDE_PADDING > Constants.PREFERRED_WIDTH then
-				return X + 2 * Constants.SIDE_PADDING
-			end
+local function getWidthFromContent(p, p2)
+	if p.inputType == "keyboard" then
+		if type(p.content) ~= "string" then
+			return Constants.PREFERRED_WIDTH
+		end
+
+		local baseSize = p2.BaseSize
+
+		local captionBody = p2.CaptionBody
+		local v2 = baseSize * captionBody.RelativeSize
+
+		local fontFromFontStyle = GetFontFromFontStyle(captionBody)
+		local x = GetTextSize(p.content, v2, fontFromFontStyle, Vector2.zero).X
+
+		if x + 2 * Constants.MIN_SIDE_PADDING > Constants.PREFERRED_WIDTH then
+			return x + 2 * Constants.SIDE_PADDING
 		end
 
 		return Constants.PREFERRED_WIDTH
+	else
+		if p.inputType ~= "gamepad" then
+			assert(false, string.format("Unreachable: Invalid inputType value: %q", p.inputType))
+			return
+		end
+
+		local v2
+
+		if typeof(p.content) == "string" then
+			v2 = Constants.DEFAULT_GAMEPAD_ICON_SIZE
+		else
+			v2 = p.content.ImageRectSize
+		end
+
+		return v2.X * Constants.HEIGHT / v2.Y
 	end
-
-	if p2.inputType == "gamepad" then
-		local v23 = if typeof(p2.content) ~= "string" then p2.content.ImageRectSize else Constants.DEFAULT_GAMEPAD_ICON_SIZE
-
-		return v23.X * Constants.HEIGHT / v23.Y
-	end
-
-	assert(false, string.format("Unreachable: Invalid inputType value: %q", p2.inputType))
 end
 
-function getKeyLabelWidth(p4, p5) -- line: 87
-	-- upvalues: getKeyCodeContent (copy), getWidthFromContent (copy)
-	local v26 = getKeyCodeContent(p4)
-
-	return getWidthFromContent(v26, p5)
+function getKeyLabelWidth(p, p2)
+	return getWidthFromContent(getKeyCodeContent(p), p2)
 end
 
 return {

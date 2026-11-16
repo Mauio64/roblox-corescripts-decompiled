@@ -1,149 +1,141 @@
 local AppDebug = script:FindFirstAncestor("AppDebug")
-local AppDebugParent = AppDebug.Parent
-local Dash = require(AppDebugParent.Dash)
-local Lumberyak = require(AppDebugParent.Lumberyak)
+local parent = AppDebug.Parent
+local Dash = require(parent.Dash)
+local Lumberyak = require(parent.Lumberyak)
 local Levels = Lumberyak.Logger.Levels
 local SharedSink = require(AppDebug.SharedSink)
-local v7 = Lumberyak.Logger.new(nil, "root")
-local timestamp = tick()
-local t1 = {
-	["*"] = v7
-}
 
-local function argToString(p1) -- line: 46
-	-- upvalues: Dash (copy)
-	if typeof(p1) == "string" then
-		return p1
+local logger = Lumberyak.Logger.new(nil, "root")
+
+local lastTime = tick()
+
+local v = { ["*"] = logger }
+
+local function argToString(value)
+	if typeof(value) == "string" then
+		return value
 	end
 
-	local mt = getmetatable(p1)
+	local metatable = getmetatable(value)
 
-	if mt and mt.__tostring then
-		return (tostring(p1))
+	if metatable and metatable.__tostring then
+		return (tostring(value))
 	end
 
-	return Dash.pretty(p1)
+	return Dash.pretty(value)
 end
 
-v7:setContext({
-	tostring = argToString
-})
+logger:setContext({ tostring = argToString })
 
-local function newLogger(p2, p3) -- line: 63
-	-- upvalues: Lumberyak (copy), t1 (copy)
-	local v19 = Lumberyak.Logger.new(p2, p3)
-
-	t1[p3] = v19
-
-	return v19
+local function newLogger(p, p2)
+	local logger2 = Lumberyak.Logger.new(p, p2)
+	v[p2] = logger2
+	return logger2
 end
-local function createLoggerTree(s1: string) -- line: 69
-	-- upvalues: v7 (copy), t1 (copy), Lumberyak (copy)
-	local parts = s1:split(".")
-	local s2 = ""
-	local v23 = v7
 
-	for v24, v25 in parts do
-		if v25 == "" then
-			error("Invalid log tag: " .. s1)
+local function createLoggerTree(value: string)
+	local parts = value:split(".")
+
+	local loggerTree = logger
+	local v2 = ""
+
+	for k, part in parts do
+		if part == "" then
+			error("Invalid log tag: " .. value)
 		end
 
-		s2 = if v24 ~= 1 then s2 .. "." .. v25 else v25
-
-		local v26 = t1[s2]
-
-		if not v26 then
-			v26 = Lumberyak.Logger.new(v23, s2)
-			t1[s2] = v26
+		if k == 1 then
+			v2 = part
+		else
+			v2 ..= "." .. part
 		end
 
-		v23 = v26
+		local v3 = v[v2]
+
+		if not v3 then
+			v3 = Lumberyak.Logger.new(loggerTree, v2)
+			v[v2] = v3
+		end
+
+		loggerTree = v3
 	end
 
-	return v23
+	return loggerTree
 end
-local function parseTag(s3: string) -- line: 92
-	-- upvalues: Dash (copy), Levels (copy)
-	local parts = s3:split(":")
 
-	if #parts ~= 2 then
-		warn("Invalid LogTree value: " .. s3)
+local function logger2(p: string) -- 1 equivalent call inferred from this helper
+	return v[p] or createLoggerTree(p)
+end
 
-		return nil, nil
+local function parseTag(value: string)
+	local parts = value:split(":")
+
+	if #parts == 2 then
+		local v2, v3 = table.unpack(parts)
+		return Dash.trim(v2), Levels.fromString(v3)
 	end
 
-	local v30, v31 = table.unpack(parts)
-
-	return Dash.trim(v30), Levels.fromString(v31)
+	warn("Invalid LogTree value: " .. value)
+	return nil, nil
 end
-local function splitNonEmpty(s4: string) -- line: 123
-	-- upvalues: Dash (copy)
-	local v45 = Dash.splitOn(s4, "%s+")
 
-	return Dash.filter(v45, function(p4) -- line: 125
-		return #p4 > 0
+local function formatLog(p, p2, p3) -- 1 equivalent call inferred from this helper
+	local level = p2.level
+	local v2 = string.format("%s [%s] %s", level:sub(1, 1), p2.loggerName, p)
+
+	if p3 then
+		local v3 = tick() - lastTime
+		return (string.format("[%0.3f] %s", v3, v2))
+	end
+
+	return v2
+end
+
+local function splitNonEmpty(p: string)
+	local splitOn = Dash.splitOn(p, "%s+")
+	return Dash.filter(splitOn, function(list): boolean
+		return #list > 0
 	end)
 end
 
-return {
-	logger = function(s5: string) -- line: 88
-		-- upvalues: t1 (copy), createLoggerTree (copy)
-		return t1[s5] or createLoggerTree(s5)
-	end,
-	formatLog = function(p5, p6, p7) -- line: 103
-		-- upvalues: timestamp (copy)
-		local level = p6.level
-		local v36 = string.format("%s [%s] %s", level:sub(1, 1), p6.loggerName, p5)
+local LogTree = {}
+LogTree.logger = logger2
+LogTree.formatLog = formatLog
 
-		if p7 then
-			local v37 = tick() - timestamp
+function LogTree.logToConsole(_, p, p2)
+	local level = p2.level
+	local v2 = formatLog(p, p2) -- inferred equivalent call
 
-			v36 = string.format("[%0.3f] %s", v37, v36)
+	if level == Levels.Error or level == Levels.Warning then
+		warn(v2)
+	else
+		print(v2)
+	end
+end
+
+function LogTree.setLogTags(p: string, p2)
+	local v2 = SharedSink.new(p2)
+	local splitOn = Dash.splitOn(p, "%s+")
+	local filtered = Dash.filter(splitOn, function(list): boolean
+		return #list > 0
+	end)
+
+	for _, v3 in filtered do
+		local parts = v3:split(":")
+		local trimmed, v4
+
+		if #parts == 2 then
+			local v5, v6 = table.unpack(parts)
+			trimmed = Dash.trim(v5)
+			v4 = Levels.fromString(v6)
+		else
+			warn("Invalid LogTree value: " .. v3)
 		end
 
-		return v36
-	end,
-	logToConsole = function(_, p9, p10) -- line: 113
-		-- upvalues: Levels (copy)
-		local level = p10.level
-		local level2 = p10.level
-		local v43 = string.format("%s [%s] %s", level2:sub(1, 1), p10.loggerName, p9)
-
-		if level == Levels.Error or level == Levels.Warning then
-			warn(v43)
-
-			return
-		end
-
-		print(v43)
-	end,
-	setLogTags = function(s6: string, p11) -- line: 130
-		-- upvalues: SharedSink (copy), Dash (copy), Levels (copy), t1 (copy), createLoggerTree (copy)
-		local v48 = SharedSink.new(p11)
-		local v49 = Dash.splitOn(s6, "%s+")
-
-		for _, v51 in (Dash.filter(v49, function(p12) -- line: 125
-			return #p12 > 0
-		end)) do
-			local parts = v51:split(":")
-			local v53, v54
-
-			if #parts ~= 2 then
-				warn("Invalid LogTree value: " .. v51)
-				v53 = nil
-				v54 = nil
-			else
-				local v55, v56 = table.unpack(parts)
-
-				v53 = Dash.trim(v55)
-				v54 = Levels.fromString(v56)
-			end
-
-			if v53 ~= nil then
-				local str = tostring(v53);
-
-				(t1[str] or createLoggerTree(str)):addSink((v48:newSink(v54)))
-			end
+		if trimmed ~= nil then
+			logger2(tostring(trimmed)):addSink((v2:newSink(v4))) -- inferred equivalent call
 		end
 	end
-}
+end
+
+return LogTree

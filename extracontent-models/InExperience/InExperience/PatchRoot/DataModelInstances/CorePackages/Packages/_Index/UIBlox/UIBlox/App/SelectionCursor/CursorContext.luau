@@ -1,10 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent
+local React = require(parent.React)
 
-return (require(ParentParent.React).createContext({
-	getCursor = function() -- line: 5
+return (React.createContext({
+	getCursor = function(): nil
 		return nil
 	end,
-	getCursorByType = function() -- line: 8
+	getCursorByType = function(): nil
 		return nil
 	end
 }))

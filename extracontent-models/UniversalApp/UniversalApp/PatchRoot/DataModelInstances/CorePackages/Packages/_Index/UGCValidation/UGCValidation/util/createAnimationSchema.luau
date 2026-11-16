@@ -1,82 +1,55 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local getFFlagUGCValidationAnimationPackFolderStructure = require(ParentParent.flags.getFFlagUGCValidationAnimationPackFolderStructure)
+local parent = script.Parent.Parent
+local Constants = require(parent.Constants)
 
-local function createAnimationEntry(b1: boolean?, b2: boolean?) -- line: 6
-	local t1 = {
-		ClassName = "Animation"
-	}
+local function createAnimationEntry(flag: boolean?, flag2: boolean?)
+	local animationEntry = { ClassName = "Animation" }
 
-	if b1 then
-		t1._optional = true
+	if flag then
+		animationEntry._optional = true
 	end
 
-	if b2 then
-		t1._children = {{
-			Name = "Weight",
-			ClassName = "NumberValue",
-			_optional = true
-		}}
+	if flag2 then
+		animationEntry._children = {
+			{ Name = "Weight", ClassName = "NumberValue", _optional = true }
+		}
 	end
 
-	return t1
+	return animationEntry
 end
-local function createStringValueWithAnimations(s1: string, n1: number, b3: boolean?) -- line: 25
-	-- upvalues: createAnimationEntry (copy)
-	local t2 = {}
 
-	table.insert(t2, (createAnimationEntry(false, b3)))
+local function createStringValueWithAnimations(name: string, p: number, flag: boolean?)
+	local children = {}
+	table.insert(children, createAnimationEntry(false, flag))
 
-	if n1 > 1 then
-		table.insert(t2, (createAnimationEntry(true, b3)))
+	if p > 1 then
+		table.insert(children, createAnimationEntry(true, flag))
 	end
 
-	return {
-		ClassName = "StringValue",
-		Name = s1,
-		_children = t2
-	}
+	return { Name = name, ClassName = "StringValue", _children = children }
 end
-local function createAnimationSchema(p1, p2) -- line: 44
-	-- upvalues: Constants (copy), createStringValueWithAnimations (copy), getFFlagUGCValidationAnimationPackFolderStructure (copy)
-	local v16 = Constants.ANIMATION_ASSET_INFO[p1]
 
-	assert(v16, `No ANIMATION_ASSET_INFO for { p1 }`)
+local function createAnimationSchema(p)
+	local v = Constants.ANIMATION_ASSET_INFO[p]
+	assert(v, `No ANIMATION_ASSET_INFO for {p}`)
 
-	local t3 = {}
+	local children = {}
 
-	if p1 == Enum.AssetType.IdleAnimation then
-		table.insert(t3, (createStringValueWithAnimations("idle", 2, true)))
+	if p == Enum.AssetType.IdleAnimation then
+		table.insert(children, createStringValueWithAnimations("idle", 2, true))
 	else
-		for _, v19 in v16.stringValueNames do
-			local t4 = {}
+		for _, stringValueName in v.stringValueNames do
+			local children2 = {}
+			table.insert(children2, { ClassName = "Animation" })
 
-			table.insert(t4, {
-				ClassName = "Animation"
-			})
-			table.insert(t3, {
+			table.insert(children, {
+				Name = stringValueName,
 				ClassName = "StringValue",
-				Name = v19,
-				_children = t4
+				_children = children2
 			})
 		end
 	end
 
-	local t5 = {
-		Name = "R15Anim",
-		ClassName = "Folder",
-		_children = t3
-	}
-
-	if getFFlagUGCValidationAnimationPackFolderStructure() and p2 and p2.Name == "R15Anim" then
-		return t5
-	end
-
-	return {
-		ClassName = "Model",
-		Name = v16.modelName,
-		_children = { t5 }
-	}
+	return { Name = "R15Anim", ClassName = "Folder", _children = children }
 end
 
 return createAnimationSchema

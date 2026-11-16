@@ -1,232 +1,139 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local Signals = require(Parent.Signals)
-local UserProfileStore = require(Parent.UserProfiles).Stores.UserProfileStore
-local GetConversationMessageStore = require(Parent.AppChat.GetConversationMessageStore)
-local GetConversationStore = require(Parent.AppChat.GetConversationStore)
-local Conversation = require(Parent.AppChat.Conversation)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+
+local Cryo = require(parent.Cryo)
+local Signals = require(parent.Signals)
+
+local GetConversationMessageStore = require(parent.AppChat.GetConversationMessageStore)
+
 local classifyMessage = require(script.Parent.classifyMessage)
 local buildRowDisplay = require(script.Parent.buildRowDisplay)
+local createFrozenSortTimes = require(script.Parent.createFrozenSortTimes)
+local createGetIsGroup = require(script.Parent.createGetIsGroup)
+local resolveNameInfos = require(script.Parent.resolveNameInfos)
 local getLocalUserId = require(script.Parent.Parent.Parent.Utils.getLocalUserId)
-local t1 = {}
 
-local function shallowArrayEquals(t2: {[any]: any}?, t3: {[any]: any}?) -- line: 52
-	if t2 == t3 then
-		return true
-	end
+local v = {}
 
-	if t2 == nil or t3 == nil or #t2 ~= #t3 then
-		return false
-	end
+local function createMessageDisplayStore(callback, p: string?)
+	local messageRowSpecs = {}
+	local frozenSortTimes = createFrozenSortTimes()
 
-	for v17, v18 in t2 do
-		if v18 ~= t3[v17] then
-			return false
-		end
-	end
+	local getIsGroup = createGetIsGroup(p)
 
-	return true
-end
-local function resolveProfileNameInfo(p1, p2) -- line: 70
-	if p1 == nil or p1.names == nil then
-		return {
-			name = nil,
-			username = nil
-		}
-	end
-
-	local getCombinedName = p1.names.getCombinedName
-	local getDisplayName = p1.names.getDisplayName
-	local getUsername = p1.names.getUsername
-	local v24 = if not getUsername then nil else getUsername(p2)
-	local v25 = if not getCombinedName then nil else getCombinedName(p2)
-	local v26 = if not getDisplayName then nil else getDisplayName(p2)
-
-	return {
-		name = if v25 == nil or v25 == "" then if v26 == nil or v26 == "" then v24 else v26 else v25,
-		username = v24
-	}
-end
-local function resolveNameInfos(t4: {[any]: any}, p3) -- line: 98
-	-- upvalues: UserProfileStore (copy), resolveProfileNameInfo (copy)
-	local t5 = {}
-	local t6 = {}
-	local t7 = {}
-
-	for _, v33 in t4 do
-		if not t6[v33] then
-			t6[v33] = true
-			table.insert(t5, v33)
-			table.insert(t7, (tostring(v33)))
-		end
-	end
-
-	local v34 = UserProfileStore.get().fetchNamesByUserIds(t7)(p3)
-	local v35 = if not v34 or not v34.data then {} else v34.data
-	local t8 = {}
-
-	for v37, v38 in t5 do
-		t8[v38] = resolveProfileNameInfo(v35[v37], p3)
-	end
-
-	return t8
-end
-local function createMessageDisplayStore(p4, s1: string?) -- line: 120
-	-- upvalues: Signals (copy), GetConversationStore (copy), Conversation (copy), resolveNameInfos (copy), getLocalUserId (copy), GetConversationMessageStore (copy), t1 (copy), classifyMessage (copy), shallowArrayEquals (copy), buildRowDisplay (copy)
-	local t9 = {}
-	local v42 = Signals.createComputed(function(p5) -- line: 126
-		-- upvalues: s1 (copy), GetConversationStore (copy), Conversation (copy)
-		if s1 == nil then
-			return false
-		end
-
-		local v47 = GetConversationStore(p5).getConversation(s1, p5)
-
-		return v47 ~= nil and v47.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
-	end)
-
-	local function resolveForRowSpec(p6, p7) -- line: 135
-		-- upvalues: resolveNameInfos (copy), getLocalUserId (copy), v42 (copy)
-		if p6.kind == "userText" or p6.kind == "hiddenUser" then
+	local function resolveForRowSpec(data, p2)
+		if data.kind == "userText" or data.kind == "hiddenUser" then
 			return {
-				namesByUserId = resolveNameInfos({ p6.senderUserId }, p7)
+				namesByUserId = resolveNameInfos({ data.senderUserId }, p2)
 			}
 		end
 
-		if p6.kind == "replyHeader" then
+		if data.kind == "replyHeader" then
 			return {
-				namesByUserId = resolveNameInfos({
-					p6.senderUserId,
-					p6.repliedToUserId
-				}, p7),
+				namesByUserId = resolveNameInfos({ data.senderUserId, data.repliedToUserId }, p2),
 				localUserId = getLocalUserId(),
-				isGroup = v42(p7)
+				isGroup = getIsGroup(p2)
 			}
 		end
 
 		return {}
 	end
-	local function getMessageRowSpecs(s2: string) -- line: 149
-		-- upvalues: t9 (copy), Signals (copy), GetConversationMessageStore (copy), t1 (copy), classifyMessage (copy)
-		local v51 = t9[s2]
 
-		if v51 == nil then
-			v51 = Signals.createComputed(function(p8) -- line: 152
-				-- upvalues: GetConversationMessageStore (copy), s2 (copy), t1 (copy), classifyMessage (copy)
-				local v74 = GetConversationMessageStore(p8).getMessage(s2, p8)
+	local function getMessageRowSpecs(p2: string) -- 2 equivalent calls inferred from this helper
+		local messageRowSpecs2 = messageRowSpecs[p2]
 
-				if v74 == nil then
-					return t1
+		if messageRowSpecs2 == nil then
+			messageRowSpecs2 = Signals.createComputed(function(p3)
+				local message = GetConversationMessageStore(p3).getMessage(p2, p3)
+
+				if message == nil then
+					return v
 				end
 
-				return classifyMessage(v74)
+				return classifyMessage(message)
 			end)
-			t9[s2] = v51
+
+			messageRowSpecs[p2] = messageRowSpecs2
 		end
 
-		return v51
+		return messageRowSpecs2
 	end
 
-	local v45 = Signals.createComputed(function(p9) -- line: 167
-		-- upvalues: p4 (copy), t9 (copy), Signals (copy), GetConversationMessageStore (copy), t1 (copy), classifyMessage (copy)
-		local t10 = {}
-		local n1 = 0
+	local computed = Signals.createComputed(function(p2)
+		local v2 = callback(p2)
+		local total = 0
+		local v3 = {}
 
-		for _, v56 in (p4(p9)) do
-			local v57 = t9[v56]
+		for _, sourceId in v2 do
+			local count = #getMessageRowSpecs(sourceId)(p2) -- inferred equivalent call
 
-			if v57 == nil then
-				v57 = Signals.createComputed(function(p10) -- line: 152
-					-- upvalues: GetConversationMessageStore (copy), v56 (copy), t1 (copy), classifyMessage (copy)
-					local v76 = GetConversationMessageStore(p10).getMessage(v56, p10)
-
-					if v76 == nil then
-						return t1
-					end
-
-					return classifyMessage(v76)
-				end)
-				t9[v56] = v57
+			if count == 0 then
+				continue
 			end
 
-			local v58 = #v57(p9)
+			if total + count > 50 then
+				break
+			end
 
-			if v58 ~= 0 then
-				if n1 + v58 > 50 then
-					break
-				end
+			total += count
+			table.insert(v3, {
+				sourceId = sourceId,
+				count = count,
+				sortTime = frozenSortTimes(sourceId, p2)
+			})
+		end
 
-				n1 += v58
-				table.insert(t10, {
-					sourceId = v56,
-					count = v58
-				})
+		table.sort(v3, function(a, b): boolean
+			if a.sortTime == b.sortTime then
+				return a.sourceId < b.sourceId
+			end
+
+			return a.sortTime < b.sortTime
+		end)
+
+		local values = {}
+		local idToHandle = {}
+
+		for _, v4 in v3 do
+			for i = 1, v4.count do
+				local formatted = `{v4.sourceId}_{i}`
+				table.insert(values, formatted)
+				idToHandle[formatted] = { messageId = v4.sourceId, rowIndex = i }
 			end
 		end
 
-		local t11 = {}
-		local t12 = {}
-
-		for i = #t10, 1, -1 do
-			local v62 = t10[i]
-
-			for j = 1, v62.count do
-				local v64 = `{ v62.sourceId }_{ j }`
-
-				table.insert(t11, v64)
-				t12[v64] = {
-					messageId = v62.sourceId,
-					rowIndex = j
-				}
-			end
-		end
-
-		return {
-			idList = t11,
-			idToHandle = t12
-		}
+		return { idList = values, idToHandle = idToHandle }
 	end)
 
 	return {
-		getDisplayIds = Signals.createComputed(function(p11) -- line: 199
-			-- upvalues: v45 (copy)
-			return v45(p11).idList
-		end, shallowArrayEquals),
-		getDisplayFromId = function(s3: string?, p12, p13) -- line: 207
-			-- upvalues: v45 (copy), t9 (copy), Signals (copy), GetConversationMessageStore (copy), t1 (copy), classifyMessage (copy), buildRowDisplay (copy), resolveForRowSpec (copy)
-			if s3 == nil then
+		getDisplayIds = Signals.createComputed(function(p2)
+			return computed(p2).idList
+		end, Cryo.List.equals),
+		getDisplayFromId = function(p2: string?, p3, options)
+			if p2 == nil then
 				return nil
 			end
 
-			local v69 = v45(false).idToHandle[s3]
+			local v2 = computed(false).idToHandle[p2]
 
-			if v69 == nil then
+			if v2 == nil then
 				return nil
 			end
 
-			local messageId = v69.messageId
-			local v71 = t9[messageId]
+			local v3 = getMessageRowSpecs(v2.messageId)(p3)[v2.rowIndex] -- inferred equivalent call
 
-			if v71 == nil then
-				v71 = Signals.createComputed(function(p14) -- line: 152
-					-- upvalues: GetConversationMessageStore (copy), messageId (copy), t1 (copy), classifyMessage (copy)
-					local v78 = GetConversationMessageStore(p14).getMessage(messageId, p14)
-
-					if v78 == nil then
-						return t1
-					end
-
-					return classifyMessage(v78)
-				end)
-				t9[messageId] = v71
-			end
-
-			local v72 = v71(p12)[v69.rowIndex]
-
-			if v72 == nil then
+			if v3 == nil then
 				return nil
 			end
 
-			return buildRowDisplay(v72, resolveForRowSpec(v72, p12), p13 or {})
+			return buildRowDisplay(v3, resolveForRowSpec(v3, p3), options or {})
+		end,
+		getMessageIdFromDisplayId = function(p2: string?)
+			if p2 == nil then
+				return nil
+			end
+
+			local v2 = computed(false).idToHandle[p2]
+			return if v2 then v2.messageId else nil
 		end
 	}
 end

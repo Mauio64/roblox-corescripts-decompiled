@@ -1,9 +1,9 @@
 game:DefineFastFlag("AbuseReportMenuOpenCloseSignal", false)
 
-return function() -- line: 3
-	if not game:GetEngineFeature("AbuseReportMenuOpenCloseSignal") then
-		return false
+return function()
+	if game:GetEngineFeature("AbuseReportMenuOpenCloseSignal") then
+		return game:GetFastFlag("AbuseReportMenuOpenCloseSignal")
 	end
 
-	return game:GetFastFlag("AbuseReportMenuOpenCloseSignal")
+	return false
 end

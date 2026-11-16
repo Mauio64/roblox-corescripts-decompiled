@@ -1,18 +1,14 @@
-local Parent = script:FindFirstAncestor("Navigation").Parent
-local Actions = require(Parent.RoactNavigation).Actions
-
+local parent = script:FindFirstAncestor("Navigation").Parent
+local RoactNavigation = require(parent.RoactNavigation)
+local Actions = RoactNavigation.Actions
 require(script.Parent.types)
-
 local getRootNavigation = require(script.Parent.getRootNavigation)
 
-local function canGoBack(p1) -- line: 11
-	-- upvalues: getRootNavigation (copy), Actions (copy)
-	local v6 = getRootNavigation(p1)
-	local state = v6.state
+local function canGoBack(p): boolean
+	local rootNavigation = getRootNavigation(p)
+	local state = rootNavigation.state
 
-	return state ~= v6.router.getStateForAction(Actions.back({
-		key = false
-	}), state)
+	return state ~= rootNavigation.router.getStateForAction(Actions.back({ key = false }), state)
 end
 
 return canGoBack

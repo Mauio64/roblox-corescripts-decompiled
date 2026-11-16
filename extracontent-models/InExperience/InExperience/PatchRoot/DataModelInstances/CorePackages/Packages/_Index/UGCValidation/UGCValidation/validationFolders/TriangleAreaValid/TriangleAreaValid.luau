@@ -1,54 +1,37 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local t1 = {
-	fflag = require(ParentParent.flags.getFFlagUGCValidateMigrateMeshGeometry),
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
-	},
-	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
-	conditionalData = { ValidationEnums.SharedDataMember.outerCagesData },
-	expectedFailures = {}
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+
+local TriangleAreaValid = {}
+TriangleAreaValid.categories = {
+	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
+	ValidationEnums.UploadCategory.DYNAMIC_HEAD
 }
 
-local function checkTriangleArea(p1, p2, s1: string) -- line: 22
-	-- upvalues: UGCValidationService (copy), ErrorSourceStrings (copy)
-	if not UGCValidationService:ValidateEditableMeshTriangleArea(p2) then
-		p1:fail(ErrorSourceStrings.Keys.MeshGeometry_ZeroAreaTriangle, {
-			meshName = s1
-		})
+TriangleAreaValid.requiredData = { ValidationEnums.SharedDataMember.renderMeshesData }
+TriangleAreaValid.conditionalData = { ValidationEnums.SharedDataMember.outerCagesData }
+TriangleAreaValid.expectedFailures = {}
+
+local function checkTriangleArea(object, editable, meshName: string) -- 2 equivalent calls inferred from this helper
+	if not UGCValidationService:ValidateEditableMeshTriangleArea(editable) then
+		object:fail(ErrorSourceStrings.Keys.MeshGeometry_ZeroAreaTriangle, { meshName = meshName })
 	end
 end
 
-function t1.run(p3, p4) -- line: 32
-	-- upvalues: UGCValidationService (copy), ErrorSourceStrings (copy)
-	for v12, v13 in p4.renderMeshesData do
-		local editable = v13.editable
-
-		if not UGCValidationService:ValidateEditableMeshTriangleArea(editable) then
-			p3:fail(ErrorSourceStrings.Keys.MeshGeometry_ZeroAreaTriangle, {
-				meshName = v12
-			})
-		end
+function TriangleAreaValid.run(object, p)
+	for k, v in p.renderMeshesData do
+		checkTriangleArea(object, v.editable, k) -- inferred equivalent call
 	end
 
-	if p4.outerCagesData then
-		for v15, v16 in p4.outerCagesData do
-			local editable = v16.editable
-			local v18 = v15 .. "OuterCage"
-
-			if not UGCValidationService:ValidateEditableMeshTriangleArea(editable) then
-				p3:fail(ErrorSourceStrings.Keys.MeshGeometry_ZeroAreaTriangle, {
-					meshName = v18
-				})
-			end
+	if p.outerCagesData then
+		for k, v in p.outerCagesData do
+			checkTriangleArea(object, v.editable, k .. "OuterCage") -- inferred equivalent call
 		end
 	end
 end
 
-return t1
+return TriangleAreaValid

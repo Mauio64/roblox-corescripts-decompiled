@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.VrCompatibility.VrCompatibility))
+local VrCompatibility = require(Workspace.VrCompatibility.VrCompatibility)
+
+return VrCompatibility

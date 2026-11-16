@@ -1,15 +1,14 @@
 local LocalizationService = game:GetService("LocalizationService")
 
-local function formatUpdatedDate(s1: string?) -- line: 12
-	-- upvalues: LocalizationService (copy)
-	if s1 == nil or s1 == "" then
+local function formatUpdatedDate(p: string?)
+	if p == nil or p == "" then
 		return nil
 	end
 
-	local dateTime = DateTime.fromIsoDate(s1)
+	local dateTime = DateTime.fromIsoDate(p)
 
 	if dateTime == nil then
-		return s1
+		return p
 	end
 
 	return dateTime:FormatLocalTime("ll", LocalizationService.RobloxLocaleId)

@@ -1,1 +1,3 @@
-return (require(script.PopoverAnchor))
+local PopoverAnchor = require(script.PopoverAnchor)
+
+return PopoverAnchor

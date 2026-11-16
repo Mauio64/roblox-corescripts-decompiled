@@ -1,277 +1,229 @@
 local MediaPlayback = script:FindFirstAncestor("MediaPlayback")
+
 local Cryo = require(MediaPlayback.Parent.Cryo)
 local Signals = require(MediaPlayback.Parent.Signals)
 local SignalsExperimental = require(MediaPlayback.Parent.SignalsExperimental)
+
 local createConsumerCounterStore = require(MediaPlayback.Stores.getAudioPlaybackStore.createConsumerCounterStore)
 local createAudioStore = require(MediaPlayback.Stores.getAudioPlaybackStore.createAudioStore)
 local createPlaylistStore = require(MediaPlayback.Stores.getAudioPlaybackStore.createPlaylistStore)
 local createVolumeStore = require(MediaPlayback.Stores.getAudioPlaybackStore.createVolumeStore)
-
 require(MediaPlayback.Stores.getAudioPlaybackStore.types)
-
 local getFFlagAudioPreviewLua = require(MediaPlayback.Flags.getFFlagAudioPreviewLua)
+
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
 
-local function createEffect(p1, p2: ((...any) -> ...any)) -- line: 17
-	-- upvalues: SignalsExperimental (copy), Signals (copy)
-	SignalsExperimental.onDisposed(p1, Signals.createEffect(p2))
+local function createEffect(p, fn) -- 1 equivalent call inferred from this helper
+	SignalsExperimental.onDisposed(p, Signals.createEffect(fn))
 end
-local function audioStoreKey(p3, b1: boolean?) -- line: 21
-	-- upvalues: getFFlagAudioPreviewLua (copy)
-	if getFFlagAudioPreviewLua() and b1 then
-		return tostring(p3) .. ":preview"
+
+local function audioStoreKey(p, flag: boolean?) -- 2 equivalent calls inferred from this helper
+	if getFFlagAudioPreviewLua() and flag then
+		return tostring(p) .. ":preview"
 	end
 
-	return (tostring(p3))
+	return (tostring(p))
 end
-local function createAudioPlaybackStore(p4) -- line: 28
-	-- upvalues: createSignal (copy), createConsumerCounterStore (copy), createVolumeStore (copy), createPlaylistStore (copy), getFFlagAudioPreviewLua (copy), createAudioStore (copy), Cryo (copy), createComputed (copy), SignalsExperimental (copy), Signals (copy)
-	local v20, v21 = createSignal({})
-	local v22 = createConsumerCounterStore()
-	local v23 = createVolumeStore()
-	local v24 = createPlaylistStore()
 
-	local function getOrCreateAudioStore(p5, b2: boolean?) -- line: 36
-		-- upvalues: getFFlagAudioPreviewLua (copy), v20 (copy), createAudioStore (copy), v21 (copy), Cryo (copy), v22 (copy)
-		local v36 = if not getFFlagAudioPreviewLua() or not b2 then tostring(p5) else tostring(p5) .. ":preview"
-		local u37 = v20(false)[v36]
+local function createAudioPlaybackStore(p)
+	local signal, v = createSignal({})
 
-		if not u37 then
-			u37 = createAudioStore(p5, b2)
-			v21(function(p6) -- line: 43
-				-- upvalues: Cryo (copy), v36 (copy), u37 (ref)
-				return Cryo.Dictionary.join(p6, {
-					[v36] = u37
-				})
+	local consumerCounterStore = createConsumerCounterStore()
+	local volumeStore = createVolumeStore()
+	local playlistStore = createPlaylistStore()
+
+	local function getOrCreateAudioStore(p2, flag: boolean?)
+		local v2 = audioStoreKey(p2, flag) -- inferred equivalent call
+		local audioStore = signal(false)[v2]
+
+		if not audioStore then
+			audioStore = createAudioStore(p2, flag)
+
+			v(function(p3)
+				return Cryo.Dictionary.join(p3, { [v2] = audioStore })
 			end)
 		end
 
-		v22.subscribe(v36)
+		consumerCounterStore.subscribe(v2)
 
-		return u37
+		return audioStore
 	end
 
-	local v26, v27 = createSignal({})
-	local u28 = nil
-	local v29 = createComputed(function(p7) -- line: 58
-		-- upvalues: v26 (copy), u28 (ref)
-		local v39 = v26(p7)
-		local v40 = v39[#v39]
+	local signal2, v2 = createSignal({})
 
-		if v40 then
-			u28 = v40
+	local v3 = nil
+	local getLastPlayedAudioStore = createComputed(function(p2)
+		local v4 = signal2(p2)
+		local v5 = v4[#v4]
+
+		if v5 then
+			v3 = v5
 		end
 
-		return u28
+		return v3
 	end)
 
-	local function getNextSong() -- line: 69
-		-- upvalues: v29 (copy), v24 (copy), getOrCreateAudioStore (copy)
-		local v41 = v29(false)
+	local function getNextSong() -- 1 equivalent call inferred from this helper
+		local v4 = getLastPlayedAudioStore(false)
 
-		if v41 then
-			local v42 = v24.getNext(v41.assetId)
+		local v5 = v4 and playlistStore.getNext(v4.assetId)
 
-			if v42 then
-				return (getOrCreateAudioStore(v42))
-			end
+		if v5 then
+			return getOrCreateAudioStore(v5)
 		end
 
 		return nil
 	end
 
-	local v31 = createComputed(function(p8) -- line: 81
-		-- upvalues: v29 (copy), v24 (copy)
-		local v44 = v29(p8)
+	local hasNextSong = createComputed(function(p2): boolean
+		local v4 = getLastPlayedAudioStore(p2)
 
-		if v44 then
-			return v24.getNext(v44.assetId) ~= nil
-		end
-
-		return false
-	end)
-	local v32 = createComputed(function(p9) -- line: 89
-		-- upvalues: v29 (copy), v24 (copy)
-		local v46 = v29(p9)
-
-		if v46 then
-			return v24.getPrev(v46.assetId) ~= nil
+		if v4 then
+			return playlistStore.getNext(v4.assetId) ~= nil
 		end
 
 		return false
 	end)
 
-	local function destroyByKey(s1: string) -- line: 137
-		-- upvalues: v20 (copy), v22 (copy), v21 (copy), Cryo (copy)
-		local v58 = v20(false)[s1]
+	local hasPrevSong = createComputed(function(p2): boolean
+		local v4 = getLastPlayedAudioStore(p2)
 
-		if v58 then
-			if v22.unsubscribe(s1) > 0 then
+		if v4 then
+			return playlistStore.getPrev(v4.assetId) ~= nil
+		end
+
+		return false
+	end)
+
+	local function destroyByKey(p2: string)
+		local v4 = signal(false)[p2]
+
+		if v4 then
+			if consumerCounterStore.unsubscribe(p2) > 0 then
 				return
 			end
 
-			v58.destroy()
-			v21(function(p10) -- line: 149
-				-- upvalues: Cryo (copy), s1 (copy)
-				return Cryo.Dictionary.join(p10, {
-					[s1] = Cryo.None
-				})
+			v4.destroy()
+
+			v(function(p3)
+				return Cryo.Dictionary.join(p3, { [p2] = Cryo.None })
 			end)
 		end
 	end
 
-	SignalsExperimental.onDisposed(p4, Signals.createEffect(function(p11) -- line: 169
-		-- upvalues: v22 (copy), destroyByKey (copy)
-		for v64, v65 in v22.getConsumerCounts(p11) do
-			if v65 <= 0 then
-				destroyByKey(v64)
+	SignalsExperimental.onDisposed(p, Signals.createEffect(function(p2)
+		for k, v4 in consumerCounterStore.getConsumerCounts(p2) do
+			if v4 <= 0 then
+				destroyByKey(k)
 			end
 		end
 	end))
-	SignalsExperimental.onDisposed(p4, Signals.createEffect(function(p12) -- line: 179
-		-- upvalues: v20 (copy), destroyByKey (copy)
-		for v67, v68 in v20(p12) do
-			if v68.getIsDestroyed(p12) then
-				destroyByKey(v67)
+	SignalsExperimental.onDisposed(p, Signals.createEffect(function(p2)
+		for k, v4 in signal(p2) do
+			if v4.getIsDestroyed(p2) then
+				destroyByKey(k)
 			end
 		end
 	end))
-	SignalsExperimental.onDisposed(p4, Signals.createEffect(function(p13) -- line: 187
-		-- upvalues: v20 (copy), Cryo (copy), v26 (copy), v27 (copy)
-		for _, v71 in v20(p13) do
-			local v72 = v71.getIsPlaying(p13)
-			local v73 = Cryo.List.find(v26(p13), v71)
-			local v74 = v73 ~= nil
 
-			if v74 and not v72 then
-				v27(function(p14) -- line: 195
-					-- upvalues: Cryo (copy), v73 (copy)
-					return Cryo.List.removeIndex(p14, v73)
+	local function fn(p2)
+		for _, v4 in signal(p2) do
+			local isPlaying = v4.getIsPlaying(p2)
+
+			local v5 = Cryo.List.find(signal2(p2), v4)
+			local v6 = v5 ~= nil
+
+			if v6 and not isPlaying then
+				v2(function(p3)
+					return Cryo.List.removeIndex(p3, v5)
 				end)
-			elseif v72 and not v74 then
-				v27(function(p15) -- line: 199
-					-- upvalues: Cryo (copy), v71 (copy)
-					return Cryo.List.join(p15, { v71 })
+			elseif isPlaying and not v6 then
+				v2(function(p3)
+					local v7 = { v4 }
+					return Cryo.List.join(p3, v7)
 				end)
 			end
 		end
-	end))
-	SignalsExperimental.onDisposed(p4, Signals.createEffect(function(p16) -- line: 206
-		-- upvalues: v23 (copy), v20 (copy)
-		local v76 = v23.getVolume(p16)
+	end
 
-		for _, v78 in v20(p16) do
-			v78.setVolume(v76)
+	createEffect(p, fn) -- inferred equivalent call
+	SignalsExperimental.onDisposed(p, Signals.createEffect(function(p2)
+		local volume = volumeStore.getVolume(p2)
+
+		for _, v4 in signal(p2) do
+			v4.setVolume(volume)
 		end
 	end))
-	SignalsExperimental.onDisposed(p4, Signals.createEffect(function(p17) -- line: 213
-		-- upvalues: v29 (copy), v31 (copy), v24 (copy), getOrCreateAudioStore (copy)
-		local v80 = v29(p17)
+	SignalsExperimental.onDisposed(p, Signals.createEffect(function(p2)
+		local v4 = getLastPlayedAudioStore(p2)
 
-		if not v80 or (not v80.getIsElapsed(p17) or not v31(p17)) then
-			return
-		end
+		if v4 and v4.getIsElapsed(p2) and hasNextSong(p2) then
+			local nextSong = getNextSong() -- inferred equivalent call
 
-		local v81 = v29(false)
-		local g82 = nil
-		local v83 = nil
-		local v84 = nil
-
-		repeat
-			if g82 or v81 then
-				if not g82 then
-					v83 = v24.getNext(v81.assetId)
-				end
-
-				if g82 or v83 then
-					if not g82 then
-						v84 = getOrCreateAudioStore(v83)
-					end
-
-					g82 = false
-
-					if v84 then
-						v84.play()
-					end
-
-					return
-				end
+			if nextSong then
+				nextSong.play()
 			end
-
-			v84 = nil
-			g82 = true
-		until not g82
+		end
 	end))
-
 	return {
-		getAudioStores = v20,
-		stopAll = function() -- line: 97
-			-- upvalues: v20 (copy)
-			for _, v48 in v20(false) do
-				v48.stop()
+		getAudioStores = signal,
+		stopAll = function()
+			for _, v4 in signal(false) do
+				v4.stop()
 			end
 		end,
-		pauseAll = function() -- line: 103
-			-- upvalues: v20 (copy)
-			for _, v50 in v20(false) do
-				v50.pause()
+		pauseAll = function()
+			for _, v4 in signal(false) do
+				v4.pause()
 			end
 		end,
-		getLastPlayedAudioStore = v29,
+		getLastPlayedAudioStore = getLastPlayedAudioStore,
 		getOrCreateAudioStore = getOrCreateAudioStore,
-		getPlayingAudioStores = v26,
-		destroyAudioStore = function(p18, b3: boolean?) -- line: 157
-			-- upvalues: destroyByKey (copy), getFFlagAudioPreviewLua (copy)
-			destroyByKey(if not getFFlagAudioPreviewLua() or not b3 then tostring(p18) else tostring(p18) .. ":preview")
+		getPlayingAudioStores = signal2,
+		destroyAudioStore = function(p2, flag: boolean?)
+			destroyByKey(audioStoreKey(p2, flag)) -- inferred equivalent call
 		end,
-		destroy = function() -- line: 161
-			-- upvalues: v20 (copy), v21 (copy), v27 (copy)
-			for _, v62 in v20(false) do
-				v62.destroy()
+		destroy = function()
+			for _, v4 in signal(false) do
+				v4.destroy()
 			end
 
-			v21({})
-			v27({})
+			v({})
+			v2({})
 		end,
-		getGlobalVolume = v23.getVolume,
-		setGlobalVolume = v23.setVolume,
-		mute = v23.mute,
-		unmute = v23.unmute,
-		getIsMuted = v23.getIsMuted,
-		hasNextSong = v31,
-		hasPrevSong = v32,
-		playNextSong = function() -- line: 109
-			-- upvalues: v29 (copy), v24 (copy), getOrCreateAudioStore (copy)
-			local v51 = v29(false)
+		getGlobalVolume = volumeStore.getVolume,
+		setGlobalVolume = volumeStore.setVolume,
+		mute = volumeStore.mute,
+		unmute = volumeStore.unmute,
+		getIsMuted = volumeStore.getIsMuted,
+		hasNextSong = hasNextSong,
+		hasPrevSong = hasPrevSong,
+		playNextSong = function()
+			local v4 = getLastPlayedAudioStore(false)
 
-			if v51 then
-				local v52 = v24.getNext(v51.assetId)
+			local v5 = v4 and playlistStore.getNext(v4.assetId)
 
-				if v52 then
-					local v53 = getOrCreateAudioStore(v52)
+			if v5 then
+				local audioStore = getOrCreateAudioStore(v5)
 
-					v51.stop()
-					v53.play()
-				end
+				v4.stop()
+				audioStore.play()
 			end
 		end,
-		playPrevSong = function() -- line: 123
-			-- upvalues: v29 (copy), v24 (copy), getOrCreateAudioStore (copy)
-			local v54 = v29(false)
+		playPrevSong = function()
+			local v4 = getLastPlayedAudioStore(false)
 
-			if v54 then
-				local v55 = v24.getPrev(v54.assetId)
+			local v5 = v4 and playlistStore.getPrev(v4.assetId)
 
-				if v55 then
-					local v56 = getOrCreateAudioStore(v55)
+			if v5 then
+				local audioStore = getOrCreateAudioStore(v5)
 
-					v54.stop()
-					v56.play()
-				end
+				v4.stop()
+				audioStore.play()
 			end
 		end,
-		setPlaylist = v24.set
+		setPlaylist = playlistStore.set
 	}
 end
 

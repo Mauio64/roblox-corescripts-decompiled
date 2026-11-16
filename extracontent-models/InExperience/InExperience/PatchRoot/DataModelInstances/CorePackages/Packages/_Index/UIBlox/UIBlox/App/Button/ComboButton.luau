@@ -1,28 +1,33 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParentParent.Core
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local React = require(ParentParentParentParent.React)
-local t = require(ParentParentParentParent.t)
-local Cryo = require(ParentParentParentParent.Cryo)
-local Images = require(ParentParent.ImageSet.Images)
-local useCursor = require(ParentParent.SelectionCursor.useCursor)
-local ControlState = require(Core.Control.Enum.ControlState)
-local GenericButton = require(Core.Button.GenericButton)
-local validateImage = require(Core.ImageSet.Validator.validateImage)
-local withStyle = require(Core.Style.withStyle)
-local v15 = Roact.PureComponent:extend("ComboButton")
-local uDim = UDim.new(0, 8)
-local t1 = {
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local core = parent2.Core
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+local React = require(parent3.React)
+local t = require(parent3.t)
+local Cryo = require(parent3.Cryo)
+
+local Images = require(parent.ImageSet.Images)
+local useCursor = require(parent.SelectionCursor.useCursor)
+
+local ControlState = require(core.Control.Enum.ControlState)
+local GenericButton = require(core.Button.GenericButton)
+local validateImage = require(core.ImageSet.Validator.validateImage)
+local withStyle = require(core.Style.withStyle)
+
+local extended = Roact.PureComponent:extend("ComboButton")
+
+local udim = UDim.new(0, 8)
+
+local buttonStateColorMap = {
 	[ControlState.Default] = "ContextualPrimaryDefault",
 	[ControlState.Hover] = "ContextualPrimaryOnHover"
 }
-local t2 = {
-	[ControlState.Default] = "ContextualPrimaryContent"
-}
 
-v15.validateProps = t.strictInterface({
+local contentStateColorMap = { [ControlState.Default] = "ContextualPrimaryContent" }
+
+extended.validateProps = t.strictInterface({
 	button = t.strictInterface({
 		icon = t.optional(validateImage),
 		text = t.optional(t.string),
@@ -40,101 +45,99 @@ v15.validateProps = t.strictInterface({
 	cursor = t.optional(t.table),
 	testId = t.optional(t.string)
 })
-v15.defaultProps = {
-	testId = "--uiblox-combo-button",
-	size = UDim2.fromScale(1, 1)
-}
 
-function v15.init(p1) -- line: 77
-	-- upvalues: ControlState (copy)
-	p1:setState({
+extended.defaultProps = { size = UDim2.fromScale(1, 1), testId = "--uiblox-combo-button" }
+
+function extended:init()
+	self:setState({
 		buttonControlState = ControlState.Initialize,
 		overflowControlState = ControlState.Initialize
 	})
 
-	function p1.onButtonStateChanged(_, p3) -- line: 80
-		-- upvalues: p1 (copy)
-		p1:setState({
-			buttonControlState = p3
-		})
+	function self.onButtonStateChanged(_, buttonControlState)
+		self:setState({ buttonControlState = buttonControlState })
 	end
-	function p1.onOverflowStateChanged(_, p5) -- line: 84
-		-- upvalues: p1 (copy)
-		p1:setState({
-			overflowControlState = p5
-		})
+
+	function self.onOverflowStateChanged(_, overflowControlState)
+		self:setState({ overflowControlState = overflowControlState })
 	end
 end
-function v15.render(p6) -- line: 89
-	-- upvalues: withStyle (copy)
-	return withStyle(function(p7) -- line: 90
-		-- upvalues: p6 (copy)
-		return p6:renderWithProviders(p7, nil, nil)
+
+function extended:render()
+	return withStyle(function(p)
+		return self:renderWithProviders(p, nil, nil)
 	end)
 end
-function v15.renderWithProviders(p8, _, _, _) -- line: 95
-	-- upvalues: Roact (copy), React (copy), GenericButton (copy), Images (copy), t1 (copy), t2 (copy)
-	local size = p8.props.size
-	local uDim2 = UDim2.new(1, -40, 1, 0)
-	local uDim2_2 = UDim2.new(0, 39, 1, 0)
 
-	return Roact.createElement("Frame", {
-		LayoutOrder = p8.props.layoutOrder,
-		Position = p8.props.position,
+function extended:renderWithProviders(_, _, _)
+	local size = self.props.size
+	local udim2 = UDim2.new(1, -40, 1, 0)
+	local udim3 = UDim2.new(0, 39, 1, 0)
+
+	local createElement = Roact.createElement
+	local v = {
+		["LayoutOrder"] = nil,
+		LayoutOrder = self.props.layoutOrder,
+		Position = self.props.position,
 		Size = size,
-		BackgroundTransparency = 1,
-		[React.Tag] = if not p8.props.testId then nil else `data-testid={ p8.props.testId }`
-	}, {
+		BackgroundTransparency = 1
+	}
+
+	local tag = React.Tag
+	local v2
+
+	if self.props.testId then
+		v2 = `data-testid={self.props.testId}`
+	end
+
+	v[tag] = v2
+	return createElement("Frame", v, {
 		Button = Roact.createElement(GenericButton, {
-			isHoverBackgroundEnabled = true,
-			ZIndex = 0,
 			Position = UDim2.fromScale(0, 0),
-			Size = uDim2,
+			Size = udim2,
 			buttonImage = Images["component_assets/bulletLeft_17"],
-			buttonStateColorMap = t1,
-			contentStateColorMap = t2,
+			buttonStateColorMap = buttonStateColorMap,
+			contentStateColorMap = contentStateColorMap,
 			hoverImage = Images["component_assets/bulletLeft_17"],
-			icon = p8.props.button.icon,
-			isDisabled = p8.props.button.isDisabled,
-			onActivated = p8.props.button.onActivated,
-			onStateChanged = p8.onButtonStateChanged,
-			SelectionImageObject = p8.props.cursor,
-			text = p8.props.button.text
+			icon = self.props.button.icon,
+			isDisabled = self.props.button.isDisabled,
+			isHoverBackgroundEnabled = true,
+			onActivated = self.props.button.onActivated,
+			onStateChanged = self.onButtonStateChanged,
+			SelectionImageObject = self.props.cursor,
+			text = self.props.button.text,
+			ZIndex = 0
 		}),
 		Overflow = Roact.createElement(GenericButton, {
-			ZIndex = 0,
-			isHoverBackgroundEnabled = true,
 			AnchorPoint = Vector2.new(1, 0),
 			Position = UDim2.fromScale(1, 0),
-			Size = uDim2_2,
+			Size = udim3,
+			ZIndex = 0,
 			buttonImage = Images["component_assets/bulletRight_17"],
-			buttonStateColorMap = t1,
-			contentStateColorMap = t2,
+			buttonStateColorMap = buttonStateColorMap,
+			contentStateColorMap = contentStateColorMap,
 			hoverImage = Images["component_assets/bulletRight_17"],
-			icon = p8.props.overflow.icon or Images["icons/actions/truncationExpand"],
-			isDisabled = p8.props.overflow.isDisabled,
-			onActivated = p8.props.overflow.onActivated,
-			onStateChanged = p8.onOverflowStateChanged,
-			SelectionImageObject = p8.props.cursor
+			icon = self.props.overflow.icon or Images["icons/actions/truncationExpand"],
+			isDisabled = self.props.overflow.isDisabled,
+			isHoverBackgroundEnabled = true,
+			onActivated = self.props.overflow.onActivated,
+			onStateChanged = self.onOverflowStateChanged,
+			SelectionImageObject = self.props.cursor
 		})
 	})
 end
-function ComboButtonFunctionalWrapper(p12) -- line: 142
-	-- upvalues: useCursor (copy), uDim (copy), Roact (copy), v15 (copy), Cryo (copy)
-	local v30 = useCursor(uDim)
 
-	return Roact.createElement(v15, Cryo.Dictionary.join(p12, {
-		cursor = v30
-	}))
+function ComboButtonFunctionalWrapper(p)
+	local cursor = useCursor(udim)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { cursor = cursor }))
 end
 
-local v19 = Roact.PureComponent:extend("ComboButtonOuterWrapper")
+local extended2 = Roact.PureComponent:extend("ComboButtonOuterWrapper")
 
-v19.validateProps = v15.validateProps
+extended2.validateProps = extended.validateProps
 
-function v19.render(p13) -- line: 156
-	-- upvalues: Roact (copy)
-	return Roact.createElement(ComboButtonFunctionalWrapper, p13.props)
+function extended2.render(p)
+	return Roact.createElement(ComboButtonFunctionalWrapper, p.props)
 end
 
-return v19
+return extended2

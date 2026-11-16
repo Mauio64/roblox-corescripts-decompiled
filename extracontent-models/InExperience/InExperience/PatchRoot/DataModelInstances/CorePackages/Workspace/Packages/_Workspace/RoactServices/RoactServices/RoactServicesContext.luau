@@ -1,5 +1,5 @@
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
+local parent = script.Parent.Parent
+local Roact = require(parent.Roact)
 
 require(script.Parent.RoactServicesTypes)
 

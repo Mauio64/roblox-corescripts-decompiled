@@ -1,206 +1,252 @@
 local Signal = require(script.Parent.Parent.Parent.Signal)
-local ChartHeaderNames = require(script.Parent.Parent.Parent.Constants).DebugVisualizationsFormatting.ChartHeaderNames
+
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local ChartHeaderNames = Constants.DebugVisualizationsFormatting.ChartHeaderNames
+
 local DebugVisualizationsStaticContent = require(script.Parent.DebugVisualizationsStaticContent)
-local v4 = game:DefineFastFlag("SlimDevConsole2", false)
-local t1 = {
-	[ChartHeaderNames[1]] = function(p1, p2) -- line: 11
-		return p1.name < p2.name
+local defineFastFlag = game:DefineFastFlag("SlimDevConsole2", false)
+local defineFastFlag2 = game:DefineFastFlag("SlimTintContextFilter", false)
+local defineFastFlag3 = game:DefineFastFlag("SlimTintModeTelemetry", false)
+local DebugVisualizationsTelemetry = require(script.Parent.DebugVisualizationsTelemetry)
+
+local v = {
+	[ChartHeaderNames[1]] = function(p, p2): boolean
+		return p.name < p2.name
 	end,
-	[ChartHeaderNames[2]] = function(p3, p4) -- line: 14
-		if p3.settingInfo.Value ~= p4.settingInfo.Value then
-			return p3.settingInfo.Value
+	[ChartHeaderNames[2]] = function(p, p2)
+		if p.settingInfo.Value == p2.settingInfo.Value then
+			return p.name < p2.name
 		end
 
-		return p3.name < p4.name
+		return p.settingInfo.Value
 	end,
-	[ChartHeaderNames[3]] = function(p5, p6) -- line: 18
-		if p5.settingInfo.Type ~= p6.settingInfo.Type then
-			return p5.settingInfo.Type < p6.settingInfo.Type
+	[ChartHeaderNames[3]] = function(p, p2): boolean
+		if p.settingInfo.Type == p2.settingInfo.Type then
+			return p.name < p2.name
 		end
 
-		return p5.name < p6.name
+		return p.settingInfo.Type < p2.settingInfo.Type
 	end,
-	[ChartHeaderNames[4]] = function(p7, p8) -- line: 22
-		return p7.name < p8.name
+	[ChartHeaderNames[4]] = function(p, p2): boolean
+		return p.name < p2.name
 	end
 }
-local t2 = {}
 
-t2.__index = t2
+local DebugVisualizationsData = {}
+DebugVisualizationsData.__index = DebugVisualizationsData
 
-function t2.new() -- line: 30
-	-- upvalues: t2 (copy), Signal (copy), ChartHeaderNames (copy)
-	local t3 = {}
+function DebugVisualizationsData.new()
+	local v2 = {}
+	setmetatable(v2, DebugVisualizationsData)
 
-	setmetatable(t3, t2)
-	t3._visualizationsUpdated = Signal.new()
-	t3._visualizationsData = {}
-	t3._visualizationCounter = 0
-	t3._sortedVisualizationData = {}
-	t3._sortType = ChartHeaderNames[3]
-	t3._isRunning = false
-
-	return t3
+	v2._visualizationsUpdated = Signal.new()
+	v2._visualizationsData = {}
+	v2._visualizationCounter = 0
+	v2._sortedVisualizationData = {}
+	v2._sortType = ChartHeaderNames[3]
+	v2._isRunning = false
+	return v2
 end
-function t2.setSortType(p9, p10) -- line: 43
-	-- upvalues: t1 (copy)
-	if t1[p10] then
-		p9._sortType = p10
-		table.sort(p9._sortedVisualizationData, t1[p9._sortType])
-		p9._visualizationsUpdated:Fire(p9._sortedVisualizationData)
+
+function DebugVisualizationsData:setSortType(sortType)
+	if not v[sortType] then
+		error(string.format("attempted to pass invalid sortType: %s", (tostring(sortType))), 2)
 
 		return
 	end
 
-	error(string.format("attempted to pass invalid sortType: %s", (tostring(p10))), 2)
+	self._sortType = sortType
+	table.sort(self._sortedVisualizationData, v[self._sortType])
+	self._visualizationsUpdated:Fire(self._sortedVisualizationData)
 end
-function t2.getSortType(p11) -- line: 53
-	return p11._sortType
-end
-function t2.Signal(p12) -- line: 57
-	return p12._visualizationsUpdated
-end
-function t2.getCurrentData(p13) -- line: 61
-	return p13._sortedVisualizationData
-end
-function t2.updateDebugVisualizationDataEntry(p14, p15, p16) -- line: 67
-	if p16 == nil then
-		p14._visualizationsData[p15] = nil
 
-		for k, v in pairs(p14._sortedVisualizationData) do
-			if p15 == v.name then
-				table.remove(p14._sortedVisualizationData, k)
+function DebugVisualizationsData:getSortType()
+	return self._sortType
+end
 
+function DebugVisualizationsData:Signal()
+	return self._visualizationsUpdated
+end
+
+function DebugVisualizationsData:getCurrentData()
+	return self._sortedVisualizationData
+end
+
+function DebugVisualizationsData:updateDebugVisualizationDataEntry(name, p)
+	if p == nil then
+		self._visualizationsData[name] = nil
+
+		for k, v2 in pairs(self._sortedVisualizationData) do
+			if v2.name == name then
+				table.remove(self._sortedVisualizationData, k)
 				return
 			end
 		end
+	else
+		if self._visualizationsData[name] then
+			self._visualizationsData[name] = p
 
-		return
-	end
+			return
+		end
 
-	if not p14._visualizationsData[p15] then
-		p14._visualizationCounter = p14._visualizationCounter + 1
-		p14._visualizationsData[p15] = p16
-
-		local t4 = {
-			name = p15,
-			settingInfo = p14._visualizationsData[p15],
-			valueChangeCallback = function(p17, p18) -- line: 84
-				-- upvalues: p14 (copy)
-				p14:_toggleValue(p17, p18)
+		self._visualizationCounter += 1
+		self._visualizationsData[name] = p
+		local v2 = {
+			name = name,
+			settingInfo = self._visualizationsData[name],
+			valueChangeCallback = function(p2, p3)
+				self:_toggleValue(p2, p3)
 			end,
-			counter = p14._visualizationCounter
+			counter = self._visualizationCounter
 		}
 
-		table.insert(p14._sortedVisualizationData, t4)
-
-		return
+		table.insert(self._sortedVisualizationData, v2)
 	end
-
-	p14._visualizationsData[p15] = p16
 end
-function t2.isRunning(p19) -- line: 95
-	return p19._isRunning
+
+function DebugVisualizationsData:isRunning()
+	return self._isRunning
 end
-function t2._toggleValue(p20, p21, p22) -- line: 99
-	-- upvalues: v4 (copy), t1 (copy)
-	if v4 then
-		local v31 = p20._visualizationsData[p21]
 
-		if v31 and v31.Kind == "Dropdown" then
-			local Service = settings():GetService(v31.Service)
+function DebugVisualizationsData:_toggleValue(p, p2)
+	if defineFastFlag then
+		local v2 = self._visualizationsData[p]
 
-			Service[v31.Setter](Service, p22)
-			v31.Value = p22
-			table.sort(p20._sortedVisualizationData, t1[p20._sortType])
-			p20._visualizationsUpdated:Fire(p20._sortedVisualizationData)
+		if v2 and v2.Kind == "Dropdown" then
+			local service = settings():GetService(v2.Service)
+			service[v2.Setter](service, p2)
+			v2.Value = p2
 
+			if defineFastFlag3 and p == "SlimTintMode" then
+				DebugVisualizationsTelemetry.logSlimTintModeSelected(p2)
+			end
+
+			table.sort(self._sortedVisualizationData, v[self._sortType])
+			self._visualizationsUpdated:Fire(self._sortedVisualizationData)
 			return
 		end
 	end
 
-	local Physics = settings().Physics
+	local physics = settings().Physics
 
-	if Physics[p21] ~= nil then
-		if p22 and p20._visualizationsData[p21].Type == "Box" then
-			for _, v in pairs(p20._visualizationsData) do
-				if v.Type == "Box" and Physics[v.Name] ~= nil then
-					Physics[v.Name] = false
-					p20._visualizationsData[v.Name].Value = false
+	if physics[p] ~= nil then
+		if p2 and self._visualizationsData[p].Type == "Box" then
+			for _, v2 in pairs(self._visualizationsData) do
+				if not (v2.Type == "Box" and physics[v2.Name] ~= nil) then
+					continue
+				end
+
+				physics[v2.Name] = false
+				self._visualizationsData[v2.Name].Value = false
+			end
+		end
+
+		physics[p] = p2
+		self._visualizationsData[p].Value = p2
+
+		table.sort(self._sortedVisualizationData, v[self._sortType])
+		self._visualizationsUpdated:Fire(self._sortedVisualizationData)
+	end
+end
+
+function _constructInfo(p, data)
+	local v2 = nil
+	local dropDownList = nil
+	local enumItems = nil
+
+	if defineFastFlag and data.kind == "Dropdown" then
+		local success, result = pcall(function()
+			return settings():GetService(data.service)
+		end)
+
+		if success and result then
+			v2 = result[data.getter](result)
+
+			if defineFastFlag2 then
+				local availableTintModes = result:GetAvailableTintModes(Enum.SlimViewContext.Player, true)
+				enumItems = {}
+				dropDownList = {}
+
+				for i, availableTintMode in ipairs(availableTintModes) do
+					enumItems[i] = Enum.SlimTintMode[availableTintMode]
+					dropDownList[i] = availableTintMode
+				end
+			else
+				enumItems = v2.EnumType:GetEnumItems()
+				dropDownList = {}
+
+				for i, v3 in ipairs(enumItems) do
+					dropDownList[i] = v3.Name
 				end
 			end
 		end
-
-		Physics[p21] = p22
-		p20._visualizationsData[p21].Value = p22
-		table.sort(p20._sortedVisualizationData, t1[p20._sortType])
-		p20._visualizationsUpdated:Fire(p20._sortedVisualizationData)
-	end
-end
-function _constructInfo(p23, p24) -- line: 132
-	-- upvalues: v4 (copy)
-	local v38 = nil
-	local t5 = nil
-	local EnumItems = nil
-
-	if v4 and p24.kind == "Dropdown" then
-		local ok, result = pcall(function() -- line: 138
-			-- upvalues: p24 (copy)
-			return settings():GetService(p24.service)
-		end)
-
-		if ok and result then
-			v38 = result[p24.getter](result)
-			EnumItems = v38.EnumType:GetEnumItems()
-			t5 = {}
-
-			for i, v in ipairs(EnumItems) do
-				t5[i] = v.Name
-			end
-		end
 	else
-		local Physics = settings().Physics
+		local physics = settings().Physics
 
-		v38 = Physics[p23] ~= nil and Physics[p23]
+		if physics[p] == nil then
+			v2 = false
+		else
+			v2 = physics[p]
+		end
 	end
 
-	local s1 = ""
+	local tagstring = ""
 
-	for i, v in ipairs(p24.tags) do
-		s1 = (s1 .. v) .. (i == #p24.tags and "" or ", ")
+	for i, tag in ipairs(data.tags) do
+		tagstring = (tagstring .. tag) .. (i == #data.tags and "" or ", ")
 	end
 
-	local t6 = {
-		Name = p24.name,
-		Value = v38,
-		Type = p24.type,
-		Kind = if not v4 then nil else p24.kind,
-		Tags = p24.tags,
-		Tagstring = s1,
-		Description = p24.description,
-		LearnMoreUrl = if not v4 then nil else p24.learnMoreUrl
+	local v3 = {
+		Name = data.name,
+		Value = v2,
+		Type = data.type,
+		Kind = 0,
+		Tags = 0,
+		Tagstring = 0,
+		Description = 0,
+		LearnMoreUrl = 0
 	}
+	local kind
 
-	if v4 and p24.kind == "Dropdown" then
-		t6.DropDownList = t5
-		t6.EnumItems = EnumItems
-		t6.Service = p24.service
-		t6.Setter = p24.setter
+	if defineFastFlag then
+		kind = data.kind
 	end
 
-	return t6
-end
-function t2.start(p25) -- line: 184
-	-- upvalues: DebugVisualizationsStaticContent (copy), t1 (copy)
-	for k, v in pairs(DebugVisualizationsStaticContent) do
-		p25:updateDebugVisualizationDataEntry(k, _constructInfo(k, v))
+	v3.Kind = kind
+	v3.Tags = data.tags
+	v3.Tagstring = tagstring
+	v3.Description = data.description
+	local learnMoreUrl
+
+	if defineFastFlag then
+		learnMoreUrl = data.learnMoreUrl
 	end
 
-	table.sort(p25._sortedVisualizationData, t1[p25._sortType])
-	p25._isRunning = true
-end
-function t2.stop(p26) -- line: 192
-	p26._isRunning = false
+	v3.LearnMoreUrl = learnMoreUrl
+
+	if not defineFastFlag or data.kind ~= "Dropdown" then
+		return v3
+	end
+
+	v3.DropDownList = dropDownList
+	v3.EnumItems = enumItems
+	v3.Service = data.service
+	v3.Setter = data.setter
+
+	return v3
 end
 
-return t2
+function DebugVisualizationsData:start()
+	for k, v2 in pairs(DebugVisualizationsStaticContent) do
+		self:updateDebugVisualizationDataEntry(k, _constructInfo(k, v2))
+	end
+
+	table.sort(self._sortedVisualizationData, v[self._sortType])
+	self._isRunning = true
+end
+
+function DebugVisualizationsData:stop()
+	self._isRunning = false
+end
+
+return DebugVisualizationsData

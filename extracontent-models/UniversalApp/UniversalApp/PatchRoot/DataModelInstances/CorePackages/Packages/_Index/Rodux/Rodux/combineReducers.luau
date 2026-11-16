@@ -1,17 +1,14 @@
-local function combineReducers(p1) -- line: 4
-	return function(p2, p3) -- line: 5
-		-- upvalues: p1 (copy)
-		if p2 == nil then
-			p2 = {}
+local function combineReducers(items)
+	return function(p, p2)
+		local v = p == nil and {} or p
+
+		local result = {}
+
+		for k, item in pairs(items) do
+			result[k] = item(v[k], p2)
 		end
 
-		local t1 = {}
-
-		for k, v in pairs(p1) do
-			t1[k] = v(p2[k], p3)
-		end
-
-		return t1
+		return result
 	end
 end
 

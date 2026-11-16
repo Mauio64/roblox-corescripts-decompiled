@@ -1,108 +1,95 @@
-local scriptParent = script.Parent
-local makeActionCreator = require(scriptParent.makeActionCreator)
-local RequestBuilder = require(scriptParent.RequestBuilder)
-local NetworkStatus = require(scriptParent.NetworkStatus)
-local Promise = require(scriptParent.Promise)
+local parent = script.Parent
+local makeActionCreator = require(parent.makeActionCreator)
+local RequestBuilder = require(parent.RequestBuilder)
+local NetworkStatus = require(parent.NetworkStatus)
+local Promise = require(parent.Promise)
+require(parent.Types)
 
-require(scriptParent.Types)
-
-return function(p1, p2) -- line: 12
-	-- upvalues: NetworkStatus (copy), makeActionCreator (copy), Promise (copy), RequestBuilder (copy)
-	local keyPath = p1.keyPath
-	local killRequestWithFilteredIds = p1.killRequestWithFilteredIds
-	local v10 = NetworkStatus({
-		keyPath = keyPath,
-		killRequestWithFilteredIds = killRequestWithFilteredIds
+return function(data, p)
+	local networkStatus = NetworkStatus({
+		keyPath = data.keyPath,
+		killRequestWithFilteredIds = data.killRequestWithFilteredIds
 	})
 
-	return function(p3, p4: ((...any) -> ...any)) -- line: 21
-		-- upvalues: makeActionCreator (copy), Promise (copy), RequestBuilder (copy), v10 (copy), p1 (copy), p2 (copy)
-		local v13 = makeActionCreator(p3)
-		local u14 = nil
+	return function(p2, callback)
+		local actionCreator = makeActionCreator(p2)
+		local fn = nil
 
-		local function v15(p5, t1: {[any]: any}) -- line: 25
-			-- upvalues: u14 (ref), Promise (copy)
-			if t1.mockNetworkImpl then
+		local function fn2(callback2, data2)
+			if data2.mockNetworkImpl then
 				error("Request already mocked - you may need to call `Mock.clear` between tests/uses")
 			end
 
-			if type(p5) ~= "function" and type(p5) ~= t1.defaultType then
-				error(t1.argumentName .. " must be a " .. t1.defaultType .. " or function")
+			if type(callback2) ~= "function" and type(callback2) ~= data2.defaultType then
+				error(data2.argumentName .. " must be a " .. data2.defaultType .. " or function")
 			end
 
-			function u14(...) -- line: 39
-				-- upvalues: p5 (copy), Promise (copy), t1 (copy)
-				local v25 = type(p5) == "function" and p5(...) or p5
+			fn = function(...)
+				local v = type(callback2) == "function" and callback2(...) or callback2
 
-				return Promise[t1.defaultResolveMethod](v25)
+				return Promise[data2.defaultResolveMethod](v)
 			end
 		end
 
 		return {
 			Mock = {
-				reply = function(p6) -- line: 84
-					-- upvalues: v15 (copy), u14 (ref)
-					return v15(p6, {
+				reply = function(p3)
+					return fn2(p3, {
 						defaultResolveMethod = "resolve",
 						argumentName = "mockResponse",
 						defaultType = "table",
-						mockNetworkImpl = u14
+						mockNetworkImpl = fn
 					})
 				end,
-				replyWithError = function(p7) -- line: 93
-					-- upvalues: v15 (copy), u14 (ref)
-					return v15(p7, {
+				replyWithError = function(p3)
+					return fn2(p3, {
 						defaultResolveMethod = "reject",
 						argumentName = "mockError",
 						defaultType = "string",
-						mockNetworkImpl = u14
+						mockNetworkImpl = fn
 					})
 				end,
-				clear = function() -- line: 102
-					-- upvalues: u14 (ref)
-					u14 = nil
+				clear = function()
+					fn = nil
 				end
 			},
-			getStatus = function(p8, p9) -- line: 72
-				-- upvalues: p4 (copy), RequestBuilder (copy), v10 (copy)
-				local v22 = p4(function(s1: string, p10) -- line: 73
-					-- upvalues: RequestBuilder (copy)
-					return RequestBuilder.new(s1, p10)
-				end, p9):makeKeyMapper()(p9)
+			getStatus = function(p3, p4)
+				local v = callback(function(p5: string, p6)
+					return RequestBuilder.new(p5, p6)
+				end, p4):makeKeyMapper()(p4)
 
-				return v10.getStatus(p8, v22)
+				return networkStatus.getStatus(p3, v)
 			end,
-			API = function(p11, ...) -- line: 46
-				-- upvalues: p4 (copy), RequestBuilder (copy), v10 (copy), u14 (ref), p1 (copy), p2 (copy), v13 (copy), Promise (copy)
-				local v19 = p4(function(s2: string, p12) -- line: 47
-					-- upvalues: RequestBuilder (copy)
-					return RequestBuilder.new(s2, p12)
-				end, p11, ...)
+			API = function(p3, ...)
+				local v = callback(function(p4: string, p5)
+					return RequestBuilder.new(p4, p5)
+				end, p3, ...)
 
-				return function(t2: {[any]: any}) -- line: 51
-					-- upvalues: v10 (copy), v19 (copy), u14 (ref), p1 (copy), p2 (copy), v13 (copy), Promise (copy)
-					return v10.setStatus(t2, v19:getIds(), v19:makeKeyMapper(), function(p13, p14) -- line: 52
-						-- upvalues: u14 (ref), p1 (copy), v19 (copy), p2 (copy), v13 (copy), Promise (copy)
-						local v33 = u14 or p1.networkImpl
-						local v34 = v19:makeOptions()
-						local v35 = v19:getNamedIds()
+				return function(p4)
+					return networkStatus.setStatus(p4, v:getIds(), v:makeKeyMapper(), function(object, p5)
+						local v2 = fn or data.networkImpl
+						local options = v:makeOptions()
+						local namedIds = v:getNamedIds()
 
-						return v33(v19:makeUrl(p14), p2, v34):andThen(function(p15) -- line: 58
-							-- upvalues: p13 (copy), v13 (copy), p14 (copy), v35 (copy), v34 (copy), v19 (copy)
-							p13:dispatch(v13.Succeeded(p14, p15.responseBody, v35, v34, v19:getAdditionalData()))
+						return v2(v:makeUrl(p5), p, options):andThen(function(p6)
+							object:dispatch(actionCreator.Succeeded(
+								p5,
+								p6.responseBody,
+								namedIds,
+								options,
+								v:getAdditionalData()
+							))
+							return p6
+						end, function(p6)
+							object:dispatch(actionCreator.Failed(p5, p6, namedIds, options, v:getAdditionalData()))
 
-							return p15
-						end, function(p16) -- line: 62
-							-- upvalues: p13 (copy), v13 (copy), p14 (copy), v35 (copy), v34 (copy), v19 (copy), Promise (copy)
-							p13:dispatch(v13.Failed(p14, p16, v35, v34, v19:getAdditionalData()))
-
-							return Promise.reject(p16)
+							return Promise.reject(p6)
 						end)
 					end)
 				end
 			end,
-			Succeeded = v13.Succeeded,
-			Failed = v13.Failed
+			Succeeded = actionCreator.Succeeded,
+			Failed = actionCreator.Failed
 		}
 	end
 end

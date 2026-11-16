@@ -1,33 +1,53 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
-local React = require(Parent.React)
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local FetchGamePlayButtonData = require(Parent.GamePlayButton).FetchGamePlayButtonData
+local parent = script:FindFirstAncestor("GameDetail").Parent
 
-require(Parent.SduiSharedUtilities)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local Milestone = require(Parent.TimeToInteractiveTracker).TimeToInteractiveTracker.Milestone
+local GamePlayButton = require(parent.GamePlayButton)
+local FetchGamePlayButtonData = GamePlayButton.FetchGamePlayButtonData
 
-local function useEdpFunctionallyReadyLogger(p1, s1: string?) -- line: 16
-	-- upvalues: useSelector (copy), FetchGamePlayButtonData (copy), React (copy), Milestone (copy)
-	local v9 = useSelector(function(p2) -- line: 17
-		-- upvalues: s1 (copy), FetchGamePlayButtonData (copy)
-		if s1 then
-			return FetchGamePlayButtonData.IsLoading(p2, s1)
+require(parent.SduiSharedUtilities)
+local TimeToInteractiveTracker = require(parent.TimeToInteractiveTracker)
+local Milestone = TimeToInteractiveTracker.TimeToInteractiveTracker.Milestone
+
+local PageGate = require(parent.PageGate)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEDPTTIParityDefinitions = SharedFlags.FFlagEDPTTIParityDefinitions
+
+local function useEdpFunctionallyReadyLogger(p, p2: string?)
+	local v = useSelector(function(p3)
+		if p2 then
+			return FetchGamePlayButtonData.IsLoading(p3, p2)
 		end
 
 		return true
 	end)
+	local ref
 
-	React.useEffect(function() -- line: 24
-		-- upvalues: v9 (copy), s1 (copy), p1 (copy), Milestone (copy)
-		if not v9 and (s1 and p1.trackOnce) then
-			p1.trackOnce(Milestone.FunctionallyReady)
+	if PageGate.FFlagEnablePLTPrefetchCallbacks then
+		ref = React.useRef(false)
+	else
+		ref = nil
+	end
+
+	React.useEffect(function()
+		if not v and p2 and p.trackOnce then
+			p.trackOnce(Milestone.FunctionallyReady)
+
+			local markPlayButtonReady = FFlagEDPTTIParityDefinitions and p.markPlayButtonReady
+
+			if markPlayButtonReady then
+				markPlayButtonReady()
+			end
+
+			if PageGate.FFlagEnablePLTPrefetchCallbacks and ref and not ref.current then
+				ref.current = true
+				PageGate.signal(PageGate.Page.ExperienceDetail, PageGate.Milestone.FunctionallyReady)
+			end
 		end
-	end, {
-		v9,
-		s1,
-		p1
-	})
+	end, { v, p2, p })
 end
 
 return useEdpFunctionallyReadyLogger

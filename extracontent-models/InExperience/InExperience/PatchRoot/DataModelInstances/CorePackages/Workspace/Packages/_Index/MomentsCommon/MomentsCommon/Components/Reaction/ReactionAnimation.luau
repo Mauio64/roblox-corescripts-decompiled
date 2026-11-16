@@ -1,30 +1,35 @@
-return {
-	getDurationSeconds = function(t1: {[any]: any}) -- line: 22
-		return t1.frameCount / t1.fps
-	end,
-	getFrameIndex = function(t2: {[any]: any}, n1: number, b1: boolean) -- line: 26
-		local v5 = math.floor(n1 * t2.fps)
+local function getFrameStride(data) -- 1 equivalent call inferred from this helper
+	return data.stride or data.cellSize or data.frameSize + (data.padding or 0)
+end
 
-		if b1 then
-			return v5 % t2.frameCount + 1
-		end
+local ReactionAnimation = {}
 
-		return (math.min(v5 + 1, t2.frameCount))
-	end,
-	getFrameRect = function(t3: {[any]: any}, n2: number) -- line: 40
-		local v9 = math.clamp(n2, 1, t3.frameCount)
-		local v10 = v9 - 1
-		local v11 = v10 % t3.columns
-		local v12 = math.floor(v10 / t3.columns)
-		local v13 = t3.stride or (t3.cellSize or t3.frameSize + (t3.padding or 0))
+function ReactionAnimation.getDurationSeconds(p)
+	return p.frameCount / p.fps
+end
 
-		return {
-			frameIndex = v9,
-			offset = Vector2.new(v11 * v13, v12 * v13),
-			size = Vector2.new(t3.frameSize, t3.frameSize)
-		}
-	end,
-	getFrameStride = function(t4: {[any]: any}) -- line: 36
-		return t4.stride or (t4.cellSize or t4.frameSize + (t4.padding or 0))
+function ReactionAnimation.getFrameIndex(p, p2: number, flag: boolean)
+	local v = math.floor(p2 * p.fps)
+
+	if flag then
+		return v % p.frameCount + 1
 	end
-}
+
+	return (math.min(v + 1, p.frameCount))
+end
+
+function ReactionAnimation.getFrameRect(data, value: number)
+	local frameIndex = math.clamp(value, 1, data.frameCount)
+	local v = frameIndex - 1
+	local v2 = v % data.columns
+	local v3 = math.floor(v / data.columns)
+	local frameStride = getFrameStride(data) -- inferred equivalent call
+	return {
+		frameIndex = frameIndex,
+		offset = Vector2.new(v2 * frameStride, v3 * frameStride),
+		size = Vector2.new(data.frameSize, data.frameSize)
+	}
+end
+
+ReactionAnimation.getFrameStride = getFrameStride
+return ReactionAnimation

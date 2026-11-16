@@ -1,169 +1,248 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
-local Signals = require(BuildExperienceParent.Signals)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local useLocalization = Localization.Hooks.useLocalization
+
+local ExternalContentSharingProtocol = require(parent.ExternalContentSharingProtocol)
+local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
+local ChatPermissionsContext = require(BuildExperience.Chat.ChatPermissionsContext)
 require(BuildExperience.Chat.chatTypes)
-
+local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
 local FeedbackAction = require(BuildExperience.Components.MessageUtilities.FeedbackAction)
 local UserFeedback = require(BuildExperience.Components.MessageUtilities.UserFeedback)
 local feedbackIcons = require(BuildExperience.Components.MessageUtilities.feedbackIcons)
 local sendAgentTurnFeedback = require(BuildExperience.Components.MessageUtilities.sendAgentTurnFeedback)
+local AgentRollbackSnackbar = require(BuildExperience.Components.VersionHistory.AgentRollbackSnackbar)
 local RestoreVersionDialog = require(BuildExperience.Components.VersionHistory.RestoreVersionDialog)
-local GetPlaytestLoadingStore = require(BuildExperience.Stores.GetPlaytestLoadingStore)
-local Snackbar = require(BuildExperienceParent.Foundation).Snackbar
-local v14, v15 = Signals.createSignal(false)
-local t1 = {
-	get = v14,
-	set = v15
-}
-local t2 = {}
+local GetAgentRollbackRequestStore = require(BuildExperience.Stores.GetAgentRollbackRequestStore)
+local GetPlaytestLoadingStore = require(parent.BuildExperiencePlaytestLaunch.GetPlaytestLoadingStore)
 
-local function getRollbackInProgressSignal(n1: number?) -- line: 38
-	-- upvalues: t1 (copy), t2 (copy), Signals (copy)
-	if n1 == nil then
-		return t1
-	end
+local IconName = Foundation.Enums.IconName
+local FFlagEnableTeamTestLua = SharedFlags.FFlagEnableTeamTestLua
 
-	local v21 = t2[n1]
+local signal = Signals.createSignal(false)
 
-	if v21 == nil then
-		local v22, v23 = Signals.createSignal(false)
+local function useAgentMessageCopy(messageText: string?)
+	local state, setState = React.useState(false)
+	local ref = React.useRef(nil)
 
-		v21 = {
-			get = v22,
-			set = v23
-		}
-		t2[n1] = v21
-	end
-
-	return v21
-end
-local function AgentTurnFeedback(t3: {[any]: any}) -- line: 55
-	-- upvalues: React (copy), feedbackIcons (copy), t1 (copy), t2 (copy), Signals (copy), GetPlaytestLoadingStore (copy), SignalsReact (copy), LocalizationStrings (copy), FeedbackAction (copy), sendAgentTurnFeedback (copy), UserFeedback (copy), Snackbar (copy), RestoreVersionDialog (copy)
-	local turnFeedbackIds = t3.turnFeedbackIds
-	local v26, v27 = React.useState(false)
-	local v28, v29 = React.useState(nil)
-	local v30, v31 = React.useState("")
-	local v32 = if turnFeedbackIds == nil then nil else turnFeedbackIds.placeId
-	local v33 = if turnFeedbackIds == nil then nil else feedbackIcons.getRollbackTargetVersionNumber(turnFeedbackIds)
-	local v34 = React.useMemo(function() -- line: 65
-		-- upvalues: v32 (copy), t1 (copy), t2 (copy), Signals (copy)
-		local v43 = v32
-
-		if v43 == nil then
-			return t1
+	local v = React.useCallback(function()
+		if messageText ~= nil and messageText ~= "" then
+			default:setClipboardText({ context = "Build-AgentMessage", text = messageText })
 		end
 
-		local v44 = t2[v43]
+		setState(true)
 
-		if v44 == nil then
-			local v45, v46 = Signals.createSignal(false)
-
-			v44 = {
-				get = v45,
-				set = v46
-			}
-			t2[v43] = v44
+		if ref.current ~= nil then
+			task.cancel(ref.current)
 		end
 
-		return v44
-	end, { v32 })
-	local v35 = React.useCallback(function(p1) -- line: 68
-		-- upvalues: GetPlaytestLoadingStore (copy), v32 (copy)
-		local v48 = GetPlaytestLoadingStore(p1)
+		ref.current = task.delay(2, function()
+			ref.current = nil
+			setState(false)
+		end)
+	end, { messageText })
 
-		if v32 == nil then
-			return false
+	React.useEffect(function()
+		return function()
+			if ref.current ~= nil then
+				task.cancel(ref.current)
+			end
 		end
-
-		return v48.getAgentStatusForPlaceId(v32)(p1) == "Loading"
-	end, { v32 })
-	local v36 = SignalsReact.useSignalState(v35)
-	local v37 = SignalsReact.useSignalState(v34.get)
-	local v38 = React.useCallback(function() -- line: 77
-		-- upvalues: v31 (copy)
-		v31("")
 	end, {})
-	local v39 = React.useCallback(function() -- line: 81
-		-- upvalues: v34 (copy)
-		v34.set(true)
-	end, { v34 })
-	local v40 = React.useCallback(function() -- line: 84
-		-- upvalues: v34 (copy), v31 (copy), LocalizationStrings (copy)
-		v34.set(false)
-		v31(LocalizationStrings.CHAT_REVERT_SUCCESS)
-	end, { v34 })
-	local v41 = React.useCallback(function() -- line: 88
-		-- upvalues: v34 (copy), v31 (copy), LocalizationStrings (copy)
-		v34.set(false)
-		v31(LocalizationStrings.CHAT_REVERT_FAILURE)
-	end, { v34 })
-	local v42 = React.useCallback(function(p2) -- line: 92
-		-- upvalues: turnFeedbackIds (copy), FeedbackAction (copy), v27 (copy), v29 (copy), sendAgentTurnFeedback (copy)
+	local v2
+
+	if state then
+		v2 = IconName.CheckLarge
+	else
+		v2 = IconName.TwoStackedSquares
+	end
+
+	return v2, v
+end
+
+local function AgentTurnFeedback(props)
+	local isRatingDisabled
+
+	if FFlagBuildCheckGamePermissions then
+		local v = React.useContext(ChatPermissionsContext)
+
+		if v == nil then
+			isRatingDisabled = false
+		else
+			isRatingDisabled = not v.canEditOnBuild
+		end
+	else
+		isRatingDisabled = false
+	end
+
+	local turnFeedbackIds = props.turnFeedbackIds
+	local placeId
+
+	if turnFeedbackIds == nil then
+		placeId = nil
+	else
+		placeId = turnFeedbackIds.placeId
+	end
+
+	local v
+
+	if turnFeedbackIds ~= nil then
+		v = feedbackIcons.getRollbackTargetVersionNumber(turnFeedbackIds)
+	end
+
+	local v2 = React.useContext(Localization.LocalizationRoactContext)
+	local v3 = useLocalization({
+		revertConfirmationTitle = LocalizationStrings.CHAT_REVERT_CONFIRMATION_TITLE,
+		revertConfirmationDescription = LocalizationStrings.CHAT_REVERT_CONFIRMATION_DESCRIPTION,
+		revertFailure = LocalizationStrings.CHAT_REVERT_FAILURE
+	})
+
+	local revertFailure = v3.revertFailure
+	local title = v3.revertConfirmationTitle
+	local description = v3.revertConfirmationDescription
+
+	if v ~= nil then
+		local v4
+
+		if v < 10 then
+			v4 = LocalizationStrings.VERSION_HISTORY_VERSION_PADDED
+		else
+			v4 = LocalizationStrings.VERSION_HISTORY_VERSION_COMPACT
+		end
+
+		local formatted = v2:Format(v4, { VERSION_NUMBER = v })
+
+		if FFlagEnableTeamTestLua then
+			description = v2:Format(LocalizationStrings.CHAT_REVERT_TO_VERSION, {
+				VERSION = formatted
+			})
+		else
+			title = formatted
+		end
+	end
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
+
+	local state3, setState3 = React.useState(nil)
+	local state4, setState4 = React.useState("")
+
+	local copyIconName, v4 = useAgentMessageCopy(props.messageText)
+	local v5 = React.useCallback(function(p): boolean
+		local playtestLoadingStore = GetPlaytestLoadingStore(p)
+
+		return placeId ~= nil and playtestLoadingStore.getAgentStatusForPlaceId(placeId)(p) == "Loading"
+	end, { placeId })
+	local v6 = SignalsReact.useSignalState(v5)
+	local v7
+
+	if placeId == nil then
+		v7 = signal
+	else
+		v7 = GetAgentRollbackRequestStore(false).getIsPendingForPlaceId(placeId)
+	end
+
+	local v8 = SignalsReact.useSignalState(v7)
+	local onClose = React.useCallback(function()
+		setState4("")
+	end, {})
+	local onActivated = React.useCallback(function(p)
 		if turnFeedbackIds == nil then
 			return
 		end
 
-		if p2.action == FeedbackAction.REVERT then
-			v27(true)
-
+		if p.action == FeedbackAction.REVERT then
+			setState(true)
 			return
 		end
 
-		v29(p2.action)
-		sendAgentTurnFeedback(p2.action, turnFeedbackIds)
-	end, { turnFeedbackIds })
+		if p.action == FeedbackAction.COPY then
+			v4()
+		else
+			setState3(p.action)
+		end
+
+		sendAgentTurnFeedback(p.action, turnFeedbackIds)
+	end, { turnFeedbackIds, v4 })
 
 	if turnFeedbackIds == nil or turnFeedbackIds.sequenceId == nil then
 		return nil
 	end
 
-	return React.createElement(React.Fragment, nil, {
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v9 = {
 		Feedback = React.createElement(UserFeedback, {
-			layoutOrder = t3.LayoutOrder,
+			layoutOrder = props.LayoutOrder,
 			icons = feedbackIcons.getFeedbackIcons({
+				includeCopy = props.messageText ~= nil and props.messageText ~= "",
+				copyIconName = copyIconName,
+				copyTestId = `{props.testId}-copy`,
 				includeRevert = feedbackIcons.canRevert(turnFeedbackIds),
-				isRevertDisabled = v36 or v37
+				isRevertDisabled = v6 or v8 or isRatingDisabled,
+				isRatingDisabled = isRatingDisabled
 			}),
-			onActivated = v42,
-			selectedAction = v28,
-			testId = t3.testId
+			onActivated = onActivated,
+			selectedAction = state3,
+			testId = props.testId
 		}),
-		RevertSnackbar = if v30 == "" then nil else React.createElement(Snackbar, {
-			LayoutOrder = (t3.LayoutOrder or 0) + 1,
-			title = v30,
-			onClose = v38,
-			testId = `{ t3.testId }.revert-snackbar`
-		}),
-		RevertDialog = if not v26 or v33 == nil then nil else React.createElement(RestoreVersionDialog, {
-			isOpen = true,
-			title = LocalizationStrings.formatVersionHistoryVersionNumber(v33),
-			description = LocalizationStrings.CHAT_REVERT_CONFIRMATION_DESCRIPTION,
-			onRestore = function() -- line: 134
-				-- upvalues: v27 (copy), v35 (copy), v34 (copy), v29 (copy), FeedbackAction (copy), sendAgentTurnFeedback (copy), turnFeedbackIds (copy), feedbackIcons (copy), v39 (copy), v40 (copy), v41 (copy)
-				v27(false)
+		RevertSnackbar = 0,
+		RevertDialog = 0
+	}
+	local revertSnackbar
 
-				if v35(false) or v34.get(false) then
+	if state4 ~= "" then
+		revertSnackbar = React.createElement(AgentRollbackSnackbar, {
+			title = state4,
+			onClose = onClose
+		})
+	end
+
+	v9.RevertSnackbar = revertSnackbar
+	local revertDialog
+
+	if state and v ~= nil then
+		revertDialog = React.createElement(RestoreVersionDialog, {
+			isOpen = true,
+			isLoading = state2,
+			title = title,
+			description = description,
+			onRestore = function()
+				if v5(false) or v7(false) then
 					return
 				end
 
-				v29(FeedbackAction.REVERT)
+				setState3(FeedbackAction.REVERT)
 				sendAgentTurnFeedback(FeedbackAction.REVERT, turnFeedbackIds)
-				feedbackIcons.rollbackPublishedVersion(turnFeedbackIds, {
-					onRevertStart = v39,
-					onRevertSuccess = v40,
-					onRevertFailure = v41
-				})
+				setState2(true)
+
+				setState4("")
+
+				feedbackIcons.requestAgentRollback(turnFeedbackIds):andThen(function()
+					setState2(false)
+					setState(false)
+				end):catch(function()
+					setState2(false)
+					setState4(revertFailure)
+				end)
 			end,
-			onCancel = function() -- line: 147
-				-- upvalues: v27 (copy)
-				v27(false)
+			onCancel = function()
+				setState(false)
 			end
 		})
-	})
+	end
+
+	v9.RevertDialog = revertDialog
+	return createElement(fragment, nil, v9)
 end
 
 return AgentTurnFeedback

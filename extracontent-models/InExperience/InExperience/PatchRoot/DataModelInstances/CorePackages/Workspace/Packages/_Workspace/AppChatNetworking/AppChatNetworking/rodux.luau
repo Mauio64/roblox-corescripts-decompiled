@@ -1,7 +1,6 @@
 return {
 	AddUserToConversation = require(script.AddUserToConversation),
 	ClearGlobalUnreadCount = require(script.ClearGlobalUnreadCount),
-	CreateChatAbuseReport = require(script.CreateChatAbuseReport),
 	CreateConversation = require(script.CreateConversation),
 	DuplicateConversation = require(script.DuplicateConversation),
 	ExpandToGroupConversation = require(script.ExpandToGroupConversation),
@@ -18,7 +17,6 @@ return {
 	UpdateConversationTitle = require(script.UpdateConversationTitle),
 	UpdateTypingStatus = require(script.UpdateTypingStatus),
 	GetChatLandingModal = require(script.GetChatLandingModal),
-	GetConversationTopModal = require(script.GetConversationTopModal),
 	GetPendingStateModal = require(script.GetPendingStateModal),
 	RecordModalSequenceResponse = require(script.RecordModalSequenceResponse),
 	GetChatModerationStatuses = require(script.GetChatModerationStatuses),

@@ -4,53 +4,72 @@ local RobloxSubscriptionOverlayController = require(RobloxSubscriptionPurchaseAp
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
 local SurfaceContext = require(RobloxSubscriptionPurchaseApp.Enums.SurfaceContext)
 local SurfaceName = require(RobloxSubscriptionPurchaseApp.Enums.SurfaceName)
-
 require(RobloxSubscriptionPurchaseApp.types)
+local parent = RobloxSubscriptionPurchaseApp.Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnablePlusReferralLandingSheet = SharedFlags.FFlagEnablePlusReferralLandingSheet
 
-local FFlagRobloxPlusFAEFreeTrial = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusFAEFreeTrial)
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnablePlusReferralEntrypointTelemetry = SharedFlags2.FFlagEnablePlusReferralEntrypointTelemetry
 
-local function initiateRobloxSubscriptionPurchase(p1, p2, n1: number?, p3, p4, p5, p6) -- line: 18
-	-- upvalues: RobloxSubscriptionStore (copy), FFlagRobloxPlusFAEFreeTrial (copy), SurfaceContext (copy), SurfaceName (copy), initiateRobloxSubscriptionPurchaseInternal (copy), RobloxSubscriptionOverlayController (copy)
-	local v16 = RobloxSubscriptionStore.get()
+local function initiateRobloxSubscriptionPurchase(p, data, universeId: number?, p2, p3, p4, p5, p6: number?)
+	local v = RobloxSubscriptionStore.get()
 
-	if p2 then
-		if p2.onFlowComplete then
-			v16.setOnFlowComplete(p2.onFlowComplete)
+	if data then
+		if data.onFlowComplete then
+			v.setOnFlowComplete(data.onFlowComplete)
 		end
 
-		if p2.onBackButtonActivated then
-			v16.setOnBackButtonActivated(p2.onBackButtonActivated)
+		if data.onBackButtonActivated then
+			v.setOnBackButtonActivated(data.onBackButtonActivated)
 		end
 
-		if FFlagRobloxPlusFAEFreeTrial and p2.onCtaOverride then
-			v16.setOnCtaOverride(p2.onCtaOverride)
+		if data.onCtaOverride then
+			v.setOnCtaOverride(data.onCtaOverride)
 		end
 	end
 
-	if p1 then
-		v16.setPurchaseUIOptions(p1)
+	if p then
+		v.setPurchaseUIOptions(p)
 	end
+
+	if p4 then
+		v.setPurchaseFlowOptions(p4)
+	end
+
+	if FFlagEnablePlusReferralLandingSheet then
+		v.setReferrerId(p6)
+	end
+
+	local metadata = {}
+
+	if universeId ~= nil then
+		metadata.universeId = universeId
+	end
+
+	local clientSessionId
 
 	if p5 then
-		v16.setPurchaseFlowOptions(p5)
+		clientSessionId = p5.clientSessionId
 	end
 
-	local t1 = {}
+	local entrypoint
 
-	if n1 ~= nil then
-		t1.universeId = n1
+	if FFlagEnablePlusReferralEntrypointTelemetry and p5 then
+		entrypoint = p5.entrypoint
 	end
 
-	local v18 = if not p6 then nil else p6.clientSessionId
-	local t2 = {
-		context = p4 or SurfaceContext.Unspecified,
-		surfaceName = p3 or SurfaceName.Unspecified,
-		metadata = t1,
-		clientSessionId = v18
+	local v2 = {
+		context = p3 or SurfaceContext.Unspecified,
+		surfaceName = p2 or SurfaceName.Unspecified,
+		metadata = metadata,
+		clientSessionId = clientSessionId,
+		entrypoint = entrypoint
 	}
 
-	v16.setEntryContext(t2)
-	initiateRobloxSubscriptionPurchaseInternal(t2)
+	v.setEntryContext(v2)
+
+	initiateRobloxSubscriptionPurchaseInternal(v2)
 
 	return RobloxSubscriptionOverlayController.render()
 end

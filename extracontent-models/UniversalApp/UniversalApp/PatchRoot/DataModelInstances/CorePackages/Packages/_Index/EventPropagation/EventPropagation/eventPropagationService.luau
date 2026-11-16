@@ -1,227 +1,294 @@
-local ParentParent = script.Parent.Parent
-local FocusNavigationUtils = require(ParentParent.FocusNavigationUtils)
+local parent = script.Parent.Parent
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local getAncestors = FocusNavigationUtils.getAncestors
 local mockableWarn = FocusNavigationUtils.mockableWarn
+
 local eventPropagationEvent = require(script.Parent.eventPropagationEvent)
+
 local __DEBUG_EVENT_PROPAGATION__ = _G.__DEBUG_EVENT_PROPAGATION__
 
-local function describeFunction(p1: ((...any) -> ...any)) -- line: 113
-	return table.concat(table.pack(debug.info(p1, "sln")), " ")
+local function describeFunction(callback)
+	return table.concat(table.pack(debug.info(callback, "sln")), " ")
 end
-local function getEventsFromRegistry(t1: {[any]: any}, p2) -- line: 117
-	return t1[p2]
+
+local function getEventsFromRegistry(p, p2)
+	return p[p2]
 end
-local function getEventPhasesFromRegistry(t2: {[any]: any}, p3, s1: string) -- line: 121
-	local v18 = t2[p3]
 
-	if v18 then
-		return v18[s1]
-	end
+local function getEventPhasesFromRegistry(p, p2, p3: string)
+	local v = p[p2]
 
-	return nil
-end
-local function getEventHandler(t3: {[any]: any}, p4, s2: string, p5) -- line: 130
-	local v23 = t3[p4]
-	local v24 = if not v23 then nil else v23[s2]
-
-	if v24 ~= nil then
-		return v24[p5]
+	if v then
+		return v[p3]
 	end
 
 	return nil
 end
 
-local t4 = {}
+local function getEventHandler(p, p2, p3: string, p4)
+	local v = p[p2]
+	local v2
 
-t4.__index = t4
+	if v then
+		v2 = v[p3]
+	end
 
-function t4.registerEventHandler(t5: {[any]: any}, p6, s3: string, p7: ((...any) -> ...any), p8) -- line: 143
-	-- upvalues: __DEBUG_EVENT_PROPAGATION__ (copy), mockableWarn (copy), describeFunction (copy)
+	if v2 == nil then
+		return nil
+	end
+
+	return v2[p4]
+end
+
+local EventPropagationService = {}
+EventPropagationService.__index = EventPropagationService
+
+function EventPropagationService:registerEventHandler(p, p2: string, callback, value)
 	if __DEBUG_EVENT_PROPAGATION__ then
-		print("+++ register handler", s3, tostring(p6), p8 or "Bubble")
+		print("+++ register handler", p2, tostring(p), value or "Bubble")
 	end
 
-	local v30 = p8 or "Bubble"
+	local v = value or "Bubble"
+	self.eventHandlerRegistry[p] = self.eventHandlerRegistry[p] or {}
+	self.eventHandlerRegistry[p][p2] = self.eventHandlerRegistry[p][p2] or {}
+	local v2 = _G.__DEV__ and self.eventHandlerRegistry[p][p2][v]
 
-	t5.eventHandlerRegistry[p6] = t5.eventHandlerRegistry[p6] or {}
-	t5.eventHandlerRegistry[p6][s3] = t5.eventHandlerRegistry[p6][s3] or {}
-
-	if _G.__DEV__ then
-		local v31 = t5.eventHandlerRegistry[p6][s3][v30]
-
-		if v31 then
-			mockableWarn(string.format("New handler bound to the %s phase of '%s' will override an existing handler:\n\tprevious handler: %s\n\t     new handler: %s", v30, s3, table.concat(table.pack(debug.info(p7, "sln")), " "), describeFunction(v31)))
-		end
+	if v2 then
+		mockableWarn(string.format(
+			"New handler bound to the %s phase of '%s' will override an existing handler:\n\tprevious handler: %s\n\t     new handler: %s",
+			v,
+			p2,
+			table.concat(table.pack(debug.info(callback, "sln")), " "),
+			describeFunction(v2)
+		))
 	end
 
-	t5.eventHandlerRegistry[p6][s3][v30] = p7
+	self.eventHandlerRegistry[p][p2][v] = callback
 end
-function t4.registerEventHandlers(t6: {[any]: any}, p9, t7: {[any]: any}) -- line: 174
-	if not t6.eventHandlerRegistry[p9] then
-		t6.eventHandlerRegistry[p9] = {}
+
+function EventPropagationService:registerEventHandlers(p, items)
+	if not self.eventHandlerRegistry[p] then
+		self.eventHandlerRegistry[p] = {}
 	end
 
-	for v35, v36 in t7 do
-		t6:registerEventHandler(p9, v35, v36.handler, v36.phase)
+	for k, item in items do
+		self:registerEventHandler(p, k, item.handler, item.phase)
 	end
 end
-function t4.deregisterEventHandlers(t8: {[any]: any}, p10, t9: {[any]: any}) -- line: 183
-	if not t8.eventHandlerRegistry[p10] then
+
+function EventPropagationService:deregisterEventHandlers(p, items)
+	if not self.eventHandlerRegistry[p] then
 		return
 	end
 
-	for v40, v41 in t9 do
-		t8:deregisterEventHandler(p10, v40, v41.handler, v41.phase)
+	for k, item in items do
+		self:deregisterEventHandler(p, k, item.handler, item.phase)
 	end
 end
-function t4.deregisterEventHandler(t10: {[any]: any}, p11, s4: string, p12: ((...any) -> ...any), p13) -- line: 192
-	-- upvalues: __DEBUG_EVENT_PROPAGATION__ (copy), mockableWarn (copy)
+
+function EventPropagationService:deregisterEventHandler(p, p2: string, callback, value)
 	if __DEBUG_EVENT_PROPAGATION__ then
-		print("--- deregister handler", s4, tostring(p11), p13 or "Bubble")
+		print("--- deregister handler", p2, tostring(p), value or "Bubble")
 	end
 
-	local v47 = p13 or "Bubble"
-	local v48 = t10.eventHandlerRegistry[p11]
-	local v49 = if not v48 then nil else v48[s4]
+	local v = value or "Bubble"
+	local eventHandler = self.eventHandlerRegistry[p]
+	local v2
 
-	if v49 and v49[v47] then
+	if eventHandler then
+		v2 = eventHandler[p2]
+	end
+
+	if v2 and v2[v] then
 		if _G.__DEV__ then
-			local v50 = v49[v47]
+			local v3 = v2[v]
 
-			if v50 ~= p12 then
-				mockableWarn(string.format("Deregistering non-matching event handler bound to the %s phase of '%s':\n\tprevious handler: %s\n\t     new handler: %s", v47, s4, if type(p12) ~= "function" then tostring(p12) else table.concat(table.pack(debug.info(p12, "sln")), " "), if type(v50) ~= "function" then tostring(v50) else table.concat(table.pack(debug.info(v50, "sln")), " ")))
+			if v3 ~= callback then
+				local v4
+
+				if type(callback) == "function" then
+					v4 = table.concat(table.pack(debug.info(callback, "sln")), " ")
+				else
+					v4 = tostring(callback)
+				end
+
+				local v5
+
+				if type(v3) == "function" then
+					v5 = table.concat(table.pack(debug.info(v3, "sln")), " ")
+				else
+					v5 = tostring(v3)
+				end
+
+				mockableWarn(string.format(
+					"Deregistering non-matching event handler bound to the %s phase of '%s':\n\tprevious handler: %s\n\t     new handler: %s",
+					v,
+					p2,
+					v4,
+					v5
+				))
 			end
 		end
 
-		v49[v47] = nil
-
-		return
-	end
-
-	if _G.__DEV__ then
-		mockableWarn(string.format("Cannot deregister unregistered event handler bound to the %s phase of '%s'", v47, s4))
+		v2[v] = nil
+	elseif _G.__DEV__ then
+		mockableWarn(string.format("Cannot deregister unregistered event handler bound to the %s phase of '%s'", v, p2))
 	end
 end
-function t4.getRegisteredEventHandlers(t11: {[any]: any}, p14) -- line: 233
-	local v53 = t11.eventHandlerRegistry[p14]
 
-	if v53 then
-		local t12 = {}
+function EventPropagationService.getRegisteredEventHandlers(p, p2)
+	local eventHandler = p.eventHandlerRegistry[p2]
 
-		for v55, v56 in v53 do
-			t12[v55] = next(v56) ~= nil
-		end
-
-		return t12
+	if not eventHandler then
+		return nil
 	end
 
-	return nil
+	local result = {}
+
+	for k, v in eventHandler do
+		result[k] = next(v) ~= nil
+	end
+
+	return result
 end
-function t4.propagateEvent(t13: {[any]: any}, p15, s5: string, p16, t14: {[any]: any}?) -- line: 247
-	-- upvalues: eventPropagationEvent (copy), getAncestors (copy), __DEBUG_EVENT_PROPAGATION__ (copy)
-	local v62 = t14 or {}
-	local v63 = v62.synthetic or false
 
-	local function runEventHandler(p17, p18) -- line: 257
-		-- upvalues: t13 (copy), s5 (copy), eventPropagationEvent (copy), p15 (copy), v63 (copy), p16 (copy)
-		local eventHandlerRegistry = t13.eventHandlerRegistry
-		local v89 = s5
-		local v90 = eventHandlerRegistry[p17]
-		local v91 = if not v90 then nil else v90[v89]
-		local v92 = if v91 == nil then nil else v91[p18]
+function EventPropagationService.propagateEvent(p, p2, p3: string, p4, options)
+	local v = options or {}
+	local synthetic = v.synthetic or false
 
-		if v92 then
-			local v93 = eventPropagationEvent.new(p15, p17, s5, p18, v63, p16)
+	local function runEventHandler(p5, p6)
+		local v2 = p3
+		local eventHandler = p.eventHandlerRegistry[p5]
+		local v3
 
-			v92(v93)
-
-			return v93.cancelled
+		if eventHandler then
+			v3 = eventHandler[v2]
 		end
 
-		return false
+		local v4
+
+		if v3 ~= nil then
+			v4 = v3[p6]
+		end
+
+		if not v4 then
+			return false
+		end
+
+		local v5 = eventPropagationEvent.new(p2, p5, p3, p6, synthetic, p4)
+		v4(v5)
+
+		return v5.cancelled
 	end
 
-	local v65 = if not (v62.silent or false) then getAncestors(p15) else { p15 }
+	local v2 = v.silent and { p2 } or getAncestors(p2)
 
 	if __DEBUG_EVENT_PROPAGATION__ then
-		print(">>> capture event", s5, "for", (tostring(p15)))
+		print(">>> capture event", p3, "for", (tostring(p2)))
 	end
 
-	for i = #v65, 1, -1 do
-		local v67 = v65[i]
-		local v68 = t13.eventHandlerRegistry[v67]
-		local v69 = if not v68 then nil else v68[s5]
-		local v70 = if v69 == nil then nil else v69.Capture
-		local cancelled
+	for i = #v2, 1, -1 do
+		local v3 = v2[i]
+		local eventHandler = p.eventHandlerRegistry[v3]
+		local v4
 
-		if v70 then
-			local v71 = eventPropagationEvent.new(p15, v67, s5, "Capture", v63, p16)
-
-			v70(v71)
-			cancelled = v71.cancelled
-		else
-			cancelled = false
+		if eventHandler then
+			v4 = eventHandler[p3]
 		end
 
-		if cancelled then
+		local capture
+
+		if v4 ~= nil then
+			capture = v4.Capture
+		end
+
+		local v5
+
+		if capture then
+			local v6 = eventPropagationEvent.new(p2, v3, p3, "Capture", synthetic, p4)
+			capture(v6)
+
+			v5 = v6.cancelled
+		else
+			v5 = false
+		end
+
+		if v5 then
 			return
 		end
 	end
 
-	local v73 = t13.eventHandlerRegistry[p15]
-	local v74 = if not v73 then nil else v73[s5]
-	local v75 = if v74 == nil then nil else v74.Target
-	local cancelled
+	local eventHandler = p.eventHandlerRegistry[p2]
+	local v3
 
-	if v75 then
-		local v76 = eventPropagationEvent.new(p15, p15, s5, "Target", v63, p16)
+	if eventHandler then
+		v3 = eventHandler[p3]
+	end
 
-		v75(v76)
-		cancelled = v76.cancelled
+	local target
+
+	if v3 ~= nil then
+		target = v3.Target
+	end
+
+	local v4
+
+	if target then
+		local v5 = eventPropagationEvent.new(p2, p2, p3, "Target", synthetic, p4)
+		target(v5)
+
+		v4 = v5.cancelled
 	else
-		cancelled = false
+		v4 = false
 	end
 
-	if cancelled then
+	if v4 then
 		return
 	end
 
 	if __DEBUG_EVENT_PROPAGATION__ then
-		print("<<< bubble event", s5, "from", (tostring(p15)))
+		print("<<< bubble event", p3, "from", (tostring(p2)))
 	end
 
-	for i = 1, #v65 do
-		local v79 = v65[i]
-		local v80 = t13.eventHandlerRegistry[v79]
-		local v81 = if not v80 then nil else v80[s5]
-		local v82 = if v81 == nil then nil else v81.Bubble
-		local cancelled2
+	for i = 1, #v2 do
+		local v5 = v2[i]
+		local eventHandler2 = p.eventHandlerRegistry[v5]
+		local v6
 
-		if v82 then
-			local v83 = eventPropagationEvent.new(p15, v79, s5, "Bubble", v63, p16)
-
-			v82(v83)
-			cancelled2 = v83.cancelled
-		else
-			cancelled2 = false
+		if eventHandler2 then
+			v6 = eventHandler2[p3]
 		end
 
-		if cancelled2 then
-			return
+		local bubble
+
+		if v6 ~= nil then
+			bubble = v6.Bubble
+		end
+
+		local v7
+
+		if bubble then
+			local v8 = eventPropagationEvent.new(p2, v5, p3, "Bubble", synthetic, p4)
+			bubble(v8)
+
+			v7 = v8.cancelled
+		else
+			v7 = false
+		end
+
+		if v7 then
+			break
 		end
 	end
 end
-function t4.new() -- line: 304
-	-- upvalues: t4 (copy)
-	local t15 = {
-		eventHandlerRegistry = setmetatable({}, {
-			__mode = "k"
-		})
+
+function EventPropagationService.new()
+	local v = {
+		eventHandlerRegistry = setmetatable({}, { __mode = "k" })
 	}
 
-	setmetatable(t15, t4)
-
-	return t15
+	setmetatable(v, EventPropagationService)
+	return v
 end
 
-return t4
+return EventPropagationService

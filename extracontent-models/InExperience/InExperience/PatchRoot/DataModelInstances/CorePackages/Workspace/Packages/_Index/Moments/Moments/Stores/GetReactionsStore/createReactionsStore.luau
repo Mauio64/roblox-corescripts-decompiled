@@ -1,231 +1,294 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local Signals = require(MomentsParent.Signals)
-local Cryo = require(MomentsParent.Cryo)
+local parent = Moments.Parent
 
-require(MomentsParent.DataHydration.MomentsStoreTypes)
+local Signals = require(parent.Signals)
+local Cryo = require(parent.Cryo)
+local Dash = require(parent.Dash)
+local debounce = Dash.debounce
 
-local MomentsTypes = require(MomentsParent.MomentsTypes)
+require(parent.DataHydration.MomentsStoreTypes)
+local MomentsTypes = require(parent.MomentsTypes)
 local ReactionAction = require(Moments.Enums.ReactionAction)
-local MomentsGetMomentsReactionsStore = require(MomentsParent.DataHydration.MomentsGetMomentsReactionsStore)
-local MomentsResolveEmoteId = require(MomentsParent.DataHydration.MomentsResolveEmoteId)
+local MomentsGetMomentsReactionsStore = require(parent.DataHydration.MomentsGetMomentsReactionsStore)
+local MomentsResolveEmoteId = require(parent.DataHydration.MomentsResolveEmoteId)
 local FFlagMomentsReactToFeedItemV2 = require(Moments.Flags.FFlagMomentsReactToFeedItemV2)
+
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
 local ReactionType = MomentsTypes.Enums.ReactionType
-local t1 = {}
 
-local function createReactionsStore(t2: {[any]: any}?) -- line: 47
-	-- upvalues: MomentsGetMomentsReactionsStore (copy), createSignal (copy), t1 (copy), createComputed (copy), ReactionType (copy), Cryo (copy), ReactionAction (copy), MomentsResolveEmoteId (copy), FFlagMomentsReactToFeedItemV2 (copy)
-	local v16 = t2 or {}
-	local v17 = if v16.momentsReactionsStore == nil then MomentsGetMomentsReactionsStore(false) else v16.momentsReactionsStore
-	local v18, v19 = createSignal({})
-	local t3 = {}
-	local t4 = {}
-	local t5 = {}
-	local t6 = {}
+local v = {}
 
-	local function updateReaction(p1) -- line: 162
-		-- upvalues: v18 (copy), ReactionAction (copy), Cryo (copy), v19 (copy)
-		local action = p1.action
-		local reaction = p1.reaction
-		local momentId = p1.momentId
-		local v46 = v18(false)
-		local v47 = v46[momentId] or {}
-		local userReaction = v47.userReaction
+local function createReactionsStore(options)
+	local v2 = options or {}
+	local v3
+
+	if v2.momentsReactionsStore == nil then
+		v3 = MomentsGetMomentsReactionsStore(false)
+	else
+		v3 = v2.momentsReactionsStore
+	end
+
+	local debounce2 = v2.debounce or debounce
+
+	local signal, v4 = createSignal({})
+	local v5 = {}
+	local v6 = {}
+	local v7 = {}
+	local v8 = {}
+
+	local v9 = {}
+	local v10 = {}
+
+	local count = 0
+
+	local function getReactions(p: string, p2) -- 4 equivalent calls inferred from this helper
+		return signal(p2 or false)[p] or v
+	end
+
+	local function updateReaction(data)
+		local action = data.action
+		local reaction = data.reaction
+		local momentId = data.momentId
+
+		local v11 = signal(false)
+		local joined = v11[momentId] or {}
+		local userReaction = joined.userReaction
 
 		if action == ReactionAction.Unreact and userReaction then
-			v47 = Cryo.Dictionary.join(v47, {
-				[userReaction] = math.max((v47[userReaction] or 0) - 1, 0),
+			joined = Cryo.Dictionary.join(joined, {
+				[userReaction] = math.max((joined[userReaction] or 0) - 1, 0),
 				userReaction = Cryo.None
 			})
 		end
 
 		if action == ReactionAction.Switch and userReaction and reaction ~= nil then
-			v47 = Cryo.Dictionary.join(v47, {
-				[userReaction] = math.max((v47[userReaction] or 0) - 1, 0),
-				[reaction] = math.max((v47[reaction] or 0) + 1, 1),
+			joined = Cryo.Dictionary.join(joined, {
+				[userReaction] = math.max((joined[userReaction] or 0) - 1, 0),
+				[reaction] = math.max((joined[reaction] or 0) + 1, 1),
 				userReaction = reaction
 			})
 		end
 
 		if action == ReactionAction.React and not userReaction and reaction ~= nil then
-			v47 = Cryo.Dictionary.join(v47, {
-				[reaction] = math.max((v47[reaction] or 0) + 1, 1),
+			joined = Cryo.Dictionary.join(joined, {
+				[reaction] = math.max((joined[reaction] or 0) + 1, 1),
 				userReaction = reaction
 			})
 		end
 
-		v19((Cryo.Dictionary.union(v46, {
-			[momentId] = v47
-		})))
+		v4((Cryo.Dictionary.union(v11, { [momentId] = joined })))
 	end
-	local function postReactToFeedItemV2(p2) -- line: 198
-		-- upvalues: v17 (copy), MomentsResolveEmoteId (copy)
-		local v50 = if v17.getEmojis == nil then {} else v17.getEmojis(false)
-		local reactToFeedItemV2 = v17.reactToFeedItemV2
 
+	local function postReactToFeedItemV2(data)
+		local v11 = v3.getEmojis == nil and {} or v3.getEmojis(false)
+		local reactToFeedItemV2 = v3.reactToFeedItemV2
 		assert(reactToFeedItemV2 ~= nil, "expected reactToFeedItemV2 when FFlagMomentsReactToFeedItemV2 is on")
-
 		return reactToFeedItemV2({
-			feedItemId = p2.feedItemId,
-			reactionType = p2.reactionType,
-			emoteId = MomentsResolveEmoteId.resolveEmoteIdForReaction(v50, p2.reactionType),
-			feedSessionId = p2.feedSessionId
+			feedItemId = data.feedItemId,
+			reactionType = data.reactionType,
+			emoteId = MomentsResolveEmoteId.resolveEmoteIdForReaction(v11, data.reactionType),
+			feedSessionId = data.feedSessionId
 		})
 	end
 
+	local function postReactionRequest(p) -- 1 equivalent call inferred from this helper
+		if FFlagMomentsReactToFeedItemV2 then
+			return postReactToFeedItemV2(p)
+		end
+
+		return v3.reactToFeedItem(p)
+	end
+
+	local function flushSync(entityId: string, feedItemId: string, entityType: string, feedSessionId: string?)
+		local v11 = v9[entityId]
+		local reactionType
+
+		if v11 ~= nil then
+			reactionType = v11.reaction
+		end
+
+		local userReaction = (signal(false)[entityId] or v).userReaction
+
+		if userReaction == reactionType then
+			return
+		end
+
+		if userReaction ~= nil then
+			reactionType = userReaction
+		end
+
+		v9[entityId] = { reaction = userReaction }
+
+		local v12 = postReactionRequest({ -- inferred equivalent call
+			feedItemId = feedItemId,
+			entityType = entityType,
+			entityId = entityId,
+			reactionType = reactionType,
+			feedSessionId = feedSessionId
+		})
+
+		if type(v12) == "table" and v12.catch ~= nil then
+			v12:catch(function() end)
+		end
+	end
+
+	local function seedSyncBaseline(entityId: string) -- 2 equivalent calls inferred from this helper
+		if v9[entityId] == nil then
+			v9[entityId] = {
+				reaction = (signal(false)[entityId] or v).userReaction
+			}
+		end
+	end
+
+	local function scheduleSync(data) -- 2 equivalent calls inferred from this helper
+		local entityId = data.entityId
+		local v11 = v10[entityId]
+
+		if v11 == nil then
+			local v12 = count
+			v11 = debounce2(function(feedItemId: string, entityType: string, feedSessionId: string?)
+				if v12 ~= count then
+					return
+				end
+
+				flushSync(entityId, feedItemId, entityType, feedSessionId)
+			end, 0.5)
+			v10[entityId] = v11
+		end
+
+		v11(data.feedItemId, data.entityType, data.feedSessionId)
+	end
+
 	return {
-		getReactionsByMomentId = v18,
-		getReactions = function(s1: string, p3) -- line: 59
-			-- upvalues: v18 (copy), t1 (copy)
-			return v18(p3 or false)[s1] or t1
-		end,
-		getReactionsForMoment = function(s2: string) -- line: 63
-			-- upvalues: t3 (copy), createComputed (copy), v18 (copy), t1 (copy)
-			if t3[s2] == nil then
-				t3[s2] = createComputed(function(p4) -- line: 65
-					-- upvalues: s2 (copy), v18 (copy), t1 (copy)
-					local v57 = s2
-
-					return v18(p4 or false)[v57] or t1
+		getReactionsByMomentId = signal,
+		getReactions = getReactions,
+		getReactionsForMoment = function(p: string)
+			if v5[p] == nil then
+				v5[p] = createComputed(function(p2)
+					return getReactions(p, p2) -- inferred equivalent call
 				end)
 			end
 
-			return t3[s2]
+			return v5[p]
 		end,
-		getUserReactionForMoment = function(s3: string) -- line: 72
-			-- upvalues: t4 (copy), createComputed (copy), v18 (copy), t1 (copy)
-			if t4[s3] == nil then
-				t4[s3] = createComputed(function(p5) -- line: 75
-					-- upvalues: s3 (copy), v18 (copy), t1 (copy)
-					local v59 = s3
-
-					return (v18(p5 or false)[v59] or t1).userReaction
+		getUserReactionForMoment = function(p: string)
+			if v6[p] == nil then
+				v6[p] = createComputed(function(p2)
+					return getReactions(p, p2).userReaction -- inferred equivalent call
 				end)
 			end
 
-			return t4[s3]
+			return v6[p]
 		end,
-		getTotalReactionCountForMoment = function(s4: string) -- line: 83
-			-- upvalues: t5 (copy), createComputed (copy), v18 (copy), t1 (copy), ReactionType (copy)
-			if t5[s4] == nil then
-				t5[s4] = createComputed(function(p6) -- line: 85
-					-- upvalues: s4 (copy), v18 (copy), t1 (copy), ReactionType (copy)
-					local n1 = 0
-					local v62 = s4
-					local v63 = v18(p6 or false)[v62] or t1
+		getTotalReactionCountForMoment = function(p: string)
+			if v7[p] == nil then
+				v7[p] = createComputed(function(p2)
+					local reactions = getReactions(p, p2) -- inferred equivalent call
+					local total = 0
 
-					for _, v65 in ReactionType do
-						n1 += v63[v65] or 0
+					for _, v11 in ReactionType do
+						total += reactions[v11] or 0
 					end
 
-					return n1
+					return total
 				end)
 			end
 
-			return t5[s4]
+			return v7[p]
 		end,
-		getIndividualReactionCountsForMoment = function(s5: string) -- line: 98
-			-- upvalues: t6 (copy), createComputed (copy), v18 (copy), t1 (copy), ReactionType (copy)
-			if t6[s5] == nil then
-				t6[s5] = createComputed(function(p7) -- line: 100
-					-- upvalues: s5 (copy), v18 (copy), t1 (copy), ReactionType (copy)
-					local v67 = s5
-					local v68 = v18(p7 or false)[v67] or t1
-					local t7 = {}
+		getIndividualReactionCountsForMoment = function(p: string)
+			if v8[p] == nil then
+				v8[p] = createComputed(function(p2)
+					local reactions = getReactions(p, p2) -- inferred equivalent call
+					local result = {}
 
-					for _, v71 in ReactionType do
-						local v72 = v68[v71]
+					for _, reaction2 in ReactionType do
+						local reaction = reactions[reaction2]
 
-						if v72 ~= nil and v72 > 0 then
-							table.insert(t7, {
-								reaction = v71,
-								count = v72
-							})
+						if reaction ~= nil and reaction > 0 then
+							table.insert(result, { reaction = reaction2, count = reaction })
 						end
 					end
 
-					table.sort(t7, function(p8, p9) -- line: 113
-						if p8.count ~= p9.count then
-							return p8.count > p9.count
+					table.sort(result, function(a, b): boolean
+						if a.count == b.count then
+							return a.reaction < b.reaction
 						end
 
-						return p8.reaction < p9.reaction
+						return a.count > b.count
 					end)
 
-					return t7
+					return result
 				end)
 			end
 
-			return t6[s5]
+			return v8[p]
 		end,
-		setBatchReactionCounts = function(p10) -- line: 127
-			-- upvalues: v18 (copy), v19 (copy)
-			local v33 = v18(false)
-			local v34 = table.clone(v33)
+		setBatchReactionCounts = function(items)
+			local v11 = signal(false)
+			local clone = table.clone(v11)
 
-			for v35, v36 in p10 do
-				local v37 = v33[v35]
+			for k, item in items do
+				local v12 = v11[k]
 
-				if v37 ~= nil and v37.userReaction ~= nil and v36.userReaction == nil then
-					local v38 = table.clone(v36)
-					local userReaction = v37.userReaction
-
-					v38.userReaction = userReaction
-					v38[userReaction] = math.max(v36[userReaction] or 0, v37[userReaction] or 0)
-					v34[v35] = v38
+				if v12 == nil or v12.userReaction == nil or item.userReaction ~= nil then
+					clone[k] = item
 				else
-					v34[v35] = v36
+					local clone2 = table.clone(item)
+					local userReaction = v12.userReaction
+					clone2.userReaction = userReaction
+					clone2[userReaction] = math.max(item[userReaction] or 0, v12[userReaction] or 0)
+					clone[k] = clone2
 				end
 			end
 
-			v19(v34)
+			v4(clone)
 		end,
-		setReactions = function(s6: string, p11) -- line: 148
-			-- upvalues: v19 (copy), Cryo (copy), v18 (copy)
-			v19((Cryo.Dictionary.union(v18(false), {
-				[s6] = p11 or {}
+		setReactions = function(p: string, options2)
+			v4((Cryo.Dictionary.union(signal(false), {
+				[p] = options2 or {}
 			})))
 		end,
-		clear = function() -- line: 154
-			-- upvalues: v19 (copy), t3 (copy), t4 (copy), t5 (copy), t6 (copy)
-			v19({})
-			table.clear(t3)
-			table.clear(t4)
-			table.clear(t5)
-			table.clear(t6)
+		clear = function()
+			count += 1
+			table.clear(v9)
+			table.clear(v10)
+			v4({})
+			table.clear(v5)
+			table.clear(v6)
+			table.clear(v7)
+			table.clear(v8)
 		end,
 		updateReaction = updateReaction,
-		reactToFeedItem = function(p12) -- line: 210
-			-- upvalues: v18 (copy), t1 (copy), updateReaction (copy), ReactionAction (copy), FFlagMomentsReactToFeedItemV2 (copy), postReactToFeedItemV2 (copy), v17 (copy)
-			local entityId = p12.entityId
-			local userReaction = (v18(false)[entityId] or t1).userReaction
+		reactToFeedItem = function(data): nil
+			local entityId = data.entityId
+			local userReaction = (signal(false)[entityId] or v).userReaction
+			seedSyncBaseline(data.entityId) -- inferred equivalent call
+			local action
 
-			updateReaction({
-				action = if userReaction == nil or userReaction == p12.reactionType then ReactionAction.React else ReactionAction.Switch,
-				momentId = p12.entityId,
-				reaction = p12.reactionType
-			})
-
-			if FFlagMomentsReactToFeedItemV2 then
-				return postReactToFeedItemV2(p12)
+			if userReaction == nil or userReaction == data.reactionType then
+				action = ReactionAction.React
+			else
+				action = ReactionAction.Switch
 			end
 
-			return v17.reactToFeedItem(p12)
+			updateReaction({
+				action = action,
+				momentId = data.entityId,
+				reaction = data.reactionType
+			})
+			scheduleSync(data) -- inferred equivalent call
+			return nil
 		end,
-		removeFeedItemReaction = function(p13) -- line: 226
-			-- upvalues: updateReaction (copy), ReactionAction (copy), FFlagMomentsReactToFeedItemV2 (copy), postReactToFeedItemV2 (copy)
+		removeFeedItemReaction = function(data): nil
+			seedSyncBaseline(data.entityId) -- inferred equivalent call
 			updateReaction({
 				action = ReactionAction.Unreact,
-				momentId = p13.entityId,
-				reaction = p13.reactionType
+				momentId = data.entityId,
+				reaction = data.reactionType
 			})
-
-			if FFlagMomentsReactToFeedItemV2 then
-				return postReactToFeedItemV2(p13)
-			end
-
+			scheduleSync(data) -- inferred equivalent call
 			return nil
 		end
 	}

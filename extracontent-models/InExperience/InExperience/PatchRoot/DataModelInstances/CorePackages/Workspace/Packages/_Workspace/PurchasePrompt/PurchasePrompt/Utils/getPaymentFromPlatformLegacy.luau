@@ -1,25 +1,27 @@
-local ParentParent = script.Parent.Parent
-local PaymentPlatform = require(ParentParent.Enums.PaymentPlatform)
+local parent = script.Parent.Parent
 
-return function(p1, p2, p3) -- line: 5
-	-- upvalues: PaymentPlatform (copy)
-	if p1 == Enum.Platform.XBoxOne then
+local PaymentPlatform = require(parent.Enums.PaymentPlatform)
+local FFlagEnablePioneerPaymentsPlatform = require(parent.Flags.FFlagEnablePioneerPaymentsPlatform)
+local getIsPioneerBuild = require(parent.Utils.getIsPioneerBuild)
+
+return function(p, p2, p3)
+	if p == Enum.Platform.XBoxOne then
 		return PaymentPlatform.Xbox
 	end
 
-	if p1 == Enum.Platform.IOS then
+	if p == Enum.Platform.IOS then
 		if p2 then
 			return PaymentPlatform.Midas
 		end
 
 		return PaymentPlatform.Apple
-	end
+	elseif p == Enum.Platform.Windows or p == Enum.Platform.OSX or p == Enum.Platform.Linux then
+		if FFlagEnablePioneerPaymentsPlatform and getIsPioneerBuild() then
+			return PaymentPlatform.Pioneer
+		end
 
-	if p1 == Enum.Platform.Windows or p1 == Enum.Platform.OSX or p1 == Enum.Platform.Linux then
 		return PaymentPlatform.Web
-	end
-
-	if p1 == Enum.Platform.Android then
+	elseif p == Enum.Platform.Android then
 		if p2 then
 			return PaymentPlatform.Midas
 		end
@@ -29,11 +31,9 @@ return function(p1, p2, p3) -- line: 5
 		end
 
 		return PaymentPlatform.Google
-	end
-
-	if p1 == Enum.Platform.UWP then
+	elseif p == Enum.Platform.UWP then
 		return PaymentPlatform.UWP
+	else
+		return PaymentPlatform.None
 	end
-
-	return PaymentPlatform.None
 end

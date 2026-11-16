@@ -1,19 +1,18 @@
-local Parent = script:FindFirstAncestor("UsageTracker").Parent
-local ReactIs = require(Parent.ReactIs)
+local parent = script:FindFirstAncestor("UsageTracker").Parent
+local ReactIs = require(parent.ReactIs)
 
-local function isReactComponent(p1) -- line: 5
-	-- upvalues: ReactIs (copy)
-	local ok, result = pcall(ReactIs.isValidElementType, p1)
+local function isReactComponent(value): boolean
+	local success, result = pcall(ReactIs.isValidElementType, value)
 
-	if ok and result then
-		if typeof(p1) == "function" then
-			local v7, v8 = debug.info(p1, "a")
-			local v9 = string.sub(debug.info(p1, "n"), 1, 3) == "use"
+	if success and result then
+		if typeof(value) == "function" then
+			local v, v2 = debug.info(value, "a")
+			local v3 = string.sub(debug.info(value, "n"), 1, 3) == "use"
 
-			if v7 == 1 and not v8 and not v9 then
+			if v == 1 and not (v2 or v3) then
 				return true
 			end
-		elseif typeof(p1) == "table" then
+		elseif typeof(value) == "table" then
 			return true
 		end
 	end

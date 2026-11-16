@@ -1,32 +1,32 @@
-local t1 = {
+local TransferStatus = {
 	Initiated = "Initiated",
 	Pending = "Pending",
 	Cancelled = "Cancelled",
 	Failed = "Failed",
 	Completed = "Completed"
 }
-local t2 = {
-	[0] = t1.Initiated,
-	[1] = t1.Pending,
-	[2] = t1.Cancelled,
-	[3] = t1.Failed,
-	[4] = t1.Completed
+
+local v = {
+	[0] = TransferStatus.Initiated,
+	[1] = TransferStatus.Pending,
+	[2] = TransferStatus.Cancelled,
+	[3] = TransferStatus.Failed,
+	[4] = TransferStatus.Completed
 }
 
-function t1.fromValue(p1) -- line: 21
-	-- upvalues: t2 (copy), t1 (copy)
-	if p1 == nil then
+function TransferStatus.fromValue(value)
+	if value == nil then
 		return nil
 	end
 
-	if type(p1) == "number" then
-		return t2[p1]
+	if type(value) == "number" then
+		return v[value]
 	end
 
-	if type(p1) == "string" then
-		for _, v in pairs(t1) do
-			if v == p1 then
-				return p1
+	if type(value) == "string" then
+		for _, v2 in pairs(TransferStatus) do
+			if v2 == value then
+				return value
 			end
 		end
 	end
@@ -34,4 +34,4 @@ function t1.fromValue(p1) -- line: 21
 	return nil
 end
 
-return t1
+return TransferStatus

@@ -1,6 +1,5 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-
-require(Parent.LuauPolyfill)
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+require(parent.LuauPolyfill)
 
 return {
 	Access = {
@@ -15,10 +14,7 @@ return {
 		Moderated = "moderated",
 		Unpublished = "unpublished"
 	},
-	HostType = {
-		Group = "group",
-		User = "user"
-	},
+	HostType = { Group = "group", User = "user" },
 	MediaAssetType = {
 		GamePreviewVideo = "GamePreviewVideo",
 		Image = "Image",

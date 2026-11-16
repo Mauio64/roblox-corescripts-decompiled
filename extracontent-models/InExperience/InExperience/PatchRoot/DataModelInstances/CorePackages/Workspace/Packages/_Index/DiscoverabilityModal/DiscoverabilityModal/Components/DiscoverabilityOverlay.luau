@@ -1,1 +1,3 @@
-return (require(script.DiscoverabilityOverlayEntryPoint))
+local DiscoverabilityOverlayEntryPoint = require(script.DiscoverabilityOverlayEntryPoint)
+
+return DiscoverabilityOverlayEntryPoint

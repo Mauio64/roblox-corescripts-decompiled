@@ -1,20 +1,21 @@
-return {
-	ContactImporterManager = require(script.ContactImporterManager),
-	Actions = require(script.Actions),
-	ContactsList = require(script.ContactsList.Components.ContactsList),
-	ContactsRevokedAccessDialog = require(script.ContactsList.Components.ContactsRevokedAccessDialog),
-	installReducer = require(script.installReducer),
-	ShowContactImporterParams = require(script.installReducer.ShowContactImporterParams),
-	FindFriendsModal = require(script.FindFriendsModal),
-	ContactImporterLandingPage = require(script.ContactImporterLandingPage),
-	Networking = require(script.Networking),
-	Signals = require(script.Signals),
-	RoduxKey = require(script.Common.Constants).RODUX_KEY,
-	Constants = require(script.Common.Constants),
-	TextKeys = require(script.Common.TextKeys),
-	Utils = require(script.Utils),
-	Flags = require(script.Flags),
-	dependencies = require(script.dependencies),
-	useBeginContactImporter = require(script.Hooks.useBeginContactImporter),
-	["jest.config"] = script["jest.config"]
-}
+local ContactImporter = {}
+ContactImporter.ContactImporterManager = require(script.ContactImporterManager)
+ContactImporter.Actions = require(script.Actions)
+ContactImporter.ContactsList = require(script.ContactsList.Components.ContactsList)
+ContactImporter.ContactsRevokedAccessDialog = require(script.ContactsList.Components.ContactsRevokedAccessDialog)
+ContactImporter.installReducer = require(script.installReducer)
+ContactImporter.ShowContactImporterParams = require(script.installReducer.ShowContactImporterParams)
+ContactImporter.FindFriendsModal = require(script.FindFriendsModal)
+ContactImporter.ContactImporterLandingPage = require(script.ContactImporterLandingPage)
+ContactImporter.Networking = require(script.Networking)
+ContactImporter.Signals = require(script.Signals)
+local Constants = require(script.Common.Constants)
+ContactImporter.RoduxKey = Constants.RODUX_KEY
+ContactImporter.Constants = require(script.Common.Constants)
+ContactImporter.TextKeys = require(script.Common.TextKeys)
+ContactImporter.Utils = require(script.Utils)
+ContactImporter.Flags = require(script.Flags)
+ContactImporter.dependencies = require(script.dependencies)
+ContactImporter.useBeginContactImporter = require(script.Hooks.useBeginContactImporter)
+ContactImporter["jest.config"] = script["jest.config"]
+return ContactImporter

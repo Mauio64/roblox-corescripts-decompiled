@@ -1,15 +1,30 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local useEventConnection = require(ParentParent.ReactUtils).useEventConnection
-local Foundation = require(ParentParent.Foundation)
 
-require(ParentParent.Signals)
+local parent = script.Parent.Parent
 
-local ChatLineReporting = require(ParentParent.ChatLineReporting)
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
+local Foundation = require(parent.Foundation)
+require(parent.Signals)
+local ChatLineReporting = require(parent.ChatLineReporting)
 local ChatLineReportRoot = ChatLineReporting.ChatLineReportRoot
 local Constants = ChatLineReporting.Constants
-local useInExperienceLocalization = require(script.Parent.useInExperienceLocalization)
+
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+local useInExperienceLocalization = ChatUIPrimitives.Hooks.useInExperienceLocalization
+local ChatUIPrimitives2 = require(parent.ChatUIPrimitives)
+local useDismissOnEscapeOrMenu = ChatUIPrimitives2.Hooks.useDismissOnEscapeOrMenu
+local ReportMenuFocusRoot = require(script.Parent.ReportMenuFocusRoot)
+local FFlagExpChatTextChannelWindowFocusNav = require(script.Parent.Flags.FFlagExpChatTextChannelWindowFocusNav)
+
+local v = {
+	SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+	SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
+	SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+	SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+}
+
 local View = Foundation.View
 local Icon = Foundation.Icon
 local Menu = Foundation.Menu
@@ -19,86 +34,78 @@ local InputSize = Foundation.Enums.InputSize
 local PopoverSide = Foundation.Enums.PopoverSide
 local PopoverAlign = Foundation.Enums.PopoverAlign
 
-local function mapMessagesForReport(t1: {[any]: any}, p1) -- line: 35
-	local t2 = table.create(#t1)
+local function mapMessagesForReport(list, targetChannel)
+	local result = table.create(#list)
 
-	for _, v24 in t1 do
-		if v24.messageType == "user" then
-			table.insert(t2, {
-				userId = v24.senderUserId,
-				text = v24.content,
-				textChannel = p1,
-				messageId = v24.messageId,
-				prefixText = v24.prefixText
+	for _, item in list do
+		if item.messageType == "user" then
+			table.insert(result, {
+				userId = item.senderUserId,
+				text = item.content,
+				textChannel = targetChannel,
+				messageId = item.messageId,
+				prefixText = item.prefixText
 			})
 		end
 	end
 
-	return t2
+	return result
 end
-local function ChatWindowTopBanner(t3: {[any]: any}) -- line: 51
-	-- upvalues: useInExperienceLocalization (copy), React (copy), useEventConnection (copy), GuiService (copy), ChatLineReportRoot (copy), mapMessagesForReport (copy), IconName (copy), Constants (copy), Menu (copy), InputSize (copy), PopoverSide (copy), PopoverAlign (copy), View (copy), Icon (copy), IconSize (copy)
-	local v26 = useInExperienceLocalization()
-	local v27, v28 = React.useState(false)
 
-	useEventConnection(GuiService:GetPropertyChangedSignal("MenuIsOpen"), function() -- line: 55
-		-- upvalues: GuiService (copy), v28 (copy)
-		if GuiService.MenuIsOpen then
-			v28(false)
-		end
-	end)
+local function TopBannerView(props)
+	useDismissOnEscapeOrMenu(props.focusNavEnabled == true and props.isOpen, props.onPressedOutside)
 
-	local v29 = v26("Feature.ReportAbuse.Action.EnterChatLineReporting")
-	local v30 = React.useCallback(function() -- line: 63
-		-- upvalues: v28 (copy), v27 (copy)
-		v28(not v27)
-	end, { v27 })
-	local v31 = React.useCallback(function() -- line: 67
-		-- upvalues: v28 (copy)
-		v28(false)
-	end, {})
-	local v32 = React.useCallback(function() -- line: 71
-		-- upvalues: t3 (copy), ChatLineReportRoot (copy), mapMessagesForReport (copy), v28 (copy)
-		local v34 = if not t3.messagesSignal then {} else t3.messagesSignal(false)
-
-		ChatLineReportRoot.initialize((mapMessagesForReport(v34, t3.targetChannel)))
-		v28(false)
-	end, {
-		t3.messagesSignal,
-		t3.targetChannel
-	})
-	local v33 = React.useMemo(function() -- line: 77
-		-- upvalues: IconName (copy), v29 (copy), v32 (copy)
-		return {{
-			id = "report",
-			icon = IconName.SpeechBubbleExclamation,
-			text = v29,
-			onActivated = v32
-		}}
-	end, {
-		v29,
-		v32
-	})
-
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
+	local createElement = React.createElement
+	local v2 = {
 		Size = UDim2.new(1, 0, 0, Constants.TopBannerSize),
-		ZIndex = t3.ZIndex
-	}, {
-		Menu = React.createElement(Menu, {
-			isOpen = v27,
-			items = v33,
-			size = InputSize.Medium,
-			side = PopoverSide.Right,
-			align = PopoverAlign.Start,
-			onPressedOutside = v31,
-			Position = UDim2.new(1, Constants.IconButtonPositionXOffset, 0, 0)
-		}, {
-			Button = React.createElement(View, {
-				tag = "align-x-center align-y-center radius-medium",
-				Size = UDim2.fromOffset(Constants.IconButtonSize, Constants.IconButtonSize),
-				onActivated = v30
-			}, {
+		BackgroundTransparency = 1,
+		ZIndex = props.ZIndex
+	}
+
+	local createElement2 = React.createElement
+	local v3 = {
+		isOpen = props.isOpen,
+		items = props.items,
+		size = InputSize.Medium,
+		side = PopoverSide.Right,
+		align = PopoverAlign.Start,
+		onPressedOutside = props.onPressedOutside,
+		Position = UDim2.new(1, Constants.IconButtonPositionXOffset, 0, 0),
+		ref = 0,
+		selectionGroup = 0
+	}
+	local ref
+
+	if props.focusNavEnabled then
+		ref = props.menuContentRef
+	end
+
+	v3.ref = ref
+	local selectionGroup
+
+	if props.focusNavEnabled then
+		selectionGroup = v
+	end
+
+	v3.selectionGroup = selectionGroup
+
+	local createElement3 = React.createElement
+	local v4 = {
+		Size = UDim2.fromOffset(Constants.IconButtonSize, Constants.IconButtonSize),
+		tag = "align-x-center align-y-center radius-medium",
+		onActivated = props.onTriggerActivated,
+		ref = 0
+	}
+	local ref2
+
+	if props.focusNavEnabled then
+		ref2 = props.triggerRef
+	end
+
+	v4.ref = ref2
+	return createElement("Frame", v2, {
+		Menu = createElement2(Menu, v3, {
+			Button = createElement3(View, v4, {
 				icon = React.createElement(Icon, {
 					name = IconName.ThreeDotsHorizontal,
 					size = IconSize.Large
@@ -108,4 +115,95 @@ local function ChatWindowTopBanner(t3: {[any]: any}) -- line: 51
 	})
 end
 
-return ChatWindowTopBanner
+local function TopBannerFocusNav(props)
+	local isOpen = props.isOpen
+	local onOpenChanged = props.onOpenChanged
+	React.useEffect(function()
+		if onOpenChanged then
+			onOpenChanged(isOpen)
+		end
+	end, { isOpen, onOpenChanged })
+
+	local render = React.useCallback(function(p)
+		return React.createElement(TopBannerView, {
+			ZIndex = props.ZIndex,
+			isOpen = props.isOpen,
+			items = props.items,
+			onTriggerActivated = props.onTriggerActivated,
+			onPressedOutside = props.onPressedOutside,
+			focusNavEnabled = props.focusNavEnabled,
+			menuContentRef = p.containerRef,
+			triggerRef = p.triggerRef
+		})
+	end, {
+		props.ZIndex,
+		props.isOpen,
+		props.items,
+		props.onTriggerActivated,
+		props.onPressedOutside,
+		props.focusNavEnabled
+	})
+
+	return React.createElement(ReportMenuFocusRoot, { isOpen = props.isOpen, render = render })
+end
+
+local function ChatWindowTopBanner(props)
+	local v2 = useInExperienceLocalization()
+	local state, setState = React.useState(false)
+
+	useEventConnection(GuiService:GetPropertyChangedSignal("MenuIsOpen"), function()
+		if GuiService.MenuIsOpen then
+			setState(false)
+		end
+	end)
+
+	local text = v2("Feature.ReportAbuse.Action.EnterChatLineReporting")
+
+	local onTriggerActivated = React.useCallback(function()
+		setState(not state)
+	end, { state })
+
+	local onPressedOutside = React.useCallback(function()
+		setState(false)
+	end, {})
+
+	local onActivated = React.useCallback(function()
+		local v3 = not props.messagesSignal and {} or props.messagesSignal(false)
+		ChatLineReportRoot.initialize(mapMessagesForReport(v3, props.targetChannel))
+		setState(false)
+	end, { props.messagesSignal, props.targetChannel })
+
+	local items = React.useMemo(function()
+		return {
+			{
+				id = "report",
+				icon = IconName.SpeechBubbleExclamation,
+				text = text,
+				onActivated = onActivated
+			}
+		}
+	end, { text, onActivated })
+
+	if FFlagExpChatTextChannelWindowFocusNav then
+		return React.createElement(TopBannerFocusNav, {
+			ZIndex = props.ZIndex,
+			isOpen = state,
+			items = items,
+			onTriggerActivated = onTriggerActivated,
+			onPressedOutside = onPressedOutside,
+			focusNavEnabled = props.focusNavEnabled,
+			onOpenChanged = props.onOpenChanged
+		})
+	end
+
+	return React.createElement(TopBannerView, {
+		ZIndex = props.ZIndex,
+		isOpen = state,
+		items = items,
+		onTriggerActivated = onTriggerActivated,
+		onPressedOutside = onPressedOutside,
+		focusNavEnabled = props.focusNavEnabled
+	})
+end
+
+return React.memo(ChatWindowTopBanner)

@@ -1,33 +1,31 @@
-local function lastIndexOf(s1: string, s2: string, n1: number?) -- line: 2
-	local v5 = string.len(s1)
-	local v6 = n1 or v5
+local function lastIndexOf(value: string, p: string, p2: number?)
+	local v = string.len(value)
 
-	if n1 and n1 < 1 then
-		v6 = 1
+	local v2 = p2 and p2 < 1 and 1 or p2 or v
+
+	if p2 and v < p2 then
+		v2 = v
 	end
 
-	if n1 and v5 < n1 then
-		v6 = v5
+	if p == "" then
+		return v2
 	end
 
-	if s2 == "" then
-		return v6
+	local v3 = nil
+	local v4 = 0
+
+	while true do
+		local v5
+		v5, v4 = string.find(value, p, v4 + 1, true)
+
+		if v5 == nil or v2 < v5 then
+			break
+		end
+
+		v3 = v5
 	end
 
-	local start = nil
-	local n2 = 0
-	local v9
-
-	repeat
-		v9 = start
-		start, n2 = string.find(s1, s2, n2 + 1, true)
-	until start == nil or v6 < start
-
-	if v9 == nil then
-		return -1
-	end
-
-	return v9
+	return if v3 == nil then -1 else v3
 end
 
 return lastIndexOf

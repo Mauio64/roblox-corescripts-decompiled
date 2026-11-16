@@ -1,11 +1,11 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
-local createCreatorCreditStore = require(script.Parent.createCreatorCreditStore)
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
+local Signals = require(parent.Signals)
+
+local createCreatorCreditStore = require(script.Parent.createCreatorCreditStore)
 require(script.Parent.types)
 
-local function createDefaultStore() -- line: 11
-	-- upvalues: createCreatorCreditStore (copy)
+local function createDefaultStore()
 	return createCreatorCreditStore()
 end
 

@@ -1,94 +1,82 @@
 local Squads = script:FindFirstAncestor("Squads")
-local SquadsParent = Squads.Parent
-local React = require(SquadsParent.React)
-local UIBlox = require(SquadsParent.UIBlox)
 
-UIBlox.init(require(SquadsParent.Dev.RobloxAppUIBloxConfig))
+local parent = Squads.Parent
 
-local mockLocale = require(SquadsParent.Dev.SocialTestHelpers).StoryHelpers.mockLocale
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+
+UIBlox.init(require(parent.Dev.RobloxAppUIBloxConfig))
+
+local SocialTestHelpers = require(parent.Dev.SocialTestHelpers)
+local mockLocale = SocialTestHelpers.StoryHelpers.mockLocale
+
 local dependencies = require(Squads.dependencies)
-local Cryo = dependencies.Cryo
-local Foundation = dependencies.Foundation
-local Roact = dependencies.Roact
+local cryo = dependencies.Cryo
+local foundation = dependencies.Foundation
+local roact = dependencies.Roact
+
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 
-Roact.setGlobalConfig({
-	propValidation = true,
-	elementTracing = true
-})
+roact.setGlobalConfig({ propValidation = true, elementTracing = true })
 
-local t1 = {
-	Default = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Light = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Dark = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	}
-}
-local t2 = {
-	language = "en-us"
+local v = {
+	Default = { themeName = "Light", fontName = "Gotham" },
+	Light = { themeName = "Light", fontName = "Gotham" },
+	Dark = { themeName = "Dark", fontName = "Gotham" }
 }
 
-local function useCreateOverlay(t3: {[any]: any}) -- line: 44
-	-- upvalues: React (copy)
-	local v15 = React.useRef(Instance.new("Frame"))
+local v2 = { language = "en-us" }
 
-	if v15.current.Parent ~= t3.focus then
-		v15.current.Parent = t3.focus
+local function useCreateOverlay(p)
+	local ref = React.useRef(Instance.new("Frame"))
+
+	if ref.current.Parent ~= p.focus then
+		ref.current.Parent = p.focus
 	end
 
-	React.useEffect(function() -- line: 52
-		-- upvalues: v15 (copy)
-		v15.current.Size = UDim2.fromScale(1, 1)
-		v15.current.BackgroundTransparency = 1
+	React.useEffect(function()
+		ref.current.Size = UDim2.fromScale(1, 1)
+		ref.current.BackgroundTransparency = 1
 
-		return function() -- line: 56
-			-- upvalues: v15 (copy)
-			v15.current:Destroy()
+		return function()
+			ref.current:Destroy()
 		end
 	end, {})
 
-	return v15.current
+	return ref.current
 end
 
-return {
-	name = "Squads",
-	storyRoot = Squads,
-	roact = Roact,
-	mapDefinition = function(p1) -- line: 68
-		-- upvalues: Cryo (copy), t2 (copy)
-		local v17 = Cryo.Dictionary.join(t2, p1.controls or {})
+local Storybook = {}
+Storybook.name = "Squads"
+Storybook.storyRoot = Squads
+Storybook.roact = roact
 
-		return Cryo.Dictionary.join(p1, {
-			controls = v17
-		})
-	end,
-	mapStory = function(p2) -- line: 72
-		-- upvalues: useCreateOverlay (copy), t1 (copy), Roact (copy), Foundation (copy), AppStyleProvider (copy), mockLocale (copy)
-		return function(p3) -- line: 73
-			-- upvalues: useCreateOverlay (copy), t1 (copy), Roact (copy), Foundation (copy), AppStyleProvider (copy), mockLocale (copy), p2 (copy)
-			local v20 = useCreateOverlay(p3)
-			local v21 = p3 and t1[p3.theme] or t1.Default
+function Storybook.mapDefinition(p)
+	local joined = cryo.Dictionary.join(v2, p.controls or {})
+	return cryo.Dictionary.join(p, { controls = joined })
+end
 
-			return Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
+function Storybook.mapStory(p)
+	return function(p2)
+		local overlayGui = useCreateOverlay(p2)
+
+		local style = p2 and v[p2.theme] or v.Default
+		return roact.createElement(
+			"Frame",
+			{
 				AutomaticSize = Enum.AutomaticSize.XY,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, { Roact.createElement(Foundation.FoundationProvider, {
-				device = "Desktop",
-				theme = v21.themeName,
-				overlayGui = v20
-			}, { Roact.createElement(AppStyleProvider, {
-				style = v21
-			}, {
-				Child = mockLocale(p2, p3)
-			}) }) })
-		end
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 1
+			},
+			{ roact.createElement(
+					foundation.FoundationProvider,
+					{ device = "Desktop", colorMode = style.themeName, overlayGui = overlayGui },
+					{ roact.createElement(AppStyleProvider, { style = style }, {
+							Child = mockLocale(p, p2)
+						}) }
+				) }
+		)
 	end
-}
+end
+
+return Storybook

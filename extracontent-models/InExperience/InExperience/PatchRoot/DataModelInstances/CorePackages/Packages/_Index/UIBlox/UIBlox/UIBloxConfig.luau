@@ -1,1 +1,2 @@
-return require(script.Parent).Config
+local parentModule = require(script.Parent)
+return parentModule.Config

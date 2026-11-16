@@ -1,6 +1,6 @@
-local Parent = script:FindFirstAncestor("MediaGallery").Parent
+local parent = script:FindFirstAncestor("MediaGallery").Parent
 
-require(Parent.React)
-require(Parent.AppCommonLib)
+require(parent.React)
+require(parent.AppCommonLib)
 
 return nil

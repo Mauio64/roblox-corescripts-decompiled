@@ -1,33 +1,43 @@
 local InterventionShared = script:FindFirstAncestor("InterventionShared")
-local InterventionSharedParent = InterventionShared.Parent
+local parent = InterventionShared.Parent
+
+local IXPService = game:GetService("IXPService")
+
+local ExperimentLayers = require(parent.ExperimentLayers)
+local AppUserLayers = ExperimentLayers.AppUserLayers
 local Constants = require(InterventionShared.Utils.Constants)
 local InterventionAnalytics = require(InterventionShared.InterventionAnalytics)
-local React = require(InterventionSharedParent.React)
-local Foundation = require(InterventionSharedParent.Foundation)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
-local useLocalization = require(InterventionSharedParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local useTokens = Foundation.Hooks.useTokens
 local interventionTreatmentShownSignal = require(InterventionShared.Signals.interventionTreatmentShownSignal)
+
 local InterventionDialog = require(InterventionShared.Components.InterventionDialog)
 
-return React.memo(function(p1) -- line: 21
-	-- upvalues: useTokens (copy), useLocalization (copy), Constants (copy), React (copy), interventionTreatmentShownSignal (copy), InterventionDialog (copy), IconSize (copy), InterventionAnalytics (copy)
-	local v13 = useTokens()
-	local v14 = useLocalization(Constants.localizationKeys)
+local FFlagUFRFriendsChatIXPExposure = require(InterventionShared.Flags.FFlagUFRFriendsChatIXPExposure)
 
-	React.useEffect(function() -- line: 24
-		-- upvalues: interventionTreatmentShownSignal (copy), Constants (copy)
+return React.memo(function(p)
+	local v = useTokens()
+	local v2 = useLocalization(Constants.localizationKeys)
+	React.useEffect(function()
+		if FFlagUFRFriendsChatIXPExposure and game:GetEngineFeature("EnableLogFlagLinkedUserLayerExposure") then
+			IXPService:LogFlagLinkedUserLayerExposure(AppUserLayers.FriendsChatRestrictionUserIDLayer)
+		end
+
 		interventionTreatmentShownSignal:fire(Constants.TreatmentType.PartyChatNudgeDialog)
 	end, {})
 
 	return React.createElement(InterventionDialog, {
+		titleText = v2.DontSharePersonalInformationText,
+		bodyText = v2.PartyChatMayBeSuspendedText,
+		onDismiss = p.onDismiss,
 		iconName = "icons/status/error_large",
-		titleText = v14.DontSharePersonalInformationText,
-		bodyText = v14.PartyChatMayBeSuspendedText,
-		onDismiss = p1.onDismiss,
 		iconSize = IconSize.Large,
-		iconStyle = v13.Color.System.Warning,
-		eventId = p1.eventId,
+		iconStyle = v.Color.System.Warning,
+		eventId = p.eventId,
 		namespaceForAnalytics = InterventionAnalytics.Constants.CounterNamespaceTypes.PartyChat,
 		interventionTypeForAnalytics = InterventionAnalytics.Constants.InterventionTypes.PartyChatNudge
 	})

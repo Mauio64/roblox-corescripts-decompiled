@@ -1,12 +1,14 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
-local WhatsNewParent = WhatsNew.Parent
+local parent = WhatsNew.Parent
+
 local Enums = require(WhatsNew.Enums)
-local Foundation = require(WhatsNewParent.Foundation)
-local Localization = require(WhatsNewParent.Localization)
-local React = require(WhatsNewParent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local React = require(parent.React)
 local GetWhatsNewStore = require(WhatsNew.store.GetWhatsNewStore)
 local useWhatsNewRuntimeState = require(WhatsNew.hooks.useWhatsNewRuntimeState)
 local WhatsNewTelemetry = require(WhatsNew.telemetry.WhatsNewTelemetry)
+
 local EducationalTooltip = Foundation.EducationalTooltip
 local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
@@ -14,145 +16,147 @@ local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local useLocalization = Localization.Hooks.useLocalization
 
-local function isRectReady(vector2: Vector2) -- line: 26
-	return vector2.X > 0 and vector2.Y > 0
+local function isRectReady(absoluteSize: Vector2): boolean -- 1 equivalent call inferred from this helper
+	return absoluteSize.X > 0 and absoluteSize.Y > 0
 end
-local function WhatsNewTourtip() -- line: 30
-	-- upvalues: GetWhatsNewStore (copy), useWhatsNewRuntimeState (copy), Enums (copy), React (copy), useLocalization (copy), WhatsNewTelemetry (copy), ButtonVariant (copy), View (copy), EducationalTooltip (copy), PopoverSide (copy), PopoverAlign (copy)
-	local v19 = GetWhatsNewStore()
-	local v20 = useWhatsNewRuntimeState()
-	local currentEntry = v20.currentEntry
-	local globalStepIndex = v20.globalStepIndex
-	local v23 = v20.surface == Enums.WhatsNewSurface.TourTip and (currentEntry ~= nil and globalStepIndex ~= nil)
-	local v24 = React.useRef(nil)
-	local v25 = React.useRef(nil)
-	local v26 = useLocalization({
+
+local function WhatsNewTourtip()
+	local whatsNewStore = GetWhatsNewStore()
+	local v = useWhatsNewRuntimeState()
+	local currentEntry = v.currentEntry
+	local globalStepIndex = v.globalStepIndex
+	local v2
+
+	if v.surface == Enums.WhatsNewSurface.TourTip and currentEntry ~= nil then
+		v2 = globalStepIndex ~= nil
+	else
+		v2 = false
+	end
+
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+
+	local v3 = useLocalization({
 		back = "CommonUI.Controls.Action.Back",
 		next = "CommonUI.Controls.Action.Next",
 		done = "CommonUI.Controls.Action.Done"
 	})
-	local v27 = globalStepIndex == nil and 0 or globalStepIndex + 1
-	local globalTotalSteps = v20.globalTotalSteps
-	local v29 = v23 and globalStepIndex == 0
-	local v30 = v23 and globalTotalSteps <= v27
-	local v31 = if not v23 or currentEntry == nil then nil else v19.getAnchorRef(currentEntry.anchorId)
 
-	v25.current = v31
+	local current = globalStepIndex == nil and 0 or globalStepIndex + 1
+	local globalTotalSteps = v.globalTotalSteps
+	local isDisabled = v2 and globalStepIndex == 0
+	local v4 = v2 and globalTotalSteps <= current
+	local current2
 
-	local v32 = false
-
-	if v31 ~= nil then
-		local AbsoluteSize = v31.AbsoluteSize
-
-		v32 = AbsoluteSize.X > 0 and AbsoluteSize.Y > 0
+	if v2 and currentEntry ~= nil then
+		current2 = whatsNewStore.getAnchorRef(currentEntry.anchorId)
 	end
 
-	React.useEffect(function() -- line: 60
-		-- upvalues: v23 (copy), currentEntry (copy), v24 (copy), WhatsNewTelemetry (copy), v19 (copy)
-		if not v23 or currentEntry == nil then
-			v24.current = nil
+	ref2.current = current2
+	local v5
 
+	if current2 == nil then
+		v5 = false
+	else
+		v5 = isRectReady(current2.AbsoluteSize) -- inferred equivalent call
+	end
+
+	React.useEffect(function()
+		if not v2 or currentEntry == nil then
+			ref.current = nil
 			return
 		end
 
-		if v24.current == currentEntry.id then
+		if ref.current == currentEntry.id then
 			return
 		end
 
-		v24.current = currentEntry.id
-		WhatsNewTelemetry.logTourtipInteraction(WhatsNewTelemetry.InteractionType.IMPRESSION, currentEntry.id, nil, v19.getRuntimeState())
-	end, {
-		v23,
-		currentEntry,
-		v19
-	})
+		ref.current = currentEntry.id
+		WhatsNewTelemetry.logTourtipInteraction(
+			WhatsNewTelemetry.InteractionType.IMPRESSION,
+			currentEntry.id,
+			nil,
+			whatsNewStore.getRuntimeState()
+		)
+	end, { v2, currentEntry, whatsNewStore })
 
-	local v34 = React.useCallback(function() -- line: 77
-		-- upvalues: currentEntry (copy), v19 (copy)
+	local onActivated = React.useCallback(function()
 		if currentEntry == nil then
 			return
 		end
 
-		v19.next()
-	end, {
-		v19,
-		currentEntry
-	})
-	local v35 = React.useCallback(function() -- line: 84
-		-- upvalues: currentEntry (copy), v19 (copy)
+		whatsNewStore.next()
+	end, { whatsNewStore, currentEntry })
+
+	local onActivated2 = React.useCallback(function()
 		if currentEntry == nil then
 			return
 		end
 
-		v19.back()
-	end, {
-		v19,
-		currentEntry
-	})
-	local v36 = React.useCallback(function() -- line: 91
-		-- upvalues: currentEntry (copy), v19 (copy)
+		whatsNewStore.back()
+	end, { whatsNewStore, currentEntry })
+
+	local onClose = React.useCallback(function()
 		if currentEntry == nil then
 			return
 		end
 
-		v19.completeTour({
-			earlyDismiss = true
-		})
-	end, {
-		v19,
-		currentEntry
-	})
+		whatsNewStore.completeTour({ earlyDismiss = true })
+	end, { whatsNewStore, currentEntry })
 
-	if not v23 or currentEntry == nil or globalStepIndex == nil then
+	if not v2 or currentEntry == nil or globalStepIndex == nil then
 		return nil
 	end
 
-	if v31 == nil or not v32 then
+	if current2 == nil or not v5 then
 		return nil
 	end
 
-	local v37 = globalTotalSteps > 1
-	local t1 = {}
-	local t2 = nil
+	local v6 = globalTotalSteps > 1
+	local actions = {}
+	local steps
 
-	if v37 then
-		table.insert(t1, {
-			isDisabled = v29,
-			text = v26.back,
+	if v6 then
+		table.insert(actions, {
+			isDisabled = isDisabled,
+			text = v3.back,
 			variant = ButtonVariant.Standard,
-			onActivated = v35
+			onActivated = onActivated2,
+			testId = "whats-new-tourtip--action-1"
 		})
-		table.insert(t1, {
-			text = if not v30 then v26.next else v26.done,
+
+		local text = if v4 then v3.done else v3.next
+		local v7 = {
+			text = text,
 			variant = ButtonVariant.Emphasis,
-			onActivated = v34
-		})
-		t2 = {
-			current = v27,
-			total = globalTotalSteps
+			onActivated = onActivated,
+			testId = "whats-new-tourtip--action-2"
 		}
+		table.insert(actions, v7)
+
+		steps = { current = current, total = globalTotalSteps }
 	end
 
-	local v40 = `{ currentEntry.id }-{ v31:GetFullName() }`
+	local formatted = `{currentEntry.id}-{current2:GetFullName()}`
 
 	return React.createElement(View, {
 		tag = "size-full",
 		BackgroundTransparency = 1,
 		Active = false
 	}, {
-		[v40] = React.createElement(EducationalTooltip, {
-			isOpen = true,
-			testId = "whats-new-tourtip",
-			anchorRef = v25,
+		[formatted] = React.createElement(EducationalTooltip, {
+			anchorRef = ref2,
 			title = currentEntry.title,
 			text = currentEntry.text,
 			side = currentEntry.side or PopoverSide.Bottom,
 			align = currentEntry.align or PopoverAlign.Center,
-			hasActions = v37,
-			showSteps = v37,
-			steps = t2,
-			onClose = v36,
-			actions = t1
+			isOpen = true,
+			hasActions = v6,
+			showSteps = v6,
+			steps = steps,
+			onClose = onClose,
+			actions = actions,
+			testId = "whats-new-tourtip"
 		})
 	})
 end

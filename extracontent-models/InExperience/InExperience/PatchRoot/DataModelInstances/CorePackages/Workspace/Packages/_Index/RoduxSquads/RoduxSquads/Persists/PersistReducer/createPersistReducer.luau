@@ -1,71 +1,67 @@
 local RoduxSquads = script:FindFirstAncestor("RoduxSquads")
-local RoduxSquadsParent = RoduxSquads.Parent
-local Rodux = require(RoduxSquadsParent.Rodux)
-local createInternalPersistManager = require(RoduxSquads.Persists.PersistManager).createInternalPersistManager
-local createPersistManager = require(RoduxSquads.Persists.PersistManager).createPersistManager
-local createPause = require(RoduxSquads.Persists.Actions).createPause
-local createPersistAndUpdateState = require(RoduxSquads.Persists.Actions).createPersistAndUpdateState
-local t1 = {
-	isPaused = false
-}
+local parent = RoduxSquads.Parent
+local Rodux = require(parent.Rodux)
+local PersistManager = require(RoduxSquads.Persists.PersistManager)
+local createInternalPersistManager = PersistManager.createInternalPersistManager
+local PersistManager2 = require(RoduxSquads.Persists.PersistManager)
+local createPersistManager = PersistManager2.createPersistManager
+local Actions = require(RoduxSquads.Persists.Actions)
+local createPause = Actions.createPause
+local Actions2 = require(RoduxSquads.Persists.Actions)
+local createPersistAndUpdateState = Actions2.createPersistAndUpdateState
 
-return function(p1, p2) -- line: 13
-	-- upvalues: createPause (copy), createPersistAndUpdateState (copy), createInternalPersistManager (copy), createPersistManager (copy), t1 (copy), Rodux (copy)
-	local u11 = false
-	local v12 = createPause(p1)
-	local v13 = createPersistAndUpdateState(p1)
-	local v14 = createInternalPersistManager(p1)
-	local v15 = createPersistManager(p1, v14)
-	local isPaused = t1.isPaused
-	local u17 = nil
+local v = { isPaused = false }
 
-	if v14 then
-		v14.bindToStorage(function(p3) -- line: 27
-			-- upvalues: u17 (ref)
-			u17 = p3
+return function(p, callback)
+	local v2 = false
+	local pause = createPause(p)
+	local persistAndUpdateState = createPersistAndUpdateState(p)
+
+	local internalPersistManager = createInternalPersistManager(p)
+	local persistManager = createPersistManager(p, internalPersistManager)
+
+	local isPaused = v.isPaused
+
+	local v3 = nil
+
+	if internalPersistManager then
+		internalPersistManager.bindToStorage(function(p2)
+			v3 = p2
 		end)
-		u17 = v14.get()
+		v3 = internalPersistManager.get()
 	end
 
-	return function(p4, p5) -- line: 33
-		-- upvalues: v14 (copy), u11 (ref), u17 (ref), v13 (copy), isPaused (ref), p2 (copy)
-		if v14 and not u11 then
-			p4 = u17 or p4
+	local function fn(p2, p3)
+		p2 = internalPersistManager and not v2 and v3 or p2
+		v2 = true
+
+		if persistAndUpdateState.name == p3.type then
+			return v3
 		end
 
-		u11 = true
+		local v4
 
-		local v21 = p4
-
-		if v13.name == p5.type then
-			return u17
+		if isPaused then
+			return p2
 		end
 
-		if not isPaused then
-			v21 = p2(p4, p5)
+		v4 = callback(p2, p3)
 
-			if v14 and v21 ~= p4 then
-				v14.update(v21)
-			end
+		if internalPersistManager and v4 ~= p2 then
+			internalPersistManager.update(v4)
 		end
 
-		return v21
-	end, Rodux.createReducer(t1, {
-		[v13.name] = function(_, _) -- line: 55
-			-- upvalues: isPaused (ref)
+		return v4
+	end
+
+	return fn, Rodux.createReducer(v, {
+		[persistAndUpdateState.name] = function(_, _)
 			isPaused = false
-
-			return {
-				isPaused = isPaused
-			}
+			return { isPaused = isPaused }
 		end,
-		[v12.name] = function(_, _) -- line: 59
-			-- upvalues: isPaused (ref)
+		[pause.name] = function(_, _)
 			isPaused = true
-
-			return {
-				isPaused = isPaused
-			}
+			return { isPaused = isPaused }
 		end
-	}), v15
+	}), persistManager
 end

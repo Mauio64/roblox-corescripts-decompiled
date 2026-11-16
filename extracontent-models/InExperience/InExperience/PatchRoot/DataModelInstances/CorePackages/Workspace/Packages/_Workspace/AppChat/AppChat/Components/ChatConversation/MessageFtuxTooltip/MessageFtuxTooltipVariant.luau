@@ -1,4 +1,1 @@
-return {
-	Replies = "Replies",
-	None = ""
-}
+return { Replies = "Replies", None = "" }

@@ -1,95 +1,107 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local React = require(GenericAbuseReportingParent.React)
-local SharedFlags = require(GenericAbuseReportingParent.SharedFlags)
+local parent = GenericAbuseReporting.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local ControlState = Foundation.Enums.ControlState
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
+
 local AbuseReportAnalyticsContext = require(GenericAbuseReporting.BeduiV2.Analytics.AbuseReportAnalyticsContext)
 local analyticsService = require(GenericAbuseReporting.BeduiV2.Analytics.analyticsService)
 local useOpenLink = require(GenericAbuseReporting.BeduiV2.Hooks.useOpenLink)
-
 require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
+local arTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation)
+local useArTranslation = arTranslation.useArTranslation
 
-local useArTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation).useArTranslation
-local v12 = game:DefineFastFlag("AddFontStyleToTextWithTranslation", false)
-local v13 = game:DefineFastFlag("AddUnderlineToLinksInTextWithTranslation", false)
-local FFlagAbuseReportLinkOpenedAnalytics = SharedFlags.FFlagAbuseReportLinkOpenedAnalytics
-local TelemetryEventType = analyticsService.TelemetryEventType
+local defineFastFlag = game:DefineFastFlag("AddFontStyleToTextWithTranslation", false)
+
+local telemetryEventType = analyticsService.TelemetryEventType
 local useOptionalAbuseReportAnalytics = AbuseReportAnalyticsContext.useOptionalAbuseReportAnalytics
 
-local function TextWithTranslation(t1: {[any]: any}) -- line: 47
-	-- upvalues: useArTranslation (copy), useOpenLink (copy), React (copy), FFlagAbuseReportLinkOpenedAnalytics (copy), useOptionalAbuseReportAnalytics (copy), TelemetryEventType (copy), v13 (copy), ControlState (copy), FoundationText (copy), v12 (copy)
+local function TextWithTranslation(props)
 	local translateIntoString = useArTranslation().translateIntoString
 	local translateIntoRichTextString = useArTranslation().translateIntoRichTextString
-	local v21 = useOpenLink()
-	local v22, v23 = React.useState(false)
-	local u24 = nil
+	local v = useOpenLink()
+	local state, setState = React.useState(false)
 
-	if FFlagAbuseReportLinkOpenedAnalytics then
-		local v25 = useOptionalAbuseReportAnalytics()
+	local v2 = useOptionalAbuseReportAnalytics()
+	local sendEvent
 
-		u24 = if not v25 then nil else v25.sendEvent
+	if v2 then
+		sendEvent = v2.sendEvent
+	else
+		sendEvent = nil
 	end
 
-	local v26, v27 = React.useMemo(function() -- line: 59
-		-- upvalues: translateIntoRichTextString (copy), t1 (copy)
-		return translateIntoRichTextString(t1.input)
-	end, {
-		t1.input,
-		translateIntoRichTextString
-	})
-	local v28 = React.useCallback(function() -- line: 64
-		-- upvalues: v27 (copy), FFlagAbuseReportLinkOpenedAnalytics (copy), u24 (ref), TelemetryEventType (copy), t1 (copy), v21 (copy), translateIntoString (copy)
-		local href = nil
+	local text, v3 = React.useMemo(function()
+		return translateIntoRichTextString(props.input)
+	end, { props.input, translateIntoRichTextString })
 
-		if v27 ~= nil then
-			href = v27.href
+	local onActivated = React.useCallback(function()
+		local href
+
+		if v3 ~= nil then
+			href = v3.href
 		end
 
-		if FFlagAbuseReportLinkOpenedAnalytics and u24 and href then
-			u24({
-				sub_event_type = TelemetryEventType.LinkOpened,
-				link_detail = {
-					href = href,
-					link_id = t1.linkId,
-					source = t1.linkSource
-				}
+		if sendEvent and href then
+			sendEvent({
+				sub_event_type = telemetryEventType.LinkOpened,
+				link_detail = { href = href, link_id = props.linkId, source = props.linkSource }
 			})
 		end
 
-		v21(translateIntoString(t1.input), href)
-	end, {
-		v27,
-		t1.input,
-		v21,
-		translateIntoString,
-		if not FFlagAbuseReportLinkOpenedAnalytics then nil else u24,
-		if not FFlagAbuseReportLinkOpenedAnalytics then nil else t1.linkId,
-		if not FFlagAbuseReportLinkOpenedAnalytics then nil else t1.linkSource
-	})
-	local v29 = if not v13 then nil else React.useCallback(function(p1) -- line: 93
-		-- upvalues: ControlState (copy), v23 (copy)
-		if p1 == ControlState.Hover then
-			v23(true)
+		v(translateIntoString(props.input), href)
+	end, { v3, props.input, v, translateIntoString, sendEvent, props.linkId, props.linkSource })
 
-			return
+	local onStateChanged = React.useCallback(function(p)
+		if p == ControlState.Hover then
+			setState(true)
+		else
+			setState(false)
 		end
-
-		v23(false)
 	end, {})
 
-	return React.createElement(FoundationText, {
+	local createElement = React.createElement
+
+	if state then
+		text = `<u>{text}</u>`
+	end
+
+	local v4 = {
+		Text = text,
 		RichText = true,
 		TextWrapped = true,
-		Text = if not v22 then v26 else `<u>{ v26 }</u>`,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		fontStyle = if not v12 then nil else t1.fontStyle,
-		tag = t1.tag,
-		LayoutOrder = t1.layoutOrder,
-		onActivated = if v27 == nil then nil else v28,
-		onStateChanged = if not v13 or v27 == nil then nil else v29
-	})
+		fontStyle = 0,
+		tag = 0,
+		LayoutOrder = 0,
+		onActivated = 0,
+		onStateChanged = 0
+	}
+	local fontStyle
+
+	if defineFastFlag then
+		fontStyle = props.fontStyle
+	end
+
+	v4.fontStyle = fontStyle
+	v4.tag = props.tag
+	v4.LayoutOrder = props.layoutOrder
+
+	if v3 == nil then
+		onActivated = nil
+	end
+
+	v4.onActivated = onActivated
+
+	if v3 == nil then
+		onStateChanged = nil
+	end
+
+	v4.onStateChanged = onStateChanged
+	return createElement(Text, v4)
 end
 
 return React.memo(TextWithTranslation)

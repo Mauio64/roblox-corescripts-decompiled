@@ -1,13 +1,10 @@
 local networkRequests = script.networkRequests
 local createGetUserPremiumMembershipStatus = require(networkRequests.createGetUserPremiumMembershipStatus)
 
-local function createRequestThunks(p1) -- line: 4
-	-- upvalues: createGetUserPremiumMembershipStatus (copy)
+local function createRequestThunks(p)
 	return {
-		GetUserPremiumMembershipStatus = createGetUserPremiumMembershipStatus(p1)
+		GetUserPremiumMembershipStatus = createGetUserPremiumMembershipStatus(p)
 	}
 end
 
-return {
-	config = createRequestThunks
-}
+return { config = createRequestThunks }

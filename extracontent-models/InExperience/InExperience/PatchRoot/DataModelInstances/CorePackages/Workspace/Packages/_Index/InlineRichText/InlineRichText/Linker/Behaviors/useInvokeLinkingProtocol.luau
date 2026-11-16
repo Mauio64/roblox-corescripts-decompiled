@@ -1,34 +1,38 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
 local RunService = game:GetService("RunService")
-local InlineRichTextParent = InlineRichText.Parent
-local React = require(InlineRichTextParent.React)
-local default = require(InlineRichTextParent.LinkingProtocol).LinkingProtocol.default
-local v6 = require(InlineRichText.Logger):new(script.Name)
+local parent = InlineRichText.Parent
+
+local React = require(parent.React)
+local LinkingProtocol = require(parent.LinkingProtocol)
+local DeepLinkSource = LinkingProtocol.Enums.DeepLinkSource
+local default = LinkingProtocol.LinkingProtocol.default
+
+local Logger = require(InlineRichText.Logger)
+local v = Logger:new(script.Name)
 
 require(InlineRichText.Types)
+local isStudio = RunService:IsStudio()
 
-local v7 = RunService:IsStudio()
-
-return function(_: nil) -- line: 15
-	-- upvalues: React (copy), default (copy), v7 (copy), v6 (copy)
-	return React.useCallback(function(s1: string) -- line: 16
-		-- upvalues: default (copy), v7 (copy), v6 (copy)
-		default:isURLRegistered(s1):andThen(function(p2) -- line: 17
-			-- upvalues: v7 (copy), s1 (copy), default (copy), v6 (copy)
-			if p2 then
-				if v7 then
-					print(`[OnActivated Debug] Detected URL with LinkingProtocol: { s1 }`)
-				end
-
-				default:detectURL(s1)
+return function(_: nil)
+	return React.useCallback(function(p: string)
+		default:isURLRegistered(p):andThen(function(p2)
+			if not p2 then
+				default:openURL(p):catch(function(p3)
+					v:error("Failed to open URL: ", p, " with error: ", p3)
+				end)
 
 				return
 			end
 
-			default:openURL(s1):catch(function(p3) -- line: 24
-				-- upvalues: v6 (copy), s1 (copy)
-				v6:error("Failed to open URL: ", s1, " with error: ", p3)
-			end)
+			if isStudio then
+				print(`[OnActivated Debug] Detected URL with LinkingProtocol: {p}`)
+			end
+
+			if default:isInternalDlicEnabled() then
+				default:detectDeeplinkIntent((default:createInternalDlic(p, DeepLinkSource.LuaInternal)))
+			else
+				default:detectURL(p)
+			end
 		end)
 	end, {})
 end

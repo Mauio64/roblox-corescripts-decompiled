@@ -1,5 +1,1 @@
-return {
-	Expiring = "Expiring",
-	Unsubscribed = "Unsubscribed",
-	ErrorCancelling = "ErrorCancelling"
-}
+return { Expiring = "Expiring", Unsubscribed = "Unsubscribed", ErrorCancelling = "ErrorCancelling" }

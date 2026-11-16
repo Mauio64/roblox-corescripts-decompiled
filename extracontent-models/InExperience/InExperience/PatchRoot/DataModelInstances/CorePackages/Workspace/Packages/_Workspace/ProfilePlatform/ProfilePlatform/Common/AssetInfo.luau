@@ -1,50 +1,76 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
+local parent = ProfilePlatform.Parent
 local Enums = require(ProfilePlatform.Common.Enums)
-local FFlagSocialEnableProfileInspectAndBuy = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuy
-local FFlagProfilePlatformEnableBundlesInAssetsCarousel = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableBundlesInAssetsCarousel
-local n1 = 0
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialEnableProfileInspectAndBuy = SharedFlags.FFlagSocialEnableProfileInspectAndBuy
 
-return {
-	mock = function(p1, s1: string?) -- line: 50
-		-- upvalues: n1 (ref), Enums (copy)
-		local t1 = {}
-		local str = tostring(p1)
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableBundlesInAssetsCarousel = SharedFlags2.FFlagProfilePlatformEnableBundlesInAssetsCarousel
+local FFlagProfileStoreShowLimitedResalePrice = require(ProfilePlatform.Flags.FFlagProfileStoreShowLimitedResalePrice)
 
-		if not str then
-			n1 += 1
-			str = tostring(n1)
+local count = 0
+
+local function fn() -- 1 equivalent call inferred from this helper
+	count += 1
+	return (tostring(count))
+end
+
+local AssetInfo = {}
+
+function AssetInfo.mock(p, p2: string?)
+	return {
+		["id"] = tostring(p) or fn(), -- inferred equivalent call
+		assetType = "0",
+		itemType = p2 or Enums.ItemTypes.Asset,
+		name = ""
+	}
+end
+
+function AssetInfo.fromAsset(data)
+	local v = {}
+
+	v.id = tostring(data.id)
+
+	local v2 = data.assetType
+
+	if not v2 then
+		if FFlagProfilePlatformEnableBundlesInAssetsCarousel then
+			v2 = data.bundleType
+		else
+			v2 = nil
 		end
-
-		t1.id = str
-		t1.assetType = "0"
-		t1.itemType = s1 or Enums.ItemTypes.Asset
-		t1.name = ""
-
-		return t1
-	end,
-	fromAsset = function(p2) -- line: 65
-		-- upvalues: FFlagProfilePlatformEnableBundlesInAssetsCarousel (copy), FFlagSocialEnableProfileInspectAndBuy (copy)
-		local t2 = {
-			id = tostring(p2.id),
-			assetType = tostring(p2.assetType or if not FFlagProfilePlatformEnableBundlesInAssetsCarousel then nil else p2.bundleType),
-			itemType = p2.itemType,
-			name = p2.name,
-			price = p2.price,
-			lowestResalePrice = p2.lowestResalePrice,
-			isOffSale = p2.isOffSale,
-			favoriteCount = p2.favoriteCount
-		}
-
-		if FFlagSocialEnableProfileInspectAndBuy then
-			t2.creatorName = p2.creatorName
-			t2.creatorHasVerifiedBadge = p2.creatorHasVerifiedBadge
-			t2.collectibleItemId = p2.collectibleItemId
-			t2.owned = p2.owned
-			t2.bundledItems = p2.bundledItems
-			t2.taxonomyName = if not p2.taxonomy or not (#p2.taxonomy > 0) then nil else p2.taxonomy[1].taxonomyName
-		end
-
-		return t2
 	end
-}
+
+	v.assetType = tostring(v2)
+	v.itemType = data.itemType
+	v.name = data.name
+	v.price = data.price
+	v.lowestResalePrice = data.lowestResalePrice
+	v.isOffSale = data.isOffSale
+	v.favoriteCount = data.favoriteCount
+
+	if FFlagSocialEnableProfileInspectAndBuy then
+		v.creatorName = data.creatorName
+		v.creatorHasVerifiedBadge = data.creatorHasVerifiedBadge
+		v.collectibleItemId = data.collectibleItemId
+		v.owned = data.owned
+		v.bundledItems = data.bundledItems
+		local taxonomyName
+
+		if data.taxonomy and #data.taxonomy > 0 then
+			taxonomyName = data.taxonomy[1].taxonomyName
+		end
+
+		v.taxonomyName = taxonomyName
+	end
+
+	if FFlagProfileStoreShowLimitedResalePrice then
+		v.hasResellers = data.hasResellers
+		v.unitsAvailableForConsumption = data.unitsAvailableForConsumption
+		v.itemRestrictions = data.itemRestrictions
+	end
+
+	return v
+end
+
+return AssetInfo

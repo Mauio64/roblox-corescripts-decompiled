@@ -1,20 +1,19 @@
-local function pop(p1, p2) -- line: 2
-	local v4 = type(p1)
+local function pop(list, value)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+	value = value or 1
+	local typeName2 = type(value)
+	local v = typeName2 == "number" and value % 1 == 0
+	assert(v, "expected an integer for second argument, got " .. typeName2)
 
-	local v5 = p2 or 1
-	local v6 = type(v5)
+	local result = {}
 
-	assert(v6 == "number" and v5 % 1 == 0, "expected an integer for second argument, got " .. v6)
-
-	local t1 = {}
-
-	for i = 1, #p1 - v5 do
-		t1[i] = p1[i]
+	for i = 1, #list - value do
+		result[i] = list[i]
 	end
 
-	return t1
+	return result
 end
 
 return pop

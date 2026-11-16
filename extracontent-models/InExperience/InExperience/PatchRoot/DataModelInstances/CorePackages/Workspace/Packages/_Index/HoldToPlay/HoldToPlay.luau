@@ -1,12 +1,9 @@
 local HoldToPlayLauncher = require(script.HoldToPlayLauncher)
 local useHoldToPlayStateAndCallbacks = require(script.useHoldToPlayStateAndCallbacks)
-local Constants = require(script.Constants)
-local HoldDetector = require(script.HoldDetector)
-
 return {
-	Constants = Constants,
+	Constants = require(script.Constants),
 	HoldToPlayLauncher = HoldToPlayLauncher,
-	HoldDetector = HoldDetector,
+	HoldDetector = require(script.HoldDetector),
 	useHoldToPlayStateAndCallbacks = useHoldToPlayStateAndCallbacks,
 	["jest.config"] = script["jest.config"]
 }

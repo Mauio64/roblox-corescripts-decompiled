@@ -1,34 +1,37 @@
 local LocalizationService = game:GetService("LocalizationService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local React = require(scriptParentParent.React)
-local Foundation = require(scriptParentParent.Foundation)
-local ReactRoblox = require(scriptParentParent.ReactRoblox)
-local Localization = require(scriptParentParent.InExperienceLocales).Localization
-local LocalizationProvider = require(scriptParentParent.Localization).LocalizationProvider
-local KeybindContextProvider = require(scriptParent.Context.KeybindContextProvider)
-local v10 = Localization.new(LocalizationService.RobloxLocaleId)
+
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local ReactRoblox = require(parent2.ReactRoblox)
+local InExperienceLocales = require(parent2.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+local Localization2 = require(parent2.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+local KeybindContextProvider = require(parent.Context.KeybindContextProvider)
+local localization = Localization.new(LocalizationService.RobloxLocaleId)
+
 local FoundationProvider = Foundation.FoundationProvider
 
-local function StoryBookMapStory(p1) -- line: 19
-	-- upvalues: React (copy), LocalizationProvider (copy), v10 (copy), KeybindContextProvider (copy), FoundationProvider (copy), Foundation (copy)
-	return function(p2) -- line: 20
-		-- upvalues: React (copy), LocalizationProvider (copy), v10 (copy), KeybindContextProvider (copy), FoundationProvider (copy), Foundation (copy), p1 (copy)
-		return React.createElement(LocalizationProvider, {
-			localization = v10
-		}, {
+local function StoryBookMapStory(p)
+	return function(p2)
+		return React.createElement(LocalizationProvider, { localization = localization }, {
 			KeybindContextProvider = React.createElement(KeybindContextProvider, nil, {
-				FoundationProvider = React.createElement(FoundationProvider, {
-					theme = Foundation.Enums.Theme.Dark
-				}, { React.createElement(p1, p2) })
+				FoundationProvider = React.createElement(
+					FoundationProvider,
+					{ colorMode = Foundation.Enums.ColorMode.Dark },
+					{ React.createElement(p, p2) }
+				)
 			})
 		})
 	end
 end
 
 return {
-	name = scriptParent.Name,
-	storyRoot = scriptParent,
+	name = parent.Name,
+	storyRoot = parent,
 	roact = React,
 	reactRoblox = ReactRoblox,
 	mapStory = StoryBookMapStory

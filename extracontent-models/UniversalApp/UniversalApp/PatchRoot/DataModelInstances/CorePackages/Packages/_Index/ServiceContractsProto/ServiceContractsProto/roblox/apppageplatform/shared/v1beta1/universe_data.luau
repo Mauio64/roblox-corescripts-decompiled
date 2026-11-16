@@ -1,718 +1,935 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 91
-	-- upvalues: t2 (copy)
+require(script.Parent.custom_options)
+
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local id
+
+	if not (data == nil or data.id == nil) then
+		id = data.id
+	end
+
+	local name
+
+	if not (data == nil or data.name == nil) then
+		name = data.name
+	end
+
+	local description
+
+	if not (data == nil or data.description == nil) then
+		description = data.description
+	end
+
+	local root_place_id
+
+	if not (data == nil or data.root_place_id == nil) then
+		root_place_id = data.root_place_id
+	end
+
+	local creator_type
+
+	if not (data == nil or data.creator_type == nil) then
+		creator_type = data.creator_type
+	end
+
+	local creator_id
+
+	if not (data == nil or data.creator_id == nil) then
+		creator_id = data.creator_id
+	end
+
+	local player_count
+
+	if not (data == nil or data.player_count == nil) then
+		player_count = data.player_count
+	end
+
+	local total_up_votes
+
+	if not (data == nil or data.total_up_votes == nil) then
+		total_up_votes = data.total_up_votes
+	end
+
+	local total_down_votes
+
+	if not (data == nil or data.total_down_votes == nil) then
+		total_down_votes = data.total_down_votes
+	end
+
+	local is_voice_supported
+
+	if not (data == nil or data.is_voice_supported == nil) then
+		is_voice_supported = data.is_voice_supported
+	end
+
+	local is_camera_supported
+
+	if not (data == nil or data.is_camera_supported == nil) then
+		is_camera_supported = data.is_camera_supported
+	end
+
+	local localized_fiat_price
+
+	if not (data == nil or data.localized_fiat_price == nil) then
+		localized_fiat_price = data.localized_fiat_price
+	end
+
+	local genre_l
+
+	if not (data == nil or data.genre_l1 == nil) then
+		genre_l = data.genre_l1
+	end
+
+	local genre_l2
+
+	if not (data == nil or data.genre_l2 == nil) then
+		genre_l2 = data.genre_l2
+	end
+
+	local maximum_server_size
+
+	if not (data == nil or data.maximum_server_size == nil) then
+		maximum_server_size = data.maximum_server_size
+	end
+
+	local created_date
+
+	if not (data == nil or data.created_date == nil) then
+		created_date = data.created_date
+	end
+
+	local updated_date
+
+	if not (data == nil or data.updated_date == nil) then
+		updated_date = data.updated_date
+	end
+
+	local favorite_count
+
+	if not (data == nil or data.favorite_count == nil) then
+		favorite_count = data.favorite_count
+	end
+
+	local total_visits
+
+	if not (data == nil or data.total_visits == nil) then
+		total_visits = data.total_visits
+	end
+
+	local canonical_url_path
+
+	if not (data == nil or data.canonical_url_path == nil) then
+		canonical_url_path = data.canonical_url_path
+	end
+
+	local game_minimum_age
+
+	if not (data == nil or data.game_minimum_age == nil) then
+		game_minimum_age = data.game_minimum_age
+	end
+
+	local game_age_display_name
+
+	if not (data == nil or data.game_age_display_name == nil) then
+		game_age_display_name = data.game_age_display_name
+	end
+
+	local content_maturity
+
+	if not (data == nil or data.content_maturity == nil) then
+		content_maturity = data.content_maturity
+	end
+
+	local is_officially_licensed
+
+	if not (data == nil or data.is_officially_licensed == nil) then
+		is_officially_licensed = data.is_officially_licensed
+	end
+
+	local refund_policy_text
+
+	if not (data == nil or data.refund_policy_text == nil) then
+		refund_policy_text = data.refund_policy_text
+	end
+
+	local refund_article_id
+
+	if not (data == nil or data.refund_article_id == nil) then
+		refund_article_id = data.refund_article_id
+	end
+
+	local preview_video_id
+
+	if not (data == nil or data.preview_video_id == nil) then
+		preview_video_id = data.preview_video_id
+	end
+
+	local creation_source
+
+	if not (data == nil or data.creation_source == nil) then
+		creation_source = data.creation_source
+	end
+
+	local promotional_text
+
+	if not (data == nil or data.promotional_text == nil) then
+		promotional_text = data.promotional_text
+	end
+
+	local moment_video_asset_id
+
+	if not (data == nil or data.moment_video_asset_id == nil) then
+		moment_video_asset_id = data.moment_video_asset_id
+	end
+
+	local is_community_licensed
+
+	if not (data == nil or data.is_community_licensed == nil) then
+		is_community_licensed = data.is_community_licensed
+	end
+
 	return (setmetatable({
-		id = if t3 ~= nil and t3.id ~= nil then t3.id else nil,
-		name = if t3 ~= nil and t3.name ~= nil then t3.name else nil,
-		description = if t3 ~= nil and t3.description ~= nil then t3.description else nil,
-		root_place_id = if t3 ~= nil and t3.root_place_id ~= nil then t3.root_place_id else nil,
-		creator_type = if t3 ~= nil and t3.creator_type ~= nil then t3.creator_type else nil,
-		creator_id = if t3 ~= nil and t3.creator_id ~= nil then t3.creator_id else nil,
-		player_count = if t3 ~= nil and t3.player_count ~= nil then t3.player_count else nil,
-		total_up_votes = if t3 ~= nil and t3.total_up_votes ~= nil then t3.total_up_votes else nil,
-		total_down_votes = if t3 ~= nil and t3.total_down_votes ~= nil then t3.total_down_votes else nil,
-		is_voice_supported = if t3 ~= nil and t3.is_voice_supported ~= nil then t3.is_voice_supported else nil,
-		is_camera_supported = if t3 ~= nil and t3.is_camera_supported ~= nil then t3.is_camera_supported else nil,
-		localized_fiat_price = if t3 ~= nil and t3.localized_fiat_price ~= nil then t3.localized_fiat_price else nil,
-		genre_l1 = if t3 ~= nil and t3.genre_l1 ~= nil then t3.genre_l1 else nil,
-		genre_l2 = if t3 ~= nil and t3.genre_l2 ~= nil then t3.genre_l2 else nil,
-		maximum_server_size = if t3 ~= nil and t3.maximum_server_size ~= nil then t3.maximum_server_size else nil,
-		created_date = if t3 ~= nil and t3.created_date ~= nil then t3.created_date else nil,
-		updated_date = if t3 ~= nil and t3.updated_date ~= nil then t3.updated_date else nil,
-		favorite_count = if t3 ~= nil and t3.favorite_count ~= nil then t3.favorite_count else nil,
-		total_visits = if t3 ~= nil and t3.total_visits ~= nil then t3.total_visits else nil,
-		canonical_url_path = if t3 ~= nil and t3.canonical_url_path ~= nil then t3.canonical_url_path else nil,
-		game_minimum_age = if t3 ~= nil and t3.game_minimum_age ~= nil then t3.game_minimum_age else nil,
-		game_age_display_name = if t3 ~= nil and t3.game_age_display_name ~= nil then t3.game_age_display_name else nil,
-		content_maturity = if t3 ~= nil and t3.content_maturity ~= nil then t3.content_maturity else nil,
-		is_officially_licensed = if t3 ~= nil and t3.is_officially_licensed ~= nil then t3.is_officially_licensed else nil,
-		refund_policy_text = if t3 ~= nil and t3.refund_policy_text ~= nil then t3.refund_policy_text else nil,
-		refund_article_id = if t3 ~= nil and t3.refund_article_id ~= nil then t3.refund_article_id else nil,
-		preview_video_id = if t3 ~= nil and t3.preview_video_id ~= nil then t3.preview_video_id else nil
-	}, t2))
+		id = id,
+		name = name,
+		description = description,
+		root_place_id = root_place_id,
+		creator_type = creator_type,
+		creator_id = creator_id,
+		player_count = player_count,
+		total_up_votes = total_up_votes,
+		total_down_votes = total_down_votes,
+		is_voice_supported = is_voice_supported,
+		is_camera_supported = is_camera_supported,
+		localized_fiat_price = localized_fiat_price,
+		genre_l1 = genre_l,
+		genre_l2 = genre_l2,
+		maximum_server_size = maximum_server_size,
+		created_date = created_date,
+		updated_date = updated_date,
+		favorite_count = favorite_count,
+		total_visits = total_visits,
+		canonical_url_path = canonical_url_path,
+		game_minimum_age = game_minimum_age,
+		game_age_display_name = game_age_display_name,
+		content_maturity = content_maturity,
+		is_officially_licensed = is_officially_licensed,
+		refund_policy_text = refund_policy_text,
+		refund_article_id = refund_article_id,
+		preview_video_id = preview_video_id,
+		creation_source = creation_source,
+		promotional_text = promotional_text,
+		moment_video_asset_id = moment_video_asset_id,
+		is_community_licensed = is_community_licensed
+	}, class))
 end
-function t2.encode(p1) -- line: 133
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.id ~= nil then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v9, v10, p1.id)
+	if data.id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.id)
 	end
 
-	if p1.name ~= nil then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.name)
+	if data.name ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.name)
 	end
 
-	if p1.description ~= nil then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v13, v14, p1.description)
+	if data.description ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.description)
 	end
 
-	if p1.root_place_id ~= nil then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v15, v16, p1.root_place_id)
+	if data.root_place_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.root_place_id)
 	end
 
-	if p1.creator_type ~= nil then
-		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v17, v18, p1.creator_type)
+	if data.creator_type ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.creator_type)
 	end
 
-	if p1.creator_id ~= nil then
-		local v19, v20 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v19, v20, p1.creator_id)
+	if data.creator_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.creator_id)
 	end
 
-	if p1.player_count ~= nil then
-		local v21, v22 = proto.writeTag(buf, n1, 7, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v21, v22, p1.player_count)
+	if data.player_count ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.player_count)
 	end
 
-	if p1.total_up_votes ~= nil then
-		local v23, v24 = proto.writeTag(buf, n1, 8, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v23, v24, p1.total_up_votes)
+	if data.total_up_votes ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.total_up_votes)
 	end
 
-	if p1.total_down_votes ~= nil then
-		local v25, v26 = proto.writeTag(buf, n1, 9, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v25, v26, p1.total_down_votes)
+	if data.total_down_votes ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.total_down_votes)
 	end
 
-	if p1.is_voice_supported ~= nil then
-		local v27, v28 = proto.writeTag(buf, n1, 10, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v27, v28, not p1.is_voice_supported and 0 or 1)
+	if data.is_voice_supported ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_voice_supported and 1 or 0)
 	end
 
-	if p1.is_camera_supported ~= nil then
-		local v29, v30 = proto.writeTag(buf, n1, 11, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v29, v30, not p1.is_camera_supported and 0 or 1)
+	if data.is_camera_supported ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 11, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_camera_supported and 1 or 0)
 	end
 
-	if p1.localized_fiat_price ~= nil then
-		local v31, v32 = proto.writeTag(buf, n1, 12, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v31, v32, p1.localized_fiat_price)
+	if data.localized_fiat_price ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 12, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.localized_fiat_price)
 	end
 
-	if p1.genre_l1 ~= nil then
-		local v33, v34 = proto.writeTag(buf, n1, 13, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v33, v34, p1.genre_l1)
+	if data.genre_l1 ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 13, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.genre_l1)
 	end
 
-	if p1.genre_l2 ~= nil then
-		local v35, v36 = proto.writeTag(buf, n1, 14, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v35, v36, p1.genre_l2)
+	if data.genre_l2 ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 14, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.genre_l2)
 	end
 
-	if p1.maximum_server_size ~= nil then
-		local v37, v38 = proto.writeTag(buf, n1, 15, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v37, v38, p1.maximum_server_size)
+	if data.maximum_server_size ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 15, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.maximum_server_size)
 	end
 
-	if p1.created_date ~= nil then
-		local v39, v40 = proto.writeTag(buf, n1, 16, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v39, v40, p1.created_date)
+	if data.created_date ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 16, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.created_date)
 	end
 
-	if p1.updated_date ~= nil then
-		local v41, v42 = proto.writeTag(buf, n1, 17, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v41, v42, p1.updated_date)
+	if data.updated_date ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 17, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.updated_date)
 	end
 
-	if p1.favorite_count ~= nil then
-		local v43, v44 = proto.writeTag(buf, n1, 18, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v43, v44, p1.favorite_count)
+	if data.favorite_count ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 18, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.favorite_count)
 	end
 
-	if p1.total_visits ~= nil then
-		local v45, v46 = proto.writeTag(buf, n1, 19, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v45, v46, p1.total_visits)
+	if data.total_visits ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 19, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.total_visits)
 	end
 
-	if p1.canonical_url_path ~= nil then
-		local v47, v48 = proto.writeTag(buf, n1, 20, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v47, v48, p1.canonical_url_path)
+	if data.canonical_url_path ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 20, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.canonical_url_path)
 	end
 
-	if p1.game_minimum_age ~= nil then
-		local v49, v50 = proto.writeTag(buf, n1, 21, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v49, v50, p1.game_minimum_age)
+	if data.game_minimum_age ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 21, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.game_minimum_age)
 	end
 
-	if p1.game_age_display_name ~= nil then
-		local v51, v52 = proto.writeTag(buf, n1, 22, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v51, v52, p1.game_age_display_name)
+	if data.game_age_display_name ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 22, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.game_age_display_name)
 	end
 
-	if p1.content_maturity ~= nil then
-		local v53, v54 = proto.writeTag(buf, n1, 23, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v53, v54, p1.content_maturity)
+	if data.content_maturity ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 23, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.content_maturity)
 	end
 
-	if p1.is_officially_licensed ~= nil then
-		local v55, v56 = proto.writeTag(buf, n1, 24, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v55, v56, not p1.is_officially_licensed and 0 or 1)
+	if data.is_officially_licensed ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 24, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_officially_licensed and 1 or 0)
 	end
 
-	if p1.refund_policy_text ~= nil then
-		local v57, v58 = proto.writeTag(buf, n1, 25, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v57, v58, p1.refund_policy_text)
+	if data.refund_policy_text ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 25, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.refund_policy_text)
 	end
 
-	if p1.refund_article_id ~= nil then
-		local v59, v60 = proto.writeTag(buf, n1, 26, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v59, v60, p1.refund_article_id)
+	if data.refund_article_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 26, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.refund_article_id)
 	end
 
-	if p1.preview_video_id ~= nil then
-		local v61, v62 = proto.writeTag(buf, n1, 27, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v61, v62, p1.preview_video_id)
+	if data.preview_video_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 27, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.preview_video_id)
 	end
 
-	local buf2 = buffer.create(n1)
+	if data.creation_source ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 28, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.creation_source)
+	end
 
-	buffer.copy(buf2, 0, buf, 0, n1)
+	if data.promotional_text ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 29, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.promotional_text)
+	end
 
-	return buf2
+	if data.moment_video_asset_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 30, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.moment_video_asset_id)
+	end
+
+	if data.is_community_licensed ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 31, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_community_licensed and 1 or 0)
+	end
+
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 277
-	-- upvalues: t2 (copy), proto (copy)
-	local v65 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v67, v68
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v67, v68, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v68 == proto.wireTypes.varint then
-			if v67 == 1 then
-				local v69
-
-				v69, n2 = proto.readVarIntI64(p2, n2)
-				v65.id = v69
-			elseif v67 == 4 then
-				local v70
-
-				v70, n2 = proto.readVarIntI64(p2, n2)
-				v65.root_place_id = v70
-			elseif v67 == 6 then
-				local v71
-
-				v71, n2 = proto.readVarIntI64(p2, n2)
-				v65.creator_id = v71
-			elseif v67 == 7 then
-				local v72
-
-				v72, n2 = proto.readVarIntI64(p2, n2)
-				v65.player_count = v72
-			elseif v67 == 8 then
-				local v73
-
-				v73, n2 = proto.readVarIntI64(p2, n2)
-				v65.total_up_votes = v73
-			elseif v67 == 9 then
-				local v74
-
-				v74, n2 = proto.readVarIntI64(p2, n2)
-				v65.total_down_votes = v74
-			elseif v67 == 10 then
-				local v75
-
-				v75, n2 = proto.readVarInt(p2, n2)
-				v65.is_voice_supported = v75 ~= 0
-			elseif v67 == 11 then
-				local v76
-
-				v76, n2 = proto.readVarInt(p2, n2)
-				v65.is_camera_supported = v76 ~= 0
-			elseif v67 == 15 then
-				local v77
-
-				v77, n2 = proto.readVarIntI64(p2, n2)
-				v65.maximum_server_size = v77
-			elseif v67 == 18 then
-				local v78
-
-				v78, n2 = proto.readVarIntI64(p2, n2)
-				v65.favorite_count = v78
-			elseif v67 == 19 then
-				local v79
-
-				v79, n2 = proto.readVarIntI64(p2, n2)
-				v65.total_visits = v79
-			elseif v67 == 21 then
-				local v80
-
-				v80, n2 = proto.readVarIntI32(p2, n2)
-				v65.game_minimum_age = v80
-			elseif v67 == 24 then
-				local v81
-
-				v81, n2 = proto.readVarInt(p2, n2)
-				v65.is_officially_licensed = v81 ~= 0
-			elseif v67 == 27 then
-				local v82
-
-				v82, n2 = proto.readVarIntI64(p2, n2)
-				v65.preview_video_id = v82
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local id
+				id, v2 = proto.readVarIntI64(buf, v2)
+				result.id = id
+			elseif v3 == 4 then
+				local root_place_id
+				root_place_id, v2 = proto.readVarIntI64(buf, v2)
+				result.root_place_id = root_place_id
+			elseif v3 == 6 then
+				local creator_id
+				creator_id, v2 = proto.readVarIntI64(buf, v2)
+				result.creator_id = creator_id
+			elseif v3 == 7 then
+				local player_count
+				player_count, v2 = proto.readVarIntI64(buf, v2)
+				result.player_count = player_count
+			elseif v3 == 8 then
+				local total_up_votes
+				total_up_votes, v2 = proto.readVarIntI64(buf, v2)
+				result.total_up_votes = total_up_votes
+			elseif v3 == 9 then
+				local total_down_votes
+				total_down_votes, v2 = proto.readVarIntI64(buf, v2)
+				result.total_down_votes = total_down_votes
+			elseif v3 == 10 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_voice_supported = v5 ~= 0
+			elseif v3 == 11 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_camera_supported = v5 ~= 0
+			elseif v3 == 15 then
+				local maximum_server_size
+				maximum_server_size, v2 = proto.readVarIntI64(buf, v2)
+				result.maximum_server_size = maximum_server_size
+			elseif v3 == 18 then
+				local favorite_count
+				favorite_count, v2 = proto.readVarIntI64(buf, v2)
+				result.favorite_count = favorite_count
+			elseif v3 == 19 then
+				local total_visits
+				total_visits, v2 = proto.readVarIntI64(buf, v2)
+				result.total_visits = total_visits
+			elseif v3 == 21 then
+				local game_minimum_age
+				game_minimum_age, v2 = proto.readVarIntI32(buf, v2)
+				result.game_minimum_age = game_minimum_age
+			elseif v3 == 24 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_officially_licensed = v5 ~= 0
+			elseif v3 == 27 then
+				local preview_video_id
+				preview_video_id, v2 = proto.readVarIntI64(buf, v2)
+				result.preview_video_id = preview_video_id
+			elseif v3 == 30 then
+				local moment_video_asset_id
+				moment_video_asset_id, v2 = proto.readVarIntI64(buf, v2)
+				result.moment_video_asset_id = moment_video_asset_id
+			elseif v3 == 31 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_community_licensed = v5 ~= 0
 			else
-				local v83
-
-				v83, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v68 == proto.wireTypes.lengthDelimited then
-			if v67 == 2 then
-				local v84
-
-				v84, n2 = proto.readBuffer(p2, n2)
-				v65.name = buffer.tostring(v84)
-			elseif v67 == 3 then
-				local v85
-
-				v85, n2 = proto.readBuffer(p2, n2)
-				v65.description = buffer.tostring(v85)
-			elseif v67 == 5 then
-				local v86
-
-				v86, n2 = proto.readBuffer(p2, n2)
-				v65.creator_type = buffer.tostring(v86)
-			elseif v67 == 12 then
-				local v87
-
-				v87, n2 = proto.readBuffer(p2, n2)
-				v65.localized_fiat_price = buffer.tostring(v87)
-			elseif v67 == 13 then
-				local v88
-
-				v88, n2 = proto.readBuffer(p2, n2)
-				v65.genre_l1 = buffer.tostring(v88)
-			elseif v67 == 14 then
-				local v89
-
-				v89, n2 = proto.readBuffer(p2, n2)
-				v65.genre_l2 = buffer.tostring(v89)
-			elseif v67 == 16 then
-				local v90
-
-				v90, n2 = proto.readBuffer(p2, n2)
-				v65.created_date = buffer.tostring(v90)
-			elseif v67 == 17 then
-				local v91
-
-				v91, n2 = proto.readBuffer(p2, n2)
-				v65.updated_date = buffer.tostring(v91)
-			elseif v67 == 20 then
-				local v92
-
-				v92, n2 = proto.readBuffer(p2, n2)
-				v65.canonical_url_path = buffer.tostring(v92)
-			elseif v67 == 22 then
-				local v93
-
-				v93, n2 = proto.readBuffer(p2, n2)
-				v65.game_age_display_name = buffer.tostring(v93)
-			elseif v67 == 23 then
-				local v94
-
-				v94, n2 = proto.readBuffer(p2, n2)
-				v65.content_maturity = buffer.tostring(v94)
-			elseif v67 == 25 then
-				local v95
-
-				v95, n2 = proto.readBuffer(p2, n2)
-				v65.refund_policy_text = buffer.tostring(v95)
-			elseif v67 == 26 then
-				local v96
-
-				v96, n2 = proto.readBuffer(p2, n2)
-				v65.refund_article_id = buffer.tostring(v96)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.name = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.description = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.creator_type = buffer.tostring(v5)
+			elseif v3 == 12 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.localized_fiat_price = buffer.tostring(v5)
+			elseif v3 == 13 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.genre_l1 = buffer.tostring(v5)
+			elseif v3 == 14 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.genre_l2 = buffer.tostring(v5)
+			elseif v3 == 16 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.created_date = buffer.tostring(v5)
+			elseif v3 == 17 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.updated_date = buffer.tostring(v5)
+			elseif v3 == 20 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.canonical_url_path = buffer.tostring(v5)
+			elseif v3 == 22 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.game_age_display_name = buffer.tostring(v5)
+			elseif v3 == 23 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.content_maturity = buffer.tostring(v5)
+			elseif v3 == 25 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.refund_policy_text = buffer.tostring(v5)
+			elseif v3 == 26 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.refund_article_id = buffer.tostring(v5)
+			elseif v3 == 28 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.creation_source = buffer.tostring(v5)
+			elseif v3 == 29 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.promotional_text = buffer.tostring(v5)
 			else
-				local v97, v98 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v98 + v97
+				v2 = v5 + varInt
 			end
-		elseif v68 == proto.wireTypes.i32 then
-			local v99
-
-			v99, n2 = proto.readFixed32(p2, n2)
-		elseif v68 == proto.wireTypes.i64 then
-			local v100
-
-			v100, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v68)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v65
-end
-function t2.jsonEncode(p3) -- line: 450
-	local t4 = {}
-
-	if p3.id ~= nil then
-		t4.id = p3.id
-	end
-
-	if p3.name ~= nil then
-		t4.name = p3.name
-	end
-
-	if p3.description ~= nil then
-		t4.description = p3.description
-	end
-
-	if p3.root_place_id ~= nil then
-		t4.rootPlaceId = p3.root_place_id
-	end
-
-	if p3.creator_type ~= nil then
-		t4.creatorType = p3.creator_type
-	end
-
-	if p3.creator_id ~= nil then
-		t4.creatorId = p3.creator_id
-	end
-
-	if p3.player_count ~= nil then
-		t4.playerCount = p3.player_count
-	end
-
-	if p3.total_up_votes ~= nil then
-		t4.totalUpVotes = p3.total_up_votes
-	end
-
-	if p3.total_down_votes ~= nil then
-		t4.totalDownVotes = p3.total_down_votes
-	end
-
-	if p3.is_voice_supported ~= nil then
-		t4.isVoiceSupported = p3.is_voice_supported
-	end
-
-	if p3.is_camera_supported ~= nil then
-		t4.isCameraSupported = p3.is_camera_supported
-	end
-
-	if p3.localized_fiat_price ~= nil then
-		t4.localizedFiatPrice = p3.localized_fiat_price
-	end
-
-	if p3.genre_l1 ~= nil then
-		t4.genreL1 = p3.genre_l1
-	end
-
-	if p3.genre_l2 ~= nil then
-		t4.genreL2 = p3.genre_l2
-	end
-
-	if p3.maximum_server_size ~= nil then
-		t4.maximumServerSize = p3.maximum_server_size
-	end
-
-	if p3.created_date ~= nil then
-		t4.createdDate = p3.created_date
-	end
-
-	if p3.updated_date ~= nil then
-		t4.updatedDate = p3.updated_date
-	end
-
-	if p3.favorite_count ~= nil then
-		t4.favoriteCount = p3.favorite_count
-	end
-
-	if p3.total_visits ~= nil then
-		t4.totalVisits = p3.total_visits
-	end
-
-	if p3.canonical_url_path ~= nil then
-		t4.canonicalUrlPath = p3.canonical_url_path
-	end
-
-	if p3.game_minimum_age ~= nil then
-		t4.gameMinimumAge = p3.game_minimum_age
-	end
-
-	if p3.game_age_display_name ~= nil then
-		t4.gameAgeDisplayName = p3.game_age_display_name
-	end
-
-	if p3.content_maturity ~= nil then
-		t4.contentMaturity = p3.content_maturity
-	end
-
-	if p3.is_officially_licensed ~= nil then
-		t4.isOfficiallyLicensed = p3.is_officially_licensed
-	end
-
-	if p3.refund_policy_text ~= nil then
-		t4.refundPolicyText = p3.refund_policy_text
-	end
-
-	if p3.refund_article_id ~= nil then
-		t4.refundArticleId = p3.refund_article_id
-	end
-
-	if p3.preview_video_id ~= nil then
-		t4.previewVideoId = p3.preview_video_id
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 564
-	-- upvalues: t2 (copy)
-	local v104 = t2.new()
-
-	if t5.id ~= nil then
-		v104.id = t5.id
-	end
-
-	if t5.name ~= nil then
-		v104.name = t5.name
-	end
-
-	if t5.description ~= nil then
-		v104.description = t5.description
-	end
-
-	if t5.root_place_id ~= nil then
-		v104.root_place_id = t5.root_place_id
-	end
-
-	if t5.rootPlaceId ~= nil then
-		v104.root_place_id = t5.rootPlaceId
-	end
-
-	if t5.creator_type ~= nil then
-		v104.creator_type = t5.creator_type
-	end
-
-	if t5.creatorType ~= nil then
-		v104.creator_type = t5.creatorType
-	end
-
-	if t5.creator_id ~= nil then
-		v104.creator_id = t5.creator_id
-	end
-
-	if t5.creatorId ~= nil then
-		v104.creator_id = t5.creatorId
-	end
-
-	if t5.player_count ~= nil then
-		v104.player_count = t5.player_count
-	end
-
-	if t5.playerCount ~= nil then
-		v104.player_count = t5.playerCount
-	end
-
-	if t5.total_up_votes ~= nil then
-		v104.total_up_votes = t5.total_up_votes
-	end
-
-	if t5.totalUpVotes ~= nil then
-		v104.total_up_votes = t5.totalUpVotes
-	end
-
-	if t5.total_down_votes ~= nil then
-		v104.total_down_votes = t5.total_down_votes
-	end
-
-	if t5.totalDownVotes ~= nil then
-		v104.total_down_votes = t5.totalDownVotes
-	end
-
-	if t5.is_voice_supported ~= nil then
-		v104.is_voice_supported = t5.is_voice_supported
-	end
-
-	if t5.isVoiceSupported ~= nil then
-		v104.is_voice_supported = t5.isVoiceSupported
-	end
-
-	if t5.is_camera_supported ~= nil then
-		v104.is_camera_supported = t5.is_camera_supported
-	end
-
-	if t5.isCameraSupported ~= nil then
-		v104.is_camera_supported = t5.isCameraSupported
-	end
-
-	if t5.localized_fiat_price ~= nil then
-		v104.localized_fiat_price = t5.localized_fiat_price
-	end
-
-	if t5.localizedFiatPrice ~= nil then
-		v104.localized_fiat_price = t5.localizedFiatPrice
-	end
-
-	if t5.genre_l1 ~= nil then
-		v104.genre_l1 = t5.genre_l1
-	end
-
-	if t5.genreL1 ~= nil then
-		v104.genre_l1 = t5.genreL1
-	end
-
-	if t5.genre_l2 ~= nil then
-		v104.genre_l2 = t5.genre_l2
-	end
-
-	if t5.genreL2 ~= nil then
-		v104.genre_l2 = t5.genreL2
-	end
-
-	if t5.maximum_server_size ~= nil then
-		v104.maximum_server_size = t5.maximum_server_size
-	end
-
-	if t5.maximumServerSize ~= nil then
-		v104.maximum_server_size = t5.maximumServerSize
-	end
-
-	if t5.created_date ~= nil then
-		v104.created_date = t5.created_date
-	end
-
-	if t5.createdDate ~= nil then
-		v104.created_date = t5.createdDate
-	end
-
-	if t5.updated_date ~= nil then
-		v104.updated_date = t5.updated_date
-	end
-
-	if t5.updatedDate ~= nil then
-		v104.updated_date = t5.updatedDate
-	end
-
-	if t5.favorite_count ~= nil then
-		v104.favorite_count = t5.favorite_count
-	end
-
-	if t5.favoriteCount ~= nil then
-		v104.favorite_count = t5.favoriteCount
-	end
-
-	if t5.total_visits ~= nil then
-		v104.total_visits = t5.total_visits
-	end
-
-	if t5.totalVisits ~= nil then
-		v104.total_visits = t5.totalVisits
-	end
-
-	if t5.canonical_url_path ~= nil then
-		v104.canonical_url_path = t5.canonical_url_path
-	end
-
-	if t5.canonicalUrlPath ~= nil then
-		v104.canonical_url_path = t5.canonicalUrlPath
-	end
-
-	if t5.game_minimum_age ~= nil then
-		v104.game_minimum_age = t5.game_minimum_age
-	end
-
-	if t5.gameMinimumAge ~= nil then
-		v104.game_minimum_age = t5.gameMinimumAge
-	end
-
-	if t5.game_age_display_name ~= nil then
-		v104.game_age_display_name = t5.game_age_display_name
-	end
-
-	if t5.gameAgeDisplayName ~= nil then
-		v104.game_age_display_name = t5.gameAgeDisplayName
-	end
-
-	if t5.content_maturity ~= nil then
-		v104.content_maturity = t5.content_maturity
-	end
-
-	if t5.contentMaturity ~= nil then
-		v104.content_maturity = t5.contentMaturity
-	end
-
-	if t5.is_officially_licensed ~= nil then
-		v104.is_officially_licensed = t5.is_officially_licensed
-	end
-
-	if t5.isOfficiallyLicensed ~= nil then
-		v104.is_officially_licensed = t5.isOfficiallyLicensed
-	end
-
-	if t5.refund_policy_text ~= nil then
-		v104.refund_policy_text = t5.refund_policy_text
-	end
-
-	if t5.refundPolicyText ~= nil then
-		v104.refund_policy_text = t5.refundPolicyText
-	end
-
-	if t5.refund_article_id ~= nil then
-		v104.refund_article_id = t5.refund_article_id
-	end
-
-	if t5.refundArticleId ~= nil then
-		v104.refund_article_id = t5.refundArticleId
-	end
-
-	if t5.preview_video_id ~= nil then
-		v104.preview_video_id = t5.preview_video_id
-	end
-
-	if t5.previewVideoId ~= nil then
-		v104.preview_video_id = t5.previewVideoId
-	end
-
-	return v104
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil then
+		v2.name = data.name
+	end
+
+	if data.description ~= nil then
+		v2.description = data.description
+	end
+
+	if data.root_place_id ~= nil then
+		v2.rootPlaceId = data.root_place_id
+	end
+
+	if data.creator_type ~= nil then
+		v2.creatorType = data.creator_type
+	end
+
+	if data.creator_id ~= nil then
+		v2.creatorId = data.creator_id
+	end
+
+	if data.player_count ~= nil then
+		v2.playerCount = data.player_count
+	end
+
+	if data.total_up_votes ~= nil then
+		v2.totalUpVotes = data.total_up_votes
+	end
+
+	if data.total_down_votes ~= nil then
+		v2.totalDownVotes = data.total_down_votes
+	end
+
+	if data.is_voice_supported ~= nil then
+		v2.isVoiceSupported = data.is_voice_supported
+	end
+
+	if data.is_camera_supported ~= nil then
+		v2.isCameraSupported = data.is_camera_supported
+	end
+
+	if data.localized_fiat_price ~= nil then
+		v2.localizedFiatPrice = data.localized_fiat_price
+	end
+
+	if data.genre_l1 ~= nil then
+		v2.genreL1 = data.genre_l1
+	end
+
+	if data.genre_l2 ~= nil then
+		v2.genreL2 = data.genre_l2
+	end
+
+	if data.maximum_server_size ~= nil then
+		v2.maximumServerSize = data.maximum_server_size
+	end
+
+	if data.created_date ~= nil then
+		v2.createdDate = data.created_date
+	end
+
+	if data.updated_date ~= nil then
+		v2.updatedDate = data.updated_date
+	end
+
+	if data.favorite_count ~= nil then
+		v2.favoriteCount = data.favorite_count
+	end
+
+	if data.total_visits ~= nil then
+		v2.totalVisits = data.total_visits
+	end
+
+	if data.canonical_url_path ~= nil then
+		v2.canonicalUrlPath = data.canonical_url_path
+	end
+
+	if data.game_minimum_age ~= nil then
+		v2.gameMinimumAge = data.game_minimum_age
+	end
+
+	if data.game_age_display_name ~= nil then
+		v2.gameAgeDisplayName = data.game_age_display_name
+	end
+
+	if data.content_maturity ~= nil then
+		v2.contentMaturity = data.content_maturity
+	end
+
+	if data.is_officially_licensed ~= nil then
+		v2.isOfficiallyLicensed = data.is_officially_licensed
+	end
+
+	if data.refund_policy_text ~= nil then
+		v2.refundPolicyText = data.refund_policy_text
+	end
+
+	if data.refund_article_id ~= nil then
+		v2.refundArticleId = data.refund_article_id
+	end
+
+	if data.preview_video_id ~= nil then
+		v2.previewVideoId = data.preview_video_id
+	end
+
+	if data.creation_source ~= nil then
+		v2.creationSource = data.creation_source
+	end
+
+	if data.promotional_text ~= nil then
+		v2.promotionalText = data.promotional_text
+	end
+
+	if data.moment_video_asset_id ~= nil then
+		v2.momentVideoAssetId = data.moment_video_asset_id
+	end
+
+	if data.is_community_licensed ~= nil then
+		v2.isCommunityLicensed = data.is_community_licensed
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil then
+		v2.name = data.name
+	end
+
+	if data.description ~= nil then
+		v2.description = data.description
+	end
+
+	if data.root_place_id ~= nil then
+		v2.root_place_id = data.root_place_id
+	end
+
+	if data.rootPlaceId ~= nil then
+		v2.root_place_id = data.rootPlaceId
+	end
+
+	if data.creator_type ~= nil then
+		v2.creator_type = data.creator_type
+	end
+
+	if data.creatorType ~= nil then
+		v2.creator_type = data.creatorType
+	end
+
+	if data.creator_id ~= nil then
+		v2.creator_id = data.creator_id
+	end
+
+	if data.creatorId ~= nil then
+		v2.creator_id = data.creatorId
+	end
+
+	if data.player_count ~= nil then
+		v2.player_count = data.player_count
+	end
+
+	if data.playerCount ~= nil then
+		v2.player_count = data.playerCount
+	end
+
+	if data.total_up_votes ~= nil then
+		v2.total_up_votes = data.total_up_votes
+	end
+
+	if data.totalUpVotes ~= nil then
+		v2.total_up_votes = data.totalUpVotes
+	end
+
+	if data.total_down_votes ~= nil then
+		v2.total_down_votes = data.total_down_votes
+	end
+
+	if data.totalDownVotes ~= nil then
+		v2.total_down_votes = data.totalDownVotes
+	end
+
+	if data.is_voice_supported ~= nil then
+		v2.is_voice_supported = data.is_voice_supported
+	end
+
+	if data.isVoiceSupported ~= nil then
+		v2.is_voice_supported = data.isVoiceSupported
+	end
+
+	if data.is_camera_supported ~= nil then
+		v2.is_camera_supported = data.is_camera_supported
+	end
+
+	if data.isCameraSupported ~= nil then
+		v2.is_camera_supported = data.isCameraSupported
+	end
+
+	if data.localized_fiat_price ~= nil then
+		v2.localized_fiat_price = data.localized_fiat_price
+	end
+
+	if data.localizedFiatPrice ~= nil then
+		v2.localized_fiat_price = data.localizedFiatPrice
+	end
+
+	if data.genre_l1 ~= nil then
+		v2.genre_l1 = data.genre_l1
+	end
+
+	if data.genreL1 ~= nil then
+		v2.genre_l1 = data.genreL1
+	end
+
+	if data.genre_l2 ~= nil then
+		v2.genre_l2 = data.genre_l2
+	end
+
+	if data.genreL2 ~= nil then
+		v2.genre_l2 = data.genreL2
+	end
+
+	if data.maximum_server_size ~= nil then
+		v2.maximum_server_size = data.maximum_server_size
+	end
+
+	if data.maximumServerSize ~= nil then
+		v2.maximum_server_size = data.maximumServerSize
+	end
+
+	if data.created_date ~= nil then
+		v2.created_date = data.created_date
+	end
+
+	if data.createdDate ~= nil then
+		v2.created_date = data.createdDate
+	end
+
+	if data.updated_date ~= nil then
+		v2.updated_date = data.updated_date
+	end
+
+	if data.updatedDate ~= nil then
+		v2.updated_date = data.updatedDate
+	end
+
+	if data.favorite_count ~= nil then
+		v2.favorite_count = data.favorite_count
+	end
+
+	if data.favoriteCount ~= nil then
+		v2.favorite_count = data.favoriteCount
+	end
+
+	if data.total_visits ~= nil then
+		v2.total_visits = data.total_visits
+	end
+
+	if data.totalVisits ~= nil then
+		v2.total_visits = data.totalVisits
+	end
+
+	if data.canonical_url_path ~= nil then
+		v2.canonical_url_path = data.canonical_url_path
+	end
+
+	if data.canonicalUrlPath ~= nil then
+		v2.canonical_url_path = data.canonicalUrlPath
+	end
+
+	if data.game_minimum_age ~= nil then
+		v2.game_minimum_age = data.game_minimum_age
+	end
+
+	if data.gameMinimumAge ~= nil then
+		v2.game_minimum_age = data.gameMinimumAge
+	end
+
+	if data.game_age_display_name ~= nil then
+		v2.game_age_display_name = data.game_age_display_name
+	end
+
+	if data.gameAgeDisplayName ~= nil then
+		v2.game_age_display_name = data.gameAgeDisplayName
+	end
+
+	if data.content_maturity ~= nil then
+		v2.content_maturity = data.content_maturity
+	end
+
+	if data.contentMaturity ~= nil then
+		v2.content_maturity = data.contentMaturity
+	end
+
+	if data.is_officially_licensed ~= nil then
+		v2.is_officially_licensed = data.is_officially_licensed
+	end
+
+	if data.isOfficiallyLicensed ~= nil then
+		v2.is_officially_licensed = data.isOfficiallyLicensed
+	end
+
+	if data.refund_policy_text ~= nil then
+		v2.refund_policy_text = data.refund_policy_text
+	end
+
+	if data.refundPolicyText ~= nil then
+		v2.refund_policy_text = data.refundPolicyText
+	end
+
+	if data.refund_article_id ~= nil then
+		v2.refund_article_id = data.refund_article_id
+	end
+
+	if data.refundArticleId ~= nil then
+		v2.refund_article_id = data.refundArticleId
+	end
+
+	if data.preview_video_id ~= nil then
+		v2.preview_video_id = data.preview_video_id
+	end
+
+	if data.previewVideoId ~= nil then
+		v2.preview_video_id = data.previewVideoId
+	end
+
+	if data.creation_source ~= nil then
+		v2.creation_source = data.creation_source
+	end
+
+	if data.creationSource ~= nil then
+		v2.creation_source = data.creationSource
+	end
+
+	if data.promotional_text ~= nil then
+		v2.promotional_text = data.promotional_text
+	end
+
+	if data.promotionalText ~= nil then
+		v2.promotional_text = data.promotionalText
+	end
+
+	if data.moment_video_asset_id ~= nil then
+		v2.moment_video_asset_id = data.moment_video_asset_id
+	end
+
+	if data.momentVideoAssetId ~= nil then
+		v2.moment_video_asset_id = data.momentVideoAssetId
+	end
+
+	if data.is_community_licensed ~= nil then
+		v2.is_community_licensed = data.is_community_licensed
+	end
+
+	if data.isCommunityLicensed ~= nil then
+		v2.is_community_licensed = data.isCommunityLicensed
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "UniverseData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseData"
 }
-t1.UniverseData = t2
-typeRegistry.default:register(t1.UniverseData)
 
-return {
-	UniverseData = t1.UniverseData
-}
+v.UniverseData = class
+
+typeRegistry.default:register(v.UniverseData)
+
+return { UniverseData = v.UniverseData }

@@ -1,25 +1,23 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("ServerTriggeredModalImpressions").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
-local t1 = {
+
+local parent = script:FindFirstAncestor("ServerTriggeredModalImpressions").Parent
+
+local LoggingProtocol = require(parent.LoggingProtocol)
+
+local defineFastFlag = game:DefineFastFlag("ModalImpressionEventAddSessionInfo", false)
+
+local v = {
 	eventName = "ModalImpression",
-	description = "Sent when a modal is shown",
-	links = "",
 	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
 	throttlingPercentage = game:DefineFastInt("ModalImpressionThrottleHundrethsPercent", 10000),
-	lastUpdated = {
-		25,
-		9,
-		9
-	}
+	lastUpdated = { 25, 9, 9 },
+	description = "Sent when a modal is shown",
+	links = ""
 }
 
-return function(s1: string, s2: string) -- line: 19
-	-- upvalues: TelemetryService (copy), t1 (copy)
-	TelemetryService:LogEvent(t1, {
-		customFields = {
-			modalId = s1,
-			modalType = s2
-		}
+return function(modalId: string, modalType: string)
+	TelemetryService:LogEvent(v, {
+		standardizedFields = defineFastFlag and { "addSessionInfo" } or nil,
+		customFields = { modalId = modalId, modalType = modalType }
 	})
 end

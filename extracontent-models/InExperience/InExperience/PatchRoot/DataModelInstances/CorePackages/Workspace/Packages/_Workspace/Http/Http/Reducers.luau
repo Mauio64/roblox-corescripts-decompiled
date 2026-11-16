@@ -1,3 +1,1 @@
-return {
-	FetchingStatus = require(script.FetchingStatus)
-}
+return { FetchingStatus = require(script.FetchingStatus) }

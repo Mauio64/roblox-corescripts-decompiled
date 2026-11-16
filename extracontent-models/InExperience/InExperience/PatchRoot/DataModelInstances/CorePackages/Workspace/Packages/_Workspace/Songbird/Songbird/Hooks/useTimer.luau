@@ -1,34 +1,30 @@
 local Songbird = script:FindFirstAncestor("Songbird")
+
 local Cryo = require(Songbird.Parent.Cryo)
-local useEffect = require(Songbird.Parent.React).useEffect
+local React = require(Songbird.Parent.React)
 
-local function useTimer(n1: number, p1: ((...any) -> ...any), t1: {[any]: any}?) -- line: 8
-	-- upvalues: useEffect (copy), Cryo (copy)
-	useEffect(function() -- line: 9
-		-- upvalues: n1 (copy), p1 (copy)
-		local u8 = true
+local useEffect = React.useEffect
 
-		task.spawn(function() -- line: 12
-			-- upvalues: u8 (ref), n1 (copy), p1 (copy)
-			while u8 do
-				task.wait(n1)
+local function useTimer(duration: number, callback, options)
+	useEffect(function()
+		local flag = true
 
-				if not u8 then
-					return
+		task.spawn(function()
+			while flag do
+				task.wait(duration)
+
+				if not flag then
+					break
 				end
 
-				p1()
+				callback()
 			end
 		end)
 
-		return function() -- line: 24
-			-- upvalues: u8 (ref)
-			u8 = false
+		return function()
+			flag = false
 		end
-	end, Cryo.Dictionary.join({
-		n1,
-		p1
-	}, t1 or {}))
+	end, Cryo.Dictionary.join({ duration, callback }, options or {}))
 end
 
 return useTimer

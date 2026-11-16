@@ -1,37 +1,35 @@
 local HttpService = game:GetService("HttpService")
 local TelemetryService = game:GetService("TelemetryService")
-local t1 = {
+
+local v = {
 	eventName = "buildExperienceEvent",
-	description = "Client events for Build tab interactions (impression, clicks, playtest) and the private playtest invite flow (add-to-playtest, picker/management impressions, playtester add/remove, share).",
-	backends = {
-		"Points",
-		"EventIngest"
-	},
+	backends = { "Points", "EventIngest" },
 	throttlingPercentage = game:DefineFastInt("BuildExperienceEventThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		2026,
-		7,
-		23
-	}
+	lastUpdated = { 2026, 11, 2 },
+	description = "Client events for Build tab interactions, chat opens, prompt chips, Library browsing and contextual prompt submissions, prompt send lifecycle (start, stall, stop, failure), playtesting, private invites, private playtest preview taps, monetization, ad-upsell impressions and clicks, and Analytics page goal card and locked-action impressions and clicks."
 }
 
-local function sendBuildExperienceEvent(s1: string, t2: {[any]: any}, t3: {[any]: any}?) -- line: 36
-	-- upvalues: HttpService (copy), TelemetryService (copy), t1 (copy)
-	local t4 = {
-		eventType = s1,
-		universeId = t2.universeId,
-		placeId = t2.placeId,
-		conversationId = t2.conversationId,
-		messageId = t2.messageId,
-		parameters = if not t3 then nil else HttpService:JSONEncode(t3)
+local function sendBuildExperienceEvent(eventType: string, data, p)
+	local customFields = {
+		eventType = eventType,
+		universeId = data.universeId,
+		placeId = data.placeId,
+		conversationId = data.conversationId,
+		messageId = data.messageId,
+		turnId = data.turnId,
+		parameters = 0
 	}
+	local parameters
 
-	TelemetryService:LogEvent(t1, {
-		standardizedFields = {
-			"addUserId",
-			"addSessionId"
-		},
-		customFields = t4
+	if p then
+		parameters = HttpService:JSONEncode(p)
+	end
+
+	customFields.parameters = parameters
+
+	TelemetryService:LogEvent(v, {
+		standardizedFields = { "addUserId", "addSessionId" },
+		customFields = customFields
 	})
 end
 

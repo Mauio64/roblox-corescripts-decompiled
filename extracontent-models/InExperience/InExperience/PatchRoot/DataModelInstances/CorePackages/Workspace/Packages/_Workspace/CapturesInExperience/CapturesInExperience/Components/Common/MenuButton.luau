@@ -1,44 +1,65 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local AppCommonLib = require(ParentParent.AppCommonLib)
-local React = require(ParentParent.React)
-local UIBlox = require(ParentParent.UIBlox)
+local parent = script.Parent.Parent.Parent.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local AppCommonLibText = AppCommonLib.Text
+local Text = AppCommonLib.Text
 local useStyle = UIBlox.Core.Style.useStyle
 
-return function(t1: {[any]: any}) -- line: 25
-	-- upvalues: useStyle (copy), React (copy), AppCommonLibText (copy), Button (copy), ButtonType (copy)
-	local v10 = useStyle()
-	local Header2Font = v10.Font.Header2.Font
-	local v12 = v10.Font.BaseSize * v10.Font.Header2.RelativeSize
-	local v13 = React.useMemo(function() -- line: 31
-		-- upvalues: t1 (copy), AppCommonLibText (copy), Header2Font (copy), v12 (copy)
-		if t1.buttonWidth then
-			return t1.buttonWidth
+return function(props)
+	local v = useStyle()
+	local font
+
+	if FoundationFontFaceMigration then
+		font = v.Tokens.Typography.TitleLarge.Font
+	else
+		font = v.Font.Header2.Font
+	end
+
+	local v2 = v.Font.BaseSize * v.Font.Header2.RelativeSize
+
+	local v3 = React.useMemo(function()
+		if props.buttonWidth then
+			return props.buttonWidth
 		end
 
-		return AppCommonLibText.GetTextWidth(t1.text, Header2Font, v12) + 24
-	end, {
-		t1.text,
-		Header2Font,
-		v12,
-		t1.buttonWidth
-	})
-	local v14 = if not t1.buttonHeight then UDim2.new(0, v13, 1, 0) else UDim2.fromOffset(v13, t1.buttonHeight)
+		local v3
+
+		if FoundationFontFaceMigration then
+			v3 = GetTextSize(props.text, v2, font, Vector2.new(10000, 10000)).X
+		else
+			v3 = Text.GetTextWidth(props.text, font, v2)
+		end
+
+		return v3 + 24
+	end, { props.text, font, v2, props.buttonWidth })
+	local size
+
+	if props.buttonHeight then
+		size = UDim2.fromOffset(v3, props.buttonHeight)
+	else
+		size = UDim2.new(0, v3, 1, 0)
+	end
 
 	return React.createElement("Frame", {
+		AnchorPoint = props.AnchorPoint,
 		BackgroundTransparency = 1,
-		AnchorPoint = t1.AnchorPoint,
-		LayoutOrder = t1.LayoutOrder,
-		Position = t1.Position,
-		Size = v14
+		LayoutOrder = props.LayoutOrder,
+		Position = props.Position,
+		Size = size
 	}, {
 		ShowMoreButton = React.createElement(Button, {
 			buttonType = ButtonType.Secondary,
-			onActivated = t1.onActivated,
+			onActivated = props.onActivated,
 			size = UDim2.fromScale(1, 1),
-			text = t1.text
+			text = props.text
 		})
 	})
 end

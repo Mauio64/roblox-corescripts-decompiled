@@ -1,10 +1,11 @@
-local ParentParent = script.Parent.Parent
-local InputTypeConstants = require(ParentParent.InputType).InputTypeConstants
-local getInputGroup = require(ParentParent.InputType).getInputGroup
+local parent = script.Parent.Parent
+local InputType = require(parent.InputType)
+local InputTypeConstants = InputType.InputTypeConstants
+local InputType2 = require(parent.InputType)
+local getInputGroup = InputType2.getInputGroup
 
-local function isGamepadInput(p1) -- line: 5
-	-- upvalues: getInputGroup (copy), InputTypeConstants (copy)
-	return getInputGroup(p1) == InputTypeConstants.Gamepad
+local function isGamepadInput(p): boolean
+	return getInputGroup(p) == InputTypeConstants.Gamepad
 end
 
 return isGamepadInput

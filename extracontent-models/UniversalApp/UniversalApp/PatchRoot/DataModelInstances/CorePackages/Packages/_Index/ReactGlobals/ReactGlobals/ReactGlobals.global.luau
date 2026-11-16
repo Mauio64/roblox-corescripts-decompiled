@@ -1,86 +1,34 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local SafeFlags = require(parent.SafeFlags)
 
-if not require(ParentParent.SafeFlags).createGetFFlag("ReactIsolatedGlobalsEnabled")() then
+if not SafeFlags.createGetFFlag("ReactIsolatedGlobalsEnabled")() then
 	return _G
 end
 
-local function loadFromGlobal(s1: string, p1) -- line: 49
-	local v23 = _G[s1]
-
-	if v23 ~= nil then
-		return v23
-	end
-
-	return p1
+local function loadFromGlobal(p: string, p2) -- 17 equivalent calls inferred from this helper
+	local v = _G[p]
+	return if v == nil then p2 else v
 end
 
-local t1 = {}
-local __DEV__ = _G.__DEV__
-
-t1.__DEV__ = __DEV__ ~= nil and __DEV__
-
-local __PROFILE__ = _G.__PROFILE__
-
-t1.__PROFILE__ = __PROFILE__ ~= nil and __PROFILE__
-
-local __EXPERIMENTAL__ = _G.__EXPERIMENTAL__
-
-t1.__EXPERIMENTAL__ = __EXPERIMENTAL__ ~= nil and __EXPERIMENTAL__
-
-local __DEBUG__ = _G.__DEBUG__
-
-t1.__DEBUG__ = __DEBUG__ ~= nil and __DEBUG__
-
-local __YOLO__ = _G.__YOLO__
-
-t1.__YOLO__ = __YOLO__ ~= nil and __YOLO__
-
-local __DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ = _G.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__
-
-t1.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ = __DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ ~= nil and __DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__
-
-local __REACT_DEVTOOLS_GLOBAL_HOOK__ = _G.__REACT_DEVTOOLS_GLOBAL_HOOK__
-
-t1.__REACT_DEVTOOLS_GLOBAL_HOOK__ = if __REACT_DEVTOOLS_GLOBAL_HOOK__ == nil then nil else __REACT_DEVTOOLS_GLOBAL_HOOK__
-
-local __REACT_DEVTOOLS_ATTACH__ = _G.__REACT_DEVTOOLS_ATTACH__
-
-t1.__REACT_DEVTOOLS_ATTACH__ = if __REACT_DEVTOOLS_ATTACH__ == nil then nil else __REACT_DEVTOOLS_ATTACH__
-
-local __REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = _G.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__
-
-t1.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = __REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ ~= nil and __REACT_DEVTOOLS_APPEND_COMPONENT_STACK__
-
-local __REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = _G.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__
-
-t1.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = __REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ ~= nil and __REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__
-
-local __REACT_DEVTOOLS_COMPONENT_FILTERS__ = _G.__REACT_DEVTOOLS_COMPONENT_FILTERS__
-
-t1.__REACT_DEVTOOLS_COMPONENT_FILTERS__ = if __REACT_DEVTOOLS_COMPONENT_FILTERS__ == nil then nil else __REACT_DEVTOOLS_COMPONENT_FILTERS__
-
-local __LOCALSTORAGE__ = _G.__LOCALSTORAGE__
-
-t1.__LOCALSTORAGE__ = if __LOCALSTORAGE__ == nil then nil else __LOCALSTORAGE__
-
-local __SESSIONSTORAGE__ = _G.__SESSIONSTORAGE__
-
-t1.__SESSIONSTORAGE__ = if __SESSIONSTORAGE__ == nil then nil else __SESSIONSTORAGE__
-
-local __COMPAT_WARNINGS__ = _G.__COMPAT_WARNINGS__
-
-t1.__COMPAT_WARNINGS__ = __COMPAT_WARNINGS__ ~= nil and __COMPAT_WARNINGS__
-
-local __TESTEZ_RUNNING_TEST__ = _G.__TESTEZ_RUNNING_TEST__
-
-t1.__TESTEZ_RUNNING_TEST__ = __TESTEZ_RUNNING_TEST__ ~= nil and __TESTEZ_RUNNING_TEST__
-
-local __ROACT_17_MOCK_SCHEDULER__ = _G.__ROACT_17_MOCK_SCHEDULER__
-
-t1.__ROACT_17_MOCK_SCHEDULER__ = __ROACT_17_MOCK_SCHEDULER__ ~= nil and __ROACT_17_MOCK_SCHEDULER__
-
-local __ROACT_17_INLINE_ACT__ = _G.__ROACT_17_INLINE_ACT__
-
-t1.__ROACT_17_INLINE_ACT__ = __ROACT_17_INLINE_ACT__ ~= nil and __ROACT_17_INLINE_ACT__
-
-return t1
+return {
+	__DEV__ = loadFromGlobal("__DEV__", false), -- inferred equivalent call
+	__PROFILE__ = loadFromGlobal("__PROFILE__", false), -- inferred equivalent call
+	__EXPERIMENTAL__ = loadFromGlobal("__EXPERIMENTAL__", false), -- inferred equivalent call
+	__DEBUG__ = loadFromGlobal("__DEBUG__", false), -- inferred equivalent call
+	__YOLO__ = loadFromGlobal("__YOLO__", false), -- inferred equivalent call
+	__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ = loadFromGlobal( -- inferred equivalent call
+		"__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__",
+		false
+	),
+	__REACT_DEVTOOLS_GLOBAL_HOOK__ = loadFromGlobal("__REACT_DEVTOOLS_GLOBAL_HOOK__"), -- inferred equivalent call
+	__REACT_DEVTOOLS_ATTACH__ = loadFromGlobal("__REACT_DEVTOOLS_ATTACH__"), -- inferred equivalent call
+	__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = loadFromGlobal("__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__", false), -- inferred equivalent call
+	__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = loadFromGlobal("__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__", false), -- inferred equivalent call
+	__REACT_DEVTOOLS_COMPONENT_FILTERS__ = loadFromGlobal("__REACT_DEVTOOLS_COMPONENT_FILTERS__"), -- inferred equivalent call
+	__LOCALSTORAGE__ = loadFromGlobal("__LOCALSTORAGE__"), -- inferred equivalent call
+	__SESSIONSTORAGE__ = loadFromGlobal("__SESSIONSTORAGE__"), -- inferred equivalent call
+	__COMPAT_WARNINGS__ = loadFromGlobal("__COMPAT_WARNINGS__", false), -- inferred equivalent call
+	__TESTEZ_RUNNING_TEST__ = loadFromGlobal("__TESTEZ_RUNNING_TEST__", false), -- inferred equivalent call
+	__ROACT_17_MOCK_SCHEDULER__ = loadFromGlobal("__ROACT_17_MOCK_SCHEDULER__", false), -- inferred equivalent call
+	__ROACT_17_INLINE_ACT__ = loadFromGlobal("__ROACT_17_INLINE_ACT__", false) -- inferred equivalent call
+}

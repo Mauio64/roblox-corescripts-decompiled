@@ -1,4 +1,1 @@
-return {
-	MomentId = "momentId",
-	FeedItemId = "feedItemId"
-}
+return { MomentId = "momentId", FeedItemId = "feedItemId" }

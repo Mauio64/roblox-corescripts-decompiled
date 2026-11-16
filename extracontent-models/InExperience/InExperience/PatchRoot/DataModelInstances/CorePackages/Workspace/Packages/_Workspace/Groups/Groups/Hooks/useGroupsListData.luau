@@ -1,39 +1,32 @@
 local Groups = script:FindFirstAncestor("Groups")
-local GroupsParent = Groups.Parent
-local React = require(GroupsParent.React)
-local SignalsReact = require(GroupsParent.SignalsReact)
-local createGroupsListStore = require(Groups.Stores.createGroupsListStore)
+local parent = Groups.Parent
 
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local createGroupsListStore = require(Groups.Stores.createGroupsListStore)
 require(Groups.Common.Types)
 
-local function useGroupsListData(s1: string?) -- line: 31
-	-- upvalues: React (copy), createGroupsListStore (copy), SignalsReact (copy)
-	local v8 = React.useMemo(function() -- line: 33
-		-- upvalues: createGroupsListStore (copy)
+local function useGroupsListData(p: string?)
+	local v = React.useMemo(function()
 		return createGroupsListStore()
 	end, {})
-	local v9 = SignalsReact.useSignalState(v8.getState)
 
-	React.useEffect(function() -- line: 41
-		-- upvalues: s1 (copy), v8 (copy)
-		if not s1 or s1 == "" then
-			v8.reset()
+	local v2 = SignalsReact.useSignalState(v.getState)
 
-			return
+	React.useEffect(function()
+		if p and p ~= "" then
+			v.fetchGroups(p)
+
+			return function()
+				v.reset()
+			end
 		end
 
-		v8.fetchGroups(s1)
+		v.reset()
+	end, { v, p })
 
-		return function() -- line: 49
-			-- upvalues: v8 (copy)
-			v8.reset()
-		end
-	end, {
-		v8,
-		s1
-	})
-
-	return v9
+	return v2
 end
 
 return useGroupsListData

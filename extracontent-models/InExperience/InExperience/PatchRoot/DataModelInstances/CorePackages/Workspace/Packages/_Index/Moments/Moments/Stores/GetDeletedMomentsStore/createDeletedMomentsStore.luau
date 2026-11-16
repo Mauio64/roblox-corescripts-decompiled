@@ -1,23 +1,22 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Signals = require(Parent.Signals)
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local Signals = require(parent.Signals)
+local Cryo = require(parent.Cryo)
+
 local createSignal = Signals.createSignal
 
-local function createDeletedMomentsStore() -- line: 27
-	-- upvalues: createSignal (copy), Cryo (copy)
-	local v6, v7 = createSignal({})
+local function createDeletedMomentsStore()
+	local signal, v = createSignal({})
 
-	return {
-		getDeletedIds = v6,
-		markDeleted = function(s1: string) -- line: 30
-			-- upvalues: v6 (copy), v7 (copy), Cryo (copy)
-			local v9 = v6(false)
+	local function markDeleted(p: string)
+		local v2 = signal(false)
 
-			if not table.find(v9, s1) then
-				v7((Cryo.List.join(v9, { s1 })))
-			end
+		if not table.find(v2, p) then
+			v((Cryo.List.join(v2, { p })))
 		end
-	}
+	end
+
+	return { getDeletedIds = signal, markDeleted = markDeleted }
 end
 
 return createDeletedMomentsStore

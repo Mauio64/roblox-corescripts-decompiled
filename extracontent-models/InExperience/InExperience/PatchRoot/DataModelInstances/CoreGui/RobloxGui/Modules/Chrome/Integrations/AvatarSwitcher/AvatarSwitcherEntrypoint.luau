@@ -1,8 +1,10 @@
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local CorePackages = game:GetService("CorePackages")
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local HttpService = game:GetService("HttpService")
 local StarterGui = game:GetService("StarterGui")
+
 local React = require(CorePackages.Packages.React)
 local Service = require(Chrome.Service)
 local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
@@ -11,69 +13,78 @@ local WindowSizeSignal = require(Chrome.ChromeShared.Service.WindowSizeSignal)
 local Constants = require(Chrome.ChromeShared.Unibar.Constants)
 local AvatarSwitcherChromeWrapper = require(Chrome.Integrations.AvatarSwitcher.AvatarSwitcherChromeWrapper)
 local AvatarSwitcherIcon = require(Chrome.Integrations.AvatarSwitcher.AvatarSwitcherIcon)
-local Url = require(CorePackages.Workspace.Packages.Http).Url
-local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
+local Http = require(CorePackages.Workspace.Packages.Http)
+local Url = Http.Url
+
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagChromeWindowSignalConstraintsToggle = SharedFlags.FFlagChromeWindowSignalConstraintsToggle
 local FFlagRemoveAvatarSwitcherIfUnsupported = SharedFlags.FFlagRemoveAvatarSwitcherIfUnsupported
-local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
-local v20 = MappedSignal.new(Service:onIntegrationStatusChanged(), function() -- line: 26
-	-- upvalues: Service (copy), Constants (copy)
+local FFlagAvatarWorkshopReplacesAvatarSwitcher = SharedFlags.FFlagAvatarWorkshopReplacesAvatarSwitcher
+
+local v = MappedSignal.new(Service:onIntegrationStatusChanged(), function()
 	return Service:isWindowOpen(Constants.AVATAR_SWITCHER_ID)
 end)
-local v21 = if not FFlagRemoveAvatarSwitcherIfUnsupported then nil else Url.AVATAR_URL .. "v2/avatar/experience/get-experience-avatar-support"
-local v22 = if not FFlagChromeWindowSignalConstraintsToggle then WindowSizeSignal.new(844, 754, false) else WindowSizeSignal.new(844, 754, false, true)
-local u23 = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.All) or StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.AvatarSwitcher)
+local v2
 
-local function getInitialAvailability() -- line: 44
-	-- upvalues: u23 (ref), FFlagRemoveAvatarSwitcherIfUnsupported (copy), Service (copy)
-	if u23 and not FFlagRemoveAvatarSwitcherIfUnsupported then
+if FFlagRemoveAvatarSwitcherIfUnsupported then
+	v2 = Url.AVATAR_URL .. "v2/avatar/experience/get-experience-avatar-support"
+else
+	v2 = nil
+end
+
+local windowSize
+
+if FFlagChromeWindowSignalConstraintsToggle then
+	windowSize = WindowSizeSignal.new(844, 754, false, true)
+else
+	windowSize = WindowSizeSignal.new(844, 754, false)
+end
+
+local v3 = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.All)
+	or StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.AvatarSwitcher)
+
+local function getInitialAvailability() -- 1 equivalent call inferred from this helper
+	if v3 and not FFlagRemoveAvatarSwitcherIfUnsupported then
 		return Service.AvailabilitySignal.Available
 	end
 
 	return Service.AvailabilitySignal.Unavailable
 end
 
-local v25 = Service:register({
-	label = "Feature.AvatarSwitcher.Heading.SwitchAvatar",
-	cachePosition = true,
-	draggable = true,
-	initialAvailability = if not u23 or FFlagRemoveAvatarSwitcherIfUnsupported then Service.AvailabilitySignal.Unavailable else Service.AvailabilitySignal.Available,
+local v4 = Service:register({
+	initialAvailability = getInitialAvailability(), -- inferred equivalent call
 	id = Constants.AVATAR_SWITCHER_ID,
-	sideSheetPlacement = SideSheetPlacement.Vertical,
-	activated = function(_) -- line: 56
-		-- upvalues: Service (copy), Constants (copy)
+	label = FFlagAvatarWorkshopReplacesAvatarSwitcher and "CommonUI.Features.Label.Avatar" or "Feature.AvatarSwitcher.Heading.SwitchAvatar",
+	sideSheetPlacement = SideSheetPlacement.AboveFold,
+	activated = function(_)
 		Service:toggleWindow(Constants.AVATAR_SWITCHER_ID)
 	end,
-	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 61
-		-- upvalues: v20 (copy)
-		return v20:get()
-	end or v20,
-	windowSize = v22,
+	isActivated = v,
+	cachePosition = true,
+	draggable = true,
+	windowSize = windowSize,
 	components = {
-		Icon = function() -- line: 68
-			-- upvalues: React (copy), AvatarSwitcherIcon (copy), v20 (copy)
-			return React.createElement(AvatarSwitcherIcon, {
-				isActive = v20
-			})
+		Icon = function()
+			return React.createElement(AvatarSwitcherIcon, { isActive = v })
 		end,
-		Window = function() -- line: 74
-			-- upvalues: React (copy), AvatarSwitcherChromeWrapper (copy), v22 (copy)
+		Window = function()
 			return React.createElement(AvatarSwitcherChromeWrapper, {
+				windowSize = windowSize,
 				maxWindowWidth = 844,
-				maxWindowHeight = 754,
-				windowSize = v22
+				maxWindowHeight = 754
 			})
 		end
 	}
 })
-local u26 = not FFlagRemoveAvatarSwitcherIfUnsupported
 
-local function updateAvatarSwitcherAvailability() -- line: 88
-	-- upvalues: u23 (ref), u26 (ref), v25 (copy), Service (copy), Constants (copy)
-	if u23 and u26 then
-		v25.availability:available()
+local v5 = not FFlagRemoveAvatarSwitcherIfUnsupported
 
+local function updateAvatarSwitcherAvailability() -- 2 equivalent calls inferred from this helper
+	if v3 and v5 then
+		v4.availability:available()
 		return
 	end
 
@@ -81,56 +92,29 @@ local function updateAvatarSwitcherAvailability() -- line: 88
 		Service:toggleWindow(Constants.AVATAR_SWITCHER_ID)
 	end
 
-	v25.availability:unavailable()
+	v4.availability:unavailable()
 end
 
-ChromeUtils.setCoreGuiAvailability(v25, Enum.CoreGuiType.AvatarSwitcher, function(p2) -- line: 100
-	-- upvalues: u23 (ref), u26 (ref), v25 (copy), Service (copy), Constants (copy)
-	u23 = p2
-
-	if u23 and u26 then
-		v25.availability:available()
-
-		return
-	end
-
-	if Service:isWindowOpen(Constants.AVATAR_SWITCHER_ID) then
-		Service:toggleWindow(Constants.AVATAR_SWITCHER_ID)
-	end
-
-	v25.availability:unavailable()
+ChromeUtils.setCoreGuiAvailability(v4, Enum.CoreGuiType.AvatarSwitcher, function(p)
+	v3 = p
+	updateAvatarSwitcherAvailability() -- inferred equivalent call
 end)
 
 if FFlagRemoveAvatarSwitcherIfUnsupported then
-	task.spawn(function() -- line: 107
-		-- upvalues: HttpRbxApiService (copy), v21 (copy), HttpService (copy), u26 (ref), u23 (ref), v25 (copy), Service (copy), Constants (copy)
+	task.spawn(function()
 		if not game:IsLoaded() then
 			game.Loaded:Wait()
 		end
 
-		local ok, result = pcall(function() -- line: 113
-			-- upvalues: HttpRbxApiService (copy), v21 (copy), HttpService (copy)
-			local AsyncFullUrl = HttpRbxApiService:GetAsyncFullUrl(v21)
-
-			return HttpService:JSONDecode(AsyncFullUrl)
+		local success, result = pcall(function()
+			return HttpService:JSONDecode((HttpRbxApiService:GetAsyncFullUrl(v2)))
 		end)
 
-		if ok and result and result.experienceAvatarSupportType ~= 0 then
-			u26 = true
-
-			if u23 and u26 then
-				v25.availability:available()
-
-				return
-			end
-
-			if Service:isWindowOpen(Constants.AVATAR_SWITCHER_ID) then
-				Service:toggleWindow(Constants.AVATAR_SWITCHER_ID)
-			end
-
-			v25.availability:unavailable()
+		if success and result and result.experienceAvatarSupportType ~= 0 then
+			v5 = true
+			updateAvatarSwitcherAvailability() -- inferred equivalent call
 		end
 	end)
 end
 
-return v25
+return v4

@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.ChatTopBarFocusSelect)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local ChatTopBarFocusSelect = require(actions.ChatTopBarFocusSelect)
+
+return event(ChatTopBarFocusSelect)

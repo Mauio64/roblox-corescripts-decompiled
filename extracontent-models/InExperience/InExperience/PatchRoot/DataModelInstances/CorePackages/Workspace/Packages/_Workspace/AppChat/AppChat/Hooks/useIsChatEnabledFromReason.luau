@@ -1,12 +1,32 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local getDeepValue = require(AppChat.Utils.getDeepValue)
+local parent = AppChat.Parent
 
-return function(s1: string) -- line: 9
-	-- upvalues: useSelector (copy), getDeepValue (copy)
-	return useSelector(function(p1) -- line: 10
-		-- upvalues: getDeepValue (copy), s1 (copy)
-		return getDeepValue(p1, `ChatAppReducer.ChatSettings.{ s1 }`) or false
-	end)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local getDeepValue = require(AppChat.Utils.getDeepValue)
+local GetFriendsChatSettingsStore = require(AppChat.Stores.GetFriendsChatSettingsStore)
+
+local FFlagAppChatUseSignalsForChatSettings = require(AppChat.Flags.FFlagAppChatUseSignalsForChatSettings)
+
+return function(p: string)
+	if not FFlagAppChatUseSignalsForChatSettings then
+		return useSelector(function(p2)
+			return getDeepValue(p2, `ChatAppReducer.ChatSettings.{p}`) or false
+		end)
+	end
+
+	local friendsChatSettingsStore = GetFriendsChatSettingsStore(false)
+	local v
+
+	if p == "globalRulesEnabled" then
+		v = friendsChatSettingsStore.getGlobalRulesEnabled
+	elseif p == "privacySettingsEnabled" then
+		v = friendsChatSettingsStore.getPrivacySettingsEnabled
+	else
+		v = friendsChatSettingsStore.getThirdPartyPrivacySettingsEnabled
+	end
+
+	return useSignalState(v)
 end

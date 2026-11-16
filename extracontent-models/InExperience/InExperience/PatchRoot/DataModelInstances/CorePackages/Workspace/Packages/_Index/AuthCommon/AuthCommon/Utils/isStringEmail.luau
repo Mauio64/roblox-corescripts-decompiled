@@ -1,9 +1,9 @@
-return function(s1: string?) -- line: 2
-	if not s1 or s1 == "" then
+return function(value: string?): boolean
+	if not value or value == "" then
 		return false
 	end
 
-	assert(s1, "")
+	assert(value, "")
 
-	return string.find(s1, "^.+@.+%..+$") ~= nil
+	return string.find(value, "^.+@.+%..+$") ~= nil
 end

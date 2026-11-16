@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("NavigationRodux").Parent
-local FFlagAppIaHomeSubTab = require(Parent.SharedFlags).FFlagAppIaHomeSubTab
+local parent = script:FindFirstAncestor("NavigationRodux").Parent
 
+local SharedFlags = require(parent.SharedFlags)
 return {
 	TempRnSwitchNavigatorName = "RootSwitchNavigator",
-	HomeContainerName = if not FFlagAppIaHomeSubTab then nil else "HomeContainer"
+	HomeContainerName = SharedFlags.FFlagAppIaHomeSubTab and "HomeContainer" or nil
 }

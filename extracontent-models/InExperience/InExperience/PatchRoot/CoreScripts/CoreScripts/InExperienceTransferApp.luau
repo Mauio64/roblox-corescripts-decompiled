@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-require(CorePackages.Workspace.Packages.CurrencyTransfers).renderInExperienceTransferApp()
+local CurrencyTransfers = require(CorePackages.Workspace.Packages.CurrencyTransfers)
+CurrencyTransfers.renderInExperienceTransferApp()

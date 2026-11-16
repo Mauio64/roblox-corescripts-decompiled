@@ -1,31 +1,17 @@
 local dependencies = require(script.Parent.Parent.Parent.dependencies)
-local Roact = dependencies.Roact
-local RoactNavigation = dependencies.RoactNavigation
-local t1 = {
-	state = {
-		routeName = "",
-		key = "",
-		params = {}
-	},
-	dispatch = function() -- line: 11
-	end,
-	goBack = function() -- line: 12
-	end,
-	addListener = function() -- line: 13
-	end,
-	isFocused = function() -- line: 14
-	end,
-	setParams = function() -- line: 15
-	end,
-	getParam = function() -- line: 16
-	end
+local roact = dependencies.Roact
+local roactNavigation = dependencies.RoactNavigation
+
+local v = {
+	state = { params = {}, routeName = "", key = "" },
+	dispatch = function() end,
+	goBack = function() end,
+	addListener = function() end,
+	isFocused = function() end,
+	setParams = function() end,
+	getParam = function() end
 }
 
-return function(p1) -- line: 19
-	-- upvalues: Roact (copy), RoactNavigation (copy), t1 (copy)
-	return Roact.createElement(RoactNavigation.Provider, {
-		value = t1
-	}, {
-		Element = p1
-	})
+return function(element)
+	return roact.createElement(roactNavigation.Provider, { value = v }, { Element = element })
 end

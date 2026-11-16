@@ -1,3 +1,1 @@
-return {
-	QuestVR = "QuestVR"
-}
+return { QuestVR = "QuestVR" }

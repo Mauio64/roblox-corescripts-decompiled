@@ -1,46 +1,45 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local React = require(Parent.React)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+
 local FlyoutNavigationItem = require(script.Parent.FlyoutNavigationItem)
 
-local function FlyoutNavigationList(t1: {[any]: any}) -- line: 16
-	-- upvalues: useTokens (copy), React (copy), FlyoutNavigationItem (copy)
-	local v7 = useTokens()
-	local v8 = React.useMemo(function() -- line: 18
-		-- upvalues: React (copy), v7 (copy), t1 (copy), FlyoutNavigationItem (copy)
-		local t2 = {
+local function FlyoutNavigationList(props)
+	local v = useTokens()
+	local v2 = React.useMemo(function()
+		local children = {
 			ListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, v7.Gap.Small)
+				Padding = UDim.new(0, v.Gap.Small)
 			})
 		}
 
-		for i, v in ipairs(t1.navigationItems) do
-			if v and v.textKey then
-				t2[v.itemType] = React.createElement(FlyoutNavigationItem, {
-					item = v,
+		for i, navigationItem in ipairs(props.navigationItems) do
+			if navigationItem and navigationItem.textKey then
+				children[navigationItem.itemType] = React.createElement(FlyoutNavigationItem, {
+					item = navigationItem,
 					layoutOrder = i,
-					closeDrawer = t1.closeDrawer,
-					buildCreatorWebNavUrl = t1.buildCreatorWebNavUrl
+					closeDrawer = props.closeDrawer,
+					buildCreatorWebNavUrl = props.buildCreatorWebNavUrl
 				})
 			end
 		end
 
-		return t2
-	end, {
-		t1.navigationItems,
-		t1.buildCreatorWebNavUrl,
-		t1.closeDrawer,
-		v7.Gap.Small
-	})
+		return children
+	end, { props.navigationItems, props.buildCreatorWebNavUrl, props.closeDrawer, v.Gap.Small })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.layoutOrder
-	}, v8)
+	return React.createElement(
+		"Frame",
+		{
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			LayoutOrder = props.layoutOrder
+		},
+		v2
+	)
 end
 
 return FlyoutNavigationList

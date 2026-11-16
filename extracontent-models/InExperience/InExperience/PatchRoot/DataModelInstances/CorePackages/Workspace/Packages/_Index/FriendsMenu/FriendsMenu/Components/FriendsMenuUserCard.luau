@@ -1,94 +1,147 @@
 local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
-local FriendsMenuParent = FriendsMenu.Parent
+local parent = FriendsMenu.Parent
 local Context = FriendsMenu.Context
-local getStandardSizeAvatarHeadShotRbxthumb = require(FriendsMenuParent.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb
+
+local UserLib = require(parent.UserLib)
+local getStandardSizeAvatarHeadShotRbxthumb = UserLib.Utils.getStandardSizeAvatarHeadShotRbxthumb
 local FFlagFriendsMenuUseProfileFrameThumbnail = require(FriendsMenu.Flags.FFlagFriendsMenuUseProfileFrameThumbnail)
-local React = require(FriendsMenuParent.React)
-local UIBlox = require(FriendsMenuParent.UIBlox)
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Interactable = UIBlox.Core.Control.Interactable
 local useStyle = UIBlox.Core.Style.useStyle
 
 require(FriendsMenu.friendsMenuModalType)
-
 local Constants = require(FriendsMenu.Constants)
 local SelectedUsersContext = require(Context.SelectedUsersContext)
-local uDim = UDim.new(1, 0)
 
-return (React.forwardRef(function(p1, p2) -- line: 24
-	-- upvalues: React (copy), SelectedUsersContext (copy), useStyle (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), FFlagFriendsMenuUseProfileFrameThumbnail (copy), Interactable (copy), Constants (copy), uDim (copy), ImageSetLabel (copy), Images (copy)
-	local v17 = React.useContext(SelectedUsersContext)
-	local v18 = useStyle()
-	local Theme = v18.Theme
-	local Font = v18.Font
-	local v21 = getStandardSizeAvatarHeadShotRbxthumb(p1.userId, FFlagFriendsMenuUseProfileFrameThumbnail)
-	local v22 = React.useCallback(function() -- line: 34
-		-- upvalues: p1 (copy), v17 (copy)
-		if p1.onRemoved then
-			p1.onRemoved()
+local udim = UDim.new(1, 0)
+
+return (React.forwardRef(function(props, ref)
+	local v = React.useContext(SelectedUsersContext)
+
+	local v2 = useStyle()
+	local theme = v2.Theme
+	local font = v2.Font
+
+	local standardSizeAvatarHeadShotRbxthumb = getStandardSizeAvatarHeadShotRbxthumb(
+		props.userId,
+		FFlagFriendsMenuUseProfileFrameThumbnail
+	)
+
+	local v3 = React.useCallback(function()
+		if props.onRemoved then
+			props.onRemoved()
 		end
 
-		v17.removeFriend(p1.userId, p1.displayName)
-	end, {
-		p1.userId,
-		v17.removeFriend,
-		p1.onRemoved
-	})
+		v.removeFriend(props.userId, props.displayName)
+	end, { props.userId, v.removeFriend, props.onRemoved })
 
-	return React.createElement(Interactable, {
+	local createElement = React.createElement
+	local v4 = {
+		["Size"] = nil,
+		["Size"] = nil,
 		Size = UDim2.new(0, Constants.FRIEND_MENU_CARD_SIZE, 0, Constants.FRIEND_MENU_CARD_SIZE),
 		BackgroundTransparency = 1,
-		LayoutOrder = p1.layoutOrder,
-		[React.Event.Activated] = if not p1.unremovable then v22 else nil,
-		ref = p2
-	}, {
-		AvatarContainer = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.fromScale(0.5, 0),
-			Size = UDim2.fromOffset(60, 60)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = uDim
-			}),
-			Avatar = React.createElement(ImageSetLabel, {
-				ZIndex = 1,
+		LayoutOrder = props.layoutOrder
+	}
+	local activated = React.Event.Activated
+
+	if props.unremovable then
+		v3 = nil
+	end
+
+	v4[activated] = v3
+	v4.ref = ref
+
+	local createElement2 = React.createElement
+	local v5 = {
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.fromScale(0.5, 0),
+		Size = UDim2.fromOffset(60, 60),
+		BackgroundTransparency = 1
+	}
+
+	local v6 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = udim }),
+		Avatar = React.createElement(
+			ImageSetLabel,
+			{
 				Size = UDim2.fromOffset(60, 60),
-				BackgroundColor3 = Theme.UIDefault.Color,
-				Image = v21
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = uDim
-				})
-			}),
-			CloseButton = if not p1.unremovable then React.createElement(ImageSetLabel, {
-				ZIndex = 2,
-				AnchorPoint = Vector2.new(1, 0),
-				Position = UDim2.fromScale(1, 0),
-				Size = UDim2.fromOffset(16, 16),
-				BackgroundTransparency = Theme.SystemPrimaryDefault.Transparency,
-				BackgroundColor3 = Theme.SystemPrimaryDefault.Color,
-				Image = Images["icons/navigation/close_small"],
-				ImageColor3 = Theme.SystemPrimaryContent.Color
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = uDim
-				})
-			}) else nil
-		}),
-		DisplayName = React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			AnchorPoint = Vector2.new(0.5, 1),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Position = UDim2.fromScale(0.5, 1),
-			Size = UDim2.fromOffset(Constants.FRIEND_MENU_CARD_SIZE, 0),
-			Font = Font.Footer.Font,
-			Text = p1.displayName,
-			TextColor3 = Theme.TextDefault.Color,
-			TextSize = Font.BaseSize * Font.Footer.RelativeSize,
-			TextTransparency = Theme.TextDefault.Transparency,
-			TextTruncate = Enum.TextTruncate.AtEnd
+				BackgroundColor3 = theme.UIDefault.Color,
+				Image = standardSizeAvatarHeadShotRbxthumb,
+				ZIndex = 1
+			},
+			{
+				UICorner = React.createElement("UICorner", { CornerRadius = udim })
+			}
+		),
+		CloseButton = 0
+	}
+	local closeButton
+
+	if not props.unremovable then
+		closeButton = React.createElement(ImageSetLabel, {
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.fromScale(1, 0),
+			Size = UDim2.fromOffset(16, 16),
+			BackgroundTransparency = theme.SystemPrimaryDefault.Transparency,
+			BackgroundColor3 = theme.SystemPrimaryDefault.Color,
+			Image = Images["icons/navigation/close_small"],
+			ImageColor3 = theme.SystemPrimaryContent.Color,
+			ZIndex = 2
+		}, {
+			UICorner = React.createElement("UICorner", { CornerRadius = udim })
 		})
-	})
+	end
+
+	v6.CloseButton = closeButton
+	local children = {
+		AvatarContainer = createElement2("Frame", v5, v6),
+		DisplayName = 0
+	}
+
+	local createElement3 = React.createElement
+	local v7 = {
+		AnchorPoint = Vector2.new(0.5, 1),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Position = UDim2.fromScale(0.5, 1),
+		Size = UDim2.fromOffset(Constants.FRIEND_MENU_CARD_SIZE, 0),
+		BackgroundTransparency = 1,
+		Font = 0,
+		FontFace = 0,
+		Text = 0,
+		TextColor3 = 0,
+		TextSize = 0,
+		TextTransparency = 0,
+		TextTruncate = 0
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Footer.Font
+	end
+
+	v7.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v2.Tokens.Typography.CaptionSmall.Font)
+	end
+
+	v7.FontFace = fontFace
+
+	v7.Text = props.displayName
+	v7.TextColor3 = theme.TextDefault.Color
+	v7.TextSize = font.BaseSize * font.Footer.RelativeSize
+	v7.TextTransparency = theme.TextDefault.Transparency
+	v7.TextTruncate = Enum.TextTruncate.AtEnd
+	children.DisplayName = createElement3("TextLabel", v7)
+	return createElement(Interactable, v4, children)
 end))

@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.RemoveReverseNudgeToxicUser)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local RemoveReverseNudgeToxicUser = require(actions.RemoveReverseNudgeToxicUser)
+
+return event(RemoveReverseNudgeToxicUser)

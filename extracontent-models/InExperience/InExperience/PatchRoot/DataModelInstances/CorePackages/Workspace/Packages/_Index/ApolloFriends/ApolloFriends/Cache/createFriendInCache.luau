@@ -1,17 +1,25 @@
-local Parent = script:FindFirstAncestor("ApolloFriends").Parent
-local gql = require(Parent.ApolloClient).gql
+local parent = script:FindFirstAncestor("ApolloFriends").Parent
 
-local function createFriendInCache(p1, t1: {[any]: any}) -- line: 13
-	-- upvalues: gql (copy)
-	return (p1.cache:writeFragment({
+local ApolloClient = require(parent.ApolloClient)
+local gql = ApolloClient.gql
+
+local function createFriendInCache(p, data)
+	return (p.cache:writeFragment({
 		data = {
 			__typename = "Friend",
-			displayName = "",
-			id = t1.userId,
-			targetUserId = t1.targetUserId,
-			hasVerifiedBadge = t1.hasVerifiedBadge or false
+			id = data.userId,
+			targetUserId = data.targetUserId,
+			hasVerifiedBadge = data.hasVerifiedBadge or false,
+			displayName = ""
 		},
-		fragment = gql("\t\t\tfragment NewFriend on Friend {\n\t\t\t\tid\n\t\t\t\ttargetUserId\n\t\t\t\thasVerifiedBadge\n\t\t\t\tdisplayName\n\t\t\t}\n\t\t")
+		fragment = gql([[
+			fragment NewFriend on Friend {
+				id
+				targetUserId
+				hasVerifiedBadge
+				displayName
+			}
+		]])
 	}))
 end
 

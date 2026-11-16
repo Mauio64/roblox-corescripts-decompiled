@@ -1,22 +1,17 @@
-return function(p1: ((...any) -> ...any), n1: number) -- line: 1
-	local u3 = nil
-	local v4 = n1 / 1000
-
+return function(callback, p: number)
+	local thread = nil
+	local v = p / 1000
 	return {
-		cancel = function() -- line: 5
-			-- upvalues: u3 (ref)
-			if u3 then
-				task.cancel(u3)
-				u3 = nil
+		cancel = function()
+			if thread then
+				task.cancel(thread)
+				thread = nil
 			end
 		end,
-		call = function(...) -- line: 11
-			-- upvalues: u3 (ref), v4 (copy), p1 (copy)
-			local t1 = { ... }
-
-			u3 = task.delay(v4, function() -- line: 13
-				-- upvalues: p1 (copy), t1 (copy)
-				p1(unpack(t1))
+		call = function(...)
+			local v2 = { ... }
+			thread = task.delay(v, function()
+				callback(unpack(v2))
 			end)
 		end
 	}

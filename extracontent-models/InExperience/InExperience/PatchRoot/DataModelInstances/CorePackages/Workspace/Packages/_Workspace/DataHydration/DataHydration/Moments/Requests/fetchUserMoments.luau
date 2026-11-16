@@ -1,42 +1,81 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Http = require(DataHydrationParent.Http)
-local HttpClient = require(DataHydrationParent.HttpClient)
+local parent = DataHydration.Parent
 
+local Http = require(parent.Http)
+local HttpClient = require(parent.HttpClient)
+local SharedFlags = require(parent.SharedFlags)
 require(DataHydration.Moments.MomentsStoreTypes)
-
 local convertApiMomentsToMomentItems = require(DataHydration.Moments.Util.convertApiMomentsToMomentItems)
+local extractCommentsByFeedItemId = require(DataHydration.Moments.Util.extractCommentsByFeedItemId)
 local extractReactionsByMomentId = require(DataHydration.Moments.Util.extractReactionsByMomentId)
 local extractShareInfoByMomentId = require(DataHydration.Moments.Util.extractShareInfoByMomentId)
 local constructApiUrl = require(DataHydration.Moments.Util.constructApiUrl)
-local FFlagProfileMomentsOrderingAndReactions = require(DataHydrationParent.SharedFlags).FFlagProfileMomentsOrderingAndReactions
 
-local function fetchUserMoments(n1: number, s1: string?, p1) -- line: 22
-	-- upvalues: constructApiUrl (copy), Http (copy), HttpClient (copy), convertApiMomentsToMomentItems (copy), FFlagProfileMomentsOrderingAndReactions (copy), extractReactionsByMomentId (copy), extractShareInfoByMomentId (copy)
-	local v14, v15 = constructApiUrl("content-captures-api/v2/moments/get-users-moments")
-	local v16 = `{ v14 }?{ Http.Url:makeQueryString({
-		count = 18,
-		targetUserId = n1,
-		paginationContext = s1
-	}) }`
+local FFlagMomentsComments = SharedFlags.FFlagMomentsComments
+local FFlagMomentsResolvePublishedPostFeedItem = SharedFlags.FFlagMomentsResolvePublishedPostFeedItem
+
+local function collectExcludedMomentIds(p)
+	local clone = table.clone(p.moderatedMomentIds or {})
+
+	for _, v in p.failedMomentIds or {} do
+		table.insert(clone, v)
+	end
+
+	return clone
+end
+
+local function fetchUserMoments(targetUserId: number, paginationContext: string?, network)
+	local v, headers = constructApiUrl("content-captures-api/v2/moments/get-users-moments")
+	local formatted = `{v}?{Http.Url:makeQueryString({ targetUserId = targetUserId, count = 18, paginationContext = paginationContext })}`
 
 	return HttpClient.fetch({
 		method = "GET",
+		url = formatted,
+		headers = headers,
 		analyticsKey = "moments.get-users-moments",
-		url = v16,
-		headers = v15,
-		network = p1,
-		decode = function(p2) -- line: 41
-			-- upvalues: convertApiMomentsToMomentItems (copy), s1 (copy), FFlagProfileMomentsOrderingAndReactions (copy), extractReactionsByMomentId (copy), extractShareInfoByMomentId (copy)
-			local items = p2.items
-			local v19 = items ~= nil and #items >= 18
+		network = network,
+		decode = function(p)
+			local items = p.items
+			local v2
 
-			return {
+			if items == nil then
+				v2 = false
+			else
+				v2 = #items >= 18
+			end
+
+			local v3 = {
 				moments = convertApiMomentsToMomentItems(items),
-				nextCursor = if not v19 then nil else p2.paginationContext or s1,
-				reactionsByMomentId = if not FFlagProfileMomentsOrderingAndReactions then nil else extractReactionsByMomentId(items),
-				shareInfoByMomentId = if not FFlagProfileMomentsOrderingAndReactions then nil else extractShareInfoByMomentId(items)
+				nextCursor = 0,
+				reactionsByMomentId = 0,
+				shareInfoByMomentId = 0,
+				commentsByFeedItemId = 0,
+				excludedMomentIds = 0
 			}
+			local nextCursor
+
+			if v2 then
+				nextCursor = p.paginationContext or paginationContext
+			end
+
+			v3.nextCursor = nextCursor
+			v3.reactionsByMomentId = extractReactionsByMomentId(items)
+			v3.shareInfoByMomentId = extractShareInfoByMomentId(items)
+			local commentsByFeedItemId
+
+			if FFlagMomentsComments then
+				commentsByFeedItemId = extractCommentsByFeedItemId(items)
+			end
+
+			v3.commentsByFeedItemId = commentsByFeedItemId
+			local excludedMomentIds
+
+			if FFlagMomentsResolvePublishedPostFeedItem then
+				excludedMomentIds = collectExcludedMomentIds(p)
+			end
+
+			v3.excludedMomentIds = excludedMomentIds
+			return v3
 		end
 	})
 end

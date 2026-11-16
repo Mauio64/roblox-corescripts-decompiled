@@ -1,13 +1,13 @@
-local function union(...) -- line: 2
-	local t1 = {}
+local function union(...)
+	local result = {}
 
 	for i = 1, select("#", ...) do
-		for k, _ in pairs(select(i, ...)) do
-			t1[k] = true
+		for k, _ in pairs((select)(i, ...)) do
+			result[k] = true
 		end
 	end
 
-	return t1
+	return result
 end
 
 return union

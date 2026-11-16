@@ -1,16 +1,14 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
+local parent = CurrencyTransfers.Parent
+
+local React = require(parent.React)
+
 local TransferRobuxContainer = require(CurrencyTransfers.Components.TransferRobuxContainer)
 local TransferContext = require(CurrencyTransfers.Contexts.TransferContext)
-
 require(CurrencyTransfers.Stores.createTransferStore)
 
-local function TransferRobuxApp(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy), TransferContext (copy), TransferRobuxContainer (copy)
-	return React.createElement(TransferContext.Provider, {
-		value = t1.transferStore
-	}, {
+local function TransferRobuxApp(p)
+	return React.createElement(TransferContext.Provider, { value = p.transferStore }, {
 		TransferRobuxSheet = React.createElement(TransferRobuxContainer, {})
 	})
 end

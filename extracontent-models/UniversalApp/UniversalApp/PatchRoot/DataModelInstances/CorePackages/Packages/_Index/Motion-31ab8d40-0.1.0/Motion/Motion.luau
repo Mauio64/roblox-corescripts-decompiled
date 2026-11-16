@@ -1,87 +1,91 @@
 require(script.Parent.Types)
 
 local TransitionPreset = require(script.Parent.Enums.TransitionPreset)
-local presets = require(script.Parent.Utility.TimingConfigs).presets
-local v3 = presets[TransitionPreset.Default]
-local t1 = {}
 
-local function getTransition(p1) -- line: 12
-	-- upvalues: v3 (copy)
-	return p1.transition or {
-		default = v3
-	}
+local TimingConfigs = require(script.Parent.Utility.TimingConfigs)
+local presets = TimingConfigs.presets
+local preset = presets[TransitionPreset.Default]
+
+local function getTransition(state) -- 1 equivalent call inferred from this helper
+	return state.transition or { default = preset }
 end
 
-function t1.createState(t2: {[any]: any}, t3: {[any]: any}?) -- line: 18
-	-- upvalues: v3 (copy)
-	local t4 = {
+local Motion = {}
+
+function Motion.createState(items, p)
+	local state = {
 		transition = {
-			default = t3 and t3.default or v3
+			default = p and p.default or preset
 		}
 	}
 
-	for v10, v11 in t2 do
-		t4[v10] = v11
+	for k, item in items do
+		state[k] = item
 
-		if t3 and t3[v10] then
-			(t4.transition or {
-				default = v3
-			})[v10] = t3[v10]
+		if not (p and p[k]) then
+			continue
 		end
+
+		local transition = getTransition(state) -- inferred equivalent call
+		transition[k] = p[k]
 	end
 
-	return t4
+	return state
 end
-function t1.transition(p2, p3) -- line: 40
-	-- upvalues: presets (copy), v3 (copy)
-	local v14 = if type(p2) ~= "string" then p2 else presets[p2] or v3
-	local t5 = {
-		duration = v14 and v14.duration or v3.duration,
-		easingStyle = v14 and v14.easingStyle or v3.easingStyle,
-		delay = v14 and v14.delay or v3.delay
+
+function Motion.transition(value, data)
+	if type(value) == "string" then
+		value = presets[value] or preset
+	end
+
+	local v = {
+		duration = value and value.duration or preset.duration,
+		easingStyle = value and value.easingStyle or preset.easingStyle,
+		delay = value and value.delay or preset.delay
 	}
 
-	if p3 then
-		if p3.duration then
-			t5.duration = p3.duration
-		end
-
-		if p3.easingStyle then
-			t5.easingStyle = p3.easingStyle
-		end
-
-		if p3.delay then
-			t5.delay = p3.delay
-		end
+	if not data then
+		return v
 	end
 
-	return t5
+	if data.duration then
+		v.duration = data.duration
+	end
+
+	if data.easingStyle then
+		v.easingStyle = data.easingStyle
+	end
+
+	if data.delay then
+		v.delay = data.delay
+	end
+
+	return v
 end
-function t1.animate(p4, t6: {[any]: any}) -- line: 69
-	-- upvalues: v3 (copy)
-	if not p4 then
+
+function Motion.animate(p, items)
+	if not p then
 		return
 	end
 
-	local v18 = p4.transition or {
-		default = v3
-	}
+	local transition = p.transition or { default = preset }
 
-	for v19, v20 in t6 do
-		local v21 = v18[v19]
-		local v22 = if v21 == nil then v18.default else v21
+	for k, item in items do
+		local v = transition[k]
 
-		if v22.delay and v22.delay > 0 then
-			local v23 = table.clone(v22)
+		if v == nil then
+			v = transition.default
+		end
 
-			task.delay(v22.delay, function() -- line: 88
-				-- upvalues: v20 (copy), p4 (copy), v19 (copy), v23 (copy)
-				v20(p4[v19], v23)
+		if v.delay and v.delay > 0 then
+			local clone = table.clone(v)
+			task.delay(v.delay, function()
+				item(p[k], clone)
 			end)
 		else
-			v20(p4[v19], v22)
+			item(p[k], v)
 		end
 	end
 end
 
-return t1
+return Motion

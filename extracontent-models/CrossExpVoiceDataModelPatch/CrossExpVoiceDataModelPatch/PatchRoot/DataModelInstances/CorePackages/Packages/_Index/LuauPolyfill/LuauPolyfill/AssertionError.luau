@@ -1,1 +1,3 @@
-return require(script.AssertionError).AssertionError
+local AssertionError = require(script.AssertionError)
+
+return AssertionError.AssertionError

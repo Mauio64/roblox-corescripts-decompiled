@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Signals = require(parent.Signals)
+
 local createUniverseCreateStore = require(script.Parent.createUniverseCreateStore)
 
-return Signals.createComputed(function() -- line: 8
-	-- upvalues: createUniverseCreateStore (copy)
+return Signals.createComputed(function()
 	return createUniverseCreateStore()
 end)

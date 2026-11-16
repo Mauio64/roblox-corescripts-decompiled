@@ -1,40 +1,36 @@
-local function createSpy(p1) -- line: 1
-	local t1 = {
-		callCount = 0,
-		valuesLength = 0,
-		values = {}
-	}
+local function createSpy(callback)
+	local spy = { callCount = 0, values = {}, valuesLength = 0 }
 
-	function t1.value(...) -- line: 8
-		-- upvalues: t1 (copy), p1 (copy)
-		t1.callCount = t1.callCount + 1
-		t1.values = { ... }
-		t1.valuesLength = select("#", ...)
+	function spy.value(...)
+		spy.callCount += 1
+		spy.values = { ... }
+		spy.valuesLength = select("#", ...)
 
-		if p1 ~= nil then
-			return p1(...)
+		if callback == nil then
+			return
 		end
+
+		return callback(...)
 	end
-	function t1.assertCalledWith(_, ...) -- line: 18
-		-- upvalues: t1 (copy)
-		local v5 = select("#", ...)
 
-		assert(t1.valuesLength, v5, "length of expected values differs from stored values")
+	function spy.assertCalledWith(_, ...)
+		local v = select("#", ...)
 
-		for i = 1, v5 do
-			local v7 = select(i, ...)
+		assert(spy.valuesLength, v, "length of expected values differs from stored values")
 
-			assert(t1.values[i], v7, "value differs")
+		for i = 1, v do
+			local v2 = select(i, ...)
+			assert(spy.values[i], v2, "value differs")
 		end
 	end
 
-	setmetatable(t1, {
-		__index = function(_, p4) -- line: 30
-			error(("%q is not a valid member of spy"):format(p4))
+	setmetatable(spy, {
+		__index = function(_, p)
+			error(("%q is not a valid member of spy"):format(p))
 		end
 	})
 
-	return t1
+	return spy
 end
 
 return createSpy

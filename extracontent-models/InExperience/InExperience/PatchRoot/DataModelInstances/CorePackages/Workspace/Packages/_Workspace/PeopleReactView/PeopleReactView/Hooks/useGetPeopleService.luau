@@ -1,12 +1,11 @@
-local Parent = script:FindFirstAncestor("PeopleReactView").Parent
-local React = require(Parent.React)
-local PeopleService = require(Parent.PeopleService)
+local parent = script:FindFirstAncestor("PeopleReactView").Parent
 
-local function useGetPeopleService(s1: string) -- line: 7
-	-- upvalues: React (copy), PeopleService (copy)
-	return (React.useMemo(function() -- line: 8
-		-- upvalues: PeopleService (copy), s1 (copy)
-		return PeopleService.getService(s1)
+local React = require(parent.React)
+local PeopleService = require(parent.PeopleService)
+
+local function useGetPeopleService(p: string)
+	return (React.useMemo(function()
+		return PeopleService.getService(p)
 	end, {}))
 end
 

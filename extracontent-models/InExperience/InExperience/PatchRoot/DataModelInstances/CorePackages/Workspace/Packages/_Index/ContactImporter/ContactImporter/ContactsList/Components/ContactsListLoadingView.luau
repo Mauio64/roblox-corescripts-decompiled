@@ -1,1 +1,3 @@
-return (require(script.ContactsListLoadingView))
+local ContactsListLoadingView = require(script.ContactsListLoadingView)
+
+return ContactsListLoadingView

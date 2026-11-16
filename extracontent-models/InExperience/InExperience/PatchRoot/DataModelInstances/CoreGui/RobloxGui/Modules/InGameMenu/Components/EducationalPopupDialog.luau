@@ -2,14 +2,17 @@ local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local CorePackages = game:GetService("CorePackages")
 local ContextActionService = game:GetService("ContextActionService")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
 local EducationalModal = InGameMenuDependencies.UIBlox.App.Dialog.Modal.EducationalModal
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local v10 = Roact.PureComponent:extend("EducationalPopupDialog")
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
 
-v10.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("EducationalPopupDialog")
+
+extended.validateProps = t.strictInterface({
 	bodyContents = t.array(t.strictInterface({
 		icon = t.optional(t.union(t.string, t.table)),
 		text = t.string,
@@ -31,13 +34,11 @@ v10.validateProps = t.strictInterface({
 	blurBackground = t.boolean,
 	visible = t.boolean
 })
-v10.defaultProps = {
-	blurBackground = false
-}
 
-function v10.render(p1) -- line: 47
-	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), CoreGui (copy), EducationalModal (copy)
-	return withFoundationOrUIBloxStyle(function(p2) -- line: 48
+extended.defaultProps = { blurBackground = false }
+
+function extended.render(p)
+	return withFoundationOrUIBloxStyle(function(p2)
 		return {
 			Theme = {
 				Overlay = {
@@ -46,86 +47,91 @@ function v10.render(p1) -- line: 47
 				}
 			}
 		}
-	end, function(p3) -- line: 54
-		-- upvalues: Roact (copy), CoreGui (copy), p1 (copy), EducationalModal (copy)
-		return Roact.createElement(Roact.Portal, {
-			target = CoreGui
-		}, {
-			InGameMenuEducationalPopupDialog = Roact.createElement("ScreenGui", {
-				IgnoreGuiInset = true,
-				OnTopOfCoreBlur = p1.props.blurBackground,
-				Enabled = p1.props.visible,
-				ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-			}, {
-				Overlay = Roact.createElement("TextButton", {
-					AutoButtonColor = false,
-					BorderSizePixel = 0,
-					Text = "",
-					BackgroundColor3 = p3.Theme.Overlay.Color,
-					BackgroundTransparency = p3.Theme.Overlay.Transparency,
-					Size = UDim2.fromScale(1, 1)
-				}),
-				Popup = Roact.createElement(EducationalModal, {
-					bodyContents = p1.props.bodyContents,
-					cancelText = p1.props.cancelText,
-					confirmText = p1.props.confirmText,
-					titleText = p1.props.titleText,
-					titleBackgroundImageProps = p1.props.titleBackgroundImageProps,
-					screenSize = p1.props.screenSize,
-					onDismiss = p1.props.onDismiss,
-					onCancel = p1.props.onCancel,
-					onConfirm = p1.props.onConfirm
-				})
-			})
+	end, function(p2)
+		return Roact.createElement(Roact.Portal, { target = CoreGui }, {
+			InGameMenuEducationalPopupDialog = Roact.createElement(
+				"ScreenGui",
+				{
+					IgnoreGuiInset = true,
+					OnTopOfCoreBlur = p.props.blurBackground,
+					Enabled = p.props.visible,
+					ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+				},
+				{
+					Overlay = Roact.createElement("TextButton", {
+						AutoButtonColor = false,
+						BackgroundColor3 = p2.Theme.Overlay.Color,
+						BackgroundTransparency = p2.Theme.Overlay.Transparency,
+						BorderSizePixel = 0,
+						Size = UDim2.fromScale(1, 1),
+						Text = ""
+					}),
+					Popup = Roact.createElement(EducationalModal, {
+						bodyContents = p.props.bodyContents,
+						cancelText = p.props.cancelText,
+						confirmText = p.props.confirmText,
+						titleText = p.props.titleText,
+						titleBackgroundImageProps = p.props.titleBackgroundImageProps,
+						screenSize = p.props.screenSize,
+						onDismiss = p.props.onDismiss,
+						onCancel = p.props.onCancel,
+						onConfirm = p.props.onConfirm
+					})
+				}
+			)
 		})
 	end)
 end
-function v10.bindActions(p4) -- line: 89
-	-- upvalues: ContextActionService (copy)
-	local function dismissFunc(_, p6, _) -- line: 90
-		-- upvalues: p4 (copy)
-		if p6 == Enum.UserInputState.Begin then
-			p4.props.onDismiss()
+
+function extended:bindActions()
+	local function dismissFunc(_, p, _)
+		if p == Enum.UserInputState.Begin then
+			self.props.onDismiss()
 		end
 	end
 
 	ContextActionService:BindCoreAction("EducationalPopupConfirm", dismissFunc, false, Enum.KeyCode.Escape)
 end
-function v10.unbindActions(_) -- line: 99
-	-- upvalues: ContextActionService (copy)
+
+function extended:unbindActions()
 	ContextActionService:UnbindCoreAction("EducationalPopupConfirm")
 end
-function v10.updateBlur(p9) -- line: 103
-	-- upvalues: RunService (copy)
-	local v16 = p9.props.blurBackground and p9.props.visible and not game:GetService("VRService").VREnabled
 
-	RunService:SetRobloxGuiFocused(v16)
-end
-function v10.didMount(p10) -- line: 110
-	p10:updateBlur()
+function extended:updateBlur()
+	local v = self.props.blurBackground and self.props.visible
 
-	if p10.props.visible then
-		p10:bindActions()
-	end
-end
-function v10.didUpdate(p11) -- line: 118
-	p11:updateBlur()
-
-	if p11.props.visible then
-		p11:bindActions()
-
-		return
+	if v then
+		local VRService = game:GetService("VRService")
+		v = not VRService.VREnabled
 	end
 
-	p11:unbindActions()
+	RunService:SetRobloxGuiFocused(v)
 end
-function v10.willUnmount(p12) -- line: 128
-	-- upvalues: RunService (copy)
-	if p12.props.blurBackground then
+
+function extended:didMount()
+	self:updateBlur()
+
+	if self.props.visible then
+		self:bindActions()
+	end
+end
+
+function extended:didUpdate()
+	self:updateBlur()
+
+	if self.props.visible then
+		self:bindActions()
+	else
+		self:unbindActions()
+	end
+end
+
+function extended:willUnmount()
+	if self.props.blurBackground then
 		RunService:SetRobloxGuiFocused(false)
 	end
 
-	p12:unbindActions()
+	self:unbindActions()
 end
 
-return v10
+return extended

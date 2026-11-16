@@ -1,5 +1,1 @@
-return {
-	Entering = "Entering",
-	Present = "Present",
-	Exiting = "Exiting"
-}
+return { Entering = "Entering", Present = "Present", Exiting = "Exiting" }

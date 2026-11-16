@@ -1,93 +1,144 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local Foundation = require(Parent.Foundation)
-local GetTextSize = require(Parent.Style).GetTextSize
+local parent = script:FindFirstAncestor("GameTile").Parent
+local Foundation = require(parent.Foundation)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
-local React = require(Parent.React)
-local useTokens = Foundation.Hooks.useTokens
-local t1 = {}
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local React = require(parent.React)
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-local function GameTileOverlayBadge(t2: {[any]: any}) -- line: 35
-	-- upvalues: t1 (copy), useTokens (copy), React (copy), GetTextSize (copy), Icon (copy), IconSize (copy)
-	local v11 = t2.icons or t1
-	local v12 = t2.text or ""
-	local v13 = #v11 > 0
-	local v14 = #v12 > 0
-	local v15 = useTokens()
-	local v16 = if not t2.styleOptions then v15.Color.Extended.White.White_90 else t2.styleOptions.backgroundColorStyle or v15.Color.Extended.White.White_90
-	local v17 = if not t2.styleOptions then v15.LightMode.Content.Emphasis else t2.styleOptions.contentColorStyle or v15.LightMode.Content.Emphasis
-	local v18 = t2.styleOptions and t2.styleOptions.cornerRadius or UDim.new(1, 0)
-	local v19 = if not v14 and not (#v11 > 1) then v15.Size.Size_150 else v15.Size.Size_200
-	local v20 = if not t2.styleOptions then v15.Size.Size_150 else t2.styleOptions.verticalPadding or v15.Size.Size_150
-	local XSmall = v15.Padding.XSmall
-	local TitleSmall = v15.Typography.TitleSmall
-	local Size_400 = v15.Size.Size_400
-	local v24 = React.useMemo(function() -- line: 60
-		-- upvalues: v14 (copy), GetTextSize (copy), v12 (copy), TitleSmall (copy)
-		if v14 then
-			return (GetTextSize(v12, TitleSmall.FontSize, TitleSmall.Font, Vector2.new(1e999, 1e999)))
+local useTokens = Foundation.Hooks.useTokens
+
+local v = {}
+
+local function GameTileOverlayBadge(props)
+	local icons = props.icons or v
+	local text = props.text or ""
+
+	local v2 = #icons > 0
+	local v3 = #text > 0
+
+	local v4 = useTokens()
+	local v5
+
+	if props.styleOptions then
+		v5 = props.styleOptions.backgroundColorStyle or v4.Color.Extended.White.White_90
+	else
+		v5 = v4.Color.Extended.White.White_90
+	end
+
+	local style
+
+	if props.styleOptions then
+		style = props.styleOptions.contentColorStyle or v4.LightMode.Content.Emphasis
+	else
+		style = v4.LightMode.Content.Emphasis
+	end
+
+	local cornerRadius = props.styleOptions and props.styleOptions.cornerRadius or UDim.new(1, 0)
+	local v6
+
+	if v3 or #icons > 1 then
+		v6 = v4.Size.Size_200
+	else
+		v6 = v4.Size.Size_150
+	end
+
+	local v7
+
+	if props.styleOptions then
+		v7 = props.styleOptions.verticalPadding or v4.Size.Size_150
+	else
+		v7 = v4.Size.Size_150
+	end
+
+	local xSmall = v4.Padding.XSmall
+	local titleSmall = v4.Typography.TitleSmall
+	local size_400 = v4.Size.Size_400
+
+	local v8 = React.useMemo(function()
+		if v3 then
+			return (GetTextSize(text, titleSmall.FontSize, titleSmall.Font, Vector2.new(1e999, 1e999)))
 		end
 
 		return (Vector2.new(0, 0))
-	end, {
-		v12,
-		v14,
-		TitleSmall.FontSize,
-		TitleSmall.Font
-	})
+	end, { text, v3, titleSmall.FontSize, titleSmall.Font })
 
-	if not v14 and not v13 then
+	if not (v3 or v2) then
 		return nil
 	end
 
-	local t3 = {
+	local children = {
 		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v20),
-			PaddingLeft = UDim.new(0, v19),
-			PaddingBottom = UDim.new(0, v20),
-			PaddingRight = UDim.new(0, v19)
+			PaddingTop = UDim.new(0, v7),
+			PaddingLeft = UDim.new(0, v6),
+			PaddingBottom = UDim.new(0, v7),
+			PaddingRight = UDim.new(0, v6)
 		}),
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, XSmall)
+			Padding = UDim.new(0, xSmall)
 		})
 	}
-	local n1 = 0
+	local total = 0
 
-	for v27, v28 in v11 do
-		t3[`Icon{ v27 }`] = React.createElement(Icon, {
-			LayoutOrder = v27,
-			name = v28,
+	for k, icon in icons do
+		children[`Icon{k}`] = React.createElement(Icon, {
+			LayoutOrder = k,
+			name = icon,
 			size = IconSize.Small,
-			style = v17
+			style = style
 		})
-		n1 += Size_400 + XSmall
+
+		total += size_400 + xSmall
 	end
 
-	if v14 then
-		t3.BadgeText = React.createElement("TextLabel", {
+	if v3 then
+		local createElement = React.createElement
+		local v9 = {
+			LayoutOrder = #icons + 1,
 			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(v8.X, v8.Y),
+			Text = text,
+			TextColor3 = style.Color3,
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			TextXAlignment = 0,
+			TextYAlignment = 0,
 			TextWrapped = false,
-			LayoutOrder = #v11 + 1,
-			Size = UDim2.fromOffset(v24.X, v24.Y),
-			Text = v12,
-			TextColor3 = v17.Color3,
-			Font = TitleSmall.Font,
-			TextSize = TitleSmall.FontSize,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Center,
-			TextTruncate = Enum.TextTruncate.AtEnd
-		}, {
-			UISizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = t2.maxWidthBinding:map(function(n2: number) -- line: 114
-					-- upvalues: v19 (copy), n1 (ref)
-					local v30 = n2 - 2 * v19 - n1
+			TextTruncate = 0
+		}
+		local font
 
-					if v30 > 0 then
-						return (Vector2.new(v30, 1e999))
+		if not FoundationFontFaceMigration then
+			font = titleSmall.Font
+		end
+
+		v9.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(titleSmall.Font)
+		end
+
+		v9.FontFace = fontFace
+		v9.TextSize = titleSmall.FontSize
+		v9.TextXAlignment = Enum.TextXAlignment.Left
+		v9.TextYAlignment = Enum.TextYAlignment.Center
+
+		v9.TextTruncate = Enum.TextTruncate.AtEnd
+		children.BadgeText = createElement("TextLabel", v9, {
+			UISizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = props.maxWidthBinding:map(function(p: number)
+					local v10 = p - 2 * v6 - total
+
+					if v10 > 0 then
+						return (Vector2.new(v10, 1e999))
 					end
 
 					return nil
@@ -97,19 +148,18 @@ local function GameTileOverlayBadge(t2: {[any]: any}) -- line: 35
 	end
 
 	return React.createElement("Frame", {
-		BackgroundColor3 = v16.Color3,
-		BackgroundTransparency = v16.Transparency,
-		Position = t2.Position,
-		AnchorPoint = t2.AnchorPoint,
+		BackgroundColor3 = v5.Color3,
+		BackgroundTransparency = v5.Transparency,
+		Position = props.Position,
+		AnchorPoint = props.AnchorPoint,
 		AutomaticSize = Enum.AutomaticSize.XY
 	}, {
-		Corner = React.createElement("UICorner", {
-			CornerRadius = v18
-		}),
-		BadgeContent = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.XY
-		}, t3)
+		Corner = React.createElement("UICorner", { CornerRadius = cornerRadius }),
+		BadgeContent = React.createElement(
+			"Frame",
+			{ BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.XY },
+			children
+		)
 	})
 end
 

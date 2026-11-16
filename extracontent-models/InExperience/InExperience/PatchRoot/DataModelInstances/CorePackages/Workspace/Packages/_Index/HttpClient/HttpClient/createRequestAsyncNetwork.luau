@@ -2,62 +2,59 @@ local HttpService = game:GetService("HttpService")
 
 require(script.Parent.types)
 
-local function toLowerKeyedHeaders(p1) -- line: 8
-	if typeof(p1) ~= "table" then
+local function toLowerKeyedHeaders(headers)
+	if typeof(headers) ~= "table" then
 		return nil
 	end
 
-	local t1 = {}
+	local result = {}
 
-	for v6, v7 in p1 do
-		t1[tostring(v6):lower()] = tostring(v7)
+	for k, item in headers do
+		result[tostring(k):lower()] = tostring(item)
 	end
 
-	return t1
+	return result
 end
-local function createRequestAsyncNetwork() -- line: 19
-	-- upvalues: HttpService (copy), toLowerKeyedHeaders (copy)
+
+local function createRequestAsyncNetwork()
 	return {
-		request = function(p2, p3: ((...any) -> ...any)) -- line: 20
-			-- upvalues: HttpService (copy), toLowerKeyedHeaders (copy)
-			assert(p2.onMessage == nil, "createRequestAsyncNetwork does not support onMessage; use createRequestInternalNetwork")
+		request = function(data, callback)
+			assert(
+				data.onMessage == nil,
+				"createRequestAsyncNetwork does not support onMessage; use createRequestInternalNetwork"
+			)
 
-			local u10 = false
+			local flag = false
 
-			task.spawn(function() -- line: 31
-				-- upvalues: HttpService (copy), p2 (copy), u10 (ref), p3 (copy), toLowerKeyedHeaders (copy)
-				local ok, result = pcall(function() -- line: 32
-					-- upvalues: HttpService (copy), p2 (copy)
+			task.spawn(function()
+				local success, result = pcall(function()
 					return HttpService:RequestAsync({
-						Url = p2.url,
-						Method = p2.method,
-						Headers = p2.headers,
-						Body = p2.body
+						Url = data.url,
+						Method = data.method,
+						Headers = data.headers,
+						Body = data.body
 					})
 				end)
 
-				if u10 then
+				if flag then
 					return
 				end
 
-				u10 = true
+				flag = true
 
-				if not ok then
-					p3(false, (tostring(result)))
-
-					return
+				if success then
+					callback(true, {
+						statusCode = tonumber(result.StatusCode) or 0,
+						responseBody = result.Body,
+						headers = toLowerKeyedHeaders(result.Headers)
+					})
+				else
+					callback(false, (tostring(result)))
 				end
-
-				p3(true, {
-					statusCode = tonumber(result.StatusCode) or 0,
-					responseBody = result.Body,
-					headers = toLowerKeyedHeaders(result.Headers)
-				})
 			end)
 
-			return function() -- line: 58
-				-- upvalues: u10 (ref)
-				u10 = true
+			return function()
+				flag = true
 			end
 		end
 	}

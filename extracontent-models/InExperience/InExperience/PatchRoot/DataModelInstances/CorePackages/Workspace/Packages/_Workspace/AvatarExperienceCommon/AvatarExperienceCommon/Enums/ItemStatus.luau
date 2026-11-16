@@ -1,3 +1,1 @@
-return {
-	IsFAE = "IsFAE"
-}
+return { IsFAE = "IsFAE" }

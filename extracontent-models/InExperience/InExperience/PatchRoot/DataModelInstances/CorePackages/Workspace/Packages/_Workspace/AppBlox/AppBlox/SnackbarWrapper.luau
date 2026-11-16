@@ -1,71 +1,89 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local RoactUtils = require(Parent.RoactUtils)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local Responsive = require(parent.Responsive)
+local useDeviceInsets = Responsive.useDeviceInsets
+local Display = require(parent.Display)
+local shouldUseDeviceSafeInsets = Display.shouldUseDeviceSafeInsets
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFixOverlayTopInsetForDeviceSafeInsets = SharedFlags.FFlagFixOverlayTopInsetForDeviceSafeInsets
+
 local Snackbar = Foundation.Snackbar
 local useScaledValue = Foundation.Hooks.useScaledValue
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local function SnackbarWrapper(t1: {[any]: any}) -- line: 39
-	-- upvalues: React (copy), useSelector (copy), useScaledValue (copy), Snackbar (copy)
-	React.useEffect(function() -- line: 41
-		-- upvalues: t1 (copy)
-		local thread = nil
+local function SnackbarWrapper(props)
+	React.useEffect(function()
+		local thread
 
-		if t1.autoDismissDelaySeconds then
-			thread = task.delay(t1.autoDismissDelaySeconds, t1.closeSnackbar)
+		if props.autoDismissDelaySeconds then
+			thread = task.delay(props.autoDismissDelaySeconds, props.closeSnackbar)
+		else
+			thread = nil
 		end
 
-		return function() -- line: 48
-			-- upvalues: thread (ref)
+		return function()
 			if thread then
 				task.cancel(thread)
 				thread = nil
 			end
 		end
-	end, {
-		t1.closeSnackbar,
-		t1.autoDismissDelaySeconds
-	})
+	end, { props.closeSnackbar, props.autoDismissDelaySeconds })
 
-	local v10 = React.useCallback(function(_, p2) -- line: 56
-		-- upvalues: t1 (copy)
-		if p2 == Enum.SwipeDirection.Up then
-			t1.closeSnackbar()
+	local v = React.useCallback(function(_, p)
+		if p == Enum.SwipeDirection.Up then
+			props.closeSnackbar()
 		end
-	end, { t1.closeSnackbar })
-	local v11 = if not t1.buttonText or not t1.onButtonActivated then nil else {
-		text = t1.buttonText,
-		onActivated = t1.onButtonActivated
-	}
-	local v12 = useSelector(function(p3) -- line: 68
-		return p3.GlobalGuiInset or {
-			left = 0,
-			top = 0,
-			right = 0,
-			bottom = 0
-		}
-	end)
-	local v13 = useSelector(function(p4) -- line: 77
-		return p4.TopBar.statusBarHeight
-	end)
-	local v14 = useScaledValue(20)
-	local v15 = t1.Position or UDim2.new(0.5, 0, 0, v14 + v12.top + v13)
+	end, { props.closeSnackbar })
 
-	return React.createElement("Frame", {
-		AnchorPoint = t1.AnchorPoint or Vector2.new(0.5, 0),
-		Position = v15,
+	local action = props.buttonText
+		and props.onButtonActivated
+		and { text = props.buttonText, onActivated = props.onButtonActivated }
+		or nil
+
+	local v2 = useSelector(function(p)
+		return p.GlobalGuiInset or { left = 0, top = 0, right = 0, bottom = 0 }
+	end)
+
+	local v3 = useSelector(function(p)
+		return p.TopBar.statusBarHeight
+	end)
+	local v4
+
+	if FFlagFixOverlayTopInsetForDeviceSafeInsets then
+		local v5 = useDeviceInsets()
+		v4 = not shouldUseDeviceSafeInsets and 0 or v5.top
+	else
+		v4 = 0
+	end
+
+	local v5 = useScaledValue(20)
+	local position = props.Position or UDim2.new(0.5, 0, 0, v5 + v2.top + v3 + v4)
+
+	local createElement = React.createElement
+	local v6 = {
+		AnchorPoint = props.AnchorPoint or Vector2.new(0.5, 0),
+		Position = position,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
 		Selectable = false,
 		Active = true,
-		[React.Event.TouchSwipe] = v10
-	}, { React.createElement(Snackbar, {
-		title = t1.titleText,
-		icon = t1.icon,
-		action = v11,
-		onClose = if not t1.hideCloseAffordance then t1.closeSnackbar else nil
-	}) })
+		[React.Event.TouchSwipe] = v
+	}
+
+	local createElement2 = React.createElement
+	local v7 = { title = props.titleText, icon = props.icon, action = action, onClose = 0 }
+	local onClose
+
+	if not props.hideCloseAffordance then
+		onClose = props.closeSnackbar
+	end
+
+	v7.onClose = onClose
+	return createElement("Frame", v6, { createElement2(Snackbar, v7) })
 end
 
 return React.memo(SnackbarWrapper)

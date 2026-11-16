@@ -1,18 +1,20 @@
-local ok, result = pcall(function() -- line: 1
+local success, result = pcall(function()
 	return game:GetService("StudioService")
 end)
-local v3 = if not ok then nil else result
-local ParentParent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+if not success then
+	result = nil
+end
 
-local function getRestrictedUserTable() -- line: 10
-	-- upvalues: v3 (copy)
-	if v3 then
-		return {{
-			creatorType = "User",
-			id = v3:GetUserId()
-		}}
+local parent = script.Parent.Parent
+
+require(parent.util.Types)
+
+local function getRestrictedUserTable()
+	if result then
+		return {
+			{ creatorType = "User", id = result:GetUserId() }
+		}
 	end
 
 	return {}

@@ -1,104 +1,98 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 42
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		is_favorited = t3 ~= nil and (t3.is_favorited ~= nil and t3.is_favorited)
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(p)
+	local v2 = {
+		is_favorited = p ~= nil and p.is_favorited ~= nil and p.is_favorited
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 48
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.is_favorited then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class.encode(p)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v9, v10, not p1.is_favorited and 0 or 1)
+	if p.is_favorited then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.is_favorited and 1 or 0)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 62
-	-- upvalues: t2 (copy), proto (copy)
-	local v13 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v15, v16
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v15, v16, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v16 == proto.wireTypes.varint then
-			if v15 == 1 then
-				local v17
-
-				v17, n2 = proto.readVarInt(p2, n2)
-				v13.is_favorited = v17 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_favorited = v5 ~= 0
 			else
-				local v18
-
-				v18, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v16 == proto.wireTypes.lengthDelimited then
-			local v19, v20 = proto.readVarInt(p2, n2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			local varInt, v5 = proto.readVarInt(buf, v2)
 
-			n2 = v20 + v19
-		elseif v16 == proto.wireTypes.i32 then
-			local v21
-
-			v21, n2 = proto.readFixed32(p2, n2)
-		elseif v16 == proto.wireTypes.i64 then
-			local v22
-
-			v22, n2 = proto.readFixed64(p2, n2)
+			v2 = v5 + varInt
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v16)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v13
-end
-function t2.jsonEncode(p3) -- line: 105
-	local t4 = {}
-
-	if p3.is_favorited then
-		t4.isFavorited = p3.is_favorited
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 115
-	-- upvalues: t2 (copy)
-	local v26 = t2.new()
-
-	if t5.is_favorited ~= nil then
-		v26.is_favorited = t5.is_favorited
-	end
-
-	if t5.isFavorited ~= nil then
-		v26.is_favorited = t5.isFavorited
-	end
-
-	return v26
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(p)
+	local v2 = {}
+
+	if p.is_favorited then
+		v2.isFavorited = p.is_favorited
+	end
+
+	return v2
+end
+
+function class.jsonDecode(p)
+	local v2 = class.new()
+
+	if p.is_favorited ~= nil then
+		v2.is_favorited = p.is_favorited
+	end
+
+	if p.isFavorited ~= nil then
+		v2.is_favorited = p.isFavorited
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "UniverseUserFavoriteData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseUserFavoriteData"
 }
-t1.UniverseUserFavoriteData = t2
-typeRegistry.default:register(t1.UniverseUserFavoriteData)
 
-return {
-	UniverseUserFavoriteData = t1.UniverseUserFavoriteData
-}
+v.UniverseUserFavoriteData = class
+
+typeRegistry.default:register(v.UniverseUserFavoriteData)
+
+return { UniverseUserFavoriteData = v.UniverseUserFavoriteData }

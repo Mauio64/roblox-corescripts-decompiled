@@ -1,74 +1,136 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local View = require(UserListParent.Foundation).View
+local parent = UserList.Parent
 
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
 require(UserList.Common.Types)
+local UserRow = require(UserList.Components.UserRow)
+local EntityRow = UserRow.EntityRow
 
-local EntityRow = require(UserList.Components.UserRow).EntityRow
-local FFlagUserListCtaIntegrationEnabled = require(UserListParent.SharedFlags).FFlagUserListCtaIntegrationEnabled
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAddStatusIndicatorToBaseRow = SharedFlags2.FFlagAddStatusIndicatorToBaseRow
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagUserListSurfaceExtensions = SharedFlags3.FFlagUserListSurfaceExtensions
 
-local function useRenderEntity(t1: {[any]: any}) -- line: 39
-	-- upvalues: React (copy), View (copy), EntityRow (copy), FFlagUserListCtaIntegrationEnabled (copy)
-	local onActivated = t1.onActivated
-	local renderRow = t1.renderRow
-	local entitiesMap = t1.entitiesMap
-	local configs = t1.configs
-	local layoutMode = t1.layoutMode
+local function useRenderEntity(data)
+	local onActivated = data.onActivated
+	local renderRow = data.renderRow
+	local entitiesMap = data.entitiesMap
+	local configs = data.configs
+	local layoutMode = data.layoutMode
+	local firstRowRef
 
-	return (React.useCallback(function(s1: string, n1: number, uDim2: UDim2?) -- line: 47
-		-- upvalues: entitiesMap (copy), renderRow (copy), onActivated (copy), React (copy), View (copy), EntityRow (copy), FFlagUserListCtaIntegrationEnabled (copy), configs (copy), layoutMode (copy)
-		local v17 = entitiesMap[s1]
+	if FFlagUserListSurfaceExtensions then
+		firstRowRef = data.firstRowRef
+	else
+		firstRowRef = nil
+	end
 
-		if not v17 then
+	local useCallback = React.useCallback
+	local function fn(p: string, layoutOrder: number, size: UDim2?)
+		local entity = entitiesMap[p]
+
+		if not entity then
 			return nil
 		end
 
 		if renderRow then
-			return (renderRow(function(p1) -- line: 55
-				-- upvalues: v17 (copy), n1 (copy), onActivated (copy), React (copy), View (copy), uDim2 (copy), EntityRow (copy), FFlagUserListCtaIntegrationEnabled (copy), configs (copy), layoutMode (copy)
-				local v19 = if not p1.onRowActivated then onActivated else function() -- line: 58
-					-- upvalues: p1 (copy), v17 (copy), n1 (copy)
-					p1.onRowActivated(v17.id, v17.type, n1)
+			return (renderRow(function(props)
+				local onActivated2
+
+				if props.onRowActivated then
+					onActivated2 = function()
+						props.onRowActivated(entity.id, entity.type, layoutOrder)
+					end
+				else
+					onActivated2 = onActivated
 				end
 
-				return React.createElement(View, {
+				local createElement = React.createElement
+				local v = {
 					tag = "size-full-full",
-					Size = uDim2,
-					LayoutOrder = n1
-				}, { React.createElement(EntityRow, {
-					entity = v17,
-					onActivated = v19,
-					primaryCta = p1.primaryCta,
-					secondaryCta = p1.secondaryCta,
-					ctaLoading = if not FFlagUserListCtaIntegrationEnabled then nil else p1.ctaLoading,
-					contextualInfo = p1.contextualInfo,
-					loadingState = p1.loadingState,
-					presence = p1.presence,
-					trailingContent = p1.trailingContent,
-					configs = configs,
-					layoutMode = layoutMode
-				}) })
-			end, v17, n1))
+					Size = size,
+					LayoutOrder = layoutOrder,
+					ref = nil
+				}
+				local ref
+
+				if FFlagUserListSurfaceExtensions and layoutOrder == 1 then
+					ref = firstRowRef
+				end
+
+				v.ref = ref
+
+				local createElement2 = React.createElement
+				local v2 = {
+					entity = entity,
+					onActivated = onActivated2,
+					primaryCta = props.primaryCta,
+					secondaryCta = props.secondaryCta,
+					ctaLoading = 0,
+					contextualInfo = 0,
+					loadingState = 0,
+					presence = 0,
+					shouldShowNewIndicator = 0,
+					trailingContent = 0,
+					configs = 0,
+					layoutMode = 0
+				}
+				local ctaLoading
+
+				if FFlagUserListCtaIntegrationEnabled then
+					ctaLoading = props.ctaLoading
+				end
+
+				v2.ctaLoading = ctaLoading
+
+				v2.contextualInfo = props.contextualInfo
+				v2.loadingState = props.loadingState
+				v2.presence = props.presence
+				local shouldShowNewIndicator
+
+				if FFlagAddStatusIndicatorToBaseRow then
+					shouldShowNewIndicator = props.shouldShowNewIndicator
+				end
+
+				v2.shouldShowNewIndicator = shouldShowNewIndicator
+
+				v2.trailingContent = props.trailingContent
+				v2.configs = configs
+				v2.layoutMode = layoutMode
+				return createElement(View, v, { createElement2(EntityRow, v2) })
+			end, entity, layoutOrder))
 		end
 
-		return (React.createElement(View, {
-			tag = "size-full-full",
-			Size = uDim2,
-			LayoutOrder = n1
-		}, { React.createElement(EntityRow, {
-			entity = v17,
-			onActivated = onActivated,
-			configs = configs,
-			layoutMode = layoutMode
-		}) }))
-	end, {
-		onActivated,
-		renderRow,
-		entitiesMap,
-		configs,
-		layoutMode
-	}))
+		local createElement = React.createElement
+		local v = { tag = "size-full-full", Size = size, LayoutOrder = layoutOrder, ref = nil }
+		local ref
+
+		if FFlagUserListSurfaceExtensions and layoutOrder == 1 then
+			ref = firstRowRef
+		end
+
+		v.ref = ref
+		return (createElement(View, v, {
+			React.createElement(EntityRow, {
+				entity = entity,
+				onActivated = onActivated,
+				configs = configs,
+				layoutMode = layoutMode
+			})
+		}))
+	end
+
+	local v
+
+	if FFlagUserListSurfaceExtensions then
+		v = firstRowRef
+	end
+
+	return (useCallback(fn, { onActivated, renderRow, entitiesMap, configs, layoutMode, v }))
 end
 
 return useRenderEntity

@@ -1,8 +1,12 @@
-local scriptParent = script.Parent
-local ReactGlobals = require(scriptParent.ReactGlobals)
-local console = require(scriptParent.Shared).console
-local t1 = {}
-local ReactSymbols = require(scriptParent.Shared).ReactSymbols
+local parent = script.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+
+local Shared = require(parent.Shared)
+local console = Shared.console
+
+local Shared2 = require(parent.Shared)
+local ReactSymbols = Shared2.ReactSymbols
+
 local REACT_CONTEXT_TYPE = ReactSymbols.REACT_CONTEXT_TYPE
 local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
 local REACT_FORWARD_REF_TYPE = ReactSymbols.REACT_FORWARD_REF_TYPE
@@ -15,137 +19,140 @@ local REACT_PROVIDER_TYPE = ReactSymbols.REACT_PROVIDER_TYPE
 local REACT_STRICT_MODE_TYPE = ReactSymbols.REACT_STRICT_MODE_TYPE
 local REACT_SUSPENSE_TYPE = ReactSymbols.REACT_SUSPENSE_TYPE
 local REACT_SUSPENSE_LIST_TYPE = ReactSymbols.REACT_SUSPENSE_LIST_TYPE
-local isValidElementType = require(scriptParent.Shared).isValidElementType
+
+local Shared3 = require(parent.Shared)
+local isValidElementType = Shared3.isValidElementType
+
 local REACT_BINDING_TYPE = ReactSymbols.REACT_BINDING_TYPE
-local v20 = require(scriptParent.SafeFlags).createGetFFlag("ReactIsProtectedTypeOf", false)()
 
-local function typeOf(p1) -- line: 50
-	-- upvalues: v20 (copy), REACT_ELEMENT_TYPE (copy), REACT_FRAGMENT_TYPE (copy), REACT_PROFILER_TYPE (copy), REACT_STRICT_MODE_TYPE (copy), REACT_SUSPENSE_TYPE (copy), REACT_SUSPENSE_LIST_TYPE (copy), REACT_CONTEXT_TYPE (copy), REACT_FORWARD_REF_TYPE (copy), REACT_LAZY_TYPE (copy), REACT_MEMO_TYPE (copy), REACT_PROVIDER_TYPE (copy), REACT_PORTAL_TYPE (copy), REACT_BINDING_TYPE (copy)
-	if typeof(p1) == "table" and p1 ~= nil then
-		local result
+local SafeFlags = require(parent.SafeFlags)
 
-		if v20 then
-			local ok
+local v = SafeFlags.createGetFFlag("ReactIsProtectedTypeOf", false)()
 
-			ok, result = pcall(function() -- line: 58
-				-- upvalues: p1 (copy)
-				return p1["$$typeof"]
-			end)
+local function typeOf(p)
+	if typeof(p) ~= "table" or p == nil then
+		return nil
+	end
 
-			if not ok then
-				return nil
-			end
-		else
-			result = p1["$$typeof"]
+	local result
+
+	if v then
+		local success
+		success, result = pcall(function()
+			return p["$$typeof"]
+		end)
+
+		if not success then
+			return nil
+		end
+	else
+		result = p["$$typeof"]
+	end
+
+	if result == REACT_ELEMENT_TYPE then
+		local v2 = p.type
+
+		if
+			v2 == REACT_FRAGMENT_TYPE
+			or v2 == REACT_PROFILER_TYPE
+			or v2 == REACT_STRICT_MODE_TYPE
+			or v2 == REACT_SUSPENSE_TYPE
+			or v2 == REACT_SUSPENSE_LIST_TYPE
+		then
+			return v2
 		end
 
-		if result == REACT_ELEMENT_TYPE then
-			local type = p1.type
-
-			if type == REACT_FRAGMENT_TYPE or type == REACT_PROFILER_TYPE or type == REACT_STRICT_MODE_TYPE or type == REACT_SUSPENSE_TYPE or type == REACT_SUSPENSE_LIST_TYPE then
-				return type
-			end
-
-			local v28 = type and (typeof(type) == "table" and type["$$typeof"])
-
-			if v28 == REACT_CONTEXT_TYPE or v28 == REACT_FORWARD_REF_TYPE or v28 == REACT_LAZY_TYPE or v28 == REACT_MEMO_TYPE or v28 == REACT_PROVIDER_TYPE then
-				return v28
-			end
-
-			return result
+		if v2 then
+			v2 = typeof(v2) == "table" and v2["$$typeof"]
 		end
 
-		if result == REACT_PORTAL_TYPE or result == REACT_BINDING_TYPE then
-			return result
+		if
+			v2 == REACT_CONTEXT_TYPE
+			or v2 == REACT_FORWARD_REF_TYPE
+			or v2 == REACT_LAZY_TYPE
+			or v2 == REACT_MEMO_TYPE
+			or v2 == REACT_PROVIDER_TYPE
+		then
+			return v2
 		end
+
+		return result
+	elseif result == REACT_PORTAL_TYPE or result == REACT_BINDING_TYPE then
+		return result
 	end
 
 	return nil
 end
 
-t1.typeOf = typeOf
-t1.ContextConsumer = REACT_CONTEXT_TYPE
-t1.ContextProvider = REACT_PROVIDER_TYPE
-t1.Element = REACT_ELEMENT_TYPE
-t1.ForwardRef = REACT_FORWARD_REF_TYPE
-t1.Fragment = REACT_FRAGMENT_TYPE
-t1.Lazy = REACT_LAZY_TYPE
-t1.Memo = REACT_MEMO_TYPE
-t1.Portal = REACT_PORTAL_TYPE
-t1.Profiler = REACT_PROFILER_TYPE
-t1.StrictMode = REACT_STRICT_MODE_TYPE
-t1.Suspense = REACT_SUSPENSE_TYPE
-t1.Binding = ReactSymbols.REACT_BINDING_TYPE
-t1.isValidElementType = isValidElementType
-
-local u22 = false
-local u23 = false
-
-function t1.isAsyncMode(_) -- line: 183
-	-- upvalues: ReactGlobals (copy), u22 (ref), console (copy)
-	if ReactGlobals.__DEV__ and not u22 then
-		u22 = true
+local ReactIs = {}
+ReactIs.typeOf = typeOf
+ReactIs.ContextConsumer = REACT_CONTEXT_TYPE
+ReactIs.ContextProvider = REACT_PROVIDER_TYPE
+ReactIs.Element = REACT_ELEMENT_TYPE
+ReactIs.ForwardRef = REACT_FORWARD_REF_TYPE
+ReactIs.Fragment = REACT_FRAGMENT_TYPE
+ReactIs.Lazy = REACT_LAZY_TYPE
+ReactIs.Memo = REACT_MEMO_TYPE
+ReactIs.Portal = REACT_PORTAL_TYPE
+ReactIs.Profiler = REACT_PROFILER_TYPE
+ReactIs.StrictMode = REACT_STRICT_MODE_TYPE
+ReactIs.Suspense = REACT_SUSPENSE_TYPE
+ReactIs.Binding = ReactSymbols.REACT_BINDING_TYPE
+ReactIs.isValidElementType = isValidElementType
+local v2 = false
+local v3 = false
+function ReactIs.isAsyncMode(_): boolean
+	if ReactGlobals.__DEV__ and not v2 then
+		v2 = true
 		console.warn("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 18+.")
 	end
 
 	return false
 end
-function t1.isConcurrentMode(_) -- line: 200
-	-- upvalues: ReactGlobals (copy), u23 (ref), console (copy)
-	if ReactGlobals.__DEV__ and not u23 then
-		u23 = true
+function ReactIs.isConcurrentMode(_): boolean
+	if ReactGlobals.__DEV__ and not v3 then
+		v3 = true
 		console.warn("The ReactIs.isConcurrentMode() alias has been deprecated, and will be removed in React 18+.")
 	end
 
 	return false
 end
-function t1.isContextConsumer(p4) -- line: 217
-	-- upvalues: typeOf (copy), REACT_CONTEXT_TYPE (copy)
-	return typeOf(p4) == REACT_CONTEXT_TYPE
+function ReactIs.isContextConsumer(p): boolean
+	return typeOf(p) == REACT_CONTEXT_TYPE
 end
-function t1.isContextProvider(p5) -- line: 221
-	-- upvalues: typeOf (copy), REACT_PROVIDER_TYPE (copy)
-	return typeOf(p5) == REACT_PROVIDER_TYPE
+function ReactIs.isContextProvider(p): boolean
+	return typeOf(p) == REACT_PROVIDER_TYPE
 end
-function t1.isElement(p6) -- line: 225
-	-- upvalues: REACT_ELEMENT_TYPE (copy)
-	return typeof(p6) == "table" and (p6 ~= nil and p6["$$typeof"] == REACT_ELEMENT_TYPE)
+function ReactIs.isElement(p): boolean
+	return typeof(p) == "table" and p ~= nil and p["$$typeof"] == REACT_ELEMENT_TYPE
 end
-function t1.isForwardRef(p7) -- line: 231
-	-- upvalues: typeOf (copy), REACT_FORWARD_REF_TYPE (copy)
-	return typeOf(p7) == REACT_FORWARD_REF_TYPE
+function ReactIs.isForwardRef(p): boolean
+	return typeOf(p) == REACT_FORWARD_REF_TYPE
 end
-function t1.isFragment(p8) -- line: 235
-	-- upvalues: typeOf (copy), REACT_FRAGMENT_TYPE (copy)
-	return typeOf(p8) == REACT_FRAGMENT_TYPE
+function ReactIs.isFragment(p): boolean
+	return typeOf(p) == REACT_FRAGMENT_TYPE
 end
-function t1.isLazy(p9) -- line: 239
-	-- upvalues: typeOf (copy), REACT_LAZY_TYPE (copy)
-	return typeOf(p9) == REACT_LAZY_TYPE
+function ReactIs.isLazy(p): boolean
+	return typeOf(p) == REACT_LAZY_TYPE
 end
-function t1.isMemo(p10) -- line: 243
-	-- upvalues: typeOf (copy), REACT_MEMO_TYPE (copy)
-	return typeOf(p10) == REACT_MEMO_TYPE
+function ReactIs.isMemo(p): boolean
+	return typeOf(p) == REACT_MEMO_TYPE
 end
-function t1.isPortal(p11) -- line: 247
-	-- upvalues: typeOf (copy), REACT_PORTAL_TYPE (copy)
-	return typeOf(p11) == REACT_PORTAL_TYPE
+function ReactIs.isPortal(p): boolean
+	return typeOf(p) == REACT_PORTAL_TYPE
 end
-function t1.isProfiler(p12) -- line: 251
-	-- upvalues: typeOf (copy), REACT_PROFILER_TYPE (copy)
-	return typeOf(p12) == REACT_PROFILER_TYPE
+function ReactIs.isProfiler(p): boolean
+	return typeOf(p) == REACT_PROFILER_TYPE
 end
-function t1.isStrictMode(p13) -- line: 255
-	-- upvalues: typeOf (copy), REACT_STRICT_MODE_TYPE (copy)
-	return typeOf(p13) == REACT_STRICT_MODE_TYPE
+function ReactIs.isStrictMode(p): boolean
+	return typeOf(p) == REACT_STRICT_MODE_TYPE
 end
-function t1.isSuspense(p14) -- line: 259
-	-- upvalues: typeOf (copy), REACT_SUSPENSE_TYPE (copy)
-	return typeOf(p14) == REACT_SUSPENSE_TYPE
-end
-function t1.isBinding(p15) -- line: 264
-	-- upvalues: typeOf (copy), REACT_BINDING_TYPE (copy)
-	return typeOf(p15) == REACT_BINDING_TYPE
+function ReactIs.isSuspense(p): boolean
+	return typeOf(p) == REACT_SUSPENSE_TYPE
 end
 
-return t1
+function ReactIs.isBinding(p): boolean
+	return typeOf(p) == REACT_BINDING_TYPE
+end
+
+return ReactIs

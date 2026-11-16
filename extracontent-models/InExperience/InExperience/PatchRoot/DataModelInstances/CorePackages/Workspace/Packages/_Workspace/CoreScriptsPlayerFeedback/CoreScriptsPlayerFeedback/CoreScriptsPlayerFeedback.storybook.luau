@@ -1,33 +1,35 @@
 local LocalizationService = game:GetService("LocalizationService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local React = require(scriptParentParent.React)
-local ReactRoblox = require(scriptParentParent.ReactRoblox)
-local Foundation = require(scriptParentParent.Foundation)
-local Localization = require(scriptParentParent.InExperienceLocales).Localization
-local LocalizationProvider = require(scriptParentParent.Localization).LocalizationProvider
-local FoundationProvider = Foundation.FoundationProvider
-local v10 = Localization.new(LocalizationService.RobloxLocaleId)
 
-local function StoryBookMapStory(p1) -- line: 16
-	-- upvalues: React (copy), LocalizationProvider (copy), v10 (copy), FoundationProvider (copy), Foundation (copy)
-	return function(p2) -- line: 17
-		-- upvalues: React (copy), LocalizationProvider (copy), v10 (copy), FoundationProvider (copy), Foundation (copy), p1 (copy)
-		return React.createElement(LocalizationProvider, {
-			localization = v10
-		}, {
-			FoundationProvider = React.createElement(FoundationProvider, {
-				theme = Foundation.Enums.Theme.Dark
-			}, {
-				Child = React.createElement(p1, p2)
-			})
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local ReactRoblox = require(parent2.ReactRoblox)
+local Foundation = require(parent2.Foundation)
+local InExperienceLocales = require(parent2.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+local Localization2 = require(parent2.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+
+local FoundationProvider = Foundation.FoundationProvider
+
+local localization = Localization.new(LocalizationService.RobloxLocaleId)
+
+local function StoryBookMapStory(p)
+	return function(p2)
+		return React.createElement(LocalizationProvider, { localization = localization }, {
+			FoundationProvider = React.createElement(
+				FoundationProvider,
+				{ colorMode = Foundation.Enums.ColorMode.Dark },
+				{ Child = React.createElement(p, p2) }
+			)
 		})
 	end
 end
 
 return {
-	name = scriptParent.Name,
-	storyRoot = scriptParent,
+	name = parent.Name,
+	storyRoot = parent,
 	roact = React,
 	reactRoblox = ReactRoblox,
 	mapStory = StoryBookMapStory

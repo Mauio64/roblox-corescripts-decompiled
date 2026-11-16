@@ -1,27 +1,24 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local React = require(VirtualEvents.Parent.React)
 local ReactRoblox = require(VirtualEvents.Parent.ReactRoblox)
 local withMockProviders = require(VirtualEvents.withMockProviders)
 
-local function testHook(p1: ((...any) -> ...any)) -- line: 7
-	-- upvalues: ReactRoblox (copy), withMockProviders (copy), React (copy)
-	local ScreenGui = Instance.new("ScreenGui")
-	local v8 = ReactRoblox.createRoot(ScreenGui)
+local function testHook(callback)
+	local screenGui = Instance.new("ScreenGui")
+	local root = ReactRoblox.createRoot(screenGui)
 
-	local function HookTester() -- line: 11
-		-- upvalues: p1 (copy)
-		p1()
-
+	local function HookTester(): nil
+		callback()
 		return nil
 	end
 
-	local v10 = withMockProviders({
+	local v = withMockProviders({
 		HookTester = React.createElement(HookTester)
 	})
 
-	ReactRoblox.act(function() -- line: 20
-		-- upvalues: v8 (copy), v10 (copy)
-		v8:render(v10)
+	ReactRoblox.act(function()
+		root:render(v)
 	end)
 end
 

@@ -1,34 +1,28 @@
-local ParentParent = script.Parent.Parent
-local Actions = ParentParent.Actions
-local ParentParentParent = ParentParent.Parent
-local Cryo = require(ParentParentParent.Cryo)
-local Rodux = require(ParentParentParent.Rodux)
-local SetShareInviteLink = require(Actions.SetShareInviteLink)
-local ClearShareInviteLink = require(Actions.ClearShareInviteLink)
-local t1 = {}
+local parent = script.Parent.Parent
+local actions = parent.Actions
 
-return function(p1) -- line: 14
-	-- upvalues: Rodux (copy), t1 (copy), Cryo (copy), SetShareInviteLink (copy), ClearShareInviteLink (copy)
-	local shareLinksNetworking = p1.shareLinksNetworking
+local parent2 = parent.Parent
 
-	return Rodux.createReducer(t1, {
-		[shareLinksNetworking.GenerateLink.Succeeded.name] = function(p2, p3) -- line: 18
-			-- upvalues: Cryo (copy)
-			return Cryo.Dictionary.join(p2, {
-				ShareInviteLink = p3.responseBody
-			})
+local Cryo = require(parent2.Cryo)
+local Rodux = require(parent2.Rodux)
+
+local SetShareInviteLink = require(actions.SetShareInviteLink)
+local ClearShareInviteLink = require(actions.ClearShareInviteLink)
+
+local v = {}
+
+return function(p)
+	local shareLinksNetworking = p.shareLinksNetworking
+
+	return Rodux.createReducer(v, {
+		[shareLinksNetworking.GenerateLink.Succeeded.name] = function(p2, p3)
+			return Cryo.Dictionary.join(p2, { ShareInviteLink = p3.responseBody })
 		end,
-		[SetShareInviteLink.name] = function(p4, p5) -- line: 22
-			-- upvalues: Cryo (copy)
-			return Cryo.Dictionary.join(p4, {
-				ShareInviteLink = p5.shareInviteLink
-			})
+		[SetShareInviteLink.name] = function(p2, p3)
+			return Cryo.Dictionary.join(p2, { ShareInviteLink = p3.shareInviteLink })
 		end,
-		[ClearShareInviteLink.name] = function(p6, _) -- line: 26
-			-- upvalues: Cryo (copy)
-			return Cryo.Dictionary.join(p6, {
-				ShareInviteLink = Cryo.None
-			})
+		[ClearShareInviteLink.name] = function(p2, _)
+			return Cryo.Dictionary.join(p2, { ShareInviteLink = Cryo.None })
 		end
 	})
 end

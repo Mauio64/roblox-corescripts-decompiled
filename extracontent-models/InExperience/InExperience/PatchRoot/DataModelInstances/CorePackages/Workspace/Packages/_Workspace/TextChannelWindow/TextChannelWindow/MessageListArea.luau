@@ -1,62 +1,73 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
+local parent = script.Parent.Parent
 
-require(ParentParent.Signals)
-
-local ChatUIPrimitives = require(ParentParent.ChatUIPrimitives)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+require(parent.Signals)
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
 local TextChannelWindowAnalytics = require(script.Parent.TextChannelWindowAnalytics)
-local useInExperienceLocalization = require(script.Parent.useInExperienceLocalization)
+local useTranslationToggleAvailable = require(script.Parent.useTranslationToggleAvailable)
+local ChatUIPrimitives2 = require(parent.ChatUIPrimitives)
+local useInExperienceLocalization = ChatUIPrimitives2.Hooks.useInExperienceLocalization
+
+local FFlagTCWTranslationSupport = ChatUIPrimitives.Flags.FFlagTCWTranslationSupport
+
 local MessageLayoutContainer = ChatUIPrimitives.MessageLayoutContainer
 
-local function MessageListArea(t1: {[any]: any}) -- line: 29
-	-- upvalues: Foundation (copy), useInExperienceLocalization (copy), React (copy), TextChannelWindowAnalytics (copy), MessageLayoutContainer (copy)
-	local v10 = Foundation.Hooks.useTokens()
-	local v11 = useInExperienceLocalization()
-	local v12 = React.useMemo(function() -- line: 33
-		-- upvalues: TextChannelWindowAnalytics (copy), t1 (copy)
-		return TextChannelWindowAnalytics.createOnScrollCallback(t1.windowName)
-	end, { t1.windowName })
+local function MessageListArea(props)
+	local v = Foundation.Hooks.useTokens()
+	local v2 = useInExperienceLocalization()
+	local isTranslationSettingEnabled
 
-	if t1.channelState == "no-channel" then
+	if FFlagTCWTranslationSupport then
+		isTranslationSettingEnabled = useTranslationToggleAvailable()
+	end
+
+	local onScroll = React.useMemo(function()
+		return TextChannelWindowAnalytics.createOnScrollCallback(props.windowName)
+	end, { props.windowName })
+
+	local contentPadding = React.useMemo(function()
+		return {
+			top = UDim.new(0, v.Size.Size_100),
+			bottom = UDim.new(0, v.Size.Size_100),
+			left = UDim.new(0, v.Size.Size_200),
+			right = UDim.new(0, v.Size.Size_1400)
+		}
+	end, { v.Size.Size_100, v.Size.Size_200, v.Size.Size_1400 })
+
+	if props.channelState == "no-channel" then
 		return React.createElement(Foundation.Empty, {
-			icon = {
-				name = "icons/status/oof_xlarge"
-			},
-			text = v11("CoreScripts.TextChat.Error.NoChannelSelected")
+			icon = { name = "icons/status/oof_xlarge" },
+			text = v2("CoreScripts.TextChat.Error.NoChannelSelected")
 		})
 	end
 
-	if t1.channelState == "not-member" then
+	if props.channelState == "not-member" then
 		return React.createElement(Foundation.Empty, {
-			icon = {
-				name = "icons/status/oof_xlarge"
-			},
-			text = v11("CoreScripts.TextChat.Error.NoChannelAccess")
+			icon = { name = "icons/status/oof_xlarge" },
+			text = v2("CoreScripts.TextChat.Error.NoChannelAccess")
 		})
 	end
 
-	if t1.channelState ~= "member" then
-		return React.createElement(Foundation.Empty, {
-			icon = {
-				name = "icons/status/oof_xlarge"
-			},
-			text = v11("CoreScripts.TextChat.InputBar.Hint.ChatUnavailable")
+	if props.channelState == "member" then
+		return React.createElement(MessageLayoutContainer, {
+			messagesSignal = props.messagesSignal,
+			layoutStyle = "textLine",
+			fontFace = props.fontFace,
+			Size = UDim2.fromScale(1, 1),
+			contentPadding = contentPadding,
+			onScroll = onScroll,
+			selectableRows = props.selectableRows,
+			selectionCursor = props.selectionCursor,
+			isTranslationSettingEnabled = isTranslationSettingEnabled,
+			onLatestUsernameChanged = props.onLatestUsernameChanged
 		})
 	end
 
-	return React.createElement(MessageLayoutContainer, {
-		layoutStyle = "textLine",
-		messagesSignal = t1.messagesSignal,
-		Size = UDim2.fromScale(1, 1),
-		contentPadding = {
-			top = UDim.new(0, v10.Size.Size_100),
-			bottom = UDim.new(0, v10.Size.Size_100),
-			left = UDim.new(0, v10.Size.Size_200),
-			right = UDim.new(0, 56)
-		},
-		onScroll = v12
+	return React.createElement(Foundation.Empty, {
+		icon = { name = "icons/status/oof_xlarge" },
+		text = v2("CoreScripts.TextChat.InputBar.Hint.ChatUnavailable")
 	})
 end
 
-return MessageListArea
+return React.memo(MessageListArea)

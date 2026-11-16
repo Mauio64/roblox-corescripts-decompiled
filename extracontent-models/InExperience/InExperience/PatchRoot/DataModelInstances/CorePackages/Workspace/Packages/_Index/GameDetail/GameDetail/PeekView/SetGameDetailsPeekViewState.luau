@@ -1,7 +1,5 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
-
-return require(Parent.Rodux).makeActionCreator("SetGameDetailsPeekViewState", function(p1) -- line: 5
-	return {
-		viewState = p1
-	}
+local parent = script:FindFirstAncestor("GameDetail").Parent
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator("SetGameDetailsPeekViewState", function(viewState)
+	return { viewState = viewState }
 end)

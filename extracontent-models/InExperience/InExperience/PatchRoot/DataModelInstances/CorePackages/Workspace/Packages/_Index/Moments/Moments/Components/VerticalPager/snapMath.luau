@@ -1,117 +1,121 @@
-local t1 = {
-	advanceCriticalDampedSpring = function(n1: number, n2: number, n3: number, n4: number, n5: number) -- line: 25
-		local v7 = 6.283185307179586 * n5
-		local v8 = n1 - n3
-		local v9 = v7 * n4
-		local v10 = math.exp(-v9)
-		local v11 = n2 + v7 * v8
-		local v12 = (v8 + v11 * n4) * v10
-		local v13 = (n2 - v11 * v9) * v10
+local SnapMath = {}
 
-		return n3 + v12, v13
-	end,
-	offsetForIndex = function(n6: number, n7: number) -- line: 45
-		return (n6 - 1) * n7
-	end,
-	clampIndex = function(n8: number, n9: number) -- line: 50
-		if n9 <= 0 then
-			return 1
-		end
+function SnapMath.advanceCriticalDampedSpring(p: number, p2: number, p3: number, p4: number, p5: number)
+	local v = 6.283185307179586 * p5
+	local v2 = p - p3
+	local v3 = v * p4
+	local v4 = math.exp(-v3)
+	local v5 = p2 + v * v2
 
-		return (math.clamp(n8, 1, n9))
-	end,
-	projectSnapOffset = function(n10: number, n11: number, n12: number) -- line: 62
-		return n10 - n11 * n12
-	end
-}
+	local v6 = (v2 + v5 * p4) * v4
+	local v7 = (p2 - v5 * v3) * v4
 
-function t1.resolveSnapIndex(n13: number, n14: number, n15: number, n16: number, n17: number) -- line: 77
-	-- upvalues: t1 (copy)
-	if n16 <= 0 or n15 <= 0 then
+	return p3 + v6, v7
+end
+
+function SnapMath.offsetForIndex(p: number, p2: number)
+	return (p - 1) * p2
+end
+
+function SnapMath.clampIndex(value: number, max: number)
+	if max <= 0 then
 		return 1
 	end
 
-	local v26 = n13 / n15
-	local v27 = t1.projectSnapOffset(n13, n14, n17) - n13
-	local v28 = n15 * 0.5
-	local v29 = if not (v28 < v27) then if not (v27 < -v28) then math.round(v26) + 1 else math.ceil(v26) else math.floor(v26) + 2
-
-	return t1.clampIndex(v29, n16)
+	return (math.clamp(value, 1, max))
 end
-function t1.getVisibleWindow(n18: number, n19: number, n20: number) -- line: 109
-	-- upvalues: t1 (copy)
-	if n20 <= 0 then
-		return {
-			startIndex = 1,
-			endIndex = 0
-		}
+
+function SnapMath.projectSnapOffset(p: number, p2: number, p3: number)
+	return p - p2 * p3
+end
+
+function SnapMath.resolveSnapIndex(p: number, p2: number, p3: number, p4: number, p5: number)
+	if p4 <= 0 or p3 <= 0 then
+		return 1
 	end
 
-	local v33 = t1.clampIndex(n18, n20)
+	local v = p / p3
+	local v2 = SnapMath.projectSnapOffset(p, p2, p5) - p
+	local v3 = p3 * 0.5
+	local v4
 
+	if v3 < v2 then
+		v4 = math.floor(v) + 2
+	elseif v2 < -v3 then
+		v4 = math.ceil(v)
+	else
+		v4 = math.round(v) + 1
+	end
+
+	return SnapMath.clampIndex(v4, p4)
+end
+
+function SnapMath.getVisibleWindow(p: number, p2: number, p3: number)
+	if p3 <= 0 then
+		return { startIndex = 1, endIndex = 0 }
+	end
+
+	local clampIndex = SnapMath.clampIndex(p, p3)
 	return {
-		startIndex = math.max(1, v33 - n19),
-		endIndex = math.min(n20, v33 + n19)
+		startIndex = math.max(1, clampIndex - p2),
+		endIndex = math.min(p3, clampIndex + p2)
 	}
 end
-function t1.reindexAfterRemoval(n21: number, n22: number, n23: number) -- line: 130
-	-- upvalues: t1 (copy)
-	if n23 <= 0 then
+
+function SnapMath.reindexAfterRemoval(p: number, p2: number, p3: number)
+	if p3 <= 0 then
 		return 1
 	end
 
-	if n22 < n21 then
-		return t1.clampIndex(n21 - 1, n23)
+	if p2 < p then
+		return SnapMath.clampIndex(p - 1, p3)
 	end
 
-	return t1.clampIndex(n21, n23)
+	return SnapMath.clampIndex(p, p3)
 end
-function t1.neighborForRemoval(n24: number, n25: number) -- line: 145
-	if n24 < n25 then
-		return n24 + 1
+
+function SnapMath.neighborForRemoval(p: number, p2: number)
+	if p < p2 then
+		return p + 1
 	end
 
-	return n24 - 1
+	return p - 1
 end
-function t1.nearestIndexForOffset(n26: number, n27: number, n28: number) -- line: 155
-	-- upvalues: t1 (copy)
-	if n28 <= 0 then
+
+function SnapMath.nearestIndexForOffset(p: number, p2: number, p3: number)
+	if p3 <= 0 or p2 <= 0 then
 		return 1
 	end
 
-	if n27 <= 0 then
-		return 1
-	end
-
-	return t1.clampIndex(math.round(n26 / n27) + 1, n28)
+	return SnapMath.clampIndex(math.round(p / p2) + 1, p3)
 end
-function t1.resolveSettleIndex(n29: number, n30: number, n31: number, n32: number, n33: number, n34: number?) -- line: 178
-	-- upvalues: t1 (copy)
-	if n32 <= 0 or n31 <= 0 then
-		return t1.clampIndex(n29, n32)
+
+function SnapMath.resolveSettleIndex(total: number, p: number, p2: number, p3: number, p4: number, p5: number?)
+	if p3 <= 0 or p2 <= 0 then
+		return SnapMath.clampIndex(total, p3)
 	end
 
-	local v48 = (n30 - t1.offsetForIndex(n29, n31)) / n31
+	local v = (p - SnapMath.offsetForIndex(total, p2)) / p2
 
-	if n33 < v48 then
-		local v49 = math.max(1, (math.round(v48)))
+	if p4 < v then
+		local v2 = math.max(1, (math.round(v)))
 
-		if n34 ~= nil then
-			v49 = math.min(v49, n34)
+		if p5 ~= nil then
+			v2 = math.min(v2, p5)
 		end
 
-		n29 += v49
-	elseif v48 < -n33 then
-		local v50 = math.min(-1, (math.round(v48)))
+		total += v2
+	elseif v < -p4 then
+		local v2 = math.min(-1, (math.round(v)))
 
-		if n34 ~= nil then
-			v50 = math.max(v50, -n34)
+		if p5 ~= nil then
+			v2 = math.max(v2, -p5)
 		end
 
-		n29 += v50
+		total += v2
 	end
 
-	return t1.clampIndex(n29, n32)
+	return SnapMath.clampIndex(total, p3)
 end
 
-return t1
+return SnapMath

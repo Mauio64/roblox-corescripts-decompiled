@@ -1,29 +1,33 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local _script = script
+local script = script
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Chat = game:GetService("Chat")
-local ChatService = require(_script:WaitForChild("ChatService"))
+
+local ChatService = require(script:WaitForChild("ChatService"))
+
 local ClientChatModules = Chat:WaitForChild("ClientChatModules")
 local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
-local ChatLocalization = nil
 
-pcall(function() -- line: 20
-	-- upvalues: ChatLocalization (ref), Chat (copy)
-	ChatLocalization = require(Chat.ClientChatModules.ChatLocalization)
+local v = nil
+pcall(function()
+	local ChatLocalization = require(Chat.ClientChatModules.ChatLocalization)
+	v = ChatLocalization
 end)
-ChatLocalization = ChatLocalization or {}
+v = v or {}
 
-local v10 = ChatSettings.MaxChannelNameCheckLength or 50
+local maxChannelNameCheckLength = ChatSettings.MaxChannelNameCheckLength or 50
 local MaximumMessageLength = ChatSettings.MaximumMessageLength
 
-if not ChatLocalization.FormatMessageToSend or not ChatLocalization.LocalizeFormattedMessage then
-	function ChatLocalization.FormatMessageToSend(_, _, p3) -- line: 28
-		return p3
+if not (v.FormatMessageToSend and v.LocalizeFormattedMessage) then
+	function v:FormatMessageToSend(_, p)
+		return p
 	end
 end
 
-local t1 = {}
+local ifDoesntExistsByName = {}
+
 local DefaultChatSystemChatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
 
 if not DefaultChatSystemChatEvents then
@@ -33,570 +37,433 @@ if not DefaultChatSystemChatEvents then
 	DefaultChatSystemChatEvents.Parent = ReplicatedStorage
 end
 
-local function validateMessageLength(p4) -- line: 43
-	-- upvalues: MaximumMessageLength (copy)
-	if p4:len() > MaximumMessageLength * 6 then
+local function validateMessageLength(value): boolean
+	local v2 = value:len()
+
+	if MaximumMessageLength * 6 < v2 then
 		return false
 	end
 
-	if utf8.len(p4) == nil then
-		return false
-	end
-
-	if utf8.len(utf8.nfcnormalize(p4)) > MaximumMessageLength then
-		return false
-	end
-
-	return true
+	return utf8.len(value) ~= nil and not (MaximumMessageLength < utf8.len(utf8.nfcnormalize(value)))
 end
-local function validateChannelNameLength(p5) -- line: 59
-	-- upvalues: v10 (copy)
-	if p5:len() > v10 * 6 then
+
+local function validateChannelNameLength(value): boolean
+	local v2 = value:len()
+
+	if maxChannelNameCheckLength * 6 < v2 then
 		return false
 	end
 
-	if utf8.len(p5) == nil then
-		return false
-	end
-
-	if utf8.len(utf8.nfcnormalize(p5)) > v10 then
-		return false
-	end
-
-	return true
+	return utf8.len(value) ~= nil and not (maxChannelNameCheckLength < utf8.len(utf8.nfcnormalize(value)))
 end
-local function emptyFunction() -- line: 77
-end
-local function GetObjectWithNameAndType(p6, p7, p8) -- line: 81
-	for _, child in pairs(p6:GetChildren()) do
-		if child:IsA(p8) and p7 == child.Name then
+
+local function emptyFunction() end
+
+local function GetObjectWithNameAndType(parent, name, className)
+	for _, child in pairs(parent:GetChildren()) do
+		if child:IsA(className) and child.Name == name then
 			return child
 		end
 	end
 
 	return nil
 end
-local function CreateIfDoesntExist(p9, p10, p11) -- line: 91
-	-- upvalues: GetObjectWithNameAndType (copy), t1 (copy)
-	local v60 = GetObjectWithNameAndType(p9, p10, p11)
 
-	if not v60 then
-		v60 = Instance.new(p11)
-		v60.Name = p10
-		v60.Parent = p9
+local function CreateIfDoesntExist(parent, name, className) -- 4 equivalent calls inferred from this helper
+	local ifDoesntExist = GetObjectWithNameAndType(parent, name, className)
+
+	if not ifDoesntExist then
+		ifDoesntExist = Instance.new(className)
+		ifDoesntExist.Name = name
+		ifDoesntExist.Parent = parent
 	end
 
-	t1[p10] = v60
+	ifDoesntExistsByName[name] = ifDoesntExist
 
-	return v60
+	return ifDoesntExist
 end
-local function CreateEventIfItDoesntExist(p12, p13) -- line: 104
-	-- upvalues: GetObjectWithNameAndType (copy), t1 (copy), emptyFunction (copy)
-	local v63 = GetObjectWithNameAndType(p12, p13, "RemoteEvent")
 
-	if not v63 then
-		v63 = Instance.new("RemoteEvent")
-		v63.Name = p13
-		v63.Parent = p12
+local function CreateEventIfItDoesntExist(defaultChatSystemChatEvents, name) -- 11 equivalent calls inferred from this helper
+	local eventIfItDoesntExist = CreateIfDoesntExist(defaultChatSystemChatEvents, name, "RemoteEvent") -- inferred equivalent call
+	eventIfItDoesntExist.OnServerEvent:Connect(emptyFunction)
+	return eventIfItDoesntExist
+end
+
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnNewMessage") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnMessageDoneFiltering") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnNewSystemMessage") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnChannelJoined") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnChannelLeft") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnMuted") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnUnmuted") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "OnMainChannelSet") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "ChannelNameColorUpdated") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "SayMessageRequest") -- inferred equivalent call
+CreateEventIfItDoesntExist(DefaultChatSystemChatEvents, "SetBlockedUserIdsRequest") -- inferred equivalent call
+CreateIfDoesntExist(DefaultChatSystemChatEvents, "GetInitDataRequest", "RemoteFunction") -- inferred equivalent call
+CreateIfDoesntExist(DefaultChatSystemChatEvents, "MutePlayerRequest", "RemoteFunction") -- inferred equivalent call
+CreateIfDoesntExist(DefaultChatSystemChatEvents, "UnMutePlayerRequest", "RemoteFunction") -- inferred equivalent call
+local v2 = ifDoesntExistsByName
+
+local function CreatePlayerSpeakerObject(player)
+	if ChatService:GetSpeaker(player.Name) then
+		ChatService:RemoveSpeaker(player.Name)
 	end
 
-	t1[p13] = v63
-	v63.OnServerEvent:Connect(emptyFunction)
+	local internalAddSpeakerWithPlayerObject = ChatService:InternalAddSpeakerWithPlayerObject(
+		player.Name,
+		player,
+		false
+	)
 
-	return v63
-end
-
-local v20 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnNewMessage", "RemoteEvent")
-
-if not v20 then
-	v20 = Instance.new("RemoteEvent")
-	v20.Name = "OnNewMessage"
-	v20.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnNewMessage = v20
-v20.OnServerEvent:Connect(emptyFunction)
-
-local v21 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnMessageDoneFiltering", "RemoteEvent")
-
-if not v21 then
-	v21 = Instance.new("RemoteEvent")
-	v21.Name = "OnMessageDoneFiltering"
-	v21.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnMessageDoneFiltering = v21
-v21.OnServerEvent:Connect(emptyFunction)
-
-local v22 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnNewSystemMessage", "RemoteEvent")
-
-if not v22 then
-	v22 = Instance.new("RemoteEvent")
-	v22.Name = "OnNewSystemMessage"
-	v22.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnNewSystemMessage = v22
-v22.OnServerEvent:Connect(emptyFunction)
-
-local v23 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnChannelJoined", "RemoteEvent")
-
-if not v23 then
-	v23 = Instance.new("RemoteEvent")
-	v23.Name = "OnChannelJoined"
-	v23.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnChannelJoined = v23
-v23.OnServerEvent:Connect(emptyFunction)
-
-local v24 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnChannelLeft", "RemoteEvent")
-
-if not v24 then
-	v24 = Instance.new("RemoteEvent")
-	v24.Name = "OnChannelLeft"
-	v24.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnChannelLeft = v24
-v24.OnServerEvent:Connect(emptyFunction)
-
-local v25 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnMuted", "RemoteEvent")
-
-if not v25 then
-	v25 = Instance.new("RemoteEvent")
-	v25.Name = "OnMuted"
-	v25.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnMuted = v25
-v25.OnServerEvent:Connect(emptyFunction)
-
-local v26 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnUnmuted", "RemoteEvent")
-
-if not v26 then
-	v26 = Instance.new("RemoteEvent")
-	v26.Name = "OnUnmuted"
-	v26.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnUnmuted = v26
-v26.OnServerEvent:Connect(emptyFunction)
-
-local v27 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "OnMainChannelSet", "RemoteEvent")
-
-if not v27 then
-	v27 = Instance.new("RemoteEvent")
-	v27.Name = "OnMainChannelSet"
-	v27.Parent = DefaultChatSystemChatEvents
-end
-
-t1.OnMainChannelSet = v27
-v27.OnServerEvent:Connect(emptyFunction)
-
-local v28 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "ChannelNameColorUpdated", "RemoteEvent")
-
-if not v28 then
-	v28 = Instance.new("RemoteEvent")
-	v28.Name = "ChannelNameColorUpdated"
-	v28.Parent = DefaultChatSystemChatEvents
-end
-
-t1.ChannelNameColorUpdated = v28
-v28.OnServerEvent:Connect(emptyFunction)
-
-local v29 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "SayMessageRequest", "RemoteEvent")
-
-if not v29 then
-	v29 = Instance.new("RemoteEvent")
-	v29.Name = "SayMessageRequest"
-	v29.Parent = DefaultChatSystemChatEvents
-end
-
-t1.SayMessageRequest = v29
-v29.OnServerEvent:Connect(emptyFunction)
-
-local v30 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "SetBlockedUserIdsRequest", "RemoteEvent")
-
-if not v30 then
-	v30 = Instance.new("RemoteEvent")
-	v30.Name = "SetBlockedUserIdsRequest"
-	v30.Parent = DefaultChatSystemChatEvents
-end
-
-t1.SetBlockedUserIdsRequest = v30
-v30.OnServerEvent:Connect(emptyFunction)
-
-local v31 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "GetInitDataRequest", "RemoteFunction")
-
-if not v31 then
-	v31 = Instance.new("RemoteFunction")
-	v31.Name = "GetInitDataRequest"
-	v31.Parent = DefaultChatSystemChatEvents
-end
-
-t1.GetInitDataRequest = v31
-
-local v32 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "MutePlayerRequest", "RemoteFunction")
-
-if not v32 then
-	v32 = Instance.new("RemoteFunction")
-	v32.Name = "MutePlayerRequest"
-	v32.Parent = DefaultChatSystemChatEvents
-end
-
-t1.MutePlayerRequest = v32
-
-local v33 = GetObjectWithNameAndType(DefaultChatSystemChatEvents, "UnMutePlayerRequest", "RemoteFunction")
-
-if not v33 then
-	v33 = Instance.new("RemoteFunction")
-	v33.Name = "UnMutePlayerRequest"
-	v33.Parent = DefaultChatSystemChatEvents
-end
-
-t1.UnMutePlayerRequest = v33
-
-local u34 = t1
-
-local function CreatePlayerSpeakerObject(p14) -- line: 128
-	-- upvalues: ChatService (copy), u34 (ref)
-	if ChatService:GetSpeaker(p14.Name) then
-		ChatService:RemoveSpeaker(p14.Name)
+	for _, v3 in pairs(ChatService:GetAutoJoinChannelList()) do
+		internalAddSpeakerWithPlayerObject:JoinChannel(v3.Name)
 	end
 
-	local u65 = ChatService:InternalAddSpeakerWithPlayerObject(p14.Name, p14, false)
+	internalAddSpeakerWithPlayerObject:InternalAssignEventFolder(v2)
 
-	for _, v in pairs(ChatService:GetAutoJoinChannelList()) do
-		u65:JoinChannel(v.Name)
-	end
+	internalAddSpeakerWithPlayerObject.ChannelJoined:connect(function(p, p2)
+		local channel = ChatService:GetChannel(p)
+		local historyLogForSpeaker, channelNameColor
 
-	u65:InternalAssignEventFolder(u34)
-	u65.ChannelJoined:connect(function(p15, p16) -- line: 145
-		-- upvalues: ChatService (copy), u65 (ref), u34 (ref), p14 (copy)
-		local HistoryLogForSpeaker = nil
-		local ChannelNameColor = nil
-		local Channel = ChatService:GetChannel(p15)
-
-		if Channel then
-			HistoryLogForSpeaker = Channel:GetHistoryLogForSpeaker(u65)
-			ChannelNameColor = Channel.ChannelNameColor
+		if channel then
+			historyLogForSpeaker = channel:GetHistoryLogForSpeaker(internalAddSpeakerWithPlayerObject)
+			channelNameColor = channel.ChannelNameColor
 		end
 
-		u34.OnChannelJoined:FireClient(p14, p15, p16, HistoryLogForSpeaker, ChannelNameColor)
+		v2.OnChannelJoined:FireClient(player, p, p2, historyLogForSpeaker, channelNameColor)
 	end)
-	u65.Muted:connect(function(p17, p18, p19) -- line: 157
-		-- upvalues: u34 (ref), p14 (copy)
-		u34.OnMuted:FireClient(p14, p17, p18, p19)
+
+	internalAddSpeakerWithPlayerObject.Muted:connect(function(p, p2, p3)
+		v2.OnMuted:FireClient(player, p, p2, p3)
 	end)
-	u65.Unmuted:connect(function(p20) -- line: 161
-		-- upvalues: u34 (ref), p14 (copy)
-		u34.OnUnmuted:FireClient(p14, p20)
+
+	internalAddSpeakerWithPlayerObject.Unmuted:connect(function(p)
+		v2.OnUnmuted:FireClient(player, p)
 	end)
-	ChatService:InternalFireSpeakerAdded(u65.Name)
+
+	ChatService:InternalFireSpeakerAdded(internalAddSpeakerWithPlayerObject.Name)
 end
 
-u34.SayMessageRequest.OnServerEvent:connect(function(p21, p22, p23) -- line: 168
-	-- upvalues: validateMessageLength (copy), validateChannelNameLength (copy), ChatService (copy)
-	if type(p22) ~= "string" then
+v2.SayMessageRequest.OnServerEvent:connect(function(p, value, value2)
+	if not (type(value) == "string" and validateMessageLength(value) and type(value2) == "string") then
 		return
 	end
 
-	if not validateMessageLength(p22) then
+	if not validateChannelNameLength(value2) then
 		return
 	end
 
-	if type(p23) ~= "string" then
-		return
-	end
+	local speaker = ChatService:GetSpeaker(p.Name)
 
-	if not validateChannelNameLength(p23) then
-		return
-	end
-
-	local Speaker = ChatService:GetSpeaker(p21.Name)
-
-	if Speaker then
-		return Speaker:SayMessage(p22, p23)
+	if speaker then
+		return speaker:SayMessage(value, value2)
 	end
 
 	return nil
 end)
 
-function u34.MutePlayerRequest.OnServerInvoke(player, p24) -- line: 189
-	-- upvalues: ChatService (copy)
-	if type(p24) ~= "string" then
+v2.MutePlayerRequest.OnServerInvoke = function(p, value)
+	if type(value) ~= "string" then
 		return
 	end
 
-	local Speaker = ChatService:GetSpeaker(player.Name)
+	local speaker = ChatService:GetSpeaker(p.Name)
 
-	if Speaker then
-		local Speaker2 = ChatService:GetSpeaker(p24)
+	local speaker2 = speaker and ChatService:GetSpeaker(value)
 
-		if Speaker2 then
-			Speaker:AddMutedSpeaker(Speaker2.Name)
-
-			return true
-		end
+	if not speaker2 then
+		return false
 	end
 
-	return false
+	speaker:AddMutedSpeaker(speaker2.Name)
+	return true
 end
-function u34.UnMutePlayerRequest.OnServerInvoke(player, p25) -- line: 205
-	-- upvalues: ChatService (copy)
-	if type(p25) ~= "string" then
+
+v2.UnMutePlayerRequest.OnServerInvoke = function(p, value)
+	if type(value) ~= "string" then
 		return
 	end
 
-	local Speaker = ChatService:GetSpeaker(player.Name)
+	local speaker = ChatService:GetSpeaker(p.Name)
 
-	if Speaker then
-		local Speaker3 = ChatService:GetSpeaker(p25)
+	local speaker2 = speaker and ChatService:GetSpeaker(value)
 
-		if Speaker3 then
-			Speaker:RemoveMutedSpeaker(Speaker3.Name)
-
-			return true
-		end
+	if not speaker2 then
+		return false
 	end
 
-	return false
+	speaker:RemoveMutedSpeaker(speaker2.Name)
+	return true
 end
 
-local t2 = {}
+local v3 = {}
 
-Players.PlayerAdded:connect(function(p26) -- line: 224
-	-- upvalues: t2 (copy), ChatService (copy)
-	for k, v in pairs(t2) do
-		local Speaker = ChatService:GetSpeaker(k.Name)
+Players.PlayerAdded:connect(function(p)
+	for k, v4 in pairs(v3) do
+		local speaker = ChatService:GetSpeaker(k.Name)
 
-		if Speaker then
-			for i = 1, #v do
-				if v[i] == p26.UserId then
-					Speaker:AddMutedSpeaker(p26.Name)
-				end
+		if not speaker then
+			continue
+		end
+
+		for i = 1, #v4 do
+			if v4[i] == p.UserId then
+				speaker:AddMutedSpeaker(p.Name)
 			end
 		end
 	end
 end)
-Players.PlayerRemoving:connect(function(p27) -- line: 238
-	-- upvalues: t2 (copy)
-	t2[p27] = nil
+
+Players.PlayerRemoving:connect(function(p)
+	v3[p] = nil
 end)
-u34.SetBlockedUserIdsRequest.OnServerEvent:Connect(function(player, p28) -- line: 242
-	-- upvalues: ChatService (copy), Players (copy), t2 (copy)
-	if type(p28) ~= "table" then
+
+v2.SetBlockedUserIdsRequest.OnServerEvent:Connect(function(p, list)
+	if type(list) ~= "table" then
 		return
 	end
 
-	local t3 = {}
-	local Speaker = ChatService:GetSpeaker(player.Name)
+	local v4 = {}
+	local speaker = ChatService:GetSpeaker(p.Name)
 
-	if Speaker then
-		for i = 1, math.min(#p28, 50) do
-			if type(p28[i]) == "number" then
-				table.insert(t3, p28[i])
+	if speaker then
+		for i = 1, math.min(#list, 50) do
+			if type(list[i]) ~= "number" then
+				continue
+			end
 
-				local PlayerByUserId = Players:GetPlayerByUserId(p28[i])
+			table.insert(v4, list[i])
 
-				if PlayerByUserId then
-					Speaker:AddMutedSpeaker(PlayerByUserId.Name)
-				end
+			local playerByUserId = Players:GetPlayerByUserId(list[i])
+
+			if playerByUserId then
+				speaker:AddMutedSpeaker(playerByUserId.Name)
 			end
 		end
 
-		t2[player] = t3
+		v3[p] = v4
 	end
 end)
 
-function u34.GetInitDataRequest.OnServerInvoke(player) -- line: 268
-	-- upvalues: ChatService (copy), CreatePlayerSpeakerObject (copy)
-	local Speaker = ChatService:GetSpeaker(player.Name)
+v2.GetInitDataRequest.OnServerInvoke = function(p)
+	local speaker = ChatService:GetSpeaker(p.Name)
 
-	if not Speaker or not Speaker:GetPlayer() then
-		CreatePlayerSpeakerObject(player)
-		Speaker = ChatService:GetSpeaker(player.Name)
+	if not (speaker and speaker:GetPlayer()) then
+		CreatePlayerSpeakerObject(p)
+		speaker = ChatService:GetSpeaker(p.Name)
 	end
 
-	local t4 = {
-		Channels = {},
-		SpeakerExtraData = {}
-	}
+	local v4 = { Channels = {}, SpeakerExtraData = {} }
 
-	for _, v in pairs(Speaker:GetChannelList()) do
-		local Channel = ChatService:GetChannel(v)
+	for _, v5 in pairs(speaker:GetChannelList()) do
+		local channel = ChatService:GetChannel(v5)
 
-		if Channel then
-			local t5 = {
-				v,
-				Channel:GetWelcomeMessageForSpeaker(Speaker),
-				Channel:GetHistoryLogForSpeaker(Speaker),
-				Channel.ChannelNameColor
-			}
-
-			table.insert(t4.Channels, t5)
+		if not channel then
+			continue
 		end
+
+		local v6 = {
+			v5,
+			channel:GetWelcomeMessageForSpeaker(speaker),
+			channel:GetHistoryLogForSpeaker(speaker),
+			channel.ChannelNameColor
+		}
+
+		table.insert(v4.Channels, v6)
 	end
 
-	for _, v in pairs(ChatService:GetSpeakerList()) do
-		local Speaker4 = ChatService:GetSpeaker(v)
-
-		t4.SpeakerExtraData[v] = Speaker4.ExtraData
+	for _, v5 in pairs(ChatService:GetSpeakerList()) do
+		local speaker2 = ChatService:GetSpeaker(v5)
+		v4.SpeakerExtraData[v5] = speaker2.ExtraData
 	end
 
-	return t4
+	return v4
 end
 
-local function DoJoinCommand(p29, p30, p31) -- line: 302
-	-- upvalues: ChatService (copy), ChatLocalization (ref)
-	local Speaker = ChatService:GetSpeaker(p29)
-	local Channel = ChatService:GetChannel(p30)
+local function DoJoinCommand(p, p2, p3)
+	local speaker = ChatService:GetSpeaker(p)
+	local channel = ChatService:GetChannel(p2)
 
-	if Speaker then
-		if Channel then
-			if Channel.Joinable then
-				if not Speaker:IsInChannel(Channel.Name) then
-					Speaker:JoinChannel(Channel.Name)
-
-					return
-				end
-
-				Speaker:SetMainChannel(Channel.Name)
-				Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_SwitchChannel_NowInChannel", string.format("You are now chatting in channel: '%s'", Channel.Name), "RBX_NAME", Channel.Name), Channel.Name)
-
+	if speaker then
+		if channel then
+			if not channel.Joinable then
+				speaker:SendSystemMessage(
+					v:FormatMessageToSend(
+						"GameChat_ChatServiceRunner_YouCannotJoinChannel",
+						"You cannot join channel '" .. p2 .. "'.",
+						"RBX_NAME",
+						p2
+					),
+					p3
+				)
 				return
 			end
 
-			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatServiceRunner_YouCannotJoinChannel", "You cannot join channel '" .. p30 .. "'.", "RBX_NAME", p30), p31)
-
-			return
-		end
-
-		Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatServiceRunner_ChannelDoesNotExist", "Channel '" .. p30 .. "' does not exist.", "RBX_NAME", p30), p31)
-	end
-end
-local function DoLeaveCommand(p32, p33, p34) -- line: 339
-	-- upvalues: ChatService (copy), ChatLocalization (ref)
-	local Speaker = ChatService:GetSpeaker(p32)
-	local Channel = ChatService:GetChannel(p33)
-
-	if Speaker then
-		if Speaker:IsInChannel(p33) then
-			if Channel.Leavable then
-				Speaker:LeaveChannel(Channel.Name)
-				Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatService_YouHaveLeftChannel", string.format("You have left channel '%s'", p33), "RBX_NAME", Channel.Name), "System")
-
+			if not speaker:IsInChannel(channel.Name) then
+				speaker:JoinChannel(channel.Name)
 				return
 			end
 
-			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatServiceRunner_YouCannotLeaveChannel", "You cannot leave channel '" .. p33 .. "'.", "RBX_NAME", p33), p34)
-
-			return
+			speaker:SetMainChannel(channel.Name)
+			speaker:SendSystemMessage(
+				v:FormatMessageToSend(
+					"GameChat_SwitchChannel_NowInChannel",
+					string.format("You are now chatting in channel: '%s'", channel.Name),
+					"RBX_NAME",
+					channel.Name
+				),
+				channel.Name
+			)
+		else
+			speaker:SendSystemMessage(
+				v:FormatMessageToSend(
+					"GameChat_ChatServiceRunner_ChannelDoesNotExist",
+					"Channel '" .. p2 .. "' does not exist.",
+					"RBX_NAME",
+					p2
+				),
+				p3
+			)
 		end
-
-		Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatServiceRunner_YouAreNotInChannel", "You are not in channel '" .. p33 .. "'.", "RBX_NAME", p33), p34)
 	end
 end
 
-ChatService:RegisterProcessCommandsFunction("default_commands", function(p35, p36, p37) -- line: 372
-	-- upvalues: DoJoinCommand (copy), DoLeaveCommand (copy)
-	if string.sub(p36, 1, 6):lower() == "/join " then
-		DoJoinCommand(p35, string.sub(p36, 7), p37)
+local function DoLeaveCommand(p, p2, p3)
+	local speaker = ChatService:GetSpeaker(p)
+	local channel = ChatService:GetChannel(p2)
 
+	if speaker then
+		if speaker:IsInChannel(p2) then
+			if not channel.Leavable then
+				speaker:SendSystemMessage(
+					v:FormatMessageToSend(
+						"GameChat_ChatServiceRunner_YouCannotLeaveChannel",
+						"You cannot leave channel '" .. p2 .. "'.",
+						"RBX_NAME",
+						p2
+					),
+					p3
+				)
+				return
+			end
+
+			speaker:LeaveChannel(channel.Name)
+			speaker:SendSystemMessage(
+				v:FormatMessageToSend(
+					"GameChat_ChatService_YouHaveLeftChannel",
+					string.format("You have left channel '%s'", p2),
+					"RBX_NAME",
+					channel.Name
+				),
+				"System"
+			)
+		else
+			speaker:SendSystemMessage(
+				v:FormatMessageToSend(
+					"GameChat_ChatServiceRunner_YouAreNotInChannel",
+					"You are not in channel '" .. p2 .. "'.",
+					"RBX_NAME",
+					p2
+				),
+				p3
+			)
+		end
+	end
+end
+
+ChatService:RegisterProcessCommandsFunction("default_commands", function(p, value, p2): boolean
+	if string.sub(value, 1, 6):lower() == "/join " then
+		DoJoinCommand(p, string.sub(value, 7), p2)
 		return true
 	end
 
-	if string.sub(p36, 1, 3):lower() == "/j " then
-		DoJoinCommand(p35, string.sub(p36, 4), p37)
-
+	if string.sub(value, 1, 3):lower() == "/j " then
+		DoJoinCommand(p, string.sub(value, 4), p2)
 		return true
 	end
 
-	if string.sub(p36, 1, 7):lower() == "/leave " then
-		DoLeaveCommand(p35, string.sub(p36, 8), p37)
-
+	if string.sub(value, 1, 7):lower() == "/leave " then
+		DoLeaveCommand(p, string.sub(value, 8), p2)
 		return true
 	end
 
-	if string.sub(p36, 1, 3):lower() == "/l " then
-		DoLeaveCommand(p35, string.sub(p36, 4), p37)
-
-		return true
+	if string.sub(value, 1, 3):lower() ~= "/l " then
+		return false
 	end
 
-	return false
+	DoLeaveCommand(p, string.sub(value, 4), p2)
+	return true
 end)
 
 if ChatSettings.GeneralChannelName and ChatSettings.GeneralChannelName ~= "" then
-	local v39 = ChatService:AddChannel(ChatSettings.GeneralChannelName)
+	local v4 = ChatService:AddChannel(ChatSettings.GeneralChannelName)
 
-	v39.Leavable = false
-	v39.AutoJoin = true
-	v39:RegisterGetWelcomeMessageFunction(function(p38) -- line: 396
-		-- upvalues: RunService (copy), Chat (copy)
+	v4.Leavable = false
+	v4.AutoJoin = true
+
+	v4:RegisterGetWelcomeMessageFunction(function(object)
 		if RunService:IsStudio() then
 			return nil
 		end
 
-		local Player = p38:GetPlayer()
+		local player = object:GetPlayer()
 
-		if Player then
-			local ok, result = pcall(function() -- line: 402
-				-- upvalues: Chat (copy), Player (copy)
-				return Chat:CanUserChatAsync(Player.UserId)
+		if player then
+			local success, result = pcall(function()
+				return Chat:CanUserChatAsync(player.UserId)
 			end)
 
-			if ok and not result then
+			if success and not result then
 				return ""
 			end
 		end
 	end)
 end
 
-local v40 = ChatService:AddChannel("System")
+local v4 = ChatService:AddChannel("System")
+v4.Leavable = false
+v4.AutoJoin = true
+v4.WelcomeMessage = v:FormatMessageToSend(
+	"GameChat_ChatServiceRunner_SystemChannelWelcomeMessage",
+	"This channel is for system and game notifications."
+)
 
-v40.Leavable = false
-v40.AutoJoin = true
-v40.WelcomeMessage = ChatLocalization:FormatMessageToSend("GameChat_ChatServiceRunner_SystemChannelWelcomeMessage", "This channel is for system and game notifications.")
-v40.SpeakerJoined:connect(function(p39) -- line: 419
-	-- upvalues: v40 (copy)
-	v40:MuteSpeaker(p39)
+v4.SpeakerJoined:connect(function(p)
+	v4:MuteSpeaker(p)
 end)
 
-local function TryRunModule(p40) -- line: 424
-	-- upvalues: ChatService (copy)
-	if p40:IsA("ModuleScript") then
-		local lib = require(p40)
+local function TryRunModule(moduleScript)
+	if moduleScript:IsA("ModuleScript") then
+		local module = require(moduleScript)
 
-		if type(lib) == "function" then
-			lib(ChatService)
+		if type(module) == "function" then
+			module(ChatService)
 		end
 	end
 end
 
 local ChatModules = Chat:WaitForChild("ChatModules")
+ChatModules.ChildAdded:connect(function(p)
+	local success, result = pcall(TryRunModule, p)
 
-ChatModules.ChildAdded:connect(function(p41) -- line: 434
-	-- upvalues: TryRunModule (copy)
-	local ok, result = pcall(TryRunModule, p41)
-
-	if not ok and result then
-		print("Error running module " .. p41.Name .. ": " .. result)
+	if not success and result then
+		print("Error running module " .. p.Name .. ": " .. result)
 	end
 end)
 
 for _, child in pairs(ChatModules:GetChildren()) do
-	local ok, result = pcall(TryRunModule, child)
+	local success, result = pcall(TryRunModule, child)
 
-	if not ok and result then
-		print("Error running module " .. child.Name .. ": " .. result)
+	if success or not result then
+		continue
 	end
+
+	print("Error running module " .. child.Name .. ": " .. result)
 end
 
-Players.PlayerRemoving:connect(function(p42) -- line: 448
-	-- upvalues: ChatService (copy)
-	if ChatService:GetSpeaker(p42.Name) then
-		ChatService:RemoveSpeaker(p42.Name)
+Players.PlayerRemoving:connect(function(p)
+	if ChatService:GetSpeaker(p.Name) then
+		ChatService:RemoveSpeaker(p.Name)
 	end
 end)

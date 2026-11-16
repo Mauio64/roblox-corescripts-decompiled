@@ -1,17 +1,17 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local getFFlagUGCValidateEyebrowEyelashThumbnailSchema = require(ParentParent.flags.getFFlagUGCValidateEyebrowEyelashThumbnailSchema)
-local v7 = game:DefineFastFlag("UGCValidationAddThumbnailFrustumCheckingv2", false)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+
+local defineFastFlag = game:DefineFastFlag("UGCValidationAddThumbnailFrustumCheckingv2", false)
 
 return {
 	categories = {
 		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH,
 		ValidationEnums.UploadCategory.RIGID_ACCESSORY
 	},
 	requiredData = {
@@ -19,72 +19,64 @@ return {
 		ValidationEnums.SharedDataMember.renderMeshesData,
 		ValidationEnums.SharedDataMember.uploadEnum
 	},
-	fflag = getFFlagUGCValidateMigrateSchemaProperties,
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 30
-		-- upvalues: getFFlagUGCValidateEyebrowEyelashThumbnailSchema (copy), ErrorSourceStrings (copy), v7 (copy), UGCValidationService (copy)
-		local rootInstance = p2.rootInstance
+	run = function(object, data)
+		local rootInstance = data.rootInstance
 
-		if getFFlagUGCValidateEyebrowEyelashThumbnailSchema() then
-			local v11 = p2.uploadEnum and p2.uploadEnum.assetType
+		local assetType = data.uploadEnum and data.uploadEnum.assetType
 
-			if v11 == Enum.AssetType.EyebrowAccessory or v11 == Enum.AssetType.EyelashAccessory then
-				return
-			end
-		end
-
-		local ThumbnailConfiguration = rootInstance:FindFirstChild("ThumbnailConfiguration")
-
-		if not ThumbnailConfiguration then
+		if assetType == Enum.AssetType.EyebrowAccessory or assetType == Enum.AssetType.EyelashAccessory then
 			return
 		end
 
-		local Handle = rootInstance:FindFirstChild("Handle")
+		local thumbnailConfiguration = rootInstance:FindFirstChild("ThumbnailConfiguration")
 
-		if not Handle or not Handle:IsA("BasePart") then
+		if not thumbnailConfiguration then
 			return
 		end
 
-		local ThumbnailCameraTarget = ThumbnailConfiguration:FindFirstChild("ThumbnailCameraTarget")
+		local handle = rootInstance:FindFirstChild("Handle")
 
-		if not ThumbnailCameraTarget then
+		if not (handle and handle:IsA("BasePart")) then
 			return
 		end
 
-		if Handle ~= ThumbnailCameraTarget.Value then
-			p1:fail(ErrorSourceStrings.Keys.ThumbnailInvalidTarget, {
-				ExpectedTarget = Handle:GetFullName()
+		local thumbnailCameraTarget = thumbnailConfiguration:FindFirstChild("ThumbnailCameraTarget")
+
+		if not thumbnailCameraTarget then
+			return
+		end
+
+		if thumbnailCameraTarget.Value ~= handle then
+			object:fail(ErrorSourceStrings.Keys.ThumbnailInvalidTarget, {
+				ExpectedTarget = handle:GetFullName()
 			})
-
-			return
-		end
-
-		if game:GetEngineFeature("EngineUGCValidateThumbnailerMeshInFrustum") and v7 then
-			local renderMeshesData = p2.renderMeshesData
+		elseif game:GetEngineFeature("EngineUGCValidateThumbnailerMeshInFrustum") and defineFastFlag then
+			local renderMeshesData = data.renderMeshesData
 
 			if not renderMeshesData then
 				return
 			end
 
-			local v16 = renderMeshesData[Handle.Name]
+			local v = renderMeshesData[handle.Name]
 
-			if not v16 then
+			if not v then
 				return
 			end
 
-			local ValueCFrame = ThumbnailCameraTarget.Value.CFrame
-			local ThumbnailCameraValue = ThumbnailConfiguration:FindFirstChild("ThumbnailCameraValue")
+			local cframe = thumbnailCameraTarget.Value.CFrame
+			local thumbnailCameraValue = thumbnailConfiguration:FindFirstChild("ThumbnailCameraValue")
 
-			if not ThumbnailCameraValue then
+			if not thumbnailCameraValue then
 				return
 			end
 
-			local v19 = ValueCFrame * ThumbnailCameraValue.Value
-			local scale = v16.scale
+			local v2 = cframe * thumbnailCameraValue.Value
+			local scale = v.scale
 
-			if UGCValidationService:CheckEditableMeshInCameraFrustum(v16.editable, scale, ValueCFrame, v19) == false then
-				p1:fail(ErrorSourceStrings.Keys.ThumbnailOutsideView, {
-					InstancePath = Handle:GetFullName()
+			if UGCValidationService:CheckEditableMeshInCameraFrustum(v.editable, scale, cframe, v2) == false then
+				object:fail(ErrorSourceStrings.Keys.ThumbnailOutsideView, {
+					InstancePath = handle:GetFullName()
 				})
 			end
 		end

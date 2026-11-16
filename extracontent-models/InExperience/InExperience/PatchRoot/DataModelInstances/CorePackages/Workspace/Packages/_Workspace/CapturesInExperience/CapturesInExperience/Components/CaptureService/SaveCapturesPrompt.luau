@@ -1,63 +1,63 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Foundation = require(ParentParentParent.Foundation)
-local Localization = require(ParentParentParent.Localization)
-local React = require(ParentParentParent.React)
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
-local UIBlox = require(ParentParentParent.UIBlox)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Foundation = require(parent2.Foundation)
+local Localization = require(parent2.Localization)
+local React = require(parent2.React)
+local RoactUtils = require(parent2.RoactUtils)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local UIBlox = require(parent2.UIBlox)
+
 local Icon = Foundation.Icon
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
-local CapturePromptItem = require(ParentParent.Components.CaptureService.CapturePromptItem)
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+
+local CapturePromptItem = require(parent.Components.CaptureService.CapturePromptItem)
+
+local useAnalytics = require(parent.Analytics.useAnalytics)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffectOnce = RoactUtils.Hooks.useEffectOnce
 local useLocalization = Localization.Hooks.useLocalization
-local usePinInputStateWhileOpen = require(ParentParent.Hooks.usePinInputStateWhileOpen)
+local usePinInputStateWhileOpen = require(parent.Hooks.usePinInputStateWhileOpen)
 local useScreenSize = RobloxAppHooks.useScreenSize
-local EventNames = require(ParentParent.Analytics.EventNames)
-local SaveCapturesPromptFinished = require(ParentParent.Thunks.SaveCapturesPromptFinished)
 
-require(ParentParent.Types)
+local EventNames = require(parent.Analytics.EventNames)
+local SaveCapturesPromptFinished = require(parent.Thunks.SaveCapturesPromptFinished)
+require(parent.Types)
 
-local FFlagCapturePermissionsPromptFreeMouse = require(ParentParent.Flags.FFlagCapturePermissionsPromptFreeMouse)
+local FFlagCapturePermissionsPromptFreeMouse = require(parent.Flags.FFlagCapturePermissionsPromptFreeMouse)
 
-return function(t1: {[any]: any}) -- line: 69
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useScreenSize (copy), React (copy), useLocalization (copy), usePinInputStateWhileOpen (copy), FFlagCapturePermissionsPromptFreeMouse (copy), EventNames (copy), useEffectOnce (copy), SaveCapturesPromptFinished (copy), ButtonType (copy), View (copy), CapturePromptItem (copy), FoundationText (copy), Icon (copy), InteractiveAlert (copy)
-	local v29 = useAnalytics()
-	local v30 = useDispatch()
-	local v31 = useScreenSize()
-	local v32, v33 = React.useState(Vector2.new(0, 0))
-	local v34, v35 = React.useState(Vector2.new(0, 0))
-	local v36, v37 = React.useState(1)
-	local v38, v39 = React.useState({})
-	local contents = t1.promptData.contents
-	local v41 = t1.enableInputDelayed == nil or t1.enableInputDelayed
-	local g45 = nil
-	local v44 = nil
+local function fn(p) -- 3 equivalent calls inferred from this helper
+	return typeof(p) == "Content" and p.Object ~= nil and p.Object:IsA("VideoCapture")
+end
 
-	for _, v43 in contents do
-		if typeof(v43) == "Content" and (v43.Object ~= nil and v43.Object:IsA("VideoCapture")) then
-			v44 = true
-			g45 = true
-		end
-
-		if g45 then
-			break
+local function fn2(contents): boolean -- 1 equivalent call inferred from this helper
+	for _, item in contents do
+		if fn(item) then -- inferred equivalent call
+			return true
 		end
 	end
 
-	if not g45 then
-		v44 = false
-	end
+	return false
+end
 
-	g45 = false
+return function(props)
+	local v = useAnalytics()
+	local v2 = useDispatch()
+	local screenSize = useScreenSize()
 
-	local v46 = v44
-	local v47 = useLocalization({
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(Vector2.new(0, 0))
+	local state3, setState3 = React.useState(1)
+	local state4, setState4 = React.useState({})
+
+	local contents = props.promptData.contents
+	local v3 = props.enableInputDelayed == nil or props.enableInputDelayed
+	local v4 = fn2(contents) -- inferred equivalent call
+	local v5 = useLocalization({
 		bodyText = "Feature.Captures.Body.SaveCapturesPrompt",
 		no = "Feature.Captures.Action.NoThanks",
 		title = "Feature.Captures.Title.SaveCapturesPrompt",
@@ -65,233 +65,231 @@ return function(t1: {[any]: any}) -- line: 69
 	})
 
 	usePinInputStateWhileOpen(FFlagCapturePermissionsPromptFreeMouse)
-	React.useEffect(function() -- line: 93
-		-- upvalues: v29 (copy), EventNames (copy)
-		v29.fireEvent(EventNames.SaveCapturesPromptViewed)
+
+	React.useEffect(function()
+		v.fireEvent(EventNames.SaveCapturesPromptViewed)
 	end, {})
-	React.useEffect(function() -- line: 97
-		-- upvalues: v46 (copy), v29 (copy), EventNames (copy)
-		if v46 then
-			v29.fireEvent(EventNames.SaveCapturesPromptVideoPrompted)
-		end
-	end, { v46 })
-	useEffectOnce(function() -- line: 103
-		-- upvalues: contents (copy), v39 (copy)
-		local t2 = {}
 
-		for v58, _ in contents do
-			t2[v58] = true
+	React.useEffect(function()
+		if v4 then
+			v.fireEvent(EventNames.SaveCapturesPromptVideoPrompted)
+		end
+	end, { v4 })
+
+	useEffectOnce(function()
+		local set = {}
+
+		for k, _ in contents do
+			set[k] = true
 		end
 
-		v39(t2)
+		setState4(set)
 	end, { contents })
 
-	local v48 = React.useCallback(function(b1: boolean) -- line: 111
-		-- upvalues: v39 (copy), v36 (copy)
-		v39(function(p1) -- line: 112
-			-- upvalues: v36 (copy), b1 (copy)
-			local v80 = table.clone(p1)
-
-			v80[v36] = b1
-
-			return v80
+	local updateSelected = React.useCallback(function(flag: boolean)
+		setState4(function(p)
+			local clone = table.clone(p)
+			clone[state3] = flag
+			return clone
 		end)
-	end, { v36 })
-	local v49 = React.useCallback(function(p2) -- line: 119
-		-- upvalues: v33 (copy)
-		v33(p2.AbsoluteSize)
-	end, { v33 })
-	local v50 = React.useCallback(function(p3) -- line: 123
-		-- upvalues: v35 (copy)
-		v35(p3.AbsoluteSize)
-	end, { v35 })
-	local v51 = React.useCallback(function() -- line: 127
-		-- upvalues: v38 (copy), contents (copy), v29 (copy), EventNames (copy), v30 (copy), SaveCapturesPromptFinished (copy), t1 (copy)
-		local n1 = 0
-		local n2 = 0
-		local v65 = false
-		local t3 = {}
+	end, { state3 })
 
-		for v67, v68 in v38 do
-			t3[contents[v67]] = v68
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize)
+	end, { setState })
 
-			if v68 then
-				n1 += 1
+	local onAbsoluteSizeChanged2 = React.useCallback(function(p)
+		setState2(p.AbsoluteSize)
+	end, { setState2 })
 
-				local v69 = contents[v67]
+	local onActivated = React.useCallback(function()
+		local v6 = {}
+		local count = 0
+		local count2 = 0
+		local flag = false
 
-				if typeof(v69) == "Content" and (v69.Object ~= nil and v69.Object:IsA("VideoCapture")) then
-					v65 = true
+		for k, v7 in state4 do
+			v6[contents[k]] = v7
+
+			if v7 then
+				count += 1
+
+				if fn(contents[k]) then -- inferred equivalent call
+					flag = true
 				end
 			end
 
-			n2 += 1
+			count2 += 1
 		end
 
-		if v65 then
-			v29.fireEvent(EventNames.SaveCapturesPromptVideoAccepted)
+		if flag then
+			v.fireEvent(EventNames.SaveCapturesPromptVideoAccepted)
 		end
 
-		v29.fireEvent(EventNames.SaveCapturesPromptAccepted, {
-			savedCaptures = n1,
-			totalCaptures = n2
+		v.fireEvent(EventNames.SaveCapturesPromptAccepted, {
+			savedCaptures = count,
+			totalCaptures = count2
 		})
-		v30(SaveCapturesPromptFinished(t1.promptId, t3))
-	end, {
-		t1.promptData,
-		t1.promptId,
-		v38
-	})
-	local v52 = React.useCallback(function() -- line: 156
-		-- upvalues: t1 (copy), v29 (copy), EventNames (copy), v30 (copy), SaveCapturesPromptFinished (copy)
-		local g73 = nil
-		local v72 = nil
 
-		for _, v71 in t1.promptData.contents do
-			if typeof(v71) == "Content" and (v71.Object ~= nil and v71.Object:IsA("VideoCapture")) then
-				v72 = true
-				g73 = true
-			end
+		v2(SaveCapturesPromptFinished(props.promptId, v6))
+	end, { props.promptData, props.promptId, state4 })
 
-			if g73 then
+	local onActivated2 = React.useCallback(function()
+		local flag = true
+		local flag2
+
+		for _, content in props.promptData.contents do
+			if fn(content) then -- inferred equivalent call
+				flag2 = true
+				flag = false
 				break
 			end
 		end
 
-		if not g73 then
-			v72 = false
+		if flag then
+			flag2 = false
 		end
 
-		g73 = false
-
-		if v72 then
-			v29.fireEvent(EventNames.SaveCapturesPromptVideoRejected)
+		if flag2 then
+			v.fireEvent(EventNames.SaveCapturesPromptVideoRejected)
 		end
 
-		v29.fireEvent(EventNames.SaveCapturesPromptRejected)
+		v.fireEvent(EventNames.SaveCapturesPromptRejected)
+		local v6 = {}
 
-		local t4 = {}
-
-		for _, v76 in t1.promptData.contents do
-			t4[v76] = false
+		for _, content in props.promptData.contents do
+			v6[content] = false
 		end
 
-		v30(SaveCapturesPromptFinished(t1.promptId, t4))
-	end, {
-		t1.promptData,
-		t1.promptId
-	})
-	local v53 = React.useCallback(function() -- line: 170
-		-- upvalues: v37 (copy), v36 (copy)
-		v37((math.max(1, v36 - 1)))
-	end, { v36 })
-	local v54 = React.useCallback(function() -- line: 174
-		-- upvalues: v37 (copy), contents (copy), v36 (copy)
-		v37((math.min(#contents, v36 + 1)))
-	end, {
-		contents,
-		v36
-	})
-	local v55 = React.useMemo(function() -- line: 178
-		-- upvalues: v52 (copy), v47 (copy), ButtonType (copy), v41 (copy), v51 (copy)
+		v2(SaveCapturesPromptFinished(props.promptId, v6))
+	end, { props.promptData, props.promptId })
+
+	local onActivated3 = React.useCallback(function()
+		setState3((math.max(1, state3 - 1)))
+	end, { state3 })
+
+	local onActivated4 = React.useCallback(function()
+		setState3((math.min(#contents, state3 + 1)))
+	end, { contents, state3 })
+
+	local buttonStackInfo = React.useMemo(function()
 		return {
 			buttons = {
 				{
-					isDefaultChild = true,
-					props = {
-						onActivated = v52,
-						text = v47.no
-					}
+					props = { onActivated = onActivated2, text = v5.no },
+					isDefaultChild = true
 				},
 				{
-					isDefaultChild = false,
 					buttonType = ButtonType.PrimarySystem,
 					props = {
 						delayInputSeconds = 2,
-						enableInputDelayed = v41,
-						isDelayedInput = v41,
-						onActivated = v51,
-						text = v47.yes
-					}
+						enableInputDelayed = v3,
+						isDelayedInput = v3,
+						onActivated = onActivated,
+						text = v5.yes
+					},
+					isDefaultChild = false
 				}
 			}
 		}
-	end, {
-		v47,
-		v51,
-		v52
-	})
-	local v56 = React.useCallback(function() -- line: 204
-		-- upvalues: v32 (copy), v34 (copy), v31 (copy), React (copy), View (copy), v50 (copy), CapturePromptItem (copy), contents (copy), v36 (copy), v38 (copy), v48 (copy), FoundationText (copy), v53 (copy), Icon (copy), v54 (copy)
-		local v77 = v32.Y - v34.Y
-		local v78 = v31.Y - 80 - v77
+	end, { v5, onActivated, onActivated2 })
 
-		return React.createElement(View, {
+	local middleContent = React.useCallback(function()
+		local v6 = state.Y - state2.Y
+		local v7 = screenSize.Y - 80 - v6
+
+		local createElement = React.createElement
+		local v8 = {
 			Size = UDim2.new(1, 0, 0, 200),
-			sizeConstraint = {
-				MaxSize = Vector2.new(1e999, v78)
-			},
-			onAbsoluteSizeChanged = v50
-		}, {
+			sizeConstraint = { MaxSize = Vector2.new(1e999, v7) },
+			onAbsoluteSizeChanged = onAbsoluteSizeChanged2
+		}
+
+		local v9 = {
 			CapturePromptItem = React.createElement(CapturePromptItem, {
-				content = contents[v36],
-				isSelected = v38[v36],
+				content = contents[state3],
+				isSelected = state4[state3],
 				showCheckbox = #contents > 1,
-				updateSelected = v48
+				updateSelected = updateSelected
 			}),
-			Overlay = React.createElement(View, {
-				LayoutOrder = 2,
-				tag = "padding-small size-full",
-				ZIndex = 2
+			Overlay = 0
+		}
+
+		local createElement2 = React.createElement
+
+		local v10 = {
+			CountView = React.createElement(View, {
+				tag = "bg-over-media-0 anchor-top-left auto-xy clip padding-x-small padding-y-xsmall position-top-left radius-circle",
+				Visible = #contents > 1
 			}, {
-				CountView = React.createElement(View, {
-					tag = "bg-over-media-0 anchor-top-left auto-xy clip padding-x-small padding-y-xsmall position-top-left radius-circle",
-					Visible = #contents > 1
-				}, {
-					Count = React.createElement(FoundationText, {
-						tag = "auto-xy content-emphasis text-body-small",
-						Text = `{ v36 }/{ #contents }`
-					})
-				}),
-				PrevCaptureButton = if not (v36 > 1) then nil else React.createElement(View, {
-					tag = "bg-over-media-0 anchor-center-left auto-xy clip position-center-left radius-circle",
-					onActivated = v53
-				}, {
-					CycleLeftIcon = React.createElement(Icon, {
-						name = "icons/actions/cycleLeft"
-					})
-				}),
-				NextCaptureButton = if not (v36 < #contents) then nil else React.createElement(View, {
-					tag = "bg-over-media-0 anchor-center-right auto-xy clip position-center-right radius-circle",
-					onActivated = v54
-				}, {}, {
-					CycleRightIcon = React.createElement(Icon, {
-						name = "icons/actions/cycleRight"
-					})
+				Count = React.createElement(Text, {
+					tag = "auto-xy content-emphasis text-body-small",
+					Text = `{state3}/{#contents}`
 				})
-			})
-		})
+			}),
+			PrevCaptureButton = 0,
+			NextCaptureButton = 0
+		}
+		local prevCaptureButton
+
+		if state3 > 1 then
+			prevCaptureButton = React.createElement(
+				View,
+				{
+					tag = "bg-over-media-0 anchor-center-left auto-xy clip position-center-left radius-circle",
+					onActivated = onActivated3
+				},
+				{
+					CycleLeftIcon = React.createElement(Icon, { name = "icons/actions/cycleLeft" })
+				}
+			)
+		end
+
+		v10.PrevCaptureButton = prevCaptureButton
+		local nextCaptureButton
+
+		if state3 < #contents then
+			nextCaptureButton = React.createElement(
+				View,
+				{
+					tag = "bg-over-media-0 anchor-center-right auto-xy clip position-center-right radius-circle",
+					onActivated = onActivated4
+				},
+				{},
+				{
+					CycleRightIcon = React.createElement(Icon, { name = "icons/actions/cycleRight" })
+				}
+			)
+		end
+
+		v10.NextCaptureButton = nextCaptureButton
+		v9.Overlay = createElement2(View, {
+			LayoutOrder = 2,
+			tag = "padding-small size-full",
+			ZIndex = 2
+		}, v10)
+		return createElement(View, v8, v9)
 	end, {
-		v32,
+		state,
 		contents,
-		v34,
-		v36,
-		v50,
-		v54,
-		v53,
-		v31,
-		v38,
-		v48
+		state2,
+		state3,
+		onAbsoluteSizeChanged2,
+		onActivated4,
+		onActivated3,
+		screenSize,
+		state4,
+		updateSelected
 	})
 
 	return React.createElement(InteractiveAlert, {
+		bodyText = v5.bodyText,
+		buttonStackInfo = buttonStackInfo,
 		isMiddleContentFocusable = false,
-		bodyText = v47.bodyText,
-		buttonStackInfo = v55,
-		middleContent = v56,
-		onAbsoluteSizeChanged = v49,
+		middleContent = middleContent,
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
 		position = UDim2.fromScale(0.5, 0.5),
-		screenSize = v31,
-		title = v47.title
+		screenSize = screenSize,
+		title = v5.title
 	})
 end

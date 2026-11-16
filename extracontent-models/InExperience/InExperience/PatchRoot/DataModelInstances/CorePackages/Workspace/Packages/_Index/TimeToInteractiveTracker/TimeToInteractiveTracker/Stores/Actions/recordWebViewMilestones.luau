@@ -1,90 +1,87 @@
 local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
-local v2 = require(TimeToInteractiveTracker.Logger):new(script.Name)
+
+local Logger = require(TimeToInteractiveTracker.Logger)
+local v = Logger:new(script.Name)
 local FFlagDebugTimeToInteractiveTracker = require(TimeToInteractiveTracker.Utils.FFlagDebugTimeToInteractiveTracker)
 
 require(script.Parent.Parent.types)
 require(TimeToInteractiveTracker.Milestones.types)
-
 local constants = require(TimeToInteractiveTracker.Milestones.constants)
 
-return function(p1, p2) -- line: 35
-	-- upvalues: FFlagDebugTimeToInteractiveTracker (copy), v2 (copy), constants (copy)
-	return function(s1: string, t1: {[any]: any}) -- line: 36
-		-- upvalues: p1 (copy), FFlagDebugTimeToInteractiveTracker (copy), v2 (copy), constants (copy), p2 (copy)
-		if #t1 == 0 then
+return function(callback, callback2)
+	return function(p: string, list)
+		if #list == 0 then
 			return
 		end
 
-		local v9 = p1(false)[s1]
+		local v2 = callback(false)[p]
 
-		if FFlagDebugTimeToInteractiveTracker and (not v9 or not v9.startTime) then
-			v2:warning(`called before trackStart for eventName={ s1 }`)
+		if FFlagDebugTimeToInteractiveTracker and not (v2 and v2.startTime) then
+			v:warning(`called before trackStart for eventName={p}`)
 		end
 
-		if not v9 or not v9.startTime then
+		if not (v2 and v2.startTime) then
 			return
 		end
 
-		local startTime = v9.startTime
-		local Subphase = constants.DataProcessingCompleted.Subphase
+		local startTime = v2.startTime
+		local subphase = constants.DataProcessingCompleted.Subphase
 
-		local function materializeSubphases(t2: {[any]: any}?) -- line: 63
-			-- upvalues: startTime (copy), Subphase (copy)
-			if t2 == nil then
+		local function materializeSubphases(subphases)
+			if subphases == nil then
 				return nil
 			end
 
-			local t3 = {}
+			local result = {}
 
-			for _, v19 in t2 do
-				local v20 = startTime + v19.deltaMs / 1000
+			for _, item in subphases do
+				local timestamp = startTime + item.deltaMs / 1000
 
-				table.insert(t3, if v19.name ~= Subphase.Decode and (v19.name ~= Subphase.DataUpdate and v19.name ~= Subphase.TreeBuild) then {
-					name = v19.name,
-					timestamp = v20,
-					deltaMs = v19.deltaMs
-				} else {
-					name = v19.name,
-					timestamp = v20,
-					deltaMs = v19.deltaMs
-				})
+				if
+					item.name == subphase.Decode
+					or item.name == subphase.DataUpdate
+					or item.name == subphase.TreeBuild
+				then
+				end
+
+				local v3 = { name = item.name, timestamp = timestamp, deltaMs = item.deltaMs }
+
+				table.insert(result, v3)
 			end
 
-			return t3
+			return result
 		end
 
-		local t4 = {}
+		local v3 = {}
 
-		for _, v15 in t1 do
-			table.insert(t4, {
-				name = v15.name,
-				id = v15.id,
-				timestamp = startTime + v15.deltaMs / 1000,
-				deltaMs = v15.deltaMs,
-				subphases = materializeSubphases(v15.subphases)
+		for _, item in list do
+			table.insert(v3, {
+				name = item.name,
+				id = item.id,
+				timestamp = startTime + item.deltaMs / 1000,
+				deltaMs = item.deltaMs,
+				subphases = materializeSubphases(item.subphases)
 			})
 		end
 
-		p2(function(p3) -- line: 110
-			-- upvalues: s1 (copy), t4 (copy)
-			local v22 = p3[s1]
+		callback2(function(p2)
+			local v4 = p2[p]
 
-			if not v22 then
-				return p3
+			if not v4 then
+				return p2
 			end
 
-			local v23 = table.clone(p3)
-			local v24 = table.clone(v22)
-			local v25 = if not v24.milestones then {} else table.clone(v24.milestones)
+			local clone = table.clone(p2)
+			local clone2 = table.clone(v4)
+			local milestones = not clone2.milestones and {} or table.clone(clone2.milestones)
 
-			for _, v27 in t4 do
-				table.insert(v25, v27)
+			for _, v5 in v3 do
+				table.insert(milestones, v5)
 			end
 
-			v24.milestones = v25
-			v23[s1] = v24
-
-			return v23
+			clone2.milestones = milestones
+			clone[p] = clone2
+			return clone
 		end)
 	end
 end

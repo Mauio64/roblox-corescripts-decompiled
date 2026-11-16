@@ -1,13 +1,10 @@
-local scriptParent = script.Parent
-local assertEqual = require(scriptParent.assertEqual)
+local parent = script.Parent
+local assertEqual = require(parent.assertEqual)
 
-local function isLowercase(s1: string) -- line: 15
-	-- upvalues: assertEqual (copy)
-	assertEqual(#s1 > 0, true, "Attempted to call Dash.isLowercase with an empty string")
-
-	local v5 = s1:sub(1, 1)
-
-	return v5 == v5:lower()
+local function isLowercase(value: string): boolean
+	assertEqual(#value > 0, true, "Attempted to call Dash.isLowercase with an empty string")
+	local v = value:sub(1, 1)
+	return v == v:lower()
 end
 
 return isLowercase

@@ -1,47 +1,76 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent
-local util = ParentParent.util
+
+local parent = script.Parent.Parent
+
+local util = parent.util
 local ParseContentIds = require(util.ParseContentIds)
-local flags = ParentParent.flags
+
+local flags = parent.flags
 local getFFlagUGCValidateEmptySurfaceAppearance = require(flags.getFFlagUGCValidateEmptySurfaceAppearance)
-local t1 = {}
 
-local function findSurfaceAppearances(p1, b1: boolean) -- line: 17
-	-- upvalues: UGCValidationService (copy), ParseContentIds (copy), getFFlagUGCValidateEmptySurfaceAppearance (copy)
-	local t2 = {}
-	local t3 = {}
-	local descendants = p1:GetDescendants()
+local function findSurfaceAppearances(folder, flag: boolean)
+	local descendants = folder:GetDescendants()
+	table.insert(descendants, folder)
+	local surfaceAppearances = {}
+	local surfaceAppearances2 = {}
 
-	table.insert(descendants, p1)
+	for _, surfaceAppearance in descendants do
+		if not surfaceAppearance:IsA("SurfaceAppearance") then
+			continue
+		end
 
-	for _, v15 in descendants do
-		if v15:IsA("SurfaceAppearance") then
-			local PropertyValue = UGCValidationService:GetPropertyValue(v15, "TexturePack")
+		local propertyValue = UGCValidationService:GetPropertyValue(surfaceAppearance, "TexturePack")
+		local v
 
-			if if not PropertyValue then nil else ParseContentIds.tryGetAssetIdFromContentId(PropertyValue) then
-				table.insert(t2, v15)
-			elseif getFFlagUGCValidateEmptySurfaceAppearance() then
-				if v15.ColorMap and v15.ColorMap ~= "" or (v15.MetalnessMap and v15.MetalnessMap ~= "" or (v15.NormalMap and v15.NormalMap ~= "" or (v15.RoughnessMap and v15.RoughnessMap ~= "" or v15.EmissiveMaskContent and (v15.EmissiveMaskContent.SourceType == Enum.ContentSourceType.Uri and (v15.EmissiveMaskContent.Uri and v15.EmissiveMaskContent.Uri ~= ""))))) or not b1 then
-					table.insert(t3, v15)
-				end
+		if propertyValue then
+			v = ParseContentIds.tryGetAssetIdFromContentId(propertyValue)
+		end
+
+		if v then
+			table.insert(surfaceAppearances, surfaceAppearance)
+		elseif getFFlagUGCValidateEmptySurfaceAppearance() then
+			local v2
+
+			if
+				surfaceAppearance.ColorMap and surfaceAppearance.ColorMap ~= ""
+				or surfaceAppearance.MetalnessMap and surfaceAppearance.MetalnessMap ~= ""
+				or surfaceAppearance.NormalMap and surfaceAppearance.NormalMap ~= ""
+				or surfaceAppearance.RoughnessMap and surfaceAppearance.RoughnessMap ~= ""
+			then
+				v2 = true
 			else
-				table.insert(t3, v15)
+				v2 = surfaceAppearance.EmissiveMaskContent
+
+				if v2 then
+					if surfaceAppearance.EmissiveMaskContent.SourceType == Enum.ContentSourceType.Uri then
+						v2 = surfaceAppearance.EmissiveMaskContent.Uri
+							and surfaceAppearance.EmissiveMaskContent.Uri ~= ""
+					else
+						v2 = false
+					end
+				end
 			end
+
+			if v2 or not flag then
+				table.insert(surfaceAppearances2, surfaceAppearance)
+			end
+		else
+			table.insert(surfaceAppearances2, surfaceAppearance)
 		end
 	end
 
-	return t2, t3
+	return surfaceAppearances, surfaceAppearances2
 end
 
-function t1.findSurfaceAppearancesMissingTexturePacks(p2, b2: boolean) -- line: 60
-	-- upvalues: findSurfaceAppearances (copy)
-	local _, v20 = findSurfaceAppearances(p2, b2)
+local TexturePackUtils = {}
 
-	return v20
-end
-function t1.findSurfaceAppearancesWithTexturePacks(p3) -- line: 68
-	-- upvalues: findSurfaceAppearances (copy)
-	return (findSurfaceAppearances(p3, false))
+function TexturePackUtils.findSurfaceAppearancesMissingTexturePacks(p, flag: boolean)
+	local _, surfaceAppearancesMissingTexturePacks = findSurfaceAppearances(p, flag)
+	return surfaceAppearancesMissingTexturePacks
 end
 
-return t1
+function TexturePackUtils.findSurfaceAppearancesWithTexturePacks(p)
+	return (findSurfaceAppearances(p, false))
+end
+
+return TexturePackUtils

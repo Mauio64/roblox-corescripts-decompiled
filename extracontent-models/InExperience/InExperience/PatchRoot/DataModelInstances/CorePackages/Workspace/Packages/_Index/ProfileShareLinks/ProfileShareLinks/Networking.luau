@@ -1,3 +1,1 @@
-return {
-	Networking = require(script.Networking)
-}
+return { Networking = require(script.Networking) }

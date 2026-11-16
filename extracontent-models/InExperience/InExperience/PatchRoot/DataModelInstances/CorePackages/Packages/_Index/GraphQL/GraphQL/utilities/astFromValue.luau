@@ -1,164 +1,133 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local luaUtils = ParentParent.luaUtils
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local luaUtils = parent.luaUtils
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Error = LuauPolyfill.Error
 local Number = LuauPolyfill.Number
-local RegExp = require(ParentParentParent.RegExp)
-local inspect = require(ParentParent.jsutils.inspect).inspect
-local invariant = require(ParentParent.jsutils.invariant).invariant
-local isObjectLike = require(ParentParent.jsutils.isObjectLike).isObjectLike
-local isIteratableObject = require(ParentParent.jsutils.isIteratableObject).isIteratableObject
+local RegExp = require(parent2.RegExp)
 
-require(ParentParent.language.ast)
+local inspect = require(parent.jsutils.inspect)
+local inspect2 = inspect.inspect
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
+local isObjectLike = require(parent.jsutils.isObjectLike)
+local isObjectLike2 = isObjectLike.isObjectLike
+local isIteratableObject = require(parent.jsutils.isIteratableObject)
+local isIteratableObject2 = isIteratableObject.isIteratableObject
 
-local Kind = require(ParentParent.language.kinds).Kind
-local GraphQLID = require(ParentParent.type.scalars).GraphQLID
-local definition = require(ParentParent.type.definition)
+require(parent.language.ast)
+
+local kinds = require(parent.language.kinds)
+local kind = kinds.Kind
+
+local scalars = require(parent.type.scalars)
+local graphQLID = scalars.GraphQLID
+local definition = require(parent.type.definition)
 local isLeafType = definition.isLeafType
 local isEnumType = definition.isEnumType
 local isInputObjectType = definition.isInputObjectType
 local isListType = definition.isListType
 local isNonNullType = definition.isNonNullType
+
 local null = require(luaUtils.null)
 local isNillish = require(luaUtils.isNillish)
 local isNillish2 = isNillish.isNillish
 local isNotNillish = isNillish.isNotNillish
-local u24 = nil
 
-local function astFromValue(p1, p2) -- line: 70
-	-- upvalues: isNonNullType (copy), astFromValue (copy), null (copy), Kind (copy), isListType (copy), isIteratableObject (copy), isNotNillish (copy), isInputObjectType (copy), isObjectLike (copy), isLeafType (copy), isNillish2 (copy), Number (copy), u24 (ref), isEnumType (copy), GraphQLID (copy), Error (copy), inspect (copy), invariant (copy)
-	if isNonNullType(p2) then
-		local v28 = astFromValue(p1, p2.ofType)
+local v = nil
+local function astFromValue(items, object)
+	if isNonNullType(object) then
+		local v2 = astFromValue(items, object.ofType)
 
-		if (v28 ~= nil and (v28 ~= null and v28.kind)) == Kind.NULL then
-			return null
-		end
-
-		return v28
+		local v3 = not (v2 == nil or v2 == null) and v2.kind
+		return if v3 == kind.NULL then null else v2
 	end
 
-	if p1 == null then
-		return {
-			kind = Kind.NULL
-		}
+	if items == null then
+		return { kind = kind.NULL }
 	end
 
-	if p1 == nil then
+	if items == nil then
 		return null
 	end
 
-	if isListType(p2) then
-		local ofType = p2.ofType
+	if isListType(object) then
+		local ofType = object.ofType
 
-		if isIteratableObject(p1) then
-			local t1 = {}
-
-			for _, v in pairs(p1) do
-				local v33 = astFromValue(v, ofType)
-
-				if isNotNillish(v33) then
-					table.insert(t1, v33)
-				end
-			end
-
-			return {
-				kind = Kind.LIST,
-				values = t1
-			}
+		if not isIteratableObject2(items) then
+			return astFromValue(items, ofType)
 		end
 
-		return astFromValue(p1, ofType)
-	end
+		local values = {}
 
-	if isInputObjectType(p2) then
-		if not isObjectLike(p1) then
+		for _, item in pairs(items) do
+			local v2 = astFromValue(item, ofType)
+
+			if isNotNillish(v2) then
+				table.insert(values, v2)
+			end
+		end
+
+		return { kind = kind.LIST, values = values }
+	elseif isInputObjectType(object) then
+		if not isObjectLike2(items) then
 			return null
 		end
 
-		local t2 = {}
+		local fields = {}
 
-		for _, v in ipairs(p2:getFields():values()) do
-			local v37 = astFromValue(p1[v.name], v.type)
+		for _, v2 in ipairs(object:getFields():values()) do
+			local v3 = astFromValue(items[v2.name], v2.type)
 
-			if isNotNillish(v37) then
-				table.insert(t2, {
-					kind = Kind.OBJECT_FIELD,
-					name = {
-						kind = Kind.NAME,
-						value = v.name
-					},
-					value = v37
+			if isNotNillish(v3) then
+				table.insert(fields, {
+					kind = kind.OBJECT_FIELD,
+					name = { kind = kind.NAME, value = v2.name },
+					value = v3
 				})
 			end
 		end
 
-		return {
-			kind = Kind.OBJECT,
-			fields = t2
-		}
+		return { kind = kind.OBJECT, fields = fields }
+	else
+		if isLeafType(object) then
+			local serialized = object:serialize(items)
+
+			if isNillish2(serialized) then
+				return null
+			end
+
+			if typeof(serialized) == "boolean" then
+				return { kind = kind.BOOLEAN, value = serialized }
+			end
+
+			if typeof(serialized) == "number" and Number.isFinite(serialized) then
+				local v2 = tostring(serialized)
+
+				if v:test(v2) then
+					return { kind = kind.INT, value = v2 }
+				end
+
+				return { kind = kind.FLOAT, value = v2 }
+			elseif typeof(serialized) == "string" then
+				if isEnumType(object) then
+					return { kind = kind.ENUM, value = serialized }
+				end
+
+				if object == graphQLID and v:test(serialized) then
+					return { kind = kind.INT, value = serialized }
+				end
+
+				return { kind = kind.STRING, value = serialized }
+			else
+				error(Error.new(("Cannot convert value to AST: %s."):format(inspect2(serialized))))
+			end
+		end
+
+		invariant2(false, "Unexpected input type: " .. inspect2(object))
 	end
-
-	if isLeafType(p2) then
-		local v38 = p2:serialize(p1)
-
-		if isNillish2(v38) then
-			return null
-		end
-
-		if typeof(v38) == "boolean" then
-			return {
-				kind = Kind.BOOLEAN,
-				value = v38
-			}
-		end
-
-		if typeof(v38) == "number" and Number.isFinite(v38) then
-			local str = tostring(v38)
-
-			if u24:test(str) then
-				return {
-					kind = Kind.INT,
-					value = str
-				}
-			end
-
-			return {
-				kind = Kind.FLOAT,
-				value = str
-			}
-		end
-
-		if typeof(v38) == "string" then
-			if isEnumType(p2) then
-				return {
-					kind = Kind.ENUM,
-					value = v38
-				}
-			end
-
-			if p2 == GraphQLID and u24:test(v38) then
-				return {
-					kind = Kind.INT,
-					value = v38
-				}
-			end
-
-			return {
-				kind = Kind.STRING,
-				value = v38
-			}
-		end
-
-		error(Error.new(("Cannot convert value to AST: %s."):format(inspect(v38))))
-	end
-
-	invariant(false, "Unexpected input type: " .. inspect(p2))
 end
 
-u24 = RegExp("^-?(?:0|[1-9][0-9]*)$")
+v = RegExp("^-?(?:0|[1-9][0-9]*)$")
 
-return {
-	astFromValue = astFromValue,
-	NULL = null
-}
+return { astFromValue = astFromValue, NULL = null }

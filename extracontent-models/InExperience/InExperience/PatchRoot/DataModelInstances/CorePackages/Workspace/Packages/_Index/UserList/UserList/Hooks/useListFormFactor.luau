@@ -1,14 +1,13 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local useSelector = require(UserListParent.RoactUtils).Hooks.RoactRodux.useSelector
-
+local parent = UserList.Parent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 require(UserList.Common.Enums)
 
-return function() -- line: 11
-	-- upvalues: useSelector (copy)
+return function()
 	return {
-		formFactor = useSelector(function(p1) -- line: 12
-			return p1.FormFactor
+		formFactor = useSelector(function(p)
+			return p.FormFactor
 		end)
 	}
 end

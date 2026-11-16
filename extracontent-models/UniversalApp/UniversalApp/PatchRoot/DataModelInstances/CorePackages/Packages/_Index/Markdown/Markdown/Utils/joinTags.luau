@@ -1,29 +1,23 @@
-local Parent = script:FindFirstAncestor("Markdown").Parent
-local forEachArgs = require(Parent.Dash).forEachArgs
+local parent = script:FindFirstAncestor("Markdown").Parent
+local Dash = require(parent.Dash)
+local forEachArgs = Dash.forEachArgs
 local concat = table.concat
 
-local function joinTags(...) -- line: 11
-	-- upvalues: forEachArgs (copy), concat (copy)
-	local t1 = {}
-
-	forEachArgs(function(p1) -- line: 13
-		-- upvalues: t1 (copy)
-		if typeof(p1) == "string" then
-			table.insert(t1, p1)
-
-			return
-		end
-
-		if typeof(p1) == "table" then
-			for v7, v8 in p1 do
-				if v8 then
-					table.insert(t1, v7)
+local function joinTags(...)
+	local v = {}
+	forEachArgs(function(value)
+		if typeof(value) == "string" then
+			table.insert(v, value)
+		elseif typeof(value) == "table" then
+			for k, item in value do
+				if item then
+					table.insert(v, k)
 				end
 			end
 		end
 	end, ...)
 
-	return concat(t1, " ")
+	return concat(v, " ")
 end
 
 return joinTags

@@ -1,70 +1,116 @@
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local AssetInfo = require(ParentParent.Models.AssetInfo)
-local SetEquippedAssets = require(ParentParent.Actions.SetEquippedAssets)
-local Constants = require(ParentParent.Constants)
-local GetAvatarPreview = require(ParentParent.Thunks.GetAvatarPreview)
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local AssetInfo = require(parent.Models.AssetInfo)
+local SetEquippedAssets = require(parent.Actions.SetEquippedAssets)
+local Constants = require(parent.Constants)
+local GetAvatarPreview = require(parent.Thunks.GetAvatarPreview)
+local SendCounter = require(parent.Thunks.SendCounter)
+
 local CorePackages = game:GetService("CorePackages")
-local FFlagAXInspectAndBuyMakeupSupport = require(CorePackages.Workspace.Packages.AvatarExperienceFlags).FFlagAXInspectAndBuyMakeupSupport
-local t1 = {}
+local Promise = require(CorePackages.Packages.Promise)
+local AvatarExperienceFlags = require(CorePackages.Workspace.Packages.AvatarExperienceFlags)
+local AvatarBackground = require(CorePackages.Workspace.Packages.DataHydration.AvatarBackground)
+local FFlagAXInspectAndBuyMakeupSupport = AvatarExperienceFlags.FFlagAXInspectAndBuyMakeupSupport
+local FFlagAXInspectAndBuyAvatarBackground = AvatarExperienceFlags.FFlagAXInspectAndBuyAvatarBackground
 
-local function getAssetIds(p1) -- line: 19
-	-- upvalues: Constants (copy), AssetInfo (copy), FFlagAXInspectAndBuyMakeupSupport (copy)
-	local t2 = {}
-	local v14 = false
+local v = {}
 
-	for v15, v16 in Constants.AssetTypeIdStringToHumanoidDescriptionProp do
-		if Constants.AssetTypeIdToAccessoryTypeEnum[v15] == nil then
-			local v17 = p1[v16] or ""
-			local v18 = v15 == tostring(Enum.AssetType.Head.Value) or v15 == tostring(Enum.AssetType.DynamicHead.Value)
+local function getAssetIds(instance)
+	local v2 = false
+	local assetIds = {}
 
-			if not v14 or not v18 then
-				if v18 then
-					v14 = true
-				end
+	for k, v3 in Constants.AssetTypeIdStringToHumanoidDescriptionProp do
+		if Constants.AssetTypeIdToAccessoryTypeEnum[k] ~= nil then
+			continue
+		end
 
-				for _, v20 in string.split(v17) do
-					if tonumber(v20) and v20 ~= "0" then
-						table.insert(t2, AssetInfo.fromHumanoidDescription(v20))
-					end
-				end
+		local v4 = instance[v3] or ""
+
+		local v5 = k == tostring(Enum.AssetType.Head.Value) or k == tostring(Enum.AssetType.DynamicHead.Value)
+
+		if v2 and v5 then
+			continue
+		end
+
+		v2 = v5 and true or v2
+
+		for _, v6 in string.split(v4) do
+			if tonumber(v6) and v6 ~= "0" then
+				table.insert(assetIds, AssetInfo.fromHumanoidDescription(v6))
 			end
 		end
 	end
 
-	for _, v22 in (p1:GetAccessories(true)) do
-		t2[#t2 + 1] = AssetInfo.fromHumanoidDescriptionAccessory(v22)
+	local accessories = instance:GetAccessories(true)
+
+	for _, accessory in accessories do
+		assetIds[#assetIds + 1] = AssetInfo.fromHumanoidDescriptionAccessory(accessory)
 	end
 
-	for _, v24 in (p1:GetEmotes()) do
-		for _, v26 in v24 do
-			t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(v26)
+	local emotes = instance:GetEmotes()
+
+	for _, emote in emotes do
+		for _, v3 in emote do
+			assetIds[#assetIds + 1] = AssetInfo.fromHumanoidDescription(v3)
 		end
 	end
 
 	if FFlagAXInspectAndBuyMakeupSupport then
-		for _, child in p1:GetChildren() do
-			if child:IsA("MakeupDescription") and child.AssetId > 0 then
-				t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(child.AssetId)
+		for _, makeupDescription in instance:GetChildren() do
+			if makeupDescription:IsA("MakeupDescription") and makeupDescription.AssetId > 0 then
+				assetIds[#assetIds + 1] = AssetInfo.fromHumanoidDescription(makeupDescription.AssetId)
 			end
 		end
 	end
 
-	return t2
+	return assetIds
 end
-local function GetAssetsFromHumanoidDescriptionV2(p2, p3) -- line: 83
-	-- upvalues: Thunk (copy), t1 (copy), getAssetIds (copy), GetAvatarPreview (copy), SetEquippedAssets (copy)
-	return Thunk.new(script.Name, t1, function(p4, _) -- line: 84
-		-- upvalues: getAssetIds (copy), p2 (copy), p3 (copy), GetAvatarPreview (copy), SetEquippedAssets (copy)
-		local v33 = getAssetIds(p2)
 
-		if not p3 then
-			p4:dispatch(GetAvatarPreview(v33))
+local function withEquippedBackground(object, p, playerId)
+	if playerId == nil or playerId == "" then
+		return Promise.resolve(p)
+	end
+
+	return AvatarBackground.getAvatarBackgroundStore(false).awaitAvatarBackground(playerId):andThen(function(p2)
+		if not p2.assetId then
+			return p
+		end
+
+		local clone = table.clone(p)
+		table.insert(clone, AssetInfo.fromHumanoidDescription(p2.assetId))
+		return clone
+	end):catch(function()
+		object:dispatch(SendCounter(Constants.Counters.GetAvatarBackground .. Constants.CounterSuffix.RequestFailed))
+		return p
+	end)
+end
+
+local function dispatchPreviewWithEquippedBackground(object, assetIds, callback) -- 1 equivalent call inferred from this helper
+	withEquippedBackground(object, assetIds, object:getState().playerId):andThen(function(p)
+		if callback and not callback() then
+			return
+		end
+
+		object:dispatch(GetAvatarPreview(p))
+	end)
+end
+
+local function GetAssetsFromHumanoidDescriptionV2(p, p2, callback)
+	return Thunk.new(script.Name, v, function(object, _)
+		local assetIds = getAssetIds(p)
+
+		if p2 then
+			object:dispatch(SetEquippedAssets(assetIds))
 
 			return
 		end
 
-		p4:dispatch(SetEquippedAssets(v33))
+		if not FFlagAXInspectAndBuyAvatarBackground then
+			object:dispatch(GetAvatarPreview(assetIds))
+			return
+		end
+
+		dispatchPreviewWithEquippedBackground(object, assetIds, callback) -- inferred equivalent call
 	end)
 end
 

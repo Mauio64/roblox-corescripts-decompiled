@@ -1,13 +1,13 @@
-return function(p1) -- line: 1
-	local t1 = {}
+return function(p)
+	local v = {}
 
-	for i = 1, p1.n do
-		if type(p1[i]) == "string" then
-			table.insert(t1, "\"" .. p1[i] .. "\"")
+	for i = 1, p.n do
+		if type(p[i]) == "string" then
+			table.insert(v, "\"" .. p[i] .. "\"")
 		else
-			table.insert(t1, (tostring(p1[i])))
+			table.insert(v, (tostring(p[i])))
 		end
 	end
 
-	return "{" .. table.concat(t1, ", ") .. "}"
+	return "{" .. table.concat(v, ", ") .. "}"
 end

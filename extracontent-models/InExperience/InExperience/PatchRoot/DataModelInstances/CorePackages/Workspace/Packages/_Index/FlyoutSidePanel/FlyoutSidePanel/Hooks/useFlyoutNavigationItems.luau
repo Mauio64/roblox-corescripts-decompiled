@@ -1,169 +1,356 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local React = require(Parent.React)
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local Constants = require(script.Parent.Parent.Constants)
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
-local SharedFlags = require(Parent.SharedFlags)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local useHomeSortDropDownOptions = require(parent.Home.useHomeSortDropDownOptions)
+local SharedFlags = require(parent.SharedFlags)
 local GetFFlagPlatformEventEnabled = SharedFlags.GetFFlagPlatformEventEnabled
 local GetFStringPlatformEventUrl = SharedFlags.GetFStringPlatformEventUrl
 local FFlagEnableBlackbird = SharedFlags.FFlagEnableBlackbird
 local FFlagEnableBlackbirdOnFlyoutMenu = SharedFlags.FFlagEnableBlackbirdOnFlyoutMenu
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
 local FFlagEnableRMOnMorePageGUAC = SharedFlags.FFlagEnableRMOnMorePageGUAC
 local FFlagEnableRMOnMorePageForAll = SharedFlags.FFlagEnableRMOnMorePageForAll
 local FFlagLuaAppFixNotificationBadgeCountsSync = SharedFlags.FFlagLuaAppFixNotificationBadgeCountsSync
-local FFlagFixMomentsExperienceFallback = SharedFlags.FFlagFixMomentsExperienceFallback
-local v16 = game:DefineFastFlag("FlyoutGateMomentsTile", false)
-local MomentsCommon = require(Parent.MomentsCommon)
+local FFlagFlyoutRemoveMomentsForArgoEnabled = SharedFlags.FFlagFlyoutRemoveMomentsForArgoEnabled
+local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
+local FFlagArgoEnableMoments = SharedFlags.FFlagArgoEnableMoments
+local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local FFlagFlyoutFilterWebViewsAndBrowserLinks = SharedFlags.FFlagFlyoutFilterWebViewsAndBrowserLinks
+local FFlagFlyoutSidePanelTradesEntry = require(script.Parent.Parent.Flags.FFlagFlyoutSidePanelTradesEntry)
+local FFlagFlyoutHideSortDeeplinkItems = require(script.Parent.Parent.Flags.FFlagFlyoutHideSortDeeplinkItems)
+local FFlagFlyoutGateLearnPlace = SharedFlags.FFlagFlyoutGateLearnPlace
+local FFlagEnableTradesEntryForNonPremium = SharedFlags.FFlagEnableTradesEntryForNonPremium
+local MomentsCommon = require(parent.MomentsCommon)
 local useMomentsGating = MomentsCommon.Hooks.useMomentsGating
 local canRenderNativeMoments = MomentsCommon.canRenderNativeMoments
+
 local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
 
-local function updateNotifications(p1, p2, p3, p4) -- line: 25
-	-- upvalues: FlyoutContentSettings (copy), FFlagLuaAppFixNotificationBadgeCountsSync (copy)
-	local n1 = 0
+local function updateNotifications(clone, data, p, p2)
+	local notificationCount = 0
 
-	if p1.itemType == FlyoutContentSettings.ItemType.Settings then
-		n1 = p2.MorePageSettings
-	elseif p1.itemType == FlyoutContentSettings.ItemType.Connections then
-		n1 = if not FFlagLuaAppFixNotificationBadgeCountsSync then p2.MorePageFriends else p3
-	elseif p1.itemType == FlyoutContentSettings.ItemType.Messages then
-		n1 = if not FFlagLuaAppFixNotificationBadgeCountsSync then p2.MorePageMessages else p4
+	if clone.itemType == FlyoutContentSettings.ItemType.Settings then
+		notificationCount = data.MorePageSettings
+	elseif clone.itemType == FlyoutContentSettings.ItemType.Connections then
+		if FFlagLuaAppFixNotificationBadgeCountsSync then
+			notificationCount = p
+		else
+			notificationCount = data.MorePageFriends
+		end
+	elseif clone.itemType == FlyoutContentSettings.ItemType.Messages then
+		if FFlagLuaAppFixNotificationBadgeCountsSync then
+			notificationCount = p2
+		else
+			notificationCount = data.MorePageMessages
+		end
 	end
 
-	if n1 > 0 and (not p1.notificationCount or n1 ~= p1.notificationCount) then
-		p1.notificationCount = n1
+	if notificationCount > 0 and (not clone.notificationCount or clone.notificationCount ~= notificationCount) then
+		clone.notificationCount = notificationCount
 	end
 end
-local function useFlyoutNavigationItems() -- line: 45
-	-- upvalues: Constants (copy), useSelector (copy), FFlagLuaAppFixNotificationBadgeCountsSync (copy), React (copy), useAppPolicy (copy), v16 (copy), FFlagFixMomentsExperienceFallback (copy), useMomentsGating (copy), FFlagEnableRMOnMorePageGUAC (copy), FlyoutContentSettings (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), updateNotifications (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), FFlagEnableRMOnMorePageForAll (copy), canRenderNativeMoments (copy), AppPage (copy)
+
+local function shouldSkipLibraryItem(p: string, p2, data): boolean
+	if
+		p2 == nil
+		or FFlagFlyoutHideSortDeeplinkItems and FlyoutContentSettings.itemIsGameSortDeeplink(p2)
+		or FFlagFlyoutFilterWebViewsAndBrowserLinks
+		and not data.webViewSupported
+		and FlyoutContentSettings.itemRequiresWebView(p2, data.externalBrowserAllowed)
+	then
+		return true
+	end
+
+	if
+		p == FlyoutContentSettings.ItemType.Favorites and not data.hasFavoritesData
+		or p == FlyoutContentSettings.ItemType.ContinuePlaying and not data.hasContinueData
+		or p == FlyoutContentSettings.ItemType.Premium and data.disablePremiumEntrypoint
+	then
+		return true
+	end
+
+	if
+		p == FlyoutContentSettings.ItemType.GiftCards and data.hideGiftCards
+		or p == FlyoutContentSettings.ItemType.Redeem and not data.redeemTileEnabled
+		or p == FlyoutContentSettings.ItemType.Trades
+		and not (data.hasPaidTradingAccess or FFlagEnableTradesEntryForNonPremium)
+	then
+		return true
+	end
+
+	if FFlagEnableBlackbird and FFlagEnableBlackbirdOnFlyoutMenu then
+		if
+			p == FlyoutContentSettings.ItemType.Premium
+			or p == FlyoutContentSettings.ItemType.Blackbird and data.disableBlackbirdEntrypoints
+		then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function useFlyoutNavigationItems()
 	local FLYOUT_DEFAULT_POLICY = Constants.FLYOUT_DEFAULT_POLICY
-	local v29 = useSelector(function(p5) -- line: 49
-		return p5.NotificationBadgeCounts
+
+	local v = useSelector(function(p)
+		return p.NotificationBadgeCounts
 	end)
-	local v30 = useSelector(function(p6) -- line: 53
-		-- upvalues: FFlagLuaAppFixNotificationBadgeCountsSync (copy)
+
+	local v2 = useSelector(function(p)
 		if not FFlagLuaAppFixNotificationBadgeCountsSync then
 			return 0
 		end
 
-		local FriendsCarousel = p6.FriendsCarousel
-		local v47 = FriendsCarousel and (FriendsCarousel.Friends and FriendsCarousel.Friends.requests)
-
-		return v47 and v47.receivedCount or 0
+		local friendsCarousel = p.FriendsCarousel
+		local requests = friendsCarousel and friendsCarousel.Friends and friendsCarousel.Friends.requests
+		return requests and requests.receivedCount or 0
 	end)
-	local v31 = useSelector(function(p7) -- line: 62
-		-- upvalues: FFlagLuaAppFixNotificationBadgeCountsSync (copy)
-		if not FFlagLuaAppFixNotificationBadgeCountsSync then
-			return 0
+
+	local v3 = useSelector(function(p)
+		if FFlagLuaAppFixNotificationBadgeCountsSync then
+			return p.SocialTab and p.SocialTab.UnreadConversationCount or 0
 		end
 
-		return p7.SocialTab and p7.SocialTab.UnreadConversationCount or 0
+		return 0
 	end)
-	local v32 = useSelector(function(p8) -- line: 69
-		return p8.OmniRecommendations and p8.OmniRecommendations.Home
-	end)
-	local v33 = v32 and v32.sorts or {}
-	local v34, v35 = React.useMemo(function() -- line: 73
-		-- upvalues: v33 (copy), Constants (copy)
-		local v50 = nil
-		local v51 = nil
+	local hasContinueData, hasFavoritesData
 
-		for _, v in pairs(v33) do
-			if v.topicId == Constants.SORT_ID_CONTINUE_PLAYING then
-				v50 = true
-			elseif v.topicId == Constants.SORT_ID_FAVORITES then
-				v51 = true
+	if FFlagLuaAppEnableSduiHomePage then
+		local v4 = useHomeSortDropDownOptions()
+		hasContinueData, hasFavoritesData = React.useMemo(function()
+			local v5 = nil
+			local v6 = nil
+
+			for _, v7 in v4 do
+				if v7.topicId == Constants.SORT_ID_CONTINUE_PLAYING then
+					v5 = true
+				elseif v7.topicId == Constants.SORT_ID_FAVORITES then
+					v6 = true
+				end
 			end
-		end
 
-		return v50, v51
-	end, { v33 })
-	local v36 = useAppPolicy(function(p9) -- line: 85
-		return p9.getDisablePremiumEntrypoint() or false
-	end)
-	local v37 = useAppPolicy(function(p10) -- line: 88
-		return p10.getDisableBlackbirdEntrypoints() or false
-	end)
-	local v38 = useAppPolicy(function(p11) -- line: 91
-		return p11.getGiftCardSourceRefOverride()
-	end)
-	local v39 = useAppPolicy(function(p12) -- line: 94
-		return p12.getRedeemTileEnabled()
-	end)
-	local v40 = if not v16 and not FFlagFixMomentsExperienceFallback then nil else useMomentsGating()
-	local v41 = not not v16 and useAppPolicy(function(p13) -- line: 101
-		return p13.getDisplayMomentsMoreTabTile()
-	end)
-	local v42 = not v16 or (not FFlagEnableRMOnMorePageGUAC or v41)
-	local v43 = not v38 or v38 == ""
+			return v5, v6
+		end, { v4 })
+	else
+		local v4 = useSelector(function(p)
+			return p.OmniRecommendations and p.OmniRecommendations.Home
+		end)
 
-	return React.useMemo(function() -- line: 111
-		-- upvalues: FLYOUT_DEFAULT_POLICY (copy), FlyoutContentSettings (copy), v35 (copy), v34 (copy), v36 (copy), v43 (copy), v39 (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), v37 (copy), updateNotifications (copy), v29 (copy), v30 (copy), v31 (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), v16 (copy), v40 (copy), FFlagEnableRMOnMorePageForAll (copy), v42 (copy), FFlagFixMomentsExperienceFallback (copy), canRenderNativeMoments (copy), AppPage (copy)
-		local t1 = {}
-		local t2 = {}
+		local sorts = v4 and v4.sorts or {}
+		hasContinueData, hasFavoritesData = React.useMemo(function()
+			local v5 = nil
+			local v6 = nil
 
-		for _, v62 in FLYOUT_DEFAULT_POLICY.MyLibrary do
-			local v63 = FlyoutContentSettings.ItemInfo[v62]
-
-			if v63 ~= nil and (v62 ~= FlyoutContentSettings.ItemType.Favorites or v35) and (v62 ~= FlyoutContentSettings.ItemType.ContinuePlaying or v34) and (v62 ~= FlyoutContentSettings.ItemType.Premium or not v36) and (v62 ~= FlyoutContentSettings.ItemType.GiftCards or not v43) and (v62 ~= FlyoutContentSettings.ItemType.Redeem or v39) and (not FFlagEnableBlackbird or not FFlagEnableBlackbirdOnFlyoutMenu or v62 ~= FlyoutContentSettings.ItemType.Premium and (v62 ~= FlyoutContentSettings.ItemType.Blackbird or not v37)) then
-				local v64 = table.clone(v63)
-
-				updateNotifications(v64, v29, v30, v31)
-				table.insert(t1, v64)
+			for _, sort in pairs(sorts) do
+				if sort.topicId == Constants.SORT_ID_CONTINUE_PLAYING then
+					v5 = true
+				elseif sort.topicId == Constants.SORT_ID_FAVORITES then
+					v6 = true
+				end
 			end
-		end
 
-		for _, v66 in FLYOUT_DEFAULT_POLICY.AdditionalNavigation do
-			local v67 = FlyoutContentSettings.ItemInfo[v66]
+			return v5, v6
+		end, { sorts })
+	end
 
-			if v67 == nil then
+	local disablePremiumEntrypoint = useAppPolicy(function(p)
+		return p.getDisablePremiumEntrypoint() or false
+	end)
+
+	local disableBlackbirdEntrypoints = useAppPolicy(function(p)
+		return p.getDisableBlackbirdEntrypoints() or false
+	end)
+
+	local v4 = useAppPolicy(function(p)
+		return p.getGiftCardSourceRefOverride()
+	end)
+
+	local redeemTileEnabled = useAppPolicy(function(p)
+		return p.getRedeemTileEnabled()
+	end)
+
+	local v5 = not FFlagFlyoutGateLearnPlace or useAppPolicy(function(p)
+		return p.getLearnPlaceEnabled()
+	end)
+
+	local webViewSupported = not FFlagFlyoutFilterWebViewsAndBrowserLinks or useAppPolicy(function(p)
+		return p.getWebViewSupport()
+	end)
+	local externalBrowserAllowed
+
+	if FFlagFlyoutFilterWebViewsAndBrowserLinks then
+		externalBrowserAllowed = useAppPolicy(function(p)
+			return p.shouldUseExternalBrowserForMorePageItem()
+		end)
+	else
+		externalBrowserAllowed = false
+	end
+
+	local hasPaidTradingAccess
+
+	if FFlagFlyoutSidePanelTradesEntry then
+		hasPaidTradingAccess = useSelector(function(p)
+			local user = p.Users[p.LocalUserId]
+
+			if not user then
+				return false
+			end
+
+			local v6 = user.membership == Enum.MembershipType.Premium
+			local v7 = FFlagEnableBlackbirdCheck and user.hasRobloxSubscription == true
+			return v6 or v7
+		end)
+	else
+		hasPaidTradingAccess = false
+	end
+
+	local v6 = useMomentsGating()
+	local isAmpPolicyEnabled = v6.isAmpPolicyEnabled
+	local v7 = not FFlagEnableRMOnMorePageGUAC or isAmpPolicyEnabled
+	local hideGiftCards = not v4 or v4 == ""
+	local useMemo = React.useMemo
+	local function fn()
+		local v8 = {
+			hasFavoritesData = hasFavoritesData,
+			hasContinueData = hasContinueData,
+			disablePremiumEntrypoint = disablePremiumEntrypoint,
+			hideGiftCards = hideGiftCards,
+			redeemTileEnabled = redeemTileEnabled,
+			hasPaidTradingAccess = hasPaidTradingAccess,
+			disableBlackbirdEntrypoints = disableBlackbirdEntrypoints,
+			webViewSupported = webViewSupported,
+			externalBrowserAllowed = externalBrowserAllowed
+		}
+		local clones = {}
+		local clones2 = {}
+
+		for _, v9 in FLYOUT_DEFAULT_POLICY.MyLibrary do
+			local v10 = FlyoutContentSettings.ItemInfo[v9]
+
+			if shouldSkipLibraryItem(v9, v10, v8) then
 				continue
 			end
 
-			if v66 == FlyoutContentSettings.ItemType.Events then
+			local clone = table.clone(v10)
+			updateNotifications(clone, v, v2, v3)
+
+			table.insert(clones, clone)
+		end
+
+		for _, v9 in FLYOUT_DEFAULT_POLICY.AdditionalNavigation do
+			local v10 = FlyoutContentSettings.ItemInfo[v9]
+
+			if v10 == nil then
+				continue
+			end
+
+			if v9 == FlyoutContentSettings.ItemType.Events then
 				if not GetFFlagPlatformEventEnabled() or GetFStringPlatformEventUrl() == "" then
 					continue
 				end
-			elseif v66 == FlyoutContentSettings.ItemType.Moments and v16 and ((v40 == nil or not v40.isFlyoutEntryEnabled) and (not FFlagEnableRMOnMorePageForAll and not v42)) then
+			elseif v9 == FlyoutContentSettings.ItemType.Learn and FFlagFlyoutGateLearnPlace then
+				if not v5 then
+					continue
+				end
+			elseif
+				v9 == FlyoutContentSettings.ItemType.Moments
+				and (FFlagFlyoutRemoveMomentsForArgoEnabled and FFlagEnableArgus and FFlagArgoEnableMoments or FFlagFlyoutRemoveMomentsForArgoEnabled and v6 ~= nil and not v6.isSupportedOnPlatform or (v6 == nil or not v6.isFlyoutEntryEnabled) and not (FFlagEnableRMOnMorePageForAll or v7))
+			then
 				continue
 			end
 
-			local v68 = table.clone(v67)
-
-			if v66 == FlyoutContentSettings.ItemType.Moments and v40 ~= nil then
-				if FFlagFixMomentsExperienceFallback then
-					v68.context = if not canRenderNativeMoments(v40) then {
-						appUri = FlyoutContentSettings.MomentsExperienceUri
-					} else {
-						appPage = AppPage.Moments
-					}
-				elseif v40.isFlyoutEntryEnabled and v40.platformIntegrationEnabled then
-					v68.context = {
-						appPage = AppPage.Moments
-					}
-				end
+			if not (not FFlagFlyoutFilterWebViewsAndBrowserLinks or webViewSupported or not FlyoutContentSettings.itemRequiresWebView(
+				v10,
+				externalBrowserAllowed
+			)) then
+				continue
 			end
 
-			table.insert(t2, v68)
+			local clone = table.clone(v10)
+
+			if v9 == FlyoutContentSettings.ItemType.Moments and v6 ~= nil then
+				local context
+
+				if canRenderNativeMoments(v6) then
+					context = {
+						appPage = AppPage.Moments,
+						destinationType = FlyoutContentSettings.DestinationType.AppPage
+					}
+				else
+					context = {
+						appUri = FlyoutContentSettings.MomentsExperienceUri,
+						destinationType = FlyoutContentSettings.DestinationType.PlaceLaunch
+					}
+				end
+
+				clone.context = context
+			end
+
+			table.insert(clones2, clone)
 		end
 
-		return {
-			myLibraryItems = t1,
-			additionalNavigationItems = t2
-		}
-	end, {
-		v35,
-		v34,
+		return { myLibraryItems = clones, additionalNavigationItems = clones2 }
+	end
+
+	local v8
+
+	if FFlagFlyoutFilterWebViewsAndBrowserLinks then
+		v8 = webViewSupported
+	end
+
+	local v9
+
+	if FFlagFlyoutFilterWebViewsAndBrowserLinks then
+		v9 = externalBrowserAllowed
+	end
+
+	local v10
+
+	if FFlagFlyoutSidePanelTradesEntry then
+		v10 = hasPaidTradingAccess
+	end
+
+	local v11
+
+	if FFlagFlyoutGateLearnPlace then
+		v11 = v5
+	end
+
+	local v12
+
+	if FFlagLuaAppFixNotificationBadgeCountsSync then
+		v12 = v2
+	end
+
+	local v13
+
+	if FFlagLuaAppFixNotificationBadgeCountsSync then
+		v13 = v3
+	end
+
+	return useMemo(fn, {
+		hasFavoritesData,
+		hasContinueData,
 		FLYOUT_DEFAULT_POLICY,
-		v29,
-		v36,
-		v37,
-		v43,
-		if not v16 then nil else v42,
-		v40,
-		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v30,
-		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v31
+		v,
+		disablePremiumEntrypoint,
+		disableBlackbirdEntrypoints,
+		hideGiftCards,
+		v8,
+		v9,
+		v10,
+		v7,
+		v11,
+		v6,
+		v12,
+		v13
 	})
 end
 

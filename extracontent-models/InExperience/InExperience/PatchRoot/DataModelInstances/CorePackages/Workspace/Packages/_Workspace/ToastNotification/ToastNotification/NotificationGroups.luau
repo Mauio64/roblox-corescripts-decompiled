@@ -1,17 +1,16 @@
-local scriptParent = script.Parent
-local NotificationTypeEnum = require(scriptParent.type).NotificationTypeEnum
+local parent = script.Parent
+local kind = require(parent.type)
+
+local notificationTypeEnum = kind.NotificationTypeEnum
 
 return {
-	ChatMessageGroup = {
-		NotificationTypeEnum.ChatNewMessage,
-		NotificationTypeEnum.SquadInvitation
-	},
+	ChatMessageGroup = { notificationTypeEnum.ChatNewMessage, notificationTypeEnum.SquadInvitation },
 	ChatLandingNotificationsGroup = {
-		NotificationTypeEnum.ChatNewMessage,
-		NotificationTypeEnum.SquadInvitation,
-		NotificationTypeEnum.SquadStartPartyPrompt,
-		NotificationTypeEnum.SquadNudgeInvite
+		notificationTypeEnum.ChatNewMessage,
+		notificationTypeEnum.SquadInvitation,
+		notificationTypeEnum.SquadStartPartyPrompt,
+		notificationTypeEnum.SquadNudgeInvite
 	},
-	SquadNudgeInviteGroup = { NotificationTypeEnum.SquadNudgeInvite },
-	SquadStartPartyPromptGroup = { NotificationTypeEnum.SquadStartPartyPrompt }
+	SquadNudgeInviteGroup = { notificationTypeEnum.SquadNudgeInvite },
+	SquadStartPartyPromptGroup = { notificationTypeEnum.SquadStartPartyPrompt }
 }

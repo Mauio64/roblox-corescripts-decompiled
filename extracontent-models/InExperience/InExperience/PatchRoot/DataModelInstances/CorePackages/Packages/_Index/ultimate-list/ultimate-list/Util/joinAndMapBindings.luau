@@ -1,15 +1,10 @@
-local ancestor = script:FindFirstAncestor("ultimate-list")
-local React = require(ancestor.Parent.React)
+local ultimatelist = script:FindFirstAncestor("ultimate-list")
 
-local function joinAndMapBindings(p1: ((...any) -> ...any), p2, p3, p4) -- line: 6
-	-- upvalues: React (copy)
-	return React.joinBindings({
-		p2,
-		p3,
-		p4
-	}):map(function(p5) -- line: 12
-		-- upvalues: p1 (copy)
-		return p1(unpack(p5))
+local React = require(ultimatelist.Parent.React)
+
+local function joinAndMapBindings(callback, p, p2, p3)
+	return React.joinBindings({ p, p2, p3 }):map(function(list)
+		return callback(unpack(list))
 	end)
 end
 

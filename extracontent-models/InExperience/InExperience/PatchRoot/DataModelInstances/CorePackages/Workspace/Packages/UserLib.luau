@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.UserLib.UserLib))
+local UserLib = require(Workspace.UserLib.UserLib)
+
+return UserLib

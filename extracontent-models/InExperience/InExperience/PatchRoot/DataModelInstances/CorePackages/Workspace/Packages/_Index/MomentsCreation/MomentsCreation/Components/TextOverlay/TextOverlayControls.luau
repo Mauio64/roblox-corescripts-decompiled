@@ -1,121 +1,145 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local Dash = require(MomentsCreationParent.Dash)
-local Foundation = require(MomentsCreationParent.Foundation)
-local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
-local React = require(MomentsCreationParent.React)
-local Signals = require(MomentsCreationParent.Signals)
-local SignalsReact = require(MomentsCreationParent.SignalsReact)
+local parent = MomentsCreation.Parent
+
+local Dash = require(parent.Dash)
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
 local Button = Foundation.Button
 local Knob = Foundation.Knob
 local Slider = Foundation.Slider
 local View = Foundation.View
+
 local useCallback = React.useCallback
 local useMemo = React.useMemo
 local useDeviceInsets = MomentsCommon.Hooks.useDeviceInsets
 local useTokens = Foundation.Hooks.useTokens
 local useSignalState = SignalsReact.useSignalState
+
 local Constants = require(MomentsCreation.Constants)
 local useCreationFlowStrings = require(MomentsCreation.Hooks.useCreationFlowStrings)
-
 require(MomentsCreation.Types.CreationFlowTypes)
-require(MomentsCreationParent.MomentsTypes)
+require(parent.MomentsTypes)
+local FFlagMomentsTextOverlayV2Redesign = MomentsCommon.Flags.FFlagMomentsTextOverlayV2Redesign
+local FFlagMomentsTextOverlayTopNav = require(MomentsCreation.Flags.FFlagMomentsTextOverlayTopNav)
 
-local function TextOverlayControls(t1: {[any]: any}) -- line: 45
-	-- upvalues: useDeviceInsets (copy), useTokens (copy), useCreationFlowStrings (copy), useMemo (copy), Signals (copy), Constants (copy), useSignalState (copy), useCallback (copy), Dash (copy), React (copy), View (copy), Slider (copy), Knob (copy), Foundation (copy), Button (copy)
-	local controller = t1.controller
-	local v23 = useDeviceInsets()
-	local v24 = useTokens()
-	local v25 = useCreationFlowStrings()
-	local v26 = useMemo(function() -- line: 53
-		-- upvalues: Signals (copy), controller (copy), Constants (copy)
-		return Signals.createComputed(function(p1) -- line: 54
-			-- upvalues: controller (copy), Constants (copy)
-			local v36 = controller.getActiveSession(p1)
-			local v37 = if v36 == nil then nil else v36.getDraft(p1)
-			local v38 = v37 and v37[1]
+local function TextOverlayControls(p)
+	local controller = p.controller
+	local v = useDeviceInsets()
+	local v2 = useTokens()
+	local v3 = useCreationFlowStrings()
 
-			if v38 ~= nil then
-				return v38.textOverlayStyle.fontSize
+	local v4 = FFlagMomentsTextOverlayV2Redesign
+	local v5 = useSignalState((useMemo(function()
+		return Signals.createComputed(function(p2)
+			if v4 then
+				return Constants.TextOverlay.DefaultFontSize
 			end
 
-			return Constants.TextOverlay.DefaultFontSize
+			local activeSession = controller.getActiveSession(p2)
+			local v5
+
+			if activeSession ~= nil then
+				v5 = activeSession.getDraft(p2)
+			end
+
+			local v6 = v5 and v5[1]
+
+			if v6 == nil then
+				return Constants.TextOverlay.DefaultFontSize
+			end
+
+			return v6.textOverlayStyle.fontSize
 		end)
-	end, { controller })
-	local v27 = useSignalState(v26)
-	local v28 = useCallback(function(n1: number) -- line: 63
-		-- upvalues: controller (copy), Dash (copy)
-		local v32 = controller.getActiveSession(false)
+	end, { controller, v4 })))
 
-		if v32 == nil then
+	local onValueChanged = useCallback(function(fontSize: number)
+		local activeSession = controller.getActiveSession(false)
+
+		if activeSession == nil then
 			return
 		end
 
-		local v33 = v32.getDraft(false)
-		local v34 = v33 and v33[1]
+		local draft = activeSession.getDraft(false)
+		local v6 = draft and draft[1]
 
-		if v34 == nil then
+		if v6 == nil then
 			return
 		end
 
-		v32.update({ Dash.joinDeep(v34, {
-			textOverlayStyle = {
-				fontSize = n1
-			}
-		}) })
+		activeSession.update({ Dash.joinDeep(v6, {
+				textOverlayStyle = { fontSize = fontSize }
+			}) })
 	end, { controller })
-	local v29 = useCallback(function() -- line: 76
-		-- upvalues: controller (copy)
+
+	local onActivated = useCallback(function()
 		controller.discardActiveTool()
 	end, { controller })
-	local v30 = useCallback(function() -- line: 80
-		-- upvalues: controller (copy)
+
+	local onActivated2 = useCallback(function()
 		controller.commitActiveTool()
 	end, { controller })
 
-	return React.createElement(View, {
+	if FFlagMomentsTextOverlayTopNav then
+		return nil
+	end
+
+	local createElement = React.createElement
+	local v6 = {
+		LayoutOrder = p.layoutOrder,
 		tag = "col align-x-center align-y-bottom gap-large position-bottom-center anchor-bottom-center size-full-0 auto-y",
-		LayoutOrder = t1.layoutOrder,
 		padding = {
-			top = UDim.new(0, v24.Padding.Small),
-			bottom = UDim.new(0, (math.max(v23.bottom, v24.Padding.Small))),
-			left = UDim.new(0, (math.max(v23.left, v24.Padding.XLarge))),
-			right = UDim.new(0, (math.max(v23.right, v24.Padding.XLarge)))
+			top = UDim.new(0, v2.Padding.Small),
+			bottom = UDim.new(0, (math.max(v.bottom, v2.Padding.Small))),
+			left = UDim.new(0, (math.max(v.left, v2.Padding.XLarge))),
+			right = UDim.new(0, (math.max(v.right, v2.Padding.XLarge)))
 		}
-	}, {
-		FontSizeSlider = React.createElement(Slider, {
-			LayoutOrder = 1,
-			knob = React.createElement(Knob, {
-				size = Foundation.Enums.InputSize.Large
-			}),
+	}
+	local fontSizeSlider
+
+	if not v4 then
+		fontSizeSlider = React.createElement(Slider, {
+			knob = React.createElement(Knob, { size = Foundation.Enums.InputSize.Large }),
 			knobVisibility = Foundation.Enums.Visibility.Always,
-			onValueChanged = v28,
+			LayoutOrder = 1,
+			onValueChanged = onValueChanged,
 			size = Foundation.Enums.InputSize.XSmall,
 			range = NumberRange.new(Constants.TextOverlay.MinFontSize, Constants.TextOverlay.MaxFontSize),
-			value = math.clamp(v27, Constants.TextOverlay.MinFontSize, Constants.TextOverlay.MaxFontSize),
+			value = math.clamp(v5, Constants.TextOverlay.MinFontSize, Constants.TextOverlay.MaxFontSize),
 			variant = Foundation.Enums.SliderVariant.Standard
-		}),
-		Nav = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = "row flex-x-between align-x-center align-y-center gap-small size-full-0 auto-y"
-		}, {
-			BackButton = React.createElement(Button, {
-				LayoutOrder = 1,
-				fillBehavior = Foundation.Enums.FillBehavior.Fit,
-				text = v25.GeneralCtaBack,
-				variant = Foundation.Enums.ButtonVariant.Text,
-				onActivated = v29,
-				size = Foundation.Enums.InputSize.Medium
-			}),
-			DoneButton = React.createElement(Button, {
-				LayoutOrder = 2,
-				fillBehavior = Foundation.Enums.FillBehavior.Fit,
-				text = v25.GeneralCtaDone,
-				variant = Foundation.Enums.ButtonVariant.Text,
-				onActivated = v30,
-				size = Foundation.Enums.InputSize.Medium
-			})
 		})
+	end
+
+	return createElement(View, v6, {
+		FontSizeSlider = fontSizeSlider,
+		Nav = React.createElement(
+			View,
+			{
+				LayoutOrder = 2,
+				tag = "row flex-x-between align-x-center align-y-center gap-small size-full-0 auto-y"
+			},
+			{
+				BackButton = React.createElement(Button, {
+					fillBehavior = Foundation.Enums.FillBehavior.Fit,
+					LayoutOrder = 1,
+					text = v3.GeneralCtaBack,
+					variant = Foundation.Enums.ButtonVariant.Text,
+					onActivated = onActivated,
+					size = Foundation.Enums.InputSize.Medium
+				}),
+				DoneButton = React.createElement(Button, {
+					fillBehavior = Foundation.Enums.FillBehavior.Fit,
+					LayoutOrder = 2,
+					text = v3.GeneralCtaDone,
+					variant = Foundation.Enums.ButtonVariant.Text,
+					onActivated = onActivated2,
+					size = Foundation.Enums.InputSize.Medium
+				})
+			}
+		)
 	})
 end
 

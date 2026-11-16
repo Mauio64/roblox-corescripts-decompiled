@@ -1,7 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator("SET_MORE_MENU_OPEN", function(p1) -- line: 5
-	return {
-		isMainPageMoreMenuOpen = p1
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("SET_MORE_MENU_OPEN", function(isMainPageMoreMenuOpen)
+	return { isMainPageMoreMenuOpen = isMainPageMoreMenuOpen }
 end)

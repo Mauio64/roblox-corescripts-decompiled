@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local CreatorCredit = require(Workspace.DataHydration.DataHydration.CreatorCredit)
 
-return (require(_Workspace.DataHydration.DataHydration.CreatorCredit))
+return CreatorCredit

@@ -1,12 +1,12 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local LuaSocialLibrariesDeps = require(UserListParent.LuaSocialLibrariesDeps)
+local parent = UserList.Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
 local myRoduxNetworking = require(UserList.Networking.myRoduxNetworking)
 
-if require(UserList.Flags.FFlagUserListPresenceStoreMigration) then
+local FFlagUserListPresenceStoreMigration = require(UserList.Flags.FFlagUserListPresenceStoreMigration)
+
+if FFlagUserListPresenceStoreMigration then
 	return nil
 end
 
-return (LuaSocialLibrariesDeps.NetworkingPresence.config({
-	roduxNetworking = myRoduxNetworking
-}))
+return (LuaSocialLibrariesDeps.NetworkingPresence.config({ roduxNetworking = myRoduxNetworking }))

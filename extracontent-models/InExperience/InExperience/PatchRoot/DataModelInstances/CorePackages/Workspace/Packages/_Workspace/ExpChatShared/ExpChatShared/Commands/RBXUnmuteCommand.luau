@@ -1,13 +1,10 @@
 local getPlayersFromString = require(script.Parent.getPlayersFromString)
-local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
-local Actions = ExpChatShared.Actions
-local UserUnmuted = require(Actions.UserUnmuted)
-local ExpChatSharedParent = ExpChatShared.Parent
-local SharedFlags = require(ExpChatSharedParent.SharedFlags)
-local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
+local parent = script:FindFirstAncestor("ExpChatShared").Parent
+local SharedFlags = require(parent.SharedFlags)
 local FFlagExpChatUseChatMuteStore = SharedFlags.FFlagExpChatUseChatMuteStore
-local ChatMute = require(ExpChatSharedParent.ChatMute)
-local t1 = {
+local ChatMute = require(parent.ChatMute)
+
+local v = {
 	["CoreScripts.TextChat.Mute.Error.TargetDoesNotExist"] = "Roblox.Unmute.Error.PlayerNotFound",
 	["CoreScripts.TextChat.Mute.Error.MultipleMatches"] = "Roblox.Unmute.Error.MultipleMatches",
 	["CoreScripts.TextChat.Mute.Error.CannotMuteSelf"] = "Roblox.Unmute.Error.CannotMuteSelf",
@@ -15,91 +12,76 @@ local t1 = {
 }
 
 require(script.Parent.types)
-
 return {
 	name = script.Name,
-	alias = {
-		"/unmute",
-		"/um"
-	},
-	clientRun = function(p1, p2, p3, p4) -- line: 24
-		-- upvalues: FFlagExpChatUseChatMuteStore (copy), ChatMute (copy), t1 (copy), getPlayersFromString (copy), FFlagExpChatUseMessagesStore (copy), UserUnmuted (copy)
+	alias = { "/unmute", "/um" },
+	clientRun = function(object, p, value, p2)
 		if FFlagExpChatUseChatMuteStore then
-			local v15 = ChatMute.resolveUnmuteTarget(string.split(p3, " ")[2], (tostring(p2)))
+			local unmuteTarget = ChatMute.resolveUnmuteTarget(string.split(value, " ")[2], (tostring(p)))
 
-			if v15.playerInfo then
-				ChatMute.unmutePlayer(v15.playerInfo)
+			if unmuteTarget.playerInfo then
+				ChatMute.unmutePlayer(unmuteTarget.playerInfo)
 			end
 
 			return {
-				key = v15.key,
-				args = v15.args,
-				metadata = t1[v15.key]
+				key = unmuteTarget.key,
+				args = unmuteTarget.args,
+				metadata = v[unmuteTarget.key]
 			}
-		end
-
-		local v16 = string.split(p3, " ")[2]
-
-		if not v16 then
-			return {
-				key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
-				metadata = "Roblox.Unmute.Error.PlayerNotFound",
-				args = {
-					RBX_NAME = ""
-				}
-			}
-		end
-
-		local v17 = getPlayersFromString(p1:getState().Players, v16)
-
-		if #v17 == 0 then
-			return {
-				key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
-				metadata = "Roblox.Unmute.Error.PlayerNotFound",
-				args = {
-					RBX_NAME = v16
-				}
-			}
-		end
-
-		if #v17 > 1 then
-			return {
-				key = "InGame.Chat.Response.DisplayNameMultipleMatches",
-				metadata = "Roblox.Unmute.Error.MultipleMatches",
-				args = {}
-			}
-		end
-
-		local v18 = v17[1]
-
-		if v18.userId == tostring(p2) then
-			return {
-				key = "CoreScripts.TextChat.Mute.Error.CannotMuteSelf",
-				metadata = "Roblox.Unmute.Error.CannotMuteSelf",
-				args = {}
-			}
-		end
-
-		if FFlagExpChatUseMessagesStore then
-			if not p4 or not p4.messagesStore then
-				return {
-					key = "CoreScripts.TextChat.MessageStatus.Warning.Unknown",
-					metadata = "Roblox.Unmute.Error.ContextNotAvailable",
-					args = {}
-				}
-			end
-
-			p4.messagesStore.unmuteUser(v18.userId)
 		else
-			p1:dispatch(UserUnmuted(v18.userId))
-		end
+			local v2 = string.split(value, " ")[2]
 
-		return {
-			key = "CoreScripts.TextChat.Unmute.Success",
-			metadata = "Roblox.Unmute.Info.Success",
-			args = {
-				RBX_NAME = v18.nameToDisplay
+			if not v2 then
+				return {
+					key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
+					args = { RBX_NAME = "" },
+					metadata = "Roblox.Unmute.Error.PlayerNotFound"
+				}
+			end
+
+			local playersFromString = getPlayersFromString(object:getState().Players, v2)
+
+			if #playersFromString == 0 then
+				return {
+					key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
+					args = { RBX_NAME = v2 },
+					metadata = "Roblox.Unmute.Error.PlayerNotFound"
+				}
+			end
+
+			if #playersFromString > 1 then
+				return {
+					key = "InGame.Chat.Response.DisplayNameMultipleMatches",
+					args = {},
+					metadata = "Roblox.Unmute.Error.MultipleMatches"
+				}
+			end
+
+			local v3 = playersFromString[1]
+
+			if v3.userId == tostring(p) then
+				return {
+					key = "CoreScripts.TextChat.Mute.Error.CannotMuteSelf",
+					args = {},
+					metadata = "Roblox.Unmute.Error.CannotMuteSelf"
+				}
+			end
+
+			if p2 and p2.messagesStore then
+				p2.messagesStore.unmuteUser(v3.userId)
+
+				return {
+					key = "CoreScripts.TextChat.Unmute.Success",
+					args = { RBX_NAME = v3.nameToDisplay },
+					metadata = "Roblox.Unmute.Info.Success"
+				}
+			end
+
+			return {
+				key = "CoreScripts.TextChat.MessageStatus.Warning.Unknown",
+				args = {},
+				metadata = "Roblox.Unmute.Error.ContextNotAvailable"
 			}
-		}
+		end
 	end
 }

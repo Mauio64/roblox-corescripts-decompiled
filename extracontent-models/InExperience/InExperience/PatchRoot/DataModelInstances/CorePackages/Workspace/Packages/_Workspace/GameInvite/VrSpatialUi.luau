@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.VrSpatialUi.VrSpatialUi))
+local VrSpatialUi = require(Workspace.VrSpatialUi.VrSpatialUi)
+
+return VrSpatialUi

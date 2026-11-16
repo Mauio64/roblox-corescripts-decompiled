@@ -1,15 +1,35 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local AvatarScreenProperties = require(Parent.AvatarExperienceNavigation).AvatarRoute.AvatarScreenProperties
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
 
-local function getUnifiedLoggingSurface(p1) -- line: 9
-	-- upvalues: AvatarScreenProperties (copy)
-	local v5 = if not p1 or not p1.opaque then nil else AvatarScreenProperties[p1.opaque.name]
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local AvatarScreenProperties = AvatarExperienceNavigation.AvatarRoute.AvatarScreenProperties
+local UnifiedLoggingSurface = AvatarExperienceNavigation.Enums.UnifiedLoggingSurface
 
-	if v5 and v5.analyticsData then
-		return v5.analyticsData.unifiedLoggingSurface
+local FFlagAXUnifiedEventStrictPayloads = AvatarExperienceFlags.FFlagAXUnifiedEventStrictPayloads
+
+local function getUnifiedLoggingSurface(p)
+	local v
+
+	if p and p.opaque then
+		v = AvatarScreenProperties[p.opaque.name]
 	end
 
-	return nil
+	local unifiedLoggingSurface
+
+	if v and v.analyticsData then
+		unifiedLoggingSurface = v.analyticsData.unifiedLoggingSurface
+	end
+
+	if unifiedLoggingSurface then
+		return unifiedLoggingSurface
+	end
+
+	if FFlagAXUnifiedEventStrictPayloads then
+		return UnifiedLoggingSurface.UNDEFINED_SURFACE
+	end
+
+	unifiedLoggingSurface = nil
+	return unifiedLoggingSurface
 end
 
 return getUnifiedLoggingSurface

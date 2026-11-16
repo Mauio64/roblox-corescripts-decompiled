@@ -1,8 +1,6 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+local ActionCreator = require(parent.ActionCreator)
 
-return require(scriptParent.ActionCreator)(script.Name, function(p1: ((...any) -> ...any)?, t1: {[any]: any}?) -- line: 4
-	return {
-		onSelectionLost = p1,
-		keybinds = t1
-	}
+return ActionCreator(script.Name, function(onSelectionLost, keybinds)
+	return { onSelectionLost = onSelectionLost, keybinds = keybinds }
 end)

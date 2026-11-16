@@ -1,19 +1,16 @@
-local Parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 
-local function useMenuItemCursor() -- line: 10
-	-- upvalues: Foundation (copy), React (copy)
-	local v5 = Foundation.Hooks.useTokens()
-
-	return React.useMemo(function() -- line: 12
-		-- upvalues: v5 (copy)
+local function useMenuItemCursor()
+	local v = Foundation.Hooks.useTokens()
+	return React.useMemo(function()
 		return {
-			radius = UDim.new(0, v5.Radius.Small),
-			offset = v5.Size.Size_200,
-			borderWidth = v5.Stroke.Thicker
+			radius = UDim.new(0, v.Radius.Small),
+			offset = v.Size.Size_200,
+			borderWidth = v.Stroke.Thicker
 		}
-	end, { v5 })
+	end, { v })
 end
 
 return useMenuItemCursor

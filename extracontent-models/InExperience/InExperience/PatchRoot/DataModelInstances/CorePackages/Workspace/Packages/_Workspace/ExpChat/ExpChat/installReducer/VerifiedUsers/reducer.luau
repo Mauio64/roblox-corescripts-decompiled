@@ -1,27 +1,26 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local Rodux = require(Parent.Rodux)
-local Dictionary = require(Parent.llama).Dictionary
-local Actions = require(Parent.ExpChatShared).Actions
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local ExpChatShared = require(parent.ExpChatShared)
+
+local Actions = ExpChatShared.Actions
 local PlayerAdded = Actions.PlayerAdded
 local PlayerRemoved = Actions.PlayerRemoved
 
 return Rodux.createReducer({}, {
-	[PlayerAdded.name] = function(t1: {[any]: any}, p1) -- line: 16
-		-- upvalues: Dictionary (copy)
-		if not p1.hasVerifiedBadge then
-			return t1
+	[PlayerAdded.name] = function(p, p2)
+		if not p2.hasVerifiedBadge then
+			return p
 		end
 
-		return Dictionary.join(t1, {
-			[p1.userId] = p1.hasVerifiedBadge
-		})
+		return dictionary.join(p, { [p2.userId] = p2.hasVerifiedBadge })
 	end,
-	[PlayerRemoved.name] = function(t2: {[any]: any}, p2) -- line: 25
-		-- upvalues: Dictionary (copy)
-		if t2[p2.userId] == nil then
-			return t2
+	[PlayerRemoved.name] = function(p, p2)
+		if p[p2.userId] == nil then
+			return p
 		end
 
-		return Dictionary.removeKey(t2, p2.userId)
+		return dictionary.removeKey(p, p2.userId)
 	end
 })

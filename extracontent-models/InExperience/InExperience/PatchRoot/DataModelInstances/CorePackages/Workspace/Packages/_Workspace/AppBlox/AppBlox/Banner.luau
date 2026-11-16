@@ -1,1 +1,3 @@
-return (require(script.Banner))
+local Banner = require(script.Banner)
+
+return Banner

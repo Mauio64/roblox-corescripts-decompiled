@@ -1,8 +1,4 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local enumerate = require(parent.enumerate)
 
-return require(ParentParent.enumerate)("InputBindingKind", {
-	"Begin",
-	"End",
-	"Step",
-	"MoveStep"
-})
+return enumerate("InputBindingKind", { "Begin", "End", "Step", "MoveStep" })

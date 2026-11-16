@@ -1,69 +1,63 @@
-local Parent = script:FindFirstAncestor("SocialExperienceJoin").Parent
-local Cryo = require(Parent.Cryo)
-local Signals = require(Parent.Signals)
-local createSignal = Signals.createSignal
-local v5 = Signals.createComputed(function(_) -- line: 27
-	-- upvalues: createSignal (copy), Cryo (copy)
-	local v7, v8 = createSignal({})
-	local v9, v10 = createSignal(nil)
+local parent = script:FindFirstAncestor("SocialExperienceJoin").Parent
 
-	local function setUserSettingsAction(p2) -- line: 39
-		-- upvalues: v10 (copy)
-		v10(p2)
+local Cryo = require(parent.Cryo)
+local Signals = require(parent.Signals)
+
+local createSignal = Signals.createSignal
+local computed = Signals.createComputed(function(_)
+	local signal, v = createSignal({})
+	local signal2, v2 = createSignal(nil)
+
+	local function setPlayabilityEntry(p: string, p2)
+		if not p or p == "" then
+			return
+		end
+
+		local v3 = signal(false)
+		v(Cryo.Dictionary.join(v3, { [p] = p2 }))
+	end
+
+	local function setUserSettingsAction(p)
+		v2(p)
+	end
+
+	local function clearPlayabilityEntry(p: string)
+		if not p or p == "" then
+			return
+		end
+
+		local v3 = signal(false)
+
+		if v3[p] == nil then
+			return
+		end
+
+		v(Cryo.Dictionary.join(v3, { [p] = Cryo.None }))
+	end
+
+	local function clearCache(p: string?)
+		if p and p ~= "" then
+			local v3 = signal(false)
+			v(Cryo.Dictionary.join(v3, { [p] = Cryo.None }))
+		else
+			v({})
+		end
+
+		v2(nil)
 	end
 
 	return {
-		getPlayabilityEntries = v7,
-		getUserSettings = v9,
-		setPlayabilityEntry = function(s1: string, p3) -- line: 31
-			-- upvalues: v7 (copy), v8 (copy), Cryo (copy)
-			if not s1 or s1 == "" then
-				return
-			end
-
-			local v14 = v7(false)
-
-			v8(Cryo.Dictionary.join(v14, {
-				[s1] = p3
-			}))
-		end,
+		getPlayabilityEntries = signal,
+		getUserSettings = signal2,
+		setPlayabilityEntry = setPlayabilityEntry,
 		setUserSettings = setUserSettingsAction,
-		clearPlayabilityEntry = function(s2: string) -- line: 43
-			-- upvalues: v7 (copy), v8 (copy), Cryo (copy)
-			if not s2 or s2 == "" then
-				return
-			end
-
-			local v17 = v7(false)
-
-			if v17[s2] == nil then
-				return
-			end
-
-			v8(Cryo.Dictionary.join(v17, {
-				[s2] = Cryo.None
-			}))
-		end,
-		clearCache = function(s3: string?) -- line: 54
-			-- upvalues: v7 (copy), v8 (copy), Cryo (copy), v10 (copy)
-			if s3 and s3 ~= "" then
-				local v19 = v7(false)
-
-				v8(Cryo.Dictionary.join(v19, {
-					[s3] = Cryo.None
-				}))
-			else
-				v8({})
-			end
-
-			v10(nil)
-		end
+		clearPlayabilityEntry = clearPlayabilityEntry,
+		clearCache = clearCache
 	}
 end)
 
 return {
-	get = function() -- line: 75
-		-- upvalues: v5 (copy)
-		return v5(false)
+	get = function()
+		return computed(false)
 	end
 }

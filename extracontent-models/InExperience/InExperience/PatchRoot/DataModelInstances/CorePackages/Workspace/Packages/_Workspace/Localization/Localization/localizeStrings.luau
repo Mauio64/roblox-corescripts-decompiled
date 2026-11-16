@@ -1,37 +1,52 @@
-local Parent = script:FindFirstAncestor("Localization").Parent
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("Localization").Parent
+local ArgCheck = require(parent.ArgCheck)
 
-local function localizeStrings(p1, p2) -- line: 6
-	-- upvalues: ArgCheck (copy)
-	local t1 = {}
+local function localizeStrings(object, items)
+	local result = {}
 
-	for k, v in pairs(p2) do
-		if typeof(v) == "table" then
-			if typeof(v[1]) == "string" then
-				local ok, result = pcall(function() -- line: 12
-					-- upvalues: p1 (copy), v (copy)
-					return p1:Format(v[1], v)
+	for k, item in pairs(items) do
+		if typeof(item) == "table" then
+			if typeof(item[1]) == "string" then
+				local success, result2 = pcall(function()
+					return object:Format(item[1], item)
 				end)
 
-				ArgCheck.isEqual(ok, true, string.format("LocalizationConsumer finding value for translation key[%s]: %s", k, v[1]))
-				t1[k] = ok and result or ""
+				ArgCheck.isEqual(
+					success,
+					true,
+					string.format("LocalizationConsumer finding value for translation key[%s]: %s", k, item[1])
+				)
+
+				result[k] = success and result2 or ""
 			else
-				error(string.format("%s[1] in stringsToBeLocalized must be a string, got %s instead", k, (typeof(v[1]))))
+				error(string.format(
+					"%s[1] in stringsToBeLocalized must be a string, got %s instead",
+					k,
+					(typeof(item[1]))
+				))
 			end
-		elseif typeof(v) == "string" then
-			local ok, result = pcall(function() -- line: 37
-				-- upvalues: p1 (copy), v (copy)
-				return p1:Format(v)
+		elseif typeof(item) == "string" then
+			local success, result2 = pcall(function()
+				return object:Format(item)
 			end)
 
-			ArgCheck.isEqual(ok, true, string.format("LocalizationConsumer finding value for translation key[%s]: %s", k, v))
-			t1[k] = ok and result or ""
+			ArgCheck.isEqual(
+				success,
+				true,
+				string.format("LocalizationConsumer finding value for translation key[%s]: %s", k, item)
+			)
+
+			result[k] = success and result2 or ""
 		else
-			error(string.format("%s in stringsToBeLocalized must be a string or table, got %s instead", k, (typeof(v))))
+			error(string.format(
+				"%s in stringsToBeLocalized must be a string or table, got %s instead",
+				k,
+				(typeof(item))
+			))
 		end
 	end
 
-	return t1
+	return result
 end
 
 return localizeStrings

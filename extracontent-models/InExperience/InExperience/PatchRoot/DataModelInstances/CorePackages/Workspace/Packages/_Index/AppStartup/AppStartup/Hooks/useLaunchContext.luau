@@ -1,14 +1,11 @@
 local AppStartup = script:FindFirstAncestor("AppStartup")
-local AppStartupParent = AppStartup.Parent
-local RoactUtils = require(AppStartupParent.RoactUtils)
-
+local parent = AppStartup.Parent
+local RoactUtils = require(parent.RoactUtils)
 require(AppStartup.Enums)
-
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-return function() -- line: 7
-	-- upvalues: useSelector (copy)
-	return useSelector(function(p1) -- line: 8
-		return p1.LaunchContext
+return function()
+	return useSelector(function(p)
+		return p.LaunchContext
 	end)
 end

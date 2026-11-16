@@ -1,365 +1,185 @@
-local Parent = script:FindFirstAncestor("ProgressLoading").Parent
-local React = require(Parent.React)
-local Motion = require(Parent.Motion)
-local Foundation = require(Parent.Foundation)
-local Localization = require(Parent.Localization)
-local InExperienceLocales = require(Parent.InExperienceLocales)
-local TiltLoadingScreenView = require(script.Parent.TiltLoadingScreenView)
-local useTiltLoadingScreenViewModel = require(script.Parent.Hooks.useTiltLoadingScreenViewModel)
-local useLoadingScreenAnimation = require(script.Parent.Hooks.useLoadingScreenAnimation)
+local parent = script:FindFirstAncestor("ProgressLoading").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local InExperienceLocales = require(parent.InExperienceLocales)
+local Responsive = require(parent.Responsive)
+local useDeviceInsets = Responsive.useDeviceInsets
+local usePreferredInput = Responsive.usePreferredInput
+local getBuilderIconForKeycode = Foundation.Utility.getBuilderIconForKeycode
+
+local TiltLoadingScreenContent = require(script.Parent.TiltLoadingScreenContent)
+local useExperienceLoadingLifecycle = require(script.Parent.Hooks.useExperienceLoadingLifecycle)
+local useDeferredLoadingLifecycle = require(script.Parent.Hooks.useDeferredLoadingLifecycle)
 local Constants = require(script.Parent.Constants)
-local shouldHoldForExit = require(script.Parent.shouldHoldForExit)
-local FFlagEnableTiltLoadingScreen = require(Parent.SharedFlags).FFlagEnableTiltLoadingScreen
-local FFlagIncreaseLoadingScreenOrder = require(Parent.SharedFlags).FFlagIncreaseLoadingScreenOrder
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableTiltLoadingScreen = SharedFlags.FFlagEnableTiltLoadingScreen
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagIncreaseLoadingScreenOrder = SharedFlags2.FFlagIncreaseLoadingScreenOrder
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagTiltLoadingScreenConsoleHints = SharedFlags3.FFlagTiltLoadingScreenConsoleHints
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagTiltLoadingScreenEnterExitHold = SharedFlags4.FFlagTiltLoadingScreenEnterExitHold
+local PioneerUtils = require(parent.PioneerUtils)
+local isPioneerLaunch = PioneerUtils.isPioneerLaunch
+
 local ContextActionService = game:GetService("ContextActionService")
 local LocalizationService = game:GetService("LocalizationService")
-local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local ANIMATION = Constants.ANIMATION
-local v20 = Motion.createState({
-	reveal = 1
-}, {
-	default = Motion.transition({
-		duration = ANIMATION.chromeFadeIn
-	})
-})
-local v21 = Motion.createState({
-	reveal = 0
-}, {
-	default = Motion.transition({
-		duration = ANIMATION.closeDur
-	})
-})
 
 require(script.Parent.Types)
 
-local function TiltLoadingScreenContainer(p1) -- line: 41
-	-- upvalues: FFlagEnableTiltLoadingScreen (copy), React (copy), ReplicatedFirst (copy), UserGameSettings (copy), Motion (copy), v20 (copy), useTiltLoadingScreenViewModel (copy), useLoadingScreenAnimation (copy), InExperienceLocales (copy), LocalizationService (copy), shouldHoldForExit (copy), ANIMATION (copy), v21 (copy), Players (copy), ContextActionService (copy), FFlagIncreaseLoadingScreenOrder (copy), Constants (copy), Foundation (copy), Localization (copy), TiltLoadingScreenView (copy)
+local function TiltLoadingScreenContainer(props)
 	if not FFlagEnableTiltLoadingScreen then
 		return nil
 	end
 
-	local v24, v25 = React.useState(function() -- line: 46
-		-- upvalues: ReplicatedFirst (copy)
-		return not ReplicatedFirst:IsDefaultLoadingGuiRemoved()
-	end)
-	local v26, v27 = React.useState(false)
-	local ReducedMotion = UserGameSettings.ReducedMotion
-	local v29, v30 = Motion.useMotion(v20)
-	local v31 = React.useRef(v30)
+	local onTopOfCoreBlur = props.deferredJoin ~= nil
+	local v = useExperienceLoadingLifecycle(not onTopOfCoreBlur, props.milestones, props.onDismissComplete)
+	local v2
 
-	v31.current = v30
+	if props.deferredJoin then
+		v2 = props.deferredJoin.assetService
+	end
 
-	local v32 = React.useRef(p1.onDismissComplete)
+	local milestones, current = useDeferredLoadingLifecycle(onTopOfCoreBlur, v2, props.onCancel)
 
-	v32.current = p1.onDismissComplete
+	local reducedMotion = UserGameSettings.ReducedMotion
+	local ref = React.useRef(props.onCancel)
 
-	local v33 = React.useRef(p1.onCancel)
+	if not onTopOfCoreBlur then
+		current = props.onCancel
+	end
 
-	v33.current = p1.onCancel
+	ref.current = current
+	local v3
 
-	local v34 = useTiltLoadingScreenViewModel(p1.placeId)
-	local v35 = useLoadingScreenAnimation({
-		reducedMotion = ReducedMotion,
-		contentReady = v34.gameData ~= nil,
-		isDismissing = v26
-	})
-	local v36 = React.useMemo(function() -- line: 64
-		-- upvalues: InExperienceLocales (copy), LocalizationService (copy)
+	if FFlagTiltLoadingScreenConsoleHints then
+		v3 = usePreferredInput()
+	end
+
+	local isDirectionalInput = FFlagTiltLoadingScreenConsoleHints and v3 == Responsive.Input.Directional
+	local gamepadCancelIcon
+
+	if isDirectionalInput then
+		gamepadCancelIcon = getBuilderIconForKeycode(Enum.KeyCode.ButtonB)
+	end
+
+	local safeAreaInsets = useDeviceInsets()
+	local localization = React.useMemo(function()
 		return InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
 	end, {})
 
-	React.useEffect(function() -- line: 68
-		-- upvalues: shouldHoldForExit (copy), UserGameSettings (copy), ANIMATION (copy), v27 (copy), v31 (copy), v21 (copy), ReplicatedFirst (copy), v25 (copy), v32 (copy), Players (copy)
-		local t1 = {}
-		local u41 = false
-		local u42 = false
-		local u43 = nil
-		local u44 = nil
-		local u45 = nil
-		local u46 = nil
-		local u47 = false
-
-		local function dismiss() -- line: 78
-			-- upvalues: u41 (ref), u47 (ref), u46 (ref), shouldHoldForExit (copy), UserGameSettings (copy), ANIMATION (copy), u42 (ref), dismiss (copy), v27 (copy), u43 (ref), v31 (copy), v21 (copy), u44 (ref), ReplicatedFirst (copy), v25 (copy), v32 (copy)
-			if u41 then
-				return
-			end
-
-			if u47 and u46 ~= nil then
-				return
-			end
-
-			if shouldHoldForExit(UserGameSettings.ReducedMotion, u47) then
-				u47 = true
-				u46 = task.delay(ANIMATION.enterExitHold, function() -- line: 89
-					-- upvalues: u46 (ref), u42 (ref), dismiss (copy)
-					u46 = nil
-
-					if u42 then
-						return
-					end
-
-					dismiss()
-				end)
-
-				return
-			end
-
-			u41 = true
-			v27(true)
-
-			local function fadeChrome() -- line: 102
-				-- upvalues: u43 (ref), u42 (ref), v31 (copy), v21 (copy), u44 (ref), ANIMATION (copy), ReplicatedFirst (copy), v25 (copy), v32 (copy)
-				u43 = nil
-
-				if u42 then
-					return
-				end
-
-				v31.current(v21, {
-					onAnimationComplete = function(p2) -- line: 108
-						-- upvalues: u42 (ref), u44 (ref), ANIMATION (copy), ReplicatedFirst (copy), v25 (copy), v32 (copy)
-						if p2 ~= true or u42 then
-							return
-						end
-
-						u44 = task.delay(ANIMATION.endPause, function() -- line: 112
-							-- upvalues: u44 (ref), u42 (ref), ReplicatedFirst (copy), v25 (copy), v32 (copy)
-							u44 = nil
-
-							if u42 then
-								return
-							end
-
-							ReplicatedFirst:SetDefaultLoadingGuiRemoved()
-							v25(false)
-
-							if v32.current then
-								v32.current()
-							end
-						end)
-					end
-				})
-			end
-
-			if UserGameSettings.ReducedMotion then
-				fadeChrome()
-
-				return
-			end
-
-			u43 = task.delay(ANIMATION.closeDur, fadeChrome)
-		end
-		local function waitForCharacterAndDismiss() -- line: 134
-			-- upvalues: u45 (ref), Players (copy), u42 (ref), dismiss (copy)
-			if u45 then
-				return
-			end
-
-			u45 = task.spawn(function() -- line: 138
-				-- upvalues: Players (copy), u45 (ref), u42 (ref), dismiss (copy)
-				if Players.CharacterAutoLoads then
-					local LocalPlayer = Players.LocalPlayer
-
-					if not LocalPlayer then
-						Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-						LocalPlayer = Players.LocalPlayer
-					end
-
-					if not LocalPlayer.Character then
-						LocalPlayer.CharacterAdded:Wait()
-					end
-				end
-
-				u45 = nil
-
-				if u42 then
-					return
-				end
-
-				dismiss()
-			end)
-		end
-		local function handleFinishedReplicating() -- line: 157
-			-- upvalues: u45 (ref), Players (copy), u42 (ref), dismiss (copy), t1 (copy)
-			if game:IsLoaded() then
-				if u45 then
-					return
-				end
-
-				u45 = task.spawn(function() -- line: 138
-					-- upvalues: Players (copy), u45 (ref), u42 (ref), dismiss (copy)
-					if Players.CharacterAutoLoads then
-						local LocalPlayer = Players.LocalPlayer
-
-						if not LocalPlayer then
-							Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-							LocalPlayer = Players.LocalPlayer
-						end
-
-						if not LocalPlayer.Character then
-							LocalPlayer.CharacterAdded:Wait()
-						end
-					end
-
-					u45 = nil
-
-					if u42 then
-						return
-					end
-
-					dismiss()
-				end)
-
-				return
-			end
-
-			local connection = nil
-
-			connection = game.Loaded:Connect(function() -- line: 162
-				-- upvalues: connection (ref), u45 (ref), Players (copy), u42 (ref), dismiss (copy)
-				connection:Disconnect()
-
-				if u45 then
-					return
-				end
-
-				u45 = task.spawn(function() -- line: 138
-					-- upvalues: Players (copy), u45 (ref), u42 (ref), dismiss (copy)
-					if Players.CharacterAutoLoads then
-						local LocalPlayer = Players.LocalPlayer
-
-						if not LocalPlayer then
-							Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-							LocalPlayer = Players.LocalPlayer
-						end
-
-						if not LocalPlayer.Character then
-							LocalPlayer.CharacterAdded:Wait()
-						end
-					end
-
-					u45 = nil
-
-					if u42 then
-						return
-					end
-
-					dismiss()
-				end)
-			end)
-			table.insert(t1, connection)
+	React.useEffect(function()
+		if isPioneerLaunch() then
+			return
 		end
 
-		table.insert(t1, ReplicatedFirst.FinishedReplicating:Connect(handleFinishedReplicating))
-		table.insert(t1, ReplicatedFirst.RemoveDefaultLoadingGuiSignal:Connect(function() -- line: 173
-			-- upvalues: dismiss (copy)
-			dismiss()
-		end))
+		local contextActionService = props.contextActionService or ContextActionService
+		local v4 = false
+		contextActionService:BindCoreAction("CancelGameLoad", function(_, p)
+			if p == Enum.UserInputState.Begin then
+				v4 = true
+			elseif p == Enum.UserInputState.End and v4 then
+				v4 = false
 
-		if ReplicatedFirst:IsFinishedReplicating() then
-			handleFinishedReplicating()
-		end
-
-		if ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
-			dismiss()
-		end
-
-		return function() -- line: 186
-			-- upvalues: u42 (ref), u46 (ref), u43 (ref), u44 (ref), u45 (ref), t1 (copy)
-			u42 = true
-
-			if u46 then
-				task.cancel(u46)
-			end
-
-			if u43 then
-				task.cancel(u43)
-			end
-
-			if u44 then
-				task.cancel(u44)
-			end
-
-			if u45 and coroutine.status(u45) ~= "dead" then
-				task.cancel(u45)
-			end
-
-			for _, v55 in t1 do
-				v55:Disconnect()
-			end
-		end
-	end, {})
-	React.useEffect(function() -- line: 205
-		-- upvalues: ContextActionService (copy), v33 (copy)
-		local u51 = false
-
-		ContextActionService:BindCoreAction("CancelGameLoad", function(_, p4) -- line: 207
-			-- upvalues: u51 (ref), v33 (copy)
-			if p4 == Enum.UserInputState.Begin then
-				u51 = true
-
-				return
-			end
-
-			if p4 == Enum.UserInputState.End and u51 then
-				u51 = false
-
-				if v33.current then
-					v33.current(false)
+				if ref.current then
+					ref.current(false, true)
 				end
 			end
 		end, false, Enum.KeyCode.ButtonB)
 
-		return function() -- line: 218
-			-- upvalues: ContextActionService (copy)
-			ContextActionService:UnbindCoreAction("CancelGameLoad")
+		return function()
+			contextActionService:UnbindCoreAction("CancelGameLoad")
+		end
+	end, { props.contextActionService })
+	local preferences = React.useMemo(function()
+		return { reducedMotion = reducedMotion }
+	end, { reducedMotion })
+	local onCancel = React.useCallback(function()
+		if ref.current then
+			ref.current(true)
 		end
 	end, {})
 
-	local v37 = React.useMemo(function() -- line: 222
-		-- upvalues: ReducedMotion (copy)
-		return {
-			reducedMotion = ReducedMotion
-		}
-	end, { ReducedMotion })
-	local v38 = React.useCallback(function() -- line: 225
-		-- upvalues: v33 (copy)
-		if v33.current then
-			v33.current(true)
-		end
-	end, {})
-
-	if not v24 then
+	if not v.isVisible then
 		return nil
 	end
 
-	local v39 = if not FFlagIncreaseLoadingScreenOrder then Constants.DISPLAY_ORDER else Constants.DISPLAY_ORDER + 1
+	local displayOrder
 
-	return React.createElement("ScreenGui", {
+	if props.deferredJoin then
+		displayOrder = props.deferredJoin.displayOrder
+	elseif FFlagIncreaseLoadingScreenOrder then
+		displayOrder = Constants.DISPLAY_ORDER + 1
+	else
+		displayOrder = Constants.DISPLAY_ORDER
+	end
+
+	local createElement = React.createElement
+	local v4 = {
+		DisplayOrder = displayOrder,
+		OnTopOfCoreBlur = onTopOfCoreBlur,
 		IgnoreGuiInset = true,
-		DisplayOrder = v39,
+		ScreenInsets = Enum.ScreenInsets.None,
+		ClipToDeviceSafeArea = false,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, {
-		Foundation = React.createElement(Foundation.FoundationProvider, {
-			theme = Foundation.Enums.Theme.Dark,
-			preferences = v37
-		}, {
-			Localization = React.createElement(Localization.LocalizationProvider, {
-				localization = v36
-			}, {
-				View = React.createElement(TiltLoadingScreenView, {
-					isMobile = v34.isMobile,
-					chromeReveal = v29.reveal,
-					animation = v35,
-					gameData = v34.gameData,
-					thumbnailUrl = v34.thumbnailUrl,
-					isAutoTranslated = v34.isAutoTranslated,
-					statusPanel = v34.statusPanel,
-					onCancel = v38
-				})
+	}
+
+	local createElement2 = React.createElement
+	local foundationProvider = Foundation.FoundationProvider
+	local v5 = { colorMode = Foundation.Enums.ColorMode.Dark, preferences = preferences }
+
+	local createElement3 = React.createElement
+	local localizationProvider = Localization.LocalizationProvider
+
+	local createElement4 = React.createElement
+	local v6 = {
+		placeId = props.placeId,
+		destinationUniverseId = 0,
+		milestones = 0,
+		reducedMotion = 0,
+		isDismissing = 0,
+		onEnterComplete = 0,
+		isDirectionalInput = 0,
+		gamepadCancelIcon = 0,
+		chromeReveal = 0,
+		onCancel = 0,
+		safeAreaInsets = 0
+	}
+	local destinationUniverseId
+
+	if props.deferredJoin then
+		destinationUniverseId = props.deferredJoin.universeId
+	end
+
+	v6.destinationUniverseId = destinationUniverseId
+
+	if not onTopOfCoreBlur then
+		milestones = v.milestones
+	end
+
+	v6.milestones = milestones
+	v6.reducedMotion = reducedMotion
+	v6.isDismissing = v.isDismissing
+	local onEnterComplete
+
+	if not (onTopOfCoreBlur or not FFlagTiltLoadingScreenEnterExitHold) then
+		onEnterComplete = v.onEnterComplete
+	end
+
+	v6.onEnterComplete = onEnterComplete
+
+	v6.isDirectionalInput = isDirectionalInput
+	v6.gamepadCancelIcon = gamepadCancelIcon
+	v6.chromeReveal = v.chromeReveal
+	v6.onCancel = onCancel
+	v6.safeAreaInsets = safeAreaInsets
+	return createElement("ScreenGui", v4, {
+		Foundation = createElement2(foundationProvider, v5, {
+			Localization = createElement3(localizationProvider, { localization = localization }, {
+				View = createElement4(TiltLoadingScreenContent, v6)
 			})
 		})
 	})

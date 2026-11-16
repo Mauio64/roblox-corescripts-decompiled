@@ -1,33 +1,29 @@
 local ReactSceneUnderstanding = script:FindFirstAncestor("ReactSceneUnderstanding")
-local useEffect = require(ReactSceneUnderstanding.Parent.React).useEffect
 
-local function useTimedLoop(n1: number, p1: ((...any) -> ...any)) -- line: 7
-	-- upvalues: useEffect (copy)
-	useEffect(function() -- line: 8
-		-- upvalues: n1 (copy), p1 (copy)
-		local u6 = true
+local React = require(ReactSceneUnderstanding.Parent.React)
 
-		task.spawn(function() -- line: 11
-			-- upvalues: u6 (ref), n1 (copy), p1 (copy)
-			while u6 do
-				task.wait(n1)
+local useEffect = React.useEffect
 
-				if not u6 then
-					return
+local function useTimedLoop(duration: number, callback)
+	useEffect(function()
+		local flag = true
+
+		task.spawn(function()
+			while flag do
+				task.wait(duration)
+
+				if not flag then
+					break
 				end
 
-				p1()
+				callback()
 			end
 		end)
 
-		return function() -- line: 23
-			-- upvalues: u6 (ref)
-			u6 = false
+		return function()
+			flag = false
 		end
-	end, {
-		n1,
-		p1
-	})
+	end, { duration, callback })
 end
 
 return useTimedLoop

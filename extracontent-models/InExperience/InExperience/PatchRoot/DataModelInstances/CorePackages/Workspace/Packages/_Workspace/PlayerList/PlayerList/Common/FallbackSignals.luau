@@ -1,5 +1,5 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-return {
-	getHasActiveLeaderboard = require(ParentParent.Signals).createSignal(false)
-}
+local Signals = require(parent.Signals)
+
+return { getHasActiveLeaderboard = Signals.createSignal(false) }

@@ -1,576 +1,624 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
+local parent = Moments.Parent
+
 local HttpService = game:GetService("HttpService")
-local MomentsCommon = require(MomentsParent.MomentsCommon)
-local MomentsTypes = require(MomentsParent.MomentsTypes)
-local Navigation = require(MomentsParent.Navigation)
-local React = require(MomentsParent.React)
-local RoactNavigation = require(MomentsParent.RoactNavigation)
-local SharedFlags = require(MomentsParent.SharedFlags)
-local AppPage = require(MomentsParent.RobloxAppEnums).AppPage
-local RobloxAppEvents = require(MomentsParent.RobloxAppEvents)
+local MomentsCommon = require(parent.MomentsCommon)
+local MomentsTypes = require(parent.MomentsTypes)
+local Navigation = require(parent.Navigation)
+local React = require(parent.React)
+local RoactNavigation = require(parent.RoactNavigation)
+local SharedFlags = require(parent.SharedFlags)
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local RobloxAppEvents = require(parent.RobloxAppEvents)
+
 local GetDeepLinkStore = require(Moments.Stores.GetDeepLinkStore)
+require(Moments.Stores.GetDeepLinkStore.createDeepLinkStore)
 local createMomentsStore = require(Moments.Stores.GetMomentsStore.createMomentsStore)
 local GetImmersiveChromeStore = require(Moments.Stores.GetImmersiveChromeStore)
-local GetFFlagMomentsFixShareDeeplink = require(Moments.Flags.GetFFlagMomentsFixShareDeeplink)
-local GetFFlagMomentsShareDeeplinkReliableOpen = require(Moments.Flags.GetFFlagMomentsShareDeeplinkReliableOpen)
-local GetFFlagMomentsFixPeekReturnChrome = require(Moments.Flags.GetFFlagMomentsFixPeekReturnChrome)
 local FFlagMomentsEmojiSetsApi = require(Moments.Flags.FFlagMomentsEmojiSetsApi)
+
+local FStringMomentsExperienceJoinActionTextIxpLayer = require(Moments.Flags.FStringMomentsExperienceJoinActionTextIxpLayer)
 local useMomentsTabIsVisible = require(Moments.Hooks.useMomentsTabIsVisible)
+local consumeEntrySource = require(Moments.Utils.consumeEntrySource)
+local logMomentsLayerExposure = MomentsCommon.Utils.logMomentsLayerExposure
 local InnerNavigator = require(Moments.Navigation.InnerNavigator)
 local MomentsHostShell = require(Moments.Components.MomentsHostShell)
+require(Moments.MomentsHostContext)
+
 local useResetTeleportingOnGameLeave = require(Moments.Hooks.useResetTeleportingOnGameLeave)
 local getExperienceDetailsSheetStore = require(Moments.ExperienceDetailsSheet.Sheet.getExperienceDetailsSheetStore)
-local MomentsGetMomentsReactionsStore = require(MomentsParent.DataHydration.MomentsGetMomentsReactionsStore)
+local MomentsGetMomentsReactionsStore = require(parent.DataHydration.MomentsGetMomentsReactionsStore)
+
 local Analytics = MomentsCommon.Analytics
 local EventNames = Analytics.EventNames
 local FunnelEventNames = Analytics.FunnelEventNames
 local SessionManager = Analytics.SessionManager
 local fireAnalyticsEvent = Analytics.fireAnalyticsEvent
 local fireFunnelAnalyticsEvent = Analytics.fireFunnelAnalyticsEvent
+
 local MomentsSurfaceLoadManager = MomentsCommon.Performance.MomentsSurfaceLoadManager
+
 local useMomentsGating = MomentsCommon.Hooks.useMomentsGating
 local canRenderNativeMoments = MomentsCommon.canRenderNativeMoments
-local FFlagMomentsWatchSessionalization = SharedFlags.FFlagMomentsWatchSessionalization
-local FFlagMomentsSurfaceLoadTTI = SharedFlags.FFlagMomentsSurfaceLoadTTI
-local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
-local ShareLinkTargetIdType = MomentsTypes.Enums.ShareLinkTargetIdType
-local v38 = RoactNavigation.createAppContainer(InnerNavigator)
-local getActiveRoutes = Navigation.getActiveRoutes
-local v40 = GetFFlagMomentsFixShareDeeplink()
 
-local function normalizeDeepLinkedMomentId(p1) -- line: 78
-	if type(p1) == "string" and p1 ~= "" then
-		return p1
+local v = {}
+local FFlagMomentsAvatarLookTryOn = SharedFlags.FFlagMomentsAvatarLookTryOn
+local FFlagMomentsCommentDeepLinks = SharedFlags.FFlagMomentsCommentDeepLinks
+local ShareLinkTargetIdType = MomentsTypes.Enums.ShareLinkTargetIdType
+local getActiveRoutes = Navigation.getActiveRoutes
+
+local function normalizeDeepLinkedMomentId(postId) -- 7 equivalent calls inferred from this helper
+	if type(postId) == "string" and postId ~= "" then
+		return postId
 	end
 
-	if type(p1) == "number" then
-		return (tostring(p1))
+	if type(postId) == "number" then
+		return (tostring(postId))
 	end
 
 	return nil
 end
-local function getMomentIdFromLaunchData(p2) -- line: 87
-	-- upvalues: HttpService (copy)
-	if type(p2) ~= "string" or p2 == "" then
+
+local function getMomentIdFromLaunchData(launchData)
+	if type(launchData) ~= "string" or launchData == "" then
 		return nil
 	end
 
-	local ok, result = pcall(function() -- line: 92
-		-- upvalues: HttpService (copy), p2 (copy)
-		return HttpService:JSONDecode(p2)
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(launchData)
 	end)
 
-	if ok and type(result) == "table" then
-		local postId = result.postId
-
-		if type(postId) == "string" and postId ~= "" then
-			return postId
-		end
-
-		if type(postId) == "number" then
-			return (tostring(postId))
-		end
-
+	if not success or type(result) ~= "table" then
 		return nil
 	end
 
-	return nil
+	return normalizeDeepLinkedMomentId(result.postId) -- inferred equivalent call
 end
-local function normalizeTargetIdType(p3) -- line: 102
-	-- upvalues: ShareLinkTargetIdType (copy)
-	if p3 == ShareLinkTargetIdType.FeedItemId then
+
+local function normalizeTargetIdType(targetIdType) -- 3 equivalent calls inferred from this helper
+	if targetIdType == ShareLinkTargetIdType.FeedItemId then
 		return ShareLinkTargetIdType.FeedItemId
 	end
 
 	return nil
 end
-local function getTargetIdTypeFromLaunchData(p4) -- line: 106
-	-- upvalues: HttpService (copy), ShareLinkTargetIdType (copy)
-	if type(p4) ~= "string" or p4 == "" then
+
+local function getTargetIdTypeFromLaunchData(launchData)
+	if type(launchData) ~= "string" or launchData == "" then
 		return nil
 	end
 
-	local ok, result = pcall(function() -- line: 111
-		-- upvalues: HttpService (copy), p4 (copy)
-		return HttpService:JSONDecode(p4)
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(launchData)
 	end)
 
-	if ok and type(result) == "table" then
-		if result.targetIdType == ShareLinkTargetIdType.FeedItemId then
-			return ShareLinkTargetIdType.FeedItemId
+	if not success or type(result) ~= "table" then
+		return nil
+	end
+
+	return normalizeTargetIdType(result.targetIdType) -- inferred equivalent call
+end
+
+local function getDeepLinkedMomentIdFromParams(data)
+	if type(data) ~= "table" then
+		return nil
+	end
+
+	local extraProps = data.extraProps
+
+	if type(extraProps) == "table" then
+		local deepLinkedMomentId = normalizeDeepLinkedMomentId(extraProps.postId) -- inferred equivalent call
+
+		if deepLinkedMomentId ~= nil then
+			return deepLinkedMomentId
 		end
 
+		local momentIdFromLaunchData = getMomentIdFromLaunchData(extraProps.launchData)
+
+		if momentIdFromLaunchData ~= nil then
+			return momentIdFromLaunchData
+		end
+	end
+
+	local deepLinkedMomentId = normalizeDeepLinkedMomentId(data.postId) -- inferred equivalent call
+
+	if deepLinkedMomentId == nil then
+		return (getMomentIdFromLaunchData(data.launchData))
+	end
+
+	return deepLinkedMomentId
+end
+
+local function getDeepLinkedMomentTargetIdTypeFromParams(data)
+	if type(data) ~= "table" then
 		return nil
+	end
+
+	local extraProps = data.extraProps
+
+	if type(extraProps) == "table" then
+		if normalizeDeepLinkedMomentId(extraProps.postId) == nil then -- inferred equivalent call
+			if getMomentIdFromLaunchData(extraProps.launchData) ~= nil then
+				return (getTargetIdTypeFromLaunchData(extraProps.launchData))
+			end
+		else
+			return normalizeTargetIdType(extraProps.targetIdType) -- inferred equivalent call
+		end
+	end
+
+	if normalizeDeepLinkedMomentId(data.postId) == nil then -- inferred equivalent call
+		return (getTargetIdTypeFromLaunchData(data.launchData))
+	end
+
+	return normalizeTargetIdType(data.targetIdType) -- inferred equivalent call
+end
+
+local function getCommentsTargetFromTable(p)
+	if type(p) ~= "table" then
+		return nil
+	end
+
+	local commentId
+
+	if type(p.commentId) == "string" and p.commentId ~= "" then
+		commentId = p.commentId
+	end
+
+	if commentId == nil and p.openComments ~= true then
+		return nil
+	end
+
+	return { commentId = commentId }
+end
+
+local function getCommentsTargetFromLaunchData(launchData) -- 2 equivalent calls inferred from this helper
+	if type(launchData) ~= "string" or launchData == "" then
+		return nil
+	end
+
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(launchData)
+	end)
+
+	if success then
+		return getCommentsTargetFromTable(result)
 	end
 
 	return nil
 end
-local function getDeepLinkedMomentIdFromParams(p5) -- line: 121
-	-- upvalues: getMomentIdFromLaunchData (copy)
-	if type(p5) ~= "table" then
+
+local function getDeepLinkedCommentsTargetFromParams(data)
+	if type(data) ~= "table" then
 		return nil
 	end
 
-	local extraProps = p5.extraProps
+	local extraProps = data.extraProps
 
 	if type(extraProps) == "table" then
-		local postId = extraProps.postId
-		local v67 = if type(postId) ~= "string" or postId == "" then if type(postId) ~= "number" then nil else tostring(postId) else postId
-
-		if v67 ~= nil then
-			return v67
-		end
-
-		local v68 = getMomentIdFromLaunchData(extraProps.launchData)
-
-		if v68 ~= nil then
-			return v68
-		end
-	end
-
-	local postId = p5.postId
-	local v70 = if type(postId) ~= "string" or postId == "" then if type(postId) ~= "number" then nil else tostring(postId) else postId
-
-	if v70 ~= nil then
-		return v70
-	end
-
-	return (getMomentIdFromLaunchData(p5.launchData))
-end
-local function getDeepLinkedMomentTargetIdTypeFromParams(p6) -- line: 147
-	-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy), ShareLinkTargetIdType (copy), getMomentIdFromLaunchData (copy), getTargetIdTypeFromLaunchData (copy)
-	if not FFlagMomentsPassFeedItemIdToBackendApis or type(p6) ~= "table" then
-		return nil
-	end
-
-	local extraProps = p6.extraProps
-
-	if type(extraProps) == "table" then
-		local postId = extraProps.postId
-
-		if ((if type(postId) ~= "string" or postId == "" then (if type(postId) ~= "number" then nil else tostring(postId)) else postId)) ~= nil then
-			if extraProps.targetIdType == ShareLinkTargetIdType.FeedItemId then
-				return ShareLinkTargetIdType.FeedItemId
-			end
-
-			return nil
+		if normalizeDeepLinkedMomentId(extraProps.postId) ~= nil then -- inferred equivalent call
+			return getCommentsTargetFromTable(extraProps)
 		end
 
 		if getMomentIdFromLaunchData(extraProps.launchData) ~= nil then
-			return (getTargetIdTypeFromLaunchData(extraProps.launchData))
+			return getCommentsTargetFromLaunchData(extraProps.launchData) -- inferred equivalent call
 		end
 	end
 
-	local postId = p6.postId
-
-	if ((if type(postId) ~= "string" or postId == "" then (if type(postId) ~= "number" then nil else tostring(postId)) else postId)) ~= nil then
-		if p6.targetIdType == ShareLinkTargetIdType.FeedItemId then
-			return ShareLinkTargetIdType.FeedItemId
-		end
-
-		return nil
+	if normalizeDeepLinkedMomentId(data.postId) ~= nil then -- inferred equivalent call
+		return getCommentsTargetFromTable(data)
 	end
 
-	return (getTargetIdTypeFromLaunchData(p6.launchData))
+	return getCommentsTargetFromLaunchData(data.launchData) -- inferred equivalent call
 end
-local function getDeepLinkRequestFromNavigationParams(p7, s1: string) -- line: 176
-	-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy), getDeepLinkedMomentIdFromParams (copy), getDeepLinkedMomentTargetIdTypeFromParams (copy)
-	if not p7 or not p7.getParam then
+
+local function getCommentsTargetKey(p) -- 2 equivalent calls inferred from this helper
+	if p == nil then
+		return ""
+	end
+
+	return `:comments:{p.commentId or ""}`
+end
+
+local function getDeepLinkRequestFromNavigationParams(p, p2: string)
+	if not (p and p.getParam) then
 		return nil
 	end
 
-	local t1 = {
-		extraProps = p7.getParam("extraProps"),
-		postId = p7.getParam("postId"),
-		targetIdType = if not FFlagMomentsPassFeedItemIdToBackendApis then nil else p7.getParam("targetIdType"),
-		launchData = p7.getParam("launchData")
+	local v2 = {
+		extraProps = p.getParam("extraProps"),
+		postId = p.getParam("postId"),
+		targetIdType = p.getParam("targetIdType"),
+		launchData = p.getParam("launchData"),
+		commentId = 0,
+		openComments = 0
 	}
-	local v78 = getDeepLinkedMomentIdFromParams(t1)
+	local commentId
 
-	if v78 == nil then
+	if FFlagMomentsCommentDeepLinks then
+		commentId = p.getParam("commentId")
+	end
+
+	v2.commentId = commentId
+	local openComments
+
+	if FFlagMomentsCommentDeepLinks then
+		openComments = p.getParam("openComments")
+	end
+
+	v2.openComments = openComments
+
+	local deepLinkedMomentIdFromParams = getDeepLinkedMomentIdFromParams(v2)
+
+	if deepLinkedMomentIdFromParams == nil then
 		return nil
 	end
 
-	local v79 = getDeepLinkedMomentTargetIdTypeFromParams(t1)
+	local deepLinkedMomentTargetIdTypeFromParams = getDeepLinkedMomentTargetIdTypeFromParams(v2)
+	local commentsTarget
+
+	if FFlagMomentsCommentDeepLinks then
+		commentsTarget = getDeepLinkedCommentsTargetFromParams(v2)
+	end
 
 	return {
-		momentId = v78,
-		targetIdType = v79,
-		key = if not FFlagMomentsPassFeedItemIdToBackendApis then `{ s1 }:params:{ tostring(t1.extraProps) }:{ tostring(t1.postId) }:{ tostring(t1.launchData) }:{ v78 }` else `{ s1 }:params:{ tostring(t1.extraProps) }:{ tostring(t1.postId) }:{ tostring(t1.launchData) }:{ v78 }:{ tostring(v79) }`
-	}
+		momentId = deepLinkedMomentIdFromParams,
+		targetIdType = deepLinkedMomentTargetIdTypeFromParams,
+		commentsTarget = commentsTarget,
+		key = `{p2}:params:{tostring(v2.extraProps)}:{tostring(v2.postId)}:{tostring(v2.launchData)}:{deepLinkedMomentIdFromParams}:{tostring(deepLinkedMomentTargetIdTypeFromParams)}{getCommentsTargetKey(commentsTarget)}`
+	} -- inferred equivalent call
 end
-local function getDeepLinkRequestFromNavigationState(p8, s2: string) -- line: 206
-	-- upvalues: getActiveRoutes (copy), getDeepLinkedMomentIdFromParams (copy), getDeepLinkedMomentTargetIdTypeFromParams (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy)
-	local v82 = getActiveRoutes(p8)
 
-	for i = #v82, 1, -1 do
-		local v84 = v82[i]
-		local v85 = getDeepLinkedMomentIdFromParams(v84.params)
+local function getDeepLinkRequestFromNavigationState(state, p: string)
+	local activeRoutes = getActiveRoutes(state)
 
-		if v85 ~= nil then
-			local v86 = getDeepLinkedMomentTargetIdTypeFromParams(v84.params)
+	for i = #activeRoutes, 1, -1 do
+		local activeRoute = activeRoutes[i]
+		local deepLinkedMomentIdFromParams = getDeepLinkedMomentIdFromParams(activeRoute.params)
+
+		if deepLinkedMomentIdFromParams ~= nil then
+			local deepLinkedMomentTargetIdTypeFromParams = getDeepLinkedMomentTargetIdTypeFromParams(activeRoute.params)
+			local commentsTarget
+
+			if FFlagMomentsCommentDeepLinks then
+				commentsTarget = getDeepLinkedCommentsTargetFromParams(activeRoute.params)
+			end
 
 			return {
-				momentId = v85,
-				targetIdType = v86,
-				key = if not FFlagMomentsPassFeedItemIdToBackendApis then `{ s2 }:state:{ tostring(v84.key) }:{ tostring(v84.params) }:{ v85 }` else `{ s2 }:state:{ tostring(v84.key) }:{ tostring(v84.params) }:{ v85 }:{ tostring(v86) }`
-			}
+				momentId = deepLinkedMomentIdFromParams,
+				targetIdType = deepLinkedMomentTargetIdTypeFromParams,
+				commentsTarget = commentsTarget,
+				key = `{p}:state:{tostring(activeRoute.key)}:{tostring(activeRoute.params)}:{deepLinkedMomentIdFromParams}:{tostring(deepLinkedMomentTargetIdTypeFromParams)}{getCommentsTargetKey(commentsTarget)}`
+			} -- inferred equivalent call
 		end
 	end
 
 	return nil
 end
-local function getDeepLinkRequest(p9) -- line: 228
-	-- upvalues: getDeepLinkRequestFromNavigationParams (copy), getDeepLinkRequestFromNavigationState (copy)
-	local n1 = 0
 
-	while p9 ~= nil do
-		local str = tostring(n1)
-		local v90 = getDeepLinkRequestFromNavigationParams(p9, str) or getDeepLinkRequestFromNavigationState(p9.state, str)
+local function getDeepLinkRequest(navigation)
+	local count = 0
 
-		if v90 ~= nil then
-			return v90
+	while navigation ~= nil do
+		local v2 = tostring(count)
+		local selected = getDeepLinkRequestFromNavigationParams(navigation, v2)
+			or getDeepLinkRequestFromNavigationState(navigation.state, v2)
+
+		if selected ~= nil then
+			return selected
 		end
 
-		if not p9._dangerouslyGetParent then
-			return nil
+		if not navigation._dangerouslyGetParent then
+			break
 		end
 
-		p9 = p9._dangerouslyGetParent()
-		n1 += 1
+		navigation = navigation._dangerouslyGetParent()
+		count += 1
 	end
 
 	return nil
 end
-local function getEntrySource(p10) -- line: 249
-	if not p10 or not p10.getParam then
-		return "watch_tab"
-	end
 
-	local v92 = p10.getParam("extraProps")
-
-	if type(v92) == "table" and type(v92.source) == "string" then
-		return v92.source
-	end
-
-	return p10.getParam("source", "watch_tab")
+local function seedDeepLinkedMoment(p, momentId: string, targetIdType: string?, p2) -- 2 equivalent calls inferred from this helper
+	p.setDeepLinkedMoment(momentId, targetIdType, p2)
 end
-local function seedDeepLinkedMoment(p11, s3: string, s4: string?) -- line: 260
-	-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy)
-	if FFlagMomentsPassFeedItemIdToBackendApis then
-		p11.setDeepLinkedMoment(s3, s4)
 
-		return
-	end
+local function MomentsTabEntry(props)
+	local ref = React.useRef(props)
+	ref.current = props
 
-	p11.setDeepLinkedMomentId(s3)
-end
-local function MomentsTabEntry(t2: {[any]: any}) -- line: 268
-	-- upvalues: React (copy), createMomentsStore (copy), useResetTeleportingOnGameLeave (copy), v40 (copy), GetFFlagMomentsShareDeeplinkReliableOpen (copy), getDeepLinkRequest (copy), GetDeepLinkStore (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), RobloxAppEvents (copy), AppPage (copy), ShareLinkTargetIdType (copy), FFlagMomentsEmojiSetsApi (copy), MomentsGetMomentsReactionsStore (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy), fireFunnelAnalyticsEvent (copy), FFlagMomentsSurfaceLoadTTI (copy), MomentsSurfaceLoadManager (copy), getExperienceDetailsSheetStore (copy), GetImmersiveChromeStore (copy), RoactNavigation (copy), useMomentsTabIsVisible (copy), GetFFlagMomentsFixPeekReturnChrome (copy), useMomentsGating (copy), canRenderNativeMoments (copy), InnerNavigator (copy), v38 (copy), MomentsHostShell (copy)
-	local v97 = React.useRef(t2)
+	local ref2 = React.useRef(false)
+	local ref3 = React.useRef(false)
 
-	v97.current = t2
+	local ref4 = React.useRef(nil)
 
-	local v98 = React.useRef(false)
-	local v99 = React.useRef(false)
-	local v100 = React.useRef(nil)
-
-	if v100.current == nil then
-		v100.current = createMomentsStore()
+	if ref4.current == nil then
+		ref4.current = createMomentsStore()
 	end
 
 	useResetTeleportingOnGameLeave()
+	local ref5 = React.useRef(nil)
+	local ref6 = React.useRef({})
+	local deepLinkRequest = getDeepLinkRequest(props.navigation)
+	local momentId
 
-	local v101 = v40 or GetFFlagMomentsShareDeeplinkReliableOpen()
-	local u102 = nil
-
-	if v101 then
-		local v103 = getDeepLinkRequest(t2.navigation)
-		local v104 = if v103 == nil then nil else v103.momentId
-		local v105 = if v103 == nil then nil else v103.key
-
-		u102 = React.useRef(nil)
-
-		if v104 ~= nil and v105 ~= u102.current then
-			local v106 = GetDeepLinkStore()
-			local v107 = if v103 == nil then nil else v103.targetIdType
-
-			if FFlagMomentsPassFeedItemIdToBackendApis then
-				v106.setDeepLinkedMoment(v104, v107)
-			else
-				v106.setDeepLinkedMomentId(v104)
-			end
-
-			u102.current = v105
-		end
-
-		React.useEffect(function() -- line: 313
-			-- upvalues: v104 (copy), v99 (copy), RobloxAppEvents (copy), AppPage (copy)
-			if v104 ~= nil and v99.current then
-				RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
-			end
-
-			v99.current = true
-		end, {
-			v105,
-			v104,
-			t2.navigation
-		})
+	if deepLinkRequest == nil then
+		momentId = nil
 	else
-		React.useEffect(function() -- line: 324
-			-- upvalues: t2 (copy), GetDeepLinkStore (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), ShareLinkTargetIdType (copy), v99 (copy), RobloxAppEvents (copy), AppPage (copy)
-			local navigation = t2.navigation
-
-			if not navigation or not navigation.getParam then
-				return
-			end
-
-			local v118 = navigation.getParam("extraProps")
-
-			if type(v118) == "table" and type(v118.postId) == "string" then
-				local v119 = GetDeepLinkStore()
-				local postId = v118.postId
-				local v121 = if not FFlagMomentsPassFeedItemIdToBackendApis then nil else if v118.targetIdType ~= ShareLinkTargetIdType.FeedItemId then nil else ShareLinkTargetIdType.FeedItemId
-
-				if FFlagMomentsPassFeedItemIdToBackendApis then
-					v119.setDeepLinkedMoment(postId, v121)
-				else
-					v119.setDeepLinkedMomentId(postId)
-				end
-
-				if v99.current then
-					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
-				end
-			end
-
-			v99.current = true
-		end, { t2.navigation })
+		momentId = deepLinkRequest.momentId
 	end
 
-	local v108 = React.useCallback(function() -- line: 347
-		-- upvalues: v98 (copy), v100 (copy), v97 (copy), FFlagMomentsEmojiSetsApi (copy), MomentsGetMomentsReactionsStore (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy), fireFunnelAnalyticsEvent (copy)
-		if v98.current then
+	local key
+
+	if deepLinkRequest ~= nil then
+		key = deepLinkRequest.key
+	end
+
+	if momentId ~= nil and ref5.current ~= key then
+		local deepLinkStore = GetDeepLinkStore()
+		local targetIdType
+
+		if deepLinkRequest ~= nil then
+			targetIdType = deepLinkRequest.targetIdType
+		end
+
+		local v2
+
+		if FFlagMomentsCommentDeepLinks and deepLinkRequest ~= nil then
+			v2 = deepLinkRequest.commentsTarget
+		end
+
+		seedDeepLinkedMoment(deepLinkStore, momentId, targetIdType, v2) -- inferred equivalent call
+		ref5.current = key
+	end
+
+	React.useEffect(function()
+		if momentId ~= nil and ref3.current then
+			RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
+		end
+
+		ref3.current = true
+	end, { key, momentId, props.navigation })
+
+	local v2 = React.useCallback(function()
+		if ref2.current then
 			return
 		end
 
-		v98.current = true
+		ref2.current = true
 
-		local current = v100.current
-		local navigation = v97.current.navigation
-		local s5
+		local current = ref4.current
 
-		if not navigation or not navigation.getParam then
-			s5 = "watch_tab"
-		else
-			local v125 = navigation.getParam("extraProps")
-
-			s5 = if type(v125) ~= "table" or type(v125.source) ~= "string" then navigation.getParam("source", "watch_tab") else v125.source
-		end
+		local source = consumeEntrySource(ref.current.navigation, ref6.current)
 
 		current.resetSession()
-		current.setSessionSource(s5)
+		current.setSessionSource(source)
+
+		logMomentsLayerExposure(FStringMomentsExperienceJoinActionTextIxpLayer)
+		local FFlagMomentsCreatorAttributionIxpEnabled = require(Moments.Flags.FFlagMomentsCreatorAttributionIxpEnabled)
+
+		if FFlagMomentsCreatorAttributionIxpEnabled then
+			logMomentsLayerExposure(require(Moments.Flags.FStringMomentsCreatorAttributionIxpLayer))
+		end
+
+		local FFlagMomentsFeedIxpEnabled = require(Moments.Flags.FFlagMomentsFeedIxpEnabled)
+
+		if FFlagMomentsFeedIxpEnabled then
+			logMomentsLayerExposure(require(Moments.Flags.FStringMomentsFeedIxpLayer))
+		end
 
 		if FFlagMomentsEmojiSetsApi then
 			local getAndFetchEmojiSets = MomentsGetMomentsReactionsStore(false).getAndFetchEmojiSets
-
 			assert(getAndFetchEmojiSets ~= nil, "expected getAndFetchEmojiSets when FFlagMomentsEmojiSetsApi is on")
 			getAndFetchEmojiSets()
 		end
 
 		fireAnalyticsEvent(EventNames.TapMomentsTab, {
 			moments_session_id = current.getMomentsSessionId(false),
-			source = s5
+			source = source
 		})
 
-		local v127 = SessionManager.startSession(FunnelEventNames.FunnelTypes.AppNavigation)
+		Analytics.reportMomentsSessionStarted(source)
 
-		fireFunnelAnalyticsEvent(FunnelEventNames.FunnelTypes.AppNavigation, FunnelEventNames.AppNavigationSteps.AppLaunched, v127)
+		local momentsSessionHeartbeat = Analytics.createMomentsSessionHeartbeat()
+		v[current.getMomentsSessionId(false)] = momentsSessionHeartbeat
+		momentsSessionHeartbeat.start(source)
+
+		local v2 = SessionManager.startSession(FunnelEventNames.FunnelTypes.AppNavigation)
+		fireFunnelAnalyticsEvent(
+			FunnelEventNames.FunnelTypes.AppNavigation,
+			FunnelEventNames.AppNavigationSteps.AppLaunched,
+			v2
+		)
 	end, {})
-	local v109 = React.useCallback(function() -- line: 380
-		-- upvalues: v98 (copy), FFlagMomentsSurfaceLoadTTI (copy), MomentsSurfaceLoadManager (copy), getExperienceDetailsSheetStore (copy), v100 (copy), fireAnalyticsEvent (copy), EventNames (copy), SessionManager (copy), FunnelEventNames (copy)
-		if not v98.current then
+
+	local v3 = React.useCallback(function()
+		if not ref2.current then
 			return
 		end
 
-		v98.current = false
-
-		if FFlagMomentsSurfaceLoadTTI then
-			MomentsSurfaceLoadManager.abort()
-		end
+		ref2.current = false
+		MomentsSurfaceLoadManager.abort("blur")
 
 		getExperienceDetailsSheetStore(false).close()
 
-		local current = v100.current
-		local v129 = os.clock() - current.getSessionStartTime(false)
+		local current = ref4.current
+		local v3 = os.clock() - current.getSessionStartTime(false)
 
 		fireAnalyticsEvent(EventNames.MomentsSessionEnded, {
 			moments_session_id = current.getMomentsSessionId(false),
 			source = current.getSessionSource(false),
-			duration_seconds = tostring((math.floor(v129)))
+			duration_seconds = tostring((math.floor(v3)))
 		})
+
+		local momentsSessionId = current.getMomentsSessionId(false)
+		local v4 = v[momentsSessionId]
+
+		if v4 then
+			v4.stop()
+			v[momentsSessionId] = nil
+		end
+
+		Analytics.reportMomentsSessionEnded(current.getSessionSource(false))
+
 		SessionManager.endSession(FunnelEventNames.FunnelTypes.AppNavigation)
 	end, {})
-	local v110 = React.useCallback(function() -- line: 410
-		-- upvalues: GetImmersiveChromeStore (copy), v97 (copy)
-		GetImmersiveChromeStore(false).setOverlayCovering(false)
 
-		local onTabFocused = v97.current.onTabFocused
+	local v4 = React.useCallback(function()
+		GetImmersiveChromeStore(false).setOverlayCovering(false)
+		local onTabFocused = ref.current.onTabFocused
 
 		if onTabFocused then
 			onTabFocused()
 		end
 	end, {})
 
-	React.useEffect(function() -- line: 423
-		-- upvalues: t2 (copy), v108 (copy), v110 (copy), v109 (copy), RoactNavigation (copy), v101 (copy), getDeepLinkRequest (copy), GetDeepLinkStore (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), u102 (ref), RobloxAppEvents (copy), AppPage (copy), ShareLinkTargetIdType (copy)
-		local navigation = t2.navigation
+	React.useEffect(function()
+		local navigation = props.navigation
 
-		if not navigation or not navigation.addListener then
-			v108()
-			v110()
+		if navigation and navigation.addListener then
+			v2()
+			v4()
 
-			return function() -- line: 428
-				-- upvalues: v109 (copy)
-				v109()
+			local v5 = navigation.addListener(RoactNavigation.Events.DidFocus, function()
+				local deepLinkRequest2 = getDeepLinkRequest(navigation)
+				local v5
+
+				if deepLinkRequest2 == nil then
+					v5 = false
+				else
+					v5 = ref5.current == deepLinkRequest2.key
+				end
+
+				if deepLinkRequest2 ~= nil and not v5 then
+					local deepLinkStore = GetDeepLinkStore()
+					local momentId2 = deepLinkRequest2.momentId
+					local targetIdType = deepLinkRequest2.targetIdType
+					local v6
+
+					if FFlagMomentsCommentDeepLinks then
+						v6 = deepLinkRequest2.commentsTarget
+					end
+
+					seedDeepLinkedMoment(deepLinkStore, momentId2, targetIdType, v6) -- inferred equivalent call
+					ref5.current = deepLinkRequest2.key
+					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
+				end
+
+				v2()
+				v4()
+			end)
+			local v6 = navigation.addListener(RoactNavigation.Events.WillBlur, function()
+				v3()
+			end)
+
+			return function()
+				v3()
+				v5.remove()
+				v6.remove()
 			end
 		end
 
-		v108()
-		v110()
-
-		local v132 = navigation.addListener(RoactNavigation.Events.DidFocus, function() -- line: 436
-			-- upvalues: v101 (copy), getDeepLinkRequest (copy), navigation (copy), GetDeepLinkStore (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), u102 (ref), RobloxAppEvents (copy), AppPage (copy), ShareLinkTargetIdType (copy), v108 (copy), v110 (copy)
-			if v101 then
-				local v136 = getDeepLinkRequest(navigation)
-
-				if v136 ~= nil then
-					local v137 = GetDeepLinkStore()
-					local momentId = v136.momentId
-					local targetIdType = v136.targetIdType
-
-					if FFlagMomentsPassFeedItemIdToBackendApis then
-						v137.setDeepLinkedMoment(momentId, targetIdType)
-					else
-						v137.setDeepLinkedMomentId(momentId)
-					end
-
-					u102.current = v136.key
-					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
-				end
-			else
-				local v140 = navigation.getParam("extraProps")
-
-				if type(v140) == "table" and type(v140.postId) == "string" then
-					local v141 = GetDeepLinkStore()
-					local postId = v140.postId
-					local v143 = if not FFlagMomentsPassFeedItemIdToBackendApis then nil else if v140.targetIdType ~= ShareLinkTargetIdType.FeedItemId then nil else ShareLinkTargetIdType.FeedItemId
-
-					if FFlagMomentsPassFeedItemIdToBackendApis then
-						v141.setDeepLinkedMoment(postId, v143)
-					else
-						v141.setDeepLinkedMomentId(postId)
-					end
-
-					RobloxAppEvents.ReloadPage:fire(AppPage.Moments)
-				end
-			end
-
-			v108()
-			v110()
-		end)
-		local v133 = navigation.addListener(RoactNavigation.Events.WillBlur, function() -- line: 465
-			-- upvalues: v109 (copy)
-			v109()
-		end)
-
-		return function() -- line: 469
-			-- upvalues: v109 (copy), v132 (copy), v133 (copy)
-			v109()
-			v132.remove()
-			v133.remove()
+		v2()
+		v4()
+		return function()
+			v3()
 		end
-	end, {
-		v108,
-		v109,
-		v110
-	})
+	end, { v2, v3, v4 })
 
-	local v111 = useMomentsTabIsVisible()
-
-	React.useEffect(function() -- line: 484
-		-- upvalues: GetFFlagMomentsFixPeekReturnChrome (copy), v111 (copy), v110 (copy)
-		if GetFFlagMomentsFixPeekReturnChrome() and v111 then
-			v110()
+	local v5 = useMomentsTabIsVisible()
+	React.useEffect(function()
+		if v5 then
+			v4()
 		end
-	end, {
-		v111,
-		v110
-	})
+	end, { v5, v4 })
 
-	local v112 = React.useMemo(function() -- line: 493
-		-- upvalues: t2 (copy), GetImmersiveChromeStore (copy)
-		local openProfile = t2.openProfile
-		local openOwnMoments = t2.openOwnMoments
-
-		return {
-			openProfile = if not openProfile then nil else function(n2: number) -- line: 498
-				-- upvalues: GetImmersiveChromeStore (copy), openProfile (copy)
+	local useMemo = React.useMemo
+	local function fn()
+		local openProfile = props.openProfile
+		local openOwnMoments = props.openOwnMoments
+		local v6 = {
+			openProfile = openProfile and function(p: number)
 				GetImmersiveChromeStore(false).setOverlayCovering(true)
-				openProfile(n2)
-			end,
-			openOwnMoments = if not openOwnMoments then nil else function() -- line: 504
-				-- upvalues: GetImmersiveChromeStore (copy), openOwnMoments (copy)
+				openProfile(p)
+			end or nil,
+			openOwnMoments = openOwnMoments and function()
 				GetImmersiveChromeStore(false).setOverlayCovering(true)
 				openOwnMoments()
-			end,
-			openMomentsFeedReport = t2.openMomentsFeedReport
+			end or nil,
+			openMomentsFeedReport = props.openMomentsFeedReport,
+			openAvatarLookTryOn = 0,
+			openMomentCommentReport = 0,
+			openBlockUser = 0
 		}
-	end, {
-		t2.openProfile,
-		t2.openOwnMoments,
-		t2.openMomentsFeedReport
-	})
-	local v113 = useMomentsGating()
+		local openAvatarLookTryOn
 
-	if not canRenderNativeMoments(v113) then
+		if FFlagMomentsAvatarLookTryOn then
+			openAvatarLookTryOn = props.openAvatarLookTryOn
+		end
+
+		v6.openAvatarLookTryOn = openAvatarLookTryOn
+		v6.openMomentCommentReport = props.openMomentCommentReport
+		v6.openBlockUser = props.openBlockUser
+		return v6
+	end
+
+	local openProfile = props.openProfile
+	local openOwnMoments = props.openOwnMoments
+	local openMomentsFeedReport = props.openMomentsFeedReport
+	local openMomentCommentReport = props.openMomentCommentReport
+	local openBlockUser = props.openBlockUser
+	local v6
+
+	if FFlagMomentsAvatarLookTryOn then
+		v6 = props.openAvatarLookTryOn
+	end
+
+	local v7 = useMemo(fn, {
+		openProfile,
+		openOwnMoments,
+		openMomentsFeedReport,
+		openMomentCommentReport,
+		openBlockUser,
+		v6
+	})
+
+	if not canRenderNativeMoments((useMomentsGating())) then
 		return nil
 	end
 
-	local v114 = if not t2.useRootOwnedNavigation then React.createElement(v38) else React.createElement(InnerNavigator, {
-		navigation = t2.navigation
-	})
+	local createElement = React.createElement
 
-	return React.createElement(MomentsHostShell, {
-		sessionStore = v100.current,
-		openProfile = v112.openProfile,
-		openOwnMoments = v112.openOwnMoments,
-		openMomentsFeedReport = v112.openMomentsFeedReport
-	}, v114)
-end
-local function MomentsTabEntrySessionized(t3: {[any]: any}) -- line: 541
-	-- upvalues: React (copy), MomentsTabEntry (copy)
-	return React.createElement(MomentsTabEntry, {
-		useRootOwnedNavigation = true,
-		navigation = t3.navigation,
-		openProfile = t3.openProfile,
-		openOwnMoments = t3.openOwnMoments,
-		openMomentsFeedReport = t3.openMomentsFeedReport,
-		onTabFocused = t3.onTabFocused
-	})
-end
+	local v8 = {
+		sessionStore = ref4.current,
+		openProfile = v7.openProfile,
+		openOwnMoments = v7.openOwnMoments,
+		openMomentsFeedReport = v7.openMomentsFeedReport,
+		openAvatarLookTryOn = 0,
+		openMomentCommentReport = 0,
+		openBlockUser = 0
+	}
+	local openAvatarLookTryOn
 
-local v54 = React.Component:extend("MomentsTabEntryScreen")
+	if FFlagMomentsAvatarLookTryOn then
+		openAvatarLookTryOn = v7.openAvatarLookTryOn
+	end
 
-function v54.render(p12) -- line: 557
-	-- upvalues: React (copy), MomentsTabEntrySessionized (copy)
-	return React.createElement(MomentsTabEntrySessionized, p12.props)
+	v8.openAvatarLookTryOn = openAvatarLookTryOn
+	v8.openMomentCommentReport = v7.openMomentCommentReport
+	v8.openBlockUser = v7.openBlockUser
+	return createElement(MomentsHostShell, v8, React.createElement(InnerNavigator, {
+		navigation = props.navigation
+	}))
 end
 
-v54.router = InnerNavigator.router
+local extended = React.Component:extend("MomentsTabEntryScreen")
 
-if FFlagMomentsWatchSessionalization then
-	return v54
+function extended.render(p)
+	return React.createElement(MomentsTabEntry, p.props)
 end
 
-return MomentsTabEntry
+extended.router = InnerNavigator.router
+
+return extended

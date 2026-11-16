@@ -1,23 +1,14 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 local PresenceContext = require(script.Parent.PresenceContext)
 
+local function isPresent(p) -- 1 equivalent call inferred from this helper
+	return p == nil or p.isPresent
+end
+
 return {
-	useIsPresent = function() -- line: 39
-		-- upvalues: React (copy), PresenceContext (copy)
-		local v5 = React.useContext(PresenceContext)
-
-		if v5 == nil then
-			return true
-		end
-
-		return v5.isPresent
+	useIsPresent = function()
+		return isPresent(React.useContext(PresenceContext)) -- inferred equivalent call
 	end,
-	isPresent = function(p1) -- line: 27
-		if p1 == nil then
-			return true
-		end
-
-		return p1.isPresent
-	end
+	isPresent = isPresent
 }

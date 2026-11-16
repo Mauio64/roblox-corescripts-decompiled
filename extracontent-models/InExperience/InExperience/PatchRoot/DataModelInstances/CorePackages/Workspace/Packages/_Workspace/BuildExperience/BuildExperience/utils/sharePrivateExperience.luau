@@ -1,50 +1,51 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local default = require(BuildExperienceParent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
-local UniversalShareSheet = require(BuildExperienceParent.ShareSheet).UniversalShareSheet
-local SharedFlags = require(BuildExperienceParent.SharedFlags)
-local createPrivateShareLink = require(BuildExperience.utils.createPrivateShareLink)
+local parent = BuildExperience.Parent
+
+local ExternalContentSharingProtocol = require(parent.ExternalContentSharingProtocol)
+local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
+local ShareSheet = require(parent.ShareSheet)
+local UniversalShareSheet = ShareSheet.UniversalShareSheet
+local SharedFlags = require(parent.SharedFlags)
+
+local createExperienceShareLink = require(BuildExperience.utils.createExperienceShareLink)
+local FFlagBuildShareSheetFriendsSortAll = require(BuildExperience.Flags.FFlagBuildShareSheetFriendsSortAll)
+
 local FFlagEnableShareSheet = SharedFlags.FFlagEnableShareSheet
 local isSubjectToDesktopPolicies = SharedFlags.isSubjectToDesktopPolicies
 
-local function sharePrivateExperience(n1: number) -- line: 33
-	-- upvalues: createPrivateShareLink (copy), FFlagEnableShareSheet (copy), UniversalShareSheet (copy), isSubjectToDesktopPolicies (copy), default (copy)
-	return createPrivateShareLink(n1):andThen(function(s1: string?) -- line: 34
-		-- upvalues: FFlagEnableShareSheet (copy), UniversalShareSheet (copy), isSubjectToDesktopPolicies (copy), default (copy)
-		if s1 == nil then
+local function sharePrivateExperience(p: number)
+	return createExperienceShareLink(p):andThen(function(p2: string?)
+		if p2 == nil then
 			error("sharePrivateExperience: no share link returned")
 		end
 
 		if FFlagEnableShareSheet then
-			UniversalShareSheet.show({
+			local show = UniversalShareSheet.show
+			local recipientSource
+
+			if FFlagBuildShareSheetFriendsSortAll then
+				recipientSource = UniversalShareSheet.RecipientSource.OneToOneFriends
+			end
+
+			show({
+				url = p2,
 				context = "BuildExperiencePrivateInvitesShareLink",
-				url = s1
+				recipientSource = recipientSource
 			})
 
 			return nil
-		end
-
-		if isSubjectToDesktopPolicies() then
+		elseif isSubjectToDesktopPolicies() then
 			default:setClipboardText({
-				context = "BuildExperiencePrivateInvitesShareLink",
-				text = s1
+				text = p2,
+				context = "BuildExperiencePrivateInvitesShareLink"
 			})
 
-			return {
-				copiedToClipboard = true,
-				url = s1
-			}
+			return { url = p2, copiedToClipboard = true }
+		else
+			default:shareUrl({ url = p2, context = "BuildExperiencePrivateInvitesShareLink" })
+
+			return { url = p2, copiedToClipboard = false }
 		end
-
-		default:shareUrl({
-			context = "BuildExperiencePrivateInvitesShareLink",
-			url = s1
-		})
-
-		return {
-			copiedToClipboard = false,
-			url = s1
-		}
 	end)
 end
 

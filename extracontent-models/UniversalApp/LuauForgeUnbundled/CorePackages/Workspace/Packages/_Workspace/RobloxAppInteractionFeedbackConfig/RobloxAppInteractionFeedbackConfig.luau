@@ -1,0 +1,1 @@
+return { AppInteractionFeedbackProvider = require("@game/CorePackages/Workspace/Packages/_Workspace/RobloxAppInteractionFeedbackConfig/RobloxAppInteractionFeedbackConfig/AppInteractionFeedbackProvider") }

@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("GamePlayButton").Parent
-local FFlagEnablePlayWithRewardComponent = require(Parent.SharedFlags).FFlagEnablePlayWithRewardComponent
-
+local parent = script:FindFirstAncestor("GamePlayButton").Parent
+local SharedFlags = require(parent.SharedFlags)
 return {
 	ExperienceDetailsLink = "ExperienceDetailsLink",
 	ExperienceAffiliateLink = "ExperienceAffiliateLink",
-	PlayWithReward = if not FFlagEnablePlayWithRewardComponent then nil else "PlayWithReward"
+	PlayWithReward = SharedFlags.FFlagEnablePlayWithRewardComponent and "PlayWithReward" or nil
 }

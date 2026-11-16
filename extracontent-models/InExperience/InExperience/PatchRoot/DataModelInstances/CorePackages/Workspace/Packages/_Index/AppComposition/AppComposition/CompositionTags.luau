@@ -1,24 +1,18 @@
-local Parent = script:FindFirstAncestor("AppComposition").Parent
-local FFlagEnableSplitPane = require(Parent.SharedFlags).FFlagEnableSplitPane
+local parent = script:FindFirstAncestor("AppComposition").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
 
 return {
-	NavigationRegion = if not FFlagEnableSplitPane then nil else {
-		Root = "composition-navigation-root"
-	},
+	NavigationRegion = FFlagEnableSplitPane and { Root = "composition-navigation-root" } or nil,
 	ContentRegion = {
 		Root = "composition-content-root",
 		Header = "composition-content-header",
 		Body = "composition-content-body"
 	},
-	SupportRegion = if not FFlagEnableSplitPane then nil else {
+	SupportRegion = FFlagEnableSplitPane and {
 		Root = "composition-support-root",
 		Collapsed = "composition-support-collapsed"
-	},
-	Layout = {
-		Discovery = "composition-layout-discovery",
-		Detail = "composition-layout-detail"
-	},
-	Utility = {
-		ClipAtMaxWidth = "composition-clip-at-max-width"
-	}
+	} or nil,
+	Layout = { Discovery = "composition-layout-discovery", Detail = "composition-layout-detail" },
+	Utility = { ClipAtMaxWidth = "composition-clip-at-max-width" }
 }

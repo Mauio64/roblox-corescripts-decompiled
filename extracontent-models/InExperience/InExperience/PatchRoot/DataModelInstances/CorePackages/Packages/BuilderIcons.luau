@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.BuilderIcons.BuilderIcons))
+local BuilderIcons = require(index.BuilderIcons.BuilderIcons)
+
+return BuilderIcons

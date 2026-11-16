@@ -1,39 +1,37 @@
-local function splice(p1, p2, p3, ...) -- line: 2
-	local v5 = type(p1)
+local function splice(list, p, p2, ...)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+	local typeName2 = type(p)
+	local v = typeName2 == "number" and p % 1 == 0
+	assert(v, "expected an integer for second argument, got " .. typeName2)
 
-	local v6 = type(p2)
+	local typeName3 = type(p2)
+	local v2 = typeName3 == "number" and p2 % 1 == 0
+	assert(v2, "expected an integer for third argument, got " .. typeName3)
 
-	assert(v6 == "number" and p2 % 1 == 0, "expected an integer for second argument, got " .. v6)
+	assert(p <= p2, "start index must be less than or equal to end index")
 
-	local v7 = type(p3)
+	local count = #list
 
-	assert(v7 == "number" and p3 % 1 == 0, "expected an integer for third argument, got " .. v7)
-	assert(p2 <= p3, "start index must be less than or equal to end index")
+	local v3 = math.max(p, 1)
+	local _ = math.min(v3, count)
+	local result = {}
+	local v4 = 1
 
-	local t1 = {}
-	local n1 = 1
-	local v10 = #p1
-	local v11 = math.max(p2, 1)
-
-	math.min(v11, v10)
-
-	for i = 1, v10 do
-		local v13 = i
-
-		if v13 == v11 then
+	for i = 1, count do
+		if i == v3 then
 			for j = 1, select("#", ...) do
-				t1[n1] = select(j, ...)
-				n1 += 1
+				result[v4] = select(j, ...)
+				v4 += 1
 			end
 		else
-			t1[n1] = p1[v13]
-			n1 += 1
+			result[v4] = list[i]
+			v4 += 1
 		end
 	end
 
-	return t1
+	return result
 end
 
 return splice

@@ -1,5 +1,6 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local JestConfigs = require(Parent.Dev.JestConfigs)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 local setupJest = script.Parent.setupJest
 local setupLogger = script.Parent.setupLogger
 

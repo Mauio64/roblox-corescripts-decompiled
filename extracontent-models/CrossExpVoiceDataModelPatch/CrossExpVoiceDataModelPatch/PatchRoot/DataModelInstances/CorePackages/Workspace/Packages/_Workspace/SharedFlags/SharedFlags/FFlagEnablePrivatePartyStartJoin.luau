@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagEnablePrivatePartyAcceptInvite) and game:DefineFastFlag("EnablePrivatePartyStartJoin2", false)
+local FFlagEnablePrivatePartyAcceptInvite = require(script.Parent.FFlagEnablePrivatePartyAcceptInvite)
+
+return FFlagEnablePrivatePartyAcceptInvite and game:DefineFastFlag("EnablePrivatePartyStartJoin2", false)

@@ -1,42 +1,37 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+local Cryo = require(parent.Cryo)
 local Categories = require(script.Parent.Parent.Enums.Categories)
-
 require(script.Parent.Parent.Types)
+local Constants = require(script.Parent.Parent.Constants)
+local BodyAssetTypes = Constants.BodyAssetTypes
 
-local BodyAssetTypes = require(script.Parent.Parent.Constants).BodyAssetTypes
+local function getAssetTypesByCategory(p, items)
+	local assetTypes = p ~= Categories.Body and {} or Cryo.List.map(BodyAssetTypes, function(p2)
+		return (tostring(p2.Value))
+	end)
+	local set = {}
 
-local function getAssetTypesByCategory(p1, t1: {[any]: any}) -- line: 11
-	-- upvalues: Categories (copy), Cryo (copy), BodyAssetTypes (copy)
-	local t2 = {}
-	local t3 = {}
+	for _, item in items do
+		assetTypes = Cryo.List.join(
+			assetTypes or {},
+			Cryo.List.map(Cryo.List.filter(item.assetTypes, function(p2): boolean
+				if set[p2] then
+					return false
+				end
 
-	if p1 == Categories.Body then
-		t3 = Cryo.List.map(BodyAssetTypes, function(p2) -- line: 18
-			return (tostring(p2.Value))
-		end)
-	end
-
-	for _, v11 in t1 do
-		t3 = Cryo.List.join(t3 or {}, Cryo.List.map(Cryo.List.filter(v11.assetTypes, function(p3) -- line: 32
-			-- upvalues: t2 (copy)
-			if not t2[p3] then
-				t2[p3] = true
-
+				set[p2] = true
 				return true
-			end
-
-			return false
-		end), function(p4) -- line: 39
-			return (tostring(p4.Value))
-		end))
+			end), function(p2)
+				return (tostring(p2.Value))
+			end)
+		)
 	end
 
-	if Cryo.List.find(t3, (tostring(Enum.AssetType.RightShoeAccessory.Value))) then
-		table.insert(t3, (tostring(Enum.AssetType.LeftShoeAccessory.Value)))
+	if Cryo.List.find(assetTypes, (tostring(Enum.AssetType.RightShoeAccessory.Value))) then
+		table.insert(assetTypes, (tostring(Enum.AssetType.LeftShoeAccessory.Value)))
 	end
 
-	return t3
+	return assetTypes
 end
 
 return getAssetTypesByCategory

@@ -1,13 +1,23 @@
+local User = require(script.User)
+local ProfileInsights = require(script.ProfileInsights)
+local Experience = require(script.Experience)
+local Media = require(script.Media)
+local OmniFeed = require(script.OmniFeed)
+local VirtualEvent = require(script.VirtualEvent)
+local UserProfile = require(script.UserProfile)
+local AmpUpsell = require(script.AmpUpsell)
+local Friends = require(script.Friends)
+local Presence = require(script.Presence)
 return {
-	require(script.User),
-	require(script.ProfileInsights),
-	require(script.Experience),
-	require(script.Media),
-	require(script.OmniFeed),
-	require(script.VirtualEvent),
-	require(script.UserProfile),
-	require(script.AmpUpsell),
-	require(script.Friends),
-	require(script.Presence),
+	User,
+	ProfileInsights,
+	Experience,
+	Media,
+	OmniFeed,
+	VirtualEvent,
+	UserProfile,
+	AmpUpsell,
+	Friends,
+	Presence,
 	require(script.ShareLink)
 }

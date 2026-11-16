@@ -1,27 +1,31 @@
-local Parent = script:FindFirstAncestor("AmpUpsell").Parent
-local UIBlox = require(Parent.UIBlox)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AmpUpsell").Parent
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
-local React = require(Parent.React)
+
+local React = require(parent.React)
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
 local useStyle = UIBlox.Core.Style.useStyle
 
-local function ProgressTile(t1: {[any]: any}) -- line: 24
-	-- upvalues: useStyle (copy), React (copy), ImageSetLabel (copy), Images (copy), Loading (copy), IconSize (copy), StyledTextLabel (copy)
-	local frameHeight = t1.frameHeight
-	local layoutOrder = t1.layoutOrder
-	local finished = t1.finished
-	local progressText = t1.progressText
-	local v17 = useStyle()
+local function ProgressTile(props)
+	local frameHeight = props.frameHeight
+	local layoutOrder = props.layoutOrder
+	local finished = props.finished
+	local progressText = props.progressText
+	local v = useStyle()
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
+	local createElement = React.createElement
+	local v2 = {
 		Size = UDim2.new(1, 0, 0, frameHeight),
+		BackgroundTransparency = 1,
 		LayoutOrder = layoutOrder
-	}, {
+	}
+
+	local v3 = {
 		UIListLayout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
@@ -29,34 +33,44 @@ local function ProgressTile(t1: {[any]: any}) -- line: 24
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			Padding = UDim.new(0, 12)
 		}),
-		StatusIcon = if not finished then React.createElement(Loading, {
-			size = IconSize.Small
-		}) else React.createElement(ImageSetLabel, {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
+		StatusIcon = 0,
+		TextFrame = 0
+	}
+	local statusIcon
+
+	if finished then
+		statusIcon = React.createElement(ImageSetLabel, {
 			Size = UDim2.new(0, frameHeight, 0, frameHeight),
 			ScaleType = Enum.ScaleType.Fit,
-			Image = Images["icons/status/success"],
-			ImageTransparency = v17.Theme.SystemPrimaryDefault.Transparency,
-			ImageColor3 = v17.Theme.IconEmphasis.Color
-		}),
-		TextFrame = React.createElement("Frame", {
+			LayoutOrder = 1,
 			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, -frameHeight - 12, 0, frameHeight)
-		}, {
-			ProgressText = React.createElement(StyledTextLabel, {
-				lineHeight = 1,
-				text = progressText,
-				fontStyle = v17.Font.CaptionBody,
-				colorStyle = v17.Theme.TextDefault,
-				size = UDim2.new(1, 0, 1, 0),
-				textTruncate = Enum.TextTruncate.AtEnd,
-				textXAlignment = Enum.TextXAlignment.Left,
-				textYAlignment = Enum.TextYAlignment.Center
-			})
+			Image = Images["icons/status/success"],
+			ImageTransparency = v.Theme.SystemPrimaryDefault.Transparency,
+			ImageColor3 = v.Theme.IconEmphasis.Color
+		})
+	else
+		statusIcon = React.createElement(Loading, { size = IconSize.Small })
+	end
+
+	v3.StatusIcon = statusIcon
+
+	v3.TextFrame = React.createElement("Frame", {
+		Size = UDim2.new(1, -frameHeight - 12, 0, frameHeight),
+		BackgroundTransparency = 1,
+		LayoutOrder = 2
+	}, {
+		ProgressText = React.createElement(StyledTextLabel, {
+			text = progressText,
+			fontStyle = v.Font.CaptionBody,
+			colorStyle = v.Theme.TextDefault,
+			size = UDim2.new(1, 0, 1, 0),
+			lineHeight = 1,
+			textTruncate = Enum.TextTruncate.AtEnd,
+			textXAlignment = Enum.TextXAlignment.Left,
+			textYAlignment = Enum.TextYAlignment.Center
 		})
 	})
+	return createElement("Frame", v2, v3)
 end
 
 return ProgressTile

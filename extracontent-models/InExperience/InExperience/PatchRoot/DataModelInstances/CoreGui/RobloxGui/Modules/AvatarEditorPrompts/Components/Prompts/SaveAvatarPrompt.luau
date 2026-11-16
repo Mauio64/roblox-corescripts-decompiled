@@ -1,25 +1,31 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 
 CoreGui:WaitForChild("RobloxGui")
-
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local HumanoidViewport = require(ParentParent.HumanoidViewport)
-local ItemsList = require(ParentParent.ItemsList)
-local SignalSaveAvatarPermissionDenied = require(ParentParentParent.Thunks.SignalSaveAvatarPermissionDenied)
-local PerformSaveAvatar = require(ParentParentParent.Thunks.PerformSaveAvatar)
-local GetConformedHumanoidDescription = require(ParentParentParent.GetConformedHumanoidDescription)
-local v17 = Roact.PureComponent:extend("SaveAvatarPrompt")
 
-v17.validateProps = t.strictInterface({
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local HumanoidViewport = require(parent.HumanoidViewport)
+local ItemsList = require(parent.ItemsList)
+
+local SignalSaveAvatarPermissionDenied = require(parent2.Thunks.SignalSaveAvatarPermissionDenied)
+local PerformSaveAvatar = require(parent2.Thunks.PerformSaveAvatar)
+
+local GetConformedHumanoidDescription = require(parent2.GetConformedHumanoidDescription)
+
+local extended = Roact.PureComponent:extend("SaveAvatarPrompt")
+
+extended.validateProps = t.strictInterface({
 	gameName = t.string,
 	screenSize = t.Vector2,
 	humanoidDescription = t.instanceOf("HumanoidDescription"),
@@ -28,194 +34,195 @@ v17.validateProps = t.strictInterface({
 	signalSaveAvatarPermissionDenied = t.callback
 })
 
-function v17.init(p1) -- line: 47
-	-- upvalues: Roact (copy), ItemsList (copy), HumanoidViewport (copy)
-	p1.mounted = false
-	p1:setState({
+function extended:init()
+	self.mounted = false
+
+	self:setState({
 		conformedHumanoidDescription = nil,
 		getConformedDescriptionFailed = false,
 		itemListScrollable = false
 	})
-	p1.middleContentRef = Roact.createRef()
 
-	local v21, v22 = Roact.createBinding(UDim2.new(1, 0, 0, 200))
+	self.middleContentRef = Roact.createRef()
+	local binding, updateContentSize = Roact.createBinding(UDim2.new(1, 0, 0, 200))
+	self.contentSize = binding
+	self.updateContentSize = updateContentSize
 
-	p1.contentSize = v21
-	p1.updateContentSize = v22
+	function self.onAlertSizeChanged(p)
+		local absoluteSize = p.AbsoluteSize
 
-	function p1.onAlertSizeChanged(p2) -- line: 59
-		-- upvalues: p1 (copy)
-		local AbsoluteSize = p2.AbsoluteSize
-
-		if not p1.middleContentRef:getValue() then
+		if not self.middleContentRef:getValue() then
 			return
 		end
 
-		local AbsoluteSizeY = p1.middleContentRef:getValue().AbsoluteSize.Y
-		local v36 = AbsoluteSize.Y - AbsoluteSizeY
-		local v37 = p1.props.screenSize.Y - 60 - v36
-		local v38 = p1.middleContentRef:getValue().AbsoluteSize.X / 2 - 10 + 80
+		local y = self.middleContentRef:getValue().AbsoluteSize.Y
+		local v = absoluteSize.Y - y
+		local v2 = self.props.screenSize.Y - 60 - v
 
-		if v38 < v37 then
-			v37 = v38
+		local v3 = self.middleContentRef:getValue().AbsoluteSize.X / 2 - 10 + 80
+
+		if v3 < v2 then
+			v2 = v3
 		end
 
-		if AbsoluteSizeY ~= v37 then
-			p1.updateContentSize(UDim2.new(1, 0, 0, v37))
+		if y ~= v2 then
+			self.updateContentSize(UDim2.new(1, 0, 0, v2))
 		end
 	end
-	function p1.itemListScrollableUpdated(p3, p4) -- line: 82
-		-- upvalues: p1 (copy)
-		if p4 == p1.contentSize:getValue().Y.Offset then
-			p1:setState({
-				itemListScrollable = p3
-			})
-		end
-	end
-	function p1.retryLoadDescription() -- line: 90
-		-- upvalues: p1 (copy)
-		p1:setState({
-			getConformedDescriptionFailed = false
-		})
-		p1:getConformedHumanoidDescription()
-	end
-	function p1.renderAlertMiddleContent() -- line: 98
-		-- upvalues: p1 (copy), Roact (copy), ItemsList (copy), HumanoidViewport (copy)
-		local conformedHumanoidDescription = p1.state.conformedHumanoidDescription
-		local getConformedDescriptionFailed = p1.state.getConformedDescriptionFailed
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = p1.contentSize,
-			[Roact.Ref] = p1.middleContentRef
-		}, {
-			ItemsListFrame = Roact.createElement("Frame", {
+	function self.itemListScrollableUpdated(itemListScrollable, p)
+		if p == self.contentSize:getValue().Y.Offset then
+			self:setState({ itemListScrollable = itemListScrollable })
+		end
+	end
+
+	function self.retryLoadDescription()
+		self:setState({ getConformedDescriptionFailed = false })
+
+		self:getConformedHumanoidDescription()
+	end
+
+	function self.renderAlertMiddleContent()
+		local conformedHumanoidDescription = self.state.conformedHumanoidDescription
+		local getConformedDescriptionFailed = self.state.getConformedDescriptionFailed
+
+		return Roact.createElement(
+			"Frame",
+			{
 				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(0.45, 1)
-			}, {
-				ItemsList = Roact.createElement(ItemsList, {
-					humanoidDescription = conformedHumanoidDescription,
-					retryLoadDescription = p1.retryLoadDescription,
-					loadingFailed = getConformedDescriptionFailed,
-					itemListScrollableUpdated = p1.itemListScrollableUpdated
+				Size = self.contentSize,
+				[Roact.Ref] = self.middleContentRef
+			},
+			{
+				ItemsListFrame = Roact.createElement(
+					"Frame",
+					{ BackgroundTransparency = 1, Size = UDim2.fromScale(0.45, 1) },
+					{
+						ItemsList = Roact.createElement(ItemsList, {
+							humanoidDescription = conformedHumanoidDescription,
+							retryLoadDescription = self.retryLoadDescription,
+							loadingFailed = getConformedDescriptionFailed,
+							itemListScrollableUpdated = self.itemListScrollableUpdated
+						})
+					}
+				),
+				HumanoidViewportFrame = Roact.createElement(
+					"Frame",
+					{
+						BackgroundTransparency = 1,
+						Size = UDim2.fromScale(0.55, 1),
+						Position = UDim2.fromScale(0.45, 0),
+						LayoutOrder = 2
+					},
+					{
+						UIPadding = Roact.createElement("UIPadding", {
+							PaddingLeft = UDim.new(0, 5),
+							PaddingRight = UDim.new(0, 5)
+						}),
+						HumanoidViewport = Roact.createElement(HumanoidViewport, {
+							humanoidDescription = conformedHumanoidDescription,
+							loadingFailed = getConformedDescriptionFailed,
+							retryLoadDescription = self.retryLoadDescription,
+							rigType = self.props.rigType
+						})
+					}
+				),
+				UISizeConstraint = Roact.createElement("UISizeConstraint", {
+					MaxSize = self.contentMaxSize
 				})
-			}),
-			HumanoidViewportFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				Size = UDim2.fromScale(0.55, 1),
-				Position = UDim2.fromScale(0.45, 0)
-			}, {
-				UIPadding = Roact.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, 5),
-					PaddingRight = UDim.new(0, 5)
-				}),
-				HumanoidViewport = Roact.createElement(HumanoidViewport, {
-					humanoidDescription = conformedHumanoidDescription,
-					loadingFailed = getConformedDescriptionFailed,
-					retryLoadDescription = p1.retryLoadDescription,
-					rigType = p1.props.rigType
-				})
-			}),
-			UISizeConstraint = Roact.createElement("UISizeConstraint", {
-				MaxSize = p1.contentMaxSize
-			})
-		})
+			}
+		)
 	end
 end
-function v17.render(p5) -- line: 146
-	-- upvalues: Roact (copy), InteractiveAlert (copy), RobloxTranslator (copy), ButtonType (copy)
+
+function extended.render(props)
 	return Roact.createElement(InteractiveAlert, {
 		title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.SaveAvatarPromptTitle"),
 		bodyText = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.SaveAvatarPromptText", {
-			RBX_NAME = p5.props.gameName
+			RBX_NAME = props.props.gameName
 		}),
 		buttonStackInfo = {
 			buttons = {
 				{
-					isDefaultChild = true,
 					props = {
-						onActivated = p5.props.signalSaveAvatarPermissionDenied,
+						onActivated = props.props.signalSaveAvatarPermissionDenied,
 						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.SaveAvatarPromptNo")
-					}
+					},
+					isDefaultChild = true
 				},
 				{
-					isDefaultChild = false,
 					buttonType = ButtonType.PrimarySystem,
 					props = {
-						onActivated = p5.props.performSaveAvatar,
+						onActivated = props.props.performSaveAvatar,
 						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.SaveAvatarPromptYes")
-					}
+					},
+					isDefaultChild = false
 				}
 			}
 		},
 		position = UDim2.fromScale(0.5, 0.5),
-		screenSize = p5.props.screenSize,
-		middleContent = p5.renderAlertMiddleContent,
-		onAbsoluteSizeChanged = p5.onAlertSizeChanged,
-		isMiddleContentFocusable = p5.state.itemListScrollable
+		screenSize = props.props.screenSize,
+		middleContent = props.renderAlertMiddleContent,
+		onAbsoluteSizeChanged = props.onAlertSizeChanged,
+		isMiddleContentFocusable = props.state.itemListScrollable
 	})
 end
-function v17.getConformedHumanoidDescription(p6, p7) -- line: 179
-	-- upvalues: GetConformedHumanoidDescription (copy)
-	GetConformedHumanoidDescription(p7, true):andThen(function(p8) -- line: 181
-		-- upvalues: p6 (copy)
-		if not p6.mounted then
+
+function extended:getConformedHumanoidDescription(p)
+	GetConformedHumanoidDescription(p, true):andThen(function(conformedHumanoidDescription)
+		if not self.mounted then
 			return
 		end
 
-		p6:setState({
-			conformedHumanoidDescription = p8
-		})
-	end, function(_) -- line: 189
-		-- upvalues: p6 (copy)
-		if not p6.mounted then
+		self:setState({ conformedHumanoidDescription = conformedHumanoidDescription })
+	end, function(_)
+		if not self.mounted then
 			return
 		end
 
-		p6:setState({
-			getConformedDescriptionFailed = true
-		})
+		self:setState({ getConformedDescriptionFailed = true })
 	end)
 end
-function v17.didMount(p10) -- line: 200
-	p10.mounted = true
-	p10:getConformedHumanoidDescription(p10.props.humanoidDescription)
-end
-function v17.didUpdate(p11, p12, _) -- line: 206
-	-- upvalues: Roact (copy)
-	if p11.props.humanoidDescription ~= p12.humanoidDescription then
-		p11:setState({
-			getConformedDescriptionFailed = false,
-			conformedHumanoidDescription = Roact.None
-		})
-		p11:getConformedHumanoidDescription(p11.props.humanoidDescription)
-	end
-end
-function v17.willUnmount(p14) -- line: 217
-	p14.mounted = false
+
+function extended:didMount()
+	self.mounted = true
+
+	self:getConformedHumanoidDescription(self.props.humanoidDescription)
 end
 
-local function mapStateToProps(p15) -- line: 221
+function extended:didUpdate(p, _)
+	if self.props.humanoidDescription ~= p.humanoidDescription then
+		self:setState({
+			conformedHumanoidDescription = Roact.None,
+			getConformedDescriptionFailed = false
+		})
+
+		self:getConformedHumanoidDescription(self.props.humanoidDescription)
+	end
+end
+
+function extended:willUnmount()
+	self.mounted = false
+end
+
+local function mapStateToProps(data)
 	return {
-		gameName = p15.gameName,
-		screenSize = p15.screenSize,
-		humanoidDescription = p15.promptInfo.humanoidDescription,
-		rigType = p15.promptInfo.rigType
+		gameName = data.gameName,
+		screenSize = data.screenSize,
+		humanoidDescription = data.promptInfo.humanoidDescription,
+		rigType = data.promptInfo.rigType
 	}
 end
-local function mapDispatchToProps(p16) -- line: 230
-	-- upvalues: SignalSaveAvatarPermissionDenied (copy), PerformSaveAvatar (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		signalSaveAvatarPermissionDenied = function() -- line: 232
-			-- upvalues: p16 (copy), SignalSaveAvatarPermissionDenied (copy)
-			return p16(SignalSaveAvatarPermissionDenied)
+		signalSaveAvatarPermissionDenied = function()
+			return callback(SignalSaveAvatarPermissionDenied)
 		end,
-		performSaveAvatar = function() -- line: 236
-			-- upvalues: p16 (copy), PerformSaveAvatar (copy)
-			return p16(PerformSaveAvatar)
+		performSaveAvatar = function()
+			return callback(PerformSaveAvatar)
 		end
 	}
 end
 
-return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v17)
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(extended)

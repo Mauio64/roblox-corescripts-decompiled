@@ -1,0 +1,3 @@
+local FFlagSocialEnableProfileInspectAndBuy = require(script.Parent.FFlagSocialEnableProfileInspectAndBuy)
+
+return game:DefineFastFlag("FriendsActivityFeedFetchItemNames", false) and FFlagSocialEnableProfileInspectAndBuy

@@ -1,5 +1,9 @@
 local CorePackages = game:GetService("CorePackages")
-local FFlagEnableConsoleExpControls = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
-local v3 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
 
-return FFlagEnableConsoleExpControls and v3
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local enabled = Chrome.Enabled()
+
+return FFlagEnableConsoleExpControls and enabled

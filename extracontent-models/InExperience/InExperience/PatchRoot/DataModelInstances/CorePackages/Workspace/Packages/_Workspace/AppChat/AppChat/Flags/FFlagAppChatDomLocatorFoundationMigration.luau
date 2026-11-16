@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
+local SharedFlags = require(parent.SharedFlags)
 
-return require(Parent.SharedFlags).FFlagAppChatDomLocatorFoundationMigration
+return SharedFlags.FFlagAppChatDomLocatorFoundationMigration

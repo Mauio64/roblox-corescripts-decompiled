@@ -1,18 +1,21 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local console = require(ParentParent.Shared).console
-local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+
+local Shared = require(parent.Shared)
+local console = Shared.console
+
+local Shared2 = require(parent.Shared)
+local ReactSymbols = Shared2.ReactSymbols
 local REACT_PROVIDER_TYPE = ReactSymbols.REACT_PROVIDER_TYPE
 local REACT_CONTEXT_TYPE = ReactSymbols.REACT_CONTEXT_TYPE
 
 return {
-	createContext = function(p1, p2: ((...any) -> ...any)?) -- line: 34
-		-- upvalues: REACT_CONTEXT_TYPE (copy), REACT_PROVIDER_TYPE (copy), ReactGlobals (copy), console (copy)
-		local t1 = {
+	createContext = function(currentValue, calculateChangedBits)
+		local v = {
 			["$$typeof"] = REACT_CONTEXT_TYPE,
-			_calculateChangedBits = p2,
-			_currentValue = p1,
-			_currentValue2 = p1,
+			_calculateChangedBits = calculateChangedBits,
+			_currentValue = currentValue,
+			_currentValue2 = currentValue,
 			_threadCount = 0,
 			Provider = nil,
 			Consumer = nil,
@@ -21,77 +24,56 @@ return {
 			_currentRenderer2 = nil
 		}
 
-		t1.Provider = {
-			["$$typeof"] = REACT_PROVIDER_TYPE,
-			_context = t1
-		}
+		v.Provider = { ["$$typeof"] = REACT_PROVIDER_TYPE, _context = v }
 
-		local u10 = false
+		local v2 = false
 
 		if ReactGlobals.__DEV__ then
-			local t2 = {
+			local consumer = {
 				["$$typeof"] = REACT_CONTEXT_TYPE,
-				_context = t1,
-				_calculateChangedBits = t1._calculateChangedBits
+				_context = v,
+				_calculateChangedBits = v._calculateChangedBits
 			}
 
-			setmetatable(t2, {
-				__index = function(_, p4) -- line: 79
-					-- upvalues: t1 (copy)
-					if p4 == "_currentValue" then
-						return t1._currentValue
-					end
-
-					if p4 == "_currentValue2" then
-						return t1._currentValue2
-					end
-
-					if p4 == "_threadCount" then
-						return t1._threadCount
-					end
-
-					if p4 == "displayName" then
-						return t1.displayName
+			setmetatable(consumer, {
+				__index = function(_, p)
+					if p == "_currentValue" then
+						return v._currentValue
+					elseif p == "_currentValue2" then
+						return v._currentValue2
+					elseif p == "_threadCount" then
+						return v._threadCount
+					elseif p == "displayName" then
+						return v.displayName
 					end
 
 					return nil
 				end,
-				__newindex = function(_, p6, p7) -- line: 92
-					-- upvalues: t1 (copy), u10 (ref), console (copy)
-					if p6 == "_currentValue" then
-						t1._currentValue = p7
+				__newindex = function(_, p, p2)
+					if p == "_currentValue" then
+						v._currentValue = p2
+					elseif p == "_currentValue2" then
+						v._currentValue2 = p2
+					elseif p == "_threadCount" then
+						v._threadCount = p2
+					elseif p == "displayName" and not v2 then
+						console.warn("Setting `displayName` on Context.Consumer has no effect. " .. "You should set it directly on the context with Context.displayName = " .. p2 .. ".")
 
-						return
-					end
-
-					if p6 == "_currentValue2" then
-						t1._currentValue2 = p7
-
-						return
-					end
-
-					if p6 == "_threadCount" then
-						t1._threadCount = p7
-
-						return
-					end
-
-					if p6 == "displayName" and not u10 then
-						console.warn("Setting `displayName` on Context.Consumer has no effect. " .. "You should set it directly on the context with Context.displayName = " .. p7 .. ".")
-						u10 = true
+						v2 = true
 					end
 				end
 			})
-			t1.Consumer = t2
+
+			v.Consumer = consumer
 		else
-			t1.Consumer = t1
+			v.Consumer = v
 		end
 
 		if ReactGlobals.__DEV__ then
-			t1._currentRenderer = nil
-			t1._currentRenderer2 = nil
+			v._currentRenderer = nil
+			v._currentRenderer2 = nil
 		end
 
-		return t1
+		return v
 	end
 }

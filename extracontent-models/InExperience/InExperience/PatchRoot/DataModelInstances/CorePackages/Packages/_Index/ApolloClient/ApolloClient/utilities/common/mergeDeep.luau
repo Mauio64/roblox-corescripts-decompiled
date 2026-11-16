@@ -1,104 +1,106 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Set = require(ParentParentParent.LuauPolyfill).Set
-local v5 = newproxy(true)
+local MergeDeep = {}
 
-getmetatable(v5).__tostring = function() -- line: 23
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Set = LuauPolyfill.Set
+
+local none = newproxy(true)
+getmetatable(none).__tostring = function(): string
 	return "Value.None"
 end
 
-local isNonNullObject = require(script.Parent.objects).isNonNullObject
-local hasOwnProperty = require(ParentParent.luaUtils.hasOwnProperty)
-local objectKeysForEach = require(ParentParent.luaUtils.objectKeysForEach)
-local mergeDeepArray = nil
+local objects = require(script.Parent.objects)
+local isNonNullObject = objects.isNonNullObject
+local hasOwnProperty = require(parent.luaUtils.hasOwnProperty)
+local objectKeysForEach = require(parent.luaUtils.objectKeysForEach)
 
-function t1.mergeDeep(...) -- line: 59
-	-- upvalues: mergeDeepArray (ref)
+local mergeDeepArray
+
+function MergeDeep.mergeDeep(...)
 	return mergeDeepArray({ ... })
 end
 
-local t2 = {}
+local class = {}
 
-function mergeDeepArray(p1) -- line: 73
-	-- upvalues: t2 (copy)
-	local v12 = p1[1] or {}
-	local v13 = #p1
+mergeDeepArray = function(list)
+	local v = list[1] or {}
 
-	if v13 > 1 then
-		local v14 = t2.new()
+	local count = #list
 
-		for i = 2, v13 do
-			v12 = v14:merge(v12, p1[i])
+	if count > 1 then
+		local v2 = class.new()
+
+		for i = 2, count do
+			v = v2:merge(v, list[i])
 		end
 	end
 
-	return v12
+	return v
 end
 
-t1.mergeDeepArray = mergeDeepArray
-t2.__index = t2
+MergeDeep.mergeDeepArray = mergeDeepArray
 
-function t2.new(p2: ((...any) -> ...any)?) -- line: 107
-	-- upvalues: t2 (copy), isNonNullObject (copy), Set (copy)
-	local self = setmetatable({}, t2)
+class.__index = class
 
-	if p2 == nil then
-		function p2(p3, p4, p5, p6) -- line: 110
-			return p3:merge(p4[p6], p5[p6])
-		end
-	end
+function class.new(callback)
+	local self = setmetatable({}, class)
 
-	self.reconciler = p2
+	self.reconciler = callback == nil and function(object, p, p2, p3)
+		return object:merge(p[p3], p2[p3])
+	end or callback
+
 	self.isObject = isNonNullObject
 	self.pastCopies = Set.new()
 
 	return self
 end
-function t2.merge(t3: {[any]: any}, p7, p8, ...) -- line: 124
-	-- upvalues: isNonNullObject (copy), objectKeysForEach (copy), hasOwnProperty (copy), v5 (copy)
-	local v22 = table.pack(...)
 
-	if isNonNullObject(p8) and isNonNullObject(p7) then
-		objectKeysForEach(p8, function(p9) -- line: 130
-			-- upvalues: hasOwnProperty (copy), p7 (ref), p8 (copy), t3 (copy), v22 (copy), v5 (copy)
-			if hasOwnProperty(p7, p9) then
-				local v30 = p7[p9]
+function class:merge(p, p2, ...)
+	local v = table.pack(...)
 
-				if v30 ~= p8[p9] then
-					local v31 = t3:reconciler(p7, p8, p9, table.unpack(v22))
+	if isNonNullObject(p2) and isNonNullObject(p) then
+		objectKeysForEach(p2, function(p3)
+			if hasOwnProperty(p, p3) then
+				local v2 = p[p3]
 
-					if v31 ~= v30 then
-						p7 = t3:shallowCopyForMerge(p7)
-						p7[p9] = v31
+				if p2[p3] ~= v2 then
+					local reconciler = self:reconciler(p, p2, p3, table.unpack(v))
+
+					if reconciler ~= v2 then
+						p = self:shallowCopyForMerge(p)
+						p[p3] = reconciler
 					end
 				end
 			else
-				p7 = t3:shallowCopyForMerge(p7)
-				p7[p9] = p8[p9]
+				p = self:shallowCopyForMerge(p)
+				p[p3] = p2[p3]
 			end
 
-			if p7[p9] == v5 then
-				p7[p9] = nil
+			if p[p3] == none then
+				p[p3] = nil
 			end
 		end)
 
-		return p7
+		return p
 	end
 
-	return p8
+	return p2
 end
-function t2.shallowCopyForMerge(p10, p11) -- line: 163
-	-- upvalues: isNonNullObject (copy)
-	if isNonNullObject(p11) and not p10.pastCopies:has(p11) then
-		p11 = table.clone(p11)
-		p10.pastCopies:add(p11)
+
+function class:shallowCopyForMerge(p)
+	if isNonNullObject(p) and not self.pastCopies:has(p) then
+		p = table.clone(p)
+
+		self.pastCopies:add(p)
 	end
 
-	return p11
+	return p
 end
 
-t2.None = v5
-t1.DeepMerger = t2
+class.None = none
 
-return t1
+MergeDeep.DeepMerger = class
+
+return MergeDeep

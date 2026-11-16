@@ -1,3 +1,1 @@
-return {
-	UseDefaultAnimations = false
-}
+return { UseDefaultAnimations = false }

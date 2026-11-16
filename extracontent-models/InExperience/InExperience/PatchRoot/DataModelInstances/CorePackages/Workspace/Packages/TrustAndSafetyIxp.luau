@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.TrustAndSafetyIxp.TrustAndSafetyIxp))
+local TrustAndSafetyIxp = require(Workspace.TrustAndSafetyIxp.TrustAndSafetyIxp)
+
+return TrustAndSafetyIxp

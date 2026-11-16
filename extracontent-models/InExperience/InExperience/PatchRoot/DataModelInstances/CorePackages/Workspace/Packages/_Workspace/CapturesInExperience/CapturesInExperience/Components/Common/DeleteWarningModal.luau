@@ -1,13 +1,17 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Localization = require(ParentParentParent.Localization)
-local React = require(ParentParentParent.React)
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
-local UIBlox = require(ParentParentParent.UIBlox)
-local Checkbox = require(ParentParentParent.Foundation).Checkbox
-local DeleteWarningModalClosed = require(ParentParent.Actions.DeleteWarningModalClosed)
-local recordDeleteWarningModalOptOut = require(ParentParent.Utils.recordDeleteWarningModalOptOut)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Localization = require(parent2.Localization)
+local React = require(parent2.React)
+local RoactUtils = require(parent2.RoactUtils)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local UIBlox = require(parent2.UIBlox)
+local Foundation = require(parent2.Foundation)
+local Checkbox = Foundation.Checkbox
+
+local DeleteWarningModalClosed = require(parent.Actions.DeleteWarningModalClosed)
+local recordDeleteWarningModalOptOut = require(parent.Utils.recordDeleteWarningModalOptOut)
+
 local useCallback = React.useCallback
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffect = React.useEffect
@@ -16,19 +20,23 @@ local useScreenSize = RobloxAppHooks.useScreenSize
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local useState = React.useState
 local useStyle = UIBlox.Core.Style.useStyle
-local Constants = require(ParentParent.Constants)
-local EventNames = require(ParentParent.Analytics.EventNames)
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+
+local Constants = require(parent.Constants)
+local EventNames = require(parent.Analytics.EventNames)
+local useAnalytics = require(parent.Analytics.useAnalytics)
+
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 
-return function(t1: {[any]: any}) -- line: 37
-	-- upvalues: useScreenSize (copy), useStyle (copy), useAnalytics (copy), useDispatch (copy), useLocalization (copy), useSelector (copy), Constants (copy), useState (copy), useEffect (copy), useCallback (copy), DeleteWarningModalClosed (copy), EventNames (copy), recordDeleteWarningModalOptOut (copy), React (copy), InteractiveAlert (copy), ButtonType (copy), Checkbox (copy)
-	local v25 = useScreenSize()
-	local v26 = useStyle()
-	local v27 = useAnalytics()
-	local v28 = useDispatch()
-	local v29 = useLocalization({
+return function(p)
+	local screenSize = useScreenSize()
+	local v = useStyle()
+
+	local v2 = useAnalytics()
+	local v3 = useDispatch()
+
+	local v4 = useLocalization({
 		alertBody = "Feature.Captures.Label.DeleteCaptureInfo",
 		alertBodyPlural = "Feature.Captures.Label.DeleteCapturesWarning",
 		alertTitle = "Feature.Captures.Title.DeleteCaptureWarning",
@@ -37,93 +45,94 @@ return function(t1: {[any]: any}) -- line: 37
 		deleteCTA = "Feature.Captures.Action.DeleteCaptureWarningConfirm",
 		optOutText = "Feature.Captures.Label.DeleteCaptureWarningOptOut"
 	})
-	local Theme = v26.Theme
-	local v31 = useSelector(function(p1) -- line: 56
-		-- upvalues: Constants (copy)
-		return p1[Constants.RoduxKey].Carousel.IsDeleteWarningModalOpen
+
+	local theme = v.Theme
+
+	local visible = useSelector(function(p2)
+		return p2[Constants.RoduxKey].Carousel.IsDeleteWarningModalOpen
 	end)
-	local v32 = useSelector(function(p2) -- line: 60
-		-- upvalues: Constants (copy)
+
+	local v5 = useSelector(function(p2)
 		return p2[Constants.RoduxKey].CaptureManager.SelectedCaptures
 	end)
-	local v33, v34 = useState(false)
 
-	useEffect(function() -- line: 66
-		-- upvalues: v31 (copy), v34 (copy)
-		if v31 then
-			v34(false)
+	local state, setState = useState(false)
+
+	useEffect(function()
+		if visible then
+			setState(false)
 		end
-	end, {
-		v31,
-		v34
-	})
+	end, { visible, setState })
 
-	local v35 = useCallback(function() -- line: 72
-		-- upvalues: v28 (copy), DeleteWarningModalClosed (copy), v27 (copy), EventNames (copy)
-		v28(DeleteWarningModalClosed())
-		v27.fireEvent(EventNames.CapturesDeleteWarningModalCancelPressed)
+	local onActivated = useCallback(function()
+		v3(DeleteWarningModalClosed())
+		v2.fireEvent(EventNames.CapturesDeleteWarningModalCancelPressed)
 	end, {})
-	local v36 = useCallback(function() -- line: 77
-		-- upvalues: t1 (copy), v33 (copy), recordDeleteWarningModalOptOut (copy), v27 (copy), EventNames (copy), v28 (copy), DeleteWarningModalClosed (copy)
-		t1.deleteItem()
 
-		if v33 then
-			recordDeleteWarningModalOptOut(v27)
+	local onActivated2 = useCallback(function()
+		p.deleteItem()
+
+		if state then
+			recordDeleteWarningModalOptOut(v2)
 		end
 
-		v27.fireEvent(EventNames.CapturesDeleteWarningModalDeletePressed)
-		v28(DeleteWarningModalClosed())
-	end, {
-		v27,
-		v33,
-		t1.deleteItem
-	})
+		v2.fireEvent(EventNames.CapturesDeleteWarningModalDeletePressed)
+		v3(DeleteWarningModalClosed())
+	end, { v2, state, p.deleteItem })
 
-	return React.createElement("TextButton", {
+	local createElement = React.createElement
+	local v6 = {
 		Active = true,
 		AutoButtonColor = false,
-		BackgroundColor3 = Theme.Overlay.Color,
-		BackgroundTransparency = Theme.Overlay.Transparency,
+		BackgroundColor3 = theme.Overlay.Color,
+		BackgroundTransparency = theme.Overlay.Transparency,
 		Size = UDim2.fromScale(1, 1),
-		Visible = v31,
-		ZIndex = t1.zIndex
-	}, {
-		Alert = React.createElement(InteractiveAlert, {
-			isMiddleContentFocusable = false,
-			bodyText = if not (#v32 > 1) then v29.alertBody else v29.alertBodyPlural,
-			buttonStackInfo = {
-				buttons = {
-					{
-						buttonType = ButtonType.Secondary,
-						props = {
-							onActivated = v35,
-							text = v29.cancelCTA
-						}
-					},
-					{
-						buttonType = ButtonType.PrimarySystem,
-						props = {
-							onActivated = v36,
-							text = v29.deleteCTA
-						}
-					}
+		Visible = visible,
+		ZIndex = p.zIndex
+	}
+
+	local createElement2 = React.createElement
+	local bodyText
+
+	if #v5 > 1 then
+		bodyText = v4.alertBodyPlural
+	else
+		bodyText = v4.alertBody
+	end
+
+	local v7 = {
+		bodyText = bodyText,
+		buttonStackInfo = {
+			buttons = {
+				{
+					buttonType = ButtonType.Secondary,
+					props = { onActivated = onActivated, text = v4.cancelCTA }
+				},
+				{
+					buttonType = ButtonType.PrimarySystem,
+					props = { onActivated = onActivated2, text = v4.deleteCTA }
 				}
-			},
-			middleContent = function() -- line: 118
-				-- upvalues: React (copy), Checkbox (copy), v29 (copy), v33 (copy), v34 (copy)
-				return React.createElement(Checkbox, {
-					isDisabled = false,
-					label = v29.optOutText,
-					isChecked = v33,
-					onActivated = function() -- line: 123
-						-- upvalues: v34 (copy), v33 (copy)
-						v34(not v33)
-					end
-				})
-			end,
-			position = UDim2.fromScale(0.5, 0.5),
-			screenSize = v25,
-			title = if not (#v32 > 1) then v29.alertTitle else v29.alertTitlePlural
-		})
+			}
+		},
+		isMiddleContentFocusable = false,
+		middleContent = function()
+			return React.createElement(Checkbox, {
+				label = v4.optOutText,
+				isChecked = state,
+				isDisabled = false,
+				onActivated = function()
+					setState(not state)
+				end
+			})
+		end,
+		position = UDim2.fromScale(0.5, 0.5),
+		screenSize = screenSize,
+		title = 0
+	}
+
+	local title = if #v5 > 1 then v4.alertTitlePlural else v4.alertTitle
+	v7.title = title
+	return createElement("TextButton", v6, {
+		Alert = createElement2(InteractiveAlert, v7)
 	})
 end

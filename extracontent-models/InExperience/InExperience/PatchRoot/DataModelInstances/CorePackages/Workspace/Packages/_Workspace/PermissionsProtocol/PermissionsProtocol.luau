@@ -1,7 +1,4 @@
 local PermissionsProtocol = require(script.PermissionsProtocol)
-
 require(script.PermissionsProtocolTypes)
 
-return {
-	PermissionsProtocol = PermissionsProtocol
-}
+return { PermissionsProtocol = PermissionsProtocol }

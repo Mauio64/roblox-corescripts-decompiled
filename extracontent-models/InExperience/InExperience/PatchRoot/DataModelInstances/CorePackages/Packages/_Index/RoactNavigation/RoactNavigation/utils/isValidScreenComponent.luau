@@ -1,5 +1,11 @@
-return function(p1) -- line: 2
-	local v2 = type(p1)
+return function(p): boolean
+	local typeName = type(p)
 
-	return v2 == "function" or v2 == "table" and type(p1.render) == "function"
+	if typeName == "function" then
+		return true
+	elseif typeName == "table" then
+		return type(p.render) == "function"
+	else
+		return false
+	end
 end

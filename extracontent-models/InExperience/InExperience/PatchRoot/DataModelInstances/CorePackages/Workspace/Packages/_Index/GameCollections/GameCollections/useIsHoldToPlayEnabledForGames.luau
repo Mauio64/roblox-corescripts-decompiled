@@ -1,45 +1,52 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local useUserExperiment = require(Parent.RoactAppExperiment).useUserExperiment
-local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
-local useUiModeInfo = require(Parent.RobloxAppHooks).useUiModeInfo
-local UiMode = require(Parent.RobloxAppEnums).UiMode
-local Responsive = require(Parent.Responsive)
-local FFlagLuaAppEnableStickyShortcutBar = require(Parent.SharedFlags).FFlagLuaAppEnableStickyShortcutBar
-local FFlagLuaAppResponsiveEnginePreferredInput = require(Parent.SharedFlags).FFlagLuaAppResponsiveEnginePreferredInput
-local FFlagGuacStickyShortcutBarEnabled = require(Parent.SharedFlags).FFlagGuacStickyShortcutBarEnabled
-local v10 = if not FFlagLuaAppEnableStickyShortcutBar then nil else require(Parent.AppShortcutBar).Hooks.useIsStickyShortcutBarEnabled
-local v11 = if not FFlagGuacStickyShortcutBarEnabled then nil else require(Parent.UniversalAppPolicy).useAppPolicy
+local parent = script:FindFirstAncestor("GameCollections").Parent
 
-local function useIsHoldToPlayEnabledForGames() -- line: 21
-	-- upvalues: useUserExperiment (copy), AppUserLayers (copy), Responsive (copy), useUiModeInfo (copy), FFlagGuacStickyShortcutBarEnabled (copy), v11 (copy), FFlagLuaAppEnableStickyShortcutBar (copy), v10 (copy), FFlagLuaAppResponsiveEnginePreferredInput (copy), UiMode (copy)
-	local v13 = useUserExperiment({ AppUserLayers.PlatformExcellenceQualityImprovementConsoles }, function(p1) -- line: 24
-		-- upvalues: AppUserLayers (copy)
-		return (p1[AppUserLayers.PlatformExcellenceQualityImprovementConsoles] or {}).enableHoldToPlay
+local RoactAppExperiment = require(parent.RoactAppExperiment)
+local useUserExperiment = RoactAppExperiment.useUserExperiment
+local ExperimentLayers = require(parent.ExperimentLayers)
+local AppUserLayers = ExperimentLayers.AppUserLayers
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useUiModeInfo = RobloxAppHooks.useUiModeInfo
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local UiMode = RobloxAppEnums.UiMode
+local Responsive = require(parent.Responsive)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppResponsiveEnginePreferredInput = SharedFlags.FFlagLuaAppResponsiveEnginePreferredInput
+
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+
+local function useIsHoldToPlayEnabledForGames()
+	local v = useUserExperiment({ AppUserLayers.PlatformExcellenceQualityImprovementConsoles }, function(p)
+		return (p[AppUserLayers.PlatformExcellenceQualityImprovementConsoles] or {}).enableHoldToPlay
 	end)
-	local v14 = Responsive.useLastInput()
-	local v15 = useUiModeInfo()
-	local v16 = if not FFlagGuacStickyShortcutBarEnabled then if not FFlagLuaAppEnableStickyShortcutBar then nil else v10() else v11(function(p2) -- line: 36
-		return p2.getStickyShortcutBarEnabled()
+
+	local v2 = Responsive.useLastInput()
+
+	local v3 = useUiModeInfo()
+
+	local v4 = useAppPolicy(function(p)
+		return p.getStickyShortcutBarEnabled()
 	end)
-	local v17 = if not FFlagLuaAppResponsiveEnginePreferredInput then nil else Responsive.usePreferredInput()
+	local v5
 
-	if v13 then
-		v13 = if not FFlagLuaAppResponsiveEnginePreferredInput then v14 == Responsive.Input.Directional else v17 == Responsive.Input.Directional
-
-		if v13 then
-			v13 = true
-
-			if v15.uiMode ~= UiMode.TenFoot then
-				if FFlagLuaAppEnableStickyShortcutBar or FFlagGuacStickyShortcutBarEnabled then
-					return v16
-				end
-
-				v13 = false
-			end
-		end
+	if FFlagLuaAppResponsiveEnginePreferredInput then
+		v5 = Responsive.usePreferredInput()
 	end
 
-	return v13
+	if not v then
+		return v
+	end
+
+	local v6
+
+	if FFlagLuaAppResponsiveEnginePreferredInput then
+		v6 = v5 == Responsive.Input.Directional
+	else
+		v6 = v2 == Responsive.Input.Directional
+	end
+
+	return v6 and (v3.uiMode == UiMode.TenFoot or v4)
 end
 
 return useIsHoldToPlayEnabledForGames

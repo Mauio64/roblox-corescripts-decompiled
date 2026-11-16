@@ -1,17 +1,25 @@
 return {
-	getCenterOffsetX = function(t1: {[any]: any}) -- line: 42
-		local v2 = t1.containerPosition + t1.ratio * t1.containerWidth
-		local v3 = t1.insetLeft + t1.margin
-		local v4 = t1.screenWidth - t1.insetRight - t1.margin
-		local v5 = v4 - v3
+	getCenterOffsetX = function(data)
+		local v = data.containerPosition + data.ratio * data.containerWidth
 
-		if v5 <= 0 or t1.popoverWidth <= 0 then
-			return v2 - t1.containerPosition
+		local v2 = data.insetLeft + data.margin
+		local v3 = data.screenWidth - data.insetRight - data.margin
+		local v4 = v3 - v2
+
+		if v4 <= 0 or data.popoverWidth <= 0 then
+			return v - data.containerPosition
 		end
 
-		local v6 = v3 + t1.popoverWidth / 2
-		local v7 = v4 - t1.popoverWidth / 2
+		local v5 = v2 + data.popoverWidth / 2
+		local v6 = v3 - data.popoverWidth / 2
+		local v7
 
-		return ((if not (v7 < v6) then math.clamp(v2, v6, v7) else v3 + v5 / 2)) - t1.containerPosition
+		if v6 < v5 then
+			v7 = v2 + v4 / 2
+		else
+			v7 = math.clamp(v, v5, v6)
+		end
+
+		return v7 - data.containerPosition
 	end
 }

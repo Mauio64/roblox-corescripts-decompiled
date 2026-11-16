@@ -1,13 +1,12 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local React = require(Parent.React)
-local ReactTestingLibrary = require(Parent.Dev.ReactTestingLibrary)
-local FoundationProvider = require(Parent.Foundation).FoundationProvider
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
 
-local function renderWithProviders(p1) -- line: 9
-	-- upvalues: ReactTestingLibrary (copy), React (copy), FoundationProvider (copy)
-	return ReactTestingLibrary.render(React.createElement(FoundationProvider, {
-		theme = "Dark"
-	}, p1))
+local React = require(parent.React)
+local ReactTestingLibrary = require(parent.Dev.ReactTestingLibrary)
+local Foundation = require(parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+
+local function renderWithProviders(p)
+	return ReactTestingLibrary.render(React.createElement(FoundationProvider, { colorMode = "Dark" }, p))
 end
 
 return renderWithProviders

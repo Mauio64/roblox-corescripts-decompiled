@@ -8,9 +8,11 @@ local ItemCardFooter = require(ItemCard.ItemCardFooter)
 local ItemCardHeader = require(ItemCard.ItemCardHeader)
 local ItemCardHeaderCornersOverlay = require(ItemCard.ItemCardHeaderCornersOverlay)
 local ItemCardIcon = require(ItemCard.ItemCardIcon)
+local ItemCardIndicatorStack = require(ItemCard.ItemCardIndicatorStack)
 local ItemCardPriceLine = require(ItemCard.ItemCardPriceLine)
 local ItemCardStatus = require(ItemCard.ItemCardStatus)
 local ItemCardThumbnail = require(ItemCard.ItemCardThumbnail)
+local ItemCardThumbnailSkeleton = require(ItemCard.ItemCardThumbnailSkeleton)
 local ItemCardTitle = require(ItemCard.ItemCardTitle)
 local Widget = script.Widget
 local WidgetHeader = require(Widget.WidgetHeader)
@@ -18,23 +20,14 @@ local WidgetLayout = require(Widget.WidgetLayout)
 local WidgetListItem = require(Widget.WidgetListItem)
 local Grid = require(script.Grid.Grid)
 local VirtualizedFeed = require(script.VirtualizedFeed.VirtualizedFeed)
+local useFlatListScrollPerformanceTracker = require(script.VirtualizedFeed.useFlatListScrollPerformanceTracker)
 local AXTooltip = require(script.AXTooltip.AXTooltip)
-local CategoryMenu = require(script.CategoryMenu.CategoryMenu)
-local TabGroup = require(script.TabGroup.TabGroup)
-local TimerBadge = require(script.TimerBadge.TimerBadge)
-local ScrollingFrameWithIndicators = require(script.ScrollingFrameWithIndicators.ScrollingFrameWithIndicators)
-local CategoryMenuButtonsLocationEnum = require(script.CategoryMenu.CategoryMenuButtonsLocationEnum)
-local useRemainingTime = require(script.Utils.useRemainingTime)
-local getRemainingTime = require(script.Utils.getRemainingTime)
-local getItemCountForRow = require(script.Utils.getItemCountForRow)
-local getLocalizedPrice = require(ItemCard.Utils.getLocalizedPrice)
-
 return {
-	CategoryMenu = CategoryMenu,
-	TabGroup = TabGroup,
-	TimerBadge = TimerBadge,
-	ScrollingFrameWithIndicators = ScrollingFrameWithIndicators,
-	CategoryMenuButtonsLocationEnum = CategoryMenuButtonsLocationEnum,
+	CategoryMenu = require(script.CategoryMenu.CategoryMenu),
+	TabGroup = require(script.TabGroup.TabGroup),
+	TimerBadge = require(script.TimerBadge.TimerBadge),
+	ScrollingFrameWithIndicators = require(script.ScrollingFrameWithIndicators.ScrollingFrameWithIndicators),
+	CategoryMenuButtonsLocationEnum = require(script.CategoryMenu.CategoryMenuButtonsLocationEnum),
 	ItemCardComponents = {
 		ItemCard = ItemCard2,
 		ItemCardAnimationStateIndicator = ItemCardAnimationStateIndicator,
@@ -44,9 +37,11 @@ return {
 		ItemCardHeader = ItemCardHeader,
 		ItemCardHeaderCornersOverlay = ItemCardHeaderCornersOverlay,
 		ItemCardIcon = ItemCardIcon,
+		ItemCardIndicatorStack = ItemCardIndicatorStack,
 		ItemCardPriceLine = ItemCardPriceLine,
 		ItemCardStatus = ItemCardStatus,
 		ItemCardThumbnail = ItemCardThumbnail,
+		ItemCardThumbnailSkeleton = ItemCardThumbnailSkeleton,
 		ItemCardTitle = ItemCardTitle
 	},
 	WidgetComponents = {
@@ -54,25 +49,18 @@ return {
 		WidgetLayout = WidgetLayout,
 		WidgetListItem = WidgetListItem
 	},
-	BackgroundLayersComponents = {
-		BackgroundLayers = BackgroundLayers
-	},
-	GridComponents = {
-		Grid = Grid
-	},
-	AXTooltipComponents = {
-		AXTooltip = AXTooltip
-	},
-	FeedComponents = {
-		VirtualizedFeed = VirtualizedFeed
-	},
+	BackgroundLayersComponents = { BackgroundLayers = BackgroundLayers },
+	GridComponents = { Grid = Grid },
+	AXTooltipComponents = { AXTooltip = AXTooltip },
+	FeedComponents = { VirtualizedFeed = VirtualizedFeed },
 	Hooks = {
-		useRemainingTime = useRemainingTime
+		useRemainingTime = require(script.Utils.useRemainingTime),
+		useFlatListScrollPerformanceTracker = useFlatListScrollPerformanceTracker
 	},
 	Utils = {
-		getRemainingTime = getRemainingTime,
-		getItemCountForRow = getItemCountForRow,
-		getLocalizedPrice = getLocalizedPrice
+		getRemainingTime = require(script.Utils.getRemainingTime),
+		getItemCountForRow = require(script.Utils.getItemCountForRow),
+		getLocalizedPrice = require(ItemCard.Utils.getLocalizedPrice)
 	},
 	["jest.config"] = script["jest.config"]
 }

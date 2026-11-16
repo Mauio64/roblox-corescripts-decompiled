@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.VariableItemWidthCarousel.VariableItemWidthCarousel))
+local VariableItemWidthCarousel = require(index.VariableItemWidthCarousel.VariableItemWidthCarousel)
+
+return VariableItemWidthCarousel

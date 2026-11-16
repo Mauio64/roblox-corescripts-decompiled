@@ -1,21 +1,18 @@
-local ParentParent = script.Parent.Parent
-local Parent = require(script.Parent)
-local instanceof = require(ParentParent.instanceof)
-local reduce = require(ParentParent.Array.reduce)
+local parent = script.Parent.Parent
+local parentModule = require(script.Parent)
+local instanceof = require(parent.instanceof)
+local reduce = require(parent.Array.reduce)
+require(parent.types)
 
-require(ParentParent.types)
-
-local function coerceToTable(p1) -- line: 9
-	-- upvalues: instanceof (copy), Parent (copy), reduce (copy)
-	if not instanceof(p1, Parent) then
-		return p1
+local function coerceToTable(object)
+	if instanceof(object, parentModule) then
+		return reduce(object:entries(), function(p, list)
+			p[list[1]] = list[2]
+			return p
+		end, {})
 	end
 
-	return reduce(p1:entries(), function(p2, p3) -- line: 15
-		p2[p3[1]] = p3[2]
-
-		return p2
-	end, {})
+	return object
 end
 
 return coerceToTable

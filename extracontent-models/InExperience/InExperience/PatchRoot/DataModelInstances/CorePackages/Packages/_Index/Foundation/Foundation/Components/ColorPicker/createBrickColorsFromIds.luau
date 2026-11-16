@@ -1,17 +1,17 @@
-local function createBrickColorsFromIds(t1: {[any]: any}) -- line: 8
-	local t2 = {}
+local function createBrickColorsFromIds(items)
+	local brickColorsFromIds = {}
 
-	for _, v5 in t1 do
-		local ok, result = pcall(BrickColor.new, v5)
+	for _, item in items do
+		local success, result = pcall(BrickColor.new, item)
 
-		if ok and result then
-			table.insert(t2, result)
+		if success and result then
+			table.insert(brickColorsFromIds, result)
 		else
-			warn(`createBrickColorsFromIds: Failed to create BrickColor with ID { v5 }`)
+			warn(`createBrickColorsFromIds: Failed to create BrickColor with ID {item}`)
 		end
 	end
 
-	return t2
+	return brickColorsFromIds
 end
 
 return createBrickColorsFromIds

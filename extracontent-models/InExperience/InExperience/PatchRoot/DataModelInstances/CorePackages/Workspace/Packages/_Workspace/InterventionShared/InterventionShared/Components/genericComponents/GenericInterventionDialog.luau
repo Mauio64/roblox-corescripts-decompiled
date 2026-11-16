@@ -1,21 +1,31 @@
 local InterventionShared = script:FindFirstAncestor("InterventionShared")
-local InterventionSharedParent = InterventionShared.Parent
+local parent = InterventionShared.Parent
+
 local VRService = game:GetService("VRService")
-local React = require(InterventionSharedParent.React)
+
+local React = require(parent.React)
 local useCallback = React.useCallback
 local useEffect = React.useEffect
 local useRef = React.useRef
+
 local Constants = require(InterventionShared.Utils.Constants)
-local Cryo = require(InterventionSharedParent.Cryo)
+local Cryo = require(parent.Cryo)
 local EvidenceField = require(InterventionShared.Components.genericComponents.EvidenceField)
+local InterventionDialogFooter = require(InterventionShared.Components.genericComponents.InterventionDialogFooter)
+local InterventionDialogLoadingSkeleton = require(InterventionShared.Components.genericComponents.InterventionDialogLoadingSkeleton)
 local InterventionAnalytics = require(InterventionShared.InterventionAnalytics)
-local LinkingProtocol = require(InterventionSharedParent.LinkingProtocol).LinkingProtocol
+local LinkingProtocol = require(parent.LinkingProtocol)
+local linkingProtocol = LinkingProtocol.LinkingProtocol
 local PostDismissIntervention = require(InterventionShared.Http.PostDismissIntervention)
-local Responsive = require(InterventionSharedParent.Responsive)
-local NotificationModalsManager = require(InterventionSharedParent.NotificationModalsManager)
-local UrlBuilder = require(InterventionSharedParent.UrlBuilder).UrlBuilder
-local FocusNavigableSurfaceIdentifierEnum = require(InterventionSharedParent.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
-local Foundation = require(InterventionSharedParent.Foundation)
+local Responsive = require(parent.Responsive)
+local NotificationModalsManager = require(parent.NotificationModalsManager)
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+
+local Foundation = require(parent.Foundation)
 local Badge = Foundation.Badge
 local BadgeVariant = Foundation.Enums.BadgeVariant
 local Button = Foundation.Button
@@ -27,403 +37,450 @@ local Divider = Foundation.Divider
 local IconName = Foundation.Enums.IconName
 local IconPosition = Foundation.Enums.IconPosition
 local IconVariant = Foundation.Enums.IconVariant
-local EnumsRadius = Foundation.Enums.Radius
-local Skeleton = Foundation.Skeleton
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local Images = require(InterventionSharedParent.FoundationImages).Images
+local FoundationImages = require(parent.FoundationImages)
+local Images = FoundationImages.Images
+
 local useInterventionFocusRoot = require(InterventionShared.Hooks.useInterventionFocusRoot)
 local useInterventionPlacement = require(InterventionShared.Hooks.useInterventionPlacement)
-local useLocalization = require(InterventionSharedParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local usePreferredInput = Responsive.usePreferredInput
 local useTokens = Foundation.Hooks.useTokens
 local useWebView = require(InterventionShared.Hooks.useWebView)
-local FFlagNavigateToSafetyDashboardForAppeals = require(InterventionSharedParent.SharedFlags).FFlagNavigateToSafetyDashboardForAppeals
-local FFlagUniversalFeatureRestrictionReceivers = require(InterventionSharedParent.SharedFlags).FFlagUniversalFeatureRestrictionReceivers
-local v43 = Images["icons/actions/accept"]
 
-local function GenericInterventionDialog(t1: {[any]: any}) -- line: 86
-	-- upvalues: useTokens (copy), useRef (copy), useInterventionPlacement (copy), useLocalization (copy), Constants (copy), usePreferredInput (copy), Responsive (copy), FFlagNavigateToSafetyDashboardForAppeals (copy), UrlBuilder (copy), useWebView (copy), LinkingProtocol (copy), useInterventionFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), useEffect (copy), InterventionAnalytics (copy), useCallback (copy), PostDismissIntervention (copy), FFlagUniversalFeatureRestrictionReceivers (copy), NotificationModalsManager (copy), v43 (copy), VRService (copy), React (copy), FoundationText (copy), View (copy), Divider (copy), EvidenceField (copy), Badge (copy), BadgeVariant (copy), IconName (copy), IconPosition (copy), IconVariant (copy), Cryo (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy), Dialog (copy), DialogSize (copy), Skeleton (copy), EnumsRadius (copy)
-	local v46 = useTokens()
-	local v47 = useRef(DateTime.now().UnixTimestampMillis)
-	local v48 = useInterventionPlacement()
-	local v49 = useLocalization(Constants.localizationKeys)
-	local v50 = usePreferredInput() == Responsive.Input.Directional
-	local v51 = if not FFlagNavigateToSafetyDashboardForAppeals then UrlBuilder.static.appealsPortal.main() else UrlBuilder.static.safetyDashboard.main()
-	local v52 = useWebView(v51, if not FFlagNavigateToSafetyDashboardForAppeals then v49.AppealsPortalTitleText else v49.AccountStatusTitleText)
-	local default = LinkingProtocol.default
-	local v54 = useInterventionFocusRoot({
-		isAutoFocusRoot = true,
-		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay
+local SharedFlags = require(parent.SharedFlags)
+local FFlagNavigateToSafetyDashboardForAppeals = SharedFlags.FFlagNavigateToSafetyDashboardForAppeals
+local FFlagUFRDialogContentCutoffFix = require(InterventionShared.Flags.FFlagUFRDialogContentCutoffFix)
+local FFlagUFRImprovements = require(InterventionShared.Flags.FFlagUFRImprovements)
+
+local iconsactionsaccept = Images["icons/actions/accept"]
+
+local function getNonEmptyString(p: string?) -- 7 equivalent calls inferred from this helper
+	return if p ~= "" then p else nil
+end
+
+local function GenericInterventionDialog(props)
+	local v = useTokens()
+
+	local nonEmptyString = getNonEmptyString(props.interventionId) -- inferred equivalent call
+	local nonEmptyString2 = getNonEmptyString(props.dsaMessage) -- inferred equivalent call
+	local nonEmptyString3 = getNonEmptyString(props.evidence) -- inferred equivalent call
+	local nonEmptyString4 = getNonEmptyString(props.formattedEndDate) -- inferred equivalent call
+	local nonEmptyString5 = getNonEmptyString(props.userNote) -- inferred equivalent call
+	local nonEmptyString6 = getNonEmptyString(props.violationReason) -- inferred equivalent call
+	local nonEmptyString7 = getNonEmptyString(props.violationUid) -- inferred equivalent call
+
+	local v2 = useRef(DateTime.now().UnixTimestampMillis)
+	local placement = useInterventionPlacement()
+	local v3 = useLocalization(Constants.localizationKeys)
+	local v4 = usePreferredInput() == Responsive.Input.Directional
+	local v5
+
+	if FFlagNavigateToSafetyDashboardForAppeals then
+		if nonEmptyString7 then
+			v5 = urlBuilder.static.safetyDashboard.violation({ id = nonEmptyString7 })
+		else
+			v5 = urlBuilder.static.safetyDashboard.violations()
+		end
+	else
+		v5 = urlBuilder.static.appealsPortal.main()
+	end
+
+	local v6
+
+	if FFlagNavigateToSafetyDashboardForAppeals then
+		v6 = v3.AccountStatusTitleText
+	else
+		v6 = v3.AppealsPortalTitleText
+	end
+
+	local v7 = useWebView(v5, v6)
+
+	local default = linkingProtocol.default
+
+	local ref = useInterventionFocusRoot({
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay,
+		isAutoFocusRoot = true
 	})
 
-	useEffect(function() -- line: 110
-		-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
+	useEffect(function()
 		InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogRendered, {
 			eventType = InterventionAnalytics.Constants.EventTypes.ModalAppeared,
-			interventionType = t1.interventionTypeForAnalytics,
-			placement = v48,
-			renderedTimestamp = v47.current,
-			eventId = t1.eventId,
-			evidence = t1.evidence,
-			duration = t1.durationForAnalytics,
-			acknowledgeable = t1.acknowledgeable,
-			abuseVector = t1.abuseVectorForAnalytics
+			interventionType = props.interventionTypeForAnalytics,
+			placement = placement,
+			renderedTimestamp = v2.current,
+			eventId = props.eventId,
+			evidence = props.evidence,
+			duration = props.durationForAnalytics,
+			acknowledgeable = props.acknowledgeable,
+			abuseVector = props.abuseVectorForAnalytics
 		})
-	end, { v47 })
+	end, { v2 })
 
-	local v55 = useCallback(function() -- line: 125
-		-- upvalues: t1 (copy), PostDismissIntervention (copy), InterventionAnalytics (copy), v48 (copy), v47 (copy)
-		if t1.acknowledgeable and (t1.interventionId and t1.interventionId ~= "") then
-			PostDismissIntervention(t1.interventionId):andThen(function(_) -- line: 127
-				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
-				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissSuccess, {
-					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissSuccess,
-					interventionType = t1.interventionTypeForAnalytics,
-					placement = v48,
-					renderedTimestamp = v47.current,
-					eventId = t1.eventId,
-					acknowledgeable = t1.acknowledgeable,
-					abuseVector = t1.abuseVectorForAnalytics
-				})
-			end):catch(function(p2) -- line: 140
-				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
-				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissFailed, {
-					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissFailed,
-					interventionType = t1.interventionTypeForAnalytics,
-					placement = v48,
-					renderedTimestamp = v47.current,
-					eventId = t1.eventId,
-					error = p2.error,
-					acknowledgeable = t1.acknowledgeable,
-					abuseVector = t1.abuseVectorForAnalytics
-				})
+	local v8 = useCallback(function()
+		if props.acknowledgeable and nonEmptyString then
+			local v8 = false
+			PostDismissIntervention(nonEmptyString):andThen(function(_)
+				v8 = true
+				InterventionAnalytics.sendAnalyticsEvent(
+					InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissSuccess,
+					{
+						eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissSuccess,
+						interventionType = props.interventionTypeForAnalytics,
+						placement = placement,
+						renderedTimestamp = v2.current,
+						eventId = props.eventId,
+						acknowledgeable = props.acknowledgeable,
+						abuseVector = props.abuseVectorForAnalytics
+					}
+				)
+
+				if props.onAcknowledgementSuccess then
+					props.onAcknowledgementSuccess()
+				end
+			end):catch(function(p)
+				InterventionAnalytics.sendAnalyticsEvent(
+					InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissFailed,
+					{
+						eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissFailed,
+						interventionType = props.interventionTypeForAnalytics,
+						placement = placement,
+						renderedTimestamp = v2.current,
+						eventId = props.eventId,
+						error = p.error,
+						acknowledgeable = props.acknowledgeable,
+						abuseVector = props.abuseVectorForAnalytics
+					}
+				)
+
+				if not v8 and props.onAcknowledgementFailure then
+					props.onAcknowledgementFailure()
+				end
 			end)
 		end
 	end, {
-		t1.acknowledgeable,
-		t1.interventionId,
-		t1.interventionTypeForAnalytics,
-		v48,
-		v47.current,
-		t1.eventId,
-		t1.abuseVectorForAnalytics
+		props.acknowledgeable,
+		nonEmptyString,
+		props.interventionTypeForAnalytics,
+		placement,
+		v2.current,
+		props.eventId,
+		props.abuseVectorForAnalytics,
+		props.onAcknowledgementSuccess,
+		props.onAcknowledgementFailure
 	})
-	local v56 = useCallback(function() -- line: 171
-		-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy), FFlagUniversalFeatureRestrictionReceivers (copy), v55 (copy), PostDismissIntervention (copy)
+
+	local v9 = useCallback(function()
 		InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogCtaClicked, {
 			eventType = InterventionAnalytics.Constants.EventTypes.CtaClicked,
-			interventionType = t1.interventionTypeForAnalytics,
-			placement = v48,
-			renderedTimestamp = v47.current,
-			eventId = t1.eventId,
-			acknowledgeable = t1.acknowledgeable,
-			abuseVector = t1.abuseVectorForAnalytics
+			interventionType = props.interventionTypeForAnalytics,
+			placement = placement,
+			renderedTimestamp = v2.current,
+			eventId = props.eventId,
+			acknowledgeable = props.acknowledgeable,
+			abuseVector = props.abuseVectorForAnalytics
 		})
 
-		if FFlagUniversalFeatureRestrictionReceivers then
-			v55()
-		elseif t1.acknowledgeable and t1.interventionId and t1.interventionId ~= "" then
-			PostDismissIntervention(t1.interventionId):andThen(function(_) -- line: 186
-				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
-				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissSuccess, {
-					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissSuccess,
-					interventionType = t1.interventionTypeForAnalytics,
-					placement = v48,
-					renderedTimestamp = v47.current,
-					eventId = t1.eventId,
-					acknowledgeable = t1.acknowledgeable,
-					abuseVector = t1.abuseVectorForAnalytics
-				})
-			end):catch(function(p4) -- line: 199
-				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
-				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissFailed, {
-					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissFailed,
-					interventionType = t1.interventionTypeForAnalytics,
-					placement = v48,
-					renderedTimestamp = v47.current,
-					eventId = t1.eventId,
-					error = p4.error,
-					acknowledgeable = t1.acknowledgeable,
-					abuseVector = t1.abuseVectorForAnalytics
-				})
-			end)
-		end
-
-		t1.onDismiss()
+		v8()
+		props.onDismiss()
 	end, {
-		t1.onDismiss,
-		t1.interventionTypeForAnalytics,
-		v48,
-		v47.current,
-		t1.eventId,
-		t1.abuseVectorForAnalytics,
-		t1.acknowledgeable,
-		t1.interventionId,
-		v55
+		props.onDismiss,
+		props.interventionTypeForAnalytics,
+		placement,
+		v2.current,
+		props.eventId,
+		props.abuseVectorForAnalytics,
+		props.acknowledgeable,
+		nonEmptyString,
+		v8,
+		props.onAcknowledgementSuccess
 	})
-	local v57 = useCallback(function() -- line: 235
-		-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy), FFlagUniversalFeatureRestrictionReceivers (copy), v55 (copy), NotificationModalsManager (copy), v43 (copy), v49 (copy), v46 (copy), VRService (copy), v50 (copy), default (copy), v51 (copy), v52 (copy)
+
+	local v10 = useCallback(function()
 		InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogAppealClicked, {
 			eventType = InterventionAnalytics.Constants.EventTypes.AppealClicked,
-			interventionType = t1.interventionTypeForAnalytics,
-			placement = v48,
-			renderedTimestamp = v47.current,
-			eventId = t1.eventId,
-			acknowledgeable = t1.acknowledgeable,
-			abuseVector = t1.abuseVectorForAnalytics
+			interventionType = props.interventionTypeForAnalytics,
+			placement = placement,
+			renderedTimestamp = v2.current,
+			eventId = props.eventId,
+			acknowledgeable = props.acknowledgeable,
+			abuseVector = props.abuseVectorForAnalytics
 		})
 
-		if FFlagUniversalFeatureRestrictionReceivers and (t1.useDetailedLayout and t1.onAppeal) then
-			t1.onAppeal()
+		if props.useDetailedLayout and props.onAppeal then
+			props.onAppeal()
 
-			if not t1.shouldOpenAppealsPortal then
-				v55()
-				t1.onDismiss()
+			if not props.shouldOpenAppealsPortal then
+				v8()
+				props.onDismiss()
+
 				NotificationModalsManager.SetUIBloxToast({
-					iconImage = v43,
-					toastTitle = v49.TakeALookText,
-					toastSubtitle = v49.FeedbackHelpsText,
+					iconImage = iconsactionsaccept,
+					toastTitle = v3.TakeALookText,
+					toastSubtitle = v3.FeedbackHelpsText,
 					sequenceNumber = DateTime.now().UnixTimestamp,
-					iconColorStyle = {
-						Transparency = 0,
-						Color = v46.Color.System.Success.Color3
-					}
+					iconColorStyle = { Color = v.Color.System.Success.Color3, Transparency = 0 }
 				})
 
 				return
 			end
 		end
 
-		if VRService.VREnabled or v50 then
-			default:openURL(v51)
-
-			return
+		if VRService.VREnabled or v4 then
+			default:openURL(v5)
+		else
+			v7()
 		end
-
-		v52()
 	end, {
-		v52,
+		v7,
 		default,
 		VRService.VREnabled,
-		v50,
-		t1.interventionTypeForAnalytics,
-		v48,
-		v47.current,
-		v51,
-		t1.abuseVectorForAnalytics,
-		t1.acknowledgeable,
-		t1.interventionId,
-		t1.eventId,
-		v49.FeedbackHelpsText,
-		v49.TakeALookText,
-		t1.onAppeal,
-		t1.shouldOpenAppealsPortal,
-		t1.onDismiss,
-		t1.useDetailedLayout,
-		v46.Color.System.Success.Color3,
-		v55
+		v4,
+		props.interventionTypeForAnalytics,
+		placement,
+		v2.current,
+		v5,
+		props.abuseVectorForAnalytics,
+		props.acknowledgeable,
+		nonEmptyString,
+		props.eventId,
+		v3.FeedbackHelpsText,
+		v3.TakeALookText,
+		props.onAppeal,
+		props.shouldOpenAppealsPortal,
+		props.onDismiss,
+		props.useDetailedLayout,
+		v.Color.System.Success.Color3,
+		v8
 	})
-	local t2 = {}
-	local v59 = FFlagUniversalFeatureRestrictionReceivers and t1.useDetailedLayout
 
-	if t1.bodyText and t1.bodyText ~= "" then
-		t2.BodyText = React.createElement(FoundationText, {
+	local children = {}
+	local useDetailedLayout = props.useDetailedLayout
+
+	if props.bodyText and props.bodyText ~= "" then
+		children.BodyText = React.createElement(Text, {
+			Text = props.bodyText,
 			tag = "auto-xy text-body-medium content-default text-align-x-left text-wrap",
 			testId = "dialog-body-text",
-			LayoutOrder = 1,
-			Text = t1.bodyText
+			LayoutOrder = 1
 		})
 	end
 
-	if v59 then
-		local t3 = {}
+	if useDetailedLayout then
+		local children2 = {}
+		local v11 = FFlagUFRImprovements and nonEmptyString6 or nonEmptyString5 or nonEmptyString4
 
-		if t1.evidence and t1.evidence ~= "" then
-			t3.EvidenceItem = React.createElement(View, {
-				tag = "size-full-0 auto-y padding-x-medium",
-				testId = "dialog-evidence-item",
-				LayoutOrder = 1
-			}, {
-				EvidenceText = React.createElement(FoundationText, {
-					tag = "auto-xy text-body-medium text-align-x-left text-wrap",
-					RichText = true,
-					Text = t1.evidence
-				})
-			})
+		if nonEmptyString3 then
+			children2.EvidenceItem = React.createElement(
+				View,
+				{
+					tag = "size-full-0 auto-y padding-x-medium",
+					testId = "dialog-evidence-item",
+					LayoutOrder = 1
+				},
+				{
+					EvidenceText = React.createElement(Text, {
+						Text = nonEmptyString3,
+						tag = "auto-xy text-body-medium text-align-x-left text-wrap",
+						RichText = true
+					})
+				}
+			)
+
+			if FFlagUFRImprovements and v11 then
+				children2.DividerBelowEvidence = React.createElement(Divider, { LayoutOrder = 2 })
+			end
 		end
 
-		if t1.violationReason and t1.violationReason ~= "" then
-			if t1.evidence and t1.evidence ~= "" then
-				t3.DividerAfterEvidence = React.createElement(Divider, {
-					LayoutOrder = 2
-				})
+		if nonEmptyString6 then
+			if not FFlagUFRImprovements and nonEmptyString3 then
+				children2.DividerAfterEvidence = React.createElement(Divider, { LayoutOrder = 2 })
 			end
 
-			t3.ReasonItem = React.createElement(View, {
-				tag = "size-full-0 auto-y padding-x-medium",
-				testId = "dialog-reason-item",
-				LayoutOrder = 3
-			}, {
-				ReasonField = React.createElement(EvidenceField, {
-					fieldLabel = v49.ReasonText,
-					fieldValue = t1.violationReason
-				})
-			})
-		end
-
-		if t1.userNote and t1.userNote ~= "" then
-			t3.NoteItem = React.createElement(View, {
-				tag = "size-full-0 auto-y padding-x-medium",
-				testId = "dialog-note-item",
-				LayoutOrder = 4
-			}, {
-				NoteText = React.createElement(EvidenceField, {
-					fieldLabel = v49.ModeratorNoteLabel,
-					fieldValue = t1.userNote
-				})
-			})
-		end
-
-		if t1.formattedEndDate and t1.formattedEndDate ~= "" then
-			t3.EndingOnItem = React.createElement(View, {
-				tag = "size-full-0 auto-y row padding-x-medium align-y-center",
-				testId = "dialog-ending-on-item",
-				LayoutOrder = 5
-			}, {
-				EndingOnInfo = React.createElement(View, {
-					tag = "auto-y col fill",
-					LayoutOrder = 1
-				}, {
-					EvidenceField = React.createElement(EvidenceField, {
-						hasColon = false,
-						fieldLabel = v49.EndsOnText,
-						fieldValue = t1.formattedEndDate
+			children2.ReasonItem = React.createElement(
+				View,
+				{
+					tag = "size-full-0 auto-y padding-x-medium",
+					testId = "dialog-reason-item",
+					LayoutOrder = 3
+				},
+				{
+					ReasonField = React.createElement(EvidenceField, {
+						fieldLabel = v3.ReasonText,
+						fieldValue = nonEmptyString6
 					})
-				}),
-				CountdownBadge = React.createElement(Badge, {
-					LayoutOrder = 2,
-					text = t1.countdownText or v49.CompleteText,
-					variant = BadgeVariant.Neutral,
-					icon = if not t1.countdownText then nil else {
-						name = IconName.Clock,
-						position = IconPosition.Left,
-						variant = IconVariant.Filled
-					}
-				})
-			})
+				}
+			)
 		end
 
-		if not Cryo.isEmpty(t3) then
-			t2.DetailedList = React.createElement(View, {
-				tag = "size-full-0 auto-y padding-top-xxsmall padding-x-xxsmall padding-bottom-medium",
-				testId = "dialog-detailed-list",
-				LayoutOrder = 2
-			}, React.createElement(View, {
-				tag = "col gap-medium size-full-0 auto-y padding-y-large stroke-standard stroke-default radius-large bg-shift-100"
-			}, t3))
+		if nonEmptyString5 then
+			children2.NoteItem = React.createElement(
+				View,
+				{
+					tag = "size-full-0 auto-y padding-x-medium",
+					testId = "dialog-note-item",
+					LayoutOrder = 4
+				},
+				{
+					NoteText = React.createElement(EvidenceField, {
+						fieldLabel = v3.ModeratorNoteLabel,
+						fieldValue = nonEmptyString5
+					})
+				}
+			)
 		end
-	elseif t1.evidence and t1.evidence ~= "" or (t1.violationReason and t1.violationReason ~= "" or t1.isAppealable) then
-		t2.Evidence = React.createElement(View, {
+
+		if nonEmptyString4 then
+			children2.EndingOnItem = React.createElement(
+				View,
+				{
+					tag = "size-full-0 auto-y row padding-x-medium align-y-center",
+					testId = "dialog-ending-on-item",
+					LayoutOrder = 5
+				},
+				{
+					EndingOnInfo = React.createElement(View, {
+						tag = {
+							["col fill"] = true,
+							["auto-xy"] = FFlagUFRDialogContentCutoffFix,
+							["auto-y"] = not FFlagUFRDialogContentCutoffFix
+						},
+						LayoutOrder = 1
+					}, {
+						EvidenceField = React.createElement(EvidenceField, {
+							fieldLabel = v3.EndsOnText,
+							fieldValue = nonEmptyString4,
+							hasColon = false
+						})
+					}),
+					CountdownBadge = React.createElement(Badge, {
+						text = props.countdownText or v3.CompleteText,
+						variant = BadgeVariant.Neutral,
+						icon = props.countdownText and {
+							name = IconName.Clock,
+							position = IconPosition.Left,
+							variant = IconVariant.Filled
+						} or nil,
+						LayoutOrder = 2
+					})
+				}
+			)
+		end
+
+		if not Cryo.isEmpty(children2) then
+			children.DetailedList = React.createElement(
+				View,
+				{
+					tag = "size-full-0 auto-y padding-top-xxsmall padding-x-xxsmall padding-bottom-medium",
+					testId = "dialog-detailed-list",
+					LayoutOrder = 2
+				},
+				React.createElement(
+					View,
+					{
+						tag = "col gap-medium size-full-0 auto-y padding-y-large stroke-standard stroke-default radius-large bg-shift-100"
+					},
+					children2
+				)
+			)
+		end
+	elseif nonEmptyString3 or nonEmptyString6 or props.isAppealable then
+		children.Evidence = React.createElement(View, {
 			tag = "size-full-0 auto-y padding-xxsmall",
 			LayoutOrder = 2
-		}, { React.createElement(View, {
-			tag = "size-full-0 auto-y col gap-small padding-medium radius-medium bg-surface-200 stroke-standard stroke-default"
 		}, {
-			EvidenceText = t1.evidence and (t1.evidence ~= "" and React.createElement(FoundationText, {
-				tag = "auto-xy text-body-medium text-align-x-left text-wrap",
-				RichText = true,
-				LayoutOrder = 1,
-				Text = t1.evidence
-			})),
-			Reason = t1.violationReason and (t1.violationReason ~= "" and React.createElement(FoundationText, {
-				tag = "auto-xy text-body-medium text-align-x-left text-wrap",
-				RichText = true,
-				LayoutOrder = 2,
-				Text = `<b>{ v49.ReasonText }:</b>\n{ t1.violationReason }`
-			})),
-			AppealButton = t1.isAppealable and React.createElement(Button, {
-				LayoutOrder = 3,
-				text = v49.ReportMistakeText,
-				variant = ButtonVariant.Standard,
-				size = ButtonSize.XSmall,
-				width = UDim.new(1, 0),
-				onActivated = v57
-			})
-		}) })
+			React.createElement(
+				View,
+				{
+					tag = "size-full-0 auto-y col gap-small padding-medium radius-medium bg-surface-200 stroke-standard stroke-default"
+				},
+				{
+					EvidenceText = nonEmptyString3 and React.createElement(Text, {
+						Text = nonEmptyString3,
+						tag = "auto-xy text-body-medium text-align-x-left text-wrap",
+						RichText = true,
+						LayoutOrder = 1
+					}),
+					Reason = nonEmptyString6 and React.createElement(Text, {
+						Text = `<b>{v3.ReasonText}:</b>\n{nonEmptyString6}`,
+						tag = "auto-xy text-body-medium text-align-x-left text-wrap",
+						RichText = true,
+						LayoutOrder = 2
+					}),
+					AppealButton = props.isAppealable and React.createElement(Button, {
+						text = v3.ReportMistakeText,
+						variant = ButtonVariant.Standard,
+						size = ButtonSize.XSmall,
+						width = UDim.new(1, 0),
+						onActivated = v10,
+						LayoutOrder = 3
+					})
+				}
+			)
+		})
 	end
 
-	if t1.dsaMessage and t1.dsaMessage ~= "" and not v59 then
-		t2.DsaMessage = React.createElement(FoundationText, {
+	if nonEmptyString2 and not useDetailedLayout then
+		children.DsaMessage = React.createElement(Text, {
+			Text = nonEmptyString2,
 			tag = "auto-xy text-caption-small content-default text-align-x-left text-wrap",
-			LayoutOrder = 3,
-			Text = t1.dsaMessage
+			LayoutOrder = 3
 		})
 	end
 
-	local t4 = nil
-
-	if v59 then
-		t4 = {{
+	local actions = {
+		{
 			variant = ButtonVariant.Emphasis,
-			size = ButtonSize.Medium,
-			text = v49.OkText,
-			onActivated = v56,
-			width = UDim.new(1, 0)
-		}}
+			size = ButtonSize.Small,
+			text = v3.OkText,
+			onActivated = v9
+		}
+	}
 
-		if t1.isAppealable then
-			table.insert(t4, {
-				variant = ButtonVariant.Standard,
-				size = ButtonSize.Medium,
-				text = v49.ReportMistakeText,
-				onActivated = v57,
-				width = UDim.new(1, 0)
-			})
-		end
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v11 = {
+		size = DialogSize.Medium,
+		hasCloseButton = false,
+		ref = ref,
+		hasBackdrop = not VRService.VREnabled,
+		disablePortal = placement ~= Constants.InterventionPlacementType.InExperience
+	}
+	local v12 = {
+		DialogTitle = not props.isLoading and React.createElement(Dialog.Title, {
+			text = props.titleText
+		}),
+		DialogContent = 0,
+		DialogFooter = 0,
+		DialogActions = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Dialog.Content
+	local v13
+
+	if props.isLoading then
+		v13 = React.createElement(InterventionDialogLoadingSkeleton)
+	else
+		v13 = React.createElement(View, { tag = "size-full-0 auto-y col gap-medium" }, children)
 	end
 
-	return React.createElement(Dialog.Root, {
-		hasCloseButton = false,
-		size = DialogSize.Medium,
-		ref = v54,
-		hasBackdrop = not VRService.VREnabled,
-		disablePortal = v48 ~= Constants.InterventionPlacementType.InExperience
-	}, {
-		DialogTitle = not t1.isLoading and React.createElement(Dialog.Title, {
-			text = t1.titleText
-		}),
-		DialogContent = React.createElement(Dialog.Content, nil, if not t1.isLoading then React.createElement(View, {
-			tag = "size-full-0 auto-y col gap-medium"
-		}, t2) else React.createElement(View, {
-			tag = "size-full-0 auto-y col gap-medium margin-top-small"
-		}, {
-			Heading = React.createElement(Skeleton, {
-				LayoutOrder = 1,
-				Size = UDim2.new(0.6, 0, 0, v46.Size.Size_1100),
-				radius = EnumsRadius.Medium
-			}),
-			Body = React.createElement(Skeleton, {
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v46.Size.Size_2000),
-				radius = EnumsRadius.Medium
-			}),
-			Actions = React.createElement(Skeleton, {
-				LayoutOrder = 3,
-				Size = UDim2.new(1, 0, 0, v46.Size.Size_800),
-				radius = EnumsRadius.Medium
-			})
-		})),
-		DialogActions = not t1.isLoading and React.createElement(Dialog.Actions, {
-			actions = if not v59 then {{
-				variant = ButtonVariant.Emphasis,
-				size = ButtonSize.Small,
-				text = v49.OkText,
-				onActivated = v56
-			}} else t4,
-			label = if not v59 or (not t1.useDetailedLayout or (not t1.dsaMessage or t1.dsaMessage == "")) then nil else t1.dsaMessage
-		})
+	v12.DialogContent = createElement2(content, useDetailedLayout and { LayoutOrder = 2 } or nil, v13)
+
+	v12.DialogFooter = not props.isLoading and useDetailedLayout and React.createElement(InterventionDialogFooter, {
+		ctaText = v3.OkText,
+		dsaMessage = props.dsaMessage,
+		isAppealable = props.isAppealable,
+		onAppealActivated = v10,
+		onCtaActivated = v9
 	})
+
+	v12.DialogActions = not props.isLoading
+		and not useDetailedLayout
+		and React.createElement(Dialog.Actions, { actions = actions })
+	return createElement(root, v11, v12)
 end
 
 return React.memo(GenericInterventionDialog)

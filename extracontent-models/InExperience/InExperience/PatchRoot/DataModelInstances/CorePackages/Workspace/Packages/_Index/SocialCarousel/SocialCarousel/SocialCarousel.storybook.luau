@@ -1,136 +1,124 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local Roact = require(SocialCarouselParent.Dev.Roact)
-local RoactRodux = require(SocialCarouselParent.RoactRodux)
-local Rodux = require(SocialCarouselParent.Rodux)
-local UIBlox = require(SocialCarouselParent.UIBlox)
-local Cryo = require(SocialCarouselParent.Cryo)
-local Style = require(SocialCarouselParent.Style)
-local ApolloClient = require(SocialCarouselParent.ApolloClient)
-local Foundation = require(SocialCarouselParent.Foundation)
-local RoactNavigation = require(SocialCarouselParent.RoactNavigation)
-local mockLocale = require(SocialCarouselParent.Dev.SocialTestHelpers).StoryHelpers.mockLocale
-local RobloxAppUIBloxConfig = require(SocialCarouselParent.Dev.RobloxAppUIBloxConfig)
-local UniversalAppPolicy = require(SocialCarouselParent.UniversalAppPolicy).UniversalAppPolicy
+local parent = SocialCarousel.Parent
+local Roact = require(parent.Dev.Roact)
+
+local RoactRodux = require(parent.RoactRodux)
+local Rodux = require(parent.Rodux)
+local UIBlox = require(parent.UIBlox)
+local Cryo = require(parent.Cryo)
+local Style = require(parent.Style)
+local ApolloClient = require(parent.ApolloClient)
+local Foundation = require(parent.Foundation)
+local RoactNavigation = require(parent.RoactNavigation)
+local SocialTestHelpers = require(parent.Dev.SocialTestHelpers)
+local mockLocale = SocialTestHelpers.StoryHelpers.mockLocale
+local RobloxAppUIBloxConfig = require(parent.Dev.RobloxAppUIBloxConfig)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local universalAppPolicy = UniversalAppPolicy.UniversalAppPolicy
 
 UIBlox.init(RobloxAppUIBloxConfig)
 
 local FoundationProvider = Foundation.FoundationProvider
 local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
-local DesignTokenProvider = require(SocialCarouselParent.Style).DesignTokenProvider
-local mockApolloClient = require(SocialCarouselParent.GraphQLServer).ApolloClientTestUtils.mockApolloClient
-local Theme = Foundation.Enums.Theme
+local Style2 = require(parent.Style)
+local DesignTokenProvider = Style2.DesignTokenProvider
+local GraphQLServer = require(parent.GraphQLServer)
+local mockApolloClient = GraphQLServer.ApolloClientTestUtils.mockApolloClient
+local ColorMode = Foundation.Enums.ColorMode
 local Device = Foundation.Enums.Device
 
-Roact.setGlobalConfig({
-	elementTracing = true
-})
+Roact.setGlobalConfig({ elementTracing = true })
 
-local t1 = {
-	language = "en-us"
-}
-local t2 = {
-	Light = Theme.Light,
-	Dark = Theme.Dark
-}
-local t3 = {
-	Console = Device.Console,
-	Desktop = Device.Desktop
-}
+local v = { language = "en-us" }
 
-local function v24(p1) -- line: 44
-	-- upvalues: Rodux (copy), Cryo (copy)
-	return Rodux.Store.new(function() -- line: 45
-		-- upvalues: Cryo (copy), p1 (copy)
-		return Cryo.Dictionary.join(p1, {
+local v2 = { Light = ColorMode.Light, Dark = ColorMode.Dark }
+
+local v3 = { Console = Device.Console, Desktop = Device.Desktop }
+
+local function fn(state)
+	return Rodux.Store.new(function()
+		return Cryo.Dictionary.join(state, {
 			ScreenSize = Vector2.new(600, 600),
-			TopBar = {
-				topBarHeight = 0
-			},
-			GlobalGuiInset = {
-				left = 0,
-				top = 0,
-				right = 0,
-				bottom = 0
-			}
+			TopBar = { topBarHeight = 0 },
+			GlobalGuiInset = { left = 0, top = 0, right = 0, bottom = 0 }
 		})
 	end, {}, { Rodux.thunkMiddleware })
 end
 
-return {
-	name = "SocialCarousel",
-	storyRoot = SocialCarousel,
-	roact = Roact,
-	roactRodux = RoactRodux,
-	mapDefinition = function(p2) -- line: 66
-		-- upvalues: Cryo (copy), t1 (copy)
-		local v27 = Cryo.Dictionary.join(t1, p2.controls or {})
+local Storybook = {}
+Storybook.name = "SocialCarousel"
+Storybook.storyRoot = SocialCarousel
+Storybook.roact = Roact
+Storybook.roactRodux = RoactRodux
 
-		return Cryo.Dictionary.join(p2, {
-			controls = v27
-		})
-	end,
-	mapStory = function(p3) -- line: 70
-		-- upvalues: t2 (copy), Roact (copy), StyleProviderWithDefaultTheme (copy), UniversalAppPolicy (copy), RoactNavigation (copy), RoactRodux (copy), v24 (copy), ApolloClient (copy), mockApolloClient (copy), FoundationProvider (copy), t3 (copy), DesignTokenProvider (copy), mockLocale (copy)
-		return function(p4) -- line: 71
-			-- upvalues: t2 (copy), Roact (copy), StyleProviderWithDefaultTheme (copy), UniversalAppPolicy (copy), RoactNavigation (copy), RoactRodux (copy), v24 (copy), ApolloClient (copy), mockApolloClient (copy), FoundationProvider (copy), t3 (copy), DesignTokenProvider (copy), mockLocale (copy), p3 (copy)
-			local v30 = t2[p4.theme]
-			local v31 = p4.definition.state or {}
+function Storybook.mapDefinition(p)
+	local joined = Cryo.Dictionary.join(v, p.controls or {})
+	return Cryo.Dictionary.join(p, { controls = joined })
+end
 
-			return Roact.createElement(StyleProviderWithDefaultTheme, {
-				withDarkTheme = true,
-				withUiModeSupport = false
-			}, { Roact.createElement(UniversalAppPolicy.Provider, {
-				policy = { function() -- line: 80
-					return {
-						useGridPageLayout = function() -- line: 82
-							return true
-						end
-					}
-				end }
+function Storybook.mapStory(p)
+	return function(props)
+		local colorMode = v2[props.theme]
+		local state = props.definition.state or {}
+		return Roact.createElement(StyleProviderWithDefaultTheme, {
+			withDarkTheme = true,
+			withUiModeSupport = false
+		}, {
+			Roact.createElement(universalAppPolicy.Provider, {
+				policy = { function()
+						return {
+							useGridPageLayout = function(): boolean
+								return true
+							end
+						}
+					end }
 			}, {
 				navigationProvider = Roact.createElement(RoactNavigation.Provider, {
 					value = {
-						state = {
-							routeName = "appPage"
-						},
-						isFocused = function() -- line: 94
+						state = { routeName = "appPage" },
+						isFocused = function(): boolean
 							return false
 						end,
-						addListener = function() -- line: 97
+						addListener = function()
 							return {
-								remove = function() -- line: 99
-								end
+								remove = function() end
 							}
 						end,
-						getParam = function(_, p6) -- line: 102
-							return p6
+						getParam = function(_, p2)
+							return p2
 						end,
-						navigate = function() -- line: 105
-						end
+						navigate = function() end
 					}
 				}, {
 					storeProvider = Roact.createElement(RoactRodux.StoreProvider, {
-						store = v24(v31)
+						store = fn(state)
 					}, {
-						apolloClient = Roact.createElement(ApolloClient.ApolloProvider, {
-							client = mockApolloClient({})
-						}, {
-							foundationProvider = Roact.createElement(FoundationProvider, {
-								theme = v30,
-								device = t3[p4.platform],
-								preferences = p4.settings
-							}, {
-								designTokenProvider = Roact.createElement(DesignTokenProvider, {
-									tokenMappers = {}
-								}, {
-									Child = mockLocale(p3, p4)
-								})
-							})
-						})
+						apolloClient = Roact.createElement(
+							ApolloClient.ApolloProvider,
+							{ client = mockApolloClient({}) },
+							{
+								foundationProvider = Roact.createElement(
+									FoundationProvider,
+									{
+										colorMode = colorMode,
+										device = v3[props.platform],
+										preferences = props.settings
+									},
+									{
+										designTokenProvider = Roact.createElement(
+											DesignTokenProvider,
+											{ tokenMappers = {} },
+											{ Child = mockLocale(p, props) }
+										)
+									}
+								)
+							}
+						)
 					})
 				})
-			}) })
-		end
+			})
+		})
 	end
-}
+end
+
+return Storybook

@@ -1,98 +1,179 @@
 local DiscoveryAvailability = script:FindFirstAncestor("DiscoveryAvailability")
-local DiscoveryAvailabilityParent = DiscoveryAvailability.Parent
-local React = require(DiscoveryAvailabilityParent.React)
-local useSelector = require(DiscoveryAvailabilityParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useDispatch = require(DiscoveryAvailabilityParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local NavigationRodux = require(DiscoveryAvailabilityParent.NavigationRodux)
+local parent = DiscoveryAvailability.Parent
+local React = require(parent.React)
+
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local RoactUtils2 = require(parent.RoactUtils)
+local useDispatch = RoactUtils2.Hooks.RoactRodux.useDispatch
+local NavigationRodux = require(parent.NavigationRodux)
 local selectCurrentRoactNavigationRoute = NavigationRodux.Selectors.selectCurrentRoactNavigationRoute
 local GetLegacyNavigationStore = NavigationRodux.GetLegacyNavigationStore
-local FFlagSignalsNavP3fGameDetails = require(DiscoveryAvailabilityParent.SharedFlags).FFlagSignalsNavP3fGameDetails
-local AppPage = require(DiscoveryAvailabilityParent.RobloxAppEnums).AppPage
-local RetrievalStatus = require(DiscoveryAvailabilityParent.Http).Enum.RetrievalStatus
-local RobloxAppHooks = require(DiscoveryAvailabilityParent.RobloxAppHooks)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3fGameDetails = SharedFlags.FFlagSignalsNavP3fGameDetails
+local FFlagUseSignalsForStartup = SharedFlags.FFlagUseSignalsForStartup
+local FFlagLuaAppEnableSduiHomePage = SharedFlags.FFlagLuaAppEnableSduiHomePage
+local getStartupStore
 
-require(DiscoveryAvailabilityParent.LuauPolyfill)
+if FFlagUseSignalsForStartup then
+	local StartupStore = require(parent.StartupStore)
+	getStartupStore = StartupStore.GetStartupStore
+else
+	getStartupStore = nil
+end
 
-local Promise = require(DiscoveryAvailabilityParent.Promise)
-local SignalsReact = require(DiscoveryAvailabilityParent.SignalsReact)
-local Signals = require(DiscoveryAvailabilityParent.Signals)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local Http = require(parent.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+require(parent.LuauPolyfill)
+local Promise = require(parent.Promise)
+local SignalsReact = require(parent.SignalsReact)
+local Signals = require(parent.Signals)
 local Signals2 = require(DiscoveryAvailability.Signals)
 local useRoactService = RobloxAppHooks.useRoactService
-local RoactNetworking = require(DiscoveryAvailabilityParent.RoactServiceTags).RoactNetworking
-local AppOmniRecommendationsRequest = require(DiscoveryAvailabilityParent.RoactServiceTags).AppOmniRecommendationsRequest
-local AppLogging = require(DiscoveryAvailabilityParent.RoactServiceTags).AppLogging
-local DiscoveryEventErrorLogger = require(DiscoveryAvailabilityParent.DiscoveryUtils).DiscoveryEventErrorLogger
-local OmniFeedConstants = require(DiscoveryAvailabilityParent.DiscoveryTypes).OmniFeedConstants
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+local RoactServiceTags2 = require(parent.RoactServiceTags)
+local AppOmniRecommendationsRequest = RoactServiceTags2.AppOmniRecommendationsRequest
+local RoactServiceTags3 = require(parent.RoactServiceTags)
+local AppLogging = RoactServiceTags3.AppLogging
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 
-local function useClientCacheFallbackBannerConfig(p1: ((...any) -> ...any)) -- line: 42
-	-- upvalues: useDispatch (copy), FFlagSignalsNavP3fGameDetails (copy), React (copy), Signals (copy), GetLegacyNavigationStore (copy), AppPage (copy), Signals2 (copy), SignalsReact (copy), useSelector (copy), selectCurrentRoactNavigationRoute (copy), useRoactService (copy), RoactNetworking (copy), AppOmniRecommendationsRequest (copy), AppLogging (copy), RetrievalStatus (copy), OmniFeedConstants (copy), DiscoveryEventErrorLogger (copy), Promise (copy)
-	local v25 = useDispatch()
-	local u26 = nil
-	local v27 = nil
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local OmniFeedConstants = DiscoveryTypes.OmniFeedConstants
+
+local function useClientCacheFallbackBannerConfig(callback, callback2)
+	local v = useDispatch()
+	local v2 = nil
+	local v3 = nil
 
 	if FFlagSignalsNavP3fGameDetails then
-		local v28 = React.useMemo(function() -- line: 49
-			-- upvalues: Signals (copy), GetLegacyNavigationStore (copy), AppPage (copy), Signals2 (copy)
-			return Signals.createComputed(function(p2) -- line: 50
-				-- upvalues: GetLegacyNavigationStore (copy), AppPage (copy), Signals2 (copy)
-				local v41 = GetLegacyNavigationStore(false).getCurrentRoute(p2)
-				local v42 = if not v41 then AppPage.Home else v41.routeName
-				local v43 = Signals2.getCacheStore().getHomePageDataSource(p2)
+		local v4 = React.useMemo(function()
+			return Signals.createComputed(function(p): boolean
+				local currentRoute = GetLegacyNavigationStore(false).getCurrentRoute(p)
+				local v4
 
-				return v42 == AppPage.Home and v43 == "Cache"
+				if currentRoute then
+					v4 = currentRoute.routeName
+				else
+					v4 = AppPage.Home
+				end
+
+				local homePageDataSource = Signals2.getCacheStore().getHomePageDataSource(p)
+				return v4 == AppPage.Home and homePageDataSource == "Cache"
 			end)
 		end, {})
-
-		v27 = SignalsReact.useSignalState(v28)
+		v3 = SignalsReact.useSignalState(v4)
 	else
-		local v29 = useSelector(selectCurrentRoactNavigationRoute)
-
-		u26 = if not v29 then AppPage.Home else v29.routeName
+		local v4 = useSelector(selectCurrentRoactNavigationRoute)
+		v2 = if v4 then v4.routeName else AppPage.Home
 	end
 
-	local v30 = useRoactService(RoactNetworking)
-	local v31 = useRoactService(AppOmniRecommendationsRequest)
-	local v32 = useRoactService(AppLogging)
-	local v33 = useSelector(function(p3) -- line: 67
-		return p3.Startup.HomePageDataStatus
-	end)
-	local v34 = SignalsReact.useSignalState(Signals2.getCacheStore().getHomePageDataSource)
-	local v35 = if not FFlagSignalsNavP3fGameDetails then u26 == AppPage.Home and (v33 == RetrievalStatus.Done and v34 == "Cache") else v27 and v33 == RetrievalStatus.Done
-	local v36 = React.useCallback(function() -- line: 80
-		-- upvalues: FFlagSignalsNavP3fGameDetails (copy), GetLegacyNavigationStore (copy), AppPage (copy), u26 (ref), v25 (copy), p1 (copy), v30 (copy), v31 (copy), OmniFeedConstants (copy), v32 (copy), DiscoveryEventErrorLogger (copy), Promise (copy)
-		local v39
+	local v4 = useRoactService(RoactNetworking)
+	local v5 = useRoactService(AppOmniRecommendationsRequest)
+	local v6 = useRoactService(AppLogging)
+	local v7
+
+	if FFlagUseSignalsForStartup then
+		v7 = SignalsReact.useSignalState(getStartupStore(false).getHomePageDataStatus)
+	else
+		v7 = useSelector(function(p)
+			return p.Startup.HomePageDataStatus
+		end)
+	end
+
+	local v8 = SignalsReact.useSignalState(Signals2.getCacheStore().getHomePageDataSource)
+	local shouldShowBanner
+
+	if FFlagSignalsNavP3fGameDetails then
+		shouldShowBanner = v3 and v7 == RetrievalStatus.Done
+	elseif v2 == AppPage.Home and v7 == RetrievalStatus.Done then
+		shouldShowBanner = v8 == "Cache"
+	else
+		shouldShowBanner = false
+	end
+
+	local useCallback = React.useCallback
+	local function fn()
+		local v9
 
 		if FFlagSignalsNavP3fGameDetails then
-			local v38 = GetLegacyNavigationStore(false).getCurrentRoute(false)
+			local currentRoute = GetLegacyNavigationStore(false).getCurrentRoute(false)
+			local v10
 
-			v39 = ((if not v38 then AppPage.Home else v38.routeName)) == AppPage.Home
+			if currentRoute then
+				v10 = currentRoute.routeName
+			else
+				v10 = AppPage.Home
+			end
+
+			v9 = v10 == AppPage.Home
 		else
-			v39 = u26 == AppPage.Home
+			v9 = v2 == AppPage.Home
 		end
 
-		if v39 then
-			return v25(p1(v30, v31, AppPage.Home, nil, nil, OmniFeedConstants.OmniRecommendationsRequestIntent.ManualRefresh, v32)):catch(function(p4) -- line: 102
-				-- upvalues: DiscoveryEventErrorLogger (copy), Promise (copy)
-				DiscoveryEventErrorLogger.reportError("ClientCacheFallbackBannerRefreshError", "Error refreshing omni recommendations")
+		if not v9 then
+			DiscoveryEventErrorLogger.reportError(
+				"ClientCacheFallbackBannerRefreshError",
+				"Current page is not the home page"
+			)
 
-				return Promise.reject(p4)
+			return Promise.reject()
+		end
+
+		if not FFlagLuaAppEnableSduiHomePage then
+			return v(callback(
+				v4,
+				v5,
+				AppPage.Home,
+				nil,
+				nil,
+				OmniFeedConstants.OmniRecommendationsRequestIntent.ManualRefresh,
+				v6
+			)):catch(function(p)
+				DiscoveryEventErrorLogger.reportError(
+					"ClientCacheFallbackBannerRefreshError",
+					"Error refreshing omni recommendations"
+				)
+
+				return Promise.reject(p)
 			end)
 		end
 
-		DiscoveryEventErrorLogger.reportError("ClientCacheFallbackBannerRefreshError", "Current page is not the home page")
+		local v10 = callback2()
 
-		return Promise.reject()
-	end, {
-		v25,
-		v30,
-		v31,
-		v32,
-		u26
-	})
+		if v10 then
+			return v10:catch(function(p)
+				DiscoveryEventErrorLogger.reportError(
+					"ClientCacheFallbackBannerRefreshError",
+					"Error refreshing SDUI home page"
+				)
+
+				return Promise.reject(p)
+			end)
+		end
+
+		return Promise.resolve()
+	end
+
+	local v9
+
+	if FFlagLuaAppEnableSduiHomePage then
+		v9 = callback
+	end
+
+	local v10
+
+	if FFlagLuaAppEnableSduiHomePage then
+		v10 = callback2
+	end
 
 	return {
-		shouldShowBanner = v35,
-		onRefreshButtonClick = v36
+		shouldShowBanner = shouldShowBanner,
+		onRefreshButtonClick = useCallback(fn, { v, v4, v5, v6, v2, v9, v10 })
 	}
 end
 

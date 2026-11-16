@@ -1,13 +1,13 @@
-local u1 = false
-local ok, result = pcall(function() -- line: 41
+local success, result = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFixOverlappingRtlChatMessages2")
 end)
 
-if ok then
-	u1 = result
+if not success then
+	result = false
 end
 
 local TextService = game:GetService("TextService")
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -16,317 +16,300 @@ while not LocalPlayer do
 	LocalPlayer = Players.LocalPlayer
 end
 
-local ParentParent = script.Parent.Parent
-local ChatSettings = require(ParentParent:WaitForChild("ChatSettings"))
-local ChatConstants = require(ParentParent:WaitForChild("ChatConstants"))
-local t1 = {}
-local t2 = {}
+local parent = script.Parent.Parent
+local ChatSettings = require(parent:WaitForChild("ChatSettings"))
+local ChatConstants = require(parent:WaitForChild("ChatConstants"))
 
-t2.__index = t2
+local v = {}
+local class = {}
+class.__index = class
 
-function t2.GetStringTextBounds(_, p2, p3, p4, p5) -- line: 66
-	-- upvalues: TextService (copy)
-	local v17 = p5 or Vector2.new(10000, 10000)
-
-	return TextService:GetTextSize(p2, p4, p3, v17)
+function class:GetStringTextBounds(p, p2, p3, p4)
+	return TextService:GetTextSize(p, p3, p2, p4 or Vector2.new(10000, 10000))
 end
-function t2.GetMessageHeight(p6, p7, p8, p9) -- line: 72
-	-- upvalues: u1 (ref)
-	local v22 = p9 or p8.AbsoluteSize.X
-	local StringTextBounds = p6:GetStringTextBounds(if not u1 then p7.Text else p7.ContentText, p7.Font, p7.TextSize, Vector2.new(v22, 1000))
 
-	if StringTextBounds.Y ~= math.floor(StringTextBounds.Y) then
-		return StringTextBounds.Y + 1
+function class:GetMessageHeight(data, p, p2)
+	local v2 = p2 or p.AbsoluteSize.X
+	local v3 = if result then data.ContentText else data.Text
+	local stringTextBounds = self:GetStringTextBounds(v3, data.Font, data.TextSize, Vector2.new(v2, 1000))
+
+	if stringTextBounds.Y == math.floor(stringTextBounds.Y) then
+		return stringTextBounds.Y
 	end
 
-	return StringTextBounds.Y
+	return stringTextBounds.Y + 1
 end
-function t2.GetNumberOfSpaces(p10, p11, p12, p13) -- line: 84
-	local StringTextBounds = p10:GetStringTextBounds(p11, p12, p13)
-	local StringTextBounds2 = p10:GetStringTextBounds(" ", p12, p13)
 
-	return (math.ceil(StringTextBounds.X / StringTextBounds2.X))
+function class:GetNumberOfSpaces(p, p2, p3)
+	local stringTextBounds = self:GetStringTextBounds(p, p2, p3)
+	local stringTextBounds2 = self:GetStringTextBounds(" ", p2, p3)
+	return (math.ceil(stringTextBounds.X / stringTextBounds2.X))
 end
-function t2.CreateLeadingSpaces(_, p15) -- line: 90
-	-- upvalues: u1 (ref)
-	if u1 then
-		return "<font dir=\"ltr\">" .. string.rep(" ", p15) .. "</font>"
+
+function class.CreateLeadingSpaces(_, count)
+	if result then
+		return "<font dir=\"ltr\">" .. string.rep(" ", count) .. "</font>"
 	end
 
-	return string.rep(" ", p15)
+	return string.rep(" ", count)
 end
-function t2.SanitizeForRichText(_, p17) -- line: 98
-	-- upvalues: u1 (ref)
-	if u1 then
-		return string.gsub(p17, "%p", {
-			["<"] = "&lt;",
-			[">"] = "&gt;",
-			["&"] = "&amp;"
-		})
+
+function class.SanitizeForRichText(_, value)
+	if result then
+		return string.gsub(value, "%p", { ["<"] = "&lt;", [">"] = "&gt;", ["&"] = "&amp;" })
 	end
 
-	return p17
+	return value
 end
-function t2.CreateBaseMessage(p18, p19, p20, p21, p22) -- line: 110
-	-- upvalues: u1 (ref)
-	local FromObjectPool = p18:GetFromObjectPool("Frame")
 
-	FromObjectPool.Selectable = false
-	FromObjectPool.Size = UDim2.new(1, 0, 0, 18)
-	FromObjectPool.Visible = true
-	FromObjectPool.BackgroundTransparency = 1
+function class:CreateBaseMessage(text, font, textSize, textColor)
+	local fromObjectPool = self:GetFromObjectPool("Frame")
+	fromObjectPool.Selectable = false
+	fromObjectPool.Size = UDim2.new(1, 0, 0, 18)
+	fromObjectPool.Visible = true
+	fromObjectPool.BackgroundTransparency = 1
 
-	local FromObjectPool2 = p18:GetFromObjectPool("TextLabel")
+	local fromObjectPool2 = self:GetFromObjectPool("TextLabel")
+	fromObjectPool2.Selectable = false
+	fromObjectPool2.Size = UDim2.new(1, -14, 1, 0)
+	fromObjectPool2.Position = UDim2.new(0, 8, 0, 0)
+	fromObjectPool2.BackgroundTransparency = 1
+	fromObjectPool2.Font = font
+	fromObjectPool2.TextSize = textSize
+	fromObjectPool2.TextXAlignment = Enum.TextXAlignment.Left
+	fromObjectPool2.TextYAlignment = Enum.TextYAlignment.Top
+	fromObjectPool2.TextTransparency = 0
+	fromObjectPool2.TextStrokeTransparency = 0.75
+	fromObjectPool2.TextColor3 = textColor
+	fromObjectPool2.TextWrapped = true
+	fromObjectPool2.ClipsDescendants = true
+	fromObjectPool2.Text = text
+	fromObjectPool2.Visible = true
+	fromObjectPool2.RichText = result and true or false
+	fromObjectPool2.Parent = fromObjectPool
 
-	FromObjectPool2.Selectable = false
-	FromObjectPool2.Size = UDim2.new(1, -14, 1, 0)
-	FromObjectPool2.Position = UDim2.new(0, 8, 0, 0)
-	FromObjectPool2.BackgroundTransparency = 1
-	FromObjectPool2.Font = p20
-	FromObjectPool2.TextSize = p21
-	FromObjectPool2.TextXAlignment = Enum.TextXAlignment.Left
-	FromObjectPool2.TextYAlignment = Enum.TextYAlignment.Top
-	FromObjectPool2.TextTransparency = 0
-	FromObjectPool2.TextStrokeTransparency = 0.75
-	FromObjectPool2.TextColor3 = p22
-	FromObjectPool2.TextWrapped = true
-	FromObjectPool2.ClipsDescendants = true
-	FromObjectPool2.Text = p19
-	FromObjectPool2.Visible = true
-	FromObjectPool2.RichText = not not u1
-	FromObjectPool2.Parent = FromObjectPool
-
-	return FromObjectPool, FromObjectPool2
+	return fromObjectPool, fromObjectPool2
 end
-function t2.AddNameButtonToBaseMessage(p23, p24, p25, p26, p27) -- line: 141
-	local StringTextBounds = p23:GetStringTextBounds(p26, p24.Font, p24.TextSize)
-	local FromObjectPool = p23:GetFromObjectPool("TextButton")
 
-	FromObjectPool.Selectable = false
-	FromObjectPool.Size = UDim2.new(0, StringTextBounds.X, 0, StringTextBounds.Y)
-	FromObjectPool.Position = UDim2.new(0, 0, 0, 0)
-	FromObjectPool.BackgroundTransparency = 1
-	FromObjectPool.Font = p24.Font
-	FromObjectPool.TextSize = p24.TextSize
-	FromObjectPool.TextXAlignment = p24.TextXAlignment
-	FromObjectPool.TextYAlignment = p24.TextYAlignment
-	FromObjectPool.TextTransparency = p24.TextTransparency
-	FromObjectPool.TextStrokeTransparency = p24.TextStrokeTransparency
-	FromObjectPool.TextColor3 = p25
-	FromObjectPool.Text = p26
-	FromObjectPool.Visible = true
-	FromObjectPool.Parent = p24
+function class:AddNameButtonToBaseMessage(parent2, textColor, text, p)
+	local stringTextBounds = self:GetStringTextBounds(text, parent2.Font, parent2.TextSize)
+	local fromObjectPool = self:GetFromObjectPool("TextButton")
+	fromObjectPool.Selectable = false
+	fromObjectPool.Size = UDim2.new(0, stringTextBounds.X, 0, stringTextBounds.Y)
+	fromObjectPool.Position = UDim2.new(0, 0, 0, 0)
+	fromObjectPool.BackgroundTransparency = 1
+	fromObjectPool.Font = parent2.Font
+	fromObjectPool.TextSize = parent2.TextSize
+	fromObjectPool.TextXAlignment = parent2.TextXAlignment
+	fromObjectPool.TextYAlignment = parent2.TextYAlignment
+	fromObjectPool.TextTransparency = parent2.TextTransparency
+	fromObjectPool.TextStrokeTransparency = parent2.TextStrokeTransparency
+	fromObjectPool.TextColor3 = textColor
+	fromObjectPool.Text = text
+	fromObjectPool.Visible = true
+	fromObjectPool.Parent = parent2
 
-	local v48 = FromObjectPool.MouseButton1Click:connect(function() -- line: 159
-		-- upvalues: p23 (copy), FromObjectPool (copy), p27 (copy)
-		p23:NameButtonClicked(FromObjectPool, p27)
+	local mouseButton1ClickConnection = fromObjectPool.MouseButton1Click:connect(function()
+		self:NameButtonClicked(fromObjectPool, p)
 	end)
-	local u49 = nil
 
-	u49 = FromObjectPool.Changed:connect(function(p28) -- line: 164
-		-- upvalues: v48 (copy), u49 (ref)
-		if p28 == "Parent" then
-			v48:Disconnect()
-			u49:Disconnect()
+	local changedConnection = nil
+	changedConnection = fromObjectPool.Changed:connect(function(p2)
+		if p2 == "Parent" then
+			mouseButton1ClickConnection:Disconnect()
+			changedConnection:Disconnect()
 		end
 	end)
 
-	return FromObjectPool
+	return fromObjectPool
 end
-function t2.AddTranslationButtonToBaseMessage(p29, p30) -- line: 174
-	local v52 = math.floor(p30.TextSize * 0.9)
-	local vector2 = Vector2.new(v52, v52)
-	local FromObjectPool = p29:GetFromObjectPool("ImageButton")
 
-	FromObjectPool.Selectable = false
-	FromObjectPool.Size = UDim2.new(0, vector2.X, 0, vector2.Y)
-	FromObjectPool.Position = UDim2.new(0, 0, 0, 0)
-	FromObjectPool.BackgroundTransparency = 1
-	FromObjectPool.Visible = false
-	FromObjectPool.Parent = p30
-	FromObjectPool.Image = "rbxasset://textures/translateIcon.png"
-	FromObjectPool.HoverImage = "rbxasset://textures/translateIconDark.png"
-	FromObjectPool.PressedImage = "rbxasset://textures/translateIconDark.png"
+function class:AddTranslationButtonToBaseMessage(parent2)
+	local v2 = math.floor(parent2.TextSize * 0.9)
+	local vector2 = Vector2.new(v2, v2)
+	local fromObjectPool = self:GetFromObjectPool("ImageButton")
+	fromObjectPool.Selectable = false
+	fromObjectPool.Size = UDim2.new(0, vector2.X, 0, vector2.Y)
+	fromObjectPool.Position = UDim2.new(0, 0, 0, 0)
+	fromObjectPool.BackgroundTransparency = 1
+	fromObjectPool.Visible = false
+	fromObjectPool.Parent = parent2
+	fromObjectPool.Image = "rbxasset://textures/translateIcon.png"
+	fromObjectPool.HoverImage = "rbxasset://textures/translateIconDark.png"
+	fromObjectPool.PressedImage = "rbxasset://textures/translateIconDark.png"
 
-	return FromObjectPool
+	return fromObjectPool
 end
-function t2.AddChannelButtonToBaseMessage(p31, p32, p33, p34, p35) -- line: 191
-	local StringTextBounds = p31:GetStringTextBounds(p34, p32.Font, p32.TextSize)
-	local FromObjectPool = p31:GetFromObjectPool("TextButton")
 
-	FromObjectPool.Selectable = false
-	FromObjectPool.Size = UDim2.new(0, StringTextBounds.X, 0, StringTextBounds.Y)
-	FromObjectPool.Position = UDim2.new(0, 0, 0, 0)
-	FromObjectPool.BackgroundTransparency = 1
-	FromObjectPool.Font = p32.Font
-	FromObjectPool.TextSize = p32.TextSize
-	FromObjectPool.TextXAlignment = p32.TextXAlignment
-	FromObjectPool.TextYAlignment = p32.TextYAlignment
-	FromObjectPool.TextTransparency = p32.TextTransparency
-	FromObjectPool.TextStrokeTransparency = p32.TextStrokeTransparency
-	FromObjectPool.TextColor3 = p33
-	FromObjectPool.Text = p34
-	FromObjectPool.Visible = true
-	FromObjectPool.Parent = p32
+function class:AddChannelButtonToBaseMessage(parent2, textColor, text, p)
+	local stringTextBounds = self:GetStringTextBounds(text, parent2.Font, parent2.TextSize)
+	local fromObjectPool = self:GetFromObjectPool("TextButton")
+	fromObjectPool.Selectable = false
+	fromObjectPool.Size = UDim2.new(0, stringTextBounds.X, 0, stringTextBounds.Y)
+	fromObjectPool.Position = UDim2.new(0, 0, 0, 0)
+	fromObjectPool.BackgroundTransparency = 1
+	fromObjectPool.Font = parent2.Font
+	fromObjectPool.TextSize = parent2.TextSize
+	fromObjectPool.TextXAlignment = parent2.TextXAlignment
+	fromObjectPool.TextYAlignment = parent2.TextYAlignment
+	fromObjectPool.TextTransparency = parent2.TextTransparency
+	fromObjectPool.TextStrokeTransparency = parent2.TextStrokeTransparency
+	fromObjectPool.TextColor3 = textColor
+	fromObjectPool.Text = text
+	fromObjectPool.Visible = true
+	fromObjectPool.Parent = parent2
 
-	local v62 = FromObjectPool.MouseButton1Click:connect(function() -- line: 209
-		-- upvalues: p31 (copy), FromObjectPool (copy), p35 (copy)
-		p31:ChannelButtonClicked(FromObjectPool, p35)
+	local mouseButton1ClickConnection = fromObjectPool.MouseButton1Click:connect(function()
+		self:ChannelButtonClicked(fromObjectPool, p)
 	end)
-	local u63 = nil
 
-	u63 = FromObjectPool.Changed:connect(function(p36) -- line: 214
-		-- upvalues: v62 (copy), u63 (ref)
-		if p36 == "Parent" then
-			v62:Disconnect()
-			u63:Disconnect()
+	local changedConnection = nil
+	changedConnection = fromObjectPool.Changed:connect(function(p2)
+		if p2 == "Parent" then
+			mouseButton1ClickConnection:Disconnect()
+			changedConnection:Disconnect()
 		end
 	end)
 
-	return FromObjectPool
+	return fromObjectPool
 end
-function t2.AddTagLabelToBaseMessage(p37, p38, p39, p40) -- line: 224
-	local StringTextBounds = p37:GetStringTextBounds(p40, p38.Font, p38.TextSize)
-	local FromObjectPool = p37:GetFromObjectPool("TextLabel")
 
-	FromObjectPool.Selectable = false
-	FromObjectPool.Size = UDim2.new(0, StringTextBounds.X, 0, StringTextBounds.Y)
-	FromObjectPool.Position = UDim2.new(0, 0, 0, 0)
-	FromObjectPool.BackgroundTransparency = 1
-	FromObjectPool.Font = p38.Font
-	FromObjectPool.TextSize = p38.TextSize
-	FromObjectPool.TextXAlignment = p38.TextXAlignment
-	FromObjectPool.TextYAlignment = p38.TextYAlignment
-	FromObjectPool.TextTransparency = p38.TextTransparency
-	FromObjectPool.TextStrokeTransparency = p38.TextStrokeTransparency
-	FromObjectPool.TextColor3 = p39
-	FromObjectPool.Text = p40
-	FromObjectPool.Visible = true
-	FromObjectPool.Parent = p38
+function class:AddTagLabelToBaseMessage(parent2, textColor, text)
+	local stringTextBounds = self:GetStringTextBounds(text, parent2.Font, parent2.TextSize)
+	local fromObjectPool = self:GetFromObjectPool("TextLabel")
+	fromObjectPool.Selectable = false
+	fromObjectPool.Size = UDim2.new(0, stringTextBounds.X, 0, stringTextBounds.Y)
+	fromObjectPool.Position = UDim2.new(0, 0, 0, 0)
+	fromObjectPool.BackgroundTransparency = 1
+	fromObjectPool.Font = parent2.Font
+	fromObjectPool.TextSize = parent2.TextSize
+	fromObjectPool.TextXAlignment = parent2.TextXAlignment
+	fromObjectPool.TextYAlignment = parent2.TextYAlignment
+	fromObjectPool.TextTransparency = parent2.TextTransparency
+	fromObjectPool.TextStrokeTransparency = parent2.TextStrokeTransparency
+	fromObjectPool.TextColor3 = textColor
+	fromObjectPool.Text = text
+	fromObjectPool.Visible = true
+	fromObjectPool.Parent = parent2
 
-	return FromObjectPool
+	return fromObjectPool
 end
-function GetWhisperChannelPrefix() -- line: 245
-	-- upvalues: ChatConstants (copy)
+
+function GetWhisperChannelPrefix()
 	if ChatConstants.WhisperChannelPrefix then
 		return ChatConstants.WhisperChannelPrefix
 	end
 
 	return "To "
 end
-function t2.NameButtonClicked(p41, _, p43) -- line: 252
-	-- upvalues: ChatSettings (copy), Players (copy), LocalPlayer (ref)
-	if not p41.ChatWindow then
+
+function class:NameButtonClicked(_, childName)
+	if not self.ChatWindow then
 		return
 	end
 
 	if ChatSettings.ClickOnPlayerNameToWhisper then
-		local p43_2 = Players:FindFirstChild(p43)
+		local child = Players:FindFirstChild(childName)
 
-		if p43_2 and p43_2 ~= LocalPlayer then
-			local v74 = GetWhisperChannelPrefix() .. p43
+		if child and child ~= LocalPlayer then
+			local v2 = GetWhisperChannelPrefix() .. childName
 
-			if p41.ChatWindow:GetChannel(v74) then
-				p41.ChatBar:ResetCustomState()
+			if self.ChatWindow:GetChannel(v2) then
+				self.ChatBar:ResetCustomState()
 
-				if v74 ~= p41.ChatWindow:GetTargetMessageChannel() then
-					p41.ChatWindow:SwitchCurrentChannel(v74)
+				if self.ChatWindow:GetTargetMessageChannel() ~= v2 then
+					self.ChatWindow:SwitchCurrentChannel(v2)
 				end
 
-				local v75 = "/w " .. p43
+				local v3 = "/w " .. childName
+				self.ChatBar:SetText(v3)
 
-				p41.ChatBar:SetText(v75)
-				p41.ChatBar:CaptureFocus()
+				self.ChatBar:CaptureFocus()
+			elseif not self.ChatBar:IsInCustomState() then
+				local v3 = "/w " .. childName
+				self.ChatBar:SetText(v3)
 
-				return
-			end
-
-			if not p41.ChatBar:IsInCustomState() then
-				local v76 = "/w " .. p43
-
-				p41.ChatBar:SetText(v76)
-				p41.ChatBar:CaptureFocus()
+				self.ChatBar:CaptureFocus()
 			end
 		end
 	end
 end
-function t2.ChannelButtonClicked(p44, _, p46) -- line: 282
-	-- upvalues: ChatSettings (copy)
-	if not p44.ChatWindow then
+
+function class:ChannelButtonClicked(_, p)
+	if not self.ChatWindow then
 		return
 	end
 
-	if ChatSettings.ClickOnChannelNameToSetMainChannel and p44.ChatWindow:GetChannel(p46) then
-		p44.ChatBar:ResetCustomState()
+	if ChatSettings.ClickOnChannelNameToSetMainChannel and self.ChatWindow:GetChannel(p) then
+		self.ChatBar:ResetCustomState()
 
-		if p46 ~= p44.ChatWindow:GetTargetMessageChannel() then
-			p44.ChatWindow:SwitchCurrentChannel(p46)
+		if self.ChatWindow:GetTargetMessageChannel() ~= p then
+			self.ChatWindow:SwitchCurrentChannel(p)
 		end
 
-		p44.ChatBar:ResetText()
-		p44.ChatBar:CaptureFocus()
+		self.ChatBar:ResetText()
+		self.ChatBar:CaptureFocus()
 	end
 end
-function t2.RegisterChatWindow(p47, p48) -- line: 300
-	p47.ChatWindow = p48
-	p47.ChatBar = p48:GetChatBar()
+
+function class:RegisterChatWindow(chatWindow)
+	self.ChatWindow = chatWindow
+	self.ChatBar = chatWindow:GetChatBar()
 end
-function t2.GetFromObjectPool(p49, p50) -- line: 305
-	if p49.ObjectPool == nil then
-		return Instance.new(p50)
+
+function class:GetFromObjectPool(className)
+	if self.ObjectPool == nil then
+		return Instance.new(className)
 	end
 
-	return p49.ObjectPool:GetInstance(p50)
+	return self.ObjectPool:GetInstance(className)
 end
-function t2.RegisterObjectPool(p51, p52) -- line: 312
-	p51.ObjectPool = p52
+
+function class:RegisterObjectPool(objectPool)
+	self.ObjectPool = objectPool
 end
-function t2.CreateFadeFunctions(_, p54) -- line: 332
-	local t3 = {}
 
-	for k, v in pairs(p54) do
-		t3[k] = {}
+function class.CreateFadeFunctions(_, items)
+	local v2 = {}
 
-		for k2, v2 in pairs(v) do
-			t3[k][k2] = {
-				NormalizedExptValue = 1,
-				Target = v2.FadedIn,
-				Current = k[k2]
-			}
+	for k, item in pairs(items) do
+		v2[k] = {}
+
+		for k2, v3 in pairs(item) do
+			v2[k][k2] = { Target = v3.FadedIn, Current = k[k2], NormalizedExptValue = 1 }
 		end
 	end
 
-	local function FadeInFunction(p55, p56) -- line: 345
-		-- upvalues: t3 (copy), p54 (copy)
-		for k, v in pairs(t3) do
-			for k3, v3 in pairs(v) do
-				v3.Target = p54[k][k3].FadedIn
-				v3.NormalizedExptValue = p56:NormalizedDefaultExptValueInSeconds(p55)
+	local function FadeInFunction(p, object)
+		for k, v3 in pairs(v2) do
+			for k2, v4 in pairs(v3) do
+				v4.Target = items[k][k2].FadedIn
+				v4.NormalizedExptValue = object:NormalizedDefaultExptValueInSeconds(p)
 			end
 		end
 	end
-	local function FadeOutFunction(p57, p58) -- line: 354
-		-- upvalues: t3 (copy), p54 (copy)
-		for k, v in pairs(t3) do
-			for k4, v4 in pairs(v) do
-				v4.Target = p54[k][k4].FadedOut
-				v4.NormalizedExptValue = p58:NormalizedDefaultExptValueInSeconds(p57)
+
+	local function FadeOutFunction(p, object)
+		for k, v3 in pairs(v2) do
+			for k2, v4 in pairs(v3) do
+				v4.Target = items[k][k2].FadedOut
+				v4.NormalizedExptValue = object:NormalizedDefaultExptValueInSeconds(p)
 			end
 		end
 	end
-	local function AnimGuiObjects() -- line: 363
-		-- upvalues: t3 (copy)
-		for k, v in pairs(t3) do
-			for k5, v5 in pairs(v) do
-				k[k5] = v5.Current
+
+	local function AnimGuiObjects()
+		for currents, v3 in pairs(v2) do
+			for k, v4 in pairs(v3) do
+				currents[k] = v4.Current
 			end
 		end
 	end
-	local function UpdateAnimFunction(p59, p60) -- line: 371
-		-- upvalues: t3 (copy), AnimGuiObjects (copy)
-		for _, v in pairs(t3) do
-			for _, v6 in pairs(v) do
-				v6.Current = p60:Expt(v6.Current, v6.Target, v6.NormalizedExptValue, p59)
+
+	local function UpdateAnimFunction(p, object)
+		for _, v3 in pairs(v2) do
+			for _, v4 in pairs(v3) do
+				v4.Current = object:Expt(v4.Current, v4.Target, v4.NormalizedExptValue, p)
 			end
 		end
 
@@ -335,25 +318,27 @@ function t2.CreateFadeFunctions(_, p54) -- line: 332
 
 	return FadeInFunction, FadeOutFunction, UpdateAnimFunction
 end
-function t2.NewBindableEvent(_, p62) -- line: 389
-	local BindableEvent = Instance.new("BindableEvent")
 
-	BindableEvent.Name = p62
+function class.NewBindableEvent(_, name)
+	local bindableEvent = Instance.new("BindableEvent")
+	bindableEvent.Name = name
+	return bindableEvent
+end
 
-	return BindableEvent
-end
-function t2.RegisterGuiRoot(_) -- line: 396
-end
-function t1.new() -- line: 401
-	-- upvalues: t2 (copy)
-	local self = setmetatable({}, t2)
+function class.RegisterGuiRoot(_) end
+
+function v.new()
+	local self = setmetatable({}, class)
 
 	self.ObjectPool = nil
 	self.ChatWindow = nil
+
 	self.DEFAULT_MESSAGE_CREATOR = "UnknownMessage"
 	self.MESSAGE_CREATOR_MODULES_VERSION = 1
+
 	self.KEY_MESSAGE_TYPE = "MessageType"
 	self.KEY_CREATOR_FUNCTION = "MessageCreatorFunc"
+
 	self.KEY_BASE_FRAME = "BaseFrame"
 	self.KEY_BASE_MESSAGE = "BaseMessage"
 	self.KEY_UPDATE_TEXT_FUNC = "UpdateTextFunction"
@@ -365,4 +350,4 @@ function t1.new() -- line: 401
 	return self
 end
 
-return t1.new()
+return v.new()

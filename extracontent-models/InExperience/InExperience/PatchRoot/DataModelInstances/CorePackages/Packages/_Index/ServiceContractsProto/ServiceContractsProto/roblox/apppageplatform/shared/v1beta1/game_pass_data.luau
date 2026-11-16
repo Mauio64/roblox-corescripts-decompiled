@@ -1,452 +1,612 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 81
-	-- upvalues: t2 (copy)
+local timestamp = require(script.Parent.Parent.Parent.Parent.Parent.google.protobuf.timestamp)
+require(script.Parent.custom_options)
+
+local class = {}
+class.__index = class
+
+function class.new(data)
 	return (setmetatable({
-		type = if t3 ~= nil and t3.type ~= nil then t3.type else "",
-		amount_in_robux = if t3 ~= nil and t3.amount_in_robux ~= nil then t3.amount_in_robux else 0,
-		percent = if t3 ~= nil and t3.percent ~= nil then t3.percent else 0
-	}, t2))
+		type = (data == nil or data.type == nil) and "" or data.type,
+		amount_in_robux = (data == nil or data.amount_in_robux == nil) and 0 or data.amount_in_robux,
+		percent = (data == nil or data.percent == nil) and 0 or data.percent
+	}, class))
 end
-function t2.encode(p1) -- line: 89
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.type ~= nil and p1.type ~= "" then
-		local v10, v11 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v10, v11, p1.type)
+	if self.type ~= nil and self.type ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.type)
 	end
 
-	if p1.amount_in_robux ~= nil and p1.amount_in_robux ~= 0 then
-		local v12, v13 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v12, v13, p1.amount_in_robux)
+	if self.amount_in_robux ~= nil and self.amount_in_robux ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.amount_in_robux)
 	end
 
-	if p1.percent ~= nil and p1.percent ~= 0 then
-		local v14, v15 = proto.writeTag(buf, n1, 3, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v14, v15, p1.percent)
+	if self.percent ~= nil and self.percent ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.percent)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 113
-	-- upvalues: t2 (copy), proto (copy)
-	local v18 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v20, v21
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v20, v21, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v21 == proto.wireTypes.varint then
-			if v20 == 2 then
-				local v22
-
-				v22, n2 = proto.readVarIntI64(p2, n2)
-				v18.amount_in_robux = v22
-			elseif v20 == 3 then
-				local v23
-
-				v23, n2 = proto.readVarIntI64(p2, n2)
-				v18.percent = v23
+		if v4 == proto.wireTypes.varint then
+			if v3 == 2 then
+				local amount_in_robux
+				amount_in_robux, v2 = proto.readVarIntI64(buf, v2)
+				result.amount_in_robux = amount_in_robux
+			elseif v3 == 3 then
+				local percent
+				percent, v2 = proto.readVarIntI64(buf, v2)
+				result.percent = percent
 			else
-				local v24
-
-				v24, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v21 == proto.wireTypes.lengthDelimited then
-			if v20 == 1 then
-				local v25
-
-				v25, n2 = proto.readBuffer(p2, n2)
-				v18.type = buffer.tostring(v25)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.type = buffer.tostring(v5)
 			else
-				local v26, v27 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v27 + v26
+				v2 = v5 + varInt
 			end
-		elseif v21 == proto.wireTypes.i32 then
-			local v28
-
-			v28, n2 = proto.readFixed32(p2, n2)
-		elseif v21 == proto.wireTypes.i64 then
-			local v29
-
-			v29, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v21)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v18
-end
-function t2.jsonEncode(p3) -- line: 166
-	local t4 = {}
-
-	if p3.type ~= nil and p3.type ~= "" then
-		t4.type = p3.type
-	end
-
-	if p3.amount_in_robux ~= nil and p3.amount_in_robux ~= 0 then
-		t4.amountInRobux = p3.amount_in_robux
-	end
-
-	if p3.percent ~= nil and p3.percent ~= 0 then
-		t4.percent = p3.percent
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 184
-	-- upvalues: t2 (copy)
-	local v33 = t2.new()
-
-	if t5.type ~= nil then
-		v33.type = t5.type
-	end
-
-	if t5.amount_in_robux ~= nil then
-		v33.amount_in_robux = t5.amount_in_robux
-	end
-
-	if t5.amountInRobux ~= nil then
-		v33.amount_in_robux = t5.amountInRobux
-	end
-
-	if t5.percent ~= nil then
-		v33.percent = t5.percent
-	end
-
-	return v33
+	return result
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.type ~= nil and self.type ~= "" then
+		v2.type = self.type
+	end
+
+	if self.amount_in_robux ~= nil and self.amount_in_robux ~= 0 then
+		v2.amountInRobux = self.amount_in_robux
+	end
+
+	if self.percent ~= nil and self.percent ~= 0 then
+		v2.percent = self.percent
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.type ~= nil then
+		v2.type = data.type
+	end
+
+	if data.amount_in_robux ~= nil then
+		v2.amount_in_robux = data.amount_in_robux
+	end
+
+	if data.amountInRobux ~= nil then
+		v2.amount_in_robux = data.amountInRobux
+	end
+
+	if data.percent ~= nil then
+		v2.percent = data.percent
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "PriceDiscountDetail",
 	fullName = "roblox.apppageplatform.shared.v1beta1.PriceDiscountDetail"
 }
-t1.PriceDiscountDetail = t2
-typeRegistry.default:register(t1.PriceDiscountDetail)
 
-local t6 = {}
+v.PriceDiscountDetail = class
 
-t6.__index = t6
+typeRegistry.default:register(v.PriceDiscountDetail)
 
-function t6.new(t7: {[any]: any}?) -- line: 220
-	-- upvalues: t6 (copy)
-	return (setmetatable({
-		id = if t7 ~= nil and t7.id ~= nil then t7.id else "",
-		display_name = if t7 ~= nil and t7.display_name ~= nil then t7.display_name else "",
-		price = if t7 ~= nil and t7.price ~= nil then t7.price else 0,
-		product_id = if t7 ~= nil and t7.product_id ~= nil then t7.product_id else 0,
-		is_owned = t7 ~= nil and (t7.is_owned ~= nil and t7.is_owned),
-		display_icon_image_asset_id = if t7 ~= nil and t7.display_icon_image_asset_id ~= nil then t7.display_icon_image_asset_id else 0,
-		display_description = if t7 ~= nil and t7.display_description ~= nil then t7.display_description else "",
-		price_discount_details = if t7 ~= nil and t7.price_discount_details ~= nil then t7.price_discount_details else {},
-		user_base_price_in_robux = if t7 ~= nil and t7.user_base_price_in_robux ~= nil then t7.user_base_price_in_robux else 0
-	}, t6))
+local class2 = {}
+class2.__index = class2
+
+function class2.new(data)
+	local v2 = {
+		id = (data == nil or data.id == nil) and "" or data.id,
+		display_name = (data == nil or data.display_name == nil) and "" or data.display_name,
+		price = (data == nil or data.price == nil) and 0 or data.price,
+		product_id = (data == nil or data.product_id == nil) and 0 or data.product_id,
+		is_owned = data ~= nil and data.is_owned ~= nil and data.is_owned,
+		display_icon_image_asset_id = (data == nil or data.display_icon_image_asset_id == nil) and 0 or data.display_icon_image_asset_id,
+		display_description = (data == nil or data.display_description == nil) and "" or data.display_description,
+		price_discount_details = (data == nil or data.price_discount_details == nil) and {} or data.price_discount_details,
+		user_base_price_in_robux = (data == nil or data.user_base_price_in_robux == nil) and 0 or data.user_base_price_in_robux,
+		is_discounted = data ~= nil and data.is_discounted ~= nil and data.is_discounted,
+		can_configure = data ~= nil and data.can_configure ~= nil and data.can_configure,
+		created_time = 0,
+		updated_time = 0,
+		total_up_votes = 0,
+		total_down_votes = 0,
+		user_vote = 0
+	}
+	local created_time
+
+	if not (data == nil or data.created_time == nil) then
+		created_time = data.created_time
+	end
+
+	v2.created_time = created_time
+	local updated_time
+
+	if not (data == nil or data.updated_time == nil) then
+		updated_time = data.updated_time
+	end
+
+	v2.updated_time = updated_time
+	local total_up_votes
+
+	if not (data == nil or data.total_up_votes == nil) then
+		total_up_votes = data.total_up_votes
+	end
+
+	v2.total_up_votes = total_up_votes
+	local total_down_votes
+
+	if not (data == nil or data.total_down_votes == nil) then
+		total_down_votes = data.total_down_votes
+	end
+
+	v2.total_down_votes = total_down_votes
+	local user_vote
+
+	if not (data == nil or data.user_vote == nil) then
+		user_vote = data.user_vote
+	end
+
+	v2.user_vote = user_vote
+	return (setmetatable(v2, class2))
 end
-function t6.encode(p4) -- line: 242
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n3 = 0
 
-	if p4.id ~= nil and p4.id ~= "" then
-		local v38, v39 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n3 = proto.writeString(v38, v39, p4.id)
+	if self.id ~= nil and self.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.id)
 	end
 
-	if p4.display_name ~= nil and p4.display_name ~= "" then
-		local v40, v41 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v40, v41, p4.display_name)
+	if self.display_name ~= nil and self.display_name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.display_name)
 	end
 
-	if p4.price ~= nil and p4.price ~= 0 then
-		local v42, v43 = proto.writeTag(buf, n3, 3, proto.wireTypes.varint)
-
-		buf, n3 = proto.writeVarInt(v42, v43, p4.price)
+	if self.price ~= nil and self.price ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.price)
 	end
 
-	if p4.product_id ~= nil and p4.product_id ~= 0 then
-		local v44, v45 = proto.writeTag(buf, n3, 4, proto.wireTypes.varint)
-
-		buf, n3 = proto.writeVarInt(v44, v45, p4.product_id)
+	if self.product_id ~= nil and self.product_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.product_id)
 	end
 
-	if p4.is_owned then
-		local v46, v47 = proto.writeTag(buf, n3, 5, proto.wireTypes.varint)
-
-		buf, n3 = proto.writeVarInt(v46, v47, not p4.is_owned and 0 or 1)
+	if self.is_owned then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.is_owned and 1 or 0)
 	end
 
-	if p4.display_icon_image_asset_id ~= nil and p4.display_icon_image_asset_id ~= 0 then
-		local v48, v49 = proto.writeTag(buf, n3, 6, proto.wireTypes.varint)
-
-		buf, n3 = proto.writeVarInt(v48, v49, p4.display_icon_image_asset_id)
+	if self.display_icon_image_asset_id ~= nil and self.display_icon_image_asset_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.display_icon_image_asset_id)
 	end
 
-	if p4.display_description ~= nil and p4.display_description ~= "" then
-		local v50, v51 = proto.writeTag(buf, n3, 7, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v50, v51, p4.display_description)
+	if self.display_description ~= nil and self.display_description ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.display_description)
 	end
 
-	if p4.price_discount_details ~= nil and #p4.price_discount_details > 0 then
-		for _, v53 in p4.price_discount_details do
-			local v54 = v53:encode()
-			local v55, v56 = proto.writeTag(buf, n3, 8, proto.wireTypes.lengthDelimited)
-
-			buf, n3 = proto.writeBuffer(v55, v56, v54, buffer.len(v54))
+	if self.price_discount_details ~= nil and #self.price_discount_details > 0 then
+		for _, price_discount_detail in self.price_discount_details do
+			local encoded = price_discount_detail:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	if p4.user_base_price_in_robux ~= nil and p4.user_base_price_in_robux ~= 0 then
-		local v57, v58 = proto.writeTag(buf, n3, 9, proto.wireTypes.varint)
-
-		buf, n3 = proto.writeVarInt(v57, v58, p4.user_base_price_in_robux)
+	if self.user_base_price_in_robux ~= nil and self.user_base_price_in_robux ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.user_base_price_in_robux)
 	end
 
-	local buf3 = buffer.create(n3)
+	if self.is_discounted then
+		local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.is_discounted and 1 or 0)
+	end
 
-	buffer.copy(buf3, 0, buf, 0, n3)
+	if self.can_configure then
+		local v4, v5 = proto.writeTag(v2, v3, 11, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.can_configure and 1 or 0)
+	end
 
-	return buf3
+	if self.created_time ~= nil then
+		local encoded = self.created_time:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 12, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.updated_time ~= nil then
+		local encoded = self.updated_time:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 13, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.total_up_votes ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 14, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.total_up_votes)
+	end
+
+	if self.total_down_votes ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 15, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.total_down_votes)
+	end
+
+	if self.user_vote ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 16, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.user_vote and 1 or 0)
+	end
+
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t6.decode(p5: buffer) -- line: 299
-	-- upvalues: t6 (copy), proto (copy), t1 (copy)
-	local v61 = t6.new()
-	local n4 = 0
 
-	while n4 < buffer.len(p5) do
-		local v63, v64
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
 
-		v63, v64, n4 = proto.readTag(p5, n4)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v64 == proto.wireTypes.varint then
-			if v63 == 3 then
-				local v65
-
-				v65, n4 = proto.readVarIntI64(p5, n4)
-				v61.price = v65
-			elseif v63 == 4 then
-				local v66
-
-				v66, n4 = proto.readVarIntI64(p5, n4)
-				v61.product_id = v66
-			elseif v63 == 5 then
-				local v67
-
-				v67, n4 = proto.readVarInt(p5, n4)
-				v61.is_owned = v67 ~= 0
-			elseif v63 == 6 then
-				local v68
-
-				v68, n4 = proto.readVarIntI64(p5, n4)
-				v61.display_icon_image_asset_id = v68
-			elseif v63 == 9 then
-				local v69
-
-				v69, n4 = proto.readVarIntI64(p5, n4)
-				v61.user_base_price_in_robux = v69
+		if v4 == proto.wireTypes.varint then
+			if v3 == 3 then
+				local price
+				price, v2 = proto.readVarIntI64(buf, v2)
+				result.price = price
+			elseif v3 == 4 then
+				local product_id
+				product_id, v2 = proto.readVarIntI64(buf, v2)
+				result.product_id = product_id
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_owned = v5 ~= 0
+			elseif v3 == 6 then
+				local display_icon_image_asset_id
+				display_icon_image_asset_id, v2 = proto.readVarIntI64(buf, v2)
+				result.display_icon_image_asset_id = display_icon_image_asset_id
+			elseif v3 == 9 then
+				local user_base_price_in_robux
+				user_base_price_in_robux, v2 = proto.readVarIntI64(buf, v2)
+				result.user_base_price_in_robux = user_base_price_in_robux
+			elseif v3 == 10 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_discounted = v5 ~= 0
+			elseif v3 == 11 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.can_configure = v5 ~= 0
+			elseif v3 == 14 then
+				local total_up_votes
+				total_up_votes, v2 = proto.readVarIntI64(buf, v2)
+				result.total_up_votes = total_up_votes
+			elseif v3 == 15 then
+				local total_down_votes
+				total_down_votes, v2 = proto.readVarIntI64(buf, v2)
+				result.total_down_votes = total_down_votes
+			elseif v3 == 16 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.user_vote = v5 ~= 0
 			else
-				local v70
-
-				v70, n4 = proto.readVarInt(p5, n4)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v64 == proto.wireTypes.lengthDelimited then
-			if v63 == 1 then
-				local v71
-
-				v71, n4 = proto.readBuffer(p5, n4)
-				v61.id = buffer.tostring(v71)
-			elseif v63 == 2 then
-				local v72
-
-				v72, n4 = proto.readBuffer(p5, n4)
-				v61.display_name = buffer.tostring(v72)
-			elseif v63 == 7 then
-				local v73
-
-				v73, n4 = proto.readBuffer(p5, n4)
-				v61.display_description = buffer.tostring(v73)
-			elseif v63 == 8 then
-				local v74
-
-				v74, n4 = proto.readBuffer(p5, n4)
-				table.insert(v61.price_discount_details, t1.PriceDiscountDetail.decode(v74))
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_name = buffer.tostring(v5)
+			elseif v3 == 7 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_description = buffer.tostring(v5)
+			elseif v3 == 8 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.price_discount_details, v.PriceDiscountDetail.decode(v5))
+			elseif v3 == 12 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.created_time = timestamp.Timestamp.decode(v5)
+			elseif v3 == 13 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.updated_time = timestamp.Timestamp.decode(v5)
 			else
-				local v75, v76 = proto.readVarInt(p5, n4)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n4 = v76 + v75
+				v2 = v5 + varInt
 			end
-		elseif v64 == proto.wireTypes.i32 then
-			local v77
-
-			v77, n4 = proto.readFixed32(p5, n4)
-		elseif v64 == proto.wireTypes.i64 then
-			local v78
-
-			v78, n4 = proto.readFixed64(p5, n4)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v64)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v61
-end
-function t6.jsonEncode(p6) -- line: 382
-	local t8 = {}
-
-	if p6.id ~= nil and p6.id ~= "" then
-		t8.id = p6.id
-	end
-
-	if p6.display_name ~= nil and p6.display_name ~= "" then
-		t8.displayName = p6.display_name
-	end
-
-	if p6.price ~= nil and p6.price ~= 0 then
-		t8.price = p6.price
-	end
-
-	if p6.product_id ~= nil and p6.product_id ~= 0 then
-		t8.productId = p6.product_id
-	end
-
-	if p6.is_owned then
-		t8.isOwned = p6.is_owned
-	end
-
-	if p6.display_icon_image_asset_id ~= nil and p6.display_icon_image_asset_id ~= 0 then
-		t8.displayIconImageAssetId = p6.display_icon_image_asset_id
-	end
-
-	if p6.display_description ~= nil and p6.display_description ~= "" then
-		t8.displayDescription = p6.display_description
-	end
-
-	if p6.price_discount_details ~= nil and #p6.price_discount_details > 0 then
-		local t9 = {}
-
-		for _, v83 in p6.price_discount_details do
-			table.insert(t9, v83:jsonEncode())
-		end
-
-		t8.priceDiscountDetails = t9
-	end
-
-	if p6.user_base_price_in_robux ~= nil and p6.user_base_price_in_robux ~= 0 then
-		t8.userBasePriceInRobux = p6.user_base_price_in_robux
-	end
-
-	return t8
-end
-function t6.jsonDecode(t10: {[any]: any}) -- line: 428
-	-- upvalues: t6 (copy), t1 (copy)
-	local v85 = t6.new()
-
-	if t10.id ~= nil then
-		v85.id = t10.id
-	end
-
-	if t10.display_name ~= nil then
-		v85.display_name = t10.display_name
-	end
-
-	if t10.displayName ~= nil then
-		v85.display_name = t10.displayName
-	end
-
-	if t10.price ~= nil then
-		v85.price = t10.price
-	end
-
-	if t10.product_id ~= nil then
-		v85.product_id = t10.product_id
-	end
-
-	if t10.productId ~= nil then
-		v85.product_id = t10.productId
-	end
-
-	if t10.is_owned ~= nil then
-		v85.is_owned = t10.is_owned
-	end
-
-	if t10.isOwned ~= nil then
-		v85.is_owned = t10.isOwned
-	end
-
-	if t10.display_icon_image_asset_id ~= nil then
-		v85.display_icon_image_asset_id = t10.display_icon_image_asset_id
-	end
-
-	if t10.displayIconImageAssetId ~= nil then
-		v85.display_icon_image_asset_id = t10.displayIconImageAssetId
-	end
-
-	if t10.display_description ~= nil then
-		v85.display_description = t10.display_description
-	end
-
-	if t10.displayDescription ~= nil then
-		v85.display_description = t10.displayDescription
-	end
-
-	if t10.price_discount_details ~= nil then
-		local t11 = {}
-
-		for _, v88 in t10.price_discount_details do
-			table.insert(t11, t1.PriceDiscountDetail.jsonDecode(v88))
-		end
-
-		v85.price_discount_details = t11
-	end
-
-	if t10.priceDiscountDetails ~= nil then
-		local t12 = {}
-
-		for _, v91 in t10.priceDiscountDetails do
-			table.insert(t12, t1.PriceDiscountDetail.jsonDecode(v91))
-		end
-
-		v85.price_discount_details = t12
-	end
-
-	if t10.user_base_price_in_robux ~= nil then
-		v85.user_base_price_in_robux = t10.user_base_price_in_robux
-	end
-
-	if t10.userBasePriceInRobux ~= nil then
-		v85.user_base_price_in_robux = t10.userBasePriceInRobux
-	end
-
-	return v85
+	return result
 end
 
-t6.descriptor = {
+function class2:jsonEncode()
+	local v2 = {}
+
+	if self.id ~= nil and self.id ~= "" then
+		v2.id = self.id
+	end
+
+	if self.display_name ~= nil and self.display_name ~= "" then
+		v2.displayName = self.display_name
+	end
+
+	if self.price ~= nil and self.price ~= 0 then
+		v2.price = self.price
+	end
+
+	if self.product_id ~= nil and self.product_id ~= 0 then
+		v2.productId = self.product_id
+	end
+
+	if self.is_owned then
+		v2.isOwned = self.is_owned
+	end
+
+	if self.display_icon_image_asset_id ~= nil and self.display_icon_image_asset_id ~= 0 then
+		v2.displayIconImageAssetId = self.display_icon_image_asset_id
+	end
+
+	if self.display_description ~= nil and self.display_description ~= "" then
+		v2.displayDescription = self.display_description
+	end
+
+	if self.price_discount_details ~= nil and #self.price_discount_details > 0 then
+		local priceDiscountDetails = {}
+
+		for _, price_discount_detail in self.price_discount_details do
+			table.insert(priceDiscountDetails, price_discount_detail:jsonEncode())
+		end
+
+		v2.priceDiscountDetails = priceDiscountDetails
+	end
+
+	if self.user_base_price_in_robux ~= nil and self.user_base_price_in_robux ~= 0 then
+		v2.userBasePriceInRobux = self.user_base_price_in_robux
+	end
+
+	if self.is_discounted then
+		v2.isDiscounted = self.is_discounted
+	end
+
+	if self.can_configure then
+		v2.canConfigure = self.can_configure
+	end
+
+	if self.created_time ~= nil then
+		v2.createdTime = self.created_time:jsonEncode()
+	end
+
+	if self.updated_time ~= nil then
+		v2.updatedTime = self.updated_time:jsonEncode()
+	end
+
+	if self.total_up_votes ~= nil then
+		v2.totalUpVotes = self.total_up_votes
+	end
+
+	if self.total_down_votes ~= nil then
+		v2.totalDownVotes = self.total_down_votes
+	end
+
+	if self.user_vote ~= nil then
+		v2.userVote = self.user_vote
+	end
+
+	return v2
+end
+
+function class2.jsonDecode(data)
+	local v2 = class2.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.display_name ~= nil then
+		v2.display_name = data.display_name
+	end
+
+	if data.displayName ~= nil then
+		v2.display_name = data.displayName
+	end
+
+	if data.price ~= nil then
+		v2.price = data.price
+	end
+
+	if data.product_id ~= nil then
+		v2.product_id = data.product_id
+	end
+
+	if data.productId ~= nil then
+		v2.product_id = data.productId
+	end
+
+	if data.is_owned ~= nil then
+		v2.is_owned = data.is_owned
+	end
+
+	if data.isOwned ~= nil then
+		v2.is_owned = data.isOwned
+	end
+
+	if data.display_icon_image_asset_id ~= nil then
+		v2.display_icon_image_asset_id = data.display_icon_image_asset_id
+	end
+
+	if data.displayIconImageAssetId ~= nil then
+		v2.display_icon_image_asset_id = data.displayIconImageAssetId
+	end
+
+	if data.display_description ~= nil then
+		v2.display_description = data.display_description
+	end
+
+	if data.displayDescription ~= nil then
+		v2.display_description = data.displayDescription
+	end
+
+	if data.price_discount_details ~= nil then
+		local price_discount_details = {}
+
+		for _, price_discount_detail in data.price_discount_details do
+			table.insert(price_discount_details, v.PriceDiscountDetail.jsonDecode(price_discount_detail))
+		end
+
+		v2.price_discount_details = price_discount_details
+	end
+
+	if data.priceDiscountDetails ~= nil then
+		local price_discount_details = {}
+
+		for _, priceDiscountDetail in data.priceDiscountDetails do
+			table.insert(price_discount_details, v.PriceDiscountDetail.jsonDecode(priceDiscountDetail))
+		end
+
+		v2.price_discount_details = price_discount_details
+	end
+
+	if data.user_base_price_in_robux ~= nil then
+		v2.user_base_price_in_robux = data.user_base_price_in_robux
+	end
+
+	if data.userBasePriceInRobux ~= nil then
+		v2.user_base_price_in_robux = data.userBasePriceInRobux
+	end
+
+	if data.is_discounted ~= nil then
+		v2.is_discounted = data.is_discounted
+	end
+
+	if data.isDiscounted ~= nil then
+		v2.is_discounted = data.isDiscounted
+	end
+
+	if data.can_configure ~= nil then
+		v2.can_configure = data.can_configure
+	end
+
+	if data.canConfigure ~= nil then
+		v2.can_configure = data.canConfigure
+	end
+
+	if data.created_time ~= nil then
+		v2.created_time = timestamp.Timestamp.jsonDecode(data.created_time)
+	end
+
+	if data.createdTime ~= nil then
+		v2.created_time = timestamp.Timestamp.jsonDecode(data.createdTime)
+	end
+
+	if data.updated_time ~= nil then
+		v2.updated_time = timestamp.Timestamp.jsonDecode(data.updated_time)
+	end
+
+	if data.updatedTime ~= nil then
+		v2.updated_time = timestamp.Timestamp.jsonDecode(data.updatedTime)
+	end
+
+	if data.total_up_votes ~= nil then
+		v2.total_up_votes = data.total_up_votes
+	end
+
+	if data.totalUpVotes ~= nil then
+		v2.total_up_votes = data.totalUpVotes
+	end
+
+	if data.total_down_votes ~= nil then
+		v2.total_down_votes = data.total_down_votes
+	end
+
+	if data.totalDownVotes ~= nil then
+		v2.total_down_votes = data.totalDownVotes
+	end
+
+	if data.user_vote ~= nil then
+		v2.user_vote = data.user_vote
+	end
+
+	if data.userVote ~= nil then
+		v2.user_vote = data.userVote
+	end
+
+	return v2
+end
+
+class2.descriptor = {
 	name = "GamePassData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.GamePassData"
 }
-t1.GamePassData = t6
-typeRegistry.default:register(t1.GamePassData)
 
-return {
-	PriceDiscountDetail = t1.PriceDiscountDetail,
-	GamePassData = t1.GamePassData
-}
+v.GamePassData = class2
+
+typeRegistry.default:register(v.GamePassData)
+
+return { PriceDiscountDetail = v.PriceDiscountDetail, GamePassData = v.GamePassData }

@@ -1,14 +1,12 @@
-local function schedulePrefetchDelay(n1: number, p1: ((...any) -> ...any)) -- line: 4
-	local function guardedCallback() -- line: 5
-		-- upvalues: p1 (copy)
+local function schedulePrefetchDelay(duration: number, callback)
+	local function guardedCallback()
 		if not game:IsLoaded() then
 			return
 		end
 
-		p1()
+		callback()
 	end
-
-	task.delay(n1, guardedCallback)
+	task.delay(duration, guardedCallback)
 end
 
 return schedulePrefetchDelay

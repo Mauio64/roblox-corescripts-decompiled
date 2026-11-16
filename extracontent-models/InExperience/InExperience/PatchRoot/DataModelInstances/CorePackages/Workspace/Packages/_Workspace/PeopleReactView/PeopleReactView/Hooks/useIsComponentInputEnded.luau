@@ -1,37 +1,35 @@
-local Parent = script:FindFirstAncestor("PeopleReactView").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("PeopleReactView").Parent
 
-return function(t1: {[any]: any}) -- line: 10
-	-- upvalues: React (copy)
-	local v4, v5 = React.useState(false)
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 13
-		-- upvalues: t1 (copy), v5 (copy)
-		local connection = nil
-		local connection2 = nil
+return function(p)
+	local state, setState = React.useState(false)
 
-		if t1.current then
-			connection = t1.current.InputBegan:Connect(function() -- line: 18
-				-- upvalues: v5 (copy)
-				v5(false)
+	React.useEffect(function()
+		local inputBeganConnection, inputEndedConnection
+
+		if p.current then
+			inputBeganConnection = p.current.InputBegan:Connect(function()
+				setState(false)
 			end)
-			connection2 = t1.current.InputEnded:Connect(function() -- line: 21
-				-- upvalues: v5 (copy)
-				v5(true)
+			inputEndedConnection = p.current.InputEnded:Connect(function()
+				setState(true)
 			end)
+		else
+			inputBeganConnection = nil
+			inputEndedConnection = nil
 		end
 
-		return function() -- line: 26
-			-- upvalues: connection (ref), connection2 (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if inputBeganConnection then
+				inputBeganConnection:Disconnect()
 			end
 
-			if connection2 then
-				connection2:Disconnect()
+			if inputEndedConnection then
+				inputEndedConnection:Disconnect()
 			end
 		end
 	end, {})
 
-	return v4
+	return state
 end

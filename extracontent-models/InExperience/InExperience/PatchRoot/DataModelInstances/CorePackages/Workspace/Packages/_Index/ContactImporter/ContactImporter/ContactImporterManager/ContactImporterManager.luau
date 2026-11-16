@@ -1,201 +1,223 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local AppStorageService = game:GetService("AppStorageService")
 local MessageBusService = game:GetService("MessageBusService")
-local ParentParentParent = ParentParent.Parent
-local dependencies = require(ParentParent.dependencies)
-local React = require(ParentParentParent.React)
-local Dash = require(ParentParentParent.Dash)
-local Cryo = require(ParentParentParent.Cryo)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
-local SocialCommon = require(ParentParentParent.SocialCommon)
-local useQuery = require(ParentParentParent.ApolloClient).useQuery
-local ApolloLocalState = require(ParentParentParent.ApolloLocalState)
-local ApolloFriends = require(ParentParentParent.ApolloFriends)
+local parent2 = parent.Parent
+
+local dependencies = require(parent.dependencies)
+
+local React = require(parent2.React)
+local Dash = require(parent2.Dash)
+local Cryo = require(parent2.Cryo)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local SocialCommon = require(parent2.SocialCommon)
+local ApolloClient = require(parent2.ApolloClient)
+local useQuery = ApolloClient.useQuery
+local ApolloLocalState = require(parent2.ApolloLocalState)
+local ApolloFriends = require(parent2.ApolloFriends)
 local queries = ApolloLocalState.queries
-local SocialLuaAnalytics = require(ParentParentParent.SocialLuaAnalytics)
+local SocialLuaAnalytics = require(parent2.SocialLuaAnalytics)
 local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
 local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
 local EventTypes = SocialLuaAnalytics.Analytics.Enums.EventTypes
 local Contexts = SocialLuaAnalytics.Analytics.Enums.Contexts
-local useDispatch = require(ParentParentParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useFetchContactImporterInfoOnce = require(ParentParent.Utils).useFetchContactImporterInfoOnce
-local useAutoSyncContacts = require(ParentParent.Utils).useAutoSyncContacts
+
+local Utils = require(parent.Utils)
+local useFetchContactImporterInfoOnce = Utils.useFetchContactImporterInfoOnce
+local Utils2 = require(parent.Utils)
+local useAutoSyncContacts = Utils2.useAutoSyncContacts
 local userIdExists = SocialCommon.Utils.userIdExists
-local PermissionsProtocol = require(ParentParentParent.PermissionsProtocol).PermissionsProtocol
-local rolloutByApplicationId = require(ParentParentParent.AppCommonLib).rolloutByApplicationId
-local UserProfiles = require(ParentParentParent.UserProfiles)
+local PermissionsProtocol = require(parent2.PermissionsProtocol)
+local permissionsProtocol = PermissionsProtocol.PermissionsProtocol
+local UserProfiles = require(parent2.UserProfiles)
+
 local useLocalUserId = RobloxAppHooks.useLocalUserId
-local UniversalAppPolicy = dependencies.UniversalAppPolicy
-local getAppFeaturePolicies = require(ParentParentParent.UniversalAppPolicy).getAppFeaturePolicies
-local NetworkingFriends = dependencies.NetworkingFriends
-local PaginatedFriendsCarouselIXP = require(ParentParent.Experiments.PaginatedFriendsCarouselIXP)
-local v32 = game:DefineFastFlag("EarlierFetchTimeForFriendsCarousel_v1", false)
-local v33 = game:DefineFastFlag("PrefetchProfileNamesOnStartup_v2", false)
-local FIntFriendsCarouselInitialFetchSize = require(ParentParentParent.SharedFlags).FIntFriendsCarouselInitialFetchSize
-local FFlagRegisterQRCodeKeyInEngine = require(ParentParentParent.SharedFlags).FFlagRegisterQRCodeKeyInEngine
-local FFlagFriendSortedByPresenceSignalsImplementation = require(ParentParentParent.SharedFlags).FFlagFriendSortedByPresenceSignalsImplementation
-local useSignalState = require(ParentParentParent.SignalsReact).useSignalState
-local DataHydration = require(ParentParentParent.DataHydration)
-local v39 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else DataHydration.Friends.FriendsStore.get()
-local v40 = not FFlagRegisterQRCodeKeyInEngine and "ScreenshotEventTracking" or "ProfileQrCodeCameraSettingsModalSeen"
-local v41 = rolloutByApplicationId(function() -- line: 61
-	return game:DefineFastInt("CallFriendCountAtStartupRollout", 0)
-end)
-local MessageId = MessageBusService:GetMessageId("Realtime", "appResume")
-local v43 = if not v33 then nil else UserProfiles.Stores.UserProfileStore.get()
-local t1 = {
+
+local universalAppPolicy = dependencies.UniversalAppPolicy
+local UniversalAppPolicy = require(parent2.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
+
+local PaginatedFriendsCarouselIXP = require(parent.Experiments.PaginatedFriendsCarouselIXP)
+
+local defineFastFlag = game:DefineFastFlag("EarlierFetchTimeForFriendsCarousel_v1", false)
+local defineFastFlag2 = game:DefineFastFlag("PrefetchProfileNamesOnStartup_v2", false)
+local FFlagGateContactAutoSyncByPolicy = require(parent.Flags.FFlagGateContactAutoSyncByPolicy)
+
+local SharedFlags = require(parent2.SharedFlags)
+local FIntFriendsCarouselInitialFetchSize = SharedFlags.FIntFriendsCarouselInitialFetchSize
+
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagRegisterQRCodeKeyInEngine = SharedFlags2.FFlagRegisterQRCodeKeyInEngine
+
+local SharedFlags3 = require(parent2.SharedFlags)
+local FFlagAddFriendsPageHighlightUnseenTrustedRequests = SharedFlags3.FFlagAddFriendsPageHighlightUnseenTrustedRequests
+
+local SharedFlags4 = require(parent2.SharedFlags)
+local FFlagSocialCarouselMigrateRecommendations = SharedFlags4.FFlagSocialCarouselMigrateRecommendations
+
+local SharedFlags5 = require(parent2.SharedFlags)
+local FFlagFriendSortedByPresenceSignalsImplementation = SharedFlags5.FFlagFriendSortedByPresenceSignalsImplementation
+
+local SignalsReact = require(parent2.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local DataHydration = require(parent2.DataHydration)
+local v = DataHydration.Friends.FriendsStore.get()
+local FriendsRequests = require(parent2.DataHydration.FriendsRequests)
+local FriendsRequestsStore = FriendsRequests.FriendsRequestsStore
+local UnseenRequestsStore = FriendsRequests.UnseenRequestsStore
+
+local FriendsRecommendations = require(parent2.DataHydration.FriendsRecommendations)
+local FriendsRecommendationsStore = FriendsRecommendations.FriendsRecommendationsStore
+local DataSource = FriendsRecommendations.Enums.DataSource
+local v2 = FFlagRegisterQRCodeKeyInEngine and "ProfileQrCodeCameraSettingsModalSeen" or "ScreenshotEventTracking"
+local messageId = MessageBusService:GetMessageId("Realtime", "appResume")
+local v3
+
+if defineFastFlag2 then
+	v3 = UserProfiles.Stores.UserProfileStore.get()
+else
+	v3 = nil
+end
+
+local eventStream = {
 	ProfileQRCodeCameraSettingsModalSeen = {
 		context = Contexts.ProfileQRCode,
 		eventType = EventTypes.SettingsModalSeenSinceLastAppStart,
-		formatRulesForAdditionalInfo = {
-			cameraPermissionResponseStatus = Dash.identity
-		}
+		formatRulesForAdditionalInfo = { cameraPermissionResponseStatus = Dash.identity }
 	}
 }
 
-local function Container(t2: {[any]: any}) -- line: 99
-	-- upvalues: useDispatch (copy), useLocalUserId (copy), getAppFeaturePolicies (copy), useFetchContactImporterInfoOnce (copy), v32 (copy), PaginatedFriendsCarouselIXP (copy), ApolloFriends (copy), FFlagFriendSortedByPresenceSignalsImplementation (copy), React (copy), v39 (copy), useSignalState (copy), useQuery (copy), queries (copy), userIdExists (copy), Cryo (copy), FIntFriendsCarouselInitialFetchSize (copy), v33 (copy), v43 (copy), useAutoSyncContacts (copy), v41 (copy), NetworkingFriends (copy), MessageBusService (copy), MessageId (copy), AnalyticsFactory (copy), t1 (copy), DefaultAnalyticsService (copy), AppStorageService (copy), v40 (copy), PermissionsProtocol (copy)
-	local v47 = useDispatch()
-	local v48 = useLocalUserId()
-	local v49 = t2.isContactImporterPolicyEnabled or getAppFeaturePolicies().getContactImporterEnabled()
+local function Container(p): nil
+	local userId = useLocalUserId()
 
-	useFetchContactImporterInfoOnce({
-		policyIsEnabled = v49
-	})
+	local isContactImporterPolicyEnabled = p.isContactImporterPolicyEnabled
+		or getAppFeaturePolicies().getContactImporterEnabled()
 
-	local v50 = nil
-	local v51 = nil
+	useFetchContactImporterInfoOnce({ policyIsEnabled = isContactImporterPolicyEnabled })
 
-	if v32 then
-		local v52, v53 = PaginatedFriendsCarouselIXP.usePaginatedFriendsCarouselExperiment()
-		local t3 = {
-			userId = v48,
-			sort = v52 and v53 or ApolloFriends.Enums.Sort.FriendshipScore
+	local v4 = nil
+	local friends = nil
+
+	if defineFastFlag then
+		local v5, v6 = PaginatedFriendsCarouselIXP.usePaginatedFriendsCarouselExperiment()
+		local variables = {
+			userId = userId,
+			sort = v5 and v6 or ApolloFriends.Enums.Sort.FriendshipScore
 		}
 
 		if FFlagFriendSortedByPresenceSignalsImplementation then
-			local v55 = React.useMemo(function() -- line: 123
-				-- upvalues: v39 (copy)
-				return v39.GetAllFriends()
-			end, {})
-			local v56 = useSignalState(v55)
+			local v7 = useSignalState((React.useMemo(function()
+				return v.GetAllFriends()
+			end, {})))
+			friends = v7 and v7.friends or nil
 
-			v51 = v56 and v56.friends or nil
-			React.useEffect(function() -- line: 130
-				-- upvalues: v39 (copy)
-				v39.GetOnlineFriends()
+			React.useEffect(function()
+				v.GetOnlineFriends()
 			end, {})
 		else
-			v50 = useQuery(queries.allFriendsByUserId, {
+			v4 = useQuery(queries.allFriendsByUserId, {
 				errorPolicy = "all",
+				skip = not (v5 and userIdExists(userId)),
 				notifyOnNetworkStatusChange = true,
-				skip = not v52 or not userIdExists(v48),
-				variables = Cryo.Dictionary.join(t3, {
-					pageCursor = "",
-					pageLimit = FIntFriendsCarouselInitialFetchSize
+				variables = Cryo.Dictionary.join(variables, {
+					pageLimit = FIntFriendsCarouselInitialFetchSize,
+					pageCursor = ""
 				})
 			})
+
 			useQuery(queries.onlineFriendsByUserId, {
+				skip = not (v5 and userIdExists(userId)),
 				notifyOnNetworkStatusChange = true,
-				skip = not v52 or not userIdExists(v48),
-				variables = t3
+				variables = variables
 			})
 		end
 	end
 
-	if v33 then
-		local v57 = if not FFlagFriendSortedByPresenceSignalsImplementation then v50 and (v50.data and (v50.data.allFriendsByUserId and v50.data.allFriendsByUserId.friends)) else v51
+	if defineFastFlag2 then
+		if not FFlagFriendSortedByPresenceSignalsImplementation then
+			friends = v4 and v4.data and v4.data.allFriendsByUserId and v4.data.allFriendsByUserId.friends
+		end
 
-		React.useEffect(function() -- line: 161
-			-- upvalues: userIdExists (copy), v48 (copy), v57 (copy), v43 (copy)
-			if userIdExists(v48) then
-				local t4 = { (tostring(v48)) }
+		React.useEffect(function()
+			if userIdExists(userId) then
+				local ids = { (tostring(userId)) }
 
-				if v57 then
-					for _, v62 in v57 do
-						if v62 and v62.id then
-							table.insert(t4, (tostring(v62.id)))
+				if friends then
+					for _, friend in friends do
+						if friend and friend.id then
+							table.insert(ids, (tostring(friend.id)))
 						end
 					end
 				end
 
-				v43.fetchNamesByUserIds(t4)
+				v3.fetchNamesByUserIds(ids)
 			end
-		end, {
-			v48,
-			v57
-		})
+		end, { userId, friends })
 	end
 
-	useAutoSyncContacts()
-
-	if v41() then
-		React.useEffect(function() -- line: 182
-			-- upvalues: userIdExists (copy), v48 (copy), v47 (copy), NetworkingFriends (copy)
-			if userIdExists(v48) then
-				v47(NetworkingFriends.GetFriendsCountFromUserId.API(v48))
+	if FFlagSocialCarouselMigrateRecommendations then
+		React.useEffect(function()
+			if getAppFeaturePolicies().getSocialGraphSyncEnabled() then
+				FriendsRecommendationsStore.get().getFriendsRecommendations(DataSource.HomepageFriendsCarousel)
 			end
-		end, { v48 })
+		end, { userId })
 	end
 
-	React.useEffect(function() -- line: 189
-		-- upvalues: userIdExists (copy), v48 (copy), v47 (copy), NetworkingFriends (copy), MessageBusService (copy), MessageId (copy)
-		if userIdExists(v48) then
-			v47(NetworkingFriends.GetNewFriendRequestsCount.API({
-				currentUserId = v48
-			}))
+	if FFlagGateContactAutoSyncByPolicy then
+		useAutoSyncContacts(isContactImporterPolicyEnabled)
+	else
+		useAutoSyncContacts()
+	end
 
-			local v63 = MessageBusService:Subscribe(MessageId, function() -- line: 194
-				-- upvalues: v47 (copy), NetworkingFriends (copy), v48 (copy)
-				v47(NetworkingFriends.GetNewFriendRequestsCount.API({
-					currentUserId = v48
-				}))
-			end, false, true)
+	React.useEffect(function()
+		if userIdExists(userId) then
+			v.GetFriendsCountByUserId((tostring(userId)))
+		end
+	end, { userId })
 
-			return function() -- line: 199
-				-- upvalues: v63 (copy)
-				v63:Disconnect()
+	React.useEffect(function()
+		if not userIdExists(userId) then
+			return function() end
+		end
+
+		if FFlagAddFriendsPageHighlightUnseenTrustedRequests then
+			UnseenRequestsStore.get().getUnseenRequestCount()
+		else
+			FriendsRequestsStore.get().getNewFriendsRequestCount()
+		end
+
+		local connection = MessageBusService:Subscribe(messageId, function()
+			if FFlagAddFriendsPageHighlightUnseenTrustedRequests then
+				UnseenRequestsStore.get().refetchUnseenRequestCount()
+			else
+				FriendsRequestsStore.get().refetchNewFriendRequestCount()
 			end
+		end, false, true)
+		return function()
+			connection:Disconnect()
 		end
+	end, { userId })
 
-		return function() -- line: 203
-		end
-	end, { v48 })
-
-	local v58 = React.useMemo(function() -- line: 206
-		-- upvalues: AnalyticsFactory (copy), t1 (copy), DefaultAnalyticsService (copy)
+	local v5 = React.useMemo(function()
 		return AnalyticsFactory.setUpAnalyticsFactory({
-			eventLists = {
-				EventStream = t1
-			},
-			analyticsImpl = {
-				EventStream = DefaultAnalyticsService.EventStream
-			}
+			eventLists = { EventStream = eventStream },
+			analyticsImpl = { EventStream = DefaultAnalyticsService.EventStream }
 		})()
 	end, {})
-
-	React.useEffect(function() -- line: 216
-		-- upvalues: AppStorageService (copy), v40 (copy), PermissionsProtocol (copy), v58 (copy)
-		if AppStorageService:GetItem(v40) == "true" then
-			PermissionsProtocol.default:checkOrRequestPermissions({ PermissionsProtocol.Permissions.CAMERA_ACCESS }):andThen(function(p1) -- line: 224
-				-- upvalues: v58 (copy)
-				v58.fireAnalyticsEvent("ProfileQRCodeCameraSettingsModalSeen", {
-					cameraPermissionResponseStatus = p1
+	React.useEffect(function()
+		if AppStorageService:GetItem(v2) == "true" then
+			permissionsProtocol.default:checkOrRequestPermissions({ permissionsProtocol.Permissions.CAMERA_ACCESS }):andThen(function(cameraPermissionResponseStatus)
+				v5.fireAnalyticsEvent("ProfileQRCodeCameraSettingsModalSeen", {
+					cameraPermissionResponseStatus = cameraPermissionResponseStatus
 				})
 			end)
-			AppStorageService:SetItem(v40, "false")
+			AppStorageService:SetItem(v2, "false")
 			AppStorageService:Flush()
 		end
-	end, {
-		v48,
-		v58
-	})
+	end, { userId, v5 })
 
 	return nil
 end
 
-return UniversalAppPolicy.connect(function(p2) -- line: 237
-	return {
-		isContactImporterPolicyEnabled = p2.getContactImporterEnabled()
-	}
+return universalAppPolicy.connect(function(p)
+	return { isContactImporterPolicyEnabled = p.getContactImporterEnabled() }
 end)(Container)

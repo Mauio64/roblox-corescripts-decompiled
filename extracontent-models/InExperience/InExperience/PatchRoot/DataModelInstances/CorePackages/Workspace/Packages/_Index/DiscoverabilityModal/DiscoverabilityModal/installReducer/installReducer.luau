@@ -1,13 +1,13 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local Rodux = dependencies.Rodux
-local RoduxNetworking = dependencies.RoduxNetworking
-local RoduxUserPermissions = dependencies.RoduxUserPermissions
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
 
-return function() -- line: 8
-	-- upvalues: Rodux (copy), RoduxUserPermissions (copy), RoduxNetworking (copy)
-	return Rodux.combineReducers({
-		UserPermissions = RoduxUserPermissions.installReducer(),
-		NetworkStatus = RoduxNetworking.installReducer()
+local rodux = dependencies.Rodux
+local roduxNetworking = dependencies.RoduxNetworking
+local roduxUserPermissions = dependencies.RoduxUserPermissions
+
+return function()
+	return rodux.combineReducers({
+		UserPermissions = roduxUserPermissions.installReducer(),
+		NetworkStatus = roduxNetworking.installReducer()
 	})
 end

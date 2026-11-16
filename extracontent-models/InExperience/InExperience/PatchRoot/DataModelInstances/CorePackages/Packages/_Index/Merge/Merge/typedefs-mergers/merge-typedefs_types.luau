@@ -1,8 +1,9 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
-require(ParentParent.GraphQL)
+require(parent.GraphQL)
+
 require(script.Parent.utils)
-require(ParentParent.Utils)
 
+require(parent.Utils)
 return {}

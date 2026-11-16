@@ -1,18 +1,28 @@
 local HttpService = game:GetService("HttpService")
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Url = require(DataHydrationParent.Http).Url
+local parent = DataHydration.Parent
+
+local Http = require(parent.Http)
+local Url = Http.Url
+
 local TrustedConnections = DataHydration.TrustedConnections
 local myHttpRequest = require(TrustedConnections.Networking.myHttpRequest)
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
 
-return function(p1) -- line: 11
-	-- upvalues: getLocalPlayerUserId (copy), HttpService (copy), Url (copy), myHttpRequest (copy)
-	local v9 = getLocalPlayerUserId()
-	local v10 = HttpService:UrlEncode(table.concat(p1, ","))
-	local v11 = string.format("%s/user/%s/multiget-are-trusted-friends?userids=%s", Url.FRIEND_URL, tostring(v9), v10)
+return function(list)
+	local localPlayerUserId = getLocalPlayerUserId()
+	local urlEncode = HttpService:UrlEncode(table.concat(list, ","))
 
-	return myHttpRequest(v11, "GET"):andThen(function(p2) -- line: 22
-		return p2 and (p2.responseBody and p2.responseBody.trustedFriendsId)
+	return myHttpRequest(
+		string.format(
+			"%s/user/%s/multiget-are-trusted-friends?userids=%s",
+			Url.FRIEND_URL,
+			tostring(localPlayerUserId),
+			urlEncode
+		),
+		"GET"
+	):andThen(function(p)
+		return p and p.responseBody and p.responseBody.trustedFriendsId
 	end)
 end

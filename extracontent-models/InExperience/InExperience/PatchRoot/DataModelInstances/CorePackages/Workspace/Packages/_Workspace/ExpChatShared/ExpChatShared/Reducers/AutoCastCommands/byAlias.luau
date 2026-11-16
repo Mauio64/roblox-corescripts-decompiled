@@ -1,13 +1,17 @@
 local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
-local ExpChatSharedParent = ExpChatShared.Parent
-local Rodux = require(ExpChatSharedParent.Rodux)
-local Dictionary = require(ExpChatSharedParent.llama).Dictionary
+local parent = ExpChatShared.Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+
 local Commands = ExpChatShared.Commands
 local RBXWhisperCommand = require(Commands.Whisper.RBXWhisperCommand)
 local RBXTeamCommand = require(Commands.RBXTeamCommand)
+
 local Actions = ExpChatShared.Actions
 local CommandAliasChanged = require(Actions.CommandAliasChanged)
-local t1 = {
+
+local v = {
 	RBXWhisperCommand = {
 		primaryAlias = RBXWhisperCommand.alias[1],
 		secondaryAlias = RBXWhisperCommand.alias[2]
@@ -18,14 +22,10 @@ local t1 = {
 	}
 }
 
-return Rodux.createReducer(t1, {
-	[CommandAliasChanged.name] = function(p1, p2) -- line: 25
-		-- upvalues: Dictionary (copy)
-		return Dictionary.join(p1, {
-			[p2.name] = {
-				primaryAlias = p2.primaryAlias,
-				secondaryAlias = p2.secondaryAlias
-			}
+return Rodux.createReducer(v, {
+	[CommandAliasChanged.name] = function(p, data)
+		return dictionary.join(p, {
+			[data.name] = { primaryAlias = data.primaryAlias, secondaryAlias = data.secondaryAlias }
 		})
 	end
 })

@@ -1,17 +1,11 @@
-return function(p1) -- line: 1
+return function(p)
 	return {
-		Diag = {
-			reportCounter = p1.fn(),
-			reportStats = p1.fn()
-		},
-		EventStream = {
-			setRBXEventStream = p1.fn(),
-			sendEventDeferred = p1.fn()
-		},
+		Diag = { reportCounter = p.fn(), reportStats = p.fn() },
+		EventStream = { setRBXEventStream = p.fn(), sendEventDeferred = p.fn() },
 		Telemetry = {
-			logRobloxTelemetryCounter = p1.fn(),
-			logRobloxTelemetryEvent = p1.fn(),
-			logRobloxTelemetryStat = p1.fn(),
+			logRobloxTelemetryCounter = p.fn(),
+			logRobloxTelemetryEvent = p.fn(),
+			logRobloxTelemetryStat = p.fn(),
 			TelemetryBackends = {
 				Points = "Points",
 				Stats = "RobloxTelemetryStat",

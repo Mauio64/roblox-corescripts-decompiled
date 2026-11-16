@@ -1,5 +1,6 @@
 local AvatarCreationService = game:GetService("AvatarCreationService")
-local t4 = {
+
+local ValidationRulesUtil = {
 	rigAttachmentToParentMap = {
 		Head = "NeckRigAttachment",
 		UpperTorso = "WaistRigAttachment",
@@ -17,149 +18,126 @@ local t4 = {
 		LeftLowerLeg = "LeftKneeRigAttachment",
 		LeftUpperLeg = "LeftHipRigAttachment"
 	},
-	getRules = function(p1) -- line: 36
-		-- upvalues: AvatarCreationService (copy)
-		if not p1.rules then
-			p1.rules = AvatarCreationService:GetValidationRules()
+	getRules = function(self)
+		if not self.rules then
+			self.rules = AvatarCreationService:GetValidationRules()
 		end
 
-		return p1.rules
+		return self.rules
 	end,
-	getBodyPartMaxTrianglesRule = function(p2, p3) -- line: 44
-		return p2:getRules().MeshRules.BodyPartMaxTriangles[p3]
+	getBodyPartMaxTrianglesRule = function(self, p)
+		return self:getRules().MeshRules.BodyPartMaxTriangles[p]
 	end,
-	getMakeupRules = function(p4) -- line: 48
-		local MakeupRules = p4:getRules().MakeupRules
-		local t1 = {}
+	getMakeupRules = function(self)
+		local makeupRules = self:getRules().MakeupRules
+		local makeupRules2 = {}
 
-		for v9, v10 in MakeupRules do
-			if v9 ~= "ExcludeUVBounds" and v9 ~= "IncludeUVBounds" then
-				t1[v9] = v10
+		for k, makeupRule in makeupRules do
+			if k ~= "ExcludeUVBounds" and k ~= "IncludeUVBounds" then
+				makeupRules2[k] = makeupRule
 			end
 		end
 
-		local t2 = {}
+		local assetUVBounds = {}
 
-		for v12, v13 in MakeupRules.ExcludeUVBounds do
-			if not t2[v12] then
-				t2[v12] = {}
+		for k, excludeUVBound in makeupRules.ExcludeUVBounds do
+			if not assetUVBounds[k] then
+				assetUVBounds[k] = {}
 			end
 
-			for _, v15 in v13 do
-				table.insert(t2[v12], {
+			for _, v in excludeUVBound do
+				table.insert(assetUVBounds[k], {
 					isIncludeBound = false,
-					MinBound = v15.MinBound,
-					MaxBound = v15.MaxBound
+					MinBound = v.MinBound,
+					MaxBound = v.MaxBound
 				})
 			end
 		end
 
-		for v16, v17 in MakeupRules.IncludeUVBounds do
-			if not t2[v16] then
-				t2[v16] = {}
+		for k, includeUVBound in makeupRules.IncludeUVBounds do
+			if not assetUVBounds[k] then
+				assetUVBounds[k] = {}
 			end
 
-			table.insert(t2[v16], {
+			table.insert(assetUVBounds[k], {
 				isIncludeBound = true,
-				MinBound = v17.MinBound,
-				MaxBound = v17.MaxBound
+				MinBound = includeUVBound.MinBound,
+				MaxBound = includeUVBound.MaxBound
 			})
 		end
 
-		t1.AssetUVBounds = t2
+		makeupRules2.AssetUVBounds = assetUVBounds
 
-		return t1
+		return makeupRules2
 	end,
-	getAccessoryRules = function(p5, p6) -- line: 89
-		for v20, v21 in p5:getRules().AccessoryRules do
-			local t3 = {
-				rigidAllowed = v21.RigidAllowed,
+	getAccessoryRules = function(self, p)
+		for k, accessoryRule in self:getRules().AccessoryRules do
+			local v = {
+				rigidAllowed = accessoryRule.RigidAllowed,
 				attachmentNames = {},
 				bounds = {}
 			}
 
-			for _, v24 in v21.Attachments do
-				table.insert(t3.attachmentNames, v24.Name)
-				t3.bounds[v24.Name] = {
-					size = v24.Size,
-					offset = v24.Offset
-				}
+			for _, attachment in accessoryRule.Attachments do
+				table.insert(v.attachmentNames, attachment.Name)
+				v.bounds[attachment.Name] = { size = attachment.Size, offset = attachment.Offset }
 			end
 
-			p6[v20] = t3
+			p[k] = v
 		end
 	end
 }
 
-function t4.getBodyPartRules(p7, p8) -- line: 107
-	-- upvalues: t4 (copy)
-	for v27, v28 in p7:getRules().BodyPartRules do
-		local t5 = {
-			isBodyPart = true,
-			bounds = {},
-			subParts = {}
-		}
+function ValidationRulesUtil.getBodyPartRules(object, p)
+	for k, bodyPartRule in object:getRules().BodyPartRules do
+		local v = { isBodyPart = true, bounds = {}, subParts = {} }
 
-		for v30, v31 in v28.Bounds do
-			t5.bounds[v30] = {
-				minSize = v31.MinSize,
-				maxSize = v31.MaxSize
-			}
+		for k2, bound in bodyPartRule.Bounds do
+			v.bounds[k2] = { minSize = bound.MinSize, maxSize = bound.MaxSize }
 		end
 
-		for v32, v33 in v28.SubParts do
-			local t6 = {
-				rigAttachmentToParent = {},
-				otherAttachments = {}
-			}
-			local v35 = t4.rigAttachmentToParentMap[v32]
+		for k2, subPart in bodyPartRule.SubParts do
+			local rigAttachmentToParent = ValidationRulesUtil.rigAttachmentToParentMap[k2]
+			local v2 = { rigAttachmentToParent = {}, otherAttachments = {} }
 
-			for v36, v37 in v33 do
-				if v35 == v36 then
-					t6.rigAttachmentToParent = {
-						name = v36,
-						bounds = {
-							min = v37.LowerBound,
-							max = v37.UpperBound
-						}
+			for k3, v3 in subPart do
+				if rigAttachmentToParent == k3 then
+					v2.rigAttachmentToParent = {
+						name = k3,
+						bounds = { min = v3.LowerBound, max = v3.UpperBound }
 					}
 				else
-					t6.otherAttachments[v36] = {
-						bounds = {
-							min = v37.LowerBound,
-							max = v37.UpperBound
-						}
+					v2.otherAttachments[k3] = {
+						bounds = { min = v3.LowerBound, max = v3.UpperBound }
 					}
 				end
 			end
 
-			t5.subParts[v32] = t6
+			v.subParts[k2] = v2
 		end
 
-		p8[v27] = t5
+		p[k] = v
 	end
 end
-function t4.getFullBodyRulesBounds(p9) -- line: 150
-	local t7 = {}
 
-	for v40, v41 in p9:getRules().FullBodyRules.Bounds do
-		t7[v40] = {
-			minSize = v41.MinSize,
-			maxSize = v41.MaxSize
-		}
+function ValidationRulesUtil.getFullBodyRulesBounds(object)
+	local fullBodyRulesBounds = {}
+
+	for k, bound in object:getRules().FullBodyRules.Bounds do
+		fullBodyRulesBounds[k] = { minSize = bound.MinSize, maxSize = bound.MaxSize }
 	end
 
-	return t7
+	return fullBodyRulesBounds
 end
-function t4.getLCSizeLimit(_: {[any]: any}, p10, p11) -- line: 161
-	-- upvalues: t4 (copy)
-	for _, v46 in t4:getRules().AccessoryRules[p10].Attachments do
-		if p11:FindFirstChild(v46.Name) then
-			return true, v46.Size
+
+function ValidationRulesUtil.getLCSizeLimit(_, p, instance)
+	for _, attachment in ValidationRulesUtil:getRules().AccessoryRules[p].Attachments do
+		if instance:FindFirstChild(attachment.Name) then
+			return true, attachment.Size
 		end
 	end
 
 	return false, nil
 end
 
-return t4
+return ValidationRulesUtil

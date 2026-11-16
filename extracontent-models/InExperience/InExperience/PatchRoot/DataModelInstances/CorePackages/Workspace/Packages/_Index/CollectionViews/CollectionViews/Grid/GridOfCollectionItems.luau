@@ -1,13 +1,14 @@
 local CollectionViews = script:FindFirstAncestor("CollectionViews")
-local CollectionViewsParent = CollectionViews.Parent
-local React = require(CollectionViewsParent.React)
-local Cryo = require(CollectionViewsParent.Cryo)
-local ArgCheck = require(CollectionViewsParent.ArgCheck)
+local parent = CollectionViews.Parent
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local ArgCheck = require(parent.ArgCheck)
 local calculateRelativeColumnGap = require(CollectionViews.Grid.calculateRelativeColumnGap)
-local calculateSpacePerItem = require(CollectionViews.calculateSpacePerItem)
-local FFlagCollectionViewMathChanges = require(CollectionViewsParent.SharedFlags).FFlagCollectionViewMathChanges
-local v9 = game:DefineFastFlag("LuaAppFixCollectionGridWindowAbsoluteCanvasSize", false)
-local t1 = {
+
+local defineFastFlag = game:DefineFastFlag("LuaAppFixCollectionGridWindowAbsoluteCanvasSize", false)
+local defineFastFlag2 = game:DefineFastFlag("LuaAppGridReuseUnchangedTileElements", false)
+
+local v = {
 	maxNumRows = 1e999,
 	numColumns = 1,
 	bufferRowsBelowScreen = 4,
@@ -18,246 +19,296 @@ local t1 = {
 	thresholdRowsFromBottom = 0
 }
 
-local function GridOfCollectionItems(t2: {[any]: any}) -- line: 84
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), v9 (copy), ArgCheck (copy), FFlagCollectionViewMathChanges (copy), calculateSpacePerItem (copy), calculateRelativeColumnGap (copy)
-	local v13 = Cryo.Dictionary.join(t1, t2)
-	local v14 = React.useRef(nil)
-	local v15 = math.min(math.ceil(#v13.items / v13.numColumns), v13.maxNumRows)
-	local v16 = v13.itemSizeBinding:map(function(vector2: Vector2) -- line: 92
-		-- upvalues: v15 (copy), v13 (copy)
-		return v15 * (vector2.Y + v13.verticalPadding) - v13.verticalPadding
+local function GridOfCollectionItems(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local ref = React.useRef(nil)
+
+	local v2 = math.min(math.ceil(#joined.items / joined.numColumns), joined.maxNumRows)
+
+	local mapped = joined.itemSizeBinding:map(function(vector2: Vector2)
+		return v2 * (vector2.Y + joined.verticalPadding) - joined.verticalPadding
 	end)
-	local v17, v18 = React.useState(-1)
-	local v19, v20 = React.useState(-1)
-	local v21, v22 = React.useState(v13.bufferRowsBelowScreen + v13.bufferRowsAboveScreen)
 
-	React.useEffect(function() -- line: 105
-		-- upvalues: v13 (copy), v14 (copy), v15 (copy), v18 (copy), v20 (copy), v22 (copy), v9 (copy)
-		local t3 = {}
+	local state, setState = React.useState(-1)
+	local state2, setState2 = React.useState(-1)
 
-		if v13.verticalScrollingFrameRef and (v13.verticalScrollingFrameRef.current and v14.current) then
-			local current = v14.current
-			local current2 = v13.verticalScrollingFrameRef.current
-			local Y = v13.itemSizeBinding:getValue().Y
-			local AbsolutePositionY = current2.AbsolutePosition.Y
-			local AbsoluteWindowSizeY = current2.AbsoluteWindowSize.Y
-			local u35 = math.ceil(AbsoluteWindowSizeY / math.max(1, Y + v13.verticalPadding)) + 1
+	local state3, setState3 = React.useState(joined.bufferRowsBelowScreen + joined.bufferRowsAboveScreen)
 
-			local function calculateOffsetOfGrid() -- line: 122
-				-- upvalues: current (copy), current2 (copy), AbsolutePositionY (ref)
-				return current.AbsolutePosition.Y + current2.CanvasPosition.Y - AbsolutePositionY
+	React.useEffect(function()
+		local connections = {}
+
+		if joined.verticalScrollingFrameRef and joined.verticalScrollingFrameRef.current and ref.current then
+			local current = ref.current
+			local current2 = joined.verticalScrollingFrameRef.current
+			local y = joined.itemSizeBinding:getValue().Y
+
+			local y2 = current2.AbsolutePosition.Y
+
+			local y3 = current2.AbsoluteWindowSize.Y
+
+			local v3 = math.ceil(y3 / math.max(1, y + joined.verticalPadding)) + 1
+
+			local function calculateOffsetOfGrid() -- 1 equivalent call inferred from this helper
+				return current.AbsolutePosition.Y + current2.CanvasPosition.Y - y2
 			end
+			local v4 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - y2
 
-			local u37 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - AbsolutePositionY
+			local function updateRowsToRender()
+				local y4 = current2.CanvasPosition.Y
+				local y5 = joined.itemSizeBinding:getValue().Y
+				local v5 = math.max(1, y5 + joined.verticalPadding)
+				local v6 = v2 * (y5 + joined.verticalPadding) - joined.verticalPadding
 
-			local function updateRowsToRender() -- line: 129
-				-- upvalues: current2 (copy), v13 (copy), v15 (copy), u37 (ref), AbsoluteWindowSizeY (ref), u35 (ref), v18 (copy), v20 (copy)
-				local CanvasPositionY = current2.CanvasPosition.Y
-				local Y2 = v13.itemSizeBinding:getValue().Y
-				local v59 = math.max(1, Y2 + v13.verticalPadding)
-				local v60 = v15 * (Y2 + v13.verticalPadding) - v13.verticalPadding
-				local v61 = u37 - CanvasPositionY
-				local v62 = v13.bufferRowsAboveScreen * v59
-				local v63 = v13.bufferRowsBelowScreen * v59
-				local n1, n2
+				local v7 = v4 - y4
 
-				if v61 > AbsoluteWindowSizeY + v63 or v61 + v60 < -v62 then
-					n1 = -1
-					n2 = -1
+				local v8 = joined.bufferRowsAboveScreen * v5
+				local v9 = joined.bufferRowsBelowScreen * v5
+				local v10, v11
+
+				if y3 + v9 < v7 or v7 + v6 < -v8 then
+					v10 = -1
+					v11 = -1
 				else
-					local v66 = math.floor(-v61 / v59)
+					local v12 = math.floor(-v7 / v5)
 
-					n1 = math.max(1, v66 + 1 - v13.bufferRowsAboveScreen)
+					v10 = math.max(1, v12 + 1 - joined.bufferRowsAboveScreen)
 
-					local v67 = u35 + v13.bufferRowsBelowScreen
-					local v68 = math.max(1, if not (v66 <= 0) then v67 + math.min(v66, v13.bufferRowsAboveScreen) else v67 + v66)
+					local v13 = v3 + joined.bufferRowsBelowScreen
+					local v14
 
-					n2 = math.min(v15, n1 + v68 - 1)
+					if v12 <= 0 then
+						v14 = v13 + v12
+					else
+						v14 = v13 + math.min(v12, joined.bufferRowsAboveScreen)
+					end
+
+					v11 = math.min(v2, v10 + math.max(1, v14) - 1)
 				end
 
-				v18(n1)
-				v20(n2)
+				setState(v10)
+				setState2(v11)
 			end
-			local function updateWindowParams() -- line: 174
-				-- upvalues: v13 (copy), AbsolutePositionY (ref), current2 (copy), AbsoluteWindowSizeY (ref), u37 (ref), current (copy), u35 (ref), v22 (copy), v15 (copy), updateRowsToRender (copy)
-				local v69 = math.max(1, v13.itemSizeBinding:getValue().Y + v13.verticalPadding)
 
-				AbsolutePositionY = current2.AbsolutePosition.Y
-				AbsoluteWindowSizeY = current2.AbsoluteWindowSize.Y
-				u37 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - AbsolutePositionY
-				u35 = math.ceil(AbsoluteWindowSizeY / v69) + 1
-				v22((math.min(v15, u35 + v13.bufferRowsBelowScreen + v13.bufferRowsAboveScreen)))
+			local function updateWindowParams()
+				local v5 = math.max(1, joined.itemSizeBinding:getValue().Y + joined.verticalPadding)
+				y2 = current2.AbsolutePosition.Y
+				y3 = current2.AbsoluteWindowSize.Y
+				v4 = calculateOffsetOfGrid() -- inferred equivalent call
+				v3 = math.ceil(y3 / v5) + 1
+				setState3((math.min(v2, v3 + joined.bufferRowsBelowScreen + joined.bufferRowsAboveScreen)))
+
 				updateRowsToRender()
 			end
 
-			table.insert(t3, current2:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateWindowParams))
-			table.insert(t3, current2:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(updateWindowParams))
-			table.insert(t3, current2:GetPropertyChangedSignal(not v9 and "CanvasSize" or "AbsoluteCanvasSize"):Connect(updateWindowParams))
-			table.insert(t3, current2:GetPropertyChangedSignal("CanvasPosition"):Connect(updateRowsToRender))
+			table.insert(connections, current2:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateWindowParams))
+
+			table.insert(
+				connections,
+				current2:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(updateWindowParams)
+			)
+
+			table.insert(
+				connections,
+				current2:GetPropertyChangedSignal(defineFastFlag and "AbsoluteCanvasSize" or "CanvasSize"):Connect(updateWindowParams)
+			)
+
+			table.insert(connections, current2:GetPropertyChangedSignal("CanvasPosition"):Connect(updateRowsToRender))
+
 			updateWindowParams()
 		else
-			v18(1)
-			v20(v15)
-			v22(v15)
+			setState(1)
+			setState2(v2)
+			setState3(v2)
 		end
 
-		return function() -- line: 221
-			-- upvalues: t3 (copy)
-			for _, v71 in t3 do
-				v71:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
 	end, {
-		v14,
-		v15,
-		v13.itemSizeBinding,
-		v13.verticalScrollingFrameRef,
-		v13.verticalPadding,
-		v13.bufferRowsAboveScreen,
-		v13.bufferRowsBelowScreen,
-		v13.onViewableItemsChanged
+		ref,
+		v2,
+		joined.itemSizeBinding,
+		joined.verticalScrollingFrameRef,
+		joined.verticalPadding,
+		joined.bufferRowsAboveScreen,
+		joined.bufferRowsBelowScreen,
+		joined.onViewableItemsChanged
 	})
 
-	local u23 = math.min(v19, v15)
-	local v24 = math.max(-1, (v17 - 1) * v13.numColumns + 1)
-	local v25 = math.max(-1, (math.min(#v13.items, u23 * v13.numColumns)))
+	local v3 = math.min(state2, v2)
 
-	React.useEffect(function() -- line: 246
-		-- upvalues: v13 (copy), v24 (copy), v25 (copy)
-		if v13.onViewableItemsChanged then
-			v13.onViewableItemsChanged(v24, v25)
+	local v4 = math.max(-1, (state - 1) * joined.numColumns + 1)
+	local v5 = math.max(-1, (math.min(#joined.items, v3 * joined.numColumns)))
+
+	React.useEffect(function()
+		if joined.onViewableItemsChanged then
+			joined.onViewableItemsChanged(v4, v5)
 		end
-	end, {
-		v24,
-		v25,
-		v13.onViewableItemsChanged
-	})
+	end, { v4, v5, joined.onViewableItemsChanged })
 
-	local v26 = React.useRef(nil)
-
-	React.useEffect(function() -- line: 254
-		-- upvalues: u23 (ref), v15 (copy), v13 (copy), v26 (copy)
-		if u23 >= v15 - v13.thresholdRowsFromBottom and v26.current ~= v13.items and v13.onReachedThresholdFromEnd then
-			v13.onReachedThresholdFromEnd()
-			v26.current = v13.items
+	local ref2 = React.useRef(nil)
+	React.useEffect(function()
+		if
+			v3 >= v2 - joined.thresholdRowsFromBottom
+			and ref2.current ~= joined.items
+			and joined.onReachedThresholdFromEnd
+		then
+			joined.onReachedThresholdFromEnd()
+			ref2.current = joined.items
 		end
-	end, {
-		u23,
-		v15,
-		v13.thresholdRowsFromBottom,
-		v13.onReachedThresholdFromEnd,
-		v13.items
-	})
+	end, { v3, v2, joined.thresholdRowsFromBottom, joined.onReachedThresholdFromEnd, joined.items })
+	local ref3
 
-	local v27 = React.useMemo(function() -- line: 273
-		-- upvalues: v17 (copy), u23 (ref), v24 (copy), v25 (copy), v13 (copy), v15 (copy), ArgCheck (copy), React (copy), FFlagCollectionViewMathChanges (copy), calculateSpacePerItem (copy), calculateRelativeColumnGap (copy), v21 (copy)
-		local t4 = {}
+	if defineFastFlag2 then
+		ref3 = React.useRef({})
+	else
+		ref3 = nil
+	end
 
-		if v17 <= 0 or u23 < v17 then
+	local v6 = React.useMemo(function()
+		local children = {}
+
+		if state <= 0 or v3 < state or (v4 <= 0 or v5 < v4) then
 			return nil
 		end
 
-		if v24 <= 0 or v25 < v24 then
+		if joined.numColumns <= 0 or v2 - state < 0 then
 			return nil
 		end
 
-		if v13.numColumns <= 0 or v15 - v17 < 0 then
-			return nil
-		end
+		ArgCheck.assert(state >= 1)
+		ArgCheck.assert(state <= v3 and v3 <= v2)
 
-		ArgCheck.assert(v17 >= 1)
-		ArgCheck.assert(u23 >= v17 and u23 <= v15)
-
-		if v17 > 1 then
-			local v41 = v17 - 1
-
-			t4.Padding = React.createElement("UIPadding", {
-				PaddingTop = v13.itemSizeBinding:map(function(vector2: Vector2) -- line: 291
-					-- upvalues: v41 (copy), v13 (copy)
-					return UDim.new(0, v41 * (vector2.Y + v13.verticalPadding))
+		if state > 1 then
+			local v6 = state - 1
+			children.Padding = React.createElement("UIPadding", {
+				PaddingTop = joined.itemSizeBinding:map(function(vector2: Vector2)
+					return UDim.new(0, v6 * (vector2.Y + joined.verticalPadding))
 				end)
 			})
 		end
 
-		local v42 = v15 - v17 + 1
+		local v6 = v2 - state + 1
 
-		ArgCheck.assert(v42 >= 1)
-		ArgCheck.assert(v13.numColumns >= 1)
+		ArgCheck.assert(v6 >= 1)
+		ArgCheck.assert(joined.numColumns >= 1)
 
-		local uDim2, uDim2_2
+		local v7 = joined.numColumns - 1
+		local v8 = v6 - 1
+		local udim = UDim2.new(
+			1 / joined.numColumns,
+			math.floor(-(v7 / joined.numColumns) * joined.columnGap),
+			1 / v6,
+			(math.floor(-(v8 / v6) * joined.verticalPadding))
+		)
 
-		if FFlagCollectionViewMathChanges then
-			local v43 = calculateSpacePerItem(v13.numColumns, v13.columnGap)
-			local v44 = calculateSpacePerItem(v42, v13.verticalPadding)
+		local v9 = math.floor(v7 / joined.numColumns * joined.columnGap) * joined.numColumns - joined.columnGap * v7
+		local v10 = joined.columnGap + v9 / v7
+		local cellPadding
 
-			uDim2 = UDim2.new(1 / v13.numColumns, -v43.gapOffsetPerItem, 1 / v42, -v44.gapOffsetPerItem)
-			uDim2_2 = UDim2.new(0, v43.adjustedGap, 0, v44.adjustedGap)
+		if joined.disableRelativeGap then
+			cellPadding = UDim2.new(0, v10, 0, joined.verticalPadding)
 		else
-			local v47 = v13.numColumns - 1
-			local v48 = v42 - 1
-
-			uDim2 = UDim2.new(1 / v13.numColumns, math.floor(-(v47 / v13.numColumns) * v13.columnGap), 1 / v42, (math.floor(-(v48 / v42) * v13.verticalPadding)))
-
-			local v49 = math.floor(v47 / v13.numColumns * v13.columnGap) * v13.numColumns - v13.columnGap * v47
-			local v50 = v13.columnGap + v49 / v47
-
-			uDim2_2 = if not v13.disableRelativeGap then v13.itemSizeBinding:map(function(vector2: Vector2) -- line: 329
-				-- upvalues: calculateRelativeColumnGap (copy), v13 (copy)
-				local v74 = calculateRelativeColumnGap(v13.numColumns, v13.columnGap, vector2.X, v13.sideMargin)
-
-				return UDim2.new(v74, 0, 0, v13.verticalPadding)
-			end) else UDim2.new(0, v50, 0, v13.verticalPadding)
+			cellPadding = joined.itemSizeBinding:map(function(vector2: Vector2)
+				local v11 = calculateRelativeColumnGap(
+					joined.numColumns,
+					joined.columnGap,
+					vector2.X,
+					joined.sideMargin
+				)
+				return UDim2.new(v11, 0, 0, joined.verticalPadding)
+			end)
 		end
 
-		t4.Layout = React.createElement("UIGridLayout", {
-			FillDirectionMaxCells = v13.numColumns,
-			CellPadding = uDim2_2,
-			CellSize = uDim2,
+		children.Layout = React.createElement("UIGridLayout", {
+			FillDirectionMaxCells = joined.numColumns,
+			CellPadding = cellPadding,
+			CellSize = udim,
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		})
-		ArgCheck.assert(v24 >= 1)
-		ArgCheck.assert(v25 >= v24 and v25 <= #v13.items)
 
-		for i = v24, v25 do
-			if i <= #v13.items then
-				local v52 = math.ceil(i / v13.numColumns)
-				local v53 = v13.items[i]
-				local v54, v55 = v13.renderItem(v53, i, UDim2.fromScale(1, 1), v52)
+		ArgCheck.assert(v4 >= 1)
+		ArgCheck.assert(v4 <= v5 and v5 <= #joined.items)
 
-				t4[`{ v55 }{ i % (v21 * v13.numColumns) }`] = v54
+		if defineFastFlag2 then
+			local current = ref3.current
+			local current2 = {}
+
+			for i = v4, v5 do
+				if not (i <= #joined.items) then
+					continue
+				end
+
+				local rowNum = math.ceil(i / joined.numColumns)
+				local item = joined.items[i]
+				local v11 = current[i]
+				local element, keyPrefix
+
+				if v11 and v11.entry == item and v11.renderItem == joined.renderItem and v11.rowNum == rowNum then
+					element = v11.element
+					keyPrefix = v11.keyPrefix
+				else
+					element, keyPrefix = joined.renderItem(item, i, UDim2.fromScale(1, 1), rowNum)
+				end
+
+				current2[i] = {
+					entry = item,
+					renderItem = joined.renderItem,
+					rowNum = rowNum,
+					element = element,
+					keyPrefix = keyPrefix
+				}
+
+				children[`{keyPrefix}{i % (state3 * joined.numColumns)}`] = element
 			end
+
+			ref3.current = current2
+			return children
 		end
 
-		return t4
+		for i = v4, v5 do
+			if not (i <= #joined.items) then
+				continue
+			end
+
+			local v11 = math.ceil(i / joined.numColumns)
+			local item = joined.items[i]
+			local item2, v12 = joined.renderItem(item, i, UDim2.fromScale(1, 1), v11)
+			children[`{v12}{i % (state3 * joined.numColumns)}`] = item2
+		end
+
+		return children
 	end, {
-		v13.columnGap,
-		v13.numColumns,
-		v13.itemSizeBinding,
-		v17,
-		u23,
-		v13.items,
-		v13.renderItem,
-		v13.verticalPadding,
-		v21,
-		v15,
-		if FFlagCollectionViewMathChanges then nil else v13.sideMargin,
-		v24,
-		v25,
-		if FFlagCollectionViewMathChanges then nil else v13.disableRelativeGap
+		joined.columnGap,
+		joined.numColumns,
+		joined.itemSizeBinding,
+		state,
+		v3,
+		joined.items,
+		joined.renderItem,
+		joined.verticalPadding,
+		state3,
+		v2,
+		joined.sideMargin,
+		v4,
+		v5,
+		joined.disableRelativeGap
 	})
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		ref = v14,
-		Size = v16:map(function(p1) -- line: 379
-			return UDim2.new(1, 0, 0, p1)
+		ref = ref,
+		Size = mapped:map(function(p2)
+			return UDim2.new(1, 0, 0, p2)
 		end),
-		LayoutOrder = v13.LayoutOrder,
-		Position = v13.Position
-	}, v27)
+		BackgroundTransparency = 1,
+		LayoutOrder = joined.LayoutOrder,
+		Position = joined.Position
+	}, v6)
 end
 
 return React.memo(GridOfCollectionItems)

@@ -1,91 +1,89 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("Moments").Parent
 
-require(Parent.MomentsCommon)
+local Foundation = require(parent.Foundation)
+require(parent.MomentsCommon)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
 
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
 local usePreferences = Foundation.Hooks.usePreferences
-local MAX_CONCURRENT_EXPLOSIONS = require(script.Parent.reactionsConstants).MAX_CONCURRENT_EXPLOSIONS
-local v7 = React.createContext(nil)
 
-local function ReactionEffectsProvider(t1: {[any]: any}) -- line: 56
-	-- upvalues: usePreferences (copy), React (copy), Signals (copy), MAX_CONCURRENT_EXPLOSIONS (copy), v7 (copy)
+local reactionsConstants = require(script.Parent.reactionsConstants)
+local MAX_CONCURRENT_EXPLOSIONS = reactionsConstants.MAX_CONCURRENT_EXPLOSIONS
+
+local context = React.createContext(nil)
+
+local function ReactionEffectsProvider(p)
 	local reducedMotion = usePreferences().reducedMotion
-	local v11 = React.useRef(0)
-	local v12 = React.useRef(nil)
-	local v13 = React.useRef(reducedMotion)
 
-	v13.current = reducedMotion
+	local ref = React.useRef(0)
+	local ref2 = React.useRef(nil)
 
-	local v14 = React.useMemo(function() -- line: 65
-		-- upvalues: Signals (copy)
-		local v16, v17 = Signals.createSignal({})
+	local ref3 = React.useRef(reducedMotion)
+	ref3.current = reducedMotion
 
-		return {
-			get = v16,
-			set = v17
-		}
+	local v = React.useMemo(function()
+		local signal, set = Signals.createSignal({})
+		return { get = signal, set = set }
 	end, {})
-	local v15 = React.useMemo(function() -- line: 70
-		-- upvalues: v12 (copy), v13 (copy), v14 (copy), MAX_CONCURRENT_EXPLOSIONS (copy), v11 (copy)
+
+	local v2 = React.useMemo(function()
 		return {
-			spawnExplosion = function(p1, vector2: Vector2?) -- line: 71
-				-- upvalues: v12 (copy), v13 (copy), v14 (copy), MAX_CONCURRENT_EXPLOSIONS (copy), v11 (copy)
-				local current = v12.current
+			spawnExplosion = function(reactionType, vector2: Vector2?)
+				local current = ref2.current
 
-				if v13.current or current == nil then
+				if ref3.current or current == nil then
 					return
 				end
 
-				local v21 = v14.get(false)
+				local v2 = v.get(false)
 
-				if #v21 >= MAX_CONCURRENT_EXPLOSIONS then
+				if MAX_CONCURRENT_EXPLOSIONS <= #v2 then
 					return
 				end
 
-				local v22 = if vector2 == nil then current.AbsoluteSize / 2 else vector2 - current.AbsolutePosition
-				local v23 = v11
+				local originLocal
 
-				v23.current = v23.current + 1
+				if vector2 == nil then
+					originLocal = current.AbsoluteSize / 2
+				else
+					originLocal = vector2 - current.AbsolutePosition
+				end
 
-				local t2 = {
-					id = v11.current,
-					reactionType = p1,
-					originLocal = v22
+				ref.current += 1
+				local v3 = {
+					id = ref.current,
+					reactionType = reactionType,
+					originLocal = originLocal
 				}
-				local v25 = table.clone(v21)
 
-				table.insert(v25, t2)
-				v14.set(v25)
+				local clone = table.clone(v2)
+				table.insert(clone, v3)
+				v.set(clone)
 			end,
-			getExplosions = v14.get,
-			onExplosionComplete = function(n1: number) -- line: 101
-				-- upvalues: v14 (copy)
-				local t3 = {}
+			getExplosions = v.get,
+			onExplosionComplete = function(p2: number)
+				local v2 = v.get(false)
+				local v3 = {}
 
-				for _, v29 in (v14.get(false)) do
-					if n1 ~= v29.id then
-						table.insert(t3, v29)
+				for _, v4 in v2 do
+					if v4.id ~= p2 then
+						table.insert(v3, v4)
 					end
 				end
 
-				v14.set(t3)
+				v.set(v3)
 			end,
-			layerRef = v12
+			layerRef = ref2
 		}
-	end, { v14 })
+	end, { v })
 
-	return React.createElement(v7.Provider, {
-		value = v15
-	}, t1.children)
+	return React.createElement(context.Provider, { value = v2 }, p.children)
 end
 
 return {
-	Context = v7,
+	Context = context,
 	Provider = ReactionEffectsProvider,
-	useReactionEffects = function() -- line: 125
-		-- upvalues: React (copy), v7 (copy)
-		return React.useContext(v7)
+	useReactionEffects = function()
+		return React.useContext(context)
 	end
 }

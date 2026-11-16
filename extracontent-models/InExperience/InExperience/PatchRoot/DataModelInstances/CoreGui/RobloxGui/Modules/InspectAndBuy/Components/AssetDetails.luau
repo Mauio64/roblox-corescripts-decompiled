@@ -1,325 +1,370 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
+
+local parent = script.Parent.Parent
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
-local DetailsText = require(ParentParent.Components.DetailsText)
-local DetailsThumbnail = require(ParentParent.Components.DetailsThumbnail)
-local DetailsDescription = require(ParentParent.Components.DetailsDescription)
-local DetailsButtons = require(ParentParent.Components.DetailsButtons)
-local TryOnViewport = require(ParentParent.Components.TryOnViewport)
-local OpenOverlay = require(ParentParent.Actions.OpenOverlay)
-local Overlay = require(ParentParent.Enums.Overlay)
-local GetAssetBundles = require(ParentParent.Thunks.GetAssetBundles)
-local ReportOpenDetailsPage = require(ParentParent.Thunks.ReportOpenDetailsPage)
-local GetEconomyProductInfo = require(ParentParent.Thunks.GetEconomyProductInfo)
-local GetCollectibleResellableInstances = require(ParentParent.Thunks.GetCollectibleResellableInstances)
-local Colors = require(ParentParent.Colors)
-local Constants = require(ParentParent.Constants)
-local UtilityFunctions = require(ParentParent.UtilityFunctions)
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
+local DetailsText = require(parent.Components.DetailsText)
+local DetailsThumbnail = require(parent.Components.DetailsThumbnail)
+local DetailsDescription = require(parent.Components.DetailsDescription)
+local DetailsButtons = require(parent.Components.DetailsButtons)
+local TryOnViewport = require(parent.Components.TryOnViewport)
+local OpenOverlay = require(parent.Actions.OpenOverlay)
+local Overlay = require(parent.Enums.Overlay)
+local GetAssetBundles = require(parent.Thunks.GetAssetBundles)
+local ReportOpenDetailsPage = require(parent.Thunks.ReportOpenDetailsPage)
+local GetEconomyProductInfo = require(parent.Thunks.GetEconomyProductInfo)
+local GetCollectibleResellableInstances = require(parent.Thunks.GetCollectibleResellableInstances)
+local Colors = require(parent.Colors)
+local Constants = require(parent.Constants)
+local UtilityFunctions = require(parent.UtilityFunctions)
 local tutils = require(CorePackages.Packages.tutils)
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local ItemInfoList = require(CorePackages.Workspace.Packages.ItemDetails).ItemInfoList
-local AttributionConstants = require(ParentParent.AttributionConstants)
-local InspectAndBuyContext = require(ParentParent.Components.InspectAndBuyContext)
-local GetFFlagDisplayCollectiblesIcon = require(ParentParent.Flags.GetFFlagDisplayCollectiblesIcon)
-local GetItemDetails = require(ParentParent.Thunks.GetItemDetails)
-local SetAssetFromBundleInfo = require(ParentParent.Actions.SetAssetFromBundleInfo)
+local ItemDetails = require(CorePackages.Workspace.Packages.ItemDetails)
+local ItemInfoList = ItemDetails.ItemInfoList
+local AttributionConstants = require(parent.AttributionConstants)
+
+local InspectAndBuyContext = require(parent.Components.InspectAndBuyContext)
+local GetFFlagDisplayCollectiblesIcon = require(parent.Flags.GetFFlagDisplayCollectiblesIcon)
+local GetItemDetails = require(parent.Thunks.GetItemDetails)
+local SetAssetFromBundleInfo = require(parent.Actions.SetAssetFromBundleInfo)
+
 local Modules = CoreGui.RobloxGui.Modules
 local Theme = require(Modules.Settings.Theme)
-local ControllerBarHeight = require(CoreGui.RobloxGui.Modules.InGameMenuConstants).ControllerBarHeight
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
-local v37 = Roact.PureComponent:extend("AssetDetails")
 
-function v37.setScrollingEnabled(p1, p2) -- line: 48
-	if p2 ~= p1.state.scrollingEnabled then
-		p1:setState({
-			scrollingEnabled = p2
-		})
+local InGameMenuConstants = require(CoreGui.RobloxGui.Modules.InGameMenuConstants)
+local ControllerBarHeight = InGameMenuConstants.ControllerBarHeight
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
+
+local extended = Roact.PureComponent:extend("AssetDetails")
+
+function extended:setScrollingEnabled(scrollingEnabled)
+	if self.state.scrollingEnabled ~= scrollingEnabled then
+		self:setState({ scrollingEnabled = scrollingEnabled })
 	end
 end
-function v37.getInfoRowProps(p3) -- line: 58
-	-- upvalues: RobloxTranslator (copy), AttributionConstants (copy), Overlay (copy), Roact (copy), Constants (copy)
-	local v41 = p3.props.assetInfo or {}
-	local locale = p3.props.locale
-	local v43 = v41.parentBundleId ~= nil
-	local t1 = {
-		LayoutOrder = 1,
-		Selectable = false,
+
+function extended:getInfoRowProps()
+	local assetInfo = self.props.assetInfo or {}
+	local locale = self.props.locale
+
+	local v = assetInfo.parentBundleId ~= nil
+
+	local v2 = {
 		infoName = RobloxTranslator:FormatByKeyForLocale("Feature.Catalog.Label.Filter.Creator", locale),
-		infoData = v41.creatorName or "",
-		hasVerifiedBadge = v41.creatorHasVerifiedBadge
+		infoData = assetInfo.creatorName or "",
+		hasVerifiedBadge = assetInfo.creatorHasVerifiedBadge,
+		LayoutOrder = 1,
+		Selectable = false
 	}
-	local t2 = nil
-	local creatingUniverseId = v41.creatingUniverseId
+
+	local attributionRefsByRef = nil
+
+	local creatingUniverseId = assetInfo.creatingUniverseId
 
 	if creatingUniverseId then
-		local v47 = p3.props.creatingExperiences[creatingUniverseId]
+		local creatingExperience = self.props.creatingExperiences[creatingUniverseId]
 
-		if v47 then
-			local playabilityStatus = v47.playabilityStatus
+		if creatingExperience then
+			local playabilityStatus = creatingExperience.playabilityStatus
 
 			if AttributionConstants.ShowPlayableAttributionMapper[playabilityStatus] then
-				local v49 = v47.name or ""
+				local name = creatingExperience.name or ""
 
-				t2 = {
+				attributionRefsByRef = {
+					["infoName"] = nil,
 					infoName = RobloxTranslator:FormatByKeyForLocale("Feature.Catalog.Label.Attribution", locale),
-					infoData = v49,
-					onActivate = function() -- line: 91
-						-- upvalues: p3 (copy), Overlay (copy), v47 (copy)
-						p3.props.openOverlay(Overlay.AttributionTraversal, v47)
+					infoData = name,
+					onActivate = function()
+						self.props.openOverlay(Overlay.AttributionTraversal, creatingExperience)
 					end,
-					LayoutOrder = 2,
-					[Roact.Ref] = p3.attributionRef,
-					Selectable = true
+					LayoutOrder = 2
 				}
+
+				attributionRefsByRef[Roact.Ref] = self.attributionRef
+				attributionRefsByRef.Selectable = true
 			end
 		end
 	end
 
-	local v50 = nil
+	local infoData = nil
 
-	if v43 then
-		v50 = RobloxTranslator:FormatByKeyForLocale("Feature.Catalog.Label.Bundle", locale)
+	if v then
+		infoData = RobloxTranslator:FormatByKeyForLocale("Feature.Catalog.Label.Bundle", locale)
 	else
-		local v51 = Constants.AssetTypeIdToCategory[v41.assetTypeId]
-		local v52 = Constants.AssetCategoriesLocalized[v51]
-		local v53 = Constants.AssetTypeIdToTypeLocalized[v41.assetTypeId]
+		local category = Constants.AssetTypeIdToCategory[assetInfo.assetTypeId]
+		local v3 = Constants.AssetCategoriesLocalized[category]
+		local typeLocalized = Constants.AssetTypeIdToTypeLocalized[assetInfo.assetTypeId]
 
-		if v52 and v53 then
-			v50 = RobloxTranslator:FormatByKeyForLocale(v52, locale) .. " | " .. RobloxTranslator:FormatByKeyForLocale(v53, locale)
+		if v3 and typeLocalized then
+			infoData = RobloxTranslator:FormatByKeyForLocale(v3, locale) .. " | " .. RobloxTranslator:FormatByKeyForLocale(typeLocalized, locale)
 		end
 	end
 
 	return {
-		t1,
-		t2,
+		v2,
+		attributionRefsByRef,
 		{
-			LayoutOrder = 3,
-			Selectable = false,
 			infoName = RobloxTranslator:FormatByKeyForLocale("Feature.Catalog.Label.CategoryType", locale),
-			infoData = v50
+			infoData = infoData,
+			LayoutOrder = 3,
+			Selectable = false
 		}
 	}
 end
-function v37.init(p4) -- line: 135
-	-- upvalues: Roact (copy)
-	p4.state = {
-		scrollingEnabled = true
-	}
-	p4.attributionRef = Roact.createRef()
-end
-function v37.willUpdate(p5, p6) -- line: 143
-	-- upvalues: UtilityFunctions (copy), tutils (copy)
-	if UtilityFunctions.isCollectibles(p5.props.assetInfo) then
-		local collectibleItemId = p5.props.assetInfo.collectibleItemId
-		local resellableInstances = p5.props.resellableInstances
-		local resellableInstances2 = p6.resellableInstances
 
-		if resellableInstances and (resellableInstances[collectibleItemId] and (resellableInstances2 and resellableInstances2[collectibleItemId])) and tutils.fieldCount(resellableInstances[collectibleItemId]) ~= tutils.fieldCount(resellableInstances2[collectibleItemId]) then
-			p5:setState({})
+function extended:init()
+	self.state = { scrollingEnabled = true }
+
+	self.attributionRef = Roact.createRef()
+end
+
+function extended.willUpdate(object, p)
+	if UtilityFunctions.isCollectibles(object.props.assetInfo) then
+		local collectibleItemId = object.props.assetInfo.collectibleItemId
+		local resellableInstances = object.props.resellableInstances
+		local resellableInstances2 = p.resellableInstances
+
+		if
+			resellableInstances
+			and resellableInstances[collectibleItemId]
+			and resellableInstances2
+			and resellableInstances2[collectibleItemId]
+			and tutils.fieldCount(resellableInstances[collectibleItemId]) ~= tutils.fieldCount(resellableInstances2[collectibleItemId])
+		then
+			object:setState({})
 		end
 	end
 
-	local v60 = p5.props.assetInfo and p5.props.assetInfo.parentBundleId
-	local bundles = p5.props.bundles
-	local bundles2 = p6.bundles
+	local parentBundleId = object.props.assetInfo and object.props.assetInfo.parentBundleId
+	local bundles = object.props.bundles
+	local bundles2 = p.bundles
 
-	if v60 and bundles and bundles[v60] and bundles2 and bundles2[v60] and bundles2[v60] ~= bundles[v60] then
-		p5.props.setAssetFromBundleInfo(p5.props.assetInfo.assetId, bundles2[v60])
+	if
+		parentBundleId
+		and bundles
+		and bundles[parentBundleId]
+		and bundles2
+		and bundles2[parentBundleId]
+		and bundles2[parentBundleId] ~= bundles[parentBundleId]
+	then
+		object.props.setAssetFromBundleInfo(object.props.assetInfo.assetId, bundles2[parentBundleId])
 	end
 end
-function v37.didUpdate(p7, p8) -- line: 176
-	-- upvalues: UtilityFunctions (copy)
-	local reportOpenDetailsPage = p7.props.reportOpenDetailsPage
-	local assetInfo = p7.props.assetInfo
-	local assetInfo2 = p8.assetInfo
+
+function extended.didUpdate(p, p2)
+	local reportOpenDetailsPage = p.props.reportOpenDetailsPage
+	local assetInfo = p.props.assetInfo
+	local assetInfo2 = p2.assetInfo
 
 	if assetInfo and assetInfo ~= assetInfo2 then
-		local bundles = p7.props.bundles
-		local v69 = assetInfo.parentBundleId ~= nil
-		local v70 = v69 and UtilityFunctions.getBundleId(assetInfo)
+		local bundles = p.props.bundles
+		local v = assetInfo.parentBundleId ~= nil
+		local v2 = v and UtilityFunctions.getBundleId(assetInfo)
 
-		if not v69 and assetInfo.owned == nil or v69 and bundles[v70].owned == nil then
-			local assetId = assetInfo.assetId
-			local Asset = Enum.AvatarItemType.Asset
+		if not v and assetInfo.owned == nil or v and bundles[v2].owned == nil then
+			local v3 = assetInfo.assetId
+			local v4 = Enum.AvatarItemType.Asset
 
-			if v69 then
-				assetId = v70
-				Asset = Enum.AvatarItemType.Bundle
+			if v then
+				v4 = Enum.AvatarItemType.Bundle
+				v3 = v2
 			end
 
-			p7.props.getItemDetails(assetId, Asset)
+			p.props.getItemDetails(v3, v4)
 		end
 	end
 
-	if p7.props.detailsInformation.viewingDetails and not p8.detailsInformation.viewingDetails then
+	if p.props.detailsInformation.viewingDetails and not p2.detailsInformation.viewingDetails then
 		reportOpenDetailsPage(assetInfo)
 	end
 end
-function v37.render(p9) -- line: 214
-	-- upvalues: Images (copy), Roact (copy), InspectAndBuyContext (copy), GetFFlagDisplayCollectiblesIcon (copy), UtilityFunctions (copy), Players (copy), tutils (copy), ControllerBarHeight (copy), Theme (copy), Colors (copy), DetailsButtons (copy), DetailsThumbnail (copy), isInExperienceUIVREnabled (copy), TryOnViewport (copy), DetailsText (copy), ImageSetLabel (copy), RobloxTranslator (copy), AppFonts (copy), DetailsDescription (copy), ItemInfoList (copy)
-	local view = p9.props.view
-	local detailsInformation = p9.props.detailsInformation
-	local v76 = p9.props.assetInfo or {}
-	local localPlayerModel = p9.props.localPlayerModel
-	local scrollingEnabled = p9.state.scrollingEnabled
-	local locale = p9.props.locale
-	local v80 = Images["icons/status/item/owned"]
-	local v81 = v80 and v80.ImageRectSize / Images.ImagesResolutionScale or Vector2.new(0, 0)
+
+function extended:render()
+	local view = self.props.view
+	local detailsInformation = self.props.detailsInformation
+	local assetInfo = self.props.assetInfo or {}
+	local localPlayerModel = self.props.localPlayerModel
+	local scrollingEnabled = self.state.scrollingEnabled
+	local locale = self.props.locale
+	local iconsstatusitemowned = Images["icons/status/item/owned"]
+	local v = iconsstatusitemowned and iconsstatusitemowned.ImageRectSize / Images.ImagesResolutionScale
+		or Vector2.new(0, 0)
 
 	return Roact.createElement(InspectAndBuyContext.Consumer, {
-		render = function(p10) -- line: 225
-			-- upvalues: view (copy), GetFFlagDisplayCollectiblesIcon (copy), UtilityFunctions (copy), v76 (copy), p9 (copy), Players (copy), tutils (copy), ControllerBarHeight (copy), Theme (copy), Roact (copy), Colors (copy), detailsInformation (copy), DetailsButtons (copy), localPlayerModel (copy), scrollingEnabled (copy), DetailsThumbnail (copy), isInExperienceUIVREnabled (copy), TryOnViewport (copy), DetailsText (copy), v81 (copy), ImageSetLabel (copy), v80 (copy), RobloxTranslator (copy), locale (copy), AppFonts (copy), DetailsDescription (copy), ItemInfoList (copy)
-			local v87 = p10[view]
-			local n1 = 0
-			local n2 = 0
+		render = function(p)
+			local v2 = p[view]
+			local v3 = 0
+			local v4
 
-			if GetFFlagDisplayCollectiblesIcon() and UtilityFunctions.isCollectibles(v76) then
-				local getCollectibleResellableInstances = p9.props.getCollectibleResellableInstances
-				local resellableInstances = p9.props.resellableInstances
-				local v92 = Players.LocalPlayer and Players.LocalPlayer.UserId
+			if GetFFlagDisplayCollectiblesIcon() and UtilityFunctions.isCollectibles(assetInfo) then
+				local getCollectibleResellableInstances = self.props.getCollectibleResellableInstances
+				local resellableInstances = self.props.resellableInstances
+				local userId = Players.LocalPlayer and Players.LocalPlayer.UserId
 
-				getCollectibleResellableInstances(v76.collectibleItemId, v92)
-				n2 = resellableInstances and (not not resellableInstances[v76.collectibleItemId] and tutils.fieldCount(resellableInstances[v76.collectibleItemId])) or 0
+				getCollectibleResellableInstances(assetInfo.collectibleItemId, userId)
+
+				v4 = resellableInstances
+					and resellableInstances[assetInfo.collectibleItemId]
+					and tutils.fieldCount(resellableInstances[assetInfo.collectibleItemId])
+					or 0
+			else
+				v4 = 0
 			end
 
-			local v93 = UtilityFunctions.isLimited2Point0_Or_LimitedCollectible(v76)
+			local limited2Point0_Or_LimitedCollectible = UtilityFunctions.isLimited2Point0_Or_LimitedCollectible(assetInfo)
 
-			if p9.props.gamepadEnabled then
-				n1 = -1 * ControllerBarHeight
+			if self.props.gamepadEnabled then
+				v3 = -1 * ControllerBarHeight
 			end
 
-			local v94 = n1 + -Theme.DefaultCornerRadius.Offset
+			local v5 = v3 + -Theme.DefaultCornerRadius.Offset
 
-			return Roact.createElement("Frame", {
+			local createElement = Roact.createElement
+			local v6 = {
+				Position = UDim2.new(0, v2.BorderPaddingSize, 0, 0),
+				Size = UDim2.new(1, -(2 * v2.BorderPaddingSize), 1, v5),
 				BackgroundTransparency = 0,
-				BorderSizePixel = 0,
-				Position = UDim2.new(0, v87.BorderPaddingSize, 0, 0),
-				Size = UDim2.new(1, -(2 * v87.BorderPaddingSize), 1, v94),
 				BackgroundColor3 = Colors.Carbon,
+				BorderSizePixel = 0,
 				Visible = detailsInformation.viewingDetails
-			}, {
+			}
+			local v7 = {
 				DetailsButtons = Roact.createElement(DetailsButtons, {
 					localPlayerModel = localPlayerModel
 				}),
-				Container = Roact.createElement("ScrollingFrame", {
-					BackgroundTransparency = 1,
-					ScrollBarThickness = 0,
-					Selectable = false,
-					Size = UDim2.new(1, 0, 1, -55),
-					ScrollingEnabled = scrollingEnabled,
-					CanvasSize = UDim2.new(1, 0, 0, 0),
-					AutomaticCanvasSize = Enum.AutomaticSize.Y
-				}, {
-					UIListLayout = Roact.createElement("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						Padding = UDim.new(0, 10)
-					}),
-					DetailsThumbnail = Roact.createElement(DetailsThumbnail),
-					TryOnViewport = if not isInExperienceUIVREnabled then localPlayerModel and Roact.createElement(TryOnViewport, {
+				Container = 0
+			}
+
+			local createElement2 = Roact.createElement
+			local v8 = {
+				BackgroundTransparency = 1,
+				ScrollBarThickness = 0,
+				Size = UDim2.new(1, 0, 1, -55),
+				ScrollingEnabled = scrollingEnabled,
+				Selectable = false,
+				CanvasSize = UDim2.new(1, 0, 0, 0),
+				AutomaticCanvasSize = Enum.AutomaticSize.Y
+			}
+			local children = {
+				UIListLayout = Roact.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 10)
+				}),
+				DetailsThumbnail = Roact.createElement(DetailsThumbnail),
+				TryOnViewport = 0,
+				DetailsText = 0,
+				ItemOwnedLabelContainer = 0,
+				DetailsDescription = 0,
+				ItemInfoList = 0
+			}
+			local tryOnViewport
+
+			if isInExperienceUIVREnabled then
+				if detailsInformation.viewingDetails and localPlayerModel then
+					tryOnViewport = Roact.createElement(TryOnViewport, {
 						localPlayerModel = localPlayerModel,
-						setScrollingEnabled = function(p11) -- line: 286
-							-- upvalues: p9 (copy)
-							p9:setScrollingEnabled(p11)
+						setScrollingEnabled = function(p2)
+							self:setScrollingEnabled(p2)
 						end
-					}) else if not detailsInformation.viewingDetails or not localPlayerModel then nil else Roact.createElement(TryOnViewport, {
-						localPlayerModel = localPlayerModel,
-						setScrollingEnabled = function(p12) -- line: 279
-							-- upvalues: p9 (copy)
-							p9:setScrollingEnabled(p12)
-						end
-					}),
-					DetailsText = Roact.createElement(DetailsText, {
-						localPlayerModel = localPlayerModel
-					}),
-					ItemOwnedLabelContainer = v93 and Roact.createElement("Frame", {
-						BorderSizePixel = 0,
-						LayoutOrder = 3,
-						Size = UDim2.new(1, 0, 0, v81.Y + 20),
-						BackgroundColor3 = Color3.fromRGB(57, 59, 61)
-					}, {
-						Corner = Roact.createElement("UICorner", {
-							CornerRadius = UDim.new(0, 8)
-						}),
-						OwnedIcon = Roact.createElement(ImageSetLabel, {
-							BackgroundTransparency = 1,
-							BorderSizePixel = 0,
-							Size = UDim2.new(0, v81.X, 0, v81.Y),
-							Position = UDim2.new(0, 12, 0, 10),
-							Image = v80
-						}),
-						ItemOwnedLabel = Roact.createElement("TextLabel", {
-							TextSize = 12,
-							BackgroundTransparency = 1,
-							Size = UDim2.new(0, v81.X, 0, v81.Y),
-							Position = UDim2.new(0, v81.X + 60, 0, 10),
-							Text = RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.OwnedItems", locale, {
-								QUANTITY = tostring(n2)
-							}),
-							Font = AppFonts.default:getDefault(),
-							TextColor3 = Color3.new(1, 1, 1)
-						})
-					}),
-					DetailsDescription = Roact.createElement(DetailsDescription),
-					ItemInfoList = Roact.createElement(ItemInfoList, {
-						LayoutOrder = 5,
-						rowData = p9:getInfoRowProps()
 					})
+				end
+			else
+				tryOnViewport = localPlayerModel and Roact.createElement(TryOnViewport, {
+					localPlayerModel = localPlayerModel,
+					setScrollingEnabled = function(p2)
+						self:setScrollingEnabled(p2)
+					end
+				})
+			end
+
+			children.TryOnViewport = tryOnViewport
+
+			children.DetailsText = Roact.createElement(DetailsText, {
+				localPlayerModel = localPlayerModel
+			})
+
+			children.ItemOwnedLabelContainer = limited2Point0_Or_LimitedCollectible and Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, v.Y + 20),
+				BorderSizePixel = 0,
+				LayoutOrder = 3,
+				BackgroundColor3 = Color3.fromRGB(57, 59, 61)
+			}, {
+				Corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
+				OwnedIcon = Roact.createElement(ImageSetLabel, {
+					Size = UDim2.new(0, v.X, 0, v.Y),
+					Position = UDim2.new(0, 12, 0, 10),
+					Image = iconsstatusitemowned,
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0
+				}),
+				ItemOwnedLabel = Roact.createElement("TextLabel", {
+					Size = UDim2.new(0, v.X, 0, v.Y),
+					Position = UDim2.new(0, v.X + 60, 0, 10),
+					Text = RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.OwnedItems", locale, {
+						QUANTITY = tostring(v4)
+					}),
+					Font = AppFonts.default:getDefault(),
+					TextSize = 12,
+					TextColor3 = Color3.new(1, 1, 1),
+					BackgroundTransparency = 1
 				})
 			})
+
+			children.DetailsDescription = Roact.createElement(DetailsDescription)
+			children.ItemInfoList = Roact.createElement(ItemInfoList, {
+				rowData = self:getInfoRowProps(),
+				LayoutOrder = 5
+			})
+			v7.Container = createElement2("ScrollingFrame", v8, children)
+			return createElement("Frame", v6, v7)
 		end
 	})
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p13, _) -- line: 335
-	local assetId = p13.detailsInformation.assetId
+return RoactRodux.UNSTABLE_connect2(function(data, _)
+	local assetId = data.detailsInformation.assetId
 
 	return {
-		view = p13.view,
-		detailsInformation = p13.detailsInformation,
-		assetInfo = p13.assets[assetId],
-		bundles = p13.bundles,
-		gamepadEnabled = p13.gamepadEnabled,
-		locale = p13.locale,
-		resellableInstances = p13.collectibleResellableInstances,
-		creatingExperiences = p13.creatingExperiences
+		view = data.view,
+		detailsInformation = data.detailsInformation,
+		assetInfo = data.assets[assetId],
+		bundles = data.bundles,
+		gamepadEnabled = data.gamepadEnabled,
+		locale = data.locale,
+		resellableInstances = data.collectibleResellableInstances,
+		creatingExperiences = data.creatingExperiences
 	}
-end, function(p15) -- line: 348
-	-- upvalues: GetAssetBundles (copy), GetEconomyProductInfo (copy), ReportOpenDetailsPage (copy), GetCollectibleResellableInstances (copy), OpenOverlay (copy), GetItemDetails (copy), SetAssetFromBundleInfo (copy)
+end, function(callback)
 	return {
-		getAssetBundles = function(p16) -- line: 350
-			-- upvalues: p15 (copy), GetAssetBundles (copy)
-			p15(GetAssetBundles(p16))
+		getAssetBundles = function(p)
+			callback(GetAssetBundles(p))
 		end,
-		getEconomyProductInfo = function(p17, p18, p19) -- line: 353
-			-- upvalues: p15 (copy), GetEconomyProductInfo (copy)
-			p15(GetEconomyProductInfo(p17, p18, p19))
+		getEconomyProductInfo = function(p, p2, p3)
+			callback(GetEconomyProductInfo(p, p2, p3))
 		end,
-		reportOpenDetailsPage = function(p20) -- line: 356
-			-- upvalues: p15 (copy), ReportOpenDetailsPage (copy)
-			p15(ReportOpenDetailsPage(p20))
+		reportOpenDetailsPage = function(p)
+			callback(ReportOpenDetailsPage(p))
 		end,
-		getCollectibleResellableInstances = function(p21, p22) -- line: 359
-			-- upvalues: p15 (copy), GetCollectibleResellableInstances (copy)
-			p15(GetCollectibleResellableInstances(p21, p22))
+		getCollectibleResellableInstances = function(p, p2)
+			callback(GetCollectibleResellableInstances(p, p2))
 		end,
-		openOverlay = function(p23, p24) -- line: 362
-			-- upvalues: p15 (copy), OpenOverlay (copy)
-			p15(OpenOverlay(p23, p24))
+		openOverlay = function(p, p2)
+			callback(OpenOverlay(p, p2))
 		end,
-		getItemDetails = function(p25, p26) -- line: 365
-			-- upvalues: p15 (copy), GetItemDetails (copy)
-			p15(GetItemDetails(p25, p26))
+		getItemDetails = function(p, p2)
+			callback(GetItemDetails(p, p2))
 		end,
-		setAssetFromBundleInfo = function(p27, p28) -- line: 368
-			-- upvalues: p15 (copy), SetAssetFromBundleInfo (copy)
-			p15(SetAssetFromBundleInfo(p27, p28))
+		setAssetFromBundleInfo = function(p, p2)
+			callback(SetAssetFromBundleInfo(p, p2))
 		end
 	}
-end)(v37)
+end)(extended)

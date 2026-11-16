@@ -1,5 +1,4 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent.InternalHttpStore)
+local parent = script.Parent.Parent
+require(parent.InternalHttpStore)
 
 return nil

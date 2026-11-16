@@ -1,52 +1,44 @@
-local t1 = {}
+local LinkedList = {}
+LinkedList.__index = LinkedList
 
-t1.__index = t1
+function LinkedList.createNode(p)
+	local v = { previous = nil, next = nil, value = p }
 
-function t1.createNode(p1) -- line: 4
-	-- upvalues: t1 (copy)
-	local t2 = {
-		previous = nil,
-		next = nil,
-		value = p1
-	}
+	setmetatable(v, LinkedList)
 
-	setmetatable(t2, t1)
-
-	return t2
+	return v
 end
-function t1.CreateNext(p2, p3) -- line: 17
-	-- upvalues: t1 (copy)
-	local t3 = {
-		previous = p2,
-		next = p2.next,
-		value = p3 or {}
+
+function LinkedList:CreateNext(options)
+	local nextNode = {
+		previous = self,
+		next = self.next,
+		value = options or {}
 	}
 
-	if p2.next then
-		p2.next.previous = t3
+	if self.next then
+		self.next.previous = nextNode
 	end
 
-	setmetatable(t3, t1)
-	p2.next = t3
-
-	return t3
+	setmetatable(nextNode, LinkedList)
+	self.next = nextNode
+	return nextNode
 end
-function t1.CreatePrevious(p4, p5) -- line: 34
-	-- upvalues: t1 (copy)
-	local t4 = {
-		previous = p4.previous,
-		next = p4,
-		value = p5 or {}
+
+function LinkedList:CreatePrevious(options)
+	local previous = {
+		previous = self.previous,
+		next = self,
+		value = options or {}
 	}
 
-	if p4.previous then
-		p4.previous.next = t4
+	if self.previous then
+		self.previous.next = previous
 	end
 
-	setmetatable(t4, t1)
-	p4.previous = t4
-
-	return t4
+	setmetatable(previous, LinkedList)
+	self.previous = previous
+	return previous
 end
 
-return t1
+return LinkedList

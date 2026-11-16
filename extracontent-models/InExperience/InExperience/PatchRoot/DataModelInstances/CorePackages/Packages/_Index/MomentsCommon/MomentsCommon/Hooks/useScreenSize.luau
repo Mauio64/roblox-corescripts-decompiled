@@ -1,45 +1,40 @@
-local Parent = script:FindFirstAncestor("MomentsCommon").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
 
-return function() -- line: 6
-	-- upvalues: React (copy)
-	local v3, v4 = React.useState(Vector2.new(1e999, 1e999))
-	local v5, v6 = React.useState(workspace.CurrentCamera)
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 10
-		-- upvalues: v6 (copy), v5 (copy), v4 (copy)
-		local connection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() -- line: 11
-			-- upvalues: v6 (copy)
-			v6(workspace.CurrentCamera)
+return function()
+	local state, setState = React.useState(Vector2.new(1e999, 1e999))
+	local state2, setState2 = React.useState(workspace.CurrentCamera)
+
+	React.useEffect(function()
+		local currentCameraChangedConnection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+			setState2(workspace.CurrentCamera)
 		end)
 
-		if v5 then
-			v4(v5.ViewportSize)
+		if state2 then
+			setState(state2.ViewportSize)
 		end
 
-		return function() -- line: 19
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			currentCameraChangedConnection:Disconnect()
 		end
 	end, {})
-	React.useEffect(function() -- line: 24
-		-- upvalues: v5 (copy), v4 (copy)
-		if not v5 then
+
+	React.useEffect(function()
+		if not state2 then
 			return
 		end
 
-		local connection = v5:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 29
-			-- upvalues: v5 (copy), v4 (copy)
-			if v5 then
-				v4(v5.ViewportSize)
+		local viewportSizeChangedConnection = state2:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+			if state2 then
+				setState(state2.ViewportSize)
 			end
 		end)
 
-		return function() -- line: 35
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			viewportSizeChangedConnection:Disconnect()
 		end
-	end, { v5 })
+	end, { state2 })
 
-	return v3
+	return state
 end

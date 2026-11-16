@@ -1,5 +1,13 @@
-local function getAssetIdForAudioSource(p1) -- line: 1
-	return (tonumber((((if not p1:IsA("Sound") then (if not p1:IsA("AudioPlayer") then nil else p1.Asset) else p1.SoundId)):match("rbxassetid://(.+)"))))
+local function getAssetIdForAudioSource(instance)
+	local v
+
+	if instance:IsA("Sound") then
+		v = instance.SoundId
+	elseif instance:IsA("AudioPlayer") then
+		v = instance.Asset
+	end
+
+	return (tonumber((v:match("rbxassetid://(.+)"))))
 end
 
 return getAssetIdForAudioSource

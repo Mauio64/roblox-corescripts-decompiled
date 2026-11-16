@@ -1,48 +1,67 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Foundation = require(AppChatParent.Foundation)
+local parent = AppChat.Parent
+
+local Foundation = require(parent.Foundation)
 local ConversationTitleWithFacePile = require(AppChat.Components.ChatConversation.ConversationTitleWithFacePile)
 local useTokens = Foundation.Hooks.useTokens
-local React = require(AppChatParent.React)
 
-local function HeaderBarTitleLeftAligned(t1: {[any]: any}) -- line: 19
-	-- upvalues: useTokens (copy), React (copy), Foundation (copy), ConversationTitleWithFacePile (copy)
-	local v9 = useTokens()
+local React = require(parent.React)
 
-	return React.createElement(Foundation.View, {
+local function HeaderBarTitleLeftAligned(props)
+	local v = useTokens()
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v2 = {
 		Size = UDim2.new(1, 0, 1, 0),
 		layout = {
 			FillDirection = Enum.FillDirection.Horizontal,
-			Padding = UDim.new(0, v9.Gap.Medium),
+			Padding = UDim.new(0, v.Gap.Medium),
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}
-	}, {
-		LeftFrame = if not t1.renderLeft then nil else React.createElement(Foundation.View, {
-			LayoutOrder = 1,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			ItemLineAlignment = Enum.ItemLineAlignment.Center
-		}, React.createElement(t1.renderLeft)),
-		CenterFrame = React.createElement(Foundation.View, {
-			LayoutOrder = 2,
-			flexItem = {
-				FlexMode = Enum.UIFlexMode.Fill
+	}
+	local leftFrame
+
+	if props.renderLeft then
+		leftFrame = React.createElement(
+			Foundation.View,
+			{
+				AutomaticSize = Enum.AutomaticSize.XY,
+				LayoutOrder = 1,
+				ItemLineAlignment = Enum.ItemLineAlignment.Center
 			},
-			Size = UDim2.new(1, 0, 1, 0)
+			React.createElement(props.renderLeft)
+		)
+	end
+
+	local v3 = {
+		LeftFrame = leftFrame,
+		CenterFrame = React.createElement(Foundation.View, {
+			flexItem = { FlexMode = Enum.UIFlexMode.Fill },
+			Size = UDim2.new(1, 0, 1, 0),
+			LayoutOrder = 2
 		}, {
 			ConversationTitle = React.createElement(ConversationTitleWithFacePile, {
-				titleText = t1.titleText,
-				conversationId = t1.conversationId,
-				navigateToChatDetails = t1.navigateToChatDetails
+				titleText = props.titleText,
+				conversationId = props.conversationId,
+				navigateToChatDetails = props.navigateToChatDetails
 			})
 		}),
-		RightFrame = if not t1.renderRight then nil else React.createElement(Foundation.View, {
-			LayoutOrder = 3,
-			tag = not t1.ignoreRightMargin and "padding-right-small" or nil,
+		RightFrame = 0
+	}
+	local rightFrame
+
+	if props.renderRight then
+		rightFrame = React.createElement(Foundation.View, {
+			tag = not props.ignoreRightMargin and "padding-right-small" or nil,
 			AutomaticSize = Enum.AutomaticSize.XY,
-			ItemLineAlignment = Enum.ItemLineAlignment.Center
-		}, React.createElement(t1.renderRight))
-	})
+			ItemLineAlignment = Enum.ItemLineAlignment.Center,
+			LayoutOrder = 3
+		}, React.createElement(props.renderRight))
+	end
+
+	v3.RightFrame = rightFrame
+	return createElement(view, v2, v3)
 end
 
 return HeaderBarTitleLeftAligned

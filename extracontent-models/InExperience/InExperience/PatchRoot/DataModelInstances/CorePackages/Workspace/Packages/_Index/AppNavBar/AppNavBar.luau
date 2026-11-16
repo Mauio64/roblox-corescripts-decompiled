@@ -3,6 +3,7 @@ require(script.Components.AppNavItem)
 return {
 	Placement = require(script.Enum.Placement),
 	AppNavBar = require(script.Components.AppNavBar),
+	BottomBarInsetBackground = require(script.Components.BottomBarInsetBackground),
 	StudioCTAIcon = require(script.Components.StudioCTAIcon),
 	useNavBarPlacement = require(script.Hooks.useNavBarPlacement),
 	useNavBarSize = require(script.Hooks.useNavBarSize),

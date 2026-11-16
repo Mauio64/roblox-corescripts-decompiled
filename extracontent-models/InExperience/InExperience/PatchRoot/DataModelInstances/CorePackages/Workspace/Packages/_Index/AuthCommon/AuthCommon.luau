@@ -1,6 +1,11 @@
 local Enums = require(script.Enums)
 
-return {
+local AuthCommon = {
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
 	["jest.config"] = script["jest.config"],
 	Components = require(script.Components),
 	Common = require(script.Common),
@@ -12,11 +17,16 @@ return {
 	Utils = require(script.Utils),
 	Reducers = require(script.Reducers),
 	Analytics = require(script.Analytics),
-	installReducer = require(script.Reducers.installReducer),
-	RoduxKey = require(script.Common.Constants).RODUX_KEY,
-	Hooks = require(script.Hooks),
-	EventReceivers = require(script.EventReceivers),
-	Experiments = require(script.Experiments),
-	Stores = require(script.Stores),
-	DesignTokenMappers = require(script.DesignTokenMappers)
+	installReducer = require(script.Reducers.installReducer)
 }
+local Constants = require(script.Common.Constants)
+AuthCommon.RoduxKey = Constants.RODUX_KEY
+AuthCommon.Hooks = require(script.Hooks)
+AuthCommon.EventReceivers = require(script.EventReceivers)
+AuthCommon.Experiments = require(script.Experiments)
+AuthCommon.Stores = require(script.Stores)
+AuthCommon.DesignTokenMappers = require(script.DesignTokenMappers)
+AuthCommon.Flags = {
+	FFlagEnableCrossDeviceApproverDialog = require(script.Flags.FFlagEnableCrossDeviceApproverDialog)
+}
+return AuthCommon

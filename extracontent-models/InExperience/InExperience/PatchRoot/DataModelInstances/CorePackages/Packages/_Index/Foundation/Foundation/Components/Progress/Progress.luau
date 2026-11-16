@@ -1,31 +1,48 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local Dash = require(parent.Dash)
+local React = require(parent.React)
+
 local ProgressBar = require(script.Parent.ProgressBar)
+
 local ProgressCircle = require(script.Parent.ProgressCircle)
+
 local ProgressShape = require(Foundation.Enums.ProgressShape)
 
 require(Foundation.Enums.ProgressSize)
 
+local Flags = require(Foundation.Utility.Flags)
 local withDefaults = require(Foundation.Utility.withDefaults)
 
 require(Foundation.Providers.Style.Tokens)
 
-local t1 = {
-	testId = "--foundation-progress"
-}
+local v = { testId = "--foundation-progress" }
 
-local function Progress(p1, p2) -- line: 29
-	-- upvalues: withDefaults (copy), t1 (copy), ProgressShape (copy), React (copy), ProgressCircle (copy), ProgressBar (copy)
-	local v12 = withDefaults(p1, t1)
+local function Progress(p, ref)
+	local joined = withDefaults(p, v)
 
-	v12.ref = p2
-
-	if v12.shape == ProgressShape.Circle then
-		return React.createElement(ProgressCircle, v12)
+	if not Flags.FoundationProgressBarBetaUpdate then
+		joined.ref = ref
 	end
 
-	return React.createElement(ProgressBar, v12)
+	if joined.shape == ProgressShape.Circle then
+		local createElement = React.createElement
+
+		if Flags.FoundationProgressBarBetaUpdate then
+			joined = Dash.join(joined, { ref = ref })
+		end
+
+		return createElement(ProgressCircle, joined)
+	else
+		local createElement = React.createElement
+
+		if Flags.FoundationProgressBarBetaUpdate then
+			joined = Dash.join(joined, { ref = ref })
+		end
+
+		return createElement(ProgressBar, joined)
+	end
 end
 
 return React.memo(React.forwardRef(Progress))

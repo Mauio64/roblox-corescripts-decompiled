@@ -1,17 +1,13 @@
-local function isSeeAllTileEnabled(b1: boolean?, n1: number?, n2: number, n3: number, p1: ((...any) -> ...any)?) -- line: 4
-	if b1 then
+local function isSeeAllTileEnabled(flag: boolean?, p: number?, p2: number, p3: number, callback): boolean
+	if flag then
 		return false
 	end
 
-	if not p1 then
-		return false
+	if callback then
+		return p ~= nil and not (p <= p2 or p3 <= p2)
 	end
 
-	if n1 == nil or n1 <= n2 or n3 <= n2 then
-		return false
-	end
-
-	return true
+	return false
 end
 
 return isSeeAllTileEnabled

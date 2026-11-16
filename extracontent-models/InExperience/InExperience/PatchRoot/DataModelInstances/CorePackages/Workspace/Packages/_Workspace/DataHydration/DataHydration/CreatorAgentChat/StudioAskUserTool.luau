@@ -1,32 +1,380 @@
 require(script.Parent.types)
-
 local HttpService = game:GetService("HttpService")
-local t1 = {
+
+local v = {
 	single_select = "single_select",
 	multi_select = "multi_select",
 	free_text = "free_text"
 }
-local t2 = {
-	name = "studio_ask_user",
+
+local function valueLooksLikeToolName(value): boolean -- 4 equivalent calls inferred from this helper
+	return typeof(value) == "string" and string.lower(value) == "ask_user"
+end
+
+local function getQuestionsPayload(items) -- 1 equivalent call inferred from this helper
+	if typeof(items) ~= "table" then
+		return nil
+	end
+
+	if typeof(items[1]) == "table" then
+		return items
+	end
+
+	if typeof(items.questions) == "table" then
+		return items.questions
+	end
+
+	return if typeof(items.data) == "table" then items.data else nil
+end
+
+local function resolveResponseType(responseType, p: number) -- 1 equivalent call inferred from this helper
+	local selected
+
+	if typeof(responseType) == "string" then
+		selected = v[responseType]
+	end
+
+	if selected ~= nil then
+		return selected
+	end
+
+	return if p > 0 then "single_select" else "free_text"
+end
+
+local function toAnswerQuestions(rawInput)
+	rawInput = getQuestionsPayload(rawInput) -- inferred equivalent call
+
+	if typeof(rawInput) ~= "table" then
+		return nil
+	end
+
+	local result = {}
+
+	for k, item in rawInput do
+		if not (typeof(item) == "table" and typeof(item.question) == "string") then
+			continue
+		end
+
+		local options2 = {}
+		local options = item.options
+
+		if typeof(options) == "table" then
+			for k2, option in options do
+				if not (typeof(option) == "table" and typeof(option.optionText) == "string") then
+					continue
+				end
+
+				table.insert(options2, {
+					id = `q{k}-o{k2}`,
+					title = option.optionText,
+					description = typeof(option.clarificationText) ~= "string" and "" or option.clarificationText
+				})
+			end
+		end
+
+		local v2 = {
+			id = `q{k}`,
+			question = item.question,
+			options = options2,
+			responseType = resolveResponseType(item.responseType, #options2) -- inferred equivalent call
+		}
+		table.insert(result, v2)
+	end
+
+	return if #result > 0 then result else nil
+end
+
+local function extractQuestionsFromToolCall(toolCall)
+	local v2 = toAnswerQuestions(toolCall.rawInput)
+
+	if v2 == nil then
+		return nil
+	end
+
+	if valueLooksLikeToolName(toolCall.kind) then -- inferred equivalent call
+		return v2
+	end
+
+	if valueLooksLikeToolName(toolCall.title) then -- inferred equivalent call
+		return v2
+	end
+
+	local rawInput = toolCall.rawInput
+
+	if
+		typeof(rawInput) ~= "table"
+		or not valueLooksLikeToolName(rawInput.name) and not valueLooksLikeToolName(rawInput.toolName) -- inferred equivalent call
+	then
+		return nil
+	end
+
+	return v2
+end
+
+local function decodePersistedToolResultText(p: string)
+	local success, result = pcall(HttpService.JSONDecode, HttpService, p)
+
+	if not success or typeof(result) ~= "table" then
+		return nil
+	end
+
+	return if typeof(result.text) == "string" then result.text else nil
+end
+
+local function getPersistedToolResultText(toolCall)
+	if toolCall.content == nil then
+		return nil
+	end
+
+	local texts = {}
+
+	for _, v2 in toolCall.content do
+		if not (v2.type == "content" and v2.content ~= nil) then
+			continue
+		end
+
+		local content = v2.content
+
+		if not (content.type == "text" and typeof(content.text) == "string") then
+			continue
+		end
+
+		local text = content.text
+		local success, result = pcall(HttpService.JSONDecode, HttpService, text)
+		local text2
+
+		if success and typeof(result) == "table" and typeof(result.text) == "string" then
+			text2 = result.text
+		end
+
+		if text2 ~= nil and text2 ~= "" then
+			table.insert(texts, text2)
+		end
+	end
+
+	if #texts > 0 then
+		return (table.concat(texts))
+	end
+
+	return nil
+end
+
+local function formatToolResultText(items)
+	local answers = {}
+
+	for _, item in items do
+		local options = item.options
+
+		if options == nil or not (#options > 0) then
+			if item.option == nil then
+				if item.customResponseText ~= nil then
+					table.insert(answers, {
+						questionId = item.question.id,
+						content = item.customResponseText
+					})
+				end
+			else
+				local option = item.option
+				table.insert(answers, {
+					questionId = item.question.id,
+					selectedOptionId = option.id,
+					content = option.title
+				})
+			end
+		else
+			local ids = {}
+			local titles = {}
+
+			for _, option in options do
+				table.insert(ids, option.id)
+				table.insert(titles, option.title)
+			end
+
+			table.insert(answers, {
+				questionId = item.question.id,
+				selectedOptionId = ids,
+				content = table.concat(titles, ", ")
+			})
+		end
+	end
+
+	return HttpService:JSONEncode({ answers = answers })
+end
+
+local function findSelectedOptionById(p, selectedOptionId: string?) -- 1 equivalent call inferred from this helper
+	if selectedOptionId == nil then
+		return nil
+	end
+
+	for _, option in p.options do
+		if option.id == selectedOptionId then
+			return option
+		end
+	end
+
+	return nil
+end
+
+local function findSelectedOptionsByIds(p, selectedOptionId)
+	local optionsById = {}
+
+	for _, option in p.options do
+		optionsById[option.id] = option
+	end
+
+	local result = {}
+
+	for _, item in selectedOptionId do
+		local v2 = optionsById[item]
+
+		if v2 == nil then
+			return nil
+		end
+
+		table.insert(result, v2)
+	end
+
+	return result
+end
+
+local function normalizeSelectedOptionId(selectedOptionId)
+	if typeof(selectedOptionId) == "string" then
+		return selectedOptionId
+	end
+
+	if typeof(selectedOptionId) ~= "table" then
+		return nil
+	end
+
+	local result = {}
+
+	for _, item in selectedOptionId do
+		if typeof(item) ~= "string" then
+			return nil
+		end
+
+		table.insert(result, item)
+	end
+
+	return if #result > 0 then result else nil
+end
+
+local function getAnswersByQuestionId(persistedToolResultText: string)
+	local answers = {}
+	local success, result = pcall(HttpService.JSONDecode, HttpService, persistedToolResultText)
+
+	if not success or typeof(result) ~= "table" then
+		return answers
+	end
+
+	local answers2 = result.answers
+
+	if typeof(answers2) ~= "table" then
+		return answers
+	end
+
+	for _, answer in answers2 do
+		if not (typeof(answer) == "table" and typeof(answer.questionId) == "string" and typeof(answer.content) == "string") then
+			continue
+		end
+
+		answers[answer.questionId] = {
+			questionId = answer.questionId,
+			selectedOptionId = normalizeSelectedOptionId(answer.selectedOptionId),
+			content = answer.content
+		}
+	end
+
+	return answers
+end
+
+local function getPromptFromToolResult(question, p, toolCallId: string, callOrder: number)
+	if p == nil then
+		return nil
+	end
+
+	local selectedOptionId = p.selectedOptionId
+
+	if typeof(selectedOptionId) == "table" then
+		if findSelectedOptionsByIds(question, selectedOptionId) == nil then
+			return nil
+		end
+
+		return {
+			question = question,
+			selectedOptionId = selectedOptionId,
+			toolCallId = toolCallId,
+			callOrder = callOrder
+		}
+	else
+		local selectedOptionById = findSelectedOptionById(question, selectedOptionId) -- inferred equivalent call
+
+		if selectedOptionId ~= nil and selectedOptionById == nil then
+			return nil
+		end
+
+		local content
+
+		if selectedOptionById == nil then
+			content = p.content
+		end
+
+		local selectedOptionId2
+
+		if selectedOptionById ~= nil then
+			selectedOptionId2 = selectedOptionById.id
+		end
+
+		return {
+			question = question,
+			selectedOptionId = selectedOptionId2,
+			customResponseText = content,
+			toolCallId = toolCallId,
+			callOrder = callOrder
+		}
+	end
+end
+
+local function getToolCallOrder(p, p2: string)
+	if p.activityItems ~= nil then
+		for k, activityItem in p.activityItems do
+			if activityItem.kind == "tool_call" and activityItem.toolCallId == p2 then
+				return k
+			end
+		end
+	end
+
+	local v2 = {}
+
+	for k in p.toolCalls do
+		table.insert(v2, k)
+	end
+
+	table.sort(v2)
+
+	for k, v3 in v2 do
+		if v3 == p2 then
+			return k
+		end
+	end
+
+	return 0
+end
+
+local StudioAskUserTool = {}
+StudioAskUserTool.TOOL_NAME = "ask_user"
+StudioAskUserTool.LOCAL_TOOL_DEFINITION = {
+	name = "ask_user",
 	inputSchema = {
 		type = "array",
 		items = {
 			type = "object",
-			required = {
-				"question",
-				"options"
-			},
+			required = { "question", "options" },
 			properties = {
-				question = {
-					type = "string"
-				},
+				question = { type = "string" },
 				responseType = {
 					type = "string",
-					enum = {
-						"single_select",
-						"multi_select",
-						"free_text"
-					}
+					enum = { "single_select", "multi_select", "free_text" }
 				},
 				options = {
 					type = "array",
@@ -34,12 +382,8 @@ local t2 = {
 						type = "object",
 						required = { "optionText" },
 						properties = {
-							optionText = {
-								type = "string"
-							},
-							clarificationText = {
-								type = "string"
-							}
+							optionText = { type = "string" },
+							clarificationText = { type = "string" }
 						}
 					}
 				}
@@ -47,462 +391,85 @@ local t2 = {
 		}
 	}
 }
+StudioAskUserTool.CANCELLATION_TEXT = "User cancelled answering the question"
+StudioAskUserTool.extractQuestionsFromToolCall = extractQuestionsFromToolCall
 
-local function valueLooksLikeToolName(p1) -- line: 74
-	return typeof(p1) == "string" and string.lower(p1) == "studio_ask_user"
-end
-local function getQuestionsPayload(p2) -- line: 78
-	if typeof(p2) ~= "table" then
-		return nil
+function StudioAskUserTool.findQuestionsInTurnState(p, p2)
+	local v2 = {}
+
+	for k in p.toolCalls do
+		table.insert(v2, k)
 	end
 
-	if typeof(p2[1]) == "table" then
-		return p2
-	end
+	table.sort(v2)
 
-	if typeof(p2.questions) == "table" then
-		return p2.questions
-	end
-
-	if typeof(p2.data) == "table" then
-		return p2.data
-	end
-
-	return nil
-end
-local function resolveResponseType(p3, n1: number) -- line: 98
-	-- upvalues: t1 (copy)
-	local v22 = if typeof(p3) ~= "string" then nil else t1[p3]
-
-	if v22 == nil then
-		if n1 > 0 then
-			return "single_select"
+	for _, v3 in v2 do
+		if p2 and p2[v3] then
+			continue
 		end
 
-		return "free_text"
-	end
+		local toolCall = p.toolCalls[v3]
 
-	return v22
-end
-local function toAnswerQuestions(p4) -- line: 109
-	-- upvalues: t1 (copy)
-	local v24 = if typeof(p4) == "table" then if typeof(p4[1]) ~= "table" then if typeof(p4.questions) ~= "table" then if typeof(p4.data) ~= "table" then nil else p4.data else p4.questions else p4 else nil
+		if not (toolCall.status ~= "completed" and toolCall.status ~= "failed" and toolCall.status ~= "cancelled" and getPersistedToolResultText(toolCall) == nil) then
+			continue
+		end
 
-	if typeof(v24) ~= "table" then
-		return nil
-	end
+		local v4 = extractQuestionsFromToolCall(toolCall)
 
-	local t3 = {}
-
-	for v26, v27 in v24 do
-		if typeof(v27) == "table" and typeof(v27.question) == "string" then
-			local t4 = {}
-			local options = v27.options
-
-			if typeof(options) == "table" then
-				for v30, v31 in options do
-					if typeof(v31) == "table" and typeof(v31.optionText) == "string" then
-						table.insert(t4, {
-							id = `q{ v26 }-o{ v30 }`,
-							title = v31.optionText,
-							description = typeof(v31.clarificationText) ~= "string" and "" or v31.clarificationText
-						})
-					end
-				end
-			end
-
-			local t5 = {
-				id = `q{ v26 }`,
-				question = v27.question,
-				options = t4
-			}
-			local responseType = v27.responseType
-			local v34 = #t4
-			local v35 = if typeof(responseType) ~= "string" then nil else t1[responseType]
-
-			t5.responseType = if v35 ~= nil then v35 else not (v34 > 0) and "free_text" or "single_select"
-			table.insert(t3, t5)
+		if v4 ~= nil then
+			return v4, v3, toolCall.rawInput, toolCall.turnId, toolCall.referenceId
 		end
 	end
 
-	if #t3 > 0 then
-		return t3
-	end
-
-	return nil
+	return nil, nil, nil, nil, nil
 end
-local function extractQuestionsFromToolCall(p5) -- line: 146
-	-- upvalues: toAnswerQuestions (copy)
-	local v37 = toAnswerQuestions(p5.rawInput)
 
-	if v37 == nil then
-		return nil
+StudioAskUserTool.formatToolResultText = formatToolResultText
+
+function StudioAskUserTool.formatToolResultContent(p)
+	return { text = formatToolResultText(p) }
+end
+
+function StudioAskUserTool.getAnsweredPromptsFromTurnState(p)
+	local v2 = {}
+	local promptFromToolResults = {}
+
+	for k in p.toolCalls do
+		table.insert(v2, k)
 	end
 
-	local kind = p5.kind
+	table.sort(v2)
 
-	if typeof(kind) == "string" and string.lower(kind) == "studio_ask_user" then
-		return v37
-	end
+	for _, v3 in v2 do
+		local toolCall = p.toolCalls[v3]
+		local v4 = extractQuestionsFromToolCall(toolCall)
+		local persistedToolResultText = getPersistedToolResultText(toolCall)
 
-	local title = p5.title
-
-	if typeof(title) == "string" and string.lower(title) == "studio_ask_user" then
-		return v37
-	end
-
-	local rawInput = p5.rawInput
-
-	if typeof(rawInput) == "table" then
-		local name = rawInput.name
-
-		if typeof(name) == "string" and string.lower(name) == "studio_ask_user" then
-			return v37
+		if not (v4 ~= nil and persistedToolResultText ~= nil) then
+			continue
 		end
 
-		local toolName = rawInput.toolName
+		local answersByQuestionId = getAnswersByQuestionId(persistedToolResultText)
 
-		if typeof(toolName) == "string" and string.lower(toolName) == "studio_ask_user" then
-			return v37
-		end
-	end
+		for _, v5 in v4 do
+			local promptFromToolResult = getPromptFromToolResult(
+				v5,
+				answersByQuestionId[v5.id],
+				v3,
+				getToolCallOrder(p, v3)
+			)
 
-	return v37
-end
-local function decodePersistedToolResultText(s1: string) -- line: 170
-	-- upvalues: HttpService (copy)
-	local ok, result = pcall(HttpService.JSONDecode, HttpService, s1)
-
-	if not ok or typeof(result) ~= "table" then
-		return nil
-	end
-
-	if typeof(result.text) == "string" then
-		return result.text
-	end
-
-	return nil
-end
-local function getPersistedToolResultText(p6) -- line: 180
-	-- upvalues: HttpService (copy)
-	if p6.content == nil then
-		return nil
-	end
-
-	local t6 = {}
-
-	for _, v49 in p6.content do
-		if v49.type == "content" and v49.content ~= nil then
-			local content = v49.content
-
-			if content.type == "text" and typeof(content.text) == "string" then
-				local text = content.text
-				local ok, result = pcall(HttpService.JSONDecode, HttpService, text)
-				local v54 = if not not ok and typeof(result) == "table" then if typeof(result.text) ~= "string" then nil else result.text else nil
-
-				if v54 ~= nil and v54 ~= "" then
-					table.insert(t6, v54)
-				end
+			if promptFromToolResult ~= nil then
+				table.insert(promptFromToolResults, promptFromToolResult)
 			end
 		end
 	end
 
-	if #t6 > 0 then
-		return (table.concat(t6))
-	end
-
-	return nil
-end
-local function formatToolResultText(t7: {[any]: any}) -- line: 235
-	-- upvalues: HttpService (copy)
-	local t8 = {}
-
-	for _, v66 in t7 do
-		local options = v66.options
-
-		if options ~= nil and #options > 0 then
-			local t9 = {}
-			local t10 = {}
-
-			for _, v71 in options do
-				table.insert(t9, v71.id)
-				table.insert(t10, v71.title)
-			end
-
-			table.insert(t8, {
-				questionId = v66.question.id,
-				selectedOptionId = t9,
-				content = table.concat(t10, ", ")
-			})
-		elseif v66.option ~= nil then
-			local option = v66.option
-
-			table.insert(t8, {
-				questionId = v66.question.id,
-				selectedOptionId = option.id,
-				content = option.title
-			})
-		elseif v66.customResponseText ~= nil then
-			table.insert(t8, {
-				questionId = v66.question.id,
-				content = v66.customResponseText
-			})
-		end
-	end
-
-	return HttpService:JSONEncode({
-		answers = t8
-	})
-end
-local function findSelectedOptionById(p7, s2: string?) -- line: 276
-	if s2 == nil then
-		return nil
-	end
-
-	for _, v77 in p7.options do
-		if s2 == v77.id then
-			return v77
-		end
-	end
-
-	return nil
-end
-local function findSelectedOptionsByIds(p8, t11: {[any]: any}) -- line: 288
-	local t12 = {}
-
-	for _, v82 in p8.options do
-		t12[v82.id] = v82
-	end
-
-	local t13 = {}
-
-	for _, v85 in t11 do
-		local v86 = t12[v85]
-
-		if v86 == nil then
-			return nil
-		end
-
-		table.insert(t13, v86)
-	end
-
-	return t13
-end
-local function normalizeSelectedOptionId(p9) -- line: 305
-	if typeof(p9) == "string" then
-		return p9
-	end
-
-	if typeof(p9) ~= "table" then
-		return nil
-	end
-
-	local t14 = {}
-
-	for _, v90 in p9 do
-		if typeof(v90) ~= "string" then
-			return nil
-		end
-
-		table.insert(t14, v90)
-	end
-
-	if #t14 > 0 then
-		return t14
-	end
-
-	return nil
-end
-local function getAnswersByQuestionId(s3: string) -- line: 323
-	-- upvalues: HttpService (copy), normalizeSelectedOptionId (copy)
-	local t15 = {}
-	local ok, result = pcall(HttpService.JSONDecode, HttpService, s3)
-
-	if not ok or typeof(result) ~= "table" then
-		return t15
-	end
-
-	local answers = result.answers
-
-	if typeof(answers) ~= "table" then
-		return t15
-	end
-
-	for _, v97 in answers do
-		if typeof(v97) == "table" and typeof(v97.questionId) == "string" and typeof(v97.content) == "string" then
-			t15[v97.questionId] = {
-				questionId = v97.questionId,
-				selectedOptionId = normalizeSelectedOptionId(v97.selectedOptionId),
-				content = v97.content
-			}
-		end
-	end
-
-	return t15
-end
-local function getPromptFromToolResult(p10, t16: {[any]: any}?, s4: string, n2: number) -- line: 350
-	-- upvalues: findSelectedOptionsByIds (copy)
-	if t16 == nil then
-		return nil
-	end
-
-	local selectedOptionId = t16.selectedOptionId
-
-	if typeof(selectedOptionId) == "table" then
-		if findSelectedOptionsByIds(p10, selectedOptionId) == nil then
-			return nil
-		end
-
-		return {
-			question = p10,
-			selectedOptionId = selectedOptionId,
-			toolCallId = s4,
-			callOrder = n2
-		}
-	end
-
-	local v103, g106
-
-	if selectedOptionId == nil then
-		v103 = nil
-	else
-		g106 = nil
-		v103 = nil
-
-		for _, v105 in p10.options do
-			if selectedOptionId == v105.id then
-				v103 = v105
-				g106 = true
-			end
-
-			if g106 then
-				break
-			end
-		end
-
-		if not g106 then
-			v103 = nil
-		end
-	end
-
-	g106 = false
-
-	if selectedOptionId ~= nil and v103 == nil then
-		return nil
-	end
-
-	local v107 = if v103 ~= nil then nil else t16.content
-
-	return {
-		question = p10,
-		selectedOptionId = if v103 == nil then nil else v103.id,
-		customResponseText = v107,
-		toolCallId = s4,
-		callOrder = n2
-	}
-end
-local function getToolCallOrder(p11, s5: string) -- line: 389
-	if p11.activityItems ~= nil then
-		for v110, v111 in p11.activityItems do
-			if v111.kind == "tool_call" and s5 == v111.toolCallId then
-				return v110
-			end
-		end
-	end
-
-	local t17 = {}
-
-	for v113 in p11.toolCalls do
-		table.insert(t17, v113)
-	end
-
-	table.sort(t17)
-
-	for v114, v115 in t17 do
-		if v115 == s5 then
-			return v114
-		end
-	end
-
-	return 0
+	return promptFromToolResults
 end
 
-return {
-	TOOL_NAME = "studio_ask_user",
-	CANCELLATION_TEXT = "User cancelled answering the question",
-	LOCAL_TOOL_DEFINITION = t2,
-	extractQuestionsFromToolCall = extractQuestionsFromToolCall,
-	findQuestionsInTurnState = function(p12, t18: {[any]: any}?) -- line: 208
-		-- upvalues: getPersistedToolResultText (copy), extractQuestionsFromToolCall (copy)
-		local t19 = {}
+function StudioAskUserTool.formatCancellationContent()
+	return { text = "User cancelled answering the question" }
+end
 
-		for v58 in p12.toolCalls do
-			table.insert(t19, v58)
-		end
-
-		table.sort(t19)
-
-		for _, v60 in t19 do
-			if t18 and t18[v60] then
-				continue
-			end
-
-			local v61 = p12.toolCalls[v60]
-
-			if getPersistedToolResultText(v61) == nil then
-				local v62 = extractQuestionsFromToolCall(v61)
-
-				if v62 == nil then
-					continue
-				end
-
-				return v62, v60, v61.rawInput, v61.turnId, v61.referenceId
-			end
-		end
-
-		return nil, nil, nil, nil, nil
-	end,
-	formatToolResultText = formatToolResultText,
-	formatToolResultContent = function(t20: {[any]: any}) -- line: 270
-		-- upvalues: formatToolResultText (copy)
-		return {
-			text = formatToolResultText(t20)
-		}
-	end,
-	getAnsweredPromptsFromTurnState = function(p13) -- line: 412
-		-- upvalues: extractQuestionsFromToolCall (copy), getPersistedToolResultText (copy), getAnswersByQuestionId (copy), getPromptFromToolResult (copy), getToolCallOrder (copy)
-		local t21 = {}
-		local t22 = {}
-
-		for v119 in p13.toolCalls do
-			table.insert(t22, v119)
-		end
-
-		table.sort(t22)
-
-		for _, v121 in t22 do
-			local v122 = p13.toolCalls[v121]
-			local v123 = extractQuestionsFromToolCall(v122)
-			local v124 = getPersistedToolResultText(v122)
-
-			if v123 ~= nil and v124 ~= nil then
-				local v125 = getAnswersByQuestionId(v124)
-
-				for _, v127 in v123 do
-					local v128 = getPromptFromToolResult(v127, v125[v127.id], v121, (getToolCallOrder(p13, v121)))
-
-					if v128 ~= nil then
-						table.insert(t21, v128)
-					end
-				end
-			end
-		end
-
-		return t21
-	end,
-	formatCancellationContent = function() -- line: 448
-		return {
-			text = "User cancelled answering the question"
-		}
-	end
-}
+return StudioAskUserTool

@@ -1,42 +1,90 @@
 local AvatarEditorService = game:GetService("AvatarEditorService")
-local Parent = script:FindFirstAncestor("AvatarExperienceSave").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("AvatarExperienceSave").Parent
 
-require(Parent.LuauPolyfill)
+local Promise = require(parent.Promise)
+require(parent.LuauPolyfill)
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local buildProfileConfigurationApplyConfig = require(script.Parent.buildProfileConfigurationApplyConfig)
 
-local AvatarExperienceAnalytics = require(Parent.AvatarExperienceAnalytics)
 local reportAvatarEventCounterNoAnalyticsArgument = AvatarExperienceAnalytics.reportAvatarEventCounterNoAnalyticsArgument
+local reportAvatarEditorServiceCounter = AvatarExperienceAnalytics.reportAvatarEditorServiceCounter
 local AVATAR_EDITOR_SERVICE_ERRORS = AvatarExperienceAnalytics.Constants.AVATAR_EDITOR_SERVICE_ERRORS
+local AVATAR_EDITOR_SERVICE_EVENTS = AvatarExperienceAnalytics.Constants.AVATAR_EDITOR_SERVICE_EVENTS
+local AVATAR_EDITOR_SERVICE_COUNTER_STATUS = AvatarExperienceAnalytics.Constants.AVATAR_EDITOR_SERVICE_COUNTER_STATUS
+local FFlagAXAvatarEditorServiceTelemetryV2 = AvatarExperienceFlags.FFlagAXAvatarEditorServiceTelemetryV2
 
-local function saveProfileConfiguration(n1: number) -- line: 29
-	-- upvalues: Promise (copy), AvatarEditorService (copy), reportAvatarEventCounterNoAnalyticsArgument (copy), AVATAR_EDITOR_SERVICE_ERRORS (copy)
-	return Promise.new(function(resolve, reject) -- line: 30
-		-- upvalues: n1 (copy), AvatarEditorService (copy), reportAvatarEventCounterNoAnalyticsArgument (copy), AVATAR_EDITOR_SERVICE_ERRORS (copy)
-		local t1 = {
-			BackgroundAssetId = n1
-		}
-		local v12 = AvatarEditorService:NoPromptApplyProfileConfiguration(t1)
+local FFlagAXDeprecateAvatarEditorServiceTelemetryV1 = AvatarExperienceFlags.FFlagAXDeprecateAvatarEditorServiceTelemetryV1
 
-		while not v12 do
+local function saveProfileConfiguration(backgroundAssetId)
+	return Promise.new(function(callback, callback2)
+		local v
+
+		if AvatarExperienceFlags.FFlagAXProfileConfigurationMultiFieldApply then
+			v = buildProfileConfigurationApplyConfig(backgroundAssetId)
+		else
+			v = { BackgroundAssetId = backgroundAssetId }
+		end
+
+		if FFlagAXAvatarEditorServiceTelemetryV2 then
+			reportAvatarEditorServiceCounter(
+				AVATAR_EDITOR_SERVICE_EVENTS.NoPromptApplyProfileConfiguration,
+				AVATAR_EDITOR_SERVICE_COUNTER_STATUS.Request
+			)
+		end
+
+		local v2 = AvatarEditorService:NoPromptApplyProfileConfiguration(v)
+
+		while not v2 do
+			if FFlagAXAvatarEditorServiceTelemetryV2 then
+				reportAvatarEditorServiceCounter(
+					AVATAR_EDITOR_SERVICE_EVENTS.NoPromptApplyProfileConfiguration,
+					AVATAR_EDITOR_SERVICE_COUNTER_STATUS.Error
+				)
+			end
+
 			AvatarEditorService.PromptApplyProfileConfigurationCompleted:Wait()
-			reportAvatarEventCounterNoAnalyticsArgument(AVATAR_EDITOR_SERVICE_ERRORS.NoPromptApplyProfileConfiguration)
-			v12 = AvatarEditorService:NoPromptApplyProfileConfiguration(t1)
+
+			if not FFlagAXDeprecateAvatarEditorServiceTelemetryV1 then
+				reportAvatarEventCounterNoAnalyticsArgument(AVATAR_EDITOR_SERVICE_ERRORS.NoPromptApplyProfileConfiguration)
+			end
+
+			if FFlagAXAvatarEditorServiceTelemetryV2 then
+				reportAvatarEditorServiceCounter(
+					AVATAR_EDITOR_SERVICE_EVENTS.NoPromptApplyProfileConfiguration,
+					AVATAR_EDITOR_SERVICE_COUNTER_STATUS.Request
+				)
+			end
+
+			v2 = AvatarEditorService:NoPromptApplyProfileConfiguration(v)
 		end
 
-		local v13 = AvatarEditorService.PromptApplyProfileConfigurationCompleted:Wait()
+		local avatarPromptResult = AvatarEditorService.PromptApplyProfileConfigurationCompleted:Wait()
 
-		if v13 == Enum.AvatarPromptResult.Success then
-			resolve({
-				avatarPromptResult = v13
-			})
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			if FFlagAXAvatarEditorServiceTelemetryV2 then
+				reportAvatarEditorServiceCounter(
+					AVATAR_EDITOR_SERVICE_EVENTS.NoPromptApplyProfileConfiguration,
+					AVATAR_EDITOR_SERVICE_COUNTER_STATUS.Success
+				)
+			end
 
-			return
+			callback({ avatarPromptResult = avatarPromptResult })
+		else
+			if not FFlagAXDeprecateAvatarEditorServiceTelemetryV1 then
+				reportAvatarEventCounterNoAnalyticsArgument(AVATAR_EDITOR_SERVICE_ERRORS.PromptApplyProfileConfigurationCompleted)
+			end
+
+			if FFlagAXAvatarEditorServiceTelemetryV2 then
+				reportAvatarEditorServiceCounter(
+					AVATAR_EDITOR_SERVICE_EVENTS.NoPromptApplyProfileConfiguration,
+					AVATAR_EDITOR_SERVICE_COUNTER_STATUS.Error,
+					avatarPromptResult
+				)
+			end
+
+			callback2({ avatarPromptResult = avatarPromptResult })
 		end
-
-		reportAvatarEventCounterNoAnalyticsArgument(AVATAR_EDITOR_SERVICE_ERRORS.PromptApplyProfileConfigurationCompleted)
-		reject({
-			avatarPromptResult = v13
-		})
 	end)
 end
 

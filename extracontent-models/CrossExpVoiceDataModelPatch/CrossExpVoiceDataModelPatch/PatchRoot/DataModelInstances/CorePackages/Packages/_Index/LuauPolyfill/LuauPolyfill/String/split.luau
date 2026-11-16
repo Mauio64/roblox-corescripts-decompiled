@@ -1,73 +1,74 @@
 local findOr = require(script.Parent.findOr)
 local slice = require(script.Parent.slice)
-local ParentParent = script.Parent.Parent
 
-require(ParentParent.types)
+local parent = script.Parent.Parent
+require(parent.types)
 
-local MAX_SAFE_INTEGER = require(ParentParent.Number).MAX_SAFE_INTEGER
+local Number = require(parent.Number)
+local MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER
 
-local function split(s1: string, p1, n1: number?) -- line: 12
-	-- upvalues: MAX_SAFE_INTEGER (copy), findOr (copy), slice (copy)
-	if p1 == nil then
-		return { s1 }
+local function split(value: string, value2, p: number?)
+	if value2 == nil then
+		return { value }
 	end
 
-	if n1 == 0 then
+	if p == 0 then
 		return {}
 	end
 
-	local v9 = if n1 ~= nil and not (n1 < 0) then n1 else MAX_SAFE_INTEGER
+	if p == nil or p < 0 then
+		p = MAX_SAFE_INTEGER
+	end
 
-	if typeof(p1) == "string" then
-		if p1 == "" then
-			local t1 = {}
+	if typeof(value2) == "string" then
+		if value2 == "" then
+			local result = {}
 
-			for match in s1:gmatch(".") do
-				table.insert(t1, match)
+			for k in value:gmatch(".") do
+				table.insert(result, k)
 			end
 
-			return t1
+			return result
 		end
 
-		p1 = { p1 }
+		value2 = { value2 }
 	end
 
-	local n2 = 1
-	local t2 = {}
-	local v14 = nil
-	local v15, v16 = utf8.len(s1)
-
-	assert(v15 ~= nil, ("string `%s` has an invalid byte at position %s"):format(s1, (tostring(v16))))
+	local v, v2 = utf8.len(value)
+	assert(v ~= nil, ("string `%s` has an invalid byte at position %s"):format(value, (tostring(v2))))
+	local v3 = 1
+	local result = {}
+	local v4 = nil
 
 	repeat
-		local v17 = findOr(s1, p1, n2)
+		local v5 = findOr(value, value2, v3)
 
-		if v17 ~= nil then
-			table.insert(t2, slice(s1, n2, v17.index))
-
-			local v18 = utf8.len(v17.match)
-
-			n2 = v17.index + v18
+		if v5 == nil then
+			table.insert(result, slice(value, v3, nil))
 		else
-			table.insert(t2, slice(s1, n2, nil))
+			table.insert(result, slice(value, v3, v5.index))
+			local v6 = utf8.len(v5.match)
+
+			v3 = v5.index + v6
 		end
 
-		if v17 ~= nil then
-			v14 = v17
+		if v5 ~= nil then
+			v4 = v5
 		end
-	until v17 == nil or v15 < n2 or v9 <= #t2
+	until v5 == nil or v < v3 or p <= #result
 
-	if v14 ~= nil then
-		local v19, v20 = utf8.len(v14.match)
-
-		assert(v19 ~= nil, ("string `%s` has an invalid byte at position %s"):format(v14.match, (tostring(v20))))
-
-		if v14.index + v19 == v15 + 1 then
-			table.insert(t2, "")
-		end
+	if v4 == nil then
+		return result
 	end
 
-	return t2
+	local v5, v6 = utf8.len(v4.match)
+	assert(v5 ~= nil, ("string `%s` has an invalid byte at position %s"):format(v4.match, (tostring(v6))))
+
+	if v4.index + v5 == v + 1 then
+		table.insert(result, "")
+	end
+
+	return result
 end
 
 return split

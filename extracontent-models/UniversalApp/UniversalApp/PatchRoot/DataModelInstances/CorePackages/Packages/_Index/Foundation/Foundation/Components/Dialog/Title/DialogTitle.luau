@@ -1,35 +1,47 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Constants = require(Foundation.Constants)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useTokens = require(Foundation.Providers.Style.useTokens)
+
 local useDialog = require(script.Parent.Parent.useDialog)
-local useDialogVariants = require(script.Parent.Parent.useDialogVariants).useDialogVariants
+local useDialogVariants = require(script.Parent.Parent.useDialogVariants)
+local useDialogVariants2 = useDialogVariants.useDialogVariants
 
-local function DialogTitle(t1: {[any]: any}) -- line: 21
-	-- upvalues: useTokens (copy), useDialog (copy), useDialogVariants (copy), React (copy), View (copy), Constants (copy), Text (copy)
-	local v12 = useTokens()
-	local v13 = useDialog()
-	local v14 = useDialogVariants()
+local function DialogTitle(p)
+	local v = useTokens()
+	local v2 = useDialog()
+	local v3 = useDialogVariants2()
 
-	return React.createElement(View, {
-		tag = v14.title.tag,
+	local createElement = React.createElement
+	local v4 = {
+		tag = v3.title.tag,
 		LayoutOrder = Constants.MIN_LAYOUT_ORDER + 1,
-		padding = {
-			right = if not v13.hasHeroMedia then UDim.new(0, v14.closeAffordance.offset + v12.Size.Size_1000) else nil,
-			top = if not v13.hasHeroMedia then UDim.new(0, v12.Size.Size_500) else nil
-		},
-		testId = `{ v13.testId }--title`
-	}, {
-		Title = React.createElement(Text, {
-			tag = v14.titleText.tag,
-			Text = t1.text
-		})
+		padding = 0,
+		testId = 0
+	}
+	local right
+
+	if not v2.hasHeroMedia then
+		right = UDim.new(0, v3.closeAffordance.offset + v.Size.Size_1000)
+	end
+
+	local top
+
+	if not v2.hasHeroMedia then
+		top = UDim.new(0, v.Size.Size_500)
+	end
+
+	v4.padding = { right = right, top = top }
+
+	v4.testId = `{v2.testId}--title`
+	return createElement(View, v4, {
+		Title = React.createElement(Text, { tag = v3.titleText.tag, Text = p.text })
 	})
 end
 

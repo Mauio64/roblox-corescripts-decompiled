@@ -1,31 +1,27 @@
-local t1 = {}
+local MockUserGameSettings = {}
+MockUserGameSettings.__index = MockUserGameSettings
 
-t1.__index = t1
+function MockUserGameSettings.new()
+	local bindableEvent = Instance.new("BindableEvent")
 
-function t1.new() -- line: 8
-	-- upvalues: t1 (copy)
-	local BindableEvent = Instance.new("BindableEvent")
-	local t2 = {
+	local v = {
 		FullscreenChanged = {
-			Connect = function(_, p2) -- line: 13
-				-- upvalues: BindableEvent (copy)
-				return BindableEvent.Event:Connect(p2)
+			Connect = function(self, onEvent)
+				return bindableEvent.Event:Connect(onEvent)
 			end,
-			GoFullscreen = function() -- line: 16
-				-- upvalues: BindableEvent (copy)
-				BindableEvent:Fire(true)
+			GoFullscreen = function()
+				bindableEvent:Fire(true)
 			end
 		}
 	}
 
-	setmetatable(t2, {
-		__index = t1
-	})
+	setmetatable(v, { __index = MockUserGameSettings })
 
-	return t2
+	return v
 end
-function t1.InFullScreen(_) -- line: 28
+
+function MockUserGameSettings.InFullScreen(_): boolean
 	return false
 end
 
-return t1
+return MockUserGameSettings

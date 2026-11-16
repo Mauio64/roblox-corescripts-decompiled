@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(t1: {[any]: any}) -- line: 13
-	return {
-		comment_added = t1.comment_added
-	}
+return Rodux.makeActionCreator(script.Name, function(p)
+	return { comment_added = p.comment_added }
 end)

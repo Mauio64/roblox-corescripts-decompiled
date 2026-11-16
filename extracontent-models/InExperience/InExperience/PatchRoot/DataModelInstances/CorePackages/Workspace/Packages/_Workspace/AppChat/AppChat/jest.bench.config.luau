@@ -1,6 +1,7 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local JestConfigs = require(AppChatParent.Dev.JestConfigs)
+local parent = AppChat.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return JestConfigs.createBenchmarkConfig("AppChatBenchmarks", {
 	setupFilesAfterEnv = {

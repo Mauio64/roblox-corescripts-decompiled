@@ -1,1 +1,2 @@
-return require(script.Parent.InExperienceUIVRIXP):isInExperienceUIVREnabled()
+local InExperienceUIVRIXP = require(script.Parent.InExperienceUIVRIXP)
+return InExperienceUIVRIXP:isInExperienceUIVREnabled()

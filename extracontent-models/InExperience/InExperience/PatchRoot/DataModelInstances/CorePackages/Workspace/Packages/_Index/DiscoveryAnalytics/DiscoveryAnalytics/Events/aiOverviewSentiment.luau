@@ -1,40 +1,37 @@
 local TelemetryService = game:GetService("TelemetryService")
 local DiscoveryAnalytics = script:FindFirstAncestor("DiscoveryAnalytics")
-local DiscoveryAnalyticsParent = DiscoveryAnalytics.Parent
-local t = require(DiscoveryAnalyticsParent.t)
-local DiscoveryEventErrorLogger = require(DiscoveryAnalyticsParent.DiscoveryUtils).DiscoveryEventErrorLogger
+local parent = DiscoveryAnalytics.Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 local AiOverviewSentiment = require(DiscoveryAnalytics.Constants.AiOverviewSentiment)
-local v7 = game:DefineFastInt("AiOverviewSentimentThrottleHundrethsPercent", 10000)
-local v8 = t.strictInterface({
+
+local defineFastInt = game:DefineFastInt("AiOverviewSentimentThrottleHundrethsPercent", 10000)
+
+local strictInterface = t.strictInterface({
 	sentiment = t.union(t.literal(AiOverviewSentiment.ThumbsUp), t.literal(AiOverviewSentiment.ThumbsDown)),
 	searchSessionId = t.string,
 	query = t.string,
 	universeIds = t.optional(t.string)
 })
 
-return function(t1: {[any]: any}, s1: string) -- line: 26
-	-- upvalues: v8 (copy), DiscoveryEventErrorLogger (copy), v7 (copy), TelemetryService (copy)
-	local v11, v12 = v8(t1)
+return function(customFields, eventContext: string)
+	local v, v2 = strictInterface(customFields)
 
-	if not v11 then
-		DiscoveryEventErrorLogger.reportError("AiOverviewSentimentInvalidInterface", v12)
+	if not v then
+		DiscoveryEventErrorLogger.reportError("AiOverviewSentimentInvalidInterface", v2)
 	end
 
-	local t2 = {
+	TelemetryService:LogEvent({
 		eventName = "aiOverviewSentiment",
-		description = "User tapped thumbs up or down on AI Overview card",
 		backends = { "EventIngest" },
-		throttlingPercentage = v7,
-		lastUpdated = {
-			26,
-			6,
-			24
-		}
-	}
-
-	TelemetryService:LogEvent(t2, {
-		eventContext = s1,
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 26, 6, 24 },
+		description = "User tapped thumbs up or down on AI Overview card"
+	}, {
+		eventContext = eventContext,
 		standardizedFields = { "addSessionInfo" },
-		customFields = t1
+		customFields = customFields
 	})
 end

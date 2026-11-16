@@ -1,5 +1,1 @@
-return {
-	UNKNOWN = "UNKNOWN",
-	WIDE = "WIDE",
-	COMPACT = "COMPACT"
-}
+return { UNKNOWN = "UNKNOWN", WIDE = "WIDE", COMPACT = "COMPACT" }

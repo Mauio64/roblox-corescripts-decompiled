@@ -1,238 +1,271 @@
 local AppBlox = script:FindFirstAncestor("AppBlox")
-local AppBloxParent = AppBlox.Parent
-local Cryo = require(AppBloxParent.Cryo)
-local AnimatedFlatList = require(AppBloxParent.VirtualizedList).AnimatedFlatList
+local parent = AppBlox.Parent
+local Cryo = require(parent.Cryo)
+local VirtualizedList = require(parent.VirtualizedList)
+local AnimatedFlatList = VirtualizedList.AnimatedFlatList
+
 local DetailsPageHeader = require(script.Parent.DetailsPageHeader)
 local getPlatformConfig = require(script.Parent.getPlatformConfig)
 local useDetailsPageRenderItems = require(script.Parent.Hooks.useDetailsPageRenderItems)
 local useAnimateFullscreen = require(script.Parent.Hooks.useAnimateFullscreen)
 local DetailsPageRenderItem = require(script.Parent.DetailsPageRenderItem)
-local Display = require(AppBloxParent.Display)
-local useSignalState = require(AppBloxParent.SignalsReact).useSignalState
+local Display = require(parent.Display)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
 local FullscreenFrame = require(AppBlox.FullscreenFrame)
-local Signal = require(AppBloxParent.AppCommonLib).Signal
-local UIBlox = require(AppBloxParent.UIBlox)
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
+
+local UIBlox = require(parent.UIBlox)
 local Overlay = UIBlox.App.Dialog.Overlay
 local LoadableImage = UIBlox.App.Loading.LoadableImage
 
-require(AppBloxParent.RobloxAppEnums)
-require(AppBloxParent.ReactOtter)
+require(parent.RobloxAppEnums)
+
+require(parent.ReactOtter)
+
 require(script.Parent.Types)
 
-local React = require(AppBloxParent.React)
-local FFlagExtendScrollingFramesBySafeInsets = require(AppBloxParent.SharedFlags).FFlagExtendScrollingFramesBySafeInsets
-local FFlagEnableLeftNavOnConsole = require(AppBloxParent.SharedFlags).FFlagEnableLeftNavOnConsole
-local v20 = game:DefineFastFlag("FixConsoleEDPDirectionalNavigation", false)
-local FFlagLuaAppEdpConsoleMediaGalleryVideo = require(AppBloxParent.SharedFlags).FFlagLuaAppEdpConsoleMediaGalleryVideo
-local FFlagLuaAppDemoModePlayButton = require(AppBloxParent.SharedFlags).FFlagLuaAppDemoModePlayButton
-local v23 = game:DefineFastFlag("FixDeviceSafePaddingAccess", false)
-local vector2 = Vector2.new(96, 144)
-local t1 = {
-	dampingRatio = 1,
-	frequency = 3
-}
-local t2 = {
+local React = require(parent.React)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEdpConsoleMediaGalleryVideo = SharedFlags.FFlagLuaAppEdpConsoleMediaGalleryVideo
+
+local v = {
+	animationConfig = { dampingRatio = 1, frequency = 3 },
 	itemPadding = 36,
-	trailingWhitespace = 3000,
-	animationConfig = t1,
-	safeAreaSize = vector2
+	safeAreaSize = Vector2.new(96, 144),
+	trailingWhitespace = 3000
 }
 
-local function DetailsPageTenfootTemplate(t3: {[any]: any}) -- line: 165
-	-- upvalues: t2 (copy), Cryo (copy), React (copy), getPlatformConfig (copy), Signal (copy), useAnimateFullscreen (copy), DetailsPageHeader (copy), FFlagLuaAppDemoModePlayButton (copy), useDetailsPageRenderItems (copy), DetailsPageRenderItem (copy), v23 (copy), FFlagEnableLeftNavOnConsole (copy), FFlagExtendScrollingFramesBySafeInsets (copy), useSignalState (copy), Display (copy), FullscreenFrame (copy), FFlagLuaAppEdpConsoleMediaGalleryVideo (copy), LoadableImage (copy), Overlay (copy), AnimatedFlatList (copy), v20 (copy)
-	local u29 = t2
+local function DetailsPageTenfootTemplate(props)
+	local joined = v
 
-	if t3.tokens then
-		u29 = Cryo.Dictionary.join(u29, t3.tokens)
+	if props.tokens then
+		joined = Cryo.Dictionary.join(joined, props.tokens)
 	end
 
-	local v30, v31 = React.useState(true)
-	local v32 = React.useMemo(function() -- line: 176
-		-- upvalues: getPlatformConfig (copy), t3 (copy)
-		return getPlatformConfig(t3.deviceType)
-	end, { t3.deviceType })
-	local v33 = React.useRef(nil)
-	local v34, v35 = React.useState(Vector2.new(0, 0))
-	local v36 = React.useCallback(function(p1) -- line: 182
-		-- upvalues: v35 (copy)
-		v35(p1.AbsoluteSize)
-	end, {})
+	local state, setState = React.useState(true)
 
-	React.useEffect(function() -- line: 185
-		-- upvalues: v33 (copy), v35 (copy)
-		if v33.current then
-			v35(v33.current.AbsoluteSize)
+	local v2 = React.useMemo(function()
+		return getPlatformConfig(props.deviceType)
+	end, { props.deviceType })
+
+	local ref = React.useRef(nil)
+	local state2, setState2 = React.useState(Vector2.new(0, 0))
+	local v3 = React.useCallback(function(p)
+		setState2(p.AbsoluteSize)
+	end, {})
+	React.useEffect(function()
+		if ref.current then
+			setState2(ref.current.AbsoluteSize)
 		end
 	end, {})
+	local thumbnailHeight
 
-	local v37 = if not t3.thumbnailHeight then v32.thumbnailHeight else t3.thumbnailHeight
-	local v38 = if t3.headerBarBackgroundHeight == nil then v32.headerBarBackgroundHeight else t3.headerBarBackgroundHeight
-	local v39 = if not t3.sideMargin then v32.sideMargin else t3.sideMargin
-	local v40 = React.useMemo(function() -- line: 197
-		-- upvalues: Signal (copy)
+	if props.thumbnailHeight then
+		thumbnailHeight = props.thumbnailHeight
+	else
+		thumbnailHeight = v2.thumbnailHeight
+	end
+
+	local headerBarBackgroundHeight
+
+	if props.headerBarBackgroundHeight == nil then
+		headerBarBackgroundHeight = v2.headerBarBackgroundHeight
+	else
+		headerBarBackgroundHeight = props.headerBarBackgroundHeight
+	end
+
+	local sideMargin
+
+	if props.sideMargin then
+		sideMargin = props.sideMargin
+	else
+		sideMargin = v2.sideMargin
+	end
+
+	local scrollViewPositionChangedSignal = React.useMemo(function()
 		return Signal.new()
 	end, {})
-	local v41 = t3.isFullscreen ~= nil and t3.isFullscreen
-	local renderFullscreenContent = t3.renderFullscreenContent
-	local v43, v44 = useAnimateFullscreen(v41, renderFullscreenContent, u29.animationConfig)
-	local v45 = React.useMemo(function() -- line: 209
-		-- upvalues: React (copy), DetailsPageHeader (copy), t3 (copy), v37 (copy), v40 (copy), v39 (copy), v38 (copy), u29 (ref), FFlagLuaAppDemoModePlayButton (copy)
+
+	local v4 = not (props.isFullscreen == nil) and props.isFullscreen
+	local renderFullscreenContent = props.renderFullscreenContent
+
+	local v5, groupTransparency = useAnimateFullscreen(v4, renderFullscreenContent, joined.animationConfig)
+
+	local v6 = React.useMemo(function()
 		return React.createElement(DetailsPageHeader, {
-			thumbnailImageUrl = t3.thumbnailImageUrl,
-			thumbnailAspectRatio = t3.thumbnailAspectRatio,
-			thumbnailHeight = v37,
-			titleText = t3.titleText,
-			subTitleText = t3.subTitleText,
-			actionBarLabelText = t3.actionBarLabelText,
-			renderActionBarLabelImpressionsDetector = t3.renderActionBarLabelImpressionsDetector,
-			scrollViewPositionChangedSignal = v40,
-			renderInfoContent = t3.renderInfoContent,
-			actionBarProps = t3.actionBarProps,
-			sideMargin = v39,
-			headerBarBackgroundHeight = v38,
-			deviceType = t3.deviceType,
-			thumbnailShadowHeight = u29.thumbnailShadowHeight,
-			gradientHeight = u29.headerGradientHeight,
-			actionBarHeight = u29.actionBarHeight,
-			actionBarWidth = if not FFlagLuaAppDemoModePlayButton then u29.actionBarWidth else t3.actionBarWidth or u29.actionBarWidth,
-			itemPadding = u29.thumbnailMargin,
-			bottomMargin = u29.headerBottomMargin
+			thumbnailImageUrl = props.thumbnailImageUrl,
+			thumbnailAspectRatio = props.thumbnailAspectRatio,
+			thumbnailHeight = thumbnailHeight,
+			titleText = props.titleText,
+			subTitleText = props.subTitleText,
+			actionBarLabelText = props.actionBarLabelText,
+			renderActionBarLabelImpressionsDetector = props.renderActionBarLabelImpressionsDetector,
+			scrollViewPositionChangedSignal = scrollViewPositionChangedSignal,
+			renderInfoContent = props.renderInfoContent,
+			actionBarProps = props.actionBarProps,
+			sideMargin = sideMargin,
+			headerBarBackgroundHeight = headerBarBackgroundHeight,
+			deviceType = props.deviceType,
+			thumbnailShadowHeight = joined.thumbnailShadowHeight,
+			gradientHeight = joined.headerGradientHeight,
+			actionBarHeight = joined.actionBarHeight,
+			actionBarWidth = props.actionBarWidth or joined.actionBarWidth,
+			itemPadding = joined.thumbnailMargin,
+			bottomMargin = joined.headerBottomMargin
 		})
 	end, {
-		t3.thumbnailImageUrl,
-		t3.thumbnailAspectRatio,
-		v37,
-		t3.titleText,
-		t3.subTitleText,
-		t3.actionBarLabelText,
-		t3.renderInfoContent,
-		t3.actionBarProps,
-		v39,
-		v38,
-		t3.deviceType,
-		u29.thumbnailShadowHeight,
-		u29.headerGradientHeight,
-		u29.thumbnailMargin,
-		u29.headerBottomMargin,
-		u29.actionBarHeight,
-		u29.actionBarWidth,
-		if not FFlagLuaAppDemoModePlayButton then nil else t3.actionBarWidth,
-		t3.renderActionBarLabelImpressionsDetector,
-		v40
+		props.thumbnailImageUrl,
+		props.thumbnailAspectRatio,
+		thumbnailHeight,
+		props.titleText,
+		props.subTitleText,
+		props.actionBarLabelText,
+		props.renderInfoContent,
+		props.actionBarProps,
+		sideMargin,
+		headerBarBackgroundHeight,
+		props.deviceType,
+		joined.thumbnailShadowHeight,
+		joined.headerGradientHeight,
+		joined.thumbnailMargin,
+		joined.headerBottomMargin,
+		joined.actionBarHeight,
+		joined.actionBarWidth,
+		props.actionBarWidth,
+		props.renderActionBarLabelImpressionsDetector,
+		scrollViewPositionChangedSignal
 	})
-	local v46 = useDetailsPageRenderItems(t3.componentList, v45, v34, u29.safeAreaSize)
-	local v47 = React.useCallback(function(p2) -- line: 262
-		-- upvalues: React (copy), DetailsPageRenderItem (copy), u29 (ref)
+
+	local v7 = useDetailsPageRenderItems(props.componentList, v6, state2, joined.safeAreaSize)
+
+	local renderItem = React.useCallback(function(p)
 		return React.createElement(DetailsPageRenderItem, {
-			item = p2.item,
-			itemPadding = u29.itemPadding,
-			safeArea = u29.safeAreaSize
+			item = p.item,
+			itemPadding = joined.itemPadding,
+			safeArea = joined.safeAreaSize
 		})
-	end, {
-		u29.itemPadding,
-		u29.safeAreaSize
-	})
-	local v48 = React.useCallback(function() -- line: 270
-		-- upvalues: React (copy), u29 (ref)
+	end, { joined.itemPadding, joined.safeAreaSize })
+
+	local itemSeparatorComponent = React.useCallback(function()
 		return React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, joined.itemPadding),
 			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, u29.itemPadding)
+			BorderSizePixel = 0
 		})
-	end, { u29.itemPadding })
-	local v49 = React.useCallback(function(p3) -- line: 279
-		-- upvalues: v40 (copy), v46 (copy), v31 (copy)
-		v40:fire()
+	end, { joined.itemPadding })
 
-		if v46[p3].showCornerGradient == false then
-			v31(false)
+	local onSelectedIndexChanged = React.useCallback(function(p)
+		scrollViewPositionChangedSignal:fire()
 
-			return
+		if v7[p].showCornerGradient == false then
+			setState(false)
+		else
+			setState(true)
 		end
+	end, { v7, scrollViewPositionChangedSignal })
 
-		v31(true)
-	end, {
-		v46,
-		v40
-	})
-	local v50 = if not v23 then if not FFlagExtendScrollingFramesBySafeInsets then nil else useSignalState(Display.GetDisplayStore().getDeviceSafePadding) else if not FFlagEnableLeftNavOnConsole and not FFlagExtendScrollingFramesBySafeInsets then nil else useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
+	local v8 = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
 
-	return React.createElement(not FFlagEnableLeftNavOnConsole and "Frame" or FullscreenFrame, {
-		[React.Change.AbsoluteSize] = v36,
-		Size = if not FFlagEnableLeftNavOnConsole then UDim2.fromScale(1, 1) else nil,
-		BackgroundTransparency = 1,
-		ref = v33
-	}, {
-		BackgroundImage = React.createElement("Frame", {
-			ZIndex = 1,
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1)
-		}, {
-			BackgroundImage = if not FFlagLuaAppEdpConsoleMediaGalleryVideo then React.createElement(LoadableImage, {
+	local createElement = React.createElement
+	local v9 = { [React.Change.AbsoluteSize] = v3, BackgroundTransparency = 1, ref = ref }
+
+	local createElement2 = React.createElement
+	local v10 = { ZIndex = 1, Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }
+	local backgroundImage
+
+	if not FFlagLuaAppEdpConsoleMediaGalleryVideo then
+		backgroundImage = React.createElement(LoadableImage, {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.new(1, 0, 1, 0),
+			Image = props.bannerImageUrl,
+			ScaleType = Enum.ScaleType.Crop
+		})
+	end
+
+	local backgroundContent
+
+	if FFlagLuaAppEdpConsoleMediaGalleryVideo then
+		if props.backgroundContentOverride then
+			backgroundContent = props.backgroundContentOverride
+		else
+			backgroundContent = React.createElement(LoadableImage, {
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
 				Size = UDim2.new(1, 0, 1, 0),
-				Image = t3.bannerImageUrl,
+				Image = props.bannerImageUrl,
 				ScaleType = Enum.ScaleType.Crop
-			}) else nil,
-			BackgroundContent = if not FFlagLuaAppEdpConsoleMediaGalleryVideo then nil else if not t3.backgroundContentOverride then React.createElement(LoadableImage, {
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Size = UDim2.new(1, 0, 1, 0),
-				Image = t3.bannerImageUrl,
-				ScaleType = Enum.ScaleType.Crop
-			}) else t3.backgroundContentOverride
+			})
+		end
+	end
+
+	local children = {
+		BackgroundImage = createElement2("Frame", v10, {
+			BackgroundImage = backgroundImage,
+			BackgroundContent = backgroundContent
 		}),
 		Overlay = React.createElement(Overlay, {
 			ZIndex = 2,
-			gradientDirection = "topRight",
-			showGradient = v30
+			showGradient = state,
+			gradientDirection = "topRight"
 		}),
 		Content = React.createElement(AnimatedFlatList, {
+			onSelectedIndexChanged = onSelectedIndexChanged,
 			animated = true,
-			UNSTABLE_forceSiblingLayoutUpdate = true,
-			onSelectedIndexChanged = v49,
-			initialNumToRender = #v46,
-			data = v46,
-			renderItem = v47,
-			ItemSeparatorComponent = v48,
+			initialNumToRender = #v7,
+			data = v7,
+			renderItem = renderItem,
+			ItemSeparatorComponent = itemSeparatorComponent,
 			ListFooterComponent = React.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, joined.trailingWhitespace),
 				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, u29.trailingWhitespace)
+				BorderSizePixel = 0
 			}),
 			ListHeaderComponent = React.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, joined.safeAreaSize.Y),
 				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, u29.safeAreaSize.Y)
+				BorderSizePixel = 0
 			}),
-			viewOffset = u29.safeAreaSize.Y,
-			contentContainerStyle = {
-				BackgroundTransparency = 1
-			},
+			viewOffset = joined.safeAreaSize.Y,
+			contentContainerStyle = { BackgroundTransparency = 1 },
 			style = {
+				Position = UDim2.fromOffset(0, -v8.top),
+				Size = UDim2.new(1, 0, 1, v8.top + v8.bottom),
 				BackgroundTransparency = 1,
 				ScrollBarThickness = 0,
 				ScrollingEnabled = true,
 				Selectable = false,
-				ZIndex = 3,
-				Position = if not FFlagEnableLeftNavOnConsole then nil else UDim2.fromOffset(0, -v50.top),
-				Size = if not FFlagExtendScrollingFramesBySafeInsets and not FFlagEnableLeftNavOnConsole then nil else UDim2.new(1, 0, 1, v50.top + v50.bottom),
-				VerticalScrollBarInset = Enum.ScrollBarInset.None
+				VerticalScrollBarInset = Enum.ScrollBarInset.None,
+				ZIndex = 3
 			},
-			animationConfig = u29.animationConfig,
-			overrideAutomaticCanvasSize = not FFlagEnableLeftNavOnConsole,
-			isSequentiallySelectable = not not v20 or nil
+			animationConfig = joined.animationConfig,
+			UNSTABLE_forceSiblingLayoutUpdate = true,
+			overrideAutomaticCanvasSize = false,
+			isSequentiallySelectable = true
 		}),
-		Fullscreen = React.createElement("CanvasGroup", {
-			BorderSizePixel = 0,
-			ZIndex = 4,
-			Size = UDim2.fromScale(1, 1),
-			GroupTransparency = v44
-		}, {
-			FullscreenContent = if not v43 then nil else renderFullscreenContent()
-		})
+		Fullscreen = 0
+	}
+
+	local createElement3 = React.createElement
+	local v11 = {
+		Size = UDim2.fromScale(1, 1),
+		GroupTransparency = groupTransparency,
+		BorderSizePixel = 0,
+		ZIndex = 4
+	}
+	local fullscreenContent
+
+	if v5 then
+		fullscreenContent = renderFullscreenContent()
+	end
+
+	children.Fullscreen = createElement3("CanvasGroup", v11, {
+		FullscreenContent = fullscreenContent
 	})
+	return createElement(FullscreenFrame, v9, children)
 end
 
 return DetailsPageTenfootTemplate

@@ -1,15 +1,13 @@
 local Players = game:GetService("Players")
 
-local function sendMediaGalleryFullscreenEvent(t1: {[any]: any}, s1: string, s2: string, s3: string?, s4: string?, n1: number?, b1: boolean?) -- line: 7
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
-
-	t1:setRBXEventStream(s1, s2, {
-		uid = not LocalPlayer and "" or tostring(LocalPlayer.UserId),
-		placeId = s3,
-		universeId = s4,
-		selectedIndex = n1,
-		isVideo = b1
+local function sendMediaGalleryFullscreenEvent(object, p: string, p2: string, placeId: string?, universeId: string?, selectedIndex: number?, isVideo: boolean?)
+	local localPlayer = Players.LocalPlayer
+	object:setRBXEventStream(p, p2, {
+		uid = not localPlayer and "" or tostring(localPlayer.UserId),
+		placeId = placeId,
+		universeId = universeId,
+		selectedIndex = selectedIndex,
+		isVideo = isVideo
 	})
 end
 

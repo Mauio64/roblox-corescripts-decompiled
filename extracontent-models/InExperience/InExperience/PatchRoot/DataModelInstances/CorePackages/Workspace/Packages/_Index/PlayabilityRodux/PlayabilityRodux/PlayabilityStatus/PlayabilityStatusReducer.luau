@@ -1,15 +1,16 @@
 local PlayabilityRodux = script:FindFirstAncestor("PlayabilityRodux")
-local PlayabilityRoduxParent = PlayabilityRodux.Parent
-local Immutable = require(PlayabilityRoduxParent.AppCommonLib).Immutable
+local parent = PlayabilityRodux.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
 local SetPlayabilityStatus = require(PlayabilityRodux.PlayabilityStatus.SetPlayabilityStatus)
 
-return function(p1, p2) -- line: 7
-	-- upvalues: SetPlayabilityStatus (copy), Immutable (copy)
-	local v7 = p1 or {}
+return function(options, p)
+	local v = options or {}
 
-	if p2.type == SetPlayabilityStatus.name then
-		v7 = Immutable.JoinDictionaries(v7, p2.playabilityStatus)
+	if p.type == SetPlayabilityStatus.name then
+		return (Immutable.JoinDictionaries(v, p.playabilityStatus))
 	end
 
-	return v7
+	return v
 end

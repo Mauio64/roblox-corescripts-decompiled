@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("VoiceChat").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("VoiceChat").Parent
+local Http = require(parent.Http)
+local Url = Http.Url
 
-return function(p1) -- line: 10
-	-- upvalues: Url (copy)
-	return p1(string.format("%s/v1/settings/", Url.VOICE_URL), "GET")
+return function(callback)
+	return callback(string.format("%s/v1/settings/", Url.VOICE_URL), "GET")
 end

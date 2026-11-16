@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.ExternalContentSharingProtocol.ExternalContentSharingProtocol))
+local ExternalContentSharingProtocol = require(Workspace.ExternalContentSharingProtocol.ExternalContentSharingProtocol)
+
+return ExternalContentSharingProtocol

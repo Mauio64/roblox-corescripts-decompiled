@@ -1,153 +1,144 @@
-local Parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
-local TimeToInteractiveTracker = require(Parent.TimeToInteractiveTracker).TimeToInteractiveTracker
-local IntervalPerformanceTracker = require(Parent.IntervalPerformanceTracker).IntervalPerformanceTracker
-local t1 = {
-	"duration",
-	"averageFPS",
-	"longestFrameTime"
-}
-local v5 = game:DefineFastFlag("TextChannelWindowPerfTrackingEnabled", false)
-local u6 = nil
-local t2 = {}
-local t3 = {}
-local t4 = {}
+local parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
 
-local function isEnabled() -- line: 31
-	-- upvalues: u6 (ref), v5 (copy)
-	if u6 ~= nil then
-		return u6
-	end
+local TimeToInteractiveTracker = require(parent.TimeToInteractiveTracker)
+local v = TimeToInteractiveTracker.TimeToInteractiveTracker
+local IntervalPerformanceTracker = require(parent.IntervalPerformanceTracker)
+local v2 = IntervalPerformanceTracker.IntervalPerformanceTracker
 
-	return v5
+local v3 = { "duration", "averageFPS", "longestFrameTime" }
+
+local defineFastFlag = game:DefineFastFlag("TextChannelWindowPerfTrackingEnabled", false)
+local v4 = nil
+
+local v5 = {}
+local v6 = {}
+
+local function isEnabled() -- 6 equivalent calls inferred from this helper
+	return if v4 == nil then defineFastFlag else v4
 end
 
-function t4.withTrackers(p1, p2) -- line: 39
-	-- upvalues: TimeToInteractiveTracker (ref), IntervalPerformanceTracker (ref)
-	TimeToInteractiveTracker = p1
-	IntervalPerformanceTracker = p2
+local TextChannelWindowPerfTracker = {}
+
+function TextChannelWindowPerfTracker.withTrackers(p, p2)
+	v = p
+	v2 = p2
 end
-function t4._setEnabledForTesting(b1: boolean?) -- line: 44
-	-- upvalues: u6 (ref)
-	u6 = b1
+
+function TextChannelWindowPerfTracker._setEnabledForTesting(flag: boolean?)
+	v4 = flag
 end
-function t4.startMountTTI(s1: string) -- line: 50
-	-- upvalues: u6 (ref), v5 (copy), TimeToInteractiveTracker (ref)
-	if not if u6 == nil then v5 else u6 then
+
+function TextChannelWindowPerfTracker.startMountTTI(p: string)
+	if not isEnabled() then -- inferred equivalent call
 		return
 	end
 
-	TimeToInteractiveTracker.trackStart("TextChannelWindow_MountTTI_" .. s1)
+	v.trackStart("TextChannelWindow_MountTTI_" .. p)
 end
-function t4.finishMountTTI(s2: string) -- line: 57
-	-- upvalues: u6 (ref), v5 (copy), TimeToInteractiveTracker (ref)
-	if not if u6 == nil then v5 else u6 then
+
+function TextChannelWindowPerfTracker.finishMountTTI(p: string)
+	if not isEnabled() then -- inferred equivalent call
 		return
 	end
 
-	TimeToInteractiveTracker.trackEnd("TextChannelWindow_MountTTI_" .. s2)
+	v.trackEnd("TextChannelWindow_MountTTI_" .. p)
 end
 
-local function sendIntervalName(s3: string) -- line: 64
-	return "TextChannelWindow_MessageSendToRenderInterval_" .. s3
-end
-local function receiveIntervalName(s4: string) -- line: 68
-	return "TextChannelWindow_MessageReceiveToRenderInterval_" .. s4
+local function sendIntervalName(p: string) -- 4 equivalent calls inferred from this helper
+	return "TextChannelWindow_MessageSendToRenderInterval_" .. p
 end
 
-function t4.startSendInterval(s5: string, s6: string) -- line: 72
-	-- upvalues: u6 (ref), v5 (copy), t2 (ref), IntervalPerformanceTracker (ref), t1 (copy)
-	if not if u6 == nil then v5 else u6 then
+local function receiveIntervalName(p: string) -- 4 equivalent calls inferred from this helper
+	return "TextChannelWindow_MessageReceiveToRenderInterval_" .. p
+end
+
+function TextChannelWindowPerfTracker.startSendInterval(id: string, p: string)
+	if not isEnabled() then -- inferred equivalent call
 		return
 	end
 
-	local v22 = t2[s6]
-	local v23 = v22 == nil and 0 or (v22.timestamp or 0)
+	local v7 = v5[p]
+	local v8 = v7 == nil and 0 or v7.timestamp or 0
 
-	if v22 ~= nil and v22.id ~= nil and v23 + 5 > os.clock() then
+	if v7 ~= nil and v7.id ~= nil and v8 + 5 > os.clock() then
 		return
 	end
 
-	t2[s6] = {
-		id = s5,
-		timestamp = os.clock()
-	}
-
-	local v24 = "TextChannelWindow_MessageSendToRenderInterval_" .. s6
-
-	IntervalPerformanceTracker:cancelTracking(v24)
-	IntervalPerformanceTracker:startTracking(v24, nil, t1, true, true)
+	v5[p] = { id = id, timestamp = os.clock() }
+	local v9 = sendIntervalName(p) -- inferred equivalent call
+	v2:cancelTracking(v9)
+	v2:startTracking(v9, nil, v3, true, true)
 end
-function t4.startReceiveInterval(s7: string, s8: string) -- line: 87
-	-- upvalues: u6 (ref), v5 (copy), t3 (ref), IntervalPerformanceTracker (ref), t1 (copy)
-	if not if u6 == nil then v5 else u6 then
+
+function TextChannelWindowPerfTracker.startReceiveInterval(id: string, p: string)
+	if not isEnabled() then -- inferred equivalent call
 		return
 	end
 
-	local v27 = t3[s8]
-	local v28 = v27 == nil and 0 or (v27.timestamp or 0)
+	local v7 = v6[p]
+	local v8 = v7 == nil and 0 or v7.timestamp or 0
 
-	if v27 ~= nil and v27.id ~= nil and v28 + 5 > os.clock() then
+	if v7 ~= nil and v7.id ~= nil and v8 + 5 > os.clock() then
 		return
 	end
 
-	t3[s8] = {
-		id = s7,
-		timestamp = os.clock()
-	}
-
-	local v29 = "TextChannelWindow_MessageReceiveToRenderInterval_" .. s8
-
-	IntervalPerformanceTracker:cancelTracking(v29)
-	IntervalPerformanceTracker:startTracking(v29, nil, t1, true, true)
+	v6[p] = { id = id, timestamp = os.clock() }
+	local v9 = receiveIntervalName(p) -- inferred equivalent call
+	v2:cancelTracking(v9)
+	v2:startTracking(v9, nil, v3, true, true)
 end
-function t4.finishMessageIntervals(s9: string) -- line: 104
-	-- upvalues: u6 (ref), v5 (copy), t2 (ref), IntervalPerformanceTracker (ref), t3 (ref)
-	if not if u6 == nil then v5 else u6 then
+
+function TextChannelWindowPerfTracker.finishMessageIntervals(p: string)
+	if not isEnabled() then -- inferred equivalent call
 		return
 	end
 
-	for v31, v32 in t2 do
-		if s9 == v32.id then
-			t2[v31] = {}
-			IntervalPerformanceTracker:stopAndLogTracking("TextChannelWindow_MessageSendToRenderInterval_" .. v31)
+	for k, v7 in v5 do
+		if v7.id ~= p then
+			continue
 		end
+
+		v5[k] = {}
+		v2:stopAndLogTracking(sendIntervalName(k)) -- inferred equivalent call
 	end
 
-	for v33, v34 in t3 do
-		if s9 == v34.id then
-			t3[v33] = {}
-			IntervalPerformanceTracker:stopAndLogTracking("TextChannelWindow_MessageReceiveToRenderInterval_" .. v33)
+	for k, v7 in v6 do
+		if v7.id ~= p then
+			continue
 		end
+
+		v6[k] = {}
+		v2:stopAndLogTracking(receiveIntervalName(k)) -- inferred equivalent call
 	end
 end
-function t4.cancelForChannel(s10: string) -- line: 123
-	-- upvalues: u6 (ref), v5 (copy), t2 (ref), IntervalPerformanceTracker (ref), t3 (ref)
-	if not if u6 == nil then v5 else u6 then
+
+function TextChannelWindowPerfTracker.cancelForChannel(p: string)
+	if not isEnabled() then -- inferred equivalent call
 		return
 	end
 
-	if t2[s10] then
-		t2[s10] = {}
-		IntervalPerformanceTracker:cancelTracking("TextChannelWindow_MessageSendToRenderInterval_" .. s10)
+	if v5[p] then
+		v5[p] = {}
+		v2:cancelTracking(sendIntervalName(p)) -- inferred equivalent call
 	end
 
-	if t3[s10] then
-		t3[s10] = {}
-		IntervalPerformanceTracker:cancelTracking("TextChannelWindow_MessageReceiveToRenderInterval_" .. s10)
+	if v6[p] then
+		v6[p] = {}
+		v2:cancelTracking(receiveIntervalName(p)) -- inferred equivalent call
 	end
 end
-function t4.cancelAll() -- line: 138
-	-- upvalues: t2 (ref), IntervalPerformanceTracker (ref), t3 (ref)
-	for v36 in t2 do
-		IntervalPerformanceTracker:cancelTracking("TextChannelWindow_MessageSendToRenderInterval_" .. v36)
+
+function TextChannelWindowPerfTracker.cancelAll()
+	for k in v5 do
+		v2:cancelTracking(sendIntervalName(k)) -- inferred equivalent call
 	end
 
-	for v37 in t3 do
-		IntervalPerformanceTracker:cancelTracking("TextChannelWindow_MessageReceiveToRenderInterval_" .. v37)
+	for k in v6 do
+		v2:cancelTracking(receiveIntervalName(k)) -- inferred equivalent call
 	end
 
-	t2 = {}
-	t3 = {}
+	v5 = {}
+	v6 = {}
 end
 
-return t4
+return TextChannelWindowPerfTracker

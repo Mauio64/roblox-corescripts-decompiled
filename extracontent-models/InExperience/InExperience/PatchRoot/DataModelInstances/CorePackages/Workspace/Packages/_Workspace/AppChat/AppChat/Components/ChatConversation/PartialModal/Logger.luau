@@ -1,8 +1,7 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local v2 = require(AppChat.Logger):new(script:GetFullName() .. ":ChatConversationPartialModal")
+local Logger = require(AppChat.Logger)
 
-v2:setContext({
-	screen = "ChatConversationPartialModal"
-})
+local v = Logger:new(script:GetFullName() .. ":ChatConversationPartialModal")
+v:setContext({ screen = "ChatConversationPartialModal" })
 
-return v2
+return v

@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("CallProtocol").Parent
+local parent = script:FindFirstAncestor("CallProtocol").Parent
 
-return require(Parent.enumerate)(script.Name, {
+local enumerate = require(parent.enumerate)
+
+return enumerate(script.Name, {
 	Idle = "Idle",
 	Ringing = "Ringing",
 	Accepting = "Accepting",

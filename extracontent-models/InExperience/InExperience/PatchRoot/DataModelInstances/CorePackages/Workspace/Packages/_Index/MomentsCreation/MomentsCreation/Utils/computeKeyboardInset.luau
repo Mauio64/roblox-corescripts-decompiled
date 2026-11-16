@@ -1,9 +1,9 @@
-local function computeKeyboardInset(b1: boolean, b2: boolean, n1: number, n2: number, n3: number) -- line: 20
-	if not b1 or not b2 then
-		return 0
+local function computeKeyboardInset(flag: boolean, flag2: boolean, p: number, p2: number, max: number)
+	if flag and flag2 then
+		return (math.clamp(p2 - p, 0, max))
 	end
 
-	return (math.clamp(n2 - n1, 0, n3))
+	return 0
 end
 
 return computeKeyboardInset

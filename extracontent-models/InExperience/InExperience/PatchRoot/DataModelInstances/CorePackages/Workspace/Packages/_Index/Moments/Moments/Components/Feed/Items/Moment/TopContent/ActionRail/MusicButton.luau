@@ -1,23 +1,25 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local Foundation = require(MomentsParent.Foundation)
-local MomentsCommon = require(MomentsParent.MomentsCommon)
+local parent = Moments.Parent
 
-require(MomentsParent.MomentsTypes)
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.MomentsTypes)
+local React = require(parent.React)
 
-local React = require(MomentsParent.React)
 local View = Foundation.View
+
 local MusicThumbnailIcon = MomentsCommon.Components.MusicThumbnailIcon
 local MusicThumbnailIconSize = MomentsCommon.Enums.MusicThumbnailIconSize
+
 local useMusicInfo = require(Moments.Hooks.useMusicInfo)
 local MusicModal = require(Moments.Components.MusicModal)
+local FFlagMomentsActionRailSpacing = require(Moments.Flags.FFlagMomentsActionRailSpacing)
 
-local function MusicButton(t1: {[any]: any}) -- line: 26
-	-- upvalues: React (copy), useMusicInfo (copy), View (copy), MusicThumbnailIcon (copy), MusicThumbnailIconSize (copy), MusicModal (copy)
-	local moment = t1.moment
-	local v14, v15 = React.useState(false)
-	local v16 = React.useMemo(function() -- line: 30
-		-- upvalues: moment (copy)
+local function MusicButton(props)
+	local moment = props.moment
+	local state, setState = React.useState(false)
+
+	local musicInfo = useMusicInfo((React.useMemo(function()
 		if moment == nil then
 			return nil
 		end
@@ -30,50 +32,52 @@ local function MusicButton(t1: {[any]: any}) -- line: 26
 
 		local music = edits.music
 
-		if music == nil then
-			return nil
-		end
+		return if music ~= nil then music.assetId else nil
+	end, { moment })))
 
-		return music.assetId
-	end, { moment })
-	local v17 = useMusicInfo(v16)
-	local v18 = React.useCallback(function() -- line: 47
-		-- upvalues: v15 (copy)
-		v15(true)
-	end, {})
-	local v19 = React.useCallback(function() -- line: 51
-		-- upvalues: v15 (copy)
-		v15(false)
+	local onActivated = React.useCallback(function()
+		setState(true)
 	end, {})
 
-	if v17 == nil then
+	local onClose = React.useCallback(function()
+		setState(false)
+	end, {})
+
+	if musicInfo == nil then
 		return nil
 	end
 
-	return React.createElement(React.Fragment, nil, {
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v = {
 		Button = React.createElement("CanvasGroup", {
 			BackgroundTransparency = 1,
-			GroupTransparency = t1.animationRatio,
-			LayoutOrder = t1.LayoutOrder,
+			GroupTransparency = props.animationRatio,
+			LayoutOrder = props.LayoutOrder,
 			Size = UDim2.fromOffset(0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY
 		}, {
 			Inner = React.createElement(View, {
-				tag = "align-x-center align-y-center size-1200-1200 radius-medium",
-				isDisabled = t1.isDisabled,
-				onActivated = v18
+				isDisabled = props.isDisabled,
+				onActivated = onActivated,
+				tag = FFlagMomentsActionRailSpacing and "align-x-center align-y-center size-1000-1000 radius-medium" or "align-x-center align-y-center size-1200-1200 radius-medium"
 			}, {
 				MusicThumbnail = React.createElement(MusicThumbnailIcon, {
-					assetId = v17.AssetId,
+					assetId = musicInfo.AssetId,
 					size = MusicThumbnailIconSize.Small
 				})
 			})
 		}),
-		Modal = if not v14 then nil else React.createElement(MusicModal, {
-			musicInfo = v17,
-			onClose = v19
-		})
-	})
+		Modal = 0
+	}
+	local modal
+
+	if state then
+		modal = React.createElement(MusicModal, { musicInfo = musicInfo, onClose = onClose })
+	end
+
+	v.Modal = modal
+	return createElement(fragment, nil, v)
 end
 
 return React.memo(MusicButton)

@@ -1,77 +1,71 @@
 local TextChatService = game:GetService("TextChatService")
+
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Foundation = require(ExpChatParent.Foundation)
-local UIBlox = require(ExpChatParent.UIBlox)
+local parent = ExpChat.Parent
+local Foundation = require(parent.Foundation)
+local UIBlox = require(parent.UIBlox)
+
 local Config = require(ExpChat.Config)
 local FStringExpChatSummaryPrefixText = require(ExpChat.Flags.FStringExpChatSummaryPrefixText)
 local FFlagExpChatPolishSummaryMessageUI = require(ExpChat.Flags.FFlagExpChatPolishSummaryMessageUI)
 
-local function ceilToEven(n1: number) -- line: 15
-	local v13 = math.ceil(n1)
+local function ceilToEven(p: number) -- 1 equivalent call inferred from this helper
+	local v = math.ceil(p)
 
-	if v13 % 2 == 1 then
-		v13 += 1
+	if v % 2 == 1 then
+		v += 1
 	end
 
-	return (math.max(0, v13))
+	return (math.max(0, v))
 end
-local function calculateSummaryTextSize(n2: number) -- line: 23
-	return (math.max(0, n2 - 2))
-end
-local function getSummaryTextSizeFromConfiguration() -- line: 27
-	-- upvalues: TextChatService (copy), Config (copy)
-	local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 
-	if ChatWindowConfiguration then
-		return (math.max(0, ChatWindowConfiguration.TextSize - 2))
+local function calculateSummaryTextSize(p: number) -- 4 equivalent calls inferred from this helper
+	return (math.max(0, p - 2))
+end
+
+local function getSummaryTextSizeFromConfiguration() -- 2 equivalent calls inferred from this helper
+	local chatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
+
+	if chatWindowConfiguration then
+		return calculateSummaryTextSize(chatWindowConfiguration.TextSize) -- inferred equivalent call
 	end
 
-	return (math.max(0, Config.ChatWindowTextSize - 2))
+	return calculateSummaryTextSize(Config.ChatWindowTextSize) -- inferred equivalent call
 end
 
-return {
-	getSummaryIconPrefix = function(n3: number?) -- line: 35
-		-- upvalues: FFlagExpChatPolishSummaryMessageUI (copy), TextChatService (copy), Config (copy), Foundation (copy), FStringExpChatSummaryPrefixText (copy)
-		if FFlagExpChatPolishSummaryMessageUI then
-			local v17
+local SummaryMessageRichText = {}
 
-			if n3 then
-				v17 = math.max(0, n3 - 2)
-			else
-				local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
-
-				v17 = if not ChatWindowConfiguration then math.max(0, Config.ChatWindowTextSize - 2) else math.max(0, ChatWindowConfiguration.TextSize - 2)
-			end
-
-			local v19 = math.ceil(v17 * 3 / 4)
-
-			if v19 % 2 == 1 then
-				v19 += 1
-			end
-
-			return `<font weight='600' size="{ math.max(0, v19) }" family='rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json'>{ Foundation.Enums.IconName.Nebula }</font>{ FStringExpChatSummaryPrefixText }`
-		end
-
-		return `<font weight='600' family='rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json'>{ Foundation.Enums.IconName.Nebula }</font>{ FStringExpChatSummaryPrefixText }`
-	end,
-	wrapInSummaryMutedStyle = function(s1: string, s2: string?, n4: number?) -- line: 46
-		-- upvalues: FFlagExpChatPolishSummaryMessageUI (copy), UIBlox (copy), TextChatService (copy), Config (copy)
-		if FFlagExpChatPolishSummaryMessageUI then
-			local v23 = UIBlox.App.Style.Colors.LightGrey:ToHex()
-			local v24
-
-			if n4 then
-				v24 = math.max(0, n4 - 2)
-			else
-				local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
-
-				v24 = if not ChatWindowConfiguration then math.max(0, Config.ChatWindowTextSize - 2) else math.max(0, ChatWindowConfiguration.TextSize - 2)
-			end
-
-			return `<font color='#{ v23 }' weight='600' size="{ v24 }">{ s1 }</font>`
-		end
-
-		return `<font color='#{ s2 or "BCBEC8" }' size="{ Config.ChatWindowTextSize - 2 }">{ s1 }</font>`
+function SummaryMessageRichText.getSummaryIconPrefix(p: number?)
+	if not FFlagExpChatPolishSummaryMessageUI then
+		return `<font weight='600' family='rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json'>{Foundation.Enums.IconName.Nebula}</font>{FStringExpChatSummaryPrefixText}`
 	end
-}
+
+	local v
+
+	if p then
+		v = calculateSummaryTextSize(p) -- inferred equivalent call
+	else
+		v = getSummaryTextSizeFromConfiguration() -- inferred equivalent call
+	end
+
+	return `<font weight='600' size="{ceilToEven(v * 3 / 4)}" family='rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json'>{Foundation.Enums.IconName.Nebula}</font>{FStringExpChatSummaryPrefixText}` -- inferred equivalent call
+end
+
+function SummaryMessageRichText.wrapInSummaryMutedStyle(p: string, value: string?, p2: number?)
+	if not FFlagExpChatPolishSummaryMessageUI then
+		return `<font color='#{value or "BCBEC8"}' size="{Config.ChatWindowTextSize - 2}">{p}</font>`
+	end
+
+	local hex = UIBlox.App.Style.Colors.LightGrey:ToHex()
+	local v
+
+	if p2 then
+		v = calculateSummaryTextSize(p2) -- inferred equivalent call
+	else
+		v = getSummaryTextSizeFromConfiguration() -- inferred equivalent call
+	end
+
+	return `<font color='#{hex}' weight='600' size="{v}">{p}</font>`
+end
+
+return SummaryMessageRichText

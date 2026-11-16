@@ -1,35 +1,49 @@
-local Parent = script:FindFirstAncestor("ErrorReporters").Parent
-local Cryo = require(Parent.Cryo)
-local t = require(Parent.t)
+local parent = script:FindFirstAncestor("ErrorReporters").Parent
+local Cryo = require(parent.Cryo)
+local t = require(parent.t)
+require(parent.SentrySdk)
 local ProcessErrorStack = require(script.Parent.Parent.ProcessErrorStack)
 local Constants = require(script.Parent.Constants)
-local v6 = t.optional(t.map(t.string, t.some(t.string, t.number, t.boolean)))
-local v7 = t.optional(t.map(t.string, function(p1) -- line: 53
-	-- upvalues: t (copy)
-	local function checkTypeRecursive(p2) -- line: 54
-		-- upvalues: checkTypeRecursive (copy), t (copy)
-		if type(p2) == "table" then
-			for k, v in pairs(p2) do
-				local v52, v53 = checkTypeRecursive(v)
 
-				if not v52 then
-					return false, string.format("error when checking key: %s - %s", k, v53 or "unknown error")
-				end
-			end
+local optional = t.optional(t.map(t.string, t.some(t.string, t.number, t.boolean)))
 
-			return true, nil
+local optional2 = t.optional(t.map(t.string, function(p)
+	local function checkTypeRecursive(items)
+		if type(items) ~= "table" then
+			return t.some(t.string, t.number, t.boolean)(items), nil
 		end
 
-		return t.some(t.string, t.number, t.boolean)(p2), nil
+		for k, item in pairs(items) do
+			local v, v2 = checkTypeRecursive(item)
+
+			if not v then
+				return false, string.format("error when checking key: %s - %s", k, v2 or "unknown error")
+			end
+		end
+
+		return true, nil
 	end
 
-	local v17, v18 = checkTypeRecursive(p1)
-
-	return v17, v18
+	local v, v2 = checkTypeRecursive(p)
+	return v, v2
 end))
-local v8 = t.map(t.string, t.some(t.string, t.number, t.boolean))
-local v9 = t.optional(t.map(t.string, v8))
-local v10 = t.strictInterface({
+
+local mapped = t.map(t.string, t.some(t.string, t.number, t.boolean))
+local optional3 = t.optional(t.map(t.string, mapped))
+
+local interface = t.interface({
+	type = t.optional(t.string),
+	category = t.optional(t.string),
+	message = t.optional(t.string),
+	data = t.optional(t.table),
+	level = t.optional(t.string),
+	timestamp = t.optional(t.number),
+	origin = t.optional(t.string)
+})
+
+local optional4 = t.optional(t.array(interface))
+
+local strictInterface = t.strictInterface({
 	guessed_frame = t.optional(t.boolean),
 	funcName = t.optional(t.string),
 	address = t.optional(t.string),
@@ -41,158 +55,186 @@ local v10 = t.strictInterface({
 	faulted = t.optional(t.boolean),
 	registers = t.optional(t.map(t.string, t.some(t.string, t.number)))
 })
-local v11 = t.strictInterface({
+
+local strictInterface2 = t.strictInterface({
 	name = t.optional(t.string),
 	fault = t.optional(t.boolean),
-	stack = t.optional(t.array(v10))
+	stack = t.optional(t.array(strictInterface))
 })
-local v12 = t.intersection(t.strictInterface({
-	threads = t.map(t.string, v11),
+
+local intersection = t.intersection(t.strictInterface({
+	threads = t.map(t.string, strictInterface2),
 	message = t.optional(t.string),
 	level = t.optional(t.string),
-	attributes = v6,
-	annotations = v7,
-	customMetadata = v9
+	attributes = optional,
+	annotations = optional2,
+	tags = t.optional(t.map(t.string, t.string)),
+	customMetadata = optional3,
+	breadcrumbs = optional4,
+	timestamp = t.optional(t.number)
 }))
-local t1 = {
-	IAttributes = v6,
-	IAnnotations = v7,
-	ICustomMetadata = v9
+
+local ErrorReport = {
+	IAttributes = optional,
+	IAnnotations = optional2,
+	ICustomMetadata = optional3,
+	IBreadcrumbs = optional4
 }
 
-t1.__index = t1
+ErrorReport.__index = ErrorReport
 
-function t1.validate(p3) -- line: 144
-	-- upvalues: v12 (copy)
-	return v12(p3)
+function ErrorReport.validate(p)
+	return intersection(p)
 end
-function t1.new() -- line: 154
-	-- upvalues: t1 (copy)
-	local t2 = {
+
+function ErrorReport.new()
+	local v = {
 		threads = {},
 		attributes = {},
 		annotations = {},
-		customMetadata = {}
+		customMetadata = {},
+		breadcrumbs = {}
 	}
 
-	setmetatable(t2, t1)
+	setmetatable(v, ErrorReport)
 
-	return t2
+	return v
 end
-function t1.addAttributes(t3: {[any]: any}, t4: {[any]: any}) -- line: 172
-	-- upvalues: Cryo (copy)
-	if type(t4) ~= "table" then
-		warn("Cannot add attributes of type: ", (type(t4)))
 
+function ErrorReport:addAttributes(p)
+	if type(p) ~= "table" then
+		warn("Cannot add attributes of type: ", (type(p)))
 		return
 	end
 
-	local attributes = t3.attributes
+	local attributes = self.attributes
 
-	t3.attributes = Cryo.Dictionary.join(attributes, t4)
+	self.attributes = Cryo.Dictionary.join(attributes, p)
 end
-function t1.addAnnotations(t5: {[any]: any}, t6: {[any]: any}) -- line: 190
-	-- upvalues: Cryo (copy)
-	if type(t6) ~= "table" then
-		warn("Cannot add annotations of type: ", (type(t6)))
 
+function ErrorReport:addAnnotations(p)
+	if type(p) ~= "table" then
+		warn("Cannot add annotations of type: ", (type(p)))
 		return
 	end
 
-	local annotations = t5.annotations
+	local annotations = self.annotations
 
-	t5.annotations = Cryo.Dictionary.join(annotations, t6)
+	self.annotations = Cryo.Dictionary.join(annotations, p)
 end
 
-local function sanitizeCustomMetadataGroup(p4) -- line: 212
-	if type(p4) ~= "table" then
+local function sanitizeCustomMetadataGroup(item)
+	if type(item) ~= "table" then
 		return nil
 	end
 
-	local t7 = {}
+	local result = {}
 
-	for k, v in pairs(p4) do
-		local v31 = type(v)
+	for k, item2 in pairs(item) do
+		local typeName = type(item2)
 
-		if v31 == "string" or v31 == "number" or v31 == "boolean" then
-			t7[k] = v
+		if typeName == "string" or typeName == "number" or typeName == "boolean" then
+			result[k] = item2
 		end
 	end
 
-	if next(t7) == nil then
-		return nil
-	end
-
-	return t7
+	return if next(result) ~= nil then result else nil
 end
 
-function t1.addCustomMetadata(t8: {[any]: any}, t9: {[any]: any}) -- line: 244
-	-- upvalues: sanitizeCustomMetadataGroup (copy), Cryo (copy)
-	if type(t9) ~= "table" then
-		warn("Cannot add custom metadata of type: ", (type(t9)))
-
+function ErrorReport:addCustomMetadata(items)
+	if type(items) ~= "table" then
+		warn("Cannot add custom metadata of type: ", (type(items)))
 		return
 	end
 
-	local customMetadata = t8.customMetadata
+	local customMetadata = self.customMetadata
 
-	for k, v in pairs(t9) do
-		local v37 = sanitizeCustomMetadataGroup(v)
+	for k, item in pairs(items) do
+		local v = sanitizeCustomMetadataGroup(item)
 
-		if v37 ~= nil then
-			local v38 = customMetadata[k]
+		if v == nil then
+			continue
+		end
 
-			if v38 ~= nil then
-				customMetadata[k] = Cryo.Dictionary.join(v38, v37)
-			else
-				customMetadata[k] = v37
-			end
+		local v2 = customMetadata[k]
+
+		if v2 == nil then
+			customMetadata[k] = v
+		else
+			customMetadata[k] = Cryo.Dictionary.join(v2, v)
 		end
 	end
 
-	t8.customMetadata = customMetadata
+	self.customMetadata = customMetadata
 end
-function t1.fromMessageAndStack(s1: string, s2: string, p5) -- line: 275
-	-- upvalues: t1 (copy), Constants (copy), ProcessErrorStack (copy)
-	local v42 = t1.new()
 
-	v42.message = s1
-	v42.level = p5 or Constants.DEFAULT_ERROR_LEVEL
-
-	local v43, v44 = ProcessErrorStack(s2)
-
-	for _, v46 in v43 do
-		if v46.sourceCode and v44[v46.sourceCode] then
-			v46.sourceCode = v44[v46.sourceCode].path
-		end
+function ErrorReport:addBreadcrumb(data)
+	if type(data) ~= "table" then
+		warn("Cannot add breadcrumb of type: ", (type(data)))
+		return
 	end
 
-	v42.threads = {
-		main = {
-			name = "main",
-			stack = v43
-		}
+	local v = {
+		type = data.type or "default",
+		category = data.category,
+		message = data.message,
+		data = data.data,
+		level = data.level or "info",
+		origin = data.origin,
+		timestamp = data.timestamp or os.time()
 	}
 
-	return v42
+	table.insert(self.breadcrumbs, v)
 end
-function t1.fromDetails(t10: {[any]: any}) -- line: 307
-	-- upvalues: t1 (copy), Constants (copy)
-	local v48
 
-	if t10.stack then
-		v48 = t1.fromMessageAndStack(t10.message, t10.stack, t10.level)
+function ErrorReport:addBreadcrumbs(list)
+	if type(list) ~= "table" then
+		warn("Cannot add breadcrumbs of type: ", (type(list)))
+		return
+	end
+
+	for _, item in ipairs(list) do
+		self:addBreadcrumb(item)
+	end
+end
+
+function ErrorReport.fromMessageAndStack(message: string, p: string, p2)
+	local v = ErrorReport.new()
+
+	v.message = message
+	v.level = p2 or Constants.DEFAULT_ERROR_LEVEL
+
+	local stack, v2 = ProcessErrorStack(p)
+
+	for _, v3 in stack do
+		if v3.sourceCode and v2[v3.sourceCode] then
+			v3.sourceCode = v2[v3.sourceCode].path
+		end
+	end
+
+	v.threads = {
+		main = { name = "main", stack = stack }
+	}
+
+	return v
+end
+
+function ErrorReport.fromDetails(data)
+	local v
+
+	if data.stack then
+		v = ErrorReport.fromMessageAndStack(data.message, data.stack, data.level)
 	else
-		v48 = t1.new()
-		v48.message = t10.message
-		v48.level = t10.level or Constants.DEFAULT_ERROR_LEVEL
+		v = ErrorReport.new()
+		v.message = data.message
+		v.level = data.level or Constants.DEFAULT_ERROR_LEVEL
 	end
 
-	if t10.annotations then
-		v48:addAnnotations(t10.annotations)
+	if data.annotations then
+		v:addAnnotations(data.annotations)
 	end
 
-	return v48
+	return v
 end
 
-return t1
+return ErrorReport

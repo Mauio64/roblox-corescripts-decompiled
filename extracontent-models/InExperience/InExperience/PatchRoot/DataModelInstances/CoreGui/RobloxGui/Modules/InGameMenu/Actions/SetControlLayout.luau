@@ -1,7 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator("SET_CONTROL_LAYOUT", function(p1) -- line: 5
-	return {
-		controlLayout = p1
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("SET_CONTROL_LAYOUT", function(controlLayout)
+	return { controlLayout = controlLayout }
 end)

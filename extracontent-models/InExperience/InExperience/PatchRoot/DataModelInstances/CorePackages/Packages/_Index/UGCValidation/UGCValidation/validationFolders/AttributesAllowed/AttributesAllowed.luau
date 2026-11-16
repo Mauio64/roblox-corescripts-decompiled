@@ -1,81 +1,117 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local t1 = {
-	categories = Constants.AllAssetUploadCategoriesIncludingMakeup,
-	requiredData = {
-		ValidationEnums.SharedDataMember.rootInstance,
-		ValidationEnums.SharedDataMember.consumerConfig,
-		ValidationEnums.SharedDataMember.hsrAssets
-	},
-	fflag = getFFlagUGCValidateMigrateSchemaProperties,
-	expectedFailures = {}
+local getFFlagUGCValidateCurveAnimAttributes = require(parent.flags.getFFlagUGCValidateCurveAnimAttributes)
+local getFFlagUGCValidateMakeupCategoryParity = require(parent.flags.getFFlagUGCValidateMakeupCategoryParity)
+local getFFlagUGCValidateR15FixedAttributes = require(parent.flags.getFFlagUGCValidateR15FixedAttributes)
+
+game:DefineFastFlag("UGCValidateAllowEmoteAttributes", false)
+
+local set = {
+	[Constants.EmoteIsUGCAttributeName] = true,
+	[Constants.EmoteMaxPartTranslationAttributeName] = true
+}
+local categories
+
+if getFFlagUGCValidateMakeupCategoryParity() then
+	categories = Constants.AllAssetUploadCategories
+else
+	categories = Constants.AllAssetUploadCategoriesIncludingMakeup
+end
+
+local AttributesAllowed = {}
+AttributesAllowed.categories = categories
+AttributesAllowed.requiredData = {
+	ValidationEnums.SharedDataMember.rootInstance,
+	ValidationEnums.SharedDataMember.consumerConfig,
+	ValidationEnums.SharedDataMember.hsrAssets
 }
 
-local function hasOnlyAllowedAttribute(t2: {[any]: any}, b1: boolean) -- line: 21
-	-- upvalues: Constants (copy)
-	for v12, v13 in t2 do
-		if b1 and v12 == Constants.AlternateMeshIdAttributeName then
+if getFFlagUGCValidateCurveAnimAttributes() then
+	table.insert(AttributesAllowed.requiredData, ValidationEnums.SharedDataMember.curveAnimations)
+end
+
+AttributesAllowed.expectedFailures = {}
+
+local function hasOnlyAllowedAttribute(attributes, flag: boolean, p): boolean
+	for k, item in attributes do
+		if not (not flag or k ~= Constants.AlternateMeshIdAttributeName) or p and p[k] then
 			continue
 		end
 
-		if v12 ~= Constants.GUIDAttributeName then
-			return false
-		end
-
-		if typeof(v13) ~= "string" then
-			return false
-		end
-
-		if string.len(v13) > Constants.GUIDAttributeMaxLength then
+		if
+			k ~= Constants.GUIDAttributeName
+			or typeof(item) ~= "string"
+			or string.len(item) > Constants.GUIDAttributeMaxLength
+		then
 			return false
 		end
 	end
 
 	return true
 end
-local function reportInstanceWithDisallowedAttributes(p1, p2) -- line: 42
-	-- upvalues: ErrorSourceStrings (copy)
-	p1:fail(ErrorSourceStrings.Keys.NoAttributes, {
-		RootInstanceName = p2.Name,
-		InstanceNameList = p2:GetFullName()
+
+local function reportInstanceWithDisallowedAttributes(object, instance) -- 2 equivalent calls inferred from this helper
+	object:fail(ErrorSourceStrings.Keys.NoAttributes, {
+		RootInstanceName = instance.Name,
+		InstanceNameList = instance:GetFullName()
 	})
 end
-local function walkInstanceTree(p3, p4, b2: boolean) -- line: 50
-	-- upvalues: hasOnlyAllowedAttribute (copy), ErrorSourceStrings (copy), Constants (copy)
-	if not hasOnlyAllowedAttribute(p4:GetAttributes(), b2) then
-		p3:fail(ErrorSourceStrings.Keys.NoAttributes, {
-			RootInstanceName = p4.Name,
-			InstanceNameList = p4:GetFullName()
-		})
+
+local function walkInstanceTree(object, folder, flag: boolean, p)
+	if not hasOnlyAllowedAttribute(folder:GetAttributes(), flag, p) then
+		reportInstanceWithDisallowedAttributes(object, folder) -- inferred equivalent call
 	end
 
-	for _, descendant in p4:GetDescendants() do
-		if (not b2 or not descendant:GetAttribute(Constants.AlternateMeshIdAttributeName)) and next(descendant:GetAttributes()) ~= nil then
-			p3:fail(ErrorSourceStrings.Keys.NoAttributes, {
-				RootInstanceName = descendant.Name,
-				InstanceNameList = descendant:GetFullName()
-			})
+	for _, descendant in folder:GetDescendants() do
+		if
+			flag and descendant:GetAttribute(Constants.AlternateMeshIdAttributeName)
+			or next(descendant:GetAttributes()) == nil
+		then
+			continue
+		end
+
+		reportInstanceWithDisallowedAttributes(object, descendant) -- inferred equivalent call
+	end
+end
+
+function AttributesAllowed.run(p, data)
+	local v = data.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.IEC
+
+	walkInstanceTree(p, data.rootInstance, v)
+
+	if
+		getFFlagUGCValidateR15FixedAttributes()
+		and data.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend
+		and data.r15LegacyDuplicateRoot ~= nil
+	then
+		walkInstanceTree(p, data.r15LegacyDuplicateRoot, v)
+	end
+
+	for _, hsrAsset in data.hsrAssets do
+		for _, v2 in hsrAsset do
+			walkInstanceTree(p, v2, v)
+		end
+	end
+
+	if getFFlagUGCValidateCurveAnimAttributes() then
+		local v2
+
+		if
+			game:GetFastFlag("UGCValidateAllowEmoteAttributes")
+			and data.uploadCategory == ValidationEnums.UploadCategory.EMOTE_ANIMATION
+		then
+			v2 = set
+		end
+
+		for _, curveAnimation in data.curveAnimations do
+			walkInstanceTree(p, curveAnimation, v, v2)
 		end
 	end
 end
 
-function t1.run(p5, p6) -- line: 69
-	-- upvalues: ValidationEnums (copy), walkInstanceTree (copy)
-	local v23 = p6.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.IEC
-
-	walkInstanceTree(p5, p6.rootInstance, v23)
-
-	for _, v25 in p6.hsrAssets do
-		for _, v27 in v25 do
-			walkInstanceTree(p5, v27, v23)
-		end
-	end
-end
-
-return t1
+return AttributesAllowed

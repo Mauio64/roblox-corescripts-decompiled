@@ -4,13 +4,21 @@ local TransferOrigination = require(script.Enums.TransferOrigination)
 return {
 	TransferRobuxFlow = require(script.Flows.TransferRobuxFlow),
 	InExperienceTransferFlow = require(script.Flows.InExperienceTransferFlow),
-	renderInExperienceTransferApp = function() -- line: 16
-		require(script.renderInExperienceTransferApp)()
+	renderInExperienceTransferApp = function()
+		local renderInExperienceTransferApp = require(script.renderInExperienceTransferApp)
+		renderInExperienceTransferApp()
 	end,
-	Enums = {
-		TransferDirection = TransferDirection,
-		TransferOrigination = TransferOrigination
-	},
+	Enums = { TransferDirection = TransferDirection, TransferOrigination = TransferOrigination },
 	GetFFlagCurrencyTransferUseRoactNetworking = require(script.Flags.GetFFlagCurrencyTransferUseRoactNetworking),
+	IncomingTransferHomepagePromptDismiss = {
+		createCallbacks = function(p)
+			local IncomingTransferHomepagePromptDismiss = require(script.Utils.IncomingTransferHomepagePromptDismiss)
+			return IncomingTransferHomepagePromptDismiss.createCallbacks(p)
+		end
+	},
+	getSduiEconomyRegister = function()
+		return require(script.System.SduiEconomyRegister)
+	end,
+	registerCurrencyTransferSduiActions = require(script.Actions.registerCurrencyTransferSduiActions),
 	["jest.config"] = script["jest.config"]
 }

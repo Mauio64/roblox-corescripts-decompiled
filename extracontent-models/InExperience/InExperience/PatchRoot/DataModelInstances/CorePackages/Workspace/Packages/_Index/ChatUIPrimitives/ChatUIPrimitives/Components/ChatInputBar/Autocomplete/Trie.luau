@@ -1,72 +1,65 @@
-local t1 = {}
+local class = {}
+class.__index = class
 
-t1.__index = t1
-
-function t1.new(s1: string) -- line: 4
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
-
+function class.new(p: string)
+	local self = setmetatable({}, class)
 	self.children = {}
 	self.isEndOfWord = false
-	self.data = s1
-
+	self.data = p
 	return self
 end
 
-local t2 = {}
+local Trie = {}
+Trie.__index = Trie
 
-t2.__index = t2
-
-function t2.new() -- line: 15
-	-- upvalues: t2 (copy), t1 (copy)
-	local self = setmetatable({}, t2)
-
-	self.root = t1.new("")
-
+function Trie.new()
+	local self = setmetatable({}, Trie)
+	self.root = class.new("")
 	return self
 end
-function t2.insert(t3: {[any]: any}, s2: string) -- line: 21
-	-- upvalues: t1 (copy)
-	local root = t3.root
 
-	for i = 1, #s2 do
-		local v10 = string.sub(s2, i, i)
+function Trie.insert(p, value: string)
+	local v = p.root
 
-		if not root.children[v10] then
-			root.children[v10] = t1.new(v10)
+	for i = 1, #value do
+		local v2 = string.sub(value, i, i)
+
+		if not v.children[v2] then
+			v.children[v2] = class.new(v2)
 		end
 
-		root = root.children[v10]
+		v = v.children[v2]
 	end
 
-	root.isEndOfWord = true
+	v.isEndOfWord = true
 end
-function t2.autocomplete(t4: {[any]: any}, s3: string) -- line: 33
-	local t5 = {}
-	local root = t4.root
 
-	for i = 1, #s3 do
-		local v16 = string.sub(s3, i, i)
+function Trie:autocomplete(value: string)
+	local v = self.root
+	local v2 = {}
 
-		if not root.children[v16] then
-			return t5
+	for i = 1, #value do
+		local v3 = string.sub(value, i, i)
+
+		if not v.children[v3] then
+			return v2
 		end
 
-		root = root.children[v16]
+		v = v.children[v3]
 	end
 
-	t4:_collect(root, t5, (string.sub(s3, 1, #s3 - 1)))
-
-	return t5
-end
-function t2._collect(t6: {[any]: any}, p1, t7: {[any]: any}, s4: string) -- line: 48
-	if p1.isEndOfWord then
-		table.insert(t7, s4 .. p1.data)
-	end
-
-	for _, v in pairs(p1.children) do
-		t6:_collect(v, t7, s4 .. p1.data)
-	end
+	self:_collect(v, v2, (string.sub(value, 1, #value - 1)))
+	return v2
 end
 
-return t2
+function Trie:_collect(data, list, p: string)
+	if data.isEndOfWord then
+		table.insert(list, p .. data.data)
+	end
+
+	for _, child in pairs(data.children) do
+		self:_collect(child, list, p .. data.data)
+	end
+end
+
+return Trie

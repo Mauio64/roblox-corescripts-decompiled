@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.UniversalAppPolicy.UniversalAppPolicy))
+local UniversalAppPolicy = require(Workspace.UniversalAppPolicy.UniversalAppPolicy)
+
+return UniversalAppPolicy

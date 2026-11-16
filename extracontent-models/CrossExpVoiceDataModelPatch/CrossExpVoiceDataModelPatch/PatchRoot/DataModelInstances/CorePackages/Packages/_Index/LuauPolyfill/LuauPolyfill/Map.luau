@@ -1,158 +1,156 @@
-local scriptParent = script.Parent
-local forEach = require(scriptParent.Array.forEach)
-local map = require(scriptParent.Array.map)
+local parent = script.Parent
+local forEach = require(parent.Array.forEach)
+local map = require(parent.Array.map)
+require(parent.types)
 
-require(scriptParent.types)
+local Map = {}
 
-local t1 = {}
+function Map.new(list)
+	local map2 = {}
+	local array
 
-function t1.new(p1) -- line: 20
-	-- upvalues: t1 (copy)
-	local t2 = {}
-	local t3
-
-	if p1 ~= nil then
+	if list == nil then
+		array = {}
+	else
 		if _G.__DEV__ then
-			local v7 = typeof(p1)
+			local typeName = typeof(list)
 
-			if v7 == "table" then
-				if #p1 > 0 and typeof(p1[1]) ~= "table" then
+			if typeName == "table" then
+				if #list > 0 and typeof(list[1]) ~= "table" then
 					error("cannot create Map from {K, V} form, it must be { {K, V}... }")
 				end
 			else
-				error(("cannot create array from value of type `%s`"):format(v7))
+				error(("cannot create array from value of type `%s`"):format(typeName))
 			end
 		end
 
-		local v8 = table.clone(p1)
+		local clone = table.clone(list)
+		array = table.create(#clone)
 
-		t3 = table.create(#v8)
+		for _, v in clone do
+			local v2 = v[1]
 
-		for _, v11 in v8 do
-			local v12 = v11[1]
-
-			if _G.__DEV__ and v12 == nil then
+			if _G.__DEV__ and v2 == nil then
 				error("cannot create Map from a table that isn't an array.")
 			end
 
-			local v13 = v11[2]
+			local v3 = v[2]
 
-			if t2[v12] == nil then
-				table.insert(t3, v12)
+			if map2[v2] == nil then
+				table.insert(array, v2)
 			end
 
-			t2[v12] = v13
+			map2[v2] = v3
 		end
-	else
-		t3 = {}
 	end
 
 	return (setmetatable({
-		size = #t3,
-		_map = t2,
-		_array = t3
-	}, t1))
+		size = #array,
+		_map = map2,
+		_array = array
+	}, Map))
 end
-function t1.set(p2, p3, p4) -- line: 64
-	if p2._map[p3] == nil then
-		p2.size = p2.size + 1
-		table.insert(p2._array, p3)
+
+function Map:set(p, p2)
+	if self._map[p] == nil then
+		self.size += 1
+		table.insert(self._array, p)
 	end
 
-	p2._map[p3] = p4
+	self._map[p] = p2
+	return self
+end
 
-	return p2
+function Map:get(p)
+	return self._map[p]
 end
-function t1.get(p5, p6) -- line: 76
-	return p5._map[p6]
-end
-function t1.clear(p7) -- line: 80
-	local _table = table
 
-	p7.size = 0
-	_table.clear(p7._map)
-	_table.clear(p7._array)
+function Map:clear()
+	local table = table
+	self.size = 0
+	table.clear(self._map)
+	table.clear(self._array)
 end
-function t1.delete(p8, p9) -- line: 87
-	if p8._map[p9] == nil then
+
+function Map:delete(p): boolean
+	if self._map[p] == nil then
 		return false
 	end
 
-	p8.size = p8.size - 1
-	p8._map[p9] = nil
+	self.size -= 1
+	self._map[p] = nil
+	local index = table.find(self._array, p)
 
-	local v23 = table.find(p8._array, p9)
-
-	if v23 then
-		table.remove(p8._array, v23)
+	if index then
+		table.remove(self._array, index)
 	end
 
 	return true
 end
-function t1.forEach(p10, p11, p12) -- line: 103
-	-- upvalues: forEach (copy)
-	if _G.__DEV__ and typeof(p11) ~= "function" then
+
+function Map:forEach(callback, p)
+	if _G.__DEV__ and typeof(callback) ~= "function" then
 		error("callback is not a function")
 	end
 
-	forEach(p10._array, function(p13) -- line: 110
-		-- upvalues: p10 (copy), p12 (copy), p11 (copy)
-		local v41 = p10._map[p13]
+	forEach(self._array, function(p2)
+		local v = self._map[p2]
 
-		if p12 ~= nil then
-			p11(p12, v41, p13, p10)
-
-			return
+		if p == nil then
+			callback(v, p2, self)
+		else
+			callback(p, v, p2, self)
 		end
+	end)
+end
 
-		p11(v41, p13, p10)
+function Map:has(p): boolean
+	return self._map[p] ~= nil
+end
+
+function Map:keys()
+	return self._array
+end
+
+function Map:values()
+	return map(self._array, function(p)
+		return self._map[p]
 	end)
 end
-function t1.has(p14, p15) -- line: 121
-	return p14._map[p15] ~= nil
-end
-function t1.keys(p16) -- line: 125
-	return p16._array
-end
-function t1.values(p17) -- line: 129
-	-- upvalues: map (copy)
-	return map(p17._array, function(p18) -- line: 130
-		-- upvalues: p17 (copy)
-		return p17._map[p18]
+
+function Map:entries()
+	return map(self._array, function(p)
+		return { p, self._map[p] }
 	end)
 end
-function t1.entries(p19) -- line: 135
-	-- upvalues: map (copy)
-	return map(p19._array, function(p20) -- line: 136
-		-- upvalues: p19 (copy)
-		return {
-			p20,
-			p19._map[p20]
-		}
-	end)
-end
-function t1.ipairs(p21) -- line: 141
+
+function Map:ipairs()
 	if _G.__DEV__ then
-		warn(debug.traceback("`for _,_ in myMap:ipairs() do` is deprecated and will be removed in a future release, please use `for _,_ in myMap do` instead\n", 2))
+		warn(debug.traceback(
+			"`for _,_ in myMap:ipairs() do` is deprecated and will be removed in a future release, please use `for _,_ in myMap do` instead\n",
+			2
+		))
 	end
 
-	return ipairs(p21:entries())
+	return ipairs(self:entries())
 end
-function t1.__iter(p22) -- line: 153
-	return next, p22:entries()
-end
-function t1.__index(p23, p24) -- line: 157
-	-- upvalues: t1 (copy)
-	local v36 = rawget(t1, p24)
 
-	if v36 ~= nil then
-		return v36
+function Map:__iter()
+	return next, self:entries()
+end
+
+function Map.__index(p, p2)
+	local v = rawget(Map, p2)
+
+	if v == nil then
+		return Map.get(p, p2)
 	end
 
-	return t1.get(p23, p24)
-end
-function t1.__newindex(p25, p26, p27) -- line: 166
-	p25:set(p26, p27)
+	return v
 end
 
-return t1
+function Map:__newindex(p, p2)
+	self:set(p, p2)
+end
+
+return Map

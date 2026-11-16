@@ -1,114 +1,137 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 local EnumScreens = require(AppChat.EnumScreens)
-local AppChatParent = AppChat.Parent
-local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
-local InputHandlers = require(AppChatParent.InputHandlers)
-local React = require(AppChatParent.React)
-local ReactFocusNavigation = require(AppChatParent.ReactFocusNavigation)
-local RoactUtils = require(AppChatParent.RoactUtils)
-local SquadExternalContractProvider = require(AppChatParent.SquadsCore.SquadExternalContractProvider)
-local mutedError = require(AppChatParent.Loggers).mutedError
+local parent = AppChat.Parent
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local InputHandlers = require(parent.InputHandlers)
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local RoactUtils = require(parent.RoactUtils)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local getFirstFocusableDescendant = FocusNavigationUtils.getFirstFocusableDescendant
+local flushPendingActivationOnFocus = FocusNavigationUtils.flushPendingActivationOnFocus
+local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
+
+local FFlagAppChatDebounceConversationFocusActivation = require(AppChat.Flags.FFlagAppChatDebounceConversationFocusActivation)
+
 local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
-local SquadPromptType = require(AppChatParent.SquadsCore.Enums).SquadPromptType
-local leaveSquad = require(AppChatParent.SquadsCore.Thunks).leaveSquad
-local useCurrentSquadParentChannelId = require(AppChatParent.SquadsCore.Hooks).useCurrentSquadParentChannelId
+local Enums = require(parent.SquadsCore.Enums)
+local SquadPromptType = Enums.SquadPromptType
+local Thunks = require(parent.SquadsCore.Thunks)
+local leaveSquad = Thunks.leaveSquad
+local Hooks = require(parent.SquadsCore.Hooks)
+local useCurrentSquadParentChannelId = Hooks.useCurrentSquadParentChannelId
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local t1 = {
+
+local v = {
 	[Enum.KeyCode.ButtonX] = FocusNavigationEventNameEnum.SquadJoin,
 	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
 	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack
 }
 
-local function ConversationStackNavigationFocusListener(t2: {[any]: any}) -- line: 35
-	-- upvalues: useDispatch (copy), React (copy), ReactFocusNavigation (copy), SquadExternalContractContext (copy), useCurrentSquadParentChannelId (copy), EnumScreens (copy), leaveSquad (copy), SquadPromptType (copy), mutedError (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), t1 (copy)
-	local v20 = useDispatch()
-	local v21 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
-	local v22 = React.useContext(SquadExternalContractContext)
-	local v23 = useCurrentSquadParentChannelId()
-	local v24 = React.useCallback(function(p1) -- line: 41
-		-- upvalues: t2 (copy), v21 (copy)
-		local v30 = t2.navigation.getChildNavigation("ConversationStackNavigator")
+local function ConversationStackNavigationFocusListener(props)
+	local v2 = useDispatch()
+	local v3 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+	local v4 = React.useContext(SquadExternalContractContext)
+	local v5 = useCurrentSquadParentChannelId()
 
-		if v21 and (v30 and v30.state.index == 1) then
-			local v31 = v21.focusedGuiObject:getValue()
+	local v6 = React.useCallback(function(object)
+		local childNavigation = props.navigation.getChildNavigation("ConversationStackNavigator")
 
-			if v31 ~= nil and v31:IsDescendantOf(t2.rightContainerRef.current) then
-				v21:focusGuiObject(t2.leftContainerRef.current, true)
-				p1:cancel()
+		if v3 and childNavigation and childNavigation.state.index == 1 then
+			local value = v3.focusedGuiObject:getValue()
+
+			if value ~= nil and value:IsDescendantOf(props.rightContainerRef.current) then
+				local v6 = FFlagAppChatConsoleFocusFixes
+					and props.conversationPanelRef.current
+					and value:IsDescendantOf(props.conversationPanelRef.current)
+					and props.conversationTopBarRef.current
+					and getFirstFocusableDescendant(props.conversationTopBarRef.current)
+
+				if v6 then
+					v3:focusGuiObject(v6, true)
+					object:cancel()
+				else
+					v3:focusGuiObject(props.leftContainerRef.current, true)
+					object:cancel()
+				end
 			end
 		end
 	end, {
-		t2.navigation,
-		t2.leftContainerRef,
-		t2.rightContainerRef,
-		v21
+		props.navigation,
+		props.leftContainerRef,
+		props.rightContainerRef,
+		props.conversationTopBarRef,
+		props.conversationPanelRef,
+		v3
 	})
-	local v25 = React.useCallback(function(p2) -- line: 54
-		-- upvalues: t2 (copy), EnumScreens (copy), v23 (copy), v20 (copy), leaveSquad (copy), SquadPromptType (copy), v22 (copy), mutedError (copy)
-		local v33 = t2.navigation.getChildNavigation("ConversationStackNavigator")
 
-		if v33 and v33.state.index == 1 then
-			local v34 = v33.state.routes[1]
+	local v7 = React.useCallback(function(object)
+		local function joinConversationSquad(conversationId: string)
+			if v5 == nil or v5 == conversationId then
+				props.navigation.navigate(EnumScreens.SquadLobby, {
+					conversationId = conversationId
+				})
+			else
+				v2(leaveSquad(SquadPromptType.JoinAnotherSquad, v4.setSquadPrompt, function()
+					props.navigation.navigate(EnumScreens.SquadLobby, {
+						conversationId = conversationId
+					})
+				end, v4.squadLocation, true))
+			end
+		end
 
-			if v34.routeName == EnumScreens.ChatConversation and v34.params then
-				local conversationId = v34.params.conversationId
+		local childNavigation = props.navigation.getChildNavigation("ConversationStackNavigator")
 
-				if conversationId then
-					if v23 == nil or conversationId == v23 then
-						t2.navigation.navigate(EnumScreens.SquadLobby, {
-							conversationId = conversationId
-						})
-					else
-						v20(leaveSquad(SquadPromptType.JoinAnotherSquad, v22.setSquadPrompt, function() -- line: 64
-							-- upvalues: t2 (copy), EnumScreens (copy), conversationId (copy)
-							t2.navigation.navigate(EnumScreens.SquadLobby, {
-								conversationId = conversationId
-							})
-						end, v22.squadLocation, true))
-					end
+		if childNavigation and childNavigation.state.index == 1 then
+			if FFlagAppChatDebounceConversationFocusActivation then
+				local conversationId = flushPendingActivationOnFocus()
 
-					p2:cancel()
+				if conversationId ~= nil then
+					joinConversationSquad(conversationId)
+					object:cancel()
+					return
+				end
+			end
 
+			local route = childNavigation.state.routes[1]
+
+			if route.routeName == EnumScreens.ChatConversation and route.params then
+				local conversationId = route.params.conversationId
+
+				if not conversationId then
+					mutedError("ConversationStackNavigationFocusListener: Missing conversationId for ChatConversation.")
 					return
 				end
 
-				mutedError("ConversationStackNavigationFocusListener: Missing conversationId for ChatConversation.")
-
-				return
+				joinConversationSquad(conversationId)
+				object:cancel()
+			else
+				mutedError("ConversationStackNavigationFocusListener: Found" .. tostring(route.routeName) .. " at root.")
 			end
-
-			mutedError("ConversationStackNavigationFocusListener: Found" .. tostring(v34.routeName) .. " at root.")
 		end
-	end, {
-		v23,
-		v20,
-		t2.navigation,
-		v22.setSquadPrompt,
-		v22.squadLocation
-	})
-	local v26 = React.useMemo(function() -- line: 86
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v24 (copy), v25 (copy)
-		return {
-			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(v24)
-			},
-			[FocusNavigationEventNameEnum.SquadJoin] = {
-				handler = InputHandlers.onRelease(v25)
-			}
-		}
-	end, {
-		v24,
-		v25
-	})
-	local v27 = ReactFocusNavigation.useEventMap(t1)
-	local v28 = ReactFocusNavigation.useEventHandlerMap(v26, v27)
+	end, { v5, v2, props.navigation, v4.setSquadPrompt, v4.squadLocation })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		ref = v28
-	}, t2.children)
+	local v8 = React.useMemo(function()
+		return {
+			[FocusNavigationEventNameEnum.NavigateBack] = { handler = InputHandlers.onRelease(v6) },
+			[FocusNavigationEventNameEnum.SquadJoin] = { handler = InputHandlers.onRelease(v7) }
+		}
+	end, { v6, v7 })
+
+	local v9 = ReactFocusNavigation.useEventMap(v)
+	local ref = ReactFocusNavigation.useEventHandlerMap(v8, v9)
+
+	return React.createElement(
+		"Frame",
+		{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ref = ref },
+		props.children
+	)
 end
 
 return ConversationStackNavigationFocusListener

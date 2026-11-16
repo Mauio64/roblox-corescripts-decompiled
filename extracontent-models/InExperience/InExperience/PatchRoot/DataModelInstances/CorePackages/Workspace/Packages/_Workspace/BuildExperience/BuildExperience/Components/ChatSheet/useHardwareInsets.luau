@@ -1,52 +1,55 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local GuiService = game:GetService("GuiService")
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function getHardwareSafeAreaInsets() -- line: 9
-	-- upvalues: GuiService (copy)
-	local InsetArea = GuiService:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets)
-	local InsetArea2 = GuiService:GetInsetArea(Enum.ScreenInsets.None)
+local GuiService = game:GetService("GuiService")
+local React = require(parent.React)
+
+local function getHardwareSafeAreaInsets()
+	local insetArea = GuiService:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets)
+	local insetArea2 = GuiService:GetInsetArea(Enum.ScreenInsets.None)
 
 	return {
-		left = InsetArea.Min.X - InsetArea2.Min.X,
-		top = InsetArea.Min.Y - InsetArea2.Min.Y,
-		right = InsetArea2.Max.X - InsetArea.Max.X,
-		bottom = InsetArea2.Max.Y - InsetArea.Max.Y
+		left = insetArea.Min.X - insetArea2.Min.X,
+		top = insetArea.Min.Y - insetArea2.Min.Y,
+		right = insetArea2.Max.X - insetArea.Max.X,
+		bottom = insetArea2.Max.Y - insetArea.Max.Y
 	}
 end
-local function useHardwareInsets(p1) -- line: 21
-	-- upvalues: React (copy), getHardwareSafeAreaInsets (copy)
-	local v9, v10 = React.useState(getHardwareSafeAreaInsets)
 
-	React.useEffect(function() -- line: 24
-		-- upvalues: p1 (copy), v10 (copy), getHardwareSafeAreaInsets (copy)
-		local connection = nil
+local function useHardwareInsets(instance)
+	local state, setState = React.useState(getHardwareSafeAreaInsets)
 
-		if p1 then
-			connection = p1:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 28
-				-- upvalues: v10 (copy), getHardwareSafeAreaInsets (copy)
-				v10(function(p2) -- line: 29
-					-- upvalues: getHardwareSafeAreaInsets (copy)
-					local v13 = getHardwareSafeAreaInsets()
+	React.useEffect(function()
+		local absoluteSizeChangedConnection
 
-					if v13.bottom ~= p2.bottom or (v13.top ~= p2.top or v13.left ~= p2.left or v13.right ~= p2.right) then
-						return v13
+		if instance then
+			absoluteSizeChangedConnection = instance:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				setState(function(data)
+					local hardwareSafeAreaInsets = getHardwareSafeAreaInsets()
+
+					if
+						hardwareSafeAreaInsets.bottom == data.bottom
+						and hardwareSafeAreaInsets.top == data.top
+						and hardwareSafeAreaInsets.left == data.left
+						and hardwareSafeAreaInsets.right == data.right
+					then
+						return data
 					end
 
-					return p2
+					return hardwareSafeAreaInsets
 				end)
 			end)
+		else
+			absoluteSizeChangedConnection = nil
 		end
 
-		return function() -- line: 45
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if absoluteSizeChangedConnection then
+				absoluteSizeChangedConnection:Disconnect()
 			end
 		end
-	end, { p1 })
+	end, { instance })
 
-	return v9
+	return state
 end
 
 return useHardwareInsets

@@ -1,18 +1,15 @@
-local scriptParent = script.Parent
-
-require(scriptParent.Types)
-
+local parent = script.Parent
+require(parent.Types)
 local insert = table.insert
 
-local function values(t1: {[any]: any}) -- line: 14
-	-- upvalues: insert (copy)
-	local t2 = {}
+local function values(items)
+	local result = {}
 
-	for _, v7 in t1 do
-		insert(t2, v7)
+	for _, item in items do
+		insert(result, item)
 	end
 
-	return t2
+	return result
 end
 
 return values

@@ -1,35 +1,37 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
-local UserProfiles = require(Parent.UserProfiles)
-local useLocalUserId = require(Parent.RobloxAppHooks).useLocalUserId
-local useFriendsListOrderedByPresence = require(Parent.FriendsCommon).Hooks.useFriendsListOrderedByPresence
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-function useFetchPaginatedFriendIds() -- line: 14
-	-- upvalues: useLocalUserId (copy), React (copy), useFriendsListOrderedByPresence (copy), Cryo (copy), UserProfiles (copy)
-	local v7 = useLocalUserId()
-	local v8 = React.useRef({})
-	local v9 = useFriendsListOrderedByPresence({
-		pageSize = 50,
-		userId = v7
-	})
-	local v10 = Cryo.List.join(v9.onlineFriends, v9.offlineFriends)
-	local v11 = Cryo.List.map(v10, function(p1) -- line: 23
-		return p1.id
-	end)
-	local v12 = Cryo.List.toSet(v8.current)
-	local v13 = Cryo.List.filter(v11, function(p2) -- line: 27
-		-- upvalues: v12 (copy)
-		return not v12[p2]
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local UserProfiles = require(parent.UserProfiles)
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local FriendsCommon = require(parent.FriendsCommon)
+local useFriendsListOrderedByPresence = FriendsCommon.Hooks.useFriendsListOrderedByPresence
+
+function useFetchPaginatedFriendIds()
+	local userId = useLocalUserId()
+	local ref = React.useRef({})
+
+	local v = useFriendsListOrderedByPresence({ userId = userId, pageSize = 50 })
+
+	local joined = Cryo.List.join(v.onlineFriends, v.offlineFriends)
+	local mapped = Cryo.List.map(joined, function(p)
+		return p.id
 	end)
 
-	if #v13 > 0 then
-		UserProfiles.Stores.UserProfileStore.get().fetchNamesByUserIds(v13)
+	local set = Cryo.List.toSet(ref.current)
+	local filtered = Cryo.List.filter(mapped, function(p): boolean
+		return not set[p]
+	end)
+
+	if #filtered > 0 then
+		UserProfiles.Stores.UserProfileStore.get().fetchNamesByUserIds(filtered)
 	end
 
-	v8.current = v11
+	ref.current = mapped
 
-	return v8.current, v9.fetchMoreFriends, v9.isEndOfList, v9
+	return ref.current, v.fetchMoreFriends, v.isEndOfList, v
 end
 
 return useFetchPaginatedFriendIds

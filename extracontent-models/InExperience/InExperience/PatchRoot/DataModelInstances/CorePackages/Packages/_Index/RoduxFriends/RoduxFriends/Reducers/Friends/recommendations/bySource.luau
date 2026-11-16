@@ -1,30 +1,27 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local llama = require(ParentParentParent.llama)
-local Actions = ParentParent.Actions
-local RecommendationSourceCreated = require(Actions.RecommendationSourceCreated)
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Rodux = require(parent2.Rodux)
+local llama = require(parent2.llama)
 
-require(ParentParent.roduxFriendsTypes)
+local actions = parent.Actions
+local RecommendationSourceCreated = require(actions.RecommendationSourceCreated)
 
-local t1 = {}
+require(parent.roduxFriendsTypes)
 
-return function(_) -- line: 14
-	-- upvalues: Rodux (copy), t1 (copy), RecommendationSourceCreated (copy), llama (copy)
-	return Rodux.createReducer(t1, {
-		[RecommendationSourceCreated.name] = function(p2, p3) -- line: 16
-			-- upvalues: llama (copy)
-			local source = p3.payload.source
-			local v12 = p3.payload.recommendationIds or {}
-			local v13 = llama.List.reduce(v12, function(p4, p5) -- line: 23
-				p4[tostring(p5)] = true
+local v = {}
 
-				return p4
+return function(_)
+	return Rodux.createReducer(v, {
+		[RecommendationSourceCreated.name] = function(p, p2)
+			local source = p2.payload.source
+			local recommendationIds = p2.payload.recommendationIds or {}
+
+			local reduced = llama.List.reduce(recommendationIds, function(p3, p4)
+				p3[tostring(p4)] = true
+				return p3
 			end, {})
 
-			return llama.Dictionary.join(p2, {
-				[source] = v13
-			})
+			return llama.Dictionary.join(p, { [source] = reduced })
 		end
 	})
 end

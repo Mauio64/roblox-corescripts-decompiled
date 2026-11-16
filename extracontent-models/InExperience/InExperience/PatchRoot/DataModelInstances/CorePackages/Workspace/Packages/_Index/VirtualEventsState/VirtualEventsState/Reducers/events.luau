@@ -1,4 +1,7 @@
 local VirtualEventsState = script:FindFirstAncestor("VirtualEventsState")
-local NetworkingVirtualEvents = require(VirtualEventsState.network).NetworkingVirtualEvents
 
-return require(script.Parent["events.impl"])(NetworkingVirtualEvents)
+local network = require(VirtualEventsState.network)
+local networkingVirtualEvents = network.NetworkingVirtualEvents
+local eventsimpl = require(script.Parent["events.impl"])
+
+return eventsimpl(networkingVirtualEvents)

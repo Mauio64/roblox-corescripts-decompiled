@@ -1,7 +1,7 @@
-local function findValueKeyInRefCache(p1, t1: {[any]: any}) -- line: 1
-	for v4, v5 in t1 do
-		if p1 == v5.current then
-			return v4
+local function findValueKeyInRefCache(p, items)
+	for k, item in items do
+		if item.current == p then
+			return k
 		end
 	end
 

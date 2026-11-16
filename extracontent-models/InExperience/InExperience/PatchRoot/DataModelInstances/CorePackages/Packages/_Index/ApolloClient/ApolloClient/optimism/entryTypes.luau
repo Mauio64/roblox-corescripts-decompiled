@@ -1,7 +1,9 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
 require(script.Parent.depTypes)
-require(ParentParent.LuauPolyfill)
+
+require(parent.LuauPolyfill)
+
 require(script.Parent.anyEntryTypes)
 
 return {}

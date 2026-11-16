@@ -3,11 +3,14 @@ local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
+
 local Roact = require(CorePackages.Packages.Roact)
 local Rodux = require(CorePackages.Packages.Rodux)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local DevConsole = script.Parent.DevConsole
 local Constants = require(DevConsole.Constants)
+
 local Components = DevConsole.Components
 local DevConsoleWindow = require(Components.DevConsoleWindow)
 local DataProvider = require(Components.DataProvider)
@@ -24,129 +27,104 @@ local MainViewScriptProfiler = require(Components.ScriptProfiler.MainViewScriptP
 local MainViewDebugVisualizations = require(Components.DebugVisualizations.MainViewDebugVisualizations)
 local MainViewLuauHeap = require(Components.LuauHeap.MainViewLuauHeap)
 local MainViewVoiceChat = require(Components.VoiceChat.MainViewVoiceChat)
+local MainViewVoiceDebug = require(Components.VoiceDebug.MainViewVoiceDebug)
+local GetFFlagVoiceDebugConsoleV2 = require(Components.VoiceDebug.GetFFlagVoiceDebugConsoleV2)
 local MainViewRequestOrchestrator = require(Components.RequestOrchestrator.MainViewRequestOrchestrator)
+
 local RCCProfilerDataCompleteListener = require(Components.MicroProfiler.RCCProfilerDataCompleteListener)
 local getClientReplicator = require(DevConsole.Util.getClientReplicator)
+
 local MainView = require(DevConsole.Reducers.MainView)
 local DevConsoleReducer = require(DevConsole.Reducers.DevConsoleReducer)
+
 local Actions = DevConsole.Actions
 local SetDevConsoleVisibility = require(Actions.SetDevConsoleVisibility)
 local SetTabList = require(Actions.SetTabList)
+
 local MiddleWare = DevConsole.MiddleWare
 local DevConsoleAnalytics = require(MiddleWare.DevConsoleAnalytics)
+
 local PlayerPermissionsModule = require(CoreGui.RobloxGui.Modules.PlayerPermissionsModule)
-local EngineFeature = game:GetEngineFeature("ScriptProfiler")
-local v39 = game:DefineFastFlag("DevConsoleRequestOrchestratorTab", false)
-local v40 = game:DefineFastFlag("DevConsoleAdminSeesDevTabs", false)
-local default = require(CoreGui.RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
-local t1 = {
-	Log = {
-		layoutOrder = 1,
-		hasClientServer = true,
-		tab = MainViewLog
-	},
-	Memory = {
-		layoutOrder = 2,
-		hasClientServer = true,
-		tab = MainViewMemory
-	},
-	Network = {
-		layoutOrder = 3,
-		hasClientServer = true,
-		tab = MainViewNetwork
-	},
-	Scripts = {
-		layoutOrder = 4,
-		tab = MainViewScripts
-	},
-	DataStores = {
-		layoutOrder = 5,
-		tab = MainViewDataStores
-	},
-	ServerStats = {
-		layoutOrder = 6,
-		tab = MainViewServerStats
-	},
-	ActionBindings = {
-		layoutOrder = 7,
-		tab = MainViewActionBindings
-	},
-	ServerJobs = {
-		layoutOrder = 8,
-		tab = MainViewServerJobs
-	},
-	MicroProfiler = {
-		layoutOrder = 9,
-		tab = MainViewMicroProfiler
-	},
-	DebugVisualizations = {
-		layoutOrder = 10,
-		tab = MainViewDebugVisualizations
-	},
-	ScriptProfiler = if not EngineFeature then nil else {
-		layoutOrder = 11,
-		tab = MainViewScriptProfiler
-	},
-	LuauHeap = {
-		layoutOrder = 12,
-		tab = MainViewLuauHeap
-	}
+
+local engineFeature = game:GetEngineFeature("ScriptProfiler")
+
+local defineFastFlag = game:DefineFastFlag("DevConsoleRequestOrchestratorTab2", false)
+local defineFastFlag2 = game:DefineFastFlag("DevConsoleAdminSeesDevTabs", false)
+
+local VoiceChatServiceManager = require(CoreGui.RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
+
+local v = false
+
+local v2 = {
+	Log = { tab = MainViewLog, layoutOrder = 1, hasClientServer = true },
+	Memory = { tab = MainViewMemory, layoutOrder = 2, hasClientServer = true },
+	Network = { tab = MainViewNetwork, layoutOrder = 3, hasClientServer = true },
+	Scripts = { tab = MainViewScripts, layoutOrder = 4 },
+	DataStores = { tab = MainViewDataStores, layoutOrder = 5 },
+	ServerStats = { tab = MainViewServerStats, layoutOrder = 6 },
+	ActionBindings = { tab = MainViewActionBindings, layoutOrder = 7 },
+	ServerJobs = { tab = MainViewServerJobs, layoutOrder = 8 },
+	MicroProfiler = { tab = MainViewMicroProfiler, layoutOrder = 9 },
+	DebugVisualizations = { tab = MainViewDebugVisualizations, layoutOrder = 10 },
+	ScriptProfiler = engineFeature and { tab = MainViewScriptProfiler, layoutOrder = 11 } or nil,
+	LuauHeap = { tab = MainViewLuauHeap, layoutOrder = 12 }
 }
-local t2 = {
-	Log = {
-		layoutOrder = 1,
-		tab = MainViewLog
-	},
-	Memory = {
-		layoutOrder = 2,
-		tab = MainViewMemory
-	},
-	ScriptProfiler = if not EngineFeature then nil else {
-		layoutOrder = 3,
-		tab = MainViewScriptProfiler
-	},
-	LuauHeap = {
-		layoutOrder = 4,
-		tab = MainViewLuauHeap
-	},
-	VoiceChat = if not game:GetEngineFeature("VoiceChatDevConsoleTabEnabled") or (not default or not default:canUseService()) then nil else {
-		layoutOrder = 5,
-		tab = MainViewVoiceChat
-	}
-}
-local t3 = {
-	Log = {
-		layoutOrder = 1,
-		tab = MainViewLog
-	},
-	Memory = {
-		layoutOrder = 2,
-		tab = MainViewMemory
-	}
-}
-local t4 = {
-	VoiceChat = {
-		layoutOrder = 13,
+
+local v3 = {
+	Log = { tab = MainViewLog, layoutOrder = 1 },
+	Memory = { tab = MainViewMemory, layoutOrder = 2 },
+	ScriptProfiler = engineFeature and { tab = MainViewScriptProfiler, layoutOrder = 3 } or nil,
+	LuauHeap = { tab = MainViewLuauHeap, layoutOrder = 4 },
+	VoiceChat = not GetFFlagVoiceDebugConsoleV2() and game:GetEngineFeature("VoiceChatDevConsoleTabEnabled") and default and default:canUseService() and {
 		tab = MainViewVoiceChat,
-		isEnabled = function() -- line: 159
-			-- upvalues: default (copy)
-			return game:GetEngineFeature("VoiceChatDevConsoleTabEnabled") and (default ~= nil and default:canUseService())
+		layoutOrder = 5
+	} or nil
+}
+
+local tabList = {
+	Log = { tab = MainViewLog, layoutOrder = 1 },
+	Memory = { tab = MainViewMemory, layoutOrder = 2 }
+}
+
+local v4 = {
+	VoiceChat = {
+		tab = MainViewVoiceChat,
+		layoutOrder = 13,
+		isEnabled = function()
+			local v4 = not GetFFlagVoiceDebugConsoleV2() and game:GetEngineFeature("VoiceChatDevConsoleTabEnabled")
+
+			if v4 then
+				if default == nil then
+					return false
+				end
+
+				return (default:canUseService())
+			end
+
+			return v4
+		end
+	},
+	VoiceDebug = {
+		tab = MainViewVoiceDebug,
+		layoutOrder = 14,
+		isEnabled = function()
+			return v
 		end
 	},
 	RequestOrchestrator = {
-		layoutOrder = 100,
 		tab = MainViewRequestOrchestrator,
-		isEnabled = function() -- line: 168
-			-- upvalues: v39 (copy)
-			return v39
+		layoutOrder = 100,
+		isEnabled = function()
+			return defineFastFlag
 		end
 	}
 }
-local t5 = {}
 
-t5.__index = t5
+local class = {}
+class.__index = class
 
-local t6 = {
+local v5 = {
 	[Enum.Platform.Windows] = Constants.FormFactor.Large,
 	[Enum.Platform.OSX] = Constants.FormFactor.Large,
 	[Enum.Platform.IOS] = Constants.FormFactor.Small,
@@ -169,201 +147,221 @@ local t6 = {
 	[Enum.Platform.None] = Constants.FormFactor.Large
 }
 
-local function isAdminAsync() -- line: 200
-	-- upvalues: PlayerPermissionsModule (copy), Players (copy)
+local function isAdminAsync() -- 2 equivalent calls inferred from this helper
 	return PlayerPermissionsModule.IsPlayerAdminAsync(Players.LocalPlayer)
 end
-local function getAdminTabList() -- line: 207
-	-- upvalues: t1 (copy), t4 (copy)
-	local v51 = table.clone(t1)
 
-	for k, v in pairs(t4) do
-		if v.isEnabled == nil or v.isEnabled() then
-			v51[k] = {
-				tab = v.tab,
-				layoutOrder = v.layoutOrder
-			}
+local function getAdminTabList()
+	local clone = table.clone(v2)
+
+	for k, v6 in pairs(v4) do
+		if v6.isEnabled == nil or v6.isEnabled() then
+			clone[k] = { tab = v6.tab, layoutOrder = v6.layoutOrder }
 		end
 	end
 
-	return v51
+	return clone
 end
 
-function t5.new() -- line: 222
-	-- upvalues: t5 (copy)
-	local t7 = {}
+function class.new()
+	local class2 = {}
+	setmetatable(class2, class)
 
-	setmetatable(t7, t5)
-	t7.init = false
-	t7.isDeveloperTabListActive = false
-	t7.isEmployee = false
-	t7.waitForStart = true
-	t7.waitForStartBindable = Instance.new("BindableEvent")
-	coroutine.wrap(function() -- line: 233
-		-- upvalues: t7 (copy)
-		t7:SetupDevConsole()
+	class2.init = false
+
+	class2.isDeveloperTabListActive = false
+	class2.isEmployee = false
+
+	class2.waitForStart = true
+	class2.waitForStartBindable = Instance.new("BindableEvent")
+	coroutine.wrap(function()
+		class2:SetupDevConsole()
 	end)()
 
-	return t7
+	return class2
 end
-function t5.SetupDevConsole(p1) -- line: 240
-	-- upvalues: UserInputService (copy), t6 (copy), MainView (copy), SetTabList (copy), t3 (copy), DevConsoleAnalytics (copy), Rodux (copy), DevConsoleReducer (copy), Roact (copy), RoactRodux (copy), DataProvider (copy), DevConsoleWindow (copy), Constants (copy), RCCProfilerDataCompleteListener (copy)
-	local v56 = t6[UserInputService:GetPlatform()]
-	local t8 = {
-		MainView = MainView(nil, SetTabList(t3, "Log"))
+
+function class:SetupDevConsole()
+	local formFactor = v5[UserInputService:GetPlatform()]
+
+	local v6 = {
+		MainView = MainView(nil, SetTabList(tabList, "Log"))
 	}
-	local t9 = { DevConsoleAnalytics }
 
-	p1.store = Rodux.Store.new(DevConsoleReducer, t8, t9)
+	self.store = Rodux.Store.new(DevConsoleReducer, v6, { DevConsoleAnalytics })
 
-	local isVisible = p1.store:getState().DisplayOptions.isVisible
+	local isVisible = self.store:getState().DisplayOptions.isVisible
 
-	p1.root = Roact.createElement(RoactRodux.StoreProvider, {
-		store = p1.store
-	}, {
-		DataProvider = Roact.createElement(DataProvider, {
-			isDeveloperView = false
-		}, {
-			App = Roact.createElement("ScreenGui", {
-				OnTopOfCoreBlur = true,
-				DisplayOrder = 10
-			}, {
+	self.root = Roact.createElement(RoactRodux.StoreProvider, { store = self.store }, {
+		DataProvider = Roact.createElement(DataProvider, { isDeveloperView = false }, {
+			App = Roact.createElement("ScreenGui", { OnTopOfCoreBlur = true, DisplayOrder = 10 }, {
 				DevConsoleWindow = Roact.createElement(DevConsoleWindow, {
+					formFactor = formFactor,
 					isDeveloperView = false,
-					isMinimized = false,
-					formFactor = v56,
 					isVisible = isVisible,
+					isMinimized = false,
 					position = Constants.MainWindowInit.Position,
 					size = Constants.MainWindowInit.Size,
-					tabList = t3,
-					onCloseCallback = function(p2) -- line: 275
-						-- upvalues: p1 (copy)
-						p1:SetServerStatsConnection(p2)
+					tabList = tabList,
+					onCloseCallback = function(p)
+						self:SetServerStatsConnection(p)
 					end
 				}),
 				RCCProfilerDataCompleteListener = Roact.createElement(RCCProfilerDataCompleteListener)
 			})
 		})
 	})
-	p1.waitForStart = false
-	p1.waitForStartBindable:Fire()
+
+	self.waitForStart = false
+	self.waitForStartBindable:Fire()
 end
 
-local v50 = t5.new()
+local v6 = class.new()
 
-function t5.refreshTabList(p3) -- line: 294
-	-- upvalues: SetTabList (copy), getAdminTabList (copy), t1 (copy)
-	if p3.isEmployee then
-		p3.store:dispatch(SetTabList(getAdminTabList(), "Log", true))
+function class:refreshTabList()
+	if self.isEmployee then
+		self.store:dispatch(SetTabList(getAdminTabList(), "Log", true))
+	elseif self.isDeveloperTabListActive then
+		self.store:dispatch(SetTabList(v2, "Log", true))
+	end
+end
 
+function class:refreshVoiceDevConsoleAvailability()
+	if not GetFFlagVoiceDebugConsoleV2() then
 		return
 	end
 
-	if p3.isDeveloperTabListActive then
-		p3.store:dispatch(SetTabList(t1, "Log", true))
-	end
-end
-function t5.Start(p4) -- line: 302
-	-- upvalues: Roact (copy), CoreGui (copy), getClientReplicator (copy), v40 (copy), PlayerPermissionsModule (copy), Players (copy), SetTabList (copy), t2 (copy), t1 (copy)
-	if not p4.init then
-		if p4.waitForStart then
-			p4.waitForStartBindable.Event:Wait()
+	if game:GetEngineFeature("VoiceChatDevConsoleTabEnabled") and default then
+		local function apply()
+			local voiceChatAvailable = default:VoiceChatAvailable()
+
+			if voiceChatAvailable == v then
+				return
+			end
+
+			v = voiceChatAvailable
+
+			self:refreshTabList()
 		end
 
-		p4.init = true
-		p4.element = Roact.mount(p4.root, CoreGui, "DevConsoleMaster")
+		default:asyncInit():andThen(apply):catch(apply)
+	end
+end
 
-		local v62 = getClientReplicator()
+function class:Start()
+	if not self.init then
+		if self.waitForStart then
+			self.waitForStartBindable.Event:Wait()
+		end
 
-		task.spawn(function() -- line: 312
-			-- upvalues: v40 (copy), PlayerPermissionsModule (copy), Players (copy), p4 (copy), SetTabList (copy), t2 (copy)
-			if v40 then
-				if PlayerPermissionsModule.IsPlayerAdminAsync(Players.LocalPlayer) then
-					p4.isEmployee = true
-					p4:refreshTabList()
+		self.init = true
+		self.element = Roact.mount(self.root, CoreGui, "DevConsoleMaster")
+		local clientReplicator = getClientReplicator()
 
-					return
+		task.spawn(function()
+			if defineFastFlag2 then
+				if isAdminAsync() then -- inferred equivalent call
+					self.isEmployee = true
+					self:refreshTabList()
 				end
-			elseif PlayerPermissionsModule.IsPlayerAdminAsync(Players.LocalPlayer) and not p4.isDeveloperTabListActive then
-				p4.store:dispatch(SetTabList(t2, "Log", false))
+			elseif isAdminAsync() and not self.isDeveloperTabListActive then -- inferred equivalent call
+				self.store:dispatch(SetTabList(v3, "Log", false))
 			end
 		end)
 
-		if v62 then
-			p4._statsConnector = v62.StatsReceived:connect(function(_) -- line: 327
-				-- upvalues: p4 (copy), v40 (copy), SetTabList (copy), t1 (copy)
-				if not p4._statsConnector then
+		task.spawn(function()
+			self:refreshVoiceDevConsoleAvailability()
+		end)
+
+		if clientReplicator then
+			self._statsConnector = clientReplicator.StatsReceived:connect(function(_)
+				if not self._statsConnector then
 					return
 				end
 
-				p4._statsConnector:Disconnect()
-				p4._statsConnector = nil
-				p4.isDeveloperTabListActive = true
+				self._statsConnector:Disconnect()
+				self._statsConnector = nil
 
-				if v40 then
-					p4:refreshTabList()
+				self.isDeveloperTabListActive = true
 
-					return
+				if defineFastFlag2 then
+					self:refreshTabList()
+				else
+					self.store:dispatch(SetTabList(v2, "Log", true))
 				end
-
-				p4.store:dispatch(SetTabList(t1, "Log", true))
 			end)
-			p4:SetServerStatsConnection(true)
+
+			self:SetServerStatsConnection(true)
 		end
 	end
 end
-function t5.ToggleVisibility(p6) -- line: 348
-	-- upvalues: v50 (copy)
-	if not p6.init then
-		v50:Start()
+
+function class:ToggleVisibility()
+	if not self.init then
+		if GetFFlagVoiceDebugConsoleV2() then
+			self:Start()
+		else
+			v6:Start()
+		end
 	end
 
-	p6:SetVisibility(not p6.store:getState().DisplayOptions.isVisible)
+	self:SetVisibility(not self.store:getState().DisplayOptions.isVisible)
 end
-function t5.GetVisibility(p7) -- line: 357
-	if not p7.init then
+
+function class:GetVisibility()
+	if not self.init then
 		return false
 	end
 
-	local v65 = p7.store:getState()
+	local state = self.store:getState()
 
-	if v65 and v65.DisplayOptions then
-		return v65.DisplayOptions.isVisible and not v65.DisplayOptions.isMinimized
+	if state and state.DisplayOptions then
+		return state.DisplayOptions.isVisible and not state.DisplayOptions.isMinimized
 	end
 
 	return false
 end
-function t5.SetServerStatsConnection(_, p9) -- line: 372
-	-- upvalues: getClientReplicator (copy)
-	local v68 = getClientReplicator()
 
-	if v68 then
-		v68:RequestServerStats(p9)
+function class:SetServerStatsConnection(p)
+	local clientReplicator = getClientReplicator()
+
+	if clientReplicator then
+		clientReplicator:RequestServerStats(p)
 	end
 end
-function t5.SetVisibility(p10, p11) -- line: 379
-	-- upvalues: v50 (copy), SetDevConsoleVisibility (copy)
-	if type(p11) == "boolean" then
-		if not p10.init and p11 then
-			v50:Start()
+
+function class:SetVisibility(p)
+	if type(p) == "boolean" then
+		if self.init or not p then
+			if GetFFlagVoiceDebugConsoleV2() and p then
+				self:refreshVoiceDevConsoleAvailability()
+			end
+		elseif GetFFlagVoiceDebugConsoleV2() then
+			self:Start()
+		else
+			v6:Start()
 		end
 
-		p10:SetServerStatsConnection(p11)
-		p10.store:dispatch(SetDevConsoleVisibility(p11))
+		self:SetServerStatsConnection(p)
+
+		self.store:dispatch(SetDevConsoleVisibility(p))
 	end
 end
 
-StarterGui:RegisterGetCore("DevConsoleVisible", function() -- line: 391
-	-- upvalues: v50 (copy)
-	return v50:GetVisibility()
+StarterGui:RegisterGetCore("DevConsoleVisible", function()
+	return v6:GetVisibility()
 end)
-StarterGui:RegisterSetCore("DevConsoleVisible", function(p12) -- line: 395
-	-- upvalues: v50 (copy)
-	if type(p12) ~= "boolean" then
+
+StarterGui:RegisterSetCore("DevConsoleVisible", function(p)
+	if type(p) ~= "boolean" then
 		error("DevConsoleVisible must be given a boolean value.")
 	end
 
-	v50:SetVisibility(p12)
+	v6:SetVisibility(p)
 end)
 
-return v50
+if GetFFlagVoiceDebugConsoleV2() then
+	v6.Klass = class
+end
+
+return v6

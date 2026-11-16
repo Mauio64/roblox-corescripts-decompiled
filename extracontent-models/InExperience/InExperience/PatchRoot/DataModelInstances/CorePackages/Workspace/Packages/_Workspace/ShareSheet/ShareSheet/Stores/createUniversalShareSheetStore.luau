@@ -1,51 +1,90 @@
 local ShareSheet = script:FindFirstAncestor("ShareSheet")
-local ShareSheetParent = ShareSheet.Parent
-local Signals = require(ShareSheetParent.Signals)
+local parent = ShareSheet.Parent
+
+local Signals = require(parent.Signals)
+local FFlagShareSheetPeoplePickerEnabled = require(ShareSheet.Flags.FFlagShareSheetPeoplePickerEnabled)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
+local RecipientSource = require(ShareSheet.Recipients.RecipientSource)
 local ShareSheetTelemetry = require(ShareSheet.telemetry.ShareSheetTelemetry)
 
-local function createUniversalShareSheetStore() -- line: 32
-	-- upvalues: Signals (copy), ShareSheetTelemetry (copy)
-	local v6, v7 = Signals.createSignal(nil)
+local function createUniversalShareSheetStore()
+	local signal, setIsPeoplePickerDisplayed = Signals.createSignal(false)
+
+	local signal2, v = Signals.createSignal(nil)
+
+	local function hide(replaced)
+		if FFlagShareSheetPeoplePickerEnabled then
+			setIsPeoplePickerDisplayed(false)
+		end
+
+		local v2 = signal2(false)
+
+		if v2 == nil then
+			return
+		end
+
+		v(nil)
+		local logLifecycle = ShareSheetTelemetry.logLifecycle
+		local v3 = {
+			context = v2.context,
+			telemetryId = v2.telemetryId or "",
+			lifecycleType = ShareSheetTelemetry.LifecycleType.Close,
+			closeReason = replaced or ShareSheetTelemetry.CloseReason.Programmatic,
+			recipientSource = 0
+		}
+		local recipientSource
+
+		if FFlagShareSheetFriendsSort then
+			recipientSource = v2.recipientSource
+		end
+
+		v3.recipientSource = recipientSource
+		logLifecycle(v3)
+
+		if v2.onHidden then
+			v2.onHidden()
+		end
+	end
+
+	local function show(data)
+		if
+			FFlagShareSheetFriendsSort
+			and data.recipientSource ~= nil
+			and not RecipientSource.isValidRecipientSource(data.recipientSource)
+		then
+			error(`Invalid recipient source {data.recipientSource}`)
+		end
+
+		hide(ShareSheetTelemetry.CloseReason.Replaced)
+		v(table.clone(data))
+		local logLifecycle = ShareSheetTelemetry.logLifecycle
+		local v2 = {
+			context = data.context,
+			telemetryId = data.telemetryId or "",
+			lifecycleType = ShareSheetTelemetry.LifecycleType.Open,
+			recipientSource = 0
+		}
+		local recipientSource
+
+		if FFlagShareSheetFriendsSort then
+			recipientSource = data.recipientSource
+		end
+
+		v2.recipientSource = recipientSource
+		logLifecycle(v2)
+
+		if data.onShown then
+			data.onShown()
+		end
+	end
 
 	return {
-		getRequest = v6,
-		show = function(t1: {[any]: any}) -- line: 48
-			-- upvalues: v6 (copy), v7 (copy), ShareSheetTelemetry (copy)
-			local v10 = v6(false)
-
-			if v10 ~= nil then
-				v7(nil)
-
-				if v10.onHidden then
-					v10.onHidden()
-				end
-			end
-
-			v7(table.clone(t1))
-			ShareSheetTelemetry.logShareSheetOpened({
-				context = t1.context,
-				url = t1.url,
-				telemetryId = t1.telemetryId or ""
-			})
-
-			if t1.onShown then
-				t1.onShown()
-			end
-		end,
-		hide = function() -- line: 36
-			-- upvalues: v6 (copy), v7 (copy)
-			local v8 = v6(false)
-
-			if v8 == nil then
-				return
-			end
-
-			v7(nil)
-
-			if v8.onHidden then
-				v8.onHidden()
-			end
-		end
+		getIsPeoplePickerDisplayed = signal,
+		getRequest = signal2,
+		setIsPeoplePickerDisplayed = setIsPeoplePickerDisplayed,
+		show = show,
+		hide = hide
 	}
 end
 

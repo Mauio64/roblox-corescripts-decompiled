@@ -1,5 +1,6 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local PresenceType = require(FriendsLanding.dependencies).RoduxPresence.Enums.PresenceType
+local dependencies = require(FriendsLanding.dependencies)
+local presenceType = dependencies.RoduxPresence.Enums.PresenceType
 
 return {
 	OnlineFriend = {
@@ -13,7 +14,7 @@ return {
 		thumbnail = "rbxthumb://type=Avatar&id=37&w=150&h=150",
 		universeId = 345,
 		userId = 456,
-		userPresenceType = PresenceType.Online,
+		["userPresenceType"] = presenceType.Online,
 		username = "username37"
 	},
 	DeletedFriend = {
@@ -27,7 +28,7 @@ return {
 		thumbnail = "rbxthumb://type=Avatar&id=37&w=150&h=150",
 		universeId = 345,
 		userId = 456,
-		userPresenceType = PresenceType.Offline,
+		["userPresenceType"] = presenceType.Offline,
 		username = "username37",
 		isDeleted = true
 	},
@@ -42,7 +43,7 @@ return {
 		thumbnail = "rbxthumb://type=Avatar&id=37&w=150&h=150",
 		universeId = 345,
 		userId = 456,
-		userPresenceType = PresenceType.Offline,
+		["userPresenceType"] = presenceType.Offline,
 		username = "username37"
 	},
 	InGameFriend = {
@@ -56,7 +57,7 @@ return {
 		thumbnail = "rbxthumb://type=Avatar&id=37&w=150&h=150",
 		universeId = 345,
 		userId = 456,
-		userPresenceType = PresenceType.InGame,
+		["userPresenceType"] = presenceType.InGame,
 		username = "username37"
 	},
 	InStudioFriend = {
@@ -70,7 +71,7 @@ return {
 		thumbnail = "rbxthumb://type=Avatar&id=37&w=150&h=150",
 		universeId = 345,
 		userId = 456,
-		userPresenceType = PresenceType.InStudio,
+		["userPresenceType"] = presenceType.InStudio,
 		username = "username37"
 	},
 	InGameWithoutLastLocationFriend = {
@@ -84,7 +85,7 @@ return {
 		thumbnail = "rbxthumb://type=Avatar&id=37&w=150&h=150",
 		universeId = 345,
 		userId = 456,
-		userPresenceType = PresenceType.InGame,
+		["userPresenceType"] = presenceType.InGame,
 		username = "username37"
 	},
 	InStudioWithoutLastLocationFriend = {
@@ -98,7 +99,7 @@ return {
 		thumbnail = "rbxthumb://type=Avatar&id=37&w=150&h=150",
 		universeId = 345,
 		userId = 456,
-		userPresenceType = PresenceType.InStudio,
+		["userPresenceType"] = presenceType.InStudio,
 		username = "username37"
 	}
 }

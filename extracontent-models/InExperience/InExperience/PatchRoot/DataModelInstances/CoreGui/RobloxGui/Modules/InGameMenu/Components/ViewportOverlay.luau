@@ -1,15 +1,23 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local t = InGameMenuDependencies.t
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Resources.Constants)
-local GlobalConfig = require(ParentParent.GlobalConfig)
-local CloseMenu = require(ParentParent.Thunks.CloseMenu)
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
+
+local parent = script.Parent.Parent
+
+local Constants = require(parent.Resources.Constants)
+
+local GlobalConfig = require(parent.GlobalConfig)
+local CloseMenu = require(parent.Thunks.CloseMenu)
+
 local vector2 = Vector2.new(0, 0)
-local v12 = t.strictInterface({
+
+local strictInterface = t.strictInterface({
 	currentPage = t.string,
 	open = t.boolean,
 	onActivated = t.callback,
@@ -17,62 +25,58 @@ local v12 = t.strictInterface({
 	screenSize = t.Vector2
 })
 
-local function ViewportOverlay(p1) -- line: 27
-	-- upvalues: GlobalConfig (copy), v12 (copy), vector2 (copy), Constants (copy), withFoundationOrUIBloxStyle (copy), Roact (copy)
+local function ViewportOverlay(data)
 	if GlobalConfig.propValidation then
-		assert(v12(p1))
+		assert(strictInterface(data))
 	end
 
-	if p1.screenSize == vector2 then
+	if data.screenSize == vector2 then
 		return nil
 	end
 
-	local v15 = p1.currentPage == Constants.InitalPageKey
+	local v = data.currentPage == Constants.InitalPageKey
 
-	return withFoundationOrUIBloxStyle(function(p2) -- line: 38
+	return withFoundationOrUIBloxStyle(function(p)
 		return {
 			Theme = {
 				Overlay = {
-					Color = p2.Color.Common.Scrim.Color3,
-					Transparency = p2.Color.Common.Scrim.Transparency
+					Color = p.Color.Common.Scrim.Color3,
+					Transparency = p.Color.Common.Scrim.Transparency
 				}
 			}
 		}
-	end, function(p3) -- line: 44
-		-- upvalues: Roact (copy), v15 (copy), p1 (copy)
+	end, function(p)
 		return Roact.createElement("Frame", {
+			BackgroundColor3 = p.Theme.Overlay.Color,
+			BackgroundTransparency = p.Theme.Overlay.Transparency,
 			BorderSizePixel = 0,
-			ZIndex = 0,
-			BackgroundColor3 = p3.Theme.Overlay.Color,
-			BackgroundTransparency = p3.Theme.Overlay.Transparency,
 			Size = UDim2.new(1, 0, 1, 0),
-			Visible = not v15 and p1.open
+			Visible = not v and data.open,
+			ZIndex = 0
 		}, {
 			InputCapturer = Roact.createElement("TextButton", {
 				AnchorPoint = Vector2.new(1, 0),
 				BackgroundTransparency = 1,
 				Position = UDim2.new(1, 0, 0, 0),
-				Size = UDim2.new(1, -p1.occupiedWidth, 1, 0),
+				Size = UDim2.new(1, -data.occupiedWidth, 1, 0),
 				Text = "",
-				[Roact.Event.Activated] = p1.onActivated
+				[Roact.Event.Activated] = data.onActivated
 			})
 		})
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p4, _) -- line: 65
+return RoactRodux.UNSTABLE_connect2(function(data, _)
 	return {
+		currentPage = data.menuPage,
+		open = data.isMenuOpen,
 		occupiedWidth = 464,
-		currentPage = p4.menuPage,
-		open = p4.isMenuOpen,
-		screenSize = p4.screenSize
+		screenSize = data.screenSize
 	}
-end, function(p6) -- line: 74
-	-- upvalues: CloseMenu (copy)
+end, function(callback)
 	return {
-		onActivated = function() -- line: 76
-			-- upvalues: p6 (copy), CloseMenu (copy)
-			p6(CloseMenu)
+		onActivated = function()
+			callback(CloseMenu)
 		end
 	}
 end)(ViewportOverlay)

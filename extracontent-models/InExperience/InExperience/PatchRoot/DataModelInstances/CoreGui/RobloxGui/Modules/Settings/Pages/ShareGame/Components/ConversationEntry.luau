@@ -1,65 +1,74 @@
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local Modules = game:GetService("CoreGui").RobloxGui.Modules
+
+local CoreGui = game:GetService("CoreGui")
+local Modules = CoreGui.RobloxGui.Modules
+
 local Roact = require(CorePackages.Packages.Roact)
+
 local Theme = require(Modules.Settings.Theme)
+
 local ShareGame = Modules.Settings.Pages.ShareGame
+
 local ConversationDetails = require(ShareGame.Components.ConversationDetails)
 local ConversationThumbnail = require(ShareGame.Components.ConversationThumbnail)
-local EventStream = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventStream
+
+local Analytics = require(CorePackages.Workspace.Packages.Analytics)
+local EventStream = Analytics.AnalyticsReporters.EventStream
+
 local InviteButton = require(ShareGame.Components.InviteButton)
-local InviteStatus = require(ShareGame.Constants).InviteStatus
-local v13 = Roact.PureComponent:extend("ConversationEntry")
 
-function v13.init(p1) -- line: 30
-	-- upvalues: EventStream (copy), RbxAnalyticsService (copy), InviteStatus (copy), Players (copy)
-	p1.eventStream = EventStream.new(RbxAnalyticsService)
+local Constants = require(ShareGame.Constants)
+local InviteStatus = Constants.InviteStatus
 
-	function p1.onInvite() -- line: 33
-		-- upvalues: p1 (copy), InviteStatus (copy), Players (copy)
-		local inviteStatus = p1.props.inviteStatus
+local extended = Roact.PureComponent:extend("ConversationEntry")
+
+function extended:init()
+	self.eventStream = EventStream.new(RbxAnalyticsService)
+
+	function self.onInvite()
+		local inviteStatus = self.props.inviteStatus
 
 		if inviteStatus and inviteStatus ~= InviteStatus.Failed then
 			return
 		end
 
-		local analytics = p1.props.analytics
-		local users = p1.props.users
-		local inviteUser = p1.props.inviteUser
+		local analytics = self.props.analytics
+		local users = self.props.users
+		local inviteUser = self.props.inviteUser
 
 		if #users == 1 then
-			inviteUser(users[1].id):andThen(function(p2) -- line: 45
-				-- upvalues: users (copy), Players (copy), analytics (copy)
-				if not p2 then
+			local function fn(p)
+				if not p then
 					return
 				end
 
-				local t1 = {}
+				local ids = {}
 
-				for _, v in pairs(users) do
-					table.insert(t1, v.id)
+				for _, user in pairs(users) do
+					table.insert(ids, user.id)
 				end
 
-				local LocalPlayer = Players.LocalPlayer
+				analytics:onActivatedInviteSent(Players.LocalPlayer.UserId, p.conversationId, ids)
+			end
 
-				analytics:onActivatedInviteSent(LocalPlayer.UserId, p2.conversationId, t1)
-			end, function() -- line: 60
-			end)
+			inviteUser(users[1].id):andThen(fn, function() end)
 		end
 	end
 end
-function v13.render(p3) -- line: 66
-	-- upvalues: Roact (copy), Theme (copy), ConversationThumbnail (copy), ConversationDetails (copy), InviteButton (copy)
-	local visible = p3.props.visible
-	local layoutOrder = p3.props.layoutOrder
-	local zIndex = p3.props.zIndex
-	local size = p3.props.size
-	local subtitle = p3.props.subtitle
-	local title = p3.props.title
-	local users = p3.props.users
-	local inviteStatus = p3.props.inviteStatus
-	local presence = p3.props.presence
+
+function extended.render(p)
+	local visible = p.props.visible
+	local layoutOrder = p.props.layoutOrder
+	local zIndex = p.props.zIndex
+	local size = p.props.size
+	local subtitle = p.props.subtitle
+	local title = p.props.title
+	local users = p.props.users
+	local inviteStatus = p.props.inviteStatus
+
+	local presence = p.props.presence
 
 	return Roact.createElement("ImageButton", {
 		Visible = visible,
@@ -72,7 +81,7 @@ function v13.render(p3) -- line: 66
 		Size = size,
 		LayoutOrder = layoutOrder,
 		ZIndex = zIndex,
-		[Roact.Event.Activated] = p3.onInvite
+		[Roact.Event.Activated] = p.onInvite
 	}, {
 		UICorner = Roact.createElement("UICorner", {
 			CornerRadius = Theme.MenuContainerCornerRadius
@@ -91,27 +100,27 @@ function v13.render(p3) -- line: 66
 			Padding = UDim.new(0, 12)
 		}),
 		Thumbnail = Roact.createElement(ConversationThumbnail, {
-			layoutOrder = 0,
 			users = users,
 			size = UDim2.new(0, 32, 0, 32),
+			layoutOrder = 0,
 			zIndex = zIndex
 		}),
 		Details = Roact.createElement(ConversationDetails, {
-			layoutOrder = 1,
 			title = title,
 			subtitle = subtitle,
 			presence = presence,
 			size = UDim2.new(1, -125, 1, 0),
+			layoutOrder = 1,
 			zIndex = zIndex
 		}),
 		InviteButton = Roact.createElement(InviteButton, {
-			layoutOrder = 2,
 			size = UDim2.new(0, 69, 1, 0),
+			layoutOrder = 2,
 			zIndex = zIndex,
-			onInvite = p3.onInvite,
+			onInvite = p.onInvite,
 			inviteStatus = inviteStatus
 		})
 	})
 end
 
-return v13
+return extended

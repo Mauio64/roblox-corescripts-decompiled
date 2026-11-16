@@ -1,236 +1,209 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local HttpClient = require(DataHydrationParent.HttpClient)
-local UrlBase = require(DataHydrationParent.UrlBuilder).UrlBase
-local withCsrfRetry = require(DataHydration.withCsrfRetry)
+local parent = DataHydration.Parent
 
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
+
+local withCsrfRetry = require(DataHydration.withCsrfRetry)
 require(script.Parent.PlaceVersionHistoryStoreTypes)
 
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function debugRestore(s1: string) -- line: 21
-	print(`[PlaceVersionHistoryRestoreDebug] { s1 }`)
+local function debugRestore(p: string) -- 2 equivalent calls inferred from this helper
+	print(`[PlaceVersionHistoryRestoreDebug] {p}`)
 end
-local function debugNote(s2: string) -- line: 25
-	print(`[PlaceVersionHistoryNoteDebug] { s2 }`)
+
+local function debugNote(p: string) -- 2 equivalent calls inferred from this helper
+	print(`[PlaceVersionHistoryNoteDebug] {p}`)
 end
-local function bodyPreview(p1) -- line: 29
-	if p1 == nil then
+
+local function bodyPreview(responseBody)
+	if responseBody == nil then
 		return "nil"
 	end
 
-	local v23 = if typeof(p1) ~= "buffer" then tostring(p1) else buffer.tostring(p1)
-	local v24 = string.gsub(v23, "[\r\n]+", " ")
+	local v
 
-	if #v24 > 500 then
-		return string.sub(v24, 1, 500) .. "..."
+	if typeof(responseBody) == "buffer" then
+		v = buffer.tostring(responseBody)
+	else
+		v = tostring(responseBody)
 	end
 
-	return v24
-end
-local function appendQuery(s3: string, t1: {[any]: any}) -- line: 43
-	local v27 = false
-	local t2 = {}
+	local v2 = string.gsub(v, "[\r\n]+", " ")
 
-	for v29, v30 in t1 do
-		if v30 ~= nil then
-			v27 = true
-			table.insert(t2, ("%s=%s"):format(v29, (tostring(v30))))
+	if #v2 > 500 then
+		return string.sub(v2, 1, 500) .. "..."
+	end
+
+	return v2
+end
+
+local function appendQuery(value: string, items)
+	local v = {}
+	local flag = false
+
+	for k, item in items do
+		if item == nil then
+			continue
 		end
+
+		table.insert(v, ("%s=%s"):format(k, (tostring(item))))
+		flag = true
 	end
 
-	if not v27 then
-		return s3
+	if flag then
+		return value .. (string.find(value, "?", 1, true) == nil and "?" or "&") .. table.concat(v, "&")
 	end
 
-	return s3 .. (string.find(s3, "?", 1, true) == nil and "?" or "&") .. table.concat(t2, "&")
+	return value
 end
-local function historyUrl(s4: string, n1: number, p2) -- line: 60
-	-- upvalues: appendQuery (copy)
-	local v34 = ("%s/place-version-history-api/v1/%d/history"):format(s4, n1)
 
-	if p2 == nil then
-		return (appendQuery(v34, {
-			pageSize = 100
-		}))
+local function historyUrl(baseUrl: string, p: number, data)
+	local formatted = ("%s/place-version-history-api/v1/%d/history"):format(baseUrl, p)
+
+	if data == nil then
+		return appendQuery(formatted, { pageSize = 100 })
 	end
 
-	return (appendQuery(v34, {
-		cursor = p2.cursor,
-		pageSize = p2.pageSize or p2.limit
-	}))
+	return appendQuery(formatted, {
+		cursor = data.cursor,
+		pageSize = data.pageSize or data.limit,
+		isPublished = data.isPublished
+	})
 end
-local function notesUrl(s5: string, n2: number, s6: string) -- line: 68
-	return ("%s/place-version-history-api/v1/%d/version/%s/notes"):format(s5, n2, s6)
-end
-local function revertUrl(s7: string, n3: number, n4: number) -- line: 72
-	return ("%s/v1/assets/%d/revert-version?assetVersionNumber=%d"):format(s7, n3, n4)
-end
-local function rollbackUrl(s8: string, n5: number) -- line: 76
-	return ("%s/universes/v1/places/%d/rollback"):format(s8, n5)
-end
-local function resolveBase(t3: {[any]: any}?) -- line: 80
-	-- upvalues: UrlBase (copy)
-	local v44 = t3 or {}
 
-	return v44.network, v44.baseUrl or UrlBase.APIS
+local function notesUrl(p: string, p2: number, p3: string) -- 1 equivalent call inferred from this helper
+	return ("%s/place-version-history-api/v1/%d/version/%s/notes"):format(p, p2, p3)
 end
-local function resolveDevelopBase(t4: {[any]: any}?) -- line: 85
-	-- upvalues: UrlBase (copy)
-	return (t4 or {}).developBaseUrl or UrlBase.new("develop")
+
+local function revertUrl(p: string, p2: number, p3: number) -- 1 equivalent call inferred from this helper
+	return ("%s/v1/assets/%d/revert-version?assetVersionNumber=%d"):format(p, p2, p3)
 end
-local function resolveMutatingNetwork(t5: {[any]: any}?) -- line: 90
-	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
-	return (t5 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
+
+local function rollbackUrl(baseUrl: string, p: number) -- 1 equivalent call inferred from this helper
+	return ("%s/universes/v1/places/%d/rollback"):format(baseUrl, p)
 end
-local function toNumber(p3) -- line: 95
-	if type(p3) == "number" then
-		return p3
+
+local function resolveBase(options) -- 1 equivalent call inferred from this helper
+	local v = options or {}
+	return v.network, v.baseUrl or UrlBase.APIS
+end
+
+local function resolveDevelopBase(options) -- 1 equivalent call inferred from this helper
+	return (options or {}).developBaseUrl or UrlBase.new("develop")
+end
+
+local function resolveMutatingNetwork(options) -- 3 equivalent calls inferred from this helper
+	return (options or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
+end
+
+local function toNumber(newVersionNumber) -- 1 equivalent call inferred from this helper
+	if type(newVersionNumber) == "number" then
+		return newVersionNumber
 	end
 
-	if type(p3) == "string" then
-		return (tonumber(p3))
+	if type(newVersionNumber) == "string" then
+		return (tonumber(newVersionNumber))
 	end
 
 	return nil
 end
 
-return {
-	fetchHistory = function(n6: number, t6: {[any]: any}?, p4) -- line: 107
-		-- upvalues: UrlBase (copy), historyUrl (copy), fetch (copy), asPromise (copy)
-		local v51 = t6 or {}
-		local network = v51.network
-		local v53 = v51.baseUrl or UrlBase.APIS
-		local v54 = historyUrl(v53, n6, p4)
-		local v55 = fetch({
-			method = "GET",
-			analyticsKey = "place-version-history.get-history",
-			network = network,
-			url = v54,
-			decode = function(p5) -- line: 119
-				return p5
-			end
-		})
+local FetchPlaceVersionHistory = { DEFAULT_HISTORY_PAGE_SIZE = 100 }
 
-		return asPromise(v55)
-	end,
-	revertVersion = function(n7: number, n8: number, t7: {[any]: any}?) -- line: 126
-		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), asPromise (copy)
-		local v59 = ("%s/v1/assets/%d/revert-version?assetVersionNumber=%d"):format((t7 or {}).developBaseUrl or UrlBase.new("develop"), n7, n8)
-		local v60 = fetch({
-			method = "POST",
-			analyticsKey = "place-version-history.revert-version",
-			legacy = true,
-			network = (t7 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
-			url = v59,
-			body = {},
-			decode = function(_) -- line: 140
-				-- upvalues: n7 (copy), n8 (copy)
-				return {
-					assetId = n7,
-					assetVersionNumber = n8
-				}
-			end
-		})
+function FetchPlaceVersionHistory.fetchHistory(p: number, options, p2)
+	local v = options or {}
+	return asPromise((fetch({
+		network = v.network,
+		method = "GET",
+		url = historyUrl(v.baseUrl or UrlBase.APIS, p, p2),
+		analyticsKey = "place-version-history.get-history",
+		decode = function(p3)
+			return p3
+		end
+	})))
+end
 
-		return asPromise(v60)
-	end,
-	rollbackPlace = function(n9: number, n10: number, s9: string?, b1: boolean?, t8: {[any]: any}?) -- line: 150
-		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), bodyPreview (copy), asPromise (copy)
-		local v66 = t8 or {}
-		local _ = v66.network
-		local v68 = ("%s/universes/v1/places/%d/rollback"):format(v66.baseUrl or UrlBase.APIS, n9)
-		local v69 = fetch({
-			method = "POST",
-			analyticsKey = "place-version-history.rollback-place",
-			network = (t8 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
-			url = v68,
-			body = {
-				versionToRollback = n10,
-				message = s9,
-				published = b1
-			},
-			analytics = function(_, p8, p9, p10, p11, p12) -- line: 169
-				-- upvalues: bodyPreview (copy)
-				if p10 == nil then
-					if p12 ~= "succeeded" then
-						local v88 = `request failed method={ p8 } url={ p9 } status={ p12 } durationMs={ math.floor(p11) } response=nil`
+function FetchPlaceVersionHistory.revertVersion(assetId: number, assetVersionNumber: number, options)
+	local url = revertUrl(resolveDevelopBase(options), assetId, assetVersionNumber) -- inferred equivalent call
+	return asPromise((fetch({
+		network = resolveMutatingNetwork(options), -- inferred equivalent call
+		method = "POST",
+		url = url,
+		body = {},
+		analyticsKey = "place-version-history.revert-version",
+		legacy = true,
+		decode = function(_)
+			return { assetId = assetId, assetVersionNumber = assetVersionNumber }
+		end
+	})))
+end
 
-						print(`[PlaceVersionHistoryRestoreDebug] { v88 }`)
-					end
+function FetchPlaceVersionHistory.rollbackPlace(placeId: number, versionToRollback: number, message: string?, published: boolean?, options)
+	local v = options or {}
+	local _network = v.network
+	local url = rollbackUrl(v.baseUrl or UrlBase.APIS, placeId) -- inferred equivalent call
 
+	return asPromise((fetch({
+		network = resolveMutatingNetwork(options), -- inferred equivalent call
+		method = "POST",
+		url = url,
+		body = { versionToRollback = versionToRollback, message = message, published = published },
+		analyticsKey = "place-version-history.rollback-place",
+		analytics = function(_, p, p2, data, p3, p4)
+			if data == nil then
+				if p4 ~= "succeeded" then
+					debugRestore(`request failed method={p} url={p2} status={p4} durationMs={math.floor(p3)} response=nil`) -- inferred equivalent call
+				end
+			else
+				if p4 == "succeeded" and data.statusCode >= 200 and data.statusCode < 300 then
 					return
 				end
 
-				if p12 == "succeeded" and p10.statusCode >= 200 and p10.statusCode < 300 then
-					return
-				end
-
-				local v89 = `request failed method={ p8 } url={ p9 } status={ p12 } httpStatus={ p10.statusCode } httpError={ tostring(p10.httpError) } durationMs={ math.floor(p11) } body="{ bodyPreview(p10.responseBody) }"`
-
-				print(`[PlaceVersionHistoryRestoreDebug] { v89 }`)
-			end,
-			decode = function(p13) -- line: 191
-				-- upvalues: n9 (copy), n10 (copy), s9 (copy)
-				local t9 = {
-					placeId = n9,
-					versionToRollback = n10
-				}
-				local newVersionNumber = p13.newVersionNumber
-
-				t9.newVersionNumber = if type(newVersionNumber) ~= "number" then if type(newVersionNumber) ~= "string" then nil else tonumber(newVersionNumber) else newVersionNumber
-				t9.message = s9
-
-				return t9
+				debugRestore(`request failed method={p} url={p2} status={p4} httpStatus={data.statusCode} httpError={tostring(data.httpError)} durationMs={math.floor(p3)} body="{bodyPreview(data.responseBody)}"`) -- inferred equivalent call
 			end
-		})
+		end,
+		decode = function(p)
+			return {
+				placeId = placeId,
+				versionToRollback = versionToRollback,
+				newVersionNumber = toNumber(p.newVersionNumber), -- inferred equivalent call
+				message = message
+			}
+		end
+	})))
+end
 
-		return asPromise(v69)
-	end,
-	addVersionNote = function(n11: number, s10: string, p14, t10: {[any]: any}?) -- line: 203
-		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), bodyPreview (copy), asPromise (copy)
-		local v74 = t10 or {}
-		local _ = v74.network
-		local v76 = v74.baseUrl or UrlBase.APIS
-		local v77 = if p14.title ~= nil then tostring(#p14.title) else "nil"
-		local v78 = if p14.description ~= nil then tostring(#p14.description) else "nil"
-		local v79 = fetch({
-			method = "POST",
-			analyticsKey = "place-version-history.add-note",
-			network = (t10 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
-			url = ("%s/place-version-history-api/v1/%d/version/%s/notes"):format(v76, n11, s10),
-			body = p14,
-			analytics = function(_, p16, p17, p18, p19, p20) -- line: 218
-				-- upvalues: v77 (copy), v78 (copy), bodyPreview (copy)
-				if p18 == nil then
-					if p20 ~= "succeeded" then
-						local v99 = `request failed method={ p16 } url={ p17 } status={ p20 } durationMs={ math.floor(p19) } titleLength={ v77 } descriptionLength={ v78 } response=nil`
-
-						print(`[PlaceVersionHistoryNoteDebug] { v99 }`)
-					end
-
+function FetchPlaceVersionHistory.addVersionNote(placeId: number, version: string, body, options)
+	local _, v = resolveBase(options) -- inferred equivalent call
+	local v2 = body.title == nil and "nil" or tostring(#body.title)
+	local v3 = body.description == nil and "nil" or tostring(#body.description)
+	return asPromise((fetch({
+		network = resolveMutatingNetwork(options), -- inferred equivalent call
+		method = "POST",
+		url = notesUrl(v, placeId, version), -- inferred equivalent call
+		body = body,
+		analyticsKey = "place-version-history.add-note",
+		analytics = function(_, p, p2, data, p3, p4)
+			if data == nil then
+				if p4 ~= "succeeded" then
+					debugNote(`request failed method={p} url={p2} status={p4} durationMs={math.floor(p3)} titleLength={v2} descriptionLength={v3} response=nil`) -- inferred equivalent call
+				end
+			else
+				if p4 == "succeeded" and data.statusCode >= 200 and data.statusCode < 300 then
 					return
 				end
 
-				if p20 == "succeeded" and p18.statusCode >= 200 and p18.statusCode < 300 then
-					return
-				end
-
-				local v100 = `request failed method={ p16 } url={ p17 } status={ p20 } httpStatus={ p18.statusCode } httpError={ tostring(p18.httpError) } durationMs={ math.floor(p19) } titleLength={ v77 } descriptionLength={ v78 } body="{ bodyPreview(p18.responseBody) }"`
-
-				print(`[PlaceVersionHistoryNoteDebug] { v100 }`)
-			end,
-			decode = function(p21) -- line: 242
-				-- upvalues: n11 (copy), s10 (copy)
-				return {
-					placeId = n11,
-					version = s10,
-					placeVersion = p21.placeVersion
-				}
+				debugNote(`request failed method={p} url={p2} status={p4} httpStatus={data.statusCode} httpError={tostring(data.httpError)} durationMs={math.floor(p3)} titleLength={v2} descriptionLength={v3} body="{bodyPreview(data.responseBody)}"`) -- inferred equivalent call
 			end
-		})
+		end,
+		decode = function(p)
+			return { placeId = placeId, version = version, placeVersion = p.placeVersion }
+		end
+	})))
+end
 
-		return asPromise(v79)
-	end
-}
+return FetchPlaceVersionHistory

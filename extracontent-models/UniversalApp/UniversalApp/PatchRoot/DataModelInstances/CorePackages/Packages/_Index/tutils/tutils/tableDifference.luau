@@ -1,17 +1,17 @@
-return function(p1, p2) -- line: 5
-	local t1 = {}
+return function(items, items2)
+	local result = {}
 
-	for k, v in pairs(p1) do
-		if p2[k] ~= p1[k] then
-			t1[k] = v
+	for k, item in pairs(items) do
+		if items2[k] ~= items[k] then
+			result[k] = item
 		end
 	end
 
-	for k, v in pairs(p2) do
-		if p2[k] ~= p1[k] then
-			t1[k] = v
+	for k, item in pairs(items2) do
+		if items2[k] ~= items[k] then
+			result[k] = item
 		end
 	end
 
-	return t1
+	return result
 end

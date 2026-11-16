@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Index/SocialExperienceJoin/SocialExperienceJoin/Components/PurchaseExperienceModal/PurchaseExperienceModalContainer")

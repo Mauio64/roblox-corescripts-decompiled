@@ -1,42 +1,62 @@
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local Analytics = require(ParentParent.Services.Analytics)
-local Constants = require(ParentParent.Constants)
-local SetItemBeingPurchased = require(ParentParent.Actions.SetItemBeingPurchased)
-local SendCounter = require(ParentParent.Thunks.SendCounter)
-local t1 = { Analytics }
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local Analytics = require(parent.Services.Analytics)
+local Constants = require(parent.Constants)
+local SetItemBeingPurchased = require(parent.Actions.SetItemBeingPurchased)
 
-local function PromptPurchase(p1, p2, p3, p4, p5, p6, p7) -- line: 18
-	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy), SetItemBeingPurchased (copy), Constants (copy), MarketplaceService (copy), Players (copy), SendCounter (copy)
-	return Thunk.new(script.Name, t1, function(p8, p9) -- line: 27
-		-- upvalues: Analytics (copy), SetItemBeingPurchased (copy), p1 (copy), p2 (copy), p4 (copy), Constants (copy), MarketplaceService (copy), Players (copy), p3 (copy), p5 (copy), p6 (copy), SendCounter (copy), p7 (copy)
-		local v20 = p9[Analytics]
+local SendCounter = require(parent.Thunks.SendCounter)
+local ReportPurchaseAttemptUnifiedEvent = require(parent.Thunks.ReportPurchaseAttemptUnifiedEvent)
 
-		p8:dispatch(SetItemBeingPurchased(p1, p2))
+local FFlagAXIaBSinglePurchaseUnifiedEvents = require(parent.Flags.FFlagAXIaBSinglePurchaseUnifiedEvents)
+local defineFastFlag = game:DefineFastFlag("FixInspectAndBuyThirdPartySales", false)
 
-		if p4 ~= nil and p2 ~= Constants.ItemType.Bundle then
-			MarketplaceService:PromptCollectiblesPurchase(Players.LocalPlayer, p1, p3, p5, p4, p6)
-			p8:dispatch(SendCounter(Constants.Counters.PromptLimitedCollectiblesPurchase))
-		elseif p2 == Constants.ItemType.Bundle then
-			MarketplaceService:PromptBundlePurchase(Players.LocalPlayer, p1)
-			p8:dispatch(SendCounter(Constants.Counters.PromptBundlePurchase))
-		elseif p2 == Constants.ItemType.Asset then
-			local v21 = p7
+local v = { Analytics }
 
-			if p3 ~= nil and not v21 then
-				MarketplaceService:PromptPurchase(Players.LocalPlayer, p1, false)
-				p8:dispatch(SendCounter(Constants.Counters.PromptUnlimitedCollectiblePurchase))
-			else
-				MarketplaceService:PromptRobloxPurchase(p1, false)
-				p8:dispatch(SendCounter(Constants.Counters.PromptRobloxPurchase))
-			end
+local function PromptPurchase(p, p2, p3, p4, p5, p6, p7)
+	return Thunk.new(script.Name, v, function(object, p8)
+		local v2 = p8[Analytics]
+		local v3
+
+		if p4 == nil then
+			v3 = false
 		else
-			p8:dispatch(SendCounter(Constants.Counters.PromptPurchaseUnknownItemType))
+			v3 = p2 ~= Constants.ItemType.Bundle
 		end
 
-		v20.reportPurchaseAttempt(p2, p1)
+		local v4
+
+		if FFlagAXIaBSinglePurchaseUnifiedEvents and v3 then
+			v4 = p6
+		end
+
+		object:dispatch(SetItemBeingPurchased(p, p2, v4))
+
+		if v3 then
+			MarketplaceService:PromptCollectiblesPurchase(Players.LocalPlayer, p, p3, p5, p4, p6)
+
+			object:dispatch(SendCounter(Constants.Counters.PromptLimitedCollectiblesPurchase))
+		elseif p2 == Constants.ItemType.Bundle then
+			MarketplaceService:PromptBundlePurchase(Players.LocalPlayer, p)
+			object:dispatch(SendCounter(Constants.Counters.PromptBundlePurchase))
+		elseif p2 == Constants.ItemType.Asset then
+			if defineFastFlag or p3 == nil or p7 then
+				MarketplaceService:PromptRobloxPurchase(p, false)
+				object:dispatch(SendCounter(Constants.Counters.PromptRobloxPurchase))
+			else
+				MarketplaceService:PromptPurchase(Players.LocalPlayer, p, false)
+				object:dispatch(SendCounter(Constants.Counters.PromptUnlimitedCollectiblePurchase))
+			end
+		else
+			object:dispatch(SendCounter(Constants.Counters.PromptPurchaseUnknownItemType))
+		end
+
+		if FFlagAXIaBSinglePurchaseUnifiedEvents then
+			object:dispatch(ReportPurchaseAttemptUnifiedEvent(p, p2, v4))
+		else
+			v2.reportPurchaseAttempt(p2, p)
+		end
 	end)
 end
 

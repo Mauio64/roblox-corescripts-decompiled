@@ -1,14 +1,13 @@
 local insert = table.insert
 
-local function reverse(t1: {[any]: any}) -- line: 9
-	-- upvalues: insert (copy)
-	local t2 = {}
+local function reverse(list)
+	local result = {}
 
-	for i = #t1, 1, -1 do
-		insert(t2, t1[i])
+	for i = #list, 1, -1 do
+		insert(result, list[i])
 	end
 
-	return t2
+	return result
 end
 
 return reverse

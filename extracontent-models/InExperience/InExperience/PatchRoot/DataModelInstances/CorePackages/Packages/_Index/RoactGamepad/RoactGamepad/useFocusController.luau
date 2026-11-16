@@ -1,16 +1,12 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent
+local React = require(parent.React)
+
 local FocusContext = require(script.Parent.FocusContext)
 
-local function useFocusController() -- line: 10
-	-- upvalues: React (copy), FocusContext (copy)
-	local v5 = React.useContext(FocusContext)
+local function useFocusController()
+	local v = React.useContext(FocusContext)
 
-	if v5 then
-		return v5.focusNode.focusController
-	end
-
-	return nil
+	return if v then v.focusNode.focusController else nil
 end
 
 return useFocusController

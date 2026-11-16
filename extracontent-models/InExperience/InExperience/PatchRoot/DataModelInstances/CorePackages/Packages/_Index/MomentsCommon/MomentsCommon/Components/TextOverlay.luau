@@ -1,91 +1,80 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local Foundation = require(MomentsCommonParent.Foundation)
-local React = require(MomentsCommonParent.React)
+local parent = MomentsCommon.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 local View = Foundation.View
+
 local useCallback = React.useCallback
 
 require(MomentsCommon.Types)
 
-local function TextOverlay(t1: {[any]: any}) -- line: 28
-	-- upvalues: React (copy), useCallback (copy), View (copy), Foundation (copy)
-	local v9 = React.useRef(nil)
-	local v10 = React.useRef(nil)
-	local v11 = useCallback(function(_, vector2: Vector2) -- line: 32
-		-- upvalues: t1 (copy), v10 (copy)
-		if t1.containerRef and t1.containerRef.current then
-			v10.current = vector2
+local function TextOverlay(props)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+
+	local v = useCallback(function(_, current: Vector2)
+		if props.containerRef and props.containerRef.current then
+			ref2.current = current
 		end
-	end, { t1.containerRef })
-	local v12 = useCallback(function(_, vector2: Vector2) -- line: 38
-		-- upvalues: v10 (copy), t1 (copy)
-		if vector2 == v10.current and t1.onActivated then
-			t1.onActivated()
+	end, { props.containerRef })
+
+	local v2 = useCallback(function(_, vector2: Vector2)
+		if ref2.current == vector2 and props.onActivated then
+			props.onActivated()
 		end
 
-		if t1.onDragEnd then
-			t1.onDragEnd()
+		if props.onDragEnd then
+			props.onDragEnd()
 		end
-	end, {
-		t1.onActivated,
-		t1.onDragEnd
-	})
-	local v13 = React.useMemo(function() -- line: 48
-		-- upvalues: t1 (copy), React (copy), v9 (copy), v11 (copy), v12 (copy)
-		if not t1.draggable then
+	end, { props.onActivated, props.onDragEnd })
+
+	local uiDragDetector = React.useMemo(function()
+		if not props.draggable then
 			return nil
 		end
 
 		return React.createElement("UIDragDetector", {
 			BoundingBehavior = Enum.UIDragDetectorBoundingBehavior.EntireObject,
-			BoundingUI = t1.boundingUI,
+			BoundingUI = props.boundingUI,
 			DragStyle = Enum.UIDragDetectorDragStyle.TranslatePlane,
-			ref = v9,
-			ReferenceUIInstance = t1.boundingUI,
+			ref = ref,
+			ReferenceUIInstance = props.boundingUI,
 			ResponseStyle = Enum.UIDragDetectorResponseStyle.Scale,
-			[React.Event.DragStart] = v11,
-			[React.Event.DragEnd] = v12
+			[React.Event.DragStart] = v,
+			[React.Event.DragEnd] = v2
 		})
-	end, {
-		t1.boundingUI,
-		t1.draggable,
-		v11,
-		v12
-	})
+	end, { props.boundingUI, props.draggable, v, v2 })
 
 	return React.createElement(View, {
+		ref = props.containerRef,
+		onActivated = props.onActivated,
+		Position = props.textOverlayEdit.position,
+		Rotation = props.textOverlayEdit.rotation,
+		scale = props.textOverlayEdit.scale * (props.additionalScale or 1),
+		sizeConstraint = { MaxSize = Vector2.new(300, 1e999) },
+		stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
 		tag = "auto-xy anchor-center-center bg-contrast padding-medium position-center-center radius-medium",
-		ref = t1.containerRef,
-		onActivated = t1.onActivated,
-		Position = t1.textOverlayEdit.position,
-		Rotation = t1.textOverlayEdit.rotation,
-		scale = t1.textOverlayEdit.scale * (t1.additionalScale or 1),
-		sizeConstraint = {
-			MaxSize = Vector2.new(300, 1e999)
-		},
-		stateLayer = {
-			affordance = Foundation.Enums.StateLayerAffordance.None
-		},
-		ZIndex = t1.textOverlayEdit.zIndex
+		ZIndex = props.textOverlayEdit.zIndex
 	}, {
-		UIDragDetector = v13,
+		UIDragDetector = uiDragDetector,
 		TextInput = React.createElement("TextBox", {
 			AutomaticSize = Enum.AutomaticSize.XY,
 			BackgroundTransparency = 1,
 			ClearTextOnFocus = false,
 			ClipsDescendants = true,
-			Font = t1.textOverlayEdit.textOverlayStyle.font,
-			Interactable = t1.editable == true,
-			Text = t1.textOverlayEdit.text,
-			TextColor3 = t1.textOverlayEdit.textOverlayStyle.fontColor,
-			TextSize = t1.textOverlayEdit.textOverlayStyle.fontSize,
-			TextXAlignment = t1.textOverlayEdit.textOverlayStyle.textXAlignment,
+			Font = props.textOverlayEdit.textOverlayStyle.font,
+			Interactable = props.editable == true,
+			Text = props.textOverlayEdit.text,
+			TextColor3 = props.textOverlayEdit.textOverlayStyle.fontColor,
+			TextSize = props.textOverlayEdit.textOverlayStyle.fontSize,
+			TextXAlignment = props.textOverlayEdit.textOverlayStyle.textXAlignment,
 			TextYAlignment = Enum.TextYAlignment.Center,
 			TextWrapped = true,
-			Size = t1.size,
-			ZIndex = t1.textOverlayEdit.zIndex,
-			ref = t1.textBoxRef,
-			[React.Change.Text] = t1.onTextChanged
+			Size = props.size,
+			ZIndex = props.textOverlayEdit.zIndex,
+			ref = props.textBoxRef,
+			[React.Change.Text] = props.onTextChanged
 		})
 	})
 end

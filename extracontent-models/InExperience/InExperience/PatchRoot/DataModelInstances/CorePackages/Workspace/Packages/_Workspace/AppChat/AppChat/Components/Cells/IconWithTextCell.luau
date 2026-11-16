@@ -1,111 +1,165 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local memo = React.memo
-local ImageSetLabel = require(AppChatParent.UIBlox).Core.ImageSet.ImageSetLabel
+
+local UIBlox = require(parent.UIBlox)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local BaseCell = require(script.Parent.BaseCell)
-local TestStyle = require(AppChat.SocialLibraries).Components.TestStyle
+
+local SocialLibraries = require(AppChat.SocialLibraries)
+local TestStyle = SocialLibraries.Components.TestStyle
 
 require(AppChat.types)
 
-local t1 = {
+local v = {
 	Text = "titleText",
 	primaryIconSize = 32,
 	isDisabled = false,
+	Size = UDim2.new(1, 0, 1, 0),
+	onActivated = function()
+		print("IconWithTextCell onActivated")
+	end,
 	secondaryIcon = "",
 	secondaryIconSize = 24,
 	iconCellWidth = 60,
 	LayoutOrder = 0,
-	showDivider = true,
-	Size = UDim2.new(1, 0, 1, 0),
-	onActivated = function() -- line: 44
-		print("IconWithTextCell onActivated")
-	end,
 	style = Cryo.Dictionary.join(TestStyle, {
 		Tokens = {
-			Color = {
-				None = {}
-			}
+			Color = { None = {} }
 		}
-	})
+	}),
+	showDivider = true
 }
 
-local function IconWithTextCell(t2: {[any]: any}) -- line: 65
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), BaseCell (copy), ImageSetLabel (copy)
-	local v12 = Cryo.Dictionary.join(t1, t2)
-	local style = v12.style
-	local Theme = style.Theme
-	local styleFont = style.Font
-	local v16 = v12.primaryIcon == nil
+local function IconWithTextCell(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local style = joined.style
+	local theme = style.Theme
+	local font = style.Font
+	local v2
 
-	return React.createElement(BaseCell, {
-		Size = v12.Size,
-		BackgroundColor3 = Theme.BackgroundDefault.Color,
+	if FoundationFontFaceMigration then
+		v2 = useTokens()
+	end
+
+	local v3 = joined.primaryIcon == nil
+
+	local createElement = React.createElement
+	local v4 = {
+		Size = joined.Size,
+		BackgroundColor3 = theme.BackgroundDefault.Color,
 		BackgroundTransparency = style.Tokens.Color.None.Transparency,
-		onPressedBackgroundColor3 = Theme.BackgroundOnPress.Color,
-		onPressedBackgroundTransparency = Theme.BackgroundOnPress.Transparency,
-		LayoutOrder = v12.LayoutOrder,
-		onActivated = v12.onActivated,
-		showDivider = v12.showDivider,
-		dividerColor3 = Theme.Divider.Color,
-		dividerTransparency = Theme.Divider.Transparency,
-		isDisabled = v12.isDisabled,
-		avatarCircleCellWidth = v12.iconCellWidth,
-		testId = t2.testId
-	}, {
-		leftFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.fromScale(0, 0.5),
-			Size = UDim2.new(1, -v12.iconCellWidth, 1, 0)
-		}, {
-			leftListLayout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}),
-			imageFrame = if v16 then nil else React.createElement("Frame", {
+		onPressedBackgroundColor3 = theme.BackgroundOnPress.Color,
+		onPressedBackgroundTransparency = theme.BackgroundOnPress.Transparency,
+		LayoutOrder = joined.LayoutOrder,
+		onActivated = joined.onActivated,
+		showDivider = joined.showDivider,
+		dividerColor3 = theme.Divider.Color,
+		dividerTransparency = theme.Divider.Transparency,
+		isDisabled = joined.isDisabled,
+		avatarCircleCellWidth = joined.iconCellWidth,
+		testId = p.testId
+	}
+
+	local createElement2 = React.createElement
+	local v5 = {
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.fromScale(0, 0.5),
+		Size = UDim2.new(1, -joined.iconCellWidth, 1, 0),
+		BackgroundTransparency = 1,
+		LayoutOrder = 1
+	}
+
+	local v6 = {
+		leftListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		imageFrame = 0,
+		text = 0
+	}
+	local imageFrame
+
+	if not v3 then
+		imageFrame = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(0, joined.iconCellWidth, 0, joined.primaryIconSize),
 				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				Size = UDim2.new(0, v12.iconCellWidth, 0, v12.primaryIconSize)
-			}, {
+				LayoutOrder = 1
+			},
+			{
 				primaryIcon = React.createElement(ImageSetLabel, {
-					BorderSizePixel = 0,
-					BackgroundTransparency = 1,
 					Position = UDim2.fromScale(0.5, 0.5),
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Image = v12.primaryIcon,
-					Size = UDim2.new(0, v12.primaryIconSize, 0, v12.primaryIconSize),
-					ImageColor3 = Theme.IconEmphasis.Color
+					Image = joined.primaryIcon,
+					BorderSizePixel = 0,
+					Size = UDim2.new(0, joined.primaryIconSize, 0, joined.primaryIconSize),
+					ImageColor3 = theme.IconEmphasis.Color,
+					BackgroundTransparency = 1
 				})
-			}),
-			text = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				Size = UDim2.new(1, if not v16 then -v12.iconCellWidth else 0, 1, 0),
-				Text = v12.Text,
-				TextSize = styleFont.Header2.RelativeSize * styleFont.BaseSize,
-				Font = styleFont.Header2.Font,
-				TextColor3 = Theme.TextEmphasis.Color,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextTruncate = Enum.TextTruncate.AtEnd
-			})
-		}),
+			}
+		)
+	end
+
+	v6.imageFrame = imageFrame
+
+	local createElement3 = React.createElement
+	local v7 = {
+		Size = UDim2.new(1, v3 and 0 or -joined.iconCellWidth, 1, 0),
+		Text = joined.Text,
+		TextSize = font.Header2.RelativeSize * font.BaseSize,
+		Font = 0,
+		FontFace = 0,
+		TextColor3 = 0,
+		TextXAlignment = 0,
+		TextTruncate = 0,
+		BackgroundTransparency = 1,
+		LayoutOrder = 2
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Header2.Font
+	end
+
+	v7.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v2.Typography.TitleLarge.Font)
+	end
+
+	v7.FontFace = fontFace
+
+	v7.TextColor3 = theme.TextEmphasis.Color
+	v7.TextXAlignment = Enum.TextXAlignment.Left
+	v7.TextTruncate = Enum.TextTruncate.AtEnd
+	v6.text = createElement3("TextLabel", v7)
+	return createElement(BaseCell, v4, {
+		leftFrame = createElement2("Frame", v5, v6),
 		rightFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
 			AnchorPoint = Vector2.new(1, 0.5),
 			Position = UDim2.fromScale(1, 0.5),
-			Size = UDim2.fromOffset(v12.iconCellWidth, v12.iconCellWidth)
+			Size = UDim2.fromOffset(joined.iconCellWidth, joined.iconCellWidth),
+			BackgroundTransparency = 1,
+			LayoutOrder = 1
 		}, {
-			secondaryIcon = v12.secondaryIcon and React.createElement("ImageLabel", {
-				BackgroundTransparency = 1,
+			secondaryIcon = joined.secondaryIcon and React.createElement("ImageLabel", {
 				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Image = v12.secondaryIcon,
-				Size = UDim2.fromOffset(v12.secondaryIconSize, v12.secondaryIconSize)
+				Image = joined.secondaryIcon,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(joined.secondaryIconSize, joined.secondaryIconSize)
 			})
 		})
 	})

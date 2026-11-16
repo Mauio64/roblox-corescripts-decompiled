@@ -1,224 +1,224 @@
-local t2 = {
-	MakeEncoder = function(s1: string?, s2: string?, s3: string?) -- line: 8
-		local t1 = {}
+local Base64 = {}
 
-		for k, v in pairs({
-			[0] = "A",
-			"B",
-			"C",
-			"D",
-			"E",
-			"F",
-			"G",
-			"H",
-			"I",
-			"J",
-			"K",
-			"L",
-			"M",
-			"N",
-			"O",
-			"P",
-			"Q",
-			"R",
-			"S",
-			"T",
-			"U",
-			"V",
-			"W",
-			"X",
-			"Y",
-			"Z",
-			"a",
-			"b",
-			"c",
-			"d",
-			"e",
-			"f",
-			"g",
-			"h",
-			"i",
-			"j",
-			"k",
-			"l",
-			"m",
-			"n",
-			"o",
-			"p",
-			"q",
-			"r",
-			"s",
-			"t",
-			"u",
-			"v",
-			"w",
-			"x",
-			"y",
-			"z",
-			"0",
-			"1",
-			"2",
-			"3",
-			"4",
-			"5",
-			"6",
-			"7",
-			"8",
-			"9",
-			s1 or "+",
-			s2 or "/",
-			s3 or "="
-		}) do
-			t1[k] = v:byte()
-		end
+function Base64.MakeEncoder(value: string?, value2: string?, value3: string?)
+	local encoder = {}
 
-		return t1
-	end
-}
-
-function t2.MakeDecoder(s4: string?, s5: string?, s6: string?) -- line: 82
-	-- upvalues: t2 (copy)
-	local t3 = {}
-
-	for k, v in pairs(t2.MakeEncoder(s4, s5, s6)) do
-		t3[v] = k
+	for k, v in pairs({
+		[0] = "A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+		"I",
+		"J",
+		"K",
+		"L",
+		"M",
+		"N",
+		"O",
+		"P",
+		"Q",
+		"R",
+		"S",
+		"T",
+		"U",
+		"V",
+		"W",
+		"X",
+		"Y",
+		"Z",
+		"a",
+		"b",
+		"c",
+		"d",
+		"e",
+		"f",
+		"g",
+		"h",
+		"i",
+		"j",
+		"k",
+		"l",
+		"m",
+		"n",
+		"o",
+		"p",
+		"q",
+		"r",
+		"s",
+		"t",
+		"u",
+		"v",
+		"w",
+		"x",
+		"y",
+		"z",
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		value or "+",
+		value2 or "/",
+		value3 or "="
+	}) do
+		encoder[k] = v:byte()
 	end
 
-	return t3
+	return encoder
 end
 
-local v2 = t2.MakeEncoder()
-local v3 = t2.MakeDecoder()
+function Base64.MakeDecoder(p: string?, p2: string?, p3: string?)
+	local decoder = {}
+
+	for k, v in pairs(Base64.MakeEncoder(p, p2, p3)) do
+		decoder[v] = k
+	end
+
+	return decoder
+end
+
+local encoder = Base64.MakeEncoder()
+local decoder = Base64.MakeDecoder()
+
 local char = string.char
 local concat = table.concat
 local extract = bit32.extract
 
-function t2.Encode(s7: string, t4: {[any]: any}?, b1: boolean?) -- line: 97
-	-- upvalues: v2 (copy), extract (copy), char (copy), concat (copy)
-	local v22 = t4 or v2
-	local t5 = {}
-	local n1 = 1
-	local v25 = #s7
-	local v26 = v25 % 3
-	local t6 = {}
+function Base64.Encode(value: string, p, flag: boolean?)
+	local v = p or encoder
+	local count = #value
+	local v2 = count % 3
+	local v3 = {}
+	local v4 = {}
+	local v5 = 1
 
-	for i = 1, v25 - v26, 3 do
-		local v29, v30, v31 = s7:byte(i, i + 2)
-		local v32 = v29 * 65536 + v30 * 256 + v31
-		local v33
+	for i = 1, count - v2, 3 do
+		local v6, v7, v8 = value:byte(i, i + 2)
+		local v9 = v6 * 65536 + v7 * 256 + v8
+		local v10
 
-		if b1 then
-			v33 = t6[v32]
+		if flag then
+			v10 = v3[v9]
 
-			if not v33 then
-				v33 = char(v22[extract(v32, 18, 6)], v22[extract(v32, 12, 6)], v22[extract(v32, 6, 6)], v22[extract(v32, 0, 6)])
-				t6[v32] = v33
+			if not v10 then
+				v10 = char(v[extract(v9, 18, 6)], v[extract(v9, 12, 6)], v[extract(v9, 6, 6)], v[extract(v9, 0, 6)])
+
+				v3[v9] = v10
 			end
 		else
-			v33 = char(v22[extract(v32, 18, 6)], v22[extract(v32, 12, 6)], v22[extract(v32, 6, 6)], v22[extract(v32, 0, 6)])
+			v10 = char(v[extract(v9, 18, 6)], v[extract(v9, 12, 6)], v[extract(v9, 6, 6)], v[extract(v9, 0, 6)])
 		end
 
-		t5[n1] = v33
-		n1 += 1
+		v4[v5] = v10
+		v5 += 1
 	end
 
-	if v26 == 2 then
-		local v34, v35 = s7:byte(v25 - 1, v25)
-		local v36 = v34 * 65536 + v35 * 256
-
-		t5[n1] = char(v22[extract(v36, 18, 6)], v22[extract(v36, 12, 6)], v22[extract(v36, 6, 6)], v22[64])
-	elseif v26 == 1 then
-		local v37 = s7:byte(v25) * 65536
-
-		t5[n1] = char(v22[extract(v37, 18, 6)], v22[extract(v37, 12, 6)], v22[64], v22[64])
+	if v2 == 2 then
+		local v6, v7 = value:byte(count - 1, count)
+		local v8 = v6 * 65536 + v7 * 256
+		v4[v5] = char(v[extract(v8, 18, 6)], v[extract(v8, 12, 6)], v[extract(v8, 6, 6)], v[64])
+	elseif v2 == 1 then
+		local v6 = value:byte(count) * 65536
+		v4[v5] = char(v[extract(v6, 18, 6)], v[extract(v6, 12, 6)], v[64], v[64])
 	end
 
-	return concat(t5)
+	return concat(v4)
 end
-function t2.EncodeUrl(s8: string, b2: boolean?) -- line: 152
-	-- upvalues: t2 (copy)
-	local v40 = t2.Encode(s8, nil, b2)
 
-	return t2.ToUrlSafeBase64(v40)
+function Base64.EncodeUrl(p: string, flag: boolean?)
+	local encoded = Base64.Encode(p, nil, flag)
+	return Base64.ToUrlSafeBase64(encoded)
 end
-function t2.Decode(s9: string, t7: {[any]: any}?, b3: boolean?) -- line: 158
-	-- upvalues: v3 (copy), char (copy), extract (copy), concat (copy)
-	local v44 = t7 or v3
-	local v45 = nil
-	local v46 = nil
 
-	for k, v in pairs(v44) do
-		if v == 62 then
-			v45 = k
-		elseif v == 63 then
-			v46 = k
+function Base64.Decode(value: string, p, flag: boolean?)
+	local v = p or decoder
+	local v2 = nil
+	local v3 = nil
+
+	for k, v4 in pairs(v) do
+		if v4 == 62 then
+			v2 = k
+		elseif v4 == 63 then
+			v3 = k
 		end
 	end
 
-	local v49 = s9:gsub(("[^%%w%%%s%%%s%%=]"):format(char(v45), (char(v46))), "")
-	local t8 = {}
-	local t9 = {}
-	local n2 = 1
-	local v53 = #v49
-	local v54 = if v49:sub(-2) ~= "==" then v49:sub(-1) ~= "=" and 0 or 1 else 2
+	local v4 = value:gsub(("[^%%w%%%s%%%s%%=]"):format(char(v2), (char(v3))), "")
 
-	for i = 1, if not (v54 > 0) then v53 else v53 - 4, 4 do
-		local v56, v57, v58, v59 = v49:byte(i, i + 3)
-		local v61
+	local v5 = {}
+	local v6 = {}
+	local v7 = 1
+	local count = #v4
+	local v8 = v4:sub(-2) == "==" and 2 or v4:sub(-1) == "=" and 1 or 0
+	local v9
 
-		if b3 then
-			local v60 = v56 * 16777216 + v57 * 65536 + v58 * 256 + v59
+	if v8 > 0 then
+		v9 = count - 4
+	else
+		v9 = count
+	end
 
-			v61 = t8[v60]
+	for i = 1, v9, 4 do
+		local v10, v11, v12, v13 = v4:byte(i, i + 3)
+		local v14
 
-			if not v61 then
-				local v62 = v44[v56] * 262144 + v44[v57] * 4096 + v44[v58] * 64 + v44[v59]
+		if flag then
+			local v15 = v10 * 16777216 + v11 * 65536 + v12 * 256 + v13
+			v14 = v5[v15]
 
-				v61 = char(extract(v62, 16, 8), extract(v62, 8, 8), (extract(v62, 0, 8)))
-				t8[v60] = v61
+			if not v14 then
+				local v16 = v[v10] * 262144 + v[v11] * 4096 + v[v12] * 64 + v[v13]
+				v14 = char(extract(v16, 16, 8), extract(v16, 8, 8), (extract(v16, 0, 8)))
+				v5[v15] = v14
 			end
 		else
-			local v63 = v44[v56] * 262144 + v44[v57] * 4096 + v44[v58] * 64 + v44[v59]
-
-			v61 = char(extract(v63, 16, 8), extract(v63, 8, 8), (extract(v63, 0, 8)))
+			local v15 = v[v10] * 262144 + v[v11] * 4096 + v[v12] * 64 + v[v13]
+			v14 = char(extract(v15, 16, 8), extract(v15, 8, 8), (extract(v15, 0, 8)))
 		end
 
-		t9[n2] = v61
-		n2 += 1
+		v6[v7] = v14
+		v7 += 1
 	end
 
-	if v54 == 1 then
-		local v64, v65, v66 = v49:byte(v53 - 3, v53 - 1)
-		local v67 = v44[v64] * 262144 + v44[v65] * 4096 + v44[v66] * 64
-
-		t9[n2] = char(extract(v67, 16, 8), (extract(v67, 8, 8)))
-	elseif v54 == 2 then
-		local v68, v69 = v49:byte(v53 - 3, v53 - 2)
-
-		t9[n2] = char((extract(v44[v68] * 262144 + v44[v69] * 4096, 16, 8)))
+	if v8 == 1 then
+		local v10, v11, v12 = v4:byte(count - 3, count - 1)
+		local v13 = v[v10] * 262144 + v[v11] * 4096 + v[v12] * 64
+		v6[v7] = char(extract(v13, 16, 8), (extract(v13, 8, 8)))
+	elseif v8 == 2 then
+		local v10, v11 = v4:byte(count - 3, count - 2)
+		v6[v7] = char((extract(v[v10] * 262144 + v[v11] * 4096, 16, 8)))
 	end
 
-	return concat(t9)
-end
-function t2.DecodeUrl(s10: string, b4: boolean?) -- line: 213
-	-- upvalues: t2 (copy)
-	local v72 = t2.FromUrlSafeBase64(s10)
-
-	return t2.Decode(v72, nil, b4)
-end
-function t2.ToUrlSafeBase64(s11: string) -- line: 218
-	local v74 = string.gsub(s11, "+", "-")
-	local v75 = string.gsub(v74, "/", "_")
-
-	return (string.gsub(v75, "=", ""))
-end
-function t2.FromUrlSafeBase64(s12: string) -- line: 225
-	local v77 = s12:gsub("[^%w%-_]", "")
-	local v78 = (4 - #v77 % 4) % 4
-	local v79 = v77 .. string.rep("=", v78)
-	local v80 = string.gsub(v79, "_", "/")
-
-	return (string.gsub(v80, "-", "+"))
+	return concat(v6)
 end
 
-return t2
+function Base64.DecodeUrl(p: string, flag: boolean?)
+	local v = Base64.FromUrlSafeBase64(p)
+	return Base64.Decode(v, nil, flag)
+end
+
+function Base64.ToUrlSafeBase64(value: string)
+	local v = string.gsub(value, "+", "-")
+	local v2 = string.gsub(v, "/", "_")
+	return (string.gsub(v2, "=", ""))
+end
+
+function Base64.FromUrlSafeBase64(value: string)
+	local v = value:gsub("[^%w%-_]", "")
+
+	local v2 = (4 - #v % 4) % 4
+	local v3 = v .. string.rep("=", v2)
+	local v4 = string.gsub(v3, "_", "/")
+	return (string.gsub(v4, "-", "+"))
+end
+
+return Base64

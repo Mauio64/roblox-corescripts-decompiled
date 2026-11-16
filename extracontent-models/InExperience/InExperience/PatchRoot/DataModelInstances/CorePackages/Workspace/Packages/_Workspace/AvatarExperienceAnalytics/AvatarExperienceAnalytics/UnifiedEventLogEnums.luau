@@ -1,16 +1,8 @@
+local UnifiedEventTypes = require(script.Parent.Generated.UnifiedEventTypes)
+
 return {
-	MarketplaceUnifiedAction = {
-		UNDEFINED_ACTION = 0,
-		UI_ELEMENT_CLICK = 1,
-		ITEM_IMPRESSION = 2,
-		ITEM_SELECTED = 3,
-		ITEM_DESELECTED = 4,
-		PURCHASE_ATTEMPT = 5,
-		PURCHASE_SUCCESS = 6,
-		WIDGET_IMPRESSION = 7,
-		WIDGET_LOADED = 8,
-		UI_ELEMENT_IMPRESSION = 9
-	},
+	MarketplaceUnifiedAction = UnifiedEventTypes.MarketplaceUnifiedAction,
+	MarketplaceUnifiedActionNumbers = UnifiedEventTypes.MarketplaceUnifiedActionNumbers,
 	MarketplaceUnifiedItemType = {
 		UNDEFINED_ITEM_TYPE = 0,
 		ASSET = 1,
@@ -27,12 +19,7 @@ return {
 		LOOK_TYPE_AVATAR = 2,
 		LOOK_TYPE_MAKEUP = 3
 	},
-	MarketplaceTimedOption = {
-		PERMANENT = 0,
-		DAYS_3 = 1,
-		DAYS_7 = 2,
-		DAYS_14 = 3
-	},
+	MarketplaceTimedOption = { PERMANENT = 0, DAYS_3 = 1, DAYS_7 = 2, DAYS_14 = 3 },
 	Sort = {
 		UNKNOWN_SORT = 0,
 		RELEVANCE = 1,
@@ -46,22 +33,10 @@ return {
 		PRICE_HIGH_TO_LOW = 9,
 		RECENTLY_CREATED = 10
 	},
-	FiltersSalesType = {
-		SALES_TYPE_ALL = 0,
-		SALES_TYPE_LIMITED = 1
-	},
-	FiltersCreators = {
-		CREATORS_ALL = 0,
-		CREATORS_BY_USERNAME = 1
-	},
-	FiltersPrice = {
-		PRICE_ANY = 0,
-		PRICE_RANGE = 1
-	},
-	FiltersUnavailableItems = {
-		UNAVAILABLE_ITEMS_HIDE = 0,
-		UNAVAILABLE_ITEMS_SHOW = 1
-	},
+	FiltersSalesType = { SALES_TYPE_ALL = 0, SALES_TYPE_LIMITED = 1 },
+	FiltersCreators = { CREATORS_ALL = 0, CREATORS_BY_USERNAME = 1 },
+	FiltersPrice = { PRICE_ANY = 0, PRICE_RANGE = 1 },
+	FiltersUnavailableItems = { UNAVAILABLE_ITEMS_HIDE = 0, UNAVAILABLE_ITEMS_SHOW = 1 },
 	WidgetUiTreatment = {
 		UNKNOWN_WIDGET_UI = 0,
 		ITEM_GROUP = 1,

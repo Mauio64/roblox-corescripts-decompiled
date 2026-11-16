@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.CoreScriptsCommon.CoreScriptsCommon))
+local CoreScriptsCommon = require(Workspace.CoreScriptsCommon.CoreScriptsCommon)
+
+return CoreScriptsCommon

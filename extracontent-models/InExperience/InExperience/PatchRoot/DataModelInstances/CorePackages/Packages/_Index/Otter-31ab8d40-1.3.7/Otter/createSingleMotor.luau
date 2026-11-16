@@ -1,109 +1,107 @@
-local ParentParent = script.Parent.Parent
-local createSignal = require(ParentParent.Signal).createSignal
+local parent = script.Parent.Parent
+
+local Signal = require(parent.Signal)
+local createSignal = Signal.createSignal
+
 local AnimationStepSignal = require(script.Parent.AnimationStepSignal)
 
 require(script.Parent.types)
 
-local t1 = {}
+local class = {}
+class.__index = class
 
-t1.__index = t1
+local function createSingleMotor(p)
+	local signal, fireOnComplete = createSignal()
+	local signal2, fireOnStep = createSignal()
 
-local function createSingleMotor(p1) -- line: 41
-	-- upvalues: createSignal (copy), t1 (copy)
-	local v7, v8 = createSignal()
-	local v9, v10 = createSignal()
-	local t2 = {
+	local singleMotor = {
 		__goal = nil,
-		__running = false,
-		__state = {
-			complete = true,
-			value = p1
-		},
-		__onComplete = v7,
-		__fireOnComplete = v8,
-		__onStep = v9,
-		__fireOnStep = v10
+		__state = { value = p, complete = true },
+		__onComplete = signal,
+		__fireOnComplete = fireOnComplete,
+		__onStep = signal2,
+		__fireOnStep = fireOnStep,
+		__running = false
 	}
 
-	setmetatable(t2, t1)
+	setmetatable(singleMotor, class)
 
-	return t2
+	return singleMotor
 end
 
-function t1.start(p2) -- line: 63
-	-- upvalues: AnimationStepSignal (copy)
-	if p2.__running then
+function class:start()
+	if self.__running then
 		return
 	end
 
-	p2.__connection = AnimationStepSignal:Connect(function(p3) -- line: 68
-		-- upvalues: p2 (copy)
-		p2:step(p3)
+	self.__connection = AnimationStepSignal:Connect(function(p)
+		self:step(p)
 	end)
-	p2.__running = true
 
-	if p2.__goal and p2.__goal.startingValue then
-		p2.__state.value = p2.__goal.startingValue
+	self.__running = true
 
-		if p2.__state.initialValue then
-			p2.__state.initialValue = p2.__goal.startingValue
+	if self.__goal and self.__goal.startingValue then
+		self.__state.value = self.__goal.startingValue
+
+		if self.__state.initialValue then
+			self.__state.initialValue = self.__goal.startingValue
 		end
 
-		p2:step(0)
+		self:step(0)
 	end
 end
-function t1.stop(p4) -- line: 83
-	if p4.__connection ~= nil then
-		p4.__connection:Disconnect()
+
+function class:stop()
+	if self.__connection ~= nil then
+		self.__connection:Disconnect()
 	end
 
-	p4.__running = false
+	self.__running = false
 end
-function t1.step(t3: {[any]: any}, n1: number) -- line: 91
-	if t3.__state.complete then
+
+function class:step(p: number)
+	if self.__state.complete or self.__goal == nil then
 		return
 	end
 
-	if t3.__goal == nil then
-		return
+	local state = self.__goal.step(self.__state, p)
+
+	if state ~= nil then
+		self.__state = state
 	end
 
-	local v16 = t3.__goal.step(t3.__state, n1)
+	self.__fireOnStep(self.__state.value)
 
-	if v16 ~= nil then
-		t3.__state = v16
-	end
-
-	t3.__fireOnStep(t3.__state.value)
-
-	if t3.__state.complete and t3.__running then
-		t3:stop()
-		t3.__fireOnComplete(t3.__state.value)
+	if self.__state.complete and self.__running then
+		self:stop()
+		self.__fireOnComplete(self.__state.value)
 	end
 end
-function t1.setGoal(p5, p6) -- line: 114
-	p5.__goal = p6
-	p5.__state.complete = false
-	p5:start()
-end
-function t1.onStep(p7, p8) -- line: 120
-	local v21 = p7.__onStep:subscribe(p8)
 
-	return function() -- line: 123
-		-- upvalues: v21 (copy)
-		v21:unsubscribe()
+function class:setGoal(goal)
+	self.__goal = goal
+	self.__state.complete = false
+	self:start()
+end
+
+function class:onStep(p)
+	local v = self.__onStep:subscribe(p)
+
+	return function()
+		v:unsubscribe()
 	end
 end
-function t1.onComplete(p9, p10) -- line: 128
-	local v24 = p9.__onComplete:subscribe(p10)
 
-	return function() -- line: 131
-		-- upvalues: v24 (copy)
-		v24:unsubscribe()
+function class:onComplete(p)
+	local v = self.__onComplete:subscribe(p)
+
+	return function()
+		v:unsubscribe()
 	end
 end
-function t1.destroy(p11) -- line: 136
-	p11:stop()
+
+function class:destroy()
+	self:stop()
 end
 
 return createSingleMotor

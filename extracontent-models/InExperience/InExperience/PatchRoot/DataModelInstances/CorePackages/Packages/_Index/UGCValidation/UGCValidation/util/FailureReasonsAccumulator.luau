@@ -1,28 +1,25 @@
-local t1 = {}
+local FailureReasonsAccumulator = {}
+FailureReasonsAccumulator.__index = FailureReasonsAccumulator
 
-t1.__index = t1
-
-function t1.new() -- line: 4
-	-- upvalues: t1 (copy)
-	return (setmetatable({
-		passed = true,
-		reasons = {}
-	}, t1))
+function FailureReasonsAccumulator.new()
+	return (setmetatable({ passed = true, reasons = {} }, FailureReasonsAccumulator))
 end
-function t1.updateReasons(t2: {[any]: any}, b1: boolean, t3: {[any]: any}?) -- line: 13
-	if b1 then
+
+function FailureReasonsAccumulator:updateReasons(flag: boolean, list)
+	if flag then
 		return
 	end
 
-	table.insert(t2.reasons, table.concat(t3, "\n"))
-	t2.passed = false
+	table.insert(self.reasons, table.concat(list, "\n"))
+	self.passed = false
 end
-function t1.getFinalResults(p1) -- line: 22
-	if p1.passed then
+
+function FailureReasonsAccumulator.getFinalResults(p)
+	if p.passed then
 		return true
 	end
 
-	return false, p1.reasons
+	return false, p.reasons
 end
 
-return t1
+return FailureReasonsAccumulator

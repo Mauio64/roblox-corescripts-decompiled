@@ -1,102 +1,102 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local CryptoUtils = require(script.Parent.CryptoUtils)
-local LegallySensitiveContentConstants = require(ParentParent.Constants.LegallySensitiveContentConstants)
-local Base64 = require(ParentParent.dependencies).Base64
-local ConsentName = require(ParentParent.Enums.ConsentName)
+local LegallySensitiveContentConstants = require(parent.Constants.LegallySensitiveContentConstants)
+local dependencies = require(parent.dependencies)
+local base64 = dependencies.Base64
+local ConsentName = require(parent.Enums.ConsentName)
 
-require(ParentParent.Types.LegallySensitiveContentTypes)
+require(parent.Types.LegallySensitiveContentTypes)
 
-local function getAuditDataForConsent(p1, t1: {[any]: any}) -- line: 18
-	-- upvalues: ConsentName (copy), LegallySensitiveContentConstants (copy)
-	local v10 = ({
+local function getAuditDataForConsent(p, data)
+	return ({
 		[ConsentName.phoneNumberDiscoverabilityUpsell] = {
 			{
-				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellNotNow,
+				consentStringTemplate = data.phoneNumberDiscoverabilityUpsellNotNow,
 				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.notNowSourceContentId
 			},
 			{
-				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellTurnOn,
+				consentStringTemplate = data.phoneNumberDiscoverabilityUpsellTurnOn,
 				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.turnOnSourceContentId
 			},
 			{
-				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellTitle,
+				consentStringTemplate = data.phoneNumberDiscoverabilityUpsellTitle,
 				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.titleSourceContentId
 			},
 			{
-				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellContent,
+				consentStringTemplate = data.phoneNumberDiscoverabilityUpsellContent,
 				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.contentSourceContentId
 			}
 		},
 		[ConsentName.PhotoToAvatar] = {
 			{
-				consentStringTemplate = t1.photoToAvatarTitle,
+				consentStringTemplate = data.photoToAvatarTitle,
 				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.titleSourceContentId
 			},
 			{
-				consentStringTemplate = t1.photoToAvatarBodyText,
+				consentStringTemplate = data.photoToAvatarBodyText,
 				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.bodyTextSourceContentId
 			},
 			{
-				consentStringTemplate = t1.photoToAvatarPrivacyLinkText,
+				consentStringTemplate = data.photoToAvatarPrivacyLinkText,
 				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.privacyLinkTextSourceContentId
 			},
 			{
-				consentStringTemplate = t1.photoToAvatarAgreeButton,
+				consentStringTemplate = data.photoToAvatarAgreeButton,
 				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.agreeButtonSourceContentId
 			},
 			{
-				consentStringTemplate = t1.photoToAvatarCancelButton,
+				consentStringTemplate = data.photoToAvatarCancelButton,
 				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.cancelButtonSourceContentId
 			}
-		}
-	})[p1]
-
-	if v10 then
-		return v10
-	end
-
-	return {}
+		},
+		[ConsentName.allowMarketingEmailCheckboxAccountUpgrade] = {
+			{
+				consentStringTemplate = data.allowMarketingEmailCheckboxAccountUpgradeConsent,
+				sourceContentId = LegallySensitiveContentConstants.allowMarketingEmailCheckboxAccountUpgrade.consentSourceContentId
+			}
+		},
+		[ConsentName.allowMarketingEmailAutoOptInAccountUpgrade] = {}
+	})[p] or {}
 end
-local function getAuditHeaderValue(t2: {[any]: any}, s1: string, t3: {[any]: any}?) -- line: 98
-	-- upvalues: CryptoUtils (copy)
-	local t4 = {}
 
-	for _, v in ipairs(t2) do
-		local t5 = {
-			hash = CryptoUtils.hashStringWithFnv1a32(v.consentStringTemplate)
+local function getAuditHeaderValue(list, surface: string, items)
+	local content = {}
+
+	for _, item in ipairs(list) do
+		local vars = {
+			hash = CryptoUtils.hashStringWithFnv1a32(item.consentStringTemplate)
 		}
 
-		if v.vars ~= nil then
-			for k, v2 in pairs(v.vars) do
-				t5[k] = v2
+		if item.vars ~= nil then
+			for k, var in pairs(item.vars) do
+				vars[k] = var
 			end
 		end
 
-		t4[v.sourceContentId] = t5
+		content[item.sourceContentId] = vars
 	end
 
-	local t6 = {
-		surface = s1,
-		content = t4
-	}
+	if next(content) == nil then
+		content = nil
+	end
 
-	if t3 then
-		for k, v in pairs(t3) do
-			t6[k] = v
+	local v = { surface = surface, content = content }
+
+	if items then
+		for k, item in pairs(items) do
+			v[k] = item
 		end
 	end
 
-	return game:GetService("HttpService"):JSONEncode(t6)
+	local HttpService = game:GetService("HttpService")
+	return HttpService:JSONEncode(v)
 end
 
 return {
 	getAuditDataForConsent = getAuditDataForConsent,
 	getAuditHeaderValue = getAuditHeaderValue,
-	getEncodedAuditHeader = function(p2, t7: {[any]: any}, s2: string, t8: {[any]: any}?) -- line: 138
-		-- upvalues: getAuditDataForConsent (copy), getAuditHeaderValue (copy), Base64 (copy)
-		local v27 = getAuditDataForConsent(p2, t7)
-		local v28 = getAuditHeaderValue(v27, s2, t8)
-
-		return (Base64.EncodeUrl(v28))
+	getEncodedAuditHeader = function(p, p2, surface: string, p3)
+		local auditHeaderValue = getAuditHeaderValue(getAuditDataForConsent(p, p2), surface, p3)
+		return (base64.EncodeUrl(auditHeaderValue))
 	end
 }

@@ -1,102 +1,127 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
-local SignalsReact = require(MomentsParent.SignalsReact)
-local Foundation = require(MomentsParent.Foundation)
-local MomentsCommon = require(MomentsParent.MomentsCommon)
-local FoundationText = Foundation.Text
+local parent = Moments.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+local FFlagMomentsUseSharedReactions = require(Moments.Flags.FFlagMomentsUseSharedReactions)
+
+local Text = Foundation.Text
 local View = Foundation.View
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
+
 local useTokens = Foundation.Hooks.useTokens
 local useSignalBinding = SignalsReact.useSignalBinding
 local useSignalState = SignalsReact.useSignalState
-local Reaction = MomentsCommon.Components.Reaction
+local v
+
+if FFlagMomentsUseSharedReactions then
+	v = require(parent.Reactions.Reaction)
+else
+	v = MomentsCommon.Components.Reaction
+end
+
 local ReactionSize = MomentsCommon.Enums.ReactionSize
+
 local MomentContext = require(script.Parent.Parent.Parent.MomentContext)
 local ReactionsSheet = require(Moments.Components.ReactionsSheet)
 local getColorStyleWithTransparency = require(Moments.Utils.getColorStyleWithTransparency)
 
-local function formatCount(n1: number?) -- line: 46
-	if n1 == nil then
+local function formatCount(p: number?) -- 1 equivalent call inferred from this helper
+	if p == nil then
 		return ""
 	end
 
-	if n1 >= 1000000 then
-		return string.format("%.1fM", n1 / 1000000)
+	if p >= 1000000 then
+		return string.format("%.1fM", p / 1000000)
 	end
 
-	if n1 >= 1000 then
-		return string.format("%.1fK", n1 / 1000)
+	if p >= 1000 then
+		return string.format("%.1fK", p / 1000)
 	end
 
-	return (tostring(n1))
+	return (tostring(p))
 end
-local function Reactions(t1: {[any]: any}) -- line: 58
-	-- upvalues: useTokens (copy), MomentContext (copy), React (copy), useSignalBinding (copy), useSignalState (copy), getColorStyleWithTransparency (copy), Reaction (copy), ReactionSize (copy), View (copy), StateLayerAffordance (copy), FoundationText (copy), ReactionsSheet (copy)
-	local v22 = useTokens()
-	local v23 = MomentContext.useMoment()
-	local v24, v25 = React.useState(false)
-	local v26 = useSignalBinding(v23.store.getReactionCount)
-	local v27 = useSignalState(v23.store.getIndividualReactionCounts)
-	local animationRatio = v23.animationRatio
-	local v29 = animationRatio:map(function(n2: number) -- line: 71
-		-- upvalues: getColorStyleWithTransparency (copy), v22 (copy)
-		return getColorStyleWithTransparency(v22.Color.Content.Emphasis, n2)
+
+local function Reactions(p)
+	local v2 = useTokens()
+	local v3 = MomentContext.useMoment()
+
+	local state, setState = React.useState(false)
+
+	local v4 = useSignalBinding(v3.store.getReactionCount)
+
+	local reactionCounts = useSignalState(v3.store.getIndividualReactionCounts)
+	local animationRatio = v3.animationRatio
+
+	local mapped = animationRatio:map(function(p2: number)
+		return getColorStyleWithTransparency(v2.Color.Content.Emphasis, p2)
 	end)
-	local v30 = React.useCallback(function() -- line: 75
-		-- upvalues: v25 (copy)
-		v25(true)
-	end, {})
-	local v31 = React.useCallback(function() -- line: 79
-		-- upvalues: v25 (copy)
-		v25(false)
-	end, {})
-	local t2 = {}
 
-	for i = 1, math.min(3, #v27) do
-		local v34 = v27[i]
+	local onActivated = React.useCallback(function()
+		setState(true)
+	end, {})
 
-		t2["Reaction" .. i] = React.createElement(Reaction, {
+	local onClose = React.useCallback(function()
+		setState(false)
+	end, {})
+
+	local children = {}
+
+	for i = 1, math.min(3, #reactionCounts) do
+		local v5 = reactionCounts[i]
+		children["Reaction" .. i] = React.createElement(v, {
 			LayoutOrder = i,
-			reactionType = v34.reaction,
+			reactionType = v5.reaction,
 			size = ReactionSize.Small,
-			imageStyle = v29
+			imageStyle = mapped
 		})
 	end
 
-	return React.createElement(React.Fragment, nil, {
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v5 = {
 		ReactionsLine = React.createElement(View, {
+			LayoutOrder = p.LayoutOrder,
 			tag = "row align-x-left align-y-center gap-small auto-xy",
-			LayoutOrder = t1.LayoutOrder,
-			onActivated = v30,
-			stateLayer = {
-				affordance = StateLayerAffordance.None
-			},
-			Visible = v26:map(function(n3: number?) -- line: 102
-				return n3 ~= nil
+			onActivated = onActivated,
+			stateLayer = { affordance = StateLayerAffordance.None },
+			Visible = v4:map(function(p2: number?): boolean
+				return p2 ~= nil
 			end)
 		}, {
-			Facepile = React.createElement(View, {
-				LayoutOrder = 1,
-				tag = "row align-x-left align-y-center gap-xxsmall auto-xy"
-			}, t2),
-			Count = React.createElement(FoundationText, {
+			Facepile = React.createElement(
+				View,
+				{ LayoutOrder = 1, tag = "row align-x-left align-y-center gap-xxsmall auto-xy" },
+				children
+			),
+			Count = React.createElement(Text, {
 				LayoutOrder = 2,
 				tag = "auto-xy text-body-medium text-align-x-left text-align-y-center content-default",
-				Text = v26:map(function(n4: number?) -- line: 114
-					return `{ (if n4 ~= nil then (if not (n4 >= 1000000) then (if not (n4 >= 1000) then tostring(n4) else string.format("%.1fK", n4 / 1000)) else string.format("%.1fM", n4 / 1000000)) else "") } reactions`
+				Text = v4:map(function(p2: number?)
+					local v5 = formatCount(p2) -- inferred equivalent call
+					return `{v5} reactions`
 				end),
-				textStyle = animationRatio:map(function(n5: number) -- line: 117
-					-- upvalues: getColorStyleWithTransparency (copy), v22 (copy)
-					return getColorStyleWithTransparency(v22.Color.Content.Default, n5)
+				textStyle = animationRatio:map(function(p2: number)
+					return getColorStyleWithTransparency(v2.Color.Content.Default, p2)
 				end)
 			})
 		}),
-		Modal = if not v24 then nil else React.createElement(ReactionsSheet, {
-			reactionCounts = v27,
-			onClose = v31
+		Modal = 0
+	}
+	local modal
+
+	if state then
+		modal = React.createElement(ReactionsSheet, {
+			reactionCounts = reactionCounts,
+			onClose = onClose
 		})
-	})
+	end
+
+	v5.Modal = modal
+	return createElement(fragment, nil, v5)
 end
 
 return React.memo(Reactions)

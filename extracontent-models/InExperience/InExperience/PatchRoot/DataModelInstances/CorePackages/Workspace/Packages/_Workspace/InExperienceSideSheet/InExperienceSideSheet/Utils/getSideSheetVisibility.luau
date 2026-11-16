@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
-local GetDrawerVisibleStore = require(Parent.Drawer).Stores.GetDrawerVisibleStore
+local parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
+local Drawer = require(parent.Drawer)
+local GetDrawerVisibleStore = Drawer.Stores.GetDrawerVisibleStore
 
-return function(p1) -- line: 6
-	-- upvalues: GetDrawerVisibleStore (copy)
-	return GetDrawerVisibleStore(p1).getDrawerVisible(p1)
+return function(p)
+	return GetDrawerVisibleStore(p).getDrawerVisible(p)
 end

@@ -1,101 +1,99 @@
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local EngineFeature = game:GetEngineFeature("PartyVoiceVolume")
+local engineFeature = game:GetEngineFeature("PartyVoiceVolume")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CrossExperience = script:FindFirstAncestor("CrossExperience")
 
+local CrossExperience = script:FindFirstAncestor("CrossExperience")
 require(CrossExperience.Types)
 
-local v5 = game:DefineFastInt("PartyVoiceAudioFaderVolumePerc", 100)
-local EngineFeature2 = game:GetEngineFeature("AudioPlayerUpdateAssetAPI")
-local t1 = {}
+local defineFastInt = game:DefineFastInt("PartyVoiceAudioFaderVolumePerc", 100)
+local engineFeature2 = game:GetEngineFeature("AudioPlayerUpdateAssetAPI")
 
-t1.__index = t1
+local PartyAudioPlayer = {}
+PartyAudioPlayer.__index = PartyAudioPlayer
 
-function t1.new() -- line: 17
-	-- upvalues: t1 (copy)
-	local t2 = {
+function PartyAudioPlayer.new()
+	local v = {
+		audioPlayers = {},
 		isInitialized = false,
 		sfxAudioFader = nil,
-		onPartyVoiceVolumeChangedSignal = nil,
-		audioPlayers = {}
+		onPartyVoiceVolumeChangedSignal = nil
 	}
 
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v, PartyAudioPlayer)
+	return v
 end
-function t1.addSound(t3: {[any]: any}, p1, s1: string) -- line: 28
-	-- upvalues: EngineFeature2 (copy)
-	local AudioPlayer = Instance.new("AudioPlayer")
 
-	AudioPlayer.Parent = workspace
+function PartyAudioPlayer:addSound(p, p2: string)
+	local audioPlayer = Instance.new("AudioPlayer")
+	audioPlayer.Parent = workspace
 
-	if EngineFeature2 then
-		AudioPlayer.Asset = s1
+	if engineFeature2 then
+		audioPlayer.Asset = p2
 	else
-		AudioPlayer.AssetId = s1
+		audioPlayer.AssetId = p2
 	end
 
-	local Wire = Instance.new("Wire")
+	local wire = Instance.new("Wire")
+	wire.Parent = workspace
 
-	Wire.Parent = workspace
-	Wire.SourceInstance = AudioPlayer
-	Wire.TargetInstance = t3.sfxAudioFader
-	t3.audioPlayers[p1] = AudioPlayer
+	wire.SourceInstance = audioPlayer
+	wire.TargetInstance = self.sfxAudioFader
+
+	self.audioPlayers[p] = audioPlayer
 end
-function t1.initialize(p2) -- line: 46
-	-- upvalues: v5 (copy), ReplicatedStorage (copy), EngineFeature (copy), UserGameSettings (copy)
-	if v5 ~= 100 then
-		ReplicatedStorage:WaitForChild("AudioFader").Volume = v5 / 100
+
+function PartyAudioPlayer:initialize()
+	if defineFastInt ~= 100 then
+		local audioFader = ReplicatedStorage:WaitForChild("AudioFader")
+		audioFader.Volume = defineFastInt / 100
 	end
 
-	local AudioDeviceOutput = Instance.new("AudioDeviceOutput")
+	local audioDeviceOutput = Instance.new("AudioDeviceOutput")
+	audioDeviceOutput.Parent = workspace
 
-	AudioDeviceOutput.Parent = workspace
+	local audioFader = Instance.new("AudioFader")
+	audioFader.Parent = workspace
 
-	local AudioFader = Instance.new("AudioFader")
-
-	AudioFader.Parent = workspace
-
-	if v5 ~= 100 then
-		AudioFader.Volume = v5 / 100
+	if defineFastInt ~= 100 then
+		audioFader.Volume = defineFastInt / 100
 	end
 
-	local Wire = Instance.new("Wire")
+	local wire = Instance.new("Wire")
+	wire.Parent = workspace
+	wire.SourceInstance = audioFader
+	wire.TargetInstance = audioDeviceOutput
 
-	Wire.Parent = workspace
-	Wire.SourceInstance = AudioFader
-	Wire.TargetInstance = AudioDeviceOutput
-	p2.sfxAudioFader = AudioFader
-	p2:addSound("join", "rbxassetid://87296803139875")
-	p2:addSound("leave", "rbxassetid://108128059974752")
-	p2.isInitialized = true
+	self.sfxAudioFader = audioFader
 
-	if EngineFeature then
-		p2.onPartyVoiceVolumeChangedSignal = UserGameSettings:GetPropertyChangedSignal("PartyVoiceVolume"):Connect(function() -- line: 75
-			-- upvalues: p2 (copy)
-			p2:playSound("join")
+	self:addSound("join", "rbxassetid://87296803139875")
+	self:addSound("leave", "rbxassetid://108128059974752")
+
+	self.isInitialized = true
+
+	if engineFeature then
+		self.onPartyVoiceVolumeChangedSignal = UserGameSettings:GetPropertyChangedSignal("PartyVoiceVolume"):Connect(function()
+			self:playSound("join")
 		end)
 	end
 end
-function t1.playSound(p3, p4) -- line: 81
-	if not p3.isInitialized then
-		p3:initialize()
+
+function PartyAudioPlayer:playSound(p)
+	if not self.isInitialized then
+		self:initialize()
 	end
 
-	if not p3.isInitialized or not p3.audioPlayers[p4] then
-		return
-	end
-
-	p3.audioPlayers[p4].TimePosition = 0
-	p3.audioPlayers[p4]:Play()
-end
-function t1.disconnect(p5) -- line: 94
-	if p5.onPartyVoiceVolumeChangedSignal then
-		p5.onPartyVoiceVolumeChangedSignal:Disconnect()
+	if self.isInitialized and self.audioPlayers[p] then
+		self.audioPlayers[p].TimePosition = 0
+		self.audioPlayers[p]:Play()
 	end
 end
 
-t1.default = t1.new()
+function PartyAudioPlayer.disconnect(p)
+	if p.onPartyVoiceVolumeChangedSignal then
+		p.onPartyVoiceVolumeChangedSignal:Disconnect()
+	end
+end
 
-return t1
+PartyAudioPlayer.default = PartyAudioPlayer.new()
+
+return PartyAudioPlayer

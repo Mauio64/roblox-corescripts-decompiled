@@ -1,12 +1,13 @@
 local Players = game:GetService("Players")
-local Modules = game:GetService("CoreGui").RobloxGui.Modules
+
+local CoreGui = game:GetService("CoreGui")
+local Modules = CoreGui.RobloxGui.Modules
 local NewInviteMenuExperimentManager = require(Modules.Settings.Pages.ShareGame.NewInviteMenuExperimentManager)
 
 game:DefineFastInt("EnableNewInviteMenuStyleRollout", 0)
 game:DefineFastFlag("EnableNewInviteMenuStyle", false)
 
-return function() -- line: 10
-	-- upvalues: Players (copy), NewInviteMenuExperimentManager (copy)
+return function()
 	if not Players.LocalPlayer then
 		return false
 	end
@@ -15,9 +16,9 @@ return function() -- line: 10
 		return true
 	end
 
-	local LocalPlayer = Players.LocalPlayer
+	local localPlayer = Players.LocalPlayer
 
-	if game:GetFastInt("EnableNewInviteMenuStyleRollout") > LocalPlayer.UserId % 100 then
+	if game:GetFastInt("EnableNewInviteMenuStyleRollout") > localPlayer.UserId % 100 then
 		return true
 	end
 

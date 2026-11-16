@@ -3,151 +3,170 @@ local CorePackages = game:GetService("CorePackages")
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui", 1e999)
-local Constants = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Constants
+
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local Constants = CoreScriptsCommon.Constants
 local Modules = CoreGui.RobloxGui.Modules
 local ShareGame = Modules.Settings.Pages.ShareGame
 local Promise = require(CorePackages.Packages.Promise)
 local Utility = require(RobloxGui.Modules.Settings.Utility)
+
 local GetFFlagEnableNewInviteMenu = require(Modules.Flags.GetFFlagEnableNewInviteMenu)
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local RoactAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy).RoactAppPolicy
+local UniversalAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy)
+local RoactAppPolicy = UniversalAppPolicy.RoactAppPolicy
+
 local httpRequest = require(Modules.Common.httpRequest)
+
 local Header = require(ShareGame.Components.Header)
 local ConversationList = require(ShareGame.Components.ConversationList)
 local Constants2 = require(ShareGame.Constants)
 local ShareInviteLink = require(ShareGame.Components.ShareInviteLink)
-local GetGameNameAndDescription = require(CorePackages.Workspace.Packages.GameDetailRodux).GetGameNameAndDescription
+local GameDetailRodux = require(CorePackages.Workspace.Packages.GameDetailRodux)
+local GetGameNameAndDescription = GameDetailRodux.GetGameNameAndDescription
+
 local BackButton = require(ShareGame.Components.BackButton)
+
 local SetGameInfoCreated = require(ShareGame.Actions.SetGameInfoCreated)
-local n1 = 10
-local n2 = 44
+local v, v2
 
 if GetFFlagEnableNewInviteMenu() then
-	n1 = 16
-	n2 = 52
+	v = 52
+	v2 = 16
+else
+	v = 44
+	v2 = 10
 end
 
-local v25 = Roact.PureComponent:extend("ShareGamePageFrame")
+local extended = Roact.PureComponent:extend("ShareGamePageFrame")
+
 local ErrorToaster = require(ShareGame.Components.ErrorToaster)
 
-function v25.init(p1) -- line: 43
-	p1.state = {
-		serverType = nil
-	}
+function extended:init()
+	self.state = { serverType = nil }
 end
-function v25.shouldShowInviteLink(p2, p3) -- line: 49
-	-- upvalues: Constants (copy), Utility (copy)
-	if p2.props.experienceInviteShareLinkEnabled and (p2.state.serverType == Constants.STANDARD_SERVER and Utility:IsExperienceOlderThanOneWeek(p3)) then
+
+function extended:shouldShowInviteLink(p): boolean
+	if
+		self.props.experienceInviteShareLinkEnabled
+		and self.state.serverType == Constants.STANDARD_SERVER
+		and Utility:IsExperienceOlderThanOneWeek(p)
+	then
 		return true
 	end
 
 	return false
 end
-function v25.didMount(p4) -- line: 61
-	-- upvalues: Promise (copy), RobloxReplicatedStorage (copy)
-	p4.props.fetchGameInfo()
 
-	if p4.state.serverType == nil then
-		Promise.try(function() -- line: 64
-			-- upvalues: RobloxReplicatedStorage (copy)
+function extended.didMount(object)
+	object.props.fetchGameInfo()
+
+	if object.state.serverType == nil then
+		Promise.try(function()
 			return RobloxReplicatedStorage:WaitForChild("GetServerType", 1e999):InvokeServer()
-		end):andThen(function(p5) -- line: 67
-			-- upvalues: p4 (copy)
-			p4:setState({
-				serverType = p5
-			})
+		end):andThen(function(serverType)
+			object:setState({ serverType = serverType })
 		end)
 	end
 end
-function v25.render(p6) -- line: 73
-	-- upvalues: Constants2 (copy), BackButton (copy), n2 (ref), Roact (copy), CoreGui (copy), ErrorToaster (copy), Header (copy), ShareInviteLink (copy), ConversationList (copy), n1 (ref)
-	local analytics = p6.props.analytics
-	local deviceLayout = p6.props.deviceLayout
-	local zIndex = p6.props.zIndex
-	local closePage = p6.props.closePage
-	local searchAreaActive = p6.props.searchAreaActive
-	local searchText = p6.props.searchText
-	local v39 = Constants2.LayoutSpecific[deviceLayout]
-	local HEADER_HEIGHT = v39.HEADER_HEIGHT
-	local v41 = deviceLayout == Constants2.DeviceLayout.DESKTOP
-	local v42 = not v41 and BackButton.IconType.Arrow or BackButton.IconType.None
-	local isVisible = p6.props.isVisible
-	local v44 = p6:shouldShowInviteLink(p6.props.gameInfo)
-	local n3 = 0
-	local n4 = 0
 
-	if v44 then
-		n3 -= n2
-		n4 = 10
+function extended:render()
+	local analytics = self.props.analytics
+	local deviceLayout = self.props.deviceLayout
+	local zIndex = self.props.zIndex
+	local closePage = self.props.closePage
+	local searchAreaActive = self.props.searchAreaActive
+	local searchText = self.props.searchText
+
+	local v3 = Constants2.LayoutSpecific[deviceLayout]
+	local HEADER_HEIGHT = v3.HEADER_HEIGHT
+	local v4 = deviceLayout == Constants2.DeviceLayout.DESKTOP
+	local arrow = not v4 and BackButton.IconType.Arrow or BackButton.IconType.None
+
+	local isVisible = self.props.isVisible
+	local shouldShowInviteLink = self:shouldShowInviteLink(self.props.gameInfo)
+	local v5 = 0
+	local v6
+
+	if shouldShowInviteLink then
+		v5 -= v
+		v6 = 10
+	else
+		v6 = 0
 	end
 
-	return Roact.createElement("Frame", {
+	local createElement = Roact.createElement
+	local v7 = {
 		BackgroundTransparency = 1,
-		AutoLocalize = false,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0, 0, 0, 0),
-		ZIndex = zIndex
-	}, {
-		toasterPortal = Roact.createElement(Roact.Portal, {
-			target = CoreGui
-		}, {
+		ZIndex = zIndex,
+		AutoLocalize = false
+	}
+
+	local v8 = {
+		toasterPortal = Roact.createElement(Roact.Portal, { target = CoreGui }, {
 			Toaster = Roact.createElement(ErrorToaster)
 		}),
 		Header = Roact.createElement(Header, {
-			layoutOrder = 0,
 			deviceLayout = deviceLayout,
 			size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
 			position = UDim2.new(0, 0, 0, -HEADER_HEIGHT),
+			layoutOrder = 0,
 			zIndex = zIndex,
 			closePage = closePage,
 			searchAreaActive = searchAreaActive,
-			toggleSearchIcon = not v41,
-			iconType = v42,
+			toggleSearchIcon = not v4,
+			iconType = arrow,
 			analytics = analytics
 		}),
-		ShareInviteLink = v44 and Roact.createElement(ShareInviteLink, {
-			layoutOrder = 1,
-			position = UDim2.new(0, 0, 0, n4),
+		ShareInviteLink = 0,
+		ConversationList = 0
+	}
+	local shareInviteLink
+
+	if shouldShowInviteLink then
+		shareInviteLink = Roact.createElement(ShareInviteLink, {
+			position = UDim2.new(0, 0, 0, v6),
 			analytics = analytics,
 			deviceLayout = deviceLayout,
-			size = UDim2.new(1, 0, 0, n2),
+			size = UDim2.new(1, 0, 0, v),
+			layoutOrder = 1,
 			zIndex = zIndex
-		}) or nil,
-		ConversationList = Roact.createElement(ConversationList, {
-			trigger = "GameMenu",
-			analytics = analytics,
-			size = UDim2.new(1, 0, 1, v39.EXTEND_BOTTOM_SIZE - n1 + n3),
-			topPadding = v44 and n1 + n2 + n4 or n1,
-			layoutOrder = not v44 and 1 or 2,
-			zIndex = zIndex,
-			searchText = searchText,
-			isVisible = isVisible
-		})
+		}) or nil
+	end
+
+	v8.ShareInviteLink = shareInviteLink
+
+	v8.ConversationList = Roact.createElement(ConversationList, {
+		analytics = analytics,
+		size = UDim2.new(1, 0, 1, v3.EXTEND_BOTTOM_SIZE - v2 + v5),
+		topPadding = shouldShowInviteLink and v2 + v + v6 or v2,
+		layoutOrder = shouldShowInviteLink and 2 or 1,
+		zIndex = zIndex,
+		searchText = searchText,
+		isVisible = isVisible,
+		trigger = "GameMenu"
 	})
+	return createElement("Frame", v7, v8)
 end
 
-local v27 = RoactRodux.connect(function(p7) -- line: 143
+local v3 = RoactRodux.connect(function(p)
+	return { gameInfo = p.GameInfo }
+end, function(callback)
 	return {
-		gameInfo = p7.GameInfo
-	}
-end, function(p8) -- line: 147
-	-- upvalues: httpRequest (copy), HttpRbxApiService (copy), GetGameNameAndDescription (copy), SetGameInfoCreated (copy)
-	return {
-		fetchGameInfo = function() -- line: 149
-			-- upvalues: httpRequest (copy), HttpRbxApiService (copy), GetGameNameAndDescription (copy), p8 (copy), SetGameInfoCreated (copy)
-			local v51 = httpRequest(HttpRbxApiService)
-
-			GetGameNameAndDescription(v51, game.GameId):andThen(function(p9) -- line: 151
-				-- upvalues: p8 (copy), SetGameInfoCreated (copy)
-				p8(SetGameInfoCreated(p9.Created))
+		fetchGameInfo = function()
+			GetGameNameAndDescription(httpRequest(HttpRbxApiService), game.GameId):andThen(function(p)
+				callback(SetGameInfoCreated(p.Created))
 			end)
 		end
 	}
-end)(v25)
+end)(extended)
 
-return (RoactAppPolicy.connect(function(p10) -- line: 158
+return (RoactAppPolicy.connect(function(p)
 	return {
-		experienceInviteShareLinkEnabled = p10.getExperienceInviteShareLinkEnabled()
+		experienceInviteShareLinkEnabled = p.getExperienceInviteShareLinkEnabled()
 	}
-end)(v27))
+end)(v3))

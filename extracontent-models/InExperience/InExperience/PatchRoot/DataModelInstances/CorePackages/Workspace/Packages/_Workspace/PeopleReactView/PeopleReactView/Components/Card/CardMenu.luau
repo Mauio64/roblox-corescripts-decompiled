@@ -1,272 +1,355 @@
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local React = require(PeopleReactViewParent.React)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
-local Foundation = require(PeopleReactViewParent.Foundation)
+local parent = PeopleReactView.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
 local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
 local Menu = Foundation.Menu
 local View = Foundation.View
-local useLocalization = require(PeopleReactViewParent.Localization).Hooks.useLocalization
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local PersonButtonConfigs = require(PeopleReactView.Configs.PersonButtonConfigs)
 local useGetPeopleService = require(PeopleReactView.Hooks.useGetPeopleService)
+
 local PersonButton = require(PeopleReactView.Components.Buttons.PersonButton)
 local CardMenuWithVoiceVolume = require(PeopleReactView.Components.Card.CardMenuWithVoiceVolume)
 local useDismissWhenOutOfView = require(PeopleReactView.Hooks.useDismissWhenOutOfView)
-local Constants = require(PeopleReactView.Constants)
-local v17 = require(PeopleReactViewParent.PeopleService).getService("Flags")
-local FFlagVoiceVolumeControlsPerUserPlayerGridMenu = v17.FFlagVoiceVolumeControlsPerUserPlayerGridMenu
-local FFlagPeoplePageDismissCardMenuOnScrollOutOfView = v17.FFlagPeoplePageDismissCardMenuOnScrollOutOfView
-local FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted = require(PeopleReactView.Flags.FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted)
-local FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry = v17.FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry
 
-local function CardMenu(t1: {[any]: any}) -- line: 42
-	-- upvalues: useLocalization (copy), Constants (copy), FFlagVoiceVolumeControlsPerUserPlayerGridMenu (copy), useGetPeopleService (copy), PersonButtonConfigs (copy), SignalsReact (copy), FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry (copy), React (copy), FFlagPeoplePageDismissCardMenuOnScrollOutOfView (copy), useDismissWhenOutOfView (copy), IconName (copy), PersonButton (copy), View (copy), CardMenuWithVoiceVolume (copy), FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted (copy), Menu (copy), InputSize (copy)
-	local v24 = useLocalization({
+local Constants = require(PeopleReactView.Constants)
+
+local PeopleService = require(parent.PeopleService)
+local service = PeopleService.getService("Flags")
+local fFlagVoiceVolumeControlsPerUserPlayerGridMenu = service.FFlagVoiceVolumeControlsPerUserPlayerGridMenu
+local fFlagPeoplePageDismissCardMenuOnScrollOutOfView = service.FFlagPeoplePageDismissCardMenuOnScrollOutOfView
+
+local FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted = require(PeopleReactView.Flags.FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted)
+
+local fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry = service.FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry
+
+local function CardMenu(p)
+	local v = {
 		unblock = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.UNBLOCK,
 		block = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.BLOCK,
 		unmute = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.UNMUTE,
 		mute = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.MUTE,
 		report = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.REPORT,
-		voiceSectionTitle = if not FFlagVoiceVolumeControlsPerUserPlayerGridMenu then nil else Constants.PEOPLEPAGE.CARD_MENU.LOCALIZED_STRINGS.VOICE_SECTION_TITLE
-	})
-	local v25 = useGetPeopleService("PeopleBlockStatusStore")
-	local v26 = useGetPeopleService("PeopleVoiceChatStore")
-	local v27 = useGetPeopleService("PeopleAnalyticsManager")
-	local v28 = useGetPeopleService("Constants")
-	local v29 = PersonButtonConfigs(t1.person.UserId)
-	local v30 = SignalsReact.useSignalState(v25.getPlayerBlockStatus(t1.person.UserId))
-	local v31 = SignalsReact.useSignalState(v26.getPlayerIsLocalMuted(t1.person.UserId))
-	local v32 = SignalsReact.useSignalState(v26.getPlayerIsTalking(t1.person.UserId))
-	local v33 = not not FFlagVoiceVolumeControlsPerUserPlayerGridMenu and SignalsReact.useSignalState(v26.getShowVolumeControl)
-	local v34 = not not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry and (v33 and v29[v28.PERSON_BUTTONS.MUTE_PLAYER].shouldShow())
-	local v35, v36 = React.useState(false)
-	local v37 = React.useCallback(function(b1: boolean) -- line: 73
-		-- upvalues: t1 (copy), v36 (copy)
-		t1.onIsOpenChanged(b1)
-		v36(b1)
-	end, { t1.onIsOpenChanged })
-	local v38 = React.useCallback(function() -- line: 78
-		-- upvalues: v27 (copy), v37 (copy)
-		v27:trackPersonCardMenuToggled(false)
-		v37(false)
-	end, { v37 })
-	local v39 = React.useCallback(function() -- line: 84
-		-- upvalues: v35 (copy), v27 (copy), FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry (copy), v34 (copy), v28 (copy), v37 (copy)
-		local v48 = not v35
+		voiceSectionTitle = 0
+	}
+	local voiceSectionTitle
 
-		v27:trackPersonCardMenuToggled(v48)
-
-		if FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry and (v48 and v34) then
-			v27:recordPerUserVoiceVolumeUiOpened(v28.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
-		end
-
-		v37(v48)
-	end, {
-		v35,
-		v37,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else v34,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else v28
-	})
-	local v40 = nil
-
-	if FFlagPeoplePageDismissCardMenuOnScrollOutOfView then
-		v40 = React.useRef(nil)
-		useDismissWhenOutOfView(v35, v38, v40)
+	if fFlagVoiceVolumeControlsPerUserPlayerGridMenu then
+		voiceSectionTitle = Constants.PEOPLEPAGE.CARD_MENU.LOCALIZED_STRINGS.VOICE_SECTION_TITLE
 	end
 
-	local v41 = React.useMemo(function() -- line: 112
-		-- upvalues: v29 (copy), v28 (copy)
-		return v29[v28.PERSON_BUTTONS.MUTE_PLAYER].animatedIcon
-	end, { v29 })
-	local v42 = nil
+	v.voiceSectionTitle = voiceSectionTitle
+	local v2 = useLocalization(v)
 
-	if FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
-		local getPlayerIsLocalMuted = v26.getPlayerIsLocalMuted
+	local v3 = useGetPeopleService("PeopleBlockStatusStore")
+	local v4 = useGetPeopleService("PeopleVoiceChatStore")
+	local v5 = useGetPeopleService("PeopleAnalyticsManager")
+	local v6 = useGetPeopleService("Constants")
 
-		v42 = React.useCallback(function(n1: number) -- line: 119
-			-- upvalues: getPlayerIsLocalMuted (copy)
-			if n1 and getPlayerIsLocalMuted then
-				return getPlayerIsLocalMuted(n1)(false)
+	local personButtonConfigs = PersonButtonConfigs(p.person.UserId)
+
+	local v7 = SignalsReact.useSignalState(v3.getPlayerBlockStatus(p.person.UserId))
+	local v8 = SignalsReact.useSignalState(v4.getPlayerIsLocalMuted(p.person.UserId))
+	local v9 = SignalsReact.useSignalState(v4.getPlayerIsTalking(p.person.UserId))
+	local v10
+
+	if fFlagVoiceVolumeControlsPerUserPlayerGridMenu then
+		v10 = SignalsReact.useSignalState(v4.getShowVolumeControl)
+	else
+		v10 = false
+	end
+
+	local v11
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v11 = v10 and personButtonConfigs[v6.PERSON_BUTTONS.MUTE_PLAYER].shouldShow()
+	else
+		v11 = false
+	end
+
+	local state, setState = React.useState(false)
+
+	local v12 = React.useCallback(function(flag: boolean)
+		p.onIsOpenChanged(flag)
+		setState(flag)
+	end, { p.onIsOpenChanged })
+
+	local onPressedOutside = React.useCallback(function()
+		v5:trackPersonCardMenuToggled(false)
+		v12(false)
+	end, { v12 })
+
+	local useCallback = React.useCallback
+	local function fn()
+		local v13 = not state
+		v5:trackPersonCardMenuToggled(v13)
+
+		if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry and v13 and v11 then
+			v5:recordPerUserVoiceVolumeUiOpened(v6.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+		end
+
+		v12(v13)
+	end
+
+	local v13
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v13 = v11
+	end
+
+	local v14
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v14 = v6
+	end
+
+	local onActivated = useCallback(fn, { state, v12, v13, v14 })
+	local ref
+
+	if fFlagPeoplePageDismissCardMenuOnScrollOutOfView then
+		ref = React.useRef(nil)
+		useDismissWhenOutOfView(state, onPressedOutside, ref)
+	end
+
+	local animatedIcon = React.useMemo(function()
+		return personButtonConfigs[v6.PERSON_BUTTONS.MUTE_PLAYER].animatedIcon
+	end, { personButtonConfigs })
+	local getPlayerIsLocalMuted2
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		local getPlayerIsLocalMuted = v4.getPlayerIsLocalMuted
+		getPlayerIsLocalMuted2 = React.useCallback(function(p2: number)
+			if p2 and getPlayerIsLocalMuted then
+				return getPlayerIsLocalMuted(p2)(false)
 			end
 
 			return false
 		end, { getPlayerIsLocalMuted })
 	end
 
-	local v44 = if not FFlagVoiceVolumeControlsPerUserPlayerGridMenu then React.useMemo(function() -- line: 201
-		-- upvalues: v29 (copy), v28 (copy), v31 (copy), v24 (copy), IconName (copy), v30 (copy), v37 (copy)
-		local v57 = v29[v28.PERSON_BUTTONS.MUTE_PLAYER]
-		local v58 = v29[v28.PERSON_BUTTONS.BLOCK_PLAYER]
-		local v59 = v29[v28.PERSON_BUTTONS.REPORT_PLAYER]
-		local t2 = {}
+	local v15
 
-		if v57.shouldShow() then
-			table.insert(t2, {
-				id = "mute",
-				text = if not v31 then v24.mute else v24.unmute,
-				icon = if not v31 then IconName.Speaker else IconName.SpeakerSlash,
-				onActivated = function() -- line: 213
-					-- upvalues: v57 (copy), v28 (copy)
-					v57.onActivated(v28.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+	if fFlagVoiceVolumeControlsPerUserPlayerGridMenu then
+		v15 = React.useMemo(function()
+			local v16 = personButtonConfigs[v6.PERSON_BUTTONS.MUTE_PLAYER]
+			local v17 = personButtonConfigs[v6.PERSON_BUTTONS.BLOCK_PLAYER]
+			local v18 = personButtonConfigs[v6.PERSON_BUTTONS.REPORT_PLAYER]
+			local PEOPLE_CARD = v6.ANALYTICS.ENTRY_POINT.PEOPLE_CARD
+
+			local v19 = {}
+			local items = {}
+			local v20
+
+			if v16.shouldShow() then
+				v20 = { id = "mute", text = 0, icon = 0, onActivated = 0 }
+
+				local text = if v8 then v2.unmute else v2.mute
+				v20.text = text
+				local icon
+
+				if v8 then
+					icon = IconName.SpeakerSlash
+				else
+					icon = IconName.Speaker
 				end
-			})
-		end
 
-		if v58.shouldShow() then
-			table.insert(t2, {
-				id = "block",
-				text = if not v30 then v24.block else v24.unblock,
-				icon = IconName.CircleSlash,
-				onActivated = function() -- line: 223
-					-- upvalues: v58 (copy), v28 (copy), v37 (copy)
-					v58.onActivated(v28.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
-					v37(false)
+				v20.icon = icon
+				function v20.onActivated()
+					v16.onActivated(PEOPLE_CARD)
 				end
-			})
-		end
+			end
 
-		if v59.shouldShow() then
-			table.insert(t2, {
-				id = "report",
-				text = v24.report,
-				icon = IconName.Flag,
-				onActivated = function() -- line: 234
-					-- upvalues: v59 (copy), v28 (copy)
-					v59.onActivated(v28.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+			if v20 and not v10 then
+				table.insert(items, v20)
+			end
+
+			if v17.shouldShow() then
+				local text = if v7 then v2.unblock else v2.block
+				local v21 = {
+					id = "block",
+					text = text,
+					icon = IconName.CircleSlash,
+					onActivated = function()
+						v17.onActivated(PEOPLE_CARD)
+						v12(false)
+					end
+				}
+				table.insert(items, v21)
+			end
+
+			if v18.shouldShow() then
+				table.insert(items, {
+					id = "report",
+					text = v2.report,
+					icon = IconName.Flag,
+					onActivated = function()
+						v18.onActivated(PEOPLE_CARD)
+					end
+				})
+			end
+
+			if #items > 0 then
+				table.insert(v19, { items = items })
+			end
+
+			if v20 and v10 then
+				table.insert(v19, {
+					title = v2.voiceSectionTitle,
+					showVolumeSlider = true,
+					items = { v20 }
+				})
+			end
+
+			return v19
+		end, { v7, v8, v12, personButtonConfigs, v2, v10 })
+	else
+		v15 = React.useMemo(function()
+			local v16 = personButtonConfigs[v6.PERSON_BUTTONS.MUTE_PLAYER]
+			local v17 = personButtonConfigs[v6.PERSON_BUTTONS.BLOCK_PLAYER]
+			local v18 = personButtonConfigs[v6.PERSON_BUTTONS.REPORT_PLAYER]
+
+			local v19 = {}
+
+			if v16.shouldShow() then
+				local text = if v8 then v2.unmute else v2.mute
+				local icon
+
+				if v8 then
+					icon = IconName.SpeakerSlash
+				else
+					icon = IconName.Speaker
 				end
-			})
-		end
 
-		return t2
-	end, {
-		v30,
-		v31,
-		v37,
-		v29,
-		v24
-	}) else React.useMemo(function() -- line: 130
-		-- upvalues: v29 (copy), v28 (copy), v31 (copy), v24 (copy), IconName (copy), v33 (copy), v30 (copy), v37 (copy)
-		local v50 = v29[v28.PERSON_BUTTONS.MUTE_PLAYER]
-		local v51 = v29[v28.PERSON_BUTTONS.BLOCK_PLAYER]
-		local v52 = v29[v28.PERSON_BUTTONS.REPORT_PLAYER]
-		local PEOPLE_CARD = v28.ANALYTICS.ENTRY_POINT.PEOPLE_CARD
-		local t3 = {}
-		local t4 = {}
-		local t5 = nil
+				table.insert(v19, {
+					id = "mute",
+					text = text,
+					icon = icon,
+					onActivated = function()
+						v16.onActivated(v6.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+					end
+				})
+			end
 
-		if v50.shouldShow() then
-			t5 = {
-				id = "mute",
-				text = if not v31 then v24.mute else v24.unmute,
-				icon = if not v31 then IconName.Speaker else IconName.SpeakerSlash,
-				onActivated = function() -- line: 145
-					-- upvalues: v50 (copy), PEOPLE_CARD (copy)
-					v50.onActivated(PEOPLE_CARD)
-				end
-			}
-		end
+			if v17.shouldShow() then
+				local text = if v7 then v2.unblock else v2.block
+				local v20 = {
+					id = "block",
+					text = text,
+					icon = IconName.CircleSlash,
+					onActivated = function()
+						v17.onActivated(v6.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+						v12(false)
+					end
+				}
+				table.insert(v19, v20)
+			end
 
-		if t5 and not v33 then
-			table.insert(t4, t5)
-		end
+			if v18.shouldShow() then
+				table.insert(v19, {
+					id = "report",
+					text = v2.report,
+					icon = IconName.Flag,
+					onActivated = function()
+						v18.onActivated(v6.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+					end
+				})
+			end
 
-		if v51.shouldShow() then
-			table.insert(t4, {
-				id = "block",
-				text = if not v30 then v24.block else v24.unblock,
-				icon = IconName.CircleSlash,
-				onActivated = function() -- line: 161
-					-- upvalues: v51 (copy), PEOPLE_CARD (copy), v37 (copy)
-					v51.onActivated(PEOPLE_CARD)
-					v37(false)
-				end
-			})
-		end
-
-		if v52.shouldShow() then
-			table.insert(t4, {
-				id = "report",
-				text = v24.report,
-				icon = IconName.Flag,
-				onActivated = function() -- line: 172
-					-- upvalues: v52 (copy), PEOPLE_CARD (copy)
-					v52.onActivated(PEOPLE_CARD)
-				end
-			})
-		end
-
-		if #t4 > 0 then
-			table.insert(t3, {
-				items = t4
-			})
-		end
-
-		if t5 and v33 then
-			table.insert(t3, {
-				showVolumeSlider = true,
-				title = v24.voiceSectionTitle,
-				items = { t5 }
-			})
-		end
-
-		return t3
-	end, {
-		v30,
-		v31,
-		v37,
-		v29,
-		v24,
-		v33
-	})
-	local v45 = React.createElement(PersonButton, {
-		isBackgroundTransparent = true,
-		LayoutOrder = 1,
-		icon = {
-			on = if not v32 then IconName.ThreeDotsHorizontal else nil
-		},
-		animatedIcon = if not v32 then nil else v41,
-		onActivated = v39,
-		isBuilderIcon = not v32
-	})
-	local v46 = if not FFlagPeoplePageDismissCardMenuOnScrollOutOfView then nil else React.createElement(View, {
-		LayoutOrder = 1,
-		tag = "auto-xy",
-		ref = v40
-	}, {
-		Button = v45
-	})
-
-	if next(v44) == nil then
-		return nil
+			return v19
+		end, { v7, v8, v12, personButtonConfigs, v2 })
 	end
 
-	if FFlagVoiceVolumeControlsPerUserPlayerGridMenu then
-		return React.createElement(CardMenuWithVoiceVolume, {
-			isOpen = v35,
-			menuGroups = v44,
-			onPressedOutside = v38,
-			userId = t1.person.UserId,
-			voiceVolumeMin = v28.VOICE_CHAT.VOICE_VOLUME.MIN,
-			voiceVolumeMax = v28.VOICE_CHAT.VOICE_VOLUME.MAX,
-			getPlayerVoiceVolume = v26.getPlayerVoiceVolume,
-			subscribePlayerVoiceVolume = v26.subscribePlayerVoiceVolume,
-			setPlayerVoiceVolume = v26.setPlayerVoiceVolume,
-			isMutedByLocalUser = if not FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted then nil else v31,
-			getPlayerIsLocalMuted = if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else v42,
-			getVoiceSessionId = if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else v26.getVoiceSessionId
-		}, {
-			MenuAnchor = v46 or v45
+	local createElement = React.createElement
+	local on
+
+	if not v9 then
+		on = IconName.ThreeDotsHorizontal
+	end
+
+	if not v9 then
+		animatedIcon = nil
+	end
+
+	local element = createElement(PersonButton, {
+		icon = { on = on },
+		animatedIcon = animatedIcon,
+		onActivated = onActivated,
+		isBuilderIcon = not v9,
+		isBackgroundTransparent = true,
+		LayoutOrder = 1
+	})
+	local v16
+
+	if fFlagPeoplePageDismissCardMenuOnScrollOutOfView then
+		v16 = React.createElement(View, { ref = ref, LayoutOrder = 1, tag = "auto-xy" }, {
+			Button = element
 		})
 	end
 
-	return React.createElement(Menu, {
-		isOpen = v35,
-		items = v44,
-		size = InputSize.Medium,
-		onPressedOutside = v38
-	}, {
-		MenuAnchor = v46 or v45
+	if next(v15) == nil then
+		return nil
+	end
+
+	if not fFlagVoiceVolumeControlsPerUserPlayerGridMenu then
+		return React.createElement(
+			Menu,
+			{
+				isOpen = state,
+				items = v15,
+				size = InputSize.Medium,
+				onPressedOutside = onPressedOutside
+			},
+			{
+				MenuAnchor = v16 or element
+			}
+		)
+	end
+
+	local createElement2 = React.createElement
+	local v17 = {
+		isOpen = state,
+		menuGroups = v15,
+		onPressedOutside = onPressedOutside,
+		userId = p.person.UserId,
+		voiceVolumeMin = v6.VOICE_CHAT.VOICE_VOLUME.MIN,
+		voiceVolumeMax = v6.VOICE_CHAT.VOICE_VOLUME.MAX,
+		getPlayerVoiceVolume = v4.getPlayerVoiceVolume,
+		subscribePlayerVoiceVolume = v4.subscribePlayerVoiceVolume,
+		setPlayerVoiceVolume = v4.setPlayerVoiceVolume,
+		isMutedByLocalUser = 0,
+		getPlayerIsLocalMuted = 0,
+		getVoiceSessionId = 0
+	}
+	local isMutedByLocalUser
+
+	if FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted then
+		isMutedByLocalUser = v8
+	end
+
+	v17.isMutedByLocalUser = isMutedByLocalUser
+
+	if not fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		getPlayerIsLocalMuted2 = nil
+	end
+
+	v17.getPlayerIsLocalMuted = getPlayerIsLocalMuted2
+	local getVoiceSessionId
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		getVoiceSessionId = v4.getVoiceSessionId
+	end
+
+	v17.getVoiceSessionId = getVoiceSessionId
+	return createElement2(CardMenuWithVoiceVolume, v17, {
+		MenuAnchor = v16 or element
 	})
 end
 

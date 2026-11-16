@@ -1,1 +1,2 @@
-return (require(script.Parent.Symbol).new("None"))
+local Symbol = require(script.Parent.Symbol)
+return (Symbol.new("None"))

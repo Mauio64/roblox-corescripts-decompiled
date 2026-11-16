@@ -1,5 +1,4 @@
-local v1 = game:DefineFastFlag("RemoveDeprecatedGuiObjectApisIsElementContentful", false)
-local t1 = {
+local v = {
 	ImageLabel = true,
 	ImageButton = true,
 	TextLabel = true,
@@ -9,17 +8,12 @@ local t1 = {
 	ViewportFrame = true
 }
 
-function isElementContentful(p1) -- line: 14
-	-- upvalues: v1 (copy), t1 (copy)
-	if v1 then
-		if not p1.Visible or p1.BackgroundTransparency == 1 then
-			return false
-		end
-	elseif not p1.Visible or p1.Transparency == 1 then
-		return false
+function isElementContentful(instance)
+	if instance.Visible and instance.BackgroundTransparency ~= 1 then
+		return v[instance.ClassName]
 	end
 
-	return t1[p1.ClassName]
+	return false
 end
 
 return isElementContentful

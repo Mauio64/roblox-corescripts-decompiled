@@ -1,23 +1,24 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local getApolloContext = require(script.Parent.ApolloContext).getApolloContext
-local invariant = require(ParentParent.jsutils.invariant).invariant
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.core.ApolloClient)
+local React = require(parent2.React)
+local ApolloContext = require(script.Parent.ApolloContext)
+local getApolloContext = ApolloContext.getApolloContext
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
 
-function ApolloConsumer(t1: {[any]: any}) -- line: 21
-	-- upvalues: getApolloContext (copy), React (copy), invariant (copy)
-	local v7 = getApolloContext()
+require(parent.core.ApolloClient)
 
-	return React.createElement(v7.Consumer, nil, function(p1) -- line: 23
-		-- upvalues: invariant (copy), t1 (copy)
-		invariant(p1 and p1.client, "Could not find \"client\" in the context of ApolloConsumer. Wrap the root component in an <ApolloProvider>.")
+function ApolloConsumer(p)
+	local apolloContext = getApolloContext()
+	return React.createElement(apolloContext.Consumer, nil, function(p2)
+		invariant2(
+			p2 and p2.client,
+			"Could not find \"client\" in the context of ApolloConsumer. Wrap the root component in an <ApolloProvider>."
+		)
 
-		return t1.children(p1.client)
+		return p.children(p2.client)
 	end)
 end
 
-return {
-	ApolloConsumer = ApolloConsumer
-}
+return { ApolloConsumer = ApolloConsumer }

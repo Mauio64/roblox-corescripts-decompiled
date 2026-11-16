@@ -2,49 +2,43 @@ local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
 
 require(MomentsCreation.Types.CreationFlowTypes)
 
-local function createCreationToolRegistry(t1: {[any]: any}?) -- line: 15
-	local t2 = {}
-	local t3 = {}
+local function createCreationToolRegistry(items)
+	local v = {}
+	local all = {}
 
-	local function rebuildOrdered() -- line: 19
-		-- upvalues: t3 (ref), t2 (copy)
-		t3 = {}
+	local function rebuildOrdered()
+		all = {}
 
-		for _, v10 in t2 do
-			table.insert(t3, v10)
+		for _, v2 in v do
+			table.insert(all, v2)
 		end
 
-		table.sort(t3, function(p1, p2) -- line: 24
-			return (p1.cta.order or 0) < (p2.cta.order or 0)
+		table.sort(all, function(a, b): boolean
+			return (a.cta.order or 0) < (b.cta.order or 0)
 		end)
 	end
 
-	if t1 ~= nil then
-		for _, v8 in t1 do
-			t2[v8.kind] = v8
+	local function register(items2) -- 1 equivalent call inferred from this helper
+		for _, item in items2 do
+			v[item.kind] = item
 		end
 
 		rebuildOrdered()
 	end
 
-	return {
-		register = function(t4: {[any]: any}) -- line: 29
-			-- upvalues: t2 (copy), rebuildOrdered (copy)
-			for _, v13 in t4 do
-				t2[v13.kind] = v13
-			end
+	local function get(p: string)
+		return v[p]
+	end
 
-			rebuildOrdered()
-		end,
-		get = function(s1: string) -- line: 36
-			-- upvalues: t2 (copy)
-			return t2[s1]
-		end,
-		getAll = function() -- line: 40
-			-- upvalues: t3 (ref)
-			return t3
-		end
-	}
+	local function getAll()
+		return all
+	end
+
+	if items ~= nil then
+		register(items) -- inferred equivalent call
+	end
+
+	return { register = register, get = get, getAll = getAll }
 end
 
 return createCreationToolRegistry

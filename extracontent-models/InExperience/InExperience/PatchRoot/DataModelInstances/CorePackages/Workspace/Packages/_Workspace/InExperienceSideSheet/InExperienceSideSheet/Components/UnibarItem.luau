@@ -1,42 +1,74 @@
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
-local Foundation = require(InExperienceSideSheetParent.Foundation)
-local React = require(InExperienceSideSheetParent.React)
+
+local parent = InExperienceSideSheet.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local View = Foundation.View
+
 local IconHost = require(script.Parent.IconHost)
+
 local AnalyticsConstants = require(InExperienceSideSheet.Analytics.AnalyticsConstants)
 local SidesheetAnalytics = require(InExperienceSideSheet.Analytics.SidesheetAnalytics)
-local toggleSideSheet = require(InExperienceSideSheet.Utils.toggleSideSheet)
-local FFlagSideSheetFocusNav = require(InExperienceSideSheetParent.SharedFlags).FFlagSideSheetFocusNav
 
-local function UnibarItem(t1: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), toggleSideSheet (copy), SidesheetAnalytics (copy), AnalyticsConstants (copy), FFlagSideSheetFocusNav (copy), View (copy), IconHost (copy)
-	local v13 = React.useCallback(function() -- line: 31
-		-- upvalues: t1 (copy), toggleSideSheet (copy), SidesheetAnalytics (copy), AnalyticsConstants (copy)
-		t1.onActivated()
+local closePeoplePageOpenedWithSideSheet = require(InExperienceSideSheet.Utils.closePeoplePageOpenedWithSideSheet)
+local toggleSideSheet = require(InExperienceSideSheet.Utils.toggleSideSheet)
+
+local Flags = require(InExperienceSideSheet.Flags)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSideSheetOpenPeoplePage = Flags.FFlagSideSheetOpenPeoplePage
+local FFlagSideSheetFocusNav = SharedFlags.FFlagSideSheetFocusNav
+
+local function UnibarItem(props)
+	local onActivated = React.useCallback(function()
+		props.onActivated()
+
+		if FFlagSideSheetOpenPeoplePage then
+			closePeoplePageOpenedWithSideSheet()
+		end
+
 		toggleSideSheet(false)
 		SidesheetAnalytics.logSidesheetClosed(AnalyticsConstants.Source.ItemSelected)
-	end, { t1.onActivated })
-	local v14 = if not FFlagSideSheetFocusNav then nil else React.useRef(nil)
+	end, { props.onActivated })
+	local ref
 
-	return React.createElement(View, {
-		tag = "auto-xy",
-		LayoutOrder = t1.layoutOrder
-	}, {
+	if FFlagSideSheetFocusNav then
+		ref = React.useRef(nil)
+	end
+
+	local createElement = React.createElement
+	local v = { tag = "auto-xy", LayoutOrder = props.layoutOrder }
+	local v2 = {
 		IconHost = React.createElement(IconHost, {
-			icon = t1.icon,
-			notification = t1.notification
+			icon = props.icon,
+			notification = props.notification
 		}),
-		ActivationOverlay = React.createElement(View, {
-			tag = "size-full radius-circle",
-			ZIndex = 10,
-			onActivated = v13,
-			selection = if not FFlagSideSheetFocusNav or not t1.disableGamepadDirections then nil else {
-				NextSelectionLeft = if not t1.disableGamepadDirections.left then nil else v14
-			},
-			ref = v14
-		})
+		ActivationOverlay = 0
+	}
+
+	local createElement2 = React.createElement
+	local selection
+
+	if FFlagSideSheetFocusNav and props.disableGamepadDirections then
+		selection = { NextSelectionLeft = 0 }
+		local nextSelectionLeft
+
+		if props.disableGamepadDirections.left then
+			nextSelectionLeft = ref
+		end
+
+		selection.NextSelectionLeft = nextSelectionLeft
+	end
+
+	v2.ActivationOverlay = createElement2(View, {
+		tag = "size-full radius-circle",
+		ZIndex = 10,
+		onActivated = onActivated,
+		selection = selection,
+		ref = ref
 	})
+	return createElement(View, v, v2)
 end
 
 return React.memo(UnibarItem)

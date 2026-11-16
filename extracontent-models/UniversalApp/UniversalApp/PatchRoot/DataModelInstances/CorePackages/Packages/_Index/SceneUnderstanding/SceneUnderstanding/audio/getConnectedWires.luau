@@ -1,10 +1,9 @@
-local function getConnectedWires(p1, s1: string) -- line: 1
-	local ok, result = pcall(function() -- line: 2
-		-- upvalues: p1 (copy), s1 (copy)
-		return p1:GetConnectedWires(s1)
+local function getConnectedWires(object, p: string)
+	local success, result = pcall(function()
+		return object:GetConnectedWires(p)
 	end)
 
-	if ok then
+	if success then
 		return result
 	end
 

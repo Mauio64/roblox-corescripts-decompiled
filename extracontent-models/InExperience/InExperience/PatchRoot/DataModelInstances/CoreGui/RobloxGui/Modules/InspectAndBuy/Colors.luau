@@ -1,6 +1,8 @@
 local CorePackages = game:GetService("CorePackages")
-local Color = require(CorePackages.Workspace.Packages.AppCommonLib).Color
-local t1 = {
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Color = AppCommonLib.Color
+
+local Colors = {
 	Obsidian = Color.Color3FromHex(1579291),
 	Carbon = Color.Color3FromHex(2040099),
 	Slate = Color.Color3FromHex(2303271),
@@ -17,12 +19,11 @@ local t1 = {
 	DisabledGreen = Color.Color3FromHex(10273956)
 }
 
-setmetatable(t1, {
-	__newindex = function(_, _, _) -- line: 25
-	end,
-	__index = function(_, p5) -- line: 26
-		error("Colors table has no value: " .. tostring(p5))
+setmetatable(Colors, {
+	__newindex = function(_, _, _) end,
+	__index = function(_, p)
+		error("Colors table has no value: " .. tostring(p))
 	end
 })
 
-return t1
+return Colors

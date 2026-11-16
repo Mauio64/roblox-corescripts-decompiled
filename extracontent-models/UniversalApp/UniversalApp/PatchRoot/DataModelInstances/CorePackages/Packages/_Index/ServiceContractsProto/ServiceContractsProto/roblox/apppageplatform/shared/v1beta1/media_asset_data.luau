@@ -1,202 +1,187 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 47
-	-- upvalues: t2 (copy)
+local class = {}
+class.__index = class
+
+function class.new(data)
 	return (setmetatable({
-		image_id = if t3 ~= nil and t3.image_id ~= nil then t3.image_id else "",
-		asset_type_id = if t3 ~= nil and t3.asset_type_id ~= nil then t3.asset_type_id else 0,
-		video_hash = if t3 ~= nil and t3.video_hash ~= nil then t3.video_hash else "",
-		video_id = if t3 ~= nil and t3.video_id ~= nil then t3.video_id else "",
-		video_title = if t3 ~= nil and t3.video_title ~= nil then t3.video_title else ""
-	}, t2))
+		image_id = (data == nil or data.image_id == nil) and "" or data.image_id,
+		asset_type_id = (data == nil or data.asset_type_id == nil) and 0 or data.asset_type_id,
+		video_hash = (data == nil or data.video_hash == nil) and "" or data.video_hash,
+		video_id = (data == nil or data.video_id == nil) and "" or data.video_id,
+		video_title = (data == nil or data.video_title == nil) and "" or data.video_title
+	}, class))
 end
-function t2.encode(p1) -- line: 57
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.image_id ~= nil and p1.image_id ~= "" then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v9, v10, p1.image_id)
+	if data.image_id ~= nil and data.image_id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.image_id)
 	end
 
-	if p1.asset_type_id ~= nil and p1.asset_type_id ~= 0 then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v11, v12, p1.asset_type_id)
+	if data.asset_type_id ~= nil and data.asset_type_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.asset_type_id)
 	end
 
-	if p1.video_hash ~= nil and p1.video_hash ~= "" then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v13, v14, p1.video_hash)
+	if data.video_hash ~= nil and data.video_hash ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.video_hash)
 	end
 
-	if p1.video_id ~= nil and p1.video_id ~= "" then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v15, v16, p1.video_id)
+	if data.video_id ~= nil and data.video_id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.video_id)
 	end
 
-	if p1.video_title ~= nil and p1.video_title ~= "" then
-		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v17, v18, p1.video_title)
+	if data.video_title ~= nil and data.video_title ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.video_title)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 91
-	-- upvalues: t2 (copy), proto (copy)
-	local v21 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v23, v24
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v23, v24, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v24 == proto.wireTypes.varint then
-			if v23 == 2 then
-				local v25
-
-				v25, n2 = proto.readVarIntI64(p2, n2)
-				v21.asset_type_id = v25
+		if v4 == proto.wireTypes.varint then
+			if v3 == 2 then
+				local asset_type_id
+				asset_type_id, v2 = proto.readVarIntI64(buf, v2)
+				result.asset_type_id = asset_type_id
 			else
-				local v26
-
-				v26, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v24 == proto.wireTypes.lengthDelimited then
-			if v23 == 1 then
-				local v27
-
-				v27, n2 = proto.readBuffer(p2, n2)
-				v21.image_id = buffer.tostring(v27)
-			elseif v23 == 3 then
-				local v28
-
-				v28, n2 = proto.readBuffer(p2, n2)
-				v21.video_hash = buffer.tostring(v28)
-			elseif v23 == 4 then
-				local v29
-
-				v29, n2 = proto.readBuffer(p2, n2)
-				v21.video_id = buffer.tostring(v29)
-			elseif v23 == 5 then
-				local v30
-
-				v30, n2 = proto.readBuffer(p2, n2)
-				v21.video_title = buffer.tostring(v30)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.image_id = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.video_hash = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.video_id = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.video_title = buffer.tostring(v5)
 			else
-				local v31, v32 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v32 + v31
+				v2 = v5 + varInt
 			end
-		elseif v24 == proto.wireTypes.i32 then
-			local v33
-
-			v33, n2 = proto.readFixed32(p2, n2)
-		elseif v24 == proto.wireTypes.i64 then
-			local v34
-
-			v34, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v24)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v21
-end
-function t2.jsonEncode(p3) -- line: 154
-	local t4 = {}
-
-	if p3.image_id ~= nil and p3.image_id ~= "" then
-		t4.imageId = p3.image_id
-	end
-
-	if p3.asset_type_id ~= nil and p3.asset_type_id ~= 0 then
-		t4.assetTypeId = p3.asset_type_id
-	end
-
-	if p3.video_hash ~= nil and p3.video_hash ~= "" then
-		t4.videoHash = p3.video_hash
-	end
-
-	if p3.video_id ~= nil and p3.video_id ~= "" then
-		t4.videoId = p3.video_id
-	end
-
-	if p3.video_title ~= nil and p3.video_title ~= "" then
-		t4.videoTitle = p3.video_title
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 180
-	-- upvalues: t2 (copy)
-	local v38 = t2.new()
-
-	if t5.image_id ~= nil then
-		v38.image_id = t5.image_id
-	end
-
-	if t5.imageId ~= nil then
-		v38.image_id = t5.imageId
-	end
-
-	if t5.asset_type_id ~= nil then
-		v38.asset_type_id = t5.asset_type_id
-	end
-
-	if t5.assetTypeId ~= nil then
-		v38.asset_type_id = t5.assetTypeId
-	end
-
-	if t5.video_hash ~= nil then
-		v38.video_hash = t5.video_hash
-	end
-
-	if t5.videoHash ~= nil then
-		v38.video_hash = t5.videoHash
-	end
-
-	if t5.video_id ~= nil then
-		v38.video_id = t5.video_id
-	end
-
-	if t5.videoId ~= nil then
-		v38.video_id = t5.videoId
-	end
-
-	if t5.video_title ~= nil then
-		v38.video_title = t5.video_title
-	end
-
-	if t5.videoTitle ~= nil then
-		v38.video_title = t5.videoTitle
-	end
-
-	return v38
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.image_id ~= nil and data.image_id ~= "" then
+		v2.imageId = data.image_id
+	end
+
+	if data.asset_type_id ~= nil and data.asset_type_id ~= 0 then
+		v2.assetTypeId = data.asset_type_id
+	end
+
+	if data.video_hash ~= nil and data.video_hash ~= "" then
+		v2.videoHash = data.video_hash
+	end
+
+	if data.video_id ~= nil and data.video_id ~= "" then
+		v2.videoId = data.video_id
+	end
+
+	if data.video_title ~= nil and data.video_title ~= "" then
+		v2.videoTitle = data.video_title
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.image_id ~= nil then
+		v2.image_id = data.image_id
+	end
+
+	if data.imageId ~= nil then
+		v2.image_id = data.imageId
+	end
+
+	if data.asset_type_id ~= nil then
+		v2.asset_type_id = data.asset_type_id
+	end
+
+	if data.assetTypeId ~= nil then
+		v2.asset_type_id = data.assetTypeId
+	end
+
+	if data.video_hash ~= nil then
+		v2.video_hash = data.video_hash
+	end
+
+	if data.videoHash ~= nil then
+		v2.video_hash = data.videoHash
+	end
+
+	if data.video_id ~= nil then
+		v2.video_id = data.video_id
+	end
+
+	if data.videoId ~= nil then
+		v2.video_id = data.videoId
+	end
+
+	if data.video_title ~= nil then
+		v2.video_title = data.video_title
+	end
+
+	if data.videoTitle ~= nil then
+		v2.video_title = data.videoTitle
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "MediaAssetData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.MediaAssetData"
 }
-t1.MediaAssetData = t2
-typeRegistry.default:register(t1.MediaAssetData)
 
-return {
-	MediaAssetData = t1.MediaAssetData
-}
+v.MediaAssetData = class
+
+typeRegistry.default:register(v.MediaAssetData)
+
+return { MediaAssetData = v.MediaAssetData }

@@ -1,5 +1,4 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent.Signals)
+local parent = script.Parent.Parent
+require(parent.Signals)
 
 return nil

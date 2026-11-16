@@ -1,12 +1,30 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local Cryo = InGameMenuDependencies.Cryo
 local t = InGameMenuDependencies.t
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local ParentParent = script.Parent.Parent
-local GlobalConfig = require(ParentParent.GlobalConfig)
-local v9 = t.strictInterface({
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
+local parent = script.Parent.Parent
+local GlobalConfig = require(parent.GlobalConfig)
+
+local v = {
+	Title = "HeadingLarge",
+	Header1 = "HeadingSmall",
+	Header2 = "TitleLarge",
+	SubHeader1 = "TitleLarge",
+	Body = "BodyLarge",
+	CaptionHeader = "CaptionLarge",
+	CaptionSubHeader = "CaptionLarge",
+	CaptionBody = "BodySmall",
+	Footer = "CaptionSmall"
+}
+
+local v2 = t.strictInterface({
 	themeKey = t.optional(t.string),
 	fontKey = t.optional(t.string),
 	AnchorPoint = t.optional(t.Vector2),
@@ -26,204 +44,228 @@ local v9 = t.strictInterface({
 	[Roact.Children] = t.optional(t.table)
 })
 
-local function ThemedTextLabel(p1) -- line: 33
-	-- upvalues: GlobalConfig (copy), v9 (copy), withFoundationOrUIBloxStyle (copy), Cryo (copy), Roact (copy)
+local function ThemedTextLabel(p)
 	if GlobalConfig.propValidation then
-		assert(v9(p1))
+		assert(v2(p))
 	end
 
-	return withFoundationOrUIBloxStyle(function(p2) -- line: 38
+	return withFoundationOrUIBloxStyle(function(data)
+		local tokens
+
+		if FoundationFontFaceMigration then
+			tokens = data
+		end
+
 		return {
+			Tokens = tokens,
 			Theme = {
 				BackgroundDefault = {
-					Color = p2.Color.Surface.Surface_0.Color3,
-					Transparency = p2.Color.Surface.Surface_0.Transparency
+					Color = data.Color.Surface.Surface_0.Color3,
+					Transparency = data.Color.Surface.Surface_0.Transparency
 				},
 				BackgroundContrast = {
-					Color = p2.Color.Surface.Surface_100.Color3,
-					Transparency = p2.Color.Surface.Surface_100.Transparency
+					Color = data.Color.Surface.Surface_100.Color3,
+					Transparency = data.Color.Surface.Surface_100.Transparency
 				},
 				BackgroundMuted = {
-					Color = p2.Color.Surface.Surface_200.Color3,
-					Transparency = p2.Color.Surface.Surface_200.Transparency
+					Color = data.Color.Surface.Surface_200.Color3,
+					Transparency = data.Color.Surface.Surface_200.Transparency
 				},
 				BackgroundUIDefault = {
-					Color = p2.Color.Surface.Surface_300.Color3,
-					Transparency = p2.Color.Surface.Surface_300.Transparency
+					Color = data.Color.Surface.Surface_300.Color3,
+					Transparency = data.Color.Surface.Surface_300.Transparency
 				},
 				BackgroundUIContrast = {
-					Color = p2.Color.OverMedia.OverMedia_0.Color3,
-					Transparency = p2.Color.OverMedia.OverMedia_0.Transparency
+					Color = data.Color.OverMedia.OverMedia_0.Color3,
+					Transparency = data.Color.OverMedia.OverMedia_0.Transparency
 				},
 				BackgroundOnHover = {
-					Color = p2.Color.State.Hover.Color3,
-					Transparency = p2.Color.State.Hover.Transparency
+					Color = data.Color.State.Hover.Color3,
+					Transparency = data.Color.State.Hover.Transparency
 				},
 				BackgroundOnPress = {
-					Color = p2.Color.State.Press.Color3,
-					Transparency = p2.Color.State.Press.Transparency
+					Color = data.Color.State.Press.Color3,
+					Transparency = data.Color.State.Press.Transparency
 				},
 				UIDefault = {
-					Color = p2.Color.Shift.Shift_200.Color3,
-					Transparency = p2.Color.Shift.Shift_200.Transparency
+					Color = data.Color.Shift.Shift_200.Color3,
+					Transparency = data.Color.Shift.Shift_200.Transparency
 				},
 				UIMuted = {
-					Color = p2.Color.Shift.Shift_100.Color3,
-					Transparency = p2.Color.Shift.Shift_100.Transparency
+					Color = data.Color.Shift.Shift_100.Color3,
+					Transparency = data.Color.Shift.Shift_100.Transparency
 				},
 				UIEmphasis = {
-					Color = p2.Color.Shift.Shift_400.Color3,
-					Transparency = p2.Color.Shift.Shift_400.Transparency
+					Color = data.Color.Shift.Shift_400.Color3,
+					Transparency = data.Color.Shift.Shift_400.Transparency
 				},
 				ContextualPrimaryDefault = {
-					Color = p2.Color.ActionEmphasis.Background.Color3,
-					Transparency = p2.Color.ActionEmphasis.Background.Transparency
+					Color = data.Color.ActionEmphasis.Background.Color3,
+					Transparency = data.Color.ActionEmphasis.Background.Transparency
 				},
 				ContextualPrimaryContent = {
-					Color = p2.Color.ActionEmphasis.Foreground.Color3,
-					Transparency = p2.Color.ActionEmphasis.Foreground.Transparency
+					Color = data.Color.ActionEmphasis.Foreground.Color3,
+					Transparency = data.Color.ActionEmphasis.Foreground.Transparency
 				},
 				SystemPrimaryDefault = {
-					Color = p2.Color.ActionSubEmphasis.Background.Color3,
-					Transparency = p2.Color.ActionSubEmphasis.Background.Transparency
+					Color = data.Color.ActionSubEmphasis.Background.Color3,
+					Transparency = data.Color.ActionSubEmphasis.Background.Transparency
 				},
 				SystemPrimaryContent = {
-					Color = p2.Color.ActionSubEmphasis.Foreground.Color3,
-					Transparency = p2.Color.ActionSubEmphasis.Foreground.Transparency
+					Color = data.Color.ActionSubEmphasis.Foreground.Color3,
+					Transparency = data.Color.ActionSubEmphasis.Foreground.Transparency
 				},
 				IconDefault = {
-					Color = p2.Color.Content.Default.Color3,
-					Transparency = p2.Color.Content.Default.Transparency
+					Color = data.Color.Content.Default.Color3,
+					Transparency = data.Color.Content.Default.Transparency
 				},
 				IconEmphasis = {
-					Color = p2.Color.Content.Emphasis.Color3,
-					Transparency = p2.Color.Content.Emphasis.Transparency
+					Color = data.Color.Content.Emphasis.Color3,
+					Transparency = data.Color.Content.Emphasis.Transparency
 				},
 				IconOnHover = {
-					Color = p2.Color.Content.Emphasis.Color3,
-					Transparency = p2.Color.Content.Emphasis.Transparency
+					Color = data.Color.Content.Emphasis.Color3,
+					Transparency = data.Color.Content.Emphasis.Transparency
 				},
 				TextEmphasis = {
-					Color = p2.Color.Content.Emphasis.Color3,
-					Transparency = p2.Color.Content.Emphasis.Transparency
+					Color = data.Color.Content.Emphasis.Color3,
+					Transparency = data.Color.Content.Emphasis.Transparency
 				},
 				TextDefault = {
-					Color = p2.Color.Content.Default.Color3,
-					Transparency = p2.Color.Content.Default.Transparency
+					Color = data.Color.Content.Default.Color3,
+					Transparency = data.Color.Content.Default.Transparency
 				},
 				TextMuted = {
-					Color = p2.Color.Content.Muted.Color3,
-					Transparency = p2.Color.Content.Muted.Transparency
+					Color = data.Color.Content.Muted.Color3,
+					Transparency = data.Color.Content.Muted.Transparency
 				},
 				TextLink = {
-					Color = p2.Color.Content.Link.Color3,
-					Transparency = p2.Color.Content.Link.Transparency
+					Color = data.Color.Content.Link.Color3,
+					Transparency = data.Color.Content.Link.Transparency
 				},
 				Divider = {
-					Color = p2.Color.Stroke.Emphasis.Color3,
-					Transparency = p2.Color.Stroke.Emphasis.Transparency
+					Color = data.Color.Stroke.Emphasis.Color3,
+					Transparency = data.Color.Stroke.Emphasis.Transparency
 				},
 				Overlay = {
-					Color = p2.Color.Common.Scrim.Color3,
-					Transparency = p2.Color.Common.Scrim.Transparency
+					Color = data.Color.Common.Scrim.Color3,
+					Transparency = data.Color.Common.Scrim.Transparency
 				},
 				DropShadow = {
-					Color = p2.Color.Common.Shadow.Color3,
-					Transparency = p2.Color.Common.Shadow.Transparency
+					Color = data.Color.Common.Shadow.Color3,
+					Transparency = data.Color.Common.Shadow.Transparency
 				},
 				NavigationBar = {
-					Color = p2.Color.Common.NavigationBar.Color3,
-					Transparency = p2.Color.Common.NavigationBar.Transparency
+					Color = data.Color.Common.NavigationBar.Color3,
+					Transparency = data.Color.Common.NavigationBar.Transparency
 				},
 				PlaceHolder = {
-					Color = p2.Color.Common.Shimmer.Color3,
-					Transparency = p2.Color.Common.Shimmer.Transparency
+					Color = data.Color.Common.Shimmer.Color3,
+					Transparency = data.Color.Common.Shimmer.Transparency
 				},
 				OnlineStatus = {
-					Color = p2.Color.System.Success.Color3,
-					Transparency = p2.Color.System.Success.Transparency
+					Color = data.Color.System.Success.Color3,
+					Transparency = data.Color.System.Success.Transparency
 				},
 				OfflineStatus = {
-					Color = p2.Color.System.Neutral.Color3,
-					Transparency = p2.Color.System.Neutral.Transparency
+					Color = data.Color.System.Neutral.Color3,
+					Transparency = data.Color.System.Neutral.Transparency
 				},
 				Success = {
-					Color = p2.Color.System.Success.Color3,
-					Transparency = p2.Color.System.Success.Transparency
+					Color = data.Color.System.Success.Color3,
+					Transparency = data.Color.System.Success.Transparency
 				},
 				Alert = {
-					Color = p2.Color.System.Alert.Color3,
-					Transparency = p2.Color.System.Alert.Transparency
+					Color = data.Color.System.Alert.Color3,
+					Transparency = data.Color.System.Alert.Transparency
 				},
 				Badge = {
-					Color = p2.Color.System.Contrast.Color3,
-					Transparency = p2.Color.System.Contrast.Transparency
+					Color = data.Color.System.Contrast.Color3,
+					Transparency = data.Color.System.Contrast.Transparency
 				},
 				BadgeContent = {
-					Color = p2.Inverse.Content.Emphasis.Color3,
-					Transparency = p2.Inverse.Content.Emphasis.Transparency
+					Color = data.Inverse.Content.Emphasis.Color3,
+					Transparency = data.Inverse.Content.Emphasis.Transparency
 				},
 				SecondaryContent = {
-					Color = p2.Color.Extended.White.White_70.Color3,
-					Transparency = p2.Color.Extended.White.White_70.Transparency
+					Color = data.Color.Extended.White.White_70.Color3,
+					Transparency = data.Color.Extended.White.White_70.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				Title = {
-					Font = p2.Typography.HeadingLarge.Font,
-					RelativeSize = p2.Typography.HeadingLarge.FontSize
+					Font = data.Typography.HeadingLarge.Font,
+					RelativeSize = data.Typography.HeadingLarge.FontSize
 				},
 				Header1 = {
-					Font = p2.Typography.HeadingSmall.Font,
-					RelativeSize = p2.Typography.HeadingSmall.FontSize
+					Font = data.Typography.HeadingSmall.Font,
+					RelativeSize = data.Typography.HeadingSmall.FontSize
 				},
 				Header2 = {
-					Font = p2.Typography.TitleLarge.Font,
-					RelativeSize = p2.Typography.TitleLarge.FontSize
+					Font = data.Typography.TitleLarge.Font,
+					RelativeSize = data.Typography.TitleLarge.FontSize
 				},
 				SubHeader1 = {
-					Font = p2.Typography.TitleLarge.Font,
-					RelativeSize = p2.Typography.TitleLarge.FontSize
+					Font = data.Typography.TitleLarge.Font,
+					RelativeSize = data.Typography.TitleLarge.FontSize
 				},
 				Body = {
-					Font = p2.Typography.BodyLarge.Font,
-					RelativeSize = p2.Typography.BodyLarge.FontSize
+					Font = data.Typography.BodyLarge.Font,
+					RelativeSize = data.Typography.BodyLarge.FontSize
 				},
 				CaptionHeader = {
-					Font = p2.Typography.CaptionLarge.Font,
-					RelativeSize = p2.Typography.CaptionLarge.FontSize
+					Font = data.Typography.CaptionLarge.Font,
+					RelativeSize = data.Typography.CaptionLarge.FontSize
 				},
 				CaptionSubHeader = {
-					Font = p2.Typography.CaptionLarge.Font,
-					RelativeSize = p2.Typography.CaptionLarge.FontSize
+					Font = data.Typography.CaptionLarge.Font,
+					RelativeSize = data.Typography.CaptionLarge.FontSize
 				},
 				CaptionBody = {
-					Font = p2.Typography.BodySmall.Font,
-					RelativeSize = p2.Typography.BodySmall.FontSize
+					Font = data.Typography.BodySmall.Font,
+					RelativeSize = data.Typography.BodySmall.FontSize
 				},
 				Footer = {
-					Font = p2.Typography.CaptionSmall.Font,
-					RelativeSize = p2.Typography.CaptionSmall.FontSize
+					Font = data.Typography.CaptionSmall.Font,
+					RelativeSize = data.Typography.CaptionSmall.FontSize
 				}
 			}
 		}
-	end, function(p3) -- line: 211
-		-- upvalues: p1 (copy), Cryo (copy), Roact (copy)
-		local v14 = p3.Theme[p1.themeKey or "TextDefault"]
-		local v15 = p3.Font[p1.fontKey or "Body"]
-		local v16 = Cryo.Dictionary.join({
-			TextColor3 = v14.Color,
-			TextTransparency = v14.Transparency
-		}, p1, {
-			BackgroundTransparency = 1,
+	end, function(props)
+		local v3 = props.Theme[p.themeKey or "TextDefault"]
+		local v4 = props.Font[p.fontKey or "Body"]
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace((props.Tokens.Typography[v[p.fontKey or "Body"]] or v4).Font)
+		end
+
+		local join = Cryo.Dictionary.join
+		local v5 = { TextColor3 = v3.Color, TextTransparency = v3.Transparency }
+
+		local v6 = {
 			fontKey = Cryo.None,
 			themeKey = Cryo.None,
-			Font = v15.Font,
-			TextSize = v15.RelativeSize * p3.Font.BaseSize
-		})
+			BackgroundTransparency = 1,
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0
+		}
+		local font
 
-		return Roact.createElement("TextLabel", v16)
+		if FoundationFontFaceMigration then
+			font = Cryo.None
+		else
+			font = v4.Font
+		end
+
+		v6.Font = font
+		v6.FontFace = fontFace
+		v6.TextSize = v4.RelativeSize * props.Font.BaseSize
+		local v7 = join(v5, p, v6)
+
+		return Roact.createElement("TextLabel", v7)
 	end)
 end
 

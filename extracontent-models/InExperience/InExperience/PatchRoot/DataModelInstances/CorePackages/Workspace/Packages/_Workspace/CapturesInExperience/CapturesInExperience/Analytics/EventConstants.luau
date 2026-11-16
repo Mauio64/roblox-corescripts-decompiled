@@ -4,11 +4,6 @@ return {
 		ForceDisableOccurred = "force_disable_occurred",
 		ShareCTAActivated = "share_cta_activated"
 	},
-	namespace = {
-		CapturesCarousel = "captures_carousel"
-	},
-	status = {
-		Success = "Success",
-		Fail = "Fail"
-	}
+	namespace = { CapturesCarousel = "captures_carousel" },
+	status = { Success = "Success", Fail = "Fail" }
 }

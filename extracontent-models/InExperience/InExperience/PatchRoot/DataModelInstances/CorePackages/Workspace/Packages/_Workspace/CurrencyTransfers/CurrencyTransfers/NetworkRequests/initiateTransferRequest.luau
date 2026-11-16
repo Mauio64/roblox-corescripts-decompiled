@@ -1,44 +1,44 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local UrlBuilder = require(CurrencyTransfersParent.UrlBuilder)
-local t = require(CurrencyTransfersParent.t)
-local Promise = require(CurrencyTransfersParent.Promise)
+local parent = CurrencyTransfers.Parent
+
+local UrlBuilder = require(parent.UrlBuilder)
+local t = require(parent.t)
+local Promise = require(parent.Promise)
+
 local InitiateTransferModel = require(CurrencyTransfers.Models.InitiateTransferModel)
 local HttpRequest = require(CurrencyTransfers.NetworkRequests.HttpRequest)
 local TransferOrigination = require(CurrencyTransfers.Enums.TransferOrigination)
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+
+local urlBuilder = UrlBuilder.UrlBuilder
 local UrlBase = UrlBuilder.UrlBase
-local v11 = UrlBuilder2.new({
-	path = "transfer/v1/robux-transfer/initiate-transfer",
-	base = UrlBase.APIS
+
+local v = urlBuilder.new({
+	base = UrlBase.APIS,
+	path = "transfer/v1/robux-transfer/initiate-transfer"
 })()
-local v12 = t.strictInterface({
+
+local strictInterface = t.strictInterface({
 	recipientId = t.number,
 	transferOrigination = t.optional(t.string)
 })
 
-local function initiateTransferRequest(p1, p2, p3) -- line: 32
-	-- upvalues: v12 (copy), HttpRequest (copy), TransferOrigination (copy), v11 (copy), InitiateTransferModel (copy), Promise (copy)
-	assert(v12(p1))
+local function initiateTransferRequest(p, p2, p3)
+	assert(strictInterface(p))
+	local v2
 
-	local v17 = if p3 == nil then HttpRequest.new(p2) else HttpRequest.fromNetworkImpl(p3)
-	local v18 = p1.transferOrigination or TransferOrigination.Unknown
-	local v19 = TransferOrigination.toEnumInteger[v18] or TransferOrigination.toEnumInteger[TransferOrigination.Unknown]
-	local t1 = {
-		recipientId = p1.recipientId,
-		transferOrigin = v19
-	}
+	if p3 == nil then
+		v2 = HttpRequest.new(p2)
+	else
+		v2 = HttpRequest.fromNetworkImpl(p3)
+	end
 
-	return v17:post(v11, t1):andThen(function(p4) -- line: 49
-		-- upvalues: InitiateTransferModel (copy)
-		print("[initiateTransferRequest] Backend response (success):", p4)
-
-		return (InitiateTransferModel.format(p4))
-	end):catch(function(p5) -- line: 54
-		-- upvalues: Promise (copy)
-		print("[initiateTransferRequest] Backend response (error):", p5)
-
-		return Promise.reject(p5)
+	local transferOrigination = p.transferOrigination or TransferOrigination.Unknown
+	local transferOrigin = TransferOrigination.toEnumInteger[transferOrigination]
+		or TransferOrigination.toEnumInteger[TransferOrigination.Unknown]
+	return v2:post(v, { recipientId = p.recipientId, transferOrigin = transferOrigin }):andThen(function(p4)
+		return InitiateTransferModel.format(p4)
+	end):catch(function(p4)
+		return Promise.reject(p4)
 	end)
 end
 

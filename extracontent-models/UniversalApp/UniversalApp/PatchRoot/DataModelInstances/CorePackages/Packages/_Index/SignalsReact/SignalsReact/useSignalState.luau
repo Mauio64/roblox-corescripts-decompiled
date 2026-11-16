@@ -1,73 +1,65 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local createEffect = require(ParentParent.Signals).createEffect
-local _, result = xpcall(function() -- line: 8
+local parent = script.Parent.Parent
+local React = require(parent.React)
+
+local Signals = require(parent.Signals)
+local createEffect = Signals.createEffect
+
+local _, result = xpcall(function()
 	return game:DefineFastFlag("SignalsReactUseMutableSource", false)
-end, function() -- line: 10
+end, function(): boolean
 	return true
 end)
 
-local function getSignalVersion(p1) -- line: 14
-	local function dummyObserver() -- line: 15
-		-- upvalues: p1 (copy)
-		return p1
+local function getSignalVersion(callback)
+	local function dummyObserver()
+		return callback
 	end
 
-	local u13 = nil
+	local v = nil
 
-	local function scope(p2: ((...any) -> ...any)) -- line: 25
-		-- upvalues: u13 (ref), dummyObserver (copy)
-		u13 = p2
-
+	local function scope(callback2)
+		v = callback2
 		return dummyObserver
 	end
 
-	p1(scope)
-	u13(dummyObserver, true)
+	callback(scope)
 
-	return u13()
+	v(dummyObserver, true)
+
+	return v()
 end
-local function getSignalSnapshot(p3) -- line: 37
-	return p3(false)
+
+local function getSignalSnapshot(callback)
+	return callback(false)
 end
-local function subscribeToSignal(p4, p5: ((...any) -> ...any)) -- line: 41
-	-- upvalues: createEffect (copy)
-	return createEffect(function(p6) -- line: 42
-		-- upvalues: p5 (copy), p4 (copy)
-		p5(p4(p6))
+
+local function subscribeToSignal(callback, callback2)
+	return createEffect(function(p)
+		callback2(callback(p))
 	end)
 end
-local function useSignalState(p7) -- line: 47
-	-- upvalues: React (copy), getSignalVersion (copy), getSignalSnapshot (copy), subscribeToSignal (copy)
-	local v19 = React.useMemo(function() -- line: 48
-		-- upvalues: React (copy), p7 (copy), getSignalVersion (copy)
-		return React.createMutableSource(p7, getSignalVersion)
-	end, { p7 })
 
-	return React.useMutableSource(v19, getSignalSnapshot, subscribeToSignal)
+local function useSignalState(p)
+	local v = React.useMemo(function()
+		return React.createMutableSource(p, getSignalVersion)
+	end, { p })
+
+	return React.useMutableSource(v, getSignalSnapshot, subscribeToSignal)
 end
-local function useSignalState_old(p8) -- line: 55
-	-- upvalues: React (copy), createEffect (copy)
-	local v21, v22 = React.useState(function() -- line: 56
-		-- upvalues: p8 (copy)
-		return p8(false)
+
+local function useSignalState_old(callback)
+	local state, setState = React.useState(function()
+		return callback(false)
 	end)
 
-	React.useLayoutEffect(function() -- line: 60
-		-- upvalues: v22 (copy), p8 (copy), createEffect (copy)
-		v22(p8(false))
-
-		return createEffect(function(p9) -- line: 62
-			-- upvalues: v22 (copy), p8 (copy)
-			v22(p8(p9))
+	React.useLayoutEffect(function()
+		setState(callback(false))
+		return createEffect(function(p)
+			setState(callback(p))
 		end)
-	end, { p8 })
+	end, { callback })
 
-	return v21
+	return state
 end
 
-if result then
-	return useSignalState
-end
-
-return useSignalState_old
+return if result then useSignalState else useSignalState_old

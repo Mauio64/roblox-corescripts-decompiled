@@ -1,189 +1,195 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
+
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local console = require(ParentParent.Shared).console
+
+local Shared = require(parent.Shared)
+local console = Shared.console
 local inspect = LuauPolyfill.util.inspect
 
-require(ParentParent.Shared)
+require(parent.Shared)
 
-local isValidElementType = require(ParentParent.Shared).isValidElementType
-local getComponentName = require(ParentParent.Shared).getComponentName
-local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local Shared2 = require(parent.Shared)
+local isValidElementType = Shared2.isValidElementType
+local Shared3 = require(parent.Shared)
+local getComponentName = Shared3.getComponentName
+local Shared4 = require(parent.Shared)
+local ReactSymbols = Shared4.ReactSymbols
 local getIteratorFn = ReactSymbols.getIteratorFn
-local _ = ReactSymbols.REACT_FORWARD_REF_TYPE
-local _ = ReactSymbols.REACT_MEMO_TYPE
+local REACT_FORWARD_REF_TYPE = ReactSymbols.REACT_FORWARD_REF_TYPE
+local REACT_MEMO_TYPE = ReactSymbols.REACT_MEMO_TYPE
 local REACT_FRAGMENT_TYPE = ReactSymbols.REACT_FRAGMENT_TYPE
 local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
-local warnAboutSpreadingKeyToJSX = require(ParentParent.Shared).ReactFeatureFlags.warnAboutSpreadingKeyToJSX
-local checkPropTypes = require(ParentParent.Shared).checkPropTypes
-local ReactCurrentOwner = require(ParentParent.Shared).ReactSharedInternals.ReactCurrentOwner
+
+local Shared5 = require(parent.Shared)
+local warnAboutSpreadingKeyToJSX = Shared5.ReactFeatureFlags.warnAboutSpreadingKeyToJSX
+local Shared6 = require(parent.Shared)
+local checkPropTypes = Shared6.checkPropTypes
+local Shared7 = require(parent.Shared)
+local ReactCurrentOwner = Shared7.ReactSharedInternals.ReactCurrentOwner
+
 local ReactElement = require(script.Parent.ReactElement)
 local isValidElement = ReactElement.isValidElement
 local createElement = ReactElement.createElement
 local cloneElement = ReactElement.cloneElement
 local jsxDEV = ReactElement.jsxDEV
-local setExtraStackFrame = require(ParentParent.Shared).ReactSharedInternals.ReactDebugCurrentFrame.setExtraStackFrame
-local describeUnknownElementTypeFrameInDEV = require(ParentParent.Shared).ReactComponentStackFrame.describeUnknownElementTypeFrameInDEV
-local t1 = {}
 
-local function setCurrentlyValidatingElement(p1) -- line: 64
-	-- upvalues: ReactGlobals (copy), describeUnknownElementTypeFrameInDEV (copy), setExtraStackFrame (copy)
+local Shared8 = require(parent.Shared)
+local setExtraStackFrame = Shared8.ReactSharedInternals.ReactDebugCurrentFrame.setExtraStackFrame
+
+local Shared9 = require(parent.Shared)
+local describeUnknownElementTypeFrameInDEV = Shared9.ReactComponentStackFrame.describeUnknownElementTypeFrameInDEV
+
+local function setCurrentlyValidatingElement(data)
 	if ReactGlobals.__DEV__ then
-		if p1 then
-			local _owner = p1._owner
-			local type = nil
+		if data then
+			local owner = data._owner
+			local v
 
-			if _owner then
-				type = _owner.type
+			if owner then
+				v = owner.type
 			end
 
-			local v44 = describeUnknownElementTypeFrameInDEV(p1.type, p1._source, type)
-
-			setExtraStackFrame(v44)
-
-			return
+			setExtraStackFrame((describeUnknownElementTypeFrameInDEV(data.type, data._source, v)))
+		else
+			setExtraStackFrame(nil)
 		end
-
-		setExtraStackFrame(nil)
 	end
 end
 
-local u29 = nil
+local v
 
 if ReactGlobals.__DEV__ then
-	u29 = false
+	v = false
+else
+	v = nil
 end
 
-local function hasOwnProperty(p2, p3) -- line: 92
-	return p2[p3] ~= nil
+local function hasOwnProperty(p, p2): boolean
+	return p[p2] ~= nil
 end
-local function getDeclarationErrorAddendum() -- line: 96
-	-- upvalues: ReactCurrentOwner (copy), getComponentName (copy)
-	if ReactCurrentOwner.current then
-		local v47 = getComponentName(ReactCurrentOwner.current.type)
 
-		if v47 then
-			return "\n\nCheck the render method of `" .. v47 .. "`."
-		end
+local function getDeclarationErrorAddendum()
+	local v2 = ReactCurrentOwner.current and getComponentName(ReactCurrentOwner.current.type)
+
+	if v2 then
+		return "\n\nCheck the render method of `" .. v2 .. "`."
 	end
 
 	return ""
 end
-local function getSourceInfoErrorAddendum(p4) -- line: 107
-	if p4 ~= nil then
-		return "\n\nCheck your code at " .. string.gsub(p4.fileName, "^.*[\\/]", "") .. ":" .. p4.lineNumber .. "."
-	end
 
-	return ""
-end
-local function getSourceInfoErrorAddendumForProps(p5) -- line: 117
-	if p5 ~= nil then
-		local __source = p5.__source
-
-		if __source ~= nil then
-			return "\n\nCheck your code at " .. string.gsub(__source.fileName, "^.*[\\/]", "") .. ":" .. __source.lineNumber .. "."
-		end
-
+local function getSourceInfoErrorAddendum(p)
+	if p == nil then
 		return ""
 	end
 
-	return ""
+	return "\n\nCheck your code at " .. string.gsub(p.fileName, "^.*[\\/]", "") .. ":" .. p.lineNumber .. "."
 end
 
-local t2 = {}
+local function getSourceInfoErrorAddendumForProps(p)
+	if p == nil then
+		return ""
+	end
 
-local function getCurrentComponentErrorInfo(p6) -- line: 134
-	-- upvalues: ReactCurrentOwner (copy), getComponentName (copy), Boolean (copy)
-	local g52 = nil
-	local v53 = nil
-	local v54 = nil
+	local __source = p.__source
 
-	repeat
-		if g52 or ReactCurrentOwner.current then
-			if not g52 then
-				v53 = getComponentName(ReactCurrentOwner.current.type)
-			end
+	if __source == nil then
+		return ""
+	end
 
-			if g52 or v53 then
-				if not g52 then
-					v54 = "\n\nCheck the render method of `" .. v53 .. "`."
-				end
+	return "\n\nCheck your code at " .. string.gsub(__source.fileName, "^.*[\\/]", "") .. ":" .. __source.lineNumber .. "."
+end
 
-				g52 = false
+local currentComponentErrorInfoSet = {}
 
-				if not Boolean.toJSBoolean(v54) then
-					local v55 = if typeof(p6) ~= "string" then if typeof(p6) ~= "table" then nil else p6.displayName or p6.name else p6
+local function getCurrentComponentErrorInfo(value)
+	local v2 = ReactCurrentOwner.current and getComponentName(ReactCurrentOwner.current.type)
 
-					if not v55 and typeof(p6) == "function" then
-						local v56 = debug.info(p6, "n")
+	local currentComponentErrorInfo = not v2 and "" or "\n\nCheck the render method of `" .. v2 .. "`."
 
-						v55 = if v56 == "" then nil else v56
-					end
+	if Boolean.toJSBoolean(currentComponentErrorInfo) then
+		return currentComponentErrorInfo
+	end
 
-					if v55 then
-						v54 = string.format("\n\nCheck the top-level render call using <%s>.", v55)
-					end
-				end
+	local v3
 
-				return v54
-			end
+	if typeof(value) == "string" then
+		v3 = value
+	elseif typeof(value) == "table" then
+		v3 = value.displayName or value.name
+	end
+
+	if not v3 and typeof(value) == "function" then
+		v3 = debug.info(value, "n")
+
+		if v3 == "" then
+			v3 = nil
 		end
+	end
 
-		v54 = ""
-		g52 = true
-	until not g52
+	if v3 then
+		currentComponentErrorInfo = string.format("\n\nCheck the top-level render call using <%s>.", v3)
+	end
+
+	return currentComponentErrorInfo
 end
-local function validateExplicitKey(p7, p8, p9) -- line: 176
-	-- upvalues: getCurrentComponentErrorInfo (copy), t2 (copy), ReactCurrentOwner (copy), getComponentName (copy), ReactGlobals (copy), describeUnknownElementTypeFrameInDEV (copy), setExtraStackFrame (copy), console (copy)
-	if p7._store == nil or p7._store.validated then
+
+local function validateExplicitKey(data, p, p2)
+	if data._store == nil or data._store.validated then
 		return
 	end
 
-	p7._store.validated = true
+	data._store.validated = true
 
-	if p7.key ~= nil ~= (p9 ~= nil) then
+	if (data.key ~= nil) ~= (p2 ~= nil) then
 		return
 	end
 
-	local v60 = getCurrentComponentErrorInfo(p8)
+	local currentComponentErrorInfo = getCurrentComponentErrorInfo(p)
 
-	if t2[v60] then
+	if currentComponentErrorInfoSet[currentComponentErrorInfo] then
 		return
 	end
 
-	t2[v60] = true
+	currentComponentErrorInfoSet[currentComponentErrorInfo] = true
 
-	local s1 = ""
-
-	if p7 and p7._owner and p7._owner ~= ReactCurrentOwner.current then
-		s1 = string.format(" It was passed a child from %s.", (tostring(getComponentName(p7._owner.type))))
-	end
+	local v2 = (not data or not data._owner or data._owner == ReactCurrentOwner.current) and ""
+		or string.format(" It was passed a child from %s.", (tostring(getComponentName(data._owner.type))))
 
 	if ReactGlobals.__DEV__ then
 		if ReactGlobals.__DEV__ then
-			if p7 then
-				local _owner = p7._owner
-				local type = nil
+			if data then
+				local owner = data._owner
+				local v3
 
-				if _owner then
-					type = _owner.type
+				if owner then
+					v3 = owner.type
 				end
 
-				local v64 = describeUnknownElementTypeFrameInDEV(p7.type, p7._source, type)
-
-				setExtraStackFrame(v64)
+				setExtraStackFrame((describeUnknownElementTypeFrameInDEV(data.type, data._source, v3)))
 			else
 				setExtraStackFrame(nil)
 			end
 		end
 
-		if p7.key ~= nil and p9 ~= nil then
-			console.error("Child element received a \"key\" prop (\"%s\") in addition to a key in the \"children\" table of its parent (\"%s\"). Please provide only one key definition. When both are present, the \"key\" prop will take precedence.%s%s See https://reactjs.org/link/warning-keys for more information.", tostring(p7.key), tostring(p9), v60, s1)
+		if data.key == nil or p2 == nil then
+			console.error(
+				"Each child in a list should have a unique \"key\" prop.%s%s See https://reactjs.org/link/warning-keys for more information.",
+				currentComponentErrorInfo,
+				v2
+			)
 		else
-			console.error("Each child in a list should have a unique \"key\" prop.%s%s See https://reactjs.org/link/warning-keys for more information.", v60, s1)
+			console.error(
+				"Child element received a \"key\" prop (\"%s\") in addition to a key in the \"children\" table of its parent (\"%s\"). Please provide only one key definition. When both are present, the \"key\" prop will take precedence.%s%s See https://reactjs.org/link/warning-keys for more information.",
+				tostring(data.key),
+				tostring(p2),
+				currentComponentErrorInfo,
+				v2
+			)
 		end
 
 		if ReactGlobals.__DEV__ then
@@ -191,135 +197,121 @@ local function validateExplicitKey(p7, p8, p9) -- line: 176
 		end
 	end
 end
-local function validateChildKeys(p10, p11) -- line: 251
-	-- upvalues: Array (copy), isValidElement (copy), validateExplicitKey (copy), getIteratorFn (copy)
-	if typeof(p10) ~= "table" then
+
+local function validateChildKeys(p, p2)
+	if typeof(p) ~= "table" then
 		return
 	end
 
-	if Array.isArray(p10) then
-		for i = 1, #p10 do
-			local v68 = p10[i]
+	if Array.isArray(p) then
+		for i = 1, #p do
+			local v2 = p[i]
 
-			if isValidElement(v68) then
-				validateExplicitKey(v68, p11)
+			if isValidElement(v2) then
+				validateExplicitKey(v2, p2)
 			end
 		end
-
-		return
-	end
-
-	if isValidElement(p10) then
-		if p10._store then
-			p10._store.validated = true
-
-			return
+	elseif isValidElement(p) then
+		if p._store then
+			p._store.validated = true
 		end
-	elseif p10 then
-		local v69 = getIteratorFn(p10)
+	elseif p then
+		local iteratorFn = getIteratorFn(p)
 
-		if typeof(v69) == "function" and v69 ~= p10.entries then
-			local v70 = v69(p10)
-			local v71 = v70.next()
+		if typeof(iteratorFn) == "function" and iteratorFn ~= p.entries then
+			local v2 = iteratorFn(p)
+			local v3 = v2.next()
 
-			while not v71.done do
-				if isValidElement(v71.value) then
-					validateExplicitKey(v71.value, p11, v71.key)
+			while not v3.done do
+				if isValidElement(v3.value) then
+					validateExplicitKey(v3.value, p2, v3.key)
 				end
 
-				v71 = v70.next()
+				v3 = v2.next()
 			end
 		end
 	end
 end
-local function validatePropTypes(p12) -- line: 294
-	-- upvalues: ReactGlobals (copy), getComponentName (copy), checkPropTypes (copy), u29 (ref), console (copy)
+
+local function validatePropTypes(p)
 	if ReactGlobals.__DEV__ or ReactGlobals.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ then
-		local type = p12.type
+		local kind = p.type
 
-		if type == nil or typeof(type) == "string" then
+		if kind == nil or typeof(kind) == "string" or typeof(kind) == "function" or typeof(kind) ~= "table" then
 			return
 		end
 
-		if typeof(type) == "function" then
-			return
-		end
-
-		if typeof(type) ~= "table" then
-			return
-		end
-
-		local propTypes = type.propTypes
-		local validateProps = type.validateProps
+		local propTypes = kind.propTypes
+		local validateProps = kind.validateProps
 
 		if propTypes or validateProps then
-			local v76 = getComponentName(type)
+			local componentName = getComponentName(kind)
 
-			checkPropTypes(propTypes, validateProps, p12.props, "prop", v76, p12)
-		elseif type.PropTypes ~= nil and not u29 then
-			u29 = true
+			checkPropTypes(propTypes, validateProps, p.props, "prop", componentName, p)
+		elseif kind.PropTypes ~= nil and not v then
+			v = true
 
-			local v77 = getComponentName(type)
-
-			console.error("Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?", v77 or "Unknown")
+			local componentName = getComponentName(kind)
+			console.error(
+				"Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?",
+				componentName or "Unknown"
+			)
 		end
 
-		if type.getDefaultProps ~= nil then
+		if kind.getDefaultProps ~= nil then
 			console.error("getDefaultProps is only used on classic React.createClass definitions. Use a static property named `defaultProps` instead.")
 		end
 	end
 end
-local function validateFragmentProps(p13) -- line: 347
-	-- upvalues: ReactGlobals (copy), Object (copy), describeUnknownElementTypeFrameInDEV (copy), setExtraStackFrame (copy), console (copy)
+
+local function validateFragmentProps(data)
 	if ReactGlobals.__DEV__ then
-		local v79 = Object.keys(p13.props)
+		local keys = Object.keys(data.props)
 
-		for i = 1, #v79 do
-			local v81 = v79[i]
+		for i = 1, #keys do
+			local key = keys[i]
 
-			if v81 ~= "children" and v81 ~= "key" then
+			if key ~= "children" and key ~= "key" then
 				if ReactGlobals.__DEV__ then
-					if p13 then
-						local _owner = p13._owner
-						local type = nil
+					if data then
+						local owner = data._owner
+						local v2
 
-						if _owner then
-							type = _owner.type
+						if owner then
+							v2 = owner.type
 						end
 
-						local v84 = describeUnknownElementTypeFrameInDEV(p13.type, p13._source, type)
-
-						setExtraStackFrame(v84)
+						setExtraStackFrame((describeUnknownElementTypeFrameInDEV(data.type, data._source, v2)))
 					else
 						setExtraStackFrame(nil)
 					end
 				end
 
-				console.error("Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.", v81)
+				console.error(
+					"Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.",
+					key
+				)
 
 				if not ReactGlobals.__DEV__ then
 					break
 				end
 
 				setExtraStackFrame(nil)
-
 				break
 			end
 		end
 
-		if p13.ref ~= nil then
+		if data.ref ~= nil then
 			if ReactGlobals.__DEV__ then
-				if p13 then
-					local _owner = p13._owner
-					local type = nil
+				if data then
+					local owner = data._owner
+					local v2
 
-					if _owner then
-						type = _owner.type
+					if owner then
+						v2 = owner.type
 					end
 
-					local v87 = describeUnknownElementTypeFrameInDEV(p13.type, p13._source, type)
-
-					setExtraStackFrame(v87)
+					setExtraStackFrame((describeUnknownElementTypeFrameInDEV(data.type, data._source, v2)))
 				else
 					setExtraStackFrame(nil)
 				end
@@ -333,264 +325,195 @@ local function validateFragmentProps(p13) -- line: 347
 		end
 	end
 end
-local function jsxWithValidation(p14, p15, p16, p17, p18, p19) -- line: 373
-	-- upvalues: isValidElementType (copy), Object (copy), ReactCurrentOwner (copy), getComponentName (copy), Array (copy), REACT_ELEMENT_TYPE (copy), inspect (copy), ReactGlobals (copy), console (copy), jsxDEV (copy), validateChildKeys (copy), warnAboutSpreadingKeyToJSX (copy), REACT_FRAGMENT_TYPE (copy), validateFragmentProps (copy), validatePropTypes (copy)
-	local v94 = isValidElementType(p14)
-	local g95 = nil
-	local g102 = nil
-	local g103 = nil
-	local v104 = nil
-	local v105 = nil
-	local v101 = nil
 
-	repeat
-		if g95 or v94 then
-			g95 = false
+local function jsxWithValidation(p, p2, p3, p4, p5, p6)
+	local validElementType = isValidElementType(p)
 
-			local v96 = jsxDEV(p14, p15, p16, p18, p19)
+	if not validElementType then
+		local v2 = ""
 
-			if v96 == nil then
-				return v96
-			end
-
-			if v94 then
-				local children = p15.children
-
-				if children ~= nil then
-					if p17 then
-						if Array.isArray(children) then
-							for i = 1, #children do
-								validateChildKeys(children[i], p14)
-							end
-
-							Object.freeze(children)
-						elseif ReactGlobals.__DEV__ then
-							console.error("React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead.")
-						end
-					else
-						validateChildKeys(children, p14)
-					end
-				end
-			end
-
-			if ReactGlobals.__DEV__ and warnAboutSpreadingKeyToJSX and p15.key ~= nil then
-				console.error("React.jsx: Spreading a key to JSX is a deprecated pattern. Explicitly pass a key after spreading props in your JSX call. E.g. <%s {...props} key={key} />", getComponentName(p14) or "ComponentName")
-			end
-
-			if p14 == REACT_FRAGMENT_TYPE then
-				validateFragmentProps(v96)
-
-				return v96
-			end
-
-			validatePropTypes(v96)
-
-			return v96
+		if p == nil or typeof(p) == "table" and #Object.keys(p) == 0 then
+			v2 ..= " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports."
 		end
 
-		local s2 = ""
+		local v3 = p5 == nil and ""
+			or "\n\nCheck your code at " .. string.gsub(p5.fileName, "^.*[\\/]", "") .. ":" .. p5.lineNumber .. "."
+		local v4
 
-		if p14 == nil or typeof(p14) == "table" and #Object.keys(p14) == 0 then
-			s2 ..= " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports."
-		end
-
-		local v100 = p18 == nil and "" or "\n\nCheck your code at " .. string.gsub(p18.fileName, "^.*[\\/]", "") .. ":" .. p18.lineNumber .. "."
-
-		if v100 then
-			v101 = s2 .. v100
-			g102 = true
-		end
-
-		repeat
-			if g102 or (g103 or ReactCurrentOwner.current) then
-				if not g102 then
-					if not g103 then
-						v104 = getComponentName(ReactCurrentOwner.current.type)
-					end
-				end
-
-				if g102 or (g103 or v104) then
-					if not g102 then
-						if not g103 then
-							v105 = "\n\nCheck the render method of `" .. v104 .. "`."
-						end
-
-						g103 = false
-						v101 = s2 .. v105
-					end
-
-					g102 = false
-
-					local s3
-
-					if p14 == nil then
-						s3 = "nil"
-					elseif Array.isArray(p14) then
-						s3 = "array"
-					elseif typeof(p14) == "table" and p14["$$typeof"] == REACT_ELEMENT_TYPE then
-						s3 = string.format("<%s />", getComponentName(p14.type) or "Unknown")
-						v101 ..= " Did you accidentally export a JSX literal or Element instead of a component?"
-					else
-						s3 = typeof(p14)
-						v101 ..= "\n" .. inspect(p14)
-					end
-
-					if ReactGlobals.__DEV__ then
-						console.error("React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", s3, v101)
-					end
-
-					g95 = true
-				end
-			end
-
-			if g95 then
-				break
-			end
-
-			v105 = ""
-			g103 = true
-		until not g103
-	until not g95
-end
-
-t1.jsxWithValidation = jsxWithValidation
-
-function t1.jsxWithValidationStatic(p20, p21, p22) -- line: 495
-	-- upvalues: jsxWithValidation (copy)
-	return (jsxWithValidation(p20, p21, p22, true))
-end
-function t1.jsxWithValidationDynamic(p23, p24, p25) -- line: 499
-	-- upvalues: jsxWithValidation (copy)
-	return (jsxWithValidation(p23, p24, p25, false))
-end
-function t1.createElementWithValidation(p26, p27, ...) -- line: 504
-	-- upvalues: isValidElementType (copy), Object (copy), ReactCurrentOwner (copy), getComponentName (copy), Array (copy), REACT_ELEMENT_TYPE (copy), inspect (copy), ReactGlobals (copy), console (copy), createElement (copy), validateChildKeys (copy), REACT_FRAGMENT_TYPE (copy), validateFragmentProps (copy), validatePropTypes (copy)
-	local v115 = isValidElementType(p26)
-	local g116 = nil
-	local g123 = nil
-	local g124 = nil
-	local v125 = nil
-	local v126 = nil
-	local v122 = nil
-
-	repeat
-		if g116 or v115 then
-			g116 = false
-
-			local v117 = createElement(p26, p27, ...)
-
-			if v117 == nil then
-				return v117
-			end
-
-			if v115 then
-				for i = 1, select("#", ...) do
-					validateChildKeys(select(i, ...), p26)
-				end
-			end
-
-			if p26 == REACT_FRAGMENT_TYPE then
-				validateFragmentProps(v117)
-
-				return v117
-			end
-
-			validatePropTypes(v117)
-
-			return v117
-		end
-
-		local s4 = ""
-
-		if p26 == nil or typeof(p26) == "table" and #Object.keys(p26) == 0 then
-			s4 ..= " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports."
-		end
-
-		local v121
-
-		if p27 ~= nil then
-			local __source = p27.__source
-
-			v121 = __source == nil and "" or "\n\nCheck your code at " .. string.gsub(__source.fileName, "^.*[\\/]", "") .. ":" .. __source.lineNumber .. "."
+		if v3 then
+			v4 = v2 .. v3
 		else
-			v121 = ""
+			local v5 = ReactCurrentOwner.current and getComponentName(ReactCurrentOwner.current.type)
+
+			v4 = v2 .. (not v5 and "" or "\n\nCheck the render method of `" .. v5 .. "`.")
 		end
 
-		if v121 then
-			v122 = s4 .. v121
-			g123 = true
+		local v5
+
+		if p == nil then
+			v5 = "nil"
+		elseif Array.isArray(p) then
+			v5 = "array"
+		elseif typeof(p) == "table" and p["$$typeof"] == REACT_ELEMENT_TYPE then
+			v5 = string.format("<%s />", getComponentName(p.type) or "Unknown")
+			v4 ..= " Did you accidentally export a JSX literal or Element instead of a component?"
+		else
+			v5 = typeof(p)
+			v4 ..= "\n" .. inspect(p)
 		end
 
-		repeat
-			if g123 or (g124 or ReactCurrentOwner.current) then
-				if not g123 then
-					if not g124 then
-						v125 = getComponentName(ReactCurrentOwner.current.type)
-					end
-				end
-
-				if g123 or (g124 or v125) then
-					if not g123 then
-						if not g124 then
-							v126 = "\n\nCheck the render method of `" .. v125 .. "`."
-						end
-
-						g124 = false
-						v122 = s4 .. v126
-					end
-
-					g123 = false
-
-					local s5
-
-					if p26 == nil then
-						s5 = "nil"
-					elseif Array.isArray(p26) then
-						s5 = "array"
-					elseif p26 ~= nil and typeof(p26) == "table" and p26["$$typeof"] == REACT_ELEMENT_TYPE then
-						s5 = string.format("<%s />", getComponentName(p26.type) or "Unknown")
-						v122 ..= " Did you accidentally export a JSX literal or Element instead of a component?"
-					else
-						s5 = typeof(p26)
-
-						if p26 ~= nil then
-							v122 ..= "\n" .. inspect(p26)
-						end
-					end
-
-					if ReactGlobals.__DEV__ then
-						console.error("React.createElement: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", s5, v122)
-					end
-
-					g116 = true
-				end
-			end
-
-			if g116 then
-				break
-			end
-
-			v126 = ""
-			g124 = true
-		until not g124
-	until not g116
-end
-function t1.cloneElementWithValidation(p28, p29, ...) -- line: 637
-	-- upvalues: cloneElement (copy), validateChildKeys (copy), validatePropTypes (copy)
-	local t3 = {
-		p28,
-		p29,
-		...
-	}
-	local v131 = cloneElement(p28, p29, ...)
-
-	for i = 3, #t3 do
-		validateChildKeys(t3[i], v131.type)
+		if ReactGlobals.__DEV__ then
+			console.error(
+				"React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s",
+				v5,
+				v4
+			)
+		end
 	end
 
-	validatePropTypes(v131)
+	local v2 = jsxDEV(p, p2, p3, p5, p6)
 
-	return v131
+	if v2 == nil then
+		return nil
+	end
+
+	if validElementType then
+		local children = p2.children
+
+		if children ~= nil then
+			if p4 then
+				if Array.isArray(children) then
+					for i = 1, #children do
+						validateChildKeys(children[i], p)
+					end
+
+					Object.freeze(children)
+				elseif ReactGlobals.__DEV__ then
+					console.error("React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead.")
+				end
+			else
+				validateChildKeys(children, p)
+			end
+		end
+	end
+
+	if ReactGlobals.__DEV__ and warnAboutSpreadingKeyToJSX and p2.key ~= nil then
+		console.error(
+			"React.jsx: Spreading a key to JSX is a deprecated pattern. Explicitly pass a key after spreading props in your JSX call. E.g. <%s {...props} key={key} />",
+			getComponentName(p) or "ComponentName"
+		)
+	end
+
+	if p == REACT_FRAGMENT_TYPE then
+		validateFragmentProps(v2)
+		return v2
+	end
+
+	validatePropTypes(v2)
+
+	return v2
 end
 
-return t1
+local ReactElementValidator = {}
+ReactElementValidator.jsxWithValidation = jsxWithValidation
+
+function ReactElementValidator.jsxWithValidationStatic(p, p2, p3)
+	return jsxWithValidation(p, p2, p3, true)
+end
+
+function ReactElementValidator.jsxWithValidationDynamic(p, p2, p3)
+	return jsxWithValidation(p, p2, p3, false)
+end
+
+function ReactElementValidator.createElementWithValidation(p, p2, ...)
+	local validElementType = isValidElementType(p)
+
+	if not validElementType then
+		local v2 = ""
+
+		if p == nil or typeof(p) == "table" and #Object.keys(p) == 0 then
+			v2 ..= " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports."
+		end
+
+		local v3
+
+		if p2 == nil then
+			v3 = ""
+		else
+			local __source = p2.__source
+			v3 = __source == nil and ""
+				or "\n\nCheck your code at " .. string.gsub(__source.fileName, "^.*[\\/]", "") .. ":" .. __source.lineNumber .. "."
+		end
+
+		local v4
+
+		if v3 then
+			v4 = v2 .. v3
+		else
+			local v5 = ReactCurrentOwner.current and getComponentName(ReactCurrentOwner.current.type)
+
+			v4 = v2 .. (not v5 and "" or "\n\nCheck the render method of `" .. v5 .. "`.")
+		end
+
+		local v5
+
+		if p == nil then
+			v5 = "nil"
+		elseif Array.isArray(p) then
+			v5 = "array"
+		elseif p == nil or typeof(p) ~= "table" or p["$$typeof"] ~= REACT_ELEMENT_TYPE then
+			v5 = typeof(p)
+
+			if p ~= nil then
+				v4 ..= "\n" .. inspect(p)
+			end
+		else
+			v5 = string.format("<%s />", getComponentName(p.type) or "Unknown")
+
+			v4 ..= " Did you accidentally export a JSX literal or Element instead of a component?"
+		end
+
+		if ReactGlobals.__DEV__ then
+			console.error(
+				"React.createElement: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s",
+				v5,
+				v4
+			)
+		end
+	end
+
+	local element = createElement(p, p2, ...)
+
+	if element == nil then
+		return nil
+	end
+
+	if validElementType then
+		for i = 1, select("#", ...) do
+			validateChildKeys(select(i, ...), p)
+		end
+	end
+
+	if p == REACT_FRAGMENT_TYPE then
+		validateFragmentProps(element)
+		return element
+	end
+
+	validatePropTypes(element)
+
+	return element
+end
+
+function ReactElementValidator.cloneElementWithValidation(p, p2, ...)
+	local v2 = { p, p2, ... }
+	local element = cloneElement(p, p2, ...)
+
+	for i = 3, #v2 do
+		validateChildKeys(v2[i], element.type)
+	end
+
+	validatePropTypes(element)
+	return element
+end
+
+return ReactElementValidator

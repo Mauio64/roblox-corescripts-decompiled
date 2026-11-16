@@ -1,14 +1,8 @@
-local ParentParent = script.Parent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
+local API_URL = require(parent.API_URL)
 
-return function(t1: {[any]: any}) -- line: 13
-	-- upvalues: API_URL (copy)
-	return t1.roduxNetworking.POST({
-		Name = "BlockUserById"
-	}, function(p1, t2: {[any]: any}) -- line: 16
-		-- upvalues: API_URL (copy)
-		return p1(API_URL, {
-			currentUserId = t2.currentUserId
-		}):path("user-blocking-api"):path("v1"):path("users"):id(t2.userId):path("block-user"):body({})
+return function(p)
+	return p.roduxNetworking.POST("BlockUserById", function(callback, p2)
+		return callback(API_URL, { currentUserId = p2.currentUserId }):path("user-blocking-api"):path("v1"):path("users"):id(p2.userId):path("block-user"):body({})
 	end)
 end

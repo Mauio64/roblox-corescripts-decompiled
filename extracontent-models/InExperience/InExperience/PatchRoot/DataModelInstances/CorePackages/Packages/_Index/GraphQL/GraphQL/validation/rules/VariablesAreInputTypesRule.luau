@@ -1,22 +1,27 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local print = require(ParentParent.language.printer).print
-local isInputType = require(ParentParent.type.definition).isInputType
-local typeFromAST = require(ParentParent.utilities.typeFromAST).typeFromAST
+local parent = script.Parent.Parent.Parent
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local printer = require(parent.language.printer)
+local Print = printer.print
+local definition = require(parent.type.definition)
+local isInputType = definition.isInputType
+local typeFromAST = require(parent.utilities.typeFromAST)
+local typeFromAST2 = typeFromAST.typeFromAST
 
 return {
-	VariablesAreInputTypesRule = function(p1) -- line: 24
-		-- upvalues: typeFromAST (copy), isInputType (copy), print (copy), GraphQLError (copy)
+	VariablesAreInputTypesRule = function(object)
 		return {
-			VariableDefinition = function(_, p3) -- line: 26
-				-- upvalues: typeFromAST (copy), p1 (copy), isInputType (copy), print (copy), GraphQLError (copy)
-				local v9 = typeFromAST(p1:getSchema(), p3.type)
+			VariableDefinition = function(_, p)
+				local v = typeFromAST2(object:getSchema(), p.type)
 
-				if v9 and not isInputType(v9) then
-					local value = p3.variable.name.value
-					local v11 = print(p3.type)
+				if v and not isInputType(v) then
+					local value = p.variable.name.value
+					local Print2 = Print(p.type)
 
-					p1:reportError(GraphQLError.new(("Variable \"$%s\" cannot be non-input type \"%s\"."):format(value, v11), p3.type))
+					object:reportError(graphQLError.new(
+						("Variable \"$%s\" cannot be non-input type \"%s\"."):format(value, Print2),
+						p.type
+					))
 				end
 			end
 		}

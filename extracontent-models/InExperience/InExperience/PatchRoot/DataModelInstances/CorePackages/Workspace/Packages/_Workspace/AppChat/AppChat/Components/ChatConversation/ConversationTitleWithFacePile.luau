@@ -1,59 +1,102 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Foundation = require(AppChatParent.Foundation)
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local ChatConversationTelemetryEvents = require(script.Parent.ChatConversationTelemetryEvents)
 local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
+
 local ConversationFacePile = require(AppChat.Components.Cells.ConversationFacePile)
 local useGetConversationFromId = require(AppChat.Hooks.useGetConversationFromId)
 local useGetUserFromId = require(AppChat.Hooks.useGetUserFromId)
 local Conversation = require(AppChat.Models.Conversation)
+local ConversationChannels = require(AppChat.Models.ConversationChannels)
 local getOtherParticipants = require(AppChat.Conversations.getOtherParticipants)
-local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local DataHydration = require(parent.DataHydration)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserTileUnfilteredChatIndicator = SharedFlags.FFlagUserTileUnfilteredChatIndicator
+local v
 
-return function(t1: {[any]: any}) -- line: 24
-	-- upvalues: useTokens (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), React (copy), ChatConversationTelemetryEvents (copy), useGetConversationFromId (copy), useLocalUserId (copy), Conversation (copy), getOtherParticipants (copy), useGetUserFromId (copy), Foundation (copy), ConversationFacePile (copy)
-	local v16 = useTokens()
-	local v17 = useTelemetry(ChatConversationTelemetryLayer.Context)
-	local v18 = React.useCallback(function() -- line: 27
-		-- upvalues: v17 (copy), ChatConversationTelemetryEvents (copy), t1 (copy)
-		v17.emit(ChatConversationTelemetryEvents.ConversationInfoBtnClicked, {})
-		t1.navigateToChatDetails()
-	end, {
-		t1.navigateToChatDetails,
-		v17
-	})
-	local v19 = nil
-	local titleText = t1.titleText
-	local v21 = useGetConversationFromId(t1.conversationId)
-	local v22 = useLocalUserId()
-	local v23 = v21 and v21.conversationType == Conversation.Type.ONE_TO_ONE_CONVERSATION
-	local v24 = if not v23 then nil else getOtherParticipants(v21, v22)[1]
-	local v25 = useGetUserFromId(v24)
+if FFlagUserTileUnfilteredChatIndicator then
+	v = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+else
+	v = nil
+end
 
-	if v25 then
-		titleText = v21.title
-		v19 = `@{ v25.name }`
+return function(props)
+	local v2 = useTokens()
+	local v3 = useTelemetry(ChatConversationTelemetryLayer.Context)
+	local onActivated = React.useCallback(function()
+		v3.emit(ChatConversationTelemetryEvents.ConversationInfoBtnClicked, {})
+		props.navigateToChatDetails()
+	end, { props.navigateToChatDetails, v3 })
+
+	local subtitleText = nil
+
+	local titleText = props.titleText
+	local v4 = useGetConversationFromId(props.conversationId)
+	local v5 = useLocalUserId()
+
+	local v6 = v4 and v4.conversationType == Conversation.Type.ONE_TO_ONE_CONVERSATION
+	local v7
+
+	if v6 then
+		v7 = getOtherParticipants(v4, v5)[1]
+	else
+		v7 = nil
 	end
 
-	return React.createElement(Foundation.View, {
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
-		TitleContainer = React.createElement(Foundation.View, {
-			Size = UDim2.new(1, 0, 1, 0),
-			Position = UDim2.new(0, 0, 0, 0),
-			cornerRadius = UDim.new(0, v16.Radius.Medium)
-		}, {
-			ConversationFacePile = React.createElement(ConversationFacePile, {
-				conversationId = t1.conversationId,
-				titleText = titleText,
-				titleStyle = v16.Typography.TitleLarge,
-				onActivated = v18,
-				subtitleText = v19,
-				trustedConnectionIndicatorEnabled = not not v23
-			})
-		})
+	local v8 = useGetUserFromId(v7)
+	local v9
+
+	if FFlagUserTileUnfilteredChatIndicator then
+		local v10 = React.useMemo(function()
+			return Signals.createComputed(function(p)
+				if v7 == nil or v7 == "" then
+					return nil
+				end
+
+				return (v.getIsTrustedConnection(v7).data(p))
+			end)
+		end, { v7 })
+		v9 = SignalsReact.useSignalState(v10)
+	end
+
+	if v8 then
+		titleText = v4.title
+
+		if FFlagUserTileUnfilteredChatIndicator and v9 then
+			subtitleText = ""
+		else
+			subtitleText = `@{v8.name}`
+		end
+	end
+
+	return React.createElement(Foundation.View, { Size = UDim2.new(1, 0, 1, 0) }, {
+		TitleContainer = React.createElement(
+			Foundation.View,
+			{
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.new(0, 0, 0, 0),
+				cornerRadius = UDim.new(0, v2.Radius.Medium)
+			},
+			{
+				ConversationFacePile = React.createElement(ConversationFacePile, {
+					conversationId = props.conversationId,
+					titleText = titleText,
+					titleStyle = v2.Typography.TitleLarge,
+					onActivated = onActivated,
+					subtitleText = subtitleText,
+					trustedConnectionIndicatorEnabled = v6 and true or false,
+					shouldShowUnfilteredChatIndicator = FFlagUserTileUnfilteredChatIndicator and v4 ~= nil and v4.moderationType == ConversationChannels.ModerationType.TrustedComms and true or nil
+				})
+			}
+		)
 	})
 end

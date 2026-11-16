@@ -1,105 +1,101 @@
 local AdService = game:GetService("AdService")
 local CoreGui = game:GetService("CoreGui")
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local UIBlox = require(ParentParent.UIBlox)
+
+local parent = script.Parent.Parent
+local Roact = require(parent.Roact)
+
+local Foundation = require(parent.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
+
+local UIBlox = require(parent.UIBlox)
+
 local AdsEuDsaPromptUI = require(script.Parent.AdsEuDsaPromptUI)
-local RobloxTranslator = require(ParentParent.RobloxTranslator)
 
-local function getBodyText(p1, p2) -- line: 15
-	-- upvalues: RobloxTranslator (copy)
-	if p1 ~= "" and p2 == "" then
+local RobloxTranslator = require(parent.RobloxTranslator)
+
+local function getBodyText(advertiserName, payerName)
+	if advertiserName ~= "" and payerName == "" then
 		return RobloxTranslator:FormatByKey("CoreScripts.Ads.Label.InExperienceDisclosureDynamic", {
-			AdvertiserName = p1
+			AdvertiserName = advertiserName
 		})
 	end
 
-	if p1 ~= "" and p2 ~= "" then
-		return RobloxTranslator:FormatByKey("CoreScripts.Ads.Label.InExperienceDisclosureDynamicWithPayer", {
-			AdvertiserName = p1,
-			PayerName = p2
-		})
+	if advertiserName == "" or payerName == "" then
+		return RobloxTranslator:FormatByKey("CoreScripts.Ads.Label.InExperienceDisclosureStatic")
 	end
 
-	return RobloxTranslator:FormatByKey("CoreScripts.Ads.Label.InExperienceDisclosureStatic")
+	return RobloxTranslator:FormatByKey("CoreScripts.Ads.Label.InExperienceDisclosureDynamicWithPayer", {
+		AdvertiserName = advertiserName,
+		PayerName = payerName
+	})
 end
 
-local v10 = Roact.PureComponent:extend("AdsEuDsaPromptHandler")
+local extended = Roact.PureComponent:extend("AdsEuDsaPromptHandler")
 
-function v10.init(p3) -- line: 32
-	-- upvalues: AdService (copy), getBodyText (copy)
-	p3:setState({
-		enabled = false
-	})
-	p3.savedSelectedCoreObject = nil
-	p3:setState({
-		bodyText = ""
-	})
-	AdService.ShowDynamicEudsaDisclosure:Connect(function(p4, p5) -- line: 42
-		-- upvalues: p3 (copy), getBodyText (copy)
-		p3:setState({
-			bodyText = getBodyText(p4, p5)
+function extended:init()
+	self:setState({ enabled = false })
+
+	self.savedSelectedCoreObject = nil
+
+	self:setState({ bodyText = "" })
+
+	AdService.ShowDynamicEudsaDisclosure:Connect(function(advertiserName, payerName)
+		self:setState({
+			bodyText = getBodyText(advertiserName, payerName)
 		})
-		p3:showPrompt()
+
+		self:showPrompt()
 	end)
 end
-function v10.saveSelectedObject(p6) -- line: 50
-	-- upvalues: GuiService (copy)
-	p6.savedSelectedCoreObject = GuiService.SelectedCoreObject
+
+function extended:saveSelectedObject()
+	self.savedSelectedCoreObject = GuiService.SelectedCoreObject
 	GuiService.SelectedCoreObject = nil
 end
-function v10.restoreSelectedObject(p7) -- line: 55
-	-- upvalues: CoreGui (copy), GuiService (copy)
-	if p7.savedSelectedCoreObject == nil or p7.savedSelectedCoreObject:IsDescendantOf(CoreGui) then
-		GuiService.SelectedCoreObject = p7.savedSelectedCoreObject
+
+function extended:restoreSelectedObject()
+	if self.savedSelectedCoreObject == nil or self.savedSelectedCoreObject:IsDescendantOf(CoreGui) then
+		GuiService.SelectedCoreObject = self.savedSelectedCoreObject
 	end
 end
-function v10.showPrompt(p8) -- line: 62
-	p8:saveSelectedObject()
-	p8:setState({
-		enabled = true
-	})
+
+function extended:showPrompt()
+	self:saveSelectedObject()
+	self:setState({ enabled = true })
 end
-function v10.hidePrompt(p9) -- line: 69
-	-- upvalues: AdService (copy)
-	p9:setState({
-		enabled = false
-	})
+
+function extended:hidePrompt()
+	self:setState({ enabled = false })
+
 	AdService:HideEudsaDisclosure()
-	p9:restoreSelectedObject()
+	self:restoreSelectedObject()
 end
-function v10.render(p10) -- line: 77
-	-- upvalues: UIBlox (copy), Roact (copy), AdsEuDsaPromptUI (copy)
-	if not p10.state.enabled then
+
+function extended.render(handler)
+	if not handler.state.enabled then
 		return nil
 	end
 
-	local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
-	local Constants = UIBlox.App.Style.Constants
-	local Dark = Constants.ThemeName.Dark
-	local Gotham = Constants.FontName.Gotham
-	local t1 = {
-		Dark = {
-			themeName = Dark,
-			fontName = Gotham
-		}
+	local appStyleProvider = UIBlox.App.Style.AppStyleProvider
+	local constants = UIBlox.App.Style.Constants
+	local v = {
+		Dark = { themeName = ColorMode.Dark, fontName = constants.FontName.Gotham }
 	}
-	local v24 = Roact.createElement(AdsEuDsaPromptUI, {
-		handler = p10,
-		bodyText = p10.state.bodyText
+
+	local element = Roact.createElement(AdsEuDsaPromptUI, {
+		handler = handler,
+		bodyText = handler.state.bodyText
 	})
 
 	return (Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
 		IgnoreGuiInset = true,
 		DisplayOrder = 15,
-		AutoLocalize = false,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-		Enabled = p10.state.enabled
-	}, Roact.createElement(AppStyleProvider, {
-		style = t1.Dark
-	}, {
+		AutoLocalize = false,
+		Enabled = handler.state.enabled
+	}, Roact.createElement(appStyleProvider, { style = v.Dark }, {
 		Frame = Roact.createElement("Frame", {
 			Selectable = false,
 			BackgroundTransparency = 1,
@@ -108,7 +104,7 @@ function v10.render(p10) -- line: 77
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5)
 		}, {
-			Prompt = v24,
+			Prompt = element,
 			ModalFix = Roact.createElement("ImageButton", {
 				BackgroundTransparency = 0,
 				Modal = true,
@@ -118,4 +114,4 @@ function v10.render(p10) -- line: 77
 	})))
 end
 
-return v10
+return extended

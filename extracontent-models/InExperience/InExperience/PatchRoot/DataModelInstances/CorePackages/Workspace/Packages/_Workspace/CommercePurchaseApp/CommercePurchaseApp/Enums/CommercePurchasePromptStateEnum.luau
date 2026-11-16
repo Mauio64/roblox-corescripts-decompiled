@@ -1,6 +1,1 @@
-return {
-	None = "None",
-	Error = "Error",
-	Checkout = "Checkout",
-	Started = "Started"
-}
+return { None = "None", Error = "Error", Checkout = "Checkout", Started = "Started" }

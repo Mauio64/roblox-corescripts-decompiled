@@ -1,53 +1,70 @@
 local CoreGui = game:GetService("CoreGui")
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("InExperienceOverlay").Parent
-local CoreGuiCommon = require(Parent.CoreGuiCommon)
-local Foundation = require(Parent.Foundation)
-local Localization = require(Parent.InExperienceLocales).Localization
-local Localization2 = require(Parent.Localization)
-local React = require(Parent.React)
-local ReactRoblox = require(Parent.ReactRoblox)
-local Songbird = require(Parent.Songbird)
+
+local parent = script:FindFirstAncestor("InExperienceOverlay").Parent
+
+local CoreGuiCommon = require(parent.CoreGuiCommon)
+local Foundation = require(parent.Foundation)
+local InExperienceLocales = require(parent.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+local Localization2 = require(parent.Localization)
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+local Songbird = require(parent.Songbird)
+
 local Components = CoreGuiCommon.Components
 local View = Foundation.View
+
 local FFlagEnableUISelector = CoreGuiCommon.Flags.FFlagEnableUISelector
 
-local function renderInExperienceOverlay() -- line: 24
-	-- upvalues: CoreGui (copy), React (copy), Foundation (copy), Localization2 (copy), Localization (copy), LocalizationService (copy), View (copy), Components (copy), FFlagEnableUISelector (copy), Songbird (copy), ReactRoblox (copy)
-	local ScreenGui = Instance.new("ScreenGui")
+local function renderInExperienceOverlay()
+	local inExperienceOverlay = Instance.new("ScreenGui")
+	inExperienceOverlay.Name = "InExperienceOverlay"
+	inExperienceOverlay.DisplayOrder = 6
+	inExperienceOverlay.IgnoreGuiInset = true
+	inExperienceOverlay.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	inExperienceOverlay.ClipToDeviceSafeArea = false
+	inExperienceOverlay.ScreenInsets = Enum.ScreenInsets.None
+	inExperienceOverlay.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
+	inExperienceOverlay.Parent = CoreGui
 
-	ScreenGui.Name = "InExperienceOverlay"
-	ScreenGui.DisplayOrder = 6
-	ScreenGui.IgnoreGuiInset = true
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	ScreenGui.ClipToDeviceSafeArea = false
-	ScreenGui.ScreenInsets = Enum.ScreenInsets.None
-	ScreenGui.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
-	ScreenGui.Parent = CoreGui
+	local createElement = React.createElement
+	local foundationProvider = Foundation.FoundationProvider
+	local v = { colorMode = Foundation.Enums.ColorMode.Dark }
 
-	local v16 = React.createElement(Foundation.FoundationProvider, {
-		theme = Foundation.Enums.Theme.Dark
-	}, {
-		LocalizationProvider = React.createElement(Localization2.LocalizationProvider, {
-			localization = Localization.new(LocalizationService.RobloxLocaleId)
-		}, {
-			Popups = React.createElement(View, {
-				tag = "size-full"
-			}, {
-				HeadsetDisconnectDialog = React.createElement(Components.HeadsetDisconnectDialog),
-				HurtOverlay = React.createElement(Components.HurtOverlay),
-				InExperienceUiSelector = if not FFlagEnableUISelector then nil else React.createElement(Components.InExperienceUiSelector)
-			}),
+	local createElement2 = React.createElement
+	local localizationProvider = Localization2.LocalizationProvider
+	local v2 = {
+		localization = Localization.new(LocalizationService.RobloxLocaleId)
+	}
+
+	local createElement3 = React.createElement
+
+	local v3 = {
+		HeadsetDisconnectDialog = React.createElement(Components.HeadsetDisconnectDialog),
+		HurtOverlay = React.createElement(Components.HurtOverlay),
+		InExperienceUiSelector = 0
+	}
+	local inExperienceUiSelector
+
+	if FFlagEnableUISelector then
+		inExperienceUiSelector = React.createElement(Components.InExperienceUiSelector)
+	end
+
+	v3.InExperienceUiSelector = inExperienceUiSelector
+	local element = createElement(foundationProvider, v, {
+		LocalizationProvider = createElement2(localizationProvider, v2, {
+			Popups = createElement3(View, { tag = "size-full" }, v3),
 			Binders = React.createElement(React.Fragment, {}, {
 				SongbirdDebugAudio = React.createElement(Songbird.DebugAudioEmitters)
 			})
 		})
 	})
-	local v17 = ReactRoblox.createRoot(ScreenGui)
 
-	v17:render(v16)
+	local root = ReactRoblox.createRoot(inExperienceOverlay)
+	root:render(element)
 
-	return v17
+	return root
 end
 
 return renderInExperienceOverlay

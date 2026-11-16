@@ -1,14 +1,20 @@
-local ParentParent = script.Parent.Parent
-local FFlagLuaAppDefaultHttpRetry = require(ParentParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
-local LuaSocialLibrariesDeps = require(ParentParent.LuaSocialLibrariesDeps)
-local HttpRequest = require(ParentParent.HttpRequest)
-local v5 = HttpRequest.config({
-	requestFunction = HttpRequest.requestFunctions.HttpRbxApi,
-	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("FriendsMenuHttpRetryCount", 4)
-})
-local sortFriendsByCorrectedPresenceAndRank = LuaSocialLibrariesDeps.SocialLibraries.config({}).User.sortFriendsByCorrectedPresenceAndRank
+local parent = script.Parent.Parent
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local HttpRequest = require(parent.HttpRequest)
+
+local config = HttpRequest.config
+local v = { requestFunction = HttpRequest.requestFunctions.HttpRbxApi, maxRetryCount = 0 }
+local maxRetryCount
+
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("FriendsMenuHttpRetryCount", 4)
+end
+
+v.maxRetryCount = maxRetryCount
 return {
-	networkImpl = v5,
-	sortFriendsByCorrectedPresenceAndRank = sortFriendsByCorrectedPresenceAndRank
+	networkImpl = config(v),
+	sortFriendsByCorrectedPresenceAndRank = LuaSocialLibrariesDeps.SocialLibraries.config({}).User.sortFriendsByCorrectedPresenceAndRank
 }

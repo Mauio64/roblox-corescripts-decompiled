@@ -1,9 +1,35 @@
-local function v1() -- line: 26
-end
+local function fn() end
 
 local DevOnly = script:FindFirstChild("DevOnly")
-local u3 = false
-local u4 = nil
+
+local flag = false
+local fn2 = nil
+
+local function register()
+	if _G.ENVIRONMENT == "PRODUCTION" or DevOnly == nil then
+		return fn
+	end
+
+	if flag then
+		return fn2 or fn
+	end
+
+	flag = true
+
+	local TagAnnotationSection = require(DevOnly.TagAnnotation.TagAnnotationSection)
+	local v = { TagAnnotationSection }
+
+	fn2 = function()
+		for _, v2 in v do
+			v2()
+		end
+
+		flag = false
+		fn2 = nil
+	end
+
+	return fn2
+end
 
 return {
 	["jest.config"] = script["jest.config"],
@@ -12,30 +38,5 @@ return {
 	littleTraceback = require(script.littleTraceback),
 	logTreeGraphviz = require(script.logTreeGraphviz),
 	LogTree = require(script.LogTree),
-	register = function() -- line: 33
-		-- upvalues: DevOnly (copy), v1 (copy), u3 (ref), u4 (ref)
-		if _G.IS_PRODUCTION or DevOnly == nil then
-			return v1
-		end
-
-		if u3 then
-			return u4 or v1
-		end
-
-		u3 = true
-
-		local t1 = { (require(DevOnly.TagAnnotation.TagAnnotationSection)) }
-
-		function u4() -- line: 48
-			-- upvalues: t1 (copy), u3 (ref), u4 (ref)
-			for _, v7 in t1 do
-				v7()
-			end
-
-			u3 = false
-			u4 = nil
-		end
-
-		return u4
-	end
+	register = register
 }

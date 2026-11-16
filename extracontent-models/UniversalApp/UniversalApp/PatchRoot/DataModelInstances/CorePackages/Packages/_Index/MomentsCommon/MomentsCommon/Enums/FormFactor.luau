@@ -1,5 +1,1 @@
-return {
-	MobilePortrait = "MobilePortrait",
-	MobileLandscape = "MobileLandscape",
-	Wide = "Wide"
-}
+return { MobilePortrait = "MobilePortrait", MobileLandscape = "MobileLandscape", Wide = "Wide" }

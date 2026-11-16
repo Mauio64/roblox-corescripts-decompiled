@@ -1,0 +1,3 @@
+local FFlagFriendSortedByPresenceSignalsImplementation = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagFriendSortedByPresenceSignalsImplementation")
+
+return game:DefineFastFlag("FriendsSignalMigrationTelemetry_v1", false) and FFlagFriendSortedByPresenceSignalsImplementation

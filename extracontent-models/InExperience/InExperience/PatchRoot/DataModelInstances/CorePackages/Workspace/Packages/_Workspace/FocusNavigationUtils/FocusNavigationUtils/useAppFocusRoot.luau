@@ -1,34 +1,41 @@
 local FocusNavigationUtils = script:FindFirstAncestor("FocusNavigationUtils")
-local FocusNavigationUtilsParent = FocusNavigationUtils.Parent
+local parent = FocusNavigationUtils.Parent
 
-require(FocusNavigationUtilsParent.ReactFocusNavigation)
+require(parent.ReactFocusNavigation)
+local Cryo = require(parent.Cryo)
+local Navigation = require(parent.Navigation)
 
-local Cryo = require(FocusNavigationUtilsParent.Cryo)
-local Navigation = require(FocusNavigationUtilsParent.Navigation)
 local useFocusRoot = require(FocusNavigationUtils.useFocusRoot)
 local useDefaultAppEventHandlers = require(FocusNavigationUtils.useDefaultAppEventHandlers)
 local FocusNavigationDefaultEventMap = require(FocusNavigationUtils.FocusNavigationDefaultEventMap)
-local t1 = {}
 
-local function useAppFocusRoot(p1) -- line: 23
-	-- upvalues: t1 (copy), Navigation (copy), useDefaultAppEventHandlers (copy), Cryo (copy), FocusNavigationDefaultEventMap (copy), useFocusRoot (copy)
-	local v11 = p1.customEventHandlers or t1
-	local v12 = p1.customEventMap or t1
-	local v13 = Navigation.useNavigationFocus()
-	local v14 = useDefaultAppEventHandlers()
-	local v15 = Cryo.Dictionary.union(v14, v11)
-	local v16 = Cryo.Dictionary.union(FocusNavigationDefaultEventMap, v12)
-	local v17 = (p1.isFocusable == nil or p1.isFocusable) and (v13 == nil or v13)
-	local v18 = p1.isAutoFocusRoot ~= nil and p1.isAutoFocusRoot
-	local v19 = Cryo.Dictionary.union(p1, {
+local v = {}
+
+local function useAppFocusRoot(data)
+	local customEventHandlers = data.customEventHandlers or v
+	local customEventMap = data.customEventMap or v
+	local v2 = Navigation.useNavigationFocus()
+
+	local v3 = useDefaultAppEventHandlers()
+	local union = Cryo.Dictionary.union(v3, customEventHandlers)
+	local union2 = Cryo.Dictionary.union(FocusNavigationDefaultEventMap, customEventMap)
+
+	local isFocusable = (data.isFocusable == nil or data.isFocusable) and (v2 == nil or v2)
+	local isAutoFocusRoot
+
+	if data.isAutoFocusRoot == nil then
+		isAutoFocusRoot = false
+	else
+		isAutoFocusRoot = data.isAutoFocusRoot
+	end
+
+	return useFocusRoot((Cryo.Dictionary.union(data, {
 		customEventHandlers = Cryo.None,
-		eventHandlers = v15,
-		eventMap = v16,
-		isFocusable = v17,
-		isAutoFocusRoot = v18
-	})
-
-	return useFocusRoot(v19)
+		eventHandlers = union,
+		eventMap = union2,
+		isFocusable = isFocusable,
+		isAutoFocusRoot = isAutoFocusRoot
+	})))
 end
 
 return useAppFocusRoot

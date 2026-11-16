@@ -1,89 +1,91 @@
 local ReactSceneUnderstanding = script:FindFirstAncestor("ReactSceneUnderstanding")
+
 local React = require(ReactSceneUnderstanding.Parent.React)
 local SceneUnderstanding = require(ReactSceneUnderstanding.Parent.SceneUnderstanding)
 local SceneAnalysisContext = require(ReactSceneUnderstanding.SceneAnalysisContext)
 local useCurrentCamera = require(ReactSceneUnderstanding.useCurrentCamera)
 local useCameraState = require(ReactSceneUnderstanding.useCameraState)
 local enums = require(ReactSceneUnderstanding.enums)
+
 local getSourceAssetsInView = SceneUnderstanding.getSourceAssetsInView
 local getSourceAssetsInRange = SceneUnderstanding.getSourceAssetsInRange
 local useCallback = React.useCallback
 local useEffect = React.useEffect
 
-local function useSourceAssets(t1: {[any]: any}?) -- line: 18
-	-- upvalues: useCurrentCamera (copy), SceneAnalysisContext (copy), useCameraState (copy), useCallback (copy), getSourceAssetsInView (copy), getSourceAssetsInRange (copy), useEffect (copy), SceneUnderstanding (copy), enums (copy)
-	local v14 = useCurrentCamera()
-	local v15 = SceneAnalysisContext.use()
-	local v16 = useCameraState(v14)
-	local v17 = useCallback(function(t2: {[any]: any}, t3: {[any]: any}) -- line: 27
-		if #t3 == #t2 then
-			for _, v22 in t2 do
-				if not table.find(t3, v22) then
-					return true
-				end
-			end
+local function useSourceAssets(p)
+	local v = useCurrentCamera()
 
-			return false
+	local v2 = SceneAnalysisContext.use()
+	local v3 = useCameraState(v)
+
+	local v4 = useCallback(function(list, list2): boolean
+		if #list2 ~= #list then
+			return true
 		end
 
-		return true
-	end, {})
-	local v18 = useCallback(function() -- line: 41
-		-- upvalues: getSourceAssetsInView (copy), v14 (copy), t1 (copy), v15 (copy), v17 (copy), getSourceAssetsInRange (copy)
-		local v23 = getSourceAssetsInView(v14, if not t1 then nil else t1.viewportQueryOptions)
-
-		v15.setAssetsInView(function(p1) -- line: 43
-			-- upvalues: v17 (copy), v23 (copy)
-			if v17(p1, v23) then
-				return v23
+		for _, item in list do
+			if not table.find(list2, item) then
+				return true
 			end
+		end
 
-			return p1
-		end)
+		return false
+	end, {})
 
-		local v24 = getSourceAssetsInRange(v14.CFrame.Position, if not t1 then nil else t1.rangeQueryOptions)
+	local v5 = useCallback(function()
+		local v5
 
-		v15.setAssetsInRange(function(p2) -- line: 49
-			-- upvalues: v17 (copy), v24 (copy)
-			if v17(p2, v24) then
-				return v24
+		if p then
+			v5 = p.viewportQueryOptions
+		end
+
+		local sourceAssetsInView = getSourceAssetsInView(v, v5)
+		v2.setAssetsInView(function(p2)
+			if v4(p2, sourceAssetsInView) then
+				return sourceAssetsInView
 			end
 
 			return p2
 		end)
-	end, {
-		v14,
-		t1,
-		v15
-	})
 
-	useEffect(function() -- line: 54
-		-- upvalues: SceneUnderstanding (copy), v18 (copy)
-		local connection = workspace.DescendantAdded:Connect(function(descendant) -- line: 55
-			-- upvalues: SceneUnderstanding (copy), v18 (copy)
+		local position = v.CFrame.Position
+		local v6
+
+		if p then
+			v6 = p.rangeQueryOptions
+		end
+
+		local sourceAssetsInRange = getSourceAssetsInRange(position, v6)
+		v2.setAssetsInRange(function(p2)
+			if v4(p2, sourceAssetsInRange) then
+				return sourceAssetsInRange
+			end
+
+			return p2
+		end)
+	end, { v, p, v2 })
+
+	useEffect(function()
+		local descendantAddedConnection = workspace.DescendantAdded:Connect(function(descendant)
 			if SceneUnderstanding.isSourceAsset(descendant) then
-				v18()
+				v5()
 			end
 		end)
 
-		v18()
+		v5()
 
-		return function() -- line: 63
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			descendantAddedConnection:Disconnect()
 		end
-	end, { v18 })
-	useEffect(function() -- line: 68
-		-- upvalues: v16 (copy), enums (copy), v18 (copy)
-		if v16 == enums.CameraState.Idle then
-			v18()
-		end
-	end, { v16 })
+	end, { v5 })
 
-	return {
-		assetsInRange = v15.assetsInRange,
-		assetsInView = v15.assetsInView
-	}
+	useEffect(function()
+		if v3 == enums.CameraState.Idle then
+			v5()
+		end
+	end, { v3 })
+
+	return { assetsInRange = v2.assetsInRange, assetsInView = v2.assetsInView }
 end
 
 return useSourceAssets

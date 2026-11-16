@@ -2,9 +2,7 @@ return {
 	uiViewClassName = "RCTScrollView",
 	bubblingEventTypes = {},
 	directEventTypes = {
-		topScrollToTop = {
-			registrationName = "onScrollToTop"
-		}
+		topScrollToTop = { registrationName = "onScrollToTop" }
 	},
 	validAttributes = {
 		alwaysBounceHorizontal = true,

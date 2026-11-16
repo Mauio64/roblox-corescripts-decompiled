@@ -1,41 +1,38 @@
 local StarterGui = game:GetService("StarterGui")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local CorePackages = game:GetService("CorePackages")
-local EventStream = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventStream
-local t1 = {}
 
-t1.__index = t1
+local Analytics = require(CorePackages.Workspace.Packages.Analytics)
+local EventStream = Analytics.AnalyticsReporters.EventStream
 
-function t1.new() -- line: 22
-	-- upvalues: EventStream (copy), RbxAnalyticsService (copy), t1 (copy)
-	local t2 = {
+local CoreGuiFinalStateAnalytics = {}
+CoreGuiFinalStateAnalytics.__index = CoreGuiFinalStateAnalytics
+
+function CoreGuiFinalStateAnalytics.new()
+	local v = {
 		evenStream = EventStream.new(RbxAnalyticsService)
 	}
-
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v, CoreGuiFinalStateAnalytics)
+	return v
 end
-function t1.sendCoreGuiFinalAnalytic(p1) -- line: 30
-	-- upvalues: RbxAnalyticsService (copy), StarterGui (copy)
-	local t3 = {
+
+function CoreGuiFinalStateAnalytics.sendCoreGuiFinalAnalytic(p)
+	local coreGuiEnabledsByName = {
 		placeid = tostring(game.PlaceId),
 		universeid = tostring(game.GameId),
 		sessionid = RbxAnalyticsService:GetSessionId()
 	}
 
-	for _, v10 in Enum.CoreGuiType:GetEnumItems() do
-		t3[v10.Name] = tostring(StarterGui:GetCoreGuiEnabled(v10))
+	for _, v in Enum.CoreGuiType:GetEnumItems() do
+		coreGuiEnabledsByName[v.Name] = tostring(StarterGui:GetCoreGuiEnabled(v))
 	end
 
-	local s1 = ""
-
-	pcall(function() -- line: 43
-		-- upvalues: s1 (ref), StarterGui (copy)
-		s1 = tostring(StarterGui:GetCore("ResetButtonCallback"))
+	local resetButtonCallback = ""
+	pcall(function()
+		resetButtonCallback = tostring(StarterGui:GetCore("ResetButtonCallback"))
 	end)
-	t3.ResetButtonCallback = s1
-	p1.evenStream:sendEventDeferred("core_gui_final_state", "core_gui_final_state", t3)
+	coreGuiEnabledsByName.ResetButtonCallback = resetButtonCallback
+	p.evenStream:sendEventDeferred("core_gui_final_state", "core_gui_final_state", coreGuiEnabledsByName)
 end
 
-return t1
+return CoreGuiFinalStateAnalytics

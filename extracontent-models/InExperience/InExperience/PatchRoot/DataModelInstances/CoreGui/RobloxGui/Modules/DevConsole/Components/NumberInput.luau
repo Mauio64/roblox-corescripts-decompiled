@@ -1,20 +1,20 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Constants = require(script.Parent.Parent.Constants)
 local Roact = require(CorePackages.Packages.Roact)
-local v4 = Roact.Component:extend("NumberInput")
 
-function v4.init(p1) -- line: 18
-	p1.state = {
-		Value = p1.props.DefaultValue
-	}
+local extended = Roact.Component:extend("NumberInput")
+
+function extended:init()
+	self.state = { Value = self.props.DefaultValue }
 end
-function v4.render(p2) -- line: 26
-	-- upvalues: Roact (copy), Constants (copy)
-	local props = p2.props
+
+function extended.render(object)
+	local props = object.props
 
 	return Roact.createElement("TextBox", {
 		Font = Constants.Font.Log,
-		Text = `{ p2.state.Value }`,
+		Text = `{object.state.Value}`,
 		TextColor3 = Constants.Color.Text,
 		TextSize = Constants.GeneralFormatting.NumberInputTextSize,
 		TextXAlignment = props.TextXAlignment or Enum.TextXAlignment.Center,
@@ -23,32 +23,29 @@ function v4.render(p2) -- line: 26
 		LayoutOrder = props.LayoutOrder,
 		Size = props.Size,
 		ClearTextOnFocus = true,
-		[Roact.Event.FocusLost] = function(p3) -- line: 43
-			-- upvalues: p2 (copy), props (copy)
-			local num = tonumber(p3.Text)
+		[Roact.Event.FocusLost] = function(p)
+			local text = tonumber(p.Text)
 
-			if num == nil or num ~= num then
-				p3.Text = `{ p2.state.Value }`
-
+			if text == nil or text ~= text then
+				p.Text = `{object.state.Value}`
 				return
 			end
 
 			if props.IntegerOnly then
-				num = math.floor(num)
+				text = math.floor(text)
 			end
 
-			local v10 = math.clamp(num, props.Range.Min, props.Range.Max)
+			local v = math.clamp(text, props.Range.Min, props.Range.Max)
 
-			p2:setState({
-				Value = v10
-			})
-			p3.Text = `{ v10 }`
+			object:setState({ Value = v })
+
+			p.Text = `{v}`
 
 			if props.OnNumberInputChanged then
-				props.OnNumberInputChanged(v10)
+				props.OnNumberInputChanged(v)
 			end
 		end
 	})
 end
 
-return v4
+return extended

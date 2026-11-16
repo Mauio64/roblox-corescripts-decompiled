@@ -1,11 +1,7 @@
 local USERS_URL = require(script.Parent.Parent.USERS_URL)
 
-return function(p1) -- line: 3
-	-- upvalues: USERS_URL (copy)
-	return p1.roduxNetworking.GET({
-		Name = "GetUserV2FromUserId"
-	}, function(p2, p3) -- line: 6
-		-- upvalues: USERS_URL (copy)
-		return p2(USERS_URL):path("v1"):path("users"):id(p3)
+return function(p)
+	return p.roduxNetworking.GET({ Name = "GetUserV2FromUserId" }, function(callback, p2)
+		return callback(USERS_URL):path("v1"):path("users"):id(p2)
 	end)
 end

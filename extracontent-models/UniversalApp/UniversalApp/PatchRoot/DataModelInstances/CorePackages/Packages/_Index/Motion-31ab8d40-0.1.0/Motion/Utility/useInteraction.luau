@@ -1,38 +1,33 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 
-local function useInteraction(p1: ((...any) -> ...any)) -- line: 11
-	-- upvalues: React (copy)
-	local v5, v6 = React.useState(false)
-	local v7, v8 = React.useState(false)
+local function useInteraction(callback)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
 
 	return {
-		onInputBegan = function(_, p3) -- line: 16
-			-- upvalues: v6 (copy)
-			if p3.UserInputType == Enum.UserInputType.MouseButton1 then
-				v6(true)
+		onInputBegan = function(_, p)
+			if p.UserInputType == Enum.UserInputType.MouseButton1 then
+				setState(true)
 			end
 		end,
-		onInputEnded = function(_, p5) -- line: 22
-			-- upvalues: v5 (copy), v7 (copy), p1 (copy), v6 (copy)
-			if p5.UserInputType == Enum.UserInputType.MouseButton1 then
-				if v5 and v7 then
-					p1()
+		onInputEnded = function(_, p)
+			if p.UserInputType == Enum.UserInputType.MouseButton1 then
+				if state and state2 then
+					callback()
 				end
 
-				v6(false)
+				setState(false)
 			end
 		end,
-		onMouseEnter = function() -- line: 31
-			-- upvalues: v8 (copy)
-			v8(true)
+		onMouseEnter = function()
+			setState2(true)
 		end,
-		onMouseLeave = function() -- line: 35
-			-- upvalues: v8 (copy), v6 (copy)
-			v8(false)
-			v6(false)
+		onMouseLeave = function()
+			setState2(false)
+			setState(false)
 		end
-	}, v5, v7
+	}, state, state2
 end
 
 return useInteraction

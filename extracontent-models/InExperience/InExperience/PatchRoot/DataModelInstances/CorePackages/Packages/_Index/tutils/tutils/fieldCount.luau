@@ -1,9 +1,9 @@
-return function(p1) -- line: 4
-	local n1 = 0
+return function(items)
+	local count = 0
 
-	for _ in pairs(p1) do
-		n1 += 1
+	for _ in pairs(items) do
+		count += 1
 	end
 
-	return n1
+	return count
 end

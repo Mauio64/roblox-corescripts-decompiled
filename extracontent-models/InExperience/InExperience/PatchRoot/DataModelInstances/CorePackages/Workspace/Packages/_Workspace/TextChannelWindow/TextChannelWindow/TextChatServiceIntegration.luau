@@ -1,43 +1,41 @@
 local Message = require(script.Parent.Message)
+local TextChatServiceIntegration = {}
 
-return {
-	mapTextChatMessage = function(p1, s1: string) -- line: 14
-		-- upvalues: Message (copy)
-		if p1.TextSource then
-			return Message.createUserMessageFromTextChatMessage(p1, s1)
-		end
-
-		return Message.createSystemMessageFromTextChatMessage(p1)
-	end,
-	mapSendingMessage = function(p2, s2: string) -- line: 24
-		-- upvalues: Message (copy)
-		return Message.createUserMessageFromTextChatMessage(p2, s2)
-	end,
-	applyMessage = function(t1: {[any]: any}, p3) -- line: 33
-		for v8, v9 in t1 do
-			if v9.messageId == p3.messageId then
-				local v10 = table.clone(t1)
-
-				if p3.content == "" then
-					table.remove(v10, v8)
-
-					return v10
-				end
-
-				v10[v8] = p3
-
-				return v10
-			end
-		end
-
-		if p3.content == "" then
-			return t1
-		end
-
-		local v11 = table.clone(t1)
-
-		table.insert(v11, p3)
-
-		return v11
+function TextChatServiceIntegration.mapTextChatMessage(p, p2: string)
+	if p.TextSource then
+		return Message.createUserMessageFromTextChatMessage(p, p2)
 	end
-}
+
+	return Message.createSystemMessageFromTextChatMessage(p)
+end
+
+function TextChatServiceIntegration.mapSendingMessage(p, p2: string)
+	return Message.createUserMessageFromTextChatMessage(p, p2)
+end
+
+function TextChatServiceIntegration.applyMessage(items, p)
+	for k, item in items do
+		if item.messageId == p.messageId then
+			local clone = table.clone(items)
+
+			if p.content == "" then
+				table.remove(clone, k)
+				return clone
+			end
+
+			clone[k] = p
+
+			return clone
+		end
+	end
+
+	if p.content == "" then
+		return items
+	end
+
+	local clone = table.clone(items)
+	table.insert(clone, p)
+	return clone
+end
+
+return TextChatServiceIntegration

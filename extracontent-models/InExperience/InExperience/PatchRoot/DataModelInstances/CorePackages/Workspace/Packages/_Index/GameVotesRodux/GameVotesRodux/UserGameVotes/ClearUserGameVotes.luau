@@ -1,9 +1,7 @@
-local Parent = script:FindFirstAncestor("GameVotesRodux").Parent
+local parent = script:FindFirstAncestor("GameVotesRodux").Parent
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(universeId)
+	assert(type(universeId) == "string", "ClearUserGameVotes: universeId must be a string")
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
-	assert(type(p1) == "string", "ClearUserGameVotes: universeId must be a string")
-
-	return {
-		universeId = p1
-	}
+	return { universeId = universeId }
 end)

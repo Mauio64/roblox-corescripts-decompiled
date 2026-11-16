@@ -1,4 +1,4 @@
-local function identity(...) -- line: 9
+local function identity(...)
 	return ...
 end
 

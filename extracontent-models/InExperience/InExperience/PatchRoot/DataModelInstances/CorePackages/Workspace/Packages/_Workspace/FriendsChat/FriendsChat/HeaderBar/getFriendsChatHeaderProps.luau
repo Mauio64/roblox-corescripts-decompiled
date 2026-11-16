@@ -1,28 +1,28 @@
 local ExpChatConversationListAdapter = require(script.Parent.Parent.ConversationList.ExpChatConversationListAdapter)
 
-local function getParticipantUserIds(t1: {[any]: any}) -- line: 24
-	local t2 = {}
-	local participants = t1.participants
+local function getParticipantUserIds(p)
+	local participantUserIds = {}
+	local participants = p.participants
 
 	if participants == nil then
-		return t2
+		return participantUserIds
 	end
 
-	for _, v8 in participants do
-		local num = tonumber(v8)
+	for _, participant in participants do
+		local v = tonumber(participant)
 
-		if num ~= nil then
-			table.insert(t2, num)
+		if v ~= nil then
+			table.insert(participantUserIds, v)
 		end
 	end
 
-	return t2
+	return participantUserIds
 end
-local function getFriendsChatHeaderProps(t3: {[any]: any}, _: number) -- line: 40
-	-- upvalues: getParticipantUserIds (copy), ExpChatConversationListAdapter (copy)
+
+local function getFriendsChatHeaderProps(p, _: number)
 	return {
-		participantUserIds = getParticipantUserIds(t3),
-		titleText = ExpChatConversationListAdapter.getConversationTitle(t3)
+		participantUserIds = getParticipantUserIds(p),
+		titleText = ExpChatConversationListAdapter.getConversationTitle(p)
 	}
 end
 

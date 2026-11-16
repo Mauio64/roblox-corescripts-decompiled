@@ -1,42 +1,46 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Constants = require(script.Parent.Parent.Constants)
 local Roact = require(CorePackages.Packages.Roact)
-local v4 = Roact.Component:extend("Checkbox")
 
-function v4.render(p1) -- line: 8
-	-- upvalues: Constants (copy), Roact (copy)
-	local propsSize = p1.props.Size
-	local v7 = p1.props.Position or UDim2.new(0, 0, 0, 0)
-	local v8 = p1.props.LayoutOrder or 0
-	local propsName = p1.props.Name
-	local v10 = p1.props.SelectedColor or Constants.Color.SelectedBlue
-	local v11 = p1.props.UnselectedColor or Constants.Color.UnselectedGray
-	local OnSelectedStateChanged = p1.props.OnSelectedStateChanged
-	local s1 = ""
-	local n1 = 1
+local extended = Roact.Component:extend("Checkbox")
 
-	if p1.props.IsSelected then
-		s1 = Constants.Image.Check
-		n1 = 0
-		v11 = v10
+function extended.render(p)
+	local size = p.props.Size
+	local position = p.props.Position or UDim2.new(0, 0, 0, 0)
+	local layoutOrder = p.props.LayoutOrder or 0
+
+	local name = p.props.Name
+
+	local backgroundColor = p.props.SelectedColor or Constants.Color.SelectedBlue
+	local unselectedColor = p.props.UnselectedColor or Constants.Color.UnselectedGray
+	local onSelectedStateChanged = p.props.OnSelectedStateChanged
+	local image, borderSizePixel
+
+	if p.props.IsSelected then
+		image = Constants.Image.Check
+		borderSizePixel = 0
+	else
+		backgroundColor = unselectedColor
+		image = ""
+		borderSizePixel = 1
 	end
 
 	return Roact.createElement("ImageButton", {
-		Size = propsSize,
-		Position = v7,
-		Image = s1,
-		BackgroundColor3 = v11,
+		Size = size,
+		Position = position,
+		Image = image,
+		BackgroundColor3 = backgroundColor,
 		BackgroundTransparency = 0,
 		BorderColor3 = Constants.Color.Text,
-		BorderSizePixel = n1,
-		LayoutOrder = v8,
-		[Roact.Event.Activated] = function(_) -- line: 39
-			-- upvalues: OnSelectedStateChanged (copy), propsName (copy), p1 (copy)
-			if OnSelectedStateChanged then
-				OnSelectedStateChanged(propsName, not p1.props.IsSelected)
+		BorderSizePixel = borderSizePixel,
+		LayoutOrder = layoutOrder,
+		[Roact.Event.Activated] = function(_)
+			if onSelectedStateChanged then
+				onSelectedStateChanged(name, not p.props.IsSelected)
 			end
 		end
 	})
 end
 
-return v4
+return extended

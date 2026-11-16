@@ -1,66 +1,72 @@
 require(script.Parent.ReactInternalTypes)
 
-local lib = require(script.Parent["ReactFiberStack.new"])
+local ReactFiberStacknew = require(script.Parent["ReactFiberStack.new"])
+
 local ReactFiberHostConfig = require(script.Parent.ReactFiberHostConfig)
+
 local getChildHostContext = ReactFiberHostConfig.getChildHostContext
 local getRootHostContext = ReactFiberHostConfig.getRootHostContext
-local createCursor = lib.createCursor
-local push = lib.push
-local pop = lib.pop
-local t1 = {}
-local v9 = createCursor(t1)
-local v10 = createCursor(t1)
-local v11 = createCursor(t1)
+local createCursor = ReactFiberStacknew.createCursor
+local push = ReactFiberStacknew.push
+local pop = ReactFiberStacknew.pop
 
-function requiredContext(p1) -- line: 42
-	return p1
-end
-function getRootHostContainer() -- line: 52
-	-- upvalues: v11 (copy)
-	return v11.current
-end
-function pushHostContainer(p2, p3) -- line: 59
-	-- upvalues: push (copy), v11 (copy), v10 (copy), v9 (copy), t1 (copy), getRootHostContext (copy), pop (copy)
-	push(v11, p3, p2)
-	push(v10, p2, p2)
-	push(v9, t1, p2)
+local v = {}
 
-	local v15 = getRootHostContext(p3)
+local cursor = createCursor(v)
+local cursor2 = createCursor(v)
 
-	pop(v9, p2)
-	push(v9, v15, p2)
-end
-function popHostContainer(p4) -- line: 79
-	-- upvalues: pop (copy), v9 (copy), v10 (copy), v11 (copy)
-	pop(v9, p4)
-	pop(v10, p4)
-	pop(v11, p4)
-end
-function getHostContext() -- line: 85
-	-- upvalues: v9 (copy)
-	return v9.current
-end
-function pushHostContext(p5) -- line: 92
-	-- upvalues: v11 (copy), v9 (copy), getChildHostContext (copy), push (copy), v10 (copy)
-	local v18 = requiredContext(v11.current)
-	local v19 = requiredContext(v9.current)
-	local v20 = getChildHostContext(v19, p5.type, v18)
+local cursor3 = createCursor(v)
 
-	if v19 == v20 then
+function requiredContext(p)
+	return p
+end
+
+function getRootHostContainer()
+	return cursor3.current
+end
+
+function pushHostContainer(p, p2)
+	push(cursor3, p2, p)
+
+	push(cursor2, p, p)
+
+	push(cursor, v, p)
+	local rootHostContext = getRootHostContext(p2)
+
+	pop(cursor, p)
+	push(cursor, rootHostContext, p)
+end
+
+function popHostContainer(p)
+	pop(cursor, p)
+	pop(cursor2, p)
+	pop(cursor3, p)
+end
+
+function getHostContext()
+	return cursor.current
+end
+
+function pushHostContext(p)
+	local v2 = requiredContext(cursor3.current)
+	local v3 = requiredContext(cursor.current)
+	local childHostContext = getChildHostContext(v3, p.type, v2)
+
+	if v3 == childHostContext then
 		return
 	end
 
-	push(v10, p5, p5)
-	push(v9, v20, p5)
+	push(cursor2, p, p)
+	push(cursor, childHostContext, p)
 end
-function popHostContext(p6) -- line: 108
-	-- upvalues: v10 (copy), pop (copy), v9 (copy)
-	if p6 ~= v10.current then
+
+function popHostContext(p)
+	if cursor2.current ~= p then
 		return
 	end
 
-	pop(v9, p6)
-	pop(v10, p6)
+	pop(cursor, p)
+	pop(cursor2, p)
 end
 
 return {

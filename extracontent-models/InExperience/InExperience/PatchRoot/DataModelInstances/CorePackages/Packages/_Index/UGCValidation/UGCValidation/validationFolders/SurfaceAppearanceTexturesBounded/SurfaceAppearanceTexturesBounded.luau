@@ -1,100 +1,108 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
-local ConstantsInterface = require(ParentParent.ConstantsInterface)
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local FetchAllDesiredData = require(ParentParent.validationSystem.dataFetchModules.FetchAllDesiredData)
-local getFFlagUGCValidateMigrateTextureTransparency = require(ParentParent.flags.getFFlagUGCValidateMigrateTextureTransparency)
-local getFFlagUGCValidateAllowEmissives = require(ParentParent.flags.getFFlagUGCValidateAllowEmissives)
-local v9 = game:DefineFastInt("AccessoryColorMapMaxSize", 1024)
-local v10 = game:DefineFastInt("AccessoryMetalnessMapMaxSize", 256)
-local v11 = game:DefineFastInt("AccessoryNormalMapMaxSize", 256)
-local v12 = game:DefineFastInt("AccessoryRoughnessMapMaxSize", 256)
-local t1 = {
-	ColorMap = v9,
-	MetalnessMap = v10,
-	NormalMap = v11,
-	RoughnessMap = v12
+local ConstantsInterface = require(parent.ConstantsInterface)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local FetchAllDesiredData = require(parent.validationSystem.dataFetchModules.FetchAllDesiredData)
+
+local v = {
+	ColorMap = game:DefineFastInt("AccessoryColorMapMaxSize", 1024),
+	MetalnessMap = game:DefineFastInt("AccessoryMetalnessMapMaxSize", 256),
+	NormalMap = game:DefineFastInt("AccessoryNormalMapMaxSize", 256),
+	RoughnessMap = game:DefineFastInt("AccessoryRoughnessMapMaxSize", 256)
 }
 
 return {
 	categories = {
 		ValidationEnums.UploadCategory.RIGID_ACCESSORY,
-		ValidationEnums.UploadCategory.LAYERED_CLOTHING
+		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH
 	},
 	requiredData = {},
 	conditionalData = { ValidationEnums.SharedDataMember.meshTextures },
-	fflag = getFFlagUGCValidateMigrateTextureTransparency,
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 48
-		-- upvalues: FetchAllDesiredData (copy), getFFlagUGCValidateAllowEmissives (copy), ConstantsInterface (copy), t1 (copy), UGCValidationService (copy), ValidationEnums (copy), ErrorSourceStrings (copy)
-		local rootInstance = p2.rootInstance
-		local assetType = p2.uploadEnum.assetType
-		local meshTextures = p2.meshTextures
-		local consumerConfig = p2.consumerConfig
+	run = function(object, data)
+		local rootInstance = data.rootInstance
+		local assetType = data.uploadEnum.assetType
+		local meshTextures = data.meshTextures
+		local consumerConfig = data.consumerConfig
 
 		if not meshTextures or meshTextures == FetchAllDesiredData.DATA_FETCH_FAILURE then
-			p1:fetchError("Failed to load texture data for surface appearance texture bounds check")
-
+			object:fetchError("Failed to load texture data for surface appearance texture bounds check")
 			return
 		end
 
-		local descendants = rootInstance:GetDescendants()
+		local v2 = consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend
 
+		local descendants = rootInstance:GetDescendants()
 		table.insert(descendants, rootInstance)
 
-		for _, v22 in descendants do
-			if v22:IsA("MeshPart") then
-				local SurfaceAppearance = v22:FindFirstChildWhichIsA("SurfaceAppearance")
+		for _, part in descendants do
+			if not part:IsA("MeshPart") then
+				continue
+			end
 
-				if SurfaceAppearance then
-					local v24 = meshTextures[v22.Name]
+			local surfaceAppearance = part:FindFirstChildWhichIsA("SurfaceAppearance")
 
-					if v24 and v24.isPBR then
-						local t2 = {
-							"ColorMap",
-							"MetalnessMap",
-							"NormalMap",
-							"RoughnessMap"
-						}
+			if not surfaceAppearance then
+				continue
+			end
 
-						if getFFlagUGCValidateAllowEmissives() then
-							table.insert(t2, "EmissiveMask")
-						end
+			local meshTexture = meshTextures[part.Name]
 
-						for _, v27 in t2 do
-							local v28 = v24[v27]
+			if not (meshTexture and meshTexture.isPBR) then
+				continue
+			end
 
-							if v28 and v28.editable then
-								local v29 = if not assetType then t1[v27] else ConstantsInterface.getTextureLimit(assetType, SurfaceAppearance, v27)
-								local ok, result = pcall(function() -- line: 96
-									-- upvalues: UGCValidationService (copy), v28 (copy)
-									return UGCValidationService:GetEditableImageSize(v28.editable)
-								end)
+			for _, fieldName in {
+				"ColorMap",
+				"MetalnessMap",
+				"NormalMap",
+				"RoughnessMap",
+				"EmissiveMask"
+			} do
+				local v3 = meshTexture[fieldName]
 
-								if not ok then
-									if consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend then
-										p1:fetchError(string.format("Failed to get texture size for '%s'. Make sure the texture exists and try again.", SurfaceAppearance:GetFullName() .. "." .. v27))
-									end
+				if not (v3 and v3.editable) then
+					continue
+				end
 
-									p1:fail(ErrorSourceStrings.Keys.TextureSize_FailedToLoad, {
-										FullName = SurfaceAppearance:GetFullName() .. "." .. v27
-									}, SurfaceAppearance)
-								elseif v29 < result.X or v29 < result.Y then
-									p1:fail(ErrorSourceStrings.Keys.TextureSize_TooBig, {
-										Width = tostring(result.X),
-										Height = tostring(result.Y),
-										FullName = SurfaceAppearance:GetFullName() .. "." .. v27,
-										MaxSize = tostring(v29),
-										FieldName = v27
-									}, SurfaceAppearance)
-								end
-							end
-						end
+				local v4
+
+				if assetType then
+					v4 = ConstantsInterface.getTextureLimit(assetType, surfaceAppearance, fieldName)
+				else
+					v4 = v[fieldName]
+				end
+
+				local success, result = pcall(function()
+					return UGCValidationService:GetEditableImageSize(v3.editable)
+				end)
+
+				if success then
+					if v4 < result.X or v4 < result.Y then
+						object:fail(ErrorSourceStrings.Keys.TextureSize_TooBig, {
+							Width = tostring(result.X),
+							Height = tostring(result.Y),
+							FullName = surfaceAppearance:GetFullName() .. "." .. fieldName,
+							MaxSize = tostring(v4),
+							FieldName = fieldName
+						}, surfaceAppearance)
 					end
+				else
+					if v2 then
+						object:fetchError(string.format(
+							"Failed to get texture size for '%s'. Make sure the texture exists and try again.",
+							surfaceAppearance:GetFullName() .. "." .. fieldName
+						))
+					end
+
+					object:fail(ErrorSourceStrings.Keys.TextureSize_FailedToLoad, {
+						FullName = surfaceAppearance:GetFullName() .. "." .. fieldName
+					}, surfaceAppearance)
 				end
 			end
 		end

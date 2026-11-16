@@ -1,18 +1,20 @@
-local ParentParent = script.Parent.Parent
-local SocialLuaAnalytics = require(ParentParent.dependencies).SocialLuaAnalytics
+local parent = script.Parent.Parent
+
+local dependencies = require(parent.dependencies)
+local socialLuaAnalytics = dependencies.SocialLuaAnalytics
+
 local TelemetryActionList = require(script.Parent.TelemetryActionList)
 local DiagActionList = require(script.Parent.DiagActionList)
 local EventStreamActionList = require(script.Parent.EventStreamActionList)
-local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
+local analyticsFactory = socialLuaAnalytics.Analytics.AnalyticsFactory
 
-return function(t1: {[any]: any}) -- line: 11
-	-- upvalues: AnalyticsFactory (copy), EventStreamActionList (copy), DiagActionList (copy), TelemetryActionList (copy)
-	return AnalyticsFactory.setUpAnalyticsFactory({
+return function(p)
+	return analyticsFactory.setUpAnalyticsFactory({
 		eventLists = {
 			EventStream = EventStreamActionList,
 			Diag = DiagActionList,
 			Telemetry = TelemetryActionList
 		},
-		analyticsImpl = t1.analytics
-	})(t1).fireAnalyticsEvent
+		analyticsImpl = p.analytics
+	})(p).fireAnalyticsEvent
 end

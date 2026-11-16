@@ -1,189 +1,202 @@
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
+
 local VideoUtils = script:FindFirstAncestor("VideoUtils")
-local VideoUtilsParent = VideoUtils.Parent
-local AppCommonLib = require(VideoUtilsParent.AppCommonLib)
-local ArgCheck = require(VideoUtilsParent.ArgCheck)
+local parent = VideoUtils.Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local ArgCheck = require(parent.ArgCheck)
 local Signal = AppCommonLib.Signal
 
 require(VideoUtils.Analytics.VideoAnalyticsTypes)
-
 local getIsInstanceVisible = require(VideoUtils.getIsInstanceVisible)
-local FFlagLuaAppEdpMediaGalleryFullScreen = require(VideoUtilsParent.SharedFlags).FFlagLuaAppEdpMediaGalleryFullScreen
-local FFlagLuaAppVideoPlaybackRefCount = require(VideoUtilsParent.SharedFlags).FFlagLuaAppVideoPlaybackRefCount
-local t1 = {}
 
-t1.__index = t1
-t1.preferredFramerateThrottling = false
-t1.isSettingFramerateThrottleAllowedByPolicy = false
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEdpMediaGalleryFullScreen = SharedFlags.FFlagLuaAppEdpMediaGalleryFullScreen
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppOneByTwoHoverIdleAutoplay = SharedFlags2.FFlagLuaAppOneByTwoHoverIdleAutoplay
 
-local n1 = 0
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback = SharedFlags3.FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback
 
-function t1.new() -- line: 62
-	-- upvalues: Signal (copy), t1 (copy)
-	local t2 = {
+local VideoPlaybackCoordinator = {}
+VideoPlaybackCoordinator.__index = VideoPlaybackCoordinator
+
+VideoPlaybackCoordinator.preferredFramerateThrottling = false
+VideoPlaybackCoordinator.isSettingFramerateThrottleAllowedByPolicy = false
+
+local v = 0
+
+function VideoPlaybackCoordinator.new()
+	local v2 = {
+		changed = Signal.new(),
 		playingVideoKey = nil,
 		currentPlaybackSessionId = nil,
 		currentplaybackSessionStartTime = nil,
 		videoAnalytics = nil,
 		playingVideoItemIndex = nil,
-		changed = Signal.new(),
 		videoDwellTaskHandles = {}
 	}
 
-	setmetatable(t2, t1)
+	setmetatable(v2, VideoPlaybackCoordinator)
 
-	return t2
+	return v2
 end
-function t1.__setRunServiceThrottleFramerateEnabled(_, b1: boolean) -- line: 79
-	-- upvalues: t1 (copy), RunService (copy)
-	if not t1.isSettingFramerateThrottleAllowedByPolicy then
+
+function VideoPlaybackCoordinator:__setRunServiceThrottleFramerateEnabled(flag: boolean)
+	if not VideoPlaybackCoordinator.isSettingFramerateThrottleAllowedByPolicy then
 		return
 	end
 
-	RunService:setThrottleFramerateEnabled(b1)
+	RunService:setThrottleFramerateEnabled(flag)
 end
-function t1.isPlaybackAllowed(_, b2: boolean, b3: boolean?) -- line: 90
-	-- upvalues: FFlagLuaAppEdpMediaGalleryFullScreen (copy)
-	if FFlagLuaAppEdpMediaGalleryFullScreen and b3 or not b2 then
-		return false
+
+function VideoPlaybackCoordinator:isPlaybackAllowed(flag: boolean, flag2: boolean?): boolean
+	return not (FFlagLuaAppEdpMediaGalleryFullScreen and flag2 or not flag)
+end
+
+function VideoPlaybackCoordinator:isPlaybackCandidate(flag: boolean, flag2: boolean?, p, p2, p3: number)
+	if self:isPlaybackAllowed(flag, flag2) then
+		return getIsInstanceVisible(p.current, p2, p3)
 	end
 
-	return true
+	return false
 end
-function t1.isPlaybackCandidate(p3, b4: boolean, b5: boolean?, t3: {[any]: any}, t4: {[any]: any}, n2: number) -- line: 102
-	-- upvalues: getIsInstanceVisible (copy)
-	if not p3:isPlaybackAllowed(b4, b5) then
-		return false
-	end
 
-	return getIsInstanceVisible(t3.current, t4, n2)
-end
-function t1.forcePlayback(p4, s1: string, s2: string, n3: number?, p5) -- line: 118
-	if s1 == p4.playingVideoKey then
+function VideoPlaybackCoordinator:forcePlayback(p: string, p2: string, p3: number?, p4)
+	if self.playingVideoKey == p then
 		return
 	end
 
-	p4:__cancelCurrentPlayback(s2, n3, nil, p4.videoAnalytics)
-	p4:requestPlayback(s1, false, 0, n3, p5)
+	self:__cancelCurrentPlayback(p2, p3, nil, self.videoAnalytics)
+	self:requestPlayback(p, false, 0, p3, p4)
 end
-function t1.requestPlayback(p6, s3: string, b6: boolean, n4: number, n5: number?, p7) -- line: 135
-	if s3 == p6.playingVideoKey then
+
+function VideoPlaybackCoordinator:requestPlayback(p: string, flag: boolean, duration: number, p2: number?, p3)
+	if not (self.playingVideoKey ~= p and self.videoDwellTaskHandles[p] == nil) then
 		return
 	end
 
-	if p6.videoDwellTaskHandles[s3] ~= nil then
-		return
-	end
-
-	if b6 then
-		local thread = task.delay(n4, function() -- line: 154
-			-- upvalues: p6 (copy), s3 (copy), n5 (copy), p7 (copy)
-			p6.videoDwellTaskHandles[s3] = nil
-			p6:__startPlayback(s3, n5, p7)
-		end)
-
-		p6.videoDwellTaskHandles[s3] = thread
+	if not flag then
+		self:__startPlayback(p, p2, p3)
 
 		return
 	end
 
-	p6:__startPlayback(s3, n5, p7)
+	local thread = task.delay(duration, function()
+		self.videoDwellTaskHandles[p] = nil
+		self:__startPlayback(p, p2, p3)
+	end)
+
+	self.videoDwellTaskHandles[p] = thread
 end
-function t1.__startPlayback(p8, s4: string, n6: number?, p9) -- line: 165
-	-- upvalues: FFlagLuaAppVideoPlaybackRefCount (copy), n1 (ref), HttpService (copy)
-	p8:__setRunServiceThrottleFramerateEnabled(false)
 
-	if FFlagLuaAppVideoPlaybackRefCount and p8.playingVideoKey == nil then
-		n1 += 1
+function VideoPlaybackCoordinator:__startPlayback(playingVideoKey: string, playingVideoItemIndex: number?, videoAnalytics)
+	self:__setRunServiceThrottleFramerateEnabled(false)
+
+	if self.playingVideoKey == nil then
+		v += 1
 	end
 
-	p8.playingVideoKey = s4
-	p8.currentPlaybackSessionId = HttpService:GenerateGUID(false)
-	p8.currentPlaybackSessionStartTime = tick()
-	p8.videoAnalytics = p9
-	p8.playingVideoItemIndex = n6
+	self.playingVideoKey = playingVideoKey
+	self.currentPlaybackSessionId = HttpService:GenerateGUID(false)
+	self.currentPlaybackSessionStartTime = tick()
+	self.videoAnalytics = videoAnalytics
+	self.playingVideoItemIndex = playingVideoItemIndex
 
-	if p9 then
-		p9.reportVideoPlay(n6, p8.currentPlaybackSessionId)
+	if videoAnalytics then
+		videoAnalytics.reportVideoPlay(playingVideoItemIndex, self.currentPlaybackSessionId)
 	end
 
-	p8.changed:fire(s4)
+	self.changed:fire(playingVideoKey)
 end
-function t1.cancelPlayback(p10, s5: string, s6: string, n7: number?, p11) -- line: 191
-	-- upvalues: FFlagLuaAppVideoPlaybackRefCount (copy), n1 (ref), t1 (copy)
-	if s5 == p10.playingVideoKey then
-		p10:__cancelCurrentPlayback(s6, n7, nil, p11)
-	elseif p10.videoDwellTaskHandles[s5] ~= nil then
-		local v46 = p10.videoDwellTaskHandles[s5]
 
-		task.cancel(v46)
-		p10.videoDwellTaskHandles[s5] = nil
+function VideoPlaybackCoordinator:cancelPlayback(p: string, p2: string, p3: number?, p4)
+	if self.playingVideoKey == p then
+		self:__cancelCurrentPlayback(p2, p3, nil, p4)
+	elseif self.videoDwellTaskHandles[p] ~= nil then
+		local videoDwellTaskHandle = self.videoDwellTaskHandles[p]
+		task.cancel(videoDwellTaskHandle)
+		self.videoDwellTaskHandles[p] = nil
 	end
 
-	if if not FFlagLuaAppVideoPlaybackRefCount then p10.playingVideoKey == nil else n1 == 0 then
-		p10:__setRunServiceThrottleFramerateEnabled(t1.preferredFramerateThrottling)
+	if v == 0 then
+		self:__setRunServiceThrottleFramerateEnabled(VideoPlaybackCoordinator.preferredFramerateThrottling)
 	end
 end
-function t1.reset(p12, s7: string, _: number?, s8: string?, _) -- line: 213
-	-- upvalues: FFlagLuaAppVideoPlaybackRefCount (copy), n1 (ref), t1 (copy)
-	if p12.playingVideoKey ~= nil then
-		p12:__cancelCurrentPlayback(s7, p12.playingVideoItemIndex, s8, p12.videoAnalytics)
+
+function VideoPlaybackCoordinator:reset(p: string, _: number?, p2: string?, _)
+	if self.playingVideoKey ~= nil then
+		self:__cancelCurrentPlayback(p, self.playingVideoItemIndex, p2, self.videoAnalytics)
 	end
 
-	for _, v53 in p12.videoDwellTaskHandles do
-		if v53 ~= nil then
-			task.cancel(v53)
+	for _, videoDwellTaskHandle in self.videoDwellTaskHandles do
+		if videoDwellTaskHandle ~= nil then
+			task.cancel(videoDwellTaskHandle)
 		end
 	end
 
-	p12.videoDwellTaskHandles = {}
+	self.videoDwellTaskHandles = {}
 
-	if not FFlagLuaAppVideoPlaybackRefCount or n1 == 0 then
-		p12:__setRunServiceThrottleFramerateEnabled(t1.preferredFramerateThrottling)
-	end
-end
-function t1.__cancelCurrentPlayback(p14, s9: string, n9: number?, s10: string?, p15) -- line: 238
-	-- upvalues: ArgCheck (copy), FFlagLuaAppVideoPlaybackRefCount (copy), n1 (ref)
-	local currentPlaybackSessionStartTime = p14.currentPlaybackSessionStartTime
-
-	if p15 then
-		local timestamp = tick()
-
-		ArgCheck.assert(currentPlaybackSessionStartTime and currentPlaybackSessionStartTime <= timestamp)
-
-		local v61 = (not currentPlaybackSessionStartTime or not (currentPlaybackSessionStartTime <= timestamp)) and -1 or timestamp - currentPlaybackSessionStartTime
-
-		p15.reportVideoEnd(n9, s9, p14.currentPlaybackSessionId, v61, s10)
+	if v == 0 then
+		self:__setRunServiceThrottleFramerateEnabled(VideoPlaybackCoordinator.preferredFramerateThrottling)
 	end
 
-	if FFlagLuaAppVideoPlaybackRefCount and p14.playingVideoKey ~= nil then
-		n1 -= 1
-	end
-
-	p14.playingVideoKey = nil
-	p14.currentPlaybackSessionId = nil
-	p14.currentPlaybackSessionStartTime = nil
-	p14.videoAnalytics = nil
-	p14.playingVideoItemIndex = nil
-	p14.changed:fire(nil)
-end
-function t1.setIsSettingFramerateThrottleAllowedByPolicy(_, b7: boolean) -- line: 270
-	-- upvalues: t1 (copy)
-	t1.isSettingFramerateThrottleAllowedByPolicy = b7
-end
-function t1.setPreferredFramerateThrottling(_, b8: boolean) -- line: 277
-	-- upvalues: t1 (copy)
-	t1.preferredFramerateThrottling = b8
-end
-
-if FFlagLuaAppVideoPlaybackRefCount then
-	function t1.isAnyPlaying() -- line: 285
-		-- upvalues: n1 (ref)
-		return n1 > 0
+	if FFlagLuaAppVideoAutoplayOneByTwoConcurrentPlayback and self.onPlaybackReset then
+		self.onPlaybackReset(p, p2)
 	end
 end
 
-t1.default = t1.new()
+function VideoPlaybackCoordinator:cancelPendingDwells()
+	for _, videoDwellTaskHandle in self.videoDwellTaskHandles do
+		if videoDwellTaskHandle ~= nil then
+			task.cancel(videoDwellTaskHandle)
+		end
+	end
 
-return t1
+	self.videoDwellTaskHandles = {}
+end
+
+function VideoPlaybackCoordinator:__cancelCurrentPlayback(p: string, p2: number?, p3: string?, p4)
+	local currentPlaybackSessionStartTime = self.currentPlaybackSessionStartTime
+
+	if p4 then
+		local now = tick()
+		ArgCheck.assert(currentPlaybackSessionStartTime and currentPlaybackSessionStartTime <= now)
+
+		local v2 = not (currentPlaybackSessionStartTime and currentPlaybackSessionStartTime <= now) and -1
+			or now - currentPlaybackSessionStartTime
+
+		p4.reportVideoEnd(p2, p, self.currentPlaybackSessionId, v2, p3)
+	end
+
+	if self.playingVideoKey ~= nil then
+		v -= 1
+	end
+
+	self.playingVideoKey = nil
+	self.currentPlaybackSessionId = nil
+	self.currentPlaybackSessionStartTime = nil
+	self.videoAnalytics = nil
+	self.playingVideoItemIndex = nil
+
+	if FFlagLuaAppOneByTwoHoverIdleAutoplay then
+		self.changed:fire(nil, p)
+	else
+		self.changed:fire(nil)
+	end
+end
+
+function VideoPlaybackCoordinator.setIsSettingFramerateThrottleAllowedByPolicy(_, isSettingFramerateThrottleAllowedByPolicy: boolean)
+	VideoPlaybackCoordinator.isSettingFramerateThrottleAllowedByPolicy = isSettingFramerateThrottleAllowedByPolicy
+end
+
+function VideoPlaybackCoordinator.setPreferredFramerateThrottling(_, preferredFramerateThrottling: boolean)
+	VideoPlaybackCoordinator.preferredFramerateThrottling = preferredFramerateThrottling
+end
+function VideoPlaybackCoordinator.isAnyPlaying(): boolean
+	return v > 0
+end
+
+VideoPlaybackCoordinator.default = VideoPlaybackCoordinator.new()
+
+return VideoPlaybackCoordinator

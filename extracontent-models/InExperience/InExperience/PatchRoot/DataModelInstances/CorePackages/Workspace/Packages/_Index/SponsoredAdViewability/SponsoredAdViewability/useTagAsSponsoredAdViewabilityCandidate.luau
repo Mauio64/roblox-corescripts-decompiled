@@ -1,35 +1,87 @@
-local Parent = script:FindFirstAncestor("SponsoredAdViewability").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("SponsoredAdViewability").Parent
 
-require(Parent.DiscoveryTypes)
+local React = require(parent.React)
+require(parent.DiscoveryTypes)
 
 local sponsoredAdViewabilityRegistry = require(script.Parent.sponsoredAdViewabilityRegistry)
+require(script.Parent.sponsoredAdViewabilityTypes)
 
-local function useTagAsSponsoredAdViewabilityCandidate(t1: {[any]: any}, p1) -- line: 13
-	-- upvalues: React (copy), sponsoredAdViewabilityRegistry (copy)
-	local v7 = if not p1 then nil else p1.encryptedAdTrackingData
-	local v8 = if not p1 then nil else p1.tileType
+local function useTagAsSponsoredAdViewabilityCandidate(p, data)
+	local encryptedAdTrackingData
 
-	React.useEffect(function() -- line: 17
-		-- upvalues: v7 (copy), v8 (copy), t1 (copy), sponsoredAdViewabilityRegistry (copy)
-		if v7 == nil or v8 == nil then
+	if data then
+		encryptedAdTrackingData = data.encryptedAdTrackingData
+	else
+		encryptedAdTrackingData = nil
+	end
+
+	local tileType
+
+	if data then
+		tileType = data.tileType
+	else
+		tileType = nil
+	end
+
+	local mediaType
+
+	if data then
+		mediaType = data.mediaType
+	else
+		mediaType = nil
+	end
+
+	local videoPlaybackStateRef
+
+	if data then
+		videoPlaybackStateRef = data.videoPlaybackStateRef
+	else
+		videoPlaybackStateRef = nil
+	end
+
+	local videoSource
+
+	if data then
+		videoSource = data.videoSource
+	else
+		videoSource = nil
+	end
+
+	local isFullscreen
+
+	if data then
+		isFullscreen = data.isFullscreen
+	else
+		isFullscreen = nil
+	end
+
+	React.useEffect(function()
+		if encryptedAdTrackingData == nil or tileType == nil or mediaType == nil then
 			return
 		end
 
-		local current = t1.current
+		local current = p.current
 
 		if current == nil then
 			return
 		end
 
 		return sponsoredAdViewabilityRegistry.bind(current, {
-			encryptedAdTrackingData = v7,
-			tileType = v8
+			encryptedAdTrackingData = encryptedAdTrackingData,
+			tileType = tileType,
+			mediaType = mediaType,
+			videoPlaybackStateRef = videoPlaybackStateRef,
+			videoSource = videoSource,
+			isFullscreen = isFullscreen
 		})
 	end, {
-		v7,
-		v8,
-		t1
+		encryptedAdTrackingData,
+		tileType,
+		p,
+		mediaType,
+		videoPlaybackStateRef,
+		videoSource,
+		isFullscreen
 	})
 end
 

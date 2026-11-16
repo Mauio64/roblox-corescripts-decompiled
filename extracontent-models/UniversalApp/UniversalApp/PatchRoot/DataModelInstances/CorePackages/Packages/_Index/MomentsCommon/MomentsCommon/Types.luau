@@ -1,8 +1,10 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
+local parent = MomentsCommon.Parent
 
-require(MomentsCommonParent.React)
+require(parent.React)
+
 require(MomentsCommon.Enums.MomentStatus)
+
 require(MomentsCommon.Enums.AttributeType)
 
 return {}

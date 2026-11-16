@@ -1,98 +1,90 @@
-local ClientChatModules = game:GetService("Chat"):WaitForChild("ClientChatModules")
-local StandardPriority = require(ClientChatModules:WaitForChild("ChatConstants")).StandardPriority
+local Chat = game:GetService("Chat")
+local ClientChatModules = Chat:WaitForChild("ClientChatModules")
+local ChatConstants = require(ClientChatModules:WaitForChild("ChatConstants"))
 
-if StandardPriority == nil then
-	StandardPriority = 10
-end
+local StandardPriority = ChatConstants.StandardPriority
+local v = StandardPriority == nil and 10 or StandardPriority
 
-local t1 = {}
+local Util = {}
+Util.__index = Util
 
-t1.__index = t1
+local v2 = {}
 
-local t2 = {}
-local t3 = {}
+local class = {}
+class.__index = class
 
-t3.__index = t3
+function class:RebuildProcessCommandsPriorities()
+	self.RegisteredPriorites = {}
 
-function t3.RebuildProcessCommandsPriorities(p1) -- line: 25
-	p1.RegisteredPriorites = {}
+	for k, v3 in pairs(self.FunctionMap) do
+		local v4 = true
 
-	for k, v in pairs(p1.FunctionMap) do
-		local v9 = true
-
-		for _, _ in pairs(v) do
-			v9 = false
-
+		for _, _ in pairs(v3) do
+			v4 = false
 			break
 		end
 
-		if not v9 then
-			table.insert(p1.RegisteredPriorites, k)
+		if not v4 then
+			table.insert(self.RegisteredPriorites, k)
 		end
 	end
 
-	table.sort(p1.RegisteredPriorites, function(p2, p3) -- line: 37
-		return p3 < p2
+	table.sort(self.RegisteredPriorites, function(a, b): boolean
+		return b < a
 	end)
 end
-function t3.HasFunction(p4, p5) -- line: 42
-	if p4.RegisteredFunctions[p5] == nil then
-		return false
-	end
 
-	return true
+function class.HasFunction(p, p2): boolean
+	return p.RegisteredFunctions[p2] ~= nil
 end
-function t3.RemoveFunction(p6, p7) -- line: 49
-	local v16 = p6.RegisteredFunctions[p7]
 
-	p6.RegisteredFunctions[p7] = nil
-	p6.FunctionMap[v16][p7] = nil
-	p6:RebuildProcessCommandsPriorities()
+function class:RemoveFunction(p)
+	local registeredFunction = self.RegisteredFunctions[p]
+	self.RegisteredFunctions[p] = nil
+	self.FunctionMap[registeredFunction][p] = nil
+	self:RebuildProcessCommandsPriorities()
 end
-function t3.AddFunction(p8, p9, p10, p11) -- line: 56
-	-- upvalues: StandardPriority (ref)
-	if p11 == nil then
-		p11 = StandardPriority
+
+function class:AddFunction(p, p2, p3)
+	if p3 == nil then
+		p3 = v
 	end
 
-	if p8.RegisteredFunctions[p9] then
-		error(p9 .. " is already in use!")
+	if self.RegisteredFunctions[p] then
+		error(p .. " is already in use!")
 	end
 
-	p8.RegisteredFunctions[p9] = p11
+	self.RegisteredFunctions[p] = p3
 
-	if p8.FunctionMap[p11] == nil then
-		p8.FunctionMap[p11] = {}
+	if self.FunctionMap[p3] == nil then
+		self.FunctionMap[p3] = {}
 	end
 
-	p8.FunctionMap[p11][p9] = p10
-	p8:RebuildProcessCommandsPriorities()
+	self.FunctionMap[p3][p] = p2
+	self:RebuildProcessCommandsPriorities()
 end
-function t3.GetIterator(p12) -- line: 75
-	local n1 = 1
-	local u23 = nil
-	local u24 = nil
 
-	return function() -- line: 80
-		-- upvalues: n1 (ref), p12 (copy), u23 (ref), u24 (ref)
-		while not (n1 > #p12.RegisteredPriorites) do
-			local v29 = p12.RegisteredPriorites[n1]
-			local v30, v31 = next(p12.FunctionMap[v29], u23)
+function class.GetIterator(p)
+	local v3 = 1
+	local v4 = nil
+	local v5 = nil
 
-			u23 = v30
-			u24 = v31
+	return function()
+		while not (v3 > #p.RegisteredPriorites) do
+			local registeredPriorite = p.RegisteredPriorites[v3]
+			v4, v5 = next(p.FunctionMap[registeredPriorite], v4)
 
-			if u23 ~= nil then
-				return u23, u24, v29
+			if v4 ~= nil then
+				return v4, v5, registeredPriorite
 			end
 
-			n1 += 1
+			v3 += 1
 		end
 	end
 end
-function t2.new() -- line: 96
-	-- upvalues: t3 (copy)
-	local self = setmetatable({}, t3)
+
+function v2.new()
+	local self = setmetatable({}, class)
 
 	self.RegisteredFunctions = {}
 	self.RegisteredPriorites = {}
@@ -100,9 +92,9 @@ function t2.new() -- line: 96
 
 	return self
 end
-function t1.NewSortedFunctionContainer(_) -- line: 107
-	-- upvalues: t2 (copy)
-	return t2.new()
+
+function Util.NewSortedFunctionContainer(_)
+	return v2.new()
 end
 
-return t1
+return Util

@@ -1,0 +1,8 @@
+return {
+	SelfUserProfileOpen = "SelfUserProfileOpen",
+	HomepageLaunch = "HomepageLaunch",
+	ChartsLaunch = "ChartsLaunch",
+	ExperienceDetailsPageSessionEnd = "ExperienceDetailsPageSessionEnd",
+	ExperienceDetailsPageOpen = "ExperienceDetailsPageOpen",
+	NotificationStreamOpen = "NotificationStreamOpen"
+}

@@ -1,162 +1,183 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local React = require(parent2.React)
 local PresenceChild = require(script.Parent.PresenceChild)
-local PresenceState = require(ParentParent.Enums.PresenceState)
+local PresenceState = require(parent.Enums.PresenceState)
 
-local function getCompositeKey(s1: string, p1) -- line: 55
-	if typeof(p1) == "table" and (p1.props and p1.props.presenceId) then
-		return string.format("%s:%s", s1, (tostring(p1.props.presenceId)))
+local function getCompositeKey(k: string, child) -- 2 equivalent calls inferred from this helper
+	if typeof(child) == "table" and child.props and child.props.presenceId then
+		return string.format("%s:%s", k, (tostring(child.props.presenceId)))
 	end
 
-	return s1
+	return k
 end
-local function AnimatePresence(t1: {[any]: any}) -- line: 63
-	-- upvalues: React (copy), PresenceState (copy), PresenceChild (copy)
-	local children = t1.children
-	local v12 = if t1.childData == nil then nil else t1.childData
-	local v13 = if t1.onExitComplete == nil then nil else t1.onExitComplete
-	local v14, v15 = React.useState({})
-	local v16 = React.useRef({})
 
-	React.useEffect(function() -- line: 73
-		-- upvalues: children (copy), PresenceState (copy), v14 (copy), v15 (copy), v16 (copy)
-		local t2 = {}
+local function AnimatePresence(props)
+	local children = props.children
+	local childData
+
+	if props.childData ~= nil then
+		childData = props.childData
+	end
+
+	local onExitComplete
+
+	if props.onExitComplete == nil then
+		onExitComplete = nil
+	else
+		onExitComplete = props.onExitComplete
+	end
+
+	local state, setState = React.useState({})
+	local ref = React.useRef({})
+
+	React.useEffect(function()
+		local dictionaryEntries = {}
 
 		if children ~= nil and typeof(children) == "table" then
-			for k, v in pairs(children) do
-				if typeof(v) == "table" and v.type ~= nil then
-					t2[if typeof(v) ~= "table" or (not v.props or not v.props.presenceId) then k else string.format("%s:%s", k, (tostring(v.props.presenceId)))] = {
-						type = PresenceState.Entering,
-						component = v,
-						dictionaryKey = k
-					}
+			for k, child in pairs(children) do
+				if not (typeof(child) == "table" and child.type ~= nil) then
+					continue
 				end
+
+				local compositeKey = getCompositeKey(k, child) -- inferred equivalent call
+				dictionaryEntries[compositeKey] = {
+					type = PresenceState.Entering,
+					component = child,
+					dictionaryKey = k
+				}
 			end
 		end
 
-		for k, v in pairs(v14) do
-			local v26 = false
+		for k, v in pairs(state) do
+			local v2 = false
 
 			if children ~= nil and typeof(children) == "table" then
-				for k2, v2 in pairs(children) do
-					if typeof(v2) == "table" and v2.type ~= nil and k == if typeof(v2) ~= "table" or (not v2.props or not v2.props.presenceId) then k2 else string.format("%s:%s", k2, (tostring(v2.props.presenceId))) then
-						v26 = true
+				for k2, child in pairs(children) do
+					if not (typeof(child) == "table" and child.type ~= nil) then
+						continue
+					end
 
+					k2 = getCompositeKey(k2, child) -- inferred equivalent call
+
+					if k2 == k then
+						v2 = true
 						break
 					end
 				end
 			end
 
-			if not v26 and v.isPresent then
-				t2[k] = {
-					type = PresenceState.Exiting,
-					component = v.component,
-					dictionaryKey = v.dictionaryKey
-				}
+			if v2 or not v.isPresent then
+				continue
 			end
+
+			dictionaryEntries[k] = {
+				type = PresenceState.Exiting,
+				component = v.component,
+				dictionaryKey = v.dictionaryKey
+			}
 		end
 
-		if next(t2) ~= nil then
-			v15(function(p2) -- line: 120
-				-- upvalues: t2 (copy), PresenceState (copy), v16 (copy)
-				local v35 = table.clone(p2)
+		if next(dictionaryEntries) ~= nil then
+			setState(function(p)
+				local clone = table.clone(p)
 
-				for k, v in pairs(t2) do
+				for k, v in pairs(dictionaryEntries) do
 					if v.type == PresenceState.Entering then
-						v35[k] = {
+						clone[k] = {
 							isPresent = true,
-							safeToRemove = false,
 							component = v.component,
+							safeToRemove = false,
 							dictionaryKey = v.dictionaryKey
 						}
-					elseif v.type == PresenceState.Exiting and v35[k] and v35[k].isPresent then
-						v35[k] = {
+					elseif v.type == PresenceState.Exiting and clone[k] and clone[k].isPresent then
+						clone[k] = {
 							isPresent = false,
-							safeToRemove = false,
 							component = v.component,
+							safeToRemove = false,
 							dictionaryKey = v.dictionaryKey
 						}
-						v16.current[k] = true
+
+						ref.current[k] = true
 					end
 				end
 
-				return v35
+				return clone
 			end)
 		end
 	end, { children })
 
-	local v17 = React.useCallback(function(p3) -- line: 150
-		-- upvalues: v16 (copy), v15 (copy)
-		if v16.current[p3] then
-			v16.current[p3] = nil
-			v15(function(p4) -- line: 154
-				-- upvalues: p3 (copy)
-				local v39 = table.clone(p4)
+	local v = React.useCallback(function(p)
+		if ref.current[p] then
+			ref.current[p] = nil
 
-				if v39[p3] then
-					v39[p3] = {
+			setState(function(p2)
+				local clone = table.clone(p2)
+
+				if clone[p] then
+					clone[p] = {
 						isPresent = false,
+						component = clone[p].component,
 						safeToRemove = true,
-						component = v39[p3].component,
-						dictionaryKey = v39[p3].dictionaryKey
+						dictionaryKey = clone[p].dictionaryKey
 					}
 				end
 
-				return v39
+				return clone
 			end)
 		end
 	end, {})
 
-	React.useEffect(function() -- line: 170
-		-- upvalues: v14 (copy), v15 (copy), v13 (copy)
-		local t3 = {}
-		local v31 = false
+	React.useEffect(function()
+		local set = {}
+		local flag = false
 
-		for k, v in pairs(v14) do
-			if v.safeToRemove then
-				v31 = true
-				t3[k] = true
+		for k, v2 in pairs(state) do
+			if not v2.safeToRemove then
+				continue
 			end
+
+			set[k] = true
+			flag = true
 		end
 
-		if v31 then
-			v15(function(p5) -- line: 182
-				-- upvalues: t3 (copy), v13 (copy)
-				local t4 = {}
+		if flag then
+			setState(function(items)
+				local result = {}
 
-				for k, v in pairs(p5) do
-					if not t3[k] then
-						t4[k] = v
-					elseif v13 then
-						v13(k)
+				for k, item in pairs(items) do
+					if set[k] then
+						if onExitComplete then
+							onExitComplete(k)
+						end
+					else
+						result[k] = item
 					end
 				end
 
-				return t4
+				return result
 			end)
 		end
-	end, { v14 })
+	end, { state })
 
-	local t5 = {}
+	local children2 = {}
 
-	for k, v in pairs(v14) do
-		if not v.safeToRemove then
-			table.insert(t5, React.createElement(PresenceChild, {
+	for k, v2 in pairs(state) do
+		if not v2.safeToRemove then
+			table.insert(children2, React.createElement(PresenceChild, {
 				key = k,
 				presenceId = k,
-				isPresent = v.isPresent,
-				onExitComplete = function() -- line: 208
-					-- upvalues: v17 (copy), k (copy)
-					v17(k)
+				isPresent = v2.isPresent,
+				onExitComplete = function()
+					v(k)
 				end,
-				childData = v12,
-				children = v.component
-			}, v.component))
+				childData = childData,
+				children = v2.component
+			}, v2.component))
 		end
 	end
 
-	return React.createElement(React.Fragment, {}, t5)
+	return React.createElement(React.Fragment, {}, children2)
 end
 
 return AnimatePresence

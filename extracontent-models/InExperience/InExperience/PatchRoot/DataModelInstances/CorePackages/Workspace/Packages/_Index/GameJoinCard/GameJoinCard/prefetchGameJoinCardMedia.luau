@@ -1,77 +1,99 @@
 local ContentProvider = game:GetService("ContentProvider")
-local Parent = script:FindFirstAncestor("GameJoinCard").Parent
-local DataHydration = require(Parent.DataHydration)
+
+local parent = script:FindFirstAncestor("GameJoinCard").Parent
+
+local DataHydration = require(parent.DataHydration)
 local DataStatus = DataHydration.DataStatus
 local getGameMediaStore = DataHydration.Game.getGameMediaStore
-local GameMediaImageType = require(Parent.DiscoveryTypes).GameMediaImageType
-local Signals = require(Parent.Signals)
-local BannerImageConstants = require(script.Parent.BannerImageConstants)
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local GameMediaImageType = DiscoveryTypes.GameMediaImageType
+local Signals = require(parent.Signals)
 
-local function preloadFirstImage(t1: {[any]: any}?) -- line: 27
-	-- upvalues: GameMediaImageType (copy), BannerImageConstants (copy), ContentProvider (copy)
-	if not t1 then
+local Foundation = require(parent.Foundation)
+local getRbxThumb = Foundation.Utility.getRbxThumb
+local ThumbnailType = Foundation.Enums.ThumbnailType
+local ThumbnailSize = Foundation.Enums.ThumbnailSize
+
+local BannerImageConstants = require(script.Parent.BannerImageConstants)
+local FFlagMobileGameJoinCardThumbnail = require(script.Parent.Flags.FFlagMobileGameJoinCardThumbnail)
+
+local function preloadFirstImage(items)
+	if not items then
 		return
 	end
 
-	for _, v14 in t1 do
-		if v14.assetTypeId == GameMediaImageType.Image and v14.imageId then
-			local v15 = string.format("rbxthumb://type=Asset&id=%s&w=%d&h=%d", tostring(v14.imageId), BannerImageConstants.DEFAULT_BANNER_WIDTH, BannerImageConstants.DEFAULT_BANNER_HEIGHT)
+	for _, item in items do
+		if item.assetTypeId == GameMediaImageType.Image and item.imageId then
+			local v = string.format(
+				"rbxthumb://type=Asset&id=%s&w=%d&h=%d",
+				tostring(item.imageId),
+				BannerImageConstants.DEFAULT_BANNER_WIDTH,
+				BannerImageConstants.DEFAULT_BANNER_HEIGHT
+			)
 
-			task.spawn(function() -- line: 39
-				-- upvalues: ContentProvider (copy), v15 (copy)
-				pcall(function() -- line: 40
-					-- upvalues: ContentProvider (copy), v15 (copy)
-					ContentProvider:PreloadAsync({ v15 })
+			task.spawn(function()
+				pcall(function()
+					ContentProvider:PreloadAsync({ v })
 				end)
 			end)
-
-			return
+			break
 		end
 	end
 end
-local function prefetchUniverseMedia(s1: string) -- line: 49
-	-- upvalues: getGameMediaStore (copy), DataStatus (copy), preloadFirstImage (copy), Signals (copy)
-	local v17 = getGameMediaStore(false).getAndFetchGameMedia(s1)
-	local v18 = v17.status(false)
 
-	if v18 ~= DataStatus.NotReady then
-		if v18 == DataStatus.Ready then
-			preloadFirstImage(v17.data(false))
-		end
+local function prefetchUniverseMedia(universeId: string)
+	local fetchGameMedia = getGameMediaStore(false).getAndFetchGameMedia(universeId)
 
-		return
+	local status = fetchGameMedia.status(false)
+
+	if status == DataStatus.NotReady then
+		local v = nil
+		v = Signals.createEffect(function(p)
+			local status2 = fetchGameMedia.status(p)
+
+			if status2 == DataStatus.NotReady then
+				return
+			end
+
+			if v then
+				v()
+				v = nil
+			end
+
+			if status2 == DataStatus.Ready then
+				preloadFirstImage(fetchGameMedia.data(false))
+			end
+		end)
+	elseif status == DataStatus.Ready then
+		preloadFirstImage(fetchGameMedia.data(false))
 	end
+end
 
-	local u19 = nil
-
-	u19 = Signals.createEffect(function(p1) -- line: 63
-		-- upvalues: v17 (copy), DataStatus (copy), u19 (ref), preloadFirstImage (copy)
-		local v24 = v17.status(p1)
-
-		if v24 == DataStatus.NotReady then
-			return
-		end
-
-		if u19 then
-			u19()
-			u19 = nil
-		end
-
-		if v24 == DataStatus.Ready then
-			preloadFirstImage(v17.data(false))
-		end
+local function preloadGameThumbnail(universeId: string, p) -- 1 equivalent call inferred from this helper
+	local v = p or ContentProvider
+	local rbxThumb = getRbxThumb(ThumbnailType.GameIcon, universeId, ThumbnailSize.Medium)
+	task.spawn(function()
+		pcall(function()
+			v:PreloadAsync({ rbxThumb })
+		end)
 	end)
 end
-local function prefetchGameJoinCardMedia(t2: {[any]: any}?) -- line: 78
-	-- upvalues: prefetchUniverseMedia (copy)
-	if not t2 then
+
+local function prefetchGameJoinCardMedia(items, p)
+	if not items then
 		return
 	end
 
-	for _, v22 in t2 do
-		if v22.universeId and v22.universeId ~= "" then
-			prefetchUniverseMedia((tostring(v22.universeId)))
+	for _, item in items do
+		if not (item.universeId and item.universeId ~= "") then
+			continue
 		end
+
+		if FFlagMobileGameJoinCardThumbnail then
+			preloadGameThumbnail(tostring(item.universeId), p) -- inferred equivalent call
+		end
+
+		prefetchUniverseMedia(tostring(item.universeId))
 	end
 end
 

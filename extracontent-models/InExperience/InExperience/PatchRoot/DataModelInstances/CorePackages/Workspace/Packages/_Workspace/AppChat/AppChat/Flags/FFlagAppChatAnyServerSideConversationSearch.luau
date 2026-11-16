@@ -1,0 +1,4 @@
+local FFlagAppChatServerSideConversationSearch = require(script.Parent.FFlagAppChatServerSideConversationSearch)
+local FFlagFriendsChatServerSideConversationSearch = require(script.Parent.FFlagFriendsChatServerSideConversationSearch)
+
+return FFlagAppChatServerSideConversationSearch or FFlagFriendsChatServerSideConversationSearch

@@ -1,71 +1,76 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
 
-local function buildProductPayloadFromInitiateArgs(s1: string, p1, b1: boolean?, b2: boolean?, s2: string?, s3: string?, s4: string?, s5: string?, s6: string?, n1: number?, p2) -- line: 10
-	-- upvalues: ProductTypeEnum (copy)
-	local v15 = p2 or {}
+local types = require(PurchasePrompt.types)
+local productTypeEnum = types.ProductTypeEnum
 
-	if p1 == Enum.InfoType.Asset then
+local SharedFlags = require(PurchasePrompt.Parent.SharedFlags)
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags.FFlagLuaAppsEnablePromptVIPServerPurchase
+
+local function buildProductPayloadFromInitiateArgs(universeId, p, flag: boolean?, flag2: boolean?, value: string?, value2: string?, value3: string?, value4: string?, value5: string?, value6: number?, options)
+	local v = options or {}
+
+	if p == Enum.InfoType.Asset then
 		return {
-			kind = ProductTypeEnum.Asset,
-			id = tostring(s1),
-			equipIfPurchased = b1 or false,
-			isRobloxPurchase = b2 or false,
-			idempotencyKey = s2 or "",
-			purchaseAuthToken = s3 or "",
-			collectibleItemId = s4 or "",
-			collectibleItemInstanceId = s5 or "",
-			collectibleProductId = s6 or "",
-			expectedPrice = n1 or 0
+			kind = productTypeEnum.Asset,
+			id = tostring(universeId),
+			equipIfPurchased = flag or false,
+			isRobloxPurchase = flag2 or false,
+			idempotencyKey = value or "",
+			purchaseAuthToken = value2 or "",
+			collectibleItemId = value3 or "",
+			collectibleItemInstanceId = value4 or "",
+			collectibleProductId = value5 or "",
+			expectedPrice = value6 or 0
 		}
 	end
 
-	if p1 == Enum.InfoType.GamePass then
+	if p == Enum.InfoType.GamePass then
+		return { kind = productTypeEnum.Gamepass, id = tostring(universeId) }
+	end
+
+	if p == Enum.InfoType.Product then
 		return {
-			kind = ProductTypeEnum.Gamepass,
-			id = tostring(s1)
+			kind = productTypeEnum.Product,
+			id = tostring(universeId),
+			equipIfPurchased = flag or false,
+			universeId = nil
 		}
 	end
 
-	if p1 == Enum.InfoType.Product then
+	if p == Enum.InfoType.Bundle then
 		return {
-			universeId = nil,
-			kind = ProductTypeEnum.Product,
-			id = tostring(s1),
-			equipIfPurchased = b1 or false
+			kind = productTypeEnum.Bundle,
+			id = tostring(universeId),
+			idempotencyKey = value or "",
+			collectibleItemId = value3 or "",
+			collectibleItemInstanceId = value4 or "",
+			collectibleProductId = value5 or "",
+			expectedPrice = value6 or 0
 		}
 	end
 
-	if p1 == Enum.InfoType.Bundle then
+	if p == productTypeEnum.Experience then
 		return {
-			kind = ProductTypeEnum.Bundle,
-			id = tostring(s1),
-			idempotencyKey = s2 or "",
-			collectibleItemId = s4 or "",
-			collectibleItemInstanceId = s5 or "",
-			collectibleProductId = s6 or "",
-			expectedPrice = n1 or 0
+			kind = productTypeEnum.Experience,
+			universeId = tostring(universeId),
+			experienceName = v.name or "",
+			experienceIconUrl = v.imageUrl or ""
 		}
 	end
 
-	if p1 == ProductTypeEnum.Experience then
+	if p == productTypeEnum.Look then
 		return {
-			kind = ProductTypeEnum.Experience,
-			universeId = tostring(s1),
-			experienceName = v15.name or "",
-			experienceIconUrl = v15.imageUrl or ""
-		}
-	end
-
-	if p1 == ProductTypeEnum.Look then
-		return {
+			kind = productTypeEnum.Look,
+			id = tostring(universeId),
+			expectedPrice = v.expectedPrice or value6 or 0,
 			salesLocationId = 0,
-			kind = ProductTypeEnum.Look,
-			id = tostring(s1),
-			expectedPrice = v15.expectedPrice or (n1 or 0),
 			excludedAssetIds = {},
 			excludedBundleIds = {}
 		}
+	end
+
+	if FFlagLuaAppsEnablePromptVIPServerPurchase and p == productTypeEnum.VIPServer then
+		return { kind = productTypeEnum.VIPServer, universeId = universeId }
 	end
 
 	return nil

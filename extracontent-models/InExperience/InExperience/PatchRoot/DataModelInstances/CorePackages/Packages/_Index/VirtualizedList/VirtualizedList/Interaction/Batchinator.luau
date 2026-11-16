@@ -1,63 +1,56 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local setTimeout = LuauPolyfill.setTimeout
 local clearTimeout = LuauPolyfill.clearTimeout
-local t1 = {
-	runAfterInteractions = function(_, p2: ((...any) -> ...any)) -- line: 20
-		p2()
 
+local v = {
+	runAfterInteractions = function(self, callback): nil
+		callback()
 		return nil
 	end
 }
-local t2 = {}
 
-t2.__index = t2
+local Batchinator = {}
+Batchinator.__index = Batchinator
 
-function t2.new(p3: ((...any) -> ...any), n1: number) -- line: 64
-	-- upvalues: t2 (copy)
-	local self = setmetatable({}, t2)
-
-	self._delay = n1
-	self._callback = p3
-
+function Batchinator.new(callback, delay: number)
+	local self = setmetatable({}, Batchinator)
+	self._delay = delay
+	self._callback = callback
 	return self
 end
-function t2.dispose(t3: {[any]: any}, t4: {[any]: any}?) -- line: 71
-	local v14 = t4 or {
-		abort = false
-	}
 
-	if t3._taskHandle then
-		t3._taskHandle.cancel()
+function Batchinator:dispose(p)
+	local v2 = p or { abort = false }
 
-		if not v14.abort then
-			t3._callback()
+	if self._taskHandle then
+		self._taskHandle.cancel()
+
+		if not v2.abort then
+			self._callback()
 		end
 
-		t3._taskHandle = nil
+		self._taskHandle = nil
 	end
 end
-function t2.schedule(p4) -- line: 85
-	-- upvalues: setTimeout (copy), t1 (copy), clearTimeout (copy)
-	if p4._taskHandle then
+
+function Batchinator:schedule()
+	if self._taskHandle then
 		return
 	end
 
-	local v16 = setTimeout(function() -- line: 90
-		-- upvalues: p4 (copy), t1 (copy)
-		p4._taskHandle = t1:runAfterInteractions(function() -- line: 91
-			-- upvalues: p4 (copy)
-			p4._taskHandle = nil
-			p4._callback()
+	local v2 = setTimeout(function()
+		self._taskHandle = v:runAfterInteractions(function()
+			self._taskHandle = nil
+			self._callback()
 		end)
-	end, p4._delay)
+	end, self._delay)
 
-	p4._taskHandle = {
-		cancel = function() -- line: 100
-			-- upvalues: clearTimeout (copy), v16 (copy)
-			return clearTimeout(v16)
+	self._taskHandle = {
+		cancel = function()
+			return clearTimeout(v2)
 		end
 	}
 end
 
-return t2
+return Batchinator

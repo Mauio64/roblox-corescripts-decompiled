@@ -1,19 +1,25 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
+local parent = MomentsCreation.Parent
 
-require(MomentsCreationParent.MomentsTypes)
+require(parent.MomentsTypes)
 
 local Constants = require(MomentsCreation.Constants)
 
-local function makeMomentMetadata(p1, s1: string?, p2, n1: number?) -- line: 27
-	-- upvalues: Constants (copy)
+local function makeMomentMetadata(data, description: string?, edits, assetTotalDuration: number?, commentsEnabled: boolean?)
+	if data.CaptureType == Enum.CaptureType.Screenshot then
+		assetTotalDuration = Constants.ScreenshotMusicDuration
+	elseif assetTotalDuration == nil or not (assetTotalDuration > 0) then
+		assetTotalDuration = data.TimeLength
+	end
+
 	return {
-		assetTotalDuration = if p1.CaptureType ~= Enum.CaptureType.Screenshot then if n1 == nil or not (n1 > 0) then p1.TimeLength else n1 else Constants.ScreenshotMusicDuration,
-		captureType = p1.CaptureType,
-		description = s1,
-		universeId = p1.SourceUniverseId,
-		placeId = p1.SourcePlaceId,
-		edits = p2
+		assetTotalDuration = assetTotalDuration,
+		captureType = data.CaptureType,
+		description = description,
+		universeId = data.SourceUniverseId,
+		placeId = data.SourcePlaceId,
+		edits = edits,
+		commentsEnabled = commentsEnabled
 	}
 end
 

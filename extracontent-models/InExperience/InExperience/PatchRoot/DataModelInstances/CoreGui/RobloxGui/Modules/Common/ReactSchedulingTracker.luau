@@ -1,270 +1,233 @@
 local CorePackages = game:GetService("CorePackages")
 local RunService = game:GetService("RunService")
-local v3 = game:DefineFastInt("ReactSchedulingTracker", 0)
-local v4 = game:DefineFastInt("ReactSchedulingTrackerPeriodMs", 30000)
-local EngineFeature = game:GetEngineFeature("TelemetryServiceMemoryCPUInfoEnabled")
-local v6 = game:DefineFastFlag("DisableReactSchedulingTimePctStats", false)
-local v7 = game:DefineFastFlag("DisableReactSchedulingAvgMaxMsStats", false)
-local FStringReactSchedulingContext = require(CorePackages.Workspace.Packages.SharedFlags).FStringReactSchedulingContext
-local v9 = game:DefineFastString("ReactSchedulingPercentiles", "10,50,95,99")
-local v10 = game:DefineFastInt("ReactSchedulingKllSketchMaxSize", 200)
-local v11 = game:DefineFastFlag("DebugReactSchedulingEnableErrorEvents", false)
-local v12 = game:DefineFastFlag("ReactSchedulingTrackerLayoutEffects", false)
-local v13 = game:DefineFastFlag("ReactSchedulingTrackerDataModelUpdate", false)
-local EngineFeature2 = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
-local v15 = game:DefineFastFlag("EnableCorescriptExecutionTime", false)
-local EngineFeature3 = game:GetEngineFeature("ScriptPlusExecutionTimeEnabled")
 
-function applicationId() -- line: 22
+local defineFastInt = game:DefineFastInt("ReactSchedulingTracker", 0)
+local defineFastInt2 = game:DefineFastInt("ReactSchedulingTrackerPeriodMs", 30000)
+local engineFeature = game:GetEngineFeature("TelemetryServiceMemoryCPUInfoEnabled")
+local defineFastFlag = game:DefineFastFlag("DisableReactSchedulingTimePctStats", false)
+local defineFastFlag2 = game:DefineFastFlag("DisableReactSchedulingAvgMaxMsStats", false)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FStringReactSchedulingContext = SharedFlags.FStringReactSchedulingContext
+local defineFastString = game:DefineFastString("ReactSchedulingPercentiles", "10,50,95,99")
+local defineFastInt3 = game:DefineFastInt("ReactSchedulingKllSketchMaxSize", 200)
+local defineFastFlag3 = game:DefineFastFlag("DebugReactSchedulingEnableErrorEvents", false)
+local defineFastFlag4 = game:DefineFastFlag("ReactSchedulingTrackerLayoutEffects", false)
+local defineFastFlag5 = game:DefineFastFlag("ReactSchedulingTrackerDataModelUpdate", false)
+local engineFeature2 = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
+local defineFastFlag6 = game:DefineFastFlag("EnableCorescriptExecutionTime", false)
+local engineFeature3 = game:GetEngineFeature("ScriptPlusExecutionTimeEnabled")
+
+function applicationId()
 	local AppStorageService = game:GetService("AppStorageService")
 
 	if not AppStorageService then
 		return nil
 	end
 
-	local Item = AppStorageService:GetItem("AppInstallationId")
-	local v49 = typeof(Item)
+	local item = AppStorageService:GetItem("AppInstallationId")
+	local typeName = typeof(item)
 
-	if v49 == "number" then
-		return tonumber(Item) or nil
+	if typeName == "number" then
+		return tonumber(item) or nil
 	end
 
-	if v49 == "string" then
-		if string.len(Item) <= 0 then
-			return nil
-		end
-
-		return (tonumber((string.sub(Item, -string.len((tostring(10000)))))))
+	if typeName ~= "string" or string.len(item) <= 0 then
+		return nil
 	end
 
-	return nil
+	return (tonumber((string.sub(item, -string.len((tostring(10000)))))))
 end
 
-local v17 = v3 > 0
-local u18 = true
-local u19 = true
+local flag, flag2
 
-if not v17 then
-	u19 = false
-	u18 = false
+if defineFastInt > 0 then
+	flag = true
+	flag2 = true
+else
+	flag = false
+	flag2 = false
 end
 
-local v20 = math.random(0, 10000)
-local v21 = applicationId()
+local v = math.random(0, 10000)
+local v2 = applicationId()
 
-if v21 ~= nil then
-	v20 = (v21 + 1409) % 10000
+if v2 ~= nil then
+	v = (v2 + 1409) % 10000
 end
 
-if not (v20 < v3) then
-	u19 = false
-	u18 = false
+if not (v < defineFastInt) then
+	flag = false
+	flag2 = false
 end
 
 local TelemetryService = game:GetService("TelemetryService")
-local mutedError = require(CorePackages.Workspace.Packages.Loggers).mutedError
+local Loggers = require(CorePackages.Workspace.Packages.Loggers)
+local mutedError = Loggers.mutedError
 local ReactRoblox = require(CorePackages.Packages.ReactRoblox)
-
 require(CorePackages.Packages.ReactReconciler)
+local InExperiencePerformance = require(CorePackages.Workspace.Packages.InExperiencePerformance)
+local KllSketch = InExperiencePerformance.KllSketch
 
-local KllSketch = require(CorePackages.Workspace.Packages.InExperiencePerformance).KllSketch
-local parts = string.split(v9)
+local v3 = string.split(defineFastString)
 local CorePackages2 = game:GetService("CorePackages")
-local DeviceTier = require(CorePackages2.Workspace.Packages.Devices).DeviceTier
+local Devices = require(CorePackages2.Workspace.Packages.Devices)
+local DeviceTier = Devices.DeviceTier
+
 local schedulingProfiler = ReactRoblox.schedulingProfiler
 local profilerEventTypes = schedulingProfiler.profilerEventTypes
-local _ = {
-	Idle = "Idle",
-	Render = "Render",
-	Commit = "Commit",
-	PassiveEffects = "PassiveEffects"
-}
 
-local function getCurrentTimeMs() -- line: 98
+local _ = { Idle = "Idle", Render = "Render", Commit = "Commit", PassiveEffects = "PassiveEffects" }
+
+local function getCurrentTimeMs() -- 16 equivalent calls inferred from this helper
 	return os.clock() * 1000
 end
 
-local v33 = DeviceTier.GetDeviceMemoryTier()
-local t1 = {}
+local deviceMemoryTier = DeviceTier.GetDeviceMemoryTier()
 
-t1.__index = t1
+local class = {}
+class.__index = class
 
-function t1.new(p1: ((...any) -> ...any), p2: ((...any) -> ...any)) -- line: 141
-	-- upvalues: v12 (copy), profilerEventTypes (copy), mutedError (copy), t1 (copy)
+function class.new(frameReporter, rootReporter)
 	return (setmetatable({
+		frameReporter = frameReporter,
+		rootReporter = rootReporter,
 		currentState = "Idle",
 		timerStartMs = 0,
+		layoutTimerStartMs = defineFastFlag4 and 0 or nil,
 		rootUpdateInProgress = false,
-		renderLevel = 0,
-		frameReporter = p1,
-		rootReporter = p2,
-		layoutTimerStartMs = if not v12 then nil else 0,
 		rootUpdateTime = {
 			tag = "RootUpdateTime",
 			RenderMs = 0,
 			CommitMs = 0,
-			StartTimeMs = 0,
-			LayoutEffectsMs = if not v12 then nil else 0
+			LayoutEffectsMs = defineFastFlag4 and 0 or nil,
+			StartTimeMs = 0
 		},
-		rootPassiveEffectsTime = {
-			tag = "RootPassiveEffectsTime",
-			PassiveEffectsMs = 0
-		},
+		rootPassiveEffectsTime = { tag = "RootPassiveEffectsTime", PassiveEffectsMs = 0 },
+		renderLevel = 0,
 		states = {
-			Idle = function(p3, n1: number) -- line: 165
-				-- upvalues: profilerEventTypes (copy), v12 (copy)
-				if n1 == profilerEventTypes.RenderStart then
-					p3.timerStartMs = os.clock() * 1000
+			Idle = function(p, p2: number): nil | string
+				if p2 == profilerEventTypes.RenderStart then
+					p.timerStartMs = getCurrentTimeMs() -- inferred equivalent call
 
-					if not p3.rootUpdateInProgress then
-						p3.rootUpdateInProgress = true
-						p3.rootUpdateTime = {
+					if not p.rootUpdateInProgress then
+						p.rootUpdateInProgress = true
+						p.rootUpdateTime = {
 							tag = "RootUpdateTime",
 							RenderMs = 0,
 							CommitMs = 0,
-							LayoutEffectsMs = if not v12 then nil else 0,
-							StartTimeMs = os.clock() * 1000
+							LayoutEffectsMs = defineFastFlag4 and 0 or nil,
+							StartTimeMs = getCurrentTimeMs() -- inferred equivalent call
 						}
 					end
 
 					return "Render"
-				end
-
-				if n1 == profilerEventTypes.PassiveEffectsStart then
-					p3.timerStartMs = os.clock() * 1000
-					p3.rootPassiveEffectsTime = {
+				elseif p2 == profilerEventTypes.PassiveEffectsStart then
+					p.timerStartMs = getCurrentTimeMs() -- inferred equivalent call
+					p.rootPassiveEffectsTime = {
 						tag = "RootPassiveEffectsTime",
 						PassiveEffectsMs = 0
 					}
 
 					return "PassiveEffects"
-				end
-
-				if n1 == profilerEventTypes.CommitStart then
-					p3.timerStartMs = os.clock() * 1000
-
-					return "Commit"
-				end
-
-				return nil
-			end,
-			Render = function(p4, n2: number) -- line: 194
-				-- upvalues: profilerEventTypes (copy), mutedError (copy)
-				if n2 == profilerEventTypes.RenderYield or n2 == profilerEventTypes.RenderStop then
-					local v149 = os.clock() * 1000 - p4.timerStartMs
-					local rootUpdateTime = p4.rootUpdateTime
-
-					rootUpdateTime.RenderMs = rootUpdateTime.RenderMs + v149
-					p4.frameReporter(v149)
-
-					return "Idle"
-				end
-
-				mutedError("Invalid event in Render: " .. n2)
-
-				return "Idle"
-			end,
-			Commit = function(p5, n3: number, p6) -- line: 206
-				-- upvalues: profilerEventTypes (copy), v12 (copy), mutedError (copy)
-				if n3 == profilerEventTypes.CommitStop then
-					if p5.renderLevel > 0 then
-						if v12 and p5.renderLevel == 1 then
-							local rootUpdateTime = p5.rootUpdateTime
-
-							rootUpdateTime.LayoutEffectsMs = rootUpdateTime.LayoutEffectsMs + (os.clock() * 1000 - p5.layoutTimerStartMs)
-						end
-
-						p5.renderLevel = p5.renderLevel - 1
-
+				else
+					if p2 ~= profilerEventTypes.CommitStart then
 						return nil
 					end
 
-					local v155 = os.clock() * 1000 - p5.timerStartMs
-					local rootUpdateTime = p5.rootUpdateTime
-
-					rootUpdateTime.CommitMs = rootUpdateTime.CommitMs + v155
-					p5.frameReporter(v155)
-					p5.rootReporter(p5.rootUpdateTime, p6)
-					p5.rootUpdateInProgress = false
-
+					p.timerStartMs = getCurrentTimeMs() -- inferred equivalent call
+					return "Commit"
+				end
+			end,
+			Render = function(data, p: number): string
+				if p ~= profilerEventTypes.RenderYield and p ~= profilerEventTypes.RenderStop then
+					mutedError("Invalid event in Render: " .. p)
 					return "Idle"
 				end
 
-				if n3 == profilerEventTypes.RenderStart then
-					p5.renderLevel = p5.renderLevel + 1
-
-					if v12 and p5.renderLevel == 1 then
-						p5.layoutTimerStartMs = os.clock() * 1000
-					end
-
-					return nil
-				end
-
-				if v12 and (n3 == profilerEventTypes.LayoutEffectsStart or n3 == profilerEventTypes.PassiveEffectsStart) then
-					if p5.renderLevel == 0 then
-						p5.layoutTimerStartMs = os.clock() * 1000
-					end
-
-					return nil
-				end
-
-				if v12 and (n3 == profilerEventTypes.LayoutEffectsStop or n3 == profilerEventTypes.PassiveEffectsStop) then
-					if p5.renderLevel == 0 then
-						local rootUpdateTime = p5.rootUpdateTime
-
-						rootUpdateTime.LayoutEffectsMs = rootUpdateTime.LayoutEffectsMs + (os.clock() * 1000 - p5.layoutTimerStartMs)
-					end
-
-					return nil
-				end
-
-				if n3 ~= profilerEventTypes.RenderYield then
-					return nil
-				end
-
-				mutedError("Invalid event in Commit: " .. n3)
-
+				local v4 = getCurrentTimeMs() - data.timerStartMs -- inferred equivalent call
+				data.rootUpdateTime.RenderMs += v4
+				data.frameReporter(v4)
 				return "Idle"
 			end,
-			PassiveEffects = function(p7, n4: number, p8) -- line: 253
-				-- upvalues: profilerEventTypes (copy), mutedError (copy)
-				if n4 == profilerEventTypes.PassiveEffectsStop then
-					local v161 = os.clock() * 1000 - p7.timerStartMs
-					local rootPassiveEffectsTime = p7.rootPassiveEffectsTime
+			Commit = function(state, p: number, p2): nil | string
+				if p == profilerEventTypes.CommitStop then
+					if state.renderLevel > 0 then
+						if defineFastFlag4 and state.renderLevel == 1 then
+							state.rootUpdateTime.LayoutEffectsMs += getCurrentTimeMs() - state.layoutTimerStartMs -- inferred equivalent call
+						end
 
-					rootPassiveEffectsTime.PassiveEffectsMs = rootPassiveEffectsTime.PassiveEffectsMs + v161
-					p7.frameReporter(v161)
-					p7.rootReporter(p7.rootPassiveEffectsTime, p8)
+						state.renderLevel -= 1
+						return nil
+					else
+						local v4 = getCurrentTimeMs() - state.timerStartMs -- inferred equivalent call
+						state.rootUpdateTime.CommitMs += v4
+						state.frameReporter(v4)
+						state.rootReporter(state.rootUpdateTime, p2)
+						state.rootUpdateInProgress = false
+						return "Idle"
+					end
+				elseif p == profilerEventTypes.RenderStart then
+					state.renderLevel += 1
 
+					if defineFastFlag4 and state.renderLevel == 1 then
+						state.layoutTimerStartMs = getCurrentTimeMs() -- inferred equivalent call
+					end
+
+					return nil
+				elseif
+					defineFastFlag4
+					and (p == profilerEventTypes.LayoutEffectsStart or p == profilerEventTypes.PassiveEffectsStart)
+				then
+					if state.renderLevel == 0 then
+						state.layoutTimerStartMs = getCurrentTimeMs() -- inferred equivalent call
+					end
+
+					return nil
+				elseif
+					defineFastFlag4
+					and (p == profilerEventTypes.LayoutEffectsStop or p == profilerEventTypes.PassiveEffectsStop)
+				then
+					if state.renderLevel == 0 then
+						state.rootUpdateTime.LayoutEffectsMs += getCurrentTimeMs() - state.layoutTimerStartMs -- inferred equivalent call
+					end
+
+					return nil
+				else
+					if p ~= profilerEventTypes.RenderYield then
+						return nil
+					end
+
+					mutedError("Invalid event in Commit: " .. p)
+					return "Idle"
+				end
+			end,
+			PassiveEffects = function(data, p: number, p2): string
+				if p ~= profilerEventTypes.PassiveEffectsStop then
+					mutedError("Invalid event in PassiveEffects: " .. p)
 					return "Idle"
 				end
 
-				mutedError("Invalid event in PassiveEffects: " .. n4)
-
+				local v4 = getCurrentTimeMs() - data.timerStartMs -- inferred equivalent call
+				data.rootPassiveEffectsTime.PassiveEffectsMs += v4
+				data.frameReporter(v4)
+				data.rootReporter(data.rootPassiveEffectsTime, p2)
 				return "Idle"
 			end
 		}
-	}, t1))
+	}, class))
 end
-function t1.transition(t2: {[any]: any}, n5: number, p9) -- line: 276
-	local currentState = t2.currentState
-	local v56 = t2.states[currentState](t2, n5, p9)
 
-	if v56 then
-		t2.currentState = v56
+function class:transition(p: number, p2)
+	local currentState = self.currentState
+	local currentState2 = self.states[currentState](self, p, p2)
+
+	if currentState2 then
+		self.currentState = currentState2
 	end
 end
 
-local t3 = {
-	"addPlaceId",
-	"addUniverseId",
-	"addSessionId",
-	"addOSInfo",
-	"addSessionInfo"
-}
-
-if EngineFeature then
-	t3 = {
+local standardizedFields = engineFeature
+	and {
 		"addPlaceId",
 		"addUniverseId",
 		"addSessionId",
@@ -273,165 +236,117 @@ if EngineFeature then
 		"addMemoryInfo",
 		"addCPUInfo"
 	}
+	or { "addPlaceId", "addUniverseId", "addSessionId", "addOSInfo", "addSessionInfo" }
+
+if engineFeature2 then
+	table.insert(standardizedFields, "addPlaySessionId")
 end
 
-if EngineFeature2 then
-	table.insert(t3, "addPlaySessionId")
-end
-
-local t4 = {
+local v4 = {
 	eventName = "ReactSessionSummary",
-	description = "Summary of React performance over a game session",
-	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
 	backends = { "EventIngest" },
 	throttlingPercentage = game:DefineFastInt("ReactSessionSummaryEventThrottleHunderedthsPercent", 0),
-	lastUpdated = {
-		2025,
-		7,
-		10
-	}
+	lastUpdated = { 2025, 7, 10 },
+	description = "Summary of React performance over a game session",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
 }
-local t5 = nil
 
-if v11 then
-	t5 = {
-		eventName = "ReactSessionErrorEvent",
-		description = "Summary of React performance over a game session",
-		links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
-		backends = { "EventIngest" },
-		throttlingPercentage = game:DefineFastInt("DebugReactSessionErrorEventThrottleHunderedthsPercent", 0),
-		lastUpdated = {
-			2025,
-			8,
-			7
-		}
-	}
-end
+local v5 = defineFastFlag3 and {
+	eventName = "ReactSessionErrorEvent",
+	backends = { "EventIngest" },
+	throttlingPercentage = game:DefineFastInt("DebugReactSessionErrorEventThrottleHunderedthsPercent", 0),
+	lastUpdated = { 2025, 8, 7 },
+	description = "Summary of React performance over a game session",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
+} or nil
 
-local t6 = {
+local v6 = {
 	eventName = "ReactPeriodSummary",
-	description = "Summary of React performance over a period",
-	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
 	backends = { "EventIngest" },
 	throttlingPercentage = game:DefineFastInt("ReactPeriodSummaryEventThrottleHunderedthsPercent", 0),
-	lastUpdated = {
-		2025,
-		2,
-		18
-	}
+	lastUpdated = { 2025, 2, 18 },
+	description = "Summary of React performance over a period",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
 }
-local t7 = {
+
+local v7 = {
 	eventName = "ReactPeriod",
+	backends = { "RobloxTelemetryStat" },
+	lastUpdated = { 2025, 2, 18 },
 	description = "Stats for React performance over a period",
-	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
-	backends = { "RobloxTelemetryStat" },
-	lastUpdated = {
-		2025,
-		2,
-		18
-	}
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
 }
-local t8 = {
+
+local v8 = {
 	eventName = "ReactFrameCounter",
+	backends = { "RobloxTelemetryCounter" },
+	lastUpdated = { 2025, 2, 18 },
 	description = "Frame counts for React performance over a period",
-	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
-	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		2025,
-		2,
-		18
-	}
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
 }
-local t9 = {
+
+local v9 = {
 	eventName = "ReactRootSummary",
-	description = "Summary of React performance for a root",
-	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
 	backends = { "EventIngest" },
-	lastUpdated = {
-		2025,
-		2,
-		18
-	},
-	throttlingPercentage = game:DefineFastInt("ReactRootSummaryEventThrottleHunderedthsPercent2", 0)
+	lastUpdated = { 2025, 2, 18 },
+	throttlingPercentage = game:DefineFastInt("ReactRootSummaryEventThrottleHunderedthsPercent2", 0),
+	description = "Summary of React performance for a root",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
 }
-local t10 = nil
 
-if not v6 then
-	t10 = {
-		eventName = "ReactRootPeriod",
-		description = "Stats for React performance for a root over a period",
-		links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
-		backends = { "RobloxTelemetryStat" },
-		lastUpdated = {
-			2025,
-			2,
-			18
-		}
-	}
-end
-
-local t11 = {
-	eventName = "ReactRootTaskCount",
-	description = "Task counts for React performance for a root over a period",
-	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
-	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		2025,
-		2,
-		18
-	}
-}
-local t12 = nil
-
-if not v7 then
-	t12 = {
-		eventName = "ReactRootPeriodTask",
-		description = "Task stats for React performance for a root over a period",
-		links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
-		backends = { "RobloxTelemetryStat" },
-		lastUpdated = {
-			2025,
-			2,
-			18
-		}
-	}
-end
-
-local t13 = {
-	eventName = "ReactRootUpdate",
-	description = "Task stats for individual React root updates, all in milliseconds",
-	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8",
+local v10 = not defineFastFlag and {
+	eventName = "ReactRootPeriod",
 	backends = { "RobloxTelemetryStat" },
-	lastUpdated = {
-		2025,
-		2,
-		18
-	}
+	lastUpdated = { 2025, 2, 18 },
+	description = "Stats for React performance for a root over a period",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
+} or nil
+
+local v11 = {
+	eventName = "ReactRootTaskCount",
+	backends = { "RobloxTelemetryCounter" },
+	lastUpdated = { 2025, 2, 18 },
+	description = "Task counts for React performance for a root over a period",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
 }
-local t14 = {}
 
-t14.__index = t14
+local v12 = not defineFastFlag2 and {
+	eventName = "ReactRootPeriodTask",
+	backends = { "RobloxTelemetryStat" },
+	lastUpdated = { 2025, 2, 18 },
+	description = "Task stats for React performance for a root over a period",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
+} or nil
 
-function t14.new(s1: string?) -- line: 464
-	-- upvalues: KllSketch (copy), v10 (copy), v11 (copy), t14 (copy), t1 (copy), u19 (ref)
-	local t15 = {}
-	local t16 = {}
-	local t17 = {}
-	local t18 = {}
-	local t19 = {}
-	local t20 = {}
+local v13 = {
+	eventName = "ReactRootUpdate",
+	backends = { "RobloxTelemetryStat" },
+	lastUpdated = { 2025, 2, 18 },
+	description = "Task stats for individual React root updates, all in milliseconds",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/3321660204/React+Profiler+Metric+Issues+and+Path+Forward#New-Metrics-%E2%9C%A8"
+}
 
-	t15.all = KllSketch.new(v10)
-	t16.all = KllSketch.new(v10)
-	t17.all = KllSketch.new(v10)
+local class2 = {}
+class2.__index = class2
 
-	if v11 then
-		t18.all = {}
-		t19.all = {}
-		t20.all = {}
+function class2.new(context: string?)
+	local sketches = {}
+	local sketches2 = {}
+	local sketches3 = {}
+	local v14 = {}
+	local v15 = {}
+	local v16 = {}
+	sketches.all = KllSketch.new(defineFastInt3)
+	sketches2.all = KllSketch.new(defineFastInt3)
+	sketches3.all = KllSketch.new(defineFastInt3)
+
+	if defineFastFlag3 then
+		v14.all = {}
+		v15.all = {}
+		v16.all = {}
 	end
 
-	local v64 = setmetatable({
+	local object = setmetatable({
 		started = false,
 		periodStartMs = 0,
 		reactFrameTimeMs = 0,
@@ -441,419 +356,377 @@ function t14.new(s1: string?) -- line: 464
 			totalReactTimeMs = 0,
 			totalCorescriptTimeMs = 0,
 			maxReactFrameTimeMs = 0,
-			allFrameHistogram = {
-				0,
-				0,
-				0,
-				0
-			},
-			reactFrameHistogram = {
-				0,
-				0,
-				0,
-				0
-			},
-			reactDropChangeHistogram = {
-				0,
-				0,
-				0,
-				0
-			}
+			allFrameHistogram = { 0, 0, 0, 0 },
+			reactFrameHistogram = { 0, 0, 0, 0 },
+			reactDropChangeHistogram = { 0, 0, 0, 0 }
 		},
 		rootsMetrics = {},
 		sessionMetrics = {
 			updateTime = {
-				numRoots = 1,
-				sketches = t15,
-				allData = if not v11 then {} else t18
+				sketches = sketches,
+				allData = not defineFastFlag3 and {} or v14,
+				numRoots = 1
 			},
 			commitTime = {
-				numRoots = 1,
-				sketches = t16,
-				allData = if not v11 then {} else t19
+				sketches = sketches2,
+				allData = not defineFastFlag3 and {} or v15,
+				numRoots = 1
 			},
 			timeToUpdate = {
-				numRoots = 1,
-				sketches = t17,
-				allData = if not v11 then {} else t20
+				sketches = sketches3,
+				allData = not defineFastFlag3 and {} or v16,
+				numRoots = 1
 			},
-			timePerFrame = {
-				sketch = KllSketch.new(v10),
-				allData = {}
-			},
-			timePerReactFrame = {
-				sketch = KllSketch.new(v10),
-				allData = {}
-			}
+			timePerFrame = { sketch = KllSketch.new(defineFastInt3), allData = {} },
+			timePerReactFrame = { sketch = KllSketch.new(defineFastInt3), allData = {} }
 		},
-		context = s1
-	}, t14)
+		context = context
+	}, class2)
 
-	v64.schedulerStateMachine = t1.new(function(p10) -- line: 519
-		-- upvalues: v64 (copy)
-		v64:addToFrame(p10)
-	end, function(p11, p12) -- line: 521
-		-- upvalues: v64 (copy), u19 (ref)
-		v64:trackSessionSketches(p11, p12)
+	object.schedulerStateMachine = class.new(function(p)
+		object:addToFrame(p)
+	end, function(p, p2)
+		object:trackSessionSketches(p, p2)
 
-		if u19 then
-			v64:reportRoot(p11, p12)
+		if flag then
+			object:reportRoot(p, p2)
 		end
 	end)
 
-	return v64
+	return object
 end
-function t14.start(p13) -- line: 531
-	-- upvalues: schedulingProfiler (copy), RunService (copy), v4 (copy), u18 (ref)
-	p13.started = true
-	p13:resetState()
-	schedulingProfiler.registerProfilerEventCallback(function(n6: number, p14) -- line: 535
-		-- upvalues: p13 (copy)
-		p13.schedulerStateMachine:transition(n6, p14)
-	end)
-	RunService.Heartbeat:Connect(function(dt) -- line: 539
-		-- upvalues: p13 (copy), v4 (copy), u18 (ref)
-		p13:processFrame(dt * 1000)
-		p13.reactFrameTimeMs = 0
 
-		if os.clock() * 1000 - p13.periodStartMs > v4 then
-			if u18 then
-				p13:reportPeriod()
+function class2:start()
+	self.started = true
+	self:resetState()
+
+	schedulingProfiler.registerProfilerEventCallback(function(p: number, p2)
+		self.schedulerStateMachine:transition(p, p2)
+	end)
+
+	RunService.Heartbeat:Connect(function(dt)
+		self:processFrame(dt * 1000)
+		self.reactFrameTimeMs = 0
+
+		if defineFastInt2 < getCurrentTimeMs() - self.periodStartMs then -- inferred equivalent call
+			if flag2 then
+				self:reportPeriod()
 			end
 
-			p13:resetState()
+			self:resetState()
 		end
 	end)
 end
-function t14.resetState(p15) -- line: 554
-	p15.periodStartMs = os.clock() * 1000
-	p15.frameMetrics = {
+
+function class2:resetState()
+	self.periodStartMs = getCurrentTimeMs() -- inferred equivalent call
+	self.frameMetrics = {
 		totalFrameCount = 0,
 		reactFrameCount = 0,
 		totalReactTimeMs = 0,
 		totalCorescriptTimeMs = 0,
 		maxReactFrameTimeMs = 0,
-		allFrameHistogram = {
-			0,
-			0,
-			0,
-			0
-		},
-		reactFrameHistogram = {
-			0,
-			0,
-			0,
-			0
-		},
-		reactDropChangeHistogram = {
-			0,
-			0,
-			0,
-			0
-		}
+		allFrameHistogram = { 0, 0, 0, 0 },
+		reactFrameHistogram = { 0, 0, 0, 0 },
+		reactDropChangeHistogram = { 0, 0, 0, 0 }
 	}
-	p15.rootsMetrics = {}
-end
-function t14.getRootName(_, p17) -- line: 571
-	if p17 then
-		if p17.containerInfo.Name ~= "Folder" then
-			return p17.containerInfo.Name
-		end
 
-		if p17.current and p17.current.child and p17.current.child.memoizedProps then
-			for v69, _ in p17.current.child.memoizedProps do
-				if typeof(v69) == "string" then
-					return v69
-				end
+	self.rootsMetrics = {}
+end
+
+function class2:getRootName(p)
+	local v14 = "Unknown"
+
+	if not p then
+		return v14
+	end
+
+	if p.containerInfo.Name ~= "Folder" then
+		return p.containerInfo.Name
+	end
+
+	if p.current and p.current.child and p.current.child.memoizedProps then
+		for k, _ in p.current.child.memoizedProps do
+			if typeof(k) == "string" then
+				return k
 			end
 		end
 	end
 
-	return "Unknown"
+	return v14
 end
-function t14.addToFrame(p18, p19) -- line: 588
-	p18.reactFrameTimeMs = p18.reactFrameTimeMs + p19
+
+function class2:addToFrame(p)
+	self.reactFrameTimeMs += p
 end
-function t14.trackSessionSketches(p20, p21, p22) -- line: 592
-	-- upvalues: v11 (copy), KllSketch (copy), v10 (copy)
-	if not p20.sessionMetrics then
+
+function class2:trackSessionSketches(data, p)
+	if not self.sessionMetrics then
 		return
 	end
 
-	local v76 = p20:getRootName(p22)
+	local rootName = self:getRootName(p)
 
-	if p21.tag == "RootUpdateTime" then
-		local v77 = os.clock() * 1000 - p21.StartTimeMs
+	if data.tag == "RootUpdateTime" then
+		local v14 = getCurrentTimeMs() - data.StartTimeMs -- inferred equivalent call
 
-		if v11 then
-			table.insert(p20.sessionMetrics.updateTime.allData.all, p21.RenderMs + p21.CommitMs)
-			table.insert(p20.sessionMetrics.commitTime.allData.all, p21.CommitMs)
-			table.insert(p20.sessionMetrics.timeToUpdate.allData.all, v77)
+		if defineFastFlag3 then
+			table.insert(self.sessionMetrics.updateTime.allData.all, data.RenderMs + data.CommitMs)
+			table.insert(self.sessionMetrics.commitTime.allData.all, data.CommitMs)
+			table.insert(self.sessionMetrics.timeToUpdate.allData.all, v14)
 		end
 
-		p20.sessionMetrics.updateTime.sketches.all:insert(p21.RenderMs + p21.CommitMs)
-		p20.sessionMetrics.commitTime.sketches.all:insert(p21.CommitMs)
-		p20.sessionMetrics.timeToUpdate.sketches.all:insert(v77)
+		self.sessionMetrics.updateTime.sketches.all:insert(data.RenderMs + data.CommitMs)
+		self.sessionMetrics.commitTime.sketches.all:insert(data.CommitMs)
+		self.sessionMetrics.timeToUpdate.sketches.all:insert(v14)
 
-		if not p20.sessionMetrics.updateTime.sketches[v76] then
-			p20.sessionMetrics.updateTime.sketches[v76] = KllSketch.new(v10)
+		if not self.sessionMetrics.updateTime.sketches[rootName] then
+			self.sessionMetrics.updateTime.sketches[rootName] = KllSketch.new(defineFastInt3)
 
-			if v11 then
-				p20.sessionMetrics.updateTime.allData[v76] = {}
+			if defineFastFlag3 then
+				self.sessionMetrics.updateTime.allData[rootName] = {}
 			end
 
-			local updateTime = p20.sessionMetrics.updateTime
-
-			updateTime.numRoots = updateTime.numRoots + 1
+			self.sessionMetrics.updateTime.numRoots += 1
 		end
 
-		p20.sessionMetrics.updateTime.sketches[v76]:insert(p21.RenderMs + p21.CommitMs)
+		self.sessionMetrics.updateTime.sketches[rootName]:insert(data.RenderMs + data.CommitMs)
 
-		if v11 then
-			table.insert(p20.sessionMetrics.updateTime.allData[v76], p21.RenderMs + p21.CommitMs)
+		if defineFastFlag3 then
+			table.insert(self.sessionMetrics.updateTime.allData[rootName], data.RenderMs + data.CommitMs)
 		end
 
-		if not p20.sessionMetrics.commitTime.sketches[v76] then
-			p20.sessionMetrics.commitTime.sketches[v76] = KllSketch.new(v10)
+		if not self.sessionMetrics.commitTime.sketches[rootName] then
+			self.sessionMetrics.commitTime.sketches[rootName] = KllSketch.new(defineFastInt3)
 
-			if v11 then
-				p20.sessionMetrics.commitTime.allData[v76] = {}
+			if defineFastFlag3 then
+				self.sessionMetrics.commitTime.allData[rootName] = {}
 			end
 
-			local commitTime = p20.sessionMetrics.commitTime
-
-			commitTime.numRoots = commitTime.numRoots + 1
+			self.sessionMetrics.commitTime.numRoots += 1
 		end
 
-		p20.sessionMetrics.commitTime.sketches[v76]:insert(p21.CommitMs)
+		self.sessionMetrics.commitTime.sketches[rootName]:insert(data.CommitMs)
 
-		if v11 then
-			table.insert(p20.sessionMetrics.commitTime.allData[v76], p21.CommitMs)
+		if defineFastFlag3 then
+			table.insert(self.sessionMetrics.commitTime.allData[rootName], data.CommitMs)
 		end
 
-		if not p20.sessionMetrics.timeToUpdate.sketches[v76] then
-			p20.sessionMetrics.timeToUpdate.sketches[v76] = KllSketch.new(v10)
+		if not self.sessionMetrics.timeToUpdate.sketches[rootName] then
+			self.sessionMetrics.timeToUpdate.sketches[rootName] = KllSketch.new(defineFastInt3)
 
-			if v11 then
-				p20.sessionMetrics.timeToUpdate.allData[v76] = {}
+			if defineFastFlag3 then
+				self.sessionMetrics.timeToUpdate.allData[rootName] = {}
 			end
 
-			local timeToUpdate = p20.sessionMetrics.timeToUpdate
-
-			timeToUpdate.numRoots = timeToUpdate.numRoots + 1
+			self.sessionMetrics.timeToUpdate.numRoots += 1
 		end
 
-		p20.sessionMetrics.timeToUpdate.sketches[v76]:insert(v77)
+		self.sessionMetrics.timeToUpdate.sketches[rootName]:insert(v14)
 
-		if v11 then
-			table.insert(p20.sessionMetrics.timeToUpdate.allData[v76], v77)
+		if defineFastFlag3 then
+			table.insert(self.sessionMetrics.timeToUpdate.allData[rootName], v14)
 		end
 	end
 end
-function t14.reportRoot(p23, p24, p25) -- line: 652
-	-- upvalues: v12 (copy), v13 (copy), TelemetryService (copy), t13 (copy), v33 (copy)
-	local v84 = p23:getRootName(p25)
 
-	if not p23.rootsMetrics[v84] then
-		p23.rootsMetrics[v84] = {
+function class2:reportRoot(data, p)
+	local rootName = self:getRootName(p)
+
+	if not self.rootsMetrics[rootName] then
+		self.rootsMetrics[rootName] = {
 			update_count = 0,
+			layout_effects_count = defineFastFlag4 and 0 or nil,
 			render_total_time_ms = 0,
 			commit_total_time_ms = 0,
+			layout_effects_total_time_ms = defineFastFlag4 and 0 or nil,
+			data_model_update_total_time_ms = defineFastFlag4 and defineFastFlag5 and 0 or nil,
 			max_render_time_ms = 0,
 			max_commit_time_ms = 0,
 			max_update_time_ms = 0,
+			max_layout_effects_time_ms = defineFastFlag4 and 0 or nil,
+			max_data_model_update_time_ms = defineFastFlag4 and defineFastFlag5 and 0 or nil,
 			passive_effects_count = 0,
 			passive_effects_total_time_ms = 0,
 			max_passive_effects_time_ms = 0,
 			total_time_to_update_ms = 0,
-			max_time_to_update_ms = 0,
-			layout_effects_count = if not v12 then nil else 0,
-			layout_effects_total_time_ms = if not v12 then nil else 0,
-			data_model_update_total_time_ms = if not v12 or not v13 then nil else 0,
-			max_layout_effects_time_ms = if not v12 then nil else 0,
-			max_data_model_update_time_ms = if not v12 or not v13 then nil else 0
+			max_time_to_update_ms = 0
 		}
 	end
 
-	local v85 = p23.rootsMetrics[v84]
+	local rootsMetric = self.rootsMetrics[rootName]
 
-	if p24.tag == "RootPassiveEffectsTime" then
-		TelemetryService:LogStat(t13, {
+	if data.tag == "RootPassiveEffectsTime" then
+		TelemetryService:LogStat(v13, {
 			customFields = {
+				rootName = rootName,
+				deviceTier = deviceMemoryTier,
 				updateType = "PassiveEffects",
-				rootName = v84,
-				deviceTier = v33,
-				context = p23.context
+				context = self.context
 			}
-		}, p24.PassiveEffectsMs)
-		v85.passive_effects_count = v85.passive_effects_count + 1
-		v85.passive_effects_total_time_ms = v85.passive_effects_total_time_ms + p24.PassiveEffectsMs
+		}, data.PassiveEffectsMs)
 
-		if p24.PassiveEffectsMs > v85.max_passive_effects_time_ms then
-			v85.max_passive_effects_time_ms = p24.PassiveEffectsMs
+		rootsMetric.passive_effects_count += 1
+		rootsMetric.passive_effects_total_time_ms += data.PassiveEffectsMs
 
-			return
+		if data.PassiveEffectsMs > rootsMetric.max_passive_effects_time_ms then
+			rootsMetric.max_passive_effects_time_ms = data.PassiveEffectsMs
 		end
-	elseif p24.tag == "RootUpdateTime" then
-		local v86 = os.clock() * 1000 - p24.StartTimeMs
-
-		TelemetryService:LogStat(t13, {
+	elseif data.tag == "RootUpdateTime" then
+		local max_time_to_update_ms = getCurrentTimeMs() - data.StartTimeMs -- inferred equivalent call
+		TelemetryService:LogStat(v13, {
 			customFields = {
+				rootName = rootName,
+				deviceTier = deviceMemoryTier,
 				updateType = "TimeToComplete",
-				rootName = v84,
-				deviceTier = v33,
-				context = p23.context
+				context = self.context
 			}
-		}, v86)
-		v85.total_time_to_update_ms = v85.total_time_to_update_ms + v86
+		}, max_time_to_update_ms)
 
-		if v86 > v85.max_time_to_update_ms then
-			v85.max_time_to_update_ms = v86
+		rootsMetric.total_time_to_update_ms += max_time_to_update_ms
+
+		if rootsMetric.max_time_to_update_ms < max_time_to_update_ms then
+			rootsMetric.max_time_to_update_ms = max_time_to_update_ms
 		end
 
-		TelemetryService:LogStat(t13, {
+		TelemetryService:LogStat(v13, {
 			customFields = {
+				rootName = rootName,
+				deviceTier = deviceMemoryTier,
 				updateType = "RenderAndCommit",
-				rootName = v84,
-				deviceTier = v33,
-				context = p23.context
+				context = self.context
 			}
-		}, p24.RenderMs + p24.CommitMs)
-		TelemetryService:LogStat(t13, {
+		}, data.RenderMs + data.CommitMs)
+
+		TelemetryService:LogStat(v13, {
 			customFields = {
+				rootName = rootName,
+				deviceTier = deviceMemoryTier,
 				updateType = "Commit",
-				rootName = v84,
-				deviceTier = v33,
-				context = p23.context
+				context = self.context
 			}
-		}, p24.CommitMs)
+		}, data.CommitMs)
 
-		if v12 then
-			if p24.LayoutEffectsMs > 0 then
-				TelemetryService:LogStat(t13, {
+		if defineFastFlag4 then
+			if data.LayoutEffectsMs > 0 then
+				TelemetryService:LogStat(v13, {
 					customFields = {
+						rootName = rootName,
+						deviceTier = deviceMemoryTier,
 						updateType = "LayoutEffects",
-						rootName = v84,
-						deviceTier = v33,
-						context = p23.context
+						context = self.context
 					}
-				}, p24.LayoutEffectsMs)
+				}, data.LayoutEffectsMs)
 			end
 
-			if v13 then
-				TelemetryService:LogStat(t13, {
+			if defineFastFlag5 then
+				TelemetryService:LogStat(v13, {
 					customFields = {
+						rootName = rootName,
+						deviceTier = deviceMemoryTier,
 						updateType = "DataModelUpdate",
-						rootName = v84,
-						deviceTier = v33,
-						context = p23.context
+						context = self.context
 					}
-				}, p24.CommitMs - p24.LayoutEffectsMs)
+				}, data.CommitMs - data.LayoutEffectsMs)
 			end
 		end
 
-		v85.update_count = v85.update_count + 1
+		rootsMetric.update_count += 1
 
-		if p24.RenderMs + p24.CommitMs > v85.max_update_time_ms then
-			v85.max_update_time_ms = p24.RenderMs + p24.CommitMs
+		if data.RenderMs + data.CommitMs > rootsMetric.max_update_time_ms then
+			rootsMetric.max_update_time_ms = data.RenderMs + data.CommitMs
 		end
 
-		v85.render_total_time_ms = v85.render_total_time_ms + p24.RenderMs
-		v85.commit_total_time_ms = v85.commit_total_time_ms + p24.CommitMs
+		rootsMetric.render_total_time_ms += data.RenderMs
+		rootsMetric.commit_total_time_ms += data.CommitMs
 
-		if p24.RenderMs > v85.max_render_time_ms then
-			v85.max_render_time_ms = p24.RenderMs
+		if data.RenderMs > rootsMetric.max_render_time_ms then
+			rootsMetric.max_render_time_ms = data.RenderMs
 		end
 
-		if p24.CommitMs > v85.max_commit_time_ms then
-			v85.max_commit_time_ms = p24.CommitMs
+		if data.CommitMs > rootsMetric.max_commit_time_ms then
+			rootsMetric.max_commit_time_ms = data.CommitMs
 		end
 
-		if v12 then
-			if p24.LayoutEffectsMs > 0 then
-				v85.layout_effects_count = v85.layout_effects_count + 1
-				v85.layout_effects_total_time_ms = v85.layout_effects_total_time_ms + p24.LayoutEffectsMs
+		if defineFastFlag4 then
+			if data.LayoutEffectsMs > 0 then
+				rootsMetric.layout_effects_count += 1
+				rootsMetric.layout_effects_total_time_ms += data.LayoutEffectsMs
 
-				if p24.LayoutEffectsMs > v85.max_layout_effects_time_ms then
-					v85.max_layout_effects_time_ms = p24.LayoutEffectsMs
+				if data.LayoutEffectsMs > rootsMetric.max_layout_effects_time_ms then
+					rootsMetric.max_layout_effects_time_ms = data.LayoutEffectsMs
 				end
 			end
 
-			if v13 then
-				v85.data_model_update_total_time_ms = v85.data_model_update_total_time_ms + (p24.CommitMs - p24.LayoutEffectsMs)
+			if defineFastFlag5 then
+				rootsMetric.data_model_update_total_time_ms += data.CommitMs - data.LayoutEffectsMs
 
-				if p24.CommitMs - p24.LayoutEffectsMs > v85.max_data_model_update_time_ms then
-					v85.max_data_model_update_time_ms = p24.CommitMs - p24.LayoutEffectsMs
+				if data.CommitMs - data.LayoutEffectsMs > rootsMetric.max_data_model_update_time_ms then
+					rootsMetric.max_data_model_update_time_ms = data.CommitMs - data.LayoutEffectsMs
 				end
 			end
 		end
 	end
 end
-function t14.getFrameBucket(_: {[any]: any}, n7: number) -- line: 791
-	return (math.min(4, math.floor(math.max(0, n7 - 2) / 16.666666666666668) + 1))
+
+function class2:getFrameBucket(p: number)
+	return (math.min(4, math.floor(math.max(0, p - 2) / (50 / 3)) + 1))
 end
-function t14.processFrame(t22: {[any]: any}, n8: number) -- line: 798
-	-- upvalues: EngineFeature3 (copy), v15 (copy), RunService (copy), v11 (copy)
-	local frameMetrics = t22.frameMetrics
-	local reactFrameTimeMs = t22.reactFrameTimeMs
 
-	if EngineFeature3 and v15 then
-		local TotalScriptPlusExecutionTime = RunService:GetTotalScriptPlusExecutionTime()
+function class2:processFrame(p: number)
+	local frameMetrics = self.frameMetrics
+	local reactFrameTimeMs = self.reactFrameTimeMs
 
-		if TotalScriptPlusExecutionTime > 0 then
-			frameMetrics.totalCorescriptTimeMs = frameMetrics.totalCorescriptTimeMs + TotalScriptPlusExecutionTime
+	if engineFeature3 and defineFastFlag6 then
+		local totalScriptPlusExecutionTime = RunService:GetTotalScriptPlusExecutionTime()
+
+		if totalScriptPlusExecutionTime > 0 then
+			frameMetrics.totalCorescriptTimeMs += totalScriptPlusExecutionTime
 		end
 	end
 
-	frameMetrics.totalFrameCount = frameMetrics.totalFrameCount + 1
+	frameMetrics.totalFrameCount += 1
+	local frameBucket = self:getFrameBucket(p)
+	frameMetrics.allFrameHistogram[frameBucket] += 1
+	self.sessionMetrics.timePerFrame.sketch:insert(reactFrameTimeMs)
 
-	local v94 = t22:getFrameBucket(n8)
-	local allFrameHistogram = frameMetrics.allFrameHistogram
-
-	allFrameHistogram[v94] = allFrameHistogram[v94] + 1
-	t22.sessionMetrics.timePerFrame.sketch:insert(reactFrameTimeMs)
-
-	if v11 then
-		table.insert(t22.sessionMetrics.timePerFrame.allData, reactFrameTimeMs)
+	if defineFastFlag3 then
+		table.insert(self.sessionMetrics.timePerFrame.allData, reactFrameTimeMs)
 	end
 
 	if reactFrameTimeMs > 0 then
-		frameMetrics.totalReactTimeMs = frameMetrics.totalReactTimeMs + reactFrameTimeMs
+		frameMetrics.totalReactTimeMs += reactFrameTimeMs
+		frameMetrics.reactFrameHistogram[frameBucket] += 1
+		self.sessionMetrics.timePerReactFrame.sketch:insert(reactFrameTimeMs)
 
-		local reactFrameHistogram = frameMetrics.reactFrameHistogram
-
-		reactFrameHistogram[v94] = reactFrameHistogram[v94] + 1
-		t22.sessionMetrics.timePerReactFrame.sketch:insert(reactFrameTimeMs)
-
-		if v11 then
-			table.insert(t22.sessionMetrics.timePerReactFrame.allData, reactFrameTimeMs)
+		if defineFastFlag3 then
+			table.insert(self.sessionMetrics.timePerReactFrame.allData, reactFrameTimeMs)
 		end
 
-		frameMetrics.reactFrameCount = frameMetrics.reactFrameCount + 1
+		frameMetrics.reactFrameCount += 1
 
-		if reactFrameTimeMs > frameMetrics.maxReactFrameTimeMs then
+		if frameMetrics.maxReactFrameTimeMs < reactFrameTimeMs then
 			frameMetrics.maxReactFrameTimeMs = reactFrameTimeMs
 		end
 
-		local v97 = v94 - t22:getFrameBucket(n8 - reactFrameTimeMs)
+		local v14 = frameBucket - self:getFrameBucket(p - reactFrameTimeMs)
 		local reactDropChangeHistogram = frameMetrics.reactDropChangeHistogram
-		local v99 = v97 + 1
-
-		reactDropChangeHistogram[v99] = reactDropChangeHistogram[v99] + 1
+		local v15 = v14 + 1
+		reactDropChangeHistogram[v15] += 1
 	end
 end
-function t14.reportPeriod(p26) -- line: 837
-	-- upvalues: TelemetryService (copy), t6 (copy), t3 (ref), t7 (copy), v33 (copy), EngineFeature3 (copy), v15 (copy), t8 (copy), v12 (copy), v13 (copy), t9 (copy), v6 (copy), t10 (ref), t11 (copy), v7 (copy), t12 (ref)
-	local frameMetrics = p26.frameMetrics
-	local v102 = os.clock() * 1000 - p26.periodStartMs
-	local t23 = {
-		period_length_ms = v102,
+
+function class2:reportPeriod()
+	local frameMetrics = self.frameMetrics
+	local period_length_ms = getCurrentTimeMs() - self.periodStartMs -- inferred equivalent call
+	local customFields = {
+		period_length_ms = period_length_ms,
 		react_total_time_ms = frameMetrics.totalReactTimeMs,
-		react_total_time_pct = frameMetrics.totalReactTimeMs / v102,
+		react_total_time_pct = frameMetrics.totalReactTimeMs / period_length_ms,
 		react_frame_count = frameMetrics.reactFrameCount,
 		total_frame_count = frameMetrics.totalFrameCount,
 		corescript_total_time_ms = frameMetrics.totalCorescriptTimeMs,
-		corescript_total_time_pct = frameMetrics.totalCorescriptTimeMs / v102,
+		corescript_total_time_pct = frameMetrics.totalCorescriptTimeMs / period_length_ms,
 		average_react_all_frame_ms = frameMetrics.totalReactTimeMs / frameMetrics.totalFrameCount,
 		average_react_only_frame_ms = not (frameMetrics.reactFrameCount > 0) and 0 or frameMetrics.totalReactTimeMs / frameMetrics.reactFrameCount,
 		max_react_frame_ms = frameMetrics.maxReactFrameTimeMs,
@@ -871,378 +744,398 @@ function t14.reportPeriod(p26) -- line: 837
 		react_drop_change3 = frameMetrics.reactDropChangeHistogram[4]
 	}
 
-	TelemetryService:LogEvent(t6, {
-		standardizedFields = t3,
-		customFields = t23
+	TelemetryService:LogEvent(v6, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
 	})
-	TelemetryService:LogStat(t7, {
+
+	TelemetryService:LogStat(v7, {
 		customFields = {
 			stat = "ReactTotalTimePct",
-			context = p26.context,
-			deviceTier = v33
+			context = self.context,
+			deviceTier = deviceMemoryTier
 		}
-	}, t23.react_total_time_pct)
+	}, customFields.react_total_time_pct)
 
-	if EngineFeature3 and v15 then
-		TelemetryService:LogStat(t7, {
+	if engineFeature3 and defineFastFlag6 then
+		TelemetryService:LogStat(v7, {
 			customFields = {
 				stat = "TotalCorescriptTimePct",
-				context = p26.context,
-				deviceTier = v33
+				context = self.context,
+				deviceTier = deviceMemoryTier
 			}
-		}, t23.corescript_total_time_pct)
+		}, customFields.corescript_total_time_pct)
 	end
 
-	TelemetryService:LogStat(t7, {
+	TelemetryService:LogStat(v7, {
 		customFields = {
 			stat = "AverageReactAllFrameMs",
-			context = p26.context,
-			deviceTier = v33
+			context = self.context,
+			deviceTier = deviceMemoryTier
 		}
-	}, t23.average_react_all_frame_ms)
-	TelemetryService:LogStat(t7, {
+	}, customFields.average_react_all_frame_ms)
+	TelemetryService:LogStat(v7, {
 		customFields = {
 			stat = "AverageReactOnlyFrameMs",
-			context = p26.context,
-			deviceTier = v33
+			context = self.context,
+			deviceTier = deviceMemoryTier
 		}
-	}, t23.average_react_only_frame_ms)
-	TelemetryService:LogStat(t7, {
+	}, customFields.average_react_only_frame_ms)
+	TelemetryService:LogStat(v7, {
 		customFields = {
 			stat = "MaxReactFrameMs",
-			context = p26.context,
-			deviceTier = v33
+			context = self.context,
+			deviceTier = deviceMemoryTier
 		}
-	}, t23.max_react_frame_ms)
+	}, customFields.max_react_frame_ms)
 
 	for i = 1, 4 do
-		local v105 = i - 1
-
-		TelemetryService:LogCounter(t8, {
+		local bucket = i - 1
+		TelemetryService:LogCounter(v8, {
 			customFields = {
 				category = "AllFrame",
-				bucket = v105,
-				context = p26.context,
-				deviceTier = v33
+				bucket = bucket,
+				context = self.context,
+				deviceTier = deviceMemoryTier
 			}
 		}, frameMetrics.allFrameHistogram[i])
-		TelemetryService:LogCounter(t8, {
+
+		TelemetryService:LogCounter(v8, {
 			customFields = {
 				category = "ReactFrame",
-				bucket = v105,
-				context = p26.context,
-				deviceTier = v33
+				bucket = bucket,
+				context = self.context,
+				deviceTier = deviceMemoryTier
 			}
 		}, frameMetrics.reactFrameHistogram[i])
-		TelemetryService:LogCounter(t8, {
+
+		TelemetryService:LogCounter(v8, {
 			customFields = {
 				category = "ReactDropChange",
-				bucket = v105,
-				context = p26.context,
-				deviceTier = v33
+				bucket = bucket,
+				context = self.context,
+				deviceTier = deviceMemoryTier
 			}
 		}, frameMetrics.reactDropChangeHistogram[i])
 	end
 
-	for v106, v107 in p26.rootsMetrics do
-		v107.root_name = v106
-		v107.update_total_time_ms = v107.render_total_time_ms + v107.commit_total_time_ms
-		v107.total_time_ms = v107.update_total_time_ms + v107.passive_effects_total_time_ms
-		v107.avg_render_time_ms = v107.render_total_time_ms / v107.update_count
-		v107.context = p26.context
-		v107.total_time_pct = (v107.update_total_time_ms + v107.passive_effects_total_time_ms) / t23.react_total_time_ms
-		v107.avg_update_time_ms = v107.update_total_time_ms / v107.update_count
-		v107.avg_commit_time_ms = v107.commit_total_time_ms / v107.update_count
+	for k, rootsMetric in self.rootsMetrics do
+		rootsMetric.root_name = k
+		rootsMetric.update_total_time_ms = rootsMetric.render_total_time_ms + rootsMetric.commit_total_time_ms
+		rootsMetric.total_time_ms = rootsMetric.update_total_time_ms + rootsMetric.passive_effects_total_time_ms
+		rootsMetric.avg_render_time_ms = rootsMetric.render_total_time_ms / rootsMetric.update_count
+		rootsMetric.context = self.context
+		rootsMetric.total_time_pct = (rootsMetric.update_total_time_ms + rootsMetric.passive_effects_total_time_ms) / customFields.react_total_time_ms
+		rootsMetric.avg_update_time_ms = rootsMetric.update_total_time_ms / rootsMetric.update_count
+		rootsMetric.avg_commit_time_ms = rootsMetric.commit_total_time_ms / rootsMetric.update_count
 
-		if v12 then
-			v107.avg_layout_effects_time_ms = v107.layout_effects_total_time_ms / v107.layout_effects_count
+		if defineFastFlag4 then
+			rootsMetric.avg_layout_effects_time_ms = rootsMetric.layout_effects_total_time_ms / rootsMetric.layout_effects_count
 
-			if v13 then
-				v107.avg_data_model_update_time_ms = v107.data_model_update_total_time_ms / v107.update_count
+			if defineFastFlag5 then
+				rootsMetric.avg_data_model_update_time_ms = rootsMetric.data_model_update_total_time_ms / rootsMetric.update_count
 			end
 		end
 
-		v107.avg_passive_effects_time_ms = v107.passive_effects_total_time_ms / v107.passive_effects_count
-		v107.avg_time_to_update_ms = v107.total_time_to_update_ms / v107.update_count
-		TelemetryService:LogEvent(t9, {
-			standardizedFields = t3,
-			customFields = v107
+		rootsMetric.avg_passive_effects_time_ms = rootsMetric.passive_effects_total_time_ms / rootsMetric.passive_effects_count
+		rootsMetric.avg_time_to_update_ms = rootsMetric.total_time_to_update_ms / rootsMetric.update_count
+
+		TelemetryService:LogEvent(v9, {
+			standardizedFields = standardizedFields,
+			customFields = rootsMetric
 		})
 
-		if not v6 then
-			TelemetryService:LogStat(t10, {
+		if not defineFastFlag then
+			TelemetryService:LogStat(v10, {
 				customFields = {
+					rootName = rootsMetric.root_name,
+					deviceTier = deviceMemoryTier,
 					stat = "TotalTimePct",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
+					context = self.context
 				}
-			}, v107.total_time_pct)
+			}, rootsMetric.total_time_pct)
 		end
 
-		TelemetryService:LogCounter(t11, {
+		TelemetryService:LogCounter(v11, {
 			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
 				task = "RenderAndCommit",
-				rootName = v107.root_name,
-				deviceTier = v33,
-				context = p26.context
+				context = self.context
 			}
-		}, v107.update_count)
+		}, rootsMetric.update_count)
 
-		if v12 then
-			TelemetryService:LogCounter(t11, {
+		if defineFastFlag4 then
+			TelemetryService:LogCounter(v11, {
 				customFields = {
+					rootName = rootsMetric.root_name,
+					deviceTier = deviceMemoryTier,
 					task = "LayoutEffects",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
+					context = self.context
 				}
-			}, v107.layout_effects_count)
+			}, rootsMetric.layout_effects_count)
 		end
 
-		TelemetryService:LogCounter(t11, {
+		TelemetryService:LogCounter(v11, {
 			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
 				task = "PassiveEffects",
-				rootName = v107.root_name,
-				deviceTier = v33,
-				context = p26.context
+				context = self.context
 			}
-		}, v107.passive_effects_count)
+		}, rootsMetric.passive_effects_count)
 
-		if not v7 then
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "RenderAndCommit",
-					stat = "AvgMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.avg_update_time_ms)
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "Commit",
-					stat = "AvgMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.avg_commit_time_ms)
+		if defineFastFlag2 then
+			continue
+		end
 
-			if v12 then
-				TelemetryService:LogStat(t12, {
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "RenderAndCommit",
+				stat = "AvgMs",
+				context = self.context
+			}
+		}, rootsMetric.avg_update_time_ms)
+
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "Commit",
+				stat = "AvgMs",
+				context = self.context
+			}
+		}, rootsMetric.avg_commit_time_ms)
+
+		if defineFastFlag4 then
+			TelemetryService:LogStat(v12, {
+				customFields = {
+					rootName = rootsMetric.root_name,
+					deviceTier = deviceMemoryTier,
+					task = "LayoutEffects",
+					stat = "AvgMs",
+					context = self.context
+				}
+			}, rootsMetric.avg_layout_effects_time_ms)
+
+			if defineFastFlag5 then
+				TelemetryService:LogStat(v12, {
 					customFields = {
-						task = "LayoutEffects",
+						rootName = rootsMetric.root_name,
+						deviceTier = deviceMemoryTier,
+						task = "DataModelUpdate",
 						stat = "AvgMs",
-						rootName = v107.root_name,
-						deviceTier = v33,
-						context = p26.context
+						context = self.context
 					}
-				}, v107.avg_layout_effects_time_ms)
-
-				if v13 then
-					TelemetryService:LogStat(t12, {
-						customFields = {
-							task = "DataModelUpdate",
-							stat = "AvgMs",
-							rootName = v107.root_name,
-							deviceTier = v33,
-							context = p26.context
-						}
-					}, v107.avg_data_model_update_time_ms)
-				end
-			end
-
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "TimeToUpdateMs",
-					stat = "AvgMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.avg_time_to_update_ms)
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "PassiveEffects",
-					stat = "AvgMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.avg_passive_effects_time_ms)
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "RenderAndCommit",
-					stat = "MaxMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.max_update_time_ms)
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "Commit",
-					stat = "MaxMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.max_commit_time_ms)
-
-			if v12 then
-				TelemetryService:LogStat(t12, {
-					customFields = {
-						task = "LayoutEffects",
-						stat = "MaxMs",
-						rootName = v107.root_name,
-						deviceTier = v33,
-						context = p26.context
-					}
-				}, v107.max_layout_effects_time_ms)
-
-				if v13 then
-					TelemetryService:LogStat(t12, {
-						customFields = {
-							task = "DataModelUpdate",
-							stat = "MaxMs",
-							rootName = v107.root_name,
-							deviceTier = v33,
-							context = p26.context
-						}
-					}, v107.max_data_model_update_time_ms)
-				end
-			end
-
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "TimeToUpdateMs",
-					stat = "MaxMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.max_time_to_update_ms)
-			TelemetryService:LogStat(t12, {
-				customFields = {
-					task = "PassiveEffects",
-					stat = "MaxMs",
-					rootName = v107.root_name,
-					deviceTier = v33,
-					context = p26.context
-				}
-			}, v107.max_passive_effects_time_ms)
-		end
-	end
-end
-function generatePercentilesFromSingleSketch(p27) -- line: 1141
-	-- upvalues: parts (copy)
-	local s2 = "{"
-
-	for v110, v111 in parts do
-		s2 = (s2 .. "\"p" .. v111 .. "\":") .. p27:getPercentile(tonumber(v111) or 0)
-
-		if v110 < #parts then
-			s2 ..= ","
-		end
-	end
-
-	return s2 .. "}"
-end
-function generatePercentilesFromSketches(t24: {[any]: any}, n9: number) -- line: 1155
-	-- upvalues: parts (copy)
-	local s3 = "{"
-
-	for v115, v116 in parts do
-		local v117 = s3 .. "\"p" .. v116 .. "\":{"
-		local v118 = tonumber(v116) or 0
-		local n10 = 0
-
-		for v120, v121 in t24 do
-			n10 += 1
-			v117 ..= "\"" .. v120 .. "\":" .. v121:getPercentile(v118)
-
-			if n10 < n9 then
-				v117 ..= ","
+				}, rootsMetric.avg_data_model_update_time_ms)
 			end
 		end
 
-		s3 = v117 .. (not (v115 < #parts) and "}" or "},")
-	end
-
-	return s3 .. "}"
-end
-function t14.reportPercentError(p28, p29, p30, p31, p32) -- line: 1175
-	-- upvalues: parts (copy), TelemetryService (copy), t5 (ref), t3 (ref)
-	table.sort(p29)
-
-	local v127 = #p29
-
-	if v127 < 1 then
-		return
-	end
-
-	for _, v129 in parts do
-		local v130 = p29[math.ceil((tonumber(v129) or 0) / 100 * v127)]
-		local v131 = if not p30.sketches then p30.sketch:getPercentile(v129) else p30.sketches[p32]:getPercentile(v129)
-		local n11 = 0
-
-		if v130 ~= 0 or v131 == 0 then
-			if v130 ~= 0 then
-				n11 = (v131 - v130) * 100 / v130
-			end
-
-			local t25 = {
-				rootName = p32,
-				percentile = v129,
-				metric = p31,
-				numDatapoints = v127,
-				context = p28.context,
-				approxError = n11
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "TimeToUpdateMs",
+				stat = "AvgMs",
+				context = self.context
 			}
+		}, rootsMetric.avg_time_to_update_ms)
 
-			TelemetryService:LogEvent(t5, {
-				standardizedFields = t3,
-				customFields = t25
-			})
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "PassiveEffects",
+				stat = "AvgMs",
+				context = self.context
+			}
+		}, rootsMetric.avg_passive_effects_time_ms)
+
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "RenderAndCommit",
+				stat = "MaxMs",
+				context = self.context
+			}
+		}, rootsMetric.max_update_time_ms)
+
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "Commit",
+				stat = "MaxMs",
+				context = self.context
+			}
+		}, rootsMetric.max_commit_time_ms)
+
+		if defineFastFlag4 then
+			TelemetryService:LogStat(v12, {
+				customFields = {
+					rootName = rootsMetric.root_name,
+					deviceTier = deviceMemoryTier,
+					task = "LayoutEffects",
+					stat = "MaxMs",
+					context = self.context
+				}
+			}, rootsMetric.max_layout_effects_time_ms)
+
+			if defineFastFlag5 then
+				TelemetryService:LogStat(v12, {
+					customFields = {
+						rootName = rootsMetric.root_name,
+						deviceTier = deviceMemoryTier,
+						task = "DataModelUpdate",
+						stat = "MaxMs",
+						context = self.context
+					}
+				}, rootsMetric.max_data_model_update_time_ms)
+			end
 		end
+
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "TimeToUpdateMs",
+				stat = "MaxMs",
+				context = self.context
+			}
+		}, rootsMetric.max_time_to_update_ms)
+
+		TelemetryService:LogStat(v12, {
+			customFields = {
+				rootName = rootsMetric.root_name,
+				deviceTier = deviceMemoryTier,
+				task = "PassiveEffects",
+				stat = "MaxMs",
+				context = self.context
+			}
+		}, rootsMetric.max_passive_effects_time_ms)
 	end
 end
-function t14.reportSession(p33) -- line: 1215
-	-- upvalues: v11 (copy), TelemetryService (copy), t4 (copy), t3 (ref)
-	if not p33.started then
+
+function generatePercentilesFromSingleSketch(object)
+	local v14 = "{"
+
+	for k, v15 in v3 do
+		v14 = (v14 .. "\"p" .. v15 .. "\":") .. object:getPercentile(tonumber(v15) or 0)
+
+		if k < #v3 then
+			v14 ..= ","
+		end
+	end
+
+	return v14 .. "}"
+end
+
+function generatePercentilesFromSketches(items, p: number)
+	local v14 = "{"
+
+	for k, v15 in v3 do
+		local v16 = v14 .. "\"p" .. v15 .. "\":{"
+		local v17 = tonumber(v15) or 0
+		local count = 0
+
+		for k2, item in items do
+			count += 1
+			v16 ..= "\"" .. k2 .. "\":" .. item:getPercentile(v17)
+
+			if count < p then
+				v16 ..= ","
+			end
+		end
+
+		v14 = v16 .. (k < #v3 and "}," or "}")
+	end
+
+	return v14 .. "}"
+end
+
+function class2:reportPercentError(list, p, metric, rootName)
+	table.sort(list)
+	local count = #list
+
+	if count < 1 then
 		return
 	end
 
-	local v135 = generatePercentilesFromSketches(p33.sessionMetrics.updateTime.sketches, p33.sessionMetrics.updateTime.numRoots)
-	local v136 = generatePercentilesFromSketches(p33.sessionMetrics.commitTime.sketches, p33.sessionMetrics.commitTime.numRoots)
-	local v137 = generatePercentilesFromSketches(p33.sessionMetrics.timeToUpdate.sketches, p33.sessionMetrics.timeToUpdate.numRoots)
-	local v138 = generatePercentilesFromSingleSketch(p33.sessionMetrics.timePerFrame.sketch)
-	local v139 = generatePercentilesFromSingleSketch(p33.sessionMetrics.timePerReactFrame.sketch)
-	local t26 = {
-		reactUpdateTime = v135,
-		reactCommitTime = v136,
-		reactTimeToUpdate = v137,
-		timePerFrame = v138,
-		timePerReactFrame = v139
+	for _, percentile in v3 do
+		local item = list[math.ceil((tonumber(percentile) or 0) / 100 * count)]
+		local v14
+
+		if p.sketches then
+			v14 = p.sketches[rootName]:getPercentile(percentile)
+		else
+			v14 = p.sketch:getPercentile(percentile)
+		end
+
+		local approxError = 0
+
+		if not (item ~= 0 or v14 == 0) then
+			continue
+		end
+
+		if item ~= 0 then
+			approxError = (v14 - item) * 100 / item
+		end
+
+		TelemetryService:LogEvent(v5, {
+			standardizedFields = standardizedFields,
+			customFields = {
+				rootName = rootName,
+				percentile = percentile,
+				metric = metric,
+				numDatapoints = count,
+				context = self.context,
+				approxError = approxError
+			}
+		})
+	end
+end
+
+function class2:reportSession()
+	if not self.started then
+		return
+	end
+
+	local customFields = {
+		reactUpdateTime = generatePercentilesFromSketches(
+			self.sessionMetrics.updateTime.sketches,
+			self.sessionMetrics.updateTime.numRoots
+		),
+		reactCommitTime = generatePercentilesFromSketches(
+			self.sessionMetrics.commitTime.sketches,
+			self.sessionMetrics.commitTime.numRoots
+		),
+		reactTimeToUpdate = generatePercentilesFromSketches(
+			self.sessionMetrics.timeToUpdate.sketches,
+			self.sessionMetrics.timeToUpdate.numRoots
+		),
+		timePerFrame = generatePercentilesFromSingleSketch(self.sessionMetrics.timePerFrame.sketch),
+		timePerReactFrame = generatePercentilesFromSingleSketch(self.sessionMetrics.timePerReactFrame.sketch)
 	}
 
-	if v11 then
-		for v141, v142 in p33.sessionMetrics do
-			if v142.sketches then
-				for v143, v144 in v142.allData do
-					p33:reportPercentError(v144, v142, v141, v143)
+	if defineFastFlag3 then
+		for k, sessionMetric in self.sessionMetrics do
+			if sessionMetric.sketches then
+				for k2, v14 in sessionMetric.allData do
+					self:reportPercentError(v14, sessionMetric, k, k2)
 				end
 			else
-				p33:reportPercentError(v142.allData, v142, v141, "all")
+				self:reportPercentError(sessionMetric.allData, sessionMetric, k, "all")
 			end
 		end
 	end
 
-	TelemetryService:LogEvent(t4, {
-		standardizedFields = t3,
-		customFields = t26
+	TelemetryService:LogEvent(v4, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
 	})
 end
 
-return (t14.new(FStringReactSchedulingContext))
+return (class2.new(FStringReactSchedulingContext))

@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Index.ServerDrivenUi.ServerDrivenUi))
+local ServerDrivenUi = require(Workspace.ServerDrivenUi.ServerDrivenUi)
+
+return ServerDrivenUi

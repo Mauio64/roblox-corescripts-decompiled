@@ -1,426 +1,147 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local Promise = require(InExperienceShopParent.Promise)
+local parent = InExperienceShop.Parent
 
+local Promise = require(parent.Promise)
 require(InExperienceShop.Types)
 
 local FFlagInExperienceShopExpectStringMetadataValues = require(InExperienceShop.Flags.FFlagInExperienceShopExpectStringMetadataValues)
-local t1 = {
+
+local v = {
 	categories = {
 		{
 			id = 1,
 			name = "Top picks",
+			metadata = {
+				categoryType = "TopPicks",
+				categoryId = "TopPicks",
+				categoryGroup = "Featured"
+			},
 			items = {
-				{
-					id = 3520436958,
-					type = "Product"
-				},
-				{
-					id = 1804642568,
-					type = "GamePass"
-				},
-				{
-					id = 3533934241,
-					type = "Product"
-				},
-				{
-					id = 1804340575,
-					type = "GamePass"
-				},
-				{
-					id = 3539559418,
-					type = "Product"
-				},
-				{
-					id = 3579160491,
-					type = "Product"
-				},
-				{
-					id = 1714448958,
-					type = "GamePass"
-				},
-				{
-					id = 3579160539,
-					type = "Product"
-				},
-				{
-					id = 40724707,
-					type = "Product"
-				},
-				{
-					id = 40895184,
-					type = "Product"
-				},
-				{
-					id = 11839038,
-					type = "GamePass"
-				},
-				{
-					id = 39470721,
-					type = "Product"
-				},
-				{
-					id = 39470723,
-					type = "Product"
-				},
-				{
-					id = 11839039,
-					type = "GamePass"
-				},
-				{
-					id = 40896176,
-					type = "Product"
-				},
-				{
-					id = 40896176,
-					type = "Product"
-				},
-				{
-					id = 11809057,
-					type = "GamePass"
-				}
+				{ id = 101, type = "Product" },
+				{ id = 201, type = "GamePass" },
+				{ id = 102, type = "Product" },
+				{ id = 202, type = "GamePass" },
+				{ id = 103, type = "Product" },
+				{ id = 104, type = "Product" },
+				{ id = 203, type = "GamePass" },
+				{ id = 105, type = "Product" },
+				{ id = 117, type = "Product" },
+				{ id = 118, type = "Product" },
+				{ id = 208, type = "GamePass" },
+				{ id = 119, type = "Product" },
+				{ id = 114, type = "Product" },
+				{ id = 207, type = "GamePass" },
+				{ id = 115, type = "Product" },
+				{ id = 115, type = "Product" },
+				{ id = 3456, type = "GamePass" }
 			}
 		},
 		{
 			id = 2,
 			name = "Coins",
 			items = {
-				{
-					id = 1716550603,
-					type = "GamePass"
-				},
-				{
-					id = 3579160572,
-					type = "Product"
-				},
-				{
-					id = 3579166829,
-					type = "Product"
-				},
-				{
-					id = 3579166863,
-					type = "Product"
-				},
-				{
-					id = 1683715929,
-					type = "GamePass"
-				},
-				{
-					id = 3579166918,
-					type = "Product"
-				},
-				{
-					id = 3579166948,
-					type = "Product"
-				},
-				{
-					id = 3520436958,
-					type = "Product"
-				},
-				{
-					id = 11836039,
-					type = "GamePass"
-				},
-				{
-					id = 39470725,
-					type = "Product"
-				},
-				{
-					id = 39470724,
-					type = "Product"
-				},
-				{
-					id = 11839038,
-					type = "GamePass"
-				},
-				{
-					id = 39470721,
-					type = "Product"
-				},
-				{
-					id = 39470723,
-					type = "Product"
-				},
-				{
-					id = 11839039,
-					type = "GamePass"
-				},
-				{
-					id = 40896176,
-					type = "Product"
-				},
-				{
-					id = 39470718,
-					type = "Product"
-				},
-				{
-					id = 40895184,
-					type = "Product"
-				}
+				{ id = 204, type = "GamePass" },
+				{ id = 106, type = "Product" },
+				{ id = 107, type = "Product" },
+				{ id = 108, type = "Product" },
+				{ id = 205, type = "GamePass" },
+				{ id = 109, type = "Product" },
+				{ id = 110, type = "Product" },
+				{ id = 101, type = "Product" },
+				{ id = 206, type = "GamePass" },
+				{ id = 116, type = "Product" },
+				{ id = 113, type = "Product" },
+				{ id = 208, type = "GamePass" },
+				{ id = 119, type = "Product" },
+				{ id = 114, type = "Product" },
+				{ id = 207, type = "GamePass" },
+				{ id = 115, type = "Product" },
+				{ id = 112, type = "Product" },
+				{ id = 118, type = "Product" }
 			}
 		},
 		{
 			id = 3,
 			name = "Boosts",
 			items = {
-				{
-					id = 3533934241,
-					type = "Product"
-				},
-				{
-					id = 3539559418,
-					type = "Product"
-				},
-				{
-					id = 1804642568,
-					type = "GamePass"
-				},
-				{
-					id = 3579160491,
-					type = "Product"
-				},
-				{
-					id = 3579160539,
-					type = "Product"
-				},
-				{
-					id = 1804340575,
-					type = "GamePass"
-				},
-				{
-					id = 3579160572,
-					type = "Product"
-				},
-				{
-					id = 3579166829,
-					type = "Product"
-				},
-				{
-					id = 3579166863,
-					type = "Product"
-				},
-				{
-					id = 1714448958,
-					type = "GamePass"
-				},
-				{
-					id = 40896176,
-					type = "Product"
-				},
-				{
-					id = 39470718,
-					type = "Product"
-				},
-				{
-					id = 40895184,
-					type = "Product"
-				},
-				{
-					id = 11836039,
-					type = "GamePass"
-				},
-				{
-					id = 39470725,
-					type = "Product"
-				},
-				{
-					id = 39470724,
-					type = "Product"
-				},
-				{
-					id = 11839038,
-					type = "GamePass"
-				},
-				{
-					id = 39470721,
-					type = "Product"
-				},
-				{
-					id = 39470723,
-					type = "Product"
-				},
-				{
-					id = 11839039,
-					type = "GamePass"
-				}
+				{ id = 102, type = "Product" },
+				{ id = 103, type = "Product" },
+				{ id = 201, type = "GamePass" },
+				{ id = 104, type = "Product" },
+				{ id = 105, type = "Product" },
+				{ id = 202, type = "GamePass" },
+				{ id = 106, type = "Product" },
+				{ id = 107, type = "Product" },
+				{ id = 108, type = "Product" },
+				{ id = 203, type = "GamePass" },
+				{ id = 115, type = "Product" },
+				{ id = 112, type = "Product" },
+				{ id = 118, type = "Product" },
+				{ id = 206, type = "GamePass" },
+				{ id = 116, type = "Product" },
+				{ id = 113, type = "Product" },
+				{ id = 208, type = "GamePass" },
+				{ id = 119, type = "Product" },
+				{ id = 114, type = "Product" },
+				{ id = 207, type = "GamePass" }
 			}
 		},
 		{
 			id = 4,
 			name = "Upgrades",
 			items = {
-				{
-					id = 3579166918,
-					type = "Product"
-				},
-				{
-					id = 1716550603,
-					type = "GamePass"
-				},
-				{
-					id = 3579166948,
-					type = "Product"
-				},
-				{
-					id = 3520436958,
-					type = "Product"
-				},
-				{
-					id = 3533934241,
-					type = "Product"
-				},
-				{
-					id = 3539559418,
-					type = "Product"
-				},
-				{
-					id = 1683715929,
-					type = "GamePass"
-				},
-				{
-					id = 3579160491,
-					type = "Product"
-				},
-				{
-					id = 39470725,
-					type = "Product"
-				},
-				{
-					id = 39470724,
-					type = "Product"
-				},
-				{
-					id = 11839038,
-					type = "GamePass"
-				}
+				{ id = 109, type = "Product" },
+				{ id = 204, type = "GamePass" },
+				{ id = 110, type = "Product" },
+				{ id = 101, type = "Product" },
+				{ id = 102, type = "Product" },
+				{ id = 103, type = "Product" },
+				{ id = 205, type = "GamePass" },
+				{ id = 104, type = "Product" },
+				{ id = 116, type = "Product" },
+				{ id = 113, type = "Product" },
+				{ id = 208, type = "GamePass" }
 			}
 		},
 		{
 			id = 5,
 			name = "Cosmetics",
 			items = {
-				{
-					id = 1804642568,
-					type = "GamePass"
-				},
-				{
-					id = 3579160539,
-					type = "Product"
-				},
-				{
-					id = 3579160572,
-					type = "Product"
-				},
-				{
-					id = 3579166829,
-					type = "Product"
-				},
-				{
-					id = 3579166863,
-					type = "Product"
-				},
-				{
-					id = 3579166918,
-					type = "Product"
-				},
-				{
-					id = 1804340575,
-					type = "GamePass"
-				},
-				{
-					id = 3579166948,
-					type = "Product"
-				},
-				{
-					id = 3520436958,
-					type = "Product"
-				},
-				{
-					id = 11809057,
-					type = "GamePass"
-				},
-				{
-					id = 40895184,
-					type = "Product"
-				},
-				{
-					id = 40724707,
-					type = "Product"
-				},
-				{
-					id = 39470720,
-					type = "Product"
-				},
-				{
-					id = 39470718,
-					type = "Product"
-				}
+				{ id = 201, type = "GamePass" },
+				{ id = 105, type = "Product" },
+				{ id = 106, type = "Product" },
+				{ id = 107, type = "Product" },
+				{ id = 108, type = "Product" },
+				{ id = 109, type = "Product" },
+				{ id = 202, type = "GamePass" },
+				{ id = 110, type = "Product" },
+				{ id = 101, type = "Product" },
+				{ id = 3456, type = "GamePass" },
+				{ id = 118, type = "Product" },
+				{ id = 117, type = "Product" },
+				{ id = 111, type = "Product" },
+				{ id = 112, type = "Product" }
 			}
 		},
 		{
 			id = 6,
 			name = "Gear",
 			items = {
-				{
-					id = 3533934241,
-					type = "Product"
-				},
-				{
-					id = 1714448958,
-					type = "GamePass"
-				},
-				{
-					id = 3539559418,
-					type = "Product"
-				},
-				{
-					id = 3579160491,
-					type = "Product"
-				},
-				{
-					id = 3579160539,
-					type = "Product"
-				},
-				{
-					id = 1716550603,
-					type = "GamePass"
-				},
-				{
-					id = 3579160572,
-					type = "Product"
-				},
-				{
-					id = 3579166829,
-					type = "Product"
-				},
-				{
-					id = 3579166863,
-					type = "Product"
-				},
-				{
-					id = 39470720,
-					type = "Product"
-				},
-				{
-					id = 40895184,
-					type = "Product"
-				},
-				{
-					id = 40724707,
-					type = "Product"
-				},
-				{
-					id = 11809057,
-					type = "GamePass"
-				},
-				{
-					id = 39470718,
-					type = "Product"
-				},
-				{
-					id = 11836039,
-					type = "GamePass"
-				}
+				{ id = 102, type = "Product" },
+				{ id = 203, type = "GamePass" },
+				{ id = 103, type = "Product" },
+				{ id = 104, type = "Product" },
+				{ id = 105, type = "Product" },
+				{ id = 204, type = "GamePass" },
+				{ id = 106, type = "Product" },
+				{ id = 107, type = "Product" },
+				{ id = 108, type = "Product" },
+				{ id = 111, type = "Product" },
+				{ id = 118, type = "Product" },
+				{ id = 117, type = "Product" },
+				{ id = 3456, type = "GamePass" },
+				{ id = 112, type = "Product" },
+				{ id = 206, type = "GamePass" }
 			}
 		},
 		{
@@ -445,10 +166,7 @@ local t1 = {
 							}
 						}
 					},
-					bonusItem = {
-						id = 11809057,
-						type = "GamePass"
-					}
+					bonusItem = { id = 3456, type = "GamePass" }
 				},
 				{
 					id = 513,
@@ -468,10 +186,7 @@ local t1 = {
 							}
 						}
 					},
-					bonusItem = {
-						id = 11809057,
-						type = "GamePass"
-					}
+					bonusItem = { id = 3456, type = "GamePass" }
 				},
 				{
 					id = 514,
@@ -491,10 +206,7 @@ local t1 = {
 							}
 						}
 					},
-					bonusItem = {
-						id = 11809057,
-						type = "GamePass"
-					}
+					bonusItem = { id = 3456, type = "GamePass" }
 				},
 				{
 					id = 511,
@@ -516,25 +228,25 @@ local t1 = {
 					}
 				}
 			},
-			metadata = {
-				paymentSessionId = "4c49d1c0-19d2-4805-a0d1-f0fecd174ab7"
-			}
+			metadata = { paymentSessionId = "1234", bonusJwt = "mock-bonus-jwt" }
 		}
 	},
 	metadata = {
-		inExperienceGlobalIconEnabled = not FFlagInExperienceShopExpectStringMetadataValues or "true"
+		inExperienceGlobalIconEnabled = FFlagInExperienceShopExpectStringMetadataValues and "true" or true,
+		notificationFreeTrialTopBarChip = "false"
+	},
+	notificationSettings = {
+		{ name = "FreeTrialTopBarChip", isEnabled = false }
 	}
 }
 
-return {
-	MOCK_RESPONSE_FOR_TESTING = t1,
-	getShopItemIds = function(n1: number?) -- line: 264
-		-- upvalues: Promise (copy), t1 (copy)
-		local v7 = n1 == nil and 0.5 or n1
+local MockShopItemIds = { MOCK_RESPONSE_FOR_TESTING = v }
 
-		return Promise.delay(v7):andThen(function() -- line: 266
-			-- upvalues: t1 (copy)
-			return t1
-		end)
-	end
-}
+function MockShopItemIds.getShopItemIds(p: number?)
+	local v2 = p == nil and 0.5 or p
+	return Promise.delay(v2):andThen(function()
+		return v
+	end)
+end
+
+return MockShopItemIds

@@ -1,1 +1,3 @@
-return (require(script.SheetContent))
+local SheetContent = require(script.SheetContent)
+
+return SheetContent

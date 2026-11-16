@@ -1,6 +1,11 @@
 local CorePackages = game:GetService("CorePackages")
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local React = require(CorePackages.Packages.React)
+
 local ButtonStack = UIBlox.App.Button.ButtonStack
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local HeaderBar = UIBlox.App.Bar.HeaderBar
@@ -11,37 +16,32 @@ local Images = UIBlox.App.ImageSet.Images
 local useStyle = UIBlox.Core.Style.useStyle
 local Button = UIBlox.App.Button.Button
 local StandardButtonSize = UIBlox.App.Button.Enum.StandardButtonSize
-local ParentParent = script.Parent.Parent
-local Assets = require(ParentParent.Resources.Assets)
-local Divider = require(ParentParent.Components.Divider)
-local RestartScreenshotDialog = require(ParentParent.Components.RestartScreenshotDialog)
 
-require(ParentParent.Utility.ReportAnythingAnalytics)
+local parent = script.Parent.Parent
+local Assets = require(parent.Resources.Assets)
+local Divider = require(parent.Components.Divider)
+local RestartScreenshotDialog = require(parent.Components.RestartScreenshotDialog)
+require(parent.Utility.ReportAnythingAnalytics)
 
 local Responsive = require(CorePackages.Workspace.Packages.Responsive)
 local usePreferredInput = Responsive.usePreferredInput
+
 local FocusNavigationUtils = require(CorePackages.Workspace.Packages.FocusNavigationUtils)
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local GetFFlagAvatarIdentificationSafeAreaFix = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagAvatarIdentificationSafeAreaFix
 
-local function ScreenshotReviewDialogSmallPortraitModeHeaderRight(p1) -- line: 60
-	-- upvalues: React (copy), RobloxTranslator (copy), Button (copy), ButtonType (copy), StandardButtonSize (copy)
-	local v28, v29 = React.useState(0)
-	local v30 = React.useCallback(function(p2) -- line: 62
-		-- upvalues: v29 (copy)
-		v29(p2.AbsoluteSize.X)
-	end, { v29 })
-	local v31 = React.useCallback(function() -- line: 65
-		-- upvalues: p1 (copy)
-		p1.setShowRestartDialog(true)
-	end, { p1.setShowRestartDialog })
+local function ScreenshotReviewDialogSmallPortraitModeHeaderRight(props)
+	local state, setState = React.useState(0)
+	local v = React.useCallback(function(p)
+		setState(p.AbsoluteSize.X)
+	end, { setState })
+	local onActivated = React.useCallback(function()
+		props.setShowRestartDialog(true)
+	end, { props.setShowRestartDialog })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
+	return React.createElement("Frame", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }, {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -50,324 +50,404 @@ local function ScreenshotReviewDialogSmallPortraitModeHeaderRight(p1) -- line: 6
 		}),
 		Text = React.createElement("TextLabel", {
 			LayoutOrder = -1,
+			Text = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.SceneCaptured"),
+			Font = props.font.Header2.Font,
+			TextColor3 = props.theme.TextEmphasis.Color,
+			TextTransparency = props.theme.TextEmphasis.Transparency,
 			TextSize = 20,
 			TextWrapped = true,
-			BackgroundTransparency = 1,
-			Text = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.SceneCaptured"),
-			Font = p1.font.Header2.Font,
-			TextColor3 = p1.theme.TextEmphasis.Color,
-			TextTransparency = p1.theme.TextEmphasis.Transparency,
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextYAlignment = Enum.TextYAlignment.Center,
-			Size = UDim2.new(0, p1.viewportUISafeAreaWidth - v28 - 50, 1, 0)
+			Size = UDim2.new(0, props.viewportUISafeAreaWidth - state - 50, 1, 0),
+			BackgroundTransparency = 1
 		}),
 		RetakeButton = React.createElement(Button, {
 			buttonType = ButtonType.Secondary,
 			text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.Retake"),
 			fitContent = true,
 			standardSize = StandardButtonSize.XSmall,
-			onActivated = v31,
-			[React.Change.AbsoluteSize] = v30
+			onActivated = onActivated,
+			[React.Change.AbsoluteSize] = v
 		})
 	})
 end
-local function ScreenshotReviewDialog(t1: {[any]: any}) -- line: 106
-	-- upvalues: usePreferredInput (copy), Responsive (copy), RobloxTranslator (copy), React (copy), useStyle (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), RestartScreenshotDialog (copy), ImageSetButton (copy), Assets (copy), HeaderBar (copy), IconButton (copy), IconSize (copy), Images (copy), ScreenshotReviewDialogSmallPortraitModeHeaderRight (copy), Button (copy), ButtonType (copy), StandardButtonSize (copy), Divider (copy), GetFFlagAvatarIdentificationSafeAreaFix (copy), ButtonStack (copy)
-	local v33 = usePreferredInput() == Responsive.Input.Directional
+
+local function ScreenshotReviewDialog(props)
+	local v = usePreferredInput() == Responsive.Input.Directional
 
 	if not RobloxTranslator then
 		return nil
 	end
 
-	local n1 = 60
+	local v2 = props.isSmallPortraitMode and 104 or 60
 
-	if t1.isSmallPortraitMode then
-		n1 = 104
+	local onActivated = React.useCallback(function()
+		props.reportAnythingAnalytics.incrementPreviewBack()
+		props.onBack()
+	end, { props.onBack, props.reportAnythingAnalytics })
+
+	local onActivated2 = React.useCallback(function()
+		props.reportAnythingAnalytics.incrementPreviewAttach()
+		props.onSkip()
+	end, { props.onSkip, props.reportAnythingAnalytics })
+
+	local state, setState = React.useState(false)
+
+	local onActivated3 = React.useCallback(function()
+		props.reportAnythingAnalytics.incrementRetake()
+		setState(true)
+	end, { setState, props.reportAnythingAnalytics })
+
+	local onRestart = React.useCallback(function()
+		props.reportAnythingAnalytics.setRetakeAbandon()
+		props.onRestart()
+	end, { props.onRestart, props.reportAnythingAnalytics })
+
+	local onActivated4 = React.useCallback(function()
+		props.reportAnythingAnalytics.incrementHighlightScene()
+		props.onNextPage()
+	end, { props.onNextPage, props.reportAnythingAnalytics })
+
+	local v3 = useStyle()
+	local theme = v3.Theme
+	local font = v3.Font
+	local udim
+
+	if props.viewportUISafeAreaHeight >= 800 then
+		udim = UDim2.new(0, 800, 0, 800)
+	else
+		udim = UDim2.new(1, 0, 1, 0)
 	end
 
-	local v35 = React.useCallback(function() -- line: 118
-		-- upvalues: t1 (copy)
-		t1.reportAnythingAnalytics.incrementPreviewBack()
-		t1.onBack()
-	end, {
-		t1.onBack,
-		t1.reportAnythingAnalytics
-	})
-	local v36 = React.useCallback(function() -- line: 123
-		-- upvalues: t1 (copy)
-		t1.reportAnythingAnalytics.incrementPreviewAttach()
-		t1.onSkip()
-	end, {
-		t1.onSkip,
-		t1.reportAnythingAnalytics
-	})
-	local v37, v38 = React.useState(false)
-	local v39 = React.useCallback(function() -- line: 130
-		-- upvalues: t1 (copy), v38 (copy)
-		t1.reportAnythingAnalytics.incrementRetake()
-		v38(true)
-	end, {
-		v38,
-		t1.reportAnythingAnalytics
-	})
-	local v40 = React.useCallback(function() -- line: 135
-		-- upvalues: t1 (copy)
-		t1.reportAnythingAnalytics.setRetakeAbandon()
-		t1.onRestart()
-	end, {
-		t1.onRestart,
-		t1.reportAnythingAnalytics
-	})
-	local v41 = React.useCallback(function() -- line: 140
-		-- upvalues: t1 (copy)
-		t1.reportAnythingAnalytics.incrementHighlightScene()
-		t1.onNextPage()
-	end, {
-		t1.onNextPage,
-		t1.reportAnythingAnalytics
-	})
-	local v42 = useStyle()
-	local Theme = v42.Theme
-	local Font = v42.Font
-	local v45 = if not (t1.viewportUISafeAreaHeight >= 800) then UDim2.new(1, 0, 1, 0) else UDim2.new(0, 800, 0, 800)
-
-	return React.createElement("TextButton", {
+	local createElement = React.createElement
+	local v4 = {
 		Selectable = false,
 		AutoButtonColor = false,
 		BorderSizePixel = 0,
-		BackgroundColor3 = Theme.Overlay.Color,
-		BackgroundTransparency = Theme.Overlay.Transparency,
+		BackgroundColor3 = theme.Overlay.Color,
+		BackgroundTransparency = theme.Overlay.Transparency,
 		Size = UDim2.fromScale(1, 1),
 		ZIndex = 10,
 		Text = "",
-		[React.Event.Activated] = v35
-	}, {
-		Container = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			BackgroundTransparency = 0,
-			ZIndex = 10,
-			Size = if not t1.isSmallPortraitMode then v45 else UDim2.new(1, 0, 1, 0),
-			Position = UDim2.fromScale(0.5, 0.5),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = Theme.Overlay.Color
-		}, {
-			RestartDialog = v37 and React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				FocusNavigationCoreScriptsWrapper = React.createElement(FocusRoot, {
-					isIsolated = true,
-					isAutoFocusRoot = true,
-					surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
-				}, {
-					DialogBody = React.createElement(RestartScreenshotDialog, {
-						ZIndex = 3,
-						isSmallPortraitMode = t1.isSmallPortraitMode,
-						onCancel = function() -- line: 185
-							-- upvalues: v38 (copy)
-							v38(false)
-						end,
-						onRestart = v40
-					})
-				})
-			}),
-			RestartDialogMask = v37 and React.createElement(ImageSetButton, {
-				BackgroundTransparency = 0.2,
-				Active = true,
-				AutoButtonColor = false,
-				ImageTransparency = 1,
-				Size = UDim2.fromScale(1, 1),
-				BackgroundColor3 = Theme.BackgroundUIDefault.Color,
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Image = Assets.Images.RoundedRect.Image,
-				ImageColor3 = Theme.BackgroundUIDefault.Color,
-				ScaleType = Assets.Images.RoundedRect.ScaleType,
-				SliceCenter = Assets.Images.RoundedRect.SliceCenter
-			}, {}),
-			ScreenshotDialog = React.createElement(ImageSetButton, {
-				Active = true,
-				Selectable = false,
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Image = Assets.Images.RoundedRect.Image,
-				ImageColor3 = Theme.BackgroundUIDefault.Color,
-				ImageTransparency = Theme.BackgroundUIDefault.Transparency,
-				ScaleType = Assets.Images.RoundedRect.ScaleType,
-				SliceCenter = Assets.Images.RoundedRect.SliceCenter
-			}, {
-				Layout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder
-				}),
-				HeaderAndContent = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 1, -n1)
-				}, {
-					Layout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						SortOrder = Enum.SortOrder.LayoutOrder
-					}),
-					Header = React.createElement("Frame", {
-						BackgroundTransparency = 0,
-						LayoutOrder = 1,
-						BackgroundColor3 = Color3.fromHex("#4F545F"),
-						Size = UDim2.new(1, 0, 0, 48)
-					}, {
-						Bar = React.createElement(HeaderBar, {
-							backgroundTransparency = 1,
-							barHeight = 48,
-							margin = 12,
-							renderLeft = function() -- line: 245
-								-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), v35 (copy)
-								return React.createElement(IconButton, {
-									iconSize = IconSize.Medium,
-									icon = Images["icons/navigation/pushBack"],
-									onActivated = v35
-								})
-							end,
-							renderRight = function() -- line: 253
-								-- upvalues: t1 (copy), React (copy), ScreenshotReviewDialogSmallPortraitModeHeaderRight (copy), v39 (copy), Font (copy), Theme (copy), Button (copy), ButtonType (copy), RobloxTranslator (copy), StandardButtonSize (copy)
-								if t1.isSmallPortraitMode then
-									return React.createElement(ScreenshotReviewDialogSmallPortraitModeHeaderRight, {
-										onActivated = v39,
-										font = Font,
-										theme = Theme,
-										viewportUISafeAreaWidth = t1.viewportUISafeAreaWidth
-									})
-								end
+		[React.Event.Activated] = onActivated
+	}
 
-								return React.createElement(Button, {
-									fitContent = true,
-									buttonType = ButtonType.Secondary,
-									text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.Retake"),
-									standardSize = StandardButtonSize.XSmall,
-									onActivated = v39
-								})
+	local createElement2 = React.createElement
+
+	if props.isSmallPortraitMode then
+		udim = UDim2.new(1, 0, 1, 0)
+	end
+
+	local v5 = {
+		Size = udim,
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BorderSizePixel = 0,
+		BackgroundColor3 = theme.Overlay.Color,
+		BackgroundTransparency = 0,
+		ZIndex = 10
+	}
+
+	local v6 = {
+		RestartDialog = state and React.createElement(
+			"Frame",
+			{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 },
+			{
+				FocusNavigationCoreScriptsWrapper = React.createElement(
+					FocusRoot,
+					{
+						surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+						isIsolated = true,
+						isAutoFocusRoot = true
+					},
+					{
+						DialogBody = React.createElement(RestartScreenshotDialog, {
+							ZIndex = 3,
+							isSmallPortraitMode = props.isSmallPortraitMode,
+							onCancel = function()
+								setState(false)
 							end,
-							title = if not t1.isSmallPortraitMode then RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.SceneCaptured") else nil,
-							isSecondary = t1.isSmallPortraitMode
+							onRestart = onRestart
 						})
-					}),
-					Divider = React.createElement(Divider, {
-						LayoutOrder = 2
-					}),
-					ScreenshotBody = React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 3,
-						ZIndex = 10,
-						Size = UDim2.new(1, 0, 1, -60)
-					}, {
-						Padding = React.createElement("UIPadding", {
-							PaddingTop = UDim.new(0, 16)
-						}),
-						Layout = React.createElement("UIListLayout", {
-							FillDirection = Enum.FillDirection.Vertical,
-							HorizontalAlignment = Enum.HorizontalAlignment.Center,
-							SortOrder = Enum.SortOrder.LayoutOrder
-						}),
-						ScreenshotContainer = React.createElement("Frame", {
-							BackgroundTransparency = 2,
-							LayoutOrder = 1,
-							Size = UDim2.new(1, 0, 1, -32)
-						}, {
-							Padding = React.createElement("UIPadding", {
-								PaddingTop = UDim.new(0, 12),
-								PaddingBottom = UDim.new(0, 12),
-								PaddingLeft = UDim.new(0, 16),
-								PaddingRight = UDim.new(0, 16)
-							}),
-							Screenshot = React.createElement("Frame", {
-								BorderSizePixel = 2,
-								LayoutOrder = 1,
-								Size = UDim2.new(1, 0, 1, 0),
-								Position = UDim2.fromScale(0.5, 0.5),
-								AnchorPoint = Vector2.new(0.5, 0.5),
-								BorderMode = if not GetFFlagAvatarIdentificationSafeAreaFix() then Enum.BorderMode.Inset else Enum.BorderMode.Outline,
-								BorderColor3 = Color3.fromRGB(255, 255, 255)
-							}, {
-								UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
-									AspectRatio = t1.imageAspectRatio
-								}),
-								ScreenshotImage = React.createElement(ImageSetButton, {
-									Active = true,
-									Selectable = not v33,
-									Size = UDim2.fromScale(1, 1),
-									Image = t1.screenshot,
-									ZIndex = 1,
-									AnchorPoint = Vector2.new(0.5, 0.5),
-									Position = UDim2.fromScale(0.5, 0.5),
-									BackgroundTransparency = 1,
-									ScaleType = Enum.ScaleType.Fit,
-									SliceCenter = Assets.Images.RoundedRect.SliceCenter,
-									[React.Event.Activated] = v41
-								})
-							})
-						}),
-						Description = React.createElement("TextLabel", {
-							LayoutOrder = 2,
-							TextWrapped = true,
-							BackgroundTransparency = 1,
-							Text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Message.ProblemNotInScene"),
-							Font = Font.Header1.Font,
-							TextColor3 = Theme.TextEmphasis.Color,
-							TextTransparency = Theme.TextEmphasis.Transparency,
-							TextSize = not t1.isSmallPortraitMode and 20 or 12,
-							TextXAlignment = Enum.TextXAlignment.Center,
-							Size = UDim2.new(1, -24, 0, not t1.isSmallPortraitMode and 40 or 24)
-						})
-					})
+					}
+				)
+			}
+		),
+		RestartDialogMask = state and React.createElement(ImageSetButton, {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 0.2,
+			BackgroundColor3 = theme.BackgroundUIDefault.Color,
+			Active = true,
+			AutoButtonColor = false,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Image = Assets.Images.RoundedRect.Image,
+			ImageColor3 = theme.BackgroundUIDefault.Color,
+			ImageTransparency = 1,
+			ScaleType = Assets.Images.RoundedRect.ScaleType,
+			SliceCenter = Assets.Images.RoundedRect.SliceCenter
+		}, {}),
+		ScreenshotDialog = 0
+	}
+	local createElement3 = React.createElement
+	local v7 = {
+		Active = true,
+		Selectable = false,
+		Size = UDim2.fromScale(1, 1),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		BackgroundTransparency = 1,
+		Image = Assets.Images.RoundedRect.Image,
+		ImageColor3 = theme.BackgroundUIDefault.Color,
+		ImageTransparency = theme.BackgroundUIDefault.Transparency,
+		ScaleType = Assets.Images.RoundedRect.ScaleType,
+		SliceCenter = Assets.Images.RoundedRect.SliceCenter
+	}
+	local children = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		HeaderAndContent = 0,
+		Footer = 0
+	}
+
+	local createElement4 = React.createElement
+	local v8 = {
+		Size = UDim2.new(1, 0, 1, -v2),
+		BackgroundTransparency = 1
+	}
+
+	local children2 = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		Header = 0,
+		Divider = 0,
+		ScreenshotBody = 0
+	}
+
+	local createElement5 = React.createElement
+	local v9 = {
+		BackgroundTransparency = 0,
+		BackgroundColor3 = Color3.fromHex("#4F545F"),
+		LayoutOrder = 1,
+		Size = UDim2.new(1, 0, 0, 48)
+	}
+
+	local createElement6 = React.createElement
+	local v10 = {
+		backgroundTransparency = 1,
+		barHeight = 48,
+		margin = 12,
+		renderLeft = function()
+			return React.createElement(IconButton, {
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/pushBack"],
+				onActivated = onActivated
+			})
+		end,
+		renderRight = function()
+			if props.isSmallPortraitMode then
+				return React.createElement(ScreenshotReviewDialogSmallPortraitModeHeaderRight, {
+					onActivated = onActivated3,
+					font = font,
+					theme = theme,
+					viewportUISafeAreaWidth = props.viewportUISafeAreaWidth
+				})
+			end
+
+			return React.createElement(Button, {
+				buttonType = ButtonType.Secondary,
+				text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.Retake"),
+				fitContent = true,
+				standardSize = StandardButtonSize.XSmall,
+				onActivated = onActivated3
+			})
+		end,
+		title = 0,
+		isSecondary = 0
+	}
+	local title
+
+	if not props.isSmallPortraitMode then
+		title = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.SceneCaptured")
+	end
+
+	v10.title = title
+
+	v10.isSecondary = props.isSmallPortraitMode
+	children2.Header = createElement5("Frame", v9, { Bar = createElement6(HeaderBar, v10) })
+
+	children2.Divider = React.createElement(Divider, { LayoutOrder = 2 })
+
+	local createElement7 = React.createElement
+	local v11 = {
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Size = UDim2.new(1, 0, 1, -60),
+		ZIndex = 10
+	}
+
+	local children3 = {
+		Padding = React.createElement("UIPadding", { PaddingTop = UDim.new(0, 16) }),
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		ScreenshotContainer = React.createElement(
+			"Frame",
+			{ Size = UDim2.new(1, 0, 1, -32), BackgroundTransparency = 2, LayoutOrder = 1 },
+			{
+				Padding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 12),
+					PaddingBottom = UDim.new(0, 12),
+					PaddingLeft = UDim.new(0, 16),
+					PaddingRight = UDim.new(0, 16)
 				}),
-				Footer = React.createElement("Frame", {
-					BackgroundTransparency = 0,
-					LayoutOrder = 4,
-					Size = UDim2.new(1, 0, 0, n1),
-					BackgroundColor3 = Color3.fromHex("#4F545F"),
-					AnchorPoint = Vector2.new(0, 1),
-					Position = UDim2.fromScale(0, 1)
+				Screenshot = React.createElement("Frame", {
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					BorderSizePixel = 2,
+					BorderMode = Enum.BorderMode.Outline,
+					BorderColor3 = Color3.fromRGB(255, 255, 255),
+					LayoutOrder = 1
 				}, {
-					Layout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center
+					UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+						AspectRatio = props.imageAspectRatio
 					}),
-					Container = React.createElement("Frame", {
+					ScreenshotImage = React.createElement(ImageSetButton, {
+						Active = true,
+						Selectable = not v,
+						Size = UDim2.fromScale(1, 1),
+						Image = props.screenshot,
+						ZIndex = 1,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.fromScale(0.5, 0.5),
 						BackgroundTransparency = 1,
-						Size = if not t1.isSmallPortraitMode then UDim2.new(0, not t1.isSmallPortraitMode and 612 or 400, 1, 0) else UDim2.new(1, 0, 1, 0)
-					}, {
-						Padding = React.createElement("UIPadding", {
-							PaddingTop = UDim.new(0, 12),
-							PaddingBottom = UDim.new(0, 12),
-							PaddingLeft = UDim.new(0, 16),
-							PaddingRight = UDim.new(0, 16)
-						}),
-						ActionButtons = React.createElement(ButtonStack, {
-							marginBetween = 8,
-							forcedFillDirection = if not t1.isSmallPortraitMode then nil else Enum.FillDirection.Vertical,
-							buttons = {
-								{
-									buttonType = ButtonType.Secondary,
-									props = {
-										onActivated = v36,
-										text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.AttachScreenshot")
-									}
-								},
-								if not v33 then {
-									buttonType = ButtonType.PrimarySystem,
-									props = {
-										onActivated = v41,
-										text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.HighlightScene")
-									}
-								} else nil
-							}
-						})
+						ScaleType = Enum.ScaleType.Fit,
+						SliceCenter = Assets.Images.RoundedRect.SliceCenter,
+						[React.Event.Activated] = onActivated4
 					})
 				})
-			})
-		})
+			}
+		),
+		Description = 0
+	}
+
+	local createElement8 = React.createElement
+	local v12 = {
+		Text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Message.ProblemNotInScene"),
+		Font = 0,
+		FontFace = 0,
+		LayoutOrder = 2,
+		TextColor3 = 0,
+		TextTransparency = 0,
+		TextSize = 0,
+		TextXAlignment = 0,
+		TextWrapped = true,
+		Size = 0,
+		BackgroundTransparency = 1
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Header1.Font
+	end
+
+	v12.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v3.Tokens.Typography.HeadingSmall.Font)
+	end
+
+	v12.FontFace = fontFace
+
+	v12.TextColor3 = theme.TextEmphasis.Color
+	v12.TextTransparency = theme.TextEmphasis.Transparency
+	v12.TextSize = props.isSmallPortraitMode and 12 or 20
+	v12.TextXAlignment = Enum.TextXAlignment.Center
+
+	v12.Size = UDim2.new(1, -24, 0, props.isSmallPortraitMode and 24 or 40)
+	children3.Description = createElement8("TextLabel", v12)
+	children2.ScreenshotBody = createElement7("Frame", v11, children3)
+	children.HeaderAndContent = createElement4("Frame", v8, children2)
+
+	local createElement9 = React.createElement
+	local v13 = {
+		BackgroundTransparency = 0,
+		Size = UDim2.new(1, 0, 0, v2),
+		BackgroundColor3 = Color3.fromHex("#4F545F"),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1),
+		LayoutOrder = 4
+	}
+
+	local v14 = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center
+		}),
+		Container = 0
+	}
+
+	local createElement10 = React.createElement
+	local size
+
+	if props.isSmallPortraitMode then
+		size = UDim2.new(1, 0, 1, 0)
+	else
+		size = UDim2.new(0, props.isSmallPortraitMode and 400 or 612, 1, 0)
+	end
+
+	local v15 = {
+		Padding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 12),
+			PaddingBottom = UDim.new(0, 12),
+			PaddingLeft = UDim.new(0, 16),
+			PaddingRight = UDim.new(0, 16)
+		}),
+		ActionButtons = 0
+	}
+
+	local createElement11 = React.createElement
+	local forcedFillDirection
+
+	if props.isSmallPortraitMode then
+		forcedFillDirection = Enum.FillDirection.Vertical
+	end
+
+	v15.ActionButtons = createElement11(ButtonStack, {
+		forcedFillDirection = forcedFillDirection,
+		marginBetween = 8,
+		buttons = {
+			{
+				buttonType = ButtonType.Secondary,
+				props = {
+					onActivated = onActivated2,
+					text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.AttachScreenshot")
+				}
+			},
+			not v and {
+				buttonType = ButtonType.PrimarySystem,
+				props = {
+					onActivated = onActivated4,
+					text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.HighlightScene")
+				}
+			} or nil
+		}
+	})
+	v14.Container = createElement10("Frame", { Size = size, BackgroundTransparency = 1 }, v15)
+	children.Footer = createElement9("Frame", v13, v14)
+	v6.ScreenshotDialog = createElement3(ImageSetButton, v7, children)
+	return createElement("TextButton", v4, {
+		Container = createElement2("Frame", v5, v6)
 	})
 end
 

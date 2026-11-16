@@ -1,127 +1,153 @@
-local function createAudioGraph(p1, p2, n1: number?) -- line: 43
-	local v5 = n1 or 0.2
-	local AudioFader = Instance.new("AudioFader")
+local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
 
-	AudioFader.Name = "MasterFader"
-	AudioFader.Volume = v5
-	AudioFader.Parent = p1
+local audioDuckingFastInts = require(MomentsCommon.Media.audioDuckingFastInts)
 
-	local Wire = Instance.new("Wire")
+local function createAudioGraph(parent, targetInstance, options)
+	local v = options or {}
 
-	Wire.SourceInstance = AudioFader
-	Wire.TargetInstance = p2
-	Wire.Parent = AudioFader
+	local volume = v.masterVolume == nil and 0.2 or v.masterVolume
+	local enableDucking = v.enableDucking == true
 
-	local t1 = {}
-	local u9 = false
-	local u10 = false
+	local masterFader = Instance.new("AudioFader")
+	masterFader.Name = "MasterFader"
+	masterFader.Volume = volume
+	masterFader.Parent = parent
 
-	local function applyStem(t2: {[any]: any}) -- line: 62
-		t2.fader.Volume = if not t2.muted then t2.targetVolume else 0
+	local wire = Instance.new("Wire")
+	wire.SourceInstance = masterFader
+	wire.TargetInstance = targetInstance
+	wire.Parent = masterFader
+	local duckCompressor
+
+	if enableDucking then
+		local compressorParams = audioDuckingFastInts.getCompressorParams()
+		duckCompressor = Instance.new("AudioCompressor")
+		duckCompressor.Name = "DuckCompressor"
+		duckCompressor.Threshold = compressorParams.threshold
+		duckCompressor.Ratio = compressorParams.ratio
+		duckCompressor.Attack = compressorParams.attack
+		duckCompressor.Release = compressorParams.release
+		duckCompressor.MakeupGain = compressorParams.makeupGain
+		duckCompressor.Parent = parent
+
+		local wire2 = Instance.new("Wire")
+		wire2.SourceInstance = duckCompressor
+		wire2.TargetInstance = masterFader
+		wire2.Parent = duckCompressor
+	else
+		duckCompressor = nil
 	end
-	local function removeStem(s1: string) -- line: 66
-		-- upvalues: t1 (copy)
-		local v15 = t1[s1]
 
-		if not v15 then
+	local v2 = {}
+	local masterMuted = false
+
+	local flag = false
+
+	local function applyStem(data) -- 2 equivalent calls inferred from this helper
+		data.fader.Volume = data.muted and 0 or data.targetVolume
+	end
+
+	local function removeStem(p: string) -- 1 equivalent call inferred from this helper
+		local v3 = v2[p]
+
+		if not v3 then
 			return
 		end
 
-		t1[s1] = nil
-		v15.fader:Destroy()
+		v2[p] = nil
+
+		v3.fader:Destroy()
 	end
 
 	return {
-		addStem = function(s2: string, p3, n2: number?) -- line: 77
-			-- upvalues: u10 (ref), t1 (copy), p1 (copy), AudioFader (copy)
-			assert(not u10, "createAudioGraph: addStem after dispose")
-			assert(not t1[s2], `createAudioGraph: stem "{ s2 }" already added`)
+		addStem = function(p: string, sourceInstance, value: number?, value2: string?)
+			assert(not flag, "createAudioGraph: addStem after dispose")
+			assert(not v2[p], `createAudioGraph: stem "{p}" already added`)
 
-			local v19 = n2 or 1
-			local AudioFader2 = Instance.new("AudioFader")
+			local v3 = value or 1
 
-			AudioFader2.Name = `Stem_{ s2 }`
-			AudioFader2.Volume = v19
-			AudioFader2.Parent = p1
+			local audioFader = Instance.new("AudioFader")
+			audioFader.Name = `Stem_{p}`
+			audioFader.Volume = v3
+			audioFader.Parent = parent
 
-			local Wire2 = Instance.new("Wire")
+			local wire2 = Instance.new("Wire")
+			wire2.SourceInstance = sourceInstance
+			wire2.TargetInstance = audioFader
+			wire2.Parent = audioFader
 
-			Wire2.SourceInstance = p3
-			Wire2.TargetInstance = AudioFader2
-			Wire2.Parent = AudioFader2
+			if enableDucking and (value2 or "input") == "sidechain" then
+				local wire3 = Instance.new("Wire")
+				wire3.SourceInstance = audioFader
+				wire3.TargetInstance = masterFader
+				wire3.Parent = audioFader
 
-			local Wire3 = Instance.new("Wire")
+				local wire4 = Instance.new("Wire")
+				wire4.SourceInstance = sourceInstance
+				wire4.TargetInstance = duckCompressor
+				wire4.TargetName = "Sidechain"
+				wire4.Parent = audioFader
+			elseif enableDucking then
+				local wire3 = Instance.new("Wire")
+				wire3.SourceInstance = audioFader
+				wire3.TargetInstance = duckCompressor
+				wire3.Parent = audioFader
+			else
+				local wire3 = Instance.new("Wire")
+				wire3.SourceInstance = audioFader
+				wire3.TargetInstance = masterFader
+				wire3.Parent = audioFader
+			end
 
-			Wire3.SourceInstance = AudioFader2
-			Wire3.TargetInstance = AudioFader
-			Wire3.Parent = AudioFader2
-			t1[s2] = {
-				muted = false,
-				fader = AudioFader2,
-				targetVolume = v19
-			}
+			v2[p] = { fader = audioFader, targetVolume = v3, muted = false }
 
-			return function() -- line: 104
-				-- upvalues: s2 (copy), t1 (copy)
-				local v32 = s2
-				local v33 = t1[v32]
-
-				if not v33 then
-					return
-				end
-
-				t1[v32] = nil
-				v33.fader:Destroy()
+			return function()
+				removeStem(p) -- inferred equivalent call
 			end
 		end,
-		setVolume = function(s3: string, n3: number) -- line: 109
-			-- upvalues: u10 (ref), t1 (copy)
-			assert(not u10, "createAudioGraph: setVolume after dispose")
-
-			local v25 = t1[s3]
-
-			assert(v25, `createAudioGraph: no stem "{ s3 }"`)
-			v25.targetVolume = n3
-			v25.fader.Volume = if not v25.muted then v25.targetVolume else 0
+		setVolume = function(p: string, targetVolume: number)
+			assert(not flag, "createAudioGraph: setVolume after dispose")
+			local v3 = v2[p]
+			assert(v3, `createAudioGraph: no stem "{p}"`)
+			v3.targetVolume = targetVolume
+			applyStem(v3) -- inferred equivalent call
 		end,
-		setMuted = function(s4: string, b1: boolean) -- line: 117
-			-- upvalues: u10 (ref), t1 (copy)
-			assert(not u10, "createAudioGraph: setMuted after dispose")
-
-			local v28 = t1[s4]
-
-			assert(v28, `createAudioGraph: no stem "{ s4 }"`)
-			v28.muted = b1
-			v28.fader.Volume = if not v28.muted then v28.targetVolume else 0
+		setMuted = function(p: string, muted: boolean)
+			assert(not flag, "createAudioGraph: setMuted after dispose")
+			local v3 = v2[p]
+			assert(v3, `createAudioGraph: no stem "{p}"`)
+			v3.muted = muted
+			applyStem(v3) -- inferred equivalent call
 		end,
-		setMasterMuted = function(b2: boolean) -- line: 125
-			-- upvalues: u10 (ref), u9 (ref), AudioFader (copy), v5 (copy)
-			assert(not u10, "createAudioGraph: setMasterMuted after dispose")
-			u9 = b2
-			AudioFader.Volume = if not b2 then v5 else 0
+		setMasterMuted = function(flag2: boolean)
+			assert(not flag, "createAudioGraph: setMasterMuted after dispose")
+			masterMuted = flag2
+			masterFader.Volume = flag2 and 0 or volume
 		end,
-		getMasterMuted = function() -- line: 131
-			-- upvalues: u9 (ref)
-			return u9
+		getMasterMuted = function()
+			return masterMuted
 		end,
-		getOutput = function() -- line: 135
-			-- upvalues: p2 (copy)
-			return p2
+		getOutput = function()
+			return targetInstance
 		end,
-		dispose = function() -- line: 139
-			-- upvalues: u10 (ref), t1 (copy), AudioFader (copy)
-			if u10 then
+		dispose = function()
+			if flag then
 				return
 			end
 
-			u10 = true
+			flag = true
 
-			for _, v31 in t1 do
-				v31.fader:Destroy()
+			for _, v3 in v2 do
+				v3.fader:Destroy()
 			end
 
-			table.clear(t1)
-			AudioFader:Destroy()
+			table.clear(v2)
+
+			if duckCompressor ~= nil then
+				duckCompressor:Destroy()
+			end
+
+			masterFader:Destroy()
 		end
 	}
 end

@@ -1,7 +1,4 @@
-local createRequestThunks = require(script.createRequestThunks)
-local Enums = require(script.Enums)
-
 return {
-	config = createRequestThunks,
-	Enums = Enums
+	config = require(script.createRequestThunks),
+	Enums = require(script.Enums)
 }

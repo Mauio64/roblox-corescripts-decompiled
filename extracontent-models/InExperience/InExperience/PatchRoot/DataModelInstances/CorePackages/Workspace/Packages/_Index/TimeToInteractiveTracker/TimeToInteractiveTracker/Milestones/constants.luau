@@ -23,18 +23,10 @@ return {
 	},
 	DataProcessingStarted = {
 		Name = "DataProcessingStarted",
-		Subphase = {
-			Decode = "Decode",
-			DataUpdate = "DataUpdate",
-			TreeBuild = "TreeBuild"
-		}
+		Subphase = { Decode = "Decode", DataUpdate = "DataUpdate", TreeBuild = "TreeBuild" }
 	},
 	DataProcessingCompleted = {
 		Name = "DataProcessingCompleted",
-		Subphase = {
-			Decode = "Decode",
-			DataUpdate = "DataUpdate",
-			TreeBuild = "TreeBuild"
-		}
+		Subphase = { Decode = "Decode", DataUpdate = "DataUpdate", TreeBuild = "TreeBuild" }
 	}
 }

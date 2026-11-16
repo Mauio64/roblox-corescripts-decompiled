@@ -1,6 +1,5 @@
 return {
 	RoduxKey = "MomentsCreationFlow",
-	RadialFillImage = "rbxasset://textures/ui/Controls/RadialFill.png",
 	AudioWaveform = {
 		SamplesPerSecond = 4,
 		WaveformWidth = 2,
@@ -9,5 +8,6 @@ return {
 		SegmentSelectorWidth = 150
 	},
 	SearchMusicCreatorFilter = { 7462718749 },
-	BottomBarSizeConstraint = Vector2.new(400, 1e999)
+	BottomBarSizeConstraint = Vector2.new(400, 1e999),
+	RadialFillImage = "rbxasset://textures/ui/Controls/RadialFill.png"
 }

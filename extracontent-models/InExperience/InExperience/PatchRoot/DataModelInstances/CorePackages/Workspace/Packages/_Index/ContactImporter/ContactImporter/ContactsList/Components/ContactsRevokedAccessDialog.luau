@@ -1,10 +1,12 @@
-local ParentParent = script.Parent.Parent.Parent
-local getFFlagPassNavigationToContactsRevoked = require(ParentParent.Flags.getFFlagPassNavigationToContactsRevoked)
-
+local parent = script.Parent.Parent.Parent
+local getFFlagPassNavigationToContactsRevoked = require(parent.Flags.getFFlagPassNavigationToContactsRevoked)
 require(script.ContactsRevokedAccessDialog)
 
 if getFFlagPassNavigationToContactsRevoked() then
-	return (require(script.ContactsRevokedAccessDialogEntryPoint))
+	local ContactsRevokedAccessDialogEntryPoint = require(script.ContactsRevokedAccessDialogEntryPoint)
+	return ContactsRevokedAccessDialogEntryPoint
 end
 
-return (require(script.ContactsRevokedAccessDialog))
+local ContactsRevokedAccessDialog = require(script.ContactsRevokedAccessDialog)
+
+return ContactsRevokedAccessDialog

@@ -1,63 +1,66 @@
-local Parent = script:FindFirstAncestor("TnSScreenshot").Parent
-local GetFFlagEnableInAppBugReporting = require(Parent.SharedFlags).GetFFlagEnableInAppBugReporting
-local t1 = {}
+local parent = script:FindFirstAncestor("TnSScreenshot").Parent
 
-t1.__index = t1
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnableInAppBugReporting = SharedFlags.GetFFlagEnableInAppBugReporting
 
-local t2 = {}
-local t3 = {}
-local u6 = false
-local t4 = {
-	RAABTestReason = "RAABTest"
-}
+local ScreenshotManager = {}
+ScreenshotManager.__index = ScreenshotManager
 
-local function v8(p1) -- line: 27
-	-- upvalues: t2 (copy), t3 (copy), u6 (ref)
-	p1.ScreenshotUploaded:Connect(function(p2, p3) -- line: 28
-		-- upvalues: t2 (copy)
-		local v18 = t2[p2]
+local v = {}
+local v2 = {}
 
-		if not v18 then
+local v3 = false
+
+local _ = { RAABTestReason = "RAABTest" }
+
+local function fn(SafetyService)
+	SafetyService.ScreenshotUploaded:Connect(function(p, p2)
+		local v4 = v[p]
+
+		if not v4 then
 			return
 		end
 
-		v18(p3)
-		table.remove(t2, p2)
+		v4(p2)
+		table.remove(v, p)
 	end)
-	p1.ScreenshotContentReady:Connect(function(p4, p5) -- line: 37
-		-- upvalues: t3 (copy)
-		local v21 = t3[p4]
+	SafetyService.ScreenshotContentReady:Connect(function(p, p2)
+		local v4 = v2[p]
 
-		if not v21 then
+		if not v4 then
 			return
 		end
 
-		v21(p5)
-		table.remove(t3, p4)
+		v4(p2)
+		table.remove(v2, p)
 	end)
-	u6 = true
+	v3 = true
 end
 
-function t1.TakeScreenshotWithCallback(_: {[any]: any}, p6: ((...any) -> ...any), p7: ((...any) -> ...any)?, s1: string?) -- line: 59
-	-- upvalues: GetFFlagEnableInAppBugReporting (copy), t4 (copy), t2 (copy), t3 (copy), u6 (ref), v8 (copy)
-	if not game:GetEngineFeature("ReportAnythingScreenshot") or not game:GetEngineFeature("ReportAnythingScreenshotUploadedSignal") then
+local function fn2() -- 1 equivalent call inferred from this helper
+	return game:GetEngineFeature("ReportAnythingScreenshot")
+		and game:GetEngineFeature("ReportAnythingScreenshotUploadedSignal")
+end
+
+function ScreenshotManager.TakeScreenshotWithCallback(_, callback, callback2, p: string?): boolean
+	if not fn2() then -- inferred equivalent call
 		return false
 	end
 
 	local SafetyService = game:GetService("SafetyService")
-	local v15 = SafetyService:TakeScreenshot({
-		registerContent = p7 == nil and 0 or 1,
-		reason = if not GetFFlagEnableInAppBugReporting() then t4.RAABTestReason else s1 or t4.RAABTestReason
+	local v4 = SafetyService:TakeScreenshot({
+		registerContent = callback2 == nil and 0 or 1,
+		reason = GetFFlagEnableInAppBugReporting() and p or "RAABTest"
 	})
 
-	t2[v15] = p6
-	t3[v15] = p7
+	v[v4] = callback
+	v2[v4] = callback2
 
-	if not u6 then
-		v8(SafetyService)
+	if not v3 then
+		fn(SafetyService)
 	end
 
 	return true
 end
 
-return t1
+return ScreenshotManager

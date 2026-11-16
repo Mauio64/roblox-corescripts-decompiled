@@ -1,23 +1,19 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Types = ParentParent.Types
-local Rodux = require(ParentParentParent.Rodux)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local types = parent.Types
+local Rodux = require(parent2.Rodux)
+require(types.ReducerTypes)
+require(types.ActionTypes)
+local Actions = require(parent.Actions)
+local RequestSent = Actions.RequestSent
+local Dash = require(parent2.Dash)
 
-require(Types.ReducerTypes)
-require(Types.ActionTypes)
+local v = {}
 
-local RequestSent = require(ParentParent.Actions).RequestSent
-local Dash = require(ParentParentParent.Dash)
-local t1 = {}
-
-return function(_) -- line: 13
-	-- upvalues: Rodux (copy), t1 (copy), RequestSent (copy), Dash (copy)
-	return Rodux.createReducer(t1, {
-		[RequestSent.name] = function(p2, p3) -- line: 15
-			-- upvalues: Dash (copy)
-			return Dash.join(p2, {
-				[p3.payload.id] = true
-			})
+return function(_)
+	return Rodux.createReducer(v, {
+		[RequestSent.name] = function(p, p2)
+			return Dash.join(p, { [p2.payload.id] = true })
 		end
 	})
 end

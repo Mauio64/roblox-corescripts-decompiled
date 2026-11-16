@@ -2,28 +2,33 @@ local Foundation = script:FindFirstAncestor("Foundation")
 
 require(Foundation.Components.Types)
 
-local function blendColors(p1, t1: {[any]: any}) -- line: 14
-	local v5 = 1 - (t1.Transparency or 0)
-	local v6 = 1 - (p1.Transparency or 0)
+local function blendColors(p, p2)
+	local v = 1 - (p2.Transparency or 0)
+	local v2 = 1 - (p.Transparency or 0)
 
-	if v5 == 1 or (v6 == 0 or p1.Color3 == nil) then
-		return t1
+	if v == 1 or v2 == 0 or p.Color3 == nil then
+		return p2
 	end
 
-	if v5 == 0 then
-		return p1
+	if v == 0 then
+		return p
 	end
 
-	local v7 = 1 - v5
-	local v8 = v5 + v6 * v7
-	local v9 = v8 > 0 and 1 / v8 or 0
-	local v10 = (t1.Color3.R * v5 + p1.Color3.R * (v6 * v7)) * v9
-	local v11 = (t1.Color3.G * v5 + p1.Color3.G * (v6 * v7)) * v9
-	local v12 = (t1.Color3.B * v5 + p1.Color3.B * (v6 * v7)) * v9
+	local v3 = 1 - v
+
+	local v4 = v + v2 * v3
+
+	local v5 = v4 > 0 and 1 / v4 or 0
+
+	local v6 = (p2.Color3.R * v + p.Color3.R * (v2 * v3)) * v5
+
+	local v7 = (p2.Color3.G * v + p.Color3.G * (v2 * v3)) * v5
+
+	local v8 = (p2.Color3.B * v + p.Color3.B * (v2 * v3)) * v5
 
 	return {
-		Color3 = Color3.new(v10, v11, v12),
-		Transparency = 1 - v8
+		Color3 = Color3.new(v6, v7, v8),
+		Transparency = 1 - v4
 	}
 end
 

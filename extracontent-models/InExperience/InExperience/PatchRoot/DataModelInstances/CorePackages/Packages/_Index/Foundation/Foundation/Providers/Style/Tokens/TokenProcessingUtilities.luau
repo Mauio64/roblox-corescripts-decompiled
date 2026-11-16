@@ -1,367 +1,375 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local Logger = require(Foundation.Utility.Logger)
-
 require(Foundation.Components.Types)
 
-local function getRoundedNumber(n1: number) -- line: 27
-	return math.round(n1 * 1000) / 1000
+local function isColorStyle(p): boolean -- 4 equivalent calls inferred from this helper
+	return type(p) == "table"
+		and p.Color3 ~= nil
+		and typeof(p.Color3) == "Color3"
+		and p.Transparency ~= nil
+		and typeof(p.Transparency) == "number"
 end
-local function getRGBAValues(color3: Color3, n2: number?) -- line: 31
-	local v13 = math.round(color3.R * 255)
-	local v14 = math.round(color3.G * 255)
-	local v15 = math.round(color3.B * 255)
 
-	if n2 then
-		return v13, v14, v15, math.round((1 - n2) * 1000) / 1000
+local function getRoundedNumber(p: number) -- 6 equivalent calls inferred from this helper
+	return math.round(p * 1000) / 1000
+end
+
+local function getRGBAValues(color: Color3, p: number?)
+	local v = math.round(color.R * 255)
+	local v2 = math.round(color.G * 255)
+	local v3 = math.round(color.B * 255)
+
+	if p then
+		return v, v2, v3, getRoundedNumber(1 - p) -- inferred equivalent call
 	end
 
-	return v13, v14, v15
+	return v, v2, v3
 end
-local function collectTokens(p1, s1: string, s2: string?, b1: boolean?) -- line: 77
-	-- upvalues: collectTokens (copy)
-	local t1 = {}
 
-	for v50, v51 in p1 do
-		local v52 = if not s2 then v50 else `{ s2 }.{ v50 }`
+local function formatColorPreviewHTML(color3: Color3, transparency: number?) -- 1 equivalent call inferred from this helper
+	local v = math.round(color3.R * 255)
+	local v2 = math.round(color3.G * 255)
+	local v3 = math.round(color3.B * 255)
+	local v4
 
-		if type(v51) == "table" and not getmetatable(v51) and (not b1 or (type(v51) ~= "table" or (v51.Color3 == nil or (typeof(v51.Color3) ~= "Color3" or (v51.Transparency == nil or typeof(v51.Transparency) ~= "number"))))) then
-			for _, v54 in (collectTokens(v51, s1, v52, b1)) do
-				table.insert(t1, v54)
+	if transparency then
+		v4 = getRoundedNumber(1 - transparency) -- inferred equivalent call
+	end
+
+	return `<span class="color-preview" style="background-color: rgba({v},{v2},{v3},{v4 or 1});"></span>`
+end
+
+local function collectTokens(item, category: string, p: string?, flag: boolean?)
+	local tokens = {}
+
+	for k, item2 in item do
+		local fullPath
+
+		if p then
+			fullPath = `{p}.{k}`
+		else
+			fullPath = k
+		end
+
+		if type(item2) == "table" and not getmetatable(item2) then
+			if flag and isColorStyle(item2) then -- inferred equivalent call
+				table.insert(tokens, {
+					key = k,
+					value = item2,
+					category = category,
+					fullPath = fullPath
+				})
+				continue
+			end
+
+			local v = collectTokens(item2, category, fullPath, flag)
+
+			for _, v2 in v do
+				table.insert(tokens, v2)
 			end
 		else
-			table.insert(t1, {
-				key = v50,
-				value = v51,
-				category = s1,
-				fullPath = v52
+			table.insert(tokens, {
+				key = k,
+				value = item2,
+				category = category,
+				fullPath = fullPath
 			})
 		end
 	end
 
-	return t1
+	return tokens
 end
-local function getTokenValue(p2, s3: string) -- line: 243
-	for _, v90 in string.split(s3, ".") do
-		if p2 == nil or type(p2) ~= "table" then
+
+local function getTokenValue(p, value: string)
+	for _, v in string.split(value, ".") do
+		if p == nil or type(p) ~= "table" then
 			return nil
 		end
 
-		p2 = p2[v90]
+		p = p[v]
 	end
 
-	return p2
+	return p
 end
-local function tokenOverrideValuesCompatible(p3, p4) -- line: 273
-	-- upvalues: tokenOverrideValuesCompatible (copy)
-	if p3 == nil or p4 == nil then
+
+local function tokenOverrideValuesCompatible(tokenValue, tokenOverrideSource): boolean
+	if tokenValue == nil or tokenOverrideSource == nil then
 		return false
 	end
 
-	if type(p3) ~= "table" or type(p4) ~= "table" then
-		return typeof(p3) == typeof(p4)
+	if type(tokenValue) ~= "table" or type(tokenOverrideSource) ~= "table" then
+		return typeof(tokenValue) == typeof(tokenOverrideSource)
 	end
 
-	for v100, v101 in p3 do
-		if not tokenOverrideValuesCompatible(v101, p4[v100]) then
+	for k, item in tokenValue do
+		if not tokenOverrideValuesCompatible(item, tokenOverrideSource[k]) then
 			return false
 		end
 	end
 
-	for v102 in p4 do
-		if p3[v102] == nil then
+	for k in tokenOverrideSource do
+		if tokenValue[k] == nil then
 			return false
 		end
 	end
 
 	return true
 end
-local function resolveTokenOverrideSource(p5, p6) -- line: 294
-	-- upvalues: getTokenValue (copy), Logger (copy)
-	if type(p6) == "string" then
-		local v105 = getTokenValue(p5, p6)
 
-		if v105 == nil then
-			Logger:warning(`Token override skipped: unknown source token path "{ p6 }"`)
-
-			return nil
-		end
-
-		return v105
+local function resolveTokenOverrideSource(p, value) -- 1 equivalent call inferred from this helper
+	if type(value) ~= "string" then
+		return value
 	end
 
-	return p6
+	local tokenValue = getTokenValue(p, value)
+
+	if tokenValue ~= nil then
+		return tokenValue
+	end
+
+	Logger:warning(`Token override skipped: unknown source token path "{value}"`)
+	return nil
 end
 
-return {
-	isColorStyle = function(p7) -- line: 19
-		return type(p7) == "table" and (p7.Color3 ~= nil and (typeof(p7.Color3) == "Color3" and (p7.Transparency ~= nil and typeof(p7.Transparency) == "number")))
-	end,
-	formatColorPreviewHTML = function(color3: Color3, n3: number?) -- line: 39
-		local v18 = math.round(color3.R * 255)
-		local v19 = math.round(color3.G * 255)
-		local v20 = math.round(color3.B * 255)
-		local v21
+local TokenProcessingUtilities = {}
+TokenProcessingUtilities.isColorStyle = isColorStyle
+TokenProcessingUtilities.formatColorPreviewHTML = formatColorPreviewHTML
 
-		if n3 then
-			v21 = math.round((1 - n3) * 1000) / 1000
+function TokenProcessingUtilities.formatTokenValue(value)
+	if typeof(value) == "Color3" then
+		return `rgb({math.round(value.R * 255)}, {math.round(value.G * 255)}, {math.round(value.B * 255)})`
+	end
+
+	if typeof(value) == "number" then
+		return (tostring(getRoundedNumber(value))) -- inferred equivalent call
+	end
+
+	if not isColorStyle(value) then -- inferred equivalent call
+		return (tostring(value))
+	end
+
+	local color3 = value.Color3
+	local transparency = value.Transparency
+	local v = math.round(color3.R * 255)
+	local v2 = math.round(color3.G * 255)
+	local v3 = math.round(color3.B * 255)
+	local v4
+
+	if transparency then
+		v4 = getRoundedNumber(1 - transparency) -- inferred equivalent call
+	end
+
+	return `rgba({v}, {v2}, {v3}, {v4})`
+end
+
+function TokenProcessingUtilities.formatTokenValueHTML(value)
+	if typeof(value) == "Color3" then
+		local v = math.round(value.R * 255)
+		local v2 = math.round(value.G * 255)
+		local v3 = math.round(value.B * 255)
+		return `<span class="color">{`<span class="color-preview" style="background-color: rgba({math.round(value.R * 255)},{math.round(value.G * 255)},{math.round(value.B * 255)},{nil or 1});"></span>`} rgb({v}, {v2}, {v3})</span>`
+	else
+		if typeof(value) == "number" then
+			return (tostring(getRoundedNumber(value))) -- inferred equivalent call
+		end
+
+		if not isColorStyle(value) then -- inferred equivalent call
+			return (tostring(value))
+		end
+
+		local color3 = value.Color3
+		local transparency = value.Transparency
+		local v = math.round(color3.R * 255)
+		local v2 = math.round(color3.G * 255)
+		local v3 = math.round(color3.B * 255)
+		local v4
+
+		if transparency then
+			v4 = getRoundedNumber(1 - transparency) -- inferred equivalent call
+		end
+
+		return `<span class="color">{formatColorPreviewHTML(value.Color3, value.Transparency)} rgba({v}, {v2}, {v3}, {v4})</span>` -- inferred equivalent call
+	end
+end
+
+TokenProcessingUtilities.collectTokens = collectTokens
+
+function TokenProcessingUtilities.collectTokensWithSubcategories(items, category: string, value: string?, flag: boolean?)
+	local tokensWithSubcategories = {}
+
+	for k, item in items do
+		local fullPath
+
+		if value then
+			fullPath = `{value}.{k}`
 		else
-			v21 = nil
+			fullPath = k
 		end
 
-		return `<span class="color-preview" style="background-color: rgba({ v18 },{ v19 },{ v20 },{ v21 or 1 });"></span>`
-	end,
-	formatTokenValue = function(p8) -- line: 45
-		if typeof(p8) == "Color3" then
-			return `rgb({ math.round(p8.R * 255) }, { math.round(p8.G * 255) }, { math.round(p8.B * 255) })`
-		end
+		if type(item) == "table" then
+			if flag and isColorStyle(item) then -- inferred equivalent call
+				local v = not value and "Default" or value:split(".")[1]
 
-		if typeof(p8) == "number" then
-			return (tostring(math.round(p8 * 1000) / 1000))
-		end
-
-		if type(p8) == "table" and (p8.Color3 ~= nil and (typeof(p8.Color3) == "Color3" and (p8.Transparency ~= nil and typeof(p8.Transparency) == "number"))) then
-			local p8Color3 = p8.Color3
-			local p8Transparency = p8.Transparency
-			local v25 = math.round(p8Color3.R * 255)
-			local v26 = math.round(p8Color3.G * 255)
-			local v27 = math.round(p8Color3.B * 255)
-			local v28
-
-			if p8Transparency then
-				v28 = math.round((1 - p8Transparency) * 1000) / 1000
-			else
-				v28 = nil
-			end
-
-			return `rgba({ v25 }, { v26 }, { v27 }, { v28 })`
-		end
-
-		return (tostring(p8))
-	end,
-	formatTokenValueHTML = function(p9) -- line: 60
-		if typeof(p9) == "Color3" then
-			local v30 = math.round(p9.R * 255)
-			local v31 = math.round(p9.G * 255)
-			local v32 = math.round(p9.B * 255)
-
-			return `<span class="color">{ `<span class="color-preview" style="background-color: rgba({ math.round(p9.R * 255) },{ math.round(p9.G * 255) },{ math.round(p9.B * 255) },{ nil or 1 });"></span>` } rgb({ v30 }, { v31 }, { v32 })</span>`
-		end
-
-		if typeof(p9) == "number" then
-			return (tostring(math.round(p9 * 1000) / 1000))
-		end
-
-		if type(p9) == "table" and (p9.Color3 ~= nil and (typeof(p9.Color3) == "Color3" and (p9.Transparency ~= nil and typeof(p9.Transparency) == "number"))) then
-			local p9Color3 = p9.Color3
-			local p9Transparency = p9.Transparency
-			local v35 = math.round(p9Color3.R * 255)
-			local v36 = math.round(p9Color3.G * 255)
-			local v37 = math.round(p9Color3.B * 255)
-			local v38
-
-			if p9Transparency then
-				v38 = math.round((1 - p9Transparency) * 1000) / 1000
-			else
-				v38 = nil
-			end
-
-			local p9Color3_2 = p9.Color3
-			local p9Transparency2 = p9.Transparency
-			local v41 = math.round(p9Color3_2.R * 255)
-			local v42 = math.round(p9Color3_2.G * 255)
-			local v43 = math.round(p9Color3_2.B * 255)
-			local v44
-
-			if p9Transparency2 then
-				v44 = math.round((1 - p9Transparency2) * 1000) / 1000
-			else
-				v44 = nil
-			end
-
-			return `<span class="color">{ `<span class="color-preview" style="background-color: rgba({ v41 },{ v42 },{ v43 },{ v44 or 1 });"></span>` } rgba({ v35 }, { v36 }, { v37 }, { v38 })</span>`
-		end
-
-		return (tostring(p9))
-	end,
-	collectTokens = collectTokens,
-	collectTokensWithSubcategories = function(p10, s4: string, s5: string?, b2: boolean?) -- line: 104
-		-- upvalues: collectTokens (copy)
-		local t2 = {}
-
-		for v60, v61 in p10 do
-			local v62 = if not s5 then v60 else `{ s5 }.{ v60 }`
-
-			if type(v61) == "table" then
-				if b2 and (type(v61) == "table" and (v61.Color3 ~= nil and (typeof(v61.Color3) == "Color3" and (v61.Transparency ~= nil and typeof(v61.Transparency) == "number")))) then
-					local v63 = not s5 and "Default" or s5:split(".")[1]
-
-					if not t2[v63] then
-						t2[v63] = {}
-					end
-
-					table.insert(t2[v63], {
-						key = v60,
-						value = v61,
-						category = s4,
-						fullPath = v62
-					})
-				elseif not s5 then
-					local v64 = collectTokens(v61, s4, v60, b2)
-
-					if #v64 > 0 then
-						t2[v60] = v64
-					end
-				else
-					local v65 = collectTokens(v61, s4, v62, b2)
-					local v66 = s5:split(".")[1]
-
-					if not t2[v66] then
-						t2[v66] = {}
-					end
-
-					for _, v68 in v65 do
-						table.insert(t2[v66], v68)
-					end
-				end
-			else
-				local v69 = not s5 and "Default" or s5:split(".")[1]
-
-				if not t2[v69] then
-					t2[v69] = {}
+				if not tokensWithSubcategories[v] then
+					tokensWithSubcategories[v] = {}
 				end
 
-				table.insert(t2[v69], {
-					key = v60,
-					value = v61,
-					category = s4,
-					fullPath = v62
+				table.insert(tokensWithSubcategories[v], {
+					key = k,
+					value = item,
+					category = category,
+					fullPath = fullPath
 				})
-			end
-		end
-
-		return t2
-	end,
-	hasSubcategories = function(p11) -- line: 168
-		for _, v72 in p11 do
-			if type(v72) ~= "table" then
 				continue
 			end
 
-			local v73 = false
+			if value then
+				local v = collectTokens(item, category, fullPath, flag)
+				local v2 = value:split(".")[1]
 
-			for _, v75 in v72 do
-				if type(v75) == "table" or typeof(v75) == "Color3" or typeof(v75) == "number" then
-					v73 = true
-
-					break
-				end
-			end
-
-			if v73 then
-				return true
-			end
-		end
-
-		return false
-	end,
-	sortTokens = function(s6: string, s7: string, b3: boolean?) -- line: 196
-		if s6:find("(%u%a+)_(%d+)%.?(%u?%w*)") and s7:find("(%u%a+)_(%d+)%.?(%u?%w*)") then
-			local v79, v80, v81 = s6:match("(%u%a+)_(%d+)%.?(%u?%w*)")
-			local v82, v83, v84 = s7:match("(%u%a+)_(%d+)%.?(%u?%w*)")
-
-			if v79 == v82 then
-				if v80 == v83 then
-					return v81 < v84
+				if not tokensWithSubcategories[v2] then
+					tokensWithSubcategories[v2] = {}
 				end
 
-				return tonumber(v80) < tonumber(v83)
-			end
+				for _, v3 in v do
+					table.insert(tokensWithSubcategories[v2], v3)
+				end
+			else
+				local v = collectTokens(item, category, k, flag)
 
-			return s6 < s7
-		end
-
-		if b3 then
-			local v85 = s6:match("| (%-?[%d.]+) |$")
-			local v86 = s7:match("| (%-?[%d.]+) |$")
-
-			return tonumber(v85) < tonumber(v86)
-		end
-
-		return s6 < s7
-	end,
-	orderedTokenCategories = {
-		"Color",
-		"Stroke",
-		"Size",
-		"Radius",
-		"Padding",
-		"Margin",
-		"Gap",
-		"Typography",
-		"FontSize",
-		"FontWeight",
-		"LineHeight",
-		"Ease",
-		"Time",
-		"Inverse",
-		"DarkMode",
-		"LightMode",
-		"Config"
-	},
-	getTokenValue = getTokenValue,
-	setTokenValue = function(p12, s8: string, p13) -- line: 256
-		local parts = string.split(s8, ".")
-
-		for i = 1, #parts - 1 do
-			local v96 = parts[i]
-
-			if p12[v96] == nil then
-				return
-			end
-
-			p12 = p12[v96]
-		end
-
-		local v97 = parts[#parts]
-
-		if p12 and v97 then
-			p12[v97] = p13
-		end
-	end,
-	resolveTokenOverride = function(p14, s9: string, p15) -- line: 307
-		-- upvalues: getTokenValue (copy), Logger (copy), tokenOverrideValuesCompatible (copy)
-		local v109
-
-		if type(p15) == "string" then
-			v109 = getTokenValue(p14, p15)
-
-			if v109 == nil then
-				Logger:warning(`Token override skipped: unknown source token path "{ p15 }"`)
-				v109 = nil
+				if #v > 0 then
+					tokensWithSubcategories[k] = v
+				end
 			end
 		else
-			v109 = p15
+			local v = not value and "Default" or value:split(".")[1]
+
+			if not tokensWithSubcategories[v] then
+				tokensWithSubcategories[v] = {}
+			end
+
+			table.insert(tokensWithSubcategories[v], {
+				key = k,
+				value = item,
+				category = category,
+				fullPath = fullPath
+			})
+		end
+	end
+
+	return tokensWithSubcategories
+end
+
+function TokenProcessingUtilities.hasSubcategories(items): boolean
+	for _, item in items do
+		if type(item) ~= "table" then
+			continue
 		end
 
-		if v109 == nil then
-			return nil
+		local flag = false
+
+		for _, v in item do
+			if type(v) == "table" or typeof(v) == "Color3" or typeof(v) == "number" then
+				flag = true
+				break
+			end
 		end
 
-		local v110 = getTokenValue(p14, s9)
+		if flag then
+			return true
+		end
+	end
 
-		if v110 == nil then
-			Logger:warning(`Token override skipped: unknown target token path "{ s9 }"`)
+	return false
+end
 
-			return nil
+function TokenProcessingUtilities.sortTokens(value: string, value2: string, flag: boolean?): boolean
+	if value:find("(%u%a+)_(%d+)%.?(%u?%w*)") and value2:find("(%u%a+)_(%d+)%.?(%u?%w*)") then
+		local match, v, v2 = value:match("(%u%a+)_(%d+)%.?(%u?%w*)")
+		local match2, v3, v4 = value2:match("(%u%a+)_(%d+)%.?(%u?%w*)")
+
+		if match ~= match2 then
+			return value < value2
 		end
 
-		if not tokenOverrideValuesCompatible(v110, v109) then
-			Logger:warning(`Token override skipped: type or shape mismatch for "{ s9 }"`)
-
-			return nil
+		if v == v3 then
+			return v2 < v4
 		end
 
-		return v109
-	end,
-	_resolveTokenOverrideSource = resolveTokenOverrideSource
+		return tonumber(v) < tonumber(v3)
+	else
+		if not flag then
+			return value < value2
+		end
+
+		local match = value:match("| (%-?[%d.]+) |$")
+		local match2 = value2:match("| (%-?[%d.]+) |$")
+		return tonumber(match) < tonumber(match2)
+	end
+end
+
+TokenProcessingUtilities.orderedTokenCategories = {
+	"Color",
+	"Stroke",
+	"Size",
+	"Radius",
+	"Padding",
+	"Margin",
+	"Gap",
+	"Typography",
+	"FontSize",
+	"FontWeight",
+	"LineHeight",
+	"Ease",
+	"Time",
+	"Inverse",
+	"DarkMode",
+	"LightMode",
+	"Config"
 }
+TokenProcessingUtilities.getTokenValue = getTokenValue
+
+function TokenProcessingUtilities.setTokenValue(p, value: string, p2)
+	local v = string.split(value, ".")
+
+	for i = 1, #v - 1 do
+		local v2 = v[i]
+
+		if p[v2] == nil then
+			return
+		end
+
+		p = p[v2]
+	end
+
+	local v2 = v[#v]
+
+	if p and v2 then
+		p[v2] = p2
+	end
+end
+
+function TokenProcessingUtilities.resolveTokenOverride(p, p2: string, value)
+	local tokenOverrideSource = resolveTokenOverrideSource(p, value) -- inferred equivalent call
+
+	if tokenOverrideSource == nil then
+		return nil
+	end
+
+	local tokenValue = getTokenValue(p, p2)
+
+	if tokenValue == nil then
+		Logger:warning(`Token override skipped: unknown target token path "{p2}"`)
+		return nil
+	end
+
+	if tokenOverrideValuesCompatible(tokenValue, tokenOverrideSource) then
+		return tokenOverrideSource
+	end
+
+	Logger:warning(`Token override skipped: type or shape mismatch for "{p2}"`)
+	return nil
+end
+
+TokenProcessingUtilities._resolveTokenOverrideSource = resolveTokenOverrideSource
+return TokenProcessingUtilities

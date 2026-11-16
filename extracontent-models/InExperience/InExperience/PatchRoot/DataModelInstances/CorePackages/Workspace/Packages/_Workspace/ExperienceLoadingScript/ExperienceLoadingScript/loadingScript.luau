@@ -1,35 +1,63 @@
 local ExperienceLoadingScript = script:FindFirstAncestor("ExperienceLoadingScript")
-local ExperienceLoadingScriptParent = ExperienceLoadingScript.Parent
-local Players = require(ExperienceLoadingScriptParent.MockableProxyServices).Players
-local ReplicatedFirst = require(ExperienceLoadingScriptParent.MockableProxyServices).ReplicatedFirst
-local RunService = require(ExperienceLoadingScriptParent.MockableProxyServices).RunService
-local VRService = require(ExperienceLoadingScriptParent.MockableProxyServices).VRService
-local SplashScreenManager = require(ExperienceLoadingScriptParent.SplashScreenManager).SplashScreenManager
-local IsVRAppBuild = require(ExperienceLoadingScriptParent.AppCommonLib).IsVRAppBuild
-local FFlagEnableTiltLoadingScreen = require(ExperienceLoadingScriptParent.SharedFlags).FFlagEnableTiltLoadingScreen
+local parent = ExperienceLoadingScript.Parent
+
+local Foundation = require(parent.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
+
+local MockableProxyServices = require(parent.MockableProxyServices)
+local Players = MockableProxyServices.Players
+local MockableProxyServices2 = require(parent.MockableProxyServices)
+local ReplicatedFirst = MockableProxyServices2.ReplicatedFirst
+local MockableProxyServices3 = require(parent.MockableProxyServices)
+local RunService = MockableProxyServices3.RunService
+local MockableProxyServices4 = require(parent.MockableProxyServices)
+local VRService = MockableProxyServices4.VRService
+local SplashScreenManager = require(parent.SplashScreenManager)
+local splashScreenManager = SplashScreenManager.SplashScreenManager
+local AppCommonLib = require(parent.AppCommonLib)
+local IsVRAppBuild = AppCommonLib.IsVRAppBuild
+
+local LoadingScreenMilestones = require(parent.ProgressLoading.LoadingScreenMilestones)
+local AbortReason = LoadingScreenMilestones.AbortReason
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLoadingScreenMilestones = SharedFlags.FFlagLoadingScreenMilestones
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLoadingScreenControlMilestones = SharedFlags2.FFlagLoadingScreenControlMilestones
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagTiltLoadingScreenEnterExitHold = SharedFlags3.FFlagTiltLoadingScreenEnterExitHold
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagEnableTiltLoadingScreen = SharedFlags4.FFlagEnableTiltLoadingScreen
+
 local CoreGui = game:GetService("CoreGui")
-local game2 = require(ExperienceLoadingScriptParent.MockableProxyServices).game
-local waitProxy = require(ExperienceLoadingScriptParent.MockableProxyServices).waitProxy
-local settingsProxy = require(ExperienceLoadingScriptParent.MockableProxyServices).settingsProxy
+
+local MockableProxyServices5 = require(parent.MockableProxyServices)
+local Game = MockableProxyServices5.game
+local MockableProxyServices6 = require(parent.MockableProxyServices)
+local waitProxy = MockableProxyServices6.waitProxy
+local MockableProxyServices7 = require(parent.MockableProxyServices)
+local settingsProxy = MockableProxyServices7.settingsProxy
 
 game:DefineFastInt("FPSAwareSplashScreenTimeout", 30)
 
-local v14 = game:DefineFastFlag("ExperienceLoadingScreenFixStyleLink", false)
-local UIBlox = require(ExperienceLoadingScriptParent.UIBlox)
-local UIBloxInGameConfig = require(ExperienceLoadingScriptParent.CoreScriptsInitializer).UIBloxInGameConfig
-
+local UIBlox = require(parent.UIBlox)
+local CoreScriptsInitializer = require(parent.CoreScriptsInitializer)
+local UIBloxInGameConfig = CoreScriptsInitializer.UIBloxInGameConfig
 UIBlox.init(UIBloxInGameConfig)
 
 local Constants = UIBlox.App.Style.Constants
-local UiModeStyleProvider = require(ExperienceLoadingScriptParent.Style).UiModeStyleProvider
-local Create = require(ExperienceLoadingScriptParent.AppCommonLib).Create
+
+local Style = require(parent.Style)
+local UiModeStyleProvider = Style.UiModeStyleProvider
+
+local AppCommonLib2 = require(parent.AppCommonLib)
+local Create = AppCommonLib2.Create
 local LoadingScreen = require(ExperienceLoadingScript.LoadingScreen)
 local LoadingScreenReducer = require(ExperienceLoadingScript.Reducers.LoadingScreenReducer)
-local LoggingProtocol = require(ExperienceLoadingScriptParent.LoggingProtocol)
+local LoggingProtocol = require(parent.LoggingProtocol)
 
-local function GenerateDevGUIBlackoutCurtain() -- line: 39
-	-- upvalues: Create (copy), CoreGui (copy)
-	local v26 = Create("ScreenGui")({
+local function GenerateDevGUIBlackoutCurtain()
+	local devGUIBlackoutCurtain = Create("ScreenGui")({
 		Name = "DevGUIBlackoutCurtain",
 		DisplayOrder = 8,
 		IgnoreGuiInset = true
@@ -37,364 +65,355 @@ local function GenerateDevGUIBlackoutCurtain() -- line: 39
 
 	Create("Frame")({
 		Name = "BlackFrame",
-		BackgroundTransparency = 0,
-		Active = true,
 		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+		BackgroundTransparency = 0,
 		Size = UDim2.fromScale(10, 10),
 		Position = UDim2.fromOffset(0, 0),
-		Parent = v26
+		Active = true,
+		Parent = devGUIBlackoutCurtain
 	})
-	v26.Parent = CoreGui
 
-	return v26
+	devGUIBlackoutCurtain.Parent = CoreGui
+
+	return devGUIBlackoutCurtain
 end
-local function mountTiltLoadingScreen(p1, p2: ((...any) -> ...any)) -- line: 60
-	-- upvalues: ExperienceLoadingScriptParent (copy), CoreGui (copy), game2 (copy), LoggingProtocol (copy)
-	local React = require(ExperienceLoadingScriptParent.React)
-	local ReactRoblox = require(ExperienceLoadingScriptParent.ReactRoblox)
-	local TiltLoadingScreen = require(ExperienceLoadingScriptParent.ProgressLoading).TiltLoadingScreen
-	local Folder = Instance.new("Folder")
 
-	Folder.Name = "RobloxLoadingGUI"
-	Folder.Parent = CoreGui
+local function mountTiltLoadingScreen(placeId, cleanUpTilt, p)
+	local React = require(parent.React)
+	local ReactRoblox = require(parent.ReactRoblox)
+	local ProgressLoading = require(parent.ProgressLoading)
+	local tiltLoadingScreen = ProgressLoading.TiltLoadingScreen
 
-	local v33 = ReactRoblox.createRoot(Folder)
-	local u34 = false
+	local robloxLoadingGUI = Instance.new("Folder")
+	robloxLoadingGUI.Name = "RobloxLoadingGUI"
+	robloxLoadingGUI.Parent = CoreGui
 
-	local function unmount() -- line: 71
-		-- upvalues: v33 (copy), Folder (copy)
-		v33:unmount()
-		Folder:Destroy()
+	local root = ReactRoblox.createRoot(robloxLoadingGUI)
+	local v = false
+	local function unmount() -- 1 equivalent call inferred from this helper
+		if FFlagLoadingScreenMilestones and p then
+			p.abort(AbortReason.Unmounted)
+		end
+
+		root:unmount()
+		robloxLoadingGUI:Destroy()
+	end
+	local function onCancel(flag: boolean?, flag2: boolean?)
+		if v or flag2 and Game:IsLoaded() then
+			return
+		end
+
+		v = true
+
+		if FFlagLoadingScreenMilestones and p then
+			p.abort(AbortReason.Cancelled)
+		end
+
+		if flag then
+			LoggingProtocol.default:logEventOnce("first_experience_cancelled")
+		end
+
+		Game:Shutdown()
 	end
 
-	v33:render(React.createElement(TiltLoadingScreen, {
-		placeId = p1,
-		onCancel = function(b1: boolean?) -- line: 75
-			-- upvalues: u34 (ref), game2 (copy), LoggingProtocol (copy)
-			if u34 or game2:IsLoaded() then
-				return
-			end
+	local createElement = React.createElement
+	local milestones
 
-			u34 = true
+	if FFlagLoadingScreenMilestones then
+		milestones = p
+	end
 
-			if b1 then
-				LoggingProtocol.default:logEventOnce("first_experience_cancelled")
-			end
-
-			game2:Shutdown()
-		end,
-		onDismissComplete = function() -- line: 89
-			-- upvalues: v33 (copy), Folder (copy), p2 (copy), LoggingProtocol (copy)
-			v33:unmount()
-			Folder:Destroy()
-			p2()
+	root:render(createElement(tiltLoadingScreen, {
+		milestones = milestones,
+		placeId = placeId,
+		onCancel = onCancel,
+		onDismissComplete = function()
+			unmount() -- inferred equivalent call
+			cleanUpTilt()
 			LoggingProtocol.default:logEventOnce("first_experience_interactive")
 		end
 	}))
 
 	return unmount
 end
-local function u25(p3, p4) -- line: 103
-	-- upvalues: GenerateDevGUIBlackoutCurtain (copy), ExperienceLoadingScriptParent (copy), LoadingScreenReducer (copy), LoadingScreen (copy), UiModeStyleProvider (copy), Constants (copy), v14 (copy), CoreGui (copy), RunService (copy), waitProxy (copy), SplashScreenManager (copy), ExperienceLoadingScript (copy), Players (copy), game2 (copy), VRService (copy), IsVRAppBuild (copy), FFlagEnableTiltLoadingScreen (copy), ReplicatedFirst (copy), LoggingProtocol (copy), mountTiltLoadingScreen (copy), u25 (ref), settingsProxy (copy)
-	local u38 = true
-	local u39 = false
-	local u40 = false
-	local u41 = nil
-	local u42 = nil
-	local u43 = GenerateDevGUIBlackoutCurtain()
-	local Roact = nil
 
-	local function v45(n1: number) -- line: 166
-		-- upvalues: u38 (ref), Roact (ref), waitProxy (copy), u42 (ref), SplashScreenManager (copy), u41 (ref), u43 (ref), ExperienceLoadingScript (copy)
-		u38 = false
+local function fn(placeId, p)
+	local v = true
+	local v2 = false
+	local v3 = false
 
-		if Roact then
-			waitProxy(0.6)
+	local fn2
+	local v4 = nil
+	local v5 = nil
 
-			if u42 ~= nil then
-				Roact.unmount(u42)
-				u42 = nil
-			end
+	local parent2 = GenerateDevGUIBlackoutCurtain()
+
+	local v6 = nil
+
+	local function fn3(placeId2)
+		local Roact = require(parent.Roact)
+		v6 = Roact
+		local Rodux = require(parent.Rodux)
+		local RoactRodux = require(parent.RoactRodux)
+		local store = Rodux.Store.new(LoadingScreenReducer, {}, { Rodux.thunkMiddleware })
+
+		local createElement = v6.createElement
+		local milestones
+
+		if FFlagLoadingScreenControlMilestones then
+			milestones = v5
 		end
 
-		SplashScreenManager.initialize(n1 / 2, game:GetFastInt("FPSAwareSplashScreenTimeout"), n1)
-		SplashScreenManager.addStatusChangeListener(function(p5) -- line: 172
-			-- upvalues: u38 (ref), u41 (ref)
-			u38 = p5
+		local element = createElement(LoadingScreen, { placeId = placeId2, milestones = milestones })
 
-			if u38 and u41 then
-				u41()
+		local element2 = v6.createElement(RoactRodux.StoreProvider, { store = store }, {
+			v6.createElement(UiModeStyleProvider, {
+				style = { themeName = ColorMode.Dark, fontName = Constants.FontName.Gotham }
+			}, { loadingScreenUI = element })
+		})
+
+		local element3 = v6.createElement("Folder", nil, element2)
+		local v7 = v6.mount(element3, CoreGui, "RobloxLoadingGUI")
+
+		RunService.Heartbeat:Wait()
+		parent2.Enabled = false
+		return v7
+	end
+
+	local function fn4() -- 2 equivalent calls inferred from this helper
+		if v6 then
+			waitProxy(0.6)
+
+			if v4 ~= nil then
+				if FFlagLoadingScreenControlMilestones and v5 then
+					v5.record(LoadingScreenMilestones.Milestone.ScreenHidden)
+					v5.complete()
+				end
+
+				v6.unmount(v4)
+				v4 = nil
+			end
+		end
+	end
+
+	local function fn5(p2: number)
+		v = false
+		fn4() -- inferred equivalent call
+		splashScreenManager.initialize(p2 / 2, game:GetFastInt("FPSAwareSplashScreenTimeout"), p2)
+		splashScreenManager.addStatusChangeListener(function(p3)
+			v = p3
+
+			if v and fn2 then
+				fn2()
 			end
 		end)
-		u43.Enabled = true
-		require(ExperienceLoadingScript.LoadingScreen3D).Parent = u43
+		parent2.Enabled = true
+
+		local LoadingScreen3D = require(ExperienceLoadingScript.LoadingScreen3D)
+		LoadingScreen3D.Parent = parent2
 	end
-	local function v46() -- line: 198
-		-- upvalues: game2 (copy), Players (copy), u39 (ref), u41 (ref)
-		if game2:IsLoaded() then
-			if Players.CharacterAutoLoads then
-				local LocalPlayer = Players.LocalPlayer
 
-				if not LocalPlayer then
-					Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-					LocalPlayer = Players.LocalPlayer
-				end
+	local function fn6() -- 2 equivalent calls inferred from this helper
+		if Players.CharacterAutoLoads then
+			local localPlayer = Players.LocalPlayer
 
-				if not LocalPlayer.Character then
-					LocalPlayer.CharacterAdded:Wait()
-				end
+			if not localPlayer then
+				Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+				localPlayer = Players.LocalPlayer
 			end
 
-			u39 = true
+			if not localPlayer.Character then
+				localPlayer.CharacterAdded:Wait()
+			end
+		end
+	end
 
-			if u41 then
-				u41()
+	local function onFinishedReplicating()
+		if Game:IsLoaded() then
+			if FFlagLoadingScreenControlMilestones and v5 then
+				v5.dismissRequested(LoadingScreenMilestones.DismissSource.NormalReady)
+			end
 
-				return
+			fn6() -- inferred equivalent call
+			v2 = true
+
+			if fn2 then
+				fn2()
 			end
 		else
-			local u63 = nil
+			local loadedConnection = nil
+			loadedConnection = Game.Loaded:Connect(function()
+				loadedConnection:Disconnect()
+				loadedConnection = nil
 
-			u63 = game2.Loaded:Connect(function() -- line: 207
-				-- upvalues: u63 (ref), Players (copy), u39 (ref), u41 (ref)
-				u63:Disconnect()
-				u63 = nil
-
-				if Players.CharacterAutoLoads then
-					local LocalPlayer = Players.LocalPlayer
-
-					if not LocalPlayer then
-						Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-						LocalPlayer = Players.LocalPlayer
-					end
-
-					if not LocalPlayer.Character then
-						LocalPlayer.CharacterAdded:Wait()
-					end
+				if FFlagLoadingScreenControlMilestones and v5 then
+					v5.dismissRequested(LoadingScreenMilestones.DismissSource.NormalReady)
 				end
 
-				u39 = true
+				fn6() -- inferred equivalent call
+				v2 = true
 
-				if u41 then
-					u41()
+				if fn2 then
+					fn2()
 				end
 			end)
+		end
+	end
+
+	local function fn7() -- 4 equivalent calls inferred from this helper
+		if parent2 then
+			parent2.Enabled = false
+			parent2:Destroy()
+			parent2 = nil
 		end
 	end
 
 	if VRService.VREnabled or IsVRAppBuild() then
-		v45(p4)
-	else
-		if FFlagEnableTiltLoadingScreen then
-			if ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
-				if u43 then
-					u43.Enabled = false
-					u43:Destroy()
-					u43 = nil
+		fn5(p)
+	elseif FFlagEnableTiltLoadingScreen then
+		if ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
+			fn7() -- inferred equivalent call
+			ReplicatedFirst:SetDefaultLoadingGuiRemoved()
+			LoggingProtocol.default:logEventOnce("first_experience_interactive")
+			return
+		else
+			local vREnabledChangedConnection = nil
+			local flag = true
+			local function cleanUpTilt() -- 1 equivalent call inferred from this helper
+				flag = false
+
+				if vREnabledChangedConnection then
+					vREnabledChangedConnection:Disconnect()
+					vREnabledChangedConnection = nil
 				end
 
-				ReplicatedFirst:SetDefaultLoadingGuiRemoved()
-				LoggingProtocol.default:logEventOnce("first_experience_interactive")
-
-				return
+				fn7() -- inferred equivalent call
 			end
 
-			local u47 = nil
-			local u48 = true
+			local v7
 
-			local function cleanUpTilt() -- line: 230
-				-- upvalues: u48 (ref), u47 (ref), u43 (ref)
-				u48 = false
+			if FFlagLoadingScreenMilestones then
+				local start = LoadingScreenMilestones.start
+				local v8 = {
+					page = LoadingScreenMilestones.Page.TiltLoadingScreen,
+					holdEnabled = FFlagTiltLoadingScreenEnterExitHold,
+					reducedMotion = 0
+				}
 
-				if u47 then
-					u47:Disconnect()
-					u47 = nil
-				end
-
-				if u43 then
-					u43.Enabled = false
-					u43:Destroy()
-					u43 = nil
-				end
+				local UserGameSettings = UserSettings():GetService("UserGameSettings")
+				v8.reducedMotion = UserGameSettings.ReducedMotion
+				v7 = start(v8)
+			else
+				v7 = nil
 			end
 
-			local v50 = mountTiltLoadingScreen(p3, cleanUpTilt)
+			local v8 = mountTiltLoadingScreen(placeId, cleanUpTilt, v7)
 
-			local function transitionToVR() -- line: 240
-				-- upvalues: u48 (ref), u47 (ref), u43 (ref), v50 (copy), u25 (ref), p3 (copy), p4 (copy)
-				if not u48 then
+			local function transitionToVR() -- 2 equivalent calls inferred from this helper
+				if not flag then
 					return
 				end
 
-				u48 = false
-
-				if u47 then
-					u47:Disconnect()
-					u47 = nil
+				if FFlagLoadingScreenMilestones and v7 then
+					v7.abort(AbortReason.VRHandoff)
 				end
 
-				if u43 then
-					u43.Enabled = false
-					u43:Destroy()
-					u43 = nil
-				end
-
-				v50()
-				u25(p3, p4)
+				cleanUpTilt() -- inferred equivalent call
+				v8()
+				fn(placeId, p)
 			end
 
-			u47 = VRService:GetPropertyChangedSignal("VREnabled"):Connect(function() -- line: 249
-				-- upvalues: VRService (copy), u48 (ref), u47 (ref), u43 (ref), v50 (copy), u25 (ref), p3 (copy), p4 (copy)
+			vREnabledChangedConnection = VRService:GetPropertyChangedSignal("VREnabled"):Connect(function()
 				if VRService.VREnabled then
-					if not u48 then
-						return
-					end
-
-					u48 = false
-
-					if u47 then
-						u47:Disconnect()
-						u47 = nil
-					end
-
-					if u43 then
-						u43.Enabled = false
-						u43:Destroy()
-						u43 = nil
-					end
-
-					v50()
-					u25(p3, p4)
+					transitionToVR() -- inferred equivalent call
 				end
 			end)
 
-			if VRService.VREnabled and u48 then
-				u48 = false
-
-				if u47 then
-					u47:Disconnect()
-					u47 = nil
-				end
-
-				if u43 then
-					u43.Enabled = false
-					u43:Destroy()
-					u43 = nil
-				end
-
-				v50()
-				u25(p3, p4)
+			if VRService.VREnabled then
+				transitionToVR() -- inferred equivalent call
 			end
 
-			if u48 then
+			if flag then
 				RunService.Heartbeat:Wait()
 
-				if u48 then
-					u43.Enabled = false
+				if flag then
+					parent2.Enabled = false
 				end
 			end
 
 			return
 		end
-
-		VRService:GetPropertyChangedSignal("VREnabled"):Connect(function() -- line: 269
-			-- upvalues: VRService (copy), v45 (copy), p4 (copy)
+	else
+		VRService:GetPropertyChangedSignal("VREnabled"):Connect(function()
 			if VRService.VREnabled then
-				v45(p4)
+				if FFlagLoadingScreenControlMilestones and v5 then
+					v5.abort(AbortReason.VRHandoff)
+				end
+
+				fn5(p)
 			end
 		end)
-		u42 = (function(p6) -- line: 124
-			-- upvalues: Roact (ref), ExperienceLoadingScriptParent (copy), LoadingScreenReducer (copy), LoadingScreen (copy), UiModeStyleProvider (copy), Constants (copy), v14 (copy), CoreGui (copy), RunService (copy), u43 (ref)
-			Roact = require(ExperienceLoadingScriptParent.Roact)
 
-			local Rodux = require(ExperienceLoadingScriptParent.Rodux)
-			local RoactRodux = require(ExperienceLoadingScriptParent.RoactRodux)
-			local v56 = Rodux.Store.new(LoadingScreenReducer, {}, { Rodux.thunkMiddleware })
-			local v57 = Roact.createElement(LoadingScreen, {
-				placeId = p6
-			})
-			local v58 = Roact.createElement(RoactRodux.StoreProvider, {
-				store = v56
-			}, { Roact.createElement(UiModeStyleProvider, {
-				style = {
-					themeName = Constants.ThemeName.Dark,
-					fontName = Constants.FontName.Gotham
-				}
-			}, {
-				loadingScreenUI = v57
-			}) })
+		if FFlagLoadingScreenControlMilestones and not ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
+			local start = LoadingScreenMilestones.start
+			local v7 = {
+				page = LoadingScreenMilestones.Page.LoadingScreenView,
+				holdEnabled = false,
+				reducedMotion = 0
+			}
 
-			if v14 then
-				v58 = Roact.createElement("Folder", nil, v58)
-			end
+			local UserGameSettings = UserSettings():GetService("UserGameSettings")
+			v7.reducedMotion = UserGameSettings.ReducedMotion
+			v5 = start(v7)
+		end
 
-			local v59 = Roact.mount(v58, CoreGui, "RobloxLoadingGUI")
-
-			RunService.Heartbeat:Wait()
-			u43.Enabled = false
-
-			return v59
-		end)(p3)
+		v4 = fn3(placeId)
 	end
 
-	function u41() -- line: 279
-		-- upvalues: VRService (copy), u38 (ref), settingsProxy (copy), u43 (ref), ReplicatedFirst (copy), LoggingProtocol (copy), u39 (ref), u40 (ref), Roact (ref), waitProxy (copy), u42 (ref)
+	fn2 = function()
 		if VRService.VREnabled then
-			if u38 or settingsProxy().Rendering.QualityLevel ~= Enum.QualityLevel.Automatic then
-				if u43 then
-					u43.Enabled = false
-					u43:Destroy()
-					u43 = nil
-				end
-
+			if v or settingsProxy().Rendering.QualityLevel ~= Enum.QualityLevel.Automatic then
+				fn7() -- inferred equivalent call
 				ReplicatedFirst:SetDefaultLoadingGuiRemoved()
 				LoggingProtocol.default:logEventOnce("first_experience_interactive")
-
-				return
 			end
-		elseif u39 or u40 then
-			if Roact then
-				waitProxy(0.6)
-
-				if u42 ~= nil then
-					Roact.unmount(u42)
-					u42 = nil
-				end
-			end
-
-			if u43 then
-				u43.Enabled = false
-				u43:Destroy()
-				u43 = nil
-			end
-
+		elseif v2 or v3 then
+			fn4() -- inferred equivalent call
+			fn7() -- inferred equivalent call
 			ReplicatedFirst:SetDefaultLoadingGuiRemoved()
 			LoggingProtocol.default:logEventOnce("first_experience_interactive")
 		end
 	end
 
-	ReplicatedFirst.FinishedReplicating:Connect(v46)
+	ReplicatedFirst.FinishedReplicating:Connect(onFinishedReplicating)
 
 	if ReplicatedFirst:IsFinishedReplicating() then
-		v46()
+		onFinishedReplicating()
 	end
 
-	ReplicatedFirst.RemoveDefaultLoadingGuiSignal:Connect(function() -- line: 309
-		-- upvalues: u40 (ref), u41 (ref)
-		u40 = true
+	ReplicatedFirst.RemoveDefaultLoadingGuiSignal:Connect(function()
+		if FFlagLoadingScreenControlMilestones and v5 then
+			v5.dismissRequested(LoadingScreenMilestones.DismissSource.DeveloperOverride)
+		end
 
-		if u41 then
-			u41()
+		v3 = true
+
+		if fn2 then
+			fn2()
 		end
 	end)
 
 	if ReplicatedFirst:IsDefaultLoadingGuiRemoved() then
-		u40 = true
+		if FFlagLoadingScreenControlMilestones and v5 then
+			v5.dismissRequested(LoadingScreenMilestones.DismissSource.DeveloperOverride)
+		end
 
-		if u41 then
-			u41()
+		v3 = true
+
+		if fn2 then
+			fn2()
 		end
 	end
 end
 
-return u25
+return fn

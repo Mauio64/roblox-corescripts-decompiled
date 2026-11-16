@@ -1,198 +1,316 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Cryo = require(ParentParentParent.Cryo)
-local UIBlox = require(ParentParentParent.UIBlox)
-local useAppPolicy = require(ParentParentParent.UniversalAppPolicy).useAppPolicy
-local useRoactService = require(ParentParentParent.RobloxAppHooks).useRoactService
-local RoactServiceTags = require(ParentParentParent.RoactServiceTags)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
+local Foundation = require(parent2.Foundation)
+local UIBlox = require(parent2.UIBlox)
+local UniversalAppPolicy = require(parent2.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent2.RoactServiceTags)
+
+local useTokens = Foundation.Hooks.useTokens
+local PopoverAlign = Foundation.Enums.PopoverAlign
+local PopoverSide = Foundation.Enums.PopoverSide
+
 local NavigationBar = UIBlox.App.Navigation.NavigationBar
 local NavigationRailV2 = UIBlox.App.Navigation.NavigationRailV2
 local NavigationBarAlignment = UIBlox.App.Navigation.Enum.NavigationBarAlignment
 local NavigationRailAlignment = UIBlox.App.Navigation.Enum.NavigationRailAlignment
-local Placement = require(ParentParent.Enum.Placement)
-local AppNavItem = require(ParentParent.Components.AppNavItem)
-local StudioCTAIcon = require(ParentParent.Components.StudioCTAIcon)
-local Constants = require(ParentParent.Constants)
-local VisibilityControl = require(ParentParent.VisibilityControl)
-local getScrollAwayEnabled = require(ParentParent.getScrollAwayEnabled)
-local AppNavTelemetry = require(ParentParent.Telemetry.AppNavTelemetry)
-local EngineFeature = game:GetEngineFeature("WebViewRedesignEnabled")
-local FFlagAddGamepadBumperNavigation = require(ParentParentParent.SharedFlags).FFlagAddGamepadBumperNavigation
-local FFlagShrinkAppNavBar = require(ParentParentParent.SharedFlags).FFlagShrinkAppNavBar
-local FFlagEnableFlyoutOnNavRail = require(ParentParentParent.SharedFlags).FFlagEnableFlyoutOnNavRail
-local v24 = game:DefineFastFlag("AppNavBarGateFooterVisibleOnPlacement", false)
-local v25 = game:DefineFastFlag("AppNavBarFooterVisibleWithoutScrollAway", false)
 
-local function addItems(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}, n1: number) -- line: 56
-	-- upvalues: Cryo (copy)
-	return Cryo.List.join(t1, t3, t2), n1 + #t1
+local Placement = require(parent.Enum.Placement)
+local AppNavItem = require(parent.Components.AppNavItem)
+local StudioCTAIcon = require(parent.Components.StudioCTAIcon)
+local Constants = require(parent.Constants)
+local VisibilityControl = require(parent.VisibilityControl)
+local getScrollAwayEnabled = require(parent.getScrollAwayEnabled)
+
+local AppNavTelemetry = require(parent.Telemetry.AppNavTelemetry)
+local engineFeature = game:GetEngineFeature("WebViewRedesignEnabled")
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagAddGamepadBumperNavigation = SharedFlags.FFlagAddGamepadBumperNavigation
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagShrinkAppNavBar = SharedFlags2.FFlagShrinkAppNavBar
+local SharedFlags3 = require(parent2.SharedFlags)
+local FFlagEnableFlyoutOnNavRail = SharedFlags3.FFlagEnableFlyoutOnNavRail
+local SharedFlags4 = require(parent2.SharedFlags)
+local FFlagEnableNavRailTooltipAndTruncation = SharedFlags4.FFlagEnableNavRailTooltipAndTruncation
+local defineFastFlag = game:DefineFastFlag("AppNavBarGateFooterVisibleOnPlacement", false)
+
+local defineFastFlag2 = game:DefineFastFlag("AppNavBarFooterVisibleWithoutScrollAway", false)
+
+local function addItems(list, p, p2, p3: number)
+	return Cryo.List.join(list, p2, p), p3 + #list
 end
 
-local t4 = {
-	selectedIndex = 1,
-	isVisible = true,
-	clipsDescendants = true
-}
+local v = { selectedIndex = 1, isVisible = true, clipsDescendants = true }
 
-local function AppNavBar(t5: {[any]: any}) -- line: 73
-	-- upvalues: Cryo (copy), t4 (copy), useAppPolicy (copy), useRoactService (copy), RoactServiceTags (copy), React (copy), StudioCTAIcon (copy), EngineFeature (copy), Constants (copy), FFlagEnableFlyoutOnNavRail (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), getScrollAwayEnabled (copy), v25 (copy), VisibilityControl (copy), v24 (copy), Placement (copy), AppNavTelemetry (copy), NavigationBar (copy), NavigationBarAlignment (copy), NavigationRailV2 (copy), NavigationRailAlignment (copy), FFlagAddGamepadBumperNavigation (copy)
-	local v34 = Cryo.Dictionary.join(t4, t5)
-	local v35 = useAppPolicy(function(p1) -- line: 77
-		return p1.getShowStudioCTA()
+local function AppNavBar(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local v2
+
+	if FFlagEnableNavRailTooltipAndTruncation then
+		v2 = useTokens()
+	end
+
+	local v3 = useAppPolicy(function(p2)
+		return p2.getShowStudioCTA()
 	end)
-	local v36 = useRoactService(RoactServiceTags.AppEventIngestService)
-	local v37 = useRoactService(RoactServiceTags.AppLinking)
-	local v38 = React.useCallback(function(_: boolean, p2) -- line: 82
-		-- upvalues: React (copy), StudioCTAIcon (copy), EngineFeature (copy), t5 (copy)
-		return React.createElement(StudioCTAIcon, {
-			controlState = p2,
-			showTooltip = if not EngineFeature then nil else t5.showTooltip
-		})
-	end, { if not EngineFeature then nil else t5.showTooltip })
-	local v39 = React.useCallback(function() -- line: 88
-		-- upvalues: v36 (copy), Constants (copy), v34 (copy), v37 (copy)
-		v36:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_OPEN)
 
-		local v55 = v34.buildCreatorWebNavUrl({
-			utm_content = "side_bar_blue_icon"
-		})
+	local v4 = useRoactService(RoactServiceTags.AppEventIngestService)
+	local v5 = useRoactService(RoactServiceTags.AppLinking)
+	local useCallback = React.useCallback
+	local function fn(_: boolean, controlState)
+		local createElement = React.createElement
+		local showTooltip
 
-		v37:openURL(v55)
-	end, {
-		v36,
-		v37,
-		v34.buildCreatorWebNavUrl
-	})
-	local u46, u47
+		if engineFeature then
+			showTooltip = p.showTooltip
+		end
+
+		return createElement(StudioCTAIcon, {
+			controlState = controlState,
+			showTooltip = showTooltip
+		})
+	end
+
+	local v6
+
+	if engineFeature then
+		v6 = p.showTooltip
+	end
+
+	local renderIcon = useCallback(fn, { v6 })
+	local onActivated = React.useCallback(function()
+		v4:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_OPEN)
+
+		v5:openURL((joined.buildCreatorWebNavUrl({ utm_content = "side_bar_blue_icon" })))
+	end, { v4, v5, joined.buildCreatorWebNavUrl })
+	local items2, selection
 
 	if FFlagEnableFlyoutOnNavRail then
-		local t6 = {}
-		local t7 = {}
+		local menuItems = {}
+		local v7 = {}
 
-		if v34.menuItem ~= nil then
-			table.insert(t6, v34.menuItem)
+		if joined.menuItem ~= nil then
+			table.insert(menuItems, joined.menuItem)
 		end
 
-		if v35 then
-			table.insert(t7, {
+		if v3 then
+			table.insert(v7, {
 				isSecondary = true,
-				renderIcon = v38,
-				onActivated = v39
+				renderIcon = renderIcon,
+				onActivated = onActivated
 			})
 		end
 
-		local items = v34.items
-		local selectedIndex = v34.selectedIndex
-		local v44 = Cryo.List.join(t6, items, t7)
-		local v45 = selectedIndex + #t6
-
-		u46 = v44
-		u47 = v45
+		local items = joined.items
+		local selectedIndex = joined.selectedIndex
+		items2 = Cryo.List.join(menuItems, items, v7)
+		selection = selectedIndex + #menuItems
 	else
-		u46 = v34.items
-		u47 = v34.selectedIndex
+		items2 = joined.items
+		selection = joined.selectedIndex
 
-		if v35 then
-			u46 = Cryo.List.join(u46)
-			table.insert(u46, {
+		if v3 then
+			items2 = Cryo.List.join(items2)
+			table.insert(items2, {
 				isSecondary = true,
-				renderIcon = v38,
-				onActivated = v39
+				renderIcon = renderIcon,
+				onActivated = onActivated
 			})
 		end
 	end
 
-	local v48 = nil
-	local v49 = React.useCallback(function(p3, b2: boolean) -- line: 130
-		-- upvalues: React (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), v34 (copy)
-		return React.createElement(AppNavItem, {
+	local v7 = nil
+	local renderItem = React.useCallback(function(p2, isChecked: boolean)
+		local createElement = React.createElement
+		local systemBarLabelTextSizeBinding
+
+		if not FFlagShrinkAppNavBar then
+			systemBarLabelTextSizeBinding = joined.systemBarLabelTextSizeBinding
+		end
+
+		return createElement(AppNavItem, {
+			item = p2,
+			isChecked = isChecked,
 			isCenterPositioned = true,
 			hasLabel = true,
-			item = p3,
-			isChecked = b2,
-			systemBarLabelTextSizeBinding = if not FFlagShrinkAppNavBar then v34.systemBarLabelTextSizeBinding else nil
+			systemBarLabelTextSizeBinding = systemBarLabelTextSizeBinding,
+			fillWidth = FFlagEnableNavRailTooltipAndTruncation and true or nil,
+			enableTooltip = not FFlagEnableNavRailTooltipAndTruncation and nil
 		})
-	end, { v34.systemBarLabelTextSizeBinding })
-	local v50 = React.useCallback(function(p4, b3: boolean) -- line: 140
-		-- upvalues: React (copy), AppNavItem (copy), FFlagShrinkAppNavBar (copy), v34 (copy)
-		return React.createElement(AppNavItem, {
+	end, { joined.systemBarLabelTextSizeBinding })
+
+	local renderItem2 = React.useCallback(function(p2, isChecked: boolean)
+		local createElement = React.createElement
+		local systemBarLabelTextSizeBinding
+
+		if not FFlagShrinkAppNavBar then
+			systemBarLabelTextSizeBinding = joined.systemBarLabelTextSizeBinding
+		end
+
+		local width
+
+		if FFlagEnableNavRailTooltipAndTruncation then
+			width = UDim.new(1, 0)
+		end
+
+		local enableTooltip
+
+		if FFlagEnableNavRailTooltipAndTruncation then
+			enableTooltip = p2.labelText ~= nil
+		end
+
+		local tooltipSide
+
+		if FFlagEnableNavRailTooltipAndTruncation then
+			tooltipSide = PopoverSide.Right
+		end
+
+		local tooltipAlign
+
+		if FFlagEnableNavRailTooltipAndTruncation then
+			tooltipAlign = PopoverAlign.Center
+		end
+
+		return createElement(AppNavItem, {
+			item = p2,
+			isChecked = isChecked,
 			isCenterPositioned = false,
 			hasLabel = true,
-			item = p4,
-			isChecked = b3,
-			systemBarLabelTextSizeBinding = if not FFlagShrinkAppNavBar then v34.systemBarLabelTextSizeBinding else nil
+			systemBarLabelTextSizeBinding = systemBarLabelTextSizeBinding,
+			width = width,
+			enableTooltip = enableTooltip,
+			tooltipSide = tooltipSide,
+			tooltipAlign = tooltipAlign
 		})
-	end, { v34.systemBarLabelTextSizeBinding })
-	local v51 = nil
+	end, { joined.systemBarLabelTextSizeBinding })
+	local visibility
 
-	if getScrollAwayEnabled() or v25 then
-		v51 = VisibilityControl.getFooterBinding()
-		React.useEffect(function() -- line: 154
-			-- upvalues: v24 (copy), v34 (copy), Placement (copy), VisibilityControl (copy)
-			local v60 = if not v24 then v34.isVisible else v34.isVisible and v34.placement == Placement.Bottom
+	if getScrollAwayEnabled() or defineFastFlag2 then
+		visibility = VisibilityControl.getFooterBinding()
+		local useEffect = React.useEffect
+		local function fn2()
+			local v8
 
-			VisibilityControl.setFooterVisible(v60)
-		end, {
-			v34.isVisible,
-			if not v24 then nil else v34.placement
-		})
-	end
+			if defineFastFlag then
+				v8 = joined.isVisible and joined.placement == Placement.Bottom
+			else
+				v8 = joined.isVisible
+			end
 
-	React.useEffect(function() -- line: 164
-		-- upvalues: FFlagEnableFlyoutOnNavRail (copy), u46 (ref), u47 (ref), v34 (copy), AppNavTelemetry (copy)
-		local v61 = if not FFlagEnableFlyoutOnNavRail then v34.items[v34.selectedIndex] else u46[u47]
-
-		if v61 ~= nil and v61.page ~= nil then
-			AppNavTelemetry.logSwitchTabEnd(v61.page)
+			VisibilityControl.setFooterVisible(v8)
 		end
-	end, if not FFlagEnableFlyoutOnNavRail then {
-		v34.items,
-		v34.selectedIndex
-	} else {
-		u46,
-		u47
-	})
-	React.useEffect(function() -- line: 185
-		-- upvalues: AppNavTelemetry (copy), v34 (copy)
-		AppNavTelemetry.logVisibilityEnd(v34.isVisible)
-	end, { v34.isVisible })
-	React.useEffect(function() -- line: 188
-		-- upvalues: AppNavTelemetry (copy), v34 (copy)
-		AppNavTelemetry.logPlacement(v34.placement)
-	end, { v34.placement })
+		local isVisible = joined.isVisible
+		local v8
 
-	if v34.placement == Placement.Bottom then
-		v48 = React.createElement(NavigationBar, {
-			animated = true,
-			active = true,
-			alignment = NavigationBarAlignment.EvenlyDistributed,
-			items = u46,
-			isVisible = v34.isVisible,
-			size = v34.size,
-			renderItem = v49,
-			position = v34.position,
-			selection = u47,
-			clipsDescendants = v34.clipsDescendants,
-			visibility = v51
-		})
-	elseif v34.placement == Placement.Left then
-		v48 = React.createElement(NavigationRailV2, {
-			animated = true,
-			alignment = NavigationRailAlignment.Justified,
-			items = u46,
-			renderItem = v50,
-			size = v34.size,
-			isVisible = v34.isVisible,
-			position = v34.position,
-			selection = u47,
-			clipsDescendants = v34.clipsDescendants,
-			leadingComponent = if not FFlagAddGamepadBumperNavigation then nil else v34.leadingComponent,
-			trailingComponent = if not FFlagAddGamepadBumperNavigation then nil else v34.trailingComponent
-		})
+		if defineFastFlag then
+			v8 = joined.placement
+		end
+
+		useEffect(fn2, { isVisible, v8 })
 	end
 
-	return v48
+	local useEffect = React.useEffect
+	local function fn2()
+		local v8
+
+		if FFlagEnableFlyoutOnNavRail then
+			v8 = items2[selection]
+		else
+			v8 = joined.items[joined.selectedIndex]
+		end
+
+		if v8 ~= nil and v8.page ~= nil then
+			AppNavTelemetry.logSwitchTabEnd(v8.page)
+		end
+	end
+
+	local v8
+
+	if FFlagEnableFlyoutOnNavRail then
+		v8 = { items2, selection }
+	else
+		v8 = { joined.items, joined.selectedIndex }
+	end
+
+	useEffect(fn2, v8)
+
+	React.useEffect(function()
+		AppNavTelemetry.logVisibilityEnd(joined.isVisible)
+	end, { joined.isVisible })
+	React.useEffect(function()
+		AppNavTelemetry.logPlacement(joined.placement)
+	end, { joined.placement })
+
+	if joined.placement == Placement.Bottom then
+		local createElement = React.createElement
+		local v9 = {
+			alignment = NavigationBarAlignment.EvenlyDistributed,
+			items = items2,
+			isVisible = joined.isVisible,
+			size = joined.size,
+			renderItem = renderItem,
+			position = joined.position,
+			selection = selection,
+			clipsDescendants = joined.clipsDescendants,
+			animated = true,
+			visibility = visibility,
+			active = true,
+			spacing = 0
+		}
+		local spacing
+
+		if FFlagEnableNavRailTooltipAndTruncation then
+			spacing = UDim.new(0, v2.Gap.Small)
+		end
+
+		v9.spacing = spacing
+		return (createElement(NavigationBar, v9))
+	elseif joined.placement == Placement.Left then
+		local createElement = React.createElement
+		local v9 = {
+			alignment = NavigationRailAlignment.Justified,
+			items = items2,
+			renderItem = renderItem2,
+			size = joined.size,
+			animated = true,
+			isVisible = joined.isVisible,
+			position = joined.position,
+			selection = selection,
+			clipsDescendants = joined.clipsDescendants,
+			leadingComponent = 0,
+			trailingComponent = 0,
+			spacing = 0
+		}
+		local leadingComponent
+
+		if FFlagAddGamepadBumperNavigation then
+			leadingComponent = joined.leadingComponent
+		end
+
+		v9.leadingComponent = leadingComponent
+		local trailingComponent
+
+		if FFlagAddGamepadBumperNavigation then
+			trailingComponent = joined.trailingComponent
+		end
+
+		v9.trailingComponent = trailingComponent
+		local spacing
+
+		if FFlagEnableNavRailTooltipAndTruncation then
+			spacing = UDim.new(0, v2.Gap.Small)
+		end
+
+		v9.spacing = spacing
+		return (createElement(NavigationRailV2, v9))
+	end
+
+	return v7
 end
 
 return React.memo(AppNavBar)

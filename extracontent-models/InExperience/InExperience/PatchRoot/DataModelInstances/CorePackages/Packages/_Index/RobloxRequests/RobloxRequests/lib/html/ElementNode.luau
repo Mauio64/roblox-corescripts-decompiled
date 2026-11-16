@@ -1,455 +1,442 @@
-local t1 = {}
+local class = {}
+class.mt = { __index = class }
 
-t1.mt = {
-	__index = t1
-}
+function class:new(list)
+	local v = {}
 
-function t1.new(_, p2) -- line: 5
-	-- upvalues: t1 (copy)
-	local t2 = {}
-	local v9 = nil
+	local v2 = getmetatable(list) == class.mt or nil
 
-	if getmetatable(p2) == t1.mt then
-		v9 = true
-	end
-
-	if type(p2) == "table" then
-		if not v9 and #p2 > 0 then
-			for _, v in ipairs(p2) do
-				t2[v] = true
+	if type(list) == "table" then
+		if v2 or not (#list > 0) then
+			for k in pairs(list) do
+				v[k] = true
 			end
 		else
-			for k in pairs(p2) do
-				t2[k] = true
+			for _, item in ipairs(list) do
+				v[item] = true
 			end
 		end
-	elseif p2 ~= nil then
-		t2 = {
-			[p2] = true
-		}
+	else
+		v = list ~= nil and { [list] = true } or v
 	end
 
-	return (setmetatable(t2, t1.mt))
-end
-function t1.add(p3, p4) -- line: 22
-	if p4 ~= nil then
-		p3[p4] = true
-	end
-
-	return p3
-end
-function t1.remove(p5, p6) -- line: 28
-	if p6 ~= nil then
-		p5[p6] = nil
-	end
-
-	return p5
-end
-function t1.tolist(p7) -- line: 34
-	local t3 = {}
-
-	for k in pairs(p7) do
-		table.insert(t3, k)
-	end
-
-	return t3
+	return (setmetatable(v, class.mt))
 end
 
-t1.to_list = t1.tolist
-
-function t1.mt.__add(p8, p9) -- line: 42
-	-- upvalues: t1 (copy)
-	local v22 = t1:new()
-	local v23 = t1:new(p8)
-	local v24 = t1:new(p9)
-
-	for k in pairs(v23) do
-		v22[k] = true
+function class:add(p)
+	if p ~= nil then
+		self[p] = true
 	end
 
-	for k in pairs(v24) do
-		v22[k] = true
-	end
-
-	return v22
-end
-function t1.mt.__sub(p10, p11) -- line: 50
-	-- upvalues: t1 (copy)
-	local v29 = t1:new()
-	local v30 = t1:new(p10)
-	local v31 = t1:new(p11)
-
-	for k in pairs(v30) do
-		v29[k] = true
-	end
-
-	for k in pairs(v31) do
-		v29[k] = nil
-	end
-
-	return v29
-end
-function t1.mt.__mul(p12, p13) -- line: 58
-	-- upvalues: t1 (copy)
-	local v36 = t1:new()
-	local v37 = t1:new(p12)
-	local v38 = t1:new(p13)
-
-	for k in pairs(v37) do
-		v36[k] = v38[k]
-	end
-
-	return v36
-end
-function t1.mt.__tostring(p14) -- line: 65
-	local s1 = "{"
-	local s2 = ""
-
-	for k in pairs(p14) do
-		s1 ..= s2 .. tostring(k)
-		s2 = ", "
-	end
-
-	return s1 .. "}"
+	return self
 end
 
-local t4 = {}
+function class:remove(p)
+	if p ~= nil then
+		self[p] = nil
+	end
 
-t4.mt = {
-	__index = t4
-}
+	return self
+end
 
-function t4.new(_, p16, p17, p18, p19, p20, p21) -- line: 77
-	-- upvalues: t1 (copy), t4 (copy)
-	local t5 = {
+function class:tolist()
+	local result = {}
+
+	for k in pairs(self) do
+		table.insert(result, k)
+	end
+
+	return result
+end
+
+class.to_list = class.tolist
+
+function class.mt.__add(p, p2)
+	local result = class:new()
+	local v = class:new(p)
+	local v2 = class:new(p2)
+
+	for k in pairs(v) do
+		result[k] = true
+	end
+
+	for k in pairs(v2) do
+		result[k] = true
+	end
+
+	return result
+end
+
+function class.mt.__sub(p, p2)
+	local result = class:new()
+	local v = class:new(p)
+	local v2 = class:new(p2)
+
+	for k in pairs(v) do
+		result[k] = true
+	end
+
+	for k in pairs(v2) do
+		result[k] = nil
+	end
+
+	return result
+end
+
+function class.mt.__mul(p, p2)
+	local result = class:new()
+	local v = class:new(p)
+	local v2 = class:new(p2)
+
+	for k in pairs(v) do
+		result[k] = v2[k]
+	end
+
+	return result
+end
+
+function class.mt.__tostring(items)
+	local v = "{"
+	local v2 = ""
+
+	for k in pairs(items) do
+		v ..= v2 .. tostring(k)
+		v2 = ", "
+	end
+
+	return v .. "}"
+end
+
+local ElementNode = {}
+ElementNode.mt = { __index = ElementNode }
+function ElementNode:new(p, text, parent, p2, p3, p4)
+	local root = {
+		index = p,
+		name = text,
 		level = 0,
 		parent = nil,
 		root = nil,
-		id = nil,
-		index = p16,
-		name = p17,
 		nodes = {},
-		_openstart = p20,
-		_openend = p21,
-		_closestart = p20,
-		_closeend = p21,
+		_openstart = p3,
+		_openend = p4,
+		_closestart = p3,
+		_closeend = p4,
 		attributes = {},
+		id = nil,
 		classes = {},
-		deepernodes = t1:new(),
+		deepernodes = class:new(),
 		deeperelements = {},
 		deeperattributes = {},
 		deeperids = {},
 		deeperclasses = {}
 	}
 
-	t5.attrs = t5.attributes
-	t5.children = t5.nodes
-	t5.descendants = t5.deepernodes
-	t5.descendant_elements = t5.deeperelements
-	t5.descendant_attrs = t5.deeperattributes
-	t5.descendent_ids = t5.deeperids
-	t5.descendant_classes = t5.deeperclasses
+	root.attrs = root.attributes
+	root.children = root.nodes
+	root.descendants = root.deepernodes
+	root.descendant_elements = root.deeperelements
+	root.descendant_attrs = root.deeperattributes
+	root.descendent_ids = root.deeperids
+	root.descendant_classes = root.deeperclasses
 
-	if not p18 then
-		t5.name = "root"
-		t5.root = t5
-		t5._text = p17
-
-		local v52 = string.len(p17)
-
-		t5._openstart = 1
-		t5._openend = v52
-		t5._closestart = 1
-		t5._closeend = v52
-	elseif p19 then
-		t5.root = p18.root
-		t5.parent = p18
-		t5.level = p18.level + 1
-		table.insert(p18.nodes, t5)
+	if parent then
+		if p2 then
+			root.root = parent.root
+			root.parent = parent
+			root.level = parent.level + 1
+			table.insert(parent.nodes, root)
+		else
+			root.root = parent.root
+			root.parent = parent.parent or parent
+			root.level = parent.level
+			table.insert(parent.parent and parent.parent.nodes or parent.nodes, root)
+		end
 	else
-		t5.root = p18.root
-		t5.parent = p18.parent or p18
-		t5.level = p18.level
-		table.insert(p18.parent and p18.parent.nodes or p18.nodes, t5)
+		root.name = "root"
+		root.root = root
+		root._text = text
+		local v = string.len(text)
+		root._openstart = 1
+		root._openend = v
+		root._closestart = 1
+		root._closeend = v
 	end
 
-	return (setmetatable(t5, t4.mt))
-end
-function t4.text(p22) -- line: 128
-	return (string.sub(p22.root._text, p22._openstart, p22._closeend))
+	return (setmetatable(root, ElementNode.mt))
 end
 
-t4.gettext = t4.text
-
-function t4.settext(p23, p24) -- line: 133
-	p23.root._text = p24
-end
-function t4.textonly(p25) -- line: 135
-	return (p25:text():gsub("<[^>]*>", ""))
-end
-function t4.content(p26) -- line: 137
-	return (string.sub(p26.root._text, p26._openend + 1, p26._closestart - 1))
+function ElementNode:text()
+	return (string.sub(self.root._text, self._openstart, self._closeend))
 end
 
-t4.getcontent = t4.content
+ElementNode.gettext = ElementNode.text
 
-function t4.addattribute(p27, p28, p29) -- line: 142
-	p27.attributes[p28] = p29
+function ElementNode.settext(p, text)
+	p.root._text = text
+end
 
-	if string.lower(p28) == "id" then
-		p27.id = p29
+function ElementNode:textonly()
+	return (self:text():gsub("<[^>]*>", ""))
+end
 
-		return
-	end
+function ElementNode:content()
+	return (string.sub(self.root._text, self._openend + 1, self._closestart - 1))
+end
 
-	if string.lower(p28) == "class" then
-		for match in string.gmatch(p29, "%S+") do
-			table.insert(p27.classes, match)
+ElementNode.getcontent = ElementNode.content
+
+function ElementNode:addattribute(value, id)
+	self.attributes[value] = id
+
+	if string.lower(value) == "id" then
+		self.id = id
+	elseif string.lower(value) == "class" then
+		for k in string.gmatch(id, "%S+") do
+			table.insert(self.classes, k)
 		end
 	end
 end
-function t4.links(p30) -- line: 154
-	local t6 = {}
 
-	for _, v in ipairs(p30:select("a[href]")) do
+function ElementNode:links()
+	local hrefs = {}
+
+	for _, v in ipairs(self:select("a[href]")) do
 		if #v.attributes.href > 0 then
-			table.insert(t6, v.attributes.href)
+			table.insert(hrefs, v.attributes.href)
 		end
 	end
 
-	return t6
+	return hrefs
 end
-function t4.absolutelinks(p31, p32) -- line: 166
-	local v68 = (p32 or (p31.page_url or "")):split("?")[1]:split("#")[1]
-	local parts = v68:split("://")
-	local v70 = parts[#parts]:split("/")[1]
-	local v71 = v68:find("://") and v68:split("://")[1] or "http"
 
-	while v68:sub(-1, -1) == "/" do
-		v68 = v68:sub(1, -2)
+function ElementNode:absolutelinks(p)
+	local v = (p or self.page_url or ""):split("?")[1]:split("#")[1]
+
+	local parts = v:split("://")
+	local v2 = parts[#parts]:split("/")[1]
+	local v3
+
+	if v:find("://") then
+		v3 = v:split("://")[1] or "http"
+	else
+		v3 = "http"
 	end
 
-	local t7 = {}
+	while v:sub(-1, -1) == "/" do
+		v = v:sub(1, -2)
+	end
 
-	for _, v in ipairs(p31:select("a[href]")) do
-		if #v.attributes.href > 0 then
-			local href = v.attributes.href
+	local result = {}
 
-			if not href:find("://") then
-				href = if href:sub(1, 2) ~= "//" then if href:sub(1, 1) ~= "/" then v68 .. "/" .. href else v71 .. "://" .. v70 .. href else v71 .. ":" .. href
+	for _, v4 in ipairs(self:select("a[href]")) do
+		if not (#v4.attributes.href > 0) then
+			continue
+		end
+
+		local v5 = v4.attributes.href
+
+		if not v5:find("://") then
+			if v5:sub(1, 2) == "//" then
+				v5 = v3 .. ":" .. v5
+			elseif v5:sub(1, 1) == "/" then
+				v5 = v3 .. "://" .. v2 .. v5
+			else
+				v5 = v .. "/" .. v5
 			end
-
-			table.insert(t7, href)
 		end
+
+		table.insert(result, v5)
 	end
 
-	return t7
+	return result
 end
 
-t4.absolute_links = t4.absolutelinks
+ElementNode.absolute_links = ElementNode.absolutelinks
 
-local function insert(p33, p34, p35) -- line: 208
-	-- upvalues: t1 (copy)
-	p33[p34] = p33[p34] or t1:new()
-	p33[p34]:add(p35)
+local function insert(p, p2, state) -- 4 equivalent calls inferred from this helper
+	p[p2] = p[p2] or class:new()
+	p[p2]:add(state)
 end
 
-function t4.close(p36, p37, p38) -- line: 213
-	-- upvalues: t1 (copy)
-	if p37 and p38 then
-		p36._closestart = p37
-		p36._closeend = p38
+function ElementNode:close(closestart, closeend)
+	if closestart and closeend then
+		self._closestart = closestart
+		self._closeend = closeend
 	end
 
-	local v82 = p36
+	local v = self
 
 	while true do
-		v82 = v82.parent
+		v = v.parent
 
-		if not v82 then
+		if not v then
 			break
 		end
 
-		v82.deepernodes:add(p36)
+		v.deepernodes:add(self)
+		insert(v.deeperelements, self.name, self) -- inferred equivalent call
 
-		local deeperelements = v82.deeperelements
-		local name = p36.name
-
-		deeperelements[name] = deeperelements[name] or t1:new()
-		deeperelements[name]:add(p36)
-
-		for k in pairs(p36.attributes) do
-			local deeperattributes = v82.deeperattributes
-
-			deeperattributes[k] = deeperattributes[k] or t1:new()
-			deeperattributes[k]:add(p36)
+		for k in pairs(self.attributes) do
+			insert(v.deeperattributes, k, self) -- inferred equivalent call
 		end
 
-		if p36.id then
-			local deeperids = v82.deeperids
-			local id = p36.id
-
-			deeperids[id] = deeperids[id] or t1:new()
-			deeperids[id]:add(p36)
+		if self.id then
+			insert(v.deeperids, self.id, self) -- inferred equivalent call
 		end
 
-		for _, v in ipairs(p36.classes) do
-			local deeperclasses = v82.deeperclasses
-
-			deeperclasses[v] = deeperclasses[v] or t1:new()
-			deeperclasses[v]:add(p36)
+		for _, class2 in ipairs(self.classes) do
+			insert(v.deeperclasses, class2, self) -- inferred equivalent call
 		end
 	end
 end
 
-local function escape(p39) -- line: 234
-	return string.gsub(p39, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+local function escape(value) -- 2 equivalent calls inferred from this helper
+	return string.gsub(value, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
 end
-local function select(p40, p41) -- line: 239
-	-- upvalues: t1 (copy), escape (copy)
-	if not p41 or (type(p41) ~= "string" or p41 == "") then
-		return t1:new()
+
+local function select(data, value)
+	if not value or type(value) ~= "string" or value == "" then
+		return class:new()
 	end
 
-	local t8 = {
-		[""] = p40.deeperelements,
-		["["] = p40.deeperattributes,
-		["#"] = p40.deeperids,
-		["."] = p40.deeperclasses
+	local v = {
+		[""] = data.deeperelements,
+		["["] = data.deeperattributes,
+		["#"] = data.deeperids,
+		["."] = data.deeperclasses
 	}
 
-	local function match(p42, p43) -- line: 247
-		-- upvalues: t1 (copy), t8 (copy), p40 (copy), escape (copy)
-		local v120 = nil
-		local v121 = nil
-		local v122 = nil
+	local function match(p, value2)
+		local v2, v3, v4
 
-		if p42 == "[" then
-			p43, v120, v121, v122 = string.match(p43, "([^=|%*~%$!%^]+)([|%*~%$!%^]?)(=?)(.*)")
+		if p == "[" then
+			value2, v2, v3, v4 = string.match(value2, "([^=|%*~%$!%^]+)([|%*~%$!%^]?)(=?)(.*)")
 		end
 
-		local v123 = t1:new(t8[p42][p43])
+		local v5 = class:new(v[p][value2])
 
-		if v121 == "=" then
-			if #v122 < 2 then
-				v122 = "'" .. v122 .. "'"
-			end
+		if v3 ~= "=" then
+			return v5
+		end
 
-			local v124 = string.sub(v122, 2, #v122 - 1)
+		if #v4 < 2 then
+			v4 = "'" .. v4 .. "'"
+		end
 
-			if v120 == "!" then
-				v123 = t1:new(p40.deepernodes)
-			end
+		local v6 = string.sub(v4, 2, #v4 - 1)
 
-			for k in pairs(v123) do
-				local v126 = k.attributes[p43]
+		if v2 == "!" then
+			v5 = class:new(data.deepernodes)
+		end
 
-				if v120 == "" and v126 ~= v124 then
-					v123:remove(k)
-				elseif v120 == "!" and v126 == v124 then
-					v123:remove(k)
-				elseif v120 == "|" and v124 ~= string.match(v126, "^[^-]*") then
-					v123:remove(k)
-				elseif v120 == "*" and v124 ~= string.match(v126, escape(v124)) then
-					v123:remove(k)
-				elseif v120 == "~" then
-					v123:remove(k)
+		for k in pairs(v5) do
+			local attribute = k.attributes[value2]
 
-					for match2 in string.gmatch(v126, "%S+") do
-						if match2 == v124 then
-							v123:add(k)
+			if v2 == "" and attribute ~= v6 then
+				v5:remove(k)
+			elseif v2 == "!" and attribute == v6 then
+				v5:remove(k)
+			elseif v2 == "|" and string.match(attribute, "^[^-]*") ~= v6 then
+				v5:remove(k)
+			elseif v2 == "*" and string.match(attribute, escape(v6)) ~= v6 then
+				v5:remove(k)
+			elseif v2 == "~" then
+				v5:remove(k)
 
-							break
-						end
+				for k2 in string.gmatch(attribute, "%S+") do
+					if k2 == v6 then
+						v5:add(k)
+						break
 					end
-				elseif v120 == "^" and v124 ~= string.match(v126, "^" .. string.gsub(v124, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")) then
-					v123:remove(k)
-				elseif v120 == "$" and v124 ~= string.match(v126, string.gsub(v124, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1") .. "$") then
-					v123:remove(k)
 				end
+			elseif v2 == "^" and string.match(attribute, "^" .. escape(v6)) ~= v6 then -- inferred equivalent call
+				v5:remove(k)
+			elseif v2 == "$" and string.match(attribute, escape(v6) .. "$") ~= v6 then -- inferred equivalent call
+				v5:remove(k)
 			end
 		end
 
-		return v123
+		return v5
 	end
 
-	local v97, v98, v99 = t1:new({ p40 })
+	local v2, v3, v4 = class:new({ data })
 
-	for match3 in string.gmatch(p41, "%S+") do
-		if match3 == ">" then
-			v99 = true
+	for k in string.gmatch(value, "%S+") do
+		if k == ">" then
+			v4 = true
 		else
-			v98 = t1:new()
+			v3 = class:new()
 
-			for k in pairs(v97) do
-				local deepernodes = k.deepernodes
+			for k2 in pairs(v2) do
+				local v5 = k2.deepernodes
 
-				if v99 then
-					deepernodes = t1:new(k.nodes)
+				if v4 then
+					v5 = class:new(k2.nodes)
 				end
 
-				v98 += deepernodes
+				v3 += v5
 			end
 
-			v99 = false
+			v4 = false
 
-			if match3 ~= "*" then
-				local v103, v104 = t1:new()
-				local n1 = 0
+			if k ~= "*" then
+				local v5, v6 = class:new()
+				local v7 = 0
 
 				while true do
-					local start, v107, v108, v109, v110, v111
+					local _, v8, v9, v10, v11, v12
+					_, v7, v8, v9, v10, v11, v12 = string.find(
+						k,
+						"(%(?%)?)([:%[#.]?)([%w-_\\]+)([|%*~%$!%^]?=?)(['\"]?)",
+						v7 + 1
+					)
 
-					start, n1, v107, v108, v109, v110, v111 = string.find(match3, "(%(?%)?)([:%[#.]?)([%w-_\\]+)([|%*~%$!%^]?=?)(['\"]?)", n1 + 1)
-
-					if not v109 then
+					if not v10 then
 						break
 					end
 
-					if v108 == ":" then
-						v104 = v109
+					if v9 == ":" then
+						v6 = v10
 					else
-						if v107 == ")" then
-							v104 = nil
+						if v8 == ")" then
+							v6 = nil
 						end
 
-						if v108 == "[" and v111 ~= "" then
-							local start2, v113
+						if v9 == "[" and v12 ~= "" then
+							local v13, v14
+							v13, v7, v14 = string.find(k, "(%b" .. v12 .. v12 .. ")]", v7)
 
-							start2, n1, v113 = string.find(match3, "(%b" .. v111 .. v111 .. ")]", n1)
-							v109 ..= v110 .. v113
+							v10 ..= v11 .. v14
 						end
 
-						local v114 = match(v108, v109)
+						local v13 = match(v9, v10)
 
-						if v104 == "not" then
-							v103 += v114
+						if v6 == "not" then
+							v5 += v13
 						else
-							v98 *= v114
+							v3 *= v13
 						end
 					end
 				end
 
-				v98 -= v103
-				v97 = t1:new(v98)
+				v3 -= v5
+				v2 = class:new(v3)
 			end
 		end
 	end
 
-	local v115 = v98:tolist()
-
-	table.sort(v115, function(p44, p45) -- line: 365
-		return p44.index < p45.index
+	local tolist = v3:tolist()
+	table.sort(tolist, function(a, b): boolean
+		return a.index < b.index
 	end)
 
-	return v115
+	return tolist
 end
 
-function t4.select(p46, p47) -- line: 371
-	-- upvalues: select (copy)
-	return select(p46, p47)
+function ElementNode:select(p)
+	return select(self, p)
 end
 
-t4.mt.__call = select
+ElementNode.mt.__call = select
 
-return t4
+return ElementNode

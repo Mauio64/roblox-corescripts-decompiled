@@ -1,5 +1,4 @@
+local GraphQLJSONType = require(script.Parent.Parent.utils.GraphQLJSONType)
 return {
-	default = {
-		JSONObject = require(script.Parent.Parent.utils.GraphQLJSONType).GraphQLJSONObject
-	}
+	default = { JSONObject = GraphQLJSONType.GraphQLJSONObject }
 }

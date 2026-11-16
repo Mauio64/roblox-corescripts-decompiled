@@ -1,40 +1,36 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local React = require(ParentParentParentParent.React)
-local Foundation = require(ParentParentParentParent.Foundation)
-local ControlState = require(ParentParent.Control.Enum.ControlState)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-require(ParentParent.Control.Hooks.useGuiControlState)
+local React = require(parent3.React)
+local Foundation = require(parent3.Foundation)
 
-local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
-local t1 = {
-	affordance = Foundation.Enums.StateLayerAffordance.None
-}
+local ControlState = require(parent.Control.Enum.ControlState)
+require(parent.Control.Hooks.useGuiControlState)
 
-local function Interactable(t2: {[any]: any}, p1) -- line: 49
-	-- upvalues: ImageSetComponent (copy), t1 (copy), React (copy), ControlState (copy), Foundation (copy)
-	local v12 = table.clone(t2)
+local ImageSetComponent = require(parent2.Core.ImageSet.ImageSetComponent)
 
-	v12.isDisabled = v12.isDisabled or v12.userInteractionEnabled == false
-	v12.userInteractionEnabled = nil
-	v12.ref = p1
-	v12.component = v12.component or ImageSetComponent.Button
-	v12.stateLayer = t1
+local stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None }
 
-	local v13 = React.useRef(ControlState.Initialize)
+local function Interactable(p, ref)
+	local clone = table.clone(p)
+	clone.isDisabled = clone.isDisabled or clone.userInteractionEnabled == false
+	clone.userInteractionEnabled = nil
+	clone.ref = ref
+	clone.component = clone.component or ImageSetComponent.Button
+	clone.stateLayer = stateLayer
 
-	if t2.onStateChanged then
-		function v12.onStateChanged(p2) -- line: 59
-			-- upvalues: ControlState (copy), t2 (copy), v13 (copy)
-			local v15 = ControlState[p2]
+	local ref2 = React.useRef(ControlState.Initialize)
 
-			t2.onStateChanged(v13.current, v15)
-			v13.current = v15
+	if p.onStateChanged then
+		function clone.onStateChanged(p2)
+			local current = ControlState[p2]
+			p.onStateChanged(ref2.current, current)
+			ref2.current = current
 		end
 	end
 
-	return React.createElement(Foundation.UNSTABLE.Interactable, v12)
+	return React.createElement(Foundation.UNSTABLE.Interactable, clone)
 end
 
 return (React.forwardRef(Interactable))

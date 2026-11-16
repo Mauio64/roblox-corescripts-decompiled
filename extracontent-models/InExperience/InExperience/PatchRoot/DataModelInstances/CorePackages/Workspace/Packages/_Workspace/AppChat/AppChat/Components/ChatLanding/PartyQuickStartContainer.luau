@@ -1,73 +1,91 @@
 local HttpService = game:GetService("HttpService")
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
 local EventNames = require(AppChat.Analytics.EventNames)
 local useAnalytics = require(AppChat.Analytics.useAnalytics)
 local useChatPlacementContext = ChatPlacementContext.useChatPlacementContext
-local React = require(AppChatParent.React)
-local Foundation = require(AppChatParent.Foundation)
-local UIBlox = require(AppChatParent.UIBlox)
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
-local useNavigation = require(AppChatParent.Navigation).useNavigation
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local UIBlox = require(parent.UIBlox)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+
 local Images = UIBlox.App.ImageSet.Images
 local IconName = Foundation.Enums.IconName
 local DomLocators = require(AppChat.Utils.DomLocators)
-local CustomConversationListEntry = require(script.Parent.CustomConversationListEntry)
-local CustomConversationListRow = require(script.Parent.CustomConversationListRow)
-local FFlagAppChatCustomConversationListRow = require(AppChat.Flags.FFlagAppChatCustomConversationListRow)
-local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
-local EnumScreens = require(AppChat.EnumScreens)
-local v21 = if not (game.PlaceId > 0) then nil else tostring(game.PlaceId)
-local v22 = if not (game.GameId > 0) then nil else tostring(game.GameId)
 
-function PartyQuickStartContainer(t1: {[any]: any}) -- line: 34
-	-- upvalues: useAnalytics (copy), useChatPlacementContext (copy), useNavigation (copy), useLocalization (copy), React (copy), HttpService (copy), EventNames (copy), v21 (copy), v22 (copy), EnumScreens (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), FFlagAppChatCustomConversationListRow (copy), CustomConversationListRow (copy), IconName (copy), CustomConversationListEntry (copy), Images (copy)
-	local v24 = useAnalytics()
-	local v25 = useChatPlacementContext()
-	local v26 = useNavigation()
-	local v27 = useLocalization({
+local CustomConversationListEntry = require(script.Parent.CustomConversationListEntry)
+local CustomConversationListRow = require(script.Parent.CustomConversationListRow.CustomConversationListRow)
+
+local FFlagAppChatUseFoundationCustomConversationListRow = require(AppChat.Flags.FFlagAppChatUseFoundationCustomConversationListRow)
+local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
+
+local EnumScreens = require(AppChat.EnumScreens)
+local placeId
+
+if game.PlaceId > 0 then
+	placeId = tostring(game.PlaceId)
+else
+	placeId = nil
+end
+
+local gameId
+
+if game.GameId > 0 then
+	gameId = tostring(game.GameId)
+else
+	gameId = nil
+end
+
+function PartyQuickStartContainer(p)
+	local v = useAnalytics()
+	local v2 = useChatPlacementContext()
+	local v3 = useNavigation()
+	local v4 = useLocalization({
 		titleText = "Feature.Squads.Label.StartParty",
 		subTitleText = "Feature.Squads.Label.JoinExperiencesTogether"
 	})
-	local v28 = React.useCallback(function() -- line: 43
-		-- upvalues: HttpService (copy), v24 (copy), EventNames (copy), v25 (copy), v21 (copy), v22 (copy), v26 (copy), EnumScreens (copy)
+
+	local onActivated = React.useCallback(function()
 		local guid = HttpService:GenerateGUID(false)
-
-		v24.fireAnalyticsEvent(EventNames.ChatLandingPartyQuickStartButtonClicked, {
-			clickLocation = v25.chatPlacement,
+		v.fireAnalyticsEvent(EventNames.ChatLandingPartyQuickStartButtonClicked, {
+			clickLocation = v2.chatPlacement,
 			partyAttemptId = guid,
-			placeId = v21,
-			universeId = v22
+			placeId = placeId,
+			universeId = gameId
 		})
-		v26.navigate(EnumScreens.QuickStartSquadInviteFriends, {
-			partyAttemptId = guid
-		})
-	end, {
-		v24,
-		v26,
-		v25.chatPlacement
-	})
-	local v29 = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingConversationListHeader("startParty")
 
-	if FFlagAppChatCustomConversationListRow then
+		v3.navigate(EnumScreens.QuickStartSquadInviteFriends, { partyAttemptId = guid })
+	end, { v, v3, v2.chatPlacement })
+	local testId
+
+	if FFlagDebugAppChatEnableDomLocators then
+		testId = DomLocators.chatLandingConversationListHeader("startParty")
+	end
+
+	if FFlagAppChatUseFoundationCustomConversationListRow then
 		return React.createElement(CustomConversationListRow, {
-			entryHeight = t1.entryHeight,
+			entryHeight = p.entryHeight,
 			entryIcon = IconName.PersonPlay,
-			onActivated = v28,
-			titleText = v27.titleText,
-			subTitleText = v27.subTitleText,
-			testId = v29
+			onActivated = onActivated,
+			titleText = v4.titleText,
+			subTitleText = v4.subTitleText,
+			testId = testId
 		})
 	end
 
 	return React.createElement(CustomConversationListEntry, {
-		entryHeight = t1.entryHeight,
+		entryHeight = p.entryHeight,
 		entryIcon = Images["icons/actions/friends/friendsplaying"],
-		onActivated = v28,
-		titleText = v27.titleText,
-		subTitleText = v27.subTitleText,
-		testId = v29
+		onActivated = onActivated,
+		titleText = v4.titleText,
+		subTitleText = v4.subTitleText,
+		testId = testId
 	})
 end
 

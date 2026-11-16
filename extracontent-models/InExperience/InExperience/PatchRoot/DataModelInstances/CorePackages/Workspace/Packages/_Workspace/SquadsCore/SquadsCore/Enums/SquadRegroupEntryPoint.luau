@@ -1,4 +1,1 @@
-return {
-	ToastPrompt = "ToastPrompt",
-	SquadLobbyButton = "SquadLobbyButton"
-}
+return { ToastPrompt = "ToastPrompt", SquadLobbyButton = "SquadLobbyButton" }

@@ -1,4 +1,1 @@
-return {
-	Default = "Default",
-	Strict = "Strict"
-}
+return { Default = "Default", Strict = "Strict" }

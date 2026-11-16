@@ -6,9 +6,7 @@ local withIsGamepadInput = require(script.withIsGamepadInput)
 local Components = require(script.Components)
 local Hooks = require(script.Hooks)
 local Profiling = require(script.Profiling)
-
 require(script.types)
-
 local TestIdUtils = require(script.TestIdUtils)
 local TagUtils = require(script.TagUtils)
 

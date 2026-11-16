@@ -1,16 +1,14 @@
-local function formatTextWithParams(s1: string, t1: {[any]: any}) -- line: 1
-	if t1 ~= nil then
-		for k, v in pairs(t1) do
-			local v6 = ("{%s}"):format(k)
-
-			s1 = string.gsub(s1, v6, function() -- line: 5
-				-- upvalues: v (copy)
-				return v
+local function formatTextWithParams(value: string, items)
+	if items ~= nil then
+		for k, item in pairs(items) do
+			local formatted = ("{%s}"):format(k)
+			value = string.gsub(value, formatted, function()
+				return item
 			end)
 		end
 	end
 
-	return s1
+	return value
 end
 
 return formatTextWithParams

@@ -1,20 +1,20 @@
-local function shallowEqual(p1, p2) -- line: 1
-	if p1 == nil then
-		return p2 == nil
+local function shallowEqual(items, items2): boolean
+	if items == nil then
+		return items2 == nil
 	end
 
-	if p2 == nil then
-		return p1 == nil
+	if items2 == nil then
+		return items == nil
 	end
 
-	for k, v in pairs(p1) do
-		if v ~= p2[k] then
+	for k, item in pairs(items) do
+		if item ~= items2[k] then
 			return false
 		end
 	end
 
-	for k, v in pairs(p2) do
-		if v ~= p1[k] then
+	for k, item in pairs(items2) do
+		if item ~= items[k] then
 			return false
 		end
 	end

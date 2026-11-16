@@ -1,1 +1,3 @@
-return (require(script.Checkbox))
+local Checkbox = require(script.Checkbox)
+
+return Checkbox

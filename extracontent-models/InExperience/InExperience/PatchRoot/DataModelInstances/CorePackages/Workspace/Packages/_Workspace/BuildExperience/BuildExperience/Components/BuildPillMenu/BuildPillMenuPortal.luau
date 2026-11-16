@@ -1,150 +1,254 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
-local ReactRoblox = require(BuildExperienceParent.ReactRoblox)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
+local parent = BuildExperience.Parent
+
+local Display = require(parent.Display)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+local SignalsReact = require(parent.SignalsReact)
+
 local BuildPillMenu = require(script.Parent.BuildPillMenu)
 local BuildPillMenuPageHost = require(script.Parent.BuildPillMenuPageHost)
 local GetBuildPillMenuPortalStore = require(BuildExperience.Stores.GetBuildPillMenuPortalStore)
+local FFlagBuildPublishNavigationSheet = require(BuildExperience.Flags.FFlagBuildPublishNavigationSheet)
+local PublishSheetController
+
+if FFlagBuildPublishNavigationSheet then
+	PublishSheetController = require(BuildExperience.Components.PublishSheet.PublishSheetController)
+else
+	PublishSheetController = nil
+end
+
 local View = Foundation.View
 local useOverlay = Foundation.Hooks.useOverlay
 local useStyleSheet = Foundation.Hooks.useStyleSheet
+local useTokens = Foundation.Hooks.useTokens
 
-local function getOverlayPosition(p1, p2) -- line: 27
-	local v17 = if not p2:IsA("GuiObject") then Vector2.zero else p2.AbsolutePosition
-	local v18 = p1.AbsolutePosition - v17
-
-	return UDim2.fromOffset(v18.X, v18.Y)
+local function isSideSheet(p, vector2: Vector2): boolean
+	return p ~= Enum.DisplaySize.Small or vector2.X > vector2.Y
 end
-local function BuildPillMenuPortal(t1: {[any]: any}) -- line: 34
-	-- upvalues: GetBuildPillMenuPortalStore (copy), SignalsReact (copy), useOverlay (copy), useStyleSheet (copy), React (copy), View (copy), BuildPillMenu (copy), ReactRoblox (copy), BuildPillMenuPageHost (copy)
-	local v20 = GetBuildPillMenuPortalStore()
-	local v21 = SignalsReact.useSignalState(v20.getPortalTarget)
-	local v22 = useOverlay()
-	local v23 = useStyleSheet()
-	local v24 = React.useRef(nil)
-	local v25, v26 = React.useState(nil)
-	local v27 = React.useCallback(function() -- line: 42
-		-- upvalues: v24 (copy), v21 (copy), v22 (copy)
-		local current = v24.current
 
-		if v21 == nil or (v22 == nil or current == nil) then
+local function getOverlayPosition(p, guiObject) -- 1 equivalent call inferred from this helper
+	local v
+
+	if guiObject:IsA("GuiObject") then
+		v = guiObject.AbsolutePosition
+	else
+		v = Vector2.zero
+	end
+
+	local v2 = p.AbsolutePosition - v
+
+	return UDim2.fromOffset(v2.X, v2.Y)
+end
+
+local function BuildPillMenuPortal(props)
+	local buildPillMenuPortalStore = GetBuildPillMenuPortalStore()
+	local v = SignalsReact.useSignalState(buildPillMenuPortalStore.getPortalTarget)
+	local guiObject = useOverlay()
+	local styleSheet = useStyleSheet()
+	local v2 = useTokens()
+	local displayStore = Display.GetDisplayStore(false)
+	local v3 = SignalsReact.useSignalState(displayStore.getDisplaySize)
+	local v4 = SignalsReact.useSignalState(displayStore.getViewportSize)
+	local ref = React.useRef(nil)
+	local state, setState = React.useState(nil)
+	local state2, setState2 = React.useState(false)
+	local sheet
+
+	if props.sheet == nil or v3 == Enum.DisplaySize.Small and not (v4.X > v4.Y) then
+		sheet = nil
+	else
+		sheet = props.sheet
+	end
+
+	local v5 = React.useCallback(function()
+		local current = ref.current
+
+		if v == nil or guiObject == nil or current == nil then
 			return
 		end
 
-		local v37 = v21
-		local v38 = v22
-		local v39 = if not v38:IsA("GuiObject") then Vector2.zero else v38.AbsolutePosition
-		local v40 = v37.AbsolutePosition - v39
+		current.Position = getOverlayPosition(v, guiObject) -- inferred equivalent call
+	end, { v, guiObject })
 
-		current.Position = UDim2.fromOffset(v40.X, v40.Y)
-	end, {
-		v21,
-		v22
-	})
-	local v28 = React.useCallback(function(p3) -- line: 51
-		-- upvalues: v24 (copy), v27 (copy)
-		v24.current = p3
-		v27()
-	end, { v27 })
-	local v29 = React.useCallback(function(p4) -- line: 56
-		-- upvalues: v26 (copy)
-		v26({
-			type = "overflow",
-			page = p4
-		})
-	end, {})
-	local v30 = React.useCallback(function() -- line: 63
-		-- upvalues: v26 (copy)
-		v26({
-			type = "agents"
-		})
-	end, {})
-	local v31 = React.useCallback(function() -- line: 69
-		-- upvalues: v26 (copy)
-		v26({
-			type = "invitePicker"
-		})
-	end, {})
-	local v32 = React.useCallback(function() -- line: 75
-		-- upvalues: v26 (copy)
-		v26({
-			type = "playtestManagement"
-		})
-	end, {})
-	local v33 = React.useCallback(function() -- line: 81
-		-- upvalues: v26 (copy)
-		v26({
-			type = "creator-credit"
-		})
-	end, {})
-	local v34 = React.useCallback(function() -- line: 87
-		-- upvalues: v26 (copy)
-		v26(nil)
+	local ref2 = React.useCallback(function(current)
+		ref.current = current
+		v5()
+	end, { v5 })
+
+	local onOpenPage = React.useCallback(function(page)
+		if FFlagBuildPublishNavigationSheet and page == "publish" then
+			setState2(true)
+		else
+			setState({ type = "overflow", page = page })
+		end
 	end, {})
 
-	React.useLayoutEffect(function() -- line: 91
-		-- upvalues: v21 (copy), v22 (copy), v27 (copy)
-		if v21 == nil or v22 == nil then
+	local onOpenAgentsPage = React.useCallback(function()
+		setState({ type = "agents" })
+	end, {})
+
+	local onOpenInvitePicker = React.useCallback(function()
+		setState({ type = "invitePicker" })
+	end, {})
+
+	local v6 = React.useCallback(function()
+		setState({ type = "playtestManagement" })
+	end, {})
+
+	local onOpenCreatorCreditPage = React.useCallback(function()
+		setState({ type = "creator-credit" })
+	end, {})
+
+	local onClose = React.useCallback(function()
+		setState(nil)
+	end, {})
+
+	local onOpenChat = React.useCallback(function(p: string)
+		onClose()
+
+		if props.onOpenChat ~= nil then
+			props.onOpenChat(p)
+		end
+	end, { onClose, props.onOpenChat })
+
+	local onClose2 = React.useCallback(function()
+		setState2(false)
+	end, {})
+
+	local navigateToSubPage = React.useCallback(function(screen: string, data)
+		setState({
+			type = "screen",
+			screen = screen,
+			target = {
+				universeId = data.universeId,
+				placeId = data.placeId,
+				sessionId = data.sessionId,
+				isNewGameTarget = data.isNewGameTarget or false
+			}
+		})
+	end, {})
+
+	React.useLayoutEffect(function()
+		if sheet == nil then
 			return
 		end
 
-		v27()
+		local clipsDescendants = sheet.ClipsDescendants
 
-		local connection = v21:GetPropertyChangedSignal("AbsolutePosition"):Connect(v27)
-		local v44 = if not v22:IsA("GuiObject") then nil else v22:GetPropertyChangedSignal("AbsolutePosition"):Connect(v27)
+		sheet.ClipsDescendants = false
 
-		return function() -- line: 104
-			-- upvalues: connection (copy), v44 (copy)
-			connection:Disconnect()
+		return function()
+			sheet.ClipsDescendants = clipsDescendants
+		end
+	end, { sheet })
 
-			if v44 ~= nil then
-				v44:Disconnect()
+	React.useLayoutEffect(function()
+		if sheet ~= nil or (v == nil or guiObject == nil) then
+			return
+		end
+
+		v5()
+
+		local absolutePositionChangedConnection = v:GetPropertyChangedSignal("AbsolutePosition"):Connect(v5)
+		local absolutePositionChangedConnection2
+
+		if guiObject:IsA("GuiObject") then
+			absolutePositionChangedConnection2 = guiObject:GetPropertyChangedSignal("AbsolutePosition"):Connect(v5)
+		else
+			absolutePositionChangedConnection2 = nil
+		end
+
+		return function()
+			absolutePositionChangedConnection:Disconnect()
+
+			if absolutePositionChangedConnection2 ~= nil then
+				absolutePositionChangedConnection2:Disconnect()
 			end
 		end
-	end, {
-		v21,
-		v22,
-		v27
-	})
+	end, { sheet, v, guiObject, v5 })
 
-	if v21 == nil or v22 == nil then
+	if v == nil or guiObject == nil then
 		return nil
 	end
 
-	local v35 = React.createElement(React.Fragment, nil, {
-		StyleLink = React.createElement("StyleLink", {
-			StyleSheet = v23
-		}),
-		Container = React.createElement(View, {
-			ZIndex = 999,
-			tag = "auto-xy",
-			testId = "build-pill-menu-overlay-container",
-			AnchorPoint = v21.AnchorPoint,
-			ref = v28
-		}, {
-			Pill = React.createElement(BuildPillMenu, {
-				target = t1.target,
-				testId = t1.testId,
-				onOpenPage = v29,
-				onOpenInvitePicker = v31,
-				onOpenAgentsPage = v30,
-				onOpenCreatorCreditPage = v33
-			})
-		})
-	})
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v7 = {
+		StyleLink = React.createElement("StyleLink", { StyleSheet = styleSheet }),
+		Container = 0
+	}
 
-	return React.createElement(React.Fragment, nil, {
-		Pill = ReactRoblox.createPortal(v35, v22),
-		Page = React.createElement(BuildPillMenuPageHost, {
-			activePage = v25,
-			target = t1.target,
-			onClose = v34,
-			onInvitesSent = v32,
-			onOpenInvitePicker = v31
+	local createElement2 = React.createElement
+	local anchorPoint
+
+	if sheet == nil then
+		anchorPoint = v.AnchorPoint
+	else
+		anchorPoint = Vector2.new(1, 0)
+	end
+
+	local position
+
+	if sheet ~= nil then
+		position = UDim2.fromOffset(-v2.Padding.Large, 0)
+	end
+
+	if sheet ~= nil then
+		ref2 = nil
+	end
+
+	v7.Container = createElement2(View, {
+		AnchorPoint = anchorPoint,
+		Position = position,
+		ref = ref2,
+		ZIndex = 999,
+		tag = "auto-xy",
+		testId = "build-pill-menu-overlay-container"
+	}, {
+		Pill = React.createElement(BuildPillMenu, {
+			target = props.target,
+			testId = props.testId,
+			onOpenPage = onOpenPage,
+			onOpenInvitePicker = onOpenInvitePicker,
+			onOpenPlaytestManagement = v6,
+			onOpenAgentsPage = onOpenAgentsPage,
+			onOpenCreatorCreditPage = onOpenCreatorCreditPage
 		})
 	})
+	local element = createElement(fragment, nil, v7)
+
+	local createElement3 = React.createElement
+	local fragment2 = React.Fragment
+	local createPortal = ReactRoblox.createPortal
+	local v8 = if sheet == nil then guiObject else sheet
+	local v9 = {
+		Pill = createPortal(element, v8),
+		Page = React.createElement(BuildPillMenuPageHost, {
+			activePage = state,
+			target = props.target,
+			onClose = onClose,
+			onOpenChat = onOpenChat,
+			onInvitesSent = v6,
+			onOpenInvitePicker = onOpenInvitePicker
+		}),
+		PublishSheet = 0
+	}
+	local publishSheet
+
+	if FFlagBuildPublishNavigationSheet then
+		publishSheet = React.createElement(PublishSheetController, {
+			isOpen = state2,
+			target = props.target,
+			onClose = onClose2,
+			navigateToSubPage = navigateToSubPage,
+			showPreviewButton = false
+		})
+	end
+
+	v9.PublishSheet = publishSheet
+	return createElement3(fragment2, nil, v9)
 end
 
 return React.memo(BuildPillMenuPortal)

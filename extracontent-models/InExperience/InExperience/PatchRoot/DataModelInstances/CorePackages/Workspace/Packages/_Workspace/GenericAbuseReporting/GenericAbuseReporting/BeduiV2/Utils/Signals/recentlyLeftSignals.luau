@@ -1,109 +1,106 @@
 local Players = game:GetService("Players")
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Signals = require(Parent.Signals)
 
-local function createRecentlyLeftStore(p1: ((...any) -> ...any)?) -- line: 43
-	-- upvalues: Signals (copy), Players (copy)
-	local v7 = p1 or os.clock
-	local v8, v9 = Signals.createSignal({})
-	local v10 = Signals.createComputed(function(p2) -- line: 46
-		-- upvalues: v8 (copy)
-		local t1 = {}
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 
-		for v17 in v8(p2) do
-			t1[v17] = true
+local Signals = require(parent.Signals)
+
+local function createRecentlyLeftStore(callback)
+	local v = callback or os.clock
+	local signal, v2 = Signals.createSignal({})
+	local computed = Signals.createComputed(function(p)
+		local result = {}
+
+		for k in signal(p) do
+			result[k] = true
 		end
 
-		return t1
+		return result
 	end)
-	local u11 = false
 
-	local function prune(t2: {[any]: any}) -- line: 55
-		-- upvalues: v7 (copy)
-		local v19 = v7()
-		local t3 = {}
+	local flag = false
 
-		for v21, v22 in t2 do
-			if v19 - v22.leftAtClock <= 120 then
-				t3[v21] = v22
+	local function prune(items)
+		local v3 = v()
+		local result = {}
+
+		for k, item in items do
+			if v3 - item.leftAtClock <= 120 then
+				result[k] = item
 			end
 		end
 
-		return t3
+		return result
 	end
-	local function handlePlayerRemoving(p3) -- line: 67
-		-- upvalues: Players (copy), v8 (copy), v7 (copy), v9 (copy), prune (copy)
-		local LocalPlayer = Players.LocalPlayer
 
-		if LocalPlayer and p3.UserId == LocalPlayer.UserId then
+	local function handlePlayerRemoving(player)
+		local localPlayer = Players.LocalPlayer
+
+		if localPlayer and player.UserId == localPlayer.UserId then
 			return
 		end
 
-		local v25 = table.clone(v8(false))
-
-		v25[tostring(p3.UserId)] = {
-			userId = p3.UserId,
-			username = p3.Name,
-			displayName = p3.DisplayName,
-			leftAtClock = v7()
+		local clone = table.clone(signal(false))
+		clone[tostring(player.UserId)] = {
+			userId = player.UserId,
+			username = player.Name,
+			displayName = player.DisplayName,
+			leftAtClock = v()
 		}
-		v9((prune(v25)))
-	end
-	local function handlePlayerAdded(p4) -- line: 83
-		-- upvalues: v8 (copy), v9 (copy), prune (copy)
-		local v27 = v8(false)
 
-		if v27[tostring(p4.UserId)] == nil then
+		v2(prune(clone))
+	end
+
+	local function handlePlayerAdded(p)
+		local v3 = signal(false)
+
+		if v3[tostring(p.UserId)] == nil then
 			return
 		end
 
-		local v28 = table.clone(v27)
-
-		v28[tostring(p4.UserId)] = nil
-		v9((prune(v28)))
+		local clone = table.clone(v3)
+		clone[tostring(p.UserId)] = nil
+		v2(prune(clone))
 	end
 
 	return {
-		init = function() -- line: 93
-			-- upvalues: u11 (ref), Players (copy), handlePlayerRemoving (copy), handlePlayerAdded (copy)
-			if u11 then
+		init = function()
+			if flag then
 				return
 			end
 
-			u11 = true
+			flag = true
 			Players.PlayerRemoving:Connect(handlePlayerRemoving)
 			Players.PlayerAdded:Connect(handlePlayerAdded)
 		end,
-		getRecentlyLeft = function() -- line: 102
-			-- upvalues: prune (copy), v8 (copy)
-			local t4 = {}
+		getRecentlyLeft = function()
+			local v3 = prune(signal(false))
+			local recentlyLeft = {}
 
-			for _, v31 in (prune(v8(false))) do
-				table.insert(t4, {
-					userId = v31.userId,
-					username = v31.username,
-					displayName = v31.displayName
+			for _, v4 in v3 do
+				table.insert(recentlyLeft, {
+					userId = v4.userId,
+					username = v4.username,
+					displayName = v4.displayName
 				})
 			end
 
-			return t4
+			return recentlyLeft
 		end,
-		getRecentlyLeftIds = function() -- line: 115
-			-- upvalues: v10 (copy)
-			return v10
+		getRecentlyLeftIds = function()
+			return computed
 		end,
 		handlePlayerRemoving = handlePlayerRemoving,
 		handlePlayerAdded = handlePlayerAdded
 	}
 end
 
-local v5 = createRecentlyLeftStore()
+local recentlyLeftStore = createRecentlyLeftStore()
 
 return {
-	init = v5.init,
-	getRecentlyLeft = v5.getRecentlyLeft,
-	getRecentlyLeftIds = v5.getRecentlyLeftIds,
-	handlePlayerRemoving = v5.handlePlayerRemoving,
-	handlePlayerAdded = v5.handlePlayerAdded,
+	init = recentlyLeftStore.init,
+	getRecentlyLeft = recentlyLeftStore.getRecentlyLeft,
+	getRecentlyLeftIds = recentlyLeftStore.getRecentlyLeftIds,
+	handlePlayerRemoving = recentlyLeftStore.handlePlayerRemoving,
+	handlePlayerAdded = recentlyLeftStore.handlePlayerAdded,
 	createRecentlyLeftStore = createRecentlyLeftStore
 }

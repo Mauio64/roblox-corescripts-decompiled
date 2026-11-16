@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("MessageBus").Parent
-
-require(Parent.LuauPolyfill)
+local parent = script:FindFirstAncestor("MessageBus").Parent
+require(parent.LuauPolyfill)
 
 return nil

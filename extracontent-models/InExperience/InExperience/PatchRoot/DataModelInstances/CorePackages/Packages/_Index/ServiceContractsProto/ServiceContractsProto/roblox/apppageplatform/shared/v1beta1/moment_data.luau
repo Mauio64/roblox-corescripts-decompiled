@@ -1,1265 +1,1328 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 258
-	-- upvalues: t2 (copy)
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local moment_id
+
+	if not (data == nil or data.moment_id == nil) then
+		moment_id = data.moment_id
+	end
+
+	local asset_id
+
+	if not (data == nil or data.asset_id == nil) then
+		asset_id = data.asset_id
+	end
+
+	local creator_id
+
+	if not (data == nil or data.creator_id == nil) then
+		creator_id = data.creator_id
+	end
+
+	local status
+
+	if not (data == nil or data.status == nil) then
+		status = data.status
+	end
+
+	local metadata
+
+	if not (data == nil or data.metadata == nil) then
+		metadata = data.metadata
+	end
+
 	return (setmetatable({
-		moment_id = if t3 ~= nil and t3.moment_id ~= nil then t3.moment_id else nil,
-		asset_id = if t3 ~= nil and t3.asset_id ~= nil then t3.asset_id else nil,
-		creator_id = if t3 ~= nil and t3.creator_id ~= nil then t3.creator_id else nil,
-		status = if t3 ~= nil and t3.status ~= nil then t3.status else nil,
-		metadata = if t3 ~= nil and t3.metadata ~= nil then t3.metadata else nil
-	}, t2))
+		moment_id = moment_id,
+		asset_id = asset_id,
+		creator_id = creator_id,
+		status = status,
+		metadata = metadata
+	}, class))
 end
-function t2.encode(p1) -- line: 268
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.moment_id ~= nil then
-		local v15, v16 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v15, v16, p1.moment_id)
+	if self.moment_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.moment_id)
 	end
 
-	if p1.asset_id ~= nil then
-		local v17, v18 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v17, v18, p1.asset_id)
+	if self.asset_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.asset_id)
 	end
 
-	if p1.creator_id ~= nil then
-		local v19, v20 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v19, v20, p1.creator_id)
+	if self.creator_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.creator_id)
 	end
 
-	if p1.status ~= nil then
-		local v21, v22 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v21, v22, p1.status)
+	if self.status ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.status)
 	end
 
-	if p1.metadata ~= nil then
-		local v23 = p1.metadata:encode()
-		local v24, v25 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v24, v25, v23, buffer.len(v23))
+	if self.metadata ~= nil then
+		local encoded = self.metadata:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 303
-	-- upvalues: t2 (copy), proto (copy), t1 (copy)
-	local v28 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v30, v31
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v30, v31, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v31 == proto.wireTypes.varint then
-			local v32
-
-			v32, n2 = proto.readVarInt(p2, n2)
-		elseif v31 == proto.wireTypes.lengthDelimited then
-			if v30 == 1 then
-				local v33
-
-				v33, n2 = proto.readBuffer(p2, n2)
-				v28.moment_id = buffer.tostring(v33)
-			elseif v30 == 2 then
-				local v34
-
-				v34, n2 = proto.readBuffer(p2, n2)
-				v28.asset_id = buffer.tostring(v34)
-			elseif v30 == 3 then
-				local v35
-
-				v35, n2 = proto.readBuffer(p2, n2)
-				v28.creator_id = buffer.tostring(v35)
-			elseif v30 == 4 then
-				local v36
-
-				v36, n2 = proto.readBuffer(p2, n2)
-				v28.status = buffer.tostring(v36)
-			elseif v30 == 5 then
-				local v37
-
-				v37, n2 = proto.readBuffer(p2, n2)
-				v28.metadata = t1.MomentData_MomentMetadata.decode(v37)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.moment_id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.asset_id = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.creator_id = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.status = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.metadata = v.MomentData_MomentMetadata.decode(v5)
 			else
-				local v38, v39 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v39 + v38
+				v2 = v5 + varInt
 			end
-		elseif v31 == proto.wireTypes.i32 then
-			local v40
-
-			v40, n2 = proto.readFixed32(p2, n2)
-		elseif v31 == proto.wireTypes.i64 then
-			local v41
-
-			v41, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v31)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v28
-end
-function t2.jsonEncode(p3) -- line: 366
-	local t4 = {}
-
-	if p3.moment_id ~= nil then
-		t4.momentId = p3.moment_id
-	end
-
-	if p3.asset_id ~= nil then
-		t4.assetId = p3.asset_id
-	end
-
-	if p3.creator_id ~= nil then
-		t4.creatorId = p3.creator_id
-	end
-
-	if p3.status ~= nil then
-		t4.status = p3.status
-	end
-
-	if p3.metadata ~= nil then
-		t4.metadata = p3.metadata:jsonEncode()
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 392
-	-- upvalues: t2 (copy), t1 (copy)
-	local v45 = t2.new()
-
-	if t5.moment_id ~= nil then
-		v45.moment_id = t5.moment_id
-	end
-
-	if t5.momentId ~= nil then
-		v45.moment_id = t5.momentId
-	end
-
-	if t5.asset_id ~= nil then
-		v45.asset_id = t5.asset_id
-	end
-
-	if t5.assetId ~= nil then
-		v45.asset_id = t5.assetId
-	end
-
-	if t5.creator_id ~= nil then
-		v45.creator_id = t5.creator_id
-	end
-
-	if t5.creatorId ~= nil then
-		v45.creator_id = t5.creatorId
-	end
-
-	if t5.status ~= nil then
-		v45.status = t5.status
-	end
-
-	if t5.metadata ~= nil then
-		v45.metadata = t1.MomentData_MomentMetadata.jsonDecode(t5.metadata)
-	end
-
-	return v45
+	return result
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.moment_id ~= nil then
+		v2.momentId = self.moment_id
+	end
+
+	if self.asset_id ~= nil then
+		v2.assetId = self.asset_id
+	end
+
+	if self.creator_id ~= nil then
+		v2.creatorId = self.creator_id
+	end
+
+	if self.status ~= nil then
+		v2.status = self.status
+	end
+
+	if self.metadata ~= nil then
+		v2.metadata = self.metadata:jsonEncode()
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.moment_id ~= nil then
+		v2.moment_id = data.moment_id
+	end
+
+	if data.momentId ~= nil then
+		v2.moment_id = data.momentId
+	end
+
+	if data.asset_id ~= nil then
+		v2.asset_id = data.asset_id
+	end
+
+	if data.assetId ~= nil then
+		v2.asset_id = data.assetId
+	end
+
+	if data.creator_id ~= nil then
+		v2.creator_id = data.creator_id
+	end
+
+	if data.creatorId ~= nil then
+		v2.creator_id = data.creatorId
+	end
+
+	if data.status ~= nil then
+		v2.status = data.status
+	end
+
+	if data.metadata ~= nil then
+		v2.metadata = v.MomentData_MomentMetadata.jsonDecode(data.metadata)
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "MomentData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.MomentData"
 }
-t1.MomentData = t2
-typeRegistry.default:register(t1.MomentData)
 
-local t6 = {}
+v.MomentData = class
 
-t6.__index = t6
+typeRegistry.default:register(v.MomentData)
 
-function t6.new(t7: {[any]: any}?) -- line: 444
-	-- upvalues: t6 (copy)
+local class2 = {}
+class2.__index = class2
+
+function class2.new(data)
+	local asset_total_duration_seconds
+
+	if not (data == nil or data.asset_total_duration_seconds == nil) then
+		asset_total_duration_seconds = data.asset_total_duration_seconds
+	end
+
+	local capture_type
+
+	if not (data == nil or data.capture_type == nil) then
+		capture_type = data.capture_type
+	end
+
+	local description
+
+	if not (data == nil or data.description == nil) then
+		description = data.description
+	end
+
+	local capture_universe_id
+
+	if not (data == nil or data.capture_universe_id == nil) then
+		capture_universe_id = data.capture_universe_id
+	end
+
+	local capture_place_id
+
+	if not (data == nil or data.capture_place_id == nil) then
+		capture_place_id = data.capture_place_id
+	end
+
+	local edits
+
+	if not (data == nil or data.edits == nil) then
+		edits = data.edits
+	end
+
 	return (setmetatable({
-		asset_total_duration_seconds = if t7 ~= nil and t7.asset_total_duration_seconds ~= nil then t7.asset_total_duration_seconds else nil,
-		capture_type = if t7 ~= nil and t7.capture_type ~= nil then t7.capture_type else nil,
-		description = if t7 ~= nil and t7.description ~= nil then t7.description else nil,
-		capture_universe_id = if t7 ~= nil and t7.capture_universe_id ~= nil then t7.capture_universe_id else nil,
-		capture_place_id = if t7 ~= nil and t7.capture_place_id ~= nil then t7.capture_place_id else nil,
-		edits = if t7 ~= nil and t7.edits ~= nil then t7.edits else nil
-	}, t6))
+		asset_total_duration_seconds = asset_total_duration_seconds,
+		capture_type = capture_type,
+		description = description,
+		capture_universe_id = capture_universe_id,
+		capture_place_id = capture_place_id,
+		edits = edits
+	}, class2))
 end
-function t6.encode(p4) -- line: 461
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n3 = 0
 
-	if p4.asset_total_duration_seconds ~= nil then
-		local v50, v51 = proto.writeTag(buf, n3, 1, proto.wireTypes.i32)
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n3 = proto.writeFloat(v50, v51, p4.asset_total_duration_seconds)
+	if self.asset_total_duration_seconds ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.i32)
+		v2, v3 = proto.writeFloat(v4, v5, self.asset_total_duration_seconds)
 	end
 
-	if p4.capture_type ~= nil then
-		local v52, v53 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v52, v53, p4.capture_type)
+	if self.capture_type ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.capture_type)
 	end
 
-	if p4.description ~= nil then
-		local v54, v55 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v54, v55, p4.description)
+	if self.description ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.description)
 	end
 
-	if p4.capture_universe_id ~= nil then
-		local v56, v57 = proto.writeTag(buf, n3, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v56, v57, p4.capture_universe_id)
+	if self.capture_universe_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.capture_universe_id)
 	end
 
-	if p4.capture_place_id ~= nil then
-		local v58, v59 = proto.writeTag(buf, n3, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v58, v59, p4.capture_place_id)
+	if self.capture_place_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.capture_place_id)
 	end
 
-	if p4.edits ~= nil then
-		local v60 = p4.edits:encode()
-		local v61, v62 = proto.writeTag(buf, n3, 6, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeBuffer(v61, v62, v60, buffer.len(v60))
+	if self.edits ~= nil then
+		local encoded = self.edits:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf3 = buffer.create(n3)
-
-	buffer.copy(buf3, 0, buf, 0, n3)
-
-	return buf3
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t6.decode(p5: buffer) -- line: 501
-	-- upvalues: t6 (copy), proto (copy), t1 (copy)
-	local v65 = t6.new()
-	local n4 = 0
 
-	while n4 < buffer.len(p5) do
-		local v67, v68
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
 
-		v67, v68, n4 = proto.readTag(p5, n4)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v68 == proto.wireTypes.varint then
-			local v69
-
-			v69, n4 = proto.readVarInt(p5, n4)
-		elseif v68 == proto.wireTypes.lengthDelimited then
-			if v67 == 2 then
-				local v70
-
-				v70, n4 = proto.readBuffer(p5, n4)
-				v65.capture_type = buffer.tostring(v70)
-			elseif v67 == 3 then
-				local v71
-
-				v71, n4 = proto.readBuffer(p5, n4)
-				v65.description = buffer.tostring(v71)
-			elseif v67 == 4 then
-				local v72
-
-				v72, n4 = proto.readBuffer(p5, n4)
-				v65.capture_universe_id = buffer.tostring(v72)
-			elseif v67 == 5 then
-				local v73
-
-				v73, n4 = proto.readBuffer(p5, n4)
-				v65.capture_place_id = buffer.tostring(v73)
-			elseif v67 == 6 then
-				local v74
-
-				v74, n4 = proto.readBuffer(p5, n4)
-				v65.edits = t1.MomentData_MomentMetadata_MomentEdits.decode(v74)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.capture_type = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.description = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.capture_universe_id = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.capture_place_id = buffer.tostring(v5)
+			elseif v3 == 6 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.edits = v.MomentData_MomentMetadata_MomentEdits.decode(v5)
 			else
-				local v75, v76 = proto.readVarInt(p5, n4)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n4 = v76 + v75
+				v2 = v5 + varInt
 			end
-		elseif v68 == proto.wireTypes.i32 then
-			if v67 == 1 then
-				local v77
-
-				v77, n4 = proto.readFloat(p5, n4)
-				v65.asset_total_duration_seconds = v77
+		elseif v4 == proto.wireTypes.i32 then
+			if v3 == 1 then
+				local asset_total_duration_seconds
+				asset_total_duration_seconds, v2 = proto.readFloat(buf, v2)
+				result.asset_total_duration_seconds = asset_total_duration_seconds
 			else
-				local v78
-
-				v78, n4 = proto.readFixed32(p5, n4)
+				local _
+				_, v2 = proto.readFixed32(buf, v2)
 			end
-		elseif v68 == proto.wireTypes.i64 then
-			local v79
-
-			v79, n4 = proto.readFixed64(p5, n4)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v68)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v65
-end
-function t6.jsonEncode(p6) -- line: 569
-	-- upvalues: proto (copy)
-	local t8 = {}
-
-	if p6.asset_total_duration_seconds ~= nil then
-		t8.assetTotalDurationSeconds = proto.json.serializeNumber(p6.asset_total_duration_seconds)
-	end
-
-	if p6.capture_type ~= nil then
-		t8.captureType = p6.capture_type
-	end
-
-	if p6.description ~= nil then
-		t8.description = p6.description
-	end
-
-	if p6.capture_universe_id ~= nil then
-		t8.captureUniverseId = p6.capture_universe_id
-	end
-
-	if p6.capture_place_id ~= nil then
-		t8.capturePlaceId = p6.capture_place_id
-	end
-
-	if p6.edits ~= nil then
-		t8.edits = p6.edits:jsonEncode()
-	end
-
-	return t8
-end
-function t6.jsonDecode(t9: {[any]: any}) -- line: 599
-	-- upvalues: t6 (copy), proto (copy), t1 (copy)
-	local v83 = t6.new()
-
-	if t9.asset_total_duration_seconds ~= nil then
-		v83.asset_total_duration_seconds = proto.json.deserializeNumber(t9.asset_total_duration_seconds)
-	end
-
-	if t9.assetTotalDurationSeconds ~= nil then
-		v83.asset_total_duration_seconds = proto.json.deserializeNumber(t9.assetTotalDurationSeconds)
-	end
-
-	if t9.capture_type ~= nil then
-		v83.capture_type = t9.capture_type
-	end
-
-	if t9.captureType ~= nil then
-		v83.capture_type = t9.captureType
-	end
-
-	if t9.description ~= nil then
-		v83.description = t9.description
-	end
-
-	if t9.capture_universe_id ~= nil then
-		v83.capture_universe_id = t9.capture_universe_id
-	end
-
-	if t9.captureUniverseId ~= nil then
-		v83.capture_universe_id = t9.captureUniverseId
-	end
-
-	if t9.capture_place_id ~= nil then
-		v83.capture_place_id = t9.capture_place_id
-	end
-
-	if t9.capturePlaceId ~= nil then
-		v83.capture_place_id = t9.capturePlaceId
-	end
-
-	if t9.edits ~= nil then
-		v83.edits = t1.MomentData_MomentMetadata_MomentEdits.jsonDecode(t9.edits)
-	end
-
-	return v83
+	return result
 end
 
-t6.descriptor = {
+function class2:jsonEncode()
+	local v2 = {}
+
+	if self.asset_total_duration_seconds ~= nil then
+		v2.assetTotalDurationSeconds = proto.json.serializeNumber(self.asset_total_duration_seconds)
+	end
+
+	if self.capture_type ~= nil then
+		v2.captureType = self.capture_type
+	end
+
+	if self.description ~= nil then
+		v2.description = self.description
+	end
+
+	if self.capture_universe_id ~= nil then
+		v2.captureUniverseId = self.capture_universe_id
+	end
+
+	if self.capture_place_id ~= nil then
+		v2.capturePlaceId = self.capture_place_id
+	end
+
+	if self.edits ~= nil then
+		v2.edits = self.edits:jsonEncode()
+	end
+
+	return v2
+end
+
+function class2.jsonDecode(data)
+	local v2 = class2.new()
+
+	if data.asset_total_duration_seconds ~= nil then
+		v2.asset_total_duration_seconds = proto.json.deserializeNumber(data.asset_total_duration_seconds)
+	end
+
+	if data.assetTotalDurationSeconds ~= nil then
+		v2.asset_total_duration_seconds = proto.json.deserializeNumber(data.assetTotalDurationSeconds)
+	end
+
+	if data.capture_type ~= nil then
+		v2.capture_type = data.capture_type
+	end
+
+	if data.captureType ~= nil then
+		v2.capture_type = data.captureType
+	end
+
+	if data.description ~= nil then
+		v2.description = data.description
+	end
+
+	if data.capture_universe_id ~= nil then
+		v2.capture_universe_id = data.capture_universe_id
+	end
+
+	if data.captureUniverseId ~= nil then
+		v2.capture_universe_id = data.captureUniverseId
+	end
+
+	if data.capture_place_id ~= nil then
+		v2.capture_place_id = data.capture_place_id
+	end
+
+	if data.capturePlaceId ~= nil then
+		v2.capture_place_id = data.capturePlaceId
+	end
+
+	if data.edits ~= nil then
+		v2.edits = v.MomentData_MomentMetadata_MomentEdits.jsonDecode(data.edits)
+	end
+
+	return v2
+end
+
+class2.descriptor = {
 	name = "MomentData_MomentMetadata",
 	fullName = "roblox.apppageplatform.shared.v1beta1.MomentMetadata"
 }
-t1.MomentData_MomentMetadata = t6
-typeRegistry.default:register(t1.MomentData_MomentMetadata)
 
-local t10 = {}
+v.MomentData_MomentMetadata = class2
 
-t10.__index = t10
+typeRegistry.default:register(v.MomentData_MomentMetadata)
 
-function t10.new(t11: {[any]: any}?) -- line: 659
-	-- upvalues: t10 (copy)
-	return (setmetatable({
-		music = if t11 ~= nil and t11.music ~= nil then t11.music else nil,
-		trim = if t11 ~= nil and t11.trim ~= nil then t11.trim else nil,
-		text_overlays = if t11 ~= nil and t11.text_overlays ~= nil then t11.text_overlays else {}
-	}, t10))
+local class3 = {}
+class3.__index = class3
+
+function class3.new(data)
+	local music
+
+	if not (data == nil or data.music == nil) then
+		music = data.music
+	end
+
+	local trim
+
+	if not (data == nil or data.trim == nil) then
+		trim = data.trim
+	end
+
+	local v2 = {
+		music = music,
+		trim = trim,
+		text_overlays = (data == nil or data.text_overlays == nil) and {} or data.text_overlays
+	}
+	return (setmetatable(v2, class3))
 end
-function t10.encode(p7) -- line: 669
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n5 = 0
 
-	if p7.music ~= nil then
-		local v88 = p7.music:encode()
-		local v89, v90 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+function class3:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n5 = proto.writeBuffer(v89, v90, v88, buffer.len(v88))
+	if self.music ~= nil then
+		local encoded = self.music:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	if p7.trim ~= nil then
-		local v91 = p7.trim:encode()
-		local v92, v93 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n5 = proto.writeBuffer(v92, v93, v91, buffer.len(v91))
+	if self.trim ~= nil then
+		local encoded = self.trim:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	if p7.text_overlays ~= nil and #p7.text_overlays > 0 then
-		for _, v95 in p7.text_overlays do
-			local v96 = v95:encode()
-			local v97, v98 = proto.writeTag(buf, n5, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n5 = proto.writeBuffer(v97, v98, v96, buffer.len(v96))
+	if self.text_overlays ~= nil and #self.text_overlays > 0 then
+		for _, text_overlay in self.text_overlays do
+			local encoded = text_overlay:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf4 = buffer.create(n5)
-
-	buffer.copy(buf4, 0, buf, 0, n5)
-
-	return buf4
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t10.decode(p8: buffer) -- line: 698
-	-- upvalues: t10 (copy), proto (copy), t1 (copy)
-	local v101 = t10.new()
-	local n6 = 0
 
-	while n6 < buffer.len(p8) do
-		local v103, v104
+function class3.decode(buf: buffer)
+	local result = class3.new()
+	local v2 = 0
 
-		v103, v104, n6 = proto.readTag(p8, n6)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v104 == proto.wireTypes.varint then
-			local v105
-
-			v105, n6 = proto.readVarInt(p8, n6)
-		elseif v104 == proto.wireTypes.lengthDelimited then
-			if v103 == 1 then
-				local v106
-
-				v106, n6 = proto.readBuffer(p8, n6)
-				v101.music = t1.MomentData_MomentMetadata_MomentEdits_MusicEdit.decode(v106)
-			elseif v103 == 2 then
-				local v107
-
-				v107, n6 = proto.readBuffer(p8, n6)
-				v101.trim = t1.MomentData_MomentMetadata_MomentEdits_TrimEdit.decode(v107)
-			elseif v103 == 3 then
-				local v108
-
-				v108, n6 = proto.readBuffer(p8, n6)
-				table.insert(v101.text_overlays, t1.MomentData_MomentMetadata_MomentEdits_TextOverlay.decode(v108))
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.music = v.MomentData_MomentMetadata_MomentEdits_MusicEdit.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.trim = v.MomentData_MomentMetadata_MomentEdits_TrimEdit.decode(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.text_overlays, v.MomentData_MomentMetadata_MomentEdits_TextOverlay.decode(v5))
 			else
-				local v109, v110 = proto.readVarInt(p8, n6)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n6 = v110 + v109
+				v2 = v5 + varInt
 			end
-		elseif v104 == proto.wireTypes.i32 then
-			local v111
-
-			v111, n6 = proto.readFixed32(p8, n6)
-		elseif v104 == proto.wireTypes.i64 then
-			local v112
-
-			v112, n6 = proto.readFixed64(p8, n6)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v104)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v101
-end
-function t10.jsonEncode(p9) -- line: 754
-	local t12 = {}
-
-	if p9.music ~= nil then
-		t12.music = p9.music:jsonEncode()
-	end
-
-	if p9.trim ~= nil then
-		t12.trim = p9.trim:jsonEncode()
-	end
-
-	if p9.text_overlays ~= nil and #p9.text_overlays > 0 then
-		local t13 = {}
-
-		for _, v117 in p9.text_overlays do
-			table.insert(t13, v117:jsonEncode())
-		end
-
-		t12.textOverlays = t13
-	end
-
-	return t12
-end
-function t10.jsonDecode(t14: {[any]: any}) -- line: 776
-	-- upvalues: t10 (copy), t1 (copy)
-	local v119 = t10.new()
-
-	if t14.music ~= nil then
-		v119.music = t1.MomentData_MomentMetadata_MomentEdits_MusicEdit.jsonDecode(t14.music)
-	end
-
-	if t14.trim ~= nil then
-		v119.trim = t1.MomentData_MomentMetadata_MomentEdits_TrimEdit.jsonDecode(t14.trim)
-	end
-
-	if t14.text_overlays ~= nil then
-		local t15 = {}
-
-		for _, v122 in t14.text_overlays do
-			table.insert(t15, t1.MomentData_MomentMetadata_MomentEdits_TextOverlay.jsonDecode(v122))
-		end
-
-		v119.text_overlays = t15
-	end
-
-	if t14.textOverlays ~= nil then
-		local t16 = {}
-
-		for _, v125 in t14.textOverlays do
-			table.insert(t16, t1.MomentData_MomentMetadata_MomentEdits_TextOverlay.jsonDecode(v125))
-		end
-
-		v119.text_overlays = t16
-	end
-
-	return v119
+	return result
 end
 
-t10.descriptor = {
+function class3:jsonEncode()
+	local v2 = {}
+
+	if self.music ~= nil then
+		v2.music = self.music:jsonEncode()
+	end
+
+	if self.trim ~= nil then
+		v2.trim = self.trim:jsonEncode()
+	end
+
+	if self.text_overlays == nil or not (#self.text_overlays > 0) then
+		return v2
+	end
+
+	local textOverlays = {}
+
+	for _, text_overlay in self.text_overlays do
+		table.insert(textOverlays, text_overlay:jsonEncode())
+	end
+
+	v2.textOverlays = textOverlays
+
+	return v2
+end
+
+function class3.jsonDecode(data)
+	local v2 = class3.new()
+
+	if data.music ~= nil then
+		v2.music = v.MomentData_MomentMetadata_MomentEdits_MusicEdit.jsonDecode(data.music)
+	end
+
+	if data.trim ~= nil then
+		v2.trim = v.MomentData_MomentMetadata_MomentEdits_TrimEdit.jsonDecode(data.trim)
+	end
+
+	if data.text_overlays ~= nil then
+		local text_overlays = {}
+
+		for _, text_overlay in data.text_overlays do
+			table.insert(text_overlays, v.MomentData_MomentMetadata_MomentEdits_TextOverlay.jsonDecode(text_overlay))
+		end
+
+		v2.text_overlays = text_overlays
+	end
+
+	if data.textOverlays == nil then
+		return v2
+	end
+
+	local text_overlays = {}
+
+	for _, textOverlay in data.textOverlays do
+		table.insert(text_overlays, v.MomentData_MomentMetadata_MomentEdits_TextOverlay.jsonDecode(textOverlay))
+	end
+
+	v2.text_overlays = text_overlays
+
+	return v2
+end
+
+class3.descriptor = {
 	name = "MomentData_MomentMetadata_MomentEdits",
 	fullName = "roblox.apppageplatform.shared.v1beta1.MomentEdits"
 }
-t1.MomentData_MomentMetadata_MomentEdits = t10
-typeRegistry.default:register(t1.MomentData_MomentMetadata_MomentEdits)
 
-local t17 = {}
+v.MomentData_MomentMetadata_MomentEdits = class3
 
-t17.__index = t17
+typeRegistry.default:register(v.MomentData_MomentMetadata_MomentEdits)
 
-function t17.new(t18: {[any]: any}?) -- line: 824
-	-- upvalues: t17 (copy)
-	return (setmetatable({
-		asset_id = if t18 ~= nil and t18.asset_id ~= nil then t18.asset_id else nil,
-		start_time_seconds = if t18 ~= nil and t18.start_time_seconds ~= nil then t18.start_time_seconds else nil
-	}, t17))
-end
-function t17.encode(p10) -- line: 833
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n7 = 0
+local class4 = {}
+class4.__index = class4
 
-	if p10.asset_id ~= nil then
-		local v130, v131 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+function class4.new(p)
+	local asset_id
 
-		buf, n7 = proto.writeString(v130, v131, p10.asset_id)
+	if not (p == nil or p.asset_id == nil) then
+		asset_id = p.asset_id
 	end
 
-	if p10.start_time_seconds ~= nil then
-		local v132, v133 = proto.writeTag(buf, n7, 2, proto.wireTypes.i32)
+	local start_time_seconds
 
-		buf, n7 = proto.writeFloat(v132, v133, p10.start_time_seconds)
+	if not (p == nil or p.start_time_seconds == nil) then
+		start_time_seconds = p.start_time_seconds
 	end
 
-	local buf5 = buffer.create(n7)
-
-	buffer.copy(buf5, 0, buf, 0, n7)
-
-	return buf5
+	return (setmetatable({ asset_id = asset_id, start_time_seconds = start_time_seconds }, class4))
 end
-function t17.decode(p11: buffer) -- line: 854
-	-- upvalues: t17 (copy), proto (copy)
-	local v136 = t17.new()
-	local n8 = 0
 
-	while n8 < buffer.len(p11) do
-		local v138, v139
+function class4:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		v138, v139, n8 = proto.readTag(p11, n8)
+	if self.asset_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.asset_id)
+	end
 
-		if v139 == proto.wireTypes.varint then
-			local v140
+	if self.start_time_seconds ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.i32)
+		v2, v3 = proto.writeFloat(v4, v5, self.start_time_seconds)
+	end
 
-			v140, n8 = proto.readVarInt(p11, n8)
-		elseif v139 == proto.wireTypes.lengthDelimited then
-			if v138 == 1 then
-				local v141
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
 
-				v141, n8 = proto.readBuffer(p11, n8)
-				v136.asset_id = buffer.tostring(v141)
+function class4.decode(buf: buffer)
+	local result = class4.new()
+	local v2 = 0
+
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.asset_id = buffer.tostring(v5)
 			else
-				local v142, v143 = proto.readVarInt(p11, n8)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n8 = v143 + v142
+				v2 = v5 + varInt
 			end
-		elseif v139 == proto.wireTypes.i32 then
-			if v138 == 2 then
-				local v144
-
-				v144, n8 = proto.readFloat(p11, n8)
-				v136.start_time_seconds = v144
+		elseif v4 == proto.wireTypes.i32 then
+			if v3 == 2 then
+				local start_time_seconds
+				start_time_seconds, v2 = proto.readFloat(buf, v2)
+				result.start_time_seconds = start_time_seconds
 			else
-				local v145
-
-				v145, n8 = proto.readFixed32(p11, n8)
+				local _
+				_, v2 = proto.readFixed32(buf, v2)
 			end
-		elseif v139 == proto.wireTypes.i64 then
-			local v146
-
-			v146, n8 = proto.readFixed64(p11, n8)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v139)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v136
-end
-function t17.jsonEncode(p12) -- line: 904
-	-- upvalues: proto (copy)
-	local t19 = {}
-
-	if p12.asset_id ~= nil then
-		t19.assetId = p12.asset_id
-	end
-
-	if p12.start_time_seconds ~= nil then
-		t19.startTimeSeconds = proto.json.serializeNumber(p12.start_time_seconds)
-	end
-
-	return t19
-end
-function t17.jsonDecode(t20: {[any]: any}) -- line: 920
-	-- upvalues: t17 (copy), proto (copy)
-	local v150 = t17.new()
-
-	if t20.asset_id ~= nil then
-		v150.asset_id = t20.asset_id
-	end
-
-	if t20.assetId ~= nil then
-		v150.asset_id = t20.assetId
-	end
-
-	if t20.start_time_seconds ~= nil then
-		v150.start_time_seconds = proto.json.deserializeNumber(t20.start_time_seconds)
-	end
-
-	if t20.startTimeSeconds ~= nil then
-		v150.start_time_seconds = proto.json.deserializeNumber(t20.startTimeSeconds)
-	end
-
-	return v150
+	return result
 end
 
-t17.descriptor = {
+function class4:jsonEncode()
+	local v2 = {}
+
+	if self.asset_id ~= nil then
+		v2.assetId = self.asset_id
+	end
+
+	if self.start_time_seconds ~= nil then
+		v2.startTimeSeconds = proto.json.serializeNumber(self.start_time_seconds)
+	end
+
+	return v2
+end
+
+function class4.jsonDecode(data)
+	local v2 = class4.new()
+
+	if data.asset_id ~= nil then
+		v2.asset_id = data.asset_id
+	end
+
+	if data.assetId ~= nil then
+		v2.asset_id = data.assetId
+	end
+
+	if data.start_time_seconds ~= nil then
+		v2.start_time_seconds = proto.json.deserializeNumber(data.start_time_seconds)
+	end
+
+	if data.startTimeSeconds ~= nil then
+		v2.start_time_seconds = proto.json.deserializeNumber(data.startTimeSeconds)
+	end
+
+	return v2
+end
+
+class4.descriptor = {
 	name = "MomentData_MomentMetadata_MomentEdits_MusicEdit",
 	fullName = "roblox.apppageplatform.shared.v1beta1.MusicEdit"
 }
-t1.MomentData_MomentMetadata_MomentEdits_MusicEdit = t17
-typeRegistry.default:register(t1.MomentData_MomentMetadata_MomentEdits_MusicEdit)
 
-local t21 = {}
+v.MomentData_MomentMetadata_MomentEdits_MusicEdit = class4
 
-t21.__index = t21
+typeRegistry.default:register(v.MomentData_MomentMetadata_MomentEdits_MusicEdit)
 
-function t21.new(t22: {[any]: any}?) -- line: 959
-	-- upvalues: t21 (copy)
+local class5 = {}
+class5.__index = class5
+
+function class5.new(p)
+	local start_time_seconds
+
+	if not (p == nil or p.start_time_seconds == nil) then
+		start_time_seconds = p.start_time_seconds
+	end
+
+	local end_time_seconds
+
+	if not (p == nil or p.end_time_seconds == nil) then
+		end_time_seconds = p.end_time_seconds
+	end
+
 	return (setmetatable({
-		start_time_seconds = if t22 ~= nil and t22.start_time_seconds ~= nil then t22.start_time_seconds else nil,
-		end_time_seconds = if t22 ~= nil and t22.end_time_seconds ~= nil then t22.end_time_seconds else nil
-	}, t21))
+		start_time_seconds = start_time_seconds,
+		end_time_seconds = end_time_seconds
+	}, class5))
 end
-function t21.encode(p13) -- line: 968
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n9 = 0
 
-	if p13.start_time_seconds ~= nil then
-		local v155, v156 = proto.writeTag(buf, n9, 1, proto.wireTypes.i32)
+function class5:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n9 = proto.writeFloat(v155, v156, p13.start_time_seconds)
+	if self.start_time_seconds ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.i32)
+		v2, v3 = proto.writeFloat(v4, v5, self.start_time_seconds)
 	end
 
-	if p13.end_time_seconds ~= nil then
-		local v157, v158 = proto.writeTag(buf, n9, 2, proto.wireTypes.i32)
-
-		buf, n9 = proto.writeFloat(v157, v158, p13.end_time_seconds)
+	if self.end_time_seconds ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.i32)
+		v2, v3 = proto.writeFloat(v4, v5, self.end_time_seconds)
 	end
 
-	local buf6 = buffer.create(n9)
-
-	buffer.copy(buf6, 0, buf, 0, n9)
-
-	return buf6
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t21.decode(p14: buffer) -- line: 989
-	-- upvalues: t21 (copy), proto (copy)
-	local v161 = t21.new()
-	local n10 = 0
 
-	while n10 < buffer.len(p14) do
-		local v163, v164
+function class5.decode(buf: buffer)
+	local result = class5.new()
+	local v2 = 0
 
-		v163, v164, n10 = proto.readTag(p14, n10)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v164 == proto.wireTypes.varint then
-			local v165
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			local varInt, v5 = proto.readVarInt(buf, v2)
 
-			v165, n10 = proto.readVarInt(p14, n10)
-		elseif v164 == proto.wireTypes.lengthDelimited then
-			local v166, v167 = proto.readVarInt(p14, n10)
-
-			n10 = v167 + v166
-		elseif v164 == proto.wireTypes.i32 then
-			if v163 == 1 then
-				local v168
-
-				v168, n10 = proto.readFloat(p14, n10)
-				v161.start_time_seconds = v168
-			elseif v163 == 2 then
-				local v169
-
-				v169, n10 = proto.readFloat(p14, n10)
-				v161.end_time_seconds = v169
+			v2 = v5 + varInt
+		elseif v4 == proto.wireTypes.i32 then
+			if v3 == 1 then
+				local start_time_seconds
+				start_time_seconds, v2 = proto.readFloat(buf, v2)
+				result.start_time_seconds = start_time_seconds
+			elseif v3 == 2 then
+				local end_time_seconds
+				end_time_seconds, v2 = proto.readFloat(buf, v2)
+				result.end_time_seconds = end_time_seconds
 			else
-				local v170
-
-				v170, n10 = proto.readFixed32(p14, n10)
+				local _
+				_, v2 = proto.readFixed32(buf, v2)
 			end
-		elseif v164 == proto.wireTypes.i64 then
-			local v171
-
-			v171, n10 = proto.readFixed64(p14, n10)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v164)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v161
-end
-function t21.jsonEncode(p15) -- line: 1039
-	-- upvalues: proto (copy)
-	local t23 = {}
-
-	if p15.start_time_seconds ~= nil then
-		t23.startTimeSeconds = proto.json.serializeNumber(p15.start_time_seconds)
-	end
-
-	if p15.end_time_seconds ~= nil then
-		t23.endTimeSeconds = proto.json.serializeNumber(p15.end_time_seconds)
-	end
-
-	return t23
-end
-function t21.jsonDecode(t24: {[any]: any}) -- line: 1055
-	-- upvalues: t21 (copy), proto (copy)
-	local v175 = t21.new()
-
-	if t24.start_time_seconds ~= nil then
-		v175.start_time_seconds = proto.json.deserializeNumber(t24.start_time_seconds)
-	end
-
-	if t24.startTimeSeconds ~= nil then
-		v175.start_time_seconds = proto.json.deserializeNumber(t24.startTimeSeconds)
-	end
-
-	if t24.end_time_seconds ~= nil then
-		v175.end_time_seconds = proto.json.deserializeNumber(t24.end_time_seconds)
-	end
-
-	if t24.endTimeSeconds ~= nil then
-		v175.end_time_seconds = proto.json.deserializeNumber(t24.endTimeSeconds)
-	end
-
-	return v175
+	return result
 end
 
-t21.descriptor = {
+function class5:jsonEncode()
+	local v2 = {}
+
+	if self.start_time_seconds ~= nil then
+		v2.startTimeSeconds = proto.json.serializeNumber(self.start_time_seconds)
+	end
+
+	if self.end_time_seconds ~= nil then
+		v2.endTimeSeconds = proto.json.serializeNumber(self.end_time_seconds)
+	end
+
+	return v2
+end
+
+function class5.jsonDecode(data)
+	local v2 = class5.new()
+
+	if data.start_time_seconds ~= nil then
+		v2.start_time_seconds = proto.json.deserializeNumber(data.start_time_seconds)
+	end
+
+	if data.startTimeSeconds ~= nil then
+		v2.start_time_seconds = proto.json.deserializeNumber(data.startTimeSeconds)
+	end
+
+	if data.end_time_seconds ~= nil then
+		v2.end_time_seconds = proto.json.deserializeNumber(data.end_time_seconds)
+	end
+
+	if data.endTimeSeconds ~= nil then
+		v2.end_time_seconds = proto.json.deserializeNumber(data.endTimeSeconds)
+	end
+
+	return v2
+end
+
+class5.descriptor = {
 	name = "MomentData_MomentMetadata_MomentEdits_TrimEdit",
 	fullName = "roblox.apppageplatform.shared.v1beta1.TrimEdit"
 }
-t1.MomentData_MomentMetadata_MomentEdits_TrimEdit = t21
-typeRegistry.default:register(t1.MomentData_MomentMetadata_MomentEdits_TrimEdit)
 
-local t25 = {}
+v.MomentData_MomentMetadata_MomentEdits_TrimEdit = class5
 
-t25.__index = t25
+typeRegistry.default:register(v.MomentData_MomentMetadata_MomentEdits_TrimEdit)
 
-function t25.new(t26: {[any]: any}?) -- line: 1094
-	-- upvalues: t25 (copy)
-	return (setmetatable({
-		position = if t26 ~= nil and t26.position ~= nil then t26.position else {},
-		rotation = if t26 ~= nil and t26.rotation ~= nil then t26.rotation else nil,
-		scale = if t26 ~= nil and t26.scale ~= nil then t26.scale else nil,
-		text = if t26 ~= nil and t26.text ~= nil then t26.text else nil,
-		style = if t26 ~= nil and t26.style ~= nil then t26.style else nil,
-		z_index = if t26 ~= nil and t26.z_index ~= nil then t26.z_index else nil
-	}, t25))
+local class6 = {}
+class6.__index = class6
+
+function class6.new(data)
+	local v2 = {
+		position = (data == nil or data.position == nil) and {} or data.position,
+		rotation = 0,
+		scale = 0,
+		text = 0,
+		style = 0,
+		z_index = 0
+	}
+	local rotation
+
+	if not (data == nil or data.rotation == nil) then
+		rotation = data.rotation
+	end
+
+	v2.rotation = rotation
+	local scale
+
+	if not (data == nil or data.scale == nil) then
+		scale = data.scale
+	end
+
+	v2.scale = scale
+	local text
+
+	if not (data == nil or data.text == nil) then
+		text = data.text
+	end
+
+	v2.text = text
+	local style
+
+	if not (data == nil or data.style == nil) then
+		style = data.style
+	end
+
+	v2.style = style
+	local z_index
+
+	if not (data == nil or data.z_index == nil) then
+		z_index = data.z_index
+	end
+
+	v2.z_index = z_index
+	return (setmetatable(v2, class6))
 end
-function t25.encode(p16) -- line: 1110
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n11 = 0
 
-	if p16.position ~= nil and #p16.position > 0 then
-		local buf7 = buffer.create(0)
-		local n12 = 0
+function class6:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		for _, v183 in p16.position do
-			buf7, n12 = proto.writeFloat(buf7, n12, v183)
+	if self.position ~= nil and #self.position > 0 then
+		local buf = buffer.create(0)
+		local v4 = 0
+
+		for _, v5 in self.position do
+			buf, v4 = proto.writeFloat(buf, v4, v5)
 		end
 
-		local v184, v185 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
-
-		buf, n11 = proto.writeBuffer(v184, v185, buf7, n12)
+		local v5, v6 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v5, v6, buf, v4)
 	end
 
-	if p16.rotation ~= nil then
-		local v186, v187 = proto.writeTag(buf, n11, 2, proto.wireTypes.i32)
-
-		buf, n11 = proto.writeFloat(v186, v187, p16.rotation)
+	if self.rotation ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.i32)
+		v2, v3 = proto.writeFloat(v4, v5, self.rotation)
 	end
 
-	if p16.scale ~= nil then
-		local v188, v189 = proto.writeTag(buf, n11, 3, proto.wireTypes.i32)
-
-		buf, n11 = proto.writeFloat(v188, v189, p16.scale)
+	if self.scale ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.i32)
+		v2, v3 = proto.writeFloat(v4, v5, self.scale)
 	end
 
-	if p16.text ~= nil then
-		local v190, v191 = proto.writeTag(buf, n11, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n11 = proto.writeString(v190, v191, p16.text)
+	if self.text ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.text)
 	end
 
-	if p16.style ~= nil then
-		local v192 = p16.style:encode()
-		local v193, v194 = proto.writeTag(buf, n11, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n11 = proto.writeBuffer(v193, v194, v192, buffer.len(v192))
+	if self.style ~= nil then
+		local encoded = self.style:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	if p16.z_index ~= nil then
-		local v195, v196 = proto.writeTag(buf, n11, 6, proto.wireTypes.varint)
-
-		buf, n11 = proto.writeVarInt(v195, v196, p16.z_index)
+	if self.z_index ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.z_index)
 	end
 
-	local buf8 = buffer.create(n11)
-
-	buffer.copy(buf8, 0, buf, 0, n11)
-
-	return buf8
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t25.decode(p17: buffer) -- line: 1159
-	-- upvalues: t25 (copy), proto (copy), t1 (copy)
-	local v199 = t25.new()
-	local n13 = 0
 
-	while n13 < buffer.len(p17) do
-		local v201, v202
+function class6.decode(buf: buffer)
+	local result = class6.new()
+	local v2 = 0
 
-		v201, v202, n13 = proto.readTag(p17, n13)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v202 == proto.wireTypes.varint then
-			if v201 == 6 then
-				local v203
-
-				v203, n13 = proto.readVarIntI32(p17, n13)
-				v199.z_index = v203
+		if v4 == proto.wireTypes.varint then
+			if v3 == 6 then
+				local z_index
+				z_index, v2 = proto.readVarIntI32(buf, v2)
+				result.z_index = z_index
 			else
-				local v204
-
-				v204, n13 = proto.readVarInt(p17, n13)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v202 == proto.wireTypes.lengthDelimited then
-			if v201 == 1 then
-				local v205
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
 
-				v205, n13 = proto.readVarInt(p17, n13)
+				local v6 = v2 + v5
 
-				local v206 = n13 + v205
-
-				while n13 < v206 do
-					local v207
-
-					v207, n13 = proto.readFloat(p17, n13)
-					table.insert(v199.position, v207)
+				while v2 < v6 do
+					local v7
+					v7, v2 = proto.readFloat(buf, v2)
+					table.insert(result.position, v7)
 				end
-			elseif v201 == 4 then
-				local v208
-
-				v208, n13 = proto.readBuffer(p17, n13)
-				v199.text = buffer.tostring(v208)
-			elseif v201 == 5 then
-				local v209
-
-				v209, n13 = proto.readBuffer(p17, n13)
-				v199.style = t1.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style.decode(v209)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.text = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.style = v.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style.decode(v5)
 			else
-				local v210, v211 = proto.readVarInt(p17, n13)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n13 = v211 + v210
+				v2 = v5 + varInt
 			end
-		elseif v202 == proto.wireTypes.i32 then
-			if v201 == 1 then
-				local v212
-
-				v212, n13 = proto.readFloat(p17, n13)
-				table.insert(v199.position, v212)
-			elseif v201 == 2 then
-				local v213
-
-				v213, n13 = proto.readFloat(p17, n13)
-				v199.rotation = v213
-			elseif v201 == 3 then
-				local v214
-
-				v214, n13 = proto.readFloat(p17, n13)
-				v199.scale = v214
+		elseif v4 == proto.wireTypes.i32 then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readFloat(buf, v2)
+				table.insert(result.position, v5)
+			elseif v3 == 2 then
+				local rotation
+				rotation, v2 = proto.readFloat(buf, v2)
+				result.rotation = rotation
+			elseif v3 == 3 then
+				local scale
+				scale, v2 = proto.readFloat(buf, v2)
+				result.scale = scale
 			else
-				local v215
-
-				v215, n13 = proto.readFixed32(p17, n13)
+				local _
+				_, v2 = proto.readFixed32(buf, v2)
 			end
-		elseif v202 == proto.wireTypes.i64 then
-			local v216
-
-			v216, n13 = proto.readFixed64(p17, n13)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v202)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v199
+	return result
 end
-function t25.jsonEncode(p18) -- line: 1242
-	-- upvalues: proto (copy)
-	local t27 = {}
 
-	if p18.position ~= nil and #p18.position > 0 then
-		local t28 = {}
+function class6:jsonEncode()
+	local v2 = {}
 
-		for _, v221 in p18.position do
-			table.insert(t28, proto.json.serializeNumber(v221))
+	if self.position ~= nil and #self.position > 0 then
+		local position = {}
+
+		for _, v3 in self.position do
+			table.insert(position, proto.json.serializeNumber(v3))
 		end
 
-		t27.position = t28
+		v2.position = position
 	end
 
-	if p18.rotation ~= nil then
-		t27.rotation = proto.json.serializeNumber(p18.rotation)
+	if self.rotation ~= nil then
+		v2.rotation = proto.json.serializeNumber(self.rotation)
 	end
 
-	if p18.scale ~= nil then
-		t27.scale = proto.json.serializeNumber(p18.scale)
+	if self.scale ~= nil then
+		v2.scale = proto.json.serializeNumber(self.scale)
 	end
 
-	if p18.text ~= nil then
-		t27.text = p18.text
+	if self.text ~= nil then
+		v2.text = self.text
 	end
 
-	if p18.style ~= nil then
-		t27.style = p18.style:jsonEncode()
+	if self.style ~= nil then
+		v2.style = self.style:jsonEncode()
 	end
 
-	if p18.z_index ~= nil then
-		t27.zIndex = p18.z_index
+	if self.z_index ~= nil then
+		v2.zIndex = self.z_index
 	end
 
-	return t27
+	return v2
 end
-function t25.jsonDecode(t29: {[any]: any}) -- line: 1278
-	-- upvalues: t25 (copy), proto (copy), t1 (copy)
-	local v223 = t25.new()
 
-	if t29.position ~= nil then
-		local t30 = {}
+function class6.jsonDecode(data)
+	local v2 = class6.new()
 
-		for _, v226 in t29.position do
-			table.insert(t30, proto.json.deserializeNumber(v226))
+	if data.position ~= nil then
+		local position = {}
+
+		for _, v3 in data.position do
+			table.insert(position, proto.json.deserializeNumber(v3))
 		end
 
-		v223.position = t30
+		v2.position = position
 	end
 
-	if t29.rotation ~= nil then
-		v223.rotation = proto.json.deserializeNumber(t29.rotation)
+	if data.rotation ~= nil then
+		v2.rotation = proto.json.deserializeNumber(data.rotation)
 	end
 
-	if t29.scale ~= nil then
-		v223.scale = proto.json.deserializeNumber(t29.scale)
+	if data.scale ~= nil then
+		v2.scale = proto.json.deserializeNumber(data.scale)
 	end
 
-	if t29.text ~= nil then
-		v223.text = t29.text
+	if data.text ~= nil then
+		v2.text = data.text
 	end
 
-	if t29.style ~= nil then
-		v223.style = t1.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style.jsonDecode(t29.style)
+	if data.style ~= nil then
+		v2.style = v.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style.jsonDecode(data.style)
 	end
 
-	if t29.z_index ~= nil then
-		v223.z_index = t29.z_index
+	if data.z_index ~= nil then
+		v2.z_index = data.z_index
 	end
 
-	if t29.zIndex ~= nil then
-		v223.z_index = t29.zIndex
+	if data.zIndex ~= nil then
+		v2.z_index = data.zIndex
 	end
 
-	return v223
+	return v2
 end
 
-t25.descriptor = {
+class6.descriptor = {
 	name = "MomentData_MomentMetadata_MomentEdits_TextOverlay",
 	fullName = "roblox.apppageplatform.shared.v1beta1.TextOverlay"
 }
-t1.MomentData_MomentMetadata_MomentEdits_TextOverlay = t25
-typeRegistry.default:register(t1.MomentData_MomentMetadata_MomentEdits_TextOverlay)
 
-local t31 = {}
+v.MomentData_MomentMetadata_MomentEdits_TextOverlay = class6
 
-t31.__index = t31
+typeRegistry.default:register(v.MomentData_MomentMetadata_MomentEdits_TextOverlay)
 
-function t31.new(t32: {[any]: any}?) -- line: 1335
-	-- upvalues: t31 (copy)
-	return (setmetatable({
-		font = if t32 ~= nil and t32.font ~= nil then t32.font else nil,
-		font_color = if t32 ~= nil and t32.font_color ~= nil then t32.font_color else {},
-		font_size = if t32 ~= nil and t32.font_size ~= nil then t32.font_size else nil,
-		text_x_alignment = if t32 ~= nil and t32.text_x_alignment ~= nil then t32.text_x_alignment else nil
-	}, t31))
-end
-function t31.encode(p19) -- line: 1349
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n14 = 0
+local class7 = {}
+class7.__index = class7
 
-	if p19.font ~= nil then
-		local v231, v232 = proto.writeTag(buf, n14, 1, proto.wireTypes.lengthDelimited)
+function class7.new(data)
+	local font
 
-		buf, n14 = proto.writeString(v231, v232, p19.font)
+	if not (data == nil or data.font == nil) then
+		font = data.font
 	end
 
-	if p19.font_color ~= nil and #p19.font_color > 0 then
-		local buf9 = buffer.create(0)
-		local n15 = 0
+	local v2 = {
+		font = font,
+		font_color = (data == nil or data.font_color == nil) and {} or data.font_color,
+		font_size = 0,
+		text_x_alignment = 0
+	}
+	local font_size
 
-		for _, v236 in p19.font_color do
-			buf9, n15 = proto.writeFloat(buf9, n15, v236)
+	if not (data == nil or data.font_size == nil) then
+		font_size = data.font_size
+	end
+
+	v2.font_size = font_size
+	local text_x_alignment
+
+	if not (data == nil or data.text_x_alignment == nil) then
+		text_x_alignment = data.text_x_alignment
+	end
+
+	v2.text_x_alignment = text_x_alignment
+	return (setmetatable(v2, class7))
+end
+
+function class7:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.font ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.font)
+	end
+
+	if self.font_color ~= nil and #self.font_color > 0 then
+		local buf = buffer.create(0)
+		local v4 = 0
+
+		for _, v5 in self.font_color do
+			buf, v4 = proto.writeFloat(buf, v4, v5)
 		end
 
-		local v237, v238 = proto.writeTag(buf, n14, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n14 = proto.writeBuffer(v237, v238, buf9, n15)
+		local v5, v6 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v5, v6, buf, v4)
 	end
 
-	if p19.font_size ~= nil then
-		local v239, v240 = proto.writeTag(buf, n14, 3, proto.wireTypes.i32)
-
-		buf, n14 = proto.writeFloat(v239, v240, p19.font_size)
+	if self.font_size ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.i32)
+		v2, v3 = proto.writeFloat(v4, v5, self.font_size)
 	end
 
-	if p19.text_x_alignment ~= nil then
-		local v241, v242 = proto.writeTag(buf, n14, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n14 = proto.writeString(v241, v242, p19.text_x_alignment)
+	if self.text_x_alignment ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.text_x_alignment)
 	end
 
-	local buf10 = buffer.create(n14)
-
-	buffer.copy(buf10, 0, buf, 0, n14)
-
-	return buf10
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t31.decode(p20: buffer) -- line: 1387
-	-- upvalues: t31 (copy), proto (copy)
-	local v245 = t31.new()
-	local n16 = 0
 
-	while n16 < buffer.len(p20) do
-		local v247, v248
+function class7.decode(buf: buffer)
+	local result = class7.new()
+	local v2 = 0
 
-		v247, v248, n16 = proto.readTag(p20, n16)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v248 == proto.wireTypes.varint then
-			local v249
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.font = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
 
-			v249, n16 = proto.readVarInt(p20, n16)
-		elseif v248 == proto.wireTypes.lengthDelimited then
-			if v247 == 1 then
-				local v250
+				local v6 = v2 + v5
 
-				v250, n16 = proto.readBuffer(p20, n16)
-				v245.font = buffer.tostring(v250)
-			elseif v247 == 2 then
-				local v251
-
-				v251, n16 = proto.readVarInt(p20, n16)
-
-				local v252 = n16 + v251
-
-				while n16 < v252 do
-					local v253
-
-					v253, n16 = proto.readFloat(p20, n16)
-					table.insert(v245.font_color, v253)
+				while v2 < v6 do
+					local v7
+					v7, v2 = proto.readFloat(buf, v2)
+					table.insert(result.font_color, v7)
 				end
-			elseif v247 == 4 then
-				local v254
-
-				v254, n16 = proto.readBuffer(p20, n16)
-				v245.text_x_alignment = buffer.tostring(v254)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.text_x_alignment = buffer.tostring(v5)
 			else
-				local v255, v256 = proto.readVarInt(p20, n16)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n16 = v256 + v255
+				v2 = v5 + varInt
 			end
-		elseif v248 == proto.wireTypes.i32 then
-			if v247 == 2 then
-				local v257
-
-				v257, n16 = proto.readFloat(p20, n16)
-				table.insert(v245.font_color, v257)
-			elseif v247 == 3 then
-				local v258
-
-				v258, n16 = proto.readFloat(p20, n16)
-				v245.font_size = v258
+		elseif v4 == proto.wireTypes.i32 then
+			if v3 == 2 then
+				local v5
+				v5, v2 = proto.readFloat(buf, v2)
+				table.insert(result.font_color, v5)
+			elseif v3 == 3 then
+				local font_size
+				font_size, v2 = proto.readFloat(buf, v2)
+				result.font_size = font_size
 			else
-				local v259
-
-				v259, n16 = proto.readFixed32(p20, n16)
+				local _
+				_, v2 = proto.readFixed32(buf, v2)
 			end
-		elseif v248 == proto.wireTypes.i64 then
-			local v260
-
-			v260, n16 = proto.readFixed64(p20, n16)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v248)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v245
-end
-function t31.jsonEncode(p21) -- line: 1460
-	-- upvalues: proto (copy)
-	local t33 = {}
-
-	if p21.font ~= nil then
-		t33.font = p21.font
-	end
-
-	if p21.font_color ~= nil and #p21.font_color > 0 then
-		local t34 = {}
-
-		for _, v265 in p21.font_color do
-			table.insert(t34, proto.json.serializeNumber(v265))
-		end
-
-		t33.fontColor = t34
-	end
-
-	if p21.font_size ~= nil then
-		t33.fontSize = proto.json.serializeNumber(p21.font_size)
-	end
-
-	if p21.text_x_alignment ~= nil then
-		t33.textXAlignment = p21.text_x_alignment
-	end
-
-	return t33
-end
-function t31.jsonDecode(t35: {[any]: any}) -- line: 1488
-	-- upvalues: t31 (copy), proto (copy)
-	local v267 = t31.new()
-
-	if t35.font ~= nil then
-		v267.font = t35.font
-	end
-
-	if t35.font_color ~= nil then
-		local t36 = {}
-
-		for _, v270 in t35.font_color do
-			table.insert(t36, proto.json.deserializeNumber(v270))
-		end
-
-		v267.font_color = t36
-	end
-
-	if t35.fontColor ~= nil then
-		local t37 = {}
-
-		for _, v273 in t35.fontColor do
-			table.insert(t37, proto.json.deserializeNumber(v273))
-		end
-
-		v267.font_color = t37
-	end
-
-	if t35.font_size ~= nil then
-		v267.font_size = proto.json.deserializeNumber(t35.font_size)
-	end
-
-	if t35.fontSize ~= nil then
-		v267.font_size = proto.json.deserializeNumber(t35.fontSize)
-	end
-
-	if t35.text_x_alignment ~= nil then
-		v267.text_x_alignment = t35.text_x_alignment
-	end
-
-	if t35.textXAlignment ~= nil then
-		v267.text_x_alignment = t35.textXAlignment
-	end
-
-	return v267
+	return result
 end
 
-t31.descriptor = {
+function class7:jsonEncode()
+	local v2 = {}
+
+	if self.font ~= nil then
+		v2.font = self.font
+	end
+
+	if self.font_color ~= nil and #self.font_color > 0 then
+		local fontColor = {}
+
+		for _, v3 in self.font_color do
+			table.insert(fontColor, proto.json.serializeNumber(v3))
+		end
+
+		v2.fontColor = fontColor
+	end
+
+	if self.font_size ~= nil then
+		v2.fontSize = proto.json.serializeNumber(self.font_size)
+	end
+
+	if self.text_x_alignment ~= nil then
+		v2.textXAlignment = self.text_x_alignment
+	end
+
+	return v2
+end
+
+function class7.jsonDecode(data)
+	local v2 = class7.new()
+
+	if data.font ~= nil then
+		v2.font = data.font
+	end
+
+	if data.font_color ~= nil then
+		local font_color = {}
+
+		for _, v3 in data.font_color do
+			table.insert(font_color, proto.json.deserializeNumber(v3))
+		end
+
+		v2.font_color = font_color
+	end
+
+	if data.fontColor ~= nil then
+		local font_color = {}
+
+		for _, v3 in data.fontColor do
+			table.insert(font_color, proto.json.deserializeNumber(v3))
+		end
+
+		v2.font_color = font_color
+	end
+
+	if data.font_size ~= nil then
+		v2.font_size = proto.json.deserializeNumber(data.font_size)
+	end
+
+	if data.fontSize ~= nil then
+		v2.font_size = proto.json.deserializeNumber(data.fontSize)
+	end
+
+	if data.text_x_alignment ~= nil then
+		v2.text_x_alignment = data.text_x_alignment
+	end
+
+	if data.textXAlignment ~= nil then
+		v2.text_x_alignment = data.textXAlignment
+	end
+
+	return v2
+end
+
+class7.descriptor = {
 	name = "MomentData_MomentMetadata_MomentEdits_TextOverlay_Style",
 	fullName = "roblox.apppageplatform.shared.v1beta1.Style"
 }
-t1.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style = t31
-typeRegistry.default:register(t1.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style)
+
+v.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style = class7
+
+typeRegistry.default:register(v.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style)
 
 return {
-	MomentData = t1.MomentData,
-	MomentData_MomentMetadata = t1.MomentData_MomentMetadata,
-	MomentData_MomentMetadata_MomentEdits = t1.MomentData_MomentMetadata_MomentEdits,
-	MomentData_MomentMetadata_MomentEdits_MusicEdit = t1.MomentData_MomentMetadata_MomentEdits_MusicEdit,
-	MomentData_MomentMetadata_MomentEdits_TrimEdit = t1.MomentData_MomentMetadata_MomentEdits_TrimEdit,
-	MomentData_MomentMetadata_MomentEdits_TextOverlay = t1.MomentData_MomentMetadata_MomentEdits_TextOverlay,
-	MomentData_MomentMetadata_MomentEdits_TextOverlay_Style = t1.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style
+	MomentData = v.MomentData,
+	MomentData_MomentMetadata = v.MomentData_MomentMetadata,
+	MomentData_MomentMetadata_MomentEdits = v.MomentData_MomentMetadata_MomentEdits,
+	MomentData_MomentMetadata_MomentEdits_MusicEdit = v.MomentData_MomentMetadata_MomentEdits_MusicEdit,
+	MomentData_MomentMetadata_MomentEdits_TrimEdit = v.MomentData_MomentMetadata_MomentEdits_TrimEdit,
+	MomentData_MomentMetadata_MomentEdits_TextOverlay = v.MomentData_MomentMetadata_MomentEdits_TextOverlay,
+	MomentData_MomentMetadata_MomentEdits_TextOverlay_Style = v.MomentData_MomentMetadata_MomentEdits_TextOverlay_Style
 }

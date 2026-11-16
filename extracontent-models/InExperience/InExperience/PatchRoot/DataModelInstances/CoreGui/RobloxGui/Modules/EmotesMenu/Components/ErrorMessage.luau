@@ -1,89 +1,87 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local ParentParent = script.Parent.Parent
-local Actions = ParentParent.Actions
-local HideError = require(Actions.HideError)
-local Constants = require(ParentParent.Constants)
-local v8 = Roact.PureComponent:extend("ErrorMessage")
 
-function v8.render(p1) -- line: 17
-	-- upvalues: Constants (copy), Roact (copy)
-	local v12 = Constants.Layouts[p1.props.layout]
+local parent = script.Parent.Parent
+
+local actions = parent.Actions
+local HideError = require(actions.HideError)
+
+local Constants = require(parent.Constants)
+
+local extended = Roact.PureComponent:extend("ErrorMessage")
+
+function extended.render(p)
+	local layout = Constants.Layouts[p.props.layout]
 
 	return Roact.createElement("Frame", {
-		Size = v12.ErrorFrameSize,
-		Position = v12.ErrorFramePosition,
+		Size = layout.ErrorFrameSize,
+		Position = layout.ErrorFramePosition,
 		BackgroundColor3 = Constants.Colors.Black,
 		BackgroundTransparency = Constants.ErrorFrameBackgroundTransparency,
 		BorderSizePixel = Constants.ErrorFrameBorderSize,
 		Selectable = false,
-		Visible = p1.props.displayOptions.errorVisible,
-		[Roact.Event.TouchTap] = function() -- line: 29
-			-- upvalues: p1 (copy)
-			p1.props.close()
+		Visible = p.props.displayOptions.errorVisible,
+		[Roact.Event.TouchTap] = function()
+			p.props.close()
 		end,
-		[Roact.Event.InputBegan] = function(_, p3) -- line: 33
-			-- upvalues: p1 (copy)
-			if p3.UserInputType == Enum.UserInputType.MouseButton1 then
-				p1.props.close()
+		[Roact.Event.InputBegan] = function(_, p2)
+			if p2.UserInputType == Enum.UserInputType.MouseButton1 then
+				p.props.close()
 			end
 		end
 	}, {
 		AsspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
-			AspectRatio = v12.ErrorFrameAspectRatio
+			AspectRatio = layout.ErrorFrameAspectRatio
 		}),
 		SizeConstraint = Roact.createElement("UISizeConstraint", {
-			MinSize = v12.ErrorFrameMinSize,
-			MaxSize = v12.ErrorFrameMaxSize
+			MinSize = layout.ErrorFrameMinSize,
+			MaxSize = layout.ErrorFrameMaxSize
 		}),
 		ErrorIcon = Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, v12.ErrorIconOffset, 0.5, 0),
-			Size = UDim2.new(0.2, -v12.ErrorIconOffset * 2, 1, -v12.ErrorIconOffset * 2),
-			Image = v12.ErrorIcon
+			Position = UDim2.new(0, layout.ErrorIconOffset, 0.5, 0),
+			Size = UDim2.new(0.2, -layout.ErrorIconOffset * 2, 1, -layout.ErrorIconOffset * 2),
+			Image = layout.ErrorIcon,
+			BackgroundTransparency = 1
 		}, {
 			AsspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1
 			})
 		}),
 		ErrorText = Roact.createElement("TextLabel", {
-			TextScaled = true,
-			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0.2, -v12.ErrorIconOffset, 0.5, 0),
+			Position = UDim2.new(0.2, -layout.ErrorIconOffset, 0.5, 0),
 			Size = UDim2.new(0.8, 0, 1, 0),
-			Text = p1.props.displayOptions.errorText,
-			TextSize = v12.ErrorTextSize,
+			Text = p.props.displayOptions.errorText,
+			TextScaled = true,
+			TextSize = layout.ErrorTextSize,
 			TextColor3 = Constants.Colors.White,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = v12.ErrorTextFont
+			Font = layout.ErrorTextFont,
+			BackgroundTransparency = 1
 		}, {
 			SizeConstraint = Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(v12.ErrorFrameMaxSize.X, v12.ErrorTextSize + Constants.TextPadding)
+				MaxSize = Vector2.new(layout.ErrorFrameMaxSize.X, layout.ErrorTextSize + Constants.TextPadding)
 			}),
 			TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
-				MaxTextSize = v12.ErrorTextSize
+				MaxTextSize = layout.ErrorTextSize
 			})
 		})
 	})
 end
 
-local function mapStateToProps(p4) -- line: 86
-	return {
-		displayOptions = p4.displayOptions,
-		layout = p4.layout
-	}
+local function mapStateToProps(p)
+	return { displayOptions = p.displayOptions, layout = p.layout }
 end
-local function mapDispatchToProps(p5) -- line: 93
-	-- upvalues: HideError (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		close = function() -- line: 95
-			-- upvalues: p5 (copy), HideError (copy)
-			return p5(HideError())
+		close = function()
+			return callback(HideError())
 		end
 	}
 end
 
-return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v8)
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(extended)

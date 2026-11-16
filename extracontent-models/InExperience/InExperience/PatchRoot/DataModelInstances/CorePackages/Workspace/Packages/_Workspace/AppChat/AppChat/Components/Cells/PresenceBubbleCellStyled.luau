@@ -1,98 +1,166 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Cryo = require(AppChatParent.Cryo)
+local parent = AppChat.Parent
 
-require(AppChatParent.UIBlox)
-
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+require(parent.UIBlox)
 local SocialLibraries = require(AppChat.SocialLibraries)
-local useTokens = require(AppChatParent.Foundation).Hooks.useTokens
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local FFlagAppChatRemoveConversationListDivider = require(AppChat.Flags.FFlagAppChatRemoveConversationListDivider)
+
 local PresenceBubbleCell = require(script.Parent.PresenceBubbleCell)
 local TestStyle = SocialLibraries.Components.TestStyle
-local t1 = {
+
+local v = {
+	Size = UDim2.new(1, 0, 1, 0),
 	avatarCirclePresenceImage = nil,
 	subTitleText = nil,
 	subTitleIcon = nil,
 	titleText = "TestUser",
 	secondaryTitleText = nil,
+	thumbnails = {},
 	conversationId = nil,
 	childWidth = 0,
+	style = Cryo.Dictionary.join(TestStyle, {
+		Tokens = {
+			Color = { None = {} }
+		}
+	}),
+	showDivider = not FFlagAppChatRemoveConversationListDivider,
 	boldTitle = true,
 	isLoading = false,
 	hideLeftAvatarPadding = false,
 	paddingLeft = 0,
-	paddingRight = 0,
-	Size = UDim2.new(1, 0, 1, 0),
-	thumbnails = {},
-	style = Cryo.Dictionary.join(TestStyle, {
-		Tokens = {
-			Color = {
-				None = {}
-			}
-		}
-	}),
-	showDivider = not FFlagAppChatRemoveConversationListDivider
+	paddingRight = 0
 }
 
-local function StyledCell(t2: {[any]: any}) -- line: 73
-	-- upvalues: useTokens (copy), Cryo (copy), t1 (copy), React (copy), PresenceBubbleCell (copy), FFlagDebugAppChatEnableDomLocators (copy)
-	local v14 = useTokens()
-	local v15 = Cryo.Dictionary.join(t1, t2)
-	local style = v15.style
-	local Theme = style.Theme
-	local styleFont = style.Font
-	local v19 = type(v15.avatarCirclePresenceImage) == "table"
+local function StyledCell(p)
+	local v2 = useTokens()
+	local joined = Cryo.Dictionary.join(v, p)
+	local style = joined.style
+	local theme = style.Theme
+	local font = style.Font
 
-	return React.createElement(PresenceBubbleCell, {
-		childWidth = v15.childWidth,
-		titleText = v15.titleText,
-		secondaryTitleText = v15.secondaryTitleText,
-		subTitleText = v15.subTitleText,
-		subTitleTimestamp = v15.subTitleTimestamp,
-		subTitleIcon = v15.subTitleIcon,
-		testId = if not FFlagDebugAppChatEnableDomLocators then nil else v15.testId,
-		avatarCirclePresenceImage = v15.avatarCirclePresenceImage,
-		thumbnails = v15.thumbnails,
-		onActivated = v15.onActivated,
-		onCircleActivated = v15.onCircleActivated,
-		Size = v15.Size,
-		isLoading = v15.isLoading,
-		showNewPresenceImage = v19,
-		conversationId = v15.conversationId,
-		BackgroundColor3 = Theme.BackgroundDefault.Color,
-		BackgroundTransparency = style.Tokens.Color.None.Transparency,
-		onPressedBackgroundColor3 = Theme.BackgroundOnPress.Color,
-		onPressedBackgroundTransparency = Theme.BackgroundOnPress.Transparency,
-		avatarCircleBackgroundColor3 = Theme.PlaceHolder.Color,
-		avatarCircleDividerColor3 = Theme.PlaceHolder.Color,
-		avatarCirclePresenceImageColor3 = if not v19 then nil else Theme.OnlineStatus.Color,
-		avatarCirclePresenceImageTransparency = if not v19 then nil else Theme.OnlineStatus.Transparency,
-		subTitleTextFont = styleFont.CaptionBody.Font,
-		subTitleTextTransparency = Theme.TextDefault.Transparency,
-		subTitleTextColor3 = Theme.TextDefault.Color,
-		subTitleTextSize = styleFont.CaptionBody.RelativeSize * styleFont.BaseSize,
-		subTitleIconColor3 = style.Theme.IconDefault.Color,
-		subTitleIconTransparency = style.Theme.IconDefault.Transparency,
-		titleFont = styleFont.Header2.Font,
-		titleTextTransparency = if v15.boldTitle then Theme.TextEmphasis.Transparency else Theme.TextDefault.Transparency,
-		titleTextColor3 = if v15.boldTitle then Theme.TextEmphasis.Color else Theme.TextDefault.Color,
-		titleTextSize = styleFont.Header2.RelativeSize * styleFont.BaseSize,
-		secondaryTitleFont = styleFont.Header2.Font,
-		secondaryTitleTextTransparency = Theme.TextMuted.Transparency,
-		secondaryTitleTextColor3 = Theme.TextMuted.Color,
-		secondaryTitleTextSize = styleFont.Header2.RelativeSize * styleFont.BaseSize,
-		showDivider = v15.showDivider,
-		dividerTransparency = Theme.Divider.Transparency,
-		dividerColor3 = Theme.Divider.Color,
-		avatarCircleSize = v14.Size.Size_1000,
-		avatarCircleCellWidth = v14.Size.Size_1200,
-		hideLeftAvatarPadding = v15.hideLeftAvatarPadding,
-		paddingLeft = v15.paddingLeft,
-		paddingRight = v15.paddingRight,
-		isRobloxSubscriber = v15.isRobloxSubscriber
-	}, v15.children or {})
+	local showNewPresenceImage = type(joined.avatarCirclePresenceImage) == "table"
+
+	local createElement = React.createElement
+	local v3 = {}
+	v3.childWidth = joined.childWidth
+	v3.titleText = joined.titleText
+	v3.secondaryTitleText = joined.secondaryTitleText
+	v3.subTitleText = joined.subTitleText
+	v3.subTitleTimestamp = joined.subTitleTimestamp
+	v3.subTitleIcon = joined.subTitleIcon
+	local testId
+
+	if FFlagDebugAppChatEnableDomLocators then
+		testId = joined.testId
+	end
+
+	v3.testId = testId
+	v3.avatarCirclePresenceImage = joined.avatarCirclePresenceImage
+	v3.thumbnails = joined.thumbnails
+	v3.onActivated = joined.onActivated
+	v3.onCircleActivated = joined.onCircleActivated
+	v3.Size = joined.Size
+	v3.isLoading = joined.isLoading
+	v3.showNewPresenceImage = showNewPresenceImage
+	v3.conversationId = joined.conversationId
+	v3.participants = joined.participants
+
+	v3.BackgroundColor3 = theme.BackgroundDefault.Color
+	v3.BackgroundTransparency = style.Tokens.Color.None.Transparency
+	v3.onPressedBackgroundColor3 = theme.BackgroundOnPress.Color
+	v3.onPressedBackgroundTransparency = theme.BackgroundOnPress.Transparency
+
+	v3.avatarCircleBackgroundColor3 = theme.PlaceHolder.Color
+	v3.avatarCircleDividerColor3 = theme.PlaceHolder.Color
+	local avatarCirclePresenceImageColor
+
+	if showNewPresenceImage then
+		avatarCirclePresenceImageColor = theme.OnlineStatus.Color
+	end
+
+	v3.avatarCirclePresenceImageColor3 = avatarCirclePresenceImageColor
+	local avatarCirclePresenceImageTransparency
+
+	if showNewPresenceImage then
+		avatarCirclePresenceImageTransparency = theme.OnlineStatus.Transparency
+	end
+
+	v3.avatarCirclePresenceImageTransparency = avatarCirclePresenceImageTransparency
+	local subTitleTextFont
+
+	if FoundationFontFaceMigration then
+		subTitleTextFont = v2.Typography.BodySmall.Font
+	else
+		subTitleTextFont = font.CaptionBody.Font
+	end
+
+	v3.subTitleTextFont = subTitleTextFont
+
+	v3.subTitleTextTransparency = theme.TextDefault.Transparency
+	v3.subTitleTextColor3 = theme.TextDefault.Color
+	v3.subTitleTextSize = font.CaptionBody.RelativeSize * font.BaseSize
+
+	v3.subTitleIconColor3 = style.Theme.IconDefault.Color
+	v3.subTitleIconTransparency = style.Theme.IconDefault.Transparency
+	local titleFont
+
+	if FoundationFontFaceMigration then
+		titleFont = v2.Typography.TitleLarge.Font
+	else
+		titleFont = font.Header2.Font
+	end
+
+	v3.titleFont = titleFont
+	local titleTextTransparency
+
+	if joined.boldTitle then
+		titleTextTransparency = theme.TextEmphasis.Transparency
+	else
+		titleTextTransparency = theme.TextDefault.Transparency
+	end
+
+	v3.titleTextTransparency = titleTextTransparency
+	local titleTextColor
+
+	if joined.boldTitle then
+		titleTextColor = theme.TextEmphasis.Color
+	else
+		titleTextColor = theme.TextDefault.Color
+	end
+
+	v3.titleTextColor3 = titleTextColor
+	v3.titleTextSize = font.Header2.RelativeSize * font.BaseSize
+	local secondaryTitleFont
+
+	if FoundationFontFaceMigration then
+		secondaryTitleFont = v2.Typography.TitleLarge.Font
+	else
+		secondaryTitleFont = font.Header2.Font
+	end
+
+	v3.secondaryTitleFont = secondaryTitleFont
+
+	v3.secondaryTitleTextTransparency = theme.TextMuted.Transparency
+	v3.secondaryTitleTextColor3 = theme.TextMuted.Color
+	v3.secondaryTitleTextSize = font.Header2.RelativeSize * font.BaseSize
+
+	v3.showDivider = joined.showDivider
+	v3.dividerTransparency = theme.Divider.Transparency
+	v3.dividerColor3 = theme.Divider.Color
+
+	v3.avatarCircleSize = v2.Size.Size_1000
+	v3.avatarCircleCellWidth = v2.Size.Size_1200
+	v3.hideLeftAvatarPadding = joined.hideLeftAvatarPadding
+	v3.paddingLeft = joined.paddingLeft
+	v3.paddingRight = joined.paddingRight
+	v3.isRobloxSubscriber = joined.isRobloxSubscriber
+	return createElement(PresenceBubbleCell, v3, joined.children or {})
 end
 
 return React.memo(StyledCell)

@@ -1,60 +1,43 @@
-local t1 = {}
+local set = {}
 
-local function isPascalCase(s1: string) -- line: 7
-	-- upvalues: t1 (copy)
-	if t1[s1] then
+local function isPascalCase(value: string) -- 1 equivalent call inferred from this helper
+	if set[value] then
 		return true
 	end
 
-	if typeof(s1) ~= "string" then
+	if typeof(value) ~= "string" then
 		return false
 	end
 
-	local v5 = s1:sub(1, 1)
-	local v6 = v5 == v5:upper()
+	local v = value:sub(1, 1)
+	local selected = v == v:upper()
 
-	if v6 then
-		t1[s1] = true
+	if selected then
+		set[value] = true
 	end
 
-	return v6
+	return selected
 end
-local function mapServerBindingProps(t2: {[any]: any}, t3: {[any]: any}) -- line: 34
-	-- upvalues: t1 (copy)
-	local v9 = nil
-	local v10 = nil
 
-	for v11, v12 in t2 do
-		local v13 = t3[v11]
+local function mapServerBindingProps(items, p)
+	local result = nil
+	local result2 = nil
 
-		if v13 ~= nil then
-			v9 = v9 or {}
-			v9[v13] = v12
+	for k, item in items do
+		local v = p[k]
+
+		if v == nil then
+			if isPascalCase(k) then -- inferred equivalent call
+				result = result or {}
+				table.insert(result, k)
+			end
 		else
-			local v14
-
-			if t1[v11] then
-				v14 = true
-			elseif typeof(v11) ~= "string" then
-				v14 = false
-			else
-				local v15 = v11:sub(1, 1)
-
-				v14 = v15 == v15:upper()
-
-				if v14 then
-					t1[v11] = true
-				end
-			end
-
-			if v14 then
-				v10 = v10 or {}
-				table.insert(v10, v11)
-			end
+			result2 = result2 or {}
+			result2[v] = item
 		end
 	end
 
-	return v9, v10
+	return result2, result
 end
 
 return mapServerBindingProps

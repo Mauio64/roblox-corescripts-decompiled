@@ -1,5 +1,1 @@
-return {
-	Leading = "Leading",
-	Content = "Content",
-	Trailing = "Trailing"
-}
+return { Leading = "Leading", Content = "Content", Trailing = "Trailing" }

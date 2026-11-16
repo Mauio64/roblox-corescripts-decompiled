@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("FormFactor").Parent
+local parent = script:FindFirstAncestor("FormFactor").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 6
-	return {
-		formFactor = p1
-	}
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(formFactor)
+	return { formFactor = formFactor }
 end)

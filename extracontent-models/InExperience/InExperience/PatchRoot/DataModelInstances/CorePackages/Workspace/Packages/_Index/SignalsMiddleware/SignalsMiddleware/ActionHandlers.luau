@@ -1,12 +1,29 @@
-return {
-	create = function() -- line: 6
-		return {}
-	end,
-	register = function(p1, s1: string, p2: ((...any) -> ...any)) -- line: 11
-		if not p1[s1] then
-			p1[s1] = {}
-		end
+local parent = script.Parent.Parent
+local SignalsExperimental = require(parent.SignalsExperimental)
+local ActionHandlers = {}
 
-		table.insert(p1[s1], p2)
+function ActionHandlers.create()
+	return {}
+end
+
+function ActionHandlers.register(p, p2: string, callback)
+	if not p[p2] then
+		p[p2] = {}
 	end
-}
+
+	table.insert(p[p2], callback)
+end
+
+function ActionHandlers.handleAction(p, p2)
+	local v = p[p2.type]
+
+	if v and #v > 0 then
+		SignalsExperimental.batch(function()
+			for _, v2 in v do
+				v2(p2)
+			end
+		end)
+	end
+end
+
+return ActionHandlers

@@ -1,1 +1,3 @@
-return (require(script.IconButton))
+local IconButton = require(script.IconButton)
+
+return IconButton

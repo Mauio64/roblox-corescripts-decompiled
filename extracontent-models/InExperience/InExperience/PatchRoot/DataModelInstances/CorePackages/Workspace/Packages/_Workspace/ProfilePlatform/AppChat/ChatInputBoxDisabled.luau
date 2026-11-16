@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local ChatInputBoxDisabled = require(Workspace.AppChat.AppChat.Components.ChatConversation.ChatInputBoxDisabled)
 
-return (require(_Workspace.AppChat.AppChat.Components.ChatConversation.ChatInputBoxDisabled))
+return ChatInputBoxDisabled

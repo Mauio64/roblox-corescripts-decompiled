@@ -1,26 +1,29 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
-local Images = require(ParentParentParent.App.ImageSet.Images)
-local withStyle = require(ParentParentParent.Core.Style.withStyle)
-local SpringAnimatedItem = require(ParentParentParent.Utility.SpringAnimatedItem)
-local ButtonType = require(ParentParent.Button.Enum.ButtonType)
-local ToastFrame = require(scriptParent.ToastFrame)
-local ToastIcon = require(scriptParent.ToastIcon)
-local ToastText = require(scriptParent.ToastText)
-local t1 = {
-	dampingRatio = 1,
-	frequency = 4
-}
-local v16 = Images["component_assets/circle_21"]
-local rect = Rect.new(10, 10, 11, 11)
-local v18 = Roact.PureComponent:extend("InteractiveToast")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-v18.validateProps = t.strictInterface({
+local Roact = require(parent4.Roact)
+local t = require(parent4.t)
+
+local ImageSetComponent = require(parent3.Core.ImageSet.ImageSetComponent)
+local Images = require(parent3.App.ImageSet.Images)
+local withStyle = require(parent3.Core.Style.withStyle)
+local SpringAnimatedItem = require(parent3.Utility.SpringAnimatedItem)
+local ButtonType = require(parent2.Button.Enum.ButtonType)
+
+local ToastFrame = require(parent.ToastFrame)
+local ToastIcon = require(parent.ToastIcon)
+local ToastText = require(parent.ToastText)
+
+local springOptions = { dampingRatio = 1, frequency = 4 }
+
+local component_assetscircle_21 = Images["component_assets/circle_21"]
+local rect = Rect.new(10, 10, 11, 11)
+
+local extended = Roact.PureComponent:extend("InteractiveToast")
+
+extended.validateProps = t.strictInterface({
 	anchorPoint = t.optional(t.Vector2),
 	buttonProps = t.optional(t.strictInterface({
 		buttonDimensions = t.Vector2,
@@ -41,56 +44,53 @@ v18.validateProps = t.strictInterface({
 	textFrameSize = t.optional(t.UDim2),
 	titleTextProps = ToastText.validateProps
 })
-v18.defaultProps = {
-	layoutOrder = 1,
-	pressedScale = 0.95,
+
+extended.defaultProps = {
 	anchorPoint = Vector2.new(0.5, 0.5),
+	layoutOrder = 1,
 	position = UDim2.new(0.5, 0, 0.5, 0),
+	pressedScale = 0.95,
 	size = UDim2.new(1, 0, 1, 0)
 }
 
-function v18.render(p1) -- line: 72
-	-- upvalues: withStyle (copy), Roact (copy), ImageSetComponent (copy), v16 (copy), rect (copy), SpringAnimatedItem (copy), t1 (copy), ToastFrame (copy)
-	return withStyle(function(p2) -- line: 73
-		-- upvalues: Roact (copy), ImageSetComponent (copy), p1 (copy), v16 (copy), rect (copy), SpringAnimatedItem (copy), t1 (copy), ToastFrame (copy)
-		local Theme = p2.Theme
+function extended.render(p)
+	return withStyle(function(p2)
+		local theme = p2.Theme
 
 		return Roact.createElement(ImageSetComponent.Label, {
+			AnchorPoint = p.props.anchorPoint,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			AnchorPoint = p1.props.anchorPoint,
-			Image = v16,
-			ImageColor3 = Theme.BackgroundUIDefault.Color,
-			ImageTransparency = Theme.BackgroundUIDefault.Transparency,
-			LayoutOrder = p1.props.layoutOrder,
-			Position = p1.props.position,
+			Image = component_assetscircle_21,
+			ImageColor3 = theme.BackgroundUIDefault.Color,
+			ImageTransparency = theme.BackgroundUIDefault.Transparency,
+			LayoutOrder = p.props.layoutOrder,
+			Position = p.props.position,
 			ScaleType = Enum.ScaleType.Slice,
-			Size = p1.props.size,
+			Size = p.props.size,
 			SliceCenter = rect
 		}, {
 			Scaler = Roact.createElement(SpringAnimatedItem.AnimatedUIScale, {
-				springOptions = t1,
+				springOptions = springOptions,
 				animatedValues = {
-					scale = p1.props.pressed and p1.props.pressedScale or 1
+					scale = p.props.pressed and p.props.pressedScale or 1
 				},
-				mapValuesToProps = function(p3) -- line: 94
-					return {
-						Scale = p3.scale
-					}
+				mapValuesToProps = function(p3)
+					return { Scale = p3.scale }
 				end
 			}),
 			ToastFrame = Roact.createElement(ToastFrame, {
-				buttonProps = p1.props.buttonProps,
-				iconProps = p1.props.iconProps,
-				iconChildren = p1.props.iconChildren,
-				isCompact = p1.props.isCompact,
-				padding = p1.props.padding,
-				subtitleTextProps = p1.props.subtitleTextProps,
-				textFrameSize = p1.props.textFrameSize,
-				titleTextProps = p1.props.titleTextProps
+				buttonProps = p.props.buttonProps,
+				iconProps = p.props.iconProps,
+				iconChildren = p.props.iconChildren,
+				isCompact = p.props.isCompact,
+				padding = p.props.padding,
+				subtitleTextProps = p.props.subtitleTextProps,
+				textFrameSize = p.props.textFrameSize,
+				titleTextProps = p.props.titleTextProps
 			})
 		})
 	end)
 end
 
-return v18
+return extended

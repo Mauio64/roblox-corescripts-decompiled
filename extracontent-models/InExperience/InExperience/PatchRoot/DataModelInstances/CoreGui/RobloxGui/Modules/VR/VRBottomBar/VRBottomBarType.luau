@@ -12,8 +12,5 @@ return {
 		Emotes = "emotes",
 		Inventory = "backpack"
 	},
-	Source = {
-		VRBottomBar = "vr_bottom_bar",
-		MoreSubMenu = "nine_dot"
-	}
+	Source = { VRBottomBar = "vr_bottom_bar", MoreSubMenu = "nine_dot" }
 }

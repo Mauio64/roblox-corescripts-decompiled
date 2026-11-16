@@ -1,14 +1,16 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local MenuClosed = require(ParentParent.Actions.MenuClosed)
-local MenuOpened = require(ParentParent.Actions.MenuOpened)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local Rodux = require(parent2.Rodux)
+
+local MenuClosed = require(parent.Actions.MenuClosed)
+local MenuOpened = require(parent.Actions.MenuOpened)
 
 return Rodux.createReducer(false, {
-	[MenuClosed.name] = function(_: boolean, _: {[any]: any}) -- line: 14
+	[MenuClosed.name] = function(_: boolean, _): boolean
 		return false
 	end,
-	[MenuOpened.name] = function(_: boolean, _: {[any]: any}) -- line: 18
+	[MenuOpened.name] = function(_: boolean, _): boolean
 		return true
 	end
 })

@@ -1,4 +1,1 @@
-return {
-	NormalSearchText = "NormalSearchText",
-	HotlineSearchText = "HotlineSearchText"
-}
+return { NormalSearchText = "NormalSearchText", HotlineSearchText = "HotlineSearchText" }

@@ -1,53 +1,65 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local ScrollView = require(Foundation.Components.ScrollView)
-
 require(Foundation.Components.Types)
-
 local Visibility = require(Foundation.Enums.Visibility)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
+
 local useScrollBarPadding = require(script.Parent.useScrollBarPadding)
-local useDialogVariants = require(script.Parent.Parent.useDialogVariants).useDialogVariants
+local useDialogVariants = require(script.Parent.Parent.useDialogVariants)
+local useDialogVariants2 = useDialogVariants.useDialogVariants
 local useDialog = require(script.Parent.Parent.useDialog)
 
-local function DialogContent(p1) -- line: 19
-	-- upvalues: useScrollBarPadding (copy), useDialogVariants (copy), useDialog (copy), React (copy), ScrollView (copy), withCommonProps (copy), Visibility (copy)
-	local v12, v13, v14 = useScrollBarPadding()
-	local v15 = useDialogVariants()
+local function DialogContent(state)
+	local v, v2, v3 = useScrollBarPadding()
+	local v4 = useDialogVariants2()
+	state.testId = `{useDialog().testId}--content`
 
-	p1.testId = `{ useDialog().testId }--content`
+	local selectable = (state.Selectable == nil or state.Selectable) and v
 
-	local v16 = (p1.Selectable == nil or p1.Selectable) and v12
+	local createElement = React.createElement
 
-	return React.createElement(ScrollView, withCommonProps(p1, {
-		scroll = {
-			AutomaticCanvasSize = Enum.AutomaticSize.Y,
-			CanvasSize = UDim2.new(0, 0, 0, 0),
-			scrollBarVisibility = if not v12 then Visibility.None else Visibility.Auto
-		},
+	local scroll = {
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = UDim2.new(0, 0, 0, 0),
+		scrollBarVisibility = 0
+	}
+	local scrollBarVisibility
+
+	if v then
+		scrollBarVisibility = Visibility.Auto
+	else
+		scrollBarVisibility = Visibility.None
+	end
+
+	scroll.scrollBarVisibility = scrollBarVisibility
+	return createElement(ScrollView, withCommonProps(state, {
+		scroll = scroll,
 		layout = {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalFlex = Enum.UIFlexAlignment.Fill,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		},
 		selection = {
-			Selectable = v16,
-			NextSelectionUp = p1.NextSelectionUp,
-			NextSelectionDown = p1.NextSelectionDown,
-			NextSelectionLeft = p1.NextSelectionLeft,
-			NextSelectionRight = p1.NextSelectionRight
+			Selectable = selectable,
+			NextSelectionUp = state.NextSelectionUp,
+			NextSelectionDown = state.NextSelectionDown,
+			NextSelectionLeft = state.NextSelectionLeft,
+			NextSelectionRight = state.NextSelectionRight
 		},
-		onAbsoluteCanvasSizeChanged = v14,
-		onAbsoluteWindowSizeChanged = v14,
-		tag = v15.content.tag
+		onAbsoluteCanvasSizeChanged = v3,
+		onAbsoluteWindowSizeChanged = v3,
+		tag = v4.content.tag
 	}), {
 		ScrollPadding = React.createElement("UIPadding", {
-			PaddingRight = v13:map(function(n1: number) -- line: 55
-				return UDim.new(0, n1)
+			PaddingRight = v2:map(function(p: number)
+				return UDim.new(0, p)
 			end)
 		}),
-		ScrollContent = React.createElement(React.Fragment, nil, p1.children)
+		ScrollContent = React.createElement(React.Fragment, nil, state.children)
 	})
 end
 

@@ -1,55 +1,67 @@
 local CorePackages = game:GetService("CorePackages")
 local Cryo = require(CorePackages.Packages.Cryo)
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local Constants = require(ParentParent.Constants)
-local AvatarViewport = require(ParentParent.Components.AvatarViewport)
-local GetHumanoidDescriptionFromCostumeId = require(ParentParent.Thunks.GetHumanoidDescriptionFromCostumeId)
-local GetFFlagDisplayCollectiblesIcon = require(ParentParent.Flags.GetFFlagDisplayCollectiblesIcon)
-local v10 = Roact.PureComponent:extend("TryOnViewport")
+local Constants = require(parent.Constants)
+local AvatarViewport = require(parent.Components.AvatarViewport)
+local GetHumanoidDescriptionFromCostumeId = require(parent.Thunks.GetHumanoidDescriptionFromCostumeId)
 
-local function isPartOfBundleAndOffsale(p1) -- line: 14
-	return not not p1 and (p1.parentBundleId ~= nil and (not p1.isForSale or false))
+local GetFFlagDisplayCollectiblesIcon = require(parent.Flags.GetFFlagDisplayCollectiblesIcon)
+
+local extended = Roact.PureComponent:extend("TryOnViewport")
+
+local function isPartOfBundleAndOffsale(p): boolean
+	if p then
+		return p.parentBundleId ~= nil and not p.isForSale or false
+	end
+
+	return false
 end
-local function createDefaultHumanoidDescriptionAccessoryInfo(p2, p3) -- line: 18
-	-- upvalues: Constants (copy)
+
+local function createDefaultHumanoidDescriptionAccessoryInfo(assetTypeId, assetId) -- 2 equivalent calls inferred from this helper
 	return {
-		AssetId = tonumber(p3),
-		Order = Constants.LayeredClothingOrder[p2],
-		AccessoryType = Constants.AssetTypeIdToAccessoryTypeEnum[p2],
-		IsLayered = Constants.LayeredAssetTypes[p2] ~= nil
+		AssetId = tonumber(assetId),
+		Order = Constants.LayeredClothingOrder[assetTypeId],
+		AccessoryType = Constants.AssetTypeIdToAccessoryTypeEnum[assetTypeId],
+		IsLayered = Constants.LayeredAssetTypes[assetTypeId] ~= nil
 	}
 end
 
-function v10.init(p4) -- line: 27
-	p4.model = p4.props.localPlayerModel
-	p4.model.HumanoidRootPart.Anchored = true
-	p4.humanoidDescriptions = {}
-	p4.humanoidDescriptionForLocalPlayer = p4.model.Humanoid.HumanoidDescription
-	p4.state = {
-		obtainedHumanoidDescriptions = {}
-	}
+function extended:init()
+	self.model = self.props.localPlayerModel
+	self.model.HumanoidRootPart.Anchored = true
+	self.humanoidDescriptions = {}
+	self.humanoidDescriptionForLocalPlayer = self.model.Humanoid.HumanoidDescription
+	self.state = { obtainedHumanoidDescriptions = {} }
 end
-function v10.didMount(p5) -- line: 37
-	p5.isMounted = true
-end
-function v10.didUpdate(p6, p7) -- line: 41
-	-- upvalues: Cryo (copy)
-	local assetInfo = p6.props.assetInfo
-	local bundles = p6.props.bundles
-	local tryingOnInfo = p6.props.tryingOnInfo
 
-	if tryingOnInfo ~= p7.tryingOnInfo and (tryingOnInfo.tryingOn and (not not assetInfo and (assetInfo.parentBundleId ~= nil and (not assetInfo.isForSale or false)))) then
-		local costumeId = bundles[assetInfo.parentBundleId].costumeId
+function extended:didMount()
+	self.isMounted = true
+end
+
+function extended.didUpdate(object, p)
+	local assetInfo = object.props.assetInfo
+	local bundles = object.props.bundles
+	local tryingOnInfo = object.props.tryingOnInfo
+
+	if tryingOnInfo ~= p.tryingOnInfo and tryingOnInfo.tryingOn then
+		local v
+
+		if assetInfo and assetInfo.parentBundleId ~= nil then
+			v = not assetInfo.isForSale or false
+		else
+			v = false
+		end
+
+		local costumeId = v and bundles[assetInfo.parentBundleId].costumeId
 
 		if costumeId then
-			p6.props.getHumanoidDescriptionFromCostumeId(costumeId, function(p8) -- line: 53
-				-- upvalues: p6 (copy), costumeId (copy), Cryo (copy)
-				if p6 and p6.isMounted then
-					p6.humanoidDescriptions[costumeId] = p8
-					p6:setState({
-						obtainedHumanoidDescriptions = Cryo.Dictionary.join(p6.state.obtainedHumanoidDescriptions, {
+			object.props.getHumanoidDescriptionFromCostumeId(costumeId, function(p2)
+				if object and object.isMounted then
+					object.humanoidDescriptions[costumeId] = p2
+					object:setState({
+						obtainedHumanoidDescriptions = Cryo.Dictionary.join(object.state.obtainedHumanoidDescriptions, {
 							[costumeId] = true
 						})
 					})
@@ -58,123 +70,124 @@ function v10.didUpdate(p6, p7) -- line: 41
 		end
 	end
 end
-function v10.tryOnBundleWithoutCostumeId(p9, p10, p11) -- line: 72
-	-- upvalues: Constants (copy)
-	local t1 = {}
-	local t2 = {}
-	local v29 = false
 
-	for _, v in pairs(p9.props.bundles[p10].assetIds) do
-		local v32 = p9.props.assets[v]
-		local v33 = Constants.AssetTypeIdToAccessoryTypeEnum[v32.assetTypeId]
+function extended:tryOnBundleWithoutCostumeId(p, assetIds)
+	local accessoryTypeEnumSet = {}
+	local set = {}
+	local flag = false
 
-		if v33 then
-			t1[v33] = true
+	for _, assetId in pairs(self.props.bundles[p].assetIds) do
+		local asset = self.props.assets[assetId]
+		local accessoryTypeEnum = Constants.AssetTypeIdToAccessoryTypeEnum[asset.assetTypeId]
 
-			local v34 = Constants.AssetTypeToAssetCategory[v32.assetTypeId]
+		if not accessoryTypeEnum then
+			continue
+		end
 
-			if v34 then
-				t2[v34] = true
+		accessoryTypeEnumSet[accessoryTypeEnum] = true
+		local v = Constants.AssetTypeToAssetCategory[asset.assetTypeId]
+
+		if v then
+			set[v] = true
+		end
+
+		flag = true
+	end
+
+	local accessories = assetIds:GetAccessories(true)
+	local v = {}
+
+	if flag then
+		for _, accessory in pairs(accessories) do
+			local v2 = Constants.AccessoryTypeEnumToAssetTypeId[accessory.AccessoryType]
+			local v3 = Constants.AssetTypeToAssetCategory[v2]
+			local v4 = not (v3 and set[v3])
+
+			if accessoryTypeEnumSet[accessory.AccessoryType] or not v4 then
+				continue
 			end
 
-			v29 = true
+			table.insert(v, accessory)
 		end
 	end
 
-	local Accessories = p11:GetAccessories(true)
-	local t3 = {}
+	for _, assetId in pairs(self.props.bundles[p].assetIds) do
+		local asset = self.props.assets[assetId]
 
-	if v29 then
-		for _, v in pairs(Accessories) do
-			local v39 = Constants.AccessoryTypeEnumToAssetTypeId[v.AccessoryType]
-			local v40 = Constants.AssetTypeToAssetCategory[v39]
-			local v41 = not v40 or not t2[v40]
-
-			if not t1[v.AccessoryType] and v41 then
-				table.insert(t3, v)
-			end
-		end
-	end
-
-	for _, v in pairs(p9.props.bundles[p10].assetIds) do
-		local v44 = p9.props.assets[v]
-
-		if Constants.AssetTypeIdToAccessoryTypeEnum[v44.assetTypeId] then
-			local assetTypeId = v44.assetTypeId
-
-			table.insert(t3, {
-				AssetId = tonumber(v),
-				Order = Constants.LayeredClothingOrder[assetTypeId],
-				AccessoryType = Constants.AssetTypeIdToAccessoryTypeEnum[assetTypeId],
-				IsLayered = Constants.LayeredAssetTypes[assetTypeId] ~= nil
-			})
+		if Constants.AssetTypeIdToAccessoryTypeEnum[asset.assetTypeId] then
+			table.insert(v, createDefaultHumanoidDescriptionAccessoryInfo(asset.assetTypeId, assetId)) -- inferred equivalent call
 		else
-			p11[Constants.AssetTypeIdStringToHumanoidDescriptionProp[v44.assetTypeId]] = v
+			assetIds[Constants.AssetTypeIdStringToHumanoidDescriptionProp[asset.assetTypeId]] = assetId
 		end
 	end
 
-	if v29 then
-		p11:SetAccessories(t3, true)
+	if flag then
+		assetIds:SetAccessories(v, true)
 	end
 
-	return p11
+	return assetIds
 end
-function v10.render(p12) -- line: 126
-	-- upvalues: Constants (copy), Roact (copy), GetFFlagDisplayCollectiblesIcon (copy), AvatarViewport (copy)
-	local assetInfo = p12.props.assetInfo
-	local bundles = p12.props.bundles
-	local tryingOnInfo = p12.props.tryingOnInfo
-	local clone = p12.humanoidDescriptionForLocalPlayer:Clone()
-	local tryingOn = tryingOnInfo.tryingOn
-	local setScrollingEnabled = p12.props.setScrollingEnabled
+
+function extended:render()
+	local assetInfo = self.props.assetInfo
+	local bundles = self.props.bundles
+	local tryingOnInfo = self.props.tryingOnInfo
+	local clone = self.humanoidDescriptionForLocalPlayer:Clone()
+	local visible = tryingOnInfo.tryingOn
+	local setScrollingEnabled = self.props.setScrollingEnabled
 
 	if tryingOnInfo and tryingOnInfo.tryingOn then
-		if not not assetInfo and (assetInfo.parentBundleId ~= nil and (not assetInfo.isForSale or false)) then
+		local v
+
+		if assetInfo and assetInfo.parentBundleId ~= nil then
+			v = not assetInfo.isForSale or false
+		else
+			v = false
+		end
+
+		if v then
 			local parentBundleId = assetInfo.parentBundleId
 			local costumeId = bundles[parentBundleId].costumeId
 
 			if costumeId then
-				local v55 = p12.humanoidDescriptions[costumeId]
+				local humanoidDescription = self.humanoidDescriptions[costumeId]
+				visible = self.state.obtainedHumanoidDescriptions[costumeId] == true
 
-				tryingOn = p12.state.obtainedHumanoidDescriptions[costumeId] == true
-
-				if v55 then
-					for k, v in pairs(Constants.AssetTypeIdStringToHumanoidDescriptionProp) do
-						if Constants.AssetTypeIdToAccessoryTypeEnum[k] == nil and tonumber(v55[v]) and tostring(v55[v]) ~= "0" then
-							clone[v] = v55[v]
+				if humanoidDescription then
+					for k, v2 in pairs(Constants.AssetTypeIdStringToHumanoidDescriptionProp) do
+						if not (Constants.AssetTypeIdToAccessoryTypeEnum[k] == nil and tonumber(humanoidDescription[v2]) and tostring(humanoidDescription[v2]) ~= "0") then
+							continue
 						end
+
+						clone[v2] = humanoidDescription[v2]
 					end
 
-					clone:SetAccessories(v55:GetAccessories(true), true)
+					clone:SetAccessories(humanoidDescription:GetAccessories(true), true)
 				end
 			else
-				clone = p12:tryOnBundleWithoutCostumeId(parentBundleId, clone)
+				clone = self:tryOnBundleWithoutCostumeId(parentBundleId, clone)
 			end
 		elseif Constants.AssetTypeIdToAccessoryTypeEnum[tryingOnInfo.assetTypeId] then
-			local v58 = Constants.AssetTypeIdToAccessoryTypeEnum[tryingOnInfo.assetTypeId]
-			local Accessories = clone:GetAccessories(true)
-			local t4 = {}
+			local accessoryTypeEnum = Constants.AssetTypeIdToAccessoryTypeEnum[tryingOnInfo.assetTypeId]
+			local accessories = clone:GetAccessories(true)
+			local v2 = {}
 
-			for _, v in pairs(Accessories) do
-				local v63 = Constants.AccessoryTypeEnumToAssetTypeId[v.AccessoryType]
-				local v64 = Constants.AssetTypeToAssetCategory[tryingOnInfo.assetTypeId]
-				local v65 = Constants.AssetTypeToAssetCategory[v63]
-				local v66 = not v64 or v65 ~= v64
+			for _, accessory in pairs(accessories) do
+				local v3 = Constants.AccessoryTypeEnumToAssetTypeId[accessory.AccessoryType]
+				local v4 = Constants.AssetTypeToAssetCategory[tryingOnInfo.assetTypeId]
+				local v5 = Constants.AssetTypeToAssetCategory[v3]
+				local v6 = not v4 or v5 ~= v4
 
-				if v58 ~= v.AccessoryType and v66 then
-					table.insert(t4, v)
+				if accessory.AccessoryType ~= accessoryTypeEnum and v6 then
+					table.insert(v2, accessory)
 				end
 			end
 
-			local assetTypeId = tryingOnInfo.assetTypeId
-
-			table.insert(t4, {
-				AssetId = tonumber(tryingOnInfo.assetId),
-				Order = Constants.LayeredClothingOrder[assetTypeId],
-				AccessoryType = Constants.AssetTypeIdToAccessoryTypeEnum[assetTypeId],
-				IsLayered = Constants.LayeredAssetTypes[assetTypeId] ~= nil
-			})
-			clone:SetAccessories(t4, true)
+			table.insert(
+				v2,
+				createDefaultHumanoidDescriptionAccessoryInfo(tryingOnInfo.assetTypeId, tryingOnInfo.assetId) -- inferred equivalent call
+			)
+			clone:SetAccessories(v2, true)
 		else
 			clone[Constants.AssetTypeIdStringToHumanoidDescriptionProp[tryingOnInfo.assetTypeId]] = tryingOnInfo.assetId
 		end
@@ -182,40 +195,39 @@ function v10.render(p12) -- line: 126
 
 	return Roact.createElement("Frame", {
 		BackgroundTransparency = 1,
-		LayoutOrder = 2,
 		Size = UDim2.new(1, 0, 0, GetFFlagDisplayCollectiblesIcon() and Constants.DetailsThumbnailFrameHeight or 300),
-		Visible = tryingOn
+		LayoutOrder = 2,
+		Visible = visible
 	}, {
 		AvatarViewport = Roact.createElement(AvatarViewport, {
-			visible = true,
-			backgroundTransparency = 1,
 			size = UDim2.new(0.75, 0, 1, 0),
 			position = UDim2.new(0.5, 0, 0.5, 0),
 			humanoidDescription = clone,
-			model = p12.model,
+			model = self.model,
+			visible = true,
+			backgroundTransparency = 1,
 			setScrollingEnabled = setScrollingEnabled
 		})
 	})
 end
-function v10.willUnmount(p13) -- line: 214
-	p13.isMounted = false
+
+function extended:willUnmount()
+	self.isMounted = false
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p14, _) -- line: 218
-	local assetId = p14.detailsInformation.assetId
+return RoactRodux.UNSTABLE_connect2(function(data, _)
+	local assetId = data.detailsInformation.assetId
 
 	return {
-		assets = p14.assets,
-		assetInfo = p14.assets[assetId],
-		bundles = p14.bundles,
-		tryingOnInfo = p14.tryingOnInfo
+		assets = data.assets,
+		assetInfo = data.assets[assetId],
+		bundles = data.bundles,
+		tryingOnInfo = data.tryingOnInfo
 	}
-end, function(p16) -- line: 227
-	-- upvalues: GetHumanoidDescriptionFromCostumeId (copy)
+end, function(callback)
 	return {
-		getHumanoidDescriptionFromCostumeId = function(p17, p18) -- line: 229
-			-- upvalues: p16 (copy), GetHumanoidDescriptionFromCostumeId (copy)
-			return p16(GetHumanoidDescriptionFromCostumeId(p17, p18))
+		getHumanoidDescriptionFromCostumeId = function(p, p2)
+			return callback(GetHumanoidDescriptionFromCostumeId(p, p2))
 		end
 	}
-end)(v10)
+end)(extended)

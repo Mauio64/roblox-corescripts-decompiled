@@ -1,210 +1,111 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Signals = require(ExpChatParent.Signals)
+local parent = ExpChat.Parent
+local Signals = require(parent.Signals)
 local createSignal = Signals.createSignal
-local FFlagExpChatTransparentFocusSupport = require(ExpChat.Flags.FFlagExpChatTransparentFocusSupport)
 local FFlagExpChatDictationFadeOverride = require(ExpChat.Flags.FFlagExpChatDictationFadeOverride)
 
-local function v7() -- line: 30
-end
+local function fn() end
 
-return function() -- line: 32
-	-- upvalues: createSignal (copy), FFlagExpChatTransparentFocusSupport (copy), Signals (copy), FFlagExpChatDictationFadeOverride (copy), v7 (copy)
-	local v8, v9 = createSignal(0)
-	local v10, v11 = createSignal(0)
-	local v12, v13 = createSignal(false)
-	local v14, v15 = createSignal(false)
-	local v16, v17 = createSignal(false)
-	local v18, v19 = createSignal(false)
-	local v20 = if not FFlagExpChatTransparentFocusSupport then if not FFlagExpChatDictationFadeOverride then nil else Signals.createComputed(function(p1) -- line: 47
-		-- upvalues: v12 (copy), v18 (copy)
-		return v12(p1) or v18(p1)
-	end) else Signals.createComputed(function(p2) -- line: 41
-		-- upvalues: v12 (copy), v14 (copy), v16 (copy), FFlagExpChatDictationFadeOverride (copy), v18 (copy)
-		return v12(p2) or (v14(p2) or (v16(p2) or FFlagExpChatDictationFadeOverride and v18(p2)))
-	end)
+return function()
+	local signal, v = createSignal(0)
+	local signal2, v2 = createSignal(0)
+	local signal3, v3 = createSignal(false)
+	local signal4, v4 = createSignal(false)
+	local signal5, v5 = createSignal(false)
+	local signal6, v6 = createSignal(false)
 
-	local function withResetAllTransparency(p3) -- line: 57
-		-- upvalues: v9 (copy), v11 (copy)
-		return function() -- line: 58
-			-- upvalues: p3 (copy), v9 (copy), v11 (copy)
-			p3()
-			v9(os.clock())
-			v11(os.clock())
+	local function resetAllTransparency() -- 1 equivalent call inferred from this helper
+		v(os.clock())
+		v2(os.clock())
+	end
+
+	local function withResetAllTransparency(fn2) -- 8 equivalent calls inferred from this helper
+		return function()
+			fn2()
+			resetAllTransparency() -- inferred equivalent call
 		end
 	end
 
-	local t1 = {
-		getLastActivity = v8,
-		getLastMessageActivity = v10,
-		getIsTextBoxFocused = v12,
-		getIsFocused = v20,
-		resetAllTransparency = function() -- line: 52
-			-- upvalues: v9 (copy), v11 (copy)
-			v9(os.clock())
-			v11(os.clock())
+	local v7 = {
+		getLastActivity = signal,
+		getLastMessageActivity = signal2,
+		getIsTextBoxFocused = signal3,
+		getIsFocused = Signals.createComputed(function(p)
+			return signal3(p) or signal4(p) or signal5(p) or FFlagExpChatDictationFadeOverride and signal6(p)
+		end),
+		resetAllTransparency = resetAllTransparency,
+		resetTextTransparency = function()
+			v2(os.clock())
 		end,
-		resetTextTransparency = function() -- line: 73
-			-- upvalues: v11 (copy)
-			v11(os.clock())
-		end
+		setTextboxFocus = 0,
+		clearTextboxFocus = 0,
+		setWindowFocusInput = 0,
+		clearWindowFocusInput = 0,
+		setContextMenuOpen = 0,
+		clearContextMenuOpen = 0,
+		setDictationActive = 0,
+		clearDictationActive = 0
 	}
-	local v24
-
-	if FFlagExpChatTransparentFocusSupport then
-		local function v23() -- line: 77
-			-- upvalues: v13 (copy)
-			v13(true)
-		end
-
-		function v24() -- line: 58
-			-- upvalues: v23 (copy), v9 (copy), v11 (copy)
-			v23()
-			v9(os.clock())
-			v11(os.clock())
-		end
-	else
-		function v24() -- line: 80
-			-- upvalues: v13 (copy), v9 (copy), v11 (copy)
-			v13(true)
-			v9(os.clock())
-			v11(os.clock())
-		end
+	local function fn2()
+		v3(true)
 	end
 
-	t1.setTextboxFocus = v24
+	v7.setTextboxFocus = withResetAllTransparency(fn2) -- inferred equivalent call
 
-	local function v25() -- line: 84
-		-- upvalues: v13 (copy)
-		v13(false)
+	local function fn3()
+		v3(false)
 	end
 
-	function t1.clearTextboxFocus() -- line: 58
-		-- upvalues: v25 (copy), v9 (copy), v11 (copy)
-		v25()
-		v9(os.clock())
-		v11(os.clock())
+	v7.clearTextboxFocus = withResetAllTransparency(fn3) -- inferred equivalent call
+
+	local function fn4()
+		v4(true)
 	end
 
-	local v27
+	v7.setWindowFocusInput = withResetAllTransparency(fn4) -- inferred equivalent call
 
-	if FFlagExpChatTransparentFocusSupport then
-		local function v26() -- line: 88
-			-- upvalues: v15 (copy)
-			v15(true)
-		end
-
-		function v27() -- line: 58
-			-- upvalues: v26 (copy), v9 (copy), v11 (copy)
-			v26()
-			v9(os.clock())
-			v11(os.clock())
-		end
-	else
-		v27 = v7
+	local function fn5()
+		v4(false)
 	end
 
-	t1.setWindowFocusInput = v27
+	v7.clearWindowFocusInput = withResetAllTransparency(fn5) -- inferred equivalent call
 
-	local v29
-
-	if FFlagExpChatTransparentFocusSupport then
-		local function v28() -- line: 93
-			-- upvalues: v15 (copy)
-			v15(false)
-		end
-
-		function v29() -- line: 58
-			-- upvalues: v28 (copy), v9 (copy), v11 (copy)
-			v28()
-			v9(os.clock())
-			v11(os.clock())
-		end
-	else
-		v29 = v7
+	local function fn6()
+		v5(true)
 	end
 
-	t1.clearWindowFocusInput = v29
+	v7.setContextMenuOpen = withResetAllTransparency(fn6) -- inferred equivalent call
 
-	local v31
-
-	if FFlagExpChatTransparentFocusSupport then
-		local function v30() -- line: 98
-			-- upvalues: v17 (copy)
-			v17(true)
-		end
-
-		function v31() -- line: 58
-			-- upvalues: v30 (copy), v9 (copy), v11 (copy)
-			v30()
-			v9(os.clock())
-			v11(os.clock())
-		end
-	else
-		v31 = v7
+	local function fn7()
+		v5(false)
 	end
 
-	t1.setContextMenuOpen = v31
-
-	local v33
-
-	if FFlagExpChatTransparentFocusSupport then
-		local function v32() -- line: 103
-			-- upvalues: v17 (copy)
-			v17(false)
-		end
-
-		function v33() -- line: 58
-			-- upvalues: v32 (copy), v9 (copy), v11 (copy)
-			v32()
-			v9(os.clock())
-			v11(os.clock())
-		end
-	else
-		v33 = v7
-	end
-
-	t1.clearContextMenuOpen = v33
-
-	local v35
+	v7.clearContextMenuOpen = withResetAllTransparency(fn7) -- inferred equivalent call
+	local setDictationActive
 
 	if FFlagExpChatDictationFadeOverride then
-		local function v34() -- line: 108
-			-- upvalues: v19 (copy)
-			v19(true)
+		local function fn8()
+			v6(true)
 		end
 
-		function v35() -- line: 58
-			-- upvalues: v34 (copy), v9 (copy), v11 (copy)
-			v34()
-			v9(os.clock())
-			v11(os.clock())
-		end
+		setDictationActive = withResetAllTransparency(fn8) -- inferred equivalent call
 	else
-		v35 = v7
+		setDictationActive = fn
 	end
 
-	t1.setDictationActive = v35
-
-	local v37
+	v7.setDictationActive = setDictationActive
+	local clearDictationActive
 
 	if FFlagExpChatDictationFadeOverride then
-		local function v36() -- line: 113
-			-- upvalues: v19 (copy)
-			v19(false)
+		local function fn8()
+			v6(false)
 		end
 
-		function v37() -- line: 58
-			-- upvalues: v36 (copy), v9 (copy), v11 (copy)
-			v36()
-			v9(os.clock())
-			v11(os.clock())
-		end
+		clearDictationActive = withResetAllTransparency(fn8) -- inferred equivalent call
 	else
-		v37 = v7
+		clearDictationActive = fn
 	end
 
-	t1.clearDictationActive = v37
-
-	return t1
+	v7.clearDictationActive = clearDictationActive
+	return v7
 end

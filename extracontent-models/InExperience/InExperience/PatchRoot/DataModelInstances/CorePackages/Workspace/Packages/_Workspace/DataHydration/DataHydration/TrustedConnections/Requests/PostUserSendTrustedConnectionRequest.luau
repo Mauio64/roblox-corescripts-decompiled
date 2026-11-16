@@ -1,19 +1,19 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local SharedFlags = require(DataHydrationParent.SharedFlags)
-local Url = require(DataHydrationParent.Http).Url
+local parent = DataHydration.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local Http = require(parent.Http)
+local Url = Http.Url
+
 local TrustedConnections = DataHydration.TrustedConnections
 local myHttpRequest = require(TrustedConnections.Networking.myHttpRequest)
 
-return function(p1, s1: string?) -- line: 10
-	-- upvalues: Url (copy), SharedFlags (copy), myHttpRequest (copy)
-	local v9 = string.format("%s/users/%s/send-trusted-friend-request", Url.FRIEND_URL, (tostring(p1)))
+return function(p, p2: string?)
+	local v = string.format("%s/users/%s/send-trusted-friend-request", Url.FRIEND_URL, (tostring(p)))
 
-	if SharedFlags.FFlagProfilePlatformTrustedConnectionsMVP and s1 ~= nil then
-		v9 ..= ("?source=%*"):format(s1)
+	if SharedFlags.FFlagProfilePlatformTrustedConnectionsMVP and p2 ~= nil then
+		v ..= `?source={p2}`
 	end
 
-	return myHttpRequest(v9, "POST", {
-		postBody = {}
-	})
+	return myHttpRequest(v, "POST", { postBody = {} })
 end

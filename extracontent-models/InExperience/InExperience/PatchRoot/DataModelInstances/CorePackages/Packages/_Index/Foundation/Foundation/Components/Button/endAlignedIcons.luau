@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-return {
-	[require(Parent.BuilderIcons).Icon.ArrowUpRightFromSquare] = true
-}
+local BuilderIcons = require(parent.BuilderIcons)
+
+return { [BuilderIcons.Icon.ArrowUpRightFromSquare] = true }

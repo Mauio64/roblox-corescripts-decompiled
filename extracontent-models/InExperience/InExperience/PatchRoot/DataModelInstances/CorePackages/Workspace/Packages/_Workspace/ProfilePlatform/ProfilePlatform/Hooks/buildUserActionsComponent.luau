@@ -1,79 +1,71 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local SocialCommon = require(ProfilePlatformParent.SocialCommon)
-local Cryo = require(ProfilePlatformParent.Cryo)
+local parent = ProfilePlatform.Parent
+local SocialCommon = require(parent.SocialCommon)
+local Cryo = require(parent.Cryo)
 
 require(ProfilePlatform.Types.Component)
-
 local Enums = require(ProfilePlatform.Common.Enums)
 local getSupportedActionsForProfileType = require(ProfilePlatform.Hooks.getSupportedActionsForProfileType)
+
 local FFlagProfilePlatformEnableVR = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableVR)
-local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
 
-local function filterSupportedActions(t1: {[any]: any}?) -- line: 23
-	-- upvalues: FFlagProfilePlatformCTAsRefactor (copy), getSupportedActionsForProfileType (copy), Enums (copy), Cryo (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy)
-	local v13 = if not FFlagProfilePlatformCTAsRefactor then Cryo.Dictionary.values(Enums.ProfileActions) else getSupportedActionsForProfileType(Enums.ProfileTypes.User)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableCurrencyTransfer = SharedFlags.FFlagProfilePlatformEnableCurrencyTransfer
+local FFlagProfilePlatformEnableTradeItems = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableTradeItems)
 
-	return Cryo.List.filter(v13, function(p1) -- line: 28
-		-- upvalues: Enums (copy), t1 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy)
-		if p1 == Enums.ProfileActions.QrCode then
-			if t1 and t1.isProfileQrCodeEnabled then
+local function filterSupportedActions(data) -- 1 equivalent call inferred from this helper
+	local supportedActionsForProfileType = getSupportedActionsForProfileType(Enums.ProfileTypes.User)
+
+	return Cryo.List.filter(supportedActionsForProfileType, function(p): boolean
+		if p == Enums.ProfileActions.QrCode then
+			if data and data.isProfileQrCodeEnabled then
 				return true
 			end
-
-			return false
-		end
-
-		if p1 == Enums.ProfileActions.EditProfile then
-			if t1 and t1.areWebViewsSupported then
+		elseif p == Enums.ProfileActions.EditProfile then
+			if data and data.areWebViewsSupported then
 				return true
 			end
-
-			return false
-		end
-
-		if FFlagProfilePlatformEnableCurrencyTransfer and p1 == Enums.ProfileActions.CurrencyTransfer then
-			if t1 and t1.canRenderTransferInProfile then
+		elseif FFlagProfilePlatformEnableCurrencyTransfer and p == Enums.ProfileActions.CurrencyTransfer then
+			if data and data.canRenderTransferInProfile then
 				return true
 			end
-
-			return false
-		end
-
-		if p1 == Enums.ProfileActions.Chat then
-			if t1 and t1.canSeeChatTab ~= false then
+		elseif FFlagProfilePlatformEnableTradeItems and p == Enums.ProfileActions.TradeItems then
+			if data and data.areWebViewsSupported then
 				return true
 			end
-
-			return false
+		elseif p ~= Enums.ProfileActions.Chat or data and data.canSeeChatTab ~= false then
+			return true
 		end
 
-		return true
+		return false
 	end)
 end
-local function buildUserActionsComponent(p2, t2: {[any]: any}?) -- line: 50
-	-- upvalues: SocialCommon (copy), Enums (copy), FFlagProfilePlatformCTAsRefactor (copy), FFlagProfilePlatformEnableVR (copy), filterSupportedActions (copy), getSupportedActionsForProfileType (copy)
-	local v16 = if p2 ~= SocialCommon.Enums.ContextualInfoTypes.OffNetworkFriendRequest then nil else Enums.ContextualTypes.OffNetworkFriendRequest
-	local v17 = FFlagProfilePlatformCTAsRefactor and (not not t2 and not not t2.isSelfView) or nil
-	local v18 = not not FFlagProfilePlatformCTAsRefactor or nil
 
-	if FFlagProfilePlatformEnableVR then
+local function buildUserActionsComponent(p, data)
+	local offNetworkFriendRequest
+
+	if p == SocialCommon.Enums.ContextualInfoTypes.OffNetworkFriendRequest then
+		offNetworkFriendRequest = Enums.ContextualTypes.OffNetworkFriendRequest
+	end
+
+	local excludeContextualActions = data and data.isSelfView and true or nil
+
+	if not FFlagProfilePlatformEnableVR then
 		return {
 			component = Enums.Components.Actions,
-			context = v16,
-			supportedActions = filterSupportedActions(t2),
-			excludeContextualActions = v17,
-			isActionsV2Supported = v18
+			context = offNetworkFriendRequest,
+			supportedActions = getSupportedActionsForProfileType(Enums.ProfileTypes.User),
+			excludeContextualActions = excludeContextualActions,
+			isActionsV2Supported = true
 		}
 	end
 
 	return {
 		component = Enums.Components.Actions,
-		context = v16,
-		supportedActions = if not FFlagProfilePlatformCTAsRefactor then nil else getSupportedActionsForProfileType(Enums.ProfileTypes.User),
-		excludeContextualActions = v17,
-		isActionsV2Supported = v18
+		context = offNetworkFriendRequest,
+		supportedActions = filterSupportedActions(data), -- inferred equivalent call
+		excludeContextualActions = excludeContextualActions,
+		isActionsV2Supported = true
 	}
 end
 

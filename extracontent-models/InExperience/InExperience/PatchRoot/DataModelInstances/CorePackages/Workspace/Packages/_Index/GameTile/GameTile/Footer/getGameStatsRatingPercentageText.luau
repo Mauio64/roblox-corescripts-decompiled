@@ -1,21 +1,9 @@
-local function getGameStatsRatingPercentageText(p1, p2) -- line: 1
-	local s1 = "--"
+local function getGameStatsRatingPercentageText(p, p2)
+	local v = (p == nil or p < 0) and 0 or p
 
-	if p1 == nil or p1 < 0 then
-		p1 = 0
-	end
+	local v2 = v + ((p2 == nil or p2 < 0) and 0 or p2)
 
-	if p2 == nil or p2 < 0 then
-		p2 = 0
-	end
-
-	local v5 = p1 + p2
-
-	if v5 > 0 then
-		s1 = tostring((math.floor(p1 / v5 * 100)))
-	end
-
-	return s1
+	return not (v2 > 0) and "--" or tostring((math.floor(v / v2 * 100)))
 end
 
 return getGameStatsRatingPercentageText

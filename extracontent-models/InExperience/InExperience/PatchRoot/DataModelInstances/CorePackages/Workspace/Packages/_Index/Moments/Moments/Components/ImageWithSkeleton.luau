@@ -1,151 +1,172 @@
 local ContentProvider = game:GetService("ContentProvider")
-local Parent = script:FindFirstAncestor("Moments").Parent
-local React = require(Parent.React)
-local ReactOtter = require(Parent.ReactOtter)
-local Foundation = require(Parent.Foundation)
-local FoundationImage = Foundation.Image
+
+local Moments = script:FindFirstAncestor("Moments")
+local parent = Moments.Parent
+
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local Foundation = require(parent.Foundation)
+
+local FFlagMomentsImageWithSkeletonRetry = require(Moments.Flags.FFlagMomentsImageWithSkeletonRetry)
+
+local Image = Foundation.Image
 local Skeleton = Foundation.Skeleton
 local View = Foundation.View
-local EnumsRadius = Foundation.Enums.Radius
-local useTokens = Foundation.Hooks.useTokens
-local t1 = {
-	frequency = 3,
-	dampingRatio = 1
-}
 
-local function getCornerRadius(p1, p2) -- line: 55
-	-- upvalues: EnumsRadius (copy)
-	if p1 == EnumsRadius.Circle then
+local Radius = Foundation.Enums.Radius
+local useTokens = Foundation.Hooks.useTokens
+
+local v = { frequency = 3, dampingRatio = 1 }
+
+local function getCornerRadius(radius, p) -- 1 equivalent call inferred from this helper
+	if radius == Radius.Circle then
 		return UDim.new(1, 0)
 	end
 
-	return UDim.new(0, p2.Radius[p1])
+	return UDim.new(0, p.Radius[radius])
 end
-local function ImageWithSkeleton(t2: {[any]: any}) -- line: 62
-	-- upvalues: useTokens (copy), EnumsRadius (copy), React (copy), ReactOtter (copy), ContentProvider (copy), t1 (copy), View (copy), FoundationImage (copy), Skeleton (copy)
-	local v17 = useTokens()
-	local v18 = t2.radius or EnumsRadius.Medium
-	local t2Image = t2.Image
-	local v20 = t2Image ~= nil and t2Image ~= ""
-	local v21, v22 = React.useState(v20)
-	local v23, v24 = ReactOtter.useAnimatedBinding(0, function() -- line: 71
-		-- upvalues: t2Image (copy), ContentProvider (copy), v22 (copy)
-		if t2Image ~= nil and ContentProvider:GetAssetFetchStatus(t2Image) == Enum.AssetFetchStatus.Success then
-			v22(false)
+
+local function ImageWithSkeleton(props)
+	local v2 = useTokens()
+	local radius = props.radius or Radius.Medium
+	local image = props.Image
+	local v3
+
+	if image == nil then
+		v3 = false
+	else
+		v3 = image ~= ""
+	end
+
+	local state, setState = React.useState(v3)
+
+	local groupTransparency, v4 = ReactOtter.useAnimatedBinding(0, function()
+		if image ~= nil and ContentProvider:GetAssetFetchStatus(image) == Enum.AssetFetchStatus.Success then
+			setState(false)
 		end
 	end)
 
-	React.useEffect(function() -- line: 78
-		-- upvalues: v22 (copy), v20 (copy), t2Image (copy), v24 (copy), ReactOtter (copy), t1 (copy), ContentProvider (copy)
-		v22(v20)
+	React.useEffect(function()
+		setState(v3)
 
-		if not v20 or (t2Image == nil or t2Image == "") then
-			v24((ReactOtter.instant(0)))
-
+		if not v3 or image == nil or image == "" then
+			v4((ReactOtter.instant(0)))
 			return
 		end
 
-		local u27 = true
-
-		local function fadeInImage() -- line: 87
-			-- upvalues: u27 (ref), v24 (copy), ReactOtter (copy), t1 (copy)
-			if u27 then
-				v24((ReactOtter.spring(1, t1)))
+		local flag = true
+		local function fadeInImage() -- 3 equivalent calls inferred from this helper
+			if flag then
+				v4((ReactOtter.spring(1, v)))
 			end
 		end
 
-		if ContentProvider:GetAssetFetchStatus(t2Image) == Enum.AssetFetchStatus.Success then
-			if u27 then
-				v24((ReactOtter.spring(1, t1)))
+		if ContentProvider:GetAssetFetchStatus(image) == Enum.AssetFetchStatus.Success then
+			fadeInImage() -- inferred equivalent call
+			return function()
+				flag = false
 			end
+		else
+			v4((ReactOtter.instant(0)))
 
-			return function() -- line: 95
-				-- upvalues: u27 (ref)
-				u27 = false
-			end
-		end
+			if not FFlagMomentsImageWithSkeletonRetry then
+				task.spawn(function()
+					pcall(function()
+						ContentProvider:PreloadAsync({ image }, function(p, p2)
+							if p == image and p2 == Enum.AssetFetchStatus.Success then
+								fadeInImage() -- inferred equivalent call
+							end
+						end)
+					end)
 
-		v24((ReactOtter.instant(0)))
-		task.spawn(function() -- line: 101
-			-- upvalues: ContentProvider (copy), t2Image (copy), u27 (ref), v24 (copy), ReactOtter (copy), t1 (copy)
-			pcall(function() -- line: 102
-				-- upvalues: ContentProvider (copy), t2Image (copy), u27 (ref), v24 (copy), ReactOtter (copy), t1 (copy)
-				ContentProvider:PreloadAsync({ t2Image }, function(p3, p4) -- line: 103
-					-- upvalues: t2Image (copy), u27 (ref), v24 (copy), ReactOtter (copy), t1 (copy)
-					if p3 == t2Image and (p4 == Enum.AssetFetchStatus.Success and u27) then
-						v24((ReactOtter.spring(1, t1)))
+					if ContentProvider:GetAssetFetchStatus(image) == Enum.AssetFetchStatus.Success then
+						fadeInImage() -- inferred equivalent call
 					end
 				end)
-			end)
 
-			if ContentProvider:GetAssetFetchStatus(t2Image) == Enum.AssetFetchStatus.Success and u27 then
-				v24((ReactOtter.spring(1, t1)))
+				return function()
+					flag = false
+				end
 			end
-		end)
 
-		return function() -- line: 115
-			-- upvalues: u27 (ref)
-			u27 = false
+			local preloadImageWithRetry = require(script.Parent.preloadImageWithRetry)
+			task.spawn(preloadImageWithRetry, image, {
+				isCurrent = function()
+					return flag
+				end,
+				onSuccess = fadeInImage,
+				onGiveUp = function()
+					setState(false)
+				end
+			})
+
+			return function()
+				flag = false
+			end
 		end
-	end, {
-		t2Image,
-		v20
-	})
+	end, { image, v3 })
 
-	local imageStyle = t2.imageStyle
-	local v26 = if not v20 or imageStyle == nil then if not v20 then imageStyle else v23:map(function(n1: number) -- line: 136
-		return {
-			Color3 = Color3.new(1, 1, 1),
-			Transparency = 1 - n1
-		}
-	end) else React.joinBindings({
-		imageStyle,
-		v23
-	}):map(function(t3: {[any]: any}) -- line: 127
-		local v30 = t3[1]
-		local v31 = t3[2]
+	local imageStyle = props.imageStyle
+	local imageStyle2
 
-		return {
-			Color3 = v30.Color3,
-			Transparency = 1 - (1 - v30.Transparency) * v31
-		}
-	end)
+	if v3 and imageStyle ~= nil then
+		imageStyle2 = React.joinBindings({ imageStyle, groupTransparency }):map(function(list)
+			local item = list[1]
+			local item2 = list[2]
+			return {
+				Color3 = item.Color3,
+				Transparency = 1 - (1 - item.Transparency) * item2
+			}
+		end)
+	elseif v3 then
+		imageStyle2 = groupTransparency:map(function(p: number)
+			return {
+				Color3 = Color3.new(1, 1, 1),
+				Transparency = 1 - p
+			}
+		end)
+	else
+		imageStyle2 = imageStyle
+	end
 
 	if imageStyle ~= nil then
-		v23 = React.joinBindings({
-			v23,
-			imageStyle
-		}):map(function(t4: {[any]: any}) -- line: 154
-			local v34 = t4[1]
-			local v35 = t4[2]
-
-			return 1 - (1 - v34) * (1 - (v35.Transparency or 0))
+		groupTransparency = React.joinBindings({ groupTransparency, imageStyle }):map(function(list)
+			local item = list[1]
+			local item2 = list[2]
+			return 1 - (1 - item) * (1 - (item2.Transparency or 0))
 		end)
 	end
 
-	return React.createElement(View, {
-		LayoutOrder = t2.LayoutOrder,
-		Size = t2.Size
-	}, {
-		Image = React.createElement(FoundationImage, {
+	local createElement = React.createElement
+	local v5 = { LayoutOrder = props.LayoutOrder, Size = props.Size }
+	local v6 = {
+		Image = React.createElement(Image, {
 			tag = "size-full",
-			Image = t2Image,
-			backgroundStyle = t2.backgroundStyle,
-			imageStyle = v26,
-			cornerRadius = if v18 ~= EnumsRadius.Circle then UDim.new(0, v17.Radius[v18]) else UDim.new(1, 0),
-			ScaleType = t2.ScaleType or Enum.ScaleType.Crop
+			Image = image,
+			backgroundStyle = props.backgroundStyle,
+			imageStyle = imageStyle2,
+			cornerRadius = getCornerRadius(radius, v2), -- inferred equivalent call
+			ScaleType = props.ScaleType or Enum.ScaleType.Crop
 		}),
-		SkeletonOverlay = if not v20 or not v21 then nil else React.createElement(View, {
-			tag = "size-full",
-			ZIndex = 2,
-			GroupTransparency = v23
-		}, {
-			Shimmer = React.createElement(Skeleton, {
-				radius = v18,
-				Size = UDim2.fromScale(1, 1)
-			})
-		})
-	})
+		SkeletonOverlay = 0
+	}
+	local skeletonOverlay
+
+	if v3 and state then
+		skeletonOverlay = React.createElement(
+			View,
+			{ tag = "size-full", ZIndex = 2, GroupTransparency = groupTransparency },
+			{
+				Shimmer = React.createElement(Skeleton, {
+					radius = radius,
+					Size = UDim2.fromScale(1, 1)
+				})
+			}
+		)
+	end
+
+	v6.SkeletonOverlay = skeletonOverlay
+	return createElement(View, v5, v6)
 end
 
 return React.memo(ImageWithSkeleton)

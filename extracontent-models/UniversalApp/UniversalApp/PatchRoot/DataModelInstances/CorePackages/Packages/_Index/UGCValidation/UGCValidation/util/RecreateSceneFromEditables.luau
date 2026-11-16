@@ -1,135 +1,194 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent.util.Types)
-
+local parent = script.Parent.Parent
+require(parent.util.Types)
 local AssetService = game:GetService("AssetService")
-local getFFlagUGCValidationAddPBRToSharedData = require(ParentParent.flags.getFFlagUGCValidationAddPBRToSharedData)
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local getFFlagUGCValidationAddGeometryToExports = require(ParentParent.flags.getFFlagUGCValidationAddGeometryToExports)
-local getFFlagUGCValidateAllowEmissives = require(ParentParent.flags.getFFlagUGCValidateAllowEmissives)
-local t1 = {}
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local R15plusUtils = require(parent.util.R15plusUtils)
+local RigBuilder = require(parent.util.RigBuilder)
+local buildEmoteKeyframeSequenceFromCurveAnim = require(parent.util.buildEmoteKeyframeSequenceFromCurveAnim)
 
-local function createCagePart(p1, p2, p3, s1: string) -- line: 18
-	-- upvalues: AssetService (copy)
-	local v15 = AssetService:CreateMeshPartAsync(Content.fromObject(p3.editable))
+local getEngineFeatureEngineUGCValidateEmoteAnimationExport = require(parent.flags.getEngineFeatureEngineUGCValidateEmoteAnimationExport)
 
-	v15.Name = `{ p1 }_{ s1 }`
-	v15.Size = v15.Size * p2.scale
+local RecreateSceneFromEditables = {}
 
-	local v16 = CFrame.new(p3.origin.Position * p2.scale) * p3.origin.Rotation
-
-	v15.CFrame = p1.CFrame * v16
-
-	return v15
-end
-local function copyMeshPart(p4, p5, p6) -- line: 32
-	-- upvalues: AssetService (copy), getFFlagUGCValidationAddPBRToSharedData (copy), getFFlagUGCValidateAllowEmissives (copy), R15plusUtils (copy)
-	local v20 = AssetService:CreateMeshPartAsync(Content.fromObject(p5.editable))
-
-	if getFFlagUGCValidationAddPBRToSharedData() then
-		if p6 and not p6.isPBR and p6.Texture then
-			v20.TextureContent = Content.fromObject(p6.Texture.editable)
-		elseif p6 and p6.isPBR then
-			local SurfaceAppearance = Instance.new("SurfaceAppearance")
-
-			if p6.ColorMap then
-				SurfaceAppearance.ColorMapContent = Content.fromObject(p6.ColorMap.editable)
-			end
-
-			if p6.MetalnessMap then
-				SurfaceAppearance.MetalnessMapContent = Content.fromObject(p6.MetalnessMap.editable)
-			end
-
-			if p6.NormalMap then
-				SurfaceAppearance.NormalMapContent = Content.fromObject(p6.NormalMap.editable)
-			end
-
-			if p6.RoughnessMap then
-				SurfaceAppearance.RoughnessMapContent = Content.fromObject(p6.RoughnessMap.editable)
-			end
-
-			if getFFlagUGCValidateAllowEmissives() and p6.EmissiveMask then
-				SurfaceAppearance.EmissiveMaskContent = Content.fromObject(p6.EmissiveMask.editable)
-			end
-
-			SurfaceAppearance.Parent = v20
-		end
-	elseif p6 then
-		v20.TextureContent = Content.fromObject(p6.editable)
-	end
-
-	v20.Name = p4.Name
-	v20.Size = p4.Size
-	v20.CFrame = p4.CFrame
-
-	for _, child in p4:GetChildren() do
-		if (child:IsA("Attachment") or child:IsA("FaceControls")) and (not R15plusUtils.checkFlagEnabledForAllowHrd() or not child:IsA("Bone")) then
-			child:Clone().Parent = v20
-		end
-	end
-
-	if R15plusUtils.checkFlagEnabledForAllowHrd() then
-		local v24 = R15plusUtils.getAvatarBoneSchema(p4.Name)
-
-		for v25, v26 in (R15plusUtils.getNameWhitelistOfClassInSchema(v24, "Attachment")) do
-			if v26 and v20:FindFirstChild(v25) == nil then
-				local v27 = p4:FindFirstChild(v25, true)
-				local v28 = if v27 == nil then v20.CFrame else v27.WorldCFrame
-				local Attachment = Instance.new("Attachment")
-
-				Attachment.Name = v25
-				Attachment.Parent = v20
-				Attachment.WorldCFrame = v28
-			end
-		end
-	end
-
-	return v20
+local function createCagePart(p, p2, p3, p4: string)
+	local meshPartAsync = AssetService:CreateMeshPartAsync(Content.fromObject(p3.editable))
+	meshPartAsync.Name = `{p}_{p4}`
+	meshPartAsync.Size *= p2.scale
+	local v = CFrame.new(p3.origin.Position * p2.scale) * p3.origin.Rotation
+	meshPartAsync.CFrame = p.CFrame * v
+	return meshPartAsync
 end
 
-function t1.createModelForGltfExport(p7) -- line: 113
-	-- upvalues: copyMeshPart (copy), createCagePart (copy), getFFlagUGCValidationAddGeometryToExports (copy), ValidationEnums (copy)
-	local Model = Instance.new("Model")
-	local descendants = p7.rootInstance:GetDescendants()
+local function copyMeshPart(part, p, data)
+	local meshPartAsync = AssetService:CreateMeshPartAsync(Content.fromObject(p.editable))
 
-	table.insert(descendants, p7.rootInstance)
+	if data and not data.isPBR and data.Texture then
+		meshPartAsync.TextureContent = Content.fromObject(data.Texture.editable)
+	elseif data and data.isPBR then
+		local surfaceAppearance = Instance.new("SurfaceAppearance")
 
-	for _, v34 in descendants do
-		if v34:IsA("MeshPart") then
-			local Name = v34.Name
-			local v36 = p7.renderMeshesData[Name]
+		if data.ColorMap then
+			surfaceAppearance.ColorMapContent = Content.fromObject(data.ColorMap.editable)
+		end
 
-			if not v36 then
-				error("Missing editable data")
-			end
+		if data.MetalnessMap then
+			surfaceAppearance.MetalnessMapContent = Content.fromObject(data.MetalnessMap.editable)
+		end
 
-			local v37 = p7.meshTextures[Name]
-			local v38 = copyMeshPart(v34, v36, v37)
+		if data.NormalMap then
+			surfaceAppearance.NormalMapContent = Content.fromObject(data.NormalMap.editable)
+		end
 
-			v38.Parent = Model
+		if data.RoughnessMap then
+			surfaceAppearance.RoughnessMapContent = Content.fromObject(data.RoughnessMap.editable)
+		end
 
-			local v39 = p7.outerCagesData[Name]
+		if data.EmissiveMask then
+			surfaceAppearance.EmissiveMaskContent = Content.fromObject(data.EmissiveMask.editable)
+		end
 
-			if v39 then
-				createCagePart(v38, v36, v39, "OuterCage").Parent = Model
-			end
+		surfaceAppearance.Parent = meshPartAsync
+	end
 
-			local v40 = p7.innerCagesData[Name]
+	meshPartAsync.Name = part.Name
+	meshPartAsync.Size = part.Size
+	meshPartAsync.CFrame = part.CFrame
 
-			if v40 then
-				createCagePart(v38, v36, v40, "InnerCage").Parent = Model
-			end
+	for _, child in part:GetChildren() do
+		if
+			not (child:IsA("Attachment") or child:IsA("FaceControls"))
+			or R15plusUtils.checkFlagEnabledForAllowHrd() and child:IsA("Bone")
+		then
+			continue
+		end
 
-			if getFFlagUGCValidationAddGeometryToExports() and p7.uploadCategory == ValidationEnums.UploadCategory.FULL_BODY then
-				v38.Name = `{ Name }_Geo`
-			end
+		local clone = child:Clone()
+		clone.Parent = meshPartAsync
+	end
+
+	if not R15plusUtils.checkFlagEnabledForAllowHrd() then
+		return meshPartAsync
+	end
+
+	local avatarBoneSchema = R15plusUtils.getAvatarBoneSchema(part.Name)
+	local nameWhitelistOfClassInSchema = R15plusUtils.getNameWhitelistOfClassInSchema(avatarBoneSchema, "Attachment")
+
+	for childName, v in nameWhitelistOfClassInSchema do
+		if not (v and meshPartAsync:FindFirstChild(childName) == nil) then
+			continue
+		end
+
+		local child = part:FindFirstChild(childName, true)
+		local worldCFrame
+
+		if child == nil then
+			worldCFrame = meshPartAsync.CFrame
+		else
+			worldCFrame = child.WorldCFrame
+		end
+
+		local attachment = Instance.new("Attachment")
+		attachment.Name = childName
+		attachment.Parent = meshPartAsync
+		attachment.WorldCFrame = worldCFrame
+	end
+
+	return meshPartAsync
+end
+
+local function addBonesFromPoses(instance, humanoidRootPart, defaultCharacter)
+	for _, pose in instance:GetChildren() do
+		if not pose:IsA("Pose") then
+			continue
+		end
+
+		local name = pose.Name
+		local part = defaultCharacter:FindFirstChild(name)
+
+		if part and part:IsA("BasePart") then
+			addBonesFromPoses(pose, part, defaultCharacter)
+		else
+			local bone = Instance.new("Bone")
+			bone.Name = name
+			bone.Parent = humanoidRootPart
+			addBonesFromPoses(pose, bone, defaultCharacter)
+		end
+	end
+end
+
+local function createEmoteExportScene(data)
+	local defaultCharacter = RigBuilder.createDefaultCharacter(false)
+	local v
+
+	if data.curveAnimations and #data.curveAnimations > 0 then
+		v = buildEmoteKeyframeSequenceFromCurveAnim(data.curveAnimations[1])
+	end
+
+	if not v then
+		error("Emote export requires a curve animation, but none was available")
+	end
+
+	v.Parent = defaultCharacter
+
+	local children = v:GetChildren()
+	local humanoidRootPart = defaultCharacter:FindFirstChild("HumanoidRootPart")
+
+	if #children > 0 and humanoidRootPart and humanoidRootPart:IsA("BasePart") then
+		addBonesFromPoses(children[1], humanoidRootPart, defaultCharacter)
+	end
+
+	defaultCharacter:PivotTo(CFrame.new())
+	return defaultCharacter
+end
+
+function RecreateSceneFromEditables.createModelForGltfExport(data)
+	if
+		getEngineFeatureEngineUGCValidateEmoteAnimationExport()
+		and data.uploadCategory == ValidationEnums.UploadCategory.EMOTE_ANIMATION
+	then
+		return createEmoteExportScene(data)
+	end
+
+	local model = Instance.new("Model")
+	local descendants = data.rootInstance:GetDescendants()
+	table.insert(descendants, data.rootInstance)
+
+	for _, part in descendants do
+		if not part:IsA("MeshPart") then
+			continue
+		end
+
+		local name = part.Name
+		local v = data.renderMeshesData[name]
+
+		if not v then
+			error("Missing editable data")
+		end
+
+		local v2 = copyMeshPart(part, v, data.meshTextures[name])
+		v2.Parent = model
+
+		local v3 = data.outerCagesData[name]
+
+		if v3 then
+			local cagePart = createCagePart(v2, v, v3, "OuterCage")
+			cagePart.Parent = model
+		end
+
+		local v4 = data.innerCagesData[name]
+
+		if v4 then
+			local cagePart = createCagePart(v2, v, v4, "InnerCage")
+			cagePart.Parent = model
+		end
+
+		if data.uploadCategory == ValidationEnums.UploadCategory.FULL_BODY then
+			v2.Name = `{name}_Geo`
 		end
 	end
 
-	Model:PivotTo(CFrame.new())
-
-	return Model
+	model:PivotTo(CFrame.new())
+	return model
 end
 
-return t1
+return RecreateSceneFromEditables

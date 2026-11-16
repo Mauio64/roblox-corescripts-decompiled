@@ -1,33 +1,24 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(parent.React)
 local useAXAnimateScrollFrame = require(script.Parent.useAXAnimateScrollFrame)
 
-local function AnimatedScrollingFrame(p1, p2) -- line: 8
-	-- upvalues: React (copy), useAXAnimateScrollFrame (copy)
-	local v7 = React.useRef(nil)
+local function AnimatedScrollingFrame(p, callback)
+	local ref = React.useRef(nil)
+	useAXAnimateScrollFrame(ref)
+	local ref2 = React.useCallback(function(current)
+		ref.current = current
 
-	useAXAnimateScrollFrame(v7)
-
-	local v8 = React.useCallback(function(p3) -- line: 11
-		-- upvalues: v7 (copy), p2 (copy)
-		v7.current = p3
-
-		if typeof(p2) == "table" then
-			p2.current = p3
-
-			return
+		if typeof(callback) == "table" then
+			callback.current = current
+		elseif typeof(callback) == "function" then
+			callback(current)
 		end
+	end, { callback })
 
-		if typeof(p2) == "function" then
-			p2(p3)
-		end
-	end, { p2 })
-	local v9 = table.clone(p1)
-
-	v9.children = nil
-	v9.ref = v8
-
-	return React.createElement("ScrollingFrame", v9, p1.children)
+	local clone = table.clone(p)
+	clone.children = nil
+	clone.ref = ref2
+	return React.createElement("ScrollingFrame", clone, p.children)
 end
 
 return React.forwardRef(AnimatedScrollingFrame)

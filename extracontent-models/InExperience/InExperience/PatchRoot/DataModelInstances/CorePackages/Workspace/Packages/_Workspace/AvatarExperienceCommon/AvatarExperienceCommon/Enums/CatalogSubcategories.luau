@@ -1,57 +1,12 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local enumerate = require(Parent.enumerate)
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local FFlagAXCatalogBodySuits = AvatarExperienceFlags.FFlagAXCatalogBodySuits
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local enumerate = require(parent.enumerate)
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXCatalogM41Props = AvatarExperienceFlags.FFlagAXCatalogM41Props
 local FFlagAXCatalogM41FullMasks = AvatarExperienceFlags.FFlagAXCatalogM41FullMasks
 local FFlagAXCatalogM41HandAndArm = AvatarExperienceFlags.FFlagAXCatalogM41HandAndArm
 local FFlagAXFixHandAndArmWidgetApiContext = AvatarExperienceFlags.FFlagAXFixHandAndArmWidgetApiContext
-local FFlagDynamicHeadsMigration = AvatarExperienceFlags.FFlagDynamicHeadsMigration
-
-if FFlagAXCatalogBodySuits then
-	return enumerate(script.Name, {
-		Featured = "Featured",
-		Limited = "Limited",
-		Community = "Community",
-		Premium = "Premium",
-		Shirts = "Shirts",
-		TShirts = "TShirts",
-		Sweaters = "Sweaters",
-		Jackets = "Jackets",
-		Pants = "Pants",
-		DressesAndSkirts = "DressSkirt",
-		Shorts = "Shorts",
-		Shoes = "Shoes",
-		ClassicShirts = "Classic Shirts",
-		ClassicTShirts = "Classic T-Shirts",
-		ClassicPants = "Classic Pants",
-		Bodysuits = "Bodysuits",
-		Hats = "Hats",
-		Face = "Face",
-		FullMasks = if not FFlagAXCatalogM41FullMasks then nil else "Full Masks",
-		Neck = "Neck",
-		Shoulder = "Shoulder",
-		HandAndArm = if not FFlagAXCatalogM41HandAndArm then nil else not FFlagAXFixHandAndArmWidgetApiContext and "Hand & Arm" or "Hand And Arm",
-		Front = "Front",
-		Back = "Back",
-		Waist = "Waist",
-		Gear = "Gear",
-		FullBodies = "Full Bodies",
-		Heads = "Heads",
-		Hair = "Hair",
-		ClassicHeads = if FFlagDynamicHeadsMigration then nil else "Classic Heads",
-		ClassicFaces = if FFlagDynamicHeadsMigration then nil else "Classic Faces",
-		MakeupLooks = "Makeup Looks",
-		EyeMakeup = "Eye Makeup",
-		FaceMakeup = "Face Makeup",
-		LipMakeup = "Lip Makeup",
-		Eyelashes = "Eyelashes",
-		Eyebrows = "Eyebrows",
-		AnimationBundles = "AnimationBundles",
-		Emotes = "Emotes",
-		Props = if not FFlagAXCatalogM41Props then nil else "Props"
-	})
-end
 
 return enumerate(script.Name, {
 	Featured = "Featured",
@@ -69,12 +24,13 @@ return enumerate(script.Name, {
 	ClassicShirts = "Classic Shirts",
 	ClassicTShirts = "Classic T-Shirts",
 	ClassicPants = "Classic Pants",
+	Bodysuits = "Bodysuits",
 	Hats = "Hats",
 	Face = "Face",
-	FullMasks = if not FFlagAXCatalogM41FullMasks then nil else "Full Masks",
+	FullMasks = FFlagAXCatalogM41FullMasks and "Full Masks" or nil,
 	Neck = "Neck",
 	Shoulder = "Shoulder",
-	HandAndArm = if not FFlagAXCatalogM41HandAndArm then nil else not FFlagAXFixHandAndArmWidgetApiContext and "Hand & Arm" or "Hand And Arm",
+	HandAndArm = FFlagAXCatalogM41HandAndArm and (FFlagAXFixHandAndArmWidgetApiContext and "Hand And Arm" or "Hand & Arm") or nil,
 	Front = "Front",
 	Back = "Back",
 	Waist = "Waist",
@@ -82,8 +38,6 @@ return enumerate(script.Name, {
 	FullBodies = "Full Bodies",
 	Heads = "Heads",
 	Hair = "Hair",
-	ClassicHeads = if FFlagDynamicHeadsMigration then nil else "Classic Heads",
-	ClassicFaces = if FFlagDynamicHeadsMigration then nil else "Classic Faces",
 	MakeupLooks = "Makeup Looks",
 	EyeMakeup = "Eye Makeup",
 	FaceMakeup = "Face Makeup",
@@ -92,5 +46,5 @@ return enumerate(script.Name, {
 	Eyebrows = "Eyebrows",
 	AnimationBundles = "AnimationBundles",
 	Emotes = "Emotes",
-	Props = if not FFlagAXCatalogM41Props then nil else "Props"
+	Props = FFlagAXCatalogM41Props and "Props" or nil
 })

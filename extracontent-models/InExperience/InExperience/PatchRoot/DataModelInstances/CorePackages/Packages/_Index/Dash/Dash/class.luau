@@ -1,144 +1,99 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
 
-require(scriptParent.Types)
+local function throwNotImplemented(p) -- 7 equivalent calls inferred from this helper
+	local Error = require(parent.Error)
 
-local function throwNotImplemented(p1) -- line: 4
-	-- upvalues: scriptParent (copy)
-	require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(p1)
+	Error.new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(p)
 end
-local function v3() -- line: 13
+
+local function fn()
 	return {}
 end
-local function class(s1: string, p2: ((...any) -> ...any)?) -- line: 49
-	-- upvalues: v3 (copy), class (copy), scriptParent (copy)
-	local v8 = p2 or v3
-	local t1 = {
-		name = s1
-	}
 
-	function t1.new(...) -- line: 65
-		-- upvalues: v8 (copy), t1 (copy)
-		local v10 = v8(...)
+local function class(p: string, callback)
+	local v = callback or fn
+	local class2 = { name = p }
 
-		setmetatable(v10, {
-			__index = t1,
-			__tostring = t1.toString,
-			__eq = t1.equals,
-			__lt = t1.__lt,
-			__le = t1.__le,
-			__add = t1.__add,
-			__sub = t1.__sub,
-			__mul = t1.__mul,
-			__div = t1.__div,
-			__mod = t1.__mod
+	function class2.new(...)
+		local v2 = v(...)
+		setmetatable(v2, {
+			__index = class2,
+			__tostring = class2.toString,
+			__eq = class2.equals,
+			__lt = class2.__lt,
+			__le = class2.__le,
+			__add = class2.__add,
+			__sub = class2.__sub,
+			__mul = class2.__mul,
+			__div = class2.__div,
+			__mod = class2.__mod
 		})
-		v10.Class = t1
-		v10:_init(...)
 
-		return v10
+		v2.Class = class2
+		v2:_init(...)
+		return v2
 	end
-	function t1._init(_) -- line: 114
-	end
-	function t1.isInstance(p4) -- line: 133
-		-- upvalues: t1 (copy)
-		local ok, result = pcall(function() -- line: 134
-			-- upvalues: p4 (copy), t1 (copy)
-			local mt = getmetatable(p4)
 
-			while mt do
-				if mt.__index == t1 then
+	function class2:_init() end
+
+	function class2.isInstance(p2)
+		local success, result = pcall(function(): boolean
+			local metatable = getmetatable(p2)
+
+			while metatable do
+				if metatable.__index == class2 then
 					return true
 				end
 
-				mt = getmetatable(mt.__index)
+				metatable = getmetatable(metatable.__index)
 			end
 
 			return false
 		end)
 
-		return ok and result
-	end
-	function t1.extend(t2: {[any]: any}, s2: string, p5) -- line: 184
-		-- upvalues: class (copy), t1 (copy)
-		local v18 = class(s2, p5 or t1.new)
-
-		setmetatable(v18, {
-			__index = t2
-		})
-
-		return v18
-	end
-	function t1.toString(p6) -- line: 222
-		return p6.name
-	end
-	function t1.equals(p7, p8) -- line: 230
-		return (rawequal(p7, p8))
-	end
-	function t1.__lt(_, _) -- line: 238
-		-- upvalues: s1 (copy), scriptParent (copy)
-		local t3 = {
-			methodName = "__lt",
-			className = s1
-		}
-
-		require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(t3)
-	end
-	function t1.__le(_, _) -- line: 250
-		-- upvalues: s1 (copy), scriptParent (copy)
-		local t4 = {
-			methodName = "__le",
-			className = s1
-		}
-
-		require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(t4)
-	end
-	function t1.__add(_) -- line: 257
-		-- upvalues: s1 (copy), scriptParent (copy)
-		local t5 = {
-			methodName = "__add",
-			className = s1
-		}
-
-		require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(t5)
-	end
-	function t1.__sub(_) -- line: 263
-		-- upvalues: s1 (copy), scriptParent (copy)
-		local t6 = {
-			methodName = "__sub",
-			className = s1
-		}
-
-		require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(t6)
-	end
-	function t1.__mul(_) -- line: 269
-		-- upvalues: s1 (copy), scriptParent (copy)
-		local t7 = {
-			methodName = "__mul",
-			className = s1
-		}
-
-		require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(t7)
-	end
-	function t1.__div(_) -- line: 275
-		-- upvalues: s1 (copy), scriptParent (copy)
-		local t8 = {
-			methodName = "__div",
-			className = s1
-		}
-
-		require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(t8)
-	end
-	function t1.__mod(_) -- line: 281
-		-- upvalues: s1 (copy), scriptParent (copy)
-		local t9 = {
-			methodName = "__mod",
-			className = s1
-		}
-
-		require(scriptParent.Error).new("NotImplemented", "The method \"{methodName}\" is not implemented on the class \"{className}\""):throw(t9)
+		return success and result
 	end
 
-	return t1
+	function class2.extend(p2, p3: string, p4)
+		local v2 = class(p3, p4 or class2.new)
+		setmetatable(v2, { __index = p2 })
+		return v2
+	end
+
+	function class2.toString(p2)
+		return p2.name
+	end
+
+	function class2.equals(p2, p3)
+		return (rawequal(p2, p3))
+	end
+
+	function class2.__lt(_, _)
+		throwNotImplemented({ methodName = "__lt", className = p }) -- inferred equivalent call
+	end
+
+	function class2.__le(_, _)
+		throwNotImplemented({ methodName = "__le", className = p }) -- inferred equivalent call
+	end
+
+	function class2.__add(_)
+		throwNotImplemented({ methodName = "__add", className = p }) -- inferred equivalent call
+	end
+	function class2.__sub(_)
+		throwNotImplemented({ methodName = "__sub", className = p }) -- inferred equivalent call
+	end
+	function class2.__mul(_)
+		throwNotImplemented({ methodName = "__mul", className = p }) -- inferred equivalent call
+	end
+	function class2.__div(_)
+		throwNotImplemented({ methodName = "__div", className = p }) -- inferred equivalent call
+	end
+	function class2.__mod(_)
+		throwNotImplemented({ methodName = "__mod", className = p }) -- inferred equivalent call
+	end
+
+	return class2
 end
 
 return class

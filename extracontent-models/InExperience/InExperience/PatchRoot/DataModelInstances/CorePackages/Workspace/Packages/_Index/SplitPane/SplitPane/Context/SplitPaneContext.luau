@@ -1,7 +1,9 @@
-local Parent = script:FindFirstAncestor("SplitPane").Parent
+local parent = script:FindFirstAncestor("SplitPane").Parent
+local React = require(parent.React)
 
-return require(Parent.React).createContext({
+return React.createContext({
 	renderSupportContent = nil,
 	supportPaneResizable = nil,
-	onContentRegionRectChanged = nil
+	onContentRegionRectChanged = nil,
+	resolveEligibility = nil
 })

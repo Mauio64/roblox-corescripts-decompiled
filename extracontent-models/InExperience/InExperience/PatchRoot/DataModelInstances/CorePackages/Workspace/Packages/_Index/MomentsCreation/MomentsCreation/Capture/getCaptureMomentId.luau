@@ -1,17 +1,17 @@
-local function getCaptureMomentId(p1) -- line: 12
-	if typeof(p1) ~= "table" then
+local function getCaptureMomentId(p)
+	if typeof(p) ~= "table" then
 		return nil
 	end
 
-	if p1.assetId ~= nil then
-		return `creation:{ p1.assetId }`
+	if p.assetId ~= nil then
+		return `creation:{p.assetId}`
 	end
 
-	if p1.LocalId ~= nil then
-		return `creation:{ p1.LocalId }`
+	if p.LocalId == nil then
+		return nil
 	end
 
-	return nil
+	return `creation:{p.LocalId}`
 end
 
 return getCaptureMomentId

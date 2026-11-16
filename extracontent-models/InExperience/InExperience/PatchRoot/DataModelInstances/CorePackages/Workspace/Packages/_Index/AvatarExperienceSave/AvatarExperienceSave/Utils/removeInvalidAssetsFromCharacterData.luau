@@ -1,25 +1,27 @@
 local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
-local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
-local tutils = require(AvatarExperienceSaveParent.tutils)
+
+local parent = AvatarExperienceSave.Parent
+local tutils = require(parent.tutils)
 
 require(AvatarExperienceSave.Context.AvatarSaveContext)
 
-local function removeInvalidAssetsFromCharacterData(p1, t1: {[any]: any}) -- line: 8
-	-- upvalues: tutils (copy)
-	local v7 = false
+local function removeInvalidAssetsFromCharacterData(p, items)
+	local v = false
 
-	for v8, v9 in t1 do
-		if p1.equipped.EquippedAssets[v9] and p1.equipped.EquippedAssets[v9][v8] then
-			v7 = true
-			p1.equipped.EquippedAssets[v9][v8] = nil
+	for k, item in items do
+		if not (p.equipped.EquippedAssets[item] and p.equipped.EquippedAssets[item][k]) then
+			continue
+		end
 
-			if tutils.fieldCount(p1.equipped.EquippedAssets[v9]) == 0 then
-				p1.equipped.EquippedAssets[v9] = nil
-			end
+		v = true
+		p.equipped.EquippedAssets[item][k] = nil
+
+		if tutils.fieldCount(p.equipped.EquippedAssets[item]) == 0 then
+			p.equipped.EquippedAssets[item] = nil
 		end
 	end
 
-	return p1, v7
+	return p, v
 end
 
 return removeInvalidAssetsFromCharacterData

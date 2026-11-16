@@ -1,5 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.React).createContext({
-	menuIconRef = nil
-})
+local React = require(CorePackages.Packages.React)
+
+return React.createContext({ menuIconRef = nil, replacesAgeRating = false })

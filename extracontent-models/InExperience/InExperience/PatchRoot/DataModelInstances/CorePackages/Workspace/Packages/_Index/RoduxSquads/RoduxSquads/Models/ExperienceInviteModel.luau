@@ -1,114 +1,98 @@
 local RoduxSquads = script:FindFirstAncestor("RoduxSquads")
-local RoduxSquadsParent = RoduxSquads.Parent
-local t = require(RoduxSquadsParent.t)
+local parent = RoduxSquads.Parent
+
+local t = require(parent.t)
+
 local ExperienceInviteState = require(RoduxSquads.Enums.ExperienceInviteState)
 local ExperienceInviteVoteType = require(RoduxSquads.Enums.ExperienceInviteVoteType)
 local ExperienceInviteType = require(RoduxSquads.Enums.ExperienceInviteType)
-local FFlagEnablePrivatePartyAcceptInvite = require(RoduxSquadsParent.SharedFlags).FFlagEnablePrivatePartyAcceptInvite
 
-local function getSpotsTaken(t1: {[any]: any}) -- line: 12
-	-- upvalues: ExperienceInviteVoteType (copy)
-	local n1 = 0
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnablePrivatePartyAcceptInvite = SharedFlags.FFlagEnablePrivatePartyAcceptInvite
 
-	for i = 1, #t1 do
-		if t1[i].voteType == ExperienceInviteVoteType.Accept then
-			n1 += 1
+local function getSpotsTaken(votes) -- 2 equivalent calls inferred from this helper
+	local count = 0
+
+	for i = 1, #votes do
+		if votes[i].voteType == ExperienceInviteVoteType.Accept then
+			count += 1
 		end
 	end
 
-	return n1
+	return count
 end
 
-local t2 = {}
+local ExperienceInviteModel = {}
 
-function t2.new(p1) -- line: 32
-	-- upvalues: t2 (copy)
-	assert(t2.isValid(p1))
-	t2.__index = t2
-	setmetatable(p1, t2)
+function ExperienceInviteModel.new(p)
+	assert(ExperienceInviteModel.isValid(p))
 
-	return p1
+	ExperienceInviteModel.__index = ExperienceInviteModel
+
+	setmetatable(p, ExperienceInviteModel)
+
+	return p
 end
-function t2.mock(p2) -- line: 44
-	-- upvalues: ExperienceInviteVoteType (copy), t2 (copy), ExperienceInviteState (copy), FFlagEnablePrivatePartyAcceptInvite (copy), ExperienceInviteType (copy)
-	local v15 = p2 or {}
-	local v16 = v15.votes or {
-		[1] = {
+
+function ExperienceInviteModel.mock(options)
+	local v = options or {}
+
+	local votes = v.votes or {
+		{
 			userId = 456,
 			voteIdentifier = "voteIdentifier",
 			voteType = ExperienceInviteVoteType.Accept
 		}
 	}
-	local n2 = 0
-
-	for i = 1, #v16 do
-		if v16[i].voteType == ExperienceInviteVoteType.Accept then
-			n2 += 1
-		end
-	end
-
-	local v19 = t2.new({
-		createdAtTime = v15.createdAtTime or "2024-07-19T21:02:47.777+00:00",
-		experienceInviteId = v15.experienceInviteId or "987",
-		experienceDetail = v15.experienceDetail or {
+	local spotsTaken = getSpotsTaken(votes) -- inferred equivalent call
+	local v2 = ExperienceInviteModel.new({
+		createdAtTime = v.createdAtTime or "2024-07-19T21:02:47.777+00:00",
+		experienceInviteId = v.experienceInviteId or "987",
+		experienceDetail = v.experienceDetail or {
 			placeId = 15308759682,
 			gameInstanceId = "instanceId"
 		},
-		inviterId = v15.inviterId or 123456,
-		membershipEntityId = v15.membershipEntityId or "54321",
-		spotsTaken = n2,
-		state = v15.state or ExperienceInviteState.Active,
-		totalSpots = v15.totalSpots or 6,
-		versionId = v15.version or 1,
-		votes = v16
+		inviterId = v.inviterId or 123456,
+		membershipEntityId = v.membershipEntityId or "54321",
+		spotsTaken = spotsTaken,
+		state = v.state or ExperienceInviteState.Active,
+		totalSpots = v.totalSpots or 6,
+		versionId = v.version or 1,
+		votes = votes
 	})
 
 	if FFlagEnablePrivatePartyAcceptInvite then
-		v19.inviteType = v15.inviteType or ExperienceInviteType.PlayWithPartyInPublicServer
+		v2.inviteType = v.inviteType or ExperienceInviteType.PlayWithPartyInPublicServer
 	end
 
-	return v19
+	return v2
 end
-function t2.format(p3) -- line: 79
-	-- upvalues: t2 (copy), ExperienceInviteVoteType (copy), FFlagEnablePrivatePartyAcceptInvite (copy), ExperienceInviteType (copy)
-	local votes = p3.votes
-	local new = t2.new
-	local t3 = {
-		createdAtTime = p3.createdAtTime,
-		experienceDetail = p3.experienceDetail,
-		experienceInviteId = p3.experienceInviteId,
-		inviterId = p3.inviterId,
-		membershipEntityId = p3.membershipEntityId
-	}
-	local n3 = 0
 
-	for i = 1, #votes do
-		if votes[i].voteType == ExperienceInviteVoteType.Accept then
-			n3 += 1
-		end
-	end
-
-	t3.spotsTaken = n3
-	t3.state = p3.state
-	t3.totalSpots = p3.totalSpots
-	t3.versionId = p3.versionId
-	t3.votes = votes
-
-	local v26 = new(t3)
+function ExperienceInviteModel.format(data)
+	local votes = data.votes
+	local v = ExperienceInviteModel.new({
+		createdAtTime = data.createdAtTime,
+		experienceDetail = data.experienceDetail,
+		experienceInviteId = data.experienceInviteId,
+		inviterId = data.inviterId,
+		membershipEntityId = data.membershipEntityId,
+		spotsTaken = getSpotsTaken(votes), -- inferred equivalent call
+		state = data.state,
+		totalSpots = data.totalSpots,
+		versionId = data.versionId,
+		votes = votes
+	})
 
 	if FFlagEnablePrivatePartyAcceptInvite then
-		v26.inviteType = p3.inviteType or ExperienceInviteType.PlayWithPartyInPublicServer
+		v.inviteType = data.inviteType or ExperienceInviteType.PlayWithPartyInPublicServer
 	end
 
-	return v26
+	return v
 end
 
-t2.isValid = t.strictInterface({
+ExperienceInviteModel.isValid = t.strictInterface({
 	createdAtTime = t.string,
-	experienceDetail = t.interface({
-		placeId = t.number,
-		gameInstanceId = t.optional(t.string)
-	}),
+	experienceDetail = t.interface({ placeId = t.number, gameInstanceId = t.optional(t.string) }),
 	experienceInviteId = t.string,
 	inviterId = t.number,
 	membershipEntityId = t.string,
@@ -121,7 +105,10 @@ t2.isValid = t.strictInterface({
 		voteIdentifier = t.optional(t.string),
 		voteType = t.string
 	})),
-	inviteType = t.optional(t.union(t.literal(ExperienceInviteType.PlayWithPartyInPublicServer), t.literal(ExperienceInviteType.PlayWithPartyInPrivatePartyServer)))
+	inviteType = t.optional(t.union(
+		t.literal(ExperienceInviteType.PlayWithPartyInPublicServer),
+		t.literal(ExperienceInviteType.PlayWithPartyInPrivatePartyServer)
+	))
 })
 
-return t2
+return ExperienceInviteModel

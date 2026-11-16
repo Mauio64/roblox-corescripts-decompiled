@@ -1,65 +1,63 @@
 local RunService = game:GetService("RunService")
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local FoundationImage = Foundation.Image
+
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
+local Image = Foundation.Image
 local Skeleton = Foundation.Skeleton
 local View = Foundation.View
 local Icon = Foundation.Icon
 local IconButton = Foundation.IconButton
 local Progress = Foundation.Progress
+
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local InputSize = Foundation.Enums.InputSize
 local ProgressShape = Foundation.Enums.ProgressShape
 local ProgressSize = Foundation.Enums.ProgressSize
+
 local useTokens = Foundation.Hooks.useTokens
 
 require(script.Parent.types)
 
-local function MediaPreview(t1: {[any]: any}) -- line: 36
-	-- upvalues: useTokens (copy), React (copy), RunService (copy), View (copy), Skeleton (copy), Foundation (copy), Icon (copy), IconName (copy), IconSize (copy), IconButton (copy), InputSize (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), FoundationImage (copy)
-	local v19 = useTokens()
-	local v20, v21 = React.useState(true)
-	local v22 = React.useRef(nil)
-	local v23, v24 = React.useBinding(0)
-	local v25 = not t1.isIcon and 1.7777777777777777 or 1
-	local v26 = React.useCallback(function() -- line: 44
-		-- upvalues: v21 (copy), v20 (copy)
-		v21(not v20)
-	end, { v20 })
+local function MediaPreview(props)
+	local v = useTokens()
+	local state, setState = React.useState(true)
+	local ref = React.useRef(nil)
+	local v2, v3 = React.useBinding(0)
 
-	React.useEffect(function() -- line: 48
-		-- upvalues: t1 (copy), v22 (copy), RunService (copy), v24 (copy)
-		if t1.mediaType ~= "video" then
+	local aspectRatio = props.isIcon and 1 or 16 / 9
+
+	local onActivated = React.useCallback(function()
+		setState(not state)
+	end, { state })
+
+	React.useEffect(function()
+		if not (props.mediaType == "video" and ref.current) then
 			return nil
 		end
 
-		if not v22.current then
-			return nil
-		end
-
-		local connection = RunService.RenderStepped:Connect(function() -- line: 58
-			-- upvalues: v22 (copy), v24 (copy)
-			local current = v22.current
+		local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+			local current = ref.current
 
 			if current and current.TimeLength > 0 then
-				v24(100 * current.TimePosition / current.TimeLength)
+				v3(100 * current.TimePosition / current.TimeLength)
 			end
 		end)
 
-		return function() -- line: 65
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			renderSteppedConnection:Disconnect()
 		end
-	end, { t1.mediaType })
+	end, { props.mediaType })
 
-	if t1.isLoading then
+	if props.isLoading then
 		return React.createElement(View, {
 			Size = UDim2.fromScale(1, 1),
-			LayoutOrder = t1.LayoutOrder,
+			LayoutOrder = props.LayoutOrder,
 			aspectRatio = {
-				AspectRatio = v25,
+				AspectRatio = aspectRatio,
 				AspectType = Enum.AspectType.FitWithinMaxSize,
 				DominantAxis = Enum.DominantAxis.Width
 			}
@@ -71,91 +69,121 @@ local function MediaPreview(t1: {[any]: any}) -- line: 36
 		})
 	end
 
-	if not t1.assetSource and not t1.imageContent then
+	if not (props.assetSource or props.imageContent) then
 		return React.createElement(View, {
 			tag = "align-x-center align-y-center radius-large clip bg-surface-200",
 			Size = UDim2.fromScale(1, 1),
-			LayoutOrder = t1.LayoutOrder,
+			LayoutOrder = props.LayoutOrder,
 			aspectRatio = {
-				AspectRatio = v25,
+				AspectRatio = aspectRatio,
 				AspectType = Enum.AspectType.FitWithinMaxSize,
 				DominantAxis = Enum.DominantAxis.Width
 			}
 		}, {
 			PlaceholderIcon = React.createElement(Icon, {
-				tag = "auto-xy content-default",
 				name = IconName.Image,
-				size = IconSize.XLarge
+				size = IconSize.XLarge,
+				tag = "auto-xy content-default"
 			})
 		})
 	end
 
-	if t1.mediaType == "video" then
-		return React.createElement(View, {
+	if props.mediaType == "video" then
+		local createElement = React.createElement
+		local v4 = {
 			Size = UDim2.fromScale(1, 1),
 			aspectRatio = {
-				AspectRatio = v25,
+				AspectRatio = aspectRatio,
 				AspectType = Enum.AspectType.FitWithinMaxSize,
 				DominantAxis = Enum.DominantAxis.Width
 			},
-			LayoutOrder = t1.LayoutOrder
-		}, {
-			Video = React.createElement("VideoFrame", {
-				Looped = true,
-				Volume = 0,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = UDim2.fromScale(1, 1),
-				Video = t1.assetSource,
-				VideoContent = t1.imageContent,
-				Playing = v20,
-				ref = v22
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, 12)
-				}),
-				PlayPauseButton = React.createElement(IconButton, {
-					Position = UDim2.new(0, 0, 1, -v19.Gap.XSmall),
-					AnchorPoint = Vector2.new(0, 1),
-					icon = if not v20 then IconName.PlaySmall else IconName.PauseSmall,
-					size = InputSize.Small,
-					onActivated = v26
-				})
-			}),
+			LayoutOrder = props.LayoutOrder
+		}
+
+		local createElement2 = React.createElement
+		local v5 = {
+			Size = UDim2.fromScale(1, 1),
+			Video = props.assetSource,
+			VideoContent = props.imageContent,
+			Playing = state,
+			Looped = true,
+			Volume = 0,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ref = ref
+		}
+
+		local v6 = {
+			UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 12) }),
+			PlayPauseButton = 0
+		}
+
+		local createElement3 = React.createElement
+		local v7 = {
+			Position = UDim2.new(0, 0, 1, -v.Gap.XSmall),
+			AnchorPoint = Vector2.new(0, 1),
+			icon = 0,
+			size = 0,
+			onActivated = 0
+		}
+		local icon
+
+		if state then
+			icon = IconName.PauseSmall
+		else
+			icon = IconName.PlaySmall
+		end
+
+		v7.icon = icon
+		v7.size = InputSize.Small
+		v7.onActivated = onActivated
+		v6.PlayPauseButton = createElement3(IconButton, v7)
+		return createElement(View, v4, {
+			Video = createElement2("VideoFrame", v5, v6),
 			ProgressBar = React.createElement(Progress, {
-				Position = UDim2.new(0, 0, 1, v19.Gap.Medium),
-				value = v23,
+				Position = UDim2.new(0, 0, 1, v.Gap.Medium),
+				value = v2,
 				shape = ProgressShape.Bar,
 				size = ProgressSize.Medium
 			})
 		})
-	end
-
-	return React.createElement(View, {
-		tag = "align-x-center align-y-center radius-large clip bg-surface-200",
-		Size = UDim2.fromScale(1, 1),
-		LayoutOrder = t1.LayoutOrder,
-		aspectRatio = {
-			AspectRatio = v25,
-			AspectType = Enum.AspectType.FitWithinMaxSize,
-			DominantAxis = Enum.DominantAxis.Width
+	else
+		local createElement = React.createElement
+		local v4 = {
+			tag = "align-x-center align-y-center radius-large clip bg-surface-200",
+			Size = UDim2.fromScale(1, 1),
+			LayoutOrder = props.LayoutOrder,
+			aspectRatio = {
+				AspectRatio = aspectRatio,
+				AspectType = Enum.AspectType.FitWithinMaxSize,
+				DominantAxis = Enum.DominantAxis.Width
+			}
 		}
-	}, {
-		PreviewImage = if not t1.imageContent then React.createElement(FoundationImage, {
-			tag = "size-full radius-large",
-			Image = t1.assetSource,
-			ScaleType = Enum.ScaleType.Crop
-		}) else React.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			ImageContent = t1.imageContent,
-			ScaleType = Enum.ScaleType.Crop,
-			Size = UDim2.fromScale(1, 1)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 12)
+		local previewImage
+
+		if props.imageContent then
+			previewImage = React.createElement(
+				"ImageLabel",
+				{
+					BackgroundTransparency = 1,
+					ImageContent = props.imageContent,
+					ScaleType = Enum.ScaleType.Crop,
+					Size = UDim2.fromScale(1, 1)
+				},
+				{
+					UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 12) })
+				}
+			)
+		else
+			previewImage = React.createElement(Image, {
+				Image = props.assetSource,
+				tag = "size-full radius-large",
+				ScaleType = Enum.ScaleType.Crop
 			})
-		})
-	})
+		end
+
+		return createElement(View, v4, { PreviewImage = previewImage })
+	end
 end
 
 return MediaPreview

@@ -1,17 +1,17 @@
 local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
-local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
-local React = require(AvatarExperienceControlBarParent.React)
+
+local parent = AvatarExperienceControlBar.Parent
+local React = require(parent.React)
+
 local useAdvancedCustomizationControlBarProps = require(AvatarExperienceControlBar.useAdvancedCustomizationControlBarProps)
 local BaseControlBarContainer = require(AvatarExperienceControlBar.BaseControlBarContainer)
 
-local function AdvancedCustomizationControlBarContainer(p1) -- line: 9
-	-- upvalues: useAdvancedCustomizationControlBarProps (copy), React (copy), BaseControlBarContainer (copy)
-	local v8 = useAdvancedCustomizationControlBarProps(p1)
-
+local function AdvancedCustomizationControlBarContainer(p)
+	local v = useAdvancedCustomizationControlBarProps(p)
 	return React.createElement(BaseControlBarContainer, {
-		config = v8.config,
-		onActiveMenuItemChanged = p1.onActiveMenuItemChanged,
-		LayoutOrder = p1.LayoutOrder
+		config = v.config,
+		onActiveMenuItemChanged = p.onActiveMenuItemChanged,
+		LayoutOrder = p.LayoutOrder
 	})
 end
 

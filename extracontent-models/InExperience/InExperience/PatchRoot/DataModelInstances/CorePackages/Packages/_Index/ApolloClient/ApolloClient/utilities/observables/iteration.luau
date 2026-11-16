@@ -1,23 +1,24 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Array = require(ParentParent.LuauPolyfill).Array
-local t1 = {}
+local parent = script.Parent.Parent.Parent.Parent
+
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+
+local Iteration = {}
 
 require(script.Parent.Observable)
 
-function t1.iterateObserversSafely(p1, s1: string, p2) -- line: 26
-	-- upvalues: Array (copy)
-	local t2 = {}
+function Iteration.iterateObserversSafely(object, p: string, p2)
+	local v = {}
 
-	p1:forEach(function(p3) -- line: 37
-		-- upvalues: s1 (copy), t2 (copy)
-		if p3[s1] ~= nil then
-			table.insert(t2, p3)
+	object:forEach(function(p3)
+		if p3[p] ~= nil then
+			table.insert(v, p3)
 		end
 	end)
-	Array.forEach(t2, function(p4) -- line: 43
-		-- upvalues: s1 (copy), p2 (copy)
-		p4[s1](p4, p2)
+
+	Array.forEach(v, function(p3)
+		p3[p](p3, p2)
 	end)
 end
 
-return t1
+return Iteration

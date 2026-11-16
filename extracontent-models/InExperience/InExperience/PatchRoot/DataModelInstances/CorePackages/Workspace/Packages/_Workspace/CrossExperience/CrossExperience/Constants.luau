@@ -3,15 +3,15 @@ local CrossExperience = script:FindFirstAncestor("CrossExperience")
 require(CrossExperience.Types)
 
 return {
+	LOCAL_PLAYER_LOADING_TIMEOUT_ENUM = {
+		Disable = "Disable",
+		EnableManualRetry = "EnableManualRetry"
+	},
 	STORAGE_CEV_STORE_KEY = "CrossExperienceVoiceStore",
 	CEV_JOIN_ATTEMPT_ID_KEY = "cevJoinAttemptId",
 	EXPERIENCE_TYPE_VOICE = "Voice",
 	EXPERIENCE_TYPE_LUAAPP = "LuaApp",
 	EXPERIENCE_TYPE_UGC = "Ugc",
-	LOCAL_PLAYER_LOADING_TIMEOUT_ENUM = {
-		Disable = "Disable",
-		EnableManualRetry = "EnableManualRetry"
-	},
 	VOICE_STATUS = {
 		DISCONNECTED = "DISCONNECTED",
 		RCC_CONNECTING = "RCC_CONNECTING",
@@ -43,6 +43,7 @@ return {
 		EXECUTE_CHANGE_PARTY_VOICE_INPUT_DEVICE = "ExecutePartyVoiceInputDeviceChange",
 		EXECUTE_CHANGE_PARTY_VOICE_OUTPUT_DEVICE = "ExecutePartyVoiceOutputDeviceChange",
 		EXECUTE_GET_BACKGROUND_DM_STATE = "ExecutePartyVoiceGetBackgroundDMState",
+		EXECUTE_GET_PARTY_VOICE_DEBUG_STATS = "ExecutePartyVoiceGetDebugStats",
 		EXECUTE_PARTY_VOICE_IGNORE_LOW_MEMORY = "ExecutePartyVoiceIgnoreLowMemory"
 	},
 	EVENTS = {
@@ -208,13 +209,7 @@ return {
 		}
 	},
 	AUDIO_FOCUS_MANAGEMENT = {
-		CEV = {
-			CONTEXT_ID = 2,
-			FOCUS_PRIORITY = 2
-		},
-		UGC = {
-			CONTEXT_ID = 1,
-			FOCUS_PRIORITY = 1
-		}
+		CEV = { CONTEXT_ID = 2, FOCUS_PRIORITY = 2 },
+		UGC = { CONTEXT_ID = 1, FOCUS_PRIORITY = 1 }
 	}
 }

@@ -1,0 +1,3 @@
+local FFlagProfileInsightsParseClassmates = require(script.Parent.FFlagProfileInsightsParseClassmates)
+
+return game:DefineFastFlag("UserSearchClassmatesInsight", false) and FFlagProfileInsightsParseClassmates

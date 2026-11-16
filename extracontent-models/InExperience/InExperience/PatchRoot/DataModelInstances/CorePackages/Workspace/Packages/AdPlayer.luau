@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.AdPlayer.AdPlayer))
+local AdPlayer = require(Workspace.AdPlayer.AdPlayer)
+
+return AdPlayer

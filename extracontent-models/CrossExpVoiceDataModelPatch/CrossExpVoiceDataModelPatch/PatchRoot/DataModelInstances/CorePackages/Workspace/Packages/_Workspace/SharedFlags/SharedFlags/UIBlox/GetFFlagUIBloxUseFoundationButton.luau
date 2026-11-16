@@ -1,6 +1,5 @@
-local v1 = game:DefineFastFlag("UIBloxUseFoundationButton5", false)
+local defineFastFlag = game:DefineFastFlag("UIBloxUseFoundationButton5", false)
 
-return function() -- line: 3
-	-- upvalues: v1 (copy)
-	return v1
+return function()
+	return defineFastFlag
 end

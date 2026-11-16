@@ -1,62 +1,88 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local Icon = Foundation.Icon
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
 local ControlState = Foundation.Enums.ControlState
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
 
-local function SideModalDropdown(t1: {[any]: any}) -- line: 30
-	-- upvalues: useTokens (copy), React (copy), ControlState (copy), View (copy), FoundationText (copy), Icon (copy), IconSize (copy)
-	local v12 = useTokens()
-	local v13, v14 = React.useState(false)
-	local v15 = React.useCallback(function(p1) -- line: 33
-		-- upvalues: ControlState (copy), v14 (copy)
-		if p1 == ControlState.Hover then
-			v14(true)
-
-			return
+local function SideModalDropdown(props)
+	local v = useTokens()
+	local state, setState = React.useState(false)
+	local onStateChanged = React.useCallback(function(p)
+		if p == ControlState.Hover then
+			setState(true)
+		else
+			setState(false)
 		end
+	end, { setState })
 
-		v14(false)
-	end, { v14 })
-	local v16 = t1.height or 40
-	local v17 = not t1.fixSizeToParent and 0 or 1
+	local height = props.height or 40
 
-	return React.createElement(View, {
-		Size = UDim2.new(v17, 0, 0, v16),
+	local v2 = props.fixSizeToParent and 1 or 0
+
+	local createElement = React.createElement
+	local v3 = {
+		Size = UDim2.new(v2, 0, 0, height),
 		tag = {
-			["auto-x"] = not t1.fixSizeToParent,
+			["auto-x"] = not props.fixSizeToParent,
 			["radius-medium"] = true,
 			["align-x-left"] = true,
 			["align-y-center"] = true,
 			["padding-xxsmall"] = true,
 			["bg-shift-100"] = true
 		},
-		onStateChanged = v15,
-		onActivated = t1.onActivated,
-		backgroundStyle = t1.backgroundColorToken
-	}, {
-		UIStroke = React.createElement("UIStroke", {
-			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-			Color = if not t1.isDropdownError then v12.Color.Stroke.Default.Color3 else v12.Color.System.Alert.Color3,
-			Transparency = if not t1.isDropdownError then if not v13 then v12.Color.Stroke.Default.Transparency else v12.Color.Stroke.Emphasis.Transparency else v12.Color.System.Alert.Transparency,
-			Thickness = v12.Stroke.Standard
-		}),
+		onStateChanged = onStateChanged,
+		onActivated = props.onActivated,
+		backgroundStyle = props.backgroundColorToken
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		Color = 0,
+		Transparency = 0,
+		Thickness = 0
+	}
+	local color
+
+	if props.isDropdownError then
+		color = v.Color.System.Alert.Color3
+	else
+		color = v.Color.Stroke.Default.Color3
+	end
+
+	v4.Color = color
+	local transparency
+
+	if props.isDropdownError then
+		transparency = v.Color.System.Alert.Transparency
+	elseif state then
+		transparency = v.Color.Stroke.Emphasis.Transparency
+	else
+		transparency = v.Color.Stroke.Default.Transparency
+	end
+
+	v4.Transparency = transparency
+
+	v4.Thickness = v.Stroke.Standard
+	return createElement(View, v3, {
+		UIStroke = createElement2("UIStroke", v4),
 		UIListLayout = React.createElement("UIListLayout", {
 			HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween,
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
-		Text = React.createElement(FoundationText, {
-			tag = "text-truncate-split padding-left-small",
-			LayoutOrder = 0,
-			Text = t1.text or "",
+		Text = React.createElement(Text, {
+			Text = props.text or "",
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Size = UDim2.new(1, -40, 1, 0)
+			Size = UDim2.new(1, -40, 1, 0),
+			tag = "text-truncate-split padding-left-small",
+			LayoutOrder = 0
 		}),
 		IconContainer = React.createElement(View, {
 			tag = "auto-xy padding-right-small",
@@ -64,8 +90,8 @@ local function SideModalDropdown(t1: {[any]: any}) -- line: 30
 		}, {
 			Icon = React.createElement(Icon, {
 				name = "icons/actions/truncationExpand",
-				LayoutOrder = 1,
-				size = IconSize.Medium
+				size = IconSize.Medium,
+				LayoutOrder = 1
 			})
 		})
 	})

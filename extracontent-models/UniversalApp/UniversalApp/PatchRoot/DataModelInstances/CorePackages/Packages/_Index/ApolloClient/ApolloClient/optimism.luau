@@ -1,248 +1,187 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local LuauPolyfill = require(scriptParentParent.LuauPolyfill)
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Set = LuauPolyfill.Set
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
-local Trie = require(scriptParent.wry.trie).Trie
-local Cache = require(script.cache).Cache
-local Entry = require(script.entry).Entry
-local parentEntrySlot = require(script.context).parentEntrySlot
+
+local trie = require(parent.wry.trie)
+local trie2 = trie.Trie
+
+local cache = require(script.cache)
+local cache2 = cache.Cache
+local entry = require(script.entry)
+local entry2 = entry.Entry
+
 local context = require(script.context)
+local parentEntrySlot = context.parentEntrySlot
 
-t1.bindContext = context.bindContext
-t1.noContext = context.noContext
-t1.setTimeout = context.setTimeout
-t1.dep = require(script.dep).dep
+local context2 = require(script.context)
+local Optimism = {}
 
-local function makeDefaultMakeCacheKeyFunction() -- line: 61
-	-- upvalues: Trie (copy)
-	local v17 = Trie.new(true)
+Optimism.bindContext = context2.bindContext
+Optimism.noContext = context2.noContext
+Optimism.setTimeout = context2.setTimeout
 
-	return function(_, ...) -- line: 64
-		-- upvalues: v17 (copy)
-		return v17:lookupArray({ ... })
+local dep = require(script.dep)
+Optimism.dep = dep.dep
+
+local function makeDefaultMakeCacheKeyFunction() -- 2 equivalent calls inferred from this helper
+	local v = trie2.new(true)
+	return function(_, ...)
+		return v:lookupArray({ ... })
 	end
 end
 
-local v15 = Trie.new(true)
+Optimism.defaultMakeCacheKey = makeDefaultMakeCacheKeyFunction() -- inferred equivalent call
 
-function t1.defaultMakeCacheKey(_, ...) -- line: 64
-	-- upvalues: v15 (copy)
-	return v15:lookupArray({ ... })
-end
+Optimism.KeyTrie = trie2
 
-t1.KeyTrie = Trie
 require(script.initTypes)
 
-local v16 = Set.new()
+local v = Set.new()
 
-function t1.wrap(p3: ((...any) -> ...any), p4, p5) -- line: 104
-	-- upvalues: Cache (copy), Boolean (copy), Trie (copy), Entry (copy), Array (copy), v16 (copy), parentEntrySlot (copy), Object (copy)
-	local g27 = nil
-	local makeCacheKey = nil
+function Optimism.wrap(callback, p, p2)
+	local v2 = p == nil and {} or p
 
-	if p4 == nil then
-		p4 = {}
-	end
-
-	local v24 = Cache.new(Boolean.toJSBoolean(p4.max) and p4.max or 65536, function(p6) -- line: 115
-		return p6:dispose()
+	local v3 = cache2.new(Boolean.toJSBoolean(v2.max) and v2.max or 65536, function(object)
+		return object:dispose()
 	end)
-	local keyArgs = p4.keyArgs
 
-	if Boolean.toJSBoolean(p4.makeCacheKey) then
-		makeCacheKey = p4.makeCacheKey
+	local keyArgs = v2.keyArgs
+	local v4 = Boolean.toJSBoolean(v2.makeCacheKey) and v2.makeCacheKey or makeDefaultMakeCacheKeyFunction() -- inferred equivalent call
 
-		if makeCacheKey then
-			g27 = true
+	if p2 ~= nil then
+		local v5 = callback
+		callback = function(...)
+			return v5(p2, ...)
 		end
 	end
 
-	if not g27 then
-		local v28 = Trie.new(true)
+	local object = setmetatable({}, {
+		__call = function(_, p3, ...)
+			local v5 = p2 == nil and { p3, ... } or { ... }
 
-		function makeCacheKey(_, ...) -- line: 64
-			-- upvalues: v28 (copy)
-			return v28:lookupArray({ ... })
-		end
-	end
-
-	g27 = false
-
-	local v29 = makeCacheKey
-
-	if p5 ~= nil then
-		local v30 = p3
-
-		function p3(...) -- line: 126
-			-- upvalues: v30 (copy), p5 (copy)
-			return v30(p5, ...)
-		end
-	end
-
-	local self = setmetatable({}, {
-		__call = function(_, p9, ...) -- line: 134
-			-- upvalues: p5 (copy), v29 (copy), keyArgs (copy), p3 (ref), v24 (copy), Entry (copy), p4 (ref), Array (copy), v16 (copy), parentEntrySlot (copy)
-			local u45 = if p5 == nil then {
-				p9,
-				...
-			} else { ... }
-			local v46 = v29(nil, table.unpack((function() -- line: 147
-				-- upvalues: keyArgs (copy), u45 (ref)
+			local v6 = v4(nil, table.unpack((function()
 				if keyArgs then
-					return keyArgs(nil, table.unpack(u45))
+					return keyArgs(nil, table.unpack(v5))
 				end
 
-				return u45
+				return v5
 			end)()))
 
-			if v46 == nil then
-				return p3(table.unpack(u45))
+			if v6 == nil then
+				return callback(table.unpack(v5))
 			end
 
-			local v47 = v24:get(v46)
+			local v7 = v3:get(v6)
 
-			if v47 == nil then
-				v47 = Entry.new(p3)
-				v24:set(v46, v47)
-				v47.subscribe = p4.subscribe
+			if v7 == nil then
+				v7 = entry2.new(callback)
+				v3:set(v6, v7)
+				v7.subscribe = v2.subscribe
 
-				function v47.forget() -- line: 167
-					-- upvalues: v24 (copy), v46 (copy)
-					return v24:delete(v46)
+				function v7.forget()
+					return v3:delete(v6)
 				end
 			end
 
-			local v48 = v47:recompute((Array.slice(u45)))
+			local recompute = v7:recompute((Array.slice(v5)))
 
-			v24:set(v46, v47)
-			v16:add(v24)
+			v3:set(v6, v7)
+
+			v:add(v3)
 
 			if not parentEntrySlot:hasValue() then
-				v16:forEach(function(p10) -- line: 184
-					return p10:clean()
+				v:forEach(function(object)
+					return object:clean()
 				end)
-				v16:clear()
+
+				v:clear()
 			end
 
-			return v48
+			return recompute
 		end,
-		__index = function(p11, p12) -- line: 193
-			-- upvalues: v24 (copy)
-			if p12 == "size" then
-				return v24.map.size
+		__index = function(p3, p4)
+			if p4 == "size" then
+				return v3.map.size
 			end
 
-			return (rawget(p11, p12))
+			return (rawget(p3, p4))
 		end,
-		__newindex = function(p13, p14, p15) -- line: 199
-			if p14 == "size" then
+		__newindex = function(p3, p4, p5)
+			if p4 == "size" then
 				error("attempt to update a read-only table", 2)
 			end
 
-			rawset(p13, p14, p15)
+			rawset(p3, p4, p5)
 		end
 	})
 
-	local function asMethod(p16: ((...any) -> ...any)) -- line: 213
-		return function(_, ...) -- line: 214
-			-- upvalues: p16 (copy)
-			return p16(...)
-		end
-	end
-	local function dirtyKey(p18) -- line: 219
-		-- upvalues: v24 (copy), Boolean (copy)
-		local v56 = v24:get(p18)
-
-		if Boolean.toJSBoolean(v56) then
-			v56:setDirty()
+	local function asMethod(callback2) -- 7 equivalent calls inferred from this helper
+		return function(_, ...)
+			return callback2(...)
 		end
 	end
 
-	function self.dirtyKey(_, ...) -- line: 214
-		-- upvalues: dirtyKey (copy)
-		return dirtyKey(...)
-	end
+	local function dirtyKey(p3) -- 1 equivalent call inferred from this helper
+		local v5 = v3:get(p3)
 
-	local function v34(...) -- line: 228
-		-- upvalues: v29 (copy), v24 (copy), Boolean (copy)
-		local v58 = v29(nil, ...)
-		local v59 = v24:get(v58)
-
-		if Boolean.toJSBoolean(v59) then
-			v59:setDirty()
+		if Boolean.toJSBoolean(v5) then
+			v5:setDirty()
 		end
 	end
 
-	function self.dirty(_, ...) -- line: 214
-		-- upvalues: v34 (copy)
-		return v34(...)
+	object.dirtyKey = asMethod(dirtyKey) -- inferred equivalent call
+
+	local function fn(...)
+		dirtyKey(v4(nil, ...)) -- inferred equivalent call
 	end
 
-	local function peekKey(p21) -- line: 232
-		-- upvalues: v24 (copy), Boolean (copy)
-		local v62 = v24:get(p21)
+	object.dirty = asMethod(fn) -- inferred equivalent call
 
-		if Boolean.toJSBoolean(v62) then
-			return v62:peek()
+	local function peekKey(p3)
+		local v5 = v3:get(p3)
+
+		if Boolean.toJSBoolean(v5) then
+			return v5:peek()
 		end
 	end
 
-	function self.peekKey(_, ...) -- line: 214
-		-- upvalues: peekKey (copy)
-		return peekKey(...)
+	object.peekKey = asMethod(peekKey) -- inferred equivalent call
+
+	local function fn2(...)
+		return peekKey(v4(nil, ...))
 	end
 
-	local function v36(...) -- line: 242
-		-- upvalues: peekKey (copy), v29 (copy)
-		return peekKey(v29(nil, ...))
+	object.peek = asMethod(fn2) -- inferred equivalent call
+
+	local function forgetKey(p3)
+		return v3:delete(p3)
 	end
 
-	function self.peek(_, ...) -- line: 214
-		-- upvalues: v36 (copy)
-		return v36(...)
+	object.forgetKey = asMethod(forgetKey) -- inferred equivalent call
+
+	local function fn3(...)
+		return forgetKey(v4(nil, ...))
 	end
 
-	local function forgetKey(p24) -- line: 246
-		-- upvalues: v24 (copy)
-		return v24:delete(p24)
-	end
+	object.forget = asMethod(fn3) -- inferred equivalent call
 
-	function self.forgetKey(_, ...) -- line: 214
-		-- upvalues: forgetKey (copy)
-		return forgetKey(...)
-	end
-
-	local function v38(...) -- line: 252
-		-- upvalues: forgetKey (copy), v29 (copy)
-		return forgetKey(v29(nil, ...))
-	end
-
-	function self.forget(_, ...) -- line: 214
-		-- upvalues: v38 (copy)
-		return v38(...)
-	end
-
-	self.makeCacheKey = v29
+	object.makeCacheKey = v4
 
 	if Boolean.toJSBoolean(keyArgs) then
-		local function v39(...) -- line: 260
-			-- upvalues: v29 (copy), keyArgs (copy)
-			return v29(nil, table.unpack(keyArgs(...)))
+		local function fn4(...)
+			return v4(nil, table.unpack(keyArgs(...)))
 		end
 
-		function self.getKey(_, ...) -- line: 214
-			-- upvalues: v39 (copy)
-			return v39(...)
-		end
+		object.getKey = asMethod(fn4) -- inferred equivalent call
 	else
-		self.getKey = v29
+		object.getKey = v4
 	end
 
-	return Object.freeze(self)
+	return Object.freeze(object)
 end
-
-return t1
+return Optimism

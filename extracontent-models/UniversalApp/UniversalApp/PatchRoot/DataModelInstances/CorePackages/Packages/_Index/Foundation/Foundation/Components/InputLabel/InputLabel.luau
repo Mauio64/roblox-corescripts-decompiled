@@ -1,82 +1,86 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
+local parent = Foundation.Parent
+
 local Text = require(Foundation.Components.Text)
-local React = require(FoundationParent.React)
+
+local React = require(parent.React)
 local Translator = require(Foundation.Utility.Localization.Translator)
+
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
-
 require(Foundation.Components.Types)
-
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local ControlState = require(Foundation.Enums.ControlState)
+
 local InputLabelSize = require(Foundation.Enums.InputLabelSize)
 
-local function labelText(s1: string, b1: boolean?) -- line: 43
-	-- upvalues: React (copy), Translator (copy)
-	if b1 == nil or b1 == React.None then
-		return s1
+local function labelText(text: string, isRequired: boolean?) -- 1 equivalent call inferred from this helper
+	if isRequired == nil or isRequired == React.None then
+		return text
 	end
 
-	if b1 then
-		return s1 .. "*"
+	if isRequired then
+		return text .. " *"
 	end
 
-	return (Translator:FormatByKey("CommonUI.Controls.Input.Optional", {
-		inputLabel = s1
-	}))
+	return (Translator:FormatByKey("CommonUI.Controls.Input.Optional", { inputLabel = text }))
 end
 
-local t1 = {
-	testId = "--foundation-input-label",
-	size = InputLabelSize.Medium
-}
+local v = { size = InputLabelSize.Medium, testId = "--foundation-input-label" }
 
-local function InputLabel(p1, p2) -- line: 58
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), ControlState (copy), Text (copy), withCommonProps (copy), Translator (copy), StateLayerAffordance (copy), InputLabelSize (copy)
-	local v18 = withDefaults(p1, t1)
-	local v19 = React.useMemo(function() -- line: 60
-		-- upvalues: v18 (copy), ControlState (copy)
-		if v18.onHover ~= nil then
-			return function(p3) -- line: 62
-				-- upvalues: v18 (copy), ControlState (copy)
-				v18.onHover(p3 == ControlState.Hover)
-			end
+local function InputLabel(p, ref)
+	local v2 = withDefaults(p, v)
+	local onStateChanged = React.useMemo(function()
+		if v2.onHover == nil then
+			return nil
 		end
 
-		return nil
-	end, { v18.onHover })
+		return function(p2)
+			v2.onHover(p2 == ControlState.Hover)
+		end
+	end, { v2.onHover })
+
 	local createElement = React.createElement
-	local v21 = Text
-	local v22 = withCommonProps
-	local t2 = {}
-	local Text2 = v18.Text
-	local isRequired = v18.isRequired
 
-	t2.Text = if isRequired ~= nil and isRequired ~= React.None then if not isRequired then Translator:FormatByKey("CommonUI.Controls.Input.Optional", {
-		inputLabel = Text2
-	}) else Text2 .. "*" else Text2
-	t2.RichText = v18.RichText
-	t2.selection = {
-		Selectable = false
+	local v3 = {
+		Text = labelText(v2.Text, v2.isRequired), -- inferred equivalent call
+		RichText = v2.RichText,
+		selection = { Selectable = false },
+		onActivated = 0,
+		onStateChanged = 0,
+		stateLayer = 0,
+		textStyle = 0,
+		tag = 0,
+		ref = 0
 	}
-	t2.onActivated = if v18.isDisabled then nil else v18.onActivated
-	t2.onStateChanged = if v18.isDisabled then nil else v19
-	t2.stateLayer = {
-		affordance = StateLayerAffordance.None
-	}
-	t2.textStyle = v18.textStyle
-	t2.tag = {
+	local onActivated
+
+	if not v2.isDisabled then
+		onActivated = v2.onActivated
+	end
+
+	v3.onActivated = onActivated
+
+	if v2.isDisabled then
+		onStateChanged = nil
+	end
+
+	v3.onStateChanged = onStateChanged
+	v3.stateLayer = { affordance = StateLayerAffordance.None }
+	v3.textStyle = v2.textStyle
+	v3.tag = {
 		["size-0 auto-xy text-wrap text-align-x-left text-align-y-top"] = true,
-		["content-muted"] = v18.isDisabled,
-		["content-default"] = not v18.isDisabled,
-		["text-title-small"] = v18.size == InputLabelSize.Small,
-		["text-title-medium"] = v18.size == InputLabelSize.Medium,
-		["text-title-large"] = v18.size == InputLabelSize.Large
+		["padding-top-xxsmall"] = v2.size ~= InputLabelSize.XSmall,
+		["content-muted"] = v2.isDisabled,
+		["content-emphasis"] = not v2.isDisabled,
+		["text-body-small"] = v2.size == InputLabelSize.Small or v2.size == InputLabelSize.XSmall,
+		["text-body-medium"] = v2.size == InputLabelSize.Medium,
+		["text-body-large"] = v2.size == InputLabelSize.Large
 	}
-	t2.ref = p2
 
-	return createElement(v21, v22(v18, t2))
+	v3.ref = ref
+	return createElement(Text, withCommonProps(v2, v3))
 end
 
 return React.memo(React.forwardRef(InputLabel))

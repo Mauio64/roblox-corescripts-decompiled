@@ -1,127 +1,188 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local FFlagLuaAppDefaultHttpRetry = require(AppChatParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local memo = React.memo
 local useCallback = React.useCallback
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffect = React.useEffect
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local v11 = require(AppChatParent.Loggers).Logger:new("PlaceIdContainer")
-local ApiFetchPlaceInfos = require(AppChatParent.PlaceInfoRodux).Thunks.ApiFetchPlaceInfos
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local PlaceDetails = require(parent.DataHydration.PlaceDetails)
+local getPlaceDetailsStore = PlaceDetails.getPlaceDetailsStore
+local DataHydration = require(parent.DataHydration)
+local DataStatus = DataHydration.DataStatus
+
+local Loggers = require(parent.Loggers)
+local Logger = Loggers.Logger
+local v = Logger.new(Logger, "PlaceIdContainer")
+
+local PlaceInfoRodux = require(parent.PlaceInfoRodux)
+local ApiFetchPlaceInfos = PlaceInfoRodux.Thunks.ApiFetchPlaceInfos
+
 local GameCardGroupable = require(script.Parent.GameCardGroupable)
 local GameCardContainer = require(script.Parent.GameCardContainer)
 local GameCardError = require(script.Parent.GameCardError)
+local GameAssetCard = require(script.Parent.GameAssetCard)
+require(AppChat.Components.ChatConversation.Grouping.MessageGroupShape)
+
 local FFlagAppChatInvalidGameLinkCard = require(AppChat.Flags.FFlagAppChatInvalidGameLinkCard)
-local HttpRequest = require(AppChatParent.HttpRequest)
-local t1 = {
-	networkImpl = HttpRequest.config({
-		requestFunction = function(p1, p2, p3) -- line: 32
-			-- upvalues: v11 (copy), HttpRequest (copy)
-			v11:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+local FFlagAppChatUseDataHydrationForPlaceInfos = require(AppChat.Flags.FFlagAppChatUseDataHydrationForPlaceInfos)
 
-			return HttpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
-		end,
-		maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("PlaceIdContainerHttpRetryCount", 4)
-	})
+local HttpRequest = require(parent.HttpRequest)
+local config = HttpRequest.config
+local v2 = {
+	requestFunction = function(p, p2, p3)
+		v:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p))
+		return HttpRequest.requestFunctions.HttpRbxApi(p, p2, p3)
+	end,
+	maxRetryCount = 0
 }
+local maxRetryCount
 
-local function getPlaceInfo(p4, p5) -- line: 52
-	return p4.ChatAppReducer.PlaceInfos[p5] or {}
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("PlaceIdContainerHttpRetryCount", 4)
 end
 
-function PlaceIdContainer(p6) -- line: 56
-	-- upvalues: Cryo (copy), t1 (copy), useDispatch (copy), useCallback (copy), ApiFetchPlaceInfos (copy), useSelector (copy), FFlagAppChatInvalidGameLinkCard (copy), React (copy), useEffect (copy), GameCardError (copy), GameCardGroupable (copy), GameCardContainer (copy)
-	local v26 = Cryo.Dictionary.join(t1, p6)
-	local v27 = useDispatch()
-	local v28 = useCallback(function(p7, p8) -- line: 60
-		-- upvalues: v27 (copy), ApiFetchPlaceInfos (copy)
-		return v27(ApiFetchPlaceInfos(p7, { p8 }))
-	end, { v27 })
-	local v29 = useSelector(function(p9) -- line: 64
-		-- upvalues: v26 (copy)
-		local placeId = v26.placeId
-		local universeId = (p9.ChatAppReducer.PlaceInfos[placeId] or {}).universeId
+v2.maxRetryCount = maxRetryCount
+local v3 = { networkImpl = config(v2) }
+
+local function getPlaceInfo(p, p2) -- 1 equivalent call inferred from this helper
+	return p.ChatAppReducer.PlaceInfos[p2] or {}
+end
+
+local function useDataHydrationUniverseId(p: string, _)
+	local placeDetailsStore = getPlaceDetailsStore(false)
+	local v4 = React.useMemo(function()
+		return placeDetailsStore.getAndFetchPlaceDetails(p)
+	end, { placeDetailsStore, p })
+	local v5 = useSignalState(v4.data)
+	local v6 = useSignalState(v4.status)
+	local universeId
+
+	if v5 then
+		universeId = v5.universeId
+	end
+
+	local v7
+
+	if v6 == DataStatus.Failed then
+		v7 = true
+	elseif v6 == DataStatus.Ready then
+		v7 = universeId == nil
+	else
+		v7 = false
+	end
+
+	return universeId, v7
+end
+
+local function useRoduxUniverseId(p: string, p2)
+	local v4 = useDispatch()
+	local v5 = useCallback(function(p3, p4)
+		return v4(ApiFetchPlaceInfos(p3, { p4 }))
+	end, { v4 })
+
+	local v6 = useSelector(function(p3)
+		local universeId = getPlaceInfo(p3, p).universeId -- inferred equivalent call
 
 		return universeId and tostring(universeId) or nil
 	end)
-	local v30 = if not FFlagAppChatInvalidGameLinkCard then {
-		current = nil
-	} else React.useRef(nil)
-	local v31 = nil
-	local u32 = nil
+
+	local v7 = not FFlagAppChatInvalidGameLinkCard and { current = nil } or React.useRef(nil)
+	local state, setState
 
 	if FFlagAppChatInvalidGameLinkCard then
-		local v33
-
-		v31, v33 = React.useState(false)
-		u32 = v33
+		state, setState = React.useState(false)
+	else
+		setState = nil
 	end
 
-	useEffect(function() -- line: 78
-		-- upvalues: v26 (copy), v28 (copy), FFlagAppChatInvalidGameLinkCard (copy), Cryo (copy), v29 (copy), v30 (copy), u32 (ref)
-		local networkImpl = v26.networkImpl
-		local u40 = false
-
-		v28(networkImpl, v26.placeId):andThen(function(p10) -- line: 82
-			-- upvalues: FFlagAppChatInvalidGameLinkCard (copy), u40 (ref), Cryo (copy)
+	useEffect(function()
+		local v8 = false
+		v5(p2, p):andThen(function(p3)
 			if FFlagAppChatInvalidGameLinkCard then
-				u40 = not Cryo.isEmpty(p10)
+				v8 = not Cryo.isEmpty(p3)
 			end
 		end)
 
-		if FFlagAppChatInvalidGameLinkCard then
-			if not v29 then
-				if v30.current then
-					task.cancel(v30.current)
-				end
+		if not FFlagAppChatInvalidGameLinkCard then
+			return
+		end
 
-				v30.current = task.delay(1, function() -- line: 94
-					-- upvalues: u40 (ref), u32 (ref), v30 (copy)
-					if not u40 then
-						u32(true)
-					end
-
-					v30.current = nil
-				end)
+		if not v6 then
+			if v7.current then
+				task.cancel(v7.current)
 			end
 
-			return function() -- line: 102
-				-- upvalues: v30 (copy)
-				if v30.current then
-					task.cancel(v30.current)
-					v30.current = nil
+			v7.current = task.delay(1, function()
+				if not v8 then
+					setState(true)
 				end
+
+				v7.current = nil
+			end)
+		end
+
+		return function()
+			if v7.current then
+				task.cancel(v7.current)
+				v7.current = nil
 			end
 		end
 	end, {})
 
 	if FFlagAppChatInvalidGameLinkCard then
-		useEffect(function() -- line: 114
-			-- upvalues: v29 (copy), v30 (copy)
-			if v29 and v30.current then
-				task.cancel(v30.current)
-				v30.current = nil
+		useEffect(function()
+			if v6 and v7.current then
+				task.cancel(v7.current)
+				v7.current = nil
 			end
-		end, { v29 })
+		end, { v6 })
 	end
 
-	if not v29 then
-		if FFlagAppChatInvalidGameLinkCard and v31 then
-			return React.createElement(GameCardError, {})
-		end
+	return v6, state
+end
 
-		return React.createElement(GameCardGroupable, {
+if FFlagAppChatUseDataHydrationForPlaceInfos then
+	useRoduxUniverseId = useDataHydrationUniverseId
+end
+
+function PlaceIdContainer(p)
+	local joined = Cryo.Dictionary.join(v3, p)
+
+	local universeId, v4 = useRoduxUniverseId(joined.placeId, joined.networkImpl)
+
+	if not universeId and joined.groupShape then
+		return React.createElement(GameAssetCard, {
 			isLoading = true,
-			gameName = "",
-			gameThumbnail = ""
+			isError = FFlagAppChatInvalidGameLinkCard and v4,
+			groupShape = joined.groupShape,
+			mediaRef = joined.mediaRef
 		})
 	end
 
-	return React.createElement(GameCardContainer, Cryo.Dictionary.join(v26, {
-		universeId = v29
-	}))
+	if universeId then
+		return React.createElement(GameCardContainer, Cryo.Dictionary.join(joined, {
+			universeId = universeId
+		}))
+	end
+
+	if FFlagAppChatInvalidGameLinkCard and v4 then
+		return React.createElement(GameCardError, {})
+	end
+
+	return React.createElement(GameCardGroupable, {
+		isLoading = true,
+		gameName = "",
+		gameThumbnail = ""
+	})
 end
 
 return memo(PlaceIdContainer)

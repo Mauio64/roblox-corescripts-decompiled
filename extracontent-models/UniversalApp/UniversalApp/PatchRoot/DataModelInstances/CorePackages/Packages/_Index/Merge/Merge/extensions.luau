@@ -1,83 +1,83 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
 
-require(ParentParent.GraphQL)
+require(parent.GraphQL)
 
-local mergeDeep = require(ParentParent.Utils).mergeDeep
+local Utils = require(parent.Utils)
 
-t1.extractExtensionsFromSchema = require(ParentParent.Utils).extractExtensionsFromSchema
+local mergeDeep = Utils.mergeDeep
 
-function t1.mergeExtensions(p1) -- line: 44
-	-- upvalues: mergeDeep (copy)
-	return mergeDeep(p1)
+local Utils2 = require(parent.Utils)
+local Extensions = {}
+
+Extensions.extractExtensionsFromSchema = Utils2.extractExtensionsFromSchema
+
+function Extensions.mergeExtensions(p)
+	return mergeDeep(p)
 end
 
-local function applyExtensionObject(p2, p3) -- line: 48
-	-- upvalues: mergeDeep (copy), Boolean (copy)
-	if not p2 then
+local function applyExtensionObject(p, p2)
+	if not p then
 		return
 	end
 
-	p2.extensions = mergeDeep({
-		Boolean.toJSBoolean(p2.extensions) and p2.extensions or {},
-		Boolean.toJSBoolean(p3) and p3 or {}
+	p.extensions = mergeDeep({
+		Boolean.toJSBoolean(p.extensions) and p.extensions or {},
+		Boolean.toJSBoolean(p2) and p2 or {}
 	})
 end
+function Extensions.applyExtensions(object, p)
+	applyExtensionObject(object, p.schemaExtensions)
 
-function t1.applyExtensions(p4, p5) -- line: 69
-	-- upvalues: applyExtensionObject (copy), Object (copy), Boolean (copy), Array (copy)
-	applyExtensionObject(p4, p5.schemaExtensions)
+	for _, v in Object.entries(Boolean.toJSBoolean(p.types) and p.types or {}) do
+		local v2 = v[1]
+		local v3 = v[2]
 
-	for _, v15 in Object.entries(Boolean.toJSBoolean(p5.types) and p5.types or {}) do
-		local v16 = v15[1]
-		local v17 = v15[2]
-		local v18 = p4:getType(v16)
+		local kind = object:getType(v2)
 
-		if Boolean.toJSBoolean(v18) then
-			applyExtensionObject(v18, v17.extensions)
+		if not Boolean.toJSBoolean(kind) then
+			continue
+		end
 
-			if v17.type == "object" or v17.type == "interface" then
-				for _, v20 in Object.entries(v17.fields) do
-					local v21 = v20[1]
-					local v22 = v20[2]
-					local v23 = v18:getFields():get(v21)
+		applyExtensionObject(kind, v3.extensions)
 
-					if Boolean.toJSBoolean(v23) then
-						applyExtensionObject(v23, v22.extensions)
+		if v3.type == "object" or v3.type == "interface" then
+			for _, v4 in Object.entries(v3.fields) do
+				local v5 = v4[1]
+				local v6 = v4[2]
 
-						for _, v25 in Object.entries(v22.arguments) do
-							local v26, v27 = table.unpack(v25, 1, 2)
+				local v7 = kind:getFields():get(v5)
 
-							applyExtensionObject(Array.find(v23.args, function(p6) -- line: 107
-								-- upvalues: v26 (copy)
-								return p6.name == v26
-							end), v27)
-						end
-					end
+				if not Boolean.toJSBoolean(v7) then
+					continue
 				end
-			elseif v17.type == "input" then
-				for _, v29 in Object.entries(v17.fields) do
-					local v30, v31 = table.unpack(v29, 1, 2)
-					local v32 = v18:getFields():get(v30)
 
-					applyExtensionObject(v32, v31.extensions)
-				end
-			elseif v17.type == "enum" then
-				for _, v34 in Object.entries(v17.values) do
-					local v35, v36 = table.unpack(v34, 1, 2)
-					local v37 = v18:getValue(v35)
+				applyExtensionObject(v7, v6.extensions)
 
-					applyExtensionObject(v37, v36)
+				for _, list in Object.entries(v6.arguments) do
+					local v8, v9 = table.unpack(list, 1, 2)
+					applyExtensionObject(Array.find(v7.args, function(p2): boolean
+						return p2.name == v8
+					end), v9)
 				end
+			end
+		elseif v3.type == "input" then
+			for _, list in Object.entries(v3.fields) do
+				local v4, v5 = table.unpack(list, 1, 2)
+
+				applyExtensionObject(kind:getFields():get(v4), v5.extensions)
+			end
+		elseif v3.type == "enum" then
+			for _, list in Object.entries(v3.values) do
+				local v4, v5 = table.unpack(list, 1, 2)
+				applyExtensionObject(kind:getValue(v4), v5)
 			end
 		end
 	end
 
-	return p4
+	return object
 end
-
-return t1
+return Extensions

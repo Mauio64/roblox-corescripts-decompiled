@@ -1,25 +1,26 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local ArgCheck = require(AppChatParent.ArgCheck)
-local React = require(AppChatParent.React)
-local Roact = require(AppChatParent.Roact)
-local Foundation = require(AppChatParent.Foundation)
-local TextButton = require(AppChatParent.UIBlox).App.Button.TextButton
+local parent = AppChat.Parent
+
+local ArgCheck = require(parent.ArgCheck)
+local React = require(parent.React)
+local Roact = require(parent.Roact)
+local Foundation = require(parent.Foundation)
+
+local UIBlox = require(parent.UIBlox)
+local TextButton = UIBlox.App.Button.TextButton
+
 local FFlagAppChatDomLocatorFoundationMigration = require(AppChat.Flags.FFlagAppChatDomLocatorFoundationMigration)
 
-return function(p1) -- line: 14
-	-- upvalues: ArgCheck (copy), Roact (copy), TextButton (copy), FFlagAppChatDomLocatorFoundationMigration (copy), React (copy), Foundation (copy)
-	local localizedStrings = p1.localizedStrings
-	local isDisabled = p1.isDisabled
-	local onActivated = p1.onActivated
-
+return function(props)
+	local localizedStrings = props.localizedStrings
+	local isDisabled = props.isDisabled
+	local onActivated = props.onActivated
 	ArgCheck.isNotNil(localizedStrings, "props.localizedStrings")
 
-	local v13 = Roact.createElement(TextButton, {
+	local element = Roact.createElement(TextButton, {
 		text = localizedStrings.systemButtonText,
 		isDisabled = isDisabled,
-		onActivated = function() -- line: 24
-			-- upvalues: isDisabled (copy), onActivated (copy), localizedStrings (copy)
+		onActivated = function()
 			if isDisabled then
 				return
 			end
@@ -30,14 +31,11 @@ return function(p1) -- line: 14
 		end
 	})
 
-	if FFlagAppChatDomLocatorFoundationMigration and p1.testId then
-		return React.createElement(Foundation.View, {
-			tag = "auto-xy",
-			testId = p1.testId
-		}, {
-			button = v13
+	if FFlagAppChatDomLocatorFoundationMigration and props.testId then
+		return React.createElement(Foundation.View, { tag = "auto-xy", testId = props.testId }, {
+			button = element
 		})
 	end
 
-	return v13
+	return element
 end

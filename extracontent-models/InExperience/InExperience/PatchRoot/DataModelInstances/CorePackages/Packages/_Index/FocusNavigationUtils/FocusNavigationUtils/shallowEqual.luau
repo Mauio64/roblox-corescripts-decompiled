@@ -1,12 +1,12 @@
-local function shallowEqual(t1: {[any]: any}, t2: {[any]: any}) -- line: 4
-	for v4, v5 in t1 do
-		if v5 ~= t2[v4] then
+local function shallowEqual(items, items2): boolean
+	for k, item in items do
+		if items2[k] ~= item then
 			return false
 		end
 	end
 
-	for v6, v7 in t2 do
-		if v7 ~= t1[v6] then
+	for k, item in items2 do
+		if items[k] ~= item then
 			return false
 		end
 	end

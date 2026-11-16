@@ -1,23 +1,15 @@
 local GuiService = game:GetService("GuiService")
-local CorePackages = script:FindFirstAncestor("CorePackages")
-local ok, result = pcall(GuiService.GetResolutionScale, GuiService)
-local scriptParent = script.Parent
-local GetImageSetData = require(scriptParent.Generated.GetImageSetData)
-local FixBlurryImages = require(scriptParent.Flags).FixBlurryImages
 
-if not ok or not FixBlurryImages and not CorePackages then
-	result = 1
-end
+local success, resolutionScale = pcall(GuiService.GetResolutionScale, GuiService)
 
-if GuiService:IsTenFootInterface() then
-	result = 3
-end
+local parent = script.Parent
+local GetImageSetData = require(parent.Generated.GetImageSetData)
 
-local function getResolutionScale() -- line: 21
-	-- upvalues: GetImageSetData (copy), result (ref)
-	local _, v10 = GetImageSetData(result)
+local v = GuiService:IsTenFootInterface() and 3 or not success and 1 or resolutionScale
 
-	return v10
+local function getResolutionScale()
+	local _, resolutionScale2 = GetImageSetData(v)
+	return resolutionScale2
 end
 
 return getResolutionScale

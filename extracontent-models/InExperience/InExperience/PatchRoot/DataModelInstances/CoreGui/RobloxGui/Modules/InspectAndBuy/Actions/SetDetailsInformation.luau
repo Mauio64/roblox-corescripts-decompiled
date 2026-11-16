@@ -1,8 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
-
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 4
-	return {
-		viewingDetails = p1,
-		assetId = p2
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator(script.Name, function(viewingDetails, assetId)
+	return { viewingDetails = viewingDetails, assetId = assetId }
 end)

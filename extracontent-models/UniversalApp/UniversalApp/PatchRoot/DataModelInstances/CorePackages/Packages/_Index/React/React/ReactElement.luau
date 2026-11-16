@@ -1,306 +1,334 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local Error = require(ParentParent.LuauPolyfill).Error
-local __DEV__ = ReactGlobals.__DEV__
-local console = require(ParentParent.Shared).console
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Error = LuauPolyfill.Error
 
-require(ParentParent.Shared)
+local __DEV__ = ReactGlobals.__DEV__
+
+local Shared = require(parent.Shared)
+local console = Shared.console
+require(parent.Shared)
+
 require(script.Parent.ReactLazy)
 
-local getComponentName = require(ParentParent.Shared).getComponentName
-local REACT_ELEMENT_TYPE = require(ParentParent.Shared).ReactSymbols.REACT_ELEMENT_TYPE
-local ReactCurrentOwner = require(ParentParent.Shared).ReactSharedInternals.ReactCurrentOwner
-local t1 = {
-	key = true,
-	ref = true,
-	__self = true,
-	__source = true
-}
-local u10 = nil
-local u11 = nil
-local t2 = nil
+local Shared2 = require(parent.Shared)
+local getComponentName = Shared2.getComponentName
 
-if __DEV__ then
-	t2 = {}
+local Shared3 = require(parent.Shared)
+local REACT_ELEMENT_TYPE = Shared3.ReactSymbols.REACT_ELEMENT_TYPE
+local Shared4 = require(parent.Shared)
+local ReactCurrentOwner = Shared4.ReactSharedInternals.ReactCurrentOwner
+
+local v = { key = true, ref = true, __self = true, __source = true }
+
+local v2 = nil
+local v3 = nil
+
+local v4 = __DEV__ and {} or nil
+
+local function hasValidRef(p): boolean
+	return (not __DEV__ or p.ref == nil or type(p.ref) ~= "table" or not p.ref.isReactWarning) and p.ref ~= nil
 end
 
-local t3 = {}
-
-local function hasValidRef(p1) -- line: 60
-	-- upvalues: __DEV__ (copy)
-	if __DEV__ and (p1.ref ~= nil and type(p1.ref) == "table" and p1.ref.isReactWarning) then
-		return false
-	end
-
-	return p1.ref ~= nil
-end
-local function hasValidKey(p2) -- line: 74
-	-- upvalues: __DEV__ (copy)
-	if __DEV__ and (p2.key ~= nil and type(p2.key) == "table" and p2.key.isReactWarning) then
-		return false
-	end
-
-	return p2.key ~= nil
+local function hasValidKey(p): boolean
+	return (not __DEV__ or p.key == nil or type(p.key) ~= "table" or not p.key.isReactWarning) and p.key ~= nil
 end
 
-local t4 = {
-	isReactWarning = true
-}
+local v5 = { isReactWarning = true }
 
-local function defineKeyPropWarningGetter(p3, s1: string) -- line: 93
-	-- upvalues: __DEV__ (copy), u10 (ref), console (copy), t4 (copy)
-	p3.key = nil
-	setmetatable(p3, {
-		__index = function(_, p5) -- line: 113
-			-- upvalues: __DEV__ (copy), u10 (ref), console (copy), s1 (copy), t4 (copy)
-			if p5 == "key" then
-				if __DEV__ and not u10 then
-					u10 = true
-					console.error("%s: `key` is not a prop. Trying to access it will result in `nil` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", s1)
-				end
-
-				return t4
+local function defineKeyPropWarningGetter(p, p2: string)
+	p.key = nil
+	setmetatable(p, {
+		__index = function(_, p3)
+			if p3 ~= "key" then
+				return nil
 			end
 
-			return nil
+			if __DEV__ and not v2 then
+				v2 = true
+				console.error(
+					"%s: `key` is not a prop. Trying to access it will result in `nil` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)",
+					p2
+				)
+			end
+
+			return v5
 		end
 	})
 end
-local function defineRefPropWarningGetter(p6, s2: string) -- line: 125
-	-- upvalues: __DEV__ (copy), u11 (ref), console (copy), t4 (copy)
-	p6.ref = nil
-	setmetatable(p6, {
-		__index = function(_, p8) -- line: 147
-			-- upvalues: __DEV__ (copy), u11 (ref), console (copy), s2 (copy), t4 (copy)
-			if p8 == "ref" then
-				if __DEV__ and not u11 then
-					u11 = true
-					console.error("%s: `ref` is not a prop. Trying to access it will result in `nil` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", s2)
-				end
 
-				return t4
+local function defineRefPropWarningGetter(p, p2: string)
+	p.ref = nil
+	setmetatable(p, {
+		__index = function(_, p3)
+			if p3 ~= "ref" then
+				return nil
 			end
 
-			return nil
+			if __DEV__ and not v3 then
+				v3 = true
+				console.error(
+					"%s: `ref` is not a prop. Trying to access it will result in `nil` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)",
+					p2
+				)
+			end
+
+			return v5
 		end
 	})
 end
-local function warnIfStringRefCannotBeAutoConverted(p9) -- line: 159
-	-- upvalues: __DEV__ (copy), ReactCurrentOwner (copy), getComponentName (copy), t2 (ref)
-	if __DEV__ and (type(p9.ref) == "string" and ReactCurrentOwner.current) then
-		local v28 = getComponentName(ReactCurrentOwner.current.type)
 
-		if not t2[v28] then
-			error(string.format("Component \"%s\" contains the string ref \"%s\". Support for string refs has been removed. We recommend using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref", v28 or "Unknown", p9.ref))
+local function warnIfStringRefCannotBeAutoConverted(data)
+	if __DEV__ and type(data.ref) == "string" and ReactCurrentOwner.current then
+		local componentName = getComponentName(ReactCurrentOwner.current.type)
+
+		if not v4[componentName] then
+			error(string.format(
+				"Component \"%s\" contains the string ref \"%s\". Support for string refs has been removed. We recommend using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref",
+				componentName or "Unknown",
+				data.ref
+			))
 		end
 	end
 end
-local function ReactElement(p10, p11, p12, p13, p14, p15, p16) -- line: 210
-	-- upvalues: REACT_ELEMENT_TYPE (copy), __DEV__ (copy)
-	local t5 = {
-		type = p10,
-		key = p11,
-		ref = p12,
-		props = p16,
-		_owner = p15,
-		["$$typeof"] = REACT_ELEMENT_TYPE
+
+local function ReactElement2(p, p2, ref, p3, source, owner, props)
+	local v6 = {
+		type = p,
+		key = p2,
+		ref = ref,
+		props = props,
+		_owner = owner
 	}
 
+	v6["$$typeof"] = REACT_ELEMENT_TYPE
+
 	if __DEV__ then
-		local t6 = {
-			validated = false
-		}
+		local v7 = { validated = false }
 
-		t5._store = setmetatable({}, {
-			__index = t6,
-			__newindex = function(p17, p18, p19) -- line: 247
-				-- upvalues: t6 (copy)
-				if p18 == "validated" then
-					t6.validated = p19
-
-					return
+		v6._store = setmetatable({}, {
+			__index = v7,
+			__newindex = function(p4, p5, validated)
+				if p5 == "validated" then
+					v7.validated = validated
+				else
+					rawset(p4, p5, validated)
 				end
-
-				rawset(p17, p18, p19)
 			end
 		})
-		setmetatable(t5, {
-			__index = {
-				_self = p13,
-				_source = p14
-			}
+
+		setmetatable(v6, {
+			__index = { _self = p3, _source = source }
 		})
 	end
 
-	return t5
+	return v6
 end
 
-function t3.jsx(_, _, _) -- line: 278
+local ReactElement = {}
+
+function ReactElement.jsx(_, _, _)
 	error("JSX is currently unsupported")
 end
-function t3.jsxDEV(_, _, _, _, _) -- line: 333
+
+function ReactElement.jsxDEV(_, _, _, _, _): nil
 	error("JSX is currently unsupported")
 
 	return nil
 end
-function t3.createElement(p28, p29, ...) -- line: 409
-	-- upvalues: __DEV__ (copy), warnIfStringRefCannotBeAutoConverted (copy), defineKeyPropWarningGetter (copy), defineRefPropWarningGetter (copy), ReactElement (copy), ReactCurrentOwner (copy)
-	local v48 = if p29 == nil then {} else table.clone(p29)
-	local v49 = nil
-	local ref = nil
-	local v51 = nil
 
-	if p29 ~= nil then
-		if (not __DEV__ or (p29.ref == nil or (type(p29.ref) ~= "table" or not p29.ref.isReactWarning))) and p29.ref ~= nil then
-			ref = p29.ref
+function ReactElement.createElement(value, data, ...)
+	local props = data == nil and {} or table.clone(data)
+
+	local key = nil
+	local ref = nil
+	local v6
+
+	if data ~= nil then
+		local v7
+
+		if __DEV__ and data.ref ~= nil and type(data.ref) == "table" and data.ref.isReactWarning then
+			v7 = false
+		else
+			v7 = data.ref ~= nil
+		end
+
+		if v7 then
+			ref = data.ref
 
 			if __DEV__ then
-				warnIfStringRefCannotBeAutoConverted(p29)
+				warnIfStringRefCannotBeAutoConverted(data)
 			end
 		end
 
-		if (not __DEV__ or (p29.key == nil or (type(p29.key) ~= "table" or not p29.key.isReactWarning))) and p29.key ~= nil then
-			local key = p29.key
+		local v8
 
-			v49 = if type(key) ~= "number" then tostring(key) else key
+		if __DEV__ and data.key ~= nil and type(data.key) == "table" and data.key.isReactWarning then
+			v8 = false
+		else
+			v8 = data.key ~= nil
 		end
 
-		v51 = if p29.__source ~= nil then p29.__source else nil
+		if v8 then
+			key = data.key
 
-		if v48.key ~= nil then
-			v48.key = nil
+			if type(key) ~= "number" then
+				key = tostring(key)
+			end
 		end
 
-		if v48.ref ~= nil then
-			v48.ref = nil
+		if data.__source ~= nil then
+			v6 = data.__source
 		end
 
-		if v48.__self ~= nil then
-			v48.__self = nil
+		if props.key ~= nil then
+			props.key = nil
 		end
 
-		if v48.__source ~= nil then
-			v48.__source = nil
+		if props.ref ~= nil then
+			props.ref = nil
+		end
+
+		if props.__self ~= nil then
+			props.__self = nil
+		end
+
+		if props.__source ~= nil then
+			props.__source = nil
 		end
 	end
 
-	local v53 = select("#", ...)
+	local v7 = select("#", ...)
 
-	if v53 == 1 then
-		v48.children = select(1, ...)
-	elseif v53 > 1 then
-		local t7 = table.create(v53)
+	if v7 == 1 then
+		props.children = select(1, ...)
+	elseif v7 > 1 then
+		local children = table.create(v7)
 
-		for i = 1, v53 do
-			table.insert(t7, (select(i, ...)))
+		for i = 1, v7 do
+			table.insert(children, (select(i, ...)))
 		end
 
 		if __DEV__ then
-			table.freeze(t7)
+			table.freeze(children)
 		end
 
-		v48.children = t7
+		props.children = children
 	end
 
-	if type(p28) == "table" and p28.defaultProps then
-		local defaultProps = p28.defaultProps
+	if type(value) == "table" and value.defaultProps then
+		local defaultProps = value.defaultProps
 
-		for v57, _ in defaultProps do
-			if v48[v57] == nil then
-				v48[v57] = defaultProps[v57]
+		for k, _ in defaultProps do
+			if props[k] == nil then
+				props[k] = defaultProps[k]
 			end
 		end
 	end
 
 	if __DEV__ then
-		if v49 or ref then
-			local v59 = if type(p28) ~= "function" then if type(p28) ~= "table" then p28 else p28.displayName or (p28.name or "Unknown") else debug.info(p28, "n") or "<function>"
+		if key or ref then
+			local v8
 
-			if v49 then
-				defineKeyPropWarningGetter(v48, v59)
+			if type(value) == "function" then
+				v8 = debug.info(value, "n") or "<function>"
+			else
+				v8 = type(value) == "table" and (value.displayName or value.name or "Unknown") or value
+			end
+
+			if key then
+				defineKeyPropWarningGetter(props, v8)
 			end
 
 			if ref then
-				defineRefPropWarningGetter(v48, v59)
+				defineRefPropWarningGetter(props, v8)
 			end
 		end
 
-		if v51 == nil then
-			v51 = {
-				fileName = debug.info(3, "s"),
-				lineNumber = debug.info(3, "l")
-			}
+		v6 = v6 == nil and { fileName = debug.info(3, "s"), lineNumber = debug.info(3, "l") } or v6
+	end
+
+	return ReactElement2(value, key, ref, nil, v6, ReactCurrentOwner.current, props)
+end
+
+function ReactElement:cloneAndReplaceKey(p)
+	return ReactElement2(self.type, p, self.ref, self._self, self._source, self._owner, self.props)
+end
+
+function ReactElement:cloneElement(p, ...)
+	if self == nil then
+		error(Error.new("React.cloneElement(...): The argument must be a React element, but you passed " .. tostring(nil)))
+	end
+
+	local props = self.props
+	local props2 = props == nil and {} or table.clone(props)
+
+	local v6 = self.key
+	local v7 = self.ref
+
+	local source = self._source
+
+	local v8 = self._owner
+
+	if p ~= nil then
+		local ref = p.ref
+
+		if ref == nil then
+			if not __DEV__ or p.ref == nil or type(p.ref) ~= "table" or not p.ref.isReactWarning then
+				local _ = p.ref == nil
+			end
+		else
+			v8 = ReactCurrentOwner.current
+			v7 = ref
+		end
+
+		local key = p.key
+
+		if key == nil then
+			if not __DEV__ or p.key == nil or type(p.key) ~= "table" or not p.key.isReactWarning then
+				local _ = p.key == nil
+			end
+		elseif type(key) == "number" then
+			v6 = key
+		else
+			v6 = key or "nil"
 		end
 	end
 
-	return (ReactElement(p28, v49, ref, nil, v51, ReactCurrentOwner.current, v48))
-end
-function t3.cloneAndReplaceKey(p30, p31) -- line: 587
-	-- upvalues: ReactElement (copy)
-	return (ReactElement(p30.type, p31, p30.ref, p30._self, p30._source, p30._owner, p30.props))
-end
-function t3.cloneElement(p32, p33, ...) -- line: 608
-	-- upvalues: Error (copy), ReactCurrentOwner (copy), __DEV__ (copy), t1 (copy), ReactElement (copy)
-	if p32 == nil then
-		error(Error.new("React.cloneElement(...): The argument must be a React element, but you passed " .. tostring(p32)))
+	local kind = self.type
+	local defaultProps
+
+	if type(kind) == "table" then
+		defaultProps = kind.defaultProps
 	end
 
-	local props = p32.props
-	local v65 = if props == nil then {} else table.clone(props)
-	local key = p32.key
-	local ref = p32.ref
-	local _source = p32._source
-	local _owner = p32._owner
+	if p ~= nil then
+		for k, _ in p do
+			if p[k] == nil or v[k] then
+				continue
+			end
 
-	if p33 ~= nil then
-		local ref2 = p33.ref
-
-		if ref2 ~= nil then
-			ref = ref2
-			_owner = ReactCurrentOwner.current
-		elseif not __DEV__ or p33.ref == nil or type(p33.ref) ~= "table" or not p33.ref.isReactWarning then
-			if p33.ref == nil then
+			if p[k] == nil and defaultProps ~= nil then
+				props2[k] = defaultProps[k]
+			else
+				props2[k] = p[k]
 			end
 		end
-
-		local key2 = p33.key
-
-		if key2 ~= nil then
-			key = if type(key2) ~= "number" then key2 or "nil" else key2
-		elseif not __DEV__ or p33.key == nil or type(p33.key) ~= "table" or not p33.key.isReactWarning then
-			if p33.key == nil then
-			end
-		end
 	end
 
-	local type2 = p32.type
-	local v73 = if type(type2) ~= "table" then nil else type2.defaultProps
+	local v9 = select("#", ...)
 
-	if p33 ~= nil then
-		for v74, _ in p33 do
-			if p33[v74] ~= nil and not t1[v74] then
-				if p33[v74] == nil and v73 ~= nil then
-					v65[v74] = v73[v74]
-				else
-					v65[v74] = p33[v74]
-				end
-			end
-		end
+	if v9 == 1 then
+		props2.children = select(1, ...)
+	elseif v9 > 1 then
+		props2.children = { ... }
 	end
 
-	local v76 = select("#", ...)
-
-	if v76 == 1 then
-		v65.children = select(1, ...)
-	elseif v76 > 1 then
-		v65.children = { ... }
-	end
-
-	return (ReactElement(p32.type, key, ref, nil, _source, _owner, v65))
-end
-function t3.isValidElement(p34) -- line: 724
-	-- upvalues: REACT_ELEMENT_TYPE (copy)
-	return type(p34) == "table" and p34["$$typeof"] == REACT_ELEMENT_TYPE
+	return ReactElement2(self.type, v6, v7, nil, source, v8, props2)
 end
 
-return t3
+function ReactElement.isValidElement(p): boolean
+	return type(p) == "table" and p["$$typeof"] == REACT_ELEMENT_TYPE
+end
+
+return ReactElement

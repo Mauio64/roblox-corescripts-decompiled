@@ -1,3 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
+local Signal = require(CorePackages.Packages.Signal)
 
-return (require(CorePackages.Packages.Signal))
+return Signal

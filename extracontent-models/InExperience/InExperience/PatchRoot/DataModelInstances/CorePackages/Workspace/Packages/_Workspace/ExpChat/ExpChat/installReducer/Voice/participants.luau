@@ -1,9 +1,13 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Dictionary = require(ExpChatParent.llama).Dictionary
-local None = require(ExpChatParent.llama).None
-local Rodux = require(ExpChatParent.Rodux)
-local VOICE_STATE = require(ExpChatParent.VoiceChat).Constants.VOICE_STATE
+local parent = ExpChat.Parent
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local llama2 = require(parent.llama)
+local none = llama2.None
+local Rodux = require(parent.Rodux)
+
+local VoiceChat = require(parent.VoiceChat)
+local VOICE_STATE = VoiceChat.Constants.VOICE_STATE
 local Actions = ExpChat.Actions
 local VoiceParticipantAdded = require(Actions.VoiceParticipantAdded)
 local VoiceParticipantRemoved = require(Actions.VoiceParticipantRemoved)
@@ -11,52 +15,44 @@ local VoiceStateChanged = require(Actions.VoiceStateChanged)
 local VoiceParticipantsChanged = require(Actions.VoiceParticipantsChanged)
 
 return Rodux.createReducer({}, {
-	[VoiceParticipantAdded.name] = function(t1: {[any]: any}, p1) -- line: 22
-		-- upvalues: Dictionary (copy)
-		local userId = p1.userId
-		local v15 = t1[userId] or "Hidden"
+	[VoiceParticipantAdded.name] = function(p, p2)
+		local userId = p2.userId
+		local v = p[userId] or "Hidden"
 
-		return Dictionary.join(t1, {
-			[userId] = v15
-		})
+		return dictionary.join(p, { [userId] = v })
 	end,
-	[VoiceParticipantRemoved.name] = function(t2: {[any]: any}, p2) -- line: 32
-		-- upvalues: Dictionary (copy), None (copy)
-		return Dictionary.join(t2, {
-			[p2.userId] = None
-		})
+	[VoiceParticipantRemoved.name] = function(p, p2)
+		return dictionary.join(p, { [p2.userId] = none })
 	end,
-	[VoiceParticipantsChanged.name] = function(p3, p4) -- line: 39
-		-- upvalues: VOICE_STATE (copy)
-		local newParticipants = p4.newParticipants
-		local v21 = table.clone(p3)
+	[VoiceParticipantsChanged.name] = function(p, p2)
+		local newParticipants = p2.newParticipants
+		local clone = table.clone(p)
 
-		for v22, v23 in newParticipants do
-			local INACTIVE = VOICE_STATE.INACTIVE
+		for k, newParticipant in newParticipants do
+			local v = VOICE_STATE.INACTIVE
 
-			if not v23.subscriptionCompleted then
-				INACTIVE = VOICE_STATE.CONNECTING
-			elseif v23.isMutedLocally then
-				INACTIVE = VOICE_STATE.LOCAL_MUTED
-			elseif v23.isMuted then
-				INACTIVE = VOICE_STATE.MUTED
-			elseif v23.isSignalActive then
-				INACTIVE = VOICE_STATE.TALKING
+			if newParticipant.subscriptionCompleted then
+				if newParticipant.isMutedLocally then
+					v = VOICE_STATE.LOCAL_MUTED
+				elseif newParticipant.isMuted then
+					v = VOICE_STATE.MUTED
+				elseif newParticipant.isSignalActive then
+					v = VOICE_STATE.TALKING
+				end
+			else
+				v = VOICE_STATE.CONNECTING
 			end
 
-			v21[tostring(v22)] = INACTIVE
+			clone[tostring(k)] = v
 		end
 
-		return v21
+		return clone
 	end,
-	[VoiceStateChanged.name] = function(t3: {[any]: any}, p5) -- line: 59
-		-- upvalues: Dictionary (copy)
-		if t3[p5.userId] then
-			return Dictionary.join(t3, {
-				[p5.userId] = p5.newState
-			})
+	[VoiceStateChanged.name] = function(p, p2)
+		if not p[p2.userId] then
+			return p
 		end
 
-		return t3
+		return dictionary.join(p, { [p2.userId] = p2.newState })
 	end
 })

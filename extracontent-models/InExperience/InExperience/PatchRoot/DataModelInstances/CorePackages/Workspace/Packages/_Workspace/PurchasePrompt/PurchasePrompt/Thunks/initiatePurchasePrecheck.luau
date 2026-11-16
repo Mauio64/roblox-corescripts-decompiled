@@ -1,92 +1,88 @@
-local ParentParent = script.Parent.Parent
-
+local parent = script.Parent.Parent
 game:GetService("UserInputService")
 
-local SetButtonState = require(ParentParent.Actions.SetButtonState)
-local PurchaseWarning = require(ParentParent.Enums.PurchaseWarning)
-local ButtonState = require(ParentParent.Enums.ButtonState)
-local UpsellFlow = require(ParentParent.Enums.UpsellFlow)
-local Network = require(ParentParent.Services.Network)
-local getPurchaseWarning = require(ParentParent.Network.getPurchaseWarning)
-local getUpsellFlow = require(ParentParent.NativeUpsell.getUpsellFlow)
-local Analytics = require(ParentParent.Services.Analytics)
-local ExternalSettings = require(ParentParent.Services.ExternalSettings)
-local Thunk = require(ParentParent.Thunk)
-local SelectedRobuxPackage = require(ParentParent.Utils.SelectedRobuxPackage)
+local SetButtonState = require(parent.Actions.SetButtonState)
+local PurchaseWarning = require(parent.Enums.PurchaseWarning)
+local ButtonState = require(parent.Enums.ButtonState)
+local UpsellFlow = require(parent.Enums.UpsellFlow)
+local Network = require(parent.Services.Network)
+local getPurchaseWarning = require(parent.Network.getPurchaseWarning)
+local getUpsellFlow = require(parent.NativeUpsell.getUpsellFlow)
+local Analytics = require(parent.Services.Analytics)
+local ExternalSettings = require(parent.Services.ExternalSettings)
+local Thunk = require(parent.Thunk)
+
+local SelectedRobuxPackage = require(parent.Utils.SelectedRobuxPackage)
+
 local resolvePurchasePrecheck = require(script.Parent.resolvePurchasePrecheck)
+require(parent.Actions.SetPromptState)
+require(parent.Enums.PromptState)
 
-require(ParentParent.Actions.SetPromptState)
-require(ParentParent.Enums.PromptState)
+local v = { Analytics, Network, ExternalSettings }
 
-local t1 = {
-	Analytics,
-	Network,
-	ExternalSettings
-}
+local function initiatePurchasePrecheck()
+	return Thunk.new(script.Name, v, function(object, p)
+		local state = object:getState()
+		local v2 = p[Analytics]
+		local v3 = p[Network]
+		local v4 = p[ExternalSettings]
 
-local function initiatePurchasePrecheck() -- line: 28
-	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy), Network (copy), ExternalSettings (copy), resolvePurchasePrecheck (copy), PurchaseWarning (copy), getUpsellFlow (copy), SelectedRobuxPackage (copy), UpsellFlow (copy), SetButtonState (copy), ButtonState (copy), getPurchaseWarning (copy)
-	return Thunk.new(script.Name, t1, function(p1, p2) -- line: 29
-		-- upvalues: Analytics (copy), Network (copy), ExternalSettings (copy), resolvePurchasePrecheck (copy), PurchaseWarning (copy), getUpsellFlow (copy), SelectedRobuxPackage (copy), UpsellFlow (copy), SetButtonState (copy), ButtonState (copy), getPurchaseWarning (copy)
-		local v18 = p1:getState()
-		local v19 = p2[Analytics]
-		local v20 = p2[Network]
-		local v21 = p2[ExternalSettings]
-
-		if v21.isStudio() then
+		if v4.isStudio() then
 			return resolvePurchasePrecheck(PurchaseWarning.NoAction)
 		end
 
-		local v22 = getUpsellFlow(v21.getPlatform())
-		local productId = v18.productInfo.productId
-		local u24 = SelectedRobuxPackage.getRobuxProductId(v18)
-		local v25 = v18.accountInfo.membershipType == 4
-		local u26
+		local upsellFlow = getUpsellFlow(v4.getPlatform())
 
-		if v22 == UpsellFlow.Web then
-			u26 = SelectedRobuxPackage.getProductId(v18)
-			u24 = nil
+		local productId = state.productInfo.productId
+		local robuxProductId = SelectedRobuxPackage.getRobuxProductId(state)
+
+		local v5 = state.accountInfo.membershipType == 4
+		local v6
+
+		if upsellFlow == UpsellFlow.Web then
+			v6 = SelectedRobuxPackage.getProductId(state)
+			robuxProductId = nil
 		else
-			u26 = nil
+			v6 = nil
 		end
 
-		p1:dispatch(SetButtonState(ButtonState.Disabled))
+		object:dispatch(SetButtonState(ButtonState.Disabled))
+		return getPurchaseWarning(v3, robuxProductId, v6, v5):andThen(function(p2)
+			object:dispatch(SetButtonState(ButtonState.Enabled))
 
-		return getPurchaseWarning(v20, u24, u26, v25):andThen(function(p3) -- line: 57
-			-- upvalues: p1 (copy), SetButtonState (copy), ButtonState (copy), v19 (copy), productId (copy), u24 (ref), u26 (ref), resolvePurchasePrecheck (copy), PurchaseWarning (copy)
-			p1:dispatch(SetButtonState(ButtonState.Enabled))
-
-			if p3 then
-				if p3.action == "U13PaymentModal" then
-					v19.signalScaryModalShown(productId, "U13PaymentModal", u24 or u26)
-
-					return p1:dispatch(resolvePurchasePrecheck(PurchaseWarning.U13PaymentModal))
+			if p2 then
+				if p2.action == "U13PaymentModal" then
+					v2.signalScaryModalShown(productId, "U13PaymentModal", robuxProductId or v6)
+					return object:dispatch(resolvePurchasePrecheck(PurchaseWarning.U13PaymentModal))
 				end
 
-				if p3.action == "U13MonthlyThreshold1Modal" then
-					v19.signalScaryModalShown(productId, "U13MonthlyThreshold1Modal", u24 or u26)
+				if p2.action == "U13MonthlyThreshold1Modal" then
+					v2.signalScaryModalShown(productId, "U13MonthlyThreshold1Modal", robuxProductId or v6)
 
-					return p1:dispatch(resolvePurchasePrecheck(PurchaseWarning.U13MonthlyThreshold1Modal))
+					return object:dispatch(resolvePurchasePrecheck(PurchaseWarning.U13MonthlyThreshold1Modal))
 				end
 
-				if p3.action == "U13MonthlyThreshold2Modal" then
-					v19.signalScaryModalShown(productId, "U13MonthlyThreshold2Modal", u24 or u26)
+				if p2.action == "U13MonthlyThreshold2Modal" then
+					v2.signalScaryModalShown(productId, "U13MonthlyThreshold2Modal", robuxProductId or v6)
 
-					return p1:dispatch(resolvePurchasePrecheck(PurchaseWarning.U13MonthlyThreshold2Modal))
+					return object:dispatch(resolvePurchasePrecheck(PurchaseWarning.U13MonthlyThreshold2Modal))
 				end
 
-				if p3.action == "ParentalConsentWarningPaymentModal13To17" then
-					v19.signalScaryModalShown(productId, "ParentalConsentWarningPaymentModal13To17", u24 or u26)
+				if p2.action == "ParentalConsentWarningPaymentModal13To17" then
+					v2.signalScaryModalShown(
+						productId,
+						"ParentalConsentWarningPaymentModal13To17",
+						robuxProductId or v6
+					)
 
-					return p1:dispatch(resolvePurchasePrecheck(PurchaseWarning.ParentalConsentWarningPaymentModal13To17))
+					return object:dispatch(resolvePurchasePrecheck(PurchaseWarning.ParentalConsentWarningPaymentModal13To17))
 				end
 			end
 
-			p1:dispatch(resolvePurchasePrecheck(PurchaseWarning.NoAction))
-		end):catch(function(_) -- line: 95
-			-- upvalues: p1 (copy), SetButtonState (copy), ButtonState (copy), resolvePurchasePrecheck (copy), PurchaseWarning (copy)
-			p1:dispatch(SetButtonState(ButtonState.Enabled))
-			p1:dispatch(resolvePurchasePrecheck(PurchaseWarning.NoAction))
+			object:dispatch(resolvePurchasePrecheck(PurchaseWarning.NoAction))
+		end):catch(function(_)
+			object:dispatch(SetButtonState(ButtonState.Enabled))
+			object:dispatch(resolvePurchasePrecheck(PurchaseWarning.NoAction))
 		end)
 	end)
 end

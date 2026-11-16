@@ -1,78 +1,108 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Boolean = require(ParentParentParent.LuauPolyfill).Boolean
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
 
-require(ParentParentParent.GraphQL)
+require(parent2.GraphQL)
 
-local equal = require(ParentParent.jsutils.equal)
-local invariant = require(ParentParent.jsutils.invariant).invariant
-
+local equal = require(parent.jsutils.equal)
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
 require(script.Parent.Parent.Parent.core)
 
 local parser = require(script.Parent.Parent.parser)
+
 local parser2 = parser.parser
 local operationName = parser.operationName
-
 require(script.Parent.Parent.types.types)
 
-local t2 = {}
+local class = {}
+class.__index = class
 
-t2.__index = t2
-
-function t2.new(p1, p2) -- line: 39
-	-- upvalues: Boolean (copy), t2 (copy)
+function class.new(p, p2)
 	return (setmetatable({
-		options = Boolean.toJSBoolean(p1) and p1 or {},
+		["options"] = Boolean.toJSBoolean(p) and p or {},
 		context = Boolean.toJSBoolean(p2) and p2 or {}
-	}, t2))
+	}, class))
 end
-function t2.getOptions(p3) -- line: 46
-	return p3.options
+
+function class.getOptions(p)
+	return p.options
 end
-function t2.setOptions(t3: {[any]: any}, p4, b1: boolean?) -- line: 50
-	-- upvalues: equal (copy)
-	if b1 == nil then
-		b1 = false
+
+function class:setOptions(options, flag: boolean?)
+	if flag == nil then
+		flag = false
 	end
 
-	if b1 and not equal(t3.options, p4) then
-		t3.previousOptions = t3.options
+	if flag and not equal(self.options, options) then
+		self.previousOptions = self.options
 	end
 
-	t3.options = p4
+	self.options = options
 end
-function t2.unmount(p5) -- line: 60
-	p5.isMounted = false
+
+function class:unmount()
+	self.isMounted = false
 end
-function t2.refreshClient(p6) -- line: 64
-	-- upvalues: Boolean (copy), invariant (copy)
-	local v19 = Boolean.toJSBoolean((if not Boolean.toJSBoolean(p6.options) then p6.options else p6.options.client)) and (if not Boolean.toJSBoolean(p6.options) then p6.options else p6.options.client) or if not Boolean.toJSBoolean(p6.context) then p6.context else p6.context.client
 
-	invariant(Boolean.toJSBoolean(v19), "Could not find \"client\" in the context or passed in as an option. Wrap the root component in an <ApolloProvider>, or pass an ApolloClient instance in via options.")
+function class:refreshClient()
+	local toJSBoolean = Boolean.toJSBoolean
+	local v
 
-	local v20 = false
-
-	if v19 ~= p6.client then
-		v20 = true
-		p6.client = v19
-		p6:cleanup()
+	if Boolean.toJSBoolean(self.options) then
+		v = self.options.client
+	else
+		v = self.options
 	end
 
-	return {
-		client = p6.client,
-		isNew = v20
-	}
+	local client
+
+	if toJSBoolean(v) then
+		if Boolean.toJSBoolean(self.options) then
+			client = self.options.client
+		else
+			client = self.options
+		end
+
+		if not client then
+			if Boolean.toJSBoolean(self.context) then
+				client = self.context.client
+			else
+				client = self.context
+			end
+		end
+	elseif Boolean.toJSBoolean(self.context) then
+		client = self.context.client
+	else
+		client = self.context
+	end
+
+	invariant2(
+		Boolean.toJSBoolean(client),
+		"Could not find \"client\" in the context or passed in as an option. Wrap the root component in an <ApolloProvider>, or pass an ApolloClient instance in via options."
+	)
+	local isNew
+
+	if client == self.client then
+		isNew = false
+	else
+		self.client = client
+		self:cleanup()
+		isNew = true
+	end
+
+	return { client = self.client, isNew = isNew }
 end
-function t2.verifyDocumentType(_, p8, p9) -- line: 99
-	-- upvalues: parser2 (copy), operationName (copy), invariant (copy)
-	local v24 = parser2(p8)
-	local v25 = operationName(p9)
-	local v26 = operationName(v24.type)
 
-	invariant(p9 == v24.type, ("Running a %s requires a graphql "):format(v25) .. ("%s, but a %s was used instead."):format(v25, v26))
+function class.verifyDocumentType(_, p, p2)
+	local v = parser2(p)
+	local v2 = operationName(p2)
+	local v3 = operationName(v.type)
+	invariant2(
+		v.type == p2,
+		("Running a %s requires a graphql "):format(v2) .. ("%s, but a %s was used instead."):format(v2, v3)
+	)
 end
 
-t1.OperationData = t2
-
-return t1
+return { OperationData = class }

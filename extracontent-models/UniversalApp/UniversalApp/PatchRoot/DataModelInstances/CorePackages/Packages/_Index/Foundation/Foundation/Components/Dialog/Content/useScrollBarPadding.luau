@@ -1,22 +1,21 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local isScrollingFrameOverflowingY = require(Foundation.Utility.isScrollingFrameOverflowingY)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 
-local function useScrollBarPadding() -- line: 9
-	-- upvalues: React (copy), useTokens (copy), isScrollingFrameOverflowingY (copy)
-	local v7, v8 = React.useState(false)
-	local v9 = useTokens()
-	local v10, v11 = React.useBinding(0)
+local function useScrollBarPadding()
+	local state, setState = React.useState(false)
+	local v = useTokens()
+	local v2, v3 = React.useBinding(0)
 
-	return v7, v10, (React.useCallback(function(p1) -- line: 14
-		-- upvalues: isScrollingFrameOverflowingY (copy), v8 (copy), v11 (copy), v9 (copy)
-		local v13 = isScrollingFrameOverflowingY(p1, 1)
-
-		v8(v13)
-		v11(not v13 and 0 or v9.Size.Size_150)
-	end, { v9.Size.Size_150 }))
+	return state, v2, (React.useCallback(function(p)
+		local scrollingFrameOverflowingY = isScrollingFrameOverflowingY(p, 1)
+		setState(scrollingFrameOverflowingY)
+		v3(not scrollingFrameOverflowingY and 0 or v.Size.Size_150)
+	end, { v.Size.Size_150 }))
 end
 
 return useScrollBarPadding

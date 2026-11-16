@@ -1,4 +1,14 @@
 local FFlagAXBackgroundsRoot = require(script.Parent.FFlagAXBackgroundsRoot)
-local v2 = game:DefineFastFlag("AXBackgroundGeneration", false)
+local FFlagAXBackgroundsCustomizeHydration = require(script.Parent.FFlagAXBackgroundsCustomizeHydration)
 
-return FFlagAXBackgroundsRoot and v2
+local v = require(script.Parent.FFlagAXBackgroundGenerationResultActionButtons)
+
+local defineFastFlag = game:DefineFastFlag("AXBackgroundGenerationV2", false)
+
+local defineFastFlag2 = game:DefineFastFlag("AXBackgroundGenerationBuildGate", false)
+
+if defineFastFlag or defineFastFlag2 or v then
+	return FFlagAXBackgroundsRoot and FFlagAXBackgroundsCustomizeHydration
+end
+
+return v

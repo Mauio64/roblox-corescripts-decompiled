@@ -1,12 +1,14 @@
 local Songbird = script:FindFirstAncestor("Songbird")
+
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+
 local AssetFavorites = require(Songbird.Parent.AssetFavorites)
 local Foundation = require(Songbird.Parent.Foundation)
 local React = require(Songbird.Parent.React)
 local FocusNavigationUtils = require(Songbird.Parent.FocusNavigationUtils)
-local logger = require(Songbird.logger)
 
+local logger = require(Songbird.logger)
 require(Songbird.types)
 
 local FocusRoot = FocusNavigationUtils.FocusRoot
@@ -14,9 +16,11 @@ local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableS
 local DefaultTwoStepReportFlow = require(Songbird.Parent.GenericAbuseReporting.DefaultTwoStepReportFlow)
 local AbuseCategory = require(Songbird.Parent.GenericAbuseReporting.AbuseCategory)
 local AbuseEntrypoint = require(Songbird.Parent.GenericAbuseReporting.AbuseEntrypoint)
+
 local useCallback = React.useCallback
 local useLocalUserId = AssetFavorites.useLocalUserId
-local t1 = {
+
+local reportCategories = {
 	{
 		localizationKey = "Feature.SongDetails.Label.InappropriateAudio",
 		value = "InappropriateAudio"
@@ -26,139 +30,129 @@ local t1 = {
 		value = "InappropriateThumbnail"
 	}
 }
-local _ = {
-	Audio = "audio",
-	Image = "image"
-}
 
-local function buildReport(t2: {[any]: any}) -- line: 57
-	-- upvalues: AbuseEntrypoint (copy), AbuseCategory (copy), HttpService (copy)
-	local t3 = {
+local _ = { Audio = "audio", Image = "image" }
+
+local function buildReport(data)
+	local v = {
 		tags = {
 			ENTRY_POINT = {
-				valueList = {{
-					data = AbuseEntrypoint.APP
-				}}
+				valueList = {
+					{ data = AbuseEntrypoint.APP }
+				}
 			},
 			SUBMITTER_USER_ID = {
-				valueList = {{
-					data = tostring(t2.userId)
-				}}
+				valueList = {
+					{ data = tostring(data.userId) }
+				}
 			},
 			REPORTED_ABUSE_CATEGORY = {
-				valueList = {{
-					data = AbuseCategory.ABUSE_CATEGORY_INAPT_CONTENT
-				}}
+				valueList = {
+					{ data = AbuseCategory.ABUSE_CATEGORY_INAPT_CONTENT }
+				}
 			},
 			REPORTER_COMMENT = {
-				valueList = {{
-					data = t2.comment
-				}}
+				valueList = {
+					{ data = data.comment }
+				}
 			},
 			REPORT_TARGET_ASSET_ID = {
-				valueList = {{
-					data = t2.assetId
-				}}
+				valueList = {
+					{ data = data.assetId }
+				}
 			},
 			REPORTED_ABUSE_VECTOR = {
-				valueList = {{
-					data = t2.abuseVector
-				}}
+				valueList = {
+					{ data = data.abuseVector }
+				}
 			},
 			VARIANT = {
-				valueList = {{
-					data = t2.variant
-				}}
+				valueList = {
+					{ data = data.variant }
+				}
 			}
 		}
 	}
-	local ok, result = pcall(function() -- line: 110
-		-- upvalues: HttpService (copy), t3 (copy)
-		return HttpService:JSONEncode(t3)
+
+	local success, result = pcall(function()
+		return HttpService:JSONEncode(v)
 	end)
-
-	if ok then
-		return result
-	end
-
-	return nil
+	return if success then result else nil
 end
-local function ReportSongDialog(t4: {[any]: any}) -- line: 117
-	-- upvalues: useLocalUserId (copy), useCallback (copy), t1 (copy), buildReport (copy), Players (copy), logger (copy), React (copy), Foundation (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), DefaultTwoStepReportFlow (copy)
-	local v25 = useLocalUserId()
-	local v26 = useCallback(function() -- line: 120
-		-- upvalues: t4 (copy)
-		if t4.onClose then
-			t4.onClose()
+
+local function ReportSongDialog(props)
+	local userId = useLocalUserId()
+
+	local v = useCallback(function()
+		if props.onClose then
+			props.onClose()
 		end
-	end, { t4.onClose })
-	local v27 = useCallback(function(s1: string, s2: string) -- line: 126
-		-- upvalues: t1 (copy), t4 (copy), buildReport (copy), v25 (copy), Players (copy), logger (copy)
-		local v30 = s1 == t1[1].value
-		local v31 = if not v30 then t4.audio.thumbnailAssetId else t4.audio.assetId
+	end, { props.onClose })
 
-		if v31 then
-			local v32 = buildReport({
-				userId = v25,
-				comment = s2,
-				assetId = v31,
-				abuseVector = not v30 and "image" or "audio",
-				variant = t4.analyticsSource
-			})
+	local onSubmit = useCallback(function(p: string, comment: string): boolean
+		local v2 = p == reportCategories[1].value
+		local assetId
 
-			if v32 then
-				local LocalPlayer = Players.LocalPlayer
+		if v2 then
+			assetId = props.audio.assetId
+		else
+			assetId = props.audio.thumbnailAssetId
+		end
 
-				if LocalPlayer then
-					local ok, result = pcall(function() -- line: 142
-						-- upvalues: Players (copy), LocalPlayer (copy), v32 (copy)
-						Players:ReportAbuseV3(LocalPlayer, v32)
-					end)
+		if not assetId then
+			return true
+		end
 
-					if ok then
-						logger:info(`Abuse report sent for asset [{ v31 }] with reason [{ s1 }] and comment [{ s2 }]`)
-					else
-						logger:warning(`Failed to submit abuse report for asset { v31 }: { result }`)
-					end
-				end
-			end
+		local report = buildReport({
+			userId = userId,
+			comment = comment,
+			assetId = assetId,
+			abuseVector = v2 and "audio" or "image",
+			variant = props.analyticsSource
+		})
+
+		local localPlayer = report and Players.LocalPlayer
+
+		if not localPlayer then
+			return true
+		end
+
+		local success, result = pcall(function()
+			Players:ReportAbuseV3(localPlayer, report)
+		end)
+
+		if success then
+			logger:info(`Abuse report sent for asset [{assetId}] with reason [{p}] and comment [{comment}]`)
+		else
+			logger:warning(`Failed to submit abuse report for asset {assetId}: {result}`)
 		end
 
 		return true
-	end, {
-		t4.analyticsSource,
-		t4.audio.assetId,
-		t4.audio.thumbnailAssetId,
-		v25
-	})
+	end, { props.analyticsSource, props.audio.assetId, props.audio.thumbnailAssetId, userId })
 
 	return React.createElement(Foundation.View, {
 		tag = "size-full-0 auto-y",
 		selectionGroup = true
 	}, {
-		FocusRoot = React.createElement(FocusRoot, {
-			isIsolated = true,
-			isAutoFocusRoot = true,
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
-		}, {
-			AbuseReportFlow = React.createElement(DefaultTwoStepReportFlow, {
-				analyticsContext = t4.analyticsSource,
-				onCloseProps = {
-					hasPreviousSteps = false,
-					onAbandon = v26
-				},
-				onSubmitProps = {
-					hasNextSteps = false,
-					onSubmit = v27
-				},
-				onComplete = v26,
-				reportCategories = t1,
-				reportCategoryDefaultKey = t1[1].value,
-				localizationKeys = {
-					formTitle = "Feature.SongDetails.Action.ReportAudio"
-				}
-			})
-		})
+		FocusRoot = React.createElement(
+			FocusRoot,
+			{
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+				isIsolated = true,
+				isAutoFocusRoot = true
+			},
+			{
+				AbuseReportFlow = React.createElement(DefaultTwoStepReportFlow, {
+					analyticsContext = props.analyticsSource,
+					onCloseProps = { hasPreviousSteps = false, onAbandon = v },
+					onSubmitProps = { hasNextSteps = false, onSubmit = onSubmit },
+					onComplete = v,
+					reportCategories = reportCategories,
+					reportCategoryDefaultKey = reportCategories[1].value,
+					localizationKeys = { formTitle = "Feature.SongDetails.Action.ReportAudio" }
+				})
+			}
+		)
 	})
 end
 

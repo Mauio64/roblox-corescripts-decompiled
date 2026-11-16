@@ -1,3 +1,4 @@
-return function(n1: number) -- line: 8
-	return game:GetService("InsertService"):LoadAsset(n1)
+return function(p: number)
+	local InsertService = game:GetService("InsertService")
+	return InsertService:LoadAsset(p)
 end

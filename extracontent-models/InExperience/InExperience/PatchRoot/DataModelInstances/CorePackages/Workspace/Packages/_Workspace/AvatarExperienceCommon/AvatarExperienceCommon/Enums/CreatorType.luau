@@ -1,4 +1,1 @@
-return {
-	User = "User",
-	Group = "Group"
-}
+return { User = "User", Group = "Group" }

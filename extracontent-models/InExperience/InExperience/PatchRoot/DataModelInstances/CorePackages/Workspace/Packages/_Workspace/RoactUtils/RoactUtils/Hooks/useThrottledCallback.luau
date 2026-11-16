@@ -1,58 +1,52 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local React = require(Parent.React)
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
 
-local function useThrottledCallback(p1: ((...any) -> ...any), n1: number) -- line: 20
-	-- upvalues: React (copy), Promise (copy)
-	local v7 = React.useRef(p1)
-	local v8 = React.useRef(n1)
+local React = require(parent.React)
+local Promise = require(parent.Promise)
 
-	v7.current = p1
-	v8.current = n1
+local function useThrottledCallback(current, current2: number)
+	local ref = React.useRef(current)
+	local ref2 = React.useRef(current2)
+	ref.current = current
+	ref2.current = current2
 
-	local v9 = React.useRef(nil)
-	local v10 = React.useRef(0)
-	local v11 = React.useCallback(function() -- line: 30
-		-- upvalues: v9 (copy), v8 (copy), v10 (copy), v7 (copy), Promise (copy)
-		if v9.current then
+	local ref3 = React.useRef(nil)
+	local ref4 = React.useRef(0)
+
+	local v = React.useCallback(function()
+		if ref3.current then
 			return
 		end
 
-		local v12 = v8.current or 0
-		local v13 = v10.current + v12 - tick()
+		local current3 = ref2.current or 0
+		local v = ref4.current + current3 - tick()
 
-		local function runCallback() -- line: 39
-			-- upvalues: v7 (copy), v10 (copy), v9 (copy)
-			v7.current()
-			v10.current = tick()
-			v9.current = nil
+		local function runCallback() -- 1 equivalent call inferred from this helper
+			ref.current()
+			ref4.current = tick()
+			ref3.current = nil
 		end
 
-		if v13 > 0 then
-			v9.current = Promise.delay(v13):andThen(runCallback)
-
+		if v > 0 then
+			ref3.current = Promise.delay(v):andThen(runCallback)
 			return
 		end
 
-		v7.current()
-		v10.current = tick()
-		v9.current = nil
+		runCallback() -- inferred equivalent call
 	end)
 
-	React.useEffect(function() -- line: 53
-		-- upvalues: v9 (copy), v7 (copy)
-		return function() -- line: 54
-			-- upvalues: v9 (copy), v7 (copy)
-			local current = v9.current
+	React.useEffect(function()
+		return function()
+			local current3 = ref3.current
 
-			if current then
-				current:cancel()
-				v7.current()
+			if current3 then
+				current3:cancel()
+
+				ref.current()
 			end
 		end
 	end, {})
 
-	return v11
+	return v
 end
 
 return useThrottledCallback

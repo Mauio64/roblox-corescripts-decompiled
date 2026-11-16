@@ -1,51 +1,73 @@
-local Kind = require(script.Parent.kinds).Kind
-local isExecutableDefinitionNode = nil
-local isTypeSystemDefinitionNode = nil
-local isTypeDefinitionNode = nil
-local isTypeSystemExtensionNode = nil
-local isTypeExtensionNode = nil
+local kinds = require(script.Parent.kinds)
+local kind = kinds.Kind
 
-function isExecutableDefinitionNode(p1) -- line: 26
-	-- upvalues: Kind (copy)
-	return p1.kind == Kind.OPERATION_DEFINITION or p1.kind == Kind.FRAGMENT_DEFINITION
-end
-function isTypeSystemDefinitionNode(p2) -- line: 54
-	-- upvalues: Kind (copy), isTypeDefinitionNode (ref)
-	return p2.kind == Kind.SCHEMA_DEFINITION or (isTypeDefinitionNode(p2) or p2.kind == Kind.DIRECTIVE_DEFINITION)
-end
-function isTypeDefinitionNode(p3) -- line: 60
-	-- upvalues: Kind (copy)
-	return p3.kind == Kind.SCALAR_TYPE_DEFINITION or (p3.kind == Kind.OBJECT_TYPE_DEFINITION or (p3.kind == Kind.INTERFACE_TYPE_DEFINITION or (p3.kind == Kind.UNION_TYPE_DEFINITION or (p3.kind == Kind.ENUM_TYPE_DEFINITION or p3.kind == Kind.INPUT_OBJECT_TYPE_DEFINITION))))
-end
-function isTypeSystemExtensionNode(p4) -- line: 69
-	-- upvalues: Kind (copy), isTypeExtensionNode (ref)
-	return p4.kind == Kind.SCHEMA_EXTENSION or isTypeExtensionNode(p4)
-end
-function isTypeExtensionNode(p5) -- line: 73
-	-- upvalues: Kind (copy)
-	return p5.kind == Kind.SCALAR_TYPE_EXTENSION or (p5.kind == Kind.OBJECT_TYPE_EXTENSION or (p5.kind == Kind.INTERFACE_TYPE_EXTENSION or (p5.kind == Kind.UNION_TYPE_EXTENSION or (p5.kind == Kind.ENUM_TYPE_EXTENSION or p5.kind == Kind.INPUT_OBJECT_TYPE_EXTENSION))))
+local isExecutableDefinitionNode
+
+local isTypeSystemDefinitionNode
+local isTypeDefinitionNode
+local isTypeSystemExtensionNode
+local isTypeExtensionNode
+
+local function isDefinitionNode(p)
+	return isExecutableDefinitionNode(p) or isTypeSystemDefinitionNode(p) or isTypeSystemExtensionNode(p)
 end
 
-return {
-	isDefinitionNode = function(p6) -- line: 20
-		-- upvalues: isExecutableDefinitionNode (ref), isTypeSystemDefinitionNode (ref), isTypeSystemExtensionNode (ref)
-		return isExecutableDefinitionNode(p6) or (isTypeSystemDefinitionNode(p6) or isTypeSystemExtensionNode(p6))
-	end,
-	isExecutableDefinitionNode = isExecutableDefinitionNode,
-	isSelectionNode = function(p7) -- line: 30
-		-- upvalues: Kind (copy)
-		return p7.kind == Kind.FIELD or (p7.kind == Kind.FRAGMENT_SPREAD or p7.kind == Kind.INLINE_FRAGMENT)
-	end,
-	isValueNode = function(p8) -- line: 36
-		-- upvalues: Kind (copy)
-		return p8.kind == Kind.VARIABLE or (p8.kind == Kind.INT or (p8.kind == Kind.FLOAT or (p8.kind == Kind.STRING or (p8.kind == Kind.BOOLEAN or (p8.kind == Kind.NULL or (p8.kind == Kind.ENUM or (p8.kind == Kind.LIST or p8.kind == Kind.OBJECT)))))))
-	end,
-	isTypeNode = function(p9) -- line: 48
-		-- upvalues: Kind (copy)
-		return p9.kind == Kind.NAMED_TYPE or (p9.kind == Kind.LIST_TYPE or p9.kind == Kind.NON_NULL_TYPE)
-	end,
-	isTypeSystemDefinitionNode = isTypeSystemDefinitionNode,
-	isTypeDefinitionNode = isTypeDefinitionNode,
-	isTypeSystemExtensionNode = isTypeSystemExtensionNode,
-	isTypeExtensionNode = isTypeExtensionNode
-}
+isExecutableDefinitionNode = function(p): boolean
+	return p.kind == kind.OPERATION_DEFINITION or p.kind == kind.FRAGMENT_DEFINITION
+end
+
+isTypeSystemDefinitionNode = function(p)
+	return p.kind == kind.SCHEMA_DEFINITION or (isTypeDefinitionNode(p) or p.kind == kind.DIRECTIVE_DEFINITION)
+end
+
+isTypeDefinitionNode = function(p): boolean
+	return p.kind == kind.SCALAR_TYPE_DEFINITION
+		or p.kind == kind.OBJECT_TYPE_DEFINITION
+		or p.kind == kind.INTERFACE_TYPE_DEFINITION
+		or p.kind == kind.UNION_TYPE_DEFINITION
+		or p.kind == kind.ENUM_TYPE_DEFINITION
+		or p.kind == kind.INPUT_OBJECT_TYPE_DEFINITION
+end
+
+isTypeSystemExtensionNode = function(p)
+	return p.kind == kind.SCHEMA_EXTENSION or isTypeExtensionNode(p)
+end
+
+isTypeExtensionNode = function(p): boolean
+	return p.kind == kind.SCALAR_TYPE_EXTENSION
+		or p.kind == kind.OBJECT_TYPE_EXTENSION
+		or p.kind == kind.INTERFACE_TYPE_EXTENSION
+		or p.kind == kind.UNION_TYPE_EXTENSION
+		or p.kind == kind.ENUM_TYPE_EXTENSION
+		or p.kind == kind.INPUT_OBJECT_TYPE_EXTENSION
+end
+
+local Predicates = {}
+Predicates.isDefinitionNode = isDefinitionNode
+Predicates.isExecutableDefinitionNode = isExecutableDefinitionNode
+
+function Predicates.isSelectionNode(p): boolean
+	return p.kind == kind.FIELD or p.kind == kind.FRAGMENT_SPREAD or p.kind == kind.INLINE_FRAGMENT
+end
+
+function Predicates.isValueNode(p): boolean
+	return p.kind == kind.VARIABLE
+		or p.kind == kind.INT
+		or p.kind == kind.FLOAT
+		or p.kind == kind.STRING
+		or p.kind == kind.BOOLEAN
+		or p.kind == kind.NULL
+		or p.kind == kind.ENUM
+		or p.kind == kind.LIST
+		or p.kind == kind.OBJECT
+end
+
+function Predicates.isTypeNode(p): boolean
+	return p.kind == kind.NAMED_TYPE or p.kind == kind.LIST_TYPE or p.kind == kind.NON_NULL_TYPE
+end
+
+Predicates.isTypeSystemDefinitionNode = isTypeSystemDefinitionNode
+Predicates.isTypeDefinitionNode = isTypeDefinitionNode
+Predicates.isTypeSystemExtensionNode = isTypeSystemExtensionNode
+Predicates.isTypeExtensionNode = isTypeExtensionNode
+return Predicates

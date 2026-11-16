@@ -1,13 +1,11 @@
 local HttpService = game:GetService("HttpService")
+
 local Url = require(script.Parent.Parent.Url)
 
-return function(p1, p2, _) -- line: 6
-	-- upvalues: HttpService (copy), Url (copy)
-	local json = HttpService:JSONEncode({
-		participantuserId = p2
-	})
+return function(callback, participantuserId, _)
+	local jsonEncode = HttpService:JSONEncode({ participantuserId = participantuserId })
 
-	return p1(string.format("%s/start-one-to-one-conversation", Url.CHAT_URL), "POST", {
-		postBody = json
+	return callback(string.format("%s/start-one-to-one-conversation", Url.CHAT_URL), "POST", {
+		postBody = jsonEncode
 	})
 end

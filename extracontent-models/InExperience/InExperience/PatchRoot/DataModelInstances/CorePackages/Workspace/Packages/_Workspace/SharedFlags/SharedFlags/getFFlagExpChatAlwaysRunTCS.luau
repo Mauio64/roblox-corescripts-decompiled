@@ -1,41 +1,40 @@
 local Chat = game:GetService("Chat")
-
 game:DefineFastFlag("DebugExpChatAlwaysRunTCS", false)
 
-local v2 = game:DefineFastFlag("ExpChatMigrationReplicationFix", false)
-local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
-local IsAutoMigrated = Chat.IsAutoMigrated
+local defineFastFlag = game:DefineFastFlag("ExpChatMigrationReplicationFix", false)
 
-if game:GetService("RunService"):IsServer() then
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local isAutoMigrated = Chat.IsAutoMigrated
+
+local RunService = game:GetService("RunService")
+
+if RunService:IsServer() then
 	RobloxReplicatedStorage:SetAttribute("ChatMigratedToExpChat", Chat.IsAutoMigrated)
-	Chat:GetPropertyChangedSignal("IsAutoMigrated"):Connect(function() -- line: 17
-		-- upvalues: RobloxReplicatedStorage (copy), Chat (copy), IsAutoMigrated (ref)
+
+	Chat:GetPropertyChangedSignal("IsAutoMigrated"):Connect(function()
 		RobloxReplicatedStorage:SetAttribute("ChatMigratedToExpChat", Chat.IsAutoMigrated)
-		IsAutoMigrated = Chat.IsAutoMigrated
+		isAutoMigrated = Chat.IsAutoMigrated
 	end)
 else
-	IsAutoMigrated = RobloxReplicatedStorage:GetAttribute("ChatMigratedToExpChat") == true
-	RobloxReplicatedStorage:GetAttributeChangedSignal("ChatMigratedToExpChat"):Connect(function() -- line: 23
-		-- upvalues: IsAutoMigrated (ref), RobloxReplicatedStorage (copy), Chat (copy)
-		IsAutoMigrated = RobloxReplicatedStorage:GetAttribute("ChatMigratedToExpChat") == true
-		Chat.IsAutoMigrated = IsAutoMigrated
+	isAutoMigrated = RobloxReplicatedStorage:GetAttribute("ChatMigratedToExpChat") == true
+	RobloxReplicatedStorage:GetAttributeChangedSignal("ChatMigratedToExpChat"):Connect(function()
+		isAutoMigrated = RobloxReplicatedStorage:GetAttribute("ChatMigratedToExpChat") == true
+		Chat.IsAutoMigrated = isAutoMigrated
 	end)
 end
 
-local function IsChatAutoMigrated() -- line: 29
-	-- upvalues: v2 (copy), Chat (copy), IsAutoMigrated (ref)
+local function IsChatAutoMigrated() -- 1 equivalent call inferred from this helper
 	if game:GetEngineFeature("ChatServiceCompatibilityForAll") then
 		return true
 	end
 
-	if v2 and game:GetEngineFeature("TCSMigrationReplicationFix") then
+	if defineFastFlag and game:GetEngineFeature("TCSMigrationReplicationFix") then
 		return Chat.IsAutoMigrated
 	end
 
-	return IsAutoMigrated
+	return isAutoMigrated
 end
 
-return function() -- line: 41
-	-- upvalues: v2 (copy), Chat (copy), IsAutoMigrated (ref)
-	return not not game:GetEngineFeature("ChatServiceCompatibilityForAll") or (if not v2 or not game:GetEngineFeature("TCSMigrationReplicationFix") then IsAutoMigrated else Chat.IsAutoMigrated) or game:GetFastFlag("DebugExpChatAlwaysRunTCS")
+return function()
+	return IsChatAutoMigrated() or game:GetFastFlag("DebugExpChatAlwaysRunTCS") -- inferred equivalent call
 end

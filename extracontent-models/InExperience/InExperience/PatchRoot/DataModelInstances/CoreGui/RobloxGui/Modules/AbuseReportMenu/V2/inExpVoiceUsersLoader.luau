@@ -1,57 +1,61 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
+
 local Foundation = require(CorePackages.Packages.Foundation)
 local RobloxGui = CoreGui.RobloxGui
+
 local AccessoryType = Foundation.Enums.AccessoryType
+
 local Promise = require(CorePackages.Packages.Promise)
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 
 return {
 	type = "listItem",
-	fetch = function(_) -- line: 15
-		-- upvalues: default (copy), Promise (copy), Players (copy), AccessoryType (copy)
-		local ok, result = pcall(function() -- line: 16
-			-- upvalues: default (copy)
+	fetch = function(_)
+		local success, result = pcall(function()
 			return default:getRecentUsersInteractionData()
 		end)
 
-		if ok then
-			if not result then
-				return Promise.resolve({})
-			end
-
-			local LocalPlayer = Players.LocalPlayer
-			local t1 = {}
-
-			for _, v in pairs(result) do
-				local player = v.player
-				local v17 = not not LocalPlayer and player.UserId == LocalPlayer.UserId
-
-				if player and not v17 then
-					table.insert(t1, {
-						leading = {
-							type = AccessoryType.Avatar,
-							userId = player.UserId
-						},
-						id = tostring(player.UserId),
-						label = player.DisplayName,
-						description = "@" .. player.Name,
-						meta = {
-							username = player.Name,
-							displayName = player.DisplayName
-						}
-					})
-				end
-			end
-
-			table.sort(t1, function(p2, p3) -- line: 43
-				return p2.label < p3.label
-			end)
-
-			return Promise.resolve(t1)
+		if not success then
+			return Promise.reject("Failed to fetch voice users")
 		end
 
-		return Promise.reject("Failed to fetch voice users")
+		if not result then
+			return Promise.resolve({})
+		end
+
+		local localPlayer = Players.LocalPlayer
+		local v = {}
+
+		for _, v2 in pairs(result) do
+			local player = v2.player
+			local v3
+
+			if localPlayer then
+				v3 = player.UserId == localPlayer.UserId
+			else
+				v3 = false
+			end
+
+			if not player or v3 then
+				continue
+			end
+
+			table.insert(v, {
+				leading = { type = AccessoryType.Avatar, userId = player.UserId },
+				id = tostring(player.UserId),
+				label = player.DisplayName,
+				description = "@" .. player.Name,
+				meta = { username = player.Name, displayName = player.DisplayName }
+			})
+		end
+
+		table.sort(v, function(a, b): boolean
+			return a.label < b.label
+		end)
+
+		return Promise.resolve(v)
 	end
 }

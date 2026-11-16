@@ -7,74 +7,81 @@ local Cryo = require(CorePackages.Packages.Cryo)
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local IXPService = game:GetService("IXPService")
 local MemStorageService = game:GetService("MemStorageService")
-local GetFFlagAvatarChatServiceEnabled = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagAvatarChatServiceEnabled
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagAvatarChatServiceEnabled = SharedFlags.GetFFlagAvatarChatServiceEnabled
 local getFFlagUseCameraDevicesListener = require(RobloxGui.Modules.Flags.getFFlagUseCameraDevicesListener)
 local cameraDevicesHelper = require(RobloxGui.Modules.Settings.cameraDevicesHelper)
+
 local TrackerMenu = require(RobloxGui.Modules.Tracker.TrackerMenu)
 local TrackerPromptType = require(RobloxGui.Modules.Tracker.TrackerPromptType)
-local v15 = game:DefineFastFlag("DisableCameraOnLowSpecDevices2", false)
-local v16 = game:DefineFastString("DisableCameraOnLowSpecDevicesIXPLayer", "AvatarChat.DisableOnLowSpecAndroid")
-local v17 = game:DefineFastString("DisableCameraOnLowSpecDevicesIXPField", "DisableOnAndroid")
-local v18 = game:DefineFastFlag("OnlyShowToastOnce2", false)
-local v19 = game:DefineFastFlag("DebugAlwaysShowDisableCameraToast", false)
-local v20 = game:DefineFastFlag("OnlyShowToastOnceInLifetime2", false)
-local EngineFeature = game:GetEngineFeature("DisableCameraToastShownStorageKey")
 
-local function ShouldCheckDeviceSpecs() -- line: 28
-	-- upvalues: v15 (copy), IXPService (copy), v16 (copy), v17 (copy)
-	if v15 then
-		local ok, result = pcall(function() -- line: 31
-			-- upvalues: IXPService (copy), v16 (copy)
-			return IXPService:GetUserLayerVariables(v16)
-		end)
+local defineFastFlag = game:DefineFastFlag("DisableCameraOnLowSpecDevices2", false)
+local defineFastString = game:DefineFastString(
+	"DisableCameraOnLowSpecDevicesIXPLayer",
+	"AvatarChat.DisableOnLowSpecAndroid"
+)
+local defineFastString2 = game:DefineFastString("DisableCameraOnLowSpecDevicesIXPField", "DisableOnAndroid")
+local defineFastFlag2 = game:DefineFastFlag("OnlyShowToastOnce2", false)
+local defineFastFlag3 = game:DefineFastFlag("DebugAlwaysShowDisableCameraToast", false)
+local defineFastFlag4 = game:DefineFastFlag("OnlyShowToastOnceInLifetime2", false)
+local engineFeature = game:GetEngineFeature("DisableCameraToastShownStorageKey")
 
-		if not ok or not result or result[v17] == nil then
-			return false
-		end
-
-		IXPService:LogUserLayerExposure(v16)
-
-		return result[v17]
+local function ShouldCheckDeviceSpecs()
+	if not defineFastFlag then
+		return false
 	end
 
-	return false
+	local success, result = pcall(function()
+		return IXPService:GetUserLayerVariables(defineFastString)
+	end)
+
+	if not success or not result or result[defineFastString2] == nil then
+		return false
+	end
+
+	IXPService:LogUserLayerExposure(defineFastString)
+	return result[defineFastString2]
 end
 
-return function() -- line: 46
-	-- upvalues: GetFFlagAvatarChatServiceEnabled (copy), AvatarChatService (copy), v15 (copy), ShouldCheckDeviceSpecs (copy), v20 (copy), EngineFeature (copy), AppStorageService (copy), v19 (copy), TrackerMenu (copy), TrackerPromptType (copy), v18 (copy), MemStorageService (copy), getFFlagUseCameraDevicesListener (copy), cameraDevicesHelper (copy), VideoCaptureService (copy), Cryo (copy)
+return function()
 	if not GetFFlagAvatarChatServiceEnabled() or _G.__TESTEZ_RUNNING_TEST__ then
 		return false
 	end
 
-	local ok, result = pcall(AvatarChatService.GetClientFeaturesAsync, AvatarChatService)
+	local success, clientFeaturesAsync = pcall(AvatarChatService.GetClientFeaturesAsync, AvatarChatService)
 
-	if not ok then
+	if not success then
 		warn("Unable to get Client Features from AvatarChatService")
-
 		return false
 	end
 
-	local v27 = AvatarChatService:IsEnabled(result, Enum.AvatarChatServiceFeature.PlaceVideo)
-	local v28 = AvatarChatService:IsEnabled(result, Enum.AvatarChatServiceFeature.UserVideo)
-	local v29 = AvatarChatService:IsEnabled(result, Enum.AvatarChatServiceFeature.UserVideoEligible)
+	local isEnabled = AvatarChatService:IsEnabled(clientFeaturesAsync, Enum.AvatarChatServiceFeature.PlaceVideo)
+	local isEnabled2 = AvatarChatService:IsEnabled(clientFeaturesAsync, Enum.AvatarChatServiceFeature.UserVideo)
+	local isEnabled3 = AvatarChatService:IsEnabled(clientFeaturesAsync, Enum.AvatarChatServiceFeature.UserVideoEligible)
 
-	if v15 and v27 and v28 and v29 and not AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.DeviceCapture) and ShouldCheckDeviceSpecs() then
-		if v20 and EngineFeature then
-			local ok2, result2 = pcall(function() -- line: 68
-				-- upvalues: AppStorageService (copy)
+	if
+		defineFastFlag
+		and isEnabled
+		and isEnabled2
+		and isEnabled3
+		and not AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.DeviceCapture)
+		and ShouldCheckDeviceSpecs()
+	then
+		if defineFastFlag4 and engineFeature then
+			local success2, result = pcall(function()
 				return AppStorageService:GetItem("DisableCameraToastShown")
 			end)
 
-			if not ok2 or (result2 ~= "true" or v19) then
+			if not success2 or result ~= "true" or defineFastFlag3 then
 				TrackerMenu:showPrompt(TrackerPromptType.CameraUnavailable)
-				pcall(function() -- line: 77
-					-- upvalues: AppStorageService (copy)
+				pcall(function()
 					AppStorageService:SetItem("DisableCameraToastShown", "true")
 					AppStorageService:Flush()
 				end)
 			end
-		elseif v18 then
-			if MemStorageService:GetItem("DisableCameraToastShown") ~= "true" or v19 then
+		elseif defineFastFlag2 then
+			if MemStorageService:GetItem("DisableCameraToastShown") ~= "true" or defineFastFlag3 then
 				TrackerMenu:showPrompt(TrackerPromptType.CameraUnavailable)
 				MemStorageService:SetItem("DisableCameraToastShown", "true")
 			end
@@ -83,22 +90,16 @@ return function() -- line: 46
 		end
 
 		return false
-	end
+	else
+		local v
 
-	local v32 = if not getFFlagUseCameraDevicesListener() then VideoCaptureService:GetCameraDevices() else cameraDevicesHelper.GetDevices()
-	local v33 = Cryo.isEmpty(v32)
-
-	if v27 then
-		v27 = v29
-
-		if v27 then
-			v27 = v28
-
-			if v27 then
-				v27 = not v33
-			end
+		if getFFlagUseCameraDevicesListener() then
+			v = cameraDevicesHelper.GetDevices()
+		else
+			v = VideoCaptureService:GetCameraDevices()
 		end
-	end
 
-	return v27
+		local v2 = not Cryo.isEmpty(v)
+		return isEnabled and isEnabled3 and isEnabled2 and v2
+	end
 end

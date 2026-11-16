@@ -1,71 +1,114 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("GameCollections").Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local Images = UIBlox.App.ImageSet.Images
 local useCursor = UIBlox.App.SelectionCursor.useCursor
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useDesignTokens = require(Parent.Style).useDesignTokens
-local v9 = Images["icons/navigation/pushRight"]
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local useTokens = Foundation.Hooks.useTokens
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiComponentsUseFoundationTokens = SharedFlags.FFlagSduiComponentsUseFoundationTokens
 
-function SeeAllTile(t1: {[any]: any}) -- line: 27
-	-- upvalues: useDesignTokens (copy), useLocalization (copy), useCursor (copy), v9 (copy), React (copy), ImageSetLabel (copy)
-	local size = t1.size
-	local layoutOrder = t1.layoutOrder
-	local v13 = useDesignTokens()
-	local v14 = useLocalization({
-		seeAll = "Feature.Home.ActionSeeAll"
-	})
-	local uDim = UDim.new(0, v13.Size.Size_200)
-	local v16 = useCursor(uDim)
-	local TitleLarge = v13.Typography.TitleLarge
-	local EmphasisColor3 = v13.Color.Content.Emphasis.Color3
-	local EmphasisColor3_2 = v13.Color.Content.Emphasis.Color3
-	local EmphasisTransparency = v13.Color.Content.Emphasis.Transparency
-	local v21 = t1.title or v14.seeAll
-	local v22 = t1.icon or v9
-	local Size_900 = v13.Size.Size_900
+local iconsnavigationpushRight = Images["icons/navigation/pushRight"]
 
-	return React.createElement("TextButton", {
+function SeeAllTile(props)
+	local size = props.size
+	local layoutOrder = props.layoutOrder
+	local v
+
+	if FFlagSduiComponentsUseFoundationTokens then
+		v = useTokens()
+	else
+		v = useDesignTokens()
+	end
+
+	local v2 = useLocalization({ seeAll = "Feature.Home.ActionSeeAll" })
+
+	local udim = UDim.new(0, v.Size.Size_200)
+
+	local selectionImageObject = useCursor(udim)
+
+	local titleLarge = v.Typography.TitleLarge
+	local color3 = v.Color.Content.Emphasis.Color3
+	local color3_2 = v.Color.Content.Emphasis.Color3
+	local transparency = v.Color.Content.Emphasis.Transparency
+
+	local title = props.title or v2.seeAll
+	local icon = props.icon or iconsnavigationpushRight
+	local size_900 = v.Size.Size_900
+
+	local createElement = React.createElement
+	local onActivatedsByActivated = {
 		AutoButtonColor = false,
 		Text = "",
 		Size = size,
 		LayoutOrder = layoutOrder,
-		BackgroundTransparency = v13.Color.Surface.Surface_300.Transparency,
-		BackgroundColor3 = v13.Color.Surface.Surface_300.Color3,
-		[React.Event.Activated] = t1.onActivated,
-		SelectionImageObject = v16
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = uDim
-		}),
+		BackgroundTransparency = v.Color.Surface.Surface_300.Transparency,
+		BackgroundColor3 = v.Color.Surface.Surface_300.Color3,
+		[React.Event.Activated] = props.onActivated,
+		SelectionImageObject = selectionImageObject
+	}
+
+	local v3 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = udim }),
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v13.Size.Size_100)
+			Padding = UDim.new(0, v.Size.Size_100)
 		}),
 		Icon = React.createElement(ImageSetLabel, {
+			Size = UDim2.fromOffset(size_900, size_900),
 			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Size = UDim2.fromOffset(Size_900, Size_900),
-			Image = v22,
-			ImageColor3 = EmphasisColor3_2,
-			ImageTransparency = EmphasisTransparency
+			Image = icon,
+			ImageColor3 = color3_2,
+			ImageTransparency = transparency,
+			LayoutOrder = 1
 		}),
-		Title = React.createElement("TextLabel", {
-			LayoutOrder = 2,
-			BackgroundTransparency = 1,
-			Text = v21,
-			Size = UDim2.new(1, 0, 0, TitleLarge.FontSize),
-			TextXAlignment = Enum.TextXAlignment.Center,
-			Font = TitleLarge.Font,
-			TextSize = TitleLarge.FontSize,
-			TextColor3 = EmphasisColor3,
-			TextTruncate = Enum.TextTruncate.AtEnd
-		})
-	})
+		Title = 0
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		Text = title,
+		Size = UDim2.new(1, 0, 0, titleLarge.FontSize),
+		TextXAlignment = Enum.TextXAlignment.Center,
+		LayoutOrder = 2,
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextColor3 = 0,
+		TextTruncate = 0,
+		BackgroundTransparency = 1
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = titleLarge.Font
+	end
+
+	v4.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(titleLarge.Font)
+	end
+
+	v4.FontFace = fontFace
+	v4.TextSize = titleLarge.FontSize
+	v4.TextColor3 = color3
+	v4.TextTruncate = Enum.TextTruncate.AtEnd
+	v3.Title = createElement2("TextLabel", v4)
+	return createElement("TextButton", onActivatedsByActivated, v3)
 end
 
 return SeeAllTile

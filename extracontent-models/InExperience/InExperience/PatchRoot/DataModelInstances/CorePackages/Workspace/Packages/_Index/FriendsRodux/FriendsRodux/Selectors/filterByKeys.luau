@@ -1,14 +1,14 @@
-return function(t1: {[any]: any}, t2: {[any]: any}) -- line: 1
-	local t3 = {}
+return function(items, p)
+	local result = {}
 
-	for _, v in pairs(t1) do
-		local str = tostring(v)
-		local v7 = t2[str]
+	for _, item in pairs(items) do
+		local v = tostring(item)
+		local v2 = p[v]
 
-		if v7 then
-			t3[str] = v7
+		if v2 then
+			result[v] = v2
 		end
 	end
 
-	return t3
+	return result
 end

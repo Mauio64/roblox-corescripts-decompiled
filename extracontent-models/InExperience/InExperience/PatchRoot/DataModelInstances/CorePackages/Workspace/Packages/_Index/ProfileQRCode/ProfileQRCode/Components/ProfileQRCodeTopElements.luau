@@ -1,1 +1,3 @@
-return (require(script.ProfileQRCodeTopElements))
+local ProfileQRCodeTopElements = require(script.ProfileQRCodeTopElements)
+
+return ProfileQRCodeTopElements

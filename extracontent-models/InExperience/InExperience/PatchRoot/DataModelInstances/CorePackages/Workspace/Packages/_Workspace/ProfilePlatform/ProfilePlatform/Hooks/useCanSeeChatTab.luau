@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
 
-return function() -- line: 6
-	-- upvalues: useAppPolicy (copy)
-	return useAppPolicy(function(p1) -- line: 7
-		return p1.getCanSeeChatTab()
+return function()
+	return useAppPolicy(function(p)
+		return p.getCanSeeChatTab()
 	end)
 end

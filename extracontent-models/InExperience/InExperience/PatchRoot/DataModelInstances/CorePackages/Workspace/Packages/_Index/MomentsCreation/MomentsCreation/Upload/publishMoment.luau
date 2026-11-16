@@ -1,18 +1,24 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
+local parent = MomentsCreation.Parent
 
-require(MomentsCreationParent.MomentsTypes)
+require(parent.MomentsTypes)
 
+local isAvatarMoment = require(MomentsCreation.Utils.isAvatarMoment)
 local makeMomentMetadata = require(MomentsCreation.Utils.makeMomentMetadata)
 local makeRegistrationInfo = require(MomentsCreation.Utils.makeRegistrationInfo)
 local createMoment = require(MomentsCreation.Upload.createMoment)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsCreateAvatarPosts = SharedFlags.FFlagMomentsCreateAvatarPosts
 
-local function publishMoment(p1, p2, s1: string, s2: string?, n1: number?) -- line: 31
-	-- upvalues: makeMomentMetadata (copy), makeRegistrationInfo (copy), createMoment (copy)
-	local v12 = makeMomentMetadata(p1, s1, p2, n1)
-	local v13 = makeRegistrationInfo(p1, v12)
+local function publishMoment(p, p2, p3: string, p4: string?, p5: number?, flag: boolean?)
+	if FFlagMomentsCreateAvatarPosts and isAvatarMoment(p) then
+		local createAvatarMoment = require(MomentsCreation.Upload.createAvatarMoment)
+		return createAvatarMoment(p, p2, p3, p4, flag)
+	end
 
-	createMoment(p1, v12, v13, s2)
+	local momentMetadata = makeMomentMetadata(p, p3, p2, p5, flag)
+	createMoment(p, momentMetadata, makeRegistrationInfo(p, momentMetadata), p4)
+	return nil
 end
 
 return publishMoment

@@ -1,104 +1,95 @@
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
-local GuiService = game:GetService("GuiService")
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local React = require(ExpChatParent.React)
-local SharedFlags = require(ExpChatParent.SharedFlags)
+
+local parent = ExpChat.Parent
+local React = require(parent.React)
+local AppCommonLib = require(parent.AppCommonLib)
+local isTenFootInterface = AppCommonLib.isTenFootInterface
+local SharedFlags = require(parent.SharedFlags)
+
 local withSignalsData = require(script.Parent.withSignalsData)
-local UIBlox = require(ExpChatParent.UIBlox)
+local UIBlox = require(parent.UIBlox)
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local Image = require(ExpChatParent.Foundation).Image
-local n1 = 0.6
+local Foundation = require(parent.Foundation)
+local Image = Foundation.Image
+
 local vector2 = Vector2.new(-1, 0)
-local v15 = game:DefineFastFlag("EnableChatMicPerfBinding", false)
+local defineFastFlag = game:DefineFastFlag("EnableChatMicPerfBinding", false)
 local FFlagExpChatMicBubbleSingleImage = require(ExpChat.Flags.FFlagExpChatMicBubbleSingleImage)
-local v17 = game:DefineFastFlag("EnableDarkerShimmerTransparency", false)
-local v18 = game:DefineFastInt("ExpChatMicActivityHeartbeatIncrement", 3)
 
-if v17 then
-	n1 = 0.4
-end
-
+local defineFastFlag2 = game:DefineFastFlag("EnableDarkerShimmerTransparency", false)
+local defineFastInt = game:DefineFastInt("ExpChatMicActivityHeartbeatIncrement", 3)
+local v = defineFastFlag2 and 0.4 or 0.6
 local GetFFlagExpChatEnableVoiceReverseNudge = require(ExpChat.Flags.GetFFlagExpChatEnableVoiceReverseNudge)
 local GetFFlagExpChatUseVoiceParticipantsStore = SharedFlags.GetFFlagExpChatUseVoiceParticipantsStore
+
 local Helpers = ExpChat.BubbleChat.Helpers
 local getVoiceIndicatorAssetName = require(Helpers.getVoiceIndicatorAssetName)
 
-local function createTweenShimmeringEffect(p1) -- line: 53
-	-- upvalues: TweenService (copy)
+local function createTweenShimmeringEffect(ref)
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out, -1)
-	local t1 = {
-		Offset = Vector2.new(1, 0)
-	}
-
-	return (TweenService:Create(p1:getValue(), tweenInfo, t1))
+	local v2 = { Offset = Vector2.new(1, 0) }
+	return (TweenService:Create(ref:getValue(), tweenInfo, v2))
 end
-local function ControlBubble(t2: {[any]: any}) -- line: 61
-	-- upvalues: FFlagExpChatMicBubbleSingleImage (copy), React (copy), getVoiceIndicatorAssetName (copy), Image (copy), v15 (copy), ImageSetLabel (copy), RunService (copy), v18 (copy), createTweenShimmeringEffect (copy), vector2 (copy), GetFFlagExpChatUseVoiceParticipantsStore (copy), GetFFlagExpChatEnableVoiceReverseNudge (copy), Images (copy), GuiService (copy), n1 (ref)
-	local v29 = nil
-	local v30, u32, v33
+
+local function ControlBubble(props)
+	local image = nil
+	local state, setState, v2
 
 	if FFlagExpChatMicBubbleSingleImage then
-		local v31
-
-		v30, v31 = React.useBinding(0)
-		u32 = v31
-		v29 = t2.iconAssetName or getVoiceIndicatorAssetName(t2.voiceState, 1, t2.iconStyle, false)
-		v33 = Image
-	elseif v15 then
-		local v34
-
-		v30, v34 = React.useBinding(0)
-		u32 = v34
-		v29 = v30:map(function(p2) -- line: 70
-			-- upvalues: t2 (copy), getVoiceIndicatorAssetName (copy)
-			return t2.iconAssetName or getVoiceIndicatorAssetName(t2.voiceState, p2, t2.iconStyle, false)
+		state, setState = React.useBinding(0)
+		image = props.iconAssetName or getVoiceIndicatorAssetName(props.voiceState, 1, props.iconStyle, false)
+		v2 = Image
+	elseif defineFastFlag then
+		state, setState = React.useBinding(0)
+		image = state:map(function(p)
+			return props.iconAssetName or getVoiceIndicatorAssetName(props.voiceState, p, props.iconStyle, false)
 		end)
-		v33 = Image
-	else
-		local v35
 
-		v30, v35 = React.useState(0)
-		u32 = v35
-		v33 = ImageSetLabel
+		v2 = Image
+	else
+		state, setState = React.useState(0)
+		v2 = ImageSetLabel
 	end
 
-	local v36 = React.useRef(0)
-
+	local ref = React.useRef(0)
 	React.useRef(nil)
 	React.useRef(nil)
 
-	local u37 = React.useRef(nil)
-	local u38 = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+	React.useEffect(function()
+		local uiGradient = ref2.current and ref2.current:FindFirstChildWhichIsA("UIGradient", true)
 
-	React.useEffect(function() -- line: 88
-		-- upvalues: u37 (ref), u38 (ref)
-		if u37.current then
-			local UIGradient = u37.current:FindFirstChildWhichIsA("UIGradient", true)
-
-			if UIGradient then
-				u38.current = UIGradient
-			end
+		if uiGradient then
+			ref3.current = uiGradient
 		end
-	end, { u37 })
-	React.useEffect(function() -- line: 97
-		-- upvalues: t2 (copy), RunService (copy), v36 (copy), v18 (copy), u32 (ref), u38 (ref), createTweenShimmeringEffect (copy), vector2 (copy)
-		local u44 = nil
+	end, { ref2 })
 
-		if t2.voiceState and t2.voiceState == "Talking" then
-			local connection = RunService.PostSimulation:Connect(function() -- line: 100
-				-- upvalues: v36 (copy), v18 (copy), u32 (ref)
-				v36.current = ((v36.current or 0) + 1) % v18
+	React.useEffect(function()
+		local connection = nil
 
-				if v36.current == 0 then
-					u32(math.random())
+		if props.voiceState and props.voiceState == "Talking" then
+			local postSimulationConnection = RunService.PostSimulation:Connect(function()
+				ref.current = ((ref.current or 0) + 1) % defineFastInt
+
+				if ref.current == 0 then
+					setState(math.random())
 				end
 			end)
 
-			return function() -- line: 109
-				-- upvalues: connection (ref)
+			return function()
+				if postSimulationConnection then
+					postSimulationConnection:Disconnect()
+					postSimulationConnection = nil
+				end
+			end
+		end
+
+		if not props.voiceState or props.voiceState ~= "Connecting" or not ref3 then
+			return function()
 				if connection then
 					connection:Disconnect()
 					connection = nil
@@ -106,115 +97,111 @@ local function ControlBubble(t2: {[any]: any}) -- line: 61
 			end
 		end
 
-		if t2.voiceState and t2.voiceState == "Connecting" and u38 then
-			local v46 = createTweenShimmeringEffect(u38)
+		local tweenShimmeringEffect = createTweenShimmeringEffect(ref3)
+		tweenShimmeringEffect:Play()
 
-			v46:Play()
+		return function()
+			tweenShimmeringEffect:Cancel()
 
-			return function() -- line: 119
-				-- upvalues: v46 (copy), u38 (ref), vector2 (copy)
-				v46:Cancel()
-
-				if u38 and u38.current then
-					u38.current.Offset = vector2
-				end
+			if ref3 and ref3.current then
+				ref3.current.Offset = vector2
 			end
 		end
+	end, { props.voiceState })
 
-		return function() -- line: 128
-			-- upvalues: u44 (ref)
-			if u44 then
-				u44:Disconnect()
-				u44 = nil
-			end
-		end
-	end, { t2.voiceState })
-
-	local v39 = nil
-	local u40 = nil
+	local v3 = nil
+	local ref4 = nil
 
 	if GetFFlagExpChatUseVoiceParticipantsStore() then
-		u40 = React.useRef(t2.voiceState)
-		React.useEffect(function() -- line: 141
-			-- upvalues: u40 (ref), t2 (copy)
-			u40.current = t2.voiceState
-		end, { t2.voiceState })
-		v39 = React.useCallback(function(p3) -- line: 145
-			-- upvalues: t2 (copy), u40 (ref)
-			if t2.onActivated then
-				t2.onActivated(p3, u40.current)
+		ref4 = React.useRef(props.voiceState)
+		React.useEffect(function()
+			ref4.current = props.voiceState
+		end, { props.voiceState })
+
+		v3 = React.useCallback(function(p)
+			if props.onActivated then
+				props.onActivated(p, ref4.current)
 			end
-		end, { t2.onActivated })
+		end, { props.onActivated })
 	end
 
-	if not v15 and not FFlagExpChatMicBubbleSingleImage then
-		local v41 = t2.iconAssetName or getVoiceIndicatorAssetName(t2.voiceState, v30, t2.iconStyle, false)
+	if not (defineFastFlag or FFlagExpChatMicBubbleSingleImage) then
+		local iconAssetName = props.iconAssetName
+			or getVoiceIndicatorAssetName(props.voiceState, state, props.iconStyle, false)
 
 		if GetFFlagExpChatEnableVoiceReverseNudge() then
-			v41 = t2.iconAssetName or getVoiceIndicatorAssetName(t2.voiceState, v30, t2.iconStyle, t2.isUserToxic)
+			iconAssetName = props.iconAssetName
+				or getVoiceIndicatorAssetName(props.voiceState, state, props.iconStyle, props.isUserToxic)
 		end
 
-		v29 = Images[v41]
+		image = Images[iconAssetName]
 	end
 
-	return React.createElement("ImageButton", {
-		AnchorPoint = Vector2.new(0.5, 1),
-		Interactable = not GuiService:IsTenFootInterface() and nil,
-		Selectable = not GuiService:IsTenFootInterface() and nil,
-		Size = t2.controlBubbleSize,
-		LayoutOrder = t2.LayoutOrder,
-		BorderSizePixel = 0,
-		Transparency = 1,
-		ZIndex = 2,
-		[React.Event.Activated] = if not GetFFlagExpChatUseVoiceParticipantsStore() then t2.onActivated else v39,
-		BackgroundTransparency = 1,
-		ref = u37
-	}, {
+	local createElement = React.createElement
+	local v4 = {}
+	v4.AnchorPoint = Vector2.new(0.5, 1)
+	v4.Interactable = not isTenFootInterface() and nil
+	v4.Selectable = not isTenFootInterface() and nil
+	v4.Size = props.controlBubbleSize
+	v4.LayoutOrder = props.LayoutOrder
+	v4.BorderSizePixel = 0
+	v4.Transparency = 1
+	v4.ZIndex = 2
+	local activated = React.Event.Activated
+
+	if not GetFFlagExpChatUseVoiceParticipantsStore() then
+		v3 = props.onActivated
+	end
+
+	v4[activated] = v3
+	v4.BackgroundTransparency = 1
+	v4.ref = ref2
+	return createElement("ImageButton", v4, {
 		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, t2.cornerRadiusOffset)
+			CornerRadius = UDim.new(0, props.cornerRadiusOffset)
 		}),
-		Contents = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, t2.cornerRadiusOffset)
-			}),
-			Icon = React.createElement(v33, {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Size = t2.iconSize,
-				ImageTransparency = t2.iconTransparency,
-				Image = v29
-			}, {
-				ShimmerGradient = React.createElement("UIGradient", {
-					Rotation = -45,
-					Color = ColorSequence.new({
-						ColorSequenceKeypoint.new(0, Color3.new(n1, n1, n1)),
-						ColorSequenceKeypoint.new(0.5, Color3.new(0.8, 0.8, 0.8)),
-						ColorSequenceKeypoint.new(1, Color3.new(n1, n1, n1))
-					}),
-					Enabled = t2.voiceState == "Connecting",
-					Offset = vector2
+		Contents = React.createElement(
+			"Frame",
+			{ Size = UDim2.fromScale(1, 1), BorderSizePixel = 0, BackgroundTransparency = 1 },
+			{
+				UICorner = React.createElement("UICorner", {
+					CornerRadius = UDim.new(0, props.cornerRadiusOffset)
 				}),
-				ActivityGradient = FFlagExpChatMicBubbleSingleImage and React.createElement("UIGradient", {
-					Rotation = 0,
-					Color = v30:map(function(p4) -- line: 213
-						return ColorSequence.new({
-							ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-							ColorSequenceKeypoint.new(p4 * 0.5, Color3.new(1, 1, 1)),
-							ColorSequenceKeypoint.new(p4 * 0.5 + 1E-06, Color3.new(0, 0, 0)),
-							ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
-						})
-					end),
-					Transparency = NumberSequence.new(0),
-					Enabled = t2.voiceState ~= "Connecting"
+				Icon = React.createElement(v2, {
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+					Size = props.iconSize,
+					BackgroundTransparency = 1,
+					ImageTransparency = props.iconTransparency,
+					BorderSizePixel = 0,
+					Image = image
+				}, {
+					ShimmerGradient = React.createElement("UIGradient", {
+						Color = ColorSequence.new({
+							ColorSequenceKeypoint.new(0, Color3.new(v, v, v)),
+							ColorSequenceKeypoint.new(0.5, Color3.new(0.8, 0.8, 0.8)),
+							ColorSequenceKeypoint.new(1, Color3.new(v, v, v))
+						}),
+						Enabled = props.voiceState == "Connecting",
+						Rotation = -45,
+						Offset = vector2
+					}),
+					ActivityGradient = FFlagExpChatMicBubbleSingleImage and React.createElement("UIGradient", {
+						Color = state:map(function(p)
+							return ColorSequence.new({
+								ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+								ColorSequenceKeypoint.new(p * 0.5, Color3.new(1, 1, 1)),
+								ColorSequenceKeypoint.new(p * 0.5 + 1e-6, Color3.new(0, 0, 0)),
+								ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
+							})
+						end),
+						Transparency = NumberSequence.new(0),
+						Enabled = props.voiceState ~= "Connecting",
+						Rotation = 0
+					})
 				})
-			})
-		})
+			}
+		)
 	})
 end
 

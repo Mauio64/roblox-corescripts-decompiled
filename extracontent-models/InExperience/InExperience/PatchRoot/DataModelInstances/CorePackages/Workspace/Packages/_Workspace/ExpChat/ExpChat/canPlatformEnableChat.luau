@@ -1,56 +1,61 @@
 local UserInputService = game:GetService("UserInputService")
 local AvatarChatService = game:GetService("AvatarChatService")
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local SocialExperiments = require(Parent.SocialExperiments)
+
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local SocialExperiments = require(parent.SocialExperiments)
 local FFlagTestDeviceForFAEUpsell = SocialExperiments.FFlagTestDeviceForFAEUpsell
 local deviceMeetsRequirementsForFAE = SocialExperiments.deviceMeetsRequirementsForFAE
-local FFlagAEGIS2UseGuacToShowFAEUpsell = require(Parent.SharedFlags).FFlagAEGIS2UseGuacToShowFAEUpsell
-local UniversalAppPolicy = nil
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAEGIS2UseGuacToShowFAEUpsell = SharedFlags.FFlagAEGIS2UseGuacToShowFAEUpsell
+local UniversalAppPolicy
 
 if FFlagAEGIS2UseGuacToShowFAEUpsell then
-	UniversalAppPolicy = require(Parent.UniversalAppPolicy)
+	UniversalAppPolicy = require(parent.UniversalAppPolicy)
+else
+	UniversalAppPolicy = nil
 end
 
-return function() -- line: 21
-	-- upvalues: FFlagAEGIS2UseGuacToShowFAEUpsell (copy), UserInputService (copy), AvatarChatService (copy), FFlagTestDeviceForFAEUpsell (copy), deviceMeetsRequirementsForFAE (copy), UniversalAppPolicy (ref)
+return function()
 	if FFlagAEGIS2UseGuacToShowFAEUpsell then
-		local v9 = UniversalAppPolicy.getAppFeaturePolicies().getShowInExpFAEUpsell()
+		local v = UniversalAppPolicy.getAppFeaturePolicies().getShowInExpFAEUpsell()
+			and AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE)
 
-		if v9 then
-			v9 = AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE)
-
-			if v9 then
-				if FFlagTestDeviceForFAEUpsell then
-					return (deviceMeetsRequirementsForFAE())
-				end
-
-				v9 = true
-			end
+		if not v then
+			return v
 		end
 
-		return v9
-	end
-
-	local Platform = UserInputService:GetPlatform()
-	local v11
-
-	if Platform ~= Enum.Platform.IOS and Platform ~= Enum.Platform.Android and Platform ~= Enum.Platform.Windows then
-		v11 = false
-
-		if Platform ~= Enum.Platform.OSX then
-			return v11
-		end
-	end
-
-	v11 = AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE)
-
-	if v11 then
 		if FFlagTestDeviceForFAEUpsell then
 			return (deviceMeetsRequirementsForFAE())
 		end
 
-		v11 = true
-	end
+		v = true
+		return true
+	else
+		local platform = UserInputService:GetPlatform()
+		local v
 
-	return v11
+		if
+			platform ~= Enum.Platform.IOS
+			and platform ~= Enum.Platform.Android
+			and platform ~= Enum.Platform.Windows
+			and platform ~= Enum.Platform.OSX
+		then
+			v = false
+			return false
+		end
+
+		v = AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE)
+
+		if not v then
+			return v
+		end
+
+		if FFlagTestDeviceForFAEUpsell then
+			return (deviceMeetsRequirementsForFAE())
+		end
+
+		v = true
+		return true
+	end
 end

@@ -1,37 +1,45 @@
 local __DEV__ = _G.__DEV__
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
 local Map = LuauPolyfill.Map
 local Set = LuauPolyfill.Set
 local Array = LuauPolyfill.Array
-local NULL = require(ParentParent.utilities).NULL
+
+local utilities = require(parent.utilities)
+local null = utilities.NULL
+
 local HttpService = game:GetService("HttpService")
 
-require(ParentParentParent.GraphQL)
+require(parent2.GraphQL)
 
-local invariant = require(ParentParent.jsutils.invariant)
+local invariant = require(parent.jsutils.invariant)
 local invariant2 = invariant.invariant
-local InvariantError = invariant.InvariantError
-local equal = require(ParentParent.jsutils.equal)
-local objectKeysForEach = require(ParentParent.luaUtils.objectKeysForEach)
-local utilities = require(ParentParent.utilities)
-local createFragmentMap = utilities.createFragmentMap
-local getFragmentFromSelection = utilities.getFragmentFromSelection
-local getDefaultValues = utilities.getDefaultValues
-local getFragmentDefinitions = utilities.getFragmentDefinitions
-local getOperationDefinition = utilities.getOperationDefinition
-local getTypenameFromResult = utilities.getTypenameFromResult
-local makeReference = utilities.makeReference
-local isField = utilities.isField
-local resultKeyNameFromField = utilities.resultKeyNameFromField
-local isReference = utilities.isReference
-local shouldInclude = utilities.shouldInclude
-local cloneDeep = utilities.cloneDeep
-local addTypenameToDocument = utilities.addTypenameToDocument
+local invariantError = invariant.InvariantError
+
+local equal = require(parent.jsutils.equal)
+
+local objectKeysForEach = require(parent.luaUtils.objectKeysForEach)
+
+local utilities2 = require(parent.utilities)
+local createFragmentMap = utilities2.createFragmentMap
+
+local getFragmentFromSelection = utilities2.getFragmentFromSelection
+local getDefaultValues = utilities2.getDefaultValues
+local getFragmentDefinitions = utilities2.getFragmentDefinitions
+local getOperationDefinition = utilities2.getOperationDefinition
+local getTypenameFromResult = utilities2.getTypenameFromResult
+local makeReference = utilities2.makeReference
+local isField = utilities2.isField
+local resultKeyNameFromField = utilities2.resultKeyNameFromField
+local isReference = utilities2.isReference
+local shouldInclude = utilities2.shouldInclude
+local cloneDeep = utilities2.cloneDeep
+local addTypenameToDocument = utilities2.addTypenameToDocument
 
 require(script.Parent.types)
 
@@ -41,484 +49,523 @@ local fieldNameFromStoreName = helpers.fieldNameFromStoreName
 local storeValueIsStoreObject = helpers.storeValueIsStoreObject
 
 require(script.Parent.entityStore)
+
 require(script.Parent.Parent.core.types.Cache)
 
-local canonicalStringify = require(script.Parent["object-canon"]).canonicalStringify
+local objectcanon = require(script.Parent["object-canon"])
+local canonicalStringify = objectcanon.canonicalStringify
 
 require(script.Parent.writeToStore_types)
 
-local warnAboutDataLoss = nil
-local getChildMergeTree = nil
-local maybeRecycleChildMergeTree = nil
-local mergeMergeTrees = nil
-local mergeTreeIsEmpty = nil
-local t2 = {}
+local warnAboutDataLoss
+local getChildMergeTree
+local maybeRecycleChildMergeTree
+local mergeMergeTrees
+local mergeTreeIsEmpty
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.new(p1, p2) -- line: 138
-	-- upvalues: t2 (copy)
-	local self = setmetatable({}, t2)
-
-	self.cache = p1
-	self.reader = p2
-
+function class.new(cache, reader)
+	local self = setmetatable({}, class)
+	self.cache = cache
+	self.reader = reader
 	return self
 end
-function t2.writeToStore(p3, p4, p5) -- line: 145
-	-- upvalues: getOperationDefinition (copy), makeProcessedFieldsMerger (copy), Object (copy), getDefaultValues (copy), canonicalStringify (copy), createFragmentMap (copy), getFragmentDefinitions (copy), Map (copy), isReference (copy), InvariantError (copy), HttpService (copy), makeReference (copy), __DEV__ (copy), fieldNameFromStoreName (copy), Set (copy), isField (copy), objectKeysForEach (copy), warnAboutDataLoss (ref)
-	local query = p5.query
-	local result = p5.result
-	local dataId = p5.dataId
-	local variables = p5.variables
-	local overwrite = p5.overwrite
-	local v56 = getOperationDefinition(query)
-	local v57 = makeProcessedFieldsMerger()
-	local v58 = Object.assign(getDefaultValues(v56), variables)
-	local t3 = {
-		clientOnly = false,
-		store = p4,
+
+function class:writeToStore(object, data)
+	local query = data.query
+	local result = data.result
+	local dataId = data.dataId
+	local variables = data.variables
+	local overwrite = data.overwrite
+	local operationDefinition = getOperationDefinition(query)
+	local processedFieldsMerger = makeProcessedFieldsMerger()
+
+	local variables2 = Object.assign(getDefaultValues(operationDefinition), variables)
+
+	local context = {
+		store = object,
 		written = {},
-		merge = function(p6, p7) -- line: 159
-			-- upvalues: v57 (copy)
-			return v57:merge(p6, p7)
+		merge = function(p, p2)
+			return processedFieldsMerger:merge(p, p2)
 		end,
-		variables = v58,
-		varString = canonicalStringify(v58),
+		variables = variables2,
+		varString = canonicalStringify(variables2),
 		fragmentMap = createFragmentMap(getFragmentDefinitions(query)),
 		overwrite = overwrite or false,
-		incomingById = Map.new(nil)
+		incomingById = Map.new(nil),
+		clientOnly = false
 	}
-	local v60 = p3:processSelectionSet({
+
+	local v = self:processSelectionSet({
 		result = result or {},
 		dataId = dataId,
-		selectionSet = v56.selectionSet,
-		mergeTree = {
-			map = Map.new(nil)
-		},
-		context = t3
+		selectionSet = operationDefinition.selectionSet,
+		mergeTree = { map = Map.new(nil) },
+		context = context
 	})
 
-	if not isReference(v60) then
-		error(InvariantError.new(("Could not identify object %s"):format(HttpService:JSONEncode(result))))
+	if not isReference(v) then
+		error(invariantError.new(("Could not identify object %s"):format(HttpService:JSONEncode(result))))
 	end
 
-	t3.incomingById:forEach(function(p8, p9) -- line: 192
-		-- upvalues: makeReference (copy), p3 (copy), t3 (copy), isReference (copy), __DEV__ (copy), fieldNameFromStoreName (copy), Set (copy), isField (copy), objectKeysForEach (copy), warnAboutDataLoss (ref), p4 (copy)
-		local fields = p8.fields
-		local mergeTree = p8.mergeTree
-		local selections = p8.selections
-		local v142 = makeReference(p9)
+	context.incomingById:forEach(function(data2, p)
+		local fields = data2.fields
+		local mergeTree = data2.mergeTree
+		local selections = data2.selections
+
+		local reference = makeReference(p)
 
 		if mergeTree.map.size > 0 then
-			local v143 = p3:applyMerges(mergeTree, v142, fields, t3)
+			fields = self:applyMerges(mergeTree, reference, fields, context)
 
-			if isReference(v143) then
+			if isReference(fields) then
 				return
 			end
-
-			fields = v143
 		end
 
-		if __DEV__ and not t3.overwrite then
-			local u144 = nil
-
-			local function hasSelectionSet(s1: string) -- line: 215
-				-- upvalues: u144 (ref), fieldNameFromStoreName (copy)
-				return u144:has(fieldNameFromStoreName(s1))
+		if __DEV__ and not context.overwrite then
+			local v2 = nil
+			local function hasSelectionSet(p2: string) -- 1 equivalent call inferred from this helper
+				return v2:has(fieldNameFromStoreName(p2))
 			end
 
-			u144 = Set.new()
-			selections:forEach(function(p10) -- line: 219
-				-- upvalues: isField (copy), u144 (ref)
-				if isField(p10) and p10.selectionSet then
-					u144:add(p10.name.value)
+			v2 = Set.new()
+			selections:forEach(function(p2)
+				if isField(p2) and p2.selectionSet then
+					v2:add(p2.name.value)
 				end
 			end)
 
-			local function hasMergeFunction(s2: string) -- line: 227
-				-- upvalues: mergeTree (copy)
-				local v173 = mergeTree.map:get(s2)
-
-				return v173 ~= nil and (v173.info ~= nil and v173.info.merge ~= nil)
+			local function hasMergeFunction(p2: string): boolean -- 1 equivalent call inferred from this helper
+				local v3 = mergeTree.map:get(p2)
+				return v3 ~= nil and v3.info ~= nil and v3.info.merge ~= nil
 			end
 
-			objectKeysForEach(fields, function(p11) -- line: 233
-				-- upvalues: u144 (ref), fieldNameFromStoreName (copy), mergeTree (copy), warnAboutDataLoss (ref), v142 (copy), fields (ref), t3 (copy)
-				if u144:has(fieldNameFromStoreName(p11)) then
-					local v175 = mergeTree.map:get(p11)
-
-					if v175 == nil or (v175.info == nil or v175.info.merge == nil) then
-						warnAboutDataLoss(v142, fields, p11, t3.store)
-					end
+			objectKeysForEach(fields, function(p2)
+				if hasSelectionSet(p2) and not hasMergeFunction(p2) then -- inferred equivalent call
+					warnAboutDataLoss(reference, fields, p2, context.store)
 				end
 			end)
 		end
 
-		p4:merge(p9, fields)
+		object:merge(p, fields)
 	end)
-	p4:retain(v60.__ref)
 
-	return v60
+	object:retain(v.__ref)
+
+	return v
 end
-function t2.processSelectionSet(t4: {[any]: any}, t5: {[any]: any}) -- line: 258
-	-- upvalues: makeReference (copy), Array (copy), getTypenameFromResult (copy), Set (copy), shouldInclude (copy), isField (copy), resultKeyNameFromField (copy), getChildMergeTree (ref), isReference (copy), maybeRecycleChildMergeTree (ref), addTypenameToDocument (copy), invariant2 (copy), HttpService (copy), getFragmentFromSelection (copy), mergeMergeTrees (ref)
-	local dataId = t5.dataId
-	local result = t5.result
-	local selectionSet = t5.selectionSet
-	local context = t5.context
-	local mergeTree = t5.mergeTree
-	local policies = t4.cache.policies
-	local v69, v70 = table.unpack(policies:identify(result, selectionSet, context.fragmentMap), 1, 2)
-	local v71 = dataId or v69
 
-	if type(v71) == "string" then
-		local v72
+function class:processSelectionSet(data)
+	local dataId = data.dataId
+	local result = data.result
+	local selectionSet = data.selectionSet
+	local context = data.context
 
-		if context.written[v71] ~= nil then
-			v72 = context.written[v71]
+	local mergeTree = data.mergeTree
+
+	local policies = self.cache.policies
+
+	local v, v2 = table.unpack(policies:identify(result, selectionSet, context.fragmentMap), 1, 2)
+
+	local v3 = dataId or v
+
+	if type(v3) == "string" then
+		local selectionSets
+
+		if context.written[v3] == nil then
+			selectionSets = {}
+			context.written[v3] = selectionSets
 		else
-			v72 = {}
-			context.written[v71] = v72
+			selectionSets = context.written[v3]
 		end
 
-		local v73 = makeReference(v71)
+		local reference = makeReference(v3)
 
-		if Array.indexOf(v72, selectionSet) >= 1 then
-			return v73
+		if Array.indexOf(selectionSets, selectionSet) >= 1 then
+			return reference
 		end
 
-		table.insert(v72, selectionSet)
+		table.insert(selectionSets, selectionSet)
 
-		if t4.reader ~= nil and t4.reader:isFresh(result, v73, selectionSet, context) then
-			return v73
+		if self.reader ~= nil and self.reader:isFresh(result, reference, selectionSet, context) then
+			return reference
 		end
 	end
 
-	local t6 = {}
+	local merged = {}
 
-	if v70 ~= nil then
-		t6 = context.merge(t6, v70)
+	if v2 ~= nil then
+		merged = context.merge(merged, v2)
 	end
 
-	local v75 = v71 and policies.rootTypenamesById[v71] or (getTypenameFromResult(result, selectionSet, context.fragmentMap) or v71 and context.store:get(v71, "__typename"))
+	local typename = v3 and policies.rootTypenamesById[v3]
+		or getTypenameFromResult(result, selectionSet, context.fragmentMap)
+		or v3 and context.store:get(v3, "__typename")
 
-	if type(v75) == "string" then
-		t6.__typename = v75
+	if type(typename) == "string" then
+		merged.__typename = typename
 	end
 
-	local v76 = Set.new(selectionSet.selections)
+	local selections = Set.new(selectionSet.selections)
 
-	for _, v78 in v76 do
-		if shouldInclude(v78, context.variables) then
-			if isField(v78) then
-				local v79 = result[resultKeyNameFromField(v78)]
-				local clientOnly = context.clientOnly
+	for _, field in selections do
+		if not shouldInclude(field, context.variables) then
+			continue
+		end
 
-				context.clientOnly = clientOnly or v78.directives and Array.some(v78.directives, function(p12) -- line: 351
-					return p12.name.value == "client"
-				end)
+		if isField(field) then
+			local v4 = result[resultKeyNameFromField(field)]
 
-				if v79 ~= nil then
-					local v81 = policies:getStoreFieldName({
-						typename = v75,
-						fieldName = v78.name.value,
-						field = v78,
-						variables = context.variables
-					})
-					local v82 = getChildMergeTree(mergeTree, v81)
-					local v83 = t4:processFieldValue(v79, v78, context, v82)
-					local v84 = nil
+			local clientOnly = context.clientOnly
 
-					if v78.selectionSet ~= nil then
-						v84 = context.store:getFieldValue(v83, "__typename")
+			context.clientOnly = clientOnly or field.directives and Array.some(field.directives, function(p): boolean
+				return p.name.value == "client"
+			end)
 
-						if not v84 and isReference(v83) then
-							local v85 = context.incomingById:get(v83.__ref)
+			if v4 == nil then
+				if not (context.clientOnly or addTypenameToDocument:added(field)) then
+					invariant2.error((string.sub(
+						("Missing field '%s' while writing result %s"):format(
+							resultKeyNameFromField(field),
+							HttpService:JSONEncode(result)
+						),
+						1,
+						1000
+					)))
+				end
+			else
+				local storeFieldName = policies:getStoreFieldName({
+					typename = typename,
+					fieldName = field.name.value,
+					field = field,
+					variables = context.variables
+				})
 
-							v84 = if v85 == nil then nil else v85.fields.__typename
+				local v5 = getChildMergeTree(mergeTree, storeFieldName)
+
+				local v6 = self:processFieldValue(v4, field, context, v5)
+				local v7
+
+				if field.selectionSet ~= nil then
+					v7 = context.store:getFieldValue(v6, "__typename")
+
+					if not v7 and isReference(v6) then
+						local v8 = context.incomingById:get(v6.__ref)
+
+						if v8 == nil then
+							v7 = nil
+						else
+							v7 = v8.fields.__typename
 						end
 					end
-
-					local v86 = policies:getMergeFunction(v75, v78.name.value, v84)
-
-					if v86 ~= nil then
-						v82.info = {
-							field = v78,
-							typename = v75,
-							merge = v86
-						}
-					else
-						maybeRecycleChildMergeTree(mergeTree, v81)
-					end
-
-					t6 = context.merge(t6, {
-						[v81] = v83
-					})
-				elseif not context.clientOnly and not addTypenameToDocument:added(v78) then
-					invariant2.error((string.sub(("Missing field '%s' while writing result %s"):format(resultKeyNameFromField(v78), HttpService:JSONEncode(result)), 1, 1000)))
 				end
 
-				context.clientOnly = clientOnly
-			else
-				local v87 = getFragmentFromSelection(v78, context.fragmentMap)
+				local mergeFunction = policies:getMergeFunction(typename, field.name.value, v7)
 
-				if v87 and policies:fragmentMatches(v87, v75, result, context.variables) then
-					Array.forEach(v87.selectionSet.selections, v76.add, v76)
+				if mergeFunction == nil then
+					maybeRecycleChildMergeTree(mergeTree, storeFieldName)
+				else
+					v5.info = { field = field, typename = typename, merge = mergeFunction }
 				end
+
+				merged = context.merge(merged, { [storeFieldName] = v6 })
 			end
-		end
-	end
 
-	if type(v71) == "string" then
-		local v88 = context.incomingById:get(v71)
-
-		if v88 then
-			v88.fields = context.merge(v88.fields, t6)
-			v88.mergeTree = mergeMergeTrees(v88.mergeTree, mergeTree)
-			v88.selections:forEach(v76.add, v76)
-			v88.selections = v76
+			context.clientOnly = clientOnly
 		else
-			context.incomingById:set(v71, {
-				fields = t6,
-				mergeTree = mergeTree,
-				selections = v76
-			})
-		end
+			local fragmentFromSelection = getFragmentFromSelection(field, context.fragmentMap)
 
-		return makeReference(v71)
-	end
-
-	return t6
-end
-function t2.processFieldValue(p13, p14, p15, p16, p17) -- line: 497
-	-- upvalues: NULL (copy), __DEV__ (copy), cloneDeep (copy), Array (copy), getChildMergeTree (ref), maybeRecycleChildMergeTree (ref)
-	if not p15.selectionSet or p14 == NULL then
-		if __DEV__ then
-			return cloneDeep(p14)
-		end
-
-		return p14
-	end
-
-	if Array.isArray(p14) then
-		return Array.map(p14, function(p18, p19) -- line: 517
-			-- upvalues: p13 (copy), p15 (copy), p16 (copy), getChildMergeTree (ref), p17 (copy), maybeRecycleChildMergeTree (ref)
-			local v150 = p13:processFieldValue(p18, p15, p16, getChildMergeTree(p17, p19))
-
-			maybeRecycleChildMergeTree(p17, p19)
-
-			return v150
-		end)
-	end
-
-	return p13:processSelectionSet({
-		result = p14,
-		selectionSet = p15.selectionSet,
-		context = p16,
-		mergeTree = p17
-	})
-end
-function t2.applyMerges(p20, p21, p22, p23, p24, p25) -- line: 532
-	-- upvalues: isReference (copy), Array (copy), storeValueIsStoreObject (copy), Map (copy), invariant2 (copy), Boolean (copy)
-	if p21.map.size > 0 and not isReference(p23) then
-		local v102 = if not (not Array.isArray(p23) and (isReference(p22) or storeValueIsStoreObject(p22))) then nil else p22
-		local v103 = p23
-
-		if v102 ~= nil and not p25 then
-			p25 = if not isReference(v102) then { v102 } else { v102.__ref }
-		end
-
-		local u104 = nil
-
-		local function getValue(p26, p27) -- line: 590
-			-- upvalues: Array (copy), p24 (copy)
-			if Array.isArray(p26) then
-				if typeof(p27) == "number" then
-					return p26[p27]
-				end
-
-				return nil
+			if
+				fragmentFromSelection
+				and policies:fragmentMatches(fragmentFromSelection, typename, result, context.variables)
+			then
+				Array.forEach(fragmentFromSelection.selectionSet.selections, selections.add, selections)
 			end
-
-			return p24.store:getFieldValue(p26, (tostring(p27)))
-		end
-
-		p21.map:forEach(function(p28, p29) -- line: 602
-			-- upvalues: v102 (copy), Array (copy), p24 (copy), v103 (copy), p25 (ref), p20 (copy), u104 (ref), Map (copy), invariant2 (copy)
-			local v155 = v102
-			local v156 = if not Array.isArray(v155) then p24.store:getFieldValue(v155, (tostring(p29))) else if typeof(p29) ~= "number" then nil else v155[p29]
-			local v157 = v103
-			local v158 = if not Array.isArray(v157) then p24.store:getFieldValue(v157, (tostring(p29))) else if typeof(p29) ~= "number" then nil else v157[p29]
-
-			if v158 == nil then
-				return
-			end
-
-			if p25 ~= nil then
-				table.insert(p25, p29)
-			end
-
-			local v159 = p20:applyMerges(p28, v156, v158, p24, p25)
-
-			if v159 ~= v158 then
-				u104 = u104 or Map.new(nil)
-				u104:set(p29, v159)
-			end
-
-			if p25 ~= nil then
-				invariant2(p29 == table.remove(p25, #p25))
-			end
-		end)
-
-		if u104 ~= nil then
-			p23 = table.clone(v103)
-			u104:forEach(function(p30, p31) -- line: 631
-				-- upvalues: p23 (ref)
-				p23[p31] = p30
-			end)
 		end
 	end
 
-	if p21.info then
-		return p20.cache.policies:runMergeFunction(p22, p23, p21.info, p24, Boolean.toJSBoolean(p25) and p24.store:getStorage(table.unpack(p25)) or nil)
+	if type(v3) ~= "string" then
+		return merged
 	end
 
-	return p23
-end
+	local v4 = context.incomingById:get(v3)
 
-t1.StoreWriter = t2
+	if v4 then
+		v4.fields = context.merge(v4.fields, merged)
+		v4.mergeTree = mergeMergeTrees(v4.mergeTree, mergeTree)
 
-local t7 = {}
-
-function getChildMergeTree(p32, p33) -- line: 656
-	-- upvalues: t7 (copy), Map (copy)
-	local map = p32.map
-
-	if not map:has(p33) then
-		map:set(p33, table.remove(t7, #t7) or {
-			map = Map.new(nil)
+		v4.selections:forEach(selections.add, selections)
+		v4.selections = selections
+	else
+		context.incomingById:set(v3, {
+			fields = merged,
+			mergeTree = mergeTree,
+			selections = selections
 		})
 	end
 
-	return (map:get(p33))
+	return makeReference(v3)
 end
-function mergeMergeTrees(p34, p35) -- line: 666
-	-- upvalues: mergeTreeIsEmpty (ref), Object (copy), Map (copy), Set (copy), mergeMergeTrees (ref)
-	if p34 == p35 or (p35 == nil or mergeTreeIsEmpty(p35)) then
-		return p34
+
+function class:processFieldValue(p, p2, context, mergeTree)
+	if p2.selectionSet and p ~= null then
+		if Array.isArray(p) then
+			return Array.map(p, function(p3, p4)
+				local v = self:processFieldValue(p3, p2, context, getChildMergeTree(mergeTree, p4))
+				maybeRecycleChildMergeTree(mergeTree, p4)
+				return v
+			end)
+		end
+
+		return self:processSelectionSet({
+			result = p,
+			selectionSet = p2.selectionSet,
+			context = context,
+			mergeTree = mergeTree
+		})
+	elseif __DEV__ then
+		return cloneDeep(p)
+	else
+		return p
 	end
+end
 
-	if p34 == nil or mergeTreeIsEmpty(p34) then
-		return p35
-	end
+function class:applyMerges(p, p2, p3, p4, list)
+	if p.map.size > 0 and not isReference(p3) then
+		local v
 
-	local v111 = if not p34.info or not p35.info then p34.info or p35.info else Object.assign(table.clone(p34.info), p35.info)
-	local v112 = if not (p34.map.size > 0) then p34.map.size else p35.map.size
-	local v113 = if not (v112 > 0) then if not (p34.map.size > 0) then p35.map else p34.map else Map.new()
-	local t8 = {
-		info = v111,
-		map = v113
-	}
+		if Array.isArray(p3) then
+			v = false
+		else
+			v = isReference(p2) or storeValueIsStoreObject(p2)
+		end
 
-	if v112 > 0 then
-		local v115 = Set.new(p35.map:keys())
+		local v2
 
-		p34.map:forEach(function(p36, p37) -- line: 696
-			-- upvalues: t8 (copy), mergeMergeTrees (ref), p35 (copy), v115 (copy)
-			t8.map:set(p37, mergeMergeTrees(p36, p35.map:get(p37)))
-			v115:delete(p37)
+		if v then
+			v2 = p2
+		else
+			v2 = nil
+		end
+
+		local v3 = p3
+
+		list = v2 ~= nil and not list and (isReference(v2) and { v2.__ref } or { v2 }) or list
+
+		local v4 = nil
+
+		local function getValue(p5, value) -- 2 equivalent calls inferred from this helper
+			if not Array.isArray(p5) then
+				return p4.store:getFieldValue(p5, (tostring(value)))
+			end
+
+			if typeof(value) == "number" then
+				return p5[value]
+			end
+
+			return nil
+		end
+
+		p.map:forEach(function(p5, value)
+			local value2 = getValue(v2, value) -- inferred equivalent call
+			local value3 = getValue(v3, value) -- inferred equivalent call
+
+			if value3 == nil then
+				return
+			end
+
+			if list ~= nil then
+				table.insert(list, value)
+			end
+
+			local v5 = self:applyMerges(p5, value2, value3, p4, list)
+
+			if v5 ~= value3 then
+				v4 = v4 or Map.new(nil)
+
+				v4:set(value, v5)
+			end
+
+			if list ~= nil then
+				invariant2(table.remove(list, #list) == value)
+			end
 		end)
-		v115:forEach(function(p38) -- line: 701
-			-- upvalues: t8 (copy), mergeMergeTrees (ref), p35 (copy), p34 (copy)
-			t8.map:set(p38, mergeMergeTrees(p35.map:get(p38), p34.map:get(p38)))
+
+		if v4 ~= nil then
+			p3 = table.clone(v3)
+
+			v4:forEach(function(p5, p6)
+				p3[p6] = p5
+			end)
+		end
+	end
+
+	if p.info then
+		return self.cache.policies:runMergeFunction(
+			p2,
+			p3,
+			p.info,
+			p4,
+			Boolean.toJSBoolean(list) and p4.store:getStorage(table.unpack(list)) or nil
+		)
+	end
+
+	return p3
+end
+
+local v = {}
+
+getChildMergeTree = function(p, p2)
+	local map = p.map
+
+	if not map:has(p2) then
+		map:set(p2, table.remove(v, #v) or { map = Map.new(nil) })
+	end
+
+	return (map:get(p2))
+end
+
+mergeMergeTrees = function(mergeTree, mergeTree2)
+	if mergeTree == mergeTree2 or mergeTree2 == nil or mergeTreeIsEmpty(mergeTree2) then
+		return mergeTree
+	end
+
+	if mergeTree == nil or mergeTreeIsEmpty(mergeTree) then
+		return mergeTree2
+	end
+
+	local info
+
+	if mergeTree.info and mergeTree2.info then
+		info = Object.assign(table.clone(mergeTree.info), mergeTree2.info)
+	else
+		info = mergeTree.info or mergeTree2.info
+	end
+
+	local size
+
+	if mergeTree.map.size > 0 then
+		size = mergeTree2.map.size
+	else
+		size = mergeTree.map.size
+	end
+
+	local map
+
+	if size > 0 then
+		map = Map.new()
+	elseif mergeTree.map.size > 0 then
+		map = mergeTree.map
+	else
+		map = mergeTree2.map
+	end
+
+	local v2 = { info = info, map = map }
+
+	if size > 0 then
+		local v3 = Set.new(mergeTree2.map:keys())
+
+		mergeTree.map:forEach(function(p, p2)
+			v2.map:set(p2, mergeMergeTrees(p, mergeTree2.map:get(p2)))
+			v3:delete(p2)
+		end)
+
+		v3:forEach(function(p)
+			v2.map:set(p, mergeMergeTrees(mergeTree2.map:get(p), mergeTree.map:get(p)))
 		end)
 	end
 
-	return t8
-end
-function mergeTreeIsEmpty(p39) -- line: 712
-	return not p39 or not (p39.info or p39.map.size > 0)
-end
-function maybeRecycleChildMergeTree(p40, p41) -- line: 718
-	-- upvalues: mergeTreeIsEmpty (ref), t7 (copy)
-	local map = p40.map
-	local v120 = map:get(p41)
-
-	if v120 ~= nil and mergeTreeIsEmpty(v120) then
-		table.insert(t7, v120)
-		map:delete(p41)
-	end
+	return v2
 end
 
-local v44 = Set.new()
+mergeTreeIsEmpty = function(p)
+	local v2 = not p
 
-function warnAboutDataLoss(p42, p43, s3: string, p44) -- line: 733
-	-- upvalues: isReference (copy), equal (copy), Array (copy), Object (copy), Boolean (copy), fieldNameFromStoreName (copy), v44 (copy), invariant2 (copy), HttpService (copy)
-	local function getChild(p45) -- line: 740
-		-- upvalues: p44 (copy), s3 (copy)
-		local v166 = p44:getFieldValue(p45, s3)
-
-		return typeof(v166) == "table" and v166
+	if not v2 then
+		local info = p.info or p.map.size > 0
+		return not info
 	end
 
-	local v126 = p44:getFieldValue(p42, s3)
-	local v127 = typeof(v126) == "table" and v126
+	return v2
+end
 
-	if not v127 then
+maybeRecycleChildMergeTree = function(p, p2)
+	local map = p.map
+
+	local v2 = map:get(p2)
+
+	if v2 ~= nil and mergeTreeIsEmpty(v2) then
+		table.insert(v, v2)
+		map:delete(p2)
+	end
+end
+
+local v2 = Set.new()
+
+warnAboutDataLoss = function(reference, fields, p: string, store)
+	local function getChild(p2) -- 2 equivalent calls inferred from this helper
+		local child = store:getFieldValue(p2, p)
+
+		if typeof(child) ~= "table" then
+			child = false
+		end
+
+		return child
+	end
+
+	local child = getChild(reference) -- inferred equivalent call
+
+	if not child then
 		return
 	end
 
-	local v128 = p44:getFieldValue(p43, s3)
-	local v129 = typeof(v128) == "table" and v128
+	local child2 = getChild(fields) -- inferred equivalent call
 
-	if not v129 then
+	if not child2 or isReference(child) or equal(child, child2) then
 		return
 	end
 
-	if isReference(v127) then
-		return
-	end
-
-	if equal(v127, v129) then
-		return
-	end
-
-	if Array.every(Object.keys(v127), function(p46) -- line: 771
-		-- upvalues: p44 (copy), v129 (copy)
-		return p44:getFieldValue(v129, p46) ~= nil
+	if Array.every(Object.keys(child), function(p2): boolean
+		return store:getFieldValue(child2, p2) ~= nil
 	end) then
 		return
 	end
 
-	local v130 = p44:getFieldValue(p42, "__typename")
-	local v131 = Boolean.toJSBoolean(v130) and v130 or p44:getFieldValue(p43, "__typename")
-	local v132 = fieldNameFromStoreName(s3)
-	local v133 = ("%s.%s"):format(v131, v132)
+	local fieldValue = store:getFieldValue(reference, "__typename")
+	local v3 = Boolean.toJSBoolean(fieldValue) and fieldValue or store:getFieldValue(fields, "__typename")
 
-	if v44:has(v133) then
+	local v4 = fieldNameFromStoreName(p)
+	local formatted = ("%s.%s"):format(v3, v4)
+
+	if v2:has(formatted) then
 		return
 	end
 
-	v44:add(v133)
+	v2:add(formatted)
 
-	local t9 = {}
+	local fieldValues = {}
 
-	if not Array.isArray(v127) and not Array.isArray(v129) then
-		Array.forEach({
-			v127,
-			v129
-		}, function(p47) -- line: 794
-			-- upvalues: p44 (copy), Array (copy), t9 (copy)
-			local v169 = p44:getFieldValue(p47, "__typename")
+	if not (Array.isArray(child) or Array.isArray(child2)) then
+		Array.forEach({ child, child2 }, function(p2)
+			local fieldValue2 = store:getFieldValue(p2, "__typename")
 
-			if typeof(v169) == "string" and not Array.includes(t9, v169) then
-				table.insert(t9, v169)
+			if typeof(fieldValue2) == "string" and not Array.includes(fieldValues, fieldValue2) then
+				table.insert(fieldValues, fieldValue2)
 			end
 		end)
 	end
 
-	invariant2.warn(("Cache data may be lost when replacing the %s field of a %s object.\n\n\tTo address this problem (which is not a bug in Apollo Client), %sdefine a custom merge function for the %s field, so InMemoryCache can safely merge these objects:\n\n\t  existing: %s\n\t  incoming: %s\n\n\tFor more information about these options, please refer to the documentation:\n\n\t  * Ensuring entity objects have IDs: https://go.apollo.dev/c/generating-unique-identifiers\n\t  * Defining custom merge functions: https://go.apollo.dev/c/merging-non-normalized-objects\n\t"):format(v132, v131, not Boolean.toJSBoolean(#t9) and "" or "either ensure all objects of type " .. Array.join(t9, " and ") .. " have an ID or a custom merge function, or ", v133, string.sub(HttpService:JSONEncode(v127), 1, 1000), (string.sub(HttpService:JSONEncode(v129), 1, 1000))))
+	invariant2.warn(("Cache data may be lost when replacing the %s field of a %s object.\n\n\tTo address this problem (which is not a bug in Apollo Client), %sdefine a custom merge function for the %s field, so InMemoryCache can safely merge these objects:\n\n\t  existing: %s\n\t  incoming: %s\n\n\tFor more information about these options, please refer to the documentation:\n\n\t  * Ensuring entity objects have IDs: https://go.apollo.dev/c/generating-unique-identifiers\n\t  * Defining custom merge functions: https://go.apollo.dev/c/merging-non-normalized-objects\n\t"):format(
+		v4,
+		v3,
+		not Boolean.toJSBoolean(#fieldValues) and "" or "either ensure all objects of type " .. Array.join(fieldValues, " and ") .. " have an ID or a custom merge function, or ",
+		formatted,
+		string.sub(HttpService:JSONEncode(child), 1, 1000),
+		(string.sub(HttpService:JSONEncode(child2), 1, 1000))
+	))
 end
 
-return t1
+return { StoreWriter = class }

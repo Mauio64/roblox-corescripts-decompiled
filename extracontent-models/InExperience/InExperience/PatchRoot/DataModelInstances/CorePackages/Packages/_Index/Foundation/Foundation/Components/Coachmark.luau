@@ -1,1 +1,3 @@
-return (require(script.Coachmark))
+local Coachmark = require(script.Coachmark)
+
+return Coachmark

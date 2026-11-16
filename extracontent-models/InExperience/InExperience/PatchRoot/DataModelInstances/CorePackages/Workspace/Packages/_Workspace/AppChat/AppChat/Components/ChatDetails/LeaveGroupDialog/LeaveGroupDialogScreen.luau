@@ -1,59 +1,68 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local EnumScreens = require(AppChat.EnumScreens)
-local Roact = require(AppChatParent.Roact)
+local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
+
+local Roact = require(parent.Roact)
+
 local LeaveGroupDialogContainer = require(script.Parent.LeaveGroupDialogContainer)
 local Logger = require(script.Parent.Logger)
-local v7 = Roact.PureComponent:extend("LeaveGroupDialogScreen")
 
-v7.defaultProps = {
-	navigation = nil
-}
+local extended = Roact.PureComponent:extend("LeaveGroupDialogScreen")
+extended.defaultProps = { navigation = nil }
 
-function v7.init(p1) -- line: 16
-	-- upvalues: Logger (copy), EnumScreens (copy)
-	function p1.onLeaveGroupDialogClose() -- line: 17
-		-- upvalues: p1 (copy)
-		p1.props.navigation.goBack()
+function extended:init()
+	function self.onLeaveGroupDialogClose()
+		self.props.navigation.goBack()
 	end
-	function p1.onLeaveGroupSuccess() -- line: 21
-		-- upvalues: p1 (copy), Logger (copy), EnumScreens (copy)
-		local navigation = p1.props.navigation
 
-		if navigation.getScreenProps("wideMode", false) then
+	function self.onLeaveGroupSuccess()
+		local navigation = self.props.navigation
+
+		if getFFlagAppChatEnableRootedNavigation() and navigation.getParam("isRooted", false) then
+			Logger:info("Close rooted ChatDetails after leave from {screen}")
+			local screenProps = navigation.getScreenProps("navigateToRootStack", nil)
+
+			if screenProps then
+				screenProps()
+			elseif navigation.isFocused() then
+				navigation.goBack()
+			end
+		elseif navigation.getScreenProps("wideMode", false) then
 			Logger:info("Navigate To ChatLanding with EmptyConversation from {screen}")
+
 			navigation.navigate(EnumScreens.EmptyConversation)
-
-			return
+		else
+			Logger:info("Navigate To ChatLanding from {screen}")
+			navigation.navigate(EnumScreens.ChatLanding)
 		end
-
-		Logger:info("Navigate To ChatLanding from {screen}")
-		navigation.navigate(EnumScreens.ChatLanding)
 	end
 end
-function v7.render(p2) -- line: 34
-	-- upvalues: Logger (copy), Roact (copy), LeaveGroupDialogContainer (copy)
-	local navigation = p2.props.navigation
 
+function extended.render(props)
+	local navigation = props.props.navigation
 	assert(type(navigation) ~= "nil", "LeaveGroupDialogScreen should be wrapped with Roact Navigation")
 
-	local v11 = navigation.getParam("conversationId", nil)
+	local param = navigation.getParam("conversationId", nil)
 
-	if v11 == nil then
+	if param == nil then
 		Logger:warning("ConversationId is required to open {screen}")
-
 		return nil
 	end
 
+	local isRooted = getFFlagAppChatEnableRootedNavigation() and navigation.getParam("isRooted", false)
+
 	return Roact.createElement(LeaveGroupDialogContainer, {
-		conversationId = v11,
-		onModalClose = p2.onLeaveGroupDialogClose,
-		onLeaveSuccess = p2.onLeaveGroupSuccess
+		conversationId = param,
+		isRooted = isRooted,
+		onModalClose = props.onLeaveGroupDialogClose,
+		onLeaveSuccess = props.onLeaveGroupSuccess
 	})
 end
-function v7.didMount(_) -- line: 51
-	-- upvalues: Logger (copy)
+
+function extended.didMount(_)
 	Logger:info("{screen} mounted")
 end
 
-return v7
+return extended

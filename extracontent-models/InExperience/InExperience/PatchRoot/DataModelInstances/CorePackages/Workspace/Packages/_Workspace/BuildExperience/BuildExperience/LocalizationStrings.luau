@@ -1,564 +1,736 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local FFlagEnableShareSheet = require(Parent.SharedFlags).FFlagEnableShareSheet
-local t1 = {
+local LocalizationService = game:GetService("LocalizationService")
+
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
+local FFlagBuildExperienceMonetizationNativeUI = require(BuildExperience.Flags.FFlagBuildExperienceMonetizationNativeUI)
+local FFlagBuildExperienceToolLocalization = require(BuildExperience.Flags.FFlagBuildExperienceToolLocalization)
+
+local SharedFlags = require(parent.SharedFlags)
+
+local FFlagEnableShareSheet = SharedFlags.FFlagEnableShareSheet
+local FFlagEnableTeamTestLua = SharedFlags.FFlagEnableTeamTestLua
+
+local v = {
 	ask_for_logs = {
-		completed = "Requested logs",
-		failed = "Couldn't request logs",
-		running = "Requesting logs"
+		completed = "Feature.Build.Label.ToolLogsDone",
+		failed = "Feature.Build.Label.ToolLogsFailed",
+		running = "Feature.Build.Label.ToolLogsRunning"
 	},
 	ask_user = {
-		completed = "Asked a question",
-		failed = "Couldn't ask a question",
-		running = "Asking a question"
+		completed = "Feature.Build.Label.ToolQuestionDone",
+		failed = "Feature.Build.Label.ToolQuestionFailed",
+		running = "Feature.Build.Label.ToolQuestionRunning"
 	},
 	execute_luau = {
-		completed = "Executed Luau",
-		failed = "Couldn't execute Luau",
-		running = "Executing Luau"
+		completed = "Feature.Build.Label.ToolLuauDone",
+		failed = "Feature.Build.Label.ToolLuauFailed",
+		running = "Feature.Build.Label.ToolLuauRunning"
 	},
 	generate_image = {
-		completed = "Generated image",
-		failed = "Couldn't generate image",
-		running = "Generating image"
+		completed = "Feature.Build.Label.ToolImageDone",
+		failed = "Feature.Build.Label.ToolImageFailed",
+		running = "Feature.Build.Label.ToolImageRunning"
 	},
 	generate_model = {
-		completed = "Generated 3D model",
-		failed = "Couldn't generate 3D model",
-		running = "Generating 3D model"
+		completed = "Feature.Build.Label.ToolModelDone",
+		failed = "Feature.Build.Label.ToolModelFailed",
+		running = "Feature.Build.Label.ToolModelRunning"
 	},
 	generate_primitive = {
-		completed = "Generated primitive shape",
-		failed = "Couldn't generate primitive shape",
-		running = "Generating primitive shape"
+		completed = "Feature.Build.Label.ToolPrimitiveDone",
+		failed = "Feature.Build.Label.ToolPrimitiveFailed",
+		running = "Feature.Build.Label.ToolPrimitiveRunning"
 	},
 	insert_asset = {
-		completed = "Inserted asset",
-		failed = "Couldn't insert asset",
-		running = "Inserting asset"
+		completed = "Feature.Build.Label.ToolAssetDone",
+		failed = "Feature.Build.Label.ToolAssetFailed",
+		running = "Feature.Build.Label.ToolAssetRunning"
 	},
 	invoke_script = {
-		completed = "Ran script",
-		failed = "Couldn't run script",
-		running = "Running script"
+		completed = "Feature.Build.Label.ToolScriptDone",
+		failed = "Feature.Build.Label.ToolScriptFailed",
+		running = "Feature.Build.Label.ToolScriptRunning"
 	},
 	list_skills = {
-		completed = "Listed available skills",
-		failed = "Couldn't list available skills",
-		running = "Listing available skills"
+		completed = "Feature.Build.Label.ToolSkillsDone",
+		failed = "Feature.Build.Label.ToolSkillsFailed",
+		running = "Feature.Build.Label.ToolSkillsRunning"
 	},
 	load_skill = {
-		completed = "Loaded skill",
-		failed = "Couldn't load skill",
-		running = "Loading skill"
+		completed = "Feature.Build.Label.ToolSkillLoadDone",
+		failed = "Feature.Build.Label.ToolSkillLoadFailed",
+		running = "Feature.Build.Label.ToolSkillLoadRunning"
 	},
 	manage_plan = {
-		completed = "Updated plan",
-		failed = "Couldn't update plan",
-		running = "Updating plan"
+		completed = "Feature.Build.Label.ToolPlanUpdateDone",
+		failed = "Feature.Build.Label.ToolPlanUpdateFailed",
+		running = "Feature.Build.Label.ToolPlanUpdateRunning"
 	},
 	manage_requirements = {
-		completed = "Updated requirements",
-		failed = "Couldn't update requirements",
-		running = "Updating requirements"
+		completed = "Feature.Build.Label.ToolReqUpdateDone",
+		failed = "Feature.Build.Label.ToolReqUpdateFailed",
+		running = "Feature.Build.Label.ToolReqUpdateRunning"
 	},
 	manage_tasks = {
-		completed = "Tasks planned",
-		failed = "Couldn't plan tasks",
-		running = "Planning your tasks"
+		completed = "Feature.Build.Label.ToolTasksPlanDone",
+		failed = "Feature.Build.Label.ToolTasksPlanFailed",
+		running = "Feature.Build.Label.ToolTasksPlanRunning"
 	},
 	present_plan = {
-		completed = "Presented plan",
-		failed = "Couldn't present plan",
-		running = "Presenting plan"
+		completed = "Feature.Build.Label.ToolPlanPresentDone",
+		failed = "Feature.Build.Label.ToolPlanPresentFailed",
+		running = "Feature.Build.Label.ToolPlanPresentRunning"
 	},
 	save_and_publish = {
-		completed = "Saved game",
-		failed = "Couldn't save game",
-		running = "Saving game"
+		completed = "Feature.Build.Label.ToolGameSaveDone",
+		failed = "Feature.Build.Label.ToolGameSaveFailed",
+		running = "Feature.Build.Label.ToolGameSaveRunning"
 	},
 	search_assets = {
-		completed = "Searched asset library",
-		failed = "Couldn't search asset library",
-		running = "Searching asset library"
+		completed = "Feature.Build.Label.ToolAssetSearchDone",
+		failed = "Feature.Build.Label.ToolAssetSearchFailed",
+		running = "Feature.Build.Label.ToolAssetSearchRunning"
 	},
 	set_game_thumbnail = {
-		completed = "Set game thumbnail",
-		failed = "Couldn't set game thumbnail",
-		running = "Setting game thumbnail"
+		completed = "Feature.Build.Label.ToolThumbnailDone",
+		failed = "Feature.Build.Label.ToolThumbnailFailed",
+		running = "Feature.Build.Label.ToolThumbnailRunning"
 	},
 	update_game_info = {
-		completed = "Updated game info",
-		failed = "Couldn't update game info",
-		running = "Updating game info"
+		completed = "Feature.Build.Label.ToolGameInfoDone",
+		failed = "Feature.Build.Label.ToolGameInfoFailed",
+		running = "Feature.Build.Label.ToolGameInfoRunning"
 	}
 }
 
-return {
-	AGENT_PLAN_BUILD = "Build",
-	AGENT_PLAN_OVERVIEW = "Overview",
-	AGENT_PLAN_VIEW = "View",
-	ANSWER_STACK_CUSTOM_ANSWER = "Custom answer",
-	ANSWER_STACK_NEXT = "Next",
-	ANSWER_STACK_SELECT_AN_OPTION = "Select an option",
-	ANSWER_STACK_SUBMIT = "Submit",
-	ARCHIVE_GAME_ARCHIVE = "Archive",
-	ARCHIVE_GAME_CANCEL = "Cancel",
-	ARCHIVE_GAME_DESCRIPTION = "If you archive this game, it will be removed from Build. You can still access and restore it from Creator Hub or Roblox Studio.",
-	ARCHIVE_GAME_TITLE = "Archive this game?",
-	BUILD_ASSISTANT_FALLBACK_NAME = "Build",
-	BUILD_ELIGIBILITY_DIALOG_ACTION = "OK",
-	BUILD_ELIGIBILITY_ERROR_DESCRIPTION = "Try again.",
-	BUILD_ELIGIBILITY_ERROR_TITLE = "Something went wrong",
-	BUILD_ELIGIBILITY_INELIGIBLE_DESCRIPTION = "Your account doesn't meet the requirements to use Build.",
-	BUILD_ELIGIBILITY_INELIGIBLE_TITLE = "Build isn't available",
-	BUILD_GREETING = "Hi",
-	BUILD_HEADER_TITLE = "Build",
-	BUILD_SEARCH_PLACEHOLDER = "Search games",
-	BUILD_SUBLINE = "What do you want to create today?",
-	BUILD_MENU_AGENTS = "Tasks",
-	BUILD_MENU_AUDIENCE = "Audience",
-	BUILD_MENU_BACK_TO_BUILD = "Back to Build",
-	BUILD_MENU_INVITE_TO_PLAYTEST = "Add to playtest",
-	BUILD_MENU_LOADING = "Loading...",
-	BUILD_MENU_PLAYTEST = "Playtest",
-	BUILD_MENU_PUBLISH = "Publish",
-	BUILD_MENU_PUBLISH_LATEST = "Publish latest",
-	CREATOR_CREDIT_BUY = "Buy",
-	CREATOR_CREDIT_DAILY_CAPTION = "Build usage resets daily",
-	CREATOR_CREDIT_DAILY_LABEL = "Daily Build usage",
-	CREATOR_CREDIT_EXTRA_DESCRIPTION = "Additional Build usage starts after your free daily usage runs out.",
-	CREATOR_CREDIT_EXTRA_LABEL = "Additional Build usage",
-	CREATOR_CREDIT_INSUFFICIENT_FUNDS = "You need more Build usage to continue.",
-	CREATOR_CREDIT_LOADING = "Loading Build usage…",
-	CREATOR_CREDIT_MENU_ITEM = "Usage",
-	CREATOR_CREDIT_PAGE_TITLE = "Build usage",
-	CREATOR_CREDIT_FREE_USAGE_LABEL = "Free Build usage",
-	CREATOR_CREDIT_FREE_USAGE_CAPTION = "Resets daily",
-	CREATOR_CREDIT_ADDITIONAL_USAGE_LABEL = "Get more Build usage",
-	CREATOR_CREDIT_ADDITIONAL_DAILY_USAGE_LABEL = "Additional Build usage",
-	CREATOR_CREDIT_AVAILABLE_SUFFIX = "available",
-	CREATOR_CREDIT_ADDITIONAL_USAGE_DESCRIPTION = "Use your Robux to automatically buy additional Build usage as you create. You can set a daily spend limit anytime.",
-	CREATOR_CREDIT_SET_DAILY_LIMIT = "Set a daily limit",
-	CREATOR_CREDIT_MANAGE_LIMIT = "Manage limit",
-	CREATOR_CREDIT_SETTINGS_SAVE_ERROR = "Couldn't save changes. Try again.",
-	CREATOR_CREDIT_LIMIT_SHEET_TITLE = "Set a daily limit",
-	CREATOR_CREDIT_LIMIT_SHEET_CONFIRM = "Set limit",
-	CREATOR_CREDIT_LIMIT_SHEET_NO_LIMIT = "No limit",
-	CREATOR_CREDIT_BUY_ROBUX_BUTTON = "Buy Robux",
-	CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = "No Robux left for Build usage",
-	CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = "Buy more Robux to keep creating, or wait for your free Build usage to reset tomorrow.",
-	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_TITLE = "Free Build usage limit reached",
-	CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_DESCRIPTION = "Buy more Build usage with Robux, or wait for your daily limit to reset.",
-	CREATOR_CREDIT_DAILY_LIMIT_REACHED_TITLE = "Daily Robux limit reached",
-	CREATOR_CREDIT_DAILY_LIMIT_REACHED_DESCRIPTION = "Increase your daily Robux limit to keep creating, or wait for it to reset tomorrow.",
-	CREATOR_CREDIT_ADJUST_LIMIT_BUTTON = "Manage limit",
-	CREATOR_CREDIT_VIEW_USAGE_BUTTON = "View usage",
-	CREATOR_CREDIT_NOT_NOW_BUTTON = "Not now",
-	CREATOR_CREDIT_BUY_ROBUX_SHEET_TITLE = "Buy Robux",
-	CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM = "Buy",
-	BUILD_MENU_SETTINGS = "Settings",
-	BUILD_MENU_SHARE = "Share",
-	BUILD_MENU_VERSION_HISTORY = "Version history",
-	CHAT_ASSIGNING_TASKS = "Working on your tasks",
-	CHAT_ASSISTANT_DISABLED = "Build unavailable.",
-	CHAT_ASSISTANT_LOADING = "Thinking",
-	CHAT_ASSISTANT_RESPONSE_FAILED = "Build couldn't respond. Try again.",
-	CHAT_ASSISTANT_STILL_WORKING = "Working on it. You can leave the app, play Roblox, or start another project while you wait.",
-	CHAT_ASSISTANT_STOPPED = "You stopped Build.",
-	CHAT_BUILD_CHAT_PAGE_TITLE = "New Game",
-	CHAT_COMPLETED_GAME_CREATION_DESCRIPTION = "I've completed creating and publishing your game. You can open it to playtest.",
-	CHAT_COMPLETED_GAME_CREATION_TITLE = "Completed game creation",
-	CHAT_COMPOSER_PLACEHOLDER = "Describe an idea",
-	CHAT_CREATE_UNIVERSE_ERROR = "Your game wasn't created. Try again.",
-	CHAT_DEFAULT_FAILURE = "Build couldn't connect. Try again.",
-	CHAT_ERROR_CONFLICT = "Build is busy. Wait a minute and try again.",
-	CHAT_ERROR_FORBIDDEN = "Build isn't available for your account right now.",
-	CHAT_ERROR_GONE = "This conversation is no longer available. Start a new one.",
-	CHAT_ERROR_INTERNAL = "Build ran into a problem. Try again.",
-	CHAT_ERROR_INVALID_PARAMS = "Something went wrong with your message. Edit it and try again.",
-	CHAT_ERROR_NOT_FOUND = "This conversation couldn't be found. Start a new one.",
-	CHAT_ERROR_OUT_OF_CREDITS = "You're out of Build usage. View your options to use Robux to keep creating.",
-	CHAT_ERROR_UNAUTHORIZED = "You're signed out. Sign in and try again.",
-	CHAT_ERROR_UPSTREAM_UNAVAILABLE = "Build is temporarily unavailable. Try again in a minute.",
-	CHAT_MISSING_PROJECT = "Create a new game to start using Build.",
-	CHAT_NOTIFICATION_DISABLED_DESCRIPTION = "Turn on notifications in your device settings to get updates from Build.",
-	CHAT_NOTIFICATION_PROMPT_DESCRIPTION = "Get notified when Build has a reply for you.",
-	CHAT_NOTIFICATION_PROMPT_TITLE = "Push notifications",
-	CHAT_NOT_NOW = "Not now",
-	CHAT_NOTIFY_ME = "Notify me",
-	CHAT_OPEN_SETTINGS = "Open settings",
-	CHAT_PLAYTEST = "Playtest",
-	CHAT_POLICY_REJECTION = "This message goes against our safety policy. Edit it and try again.",
-	CHAT_PORTRAIT_REQUIRED = "Turn your device to portrait mode to continue working on your game.",
-	CHAT_QUESTION_COMPOSER_ANSWER = "Answer Build's question below.",
-	CHAT_QUESTION_MULTIPLE = "Build has some questions",
-	CHAT_QUESTION_SINGLE = "Build has a question",
-	CHAT_REVERT_CONFIRMATION_DESCRIPTION = "This version will become your latest published version.",
-	CHAT_REVERT_FAILURE = "Your publish wasn't reverted. Try again.",
-	CHAT_REVERT_SUCCESS = "Reverted publish.",
-	CHAT_TOOL = "tool",
-	CHAT_TURN_ACTIVITY = "Turn activity",
-	CHAT_UPDATE_WITH_CHANGES = "Update with changes",
-	GAME_CONFIGURATION_ACCESS = "Access",
-	GAME_CONFIGURATION_ACCESS_AND_SHARING = "Access & sharing",
-	GAME_CONFIGURATION_ACCESS_BODY = "Choose who can play after you publish this experience.",
-	GAME_CONFIGURATION_ARCHIVE_GAME = "Archive game",
-	GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER = "This game was edited outside of Build. Complete the content questionnaire to publish.",
-	GAME_CONFIGURATION_AUDIENCE = "Audience",
-	GAME_CONFIGURATION_AUDIENCE_BANNER = "Expand your audience eligibility on Creator Hub",
-	GAME_CONFIGURATION_AUDIENCE_BODY = "Choose who can play after you publish this experience.",
-	GAME_CONFIGURATION_AUDIENCE_FRIENDS = "Friends",
-	GAME_CONFIGURATION_AUDIENCE_FRIENDS_ONLY = "Friends only",
-	GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE = "Not eligible for this audience",
-	GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE_DESCRIPTION = "Expand your audience eligibility on Creator Hub",
-	GAME_CONFIGURATION_AUDIENCE_PAGE_TITLE = "Experience audience",
-	GAME_CONFIGURATION_AUDIENCE_PRIVATE = "Private",
-	GAME_CONFIGURATION_AUDIENCE_PUBLIC = "Public",
-	GAME_CONFIGURATION_AUDIENCE_UNKNOWN = "Unknown",
-	GAME_CONFIGURATION_CONTENT_RATING = "Content rating",
-	GAME_CONFIGURATION_CREATOR_HUB = "Creator Hub",
-	GAME_CONFIGURATION_CREATOR_HUB_DESCRIPTION = "Manage all settings on Creator Hub",
-	GAME_CONFIGURATION_GAME_DETAILS = "Game details",
-	GAME_CONFIGURATION_GAME_DETAILS_BODY = "Manage how your game appears to others.",
-	GAME_CONFIGURATION_ICON_AND_THUMBNAILS = "Icon & thumbnails",
-	GAME_CONFIGURATION_LINK_COPIED = if FFlagEnableShareSheet then nil else "Link copied to clipboard.",
-	GAME_CONFIGURATION_LOADING = "Loading...",
-	GAME_CONFIGURATION_PREVIEW = "Preview",
-	GAME_CONFIGURATION_PUBLISH = "Publish",
-	GAME_CONFIGURATION_PUBLISH_AUDIENCE_ERROR = "Your game was published, but couldn't be made public. Try again.",
-	GAME_CONFIGURATION_PUBLISH_ERROR = "Your game couldn't be published. Try again.",
-	GAME_CONFIGURATION_PUBLISH_SUCCESS = "Your game is ready to play on Roblox!",
-	GAME_CONFIGURATION_SHARE = "Share",
-	GAME_CONFIGURATION_UPDATE_RATING = "Update rating",
-	GAME_CONFIGURATION_TITLE_AND_DESCRIPTION = "Title & description",
-	GENRE_ACTION_NAME = "Action",
-	GENRE_ACTION_DESCRIPTION = "Combat, shooting, brawling, and action-oriented gameplay.",
-	GENRE_BATTLE_ROYALE_NAME = "Battle Royale",
-	GENRE_BATTLE_ROYALE_DESCRIPTION = "Last-player-standing matches.",
-	GENRE_FIGHTING_NAME = "Fighting",
-	GENRE_FIGHTING_DESCRIPTION = "One-on-one or team combat.",
-	GENRE_ACTION_SHOOTER_NAME = "Shooter",
-	GENRE_ACTION_SHOOTER_DESCRIPTION = "First- or third-person shooting.",
-	GENRE_ADVENTURE_NAME = "Adventure",
-	GENRE_ADVENTURE_DESCRIPTION = "Exploration-driven gameplay with narrative or world goals.",
-	GENRE_EXPLORATION_NAME = "Exploration",
-	GENRE_EXPLORATION_DESCRIPTION = "Discover worlds and lore.",
-	GENRE_STORY_NAME = "Story",
-	GENRE_STORY_DESCRIPTION = "Narrative-driven adventures.",
-	GENRE_SCAVENGER_HUNT_NAME = "Scavenger Hunt",
-	GENRE_SCAVENGER_HUNT_DESCRIPTION = "Find-and-collect quests.",
-	GENRE_COMEDY_NAME = "Comedy",
-	GENRE_COMEDY_DESCRIPTION = "Humour-first experiences and party games.",
-	GENRE_MEMES_NAME = "Memes",
-	GENRE_MEMES_DESCRIPTION = "Memetic, parodic content.",
-	GENRE_FUNNY_ANIMATIONS_NAME = "Funny Animations",
-	GENRE_FUNNY_ANIMATIONS_DESCRIPTION = "Animation showcases.",
-	GENRE_HORROR_NAME = "Horror",
-	GENRE_HORROR_DESCRIPTION = "Scary, suspenseful, or thriller content.",
-	GENRE_SURVIVAL_HORROR_NAME = "Survival Horror",
-	GENRE_SURVIVAL_HORROR_DESCRIPTION = "Escape monsters or threats.",
-	GENRE_JUMPSCARE_NAME = "Jumpscare",
-	GENRE_JUMPSCARE_DESCRIPTION = "Reactive scare-driven gameplay.",
-	GENRE_LIFE_NAME = "Life",
-	GENRE_LIFE_DESCRIPTION = "Roleplay, avatar simulation, and slice-of-life experiences.",
-	GENRE_ROLEPLAY_NAME = "Roleplay",
-	GENRE_ROLEPLAY_DESCRIPTION = "Player-driven roleplay scenarios.",
-	GENRE_AVATAR_SIMULATOR_NAME = "Avatar Simulator",
-	GENRE_AVATAR_SIMULATOR_DESCRIPTION = "Avatar customisation and showcases.",
-	GENRE_SOCIAL_HANGOUT_NAME = "Social Hangout",
-	GENRE_SOCIAL_HANGOUT_DESCRIPTION = "Chat and hangout spaces.",
-	GENRE_PARTY_NAME = "Party",
-	GENRE_PARTY_DESCRIPTION = "Minigames and casual social play.",
-	GENRE_MINIGAMES_NAME = "Minigames",
-	GENRE_MINIGAMES_DESCRIPTION = "Collections of quick-play games.",
-	GENRE_OBBY_NAME = "Obby",
-	GENRE_OBBY_DESCRIPTION = "Obstacle courses and parkour.",
-	GENRE_PUZZLE_NAME = "Puzzle",
-	GENRE_PUZZLE_DESCRIPTION = "Logic, escape-room, and puzzle-solving gameplay.",
-	GENRE_ESCAPE_ROOM_NAME = "Escape Room",
-	GENRE_ESCAPE_ROOM_DESCRIPTION = "Locked-room puzzles.",
-	GENRE_TRIVIA_NAME = "Trivia",
-	GENRE_TRIVIA_DESCRIPTION = "Quiz-style questions.",
-	GENRE_RPG_NAME = "RPG",
-	GENRE_RPG_DESCRIPTION = "Character progression, classes, and stats.",
-	GENRE_MMORPG_NAME = "MMORPG",
-	GENRE_MMORPG_DESCRIPTION = "Massively multiplayer RPGs.",
-	GENRE_ACTION_RPG_NAME = "Action RPG",
-	GENRE_ACTION_RPG_DESCRIPTION = "Real-time combat RPGs.",
-	GENRE_TURN_BASED_RPG_NAME = "Turn-Based RPG",
-	GENRE_TURN_BASED_RPG_DESCRIPTION = "Strategic, turn-taking combat.",
-	GENRE_SHOOTER_NAME = "Shooter",
-	GENRE_SHOOTER_DESCRIPTION = "Dedicated shooting-mechanic experiences.",
-	GENRE_FPS_NAME = "FPS",
-	GENRE_FPS_DESCRIPTION = "First-person shooting.",
-	GENRE_TPS_NAME = "Third-Person Shooter",
-	GENRE_TPS_DESCRIPTION = "Third-person shooting.",
-	GENRE_SIMULATOR_NAME = "Simulator",
-	GENRE_SIMULATOR_DESCRIPTION = "Progression and collection-driven simulators.",
-	GENRE_INCREMENTAL_NAME = "Incremental",
-	GENRE_INCREMENTAL_DESCRIPTION = "Tap-and-grow gameplay.",
-	GENRE_TYCOON_NAME = "Tycoon",
-	GENRE_TYCOON_DESCRIPTION = "Build-and-manage tycoons.",
-	GENRE_SOCIAL_NAME = "Social",
-	GENRE_SOCIAL_DESCRIPTION = "Hangouts, dancing, and social-focused experiences.",
-	GENRE_DANCE_CLUB_NAME = "Dance Club",
-	GENRE_DANCE_CLUB_DESCRIPTION = "Dance and music venues.",
-	GENRE_SHOWCASE_NAME = "Showcase",
-	GENRE_SHOWCASE_DESCRIPTION = "Showcase or gallery worlds.",
-	GENRE_SPORTS_NAME = "Sports & Racing",
-	GENRE_SPORTS_DESCRIPTION = "Sports, racing, and athletics.",
-	GENRE_RACING_NAME = "Racing",
-	GENRE_RACING_DESCRIPTION = "Vehicle or foot races.",
-	GENRE_TEAM_SPORTS_NAME = "Team Sports",
-	GENRE_TEAM_SPORTS_DESCRIPTION = "Football, basketball, etc.",
-	GENRE_STRATEGY_NAME = "Strategy",
-	GENRE_STRATEGY_DESCRIPTION = "Real-time and turn-based strategy games.",
-	GENRE_RTS_NAME = "RTS",
-	GENRE_RTS_DESCRIPTION = "Real-time strategy.",
-	GENRE_TOWER_DEFENSE_NAME = "Tower Defense",
-	GENRE_TOWER_DEFENSE_DESCRIPTION = "Defend against waves.",
-	GENRE_SURVIVAL_NAME = "Survival",
-	GENRE_SURVIVAL_DESCRIPTION = "Resource management and survival gameplay.",
-	GENRE_OPEN_WORLD_SURVIVAL_NAME = "Open World Survival",
-	GENRE_OPEN_WORLD_SURVIVAL_DESCRIPTION = "Sandbox survival.",
-	GENRE_ZOMBIE_SURVIVAL_NAME = "Zombie Survival",
-	GENRE_ZOMBIE_SURVIVAL_DESCRIPTION = "Survive waves of enemies.",
-	GENRE_UTILITY_NAME = "Utility",
-	GENRE_UTILITY_DESCRIPTION = "Non-game experiences (showrooms, education).",
-	GENRE_EDUCATION_NAME = "Education",
-	GENRE_EDUCATION_DESCRIPTION = "Learning-focused experiences.",
-	GENRE_SHOWROOM_NAME = "Showroom",
-	GENRE_SHOWROOM_DESCRIPTION = "Brand or product showcases.",
-	GENRE_VEHICLE_NAME = "Vehicle Sim",
-	GENRE_VEHICLE_DESCRIPTION = "Vehicle-centric simulation gameplay.",
-	GENRE_DRIVING_NAME = "Driving",
-	GENRE_DRIVING_DESCRIPTION = "Open-world driving sims.",
-	GENRE_FLIGHT_NAME = "Flight",
-	GENRE_FLIGHT_DESCRIPTION = "Aircraft simulators.",
-	GENRE_NONE_NAME = "None",
-	GENRE_NONE_DESCRIPTION = "No genre selected.",
-	MEDIA_SELECTION_CAPTURE_LIBRARY = "Capture library",
-	MEDIA_SELECTION_DELETE = "Delete",
-	MEDIA_SELECTION_TITLE = "Icon & thumbnails",
-	MEDIA_SELECTION_VIDEO = "Video",
-	MY_CREATIONS_BUILD_WITH_AI = "Turn your ideas into a game",
-	MY_CREATIONS_BUILDING = "Building...",
-	MY_CREATIONS_INPUT_NEEDED = "Input needed",
-	MY_CREATIONS_LOAD_ERROR = "Couldn't load experiences",
-	MY_CREATIONS_NEW_GAME = "New game",
-	MY_CREATIONS_PRIVATE = "Private",
-	MY_CREATIONS_PUBLIC = "Public",
-	MY_CREATIONS_PUBLICLY_UNAVAILABLE = "Publicly unavailable",
-	MY_CREATIONS_READY = "Ready",
-	MY_CREATIONS_RESTRICTED = "Limited",
-	PLAYTEST_DISABLED_TOOLTIP = "You can start playtesting after you create your first game.",
-	PLAYTEST_TITLE = "Playtest",
-	PRIVATE_INVITES_ADD_PLAYTESTER = "Add playtester",
-	PRIVATE_INVITES_ADD_PLAYTESTERS = "Add playtesters",
-	PRIVATE_INVITES_ALL_FRIENDS_ADDED = "You've added all your friends as playtesters.",
-	PRIVATE_INVITES_FRIENDS_LOAD_ERROR = "Couldn't load friends. Try again.",
-	PRIVATE_INVITES_INVITE_BUTTON = "Add friends",
-	PRIVATE_INVITES_NO_FRIENDS = "You don't have any friends to add yet. Find people to connect with on Roblox first.",
-	PRIVATE_INVITES_PAGE_TITLE = "Playtesters",
-	PRIVATE_INVITES_ROW_DESCRIPTION = "Choose friends to help you playtest.",
-	PRIVATE_INVITES_ROW_LOAD_ERROR = "Couldn't load invites",
-	PRIVATE_INVITES_ROW_TITLE = "Playtesters",
-	PRIVATE_INVITES_ROW_TITLE_EMPTY = "Add to playtest",
-	PRIVATE_INVITES_SEARCH_PLACEHOLDER = "Search",
-	PRIVATE_INVITES_SEND = "Send invites separately",
-	PRIVATE_INVITES_SHARE_LINK = "Share link",
-	PRIVATE_INVITES_SHARE_LINK_ERROR = "Couldn't create the share link. Try again.",
-	PRIVATE_INVITES_SHARE_WITH_FRIENDS = "Share with friends you added",
-	PRIVATE_INVITES_SHARE_WITH_FRIENDS_BUTTON = "Share",
-	PRIVATE_INVITES_TITLE = "Add friends to help you playtest",
-	PRIVATE_INVITES_UNKNOWN_USER = "Unknown",
-	PUBLISH_CONTENT_BODY = "By publishing, you agree that this content rating is accurate.",
-	PUBLISH_CONTENT_MATURITY = "Content maturity",
-	PUBLISH_CONTENT_TITLE = "Content",
-	PUBLISH_GAME_SHEET_CAPTION = "Who can play your game depends on our account verification criteria.",
-	PUBLISH_GAME_SHEET_PUBLISH = "Publish",
-	PUBLISH_GAME_SHEET_TITLE = "Configure game",
-	PUBLISH_VERSION_INFORMATION_BODY = "Tell players what's changed in this version.",
-	PUBLISH_VERSION_INFORMATION_TITLE = "Version Information",
-	PUBLISH_VERSION_TITLE_DESCRIPTION = "Version title & description",
-	SHARE_AUDIENCE_CANCEL = "Cancel",
-	SHARE_AUDIENCE_FRIENDS_ONLY_DESCRIPTION = "Only your friends can access this link. Change your game's Audience setting if you want more people to play.",
-	SHARE_AUDIENCE_FRIENDS_ONLY_TITLE = "Only friends can play",
-	SHARE_AUDIENCE_PLAYTESTERS_ONLY_DESCRIPTION = "Add friends as playtesters or change your game's Audience setting to let more people play.",
-	SHARE_AUDIENCE_PLAYTESTERS_ONLY_TITLE = "Only playtesters can play",
-	SHARE_AUDIENCE_PRIVATE_DESCRIPTION = "Change your game's Audience setting to share it.",
-	SHARE_AUDIENCE_PRIVATE_TITLE = "This game is private",
-	SHARE_AUDIENCE_SHARE = "Share",
-	SUBAGENT_STATUS_AGENTS = "Tasks",
-	SUBAGENT_STATUS_ALL = "All",
-	SUBAGENT_STATUS_BUILDING = "Building...",
-	SUBAGENT_STATUS_DELETED = "Deleted",
-	SUBAGENT_STATUS_DONE = "Done",
-	SUBAGENT_STATUS_ERROR = "Error",
-	SUBAGENT_STATUS_IN_PROGRESS = "In progress",
-	SUBAGENT_STATUS_NOT_STARTED = "Not started",
-	SUBAGENT_STATUS_PENDING = "Pending",
-	SUBAGENT_STATUS_SEARCH_TASKS = "Search tasks",
-	SUBAGENT_STATUS_VERSION = "Version",
-	TITLE_DESCRIPTION_DESCRIPTION_LABEL = "Description",
-	TITLE_DESCRIPTION_TITLE_LABEL = "Title",
-	TITLE_DESCRIPTION_TITLE = "Title & description",
-	USER_PICKER_NO_RESULTS = "No results",
-	VERSION_HISTORY_AUTOSAVED = "Autosaved",
-	VERSION_HISTORY_CANCEL = "Cancel",
-	VERSION_HISTORY_EMPTY = "No version history yet.",
-	VERSION_HISTORY_FALLBACK_DESCRIPTION = "No description provided.",
-	VERSION_HISTORY_HIDE_AUTOSAVED = "Hide autosaved",
-	VERSION_HISTORY_LOAD_FAILED = "Version history couldn't load.",
-	VERSION_HISTORY_LOADING = "Loading version history...",
-	VERSION_HISTORY_PREVIOUSLY_PUBLISHED = "Previously published",
-	VERSION_HISTORY_PUBLISHED = "Published",
-	VERSION_HISTORY_RESTORE = "Restore",
-	VERSION_HISTORY_RESTORE_FAILED = "Couldn't restore this version. Try again.",
-	VERSION_HISTORY_TITLE = "Version history",
-	formatBuildGreeting = function(s1: string) -- line: 107
-		if s1 ~= "" then
-			return `Hi, { s1 }`
-		end
+if FFlagBuildExperienceMonetizationNativeUI then
+	v.manage_developer_product = {
+		completed = "Feature.Build.Title.DeveloperProduct",
+		failed = "Feature.Build.Title.DeveloperProduct",
+		running = "Feature.Build.Title.DeveloperProduct"
+	}
 
-		return "Hi"
-	end,
-	formatGameSharedWithTarget = function(s2: string) -- line: 115
-		if s2 == "" then
-			return "Game shared"
-		end
+	v.manage_game_pass = {
+		completed = "Feature.Build.Title.GamePass",
+		failed = "Feature.Build.Title.GamePass",
+		running = "Feature.Build.Title.GamePass"
+	}
 
-		return `Game shared with { s2 }`
-	end,
-	formatShareExperience = function(s3: string) -- line: 111
-		return `Share { s3 }`
-	end,
-	formatChatFailedTool = function(s4: string) -- line: 157
-		return `Failed { s4 }`
-	end,
-	formatChatFinishedTool = function(s5: string) -- line: 153
-		return `Finished { s5 }`
-	end,
-	formatChatRunningTool = function(s6: string) -- line: 161
-		return `Running { s6 }`
-	end,
-	formatChatTaskCount = function(n1: number) -- line: 134
-		if n1 == 1 then
-			return "1 task completed"
-		end
+	v.manage_subscription = {
+		completed = "Feature.Build.Title.Subscription",
+		failed = "Feature.Build.Title.Subscription",
+		running = "Feature.Build.Title.Subscription"
+	}
 
-		return `{ n1 } tasks completed`
-	end,
-	formatChatThinkingDuration = function(n2: number) -- line: 148
-		return `Thinking for { math.max(0, (math.floor(n2))) }s`
-	end,
-	formatChatTurnFailureMessage = function(s7: string, n3: number?) -- line: 130
-		if n3 ~= nil then
-			return `({ n3 }) { s7 }`
-		end
-
-		return s7
-	end,
-	formatChatWorkedDuration = function(n4: number) -- line: 138
-		local v13 = math.max(0, (math.floor(n4 + 0.5)))
-
-		if v13 < 60 then
-			return `Worked for { v13 }s`
-		end
-
-		return `Worked for { math.floor(v13 / 60) }m{ v13 % 60 }s`
-	end,
-	getChatToolActivityLabel = function(s8: string, s9: string?) -- line: 165
-		-- upvalues: t1 (copy)
-		local v20 = t1[s8]
-
-		if v20 == nil then
-			return nil
-		end
-
-		if s9 == "completed" then
-			return v20.completed
-		end
-
-		if s9 == "failed" then
-			return v20.failed
-		end
-
-		return v20.running
-	end,
-	formatMyCreationsUniverseName = function(n5: number) -- line: 122
-		return `Universe { n5 }`
-	end,
-	formatPrivateInvitesCount = function(n6: number, n7: number) -- line: 210
-		return `{ n6 }/{ n7 }`
-	end,
-	formatPrivateInvitesSent = function(n8: number, n9: number) -- line: 206
-		return `{ n8 } of { n9 } playtesters added`
-	end,
-	formatPrivateInvitesSubtitle = function(n10: number) -- line: 202
-		return `Choose up to { n10 } friends, then share the link to the game.`
-	end,
-	formatSubagentStatusCompletedTasks = function(n11: number) -- line: 126
-		return `{ n11 } completed tasks`
-	end,
-	formatUserPickerUsername = function(s10: string) -- line: 214
-		return `@{ s10 }`
-	end,
-	formatVersionHistoryCreatedDate = function(s11: string, n12: number, s12: string) -- line: 190
-		return `{ s11 } { n12 }, { s12 }`
-	end,
-	formatVersionHistoryRestoredBadge = function(n13: number) -- line: 186
-		return `Restored { (if not (n13 < 10) then `v{ n13 }` else `v0{ n13 }`) }`
-	end,
-	formatVersionHistoryVersionLabel = function(n14: number, s13: string) -- line: 198
-		return `{ (if not (n14 < 10) then `v{ n14 }` else `v0{ n14 }`) } · { s13 }`
-	end,
-	formatVersionHistoryVersionNumber = function(n15: number) -- line: 179
-		if n15 < 10 then
-			return `v0{ n15 }`
-		end
-
-		return `v{ n15 }`
-	end,
-	formatVersionHistoryVersionTitle = function(n16: number) -- line: 194
-		return `Version { n16 }`
-	end,
-	formatCreatorCreditAdditionalUsed = function(s14: string, s15: string) -- line: 248
-		return `{ s14 } of { s15 } used`
-	end,
-	formatCreatorCreditAdditionalUsedNoLimit = function(s16: string) -- line: 252
-		return `{ s16 } used • No limit`
-	end,
-	formatCreatorCreditLimitBelowSpend = function(s17: string) -- line: 256
-		return `Limit can't be below the { s17 } Robux already spent today.`
-	end,
-	formatCreatorCreditPercentUsed = function(n17: number) -- line: 222
-		local v38 = math.floor(n17 + 0.5)
-
-		if v38 < 0 then
-			v38 = 0
-		end
-
-		if v38 > 100 then
-			v38 = 100
-		end
-
-		return `{ v38 }% used`
-	end,
-	formatCreatorCreditRobuxUsage = function(s18: string, s19: string) -- line: 233
-		return `{ s18 }/{ s19 }`
-	end,
-	formatCreatorCreditRobuxUsageUnlimited = function(s20: string) -- line: 237
-		return `{ s20 } used`
-	end,
-	formatCreatorCreditResetHours = function(n18: number) -- line: 241
-		if n18 == 1 then
-			return "Resets in 1 hour"
-		end
-
-		return `Resets in { n18 } hours`
-	end,
-	formatCreatorCreditUsageTrailing = function(s21: string, s22: string) -- line: 218
-		return `{ s21 } of { s22 }`
+	if SharedFlags.FFlagBuildExperienceManageMonetizationTool then
+		v.manage_monetization = {
+			completed = "Feature.Build.Title.Monetization",
+			failed = "Feature.Build.Title.Monetization",
+			running = "Feature.Build.Title.Monetization"
+		}
 	end
+end
+
+v.inspect_client_instance = {
+	completed = "Feature.Build.Label.ToolInspectDone",
+	failed = "Feature.Build.Label.ToolInspectFailed",
+	running = "Feature.Build.Label.ToolInspectRunning"
 }
+
+v.search_client_datamodel = {
+	completed = "Feature.Build.Label.ToolClientDMDone",
+	failed = "Feature.Build.Label.ToolClientDMFailed",
+	running = "Feature.Build.Label.ToolClientDMRunning"
+}
+
+if FFlagBuildExperienceToolLocalization then
+	v.ask_analytics_agent = {
+		completed = "Feature.Build.Label.ToolAnalyticsDone",
+		failed = "Feature.Build.Label.ToolAnalyticsFailed",
+		running = "Feature.Build.Label.ToolAnalyticsRunning"
+	}
+
+	v.check_ad_campaign_eligibility = {
+		completed = "Feature.Build.Label.ToolAdEligibilityDone",
+		failed = "Feature.Build.Label.ToolAdEligibilityFailed",
+		running = "Feature.Build.Label.ToolAdEligibilityRunning"
+	}
+
+	v.compile_luau = {
+		completed = "Feature.Build.Label.ToolCompileDone",
+		failed = "Feature.Build.Label.ToolCompileFailed",
+		running = "Feature.Build.Label.ToolCompileRunning"
+	}
+
+	v.verify_luau = {
+		completed = "Feature.Build.Label.ToolVerifyDone",
+		failed = "Feature.Build.Label.ToolVerifyFailed",
+		running = "Feature.Build.Label.ToolVerifyRunning"
+	}
+
+	v.lookup_engine_api_docs = {
+		completed = "Feature.Build.Label.ToolApiDocsDone",
+		failed = "Feature.Build.Label.ToolApiDocsFailed",
+		running = "Feature.Build.Label.ToolApiDocsRunning"
+	}
+
+	v.restore_version = {
+		completed = "Feature.Build.Label.ToolRestoreVersionDone",
+		failed = "Feature.Build.Label.ToolRestoreVersionFailed",
+		running = "Feature.Build.Label.ToolRestoreVersionRunning"
+	}
+end
+
+local LocalizationStrings = {}
+LocalizationStrings.AD_UPSELL_CARD_CREATE = "Feature.Build.Action.Create"
+LocalizationStrings.AD_UPSELL_CARD_DESC = "Feature.Build.Description.BoostAudienceForPlays"
+LocalizationStrings.AD_UPSELL_CARD_DONT_SHOW_AGAIN = "Feature.Build.Action.DontShowAgain"
+LocalizationStrings.AD_UPSELL_CARD_TITLE = "Feature.Build.Title.PromoteGameFree"
+LocalizationStrings.AD_UPSELL_FREE_TITLE = "Feature.Build.Title.PromoteGameFreeSingular"
+LocalizationStrings.AD_UPSELL_FREE_TITLE_PLURAL = "Feature.Build.Title.PromoteGameFreePlural"
+LocalizationStrings.AD_UPSELL_FREE_DESC = "Feature.Build.Description.PromoteGameFree"
+LocalizationStrings.AD_UPSELL_NO_FREE_TITLE = "Feature.Build.Title.PromoteGamePaid"
+LocalizationStrings.AD_UPSELL_NO_FREE_DESC = "Feature.Build.Description.PromoteGamePaid"
+LocalizationStrings.AD_UPSELL_CONGRATS = "Feature.Build.Message.PublishPromotionUpsell"
+LocalizationStrings.AD_UPSELL_CONGRATS_SINGULAR = "Feature.Build.Message.PublishPromotionUpsellSingular"
+LocalizationStrings.AGENT_PLAN_BUILD = "Feature.Build.Action.Build"
+LocalizationStrings.AGENT_PLAN_OVERVIEW = "Feature.Build.Header.Overview"
+LocalizationStrings.AGENT_PLAN_VIEW = "Feature.Build.Action.View"
+LocalizationStrings.AGENT_DEV_PRODUCT_APPROVE = "Feature.Build.Action.Approve"
+LocalizationStrings.AGENT_DEV_PRODUCT_ACTIVATE = "Feature.Build.Description.ActivateDeveloperProduct"
+LocalizationStrings.AGENT_DEV_PRODUCT_CREATE = "Feature.Build.Description.CreateDeveloperProduct"
+LocalizationStrings.AGENT_DEV_PRODUCT_DEFAULT_NAME = "Feature.Build.Label.DefaultDeveloperProductName"
+LocalizationStrings.AGENT_DEV_PRODUCT_DEACTIVATE = "Feature.Build.Description.DeactivateDeveloperProduct"
+LocalizationStrings.AGENT_DEV_PRODUCT_DESCRIPTION = "Feature.Build.Label.DeveloperProductDescription"
+LocalizationStrings.AGENT_DEV_PRODUCT_MANAGE = "Feature.Build.Description.ManageDeveloperProduct"
+LocalizationStrings.AGENT_DEV_PRODUCT_NAME = "Feature.Build.Label.DeveloperProductName"
+LocalizationStrings.AGENT_DEV_PRODUCT_PRICE = "Feature.Build.Label.DeveloperProductPrice"
+LocalizationStrings.AGENT_DEV_PRODUCT_PRICE_UNAVAILABLE = "Feature.Build.Label.DeveloperProductPriceUnavailable"
+LocalizationStrings.AGENT_DEV_PRODUCT_REJECT = "Feature.Build.Action.Reject"
+LocalizationStrings.AGENT_DEV_PRODUCT_TITLE = "Feature.Build.Title.DeveloperProduct"
+LocalizationStrings.AGENT_DEV_PRODUCT_UPDATE = "Feature.Build.Description.UpdateDeveloperProduct"
+LocalizationStrings.AGENT_GAME_PASS_ACTIVATE = "Feature.Build.Description.ActivateGamePass"
+LocalizationStrings.AGENT_GAME_PASS_CREATE = "Feature.Build.Description.CreateGamePass"
+LocalizationStrings.AGENT_GAME_PASS_DEACTIVATE = "Feature.Build.Description.DeactivateGamePass"
+LocalizationStrings.AGENT_GAME_PASS_TITLE = "Feature.Build.Title.GamePass"
+LocalizationStrings.AGENT_GAME_PASS_UPDATE = "Feature.Build.Description.UpdateGamePass"
+LocalizationStrings.AGENT_MONETIZATION_CREATE_TITLE = "Feature.Build.Label.MonetizationCreateTitle"
+LocalizationStrings.AGENT_SUBSCRIPTION_ACTIVATE = "Feature.Build.Description.ActivateSubscription"
+LocalizationStrings.AGENT_SUBSCRIPTION_CREATE = "Feature.Build.Description.CreateSubscription"
+LocalizationStrings.AGENT_SUBSCRIPTION_DEACTIVATE = "Feature.Build.Description.DeactivateSubscription"
+LocalizationStrings.AGENT_SUBSCRIPTION_DEACTIVATE_CANCEL_RENEWALS = "Feature.Build.Description.DeactivateSubscriptionCancelRenewals"
+LocalizationStrings.AGENT_SUBSCRIPTION_DELETE = "Feature.Build.Description.DeleteSubscription"
+LocalizationStrings.AGENT_SUBSCRIPTION_PRODUCT_TYPE = "Feature.Build.Label.SubscriptionProductType"
+LocalizationStrings.AGENT_SUBSCRIPTION_PRODUCT_TYPE_CONSUMABLE = "Feature.Build.Label.SubscriptionProductTypeConsumable"
+LocalizationStrings.AGENT_SUBSCRIPTION_PRODUCT_TYPE_CURRENCY = "Feature.Build.Label.SubscriptionProductTypeCurrency"
+LocalizationStrings.AGENT_SUBSCRIPTION_PRODUCT_TYPE_DURABLE = "Feature.Build.Label.SubscriptionProductTypeDurable"
+LocalizationStrings.AGENT_SUBSCRIPTION_TITLE = "Feature.Build.Title.Subscription"
+LocalizationStrings.AGENT_SUBSCRIPTION_UPDATE = "Feature.Build.Description.UpdateSubscription"
+LocalizationStrings.ANALYTICS_DURATION_TEMPLATE = "Feature.Build.Analytics.DurationHours"
+LocalizationStrings.ANALYTICS_METRIC_TITLE_ARPPU = "Feature.Build.Analytics.Title.Arppu"
+LocalizationStrings.ANALYTICS_METRIC_TITLE_D1_RETENTION = "Feature.Build.Analytics.Title.D1Retention"
+LocalizationStrings.ANALYTICS_METRIC_TITLE_DAILY_ACTIVE_USERS = "Feature.Build.Analytics.Title.DailyActiveUsers"
+LocalizationStrings.ANALYTICS_METRIC_TITLE_PAYER_CONVERSION = "Feature.Build.Analytics.Title.PayerConversion"
+LocalizationStrings.ANALYTICS_METRIC_TITLE_PLAYTHROUGH_RATE = "Feature.Build.Analytics.Title.PlaythroughRate"
+LocalizationStrings.ANALYTICS_METRIC_TITLE_TOTAL_PLAYTIME = "Feature.Build.Analytics.Title.TotalPlaytime"
+LocalizationStrings.ANALYTICS_PERCENT_TEMPLATE = "Feature.Build.Analytics.Percent"
+LocalizationStrings.ADS_STATS_AD_CLICKS = "Feature.Build.Label.AdClicks"
+LocalizationStrings.ADS_STATS_AD_VIEWS = "Feature.Build.Label.AdViews"
+LocalizationStrings.ADS_STATS_ADS_MANAGER = "Feature.Build.Label.AdsManager"
+LocalizationStrings.ADS_STATS_DATE_RANGE = "Feature.Build.Label.DateRange"
+LocalizationStrings.ADS_STATS_ERROR = "Feature.Build.Message.AdPerformanceLoadFailed"
+LocalizationStrings.ADS_STATS_GAME_PLAYS = "Feature.Build.Label.GamePlays"
+LocalizationStrings.ADS_STATS_PAGE_TITLE = "Feature.Build.Title.GetUsers"
+LocalizationStrings.ADS_STATS_PAST_CAMPAIGNS = "Feature.Build.Header.PastCampaigns"
+LocalizationStrings.ADS_STATS_PLAY_TIME = "Feature.Build.Label.PlayTime"
+LocalizationStrings.ANSWER_FORM_CUSTOM_OPTION = "Feature.Build.Action.AddCustomOption"
+LocalizationStrings.ANSWER_FORM_ANSWERS = "Feature.Build.Header.Answers"
+LocalizationStrings.ANSWER_STACK_CUSTOM_ANSWER = "Feature.Build.Header.CustomAnswer"
+LocalizationStrings.ANSWER_STACK_NEXT = "Feature.Build.Action.Next"
+LocalizationStrings.ANSWER_STACK_SELECT_AN_OPTION = "Feature.Build.Label.SelectOption"
+LocalizationStrings.ANSWER_STACK_SUBMIT = "Feature.Build.Action.Submit"
+LocalizationStrings.ARCHIVE_GAME_ARCHIVE = "Feature.Build.Action.Archive"
+LocalizationStrings.ARCHIVE_GAME_CANCEL = "Feature.Build.Action.Cancel"
+LocalizationStrings.ARCHIVE_GAME_DESCRIPTION = "Feature.Build.Description.ArchiveRemoval"
+LocalizationStrings.ARCHIVE_GAME_TITLE = "Feature.Build.Title.ArchiveThisGame"
+LocalizationStrings.BUILD_ASSISTANT_FALLBACK_NAME = "Feature.Build.Action.Build"
+LocalizationStrings.BUILD_ELIGIBILITY_DIALOG_ACTION = "Feature.Build.Action.OK"
+LocalizationStrings.BUILD_ELIGIBILITY_ERROR_DESCRIPTION = "Feature.Build.Message.TryAgain"
+LocalizationStrings.BUILD_ELIGIBILITY_ERROR_TITLE = "Feature.Build.Title.GenericError"
+LocalizationStrings.BUILD_ELIGIBILITY_INELIGIBLE_DESCRIPTION = "Feature.Build.Message.AccountRequirements"
+LocalizationStrings.BUILD_ELIGIBILITY_INELIGIBLE_TITLE = "Feature.Build.Title.BuildUnavailable"
+LocalizationStrings.BUILD_GREETING = "Feature.Build.Label.Hi"
+LocalizationStrings.BUILD_GREETING_WITH_NAME = "Feature.Build.Message.HiDisplayName"
+LocalizationStrings.BUILD_HEADER_TITLE = "Feature.Build.Action.Build"
+LocalizationStrings.BUILD_HOME_TAB_GAMES = "Feature.Build.Label.GamesTab"
+LocalizationStrings.BUILD_HOME_TAB_PREVIEWS = "Feature.Build.Label.PreviewsTab"
+LocalizationStrings.BUILD_SEARCH_PLACEHOLDER = "Feature.Build.Label.SearchGames"
+LocalizationStrings.BUILD_SUBLINE = "Feature.Build.Message.WhatToCreate"
+LocalizationStrings.BUILD_MENU_AUDIENCE = "Feature.Build.Title.Audience"
+LocalizationStrings.BUILD_MENU_BACK_TO_BUILD = "Feature.Build.Label.BackToBuild"
+LocalizationStrings.BUILD_MENU_GET_USERS = "Feature.Build.Title.GetUsers"
+LocalizationStrings.BUILD_MENU_GET_USERS_FREE_TAG = "Feature.Build.Label.Free"
+LocalizationStrings.PROMOTION_CREATE_BUTTON = "Feature.Build.Action.Create"
+LocalizationStrings.ADS_STATS_EMPTY_TITLE = "Feature.Build.Title.AdsStatsEmpty"
+LocalizationStrings.ADS_STATS_EMPTY_SUBTITLE = "Feature.Build.Message.AdsStatsEmpty"
+LocalizationStrings.ADS_STATS_EMPTY_TITLE_FREE = "Feature.Build.Title.AdsStatsEmptyFree"
+LocalizationStrings.ADS_STATS_EMPTY_SUBTITLE_FREE = "Feature.Build.Message.AdsStatsEmptyFree"
+LocalizationStrings.ADS_STATS_CREATE_SUCCESS = "Feature.Build.Title.AdCreatedPeriod"
+LocalizationStrings.BUILD_MENU_INVITE_TO_PLAYTEST = "Feature.Build.Action.AddToPlaytest"
+LocalizationStrings.BUILD_MENU_LOADING = "Feature.Build.Label.Loading"
+LocalizationStrings.MODEL_PICKER_TITLE = "Feature.Build.Title.ChooseModel"
+LocalizationStrings.MODEL_PICKER_UNAVAILABLE = "Feature.Build.Label.ModelUnavailable"
+LocalizationStrings.MODEL_PICKER_DEFAULT_LABEL = "Feature.Build.Label.DefaultModel"
+LocalizationStrings.MODEL_PICKER_DEFAULT_DESCRIPTION = "Feature.Build.Description.DefaultModel"
+LocalizationStrings.MODEL_PICKER_ADVANCED_LABEL = "Feature.Build.Label.AdvancedModel"
+LocalizationStrings.MODEL_PICKER_ADVANCED_DESCRIPTION = "Feature.Build.Description.AdvancedModel"
+LocalizationStrings.MODEL_PICKER_INTERNAL_LABEL = "Feature.Build.Label.InternalTesting"
+LocalizationStrings.MODEL_PICKER_INTERNAL_DESCRIPTION = "Feature.Build.Description.InternalTesting"
+LocalizationStrings.MODEL_PICKER_INTERNAL_SPEC_LABEL = "Feature.Build.Label.InternalSpec"
+LocalizationStrings.MODEL_PICKER_INTERNAL_SPEC_PLACEHOLDER = "Feature.Build.Placeholder.InternalSpec"
+LocalizationStrings.MODEL_PICKER_INTERNAL_SPEC_HINT = "Feature.Build.Description.InternalSpec"
+LocalizationStrings.BUILD_MENU_PLAYTEST = "Feature.Build.Action.Playtest"
+LocalizationStrings.BUILD_MENU_PUBLISH = "Feature.Build.Action.Publish"
+LocalizationStrings.BUILD_MENU_PUBLISH_LATEST = "Feature.Build.Action.PublishLatest"
+LocalizationStrings.CREATOR_CREDIT_BUY = "Feature.Build.Action.Buy"
+LocalizationStrings.CREATOR_CREDIT_MENU_ITEM = "Feature.Build.Label.Usage"
+LocalizationStrings.CREATOR_CREDIT_PAGE_TITLE = "Feature.Build.Title.BuildUsage"
+LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_LABEL = "Feature.Build.Label.FreeBuildUsage"
+LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_CAPTION = "Feature.Build.Label.ResetsDaily"
+LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_CAPTION_WEEKLY = "Feature.Build.Label.ResetsWeekly"
+LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_CAPTION_MONTHLY = "Feature.Build.Label.ResetsMonthly"
+LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USAGE_LABEL = "Feature.Build.Label.GetMoreBuildUsage"
+LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_DAILY_USAGE_LABEL = "Feature.Build.Label.AdditionalUsage"
+LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USED = "Feature.Build.Label.AdditionalUsed"
+LocalizationStrings.CREATOR_CREDIT_AMOUNT_AVAILABLE = "Feature.Build.Label.AmountAvailable"
+LocalizationStrings.CREATOR_CREDIT_AVAILABLE_SUFFIX = "Feature.Build.Label.Available"
+LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USAGE_DESCRIPTION = "Feature.Build.Description.AutoBuyUsage"
+LocalizationStrings.CREATOR_CREDIT_SET_DAILY_LIMIT = "Feature.Build.Action.SetDailyLimit"
+LocalizationStrings.CREATOR_CREDIT_MANAGE_LIMIT = "Feature.Build.Action.ManageLimit"
+LocalizationStrings.CREATOR_CREDIT_SETTINGS_SAVE_ERROR = "Feature.Build.Message.SaveChangesFailed"
+LocalizationStrings.CREATOR_CREDIT_LIMIT_SHEET_TITLE = "Feature.Build.Action.SetDailyLimit"
+LocalizationStrings.CREATOR_CREDIT_LIMIT_SHEET_CONFIRM = "Feature.Build.Action.SetLimit"
+LocalizationStrings.CREATOR_CREDIT_LIMIT_BELOW_SPEND = "Feature.Build.Message.LimitBelowSpend"
+LocalizationStrings.CREATOR_CREDIT_LIMIT_SHEET_NO_LIMIT = "Feature.Build.Label.NoLimit"
+LocalizationStrings.CREATOR_CREDIT_PERCENT_USED = "Feature.Build.Label.PercentUsed"
+LocalizationStrings.CREATOR_CREDIT_RESET_HOURS = "Feature.Build.Message.ResetHours"
+LocalizationStrings.CREATOR_CREDIT_RESET_ONE_HOUR = "Feature.Build.Message.ResetOneHour"
+LocalizationStrings.CREATOR_CREDIT_ROBUX_USAGE = "Feature.Build.Label.RobuxUsage"
+LocalizationStrings.CREATOR_CREDIT_USAGE_USED = "Feature.Build.Label.UsageUsed"
+LocalizationStrings.CREATOR_CREDIT_UNLIMITED_USED = "Feature.Build.Label.UnlimitedUsed"
+LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_BUTTON = "Feature.Build.Action.BuyRobux"
+LocalizationStrings.CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = "Feature.Build.Title.NoRobuxForUsage"
+LocalizationStrings.CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = "Feature.Build.Description.BuyRobuxToCreate"
+LocalizationStrings.CREATOR_CREDIT_INSUFFICIENT_ROBUX_TITLE = "Feature.Build.Title.InsufficientRobuxForModel"
+LocalizationStrings.CREATOR_CREDIT_INSUFFICIENT_ROBUX_DEFAULT_AMOUNT_DESCRIPTION = "Feature.Build.Description.RequiredRobuxForDefault"
+LocalizationStrings.CREATOR_CREDIT_INSUFFICIENT_ROBUX_ADVANCED_AMOUNT_DESCRIPTION = "Feature.Build.Description.RequiredRobuxForAdvanced"
+LocalizationStrings.CREATOR_CREDIT_FREE_LIMIT_REACHED_TITLE = "Feature.Build.Title.FreeLimitReached"
+LocalizationStrings.CREATOR_CREDIT_FREE_LIMIT_REACHED_DESCRIPTION = "Feature.Build.Description.EnableUsageOrWait"
+LocalizationStrings.CREATOR_CREDIT_MANAGE_USAGE_BUTTON = "Feature.Build.Action.ManageUsage"
+LocalizationStrings.CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_TITLE = "Feature.Build.Title.FreeUsageReached"
+LocalizationStrings.CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_DESCRIPTION = "Feature.Build.Description.BuyUsageOrWait"
+LocalizationStrings.CREATOR_CREDIT_DAILY_LIMIT_REACHED_TITLE = "Feature.Build.Title.DailyRobuxReached"
+LocalizationStrings.CREATOR_CREDIT_DAILY_LIMIT_REACHED_DESCRIPTION = "Feature.Build.Description.RaiseLimitOrWait"
+LocalizationStrings.CREATOR_CREDIT_ADJUST_LIMIT_BUTTON = "Feature.Build.Action.ManageLimit"
+LocalizationStrings.CREATOR_CREDIT_VIEW_USAGE_BUTTON = "Feature.Build.Action.ViewUsage"
+LocalizationStrings.CREATOR_CREDIT_NOT_NOW_BUTTON = "Feature.Build.Action.NotNow"
+LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_SHEET_TITLE = "Feature.Build.Action.BuyRobux"
+LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM = "Feature.Build.Action.Buy"
+LocalizationStrings.BUILD_MENU_SETTINGS = "Feature.Build.Action.Settings"
+LocalizationStrings.BUILD_MENU_SHARE = "Feature.Build.Action.Share"
+LocalizationStrings.BUILD_MENU_STATS = "Feature.Build.Action.Stats"
+LocalizationStrings.BUILD_MENU_VERSION_HISTORY = "Feature.Build.Title.VersionHistory"
+LocalizationStrings.BUILD_MENU_VERSIONS = "Feature.Build.Title.Versions"
+LocalizationStrings.MONETIZATION_OPTIONS = "Feature.Build.Action.Options"
+LocalizationStrings.MONETIZATION_PRICING_OPTIONS = "Feature.Build.Label.PricingOptions"
+LocalizationStrings.MONETIZATION_PRICING_OPTIONS_DESCRIPTION = "Feature.Build.Description.PricingRules"
+LocalizationStrings.MONETIZATION_MANAGED_PRICING = "Feature.Build.Label.ManagedPricing"
+LocalizationStrings.MONETIZATION_MANAGED_PRICING_DESCRIPTION = "Feature.Build.Description.ManagedPricingCurrentProducts"
+LocalizationStrings.MONETIZATION_SHOP_UI = "Feature.Build.Label.ShopUi"
+LocalizationStrings.MONETIZATION_SHOP_BUTTON = "Feature.Build.Label.ShopButton"
+LocalizationStrings.MONETIZATION_SHOP_BUTTON_DESCRIPTION = "Feature.Build.Description.ShopButton"
+LocalizationStrings.MONETIZATION_OPTIONS_LOAD_ERROR = "Feature.Build.Error.MonetizationOptionsLoad"
+LocalizationStrings.MONETIZATION_PERMISSION_DENIED = "Feature.Build.Error.MonetizationPermissionDenied"
+LocalizationStrings.MONETIZATION_MANAGED_PRICING_MIXED = "Feature.Build.Label.ManagedPricingMixed"
+LocalizationStrings.MONETIZATION_MANAGED_PRICING_UNAVAILABLE = "Feature.Build.Description.ManagedPricingUnavailable"
+LocalizationStrings.MONETIZATION_NO_ELIGIBLE_PRODUCTS = "Feature.Build.Description.NoEligibleManagedPricingProducts"
+LocalizationStrings.MONETIZATION_OPTIONS_UPDATE_ERROR = "Feature.Build.Error.MonetizationOptionUpdate"
+LocalizationStrings.MONETIZATION_MANAGED_PRICING_PARTIAL_ERROR = "Feature.Build.Error.ManagedPricingPartialUpdate"
+LocalizationStrings.MONETIZATION_MANAGED_PRICING_ACK_TITLE = "Feature.Build.Title.ManagedPricingAcknowledgement"
+LocalizationStrings.MONETIZATION_MANAGED_PRICING_ACK_DESCRIPTION = "Feature.Build.Description.ManagedPricingAcknowledgement"
+LocalizationStrings.MONETIZATION_AGREE = "Feature.Build.Action.AgreeAndEnable"
+LocalizationStrings.CHAT_ASSIGNING_TASKS = "Feature.Build.Message.WorkingOnTasks"
+LocalizationStrings.CHAT_ASSISTANT_DISABLED = "Feature.Build.Title.ChatBuildUnavailable"
+LocalizationStrings.CHAT_ASSISTANT_LOADING = "Feature.Build.Label.Thinking"
+LocalizationStrings.CHAT_ASSISTANT_RESPONSE_FAILED = "Feature.Build.Message.BuildResponseFailed"
+LocalizationStrings.CHAT_ASSISTANT_STILL_WORKING = "Feature.Build.Message.BuildStillWorking"
+LocalizationStrings.CHAT_ASSISTANT_STOPPED = "Feature.Build.Message.BuildStopped"
+LocalizationStrings.CHAT_ASSISTANT_TAKING_LONGER = "Feature.Build.Message.BuildTakingLonger"
+LocalizationStrings.CHAT_BUILD_CHAT_PAGE_TITLE = "New Game"
+LocalizationStrings.CHAT_COMPLETED_GAME_CREATION_DESCRIPTION = FFlagEnableTeamTestLua
+	and "Feature.Build.Description.GameSavedPlaytest"
+	or "Feature.Build.Description.GameCreationDone"
+LocalizationStrings.CHAT_COMPLETED_GAME_CREATION_TITLE = "Feature.Build.Title.GameCreationDone"
+LocalizationStrings.CHAT_COMPOSER_PLACEHOLDER = "Feature.Build.Label.DescribeIdea"
+LocalizationStrings.CHAT_COPY_TEXT = "Feature.Build.Action.CopyText"
+LocalizationStrings.CHAT_CAPTURE_GALLERY_ADD = "Feature.Build.Action.Add"
+LocalizationStrings.CHAT_CAPTURE_GALLERY_EMPTY = "Feature.Build.Message.NoCapturesAvailable"
+LocalizationStrings.CHAT_CAPTURE_GALLERY_SELECTION_COUNT = "Feature.Build.Label.CaptureSelectionCount"
+LocalizationStrings.CHAT_CAPTURE_GALLERY_SHOW_MORE = "Feature.Build.Action.ShowMore"
+LocalizationStrings.CHAT_CAPTURE_GALLERY_TITLE = "Feature.Build.Title.AddImages"
+LocalizationStrings.CHAT_CAPTURE_UPLOAD_ERROR = "Feature.Build.Message.ImageUploadFailed"
+LocalizationStrings.CHAT_CREATE_UNIVERSE_ERROR = "Feature.Build.Message.GameNotCreated"
+LocalizationStrings.CHAT_DEFAULT_FAILURE = "Feature.Build.Message.BuildConnectFailed"
+LocalizationStrings.CHAT_ERROR_CONFLICT = "Feature.Build.Message.BuildBusy"
+LocalizationStrings.CHAT_ERROR_CODE_TEXT = "Feature.Build.Message.ErrorCodeText"
+LocalizationStrings.CHAT_ERROR_FORBIDDEN = "Feature.Build.Message.BuildAccountBlocked"
+LocalizationStrings.CHAT_ERROR_GONE = "Feature.Build.Message.ConversationGone"
+LocalizationStrings.CHAT_ERROR_INTERNAL = "Feature.Build.Message.BuildInternalError"
+LocalizationStrings.CHAT_ERROR_INVALID_PARAMS = "Feature.Build.Message.InvalidMessage"
+LocalizationStrings.CHAT_ERROR_NOT_FOUND = "Feature.Build.Message.ConversationNotFound"
+LocalizationStrings.CHAT_ERROR_OUT_OF_CREDITS = "Feature.Build.Message.OutOfBuildUsage"
+LocalizationStrings.CHAT_ERROR_UNAUTHORIZED = "Feature.Build.Message.SignedOut"
+LocalizationStrings.CHAT_ERROR_UPSTREAM_UNAVAILABLE = "Feature.Build.Message.BuildTemporarilyDown"
+LocalizationStrings.CHAT_MISSING_PROJECT = "Feature.Build.Message.CreateGameToUseBuild"
+LocalizationStrings.CHAT_NOTIFICATION_DISABLED_DESCRIPTION = "Feature.Build.Description.EnableBuildNotifs"
+LocalizationStrings.CHAT_NOTIFICATION_PROMPT_DESCRIPTION = "Feature.Build.Description.BuildReplyNotif"
+LocalizationStrings.CHAT_NOTIFICATION_PROMPT_TITLE = "Feature.Build.Title.PushNotifications"
+LocalizationStrings.CHAT_DONT_ASK_AGAIN = "Feature.Build.Action.DontAskAgain"
+LocalizationStrings.CHAT_NOTIFY_ME = "Feature.Build.Action.NotifyMe"
+LocalizationStrings.CHAT_ONE_TASK_COMPLETED = "Feature.Build.Message.OneTaskCompleted"
+LocalizationStrings.CHAT_OPEN_SETTINGS = "Feature.Build.Action.OpenSettings"
+LocalizationStrings.CHAT_PLAYTEST = "Feature.Build.Action.Playtest"
+LocalizationStrings.CHAT_POLICY_REJECTION = "Feature.Build.Message.SafetyPolicy"
+LocalizationStrings.CHAT_PORTRAIT_REQUIRED = "Feature.Build.Message.TurnToPortrait"
+LocalizationStrings.CHAT_QUESTION_COMPOSER_ANSWER = "Feature.Build.Message.AnswerBuildQuestion"
+LocalizationStrings.CHAT_QUESTION_MULTIPLE = "Feature.Build.Title.BuildQuestions"
+LocalizationStrings.CHAT_QUESTION_SINGLE = "Feature.Build.Title.BuildQuestion"
+LocalizationStrings.CHAT_REVERT_CONFIRMATION_ACTION = "Feature.Build.Action.Revert"
+LocalizationStrings.CHAT_REVERT_CONFIRMATION_DESCRIPTION = "Feature.Build.Description.RestoreLatest"
+LocalizationStrings.CHAT_REVERT_CONFIRMATION_TITLE = "Feature.Build.Title.RevertLastChange"
+LocalizationStrings.CHAT_REVERT_TO_VERSION = "Feature.Build.Description.RevertToVersion"
+LocalizationStrings.CHAT_REVERT_FAILURE = FFlagEnableTeamTestLua and "Feature.Build.Message.RevertVersionFail"
+	or "Feature.Build.Message.PublishNotReverted"
+LocalizationStrings.CHAT_SEND_UNCONFIRMED = "Feature.Build.Message.BuildSendUnconfirmed"
+LocalizationStrings.CHAT_STOP_CONFIRMATION_ACTION = "Feature.Build.Action.Stop"
+LocalizationStrings.CHAT_STOP_CONFIRMATION_CANCEL = "Feature.Build.Action.KeepBuilding"
+LocalizationStrings.CHAT_STOP_CONFIRMATION_DESCRIPTION = "Feature.Build.Description.StopBuild"
+LocalizationStrings.CHAT_STOP_CONFIRMATION_TITLE = "Feature.Build.Title.StopBuild"
+LocalizationStrings.CHAT_TOOL = "Feature.Build.Label.Tool"
+LocalizationStrings.CHAT_TOOL_FAILED = "Feature.Build.Message.FailedTitle"
+LocalizationStrings.CHAT_TOOL_FINISHED = "Feature.Build.Message.FinishedTitle"
+LocalizationStrings.CHAT_TOOL_RUNNING = "Feature.Build.Message.RunningTitle"
+LocalizationStrings.CHAT_TASKS_COMPLETED = "Feature.Build.Message.TasksCompleted"
+LocalizationStrings.CHAT_THINKING_SECONDS = "Feature.Build.Message.ThinkingSeconds"
+LocalizationStrings.CHAT_TURN_ACTIVITY = "Feature.Build.Title.TurnActivity"
+LocalizationStrings.CHAT_UPDATE_WITH_CHANGES = "Feature.Build.Action.UpdateWithChanges"
+LocalizationStrings.CHAT_WORKED_MINUTES_SECONDS = "Feature.Build.Message.WorkedMinutesSeconds"
+LocalizationStrings.CHAT_WORKED_SECONDS = "Feature.Build.Message.WorkedSeconds"
+LocalizationStrings.GAME_CONFIGURATION_ACCESS = "Feature.Build.Label.Access"
+LocalizationStrings.GAME_CONFIGURATION_ACCESS_AND_SHARING = "Feature.Build.Header.AccessSharing"
+LocalizationStrings.GAME_CONFIGURATION_ACCESS_BODY = "Feature.Build.Description.PlayAfterPublish"
+LocalizationStrings.GAME_CONFIGURATION_ARCHIVE_GAME = "Feature.Build.Action.ArchiveGame"
+LocalizationStrings.GAME_CONFIGURATION_QUESTIONNAIRE_REQUIRED_BANNER = "Feature.Build.Message.QuestionnaireNeeded"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE = "Feature.Build.Title.Audience"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_BANNER = "Feature.Build.Message.ExpandAudience"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_BODY = "Feature.Build.Description.PlayAfterPublish"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_FRIENDS = "Feature.Build.Label.Friends"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_FRIENDS_ONLY = "Feature.Build.Label.FriendsOnly"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE = "Feature.Build.Message.AudienceIneligible"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE_DESCRIPTION = "Feature.Build.Message.ExpandAudience"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PAGE_TITLE = "Feature.Build.Title.ExperienceAudience"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PRIVATE = "Feature.Build.Label.Private"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLIC = "Feature.Build.Label.Public"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLISH_REQUIRED = "Feature.Build.Message.PublishExpandAudience"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLISH_REQUIRED_DESCRIPTION = "Feature.Build.Description.MakeAudienceAvail"
+LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_UNKNOWN = "Feature.Build.Label.Unknown"
+LocalizationStrings.GAME_CONFIGURATION_CONTENT_RATING = "Feature.Build.Label.ContentRating"
+LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB = "Feature.Build.Label.CreatorHub"
+LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB_DESCRIPTION = "Feature.Build.Description.HubSettings"
+LocalizationStrings.GAME_CONFIGURATION_GAME_CONFIGURATION = "Feature.Build.Header.GameConfiguration"
+LocalizationStrings.GAME_CONFIGURATION_GAME_CONFIGURATION_BODY = "Feature.Build.Description.GameConfiguration"
+LocalizationStrings.GAME_CONFIGURATION_GAME_DETAILS = "Feature.Build.Header.GameDetails"
+LocalizationStrings.GAME_CONFIGURATION_GAME_DETAILS_BODY = "Feature.Build.Description.ManageAppearance"
+LocalizationStrings.GAME_CONFIGURATION_ICON_AND_THUMBNAILS = "Feature.Build.Label.IconThumbnails"
+LocalizationStrings.GAME_CONFIGURATION_SALES_OPTIONS = "Feature.Build.Label.SalesOptions"
+LocalizationStrings.GAME_CONFIGURATION_LINK_COPIED = not FFlagEnableShareSheet and "Feature.Build.Message.LinkCopied"
+	or nil
+LocalizationStrings.GAME_CONFIGURATION_LOADING = "Feature.Build.Label.Loading"
+LocalizationStrings.GAME_CONFIGURATION_PREVIEW = "Feature.Build.Action.Preview"
+LocalizationStrings.GAME_CONFIGURATION_PUBLISH = "Feature.Build.Action.Publish"
+LocalizationStrings.GAME_CONFIGURATION_PUBLISH_ACCOUNT_TOO_NEW_ERROR = "Feature.Build.Message.AccountTooNew"
+LocalizationStrings.GAME_CONFIGURATION_PUBLISH_AUDIENCE_ERROR = "Feature.Build.Message.PublicPublishFailed"
+LocalizationStrings.GAME_CONFIGURATION_PUBLISH_ERROR = "Feature.Build.Message.GamePublishFailed"
+LocalizationStrings.GAME_CONFIGURATION_PUBLISH_SUCCESS = "Feature.Build.Message.ReadyToPlay"
+LocalizationStrings.GAME_CONFIGURATION_SHARE = "Feature.Build.Action.Share"
+LocalizationStrings.GAME_CONFIGURATION_UPDATE_RATING = "Feature.Build.Action.UpdateRating"
+LocalizationStrings.GAME_CONFIGURATION_TITLE_AND_DESCRIPTION = "Feature.Build.Label.TitleDescription"
+LocalizationStrings.LIBRARY_TITLE = "Feature.Build.Title.AssetLibrary"
+LocalizationStrings.LIBRARY_EMPTY = "Feature.Build.Message.NoAssetsFound"
+LocalizationStrings.LIBRARY_SEARCH_EMPTY = "Feature.Build.Message.NoSearchResultsFound"
+LocalizationStrings.LIBRARY_OBJECTS_3D = "Feature.Build.Label.Objects3D"
+LocalizationStrings.LIBRARY_IMAGES_2D = "Feature.Build.Label.Images2D"
+LocalizationStrings.LIBRARY_SOUNDS = "Feature.Build.Label.Sounds"
+LocalizationStrings.LIBRARY_OBJECT = "Feature.Build.Label.Object"
+LocalizationStrings.LIBRARY_WORLD = "Feature.Build.Label.World"
+LocalizationStrings.LIBRARY_MODEL_UNAVAILABLE = "Feature.Build.Message.AssetDetailsUnavailable"
+LocalizationStrings.LIBRARY_SEARCH_PLACEHOLDER = "CommonUI.Controls.Action.Search"
+LocalizationStrings.MEDIA_SELECTION_CAPTURE_LIBRARY = "Feature.Build.Label.CaptureLibrary"
+LocalizationStrings.MEDIA_SELECTION_DELETE = "Feature.Build.Action.Delete"
+LocalizationStrings.MEDIA_SELECTION_TITLE = "Feature.Build.Label.IconThumbnails"
+LocalizationStrings.MEDIA_SELECTION_VIDEO = "Feature.Build.Label.Video"
+LocalizationStrings.MY_CREATIONS_BUILD_WITH_AI = "Feature.Build.Description.BuildIdeaGame"
+LocalizationStrings.MY_CREATIONS_BUILDING = "Feature.Build.Label.Building"
+LocalizationStrings.MY_CREATIONS_CREATE_NEW_GAME = "Feature.Build.Action.CreateNewGame"
+LocalizationStrings.MY_CREATIONS_INPUT_NEEDED = "Feature.Build.Label.InputNeeded"
+LocalizationStrings.MY_CREATIONS_LOAD_ERROR = "Feature.Build.Message.ExperiencesLoadFailed"
+LocalizationStrings.MY_CREATIONS_NEW_GAME = "Feature.Build.Content.NewGame"
+LocalizationStrings.MY_CREATIONS_NO_GAMES = "Feature.Build.Message.NoGamesYet"
+LocalizationStrings.MY_CREATIONS_LIVE = "Feature.Build.Label.Live"
+LocalizationStrings.MY_CREATIONS_PRIVATE = "Feature.Build.Label.Private"
+LocalizationStrings.MY_CREATIONS_PUBLIC = "Feature.Build.Label.Public"
+LocalizationStrings.MY_CREATIONS_PUBLICLY_UNAVAILABLE = "Feature.Build.Label.PubliclyUnavailable"
+LocalizationStrings.MY_CREATIONS_READY = "Feature.Build.Label.Ready"
+LocalizationStrings.MY_CREATIONS_RESTRICTED = "Feature.Build.Label.Limited"
+LocalizationStrings.MY_CREATIONS_UNIVERSE_NAME = "Feature.Build.Label.UniverseNumber"
+LocalizationStrings.MY_CREATIONS_FILTER_ALL = "Feature.Build.Label.All"
+LocalizationStrings.MY_CREATIONS_FILTER_ALL_GAMES = "Feature.Build.Label.AllGames"
+LocalizationStrings.MY_CREATIONS_FILTER_APPLY = "CommonUI.Messages.Action.Apply"
+LocalizationStrings.MY_CREATIONS_FILTER_GAMES = "CommonUI.Features.Label.Games"
+LocalizationStrings.MY_CREATIONS_FILTER_GROUP_GAMES = "Feature.Build.Label.GroupGames"
+LocalizationStrings.MY_CREATIONS_FILTER_GROUPS = "Feature.Build.Label.Groups"
+LocalizationStrings.MY_CREATIONS_FILTER_MY_GAMES = "Feature.Build.Label.MyGames"
+LocalizationStrings.MY_CREATIONS_FILTER_RESET = "CommonUI.Messages.Action.Reset"
+LocalizationStrings.MY_CREATIONS_FILTER_SEARCH_GROUPS = "Feature.Build.Label.Search"
+LocalizationStrings.MY_CREATIONS_FILTER_SHARED_GAMES = "Feature.Build.Label.SharedWithMe"
+LocalizationStrings.MY_CREATIONS_FILTER_TITLE = "Feature.Build.Label.Filters"
+LocalizationStrings.PLAYTEST_DISABLED_TOOLTIP = "Feature.Build.Description.PlaytestLocked"
+LocalizationStrings.PLAYTEST_TITLE = "Feature.Build.Action.Playtest"
+LocalizationStrings.PRIVATE_INVITES_ADD_ERROR = "Feature.Build.Message.PlaytesterRequestFailed"
+LocalizationStrings.PRIVATE_INVITES_ADD_ERROR_ACTION = "Feature.Build.Action.OK"
+LocalizationStrings.PRIVATE_INVITES_ADD_ERROR_TITLE = "Feature.Build.Title.GenericError"
+LocalizationStrings.PRIVATE_INVITES_ADD_REJECTED_TITLE = "Feature.Build.Title.PlaytestersAddRejected"
+LocalizationStrings.PRIVATE_INVITES_ADD_PLAYTESTER = "Feature.Build.Action.AddPlaytester"
+LocalizationStrings.PRIVATE_INVITES_ADD_PLAYTESTERS = "Feature.Build.Action.AddPlaytesters"
+LocalizationStrings.PRIVATE_INVITES_ALL_FRIENDS_ADDED = "Feature.Build.Message.AllFriendsAdded"
+LocalizationStrings.PRIVATE_INVITES_FRIENDS_LOAD_ERROR = "Feature.Build.Message.FriendsLoadFailed"
+LocalizationStrings.PRIVATE_INVITES_INVITE_BUTTON = "Feature.Build.Action.AddFriends"
+LocalizationStrings.PRIVATE_INVITES_COUNT = "Feature.Build.Label.InviteCount"
+LocalizationStrings.PRIVATE_INVITES_NO_FRIENDS = "Feature.Build.Message.NoFriendsToAdd"
+LocalizationStrings.PRIVATE_INVITES_PAGE_TITLE = "Feature.Build.Title.Playtesters"
+LocalizationStrings.PRIVATE_INVITES_ROW_DESCRIPTION = "Feature.Build.Description.ChoosePlaytesters"
+LocalizationStrings.PRIVATE_INVITES_ROW_LOAD_ERROR = "Feature.Build.Message.InvitesLoadFailed"
+LocalizationStrings.PRIVATE_INVITES_ROW_TITLE = "Feature.Build.Title.Playtesters"
+LocalizationStrings.PRIVATE_INVITES_ROW_TITLE_EMPTY = "Feature.Build.Action.AddToPlaytest"
+LocalizationStrings.PRIVATE_INVITES_SEARCH_PLACEHOLDER = "Feature.Build.Label.Search"
+LocalizationStrings.PRIVATE_INVITES_SENT = "Feature.Build.Message.PlaytestersAdded"
+LocalizationStrings.PRIVATE_INVITES_SHARE_LINK = "Feature.Build.Action.ShareLink"
+LocalizationStrings.PRIVATE_INVITES_SHARE_LINK_ERROR = "Feature.Build.Message.ShareLinkFailed"
+LocalizationStrings.PRIVATE_INVITES_SUBTITLE = "Feature.Build.Description.InviteFriendLimit"
+LocalizationStrings.PRIVATE_INVITES_TITLE = "Feature.Build.Title.AddFriendsToPlaytest"
+LocalizationStrings.PRIVATE_INVITES_UNKNOWN_USER = "Feature.Build.Label.Unknown"
+LocalizationStrings.PUBLISH_CONTENT_BODY = "Feature.Build.Description.RatingAgreement"
+LocalizationStrings.PUBLISH_CONTENT_MATURITY = "Feature.Build.Header.ContentMaturity"
+LocalizationStrings.PUBLISH_CONTENT_TITLE = "Feature.Build.Title.Content"
+LocalizationStrings.PUBLISH_VERSION_INFORMATION_BODY = "Feature.Build.Description.ShareLatest"
+LocalizationStrings.PUBLISH_VERSION_INFORMATION_TITLE = "Feature.Build.Header.UpdateDetails"
+LocalizationStrings.PUBLISH_VERSION_TITLE_DESCRIPTION = "Feature.Build.Label.UpdateTitleDesc"
+LocalizationStrings.SHARE_AUDIENCE_CANCEL = "Feature.Build.Action.Cancel"
+LocalizationStrings.SHARE_AUDIENCE_FRIENDS_ONLY_DESCRIPTION = "Feature.Build.Description.FriendsLinkOnly"
+LocalizationStrings.SHARE_AUDIENCE_FRIENDS_ONLY_TITLE = "Feature.Build.Title.FriendsOnlyPlay"
+LocalizationStrings.SHARE_AUDIENCE_PLAYTESTERS_ONLY_DESCRIPTION = "Feature.Build.Description.PlaytesterAccess"
+LocalizationStrings.SHARE_AUDIENCE_PLAYTESTERS_ONLY_TITLE = "Feature.Build.Title.PlaytestersOnlyPlay"
+LocalizationStrings.SHARE_AUDIENCE_SHARE = "Feature.Build.Action.Share"
+LocalizationStrings.SHARE_EXPERIENCE = "Feature.Build.Message.ShareExperience"
+LocalizationStrings.SHARE_GAME_SHARED = "Feature.Build.Message.GameShared"
+LocalizationStrings.SHARE_GAME_SHARED_WITH_TARGET = "Feature.Build.Message.GameSharedWith"
+LocalizationStrings.SUBAGENT_STATUS_AGENTS = "Feature.Build.Title.Tasks"
+LocalizationStrings.SUBAGENT_STATUS_ALL = "Feature.Build.Label.All"
+LocalizationStrings.SUBAGENT_STATUS_BUILDING = "Feature.Build.Label.Building"
+LocalizationStrings.SUBAGENT_STATUS_COMPLETED_TASKS = "Feature.Build.Message.CompletedTasks"
+LocalizationStrings.SUBAGENT_STATUS_DELETED = "Feature.Build.Label.Deleted"
+LocalizationStrings.SUBAGENT_STATUS_DONE = "Feature.Build.Label.Done"
+LocalizationStrings.SUBAGENT_STATUS_ERROR = "Feature.Build.Label.Error"
+LocalizationStrings.SUBAGENT_STATUS_IN_PROGRESS = "Feature.Build.Label.InProgress"
+LocalizationStrings.SUBAGENT_STATUS_NOT_STARTED = "Feature.Build.Label.NotStarted"
+LocalizationStrings.SUBAGENT_STATUS_PENDING = "Feature.Build.Label.Pending"
+LocalizationStrings.SUBAGENT_STATUS_SEARCH_TASKS = "Feature.Build.Label.SearchTasks"
+LocalizationStrings.SUBAGENT_STATUS_VERSION = "Feature.Build.Label.Version"
+LocalizationStrings.TITLE_DESCRIPTION_DESCRIPTION_LABEL = "Feature.Build.Label.Description"
+LocalizationStrings.TITLE_DESCRIPTION_TITLE_LABEL = "Feature.Build.Label.Title"
+LocalizationStrings.TITLE_DESCRIPTION_TITLE = "Feature.Build.Label.TitleDescription"
+LocalizationStrings.UNPUBLISHED_PLAYTEST_MODE_TOOLTIP_DESCRIPTION = "Feature.Build.Description.PlaytestLatest"
+LocalizationStrings.UNPUBLISHED_PLAYTEST_MODE_TOOLTIP_TITLE = "Feature.Build.Title.ChangesNotLive"
+LocalizationStrings.USER_PICKER_NO_RESULTS = "Feature.Build.Message.NoResults"
+LocalizationStrings.USER_PICKER_USERNAME = "Feature.Build.Label.UsernameHandle"
+LocalizationStrings.VERSION_HISTORY_AUTOSAVED = "Feature.Build.Label.Autosaved"
+LocalizationStrings.VERSION_HISTORY_ALL_VERSIONS = "Feature.Build.Header.AllVersions"
+LocalizationStrings.VERSION_HISTORY_CANCEL = "Feature.Build.Action.Cancel"
+LocalizationStrings.VERSION_HISTORY_CREATED_DATE = "Feature.Build.Label.CreatedDate"
+LocalizationStrings.VERSION_HISTORY_EMPTY = "Feature.Build.Message.NoVersionHistory"
+LocalizationStrings.VERSION_HISTORY_FALLBACK_DESCRIPTION = "Feature.Build.Message.NoDescriptionProvided"
+LocalizationStrings.VERSION_HISTORY_HIDE_AUTOSAVED = "Feature.Build.Action.HideAutosaved"
+LocalizationStrings.VERSION_HISTORY_LOAD_FAILED = "Feature.Build.Message.VersionHistoryLoad"
+LocalizationStrings.VERSION_HISTORY_LOADING = "Feature.Build.Message.LoadingVersions"
+LocalizationStrings.VERSION_HISTORY_PREVIOUSLY_PUBLISHED = "Feature.Build.Label.PreviouslyPublished"
+LocalizationStrings.VERSION_HISTORY_PUBLISHED = "Feature.Build.Label.Published"
+LocalizationStrings.VERSION_HISTORY_RESTORED_BADGE = "Feature.Build.Label.RestoredVersion"
+LocalizationStrings.VERSION_HISTORY_RESTORE = "Feature.Build.Action.Restore"
+LocalizationStrings.VERSION_HISTORY_RESTORE_FAILED = "Feature.Build.Message.RestoreVersionFailed"
+LocalizationStrings.VERSION_HISTORY_TITLE = "Feature.Build.Title.VersionInfo"
+LocalizationStrings.LIVE_VERSION_CARD_CREATED_DATE = "Feature.Build.Label.CreatedDate"
+LocalizationStrings.LIVE_VERSION_CARD_FALLBACK_DESCRIPTION = "Feature.Build.Message.NoDescriptionProvided"
+LocalizationStrings.LIVE_VERSION_CARD_PLAY = "Feature.Build.Action.Play"
+LocalizationStrings.LIVE_VERSION_CARD_VERSION_COMPACT = "Feature.Build.Label.VersionCompact"
+LocalizationStrings.LIVE_VERSION_CARD_VERSION_PADDED = "Feature.Build.Label.VersionPadded"
+LocalizationStrings.LIVE_VERSION_CARD_VERSION_TITLE = "Feature.Build.Title.VersionNumber"
+LocalizationStrings.VERSION_HISTORY_VERSION_COMPACT = "Feature.Build.Label.VersionCompact"
+LocalizationStrings.VERSION_HISTORY_VERSION_LABEL = "Feature.Build.Label.VersionDate"
+LocalizationStrings.VERSION_HISTORY_VERSION_PADDED = "Feature.Build.Label.VersionPadded"
+LocalizationStrings.VERSION_HISTORY_VERSION_TITLE = "Feature.Build.Title.VersionNumber"
+LocalizationStrings.VERSION_HISTORY_VERSIONS_TITLE = "Feature.Build.Title.Versions"
+LocalizationStrings.AD_CAMPAIGN_CARD_TITLE_FREE = "Feature.Build.Title.PromoteGameFree"
+LocalizationStrings.AD_CAMPAIGN_CARD_TITLE_ACTIVE = "Feature.Build.Title.AdActive"
+LocalizationStrings.AD_CAMPAIGN_CARD_TITLE_COMPLETE = "Feature.Build.Title.AdComplete"
+LocalizationStrings.AD_CAMPAIGN_CARD_DESC_FREE = "Feature.Build.Description.BoostAudienceForPlays"
+LocalizationStrings.AD_CAMPAIGN_CARD_ACTIVE_DESC = "Feature.Build.Description.CampaignRunDates"
+LocalizationStrings.AD_CAMPAIGN_CARD_DESC_COMPLETE = "Feature.Build.Description.AdComplete"
+LocalizationStrings.AD_CAMPAIGN_CARD_VIEW = "Feature.Build.Action.View"
+LocalizationStrings.AD_CAMPAIGN_SHEET_TITLE = "Feature.Build.Title.PromoteGame"
+LocalizationStrings.AD_CAMPAIGN_SHEET_DESCRIPTION = "Feature.Build.Description.PromoteGameWithAdCampaign"
+LocalizationStrings.AD_CAMPAIGN_SHEET_CAMPAIGN_TITLE = "Feature.Build.Title.AdCampaignDuration"
+LocalizationStrings.AD_CAMPAIGN_SHEET_RUN_DATES = "Feature.Build.Description.AdCampaignSheetRunDates"
+LocalizationStrings.AD_CAMPAIGN_SHEET_FREE = "Feature.Build.Label.Free"
+LocalizationStrings.AD_CAMPAIGN_SHEET_EARNED_ROBUX_DISCLAIMER = "Feature.Build.Description.EarnedRobuxAppliedFirst"
+LocalizationStrings.AD_CAMPAIGN_SHEET_INCLUDED_TITLE = "Feature.Build.Title.WhatsIncluded"
+LocalizationStrings.AD_CAMPAIGN_SHEET_MAXIMIZE_PLAYS = "Feature.Build.Label.MaximizeForGamePlays"
+LocalizationStrings.AD_CAMPAIGN_SHEET_TARGET_PLAYERS = "Feature.Build.Label.TargetAllRobloxPlayers"
+LocalizationStrings.AD_CAMPAIGN_SHEET_PERFORMANCE_REPORT = "Feature.Build.Label.EasyPerformanceReport"
+LocalizationStrings.AD_CAMPAIGN_SHEET_LEGAL = "Feature.Build.Description.AdvertisingAgreement"
+LocalizationStrings.AD_CAMPAIGN_SHEET_CREATE = "Feature.Build.Action.Create"
+LocalizationStrings.AD_CAMPAIGN_SHEET_MODERATION_NOTICE = "Feature.Build.Description.AdCampaignModerationReview"
+LocalizationStrings.AD_CAMPAIGN_SHEET_CREATE_ERROR = "Feature.Build.Message.AdCampaignCreateFailed"
+LocalizationStrings.AD_CAMPAIGN_SHEET_FORBIDDEN_ERROR = "Feature.Build.Error.AdForbidden"
+LocalizationStrings.AD_CAMPAIGN_SHEET_INSUFFICIENT_FUNDS_ERROR = "Feature.Build.Error.AdInsufficientFunds"
+LocalizationStrings.AD_CAMPAIGN_SHEET_INTERNAL_ERROR = "Feature.Build.Error.AdInternalError"
+LocalizationStrings.AD_CAMPAIGN_SHEET_MISSING_THUMBNAIL_ERROR = "Feature.Build.Error.AdMissingThumbnail"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_TITLE = "Feature.Build.Title.CreateYourAd"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_INTRODUCTION = "Feature.Build.Description.ChooseAdCampaignLength"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_CAMPAIGN_PICKER_TITLE = "Feature.Build.Title.PickCampaign"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_OPTION_TITLE = "Feature.Build.Title.AdCampaignOptionDurationShort"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_SHORT_DESCRIPTION = "Feature.Build.Description.ShortAdCampaign"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_LONG_DESCRIPTION = "Feature.Build.Description.LongAdCampaign"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_MODERATION_NOTICE = "Feature.Build.Description.AdModerationReview"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_AD_CREDITS_TITLE = "Feature.Build.Title.UseYourAdCredits"
+LocalizationStrings.TWO_OPTIONS_AD_CAMPAIGN_SHEET_AD_CREDITS_ACTION = "Feature.Build.Description.UseAdCreditsInAdsManager"
+LocalizationStrings.BUILD_MENU_MONETIZATION = "Feature.Build.Action.EarnRobux"
+LocalizationStrings.MONETIZATION_TITLE = "Feature.Build.Action.EarnRobux"
+LocalizationStrings.MONETIZATION_EMPTY_TITLE = "Feature.Build.Title.NoMonetizationProducts"
+LocalizationStrings.MONETIZATION_EMPTY_DESCRIPTION = "Feature.Build.Description.NoMonetizationProducts"
+LocalizationStrings.MONETIZATION_EMPTY_CREATE_PRODUCT = "Feature.Build.Action.CreateDeveloperProduct"
+LocalizationStrings.MONETIZATION_CREATE_PRODUCT_PROMPT = "Feature.Build.Prompt.CreateDeveloperProduct"
+LocalizationStrings.MONETIZATION_PRICING = "Feature.Build.Label.Pricing"
+LocalizationStrings.MONETIZATION_REGIONAL_PRICING = "Feature.Build.Label.RegionalPricing"
+LocalizationStrings.MONETIZATION_LOADING = "Feature.Build.Label.Loading"
+LocalizationStrings.MONETIZATION_RETRY = "Feature.Build.Action.Retry"
+LocalizationStrings.MONETIZATION_DEFAULT_PRODUCT_NAME = "Feature.Build.Label.DefaultDeveloperProduct"
+LocalizationStrings.MONETIZATION_GAME_PASS = "Feature.InExperienceShop.GamePass"
+LocalizationStrings.MONETIZATION_PASSES = "Feature.GamePass.Heading.PassesForThisGame"
+LocalizationStrings.MONETIZATION_DEVELOPER_PRODUCTS = "Feature.Build.Label.DeveloperProducts"
+LocalizationStrings.MONETIZATION_SUBSCRIPTIONS = "CommonUI.Features.Label.DevSubs"
+LocalizationStrings.MONETIZATION_EMPTY_PASSES_TITLE = "Feature.Build.Title.NoMonetizationPasses"
+LocalizationStrings.MONETIZATION_EMPTY_PASSES_DESCRIPTION = "Feature.Build.Description.NoMonetizationPasses"
+LocalizationStrings.MONETIZATION_EMPTY_DEVELOPER_PRODUCTS_TITLE = "Feature.Build.Title.NoMonetizationDeveloperProducts"
+LocalizationStrings.MONETIZATION_EMPTY_DEVELOPER_PRODUCTS_DESCRIPTION = "Feature.Build.Description.NoMonetizationDeveloperProducts"
+LocalizationStrings.MONETIZATION_EMPTY_SUBSCRIPTIONS_TITLE = "Feature.Build.Title.NoMonetizationSubscriptions"
+LocalizationStrings.MONETIZATION_EMPTY_SUBSCRIPTIONS_DESCRIPTION = "Feature.Build.Description.NoMonetizationSubscriptions"
+LocalizationStrings.MONETIZATION_CREATE_PASS = "Feature.Build.Action.CreateMonetizationPass"
+LocalizationStrings.MONETIZATION_CREATE_DEVELOPER_PRODUCT = "Feature.Build.Action.CreateMonetizationDeveloperProduct"
+LocalizationStrings.MONETIZATION_CREATE_SUBSCRIPTION = "Feature.Build.Action.CreateMonetizationSubscription"
+LocalizationStrings.MONETIZATION_CREATE_PASS_PROMPT = "Feature.Build.CreatePassDraft"
+LocalizationStrings.MONETIZATION_CREATE_DEVELOPER_PRODUCT_PROMPT = "Feature.Build.CreateDeveloperProductDraft"
+LocalizationStrings.MONETIZATION_CREATE_SUBSCRIPTION_PROMPT = "Feature.Build.CreateSubscriptionDraft"
+LocalizationStrings.MONETIZATION_PRICE_UNAVAILABLE = "Feature.Build.Label.PriceUnavailable"
+LocalizationStrings.MONETIZATION_ON_SALE = "Feature.Build.Label.OnSale"
+LocalizationStrings.MONETIZATION_OFF_SALE = "Feature.Build.Label.OffSale"
+LocalizationStrings.MONETIZATION_AVAILABLE_FOR_PURCHASE = "Feature.Build.Label.AvailableForPurchase"
+LocalizationStrings.MONETIZATION_EDIT = "Feature.Build.Action.Edit"
+LocalizationStrings.MONETIZATION_EDIT_PRODUCT = "Feature.Build.Title.EditDeveloperProduct"
+LocalizationStrings.MONETIZATION_NAME = "Feature.Build.Label.Name"
+LocalizationStrings.MONETIZATION_DESCRIPTION = "Feature.Build.Label.Description"
+LocalizationStrings.MONETIZATION_PRICE = "Feature.Build.Label.Price"
+LocalizationStrings.MONETIZATION_CANCEL = "Feature.Build.Action.Cancel"
+LocalizationStrings.MONETIZATION_SAVE = "Feature.Build.Action.Save"
+LocalizationStrings.MONETIZATION_NAME_REQUIRED_ERROR = "Feature.Build.Error.DeveloperProductNameRequired"
+LocalizationStrings.MONETIZATION_NAME_LENGTH_ERROR = "Feature.Build.Error.DeveloperProductNameTooLong"
+LocalizationStrings.MONETIZATION_DESCRIPTION_LENGTH_ERROR = "Feature.Build.Error.DeveloperProductDescriptionTooLong"
+LocalizationStrings.MONETIZATION_PRICE_ERROR = "Feature.Build.Error.DeveloperProductPriceInvalid"
+LocalizationStrings.MONETIZATION_PRICE_REQUIRED_FOR_SALE = "Feature.Build.Error.DeveloperProductPriceRequiredForSale"
+LocalizationStrings.MONETIZATION_PRICE_REQUIRED_FOR_KIND_SALE = "Feature.Build.Error.MonetizationPriceRequiredForSale"
+LocalizationStrings.MONETIZATION_PRICE_REQUIRED_FOR_REGIONAL_PRICING = "Feature.Build.Error.MonetizationPriceRequiredForRegionalPricing"
+LocalizationStrings.MONETIZATION_MODERATION_ERROR = "Feature.Build.Error.DeveloperProductTextModerated"
+LocalizationStrings.MONETIZATION_CAUSE_IMAGE_IN_REVIEW = "Feature.Build.Error.MonetizationImageInReview"
+LocalizationStrings.MONETIZATION_CAUSE_IMAGE_PREPARING = "Feature.Build.Error.MonetizationImagePreparing"
+LocalizationStrings.MONETIZATION_CAUSE_IMAGE_TOO_LARGE = "Feature.Build.Error.MonetizationImageTooLarge"
+LocalizationStrings.MONETIZATION_CAUSE_IMAGE_TIMED_OUT = "Feature.Build.Error.MonetizationImageTimedOut"
+LocalizationStrings.MONETIZATION_CAUSE_IMAGE_FAILED = "Feature.Build.Error.MonetizationImageFailed"
+LocalizationStrings.MONETIZATION_CAUSE_NO_UNIVERSE = "Feature.Build.Error.MonetizationNoUniverse"
+LocalizationStrings.MONETIZATION_CAUSE_RATE_LIMITED = "Feature.Build.Error.MonetizationRateLimited"
+LocalizationStrings.MONETIZATION_COMPOSER_CATALOG = "Feature.Build.Placeholder.DescribeProduct"
+LocalizationStrings.MONETIZATION_COMPOSER_EMPTY = "Feature.Build.Placeholder.DescribeProduct"
+LocalizationStrings.MONETIZATION_COMPOSER_DETAIL = "Feature.Build.Placeholder.DescribeProductUpdate"
+
+function LocalizationStrings.formatGameSharedWithTarget(p: string)
+	if p == "" then
+		return "Game shared"
+	end
+
+	return `Game shared with {p}`
+end
+
+function LocalizationStrings.formatShareExperience(p: string)
+	return `Share {p}`
+end
+
+function LocalizationStrings.getChatToolActivityLocalizationKey(p: string?, p2: string?)
+	if p == nil then
+		return nil
+	end
+
+	local v2 = v[p]
+
+	if v2 == nil then
+		return nil
+	end
+
+	if p2 == "completed" then
+		return v2.completed
+	elseif p2 == "failed" then
+		return v2.failed
+	end
+
+	return v2.running
+end
+
+function LocalizationStrings.formatAdCampaignSheetDate(p: number)
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
+	local v = robloxLocaleId == "" and "en-us" or robloxLocaleId
+
+	return DateTime.fromUnixTimestampMillis(p):FormatUniversalTime("MMM D", v)
+end
+
+function LocalizationStrings.formatAdCampaignSheetLocalDate(p: number)
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
+	local v = robloxLocaleId == "" and "en-us" or robloxLocaleId
+
+	return DateTime.fromUnixTimestampMillis(p):FormatLocalTime("MMM D", v)
+end
+
+function LocalizationStrings.formatCampaignDate(p: number)
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
+	local v = robloxLocaleId == "" and "en-us" or robloxLocaleId
+
+	return DateTime.fromUnixTimestampMillis(p):FormatLocalTime("MMM D", v)
+end
+
+return LocalizationStrings

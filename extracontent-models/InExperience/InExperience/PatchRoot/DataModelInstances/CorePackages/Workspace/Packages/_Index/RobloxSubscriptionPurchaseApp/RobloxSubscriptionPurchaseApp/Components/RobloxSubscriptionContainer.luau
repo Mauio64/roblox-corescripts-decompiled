@@ -1,52 +1,60 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
-local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
-local React = require(RobloxSubscriptionPurchaseAppParent.React)
-local Foundation = require(RobloxSubscriptionPurchaseAppParent.Foundation)
+local parent = RobloxSubscriptionPurchaseApp.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+
 local completeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.completeRobloxSubscriptionUpsellFlow)
-local SignalsReact = require(RobloxSubscriptionPurchaseAppParent.SignalsReact)
+
+local SignalsReact = require(parent.SignalsReact)
+
 local useNativePurchaseFinishedListener = require(RobloxSubscriptionPurchaseApp.Hooks.useNativePurchaseFinishedListener)
 local useRobloxSubscriptionChangedListener = require(RobloxSubscriptionPurchaseApp.Hooks.useRobloxSubscriptionChangedListener)
 local useSubscriptionPollingTimeoutGuard = require(RobloxSubscriptionPurchaseApp.Hooks.useSubscriptionPollingTimeoutGuard)
+
 local Sheet = Foundation.Sheet
 local DialogSize = Foundation.Enums.DialogSize
+
 local BlackbirdSheetContent = require(script.Parent.BlackbirdSheetContent)
 local ErrorSheetContent = require(script.Parent.ErrorSheetContent)
-local t1 = {
-	[PromptState.Error] = true
-}
-local t2 = {
+
+local errorSet = { [PromptState.Error] = true }
+
+local set = {
 	[PromptState.SubscriptionPurchaseUIReady] = true,
 	[PromptState.SubscriptionPurchaseInProgress] = true,
 	[PromptState.SubscriptionStatusPolling] = true,
 	[PromptState.Error] = true
 }
 
-local function RobloxSubscriptionContainer() -- line: 46
-	-- upvalues: RobloxSubscriptionStore (copy), SignalsReact (copy), useNativePurchaseFinishedListener (copy), useRobloxSubscriptionChangedListener (copy), useSubscriptionPollingTimeoutGuard (copy), BlackbirdSheetContent (copy), ErrorSheetContent (copy), t1 (copy), t2 (copy), React (copy), Sheet (copy), completeRobloxSubscriptionUpsellFlow (copy), DialogSize (copy)
-	local v19 = RobloxSubscriptionStore.get()
-	local v20 = SignalsReact.useSignalState(v19.getPromptState)
+local function RobloxSubscriptionContainer()
+	local v = RobloxSubscriptionStore.get()
+	local v2 = SignalsReact.useSignalState(v.getPromptState)
 
 	useNativePurchaseFinishedListener()
 	useRobloxSubscriptionChangedListener()
 	useSubscriptionPollingTimeoutGuard()
 
-	local v21 = BlackbirdSheetContent()
-	local v22 = ErrorSheetContent()
-	local v23 = if t1[v20] ~= true then v21 else v22
+	local blackbirdSheetContent = BlackbirdSheetContent()
+	local errorSheetContent = ErrorSheetContent()
 
-	return t2[v20] == true and React.createElement(Sheet.Root, {
-		preferCenterSheet = true,
-		onClose = function() -- line: 66
-			-- upvalues: completeRobloxSubscriptionUpsellFlow (copy)
+	if errorSet[v2] ~= true then
+		errorSheetContent = blackbirdSheetContent
+	end
+
+	return set[v2] == true and React.createElement(Sheet.Root, {
+		onClose = function()
 			completeRobloxSubscriptionUpsellFlow()
 		end,
+		preferCenterSheet = true,
 		size = DialogSize.Medium
 	}, {
-		Header = v23.Header,
-		Content = v23.Content,
-		Actions = v23.Actions
+		Header = errorSheetContent.Header,
+		Content = errorSheetContent.Content,
+		Actions = errorSheetContent.Actions
 	}) or nil
 end
 

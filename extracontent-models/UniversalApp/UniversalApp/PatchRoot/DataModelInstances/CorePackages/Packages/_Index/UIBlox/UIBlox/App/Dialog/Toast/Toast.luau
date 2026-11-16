@@ -1,21 +1,25 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local SlidingDirection = require(ParentParentParent.Core.Animation.Enum.SlidingDirection)
-local SlidingContainer = require(ParentParentParent.Core.Animation.SlidingContainer)
-local validateColorInfo = require(ParentParentParent.Core.Style.Validator.validateColorInfo)
-local StateTable = require(ParentParentParent.StateTable.StateTable)
-local ButtonType = require(ParentParent.Button.Enum.ButtonType)
-local AnimationState = require(scriptParent.Enum.AnimationState)
-local InformativeToast = require(scriptParent.InformativeToast)
-local InteractiveToast = require(scriptParent.InteractiveToast)
-local ToastContainer = require(scriptParent.ToastContainer)
-local v16 = Roact.PureComponent:extend("Toast")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-v16.validateProps = t.strictInterface({
+local Roact = require(parent4.Roact)
+local t = require(parent4.t)
+
+local SlidingDirection = require(parent3.Core.Animation.Enum.SlidingDirection)
+local SlidingContainer = require(parent3.Core.Animation.SlidingContainer)
+local validateColorInfo = require(parent3.Core.Style.Validator.validateColorInfo)
+local StateTable = require(parent3.StateTable.StateTable)
+local ButtonType = require(parent2.Button.Enum.ButtonType)
+
+local AnimationState = require(parent.Enum.AnimationState)
+local InformativeToast = require(parent.InformativeToast)
+local InteractiveToast = require(parent.InteractiveToast)
+local ToastContainer = require(parent.ToastContainer)
+
+local extended = Roact.PureComponent:extend("Toast")
+
+extended.validateProps = t.strictInterface({
 	anchorPoint = t.optional(t.Vector2),
 	duration = t.optional(t.number),
 	layoutOrder = t.optional(t.integer),
@@ -40,249 +44,209 @@ v16.validateProps = t.strictInterface({
 		onTouchSwipeUp = t.optional(t.callback)
 	})
 })
-v16.defaultProps = {
-	show = true,
+
+extended.defaultProps = {
 	anchorPoint = Vector2.new(0.5, 0),
-	position = UDim2.new(0.5, 0, 0, 20)
+	position = UDim2.new(0.5, 0, 0, 20),
+	show = true
 }
 
-local function toastContentEqual(p1, p2) -- line: 90
-	if p1.iconColorStyle ~= p2.iconColorStyle or (p1.iconImage ~= p2.iconImage or p1.iconSize ~= p2.iconSize or p1.iconChildren ~= p2.iconChildren or p1.onActivated ~= p2.onActivated or p1.onDismissed ~= p2.onDismissed or p1.sequenceNumber ~= p2.sequenceNumber or p1.swipeUpDismiss ~= p2.swipeUpDismiss or p1.toastSubtitle ~= p2.toastSubtitle or p1.toastTitle ~= p2.toastTitle) then
-		return false
-	end
-
-	return true
+local function toastContentEqual(toastContent, toastContent2): boolean
+	return toastContent.iconColorStyle == toastContent2.iconColorStyle
+		and toastContent.iconImage == toastContent2.iconImage
+		and toastContent.iconSize == toastContent2.iconSize
+		and toastContent.iconChildren == toastContent2.iconChildren
+		and toastContent.onActivated == toastContent2.onActivated
+		and toastContent.onDismissed == toastContent2.onDismissed
+		and toastContent.sequenceNumber == toastContent2.sequenceNumber
+		and toastContent.swipeUpDismiss == toastContent2.swipeUpDismiss
+		and toastContent.toastSubtitle == toastContent2.toastSubtitle
+		and toastContent.toastTitle == toastContent2.toastTitle
 end
 
-function v16.init(p3) -- line: 108
-	-- upvalues: AnimationState (copy), Roact (copy), InteractiveToast (copy), InformativeToast (copy), StateTable (copy)
-	p3.isMounted = false
-	p3.currentToastContent = p3.props.toastContent
+function extended:init()
+	self.isMounted = false
 
-	function p3.onActivated() -- line: 113
-		-- upvalues: p3 (copy)
-		p3.stateTable.events.Activated({
-			activated = true
-		})
+	self.currentToastContent = self.props.toastContent
+
+	function self.onActivated()
+		self.stateTable.events.Activated({ activated = true })
 	end
-	function p3.onAppeared() -- line: 119
-		-- upvalues: p3 (copy)
-		if p3.currentToastContent.onAppeared then
-			p3.currentToastContent.onAppeared()
+
+	function self.onAppeared()
+		if self.currentToastContent.onAppeared then
+			self.currentToastContent.onAppeared()
 		end
 
-		local duration = p3.props.duration
+		local duration = self.props.duration
 
 		if duration and duration > 0 then
-			local currentToastContent = p3.currentToastContent
-
-			delay(duration, function() -- line: 126
-				-- upvalues: currentToastContent (copy), p3 (copy)
-				if currentToastContent == p3.currentToastContent then
-					p3.stateTable.events.AutoDismiss()
+			local currentToastContent = self.currentToastContent
+			delay(duration, function()
+				if currentToastContent == self.currentToastContent then
+					self.stateTable.events.AutoDismiss()
 				end
 			end)
 		end
 	end
-	function p3.onComplete() -- line: 134
-		-- upvalues: p3 (copy), AnimationState (copy)
-		local duration = p3.props.duration
 
-		if p3.state.currentState == AnimationState.Appearing and (duration and duration <= 0) then
-			p3.stateTable.events.AutoDismiss()
+	function self.onComplete()
+		local duration = self.props.duration
 
-			return
+		if self.state.currentState == AnimationState.Appearing and duration and duration <= 0 then
+			self.stateTable.events.AutoDismiss()
+		else
+			self.stateTable.events.AnimationComplete()
 		end
-
-		p3.stateTable.events.AnimationComplete()
 	end
-	function p3.onDisappeared() -- line: 144
-		-- upvalues: p3 (copy)
-		if p3.state.context.activated then
-			if p3.currentToastContent.onActivated then
-				p3.currentToastContent.onActivated()
 
-				return
+	function self.onDisappeared()
+		if self.state.context.activated then
+			if self.currentToastContent.onActivated then
+				self.currentToastContent.onActivated()
 			end
-		elseif p3.currentToastContent.onDismissed then
-			p3.currentToastContent.onDismissed()
+		elseif self.currentToastContent.onDismissed then
+			self.currentToastContent.onDismissed()
 		end
 	end
-	function p3.onTouchSwipe(_, p5) -- line: 156
-		-- upvalues: p3 (copy)
-		if p5 == Enum.SwipeDirection.Up then
-			p3.stateTable.events.ForceDismiss()
 
-			if p3.currentToastContent.onTouchSwipeUp then
-				p3.currentToastContent.onTouchSwipeUp()
-			end
-		end
-	end
-	function p3.renderInteractiveToast(p6) -- line: 165
-		-- upvalues: Roact (copy), InteractiveToast (copy)
-		return Roact.createElement(InteractiveToast, p6)
-	end
-	function p3.renderInformativeToast(p7) -- line: 169
-		-- upvalues: Roact (copy), InformativeToast (copy)
-		return Roact.createElement(InformativeToast, p7)
-	end
-	function p3.setContext(_, _, p10) -- line: 173
-		return p10
-	end
-	function p3.updateToastContent() -- line: 177
-		-- upvalues: p3 (copy)
-		if p3.currentToastContent ~= p3.props.toastContent then
-			p3.currentToastContent = p3.props.toastContent
+	function self.onTouchSwipe(_, p)
+		if p == Enum.SwipeDirection.Up then
+			self.stateTable.events.ForceDismiss()
 
-			if p3.props.show then
-				p3.stateTable.events.ForceAppear({
-					activated = false
-				})
+			if self.currentToastContent.onTouchSwipeUp then
+				self.currentToastContent.onTouchSwipeUp()
 			end
 		end
 	end
 
-	local Disappeared = AnimationState.Disappeared
+	function self.renderInteractiveToast(p)
+		return Roact.createElement(InteractiveToast, p)
+	end
 
-	p3.state = {
-		currentState = Disappeared,
-		context = {
-			activated = false
-		}
+	function self.renderInformativeToast(p)
+		return Roact.createElement(InformativeToast, p)
+	end
+
+	function self.setContext(_, _, p)
+		return p
+	end
+
+	function self.updateToastContent()
+		if self.currentToastContent ~= self.props.toastContent then
+			self.currentToastContent = self.props.toastContent
+
+			if self.props.show then
+				self.stateTable.events.ForceAppear({ activated = false })
+			end
+		end
+	end
+
+	local disappeared = AnimationState.Disappeared
+	self.state = {
+		currentState = disappeared,
+		context = { activated = false }
 	}
 
-	local v22 = string.format("Animated(%s)", (tostring(p3)))
-
-	p3.stateTable = StateTable.new(v22, Disappeared, {}, {
+	local v = string.format("Animated(%s)", (tostring(self)))
+	self.stateTable = StateTable.new(v, disappeared, {}, {
 		[AnimationState.Appearing] = {
-			AnimationComplete = {
-				nextState = AnimationState.Appeared,
-				action = p3.onAppeared
-			},
-			AutoDismiss = {
-				nextState = AnimationState.Disappearing,
-				action = p3.onAppeared
-			},
-			ContentChanged = {
-				nextState = AnimationState.Disappearing
-			},
-			ForceDismiss = {
-				nextState = AnimationState.Disappearing
-			}
+			AnimationComplete = { nextState = AnimationState.Appeared, action = self.onAppeared },
+			AutoDismiss = { nextState = AnimationState.Disappearing, action = self.onAppeared },
+			ContentChanged = { nextState = AnimationState.Disappearing },
+			ForceDismiss = { nextState = AnimationState.Disappearing }
 		},
 		[AnimationState.Appeared] = {
-			Activated = {
-				nextState = AnimationState.Disappearing,
-				action = p3.setContext
-			},
-			AutoDismiss = {
-				nextState = AnimationState.Disappearing
-			},
-			ContentChanged = {
-				nextState = AnimationState.Disappearing
-			},
-			ForceDismiss = {
-				nextState = AnimationState.Disappearing
-			}
+			Activated = { nextState = AnimationState.Disappearing, action = self.setContext },
+			AutoDismiss = { nextState = AnimationState.Disappearing },
+			ContentChanged = { nextState = AnimationState.Disappearing },
+			ForceDismiss = { nextState = AnimationState.Disappearing }
 		},
 		[AnimationState.Disappearing] = {
 			AnimationComplete = {
 				nextState = AnimationState.Disappeared,
-				action = p3.onDisappeared
+				action = self.onDisappeared
 			}
 		},
 		[AnimationState.Disappeared] = {
 			ContentChanged = {
 				nextState = AnimationState.Appearing,
-				action = p3.updateToastContent
+				action = self.updateToastContent
 			},
-			ForceAppear = {
-				nextState = AnimationState.Appearing,
-				action = p3.setContext
-			}
+			ForceAppear = { nextState = AnimationState.Appearing, action = self.setContext }
 		}
 	})
-	p3.stateTable:onStateChange(function(p11, p12, p13) -- line: 220
-		-- upvalues: p3 (copy)
-		if p3.isMounted and p11 ~= p12 then
-			p3:setState({
-				currentState = p12,
-				context = p13
-			})
+
+	self.stateTable:onStateChange(function(p, currentState, context)
+		if self.isMounted and p ~= currentState then
+			self:setState({ currentState = currentState, context = context })
 		end
 	end)
 end
-function v16.isShowing(p14) -- line: 230
-	-- upvalues: AnimationState (copy)
-	return p14.state.currentState == AnimationState.Appearing or p14.state.currentState == AnimationState.Appeared
-end
-function v16.render(p15) -- line: 234
-	-- upvalues: Roact (copy), SlidingContainer (copy), SlidingDirection (copy), ToastContainer (copy)
-	local onActivated = p15.currentToastContent.onActivated
-	local swipeUpDismiss = p15.currentToastContent.swipeUpDismiss
 
-	if swipeUpDismiss == nil then
-		swipeUpDismiss = true
-	end
+function extended:isShowing(): boolean
+	return self.state.currentState == AnimationState.Appearing or self.state.currentState == AnimationState.Appeared
+end
+
+function extended:render()
+	local onActivated = self.currentToastContent.onActivated
+	local swipeUpDismiss = self.currentToastContent.swipeUpDismiss
+	local v = swipeUpDismiss == nil or swipeUpDismiss
 
 	return Roact.createElement(SlidingContainer, {
-		show = p15:isShowing(),
-		layoutOrder = p15.props.layoutOrder,
-		onComplete = p15.onComplete,
+		show = self:isShowing(),
+		layoutOrder = self.props.layoutOrder,
+		onComplete = self.onComplete,
 		slidingDirection = SlidingDirection.Down,
-		springOptions = p15.props.springOptions
+		springOptions = self.props.springOptions
 	}, {
 		ToastContainer = Roact.createElement(ToastContainer, {
-			anchorPoint = p15.props.anchorPoint,
-			buttonText = p15.currentToastContent.buttonText,
-			position = p15.props.position,
-			size = p15.props.size,
-			iconColorStyle = p15.currentToastContent.iconColorStyle,
-			iconImage = p15.currentToastContent.iconImage,
-			iconSize = p15.currentToastContent.iconSize,
-			iconChildren = p15.currentToastContent.iconChildren,
-			onActivated = onActivated and p15.onActivated,
-			onTouchSwipe = swipeUpDismiss and p15.onTouchSwipe,
-			renderToast = onActivated and p15.renderInteractiveToast or p15.renderInformativeToast,
-			toastSubtitle = p15.currentToastContent.toastSubtitle,
-			toastTitle = p15.currentToastContent.toastTitle,
-			buttonType = p15.currentToastContent.buttonType
+			anchorPoint = self.props.anchorPoint,
+			buttonText = self.currentToastContent.buttonText,
+			position = self.props.position,
+			size = self.props.size,
+			iconColorStyle = self.currentToastContent.iconColorStyle,
+			iconImage = self.currentToastContent.iconImage,
+			iconSize = self.currentToastContent.iconSize,
+			iconChildren = self.currentToastContent.iconChildren,
+			onActivated = onActivated and self.onActivated,
+			onTouchSwipe = v and self.onTouchSwipe,
+			renderToast = onActivated and self.renderInteractiveToast or self.renderInformativeToast,
+			toastSubtitle = self.currentToastContent.toastSubtitle,
+			toastTitle = self.currentToastContent.toastTitle,
+			buttonType = self.currentToastContent.buttonType
 		})
 	})
 end
-function v16.didMount(p16) -- line: 267
-	p16.isMounted = true
 
-	if p16.props.show then
-		p16.stateTable.events.ForceAppear({
-			activated = false
-		})
+function extended:didMount()
+	self.isMounted = true
+
+	if self.props.show then
+		self.stateTable.events.ForceAppear({ activated = false })
 	end
 end
-function v16.willUnmount(p17) -- line: 276
-	p17.isMounted = false
+
+function extended:willUnmount()
+	self.isMounted = false
 end
-function v16.didUpdate(p18, p19, p20) -- line: 280
-	-- upvalues: toastContentEqual (copy), AnimationState (copy)
-	if p19.show ~= p18.props.show then
-		if p18.props.show then
-			p18.stateTable.events.ForceAppear({
-				activated = false
-			})
+
+function extended.didUpdate(data, p, p2)
+	if p.show ~= data.props.show then
+		if data.props.show then
+			data.stateTable.events.ForceAppear({ activated = false })
 		else
-			p18.stateTable.events.ForceDismiss()
+			data.stateTable.events.ForceDismiss()
 		end
 	end
 
-	if not toastContentEqual(p19.toastContent, p18.props.toastContent) then
-		p18.stateTable.events.ContentChanged({
-			activated = false
-		})
+	if not toastContentEqual(p.toastContent, data.props.toastContent) then
+		data.stateTable.events.ContentChanged({ activated = false })
 	end
 
-	if p20.currentState ~= p18.state.currentState and p18.state.currentState == AnimationState.Disappeared then
-		p18.updateToastContent()
+	if p2.currentState ~= data.state.currentState and data.state.currentState == AnimationState.Disappeared then
+		data.updateToastContent()
 	end
 end
 
-return v16
+return extended

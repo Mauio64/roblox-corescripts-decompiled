@@ -1,123 +1,93 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Constants = require(Foundation.Constants)
-local Dash = require(FoundationParent.Dash)
+local parent = Foundation.Parent
 
+local Constants = require(Foundation.Constants)
+local Dash = require(parent.Dash)
 require(Foundation.Components.Types)
 
 local ButtonVariant = require(Foundation.Enums.ButtonVariant)
+
 local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 
 require(Foundation.Enums.StateLayerMode)
+
 require(Foundation.Utility.composeStyleVariant)
+
 require(Foundation.Providers.Style.Tokens)
 
 local InputSize = require(Foundation.Enums.InputSize)
 
-local function toStroke(p1) -- line: 40
-	return {
-		Color = p1.Color3,
-		Transparency = p1.Transparency
-	}
+local function toStroke(border) -- 1 equivalent call inferred from this helper
+	return { Color = border.Color3, Transparency = border.Transparency }
 end
-local function createButtonVariantStyles(p2, p3, b1: boolean?) -- line: 48
-	-- upvalues: ColorNamespace (copy), Dash (copy), Constants (copy)
-	local t1 = {}
 
-	for v18 in ColorNamespace do
-		local v19 = p2[v18]
-		local v20 = if type(p3) ~= "table" then v19[p3] else {
-			Foreground = Dash.get(v19, p3)
-		}
-		local t2 = {}
-		local t3 = {
-			style = v20.Background
-		}
-		local t4
+local function createButtonVariantStyles(p, p2, flag: boolean?)
+	local buttonVariantStyles = {}
 
-		if v20.Border then
-			local Border = v20.Border
+	for k in ColorNamespace do
+		local v = p[k]
+		local v2
 
-			t4 = {
-				Color = Border.Color3,
-				Transparency = Border.Transparency
-			}
+		if (type)(p2) == "table" then
+			v2 = { Foreground = Dash.get(v, p2) }
 		else
-			t4 = nil
+			v2 = v[p2]
 		end
 
-		t3.stroke = t4
-		t3.stateLayer = {
-			mode = Constants.COLOR_NAMESPACE_TO_STATE_LAYER_MODE[b1 or false][v18]
+		local container = { style = v2.Background, stroke = 0, stateLayer = 0 }
+		local stroke
+
+		if v2.Border then
+			stroke = toStroke(v2.Border) -- inferred equivalent call
+		end
+
+		container.stroke = stroke
+		container.stateLayer = {
+			mode = Constants.COLOR_NAMESPACE_TO_STATE_LAYER_MODE[flag or false][k]
 		}
-		t2.container = t3
-		t2.content = {
-			style = v20.Foreground
+		buttonVariantStyles[k] = {
+			container = container,
+			content = { style = v2.Foreground }
 		}
-		t1[v18] = t2
 	end
 
-	return t1
+	return buttonVariantStyles
 end
-local function getButtonTypes(p4) -- line: 89
-	-- upvalues: ButtonVariant (copy), createButtonVariantStyles (copy)
+
+local function getButtonTypes(p)
 	return {
-		[ButtonVariant.Utility] = createButtonVariantStyles(p4, "ActionUtility"),
-		[ButtonVariant.Standard] = createButtonVariantStyles(p4, "ActionStandard"),
-		[ButtonVariant.Emphasis] = createButtonVariantStyles(p4, "ActionEmphasis"),
-		[ButtonVariant.Alert] = createButtonVariantStyles(p4, "ActionAlert"),
-		[ButtonVariant.SubEmphasis] = createButtonVariantStyles(p4, "ActionSubEmphasis", true),
-		[ButtonVariant.SoftEmphasis] = createButtonVariantStyles(p4, "ActionSoftEmphasis"),
-		[ButtonVariant.Subtle] = createButtonVariantStyles(p4, "ActionSubtle"),
-		[ButtonVariant.Text] = createButtonVariantStyles(p4, {
-			"Content",
-			"Emphasis"
-		}),
-		[ButtonVariant.Link] = createButtonVariantStyles(p4, {
-			"Content",
-			"Link"
-		}),
-		[ButtonVariant.OverMedia] = createButtonVariantStyles(p4, "ActionOverMedia", true)
+		[ButtonVariant.Utility] = createButtonVariantStyles(p, "ActionUtility"),
+		[ButtonVariant.Standard] = createButtonVariantStyles(p, "ActionStandard"),
+		[ButtonVariant.Emphasis] = createButtonVariantStyles(p, "ActionEmphasis"),
+		[ButtonVariant.Alert] = createButtonVariantStyles(p, "ActionAlert"),
+		[ButtonVariant.SubEmphasis] = createButtonVariantStyles(p, "ActionSubEmphasis", true),
+		[ButtonVariant.SoftEmphasis] = createButtonVariantStyles(p, "ActionSoftEmphasis"),
+		[ButtonVariant.Subtle] = createButtonVariantStyles(p, "ActionSubtle"),
+		[ButtonVariant.Text] = createButtonVariantStyles(p, { "Content", "Emphasis" }),
+		[ButtonVariant.Link] = createButtonVariantStyles(p, { "Content", "Link" }),
+		[ButtonVariant.OverMedia] = createButtonVariantStyles(p, "ActionOverMedia", true)
 	}
 end
-local function getSizes(p5) -- line: 106
-	-- upvalues: InputSize (copy)
+
+local function getSizes(p)
 	return {
 		[InputSize.XSmall] = {
-			container = {
-				radius = p5.Radius.Small,
-				height = p5.Size.Size_600
-			}
+			container = { radius = p.Radius.Small, height = p.Size.Size_600 }
 		},
 		[InputSize.Small] = {
-			container = {
-				radius = p5.Radius.Medium,
-				height = p5.Size.Size_800
-			}
+			container = { radius = p.Radius.Medium, height = p.Size.Size_800 }
 		},
 		[InputSize.Medium] = {
-			container = {
-				radius = p5.Radius.Medium,
-				height = p5.Size.Size_1000
-			}
+			container = { radius = p.Radius.Medium, height = p.Size.Size_1000 }
 		},
 		[InputSize.Large] = {
-			container = {
-				radius = p5.Radius.Medium,
-				height = p5.Size.Size_1200
-			}
+			container = { radius = p.Radius.Medium, height = p.Size.Size_1200 }
 		}
 	}
 end
-local function getSharedVariants(p6) -- line: 123
-	-- upvalues: getSizes (copy), getButtonTypes (copy)
-	local v28 = getSizes(p6)
-	local v29 = getButtonTypes(p6)
 
-	return {
-		sizes = v28,
-		types = v29
-	}
+local function getSharedVariants(p)
+	return { sizes = getSizes(p), types = getButtonTypes(p) }
 end
 
 return getSharedVariants

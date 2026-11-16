@@ -1,13 +1,12 @@
-local t1 = {}
-local n1 = 0
+local count = 0
+local HttpSession = {}
 
-function t1.currentSession() -- line: 5
-	-- upvalues: n1 (ref)
-	return n1
-end
-function t1.startNewSession() -- line: 9
-	-- upvalues: n1 (ref)
-	n1 += 1
+function HttpSession.currentSession()
+	return count
 end
 
-return t1
+function HttpSession.startNewSession()
+	count += 1
+end
+
+return HttpSession

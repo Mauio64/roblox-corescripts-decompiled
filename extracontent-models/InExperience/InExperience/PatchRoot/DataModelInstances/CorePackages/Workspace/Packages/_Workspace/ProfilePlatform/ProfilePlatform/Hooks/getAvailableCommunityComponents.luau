@@ -1,67 +1,59 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
+local parent = ProfilePlatform.Parent
 
 require(ProfilePlatform.Types.Component)
-
 local Enums = require(ProfilePlatform.Common.Enums)
 local getSupportedActionsForProfileType = require(ProfilePlatform.Hooks.getSupportedActionsForProfileType)
-local FFlagAddSocialLinksToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddSocialLinksToCommunityProfile
-local FFlagAddVideoToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddVideoToCommunityProfile
-local FFlagAddCommunityLockedToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddCommunityLockedToCommunityProfile
-local FFlagAddEventsToCommunityProfile = require(ProfilePlatform.Flags.FFlagAddEventsToCommunityProfile)
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddSocialLinksToCommunityProfile = SharedFlags.FFlagAddSocialLinksToCommunityProfile
 
-return function() -- line: 14
-	-- upvalues: Enums (copy), FFlagProfilePlatformCTAsRefactor (copy), getSupportedActionsForProfileType (copy), FFlagAddSocialLinksToCommunityProfile (copy), FFlagAddVideoToCommunityProfile (copy), FFlagAddCommunityLockedToCommunityProfile (copy), FFlagAddEventsToCommunityProfile (copy)
-	local t1 = {
-		{
-			component = Enums.Components.CommunityProfileHeader
-		},
-		{
-			component = Enums.Components.About
-		},
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAddCommunityLockedToCommunityProfile = SharedFlags2.FFlagAddCommunityLockedToCommunityProfile
+local FFlagAddEventsToCommunityProfile = require(ProfilePlatform.Flags.FFlagAddEventsToCommunityProfile)
+local FFlagHideLeaveFromOpenCommunityOwner = require(ProfilePlatform.Flags.FFlagHideLeaveFromOpenCommunityOwner)
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagGroupAnnouncementsSdui = SharedFlags3.FFlagGroupAnnouncementsSdui
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagGroupForumsDiscoverySdui = SharedFlags4.FFlagGroupForumsDiscoverySdui
+
+return function()
+	local v = {
+		{ component = Enums.Components.CommunityProfileHeader },
+		{ component = Enums.Components.About },
 		{
 			component = Enums.Components.Actions,
-			supportedActions = if not FFlagProfilePlatformCTAsRefactor then nil else getSupportedActionsForProfileType(Enums.ProfileTypes.Community),
-			isActionsV2Supported = not not FFlagProfilePlatformCTAsRefactor or nil
+			supportedActions = getSupportedActionsForProfileType(Enums.ProfileTypes.Community),
+			isActionsV2Supported = true
 		},
-		{
-			component = Enums.Components.Experiences
-		},
-		{
-			component = Enums.Components.Store
-		},
-		{
-			component = Enums.Components.ViewFullProfile
-		},
-		{
-			component = Enums.Components.CoverPhoto
-		}
+		{ component = Enums.Components.Experiences },
+		{ component = Enums.Components.Store },
+		{ component = Enums.Components.ViewFullProfile },
+		{ component = Enums.Components.CoverPhoto }
 	}
 
 	if FFlagAddSocialLinksToCommunityProfile then
-		table.insert(t1, {
-			component = Enums.Components.SocialLinks
-		})
-	end
-
-	if FFlagAddVideoToCommunityProfile then
-		table.insert(t1, {
-			component = Enums.Components.Videos
-		})
+		table.insert(v, { component = Enums.Components.SocialLinks })
 	end
 
 	if FFlagAddCommunityLockedToCommunityProfile then
-		table.insert(t1, {
-			component = Enums.Components.CommunityLocked
-		})
+		table.insert(v, { component = Enums.Components.CommunityLocked })
+	end
+
+	if FFlagHideLeaveFromOpenCommunityOwner then
+		table.insert(v, { component = Enums.Components.CommunityDeactivated })
 	end
 
 	if FFlagAddEventsToCommunityProfile then
-		table.insert(t1, {
-			component = Enums.Components.Events
-		})
+		table.insert(v, { component = Enums.Components.Events })
 	end
 
-	return t1
+	if FFlagGroupAnnouncementsSdui then
+		table.insert(v, { component = Enums.Components.Announcements })
+	end
+
+	if FFlagGroupForumsDiscoverySdui then
+		table.insert(v, { component = Enums.Components.GroupForumsDiscovery })
+	end
+
+	return v
 end

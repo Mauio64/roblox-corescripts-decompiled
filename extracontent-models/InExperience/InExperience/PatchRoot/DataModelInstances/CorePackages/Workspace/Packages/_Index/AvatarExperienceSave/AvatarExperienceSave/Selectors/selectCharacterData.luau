@@ -1,28 +1,39 @@
 local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
-local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
+local parent = AvatarExperienceSave.Parent
 
 require(AvatarExperienceSave.Context.AvatarSaveContext)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 
-local FFlagAXBackgroundsPersistence = require(AvatarExperienceSaveParent.AvatarExperienceFlags).FFlagAXBackgroundsPersistence
+local FFlagAXBackgroundsPersistence = AvatarExperienceFlags.FFlagAXBackgroundsPersistence
 
-local function selectCharacterData(p1) -- line: 9
-	-- upvalues: FFlagAXBackgroundsPersistence (copy)
-	return {
+local function selectCharacterData(p)
+	local characterData = {
 		tryOn = {
-			TryOn = p1.AvatarExperience.AvatarScene.TryOn,
-			OutfitTryOn = p1.AvatarExperience.AvatarScene.OutfitTryOn,
-			LastSavedTriedOnOutfit = p1.AvatarExperience.AvatarScene.LastSavedTriedOnOutfit
+			TryOn = p.AvatarExperience.AvatarScene.TryOn,
+			OutfitTryOn = p.AvatarExperience.AvatarScene.OutfitTryOn,
+			LastSavedTriedOnOutfit = p.AvatarExperience.AvatarScene.LastSavedTriedOnOutfit
 		},
-		equipped = {
-			AvatarType = p1.AvatarExperience.AvatarEditor.Character.AvatarType,
-			AvatarScales = p1.AvatarExperience.AvatarEditor.Character.AvatarScales,
-			BodyColor3s = p1.AvatarExperience.AvatarEditor.Character.BodyColor3s,
-			BodyPartRangeIds = p1.AvatarExperience.AvatarEditor.Character.BodyPartRangeIds,
-			EquippedAssets = p1.AvatarExperience.AvatarEditor.Character.EquippedAssets,
-			EquippedEmotes = p1.AvatarExperience.AvatarEditor.EquippedEmotes,
-			BackgroundAssetId = if not FFlagAXBackgroundsPersistence then nil else p1.AvatarExperience.AvatarScene.ProfileConfiguration.BackgroundAssetId
-		}
+		equipped = 0
 	}
+
+	local equipped = {
+		AvatarType = p.AvatarExperience.AvatarEditor.Character.AvatarType,
+		AvatarScales = p.AvatarExperience.AvatarEditor.Character.AvatarScales,
+		BodyColor3s = p.AvatarExperience.AvatarEditor.Character.BodyColor3s,
+		BodyPartRangeIds = p.AvatarExperience.AvatarEditor.Character.BodyPartRangeIds,
+		EquippedAssets = p.AvatarExperience.AvatarEditor.Character.EquippedAssets,
+		EquippedEmotes = p.AvatarExperience.AvatarEditor.EquippedEmotes,
+		BackgroundAssetId = 0
+	}
+	local backgroundAssetId
+
+	if FFlagAXBackgroundsPersistence then
+		backgroundAssetId = p.AvatarExperience.AvatarScene.ProfileConfiguration.BackgroundAssetId
+	end
+
+	equipped.BackgroundAssetId = backgroundAssetId
+	characterData.equipped = equipped
+	return characterData
 end
 
 return selectCharacterData

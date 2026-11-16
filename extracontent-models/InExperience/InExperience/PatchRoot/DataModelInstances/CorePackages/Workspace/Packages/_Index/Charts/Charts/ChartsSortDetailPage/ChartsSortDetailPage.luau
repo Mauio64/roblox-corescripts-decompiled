@@ -1,13 +1,17 @@
 local Charts = script:FindFirstAncestor("Charts")
-local ChartsParent = Charts.Parent
+local parent = Charts.Parent
 
-require(ChartsParent.Navigation)
+require(parent.Navigation)
+local React = require(parent.React)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local AppComposition = require(parent.AppComposition)
+local CompositionTags = AppComposition.CompositionTags
 
-local React = require(ChartsParent.React)
-local RobloxAppEnums = require(ChartsParent.RobloxAppEnums)
-local SduiSharedUtilities = require(ChartsParent.SduiSharedUtilities)
-local CompositionTags = require(ChartsParent.AppComposition).CompositionTags
 local AppPage = RobloxAppEnums.AppPage
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppThemeHalloween2026HomeBackground = SharedFlags.FFlagAppThemeHalloween2026HomeBackground
+
 local SduiPageEntryPoint = SduiSharedUtilities.SduiPageEntryPoint
 local SduiSurfaceLoadTimeTracker = SduiSharedUtilities.SduiSurfaceLoadTimeTracker
 local getSduiClientPageScope = SduiSharedUtilities.getSduiClientPageScope
@@ -18,104 +22,98 @@ local ChartsSortDetailConstants = require(Charts.ChartsSortDetailPage.ChartsSort
 local ChartsSortDetailScopeFields = require(Charts.ChartsSortDetailPage.ChartsSortDetailScopeFields)
 local fetchChartsSortDetail = require(Charts.ChartsSortDetailPage.fetchChartsSortDetail)
 local getChartsSortDetailPageKey = require(Charts.ChartsSortDetailPage.getChartsSortDetailPageKey)
-local FFlagLuaAppSduiGameSortDropDown = require(ChartsParent.SharedFlags).FFlagLuaAppSduiGameSortDropDown
 
-local function getFromPropsOrNavigationParams(t1: {[any]: any}, s1: string) -- line: 36
-	return t1[s1] or t1.navigation and t1.navigation.getParam(s1)
+local function getFromPropsOrNavigationParams(props, p: string) -- 2 equivalent calls inferred from this helper
+	return props[p] or props.navigation and props.navigation.getParam(p)
 end
-local function ChartsSortDetailPage(t2: {[any]: any}) -- line: 40
-	-- upvalues: React (copy), getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy), getChartsSortDetailPageKey (copy), usePageScopeRef (copy), FFlagLuaAppSduiGameSortDropDown (copy), ChartsSortDetailScopeFields (copy), SduiSurfaceLoadTimeTracker (copy), ChartsSortDetailConstants (copy), fetchChartsSortDetail (copy), SduiPageEntryPoint (copy), AppPage (copy), CompositionTags (copy)
-	local v24 = t2.sortId or t2.navigation and t2.navigation.getParam("sortId")
-	local v25 = React.useMemo(function() -- line: 45
-		-- upvalues: getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy)
+
+local function ChartsSortDetailPage(props)
+	local v = getFromPropsOrNavigationParams(props, "sortId") -- inferred equivalent call
+	local chartsSortDetailPageKey = getChartsSortDetailPageKey(v, nil, (React.useMemo(function()
 		return getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections)
-	end, {})
-	local v26 = getChartsSortDetailPageKey(v24, nil, v25)
-	local v27 = t2.pageTimer or t2.navigation and t2.navigation.getParam("pageTimer")
+	end, {})))
+	local v2 = getFromPropsOrNavigationParams(props, "pageTimer") -- inferred equivalent call
+	usePageScopeRef(chartsSortDetailPageKey)
+	React.useMemo(function()
+		getSduiClientPageScope(chartsSortDetailPageKey).set(ChartsSortDetailScopeFields.SelectedSortId, v)
+	end, { chartsSortDetailPageKey, v })
 
-	usePageScopeRef(v26)
-
-	if FFlagLuaAppSduiGameSortDropDown then
-		React.useMemo(function() -- line: 56
-			-- upvalues: getSduiClientPageScope (copy), v26 (copy), ChartsSortDetailScopeFields (copy), v24 (copy)
-			getSduiClientPageScope(v26).set(ChartsSortDetailScopeFields.SelectedSortId, v24)
-		end, {
-			v26,
-			v24
-		})
-	end
-
-	local v28 = React.useMemo(function() -- line: 61
-		-- upvalues: v27 (copy), SduiSurfaceLoadTimeTracker (copy), v26 (copy), ChartsSortDetailConstants (copy), getSduiClientPageScope (copy)
-		local v31 = v27 or SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(v26, {
+	local pageTimer = React.useMemo(function()
+		local selected = v2 or SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(chartsSortDetailPageKey, {
 			eventName = ChartsSortDetailConstants.SurfaceLoadTimeEventName,
-			metadata = {
-				page = "mount"
-			}
+			metadata = { page = "mount" }
 		})
 
-		getSduiClientPageScope(v26).set(SduiSurfaceLoadTimeTracker.SURFACE_LOAD_TIME_PAGE_SCOPE_KEY, v31)
+		getSduiClientPageScope(chartsSortDetailPageKey).set(
+			SduiSurfaceLoadTimeTracker.SURFACE_LOAD_TIME_PAGE_SCOPE_KEY,
+			selected
+		)
+		return selected
+	end, { chartsSortDetailPageKey, v2 })
 
-		return v31
-	end, {
-		v26,
-		v27
-	})
-
-	React.useEffect(function() -- line: 73
-		-- upvalues: v24 (copy), fetchChartsSortDetail (copy), v28 (copy)
-		if v24 then
-			fetchChartsSortDetail(v24, v28)
+	React.useEffect(function()
+		if v then
+			fetchChartsSortDetail(v, pageTimer)
 		end
-	end, {
-		v24,
-		v28
-	})
+	end, { v, pageTimer })
 
-	local v29 = React.useCallback(function() -- line: 79
-		-- upvalues: v24 (copy), SduiSurfaceLoadTimeTracker (copy), v26 (copy), ChartsSortDetailConstants (copy), fetchChartsSortDetail (copy)
-		if v24 then
-			local v32 = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(v26, {
-				eventName = ChartsSortDetailConstants.SurfaceLoadTimeEventName,
-				metadata = {
-					page = "refresh"
+	local refresh = React.useCallback(function()
+		if v then
+			local loadTimerWithSurfaceLoadTime = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(
+				chartsSortDetailPageKey,
+				{
+					eventName = ChartsSortDetailConstants.SurfaceLoadTimeEventName,
+					metadata = { page = "refresh" }
 				}
-			})
+			)
 
-			v32.start("refresh")
-			fetchChartsSortDetail(v24, v32)
+			loadTimerWithSurfaceLoadTime.start("refresh")
+			fetchChartsSortDetail(v, loadTimerWithSurfaceLoadTime)
 		end
-	end, {
-		v24,
-		v26
-	})
-	local v30 = React.useMemo(function() -- line: 92
-		-- upvalues: t2 (copy)
-		if t2.pageContext then
-			return {
-				pageContext = t2.pageContext
-			}
+	end, { v, chartsSortDetailPageKey })
+
+	local additionalAnalyticsData = React.useMemo(function()
+		if props.pageContext then
+			return { pageContext = props.pageContext }
 		end
 
 		return nil
-	end, { t2.pageContext })
+	end, { props.pageContext })
 
-	if v24 == nil then
+	if v == nil then
 		return nil
 	end
 
-	return React.createElement(SduiPageEntryPoint, {
-		includeNavigationHeaderBar = false,
-		appPage = t2.pageContext or AppPage.Games,
+	local createElement = React.createElement
+	local v3 = {
+		appPage = props.pageContext or AppPage.Games,
 		routeName = AppPage.GamesList,
-		configKey = v26,
-		pageTimer = v28,
-		refresh = v29,
+		configKey = chartsSortDetailPageKey,
+		pageTimer = pageTimer,
+		includeNavigationHeaderBar = false,
+		refresh = refresh,
 		contentTag = CompositionTags.ContentRegion.Body,
 		stickyContentTag = CompositionTags.ContentRegion.Header,
-		additionalAnalyticsData = v30,
-		pageTopPadding = t2.pageTopPadding
-	})
+		additionalAnalyticsData = additionalAnalyticsData,
+		pageTopPadding = props.pageTopPadding,
+		backgroundStyle = 0,
+		feedBackgroundStyle = 0
+	}
+	local backgroundStyle
+
+	if FFlagAppThemeHalloween2026HomeBackground then
+		backgroundStyle = props.backgroundStyle
+	end
+
+	v3.backgroundStyle = backgroundStyle
+	local feedBackgroundStyle
+
+	if FFlagAppThemeHalloween2026HomeBackground then
+		feedBackgroundStyle = props.backgroundStyle
+	end
+
+	v3.feedBackgroundStyle = feedBackgroundStyle
+	return createElement(SduiPageEntryPoint, v3)
 end
 
 return React.memo(ChartsSortDetailPage)

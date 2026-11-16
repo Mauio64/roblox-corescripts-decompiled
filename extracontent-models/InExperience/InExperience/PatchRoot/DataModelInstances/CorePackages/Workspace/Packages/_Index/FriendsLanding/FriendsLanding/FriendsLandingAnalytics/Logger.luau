@@ -1,3 +1,4 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local Logger = require(FriendsLanding.Logger)
 
-return (require(FriendsLanding.Logger):new("FriendsLanding Analytics"))
+return (Logger:new("FriendsLanding Analytics"))

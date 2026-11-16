@@ -1,35 +1,45 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local Cryo = require(ParentParentParent.Cryo)
-local StatusIndicator = require(ParentParentParent.Foundation).StatusIndicator
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local ControlState = require(ParentParent.Core.Control.Enum.ControlState)
-local ImageSetComponent = require(ParentParent.Core.ImageSet.ImageSetComponent)
-local validateImageSetData = require(ParentParent.Core.ImageSet.Validator.validateImageSetData)
-local BadgeVariant = require(ParentParent.App.Indicator.Enum.BadgeVariant)
-local BadgeStates = require(ParentParent.App.Indicator.Enum.BadgeStates)
-local IconSize = require(ParentParent.App.ImageSet.Enum.IconSize)
-local getIconSize = require(ParentParent.App.ImageSet.getIconSize)
-local InteractableList = require(ParentParent.Core.Control.InteractableList)
-local withAnimation = require(ParentParent.Core.Animation.withAnimation)
-local migrateBadgeVariant = require(ParentParent.Utility.migrateBadgeVariant)
-local Placement = require(script.Parent.Enum.Placement)
-local t1 = {
-	frequency = 3
-}
-local v20 = getIconSize(IconSize.Medium)
-local v21 = v20 + 8
-local v22 = (v21 - v20) / 2
-local v23 = (v21 - v20) / 2
-local v24 = v22 + 4
-local v25 = v23 - 4
-local v26 = 12 + (64 - v21) / 2
-local v27 = 4 + (64 - v21)
-local v28 = Roact.PureComponent:extend("SystemBar")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-v28.validateProps = t.strictInterface({
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+local Cryo = require(parent2.Cryo)
+local Foundation = require(parent2.Foundation)
+
+local StatusIndicator = Foundation.StatusIndicator
+local withStyle = require(parent.Core.Style.withStyle)
+local ControlState = require(parent.Core.Control.Enum.ControlState)
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
+local validateImageSetData = require(parent.Core.ImageSet.Validator.validateImageSetData)
+local BadgeVariant = require(parent.App.Indicator.Enum.BadgeVariant)
+local BadgeStates = require(parent.App.Indicator.Enum.BadgeStates)
+local IconSize = require(parent.App.ImageSet.Enum.IconSize)
+local getIconSize = require(parent.App.ImageSet.getIconSize)
+
+local InteractableList = require(parent.Core.Control.InteractableList)
+local withAnimation = require(parent.Core.Animation.withAnimation)
+
+local migrateBadgeVariant = require(parent.Utility.migrateBadgeVariant)
+
+local Placement = require(script.Parent.Enum.Placement)
+
+local v = { frequency = 3 }
+
+local iconSize = getIconSize(IconSize.Medium)
+
+local v2 = iconSize + 8
+
+local v3 = (v2 - iconSize) / 2
+local v4 = (v2 - iconSize) / 2
+local v5 = v3 + 4
+local v6 = v4 - 4
+
+local v7 = 12 + (64 - v2) / 2
+local v8 = 4 + (64 - v2)
+
+local extended = Roact.PureComponent:extend("SystemBar")
+
+extended.validateProps = t.strictInterface({
 	itemList = t.array(t.strictInterface({
 		iconOn = t.optional(validateImageSetData),
 		iconOff = t.optional(validateImageSetData),
@@ -58,301 +68,336 @@ v28.validateProps = t.strictInterface({
 	clipsDescendants = t.optional(t.boolean),
 	experimentalTabSizePortraitY = t.optional(t.number)
 })
-v28.defaultProps = {
-	clipsDescendants = true,
-	experimentalTabSizePortraitY = 48,
+
+extended.defaultProps = {
 	placement = Placement.Auto,
 	layoutPaddingOffset = UDim.new(0, 0),
 	firstItemPaddingOffset = UDim.new(0, 0),
-	lastItemPaddingOffset = UDim.new(0, 0)
+	lastItemPaddingOffset = UDim.new(0, 0),
+	clipsDescendants = true,
+	experimentalTabSizePortraitY = 48
 }
 
-function v28.isPortrait(p1) -- line: 145
-	-- upvalues: Placement (copy)
-	if p1.props.placement == Placement.Left then
+function extended:isPortrait()
+	if self.props.placement == Placement.Left then
 		return false
 	end
 
-	if p1.props.placement == Placement.Bottom then
-		return true
-	end
-
-	return p1.state.portrait
+	return self.props.placement == Placement.Bottom or self.state.portrait
 end
-function v28.renderItem(p2, p3, p4, p5, p6) -- line: 155
-	-- upvalues: ControlState (copy), Placement (copy), Roact (copy), BadgeStates (copy), t (copy), v22 (copy), v23 (copy), v25 (copy), v24 (copy), withAnimation (copy), withStyle (copy), ImageSetComponent (copy), v20 (copy), v20 (copy), StatusIndicator (copy), migrateBadgeVariant (copy), BadgeVariant (copy), t1 (copy)
-	assert(p3.iconOn ~= nil and p3.iconOff ~= nil or (p3.iconImageComponent ~= nil or p3.iconComponent ~= nil), "items must define either iconOn and iconOff or iconImageComponent or iconComponent")
 
-	local v35 = p4 == ControlState.Pressed
-	local v36 = v35 or p4 == ControlState.Hover
+function extended:renderItem(props, p, selected, layoutOrder)
+	assert(
+		props.iconOn ~= nil and props.iconOff ~= nil or props.iconImageComponent ~= nil or props.iconComponent ~= nil,
+		"items must define either iconOn and iconOff or iconImageComponent or iconComponent"
+	)
 
-	if p3.iconComponent then
-		local v37 = if not p2:isPortrait() then Placement.Left else Placement.Bottom
+	local pressed = p == ControlState.Pressed
+	local hovered = pressed or p == ControlState.Hover
 
-		return Roact.createElement(p3.iconComponent, {
-			placement = v37,
-			hovered = v36,
-			selected = p5,
-			pressed = v35,
-			badgeValue = p3.badgeValue
-		}), {
-			LayoutOrder = p6
-		}
-	end
+	if props.iconComponent then
+		local placement
 
-	local u38 = not not p3.badgeValue and (p3.badgeValue == BadgeStates.isEmpty or (not not t.string(p3.badgeValue) or p3.badgeValue > 0))
-	local v39 = v22
-	local v40 = v23
-
-	if v36 then
-		if p2:isPortrait() then
-			v40 = v25
+		if self:isPortrait() then
+			placement = Placement.Bottom
 		else
-			v39 = v24
+			placement = Placement.Left
 		end
+
+		return Roact.createElement(props.iconComponent, {
+			placement = placement,
+			hovered = hovered,
+			selected = selected,
+			pressed = pressed,
+			badgeValue = props.badgeValue
+		}), { LayoutOrder = layoutOrder }
+	else
+		local v9
+
+		if props.badgeValue then
+			v9 = props.badgeValue == BadgeStates.isEmpty
+				or (t.string(props.badgeValue) and true or props.badgeValue > 0)
+		else
+			v9 = false
+		end
+
+		local positionX = v3
+		local positionY = v4
+
+		if hovered then
+			if self:isPortrait() then
+				positionY = v6
+			else
+				positionX = v5
+			end
+		end
+
+		return withAnimation({ positionX = positionX, positionY = positionY }, function(p2)
+			return withStyle(function(p3)
+				local theme = p3.Theme
+				local createElement = Roact.createElement
+				local iconImageComponent = props.iconImageComponent or ImageSetComponent.Label
+				local v10 = {
+					Position = UDim2.fromOffset(math.floor(p2.positionX + 0.5), (math.floor(p2.positionY + 0.5))),
+					Size = UDim2.fromOffset(iconSize, iconSize),
+					BackgroundTransparency = self.props.buttonStroke and 0.99 or 1,
+					Image = selected and props.iconOn or props.iconOff,
+					ImageColor3 = theme.IconDefault.Color,
+					ImageTransparency = pressed and 0.5 or 0
+				}
+
+				local badge = v9
+
+				if badge then
+					local createElement2 = Roact.createElement
+					local position
+
+					if props.badgeValue == BadgeStates.isEmpty then
+						position = UDim2.fromOffset(22, 2)
+					else
+						position = UDim2.fromOffset(18, -2)
+					end
+
+					badge = createElement2(StatusIndicator, {
+						position = position,
+						value = tonumber(props.badgeValue),
+						variant = migrateBadgeVariant(BadgeVariant.Default),
+						max = tonumber(props.badgeValue) and 99 or nil
+					})
+				end
+
+				return createElement(iconImageComponent, v10, {
+					Badge = badge,
+					UICorner = self.props.roundCorners and Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0.15, 0)
+					}) or nil,
+					UIStroke = self.props.buttonStroke and Roact.createElement("UIStroke", {
+						Color = Color3.new(0.4, 0.4, 0.4),
+						Transparency = 0,
+						Thickness = 1
+					}) or nil
+				})
+			end)
+		end, v), { LayoutOrder = layoutOrder }
 	end
-
-	return withAnimation({
-		positionX = v39,
-		positionY = v40
-	}, function(p7) -- line: 208
-		-- upvalues: withStyle (copy), Roact (copy), p3 (copy), ImageSetComponent (copy), v20 (copy), v20 (copy), p2 (copy), p5 (copy), v35 (copy), u38 (ref), StatusIndicator (copy), BadgeStates (copy), migrateBadgeVariant (copy), BadgeVariant (copy)
-		return withStyle(function(p8) -- line: 209
-			-- upvalues: Roact (copy), p3 (copy), ImageSetComponent (copy), p7 (copy), v20 (copy), v20 (copy), p2 (copy), p5 (copy), v35 (copy), u38 (ref), StatusIndicator (copy), BadgeStates (copy), migrateBadgeVariant (copy), BadgeVariant (copy)
-			local Theme = p8.Theme
-
-			return Roact.createElement(p3.iconImageComponent or ImageSetComponent.Label, {
-				Position = UDim2.fromOffset(math.floor(p7.positionX + 0.5), (math.floor(p7.positionY + 0.5))),
-				Size = UDim2.fromOffset(v20, v20),
-				BackgroundTransparency = not p2.props.buttonStroke and 1 or 0.99,
-				Image = p5 and p3.iconOn or p3.iconOff,
-				ImageColor3 = Theme.IconDefault.Color,
-				ImageTransparency = not v35 and 0 or 0.5
-			}, {
-				Badge = u38 and Roact.createElement(StatusIndicator, {
-					position = if p3.badgeValue ~= BadgeStates.isEmpty then UDim2.fromOffset(18, -2) else UDim2.fromOffset(22, 2),
-					value = tonumber(p3.badgeValue),
-					variant = migrateBadgeVariant(BadgeVariant.Default),
-					max = if not tonumber(p3.badgeValue) then nil else 99
-				}),
-				UICorner = p2.props.roundCorners and Roact.createElement("UICorner", {
-					CornerRadius = UDim.new(0.15, 0)
-				}) or nil,
-				UIStroke = p2.props.buttonStroke and Roact.createElement("UIStroke", {
-					Transparency = 0,
-					Thickness = 1,
-					Color = Color3.new(0.4, 0.4, 0.4)
-				}) or nil
-			})
-		end)
-	end, t1), {
-		LayoutOrder = p6
-	}
 end
-function v28.renderPortrait(p9, p10, p11) -- line: 244
-	-- upvalues: withAnimation (copy), Roact (copy), Cryo (copy), v21 (copy), t1 (copy)
+
+function extended:renderPortrait(p, p2)
 	return withAnimation({
-		offset = if not p9.props.hidden then -p9.props.experimentalTabSizePortraitY else 0
-	}, function(p12) -- line: 247
-		-- upvalues: Roact (copy), Cryo (copy), p10 (copy), p9 (copy), v21 (copy), p11 (copy)
-		return Roact.createElement("Frame", Cryo.Dictionary.join(p10, {
-			ZIndex = 99,
-			Position = UDim2.new(0, 0, 1, (math.floor(p12.offset + 0.5))),
-			Size = UDim2.new(1, 0, 0, p9.props.experimentalTabSizePortraitY)
+		offset = self.props.hidden and 0 or -self.props.experimentalTabSizePortraitY
+	}, function(p3)
+		return Roact.createElement("Frame", Cryo.Dictionary.join(p, {
+			Position = UDim2.new(0, 0, 1, (math.floor(p3.offset + 0.5))),
+			Size = UDim2.new(1, 0, 0, self.props.experimentalTabSizePortraitY),
+			ZIndex = 99
 		}), {
 			Layout = Roact.createElement("UIListLayout", {
 				HorizontalAlignment = Enum.HorizontalAlignment.Center
 			}),
-			InnerFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, Cryo.Dictionary.join({
-				Constraint = Roact.createElement("UISizeConstraint", {
-					MaxSize = Vector2.new(600, p9.props.experimentalTabSizePortraitY)
-				}),
-				Layout = Roact.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					Padding = p9.props.layoutPaddingOffset + UDim.new(1 / #p9.props.itemList, -v21),
-					SortOrder = p9.props.sortOrder
-				}, {})
-			}, p11))
+			InnerFrame = Roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 },
+				Cryo.Dictionary.join({
+					Constraint = Roact.createElement("UISizeConstraint", {
+						MaxSize = Vector2.new(600, self.props.experimentalTabSizePortraitY)
+					}),
+					Layout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						Padding = self.props.layoutPaddingOffset + UDim.new(1 / #self.props.itemList, -v2),
+						SortOrder = self.props.sortOrder
+					}, {})
+				}, p2)
+			)
 		})
-	end, t1)
+	end, v)
 end
-function v28.renderLandscape(p13, p14, p15, p16) -- line: 283
-	-- upvalues: withAnimation (copy), Roact (copy), Cryo (copy), v26 (copy), v27 (copy), t1 (copy)
+
+function extended:renderLandscape(p, p2, p3)
 	return withAnimation({
-		offset = not p13.props.hidden and 0 or -64
-	}, function(p17) -- line: 286
-		-- upvalues: Roact (copy), Cryo (copy), p14 (copy), p16 (copy), p13 (copy), v26 (copy), v27 (copy), p15 (copy)
-		return Roact.createElement("Frame", Cryo.Dictionary.join(p14, {
-			ZIndex = 99,
-			Position = UDim2.new(0, math.floor(p17.offset + 0.5), 0, 0),
+		offset = self.props.hidden and -64 or 0
+	}, function(p4)
+		local createElement = Roact.createElement
+
+		local joined = Cryo.Dictionary.join(p, {
+			Position = UDim2.new(0, math.floor(p4.offset + 0.5), 0, 0),
 			Size = UDim2.new(0, 64, 1, 0),
-			BackgroundTransparency = if not p16 then nil else 1
-		}), Cryo.Dictionary.join({
-			Padding = Roact.createElement("UIPadding", {
-				PaddingTop = if p16 then nil else p13.props.firstItemPaddingOffset + UDim.new(0, v26),
-				PaddingBottom = if not p16 then nil else p13.props.lastItemPaddingOffset + UDim.new(0, v27)
-			}),
-			Layout = Roact.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = if not p16 then nil else Enum.VerticalAlignment.Bottom,
-				Padding = p13.props.layoutPaddingOffset + UDim.new(0, v27),
-				SortOrder = p13.props.sortOrder
-			})
-		}, p15))
-	end, t1)
-end
-function v28.renderBackground(p18, p19, p20) -- line: 316
-	-- upvalues: Cryo (copy), Roact (copy)
-	if p18:isPortrait() then
-		return p18:renderPortrait(p19, p20)
-	end
-
-	local v51 = Cryo.List.filter(p20, function(_, p22) -- line: 320
-		-- upvalues: p18 (copy)
-		return not p18.props.itemList[p22].bottomAligned
-	end)
-	local v52 = Cryo.List.filter(p20, function(_, p24) -- line: 323
-		-- upvalues: p18 (copy)
-		return p18.props.itemList[p24].bottomAligned
-	end)
-	local v53 = p18:renderLandscape(p19, v51)
-
-	if #v52 > 0 then
-		v53 = Roact.createFragment({
-			NavBar = v53,
-			BottomAlignedNavBar = p18:renderLandscape(p19, v52, true)
+			ZIndex = 99,
+			BackgroundTransparency = p3 and 1 or nil
 		})
+
+		local join = Cryo.Dictionary.join
+		local createElement2 = Roact.createElement
+		local paddingTop
+
+		if not p3 then
+			paddingTop = self.props.firstItemPaddingOffset + UDim.new(0, v7)
+		end
+
+		local paddingBottom
+
+		if p3 then
+			paddingBottom = self.props.lastItemPaddingOffset + UDim.new(0, v8)
+		end
+
+		local children = {
+			Padding = createElement2("UIPadding", {
+				PaddingTop = paddingTop,
+				PaddingBottom = paddingBottom
+			}),
+			Layout = 0
+		}
+
+		local createElement3 = Roact.createElement
+		local v9 = {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = 0,
+			Padding = 0,
+			SortOrder = 0
+		}
+		local verticalAlignment
+
+		if p3 then
+			verticalAlignment = Enum.VerticalAlignment.Bottom
+		end
+
+		v9.VerticalAlignment = verticalAlignment
+		v9.Padding = self.props.layoutPaddingOffset + UDim.new(0, v8)
+		v9.SortOrder = self.props.sortOrder
+		children.Layout = createElement3("UIListLayout", v9)
+		return createElement("Frame", joined, join(children, p2))
+	end, v)
+end
+
+function extended:renderBackground(p, p2)
+	if self:isPortrait() then
+		return self:renderPortrait(p, p2)
 	end
 
-	return v53
-end
-function v28.renderSafeArea(p25) -- line: 337
-	-- upvalues: Roact (copy)
-	local uDim2, uDim2_2
+	local filtered = Cryo.List.filter(p2, function(_, p3): boolean
+		return not self.props.itemList[p3].bottomAligned
+	end)
 
-	if p25.props.hidden then
-		uDim2 = UDim2.new(0, 0, 0, 0)
-		uDim2_2 = UDim2.new(1, 0, 1, 0)
-	elseif p25:isPortrait() then
-		uDim2 = UDim2.new(0, 0, 0, 0)
-		uDim2_2 = UDim2.new(1, 0, 1, -p25.props.experimentalTabSizePortraitY)
+	local filtered2 = Cryo.List.filter(p2, function(_, p3)
+		return self.props.itemList[p3].bottomAligned
+	end)
+
+	local navBar = self:renderLandscape(p, filtered)
+
+	if #filtered2 > 0 then
+		return (Roact.createFragment({
+			NavBar = navBar,
+			BottomAlignedNavBar = self:renderLandscape(p, filtered2, true)
+		}))
+	end
+
+	return navBar
+end
+
+function extended:renderSafeArea()
+	local udim, udim2
+
+	if self.props.hidden then
+		udim = UDim2.new(0, 0, 0, 0)
+		udim2 = UDim2.new(1, 0, 1, 0)
+	elseif self:isPortrait() then
+		udim = UDim2.new(0, 0, 0, 0)
+		udim2 = UDim2.new(1, 0, 1, -self.props.experimentalTabSizePortraitY)
 	else
-		uDim2 = UDim2.new(0, 64, 0, 0)
-		uDim2_2 = UDim2.new(1, -64, 1, 0)
+		udim = UDim2.new(0, 64, 0, 0)
+		udim2 = UDim2.new(1, -64, 1, 0)
 	end
 
 	return Roact.createElement("Frame", {
-		Position = uDim2,
-		Size = uDim2_2,
+		Position = udim,
+		Size = udim2,
 		BackgroundTransparency = 1,
-		[Roact.Change.AbsoluteSize] = p25.onSafeAreaEvent,
-		[Roact.Change.AbsolutePosition] = p25.onSafeAreaEvent
-	}, p25.props[Roact.Children])
+		[Roact.Change.AbsoluteSize] = self.onSafeAreaEvent,
+		[Roact.Change.AbsolutePosition] = self.onSafeAreaEvent
+	}, self.props[Roact.Children])
 end
-function v28.renderList(p26, p27, p28) -- line: 358
-	-- upvalues: withStyle (copy), Cryo (copy), Roact (copy)
-	return withStyle(function(p29) -- line: 359
-		-- upvalues: Cryo (copy), p27 (copy), p28 (copy), Roact (copy), p26 (copy)
-		local Theme = p29.Theme
-		local v73 = Cryo.List.map(p27, function(_, p31) -- line: 361
-			-- upvalues: p28 (copy)
-			return p28(p31)
+
+function extended:renderList(p, callback)
+	return withStyle(function(p2)
+		local theme = p2.Theme
+		local mapped = Cryo.List.map(p, function(_, p3)
+			return callback(p3)
 		end)
 
 		return Roact.createElement("Frame", {
-			Position = p26.props.position or UDim2.new(0, 0, 0, 0),
-			Size = p26.props.size or UDim2.new(1, 0, 1, 0),
+			Position = self.props.position or UDim2.new(0, 0, 0, 0),
+			Size = self.props.size or UDim2.new(1, 0, 1, 0),
 			BackgroundColor3 = Color3.new(0, 0, 0),
-			ClipsDescendants = p26.props.clipsDescendants,
-			LayoutOrder = p26.props.layoutOrder,
-			BackgroundTransparency = p26.props.bgTransparency or 1,
-			[Roact.Change.AbsoluteSize] = function(p32) -- line: 371
-				-- upvalues: p26 (copy)
-				if p26.state.portrait and p32.AbsoluteSize.X > p32.AbsoluteSize.Y then
-					p26:setState({
-						portrait = false
-					})
-
-					return
-				end
-
-				if not p26.state.portrait and p32.AbsoluteSize.X < p32.AbsoluteSize.Y then
-					p26:setState({
-						portrait = true
-					})
+			ClipsDescendants = self.props.clipsDescendants,
+			LayoutOrder = self.props.layoutOrder,
+			BackgroundTransparency = self.props.bgTransparency or 1,
+			[Roact.Change.AbsoluteSize] = function(p3)
+				if self.state.portrait and p3.AbsoluteSize.X > p3.AbsoluteSize.Y then
+					self:setState({ portrait = false })
+				elseif not self.state.portrait and p3.AbsoluteSize.X < p3.AbsoluteSize.Y then
+					self:setState({ portrait = true })
 				end
 			end
 		}, {
-			NavBar = p26:renderBackground({
-				BorderSizePixel = 0,
-				BackgroundColor3 = Theme.NavigationBar.Color,
-				BackgroundTransparency = if not p26.props.roundCorners then Theme.NavigationBar.Transparency else 1
-			}, v73),
-			SafeArea = p26:renderSafeArea()
+			NavBar = self:renderBackground({
+				BackgroundColor3 = theme.NavigationBar.Color,
+				BackgroundTransparency = self.props.roundCorners and 1 or theme.NavigationBar.Transparency,
+				BorderSizePixel = 0
+			}, mapped),
+			SafeArea = self:renderSafeArea()
 		}, {
-			UICorner = p26.props.roundCorners and Roact.createElement("UICorner", {
+			UICorner = self.props.roundCorners and Roact.createElement("UICorner", {
 				CornerRadius = UDim.new(0.15, 0) or nil
 			}) or nil
 		})
 	end)
 end
-function v28.init(p33) -- line: 397
-	p33:setState({
-		portrait = true
-	})
 
-	function p33.onSelectionChanged(p34) -- line: 401
-		-- upvalues: p33 (copy)
-		if #p34 > 0 then
-			local v75 = p33.props.itemList[p34[1]]
+function extended:init()
+	self:setState({ portrait = true })
 
-			if v75 and v75.onActivated then
-				v75.onActivated()
+	function self.onSelectionChanged(list)
+		if #list > 0 then
+			local item = self.props.itemList[list[1]]
+
+			if item and item.onActivated then
+				item.onActivated()
 			end
 		end
 	end
-	function p33.onSafeAreaEvent(p35) -- line: 409
-		-- upvalues: p33 (copy)
-		if p33.props.onSafeAreaChanged then
-			p33.props.onSafeAreaChanged({
-				Position = p35.Position,
-				AbsolutePosition = p35.AbsolutePosition,
-				Size = p35.Size,
-				AbsoluteSize = p35.AbsoluteSize
+	function self.onSafeAreaEvent(data)
+		if self.props.onSafeAreaChanged then
+			self.props.onSafeAreaChanged({
+				Position = data.Position,
+				AbsolutePosition = data.AbsolutePosition,
+				Size = data.Size,
+				AbsoluteSize = data.AbsoluteSize
 			})
 		end
 	end
 end
-function v28.render(p36) -- line: 421
-	-- upvalues: Roact (copy), InteractableList (copy), v21 (copy), v21 (copy)
-	local itemList = p36.props.itemList
-	local selection = p36.props.selection
 
-	if selection then
-		selection = if itemList[selection] ~= nil then { selection } else nil
-	end
+function extended:render()
+	local itemList = self.props.itemList
+	local selection = self.props.selection
+
+	local selection2 = selection and (itemList[selection] ~= nil and { selection } or nil)
 
 	return Roact.createElement(InteractableList, {
 		itemList = itemList,
-		selection = selection,
-		itemSize = UDim2.fromOffset(v21, v21),
-		renderList = function(...) -- line: 437
-			-- upvalues: p36 (copy)
-			return p36:renderList(...)
+		selection = selection2,
+		itemSize = UDim2.fromOffset(v2, v2),
+		renderList = function(...)
+			return self:renderList(...)
 		end,
-		renderItem = function(...) -- line: 440
-			-- upvalues: p36 (copy)
-			return p36:renderItem(...)
+		renderItem = function(...)
+			return self:renderItem(...)
 		end,
-		sortOrder = p36.props.sortOrder,
-		onSelectionChanged = p36.onSelectionChanged
+		sortOrder = self.props.sortOrder,
+		onSelectionChanged = self.onSelectionChanged
 	})
 end
 
-return v28
+return extended

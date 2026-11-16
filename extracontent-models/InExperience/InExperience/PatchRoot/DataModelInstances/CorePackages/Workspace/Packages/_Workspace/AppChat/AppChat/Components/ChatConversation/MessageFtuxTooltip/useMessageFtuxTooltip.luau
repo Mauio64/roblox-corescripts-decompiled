@@ -1,135 +1,105 @@
 local AppStorageService = game:GetService("AppStorageService")
 local HttpService = game:GetService("HttpService")
+
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
-local MessageFtuxTooltipVariant = require(script.Parent.MessageFtuxTooltipVariant)
+
+require(script.Parent.MessageFtuxTooltipVariant)
 local MessageFtuxTooltipDismissSignal = require(script.Parent.MessageFtuxTooltipDismissSignal)
 local useMessageFtuxTooltipConfig = require(script.Parent.useMessageFtuxTooltipConfig)
 local ChatConversationTelemetryEvents = require(AppChat.Components.ChatConversation.ChatConversationTelemetryEvents)
 local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
-local FFlagAppChatUseSwipeForReplies = require(AppChat.Flags.FFlagAppChatUseSwipeForReplies)
 
-local function useMessageFtuxTooltip(p1) -- line: 27
-	-- upvalues: MessageFtuxTooltipVariant (copy), useMessageFtuxTooltipConfig (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), useLocalUserId (copy), React (copy), ChatConversationTelemetryEvents (copy), FFlagAppChatUseSwipeForReplies (copy), AppStorageService (copy), HttpService (copy), MessageFtuxTooltipDismissSignal (copy), useLocalization (copy)
-	if p1 == MessageFtuxTooltipVariant.None then
-		return {
-			text = "",
-			isDismissed = true,
-			handleDismiss = function() -- line: 32
-			end
-		}
+local v = {
+	GetItem = function(self, p)
+		return AppStorageService:GetItem(p)
+	end,
+	SetItem = function(self, p, p2)
+		AppStorageService:SetItem(p, p2)
+	end,
+	Flush = function()
+		AppStorageService:Flush()
 	end
+}
 
-	local v17 = useMessageFtuxTooltipConfig(p1)
-	local v18 = useTelemetry(ChatConversationTelemetryLayer.Context)
-	local v19 = useLocalUserId() or ""
-	local v20, v21 = React.useState(true)
-	local v22 = React.useRef({})
-	local v23 = React.useCallback(function() -- line: 42
-		-- upvalues: v18 (copy), ChatConversationTelemetryEvents (copy), p1 (copy)
-		v18.emit(ChatConversationTelemetryEvents.ConversationMessageFtuxTooltipImpression, {
-			tooltipVariant = p1
+local function useMessageFtuxTooltip(tooltipVariant, p)
+	local v2 = p or v
+	local v3 = useMessageFtuxTooltipConfig(tooltipVariant)
+	local current = useTelemetry(ChatConversationTelemetryLayer.Context)
+
+	local ref = React.useRef(current)
+	ref.current = current
+	local v4 = useLocalUserId() or ""
+	local state, setState = React.useState(true)
+	local ref2 = React.useRef({})
+
+	local v5 = React.useCallback(function()
+		ref.current.emit(ChatConversationTelemetryEvents.ConversationMessageFtuxTooltipImpression, {
+			tooltipVariant = tooltipVariant
 		})
-	end, {
-		p1,
-		v18
-	})
-	local v24 = React.useCallback(function() -- line: 48
-		-- upvalues: v18 (copy), ChatConversationTelemetryEvents (copy), p1 (copy)
-		v18.emit(ChatConversationTelemetryEvents.ConversationMessageFtuxTooltipDismissed, {
-			tooltipVariant = p1
+	end, { tooltipVariant })
+
+	local v6 = React.useCallback(function()
+		ref.current.emit(ChatConversationTelemetryEvents.ConversationMessageFtuxTooltipDismissed, {
+			tooltipVariant = tooltipVariant
 		})
-	end, {
-		p1,
-		v18
-	})
-	local v25 = React.useCallback(function() -- line: 54
-		-- upvalues: v20 (copy), v24 (copy), v22 (copy), v19 (copy), FFlagAppChatUseSwipeForReplies (copy), v17 (copy), AppStorageService (copy), HttpService (copy), v21 (copy)
-		if v20 then
+	end, { tooltipVariant })
+
+	local handleDismiss = React.useCallback(function()
+		if state then
 			return
 		end
 
-		v24()
-		v22.current[v19] = not FFlagAppChatUseSwipeForReplies or v17.textKey
+		v6()
+		ref2.current[v4] = v3.textKey
+		local success, _ = pcall(function()
+			v2:SetItem(v3.storageKey, HttpService:JSONEncode(ref2.current))
+			v2:Flush()
+		end)
+		setState(success)
+	end, { v3.storageKey, v3.textKey, v4, state, v2, v6 })
 
-		local ok, _ = pcall(function() -- line: 60
-			-- upvalues: AppStorageService (copy), v17 (copy), HttpService (copy), v22 (copy)
-			AppStorageService:SetItem(v17.storageKey, HttpService:JSONEncode(v22.current))
-			AppStorageService:Flush()
+	React.useEffect(function()
+		local success, result = pcall(function()
+			return HttpService:JSONDecode((v2:GetItem(v3.storageKey)))
 		end)
 
-		v21(ok)
-	end, {
-		v17.storageKey,
-		v19,
-		v20
-	})
+		ref2.current = not success and {} or result
+		local v7 = ref2.current[v4] == v3.textKey
+		setState(v7)
 
-	React.useEffect(function() -- line: 67
-		-- upvalues: AppStorageService (copy), v17 (copy), HttpService (copy), v22 (copy), FFlagAppChatUseSwipeForReplies (copy), v19 (copy), v21 (copy), v23 (copy)
-		local ok, result = pcall(function() -- line: 68
-			-- upvalues: AppStorageService (copy), v17 (copy), HttpService (copy)
-			local Item = AppStorageService:GetItem(v17.storageKey)
-
-			return HttpService:JSONDecode(Item)
-		end)
-
-		v22.current = if not ok then {} else result
-
-		local v31 = if not FFlagAppChatUseSwipeForReplies then v22.current[v19] or false else v22.current[v19] == v17.textKey
-
-		v21(v31)
-
-		if not v31 then
-			v23()
+		if not v7 then
+			v5()
 		end
-	end, {
-		v17.storageKey,
-		v19
-	})
-	React.useEffect(function() -- line: 82
-		-- upvalues: v20 (copy), MessageFtuxTooltipDismissSignal (copy), p1 (copy), v25 (copy)
-		if v20 then
+	end, { v3.storageKey, v3.textKey, v4, v2, v5 })
+
+	React.useEffect(function()
+		if state then
 			return
 		end
 
-		local v32 = MessageFtuxTooltipDismissSignal.dismissed:connect(function(p2) -- line: 86
-			-- upvalues: p1 (copy), v25 (copy)
-			if p2 == p1 then
-				v25()
+		local dismissedConnection = MessageFtuxTooltipDismissSignal.dismissed:connect(function(p2)
+			if p2 == tooltipVariant then
+				handleDismiss()
 			end
 		end)
-
-		return function() -- line: 91
-			-- upvalues: v32 (copy)
-			v32:disconnect()
+		return function()
+			dismissedConnection:disconnect()
 		end
-	end, {
-		p1,
-		v25,
-		v20
-	})
+	end, { tooltipVariant, handleDismiss, state })
 
-	local v26 = useLocalization({
-		tooltipText = v17.textKey
-	})
+	local v7 = useLocalization({ tooltipText = v3.textKey })
 
-	return React.useMemo(function() -- line: 99
-		-- upvalues: v26 (copy), v20 (copy), v25 (copy)
-		return {
-			text = v26.tooltipText,
-			isDismissed = v20,
-			handleDismiss = v25
-		}
-	end, {
-		v26.tooltipText,
-		v20,
-		v25
-	})
+	return React.useMemo(function()
+		return { text = v7.tooltipText, isDismissed = state, handleDismiss = handleDismiss }
+	end, { v7.tooltipText, state, handleDismiss })
 end
 
 return useMessageFtuxTooltip

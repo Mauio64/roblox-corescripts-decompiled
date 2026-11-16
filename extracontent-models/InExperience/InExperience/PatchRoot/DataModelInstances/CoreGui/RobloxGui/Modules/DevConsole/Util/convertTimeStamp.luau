@@ -1,34 +1,27 @@
-local v1 = game:DefineFastFlag("DevConsoleFixTimestampDST", false)
+local defineFastFlag = game:DefineFastFlag("DevConsoleFixTimestampDST", false)
 
-local function numberWithZero(p1) -- line: 4
-	return (not (p1 < 10) and "" or "0") .. p1
+local function numberWithZero(p) -- 3 equivalent calls inferred from this helper
+	return (p < 10 and "0" or "") .. p
 end
-local function convertTimeStamp(p2) -- line: 8
-	-- upvalues: v1 (copy)
-	local hour, min, sec
 
-	if v1 then
-		local v6 = os.date("*t", p2)
+local function convertTimeStamp(p)
+	local v, v2, v3
 
-		hour = v6.hour
-		min = v6.min
-		sec = v6.sec
+	if defineFastFlag then
+		local v4 = os.date("*t", p)
+		v = v4.hour
+		v2 = v4.min
+		v3 = v4.sec
 	else
-		local v10 = math.floor(p2 - os.time() + tick()) % 86400
+		local v4 = math.floor(p - os.time() + tick()) % 86400
 
-		hour = math.floor(v10 / 3600)
-
-		local v11 = v10 - hour * 3600
-
-		min = math.floor(v11 / 60)
-		sec = v11 - min * 60
+		v = math.floor(v4 / 3600)
+		local v5 = v4 - v * 3600
+		v2 = math.floor(v5 / 60)
+		v3 = v5 - v2 * 60
 	end
 
-	local v12 = (not (hour < 10) and "" or "0") .. hour
-	local v13 = (not (min < 10) and "" or "0") .. min
-	local v14 = (not (sec < 10) and "" or "0") .. sec
-
-	return string.format("%s:%s:%s", v12, v13, v14)
+	return string.format("%s:%s:%s", numberWithZero(v), numberWithZero(v2), numberWithZero(v3)) -- inferred equivalent call
 end
 
 return convertTimeStamp

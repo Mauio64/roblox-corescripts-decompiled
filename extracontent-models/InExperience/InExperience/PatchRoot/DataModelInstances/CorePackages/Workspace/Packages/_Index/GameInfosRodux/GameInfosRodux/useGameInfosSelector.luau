@@ -1,13 +1,12 @@
 local GameInfosRodux = script:FindFirstAncestor("GameInfosRodux")
 local GameInfosReducer = require(GameInfosRodux.GameInfosReducer)
-local GameInfosRoduxParent = GameInfosRodux.Parent
-local useSelector = require(GameInfosRoduxParent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = GameInfosRodux.Parent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local function useGameInfosSelector(p1) -- line: 6
-	-- upvalues: useSelector (copy), GameInfosReducer (copy)
-	return (useSelector(function(p2) -- line: 7
-		-- upvalues: GameInfosReducer (copy), p1 (copy)
-		return p2.Personalization[GameInfosReducer.key][p1]
+local function useGameInfosSelector(p)
+	return (useSelector(function(p2)
+		return p2.Personalization[GameInfosReducer.key][p]
 	end))
 end
 

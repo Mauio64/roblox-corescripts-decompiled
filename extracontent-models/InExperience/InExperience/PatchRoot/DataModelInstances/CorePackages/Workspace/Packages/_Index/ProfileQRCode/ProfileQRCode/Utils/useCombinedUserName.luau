@@ -1,32 +1,32 @@
-local Parent = script:FindFirstAncestor("ProfileQRCode").Parent
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
-local v5 = require(Parent.UserProfiles).Stores.UserProfileStore.get()
+local parent = script:FindFirstAncestor("ProfileQRCode").Parent
 
-return function(s1: string) -- line: 11
-	-- upvalues: React (copy), Signals (copy), v5 (copy), SignalsReact (copy)
-	local v7 = React.useMemo(function() -- line: 12
-		-- upvalues: s1 (copy), Signals (copy), v5 (copy)
-		if s1 == "" then
-			return function() -- line: 14
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local UserProfiles = require(parent.UserProfiles)
+
+local v = UserProfiles.Stores.UserProfileStore.get()
+
+return function(p: string)
+	local v2 = React.useMemo(function()
+		if p == "" then
+			return function(): string
 				return ""
 			end
 		end
 
-		return Signals.createComputed(function(p1) -- line: 19
-			-- upvalues: v5 (copy), s1 (copy)
-			local v9 = v5.fetchNamesByUserIds({ s1 })(p1)
-			local v10 = v9 and (v9.data and v9.data[1])
-			local v11 = v10 and v10.names
+		return Signals.createComputed(function(p2)
+			local v2 = v.fetchNamesByUserIds({ p })(p2)
+			local v3 = v2 and v2.data and v2.data[1]
+			local names = v3 and v3.names
 
-			if v11 then
-				return v11.getCombinedName(p1) or ""
+			if names then
+				return names.getCombinedName(p2) or ""
 			end
 
 			return ""
 		end)
-	end, { s1 })
+	end, { p })
 
-	return SignalsReact.useSignalState(v7) or ""
+	return SignalsReact.useSignalState(v2) or ""
 end

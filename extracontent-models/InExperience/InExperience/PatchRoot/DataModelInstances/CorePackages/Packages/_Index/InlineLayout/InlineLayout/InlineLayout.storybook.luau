@@ -1,12 +1,11 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local StoryMiddleware = require(scriptParentParent.MarkdownCore).StoryMiddleware
-local Roact = require(scriptParentParent.Dev.Roact)
+local parent = script.Parent
 
+local parent2 = parent.Parent
+local MarkdownCore = require(parent2.MarkdownCore)
 return {
 	name = "InlineLayout",
 	exclude = { "_Index" },
-	storyRoots = { scriptParent },
-	mapStory = StoryMiddleware,
-	roact = Roact
+	storyRoots = { parent },
+	mapStory = MarkdownCore.StoryMiddleware,
+	roact = require(parent2.Dev.Roact)
 }

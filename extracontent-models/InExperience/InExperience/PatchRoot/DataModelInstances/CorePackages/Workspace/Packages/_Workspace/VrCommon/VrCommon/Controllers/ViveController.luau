@@ -1,9 +1,12 @@
 local VRService = game:GetService("VRService")
-local Parent = script:FindFirstAncestor("VrCommon").Parent
-local Create = require(Parent.AppCommonLib).Create
-local t1 = {
+local parent = script:FindFirstAncestor("VrCommon").Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local Create = AppCommonLib.Create
+
+local v = {
 	Body = {
-		size = Vector3.new(0.39100000262260437, 0.2770000100135803, 0.7310000061988831),
+		size = Vector3.new(0.391, 0.277, 0.731),
 		meshId = "rbxassetid://433286977",
 		textureId = "rbxassetid://433287000",
 		offset = CFrame.new(0, -0.115, 0.213)
@@ -24,19 +27,19 @@ local t1 = {
 		meshId = "rbxassetid://433291265",
 		textureId = "rbxassetid://433291278",
 		offset = CFrame.new(0, 0.005, 0.294),
-		moveOffset = CFrame.new((Vector3.new(-0, -0.0009974209824576974, -7.177444058470428E-05)))
+		moveOffset = CFrame.new(-Vector3.new(0, 0.000997421, 0.00007177444))
 	},
 	MenuButton = {
 		meshId = "rbxassetid://433288124",
 		textureId = "rbxassetid://433288134",
 		offset = CFrame.new(0, 0.016, 0.068),
-		moveOffset = CFrame.new((Vector3.new(-0, -0.000999877811409533, 1.5630490452167578E-05)))
+		moveOffset = CFrame.new(Vector3.new(-0, -0.0009998778, 0.00001563049))
 	},
 	Trackpad = {
 		meshId = "rbxassetid://433288821",
 		textureId = "rbxassetid://433288836",
 		offset = CFrame.new(0, 0, 0.163),
-		moveOffset = CFrame.new((Vector3.new(-0, -0.0009935068665072322, -0.000113772286567837)))
+		moveOffset = CFrame.new(-Vector3.new(0, 0.0009935069, 0.00011377229))
 	},
 	Trigger = {
 		meshId = "rbxassetid://433288767",
@@ -73,7 +76,8 @@ local t1 = {
 		moveOffset = CFrame.new(0, -0.005, 0)
 	}
 }
-local t2 = {
+
+local v2 = {
 	[Enum.KeyCode.ButtonL1] = "LeftGrip",
 	[Enum.KeyCode.ButtonL2] = "Trigger",
 	[Enum.KeyCode.ButtonL3] = "Trackpad",
@@ -89,332 +93,336 @@ local t2 = {
 	[Enum.KeyCode.ButtonX] = "ButtonX",
 	[Enum.KeyCode.ButtonY] = "ButtonY"
 }
+
 local Granite = Enum.Material.Granite
-local t3 = {}
 
-t3.__index = t3
+local ViveController = {}
+ViveController.__index = ViveController
 
-local t4 = {
+local v3 = {
 	[Enum.UserCFrame.LeftHand] = Enum.VRTouchpad.Left,
 	[Enum.UserCFrame.RightHand] = Enum.VRTouchpad.Right
 }
 
-function t3.new(p1) -- line: 109
-	-- upvalues: t3 (copy), t4 (copy), VRService (copy), Create (copy), t1 (copy), Granite (copy)
-	local self = setmetatable({}, t3)
-
-	self.userCFrame = p1
-	self.touchpad = t4[self.userCFrame]
-	self.touchpadMode = VRService:GetTouchpadMode(self.touchpad)
-	self.onTouchpadModeChangedConn = VRService.TouchpadModeChanged:connect(function(...) -- line: 114
-		-- upvalues: self (copy)
-		self:onTouchpadModeChanged(...)
+function ViveController.new(userCFrame)
+	local object = setmetatable({}, ViveController)
+	object.userCFrame = userCFrame
+	object.touchpad = v3[object.userCFrame]
+	object.touchpadMode = VRService:GetTouchpadMode(object.touchpad)
+	object.onTouchpadModeChangedConn = VRService.TouchpadModeChanged:connect(function(...)
+		object:onTouchpadModeChanged(...)
 	end)
-	self.model = Create("Model")({
-		Name = "ViveController",
-		Archivable = false
-	})
-	self.origin = Create("Part")({
+
+	object.model = Create("Model")({ Name = "ViveController", Archivable = false })
+
+	object.origin = Create("Part")({
+		Parent = object.model,
 		Name = "Origin",
 		Anchored = true,
 		Transparency = 1,
-		Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
+		Size = Vector3.new(0.05, 0.05, 0.05),
 		CanCollide = false,
 		CanQuery = false,
-		CanTouch = false,
-		Parent = self.model
+		CanTouch = false
 	})
-	self.scale = 1
-	self.parts = {}
 
-	for k, v in pairs(t1) do
-		local vector3 = Vector3.new(0.032999999821186066, 0.032999999821186066, 0.032999999821186066)
+	object.scale = 1
+	object.parts = {}
 
-		if v.scale then
-			vector3 *= v.scale
+	for k, v4 in pairs(v) do
+		local scale = Vector3.new(0.033, 0.033, 0.033)
+
+		if v4.scale then
+			scale *= v4.scale
 		end
 
-		local v14 = Create("Part")({
+		local v5 = Create("Part")({
+			Parent = object.model,
+			Name = k,
 			Anchored = true,
+			Material = Granite,
+			Size = v4.size or Vector3.new(0.05, 0.05, 0.05),
+			CFrame = object.origin.CFrame * v4.offset,
 			CanCollide = false,
 			CanQuery = false,
-			CanTouch = false,
-			Parent = self.model,
-			Name = k,
-			Material = Granite,
-			Size = v.size or Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
-			CFrame = self.origin.CFrame * v.offset
+			CanTouch = false
 		})
 
 		Create("SpecialMesh")({
+			Parent = v5,
 			Name = "Mesh",
-			Parent = v14,
-			MeshId = v.meshId,
-			TextureId = v.textureId,
-			Scale = vector3
+			MeshId = v4.meshId,
+			TextureId = v4.textureId,
+			Scale = scale
 		})
+
 		Create("Weld")({
+			Parent = v5,
 			Name = "Weld",
-			Parent = v14,
-			Part0 = self.origin,
-			Part1 = v14,
-			C0 = v.offset
+			Part0 = object.origin,
+			Part1 = v5,
+			C0 = v4.offset
 		})
-		self.parts[k] = v14
+
+		object.parts[k] = v5
 	end
 
-	local v15 = Create("Part")({
+	local v4 = Create("Part")({
+		Parent = object.model,
 		Name = "TrackpadIndicator",
-		Anchored = true,
-		Transparency = 1,
-		Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
-		CanCollide = false,
-		CanQuery = false,
-		CanTouch = false,
-		Parent = self.model,
 		Material = Enum.Material.Neon,
 		BrickColor = BrickColor.new("Institutional white"),
-		Shape = Enum.PartType.Ball
+		Shape = Enum.PartType.Ball,
+		Anchored = true,
+		Transparency = 1,
+		Size = Vector3.new(0.05, 0.05, 0.05),
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false
 	})
 
 	Create("Weld")({
+		Parent = v4,
 		Name = "Weld",
-		Parent = v15,
-		Part0 = self.origin,
-		Part1 = v15,
-		C0 = t1.Trackpad.offset
+		Part0 = object.origin,
+		Part1 = v4,
+		C0 = v.Trackpad.offset
 	})
-	self.parts.TrackpadIndicator = v15
-	self.model.PrimaryPart = self.origin
-	self:onTouchpadModeChanged(self.touchpad, VRService:GetTouchpadMode(self.touchpad))
 
-	return self
+	object.parts.TrackpadIndicator = v4
+	object.model.PrimaryPart = object.origin
+
+	object:onTouchpadModeChanged(object.touchpad, VRService:GetTouchpadMode(object.touchpad))
+
+	return object
 end
-function t3.setPartVisible(p2, p3, p4) -- line: 200
-	local v19 = p2.parts[p3]
 
-	if v19 then
-		v19.Transparency = not p4 and 1 or 0
+function ViveController:setPartVisible(p, p2)
+	local part = self.parts[p]
+
+	if part then
+		part.Transparency = p2 and 0 or 1
 	end
 end
-function t3.setABXYEnabled(p5, p6) -- line: 207
-	p5:setPartVisible("ButtonA", p6)
-	p5:setPartVisible("ButtonB", p6)
-	p5:setPartVisible("ButtonX", p6)
-	p5:setPartVisible("ButtonY", p6)
+
+function ViveController:setABXYEnabled(p)
+	self:setPartVisible("ButtonA", p)
+	self:setPartVisible("ButtonB", p)
+	self:setPartVisible("ButtonX", p)
+	self:setPartVisible("ButtonY", p)
 end
-function t3.setCFrame(p7, p8) -- line: 214
-	p7.model:SetPrimaryPartCFrame(p8)
+
+function ViveController.setCFrame(p, cframe)
+	p.model:SetPrimaryPartCFrame(cframe)
 end
-function t3.setCFrameAndScale(p9, p10, p11) -- line: 218
-	-- upvalues: t1 (copy)
-	p9.model:SetPrimaryPartCFrame(p10)
 
-	if p11 ~= p9.scale then
-		p9.scale = p11
+function ViveController:setCFrameAndScale(cframe, scale)
+	self.model:SetPrimaryPartCFrame(cframe)
 
-		for k, v in pairs(t1) do
-			local v29 = p9.parts[k]
+	if self.scale ~= scale then
+		self.scale = scale
 
-			if v29 then
-				local vector3 = Vector3.new(0.032999999821186066, 0.032999999821186066, 0.032999999821186066)
+		for k, v4 in pairs(v) do
+			local part = self.parts[k]
 
-				if v.scale then
-					vector3 *= v.scale
-				end
+			if not part then
+				continue
+			end
 
-				local Mesh = v29:FindFirstChild("Mesh")
-				local Weld = v29:FindFirstChild("Weld")
-				local v33 = CFrame.new(v.offset.p * p9.scale) * (v.offset - v.offset.p)
+			local v5 = Vector3.new(0.033, 0.033, 0.033)
 
-				v29.CFrame = p10 * v33
+			if v4.scale then
+				v5 *= v4.scale
+			end
 
-				if Mesh then
-					Mesh.Scale = vector3 * p9.scale
-				end
+			local mesh = part:FindFirstChild("Mesh")
+			local weld = part:FindFirstChild("Weld")
 
-				if Weld then
-					Weld.C0 = v33
-				end
+			local c0 = CFrame.new(v4.offset.p * self.scale) * (v4.offset - v4.offset.p)
+			part.CFrame = cframe * c0
+
+			if mesh then
+				mesh.Scale = v5 * self.scale
+			end
+
+			if weld then
+				weld.C0 = c0
 			end
 		end
 	end
 end
-function t3.setButtonState(p12, p13, p14) -- line: 247
-	-- upvalues: t1 (copy)
-	local v37 = t1[p13]
 
-	if not v37 then
+function ViveController:setButtonState(p, p2)
+	local v4 = v[p]
+
+	if not v4 then
 		return
 	end
 
-	local offset = v37.offset
-	local moveOffset = v37.moveOffset
+	local offset = v4.offset
+	local moveOffset = v4.moveOffset
 
 	if offset and moveOffset then
-		local v40 = CFrame.new(offset.p * p12.scale) * (offset - offset.p)
-		local v41 = CFrame.new(moveOffset.p * p12.scale) * (moveOffset - moveOffset.p)
-		local v42 = p12.parts[p13]
+		local c0 = CFrame.new(offset.p * self.scale) * (offset - offset.p)
+		local v5 = CFrame.new(moveOffset.p * self.scale) * (moveOffset - moveOffset.p)
 
-		if v42 then
-			local Mesh = v42:FindFirstChild("Mesh")
-			local Weld = v42:FindFirstChild("Weld")
+		local part = self.parts[p]
 
-			if Weld then
-				if p14 then
-					v42.CFrame = p12.origin.CFrame * v40 * v41
-					Weld.C0 = v40 * v41
+		if part then
+			local mesh = part:FindFirstChild("Mesh")
+			local weld = part:FindFirstChild("Weld")
+
+			if weld then
+				if p2 then
+					part.CFrame = self.origin.CFrame * c0 * v5
+					weld.C0 = c0 * v5
 				else
-					v42.CFrame = p12.origin.CFrame * v40
-					Weld.C0 = v40
+					part.CFrame = self.origin.CFrame * c0
+					weld.C0 = c0
 				end
 			end
 
-			if Mesh then
-				if p14 then
-					Mesh.VertexColor = Vector3.new(0.5, 0.5, 0.5)
-
-					return
+			if mesh then
+				if p2 then
+					mesh.VertexColor = Vector3.new(0.5, 0.5, 0.5)
+				else
+					mesh.VertexColor = Vector3.new(1, 1, 1)
 				end
-
-				Mesh.VertexColor = Vector3.new(1, 1, 1)
 			end
 		end
 	end
 end
-function t3.setTriggerState(p15, p16) -- line: 284
-	-- upvalues: t1 (copy)
-	local offset = t1.Trigger.offset
-	local v48 = CFrame.new(offset.p * p15.scale) * (offset - offset.p)
-	local Trigger = p15.parts.Trigger
-	local Weld = Trigger:FindFirstChild("Weld")
 
-	if Weld then
-		local vector3 = Vector3.new(0, 0.05 * p15.scale, -0.025 * p15.scale)
-		local v52 = p16 * -0.3490658503988659 + 0
-		local v53 = v48 * CFrame.new(vector3) * CFrame.Angles(v52, 0, 0) * CFrame.new(-vector3)
+function ViveController:setTriggerState(p)
+	local offset = v.Trigger.offset
+	local v4 = CFrame.new(offset.p * self.scale) * (offset - offset.p)
 
-		Trigger.CFrame = p15.origin.CFrame * v53
-		Weld.C0 = v53
+	local trigger = self.parts.Trigger
+	local weld = trigger:FindFirstChild("Weld")
+
+	if weld then
+		local vector3 = Vector3.new(0, 0.05 * self.scale, -0.025 * self.scale)
+		local v5 = p * -0.3490658503988659 + 0
+		local c0 = v4 * CFrame.new(vector3) * CFrame.Angles(v5, 0, 0) * CFrame.new(-vector3)
+		trigger.CFrame = self.origin.CFrame * c0
+		weld.C0 = c0
 	end
 end
-function t3.setTrackpadState(p17, p18) -- line: 302
-	-- upvalues: t1 (copy)
-	local TrackpadIndicator = p17.parts.TrackpadIndicator
-	local Weld = TrackpadIndicator:FindFirstChild("Weld")
-	local offset = t1.Trackpad.offset
-	local v59 = CFrame.new(offset.p * p17.scale) * (offset - offset.p)
 
-	if Weld then
-		local v60 = Vector3.new(p18.X, 0, -p18.Y) * 0.055
-		local v61 = CFrame.Angles(0.11344640137963143, 0, 0) * CFrame.new(0, 0.002 * p17.scale * p18.magnitude ^ 3, 0)
-		local v62 = v59 * CFrame.new(0, 0.01 * p17.scale, 0) * v61:toWorldSpace(CFrame.new(v60))
+function ViveController:setTrackpadState(data)
+	local trackpadIndicator = self.parts.TrackpadIndicator
+	local weld = trackpadIndicator:FindFirstChild("Weld")
+	local offset = v.Trackpad.offset
+	local v4 = CFrame.new(offset.p * self.scale) * (offset - offset.p)
 
-		TrackpadIndicator.CFrame = p17.origin.CFrame * v62
-		Weld.C0 = v62
+	if weld then
+		local v5 = Vector3.new(data.X, 0, -data.Y) * 0.055
+		local v6 = CFrame.Angles(0.11344640137963143, 0, 0) * CFrame.new(0, 0.002 * self.scale * data.magnitude ^ 3, 0)
+		local c0 = v4 * CFrame.new(0, 0.01 * self.scale, 0) * v6:toWorldSpace(CFrame.new(v5))
+		trackpadIndicator.CFrame = self.origin.CFrame * c0
+		weld.C0 = c0
 	end
 end
-function t3.onButtonInputChanged(p19, p20, p21) -- line: 318
-	if p19.userCFrame == Enum.UserCFrame.RightHand and p20.KeyCode == Enum.KeyCode.ButtonR3 or p19.userCFrame == Enum.UserCFrame.LeftHand and p20.KeyCode == Enum.KeyCode.ButtonL3 then
-		p19:setButtonState("Trackpad", p21)
 
-		return
-	end
-
-	if p19.userCFrame == Enum.UserCFrame.RightHand and p20.KeyCode == Enum.KeyCode.ButtonR1 or p19.userCFrame == Enum.UserCFrame.LeftHand and p20.KeyCode == Enum.KeyCode.ButtonL1 then
-		p19:setButtonState("LeftGrip", p21)
-		p19:setButtonState("RightGrip", p21)
-
-		return
-	end
-
-	if p19.userCFrame == Enum.UserCFrame.RightHand and p20.KeyCode == Enum.KeyCode.ButtonStart or p19.userCFrame == Enum.UserCFrame.LeftHand and p20.KeyCode == Enum.KeyCode.ButtonSelect then
-		p19:setButtonState("MenuButton", p21)
-
-		return
-	end
-
-	if p19.touchpadMode == Enum.VRTouchpadMode.ABXY then
-		if p20.KeyCode == Enum.KeyCode.ButtonA then
-			p19:setButtonState("ButtonA", p21)
-
-			return
-		end
-
-		if p20.KeyCode == Enum.KeyCode.ButtonB then
-			p19:setButtonState("ButtonB", p21)
-
-			return
-		end
-
-		if p20.KeyCode == Enum.KeyCode.ButtonX then
-			p19:setButtonState("ButtonX", p21)
-
-			return
-		end
-
-		if p20.KeyCode == Enum.KeyCode.ButtonY then
-			p19:setButtonState("ButtonY", p21)
-
-			return
+function ViveController:onButtonInputChanged(p, p2)
+	if
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonR3
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonL3
+	then
+		self:setButtonState("Trackpad", p2)
+	elseif
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonR1
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonL1
+	then
+		self:setButtonState("LeftGrip", p2)
+		self:setButtonState("RightGrip", p2)
+	elseif
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonStart
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonSelect
+	then
+		self:setButtonState("MenuButton", p2)
+	elseif self.touchpadMode == Enum.VRTouchpadMode.ABXY then
+		if p.KeyCode == Enum.KeyCode.ButtonA then
+			self:setButtonState("ButtonA", p2)
+		elseif p.KeyCode == Enum.KeyCode.ButtonB then
+			self:setButtonState("ButtonB", p2)
+		elseif p.KeyCode == Enum.KeyCode.ButtonX then
+			self:setButtonState("ButtonX", p2)
+		elseif p.KeyCode == Enum.KeyCode.ButtonY then
+			self:setButtonState("ButtonY", p2)
 		end
 	end
 end
-function t3.onInputBegan(p22, p23) -- line: 368
-	p22:onButtonInputChanged(p23, true)
 
-	if p22.userCFrame == Enum.UserCFrame.RightHand and p23.KeyCode == Enum.KeyCode.Thumbstick2 or p22.userCFrame == Enum.UserCFrame.LeftHand and p23.KeyCode == Enum.KeyCode.Thumbstick1 then
-		p22:setPartVisible("TrackpadIndicator", true)
+function ViveController:onInputBegan(p)
+	self:onButtonInputChanged(p, true)
+
+	if
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.Thumbstick2
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.Thumbstick1
+	then
+		self:setPartVisible("TrackpadIndicator", true)
 	end
 end
-function t3.onInputChanged(p24, p25) -- line: 378
-	if p24.userCFrame == Enum.UserCFrame.RightHand and p25.KeyCode == Enum.KeyCode.ButtonR2 or p24.userCFrame == Enum.UserCFrame.LeftHand and p25.KeyCode == Enum.KeyCode.ButtonL2 then
-		p24:setTriggerState(p25.Position.Z)
+
+function ViveController:onInputChanged(p)
+	if
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonR2
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonL2
+	then
+		self:setTriggerState(p.Position.Z)
 	end
 
-	if p24.userCFrame == Enum.UserCFrame.RightHand and p25.KeyCode == Enum.KeyCode.Thumbstick2 or p24.userCFrame == Enum.UserCFrame.LeftHand and p25.KeyCode == Enum.KeyCode.Thumbstick1 then
-		p24:setTrackpadState(p25.Position)
+	if
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.Thumbstick2
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.Thumbstick1
+	then
+		self:setTrackpadState(p.Position)
 	end
 end
-function t3.onInputEnded(p26, p27) -- line: 393
-	p26:onButtonInputChanged(p27, false)
 
-	if p26.userCFrame == Enum.UserCFrame.RightHand and p27.KeyCode == Enum.KeyCode.Thumbstick2 or p26.userCFrame == Enum.UserCFrame.LeftHand and p27.KeyCode == Enum.KeyCode.Thumbstick1 then
-		p26:setPartVisible("TrackpadIndicator", false)
+function ViveController:onInputEnded(p)
+	self:onButtonInputChanged(p, false)
+
+	if
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.Thumbstick2
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.Thumbstick1
+	then
+		self:setPartVisible("TrackpadIndicator", false)
 	end
 end
-function t3.onTouchpadModeChanged(p28, p29, p30) -- line: 403
-	if p29 ~= p28.touchpad then
+
+function ViveController:onTouchpadModeChanged(p, touchpadMode)
+	if p ~= self.touchpad then
 		return
 	end
 
-	p28.touchpadMode = p30
+	self.touchpadMode = touchpadMode
 
-	if p30 == Enum.VRTouchpadMode.ABXY then
-		p28:setABXYEnabled(true)
+	if touchpadMode == Enum.VRTouchpadMode.ABXY then
+		self:setABXYEnabled(true)
+	else
+		self:setABXYEnabled(false)
+	end
+end
 
-		return
+function ViveController:destroy()
+	if self.onTouchpadModeChangedConn then
+		self.onTouchpadModeChangedConn:disconnect()
+		self.onTouchpadModeChangedConn = nil
 	end
 
-	p28:setABXYEnabled(false)
+	self.model:Destroy()
 end
-function t3.destroy(p31) -- line: 417
-	if p31.onTouchpadModeChangedConn then
-		p31.onTouchpadModeChangedConn:disconnect()
-		p31.onTouchpadModeChangedConn = nil
-	end
 
-	p31.model:Destroy()
-end
-function t3.getButtonPart(p32, p33) -- line: 425
-	-- upvalues: t2 (copy)
-	local v78 = t2[p33]
+function ViveController.getButtonPart(p, p2)
+	local v4 = v2[p2]
 
-	if v78 then
-		return p32.parts[v78]
+	if v4 then
+		return p.parts[v4]
 	end
 
 	return nil
 end
 
-return t3
+return ViveController

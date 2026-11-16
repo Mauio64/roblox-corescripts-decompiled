@@ -1,150 +1,144 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent.Parent
 
-local function calculateBounds(t1: {[any]: any}, n1: number, n2: number) -- line: 17
-	local v8 = math.max(n2, 0)
-	local n3 = 0
-	local n4 = 0
-	local n5 = 0
+local React = require(parent.React)
 
-	for v12, v13 in t1 do
-		if n3 <= v8 then
-			n4 = v12
+local function calculateBounds(virtualizedItems, state: number, p: number)
+	local v = (math.max)(p, 0)
+	local total = 0
+	local v2 = 0
+	local v3 = 0
+
+	for k, item in virtualizedItems do
+		if total <= v then
+			v2 = k
 		end
 
-		n3 += v13.height
+		total += item.height
 
-		if v8 <= n3 then
-			n5 = v12
+		if v <= total then
+			v3 = k
 		end
 
-		if n3 >= v8 + n1 then
-			return (Vector3.new(n4, n5))
+		if v + state <= total then
+			break
 		end
 	end
 
-	return (Vector3.new(n4, n5))
+	return (Vector3.new(v2, v3))
 end
-local function useVirtualizedList(t2: {[any]: any}) -- line: 56
-	-- upvalues: React (copy), calculateBounds (copy)
-	local v15, v16 = React.useState(0)
-	local v17, v18 = React.useState(function() -- line: 58
-		-- upvalues: calculateBounds (copy), t2 (copy), v15 (copy)
-		return (calculateBounds(t2.virtualizedItems, v15, 0))
+
+local function useVirtualizedList(props)
+	local state, setState = React.useState(0)
+	local state2, setState2 = React.useState(function()
+		return calculateBounds(props.virtualizedItems, state, 0)
 	end)
-	local v19 = React.useRef(0)
-	local v20 = React.useCallback(function(n6: number) -- line: 63
-		-- upvalues: v19 (copy), v18 (copy), calculateBounds (copy), t2 (copy), v15 (copy)
-		if n6 == v19.current then
+
+	local ref = React.useRef(0)
+	local v = React.useCallback(function(current: number)
+		if ref.current == current then
 			return
 		end
 
-		v19.current = n6
-		v18((calculateBounds(t2.virtualizedItems, v15, n6)))
-	end, {
-		v15,
-		t2.virtualizedItems
-	})
+		ref.current = current
+		setState2(calculateBounds(props.virtualizedItems, state, current))
+	end, { state, props.virtualizedItems })
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: t2 (copy), v16 (copy), v20 (copy)
-		local current = t2.scrollingFrameRef.current
+	React.useEffect(function()
+		local current = props.scrollingFrameRef.current
 
 		if current == nil then
 			return
 		end
 
-		local connection = current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() -- line: 80
-			-- upvalues: v16 (copy), current (copy)
-			v16(current.AbsoluteWindowSize.Y)
-		end)
-		local connection2 = current:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 86
-			-- upvalues: v20 (copy), current (copy)
-			v20(current.CanvasPosition.Y)
+		setState(current.AbsoluteWindowSize.Y)
+		v(current.CanvasPosition.Y)
+
+		local absoluteWindowSizeChangedConnection = current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function()
+			setState(current.AbsoluteWindowSize.Y)
 		end)
 
-		return function() -- line: 90
-			-- upvalues: connection (copy), connection2 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+		local canvasPositionChangedConnection = current:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+			v(current.CanvasPosition.Y)
+		end)
+
+		return function()
+			absoluteWindowSizeChangedConnection:Disconnect()
+			canvasPositionChangedConnection:Disconnect()
 		end
-	end, { v20 })
+	end, { v })
 
-	local v21 = React.useMemo(function() -- line: 97
-		-- upvalues: t2 (copy)
-		local n7 = 0
+	local v2 = React.useMemo(function()
+		local total = 0
 
-		for _, v35 in t2.virtualizedItems do
-			n7 += v35.height
+		for _, virtualizedItem in props.virtualizedItems do
+			total += virtualizedItem.height
 		end
 
-		return n7
-	end, { t2.virtualizedItems })
+		return total
+	end, { props.virtualizedItems })
 
-	React.useEffect(function() -- line: 108
-		-- upvalues: t2 (copy), v21 (copy)
-		local current = t2.scrollingFrameRef.current
+	React.useEffect(function()
+		local current = props.scrollingFrameRef.current
 
 		if current then
-			current.CanvasSize = UDim2.new(1, 0, 0, v21)
+			current.CanvasSize = UDim2.new(1, 0, 0, v2)
 		end
-	end, { v21 })
-	React.useLayoutEffect(function() -- line: 115
-		-- upvalues: v18 (copy), calculateBounds (copy), t2 (copy), v15 (copy), v19 (copy)
-		v18((calculateBounds(t2.virtualizedItems, v15, v19.current)))
-	end, {
-		v15,
-		t2.virtualizedItems
-	})
+	end, { v2 })
 
-	local v22 = React.useCallback(function(s1: string) -- line: 119
-		-- upvalues: t2 (copy)
-		local current = t2.scrollingFrameRef.current
+	React.useLayoutEffect(function()
+		setState2(calculateBounds(props.virtualizedItems, state, ref.current))
+	end, { state, props.virtualizedItems })
 
+	local v3 = React.useCallback(function(p: string)
+		local current = props.scrollingFrameRef.current
 		assert(current ~= nil, "VirtualizedList has not been mounted yet")
+		local total = 0
 
-		local n8 = 0
-
-		for _, v41 in t2.virtualizedItems do
-			if s1 == v41.key then
-				current.CanvasPosition = Vector2.new(0, n8)
-
-				return
+		for _, virtualizedItem in props.virtualizedItems do
+			if virtualizedItem.key == p then
+				current.CanvasPosition = Vector2.new(0, total)
+				break
 			end
 
-			n8 += v41.height
+			total += virtualizedItem.height
 		end
-	end, { t2.virtualizedItems })
-	local t3 = {}
-	local n9 = 0
+	end, { props.virtualizedItems })
 
-	for i = 1, v17.X - 1 do
-		local v26 = t2.virtualizedItems[i]
+	local children = {}
+	local total = 0
 
-		if v26 == nil then
+	for i = 1, state2.X - 1 do
+		local virtualizedItem = props.virtualizedItems[i]
+
+		if virtualizedItem == nil then
 			break
 		end
 
-		n9 += v26.height
+		total += virtualizedItem.height
 	end
 
-	for i = v17.X, v17.Y do
-		local v28 = t2.virtualizedItems[i]
+	for i = state2.X, state2.Y do
+		local virtualizedItem = props.virtualizedItems[i]
 
-		if v28 == nil then
-			return t3, v22
+		if virtualizedItem == nil then
+			break
 		end
 
-		t3[v28.key] = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Position = UDim2.fromOffset(0, n9),
-			Size = UDim2.new(1, 0, 0, v28.height)
-		}, t2.renderItem(v28))
-		n9 += v28.height
+		children[virtualizedItem.key] = React.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Position = UDim2.fromOffset(0, total),
+				Size = UDim2.new(1, 0, 0, virtualizedItem.height)
+			},
+			props.renderItem(virtualizedItem)
+		)
+
+		total += virtualizedItem.height
 	end
 
-	return t3, v22
+	return children, v3
 end
 
 return useVirtualizedList

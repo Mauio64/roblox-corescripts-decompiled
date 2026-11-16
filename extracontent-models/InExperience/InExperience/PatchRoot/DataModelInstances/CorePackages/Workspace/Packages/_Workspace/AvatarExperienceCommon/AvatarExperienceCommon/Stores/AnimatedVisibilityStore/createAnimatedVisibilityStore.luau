@@ -1,50 +1,51 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local Signals = require(Parent.Signals)
-local Otter = require(Parent.Otter)
-local t1 = {
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local Signals = require(parent.Signals)
+local Otter = require(parent.Otter)
+
+local v = {
 	dampingRatio = 1,
 	frequency = 3,
 	restingVelocityLimit = 0.1,
 	restingPositionLimit = 0.1
 }
 
-local function createAnimatedVisibilityStore(n1: number?) -- line: 38
-	-- upvalues: Signals (copy), Otter (copy), t1 (copy)
-	local v7 = n1 or 1
-	local v8, v9 = Signals.createSignal(v7)
-	local v10, v11 = Signals.createSignal(false)
-	local v12, v13 = Signals.createSignal(v7 > 0.5)
-	local v14 = Otter.createSingleMotor(v7)
-	local v15 = t1
+local function createAnimatedVisibilityStore(value: number?)
+	local v2 = value or 1
 
-	v14:onStep(function(p1) -- line: 51
-		-- upvalues: v9 (copy)
-		v9(p1)
+	local signal, v3 = Signals.createSignal(v2)
+
+	local signal2, v4 = Signals.createSignal(false)
+
+	local signal3, v5 = Signals.createSignal(v2 > 0.5)
+
+	local singleMotor = Otter.createSingleMotor(v2)
+	local v6 = v
+
+	singleMotor:onStep(function(p)
+		v3(p)
 	end)
-	v14:onComplete(function() -- line: 55
-		-- upvalues: v11 (copy)
-		v11(false)
+
+	singleMotor:onComplete(function()
+		v4(false)
 	end)
 
 	return {
-		getVisibilityRatio = v8,
-		getIsVisible = v12,
-		getIsAnimating = v10,
-		show = function() -- line: 60
-			-- upvalues: v13 (copy), v11 (copy), v14 (copy), Otter (copy), v15 (copy)
-			v13(true)
-			v11(true)
-			v14:setGoal(Otter.spring(1, v15))
+		getVisibilityRatio = signal,
+		getIsVisible = signal3,
+		getIsAnimating = signal2,
+		show = function()
+			v5(true)
+			v4(true)
+			singleMotor:setGoal(Otter.spring(1, v6))
 		end,
-		hide = function() -- line: 67
-			-- upvalues: v13 (copy), v11 (copy), v14 (copy), Otter (copy), v15 (copy)
-			v13(false)
-			v11(true)
-			v14:setGoal(Otter.spring(0, v15))
+		hide = function()
+			v5(false)
+			v4(true)
+			singleMotor:setGoal(Otter.spring(0, v6))
 		end,
-		destroy = function() -- line: 73
-			-- upvalues: v14 (copy)
-			v14:destroy()
+		destroy = function()
+			singleMotor:destroy()
 		end
 	}
 end

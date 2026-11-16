@@ -1,206 +1,370 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
+local parent = script:FindFirstAncestor("Moments").Parent
+
 local UserInputService = game:GetService("UserInputService")
-local React = require(Parent.React)
-local useEventConnection = require(Parent.ReactUtils).useEventConnection
 
-local function isActivationInput(p1) -- line: 51
-	return p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Touch
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+
+local useEventConnection = ReactUtils.useEventConnection
+
+local function isActivationInput(p): boolean
+	return p.UserInputType == Enum.UserInputType.MouseButton1 or p.UserInputType == Enum.UserInputType.Touch
 end
-local function withinDistance(vector2: Vector2, vector2_2: Vector2, n1: number) -- line: 56
-	return n1 >= (vector2 - vector2_2).Magnitude
+
+local function withinDistance(vector2: Vector2, current: Vector2, p: number): boolean -- 1 equivalent call inferred from this helper
+	return (vector2 - current).Magnitude <= p
 end
-local function useMomentGestures(b1: boolean, t1: {[any]: any}, p2: ((...any) -> ...any)?) -- line: 60
-	-- upvalues: React (copy), useEventConnection (copy), UserInputService (copy)
-	local v15 = React.useRef(nil)
-	local v16 = React.useRef(t1)
 
-	v16.current = t1
+local function containsPoint(current, mouseLocation: Vector2): boolean -- 1 equivalent call inferred from this helper
+	local absolutePosition = current.AbsolutePosition
+	local v = absolutePosition + current.AbsoluteSize
+	return mouseLocation.X >= absolutePosition.X
+		and mouseLocation.X <= v.X
+		and mouseLocation.Y >= absolutePosition.Y
+		and mouseLocation.Y <= v.Y
+end
 
-	local v17 = p2 or os.clock
-	local v18 = React.useRef(0)
-	local v19 = React.useRef(Vector2.zero)
-	local v20 = React.useRef(0)
-	local v21 = React.useRef(nil)
-	local v22 = React.useRef(nil)
-	local v23 = React.useRef(nil)
-	local v24 = React.useRef(false)
-	local v25 = React.useRef(nil)
-	local v26 = React.useRef(false)
-	local v27 = React.useCallback(function(p3) -- line: 82
-		-- upvalues: b1 (copy), v23 (copy), v24 (copy), v26 (copy), v17 (copy), v25 (copy), v18 (copy), v19 (copy), v20 (copy), v22 (copy), v21 (copy), v16 (copy)
-		if not b1 or p3.UserInputType ~= Enum.UserInputType.MouseButton1 and p3.UserInputType ~= Enum.UserInputType.Touch then
+local function useMomentGestures(flag: boolean, current, callback, data)
+	local ref = React.useRef(nil)
+
+	local ref2 = React.useRef(current)
+	ref2.current = current
+
+	local v = callback or os.clock
+
+	local ref3 = React.useRef(0)
+	local ref4 = React.useRef(Vector2.zero)
+	local ref5 = React.useRef(0)
+	local ref6 = React.useRef(nil)
+	local ref7 = React.useRef(nil)
+	local ref8 = React.useRef(nil)
+	local ref9 = React.useRef(false)
+	local ref10 = React.useRef(false)
+	local ref11 = React.useRef(nil)
+	local ref12 = React.useRef(false)
+	local ref13 = React.useRef(false)
+	local v2 = (data == nil or data.movementThreshold == nil) and 50 or data.movementThreshold
+
+	local v3 = (data == nil or data.longPressThreshold == nil) and 0.5 or data.longPressThreshold
+	local scrollingFrameRef
+
+	if data == nil then
+		scrollingFrameRef = nil
+	else
+		scrollingFrameRef = data.scrollingFrameRef
+	end
+
+	local cancellationSignal
+
+	if data == nil then
+		cancellationSignal = nil
+	else
+		cancellationSignal = data.cancellationSignal
+	end
+
+	local v4
+
+	if data == nil then
+		v4 = false
+	else
+		v4 = data.cancelWhenInactive == true
+	end
+
+	local v5
+
+	if data == nil then
+		v5 = false
+	else
+		v5 = data.cancelOnUserScroll == true
+	end
+
+	local v6 = React.useCallback(function()
+		if not ref10.current then
 			return
 		end
 
-		v23.current = p3
-		v24.current = false
-		v26.current = false
+		ref10.current = false
+		local onLongPressCancel = ref2.current.onLongPressCancel
 
-		local v31 = v17()
-		local vector2 = Vector2.new(p3.Position.X, p3.Position.Y)
+		if onLongPressCancel then
+			onLongPressCancel()
+		end
+	end, {})
 
-		v25.current = vector2
+	local v7 = React.useCallback(function()
+		v6()
+		ref8.current = nil
+		ref11.current = nil
+		ref12.current = false
+		ref13.current = false
+		ref9.current = false
+		ref5.current = 0
 
-		local v33 = v31 - v18.current <= 0.25
-		local v34 = (vector2 - v19.current).Magnitude <= 50
+		if ref6.current then
+			task.cancel(ref6.current)
+			ref6.current = nil
+		end
 
-		if v33 and v34 then
-			local v35 = v20
+		if ref7.current then
+			task.cancel(ref7.current)
+			ref7.current = nil
+		end
+	end, {})
 
-			v35.current = v35.current + 1
+	local onInputBegan = React.useCallback(function(current2)
+		if
+			not flag
+			or current2.UserInputType ~= Enum.UserInputType.MouseButton1
+			and current2.UserInputType ~= Enum.UserInputType.Touch
+		then
+			return
+		end
+
+		ref8.current = current2
+		ref9.current = false
+		ref12.current = false
+		ref13.current = false
+
+		local current3 = v()
+		local vector2 = Vector2.new(current2.Position.X, current2.Position.Y)
+		ref11.current = vector2
+
+		local v8 = current3 - ref3.current <= 0.25
+		local v9 = withinDistance(vector2, ref4.current, 50) -- inferred equivalent call
+
+		if v8 and v9 then
+			ref5.current += 1
 		else
-			v20.current = 1
+			ref5.current = 1
 		end
 
-		v18.current = v31
-		v19.current = vector2
+		ref3.current = current3
+		ref4.current = vector2
 
-		if v20.current >= 2 and v22.current then
-			task.cancel(v22.current)
-			v22.current = nil
+		if ref5.current >= 2 and ref7.current then
+			task.cancel(ref7.current)
+			ref7.current = nil
 		end
 
-		if v21.current then
-			task.cancel(v21.current)
+		if ref6.current then
+			task.cancel(ref6.current)
 		end
 
-		v21.current = task.delay(0.5, function() -- line: 116
-			-- upvalues: b1 (copy), v23 (copy), p3 (copy), v24 (copy), v16 (copy)
-			if not b1 then
+		v6()
+		ref10.current = true
+		local onLongPressStart = ref2.current.onLongPressStart
+
+		if onLongPressStart then
+			onLongPressStart()
+		end
+
+		ref6.current = task.delay(v3, function()
+			if not flag then
 				return
 			end
 
-			if v23.current == p3 and not v24.current then
-				v24.current = true
-
-				local onLongPress = v16.current.onLongPress
+			if ref8.current == current2 and not ref9.current then
+				ref9.current = true
+				ref10.current = false
+				local onLongPress = ref2.current.onLongPress
 
 				if onLongPress then
 					onLongPress()
 				end
 			end
 		end)
-	end, {
-		b1,
-		v17
-	})
-	local v28 = React.useCallback(function(p4) -- line: 132
-		-- upvalues: b1 (copy), v23 (copy), v25 (copy), v26 (copy), v21 (copy)
-		if not b1 or v23.current == nil then
-			return
+	end, { flag, v, v3, v6 })
+
+	local onInputChanged = React.useCallback(function(p)
+		local current2 = ref8.current
+		local current3 = ref11.current
+		local current4
+
+		if scrollingFrameRef ~= nil then
+			current4 = scrollingFrameRef.current
 		end
 
-		if p4.UserInputType == Enum.UserInputType.Touch and p4 ~= v23.current then
-			return
-		end
+		if v5 and current4 ~= nil then
+			local userInputType = p.UserInputType
+			local vector2 = Vector2.new(p.Position.X, p.Position.Y)
+			local v8
 
-		if v25.current ~= nil and not v26.current and not ((Vector2.new(p4.Position.X, p4.Position.Y) - v25.current).Magnitude <= 50) then
-			v26.current = true
-
-			if v21.current then
-				task.cancel(v21.current)
-				v21.current = nil
-			end
-		end
-	end, { b1 })
-
-	useEventConnection(UserInputService.InputChanged, v28, { v28 })
-
-	local v29 = React.useCallback(function(p5) -- line: 156
-		-- upvalues: v23 (copy), v21 (copy), v24 (copy), v26 (copy), v16 (copy), v20 (copy), v22 (copy), v19 (copy)
-		if p5 ~= v23.current then
-			return
-		end
-
-		v23.current = nil
-
-		if v21.current then
-			task.cancel(v21.current)
-			v21.current = nil
-		end
-
-		if v24.current or v26.current or p5.UserInputType ~= Enum.UserInputType.MouseButton1 and p5.UserInputType ~= Enum.UserInputType.Touch then
-			return
-		end
-
-		local onTap = v16.current.onTap
-
-		if onTap then
-			onTap()
-		end
-
-		if v20.current >= 2 then
-			if v22.current then
-				task.cancel(v22.current)
-				v22.current = nil
+			if userInputType == Enum.UserInputType.Touch then
+				v8 = p == current2
+			else
+				v8 = false
 			end
 
-			v20.current = 0
+			local v9
 
-			local onDoubleTap = v16.current.onDoubleTap
+			if userInputType == Enum.UserInputType.MouseMovement and current2 ~= nil then
+				v9 = current2.UserInputType == Enum.UserInputType.MouseButton1
+			else
+				v9 = false
+			end
 
-			if onDoubleTap then
-				onDoubleTap(v19.current)
+			if current2 == nil or current3 == nil then
+				v9 = false
+			elseif v8 or v9 then
+				v9 = not ((vector2 - current3).Magnitude <= 2)
+			end
 
+			local v10
+
+			if userInputType == Enum.UserInputType.MouseWheel then
+				v10 = containsPoint(current4, UserInputService:GetMouseLocation()) -- inferred equivalent call
+			else
+				v10 = false
+			end
+
+			local v11
+
+			if ref6.current == nil then
+				v11 = false
+			else
+				v11 = ref2.current.onLongPress ~= nil
+			end
+
+			if v9 and v11 and (vector2 - current3).Magnitude <= 10 then
+				ref13.current = true
+				ref5.current = 0
+
+				if ref7.current then
+					task.cancel(ref7.current)
+					ref7.current = nil
+				end
+			elseif v9 or v10 then
+				v7()
 				return
 			end
-		else
-			if v22.current then
-				task.cancel(v22.current)
-			end
-
-			v22.current = task.delay(0.25, function() -- line: 195
-				-- upvalues: v22 (copy), v20 (copy), v16 (copy)
-				v22.current = nil
-
-				if v20.current == 1 then
-					local onSingleTapConfirmed = v16.current.onSingleTapConfirmed
-
-					if onSingleTapConfirmed then
-						onSingleTapConfirmed()
-					end
-				end
-
-				v20.current = 0
-			end)
 		end
-	end, {})
 
-	useEventConnection(UserInputService.InputEnded, v29, { v29 })
-	React.useEffect(function() -- line: 210
-		-- upvalues: v15 (copy), v27 (copy)
-		local current = v15.current
-
-		if current == nil then
+		if not flag or current2 == nil or p.UserInputType == Enum.UserInputType.Touch and p ~= current2 then
 			return
 		end
 
-		local connection = current.InputBegan:Connect(v27)
+		if
+			current3 ~= nil
+			and not ref12.current
+			and not (v2 >= (Vector2.new(p.Position.X, p.Position.Y) - current3).Magnitude)
+		then
+			ref12.current = true
 
-		return function() -- line: 216
-			-- upvalues: connection (copy)
+			if ref6.current then
+				task.cancel(ref6.current)
+				ref6.current = nil
+			end
+
+			v6()
+		end
+	end, { flag, v2, scrollingFrameRef, v5, v7, v6 })
+
+	useEventConnection(UserInputService.InputChanged, onInputChanged, { onInputChanged })
+
+	local onInputEnded = React.useCallback(function(p)
+		if ref8.current ~= p then
+			return
+		end
+
+		ref8.current = nil
+
+		if ref6.current then
+			task.cancel(ref6.current)
+			ref6.current = nil
+		end
+
+		v6()
+
+		if
+			ref9.current
+			or ref12.current
+			or ref13.current
+			or p.UserInputType ~= Enum.UserInputType.MouseButton1 and p.UserInputType ~= Enum.UserInputType.Touch
+		then
+			return
+		end
+
+		local onTap = ref2.current.onTap
+
+		if onTap then
+			onTap(ref4.current, ref5.current)
+		end
+
+		if ref5.current >= 2 then
+			if ref7.current then
+				task.cancel(ref7.current)
+				ref7.current = nil
+			end
+
+			ref5.current = 0
+			local onDoubleTap = ref2.current.onDoubleTap
+
+			if onDoubleTap then
+				onDoubleTap(ref4.current)
+			end
+		else
+			if ref7.current then
+				task.cancel(ref7.current)
+			end
+
+			local current2 = ref4.current
+			ref7.current = task.delay(0.25, function()
+				ref7.current = nil
+				local onSingleTapConfirmed = ref5.current == 1 and ref2.current.onSingleTapConfirmed
+
+				if onSingleTapConfirmed then
+					onSingleTapConfirmed(current2)
+				end
+
+				ref5.current = 0
+			end)
+		end
+	end, { v6 })
+
+	useEventConnection(UserInputService.InputEnded, onInputEnded, { onInputEnded })
+
+	React.useEffect(function()
+		if cancellationSignal == nil then
+			return
+		end
+
+		local connection = cancellationSignal:Connect(v7)
+		return function()
 			connection:Disconnect()
 		end
-	end, { v27 })
-	React.useEffect(function() -- line: 221
-		-- upvalues: v21 (copy), v22 (copy)
-		return function() -- line: 222
-			-- upvalues: v21 (copy), v22 (copy)
-			if v21.current then
-				task.cancel(v21.current)
-			end
+	end, { cancellationSignal, v7 })
 
-			if v22.current then
-				task.cancel(v22.current)
-			end
+	React.useEffect(function()
+		if v4 and not flag then
+			v7()
 		end
-	end, {})
+	end, { flag, v4, v7 })
+
+	React.useEffect(function()
+		local current2 = ref.current
+
+		if current2 == nil then
+			return
+		end
+
+		local inputBeganConnection = current2.InputBegan:Connect(onInputBegan)
+		return function()
+			inputBeganConnection:Disconnect()
+		end
+	end, { onInputBegan })
+
+	React.useEffect(function()
+		return function()
+			ref10.current = false
+			v7()
+		end
+	end, { v7 })
 
 	return {
-		ref = v15,
-		onInputBegan = v27,
-		onInputChanged = v28,
-		onInputEnded = v29
+		ref = ref,
+		onInputBegan = onInputBegan,
+		onInputChanged = onInputChanged,
+		onInputEnded = onInputEnded
 	}
 end
 

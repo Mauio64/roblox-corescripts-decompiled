@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent
-local SharedFlags = require(ParentParent.SharedFlags)
+local parent = script.Parent.Parent
+
+local SharedFlags = require(parent.SharedFlags)
 local UIBlox = SharedFlags.UIBlox
 
 return {
@@ -7,7 +8,8 @@ return {
 	enableTooltipV2HoverControllerReRenderFix = UIBlox.GetFFlagUIBloxEnableTooltipV2HoverControllerReRenderFix(),
 	enableTooltipV2BodyFontFix = UIBlox.GetFFlagUIBloxEnableTooltipV2BodyFontFix(),
 	enableOpenTypeSupport = SharedFlags.GetFFlagLuaAppEnableOpenTypeSupport(),
-	didMountUpdateFullPageModal = UIBlox.GetFFlagUIBloxDidMountUpdateFullPageModal(),
+	didMountUpdateFullPageModal = true,
+	useFoundationToastButtonSizing = UIBlox.FFlagUIBloxToastFoundationButtonSizing,
 	useTokenizedShortcutBar = SharedFlags.FFlagEnableConsoleExpControls,
 	disableTokenScaling = UIBlox.FFlagUIBloxDisableTokenScaling
 }

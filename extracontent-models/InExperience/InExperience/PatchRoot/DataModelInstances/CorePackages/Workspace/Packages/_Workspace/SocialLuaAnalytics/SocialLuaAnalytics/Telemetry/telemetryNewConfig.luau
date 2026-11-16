@@ -1,36 +1,28 @@
 local SocialLuaAnalytics = script:FindFirstAncestor("SocialLuaAnalytics")
-local SocialLuaAnalyticsParent = SocialLuaAnalytics.Parent
-local Cryo = require(SocialLuaAnalyticsParent.Cryo)
-
+local parent = SocialLuaAnalytics.Parent
+local Cryo = require(parent.Cryo)
 require(SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends)
-
 local formatEventStreamFields = require(SocialLuaAnalytics.Telemetry.formatEventStreamFields)
-
 require(SocialLuaAnalytics.Analytics.Enums.Contexts)
 
-local function telemetryConfig(t1: {[any]: any}) -- line: 32
-	-- upvalues: Cryo (copy), formatEventStreamFields (copy)
+local function telemetryConfig(data)
 	return {
-		name = t1.name,
-		description = t1.description,
-		eventStreamCtx = t1.eventStreamCtx,
-		lastUpdated = t1.lastUpdated,
-		backendsList = Cryo.List.map(t1.backendsList, function(p1) -- line: 38
-			-- upvalues: formatEventStreamFields (copy), Cryo (copy)
-			if p1.type == "EventIngest" then
-				return Cryo.Dictionary.join(p1, {
-					format = function(...) -- line: 41
-						-- upvalues: p1 (copy), formatEventStreamFields (copy)
-						local v8 = p1.format(...)
-
-						return formatEventStreamFields(v8)
-					end
-				})
+		name = data.name,
+		description = data.description,
+		eventStreamCtx = data.eventStreamCtx,
+		lastUpdated = data.lastUpdated,
+		backendsList = Cryo.List.map(data.backendsList, function(p)
+			if p.type ~= "EventIngest" then
+				return p
 			end
 
-			return p1
+			local function fn(...)
+				return formatEventStreamFields((p.format(...)))
+			end
+
+			return Cryo.Dictionary.join(p, { format = fn })
 		end),
-		throttlingThousandths = t1.throttlingThousandths
+		throttlingThousandths = data.throttlingThousandths
 	}
 end
 

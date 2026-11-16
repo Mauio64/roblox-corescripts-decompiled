@@ -1,13 +1,18 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local UIBlox = require(Parent.UIBlox)
-local withStyle = UIBlox.Core.Style.withStyle
-local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
-local Roact = require(Parent.Roact)
-local t = require(Parent.t)
-local GetTextSize = require(Parent.Style).GetTextSize
-local v8 = Roact.PureComponent:extend("DetailsPageTitleContent")
+local parent = script:FindFirstAncestor("AppBlox").Parent
+local UIBlox = require(parent.UIBlox)
 
-v8.validateProps = t.strictInterface({
+local withStyle = UIBlox.Core.Style.withStyle
+
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+
+local extended = Roact.PureComponent:extend("DetailsPageTitleContent")
+
+extended.validateProps = t.strictInterface({
 	titleText = t.optional(t.string),
 	subTitleText = t.optional(t.string),
 	renderInfoContent = t.optional(t.callback),
@@ -15,87 +20,99 @@ v8.validateProps = t.strictInterface({
 	verticalAlignment = t.optional(t.enum(Enum.VerticalAlignment))
 })
 
-function v8.init(p1) -- line: 27
-	-- upvalues: GetTextSize (copy)
-	p1.state = {
-		containerWidth = nil
-	}
+function extended:init()
+	self.state = { containerWidth = nil }
 
-	function p1.onContainerSizeChange(p2) -- line: 31
-		-- upvalues: p1 (copy)
-		p1:setState(function(_, _) -- line: 32
-			-- upvalues: p2 (copy)
-			return {
-				containerWidth = p2.AbsoluteSize.X
-			}
+	function self.onContainerSizeChange(p)
+		self:setState(function(_, _)
+			return { containerWidth = p.AbsoluteSize.X }
 		end)
 	end
-	function p1.getTextSize(p5, p6, p7) -- line: 38
-		-- upvalues: GetTextSize (copy)
-		local BaseSize = p7.Font.BaseSize
-		local v16 = p6.RelativeSize * BaseSize
+	function self.getTextSize(p, p2, p3)
+		local baseSize = p3.Font.BaseSize
+		local v = p2.RelativeSize * baseSize
 		local vector2 = Vector2.new(10000, 10000)
-
-		return GetTextSize(p5, v16, p6.Font, vector2)
+		return GetTextSize(p, v, p2.Font, vector2)
 	end
 end
-function v8.render(p8) -- line: 46
-	-- upvalues: withStyle (copy), Roact (copy), StyledTextLabel (copy)
-	return withStyle(function(p9) -- line: 47
-		-- upvalues: p8 (copy), Roact (copy), StyledTextLabel (copy)
-		local Theme = p9.Theme
-		local p9Font = p9.Font
-		local uDim2 = UDim2.new(0, 0, 1, 0)
 
-		if p8.props.titleText then
-			local v22 = p8.getTextSize(p8.props.titleText, p9Font.Title, p9)
-			local v23 = v22.Y * 1
+function extended.render(data)
+	return withStyle(function(p)
+		local theme = p.Theme
+		local font = p.Font
+		local udim = UDim2.new(0, 0, 1, 0)
 
-			uDim2 = if p8.state.containerWidth == nil or not (v22.X >= p8.state.containerWidth) then UDim2.new(0, 0, 0, v23) else UDim2.new(0, 0, 0, v23 * 2)
+		if data.props.titleText then
+			local textSize = data.getTextSize(data.props.titleText, font.Title, p)
+			local v = textSize.Y * 1
+
+			if data.state.containerWidth == nil or not (textSize.X >= data.state.containerWidth) then
+				udim = UDim2.new(0, 0, 0, v)
+			else
+				udim = UDim2.new(0, 0, 0, v * 2)
+			end
 		end
 
-		return Roact.createElement("Frame", {
+		local createElement = Roact.createElement
+		local onContainerSizeChangesByAbsoluteSize = {
 			Size = UDim2.fromScale(1, 0),
 			BackgroundTransparency = 1,
-			[Roact.Change.AbsoluteSize] = p8.onContainerSizeChange,
+			[Roact.Change.AbsoluteSize] = data.onContainerSizeChange,
 			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = p8.props.layoutOrder
-		}, {
+			LayoutOrder = data.props.layoutOrder
+		}
+		local v = {
 			ListLayout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Vertical,
-				VerticalAlignment = p8.props.verticalAlignment
+				VerticalAlignment = data.props.verticalAlignment
 			}),
-			Title = p8.props.titleText and Roact.createElement(StyledTextLabel, {
+			Title = 0,
+			SubTitle = 0,
+			CustomContentComponentFrame = 0
+		}
+		local title
+
+		if data.props.titleText then
+			title = Roact.createElement(StyledTextLabel, {
+				text = data.props.titleText,
+				size = udim,
+				automaticSize = Enum.AutomaticSize.X,
+				fontStyle = font.Title,
+				colorStyle = theme.TextEmphasis,
+				textTruncate = Enum.TextTruncate.AtEnd,
 				lineHeight = 1,
 				fluidSizing = false,
 				layoutOrder = 1,
-				richText = false,
-				text = p8.props.titleText,
-				size = uDim2,
-				automaticSize = Enum.AutomaticSize.X,
-				fontStyle = p9Font.Title,
-				colorStyle = Theme.TextEmphasis,
-				textTruncate = Enum.TextTruncate.AtEnd
-			}) or nil,
-			SubTitle = p8.props.subTitleText and Roact.createElement(StyledTextLabel, {
-				layoutOrder = 2,
-				richText = false,
-				text = p8.props.subTitleText,
-				fontStyle = p9Font.Header2,
-				colorStyle = Theme.TextMuted,
-				automaticSize = Enum.AutomaticSize.XY
-			}) or nil,
-			CustomContentComponentFrame = p8.props.renderInfoContent and Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 3,
-				Size = UDim2.fromScale(1, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				CustomContent = p8.props.renderInfoContent()
+				richText = false
 			}) or nil
-		})
+		end
+
+		v.Title = title
+
+		v.SubTitle = data.props.subTitleText and Roact.createElement(StyledTextLabel, {
+			text = data.props.subTitleText,
+			fontStyle = font.Header2,
+			colorStyle = theme.TextMuted,
+			automaticSize = Enum.AutomaticSize.XY,
+			layoutOrder = 2,
+			richText = false
+		}) or nil
+
+		v.CustomContentComponentFrame = data.props.renderInfoContent
+			and Roact.createElement(
+				"Frame",
+				{
+					Size = UDim2.fromScale(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					LayoutOrder = 3
+				},
+				{ CustomContent = data.props.renderInfoContent() }
+			)
+			or nil
+		return createElement("Frame", onContainerSizeChangesByAbsoluteSize, v)
 	end)
 end
 
-return v8
+return extended

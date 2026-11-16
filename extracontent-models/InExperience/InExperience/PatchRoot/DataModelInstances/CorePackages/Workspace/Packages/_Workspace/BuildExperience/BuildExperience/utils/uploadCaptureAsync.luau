@@ -1,94 +1,74 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Promise = require(Parent.Promise)
-local debug = require(Parent.DataHydration.CreatorAgentChat).debug
-local CaptureService = game:GetService("CaptureService")
-local t1 = {}
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function uploadCaptureAsync(p1) -- line: 20
-	-- upvalues: Promise (copy), t1 (copy), debug (copy), CaptureService (copy)
-	local ok, result = pcall(function() -- line: 21
+local Promise = require(parent.Promise)
+
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local Debug = CreatorAgentChat.debug
+
+local CaptureService = game:GetService("CaptureService")
+
+local v = {}
+
+local function uploadCaptureAsync(p)
+	local success, result = pcall(function()
 		return game:GetEngineFeature("CaptureServiceStartUploadCoreScriptBypass")
 	end)
 
-	if not ok or result ~= true then
+	if not success or result ~= true then
 		return Promise.reject("Capture upload is not supported on this platform")
 	end
 
-	local v10 = t1[p1]
+	local assetId = v[p]
 
-	if v10 then
-		return Promise.resolve({
-			assetId = v10
-		})
+	if assetId then
+		return Promise.resolve({ assetId = assetId })
 	end
 
-	debug.log("info", "capture_upload starting")
+	Debug.log("info", "capture_upload starting")
 
-	return Promise.new(function(resolve, reject) -- line: 35
-		-- upvalues: CaptureService (copy), p1 (copy), debug (copy), t1 (copy)
-		local ok2, result2, v15 = pcall(function() -- line: 36
-			-- upvalues: CaptureService (copy), p1 (copy)
-			return CaptureService:StartUploadCaptureAsync(p1)
+	return Promise.new(function(callback, callback2)
+		local success2, result2, v2 = pcall(function()
+			return CaptureService:StartUploadCaptureAsync(p)
 		end)
 
-		if not ok2 then
-			debug.log("warn", "capture_upload start failed", {
-				error = tostring(result2)
-			})
-			reject(`Failed to start capture upload: { result2 }`)
+		if success2 then
+			if result2 == Enum.UploadCaptureResult.Success then
+				for _ = 1, 30 do
+					task.wait(2)
 
-			return
-		end
+					local success3, result3, assetId2 = pcall(function()
+						return CaptureService:CheckUploadCaptureStatusAsync(v2)
+					end)
 
-		if result2 ~= Enum.UploadCaptureResult.Success then
-			debug.log("warn", "capture_upload rejected", {
-				status = tostring(result2)
-			})
-			reject(`Upload rejected: { tostring(result2) }`)
+					if success3 then
+						if result3 == Enum.UploadCaptureResult.Success then
+							Debug.log("info", "capture_upload succeeded", { assetId = assetId2 })
+							v[p] = assetId2
+							callback({ assetId = assetId2 })
+							return
+						elseif result3 ~= Enum.UploadCaptureResult.UploadPending then
+							Debug.log("warn", "capture_upload failed", {
+								status = tostring(result3)
+							})
+							callback2(`Upload failed: {tostring(result3)}`)
+							return
+						end
+					else
+						Debug.log("warn", "capture_upload poll error", { error = tostring(result3) })
+						callback2(`Upload poll error: {result3}`)
+						return
+					end
+				end
 
-			return
-		end
-
-		for _ = 1, 30 do
-			task.wait(2)
-
-			local ok3, result3, v19 = pcall(function() -- line: 55
-				-- upvalues: CaptureService (copy), v15 (copy)
-				return CaptureService:CheckUploadCaptureStatusAsync(v15)
-			end)
-
-			if not ok3 then
-				debug.log("warn", "capture_upload poll error", {
-					error = tostring(result3)
-				})
-				reject(`Upload poll error: { result3 }`)
-
-				return
+				callback2("Upload timed out")
+			else
+				Debug.log("warn", "capture_upload rejected", { status = tostring(result2) })
+				callback2(`Upload rejected: {tostring(result2)}`)
 			end
-
-			if result3 == Enum.UploadCaptureResult.Success then
-				debug.log("info", "capture_upload succeeded", {
-					assetId = v19
-				})
-				t1[p1] = v19
-				resolve({
-					assetId = v19
-				})
-
-				return
-			end
-
-			if result3 ~= Enum.UploadCaptureResult.UploadPending then
-				debug.log("warn", "capture_upload failed", {
-					status = tostring(result3)
-				})
-				reject(`Upload failed: { tostring(result3) }`)
-
-				return
-			end
+		else
+			Debug.log("warn", "capture_upload start failed", { error = tostring(result2) })
+			callback2(`Failed to start capture upload: {result2}`)
 		end
-
-		reject("Upload timed out")
 	end)
 end
 

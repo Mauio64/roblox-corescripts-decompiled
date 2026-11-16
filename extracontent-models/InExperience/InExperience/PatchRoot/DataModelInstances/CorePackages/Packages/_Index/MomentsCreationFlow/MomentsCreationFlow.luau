@@ -4,13 +4,16 @@ local CreationFlowContextProvider = require(script.Context.CreationFlowContextPr
 local CreationFlowScreen = require(script.Components.CreationFlowScreen)
 local EventNames = require(script.Analytics.EventNames)
 local installReducer = require(script.Reducers.installReducer)
+
 local CreationFlowStateUpdated = require(script.Actions.CreationFlowStateUpdated)
 local SelectedCaptureUpdated = require(script.Actions.SelectedCaptureUpdated)
-local CreationFlowLocalization = require(script.Enums.CreationFlowLocalization)
-local CreationFlowState = require(script.Enums.CreationFlowState)
-local scriptParent = script.Parent
 
-require(scriptParent.MomentsCommon)
+local CreationFlowLocalization = require(script.Enums.CreationFlowLocalization)
+
+local CreationFlowState = require(script.Enums.CreationFlowState)
+
+local parent = script.Parent
+require(parent.MomentsCommon)
 
 return {
 	EventNames = EventNames,
@@ -18,16 +21,12 @@ return {
 		CreationFlowStateUpdated = CreationFlowStateUpdated,
 		SelectedCaptureUpdated = SelectedCaptureUpdated
 	},
-	Constants = {
-		RoduxKey = Constants.RoduxKey
-	},
+	Constants = { RoduxKey = Constants.RoduxKey },
 	installReducer = installReducer,
 	CreationFlowContext = CreationFlowContext,
 	CreationFlowContextProvider = CreationFlowContextProvider,
 	CreationFlowScreen = CreationFlowScreen,
-	Enums = {
-		CreationFlowState = CreationFlowState
-	},
+	Enums = { CreationFlowState = CreationFlowState },
 	CreationFlowLocalization = CreationFlowLocalization,
 	["jest.config"] = script["jest.config"]
 }

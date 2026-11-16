@@ -1,136 +1,185 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local IconVariant = require(FoundationParent.BuilderIcons).IconVariant
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
+local BuilderIcons = require(parent.BuilderIcons)
+local IconVariant = BuilderIcons.IconVariant
+
 local Constants = require(Foundation.Constants)
+local Flags = require(Foundation.Utility.Flags)
 local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local Accessory = require(script.Parent.Accessory)
+
 local IconPosition = require(Foundation.Enums.IconPosition)
+
 local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local StateLayerMode = require(Foundation.Enums.StateLayerMode)
 
 require(Foundation.Enums.CursorType)
 
 local ChipSize = require(Foundation.Enums.ChipSize)
+
 local ChipVariant = require(Foundation.Enums.ChipVariant)
+
 local useChipVariants = require(script.Parent.useChipVariants)
-local t1 = {
+
+local v = {
 	isChecked = false,
 	Selectable = true,
 	isDisabled = false,
-	testId = "--foundation-chip",
 	size = ChipSize.Medium,
-	variant = ChipVariant.Standard
+	variant = ChipVariant.Standard,
+	testId = "--foundation-chip"
 }
 
-local function Chip(p1, p2) -- line: 71
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), IconPosition (copy), IconVariant (copy), useChipVariants (copy), View (copy), withCommonProps (copy), StateLayerMode (copy), Constants (copy), PresentationContext (copy), ColorNamespace (copy), Accessory (copy), Text (copy)
-	local v23 = withDefaults(p1, t1)
-	local v24 = useTokens()
-	local v25, v26 = React.useMemo(function() -- line: 75
-		-- upvalues: v23 (copy), IconPosition (copy), IconVariant (copy)
-		local leading = v23.leading
-		local trailing = v23.trailing
+local function Chip(p, ref)
+	local v2 = withDefaults(p, v)
 
-		if v23.icon ~= nil then
-			if typeof(v23.icon) == "string" then
-				leading = {
-					iconName = v23.icon
-				}
+	local v3 = useTokens()
+	local config, config2 = React.useMemo(function()
+		local v4 = v2.leading
+		local v5 = v2.trailing
+
+		if v2.icon ~= nil then
+			if typeof(v2.icon) == "string" then
+				v4 = { iconName = v2.icon }
 			else
-				local t2 = {
-					iconName = v23.icon.name
-				}
+				local v6 = { iconName = v2.icon.name }
 
-				if v23.icon.position == IconPosition.Left then
-					leading = t2
+				if v2.icon.position == IconPosition.Left then
+					v4 = v6
 				else
-					trailing = t2
+					v5 = v6
 				end
 			end
 		end
 
-		if typeof(leading) == "table" and leading.isCircular then
-			leading.iconVariant = IconVariant.Filled
+		if typeof(v4) == "table" and v4.isCircular then
+			v4.iconVariant = IconVariant.Filled
 		end
 
-		if typeof(trailing) == "table" and trailing.isCircular then
-			trailing.iconVariant = IconVariant.Filled
+		if typeof(v5) == "table" and v5.isCircular then
+			v5.iconVariant = IconVariant.Filled
 		end
 
-		return leading, trailing
-	end, {
-		v23.leading,
-		v23.icon,
-		v23.trailing
-	})
-	local v27 = useChipVariants(v24, v23.size, v23.variant, v23.isChecked, v25 ~= nil, v26 ~= nil)
-	local v28 = math.floor(v24.Stroke.Thicker)
+		return v4, v5
+	end, { v2.leading, v2.icon, v2.trailing })
+	local v4
 
-	return React.createElement(View, withCommonProps(v23, {
-		isDisabled = v23.isDisabled,
+	if v2.text == nil then
+		v4 = false
+	else
+		v4 = v2.text ~= ""
+	end
+
+	local isIconOnly
+
+	if Flags.FoundationFixChipAccessoryLayout then
+		isIconOnly = not v4 and (config == nil) ~= (config2 == nil)
+	end
+
+	local v5 = useChipVariants(v3, v2.size, v2.variant, v2.isChecked, config ~= nil, config2 ~= nil)
+	local thicker = math.floor(v3.Stroke.Thicker)
+
+	local v6 = React.useMemo(function()
+		local colorNamespace
+
+		if v2.isChecked then
+			colorNamespace = ColorNamespace.Inverse
+		else
+			colorNamespace = ColorNamespace.Color
+		end
+
+		return { colorNamespace = colorNamespace, isIconSize = true }
+	end, { v2.isChecked })
+
+	local createElement = React.createElement
+
+	local v7 = withCommonProps(v2, {
+		isDisabled = v2.isDisabled,
 		selection = {
-			Selectable = not v23.isDisabled and v23.Selectable,
-			NextSelectionUp = v23.NextSelectionUp,
-			NextSelectionDown = v23.NextSelectionDown,
-			NextSelectionLeft = v23.NextSelectionLeft,
-			NextSelectionRight = v23.NextSelectionRight
+			Selectable = not v2.isDisabled and v2.Selectable,
+			NextSelectionUp = v2.NextSelectionUp,
+			NextSelectionDown = v2.NextSelectionDown,
+			NextSelectionLeft = v2.NextSelectionLeft,
+			NextSelectionRight = v2.NextSelectionRight
 		},
-		onActivated = v23.onActivated,
-		stateLayer = if not v23.isChecked then nil else {
-			mode = StateLayerMode.Inverse
-		},
-		backgroundStyle = v27.chip.backgroundStyle,
-		padding = v27.chip.padding,
+		onActivated = v2.onActivated,
+		stateLayer = v2.isChecked and { mode = StateLayerMode.Inverse } or nil,
+		backgroundStyle = v5.chip.backgroundStyle,
+		padding = v5.chip.padding,
 		cursor = {
-			radius = UDim.new(0, v24.Radius.Circle),
-			offset = v28 * 2,
-			borderWidth = v28
+			radius = UDim.new(0, v3.Radius.Circle),
+			offset = thicker * 2,
+			borderWidth = thicker
 		},
-		tag = v27.chip.tag,
-		ref = p2,
-		GroupTransparency = not v23.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY
-	}), React.createElement(PresentationContext.Provider, {
-		value = {
-			isIconSize = true,
-			colorNamespace = if not v23.isChecked then ColorNamespace.Color else ColorNamespace.Inverse
-		}
-	}, {
-		Leading = if not v25 then nil else React.createElement(Accessory, {
+		tag = v5.chip.tag,
+		ref = ref,
+		GroupTransparency = not v2.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY
+	})
+
+	local createElement2 = React.createElement
+	local provider = PresentationContext.Provider
+	local leading
+
+	if config then
+		leading = React.createElement(Accessory, {
 			isLeading = true,
-			config = v25,
-			size = v23.size,
-			chipBackgroundStyle = v27.chip.backgroundStyle,
-			contentStyle = v27.text.contentStyle,
-			isDisabled = v23.isDisabled,
-			testId = `{ v23.testId }--leading-accessory`
-		}),
-		Text = if not v23.text or v23.text == "" then nil else React.createElement(Text, {
-			LayoutOrder = 2,
-			Text = v23.text,
-			textStyle = v27.text.contentStyle,
-			tag = v27.text.tag,
-			padding = v27.text.padding,
-			testId = `{ v23.testId }--text`
-		}),
-		Trailing = if not v26 then nil else React.createElement(Accessory, {
-			isLeading = false,
-			config = v26,
-			size = v23.size,
-			chipBackgroundStyle = v27.chip.backgroundStyle,
-			contentStyle = v27.text.contentStyle,
-			isDisabled = v23.isDisabled,
-			testId = `{ v23.testId }--trailing-accessory`
+			config = config,
+			size = v2.size,
+			chipBackgroundStyle = v5.chip.backgroundStyle,
+			contentStyle = v5.text.contentStyle,
+			isDisabled = v2.isDisabled,
+			isIconOnly = isIconOnly,
+			testId = `{v2.testId}--leading-accessory`
 		})
-	}))
+	end
+
+	local text
+
+	if v4 then
+		text = React.createElement(Text, {
+			Text = v2.text,
+			textStyle = v5.text.contentStyle,
+			LayoutOrder = 2,
+			tag = v5.text.tag,
+			padding = v5.text.padding,
+			testId = `{v2.testId}--text`
+		})
+	end
+
+	local trailing
+
+	if config2 then
+		trailing = React.createElement(Accessory, {
+			isLeading = false,
+			config = config2,
+			size = v2.size,
+			chipBackgroundStyle = v5.chip.backgroundStyle,
+			contentStyle = v5.text.contentStyle,
+			isDisabled = v2.isDisabled,
+			isIconOnly = isIconOnly,
+			testId = `{v2.testId}--trailing-accessory`
+		})
+	end
+
+	return createElement(
+		View,
+		v7,
+		createElement2(provider, { value = v6 }, {
+			Leading = leading,
+			Text = text,
+			Trailing = trailing
+		})
+	)
 end
 
 return React.memo(React.forwardRef(Chip))

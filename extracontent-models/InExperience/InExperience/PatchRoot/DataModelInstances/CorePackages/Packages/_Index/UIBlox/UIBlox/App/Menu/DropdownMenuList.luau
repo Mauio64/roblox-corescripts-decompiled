@@ -1,15 +1,19 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local withStyle = require(ParentParent.Core.Style.withStyle)
+
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+
+local withStyle = require(parent.Core.Style.withStyle)
 local BaseMenu = require(script.Parent.BaseMenu)
 local validateButtonProps = require(script.Parent.validateButtonProps)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local v10 = Roact.PureComponent:extend("DropdownMenuList")
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
 
-v10.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("DropdownMenuList")
+
+extended.validateProps = t.strictInterface({
 	buttonProps = validateButtonProps,
 	zIndex = t.optional(t.integer),
 	open = t.boolean,
@@ -25,7 +29,8 @@ v10.validateProps = t.strictInterface({
 	selectionOrder = t.optional(t.number),
 	menuPositionFixed = t.optional(t.boolean)
 })
-v10.defaultProps = {
+
+extended.defaultProps = {
 	zIndex = 2,
 	closeBackgroundVisible = false,
 	showDropShadow = false,
@@ -35,120 +40,122 @@ v10.defaultProps = {
 	menuPositionFixed = false
 }
 
-function v10.init(p1) -- line: 50
-	p1:setState({
-		visible = false,
-		absolutePosition = Vector2.new(0, 0)
-	})
+function extended:init()
+	self:setState({ absolutePosition = Vector2.new(0, 0), visible = false })
 
-	function p1.setAbsolutePosition(p2) -- line: 56
-		-- upvalues: p1 (copy)
-		p1:setState({
-			absolutePosition = p2.AbsolutePosition
-		})
+	function self.setAbsolutePosition(p)
+		self:setState({ absolutePosition = p.AbsolutePosition })
 	end
-	function p1.dismissMenu() -- line: 62
-		-- upvalues: p1 (copy)
-		if p1.state.visible then
-			p1:setState({
-				visible = false
-			})
-			p1.props.onDismiss()
+
+	function self.dismissMenu()
+		if self.state.visible then
+			self:setState({ visible = false })
+
+			self.props.onDismiss()
 		end
 	end
 end
-function v10.render(p3) -- line: 72
-	-- upvalues: withStyle (copy), GuiService (copy), Roact (copy), BaseMenu (copy)
-	return withStyle(function(p4) -- line: 73
-		-- upvalues: GuiService (copy), p3 (copy), Roact (copy), BaseMenu (copy)
-		local v19, v20 = GuiService:GetGuiInset()
-		local v21 = p3.state.absolutePosition + v19
-		local n1 = 0
-		local n2 = 1
-		local buttonSizeY = p3.props.buttonSize.Y
-		local buttonSizeX = p3.props.buttonSize.X
 
-		if p3.state.absolutePosition.Y > p3.props.screenSize.Y / 2 then
-			n1 = 1
-			n2 = -1
-			buttonSizeY = UDim.new(0, 0)
+function extended.render(data)
+	return withStyle(function(p)
+		local guiInset, v = GuiService:GetGuiInset()
+		local v2 = data.state.absolutePosition + guiInset
+
+		local v3 = data.props.buttonSize.Y
+		local x = data.props.buttonSize.X
+		local v4, v5
+
+		if data.state.absolutePosition.Y > data.props.screenSize.Y / 2 then
+			v3 = UDim.new(0, 0)
+			v4 = -1
+			v5 = 1
+		else
+			v4 = 1
+			v5 = 0
 		end
 
-		local v26 = if n2 ~= 1 then buttonSizeY - p3.props.openPositionY else buttonSizeY + p3.props.openPositionY
-		local uDim2 = UDim2.new(0, 0, v26.Scale, v26.Offset)
+		local v6
 
-		if p3.props.screenSize.X < 640 and not p3.props.menuPositionFixed then
-			n1 = 1
-			uDim2 = UDim2.new(-p3.props.buttonSize.X.Scale / 2, -v21.X + p3.props.screenSize.X / 2 - p3.props.buttonSize.X.Offset / 2, 0, p3.props.screenSize.Y - v21.Y - v20.Y - 24)
+		if v4 == 1 then
+			v6 = v3 + data.props.openPositionY
+		else
+			v6 = v3 - data.props.openPositionY
 		end
 
-		local OverlayTransparency = p4.Theme.Overlay.Transparency
+		local udim = UDim2.new(0, 0, v6.Scale, v6.Offset)
 
-		if not p3.props.closeBackgroundVisible then
-			OverlayTransparency = 1
+		if data.props.screenSize.X < 640 and not data.props.menuPositionFixed then
+			udim = UDim2.new(
+				-data.props.buttonSize.X.Scale / 2,
+				-v2.X + data.props.screenSize.X / 2 - data.props.buttonSize.X.Offset / 2,
+				0,
+				data.props.screenSize.Y - v2.Y - v.Y - 24
+			)
+			v5 = 1
 		end
+
+		local transparency = p.Theme.Overlay.Transparency
+		local backgroundTransparency = not data.props.closeBackgroundVisible and 1 or transparency
 
 		return Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
-			Visible = p3.state.visible,
-			ZIndex = p3.props.zIndex,
-			[Roact.Change.AbsolutePosition] = p3.setAbsolutePosition
+			Visible = data.state.visible,
+			ZIndex = data.props.zIndex,
+			[Roact.Change.AbsolutePosition] = data.setAbsolutePosition
 		}, {
 			Background = Roact.createElement("TextButton", {
 				ZIndex = 1,
 				Text = "",
 				BorderSizePixel = 0,
-				BackgroundColor3 = p4.Theme.Overlay.Color,
-				BackgroundTransparency = OverlayTransparency,
+				BackgroundColor3 = p.Theme.Overlay.Color,
+				BackgroundTransparency = backgroundTransparency,
 				AutoButtonColor = false,
 				Selectable = false,
-				Position = UDim2.fromOffset(-v21.X, -v21.Y),
-				Size = UDim2.fromOffset(p3.props.screenSize.X, p3.props.screenSize.Y),
-				[Roact.Event.Activated] = p3.dismissMenu
+				Position = UDim2.fromOffset(-v2.X, -v2.Y),
+				Size = UDim2.fromOffset(data.props.screenSize.X, data.props.screenSize.Y),
+				[Roact.Event.Activated] = data.dismissMenu
 			}),
-			PositionFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				ZIndex = 2,
-				Size = UDim2.fromScale(1, 1),
-				Position = uDim2
-			}, {
-				BaseMenu = Roact.createElement(BaseMenu, {
-					buttonProps = p3.props.buttonProps,
-					showDropShadow = p3.props.showDropShadow,
-					fixedListHeight = p3.props.fixedListHeight,
-					width = buttonSizeX,
-					position = UDim2.fromScale(0, 0),
-					anchorPoint = Vector2.new(0, n1),
-					background = p3.props.menuListBackground,
-					enableTokenOverride = p3.props.enableTokenOverride,
-					selectionOrder = p3.props.selectionOrder
-				})
-			})
+			PositionFrame = Roact.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 1),
+					Position = udim,
+					ZIndex = 2
+				},
+				{
+					BaseMenu = Roact.createElement(BaseMenu, {
+						buttonProps = data.props.buttonProps,
+						showDropShadow = data.props.showDropShadow,
+						fixedListHeight = data.props.fixedListHeight,
+						width = x,
+						position = UDim2.fromScale(0, 0),
+						anchorPoint = Vector2.new(0, v5),
+						background = data.props.menuListBackground,
+						enableTokenOverride = data.props.enableTokenOverride,
+						selectionOrder = data.props.selectionOrder
+					})
+				}
+			)
 		})
 	end)
 end
-function v10.didMount(p5) -- line: 155
-	if p5.props.open then
-		p5:setState({
-			visible = true
-		})
+
+function extended.didMount(object)
+	if object.props.open then
+		object:setState({ visible = true })
 	end
 end
-function v10.didUpdate(p6, p7, _) -- line: 163
-	if p6.props.open ~= p7.open then
-		if p6.props.open then
-			p6:setState({
-				visible = true
-			})
 
-			return
+function extended.didUpdate(object, p, _)
+	if object.props.open ~= p.open then
+		if object.props.open then
+			object:setState({ visible = true })
+		else
+			object:setState({ visible = false })
 		end
-
-		p6:setState({
-			visible = false
-		})
 	end
 end
 
-return v10
+return extended

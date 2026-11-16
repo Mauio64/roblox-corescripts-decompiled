@@ -1,16 +1,16 @@
-local function getWidth(n1: number) -- line: 6
-	return n1 * 0.6596491228070176
+local function getWidth(p: number) -- 1 equivalent call inferred from this helper
+	return p * (188 / 285)
 end
 
 return {
-	getSize = function(vector2: Vector2, b1: boolean) -- line: 10
-		local v5 = math.min(math.round(vector2.Y * 0.7), 285)
-		local v6 = v5 * 0.6596491228070176
+	getSize = function(vector2: Vector2, flag: boolean)
+		local v = math.min(math.round(vector2.Y * 0.7), 285)
+		local width = getWidth(v) -- inferred equivalent call
 
-		if not b1 then
-			v5 *= 0.45614035087719296
+		if not flag then
+			v *= 26 / 57
 		end
 
-		return Vector2.new(v6, v5)
+		return Vector2.new(width, v)
 	end
 }

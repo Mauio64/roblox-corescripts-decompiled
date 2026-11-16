@@ -1,32 +1,38 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local t = dependencies.t
-local Roact = dependencies.Roact
-local UIBlox = dependencies.UIBlox
-local withLocalization = dependencies.withLocalization
-local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local Images = UIBlox.App.ImageSet.Images
-local IconSize = UIBlox.App.Constant.IconSize
-local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
-local withStyle = UIBlox.Style.withStyle
-local TextKeys = require(ParentParent.Common.TextKeys)
-local Dash = dependencies.Dash
-local v16 = Roact.PureComponent:extend("ContactsImporterOverlay")
+local parent = script.Parent.Parent.Parent.Parent
+local dependencies = require(parent.dependencies)
 
-v16.validateProps = t.strictInterface({
+local t = dependencies.t
+local roact = dependencies.Roact
+local uiBlox = dependencies.UIBlox
+local withLocalization = dependencies.withLocalization
+
+local partialPageModal = uiBlox.App.Dialog.Modal.PartialPageModal
+local buttonType = uiBlox.App.Button.Enum.ButtonType
+local imageSetLabel = uiBlox.Core.ImageSet.ImageSetLabel
+local images = uiBlox.App.ImageSet.Images
+local iconSize = uiBlox.App.Constant.IconSize
+local styledTextLabel = uiBlox.App.Text.StyledTextLabel
+local withStyle = uiBlox.Style.withStyle
+local TextKeys = require(parent.Common.TextKeys)
+local dash = dependencies.Dash
+local foundation = dependencies.Foundation
+local normalizeFontFace = foundation.Utility.normalizeFontFace
+local foundationFontFaceMigration = dependencies.FFlagFontFaceSocialFriends
+	and foundation.Utility.Flags.FoundationFontFaceMigration
+
+local extended = roact.PureComponent:extend("ContactsImporterOverlay")
+
+extended.validateProps = t.strictInterface({
 	screenSize = t.Vector2,
-	onCloseClicked = Dash.isCallable,
-	onConnectContacts = Dash.isCallable,
-	onLearnMoreClick = Dash.isCallable,
-	onAddFriendsActivated = Dash.isCallable,
+	onCloseClicked = dash.isCallable,
+	onConnectContacts = dash.isCallable,
+	onLearnMoreClick = dash.isCallable,
+	onAddFriendsActivated = dash.isCallable,
 	isFromAddFriendsPage = t.boolean,
 	isFromSignup = t.optional(t.boolean)
 })
 
-function v16.render(p1) -- line: 48
-	-- upvalues: withLocalization (copy), TextKeys (copy), withStyle (copy), ButtonType (copy), Roact (copy), PartialPageModal (copy), ImageSetLabel (copy), Images (copy), IconSize (copy), StyledTextLabel (copy)
+function extended.render(p)
 	return withLocalization({
 		connectWithFriends = TextKeys.CONTACTS_LIST_TITLE,
 		connectWithFriendsBody = TextKeys.CONNECT_CONTACTS_BODY,
@@ -35,121 +41,140 @@ function v16.render(p1) -- line: 48
 		closeModal = TextKeys.CLOSE_MODAL,
 		goToAddFriends = TextKeys.NOT_NOW,
 		learnMore = TextKeys.LEARN_MORE
-	})(function(p2) -- line: 57
-		-- upvalues: withStyle (copy), p1 (copy), ButtonType (copy), Roact (copy), PartialPageModal (copy), ImageSetLabel (copy), Images (copy), IconSize (copy), StyledTextLabel (copy)
-		return withStyle(function(p3) -- line: 58
-			-- upvalues: p1 (copy), ButtonType (copy), p2 (copy), Roact (copy), PartialPageModal (copy), ImageSetLabel (copy), Images (copy), IconSize (copy), StyledTextLabel (copy)
-			local Theme = p3.Theme
-			local p3Font = p3.Font
-			local props = p1.props
-			local t1 = {}
+	})(function(data)
+		return withStyle(function(props)
+			local theme = props.Theme
+			local font = props.Font
+			local props2 = p.props
 
-			if props.isFromAddFriendsPage or props.isFromSignup then
-				table.insert(t1, {
-					buttonType = ButtonType.Secondary,
-					props = {
-						onActivated = props.onCloseClicked,
-						text = p2.goToAddFriends
-					}
+			local buttons = {}
+
+			if props2.isFromAddFriendsPage or props2.isFromSignup then
+				table.insert(buttons, {
+					buttonType = buttonType.Secondary,
+					props = { onActivated = props2.onCloseClicked, text = data.goToAddFriends }
 				})
 			else
-				table.insert(t1, {
-					buttonType = ButtonType.Secondary,
+				table.insert(buttons, {
+					buttonType = buttonType.Secondary,
 					props = {
-						onActivated = props.onAddFriendsActivated,
-						text = p2.goToAddFriends
+						onActivated = props2.onAddFriendsActivated,
+						text = data.goToAddFriends
 					}
 				})
 			end
 
-			table.insert(t1, {
-				buttonType = ButtonType.PrimarySystem,
-				props = {
-					onActivated = props.onConnectContacts,
-					text = p2.getStarted
-				}
+			table.insert(buttons, {
+				buttonType = buttonType.PrimarySystem,
+				props = { onActivated = props2.onConnectContacts, text = data.getStarted }
 			})
 
-			return Roact.createElement(PartialPageModal, {
-				title = p2.connectWithFriends,
-				screenSize = props.screenSize,
-				onCloseClicked = props.onCloseClicked,
+			local createElement = roact.createElement
+			local v = {
+				title = data.connectWithFriends,
+				screenSize = props2.screenSize,
+				onCloseClicked = props2.onCloseClicked,
 				buttonStackProps = {
+					buttons = buttons,
 					buttonHeight = 48,
 					marginBetween = 6,
-					buttons = t1,
 					forcedFillDirection = Enum.FillDirection.Vertical
 				}
-			}, {
-				ViewContainer = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(1, 0, 0, 0)
-				}, {
-					UIListLayout = Roact.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						Padding = UDim.new(0, 12),
-						HorizontalAlignment = Enum.HorizontalAlignment.Center
-					}),
-					UIPadding = Roact.createElement("UIPadding", {
-						PaddingTop = UDim.new(0, 24),
-						PaddingBottom = UDim.new(0, 36)
-					}),
-					IconContainer = Roact.createElement("Frame", {
-						BackgroundTransparency = 1,
-						Size = UDim2.fromOffset(120, 132)
-					}, {
-						Icon = Roact.createElement(ImageSetLabel, {
-							BackgroundTransparency = 1,
-							LayoutOrder = 1,
+			}
+
+			local createElement2 = roact.createElement
+			local v2 = {
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0),
+				BackgroundTransparency = 1
+			}
+
+			local v3 = {
+				UIListLayout = roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 12),
+					HorizontalAlignment = Enum.HorizontalAlignment.Center
+				}),
+				UIPadding = roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 24),
+					PaddingBottom = UDim.new(0, 36)
+				}),
+				IconContainer = roact.createElement(
+					"Frame",
+					{ BackgroundTransparency = 1, Size = UDim2.fromOffset(120, 132) },
+					{
+						Icon = roact.createElement(imageSetLabel, {
 							AnchorPoint = Vector2.new(0.5, 0.5),
-							ImageTransparency = Theme.IconEmphasis.Transparency,
-							Image = Images["icons/graphic/connectcontacts_xlarge"],
-							Size = UDim2.fromOffset(IconSize.XLarge, IconSize.XLarge),
-							Position = UDim2.fromScale(0.5, 0.5)
+							BackgroundTransparency = 1,
+							ImageTransparency = theme.IconEmphasis.Transparency,
+							Image = images["icons/graphic/connectcontacts_xlarge"],
+							Size = UDim2.fromOffset(iconSize.XLarge, iconSize.XLarge),
+							Position = UDim2.fromScale(0.5, 0.5),
+							LayoutOrder = 1
 						})
-					}),
-					Header = Roact.createElement(StyledTextLabel, {
-						layoutOrder = 2,
-						text = p2.connectWithFriendsBody,
-						fontStyle = p3Font.Body,
-						colorStyle = Theme.TextEmphasis,
-						size = UDim2.fromScale(1, 0),
-						automaticSize = Enum.AutomaticSize.Y,
-						textTruncate = Enum.TextTruncate.AtEnd,
-						textXAlignment = Enum.TextXAlignment.Center,
-						textYAlignment = Enum.TextYAlignment.Top
-					}),
-					Description = Roact.createElement(StyledTextLabel, {
-						layoutOrder = 3,
-						text = p2.connectWithFriendsCaption,
-						fontStyle = p3Font.CaptionBody,
-						colorStyle = Theme.TextDefault,
-						size = UDim2.fromScale(1, 0),
-						automaticSize = Enum.AutomaticSize.Y,
-						textTruncate = Enum.TextTruncate.AtEnd,
-						textXAlignment = Enum.TextXAlignment.Center,
-						textYAlignment = Enum.TextYAlignment.Top
-					}),
-					LearnMore = Roact.createElement("TextButton", {
-						AutomaticSize = Enum.AutomaticSize.Y,
-						BackgroundTransparency = 1,
-						Font = p3.Font.CaptionBody.Font,
-						Size = UDim2.fromScale(1, 0),
-						Text = p2.learnMore,
-						TextColor3 = Theme.TextEmphasis.Color,
-						TextSize = p3Font.CaptionBody.RelativeSize * p3Font.BaseSize,
-						TextTransparency = Theme.TextEmphasis.Transparency,
-						TextXAlignment = Enum.TextXAlignment.Center,
-						TextYAlignment = Enum.TextYAlignment.Top,
-						LayoutOrder = 4,
-						[Roact.Event.Activated] = props.onLearnMoreClick
-					})
-				})
+					}
+				),
+				Header = roact.createElement(styledTextLabel, {
+					text = data.connectWithFriendsBody,
+					fontStyle = font.Body,
+					colorStyle = theme.TextEmphasis,
+					size = UDim2.fromScale(1, 0),
+					automaticSize = Enum.AutomaticSize.Y,
+					textTruncate = Enum.TextTruncate.AtEnd,
+					textXAlignment = Enum.TextXAlignment.Center,
+					textYAlignment = Enum.TextYAlignment.Top,
+					layoutOrder = 2
+				}),
+				Description = roact.createElement(styledTextLabel, {
+					text = data.connectWithFriendsCaption,
+					fontStyle = font.CaptionBody,
+					colorStyle = theme.TextDefault,
+					size = UDim2.fromScale(1, 0),
+					automaticSize = Enum.AutomaticSize.Y,
+					textTruncate = Enum.TextTruncate.AtEnd,
+					textXAlignment = Enum.TextXAlignment.Center,
+					textYAlignment = Enum.TextYAlignment.Top,
+					layoutOrder = 3
+				}),
+				LearnMore = 0
+			}
+
+			local createElement3 = roact.createElement
+			local onLearnMoreClicksByActivated = {}
+			onLearnMoreClicksByActivated.AutomaticSize = Enum.AutomaticSize.Y
+			onLearnMoreClicksByActivated.BackgroundTransparency = 1
+			local font2
+
+			if not foundationFontFaceMigration then
+				font2 = props.Font.CaptionBody.Font
+			end
+
+			onLearnMoreClicksByActivated.Font = font2
+			local fontFace
+
+			if foundationFontFaceMigration then
+				fontFace = normalizeFontFace(props.Tokens.Typography.BodySmall.Font)
+			end
+
+			onLearnMoreClicksByActivated.FontFace = fontFace
+
+			onLearnMoreClicksByActivated.Size = UDim2.fromScale(1, 0)
+			onLearnMoreClicksByActivated.Text = data.learnMore
+			onLearnMoreClicksByActivated.TextColor3 = theme.TextEmphasis.Color
+			onLearnMoreClicksByActivated.TextSize = font.CaptionBody.RelativeSize * font.BaseSize
+			onLearnMoreClicksByActivated.TextTransparency = theme.TextEmphasis.Transparency
+			onLearnMoreClicksByActivated.TextXAlignment = Enum.TextXAlignment.Center
+			onLearnMoreClicksByActivated.TextYAlignment = Enum.TextYAlignment.Top
+			onLearnMoreClicksByActivated.LayoutOrder = 4
+
+			onLearnMoreClicksByActivated[roact.Event.Activated] = props2.onLearnMoreClick
+			v3.LearnMore = createElement3("TextButton", onLearnMoreClicksByActivated)
+			return createElement(partialPageModal, v, {
+				ViewContainer = createElement2("Frame", v2, v3)
 			})
 		end)
 	end)
 end
 
-return v16
+return extended

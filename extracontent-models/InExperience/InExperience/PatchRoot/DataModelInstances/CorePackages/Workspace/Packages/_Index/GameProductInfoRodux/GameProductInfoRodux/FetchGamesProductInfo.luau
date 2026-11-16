@@ -1,75 +1,71 @@
 local GameProductInfoRodux = script:FindFirstAncestor("GameProductInfoRodux")
-local GameProductInfoRoduxParent = GameProductInfoRodux.Parent
-local Promise = require(GameProductInfoRoduxParent.Promise)
-local Result = require(GameProductInfoRoduxParent.Result)
-local PerformFetch = require(GameProductInfoRoduxParent.Http).PerformFetch
-local Logging = require(GameProductInfoRoduxParent.AppCommonLib).Logging
+local parent = GameProductInfoRodux.Parent
+local Promise = require(parent.Promise)
+local Result = require(parent.Result)
+local Http = require(parent.Http)
+local PerformFetch = Http.PerformFetch
+local AppCommonLib = require(parent.AppCommonLib)
+local Logging = AppCommonLib.Logging
 local SetGamesProductInfo = require(GameProductInfoRodux.SetGamesProductInfo)
 local GamesGetProductInfo = require(GameProductInfoRodux.GamesGetProductInfo)
 local GameProductInfo = require(GameProductInfoRodux.GameProductInfo)
-local t1 = {}
 
-local function v11(p1) -- line: 16
-	return "luaapp.gamesapi.games-product-info." .. p1
+local function fn(p) -- 4 equivalent calls inferred from this helper
+	return "luaapp.gamesapi.games-product-info." .. p
 end
 
-t1.KeyMapper = v11
+local FetchGamesProductInfo = {}
+FetchGamesProductInfo.KeyMapper = fn
 
-function t1.Fetch(p2, p3) -- line: 22
-	-- upvalues: PerformFetch (copy), v11 (copy), GamesGetProductInfo (copy), Result (copy), GameProductInfo (copy), Logging (copy), SetGamesProductInfo (copy), Promise (copy)
-	assert(type(p3) == "table", "FetchGamesProductInfo thunk expects universeIds to be a table")
-	assert(#p3 > 0, "FetchGamesProductInfo thunk expects universeIds count to be greater than 0")
-	assert(#p3 <= 100, "FetchGamesProductInfo thunk expects universeIds count to not exceed " .. 100)
+function FetchGamesProductInfo.Fetch(p, list)
+	assert(type(list) == "table", "FetchGamesProductInfo thunk expects universeIds to be a table")
+	assert(#list > 0, "FetchGamesProductInfo thunk expects universeIds count to be greater than 0")
+	assert(#list <= 100, "FetchGamesProductInfo thunk expects universeIds count to not exceed " .. 100)
 
-	return PerformFetch.Batch(p3, v11, function(p4, p5) -- line: 30
-		-- upvalues: GamesGetProductInfo (copy), p2 (copy), Result (copy), GameProductInfo (copy), Logging (copy), SetGamesProductInfo (copy), Promise (copy)
-		return GamesGetProductInfo(p2, p5):andThen(function(p6) -- line: 31
-			-- upvalues: p5 (copy), Result (copy), GameProductInfo (copy), Logging (copy), p4 (copy), SetGamesProductInfo (copy), Promise (copy)
-			local t2 = {}
+	return PerformFetch.Batch(list, fn, function(object, list2)
+		return GamesGetProductInfo(p, list2):andThen(function(p2)
+			local v = {}
 
-			for _, v in ipairs(p5) do
-				t2["luaapp.gamesapi.games-product-info." .. v] = Result.new(false, nil)
+			for _, item in ipairs(list2) do
+				v[fn(item)] = Result.new(false, nil) -- inferred equivalent call
 			end
 
-			local v23 = p6 and (p6.responseBody and p6.responseBody.data)
+			local data = p2 and p2.responseBody and p2.responseBody.data
 
-			if v23 ~= nil then
-				local t3 = {}
+			if data == nil then
+				Logging.warn("Response from GamesGetProductInfo is malformed!")
+			else
+				local v2 = {}
 
-				for _, v in ipairs(v23) do
-					GameProductInfo.fromJsonData(v):match(function(p7) -- line: 42
-						-- upvalues: t3 (copy), t2 (copy), Result (copy)
-						t3[p7.universeId] = p7
-						t2["luaapp.gamesapi.games-product-info." .. p7.universeId] = Result.new(true, nil)
-					end):matchError(function(p8) -- line: 46
-						-- upvalues: Logging (copy)
-						Logging.warn(p8)
+				for _, v3 in ipairs(data) do
+					GameProductInfo.fromJsonData(v3):match(function(p3)
+						v2[p3.universeId] = p3
+						v[fn(p3.universeId)] = Result.new(true, nil) -- inferred equivalent call
+					end):matchError(function(p3)
+						Logging.warn(p3)
 					end)
 				end
 
-				if next(t3) then
-					p4:dispatch(SetGamesProductInfo(t3))
+				if next(v2) then
+					object:dispatch(SetGamesProductInfo(v2))
 				end
-			else
-				Logging.warn("Response from GamesGetProductInfo is malformed!")
 			end
 
-			return Promise.resolve(t2)
-		end, function(_) -- line: 59
-			-- upvalues: p5 (copy), Result (copy), Promise (copy)
-			local t4 = {}
+			return Promise.resolve(v)
+		end, function(_)
+			local v = {}
 
-			for _, v in ipairs(p5) do
-				t4["luaapp.gamesapi.games-product-info." .. v] = Result.new(false, nil)
+			for _, item in ipairs(list2) do
+				v[fn(item)] = Result.new(false, nil) -- inferred equivalent call
 			end
 
-			return Promise.resolve(t4)
+			return Promise.resolve(v)
 		end)
 	end)
 end
-function t1.GetFetchingStatus(p10, p11) -- line: 69
-	-- upvalues: PerformFetch (copy)
-	return PerformFetch.GetStatus(p10, "luaapp.gamesapi.games-product-info." .. p11)
+
+function FetchGamesProductInfo.GetFetchingStatus(p, p2)
+	return PerformFetch.GetStatus(p, fn(p2)) -- inferred equivalent call
 end
 
-return t1
+return FetchGamesProductInfo

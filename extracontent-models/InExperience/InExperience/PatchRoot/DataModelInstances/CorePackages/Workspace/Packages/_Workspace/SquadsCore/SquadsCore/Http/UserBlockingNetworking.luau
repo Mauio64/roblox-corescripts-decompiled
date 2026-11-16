@@ -1,6 +1,7 @@
-local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local parent = script:FindFirstAncestor("SquadsCore").Parent
+
 local RoduxNetworking = require(script.Parent.RoduxNetworking)
 
-return (require(Parent.UserBlockingNetworking).config({
-	roduxNetworking = RoduxNetworking
-}))
+local UserBlockingNetworking = require(parent.UserBlockingNetworking)
+
+return (UserBlockingNetworking.config({ roduxNetworking = RoduxNetworking }))

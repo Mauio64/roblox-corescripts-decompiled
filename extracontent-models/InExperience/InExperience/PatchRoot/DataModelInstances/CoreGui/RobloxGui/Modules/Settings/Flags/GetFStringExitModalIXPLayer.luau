@@ -1,8 +1,9 @@
 local CorePackages = game:GetService("CorePackages")
-local AppUserLayers = require(CorePackages.Workspace.Packages.ExperimentLayers).AppUserLayers
+local ExperimentLayers = require(CorePackages.Workspace.Packages.ExperimentLayers)
+local AppUserLayers = ExperimentLayers.AppUserLayers
 
 game:DefineFastString("ExitModalIXPLayer", AppUserLayers.ExperienceMenuExitModalLayer)
 
-return function() -- line: 6
+return function()
 	return game:GetFastString("ExitModalIXPLayer")
 end

@@ -1,59 +1,67 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local createSignal = require(Parent.Signals).createSignal
+local parent = script:FindFirstAncestor("Moments").Parent
 
-local function createDeepLinkStore() -- line: 23
-	-- upvalues: createSignal (copy)
-	local v4, v5 = createSignal(nil)
-	local v6, v7 = createSignal(nil)
+local Signals = require(parent.Signals)
+
+local createSignal = Signals.createSignal
+
+local function createDeepLinkStore()
+	local signal, v = createSignal(nil)
+
+	local signal2, v2 = createSignal(nil)
+
+	local signal3, v3 = createSignal(nil)
 
 	return {
-		getDeepLinkedMomentId = v4,
-		getDeepLinkedMomentTargetIdType = v6,
-		setDeepLinkedMomentId = function(s1: string?) -- line: 34
-			-- upvalues: v5 (copy), v7 (copy)
-			v5(s1)
-			v7(if s1 == nil then nil else nil)
-		end,
-		setDeepLinkedMoment = function(s2: string?, s3: string?) -- line: 29
-			-- upvalues: v5 (copy), v7 (copy)
-			v5(s2)
-			v7(if s2 == nil then nil else s3)
-		end,
-		consumeDeepLinkedMoment = function() -- line: 38
-			-- upvalues: v4 (copy), v6 (copy), v5 (copy), v7 (copy)
-			local v11 = v4(false)
-			local v12 = v6(false)
+		getDeepLinkedMomentId = signal,
+		getDeepLinkedMomentTargetIdType = signal2,
+		getPendingCommentsTarget = signal3,
+		setDeepLinkedMomentId = function(p: string?)
+			v(p)
+			v2(nil)
 
-			v5(nil)
-			v7(nil)
+			if p ~= nil then
+				v3(nil)
+			end
+		end,
+		setDeepLinkedMoment = function(deepLinkId: string?, p: string?, p2)
+			v(deepLinkId)
 
-			if v11 == nil then
+			if deepLinkId == nil then
+				p = nil
+			end
+
+			v2(p)
+
+			if deepLinkId ~= nil then
+				v3(p2 ~= nil and {
+					deepLinkId = deepLinkId,
+					feedItemId = nil,
+					commentId = p2.commentId
+				} or nil)
+			end
+		end,
+		resolvePendingCommentsTarget = function(deepLinkId: string, feedItemId: string?)
+			local v4 = signal3(false)
+
+			if v4 == nil or v4.deepLinkId ~= deepLinkId then
+				return
+			end
+
+			v3(feedItemId ~= nil and feedItemId ~= "" and {
+				deepLinkId = deepLinkId,
+				feedItemId = feedItemId,
+				commentId = v4.commentId
+			} or nil)
+		end,
+		takeCommentsTarget = function(p: string)
+			local v4 = signal3(false)
+
+			if v4 == nil or v4.feedItemId == nil or v4.feedItemId ~= p then
 				return nil
 			end
 
-			return {
-				targetId = v11,
-				targetIdType = v12
-			}
-		end,
-		consumeDeepLinkedMomentId = function() -- line: 51
-			-- upvalues: v4 (copy), v6 (copy), v5 (copy), v7 (copy)
-			local v13 = v4(false)
-			local v14 = v6(false)
-
-			v5(nil)
-			v7(nil)
-
-			local v15 = if v13 ~= nil then {
-				targetId = v13,
-				targetIdType = v14
-			} else nil
-
-			if v15 ~= nil then
-				return v15.targetId
-			end
-
-			return nil
+			v3(nil)
+			return { commentId = v4.commentId }
 		end
 	}
 end

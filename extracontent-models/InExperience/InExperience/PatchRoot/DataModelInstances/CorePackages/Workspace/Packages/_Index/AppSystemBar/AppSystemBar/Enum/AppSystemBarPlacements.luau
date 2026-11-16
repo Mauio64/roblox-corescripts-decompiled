@@ -1,5 +1,1 @@
-return {
-	Bottom = "Bottom",
-	Left = "Left",
-	VR = "VR"
-}
+return { Bottom = "Bottom", Left = "Left", VR = "VR" }

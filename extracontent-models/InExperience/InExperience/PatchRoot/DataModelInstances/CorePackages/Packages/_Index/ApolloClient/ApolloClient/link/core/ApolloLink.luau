@@ -1,14 +1,15 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Error = LuauPolyfill.Error
-local invariant = require(ParentParent.jsutils.invariant)
-local InvariantError = invariant.InvariantError
+
+local invariant = require(parent.jsutils.invariant)
+local invariantError = invariant.InvariantError
 local invariant2 = invariant.invariant
-local Observable = require(ParentParent.utilities).Observable
+local utilities = require(parent.utilities)
+local observable = utilities.Observable
 
 require(script.Parent.types)
 
@@ -16,195 +17,179 @@ local utils = require(script.Parent.Parent.utils)
 local validateOperation = utils.validateOperation
 local createOperation = utils.createOperation
 local transformOperation = utils.transformOperation
-local t2 = {}
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-local function passthrough(_: {[any]: any}, p1, p2) -- line: 53
-	-- upvalues: Boolean (copy), Observable (copy)
-	if Boolean.toJSBoolean(p2) then
-		return (p2(p1))
+local function passthrough(_, p, callback)
+	if Boolean.toJSBoolean(callback) then
+		return (callback(p))
 	end
 
-	return Observable.of()
+	return observable.of()
 end
-local function toLink(p3) -- line: 61
-	-- upvalues: t2 (copy)
-	if typeof(p3) == "function" then
-		return t2.new(p3)
+
+local function toLink(callback)
+	if typeof(callback) == "function" then
+		return class.new(callback)
 	end
 
-	return p3
-end
-local function isTerminating(t4: {[any]: any}) -- line: 69
-	local v26, _ = debug.info(t4.request, "a")
-
-	return v26 <= 2
+	return callback
 end
 
-local self = setmetatable({}, {
-	__index = Error
-})
-
-self.__index = self
-
-function self.new(s1: string?, t5: {[any]: any}?) -- line: 79
-	-- upvalues: Error (copy), self (copy)
-	local v30 = Error.new(s1)
-
-	v30.link = t5
-
-	return (setmetatable(v30, self))
+local function isTerminating(p): boolean
+	local v, _ = debug.info(p.request, "a")
+	return v <= 2
 end
-function t2.empty() -- line: 86
-	-- upvalues: t2 (copy), Observable (copy)
-	return t2.new(function(_) -- line: 87
-		-- upvalues: Observable (copy)
-		return Observable.of()
+
+local object = setmetatable({}, { __index = Error })
+object.__index = object
+
+function object.new(p: string?, link)
+	local v = Error.new(p)
+	v.link = link
+
+	return (setmetatable(v, object))
+end
+
+function class.empty()
+	return class.new(function(_)
+		return observable.of()
 	end)
 end
-function t2.from(p5) -- line: 92
-	-- upvalues: t2 (copy), Array (copy), toLink (copy)
-	if #p5 == 0 then
-		return t2.empty()
+
+function class.from(list)
+	if #list == 0 then
+		return class.empty()
 	end
 
-	return (Array.reduce(Array.map(p5, toLink, nil), function(p6, p7) -- line: 96
-		return p6:concat(p7)
+	return (Array.reduce(Array.map(list, toLink, nil), function(object2, p)
+		return object2:concat(p)
 	end))
 end
-function t2.split_(p8: ((...any) -> ...any), p9, p10) -- line: 101
-	-- upvalues: t2 (copy), Boolean (copy), passthrough (copy), Observable (copy)
-	local v35 = if typeof(p9) ~= "function" then p9 else t2.new(p9)
-	local u36
 
-	if Boolean.toJSBoolean(p10) and p10 ~= nil then
-		u36 = if typeof(p10) ~= "function" then p10 else t2.new(p10)
-	else
-		local v37 = t2.new(passthrough)
-
-		u36 = if typeof(v37) ~= "function" then v37 else t2.new(v37)
+function class.split_(callback, callback2, callback3)
+	if typeof(callback2) == "function" then
+		callback2 = class.new(callback2)
 	end
 
-	local v38, _ = debug.info(v35.request, "a")
+	if not Boolean.toJSBoolean(callback3) or callback3 == nil then
+		callback3 = class.new(passthrough)
+	end
 
-	if v38 <= 2 then
-		local v40 = u36
-		local v41, _ = debug.info(v40.request, "a")
+	if typeof(callback3) == "function" then
+		callback3 = class.new(callback3)
+	end
 
-		if v41 <= 2 then
-			return t2.new(function(_, p12) -- line: 115
-				-- upvalues: p8 (copy), v35 (copy), Boolean (copy), Observable (copy), u36 (ref)
-				if p8(p12) then
-					local v75 = v35:request(p12)
+	local v, _ = debug.info(callback2.request, "a")
 
-					return Boolean.toJSBoolean(v75) and v75 or Observable.of()
+	if v <= 2 then
+		local v2, _ = debug.info(callback3.request, "a")
+
+		if v2 <= 2 then
+			return class.new(function(_, p)
+				if callback(p) then
+					local request = callback2:request(p)
+					return Boolean.toJSBoolean(request) and request or observable.of()
 				end
 
-				local v76 = u36:request(p12)
-
-				return Boolean.toJSBoolean(v76) and v76 or Observable.of()
+				local request = callback3:request(p)
+				return Boolean.toJSBoolean(request) and request or observable.of()
 			end)
 		end
 	end
 
-	return t2.new(function(_, p14, p15) -- line: 125
-		-- upvalues: p8 (copy), v35 (copy), Boolean (copy), Observable (copy), u36 (ref)
-		if p8(p14) then
-			local v80 = v35:request(p14, p15)
-
-			return Boolean.toJSBoolean(v80) and v80 or Observable.of()
+	return class.new(function(_, p, p2)
+		if callback(p) then
+			local request = callback2:request(p, p2)
+			return Boolean.toJSBoolean(request) and request or observable.of()
 		end
 
-		local v81 = u36:request(p14, p15)
-
-		return Boolean.toJSBoolean(v81) and v81 or Observable.of()
+		local request = callback3:request(p, p2)
+		return Boolean.toJSBoolean(request) and request or observable.of()
 	end)
 end
-function t2.execute(t6: {[any]: any}, p16) -- line: 137
-	-- upvalues: createOperation (copy), transformOperation (copy), validateOperation (copy), Boolean (copy), Observable (copy)
-	local v45 = t6:request(createOperation(p16.context, transformOperation(validateOperation(p16))))
 
-	return Boolean.toJSBoolean(v45) and v45 or Observable.of()
+function class:execute(p)
+	local request = self:request(createOperation(p.context, transformOperation(validateOperation(p))))
+	return Boolean.toJSBoolean(request) and request or observable.of()
 end
-function t2.concat_(p17, p18) -- line: 142
-	-- upvalues: t2 (copy), invariant2 (copy), self (copy), Boolean (copy), Observable (copy)
-	local v48 = if typeof(p17) ~= "function" then p17 else t2.new(p17)
-	local v49, _ = debug.info(v48.request, "a")
 
-	if v49 <= 2 then
-		invariant2.warn(self.new("You are calling concat on a terminating link, which will have no effect", v48))
-
-		return v48
+function class.concat_(callback, callback2)
+	if typeof(callback) == "function" then
+		callback = class.new(callback)
 	end
 
-	local v51 = if typeof(p18) ~= "function" then p18 else t2.new(p18)
-	local v52, _ = debug.info(v51.request, "a")
+	local v, _ = debug.info(callback.request, "a")
 
-	if v52 <= 2 then
-		return t2.new(function(_, p20) -- line: 153
-			-- upvalues: v48 (copy), v51 (copy), Boolean (copy), Observable (copy)
-			local v84 = v48:request(p20, function(p21) -- line: 154
-				-- upvalues: v51 (copy), Boolean (copy), Observable (copy)
-				local v90 = v51:request(p21)
+	if v <= 2 then
+		invariant2.warn(object.new("You are calling concat on a terminating link, which will have no effect", callback))
 
-				return Boolean.toJSBoolean(v90) and v90 or Observable.of()
+		return callback
+	end
+
+	if typeof(callback2) == "function" then
+		callback2 = class.new(callback2)
+	end
+
+	local v2, _ = debug.info(callback2.request, "a")
+
+	if v2 <= 2 then
+		return class.new(function(_, p)
+			local request = callback:request(p, function(p2)
+				local request = callback2:request(p2)
+				return Boolean.toJSBoolean(request) and request or observable.of()
 			end)
 
-			return Boolean.toJSBoolean(v84) and v84 or Observable.of()
+			return Boolean.toJSBoolean(request) and request or observable.of()
 		end)
 	end
 
-	return t2.new(function(_, p23, p24) -- line: 161
-		-- upvalues: v48 (copy), v51 (copy), Boolean (copy), Observable (copy)
-		local v88 = v48:request(p23, function(p25) -- line: 162
-			-- upvalues: v51 (copy), p24 (copy), Boolean (copy), Observable (copy)
-			local v92 = v51:request(p25, p24)
-
-			return Boolean.toJSBoolean(v92) and v92 or Observable.of()
+	return class.new(function(_, p, p2)
+		local request = callback:request(p, function(p3)
+			local request = callback2:request(p3, p2)
+			return Boolean.toJSBoolean(request) and request or observable.of()
 		end)
 
-		return Boolean.toJSBoolean(v88) and v88 or Observable.of()
+		return Boolean.toJSBoolean(request) and request or observable.of()
 	end)
 end
-function t2.new(p26) -- line: 171
-	-- upvalues: Boolean (copy), t2 (copy)
-	local t7 = {}
 
-	if Boolean.toJSBoolean(p26) then
-		t7.request = p26
+function class.new(request)
+	local v = {}
+
+	if Boolean.toJSBoolean(request) then
+		v.request = request
 	end
 
-	return (setmetatable(t7, t2))
+	return (setmetatable(v, class))
 end
-function t2.split(t8: {[any]: any}, p27: ((...any) -> ...any), p28, p29) -- line: 179
-	-- upvalues: t2 (copy), Boolean (copy), passthrough (copy)
-	return t8:concat(t2.split_(p27, p28, Boolean.toJSBoolean(p29) and p29 or t2.new(passthrough)))
+
+function class:split(callback, p, p2)
+	return self:concat(class.split_(callback, p, Boolean.toJSBoolean(p2) and p2 or class.new(passthrough)))
 end
-function t2.concat(p30, p31) -- line: 189
-	-- upvalues: t2 (copy)
-	return t2.concat_(p30, p31)
+
+function class:concat(p)
+	return class.concat_(self, p)
 end
-function t2.request(_, _, _) -- line: 193
-	-- upvalues: InvariantError (copy)
-	error(InvariantError.new("request is not implemented"))
+
+function class:request(_, _)
+	error(invariantError.new("request is not implemented"))
 end
-function t2.onError(_, p36, p37) -- line: 197
-	-- upvalues: Boolean (copy)
-	if Boolean.toJSBoolean(p37) and (p37 ~= nil and Boolean.toJSBoolean(p37.error)) then
-		p37:error(p36)
+
+function class.onError(_, message, object2)
+	if Boolean.toJSBoolean(object2) and object2 ~= nil and Boolean.toJSBoolean(object2.error) then
+		object2:error(message)
 
 		return false
 	end
 
-	error(p36)
-end
-function t2.setOnError(p38, p39) -- line: 213
-	p38.onError = p39
-
-	return p38
+	error(message)
 end
 
-t1.ApolloLink = t2
+function class:setOnError(onError)
+	self.onError = onError
+	return self
+end
 
-return t1
+return { ApolloLink = class }

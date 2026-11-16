@@ -1,28 +1,31 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local ParentParent = scriptParentParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Cryo = require(ParentParentParent.Cryo)
-local t = require(ParentParentParent.t)
-local Images = require(ParentParent.App.ImageSet.Images)
-local ItemRestrictionStatus = require(scriptParent.ItemRestrictionStatus)
-local ItemTileStatusIcon = require(scriptParent.ItemTileStatusIcon)
-local ItemTileStatus = require(scriptParent.ItemTileStatus)
-local ItemTileEnums = require(scriptParentParent.Enum.ItemTileEnums)
-local ItemIcon = require(scriptParent.ItemIcon)
-local Tile = require(scriptParentParent.BaseTile.Tile)
-local v15 = React.PureComponent:extend("ItemTile")
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent.Parent
+local parent4 = parent3.Parent
 
-local function tileBannerUseValidator(p1) -- line: 22
-	if p1.bannerText and p1.footer then
+local React = require(parent4.React)
+local Cryo = require(parent4.Cryo)
+local t = require(parent4.t)
+
+local Images = require(parent3.App.ImageSet.Images)
+local ItemRestrictionStatus = require(parent.ItemRestrictionStatus)
+local ItemTileStatusIcon = require(parent.ItemTileStatusIcon)
+local ItemTileStatus = require(parent.ItemTileStatus)
+local ItemTileEnums = require(parent2.Enum.ItemTileEnums)
+local ItemIcon = require(parent.ItemIcon)
+local Tile = require(parent2.BaseTile.Tile)
+
+local extended = React.PureComponent:extend("ItemTile")
+
+local function tileBannerUseValidator(props)
+	if props.bannerText and props.footer then
 		return false, "A custom footer and bannerText can't be used together"
 	end
 
 	return true
 end
 
-v15.validateProps = t.strictInterface({
+extended.validateProps = t.strictInterface({
 	footer = t.optional(t.table),
 	name = t.optional(t.string),
 	nameTextColor = t.optional(t.Color3),
@@ -65,7 +68,8 @@ v15.validateProps = t.strictInterface({
 	onThumbnailLoaded = t.optional(t.callback),
 	isRoactGamepadEnabled = t.optional(t.boolean)
 })
-v15.defaultProps = {
+
+extended.defaultProps = {
 	titleTextLineCount = 2,
 	innerPadding = 8,
 	isSelected = false,
@@ -76,76 +80,72 @@ v15.defaultProps = {
 	isRoactGamepadEnabled = true
 }
 
-local function isIconStatusStyle(p2) -- line: 155
-	-- upvalues: ItemTileEnums (copy)
-	return p2 == ItemTileEnums.StatusStyle.PendingIcon or p2 == ItemTileEnums.StatusStyle.AlertIcon
+local function isIconStatusStyle(statusStyle): boolean -- 1 equivalent call inferred from this helper
+	return statusStyle == ItemTileEnums.StatusStyle.PendingIcon or statusStyle == ItemTileEnums.StatusStyle.AlertIcon
 end
 
-function v15.render(p3) -- line: 159
-	-- upvalues: tileBannerUseValidator (copy), React (copy), ItemIcon (copy), ItemRestrictionStatus (copy), ItemTileStatus (copy), ItemTileEnums (copy), ItemTileStatusIcon (copy), Tile (copy), Images (copy)
-	assert(tileBannerUseValidator(p3.props))
+function extended.render(p)
+	assert(tileBannerUseValidator(p.props))
+	local footer = p.props.footer
+	local bannerText = p.props.bannerText
+	local hasRoundedCorners = p.props.hasRoundedCorners
+	local innerPadding = p.props.innerPadding
+	local isPremium = p.props.isPremium
+	local isSelected = p.props.isSelected
+	local multiSelect = p.props.multiSelect
+	local itemIconType = p.props.itemIconType
+	local name = p.props.name
+	local nameTextColor = p.props.nameTextColor
+	local nameTextTransparency = p.props.nameTextTransparency
+	local subtitle = p.props.subtitle
+	local titleTopPadding = p.props.titleTopPadding
+	local subtitleTopPadding = p.props.subtitleTopPadding
+	local footerTopPadding = p.props.footerTopPadding
+	local onActivated = p.props.onActivated
+	local restrictionInfo = p.props.restrictionInfo
+	local restrictionTypes = p.props.restrictionTypes
+	local statusStyle = p.props.statusStyle
+	local statusText = p.props.statusText
+	local titleTextLineCount = p.props.titleTextLineCount
+	local thumbnail = p.props.thumbnail
+	local backgroundImage = p.props.backgroundImage
+	local useMaxTitleHeight = p.props.useMaxTitleHeight
+	local addSubtitleSpace = p.props.addSubtitleSpace
+	local selectable = p.props.Selectable
+	local titleFontStyle = p.props.titleFontStyle
+	local renderTileInset = p.props.renderTileInset
+	local aspectRatio = p.props.aspectRatio
+	local scaleType = p.props.scaleType
 
-	local footer = p3.props.footer
-	local bannerText = p3.props.bannerText
-	local hasRoundedCorners = p3.props.hasRoundedCorners
-	local innerPadding = p3.props.innerPadding
-	local isPremium = p3.props.isPremium
-	local isSelected = p3.props.isSelected
-	local multiSelect = p3.props.multiSelect
-	local itemIconType = p3.props.itemIconType
-	local name = p3.props.name
-	local nameTextColor = p3.props.nameTextColor
-	local nameTextTransparency = p3.props.nameTextTransparency
-	local subtitle = p3.props.subtitle
-	local titleTopPadding = p3.props.titleTopPadding
-	local subtitleTopPadding = p3.props.subtitleTopPadding
-	local footerTopPadding = p3.props.footerTopPadding
-	local onActivated = p3.props.onActivated
-	local restrictionInfo = p3.props.restrictionInfo
-	local restrictionTypes = p3.props.restrictionTypes
-	local statusStyle = p3.props.statusStyle
-	local statusText = p3.props.statusText
-	local titleTextLineCount = p3.props.titleTextLineCount
-	local thumbnail = p3.props.thumbnail
-	local backgroundImage = p3.props.backgroundImage
-	local useMaxTitleHeight = p3.props.useMaxTitleHeight
-	local addSubtitleSpace = p3.props.addSubtitleSpace
-	local Selectable = p3.props.Selectable
-	local titleFontStyle = p3.props.titleFontStyle
-	local renderTileInset = p3.props.renderTileInset
-	local aspectRatio = p3.props.aspectRatio
-	local scaleType = p3.props.scaleType
-	local v51 = false
-	local t1 = {}
+	local children = {}
+	local v
 
 	if itemIconType then
-		v51 = true
-		t1.ItemIconType = React.createElement(ItemIcon, {
-			itemIconType = itemIconType
-		})
+		children.ItemIconType = React.createElement(ItemIcon, { itemIconType = itemIconType })
+		v = true
+	else
+		v = false
 	end
 
 	if restrictionTypes then
-		v51 = true
-		t1.RestrictionStatus = React.createElement(ItemRestrictionStatus, {
+		children.RestrictionStatus = React.createElement(ItemRestrictionStatus, {
 			restrictionInfo = restrictionInfo,
 			restrictionTypes = restrictionTypes
 		})
+		v = true
 	end
 
 	if statusText then
-		v51 = true
-		t1.Status = React.createElement(ItemTileStatus, {
+		children.Status = React.createElement(ItemTileStatus, {
 			statusStyle = statusStyle,
 			statusText = statusText
 		})
+		v = true
 	end
 
-	if statusStyle == ItemTileEnums.StatusStyle.PendingIcon or statusStyle == ItemTileEnums.StatusStyle.AlertIcon then
-		v51 = true
-		t1.Status = React.createElement(ItemTileStatusIcon, {
-			statusStyle = statusStyle
-		})
+	if isIconStatusStyle(statusStyle) then -- inferred equivalent call
+		children.Status = React.createElement(ItemTileStatusIcon, { statusStyle = statusStyle })
+		v = true
 	end
 
 	return React.createElement(Tile, {
@@ -154,7 +154,7 @@ function v15.render(p3) -- line: 159
 		hasRoundedCorners = hasRoundedCorners,
 		innerPadding = innerPadding,
 		isSelected = isSelected,
-		Selectable = Selectable,
+		Selectable = selectable,
 		multiSelect = multiSelect,
 		name = name,
 		nameTextColor = nameTextColor,
@@ -166,7 +166,7 @@ function v15.render(p3) -- line: 159
 		onActivated = onActivated,
 		thumbnail = thumbnail,
 		backgroundImage = backgroundImage,
-		thumbnailOverlayComponents = v51 and t1 or nil,
+		thumbnailOverlayComponents = v and children or nil,
 		titleIcon = isPremium and Images["icons/status/premium_small"] or nil,
 		titleTextLineCount = titleTextLineCount,
 		useMaxTitleHeight = useMaxTitleHeight,
@@ -175,23 +175,20 @@ function v15.render(p3) -- line: 159
 		renderTileInset = renderTileInset,
 		thumbnailAspectRatio = aspectRatio,
 		thumbnailScaleType = scaleType,
-		hasVerifiedBadge = p3.props.hasVerifiedBadge,
-		NextSelectionLeft = p3.props.NextSelectionLeft,
-		NextSelectionRight = p3.props.NextSelectionRight,
-		NextSelectionUp = p3.props.NextSelectionUp,
-		NextSelectionDown = p3.props.NextSelectionDown,
-		textButtonRef = p3.props.textButtonRef,
-		inputBindings = p3.props.inputBindings,
-		ref = p3.props.thumbnailRef,
-		[React.Tag] = p3.props[React.Tag],
-		onThumbnailLoaded = p3.props.onThumbnailLoaded,
-		isRoactGamepadEnabled = p3.props.isRoactGamepadEnabled
+		hasVerifiedBadge = p.props.hasVerifiedBadge,
+		NextSelectionLeft = p.props.NextSelectionLeft,
+		NextSelectionRight = p.props.NextSelectionRight,
+		NextSelectionUp = p.props.NextSelectionUp,
+		NextSelectionDown = p.props.NextSelectionDown,
+		textButtonRef = p.props.textButtonRef,
+		inputBindings = p.props.inputBindings,
+		ref = p.props.thumbnailRef,
+		[React.Tag] = p.props[React.Tag],
+		onThumbnailLoaded = p.props.onThumbnailLoaded,
+		isRoactGamepadEnabled = p.props.isRoactGamepadEnabled
 	})
 end
 
-return React.forwardRef(function(p4, p5) -- line: 270
-	-- upvalues: React (copy), v15 (copy), Cryo (copy)
-	return React.createElement(v15, Cryo.Dictionary.join(p4, {
-		thumbnailRef = p5
-	}))
+return React.forwardRef(function(p, thumbnailRef)
+	return React.createElement(extended, Cryo.Dictionary.join(p, { thumbnailRef = thumbnailRef }))
 end)

@@ -1,5 +1,1 @@
-return {
-	Startup = "Startup",
-	SignUp = "SignUp",
-	Login = "Login"
-}
+return { Startup = "Startup", SignUp = "SignUp", Login = "Login" }

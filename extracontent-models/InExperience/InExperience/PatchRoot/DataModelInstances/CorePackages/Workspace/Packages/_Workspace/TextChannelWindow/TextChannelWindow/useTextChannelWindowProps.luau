@@ -1,51 +1,63 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local useEventConnection = require(ParentParent.ReactUtils).useEventConnection
+local parent = script.Parent.Parent
 
-local function resolveTarget(p1) -- line: 19
-	local p1Target = p1.Target
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
 
-	if p1Target and p1Target:IsA("TextChannel") then
-		return p1Target
+local FFlagExpChatTextChannelWindowFontOverride = require(script.Parent.Flags.FFlagExpChatTextChannelWindowFontOverride)
+
+local function resolveTarget(instance) -- 2 equivalent calls inferred from this helper
+	local target = instance.Target
+	return if target and target:IsA("TextChannel") then target else nil
+end
+
+local function resolveFontOverride(instance) -- 3 equivalent calls inferred from this helper
+	if not FFlagExpChatTextChannelWindowFontOverride or instance.UseDefaultFont then
+		return nil
 	end
 
-	return nil
+	return instance.FontFace
 end
-local function useTextChannelWindowProps(p2) -- line: 27
-	-- upvalues: React (copy), useEventConnection (copy)
-	local v9, v10 = React.useState(function() -- line: 28
-		-- upvalues: p2 (copy)
-		local p2Target = p2.Target
 
-		if p2Target and p2Target:IsA("TextChannel") then
-			return p2Target
-		end
-
-		return nil
+local function useTextChannelWindowProps(instance)
+	local state, setState = React.useState(function()
+		return resolveTarget(instance) -- inferred equivalent call
 	end)
-	local v11, v12 = React.useState(function() -- line: 32
-		-- upvalues: p2 (copy)
-		return p2.BackgroundColor3
+
+	local state2, setState2 = React.useState(function()
+		return instance.BackgroundColor3
 	end)
-	local v13 = React.useRef(v9)
 
-	useEventConnection(p2:GetPropertyChangedSignal("Target"), function() -- line: 38
-		-- upvalues: p2 (copy), v13 (copy), v10 (copy)
-		local p2Target = p2.Target
-		local v16 = if not p2Target or not p2Target:IsA("TextChannel") then nil else p2Target
+	local ref = React.useRef(state)
 
-		v13.current = v16
-		v10(v16)
-	end, { p2 })
-	useEventConnection(p2:GetPropertyChangedSignal("BackgroundColor3"), function() -- line: 45
-		-- upvalues: v12 (copy), p2 (copy)
-		v12(p2.BackgroundColor3)
-	end, { p2 })
+	useEventConnection(instance:GetPropertyChangedSignal("Target"), function()
+		local target = resolveTarget(instance) -- inferred equivalent call
+		ref.current = target
 
-	return {
-		target = v9,
-		backgroundColor = v11
-	}
+		setState(target)
+	end, { instance })
+
+	useEventConnection(instance:GetPropertyChangedSignal("BackgroundColor3"), function()
+		setState2(instance.BackgroundColor3)
+	end, { instance })
+	local state3
+
+	if FFlagExpChatTextChannelWindowFontOverride then
+		local setState3
+		state3, setState3 = React.useState(function()
+			return resolveFontOverride(instance) -- inferred equivalent call
+		end)
+
+		useEventConnection(instance:GetPropertyChangedSignal("FontFace"), function()
+			setState3(resolveFontOverride(instance)) -- inferred equivalent call
+		end, { instance })
+
+		useEventConnection(instance:GetPropertyChangedSignal("UseDefaultFont"), function()
+			setState3(resolveFontOverride(instance)) -- inferred equivalent call
+		end, { instance })
+	end
+
+	return { target = state, backgroundColor = state2, fontOverride = state3 }
 end
 
 return useTextChannelWindowProps

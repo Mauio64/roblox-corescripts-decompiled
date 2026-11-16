@@ -1,1034 +1,1379 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
+
+local v = {}
+
+local client_capabilities = require(script.Parent.Parent.Parent.shared.v1beta1.client_capabilities)
+
 local hydration_content = require(script.Parent.Parent.Parent.shared.v1beta1.hydration_content)
+
 local page_entry_content = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry_content)
+
 local template_entry = require(script.Parent.Parent.Parent.shared.v1beta1.template_entry)
-local t2 = {}
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.new(t3: {[any]: any}?) -- line: 240
-	-- upvalues: t2 (copy)
+function class.new(p)
 	return (setmetatable({
-		parameters = if t3 ~= nil and t3.parameters ~= nil then t3.parameters else {},
-		translations = if t3 ~= nil and t3.translations ~= nil then t3.translations else {}
-	}, t2))
+		parameters = (p == nil or p.parameters == nil) and {} or p.parameters,
+		translations = (p == nil or p.translations == nil) and {} or p.translations
+	}, class))
 end
-function t2.encode(p1) -- line: 247
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.parameters ~= nil and next(p1.parameters) ~= nil then
-		for v18, v19 in p1.parameters do
-			local buf2 = buffer.create(0)
-			local v21, v22 = proto.writeTag(buf2, 0, 1, proto.wireTypes.lengthDelimited)
-			local v23, v24 = proto.writeString(v21, v22, v18)
-			local v25, v26 = proto.writeTag(v23, v24, 2, proto.wireTypes.lengthDelimited)
-			local v27, v28 = proto.writeString(v25, v26, v19)
-			local v29, v30 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n1 = proto.writeBuffer(v29, v30, v27, v28)
+	if self.parameters ~= nil and next(self.parameters) ~= nil then
+		for k, parameter in self.parameters do
+			local buf = buffer.create(0)
+
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeString(v8, v9, parameter)
+			local v12, v13 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
 		end
 	end
 
-	if p1.translations ~= nil and next(p1.translations) ~= nil then
-		for v31, v32 in p1.translations do
-			local buf3 = buffer.create(0)
-			local v34, v35 = proto.writeTag(buf3, 0, 1, proto.wireTypes.lengthDelimited)
-			local v36, v37 = proto.writeString(v34, v35, v31)
-			local v38, v39 = proto.writeTag(v36, v37, 2, proto.wireTypes.lengthDelimited)
-			local v40, v41 = proto.writeString(v38, v39, v32)
-			local v42, v43 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+	if self.translations ~= nil and next(self.translations) ~= nil then
+		for k, translation in self.translations do
+			local buf = buffer.create(0)
 
-			buf, n1 = proto.writeBuffer(v42, v43, v40, v41)
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeString(v8, v9, translation)
+			local v12, v13 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
 		end
 	end
 
-	local buf4 = buffer.create(n1)
-
-	buffer.copy(buf4, 0, buf, 0, n1)
-
-	return buf4
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 282
-	-- upvalues: t2 (copy), proto (copy), t1 (copy)
-	local v46 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v48, v49
+function class.decode(buf: buffer)
+	local v2 = class.new()
+	local v3 = 0
 
-		v48, v49, n2 = proto.readTag(p2, n2)
+	while v3 < buffer.len(buf) do
+		local v4, v5
+		v4, v5, v3 = proto.readTag(buf, v3)
 
-		if v49 == proto.wireTypes.varint then
-			local v50
+		if v5 == proto.wireTypes.varint then
+			local _
+			_, v3 = proto.readVarInt(buf, v3)
+		elseif v5 == proto.wireTypes.lengthDelimited then
+			if v4 == 1 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
 
-			v50, n2 = proto.readVarInt(p2, n2)
-		elseif v49 == proto.wireTypes.lengthDelimited then
-			if v48 == 1 then
-				local v51
+				local decoded = v.CustomPrompt_ParametersEntry.decode(v6)
 
-				v51, n2 = proto.readBuffer(p2, n2)
+				v2.parameters[decoded.key or ""] = decoded.value or ""
+			elseif v4 == 2 then
+				local v6
+				v6, v3 = proto.readBuffer(buf, v3)
 
-				local v52 = t1.CustomPrompt_ParametersEntry.decode(v51)
+				local decoded = v.CustomPrompt_TranslationsEntry.decode(v6)
 
-				v46.parameters[v52.key or ""] = v52.value or ""
-			elseif v48 == 2 then
-				local v53
-
-				v53, n2 = proto.readBuffer(p2, n2)
-
-				local v54 = t1.CustomPrompt_TranslationsEntry.decode(v53)
-
-				v46.translations[v54.key or ""] = v54.value or ""
+				v2.translations[decoded.key or ""] = decoded.value or ""
 			else
-				local v55, v56 = proto.readVarInt(p2, n2)
+				local varInt, v6 = proto.readVarInt(buf, v3)
 
-				n2 = v56 + v55
+				v3 = v6 + varInt
 			end
-		elseif v49 == proto.wireTypes.i32 then
-			local v57
-
-			v57, n2 = proto.readFixed32(p2, n2)
-		elseif v49 == proto.wireTypes.i64 then
-			local v58
-
-			v58, n2 = proto.readFixed64(p2, n2)
+		elseif v5 == proto.wireTypes.i32 then
+			local _
+			_, v3 = proto.readFixed32(buf, v3)
+		elseif v5 == proto.wireTypes.i64 then
+			local _
+			_, v3 = proto.readFixed64(buf, v3)
 		else
-			error("Unsupported wire type: " .. v49)
+			error("Unsupported wire type: " .. v5)
 		end
 	end
 
-	return v46
-end
-function t2.jsonEncode(p3) -- line: 344
-	local t4 = {}
-
-	if p3.parameters ~= nil and next(p3.parameters) ~= nil then
-		local t5 = {}
-
-		for v62, v63 in p3.parameters do
-			t5[v62] = v63
-		end
-
-		t4.parameters = t5
-	end
-
-	if p3.translations ~= nil and next(p3.translations) ~= nil then
-		local t6 = {}
-
-		for v65, v66 in p3.translations do
-			t6[v65] = v66
-		end
-
-		t4.translations = t6
-	end
-
-	return t4
-end
-function t2.jsonDecode(t7: {[any]: any}) -- line: 366
-	-- upvalues: t2 (copy)
-	local v68 = t2.new()
-
-	if t7.parameters ~= nil then
-		local t8 = {}
-
-		for v70, v71 in t7.parameters do
-			t8[v70] = v71
-		end
-
-		v68.parameters = t8
-	end
-
-	if t7.translations ~= nil then
-		local t9 = {}
-
-		for v73, v74 in t7.translations do
-			t9[v73] = v74
-		end
-
-		v68.translations = t9
-	end
-
-	return v68
+	return v2
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.parameters ~= nil and next(self.parameters) ~= nil then
+		local parameters = {}
+
+		for k, parameter in self.parameters do
+			parameters[k] = parameter
+		end
+
+		v2.parameters = parameters
+	end
+
+	if self.translations == nil or next(self.translations) == nil then
+		return v2
+	end
+
+	local translations = {}
+
+	for k, translation in self.translations do
+		translations[k] = translation
+	end
+
+	v2.translations = translations
+
+	return v2
+end
+
+function class.jsonDecode(p)
+	local v2 = class.new()
+
+	if p.parameters ~= nil then
+		local parameters = {}
+
+		for k, parameter in p.parameters do
+			parameters[k] = parameter
+		end
+
+		v2.parameters = parameters
+	end
+
+	if p.translations == nil then
+		return v2
+	end
+
+	local translations = {}
+
+	for k, translation in p.translations do
+		translations[k] = translation
+	end
+
+	v2.translations = translations
+
+	return v2
+end
+
+class.descriptor = {
 	name = "CustomPrompt",
 	fullName = "roblox.apppageplatform.prompts.v1beta1.CustomPrompt"
 }
-t1.CustomPrompt = t2
-typeRegistry.default:register(t1.CustomPrompt)
 
-local t10 = {}
+v.CustomPrompt = class
 
-t10.__index = t10
+typeRegistry.default:register(v.CustomPrompt)
 
-function t10.new(t11: {[any]: any}?) -- line: 404
-	-- upvalues: t10 (copy)
+local class2 = {}
+class2.__index = class2
+
+function class2.new(p)
 	return (setmetatable({
-		key = if t11 ~= nil and t11.key ~= nil then t11.key else "",
-		value = if t11 ~= nil and t11.value ~= nil then t11.value else ""
-	}, t10))
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = (p == nil or p.value == nil) and "" or p.value
+	}, class2))
 end
-function t10.encode(p4) -- line: 413
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n3 = 0
 
-	if p4.key ~= nil and p4.key ~= "" then
-		local v79, v80 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n3 = proto.writeString(v79, v80, p4.key)
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
 	end
 
-	if p4.value ~= nil and p4.value ~= "" then
-		local v81, v82 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeString(v81, v82, p4.value)
+	if self.value ~= nil and self.value ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.value)
 	end
 
-	local buf5 = buffer.create(n3)
-
-	buffer.copy(buf5, 0, buf, 0, n3)
-
-	return buf5
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t10.decode(p5: buffer) -- line: 432
-	-- upvalues: t10 (copy), proto (copy)
-	local v85 = t10.new()
-	local n4 = 0
 
-	while n4 < buffer.len(p5) do
-		local v87, v88
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
 
-		v87, v88, n4 = proto.readTag(p5, n4)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v88 == proto.wireTypes.varint then
-			local v89
-
-			v89, n4 = proto.readVarInt(p5, n4)
-		elseif v88 == proto.wireTypes.lengthDelimited then
-			if v87 == 1 then
-				local v90
-
-				v90, n4 = proto.readBuffer(p5, n4)
-				v85.key = buffer.tostring(v90)
-			elseif v87 == 2 then
-				local v91
-
-				v91, n4 = proto.readBuffer(p5, n4)
-				v85.value = buffer.tostring(v91)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = buffer.tostring(v5)
 			else
-				local v92, v93 = proto.readVarInt(p5, n4)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n4 = v93 + v92
+				v2 = v5 + varInt
 			end
-		elseif v88 == proto.wireTypes.i32 then
-			local v94
-
-			v94, n4 = proto.readFixed32(p5, n4)
-		elseif v88 == proto.wireTypes.i64 then
-			local v95
-
-			v95, n4 = proto.readFixed64(p5, n4)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v88)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v85
-end
-function t10.jsonEncode(p6) -- line: 480
-	local t12 = {}
-
-	if p6.key ~= nil and p6.key ~= "" then
-		t12.key = p6.key
-	end
-
-	if p6.value ~= nil and p6.value ~= "" then
-		t12.value = p6.value
-	end
-
-	return t12
-end
-function t10.jsonDecode(t13: {[any]: any}) -- line: 494
-	-- upvalues: t10 (copy)
-	local v99 = t10.new()
-
-	if t13.key ~= nil then
-		v99.key = t13.key
-	end
-
-	if t13.value ~= nil then
-		v99.value = t13.value
-	end
-
-	return v99
+	return result
 end
 
-t10.descriptor = {
+function class2:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil and self.value ~= "" then
+		v2.value = self.value
+	end
+
+	return v2
+end
+
+function class2.jsonDecode(p)
+	local v2 = class2.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = p.value
+	end
+
+	return v2
+end
+
+class2.descriptor = {
 	name = "CustomPrompt_ParametersEntry",
 	fullName = "roblox.apppageplatform.prompts.v1beta1.ParametersEntry"
 }
-t1.CustomPrompt_ParametersEntry = t10
-typeRegistry.default:register(t1.CustomPrompt_ParametersEntry)
 
-local t14 = {}
+v.CustomPrompt_ParametersEntry = class2
 
-t14.__index = t14
+typeRegistry.default:register(v.CustomPrompt_ParametersEntry)
 
-function t14.new(t15: {[any]: any}?) -- line: 522
-	-- upvalues: t14 (copy)
+local class3 = {}
+class3.__index = class3
+
+function class3.new(p)
 	return (setmetatable({
-		key = if t15 ~= nil and t15.key ~= nil then t15.key else "",
-		value = if t15 ~= nil and t15.value ~= nil then t15.value else ""
-	}, t14))
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = (p == nil or p.value == nil) and "" or p.value
+	}, class3))
 end
-function t14.encode(p7) -- line: 531
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n5 = 0
 
-	if p7.key ~= nil and p7.key ~= "" then
-		local v104, v105 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+function class3:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n5 = proto.writeString(v104, v105, p7.key)
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
 	end
 
-	if p7.value ~= nil and p7.value ~= "" then
-		local v106, v107 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n5 = proto.writeString(v106, v107, p7.value)
+	if self.value ~= nil and self.value ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.value)
 	end
 
-	local buf6 = buffer.create(n5)
-
-	buffer.copy(buf6, 0, buf, 0, n5)
-
-	return buf6
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t14.decode(p8: buffer) -- line: 550
-	-- upvalues: t14 (copy), proto (copy)
-	local v110 = t14.new()
-	local n6 = 0
 
-	while n6 < buffer.len(p8) do
-		local v112, v113
+function class3.decode(buf: buffer)
+	local result = class3.new()
+	local v2 = 0
 
-		v112, v113, n6 = proto.readTag(p8, n6)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v113 == proto.wireTypes.varint then
-			local v114
-
-			v114, n6 = proto.readVarInt(p8, n6)
-		elseif v113 == proto.wireTypes.lengthDelimited then
-			if v112 == 1 then
-				local v115
-
-				v115, n6 = proto.readBuffer(p8, n6)
-				v110.key = buffer.tostring(v115)
-			elseif v112 == 2 then
-				local v116
-
-				v116, n6 = proto.readBuffer(p8, n6)
-				v110.value = buffer.tostring(v116)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = buffer.tostring(v5)
 			else
-				local v117, v118 = proto.readVarInt(p8, n6)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n6 = v118 + v117
+				v2 = v5 + varInt
 			end
-		elseif v113 == proto.wireTypes.i32 then
-			local v119
-
-			v119, n6 = proto.readFixed32(p8, n6)
-		elseif v113 == proto.wireTypes.i64 then
-			local v120
-
-			v120, n6 = proto.readFixed64(p8, n6)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v113)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v110
-end
-function t14.jsonEncode(p9) -- line: 598
-	local t16 = {}
-
-	if p9.key ~= nil and p9.key ~= "" then
-		t16.key = p9.key
-	end
-
-	if p9.value ~= nil and p9.value ~= "" then
-		t16.value = p9.value
-	end
-
-	return t16
-end
-function t14.jsonDecode(t17: {[any]: any}) -- line: 612
-	-- upvalues: t14 (copy)
-	local v124 = t14.new()
-
-	if t17.key ~= nil then
-		v124.key = t17.key
-	end
-
-	if t17.value ~= nil then
-		v124.value = t17.value
-	end
-
-	return v124
+	return result
 end
 
-t14.descriptor = {
+function class3:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil and self.value ~= "" then
+		v2.value = self.value
+	end
+
+	return v2
+end
+
+function class3.jsonDecode(p)
+	local v2 = class3.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = p.value
+	end
+
+	return v2
+end
+
+class3.descriptor = {
 	name = "CustomPrompt_TranslationsEntry",
 	fullName = "roblox.apppageplatform.prompts.v1beta1.TranslationsEntry"
 }
-t1.CustomPrompt_TranslationsEntry = t14
-typeRegistry.default:register(t1.CustomPrompt_TranslationsEntry)
 
-local t18 = {}
+v.CustomPrompt_TranslationsEntry = class3
 
-t18.__index = t18
+typeRegistry.default:register(v.CustomPrompt_TranslationsEntry)
 
-function t18.new(t19: {[any]: any}?) -- line: 640
-	-- upvalues: t18 (copy)
-	return (setmetatable({
-		page_entries = if t19 ~= nil and t19.page_entries ~= nil then t19.page_entries else {},
-		hydration_data = if t19 ~= nil and t19.hydration_data ~= nil then t19.hydration_data else nil,
-		templates = if t19 ~= nil and t19.templates ~= nil then t19.templates else {},
-		custom_prompts = if t19 ~= nil and t19.custom_prompts ~= nil then t19.custom_prompts else {},
-		localized_literals = if t19 ~= nil and t19.localized_literals ~= nil then t19.localized_literals else {}
-	}, t18))
+local class4 = {}
+class4.__index = class4
+
+function class4.new(data)
+	local v2 = {
+		entry_points = (data == nil or data.entry_points == nil) and {} or data.entry_points,
+		deeplink_detected = data ~= nil and data.deeplink_detected ~= nil and data.deeplink_detected,
+		prompt_styles = (data == nil or data.prompt_styles == nil) and {} or data.prompt_styles,
+		client_attributes = (data == nil or data.client_attributes == nil) and {} or data.client_attributes,
+		client_capabilities = 0
+	}
+	local client_capabilities2
+
+	if not (data == nil or data.client_capabilities == nil) then
+		client_capabilities2 = data.client_capabilities
+	end
+
+	v2.client_capabilities = client_capabilities2
+	return (setmetatable(v2, class4))
 end
-function t18.encode(p10) -- line: 652
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n7 = 0
 
-	if p10.page_entries ~= nil and #p10.page_entries > 0 then
-		for _, v130 in p10.page_entries do
-			local v131 = v130:encode()
-			local v132, v133 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+function class4:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n7 = proto.writeBuffer(v132, v133, v131, buffer.len(v131))
+	if self.entry_points ~= nil and #self.entry_points > 0 then
+		for _, entry_point in self.entry_points do
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, entry_point)
 		end
 	end
 
-	if p10.hydration_data ~= nil then
-		local v134 = p10.hydration_data:encode()
-		local v135, v136 = proto.writeTag(buf, n7, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n7 = proto.writeBuffer(v135, v136, v134, buffer.len(v134))
+	if self.deeplink_detected then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.deeplink_detected and 1 or 0)
 	end
 
-	if p10.templates ~= nil and next(p10.templates) ~= nil then
-		for v137, v138 in p10.templates do
-			local buf7 = buffer.create(0)
-			local v140, v141 = proto.writeTag(buf7, 0, 1, proto.wireTypes.lengthDelimited)
-			local v142, v143 = proto.writeString(v140, v141, v137)
-			local v144 = v138:encode()
-			local v145, v146 = proto.writeTag(v142, v143, 2, proto.wireTypes.lengthDelimited)
-			local v147, v148 = proto.writeBuffer(v145, v146, v144, buffer.len(v144))
-			local v149, v150 = proto.writeTag(buf, n7, 3, proto.wireTypes.lengthDelimited)
-
-			buf, n7 = proto.writeBuffer(v149, v150, v147, v148)
+	if self.prompt_styles ~= nil and #self.prompt_styles > 0 then
+		for _, prompt_style in self.prompt_styles do
+			local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, prompt_style)
 		end
 	end
 
-	if p10.custom_prompts ~= nil and next(p10.custom_prompts) ~= nil then
-		for v151, v152 in p10.custom_prompts do
-			local buf8 = buffer.create(0)
-			local v154, v155 = proto.writeTag(buf8, 0, 1, proto.wireTypes.lengthDelimited)
-			local v156, v157 = proto.writeString(v154, v155, v151)
-			local v158 = v152:encode()
-			local v159, v160 = proto.writeTag(v156, v157, 2, proto.wireTypes.lengthDelimited)
-			local v161, v162 = proto.writeBuffer(v159, v160, v158, buffer.len(v158))
-			local v163, v164 = proto.writeTag(buf, n7, 4, proto.wireTypes.lengthDelimited)
+	if self.client_attributes ~= nil and next(self.client_attributes) ~= nil then
+		for k, client_attribute in self.client_attributes do
+			local buf = buffer.create(0)
 
-			buf, n7 = proto.writeBuffer(v163, v164, v161, v162)
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeString(v8, v9, client_attribute)
+			local v12, v13 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
 		end
 	end
 
-	if p10.localized_literals ~= nil and next(p10.localized_literals) ~= nil then
-		for v165, v166 in p10.localized_literals do
-			local buf9 = buffer.create(0)
-			local v168, v169 = proto.writeTag(buf9, 0, 1, proto.wireTypes.lengthDelimited)
-			local v170, v171 = proto.writeString(v168, v169, v165)
-			local v172, v173 = proto.writeTag(v170, v171, 2, proto.wireTypes.lengthDelimited)
-			local v174, v175 = proto.writeString(v172, v173, v166)
-			local v176, v177 = proto.writeTag(buf, n7, 5, proto.wireTypes.lengthDelimited)
-
-			buf, n7 = proto.writeBuffer(v176, v177, v174, v175)
-		end
+	if self.client_capabilities ~= nil then
+		local encoded = self.client_capabilities:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf10 = buffer.create(n7)
-
-	buffer.copy(buf10, 0, buf, 0, n7)
-
-	return buf10
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t18.decode(p11: buffer) -- line: 716
-	-- upvalues: t18 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
-	local v180 = t18.new()
-	local n8 = 0
 
-	while n8 < buffer.len(p11) do
-		local v182, v183
+function class4.decode(buf: buffer)
+	local result = class4.new()
+	local v2 = 0
 
-		v182, v183, n8 = proto.readTag(p11, n8)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v183 == proto.wireTypes.varint then
-			local v184
-
-			v184, n8 = proto.readVarInt(p11, n8)
-		elseif v183 == proto.wireTypes.lengthDelimited then
-			if v182 == 1 then
-				local v185
-
-				v185, n8 = proto.readBuffer(p11, n8)
-				table.insert(v180.page_entries, page_entry_content.UniversalPageEntry.decode(v185))
-			elseif v182 == 2 then
-				local v186
-
-				v186, n8 = proto.readBuffer(p11, n8)
-				v180.hydration_data = hydration_content.HydrationContent.decode(v186)
-			elseif v182 == 3 then
-				local v187
-
-				v187, n8 = proto.readBuffer(p11, n8)
-
-				local v188 = t1.GetEligiblePromptsResponse_TemplatesEntry.decode(v187)
-				local v189 = template_entry.TemplateEntry.new()
-
-				v180.templates[v188.key or ""] = v188.value or v189
-			elseif v182 == 4 then
-				local v190
-
-				v190, n8 = proto.readBuffer(p11, n8)
-
-				local v191 = t1.GetEligiblePromptsResponse_CustomPromptsEntry.decode(v190)
-				local v192 = t1.CustomPrompt.new()
-
-				v180.custom_prompts[v191.key or ""] = v191.value or v192
-			elseif v182 == 5 then
-				local v193
-
-				v193, n8 = proto.readBuffer(p11, n8)
-
-				local v194 = t1.GetEligiblePromptsResponse_LocalizedLiteralsEntry.decode(v193)
-
-				v180.localized_literals[v194.key or ""] = v194.value or ""
+		if v4 == proto.wireTypes.varint then
+			if v3 == 2 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.deeplink_detected = v5 ~= 0
 			else
-				local v195, v196 = proto.readVarInt(p11, n8)
-
-				n8 = v196 + v195
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v183 == proto.wireTypes.i32 then
-			local v197
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.entry_points, buffer.tostring(v5))
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.prompt_styles, buffer.tostring(v5))
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
 
-			v197, n8 = proto.readFixed32(p11, n8)
-		elseif v183 == proto.wireTypes.i64 then
-			local v198
+				local decoded = v.GetEligiblePromptsRequest_ClientAttributesEntry.decode(v5)
 
-			v198, n8 = proto.readFixed64(p11, n8)
+				result.client_attributes[decoded.key or ""] = decoded.value or ""
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.client_capabilities = client_capabilities.ClientCapabilities.decode(v5)
+			else
+				local varInt, v5 = proto.readVarInt(buf, v2)
+
+				v2 = v5 + varInt
+			end
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v183)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v180
-end
-function t18.jsonEncode(p12) -- line: 804
-	local t20 = {}
-
-	if p12.page_entries ~= nil and #p12.page_entries > 0 then
-		local t21 = {}
-
-		for _, v203 in p12.page_entries do
-			table.insert(t21, v203:jsonEncode())
-		end
-
-		t20.pageEntries = t21
-	end
-
-	if p12.hydration_data ~= nil then
-		t20.hydrationData = p12.hydration_data:jsonEncode()
-	end
-
-	if p12.templates ~= nil and next(p12.templates) ~= nil then
-		local t22 = {}
-
-		for v205, v206 in p12.templates do
-			t22[v205] = v206:jsonEncode()
-		end
-
-		t20.templates = t22
-	end
-
-	if p12.custom_prompts ~= nil and next(p12.custom_prompts) ~= nil then
-		local t23 = {}
-
-		for v208, v209 in p12.custom_prompts do
-			t23[v208] = v209:jsonEncode()
-		end
-
-		t20.customPrompts = t23
-	end
-
-	if p12.localized_literals ~= nil and next(p12.localized_literals) ~= nil then
-		local t24 = {}
-
-		for v211, v212 in p12.localized_literals do
-			t24[v211] = v212
-		end
-
-		t20.localizedLiterals = t24
-	end
-
-	return t20
-end
-function t18.jsonDecode(t25: {[any]: any}) -- line: 846
-	-- upvalues: t18 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy), t1 (copy)
-	local v214 = t18.new()
-
-	if t25.page_entries ~= nil then
-		local t26 = {}
-
-		for _, v217 in t25.page_entries do
-			table.insert(t26, page_entry_content.UniversalPageEntry.jsonDecode(v217))
-		end
-
-		v214.page_entries = t26
-	end
-
-	if t25.pageEntries ~= nil then
-		local t27 = {}
-
-		for _, v220 in t25.pageEntries do
-			table.insert(t27, page_entry_content.UniversalPageEntry.jsonDecode(v220))
-		end
-
-		v214.page_entries = t27
-	end
-
-	if t25.hydration_data ~= nil then
-		v214.hydration_data = hydration_content.HydrationContent.jsonDecode(t25.hydration_data)
-	end
-
-	if t25.hydrationData ~= nil then
-		v214.hydration_data = hydration_content.HydrationContent.jsonDecode(t25.hydrationData)
-	end
-
-	if t25.templates ~= nil then
-		local t28 = {}
-
-		for v222, v223 in t25.templates do
-			t28[v222] = template_entry.TemplateEntry.jsonDecode(v223)
-		end
-
-		v214.templates = t28
-	end
-
-	if t25.custom_prompts ~= nil then
-		local t29 = {}
-
-		for v225, v226 in t25.custom_prompts do
-			t29[v225] = t1.CustomPrompt.jsonDecode(v226)
-		end
-
-		v214.custom_prompts = t29
-	end
-
-	if t25.customPrompts ~= nil then
-		local t30 = {}
-
-		for v228, v229 in t25.customPrompts do
-			t30[v228] = t1.CustomPrompt.jsonDecode(v229)
-		end
-
-		v214.custom_prompts = t30
-	end
-
-	if t25.localized_literals ~= nil then
-		local t31 = {}
-
-		for v231, v232 in t25.localized_literals do
-			t31[v231] = v232
-		end
-
-		v214.localized_literals = t31
-	end
-
-	if t25.localizedLiterals ~= nil then
-		local t32 = {}
-
-		for v234, v235 in t25.localizedLiterals do
-			t32[v234] = v235
-		end
-
-		v214.localized_literals = t32
-	end
-
-	return v214
+	return result
 end
 
-t18.descriptor = {
+function class4:jsonEncode()
+	local v2 = {}
+
+	if self.entry_points ~= nil and #self.entry_points > 0 then
+		local entry_points = {}
+
+		for _, entry_point in self.entry_points do
+			table.insert(entry_points, entry_point)
+		end
+
+		v2.entryPoints = entry_points
+	end
+
+	if self.deeplink_detected then
+		v2.deeplinkDetected = self.deeplink_detected
+	end
+
+	if self.prompt_styles ~= nil and #self.prompt_styles > 0 then
+		local prompt_styles = {}
+
+		for _, prompt_style in self.prompt_styles do
+			table.insert(prompt_styles, prompt_style)
+		end
+
+		v2.promptStyles = prompt_styles
+	end
+
+	if self.client_attributes ~= nil and next(self.client_attributes) ~= nil then
+		local client_attributes = {}
+
+		for k, client_attribute in self.client_attributes do
+			client_attributes[k] = client_attribute
+		end
+
+		v2.clientAttributes = client_attributes
+	end
+
+	if self.client_capabilities ~= nil then
+		v2.clientCapabilities = self.client_capabilities:jsonEncode()
+	end
+
+	return v2
+end
+
+function class4.jsonDecode(data)
+	local v2 = class4.new()
+
+	if data.entry_points ~= nil then
+		local entry_points = {}
+
+		for _, entry_point in data.entry_points do
+			table.insert(entry_points, entry_point)
+		end
+
+		v2.entry_points = entry_points
+	end
+
+	if data.entryPoints ~= nil then
+		local entryPoints = {}
+
+		for _, entryPoint in data.entryPoints do
+			table.insert(entryPoints, entryPoint)
+		end
+
+		v2.entry_points = entryPoints
+	end
+
+	if data.deeplink_detected ~= nil then
+		v2.deeplink_detected = data.deeplink_detected
+	end
+
+	if data.deeplinkDetected ~= nil then
+		v2.deeplink_detected = data.deeplinkDetected
+	end
+
+	if data.prompt_styles ~= nil then
+		local prompt_styles = {}
+
+		for _, prompt_style in data.prompt_styles do
+			table.insert(prompt_styles, prompt_style)
+		end
+
+		v2.prompt_styles = prompt_styles
+	end
+
+	if data.promptStyles ~= nil then
+		local promptStyles = {}
+
+		for _, promptStyle in data.promptStyles do
+			table.insert(promptStyles, promptStyle)
+		end
+
+		v2.prompt_styles = promptStyles
+	end
+
+	if data.client_attributes ~= nil then
+		local client_attributes = {}
+
+		for k, client_attribute in data.client_attributes do
+			client_attributes[k] = client_attribute
+		end
+
+		v2.client_attributes = client_attributes
+	end
+
+	if data.clientAttributes ~= nil then
+		local clientAttributes = {}
+
+		for k, clientAttribute in data.clientAttributes do
+			clientAttributes[k] = clientAttribute
+		end
+
+		v2.client_attributes = clientAttributes
+	end
+
+	if data.client_capabilities ~= nil then
+		v2.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(data.client_capabilities)
+	end
+
+	if data.clientCapabilities ~= nil then
+		v2.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(data.clientCapabilities)
+	end
+
+	return v2
+end
+
+class4.descriptor = {
+	name = "GetEligiblePromptsRequest",
+	fullName = "roblox.apppageplatform.prompts.v1beta1.GetEligiblePromptsRequest"
+}
+
+v.GetEligiblePromptsRequest = class4
+
+typeRegistry.default:register(v.GetEligiblePromptsRequest)
+
+local class5 = {}
+class5.__index = class5
+
+function class5.new(p)
+	return (setmetatable({
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = (p == nil or p.value == nil) and "" or p.value
+	}, class5))
+end
+
+function class5:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
+	end
+
+	if self.value ~= nil and self.value ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.value)
+	end
+
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
+
+function class5.decode(buf: buffer)
+	local result = class5.new()
+	local v2 = 0
+
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = buffer.tostring(v5)
+			else
+				local varInt, v5 = proto.readVarInt(buf, v2)
+
+				v2 = v5 + varInt
+			end
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
+		else
+			error("Unsupported wire type: " .. v4)
+		end
+	end
+
+	return result
+end
+
+function class5:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil and self.value ~= "" then
+		v2.value = self.value
+	end
+
+	return v2
+end
+
+function class5.jsonDecode(p)
+	local v2 = class5.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = p.value
+	end
+
+	return v2
+end
+
+class5.descriptor = {
+	name = "GetEligiblePromptsRequest_ClientAttributesEntry",
+	fullName = "roblox.apppageplatform.prompts.v1beta1.ClientAttributesEntry"
+}
+
+v.GetEligiblePromptsRequest_ClientAttributesEntry = class5
+
+typeRegistry.default:register(v.GetEligiblePromptsRequest_ClientAttributesEntry)
+
+local class6 = {}
+class6.__index = class6
+
+function class6.new(data)
+	local v2 = {
+		page_entries = (data == nil or data.page_entries == nil) and {} or data.page_entries,
+		hydration_data = 0,
+		templates = 0,
+		custom_prompts = 0,
+		localized_literals = 0
+	}
+	local hydration_data
+
+	if not (data == nil or data.hydration_data == nil) then
+		hydration_data = data.hydration_data
+	end
+
+	v2.hydration_data = hydration_data
+	v2.templates = (data == nil or data.templates == nil) and {} or data.templates
+	v2.custom_prompts = (data == nil or data.custom_prompts == nil) and {} or data.custom_prompts
+	v2.localized_literals = (data == nil or data.localized_literals == nil) and {} or data.localized_literals
+	return (setmetatable(v2, class6))
+end
+
+function class6:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.page_entries ~= nil and #self.page_entries > 0 then
+		for _, page_entry in self.page_entries do
+			local encoded = page_entry:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+		end
+	end
+
+	if self.hydration_data ~= nil then
+		local encoded = self.hydration_data:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.templates ~= nil and next(self.templates) ~= nil then
+		for k, template in self.templates do
+			local buf = buffer.create(0)
+
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local encoded = template:encode()
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeBuffer(v8, v9, encoded, buffer.len(encoded))
+			local v12, v13 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
+		end
+	end
+
+	if self.custom_prompts ~= nil and next(self.custom_prompts) ~= nil then
+		for k, custom_prompt in self.custom_prompts do
+			local buf = buffer.create(0)
+
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local encoded = custom_prompt:encode()
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeBuffer(v8, v9, encoded, buffer.len(encoded))
+			local v12, v13 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
+		end
+	end
+
+	if self.localized_literals ~= nil and next(self.localized_literals) ~= nil then
+		for k, localized_literal in self.localized_literals do
+			local buf = buffer.create(0)
+
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeString(v8, v9, localized_literal)
+			local v12, v13 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
+		end
+	end
+
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
+end
+
+function class6.decode(buf: buffer)
+	local result = class6.new()
+	local v2 = 0
+
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
+
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.page_entries, page_entry_content.UniversalPageEntry.decode(v5))
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.hydration_data = hydration_content.HydrationContent.decode(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+
+				local decoded = v.GetEligiblePromptsResponse_TemplatesEntry.decode(v5)
+
+				local templateEntry = template_entry.TemplateEntry.new()
+
+				result.templates[decoded.key or ""] = decoded.value or templateEntry
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+
+				local decoded = v.GetEligiblePromptsResponse_CustomPromptsEntry.decode(v5)
+
+				local customPrompt = v.CustomPrompt.new()
+
+				result.custom_prompts[decoded.key or ""] = decoded.value or customPrompt
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+
+				local decoded = v.GetEligiblePromptsResponse_LocalizedLiteralsEntry.decode(v5)
+
+				result.localized_literals[decoded.key or ""] = decoded.value or ""
+			else
+				local varInt, v5 = proto.readVarInt(buf, v2)
+
+				v2 = v5 + varInt
+			end
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
+		else
+			error("Unsupported wire type: " .. v4)
+		end
+	end
+
+	return result
+end
+
+function class6:jsonEncode()
+	local v2 = {}
+
+	if self.page_entries ~= nil and #self.page_entries > 0 then
+		local pageEntries = {}
+
+		for _, page_entry in self.page_entries do
+			table.insert(pageEntries, page_entry:jsonEncode())
+		end
+
+		v2.pageEntries = pageEntries
+	end
+
+	if self.hydration_data ~= nil then
+		v2.hydrationData = self.hydration_data:jsonEncode()
+	end
+
+	if self.templates ~= nil and next(self.templates) ~= nil then
+		local templates = {}
+
+		for k, template in self.templates do
+			templates[k] = template:jsonEncode()
+		end
+
+		v2.templates = templates
+	end
+
+	if self.custom_prompts ~= nil and next(self.custom_prompts) ~= nil then
+		local customPrompts = {}
+
+		for k, custom_prompt in self.custom_prompts do
+			customPrompts[k] = custom_prompt:jsonEncode()
+		end
+
+		v2.customPrompts = customPrompts
+	end
+
+	if self.localized_literals == nil or next(self.localized_literals) == nil then
+		return v2
+	end
+
+	local localized_literals = {}
+
+	for k, localized_literal in self.localized_literals do
+		localized_literals[k] = localized_literal
+	end
+
+	v2.localizedLiterals = localized_literals
+
+	return v2
+end
+
+function class6.jsonDecode(data)
+	local v2 = class6.new()
+
+	if data.page_entries ~= nil then
+		local page_entries = {}
+
+		for _, page_entry in data.page_entries do
+			table.insert(page_entries, page_entry_content.UniversalPageEntry.jsonDecode(page_entry))
+		end
+
+		v2.page_entries = page_entries
+	end
+
+	if data.pageEntries ~= nil then
+		local page_entries = {}
+
+		for _, pageEntry in data.pageEntries do
+			table.insert(page_entries, page_entry_content.UniversalPageEntry.jsonDecode(pageEntry))
+		end
+
+		v2.page_entries = page_entries
+	end
+
+	if data.hydration_data ~= nil then
+		v2.hydration_data = hydration_content.HydrationContent.jsonDecode(data.hydration_data)
+	end
+
+	if data.hydrationData ~= nil then
+		v2.hydration_data = hydration_content.HydrationContent.jsonDecode(data.hydrationData)
+	end
+
+	if data.templates ~= nil then
+		local templates = {}
+
+		for k, template in data.templates do
+			templates[k] = template_entry.TemplateEntry.jsonDecode(template)
+		end
+
+		v2.templates = templates
+	end
+
+	if data.custom_prompts ~= nil then
+		local custom_prompts = {}
+
+		for k, custom_prompt in data.custom_prompts do
+			custom_prompts[k] = v.CustomPrompt.jsonDecode(custom_prompt)
+		end
+
+		v2.custom_prompts = custom_prompts
+	end
+
+	if data.customPrompts ~= nil then
+		local custom_prompts = {}
+
+		for k, customPrompt in data.customPrompts do
+			custom_prompts[k] = v.CustomPrompt.jsonDecode(customPrompt)
+		end
+
+		v2.custom_prompts = custom_prompts
+	end
+
+	if data.localized_literals ~= nil then
+		local localized_literals = {}
+
+		for k, localized_literal in data.localized_literals do
+			localized_literals[k] = localized_literal
+		end
+
+		v2.localized_literals = localized_literals
+	end
+
+	if data.localizedLiterals == nil then
+		return v2
+	end
+
+	local localizedLiterals = {}
+
+	for k, localizedLiteral in data.localizedLiterals do
+		localizedLiterals[k] = localizedLiteral
+	end
+
+	v2.localized_literals = localizedLiterals
+
+	return v2
+end
+
+class6.descriptor = {
 	name = "GetEligiblePromptsResponse",
 	fullName = "roblox.apppageplatform.prompts.v1beta1.GetEligiblePromptsResponse"
 }
-t1.GetEligiblePromptsResponse = t18
-typeRegistry.default:register(t1.GetEligiblePromptsResponse)
 
-local t33 = {}
+v.GetEligiblePromptsResponse = class6
 
-t33.__index = t33
+typeRegistry.default:register(v.GetEligiblePromptsResponse)
 
-function t33.new(t34: {[any]: any}?) -- line: 947
-	-- upvalues: t33 (copy)
-	return (setmetatable({
-		key = if t34 ~= nil and t34.key ~= nil then t34.key else "",
-		value = if t34 ~= nil and t34.value ~= nil then t34.value else nil
-	}, t33))
-end
-function t33.encode(p13) -- line: 956
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n9 = 0
+local class7 = {}
+class7.__index = class7
 
-	if p13.key ~= nil and p13.key ~= "" then
-		local v240, v241 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
+function class7.new(p)
+	local v2 = {
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = 0
+	}
+	local v3
 
-		buf, n9 = proto.writeString(v240, v241, p13.key)
+	if not (p == nil or p.value == nil) then
+		v3 = p.value
 	end
 
-	if p13.value ~= nil then
-		local v242 = p13.value:encode()
-		local v243, v244 = proto.writeTag(buf, n9, 2, proto.wireTypes.lengthDelimited)
+	v2.value = v3
+	return (setmetatable(v2, class7))
+end
 
-		buf, n9 = proto.writeBuffer(v243, v244, v242, buffer.len(v242))
+function class7:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
 	end
 
-	local buf11 = buffer.create(n9)
+	if self.value ~= nil then
+		local encoded = self.value:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-	buffer.copy(buf11, 0, buf, 0, n9)
-
-	return buf11
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t33.decode(p14: buffer) -- line: 978
-	-- upvalues: t33 (copy), proto (copy), template_entry (copy)
-	local v247 = t33.new()
-	local n10 = 0
 
-	while n10 < buffer.len(p14) do
-		local v249, v250
+function class7.decode(buf: buffer)
+	local result = class7.new()
+	local v2 = 0
 
-		v249, v250, n10 = proto.readTag(p14, n10)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v250 == proto.wireTypes.varint then
-			local v251
-
-			v251, n10 = proto.readVarInt(p14, n10)
-		elseif v250 == proto.wireTypes.lengthDelimited then
-			if v249 == 1 then
-				local v252
-
-				v252, n10 = proto.readBuffer(p14, n10)
-				v247.key = buffer.tostring(v252)
-			elseif v249 == 2 then
-				local v253
-
-				v253, n10 = proto.readBuffer(p14, n10)
-				v247.value = template_entry.TemplateEntry.decode(v253)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = template_entry.TemplateEntry.decode(v5)
 			else
-				local v254, v255 = proto.readVarInt(p14, n10)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n10 = v255 + v254
+				v2 = v5 + varInt
 			end
-		elseif v250 == proto.wireTypes.i32 then
-			local v256
-
-			v256, n10 = proto.readFixed32(p14, n10)
-		elseif v250 == proto.wireTypes.i64 then
-			local v257
-
-			v257, n10 = proto.readFixed64(p14, n10)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v250)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v247
-end
-function t33.jsonEncode(p15) -- line: 1028
-	local t35 = {}
-
-	if p15.key ~= nil and p15.key ~= "" then
-		t35.key = p15.key
-	end
-
-	if p15.value ~= nil then
-		t35.value = p15.value:jsonEncode()
-	end
-
-	return t35
-end
-function t33.jsonDecode(t36: {[any]: any}) -- line: 1044
-	-- upvalues: t33 (copy), template_entry (copy)
-	local v261 = t33.new()
-
-	if t36.key ~= nil then
-		v261.key = t36.key
-	end
-
-	if t36.value ~= nil then
-		v261.value = template_entry.TemplateEntry.jsonDecode(t36.value)
-	end
-
-	return v261
+	return result
 end
 
-t33.descriptor = {
+function class7:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil then
+		v2.value = self.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class7.jsonDecode(p)
+	local v2 = class7.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = template_entry.TemplateEntry.jsonDecode(p.value)
+	end
+
+	return v2
+end
+
+class7.descriptor = {
 	name = "GetEligiblePromptsResponse_TemplatesEntry",
 	fullName = "roblox.apppageplatform.prompts.v1beta1.TemplatesEntry"
 }
-t1.GetEligiblePromptsResponse_TemplatesEntry = t33
-typeRegistry.default:register(t1.GetEligiblePromptsResponse_TemplatesEntry)
 
-local t37 = {}
+v.GetEligiblePromptsResponse_TemplatesEntry = class7
 
-t37.__index = t37
+typeRegistry.default:register(v.GetEligiblePromptsResponse_TemplatesEntry)
 
-function t37.new(t38: {[any]: any}?) -- line: 1074
-	-- upvalues: t37 (copy)
-	return (setmetatable({
-		key = if t38 ~= nil and t38.key ~= nil then t38.key else "",
-		value = if t38 ~= nil and t38.value ~= nil then t38.value else nil
-	}, t37))
-end
-function t37.encode(p16) -- line: 1083
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n11 = 0
+local class8 = {}
+class8.__index = class8
 
-	if p16.key ~= nil and p16.key ~= "" then
-		local v266, v267 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
+function class8.new(p)
+	local v2 = {
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = 0
+	}
+	local v3
 
-		buf, n11 = proto.writeString(v266, v267, p16.key)
+	if not (p == nil or p.value == nil) then
+		v3 = p.value
 	end
 
-	if p16.value ~= nil then
-		local v268 = p16.value:encode()
-		local v269, v270 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
+	v2.value = v3
+	return (setmetatable(v2, class8))
+end
 
-		buf, n11 = proto.writeBuffer(v269, v270, v268, buffer.len(v268))
+function class8:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
 	end
 
-	local buf12 = buffer.create(n11)
+	if self.value ~= nil then
+		local encoded = self.value:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-	buffer.copy(buf12, 0, buf, 0, n11)
-
-	return buf12
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t37.decode(p17: buffer) -- line: 1105
-	-- upvalues: t37 (copy), proto (copy), t1 (copy)
-	local v273 = t37.new()
-	local n12 = 0
 
-	while n12 < buffer.len(p17) do
-		local v275, v276
+function class8.decode(buf: buffer)
+	local result = class8.new()
+	local v2 = 0
 
-		v275, v276, n12 = proto.readTag(p17, n12)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v276 == proto.wireTypes.varint then
-			local v277
-
-			v277, n12 = proto.readVarInt(p17, n12)
-		elseif v276 == proto.wireTypes.lengthDelimited then
-			if v275 == 1 then
-				local v278
-
-				v278, n12 = proto.readBuffer(p17, n12)
-				v273.key = buffer.tostring(v278)
-			elseif v275 == 2 then
-				local v279
-
-				v279, n12 = proto.readBuffer(p17, n12)
-				v273.value = t1.CustomPrompt.decode(v279)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = v.CustomPrompt.decode(v5)
 			else
-				local v280, v281 = proto.readVarInt(p17, n12)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n12 = v281 + v280
+				v2 = v5 + varInt
 			end
-		elseif v276 == proto.wireTypes.i32 then
-			local v282
-
-			v282, n12 = proto.readFixed32(p17, n12)
-		elseif v276 == proto.wireTypes.i64 then
-			local v283
-
-			v283, n12 = proto.readFixed64(p17, n12)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v276)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v273
-end
-function t37.jsonEncode(p18) -- line: 1155
-	local t39 = {}
-
-	if p18.key ~= nil and p18.key ~= "" then
-		t39.key = p18.key
-	end
-
-	if p18.value ~= nil then
-		t39.value = p18.value:jsonEncode()
-	end
-
-	return t39
-end
-function t37.jsonDecode(t40: {[any]: any}) -- line: 1171
-	-- upvalues: t37 (copy), t1 (copy)
-	local v287 = t37.new()
-
-	if t40.key ~= nil then
-		v287.key = t40.key
-	end
-
-	if t40.value ~= nil then
-		v287.value = t1.CustomPrompt.jsonDecode(t40.value)
-	end
-
-	return v287
+	return result
 end
 
-t37.descriptor = {
+function class8:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil then
+		v2.value = self.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class8.jsonDecode(p)
+	local v2 = class8.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = v.CustomPrompt.jsonDecode(p.value)
+	end
+
+	return v2
+end
+
+class8.descriptor = {
 	name = "GetEligiblePromptsResponse_CustomPromptsEntry",
 	fullName = "roblox.apppageplatform.prompts.v1beta1.CustomPromptsEntry"
 }
-t1.GetEligiblePromptsResponse_CustomPromptsEntry = t37
-typeRegistry.default:register(t1.GetEligiblePromptsResponse_CustomPromptsEntry)
 
-local t41 = {}
+v.GetEligiblePromptsResponse_CustomPromptsEntry = class8
 
-t41.__index = t41
+typeRegistry.default:register(v.GetEligiblePromptsResponse_CustomPromptsEntry)
 
-function t41.new(t42: {[any]: any}?) -- line: 1202
-	-- upvalues: t41 (copy)
+local class9 = {}
+class9.__index = class9
+
+function class9.new(p)
 	return (setmetatable({
-		key = if t42 ~= nil and t42.key ~= nil then t42.key else "",
-		value = if t42 ~= nil and t42.value ~= nil then t42.value else ""
-	}, t41))
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = (p == nil or p.value == nil) and "" or p.value
+	}, class9))
 end
-function t41.encode(p19) -- line: 1214
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n13 = 0
 
-	if p19.key ~= nil and p19.key ~= "" then
-		local v292, v293 = proto.writeTag(buf, n13, 1, proto.wireTypes.lengthDelimited)
+function class9:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n13 = proto.writeString(v292, v293, p19.key)
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
 	end
 
-	if p19.value ~= nil and p19.value ~= "" then
-		local v294, v295 = proto.writeTag(buf, n13, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n13 = proto.writeString(v294, v295, p19.value)
+	if self.value ~= nil and self.value ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.value)
 	end
 
-	local buf13 = buffer.create(n13)
-
-	buffer.copy(buf13, 0, buf, 0, n13)
-
-	return buf13
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t41.decode(p20: buffer) -- line: 1235
-	-- upvalues: t41 (copy), proto (copy)
-	local v298 = t41.new()
-	local n14 = 0
 
-	while n14 < buffer.len(p20) do
-		local v300, v301
+function class9.decode(buf: buffer)
+	local result = class9.new()
+	local v2 = 0
 
-		v300, v301, n14 = proto.readTag(p20, n14)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v301 == proto.wireTypes.varint then
-			local v302
-
-			v302, n14 = proto.readVarInt(p20, n14)
-		elseif v301 == proto.wireTypes.lengthDelimited then
-			if v300 == 1 then
-				local v303
-
-				v303, n14 = proto.readBuffer(p20, n14)
-				v298.key = buffer.tostring(v303)
-			elseif v300 == 2 then
-				local v304
-
-				v304, n14 = proto.readBuffer(p20, n14)
-				v298.value = buffer.tostring(v304)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = buffer.tostring(v5)
 			else
-				local v305, v306 = proto.readVarInt(p20, n14)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n14 = v306 + v305
+				v2 = v5 + varInt
 			end
-		elseif v301 == proto.wireTypes.i32 then
-			local v307
-
-			v307, n14 = proto.readFixed32(p20, n14)
-		elseif v301 == proto.wireTypes.i64 then
-			local v308
-
-			v308, n14 = proto.readFixed64(p20, n14)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v301)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v298
-end
-function t41.jsonEncode(p21) -- line: 1285
-	local t43 = {}
-
-	if p21.key ~= nil and p21.key ~= "" then
-		t43.key = p21.key
-	end
-
-	if p21.value ~= nil and p21.value ~= "" then
-		t43.value = p21.value
-	end
-
-	return t43
-end
-function t41.jsonDecode(t44: {[any]: any}) -- line: 1301
-	-- upvalues: t41 (copy)
-	local v312 = t41.new()
-
-	if t44.key ~= nil then
-		v312.key = t44.key
-	end
-
-	if t44.value ~= nil then
-		v312.value = t44.value
-	end
-
-	return v312
+	return result
 end
 
-t41.descriptor = {
+function class9:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil and self.value ~= "" then
+		v2.value = self.value
+	end
+
+	return v2
+end
+
+function class9.jsonDecode(p)
+	local v2 = class9.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = p.value
+	end
+
+	return v2
+end
+
+class9.descriptor = {
 	name = "GetEligiblePromptsResponse_LocalizedLiteralsEntry",
 	fullName = "roblox.apppageplatform.prompts.v1beta1.LocalizedLiteralsEntry"
 }
-t1.GetEligiblePromptsResponse_LocalizedLiteralsEntry = t41
-typeRegistry.default:register(t1.GetEligiblePromptsResponse_LocalizedLiteralsEntry)
+
+v.GetEligiblePromptsResponse_LocalizedLiteralsEntry = class9
+
+typeRegistry.default:register(v.GetEligiblePromptsResponse_LocalizedLiteralsEntry)
 
 return {
-	CustomPrompt = t1.CustomPrompt,
-	GetEligiblePromptsResponse = t1.GetEligiblePromptsResponse
+	CustomPrompt = v.CustomPrompt,
+	GetEligiblePromptsRequest = v.GetEligiblePromptsRequest,
+	GetEligiblePromptsResponse = v.GetEligiblePromptsResponse
 }

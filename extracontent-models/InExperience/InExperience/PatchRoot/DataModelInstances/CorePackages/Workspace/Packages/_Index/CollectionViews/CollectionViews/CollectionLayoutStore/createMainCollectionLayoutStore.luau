@@ -1,34 +1,39 @@
 local CollectionViews = script:FindFirstAncestor("CollectionViews")
-local CollectionViewsParent = CollectionViews.Parent
-local Display = require(CollectionViewsParent.Display)
-local Signals = require(CollectionViewsParent.Signals)
+local parent = CollectionViews.Parent
+local Display = require(parent.Display)
+local Signals = require(parent.Signals)
 
 require(CollectionViews.CollectionViewTypes)
-
 local createCollectionLayoutStore = require(script.Parent.createCollectionLayoutStore)
 
-local function createMainCollectionLayoutStore() -- line: 17
-	-- upvalues: Display (copy), Signals (copy), createCollectionLayoutStore (copy)
-	local v7 = Display.GetDisplayStore(false)
-	local v8, v9 = Signals.createSignal(nil)
-	local v10 = Signals.createComputed(function(p1) -- line: 22
-		-- upvalues: v8 (copy), v7 (copy)
-		local v13 = v8(p1)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableHomePageSduiPrefetch = SharedFlags.FFlagEnableHomePageSduiPrefetch
 
-		if v13 then
-			return v13
-		end
+local function createMainCollectionLayoutStore()
+	local displayStore = Display.GetDisplayStore(false)
 
-		return v7.getViewportSize(p1).X
+	local signal, setDefaultContentRegionWidth = Signals.createSignal(nil)
+
+	local computed = Signals.createComputed(function(p)
+		return signal(p) or displayStore.getViewportSize(p).X
 	end)
-	local v11 = createCollectionLayoutStore(v10)
+	local getIsContainerMeasured
 
+	if FFlagEnableHomePageSduiPrefetch then
+		getIsContainerMeasured = Signals.createComputed(function(p): boolean
+			local v = signal(p)
+			return v ~= nil and v > 0
+		end)
+	end
+
+	local collectionLayoutStore = createCollectionLayoutStore(computed)
 	return {
-		getContainerWidth = v11.getContainerWidth,
-		getDesignSpaceContainerWidth = v11.getDesignSpaceContainerWidth,
-		getItemsPerRow = v11.getItemsPerRow,
-		getNumItemsForAllCategories = v11.getNumItemsForAllCategories,
-		setDefaultContentRegionWidth = v9
+		getContainerWidth = collectionLayoutStore.getContainerWidth,
+		getDesignSpaceContainerWidth = collectionLayoutStore.getDesignSpaceContainerWidth,
+		getItemsPerRow = collectionLayoutStore.getItemsPerRow,
+		getNumItemsForAllCategories = collectionLayoutStore.getNumItemsForAllCategories,
+		getIsContainerMeasured = getIsContainerMeasured,
+		setDefaultContentRegionWidth = setDefaultContentRegionWidth
 	}
 end
 

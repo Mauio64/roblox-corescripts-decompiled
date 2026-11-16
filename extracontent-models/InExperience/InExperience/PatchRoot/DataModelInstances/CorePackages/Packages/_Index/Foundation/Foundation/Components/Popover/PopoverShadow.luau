@@ -1,34 +1,69 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Constants = require(Foundation.Constants)
+local Flags = require(Foundation.Utility.Flags)
 local Image = require(Foundation.Components.Image)
-
 require(Foundation.Components.Types)
-
+local View = require(Foundation.Components.View)
 local useTokens = require(Foundation.Providers.Style.useTokens)
+
 local SHADOW_IMAGE = Constants.SHADOW_IMAGE
-local SHADOW_SIZE = Constants.SHADOW_SIZE
+local v
 
-local function PopoverShadow(t1: {[any]: any}) -- line: 22
-	-- upvalues: useTokens (copy), React (copy), Image (copy), SHADOW_IMAGE (copy), SHADOW_SIZE (copy)
-	local v11 = useTokens()
+if Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize then
+	v = Constants.PLUGIN_SHADOW_SIZE
+else
+	v = Constants.SHADOW_SIZE
+end
 
-	return React.createElement(Image, {
-		AnchorPoint = t1.AnchorPoint,
-		Image = SHADOW_IMAGE,
-		Size = t1.contentSize:map(function(uDim2: UDim2) -- line: 28
-			-- upvalues: SHADOW_SIZE (copy)
-			return uDim2 + UDim2.fromOffset(SHADOW_SIZE, SHADOW_SIZE)
+local function PopoverShadow(props)
+	local v2 = useTokens()
+
+	if not (Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize) then
+		return (React.createElement(Image, {
+			AnchorPoint = props.AnchorPoint,
+			Image = SHADOW_IMAGE,
+			Size = props.contentSize:map(function(udim: UDim2)
+				return udim + UDim2.fromOffset(v, v)
+			end),
+			Position = props.position,
+			ZIndex = props.ZIndex,
+			slice = {
+				center = Rect.new(v, v, v + 1, v + 1)
+			},
+			imageStyle = v2.Color.Extended.Black.Black_20,
+			testId = props.testId
+		}))
+	end
+
+	local createElement = React.createElement
+
+	local v3 = {
+		Size = props.contentSize:map(function(udim: UDim2)
+			return udim + UDim2.fromOffset(v, v)
 		end),
-		Position = t1.position,
-		ZIndex = t1.ZIndex,
-		slice = {
-			center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1)
-		},
-		imageStyle = v11.Color.Extended.Black.Black_20,
-		testId = t1.testId
-	})
+		Position = props.position,
+		ZIndex = props.ZIndex,
+		Transparency = 1,
+		tag = 0,
+		testId = 0
+	}
+
+	local radiusTagSet = { [props.radiusTag] = true }
+	v3.tag = radiusTagSet
+
+	v3.testId = props.testId
+	return (createElement(View, v3, React.createElement("UIShadow", {
+		Offset = UDim2.fromOffset(0, 2),
+		Transparency = 0.92,
+		BlurRadius = UDim.new(0, 4),
+		Color = v2.Color.Extended.Black.Black_100.Color3,
+		ZIndex = -1,
+		Spread = UDim2.fromOffset(-1, -1)
+	})))
 end
 
 return PopoverShadow

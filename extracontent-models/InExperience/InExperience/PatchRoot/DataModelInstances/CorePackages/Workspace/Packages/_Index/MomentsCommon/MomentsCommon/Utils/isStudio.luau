@@ -1,7 +1,6 @@
 local RunService = game:GetService("RunService")
 
-local function isStudio() -- line: 4
-	-- upvalues: RunService (copy)
+local function isStudio()
 	return RunService:IsStudio()
 end
 

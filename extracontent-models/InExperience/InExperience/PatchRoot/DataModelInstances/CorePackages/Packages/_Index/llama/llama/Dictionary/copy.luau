@@ -1,15 +1,14 @@
-local function copy(p1) -- line: 2
-	local v3 = type(p1)
+local function copy(items)
+	local typeName = type(items)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+	local result = {}
 
-	local t1 = {}
-
-	for k, v in pairs(p1) do
-		t1[k] = v
+	for k, item in pairs(items) do
+		result[k] = item
 	end
 
-	return t1
+	return result
 end
 
 return copy

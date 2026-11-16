@@ -1,9 +1,11 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Roact = require(AppChatParent.Roact)
-local RoactNavigation = require(AppChatParent.RoactNavigation)
+local parent = AppChat.Parent
+
+local Roact = require(parent.Roact)
+local RoactNavigation = require(parent.RoactNavigation)
 local EnumScreens = require(AppChat.EnumScreens)
-local SharedFlags = require(AppChatParent.SharedFlags)
+local SharedFlags = require(parent.SharedFlags)
+
 local ChatDetails = AppChat.Components.ChatDetails
 local GenericDialogType = require(ChatDetails.Dialogs.GenericDialogType)
 local EditChatGroupNameDialogScreen = require(ChatDetails.EditChatGroupNameDialog.EditChatGroupNameDialogScreen)
@@ -11,202 +13,173 @@ local LeaveGroupDialogScreen = require(ChatDetails.LeaveGroupDialog.LeaveGroupDi
 local ParticipantDialogScreenDeprecated = require(ChatDetails.ParticipantDialog.ParticipantDialogScreenDeprecated)
 local RemoveUserDialogScreen = require(ChatDetails.RemoveUserDialog.RemoveUserDialogScreen)
 local AbuseReportScreen = require(AppChat.Components.ChatAbuseReport.AbuseReportScreen)
-local FFlagAppChatEnableTrustedFriendEntryPoint = require(AppChat.Flags.FFlagAppChatEnableTrustedFriendEntryPoint)
-local TrustedContactsModalScreen = require(AppChat.Components.TrustedContactsModal.TrustedContactsModalScreen)
+local FFlagAppChatDisableAbsorbInputSelectable = require(AppChat.Flags.FFlagAppChatDisableAbsorbInputSelectable)
+
 local MessageContextMenuScreen = require(AppChat.Components.ChatConversation.MessageInteraction.MessageContextMenuScreen)
-local SquadVoiceChangerOverlay = require(AppChatParent.Squads.SquadVoiceChangerOverlay)
-local FocusNavigableSurfaceIdentifierEnum = require(AppChatParent.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
+local SquadVoiceChangerOverlay = require(parent.Squads.SquadVoiceChangerOverlay)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+
 local ChatConversation = AppChat.Components.ChatConversation
+
 local CreateUnfilteredChatPartialModalScreen = require(ChatConversation.PartialModal.CreateUnfilteredChatPartialModalScreen)
 local LearnMorePartialModalScreen = require(ChatConversation.PartialModal.LearnMorePartialModalScreen)
-local SquadVoiceAbuseReportScreen = require(AppChatParent.Squads.SquadVoiceAbuseReportScreen)
+local SquadVoiceAbuseReportScreen = require(parent.Squads.SquadVoiceAbuseReportScreen)
 local ConversationOverlayScreen = require(ChatConversation.PartialModal.ConversationOverlayScreen)
-local TrustedConnectionsUpsellScreen = require(AppChat.Components.TrustedConnectionsUpsell.TrustedConnectionsUpsellScreen)
+local TrustedFriendsUpsellScreen = require(AppChat.Components.TrustedFriendsUpsell.TrustedFriendsUpsellScreen)
 local GroupOSADialogScreen = require(AppChat.Components.OSA.GroupOSADialogScreen)
 local makeDialogScreenTelemetryWrapper = require(AppChat.Navigators.makeDialogScreenTelemetryWrapper)
 local isolatedAutoFocusNavigation = require(AppChat.Navigators.isolatedAutoFocusNavigation)
-local BlockingModal = require(AppChatParent.SocialBlockingModal).BlockingModal
+
+local SocialBlockingModal = require(parent.SocialBlockingModal)
+local BlockingModal = SocialBlockingModal.BlockingModal
+
 local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
 local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
-local FFlagAppChatEnableDoubleOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableDoubleOptIn
 local chatLandingStackNavigator = require(script.Parent.chatLandingStackNavigator)
-local v34 = Roact.Component:extend("ChatLandingStackNavigatorConnector")
+local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
 
-v34.router = chatLandingStackNavigator.router
+local extended = Roact.Component:extend("ChatLandingStackNavigatorConnector")
+extended.router = chatLandingStackNavigator.router
 
-function v34.render(p1) -- line: 47
-	-- upvalues: Roact (copy), chatLandingStackNavigator (copy)
+function extended.render(p)
 	return Roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		ClipsDescendants = true,
-		Size = UDim2.new(1, 0, 1, 0)
+		ClipsDescendants = not FFlagAppChatConsoleFocusFixes or nil
 	}, {
-		ChatLandingStackNavigator = Roact.createElement(chatLandingStackNavigator, p1.props)
+		ChatLandingStackNavigator = Roact.createElement(chatLandingStackNavigator, p.props)
 	})
 end
 
-local t1 = {
-	{
-		[EnumScreens.ChatLandingStack] = v34
-	},
+local v = {
+	{ [EnumScreens.ChatLandingStack] = extended },
 	{
 		[GenericDialogType.EditChatGroupNameDialog] = {
-			screen = isolatedAutoFocusNavigation(EditChatGroupNameDialogScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+			screen = isolatedAutoFocusNavigation(
+				EditChatGroupNameDialogScreen,
+				FocusNavigableSurfaceIdentifierEnum.PopUp
+			),
+			navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 		}
 	},
 	{
 		[GenericDialogType.LeaveGroupDialog] = {
-			screen = isolatedAutoFocusNavigation(makeDialogScreenTelemetryWrapper(LeaveGroupDialogScreen), FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+			screen = isolatedAutoFocusNavigation(
+				makeDialogScreenTelemetryWrapper(LeaveGroupDialogScreen),
+				FocusNavigableSurfaceIdentifierEnum.PopUp
+			),
+			navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 		}
 	},
 	{
 		[GenericDialogType.ParticipantDialog] = {
-			screen = isolatedAutoFocusNavigation(makeDialogScreenTelemetryWrapper(ParticipantDialogScreenDeprecated), FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+			screen = isolatedAutoFocusNavigation(
+				makeDialogScreenTelemetryWrapper(ParticipantDialogScreenDeprecated),
+				FocusNavigableSurfaceIdentifierEnum.PopUp
+			),
+			navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 		}
 	},
 	{
 		[GenericDialogType.RemoveUserDialog] = {
 			screen = isolatedAutoFocusNavigation(RemoveUserDialogScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+			navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 		}
 	},
 	{
 		[EnumScreens.CreateUnfilteredChatPartialModal] = {
-			screen = isolatedAutoFocusNavigation(CreateUnfilteredChatPartialModalScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+			screen = isolatedAutoFocusNavigation(
+				CreateUnfilteredChatPartialModalScreen,
+				FocusNavigableSurfaceIdentifierEnum.PopUp
+			),
+			navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 		}
 	},
 	{
 		[EnumScreens.LearnMorePartialModal] = {
 			screen = isolatedAutoFocusNavigation(LearnMorePartialModalScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+			navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 		}
 	}
 }
 
-table.insert(t1, {
+local v2 = {
 	[EnumScreens.AppChatReportAbuse] = {
 		screen = isolatedAutoFocusNavigation(AbuseReportScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-		navigationOptions = {
-			backButtonEnabled = true,
-			overlayEnabled = true
-		}
+		navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 	}
-})
+}
+table.insert(v, v2)
 
-if FFlagAppChatEnableTrustedFriendEntryPoint then
-	table.insert(t1, {
-		[EnumScreens.AppChatTrustedContactsModal] = {
-			screen = isolatedAutoFocusNavigation(TrustedContactsModalScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
-		}
-	})
-end
-
-table.insert(t1, {
+local v3 = {
 	[EnumScreens.BlockingModal] = {
 		screen = isolatedAutoFocusNavigation(BlockingModal, FocusNavigableSurfaceIdentifierEnum.PopUp),
-		navigationOptions = {
-			backButtonEnabled = true,
-			overlayEnabled = true
-		}
+		navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 	}
-})
-table.insert(t1, {
+}
+table.insert(v, v3)
+
+local v4 = {
 	[EnumScreens.MessageContextMenu] = {
-		screen = isolatedAutoFocusNavigation(MessageContextMenuScreen, FocusNavigableSurfaceIdentifierEnum.ContextualMenu),
-		navigationOptions = {
-			backButtonEnabled = true,
-			overlayEnabled = true
-		}
+		screen = isolatedAutoFocusNavigation(
+			MessageContextMenuScreen,
+			FocusNavigableSurfaceIdentifierEnum.ContextualMenu
+		),
+		navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 	}
-})
+}
+table.insert(v, v4)
 
 if GetFFlagIsSquadEnabled() and GetFFlagEnableCrossExpVoice() then
-	table.insert(t1, {
+	local v5 = {
 		[EnumScreens.SquadVoiceReportAbuse] = {
 			screen = isolatedAutoFocusNavigation(SquadVoiceAbuseReportScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+			navigationOptions = { backButtonEnabled = true, overlayEnabled = true }
 		}
-	})
+	}
+	table.insert(v, v5)
 end
 
-table.insert(t1, {
+local v5 = {
 	[EnumScreens.ConversationOverlay] = {
 		screen = isolatedAutoFocusNavigation(ConversationOverlayScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
-		navigationOptions = {
-			overlayEnabled = true,
-			transparent = true,
-			overlayTransparency = 0.5
-		}
+		navigationOptions = { overlayEnabled = true, transparent = true, overlayTransparency = 0.5 }
 	}
-})
+}
+table.insert(v, v5)
 
-if FFlagAppChatEnableDoubleOptIn then
-	table.insert(t1, {
-		[EnumScreens.TrustedConnectionsUpsell] = {
-			screen = TrustedConnectionsUpsellScreen,
-			navigationOptions = {
-				transparent = true,
-				overlayTransparency = 0.5,
-				overlayEnabled = true
-			}
-		}
-	})
-end
+local v6 = {
+	[EnumScreens.TrustedConnectionsUpsell] = {
+		screen = isolatedAutoFocusNavigation(TrustedFriendsUpsellScreen, FocusNavigableSurfaceIdentifierEnum.PopUp),
+		navigationOptions = { transparent = true, overlayTransparency = 0.5, overlayEnabled = true }
+	}
+}
+table.insert(v, v6)
 
-table.insert(t1, {
+local v7 = {
 	[EnumScreens.GroupOSADialog] = {
 		screen = GroupOSADialogScreen,
-		navigationOptions = {
-			transparent = true,
-			overlayTransparency = 0.5,
-			overlayEnabled = true
-		}
+		navigationOptions = { transparent = true, overlayTransparency = 0.5, overlayEnabled = true }
 	}
-})
+}
+table.insert(v, v7)
 
 if FFlagEnablePartyVoiceChangersInLua then
-	table.insert(t1, {
+	local v8 = {
 		[EnumScreens.SquadVoiceChangers] = {
 			screen = isolatedAutoFocusNavigation(SquadVoiceChangerOverlay, FocusNavigableSurfaceIdentifierEnum.PopUp),
-			navigationOptions = {
-				overlayEnabled = true,
-				overlayTransparency = 0.5
-			}
+			navigationOptions = { overlayEnabled = true, overlayTransparency = 0.5 }
 		}
-	})
+	}
+	table.insert(v, v8)
 end
 
-return RoactNavigation.createRobloxStackNavigator(t1, {
+return RoactNavigation.createRobloxStackNavigator(v, {
+	defaultNavigationOptions = FFlagAppChatDisableAbsorbInputSelectable and {
+		absorbInputSelectable = false
+	} or nil,
 	mode = RoactNavigation.StackPresentationStyle.Overlay
 })

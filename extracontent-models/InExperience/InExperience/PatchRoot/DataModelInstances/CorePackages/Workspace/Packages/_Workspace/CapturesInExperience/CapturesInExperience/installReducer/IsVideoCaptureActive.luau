@@ -1,27 +1,18 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local VideoCaptureStarted = require(ParentParent.Actions.VideoCaptureStarted)
-local VideoCaptureStopped = require(ParentParent.Actions.VideoCaptureStopped)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Enums.CaptureTriggerType)
+local Rodux = require(parent2.Rodux)
 
-local t1 = {
-	status = false,
-	triggerType = nil
-}
+local VideoCaptureStarted = require(parent.Actions.VideoCaptureStarted)
+local VideoCaptureStopped = require(parent.Actions.VideoCaptureStopped)
 
-return Rodux.createReducer(t1, {
-	[VideoCaptureStarted.name] = function(_: {[any]: any}, p1) -- line: 22
-		return {
-			status = true,
-			triggerType = p1.triggerType
-		}
+require(parent.Enums.CaptureTriggerType)
+
+return Rodux.createReducer({ status = false, triggerType = nil }, {
+	[VideoCaptureStarted.name] = function(_, p)
+		return { status = true, triggerType = p.triggerType }
 	end,
-	[VideoCaptureStopped.name] = function(_: {[any]: any}, p2) -- line: 29
-		return {
-			status = false,
-			triggerType = p2.triggerType
-		}
+	[VideoCaptureStopped.name] = function(_, p)
+		return { status = false, triggerType = p.triggerType }
 	end
 })

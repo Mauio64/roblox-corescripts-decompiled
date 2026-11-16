@@ -1,32 +1,36 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
-local useDesignTokens = require(Parent.Style).useDesignTokens
-local StyledTextLabel = require(Parent.UIBlox).App.Text.StyledTextLabel
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local UIBlox = require(parent.UIBlox)
+
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+
 local LineItemLayout = require(script.Parent.LineItemLayout)
 
-local function ItemListHeader(t1: {[any]: any}) -- line: 17
-	-- upvalues: useDesignTokens (copy), React (copy), LineItemLayout (copy), StyledTextLabel (copy)
-	local v8 = useDesignTokens()
-	local t2 = {
-		LineHeight = v8.Typography.BodyLarge.LineHeight,
-		Font = v8.Typography.TitleLarge.Font,
-		FontSize = v8.Typography.BodyLarge.FontSize,
-		LetterSpacing = v8.Typography.BodyLarge.LetterSpacing
+local function ItemListHeader(props)
+	local v = useDesignTokens()
+	local fontStyle = {
+		LineHeight = v.Typography.BodyLarge.LineHeight,
+		Font = v.Typography.TitleLarge.Font,
+		FontSize = v.Typography.BodyLarge.FontSize,
+		LetterSpacing = v.Typography.BodyLarge.LetterSpacing
 	}
-	local Emphasis = v8.Color.Content.Emphasis
+
+	local emphasis = v.Color.Content.Emphasis
 
 	return React.createElement(LineItemLayout, {
 		startSlot = React.createElement(StyledTextLabel, {
-			fontStyle = t2,
-			colorStyle = Emphasis,
-			text = t1.heading
+			fontStyle = fontStyle,
+			colorStyle = emphasis,
+			text = props.heading
 		}),
 		endSlot = React.createElement(StyledTextLabel, {
-			fontStyle = t2,
-			colorStyle = Emphasis,
-			text = t1.itemCount
+			fontStyle = fontStyle,
+			colorStyle = emphasis,
+			text = props.itemCount
 		}),
-		LayoutOrder = t1.LayoutOrder
+		LayoutOrder = props.LayoutOrder
 	})
 end
 

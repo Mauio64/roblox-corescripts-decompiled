@@ -1,27 +1,25 @@
 local CorePackages = game:GetService("CorePackages")
+
 local WhatsNew = require(CorePackages.Workspace.Packages.WhatsNew)
 local InExperienceSideSheet = require(CorePackages.Workspace.Packages.InExperienceSideSheet)
 
-local function createInGameScopeActions() -- line: 17
-	-- upvalues: InExperienceSideSheet (copy), WhatsNew (copy)
+local function createInGameScopeActions()
 	local toggleSideSheet = InExperienceSideSheet.toggleSideSheet
-	local v6 = WhatsNew.scopeActions.createScopeActions()
+	local scopeActions = WhatsNew.scopeActions.createScopeActions()
 
-	v6:register("OpenTiltMenu", function() -- line: 21
-		-- upvalues: toggleSideSheet (copy)
+	scopeActions:register("OpenTiltMenu", function()
 		toggleSideSheet(true)
 	end)
-	v6:register("CloseTiltMenu", function() -- line: 24
-		-- upvalues: toggleSideSheet (copy)
+	scopeActions:register("CloseTiltMenu", function()
 		toggleSideSheet(false)
 	end)
-	v6:bindOpenState({
+	scopeActions:bindOpenState({
 		openActionKey = "OpenTiltMenu",
 		closeActionKey = "CloseTiltMenu",
 		getIsOpen = InExperienceSideSheet.getSideSheetVisibility
 	})
 
-	return v6
+	return scopeActions
 end
 
 return createInGameScopeActions

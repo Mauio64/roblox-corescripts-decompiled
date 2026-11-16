@@ -1,41 +1,43 @@
 local TextChatService = game:GetService("TextChatService")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+
 local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
-local ExpChatSharedParent = ExpChatShared.Parent
-local Dictionary = require(ExpChatSharedParent.llama).Dictionary
-local v6 = require(ExpChatShared.Logger):new("ExpChat/Command/Whisper")
+
+local parent = ExpChatShared.Parent
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local Logger = require(ExpChatShared.Logger)
+local v = Logger:new("ExpChat/Command/Whisper")
+
 local Actions = ExpChatShared.Actions
 local ChatInputBarActivatedWhisperMode = require(Actions.ChatInputBarActivatedWhisperMode)
+
 local Commands = script:FindFirstAncestor("Commands")
 local getAutocompletePlayersFromString = require(Commands.getAutocompletePlayersFromString)
 local getNameFromWhisper = require(Commands.Whisper.getNameFromWhisper)
-
 require(Commands.types)
 
 return {
 	name = script.Name,
-	alias = {
-		"/whisper",
-		"/w"
-	},
-	clientRun = function(p1, n1: number, s1: string) -- line: 21
-		-- upvalues: getNameFromWhisper (copy), Dictionary (copy), getAutocompletePlayersFromString (copy), v6 (copy), TextChatService (copy), RobloxReplicatedStorage (copy), ChatInputBarActivatedWhisperMode (copy)
-		local v15 = p1:getState().AutoCastCommands[script.Name]
-		local v16 = getNameFromWhisper(s1, v15)
+	alias = { "/whisper", "/w" },
+	clientRun = function(object, p: number, p2: string)
+		local nameFromWhisper = getNameFromWhisper(p2, object:getState().AutoCastCommands[script.Name])
 
-		if v16 then
-			local Players = p1:getState().Players
-			local v18 = Dictionary.join(Players, {
-				byUserId = Dictionary.removeKey(Players.byUserId, (tostring(n1)))
-			})
-			local v19 = getAutocompletePlayersFromString(v18, v16)
+		if nameFromWhisper then
+			local players = object:getState().Players
+			local autocompletePlayersFromString = getAutocompletePlayersFromString(
+				dictionary.join(players, {
+					byUserId = dictionary.removeKey(players.byUserId, (tostring(p)))
+				}),
+				nameFromWhisper
+			)
 
-			if #v19 == 0 then
-				v6:debug("Autocomplete: No matches!")
+			if #autocompletePlayersFromString == 0 then
+				v:debug("Autocomplete: No matches!")
 
-				local v20 = Players.byUserId[tostring(n1)]
+				local v2 = players.byUserId[tostring(p)]
 
-				if v20 and (v16 == v20.displayName or v16 == "@" .. v20.username) then
+				if v2 and (nameFromWhisper == v2.displayName or nameFromWhisper == "@" .. v2.username) then
 					return {
 						key = "InGame.UnknownNamespace.GameChat_PrivateMessaging_CannotWhisperToSelf",
 						args = nil,
@@ -45,80 +47,69 @@ return {
 
 				return {
 					key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
-					metadata = "Roblox.Whisper.Error.TargetDoesNotExist",
 					args = {
-						RBX_NAME = v16 or ""
+						RBX_NAME = nameFromWhisper or ""
+					},
+					metadata = "Roblox.Whisper.Error.TargetDoesNotExist"
+				}
+			else
+				if #autocompletePlayersFromString ~= 1 then
+					v:debug("Autocomplete: Too many matches!")
+					return {
+						key = "CoreScripts.TextChat.Whisper.Error.CannotChat",
+						metadata = "Roblox.Whisper.Error.TooManyMatches"
 					}
-				}
-			end
-
-			if #v19 ~= 1 then
-				v6:debug("Autocomplete: Too many matches!")
-
-				return {
-					key = "CoreScripts.TextChat.Whisper.Error.CannotChat",
-					metadata = "Roblox.Whisper.Error.TooManyMatches"
-				}
-			end
-
-			local v21 = v19[1]
-			local num = tonumber(v21.userId)
-
-			if num then
-				local v23 = string.format("RBXWhisper:%d_%d", n1 < num and n1 or num, num < n1 and n1 or num)
-				local v24 = TextChatService:FindFirstChild(v23, true)
-
-				if not v24 then
-					local ExperienceChat = RobloxReplicatedStorage:FindFirstChild("ExperienceChat")
-
-					if not ExperienceChat then
-						v6:error("Could not create whisper channel because RobloxReplicatedStorage.ExperienceChat is missing.")
-
-						return {
-							key = "",
-							metadata = "Roblox.Whisper.Error.Unknown"
-						}
-					end
-
-					local WhisperChat = ExperienceChat:FindFirstChild("WhisperChat")
-
-					if not WhisperChat or not WhisperChat:IsA("RemoteFunction") then
-						v6:error("Could not create whisper channel because WhisperChat RemoteFunction is missing.")
-
-						return {
-							key = "",
-							metadata = "Roblox.Whisper.Error.Unknown"
-						}
-					end
-
-					v24 = WhisperChat:InvokeServer(v21.userId)
-
-					if not v24 then
-						v6:error("Could not create whisper channel for some reason.")
-
-						return {
-							key = "CoreScripts.TextChat.Whisper.Error.CannotChat",
-							args = nil,
-							metadata = "Roblox.Whisper.Error.Unknown"
-						}
-					end
 				end
 
-				p1:dispatch(ChatInputBarActivatedWhisperMode(nil, v24))
+				local v2 = autocompletePlayersFromString[1]
 
-				return {
-					key = "CoreScripts.TextChat.Notification.WhisperChat.Created",
-					metadata = "Roblox.Whisper.Info.Success",
-					args = {
-						RBX_NAME = v16
+				local v3 = tonumber(v2.userId)
+
+				if v3 then
+					local v4 = p < v3 and p or v3
+					v3 = v3 < p and p or v3
+					local v5 = TextChatService:FindFirstChild(string.format("RBXWhisper:%d_%d", v4, v3), true)
+
+					if not v5 then
+						local experienceChat = RobloxReplicatedStorage:FindFirstChild("ExperienceChat")
+
+						if not experienceChat then
+							v:error("Could not create whisper channel because RobloxReplicatedStorage.ExperienceChat is missing.")
+
+							return { key = "", metadata = "Roblox.Whisper.Error.Unknown" }
+						end
+
+						local whisperChat = experienceChat:FindFirstChild("WhisperChat")
+
+						if not (whisperChat and whisperChat:IsA("RemoteFunction")) then
+							v:error("Could not create whisper channel because WhisperChat RemoteFunction is missing.")
+
+							return { key = "", metadata = "Roblox.Whisper.Error.Unknown" }
+						end
+
+						v5 = whisperChat:InvokeServer(v2.userId)
+
+						if not v5 then
+							v:error("Could not create whisper channel for some reason.")
+							return {
+								key = "CoreScripts.TextChat.Whisper.Error.CannotChat",
+								args = nil,
+								metadata = "Roblox.Whisper.Error.Unknown"
+							}
+						end
+					end
+
+					object:dispatch(ChatInputBarActivatedWhisperMode(nil, v5))
+
+					return {
+						key = "CoreScripts.TextChat.Notification.WhisperChat.Created",
+						args = { RBX_NAME = nameFromWhisper },
+						metadata = "Roblox.Whisper.Info.Success"
 					}
-				}
+				end
 			end
 		end
 
-		return {
-			key = "",
-			metadata = "Roblox.Whisper.Error.Unknown"
-		}
+		return { key = "", metadata = "Roblox.Whisper.Error.Unknown" }
 	end
 }

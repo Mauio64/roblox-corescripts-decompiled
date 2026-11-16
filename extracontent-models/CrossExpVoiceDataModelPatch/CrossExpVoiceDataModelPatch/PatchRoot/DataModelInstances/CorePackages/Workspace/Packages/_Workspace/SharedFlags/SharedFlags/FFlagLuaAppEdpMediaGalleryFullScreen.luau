@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagLuaAppEdpMediaGalleryRedesign) and game:DefineFastFlag("LuaAppEdpMediaGalleryFullScreen4", false)
+local FFlagLuaAppEdpMediaGalleryRedesign = require(script.Parent.FFlagLuaAppEdpMediaGalleryRedesign)
+
+return FFlagLuaAppEdpMediaGalleryRedesign and game:DefineFastFlag("LuaAppEdpMediaGalleryFullScreen4", false)

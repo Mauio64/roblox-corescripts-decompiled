@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Workspace.ChatLineReporting.ChatLineReporting))
+local ChatLineReporting = require(index.ChatLineReporting.ChatLineReporting)
+
+return ChatLineReporting

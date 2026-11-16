@@ -1,10 +1,5 @@
 return {
-	MarketplaceItemType = {
-		ASSET = 0,
-		BUNDLE = 1,
-		LOOK = 2,
-		CHARACTER = 3
-	},
+	MarketplaceItemType = { ASSET = 0, BUNDLE = 1, LOOK = 2, CHARACTER = 3 },
 	MarketplaceSurfaceType = {
 		HOMEPAGE = 0,
 		SEARCH = 1,
@@ -27,11 +22,7 @@ return {
 		SEE_ALL = 8,
 		UI_BUTTON_CLICK = 9
 	},
-	CharacterType = {
-		UNKNOWN_CHARACTER = 0,
-		CREATION = 1,
-		PURCHASED = 2
-	},
+	CharacterType = { UNKNOWN_CHARACTER = 0, CREATION = 1, PURCHASED = 2 },
 	MarketplaceEventSenderAPI = {
 		SEND_EVENT_DEFERRED = 0,
 		SEND_EVENT_IMMEDIATELY = 1,

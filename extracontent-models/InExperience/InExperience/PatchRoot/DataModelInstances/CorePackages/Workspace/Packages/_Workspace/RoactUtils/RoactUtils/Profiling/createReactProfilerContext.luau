@@ -1,14 +1,11 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local Signal = require(Parent.AppCommonLib).Signal
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
 require(script.Parent.types)
 
-local function createReactProfilerContext() -- line: 8
-	-- upvalues: Signal (copy)
-	return {
-		onRender = Signal.new(),
-		onCommit = Signal.new()
-	}
+local function createReactProfilerContext()
+	return { onRender = Signal.new(), onCommit = Signal.new() }
 end
 
 return createReactProfilerContext

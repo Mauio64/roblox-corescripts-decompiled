@@ -1,1 +1,3 @@
-return (require(script.SegmentedControl))
+local SegmentedControl = require(script.SegmentedControl)
+
+return SegmentedControl

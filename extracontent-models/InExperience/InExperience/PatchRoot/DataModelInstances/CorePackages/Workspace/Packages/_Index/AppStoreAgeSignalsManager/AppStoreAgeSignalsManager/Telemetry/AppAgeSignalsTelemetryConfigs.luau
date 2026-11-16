@@ -1,52 +1,36 @@
 local TelemetryService = game:GetService("TelemetryService")
-local v2 = game:DefineFastFlag("EnableAppAgeSignalsErrorTelemetry", false)
-local t1 = {
+
+local defineFastFlag = game:DefineFastFlag("EnableAppAgeSignalsErrorTelemetry", false)
+
+local v = {
 	ErrorCounter = {
 		eventName = "AppAgeSignalsErrorCounter",
-		description = "Error counter for app age signals collection flow",
 		backends = { "RobloxTelemetryCounter" },
-		lastUpdated = {
-			2026,
-			3,
-			4
-		}
+		lastUpdated = { 2026, 3, 4 },
+		description = "Error counter for app age signals collection flow"
 	},
 	ErrorEvent = {
 		eventName = "AppAgeSignalsError",
-		throttlingPercentage = 10000,
-		description = "Error event for app age signals collection flow",
 		backends = { "EventIngest" },
-		lastUpdated = {
-			2026,
-			3,
-			4
-		}
+		throttlingPercentage = 10000,
+		lastUpdated = { 2026, 3, 4 },
+		description = "Error event for app age signals collection flow"
 	}
 }
 
 return {
-	reportError = function(t2: {[any]: any}) -- line: 28
-		-- upvalues: v2 (copy), TelemetryService (copy), t1 (copy)
-		if not v2 then
+	reportError = function(p)
+		if not defineFastFlag then
 			return
 		end
 
-		TelemetryService:LogCounter(t1.ErrorCounter, {
-			customFields = {
-				error = t2.error,
-				signalSource = t2.signalSource
-			}
+		TelemetryService:LogCounter(v.ErrorCounter, {
+			customFields = { error = p.error, signalSource = p.signalSource }
 		}, 1)
-		TelemetryService:LogEvent(t1.ErrorEvent, {
-			standardizedFields = {
-				"addSessionInfo",
-				"addSessionId",
-				"addOSInfo"
-			},
-			customFields = {
-				error = t2.error,
-				signalSource = t2.signalSource
-			}
+
+		TelemetryService:LogEvent(v.ErrorEvent, {
+			standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" },
+			customFields = { error = p.error, signalSource = p.signalSource }
 		})
 	end
 }

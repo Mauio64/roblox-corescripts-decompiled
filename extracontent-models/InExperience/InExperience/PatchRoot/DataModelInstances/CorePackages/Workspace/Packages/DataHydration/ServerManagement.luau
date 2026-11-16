@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local ServerManagement = require(Workspace.DataHydration.DataHydration.ServerManagement)
 
-return (require(_Workspace.DataHydration.DataHydration.ServerManagement))
+return ServerManagement

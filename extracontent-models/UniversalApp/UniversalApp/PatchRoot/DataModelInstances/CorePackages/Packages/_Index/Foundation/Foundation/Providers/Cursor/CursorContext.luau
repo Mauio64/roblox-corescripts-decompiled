@@ -1,19 +1,18 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
+local parent = Foundation.Parent
 local Logger = require(Foundation.Utility.Logger)
-local React = require(FoundationParent.React)
+local React = require(parent.React)
 
 require(Foundation.Enums.CursorType)
+
 require(Foundation.Components.Types)
 
 return (React.createContext({
 	refCache = {},
-	setMountedCursors = function(_: ((...any) -> ...any)) -- line: 12
-		-- upvalues: Logger (copy)
+	setMountedCursors = function(_)
 		Logger:warning("No Cursor Provider found")
 	end,
-	getCursor = function(_) -- line: 15
-		-- upvalues: Logger (copy)
+	getCursor = function(_)
 		Logger:warning("No Cursor Provider found")
 	end
 }))

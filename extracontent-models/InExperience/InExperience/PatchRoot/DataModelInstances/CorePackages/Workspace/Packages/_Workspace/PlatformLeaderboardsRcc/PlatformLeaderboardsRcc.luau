@@ -1,16 +1,37 @@
 local PlatformLeaderboardTypes = require(script.PlatformLeaderboardTypes)
-local scriptParent = script.Parent
-local FFlagPlatformLeaderboardRccEnabled = require(scriptParent.SharedFlags).FFlagPlatformLeaderboardRccEnabled
-local v4 = if not FFlagPlatformLeaderboardRccEnabled then nil else require(script.PlatformLeaderboardFetcher)
-local v5 = if not FFlagPlatformLeaderboardRccEnabled then nil else require(script.PlatformLeaderboardConfigService)
-local v6 = if not FFlagPlatformLeaderboardRccEnabled then nil else require(script.PlatformLeaderboardCache)
-local v7 = if not FFlagPlatformLeaderboardRccEnabled then nil else require(script.PlatformLeaderboardController)
+
+local parent = script.Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPlatformLeaderboardRccEnabled = SharedFlags.FFlagPlatformLeaderboardRccEnabled
+local PlatformLeaderboardFetcher
+
+if FFlagPlatformLeaderboardRccEnabled then
+	PlatformLeaderboardFetcher = require(script.PlatformLeaderboardFetcher)
+end
+
+local PlatformLeaderboardConfigService
+
+if FFlagPlatformLeaderboardRccEnabled then
+	PlatformLeaderboardConfigService = require(script.PlatformLeaderboardConfigService)
+end
+
+local PlatformLeaderboardCache
+
+if FFlagPlatformLeaderboardRccEnabled then
+	PlatformLeaderboardCache = require(script.PlatformLeaderboardCache)
+end
+
+local platformLeaderboardController
+
+if FFlagPlatformLeaderboardRccEnabled then
+	platformLeaderboardController = require(script.PlatformLeaderboardController)
+end
 
 return {
 	["jest.config"] = script["jest.config"],
 	PlatformLeaderboardTypes = PlatformLeaderboardTypes,
-	PlatformLeaderboardFetcher = v4,
-	PlatformLeaderboardConfigService = v5,
-	PlatformLeaderboardCache = v6,
-	PlatformLeaderboardController = v7
+	PlatformLeaderboardFetcher = PlatformLeaderboardFetcher,
+	PlatformLeaderboardConfigService = PlatformLeaderboardConfigService,
+	PlatformLeaderboardCache = PlatformLeaderboardCache,
+	PlatformLeaderboardController = platformLeaderboardController
 }

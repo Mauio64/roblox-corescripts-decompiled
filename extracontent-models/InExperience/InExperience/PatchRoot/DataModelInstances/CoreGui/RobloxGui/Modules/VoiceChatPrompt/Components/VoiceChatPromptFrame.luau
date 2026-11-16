@@ -4,731 +4,1310 @@ local ContextActionService = game:GetService("ContextActionService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
+
 local Roact = require(CorePackages.Packages.Roact)
 local t = require(CorePackages.Packages.t)
+
+local FFlagVoiceChatBanDurationUseServerTime = require(script.Parent.Parent.Parent.VoiceChat.Flags.FFlagVoiceChatBanDurationUseServerTime)
 local Cryo = require(CorePackages.Packages.Cryo)
+
 local renderWithCoreScriptsStyleProvider = require(script.Parent.Parent.Parent.Common.renderWithCoreScriptsStyleProvider)
-local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local RoactUtils = require(CorePackages.Workspace.Packages.RoactUtils)
+local ExternalEventConnection = RoactUtils.ExternalEventConnection
+
 local Responsive = require(CorePackages.Workspace.Packages.Responsive)
 local useLastInput = Responsive.useLastInput
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local Style = require(CorePackages.Workspace.Packages.Style)
+local GetTextSize = Style.GetTextSize
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Toast = UIBlox.App.Dialog.Toast
 local Images = UIBlox.App.ImageSet.Images
 local useStyle = UIBlox.Core.Style.useStyle
 local validateStyle = UIBlox.Style.Validator.validateStyle
+
 local PromptType = require(script.Parent.Parent.PromptType)
 local InGameMenuPolicy = require(script.Parent.Parent.Parent.InGameMenu.InGameMenuPolicy)
 local VoiceChatConsentModal = require(script.Parent.VoiceChatConsentModal)
 local VoiceChatTooltip = require(script.Parent.VoiceChatTooltip)
 local DevicePermissionsModal = require(script.Parent.DevicePermissionsModal)
+
 local Assets = require(script.Parent.Parent.Parent.InGameMenu.Resources.Assets)
 
-require(CorePackages.Workspace.Packages.VoiceChatCore)
+local VoiceChatCore = require(CorePackages.Workspace.Packages.VoiceChatCore)
+local getFFlagMicConsumerRegistry = VoiceChatCore.Flags and VoiceChatCore.Flags.GetFFlagMicConsumerRegistry
+local VoiceChat = require(CorePackages.Workspace.Packages.VoiceChat)
 
-local Flags = require(CorePackages.Workspace.Packages.VoiceChat).Flags
+local Flags = VoiceChat.Flags
+
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local GetFFlagEnableVoicePromptReasonText = require(RobloxGui.Modules.Flags.GetFFlagEnableVoicePromptReasonText)
 local GetFFlagSupportGamepadNavInVoiceModals = Flags.GetFFlagSupportGamepadNavInVoiceModals
+
 local GetFIntVoiceToxicityToastDurationSeconds = require(RobloxGui.Modules.Flags.GetFIntVoiceToxicityToastDurationSeconds)
-local v34 = game:DefineFastFlag("VoiceChatOnlyReportVoiceBans", false)
+local defineFastFlag = game:DefineFastFlag("VoiceChatOnlyReportVoiceBans", false)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
 local GetFFlagShowDevicePermissionsModal = SharedFlags.GetFFlagShowDevicePermissionsModal
-local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+
+local engineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
 local GetFIntVoiceJoinM3ToastDurationSeconds = require(RobloxGui.Modules.Flags.GetFIntVoiceJoinM3ToastDurationSeconds)
+
 local GetFFlagEnableSeamlessVoiceDataConsentToast = require(RobloxGui.Modules.Flags.GetFFlagEnableSeamlessVoiceDataConsentToast)
-local GetFFlagUpdateVoiceConnectionToasts = require(script.Parent.Parent.Parent.VoiceChat.Flags.GetFFlagUpdateVoiceConnectionToasts)
-local GetFFlagEnableVoiceTrustedConnectionsToasts = require(script.Parent.Parent.Parent.VoiceChat.Flags.GetFFlagEnableVoiceTrustedConnectionsToasts)
-local GetFFlagVoiceConnectToastCapturesTrustedFriendsSubtitle = require(script.Parent.Parent.Parent.VoiceChat.Flags.GetFFlagVoiceConnectToastCapturesTrustedFriendsSubtitle)
+
 local GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 = require(script.Parent.Parent.Parent.VoiceChat.Flags.GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2)
 local VoiceNudgeUseNewDACopy = require(script.Parent.Parent.Parent.VoiceChat.Helpers.VoiceNudgeUseNewDACopy)
-local v46 = game:DefineFastFlag("VoiceNudgeUseNewConfirmButton", false)
+local defineFastFlag2 = game:DefineFastFlag("VoiceNudgeUseNewConfirmButton", false)
+
 local FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast = require(script.Parent.Parent.Parent.VoiceChat.Flags.FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast)
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+
 local LocalizationService = game:GetService("LocalizationService")
-local v50 = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization.new(LocalizationService.RobloxLocaleId)
-local color3 = Color3.fromRGB(255, 255, 255)
-local color3_2 = Color3.fromRGB(220, 220, 220)
+local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
+local localization = InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
+
+local color = Color3.fromRGB(255, 255, 255)
+local color2 = Color3.fromRGB(220, 220, 220)
+
+local function formatMicPromptText(p, p2)
+	if not getFFlagMicConsumerRegistry() then
+		return nil
+	end
+
+	local success, result = pcall(function()
+		return localization:Format(p)
+	end)
+	return if success then result else p2
+end
+
+local function getMicPermissionDeniedTitle()
+	if not getFFlagMicConsumerRegistry() then
+		return nil
+	end
+
+	local v = "Feature.SettingsHub.Prompt.MicPermissionDenied"
+	local success, result = pcall(function()
+		return localization:Format(v)
+	end)
+	return if success then result else "Can't access microphone"
+end
+
+local function getMicFirstUnmutePrivacyTitle()
+	if not getFFlagMicConsumerRegistry() then
+		return nil
+	end
+
+	local v = "Feature.SettingsHub.Prompt.MicFirstUnmutePrivacy"
+	local success, result = pcall(function()
+		return localization:Format(v)
+	end)
+	return if success then result else "Microphone is active"
+end
+
+local function getMicPermissionDeniedSubtitle()
+	if not getFFlagMicConsumerRegistry() then
+		return nil
+	end
+
+	local v = "Feature.SettingsHub.Prompt.Subtitle.MicPermissionDenied"
+	local success, result = pcall(function()
+		return localization:Format(v)
+	end)
+
+	if success then
+		return result
+	end
+
+	return "To use your microphone, tap here to update your device settings."
+end
+
+local function getMicFirstUnmutePrivacySubtitle()
+	if not getFFlagMicConsumerRegistry() then
+		return nil
+	end
+
+	local v = "Feature.SettingsHub.Prompt.Subtitle.MicFirstUnmutePrivacy"
+	local success, result = pcall(function()
+		return localization:Format(v)
+	end)
+
+	if success then
+		return result
+	end
+
+	return "We process and then delete your audio. Tap to view our privacy policy."
+end
 
 Roact.PureComponent:extend("VoiceChatPromptFrame")
 
-local t1 = {
+local v = {
 	[PromptType.None] = "",
-	[PromptType.NotAudible] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.NotAudible"),
-	[PromptType.NotAudibleVoiceChatVolume] = if not FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast then nil else v50:Format("Feature.SettingsHub.Prompt.NotAudible"),
-	[PromptType.Permission] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicrophonePermission"),
-	[PromptType.Retry] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicrophonePermission"),
-	[PromptType.Place] = "Exceeds Max Players",
-	[PromptType.User] = "Not Eligible for Voice",
-	[PromptType.VoiceChatSuspendedTemporaryAvatarChat] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicAndCameraUseSuspended"),
-	[PromptType.VoiceChatSuspendedTemporary] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicUseSuspended"),
-	[PromptType.VoiceChatSuspendedTemporaryB] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatSuspended"),
-	[PromptType.VoiceChatSuspendedPermanent] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatSuspended"),
-	[PromptType.VoiceLoading] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Connecting"),
-	[PromptType.VoiceToxicityModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRules"),
-	[PromptType.VoiceToxicityToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRules"),
-	[PromptType.VoiceToxicityFeedbackToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.ThankYouForFeedback"),
-	[PromptType.VoiceChatSuspendedTemporaryToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicUseSuspended"),
-	[PromptType.VoiceConsentDeclinedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.ChangeYourMind"),
-	[PromptType.VoiceConsentAcceptedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChat"),
-	[PromptType.VoiceConsentModalV1] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.GetVoiceChat"),
-	[PromptType.VoiceConsentModalV2] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatWithOthers"),
-	[PromptType.VoiceConsentModalV3] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.GetVoiceChat"),
-	[PromptType.JoinedVoiceToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChat"),
-	[PromptType.JoinVoiceSTUX] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChat"),
-	[PromptType.LeaveVoice] = if not GetFFlagUpdateVoiceConnectionToasts() then RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.LeaveVoiceChat") else v50:Format("Feature.SettingsHub.Prompt.LeaveVoiceChatV2"),
-	[PromptType.JoinVoice] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChatV2"),
-	[PromptType.DevicePermissionsModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.NeedMicrophoneAccess"),
-	[PromptType.VoiceDataConsentOptOutToast] = if not GetFFlagEnableSeamlessVoiceDataConsentToast() then nil else v50:Format("Feature.SettingsHub.Prompt.Title.ImproveVoiceChat"),
-	[PromptType.UnifiedJoinVoiceToast] = if not GetFFlagUpdateVoiceConnectionToasts() then nil else v50:Format("Feature.SettingsHub.Prompt.JoinedVoiceChatV3"),
-	[PromptType.AgeCheckForVoiceToast] = v50:Format("Feature.SettingsHub.Prompt.Title.AgeCheckForVoiceToast"),
-	[PromptType.UpdateOnAutoJoinToast] = if not GetFFlagEnableVoiceTrustedConnectionsToasts() then nil else v50:Format("Feature.SettingsHub.Prompt.UpdateToVoiceChat"),
-	[PromptType.VoiceChatSuspendedTemporaryBV2] = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatSuspendedV2"),
-	[PromptType.VoiceToxicityModalV2] = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRulesVoiceChat"),
-	[PromptType.VoiceToxicityToastV2] = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRulesVoiceChat")
+	[PromptType.NotAudible] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.NotAudible")
 }
-local v54 = not FFlagConnectionsToFriendsRename and "Feature.SettingsHub.Prompt.Subtitle.TalkInAgeGroupTrustedConnections" or "Feature.SettingsHub.Prompt.Subtitle.TalkInAgeGroupTrustedFriends"
-local v55 = not FFlagConnectionsToFriendsRename and "Feature.SettingsHub.Prompt.Subtitle.TalkAgeGroupTrustedConnectionsUpdate" or "Feature.SettingsHub.Prompt.Subtitle.TalkAgeGroupTrustedFriendsUpdate"
-local t2 = {
+local NotAudibleVoiceChatVolume = PromptType.NotAudibleVoiceChatVolume
+local v2
+
+if FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast then
+	v2 = localization:Format("Feature.SettingsHub.Prompt.NotAudible")
+end
+
+v[NotAudibleVoiceChatVolume] = v2
+
+v[PromptType.Permission] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicrophonePermission")
+v[PromptType.Retry] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicrophonePermission")
+v[PromptType.Place] = "Exceeds Max Players"
+v[PromptType.User] = "Not Eligible for Voice"
+v[PromptType.VoiceChatSuspendedTemporaryAvatarChat] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicAndCameraUseSuspended")
+
+v[PromptType.VoiceChatSuspendedTemporary] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicUseSuspended")
+
+v[PromptType.VoiceChatSuspendedTemporaryB] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatSuspended")
+
+v[PromptType.VoiceChatSuspendedPermanent] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatSuspended")
+
+v[PromptType.VoiceLoading] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Connecting")
+v[PromptType.VoiceToxicityModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRules")
+v[PromptType.VoiceToxicityToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRules")
+v[PromptType.VoiceToxicityFeedbackToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.ThankYouForFeedback")
+
+v[PromptType.VoiceChatSuspendedTemporaryToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicUseSuspended")
+
+v[PromptType.VoiceConsentDeclinedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.ChangeYourMind")
+v[PromptType.VoiceConsentAcceptedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChat")
+v[PromptType.VoiceConsentModalV1] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.GetVoiceChat")
+v[PromptType.VoiceConsentModalV2] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatWithOthers")
+v[PromptType.VoiceConsentModalV3] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.GetVoiceChat")
+v[PromptType.JoinedVoiceToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChat")
+v[PromptType.JoinVoiceSTUX] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChat")
+v[PromptType.LeaveVoice] = localization:Format("Feature.SettingsHub.Prompt.LeaveVoiceChatV2")
+v[PromptType.JoinVoice] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.JoinedVoiceChatV2")
+v[PromptType.DevicePermissionsModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.NeedMicrophoneAccess")
+
+local VoiceDataConsentOptOutToast = PromptType.VoiceDataConsentOptOutToast
+local v3
+
+if GetFFlagEnableSeamlessVoiceDataConsentToast() then
+	v3 = localization:Format("Feature.SettingsHub.Prompt.Title.ImproveVoiceChat")
+end
+
+v[VoiceDataConsentOptOutToast] = v3
+
+v[PromptType.UnifiedJoinVoiceToast] = localization:Format("Feature.SettingsHub.Prompt.JoinedVoiceChatV3")
+v[PromptType.AgeCheckForVoiceToast] = localization:Format("Feature.SettingsHub.Prompt.Title.AgeCheckForVoiceToast")
+v[PromptType.UpdateOnAutoJoinToast] = localization:Format("Feature.SettingsHub.Prompt.UpdateToVoiceChat")
+local VoiceChatSuspendedTemporaryBV2 = PromptType.VoiceChatSuspendedTemporaryBV2
+local v4
+
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v4 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.VoiceChatSuspendedV2")
+end
+
+v[VoiceChatSuspendedTemporaryBV2] = v4
+
+local VoiceToxicityModalV2 = PromptType.VoiceToxicityModalV2
+local v5
+
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v5 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRulesVoiceChat")
+end
+
+v[VoiceToxicityModalV2] = v5
+
+local VoiceToxicityToastV2 = PromptType.VoiceToxicityToastV2
+local v6
+
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v6 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.RememberRulesVoiceChat")
+end
+
+v[VoiceToxicityToastV2] = v6
+
+v[PromptType.MicPermissionDenied] = getMicPermissionDeniedTitle
+v[PromptType.MicFirstUnmutePrivacy] = getMicFirstUnmutePrivacyTitle
+
+local v7 = {
 	[PromptType.None] = "",
-	[PromptType.NotAudible] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.NotAudible"),
-	[PromptType.NotAudibleVoiceChatVolume] = if not FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast then nil else v50:Format("Feature.SettingsHub.Prompt.Subtitle.NotAudibleVoiceChatVolume"),
-	[PromptType.Permission] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.MicrophonePermission"),
-	[PromptType.Retry] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Retry"),
-	[PromptType.Place] = "Spatial voice is only available for places with Max Players of 30 or less.",
-	[PromptType.User] = "This account is not eligible to use Spatial Voice.",
-	[PromptType.VoiceChatSuspendedTemporary] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Microphone"),
-	[PromptType.VoiceChatSuspendedTemporaryAvatarChat] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.MicAndCamera"),
-	[PromptType.VoiceChatSuspendedTemporaryB] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan1"),
-	[PromptType.VoiceChatSuspendedPermanent] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Revoked"),
-	[PromptType.VoiceLoading] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Connecting"),
-	[PromptType.VoiceToxicityModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityModal"),
-	[PromptType.VoiceToxicityToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityToast"),
-	[PromptType.VoiceToxicityFeedbackToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.ThanksForLettingUsKnow"),
-	[PromptType.VoiceChatSuspendedTemporaryToast] = function(p1) -- line: 194
-		-- upvalues: RobloxTranslator (copy)
-		return RobloxTranslator:FormatByKey("Feature.SettingsHub.Description.ChatWithVoiceDisabledUntil", {
-			dateTime = p1
-		})
-	end,
-	[PromptType.VoiceConsentDeclinedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.JoinVoiceLater"),
-	[PromptType.VoiceConsentAcceptedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.MuteAnyoneAnytime"),
-	[PromptType.VoiceConsentModalV1] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.InExpVoiceUpsell1"),
-	[PromptType.VoiceConsentModalV2] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.InExpVoiceUpsell2"),
-	[PromptType.VoiceConsentModalV3] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.InExpVoiceUpsell2"),
-	[PromptType.JoinedVoiceToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.DisconnectOrMute"),
-	[PromptType.JoinVoiceSTUX] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.DisconnectOrMuteHere"),
-	[PromptType.DevicePermissionsModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.AllowMicrophoneAccess"),
-	[PromptType.VoiceDataConsentOptOutToast] = if not GetFFlagEnableSeamlessVoiceDataConsentToast() then nil else v50:Format("Feature.SettingsHub.Prompt.Subtitle.ThanksForVoiceData"),
-	[PromptType.UnifiedJoinVoiceToast] = if not GetFFlagVoiceConnectToastCapturesTrustedFriendsSubtitle then if not GetFFlagEnableVoiceTrustedConnectionsToasts() then if not GetFFlagUpdateVoiceConnectionToasts() then nil else v50:Format("Feature.SettingsHub.Prompt.Subtitle.TalkInAgeGroupV2") else v50:Format(v54) else RobloxTranslator:FormatByKey("Feature.Captures.Prompt.Subtitle.VoiceChatRecordingTrustedFriendsAgeGroup"),
-	[PromptType.AgeCheckForVoiceToast] = v50:Format("Feature.SettingsHub.Prompt.Subtitle.GoToAccountInfo"),
-	[PromptType.UpdateOnAutoJoinToast] = if not GetFFlagEnableVoiceTrustedConnectionsToasts() then nil else v50:Format(v55),
-	[PromptType.VoiceChatSuspendedTemporaryBV2] = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan1V2"),
-	[PromptType.VoiceToxicityModalV2] = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityModalV2"),
-	[PromptType.VoiceToxicityToastV2] = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityToastV2")
+	[PromptType.NotAudible] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.NotAudible")
 }
+local notAudibleVoiceChatVolume = PromptType.NotAudibleVoiceChatVolume
+local v8
+
+if FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast then
+	v8 = localization:Format("Feature.SettingsHub.Prompt.Subtitle.NotAudibleVoiceChatVolume")
+end
+
+v7[notAudibleVoiceChatVolume] = v8
+
+v7[PromptType.Permission] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.MicrophonePermission")
+v7[PromptType.Retry] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Retry")
+v7[PromptType.Place] = "Spatial voice is only available for places with Max Players of 30 or less."
+v7[PromptType.User] = "This account is not eligible to use Spatial Voice."
+v7[PromptType.VoiceChatSuspendedTemporary] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Microphone")
+
+v7[PromptType.VoiceChatSuspendedTemporaryAvatarChat] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.MicAndCamera")
+
+v7[PromptType.VoiceChatSuspendedTemporaryB] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan1")
+
+v7[PromptType.VoiceChatSuspendedPermanent] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Revoked")
+
+v7[PromptType.VoiceLoading] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Connecting")
+v7[PromptType.VoiceToxicityModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityModal")
+
+v7[PromptType.VoiceToxicityToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityToast")
+
+v7[PromptType.VoiceToxicityFeedbackToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.ThanksForLettingUsKnow")
+
+v7[PromptType.VoiceChatSuspendedTemporaryToast] = function(dateTime)
+	return RobloxTranslator:FormatByKey("Feature.SettingsHub.Description.ChatWithVoiceDisabledUntil", {
+		dateTime = dateTime
+	})
+end
+
+v7[PromptType.VoiceConsentDeclinedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.JoinVoiceLater")
+
+v7[PromptType.VoiceConsentAcceptedToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.MuteAnyoneAnytime")
+
+v7[PromptType.VoiceConsentModalV1] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.InExpVoiceUpsell1")
+
+v7[PromptType.VoiceConsentModalV2] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.InExpVoiceUpsell2")
+
+v7[PromptType.VoiceConsentModalV3] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.InExpVoiceUpsell2")
+
+v7[PromptType.JoinedVoiceToast] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.DisconnectOrMute")
+
+v7[PromptType.JoinVoiceSTUX] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.DisconnectOrMuteHere")
+
+v7[PromptType.DevicePermissionsModal] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.AllowMicrophoneAccess")
+
+local voiceDataConsentOptOutToast = PromptType.VoiceDataConsentOptOutToast
+local v9
+
+if GetFFlagEnableSeamlessVoiceDataConsentToast() then
+	v9 = localization:Format("Feature.SettingsHub.Prompt.Subtitle.ThanksForVoiceData")
+end
+
+v7[voiceDataConsentOptOutToast] = v9
+
+v7[PromptType.UnifiedJoinVoiceToast] = RobloxTranslator:FormatByKey("Feature.Captures.Prompt.Subtitle.VoiceChatRecordingTrustedFriendsAgeGroup")
+
+v7[PromptType.AgeCheckForVoiceToast] = localization:Format("Feature.SettingsHub.Prompt.Subtitle.GoToAccountInfo")
+v7[PromptType.UpdateOnAutoJoinToast] = localization:Format("Feature.SettingsHub.Prompt.Subtitle.TalkAgeGroupTrustedFriendsUpdate")
+local voiceChatSuspendedTemporaryBV2 = PromptType.VoiceChatSuspendedTemporaryBV2
+local v10
+
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v10 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan1V2")
+end
+
+v7[voiceChatSuspendedTemporaryBV2] = v10
+
+local voiceToxicityModalV2 = PromptType.VoiceToxicityModalV2
+local v11
+
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v11 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityModalV2")
+end
+
+v7[voiceToxicityModalV2] = v11
+
+local voiceToxicityToastV2 = PromptType.VoiceToxicityToastV2
+local v12
+
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v12 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.VoiceToxicityToastV2")
+end
+
+v7[voiceToxicityToastV2] = v12
+
+v7[PromptType.MicPermissionDenied] = getMicPermissionDeniedSubtitle
+v7[PromptType.MicFirstUnmutePrivacy] = getMicFirstUnmutePrivacySubtitle
 
 if RunService:IsStudio() then
-	t1[PromptType.Place] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Place")
-	t1[PromptType.User] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.User")
-	t2[PromptType.Place] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Place")
-	t2[PromptType.User] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.User")
+	v[PromptType.Place] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Place")
+	v[PromptType.User] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.User")
+	v7[PromptType.Place] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Place")
+	v7[PromptType.User] = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.User")
 end
 
 RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.Respect")
+local formatByKey = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.FutureViolations")
+local formatByKey2 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.EffectiveUntil")
+local formatByKey3 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Understand")
+local formatByKey4 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.GotIt")
+local formatByKey5 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.IncorrectNudge")
+local formatByKey6 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan2")
+local v13
 
-local v57 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.FutureViolations")
-local v58 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.EffectiveUntil")
-local v59 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Understand")
-local v60 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.GotIt")
-local v61 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.IncorrectNudge")
-local v62 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan2")
-local v63 = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Ok")
-local v64 = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan2V2")
-local v65 = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.IncorrectNudgeV2")
-
-local function PromptTypeIsBan(p2) -- line: 273
-	-- upvalues: PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy)
-	return p2 == PromptType.VoiceChatSuspendedPermanent or (p2 == PromptType.VoiceChatSuspendedTemporary or (p2 == PromptType.VoiceChatSuspendedTemporaryAvatarChat or (p2 == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p2 == PromptType.VoiceChatSuspendedTemporaryBV2)))
-end
-local function IsModalNudge(p3) -- line: 281
-	-- upvalues: PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy)
-	return p3 == PromptType.VoiceToxicityModal or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p3 == PromptType.VoiceToxicityModalV2
-end
-local function IsVoiceConsentModal(p4) -- line: 286
-	-- upvalues: PromptType (copy)
-	return p4 == PromptType.VoiceConsentModalV1 or (p4 == PromptType.VoiceConsentModalV2 or p4 == PromptType.VoiceConsentModalV3)
-end
-local function IsDevicePermissionsModal(p5) -- line: 292
-	-- upvalues: PromptType (copy)
-	return p5 == PromptType.DevicePermissionsModal
-end
-local function PromptTypeIsModal(p6) -- line: 296
-	-- upvalues: PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy)
-	return p6 == PromptType.VoiceChatSuspendedPermanent or (p6 == PromptType.VoiceChatSuspendedTemporary or (p6 == PromptType.VoiceChatSuspendedTemporaryAvatarChat or (p6 == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p6 == PromptType.VoiceChatSuspendedTemporaryBV2))) or (p6 == PromptType.VoiceToxicityModal or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p6 == PromptType.VoiceToxicityModalV2 or (p6 == PromptType.VoiceConsentModalV1 or (p6 == PromptType.VoiceConsentModalV2 or p6 == PromptType.VoiceConsentModalV3) or p6 == PromptType.DevicePermissionsModal))
-end
-local function PromptTypeIsVoiceConsent(p7) -- line: 303
-	-- upvalues: PromptType (copy)
-	return p7 == PromptType.VoiceConsentDeclinedToast or p7 == PromptType.VoiceConsentAcceptedToast
-end
-local function PromptTypeIsVoiceDataConsent(p8) -- line: 307
-	-- upvalues: PromptType (copy)
-	return p8 == PromptType.VoiceDataConsentOptOutToast
-end
-local function PromptTypeIsConnectDisconnectToast(p9) -- line: 311
-	-- upvalues: PromptType (copy), GetFFlagUpdateVoiceConnectionToasts (copy)
-	return p9 == PromptType.JoinVoice or (p9 == PromptType.LeaveVoice or GetFFlagUpdateVoiceConnectionToasts() and p9 == PromptType.UnifiedJoinVoiceToast)
-end
-local function ShouldShowBannedUntil(p10) -- line: 317
-	-- upvalues: PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy)
-	return p10 == PromptType.VoiceChatSuspendedTemporary or (p10 == PromptType.VoiceChatSuspendedTemporaryAvatarChat or (p10 == PromptType.VoiceChatSuspendedTemporaryToast or (p10 == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p10 == PromptType.VoiceChatSuspendedTemporaryBV2)))
-end
-local function ShouldShowSecondaryButton(p11) -- line: 325
-	-- upvalues: PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy)
-	return p11 == PromptType.VoiceChatSuspendedTemporaryB or (GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p11 == PromptType.VoiceChatSuspendedTemporaryBV2 or (p11 == PromptType.VoiceToxicityModal or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p11 == PromptType.VoiceToxicityModalV2))
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v13 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Ok")
+else
+	v13 = nil
 end
 
-local v76 = Roact.PureComponent:extend("VoiceChatPromptFrame")
+local v14
 
-v76.validateProps = t.strictInterface({
-	promptSignal = t.optional(t.RBXScriptSignal),
-	errorText = t.optional(t.string),
-	bannedUntil = t.optional(t.string),
-	onContinueFunc = t.optional(t.callback),
-	onPrimaryActivated = t.optional(t.callback),
-	onSecondaryActivated = t.optional(t.callback),
-	onReadyForSignal = t.optional(t.callback),
-	Analytics = t.optional(t.table),
-	VoiceChatServiceManager = t.optional(t.table),
-	showNewContent = t.optional(t.boolean),
-	showCheckbox = t.optional(t.boolean),
-	showDataConsentToast = t.optional(t.boolean),
-	policyMapper = t.optional(t.callback),
-	appStyle = validateStyle,
-	settingsAppAvailable = t.optional(t.boolean),
-	UserInputService = t.optional(t.table),
-	lastInput = t.optional(t.string)
-})
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v14 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporaryVoiceBan2V2")
+else
+	v14 = nil
+end
 
-function v76.init(p12) -- line: 350
-	-- upvalues: PromptType (copy), GetFFlagSupportGamepadNavInVoiceModals (copy), Roact (copy), RobloxTranslator (copy), t1 (copy), t2 (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy), EngineFeature (copy), RbxAnalyticsService (copy), GetFFlagUpdateVoiceConnectionToasts (copy), GetFFlagEnableVoiceTrustedConnectionsToasts (copy), Images (copy), GetFFlagEnableSeamlessVoiceDataConsentToast (copy), ContextActionService (copy), VoiceNudgeUseNewDACopy (copy), v34 (copy)
-	p12.promptStyle = {
-		Theme = p12.props.appStyle.Theme,
-		Font = p12.props.appStyle.Font
-	}
-	p12.state = {
-		toastContent = nil,
-		banEnd = "",
-		showPrompt = true,
-		screenSize = Vector2.new(0, 0),
-		promptType = PromptType.None
-	}
-	p12.ref = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else Roact.createRef()
+local v15
 
-	if p12.props.showNewContent then
-		local v91 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicUseSuspended")
-		local v92 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporarySuspension2")
+if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+	v15 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.IncorrectNudgeV2")
+else
+	v15 = nil
+end
 
-		t1[PromptType.VoiceChatSuspendedTemporary] = v91
-		t1[PromptType.VoiceChatSuspendedPermanent] = v91
-		t2[PromptType.VoiceChatSuspendedTemporary] = v92
-	end
+local function formatBannedUntilDate(absoluteSeconds: number) -- 2 equivalent calls inferred from this helper
+	return DateTime.fromUnixTimestamp(absoluteSeconds):FormatLocalTime("l LT", LocalizationService.RobloxLocaleId)
+end
 
-	function p12.onScreenSizeChanged(p13) -- line: 374
-		-- upvalues: p12 (copy)
-		if p12.state.screenSize ~= p13.AbsoluteSize then
-			p12:setState({
-				screenSize = p13.AbsoluteSize
-			})
+local function PromptTypeIsBan(p) -- 4 equivalent calls inferred from this helper
+	return p == PromptType.VoiceChatSuspendedPermanent
+		or p == PromptType.VoiceChatSuspendedTemporary
+		or p == PromptType.VoiceChatSuspendedTemporaryAvatarChat
+		or p == PromptType.VoiceChatSuspendedTemporaryB
+		or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p == PromptType.VoiceChatSuspendedTemporaryBV2
+end
+
+local function IsModalNudge(p) -- 3 equivalent calls inferred from this helper
+	return p == PromptType.VoiceToxicityModal
+		or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p == PromptType.VoiceToxicityModalV2
+end
+
+local function IsVoiceConsentModal(p): boolean -- 4 equivalent calls inferred from this helper
+	return p == PromptType.VoiceConsentModalV1
+		or p == PromptType.VoiceConsentModalV2
+		or p == PromptType.VoiceConsentModalV3
+end
+
+local function IsDevicePermissionsModal(p): boolean -- 4 equivalent calls inferred from this helper
+	return p == PromptType.DevicePermissionsModal
+end
+
+local function PromptTypeIsModal(p)
+	return PromptTypeIsBan(p) or IsModalNudge(p) or IsVoiceConsentModal(p) or IsDevicePermissionsModal(p) -- inferred equivalent call
+end
+
+local function PromptTypeIsVoiceConsent(p): boolean -- 1 equivalent call inferred from this helper
+	return p == PromptType.VoiceConsentDeclinedToast or p == PromptType.VoiceConsentAcceptedToast
+end
+
+local function PromptTypeIsVoiceDataConsent(p): boolean -- 1 equivalent call inferred from this helper
+	return p == PromptType.VoiceDataConsentOptOutToast
+end
+
+local function PromptTypeIsConnectDisconnectToast(p): boolean -- 2 equivalent calls inferred from this helper
+	return p == PromptType.JoinVoice or p == PromptType.LeaveVoice or p == PromptType.UnifiedJoinVoiceToast
+end
+
+local function ShouldShowBannedUntil(p) -- 1 equivalent call inferred from this helper
+	return p == PromptType.VoiceChatSuspendedTemporary
+		or p == PromptType.VoiceChatSuspendedTemporaryAvatarChat
+		or p == PromptType.VoiceChatSuspendedTemporaryToast
+		or p == PromptType.VoiceChatSuspendedTemporaryB
+		or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p == PromptType.VoiceChatSuspendedTemporaryBV2
+end
+
+local function ShouldShowSecondaryButton(promptType) -- 1 equivalent call inferred from this helper
+	return (promptType == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType == PromptType.VoiceChatSuspendedTemporaryBV2 or promptType == PromptType.VoiceToxicityModal)
+		and true
+		or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType == PromptType.VoiceToxicityModalV2
+end
+
+local function promptSignalCallback(object, promptType)
+	if PromptTypeIsBan(promptType) then -- inferred equivalent call
+		if object.props.Analytics then
+			object.props.Analytics:reportBanMessageEvent("Shown")
+		end
+
+		if object.props.VoiceChatServiceManager then
+			object.props.VoiceChatServiceManager:reportBanMessage("Shown")
 		end
 	end
-	function p12.promptSignalCallback(p14) -- line: 382
-		-- upvalues: PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy), p12 (copy), EngineFeature (copy), RbxAnalyticsService (copy), t1 (copy), t2 (copy), GetFFlagUpdateVoiceConnectionToasts (copy), GetFFlagEnableVoiceTrustedConnectionsToasts (copy), Images (copy), GetFFlagEnableSeamlessVoiceDataConsentToast (copy), RobloxTranslator (copy), Roact (copy)
-		if p14 == PromptType.VoiceChatSuspendedPermanent or (p14 == PromptType.VoiceChatSuspendedTemporary or (p14 == PromptType.VoiceChatSuspendedTemporaryAvatarChat or (p14 == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p14 == PromptType.VoiceChatSuspendedTemporaryBV2))) then
-			if p12.props.Analytics then
-				p12.props.Analytics:reportBanMessageEvent("Shown")
-			end
 
-			if p12.props.VoiceChatServiceManager then
-				p12.props.VoiceChatServiceManager:reportBanMessage("Shown")
-			end
+	if IsVoiceConsentModal(promptType) and object.props.Analytics then -- inferred equivalent call
+		local v16 = not engineFeature and "" or RbxAnalyticsService:GetPlaySessionId()
+
+		object.props.Analytics:reportInExpConsent(
+			"shown",
+			object.props.VoiceChatServiceManager.inExpUpsellEntrypoint,
+			game.GameId,
+			game.PlaceId,
+			v16
+		)
+	end
+
+	if IsDevicePermissionsModal(promptType) and object.props.Analytics and object.props.VoiceChatServiceManager then -- inferred equivalent call
+		object.props.Analytics:reportDevicePermissionsModalEvent(
+			"Shown",
+			object.props.VoiceChatServiceManager:GetSessionId(),
+			object.props.VoiceChatServiceManager:GetInExpUpsellAnalyticsData()
+		)
+	end
+
+	if promptType and promptType ~= PromptType.None then
+		local toastTitle = v[promptType]
+		local toastSubtitle = v7[promptType]
+
+		if
+			PromptTypeIsConnectDisconnectToast(promptType) -- inferred equivalent call
+			and object.props.VoiceChatServiceManager
+			and object.props.VoiceChatServiceManager:HasSeamlessVoiceFeature("HideJoinToastSubtitle")
+		then
+			toastSubtitle = nil
 		end
 
-		if (p14 == PromptType.VoiceConsentModalV1 or (p14 == PromptType.VoiceConsentModalV2 or p14 == PromptType.VoiceConsentModalV3)) and p12.props.Analytics then
-			local s1 = ""
+		local v16 = object.props.bannedUntil
 
-			if EngineFeature then
-				s1 = RbxAnalyticsService:GetPlaySessionId()
-			end
-
-			p12.props.Analytics:reportInExpConsent("shown", p12.props.VoiceChatServiceManager.inExpUpsellEntrypoint, game.GameId, game.PlaceId, s1)
+		if FFlagVoiceChatBanDurationUseServerTime then
+			v16 = object.props.bannedUntil and formatBannedUntilDate(object.props.bannedUntil.absoluteSeconds) -- inferred equivalent call
 		end
 
-		if p14 == PromptType.DevicePermissionsModal and p12.props.Analytics and p12.props.VoiceChatServiceManager then
-			p12.props.Analytics:reportDevicePermissionsModalEvent("Shown", p12.props.VoiceChatServiceManager:GetSessionId(), p12.props.VoiceChatServiceManager:GetInExpUpsellAnalyticsData())
+		if typeof(toastTitle) == "function" then
+			toastTitle = toastTitle(v16)
 		end
 
-		if p14 and p14 ~= PromptType.None then
-			local v138 = t1[p14]
-			local v139 = t2[p14]
+		if typeof(toastSubtitle) == "function" then
+			toastSubtitle = toastSubtitle(v16)
+		end
 
-			if (p14 == PromptType.JoinVoice or (p14 == PromptType.LeaveVoice or GetFFlagUpdateVoiceConnectionToasts() and p14 == PromptType.UnifiedJoinVoiceToast)) and p12.props.VoiceChatServiceManager and p12.props.VoiceChatServiceManager:HasSeamlessVoiceFeature("HideJoinToastSubtitle") then
-				v139 = nil
+		local fn
+		local iconImage
+
+		if getFFlagMicConsumerRegistry() and promptType == PromptType.MicPermissionDenied then
+			iconImage = Images["icons/status/alert"]
+			fn = function()
+				local LinkingProtocol = require(CorePackages.Workspace.Packages.LinkingProtocol)
+				local default = LinkingProtocol.LinkingProtocol.default
+				local settingsRoute = LinkingProtocol.Enums.SettingsRoute
+				local microphone
+
+				if settingsRoute then
+					microphone = settingsRoute.Microphone
+				end
+
+				local v17, v18 = default:supportsSwitchToSettingsApp(microphone):await()
+
+				if v17 and v18 then
+					default:switchToSettingsApp(microphone):catch(function() end)
+				end
 			end
-
-			if typeof(v138) == "function" then
-				v138 = v138(p12.props.bannedUntil)
+		elseif getFFlagMicConsumerRegistry() and promptType == PromptType.MicFirstUnmutePrivacy then
+			iconImage = Images["icons/controls/microphone"]
+			fn = function()
+				local LinkingProtocol = require(CorePackages.Workspace.Packages.LinkingProtocol)
+				LinkingProtocol.LinkingProtocol.default:openURL("https://en.help.roblox.com/hc/articles/115004630823"):catch(function() end)
 			end
+		elseif promptType == PromptType.UpdateOnAutoJoinToast then
+			iconImage = Images["icons/controls/microphone"]
+		elseif
+			PromptTypeIsVoiceConsent(promptType) -- inferred equivalent call
+			or promptType == PromptType.JoinedVoiceToast
+			or promptType == PromptType.UnifiedJoinVoiceToast
+		then
+			iconImage = Images["icons/controls/publicAudioJoin"]
+		elseif PromptTypeIsConnectDisconnectToast(promptType) then -- inferred equivalent call
+			iconImage = Images["icons/actions/info"]
+		elseif not (PromptTypeIsVoiceDataConsent(promptType) and GetFFlagEnableSeamlessVoiceDataConsentToast()) then -- inferred equivalent call
+			iconImage = Images["icons/status/alert"]
+		end
 
-			if typeof(v139) == "function" then
-				v139 = v139(p12.props.bannedUntil)
-			end
-
-			local v140 = if not GetFFlagEnableVoiceTrustedConnectionsToasts() or p14 ~= PromptType.UpdateOnAutoJoinToast then if not (p14 == PromptType.VoiceConsentDeclinedToast or p14 == PromptType.VoiceConsentAcceptedToast) and (p14 ~= PromptType.JoinedVoiceToast and (not GetFFlagUpdateVoiceConnectionToasts() or p14 ~= PromptType.UnifiedJoinVoiceToast)) then if not (p14 == PromptType.JoinVoice or (p14 == PromptType.LeaveVoice or GetFFlagUpdateVoiceConnectionToasts() and p14 == PromptType.UnifiedJoinVoiceToast)) then if p14 ~= PromptType.VoiceDataConsentOptOutToast or not GetFFlagEnableSeamlessVoiceDataConsentToast() then Images["icons/status/alert"] else nil else Images["icons/actions/info"] else Images["icons/controls/publicAudioJoin"] else Images["icons/controls/microphone"]
-
-			p12:setState({
-				showPrompt = true,
-				promptType = p14,
-				toastContent = {
-					iconImage = v140,
-					toastTitle = v138,
-					toastSubtitle = v139,
-					onActivated = function() -- line: 460
-						-- upvalues: p12 (copy)
-						if p12.props.onPrimaryActivated then
-							p12.props.onPrimaryActivated()
-						end
-					end,
-					onDismissed = function() -- line: 465
+		object:setState({
+			showPrompt = true,
+			promptType = promptType,
+			toastContent = {
+				iconImage = iconImage,
+				toastTitle = toastTitle,
+				toastSubtitle = toastSubtitle,
+				onActivated = fn or function()
+					if object.props.onPrimaryActivated then
+						object.props.onPrimaryActivated()
 					end
-				}
-			})
-
-			if p14 == PromptType.VoiceChatSuspendedTemporary or (p14 == PromptType.VoiceChatSuspendedTemporaryAvatarChat or (p14 == PromptType.VoiceChatSuspendedTemporaryToast or (p14 == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p14 == PromptType.VoiceChatSuspendedTemporaryBV2))) then
-				local v141 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.XMinuteSuspension", {
-					banDurationInMinutes = p12.props.bannedUntil
-				})
-				local v142 = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.XMinuteSuspensionV2", {
-					banDurationInMinutes = p12.props.bannedUntil
-				})
-				local v143 = if p14 ~= PromptType.VoiceChatSuspendedTemporaryB then if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() or p14 ~= PromptType.VoiceChatSuspendedTemporaryBV2 then " " .. p12.props.bannedUntil .. "." else v142 else v141
-
-				p12:setState({
-					banEnd = v143
-				})
-
-				return
-			end
-		else
-			p12:setState({
-				promptType = PromptType.None,
-				toastContent = Roact.None
-			})
-		end
-	end
-	function p12.closeVoiceBanPrompt() -- line: 495
-		-- upvalues: p12 (copy), ContextActionService (copy), PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy), VoiceNudgeUseNewDACopy (copy), v34 (copy)
-		p12:setState({
-			showPrompt = false
+				end,
+				onDismissed = function() end
+			}
 		})
 
-		if p12.props.onContinueFunc then
-			p12.props.onContinueFunc()
+		if ShouldShowBannedUntil(promptType) then -- inferred equivalent call
+			local banEnd
+
+			if FFlagVoiceChatBanDurationUseServerTime then
+				local v17 = GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+					and promptType == PromptType.VoiceChatSuspendedTemporaryBV2
+
+				local v18 = promptType == PromptType.VoiceChatSuspendedTemporaryB or v17
+				local minutes = object.props.bannedUntil.minutes
+
+				if v18 then
+					if minutes >= 1 then
+						v18 = minutes <= 60
+					else
+						v18 = false
+					end
+				end
+
+				if v18 and v17 then
+					banEnd = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.XMinuteSuspensionV2", {
+						banDurationInMinutes = minutes
+					})
+				elseif v18 then
+					banEnd = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.XMinuteSuspension", {
+						banDurationInMinutes = minutes
+					})
+				else
+					banEnd = formatByKey2 .. " " .. formatBannedUntilDate(object.props.bannedUntil.absoluteSeconds) .. "." -- inferred equivalent call
+				end
+			else
+				local formatByKey7 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.XMinuteSuspension", {
+					banDurationInMinutes = object.props.bannedUntil
+				})
+
+				if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() then
+					banEnd = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.XMinuteSuspensionV2", {
+						banDurationInMinutes = object.props.bannedUntil
+					})
+				end
+
+				if promptType == PromptType.VoiceChatSuspendedTemporaryB then
+					banEnd = formatByKey7
+				elseif
+					not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+					or promptType ~= PromptType.VoiceChatSuspendedTemporaryBV2
+				then
+					banEnd = " " .. object.props.bannedUntil .. "."
+				end
+			end
+
+			object:setState({ banEnd = banEnd })
+		end
+	else
+		object:setState({ promptType = PromptType.None, toastContent = Roact.None })
+	end
+end
+
+local extended = Roact.PureComponent:extend("VoiceChatPromptFrame")
+local strictInterface = t.strictInterface
+local v16 = {
+	promptSignal = t.optional(t.RBXScriptSignal),
+	errorText = t.optional(t.string),
+	bannedUntil = 0,
+	onContinueFunc = 0,
+	onPrimaryActivated = 0,
+	onSecondaryActivated = 0,
+	onReadyForSignal = 0,
+	Analytics = 0,
+	VoiceChatServiceManager = 0,
+	showNewContent = 0,
+	showCheckbox = 0,
+	showDataConsentToast = 0,
+	policyMapper = 0,
+	appStyle = 0,
+	settingsAppAvailable = 0,
+	UserInputService = 0,
+	lastInput = 0
+}
+local optional = t.optional
+local v17
+
+if FFlagVoiceChatBanDurationUseServerTime then
+	v17 = t.interface({ minutes = t.number, absoluteSeconds = t.number })
+else
+	v17 = t.string
+end
+
+v16.bannedUntil = optional(v17)
+
+v16.onContinueFunc = t.optional(t.callback)
+v16.onPrimaryActivated = t.optional(t.callback)
+v16.onSecondaryActivated = t.optional(t.callback)
+v16.onReadyForSignal = t.optional(t.callback)
+v16.Analytics = t.optional(t.table)
+v16.VoiceChatServiceManager = t.optional(t.table)
+v16.showNewContent = t.optional(t.boolean)
+v16.showCheckbox = t.optional(t.boolean)
+v16.showDataConsentToast = t.optional(t.boolean)
+v16.policyMapper = t.optional(t.callback)
+v16.appStyle = validateStyle
+v16.settingsAppAvailable = t.optional(t.boolean)
+v16.UserInputService = t.optional(t.table)
+v16.lastInput = t.optional(t.string)
+extended.validateProps = strictInterface(v16)
+
+function extended:init()
+	self.promptStyle = { Theme = self.props.appStyle.Theme, Font = self.props.appStyle.Font }
+
+	self.state = {
+		screenSize = Vector2.new(0, 0),
+		promptType = PromptType.None,
+		toastContent = nil,
+		banEnd = "",
+		showPrompt = true
+	}
+	local ref
+
+	if GetFFlagSupportGamepadNavInVoiceModals() then
+		ref = Roact.createRef()
+	end
+
+	self.ref = ref
+
+	if self.props.showNewContent then
+		local formatByKey7 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.MicUseSuspended")
+		local formatByKey8 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Prompt.Subtitle.TemporarySuspension2")
+		v[PromptType.VoiceChatSuspendedTemporary] = formatByKey7
+		v[PromptType.VoiceChatSuspendedPermanent] = formatByKey7
+		v7[PromptType.VoiceChatSuspendedTemporary] = formatByKey8
+	end
+
+	function self.onScreenSizeChanged(p)
+		if self.state.screenSize ~= p.AbsoluteSize then
+			self:setState({ screenSize = p.AbsoluteSize })
+		end
+	end
+
+	function self.promptSignalCallback(promptType)
+		promptSignalCallback(self, promptType)
+	end
+
+	function self.closeVoiceBanPrompt()
+		self:setState({ showPrompt = false })
+
+		if self.props.onContinueFunc then
+			self.props.onContinueFunc()
 		end
 
 		ContextActionService:UnbindCoreAction("CloseVoiceBanPrompt")
+		local v18 = self.state.promptType == PromptType.VoiceChatSuspendedTemporaryB
+		local v19 = GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+			and VoiceNudgeUseNewDACopy()
+			and self.state.promptType == PromptType.VoiceChatSuspendedTemporaryBV2
 
-		local v144 = p12.state.promptType == PromptType.VoiceChatSuspendedTemporaryB
-		local v145 = GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and (VoiceNudgeUseNewDACopy() and p12.state.promptType == PromptType.VoiceChatSuspendedTemporaryBV2)
-
-		if v34 then
-			local promptType = p12.state.promptType
-
-			if (promptType == PromptType.VoiceChatSuspendedPermanent or (promptType == PromptType.VoiceChatSuspendedTemporary or (promptType == PromptType.VoiceChatSuspendedTemporaryAvatarChat or (promptType == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType == PromptType.VoiceChatSuspendedTemporaryBV2)))) and not v144 and not v145 then
-				if p12.props.Analytics then
-					p12.props.Analytics:reportBanMessageEvent("Acknowledged")
+		if defineFastFlag then
+			if PromptTypeIsBan(self.state.promptType) and not (v18 or v19) then -- inferred equivalent call
+				if self.props.Analytics then
+					self.props.Analytics:reportBanMessageEvent("Acknowledged")
 				end
 
-				if p12.props.VoiceChatServiceManager then
-					p12.props.VoiceChatServiceManager:reportBanMessage("Acknowledged")
-
-					return
+				if self.props.VoiceChatServiceManager then
+					self.props.VoiceChatServiceManager:reportBanMessage("Acknowledged")
 				end
 			end
-		elseif not v144 and not v145 then
-			if p12.props.Analytics then
-				p12.props.Analytics:reportBanMessageEvent("Acknowledged")
+		elseif not (v18 or v19) then
+			if self.props.Analytics then
+				self.props.Analytics:reportBanMessageEvent("Acknowledged")
 			end
 
-			if p12.props.VoiceChatServiceManager then
-				p12.props.VoiceChatServiceManager:reportBanMessage("Acknowledged")
+			if self.props.VoiceChatServiceManager then
+				self.props.VoiceChatServiceManager:reportBanMessage("Acknowledged")
 			end
 		end
 	end
-	function p12.checkInputStateForClosePrompt(_, p16, _) -- line: 530
-		-- upvalues: p12 (copy)
-		if p16 == Enum.UserInputState.Begin then
-			p12.closeVoiceBanPrompt()
+
+	function self.checkInputStateForClosePrompt(_, p, _)
+		if p == Enum.UserInputState.Begin then
+			self.closeVoiceBanPrompt()
 		end
 	end
-	function p12.handlePrimayActivated() -- line: 536
-		-- upvalues: p12 (copy)
-		p12.closeVoiceBanPrompt()
 
-		if p12.props.onPrimaryActivated then
-			p12.props.onPrimaryActivated()
+	function self.handlePrimayActivated()
+		self.closeVoiceBanPrompt()
+
+		if self.props.onPrimaryActivated then
+			self.props.onPrimaryActivated()
 		end
 	end
-	function p12.handleSecondaryActivated() -- line: 543
-		-- upvalues: p12 (copy)
-		p12.closeVoiceBanPrompt()
 
-		if p12.props.onSecondaryActivated then
-			p12.props.onSecondaryActivated()
+	function self.handleSecondaryActivated()
+		self.closeVoiceBanPrompt()
+
+		if self.props.onSecondaryActivated then
+			self.props.onSecondaryActivated()
 		end
 	end
 end
-function v76.render(p18) -- line: 551
-	-- upvalues: GetFFlagEnableVoicePromptReasonText (copy), PromptType (copy), GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2 (copy), VoiceNudgeUseNewDACopy (copy), GetFFlagShowDevicePermissionsModal (copy), TextService (copy), v58 (copy), v62 (copy), v64 (copy), v57 (copy), GetFFlagSupportGamepadNavInVoiceModals (copy), v46 (copy), Roact (copy), v63 (copy), v60 (copy), v59 (copy), color3_2 (copy), color3 (copy), Button (copy), ButtonType (copy), UIBlox (copy), Assets (copy), v65 (copy), v61 (copy), DevicePermissionsModal (copy), t1 (copy), t2 (copy), UserInputService (copy), VoiceChatConsentModal (copy), CoreGui (copy), VoiceChatTooltip (copy), GetFIntVoiceToxicityToastDurationSeconds (copy), GetFIntVoiceJoinM3ToastDurationSeconds (copy), GetFFlagEnableSeamlessVoiceDataConsentToast (copy), Toast (copy), ExternalEventConnection (copy)
-	local v94 = GetFFlagEnableVoicePromptReasonText() and p18.props.errorText or nil
-	local promptType = p18.state.promptType
-	local v96 = promptType == PromptType.VoiceToxicityModal or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType == PromptType.VoiceToxicityModalV2
-	local v97 = p18.state.promptType == PromptType.VoiceToxicityToast or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and p18.state.promptType == PromptType.VoiceToxicityToastV2
-	local v98 = p18.state.promptType == PromptType.VoiceChatSuspendedTemporaryB
-	local v99 = GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and (VoiceNudgeUseNewDACopy() and p18.state.promptType == PromptType.VoiceChatSuspendedTemporaryBV2)
-	local v100 = GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and (VoiceNudgeUseNewDACopy() and (p18.state.promptType == PromptType.VoiceToxicityModalV2 or p18.state.promptType == PromptType.VoiceChatSuspendedTemporaryBV2))
-	local promptType2 = p18.state.promptType
-	local v102 = promptType2 == PromptType.VoiceConsentModalV1 or (promptType2 == PromptType.VoiceConsentModalV2 or promptType2 == PromptType.VoiceConsentModalV3)
-	local v103 = GetFFlagShowDevicePermissionsModal() and p18.state.promptType == PromptType.DevicePermissionsModal
-	local AutomaticSizeY = Enum.AutomaticSize.Y
-	local promptType3 = p18.state.promptType
 
-	if promptType3 == PromptType.VoiceChatSuspendedPermanent or (promptType3 == PromptType.VoiceChatSuspendedTemporary or (promptType3 == PromptType.VoiceChatSuspendedTemporaryAvatarChat or (promptType3 == PromptType.VoiceChatSuspendedTemporaryB or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType3 == PromptType.VoiceChatSuspendedTemporaryBV2))) or (promptType3 == PromptType.VoiceToxicityModal or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType3 == PromptType.VoiceToxicityModalV2 or (promptType3 == PromptType.VoiceConsentModalV1 or (promptType3 == PromptType.VoiceConsentModalV2 or promptType3 == PromptType.VoiceConsentModalV3) or promptType3 == PromptType.DevicePermissionsModal)) then
-		local toastTitle = p18.state.toastContent.toastTitle
-		local Header1Font = p18.promptStyle.Font.Header1.Font
-		local v108 = p18.promptStyle.Font.Header1.RelativeSize * p18.promptStyle.Font.BaseSize
-		local v109 = 20 + TextService:GetTextSize(toastTitle, v108, Header1Font, Vector2.new(325, 1e999)).Y
-		local v110 = if not v98 and (not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() or not v99) then v58 .. p18.state.banEnd else p18.state.banEnd
-		local v111 = if p18.state.banEnd == "" then p18.state.toastContent.toastSubtitle .. p18.state.banEnd else "<b>" .. v110 .. "</b><br />" .. p18.state.toastContent.toastSubtitle
-		local v112 = v94 or v111
-		local BodyFont = p18.promptStyle.Font.Body.Font
-		local v114 = p18.promptStyle.Font.Body.RelativeSize * p18.promptStyle.Font.BaseSize
-		local v115 = 20 + TextService:GetTextSize(v112, v114, BodyFont, Vector2.new(325, 1e999)).Y
+function extended.render(props)
+	local errorText
 
-		if v98 or v99 then
-			v115 += 20
+	if GetFFlagEnableVoicePromptReasonText() then
+		errorText = props.props.errorText or nil
+	end
+
+	local modalNudge = IsModalNudge(props.state.promptType) -- inferred equivalent call
+	local v18 = props.state.promptType == PromptType.VoiceToxicityToast
+		or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+		and props.state.promptType == PromptType.VoiceToxicityToastV2
+
+	local v19 = props.state.promptType == PromptType.VoiceChatSuspendedTemporaryB
+	local v20 = GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+		and VoiceNudgeUseNewDACopy()
+		and props.state.promptType == PromptType.VoiceChatSuspendedTemporaryBV2
+	local v21 = GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+		and VoiceNudgeUseNewDACopy()
+		and (props.state.promptType == PromptType.VoiceToxicityModalV2 or props.state.promptType == PromptType.VoiceChatSuspendedTemporaryBV2)
+
+	local voiceConsentModal = IsVoiceConsentModal(props.state.promptType) -- inferred equivalent call
+	local v22 = GetFFlagShowDevicePermissionsModal() and IsDevicePermissionsModal(props.state.promptType) -- inferred equivalent call
+	local y = Enum.AutomaticSize.Y
+
+	local promptType = props.state.promptType
+
+	if
+		PromptTypeIsBan(promptType) -- inferred equivalent call
+		or IsModalNudge(promptType) -- inferred equivalent call
+		or IsVoiceConsentModal(promptType) -- inferred equivalent call
+		or IsDevicePermissionsModal(promptType) -- inferred equivalent call
+	then
+		local toastTitle = props.state.toastContent.toastTitle
+		local font = props.promptStyle.Font.Header1.Font
+		local v23 = props.promptStyle.Font.Header1.RelativeSize * props.promptStyle.Font.BaseSize
+		local v24
+
+		if FoundationFontFaceMigration then
+			v24 = GetTextSize(toastTitle, v23, font, Vector2.new(325, 1e999), {
+				addTemporaryPadding = false
+			}).Y
+		else
+			v24 = TextService:GetTextSize(toastTitle, v23, font, Vector2.new(325, 1e999)).Y
 		end
 
-		local v116 = if not v98 then if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() or not v99 then v57 else v64 else v62
-		local v117 = 20 + TextService:GetTextSize(v116, v114, BodyFont, Vector2.new(325, 1e999)).Y
-		local promptType4 = p18.state.promptType
-		local v119 = promptType4 == PromptType.VoiceChatSuspendedTemporaryB or (GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType4 == PromptType.VoiceChatSuspendedTemporaryBV2 or (promptType4 == PromptType.VoiceToxicityModal or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and promptType4 == PromptType.VoiceToxicityModalV2))
-		local v120 = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else Enum.SelectionBehavior.Stop
-		local v121 = not not GetFFlagSupportGamepadNavInVoiceModals() or nil
-		local v122 = if not v46 then Roact.createElement(Button, {
-			layoutOrder = 1,
-			buttonType = ButtonType.PrimarySystem,
-			size = UDim2.new(1, -5, 0, 48),
-			text = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() or (not VoiceNudgeUseNewDACopy() or not v99) then if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() or (not v96 or (not VoiceNudgeUseNewDACopy() or p18.state.promptType ~= PromptType.VoiceToxicityModalV2)) then if not v96 then v59 else v60 else v63 else v63,
-			onActivated = p18.handlePrimayActivated,
-			Selectable = v121
-		}) else Roact.createElement("TextButton", {
-			Size = UDim2.new(1, -5, 0, 48),
-			LayoutOrder = 1,
-			Text = if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() or (not VoiceNudgeUseNewDACopy() or not v99) then if not GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() or (not v96 or (not VoiceNudgeUseNewDACopy() or p18.state.promptType ~= PromptType.VoiceToxicityModalV2)) then if not v96 then v59 else v60 else v63 else v63,
-			[Roact.Event.Activated] = p18.handlePrimayActivated,
-			[Roact.Event.MouseEnter] = function(p19) -- line: 619
-				-- upvalues: color3_2 (copy)
-				p19.BackgroundColor3 = color3_2
-			end,
-			[Roact.Event.MouseLeave] = function(p20) -- line: 622
-				-- upvalues: color3 (copy)
-				p20.BackgroundColor3 = color3
-			end,
-			Selectable = v121,
-			BackgroundColor3 = color3,
-			BackgroundTransparency = 0,
-			TextColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-			AutoButtonColor = false,
-			Font = Enum.Font.BuilderSansBold,
-			TextSize = 20
-		}, {
-			Corner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 8)
+		local v25 = 20 + v24
+		local v26
+
+		if
+			FFlagVoiceChatBanDurationUseServerTime
+			or v19
+			or GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and v20
+		then
+			v26 = props.state.banEnd
+		else
+			v26 = formatByKey2 .. props.state.banEnd
+		end
+
+		local v27
+
+		if props.state.banEnd == "" then
+			v27 = props.state.toastContent.toastSubtitle .. props.state.banEnd
+		else
+			v27 = "<b>" .. v26 .. "</b><br />" .. props.state.toastContent.toastSubtitle
+		end
+
+		local text = errorText or v27
+		local font2 = props.promptStyle.Font.Body.Font
+		local v28 = props.promptStyle.Font.Body.RelativeSize * props.promptStyle.Font.BaseSize
+		local v29
+
+		if FoundationFontFaceMigration then
+			v29 = GetTextSize(text, v28, font2, Vector2.new(325, 1e999), {
+				addTemporaryPadding = false
+			}).Y
+		else
+			v29 = TextService:GetTextSize(text, v28, font2, Vector2.new(325, 1e999)).Y
+		end
+
+		local v30 = 20 + v29
+
+		if v19 or v20 then
+			v30 += 20
+		end
+
+		local text2
+
+		if v19 then
+			text2 = formatByKey6
+		elseif GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and v20 then
+			text2 = v14
+		else
+			text2 = formatByKey
+		end
+
+		local v31
+
+		if FoundationFontFaceMigration then
+			v31 = GetTextSize(text2, v28, font2, Vector2.new(325, 1e999), {
+				addTemporaryPadding = false
+			}).Y
+		else
+			v31 = TextService:GetTextSize(text2, v28, font2, Vector2.new(325, 1e999)).Y
+		end
+
+		local v32 = 20 + v31
+
+		local secondaryButton = ShouldShowSecondaryButton(props.state.promptType) -- inferred equivalent call
+		local stop
+
+		if GetFFlagSupportGamepadNavInVoiceModals() then
+			stop = Enum.SelectionBehavior.Stop
+		end
+
+		local v38 = GetFFlagSupportGamepadNavInVoiceModals() and true or nil
+		local confirmButton
+
+		if defineFastFlag2 then
+			local createElement = Roact.createElement
+			local v41 = {}
+			v41.Size = UDim2.new(1, -5, 0, 48)
+			v41.LayoutOrder = 1
+			local text3
+
+			if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and VoiceNudgeUseNewDACopy() and v20 then
+				text3 = v13
+			elseif
+				GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+				and modalNudge
+				and VoiceNudgeUseNewDACopy()
+				and props.state.promptType == PromptType.VoiceToxicityModalV2
+			then
+				text3 = v13
+			elseif modalNudge then
+				text3 = formatByKey4
+			else
+				text3 = formatByKey3
+			end
+
+			v41.Text = text3
+
+			v41[Roact.Event.Activated] = props.handlePrimayActivated
+			v41[Roact.Event.MouseEnter] = function(p)
+				p.BackgroundColor3 = color2
+			end
+			v41[Roact.Event.MouseLeave] = function(p)
+				p.BackgroundColor3 = color
+			end
+			v41.Selectable = v38
+			v41.BackgroundColor3 = color
+			v41.BackgroundTransparency = 0
+			v41.TextColor3 = Color3.fromRGB(0, 0, 0)
+			v41.BorderSizePixel = 0
+			v41.AutoButtonColor = false
+
+			v41.Font = Enum.Font.BuilderSansBold
+			v41.TextSize = 20
+			confirmButton = createElement("TextButton", v41, {
+				Corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) })
 			})
-		})
-		local v123 = Roact.createElement("ScreenGui", {
+		else
+			local createElement = Roact.createElement
+			local v40 = {
+				buttonType = ButtonType.PrimarySystem,
+				layoutOrder = 1,
+				size = UDim2.new(1, -5, 0, 48),
+				text = 0,
+				onActivated = 0,
+				Selectable = 0
+			}
+			local text3
+
+			if GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2() and VoiceNudgeUseNewDACopy() and v20 then
+				text3 = v13
+			elseif
+				GetFFlagVoiceChatDisruptiveVoiceNudgeEnableVariant2()
+				and modalNudge
+				and VoiceNudgeUseNewDACopy()
+				and props.state.promptType == PromptType.VoiceToxicityModalV2
+			then
+				text3 = v13
+			elseif modalNudge then
+				text3 = formatByKey4
+			else
+				text3 = formatByKey3
+			end
+
+			v40.text = text3
+
+			v40.onActivated = props.handlePrimayActivated
+			v40.Selectable = v38
+			confirmButton = createElement(Button, v40)
+		end
+
+		local createElement = Roact.createElement
+		local v41 = {
 			DisplayOrder = 8,
 			IgnoreGuiInset = true,
 			OnTopOfCoreBlur = true,
-			Enabled = p18.state.showPrompt,
+			Enabled = props.state.showPrompt,
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-		}, {
+		}
+		local v42 = {
 			Overlay = Roact.createElement("TextButton", {
 				AutoButtonColor = false,
+				BackgroundColor3 = props.promptStyle.Theme.Overlay.Color,
+				BackgroundTransparency = props.promptStyle.Theme.Overlay.Transparency,
 				BorderSizePixel = 0,
-				Text = "",
-				BackgroundColor3 = p18.promptStyle.Theme.Overlay.Color,
-				BackgroundTransparency = p18.promptStyle.Theme.Overlay.Transparency,
-				Size = UDim2.new(1, 0, 1, 0)
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = ""
 			}),
-			DialogMainFrame = Roact.createElement(UIBlox.Core.ImageSet.ImageSetLabel, {
-				BackgroundTransparency = 1,
+			DialogMainFrame = 0
+		}
+
+		local createElement2 = Roact.createElement
+		local imageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+		local v43 = {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = 1,
+			Image = Assets.Images.RoundedRect.Image,
+			ImageColor3 = props.promptStyle.Theme.BackgroundUIDefault.Color,
+			ImageTransparency = props.promptStyle.Theme.BackgroundUIDefault.Transparency,
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			ScaleType = Assets.Images.RoundedRect.ScaleType,
+			Size = UDim2.new(0, 365, 0, 55 + v25 + 1 + v30 + 14 + v32 + 36 + 40),
+			AutomaticSize = y,
+			SliceCenter = Assets.Images.RoundedRect.SliceCenter,
+			SelectionBehaviorDown = stop,
+			SelectionBehaviorLeft = stop,
+			SelectionBehaviorRight = stop,
+			SelectionBehaviorUp = stop,
+			SelectionGroup = v38,
+			ref = 0
+		}
+		local ref
+
+		if GetFFlagSupportGamepadNavInVoiceModals() then
+			ref = props.ref
+		end
+
+		v43.ref = ref
+		local v45 = {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 20),
+				PaddingBottom = UDim.new(0, 20),
+				PaddingLeft = UDim.new(0, 20),
+				PaddingRight = UDim.new(0, 20)
+			}),
+			Layout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Icon = Roact.createElement(UIBlox.Core.ImageSet.ImageSetLabel, {
+				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Image = Assets.Images.RoundedRect.Image,
-				ImageColor3 = p18.promptStyle.Theme.BackgroundUIDefault.Color,
-				ImageTransparency = p18.promptStyle.Theme.BackgroundUIDefault.Transparency,
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				ScaleType = Assets.Images.RoundedRect.ScaleType,
-				Size = UDim2.new(0, 365, 0, 55 + v109 + 1 + v115 + 14 + v117 + 36 + 40),
-				AutomaticSize = AutomaticSizeY,
-				SliceCenter = Assets.Images.RoundedRect.SliceCenter,
-				SelectionBehaviorDown = v120,
-				SelectionBehaviorLeft = v120,
-				SelectionBehaviorRight = v120,
-				SelectionBehaviorUp = v120,
-				SelectionGroup = v121,
-				ref = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else p18.ref
-			}, {
-				Padding = Roact.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, 20),
-					PaddingBottom = UDim.new(0, 20),
-					PaddingLeft = UDim.new(0, 20),
-					PaddingRight = UDim.new(0, 20)
-				}),
-				Layout = Roact.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder
-				}),
-				Icon = Roact.createElement(UIBlox.Core.ImageSet.ImageSetLabel, {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					BorderSizePixel = 0,
-					Position = UDim2.fromScale(0.5, 0.5),
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Image = p18.state.toastContent.iconImage,
-					Size = UDim2.new(0, 55, 0, 55)
-				}),
-				TitleTextContainer = Roact.createElement("Frame", {
+				Image = props.state.toastContent.iconImage,
+				Size = UDim2.new(0, 55, 0, 55),
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0
+			}),
+			TitleTextContainer = Roact.createElement(
+				"Frame",
+				{
 					BackgroundTransparency = 1,
 					LayoutOrder = 2,
-					Size = UDim2.new(1, 0, 0, v109),
-					AutomaticSize = AutomaticSizeY
-				}, {
+					Size = UDim2.new(1, 0, 0, v25),
+					AutomaticSize = y
+				},
+				{
 					TitleText = Roact.createElement(UIBlox.App.Text.StyledTextLabel, {
-						fontStyle = p18.promptStyle.Font.Header1,
-						colorStyle = p18.promptStyle.Theme.SystemPrimaryDefault,
+						fontStyle = props.promptStyle.Font.Header1,
+						colorStyle = props.promptStyle.Theme.SystemPrimaryDefault,
 						textXAlignment = Enum.TextXAlignment.Center,
 						size = UDim2.new(1, 0, 1, 0),
 						text = toastTitle
 					})
-				}),
-				Divider = Roact.createElement("Frame", {
-					BorderSizePixel = 0,
-					LayoutOrder = 3,
-					BackgroundColor3 = p18.promptStyle.Theme.Divider.Color,
-					BackgroundTransparency = p18.promptStyle.Theme.Divider.Transparency,
-					Size = UDim2.new(0.8, 0, 0, 1)
-				}),
-				DividerSpaceContainer = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 4,
-					Size = UDim2.new(1, 0, 0, 7)
-				}),
-				BodyTextContainer = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 5,
-					Size = UDim2.new(1, 0, 0, v115)
-				}, {
+				}
+			),
+			Divider = Roact.createElement("Frame", {
+				BackgroundColor3 = props.promptStyle.Theme.Divider.Color,
+				BackgroundTransparency = props.promptStyle.Theme.Divider.Transparency,
+				BorderSizePixel = 0,
+				LayoutOrder = 3,
+				Size = UDim2.new(0.8, 0, 0, 1)
+			}),
+			DividerSpaceContainer = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 4,
+				Size = UDim2.new(1, 0, 0, 7)
+			}),
+			BodyTextContainer = Roact.createElement(
+				"Frame",
+				{ BackgroundTransparency = 1, LayoutOrder = 5, Size = UDim2.new(1, 0, 0, v30) },
+				{
 					BodyText = Roact.createElement(UIBlox.App.Text.StyledTextLabel, {
-						fontStyle = p18.promptStyle.Font.Body,
-						colorStyle = p18.promptStyle.Theme.TextDefault,
+						fontStyle = props.promptStyle.Font.Body,
+						colorStyle = props.promptStyle.Theme.TextDefault,
 						textXAlignment = Enum.TextXAlignment.Center,
 						size = UDim2.new(1, 0, 1, 0),
-						text = v112
+						text = text
 					})
-				}),
-				TextSpaceContainer = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 6,
-					Size = UDim2.new(1, 0, 0, 7)
-				}),
-				SubBodyTextContainer = not v96 and Roact.createElement("Frame", {
+				}
+			),
+			TextSpaceContainer = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 6,
+				Size = UDim2.new(1, 0, 0, 7)
+			}),
+			SubBodyTextContainer = not modalNudge and Roact.createElement(
+				"Frame",
+				{
 					BackgroundTransparency = 1,
 					LayoutOrder = 7,
-					Size = UDim2.new(1, 0, 0, v117),
-					AutomaticSize = AutomaticSizeY
-				}, {
+					Size = UDim2.new(1, 0, 0, v32),
+					AutomaticSize = y
+				},
+				{
 					BodyText = Roact.createElement(UIBlox.App.Text.StyledTextLabel, {
-						fontStyle = p18.promptStyle.Font.Body,
-						colorStyle = p18.promptStyle.Theme.TextDefault,
+						fontStyle = props.promptStyle.Font.Body,
+						colorStyle = props.promptStyle.Theme.TextDefault,
 						textXAlignment = Enum.TextXAlignment.Center,
 						size = UDim2.new(1, 0, 1, 0),
-						text = v116
+						text = text2
 					})
-				}),
-				SpaceContainer2 = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 8,
-					Size = UDim2.new(1, 0, 0, 10)
-				}),
-				ButtonContainer = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 9,
-					Size = UDim2.new(1, 0, 0, 36),
-					AutomaticSize = AutomaticSizeY
-				}, {
-					Layout = Roact.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						Padding = UDim.new(0, 20),
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						VerticalAlignment = Enum.VerticalAlignment.Center
-					}),
-					ConfirmButton = v122,
-					SecondaryButton = v119 and Roact.createElement(UIBlox.App.Button.LinkButton, {
-						colorStyleDefault = "TextMuted",
-						colorStyleHover = "TextMuted",
-						layoutOrder = not v46 and 1 or 2,
-						size = UDim2.new(1, -5, 0, 36),
-						text = if not v100 then v61 else v65,
-						onActivated = p18.handleSecondaryActivated
-					})
-				})
-			})
-		})
+				}
+			),
+			SpaceContainer2 = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 8,
+				Size = UDim2.new(1, 0, 0, 10)
+			}),
+			ButtonContainer = 0
+		}
 
-		if v103 then
-			v123 = Roact.createElement(DevicePermissionsModal, {
-				titleText = t1[p18.state.promptType],
-				bodyText = t2[p18.state.promptType],
-				handlePrimaryActivated = p18.handlePrimayActivated,
-				handleSecondaryActivated = p18.handleSecondaryActivated,
-				Analytics = p18.props.Analytics,
-				promptStyle = p18.promptStyle,
-				showPrompt = p18.state.showPrompt,
-				settingsAppAvailable = p18.props.settingsAppAvailable,
-				UserInputService = if p18.props.UserInputService == nil then UserInputService else p18.props.UserInputService,
-				ref = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else p18.ref
-			})
+		local createElement3 = Roact.createElement
+		local v47 = {
+			BackgroundTransparency = 1,
+			LayoutOrder = 9,
+			Size = UDim2.new(1, 0, 0, 36),
+			AutomaticSize = y
+		}
+
+		local v48 = {
+			Layout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 20),
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			ConfirmButton = confirmButton,
+			SecondaryButton = 0
+		}
+
+		if secondaryButton then
+			local createElement4 = Roact.createElement
+			local linkButton = UIBlox.App.Button.LinkButton
+			local v49 = {
+				layoutOrder = defineFastFlag2 and 2 or 1,
+				size = UDim2.new(1, -5, 0, 36),
+				text = 0,
+				colorStyleDefault = "TextMuted",
+				colorStyleHover = "TextMuted",
+				onActivated = 0
+			}
+			local text3 = if v21 then v15 else formatByKey5
+			v49.text = text3
+
+			v49.onActivated = props.handleSecondaryActivated
+			secondaryButton = createElement4(linkButton, v49)
 		end
 
-		if v102 then
-			v123 = Roact.createElement(VoiceChatConsentModal, {
-				titleText = t1[p18.state.promptType],
-				bodyText = t2[p18.state.promptType],
-				handlePrimaryActivated = p18.handlePrimayActivated,
-				handleSecondaryActivated = p18.handleSecondaryActivated,
-				Analytics = p18.props.Analytics,
-				showCheckbox = p18.props.showCheckbox,
-				promptStyle = p18.promptStyle,
-				showPrompt = p18.state.showPrompt,
-				ref = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else p18.ref
-			})
-		end
+		v48.SecondaryButton = secondaryButton
+		v45.ButtonContainer = createElement3("Frame", v47, v48)
+		v42.DialogMainFrame = createElement2(imageSetLabel, v43, v45)
+		local inGameMenuInformationalDialog = createElement("ScreenGui", v41, v42)
 
-		return (Roact.createElement(Roact.Portal, {
-			target = CoreGui
-		}, {
-			InGameMenuInformationalDialog = v123
-		}))
-	end
+		if v22 then
+			local createElement4 = Roact.createElement
+			local v50 = {
+				titleText = v[props.state.promptType],
+				bodyText = v7[props.state.promptType],
+				handlePrimaryActivated = props.handlePrimayActivated,
+				handleSecondaryActivated = props.handleSecondaryActivated,
+				Analytics = props.props.Analytics,
+				promptStyle = props.promptStyle,
+				showPrompt = props.state.showPrompt,
+				settingsAppAvailable = props.props.settingsAppAvailable,
+				UserInputService = 0,
+				ref = 0
+			}
+			local userInputService
 
-	if p18.state.promptType == PromptType.JoinVoiceSTUX then
-		return (Roact.createElement(VoiceChatTooltip, {
-			titleText = t1[p18.state.promptType],
-			subtitleText = t2[p18.state.promptType],
-			promptStyle = p18.promptStyle,
-			showPrompt = p18.state.showPrompt,
-			onClose = function() -- line: 854
-				-- upvalues: p18 (copy)
-				p18:setState({
-					showPrompt = false
-				})
-			end,
-			onMenuOpen = p18.hideOnMenuOpen
-		}))
-	end
-
-	local v124 = if not v97 then p18.state.promptType ~= PromptType.JoinedVoiceToast and 3 or GetFIntVoiceJoinM3ToastDurationSeconds() else GetFIntVoiceToxicityToastDurationSeconds()
-	local showPrompt = p18.state.showPrompt
-
-	if p18.state.promptType == PromptType.VoiceDataConsentOptOutToast and GetFFlagEnableSeamlessVoiceDataConsentToast() then
-		showPrompt = not not p18.props.showDataConsentToast and p18.props.showDataConsentToast
-	end
-
-	return (Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		[Roact.Change.AbsoluteSize] = p18.onScreenSizeChanged
-	}, {
-		Toast = p18.state.promptType ~= PromptType.None and Roact.createElement(Toast, {
-			duration = if not v97 then v124 else GetFIntVoiceToxicityToastDurationSeconds(),
-			toastContent = p18.state.toastContent,
-			show = showPrompt
-		}),
-		EventConnection = p18.props.promptSignal and Roact.createElement(ExternalEventConnection, {
-			event = p18.props.promptSignal,
-			callback = p18.promptSignalCallback
-		})
-	}))
-end
-function v76.didUpdate(p21) -- line: 898
-	-- upvalues: GetFFlagSupportGamepadNavInVoiceModals (copy), Responsive (copy), GuiService (copy)
-	if GetFFlagSupportGamepadNavInVoiceModals() then
-		if p21.props.lastInput == Responsive.Input.Directional then
-			local v127 = p21.ref:getValue()
-
-			if p21.state.showPrompt and v127 then
-				GuiService:Select(v127)
+			if props.props.UserInputService == nil then
+				userInputService = UserInputService
+			else
+				userInputService = props.props.UserInputService
 			end
 
-			if not p21.state.showPrompt and v127 then
-				GuiService.SelectedCoreObject = nil
+			v50.UserInputService = userInputService
+			local ref2
 
-				return
+			if GetFFlagSupportGamepadNavInVoiceModals() then
+				ref2 = props.ref
+			end
+
+			v50.ref = ref2
+			inGameMenuInformationalDialog = createElement4(DevicePermissionsModal, v50)
+		end
+
+		if voiceConsentModal then
+			local createElement4 = Roact.createElement
+			local v50 = {
+				titleText = v[props.state.promptType],
+				bodyText = v7[props.state.promptType],
+				handlePrimaryActivated = props.handlePrimayActivated,
+				handleSecondaryActivated = props.handleSecondaryActivated,
+				Analytics = props.props.Analytics,
+				showCheckbox = props.props.showCheckbox,
+				promptStyle = props.promptStyle,
+				showPrompt = props.state.showPrompt,
+				ref = 0
+			}
+			local ref2
+
+			if GetFFlagSupportGamepadNavInVoiceModals() then
+				ref2 = props.ref
+			end
+
+			v50.ref = ref2
+			inGameMenuInformationalDialog = createElement4(VoiceChatConsentModal, v50)
+		end
+
+		return (Roact.createElement(Roact.Portal, { target = CoreGui }, {
+			InGameMenuInformationalDialog = inGameMenuInformationalDialog
+		}))
+	else
+		if props.state.promptType == PromptType.JoinVoiceSTUX then
+			return (Roact.createElement(VoiceChatTooltip, {
+				titleText = v[props.state.promptType],
+				subtitleText = v7[props.state.promptType],
+				promptStyle = props.promptStyle,
+				showPrompt = props.state.showPrompt,
+				onClose = function()
+					props:setState({ showPrompt = false })
+				end,
+				onMenuOpen = props.hideOnMenuOpen
+			}))
+		end
+
+		local duration
+
+		if v18 then
+			duration = GetFIntVoiceToxicityToastDurationSeconds()
+		else
+			duration = props.state.promptType ~= PromptType.JoinedVoiceToast and 3
+				or GetFIntVoiceJoinM3ToastDurationSeconds()
+		end
+
+		local show = props.state.showPrompt
+
+		if
+			props.state.promptType == PromptType.VoiceDataConsentOptOutToast
+			and GetFFlagEnableSeamlessVoiceDataConsentToast()
+		then
+			if props.props.showDataConsentToast then
+				show = props.props.showDataConsentToast
+			else
+				show = false
+			end
+		end
+
+		local createElement = Roact.createElement
+		local onScreenSizeChangedsByAbsoluteSize = {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			[Roact.Change.AbsoluteSize] = props.onScreenSizeChanged
+		}
+		local toast
+
+		if props.state.promptType == PromptType.None then
+			toast = false
+		else
+			local createElement2 = Roact.createElement
+
+			if v18 then
+				duration = GetFIntVoiceToxicityToastDurationSeconds()
+			end
+
+			toast = createElement2(Toast, {
+				duration = duration,
+				toastContent = props.state.toastContent,
+				show = show
+			})
+		end
+
+		return (createElement("Frame", onScreenSizeChangedsByAbsoluteSize, {
+			Toast = toast,
+			EventConnection = props.props.promptSignal and Roact.createElement(ExternalEventConnection, {
+				event = props.props.promptSignal,
+				callback = props.promptSignalCallback
+			})
+		}))
+	end
+end
+
+function extended.didUpdate(data)
+	if GetFFlagSupportGamepadNavInVoiceModals() then
+		if data.props.lastInput == Responsive.Input.Directional then
+			local value = data.ref:getValue()
+
+			if data.state.showPrompt and value then
+				GuiService:Select(value)
+			end
+
+			if not data.state.showPrompt and value then
+				GuiService.SelectedCoreObject = nil
 			end
 		elseif GuiService.SelectedCoreObject then
 			GuiService.SelectedCoreObject = nil
 		end
 	end
 end
-function v76.didMount(p22) -- line: 930
-	-- upvalues: ContextActionService (copy)
-	if p22.props.onReadyForSignal then
-		p22.props.onReadyForSignal()
+
+function extended.didMount(p)
+	if p.props.onReadyForSignal then
+		p.props.onReadyForSignal()
 	end
 
-	ContextActionService:BindCoreAction("CloseVoiceBanPrompt", p22.checkInputStateForClosePrompt, false, Enum.KeyCode.ButtonA)
-	ContextActionService:BindCoreAction("CloseVoiceBanPrompt", p22.checkInputStateForClosePrompt, false, Enum.KeyCode.ButtonB)
+	ContextActionService:BindCoreAction(
+		"CloseVoiceBanPrompt",
+		p.checkInputStateForClosePrompt,
+		false,
+		Enum.KeyCode.ButtonA
+	)
+
+	ContextActionService:BindCoreAction(
+		"CloseVoiceBanPrompt",
+		p.checkInputStateForClosePrompt,
+		false,
+		Enum.KeyCode.ButtonB
+	)
 end
 
-local u77 = InGameMenuPolicy.connect(function(p23, _) -- line: 948
+local v18 = InGameMenuPolicy.connect(function(p, _)
 	return {
-		showNewContent = p23.getGameInfoShowChatFeatures(),
-		showCheckbox = p23.getDisplayCheckboxInVoiceConsent(),
-		showDataConsentToast = p23.getDisplayCheckboxInVoiceConsent() ~= nil and p23.getDisplayCheckboxInVoiceConsent()
+		showNewContent = p.getGameInfoShowChatFeatures(),
+		showCheckbox = p.getDisplayCheckboxInVoiceConsent(),
+		showDataConsentToast = p.getDisplayCheckboxInVoiceConsent() ~= nil and p.getDisplayCheckboxInVoiceConsent()
 	}
-end)(v76)
+end)(extended)
 
-local function WrappedVoiceChatPromptFrame(p25) -- line: 958
-	-- upvalues: useStyle (copy), GetFFlagSupportGamepadNavInVoiceModals (copy), useLastInput (copy), Roact (copy), u77 (ref), Cryo (copy)
-	local v132 = useStyle()
-	local v133 = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else useLastInput()
+local function WrappedVoiceChatPromptFrame(p)
+	local appStyle = useStyle()
+	local lastInput
 
-	return Roact.createElement(u77, Cryo.Dictionary.join(p25, {
-		appStyle = v132,
-		lastInput = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else v133
-	}))
+	if GetFFlagSupportGamepadNavInVoiceModals() then
+		lastInput = useLastInput()
+	end
+
+	local createElement = Roact.createElement
+
+	local join = Cryo.Dictionary.join
+
+	if not GetFFlagSupportGamepadNavInVoiceModals() then
+		lastInput = nil
+	end
+
+	return createElement(v18, join(p, { appStyle = appStyle, lastInput = lastInput }))
 end
 
-return function(p26) -- line: 969
-	-- upvalues: renderWithCoreScriptsStyleProvider (copy), Roact (copy), WrappedVoiceChatPromptFrame (copy)
-	return renderWithCoreScriptsStyleProvider({ Roact.createElement(WrappedVoiceChatPromptFrame, p26) })
+return function(p)
+	return renderWithCoreScriptsStyleProvider({ Roact.createElement(WrappedVoiceChatPromptFrame, p) })
 end

@@ -1,12 +1,13 @@
 local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
 
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(s1: string, s2: string, p1, p2) -- line: 20
+return Rodux.makeActionCreator(script.Name, function(promptType: string, guid: string, scopes, makeupEntries)
 	return {
 		promptInfo = {
-			promptType = s1,
-			guid = s2,
-			scopes = p1,
-			makeupEntries = p2
+			promptType = promptType,
+			guid = guid,
+			scopes = scopes,
+			makeupEntries = makeupEntries
 		}
 	}
 end)

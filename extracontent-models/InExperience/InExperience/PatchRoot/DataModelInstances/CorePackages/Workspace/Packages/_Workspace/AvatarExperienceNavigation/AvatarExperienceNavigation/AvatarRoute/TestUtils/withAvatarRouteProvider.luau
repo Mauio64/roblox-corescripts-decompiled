@@ -1,74 +1,68 @@
 local AvatarExperienceNavigation = script:FindFirstAncestor("AvatarExperienceNavigation")
-local AvatarExperienceNavigationParent = AvatarExperienceNavigation.Parent
-local React = require(AvatarExperienceNavigationParent.React)
-
+local parent = AvatarExperienceNavigation.Parent
+local React = require(parent.React)
 require(AvatarExperienceNavigation.AvatarRoute.Types)
-
 local AvatarScreen = require(AvatarExperienceNavigation.Enums.AvatarScreen)
 local AvatarRouteContext = require(AvatarExperienceNavigation.AvatarRoute.Context.AvatarRouteContext)
 local AvatarRoute = require(AvatarExperienceNavigation.AvatarRoute.AvatarRoute)
 
-local function avatarRouteFromString(s1: string) -- line: 17
-	-- upvalues: AvatarRoute (copy)
-	local t1 = {
-		name = s1,
-		key = s1,
-		params = {}
-	}
+local function avatarRouteFromString(name: string)
+	local v = { name = name, key = name, params = {} }
 
 	return AvatarRoute.new({
+		current = v,
+		previousPages = { v },
+		opaque = v,
 		isVisible = true,
-		isOverlayVisible = false,
-		current = t1,
-		previousPages = { t1 },
-		opaque = t1
+		isOverlayVisible = false
 	})
 end
-local function avatarRouteFromTable(p1) -- line: 32
-	-- upvalues: AvatarScreen (copy), AvatarRoute (copy)
-	local v12 = p1 or {}
-	local v13 = v12.current or {}
-	local v14 = v12.previous or {}
-	local v15 = v12.opaque or {}
-	local v16 = v13.name or AvatarScreen.None
-	local v17 = v14.name or AvatarScreen.None
-	local v18 = v15.name or AvatarScreen.None
 
+local function avatarRouteFromTable(options)
+	local v = options or {}
+	local current = v.current or {}
+	local previous = v.previous or {}
+	local opaque = v.opaque or {}
+	local name = current.name or AvatarScreen.None
+	local name2 = previous.name or AvatarScreen.None
+	local name3 = opaque.name or AvatarScreen.None
 	return AvatarRoute.new({
 		current = {
-			name = v16,
-			key = v13.key or v16,
-			params = v13.params or {}
+			name = name,
+			key = current.key or name,
+			params = current.params or {}
 		},
-		previousPages = {{
-			name = v17,
-			key = v14.key or v17,
-			params = v14.params or {}
-		}},
+		previousPages = {
+			{
+				name = name2,
+				key = previous.key or name2,
+				params = previous.params or {}
+			}
+		},
 		opaque = {
-			name = v18,
-			key = v15.key or v18,
-			params = v15.params or {}
+			name = name3,
+			key = opaque.key or name3,
+			params = opaque.params or {}
 		},
-		isVisible = v12.isVisible ~= false,
-		isOverlayVisible = v12.isOverlayVisible == true
+		isVisible = v.isVisible ~= false,
+		isOverlayVisible = v.isOverlayVisible == true
 	})
 end
 
-return function(p2, p3) -- line: 72
-	-- upvalues: avatarRouteFromString (copy), avatarRouteFromTable (copy), React (copy), AvatarRouteContext (copy)
-	local v21 = if type(p3) ~= "string" then avatarRouteFromTable(p3) else avatarRouteFromString(p3)
+return function(p, name)
+	local v
 
-	return React.forwardRef(function(p4, p5) -- line: 77
-		-- upvalues: React (copy), AvatarRouteContext (copy), v21 (copy), p2 (copy)
-		local v24 = table.clone(p4)
+	if type(name) == "string" then
+		v = avatarRouteFromString(name)
+	else
+		v = avatarRouteFromTable(name)
+	end
 
-		v24.ref = p5
-
-		return React.createElement(AvatarRouteContext.Provider, {
-			value = v21
-		}, {
-			component = React.createElement(p2, v24)
+	return React.forwardRef(function(p2, ref)
+		local clone = table.clone(p2)
+		clone.ref = ref
+		return React.createElement(AvatarRouteContext.Provider, { value = v }, {
+			component = React.createElement(p, clone)
 		})
 	end)
 end

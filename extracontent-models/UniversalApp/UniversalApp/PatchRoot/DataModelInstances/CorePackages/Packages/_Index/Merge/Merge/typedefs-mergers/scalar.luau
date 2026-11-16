@@ -1,32 +1,46 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
-local Kind = require(ParentParent.GraphQL).Kind
-local mergeDirectives = require(script.Parent.directives).mergeDirectives
+local Scalar = {}
+local GraphQL = require(parent.GraphQL)
+local Kind = GraphQL.Kind
+
+local directives = require(script.Parent.directives)
+local mergeDirectives = directives.mergeDirectives
 
 require(script.Parent["merge-typedefs_types"])
 
-function t1.mergeScalar(p1, p2, p3) -- line: 24
-	-- upvalues: Boolean (copy), mergeDirectives (copy), Object (copy), Kind (copy)
-	if p2 then
-		return {
-			name = p1.name,
-			description = if not Boolean.toJSBoolean(p1.description) then p2.description else p1.description,
-			kind = not (not not p3 and Boolean.toJSBoolean(p3.convertExtensions)) and (p1.kind ~= "ScalarTypeDefinition" and p2.kind ~= "ScalarTypeDefinition") and "ScalarTypeExtension" or "ScalarTypeDefinition",
-			loc = p1.loc,
-			directives = mergeDirectives(p1.directives, p2.directives, p3)
+function Scalar.mergeScalar(data, data2, p)
+	if data2 then
+		local v = {
+			name = data.name,
+			description = 0,
+			kind = 0,
+			loc = 0,
+			directives = 0
 		}
-	end
+		local description
 
-	if p3 and Boolean.toJSBoolean(p3.convertExtensions) then
-		return (Object.assign({}, p1, {
-			kind = Kind.SCALAR_TYPE_DEFINITION
-		}))
-	end
+		if Boolean.toJSBoolean(data.description) then
+			description = data.description
+		else
+			description = data2.description
+		end
 
-	return p1
+		v.description = description
+
+		v.kind = (p and Boolean.toJSBoolean(p.convertExtensions) or data.kind == "ScalarTypeDefinition" or data2.kind == "ScalarTypeDefinition")
+			and "ScalarTypeDefinition"
+			or "ScalarTypeExtension"
+
+		v.loc = data.loc
+		v.directives = mergeDirectives(data.directives, data2.directives, p)
+		return v
+	elseif p and Boolean.toJSBoolean(p.convertExtensions) then
+		return (Object.assign({}, data, { kind = Kind.SCALAR_TYPE_DEFINITION }))
+	else
+		return data
+	end
 end
-
-return t1
+return Scalar

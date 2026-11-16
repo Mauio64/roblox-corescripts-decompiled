@@ -1,102 +1,88 @@
 local VirtualEventsState = script:FindFirstAncestor("VirtualEventsState")
+
 local Rodux = require(VirtualEventsState.Parent.Rodux)
 local Cryo = require(VirtualEventsState.Parent.Cryo)
-
 require(VirtualEventsState.Parent.NetworkingVirtualEvents)
 
-return function(p1, p2) -- line: 31
-	-- upvalues: Rodux (copy), Cryo (copy)
-	local v6 = Rodux.createReducer({
-		nextPageCursor = nil,
-		prevPageCursor = nil
-	}, {
-		[p1.GetVirtualEventRsvps.Succeeded.name] = function(_: {[any]: any}, p3) -- line: 36
+return function(data, p)
+	local reducer = Rodux.createReducer({ nextPageCursor = nil, prevPageCursor = nil }, {
+		[data.GetVirtualEventRsvps.Succeeded.name] = function(_, p2)
 			return {
-				nextPageCursor = p3.responseBody.nextPageCursor,
-				prevPageCursor = p3.responseBody.prevPageCursor
+				nextPageCursor = p2.responseBody.nextPageCursor,
+				prevPageCursor = p2.responseBody.prevPageCursor
 			}
 		end
 	})
-	local v7 = Rodux.createReducer({}, {
-		[p1.GetVirtualEventRsvpCounts.Succeeded.name] = function(t2: {[any]: any}, p4) -- line: 45
-			-- upvalues: Cryo (copy)
-			local v13 = p4.ids[1]
 
-			return Cryo.Dictionary.join(t2, {
-				[v13] = p4.responseBody.counters
-			})
+	local reducer2 = Rodux.createReducer({}, {
+		[data.GetVirtualEventRsvpCounts.Succeeded.name] = function(p2, p3)
+			local id = p3.ids[1]
+
+			return Cryo.Dictionary.join(p2, { [id] = p3.responseBody.counters })
 		end,
-		[p1.GetVirtualEventRsvpCounts.Failed.name] = function(t3: {[any]: any}, _) -- line: 53
-			return t3
+		[data.GetVirtualEventRsvpCounts.Failed.name] = function(p2, _)
+			return p2
 		end,
-		[p1.UpdateMyRsvpStatus.Succeeded.name] = function(t4: {[any]: any}, p6) -- line: 57
-			-- upvalues: Cryo (copy)
-			local v18 = p6.ids[1]
-			local v19 = t4[v18]
+		[data.UpdateMyRsvpStatus.Succeeded.name] = function(p2, p3)
+			local id = p3.ids[1]
+			local v = p2[id]
 
-			if v19 then
-				local rsvpStatus = p6.postBody.rsvpStatus
-				local n1 = 0
+			if not v then
+				return p2
+			end
 
-				if rsvpStatus == "going" then
-					n1 = 1
-				elseif rsvpStatus == "notGoing" then
-					n1 = -1
-				end
+			local rsvpStatus = p3.postBody.rsvpStatus
 
-				return Cryo.Dictionary.join(t4, {
-					[v18] = Cryo.Dictionary.join(v19, {
-						going = math.clamp(v19.going + n1, 0, 1e999)
-					})
+			local v2 = rsvpStatus == "going" and 1 or rsvpStatus == "notGoing" and -1 or 0
+
+			return Cryo.Dictionary.join(p2, {
+				[id] = Cryo.Dictionary.join(v, {
+					going = math.clamp(v.going + v2, 0, 1e999)
 				})
-			end
-
-			return t4
+			})
 		end,
-		[p1.UpdateMyRsvpStatus.Failed.name] = function(t5: {[any]: any}, _) -- line: 88
-			return t5
+		[data.UpdateMyRsvpStatus.Failed.name] = function(p2, _)
+			return p2
 		end
 	})
-	local v8 = Rodux.createReducer({}, {
-		[p1.GetVirtualEventRsvps.Succeeded.name] = function(t6: {[any]: any}, p8) -- line: 94
-			-- upvalues: Cryo (copy)
-			local v26 = p8.ids[1]
-			local t7 = {}
 
-			for _, v29 in p8.responseBody.data do
-				t7[tostring(v29.userId)] = v29
+	local reducer3 = Rodux.createReducer({}, {
+		[data.GetVirtualEventRsvps.Succeeded.name] = function(p2, p3)
+			local id = p3.ids[1]
+
+			local v = {}
+
+			for _, v2 in p3.responseBody.data do
+				v[tostring(v2.userId)] = v2
 			end
 
-			return Cryo.Dictionary.join(t6, {
-				[v26] = Cryo.Dictionary.join(t6[v26] or {}, t7)
+			return Cryo.Dictionary.join(p2, {
+				[id] = Cryo.Dictionary.join(p2[id] or {}, v)
 			})
 		end,
-		[p1.GetVirtualEventRsvps.Failed.name] = function(t8: {[any]: any}, _) -- line: 107
-			return t8
+		[data.GetVirtualEventRsvps.Failed.name] = function(p2, _)
+			return p2
 		end,
-		[p1.UpdateMyRsvpStatus.Succeeded.name] = function(t9: {[any]: any}, p10) -- line: 111
-			-- upvalues: p2 (copy), Cryo (copy)
-			local v34 = p10.ids[1]
-			local v35 = not p2.LocalPlayer and -1 or p2.LocalPlayer.UserId
-			local t10 = {
-				[tostring(v35)] = {
-					userId = v35,
-					rsvpStatus = p10.postBody.rsvpStatus
-				}
+		[data.UpdateMyRsvpStatus.Succeeded.name] = function(p2, p3)
+			local id = p3.ids[1]
+			local userId = not p.LocalPlayer and -1 or p.LocalPlayer.UserId
+
+			local v = {
+				[tostring(userId)] = { userId = userId, rsvpStatus = p3.postBody.rsvpStatus }
 			}
 
-			return Cryo.Dictionary.join(t9, {
-				[v34] = Cryo.Dictionary.join(t9[v34] or {}, t10)
+			return Cryo.Dictionary.join(p2, {
+				[id] = Cryo.Dictionary.join(p2[id] or {}, v)
 			})
 		end,
-		[p1.UpdateMyRsvpStatus.Failed.name] = function(t11: {[any]: any}, _) -- line: 127
-			return t11
+		[data.UpdateMyRsvpStatus.Failed.name] = function(p2, _)
+			return p2
 		end
 	})
 
 	return (Rodux.combineReducers({
-		page = v6,
-		counters = v7,
-		byVirtualEventId = v8
+		page = reducer,
+		counters = reducer2,
+		byVirtualEventId = reducer3
 	}))
 end

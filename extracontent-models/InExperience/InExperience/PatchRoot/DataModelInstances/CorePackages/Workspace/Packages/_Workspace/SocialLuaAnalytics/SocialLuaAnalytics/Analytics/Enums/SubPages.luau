@@ -1,4 +1,1 @@
-return {
-	PeekView = "peekView",
-	PlayerContextualMenu = "playerContextualMenu"
-}
+return { PeekView = "peekView", PlayerContextualMenu = "playerContextualMenu" }

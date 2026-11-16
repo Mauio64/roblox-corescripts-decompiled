@@ -1,39 +1,38 @@
-local t1 = {}
-local v2 = game:DefineFastInt("WaitForChildOfClassTimeout", 0)
+local CoreUtility = {}
+local defineFastInt = game:DefineFastInt("WaitForChildOfClassTimeout", 0)
 
-if v2 > 0 then
-	function t1.waitForChildOfClass(p1, p2) -- line: 5
-		-- upvalues: v2 (copy)
-		local p2_2 = p1:FindFirstChildOfClass(p2)
-		local v6 = tick() + v2
+if defineFastInt > 0 then
+	function CoreUtility.waitForChildOfClass(instance, className)
+		local v = instance:FindFirstChildOfClass(className)
+		local v2 = tick() + defineFastInt
 
-		while not p2_2 and v6 > tick() do
+		while not v and tick() < v2 do
 			task.wait()
-			p2_2 = p1:FindFirstChildOfClass(p2)
+			v = instance:FindFirstChildOfClass(className)
 		end
 
-		return p2_2
+		return v
 	end
 else
-	function t1.waitForChildOfClass(p3, p4) -- line: 15
-		local p4_2 = p3:FindFirstChildOfClass(p4)
+	function CoreUtility.waitForChildOfClass(instance, className)
+		local v = instance:FindFirstChildOfClass(className)
 
-		while not p4_2 or p4 ~= p4_2.ClassName do
-			p4_2 = p3.ChildAdded:Wait()
+		while not v or v.ClassName ~= className do
+			v = instance.ChildAdded:Wait()
 		end
 
-		return p4_2
+		return v
 	end
 end
 
-function t1.waitForChildWhichIsA(p5, p6) -- line: 24
-	local p6_2 = p5:FindFirstChildWhichIsA(p6)
+function CoreUtility.waitForChildWhichIsA(instance, className)
+	local v = instance:FindFirstChildWhichIsA(className)
 
-	while not p6_2 or not p6_2:IsA(p6) do
-		p6_2 = p5.ChildAdded:Wait()
+	while not (v and v:IsA(className)) do
+		v = instance.ChildAdded:Wait()
 	end
 
-	return p6_2
+	return v
 end
 
-return t1
+return CoreUtility

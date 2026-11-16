@@ -1,20 +1,19 @@
-local Parent = script:FindFirstAncestor("AuthenticationStatus").Parent
-local Signals = require(Parent.Signals)
-local UNKNOWN = require(Parent.RobloxAppEnums).LoginStatus.UNKNOWN
+local parent = script:FindFirstAncestor("AuthenticationStatus").Parent
 
-local function createAuthenticationStatusStore() -- line: 9
-	-- upvalues: Signals (copy), UNKNOWN (copy)
-	local v5, v6 = Signals.createSignal(UNKNOWN)
+local Signals = require(parent.Signals)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local unknown = RobloxAppEnums.LoginStatus.UNKNOWN
+
+local function createAuthenticationStatusStore()
+	local signal, v = Signals.createSignal(unknown)
 
 	return {
-		getStatus = v5,
-		setAuthenticationStatus = function(p1) -- line: 12
-			-- upvalues: v6 (copy)
-			v6(p1)
+		getStatus = signal,
+		setAuthenticationStatus = function(p)
+			v(p)
 		end,
-		reset = function() -- line: 16
-			-- upvalues: v6 (copy), UNKNOWN (copy)
-			v6(UNKNOWN)
+		reset = function()
+			v(unknown)
 		end
 	}
 end

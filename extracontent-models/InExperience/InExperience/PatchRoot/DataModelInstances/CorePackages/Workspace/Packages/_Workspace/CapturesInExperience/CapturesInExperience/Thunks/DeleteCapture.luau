@@ -1,32 +1,31 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local CaptureService = game:GetService("CaptureService")
-local RetrieveCaptures = require(ParentParent.Thunks.RetrieveCaptures)
-local CaptureType = require(ParentParent.Enums.CaptureType)
 
-require(ParentParent.Types)
+local RetrieveCaptures = require(parent.Thunks.RetrieveCaptures)
 
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagCapturesVideoDeleteAsync = require(ParentParent.Flags.FFlagCapturesVideoDeleteAsync)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+local CaptureType = require(parent.Enums.CaptureType)
+require(parent.Types)
 
-return function(p1) -- line: 15
-	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureService (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), FFlagCapturesVideoDeleteAsync (copy), RetrieveCaptures (copy)
-	return function(p2) -- line: 16
-		-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), p1 (copy), CaptureService (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), FFlagCapturesVideoDeleteAsync (copy), RetrieveCaptures (copy)
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
+local FFlagCapturesVideoDeleteAsync = require(parent.Flags.FFlagCapturesVideoDeleteAsync)
+
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
+return function(data)
+	return function(object)
 		if FFlagEnableCapturesGalleryRetrievalCoreScript then
-			local t1 = { p1 }
-
-			CaptureService:DeleteCapturesAsync(t1)
-		elseif FFlagUseRbxstorageInGallery and p1.type == CaptureType.Video then
+			CaptureService:DeleteCapturesAsync({ data })
+		elseif FFlagUseRbxstorageInGallery and data.type == CaptureType.Video then
 			if FFlagCapturesVideoDeleteAsync then
-				CaptureService:DeleteVideoCaptureAsync(p1.videoCapture)
+				CaptureService:DeleteVideoCaptureAsync(data.videoCapture)
 			else
-				CaptureService:DeleteVideoCapture(p1.videoCapture)
+				CaptureService:DeleteVideoCapture(data.videoCapture)
 			end
 		else
-			CaptureService:DeleteCapture(p1.filePath)
+			CaptureService:DeleteCapture(data.filePath)
 		end
 
-		p2:dispatch(RetrieveCaptures())
+		object:dispatch(RetrieveCaptures())
 	end
 end

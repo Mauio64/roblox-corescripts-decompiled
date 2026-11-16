@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("MomentsCommon").Parent
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
 
-require(Parent.React)
-require(Parent.Signals)
-require(Parent.MomentsTypes)
+require(parent.React)
+require(parent.Signals)
+
+require(parent.MomentsTypes)
 
 return {}

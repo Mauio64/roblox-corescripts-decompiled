@@ -1,57 +1,55 @@
-local t1 = {}
-local t2 = {}
+local TableUtilities = {}
+local v = {}
 
-local function makeKeyString(p1) -- line: 8
-	if type(p1) == "string" then
-		return string.format("%s", p1)
+local function makeKeyString(value) -- 3 equivalent calls inferred from this helper
+	if type(value) == "string" then
+		return string.format("%s", value)
 	end
 
-	return string.format("[%s]", (tostring(p1)))
+	return string.format("[%s]", (tostring(value)))
 end
-local function makeValueString(p2) -- line: 16
-	local v11 = type(p2)
 
-	if v11 == "string" then
-		return string.format("%q", p2)
+local function makeValueString(p)
+	local typeName = type(p)
+
+	if typeName == "string" then
+		return string.format("%q", p)
 	end
 
-	if v11 == "function" or v11 == "table" then
-		return string.format("<%s>", (tostring(p2)))
+	if typeName == "function" or typeName == "table" then
+		return string.format("<%s>", (tostring(p)))
 	end
 
-	return string.format("%s", (tostring(p2)))
-end
-local function printKeypair(p3, p4, p5, p6) -- line: 27
-	-- upvalues: makeValueString (copy)
-	local v16 = if type(p3) ~= "string" then string.format("[%s]", (tostring(p3))) else string.format("%s", p3)
-	local v17 = makeValueString(p4)
-	local v18 = not p6 and "" or string.format(" -- %s", p6)
-
-	print(string.format("%s%s = %s,%s", p5, v16, v17, v18))
+	return string.format("%s", (tostring(p)))
 end
 
-function t1.ShallowEqual(p7, p8, p9) -- line: 39
-	-- upvalues: t2 (copy)
-	if not p7 or not p8 then
+local function printKeypair(value, item, p, p2)
+	local keyString = makeKeyString(value) -- inferred equivalent call
+	local valueString = makeValueString(item)
+
+	local v2 = not p2 and "" or string.format(" -- %s", p2)
+	print(string.format("%s%s = %s,%s", p, keyString, valueString, v2))
+end
+
+function TableUtilities.ShallowEqual(items, items2, p): boolean
+	if not (items and items2) then
 		return false
 	end
 
-	if p7 == p8 then
+	if items == items2 then
 		return true
 	end
 
-	if not p9 then
-		p9 = t2
-	end
+	local v2 = p or v
 
-	for v22, v23 in p7 do
-		if v23 ~= p8[v22] and not p9[v22] then
+	for k, item in items do
+		if items2[k] ~= item and not v2[k] then
 			return false
 		end
 	end
 
-	for v24, v25 in p8 do
-		if v25 ~= p7[v24] and not p9[v24] then
+	for k, item in items2 do
+		if items[k] ~= item and not v2[k] then
 			return false
 		end
 	end
@@ -59,236 +57,223 @@ function t1.ShallowEqual(p7, p8, p9) -- line: 39
 	return true
 end
 
-local function formatDeepEqualMessage(p10, p11) -- line: 64
-	if p11 ~= 0 then
-		return p10
+local function formatDeepEqualMessage(value, value2)
+	if value2 == 0 then
+		return value:gsub("{1}", "first"):gsub("{2}", "second")
 	end
 
-	return p10:gsub("{1}", "first"):gsub("{2}", "second")
+	return value
 end
 
-function t1.DeepEqual(p12, p13, p14) -- line: 75
-	-- upvalues: formatDeepEqualMessage (copy), t1 (copy)
-	local v31 = p14 or 0
+function TableUtilities.DeepEqual(items, items2, value)
+	value = value or 0
 
-	if p12 == p13 then
+	if items == items2 then
 		return true
 	end
 
-	if typeof(p12) ~= typeof(p13) then
-		local v32 = ("{1} is of type %s, but {2} is of type %s"):format(typeof(p12), (typeof(p13)))
-
-		return false, formatDeepEqualMessage(v32, v31)
+	if typeof(items) ~= typeof(items2) then
+		return
+			false,
+			formatDeepEqualMessage(
+				("{1} is of type %s, but {2} is of type %s"):format(typeof(items), (typeof(items2))),
+				value
+			)
 	end
 
-	if typeof(p12) == "table" then
-		local t3 = {}
-
-		for v34, v35 in p12 do
-			t3[v34] = true
-
-			local v36, v37 = t1.DeepEqual(v35, p13[v34], v31 + 1)
-
-			if not v36 then
-				local v38 = v37:gsub("{1}", ("{1}[%s]"):format((tostring(v34)))):gsub("{2}", ("{2}[%s]"):format((tostring(v34))))
-
-				return false, formatDeepEqualMessage(v38, v31)
-			end
-		end
-
-		for v39, v40 in p13 do
-			if t3[v39] then
-				continue
-			end
-
-			local v41, v42 = t1.DeepEqual(p12[v39], v40, v31 + 1)
-
-			if not v41 then
-				local v43 = v42:gsub("{1}", ("{1}[%s]"):format((tostring(v39)))):gsub("{2}", ("{2}[%s]"):format((tostring(v39))))
-
-				return false, formatDeepEqualMessage(v43, v31)
-			end
-		end
-
-		return true
+	if typeof(items) ~= "table" then
+		return false, formatDeepEqualMessage("{1} ~= {2}", value)
 	end
 
-	return false, formatDeepEqualMessage("{1} ~= {2}", v31)
+	local set = {}
+
+	for k, item in items do
+		set[k] = true
+
+		local deepEqual, v2 = TableUtilities.DeepEqual(item, items2[k], value + 1)
+
+		if not deepEqual then
+			return
+				false,
+				formatDeepEqualMessage(
+					v2:gsub("{1}", ("{1}[%s]"):format((tostring(k)))):gsub("{2}", ("{2}[%s]"):format((tostring(k)))),
+					value
+				)
+		end
+	end
+
+	for k, item in items2 do
+		if set[k] then
+			continue
+		end
+
+		local deepEqual, v2 = TableUtilities.DeepEqual(items[k], item, value + 1)
+
+		if not deepEqual then
+			return
+				false,
+				formatDeepEqualMessage(
+					v2:gsub("{1}", ("{1}[%s]"):format((tostring(k)))):gsub("{2}", ("{2}[%s]"):format((tostring(k)))),
+					value
+				)
+		end
+	end
+
+	return true
 end
-function t1.EqualKey(p15, p16, p17) -- line: 127
-	if p15 and (p16 and p17 and p17 ~= "" and p15[p17] and p16[p17] and p15[p17] == p16[p17]) then
+
+function TableUtilities.EqualKey(p, p2, p3): boolean
+	if p and p2 and p3 and p3 ~= "" and p[p3] and p2[p3] and p[p3] == p2[p3] then
 		return true
 	end
 
 	return false
 end
-function t1.TableDifference(p18, p19) -- line: 138
-	local t4 = {}
 
-	for v50, v51 in p18 do
-		if p19[v50] ~= p18[v50] then
-			t4[v50] = v51
+function TableUtilities.TableDifference(items, p)
+	local result = {}
+
+	for k, item in items do
+		if p[k] ~= items[k] then
+			result[k] = item
 		end
 	end
 
-	return t4
+	return result
 end
 
-local function membershipTable(p20) -- line: 155
-	local t5 = {}
+local function membershipTable(list) -- 2 equivalent calls inferred from this helper
+	local result = {}
 
-	for i = 1, #p20 do
-		t5[p20[i]] = true
+	for i = 1, #list do
+		result[list[i]] = true
 	end
 
-	return t5
-end
-local function listOfKeys(p21) -- line: 166
-	local t6 = {}
-
-	for v57, _ in p21 do
-		table.insert(t6, v57)
-	end
-
-	return t6
+	return result
 end
 
-function t1.ListDifference(p22, p23) -- line: 178
-	-- upvalues: t1 (copy)
-	local TableDifference = t1.TableDifference
-	local t7 = {}
+local function listOfKeys(items) -- 1 equivalent call inferred from this helper
+	local result = {}
 
-	for i = 1, #p22 do
-		t7[p22[i]] = true
+	for k, _ in items do
+		table.insert(result, k)
 	end
 
-	local t8 = {}
-
-	for i = 1, #p23 do
-		t8[p23[i]] = true
-	end
-
-	local t9 = {}
-
-	for v67, _ in (TableDifference(t7, t8)) do
-		table.insert(t9, v67)
-	end
-
-	return t9
+	return result
 end
-function t1.CheckListConsistency(p24) -- line: 188
-	local v70 = false
-	local v71 = false
-	local v72 = true
-	local n1 = 1
 
-	for v74, _ in p24 do
-		if type(v74) == "string" then
-			v71 = true
+function TableUtilities.ListDifference(list, list2)
+	return listOfKeys(TableUtilities.TableDifference(membershipTable(list), membershipTable(list2))) -- inferred equivalent call
+end
+
+function TableUtilities.CheckListConsistency(items)
+	local v2 = 1
+	local v3 = false
+	local flag = false
+	local v4 = true
+
+	for k, _ in items do
+		if type(k) == "string" then
+			v3 = true
 		else
-			if type(v74) ~= "number" then
+			if type(k) ~= "number" then
 				return false
 			end
 
-			if n1 ~= v74 then
-				v72 = false
+			if v2 ~= k then
+				v4 = false
 			end
 
-			v70 = true
+			flag = true
 		end
 
-		if v71 and v70 then
+		if v3 and flag then
 			return false
 		end
 
-		n1 += 1
+		v2 += 1
 	end
 
-	if v70 then
-		return v72
-	end
-
-	return true
+	return not flag or v4
 end
-function t1.RecursiveToString(p25, p26) -- line: 223
-	-- upvalues: t1 (copy)
-	local v78 = p26 or ""
 
-	if type(p25) == "table" then
-		local s1 = ""
+function TableUtilities.RecursiveToString(items, value)
+	local v2 = value or ""
 
-		if not t1.CheckListConsistency(p25) then
-			s1 ..= "-- WARNING: this table fails the list consistency test\n"
+	if type(items) ~= "table" then
+		return (tostring(items))
+	end
+
+	local v3 = ""
+
+	if not TableUtilities.CheckListConsistency(items) then
+		v3 ..= "-- WARNING: this table fails the list consistency test\n"
+	end
+
+	local v4 = v3 .. "{\n"
+
+	for k, item in items do
+		if type(k) == "string" then
+			v4 ..= "  " .. v2 .. tostring(k) .. " = " .. TableUtilities.RecursiveToString(item, "  " .. v2) .. ";\n"
 		end
 
-		local v80 = s1 .. "{\n"
-
-		for v81, v82 in p25 do
-			if type(v81) == "string" then
-				v80 ..= "  " .. v78 .. tostring(v81) .. " = " .. t1.RecursiveToString(v82, "  " .. v78) .. ";\n"
-			end
-
-			if type(v81) == "number" then
-				v80 ..= "  " .. v78 .. t1.RecursiveToString(v82, "  " .. v78) .. ",\n"
-			end
+		if type(k) == "number" then
+			v4 ..= "  " .. v2 .. TableUtilities.RecursiveToString(item, "  " .. v2) .. ",\n"
 		end
-
-		return v80 .. v78 .. "}"
 	end
 
-	return (tostring(p25))
+	return v4 .. v2 .. "}"
 end
-function t1.Print(p27, p28) -- line: 257
-	-- upvalues: makeValueString (copy), printKeypair (copy)
-	local u85 = p28 or "  "
 
-	if type(p27) ~= "table" then
+function TableUtilities.Print(p, value)
+	local v2 = value or "  "
+
+	if type(p) ~= "table" then
 		error("TableUtilities.Print must be passed a table", 2)
 	end
 
-	local t10 = {}
+	local itemsSet = {}
+	local function recurse(items, value2, p2)
+		itemsSet[items] = true
 
-	local function recurse(p29, p30, p31) -- line: 267
-		-- upvalues: t10 (copy), u85 (ref), makeValueString (copy), printKeypair (copy), recurse (copy)
-		t10[p29] = true
+		local v3 = string.rep(v2, p2)
+		local v4 = string.rep(v2, p2 + 1)
 
-		local v94 = string.rep(u85, p31)
-		local v95 = string.rep(u85, p31 + 1)
-
-		if p30 then
-			print(string.format("%s%s = %s {", v94, if type(p30) ~= "string" then string.format("[%s]", (tostring(p30))) else string.format("%s", p30), makeValueString(p29)))
+		if value2 then
+			print(string.format("%s%s = %s {", v3, makeKeyString(value2), makeValueString(items))) -- inferred equivalent call
 		else
-			print(string.format("%s%s {", v94, makeValueString(p29)))
+			print(string.format("%s%s {", v3, makeValueString(items)))
 		end
 
-		for v96, v97 in p29 do
-			if type(v97) == "table" then
-				if t10[v97] then
-					printKeypair(v96, v97, v95, "Possible cycle")
+		for k, item in items do
+			if type(item) == "table" then
+				if itemsSet[item] then
+					printKeypair(k, item, v4, "Possible cycle")
 				else
-					recurse(v97, v96, p31 + 1)
+					recurse(item, k, p2 + 1)
 				end
 			else
-				local v98 = if type(v96) ~= "string" then string.format("[%s]", (tostring(v96))) else string.format("%s", v96)
-				local v99 = makeValueString(v97)
+				local keyString = makeKeyString(k) -- inferred equivalent call
+				local valueString = makeValueString(item)
 
-				print(string.format("%s%s = %s,%s", v95, v98, v99, ""))
+				print(string.format("%s%s = %s,%s", v4, keyString, valueString, ""))
 			end
 		end
 
-		print(string.format("%s}%s", v94, not (p31 > 0) and "" or ","))
+		print(string.format("%s}%s", v3, p2 > 0 and "," or ""))
 	end
 
-	recurse(p27, nil, 0)
+	recurse(p, nil, 0)
 end
-function t1.FieldCount(p32) -- line: 301
-	local n2 = 0
 
-	for _ in p32 do
-		n2 += 1
+function TableUtilities.FieldCount(items)
+	local count = 0
+
+	for _ in items do
+		count += 1
 	end
 
-	return n2
+	return count
 end
 
-return t1
+return TableUtilities

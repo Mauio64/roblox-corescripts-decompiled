@@ -1,29 +1,26 @@
-local Parent = script:FindFirstAncestor("DiscoveryUtils").Parent
-local default = require(Parent.LoggingProtocol).default
-local v3 = game:DefineFastInt("DiscoveryResponseSizeEventHundredthsPercent", 0)
-local t1 = {
+local parent = script:FindFirstAncestor("DiscoveryUtils").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
+local default = LoggingProtocol.default
+
+local defineFastInt = game:DefineFastInt("DiscoveryResponseSizeEventHundredthsPercent", 0)
+
+local v = {
 	eventName = "DiscoveryResponseSize",
-	description = "Response body size for discovery network requests",
-	links = "",
 	backends = { default.TelemetryBackends.Stats },
-	throttlingPercentage = v3,
-	lastUpdated = {
-		24,
-		8,
-		2
-	}
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 24, 8, 2 },
+	description = "Response body size for discovery network requests",
+	links = ""
 }
 
-local function logResponseTelemetry(s1: string, t2: {[any]: any}, p1) -- line: 23
-	-- upvalues: default (copy), t1 (copy)
-	if p1 == nil then
-		p1 = default
+local function logResponseTelemetry(endpoint_name: string, p, object)
+	if object == nil then
+		object = default
 	end
 
-	assert(p1, "LoggingProtocol must exist")
-	p1:logRobloxTelemetryStat(t1, t2.responseSize, {
-		endpoint_name = s1
-	})
+	assert(object, "LoggingProtocol must exist")
+
+	object:logRobloxTelemetryStat(v, p.responseSize, { endpoint_name = endpoint_name })
 end
 
 return logResponseTelemetry

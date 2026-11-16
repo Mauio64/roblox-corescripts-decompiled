@@ -1,317 +1,294 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Cryo = require(DataHydrationParent.Cryo)
-local Dash = require(DataHydrationParent.Dash)
-local Signals = require(DataHydrationParent.Signals)
+local parent = DataHydration.Parent
+
+local Cryo = require(parent.Cryo)
+local Dash = require(parent.Dash)
+local Signals = require(parent.Signals)
+
 local HttpService = game:GetService("HttpService")
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
-
 local VotesStoreTypes = require(script.Parent.VotesStoreTypes)
 local VotesUtils = require(script.Parent.VotesUtils)
-local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
-local StatusCodes = require(DataHydrationParent.Http).StatusCodes
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local Http = require(parent.Http)
+local StatusCodes = Http.StatusCodes
 local logResponseError = DiscoveryUtils.logResponseError
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 local fetchVotes = require(script.Parent.fetchVotes)
 local fetchUserVote = require(script.Parent.fetchUserVote)
 local requestUserVoteUpdate = require(script.Parent.requestUserVoteUpdate)
-local SharedFlags = require(DataHydrationParent.SharedFlags)
+local SharedFlags = require(parent.SharedFlags)
+
 local FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes = SharedFlags.FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes
-local FFlagLuaAppDataHydrationOptimisticMutationLayer = SharedFlags.FFlagLuaAppDataHydrationOptimisticMutationLayer
 local ReasonNotVoteable = VotesStoreTypes.ReasonNotVoteable
-local FFlagLuaAppInExperienceDetailsPrompt = require(DataHydrationParent.SharedFlags).FFlagLuaAppInExperienceDetailsPrompt
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppInExperienceDetailsPrompt = SharedFlags2.FFlagLuaAppInExperienceDetailsPrompt
 local FFlagLuaAppDataHydrationUpdateItem = SharedFlags.FFlagLuaAppDataHydrationUpdateItem
-local FFlagLuaAppVoteOptimisticUpdateRaceFix = SharedFlags.FFlagLuaAppVoteOptimisticUpdateRaceFix
+
 local getGameInfoStore = require(DataHydration.Game.GameInfo.getGameInfoStore)
-local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
-local v27 = game:DefineFastInt("USER_VOTE_CACHE_TTL_SECONDS", 600)
 
-local function createVotesStore() -- line: 42
-	-- upvalues: createDataCache (copy), createDataResolver (copy), Dash (copy), fetchVotes (copy), FFlagLuaAppInExperienceDetailsPrompt (copy), VotesUtils (copy), v27 (copy), logResponseError (copy), fetchUserVote (copy), VotesStoreTypes (copy), DiscoveryEventErrorLogger (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), Signals (copy), FFlagLuaAppVoteOptimisticUpdateRaceFix (copy), Cryo (copy), FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes (copy), FFlagSduiExperienceDetailsSupport (copy), getGameInfoStore (copy), requestUserVoteUpdate (copy), HttpService (copy), ReasonNotVoteable (copy), StatusCodes (copy), FFlagLuaAppDataHydrationUpdateItem (copy)
-	local v29 = createDataCache()
-	local v30 = createDataResolver({
-		cache = v29,
-		fetchFn = function(t1: {[any]: any}) -- line: 46
-			-- upvalues: Dash (copy), fetchVotes (copy), FFlagLuaAppInExperienceDetailsPrompt (copy), VotesUtils (copy)
-			local v34 = Dash.keys(t1)
+local defineFastInt = game:DefineFastInt("USER_VOTE_CACHE_TTL_SECONDS", 600)
 
-			return fetchVotes(v34):andThen(function(p1) -- line: 51
-				-- upvalues: FFlagLuaAppInExperienceDetailsPrompt (copy), Dash (copy), VotesUtils (copy)
-				if not p1 then
+local function createVotesStore()
+	local dataCache = createDataCache()
+	local dataResolver = createDataResolver({
+		cache = dataCache,
+		fetchFn = function(p)
+			return fetchVotes((Dash.keys(p))):andThen(function(data)
+				if not data then
 					error("No response")
 				end
 
-				if not p1.responseBody or not p1.responseBody.data then
+				if not (data.responseBody and data.responseBody.data) then
 					if FFlagLuaAppInExperienceDetailsPrompt then
-						error(`Response Code: { p1.responseCode }`)
+						error(`Response Code: {data.responseCode}`)
 					else
-						error(`Response Code: { p1.reponseCode }`)
+						error(`Response Code: {data.reponseCode}`)
 					end
 				end
 
-				local t2 = {}
-				local data = p1.responseBody.data
-
-				Dash.forEach(data, function(p2) -- line: 65
-					-- upvalues: VotesUtils (copy), t2 (copy)
-					local v83 = nil
-					local upVotes = p2.upVotes
-					local downVotes = p2.downVotes
+				local v = {}
+				local data2 = data.responseBody.data
+				Dash.forEach(data2, function(data3)
+					local upVotes = data3.upVotes
+					local downVotes = data3.downVotes
+					local rating
 
 					if typeof(upVotes) == "number" and typeof(downVotes) == "number" then
-						v83 = VotesUtils.calculateRating(upVotes, downVotes)
+						rating = VotesUtils.calculateRating(upVotes, downVotes)
 					end
 
-					t2[tostring(p2.id)] = {
+					v[tostring(data3.id)] = {
 						upVotes = upVotes,
 						downVotes = downVotes,
-						rating = v83
+						rating = rating
 					}
 				end)
 
-				return t2
-			end):catch(function(p3) -- line: 81
-				error(`Error requesting votes: { p3 }`)
+				return v
+			end):catch(function(p2)
+				error(`Error requesting votes: {p2}`)
 			end)
 		end
 	})
-	local v31 = createDataCache(v27)
-	local v32 = createDataResolver({
-		supportsMultiGet = false,
-		cache = v31,
-		logError = function(p4) -- line: 92
-			-- upvalues: logResponseError (copy)
-			logResponseError("v1/games/votes/user", p4)
+
+	local dataCache2 = createDataCache(defineFastInt)
+
+	local dataResolver2 = createDataResolver({
+		cache = dataCache2,
+		logError = function(p)
+			logResponseError("v1/games/votes/user", p)
 		end,
-		fetchFn = function(s1: string, _) -- line: 95
-			-- upvalues: fetchUserVote (copy), VotesStoreTypes (copy), DiscoveryEventErrorLogger (copy)
-			return fetchUserVote(s1):andThen(function(p6) -- line: 99
-				-- upvalues: VotesStoreTypes (copy), DiscoveryEventErrorLogger (copy), s1 (copy)
-				local responseBody = p6.responseBody
+		fetchFn = function(universeId: string, _)
+			return fetchUserVote(universeId):andThen(function(p)
+				local responseBody = p.responseBody
 
 				if not VotesStoreTypes.userVoteResponseValidator(responseBody) then
 					DiscoveryEventErrorLogger.reportError("createVotesStore", "Invalid user vote response", {
-						universeId = s1,
+						universeId = universeId,
 						responseBody = responseBody
 					})
-					error({
-						StatusCode = p6.responseCode
-					})
+
+					error({ StatusCode = p.responseCode })
 				end
 
 				return responseBody
 			end)
 		end,
-		supportsMutations = FFlagLuaAppDataHydrationOptimisticMutationLayer
+		supportsMultiGet = false,
+		supportsMutations = true
 	})
 
-	return {
-		fetchVote = v30.fetchItem,
-		fetchVotes = v30.fetchItems,
-		getVote = v30.getCachedItem,
-		getVotes = v30.getCachedItems,
-		getAndFetchVote = v30.getAndFetchItem,
-		getAndFetchVotes = v30.getAndFetchItems,
-		fetchUserVote = v32.fetchItem,
-		fetchUserVotes = v32.fetchItems,
-		getUserVote = if not FFlagLuaAppDataHydrationOptimisticMutationLayer then v32.getCachedItem else v32.getOptimisticCachedItem,
-		getUserVotes = if not FFlagLuaAppDataHydrationOptimisticMutationLayer then v32.getCachedItems else v32.getOptimisticCachedItems,
-		getAndFetchUserVote = if not FFlagLuaAppDataHydrationOptimisticMutationLayer then v32.getAndFetchItem else v32.getOptimisticAndFetchItem,
-		getAndFetchUserVotes = if not FFlagLuaAppDataHydrationOptimisticMutationLayer then v32.getAndFetchItems else v32.getOptimisticAndFetchItems,
-		updateUserVote = function(s2: string, b1: boolean?) -- line: 116
-			-- upvalues: Signals (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), v32 (copy), v31 (copy), v29 (copy), FFlagLuaAppVoteOptimisticUpdateRaceFix (copy), Cryo (copy), FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes (copy), VotesUtils (copy), FFlagSduiExperienceDetailsSupport (copy), getGameInfoStore (copy), requestUserVoteUpdate (copy), HttpService (copy), VotesStoreTypes (copy), ReasonNotVoteable (copy), StatusCodes (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy)
-			local v40, v41 = Signals.createSignal(nil)
-			local v42, v43
+	local function updateUserVote(universeId: string, userVote2: boolean?)
+		local signal, v = Signals.createSignal(nil)
 
-			if FFlagLuaAppDataHydrationOptimisticMutationLayer then
-				v42, v43 = v32.getOptimisticCachedItem(s2)
+		local optimisticCachedItem, v2 = dataResolver2.getOptimisticCachedItem(universeId)
+		local v3 = optimisticCachedItem and optimisticCachedItem.data(false)
+		local userVote
+
+		if v3 then
+			userVote = v3.userVote
+		end
+
+		local item = dataCache.getItem(universeId)
+		local v4 = item and item.data(false)
+
+		if not v2 and v3 and not v3.canVote then
+			v({ type = "error", reasonForNotVoteable = v3.reasonForNotVoteable })
+
+			return signal
+		end
+
+		local userVote3
+
+		if userVote2 == nil then
+			userVote3 = Cryo.None
+		else
+			userVote3 = userVote2
+		end
+
+		dataResolver2.setMutation(universeId, { userVote = userVote3 })
+
+		if v4 then
+			local v5, v6
+
+			if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
+				local v7 = userVote == true and 1 or 0
+				local v8 = userVote == false and 1 or 0
+
+				local v9 = userVote2 == true and 1 or 0
+				local v10 = userVote2 == false and 1 or 0
+
+				v5 = v9 - v7
+				v6 = v10 - v8
 			else
-				v42, v43 = v31.getItem(s2)
+				v5 = userVote2 == true and 1 or 0
+				v6 = if userVote2 == false then 1 else 0
 			end
 
-			local v44 = v42 and v42.data(false)
-			local v45 = if not v44 then nil else v44.userVote
-			local v46 = v29.getItem(s2)
-			local v47 = v46 and v46.data(false)
+			local upVotes = v4.upVotes + v5
+			local downVotes = v4.downVotes + v6
 
-			if FFlagLuaAppVoteOptimisticUpdateRaceFix then
-				if not v43 and v44 and not v44.canVote then
-					v41({
-						type = "error",
-						reasonForNotVoteable = v44.reasonForNotVoteable
-					})
-
-					return v40
-				end
-			elseif v43 then
-				v32.fetchItem(s2)
-			elseif v44 and not v44.canVote then
-				v41({
-					type = "error",
-					reasonForNotVoteable = v44.reasonForNotVoteable
-				})
-
-				return v40
+			if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
+				upVotes = math.max(0, upVotes)
+				downVotes = math.max(0, downVotes)
 			end
 
-			if FFlagLuaAppDataHydrationOptimisticMutationLayer then
-				local t3 = {
-					userVote = if b1 ~= nil then b1 else Cryo.None
-				}
+			local v7 = {
+				upVotes = upVotes,
+				downVotes = downVotes,
+				rating = VotesUtils.calculateRating(upVotes, downVotes)
+			}
 
-				v32.setMutation(s2, t3)
-			else
-				local v49 = v44 and v44.canVote or nil
-				local v50 = v44 and v44.reasonForNotVoteable or nil
+			dataCache.updateItem(universeId, v7)
+		end
 
-				v31.replaceItem(s2, {
-					canVote = v49,
-					reasonForNotVoteable = v50,
-					userVote = b1
-				})
+		local v5 = getGameInfoStore(false).applyVoteChange(universeId, userVote, userVote2)
+
+		requestUserVoteUpdate(universeId, userVote2):andThen(function(_)
+			dataResolver2.commitMutation(universeId)
+			v({ type = "success", userVote = userVote2 })
+		end):catch(function(data)
+			dataResolver2.clearMutation(universeId)
+
+			if v4 then
+				dataCache.updateItem(universeId, v4)
 			end
 
-			if v47 then
-				local v55, v56
-
-				if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
-					local v51 = v45 ~= true and 0 or 1
-					local v52 = v45 ~= false and 0 or 1
-					local v53 = b1 ~= true and 0 or 1
-					local v54 = b1 ~= false and 0 or 1
-
-					v55 = v53 - v51
-					v56 = v54 - v52
-				else
-					v55 = b1 ~= true and 0 or 1
-					v56 = b1 ~= false and 0 or 1
-				end
-
-				local v57 = v47.upVotes + v55
-				local v58 = v47.downVotes + v56
-
-				if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
-					v57 = math.max(0, v57)
-					v58 = math.max(0, v58)
-				end
-
-				local v59 = VotesUtils.calculateRating(v57, v58)
-				local t4 = {
-					upVotes = v57,
-					downVotes = v58,
-					rating = v59
-				}
-
-				v29.updateItem(s2, t4)
+			if v5 then
+				getGameInfoStore(false).updateGameInfo(universeId, v5)
 			end
 
-			local u61 = nil
+			local statusCode
 
-			if FFlagSduiExperienceDetailsSupport then
-				u61 = getGameInfoStore(false).applyVoteChange(s2, v45, b1)
+			if type(data) == "table" and data.StatusCode then
+				statusCode = data.StatusCode
 			end
 
-			requestUserVoteUpdate(s2, b1):andThen(function(_) -- line: 219
-				-- upvalues: FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), v32 (copy), s2 (copy), v41 (copy), b1 (copy)
-				if FFlagLuaAppDataHydrationOptimisticMutationLayer then
-					v32.commitMutation(s2)
-				end
+			local reasonForNotVoteable = nil
 
-				v41({
-					type = "success",
-					userVote = b1
-				})
-			end):catch(function(p8) -- line: 228
-				-- upvalues: FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), v32 (copy), s2 (copy), v44 (copy), v31 (copy), v45 (copy), v47 (copy), v29 (copy), FFlagSduiExperienceDetailsSupport (copy), u61 (ref), getGameInfoStore (copy), HttpService (copy), VotesStoreTypes (copy), ReasonNotVoteable (copy), StatusCodes (copy), v41 (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy)
-				if FFlagLuaAppDataHydrationOptimisticMutationLayer then
-					v32.clearMutation(s2)
-				else
-					local v73 = v44 and v44.canVote or nil
-					local v74 = v44 and v44.reasonForNotVoteable or nil
+			if statusCode then
+				local success, result = pcall(function()
+					return HttpService:JSONDecode(data.Body)
+				end)
 
-					v31.replaceItem(s2, {
-						canVote = v73,
-						reasonForNotVoteable = v74,
-						userVote = v45
-					})
-				end
-
-				if v47 then
-					v29.updateItem(s2, v47)
-				end
-
-				if FFlagSduiExperienceDetailsSupport and u61 then
-					getGameInfoStore(false).updateGameInfo(s2, u61)
-				end
-
-				local v75 = if type(p8) ~= "table" or not p8.StatusCode then nil else p8.StatusCode
-				local PlayGame = nil
-
-				if v75 then
-					local ok, result = pcall(function() -- line: 259
-						-- upvalues: HttpService (copy), p8 (copy)
-						return HttpService:JSONDecode(p8.Body)
-					end)
-
-					if ok and result and result.errors then
-						for _, v in ipairs(result.errors) do
-							if v.code == VotesStoreTypes.PLAY_GAME_ERROR_CODE then
-								PlayGame = ReasonNotVoteable.PlayGame
-							end
+				if success and result and result.errors then
+					for _, err in ipairs(result.errors) do
+						if err.code == VotesStoreTypes.PLAY_GAME_ERROR_CODE then
+							reasonForNotVoteable = ReasonNotVoteable.PlayGame
 						end
 					end
-
-					if v75 == StatusCodes.TOO_MANY_REQUESTS then
-						PlayGame = ReasonNotVoteable.FloodCheckThresholdMet
-					end
 				end
 
-				v41({
-					type = "error",
-					reasonForNotVoteable = PlayGame
-				})
+				if statusCode == StatusCodes.TOO_MANY_REQUESTS then
+					reasonForNotVoteable = ReasonNotVoteable.FloodCheckThresholdMet
+				end
+			end
 
-				local v81 = if type(p8) ~= "table" or not p8.StatusMessage then nil else p8.StatusMessage
+			v({ type = "error", reasonForNotVoteable = reasonForNotVoteable })
+			local statusMessage
 
-				DiscoveryEventErrorLogger.reportError("updateUserVote", "Error updating user vote", {
-					universeId = s2,
-					statusCode = v75,
-					statusMessage = v81
-				})
-				logResponseError("v1/games/votes/user-votes", {
-					StatusCode = v75
-				})
-			end)
+			if type(data) == "table" and data.StatusMessage then
+				statusMessage = data.StatusMessage
+			end
 
-			return v40
-		end,
-		updateVoteItem = if not FFlagLuaAppDataHydrationUpdateItem then nil else function(s3: string, n1: number, n2: number) -- line: 330
-			-- upvalues: v29 (copy), VotesUtils (copy)
-			v29.updateItem(s3, {
-				downVotes = n1,
-				upVotes = n2,
-				rating = VotesUtils.calculateRating(n2, n1)
+			DiscoveryEventErrorLogger.reportError("updateUserVote", "Error updating user vote", {
+				universeId = universeId,
+				statusCode = statusCode,
+				statusMessage = statusMessage
 			})
-		end,
-		updateUserVoteItem = if not FFlagLuaAppDataHydrationUpdateItem then nil else v31.updateItem,
-		updateUserVoteItems = v31.updateItems,
-		clear = function() -- line: 292
-			-- upvalues: v29 (copy), v30 (copy), v31 (copy), v32 (copy)
-			v29.clear()
-			v30.clear()
-			v31.clear()
-			v32.clear()
-		end,
-		dispose = function() -- line: 299
-			-- upvalues: v29 (copy), v30 (copy), v32 (copy)
-			v29.dispose()
-			v30.dispose()
-			v32.dispose()
+
+			logResponseError("v1/games/votes/user-votes", { StatusCode = statusCode })
+		end)
+		return signal
+	end
+
+	local function updateVoteItems(items)
+		local v = {}
+
+		for k, item in items do
+			v[k] = {
+				upVotes = item.upVotes,
+				downVotes = item.downVotes,
+				rating = VotesUtils.calculateRating(item.upVotes, item.downVotes)
+			}
 		end
+
+		dataCache.updateItems(v)
+	end
+
+	local votesStore = {
+		fetchVote = dataResolver.fetchItem,
+		fetchVotes = dataResolver.fetchItems,
+		getVote = dataResolver.getCachedItem,
+		getVotes = dataResolver.getCachedItems,
+		getAndFetchVote = dataResolver.getAndFetchItem,
+		getAndFetchVotes = dataResolver.getAndFetchItems,
+		fetchUserVote = dataResolver2.fetchItem,
+		fetchUserVotes = dataResolver2.fetchItems,
+		getUserVote = dataResolver2.getOptimisticCachedItem,
+		getUserVotes = dataResolver2.getOptimisticCachedItems,
+		getAndFetchUserVote = dataResolver2.getOptimisticAndFetchItem,
+		getAndFetchUserVotes = dataResolver2.getOptimisticAndFetchItems,
+		updateUserVote = updateUserVote,
+		updateVoteItem = FFlagLuaAppDataHydrationUpdateItem and function(p: string, downVotes: number, upVotes: number)
+			dataCache.updateItem(p, {
+				downVotes = downVotes,
+				upVotes = upVotes,
+				rating = VotesUtils.calculateRating(upVotes, downVotes)
+			})
+		end or nil,
+		updateVoteItems = updateVoteItems,
+		updateUserVoteItem = 0,
+		updateUserVoteItems = 0,
+		clear = 0,
+		dispose = 0
 	}
+	local updateUserVoteItem
+
+	if FFlagLuaAppDataHydrationUpdateItem then
+		updateUserVoteItem = dataCache2.updateItem
+	end
+
+	votesStore.updateUserVoteItem = updateUserVoteItem
+	votesStore.updateUserVoteItems = dataCache2.updateItems
+
+	function votesStore.clear()
+		dataCache.clear()
+		dataResolver.clear()
+		dataCache2.clear()
+		dataResolver2.clear()
+	end
+
+	function votesStore.dispose()
+		dataCache.dispose()
+		dataResolver.dispose()
+		dataResolver2.dispose()
+	end
+	return votesStore
 end
 
 return createVotesStore

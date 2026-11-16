@@ -1,12 +1,11 @@
-local Parent = script:FindFirstAncestor("GameInfosRodux").Parent
-local makeActionCreator = require(Parent.Rodux).makeActionCreator
+local parent = script:FindFirstAncestor("GameInfosRodux").Parent
 
-require(Parent.DiscoveryTypes)
+local Rodux = require(parent.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
+require(parent.DiscoveryTypes)
 
-return makeActionCreator(script.Name, function(t1: {[any]: any}) -- line: 9
-	assert(type(t1) == "table", string.format("AddGames action expects games to be a table, was %s", (type(t1))))
+return makeActionCreator(script.Name, function(games)
+	assert(type(games) == "table", string.format("AddGames action expects games to be a table, was %s", (type(games))))
 
-	return {
-		games = t1
-	}
+	return { games = games }
 end)

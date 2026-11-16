@@ -1,3 +1,1 @@
-return {
-	transition = 0
-}
+return { transition = 0 }

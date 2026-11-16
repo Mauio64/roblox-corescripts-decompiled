@@ -1,42 +1,32 @@
 local CorePackages = game:GetService("CorePackages")
 local AppStorageService = game:GetService("AppStorageService")
 local HttpService = game:GetService("HttpService")
+
 local React = require(CorePackages.Packages.React)
-
 require(CorePackages.Packages.UIBlox)
-
 local GamepadNavigationDialog = require(script.Parent.GamepadNavigationDialog)
 
 React.PureComponent:extend("GamepadNavigationDialogShowCounter")
 
-local function shouldShowBasedOnCountInAppStorage(p1, p2) -- line: 20
-	-- upvalues: AppStorageService (copy), HttpService (copy)
-	local Item = AppStorageService:GetItem(p1)
-	local Item2 = AppStorageService:GetItem("UserId")
-	local ok, result = pcall(function() -- line: 23
-		-- upvalues: HttpService (copy), Item (copy)
-		return HttpService:JSONDecode(Item)
+local function shouldShowBasedOnCountInAppStorage(appStorageKey, maxShownCount)
+	local item = AppStorageService:GetItem(appStorageKey)
+	local item2 = AppStorageService:GetItem("UserId")
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(item)
 	end)
 
-	if not ok or type(result) ~= "table" then
-		result = {}
-	end
+	local v = (not success or type(result) ~= "table") and {} or result
 
-	local v15 = result[Item2]
+	local v2 = v[item2]
+	local v3 = type(v2) ~= "number" and 0 or v2
 
-	if type(v15) ~= "number" then
-		v15 = 0
-	end
-
-	result[Item2] = v15 + 1
-
-	return v15 < p2, HttpService:JSONEncode(result)
+	v[item2] = v3 + 1
+	return v3 < maxShownCount, HttpService:JSONEncode(v)
 end
-local function GamepadNavigationDialogTextButton(t1: {[any]: any}) -- line: 43
-	-- upvalues: React (copy), GamepadNavigationDialog (copy)
-	React.useEffect(function() -- line: 44
-		-- upvalues: t1 (copy)
-		return t1.onCleanup
+
+local function GamepadNavigationDialogTextButton(props)
+	React.useEffect(function()
+		return props.onCleanup
 	end, {})
 
 	return React.createElement("TextButton", {
@@ -44,38 +34,36 @@ local function GamepadNavigationDialogTextButton(t1: {[any]: any}) -- line: 43
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Size = UDim2.new(1, 0, 1, 0),
-		[React.Event.Activated] = t1.onDismissed
+		[React.Event.Activated] = props.onDismissed
 	}, {
 		GamepadNavigationDialog = React.createElement(GamepadNavigationDialog, {
-			selectButtonDismissesGamepadNavigationDialog = t1.selectButtonDismissesGamepadNavigationDialog,
-			onDismissed = t1.onDismissed
+			selectButtonDismissesGamepadNavigationDialog = props.selectButtonDismissesGamepadNavigationDialog,
+			onDismissed = props.onDismissed
 		})
 	})
 end
-local function GamepadNavigationDialogShowCounter(t2: {[any]: any}) -- line: 62
-	-- upvalues: shouldShowBasedOnCountInAppStorage (copy), React (copy), GamepadNavigationDialogTextButton (copy), AppStorageService (copy)
-	if not t2.isGamepadNavigationDialogEnabled or not t2.isGamepadNavigationDialogOpen then
+
+local function GamepadNavigationDialogShowCounter(props)
+	if not (props.isGamepadNavigationDialogEnabled and props.isGamepadNavigationDialogOpen) then
 		return nil
 	end
 
-	local v18, v19 = shouldShowBasedOnCountInAppStorage(t2.appStorageKey, t2.maxShownCount)
+	local v, v2 = shouldShowBasedOnCountInAppStorage(props.appStorageKey, props.maxShownCount)
 
-	if not v18 then
-		return nil
+	if v then
+		return React.createElement(GamepadNavigationDialogTextButton, {
+			selectButtonDismissesGamepadNavigationDialog = props.selectButtonDismissesGamepadNavigationDialog,
+			onDismissed = function()
+				props.SetGamepadNavigationDialogOpen(false)
+			end,
+			onCleanup = function()
+				AppStorageService:SetItem(props.appStorageKey, v2)
+				AppStorageService:Flush()
+			end
+		})
 	end
 
-	return React.createElement(GamepadNavigationDialogTextButton, {
-		selectButtonDismissesGamepadNavigationDialog = t2.selectButtonDismissesGamepadNavigationDialog,
-		onDismissed = function() -- line: 74
-			-- upvalues: t2 (copy)
-			t2.SetGamepadNavigationDialogOpen(false)
-		end,
-		onCleanup = function() -- line: 77
-			-- upvalues: AppStorageService (copy), t2 (copy), v19 (copy)
-			AppStorageService:SetItem(t2.appStorageKey, v19)
-			AppStorageService:Flush()
-		end
-	})
+	return nil
 end
 
 return GamepadNavigationDialogShowCounter

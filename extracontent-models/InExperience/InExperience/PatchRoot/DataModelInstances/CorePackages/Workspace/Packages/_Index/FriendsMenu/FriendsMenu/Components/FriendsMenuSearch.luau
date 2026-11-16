@@ -1,143 +1,178 @@
 local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
-local FriendsMenuParent = FriendsMenu.Parent
-local React = require(FriendsMenuParent.React)
-local UIBlox = require(FriendsMenuParent.UIBlox)
-local LocalizationHelper = require(FriendsMenuParent.NotificationsCommon).LocalizationHelper
-local Debounce = require(FriendsMenuParent.NotificationsCommon).Debounce
-local SharedFlags = require(FriendsMenuParent.SharedFlags)
-local Foundation = require(FriendsMenuParent.Foundation)
+local parent = FriendsMenu.Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local NotificationsCommon = require(parent.NotificationsCommon)
+local LocalizationHelper = NotificationsCommon.LocalizationHelper
+local NotificationsCommon2 = require(parent.NotificationsCommon)
+local Debounce = NotificationsCommon2.Debounce
+local SharedFlags = require(parent.SharedFlags)
+local Foundation = require(parent.Foundation)
 local useCursor = Foundation.Hooks.useCursor
 local useTokens = Foundation.Hooks.useTokens
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local GetFFlagEnableFriendsListSearchNormalizationErrorFix = SharedFlags.GetFFlagEnableFriendsListSearchNormalizationErrorFix
+
 local useStyle = UIBlox.Core.Style.useStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
 local Images = UIBlox.App.ImageSet.Images
 local getLocalizedStrings = LocalizationHelper.getLocalizedStrings
+
 local FriendsListContext = require(FriendsMenu.Context.FriendsListContext)
-local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
-local v19 = Images["icons/menu/search"]
-local v20 = Images["icons/actions/edit/clear"]
-local n1 = 8
-local n2 = 6
-local n3 = 18
-local n4 = 4
-local n5 = 24
-local n6 = 16
-local u27 = n3 + n5 + n4
-local n7 = 4
-local t1 = {
-	searchPlaceHolder = not FFlagConnectionsToFriendsRename and "Feature.FriendsMenu.Label.SearchForConnections" or "Feature.SettingsHub.Label.SearchForFriendsPlaceholder.FriendsRename"
+
+local iconsmenusearch = Images["icons/menu/search"]
+local iconsactionseditclear = Images["icons/actions/edit/clear"]
+local v = 8
+local v2 = 6
+local v3 = 18
+local v4 = 4
+local v5 = 24
+local textSize = 16
+local v6 = v3 + v5 + v4
+local v7 = 4
+
+local v8 = {
+	searchPlaceHolder = "Feature.SettingsHub.Label.SearchForFriendsPlaceholder.FriendsRename"
 }
 
-return (React.memo(React.forwardRef(function(t2: {[any]: any}, p1) -- line: 49
-	-- upvalues: useStyle (copy), useTokens (copy), React (copy), FriendsListContext (copy), getLocalizedStrings (copy), t1 (copy), n1 (ref), n2 (ref), n3 (ref), n5 (ref), n4 (ref), n6 (ref), n7 (ref), u27 (ref), useCursor (copy), Foundation (copy), GetFFlagEnableFriendsListSearchNormalizationErrorFix (copy), Debounce (copy), ImageSetLabel (copy), v19 (copy), ImageSetButton (copy), v20 (copy)
-	local v32 = useStyle()
-	local v33 = useTokens()
-	local v34 = React.useContext(FriendsListContext)
-	local v35 = getLocalizedStrings(t1)
-	local u36 = React.useRef(nil)
+local function fn(props, p)
+	local v9 = useStyle()
+	local v10 = useTokens()
+	local v11 = React.useContext(FriendsListContext)
+	local localizedStrings = getLocalizedStrings(v8)
+	local ref = React.useRef(nil)
 
-	if v33 then
-		n1 = v33.Size.Size_200
-		n2 = v33.Size.Size_150
-		n3 = v33.Size.Size_400
-		n5 = v33.Size.Size_600
-		n4 = v33.Size.Size_100
-		n6 = v33.FontSize.FontSize_300
-		n7 = v33.Radius.Small
-		u27 = n3 + n5 + n4
+	if v10 then
+		v = v10.Size.Size_200
+		v2 = v10.Size.Size_150
+		v3 = v10.Size.Size_400
+		v5 = v10.Size.Size_600
+		v4 = v10.Size.Size_100
+		textSize = v10.FontSize.FontSize_300
+		v7 = v10.Radius.Small
+		v6 = v3 + v5 + v4
 	end
 
-	local v37 = useCursor(Foundation.Enums.CursorType.RoundedRect)
+	local selectionImageObject = useCursor(Foundation.Enums.CursorType.RoundedRect)
+	local ref2 = p or ref
+	local searchFriendsString = v11.searchFriendsString
+	local searchFriends = v11.searchFriends
+	local v12 = #searchFriendsString > 0
 
-	if p1 then
-		u36 = p1
-	end
-
-	local searchFriendsString = v34.searchFriendsString
-	local searchFriends = v34.searchFriends
-	local v40 = #searchFriendsString > 0
-	local v41 = not GetFFlagEnableFriendsListSearchNormalizationErrorFix() and function(t3: {[any]: any}) -- line: 88
-		-- upvalues: searchFriends (copy)
-		searchFriends(t3.Text)
-	end or React.useCallback(Debounce(function(t4: {[any]: any}) -- line: 80
-		-- upvalues: searchFriends (copy)
-		searchFriends(t4.Text:lower())
+	local fn2 = not GetFFlagEnableFriendsListSearchNormalizationErrorFix() and function(p2)
+		searchFriends(p2.Text)
+	end or React.useCallback(Debounce(function(p2)
+		searchFriends(p2.Text:lower())
 	end, 0.5), { searchFriends })
 
-	React.useEffect(function() -- line: 95
-		-- upvalues: u36 (ref), t2 (copy)
-		if u36.current and t2.focusElement then
-			u36.current:CaptureFocus()
+	React.useEffect(function()
+		if ref2.current and props.focusElement then
+			ref2.current:CaptureFocus()
 		end
-	end, { u36.current })
+	end, { ref2.current })
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v13 = {
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0, 0.5),
-		Size = t2.size,
-		LayoutOrder = t2.layoutOrder
-	}, {
+		Size = props.size,
+		LayoutOrder = props.layoutOrder
+	}
+	local v14 = {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = UDim.new(0, n4)
+			Padding = UDim.new(0, v4)
 		}),
 		UIStroke = React.createElement("UIStroke", {
 			Thickness = 1,
-			Color = v32.Theme.UIDefault.Color,
-			Transparency = v32.Theme.UIDefault.Transparency
+			Color = v9.Theme.UIDefault.Color,
+			Transparency = v9.Theme.UIDefault.Transparency
 		}),
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, n7)
-		}),
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, v7) }),
 		UIPadding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, n1),
-			PaddingRight = UDim.new(0, n1),
-			PaddingTop = UDim.new(0, n2),
-			PaddingBottom = UDim.new(0, n2)
+			PaddingLeft = UDim.new(0, v),
+			PaddingRight = UDim.new(0, v),
+			PaddingTop = UDim.new(0, v2),
+			PaddingBottom = UDim.new(0, v2)
 		}),
 		SearchIcon = React.createElement(ImageSetLabel, {
 			LayoutOrder = 0,
+			Size = UDim2.fromOffset(v3, v3),
 			BackgroundTransparency = 1,
-			Size = UDim2.fromOffset(n3, n3),
-			Image = v19,
-			ImageColor3 = v32.Theme.IconEmphasis.Color,
-			ImageTransparency = v32.Theme.IconEmphasis.Transparency
+			Image = iconsmenusearch,
+			ImageColor3 = v9.Theme.IconEmphasis.Color,
+			ImageTransparency = v9.Theme.IconEmphasis.Transparency
 		}),
-		SearchField = React.createElement("TextBox", {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, u27 * -1, 1, 0),
-			ClearTextOnFocus = false,
-			PlaceholderColor3 = v32.Theme.TextDefault.Color,
-			PlaceholderText = v35.searchPlaceHolder,
-			Text = searchFriendsString,
-			TextColor3 = v32.Theme.TextDefault.Color,
-			TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextSize = n6,
-			Font = v32.Font.Body.Font,
-			ref = u36,
-			[React.Event.Focused] = t2.onFocus,
-			[React.Change.Text] = v41,
-			SelectionImageObject = v37
-		}),
-		ClearButton = v40 and React.createElement(ImageSetButton, {
+		SearchField = 0,
+		ClearButton = 0
+	}
+
+	local createElement2 = React.createElement
+	local v15 = {
+		["LayoutOrder"] = nil,
+		["LayoutOrder"] = nil,
+		["LayoutOrder"] = nil,
+		["LayoutOrder"] = nil,
+		["LayoutOrder"] = nil,
+		["LayoutOrder"] = nil,
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, v6 * -1, 1, 0),
+		ClearTextOnFocus = false,
+		PlaceholderColor3 = v9.Theme.TextDefault.Color,
+		PlaceholderText = localizedStrings.searchPlaceHolder,
+		Text = searchFriendsString,
+		TextColor3 = v9.Theme.TextDefault.Color,
+		TextWrapped = true,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextSize = textSize
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = v9.Font.Body.Font
+	end
+
+	v15.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v10.Typography.BodyLarge.Font)
+	end
+
+	v15.FontFace = fontFace
+
+	v15.ref = ref2
+	v15[React.Event.Focused] = props.onFocus
+	v15[React.Change.Text] = fn2
+	v15.SelectionImageObject = selectionImageObject
+	v14.SearchField = createElement2("TextBox", v15)
+	local clearButton
+
+	if v12 then
+		clearButton = React.createElement(ImageSetButton, {
 			BackgroundTransparency = 1,
 			LayoutOrder = 2,
-			Size = UDim2.new(0, n5, 0, n5),
-			Image = v20,
-			ImageColor3 = v32.Theme.IconEmphasis.Color,
-			ImageTransparency = v32.Theme.IconEmphasis.Transparency,
-			[React.Event.Activated] = function() -- line: 161
-				-- upvalues: searchFriends (copy)
+			Size = UDim2.new(0, v5, 0, v5),
+			Image = iconsactionseditclear,
+			ImageColor3 = v9.Theme.IconEmphasis.Color,
+			ImageTransparency = v9.Theme.IconEmphasis.Transparency,
+			[React.Event.Activated] = function()
 				searchFriends("")
 			end,
-			SelectionImageObject = v37
+			SelectionImageObject = selectionImageObject
 		}) or nil
-	})
-end)))
+	end
+
+	v14.ClearButton = clearButton
+	return createElement("Frame", v13, v14)
+end
+
+return (React.memo(React.forwardRef(fn)))

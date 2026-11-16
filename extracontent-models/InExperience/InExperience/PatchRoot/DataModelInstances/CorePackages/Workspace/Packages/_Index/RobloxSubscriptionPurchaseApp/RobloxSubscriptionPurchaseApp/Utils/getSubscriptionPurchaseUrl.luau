@@ -1,14 +1,33 @@
 local ContentProvider = game:GetService("ContentProvider")
 
-local function getSubscriptionPurchaseUrl(s1: string, s2: string?) -- line: 3
-	-- upvalues: ContentProvider (copy)
-	local BaseUrl = ContentProvider.BaseUrl
+local parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnablePlusReferralLandingSheet = SharedFlags.FFlagEnablePlusReferralLandingSheet
 
-	if s2 then
-		return string.format("%supgrades/paymentmethods?ctx=subscription&type=Blackbird&id=%s&paymentSessionId=%s", BaseUrl, s1, s2)
+local function getSubscriptionPurchaseUrl(p: string, p2: string?, p3: number?)
+	local baseUrl = ContentProvider.BaseUrl
+	local subscriptionPurchaseUrl
+
+	if p2 then
+		subscriptionPurchaseUrl = string.format(
+			"%supgrades/paymentmethods?ctx=subscription&type=Blackbird&id=%s&paymentSessionId=%s",
+			baseUrl,
+			p,
+			p2
+		)
+	else
+		subscriptionPurchaseUrl = string.format(
+			"%supgrades/paymentmethods?ctx=subscription&type=Blackbird&id=%s",
+			baseUrl,
+			p
+		)
 	end
 
-	return string.format("%supgrades/paymentmethods?ctx=subscription&type=Blackbird&id=%s", BaseUrl, s1)
+	if FFlagEnablePlusReferralLandingSheet and p3 then
+		subscriptionPurchaseUrl ..= "&referrerId=" .. tostring(p3)
+	end
+
+	return subscriptionPurchaseUrl
 end
 
 return getSubscriptionPurchaseUrl

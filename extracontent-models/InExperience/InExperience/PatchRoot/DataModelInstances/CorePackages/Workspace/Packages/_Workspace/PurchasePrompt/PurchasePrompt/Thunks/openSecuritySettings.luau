@@ -1,54 +1,43 @@
-local ParentParent = script.Parent.Parent
-
+local parent = script.Parent.Parent
 game:GetService("Players")
-require(ParentParent.Actions.ErrorOccurred)
-require(ParentParent.Actions.SetPromptState)
 
-local UpsellFlow = require(ParentParent.Enums.UpsellFlow)
+require(parent.Actions.ErrorOccurred)
+require(parent.Actions.SetPromptState)
+local UpsellFlow = require(parent.Enums.UpsellFlow)
+require(parent.Enums.PromptState)
+require(parent.Enums.PurchaseError)
+local hideWindow = require(parent.Thunks.hideWindow)
+local getUpsellFlow = require(parent.NativeUpsell.getUpsellFlow)
+local Analytics = require(parent.Services.Analytics)
+local ExternalSettings = require(parent.Services.ExternalSettings)
+local Network = require(parent.Services.Network)
+local PlatformInterface = require(parent.Services.PlatformInterface)
+local Thunk = require(parent.Thunk)
+require(parent.Promise)
 
-require(ParentParent.Enums.PromptState)
-require(ParentParent.Enums.PurchaseError)
+local v = { Analytics, ExternalSettings, Network, PlatformInterface }
 
-local hideWindow = require(ParentParent.Thunks.hideWindow)
-local getUpsellFlow = require(ParentParent.NativeUpsell.getUpsellFlow)
-local Analytics = require(ParentParent.Services.Analytics)
-local ExternalSettings = require(ParentParent.Services.ExternalSettings)
-local Network = require(ParentParent.Services.Network)
-local PlatformInterface = require(ParentParent.Services.PlatformInterface)
-local Thunk = require(ParentParent.Thunk)
+local function openSecuritySettings(p: string?)
+	return Thunk.new(script.Name, v, function(object, p2)
+		local v2 = p2[Analytics]
+		local v3 = p2[ExternalSettings]
+		local v4 = p2[PlatformInterface]
+		local state = object:getState()
 
-require(ParentParent.Promise)
+		if getUpsellFlow(v3.getPlatform()) == UpsellFlow.Web then
+			local productId = state.productInfo.productId
+			local requestType = state.requestType
 
-local t1 = {
-	Analytics,
-	ExternalSettings,
-	Network,
-	PlatformInterface
-}
+			v2.signalTwoSVSettingsErrorConfirmed(productId, requestType)
 
-local function openSecuritySettings(s1: string?) -- line: 26
-	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy), ExternalSettings (copy), PlatformInterface (copy), getUpsellFlow (copy), UpsellFlow (copy), hideWindow (copy)
-	return Thunk.new(script.Name, t1, function(p1, p2) -- line: 27
-		-- upvalues: Analytics (copy), ExternalSettings (copy), PlatformInterface (copy), getUpsellFlow (copy), UpsellFlow (copy), s1 (copy), hideWindow (copy)
-		local v15 = p2[Analytics]
-		local v16 = p2[ExternalSettings]
-		local v17 = p2[PlatformInterface]
-		local v18 = p1:getState()
-
-		if getUpsellFlow(v16.getPlatform()) == UpsellFlow.Web then
-			local productId = v18.productInfo.productId
-			local requestType = v18.requestType
-
-			v15.signalTwoSVSettingsErrorConfirmed(productId, requestType)
-
-			if s1 then
-				v17.openSecuritySettings(s1)
+			if p then
+				v4.openSecuritySettings(p)
 			else
-				v17.openSecuritySettings()
+				v4.openSecuritySettings()
 			end
 		end
 
-		p1:dispatch(hideWindow())
+		object:dispatch(hideWindow())
 	end)
 end
 

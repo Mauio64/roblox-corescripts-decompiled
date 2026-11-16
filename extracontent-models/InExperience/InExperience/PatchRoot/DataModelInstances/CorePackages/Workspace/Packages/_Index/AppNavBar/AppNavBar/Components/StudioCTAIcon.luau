@@ -1,99 +1,109 @@
 local CoreGui = game:GetService("CoreGui")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local UIBlox = require(ParentParentParent.UIBlox)
+
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local UIBlox = require(parent2.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
-local Localization = require(ParentParentParent.Localization)
-local Promise = require(ParentParentParent.Promise)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local RoactServiceTags = require(ParentParentParent.RoactServiceTags)
+local Localization = require(parent2.Localization)
+local Promise = require(parent2.Promise)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local RoactUtils = require(parent2.RoactUtils)
+local RoactServiceTags = require(parent2.RoactServiceTags)
+
 local ControlState = UIBlox.Core.Control.Enum.ControlState
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
 local withTooltip = UIBlox.App.Dialog.TooltipV2.withTooltip
 local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
-local Image = require(ParentParentParent.Foundation).Image
-local FFlagCoreUiMigrateUIBloxToFoundation = require(ParentParentParent.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+
+local Foundation = require(parent2.Foundation)
+local Image = Foundation.Image
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+
 local useLocalization = Localization.Hooks.useLocalization
 local useRoactService = RobloxAppHooks.useRoactService
 local useEffectOnce = RoactUtils.Hooks.useEffectOnce
 local AppEventIngestService = RoactServiceTags.AppEventIngestService
-local Constants = require(ParentParent.Constants)
-local v24 = if not FFlagCoreUiMigrateUIBloxToFoundation then Images["icons/logo/studiologo"] else "icons/logo/studiologo"
-local EngineFeature = game:GetEngineFeature("WebViewRedesignEnabled")
 
-local function StudioCTAIcon(t1: {[any]: any}) -- line: 48
-	-- upvalues: useStyle (copy), React (copy), useRoactService (copy), AppEventIngestService (copy), useLocalization (copy), useEffectOnce (copy), Constants (copy), ControlState (copy), Promise (copy), TooltipOrientation (copy), CoreGui (copy), EngineFeature (copy), withTooltip (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Image (copy), v24 (copy), ImageSetLabel (copy)
-	local Theme = useStyle().Theme
-	local v29, v30 = React.useState(false)
-	local v31 = useRoactService(AppEventIngestService)
-	local v32 = useLocalization({
+local Constants = require(parent.Constants)
+
+local image = FFlagCoreUiMigrateUIBloxToFoundation and "icons/logo/studiologo" or Images["icons/logo/studiologo"]
+
+local engineFeature = game:GetEngineFeature("WebViewRedesignEnabled")
+
+local function StudioCTAIcon(p)
+	local theme = useStyle().Theme
+
+	local state, setState = React.useState(false)
+	local v = useRoactService(AppEventIngestService)
+
+	local v2 = useLocalization({
 		titleText = "CommonUI.Features.StudioCTA.Tooltip.Title",
 		bodyText = "CommonUI.Features.StudioCTA.Tooltip.Body"
 	})
-	local v33 = React.useRef(nil)
 
-	useEffectOnce(function() -- line: 63
-		-- upvalues: v31 (copy), Constants (copy)
-		v31:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_MOUNT)
+	local ref = React.useRef(nil)
+
+	useEffectOnce(function()
+		v:setRBXEventStream(Constants.STUDIO_CTA_EVENT_CONTEXT, Constants.STUDIO_CTA_EVENT_NAME_MOUNT)
 	end, {})
 
-	if t1.controlState == ControlState.Hover or t1.controlState == ControlState.Selected then
-		if not v33.current then
-			v33.current = Promise.delay(0.4):andThenCall(function() -- line: 71
-				-- upvalues: v33 (copy), v30 (copy)
-				v33.current = nil
-				v30(true)
+	if p.controlState == ControlState.Hover or p.controlState == ControlState.Selected then
+		if not ref.current then
+			ref.current = Promise.delay(0.4):andThenCall(function()
+				ref.current = nil
+				setState(true)
 			end)
 		end
 	else
-		if v33.current then
-			v33.current:cancel()
-			v33.current = nil
+		if ref.current then
+			ref.current:cancel()
+			ref.current = nil
 		end
 
-		if v29 then
-			v30(false)
+		if state then
+			setState(false)
 		end
 	end
 
-	local t2 = {
-		headerText = v32.titleText,
-		bodyText = v32.bodyText
-	}
-	local t3 = {
-		DisplayOrder = 10,
+	local v3 = { headerText = v2.titleText, bodyText = v2.bodyText }
+
+	local v4 = {
 		preferredOrientation = TooltipOrientation.Top,
 		guiTarget = CoreGui,
-		active = if not EngineFeature then v29 else t1.showTooltip and v29
+		active = 0,
+		DisplayOrder = 10
 	}
 
-	return withTooltip(t2, t3, function(p1) -- line: 99
-		-- upvalues: FFlagCoreUiMigrateUIBloxToFoundation (copy), React (copy), Image (copy), v24 (copy), Theme (ref), ImageSetLabel (copy)
+	if engineFeature then
+		state = p.showTooltip and state
+	end
+
+	v4.active = state
+
+	return withTooltip(v3, v4, function(p2)
 		if FFlagCoreUiMigrateUIBloxToFoundation then
 			return React.createElement(Image, {
 				Size = UDim2.fromScale(1, 1),
-				Image = v24,
+				Image = image,
 				ScaleType = Enum.ScaleType.Fit,
-				imageStyle = {
-					Transparency = 0,
-					Color3 = Theme.IconEmphasis.Color
-				},
-				onAbsoluteSizeChanged = p1,
-				onAbsolutePositionChanged = p1
+				imageStyle = { Color3 = theme.IconEmphasis.Color, Transparency = 0 },
+				onAbsoluteSizeChanged = p2,
+				onAbsolutePositionChanged = p2
 			})
 		end
 
 		return React.createElement(ImageSetLabel, {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
-			Image = v24,
+			Image = image,
 			ScaleType = Enum.ScaleType.Fit,
-			ImageColor3 = Theme.IconEmphasis.Color,
-			[React.Change.AbsoluteSize] = p1,
-			[React.Change.AbsolutePosition] = p1
+			ImageColor3 = theme.IconEmphasis.Color,
+			[React.Change.AbsoluteSize] = p2,
+			[React.Change.AbsolutePosition] = p2
 		})
 	end)
 end

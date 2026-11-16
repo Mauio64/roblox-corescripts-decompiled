@@ -1,57 +1,57 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ConstantsInterface = require(parent.ConstantsInterface)
+local AssetCalculator = require(parent.util.AssetCalculator)
+local getPartNamesInHierarchyOrder = require(parent.util.getPartNamesInHierarchyOrder)
+local getMeshVerts = require(parent.util.getMeshVerts)
+local getMeshInfo = require(parent.util.getMeshInfo)
+local BoundsDataUtils = require(parent.util.BoundsDataUtils)
+local getExpectedPartSize = require(parent.util.getExpectedPartSize)
+local R15plusUtils = require(parent.util.R15plusUtils)
+local getAttachmentCFrameInPartSpace = require(parent.util.getAttachmentCFrameInPartSpace)
 
-require(ParentParent.util.Types)
+local BoundsCalculator = {}
 
-local ConstantsInterface = require(ParentParent.ConstantsInterface)
-local AssetCalculator = require(ParentParent.util.AssetCalculator)
-local getPartNamesInHierarchyOrder = require(ParentParent.util.getPartNamesInHierarchyOrder)
-local getMeshVerts = require(ParentParent.util.getMeshVerts)
-local getMeshInfo = require(ParentParent.util.getMeshInfo)
-local BoundsDataUtils = require(ParentParent.util.BoundsDataUtils)
-local getExpectedPartSize = require(ParentParent.util.getExpectedPartSize)
-local getFFlagUGCValidateLegFullBodySeparation = require(ParentParent.flags.getFFlagUGCValidateLegFullBodySeparation)
-local getFFlagUGCValidateMigrateBodyPartBounds = require(ParentParent.flags.getFFlagUGCValidateMigrateBodyPartBounds)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local getAttachmentCFrameInPartSpace = require(ParentParent.util.getAttachmentCFrameInPartSpace)
-local t1 = {}
-
-local function orientSingleAssetToWorldAxes(t2: {[any]: any}, p1, p2: ((...any) -> ...any)) -- line: 34
-	-- upvalues: AssetCalculator (copy)
-	if p1 ~= Enum.AssetType.LeftArm and (p1 ~= Enum.AssetType.RightArm and p1 ~= Enum.AssetType.LeftLeg and p1 ~= Enum.AssetType.RightLeg) then
+local function orientSingleAssetToWorldAxes(p, p2, callback)
+	if
+		p2 ~= Enum.AssetType.LeftArm
+		and p2 ~= Enum.AssetType.RightArm
+		and p2 ~= Enum.AssetType.LeftLeg
+		and p2 ~= Enum.AssetType.RightLeg
+	then
 		return
 	end
 
-	for v25, v26 in (AssetCalculator.calculateStraightenedLimb(p1, t2, p2)) do
-		t2[v25] = v26
+	local straightenedLimb = AssetCalculator.calculateStraightenedLimb(p2, p, callback)
+
+	for k, v in straightenedLimb do
+		p[k] = v
 	end
 end
-local function orientFullBodyArmsLegsToWorldAxes(t3: {[any]: any}, p3: ((...any) -> ...any)) -- line: 55
-	-- upvalues: orientSingleAssetToWorldAxes (copy), getPartNamesInHierarchyOrder (copy), ConstantsInterface (copy), R15plusUtils (copy), getAttachmentCFrameInPartSpace (copy)
-	local function orientAndMoveParts(p4, s1: string) -- line: 56
-		-- upvalues: orientSingleAssetToWorldAxes (copy), t3 (copy), p3 (copy), getPartNamesInHierarchyOrder (copy), ConstantsInterface (copy), R15plusUtils (copy), getAttachmentCFrameInPartSpace (copy)
-		orientSingleAssetToWorldAxes(t3, p4, p3)
 
-		local v139 = getPartNamesInHierarchyOrder(p4)
-		local v140 = p3(v139[1])
-		local v141 = ConstantsInterface.getRigAttachmentToParent(p4, v140.Name)
-		local v142 = v140:FindFirstChild(v141, R15plusUtils.checkFlagEnabledForAllowHrd())
+local function orientFullBodyArmsLegsToWorldAxes(allTransformsForFullBody, findMeshHandle)
+	local function orientAndMoveParts(p, p2: string)
+		orientSingleAssetToWorldAxes(allTransformsForFullBody, p, findMeshHandle)
 
-		assert(v142)
+		local partNamesInHierarchyOrder = getPartNamesInHierarchyOrder(p)
+		local v = findMeshHandle(partNamesInHierarchyOrder[1])
 
-		local v143 = t3[v140.Name] * getAttachmentCFrameInPartSpace(v142)
-		local v144 = p3(s1)
+		local rigAttachmentToParent = ConstantsInterface.getRigAttachmentToParent(p, v.Name)
 
-		assert(v144)
+		local child = v:FindFirstChild(rigAttachmentToParent, R15plusUtils.checkFlagEnabledForAllowHrd())
+		assert(child)
+		local v2 = allTransformsForFullBody[v.Name] * getAttachmentCFrameInPartSpace(child)
 
-		local v145 = v144:FindFirstChild(v141, R15plusUtils.checkFlagEnabledForAllowHrd())
+		local v3 = findMeshHandle(p2)
+		assert(v3)
 
-		assert(v145)
+		local child2 = v3:FindFirstChild(rigAttachmentToParent, R15plusUtils.checkFlagEnabledForAllowHrd())
+		assert(child2)
+		local v4 = (allTransformsForFullBody[v3.Name] * getAttachmentCFrameInPartSpace(child2)).Position - v2.Position
 
-		local v146 = (t3[v144.Name] * getAttachmentCFrameInPartSpace(v145)).Position - v143.Position
-
-		for _, v148 in v139 do
-			t3[v148] = CFrame.new(t3[v148].Position + v146) * t3[v148].Rotation
+		for _, v5 in partNamesInHierarchyOrder do
+			allTransformsForFullBody[v5] = CFrame.new(allTransformsForFullBody[v5].Position + v4) * allTransformsForFullBody[v5].Rotation
 		end
 	end
 
@@ -60,297 +60,253 @@ local function orientFullBodyArmsLegsToWorldAxes(t3: {[any]: any}, p3: ((...any)
 	orientAndMoveParts(Enum.AssetType.LeftLeg, "LowerTorso")
 	orientAndMoveParts(Enum.AssetType.RightLeg, "LowerTorso")
 end
-local function calculateBoundsDataForPart(p5, p6, cFrame: CFrame, p7, p8) -- line: 91
-	-- upvalues: getExpectedPartSize (copy), getMeshVerts (copy), BoundsDataUtils (copy), ConstantsInterface (copy), R15plusUtils (copy), getAttachmentCFrameInPartSpace (copy)
-	assert(p5 ~= nil ~= (p8 ~= nil))
 
-	local MeshSize = p6.MeshSize
-	local v36 = getExpectedPartSize(p6, p7) / MeshSize
-	local v37 = nil
+local function calculateBoundsDataForPart(p, instance, item: CFrame, p2, p3)
+	assert((p ~= nil) ~= (p3 ~= nil))
 
-	if p8 then
-		if p8.meshData and p8.meshData[p6.MeshId] then
-			local verts = p8.meshData[p6.MeshId].verts
+	local meshSize = instance.MeshSize
 
-			if verts then
-				v37 = verts
-			end
-		end
+	local v = getExpectedPartSize(instance, p2) / meshSize
 
-		if not v37 then
+	local v2 = nil
+
+	if p3 then
+		v2 = p3.meshData and p3.meshData[instance.MeshId] and p3.meshData[instance.MeshId].verts or v2
+
+		if not v2 then
 			return false, { "Verts not found in data cache" }
 		end
 	end
 
-	if not v37 then
-		local v39, v40
+	if not v2 then
+		local v3, v4
+		v3, v4, v2 = getMeshVerts(p, p2)
 
-		v39, v40, v37 = getMeshVerts(p5, p7)
-
-		if not v39 then
-			return v39, v40
+		if not v3 then
+			return v3, v4
 		end
 	end
 
-	local t4 = {}
+	local v3 = {}
 
-	for _, v43 in v37 do
-		BoundsDataUtils.expandMeshBounds(t4, cFrame:PointToWorldSpace(v43 * v36))
+	for _, v4 in v2 do
+		BoundsDataUtils.expandMeshBounds(v3, item:PointToWorldSpace(v4 * v))
 	end
 
-	for _, v45 in ConstantsInterface.getAttachments(nil, p6.Name) do
-		if string.match(v45, "RigAttachment$") ~= nil then
-			local v46 = p6:FindFirstChild(v45, R15plusUtils.checkFlagEnabledForAllowHrd())
-
-			assert(v46)
-
-			local v47 = cFrame * getAttachmentCFrameInPartSpace(v46)
-
-			BoundsDataUtils.expandRigAttachmentBounds(t4, v47.Position)
+	for _, childName in ConstantsInterface.getAttachments(nil, instance.Name) do
+		if string.match(childName, "RigAttachment$") == nil then
+			continue
 		end
+
+		local child = instance:FindFirstChild(childName, R15plusUtils.checkFlagEnabledForAllowHrd())
+		assert(child)
+
+		local v4 = item * getAttachmentCFrameInPartSpace(child)
+		BoundsDataUtils.expandRigAttachmentBounds(v3, v4.Position)
 	end
 
-	BoundsDataUtils.setOverallBounds(t4)
-
-	return true, nil, t4
+	BoundsDataUtils.setOverallBounds(v3)
+	return true, nil, v3
 end
-local function buildValidationContextFromRenderMeshes(p9, p10, t5: {[any]: any}) -- line: 149
-	local t6 = {}
-	local descendants = p9:GetDescendants()
 
-	table.insert(descendants, p9)
+local function buildValidationContextFromRenderMeshes(folder, assetTypeEnum, p)
+	local descendants = folder:GetDescendants()
+	table.insert(descendants, folder)
+	local editableMeshes = {}
 
-	for _, v54 in descendants do
-		local v55 = t5[v54.Name]
+	for _, descendant in descendants do
+		local v = p[descendant.Name]
 
-		if v55 and v55.editable then
-			t6[v54] = {
+		if v and v.editable then
+			editableMeshes[descendant] = {
 				MeshId = {
-					instance = v55.editable,
-					created = v55.createdInValidation or false
+					instance = v.editable,
+					created = v.createdInValidation or false
 				}
 			}
 		end
 	end
 
-	return {
-		assetTypeEnum = p10,
-		editableMeshes = t6
-	}
+	return { assetTypeEnum = assetTypeEnum, editableMeshes = editableMeshes }
 end
-local function calculateAllPartsBoundsData(t7: {[any]: any}, p11: ((...any) -> ...any), p12, p13) -- line: 170
-	-- upvalues: getMeshInfo (copy), Constants (copy), calculateBoundsDataForPart (copy)
-	local t8 = {}
 
-	for v61, v62 in t7 do
-		local v63 = p11(v61)
-		local v64 = nil
+local function calculateAllPartsBoundsData(items, callback, p, p2)
+	local result = {}
 
-		if not p13 then
-			local v65, v66
+	for k, item in items do
+		local v = callback(k)
+		local v2
 
-			v65, v66, v64 = getMeshInfo(v63, Constants.MESH_CONTENT_TYPE.RENDER_MESH, p12)
+		if not p2 then
+			local v3, v4
+			v3, v4, v2 = getMeshInfo(v, Constants.MESH_CONTENT_TYPE.RENDER_MESH, p)
 
-			if not v65 then
-				return v65, v66
+			if not v3 then
+				return v3, v4
 			end
 		end
 
-		local v67, v68, v69 = calculateBoundsDataForPart(v64, v63, v62, p12, p13)
+		local v3, v4, v5 = calculateBoundsDataForPart(v2, v, item, p, p2)
 
-		if not v67 then
-			return v67, v68
+		if not v3 then
+			return v3, v4
 		end
 
-		t8[v61] = v69
+		result[k] = v5
 	end
 
-	return true, nil, t8
-end
-local function calculateTotalBoundsForAsset(t9: {[any]: any}, p14: ((...any) -> ...any), p15) -- line: 201
-	-- upvalues: calculateAllPartsBoundsData (copy), BoundsDataUtils (copy)
-	local v73, v74, v75 = calculateAllPartsBoundsData(t9, p14, p15)
-
-	if not v73 then
-		return v73, v74
-	end
-
-	local t10 = {}
-
-	for _, v78 in v75 do
-		t10 = BoundsDataUtils.combineBounds(t10, v78)
-	end
-
-	return true, nil, t10
-end
-local function calculatePartBounds(p16, p17) -- line: 220
-	-- upvalues: calculateTotalBoundsForAsset (copy)
-	local t11 = {
-		[p16.Name] = CFrame.new()
-	}
-
-	local function findMeshHandle(s2: string) -- line: 225
-		-- upvalues: p16 (copy)
-		assert(s2 == p16.Name)
-
-		return p16
-	end
-
-	local v83, v84, v85 = calculateTotalBoundsForAsset(t11, findMeshHandle, p17)
-
-	if not v83 then
-		return v83, v84
-	end
-
-	return true, nil, v85
+	return true, nil, result
 end
 
-function t1.calculateAssetBounds(p18, p19) -- line: 239
-	-- upvalues: calculatePartBounds (copy), AssetCalculator (copy), orientSingleAssetToWorldAxes (copy), calculateTotalBoundsForAsset (copy)
-	local assetTypeEnum = p19.assetTypeEnum
+local function calculateTotalBoundsForAsset(p, findMeshHandle, p2)
+	local v, v2, v3 = calculateAllPartsBoundsData(p, findMeshHandle, p2)
 
+	if not v then
+		return v, v2
+	end
+
+	local v4 = {}
+
+	for _, v5 in v3 do
+		v4 = BoundsDataUtils.combineBounds(v4, v5)
+	end
+
+	return true, nil, v4
+end
+
+local function calculatePartBounds(instance, p)
+	local function findMeshHandle(p2: string)
+		assert(p2 == instance.Name)
+		return instance
+	end
+
+	local v, v2, v3 = calculateTotalBoundsForAsset({ [instance.Name] = CFrame.new() }, findMeshHandle, p)
+
+	if v then
+		return true, nil, v3
+	end
+
+	return v, v2
+end
+
+function BoundsCalculator.calculateAssetBounds(instance, p)
+	local assetTypeEnum = p.assetTypeEnum
 	assert(assetTypeEnum)
 
 	if assetTypeEnum == Enum.AssetType.DynamicHead then
-		return calculatePartBounds(p18, p19)
+		return calculatePartBounds(instance, p)
 	end
 
-	local v89 = AssetCalculator.calculateAllTransformsForAsset(assetTypeEnum, p18)
+	local allTransformsForAsset = AssetCalculator.calculateAllTransformsForAsset(assetTypeEnum, instance)
 
-	local function findMeshHandle(s3: string) -- line: 252
-		-- upvalues: p18 (copy)
-		return (p18:FindFirstChild(s3))
+	local function findMeshHandle(childName: string)
+		return (instance:FindFirstChild(childName))
 	end
 
-	orientSingleAssetToWorldAxes(v89, assetTypeEnum, findMeshHandle)
+	orientSingleAssetToWorldAxes(allTransformsForAsset, assetTypeEnum, findMeshHandle)
 
-	local v91, v92, v93 = calculateTotalBoundsForAsset(v89, findMeshHandle, p19)
+	local v, v2, v3 = calculateTotalBoundsForAsset(allTransformsForAsset, findMeshHandle, p)
 
-	if not v91 then
-		return v91, v92
+	if v then
+		return true, nil, v3
 	end
 
-	return true, nil, v93
+	return v, v2
 end
-function t1.calculateIndividualAssetPartsData(p20, p21) -- line: 268
-	-- upvalues: AssetCalculator (copy), orientSingleAssetToWorldAxes (copy), calculateAllPartsBoundsData (copy)
-	local assetTypeEnum = p21.assetTypeEnum
 
+function BoundsCalculator.calculateIndividualAssetPartsData(instance, p)
+	local assetTypeEnum = p.assetTypeEnum
 	assert(assetTypeEnum)
 
-	local v97 = AssetCalculator.calculateAllTransformsForAsset(assetTypeEnum, p20)
+	local allTransformsForAsset = AssetCalculator.calculateAllTransformsForAsset(assetTypeEnum, instance)
 
-	local function findMeshHandle(s4: string) -- line: 277
-		-- upvalues: assetTypeEnum (copy), p20 (copy)
+	local function findMeshHandle(childName: string)
 		if assetTypeEnum == Enum.AssetType.DynamicHead then
-			return p20
+			return instance
 		end
 
-		return (p20:FindFirstChild(s4))
+		return (instance:FindFirstChild(childName))
 	end
 
-	orientSingleAssetToWorldAxes(v97, assetTypeEnum, findMeshHandle)
+	orientSingleAssetToWorldAxes(allTransformsForAsset, assetTypeEnum, findMeshHandle)
 
-	local v99, v100, v101 = calculateAllPartsBoundsData(v97, findMeshHandle, p21)
+	local v, v2, v3 = calculateAllPartsBoundsData(allTransformsForAsset, findMeshHandle, p)
 
-	if not v99 then
-		return v99, v100
+	if not v then
+		return v, v2
 	end
 
-	local t12 = {}
+	local result = {}
 
-	for v103, v104 in v101 do
-		t12[v103] = {
-			boundsData = v104,
-			cframe = v97[v103]
-		}
+	for k, boundsData in v3 do
+		result[k] = { boundsData = boundsData, cframe = allTransformsForAsset[k] }
 	end
 
-	return true, nil, t12
+	return true, nil, result
 end
-function t1.calculateIndividualFullBodyPartsData(p22, p23, p24, b1: boolean) -- line: 302
-	-- upvalues: AssetCalculator (copy), getFFlagUGCValidateLegFullBodySeparation (copy), orientFullBodyArmsLegsToWorldAxes (copy), calculateAllPartsBoundsData (copy)
-	local function findMeshHandle(s5: string) -- line: 308
-		-- upvalues: p22 (copy)
-		return p22[s5]
+
+function BoundsCalculator.calculateIndividualFullBodyPartsData(p, p2, p3, flag: boolean)
+	local function findMeshHandle(p4: string)
+		return p[p4]
 	end
 
-	local v110 = AssetCalculator.calculateAllTransformsForFullBody(p22)
+	local allTransformsForFullBody = AssetCalculator.calculateAllTransformsForFullBody(p)
 
-	if getFFlagUGCValidateLegFullBodySeparation() then
-		if b1 then
-			orientFullBodyArmsLegsToWorldAxes(v110, findMeshHandle)
-		end
-	else
-		orientFullBodyArmsLegsToWorldAxes(v110, findMeshHandle)
+	if flag then
+		orientFullBodyArmsLegsToWorldAxes(allTransformsForFullBody, findMeshHandle)
 	end
 
-	local v111, v112, v113 = calculateAllPartsBoundsData(v110, findMeshHandle, p23, p24)
+	local v, v2, v3 = calculateAllPartsBoundsData(allTransformsForFullBody, findMeshHandle, p2, p3)
 
-	if not v111 then
-		return v111, v112
+	if not v then
+		return v, v2
 	end
 
-	local t13 = {}
+	local result = {}
 
-	for v115, v116 in v113 do
-		t13[v115] = {
-			boundsData = v116,
-			cframe = v110[v115]
-		}
+	for k, boundsData in v3 do
+		result[k] = { boundsData = boundsData, cframe = allTransformsForFullBody[k] }
 	end
 
-	return true, nil, t13
+	return true, nil, result
 end
-function t1.calculateFullBodyBounds(p25, p26) -- line: 335
-	-- upvalues: AssetCalculator (copy), orientFullBodyArmsLegsToWorldAxes (copy), calculateTotalBoundsForAsset (copy)
-	local function findMeshHandle(s6: string) -- line: 339
-		-- upvalues: p25 (copy)
-		return p25[s6]
+
+function BoundsCalculator.calculateFullBodyBounds(p, p2)
+	local function findMeshHandle(p3: string)
+		return p[p3]
 	end
 
-	local v120 = AssetCalculator.calculateAllTransformsForFullBody(p25)
+	local allTransformsForFullBody = AssetCalculator.calculateAllTransformsForFullBody(p)
+	orientFullBodyArmsLegsToWorldAxes(allTransformsForFullBody, findMeshHandle)
 
-	orientFullBodyArmsLegsToWorldAxes(v120, findMeshHandle)
+	local v, v2, v3 = calculateTotalBoundsForAsset(allTransformsForFullBody, findMeshHandle, p2)
 
-	local v121, v122, v123 = calculateTotalBoundsForAsset(v120, findMeshHandle, p26)
-
-	if not v121 then
-		return v121, v122
+	if v then
+		return true, nil, v3
 	end
 
-	return true, nil, v123
+	return v, v2
 end
-function t1.calculateAssetBoundsFromData(p27, p28, t14: {[any]: any}) -- line: 353
-	-- upvalues: getFFlagUGCValidateMigrateBodyPartBounds (copy), buildValidationContextFromRenderMeshes (copy), t1 (copy)
-	assert(getFFlagUGCValidateMigrateBodyPartBounds(), "calculateAssetBoundsFromData requires FFlagUGCValidateMigrateBodyPartBounds")
 
-	local v127 = buildValidationContextFromRenderMeshes(p27, p28, t14)
-
-	return t1.calculateAssetBounds(p27, v127)
+function BoundsCalculator.calculateAssetBoundsFromData(p, assetTypeEnum, p2)
+	local validationContextFromRenderMeshes = buildValidationContextFromRenderMeshes(p, assetTypeEnum, p2)
+	return BoundsCalculator.calculateAssetBounds(p, validationContextFromRenderMeshes)
 end
-function t1.calculateFullBodyBoundsFromData(p29, t15: {[any]: any}) -- line: 366
-	-- upvalues: getFFlagUGCValidateMigrateBodyPartBounds (copy), buildValidationContextFromRenderMeshes (copy), t1 (copy)
-	assert(getFFlagUGCValidateMigrateBodyPartBounds(), "calculateFullBodyBoundsFromData requires FFlagUGCValidateMigrateBodyPartBounds")
 
-	local v130 = next(p29)
+function BoundsCalculator.calculateFullBodyBoundsFromData(items, p)
+	local v = next(items)
 
-	if not v130 then
+	if not v then
 		return false, { "No body parts provided" }
 	end
 
-	local Parent = p29[v130].Parent
-	local v132 = buildValidationContextFromRenderMeshes(Parent, nil, t15)
-
-	return t1.calculateFullBodyBounds(p29, v132)
-end
-function t1.calculateIndividualAssetPartsDataFromData(p30, p31, t16: {[any]: any}) -- line: 383
-	-- upvalues: getFFlagUGCValidateMigrateBodyPartBounds (copy), buildValidationContextFromRenderMeshes (copy), t1 (copy)
-	assert(getFFlagUGCValidateMigrateBodyPartBounds(), "calculateIndividualAssetPartsDataFromData requires FFlagUGCValidateMigrateBodyPartBounds")
-
-	local v136 = buildValidationContextFromRenderMeshes(p30, p31, t16)
-
-	return t1.calculateIndividualAssetPartsData(p30, v136)
+	local validationContextFromRenderMeshes = buildValidationContextFromRenderMeshes(items[v].Parent, nil, p)
+	return BoundsCalculator.calculateFullBodyBounds(items, validationContextFromRenderMeshes)
 end
 
-return t1
+function BoundsCalculator.calculateIndividualAssetPartsDataFromData(p, assetTypeEnum, p2)
+	local validationContextFromRenderMeshes = buildValidationContextFromRenderMeshes(p, assetTypeEnum, p2)
+	return BoundsCalculator.calculateIndividualAssetPartsData(p, validationContextFromRenderMeshes)
+end
+
+return BoundsCalculator

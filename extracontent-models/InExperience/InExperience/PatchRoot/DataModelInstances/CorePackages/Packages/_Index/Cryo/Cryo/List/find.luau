@@ -1,6 +1,6 @@
-local function find(p1, p2) -- line: 5
-	for i = 1, #p1 do
-		if p2 == p1[i] then
+local function find(list, p)
+	for i = 1, #list do
+		if list[i] == p then
 			return i
 		end
 	end

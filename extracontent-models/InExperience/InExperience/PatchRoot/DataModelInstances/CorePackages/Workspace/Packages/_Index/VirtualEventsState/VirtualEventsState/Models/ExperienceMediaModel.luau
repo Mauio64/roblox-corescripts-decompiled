@@ -1,13 +1,13 @@
 return {
-	mock = function(n1: number?) -- line: 18
+	mock = function(value: number?)
 		return {
 			assetTypeId = -1,
 			assetType = "Image",
+			imageId = value or 123456789,
 			videoHash = nil,
 			videoTitle = nil,
 			approved = true,
-			altText = "Alt Text",
-			imageId = n1 or 123456789
+			altText = "Alt Text"
 		}
 	end
 }

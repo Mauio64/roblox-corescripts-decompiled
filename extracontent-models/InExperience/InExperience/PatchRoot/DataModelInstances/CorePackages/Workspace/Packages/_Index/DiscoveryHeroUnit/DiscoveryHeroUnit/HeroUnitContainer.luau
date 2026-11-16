@@ -1,302 +1,355 @@
 local DiscoveryHeroUnit = script:FindFirstAncestor("DiscoveryHeroUnit")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local DiscoveryHeroUnitParent = DiscoveryHeroUnit.Parent
-local ArgCheck = require(DiscoveryHeroUnitParent.ArgCheck)
-local Cryo = require(DiscoveryHeroUnitParent.Cryo)
-local Foundation = require(DiscoveryHeroUnitParent.Foundation)
+
+local parent = DiscoveryHeroUnit.Parent
+local ArgCheck = require(parent.ArgCheck)
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local FoundationImage = Foundation.Image
-local React = require(DiscoveryHeroUnitParent.React)
-local Responsive = require(DiscoveryHeroUnitParent.Responsive)
+local Image = Foundation.Image
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
+
 local HeroImages = require(DiscoveryHeroUnit.HeroImages)
-local HeroNarrowLayout = require(DiscoveryHeroUnit.HeroUnitTypes).HeroNarrowLayout
-local CollectionViews = require(DiscoveryHeroUnitParent.CollectionViews)
+local HeroUnitTypes = require(DiscoveryHeroUnit.HeroUnitTypes)
+local HeroNarrowLayout = HeroUnitTypes.HeroNarrowLayout
+
+local CollectionViews = require(parent.CollectionViews)
 local CollectionHeader = CollectionViews.CollectionHeader
 local maybeForceDarkTheme = CollectionViews.maybeForceDarkTheme
-local SharedFlags = require(DiscoveryHeroUnitParent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppEnableHeroUnitV2 = SharedFlags.FFlagLuaAppEnableHeroUnitV2
-local FFlagLuaAppHeroUnitParallaxUpdates = SharedFlags.FFlagLuaAppHeroUnitParallaxUpdates
 local FFlagLuaAppHomePageFirstImageLoadObserver = SharedFlags.FFlagLuaAppHomePageFirstImageLoadObserver
-local t1 = {
-	Compact = 0.5625,
-	Square = 1,
-	Tall = 1.25
-}
-local t2 = {
-	Transparency = 0,
-	Color3 = Color3.new(1, 1, 1)
-}
 
-local function scaleSizeForPlatform(n1: number, p1) -- line: 138
-	return n1 * p1.Stroke.Standard
+local v = { Compact = 0.5625, Square = 1, Tall = 1.25 }
+
+local v2 = { Color3 = Color3.new(1, 1, 1), Transparency = 0 }
+
+local function scaleSizeForPlatform(p: number, data) -- 3 equivalent calls inferred from this helper
+	return p * data.Stroke.Standard
 end
-local function useHeroConfiguration(t3: {[any]: any}, p2) -- line: 143
-	-- upvalues: Responsive (copy), HeroNarrowLayout (copy), t1 (copy), FFlagLuaAppEnableHeroUnitV2 (copy), Cryo (copy), UserGameSettings (copy)
-	local v29 = Responsive.useResponsive({
-		{
-			Key = "Small",
-			maxWidth = 413
-		},
-		{
-			Key = "Medium",
-			maxWidth = 600
-		}
+
+local function useHeroConfiguration(props, data)
+	local v3 = Responsive.useResponsive({
+		{ Key = "Small", maxWidth = 413 },
+		{ Key = "Medium", maxWidth = 600 }
 	})
-	local v30 = nil
-	local v31 = nil
-	local v33, BodyMedium, v35, Large, Large2, n2
 
-	if v29 == "Small" or v29 == "Medium" then
-		local v32 = t3.narrowLayout or HeroNarrowLayout.Compact
+	local aspectRatio = nil
+	local backgroundImageFrameHeight = nil
+	local titleTypography, subtitleTypography, hideSubtitle, contentPadding, foregroundOverflow, titleImageHeightPercentage
 
-		v30 = t1[v32] or t1[HeroNarrowLayout.Compact]
-		v33 = if v29 ~= "Small" then p2.Typography.HeadingLarge else p2.Typography.HeadingMedium
-		BodyMedium = p2.Typography.BodyMedium
-		v35 = t3.titleImage == nil and v32 == HeroNarrowLayout.Compact or t3.subtitle == nil
-		Large = p2.Padding.Large
-		Large2 = p2.Gap.Large
+	if v3 == "Small" or v3 == "Medium" then
+		local narrowLayout = props.narrowLayout or HeroNarrowLayout.Compact
+		aspectRatio = v[narrowLayout] or v[HeroNarrowLayout.Compact]
+
+		if v3 == "Small" then
+			titleTypography = data.Typography.HeadingMedium
+		else
+			titleTypography = data.Typography.HeadingLarge
+		end
+
+		subtitleTypography = data.Typography.BodyMedium
+		hideSubtitle = props.titleImage == nil and narrowLayout == HeroNarrowLayout.Compact or props.subtitle == nil
+		contentPadding = data.Padding.Large
+		foregroundOverflow = data.Gap.Large
 
 		if FFlagLuaAppEnableHeroUnitV2 then
-			n2 = 0.16
-
-			if t3.titleImageAspectRatio == 1 then
-				n2 = 0.26
+			if props.titleImageAspectRatio == 1 then
+				titleImageHeightPercentage = 0.26
+			else
+				titleImageHeightPercentage = 0.16
 			end
 		else
-			n2 = 0.25
+			titleImageHeightPercentage = 0.25
 		end
 	else
-		v31 = 336 * p2.Stroke.Standard
-		v33 = p2.Typography.DisplaySmall
-		BodyMedium = p2.Typography.BodyLarge
-		v35 = t3.subtitle == nil
-		Large = p2.Padding.XLarge
-		Large2 = p2.Gap.XXLarge
+		backgroundImageFrameHeight = scaleSizeForPlatform(336, data) -- inferred equivalent call
+		titleTypography = data.Typography.DisplaySmall
+		subtitleTypography = data.Typography.BodyLarge
+		hideSubtitle = props.subtitle == nil
+		contentPadding = data.Padding.XLarge
+		foregroundOverflow = data.Gap.XXLarge
 
 		if FFlagLuaAppEnableHeroUnitV2 then
-			n2 = 0.2
-
-			if t3.titleImageAspectRatio == 1 then
-				n2 = 0.3
+			if props.titleImageAspectRatio == 1 then
+				titleImageHeightPercentage = 0.3
+			else
+				titleImageHeightPercentage = 0.2
 			end
 		else
-			n2 = 0.3
+			titleImageHeightPercentage = 0.3
 		end
 	end
 
-	local n3, n4
+	local gradientWidthPercent, gradientHeightPercent
 
-	if t3.gradient ~= nil then
-		if t3.gradient.degree == 270 then
-			n3 = 0.5
-			n4 = 1
-		elseif t3.gradient.degree == 0 then
-			n3 = 1
-			n4 = 0.5
-		else
-			n3 = 0.5
-			n4 = 1
-		end
+	if props.gradient == nil or props.gradient.degree == 270 then
+		gradientWidthPercent = 1
+		gradientHeightPercent = 0.5
+	elseif props.gradient.degree == 0 then
+		gradientWidthPercent = 0.5
+		gradientHeightPercent = 1
 	else
-		n3 = 0.5
-		n4 = 1
+		gradientWidthPercent = 1
+		gradientHeightPercent = 0.5
 	end
 
 	return Cryo.Dictionary.join({
+		cornerRadius = data.Radius.Medium,
+		titleTypography = titleTypography,
+		subtitleTypography = subtitleTypography,
+		aspectRatio = aspectRatio,
+		backgroundImageFrameHeight = backgroundImageFrameHeight,
+		hideSubtitle = hideSubtitle,
+		foregroundOverflow = foregroundOverflow,
+		backgroundOverflow = scaleSizeForPlatform(50, data), -- inferred equivalent call
 		foregroundAspectRatio = 1,
-		sideMargin = 0,
-		minForegroundHeightPercent = 0.8,
-		maxForegroundHeightPercent = 1,
-		titleImageAspectRatio = 3,
-		cornerRadius = p2.Radius.Medium,
-		titleTypography = v33,
-		subtitleTypography = BodyMedium,
-		aspectRatio = v30,
-		backgroundImageFrameHeight = v31,
-		hideSubtitle = v35,
-		foregroundOverflow = Large2,
-		backgroundOverflow = 50 * p2.Stroke.Standard,
-		gradientWidthPercent = n4,
-		gradientHeightPercent = n3,
-		contentPadding = Large,
+		gradientWidthPercent = gradientWidthPercent,
+		gradientHeightPercent = gradientHeightPercent,
+		contentPadding = contentPadding,
 		enableBackgroundAnimation = not UserGameSettings.ReducedMotion,
 		enableForegroundAnimation = not UserGameSettings.ReducedMotion,
-		titleImageHeightPercentage = n2,
-		minCardHeight = 262 * p2.Stroke.Standard
-	}, t3)
+		sideMargin = 0,
+		titleImageAspectRatio = 3,
+		titleImageHeightPercentage = titleImageHeightPercentage,
+		minCardHeight = scaleSizeForPlatform(262, data) -- inferred equivalent call
+	}, props)
 end
-local function HeroUnitContainer(t4: {[any]: any}) -- line: 246
-	-- upvalues: React (copy), useTokens (copy), useHeroConfiguration (copy), FFlagLuaAppEnableHeroUnitV2 (copy), ArgCheck (copy), FoundationImage (copy), FFlagLuaAppHomePageFirstImageLoadObserver (copy), CollectionHeader (copy), t2 (copy), HeroImages (copy), FFlagLuaAppHeroUnitParallaxUpdates (copy), UserGameSettings (copy), maybeForceDarkTheme (copy)
-	local v42, v43 = React.useBinding(0)
-	local v44 = React.useCallback(function(p3) -- line: 248
-		-- upvalues: v43 (copy)
-		if p3 then
-			v43(p3.AbsoluteSize.X)
+
+local function HeroUnitContainer(props)
+	local v3, v4 = React.useBinding(0)
+	local ref = React.useCallback(function(p)
+		if p then
+			v4(p.AbsoluteSize.X)
 		end
 	end, {})
-	local v45 = useTokens()
-	local v46 = useHeroConfiguration(t4, v45)
-	local u47 = if not v46.backgroundImageFrameHeight or not v46.foregroundOverflow then v46.backgroundImageFrameHeight else v46.backgroundImageFrameHeight + v46.foregroundOverflow
 
-	if FFlagLuaAppEnableHeroUnitV2 then
-		assert(v46.minCardHeight ~= nil, "minCardHeight is required")
-		assert(v46.titleImageAspectRatio ~= nil, "titleImageAspectRatio is required")
+	local tokens = useTokens()
+
+	local v5 = useHeroConfiguration(props, tokens)
+	local v6
+
+	if v5.backgroundImageFrameHeight and v5.foregroundOverflow then
+		v6 = v5.backgroundImageFrameHeight + v5.foregroundOverflow
+	else
+		v6 = v5.backgroundImageFrameHeight
 	end
 
-	local v48 = React.useCallback(function() -- line: 270
-		-- upvalues: t4 (copy), ArgCheck (copy), React (copy), FoundationImage (copy), v42 (copy), u47 (ref), v46 (copy), FFlagLuaAppHomePageFirstImageLoadObserver (copy)
-		if not t4.titleImage then
-			ArgCheck.assert(false, "The path should never be called")
+	if FFlagLuaAppEnableHeroUnitV2 then
+		assert(v5.minCardHeight ~= nil, "minCardHeight is required")
+		assert(v5.titleImageAspectRatio ~= nil, "titleImageAspectRatio is required")
+	end
 
-			return React.createElement(React.Fragment)
+	local title = React.useCallback(function()
+		if props.titleImage then
+			return React.createElement(Image, {
+				Image = props.titleImage,
+				Size = v3:map(function(p: number)
+					local v7 = v6
+
+					if v5.aspectRatio then
+						v7 = math.max(v5.minCardHeight, p * v5.aspectRatio + v5.foregroundOverflow)
+					end
+
+					return UDim2.new(0, p, 0, v7 * v5.titleImageHeightPercentage)
+				end),
+				aspectRatio = v5.titleImageAspectRatio,
+				Position = UDim2.new(0, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				ZIndex = 0,
+				tag = FFlagLuaAppHomePageFirstImageLoadObserver and "observed-image" or nil
+			})
 		end
 
-		return React.createElement(FoundationImage, {
-			ZIndex = 0,
-			Image = t4.titleImage,
-			Size = v42:map(function(n5: number) -- line: 278
-				-- upvalues: u47 (ref), v46 (copy)
-				local v59 = u47
-
-				if v46.aspectRatio then
-					v59 = math.max(v46.minCardHeight, n5 * v46.aspectRatio + v46.foregroundOverflow)
-				end
-
-				return UDim2.new(0, n5, 0, v59 * v46.titleImageHeightPercentage)
-			end),
-			aspectRatio = v46.titleImageAspectRatio,
-			Position = UDim2.new(0, 0, 0.5, 0),
-			AnchorPoint = Vector2.new(0, 0.5),
-			tag = if not FFlagLuaAppHomePageFirstImageLoadObserver then nil else "observed-image"
-		})
+		ArgCheck.assert(false, "The path should never be called")
+		return React.createElement(React.Fragment)
 	end, {
-		v42,
-		u47,
-		t4.titleImage,
-		v46.titleImageAspectRatio,
-		v46.minCardHeight,
-		v46.aspectRatio,
-		v46.foregroundOverflow,
-		v46.titleImageHeightPercentage
-	})
-	local v49 = t4.headerComponent or React.createElement(CollectionHeader, {
-		LayoutOrder = 0,
-		hideButton = true,
-		forceUpdatedHeader = true,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		title = if not FFlagLuaAppEnableHeroUnitV2 then if not t4.titleImage then t4.title else v48 else t4.title,
-		AnchorPoint = Vector2.new(0, 0.5),
-		subtitle = if not v46.hideSubtitle then t4.subtitle else nil,
-		titleColor = t2,
-		subtitleColor = t2,
-		titleTypography = v46.titleTypography,
-		subtitleTypography = v46.subtitleTypography,
-		Position = UDim2.new(0, 0, 0.5, 0)
+		v3,
+		v6,
+		props.titleImage,
+		v5.titleImageAspectRatio,
+		v5.minCardHeight,
+		v5.aspectRatio,
+		v5.foregroundOverflow,
+		v5.titleImageHeightPercentage
 	})
 
-	return React.createElement("TextButton", {
-		ref = v44,
-		[React.Change.AbsoluteSize] = v44,
-		Position = UDim2.new(0, v46.sideMargin, 0, 0),
-		Size = if not v46.aspectRatio then UDim2.new(1, -2 * v46.sideMargin, 0, u47) else v42:map(function(n6: number) -- line: 327
-			-- upvalues: v46 (copy)
-			return UDim2.new(1, -2 * v46.sideMargin, 0, (math.max(v46.minCardHeight, n6 * v46.aspectRatio + v46.foregroundOverflow)))
-		end),
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Text = "",
-		[React.Event.Activated] = t4.onActivated,
-		SelectionOrder = t4.SelectionOrder,
-		[React.Tag] = if not t4.testId then nil else `data-testid={ t4.testId }`
-	}, {
-		HeroBackground = t4.backgroundComponent or React.createElement(HeroImages, {
+	local heroHeader = props.headerComponent
+
+	if not heroHeader then
+		local createElement = React.createElement
+		local v7 = {
+			LayoutOrder = 0,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			title = 0,
+			AnchorPoint = 0,
+			subtitle = 0,
+			hideButton = true,
+			titleColor = 0,
+			subtitleColor = 0,
+			titleTypography = 0,
+			subtitleTypography = 0,
+			forceUpdatedHeader = true,
+			Position = 0
+		}
+
+		if FFlagLuaAppEnableHeroUnitV2 then
+			title = props.title
+		elseif not props.titleImage then
+			title = props.title
+		end
+
+		v7.title = title
+
+		v7.AnchorPoint = Vector2.new(0, 0.5)
+		local subtitle
+
+		if not v5.hideSubtitle then
+			subtitle = props.subtitle
+		end
+
+		v7.subtitle = subtitle
+
+		v7.titleColor = v2
+		v7.subtitleColor = v2
+		v7.titleTypography = v5.titleTypography
+		v7.subtitleTypography = v5.subtitleTypography
+
+		v7.Position = UDim2.new(0, 0, 0.5, 0)
+		heroHeader = createElement(CollectionHeader, v7)
+	end
+
+	local createElement = React.createElement
+	local v7 = {
+		["ref"] = nil,
+		["ref"] = nil,
+		["ref"] = nil,
+		["ref"] = nil,
+		["ref"] = nil,
+		["ref"] = nil,
+		ref = ref,
+		[React.Change.AbsoluteSize] = ref,
+		Position = UDim2.new(0, v5.sideMargin, 0, 0)
+	}
+	local size
+
+	if v5.aspectRatio then
+		size = v3:map(function(p: number)
+			return UDim2.new(
+				1,
+				-2 * v5.sideMargin,
+				0,
+				(math.max(v5.minCardHeight, p * v5.aspectRatio + v5.foregroundOverflow))
+			)
+		end)
+	else
+		size = UDim2.new(1, -2 * v5.sideMargin, 0, v6)
+	end
+
+	v7.Size = size
+
+	v7.BackgroundTransparency = 1
+	v7.BorderSizePixel = 0
+	v7.Text = ""
+	v7[React.Event.Activated] = props.onActivated
+	v7.SelectionOrder = props.SelectionOrder
+	local tag = React.Tag
+	local v8
+
+	if props.testId then
+		v8 = `data-testid={props.testId}`
+	end
+
+	v7[tag] = v8
+	local v9 = {
+		HeroBackground = props.backgroundComponent or React.createElement(HeroImages, {
 			ZIndex = 0,
 			Size = UDim2.new(1, 0, 1, 0),
 			AnchorPoint = Vector2.new(0, 1),
 			Position = UDim2.new(0, 0, 1, 0),
-			verticalScrollingFrameRef = t4.verticalScrollingFrameRef,
-			foregroundImage = t4.foregroundImage,
-			backgroundImage = t4.backgroundImage,
-			foregroundAspectRatio = v46.foregroundAspectRatio,
-			foregroundHeightPercent = if not FFlagLuaAppHeroUnitParallaxUpdates then v42:map(function(n7: number) -- line: 358
-				-- upvalues: v46 (copy)
-				local minForegroundHeightPercent = v46.minForegroundHeightPercent
-				local maxForegroundHeightPercent = v46.maxForegroundHeightPercent
-
-				if n7 < 600 then
-					return minForegroundHeightPercent
-				end
-
-				if n7 > 1140 then
-					return maxForegroundHeightPercent
-				end
-
-				local v55 = (n7 - 600) / 540
-
-				return v55 * maxForegroundHeightPercent + (1 - v55) * minForegroundHeightPercent
-			end) else nil,
-			foregroundOverflow = v46.foregroundOverflow,
-			backgroundOverflow = v46.backgroundOverflow,
-			cornerRadius = v46.cornerRadius,
-			enableBackgroundAnimation = v46.enableBackgroundAnimation and not UserGameSettings.ReducedMotion,
-			enableForegroundAnimation = v46.enableForegroundAnimation and not UserGameSettings.ReducedMotion,
-			gradient = v46.gradient,
-			gradientHeightPercent = v46.gradientHeightPercent,
-			gradientWidthPercent = v46.gradientWidthPercent,
-			tokens = v45
+			verticalScrollingFrameRef = props.verticalScrollingFrameRef,
+			foregroundImage = props.foregroundImage,
+			backgroundImage = props.backgroundImage,
+			foregroundAspectRatio = v5.foregroundAspectRatio,
+			foregroundOverflow = v5.foregroundOverflow,
+			backgroundOverflow = v5.backgroundOverflow,
+			cornerRadius = v5.cornerRadius,
+			enableBackgroundAnimation = v5.enableBackgroundAnimation and not UserGameSettings.ReducedMotion,
+			enableForegroundAnimation = v5.enableForegroundAnimation and not UserGameSettings.ReducedMotion,
+			gradient = v5.gradient,
+			gradientHeightPercent = v5.gradientHeightPercent,
+			gradientWidthPercent = v5.gradientWidthPercent,
+			tokens = tokens
 		}),
-		HeroForeground = maybeForceDarkTheme(React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			ZIndex = 2,
-			Size = UDim2.new(1, 0, 1, -v46.foregroundOverflow),
-			Position = UDim2.new(0, 0, 0, v46.foregroundOverflow)
-		}, {
-			UIPadding = React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v46.contentPadding),
-				PaddingRight = UDim.new(0, v46.contentPadding),
-				PaddingTop = UDim.new(0, v46.contentPadding),
-				PaddingBottom = UDim.new(0, v46.contentPadding)
-			}),
-			HeroLogo = if not FFlagLuaAppEnableHeroUnitV2 or not t4.titleImage then nil else React.createElement(FoundationImage, {
-				Image = t4.titleImage,
-				Size = v42:map(function(n8: number) -- line: 401
-					-- upvalues: u47 (ref), v46 (copy)
-					local v57 = u47 or 0
+		HeroForeground = 0
+	}
 
-					if v46.aspectRatio then
-						v57 = math.max(v46.minCardHeight, n8 * v46.aspectRatio + v46.foregroundOverflow)
-					end
+	local createElement2 = React.createElement
+	local v10 = {
+		Size = UDim2.new(1, 0, 1, -v5.foregroundOverflow),
+		Position = UDim2.new(0, 0, 0, v5.foregroundOverflow),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = 2
+	}
 
-					return UDim2.new(0, n8, 0, v57 * v46.titleImageHeightPercentage)
-				end),
-				aspectRatio = v46.titleImageAspectRatio,
-				Position = UDim2.new(1, 0, 0, 0),
-				AnchorPoint = Vector2.new(1, 0)
-			}),
-			HeroHeaderFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Position = UDim2.new(0, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0, 0.5)
-			}, {
-				HeroHeader = v49
-			}),
-			HeroBottomRowFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Position = UDim2.new(0, 0, 1, 0),
-				AnchorPoint = Vector2.new(0, 1)
-			}, {
-				HeroBottomRow = t4.bottomRowComponent
-			}),
-			HeroOverlay = t4.overlayComponent
-		}), true)
-	})
+	local children = {
+		UIPadding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, v5.contentPadding),
+			PaddingRight = UDim.new(0, v5.contentPadding),
+			PaddingTop = UDim.new(0, v5.contentPadding),
+			PaddingBottom = UDim.new(0, v5.contentPadding)
+		}),
+		HeroLogo = 0,
+		HeroHeaderFrame = 0,
+		HeroBottomRowFrame = 0,
+		HeroOverlay = 0
+	}
+	local heroLogo
+
+	if FFlagLuaAppEnableHeroUnitV2 and props.titleImage then
+		heroLogo = React.createElement(Image, {
+			Image = props.titleImage,
+			Size = v3:map(function(p: number)
+				local v11 = v6 or 0
+
+				if v5.aspectRatio then
+					v11 = math.max(v5.minCardHeight, p * v5.aspectRatio + v5.foregroundOverflow)
+				end
+
+				return UDim2.new(0, p, 0, v11 * v5.titleImageHeightPercentage)
+			end),
+			aspectRatio = v5.titleImageAspectRatio,
+			Position = UDim2.new(1, 0, 0, 0),
+			AnchorPoint = Vector2.new(1, 0)
+		})
+	end
+
+	children.HeroLogo = heroLogo
+
+	children.HeroHeaderFrame = React.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Position = UDim2.new(0, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0, 0.5),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0
+	}, { HeroHeader = heroHeader })
+
+	children.HeroBottomRowFrame = React.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Position = UDim2.new(0, 0, 1, 0),
+		AnchorPoint = Vector2.new(0, 1),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0
+	}, { HeroBottomRow = props.bottomRowComponent })
+
+	children.HeroOverlay = props.overlayComponent
+	v9.HeroForeground = maybeForceDarkTheme(createElement2("Frame", v10, children), true)
+	return createElement("TextButton", v7, v9)
 end
 
 return React.memo(HeroUnitContainer)

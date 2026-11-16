@@ -1,298 +1,470 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
 local Players = game:GetService("Players")
-local React = require(ParentParentParent.React)
-local Signals = require(ParentParentParent.Signals)
-local SignalsReact = require(ParentParentParent.SignalsReact)
-local Foundation = require(ParentParentParent.Foundation)
+
+local React = require(parent2.React)
+local CoreGuiCommon = require(parent2.CoreGuiCommon)
+local Signals = require(parent2.Signals)
+local SignalsReact = require(parent2.SignalsReact)
+local Foundation = require(parent2.Foundation)
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local ScrollView = Foundation.ScrollView
 local useTokens = Foundation.Hooks.useTokens
-local Constants = require(ParentParent.Common.Constants)
-local FFlagPlayerListReskinOptimization = require(ParentParent.Flags.FFlagPlayerListReskinOptimization)
-local usePlatformLeaderboard = require(ParentParent.Hooks.usePlatformLeaderboard)
-local PlatformEntryView = require(ParentParent.Components.Presentation.PlatformEntryView)
-local EmptyAndErrorStates = require(ParentParent.Components.Presentation.EmptyAndErrorStates)
-local resolveDisplayName = require(ParentParent.Common.resolveDisplayName)
-local getPeopleHeaderLabel = require(ParentParent.Common.getPeopleHeaderLabel)
+
+local Constants = require(parent.Common.Constants)
+local useGamepadStickScroll = CoreGuiCommon.Hooks.useGamepadStickScroll
+local useReportPanelContentHeight = require(parent.Hooks.useReportPanelContentHeight)
+local usePlatformLeaderboard = require(parent.Hooks.usePlatformLeaderboard)
+local PlatformEntryView = require(parent.Components.Presentation.PlatformEntryView)
+local EmptyAndErrorStates = require(parent.Components.Presentation.EmptyAndErrorStates)
+local resolveDisplayName = require(parent.Common.resolveDisplayName)
+local getPeopleHeaderLabel = require(parent.Common.getPeopleHeaderLabel)
+local FFlagPlayerListLocalizeGameText = require(parent.Flags.FFlagPlayerListLocalizeGameText)
+local FFlagPlayerListReskin = require(parent.Flags.FFlagPlayerListReskin)
+local Localization = require(parent2.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local LoadingState = EmptyAndErrorStates.LoadingState
 local EmptyFriendsState = EmptyAndErrorStates.EmptyFriendsState
 local ServiceUnavailableState = EmptyAndErrorStates.ServiceUnavailableState
-local v22 = Signals.createSignal(nil)
-local v23 = Signals.createSignal(nil)
-local v24 = require(ParentParentParent.CoreScriptsRoactCommon).Utilities.createSignalMap()
 
-local function formatRelativeTime(n1: number?, n2: number) -- line: 45
-	if n1 == nil then
+local leaderboardViewChangeTelemetry = nil
+local function getLeaderboardViewChangeTelemetry() -- 2 equivalent calls inferred from this helper
+	if leaderboardViewChangeTelemetry == nil then
+		local LeaderboardViewChangeTelemetry = require(parent.Common.LeaderboardViewChangeTelemetry)
+		leaderboardViewChangeTelemetry = LeaderboardViewChangeTelemetry
+	end
+
+	return leaderboardViewChangeTelemetry
+end
+
+local signal = Signals.createSignal(nil)
+local signal2 = Signals.createSignal(nil)
+local CoreScriptsRoactCommon = require(parent2.CoreScriptsRoactCommon)
+local signalMap = CoreScriptsRoactCommon.Utilities.createSignalMap()
+
+local function formatRelativeTimeLegacy(lastRefreshedAt: number?, now: number) -- 1 equivalent call inferred from this helper
+	if lastRefreshedAt == nil then
 		return "Unable to load"
 	end
 
-	return `Last updated { math.max(0, (math.floor((n2 - n1) / 60))) } min ago`
+	return `Last updated {math.max(0, (math.floor((now - lastRefreshedAt) / 60)))} min ago`
 end
-local function PlatformLeaderboardViewImpl(t1: {[any]: any}) -- line: 59
-	-- upvalues: usePlatformLeaderboard (copy), useTokens (copy), Constants (copy), v24 (copy), v22 (copy), v23 (copy), React (copy), SignalsReact (copy), Signals (copy), Players (copy), resolveDisplayName (copy), getPeopleHeaderLabel (copy), FFlagPlayerListReskinOptimization (copy), ServiceUnavailableState (copy), LoadingState (copy), EmptyFriendsState (copy), PlatformEntryView (copy), ScrollView (copy), View (copy), FoundationText (copy)
-	local tab = t1.tab
-	local v31 = tab == "Friends"
-	local v32 = usePlatformLeaderboard()
-	local UIScale = useTokens().Config.UI.Scale
-	local v34 = Constants.PLATFORM_ROW_HEIGHT * UIScale
-	local v35 = Constants.PLATFORM_HEADER_HEIGHT * UIScale
-	local v36 = 26 * UIScale
-	local v37 = Constants.PLATFORM_RANK_WIDTH * UIScale
-	local v38 = Constants.PLATFORM_SCORE_WIDTH * UIScale
-	local v39 = if not v32 then v24 else if not v31 then v32.globalEntries else v32.friendsEntries
-	local v40 = if not v32 then v22 else if not v31 then v32.getGlobalLastRefreshedAt else v32.getFriendsLastRefreshedAt
-	local v41 = if not v32 then v22 else if not v31 then v32.getUserScore else v32.getUserFriendScore
-	local v42 = if not v32 then v22 else if not v31 then v32.getUserRank else v32.getUserFriendRank
-	local v43 = if not v32 then v23 else v32.getUnit
-	local v44, v45 = React.useState("loading")
-	local v46, v47 = React.useState(0)
-	local v48 = React.useRef(false)
-	local v49 = SignalsReact.useSignalState(v39.getAllData)
-	local v50 = React.useMemo(function() -- line: 94
-		-- upvalues: Signals (copy), v40 (copy)
-		return Signals.createComputed(function(p1) -- line: 95
-			-- upvalues: v40 (copy)
-			return v40(p1) ~= nil
-		end)
-	end, { v40 })
-	local v51 = SignalsReact.useSignalState(v50)
-	local n3 = 0
 
-	for _ in pairs(v49) do
-		n3 += 1
+local function PlatformLeaderboardViewImpl(props)
+	local tab = props.tab
+	local v = tab == "Friends"
+	local useLegacyPanelStyling = props.legacyPanelBackgroundColor ~= nil
+	local v2 = usePlatformLeaderboard()
+
+	local scale = useTokens().Config.UI.Scale
+	local rowHeight = Constants.PLATFORM_ROW_HEIGHT * scale
+	local rowHeight2 = Constants.PLATFORM_HEADER_HEIGHT * scale
+	local v3 = Constants.PLATFORM_FOOTER_HEIGHT * scale
+	local rankWidth = Constants.PLATFORM_RANK_WIDTH * scale
+	local scoreWidth = Constants.PLATFORM_SCORE_WIDTH * scale
+
+	local v4 = useReportPanelContentHeight(rowHeight2 + rowHeight + v3)
+	local ref = React.useRef(nil)
+	local scrollingFrameRef = React.useCallback(function(current)
+		ref.current = current
+		v4(current)
+	end, { v4 })
+
+	useGamepadStickScroll({
+		actionName = "RbxPlayerListReskinGamepadStickScroll",
+		scrollingFrameRef = ref,
+		enabled = not useLegacyPanelStyling
+	})
+	local v5
+
+	if v2 then
+		v5 = if v then v2.friendsEntries else v2.globalEntries
+	else
+		v5 = signalMap
 	end
 
-	local v54 = SignalsReact.useSignalBinding(v40)
-	local v55, v56 = React.useBinding(os.time())
+	local v6
 
-	React.useEffect(function() -- line: 109
-		-- upvalues: v56 (copy)
-		local thread = nil
+	if v2 then
+		if v then
+			v6 = v2.getFriendsLastRefreshedAt
+		else
+			v6 = v2.getGlobalLastRefreshedAt
+		end
+	else
+		v6 = signal
+	end
 
-		local function schedule() -- line: 111
-			-- upvalues: thread (ref), v56 (copy), schedule (copy)
-			thread = task.delay(300, function() -- line: 112
-				-- upvalues: v56 (copy), schedule (copy)
-				v56(os.time())
+	local scoreGetter
+
+	if v2 then
+		if v then
+			scoreGetter = v2.getUserFriendScore
+		else
+			scoreGetter = v2.getUserScore
+		end
+	else
+		scoreGetter = signal
+	end
+
+	local rankGetter
+
+	if v2 then
+		rankGetter = if v then v2.getUserFriendRank else v2.getUserRank
+	else
+		rankGetter = signal
+	end
+
+	local v7 = if v2 then v2.getUnit else signal2
+
+	local state, setState = React.useState("loading")
+	local state2, setState2 = React.useState(0)
+	local ref2 = React.useRef(false)
+
+	local v8 = SignalsReact.useSignalState(v5.getAllData)
+
+	local v9 = React.useMemo(function()
+		return Signals.createComputed(function(p): boolean
+			return v6(p) ~= nil
+		end)
+	end, { v6 })
+	local v10 = SignalsReact.useSignalState(v9)
+	local count = 0
+
+	for _ in pairs(v8) do
+		count += 1
+	end
+
+	local rankHeader = nil
+	local text
+
+	if FFlagPlayerListLocalizeGameText then
+		local v11 = SignalsReact.useSignalState(v6)
+
+		local _, setState3 = React.useState(0)
+		React.useEffect(function()
+			local thread = nil
+			local function schedule()
+				thread = task.delay(300, function()
+					setState3(function(p)
+						return p + 1
+					end)
+
+					schedule()
+				end)
+			end
+
+			thread = task.delay(300, function()
+				setState3(function(p)
+					return p + 1
+				end)
+
 				schedule()
 			end)
+
+			return function()
+				if thread then
+					task.cancel(thread)
+					thread = nil
+				end
+			end
+		end, {})
+
+		local v12 = useLocalization({
+			rankHeader = "InGame.PlayerList.RankHeader",
+			footerUnableToLoad = "InGame.PlayerList.FooterUnableToLoad",
+			footerLastUpdated = {
+				"InGame.PlayerList.FooterLastUpdated",
+				minutes = v11 == nil and 0 or math.max(0, (math.floor((os.time() - v11) / 60)))
+			}
+		})
+
+		rankHeader = v12.rankHeader
+
+		if v11 == nil then
+			text = v12.footerUnableToLoad
+		else
+			text = v12.footerLastUpdated
+		end
+	else
+		local lastRefreshedAt = SignalsReact.useSignalBinding(v6)
+
+		local tick, v11 = React.useBinding(os.time())
+		React.useEffect(function()
+			local thread = nil
+			local function schedule()
+				thread = task.delay(300, function()
+					v11(os.time())
+					schedule()
+				end)
+			end
+
+			thread = task.delay(300, function()
+				v11(os.time())
+				schedule()
+			end)
+
+			return function()
+				if thread then
+					task.cancel(thread)
+					thread = nil
+				end
+			end
+		end, {})
+		text = React.useMemo(function()
+			return React.joinBindings({ lastRefreshedAt = lastRefreshedAt, tick = tick }):map(function(p)
+				return formatRelativeTimeLegacy(p.lastRefreshedAt, os.time()) -- inferred equivalent call
+			end)
+		end, { lastRefreshedAt, tick })
+	end
+
+	React.useEffect(function()
+		if v2 then
+			v2:fireTabOpened(tab)
 		end
 
-		thread = task.delay(300, function() -- line: 112
-			-- upvalues: v56 (copy), schedule (copy)
-			v56(os.time())
-			schedule()
+		return function()
+			if v2 then
+				v2:fireTabClosed(tab)
+			end
+		end
+	end, { v2, tab })
+
+	React.useEffect(function()
+		ref2.current = false
+		setState("loading")
+
+		if v10 then
+			return function()
+				ref2.current = true
+			end
+		end
+
+		local thread = task.delay(30, function()
+			if not ref2.current then
+				setState("error")
+			end
 		end)
-
-		return function() -- line: 118
-			-- upvalues: thread (ref)
-			if thread then
-				task.cancel(thread)
-				thread = nil
-			end
-		end
-	end, {})
-
-	local v57 = React.useMemo(function() -- line: 125
-		-- upvalues: React (copy), v54 (copy), v55 (copy)
-		return React.joinBindings({
-			lastRefreshedAt = v54,
-			tick = v55
-		}):map(function(p2) -- line: 129
-			local lastRefreshedAt = p2.lastRefreshedAt
-			local timestamp = os.time()
-
-			if lastRefreshedAt == nil then
-				return "Unable to load"
-			end
-
-			return `Last updated { math.max(0, (math.floor((timestamp - lastRefreshedAt) / 60))) } min ago`
-		end)
-	end, {
-		v54,
-		v55
-	})
-
-	React.useEffect(function() -- line: 134
-		-- upvalues: v32 (copy), tab (copy)
-		if v32 then
-			v32:fireTabOpened(tab)
-		end
-
-		return function() -- line: 138
-			-- upvalues: v32 (copy), tab (copy)
-			if v32 then
-				v32:fireTabClosed(tab)
-			end
-		end
-	end, {
-		v32,
-		tab
-	})
-	React.useEffect(function() -- line: 145
-		-- upvalues: v48 (copy), v45 (copy), v51 (copy)
-		v48.current = false
-		v45("loading")
-
-		if v51 then
-			return function() -- line: 149
-				-- upvalues: v48 (copy)
-				v48.current = true
-			end
-		end
-
-		local thread = task.delay(30, function() -- line: 153
-			-- upvalues: v48 (copy), v45 (copy)
-			if not v48.current then
-				v45("error")
-			end
-		end)
-
-		return function() -- line: 158
-			-- upvalues: v48 (copy), thread (copy)
-			v48.current = true
+		return function()
+			ref2.current = true
 			task.cancel(thread)
 		end
-	end, {
-		v32,
-		tab,
-		v51,
-		v46
-	})
+	end, { v2, tab, v10, state2 })
 
-	local LocalPlayer = Players.LocalPlayer
-	local v59 = React.useMemo(function() -- line: 165
-		-- upvalues: LocalPlayer (copy), resolveDisplayName (copy)
-		if LocalPlayer then
-			return (resolveDisplayName(LocalPlayer))
+	if FFlagPlayerListReskin then
+		React.useEffect(function()
+			if useLegacyPanelStyling or state ~= "error" then
+				return
+			end
+
+			getLeaderboardViewChangeTelemetry().logLoadError(string.lower(tab)) -- inferred equivalent call
+		end, { state, useLegacyPanelStyling })
+	end
+
+	local localPlayer = Players.LocalPlayer
+	local displayName = React.useMemo(function()
+		if localPlayer then
+			return (resolveDisplayName(localPlayer))
 		end
 
 		return nil
-	end, { LocalPlayer })
-	local v60 = SignalsReact.useSignalState(v43)
-	local v61 = getPeopleHeaderLabel()
-	local v62 = nil
+	end, { localPlayer })
 
-	if FFlagPlayerListReskinOptimization then
-		v62 = React.useCallback(function() -- line: 175
-			-- upvalues: v32 (copy), tab (copy), v45 (copy), v47 (copy)
-			if v32 then
-				v32:fireTabClosed(tab)
-				v32:fireTabOpened(tab)
-			end
+	local scoreLabel = SignalsReact.useSignalState(v7)
 
-			v45("loading")
-			v47(function(p3) -- line: 181
-				return p3 + 1
-			end)
-		end, {
-			v32,
-			tab
-		})
-	end
+	local peopleHeaderLabel = getPeopleHeaderLabel()
 
-	if v32 == nil or not v51 then
-		if v44 == "error" then
-			local v63 = not FFlagPlayerListReskinOptimization and function() -- line: 193
-				-- upvalues: v32 (copy), tab (copy), v45 (copy), v47 (copy)
-				if v32 then
-					v32:fireTabClosed(tab)
-					v32:fireTabOpened(tab)
-				end
+	local onRetry = React.useCallback(function()
+		if FFlagPlayerListReskin and not useLegacyPanelStyling then
+			getLeaderboardViewChangeTelemetry().logRetryError(string.lower(tab)) -- inferred equivalent call
+		end
 
-				v45("loading")
-				v47(function(p4) -- line: 199
-					return p4 + 1
-				end)
-			end or v62
+		if v2 then
+			v2:fireTabClosed(tab)
+			v2:fireTabOpened(tab)
+		end
 
+		setState("loading")
+		setState2(function(p)
+			return p + 1
+		end)
+	end, { v2, tab, useLegacyPanelStyling })
+
+	if v2 == nil or not v10 then
+		if state == "error" then
 			return React.createElement(ServiceUnavailableState, {
-				onRetry = v63,
-				layoutOrder = t1.layoutOrder
+				onRetry = onRetry,
+				layoutOrder = props.layoutOrder,
+				useLegacyPanelStyling = useLegacyPanelStyling
 			})
 		end
 
 		return React.createElement(LoadingState, {
-			layoutOrder = t1.layoutOrder
+			layoutOrder = props.layoutOrder,
+			useLegacyPanelStyling = useLegacyPanelStyling
 		})
-	end
+	else
+		if v and count == 0 then
+			return React.createElement(EmptyFriendsState, {
+				layoutOrder = props.layoutOrder,
+				useLegacyPanelStyling = useLegacyPanelStyling
+			})
+		end
 
-	if v31 and n3 == 0 then
-		return React.createElement(EmptyFriendsState, {
-			layoutOrder = t1.layoutOrder
-		})
-	end
+		local children = {}
 
-	local t2 = {}
+		for k, v11 in pairs(v8) do
+			children[`Row_{k}`] = React.createElement(PlatformEntryView, {
+				scoreGetter = v11.getScore,
+				rankGetter = v11.getRank,
+				displayName = v11.displayName,
+				isViewer = false,
+				showDivider = true,
+				rowHeight = rowHeight,
+				rankWidth = rankWidth,
+				scoreWidth = scoreWidth
+			})
+		end
 
-	for k, v in pairs(v49) do
-		t2[`Row_{ k }`] = React.createElement(PlatformEntryView, {
-			isViewer = false,
-			showDivider = true,
-			scoreGetter = v.getScore,
-			rankGetter = v.getRank,
-			displayName = v.displayName,
-			rowHeight = v34,
-			rankWidth = v37,
-			scoreWidth = v38
-		})
-	end
+		local createElement = React.createElement
+		local v11 = {
+			tag = "fill size-full-0",
+			layout = {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			},
+			scroll = 0,
+			scrollingFrameRef = 0,
+			selection = 0
+		}
+		local automaticCanvasSize
 
-	local v67 = React.createElement(ScrollView, {
-		tag = "fill size-full-0",
-		layout = {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		},
-		scroll = {
-			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		if useLegacyPanelStyling then
+			automaticCanvasSize = Enum.AutomaticSize.Y
+		end
+
+		v11.scroll = {
+			AutomaticCanvasSize = automaticCanvasSize,
 			ScrollingDirection = Enum.ScrollingDirection.Y
 		}
-	}, t2)
 
-	return React.createElement(View, {
-		tag = "col fill size-full-0",
-		LayoutOrder = t1.layoutOrder
-	}, {
-		ColumnHeader = React.createElement(PlatformEntryView, {
-			isHeader = true,
-			layoutOrder = 1,
-			scoreLabel = v60,
-			peopleHeaderText = v61,
-			rowHeight = v35,
-			rankWidth = v37,
-			scoreWidth = v38
-		}),
-		PinnedViewer = React.createElement(PlatformEntryView, {
-			isViewer = true,
-			layoutOrder = 3,
-			scoreGetter = v41,
-			rankGetter = v42,
-			displayName = v59,
-			rowHeight = v34,
-			rankWidth = v37,
-			scoreWidth = v38
-		}),
-		RowList = React.createElement(View, {
-			tag = "col fill size-full-0",
-			LayoutOrder = 5
-		}, {
-			Rows = v67
-		}),
-		Footer = React.createElement(View, {
-			tag = "row align-x-right align-y-center size-full-0 padding-x-medium padding-y-xsmall stroke-standard stroke-default bg-surface-100",
-			LayoutOrder = 6,
-			Size = UDim2.new(1, 0, 0, v36)
-		}, {
-			FooterText = React.createElement(FoundationText, {
-				tag = "auto-xy text-caption-small text-align-x-right content-muted",
-				Text = v57
+		if useLegacyPanelStyling then
+			scrollingFrameRef = nil
+		end
+
+		v11.scrollingFrameRef = scrollingFrameRef
+		v11.selection = Constants.NOT_SELECTABLE
+		local element = createElement(ScrollView, v11, children)
+		local columnHeader
+
+		if useLegacyPanelStyling then
+			columnHeader = React.createElement("Frame", {
+				Name = "LegacyPlatformColumnHeader",
+				Size = UDim2.new(1, 0, 0, rowHeight2),
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0
+			}, {
+				Header = React.createElement(PlatformEntryView, {
+					isHeader = true,
+					scoreLabel = scoreLabel,
+					peopleHeaderText = peopleHeaderLabel,
+					rankHeaderText = rankHeader,
+					rowHeight = rowHeight2,
+					rankWidth = rankWidth,
+					scoreWidth = scoreWidth
+				})
 			})
+		else
+			columnHeader = React.createElement(
+				View,
+				{
+					tag = "size-full-0 bg-surface-100",
+					Size = UDim2.new(1, 0, 0, rowHeight2),
+					LayoutOrder = 1
+				},
+				{
+					Header = React.createElement(PlatformEntryView, {
+						isHeader = true,
+						scoreLabel = scoreLabel,
+						peopleHeaderText = peopleHeaderLabel,
+						rankHeaderText = rankHeader,
+						rowHeight = rowHeight2,
+						rankWidth = rankWidth,
+						scoreWidth = scoreWidth
+					})
+				}
+			)
+		end
+
+		local footer
+
+		if useLegacyPanelStyling then
+			footer = React.createElement("Frame", {
+				Name = "LegacyPlatformFooter",
+				Size = UDim2.new(1, 0, 0, v3),
+				LayoutOrder = 6,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0
+			}, {
+				FooterInner = React.createElement(
+					View,
+					{
+						tag = "row align-x-right align-y-center size-full padding-x-medium padding-y-xsmall",
+						Size = UDim2.fromScale(1, 1)
+					},
+					{
+						FooterText = React.createElement(Text, {
+							Text = text,
+							tag = "auto-xy text-caption-small text-align-x-right content-muted"
+						})
+					}
+				)
+			})
+		else
+			footer = React.createElement(
+				View,
+				{
+					tag = "row align-x-right align-y-center size-full-0 padding-x-medium padding-y-xsmall stroke-standard stroke-default bg-surface-100",
+					Size = UDim2.new(1, 0, 0, v3),
+					LayoutOrder = 6
+				},
+				{
+					FooterText = React.createElement(Text, {
+						Text = text,
+						tag = "auto-xy text-caption-small text-align-x-right content-muted"
+					})
+				}
+			)
+		end
+
+		return React.createElement(View, {
+			tag = "col fill size-full-0",
+			LayoutOrder = props.layoutOrder
+		}, {
+			ColumnHeader = columnHeader,
+			PinnedViewer = React.createElement(PlatformEntryView, {
+				scoreGetter = scoreGetter,
+				rankGetter = rankGetter,
+				displayName = displayName,
+				isViewer = true,
+				highlightViewerRow = not useLegacyPanelStyling,
+				layoutOrder = 3,
+				rowHeight = rowHeight,
+				rankWidth = rankWidth,
+				scoreWidth = scoreWidth
+			}),
+			RowList = React.createElement(View, { tag = "col fill size-full-0", LayoutOrder = 5 }, {
+				Rows = element
+			}),
+			Footer = footer
 		})
-	})
+	end
 end
 
 return React.memo(PlatformLeaderboardViewImpl)

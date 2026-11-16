@@ -1,89 +1,83 @@
-local t1 = {}
-local u2 = nil
-local u3 = nil
-local u4 = false
-local u5 = nil
+local WebViewStateTracker = {}
 
-local function defaultClock() -- line: 17
+local v = nil
+local v2 = nil
+
+local v3 = false
+
+local webViewMetadata = nil
+
+local function defaultClock()
 	return os.clock()
 end
 
-local u7 = defaultClock
+local v4 = defaultClock
 
-function t1._setClockForTesting(p1: ((...any) -> ...any)) -- line: 24
-	-- upvalues: u7 (ref)
-	u7 = p1
+function WebViewStateTracker._setClockForTesting(callback)
+	v4 = callback
 end
-function t1.markClosed() -- line: 31
-	-- upvalues: u4 (ref), u2 (ref), u7 (ref), u5 (ref)
-	if u4 or u2 == nil then
-		u2 = u7()
+
+function WebViewStateTracker.markClosed()
+	if v3 or v == nil then
+		v = v4()
 	end
 
-	u4 = false
-	u5 = nil
+	v3 = false
+	webViewMetadata = nil
 end
-function t1.updateMetadata(s1: string, s2: string?, b1: boolean?, b2: boolean?) -- line: 46
-	-- upvalues: u5 (ref)
-	u5 = {
-		url = s1,
-		title = s2,
-		isVisible = b1,
-		hasBackButton = b2
+
+function WebViewStateTracker.updateMetadata(url: string, title: string?, isVisible: boolean?, hasBackButton: boolean?)
+	webViewMetadata = {
+		url = url,
+		title = title,
+		isVisible = isVisible,
+		hasBackButton = hasBackButton
 	}
 end
-function t1.markOpen(s3: string, s4: string?, b3: boolean?, b4: boolean?) -- line: 67
-	-- upvalues: u4 (ref), u3 (ref), u7 (ref), t1 (copy)
-	if not u4 or u3 == nil then
-		u3 = u7()
+
+function WebViewStateTracker.markOpen(p: string, p2: string?, flag: boolean?, flag2: boolean?)
+	if not v3 or v2 == nil then
+		v2 = v4()
 	end
 
-	u4 = true
-	t1.updateMetadata(s3, s4, b3, b4)
+	v3 = true
+	WebViewStateTracker.updateMetadata(p, p2, flag, flag2)
 end
-function t1.isOpen() -- line: 79
-	-- upvalues: u4 (ref)
-	return u4
+
+function WebViewStateTracker.isOpen()
+	return v3
 end
-function t1.wasLastClosed() -- line: 87
-	-- upvalues: u2 (ref), u7 (ref)
-	if u2 == nil then
+
+function WebViewStateTracker.wasLastClosed()
+	if v == nil then
 		return -1
 	end
 
-	return u7() - u2
+	return v4() - v
 end
-function t1.getOpenDuration() -- line: 99
-	-- upvalues: u3 (ref), u7 (ref)
-	if u3 == nil then
+
+function WebViewStateTracker.getOpenDuration()
+	if v2 == nil then
 		return -1
 	end
 
-	return u7() - u3
+	return v4() - v2
 end
-function t1.wasClosedWithin(n1: number) -- line: 112
-	-- upvalues: u2 (ref), u7 (ref)
-	if u2 == nil then
-		return false
+
+function WebViewStateTracker.wasClosedWithin(p: number): boolean
+	return v ~= nil and v4() - v <= p
+end
+
+function WebViewStateTracker.isOpenNoLongerThan(flag: boolean, p: number)
+	if not flag then
+		return v3
 	end
 
-	return n1 >= u7() - u2
-end
-function t1.isOpenNoLongerThan(b5: boolean, n2: number) -- line: 127
-	-- upvalues: u4 (ref), u3 (ref), u7 (ref)
-	if not b5 then
-		return u4
-	end
-
-	if u3 == nil or u4 and n2 <= u7() - u3 then
-		return false
-	end
-
-	return u4
-end
-function t1.getWebViewMetadata() -- line: 143
-	-- upvalues: u5 (ref)
-	return u5
+	return v2 ~= nil and not (v3 and p <= v4() - v2) and v3
 end
 
-return t1
+function WebViewStateTracker.getWebViewMetadata()
+	return webViewMetadata
+end
+
+return WebViewStateTracker

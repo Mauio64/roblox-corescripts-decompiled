@@ -1,59 +1,82 @@
-local Parent = script:FindFirstAncestor("InGameAssetReporting").Parent
-local React = require(Parent.React)
-local useStyle = require(Parent.UIBlox).Core.Style.useStyle
+local parent = script:FindFirstAncestor("InGameAssetReporting").Parent
 
-local function ReportTextEntry(t1: {[any]: any}) -- line: 13
-	-- upvalues: useStyle (copy), React (copy)
-	local v6 = useStyle()
-	local BodyFont = v6.Font.Body.Font
-	local BaseSize = v6.Font.BaseSize
-	local Theme = v6.Theme
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-	return React.createElement("Frame", {
-		LayoutOrder = 1,
+local useStyle = UIBlox.Core.Style.useStyle
+
+local function ReportTextEntry(props)
+	local v = useStyle()
+	local font = v.Font.Body.Font
+	local baseSize = v.Font.BaseSize
+	local theme = v.Theme
+
+	local createElement = React.createElement
+	local v2 = {
 		Size = UDim2.new(1, 0, 0, 60),
-		BackgroundTransparency = v6.Theme.BackgroundDefault.Transparency,
-		BackgroundColor3 = v6.Theme.BackgroundDefault.Color
-	}, {
+		BackgroundTransparency = v.Theme.BackgroundDefault.Transparency,
+		BackgroundColor3 = v.Theme.BackgroundDefault.Color,
+		LayoutOrder = 1
+	}
+
+	local v3 = {
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, 10),
 			PaddingRight = UDim.new(0, 10),
 			PaddingTop = UDim.new(0, 10),
 			PaddingBottom = UDim.new(0, 10)
 		}),
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, 8)
-		}),
-		ReportCommentTextBox = React.createElement("TextBox", {
-			Size = UDim2.new(1, 0, 0, 40),
-			Position = UDim2.new(0, 0, 0, 0),
-			AnchorPoint = Vector2.new(0, 0),
-			BackgroundColor3 = Theme.BackgroundDefault.Color,
-			PlaceholderText = t1.placeholderText,
-			Font = BodyFont,
-			Text = t1.text,
-			TextSize = BaseSize,
-			TextColor3 = Theme.TextDefault.Color,
-			TextTransparency = Theme.TextDefault.Transparency,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			BackgroundTransparency = Theme.BackgroundDefault.Transparency,
-			BorderSizePixel = 0,
-			LayoutOrder = 1,
-			RichText = false,
-			MultiLine = true,
-			TextWrapped = true,
-			ClearTextOnFocus = false,
-			OverlayNativeInput = true,
-			ClipsDescendants = true,
-			[React.Change.Text] = function(p1) -- line: 56
-				-- upvalues: t1 (copy)
-				if t1.text ~= p1.Text then
-					t1.onUpdate(p1.Text)
-				end
-			end
-		})
-	})
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
+		ReportCommentTextBox = 0
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {}
+	v4.Size = UDim2.new(1, 0, 0, 40)
+	v4.Position = UDim2.new(0, 0, 0, 0)
+	v4.AnchorPoint = Vector2.new(0, 0)
+	v4.BackgroundColor3 = theme.BackgroundDefault.Color
+	v4.PlaceholderText = props.placeholderText
+
+	if FoundationFontFaceMigration then
+		font = nil
+	end
+
+	v4.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
+	end
+
+	v4.FontFace = fontFace
+
+	v4.Text = props.text
+	v4.TextSize = baseSize
+	v4.TextColor3 = theme.TextDefault.Color
+	v4.TextTransparency = theme.TextDefault.Transparency
+	v4.TextXAlignment = Enum.TextXAlignment.Left
+	v4.TextYAlignment = Enum.TextYAlignment.Top
+	v4.BackgroundTransparency = theme.BackgroundDefault.Transparency
+	v4.BorderSizePixel = 0
+	v4.LayoutOrder = 1
+	v4.RichText = false
+	v4.MultiLine = true
+	v4.TextWrapped = true
+	v4.ClearTextOnFocus = false
+	v4.OverlayNativeInput = true
+	v4.ClipsDescendants = true
+	v4[React.Change.Text] = function(p)
+		if props.text ~= p.Text then
+			props.onUpdate(p.Text)
+		end
+	end
+
+	v3.ReportCommentTextBox = createElement2("TextBox", v4)
+	return createElement("Frame", v2, v3)
 end
 
 return ReportTextEntry

@@ -1,9 +1,5 @@
-local function getAppContext() -- line: 5
-	if game.GameId == 0 then
-		return "UA"
-	end
-
-	return "IN_EXPERIENCE"
+local function getAppContext(): string
+	return if game.GameId == 0 then "UA" else "IN_EXPERIENCE"
 end
 
 return getAppContext

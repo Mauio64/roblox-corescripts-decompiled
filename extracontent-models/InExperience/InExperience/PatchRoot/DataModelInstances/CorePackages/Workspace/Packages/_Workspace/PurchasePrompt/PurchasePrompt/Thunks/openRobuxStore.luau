@@ -1,18 +1,18 @@
-local ParentParent = script.Parent.Parent
-local SetPromptState = require(ParentParent.Actions.SetPromptState)
-local PromptState = require(ParentParent.Enums.PromptState)
-local PlatformInterface = require(ParentParent.Services.PlatformInterface)
-local Thunk = require(ParentParent.Thunk)
-local t1 = { PlatformInterface }
+local parent = script.Parent.Parent
 
-local function openRobuxStore() -- line: 13
-	-- upvalues: Thunk (copy), t1 (copy), PlatformInterface (copy), SetPromptState (copy), PromptState (copy)
-	return Thunk.new(script.Name, t1, function(p1, p2) -- line: 14
-		-- upvalues: PlatformInterface (copy), SetPromptState (copy), PromptState (copy)
-		local v10 = p2[PlatformInterface]
+local SetPromptState = require(parent.Actions.SetPromptState)
+local PromptState = require(parent.Enums.PromptState)
+local PlatformInterface = require(parent.Services.PlatformInterface)
+local Thunk = require(parent.Thunk)
 
-		p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
-		v10.openRobuxStore()
+local v = { PlatformInterface }
+
+local function openRobuxStore()
+	return Thunk.new(script.Name, v, function(object, p)
+		local v2 = p[PlatformInterface]
+
+		object:dispatch(SetPromptState(PromptState.UpsellInProgress))
+		v2.openRobuxStore()
 	end)
 end
 

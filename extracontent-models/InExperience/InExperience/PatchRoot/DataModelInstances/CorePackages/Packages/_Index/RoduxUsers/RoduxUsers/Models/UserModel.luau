@@ -1,57 +1,64 @@
 game:DefineFastFlag("EnableHasVerifiedBadgeUserModelValidation", false)
 
 local MockId = require(script.Parent.MockId)
-local t1 = {}
 
-function t1.new(p1) -- line: 7
-	-- upvalues: t1 (copy)
-	assert(t1.isValid(p1))
-	t1.__index = t1
-	setmetatable(p1, t1)
+local UserModel = {}
 
-	return p1
+function UserModel.new(p)
+	assert(UserModel.isValid(p))
+
+	UserModel.__index = UserModel
+
+	setmetatable(p, UserModel)
+
+	return p
 end
-function t1.mock(p2) -- line: 19
-	-- upvalues: t1 (copy), MockId (copy)
-	local v5 = p2 or {}
 
-	return (t1.new({
-		id = v5.id or MockId(),
-		username = v5.username or "UN_" .. tostring(math.random(100000, 99999999)),
-		displayName = v5.displayName or "DN_" .. tostring(math.random(100000, 99999999)),
-		hasVerifiedBadge = v5.hasVerifiedBadge or false,
-		created = v5.created or ""
+function UserModel.mock(options)
+	local v = options or {}
+
+	return (UserModel.new({
+		id = v.id or MockId(),
+		username = v.username or "UN_" .. tostring(math.random(100000, 99999999)),
+		displayName = v.displayName or "DN_" .. tostring(math.random(100000, 99999999)),
+		hasVerifiedBadge = v.hasVerifiedBadge or false,
+		created = v.created or ""
 	}))
 end
-function t1.isValid(p3) -- line: 33
-	if not p3 then
+
+function UserModel.isValid(data): (boolean, string)
+	if not data then
 		return false, "Expected user information to be given"
 	end
 
-	if not p3.id then
+	if not data.id then
 		return false, "Expected user's id to be given"
 	end
 
-	if p3.id ~= "0" and not p3.username then
+	if data.id ~= "0" and not data.username then
 		return false, "Expected user's username to be given"
 	end
 
-	if not p3.displayName then
+	if not data.displayName then
 		return false, "Expected user's displayName to be given"
 	end
 
-	if game:GetFastFlag("EnableHasVerifiedBadgeUserModelValidation") and p3.hasVerifiedBadge == nil then
+	if game:GetFastFlag("EnableHasVerifiedBadgeUserModelValidation") and data.hasVerifiedBadge == nil then
 		return false, "Expected user's hasVerifiedBadge to be given"
 	end
 
 	return true, "Valid UserModel"
 end
-function t1.isEqual(p4, p5) -- line: 52
+
+function UserModel.isEqual(data, data2): boolean
 	if game:GetFastFlag("EnableHasVerifiedBadgeUserModelValidation") then
-		return p4.id == p5.id and (p4.username == p5.username and (p4.displayName == p5.displayName and p4.hasVerifiedBadge == p5.hasVerifiedBadge))
+		return data.id == data2.id
+			and data.username == data2.username
+			and data.displayName == data2.displayName
+			and data.hasVerifiedBadge == data2.hasVerifiedBadge
 	end
 
-	return p4.id == p5.id and (p4.username == p5.username and p4.displayName == p5.displayName)
+	return data.id == data2.id and data.username == data2.username and data.displayName == data2.displayName
 end
 
-return t1
+return UserModel

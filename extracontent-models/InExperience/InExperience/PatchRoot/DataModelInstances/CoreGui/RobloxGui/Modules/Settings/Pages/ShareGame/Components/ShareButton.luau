@@ -1,65 +1,86 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local Theme = require(RobloxGui.Modules.Settings.Theme)
-local v5 = Theme.font(Enum.Font.SourceSansSemibold, "Semibold")
-local v6 = Theme.textSize(19)
-local color3 = Color3.fromRGB(222, 225, 227)
-local color3_2 = Color3.fromRGB(255, 255, 255)
-local v9 = Roact.PureComponent:extend("ShareButton")
 
-function v9.init(p1) -- line: 14
-	p1.state = {
-		isHovering = false
-	}
+local font = Theme.font(Enum.Font.SourceSansSemibold, "Semibold")
+local textSize = Theme.textSize(19)
+local color = Color3.fromRGB(222, 225, 227)
+local color2 = Color3.fromRGB(255, 255, 255)
+
+local extended = Roact.PureComponent:extend("ShareButton")
+
+function extended:init()
+	self.state = { isHovering = false }
 end
-function v9.render(p2) -- line: 20
-	-- upvalues: Roact (copy), color3 (copy), color3_2 (copy), Theme (copy), v6 (copy), v5 (copy)
-	local size = p2.props.size
-	local layoutOrder = p2.props.layoutOrder
-	local onShare = p2.props.onShare
-	local isEnabled = p2.props.isEnabled
-	local text = p2.props.text
-	local t1 = {
-		Border = Roact.createElement("UIStroke", {
-			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-			Color = if not p2.state.isHovering or not isEnabled then color3_2 else color3,
-			Thickness = Theme.DefaultStokeThickness,
-			Transparency = not isEnabled and 0.5 or 0
-		}),
-		UICorner = Roact.createElement("UICorner", {
-			CornerRadius = Theme.DefaultCornerRadius
-		})
-	}
 
-	return Roact.createElement("TextButton", {
+function extended.render(object)
+	local size = object.props.size
+	local layoutOrder = object.props.layoutOrder
+	local onShare = object.props.onShare
+	local isEnabled = object.props.isEnabled
+	local text = object.props.text
+
+	local children = {}
+	local createElement = Roact.createElement
+	local v = {
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		Color = 0,
+		Thickness = 0,
+		Transparency = 0
+	}
+	local color3
+
+	if object.state.isHovering and isEnabled then
+		color3 = color
+	else
+		color3 = color2
+	end
+
+	v.Color = color3
+	v.Thickness = Theme.DefaultStokeThickness
+	v.Transparency = isEnabled and 0 or 0.5
+	children.Border = createElement("UIStroke", v)
+
+	children.UICorner = Roact.createElement("UICorner", { CornerRadius = Theme.DefaultCornerRadius })
+
+	local createElement2 = Roact.createElement
+	local v2 = {
+		["LayoutOrder"] = nil,
+		["LayoutOrder"] = nil,
+		["LayoutOrder"] = nil,
 		LayoutOrder = layoutOrder,
 		Size = size,
 		Text = text,
-		TextSize = v6,
-		Font = v5,
-		AutoButtonColor = false,
-		BackgroundColor3 = if not p2.state.isHovering or not isEnabled then color3_2 else color3,
-		Transparency = not isEnabled and 0.5 or 0,
-		[Roact.Event.Activated] = function() -- line: 48
-			-- upvalues: isEnabled (copy), onShare (copy)
-			if isEnabled then
-				onShare()
-			end
-		end,
-		[Roact.Event.InputBegan] = function() -- line: 53
-			-- upvalues: p2 (copy)
-			p2:setState({
-				isHovering = true
-			})
-		end,
-		[Roact.Event.InputEnded] = function() -- line: 56
-			-- upvalues: p2 (copy)
-			p2:setState({
-				isHovering = false
-			})
+		TextSize = textSize,
+		Font = font,
+		AutoButtonColor = false
+	}
+	local backgroundColor
+
+	if object.state.isHovering and isEnabled then
+		backgroundColor = color
+	else
+		backgroundColor = color2
+	end
+
+	v2.BackgroundColor3 = backgroundColor
+	v2.Transparency = isEnabled and 0 or 0.5
+
+	v2[Roact.Event.Activated] = function()
+		if isEnabled then
+			onShare()
 		end
-	}, t1)
+	end
+	v2[Roact.Event.InputBegan] = function()
+		object:setState({ isHovering = true })
+	end
+	v2[Roact.Event.InputEnded] = function()
+		object:setState({ isHovering = false })
+	end
+
+	return createElement2("TextButton", v2, children)
 end
 
-return v9
+return extended

@@ -1,29 +1,29 @@
-local Parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
+local React = require(parent.React)
+require(parent.DataHydration)
+local VerifiedBadges = require(parent.VerifiedBadges)
 
-require(Parent.DataHydration)
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 
-local VerifiedBadges = require(Parent.VerifiedBadges)
-local Text = require(Parent.Foundation).Text
-
-local function InExperienceDetailsPromptSubtitle(t1: {[any]: any}) -- line: 16
-	-- upvalues: React (copy), VerifiedBadges (copy), Text (copy)
-	if t1.creator.hasVerifiedBadge then
-		return React.createElement(VerifiedBadges.EmojiWrapper, {
-			emoji = VerifiedBadges.emoji.verified,
-			layoutOrder = t1.layoutOrder
-		}, {
-			CreatorName = React.createElement(Text, {
-				tag = "text-body-large content-default auto-xy text-truncate-split padding-right-xxsmall",
-				Text = t1.creator.name
-			})
-		})
+local function InExperienceDetailsPromptSubtitle(p)
+	if p.creator.hasVerifiedBadge then
+		return React.createElement(
+			VerifiedBadges.EmojiWrapper,
+			{ emoji = VerifiedBadges.emoji.verified, layoutOrder = p.layoutOrder },
+			{
+				CreatorName = React.createElement(Text, {
+					Text = p.creator.name,
+					tag = "text-body-large content-default auto-xy text-truncate-split padding-right-xxsmall"
+				})
+			}
+		)
 	end
 
 	return React.createElement(Text, {
+		Text = p.creator.name,
 		tag = "text-body-large content-default auto-xy text-truncate-split padding-right-xxsmall",
-		Text = t1.creator.name,
-		LayoutOrder = t1.layoutOrder
+		LayoutOrder = p.layoutOrder
 	})
 end
 

@@ -1,19 +1,16 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+require(parent2.LuauPolyfill)
 
-require(ParentParentParent.LuauPolyfill)
-
-local Promise = require(ParentParentParent.Promise)
-
-require(ParentParent.jsutils.PromiseOrValue)
+local Promise = require(parent2.Promise)
+require(parent.jsutils.PromiseOrValue)
 
 return {
-	coerceToPromise = function(p1) -- line: 10
-		-- upvalues: Promise (copy)
-		if Promise.is(p1) then
-			return p1
+	coerceToPromise = function(p)
+		if Promise.is(p) then
+			return p
 		end
 
-		return (Promise.resolve(p1))
+		return (Promise.resolve(p))
 	end
 }

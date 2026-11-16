@@ -1,16 +1,15 @@
 local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
 
-local function applyClickStampFieldOverrides(t1: {[any]: any}, t2: {[any]: any}) -- line: 3
-	-- upvalues: UnifiedEventLogConstants (copy)
-	if t2[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "selectedItemIndex"] ~= nil then
-		t1.selectedItemIndex = nil
+local function applyClickStampFieldOverrides(p, p2)
+	if p2[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "selectedItemIndex"] ~= nil then
+		p.selectedItemIndex = nil
 	end
 
-	if t2[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "keyword"] ~= nil then
-		t1.keyword = nil
+	if p2[UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "keyword"] ~= nil then
+		p.keyword = nil
 	end
 
-	return t1
+	return p
 end
 
 return applyClickStampFieldOverrides

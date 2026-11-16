@@ -1,0 +1,3 @@
+local FFlagEnableRecentActivityInspectAndBuy = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagEnableRecentActivityInspectAndBuy")
+
+return game:DefineFastFlag("EnableRecentActivitySingleItemDetails", false) and FFlagEnableRecentActivityInspectAndBuy

@@ -1,306 +1,284 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 57
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		id = if t3 ~= nil and t3.id ~= nil then t3.id else "",
-		title = if t3 ~= nil and t3.title ~= nil then t3.title else "",
-		subtitle = if t3 ~= nil and t3.subtitle ~= nil then t3.subtitle else "",
-		event_start = if t3 ~= nil and t3.event_start ~= nil then t3.event_start else "",
-		event_end = if t3 ~= nil and t3.event_end ~= nil then t3.event_end else "",
-		user_rsvp = t3 ~= nil and (t3.user_rsvp ~= nil and t3.user_rsvp),
-		media_asset_id = if t3 ~= nil and t3.media_asset_id ~= nil then t3.media_asset_id else 0,
-		description = if t3 ~= nil and t3.description ~= nil then t3.description else "",
-		rsvp_count = if t3 ~= nil and t3.rsvp_count ~= nil then t3.rsvp_count else 0,
-		place_id = if t3 ~= nil and t3.place_id ~= nil then t3.place_id else ""
-	}, t2))
+require(script.Parent.custom_options)
+
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local v2 = {
+		id = (data == nil or data.id == nil) and "" or data.id,
+		title = (data == nil or data.title == nil) and "" or data.title,
+		subtitle = (data == nil or data.subtitle == nil) and "" or data.subtitle,
+		event_start = (data == nil or data.event_start == nil) and "" or data.event_start,
+		event_end = (data == nil or data.event_end == nil) and "" or data.event_end,
+		user_rsvp = data ~= nil and data.user_rsvp ~= nil and data.user_rsvp,
+		media_asset_id = (data == nil or data.media_asset_id == nil) and 0 or data.media_asset_id,
+		description = (data == nil or data.description == nil) and "" or data.description,
+		rsvp_count = (data == nil or data.rsvp_count == nil) and 0 or data.rsvp_count,
+		place_id = (data == nil or data.place_id == nil) and "" or data.place_id
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 72
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.id ~= nil and p1.id ~= "" then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v9, v10, p1.id)
+	if data.id ~= nil and data.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.id)
 	end
 
-	if p1.title ~= nil and p1.title ~= "" then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.title)
+	if data.title ~= nil and data.title ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.title)
 	end
 
-	if p1.subtitle ~= nil and p1.subtitle ~= "" then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v13, v14, p1.subtitle)
+	if data.subtitle ~= nil and data.subtitle ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.subtitle)
 	end
 
-	if p1.event_start ~= nil and p1.event_start ~= "" then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v15, v16, p1.event_start)
+	if data.event_start ~= nil and data.event_start ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.event_start)
 	end
 
-	if p1.event_end ~= nil and p1.event_end ~= "" then
-		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v17, v18, p1.event_end)
+	if data.event_end ~= nil and data.event_end ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.event_end)
 	end
 
-	if p1.user_rsvp then
-		local v19, v20 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v19, v20, not p1.user_rsvp and 0 or 1)
+	if data.user_rsvp then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.user_rsvp and 1 or 0)
 	end
 
-	if p1.media_asset_id ~= nil and p1.media_asset_id ~= 0 then
-		local v21, v22 = proto.writeTag(buf, n1, 7, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v21, v22, p1.media_asset_id)
+	if data.media_asset_id ~= nil and data.media_asset_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.media_asset_id)
 	end
 
-	if p1.description ~= nil and p1.description ~= "" then
-		local v23, v24 = proto.writeTag(buf, n1, 8, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v23, v24, p1.description)
+	if data.description ~= nil and data.description ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.description)
 	end
 
-	if p1.rsvp_count ~= nil and p1.rsvp_count ~= 0 then
-		local v25, v26 = proto.writeTag(buf, n1, 9, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v25, v26, p1.rsvp_count)
+	if data.rsvp_count ~= nil and data.rsvp_count ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.rsvp_count)
 	end
 
-	if p1.place_id ~= nil and p1.place_id ~= "" then
-		local v27, v28 = proto.writeTag(buf, n1, 10, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v27, v28, p1.place_id)
+	if data.place_id ~= nil and data.place_id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.place_id)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 131
-	-- upvalues: t2 (copy), proto (copy)
-	local v31 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v33, v34
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v33, v34, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v34 == proto.wireTypes.varint then
-			if v33 == 6 then
-				local v35
-
-				v35, n2 = proto.readVarInt(p2, n2)
-				v31.user_rsvp = v35 ~= 0
-			elseif v33 == 7 then
-				local v36
-
-				v36, n2 = proto.readVarIntI64(p2, n2)
-				v31.media_asset_id = v36
-			elseif v33 == 9 then
-				local v37
-
-				v37, n2 = proto.readVarIntI64(p2, n2)
-				v31.rsvp_count = v37
+		if v4 == proto.wireTypes.varint then
+			if v3 == 6 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.user_rsvp = v5 ~= 0
+			elseif v3 == 7 then
+				local media_asset_id
+				media_asset_id, v2 = proto.readVarIntI64(buf, v2)
+				result.media_asset_id = media_asset_id
+			elseif v3 == 9 then
+				local rsvp_count
+				rsvp_count, v2 = proto.readVarIntI64(buf, v2)
+				result.rsvp_count = rsvp_count
 			else
-				local v38
-
-				v38, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v34 == proto.wireTypes.lengthDelimited then
-			if v33 == 1 then
-				local v39
-
-				v39, n2 = proto.readBuffer(p2, n2)
-				v31.id = buffer.tostring(v39)
-			elseif v33 == 2 then
-				local v40
-
-				v40, n2 = proto.readBuffer(p2, n2)
-				v31.title = buffer.tostring(v40)
-			elseif v33 == 3 then
-				local v41
-
-				v41, n2 = proto.readBuffer(p2, n2)
-				v31.subtitle = buffer.tostring(v41)
-			elseif v33 == 4 then
-				local v42
-
-				v42, n2 = proto.readBuffer(p2, n2)
-				v31.event_start = buffer.tostring(v42)
-			elseif v33 == 5 then
-				local v43
-
-				v43, n2 = proto.readBuffer(p2, n2)
-				v31.event_end = buffer.tostring(v43)
-			elseif v33 == 8 then
-				local v44
-
-				v44, n2 = proto.readBuffer(p2, n2)
-				v31.description = buffer.tostring(v44)
-			elseif v33 == 10 then
-				local v45
-
-				v45, n2 = proto.readBuffer(p2, n2)
-				v31.place_id = buffer.tostring(v45)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.title = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.subtitle = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.event_start = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.event_end = buffer.tostring(v5)
+			elseif v3 == 8 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.description = buffer.tostring(v5)
+			elseif v3 == 10 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.place_id = buffer.tostring(v5)
 			else
-				local v46, v47 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v47 + v46
+				v2 = v5 + varInt
 			end
-		elseif v34 == proto.wireTypes.i32 then
-			local v48
-
-			v48, n2 = proto.readFixed32(p2, n2)
-		elseif v34 == proto.wireTypes.i64 then
-			local v49
-
-			v49, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v34)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v31
-end
-function t2.jsonEncode(p3) -- line: 219
-	local t4 = {}
-
-	if p3.id ~= nil and p3.id ~= "" then
-		t4.id = p3.id
-	end
-
-	if p3.title ~= nil and p3.title ~= "" then
-		t4.title = p3.title
-	end
-
-	if p3.subtitle ~= nil and p3.subtitle ~= "" then
-		t4.subtitle = p3.subtitle
-	end
-
-	if p3.event_start ~= nil and p3.event_start ~= "" then
-		t4.eventStart = p3.event_start
-	end
-
-	if p3.event_end ~= nil and p3.event_end ~= "" then
-		t4.eventEnd = p3.event_end
-	end
-
-	if p3.user_rsvp then
-		t4.userRsvp = p3.user_rsvp
-	end
-
-	if p3.media_asset_id ~= nil and p3.media_asset_id ~= 0 then
-		t4.mediaAssetId = p3.media_asset_id
-	end
-
-	if p3.description ~= nil and p3.description ~= "" then
-		t4.description = p3.description
-	end
-
-	if p3.rsvp_count ~= nil and p3.rsvp_count ~= 0 then
-		t4.rsvpCount = p3.rsvp_count
-	end
-
-	if p3.place_id ~= nil and p3.place_id ~= "" then
-		t4.placeId = p3.place_id
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 265
-	-- upvalues: t2 (copy)
-	local v53 = t2.new()
-
-	if t5.id ~= nil then
-		v53.id = t5.id
-	end
-
-	if t5.title ~= nil then
-		v53.title = t5.title
-	end
-
-	if t5.subtitle ~= nil then
-		v53.subtitle = t5.subtitle
-	end
-
-	if t5.event_start ~= nil then
-		v53.event_start = t5.event_start
-	end
-
-	if t5.eventStart ~= nil then
-		v53.event_start = t5.eventStart
-	end
-
-	if t5.event_end ~= nil then
-		v53.event_end = t5.event_end
-	end
-
-	if t5.eventEnd ~= nil then
-		v53.event_end = t5.eventEnd
-	end
-
-	if t5.user_rsvp ~= nil then
-		v53.user_rsvp = t5.user_rsvp
-	end
-
-	if t5.userRsvp ~= nil then
-		v53.user_rsvp = t5.userRsvp
-	end
-
-	if t5.media_asset_id ~= nil then
-		v53.media_asset_id = t5.media_asset_id
-	end
-
-	if t5.mediaAssetId ~= nil then
-		v53.media_asset_id = t5.mediaAssetId
-	end
-
-	if t5.description ~= nil then
-		v53.description = t5.description
-	end
-
-	if t5.rsvp_count ~= nil then
-		v53.rsvp_count = t5.rsvp_count
-	end
-
-	if t5.rsvpCount ~= nil then
-		v53.rsvp_count = t5.rsvpCount
-	end
-
-	if t5.place_id ~= nil then
-		v53.place_id = t5.place_id
-	end
-
-	if t5.placeId ~= nil then
-		v53.place_id = t5.placeId
-	end
-
-	return v53
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.id ~= nil and data.id ~= "" then
+		v2.id = data.id
+	end
+
+	if data.title ~= nil and data.title ~= "" then
+		v2.title = data.title
+	end
+
+	if data.subtitle ~= nil and data.subtitle ~= "" then
+		v2.subtitle = data.subtitle
+	end
+
+	if data.event_start ~= nil and data.event_start ~= "" then
+		v2.eventStart = data.event_start
+	end
+
+	if data.event_end ~= nil and data.event_end ~= "" then
+		v2.eventEnd = data.event_end
+	end
+
+	if data.user_rsvp then
+		v2.userRsvp = data.user_rsvp
+	end
+
+	if data.media_asset_id ~= nil and data.media_asset_id ~= 0 then
+		v2.mediaAssetId = data.media_asset_id
+	end
+
+	if data.description ~= nil and data.description ~= "" then
+		v2.description = data.description
+	end
+
+	if data.rsvp_count ~= nil and data.rsvp_count ~= 0 then
+		v2.rsvpCount = data.rsvp_count
+	end
+
+	if data.place_id ~= nil and data.place_id ~= "" then
+		v2.placeId = data.place_id
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.title ~= nil then
+		v2.title = data.title
+	end
+
+	if data.subtitle ~= nil then
+		v2.subtitle = data.subtitle
+	end
+
+	if data.event_start ~= nil then
+		v2.event_start = data.event_start
+	end
+
+	if data.eventStart ~= nil then
+		v2.event_start = data.eventStart
+	end
+
+	if data.event_end ~= nil then
+		v2.event_end = data.event_end
+	end
+
+	if data.eventEnd ~= nil then
+		v2.event_end = data.eventEnd
+	end
+
+	if data.user_rsvp ~= nil then
+		v2.user_rsvp = data.user_rsvp
+	end
+
+	if data.userRsvp ~= nil then
+		v2.user_rsvp = data.userRsvp
+	end
+
+	if data.media_asset_id ~= nil then
+		v2.media_asset_id = data.media_asset_id
+	end
+
+	if data.mediaAssetId ~= nil then
+		v2.media_asset_id = data.mediaAssetId
+	end
+
+	if data.description ~= nil then
+		v2.description = data.description
+	end
+
+	if data.rsvp_count ~= nil then
+		v2.rsvp_count = data.rsvp_count
+	end
+
+	if data.rsvpCount ~= nil then
+		v2.rsvp_count = data.rsvpCount
+	end
+
+	if data.place_id ~= nil then
+		v2.place_id = data.place_id
+	end
+
+	if data.placeId ~= nil then
+		v2.place_id = data.placeId
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "EventData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.EventData"
 }
-t1.EventData = t2
-typeRegistry.default:register(t1.EventData)
 
-return {
-	EventData = t1.EventData
-}
+v.EventData = class
+
+typeRegistry.default:register(v.EventData)
+
+return { EventData = v.EventData }

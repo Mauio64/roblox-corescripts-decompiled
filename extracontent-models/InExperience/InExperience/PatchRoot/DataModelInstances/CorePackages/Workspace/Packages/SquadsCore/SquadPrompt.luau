@@ -1,3 +1,3 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
 
-return require(_Workspace.SquadsCore.SquadsCore.Components.SquadOverlay.SquadPrompt)
+return require(Workspace.SquadsCore.SquadsCore.Components.SquadOverlay.SquadPrompt)

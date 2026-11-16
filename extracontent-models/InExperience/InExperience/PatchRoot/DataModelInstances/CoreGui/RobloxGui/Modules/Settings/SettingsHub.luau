@@ -1,132 +1,178 @@
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
-local FFlagEnableNewBackpack = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableNewBackpack
-local v5 = if not FFlagEnableNewBackpack then nil else require(CorePackages.Workspace.Packages.System).Features
-local Symbol = require(CorePackages.Workspace.Packages.AppCommonLib).Symbol
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableNewBackpack = SharedFlags.FFlagEnableNewBackpack
+local features
+
+if FFlagEnableNewBackpack then
+	local System = require(CorePackages.Workspace.Packages.System)
+	features = System.Features
+else
+	features = nil
+end
+
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Symbol = AppCommonLib.Symbol
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local IXPService = game:GetService("IXPService")
 local LocalizationService = game:GetService("LocalizationService")
 local TelemetryService = game:GetService("TelemetryService")
+
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
-local v13 = require(RobloxGui.Modules.TenFootInterface):IsEnabled()
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagResponsiveUnitsDeprecateTenFoot = SharedFlags2.FFlagResponsiveUnitsDeprecateTenFoot
+local TenFootInterface = require(RobloxGui.Modules.TenFootInterface)
+local isEnabled = TenFootInterface:IsEnabled()
+local v = isEnabled and not FFlagResponsiveUnitsDeprecateTenFoot
 local Roact = require(CorePackages.Packages.Roact)
 local Cryo = require(CorePackages.Packages.Cryo)
 local Otter = require(CorePackages.Packages.Otter)
 local React = require(CorePackages.Packages.React)
 local ReactRoblox = require(CorePackages.Packages.ReactRoblox)
+
 local Foundation = require(CorePackages.Packages.Foundation)
 local FoundationProvider = Foundation.FoundationProvider
-local Traversal = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).Traversal
+
+local CoreScriptsRoactCommon = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon)
+local Traversal = CoreScriptsRoactCommon.Traversal
+
 local PortalWithFoundationStylelink = require(script.Parent.Components.PortalWithFoundationStylelink)
 local InExperienceMenuReact = require(script.Parent.InExperienceMenuReact)
 local InExperienceMenuReactPage = require(script.Parent.Pages.InExperienceMenuReactPage)
 local ReactPageSignal = require(script.Parent.ReactPageSignal)
 local Utils = require(script.Parent.Integrations.Utils)
 local Utility = require(RobloxGui.Modules.Settings.Utility)
-local VRHub = require(CorePackages.Workspace.Packages.VrCommon).VRHub
+local VrCommon = require(CorePackages.Workspace.Packages.VrCommon)
+local VRHub = VrCommon.VRHub
 local CachedPolicyService = require(CorePackages.Workspace.Packages.CachedPolicyService)
 local PerfUtils = require(RobloxGui.Modules.Common.PerfUtils)
-local MouseIconOverrideService = require(CorePackages.Workspace.Packages.CoreScriptsCommon).MouseIconOverrideService
-local isSubjectToDesktopPolicies = require(CorePackages.Workspace.Packages.SharedFlags).isSubjectToDesktopPolicies
-local SwitchTabHint = require(RobloxGui.Modules.Settings.Components.TabHeader).SwitchTabHint
-local TraversalHistoryMenu = require(RobloxGui.Modules.Settings.Components.Traversal).TraversalHistoryMenu
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local MouseIconOverrideService = CoreScriptsCommon.MouseIconOverrideService
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local isSubjectToDesktopPolicies = SharedFlags3.isSubjectToDesktopPolicies
+local TabHeader = require(RobloxGui.Modules.Settings.Components.TabHeader)
+local SwitchTabHint = TabHeader.SwitchTabHint
+local Traversal2 = require(RobloxGui.Modules.Settings.Components.Traversal)
+local TraversalHistoryMenu = Traversal2.TraversalHistoryMenu
 local MenuBackButton = require(RobloxGui.Modules.Settings.Components.MenuBackButton)
 local MenuFrontButton = require(RobloxGui.Modules.Settings.Components.MenuFrontButton)
 local MenuButtonsContainer = require(RobloxGui.Modules.Settings.Components.MenuButtons.MenuButtonsContainer)
 local RoactAppExperiment = require(CorePackages.Packages.RoactAppExperiment)
-local IXPServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
-local CapturesPolicy = require(CorePackages.Workspace.Packages.CapturesInExperience).CapturesPolicy
-local InExperienceCapabilities = require(CorePackages.Workspace.Packages.InExperienceCapabilities).InExperienceCapabilities
+local IxpServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper)
+local IXPServiceWrapper = IxpServiceWrapper.IXPServiceWrapper
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
+local CapturesInExperience = require(CorePackages.Workspace.Packages.CapturesInExperience)
+local CapturesPolicy = CapturesInExperience.CapturesPolicy
+local InExperienceCapabilities = require(CorePackages.Workspace.Packages.InExperienceCapabilities)
+local inExperienceCapabilities = InExperienceCapabilities.InExperienceCapabilities
 local getCamMicPermissions = require(CoreGui.RobloxGui.Modules.Settings.getCamMicPermissions)
-local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
-local Stores = require(CorePackages.Workspace.Packages.CoreGuiCommon).Stores
+local AppCommonLib2 = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Create = AppCommonLib2.Create
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local Stores = CoreGuiCommon.Stores
 local Signals = require(CorePackages.Packages.Signals)
 local createSignal = Signals.createSignal
-local AppStyleProvider = require(CorePackages.Packages.UIBlox).App.Style.AppStyleProvider
-local Dark = require(CorePackages.Packages.UIBlox).App.Style.Constants.ThemeName.Dark
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Foundation2 = require(CorePackages.Packages.Foundation)
+local Dark = Foundation2.Enums.ColorMode.Dark
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
+local AppCommonLib3 = require(CorePackages.Workspace.Packages.AppCommonLib)
+local isSpatial = AppCommonLib3.isSpatial
 local HelpPage = require(CorePackages.Workspace.Packages.HelpPage)
 local leaveGame = require(RobloxGui.Modules.Settings.leaveGame)
+
 local Theme = require(script.Parent.Theme)
-local v55 = Theme.color("SETTINGS_SHIELD", Color3.new(0.1607843137254902, 0.1607843137254902, 0.1607843137254902))
-local v56 = Theme.transparency("SETTINGS_SHIELD_TRANSPARENCY", 0.2)
+
+local color = Theme.color("SETTINGS_SHIELD", Color3.new(41 / 255, 41 / 255, 41 / 255))
+local transparency = Theme.transparency("SETTINGS_SHIELD_TRANSPARENCY", 0.2)
+
 local SHIELD_INACTIVE_POSITION = Theme.SHIELD_INACTIVE_POSITION
-local v58 = Symbol.named("SettingsHubCursorOverride")
-local v59 = if not v13 then not Utility:IsSmallTouchScreen() and 26 or 24 else 32
-local v60 = game:DefineFastInt("CheckLeaveGameUpsellCooldown", 300)
-local v61 = game:DefineFastInt("GetServerChannelRetries", 10)
-local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+
+local named = Symbol.named("SettingsHubCursorOverride")
+
+local v2 = v and 32 or Utility:IsSmallTouchScreen() and 24 or 26
+
+local defineFastInt = game:DefineFastInt("CheckLeaveGameUpsellCooldown", 300)
+local defineFastInt2 = game:DefineFastInt("GetServerChannelRetries", 10)
+
+local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
 local Flags = require(script.Parent.Flags)
-local FFlagIEMFocusNavPeoplePageToButtons = SharedFlags.FFlagIEMFocusNavPeoplePageToButtons
-local t1 = {
-	EngineFeatureRbxAnalyticsServiceExposePlaySessionId = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId"),
-	EngineFeatureTeleportHistoryButtons = game:GetEngineFeature("TeleportHistoryButtons"),
-	EngineFeaturePlayerScriptStatusProperty = game:GetEngineFeature("PlayerScriptStatusProperty"),
-	FFlagRemoveRecordPage = game:DefineFastFlag("RemoveRecordPage", false),
-	FFlagPreventHiddenSwitchPage = game:DefineFastFlag("PreventHiddenSwitchPage", false),
-	FFlagLuaEnableGameInviteModalSettingsHub = game:DefineFastFlag("LuaEnableGameInviteModalSettingsHub", false),
-	FFlagFixDisableTopPaddingError = game:DefineFastFlag("FixDisableTopPaddingError", false),
-	GetFFlagLuaInExperienceCoreScriptsGameInviteUnification = require(RobloxGui.Modules.Flags.GetFFlagLuaInExperienceCoreScriptsGameInviteUnification),
-	FFlagEnableInGameMenuDurationLogger = require(RobloxGui.Modules.Common.Flags.GetFFlagEnableInGameMenuDurationLogger)(),
-	isNewInGameMenuEnabled = require(RobloxGui.Modules.isNewInGameMenuEnabled),
-	GetFFlagRemoveAssetVersionEndpoint = require(RobloxGui.Modules.Flags.GetFFlagRemoveAssetVersionEndpoint),
-	GetFFlagNewEventIngestPlayerScriptsDimensions = require(RobloxGui.Modules.Flags.GetFFlagNewEventIngestPlayerScriptsDimensions),
-	GetFFlagReportAbuseMenuEntrypointAnalytics = require(RobloxGui.Modules.Settings.Flags.GetFFlagReportAbuseMenuEntrypointAnalytics),
-	GetFFlagEnableLeaveGameUpsellEntrypoint = require(RobloxGui.Modules.Settings.Flags.GetFFlagEnableLeaveGameUpsellEntrypoint),
-	GetFStringInExperienceMenuIXPLayer = require(RobloxGui.Modules.Settings.Flags.GetFStringInExperienceMenuIXPLayer),
-	GetFStringExitModalIXPLayer = require(RobloxGui.Modules.Settings.Flags.GetFStringExitModalIXPLayer),
-	GetFStringInExperienceMenuIXPVar = require(RobloxGui.Modules.Settings.Flags.GetFStringInExperienceMenuIXPVar),
-	FFlagRelocateMobileMenuButtons = require(RobloxGui.Modules.Settings.Flags.FFlagRelocateMobileMenuButtons),
-	FIntRelocateMobileMenuButtonsVariant = require(RobloxGui.Modules.Settings.Flags.FIntRelocateMobileMenuButtonsVariant),
-	FFlagMenuButtonsMountWithIEM = require(RobloxGui.Modules.Settings.Flags.FFlagMenuButtonsMountWithIEM),
-	FFlagSpatialUIFixMenuPanelChatExclusive = require(RobloxGui.Modules.Settings.Flags.FFlagSpatialUIFixMenuPanelChatExclusive),
-	FFlagRemoveLoadingTimeout = require(RobloxGui.Modules.Flags.FFlagRemoveLoadingTimeout),
-	FFlagAddNewPlayerListMobileFocusNav = PlayerList.Flags.FFlagAddNewPlayerListMobileFocusNav,
-	ChromeEnabled = require(CorePackages.Workspace.Packages.Chrome).Enabled(),
-	FFlagRespawnChromeShortcutTelemetry = require(RobloxGui.Modules.Chrome.Flags.FFlagRespawnChromeShortcutTelemetry),
-	FFlagLocalizeVersionLabels = settings():GetFFlag("LocalizeVersionLabels"),
-	isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled,
-	InExperienceUIVRIXP = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).InExperienceUIVRIXP,
-	FFlagAddSwitchTabHintsToIEM = SharedFlags.FFlagAddSwitchTabHintsToIEM,
-	GetFStringGameInviteMenuLayer = SharedFlags.GetFStringGameInviteMenuLayer,
-	GetFFlagEnableAppChatInExperience = SharedFlags.GetFFlagEnableAppChatInExperience,
-	GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints = SharedFlags.GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints,
-	GetFFlagDisplayServerChannel = SharedFlags.GetFFlagDisplayServerChannel,
-	FFlagSettingsHubIndependentBackgroundVisibility = SharedFlags.getFFlagSettingsHubIndependentBackgroundVisibility(),
-	GetFFlagPackagifySettingsShowSignal = SharedFlags.GetFFlagPackagifySettingsShowSignal,
-	FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls,
-	FFlagIEMFocusNavToButtons = SharedFlags.FFlagIEMFocusNavToButtons,
-	FFlagIEMTabFocusNav = SharedFlags.FFlagIEMTabFocusNav,
-	FFlagIEMFocusNavSupportNewButtons = Flags.FFlagIEMFocusNavSupportNewButtons,
-	FFlagIEMResumeButtonPressBugfix = SharedFlags.FFlagIEMResumeButtonPressBugfix,
-	FFlagAddUILessMode = SharedFlags.FFlagAddUILessMode,
-	FIntAddUILessModeVariant = SharedFlags.FIntAddUILessModeVariant,
-	FFlagInExperienceReportClosingBugfix = SharedFlags.FFlagInExperienceReportClosingBugfix,
-	FFlagEnableSettingsHubUIDelegateRollout = SharedFlags.FFlagEnableSettingsHubUIDelegateRollout,
-	FFlagAddIEMProfilePage = SharedFlags.FFlagAddIEMProfilePage,
-	FFlagFixSpatialUICaptures = SharedFlags.FFlagFixSpatialUICaptures,
-	FFlagVoiceRewarmTelemetry = SharedFlags.FFlagVoiceRewarmTelemetry,
-	FFlagAddTraversalBackButton = Traversal.Flags.FFlagAddTraversalBackButton,
-	FFlagAddTraversalHistory = Traversal.Flags.FFlagAddTraversalHistory,
-	FFlagCreateInExperienceMenuReact = Flags.FFlagCreateInExperienceMenuReact,
-	FFlagEnableSystemScrimInSettingsHub = game:DefineFastFlag("EnableSystemScrimInSettingsHub", false),
-	FFlagHelpPageIXPExposure = HelpPage.Flags.FFlagHelpPageIXPExposure,
-	FStringHelpPageIXPLayer = HelpPage.Flags.FStringHelpPageIXPLayer,
-	FFlagAddAbilityToDisableIGMScroll = SharedFlags.FFlagAddAbilityToDisableIGMScroll,
-	FFlagFixDisabledScrollOnIos = game:DefineFastFlag("FixDisabledScrollOnIos", false),
-	FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet,
-	FFlagSideSheetAndroidBack = game:DefineFastFlag("SideSheetAndroidBack", false),
-	FFlagAddInviteFriendsIntegration = SharedFlags.FFlagAddInviteFriendsIntegration,
-	FFlagIntegrateTraversalHistoryInSideSheet = SharedFlags.FFlagIntegrateTraversalHistoryInSideSheet,
-	FFlagImprovePageTitleCloseButton = game:DefineFastFlag("ImprovePageTitleCloseButton", false),
-	FFlagIGMSelectionGroup = game:DefineFastFlag("IGMSelectionGroup", false),
-	FFlagRemoveExitModal = require(RobloxGui.Modules.Settings.Flags.FFlagRemoveExitModal),
-	FFlagEnableExitModalExposure = game:DefineFastFlag("EnableExitModalExposure", false)
-}
+
+local v3 = {}
+v3.EngineFeatureRbxAnalyticsServiceExposePlaySessionId = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+v3.EngineFeatureTeleportHistoryButtons = game:GetEngineFeature("TeleportHistoryButtons")
+v3.EngineFeaturePlayerScriptStatusProperty = game:GetEngineFeature("PlayerScriptStatusProperty")
+v3.FFlagPreventHiddenSwitchPage = game:DefineFastFlag("PreventHiddenSwitchPage", false)
+v3.FFlagFixDisableTopPaddingError = game:DefineFastFlag("FixDisableTopPaddingError", false)
+v3.FFlagWaitPlayerModuleStatus = game:DefineFastFlag("WaitPlayerModuleStatus", false)
+
+local GetFFlagEnableInGameMenuDurationLogger = require(RobloxGui.Modules.Common.Flags.GetFFlagEnableInGameMenuDurationLogger)
+v3.FFlagEnableInGameMenuDurationLogger = GetFFlagEnableInGameMenuDurationLogger()
+v3.isNewInGameMenuEnabled = require(RobloxGui.Modules.isNewInGameMenuEnabled)
+
+v3.GetFFlagRemoveAssetVersionEndpoint = require(RobloxGui.Modules.Flags.GetFFlagRemoveAssetVersionEndpoint)
+v3.GetFFlagNewEventIngestPlayerScriptsDimensions = require(RobloxGui.Modules.Flags.GetFFlagNewEventIngestPlayerScriptsDimensions)
+
+v3.GetFFlagReportAbuseMenuEntrypointAnalytics = require(RobloxGui.Modules.Settings.Flags.GetFFlagReportAbuseMenuEntrypointAnalytics)
+v3.GetFFlagEnableLeaveGameUpsellEntrypoint = require(RobloxGui.Modules.Settings.Flags.GetFFlagEnableLeaveGameUpsellEntrypoint)
+v3.GetFStringInExperienceMenuIXPLayer = require(RobloxGui.Modules.Settings.Flags.GetFStringInExperienceMenuIXPLayer)
+v3.GetFStringExitModalIXPLayer = require(RobloxGui.Modules.Settings.Flags.GetFStringExitModalIXPLayer)
+v3.GetFStringInExperienceMenuIXPVar = require(RobloxGui.Modules.Settings.Flags.GetFStringInExperienceMenuIXPVar)
+v3.FFlagRelocateMobileMenuButtons = require(RobloxGui.Modules.Settings.Flags.FFlagRelocateMobileMenuButtons)
+v3.FIntRelocateMobileMenuButtonsVariant = require(RobloxGui.Modules.Settings.Flags.FIntRelocateMobileMenuButtonsVariant)
+v3.FFlagMenuButtonsMountWithIEM = require(RobloxGui.Modules.Settings.Flags.FFlagMenuButtonsMountWithIEM)
+v3.FFlagSpatialUIFixMenuPanelChatExclusive = require(RobloxGui.Modules.Settings.Flags.FFlagSpatialUIFixMenuPanelChatExclusive)
+v3.FFlagRemoveLoadingTimeout = require(RobloxGui.Modules.Flags.FFlagRemoveLoadingTimeout)
+
+v3.FFlagAddNewPlayerListMobileFocusNav = PlayerList.Flags.FFlagAddNewPlayerListMobileFocusNav
+
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+v3.ChromeEnabled = Chrome.Enabled()
+v3.FFlagRespawnChromeShortcutTelemetry = require(RobloxGui.Modules.Chrome.Flags.FFlagRespawnChromeShortcutTelemetry)
+
+v3.FFlagLocalizeVersionLabels = settings():GetFFlag("LocalizeVersionLabels")
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+v3.isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
+local SharedExperimentDefinition2 = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+v3.InExperienceUIVRIXP = SharedExperimentDefinition2.InExperienceUIVRIXP
+v3.FFlagAddSwitchTabHintsToIEM = SharedFlags4.FFlagAddSwitchTabHintsToIEM
+v3.GetFFlagEnableAppChatInExperience = SharedFlags4.GetFFlagEnableAppChatInExperience
+v3.GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints = SharedFlags4.GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints
+v3.GetFFlagDisplayServerChannel = SharedFlags4.GetFFlagDisplayServerChannel
+v3.FFlagSettingsHubIndependentBackgroundVisibility = SharedFlags4.getFFlagSettingsHubIndependentBackgroundVisibility()
+v3.GetFFlagPackagifySettingsShowSignal = SharedFlags4.GetFFlagPackagifySettingsShowSignal
+v3.FFlagEnableConsoleExpControls = SharedFlags4.FFlagEnableConsoleExpControls
+v3.FFlagIEMTabFocusNav = SharedFlags4.FFlagIEMTabFocusNav
+v3.FFlagIEMFocusNavSupportNewButtons = Flags.FFlagIEMFocusNavSupportNewButtons
+v3.FFlagAddUILessMode = SharedFlags4.FFlagAddUILessMode
+v3.FIntAddUILessModeVariant = SharedFlags4.FIntAddUILessModeVariant
+v3.FFlagInExperienceReportClosingBugfix = SharedFlags4.FFlagInExperienceReportClosingBugfix
+v3.FFlagEnableSettingsHubUIDelegateRollout = SharedFlags4.FFlagEnableSettingsHubUIDelegateRollout
+v3.FFlagAddIEMProfilePage = SharedFlags4.FFlagAddIEMProfilePage
+v3.FFlagFixSpatialUICaptures = SharedFlags4.FFlagFixSpatialUICaptures
+v3.FFlagVoiceRewarmTelemetry = SharedFlags4.FFlagVoiceRewarmTelemetry
+
+v3.FFlagAddTraversalBackButton = Traversal.Flags.FFlagAddTraversalBackButton
+v3.FFlagAddTraversalHistory = Traversal.Flags.FFlagAddTraversalHistory
+v3.FFlagEnableSystemScrimInSettingsHub = game:DefineFastFlag("EnableSystemScrimInSettingsHub", false)
+
+v3.FFlagHelpPageIXPExposure = HelpPage.Flags.FFlagHelpPageIXPExposure
+v3.FStringHelpPageIXPLayer = HelpPage.Flags.FStringHelpPageIXPLayer
+
+v3.FFlagFixDisabledScrollOnIos = game:DefineFastFlag("FixDisabledScrollOnIos", false)
+
+v3.FFlagSideSheetAndroidBack = game:DefineFastFlag("SideSheetAndroidBack", false)
+v3.FFlagAddInviteFriendsIntegration = SharedFlags4.FFlagAddInviteFriendsIntegration
+v3.FFlagIntegrateTraversalHistoryInSideSheet = SharedFlags4.FFlagIntegrateTraversalHistoryInSideSheet
+v3.FFlagShowSwitchServerButton = SharedFlags4.FFlagShowSwitchServerButton
+v3.isExitModalRemoved = require(RobloxGui.Modules.Settings.Flags.isExitModalRemoved)
+v3.FFlagEnableExitModalExposure = game:DefineFastFlag("EnableExitModalExposure", false)
+
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local ContentProvider = game:GetService("ContentProvider")
 local StarterGui = game:GetService("StarterGui")
@@ -138,718 +184,763 @@ local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local HttpService = game:GetService("HttpService")
-local GameSettings = UserSettings().GameSettings
-local ExperienceMenuSessionManagerInstance = require(CorePackages.Workspace.Packages.InExperienceSessionization).ExperienceMenuSessionManagerInstance
-local PlatformService = nil
+local gameSettings = UserSettings().GameSettings
+local InExperienceSessionization = require(CorePackages.Workspace.Packages.InExperienceSessionization)
+local ExperienceMenuSessionManagerInstance = InExperienceSessionization.ExperienceMenuSessionManagerInstance
 
-pcall(function() -- line: 199
-	-- upvalues: PlatformService (ref)
-	PlatformService = game:GetService("PlatformService")
+local v4 = nil
+pcall(function()
+	local PlatformService = game:GetService("PlatformService")
+	v4 = PlatformService
 end)
 
-local PlatformFriendsService = nil
-
-pcall(function() -- line: 202
-	-- upvalues: PlatformFriendsService (ref)
-	PlatformFriendsService = game:GetService("PlatformFriendsService")
+local v5 = nil
+pcall(function()
+	local PlatformFriendsService = game:GetService("PlatformFriendsService")
+	v5 = PlatformFriendsService
 end)
 
-local GetServerVersion = nil
-
-spawn(function() -- line: 206
-	-- upvalues: GetServerVersion (ref), RobloxReplicatedStorage (copy)
-	GetServerVersion = RobloxReplicatedStorage:WaitForChild("GetServerVersion", 1e999)
+local getServerVersion = nil
+spawn(function()
+	getServerVersion = RobloxReplicatedStorage:WaitForChild("GetServerVersion", 1e999)
 end)
 
-local GetServerChannel = nil
+local getServerChannel = nil
 
-if t1.GetFFlagDisplayServerChannel() then
-	spawn(function() -- line: 212
-		-- upvalues: GetServerChannel (ref), RobloxReplicatedStorage (copy)
-		GetServerChannel = RobloxReplicatedStorage:WaitForChild("GetServerChannel", 1e999)
+if v3.GetFFlagDisplayServerChannel() then
+	spawn(function()
+		getServerChannel = RobloxReplicatedStorage:WaitForChild("GetServerChannel", 1e999)
 	end)
 end
 
-local v83 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
-
+local v6 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
 RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
+local platform = UserInputService:GetPlatform()
 
-local Platform = UserInputService:GetPlatform()
 local BaseUrl = ContentProvider.BaseUrl
-local v86 = not string.find(BaseUrl, "www.roblox.com")
+local visible2 = not string.find(BaseUrl, "www.roblox.com")
 local DevConsoleMaster = require(RobloxGui.Modules.DevConsoleMaster)
-local u88 = nil
-local u89 = false
-local u90 = nil
-local u91 = nil
+
+local lastInputTypeChangedConnection = nil
+local v7 = false
+
+local serverVersionBlocking = nil
+local serverChannelBlocking = nil
+
 local SettingsFullScreenTitleBar = require(RobloxGui.Modules.Settings.Components.SettingsFullScreenTitleBar)
+
 local MenuLeaveGameTelemetryConfig = require(RobloxGui.Modules.Settings.Analytics.MenuLeaveGameTelemetryConfig)
 local MenuResetCharacterTelemetryConfig = require(RobloxGui.Modules.Settings.Analytics.MenuResetCharacterTelemetryConfig)
 local MenuResumeTelemetryConfig = require(RobloxGui.Modules.Settings.Analytics.MenuResumeTelemetryConfig)
+
 local ReactPageAnalytics = require(RobloxGui.Modules.Settings.Analytics.ReactPageAnalytics)
-local GameInviteAnalytics = require(CorePackages.Workspace.Packages.GameInvite).GameInviteAnalytics
-local GameInviteModalManager = nil
-local GameInviteInviteExperimentVariant = nil
-local GameInviteConstants = nil
 
-if t1.GetFFlagLuaInExperienceCoreScriptsGameInviteUnification() then
-	local GameInvite = require(CorePackages.Workspace.Packages.GameInvite)
-
-	GameInviteModalManager = GameInvite.GameInviteModalManager
-	GameInviteInviteExperimentVariant = GameInvite.GameInviteInviteExperimentVariant
-	GameInviteConstants = GameInvite.GameInviteConstants
-end
+local GameInvite = require(CorePackages.Workspace.Packages.GameInvite)
+local GameInviteModalManager = GameInvite.GameInviteModalManager
+local GameInviteConstants = GameInvite.GameInviteConstants
 
 local CapturesApp = require(RobloxGui.Modules.Captures.CapturesApp)
+
 local Constants = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
-local v104 = CachedPolicyService:IsSubjectToChinaPolicies()
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+
+local isSubjectToChinaPolicies = CachedPolicyService:IsSubjectToChinaPolicies()
+
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 local Constants2 = require(RobloxGui.Modules.VoiceChat.Constants)
-local v107 = game:DefineFastFlag("SettingsHubRaceConditionFix", false)
-local v108 = game:DefineFastFlag("FixReportButtonCutOff", false)
+local defineFastFlag = game:DefineFastFlag("SettingsHubRaceConditionFix", false)
+local defineFastFlag2 = game:DefineFastFlag("FixReportButtonCutOff", false)
+
 local InExperienceAppChatModal = require(CorePackages.Workspace.Packages.AppChat.InExperienceAppChatModal)
-local v110 = if not t1.GetFFlagPackagifySettingsShowSignal() then nil else require(CorePackages.Workspace.Packages.CoreScriptsCommon).SettingsShowSignal
-local v111 = if not t1.GetFFlagPackagifySettingsShowSignal() then nil else require(CorePackages.Workspace.Packages.CoreScriptsCommon).SettingsUtility
-local t2 = {
-	frequency = 4,
-	dampingRatio = 1
-}
+local settingsShowSignal
+
+if v3.GetFFlagPackagifySettingsShowSignal() then
+	local CoreScriptsCommon2 = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+	settingsShowSignal = CoreScriptsCommon2.SettingsShowSignal
+else
+	settingsShowSignal = nil
+end
+
+local settingsUtility
+
+if v3.GetFFlagPackagifySettingsShowSignal() then
+	local CoreScriptsCommon2 = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+	settingsUtility = CoreScriptsCommon2.SettingsUtility
+else
+	settingsUtility = nil
+end
+
+local v8 = { frequency = 4, dampingRatio = 1 }
+
 local InExperienceSideSheet = require(CorePackages.Workspace.Packages.InExperienceSideSheet)
+local getDidSideSheetOpenWithPeoplePage = InExperienceSideSheet.getDidSideSheetOpenWithPeoplePage
+local getHasRoomForPeoplePage = InExperienceSideSheet.getHasRoomForPeoplePage
+local getIsPeoplePageOpen = InExperienceSideSheet.getIsPeoplePageOpen
+local getSideSheetAnimationDuration = InExperienceSideSheet.getSideSheetAnimationDuration
+local getSideSheetDrawerWidth = InExperienceSideSheet.getSideSheetDrawerWidth
+local getSideSheetMenuPageHeight = InExperienceSideSheet.getSideSheetMenuPageHeight
+local getSideSheetMenuPageWidth = InExperienceSideSheet.getSideSheetMenuPageWidth
 local toggleSideSheet = InExperienceSideSheet.toggleSideSheet
 local getSideSheetVisibility = InExperienceSideSheet.getSideSheetVisibility
+local setupInGameMenuPeoplePageActions = InExperienceSideSheet.setupInGameMenuPeoplePageActions
+local setupPeoplePageOpenTracking = InExperienceSideSheet.setupPeoplePageOpenTracking
+local closePeoplePageWhenNoRoomBesideSideSheet = InExperienceSideSheet.closePeoplePageWhenNoRoomBesideSideSheet
+local FFlagSideSheetOpenPeoplePage = InExperienceSideSheet.Flags.FFlagSideSheetOpenPeoplePage
+
+local FFlagClosePeoplePageWhenNoRoomBesideSideSheet = InExperienceSideSheet.Flags.FFlagClosePeoplePageWhenNoRoomBesideSideSheet
+local isSideSheetEnabled = require(CorePackages.Workspace.Packages.InExperienceSideSheetUtils.isSideSheetEnabled)
+local SwitchServer = require(CorePackages.Workspace.Packages.SwitchServer)
+local GetSwitchServerStore = SwitchServer.GetSwitchServerStore
+local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
+local isPioneerLaunch = PioneerUtils.isPioneerLaunch
 
 require(RobloxGui.Modules.Settings.ReactPageFactory)
 
-local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
-local v117 = t1.FFlagLocalizeVersionLabels or v104
+local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+
+local fFlagLocalizeVersionLabels = v3.FFlagLocalizeVersionLabels or isSubjectToChinaPolicies
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
 
-local function tryTranslate(p1, p2) -- line: 297
-	-- upvalues: RobloxTranslator (copy)
+local function tryTranslate(p, p2)
 	if not RobloxTranslator then
 		return p2
 	end
 
-	local ok, result = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, p1)
-
-	if ok then
-		return result
-	end
-
-	return p2
+	local success, result = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, p)
+	return if success then result else p2
 end
 
 local ChatSelector = require(RobloxGui.Modules.ChatSelector)
-local v121, _ = GuiService:GetGuiInset()
-local uDim2 = UDim2.new(0, 0, 0, -v121.Y)
-local uDim2_2 = UDim2.new(1, 0, 1, v121.Y)
+local guiInset, _ = GuiService:GetGuiInset()
+local udim = UDim2.new(0, 0, 0, -guiInset.Y)
+local udim2 = UDim2.new(1, 0, 1, guiInset.Y)
 
-local function GetCorePackagesLoaded(p3) -- line: 313
-	local CorePackages2 = game:GetService("CorePackages")
-
-	for _, v in pairs(p3) do
-		if not CorePackages2:FindFirstChild(v) then
-			return false
-		end
+local function GetServerVersionBlocking() -- 1 equivalent call inferred from this helper
+	if serverVersionBlocking then
+		return serverVersionBlocking
 	end
 
-	return true
-end
-local function GetServerVersionBlocking() -- line: 323
-	-- upvalues: u90 (ref), GetServerVersion (ref)
-	if u90 then
-		return u90
-	end
-
-	if not GetServerVersion then
+	if not getServerVersion then
 		repeat
 			wait()
-		until GetServerVersion
+		until getServerVersion
 	end
 
-	u90 = GetServerVersion:InvokeServer()
-
-	return u90
+	serverVersionBlocking = getServerVersion:InvokeServer()
+	return serverVersionBlocking
 end
-local function GetServerChannelBlocking() -- line: 336
-	-- upvalues: u91 (ref), v61 (copy), GetServerChannel (ref)
-	if u91 then
-		return u91
+
+local function GetServerChannelBlocking()
+	if serverChannelBlocking then
+		return serverChannelBlocking
 	end
 
-	local v141 = v61
+	local v9 = defineFastInt2
 
-	if not GetServerChannel then
+	if not getServerChannel then
 		repeat
 			task.wait()
-			v141 -= 1
-		until GetServerChannel or v141 == 0
+			v9 -= 1
+		until getServerChannel or v9 == 0
 	end
 
-	if GetServerChannel then
-		u91 = GetServerChannel:InvokeServer()
+	if getServerChannel then
+		serverChannelBlocking = getServerChannel:InvokeServer()
 	else
 		warn("GetServerChannelRemote not available")
-		u91 = "Unknown"
+		serverChannelBlocking = "Unknown"
 	end
 
-	return u91
+	return serverChannelBlocking
 end
-local function GetPlaceVersionText() -- line: 357
-	-- upvalues: t1 (copy), HttpRbxApiService (copy), HttpService (copy)
-	if t1.GetFFlagRemoveAssetVersionEndpoint() then
+
+local function GetPlaceVersionText() -- 1 equivalent call inferred from this helper
+	if v3.GetFFlagRemoveAssetVersionEndpoint() then
 		return game.PlaceVersion
 	end
 
-	local PlaceVersion = game.PlaceVersion
+	local placeVersion = game.PlaceVersion
 
-	pcall(function() -- line: 364
-		-- upvalues: HttpRbxApiService (copy), HttpService (copy), PlaceVersion (ref)
-		local Async = HttpRbxApiService:GetAsync(string.format("assets/%d/versions", game.PlaceId))
-		local VersionNumber = HttpService:JSONDecode(Async)[1].VersionNumber
-
-		PlaceVersion = string.format("%s (Latest: %d)", PlaceVersion, VersionNumber)
+	pcall(function()
+		local versionNumber = HttpService:JSONDecode((HttpRbxApiService:GetAsync(string.format("assets/%d/versions", game.PlaceId))))[1].VersionNumber
+		placeVersion = string.format("%s (Latest: %d)", placeVersion, versionNumber)
 	end)
 
-	return PlaceVersion
+	return placeVersion
 end
-local function createReactPage(p4) -- line: 374
-	-- upvalues: Create (copy)
+
+local function createReactPage(parent)
 	return Create("Frame")({
 		Name = "InExperienceMenuPage",
 		BackgroundTransparency = 1,
-		Visible = false,
 		Size = UDim2.fromScale(0, 0),
-		Parent = p4
+		Visible = false,
+		Parent = parent
 	})
 end
-local function CreateSettingsHub() -- line: 385
-	-- upvalues: t1 (copy), RobloxGui (copy), v110 (copy), Utility (copy), v111 (copy), createSignal (copy), Constants2 (copy), Stores (copy), RbxAnalyticsService (copy), ReactPageAnalytics (copy), createReactPage (copy), Theme (copy), ContextActionService (copy), LocalizationService (copy), Localization (copy), v13 (copy), Create (copy), v83 (copy), UserInputService (copy), Platform (copy), default (copy), getCamMicPermissions (copy), Otter (copy), RobloxTranslator (copy), v107 (copy), StarterGui (copy), InExperienceSideSheet (copy), TelemetryService (copy), MenuLeaveGameTelemetryConfig (copy), MenuResetCharacterTelemetryConfig (copy), Constants (copy), MenuResumeTelemetryConfig (copy), ReactRoblox (copy), React (copy), MenuButtonsContainer (copy), Flags (copy), GuiService (copy), uDim2_2 (copy), uDim2 (copy), SHIELD_INACTIVE_POSITION (copy), v56 (copy), v55 (copy), v59 (copy), v117 (copy), GetServerChannelBlocking (copy), u90 (ref), GetServerVersion (ref), RunService (copy), HttpRbxApiService (copy), HttpService (copy), CachedPolicyService (copy), BaseUrl (copy), v86 (copy), StarterPlayer (copy), Players (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), Roact (copy), RoactAppExperiment (copy), IXPService (copy), AppStyleProvider (copy), Dark (copy), MenuBackButton (copy), MenuFrontButton (copy), AppFonts (copy), t2 (copy), CorePackages (copy), InExperienceAppChatModal (copy), InExperienceCapabilities (copy), FoundationProvider (copy), Foundation (copy), Utils (copy), SwitchTabHint (copy), isSubjectToDesktopPolicies (copy), SettingsFullScreenTitleBar (copy), VRService (copy), GameSettings (copy), DevConsoleMaster (copy), v108 (copy), Cryo (copy), IXPServiceWrapper (copy), ExperienceMenuSessionManagerInstance (copy), ReactPageSignal (copy), MouseIconOverrideService (copy), v58 (copy), v60 (copy), TweenService (copy), PerfUtils (copy), u88 (ref), ChatSelector (copy), FFlagEnableNewBackpack (copy), v5 (copy), u89 (ref), GameInviteInviteExperimentVariant (ref), PlatformFriendsService (ref), PlatformService (ref), GameInviteModalManager (ref), GameInviteConstants (ref), GetCorePackagesLoaded (copy), GameInviteAnalytics (copy), CapturesPolicy (copy), isSpatial (copy), CapturesApp (copy), getSideSheetVisibility (copy), toggleSideSheet (copy), leaveGame (copy), Signals (copy), PortalWithFoundationStylelink (copy), TraversalHistoryMenu (copy), InExperienceMenuReact (copy), InExperienceMenuReactPage (copy)
-	local t3 = {
-		Visible = false,
-		Active = true,
-		Pages = {
-			CurrentPage = nil,
-			PageTable = {}
-		},
-		MenuStack = {},
-		TabHeaders = {},
-		BottomBarButtons = {},
-		BottomBarButtonsComponents = {},
-		ResizedConnection = nil,
-		BackBarVisibleConnection = nil
-	}
 
-	if t1.EngineFeatureTeleportHistoryButtons then
-		t3.FrontBarVisibleConnection = nil
+local function CreateSettingsHub()
+	local children = {}
+	children.Visible = false
+	children.Active = true
+	children.Pages = { CurrentPage = nil, PageTable = {} }
+	children.MenuStack = {}
+	children.TabHeaders = {}
+	children.BottomBarButtons = {}
+	children.BottomBarButtonsComponents = {}
+	children.ResizedConnection = nil
+	children.BackBarVisibleConnection = nil
+
+	if v3.EngineFeatureTeleportHistoryButtons then
+		children.FrontBarVisibleConnection = nil
 	end
 
-	t3.PreferredTransparencyChangedConnection = nil
-	t3.TabConnection = nil
-	t3.LeaveGamePage = require(RobloxGui.Modules.Settings.Pages.LeaveGame)
-	t3.LeaveGameUpsellPage = if not t1.GetFFlagEnableLeaveGameUpsellEntrypoint() then nil else require(RobloxGui.Modules.Settings.Pages.LeaveGameUpsell.LeaveGameUpsell)
-	t3.ResetCharacterPage = require(RobloxGui.Modules.Settings.Pages.ResetCharacter)
-	t3.SettingsShowSignal = if not t1.GetFFlagPackagifySettingsShowSignal() then Utility:CreateSignal() else v110
-	t3.CurrentPageSignal = if not t1.GetFFlagPackagifySettingsShowSignal() then Utility:CreateSignal() else v111.CreateSignal()
+	children.PreferredTransparencyChangedConnection = nil
+	children.TabConnection = nil
 
-	local v145, v146 = createSignal(false)
+	children.LeaveGamePage = require(RobloxGui.Modules.Settings.Pages.LeaveGame)
+	local leaveGameUpsellPage
 
-	t3.showBottomBarSignal = v145
-	t3.setShowBottomBarSignal = v146
-	t3.OpenStateChangedCount = 0
-	t3.BottomButtonFrame = nil
-
-	if t1.FFlagRelocateMobileMenuButtons then
-		t3.addMenuKeyBindings = nil
-		t3.removeMenuKeyBindings = nil
+	if v3.GetFFlagEnableLeaveGameUpsellEntrypoint() then
+		leaveGameUpsellPage = require(RobloxGui.Modules.Settings.Pages.LeaveGameUpsell.LeaveGameUpsell)
 	end
 
-	if t1.FFlagIEMFocusNavSupportNewButtons then
-		t3.ResumeMenuButton = nil
+	children.LeaveGameUpsellPage = leaveGameUpsellPage
+	children.ResetCharacterPage = require(RobloxGui.Modules.Settings.Pages.ResetCharacter)
+	local settingsShowSignal2
+
+	if v3.GetFFlagPackagifySettingsShowSignal() then
+		settingsShowSignal2 = settingsShowSignal
+	else
+		settingsShowSignal2 = Utility:CreateSignal()
 	end
 
-	t3.hasMicPermissions = false
+	children.SettingsShowSignal = settingsShowSignal2
+	local currentPageSignal
 
-	if t1.GetFFlagEnableLeaveGameUpsellEntrypoint() then
-		t3.checkedUpsell = false
-		t3.leaveGameUpsellProp = Constants2.PHONE_UPSELL_VALUE_PROP.None
-		t3.sessionStartTime = os.time()
+	if v3.GetFFlagPackagifySettingsShowSignal() then
+		currentPageSignal = settingsUtility.CreateSignal()
+	else
+		currentPageSignal = Utility:CreateSignal()
 	end
 
-	t3.isFetchingMicPermissions = true
+	children.CurrentPageSignal = currentPageSignal
+	local signal, setShowBottomBarSignal = createSignal(false)
+	children.showBottomBarSignal = signal
+	children.setShowBottomBarSignal = setShowBottomBarSignal
+	children.OpenStateChangedCount = 0
+	children.BottomButtonFrame = nil
 
-	if t1.FFlagAddUILessMode and t1.FIntAddUILessModeVariant ~= 0 then
-		t3.uiLessStore = Stores.GetUILessStore(false)
+	if v3.FFlagRelocateMobileMenuButtons then
+		children.addMenuKeyBindings = nil
+		children.removeMenuKeyBindings = nil
 	end
 
-	t3.PageTitleLabel = nil
-	t3.PageTitleCloseButton = nil
-	t3.PageTitleHeader = nil
-	t3.isMuted = nil
-	t3.lastVoiceRecordingIndicatorTextUpdated = nil
-	t3.playSessionId = ""
-
-	if t1.EngineFeatureRbxAnalyticsServiceExposePlaySessionId then
-		t3.playSessionId = RbxAnalyticsService:GetPlaySessionId()
+	if v3.FFlagIEMFocusNavSupportNewButtons then
+		children.ResumeMenuButton = nil
 	end
 
-	t3.reactPageAnalytics = ReactPageAnalytics.new()
+	children.hasMicPermissions = false
 
-	local u147 = nil
-	local u148 = nil
-	local BindableEvent = Instance.new("BindableEvent")
-
-	BindableEvent.Name = "PoppedMenu"
-	t3.PoppedMenu = BindableEvent.Event
-	t3.ReactPage = nil
-
-	if t1.FFlagCreateInExperienceMenuReact then
-		t3.ReactPage = createReactPage()
+	if v3.GetFFlagEnableLeaveGameUpsellEntrypoint() then
+		children.checkedUpsell = false
+		children.leaveGameUpsellProp = Constants2.PHONE_UPSELL_VALUE_PROP.None
+		children.sessionStartTime = os.time()
 	end
 
-	local function shouldShowHubBar(p5) -- line: 457
-		-- upvalues: t3 (copy), t1 (copy)
-		local v260 = p5 or t3.Pages.CurrentPage
+	children.isFetchingMicPermissions = true
 
-		if t1.FFlagEnableSideSheet then
-			return v260.ShouldShowHubBar == true
+	if v3.FFlagAddUILessMode and v3.FIntAddUILessModeVariant ~= 0 then
+		children.uiLessStore = Stores.GetUILessStore(false)
+	end
+
+	children.PageTitleLabel = nil
+	children.PageTitleCloseButton = nil
+	children.PageTitleHeader = nil
+
+	children.isMuted = nil
+	children.lastVoiceRecordingIndicatorTextUpdated = nil
+
+	children.playSessionId = ""
+
+	if v3.EngineFeatureRbxAnalyticsServiceExposePlaySessionId then
+		children.playSessionId = RbxAnalyticsService:GetPlaySessionId()
+	end
+
+	children.reactPageAnalytics = ReactPageAnalytics.new()
+
+	local changedConnection = nil
+	local canvasPositionChangedConnection = nil
+
+	local poppedMenu = Instance.new("BindableEvent")
+	poppedMenu.Name = "PoppedMenu"
+	children.PoppedMenu = poppedMenu.Event
+
+	children.ReactPage = nil
+	children.ReactPage = createReactPage()
+
+	local function shouldShowHubBar(p): boolean -- 4 equivalent calls inferred from this helper
+		local v9 = p or children.Pages.CurrentPage
+
+		if isSideSheetEnabled then
+			return v9.ShouldShowHubBar == true
 		end
 
-		return v260.ShouldShowBottomBar == true
+		return v9.ShouldShowBottomBar == true
 	end
-	local function updatePageTitleHeader(p6) -- line: 462
-		-- upvalues: t3 (copy), t1 (copy)
-		local v262 = p6 or t3.Pages.CurrentPage
 
-		if not (if not t1.FFlagEnableSideSheet then v262.ShouldShowBottomBar == true else v262.ShouldShowHubBar == true) or not p6.TabHeader then
-			t3.PageTitleLabel.Text = ""
+	local function updatePageTitleHeader(currentPage) -- 2 equivalent calls inferred from this helper
+		if shouldShowHubBar(currentPage) and currentPage.TabHeader then -- inferred equivalent call
+			children.PageTitleLabel.Text = currentPage.TabHeader.TabLabel.Title.Text
+		else
+			children.PageTitleLabel.Text = ""
+		end
+	end
 
+	local function setTabHeaderSelection(object) -- 3 equivalent calls inferred from this helper
+		if not v3.FFlagIEMTabFocusNav then
 			return
 		end
 
-		t3.PageTitleLabel.Text = p6.TabHeader.TabLabel.Title.Text
-	end
-	local function setTabHeaderSelection(p7) -- line: 471
-		-- upvalues: t1 (copy)
-		if not t1.FFlagIEMTabFocusNav then
+		local tabHeader = object:GetTabHeader()
+
+		if not tabHeader then
 			return
 		end
 
-		local TabHeader = p7:GetTabHeader()
-
-		if not TabHeader then
-			return
-		end
-
-		for _, v266 in p7.FirstSelectableObjects do
-			v266.NextSelectionUp = TabHeader
-			TabHeader.NextSelectionDown = v266
+		for _, firstSelectableObject in object.FirstSelectableObjects do
+			firstSelectableObject.NextSelectionUp = tabHeader
+			tabHeader.NextSelectionDown = firstSelectableObject
 		end
 	end
-	local function updateTabHeaderWrapping() -- line: 485
-		-- upvalues: t1 (copy), t3 (copy)
-		if not t1.FFlagIEMTabFocusNav then
+
+	local function updateTabHeaderWrapping() -- 2 equivalent calls inferred from this helper
+		if not v3.FFlagIEMTabFocusNav then
 			return
 		end
 
-		for _, v268 in t3.TabHeaders do
-			v268.NextSelectionLeft = nil
-			v268.NextSelectionRight = nil
+		for _, tabHeader in children.TabHeaders do
+			tabHeader.NextSelectionLeft = nil
+			tabHeader.NextSelectionRight = nil
 		end
 
-		local v269 = #t3.TabHeaders
+		local count = #children.TabHeaders
 
-		if v269 < 2 then
+		if count < 2 then
 			return
 		end
 
-		t3.TabHeaders[1].NextSelectionLeft = t3.TabHeaders[v269]
-		t3.TabHeaders[v269].NextSelectionRight = t3.TabHeaders[1]
+		children.TabHeaders[1].NextSelectionLeft = children.TabHeaders[count]
+		children.TabHeaders[count].NextSelectionRight = children.TabHeaders[1]
 	end
-	local function setBottomBarSelection(p8) -- line: 497
-		-- upvalues: t3 (copy), t1 (copy)
-		if not t3.BottomButtonFrame and (t1.FFlagIEMFocusNavToButtons and not p8) and (not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 or t1.FIntRelocateMobileMenuButtonsVariant == 2) then
+
+	local function setBottomBarSelection(object)
+		if
+			not children.BottomButtonFrame
+			and not object
+			and (not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 or v3.FIntRelocateMobileMenuButtonsVariant == 2)
+		then
 			return
 		end
 
-		if t3.ResumeButton then
-			p8.PageNextSelectionDown = t3.ResumeButton
-		elseif t1.FFlagIEMFocusNavSupportNewButtons and t1.FIntRelocateMobileMenuButtonsVariant == 2 and t3.ResumeMenuButton then
-			p8.PageNextSelectionDown = t3.ResumeMenuButton
+		if children.ResumeButton then
+			object.PageNextSelectionDown = children.ResumeButton
+		elseif
+			v3.FFlagIEMFocusNavSupportNewButtons
+			and v3.FIntRelocateMobileMenuButtonsVariant == 2
+			and children.ResumeMenuButton
+		then
+			object.PageNextSelectionDown = children.ResumeMenuButton
 		end
 
-		if t1.FFlagIEMTabFocusNav and t3.BottomButtonFrame then
-			local TabHeader = p8:GetTabHeader()
-			local v272 = t3.ResumeButton or t3.ResumeMenuButton
+		if v3.FFlagIEMTabFocusNav and children.BottomButtonFrame then
+			local tabHeader = object:GetTabHeader()
 
-			if v272 then
-				for k, _ in pairs(t3.Pages.PageTable) do
-					local TabHeader2 = k:GetTabHeader()
+			local resumeButton = children.ResumeButton or children.ResumeMenuButton
 
-					if TabHeader2 then
-						TabHeader2.NextSelectionUp = v272
+			if resumeButton then
+				for k, _ in pairs(children.Pages.PageTable) do
+					local tabHeader2 = k:GetTabHeader()
+
+					if tabHeader2 then
+						tabHeader2.NextSelectionUp = resumeButton
 					end
 				end
 			end
 
-			for _, descendant in t3.BottomButtonFrame:GetDescendants() do
-				if descendant:IsA("GuiObject") and descendant.Selectable then
-					descendant.NextSelectionDown = TabHeader
+			for _, guiObject in children.BottomButtonFrame:GetDescendants() do
+				if guiObject:IsA("GuiObject") and guiObject.Selectable then
+					guiObject.NextSelectionDown = tabHeader
 				end
 			end
 		end
 
-		for _, v279 in p8.LastSelectableObjects do
-			t3.BottomButtonFrame.SelectionBehaviorUp = Enum.SelectionBehavior.Escape
-			t3.BottomButtonFrame.NextSelectionUp = v279
-			v279.NextSelectionDown = p8.PageNextSelectionDown
+		for _, lastSelectableObject in object.LastSelectableObjects do
+			children.BottomButtonFrame.SelectionBehaviorUp = Enum.SelectionBehavior.Escape
+			children.BottomButtonFrame.NextSelectionUp = lastSelectableObject
+			lastSelectableObject.NextSelectionDown = object.PageNextSelectionDown
 
-			local LeaveGameButton = t3.LeaveGameButton
+			local leaveGameButton = children.LeaveGameButton
 
-			if LeaveGameButton then
-				LeaveGameButton.NextSelectionUp = v279
+			if leaveGameButton then
+				leaveGameButton.NextSelectionUp = lastSelectableObject
 			end
 
-			if t1.FFlagIEMFocusNavSupportNewButtons and t1.FIntRelocateMobileMenuButtonsVariant == 2 then
-				for _, descendant in t3.BottomButtonFrame:GetDescendants() do
-					if descendant:IsA("GuiObject") and descendant.Selectable then
-						descendant.NextSelectionUp = v279
-					end
+			if not (v3.FFlagIEMFocusNavSupportNewButtons and v3.FIntRelocateMobileMenuButtonsVariant == 2) then
+				continue
+			end
+
+			for _, guiObject in children.BottomButtonFrame:GetDescendants() do
+				if guiObject:IsA("GuiObject") and guiObject.Selectable then
+					guiObject.NextSelectionUp = lastSelectableObject
 				end
 			end
 		end
 
-		if #p8.LastSelectableObjects < 1 then
-			t3.BottomButtonFrame.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
-			t3.BottomButtonFrame.NextSelectionUp = nil
+		if #object.LastSelectableObjects < 1 then
+			children.BottomButtonFrame.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+			children.BottomButtonFrame.NextSelectionUp = nil
+			local leaveGameButton = children.LeaveGameButton
 
-			local LeaveGameButton = t3.LeaveGameButton
-
-			if LeaveGameButton then
-				LeaveGameButton.NextSelectionUp = nil
+			if leaveGameButton then
+				leaveGameButton.NextSelectionUp = nil
 			end
 
-			if t1.FFlagIEMFocusNavSupportNewButtons and t1.FIntRelocateMobileMenuButtonsVariant == 2 then
-				for _, descendant in t3.BottomButtonFrame:GetDescendants() do
-					if descendant:IsA("GuiObject") and descendant.Selectable then
-						descendant.NextSelectionUp = if not t1.FFlagIEMTabFocusNav then nil else p8:GetTabHeader()
+			if v3.FFlagIEMFocusNavSupportNewButtons and v3.FIntRelocateMobileMenuButtonsVariant == 2 then
+				for _, guiObject in children.BottomButtonFrame:GetDescendants() do
+					if not (guiObject:IsA("GuiObject") and guiObject.Selectable) then
+						continue
 					end
+
+					local nextSelectionUp
+
+					if v3.FFlagIEMTabFocusNav then
+						nextSelectionUp = object:GetTabHeader()
+					end
+
+					guiObject.NextSelectionUp = nextSelectionUp
 				end
 			end
 		end
 	end
-	local function shouldShowBottomBar(p9) -- line: 566
-		-- upvalues: t3 (copy), t1 (copy), Utility (copy), Theme (copy)
-		local v287 = p9 or t3.Pages.CurrentPage
 
-		if (not t1.FFlagRelocateMobileMenuButtons or (t1.FIntRelocateMobileMenuButtonsVariant == 0 or t1.FIntRelocateMobileMenuButtonsVariant == 2)) and ((Utility:IsPortrait() or Utility:IsSmallTouchScreen()) and not Theme.AlwaysShowBottomBar()) then
+	local function shouldShowBottomBar(p): boolean
+		local v9 = p or children.Pages.CurrentPage
+
+		if
+			(not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 or v3.FIntRelocateMobileMenuButtonsVariant == 2)
+			and (Utility:IsPortrait() or Utility:IsSmallTouchScreen())
+			and not Theme.AlwaysShowBottomBar()
+		then
 			return false
 		end
 
-		return v287 ~= nil and v287.ShouldShowBottomBar == true
+		return v9 ~= nil and v9.ShouldShowBottomBar == true
 	end
-	local function shouldDisableDefaultScroll(p10) -- line: 580
-		-- upvalues: t3 (copy)
-		local v289 = p10 or t3.Pages.CurrentPage
 
-		return v289 ~= nil and v289.ShouldDisableDefaultScroll == true
+	local function shouldDisableDefaultScroll(p): boolean -- 2 equivalent calls inferred from this helper
+		local v9 = p or children.Pages.CurrentPage
+		return v9 ~= nil and v9.ShouldDisableDefaultScroll == true
 	end
-	local function setBottomBarBindings() -- line: 585
-		-- upvalues: t3 (copy), t1 (copy), ContextActionService (copy)
-		if not t3.Visible then
+
+	local function setBottomBarBindings()
+		if not children.Visible then
 			return
 		end
 
-		if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-			for i = 1, #t3.BottomBarButtons do
-				local v291 = t3.BottomBarButtons[i]
-				local v292 = v291[1]
-				local v293 = v291[2]
-
-				ContextActionService:BindCoreAction(v292, v293[1], false, unpack(v293[2]))
+		if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+			if children.addMenuKeyBindings then
+				children.addMenuKeyBindings()
 			end
-		elseif t3.addMenuKeyBindings then
-			t3.addMenuKeyBindings()
+		else
+			for i = 1, #children.BottomBarButtons do
+				local bottomBarButton = children.BottomBarButtons[i]
+				local v9 = bottomBarButton[1]
+				local v10 = bottomBarButton[2]
+				ContextActionService:BindCoreAction(v9, v10[1], false, unpack(v10[2]))
+			end
 		end
 
-		if t3.BottomButtonFrame then
-			t3.BottomButtonFrame.Visible = true
+		if children.BottomButtonFrame then
+			children.BottomButtonFrame.Visible = true
 		end
 	end
-	local function removeBottomBarBindings(p11) -- line: 608
-		-- upvalues: t1 (copy), t3 (copy), ContextActionService (copy)
-		if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-			for _, v in pairs(t3.BottomBarButtons) do
-				ContextActionService:UnbindCoreAction(v[1])
+
+	local function removeBottomBarBindings(p)
+		if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+			if children.removeMenuKeyBindings then
+				children.removeMenuKeyBindings()
 			end
-		elseif t3.removeMenuKeyBindings then
-			t3.removeMenuKeyBindings()
+		else
+			for _, bottomBarButton in pairs(children.BottomBarButtons) do
+				ContextActionService:UnbindCoreAction(bottomBarButton[1])
+			end
 		end
 
-		local OpenStateChangedCount = t3.OpenStateChangedCount
+		local openStateChangedCount = children.OpenStateChangedCount
+		local function fn() -- 1 equivalent call inferred from this helper
+			if children.OpenStateChangedCount == openStateChangedCount and children.BottomButtonFrame then
+				children.BottomButtonFrame.Visible = false
+			end
+		end
 
-		if p11 then
-			delay(p11, function() -- line: 620
-				-- upvalues: t3 (copy), OpenStateChangedCount (copy)
-				if t3.OpenStateChangedCount == OpenStateChangedCount and t3.BottomButtonFrame then
-					t3.BottomButtonFrame.Visible = false
-				end
-			end)
-
+		if p then
+			delay(p, fn)
 			return
 		end
 
-		if OpenStateChangedCount == t3.OpenStateChangedCount and t3.BottomButtonFrame then
-			t3.BottomButtonFrame.Visible = false
-		end
+		fn() -- inferred equivalent call
 	end
-	local function updateButtonPosition(p12, p13, p14) -- line: 633
-		-- upvalues: t1 (copy), t3 (copy)
-		if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-			local v301 = t3.BottomButtonFrame:FindFirstChild(p12 .. "ButtonButton", true)
 
-			if not v301 then
+	local function updateButtonPosition(p, position, size)
+		if not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 then
+			local child = children.BottomButtonFrame:FindFirstChild(p .. "ButtonButton", true)
+
+			if not child then
 				return
 			end
 
-			v301.Position = p13
-			v301.Size = p14
+			child.Position = position
+			child.Size = size
 		end
 	end
 
-	local RobloxLocaleId = LocalizationService.RobloxLocaleId
-	local v161 = Localization.new(RobloxLocaleId)
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
+	local v9 = Localization.new(robloxLocaleId)
 
-	local function hideVoiceUx() -- line: 649
-		-- upvalues: t3 (copy), v13 (copy), Theme (copy), t1 (copy)
-		local MuteButtonButton = t3.MuteButtonButton
+	local function hideVoiceUx()
+		local muteButtonButton = children.MuteButtonButton
 
-		if MuteButtonButton then
-			MuteButtonButton.Visible = false
-			MuteButtonButton:Destroy()
+		if muteButtonButton then
+			muteButtonButton.Visible = false
+			muteButtonButton:Destroy()
 		end
 
-		local v303 = if not v13 then UDim2.new(0, 260, 0, Theme.LargeButtonHeight) else UDim2.new(0, 320, 0, 72)
+		local udim3
 
-		if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-			local uDim2_3 = UDim2.new(0.5, not v13 and -130 or -160, 0.5, -25)
+		if v then
+			udim3 = UDim2.new(0, 320, 0, 72)
+		else
+			udim3 = UDim2.new(0, 260, 0, Theme.LargeButtonHeight)
+		end
 
-			if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-				local LeaveGameButtonButton = t3.BottomButtonFrame:FindFirstChild("LeaveGameButtonButton", true)
+		if not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 then
+			local udim4 = UDim2.new(0.5, v and -160 or -130, 0.5, -25)
+			local leaveGameButtonButton = (not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0)
+				and children.BottomButtonFrame:FindFirstChild("LeaveGameButtonButton", true)
 
-				if LeaveGameButtonButton then
-					LeaveGameButtonButton.Position = uDim2_3
-					LeaveGameButtonButton.Size = v303
-				end
+			if leaveGameButtonButton then
+				leaveGameButtonButton.Position = udim4
+				leaveGameButtonButton.Size = udim3
 			end
 
-			local uDim2_4 = UDim2.new(0.5, not v13 and -400 or -550, 0.5, -25)
+			local udim5 = UDim2.new(0.5, v and -550 or -400, 0.5, -25)
+			local resetCharacterButtonButton = (not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0)
+				and children.BottomButtonFrame:FindFirstChild("ResetCharacterButtonButton", true)
 
-			if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-				local ResetCharacterButtonButton = t3.BottomButtonFrame:FindFirstChild("ResetCharacterButtonButton", true)
-
-				if ResetCharacterButtonButton then
-					ResetCharacterButtonButton.Position = uDim2_4
-					ResetCharacterButtonButton.Size = v303
-				end
+			if resetCharacterButtonButton then
+				resetCharacterButtonButton.Position = udim5
+				resetCharacterButtonButton.Size = udim3
 			end
 
-			local uDim2_5 = UDim2.new(0.5, not v13 and 140 or 200, 0.5, -25)
+			local udim6 = UDim2.new(0.5, v and 200 or 140, 0.5, -25)
 
-			if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-				local ResumeButtonButton = t3.BottomButtonFrame:FindFirstChild("ResumeButtonButton", true)
+			if not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 then
+				local resumeButtonButton = children.BottomButtonFrame:FindFirstChild("ResumeButtonButton", true)
 
-				if not ResumeButtonButton then
+				if not resumeButtonButton then
 					return
 				end
 
-				ResumeButtonButton.Position = uDim2_5
-				ResumeButtonButton.Size = v303
+				resumeButtonButton.Position = udim6
+				resumeButtonButton.Size = udim3
 			end
 		end
 	end
-	local function addBottomBarButtonOld(p15, p16, p17, p18, p19, p20, p21, p22) -- line: 665
-		-- upvalues: t1 (copy), Theme (copy), v13 (copy), t3 (copy), Utility (copy), Create (copy), v83 (copy), UserInputService (copy), Platform (copy)
-		if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-			local v318 = p15 .. "Button"
-			local v319 = p15 .. "Text"
-			local uDim2_6 = UDim2.new(0, 260, 0, Theme.LargeButtonHeight)
 
-			if v13 then
-				uDim2_6 = UDim2.new(0, 320, 0, 72)
+	local function addBottomBarButtonOld(p, p2, image, image2, position, fn, p3, fn2)
+		if not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 then
+			local v10 = p .. "Button"
+			local v11 = p .. "Text"
+
+			local udim3 = UDim2.new(0, 260, 0, Theme.LargeButtonHeight)
+
+			if v then
+				udim3 = UDim2.new(0, 320, 0, 72)
 			end
 
-			local v321 = t3
-			local v322 = t3
-			local v323, v324 = Utility:MakeStyledButton(p15 .. "Button", p16, uDim2_6, p20, nil, t3)
-
-			v321[v318] = v323
-			v322[v319] = v324
+			local styledButton, v12 = Utility:MakeStyledButton(p .. "Button", p2, udim3, fn, nil, children)
+			children[v10] = styledButton
+			children[v11] = v12
 			Create("UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
-				Parent = t3[v318]
+				Parent = children[v10]
 			})
-			Create("UIPadding")({
-				PaddingLeft = UDim.new(0.025, 0),
-				Parent = t3[v318]
-			})
-			t3[v319].Size = UDim2.new(0, 0, 1, 0)
-			Create("UIFlexItem")({
-				FlexMode = Enum.UIFlexMode.Grow,
-				Parent = t3[v319]
-			})
-			t3[v318].Position = p19
-			t3[v318].Parent = t3.BottomButtonFrame
 
-			if v13 then
-				t3[v318].ImageTransparency = 1
+			Create("UIPadding")({ PaddingLeft = UDim.new(0.025, 0), Parent = children[v10] })
+
+			children[v11].Size = UDim2.new(0, 0, 1, 0)
+
+			Create("UIFlexItem")({ FlexMode = Enum.UIFlexMode.Grow, Parent = children[v11] })
+
+			children[v10].Position = position
+			children[v10].Parent = children.BottomButtonFrame
+
+			if v then
+				children[v10].ImageTransparency = 1
 			end
 
-			t3[v319].FontSize = Enum.FontSize.Size24
+			children[v11].FontSize = Enum.FontSize.Size24
+			local v13
 
-			local u325 = nil
+			if v6 then
+				v13 = nil
+			else
+				local name = p .. "Hint"
+				local image3
 
-			if not v83 then
-				local v326 = p15 .. "Hint"
-				local v327 = if not UserInputService:GetGamepadConnected(Enum.UserInputType.Gamepad1) and Platform ~= Enum.Platform.XBoxOne then p18 else p17
+				if
+					UserInputService:GetGamepadConnected(Enum.UserInputType.Gamepad1)
+					or platform == Enum.Platform.XBoxOne
+				then
+					image3 = image
+				else
+					image3 = image2
+				end
 
-				u325 = Create("ImageLabel")({
+				v13 = Create("ImageLabel")({
+					Name = name,
+					ZIndex = children.Shield.ZIndex + 2,
 					BackgroundTransparency = 1,
+					Image = image3,
 					LayoutOrder = -1,
-					Name = v326,
-					ZIndex = t3.Shield.ZIndex + 2,
-					Image = v327,
-					Parent = t3[v318]
+					Parent = children[v10]
 				})
 
-				if v327 == p18 then
-					u325.ImageColor3 = Theme.color("WhiteButtonText", Color3.new(1, 1, 1))
-					u325.ImageTransparency = Theme.transparency("WhiteButtonText", 1)
+				if image3 == image2 then
+					v13.ImageColor3 = Theme.color("WhiteButtonText", Color3.new(1, 1, 1))
+					v13.ImageTransparency = Theme.transparency("WhiteButtonText", 1)
 				end
 
-				u325.Position = UDim2.new(0, 9, 0.5, 0)
-				u325.Size = UDim2.new(0, 33, 0, 33)
-				u325.AnchorPoint = Vector2.new(0, 0.5)
+				v13.Position = UDim2.new(0, 9, 0.5, 0)
+				v13.Size = UDim2.new(0, 33, 0, 33)
+				v13.AnchorPoint = Vector2.new(0, 0.5)
 			end
 
-			if v13 then
-				t3[v319].FontSize = Enum.FontSize.Size36
+			if v then
+				children[v11].FontSize = Enum.FontSize.Size36
 			end
 
-			UserInputService.InputBegan:connect(function(p23) -- line: 738
-				-- upvalues: u325 (ref), p17 (copy), p18 (copy)
-				if p23.UserInputType == Enum.UserInputType.Gamepad1 or (p23.UserInputType == Enum.UserInputType.Gamepad2 or p23.UserInputType == Enum.UserInputType.Gamepad3 or p23.UserInputType == Enum.UserInputType.Gamepad4) then
-					if u325 then
-						u325.Image = p17
-
-						return
+			UserInputService.InputBegan:connect(function(p4)
+				if
+					p4.UserInputType == Enum.UserInputType.Gamepad1
+					or p4.UserInputType == Enum.UserInputType.Gamepad2
+					or p4.UserInputType == Enum.UserInputType.Gamepad3
+					or p4.UserInputType == Enum.UserInputType.Gamepad4
+				then
+					if v13 then
+						v13.Image = image
 					end
-				elseif p23.UserInputType == Enum.UserInputType.Keyboard and u325 then
-					u325.Image = p18
+				elseif p4.UserInputType == Enum.UserInputType.Keyboard and v13 then
+					v13.Image = image2
 				end
 			end)
-			t3.BottomBarButtons[#t3.BottomBarButtons + 1] = {
-				v318,
+
+			children.BottomBarButtons[#children.BottomBarButtons + 1] = {
+				v10,
 				{
-					function(_, p25, _) -- line: 761
-						-- upvalues: p22 (copy)
-						if p25 == Enum.UserInputState.Begin then
-							p22()
+					function(_, p4, _)
+						if p4 == Enum.UserInputState.Begin then
+							fn2()
 						end
 					end,
-					p21
+					p3
 				}
 			}
 		end
 	end
 
-	local s1 = ""
+	local v10 = v and "@2x" or ""
+	local v11, v12, v13
 
-	if v13 then
-		s1 = "@2x"
-	end
-
-	local ImageForKeyCode, ImageForKeyCode2, ImageForKeyCode3
-
-	if t1.FFlagEnableConsoleExpControls then
-		ImageForKeyCode = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonB)
-		ImageForKeyCode2 = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonX)
-		ImageForKeyCode3 = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonY)
+	if v3.FFlagEnableConsoleExpControls then
+		v11 = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonB)
+		v12 = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonX)
+		v13 = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonY)
 	else
-		ImageForKeyCode = "rbxasset://textures/ui/Controls/DesignSystem/ButtonB" .. s1 .. ".png"
-		ImageForKeyCode2 = "rbxasset://textures/ui/Controls/DesignSystem/ButtonX" .. s1 .. ".png"
-		ImageForKeyCode3 = "rbxasset://textures/ui/Controls/DesignSystem/ButtonY" .. s1 .. ".png"
+		v11 = "rbxasset://textures/ui/Controls/DesignSystem/ButtonB" .. v10 .. ".png"
+		v12 = "rbxasset://textures/ui/Controls/DesignSystem/ButtonX" .. v10 .. ".png"
+		v13 = "rbxasset://textures/ui/Controls/DesignSystem/ButtonY" .. v10 .. ".png"
 	end
 
-	local ImageForKeyCode4 = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonStart)
-	local u169 = false
-	local connection = nil
+	local imageForKeyCode = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonStart)
 
-	local function setupVoiceListeners() -- line: 795
-		-- upvalues: u169 (ref), t3 (copy), default (copy), getCamMicPermissions (copy), connection (ref), Otter (copy), RobloxTranslator (copy), hideVoiceUx (copy)
-		if game:GetEngineFeature("VoiceChatSupported") and not u169 then
-			u169 = true
+	local v14 = false
+	local eventConnection = nil
 
-			local function showUI() -- line: 800
-				-- upvalues: t3 (copy), default (copy), getCamMicPermissions (copy), connection (ref), Otter (copy), RobloxTranslator (copy)
-				t3.VoiceRecordingText.Visible = true
-				default:getService().StateChanged:Connect(function(_, newState) -- line: 803
-					-- upvalues: t3 (copy)
-					if newState == Enum.VoiceChatState.Joined then
-						t3.VoiceRecordingText.Visible = true
+	local function setupVoiceListeners()
+		if game:GetEngineFeature("VoiceChatSupported") and not v14 then
+			v14 = true
+			local function showUI()
+				children.VoiceRecordingText.Visible = true
+				default:getService().StateChanged:Connect(function(_, p)
+					if p == Enum.VoiceChatState.Joined then
+						children.VoiceRecordingText.Visible = true
 					end
 				end)
 				default:SetupParticipantListeners()
-				getCamMicPermissions(function(p28) -- line: 810
-					-- upvalues: t3 (copy)
-					t3.hasMicPermissions = p28.hasMicPermissions
+				getCamMicPermissions(function(p)
+					children.hasMicPermissions = p.hasMicPermissions
 				end, nil, true, "PermissionsButtons.getPermissions")
-				connection = default.muteChanged.Event:Connect(function(p29) -- line: 814
-					-- upvalues: t3 (copy), Otter (copy), RobloxTranslator (copy)
-					t3.isMuted = p29
-					t3.lastVoiceRecordingIndicatorTextUpdated = tick()
-					t3.voiceRecordingIndicatorTextMotor:setGoal(Otter.instant(0))
+				eventConnection = default.muteChanged.Event:Connect(function(isMuted)
+					children.isMuted = isMuted
+					children.lastVoiceRecordingIndicatorTextUpdated = tick()
+					children.voiceRecordingIndicatorTextMotor:setGoal(Otter.instant(0))
 
-					if t3.isMuted then
-						local VoiceRecordingText = t3.VoiceRecordingText
-						local s2
+					if children.isMuted then
+						local voiceRecordingText = children.VoiceRecordingText
+						local text
 
-						if not RobloxTranslator then
-							s2 = "Mic Off"
+						if RobloxTranslator then
+							local success, result = pcall(
+								RobloxTranslator.FormatByKey,
+								RobloxTranslator,
+								"InGame.CommonUI.Label.MicOff"
+							)
+							text = not success and "Mic Off" or result
 						else
-							local ok, result = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.CommonUI.Label.MicOff")
-
-							s2 = not ok and "Mic Off" or result
+							text = "Mic Off"
 						end
 
-						VoiceRecordingText.Text = s2
-
-						return
-					end
-
-					local VoiceRecordingText = t3.VoiceRecordingText
-					local s3
-
-					if not RobloxTranslator then
-						s3 = "Mic On (recording audio)"
+						voiceRecordingText.Text = text
 					else
-						local ok, result = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.CommonUI.Label.MicOnRecording")
+						local voiceRecordingText = children.VoiceRecordingText
+						local text
 
-						s3 = not ok and "Mic On (recording audio)" or result
+						if RobloxTranslator then
+							local success, result = pcall(
+								RobloxTranslator.FormatByKey,
+								RobloxTranslator,
+								"InGame.CommonUI.Label.MicOnRecording"
+							)
+							text = not success and "Mic On (recording audio)" or result
+						else
+							text = "Mic On (recording audio)"
+						end
+
+						voiceRecordingText.Text = text
 					end
-
-					VoiceRecordingText.Text = s3
 				end)
 			end
-			local function hideUI() -- line: 825
-				-- upvalues: t3 (copy), hideVoiceUx (copy), connection (ref)
-				t3.VoiceRecordingText.Visible = false
+			local function hideUI()
+				children.VoiceRecordingText.Visible = false
 				hideVoiceUx()
 
-				if connection then
-					connection:Disconnect()
+				if eventConnection then
+					eventConnection:Disconnect()
 				end
 			end
 
@@ -862,331 +953,353 @@ local function CreateSettingsHub() -- line: 385
 		end
 	end
 
-	if not v107 then
+	if not defineFastFlag then
 		setupVoiceListeners()
 	end
 
-	local u172 = true
+	local v15 = true
+	local function setResetEnabled(p)
+		v15 = p
 
-	local function setResetEnabled(p30) -- line: 849
-		-- upvalues: u172 (ref), t3 (copy)
-		u172 = p30
+		if children.ResetCharacterButton then
+			children.ResetCharacterButton.Selectable = p
+			children.ResetCharacterButton.Active = p
+			children.ResetCharacterButton.Enabled.Value = p
+			local resetCharacterHint = children.ResetCharacterButton:FindFirstChild("ResetCharacterHint")
 
-		if t3.ResetCharacterButton then
-			t3.ResetCharacterButton.Selectable = p30
-			t3.ResetCharacterButton.Active = p30
-			t3.ResetCharacterButton.Enabled.Value = p30
-
-			local ResetCharacterHint = t3.ResetCharacterButton:FindFirstChild("ResetCharacterHint")
-
-			if ResetCharacterHint then
-				ResetCharacterHint.ImageColor3 = p30 and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100)
+			if resetCharacterHint then
+				resetCharacterHint.ImageColor3 = p and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100)
 			end
 
-			local ResetCharacterButtonTextLabel = t3.ResetCharacterButton:FindFirstChild("ResetCharacterButtonTextLabel")
+			local resetCharacterButtonTextLabel = children.ResetCharacterButton:FindFirstChild("ResetCharacterButtonTextLabel")
 
-			if ResetCharacterButtonTextLabel then
-				ResetCharacterButtonTextLabel.TextColor3 = p30 and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100)
+			if resetCharacterButtonTextLabel then
+				resetCharacterButtonTextLabel.TextColor3 = p and Color3.fromRGB(255, 255, 255)
+					or Color3.fromRGB(100, 100, 100)
 			end
 		end
 	end
 
-	local u174 = nil
-
-	function t3.GetRespawnBehaviour(_) -- line: 867
-		-- upvalues: t1 (copy), t3 (copy), u172 (ref), u174 (ref)
-		if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-			return t3:GetExperienceControlStore().getCanRespawn(false), t3:GetExperienceControlStore().getCustomRespawnCallback(false)
+	local v16 = nil
+	function children:GetRespawnBehaviour()
+		if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+			return
+				children:GetExperienceControlStore().getCanRespawn(false),
+				children:GetExperienceControlStore().getCustomRespawnCallback(false)
 		end
 
-		return u172, u174
+		return v15, v16
 	end
 
-	t3.RespawnBehaviourChangedEvent = Instance.new("BindableEvent")
-	StarterGui:RegisterSetCore("ResetButtonCallback", function(p32) -- line: 877
-		-- upvalues: t3 (copy), t1 (copy), u172 (ref), setResetEnabled (copy), InExperienceSideSheet (copy), u174 (ref)
-		local v335 = typeof(p32) == "Instance" and p32:IsA("BindableEvent")
+	children.RespawnBehaviourChangedEvent = Instance.new("BindableEvent")
 
-		if v335 or type(p32) == "boolean" then
-			t3.ResetCharacterPage:SetResetCallback(p32)
+	StarterGui:RegisterSetCore("ResetButtonCallback", function(bindableEvent)
+		local v17
+
+		if typeof(bindableEvent) == "Instance" then
+			v17 = bindableEvent:IsA("BindableEvent")
+		else
+			v17 = false
+		end
+
+		if v17 or type(bindableEvent) == "boolean" then
+			children.ResetCharacterPage:SetResetCallback(bindableEvent)
 		else
 			warn("ResetButtonCallback must be set to a BindableEvent or a boolean")
 		end
 
-		local v336 = if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then u172 else t3:GetExperienceControlStore().getCanRespawn(false)
+		local v18
 
-		if p32 == false then
-			if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-				t3:GetExperienceControlStore().setCanRespawn(false)
+		if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+			v18 = children:GetExperienceControlStore().getCanRespawn(false)
+		else
+			v18 = v15
+		end
+
+		if bindableEvent == false then
+			if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+				children:GetExperienceControlStore().setCanRespawn(false)
 			else
 				setResetEnabled(false)
 			end
 
-			if t1.FFlagEnableSideSheet then
+			if isSideSheetEnabled then
 				InExperienceSideSheet.setIsRespawnEnabled(false)
 			end
-		elseif not v336 and (v335 or p32 == true) then
-			if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-				t3:GetExperienceControlStore().setCanRespawn(true)
+		elseif not v18 and (v17 or bindableEvent == true) then
+			if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+				children:GetExperienceControlStore().setCanRespawn(true)
 			else
 				setResetEnabled(true)
 			end
 
-			if t1.FFlagEnableSideSheet then
+			if isSideSheetEnabled then
 				InExperienceSideSheet.setIsRespawnEnabled(true)
 			end
 		end
 
-		if v335 then
-			if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-				t3:GetExperienceControlStore().setCustomRespawnCallback(p32)
+		if v17 then
+			if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+				children:GetExperienceControlStore().setCustomRespawnCallback(bindableEvent)
 			else
-				u174 = p32
+				v16 = bindableEvent
 			end
 		end
 
-		if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-			t3.RespawnBehaviourChangedEvent:Fire(t3:GetExperienceControlStore().getCanRespawn(false), t3:GetExperienceControlStore().getCustomRespawnCallback(false))
-
-			return
+		if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+			children.RespawnBehaviourChangedEvent:Fire(
+				children:GetExperienceControlStore().getCanRespawn(false),
+				children:GetExperienceControlStore().getCustomRespawnCallback(false)
+			)
+		else
+			children.RespawnBehaviourChangedEvent:Fire(v15, v16)
 		end
-
-		t3.RespawnBehaviourChangedEvent:Fire(u172, u174)
-	end)
-	StarterGui:RegisterGetCore("ResetButtonCallback", function() -- line: 918
-		-- upvalues: t3 (copy)
-		local v337, _ = t3:GetRespawnBehaviour()
-
-		return v337
 	end)
 
-	local setVisibilityInternal = nil
-	local v176, v177 = createSignal(true)
-	local v178, v179 = createSignal(nil)
+	StarterGui:RegisterGetCore("ResetButtonCallback", function()
+		local respawnBehaviour, _ = children:GetRespawnBehaviour()
+		return respawnBehaviour
+	end)
 
-	function t3.GetExperienceControlStore(_) -- line: 928
-		-- upvalues: v177 (copy), t3 (copy), v176 (copy), v178 (copy), v179 (copy), t1 (copy), Constants2 (copy), TelemetryService (copy), MenuLeaveGameTelemetryConfig (copy), MenuResetCharacterTelemetryConfig (copy), RbxAnalyticsService (copy), Constants (copy), MenuResumeTelemetryConfig (copy)
+	local setVisibilityInternal
+
+	local signal2, v17 = createSignal(true)
+	local signal3, setCustomRespawnCallback = createSignal(nil)
+
+	function children:GetExperienceControlStore()
 		return {
-			getCanRespawn = v176,
-			getCustomRespawnCallback = v178,
-			setCanRespawn = function(b1: boolean) -- line: 929
-				-- upvalues: v177 (copy), t3 (copy)
-				v177(b1)
+			getCanRespawn = signal2,
+			getCustomRespawnCallback = signal3,
+			setCanRespawn = function(flag: boolean)
+				v17(flag)
 
-				if t3.ResetCharacterButton then
-					t3.ResetCharacterButton.Selectable = b1
-					t3.ResetCharacterButton.Active = b1
-					t3.ResetCharacterButton.Enabled.Value = b1
+				if children.ResetCharacterButton then
+					children.ResetCharacterButton.Selectable = flag
+					children.ResetCharacterButton.Active = flag
+					children.ResetCharacterButton.Enabled.Value = flag
+					local resetCharacterHint = children.ResetCharacterButton:FindFirstChild("ResetCharacterHint")
 
-					local ResetCharacterHint = t3.ResetCharacterButton:FindFirstChild("ResetCharacterHint")
-
-					if ResetCharacterHint then
-						ResetCharacterHint.ImageColor3 = b1 and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100)
+					if resetCharacterHint then
+						resetCharacterHint.ImageColor3 = flag and Color3.fromRGB(255, 255, 255)
+							or Color3.fromRGB(100, 100, 100)
 					end
 
-					local ResetCharacterButtonTextLabel = t3.ResetCharacterButton:FindFirstChild("ResetCharacterButtonTextLabel")
+					local resetCharacterButtonTextLabel = children.ResetCharacterButton:FindFirstChild("ResetCharacterButtonTextLabel")
 
-					if ResetCharacterButtonTextLabel then
-						ResetCharacterButtonTextLabel.TextColor3 = b1 and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100)
+					if resetCharacterButtonTextLabel then
+						resetCharacterButtonTextLabel.TextColor3 = flag and Color3.fromRGB(255, 255, 255)
+							or Color3.fromRGB(100, 100, 100)
 					end
 				end
 			end,
-			setCustomRespawnCallback = v179,
-			onLeaveGame = function(s4: string) -- line: 951
-				-- upvalues: t3 (copy), t1 (copy), Constants2 (copy), TelemetryService (copy), MenuLeaveGameTelemetryConfig (copy)
-				if not t3:GetVisibility() then
+			setCustomRespawnCallback = setCustomRespawnCallback,
+			onLeaveGame = function(source: string)
+				if not children:GetVisibility() then
 					return
 				end
 
-				t3:AddToMenuStack(t3.Pages.CurrentPage)
-				t3.HubBar.Visible = false
+				children:AddToMenuStack(children.Pages.CurrentPage)
+				children.HubBar.Visible = false
 
-				if t1.GetFFlagEnableLeaveGameUpsellEntrypoint() and t3.leaveGameUpsellProp ~= Constants2.PHONE_UPSELL_VALUE_PROP.None then
-					t3:SwitchToPage(t3.LeaveGameUpsellPage, false)
+				if
+					v3.GetFFlagEnableLeaveGameUpsellEntrypoint()
+					and children.leaveGameUpsellProp ~= Constants2.PHONE_UPSELL_VALUE_PROP.None
+				then
+					children:SwitchToPage(children.LeaveGameUpsellPage, false)
 				else
-					t3:SwitchToPage(t3.LeaveGamePage, false, nil, true)
+					children:SwitchToPage(children.LeaveGamePage, false, nil, true)
 				end
 
 				TelemetryService:LogCounter(MenuLeaveGameTelemetryConfig, {
-					customFields = {
-						source = s4
-					}
+					customFields = { source = source }
 				})
 			end,
-			onRespawn = function(s5: string) -- line: 970
-				-- upvalues: v176 (copy), t3 (copy), TelemetryService (copy), MenuResetCharacterTelemetryConfig (copy)
-				if not v176(false) then
+			onRespawn = function(source: string)
+				if not signal2(false) then
 					return
 				end
 
-				t3:AddToMenuStack(t3.Pages.CurrentPage)
-				t3.HubBar.Visible = false
-				t3:SwitchToPage(t3.ResetCharacterPage, false, nil, true)
+				children:AddToMenuStack(children.Pages.CurrentPage)
+				children.HubBar.Visible = false
+				children:SwitchToPage(children.ResetCharacterPage, false, nil, true)
+
 				TelemetryService:LogCounter(MenuResetCharacterTelemetryConfig, {
-					customFields = {
-						source = s5
-					}
+					customFields = { source = source }
 				})
 			end,
-			onResume = function(s6: string) -- line: 985
-				-- upvalues: t1 (copy), t3 (copy), RbxAnalyticsService (copy), Constants (copy), TelemetryService (copy), MenuResumeTelemetryConfig (copy)
-				if t1.FFlagAddUILessMode then
-					t3:SetVisibility(false, nil, nil, nil, s6)
+			onResume = function(source: string)
+				if v3.FFlagAddUILessMode then
+					children:SetVisibility(false, nil, nil, nil, source)
 				else
-					t3:SetVisibility(false)
+					children:SetVisibility(false)
 				end
 
-				if t1.FFlagAddUILessMode and t1.FIntAddUILessModeVariant ~= 0 and t3.uiLessStore.getUILessModeEnabled(false) then
-					t3.uiLessStore.setUIVisible(false)
+				if
+					v3.FFlagAddUILessMode
+					and v3.FIntAddUILessModeVariant ~= 0
+					and children.uiLessStore.getUILessModeEnabled(false)
+				then
+					children.uiLessStore.setUIVisible(false)
 				end
 
-				RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsResumeGameName, Constants.AnalyticsMenuActionName, {
-					source = s6,
-					playsessionid = t3.playSessionId,
-					universeid = tostring(game.GameId)
-				})
-				TelemetryService:LogCounter(MenuResumeTelemetryConfig, {
-					customFields = {
-						source = s6
+				RbxAnalyticsService:SetRBXEventStream(
+					Constants.AnalyticsTargetName,
+					Constants.AnalyticsResumeGameName,
+					Constants.AnalyticsMenuActionName,
+					{
+						source = source,
+						playsessionid = children.playSessionId,
+						universeid = tostring(game.GameId)
 					}
+				)
+
+				TelemetryService:LogCounter(MenuResumeTelemetryConfig, {
+					customFields = { source = source }
 				})
 			end
 		}
 	end
 
-	local v180 = if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then nil else function() -- line: 1017
-		-- upvalues: t3 (copy), ReactRoblox (copy), React (copy), MenuButtonsContainer (copy), Flags (copy), t1 (copy), GuiService (copy)
-		if t3.BottomButtonFrameRoot then
+	local fn = v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 and function()
+		if children.BottomButtonFrameRoot then
 			return
 		end
 
-		local ExperienceControlStore = t3:GetExperienceControlStore()
+		local experienceControlStore = children:GetExperienceControlStore()
 
-		t3.BottomButtonFrameRoot = ReactRoblox.createRoot(t3.BottomButtonFrame)
-		t3.BottomButtonFrameRoot:render(React.createElement(MenuButtonsContainer, {
-			onLeaveGame = ExperienceControlStore.onLeaveGame,
-			onRespawn = ExperienceControlStore.onRespawn,
-			onResume = ExperienceControlStore.onResume,
-			setAddMenuKeyBindings = function(p34: ((...any) -> ...any)) -- line: 1029
-				-- upvalues: t3 (copy)
-				t3.addMenuKeyBindings = p34
+		children.BottomButtonFrameRoot = ReactRoblox.createRoot(children.BottomButtonFrame)
+		local bottomButtonFrameRoot = children.BottomButtonFrameRoot
+		local createElement = React.createElement
+		local v18 = {
+			onLeaveGame = experienceControlStore.onLeaveGame,
+			onRespawn = experienceControlStore.onRespawn,
+			onResume = experienceControlStore.onResume,
+			setAddMenuKeyBindings = function(addMenuKeyBindings)
+				children.addMenuKeyBindings = addMenuKeyBindings
 			end,
-			setRemoveMenuKeyBindings = function(p35: ((...any) -> ...any)) -- line: 1033
-				-- upvalues: t3 (copy)
-				t3.removeMenuKeyBindings = p35
+			setRemoveMenuKeyBindings = function(removeMenuKeyBindings)
+				children.removeMenuKeyBindings = removeMenuKeyBindings
 			end,
-			getVisibility = function() -- line: 1037
-				-- upvalues: t3 (copy)
-				return t3.GetVisibility()
+			getVisibility = function()
+				return children.GetVisibility()
 			end,
-			getCanRespawn = ExperienceControlStore.getCanRespawn,
-			currentPageChangeSignal = if not Flags.FFlagAddTraversalHistoryReactMenuButtons then nil else t3.CurrentPageSignal,
-			setResumeMenuButton = if not t1.FFlagIEMFocusNavSupportNewButtons then nil else function(p36) -- line: 1042
-				-- upvalues: t3 (copy), t1 (copy), GuiService (copy)
-				t3.ResumeMenuButton = p36
+			getCanRespawn = experienceControlStore.getCanRespawn,
+			currentPageChangeSignal = 0,
+			setResumeMenuButton = 0
+		}
+		local currentPageChangeSignal
 
-				if t1.FFlagIEMFocusNavSupportNewButtons and (not GuiService.SelectedCoreObject or not GuiService.SelectedCoreObject:IsDescendantOf(t3.Shield)) then
-					GuiService.SelectedCoreObject = p36
-				end
+		if Flags.FFlagAddTraversalHistoryReactMenuButtons then
+			currentPageChangeSignal = children.CurrentPageSignal
+		end
+
+		v18.currentPageChangeSignal = currentPageChangeSignal
+		v18.setResumeMenuButton = v3.FFlagIEMFocusNavSupportNewButtons and function(p)
+			children.ResumeMenuButton = p
+
+			if
+				v3.FFlagIEMFocusNavSupportNewButtons
+				and not (GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(children.Shield))
+			then
+				GuiService.SelectedCoreObject = p
 			end
-		}))
-	end
-	local v181 = if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then nil else function() -- line: 1053
-		-- upvalues: t3 (copy)
-		if t3.BottomButtonFrameRoot then
-			t3.BottomButtonFrameRoot:unmount()
-			t3.BottomButtonFrameRoot = nil
+		end or nil
+		bottomButtonFrameRoot:render(createElement(MenuButtonsContainer, v18))
+	end or nil
+
+	local fn2 = v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 and function()
+		if children.BottomButtonFrameRoot then
+			children.BottomButtonFrameRoot:unmount()
+			children.BottomButtonFrameRoot = nil
 		end
-	end
+	end or nil
 
-	local function createGui() -- line: 1061
-		-- upvalues: Utility (copy), t3 (copy), Create (copy), uDim2_2 (copy), uDim2 (copy), RobloxGui (copy), SHIELD_INACTIVE_POSITION (copy), v56 (copy), v55 (copy), v59 (copy), t1 (copy), Theme (copy), v13 (copy), v117 (copy), RobloxTranslator (copy), GetServerChannelBlocking (copy), u90 (ref), GetServerVersion (ref), RunService (copy), HttpRbxApiService (copy), HttpService (copy), CachedPolicyService (copy), BaseUrl (copy), v86 (copy), StarterPlayer (copy), Players (copy), RbxAnalyticsService (copy), Constants (copy), createReactPage (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), GuiService (copy), getCamMicPermissions (copy), default (copy), Roact (copy), RoactAppExperiment (copy), IXPService (copy), AppStyleProvider (copy), Dark (copy), MenuBackButton (copy), MenuFrontButton (copy), AppFonts (copy), Otter (copy), t2 (copy), UserInputService (copy), setVisibilityInternal (ref), v180 (copy), CorePackages (copy), InExperienceAppChatModal (copy), removeBottomBarBindings (copy), Constants2 (copy), InExperienceCapabilities (copy), addBottomBarButtonOld (copy), ImageForKeyCode2 (ref), u172 (ref), v161 (copy), ImageForKeyCode3 (ref), ImageForKeyCode4 (copy), ImageForKeyCode (ref), ReactRoblox (copy), React (copy), FoundationProvider (copy), Foundation (copy), Utils (copy), SwitchTabHint (copy), isSubjectToDesktopPolicies (copy), SettingsFullScreenTitleBar (copy)
-		local n1 = 0
+	local function createGui()
+		local v18 = Utility:IsSmallTouchScreen() and 5 or 0
 
-		if Utility:IsSmallTouchScreen() then
-			n1 = 5
-		end
-
-		t3.ClippingShield = Create("Frame")({
+		children.ClippingShield = Create("Frame")({
 			Name = "SettingsClippingShield",
+			Size = udim2,
+			Position = udim,
 			BorderSizePixel = 0,
 			ClipsDescendants = true,
 			BackgroundTransparency = 1,
 			Visible = true,
 			ZIndex = 2,
-			Size = uDim2_2,
-			Position = uDim2,
 			Parent = RobloxGui
 		})
-		t3.CanvasGroup = Create("CanvasGroup")({
+
+		children.CanvasGroup = Create("CanvasGroup")({
 			Name = "CanvasGroup",
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			GroupTransparency = 0,
 			Visible = false,
-			Size = UDim2.fromScale(1, 1),
-			Parent = t3.ClippingShield
+			Parent = children.ClippingShield
 		})
-		t3.Shield = Create("ImageButton")({
+
+		children.Shield = Create("ImageButton")({
 			Name = "SettingsShield",
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = SHIELD_INACTIVE_POSITION,
+			BackgroundTransparency = transparency,
+			BackgroundColor3 = color,
 			BorderSizePixel = 0,
 			Visible = false,
 			Active = true,
 			ZIndex = 2,
-			Size = UDim2.new(1, 0, 1, 0),
-			Position = SHIELD_INACTIVE_POSITION,
-			BackgroundTransparency = v56,
-			BackgroundColor3 = v55,
-			Parent = t3.ClippingShield
+			Parent = children.ClippingShield
 		})
-		t3.VRShield = Create("Frame")({
+
+		children.VRShield = Create("Frame")({
 			Name = "VRBackground",
-			BorderSizePixel = 0,
-			Visible = false,
-			Parent = t3.Shield,
-			BackgroundColor3 = v55,
-			BackgroundTransparency = v56,
+			Parent = children.Shield,
+			BackgroundColor3 = color,
+			BackgroundTransparency = transparency,
 			Position = UDim2.new(0, -4, 0, 24),
-			Size = UDim2.new(1, 8, 1, -40)
+			Size = UDim2.new(1, 8, 1, -40),
+			BorderSizePixel = 0,
+			Visible = false
 		})
 
-		local EngineFeature = game:GetEngineFeature("CoreScriptVersionEnabled")
+		local engineFeature = game:GetEngineFeature("CoreScriptVersionEnabled")
 
-		if EngineFeature then
-			t3.VersionContainer = Create("ScrollingFrame")({
+		if engineFeature then
+			children.VersionContainer = Create("ScrollingFrame")({
 				Name = "VersionContainer",
+				Parent = children.Shield,
+				CanvasSize = UDim2.new(0, 0, 0, v2),
+				BackgroundColor3 = color,
+				BackgroundTransparency = transparency,
+				Position = UDim2.new(0, 0, 1, 0),
+				Size = UDim2.new(1, 0, 0, v2),
+				AnchorPoint = Vector2.new(0, 1),
 				BorderSizePixel = 0,
 				AutoLocalize = false,
+				ScrollingDirection = Enum.ScrollingDirection.X,
 				ScrollBarThickness = 0,
 				ZIndex = 5,
-				Visible = false,
-				Parent = t3.Shield,
-				CanvasSize = UDim2.new(0, 0, 0, v59),
-				BackgroundColor3 = v55,
-				BackgroundTransparency = v56,
-				Position = UDim2.new(0, 0, 1, 0),
-				Size = UDim2.new(1, 0, 0, v59),
-				AnchorPoint = Vector2.new(0, 1),
-				ScrollingDirection = Enum.ScrollingDirection.X
+				Visible = false
 			})
 		else
-			t3.VersionContainer = Create("Frame")({
+			children.VersionContainer = Create("Frame")({
 				Name = "VersionContainer",
+				Parent = children.Shield,
+				BackgroundColor3 = color,
+				BackgroundTransparency = transparency,
+				Position = UDim2.new(0, 0, 1, 0),
+				Size = UDim2.new(1, 0, 0, v2),
+				AnchorPoint = Vector2.new(0, 1),
 				BorderSizePixel = 0,
 				AutoLocalize = false,
 				ZIndex = 5,
-				Visible = false,
-				Parent = t3.Shield,
-				BackgroundColor3 = v55,
-				BackgroundTransparency = v56,
-				Position = UDim2.new(0, 0, 1, 0),
-				Size = UDim2.new(1, 0, 0, v59),
-				AnchorPoint = Vector2.new(0, 1)
+				Visible = false
 			})
 		end
 
-		local v343 = Create("UIListLayout")({
+		local v19 = Create("UIListLayout")({
 			Name = "VersionContainer",
-			Parent = t3.VersionContainer,
+			Parent = children.VersionContainer,
 			Padding = UDim.new(0, 6),
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -1194,263 +1307,209 @@ local function CreateSettingsHub() -- line: 385
 			SortOrder = Enum.SortOrder.LayoutOrder
 		})
 
-		local function addSizeToLabel(p37) -- line: 1171
-			-- upvalues: EngineFeature (copy), v59 (copy)
-			local uDim2_7 = UDim2.new(0.2, -6, 1, 0)
-
-			p37.Size = EngineFeature and UDim2.new(0, p37.TextBounds.X + 6, 0, v59) or uDim2_7
+		local function addSizeToLabel(p) -- 8 equivalent calls inferred from this helper
+			local udim3 = UDim2.new(0.2, -6, 1, 0)
+			udim3 = engineFeature and UDim2.new(0, p.TextBounds.X + 6, 0, v2) or udim3
+			p.Size = udim3
 		end
 
-		if t1.GetFFlagDisplayServerChannel() then
-			t3.ServerChannelLabel = Create("TextLabel")({
+		if v3.GetFFlagDisplayServerChannel() then
+			children.ServerChannelLabel = Create("TextLabel")({
 				Name = "ServerChannelLabel",
+				Parent = children.VersionContainer,
 				LayoutOrder = 3,
 				BackgroundTransparency = 1,
-				Text = "Server Channel: ...",
-				ZIndex = 5,
-				Parent = t3.VersionContainer,
 				TextColor3 = Color3.new(1, 1, 1),
-				TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
+				TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
+				Text = "Server Channel: ...",
 				Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 				TextXAlignment = Enum.TextXAlignment.Center,
-				TextYAlignment = Enum.TextYAlignment.Center
+				TextYAlignment = Enum.TextYAlignment.Center,
+				ZIndex = 5
 			})
-			spawn(function() -- line: 1190
-				-- upvalues: v117 (copy), RobloxTranslator (copy), t3 (copy), GetServerChannelBlocking (copy), EngineFeature (copy), v59 (copy)
-				local s7 = "Server Channel: "
 
-				if v117 then
-					if not RobloxTranslator then
-						s7 = "Server Channel: "
-					else
-						local ok, result = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.HelpMenu.Label.ServerChannel")
+			spawn(function()
+				local v20
 
-						s7 = not ok and "Server Channel: " or result
-					end
+				if fFlagLocalizeVersionLabels and RobloxTranslator then
+					local success, result = pcall(
+						RobloxTranslator.FormatByKey,
+						RobloxTranslator,
+						"InGame.HelpMenu.Label.ServerChannel"
+					)
+					v20 = not success and "Server Channel: " or result
+				else
+					v20 = "Server Channel: "
 				end
 
-				t3.ServerChannelLabel.Text = s7 .. GetServerChannelBlocking()
-
-				local ServerChannelLabel = t3.ServerChannelLabel
-				local uDim2_8 = UDim2.new(0.2, -6, 1, 0)
-
-				ServerChannelLabel.Size = EngineFeature and UDim2.new(0, ServerChannelLabel.TextBounds.X + 6, 0, v59) or uDim2_8
-				t3.ServerChannelLabel.TextScaled = not (EngineFeature or t3.ServerChannelLabel.TextFits)
+				children.ServerChannelLabel.Text = v20 .. GetServerChannelBlocking()
+				addSizeToLabel(children.ServerChannelLabel) -- inferred equivalent call
+				children.ServerChannelLabel.TextScaled = not (engineFeature or children.ServerChannelLabel.TextFits)
 			end)
 		end
 
-		t3.ServerVersionLabel = Create("TextLabel")({
+		children.ServerVersionLabel = Create("TextLabel")({
 			Name = "ServerVersionLabel",
+			Parent = children.VersionContainer,
 			LayoutOrder = 2,
 			BackgroundTransparency = 1,
-			Text = "Server Version: ...",
-			ZIndex = 5,
-			Parent = t3.VersionContainer,
 			TextColor3 = Color3.new(1, 1, 1),
-			TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
+			TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
+			Text = "Server Version: ...",
 			Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center
+			TextYAlignment = Enum.TextYAlignment.Center,
+			ZIndex = 5
 		})
-		spawn(function() -- line: 1214
-			-- upvalues: v117 (copy), RobloxTranslator (copy), t3 (copy), u90 (ref), GetServerVersion (ref), EngineFeature (copy), v59 (copy)
-			local s8 = "Server Version: "
 
-			if v117 then
-				if not RobloxTranslator then
-					s8 = "Server Version: "
-				else
-					local ok, result = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.HelpMenu.Label.ServerVersion")
+		spawn(function()
+			local v20
 
-					s8 = not ok and "Server Version: " or result
-				end
-			end
-
-			local ServerVersionLabel = t3.ServerVersionLabel
-			local v620
-
-			if u90 then
-				v620 = u90
+			if fFlagLocalizeVersionLabels and RobloxTranslator then
+				local success, result = pcall(
+					RobloxTranslator.FormatByKey,
+					RobloxTranslator,
+					"InGame.HelpMenu.Label.ServerVersion"
+				)
+				v20 = not success and "Server Version: " or result
 			else
-				if not GetServerVersion then
-					repeat
-						wait()
-					until GetServerVersion
-				end
-
-				u90 = GetServerVersion:InvokeServer()
-				v620 = u90
+				v20 = "Server Version: "
 			end
 
-			ServerVersionLabel.Text = s8 .. v620
-
-			local ServerVersionLabel2 = t3.ServerVersionLabel
-			local uDim2_9 = UDim2.new(0.2, -6, 1, 0)
-
-			ServerVersionLabel2.Size = EngineFeature and UDim2.new(0, ServerVersionLabel2.TextBounds.X + 6, 0, v59) or uDim2_9
-			t3.ServerVersionLabel.TextScaled = not (EngineFeature or t3.ServerVersionLabel.TextFits)
+			local serverVersionLabel = children.ServerVersionLabel
+			serverVersionLabel.Text = v20 .. GetServerVersionBlocking() -- inferred equivalent call
+			addSizeToLabel(children.ServerVersionLabel) -- inferred equivalent call
+			children.ServerVersionLabel.TextScaled = not (engineFeature or children.ServerVersionLabel.TextFits)
 		end)
+		local v20
 
-		local s9 = "Client Version: "
-
-		if v117 then
-			if not RobloxTranslator then
-				s9 = "Client Version: "
-			else
-				local ok, result = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.HelpMenu.Label.ClientVersion")
-
-				s9 = not ok and "Client Version: " or result
-			end
+		if fFlagLocalizeVersionLabels and RobloxTranslator then
+			local success, result = pcall(
+				RobloxTranslator.FormatByKey,
+				RobloxTranslator,
+				"InGame.HelpMenu.Label.ClientVersion"
+			)
+			v20 = not success and "Client Version: " or result
+		else
+			v20 = "Client Version: "
 		end
 
-		local RobloxVersion = RunService:GetRobloxVersion()
-		local ok, result = pcall(function() -- line: 1230
-			-- upvalues: RunService (copy)
+		local robloxVersion = RunService:GetRobloxVersion()
+		local success, result = pcall(function()
 			return RunService.ClientGitHash
 		end)
 
-		if ok then
-			RobloxVersion = string.format("%s (%.6s)", RobloxVersion, result)
+		if success then
+			robloxVersion = string.format("%s (%.6s)", robloxVersion, result)
 		end
 
-		t3.ClientVersionLabel = Create("TextLabel")({
+		children.ClientVersionLabel = Create("TextLabel")({
 			Name = "ClientVersionLabel",
+			Parent = children.VersionContainer,
 			LayoutOrder = 1,
 			BackgroundTransparency = 1,
-			ZIndex = 5,
-			Parent = t3.VersionContainer,
 			TextColor3 = Color3.new(1, 1, 1),
-			TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
-			Text = s9 .. RobloxVersion,
+			TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
+			Text = v20 .. robloxVersion,
 			Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center
+			TextYAlignment = Enum.TextYAlignment.Center,
+			ZIndex = 5
 		})
 
-		local ClientVersionLabel = t3.ClientVersionLabel
-		local uDim2_10 = UDim2.new(0.2, -6, 1, 0)
+		addSizeToLabel(children.ClientVersionLabel) -- inferred equivalent call
+		children.ClientVersionLabel.TextScaled = not (engineFeature or children.ClientVersionLabel.TextFits)
 
-		ClientVersionLabel.Size = EngineFeature and UDim2.new(0, ClientVersionLabel.TextBounds.X + 6, 0, v59) or uDim2_10
-		t3.ClientVersionLabel.TextScaled = not (EngineFeature or t3.ClientVersionLabel.TextFits)
-		t3.PlaceVersionLabel = Create("TextLabel")({
+		children.PlaceVersionLabel = Create("TextLabel")({
 			Name = "PlaceVersionLabel",
+			Parent = children.VersionContainer,
 			BackgroundTransparency = 1,
 			LayoutOrder = 3,
-			Text = "Place Version: ...",
-			ZIndex = 5,
-			Parent = t3.VersionContainer,
 			TextColor3 = Color3.new(1, 1, 1),
-			TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
+			TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
+			Text = "Place Version: ...",
 			Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center
+			TextYAlignment = Enum.TextYAlignment.Center,
+			ZIndex = 5
 		})
 
-		local function setPlaceVersionText() -- line: 1267
-			-- upvalues: v117 (copy), RobloxTranslator (copy), t3 (copy), t1 (copy), HttpRbxApiService (copy), HttpService (copy), EngineFeature (copy), v59 (copy)
-			local s10 = "Place Version: "
+		local function setPlaceVersionText()
+			local v21
 
-			if v117 then
-				if not RobloxTranslator then
-					s10 = "Place Version: "
-				else
-					local ok2, result2 = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.HelpMenu.Label.PlaceVersion")
-
-					s10 = not ok2 and "Place Version: " or result2
-				end
-			end
-
-			local PlaceVersionLabel = t3.PlaceVersionLabel
-			local PlaceVersion
-
-			if t1.GetFFlagRemoveAssetVersionEndpoint() then
-				PlaceVersion = game.PlaceVersion
+			if fFlagLocalizeVersionLabels and RobloxTranslator then
+				local success2, result2 = pcall(
+					RobloxTranslator.FormatByKey,
+					RobloxTranslator,
+					"InGame.HelpMenu.Label.PlaceVersion"
+				)
+				v21 = not success2 and "Place Version: " or result2
 			else
-				local PlaceVersion2 = game.PlaceVersion
-
-				pcall(function() -- line: 364
-					-- upvalues: HttpRbxApiService (copy), HttpService (copy), PlaceVersion2 (ref)
-					local Async = HttpRbxApiService:GetAsync(string.format("assets/%d/versions", game.PlaceId))
-					local VersionNumber = HttpService:JSONDecode(Async)[1].VersionNumber
-
-					PlaceVersion2 = string.format("%s (Latest: %d)", PlaceVersion2, VersionNumber)
-				end)
-				PlaceVersion = PlaceVersion2
+				v21 = "Place Version: "
 			end
 
-			PlaceVersionLabel.Text = s10 .. PlaceVersion
-
-			local PlaceVersionLabel2 = t3.PlaceVersionLabel
-			local uDim2_11 = UDim2.new(0.2, -6, 1, 0)
-
-			PlaceVersionLabel2.Size = EngineFeature and UDim2.new(0, PlaceVersionLabel2.TextBounds.X + 6, 0, v59) or uDim2_11
-			t3.PlaceVersionLabel.TextScaled = not (EngineFeature or t3.PlaceVersionLabel.TextFits)
+			local placeVersionLabel = children.PlaceVersionLabel
+			placeVersionLabel.Text = v21 .. GetPlaceVersionText() -- inferred equivalent call
+			addSizeToLabel(children.PlaceVersionLabel) -- inferred equivalent call
+			children.PlaceVersionLabel.TextScaled = not (engineFeature or children.PlaceVersionLabel.TextFits)
 		end
-
 		game:GetPropertyChangedSignal("PlaceVersion"):Connect(setPlaceVersionText)
 		spawn(setPlaceVersionText)
 
 		if not CachedPolicyService:IsSubjectToChinaPolicies() then
-			t3.EnvironmentLabel = Create("TextLabel")({
+			children.EnvironmentLabel = Create("TextLabel")({
 				Name = "EnvironmentLabel",
-				BackgroundTransparency = 1,
-				LayoutOrder = 4,
-				ZIndex = 5,
-				Parent = t3.VersionContainer,
+				Parent = children.VersionContainer,
 				AnchorPoint = Vector2.new(0.5, 0),
+				BackgroundTransparency = 1,
 				TextColor3 = Color3.new(1, 1, 1),
-				TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
+				LayoutOrder = 4,
+				TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
 				Text = BaseUrl,
 				Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				Visible = v86
+				ZIndex = 5,
+				Visible = visible2
 			})
 
-			local EnvironmentLabel = t3.EnvironmentLabel
-			local uDim2_12 = UDim2.new(0.2, -6, 1, 0)
-
-			EnvironmentLabel.Size = EngineFeature and UDim2.new(0, EnvironmentLabel.TextBounds.X + 6, 0, v59) or uDim2_12
-			t3.EnvironmentLabel.TextScaled = not (EngineFeature or t3.EnvironmentLabel.TextFits)
+			addSizeToLabel(children.EnvironmentLabel) -- inferred equivalent call
+			children.EnvironmentLabel.TextScaled = not (engineFeature or children.EnvironmentLabel.TextFits)
 		end
 
 		if game:GetEngineFeature("GetPlaySessionIdEnabled") then
-			local PlaySessionId = game:GetPlaySessionId()
+			local playSessionId = game:GetPlaySessionId()
 
-			if PlaySessionId ~= "" then
-				local v357 = "PlaySessionId: " .. PlaySessionId
+			if playSessionId ~= "" then
+				local text = "PlaySessionId: " .. playSessionId
 
 				if RobloxTranslator then
-					v357 = RobloxTranslator:FormatByKey("InGame.HelpMenu.Label.PlaySessionId", {
-						RBX_STR = PlaySessionId
+					text = RobloxTranslator:FormatByKey("InGame.HelpMenu.Label.PlaySessionId", {
+						RBX_STR = playSessionId
 					})
 				end
 
-				t3.PlaySessionIdLabel = Create("TextLabel")({
+				children.PlaySessionIdLabel = Create("TextLabel")({
 					Name = "PlaySessionIdLabel",
+					Parent = children.VersionContainer,
 					BackgroundTransparency = 1,
 					LayoutOrder = 5,
-					ZIndex = 5,
-					Parent = t3.VersionContainer,
 					TextColor3 = Color3.new(1, 1, 1),
-					TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
-					Text = v357,
+					TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
+					Text = text,
 					Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 					TextXAlignment = Enum.TextXAlignment.Center,
-					TextYAlignment = Enum.TextYAlignment.Center
+					TextYAlignment = Enum.TextYAlignment.Center,
+					ZIndex = 5
 				})
 
-				local PlaySessionIdLabel = t3.PlaySessionIdLabel
-				local uDim2_13 = UDim2.new(0.2, -6, 1, 0)
-
-				PlaySessionIdLabel.Size = EngineFeature and UDim2.new(0, PlaySessionIdLabel.TextBounds.X + 6, 0, v59) or uDim2_13
-				t3.PlaySessionIdLabel.TextScaled = not t3.PlaySessionIdLabel.TextFits
+				addSizeToLabel(children.PlaySessionIdLabel) -- inferred equivalent call
+				children.PlaySessionIdLabel.TextScaled = not children.PlaySessionIdLabel.TextFits
 			end
 		end
 
-		local function getOverridesPlayerScripts() -- line: 1329
-			-- upvalues: t1 (copy), StarterPlayer (copy), v117 (copy), RobloxTranslator (copy)
-			if t1.EngineFeaturePlayerScriptStatusProperty then
+		local function getOverridesPlayerScripts()
+			if v3.EngineFeaturePlayerScriptStatusProperty then
 				return ({
 					[0] = "Unknown",
 					[1] = "v3 Custom",
@@ -1461,1010 +1520,1282 @@ local function CreateSettingsHub() -- line: 385
 				})[StarterPlayer.PlayerModuleStatus]
 			end
 
-			local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts", if not t1.FFlagRemoveLoadingTimeout then nil else 1e999)
-			local PlayerScriptsLoader = StarterPlayerScripts:FindFirstChild("PlayerScriptsLoader")
-			local PlayerModule = StarterPlayerScripts:FindFirstChild("PlayerModule")
+			local starterPlayerScripts = StarterPlayer:WaitForChild(
+				"StarterPlayerScripts",
+				v3.FFlagRemoveLoadingTimeout and 1e999 or nil
+			)
+			local playerScriptsLoader = starterPlayerScripts:FindFirstChild("PlayerScriptsLoader")
+			local playerModule = starterPlayerScripts:FindFirstChild("PlayerModule")
 
-			if PlayerModule and PlayerScriptsLoader and not PlayerModule.Archivable then
-				if PlayerScriptsLoader.Archivable then
-					if v117 then
-						if not RobloxTranslator then
-							return "Possibly Custom"
-						end
-
-						local ok3, result3 = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.CommonUI.Label.PossiblyCustom")
-
-						if ok3 then
-							return result3
-						end
-
+			if playerModule and playerScriptsLoader and not playerModule.Archivable then
+				if playerScriptsLoader.Archivable then
+					if not (fFlagLocalizeVersionLabels and RobloxTranslator) then
 						return "Possibly Custom"
 					end
 
-					return "Possibly Custom"
-				end
+					local success2, result2 = pcall(
+						RobloxTranslator.FormatByKey,
+						RobloxTranslator,
+						"InGame.CommonUI.Label.PossiblyCustom"
+					)
 
-				if v117 then
-					if not RobloxTranslator then
+					if success2 then
+						return result2
+					end
+
+					return "Possibly Custom"
+				else
+					if not (fFlagLocalizeVersionLabels and RobloxTranslator) then
 						return "Default"
 					end
 
-					local ok4, result4 = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.CommonUI.Label.Default")
-
-					if ok4 then
-						return result4
-					end
-
-					return "Default"
+					local success2, result2 = pcall(
+						RobloxTranslator.FormatByKey,
+						RobloxTranslator,
+						"InGame.CommonUI.Label.Default"
+					)
+					return if success2 then result2 else "Default"
 				end
+			else
+				local cameraScript = starterPlayerScripts:FindFirstChild("CameraScript")
+				local controlScript = starterPlayerScripts:FindFirstChild("ControlScript")
 
-				return "Default"
-			end
-
-			local CameraScript = StarterPlayerScripts:FindFirstChild("CameraScript")
-			local ControlScript = StarterPlayerScripts:FindFirstChild("ControlScript")
-
-			if CameraScript or ControlScript then
-				if v117 then
-					if not RobloxTranslator then
+				if cameraScript or controlScript then
+					if not (fFlagLocalizeVersionLabels and RobloxTranslator) then
 						return "Custom Old"
 					end
 
-					local ok5, result5 = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.CommonUI.Label.CustomOld")
-
-					if ok5 then
-						return result5
+					local success2, result2 = pcall(
+						RobloxTranslator.FormatByKey,
+						RobloxTranslator,
+						"InGame.CommonUI.Label.CustomOld"
+					)
+					return if success2 then result2 else "Custom Old"
+				else
+					if not (fFlagLocalizeVersionLabels and RobloxTranslator) then
+						return "Custom"
 					end
 
-					return "Custom Old"
+					local success2, result2 = pcall(
+						RobloxTranslator.FormatByKey,
+						RobloxTranslator,
+						"InGame.CommonUI.Label.Custom"
+					)
+					return if success2 then result2 else "Custom"
 				end
-
-				return "Custom Old"
 			end
-
-			if v117 then
-				if not RobloxTranslator then
-					return "Custom"
-				end
-
-				local ok6, result6 = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.CommonUI.Label.Custom")
-
-				if ok6 then
-					return result6
-				end
-
-				return "Custom"
-			end
-
-			return "Custom"
 		end
 
-		t3.OverridesPlayerScriptsLabel = Create("TextLabel")({
+		children.OverridesPlayerScriptsLabel = Create("TextLabel")({
 			Name = "OverridesPlayerScriptsLabel",
-			BackgroundTransparency = 1,
-			LayoutOrder = 5,
-			Text = "PlayerScripts: ",
-			ZIndex = 5,
-			Visible = false,
-			Parent = t3.VersionContainer,
+			Parent = children.VersionContainer,
 			AnchorPoint = Vector2.new(0.5, 0),
+			BackgroundTransparency = 1,
 			TextColor3 = Color3.new(1, 1, 1),
-			TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
+			LayoutOrder = 5,
+			TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
+			Text = "PlayerScripts: ",
 			Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center
+			TextYAlignment = Enum.TextYAlignment.Center,
+			ZIndex = 5,
+			Visible = false
 		})
-		spawn(function() -- line: 1396
-			-- upvalues: RobloxGui (copy), Players (copy), v117 (copy), RobloxTranslator (copy), getOverridesPlayerScripts (copy), t1 (copy), RbxAnalyticsService (copy), Constants (copy), t3 (copy), v86 (copy), EngineFeature (copy), v59 (copy)
+
+		spawn(function()
 			local PlayerPermissionsModule = require(RobloxGui.Modules.PlayerPermissionsModule)
 
 			if not Players.LocalPlayer then
 				Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 			end
 
-			local s11 = "PlayerScripts: "
-
-			if v117 then
-				if not RobloxTranslator then
-					s11 = "PlayerScripts: "
-				else
-					local ok7, result7 = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.HelpMenu.Label.PlayerScripts")
-
-					s11 = not ok7 and "PlayerScripts: " or result7
-				end
+			if v3.FFlagWaitPlayerModuleStatus and StarterPlayer.PlayerModuleStatus == 0 then
+				StarterPlayer:GetPropertyChangedSignal("PlayerModuleStatus"):Wait()
 			end
 
-			local v648 = getOverridesPlayerScripts()
-			local v649 = if not t1.EngineFeaturePlayerScriptStatusProperty then v648 == "Default" else v648 == "v3 Default"
+			local v21
 
-			RbxAnalyticsService:setRBXEventStream(Constants.AnalyticsTargetName, "player_scripts_status", "player_scripts_status_action", {
-				defaultPlayerScripts = v649,
+			if fFlagLocalizeVersionLabels and RobloxTranslator then
+				local success2, result2 = pcall(
+					RobloxTranslator.FormatByKey,
+					RobloxTranslator,
+					"InGame.HelpMenu.Label.PlayerScripts"
+				)
+				v21 = not success2 and "PlayerScripts: " or result2
+			else
+				v21 = "PlayerScripts: "
+			end
+
+			local overridesPlayerScripts = getOverridesPlayerScripts()
+			local defaultPlayerScripts
+
+			if v3.EngineFeaturePlayerScriptStatusProperty then
+				defaultPlayerScripts = overridesPlayerScripts == "v3 Default"
+			else
+				defaultPlayerScripts = overridesPlayerScripts == "Default"
+			end
+
+			local analyticsTargetName = Constants.AnalyticsTargetName
+			local v22 = {
+				defaultPlayerScripts = defaultPlayerScripts,
 				placeID = tostring(game.PlaceId),
-				rawValue = if not t1.GetFFlagNewEventIngestPlayerScriptsDimensions() then nil else v648,
-				context = if not t1.GetFFlagNewEventIngestPlayerScriptsDimensions() then nil else "IGMv1"
-			})
-			t3.OverridesPlayerScriptsLabel.Text = s11 .. v648
-			t3.OverridesPlayerScriptsLabel.Visible = v86 or PlayerPermissionsModule.IsPlayerAdminAsync(Players.LocalPlayer)
+				rawValue = 0,
+				context = 0
+			}
+			local rawValue
 
-			local OverridesPlayerScriptsLabel = t3.OverridesPlayerScriptsLabel
-			local uDim2_14 = UDim2.new(0.2, -6, 1, 0)
+			if v3.GetFFlagNewEventIngestPlayerScriptsDimensions() then
+				rawValue = overridesPlayerScripts
+			end
 
-			OverridesPlayerScriptsLabel.Size = EngineFeature and UDim2.new(0, OverridesPlayerScriptsLabel.TextBounds.X + 6, 0, v59) or uDim2_14
-			t3.OverridesPlayerScriptsLabel.TextScaled = not (EngineFeature or t3.OverridesPlayerScriptsLabel.TextFits)
+			v22.rawValue = rawValue
+			v22.context = v3.GetFFlagNewEventIngestPlayerScriptsDimensions() and "IGMv1" or nil
+			RbxAnalyticsService:setRBXEventStream(
+				analyticsTargetName,
+				"player_scripts_status",
+				"player_scripts_status_action",
+				v22
+			)
+
+			children.OverridesPlayerScriptsLabel.Text = v21 .. overridesPlayerScripts
+			children.OverridesPlayerScriptsLabel.Visible = visible2
+				or PlayerPermissionsModule.IsPlayerAdminAsync(Players.LocalPlayer)
+			addSizeToLabel(children.OverridesPlayerScriptsLabel) -- inferred equivalent call
+			children.OverridesPlayerScriptsLabel.TextScaled = not (engineFeature or children.OverridesPlayerScriptsLabel.TextFits)
 		end)
 
-		if EngineFeature then
-			local s12 = "Client CoreScript Version: "
+		if engineFeature then
+			local v21
 
-			if v117 then
-				if not RobloxTranslator then
-					s12 = "Client CoreScript Version: "
-				else
-					local ok8, result8 = pcall(RobloxTranslator.FormatByKey, RobloxTranslator, "InGame.HelpMenu.Label.ClientCoreScriptVersion")
-
-					s12 = not ok8 and "Client CoreScript Version: " or result8
-				end
+			if fFlagLocalizeVersionLabels and RobloxTranslator then
+				local success2, result2 = pcall(
+					RobloxTranslator.FormatByKey,
+					RobloxTranslator,
+					"InGame.HelpMenu.Label.ClientCoreScriptVersion"
+				)
+				v21 = not success2 and "Client CoreScript Version: " or result2
+			else
+				v21 = "Client CoreScript Version: "
 			end
 
-			t3.CoreScriptVersionLabel = Create("TextLabel")({
+			children.CoreScriptVersionLabel = Create("TextLabel")({
 				Name = "CoreScriptVersionLabel",
+				Parent = children.VersionContainer,
 				LayoutOrder = 6,
 				BackgroundTransparency = 1,
-				ZIndex = 5,
-				Parent = t3.VersionContainer,
 				TextColor3 = Color3.new(1, 1, 1),
-				TextSize = Theme.textSize(if not v13 then not Utility:IsSmallTouchScreen() and 20 or 14 else 28),
-				Text = s12 .. RunService:GetCoreScriptVersion(),
+				TextSize = Theme.textSize(v and 28 or Utility:IsSmallTouchScreen() and 14 or 20),
+				Text = v21 .. RunService:GetCoreScriptVersion(),
 				Font = Theme.font(Enum.Font.SourceSans, "SettingsHub"),
 				TextXAlignment = Enum.TextXAlignment.Center,
-				TextYAlignment = Enum.TextYAlignment.Center
+				TextYAlignment = Enum.TextYAlignment.Center,
+				ZIndex = 5
 			})
 
-			local CoreScriptVersionLabel = t3.CoreScriptVersionLabel
-			local uDim2_15 = UDim2.new(0.2, -6, 1, 0)
+			addSizeToLabel(children.CoreScriptVersionLabel) -- inferred equivalent call
 
-			CoreScriptVersionLabel.Size = EngineFeature and UDim2.new(0, CoreScriptVersionLabel.TextBounds.X + 6, 0, v59) or uDim2_15
-
-			local VersionContainer = t3.VersionContainer
-
-			v343:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() -- line: 1446
-				-- upvalues: VersionContainer (copy), v343 (copy), v59 (copy)
-				VersionContainer.CanvasSize = UDim2.new(0, v343.AbsoluteContentSize.X, 0, v59)
+			local versionContainer = children.VersionContainer
+			v19:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+				versionContainer.CanvasSize = UDim2.new(0, v19.AbsoluteContentSize.X, 0, v2)
 			end)
 		end
 
-		t3.Modal = Create("TextButton")({
+		children.Modal = Create("TextButton")({
 			Name = "Modal",
 			BackgroundTransparency = 1,
-			Modal = true,
-			Text = "",
-			Selectable = false,
 			Position = UDim2.new(0, 0, 1, -1),
 			Size = UDim2.new(1, 0, 1, 0),
-			Parent = t3.Shield
+			Modal = true,
+			Text = "",
+			Parent = children.Shield,
+			Selectable = false
 		})
 
-		if t1.FFlagSettingsHubIndependentBackgroundVisibility then
-			t3.DarkenBackground = Create("ImageButton")({
+		if v3.FFlagSettingsHubIndependentBackgroundVisibility then
+			local create = Create("ImageButton")
+			local darkenBackground = {
 				Name = "DarkenBackground",
+				ZIndex = children.Shield.ZIndex - 1,
 				BackgroundTransparency = 1,
+				BackgroundColor3 = 0,
+				Size = 0,
+				Parent = 0,
 				AutoButtonColor = false,
-				Visible = false,
-				ZIndex = t3.Shield.ZIndex - 1,
-				BackgroundColor3 = if not t1.isInExperienceUIVREnabled then Theme.color("DarkenBackground") else t3.SettingsUIDelegate:getDarkBackgroundTheme().Color,
-				Size = UDim2.new(1, 0, 1, 0),
-				Parent = t3.ClippingShield
-			})
+				Visible = false
+			}
+			local backgroundColor
+
+			if v3.isInExperienceUIVREnabled then
+				backgroundColor = children.SettingsUIDelegate:getDarkBackgroundTheme().Color
+			else
+				backgroundColor = Theme.color("DarkenBackground")
+			end
+
+			darkenBackground.BackgroundColor3 = backgroundColor
+
+			darkenBackground.Size = UDim2.new(1, 0, 1, 0)
+			darkenBackground.Parent = children.ClippingShield
+			children.DarkenBackground = create(darkenBackground)
 		else
-			t3.DarkenBackground = Create("Frame")({
+			children.DarkenBackground = Create("Frame")({
 				Name = "DarkenBackground",
+				ZIndex = children.Shield.ZIndex - 1,
 				BackgroundTransparency = 1,
-				ZIndex = t3.Shield.ZIndex - 1,
 				BackgroundColor3 = Theme.color("DarkenBackground"),
 				Size = UDim2.new(1, 0, 1, 0),
-				Parent = t3.ClippingShield
+				Parent = children.ClippingShield
 			})
 		end
 
-		local v367 = Theme.MenuContainerPosition(t3.SettingsUIDelegate)
-
-		t3.MenuContainer = Create("ImageButton")({
+		local menuContainerPosition = Theme.MenuContainerPosition(children.SettingsUIDelegate)
+		children.MenuContainer = Create("ImageButton")({
 			Name = "MenuContainer",
-			ZIndex = t3.Shield.ZIndex,
+			ZIndex = children.Shield.ZIndex,
 			BackgroundTransparency = Theme.transparency("MenuContainer", 1),
 			BackgroundColor3 = Theme.color("MenuContainer"),
-			Position = v367.Position,
-			Size = v367.Size,
-			AnchorPoint = v367.AnchorPoint,
-			AutomaticSize = v367.AutomaticSize,
-			Parent = t3.Shield
+			Position = menuContainerPosition.Position,
+			Size = menuContainerPosition.Size,
+			AnchorPoint = menuContainerPosition.AnchorPoint,
+			AutomaticSize = menuContainerPosition.AutomaticSize,
+			Parent = children.Shield
 		})
 
-		if t1.FFlagCreateInExperienceMenuReact then
-			t3.ReactPage.Parent = t3.MenuContainer
-		else
-			t3.ReactPage = createReactPage(t3.MenuContainer)
-		end
+		children.ReactPage.Parent = children.MenuContainer
 
-		t3.Page = Create("Frame")({
+		children.Page = Create("Frame")({
 			Name = "Page",
 			BackgroundTransparency = 1,
 			AutomaticSize = Enum.AutomaticSize.XY,
-			Parent = t3.MenuContainer
+			Parent = children.MenuContainer
 		})
 
-		if FFlagIEMFocusNavPeoplePageToButtons then
-			t3.Page.SelectionGroup = true
-			t3.Page.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
-			t3.Page.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
-			t3.Page.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
-			t3.Page.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
-		end
+		children.Page.SelectionGroup = true
+		children.Page.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+		children.Page.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
+		children.Page.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
+		children.Page.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
 
-		local Page = t3.Page
+		local page = children.Page
+		children.MenuContainerPadding = Create("UIPadding")({ Parent = page })
 
-		t3.MenuContainerPadding = Create("UIPadding")({
-			Parent = Page
-		})
-
-		if not v13 then
+		if not v then
 			local _ = GuiService:GetGuiInset().Y
 
-			t3.MenuContainerPadding.PaddingTop = UDim.new(0, 0)
+			children.MenuContainerPadding.PaddingTop = UDim.new(0, 0)
 		end
 
-		local v370 = Theme.HubPadding()
+		local hubPadding = Theme.HubPadding()
+		children.MenuContainer.AutoButtonColor = false
+		children.MenuContainerPadding.PaddingLeft = hubPadding.PaddingLeft
+		children.MenuContainerPadding.PaddingRight = hubPadding.PaddingRight
+		children.MenuContainerPadding.PaddingBottom = hubPadding.PaddingBottom
+		children.MenuContainerPadding.PaddingTop = hubPadding.PaddingTop
 
-		t3.MenuContainer.AutoButtonColor = false
-		t3.MenuContainerPadding.PaddingLeft = v370.PaddingLeft
-		t3.MenuContainerPadding.PaddingRight = v370.PaddingRight
-		t3.MenuContainerPadding.PaddingBottom = v370.PaddingBottom
-		t3.MenuContainerPadding.PaddingTop = v370.PaddingTop
 		Create("UICorner")({
 			CornerRadius = Theme.MenuContainerCornerRadius,
-			Parent = t3.MenuContainer
+			Parent = children.MenuContainer
 		})
-		getCamMicPermissions(function(p38) -- line: 1556
-			-- upvalues: t3 (copy)
-			t3.hasMicPermissions = p38.hasMicPermissions
-			t3.isFetchingMicPermissions = false
-		end, nil, true)
-		t3.SettingsShowSignal:connect(function(p39) -- line: 1562
-			-- upvalues: default (copy), t1 (copy), t3 (copy)
-			if p39 then
-				if default:IsSeamlessVoice() and not default.voiceUIVisible then
-					if t1.FFlagVoiceRewarmTelemetry then
-						local v654, v655, v656, v657 = default:GetConnectDisconnectButtonAnalyticsData(true)
 
-						default.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("shown", v654, v655, v656, v657, default.joinVoiceButtonContext)
+		getCamMicPermissions(function(p)
+			children.hasMicPermissions = p.hasMicPermissions
+			children.isFetchingMicPermissions = false
+		end, nil, true)
+
+		children.SettingsShowSignal:connect(function(p)
+			if p then
+				if default:IsSeamlessVoice() and not default.voiceUIVisible then
+					if v3.FFlagVoiceRewarmTelemetry then
+						local connectDisconnectButtonAnalyticsData, v21, v22, v23 = default:GetConnectDisconnectButtonAnalyticsData(true)
+						default.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId(
+							"shown",
+							connectDisconnectButtonAnalyticsData,
+							v21,
+							v22,
+							v23,
+							default.joinVoiceButtonContext
+						)
 					else
-						default.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("shown", default:GetConnectDisconnectButtonAnalyticsData(true))
+						default.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId(
+							"shown",
+							default:GetConnectDisconnectButtonAnalyticsData(true)
+						)
 					end
 				elseif default:IsSeamlessVoice() and default.voiceUIVisible then
-					default.Analytics:reportLeaveVoiceButtonEvent("shown", default:GetConnectDisconnectButtonAnalyticsData(true))
+					default.Analytics:reportLeaveVoiceButtonEvent(
+						"shown",
+						default:GetConnectDisconnectButtonAnalyticsData(true)
+					)
 				end
 
-				if default:UserVoiceEnabled() and t3.isFetchingMicPermissions then
-					return
-				end
-
-				if not default:UserOnlyEligibleForVoice() and (not default:UserVoiceEnabled() or t3.hasMicPermissions) then
+				if
+					default:UserVoiceEnabled() and children.isFetchingMicPermissions
+					or not default:UserOnlyEligibleForVoice()
+					and (not default:UserVoiceEnabled() or children.hasMicPermissions)
+				then
 					return
 				end
 			end
 		end)
-		t3.MenuListLayout = Create("UIListLayout")({
+
+		children.MenuListLayout = Create("UIListLayout")({
 			Name = "MenuListLayout",
 			FillDirection = Enum.FillDirection.Vertical,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Parent = Page
-		})
-		t3.HubBar = Create("ImageLabel")({
-			Name = "HubBar",
-			BorderSizePixel = 0,
-			LayoutOrder = 0,
-			BackgroundColor3 = Theme.color("HubBarContainer"),
-			BackgroundTransparency = Theme.transparency("HubBarContainerTransparency"),
-			ZIndex = t3.Shield.ZIndex + 1,
-			AnchorPoint = Vector2.new(0.5, 0),
-			Parent = Page
+			Parent = page
 		})
 
-		if not t1.FFlagEnableSideSheet then
+		children.HubBar = Create("ImageLabel")({
+			Name = "HubBar",
+			BackgroundColor3 = Theme.color("HubBarContainer"),
+			BackgroundTransparency = Theme.transparency("HubBarContainerTransparency"),
+			ZIndex = children.Shield.ZIndex + 1,
+			BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(0.5, 0),
+			LayoutOrder = 0,
+			Parent = page
+		})
+
+		if not isSideSheetEnabled then
 			Create("Frame")({
-				BorderSizePixel = 0,
 				BackgroundColor3 = Theme.color("Divider"),
 				BackgroundTransparency = Theme.transparency("Divider"),
+				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 0, 1),
 				Position = UDim2.new(0, 0, 1, 0),
 				AnchorPoint = Vector2.new(0, 1),
-				Parent = t3.HubBar
+				Parent = children.HubBar
 			})
 		end
 
-		if t1.FFlagEnableSideSheet then
-			t3.PageTitleHeader = Create("Frame")({
+		if isSideSheetEnabled then
+			children.PageTitleHeader = Create("Frame")({
 				Name = "PageTitleHeader",
 				BackgroundTransparency = 1,
-				LayoutOrder = 0,
 				Size = UDim2.new(1, 0, 1, 0),
-				Parent = t3.HubBar,
-				ZIndex = t3.Shield.ZIndex + 1
+				LayoutOrder = 0,
+				Parent = children.HubBar,
+				ZIndex = children.Shield.ZIndex + 1
 			})
+
 			Create("UIPadding")({
 				PaddingLeft = UDim.new(0, 12),
 				PaddingRight = UDim.new(0, 12),
-				Parent = t3.PageTitleHeader
+				Parent = children.PageTitleHeader
 			})
 
-			if not t1.FFlagImprovePageTitleCloseButton then
-				t3.PageTitleCloseButton = Create("ImageButton")({
-					Name = "PageTitleCloseButton",
-					BackgroundTransparency = 1,
-					Image = "rbxasset://textures/ui/InspectMenu/x.png",
-					Size = UDim2.new(0, 16, 0, 16),
-					AnchorPoint = Vector2.new(1, 0.5),
-					Position = UDim2.new(1, 0, 0.5, 0),
-					Parent = t3.PageTitleHeader
-				})
-			end
-
-			t3.PageTitleLabel = Create("TextLabel")({
+			children.PageTitleLabel = Create("TextLabel")({
 				Name = "Title",
 				BackgroundTransparency = 1,
-				Text = "",
 				Size = UDim2.new(1, -36, 0, 0),
 				Position = UDim2.new(0, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0, 0.5),
 				AutomaticSize = Enum.AutomaticSize.Y,
+				Text = "",
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextColor3 = Color3.new(1, 1, 1),
 				Font = Theme.font(Enum.Font.SourceSansBold, "Confirmation"),
 				FontSize = Theme.fontSize(Enum.FontSize.Size36, "Confirmation"),
-				Parent = t3.PageTitleHeader
+				Parent = children.PageTitleHeader
 			})
 		end
 
-		t3.HubBarListLayout = Create("UIListLayout")({
+		children.HubBarListLayout = Create("UIListLayout")({
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Parent = t3.HubBar
+			Parent = children.HubBar
 		})
 
-		if not t1.FFlagAddTraversalBackButton then
-			if t1.EngineFeatureTeleportHistoryButtons then
-				t3.BackBarRef = Roact.createRef()
-				t3.FrontBarRef = Roact.createRef()
-				t3.BackBar = Roact.createElement(RoactAppExperiment.Provider, {
+		if not v3.FFlagAddTraversalBackButton then
+			if v3.EngineFeatureTeleportHistoryButtons then
+				children.BackBarRef = Roact.createRef()
+				children.FrontBarRef = Roact.createRef()
+				children.BackBar = Roact.createElement(RoactAppExperiment.Provider, {
 					value = IXPService
 				}, {
 					AppStyleProvider = Roact.createElement(AppStyleProvider, {
-						style = {
-							themeName = Dark
-						}
+						style = { themeName = Dark }
 					}, {
-						ButtonsFrame = Roact.createElement("Frame", {
-							BackgroundTransparency = 1,
-							LayoutOrder = -1,
-							AutomaticSize = Enum.AutomaticSize.Y,
-							Size = UDim2.new(1, 0, 0, 0)
-						}, {
-							BackButton = Roact.createElement(MenuBackButton, {
-								LayoutOrder = 1,
-								BackBarRef = t3.BackBarRef,
-								HubBar = t3.HubBar
-							}),
-							FrontButton = Roact.createElement(MenuFrontButton, {
-								LayoutOrder = 2,
-								FrontBarRef = t3.FrontBarRef,
-								HubBar = t3.HubBar
-							})
-						})
+						ButtonsFrame = Roact.createElement(
+							"Frame",
+							{
+								BackgroundTransparency = 1,
+								LayoutOrder = -1,
+								AutomaticSize = Enum.AutomaticSize.Y,
+								Size = UDim2.new(1, 0, 0, 0)
+							},
+							{
+								BackButton = Roact.createElement(MenuBackButton, {
+									BackBarRef = children.BackBarRef,
+									HubBar = children.HubBar,
+									LayoutOrder = 1
+								}),
+								FrontButton = Roact.createElement(MenuFrontButton, {
+									FrontBarRef = children.FrontBarRef,
+									HubBar = children.HubBar,
+									LayoutOrder = 2
+								})
+							}
+						)
 					})
 				})
-				Roact.mount(t3.BackBar, Page, "BackBar")
 			else
-				t3.BackBarRef = Roact.createRef()
-				t3.BackBar = Roact.createElement(RoactAppExperiment.Provider, {
+				children.BackBarRef = Roact.createRef()
+				children.BackBar = Roact.createElement(RoactAppExperiment.Provider, {
 					value = IXPService
 				}, {
 					AppStyleProvider = Roact.createElement(AppStyleProvider, {
-						style = {
-							themeName = Dark
-						}
+						style = { themeName = Dark }
 					}, {
 						BackButton = Roact.createElement(MenuBackButton, {
-							BackBarRef = t3.BackBarRef,
-							HubBar = t3.HubBar
+							BackBarRef = children.BackBarRef,
+							HubBar = children.HubBar
 						})
 					})
 				})
-				Roact.mount(t3.BackBar, Page, "BackBar")
 			end
+
+			Roact.mount(children.BackBar, page, "BackBar")
 		end
 
 		if Utility:IsSmallTouchScreen() then
-			t3.HubBar.Size = UDim2.new(0, RobloxGui.AbsoluteSize.X - 100, 0, 50)
-			t3.HubBar.Position = UDim2.new(0.5, 0, 0, 6)
-		elseif v13 then
-			t3.HubBar.Size = UDim2.new(0, 1200, 0, 100)
-			t3.HubBar.Position = UDim2.new(0.5, 0, 0.1, 0)
+			children.HubBar.Size = UDim2.new(0, RobloxGui.AbsoluteSize.X - 100, 0, 50)
+			children.HubBar.Position = UDim2.new(0.5, 0, 0, 6)
 		else
-			t3.HubBar.Size = UDim2.new(0, 800, 0, 60)
-			t3.HubBar.Position = UDim2.new(0.5, 0, 0.1, 0)
+			if v then
+				children.HubBar.Size = UDim2.new(0, 1200, 0, 100)
+			else
+				children.HubBar.Size = UDim2.new(0, 800, 0, 60)
+			end
+
+			children.HubBar.Position = UDim2.new(0.5, 0, 0.1, 0)
 		end
 
-		t3.VoiceRecordingIndicatorFrame = Create("Frame")({
-			BackgroundTransparency = 1,
-			Size = if not t1.ChromeEnabled then UDim2.fromOffset(0, 100) else UDim2.new(1, 0, 0, 100),
+		local create = Create("Frame")
+		local size
+
+		if v3.ChromeEnabled then
+			size = UDim2.new(1, 0, 0, 100)
+		else
+			size = UDim2.fromOffset(0, 100)
+		end
+
+		children.VoiceRecordingIndicatorFrame = create({
+			Size = size,
 			Position = UDim2.new(0, 0, 0, 0),
-			Parent = t3.HubBar
+			Parent = children.HubBar,
+			BackgroundTransparency = 1
 		})
-		t3.VoiceRecordingText = Create("TextLabel")({
+
+		children.VoiceRecordingText = Create("TextLabel")({
+			Parent = children.VoiceRecordingIndicatorFrame,
 			Text = "",
 			Visible = false,
-			TextSize = 12,
-			BackgroundTransparency = 1,
-			Parent = t3.VoiceRecordingIndicatorFrame,
 			Position = UDim2.new(0, 60, 0, 0),
+			TextSize = 12,
 			Font = AppFonts.default:getMedium(),
 			Size = UDim2.fromScale(1, 1),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center,
-			TextColor3 = Color3.fromRGB(255, 255, 255)
+			TextColor3 = Color3.fromRGB(255, 255, 255),
+			BackgroundTransparency = 1
 		})
 
 		if Utility:IsSmallTouchScreen() then
-			t3.VoiceRecordingText.Size = UDim2.fromScale(1, 1)
-			t3.VoiceRecordingText.AnchorPoint = Vector2.new(0, 0)
+			children.VoiceRecordingText.Size = UDim2.fromScale(1, 1)
+			children.VoiceRecordingText.AnchorPoint = Vector2.new(0, 0)
 
-			if t1.ChromeEnabled then
-				t3.VoiceRecordingText.TextXAlignment = Enum.TextXAlignment.Right
-				t3.VoiceRecordingText.Position = UDim2.new(0, 0, 0, -60)
+			if v3.ChromeEnabled then
+				children.VoiceRecordingText.TextXAlignment = Enum.TextXAlignment.Right
+				children.VoiceRecordingText.Position = UDim2.new(0, 0, 0, -60)
 			else
-				t3.VoiceRecordingText.Position = UDim2.new(0, 60, 0, -60)
+				children.VoiceRecordingText.Position = UDim2.new(0, 60, 0, -60)
 			end
-		elseif v13 then
-			t3.VoiceRecordingText.AnchorPoint = Vector2.new(0, 1)
+		elseif v then
+			children.VoiceRecordingText.AnchorPoint = Vector2.new(0, 1)
 
-			if t1.ChromeEnabled then
-				t3.VoiceRecordingText.TextXAlignment = Enum.TextXAlignment.Right
-				t3.VoiceRecordingText.Size = UDim2.new(1, 0, 0, 100)
-				t3.VoiceRecordingText.Position = UDim2.new(0, 0, 0.1, 0)
+			if v3.ChromeEnabled then
+				children.VoiceRecordingText.TextXAlignment = Enum.TextXAlignment.Right
+				children.VoiceRecordingText.Size = UDim2.new(1, 0, 0, 100)
+				children.VoiceRecordingText.Position = UDim2.new(0, 0, 0.1, 0)
 			else
-				t3.VoiceRecordingText.Size = UDim2.new(0, 1200, 0, 100)
-				t3.VoiceRecordingText.Position = UDim2.new(0.5, 0, 0.1, 0)
+				children.VoiceRecordingText.Size = UDim2.new(0, 1200, 0, 100)
+				children.VoiceRecordingText.Position = UDim2.new(0.5, 0, 0.1, 0)
 			end
 		else
-			t3.VoiceRecordingText.AnchorPoint = Vector2.new(0, 1)
+			children.VoiceRecordingText.AnchorPoint = Vector2.new(0, 1)
 
-			if t1.ChromeEnabled then
-				t3.VoiceRecordingText.TextXAlignment = Enum.TextXAlignment.Right
-				t3.VoiceRecordingText.Size = UDim2.new(1, 0, 0, 60)
-				t3.VoiceRecordingText.Position = UDim2.new(0, 0, 0.1, 0)
+			if v3.ChromeEnabled then
+				children.VoiceRecordingText.TextXAlignment = Enum.TextXAlignment.Right
+				children.VoiceRecordingText.Size = UDim2.new(1, 0, 0, 60)
+				children.VoiceRecordingText.Position = UDim2.new(0, 0, 0.1, 0)
 			else
-				t3.VoiceRecordingText.Size = UDim2.new(0, 800, 0, 60)
-				t3.VoiceRecordingText.Position = UDim2.new(0.5, 0, 0.1, 0)
+				children.VoiceRecordingText.Size = UDim2.new(0, 800, 0, 60)
+				children.VoiceRecordingText.Position = UDim2.new(0.5, 0, 0.1, 0)
 			end
 		end
 
-		t3.voiceRecordingIndicatorTextMotor = Otter.createSingleMotor(0)
-		t3.voiceRecordingIndicatorTextMotor:onStep(function(p40) -- line: 1803
-			-- upvalues: t3 (copy)
-			t3.VoiceRecordingText.TextTransparency = p40
+		children.voiceRecordingIndicatorTextMotor = Otter.createSingleMotor(0)
+		children.voiceRecordingIndicatorTextMotor:onStep(function(textTransparency)
+			children.VoiceRecordingText.TextTransparency = textTransparency
 		end)
-		spawn(function() -- line: 1807
-			-- upvalues: RunService (copy), t3 (copy), Otter (copy), t2 (copy)
-			RunService:BindToRenderStep("VoiceRecordingIndicator", 1, function() -- line: 1808
-				-- upvalues: t3 (copy), Otter (copy), t2 (copy)
-				if t3.isMuted ~= nil and (t3.lastVoiceRecordingIndicatorTextUpdated ~= nil and tick() - t3.lastVoiceRecordingIndicatorTextUpdated >= 5 and t3.isMuted) then
-					t3.voiceRecordingIndicatorTextMotor:setGoal(Otter.spring(1, t2))
-					t3.voiceRecordingIndicatorTextMotor:start()
+
+		spawn(function()
+			RunService:BindToRenderStep("VoiceRecordingIndicator", 1, function()
+				if
+					children.isMuted ~= nil
+					and children.lastVoiceRecordingIndicatorTextUpdated ~= nil
+					and tick() - children.lastVoiceRecordingIndicatorTextUpdated >= 5
+					and children.isMuted
+				then
+					children.voiceRecordingIndicatorTextMotor:setGoal(Otter.spring(1, v8))
+					children.voiceRecordingIndicatorTextMotor:start()
 				end
 			end)
 		end)
-		t3.PageViewClipper = Create("Frame")({
+
+		children.PageViewClipper = Create("Frame")({
 			Name = "PageViewClipper",
 			BackgroundTransparency = 1,
-			Size = UDim2.new(t3.HubBar.Size.X.Scale, t3.HubBar.Size.X.Offset, 1, -t3.HubBar.Size.Y.Offset - t3.HubBar.Position.Y.Offset - n1),
-			Position = UDim2.new(t3.HubBar.Position.X.Scale, t3.HubBar.Position.X.Offset, t3.HubBar.Position.Y.Scale, t3.HubBar.Position.Y.Offset + t3.HubBar.Size.Y.Offset + 1),
+			Size = UDim2.new(
+				children.HubBar.Size.X.Scale,
+				children.HubBar.Size.X.Offset,
+				1,
+				-children.HubBar.Size.Y.Offset - children.HubBar.Position.Y.Offset - v18
+			),
+			Position = UDim2.new(
+				children.HubBar.Position.X.Scale,
+				children.HubBar.Position.X.Offset,
+				children.HubBar.Position.Y.Scale,
+				children.HubBar.Position.Y.Offset + children.HubBar.Size.Y.Offset + 1
+			),
 			AnchorPoint = Vector2.new(0.5, 0),
 			ClipsDescendants = true,
 			LayoutOrder = 1,
-			Parent = Page,
-			SelectionGroup = not not t1.FFlagIGMSelectionGroup or nil,
-			SelectionBehaviorLeft = if not t1.FFlagIGMSelectionGroup then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorRight = if not t1.FFlagIGMSelectionGroup then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorDown = if not t1.FFlagIGMSelectionGroup then nil else Enum.SelectionBehavior.Escape,
-			SelectionBehaviorUp = if not t1.FFlagIGMSelectionGroup then nil else Enum.SelectionBehavior.Escape,
-			if not t1.FFlagIGMSelectionGroup then Create("ImageButton")({
-				Name = "InputCapture",
-				BackgroundTransparency = 1,
-				Image = "",
-				Size = UDim2.new(1, 0, 1, 0)
-			}) else nil
+			Parent = page,
+			SelectionGroup = true,
+			SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+			SelectionBehaviorRight = Enum.SelectionBehavior.Stop,
+			SelectionBehaviorDown = Enum.SelectionBehavior.Escape,
+			SelectionBehaviorUp = Enum.SelectionBehavior.Escape
 		})
 
-		if t1.FFlagEnableConsoleExpControls and t1.ChromeEnabled then
-			t3.PageViewPadding = Create("UIPadding")({
-				Parent = t3.PageViewClipper
-			})
+		if v3.FFlagEnableConsoleExpControls and v3.ChromeEnabled then
+			children.PageViewPadding = Create("UIPadding")({ Parent = children.PageViewClipper })
 
 			local Service = require(RobloxGui.Modules.Chrome.Service)
-
-			Service:onShortcutBarChanged():connect(function() -- line: 1854
-				-- upvalues: Utility (copy), Service (copy), t3 (copy), Theme (copy)
+			Service:onShortcutBarChanged():connect(function()
 				if Utility:IsSmallTouchScreen() and Service:getCurrentShortcutBar():get() ~= nil then
-					t3.PageViewPadding.PaddingBottom = UDim.new(0, Theme.ExtraPageBottomPaddingMobile)
-
-					return
+					children.PageViewPadding.PaddingBottom = UDim.new(0, Theme.ExtraPageBottomPaddingMobile)
+				else
+					children.PageViewPadding.PaddingBottom = UDim.new(0, 0)
 				end
-
-				t3.PageViewPadding.PaddingBottom = UDim.new(0, 0)
 			end)
 		end
 
-		t3.PageView = Create("ScrollingFrame")({
+		children.PageView = Create("ScrollingFrame")({
 			Name = "PageView",
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Selectable = false,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.new(0.5, 0, 0.5, 2),
 			Size = UDim2.new(1, 0, 1, -20),
 			CanvasSize = UDim2.new(1, 0, 1, 0),
-			ZIndex = t3.Shield.ZIndex,
+			ZIndex = children.Shield.ZIndex,
 			ScrollingDirection = Enum.ScrollingDirection.Y,
-			ScrollBarThickness = Theme.DefaultScrollBarThickness,
-			Parent = t3.PageViewClipper
-		})
-		t3.PageView.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
-		t3.PageViewInnerFrame = Create("Frame")({
-			Name = "PageViewInnerFrame",
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Selectable = false,
-			LayoutOrder = 1,
+			ScrollBarThickness = Theme.DefaultScrollBarThickness,
+			Parent = children.PageViewClipper
+		})
+
+		children.PageView.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+
+		children.PageViewInnerFrame = Create("Frame")({
+			Name = "PageViewInnerFrame",
 			Position = UDim2.new(0, 0, 0, 0),
 			Size = UDim2.new(1, 0, 1, 0),
-			ZIndex = t3.Shield.ZIndex,
-			Parent = t3.PageView
+			ZIndex = children.Shield.ZIndex,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Selectable = false,
+			Parent = children.PageView,
+			LayoutOrder = 1
 		})
-		Create("UIPadding")({
-			PaddingTop = UDim.new(0, 5),
-			Parent = t3.PageViewInnerFrame
-		})
-		t3.InnerCanvasGroupShow = Create("CanvasGroup")({
+
+		Create("UIPadding")({ PaddingTop = UDim.new(0, 5), Parent = children.PageViewInnerFrame })
+
+		children.InnerCanvasGroupShow = Create("CanvasGroup")({
 			Name = "InnerCanvasGroupShow",
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			GroupTransparency = 0,
 			Visible = false,
-			Size = UDim2.fromScale(1, 1),
-			Parent = t3.PageViewInnerFrame
+			Parent = children.PageViewInnerFrame
 		})
-		t3.InnerCanvasGroupHide = Create("CanvasGroup")({
+
+		children.InnerCanvasGroupHide = Create("CanvasGroup")({
 			Name = "InnerCanvasGroupHide",
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			GroupTransparency = 0,
 			Visible = false,
-			Size = UDim2.fromScale(1, 1),
-			Parent = t3.PageViewInnerFrame
+			Parent = children.PageViewInnerFrame
 		})
 
 		if UserInputService.MouseEnabled then
-			t3.PageViewClipper.Size = UDim2.new(t3.HubBar.Size.X.Scale, t3.HubBar.Size.X.Offset, 0.5, -(t3.HubBar.Position.Y.Offset - t3.HubBar.Size.Y.Offset))
+			children.PageViewClipper.Size = UDim2.new(
+				children.HubBar.Size.X.Scale,
+				children.HubBar.Size.X.Offset,
+				0.5,
+				-(children.HubBar.Position.Y.Offset - children.HubBar.Size.Y.Offset)
+			)
 		end
 
-		t3.BottomButtonFrame = Create("Frame")({
+		children.BottomButtonFrame = Create("Frame")({
 			Name = "BottomButtonFrame",
+			Size = children.HubBar.Size,
+			Position = UDim2.new(
+				0.5,
+				-children.HubBar.Size.X.Offset / 2,
+				1 - children.HubBar.Position.Y.Scale - children.HubBar.Size.Y.Scale,
+				-children.HubBar.Position.Y.Offset - children.HubBar.Size.Y.Offset
+			),
+			ZIndex = children.Shield.ZIndex + 1,
 			BackgroundTransparency = 1,
 			LayoutOrder = 2,
-			Size = t3.HubBar.Size,
-			Position = UDim2.new(0.5, -t3.HubBar.Size.X.Offset / 2, 1 - t3.HubBar.Position.Y.Scale - t3.HubBar.Size.Y.Scale, -t3.HubBar.Position.Y.Offset - t3.HubBar.Size.Y.Offset),
-			ZIndex = t3.Shield.ZIndex + 1,
-			Parent = Page,
-			Selectable = not t1.FFlagIEMFocusNavToButtons and nil,
-			SelectionGroup = not not t1.FFlagIEMFocusNavToButtons or nil,
-			SelectionBehaviorLeft = if not t1.FFlagIEMFocusNavToButtons then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorRight = if not t1.FFlagIEMFocusNavToButtons then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorDown = if not t1.FFlagIEMFocusNavToButtons then nil else Enum.SelectionBehavior.Stop
+			Parent = page,
+			Selectable = false,
+			SelectionGroup = true,
+			SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+			SelectionBehaviorRight = Enum.SelectionBehavior.Stop,
+			SelectionBehaviorDown = Enum.SelectionBehavior.Stop
 		})
-		t3.BottomButtonFrame:GetPropertyChangedSignal("Visible"):Connect(function() -- line: 1939
-			-- upvalues: t3 (copy)
-			t3.setShowBottomBarSignal(t3.BottomButtonFrame.Visible)
+
+		children.BottomButtonFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+			children.setShowBottomBarSignal(children.BottomButtonFrame.Visible)
 		end)
 
-		local function v372(p41) -- line: 1943
-			-- upvalues: t1 (copy), setVisibilityInternal (ref), t3 (copy), RbxAnalyticsService (copy), Constants (copy), GuiService (copy)
-			if t1.FFlagAddUILessMode then
-				setVisibilityInternal(false, nil, nil, nil, p41)
+		local function fn3(source)
+			if v3.FFlagAddUILessMode then
+				setVisibilityInternal(false, nil, nil, nil, source)
 			else
 				setVisibilityInternal(false)
 			end
 
-			if t1.FFlagAddUILessMode and t1.FIntAddUILessModeVariant ~= 0 and t3.uiLessStore.getUILessModeEnabled(false) then
-				t3.uiLessStore.setUIVisible(false)
+			if
+				v3.FFlagAddUILessMode
+				and v3.FIntAddUILessModeVariant ~= 0
+				and children.uiLessStore.getUILessModeEnabled(false)
+			then
+				children.uiLessStore.setUIVisible(false)
 			end
 
-			RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsResumeGameName, Constants.AnalyticsMenuActionName, {
-				source = p41,
-				playsessionid = t3.playSessionId,
-				universeid = tostring(game.GameId)
-			})
+			RbxAnalyticsService:SetRBXEventStream(
+				Constants.AnalyticsTargetName,
+				Constants.AnalyticsResumeGameName,
+				Constants.AnalyticsMenuActionName,
+				{
+					source = source,
+					playsessionid = children.playSessionId,
+					universeid = tostring(game.GameId)
+				}
+			)
 
-			if t1.FFlagIEMResumeButtonPressBugfix then
-				GuiService.SelectedCoreObject = nil
+			GuiService.SelectedCoreObject = nil
+		end
+
+		if isSideSheetEnabled then
+			children.PageTitleCloseButton = Utility:MakeStyledImageButton(
+				"PageTitleClose",
+				"rbxasset://textures/ui/InspectMenu/x.png",
+				UDim2.new(0, 40, 0, 40),
+				UDim2.new(0, 16, 0, 16),
+				function()
+					fn3(Constants.AnalyticsResumeXButtonSource)
+				end,
+				nil,
+				children,
+				"DefaultButton"
+			)
+
+			children.PageTitleCloseButton.AnchorPoint = Vector2.new(1, 0.5)
+			children.PageTitleCloseButton.Position = UDim2.new(1, 0, 0.5, 0)
+
+			local border = children.PageTitleCloseButton:FindFirstChild("Border")
+
+			if border then
+				border.Parent = nil
 			end
+
+			children.PageTitleCloseButton.Parent = children.PageTitleHeader
 		end
 
-		if t1.FFlagEnableSideSheet then
-			if t1.FFlagImprovePageTitleCloseButton then
-				t3.PageTitleCloseButton = Utility:MakeStyledImageButton("PageTitleClose", "rbxasset://textures/ui/InspectMenu/x.png", UDim2.new(0, 40, 0, 40), UDim2.new(0, 16, 0, 16), function() -- line: 1976
-					-- upvalues: v372 (copy), Constants (copy)
-					v372(Constants.AnalyticsResumeXButtonSource)
-				end, nil, t3, "DefaultButton")
-				t3.PageTitleCloseButton.AnchorPoint = Vector2.new(1, 0.5)
-				t3.PageTitleCloseButton.Position = UDim2.new(1, 0, 0.5, 0)
-
-				local Border = t3.PageTitleCloseButton:FindFirstChild("Border")
-
-				if Border then
-					Border.Parent = nil
-				end
-
-				t3.PageTitleCloseButton.Parent = t3.PageTitleHeader
-			else
-				t3.PageTitleCloseButton.Activated:Connect(function() -- line: 1993
-					-- upvalues: v372 (copy), Constants (copy)
-					v372(Constants.AnalyticsResumeXButtonSource)
-				end)
-			end
+		if
+			not v3.FFlagMenuButtonsMountWithIEM
+			and v3.FFlagRelocateMobileMenuButtons
+			and (v3.FIntRelocateMobileMenuButtonsVariant == 1 or v3.FIntRelocateMobileMenuButtonsVariant == 3 or v3.FIntRelocateMobileMenuButtonsVariant == 2 and not Utility:IsSmallTouchScreen())
+		then
+			fn()
 		end
 
-		if not t1.FFlagMenuButtonsMountWithIEM and t1.FFlagRelocateMobileMenuButtons and (t1.FIntRelocateMobileMenuButtonsVariant == 1 or t1.FIntRelocateMobileMenuButtonsVariant == 3 or t1.FIntRelocateMobileMenuButtonsVariant == 2 and not Utility:IsSmallTouchScreen()) then
-			v180()
+		if
+			not v3.FFlagRelocateMobileMenuButtons
+			or v3.FIntRelocateMobileMenuButtonsVariant == 0
+			or v3.FIntRelocateMobileMenuButtonsVariant == 2 and Utility:IsSmallTouchScreen()
+		then
+			children.BottomButtonFrame.Size = UDim2.new(1, 0, 0, 80)
 		end
 
-		if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 or t1.FIntRelocateMobileMenuButtonsVariant == 2 and Utility:IsSmallTouchScreen() then
-			t3.BottomButtonFrame.Size = UDim2.new(1, 0, 0, 80)
-		end
-
-		t3.MenuListLayout = Create("UIListLayout")({
+		children.MenuListLayout = Create("UIListLayout")({
 			Padding = UDim.new(0, 12),
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Parent = t3.BottomButtonFrame
+			Parent = children.BottomButtonFrame
 		})
 
-		if t1.FFlagEnableSystemScrimInSettingsHub then
-			local v374 = require(CorePackages.Workspace.Packages.SystemScrim).SystemScrimSignalStore(false)
-
-			v374.backgroundScrimActivated.Event:Connect(function() -- line: 2021
-				-- upvalues: t1 (copy), t3 (copy), Constants (copy), v372 (copy)
-				if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-					t3:GetExperienceControlStore().onResume(Constants.AnalyticsResumeShieldSource)
-
-					return
+		if v3.FFlagEnableSystemScrimInSettingsHub then
+			local SystemScrim = require(CorePackages.Workspace.Packages.SystemScrim)
+			local systemScrimSignalStore = SystemScrim.SystemScrimSignalStore(false)
+			systemScrimSignalStore.backgroundScrimActivated.Event:Connect(function()
+				if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+					children:GetExperienceControlStore().onResume(Constants.AnalyticsResumeShieldSource)
+				else
+					fn3(Constants.AnalyticsResumeShieldSource)
 				end
-
-				v372(Constants.AnalyticsResumeShieldSource)
 			end)
-			t3.Shield:GetPropertyChangedSignal("Visible"):Connect(function() -- line: 2029
-				-- upvalues: v374 (copy), t3 (copy)
-				v374.setTransparency(1)
-				v374.setAutoDismiss(true)
-				v374.setVisibility(t3.Shield.Visible)
+
+			children.Shield:GetPropertyChangedSignal("Visible"):Connect(function()
+				systemScrimSignalStore.setTransparency(1)
+				systemScrimSignalStore.setAutoDismiss(true)
+				systemScrimSignalStore.setVisibility(children.Shield.Visible)
 			end)
 		end
 
-		t3.Shield.Activated:Connect(function() -- line: 2036
-			-- upvalues: t1 (copy), t3 (copy), Constants (copy), v372 (copy)
-			if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-				t3:GetExperienceControlStore().onResume(Constants.AnalyticsResumeShieldSource)
-
-				return
+		children.Shield.Activated:Connect(function()
+			if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+				children:GetExperienceControlStore().onResume(Constants.AnalyticsResumeShieldSource)
+			else
+				fn3(Constants.AnalyticsResumeShieldSource)
 			end
-
-			v372(Constants.AnalyticsResumeShieldSource)
 		end)
 
-		if t1.FFlagSettingsHubIndependentBackgroundVisibility then
-			t3.DarkenBackground.Activated:Connect(function() -- line: 2046
-				-- upvalues: t1 (copy), t3 (copy), Constants (copy), v372 (copy), InExperienceAppChatModal (copy)
-				if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-					t3:GetExperienceControlStore().onResume(Constants.AnalyticsResumeShieldSource)
+		if v3.FFlagSettingsHubIndependentBackgroundVisibility then
+			children.DarkenBackground.Activated:Connect(function()
+				if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+					children:GetExperienceControlStore().onResume(Constants.AnalyticsResumeShieldSource)
 				else
-					v372(Constants.AnalyticsResumeShieldSource)
+					fn3(Constants.AnalyticsResumeShieldSource)
 				end
 
 				InExperienceAppChatModal.default:setVisible(false)
 			end)
 		end
 
-		if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 then
-			local function v375() -- line: 2057
-				-- upvalues: t1 (copy), t3 (copy), removeBottomBarBindings (copy), Constants2 (copy)
-				if t1.FFlagPreventHiddenSwitchPage and t3:GetVisibility() == false then
+		if not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 then
+			local function fn4()
+				if v3.FFlagPreventHiddenSwitchPage and children:GetVisibility() == false then
 					return
 				end
 
-				t3:AddToMenuStack(t3.Pages.CurrentPage)
-				t3.HubBar.Visible = false
+				children:AddToMenuStack(children.Pages.CurrentPage)
+				children.HubBar.Visible = false
 				removeBottomBarBindings()
 
-				if t1.GetFFlagEnableLeaveGameUpsellEntrypoint() and t3.leaveGameUpsellProp ~= Constants2.PHONE_UPSELL_VALUE_PROP.None then
-					t3:SwitchToPage(t3.LeaveGameUpsellPage, nil, 1, true)
+				if
+					v3.GetFFlagEnableLeaveGameUpsellEntrypoint()
+					and children.leaveGameUpsellProp ~= Constants2.PHONE_UPSELL_VALUE_PROP.None
+				then
+					children:SwitchToPage(children.LeaveGameUpsellPage, nil, 1, true)
+				else
+					children:SwitchToPage(children.LeaveGamePage, nil, 1, true)
+				end
+			end
 
-					return
+			if inExperienceCapabilities.canNavigateHome then
+				local udim3 = UDim2.new(0.5, v and -160 or -130, 0.5, -25)
+				local l = Enum.KeyCode.L
+				local v21
+
+				if not (v3.FFlagEnableConsoleExpControls and v3.ChromeEnabled) then
+					v21 = Enum.KeyCode.ButtonX
 				end
 
-				t3:SwitchToPage(t3.LeaveGamePage, nil, 1, true)
+				addBottomBarButtonOld(
+					"LeaveGame",
+					"Leave",
+					v12,
+					"rbxasset://textures/ui/Settings/Help/LeaveIcon.png",
+					udim3,
+					fn4,
+					{ l, v21 },
+					fn4
+				)
 			end
 
-			if InExperienceCapabilities.canNavigateHome then
-				addBottomBarButtonOld("LeaveGame", "Leave", ImageForKeyCode2, "rbxasset://textures/ui/Settings/Help/LeaveIcon.png", UDim2.new(0.5, not v13 and -130 or -160, 0.5, -25), v375, {
-					Enum.KeyCode.L,
-					if not not t1.FFlagEnableConsoleExpControls and t1.ChromeEnabled then nil else Enum.KeyCode.ButtonX
-				}, v375)
-			end
-
-			local function v376() -- line: 2081
-				-- upvalues: u172 (ref), t3 (copy), removeBottomBarBindings (copy)
-				if u172 then
-					t3:AddToMenuStack(t3.Pages.CurrentPage)
-					t3.HubBar.Visible = false
+			local function fn5()
+				if v15 then
+					children:AddToMenuStack(children.Pages.CurrentPage)
+					children.HubBar.Visible = false
 					removeBottomBarBindings()
-					t3:SwitchToPage(t3.ResetCharacterPage, nil, 1, true)
+					children:SwitchToPage(children.ResetCharacterPage, nil, 1, true)
 				end
 			end
 
-			local v377 = v161:Format(Constants.RespawnLocalizedKey)
+			local formatted = v9:Format(Constants.RespawnLocalizedKey)
 
-			addBottomBarButtonOld("ResetCharacter", v377, ImageForKeyCode3, "rbxasset://textures/ui/Settings/Help/ResetIcon.png", UDim2.new(0.5, not v13 and -400 or -550, 0.5, -25), v376, {
-				Enum.KeyCode.R,
-				if not not t1.FFlagEnableConsoleExpControls and t1.ChromeEnabled then nil else Enum.KeyCode.ButtonY
-			}, v376)
-			addBottomBarButtonOld("Resume", "Resume", if not t1.FFlagEnableConsoleExpControls then ImageForKeyCode else ImageForKeyCode4, "rbxasset://textures/ui/Settings/Help/EscapeIcon.png", UDim2.new(0.5, not v13 and 140 or 200, 0.5, -25), function() -- line: 2097
-				-- upvalues: v372 (copy), Constants (copy)
-				v372(Constants.AnalyticsResumeButtonSource)
-			end, if not not t1.FFlagEnableConsoleExpControls and t1.ChromeEnabled then {} else {
-				Enum.KeyCode.ButtonB,
-				Enum.KeyCode.ButtonStart
-			}, function() -- line: 2100
-				-- upvalues: v372 (copy), Constants (copy)
-				v372(Constants.AnalyticsResumeGamepadSource)
-			end)
+			local udim3 = UDim2.new(0.5, v and -550 or -400, 0.5, -25)
+			local r = Enum.KeyCode.R
+			local v21
+
+			if not (v3.FFlagEnableConsoleExpControls and v3.ChromeEnabled) then
+				v21 = Enum.KeyCode.ButtonY
+			end
+
+			addBottomBarButtonOld(
+				"ResetCharacter",
+				formatted,
+				v13,
+				"rbxasset://textures/ui/Settings/Help/ResetIcon.png",
+				udim3,
+				fn5,
+				{ r, v21 },
+				fn5
+			)
+
+			local function fn6()
+				fn3(Constants.AnalyticsResumeButtonSource)
+			end
+			local function fn7()
+				fn3(Constants.AnalyticsResumeGamepadSource)
+			end
+
+			local v22
+
+			if v3.FFlagEnableConsoleExpControls then
+				v22 = imageForKeyCode
+			else
+				v22 = v11
+			end
+
+			addBottomBarButtonOld(
+				"Resume",
+				"Resume",
+				v22,
+				"rbxasset://textures/ui/Settings/Help/EscapeIcon.png",
+				UDim2.new(0.5, v and 200 or 140, 0.5, -25),
+				fn6,
+				v3.FFlagEnableConsoleExpControls and v3.ChromeEnabled and {} or {
+					Enum.KeyCode.ButtonB,
+					Enum.KeyCode.ButtonStart
+				},
+				fn7
+			)
 		end
 
-		if t1.FFlagAddSwitchTabHintsToIEM then
-			local function MountSwitchTabHint(t4: {[any]: any}) -- line: 2110
-				-- upvalues: Create (copy), ReactRoblox (copy), React (copy), FoundationProvider (copy), Foundation (copy), Utils (copy), SwitchTabHint (copy)
-				local v661 = Create("Frame")({
+		if v3.FFlagAddSwitchTabHintsToIEM then
+			local function MountSwitchTabHint(props)
+				local v21 = Create("Frame")({
 					Name = "SwitchTabHintContainer",
-					BackgroundTransparency = 1,
 					Size = UDim2.fromScale(0, 1),
+					BackgroundTransparency = 1,
 					AutomaticSize = Enum.AutomaticSize.X,
-					LayoutOrder = t4.layoutOrder,
-					Parent = t4.parent
+					LayoutOrder = props.layoutOrder,
+					Parent = props.parent
 				})
 
-				ReactRoblox.createRoot(v661):render(React.createElement(React.Fragment, nil, React.createElement("UIListLayout", {
-					Name = "SwitchTabHintCenterAlign",
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}), React.createElement(FoundationProvider, {
-					theme = Foundation.Enums.Theme.Dark,
-					device = Utils.getDeviceType()
-				}, {
-					["SwitchTabHint" .. t4.keycode.Name] = React.createElement(SwitchTabHint, {
-						keycode = t4.keycode
-					})
-				})))
+				ReactRoblox.createRoot(v21):render(React.createElement(
+					React.Fragment,
+					nil,
+					React.createElement("UIListLayout", {
+						Name = "SwitchTabHintCenterAlign",
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center
+					}),
+					React.createElement(
+						FoundationProvider,
+						{
+							colorMode = Foundation.Enums.ColorMode.Dark,
+							device = Utils.getDeviceType()
+						},
+						{
+							["SwitchTabHint" .. props.keycode.Name] = React.createElement(SwitchTabHint, {
+								keycode = props.keycode
+							})
+						}
+					)
+				))
 			end
 
-			t3.TabHeaderContainer = Create("Frame")({
+			children.TabHeaderContainer = Create("Frame")({
 				Name = "TabHeaderContainer",
 				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1),
-				Parent = t3.HubBar,
-				Visible = not t1.FFlagEnableSideSheet
+				Parent = children.HubBar,
+				Visible = not isSideSheetEnabled
 			})
-			t3.TabHeaderContainerListLayout = Create("UIListLayout")({
+
+			children.TabHeaderContainerListLayout = Create("UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
 				HorizontalFlex = Enum.UIFlexAlignment.Fill,
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				Parent = t3.TabHeaderContainer
+				Parent = children.TabHeaderContainer
 			})
+
 			MountSwitchTabHint({
-				layoutOrder = -999,
 				keycode = Enum.KeyCode.ButtonL1,
-				parent = t3.TabHeaderContainer
+				parent = children.TabHeaderContainer,
+				layoutOrder = -999
 			})
+
 			MountSwitchTabHint({
-				layoutOrder = 999,
 				keycode = Enum.KeyCode.ButtonR1,
-				parent = t3.TabHeaderContainer
+				parent = children.TabHeaderContainer,
+				layoutOrder = 999
 			})
 		end
 
-		t3.HubBarContainer = Create("ImageLabel")({
+		local create2 = Create("ImageLabel")
+		local hubBarContainer = {
 			Name = "HubBarContainer",
+			ZIndex = children.Shield.ZIndex + 2,
 			BorderSizePixel = 0,
-			ZIndex = t3.Shield.ZIndex + 2,
 			BackgroundColor3 = Theme.color("HubBarContainer"),
 			BackgroundTransparency = Theme.transparency("HubBarContainerTransparency"),
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0, 0, 0, 0),
-			Parent = if not t1.FFlagAddSwitchTabHintsToIEM then t3.HubBar else t3.TabHeaderContainer,
-			Selectable = not t1.FFlagIEMTabFocusNav and nil,
-			SelectionGroup = not not t1.FFlagIEMTabFocusNav or nil,
-			SelectionBehaviorUp = if not t1.FFlagIEMTabFocusNav then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorLeft = if not t1.FFlagIEMTabFocusNav then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorRight = if not t1.FFlagIEMTabFocusNav then nil else Enum.SelectionBehavior.Stop
-		})
-		t3.HubBar.ImageTransparency = 1
-		t3.HubBarListLayout.Parent = t3.HubBarContainer
+			Parent = 0,
+			Selectable = 0,
+			SelectionGroup = 0,
+			SelectionBehaviorUp = 0,
+			SelectionBehaviorLeft = 0,
+			SelectionBehaviorRight = 0
+		}
+		local parent
 
-		if isSubjectToDesktopPolicies() then
-			t3.FullScreenTitleBar = SettingsFullScreenTitleBar.mount({}, t3.Shield, "FullScreenTitleBar")
+		if v3.FFlagAddSwitchTabHintsToIEM then
+			parent = children.TabHeaderContainer
+		else
+			parent = children.HubBar
 		end
 
-		local function cameraViewportChanged() -- line: 2197
-			-- upvalues: Theme (copy), Utility (copy)
+		hubBarContainer.Parent = parent
+		hubBarContainer.Selectable = not v3.FFlagIEMTabFocusNav and nil
+		hubBarContainer.SelectionGroup = v3.FFlagIEMTabFocusNav and true or nil
+		local selectionBehaviorUp
+
+		if v3.FFlagIEMTabFocusNav then
+			selectionBehaviorUp = Enum.SelectionBehavior.Stop
+		end
+
+		hubBarContainer.SelectionBehaviorUp = selectionBehaviorUp
+		local selectionBehaviorLeft
+
+		if v3.FFlagIEMTabFocusNav then
+			selectionBehaviorLeft = Enum.SelectionBehavior.Stop
+		end
+
+		hubBarContainer.SelectionBehaviorLeft = selectionBehaviorLeft
+		local selectionBehaviorRight
+
+		if v3.FFlagIEMTabFocusNav then
+			selectionBehaviorRight = Enum.SelectionBehavior.Stop
+		end
+
+		hubBarContainer.SelectionBehaviorRight = selectionBehaviorRight
+		children.HubBarContainer = create2(hubBarContainer)
+
+		children.HubBar.ImageTransparency = 1
+		children.HubBarListLayout.Parent = children.HubBarContainer
+
+		if isSubjectToDesktopPolicies() then
+			children.FullScreenTitleBar = SettingsFullScreenTitleBar.mount({}, children.Shield, "FullScreenTitleBar")
+		end
+
+		local function cameraViewportChanged() -- 1 equivalent call inferred from this helper
 			Theme.viewportResized()
 			Utility:FireOnResized()
 		end
 
-		local connection2 = nil
+		local viewportSizeChangedConnection = nil
+		local function onWorkspaceChanged(p) -- 1 equivalent call inferred from this helper
+			if p == "CurrentCamera" then
+				cameraViewportChanged() -- inferred equivalent call
 
-		local function onWorkspaceChanged(p42) -- line: 2203
-			-- upvalues: Theme (copy), Utility (copy), connection2 (ref), cameraViewportChanged (copy)
-			if p42 == "CurrentCamera" then
-				Theme.viewportResized()
-				Utility:FireOnResized()
-
-				if connection2 then
-					connection2:disconnect()
+				if viewportSizeChangedConnection then
+					viewportSizeChangedConnection:disconnect()
 				end
 
-				connection2 = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(cameraViewportChanged)
+				viewportSizeChangedConnection = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(cameraViewportChanged)
 			end
 		end
 
-		Theme.viewportResized()
-		Utility:FireOnResized()
-
-		if connection2 then
-			connection2:disconnect()
-		end
-
-		connection2 = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(cameraViewportChanged)
+		onWorkspaceChanged("CurrentCamera") -- inferred equivalent call
 		workspace.Changed:Connect(onWorkspaceChanged)
 	end
-	local function resizeBottomBarButtons() -- line: 2215
-		-- upvalues: t3 (copy), t1 (copy)
-		local AbsoluteSizeX = t3.BottomButtonFrame.AbsoluteSize.X
-		local v383 = #t3.BottomBarButtons
 
-		if v383 == 4 then
-			AbsoluteSizeX = AbsoluteSizeX - 48 - 12
-			v383 -= 1
+	local function resizeBottomBarButtons()
+		local v18 = children.BottomButtonFrame.AbsoluteSize.X
+
+		local count = #children.BottomBarButtons
+
+		if count == 4 then
+			v18 = v18 - 48 - 12
+			count = 4 - 1
 		end
 
-		local v384 = (AbsoluteSizeX - (v383 - 1) * 12 - 12) / v383
+		local v19 = (v18 - (count - 1) * 12 - 12) / count
 
-		if t1.isInExperienceUIVREnabled then
-			v384 = t3.SettingsUIDelegate:getBottomButtonSize(v384)
+		if v3.isInExperienceUIVREnabled then
+			v19 = children.SettingsUIDelegate:getBottomButtonSize(v19)
 		end
 
-		for i = 1, #t3.BottomBarButtons do
-			local v386 = t3.BottomBarButtons[i]
-			local v387 = v386[1]
+		for i = 1, #children.BottomBarButtons do
+			local bottomBarButton = children.BottomBarButtons[i]
+			local v20 = bottomBarButton[1]
 
-			if v387 ~= "MuteButtonButton" then
-				t3[v387].Size = UDim2.fromOffset(v384, t3[v386[1]].Size.Y.Offset)
+			if v20 ~= "MuteButtonButton" then
+				children[v20].Size = UDim2.fromOffset(v19, children[bottomBarButton[1]].Size.Y.Offset)
 			end
 		end
 	end
-	local function onScreenSizeChanged() -- line: 2238
-		-- upvalues: t3 (copy), t1 (copy), Utility (copy), Theme (copy), v180 (copy), v181 (copy), RobloxGui (copy), v13 (copy), VRService (copy), RunService (copy), shouldShowBottomBar (copy), setBottomBarBindings (copy), setBottomBarSelection (copy), removeBottomBarBindings (copy)
-		local function getBackBarVisible() -- line: 2239
-			-- upvalues: t3 (copy)
-			if not t3.BackBarRef:getValue() then
-				return false
+
+	local function isSideSheetPairedWithPeoplePage() -- 6 equivalent calls inferred from this helper
+		return FFlagSideSheetOpenPeoplePage and getDidSideSheetOpenWithPeoplePage()
+	end
+
+	local function shouldAndroidBackUseSideSheet() -- 1 equivalent call inferred from this helper
+		return FFlagSideSheetOpenPeoplePage and (getSideSheetVisibility() or getHasRoomForPeoplePage())
+	end
+
+	local function shouldUseSideSheetPeoplePageLayout() -- 8 equivalent calls inferred from this helper
+		return isSideSheetPairedWithPeoplePage() and getSideSheetVisibility() and getIsPeoplePageOpen() -- inferred equivalent call
+	end
+
+	local function shouldShowSettingsHubModal() -- 2 equivalent calls inferred from this helper
+		return children.Visible and not shouldUseSideSheetPeoplePageLayout() -- inferred equivalent call
+	end
+
+	local function getShieldOpenTweenTime(p: number) -- 2 equivalent calls inferred from this helper
+		if isSideSheetPairedWithPeoplePage() and getSideSheetVisibility() then -- inferred equivalent call
+			return getSideSheetAnimationDuration()
+		end
+
+		return p
+	end
+
+	local function shouldCloseShieldWithSideSheet(flag: boolean?) -- 3 equivalent calls inferred from this helper
+		if flag == nil then
+			return shouldUseSideSheetPeoplePageLayout() -- inferred equivalent call
+		end
+
+		return flag
+	end
+
+	local function getShieldCloseTweenTime(p: number, flag: boolean?) -- 1 equivalent call inferred from this helper
+		flag = shouldCloseShieldWithSideSheet(flag) -- inferred equivalent call
+
+		if flag then
+			return getSideSheetAnimationDuration()
+		end
+
+		return p
+	end
+
+	local function getSideSheetMenuInset() -- 4 equivalent calls inferred from this helper
+		if shouldUseSideSheetPeoplePageLayout() then -- inferred equivalent call
+			return getSideSheetDrawerWidth()
+		end
+
+		return 0
+	end
+
+	local function constrainMenuWidthForSideSheet(p: number) -- 4 equivalent calls inferred from this helper
+		local sideSheetMenuInset = getSideSheetMenuInset() -- inferred equivalent call
+
+		if sideSheetMenuInset <= 0 then
+			return p
+		end
+
+		local hubPadding = Theme.HubPadding()
+		return (math.max(
+			150,
+			(math.min(
+				p,
+				(getSideSheetMenuPageWidth(
+					RobloxGui.AbsoluteSize.X,
+					sideSheetMenuInset,
+					hubPadding.PaddingLeft.Offset + hubPadding.PaddingRight.Offset
+				))
+			))
+		))
+	end
+
+	local function getSideSheetMenuReservedHeight(p: number, p2: number) -- 1 equivalent call inferred from this helper
+		local hubPadding = Theme.HubPadding()
+		return p + hubPadding.PaddingTop.Offset + hubPadding.PaddingBottom.Offset + p2
+	end
+
+	local function applySideSheetLayoutToMenuContainer(udim3: UDim2, vector2: Vector2)
+		local sideSheetMenuInset = getSideSheetMenuInset() -- inferred equivalent call
+
+		if sideSheetMenuInset <= 0 then
+			return udim3, vector2
+		end
+
+		local halfSideSheetMenuInset = sideSheetMenuInset / 2
+
+		return UDim2.new(udim3.X.Scale, udim3.X.Offset + halfSideSheetMenuInset, 0.5, 0), Vector2.new(vector2.X, 0.5)
+	end
+
+	local function onScreenSizeChanged()
+		if
+			FFlagClosePeoplePageWhenNoRoomBesideSideSheet
+			and shouldUseSideSheetPeoplePageLayout() -- inferred equivalent call
+			and closePeoplePageWhenNoRoomBesideSideSheet(RobloxGui.AbsoluteSize.X)
+		then
+			return
+		end
+
+		local function getBackBarVisible() -- 2 equivalent calls inferred from this helper
+			if children.BackBarRef:getValue() then
+				return children.BackBarRef:getValue().Visible
 			end
 
-			return t3.BackBarRef:getValue().Visible
+			return false
 		end
-		local function getFrontBarVisible() -- line: 2246
-			-- upvalues: t3 (copy)
-			if not t3.FrontBarRef:getValue() then
-				return false
+
+		local function getFrontBarVisible() -- 2 equivalent calls inferred from this helper
+			if children.FrontBarRef:getValue() then
+				return children.FrontBarRef:getValue().Visible
 			end
 
-			return t3.FrontBarRef:getValue().Visible
+			return false
 		end
 
-		if t1.FFlagRelocateMobileMenuButtons and (t1.FIntRelocateMobileMenuButtonsVariant == 2 and t3.Visible) then
-			if not Utility:IsPortrait() and not Utility:IsSmallTouchScreen() or Theme.AlwaysShowBottomBar() then
-				if not t3.BottomButtonFrameRoot then
-					v180()
+		if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant == 2 and children.Visible then
+			if (Utility:IsPortrait() or Utility:IsSmallTouchScreen()) and not Theme.AlwaysShowBottomBar() then
+				if children.BottomButtonFrameRoot then
+					fn2()
 				end
 
-				if t3.PlayersPage then
-					t3.PlayersPage:UnmountMenuButtonsContainer()
+				if children.PlayersPage then
+					children.PlayersPage:CreateMenuButtonsContainer()
 				end
 			else
-				if t3.BottomButtonFrameRoot then
-					v181()
+				if not children.BottomButtonFrameRoot then
+					fn()
 				end
 
-				if t3.PlayersPage then
-					t3.PlayersPage:CreateMenuButtonsContainer()
+				if children.PlayersPage then
+					children.PlayersPage:UnmountMenuButtonsContainer()
 				end
 			end
 		end
 
-		local v390 = Theme.MenuContainerPosition(t3.SettingsUIDelegate)
-		local n2 = 600
-		local v392 = if not t1.isInExperienceUIVREnabled then RobloxGui.AbsoluteSize.y else t3.SettingsUIDelegate:getFullScreenSize()
-		local v393 = 0.050000000000000044 * v392
-		local v394 = Utility:IsPortrait()
+		local menuContainerPosition = Theme.MenuContainerPosition(children.SettingsUIDelegate)
+		local v18 = 600
+		local v19
 
-		if v13 then
-			n2 = 800
-			v393 = 0.07 * v392
-		elseif Utility:IsSmallTouchScreen() then
-			v393 = math.min(10, 0.010000000000000009 * v392)
-		elseif t1.isInExperienceUIVREnabled and VRService.VREnabled then
-			v393 = 0
-		end
-
-		t3.MenuContainer.Size = v390.Size
-		t3.MenuContainer.Position = v390.Position
-		t3.MenuContainer.AnchorPoint = v390.AnchorPoint
-
-		local YOffset = t3.HubBar.Size.Y.Offset
-		local _ = v393 * 2 + YOffset * 2
-		local n3 = 0
-
-		if not t1.FFlagAddTraversalBackButton then
-			if ((if t3.BackBarRef:getValue() then t3.BackBarRef:getValue().Visible else false)) and t3.BackBarRef:getValue() then
-				n3 = t3.BackBarRef:getValue().Size.Y.Offset
-			end
-
-			if t1.EngineFeatureTeleportHistoryButtons and (if t3.FrontBarRef:getValue() then t3.FrontBarRef:getValue().Visible else false) and t3.FrontBarRef:getValue() then
-				n3 += t3.FrontBarRef:getValue().Size.Y.Offset
-			end
-		end
-
-		if v394 then
-			t3.HubBar.Position = UDim2.new(0.5, 0, 0, 10)
-			t3.HubBar.Size = UDim2.new(0, RobloxGui.AbsoluteSize.X - 40, 0, 54)
-		elseif v13 then
-			t3.HubBar.Size = UDim2.new(0, 1200, 0, 100)
-		elseif Utility:IsSmallTouchScreen() then
-			t3.HubBar.Size = UDim2.new(0, RobloxGui.AbsoluteSize.X - 60, 0, 52)
-		elseif t1.isInExperienceUIVREnabled then
-			t3.HubBar.Size = UDim2.new(0, t3.SettingsUIDelegate:getHubBarSize(), 0, 60)
+		if v3.isInExperienceUIVREnabled then
+			v19 = children.SettingsUIDelegate:getFullScreenSize()
 		else
-			t3.HubBar.Size = UDim2.new(0, 800, 0, 60)
+			v19 = RobloxGui.AbsoluteSize.y
 		end
 
-		local v398 = if not t1.FFlagEnableSideSheet and Theme.AlwaysShowBottomBar() then t3.HubBar.Size.Y.Offset + t3.BottomButtonFrame.Size.Y.Offset else t3.HubBar.Size.Y.Offset
-		local v399 = v393 * 2 + if t1.FFlagFixDisableTopPaddingError and t3.Pages.CurrentPage == nil or not t3.Pages.CurrentPage.DisableTopPadding then v398 else 0
+		local v20 = 0.050000000000000044 * v19
+		local isPortrait = Utility:IsPortrait()
 
-		if not t1.FFlagAddTraversalBackButton then
-			n3 = (not (if t3.BackBarRef:getValue() then t3.BackBarRef:getValue().Visible else false) or not t3.BackBarRef:getValue()) and 0 or t3.BackBarRef:getValue().Size.Y.Offset
+		if v then
+			v20 = 0.07 * v19
+			v18 = 800
+		elseif Utility:IsSmallTouchScreen() then
+			v20 = math.min(10, 0.010000000000000009 * v19)
+		elseif v3.isInExperienceUIVREnabled and VRService.VREnabled then
+			v20 = 0
+		end
 
-			if t1.EngineFeatureTeleportHistoryButtons and (if t3.FrontBarRef:getValue() then t3.FrontBarRef:getValue().Visible else false) and t3.FrontBarRef:getValue() then
-				n3 += t3.FrontBarRef:getValue().Size.Y.Offset
+		local position = menuContainerPosition.Position
+		local anchorPoint = menuContainerPosition.AnchorPoint
+		local sideSheetMenuInset = getSideSheetMenuInset() -- inferred equivalent call
+
+		if not (sideSheetMenuInset <= 0) then
+			local halfSideSheetMenuInset = sideSheetMenuInset / 2
+
+			position = UDim2.new(position.X.Scale, position.X.Offset + halfSideSheetMenuInset, 0.5, 0)
+			anchorPoint = Vector2.new(anchorPoint.X, 0.5)
+		end
+
+		children.MenuContainer.Size = menuContainerPosition.Size
+		children.MenuContainer.Position = position
+		children.MenuContainer.AnchorPoint = anchorPoint
+
+		local offset = children.HubBar.Size.Y.Offset
+		local _ = v20 * 2 + offset * 2
+
+		local v21 = 0
+
+		if not v3.FFlagAddTraversalBackButton then
+			if getBackBarVisible() and children.BackBarRef:getValue() then -- inferred equivalent call
+				v21 = children.BackBarRef:getValue().Size.Y.Offset
+			end
+
+			if v3.EngineFeatureTeleportHistoryButtons and getFrontBarVisible() and children.FrontBarRef:getValue() then -- inferred equivalent call
+				v21 += children.FrontBarRef:getValue().Size.Y.Offset
+			end
+		end
+
+		if isPortrait then
+			children.HubBar.Position = UDim2.new(0.5, 0, 0, 10)
+			local hubBar = children.HubBar
+			hubBar.Size = UDim2.new(0, constrainMenuWidthForSideSheet(RobloxGui.AbsoluteSize.X - 40), 0, 54) -- inferred equivalent call
+		elseif v then
+			children.HubBar.Size = UDim2.new(0, 1200, 0, 100)
+		elseif Utility:IsSmallTouchScreen() then
+			local hubBar = children.HubBar
+			hubBar.Size = UDim2.new(0, constrainMenuWidthForSideSheet(RobloxGui.AbsoluteSize.X - 60), 0, 52) -- inferred equivalent call
+		elseif v3.isInExperienceUIVREnabled then
+			local hubBar = children.HubBar
+			hubBar.Size = UDim2.new(
+				0,
+				constrainMenuWidthForSideSheet(children.SettingsUIDelegate:getHubBarSize()), -- inferred equivalent call
+				0,
+				60
+			)
+		else
+			local hubBar = children.HubBar
+			hubBar.Size = UDim2.new(0, constrainMenuWidthForSideSheet(800), 0, 60) -- inferred equivalent call
+		end
+
+		local v22
+
+		if isSideSheetEnabled or not Theme.AlwaysShowBottomBar() then
+			v22 = children.HubBar.Size.Y.Offset
+		else
+			v22 = children.HubBar.Size.Y.Offset + children.BottomButtonFrame.Size.Y.Offset
+		end
+
+		local v23 = v20 * 2
+		local v24
+
+		if v3.FFlagFixDisableTopPaddingError and children.Pages.CurrentPage == nil then
+			v24 = v22
+		else
+			v24 = children.Pages.CurrentPage.DisableTopPadding and 0 or v22
+		end
+
+		local v25 = v23 + v24
+
+		if not v3.FFlagAddTraversalBackButton then
+			v21 = not (getBackBarVisible() and children.BackBarRef:getValue()) and 0 -- inferred equivalent call
+				or children.BackBarRef:getValue().Size.Y.Offset
+
+			if v3.EngineFeatureTeleportHistoryButtons and getFrontBarVisible() and children.FrontBarRef:getValue() then -- inferred equivalent call
+				v21 += children.FrontBarRef:getValue().Size.Y.Offset
 			end
 		end
 
@@ -2472,94 +2803,230 @@ local function CreateSettingsHub() -- line: 385
 
 		if shouldShowBottomBar() then
 			setBottomBarBindings()
-
-			if t1.FFlagIEMFocusNavToButtons then
-				setBottomBarSelection(t3.Pages.CurrentPage)
-			end
+			setBottomBarSelection(children.Pages.CurrentPage)
 		else
 			removeBottomBarBindings()
 		end
 
-		if t1.isInExperienceUIVREnabled then
-			v399 += t3.SettingsUIDelegate:getMenuContainerExtraSpace()
+		if v3.isInExperienceUIVREnabled then
+			v25 += children.SettingsUIDelegate:getMenuContainerExtraSpace()
 		end
 
-		local v400 = v392 - v399 - n3
+		local v26 = v19 - v25 - v21
 
-		if t1.FFlagRelocateMobileMenuButtons and ((t1.FIntRelocateMobileMenuButtonsVariant == 1 or t1.FIntRelocateMobileMenuButtonsVariant == 3) and Utility:IsSmallTouchScreen()) then
-			v400 -= Theme.ExtraHubBottomPaddingMobile
+		if
+			v3.FFlagRelocateMobileMenuButtons
+			and (v3.FIntRelocateMobileMenuButtonsVariant == 1 or v3.FIntRelocateMobileMenuButtonsVariant == 3)
+			and Utility:IsSmallTouchScreen()
+		then
+			v26 -= Theme.ExtraHubBottomPaddingMobile
 		end
 
-		if not v394 then
-			if n2 < v400 then
-				t3.HubBar.Position = UDim2.new(t3.HubBar.Position.X.Scale, t3.HubBar.Position.X.Offset, 0.5, -n2 / 2 - t3.HubBar.Size.Y.Offset)
+		if shouldUseSideSheetPeoplePageLayout() then -- inferred equivalent call
+			v26 = getSideSheetMenuPageHeight(children.Shield.AbsoluteSize.Y, getSideSheetMenuReservedHeight(v22, v21)) -- inferred equivalent call
+		end
 
-				if t3.BottomButtonFrame then
-					t3.BottomButtonFrame.Position = UDim2.new(t3.BottomButtonFrame.Position.X.Scale, t3.BottomButtonFrame.Position.X.Offset, 0.5, n2 / 2)
-				end
-			elseif v400 < 150 then
-				n2 = 150
-				t3.HubBar.Position = UDim2.new(t3.HubBar.Position.X.Scale, t3.HubBar.Position.X.Offset, 0.5, -75 - t3.HubBar.Size.Y.Offset)
+		if FFlagSideSheetOpenPeoplePage then
+			local pageView = children.PageView
+			local verticalScrollBarInset
 
-				if t3.BottomButtonFrame then
-					t3.BottomButtonFrame.Position = UDim2.new(t3.BottomButtonFrame.Position.X.Scale, t3.BottomButtonFrame.Position.X.Offset, 0.5, 75)
-				end
+			if shouldUseSideSheetPeoplePageLayout() then -- inferred equivalent call
+				verticalScrollBarInset = Enum.ScrollBarInset.Always
 			else
-				n2 = v400
-				t3.HubBar.Position = UDim2.new(t3.HubBar.Position.X.Scale, t3.HubBar.Position.X.Offset, 0, v393)
+				verticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+			end
 
-				if t3.BottomButtonFrame then
-					t3.BottomButtonFrame.Position = UDim2.new(t3.BottomButtonFrame.Position.X.Scale, t3.BottomButtonFrame.Position.X.Offset, 1, -(v393 + v398))
-				end
+			pageView.VerticalScrollBarInset = verticalScrollBarInset
+		end
+
+		if isPortrait then
+			v18 = v26
+		elseif v18 < v26 then
+			children.HubBar.Position = UDim2.new(
+				children.HubBar.Position.X.Scale,
+				children.HubBar.Position.X.Offset,
+				0.5,
+				-v18 / 2 - children.HubBar.Size.Y.Offset
+			)
+
+			if children.BottomButtonFrame then
+				children.BottomButtonFrame.Position = UDim2.new(
+					children.BottomButtonFrame.Position.X.Scale,
+					children.BottomButtonFrame.Position.X.Offset,
+					0.5,
+					v18 / 2
+				)
+			end
+		elseif v26 < 150 then
+			v18 = 150
+			children.HubBar.Position = UDim2.new(
+				children.HubBar.Position.X.Scale,
+				children.HubBar.Position.X.Offset,
+				0.5,
+				-75 - children.HubBar.Size.Y.Offset
+			)
+
+			if children.BottomButtonFrame then
+				children.BottomButtonFrame.Position = UDim2.new(
+					children.BottomButtonFrame.Position.X.Scale,
+					children.BottomButtonFrame.Position.X.Offset,
+					0.5,
+					75
+				)
 			end
 		else
-			n2 = v400
+			children.HubBar.Position = UDim2.new(
+				children.HubBar.Position.X.Scale,
+				children.HubBar.Position.X.Offset,
+				0,
+				v20
+			)
+
+			if children.BottomButtonFrame then
+				children.BottomButtonFrame.Position = UDim2.new(
+					children.BottomButtonFrame.Position.X.Scale,
+					children.BottomButtonFrame.Position.X.Offset,
+					1,
+					-(v20 + v22)
+				)
+			end
+
+			v18 = v26
 		end
 
-		local v401 = if v13 then UDim2.new(0, t3.HubBar.AbsoluteSize.X, 0, n2) else if not Utility:IsSmallTouchScreen() then UDim2.new(0, t3.HubBar.AbsoluteSize.X, 0, n2) else if not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant ~= 1 and t1.FIntRelocateMobileMenuButtonsVariant ~= 3 then UDim2.new(0, t3.HubBar.AbsoluteSize.X, 0, n2 + 0 + 0) else UDim2.new(0, t3.HubBar.AbsoluteSize.X, 0, n2 + 0 + 0 - t3.BottomButtonFrame.Size.Y.Offset)
+		local udim3
 
-		if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 and t3.BottomButtonFrame then
-			t3.BottomButtonFrame.Size = UDim2.new(0, t3.HubBar.Size.X.Offset, 0, t3.HubBar.Size.Y.Offset)
+		if v then
+			udim3 = UDim2.new(0, children.HubBar.AbsoluteSize.X, 0, v18)
+		elseif Utility:IsSmallTouchScreen() then
+			if
+				v3.FFlagRelocateMobileMenuButtons
+				and (v3.FIntRelocateMobileMenuButtonsVariant == 1 or v3.FIntRelocateMobileMenuButtonsVariant == 3)
+			then
+				udim3 = UDim2.new(
+					0,
+					children.HubBar.AbsoluteSize.X,
+					0,
+					v18 + 0 + 0 - children.BottomButtonFrame.Size.Y.Offset
+				)
+			else
+				udim3 = UDim2.new(0, children.HubBar.AbsoluteSize.X, 0, v18 + 0 + 0)
+			end
+		else
+			udim3 = UDim2.new(0, children.HubBar.AbsoluteSize.X, 0, v18)
 		end
 
-		local v402 = Theme.HubPadding()
-		local v403 = v402.PaddingLeft.Offset + v402.PaddingRight.Offset
-		local v404 = v402.PaddingTop.Offset + v402.PaddingBottom.Offset
-
-		t3.ReactPage.Size = UDim2.new(0, t3.HubBar.AbsoluteSize.X + v403, 0, n2 + v398 + v404)
-		t3.PageViewClipper.Size = v401
-
-		if not v394 then
-			t3.PageViewClipper.Position = UDim2.new(t3.PageViewClipper.Position.X.Scale, t3.PageViewClipper.Position.X.Offset, 0.5, -n2 / 2)
-
-			return
+		if
+			v3.FFlagRelocateMobileMenuButtons
+			and v3.FIntRelocateMobileMenuButtonsVariant ~= 0
+			and children.BottomButtonFrame
+		then
+			children.BottomButtonFrame.Size = UDim2.new(
+				0,
+				children.HubBar.Size.X.Offset,
+				0,
+				children.HubBar.Size.Y.Offset
+			)
 		end
 
-		t3.PageViewClipper.Position = UDim2.new(0.5, 0, 0, t3.HubBar.Position.Y.Offset + t3.HubBar.AbsoluteSize.Y)
+		local hubPadding = Theme.HubPadding()
+		local v27 = hubPadding.PaddingLeft.Offset + hubPadding.PaddingRight.Offset
+		local v28 = hubPadding.PaddingTop.Offset + hubPadding.PaddingBottom.Offset
+		children.ReactPage.Size = UDim2.new(0, children.HubBar.AbsoluteSize.X + v27, 0, v18 + v22 + v28)
+
+		children.PageViewClipper.Size = udim3
+
+		if isPortrait then
+			children.PageViewClipper.Position = UDim2.new(
+				0.5,
+				0,
+				0,
+				children.HubBar.Position.Y.Offset + children.HubBar.AbsoluteSize.Y
+			)
+		else
+			children.PageViewClipper.Position = UDim2.new(
+				children.PageViewClipper.Position.X.Scale,
+				children.PageViewClipper.Position.X.Offset,
+				0.5,
+				-v18 / 2
+			)
+		end
 	end
-	local function onPreferredTransparencyChanged() -- line: 2490
-		-- upvalues: t3 (copy), Theme (copy), GuiService (copy)
-		t3.MenuContainer.BackgroundTransparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
-	end
-	local function toggleQuickProfilerFromHotkey(p43, p44, _) -- line: 2494
-		-- upvalues: UserInputService (copy), GameSettings (copy)
-		if not UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) and not UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
-			return
+
+	if FFlagSideSheetOpenPeoplePage then
+		local function scheduleSideSheetPeoplePageLayoutRefresh()
+			if isSideSheetPairedWithPeoplePage() and not getSideSheetVisibility() and getIsPeoplePageOpen() then -- inferred equivalent call
+				return
+			end
+
+			local selectionBehaviorLeft
+
+			if shouldUseSideSheetPeoplePageLayout() then -- inferred equivalent call
+				selectionBehaviorLeft = Enum.SelectionBehavior.Escape
+			else
+				selectionBehaviorLeft = Enum.SelectionBehavior.Stop
+			end
+
+			if children.Modal then
+				local modal = children.Modal
+				modal.Visible = shouldShowSettingsHubModal() -- inferred equivalent call
+			end
+
+			if children.Page then
+				children.Page.SelectionBehaviorLeft = selectionBehaviorLeft
+			end
+
+			if children.PageViewClipper then
+				children.PageViewClipper.SelectionBehaviorLeft = selectionBehaviorLeft
+			end
+
+			if children._sideSheetLayoutRefreshScheduled then
+				return
+			end
+
+			children._sideSheetLayoutRefreshScheduled = true
+			task.defer(function()
+				children._sideSheetLayoutRefreshScheduled = false
+
+				if children.Visible and children.MenuContainer then
+					onScreenSizeChanged()
+				end
+			end)
 		end
 
-		if p43 == "Show Quick Profiler" and p44 and p44 == Enum.UserInputState.Begin then
-			GameSettings.PerformanceStatsVisible = not GameSettings.PerformanceStatsVisible
+		children._sideSheetLayoutEffectDispose = Signals.createEffect(function(p)
+			getSideSheetVisibility(p)
+			getSideSheetDrawerWidth(p)
+			getIsPeoplePageOpen(p)
+			getDidSideSheetOpenWithPeoplePage(p)
+			scheduleSideSheetPeoplePageLayoutRefresh()
+		end)
+	end
+
+	local function onPreferredTransparencyChanged() -- 3 equivalent calls inferred from this helper
+		children.MenuContainer.BackgroundTransparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
+	end
+
+	local function toggleQuickProfilerFromHotkey(p, p2, _)
+		if
+			(UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl))
+			and p == "Show Quick Profiler"
+			and p2
+			and p2 == Enum.UserInputState.Begin
+		then
+			gameSettings.PerformanceStatsVisible = not gameSettings.PerformanceStatsVisible
 		end
 	end
-	local function toggleDevConsole(p46, p47, _) -- line: 2510
-		-- upvalues: DevConsoleMaster (copy)
-		if p46 == "Open Dev Console" and (p47 and p47 == Enum.UserInputState.Begin) then
+
+	local function toggleDevConsole(p, p2, _)
+		if p == "Open Dev Console" and p2 and p2 == Enum.UserInputState.Begin then
 			DevConsoleMaster:ToggleVisibility()
 		end
 	end
 
-	local u188 = v13
-	local t5 = {
+	local v18 = isEnabled
+
+	local v19 = {
 		[Enum.UserInputType.Gamepad1] = true,
 		[Enum.UserInputType.Gamepad2] = true,
 		[Enum.UserInputType.Gamepad3] = true,
@@ -2574,128 +3041,102 @@ local function CreateSettingsHub() -- line: 385
 		[Enum.UserInputType.MouseButton2] = false
 	}
 
-	UserInputService.InputBegan:connect(function(p49) -- line: 2536
-		-- upvalues: t5 (copy), u188 (ref)
-		if p49.UserInputType and t5[p49.UserInputType] ~= nil then
-			u188 = t5[p49.UserInputType]
-
-			return
-		end
-
-		if p49.KeyCode and t5[p49.KeyCode] then
-			u188 = t5[p49.KeyCode]
+	UserInputService.InputBegan:connect(function(p)
+		if p.UserInputType and v19[p.UserInputType] ~= nil then
+			v18 = v19[p.UserInputType]
+		elseif p.KeyCode and v19[p.KeyCode] then
+			v18 = v19[p.KeyCode]
 		end
 	end)
-	UserInputService.InputChanged:connect(function(p50) -- line: 2543
-		-- upvalues: u188 (ref)
-		if p50.KeyCode == Enum.KeyCode.Thumbstick1 or p50.KeyCode == Enum.KeyCode.Thumbstick2 then
-			if p50.Position.magnitude >= 0.25 then
-				u188 = true
-
-				return
+	UserInputService.InputChanged:connect(function(data)
+		if data.KeyCode == Enum.KeyCode.Thumbstick1 or data.KeyCode == Enum.KeyCode.Thumbstick2 then
+			if data.Position.magnitude >= 0.25 then
+				v18 = true
 			end
-		elseif p50.UserInputType == Enum.UserInputType.Touch or p50.UserInputType == Enum.UserInputType.MouseMovement then
-			u188 = false
+		elseif
+			data.UserInputType == Enum.UserInputType.Touch
+			or data.UserInputType == Enum.UserInputType.MouseMovement
+		then
+			v18 = false
 		end
 	end)
 
-	local GetHeaderPosition = nil
+	local GetHeaderPosition
 
-	local function v191(p51, p52) -- line: 2555
-		-- upvalues: t1 (copy), t3 (copy), GetHeaderPosition (ref)
-		if t1.FFlagInExperienceReportClosingBugfix and not t3.HubBar.Visible then
+	local function fn3(p, p2)
+		if v3.FFlagInExperienceReportClosingBugfix and not children.HubBar.Visible then
 			return
 		end
 
-		local v415 = GetHeaderPosition(t3.Pages.CurrentPage)
+		local headerPosition = GetHeaderPosition(children.Pages.CurrentPage)
 
-		if v415 < 0 then
+		if headerPosition < 0 then
 			return
 		end
 
-		local v416 = v415 + p51
+		local v20 = headerPosition + p
 
-		if p52 then
-			if v416 > #t3.TabHeaders then
-				v416 = 1
-			elseif v416 < 1 then
-				v416 = #t3.TabHeaders
-			end
+		if p2 then
+			v20 = #children.TabHeaders < v20 and 1 or v20 < 1 and #children.TabHeaders or v20
 		end
 
-		local v417 = t3.TabHeaders[v416]
+		local tabHeader = children.TabHeaders[v20]
 
-		if v417 then
-			for k, _ in pairs(t3.Pages.PageTable) do
-				if v417 == k:GetTabHeader() then
-					t3:SwitchToPage(k, true, p51)
-
+		if tabHeader then
+			for k, _ in pairs(children.Pages.PageTable) do
+				if k:GetTabHeader() == tabHeader then
+					children:SwitchToPage(k, true, p)
 					return
 				end
 			end
 		end
 	end
-	local function v192(_, p54, p55) -- line: 2582
-		-- upvalues: v191 (copy)
-		if p54 ~= Enum.UserInputState.Begin then
+
+	local function fn4(_, p, p2)
+		if p ~= Enum.UserInputState.Begin then
 			return
 		end
 
-		local n4 = 0
-
-		if p55.KeyCode == Enum.KeyCode.ButtonR1 then
-			n4 = 1
-		elseif p55.KeyCode == Enum.KeyCode.ButtonL1 then
-			n4 = -1
-		end
-
-		v191(n4, true)
+		fn3(p2.KeyCode == Enum.KeyCode.ButtonR1 and 1 or p2.KeyCode == Enum.KeyCode.ButtonL1 and -1 or 0, true)
 	end
-	local function v193(p56) -- line: 2595
-		-- upvalues: UserInputService (copy), v191 (copy)
-		if p56.KeyCode == Enum.KeyCode.Tab then
-			local v425 = not UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) and not UserInputService:IsKeyDown(Enum.KeyCode.RightShift) and 1 or -1
 
-			v191(v425, true)
+	local function fn5(p)
+		if p.KeyCode == Enum.KeyCode.Tab then
+			fn3(
+				(UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)) and -1 or 1,
+				true
+			)
 		end
 	end
-	local function v194(_, p58, p59) -- line: 2608
-		-- upvalues: t3 (copy)
-		if p58 ~= Enum.UserInputState.Begin then
+
+	local function fn6(_, p, p2)
+		if p ~= Enum.UserInputState.Begin then
 			return
 		end
 
-		local n5 = 0
-
-		if p59.KeyCode == Enum.KeyCode.PageUp then
-			n5 = -100
-		elseif p59.KeyCode == Enum.KeyCode.PageDown then
-			n5 = 100
-		end
-
-		t3:ScrollPixels(n5)
+		children:ScrollPixels(p2.KeyCode == Enum.KeyCode.PageUp and -100 or p2.KeyCode == Enum.KeyCode.PageDown and 100 or 0)
 	end
 
-	if t1.isInExperienceUIVREnabled or t1.FFlagEnableSettingsHubUIDelegateRollout then
-		t3.SettingsUIDelegate = require(RobloxGui.Modules.Settings.SettingsUIDelegate).new(t3)
+	if v3.isInExperienceUIVREnabled or v3.FFlagEnableSettingsHubUIDelegateRollout then
+		local SettingsUIDelegate = require(RobloxGui.Modules.Settings.SettingsUIDelegate)
+		children.SettingsUIDelegate = SettingsUIDelegate.new(children)
 	end
 
 	createGui()
 
-	if v107 then
+	if defineFastFlag then
 		setupVoiceListeners()
 	end
 
-	function GetHeaderPosition(p60) -- line: 2632
-		-- upvalues: t3 (copy)
-		local TabHeader = p60:GetTabHeader()
+	GetHeaderPosition = function(currentPage)
+		local tabHeader = currentPage:GetTabHeader()
 
-		if not TabHeader then
+		if not tabHeader then
 			return -1
 		end
 
-		for k, v in pairs(t3.TabHeaders) do
-			if v == TabHeader then
+		for k, tabHeader2 in pairs(children.TabHeaders) do
+			if tabHeader2 == tabHeader then
 				return k
 			end
 		end
@@ -2703,847 +3144,808 @@ local function CreateSettingsHub() -- line: 385
 		return -1
 	end
 
-	local function u195(p61, p62) -- line: 2646
-		-- upvalues: u195 (ref)
-		if p62:IsA("GuiObject") then
-			p62.ZIndex = p61
+	local function fn7(zIndex, guiObject)
+		if guiObject:IsA("GuiObject") then
+			guiObject.ZIndex = zIndex
+			local children2 = guiObject:GetChildren()
 
-			local children = p62:GetChildren()
-
-			for i = 1, #children do
-				u195(p61, children[i])
+			for i = 1, #children2 do
+				fn7(zIndex, children2[i])
 			end
 		end
 	end
-	local function AddHeader(p63, p64) -- line: 2656
-		-- upvalues: t3 (copy), u195 (ref)
-		if not p63 then
+
+	local function AddHeader(tabHeader, object)
+		if not tabHeader then
 			return
 		end
 
-		table.insert(t3.TabHeaders, p63)
-		p64.TabPosition = #t3.TabHeaders
+		table.insert(children.TabHeaders, tabHeader)
+		object.TabPosition = #children.TabHeaders
 
-		local v440 = 1 / #t3.TabHeaders
+		local v20 = 1 / #children.TabHeaders
 
-		for i = 1, #t3.TabHeaders do
-			t3.TabHeaders[i].Size = UDim2.new(v440, 0, 1, 0)
+		for i = 1, #children.TabHeaders do
+			children.TabHeaders[i].Size = UDim2.new(v20, 0, 1, 0)
 		end
 
-		u195(3, p63)
-		p63.Parent = t3.HubBarContainer
+		fn7(3, tabHeader)
+		tabHeader.Parent = children.HubBarContainer
 	end
-	local function RemoveHeader(p65) -- line: 2672
-		-- upvalues: t3 (copy)
-		local v443 = nil
 
-		for i = 1, #t3.TabHeaders do
-			if p65 == t3.TabHeaders[i] then
-				v443 = i
-				table.remove(t3.TabHeaders, i)
+	local function RemoveHeader(tabHeader)
+		local v20 = nil
 
+		for i = 1, #children.TabHeaders do
+			if children.TabHeaders[i] == tabHeader then
+				table.remove(children.TabHeaders, i)
+				v20 = i
 				break
 			end
 		end
 
-		if v443 then
-			for i = v443, #t3.TabHeaders do
-				local v446 = t3.TabHeaders[i]
-
-				v446.Position = UDim2.new(v446.Position.X.Scale, v446.Position.X.Offset - p65.AbsoluteSize.X, v446.Position.Y.Scale, v446.Position.Y.Offset)
+		if v20 then
+			for i = v20, #children.TabHeaders do
+				local tabHeader2 = children.TabHeaders[i]
+				tabHeader2.Position = UDim2.new(
+					tabHeader2.Position.X.Scale,
+					tabHeader2.Position.X.Offset - tabHeader.AbsoluteSize.X,
+					tabHeader2.Position.Y.Scale,
+					tabHeader2.Position.Y.Offset
+				)
 			end
 		end
 
-		p65.Parent = nil
+		tabHeader.Parent = nil
 	end
 
-	function t3.AddPage(_, p67) -- line: 2695
-		-- upvalues: t3 (copy), AddHeader (copy), t1 (copy), setBottomBarSelection (copy)
-		t3.Pages.PageTable[p67] = true
-		AddHeader(p67:GetTabHeader(), p67)
-		p67.Page.Position = UDim2.new(p67.TabPosition - 1, 0, 0, 0)
+	function children:AddPage(object)
+		children.Pages.PageTable[object] = true
+		AddHeader(object:GetTabHeader(), object)
+		object.Page.Position = UDim2.new(object.TabPosition - 1, 0, 0, 0)
+		object.LastSelectableObjectsUpdated:connect(function()
+			setBottomBarSelection(object)
+		end)
 
-		if t1.FFlagIEMFocusNavToButtons then
-			p67.LastSelectableObjectsUpdated:connect(function() -- line: 2700
-				-- upvalues: setBottomBarSelection (copy), p67 (copy)
-				setBottomBarSelection(p67)
-			end)
-		end
-
-		if t1.FFlagIEMTabFocusNav then
-			if t1.FFlagIEMTabFocusNav then
-				local TabHeader = p67:GetTabHeader()
-
-				if TabHeader then
-					for _, v451 in p67.FirstSelectableObjects do
-						v451.NextSelectionUp = TabHeader
-						TabHeader.NextSelectionDown = v451
-					end
-				end
-			end
-
-			if t1.FFlagIEMTabFocusNav then
-				for _, v453 in t3.TabHeaders do
-					v453.NextSelectionLeft = nil
-					v453.NextSelectionRight = nil
-				end
-
-				local v454 = #t3.TabHeaders
-
-				if not (v454 < 2) then
-					t3.TabHeaders[1].NextSelectionLeft = t3.TabHeaders[v454]
-					t3.TabHeaders[v454].NextSelectionRight = t3.TabHeaders[1]
-				end
-			end
-
-			p67.FirstSelectableObjectsUpdated:connect(function() -- line: 2707
-				-- upvalues: p67 (copy), t1 (copy)
-				local v663 = p67
-
-				if not t1.FFlagIEMTabFocusNav then
-					return
-				end
-
-				local TabHeader = v663:GetTabHeader()
-
-				if not TabHeader then
-					return
-				end
-
-				for _, v666 in v663.FirstSelectableObjects do
-					v666.NextSelectionUp = TabHeader
-					TabHeader.NextSelectionDown = v666
-				end
+		if v3.FFlagIEMTabFocusNav then
+			setTabHeaderSelection(object) -- inferred equivalent call
+			updateTabHeaderWrapping() -- inferred equivalent call
+			object.FirstSelectableObjectsUpdated:connect(function()
+				setTabHeaderSelection(object) -- inferred equivalent call
 			end)
 		end
 	end
-	function t3.RemovePage(_, p69) -- line: 2713
-		-- upvalues: t3 (copy), RemoveHeader (copy), t1 (copy)
-		t3.Pages.PageTable[p69] = nil
-		RemoveHeader(p69:GetTabHeader())
 
-		if t1.FFlagIEMFocusNavToButtons then
-			p69.LastSelectableObjectsUpdated:disconnect()
-		end
+	function children.RemovePage(_, object)
+		children.Pages.PageTable[object] = nil
+		RemoveHeader(object:GetTabHeader())
+		object.LastSelectableObjectsUpdated:disconnect()
 
-		if t1.FFlagIEMTabFocusNav then
-			p69.FirstSelectableObjectsUpdated:disconnect()
-
-			if not t1.FFlagIEMTabFocusNav then
-				return
-			end
-
-			for _, v458 in t3.TabHeaders do
-				v458.NextSelectionLeft = nil
-				v458.NextSelectionRight = nil
-			end
-
-			local v459 = #t3.TabHeaders
-
-			if v459 < 2 then
-				return
-			end
-
-			t3.TabHeaders[1].NextSelectionLeft = t3.TabHeaders[v459]
-			t3.TabHeaders[v459].NextSelectionRight = t3.TabHeaders[1]
+		if v3.FFlagIEMTabFocusNav then
+			object.FirstSelectableObjectsUpdated:disconnect()
+			updateTabHeaderWrapping() -- inferred equivalent call
 		end
 	end
-	function t3.HideBar(_) -- line: 2725
-		-- upvalues: t3 (copy), removeBottomBarBindings (copy)
-		t3.HubBar.Visible = false
-		t3.PageViewClipper.Visible = false
 
-		if t3.BottomButtonFrame then
+	function children.HideBar(_)
+		children.HubBar.Visible = false
+		children.PageViewClipper.Visible = false
+
+		if children.BottomButtonFrame then
 			removeBottomBarBindings()
 		end
 	end
-	function t3.ShowBar(_) -- line: 2733
-		-- upvalues: t3 (copy), shouldShowBottomBar (copy), setBottomBarBindings (copy), t1 (copy), setBottomBarSelection (copy)
-		t3.HubBar.Visible = true
-		t3.PageViewClipper.Visible = true
 
-		if t3.BottomButtonFrame and shouldShowBottomBar() then
+	function children.ShowBar(_)
+		children.HubBar.Visible = true
+		children.PageViewClipper.Visible = true
+
+		if children.BottomButtonFrame and shouldShowBottomBar() then
 			setBottomBarBindings()
+			setBottomBarSelection(children.Pages.CurrentPage)
+		end
+	end
 
-			if t1.FFlagIEMFocusNavToButtons then
-				setBottomBarSelection(t3.Pages.CurrentPage)
+	function children:ScrollPixels(p)
+		local y = children.PageView.CanvasPosition.Y
+		local v20 = children.PageView.CanvasSize.Y.Offset - children.PageViewClipper.AbsoluteSize.y
+		local v21 = math.max(0, (math.min(y + p, v20)))
+		children.PageView.CanvasPosition = Vector2.new(0, v21)
+	end
+
+	function children.ScrollToFrame(_, p, p2)
+		if v18 or p2 then
+			local v20 = p.AbsolutePosition.y - children.Pages.CurrentPage.Page.AbsolutePosition.y
+			local v21 = v20 + p.AbsoluteSize.y
+
+			if v20 < children.PageView.CanvasPosition.y then
+				children.PageView.CanvasPosition = Vector2.new(0, v20)
+			elseif
+				children.Pages.CurrentPage.Page.Name == Constants.PeoplePageKey
+				and v21 - children.PageView.CanvasPosition.y > children.PageView.AbsoluteSize.Y - Constants.PeoplePageScrollBuffer
+			then
+				children.PageView.CanvasPosition = Vector2.new(
+					0,
+					v21 - children.PageView.AbsoluteSize.Y + Constants.PeoplePageScrollBuffer
+				)
+			elseif v21 - children.PageView.CanvasPosition.y > children.PageViewClipper.Size.Y.Offset then
+				children.PageView.CanvasPosition = Vector2.new(0, v21 - children.PageViewClipper.Size.Y.Offset)
 			end
 		end
 	end
-	function t3.ScrollPixels(_, p73) -- line: 2744
-		-- upvalues: t3 (copy)
-		local CanvasPositionY = t3.PageView.CanvasPosition.Y
-		local v465 = t3.PageView.CanvasSize.Y.Offset - t3.PageViewClipper.AbsoluteSize.y
-		local v466 = math.max(0, (math.min(CanvasPositionY + p73, v465)))
 
-		t3.PageView.CanvasPosition = Vector2.new(0, v466)
-	end
-	function t3.ScrollToFrame(_, p75, p76) -- line: 2752
-		-- upvalues: u188 (ref), t3 (copy), Constants (copy)
-		if u188 or p76 then
-			local v470 = p75.AbsolutePosition.y - t3.Pages.CurrentPage.Page.AbsolutePosition.y
-			local v471 = v470 + p75.AbsoluteSize.y
+	function children:GetFirstPageWithTabHeader()
+		local v20 = nil
 
-			if v470 < t3.PageView.CanvasPosition.y then
-				t3.PageView.CanvasPosition = Vector2.new(0, v470)
-
-				return
-			end
-
-			if t3.Pages.CurrentPage.Page.Name == Constants.PeoplePageKey and v471 - t3.PageView.CanvasPosition.y > t3.PageView.AbsoluteSize.Y - Constants.PeoplePageScrollBuffer then
-				t3.PageView.CanvasPosition = Vector2.new(0, v471 - t3.PageView.AbsoluteSize.Y + Constants.PeoplePageScrollBuffer)
-
-				return
-			end
-
-			if v471 - t3.PageView.CanvasPosition.y > t3.PageViewClipper.Size.Y.Offset then
-				t3.PageView.CanvasPosition = Vector2.new(0, v471 - t3.PageViewClipper.Size.Y.Offset)
-			end
-		end
-	end
-	function t3.GetFirstPageWithTabHeader(_) -- line: 2767
-		-- upvalues: t3 (copy)
-		local v473 = nil
-
-		for k, _ in pairs(t3.Pages.PageTable) do
+		for k, _ in pairs(children.Pages.PageTable) do
 			if k:GetTabHeader() ~= nil and k.TabPosition == 1 then
-				v473 = k
-
+				v20 = k
 				break
 			end
 		end
 
-		if v473 == nil then
-			error("No page with tab header found")
-
-			return nil
+		if v20 ~= nil then
+			return v20
 		end
 
-		return v473
+		error("No page with tab header found")
+		return nil
 	end
-	function t3.InitInPage(_, p79) -- line: 2786
-		-- upvalues: t3 (copy), t1 (copy), Utility (copy), shouldShowBottomBar (copy), setBottomBarBindings (copy), setBottomBarSelection (copy), u147 (ref)
-		local TabPosition = p79.TabPosition
 
-		for k, _ in pairs(t3.Pages.PageTable) do
-			if k ~= p79 then
-				k:Hide(-1, TabPosition, true, nil, t3.PageViewInnerFrame)
+	function children:InitInPage(currentPage)
+		local tabPosition = currentPage.TabPosition
+
+		for k, _ in pairs(children.Pages.PageTable) do
+			if k ~= currentPage then
+				k:Hide(-1, tabPosition, true, nil, children.PageViewInnerFrame)
 			end
 		end
 
-		if (not t1.FFlagRelocateMobileMenuButtons or t1.FIntRelocateMobileMenuButtonsVariant == 0 or t1.FIntRelocateMobileMenuButtonsVariant == 2 and Utility:IsSmallTouchScreen()) and t3.BottomButtonFrame then
-			if shouldShowBottomBar(p79) then
+		if
+			(not v3.FFlagRelocateMobileMenuButtons or v3.FIntRelocateMobileMenuButtonsVariant == 0 or v3.FIntRelocateMobileMenuButtonsVariant == 2 and Utility:IsSmallTouchScreen())
+			and children.BottomButtonFrame
+		then
+			if shouldShowBottomBar(currentPage) then
 				setBottomBarBindings()
-
-				if t1.FFlagIEMFocusNavToButtons then
-					setBottomBarSelection(p79)
-				end
+				setBottomBarSelection(currentPage)
 			else
-				t3.BottomButtonFrame.Visible = false
+				children.BottomButtonFrame.Visible = false
 			end
 
-			local HubBar = t3.HubBar
-			local v482 = p79 or t3.Pages.CurrentPage
-
-			HubBar.Visible = if not t1.FFlagEnableSideSheet then v482.ShouldShowBottomBar == true else v482.ShouldShowHubBar == true
+			local hubBar = children.HubBar
+			hubBar.Visible = shouldShowHubBar(currentPage) -- inferred equivalent call
 		end
 
-		local v483 = p79.IsPageClipped == true
+		local isPageClipped = currentPage.IsPageClipped == true
+		children.PageViewClipper.ClipsDescendants = isPageClipped
+		children.PageView.ClipsDescendants = isPageClipped
 
-		t3.PageViewClipper.ClipsDescendants = v483
-		t3.PageView.ClipsDescendants = v483
-		t3.PageViewInnerFrame.ClipsDescendants = v483
-		t3.Pages.CurrentPage = p79
-		t3.Pages.CurrentPage.Active = true
-		t3.CurrentPageSignal:fire(t3.Pages.CurrentPage and t3.Pages.CurrentPage.Page.Name or nil)
+		children.PageViewInnerFrame.ClipsDescendants = isPageClipped
 
-		if t1.FFlagEnableSideSheet then
-			local CurrentPage = t3.Pages.CurrentPage
-			local v485 = CurrentPage or t3.Pages.CurrentPage
+		children.Pages.CurrentPage = currentPage
+		children.Pages.CurrentPage.Active = true
+		children.CurrentPageSignal:fire(children.Pages.CurrentPage and children.Pages.CurrentPage.Page.Name or nil)
 
-			if not (if not t1.FFlagEnableSideSheet then v485.ShouldShowBottomBar == true else v485.ShouldShowHubBar == true) or not CurrentPage.TabHeader then
-				t3.PageTitleLabel.Text = ""
-			else
-				t3.PageTitleLabel.Text = CurrentPage.TabHeader.TabLabel.Title.Text
-			end
+		if isSideSheetEnabled then
+			updatePageTitleHeader(children.Pages.CurrentPage) -- inferred equivalent call
 		end
 
-		local Size = t3.Pages.CurrentPage:GetSize()
+		local size = children.Pages.CurrentPage:GetSize()
+		children.PageView.CanvasSize = UDim2.new(0, 0, 0, size.Y)
 
-		t3.PageView.CanvasSize = UDim2.new(0, 0, 0, Size.Y)
-		u147 = t3.Pages.CurrentPage.Page.Changed:connect(function(p80) -- line: 2829
-			-- upvalues: t3 (copy)
-			if p80 == "AbsoluteSize" then
-				local Size2 = t3.Pages.CurrentPage:GetSize()
-
-				t3.PageView.CanvasSize = UDim2.new(0, 0, 0, Size2.Y)
+		changedConnection = children.Pages.CurrentPage.Page.Changed:connect(function(p)
+			if p == "AbsoluteSize" then
+				local size2 = children.Pages.CurrentPage:GetSize()
+				children.PageView.CanvasSize = UDim2.new(0, 0, 0, size2.Y)
 			end
 		end)
 	end
-	function t3.SwitchToPage(_, p82, p83, p84, p85, _, p87) -- line: 2837
-		-- upvalues: t3 (copy), t1 (copy), v108 (copy), Utility (copy), Theme (copy), shouldShowBottomBar (copy), u147 (ref), u148 (ref), setBottomBarBindings (copy), setBottomBarSelection (copy), onScreenSizeChanged (copy), Cryo (copy), IXPServiceWrapper (copy), RbxAnalyticsService (copy), Constants (copy), Flags (copy), ExperienceMenuSessionManagerInstance (copy), ReactPageSignal (copy)
-		if t3.Pages.PageTable[p82] == nil then
+
+	function children:SwitchToPage(currentPage, p, p2, p3, _, p4)
+		if
+			children.Pages.PageTable[currentPage] == nil
+			or v3.FFlagPreventHiddenSwitchPage and children:GetVisibility() == false
+		then
 			return
 		end
 
-		if t1.FFlagPreventHiddenSwitchPage and t3:GetVisibility() == false then
-			return
-		end
-
-		if v108 then
-			if p82.Page.Name == "ReportAbuseMenuNewContainerPage" then
-				t3.PageViewInnerFrame.UIPadding.PaddingTop = UDim.new(0, 0)
+		if defineFastFlag2 then
+			if currentPage.Page.Name == "ReportAbuseMenuNewContainerPage" then
+				children.PageViewInnerFrame.UIPadding.PaddingTop = UDim.new(0, 0)
 			else
-				t3.PageViewInnerFrame.UIPadding.PaddingTop = UDim.new(0, 5)
+				children.PageViewInnerFrame.UIPadding.PaddingTop = UDim.new(0, 5)
 			end
 		end
 
-		local uDim = UDim.new(0, 0)
-		local uDim3 = UDim.new(0, 0)
-		local v496 = not (Utility:IsPortrait() or Utility:IsSmallTouchScreen()) or Theme.AlwaysShowBottomBar()
+		local udim3 = UDim.new(0, 0)
+		local udim4 = UDim.new(0, 0)
+		local v20 = not (Utility:IsPortrait() or Utility:IsSmallTouchScreen()) or Theme.AlwaysShowBottomBar()
+		local v21 = v3.FFlagRelocateMobileMenuButtons
+			and (v3.FIntRelocateMobileMenuButtonsVariant == 1 or v3.FIntRelocateMobileMenuButtonsVariant == 3 or v3.FIntRelocateMobileMenuButtonsVariant == 2 and not Utility:IsSmallTouchScreen())
+			and true
+			or v20
 
-		if t1.FFlagRelocateMobileMenuButtons and (t1.FIntRelocateMobileMenuButtonsVariant == 1 or t1.FIntRelocateMobileMenuButtonsVariant == 3 or t1.FIntRelocateMobileMenuButtonsVariant == 2 and not Utility:IsSmallTouchScreen()) then
-			v496 = true
+		if children.HubBar and not (shouldShowHubBar(currentPage) or currentPage.DisableTopPadding) then -- inferred equivalent call
+			udim3 = UDim.new(0, children.HubBar.AbsoluteSize.Y)
 		end
 
-		if t3.HubBar then
-			local v497 = p82 or t3.Pages.CurrentPage
+		if not isSideSheetEnabled and children.BottomButtonFrame and v21 and not shouldShowBottomBar(currentPage) then
+			udim4 = UDim.new(0, children.BottomButtonFrame.AbsoluteSize.Y)
+		end
 
-			if not (if not t1.FFlagEnableSideSheet then v497.ShouldShowBottomBar == true else v497.ShouldShowHubBar == true) and not p82.DisableTopPadding then
-				uDim = UDim.new(0, t3.HubBar.AbsoluteSize.Y)
+		local hubPadding = Theme.HubPadding()
+		children.MenuContainerPadding.PaddingLeft = hubPadding.PaddingLeft
+		children.MenuContainerPadding.PaddingRight = hubPadding.PaddingRight
+		children.MenuContainerPadding.PaddingBottom = hubPadding.PaddingBottom + udim4
+		children.MenuContainerPadding.PaddingTop = hubPadding.PaddingTop + udim3
+
+		local menuContainerPosition = Theme.MenuContainerPosition(children.SettingsUIDelegate)
+
+		local position = menuContainerPosition.Position
+		local anchorPoint = menuContainerPosition.AnchorPoint
+		local sideSheetMenuInset = getSideSheetMenuInset() -- inferred equivalent call
+
+		if not (sideSheetMenuInset <= 0) then
+			local halfSideSheetMenuInset = sideSheetMenuInset / 2
+
+			position = UDim2.new(position.X.Scale, position.X.Offset + halfSideSheetMenuInset, 0.5, 0)
+			anchorPoint = Vector2.new(anchorPoint.X, 0.5)
+		end
+
+		children.MenuContainer.Position = position
+		children.MenuContainer.Size = menuContainerPosition.Size
+		children.MenuContainer.AnchorPoint = anchorPoint
+
+		local v22 = p2 == nil
+			and children.Pages.CurrentPage
+			and children.Pages.CurrentPage.TabHeader
+			and currentPage
+			and currentPage.TabHeader
+			and (children.Pages.CurrentPage.TabHeader.AbsolutePosition.x < currentPage.TabHeader.AbsolutePosition.x and 1 or -1)
+			or p2
+
+		local v23 = v22 == nil and 1 or v22
+
+		if children.Pages.CurrentPage and changedConnection ~= nil then
+			changedConnection:disconnect()
+			children.Pages.CurrentPage.Active = false
+		end
+
+		if v3.FFlagFixDisabledScrollOnIos and canvasPositionChangedConnection ~= nil then
+			canvasPositionChangedConnection:Disconnect()
+			canvasPositionChangedConnection = nil
+		end
+
+		local tabPosition = currentPage.TabPosition
+
+		for k, _ in pairs(children.Pages.PageTable) do
+			if k ~= currentPage then
+				k:Hide(-v23, tabPosition, p3, nil, children.PageViewInnerFrame, k == children.Pages.CurrentPage)
 			end
 		end
 
-		if not t1.FFlagEnableSideSheet and t3.BottomButtonFrame and v496 and not shouldShowBottomBar(p82) then
-			uDim3 = UDim.new(0, t3.BottomButtonFrame.AbsoluteSize.Y)
-		end
-
-		local v498 = Theme.HubPadding()
-
-		t3.MenuContainerPadding.PaddingLeft = v498.PaddingLeft
-		t3.MenuContainerPadding.PaddingRight = v498.PaddingRight
-		t3.MenuContainerPadding.PaddingBottom = v498.PaddingBottom + uDim3
-		t3.MenuContainerPadding.PaddingTop = v498.PaddingTop + uDim
-
-		local v499 = Theme.MenuContainerPosition(t3.SettingsUIDelegate)
-
-		t3.MenuContainer.Position = v499.Position
-		t3.MenuContainer.Size = v499.Size
-		t3.MenuContainer.AnchorPoint = v499.AnchorPoint
-
-		if p84 == nil and t3.Pages.CurrentPage and t3.Pages.CurrentPage.TabHeader and p82 and p82.TabHeader then
-			p84 = not (t3.Pages.CurrentPage.TabHeader.AbsolutePosition.x < p82.TabHeader.AbsolutePosition.x) and -1 or 1
-		end
-
-		if p84 == nil then
-			p84 = 1
-		end
-
-		if t3.Pages.CurrentPage and u147 ~= nil then
-			u147:disconnect()
-			t3.Pages.CurrentPage.Active = false
-		end
-
-		if t1.FFlagFixDisabledScrollOnIos and u148 ~= nil then
-			u148:Disconnect()
-			u148 = nil
-		end
-
-		local TabPosition = p82.TabPosition
-
-		for k, _ in pairs(t3.Pages.PageTable) do
-			if k ~= p82 then
-				k:Hide(-p84, TabPosition, p85, nil, t3.PageViewInnerFrame, k == t3.Pages.CurrentPage)
-			end
-		end
-
-		if t3.BottomButtonFrame then
-			if shouldShowBottomBar(p82) then
+		if children.BottomButtonFrame then
+			if shouldShowBottomBar(currentPage) then
 				setBottomBarBindings()
-
-				if t1.FFlagIEMFocusNavToButtons then
-					setBottomBarSelection(p82)
-				end
+				setBottomBarSelection(currentPage)
 			else
-				t3.BottomButtonFrame.Visible = false
+				children.BottomButtonFrame.Visible = false
 			end
 
-			local HubBar = t3.HubBar
-			local v504 = p82 or t3.Pages.CurrentPage
-
-			HubBar.Visible = if not t1.FFlagEnableSideSheet then v504.ShouldShowBottomBar == true else v504.ShouldShowHubBar == true
+			local hubBar = children.HubBar
+			hubBar.Visible = shouldShowHubBar(currentPage) -- inferred equivalent call
 		end
 
-		if t1.FFlagIEMTabFocusNav and t1.FFlagIEMTabFocusNav then
-			local TabHeader = p82:GetTabHeader()
-
-			if TabHeader then
-				for _, v507 in p82.FirstSelectableObjects do
-					v507.NextSelectionUp = TabHeader
-					TabHeader.NextSelectionDown = v507
-				end
-			end
+		if v3.FFlagIEMTabFocusNav then
+			setTabHeaderSelection(currentPage) -- inferred equivalent call
 		end
 
-		local v508 = p82.IsPageClipped == true
+		local isPageClipped = currentPage.IsPageClipped == true
+		children.PageViewClipper.ClipsDescendants = isPageClipped
+		children.PageView.ClipsDescendants = isPageClipped
+		children.PageViewInnerFrame.ClipsDescendants = isPageClipped
 
-		t3.PageViewClipper.ClipsDescendants = v508
-		t3.PageView.ClipsDescendants = v508
-		t3.PageViewInnerFrame.ClipsDescendants = v508
-		t3.Pages.CurrentPage = p82
-		t3.Pages.CurrentPage:Display(t3.PageViewInnerFrame, p85)
-		t3.Pages.CurrentPage.Active = true
-		t3.CurrentPageSignal:fire(t3.Pages.CurrentPage and t3.Pages.CurrentPage.Page.Name or nil)
+		children.Pages.CurrentPage = currentPage
+		children.Pages.CurrentPage:Display(children.PageViewInnerFrame, p3)
+		children.Pages.CurrentPage.Active = true
+		children.CurrentPageSignal:fire(children.Pages.CurrentPage and children.Pages.CurrentPage.Page.Name or nil)
 
-		if t1.FFlagEnableSideSheet then
-			local CurrentPage = t3.Pages.CurrentPage
-			local v510 = CurrentPage or t3.Pages.CurrentPage
-
-			if not (if not t1.FFlagEnableSideSheet then v510.ShouldShowBottomBar == true else v510.ShouldShowHubBar == true) or not CurrentPage.TabHeader then
-				t3.PageTitleLabel.Text = ""
-			else
-				t3.PageTitleLabel.Text = CurrentPage.TabHeader.TabLabel.Title.Text
-			end
+		if isSideSheetEnabled then
+			updatePageTitleHeader(children.Pages.CurrentPage) -- inferred equivalent call
 		end
 
-		if t1.FFlagAddAbilityToDisableIGMScroll then
-			local v511 = nil or t3.Pages.CurrentPage
+		if shouldDisableDefaultScroll(nil) then -- inferred equivalent call
+			children.PageView.ScrollBarThickness = 0
+			children.PageView.ScrollingEnabled = false
+			children.PageView.CanvasPosition = Vector2.new(0, 0)
+			children.PageView.CanvasSize = UDim2.new(1, 0, 1, 0)
 
-			if v511 ~= nil and v511.ShouldDisableDefaultScroll == true then
-				t3.PageView.ScrollBarThickness = 0
-				t3.PageView.ScrollingEnabled = false
-				t3.PageView.CanvasPosition = Vector2.new(0, 0)
-				t3.PageView.CanvasSize = UDim2.new(1, 0, 1, 0)
-
-				if t1.FFlagFixDisabledScrollOnIos then
-					u148 = t3.PageView:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 2951
-						-- upvalues: t3 (copy)
-						if t3.PageView.CanvasPosition.Magnitude > 0 then
-							t3.PageView.CanvasPosition = Vector2.new(0, 0)
-						end
-					end)
-				end
-			else
-				t3.PageView.ScrollBarThickness = Theme.DefaultScrollBarThickness
-				t3.PageView.ScrollingEnabled = true
-			end
-		end
-
-		if t1.FFlagAddAbilityToDisableIGMScroll then
-			local v512 = nil or t3.Pages.CurrentPage
-
-			if v512 == nil or v512.ShouldDisableDefaultScroll ~= true then
-				local Size = t3.Pages.CurrentPage:GetSize()
-
-				t3.PageView.CanvasSize = UDim2.new(0, 0, 0, Size.Y)
+			if v3.FFlagFixDisabledScrollOnIos then
+				canvasPositionChangedConnection = children.PageView:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+					if children.PageView.CanvasPosition.Magnitude > 0 then
+						children.PageView.CanvasPosition = Vector2.new(0, 0)
+					end
+				end)
 			end
 		else
-			local Size = t3.Pages.CurrentPage:GetSize()
-
-			t3.PageView.CanvasSize = UDim2.new(0, 0, 0, Size.Y)
+			children.PageView.ScrollBarThickness = Theme.DefaultScrollBarThickness
+			children.PageView.ScrollingEnabled = true
+			local size = children.Pages.CurrentPage:GetSize()
+			children.PageView.CanvasSize = UDim2.new(0, 0, 0, size.Y)
 		end
 
-		u147 = t3.Pages.CurrentPage.Page.Changed:connect(function(p88) -- line: 2973
-			-- upvalues: t1 (copy), t3 (copy)
-			if p88 == "AbsoluteSize" then
-				if t1.FFlagAddAbilityToDisableIGMScroll then
-					local v670 = nil or t3.Pages.CurrentPage
-
-					if v670 ~= nil and v670.ShouldDisableDefaultScroll == true then
-						return
-					end
-				end
-
-				local Size = t3.Pages.CurrentPage:GetSize()
-
-				t3.PageView.CanvasSize = UDim2.new(0, 0, 0, Size.Y)
+		changedConnection = children.Pages.CurrentPage.Page.Changed:connect(function(p5)
+			if p5 == "AbsoluteSize" and not shouldDisableDefaultScroll(nil) then -- inferred equivalent call
+				local size = children.Pages.CurrentPage:GetSize()
+				children.PageView.CanvasSize = UDim2.new(0, 0, 0, size.Y)
 			end
 		end)
 
-		if t3.MenuStack[#t3.MenuStack] ~= t3.Pages.CurrentPage and not p83 then
-			t3.MenuStack[#t3.MenuStack + 1] = t3.Pages.CurrentPage
+		if children.MenuStack[#children.MenuStack] ~= children.Pages.CurrentPage and not p then
+			children.MenuStack[#children.MenuStack + 1] = children.Pages.CurrentPage
 		end
 
-		if p82.DisableTopPadding then
+		if currentPage.DisableTopPadding then
 			onScreenSizeChanged()
 		end
 
-		local t6 = {
-			universeid = tostring(game.GameId)
-		}
+		local joined = {}
+		joined.universeid = tostring(game.GameId)
 
-		if t1.GetFFlagReportAbuseMenuEntrypointAnalytics() and p87 then
-			t6 = Cryo.Dictionary.join(t6, p87)
+		if v3.GetFFlagReportAbuseMenuEntrypointAnalytics() and p4 then
+			joined = Cryo.Dictionary.join(joined, p4)
 		end
 
-		if t1.FFlagRespawnChromeShortcutTelemetry and t6.used_shortcut == nil then
-			t6.used_shortcut = false
+		if v3.FFlagRespawnChromeShortcutTelemetry and joined.used_shortcut == nil then
+			joined.used_shortcut = false
 		end
 
-		if t6.playsessionid == nil then
-			t6.playsessionid = t3.playSessionId
+		if joined.playsessionid == nil then
+			joined.playsessionid = children.playSessionId
 		end
 
-		if p82 then
-			if t1.FFlagHelpPageIXPExposure and p82 == t3.HelpPage and not t3.HelpPageIXPFetched then
-				IXPServiceWrapper:LogUserLayerExposure(t1.FStringHelpPageIXPLayer)
-				t3.HelpPageIXPFetched = true
+		if currentPage then
+			if v3.FFlagHelpPageIXPExposure and children.HelpPage == currentPage and not children.HelpPageIXPFetched then
+				IXPServiceWrapper:LogUserLayerExposure(v3.FStringHelpPageIXPLayer)
+				children.HelpPageIXPFetched = true
 			end
 
-			if p82 == t3.GameSettingsPage then
-				RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, "open_GameSettings_tab", Constants.AnalyticsMenuActionName, t6)
+			if children.GameSettingsPage == currentPage then
+				RbxAnalyticsService:SetRBXEventStream(
+					Constants.AnalyticsTargetName,
+					"open_GameSettings_tab",
+					Constants.AnalyticsMenuActionName,
+					joined
+				)
 
-				if Flags.FFlagIEMSettingsLogExposureIXPFlags and not t3.GameSettingsPageReorderIXPFetched then
-					IXPServiceWrapper:LogFlagLinkedUserLayerExposure(t1.GetFStringInExperienceMenuIXPLayer())
-					t3.GameSettingsPageReorderIXPFetched = true
+				if Flags.FFlagIEMSettingsLogExposureIXPFlags and not children.GameSettingsPageReorderIXPFetched then
+					IXPServiceWrapper:LogFlagLinkedUserLayerExposure(v3.GetFStringInExperienceMenuIXPLayer())
+					children.GameSettingsPageReorderIXPFetched = true
 				end
 			else
-				RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, "open_" .. p82.Page.Name .. "_tab", Constants.AnalyticsMenuActionName, t6)
+				RbxAnalyticsService:SetRBXEventStream(
+					Constants.AnalyticsTargetName,
+					"open_" .. currentPage.Page.Name .. "_tab",
+					Constants.AnalyticsMenuActionName,
+					joined
+				)
 			end
 
-			ExperienceMenuSessionManagerInstance:MenuSwitchToPage(p82.Page)
+			ExperienceMenuSessionManagerInstance:MenuSwitchToPage(currentPage.Page)
 		else
-			RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, "open_unknown_tab", Constants.AnalyticsMenuActionName, t6)
+			RbxAnalyticsService:SetRBXEventStream(
+				Constants.AnalyticsTargetName,
+				"open_unknown_tab",
+				Constants.AnalyticsMenuActionName,
+				joined
+			)
 			ExperienceMenuSessionManagerInstance:CloseOpenedMenuTab()
 		end
 
-		if t1.FFlagAddTraversalHistory and t1.FFlagIntegrateTraversalHistoryInSideSheet then
+		if v3.FFlagAddTraversalHistory and v3.FFlagIntegrateTraversalHistoryInSideSheet then
 			ReactPageSignal(false).setCurrentReactPage(nil)
 		end
 	end
-	function t3.SetActive(_, p90) -- line: 3031
-		-- upvalues: t3 (copy)
-		t3.Active = p90
 
-		if t3.Pages.CurrentPage then
-			t3.Pages.CurrentPage.Active = p90
+	function children.SetActive(_, active)
+		children.Active = active
+
+		if children.Pages.CurrentPage then
+			children.Pages.CurrentPage.Active = active
 		end
 	end
-	function clearMenuStack() -- line: 3039
-		-- upvalues: t3 (copy)
-		while t3.MenuStack and #t3.MenuStack > 0 do
-			t3:PopMenu()
+
+	function clearMenuStack()
+		while children.MenuStack and #children.MenuStack > 0 do
+			children:PopMenu()
 		end
 	end
-	function setOverrideMouseIconBehavior() -- line: 3045
-		-- upvalues: t3 (copy), UserInputService (copy), VRService (copy), MouseIconOverrideService (copy), v58 (copy)
-		if not t3.Visible then
+
+	function setOverrideMouseIconBehavior()
+		if not children.Visible then
 			return
 		end
 
 		if UserInputService:GetLastInputType() == Enum.UserInputType.Gamepad1 or VRService.VREnabled then
-			MouseIconOverrideService.push(v58, Enum.OverrideMouseIconBehavior.ForceHide)
-
-			return
+			MouseIconOverrideService.push(named, Enum.OverrideMouseIconBehavior.ForceHide)
+		else
+			MouseIconOverrideService.push(named, Enum.OverrideMouseIconBehavior.ForceShow)
 		end
-
-		MouseIconOverrideService.push(v58, Enum.OverrideMouseIconBehavior.ForceShow)
 	end
-	function checkLeaveGameUpsell() -- line: 3057
-		-- upvalues: t1 (copy), t3 (copy), Constants2 (copy), default (copy), v60 (copy)
-		if not t1.GetFFlagEnableLeaveGameUpsellEntrypoint() then
+
+	function checkLeaveGameUpsell()
+		if not v3.GetFFlagEnableLeaveGameUpsellEntrypoint() then
 			return
 		end
 
-		if not t3.sessionStartTime then
-			t3.sessionStartTime = os.time()
+		if not children.sessionStartTime then
+			children.sessionStartTime = os.time()
 		end
 
-		if not t3.sessionStartTime then
+		if not children.sessionStartTime then
 			return
 		end
 
-		if not t3.checkedUpsell and t3.leaveGameUpsellProp == Constants2.PHONE_UPSELL_VALUE_PROP.None then
-			t3.checkedUpsell = true
-			t3.leaveGameUpsellProp = default:FetchPhoneVerificationUpsell(Constants2.EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER, t3.sessionStartTime, true)
-			t3.LeaveGameUpsellPage:SetUpsellProp(t3.leaveGameUpsellProp)
-			task.delay(v60, function() -- line: 3078
-				-- upvalues: t3 (copy)
-				t3.checkedUpsell = false
+		if children.checkedUpsell or children.leaveGameUpsellProp ~= Constants2.PHONE_UPSELL_VALUE_PROP.None then
+			if children.checkedUpsell then
+				local phoneVerificationUpsell = default:FetchPhoneVerificationUpsell(
+					Constants2.EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER,
+					children.sessionStartTime,
+					false
+				)
+
+				if children.leaveGameUpsellProp ~= phoneVerificationUpsell then
+					children.leaveGameUpsellProp = phoneVerificationUpsell
+					children.LeaveGameUpsellPage:SetUpsellProp(children.leaveGameUpsellProp)
+				end
+			end
+		else
+			children.checkedUpsell = true
+			children.leaveGameUpsellProp = default:FetchPhoneVerificationUpsell(
+				Constants2.EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER,
+				children.sessionStartTime,
+				true
+			)
+
+			children.LeaveGameUpsellPage:SetUpsellProp(children.leaveGameUpsellProp)
+			task.delay(defineFastInt, function()
+				children.checkedUpsell = false
 			end)
+		end
+	end
 
+	local fn8 = v3.FFlagSettingsHubIndependentBackgroundVisibility and function(visible, p, p2)
+		if
+			not children.DarkenBackground
+			or not visible
+			and children.DarkenBackground.Visible
+			and (InExperienceAppChatModal:getVisible() or children.Visible)
+		then
 			return
 		end
 
-		if t3.checkedUpsell then
-			local v518 = default:FetchPhoneVerificationUpsell(Constants2.EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER, t3.sessionStartTime, false)
+		local backgroundTransparency = 1
+		local v20 = Enum.EasingStyle.Quart
 
-			if v518 ~= t3.leaveGameUpsellProp then
-				t3.leaveGameUpsellProp = v518
-				t3.LeaveGameUpsellPage:SetUpsellProp(t3.leaveGameUpsellProp)
-			end
-		end
-	end
+		local shieldCloseTweenTime = getShieldCloseTweenTime( -- inferred equivalent call
+			not Constants and 0.4 or Constants.ShieldCloseAnimationTweenTime,
+			p2
+		)
 
-	local u198 = nil
-
-	if t1.FFlagSettingsHubIndependentBackgroundVisibility then
-		function u198(p91, p92) -- line: 3093
-			-- upvalues: t3 (copy), InExperienceAppChatModal (copy), Constants (copy), t1 (copy), Theme (copy), TweenService (copy)
-			if not t3.DarkenBackground then
-				return
-			end
-
-			if not p91 and t3.DarkenBackground.Visible and (InExperienceAppChatModal:getVisible() or t3.Visible) then
-				return
-			end
-
-			local n6 = 1
-			local Quart = Enum.EasingStyle.Quart
-			local v523 = not Constants and 0.4 or Constants.ShieldCloseAnimationTweenTime
-
-			if p91 then
-				n6 = if not t1.isInExperienceUIVREnabled then Theme.transparency("DarkenBackground") else t3.SettingsUIDelegate:getDarkBackgroundTheme().Transparency
-				Quart = Enum.EasingStyle.Quad
-				v523 = not Constants and 0.5 or Constants.ShieldOpenAnimationTweenTime
-			end
-
-			if p92 then
-				if t3.DarkenBackgroundTween then
-					t3.DarkenBackgroundTween:Cancel()
-					t3.DarkenBackgroundTween = nil
-				end
-
-				t3.DarkenBackground.BackgroundTransparency = n6
+		if visible then
+			if v3.isInExperienceUIVREnabled then
+				backgroundTransparency = children.SettingsUIDelegate:getDarkBackgroundTheme().Transparency
 			else
-				local tweenInfo = TweenInfo.new(v523, Quart, Enum.EasingDirection.Out)
-
-				if t3.DarkenBackgroundTween then
-					t3.DarkenBackgroundTween:Cancel()
-				end
-
-				t3.DarkenBackgroundTween = TweenService:Create(t3.DarkenBackground, tweenInfo, {
-					BackgroundTransparency = n6
-				})
-				t3.DarkenBackgroundTween:Play()
+				backgroundTransparency = Theme.transparency("DarkenBackground")
 			end
 
-			t3.DarkenBackground.Visible = p91
+			v20 = Enum.EasingStyle.Quad
+			shieldCloseTweenTime = not Constants and 0.5 or Constants.ShieldOpenAnimationTweenTime
+			shieldCloseTweenTime = getShieldOpenTweenTime(shieldCloseTweenTime) -- inferred equivalent call
 		end
-	end
 
-	function setVisibilityInternal(p93, p94, p95, _, p97) -- line: 3140
-		-- upvalues: t1 (copy), t3 (copy), PerfUtils (copy), RobloxGui (copy), u198 (ref), onScreenSizeChanged (copy), Utility (copy), v180 (copy), GuiService (copy), Theme (copy), ExperienceMenuSessionManagerInstance (copy), Constants (copy), GameSettings (copy), TweenService (copy), ContextActionService (copy), v192 (copy), v194 (copy), shouldShowBottomBar (copy), setBottomBarBindings (copy), setBottomBarSelection (copy), UserInputService (copy), v193 (copy), u88 (ref), VRService (copy), MouseIconOverrideService (copy), v58 (copy), removeBottomBarBindings (copy), ChatSelector (copy), FFlagEnableNewBackpack (copy), v5 (copy), InExperienceAppChatModal (copy), u89 (ref), v181 (copy), SHIELD_INACTIVE_POSITION (copy), RbxAnalyticsService (copy)
-		local v530 = if not t1.isInExperienceUIVREnabled then p94 else p94 or not t3.SettingsUIDelegate:isOpenCloseAnimationAllowed()
+		if p then
+			if children.DarkenBackgroundTween then
+				children.DarkenBackgroundTween:Cancel()
+				children.DarkenBackgroundTween = nil
+			end
 
-		t3.OpenStateChangedCount = t3.OpenStateChangedCount + 1
+			children.DarkenBackground.BackgroundTransparency = backgroundTransparency
+		else
+			local tweenInfo = TweenInfo.new(shieldCloseTweenTime, v20, Enum.EasingDirection.Out)
 
-		local v531 = p93 ~= t3.Visible
+			if children.DarkenBackgroundTween then
+				children.DarkenBackgroundTween:Cancel()
+			end
 
-		t3.Visible = p93
+			children.DarkenBackgroundTween = TweenService:Create(children.DarkenBackground, tweenInfo, {
+				BackgroundTransparency = backgroundTransparency
+			})
+			children.DarkenBackgroundTween:Play()
+		end
 
-		if t1.FFlagEnableInGameMenuDurationLogger and (v531 and not p93) then
+		children.DarkenBackground.Visible = visible
+	end or nil
+
+	setVisibilityInternal = function(visible, p, p2, _, source)
+		local v20 = shouldUseSideSheetPeoplePageLayout() -- inferred equivalent call
+
+		if
+			FFlagSideSheetOpenPeoplePage
+			and getDidSideSheetOpenWithPeoplePage()
+			and not visible
+			and children.Visible
+		then
+			toggleSideSheet(false)
+		end
+
+		if v3.isInExperienceUIVREnabled then
+			p = p or not children.SettingsUIDelegate:isOpenCloseAnimationAllowed()
+		end
+
+		children.OpenStateChangedCount += 1
+
+		local v21 = visible ~= children.Visible
+		children.Visible = visible
+
+		if v3.FFlagEnableInGameMenuDurationLogger and v21 and not visible then
 			PerfUtils.menuClose()
 		end
 
-		if t3.ResizedConnection then
-			t3.ResizedConnection:disconnect()
-			t3.ResizedConnection = nil
+		if children.ResizedConnection then
+			children.ResizedConnection:disconnect()
+			children.ResizedConnection = nil
 		end
 
-		if t3.BackBarVisibleConnection then
-			t3.BackBarVisibleConnection:disconnect()
-			t3.BackBarVisibleConnection = nil
+		if children.BackBarVisibleConnection then
+			children.BackBarVisibleConnection:disconnect()
+			children.BackBarVisibleConnection = nil
 		end
 
-		if t1.EngineFeatureTeleportHistoryButtons and t3.FrontBarVisibleConnection then
-			t3.FrontBarVisibleConnection:disconnect()
-			t3.FrontBarVisibleConnection = nil
+		if v3.EngineFeatureTeleportHistoryButtons and children.FrontBarVisibleConnection then
+			children.FrontBarVisibleConnection:disconnect()
+			children.FrontBarVisibleConnection = nil
 		end
 
-		if t3.PreferredTransparencyChangedConnection then
-			t3.PreferredTransparencyChangedConnection:disconnect()
-			t3.PreferredTransparencyChangedConnection = nil
+		if children.PreferredTransparencyChangedConnection then
+			children.PreferredTransparencyChangedConnection:disconnect()
+			children.PreferredTransparencyChangedConnection = nil
 		end
 
-		t3.Modal.Visible = t3.Visible
+		local modal = children.Modal
+		local visible3
 
-		if t3.TabConnection then
-			t3.TabConnection:disconnect()
-			t3.TabConnection = nil
+		if FFlagSideSheetOpenPeoplePage then
+			visible3 = shouldShowSettingsHubModal() -- inferred equivalent call
+		else
+			visible3 = children.Visible
+		end
+
+		modal.Visible = visible3
+
+		if children.TabConnection then
+			children.TabConnection:disconnect()
+			children.TabConnection = nil
 		end
 
 		local PlayerListManager = require(RobloxGui.Modules.PlayerList.PlayerListManager)
 
-		if t1.FFlagSettingsHubIndependentBackgroundVisibility then
-			u198(t3.Visible, v530)
+		if v3.FFlagSettingsHubIndependentBackgroundVisibility then
+			fn8(children.Visible, p, v20)
 		end
 
-		if t3.Visible then
-			t3.ResizedConnection = RobloxGui.Changed:connect(function(p98) -- line: 3190
-				-- upvalues: onScreenSizeChanged (copy)
-				if p98 == "AbsoluteSize" then
+		if children.Visible then
+			children.ResizedConnection = RobloxGui.Changed:connect(function(p3)
+				if p3 == "AbsoluteSize" then
 					onScreenSizeChanged()
 				end
 			end)
 
-			if t1.FFlagMenuButtonsMountWithIEM then
-				if t1.FFlagRelocateMobileMenuButtons and (t1.FIntRelocateMobileMenuButtonsVariant == 1 or t1.FIntRelocateMobileMenuButtonsVariant == 3 or t1.FIntRelocateMobileMenuButtonsVariant == 2 and not Utility:IsSmallTouchScreen()) then
-					v180()
+			if v3.FFlagMenuButtonsMountWithIEM then
+				if
+					v3.FFlagRelocateMobileMenuButtons
+					and (v3.FIntRelocateMobileMenuButtonsVariant == 1 or v3.FIntRelocateMobileMenuButtonsVariant == 3 or v3.FIntRelocateMobileMenuButtonsVariant == 2 and not Utility:IsSmallTouchScreen())
+				then
+					fn()
 				end
 
-				if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant == 2 and Utility:IsSmallTouchScreen() and t3.PlayersPage then
-					t3.PlayersPage:CreateMenuButtonsContainer()
+				if
+					v3.FFlagRelocateMobileMenuButtons
+					and v3.FIntRelocateMobileMenuButtonsVariant == 2
+					and Utility:IsSmallTouchScreen()
+					and children.PlayersPage
+				then
+					children.PlayersPage:CreateMenuButtonsContainer()
 				end
 			end
 
-			if not t1.FFlagAddTraversalBackButton then
-				if t3.BackBarRef:getValue() then
-					t3.BackBarVisibleConnection = t3.BackBarRef:getValue():GetPropertyChangedSignal("Visible"):connect(function() -- line: 3210
-						-- upvalues: onScreenSizeChanged (copy)
+			if not v3.FFlagAddTraversalBackButton then
+				if children.BackBarRef:getValue() then
+					children.BackBarVisibleConnection = children.BackBarRef:getValue():GetPropertyChangedSignal("Visible"):connect(function()
 						onScreenSizeChanged()
 					end)
 				end
 
-				if t1.EngineFeatureTeleportHistoryButtons and t3.FrontBarRef:getValue() then
-					t3.FrontBarVisibleConnection = t3.FrontBarRef:getValue():GetPropertyChangedSignal("Visible"):connect(function() -- line: 3215
-						-- upvalues: onScreenSizeChanged (copy)
+				if v3.EngineFeatureTeleportHistoryButtons and children.FrontBarRef:getValue() then
+					children.FrontBarVisibleConnection = children.FrontBarRef:getValue():GetPropertyChangedSignal("Visible"):connect(function()
 						onScreenSizeChanged()
 					end)
 				end
 			end
 
 			onScreenSizeChanged()
-			t3.PreferredTransparencyChangedConnection = GuiService:GetPropertyChangedSignal("PreferredTransparency"):connect(function() -- line: 3222
-				-- upvalues: t3 (copy), Theme (copy), GuiService (copy)
-				t3.MenuContainer.BackgroundTransparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
+
+			children.PreferredTransparencyChangedConnection = GuiService:GetPropertyChangedSignal("PreferredTransparency"):connect(function()
+				onPreferredTransparencyChanged() -- inferred equivalent call
 			end)
-			t3.MenuContainer.BackgroundTransparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
-			t3.SettingsShowSignal:fire(t3.Visible)
+			onPreferredTransparencyChanged() -- inferred equivalent call
+			children.SettingsShowSignal:fire(children.Visible)
+
 			GuiService:SetMenuIsOpen(true, "SettingsHub")
 			ExperienceMenuSessionManagerInstance:OpenExperienceMenu()
-			t3.Shield.Visible = t3.Visible
+			children.Shield.Visible = children.Visible
 			GuiService:CloseInspectMenu()
 
-			if v530 or not t3.Shield:IsDescendantOf(game) then
-				t3.Shield.Position = UDim2.new(0, 0, 0, 0)
+			if p or not children.Shield:IsDescendantOf(game) then
+				children.Shield.Position = UDim2.new(0, 0, 0, 0)
 
-				if not t1.FFlagSettingsHubIndependentBackgroundVisibility and t3.DarkenBackground then
-					if t3.DarkenBackgroundTween then
-						t3.DarkenBackgroundTween:Cancel()
-						t3.DarkenBackgroundTween = nil
+				if not v3.FFlagSettingsHubIndependentBackgroundVisibility and children.DarkenBackground then
+					if children.DarkenBackgroundTween then
+						children.DarkenBackgroundTween:Cancel()
+						children.DarkenBackgroundTween = nil
 					end
 
-					t3.DarkenBackground.BackgroundTransparency = Theme.transparency("DarkenBackground")
+					children.DarkenBackground.BackgroundTransparency = Theme.transparency("DarkenBackground")
 				end
 			else
-				local v533 = not Constants and 0.5 or Constants.ShieldOpenAnimationTweenTime
+				local shieldOpenTweenTime = getShieldOpenTweenTime(not Constants and 0.5 or Constants.ShieldOpenAnimationTweenTime) -- inferred equivalent call
 
-				if GameSettings.ReducedMotion then
-					if t3.ReducedMotionOpenTween then
-						t3.ReducedMotionOpenTween:Cancel()
-						t3.ReducedMotionOpenTween = nil
+				if gameSettings.ReducedMotion then
+					if children.ReducedMotionOpenTween then
+						children.ReducedMotionOpenTween:Cancel()
+						children.ReducedMotionOpenTween = nil
 					end
 
-					if t3.ReducedMotionCloseTween then
-						t3.ReducedMotionCloseTween:Cancel()
-						t3.ReducedMotionCloseTween = nil
+					if children.ReducedMotionCloseTween then
+						children.ReducedMotionCloseTween:Cancel()
+						children.ReducedMotionCloseTween = nil
 					end
 
-					t3.Shield.Parent = t3.CanvasGroup
-					t3.CanvasGroup.GroupTransparency = 1
-					t3.CanvasGroup.Visible = true
-					t3.Shield.Position = UDim2.new(0, 0, 0, 0)
+					children.Shield.Parent = children.CanvasGroup
+					children.CanvasGroup.GroupTransparency = 1
+					children.CanvasGroup.Visible = true
+					children.Shield.Position = UDim2.new(0, 0, 0, 0)
 
 					local tweenInfo = TweenInfo.new(0.25)
-					local t7 = {
+					children.ReducedMotionOpenTween = TweenService:Create(children.CanvasGroup, tweenInfo, {
 						GroupTransparency = 0
-					}
+					})
+					children.ReducedMotionOpenTween:Play()
 
-					t3.ReducedMotionOpenTween = TweenService:Create(t3.CanvasGroup, tweenInfo, t7)
-					t3.ReducedMotionOpenTween:Play()
-					t3.ReducedMotionOpenTween.Completed:Connect(function(p99) -- line: 3271
-						-- upvalues: t3 (copy)
-						if p99 == Enum.PlaybackState.Completed then
-							t3.Shield.Parent = t3.ClippingShield
-							t3.ReducedMotionOpenTween = nil
+					children.ReducedMotionOpenTween.Completed:Connect(function(p3)
+						if p3 == Enum.PlaybackState.Completed then
+							children.Shield.Parent = children.ClippingShield
+							children.ReducedMotionOpenTween = nil
 						end
 
-						t3.CanvasGroup.Visible = false
+						children.CanvasGroup.Visible = false
 					end)
 
-					if t1.FFlagEnableInGameMenuDurationLogger then
+					if v3.FFlagEnableInGameMenuDurationLogger then
 						PerfUtils.menuOpenComplete()
 					end
 				else
-					t3.Shield:TweenPositionInternal(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quart, v533, true, function() -- line: 3290
-						-- upvalues: t1 (copy), PerfUtils (copy)
-						if t1.FFlagEnableInGameMenuDurationLogger then
-							PerfUtils.menuOpenComplete()
+					children.Shield:TweenPositionInternal(
+						UDim2.new(0, 0, 0, 0),
+						Enum.EasingDirection.InOut,
+						Enum.EasingStyle.Quart,
+						shieldOpenTweenTime,
+						true,
+						function()
+							if v3.FFlagEnableInGameMenuDurationLogger then
+								PerfUtils.menuOpenComplete()
+							end
 						end
-					end)
+					)
 				end
 
-				if not t1.FFlagSettingsHubIndependentBackgroundVisibility and t3.DarkenBackground then
-					local tweenInfo = TweenInfo.new(v533, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+				if not v3.FFlagSettingsHubIndependentBackgroundVisibility and children.DarkenBackground then
+					local tweenInfo = TweenInfo.new(
+						shieldOpenTweenTime,
+						Enum.EasingStyle.Quad,
+						Enum.EasingDirection.Out
+					)
 
-					if t3.DarkenBackgroundTween then
-						t3.DarkenBackgroundTween:Cancel()
+					if children.DarkenBackgroundTween then
+						children.DarkenBackgroundTween:Cancel()
 					end
 
-					t3.DarkenBackgroundTween = TweenService:Create(t3.DarkenBackground, tweenInfo, {
+					children.DarkenBackgroundTween = TweenService:Create(children.DarkenBackground, tweenInfo, {
 						BackgroundTransparency = Theme.transparency("DarkenBackground")
 					})
-					t3.DarkenBackgroundTween:Play()
+					children.DarkenBackgroundTween:Play()
 				end
 			end
 
-			local function v537() -- line: 3314
-			end
-
-			if t1.isInExperienceUIVREnabled then
-				function v537(p100, p101, p102) -- line: 3316
-					-- upvalues: t3 (copy)
-					if t3.SettingsUIDelegate:isInputEventNeededBySettings(p100, p101, p102) then
+			ContextActionService:BindCoreAction(
+				"RbxSettingsHubStopCharacter",
+				v3.isInExperienceUIVREnabled and function(p3, p4, p5)
+					if children.SettingsUIDelegate:isInputEventNeededBySettings(p3, p4, p5) then
 						return Enum.ContextActionResult.Pass
 					end
 
 					return nil
-				end
+				end or function() end,
+				false,
+				Enum.PlayerActions.CharacterForward,
+				Enum.PlayerActions.CharacterBackward,
+				Enum.PlayerActions.CharacterLeft,
+				Enum.PlayerActions.CharacterRight,
+				Enum.PlayerActions.CharacterJump,
+				Enum.KeyCode.LeftShift,
+				Enum.KeyCode.RightShift,
+				Enum.KeyCode.Tab,
+				Enum.UserInputType.Gamepad1,
+				Enum.UserInputType.Gamepad2,
+				Enum.UserInputType.Gamepad3,
+				Enum.UserInputType.Gamepad4
+			)
+
+			if not isSideSheetEnabled then
+				ContextActionService:BindCoreAction(
+					"RbxSettingsHubSwitchTab",
+					fn4,
+					false,
+					Enum.KeyCode.ButtonR1,
+					Enum.KeyCode.ButtonL1
+				)
 			end
 
-			ContextActionService:BindCoreAction("RbxSettingsHubStopCharacter", v537, false, Enum.PlayerActions.CharacterForward, Enum.PlayerActions.CharacterBackward, Enum.PlayerActions.CharacterLeft, Enum.PlayerActions.CharacterRight, Enum.PlayerActions.CharacterJump, Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.Tab, Enum.UserInputType.Gamepad1, Enum.UserInputType.Gamepad2, Enum.UserInputType.Gamepad3, Enum.UserInputType.Gamepad4)
-
-			if not t1.FFlagEnableSideSheet then
-				ContextActionService:BindCoreAction("RbxSettingsHubSwitchTab", v192, false, Enum.KeyCode.ButtonR1, Enum.KeyCode.ButtonL1)
-			end
-
-			ContextActionService:BindCoreAction("RbxSettingsScrollHotkey", v194, false, Enum.KeyCode.PageUp, Enum.KeyCode.PageDown)
+			ContextActionService:BindCoreAction(
+				"RbxSettingsScrollHotkey",
+				fn6,
+				false,
+				Enum.KeyCode.PageUp,
+				Enum.KeyCode.PageDown
+			)
 
 			if shouldShowBottomBar() then
 				setBottomBarBindings()
-
-				if t1.FFlagIEMFocusNavToButtons then
-					setBottomBarSelection(t3.Pages.CurrentPage)
-				end
+				setBottomBarSelection(children.Pages.CurrentPage)
 			end
 
-			if t1.ChromeEnabled and t1.FFlagEnableConsoleExpControls then
-				require(RobloxGui.Modules.Chrome.Service):setShortcutBar(require(RobloxGui.Modules.Chrome.ChromeShared.Unibar.Constants).TILTMENU_SHORTCUTBAR_ID)
+			if v3.ChromeEnabled and v3.FFlagEnableConsoleExpControls then
+				local Service = require(RobloxGui.Modules.Chrome.Service)
+				local Constants3 = require(RobloxGui.Modules.Chrome.ChromeShared.Unibar.Constants)
+				Service:setShortcutBar(Constants3.TILTMENU_SHORTCUTBAR_ID)
 			end
 
-			if not t1.FFlagEnableSideSheet then
-				t3.TabConnection = UserInputService.InputBegan:connect(v193)
+			if not isSideSheetEnabled then
+				children.TabConnection = UserInputService.InputBegan:connect(fn5)
 			end
 
 			setOverrideMouseIconBehavior()
-			u88 = UserInputService.LastInputTypeChanged:connect(setOverrideMouseIconBehavior)
+			lastInputTypeChangedConnection = UserInputService.LastInputTypeChanged:connect(setOverrideMouseIconBehavior)
 
 			if UserInputService.MouseEnabled and not VRService.VREnabled then
-				MouseIconOverrideService.push(v58, Enum.OverrideMouseIconBehavior.ForceShow)
+				MouseIconOverrideService.push(named, Enum.OverrideMouseIconBehavior.ForceShow)
 			end
 
-			t3:CloseReactPage()
+			children:CloseReactPage()
 
-			if p95 then
+			if p2 then
 				removeBottomBarBindings()
-				t3:SwitchToPage(p95, nil, 1, true)
+				children:SwitchToPage(p2, nil, 1, true)
 			else
-				t3:SwitchToPage(t3:GetFirstPageWithTabHeader(), nil, 1, true)
+				children:SwitchToPage(children:GetFirstPageWithTabHeader(), nil, 1, true)
 			end
 
-			if not t1.isInExperienceUIVREnabled or (t1.InExperienceUIVRIXP:isMovePanelToCenter() and true or not VRService.VREnabled) then
-				if t1.FFlagAddNewPlayerListMobileFocusNav then
+			if
+				not v3.isInExperienceUIVREnabled
+				or v3.InExperienceUIVRIXP:isMovePanelToCenter()
+				or not VRService.VREnabled
+			then
+				if v3.FFlagAddNewPlayerListMobileFocusNav then
 					if PlayerListManager:GetIsModal() then
 						PlayerListManager:SetVisibility(false)
 					else
@@ -3553,12 +3955,12 @@ local function CreateSettingsHub() -- line: 385
 					PlayerListManager:HideTemp("SettingsMenu", true)
 				end
 
-				if not t1.isInExperienceUIVREnabled or not t1.InExperienceUIVRIXP:isMovePanelToCenter() or not t1.FFlagSpatialUIFixMenuPanelChatExclusive or not VRService.VREnabled then
+				if not (v3.isInExperienceUIVREnabled and v3.InExperienceUIVRIXP:isMovePanelToCenter() and v3.FFlagSpatialUIFixMenuPanelChatExclusive and VRService.VREnabled) then
 					ChatSelector:HideTemp("SettingsMenu", true)
 				end
 
 				if FFlagEnableNewBackpack then
-					v5.setVisibility(v5.FeatureName.Backpack, false)
+					features.setVisibility(features.FeatureName.Backpack, false)
 				else
 					local BackpackScript = require(RobloxGui.Modules.BackpackScript)
 
@@ -3568,14 +3970,14 @@ local function CreateSettingsHub() -- line: 385
 				end
 			end
 
-			if t1.GetFFlagEnableAppChatInExperience() and InExperienceAppChatModal:getVisible() then
-				u89 = true
+			if v3.GetFFlagEnableAppChatInExperience() and InExperienceAppChatModal:getVisible() then
+				v7 = true
 				InExperienceAppChatModal.default:setVisible(false)
 			end
 
-			if not t1.isInExperienceUIVREnabled then
+			if not v3.isInExperienceUIVREnabled then
 				if FFlagEnableNewBackpack then
-					v5.setVisibility(v5.FeatureName.Backpack, false)
+					features.setVisibility(features.FeatureName.Backpack, false)
 				else
 					local BackpackScript = require(RobloxGui.Modules.BackpackScript)
 
@@ -3585,989 +3987,943 @@ local function CreateSettingsHub() -- line: 385
 				end
 			end
 
-			t3.GameSettingsPage:OpenSettingsPage()
+			children.GameSettingsPage:OpenSettingsPage()
 		else
-			t3.CurrentPageSignal:fire("")
+			children.CurrentPageSignal:fire("")
 
-			if t1.FFlagMenuButtonsMountWithIEM and t1.FFlagRelocateMobileMenuButtons then
-				if t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-					v181()
+			if v3.FFlagMenuButtonsMountWithIEM and v3.FFlagRelocateMobileMenuButtons then
+				if v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+					fn2()
 				end
 
-				if t1.FIntRelocateMobileMenuButtonsVariant == 2 and t3.PlayersPage then
-					t3.PlayersPage:UnmountMenuButtonsContainer()
+				if v3.FIntRelocateMobileMenuButtonsVariant == 2 and children.PlayersPage then
+					children.PlayersPage:UnmountMenuButtonsContainer()
 				end
 			end
 
-			if t1.ChromeEnabled and t1.FFlagEnableConsoleExpControls then
-				require(RobloxGui.Modules.Chrome.Service):setShortcutBar(nil)
+			if v3.ChromeEnabled and v3.FFlagEnableConsoleExpControls then
+				local Service = require(RobloxGui.Modules.Chrome.Service)
+				Service:setShortcutBar(nil)
 			end
 
-			if t1.GetFFlagEnableAppChatInExperience() and u89 then
-				u89 = false
+			if v3.GetFFlagEnableAppChatInExperience() and v7 then
+				v7 = false
 			end
 
-			if t1.isInExperienceUIVREnabled and t1.InExperienceUIVRIXP:isMovePanelToCenter() then
+			if v3.isInExperienceUIVREnabled and v3.InExperienceUIVRIXP:isMovePanelToCenter() then
 				PlayerListManager:HideTemp("SettingsMenu", false)
 
-				if not t1.FFlagSpatialUIFixMenuPanelChatExclusive or not VRService.VREnabled then
+				if not (v3.FFlagSpatialUIFixMenuPanelChatExclusive and VRService.VREnabled) then
 					ChatSelector:HideTemp("SettingsMenu", false)
 				end
 			end
 
-			if v530 then
-				t3.Shield.Position = SHIELD_INACTIVE_POSITION
-				t3.Shield.Visible = t3.Visible
-				t3.SettingsShowSignal:fire(t3.Visible)
+			if p then
+				children.Shield.Position = SHIELD_INACTIVE_POSITION
+				children.Shield.Visible = children.Visible
+				children.SettingsShowSignal:fire(children.Visible)
 				GuiService:SetMenuIsOpen(false, "SettingsHub")
 				ExperienceMenuSessionManagerInstance:CloseExperienceMenu()
 
-				if t1.FFlagEnableInGameMenuDurationLogger then
+				if v3.FFlagEnableInGameMenuDurationLogger then
 					PerfUtils.menuCloseComplete()
 				end
 
-				if not t1.FFlagSettingsHubIndependentBackgroundVisibility and t3.DarkenBackground then
-					if t3.DarkenBackgroundTween then
-						t3.DarkenBackgroundTween:Cancel()
-						t3.DarkenBackgroundTween = nil
+				if not v3.FFlagSettingsHubIndependentBackgroundVisibility and children.DarkenBackground then
+					if children.DarkenBackgroundTween then
+						children.DarkenBackgroundTween:Cancel()
+						children.DarkenBackgroundTween = nil
 					end
 
-					t3.DarkenBackground.BackgroundTransparency = 1
+					children.DarkenBackground.BackgroundTransparency = 1
 				end
 			else
-				local v540 = not Constants and 0.4 or Constants.ShieldCloseAnimationTweenTime
+				local v22 = not Constants and 0.4 or Constants.ShieldCloseAnimationTweenTime
 
-				local function handleShieldClose() -- line: 3475
-					-- upvalues: t1 (copy), t3 (copy), GuiService (copy), ExperienceMenuSessionManagerInstance (copy), PerfUtils (copy)
-					if not t1.FFlagAddTraversalBackButton then
-						t3.SettingsShowSignal:fire(t3.Visible)
+				if shouldCloseShieldWithSideSheet(v20) then -- inferred equivalent call
+					v22 = getSideSheetAnimationDuration()
+				end
+
+				local function handleShieldClose()
+					if not v3.FFlagAddTraversalBackButton then
+						children.SettingsShowSignal:fire(children.Visible)
 					end
 
-					if not t3.Visible then
+					if not children.Visible then
 						GuiService:SetMenuIsOpen(false, "SettingsHub")
 						ExperienceMenuSessionManagerInstance:CloseExperienceMenu()
 					end
 
-					if t1.FFlagEnableInGameMenuDurationLogger then
+					if v3.FFlagEnableInGameMenuDurationLogger then
 						PerfUtils.menuCloseComplete()
 					end
 				end
 
-				if t1.FFlagAddTraversalBackButton then
-					t3.SettingsShowSignal:fire(t3.Visible)
+				if v3.FFlagAddTraversalBackButton then
+					children.SettingsShowSignal:fire(children.Visible)
 				end
 
-				if GameSettings.ReducedMotion then
-					if t3.ReducedMotionOpenTween then
-						t3.ReducedMotionOpenTween:Cancel()
-						t3.ReducedMotionOpenTween = nil
+				if gameSettings.ReducedMotion then
+					if children.ReducedMotionOpenTween then
+						children.ReducedMotionOpenTween:Cancel()
+						children.ReducedMotionOpenTween = nil
 					end
 
-					if t3.ReducedMotionCloseTween then
-						t3.ReducedMotionCloseTween:Cancel()
-						t3.ReducedMotionCloseTween = nil
+					if children.ReducedMotionCloseTween then
+						children.ReducedMotionCloseTween:Cancel()
+						children.ReducedMotionCloseTween = nil
 					end
 
-					t3.Shield.Parent = t3.CanvasGroup
-					t3.CanvasGroup.Visible = true
+					children.Shield.Parent = children.CanvasGroup
+					children.CanvasGroup.Visible = true
 
 					local tweenInfo = TweenInfo.new(0.25)
-					local t8 = {
+					children.ReducedMotionCloseTween = TweenService:Create(children.CanvasGroup, tweenInfo, {
 						GroupTransparency = 1
-					}
+					})
+					children.ReducedMotionCloseTween:Play()
+					children.ReducedMotionCloseTween.Completed:Connect(function(p3)
+						if p3 == Enum.PlaybackState.Completed then
+							children.Shield.Position = SHIELD_INACTIVE_POSITION
 
-					t3.ReducedMotionCloseTween = TweenService:Create(t3.CanvasGroup, tweenInfo, t8)
-					t3.ReducedMotionCloseTween:Play()
-					t3.ReducedMotionCloseTween.Completed:Connect(function(p103) -- line: 3511
-						-- upvalues: t3 (copy), SHIELD_INACTIVE_POSITION (copy)
-						if p103 == Enum.PlaybackState.Completed then
-							t3.Shield.Position = SHIELD_INACTIVE_POSITION
-							t3.Shield.Visible = t3.Visible
-							t3.Shield.Parent = t3.ClippingShield
-							t3.ReducedMotionCloseTween = nil
+							children.Shield.Visible = children.Visible
+							children.Shield.Parent = children.ClippingShield
+							children.ReducedMotionCloseTween = nil
 						end
 
-						t3.CanvasGroup.Visible = false
+						children.CanvasGroup.Visible = false
 					end)
+
 					handleShieldClose()
 				else
-					if t1.ChromeEnabled and t1.FFlagEnableConsoleExpControls then
-						require(RobloxGui.Modules.Chrome.Service):setShortcutBar(nil)
+					if v3.ChromeEnabled and v3.FFlagEnableConsoleExpControls then
+						local Service = require(RobloxGui.Modules.Chrome.Service)
+						Service:setShortcutBar(nil)
 					end
 
-					t3.Shield:TweenPositionInternal(SHIELD_INACTIVE_POSITION, Enum.EasingDirection.In, Enum.EasingStyle.Quad, v540, true, function() -- line: 3534
-						-- upvalues: t3 (copy), handleShieldClose (copy)
-						t3.Shield.Visible = t3.Visible
+					local v23 = Enum.EasingDirection.In
+					local v24 = Enum.EasingStyle.Quad
+					v20 = shouldCloseShieldWithSideSheet(v20) -- inferred equivalent call
+
+					if v20 then
+						v23 = Enum.EasingDirection.Out
+						v24 = Enum.EasingStyle.Quart
+					end
+
+					children.Shield:TweenPositionInternal(SHIELD_INACTIVE_POSITION, v23, v24, v22, true, function()
+						children.Shield.Visible = children.Visible
 						handleShieldClose()
 					end)
 				end
 
-				if not t1.FFlagSettingsHubIndependentBackgroundVisibility and t3.DarkenBackground then
-					local tweenInfo = TweenInfo.new(v540, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+				if not v3.FFlagSettingsHubIndependentBackgroundVisibility and children.DarkenBackground then
+					local tweenInfo = TweenInfo.new(v22, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
-					if t3.DarkenBackgroundTween then
-						t3.DarkenBackgroundTween:Cancel()
+					if children.DarkenBackgroundTween then
+						children.DarkenBackgroundTween:Cancel()
 					end
 
-					t3.DarkenBackgroundTween = TweenService:Create(t3.DarkenBackground, tweenInfo, {
+					children.DarkenBackgroundTween = TweenService:Create(children.DarkenBackground, tweenInfo, {
 						BackgroundTransparency = 1
 					})
-					t3.DarkenBackgroundTween:Play()
+					children.DarkenBackgroundTween:Play()
 				end
 			end
 
-			if u88 then
-				u88:disconnect()
+			if lastInputTypeChangedConnection then
+				lastInputTypeChangedConnection:disconnect()
 			end
 
-			if t1.isInExperienceUIVREnabled then
-				if not t1.InExperienceUIVRIXP:isMovePanelToCenter() and not VRService.VREnabled then
+			if v3.isInExperienceUIVREnabled then
+				if not (v3.InExperienceUIVRIXP:isMovePanelToCenter() or VRService.VREnabled) then
 					PlayerListManager:HideTemp("SettingsMenu", false)
 					ChatSelector:HideTemp("SettingsMenu", false)
 				end
 			else
 				PlayerListManager:HideTemp("SettingsMenu", false)
+
 				ChatSelector:HideTemp("SettingsMenu", false)
 			end
 
 			if not VRService.VREnabled then
-				MouseIconOverrideService.pop(v58)
+				MouseIconOverrideService.pop(named)
 			end
 
-			t3:CloseReactPage()
+			children:CloseReactPage()
+
 			clearMenuStack()
 
-			if not t1.FFlagEnableSideSheet then
+			if not isSideSheetEnabled then
 				ContextActionService:UnbindCoreAction("RbxSettingsHubSwitchTab")
 			end
 
 			ContextActionService:UnbindCoreAction("RbxSettingsHubStopCharacter")
 			ContextActionService:UnbindCoreAction("RbxSettingsScrollHotkey")
+
 			removeBottomBarBindings(0.4)
 			GuiService.SelectedCoreObject = nil
-			t3.GameSettingsPage:CloseSettingsPage()
 
-			if t3.ShareGamePage then
-				t3.ShareGamePage:ClearShareInviteLink(t3.ShareGameApp)
-			end
+			children.GameSettingsPage:CloseSettingsPage()
 		end
 
-		local t9 = {
-			source = p97,
-			playsessionid = t3.playSessionId,
+		local v22 = {
+			source = source,
+			playsessionid = children.playSessionId,
 			universeid = tostring(game.GameId)
 		}
 
-		if v531 then
-			if p93 then
-				RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsMenuOpenName, Constants.AnalyticsMenuActionName, t9)
+		if v21 then
+			if visible then
+				RbxAnalyticsService:SetRBXEventStream(
+					Constants.AnalyticsTargetName,
+					Constants.AnalyticsMenuOpenName,
+					Constants.AnalyticsMenuActionName,
+					v22
+				)
 
-				if t1.GetFFlagEnableLeaveGameUpsellEntrypoint() then
+				if v3.GetFFlagEnableLeaveGameUpsellEntrypoint() then
 					task.spawn(checkLeaveGameUpsell)
-
-					return
 				end
 			else
-				RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsMenuCloseName, Constants.AnalyticsMenuActionName, t9)
+				RbxAnalyticsService:SetRBXEventStream(
+					Constants.AnalyticsTargetName,
+					Constants.AnalyticsMenuCloseName,
+					Constants.AnalyticsMenuActionName,
+					v22
+				)
 			end
 		end
 	end
-	function t3.SetVisibility(_, p105, p106, p107, p108, p109) -- line: 3616
-		-- upvalues: t3 (copy), setVisibilityInternal (ref)
-		if p105 == t3.Visible then
+
+	function children:SetVisibility(p, p2, p3, p4, p5)
+		if children.Visible == p then
 			return
 		end
 
-		setVisibilityInternal(p105, p106, p107, p108, p109)
+		setVisibilityInternal(p, p2, p3, p4, p5)
 	end
-	function t3.SetBackgroundVisibility(_, p111, p112) -- line: 3622
-		-- upvalues: t3 (copy), u198 (ref)
-		if p111 == t3.DarkenBackground.Visible then
+
+	function children:SetBackgroundVisibility(p, p2)
+		if children.DarkenBackground.Visible == p then
 			return
 		end
 
-		u198(p111, p112)
+		fn8(p, p2)
 	end
-	function t3.GetVisibility(_) -- line: 3628
-		-- upvalues: t3 (copy)
-		return t3.Visible
+
+	function children.GetVisibility(_)
+		return children.Visible
 	end
-	function t3.ToggleVisibility(_, p115, p116) -- line: 3632
-		-- upvalues: setVisibilityInternal (ref), t3 (copy)
-		setVisibilityInternal(not t3.Visible, nil, nil, p115, p116)
+
+	function children:ToggleVisibility(p, p2)
+		setVisibilityInternal(not children.Visible, nil, nil, p, p2)
 	end
-	function t3.AddToMenuStack(_, p118) -- line: 3636
-		-- upvalues: t3 (copy)
-		if p118 ~= t3.MenuStack[#t3.MenuStack] then
-			t3.MenuStack[#t3.MenuStack + 1] = p118
+
+	function children:AddToMenuStack(p)
+		if children.MenuStack[#children.MenuStack] ~= p then
+			children.MenuStack[#children.MenuStack + 1] = p
 		end
 	end
-	function t3.InviteToGame(_) -- line: 3642
-		-- upvalues: t1 (copy), IXPServiceWrapper (copy), GameInviteInviteExperimentVariant (ref), PlatformFriendsService (ref), UserInputService (copy), PlatformService (ref), t3 (copy), GameInviteModalManager (ref), GameInviteConstants (ref), RobloxGui (copy)
-		local v562 = false
 
-		if t1.GetFFlagLuaInExperienceCoreScriptsGameInviteUnification() and t1.FFlagLuaEnableGameInviteModalSettingsHub then
-			local v563 = t1.GetFStringGameInviteMenuLayer()
-			local LayerData = IXPServiceWrapper:GetLayerData(v563)
-
-			IXPServiceWrapper:LogUserLayerExposure(v563)
-			v562 = not not LayerData and (LayerData.inExperienceGameInviteUXRefresh2023 == GameInviteInviteExperimentVariant.UxRefresh or LayerData.inExperienceGameInviteUXRefresh2023 == GameInviteInviteExperimentVariant.InviteLimit)
-		end
-
-		if game:GetEngineFeature("PlatformFriendsService") and PlatformFriendsService and PlatformFriendsService:IsInviteFriendsEnabled() then
-			PlatformFriendsService:ShowInviteFriendsUI()
-
-			return
-		end
-
-		if UserInputService:GetPlatform() == Enum.Platform.XBoxOne then
-			if PlatformService then
-				PlatformService:PopupGameInviteUI()
-
-				return
-			end
-		elseif v562 then
-			if not t1.FFlagAddInviteFriendsIntegration or t3.Visible then
-				t3:ToggleVisibility()
-			end
-
-			GameInviteModalManager:openModal({
-				trigger = GameInviteConstants.Triggers.GameMenu
-			})
-
-			if t1.FFlagEnableConsoleExpControls and t1.ChromeEnabled then
-				require(RobloxGui.Modules.Chrome.Service):setShortcutBar(nil)
-
-				return
+	function children:InviteToGame()
+		if game:GetEngineFeature("PlatformFriendsService") and v5 and v5:IsInviteFriendsEnabled() then
+			v5:ShowInviteFriendsUI()
+		elseif UserInputService:GetPlatform() == Enum.Platform.XBoxOne then
+			if v4 then
+				v4:PopupGameInviteUI()
 			end
 		else
-			t3:AddToMenuStack(t3.Pages.CurrentPage)
-			t3:SwitchToPage(t3.ShareGamePage, nil, 1, true)
-		end
-	end
-	function t3.PopMenu(_, _, p122, p123) -- line: 3675
-		-- upvalues: t3 (copy), BindableEvent (copy), t1 (copy), RobloxGui (copy)
-		if t3.MenuStack and #t3.MenuStack > 0 then
-			local v569 = t3.MenuStack[#t3.MenuStack]
-
-			if type(v569) ~= "table" then
-				BindableEvent:Fire(v569)
+			if not v3.FFlagAddInviteFriendsIntegration or children.Visible then
+				children:ToggleVisibility()
 			end
 
-			table.remove(t3.MenuStack, #t3.MenuStack)
-			t3:SwitchToPage(t3.MenuStack[#t3.MenuStack], true, 1, p122)
+			GameInviteModalManager:openModal({ trigger = GameInviteConstants.Triggers.GameMenu })
 
-			if #t3.MenuStack == 0 then
-				if t1.FFlagAddUILessMode then
-					t3:SetVisibility(false, nil, nil, nil, p123)
+			if v3.FFlagEnableConsoleExpControls and v3.ChromeEnabled then
+				local Service = require(RobloxGui.Modules.Chrome.Service)
+				Service:setShortcutBar(nil)
+			end
+		end
+
+		if isSideSheetPairedWithPeoplePage() then -- inferred equivalent call
+			toggleSideSheet(false)
+		end
+	end
+
+	function children:PopMenu(_, p, p2)
+		if children.MenuStack and #children.MenuStack > 0 then
+			local v20 = children.MenuStack[#children.MenuStack]
+
+			if type(v20) ~= "table" then
+				poppedMenu:Fire(v20)
+			end
+
+			table.remove(children.MenuStack, #children.MenuStack)
+			children:SwitchToPage(children.MenuStack[#children.MenuStack], true, 1, p)
+
+			if #children.MenuStack == 0 then
+				if v3.FFlagAddUILessMode then
+					children:SetVisibility(false, nil, nil, nil, p2)
 				else
-					t3:SetVisibility(false)
+					children:SetVisibility(false)
 				end
 
-				t3.Pages.CurrentPage:Hide(0, 0, nil, nil, t3.PageViewInnerFrame)
-
-				return
-			end
-
-			if t1.ChromeEnabled and t1.FFlagEnableConsoleExpControls then
-				require(RobloxGui.Modules.Chrome.Service):setShortcutBar(require(RobloxGui.Modules.Chrome.ChromeShared.Unibar.Constants).TILTMENU_SHORTCUTBAR_ID)
-
-				return
+				children.Pages.CurrentPage:Hide(0, 0, nil, nil, children.PageViewInnerFrame)
+			elseif v3.ChromeEnabled and v3.FFlagEnableConsoleExpControls then
+				local Service = require(RobloxGui.Modules.Chrome.Service)
+				local Constants3 = require(RobloxGui.Modules.Chrome.ChromeShared.Unibar.Constants)
+				Service:setShortcutBar(Constants3.TILTMENU_SHORTCUTBAR_ID)
 			end
 		else
-			t3.MenuStack = {}
-			BindableEvent:Fire()
+			children.MenuStack = {}
+			poppedMenu:Fire()
 
-			if t1.FFlagAddUILessMode then
-				t3:ToggleVisibility(nil, p123)
+			if v3.FFlagAddUILessMode then
+				children:ToggleVisibility(nil, p2)
+			else
+				children:ToggleVisibility(p2)
+			end
+		end
+	end
 
-				return
+	function children:ShowShield()
+		local backgroundTransparency = UserInputService.VREnabled and 1 or transparency
+
+		children.Shield.BackgroundTransparency = backgroundTransparency
+	end
+
+	function children:HideShield()
+		children.Shield.BackgroundTransparency = 1
+	end
+
+	function children:ShowReactPage()
+		if children.reactPage then
+			children.reactPageAnalytics:openPage(children.reactPage.name)
+		end
+
+		children.ReactPage.Visible = true
+		children.Page.Visible = false
+	end
+
+	function children:HideReactPage()
+		if children.reactPage then
+			children.reactPageAnalytics:closePage(children.reactPage.name)
+		end
+
+		local visible = children.ReactPage.Visible
+		children.ReactPage.Visible = false
+		children.Page.Visible = true
+
+		if children.Pages.CurrentPage and visible and children.Visible then
+			children.Pages.CurrentPage:SelectARow(true)
+		end
+	end
+
+	function children:MountReactPage()
+		ReactPageSignal(false).setCurrentReactPage(nil)
+
+		if children.reactPageRoot then
+			children:UnmountReactPage()
+		end
+
+		children.reactPageRoot = ReactRoblox.createRoot(children.ReactPage)
+	end
+
+	function children:UnmountReactPage()
+		if children.reactPageRoot then
+			children.reactPageRoot:unmount()
+			children.reactPageRoot = nil
+		end
+	end
+
+	function children:CloseReactPage()
+		children:HideReactPage()
+		children:UnmountReactPage()
+	end
+
+	function children:SwitchToReactPage(reactPage, p, flag: boolean?)
+		if flag then
+			children:UnmountReactPage()
+		elseif reactPage then
+			children.reactPage = reactPage
+
+			if not children.reactPageRoot then
+				children:MountReactPage()
 			end
 
-			t3:ToggleVisibility(p123)
-		end
-	end
-	function t3.ShowShield(_) -- line: 3709
-		-- upvalues: UserInputService (copy), v56 (copy), t3 (copy)
-		local v571 = if not UserInputService.VREnabled then v56 else 1
-
-		t3.Shield.BackgroundTransparency = v571
-	end
-	function t3.HideShield(_) -- line: 3719
-		-- upvalues: t3 (copy)
-		t3.Shield.BackgroundTransparency = 1
-	end
-	function t3.ShowReactPage(_) -- line: 3723
-		-- upvalues: t3 (copy)
-		if t3.reactPage then
-			t3.reactPageAnalytics:openPage(t3.reactPage.name)
+			children.reactPageRoot:render(reactPage:createPage(p))
 		end
 
-		t3.ReactPage.Visible = true
-		t3.Page.Visible = false
+		children:ShowReactPage()
 	end
-	function t3.HideReactPage(_) -- line: 3732
-		-- upvalues: t3 (copy), t1 (copy)
-		if t3.reactPage then
-			t3.reactPageAnalytics:closePage(t3.reactPage.name)
-		end
 
-		local ReactPageVisible = t3.ReactPage.Visible
+	children.GameSettingsPageReorderIXPFetched = false
+	local settingsShowSignalConnection = nil
+	local v20 = nil
+	local function enableVR()
+		local VrCommon2 = require(CorePackages.Workspace.Packages.VrCommon)
+		local vrHub = VrCommon2.VRHub
+		local VrCommon3 = require(CorePackages.Workspace.Packages.VrCommon)
+		local panel3D = VrCommon3.Panel3D
+		local settingsMenu = panel3D.Get("SettingsMenu")
+		settingsMenu:ResizeStuds(4, 4, 250)
+		settingsMenu:SetType(panel3D.Type.Standard)
+		settingsMenu:SetVisible(false)
+		settingsMenu:SetCanFade(false)
 
-		t3.ReactPage.Visible = false
-		t3.Page.Visible = true
+		children.ClippingShield.Parent = settingsMenu:GetGUI()
+		children.Shield.Parent.ClipsDescendants = false
+		children.VRShield.Visible = true
+		children:HideShield()
 
-		if t1.FFlagCreateInExperienceMenuReact and t1.FFlagIEMFocusNavToButtons and t3.Pages.CurrentPage and ReactPageVisible and t3.Visible then
-			t3.Pages.CurrentPage:SelectARow(true)
-		end
-	end
-	function t3.MountReactPage(_) -- line: 3746
-		-- upvalues: t1 (copy), ReactPageSignal (copy), t3 (copy), ReactRoblox (copy)
-		if t1.FFlagCreateInExperienceMenuReact then
-			ReactPageSignal(false).setCurrentReactPage(nil)
-		end
+		settingsShowSignalConnection = children.SettingsShowSignal:connect(function(p)
+			if p then
+				settingsMenu:SetVisible(true)
 
-		if t3.reactPageRoot then
-			t3:UnmountReactPage()
-		end
+				vrHub:FireModuleOpened("SettingsMenu")
+			else
+				settingsMenu:SetVisible(false)
 
-		t3.reactPageRoot = ReactRoblox.createRoot(t3.ReactPage)
-	end
-	function t3.UnmountReactPage(_) -- line: 3756
-		-- upvalues: t3 (copy)
-		if t3.reactPageRoot then
-			t3.reactPageRoot:unmount()
-			t3.reactPageRoot = nil
-		end
-	end
-	function t3.CloseReactPage(_) -- line: 3763
-		-- upvalues: t3 (copy)
-		t3:HideReactPage()
-		t3:UnmountReactPage()
-	end
-	function t3.SwitchToReactPage(_: {[any]: any}, p131, p132, b2: boolean?) -- line: 3768
-		-- upvalues: t1 (copy), t3 (copy)
-		if t1.FFlagCreateInExperienceMenuReact and b2 then
-			t3:UnmountReactPage()
-		elseif p131 then
-			t3.reactPage = p131
-
-			if not t3.reactPageRoot then
-				t3:MountReactPage()
+				vrHub:FireModuleClosed("SettingsMenu")
 			end
-
-			t3.reactPageRoot:render(p131:createPage(p132))
-		end
-
-		t3:ShowReactPage()
-	end
-
-	t3.GameSettingsPageReorderIXPFetched = false
-
-	local u199 = nil
-	local u200 = nil
-
-	local function enableVR() -- line: 3786
-		-- upvalues: CorePackages (copy), t3 (copy), u199 (ref)
-		local VRHub2 = require(CorePackages.Workspace.Packages.VrCommon).VRHub
-		local Panel3D = require(CorePackages.Workspace.Packages.VrCommon).Panel3D
-		local v585 = Panel3D.Get("SettingsMenu")
-
-		v585:ResizeStuds(4, 4, 250)
-		v585:SetType(Panel3D.Type.Standard)
-		v585:SetVisible(false)
-		v585:SetCanFade(false)
-		t3.ClippingShield.Parent = v585:GetGUI()
-		t3.Shield.Parent.ClipsDescendants = false
-		t3.VRShield.Visible = true
-		t3:HideShield()
-		u199 = t3.SettingsShowSignal:connect(function(p133) -- line: 3800
-			-- upvalues: v585 (copy), VRHub2 (copy)
-			if p133 then
-				v585:SetVisible(true)
-				VRHub2:FireModuleOpened("SettingsMenu")
-
-				return
-			end
-
-			v585:SetVisible(false)
-			VRHub2:FireModuleClosed("SettingsMenu")
 		end)
-		VRHub2.ModuleOpened.Event:connect(function(p134) -- line: 3812
-			-- upvalues: t3 (copy)
-			if p134 ~= "SettingsMenu" then
-				t3:SetVisibility(false)
+
+		vrHub.ModuleOpened.Event:connect(function(p)
+			if p ~= "SettingsMenu" then
+				children:SetVisibility(false)
 			end
 		end)
 	end
-	local function disableVR() -- line: 3818
-		-- upvalues: t3 (copy), RobloxGui (copy), u199 (ref), u200 (ref), CorePackages (copy)
-		t3.ClippingShield.Parent = RobloxGui
-		t3.Shield.Parent.ClipsDescendants = true
-		t3.VRShield.Visible = false
-		t3:ShowShield()
+	local function disableVR()
+		children.ClippingShield.Parent = RobloxGui
+		children.Shield.Parent.ClipsDescendants = true
+		children.VRShield.Visible = false
+		children:ShowShield()
 
-		if u199 then
-			u199:disconnect()
-			u199 = nil
+		if settingsShowSignalConnection then
+			settingsShowSignalConnection:disconnect()
+			settingsShowSignalConnection = nil
 		end
 
-		if u200 then
-			u200:disconnect()
-			u200 = nil
+		if v20 then
+			v20:disconnect()
+			v20 = nil
 		end
 
-		require(CorePackages.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):SetVisible(false)
+		local VrCommon2 = require(CorePackages.Workspace.Packages.VrCommon)
+		VrCommon2.Panel3D.Get("SettingsMenu"):SetVisible(false)
 	end
-	local function refreshForSpatialUI() -- line: 3838
-		-- upvalues: onScreenSizeChanged (copy), t3 (copy), Theme (copy), GuiService (copy), resizeBottomBarButtons (copy)
+
+	local function refreshForSpatialUI() -- 2 equivalent calls inferred from this helper
 		onScreenSizeChanged()
-		t3.MenuContainer.BackgroundTransparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
+		onPreferredTransparencyChanged() -- inferred equivalent call
 		resizeBottomBarButtons()
 	end
-	local function OnVREnabled(p135) -- line: 3844
-		-- upvalues: UserInputService (copy), t1 (copy), t3 (copy), onScreenSizeChanged (copy), Theme (copy), GuiService (copy), resizeBottomBarButtons (copy), enableVR (copy), disableVR (copy)
-		if p135 == "VREnabled" then
-			if UserInputService.VREnabled then
-				if t1.isInExperienceUIVREnabled then
-					t3.SettingsUIDelegate:enableVR()
-					onScreenSizeChanged()
-					t3.MenuContainer.BackgroundTransparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
-					resizeBottomBarButtons()
 
+	local function OnVREnabled(p)
+		if p == "VREnabled" then
+			if UserInputService.VREnabled then
+				if not v3.isInExperienceUIVREnabled then
+					enableVR()
 					return
 				end
 
-				enableVR()
-
-				return
+				children.SettingsUIDelegate:enableVR()
+				refreshForSpatialUI() -- inferred equivalent call
+			elseif v3.isInExperienceUIVREnabled then
+				children.SettingsUIDelegate:disableVR()
+				refreshForSpatialUI() -- inferred equivalent call
+			else
+				disableVR()
 			end
-
-			if t1.isInExperienceUIVREnabled then
-				t3.SettingsUIDelegate:disableVR()
-				onScreenSizeChanged()
-				t3.MenuContainer.BackgroundTransparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
-				resizeBottomBarButtons()
-
-				return
-			end
-
-			disableVR()
 		end
 	end
-
 	UserInputService.Changed:connect(OnVREnabled)
 	OnVREnabled("VREnabled")
-	t3.ResetCharacterPage:SetHub(t3)
 
-	if InExperienceCapabilities.canNavigateHome then
-		t3.LeaveGamePage:SetHub(t3)
+	children.ResetCharacterPage:SetHub(children)
+
+	if inExperienceCapabilities.canNavigateHome then
+		children.LeaveGamePage:SetHub(children)
 	end
 
-	if t1.GetFFlagEnableLeaveGameUpsellEntrypoint() then
-		t3.LeaveGameUpsellPage:SetHub(t3)
+	if v3.GetFFlagEnableLeaveGameUpsellEntrypoint() then
+		children.LeaveGameUpsellPage:SetHub(children)
 	end
 
-	t3.GameSettingsPage = require(RobloxGui.Modules.Settings.Pages.GameSettingsWrapper)
-	t3.GameSettingsPage:SetHub(t3)
-	t3.ReportAbusePage = require(RobloxGui.Modules.Settings.Pages.ReportAbuseMenuNewContainerPage)
-	t3.ReportAbusePage:SetHub(t3)
-	t3.ReportSentPage = require(RobloxGui.Modules.Settings.Pages.ReportSentPage)
-	t3.ReportSentPage:SetHub(t3)
-	t3.ReportSentPageV2 = require(RobloxGui.Modules.Settings.Pages.ReportSentPageV2)
-	t3.ReportSentPageV2:SetHub(t3)
-	t3.HelpPage = require(RobloxGui.Modules.Settings.Pages.HelpWrapper)
-	t3.HelpPage:SetHub(t3)
+	children.GameSettingsPage = require(RobloxGui.Modules.Settings.Pages.GameSettingsWrapper)
+	children.GameSettingsPage:SetHub(children)
 
-	if t1.FFlagHelpPageIXPExposure then
-		t3.HelpPageIXPFetched = false
+	children.ReportAbusePage = require(RobloxGui.Modules.Settings.Pages.ReportAbuseMenuContainerPage)
+	children.ReportAbusePage:SetHub(children)
+
+	children.ReportSentPage = require(RobloxGui.Modules.Settings.Pages.ReportSentPage)
+	children.ReportSentPage:SetHub(children)
+
+	children.ReportSentPageV2 = require(RobloxGui.Modules.Settings.Pages.ReportSentPageV2)
+	children.ReportSentPageV2:SetHub(children)
+
+	children.HelpPage = require(RobloxGui.Modules.Settings.Pages.HelpWrapper)
+	children.HelpPage:SetHub(children)
+
+	if v3.FFlagHelpPageIXPExposure then
+		children.HelpPageIXPFetched = false
 	end
 
-	if not t1.FFlagRemoveRecordPage then
-		local v205 = CachedPolicyService:IsSubjectToChinaPolicies()
+	if inExperienceCapabilities.canListPeopleInSameServer then
+		children.PlayersPage = require(RobloxGui.Modules.Settings.Pages.PeopleWrapper)
+		children.PlayersPage:SetHub(children)
 
-		if Platform == Enum.Platform.Windows and not v205 then
-			t3.RecordPage = require(RobloxGui.Modules.Settings.Pages.Record)
-			t3.RecordPage:SetHub(t3)
+		if
+			not v3.FFlagMenuButtonsMountWithIEM
+			and v3.FFlagRelocateMobileMenuButtons
+			and v3.FIntRelocateMobileMenuButtonsVariant == 2
+			and Utility:IsSmallTouchScreen()
+		then
+			children.PlayersPage:CreateMenuButtonsContainer()
 		end
 	end
 
-	if InExperienceCapabilities.canListPeopleInSameServer then
-		t3.PlayersPage = require(RobloxGui.Modules.Settings.Pages.PeopleWrapper)
-		t3.PlayersPage:SetHub(t3)
-
-		if not t1.FFlagMenuButtonsMountWithIEM and t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant == 2 and Utility:IsSmallTouchScreen() then
-			t3.PlayersPage:CreateMenuButtonsContainer()
-		end
+	if v3.FFlagAddIEMProfilePage then
+		children.PlayerProfilePage = require(RobloxGui.Modules.Settings.Pages.PlayerProfile)
 	end
 
-	if t1.FFlagAddIEMProfilePage then
-		t3.PlayerProfilePage = require(RobloxGui.Modules.Settings.Pages.PlayerProfile)
+	if not v3.isExitModalRemoved and isSubjectToDesktopPolicies() then
+		children.ExitModalPage = require(RobloxGui.Modules.Settings.Pages.ExitModal)
+		children.ExitModalPage:SetHub(children)
 	end
 
-	if not t1.FFlagRemoveExitModal and isSubjectToDesktopPolicies() then
-		t3.ExitModalPage = require(RobloxGui.Modules.Settings.Pages.ExitModal)
-		t3.ExitModalPage:SetHub(t3)
+	if isSubjectToDesktopPolicies() and inExperienceCapabilities.canNavigateHome then
+		children.LeaveGameToHomePage = require(RobloxGui.Modules.Settings.Pages.LeaveGameToHome)
+		children.LeaveGameToHomePage:SetHub(children)
 	end
 
-	if isSubjectToDesktopPolicies() and InExperienceCapabilities.canNavigateHome then
-		t3.LeaveGameToHomePage = require(RobloxGui.Modules.Settings.Pages.LeaveGameToHome)
-		t3.LeaveGameToHomePage:SetHub(t3)
+	local v21 = CapturesPolicy.PolicyImplementation.read()
+	local v22
+
+	if v21 then
+		v22 = CapturesPolicy.Mapper(v21).eligibleForCapturesFeature()
+	else
+		v22 = false
 	end
 
-	if not v13 and GetCorePackagesLoaded({
-		"Roact",
-		"Rodux",
-		"RoactRodux"
-	}) then
-		local CorePackages3 = game:GetService("CorePackages")
-		local EventStream = require(CorePackages3.Workspace.Packages.Analytics).AnalyticsReporters.EventStream
-		local Diag = require(CorePackages3.Workspace.Packages.Analytics).AnalyticsReporters.Diag
-		local v209 = EventStream.new(RbxAnalyticsService)
-		local v210 = GameInviteAnalytics.new():withEventStream(v209):withDiag(Diag.new(RbxAnalyticsService)):withButtonName(GameInviteAnalytics.ButtonName.SettingsHub)
+	local fFlagFixSpatialUICaptures = v3.isInExperienceUIVREnabled and v3.FFlagFixSpatialUICaptures
 
-		t3.ShareGameApp = require(RobloxGui.Modules.Settings.ShareGameMaster).createApp(t3.PageViewClipper, v210)
-		t3.ShareGamePage = require(RobloxGui.Modules.Settings.Pages.ShareGamePlaceholderPage)
-		t3.ShareGamePage:ConnectHubToApp(t3, t3.ShareGameApp)
-		t3:AddPage(t3.ShareGamePage)
-	end
-
-	local v211 = CapturesPolicy.PolicyImplementation.read()
-	local v212 = not not v211 and CapturesPolicy.Mapper(v211).eligibleForCapturesFeature()
-	local v213 = t1.isInExperienceUIVREnabled and t1.FFlagFixSpatialUICaptures
-
-	if v212 and (not v213 or not isSpatial()) then
+	if v22 and not (fFlagFixSpatialUICaptures and isSpatial()) then
 		local CapturesPageWrapper = require(RobloxGui.Modules.Settings.Pages.CapturesPageWrapper)
 
-		local function closeSettingsMenu() -- line: 3968
-			-- upvalues: t3 (copy)
-			t3:SetVisibility(false, true)
+		local function closeSettingsMenu()
+			children:SetVisibility(false, true)
 		end
 
-		t3.CapturesApp = CapturesApp
-		t3.CapturesApp.mountMenuPage(CapturesPageWrapper.Page, closeSettingsMenu, t1.ChromeEnabled)
-		t3.CapturesPage = CapturesPageWrapper
-		t3.CapturesPage:ConnectHubToApp(t3, t3.PageViewClipper, t3.CapturesApp)
+		children.CapturesApp = CapturesApp
+		children.CapturesApp.mountMenuPage(CapturesPageWrapper.Page, closeSettingsMenu, v3.ChromeEnabled)
+
+		children.CapturesPage = CapturesPageWrapper
+		children.CapturesPage:ConnectHubToApp(children, children.PageViewClipper, children.CapturesApp)
 	end
 
-	if t1.FFlagIntegrateTraversalHistoryInSideSheet then
-		t3.TraversalHistoryPage = require(RobloxGui.Modules.Settings.Pages.TraversalHistoryWrapper)()
-		t3.TraversalHistoryPage:SetHub(t3)
+	if v3.FFlagIntegrateTraversalHistoryInSideSheet then
+		local TraversalHistoryWrapper = require(RobloxGui.Modules.Settings.Pages.TraversalHistoryWrapper)
+		children.TraversalHistoryPage = TraversalHistoryWrapper()
+		children.TraversalHistoryPage:SetHub(children)
 	end
 
-	if t3.PlayersPage then
-		t3:AddPage(t3.PlayersPage)
+	if children.PlayersPage then
+		children:AddPage(children.PlayersPage)
 	end
 
-	t3:AddPage(t3.ResetCharacterPage)
+	children:AddPage(children.ResetCharacterPage)
 
-	if t3.LeaveGamePage then
-		t3:AddPage(t3.LeaveGamePage)
+	if children.LeaveGamePage then
+		children:AddPage(children.LeaveGamePage)
 	end
 
-	if t1.GetFFlagEnableLeaveGameUpsellEntrypoint() and t3.LeaveGameUpsellPage then
-		t3:AddPage(t3.LeaveGameUpsellPage)
+	if v3.GetFFlagEnableLeaveGameUpsellEntrypoint() and children.LeaveGameUpsellPage then
+		children:AddPage(children.LeaveGameUpsellPage)
 	end
 
-	t3:AddPage(t3.GameSettingsPage)
+	children:AddPage(children.GameSettingsPage)
 
-	if t3.CapturesPage then
-		t3:AddPage(t3.CapturesPage)
+	if children.CapturesPage then
+		children:AddPage(children.CapturesPage)
 	end
 
-	if t3.ReportAbusePage then
-		t3:AddPage(t3.ReportAbusePage)
+	if children.ReportAbusePage then
+		children:AddPage(children.ReportAbusePage)
 	end
 
-	if t3.ReportSentPage then
-		t3:AddPage(t3.ReportSentPage)
+	if children.ReportSentPage then
+		children:AddPage(children.ReportSentPage)
 	end
 
-	if t3.ReportSentPageV2 then
-		t3:AddPage(t3.ReportSentPageV2)
+	if children.ReportSentPageV2 then
+		children:AddPage(children.ReportSentPageV2)
 	end
 
-	t3:AddPage(t3.HelpPage)
+	children:AddPage(children.HelpPage)
 
-	if not t1.FFlagRemoveRecordPage and t3.RecordPage and not t3.CapturesPage then
-		t3:AddPage(t3.RecordPage)
+	if not v3.isExitModalRemoved and children.ExitModalPage then
+		children:AddPage(children.ExitModalPage)
 	end
 
-	if not t1.FFlagRemoveExitModal and t3.ExitModalPage then
-		t3:AddPage(t3.ExitModalPage)
+	if children.LeaveGameToHomePage then
+		children:AddPage(children.LeaveGameToHomePage)
 	end
 
-	if t3.LeaveGameToHomePage then
-		t3:AddPage(t3.LeaveGameToHomePage)
+	if children.TraversalHistoryPage then
+		children:AddPage(children.TraversalHistoryPage)
 	end
 
-	if t3.TraversalHistoryPage then
-		t3:AddPage(t3.TraversalHistoryPage)
-	end
+	children:InitInPage(children:GetFirstPageWithTabHeader())
 
-	t3:InitInPage(t3:GetFirstPageWithTabHeader())
-
-	if not t1.isNewInGameMenuEnabled() and (not t1.FFlagAddUILessMode or t1.FIntAddUILessModeVariant == 0) then
-		ContextActionService:BindCoreAction("RBXEscapeMainMenu", function(_, p137, _) -- line: 4038
-			-- upvalues: t1 (copy), getSideSheetVisibility (copy), toggleSideSheet (copy), t3 (copy), Constants (copy)
-			if p137 ~= Enum.UserInputState.Begin then
+	if not v3.isNewInGameMenuEnabled() and (not v3.FFlagAddUILessMode or v3.FIntAddUILessModeVariant == 0) then
+		ContextActionService:BindCoreAction("RBXEscapeMainMenu", function(_, p, _)
+			if
+				p ~= Enum.UserInputState.Begin
+				or (v3.FFlagShowSwitchServerButton or isPioneerLaunch())
+				and GetSwitchServerStore(false).isConfirmationOpen(false)
+			then
 				return
 			end
 
-			if t1.FFlagEnableSideSheet then
+			if isSideSheetEnabled then
 				if getSideSheetVisibility() then
-					toggleSideSheet(false)
-
-					return
-				end
-
-				if t3.MenuStack and #t3.MenuStack > 0 then
-					if t1.FFlagAddUILessMode then
-						t3:PopMenu(false, true, Constants.AnalyticsMenuOpenTypes.Keyboard)
-
-						return
+					if isSideSheetPairedWithPeoplePage() and getIsPeoplePageOpen() then -- inferred equivalent call
+						children:SetVisibility(false)
+					else
+						toggleSideSheet(false)
 					end
-
-					t3:PopMenu(false, true)
-
-					return
+				elseif not (children.MenuStack and #children.MenuStack > 0) then
+					toggleSideSheet(true)
+				elseif v3.FFlagAddUILessMode then
+					children:PopMenu(false, true, Constants.AnalyticsMenuOpenTypes.Keyboard)
+				else
+					children:PopMenu(false, true)
 				end
-
-				toggleSideSheet(true)
-
-				return
+			elseif v3.FFlagAddUILessMode then
+				children:PopMenu(false, true, Constants.AnalyticsMenuOpenTypes.Keyboard)
+			else
+				children:PopMenu(false, true)
 			end
-
-			if t1.FFlagAddUILessMode then
-				t3:PopMenu(false, true, Constants.AnalyticsMenuOpenTypes.Keyboard)
-
-				return
-			end
-
-			t3:PopMenu(false, true)
 		end, false, Enum.KeyCode.Escape)
 	end
 
-	GuiService.ShowLeaveConfirmation:connect(function() -- line: 4069
-		-- upvalues: t1 (copy), getSideSheetVisibility (copy), toggleSideSheet (copy), t3 (copy), Constants (copy)
-		if t1.FFlagEnableSideSheet and t1.FFlagSideSheetAndroidBack then
+	local teamCreateUtils = require(CorePackages.Workspace.Packages.BuildExperiencePlaytestLaunch.teamCreateUtils)
+	local viewer = teamCreateUtils.isViewer()
+	GuiService.ShowLeaveConfirmation:connect(function()
+		if viewer then
+			return
+		end
+
+		if isSideSheetEnabled and (v3.FFlagSideSheetAndroidBack or shouldAndroidBackUseSideSheet()) then -- inferred equivalent call
 			if getSideSheetVisibility() then
-				toggleSideSheet(false)
+				if isSideSheetPairedWithPeoplePage() and getIsPeoplePageOpen() then -- inferred equivalent call
+					children:SetVisibility(false)
+				else
+					toggleSideSheet(false)
+				end
+			elseif #children.MenuStack > 0 then
+				children:PopMenu(false, true)
+			else
+				toggleSideSheet(true)
+			end
+		else
+			if #children.MenuStack ~= 0 then
+				children:PopMenu(false, true)
 
 				return
 			end
 
-			if #t3.MenuStack > 0 then
-				t3:PopMenu(false, true)
-
-				return
-			end
-
-			toggleSideSheet(true)
-
-			return
+			children:SetVisibility(true, nil, nil, nil, Constants.AnalyticsMenuOpenTypes.GamepadLeaveGame)
+			children:SwitchToPage(children:GetFirstPageWithTabHeader(), nil, 1)
 		end
-
-		if #t3.MenuStack == 0 then
-			t3:SetVisibility(true, nil, nil, nil, Constants.AnalyticsMenuOpenTypes.GamepadLeaveGame)
-			t3:SwitchToPage(t3:GetFirstPageWithTabHeader(), nil, 1)
-
-			return
-		end
-
-		t3:PopMenu(false, true)
 	end)
+
 	ContextActionService:BindCoreAction("Open Dev Console", toggleDevConsole, false, Enum.KeyCode.F9)
+
 	ContextActionService:BindCoreAction("Show Quick Profiler", toggleQuickProfilerFromHotkey, false, Enum.KeyCode.F7)
-	UserInputService.InputBegan:connect(function(p139) -- line: 4105
-		-- upvalues: t3 (copy), GuiService (copy)
-		if (p139.KeyCode == Enum.KeyCode.Left or (p139.KeyCode == Enum.KeyCode.Right or p139.KeyCode == Enum.KeyCode.Up or p139.KeyCode == Enum.KeyCode.Down)) and (t3.Visible and t3.Active and t3.Pages.CurrentPage and GuiService.SelectedCoreObject == nil) then
-			t3.Pages.CurrentPage:SelectARow()
+
+	UserInputService.InputBegan:connect(function(p)
+		if
+			(p.KeyCode == Enum.KeyCode.Left or p.KeyCode == Enum.KeyCode.Right or p.KeyCode == Enum.KeyCode.Up or p.KeyCode == Enum.KeyCode.Down)
+			and children.Visible
+			and children.Active
+			and children.Pages.CurrentPage
+			and GuiService.SelectedCoreObject == nil
+		then
+			children.Pages.CurrentPage:SelectARow()
 		end
 	end)
 
-	local u216 = false
-
-	local function logExitModalIXPExposureOnce() -- line: 4119
-		-- upvalues: u216 (ref), IXPServiceWrapper (copy), t1 (copy)
-		if u216 then
+	local flag = false
+	local function logExitModalIXPExposureOnce() -- 3 equivalent calls inferred from this helper
+		if flag then
 			return
 		end
 
-		u216 = true
-		IXPServiceWrapper:LogFlagLinkedUserLayerExposure(t1.GetFStringExitModalIXPLayer())
+		flag = true
+		IXPServiceWrapper:LogFlagLinkedUserLayerExposure(v3.GetFStringExitModalIXPLayer())
 	end
 
-	if t1.FFlagRemoveExitModal and isSubjectToDesktopPolicies() then
-		game:GetService("GuiService").NativeClose:Connect(function() -- line: 4128
-			-- upvalues: t1 (copy), u216 (ref), IXPServiceWrapper (copy), leaveGame (copy)
-			if t1.FFlagEnableExitModalExposure and not u216 then
-				u216 = true
-				IXPServiceWrapper:LogFlagLinkedUserLayerExposure(t1.GetFStringExitModalIXPLayer())
+	if v3.isExitModalRemoved and isSubjectToDesktopPolicies() then
+		local GuiService2 = game:GetService("GuiService")
+		GuiService2.NativeClose:Connect(function()
+			if v3.FFlagEnableExitModalExposure then
+				logExitModalIXPExposureOnce() -- inferred equivalent call
 			end
 
-			leaveGame(false, {
-				shouldNativeExit = true
-			})
+			leaveGame(false, { shouldNativeExit = true })
 		end)
 
-		if t3.FullScreenTitleBar then
-			t3.FullScreenTitleBar = SettingsFullScreenTitleBar.update(t3.FullScreenTitleBar, {
-				onClose = function() -- line: 4137
-					-- upvalues: t1 (copy), u216 (ref), IXPServiceWrapper (copy), leaveGame (copy)
-					if t1.FFlagEnableExitModalExposure and not u216 then
-						u216 = true
-						IXPServiceWrapper:LogFlagLinkedUserLayerExposure(t1.GetFStringExitModalIXPLayer())
+		if children.FullScreenTitleBar then
+			children.FullScreenTitleBar = SettingsFullScreenTitleBar.update(children.FullScreenTitleBar, {
+				onClose = function()
+					if v3.FFlagEnableExitModalExposure then
+						logExitModalIXPExposureOnce() -- inferred equivalent call
 					end
 
-					leaveGame(false, {
-						shouldNativeExit = true
-					})
+					leaveGame(false, { shouldNativeExit = true })
 				end
 			})
 		end
-	elseif t3.ExitModalPage then
-		local function showExitModal() -- line: 4146
-			-- upvalues: t1 (copy), u216 (ref), IXPServiceWrapper (copy), t3 (copy), removeBottomBarBindings (copy)
-			if t1.FFlagEnableExitModalExposure and not u216 then
-				u216 = true
-				IXPServiceWrapper:LogFlagLinkedUserLayerExposure(t1.GetFStringExitModalIXPLayer())
+	elseif children.ExitModalPage then
+		local function showExitModal()
+			if v3.FFlagEnableExitModalExposure then
+				logExitModalIXPExposureOnce() -- inferred equivalent call
 			end
 
-			t3.HubBar.Visible = false
+			children.HubBar.Visible = false
 			removeBottomBarBindings()
 
-			if t3:GetVisibility() then
-				t3:AddToMenuStack(t3.Pages.CurrentPage)
-				t3:SwitchToPage(t3.ExitModalPage, nil, 1, true)
+			if not children:GetVisibility() then
+				children:SetVisibility(true, nil, children.ExitModalPage, false)
 
 				return
 			end
 
-			t3:SetVisibility(true, nil, t3.ExitModalPage, false)
+			children:AddToMenuStack(children.Pages.CurrentPage)
+			children:SwitchToPage(children.ExitModalPage, nil, 1, true)
 		end
-		local function handleNativeExit() -- line: 4159
-			-- upvalues: t3 (copy), t1 (copy), PerfUtils (copy), v181 (copy), showExitModal (copy)
-			if t3:GetVisibility() and t3.Pages.CurrentPage == t3.ExitModalPage then
-				if t1.FFlagEnableInGameMenuDurationLogger then
-					PerfUtils.leavingGame()
-				end
-
-				if t1.FFlagRelocateMobileMenuButtons and t1.FIntRelocateMobileMenuButtonsVariant ~= 0 then
-					v181()
-
-					if t1.FFlagMenuButtonsMountWithIEM and t1.FIntRelocateMobileMenuButtonsVariant == 2 and t3.PlayersPage then
-						t3.PlayersPage:UnmountMenuButtonsContainer()
-					end
-				end
-
-				t3.ExitModalPage.LeaveAppFunc(true)
+		local function handleNativeExit()
+			if not children:GetVisibility() or children.Pages.CurrentPage ~= children.ExitModalPage then
+				showExitModal()
 
 				return
 			end
 
-			showExitModal()
+			if v3.FFlagEnableInGameMenuDurationLogger then
+				PerfUtils.leavingGame()
+			end
+
+			if v3.FFlagRelocateMobileMenuButtons and v3.FIntRelocateMobileMenuButtonsVariant ~= 0 then
+				fn2()
+
+				if
+					v3.FFlagMenuButtonsMountWithIEM
+					and v3.FIntRelocateMobileMenuButtonsVariant == 2
+					and children.PlayersPage
+				then
+					children.PlayersPage:UnmountMenuButtonsContainer()
+				end
+			end
+
+			children.ExitModalPage.LeaveAppFunc(true)
 		end
 
-		game:GetService("GuiService").NativeClose:Connect(handleNativeExit)
+		local GuiService2 = game:GetService("GuiService")
+		GuiService2.NativeClose:Connect(handleNativeExit)
 
-		if t3.FullScreenTitleBar then
-			t3.FullScreenTitleBar = SettingsFullScreenTitleBar.update(t3.FullScreenTitleBar, {
+		if children.FullScreenTitleBar then
+			children.FullScreenTitleBar = SettingsFullScreenTitleBar.update(children.FullScreenTitleBar, {
 				onClose = handleNativeExit
 			})
 		end
 	end
 
-	if t1.GetFFlagEnableAppChatInExperience() then
-		local connection3 = nil
+	if v3.GetFFlagEnableAppChatInExperience() then
+		local eventConnection2 = nil
 
-		t3.SettingsShowSignal:connect(function(p140) -- line: 4188
-			-- upvalues: connection3 (ref), InExperienceAppChatModal (copy), t3 (copy)
-			if p140 then
-				connection3 = InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p141) -- line: 4190
-					-- upvalues: t3 (copy)
-					if p141 and t3.Visible then
-						t3:SetVisibility(false, true)
+		children.SettingsShowSignal:connect(function(p)
+			if p then
+				eventConnection2 = InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p2)
+					if p2 and children.Visible then
+						children:SetVisibility(false, true)
 					end
 				end)
-
-				return
-			end
-
-			if connection3 then
-				connection3:Disconnect()
-				connection3 = nil
+			elseif eventConnection2 then
+				eventConnection2:Disconnect()
+				eventConnection2 = nil
 			end
 		end)
 	end
 
-	if t1.FFlagCreateInExperienceMenuReact then
-		t3.InExperienceMenuReact = Create("Folder")({
-			Name = "InExperienceMenuReact",
-			Parent = t3.ClippingShield
-		})
+	children.InExperienceMenuReact = Create("Folder")({
+		Name = "InExperienceMenuReact",
+		Parent = children.ClippingShield
+	})
 
-		local ButtonsContainer = t3.PlayersPage.ButtonsContainer
-		local v222 = if not ButtonsContainer then nil else ButtonsContainer:FindFirstChild("LeaveButtonButton", true)
-		local LeaveGameButton = nil
+	local buttonsContainer = children.PlayersPage.ButtonsContainer
+	local leaveButtonButton
 
-		if t1.FFlagAddTraversalHistory then
-			LeaveGameButton = t3.LeaveGameButton
-		end
+	if buttonsContainer then
+		leaveButtonButton = buttonsContainer:FindFirstChild("LeaveButtonButton", true)
+	end
 
-		local function v224(p142) -- line: 4218
-			-- upvalues: React (copy), t3 (copy), Signals (copy), t1 (copy), isSpatial (copy), PortalWithFoundationStylelink (copy), TraversalHistoryMenu (copy)
-			local v593, v594 = React.useState(p142.showSignal(false) and t3.Visible)
+	local leaveGameButton
 
-			React.useEffect(function() -- line: 4220
-				-- upvalues: Signals (copy), v594 (copy), p142 (copy), t3 (copy)
-				local v681 = Signals.createEffect(function(p143) -- line: 4221
-					-- upvalues: v594 (copy), p142 (copy), t3 (copy)
-					v594(p142.showSignal(p143) and t3.Visible)
-				end)
-				local v682 = t3.SettingsShowSignal:connect(function(p144) -- line: 4224
-					-- upvalues: v594 (copy), p142 (copy)
-					v594(p142.showSignal(false) and p144)
-				end)
+	if v3.FFlagAddTraversalHistory then
+		leaveGameButton = children.LeaveGameButton
+	end
 
-				return function() -- line: 4228
-					-- upvalues: v681 (copy), v682 (copy)
-					v681()
-					v682:Disconnect()
-				end
-			end, {})
+	local function fn9(props)
+		local state, setState = React.useState(props.showSignal(false) and children.Visible)
+		React.useEffect(function()
+			local effect = Signals.createEffect(function(p)
+				setState(props.showSignal(p) and children.Visible)
+			end)
+			local settingsShowSignalConnection2 = children.SettingsShowSignal:connect(function(p)
+				setState(props.showSignal(false) and p)
+			end)
 
-			return t1.FFlagAddTraversalHistory and (not (t1.isInExperienceUIVREnabled and isSpatial()) and (p142.parent and (v593 and React.createElement(PortalWithFoundationStylelink, {
-				parent = p142.parent
-			}, {
+			return function()
+				effect()
+				settingsShowSignalConnection2:Disconnect()
+			end
+		end, {})
+
+		return v3.FFlagAddTraversalHistory
+			and not (v3.isInExperienceUIVREnabled and isSpatial())
+			and props.parent
+			and state
+			and React.createElement(PortalWithFoundationStylelink, { parent = props.parent }, {
 				TraversalHistoryMenu = React.createElement(TraversalHistoryMenu, {
-					anchorParent = p142.parent,
-					currentPageChangeSignal = p142.currentPageChangeSignal,
-					menuSide = p142.menuSide
+					anchorParent = props.parent,
+					currentPageChangeSignal = props.currentPageChangeSignal,
+					menuSide = props.menuSide
 				})
-			}))))
-		end
-
-		ReactRoblox.createRoot(t3.InExperienceMenuReact):render(React.createElement(InExperienceMenuReact, nil, {
-			InExperienceMenuReactPage = React.createElement(InExperienceMenuReactPage, {
-				onMount = function() -- line: 4249
-					-- upvalues: t3 (copy)
-					t3:SwitchToReactPage(nil, nil, true)
-				end,
-				onUnmount = function() -- line: 4250
-					-- upvalues: t3 (copy), ReactPageSignal (copy)
-					t3:CloseReactPage()
-					ReactPageSignal(false).setCurrentReactPage(nil)
-				end,
-				mountTo = t3.ReactPage
-			}),
-			TraversalHistoryMenuBottomBar = React.createElement(v224, {
-				showSignal = t3.showBottomBarSignal,
-				parent = LeaveGameButton,
-				menuSide = Foundation.Enums.PopoverSide.Top,
-				currentPageChangeSignal = t3.CurrentPageSignal
-			}),
-			TraversalHistoryMenuMobileButton = React.createElement(v224, {
-				showSignal = Signals.createComputed(function(p145) -- line: 4263
-					-- upvalues: t3 (copy)
-					return not t3.showBottomBarSignal(p145)
-				end),
-				parent = v222,
-				menuSide = Foundation.Enums.PopoverSide.Bottom,
-				currentPageChangeSignal = t3.CurrentPageSignal
 			})
-		}))
 	end
 
-	return t3
+	ReactRoblox.createRoot(children.InExperienceMenuReact):render(React.createElement(InExperienceMenuReact, nil, {
+		InExperienceMenuReactPage = React.createElement(InExperienceMenuReactPage, {
+			onMount = function()
+				children:SwitchToReactPage(nil, nil, true)
+			end,
+			onUnmount = function()
+				children:CloseReactPage()
+				ReactPageSignal(false).setCurrentReactPage(nil)
+			end,
+			mountTo = children.ReactPage
+		}),
+		TraversalHistoryMenuBottomBar = React.createElement(fn9, {
+			showSignal = children.showBottomBarSignal,
+			parent = leaveGameButton,
+			menuSide = Foundation.Enums.PopoverSide.Top,
+			currentPageChangeSignal = children.CurrentPageSignal
+		}),
+		TraversalHistoryMenuMobileButton = React.createElement(fn9, {
+			showSignal = Signals.createComputed(function(p): boolean
+				return not children.showBottomBarSignal(p)
+			end),
+			parent = leaveButtonButton,
+			menuSide = Foundation.Enums.PopoverSide.Bottom,
+			currentPageChangeSignal = children.CurrentPageSignal
+		})
+	}))
+
+	return children
 end
 
-local t11 = {
-	ModuleName = "SettingsMenu",
-	KeepVRTopbarOpen = true,
-	VRIsExclusive = true,
-	VRClosesNonExclusive = true,
-	SetVisibility = nil
-}
+local SettingsHub = {}
+SettingsHub.ModuleName = "SettingsMenu"
+SettingsHub.KeepVRTopbarOpen = true
+SettingsHub.VRIsExclusive = true
+SettingsHub.VRClosesNonExclusive = true
+SettingsHub.SetVisibility = nil
+VRHub:RegisterModule(SettingsHub)
 
-VRHub:RegisterModule(t11)
-VRHub.ModuleOpened.Event:connect(function(p146) -- line: 4288
-	-- upvalues: t11 (copy), VRHub (copy)
-	if p146 ~= t11.ModuleName and VRHub:GetModule(p146).VRIsExclusive then
-		t11:SetVisibility(false)
+VRHub.ModuleOpened.Event:connect(function(p)
+	if p ~= SettingsHub.ModuleName and VRHub:GetModule(p).VRIsExclusive then
+		SettingsHub:SetVisibility(false)
 	end
 end)
 
-local v132 = CreateSettingsHub()
+local instance = CreateSettingsHub()
 
-function t11.GetExperienceControlStore(_) -- line: 4299
-	-- upvalues: v132 (copy)
-	return v132:GetExperienceControlStore()
-end
-function t11.SetVisibility(_, p149, p150, p151, p152, p153) -- line: 4303
-	-- upvalues: v132 (copy)
-	v132:SetVisibility(p149, p150, p151, p152, p153)
-end
-function t11.SetBackgroundVisibility(_, p155, p156) -- line: 4307
-	-- upvalues: v132 (copy)
-	v132:SetBackgroundVisibility(p155, p156)
-end
-function t11.ToggleVisibility(_, p158, p159) -- line: 4311
-	-- upvalues: v132 (copy)
-	v132:ToggleVisibility(p158, p159)
-end
-function t11.SwitchToPage(_, p161, p162) -- line: 4315
-	-- upvalues: v132 (copy)
-	v132:SwitchToPage(p161, p162, 1)
+if FFlagSideSheetOpenPeoplePage then
+	setupPeoplePageOpenTracking(instance)
+	setupInGameMenuPeoplePageActions(instance)
 end
 
-if t1.FFlagAddUILessMode and t1.FIntAddUILessModeVariant ~= 0 then
-	function t11.PopMenu(_, p164, p165, p166) -- line: 4320
-		-- upvalues: v132 (copy)
-		return v132:PopMenu(p164, p165, p166)
+function SettingsHub:GetExperienceControlStore()
+	return instance:GetExperienceControlStore()
+end
+
+function SettingsHub:SetVisibility(p, p2, p3, p4, p5)
+	instance:SetVisibility(p, p2, p3, p4, p5)
+end
+
+function SettingsHub:SetBackgroundVisibility(p, p2)
+	instance:SetBackgroundVisibility(p, p2)
+end
+
+function SettingsHub:ToggleVisibility(p, p2)
+	instance:ToggleVisibility(p, p2)
+end
+
+function SettingsHub:SwitchToPage(p, p2)
+	instance:SwitchToPage(p, p2, 1)
+end
+
+if v3.FFlagAddUILessMode and v3.FIntAddUILessModeVariant ~= 0 then
+	function SettingsHub:PopMenu(p, p2, p3)
+		return instance:PopMenu(p, p2, p3)
 	end
 end
 
-function t11.GetVisibility(_) -- line: 4325
-	-- upvalues: v132 (copy)
-	return v132.Visible
-end
-function t11.ShowShield(_) -- line: 4329
-	-- upvalues: v132 (copy)
-	v132:ShowShield()
-end
-function t11.HideShield(_) -- line: 4333
-	-- upvalues: v132 (copy)
-	v132:HideShield()
-end
-function t11.GetRespawnBehaviour(_) -- line: 4337
-	-- upvalues: v132 (copy)
-	return v132:GetRespawnBehaviour()
-end
-function t11.CloseReactPage(_) -- line: 4341
-	-- upvalues: v132 (copy)
-	v132:CloseReactPage()
-end
-function t11.SwitchToReactPage(_, p173, p174, p175) -- line: 4345
-	-- upvalues: v132 (copy)
-	v132:SwitchToReactPage(p173, p174, p175)
+function SettingsHub.GetVisibility(_)
+	return instance.Visible
 end
 
-if t1.FFlagAddInviteFriendsIntegration then
-	function t11.InviteToGame(_) -- line: 4350
-		-- upvalues: v132 (copy)
-		v132:InviteToGame()
+function SettingsHub:ShowShield()
+	instance:ShowShield()
+end
+
+function SettingsHub:HideShield()
+	instance:HideShield()
+end
+
+function SettingsHub:GetRespawnBehaviour()
+	return instance:GetRespawnBehaviour()
+end
+
+function SettingsHub:CloseReactPage()
+	instance:CloseReactPage()
+end
+
+function SettingsHub:SwitchToReactPage(p, p2, p3)
+	instance:SwitchToReactPage(p, p2, p3)
+end
+
+if v3.FFlagAddInviteFriendsIntegration then
+	function SettingsHub:InviteToGame()
+		instance:InviteToGame()
 	end
 end
 
-t11.RespawnBehaviourChangedEvent = v132.RespawnBehaviourChangedEvent
-t11.SettingsShowSignal = v132.SettingsShowSignal
-t11.CurrentPageSignal = v132.CurrentPageSignal
-t11.SettingsShowEvent = Instance.new("BindableEvent")
-v132.SettingsShowSignal:connect(function(p177) -- line: 4363
-	-- upvalues: t11 (copy)
-	t11.SettingsShowEvent:Fire(p177)
+SettingsHub.RespawnBehaviourChangedEvent = instance.RespawnBehaviourChangedEvent
+
+SettingsHub.SettingsShowSignal = instance.SettingsShowSignal
+
+SettingsHub.CurrentPageSignal = instance.CurrentPageSignal
+
+SettingsHub.SettingsShowEvent = Instance.new("BindableEvent")
+
+instance.SettingsShowSignal:connect(function(p)
+	SettingsHub.SettingsShowEvent:Fire(p)
 end)
-t11.Instance = v132
 
-return t11
+SettingsHub.Instance = instance
+
+return SettingsHub

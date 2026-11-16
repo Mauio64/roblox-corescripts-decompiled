@@ -1,13 +1,12 @@
-local function getAttachment(p1, t1: {[any]: any}) -- line: 1
-	for _, v in pairs(t1) do
-		local v2 = p1:FindFirstChild(v)
+local function getAttachment(instance, items)
+	for _, childName in pairs(items) do
+		local attachment = instance:FindFirstChild(childName)
 
-		if v2 then
-			if v2:IsA("Attachment") then
-				return v2
+		if attachment then
+			if attachment:IsA("Attachment") then
 			end
 
-			return v2
+			return attachment
 		end
 	end
 

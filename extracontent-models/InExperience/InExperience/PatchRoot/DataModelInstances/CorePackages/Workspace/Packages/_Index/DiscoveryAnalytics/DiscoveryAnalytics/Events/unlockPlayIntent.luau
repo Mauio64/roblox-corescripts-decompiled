@@ -1,21 +1,22 @@
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local flaggedMutedError = require(Parent.Loggers).flaggedMutedError
-local FFlagLuaAppLogPageContextUnlockPlayIntent = require(Parent.SharedFlags).FFlagLuaAppLogPageContextUnlockPlayIntent
-local v5 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+
+local t = require(parent.t)
+local Loggers = require(parent.Loggers)
+local flaggedMutedError = Loggers.flaggedMutedError
+
+local strictInterface = t.strictInterface({
 	universeId = t.string,
 	upsellName = t.string,
 	playabilityStatus = t.optional(t.string),
-	pageName = if not FFlagLuaAppLogPageContextUnlockPlayIntent then nil else t.optional(t.string)
+	pageName = t.optional(t.string)
 })
 
-return function(p1, p2) -- line: 17
-	-- upvalues: v5 (copy), flaggedMutedError (copy)
-	local v8, v9 = v5(p2)
+return function(object, p)
+	local v, v2 = strictInterface(p)
 
-	if not v8 then
-		flaggedMutedError("UnlockPlayIntentEventInterface", v9)
+	if not v then
+		flaggedMutedError("UnlockPlayIntentEventInterface", v2)
 	end
 
-	p1:sendEventDeferred("PlayButton", "unlockPlayIntent", p2)
+	object:sendEventDeferred("PlayButton", "unlockPlayIntent", p)
 end

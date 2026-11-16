@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local React = require(parent.React)
+
 local PrivateInvitesPickerView = require(script.Parent.PrivateInvitesPickerView)
 local usePrivateInvitesPickerViewModel = require(script.Parent.usePrivateInvitesPickerViewModel)
 
-local function PrivateInvitesPickerContainer(p1) -- line: 15
-	-- upvalues: usePrivateInvitesPickerViewModel (copy), React (copy), PrivateInvitesPickerView (copy)
-	local v7 = usePrivateInvitesPickerViewModel(p1)
-
-	return React.createElement(PrivateInvitesPickerView, v7)
+local function PrivateInvitesPickerContainer(p)
+	local v = usePrivateInvitesPickerViewModel(p)
+	return React.createElement(PrivateInvitesPickerView, v)
 end
 
 return PrivateInvitesPickerContainer

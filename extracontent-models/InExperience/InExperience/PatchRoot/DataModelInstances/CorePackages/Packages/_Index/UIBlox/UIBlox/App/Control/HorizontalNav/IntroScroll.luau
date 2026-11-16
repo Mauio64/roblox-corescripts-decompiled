@@ -1,50 +1,51 @@
-local ParentParent = script.Parent.Parent.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local t = require(ParentParent.t)
-local Otter = require(ParentParent.Otter)
-local t1 = {
-	dampingRatio = 1,
-	frequency = 3.5
-}
-local v6 = Roact.PureComponent:extend("IntroScroll")
+local parent = script.Parent.Parent.Parent.Parent.Parent
 
-v6.validateProps = t.strictInterface({
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+local Otter = require(parent.Otter)
+
+local v = { dampingRatio = 1, frequency = 3.5 }
+
+local extended = Roact.PureComponent:extend("IntroScroll")
+
+extended.validateProps = t.strictInterface({
 	childWidgetIndex = t.number,
 	scrollingFrameRef = t.table,
 	updateCanvasPosition = t.callback
 })
 
-function v6.init(p1) -- line: 25
-	-- upvalues: Otter (copy)
-	p1.motor = Otter.createSingleMotor(0)
-	p1.motor:onStep(function(p2) -- line: 27
-		-- upvalues: p1 (copy)
-		p1.props.updateCanvasPosition(Vector2.new(p2, 0))
+function extended:init()
+	self.motor = Otter.createSingleMotor(0)
+	self.motor:onStep(function(p)
+		self.props.updateCanvasPosition(Vector2.new(p, 0))
 	end)
 end
-function v6.didUpdate(p3, p4, _) -- line: 32
-	-- upvalues: Otter (copy)
-	if p3.props.childWidgetIndex and p3.props.childWidgetIndex ~= p4.childWidgetIndex then
-		local current = p3.props.scrollingFrameRef.current
-		local v12 = math.clamp(current.AbsoluteCanvasSize.X - current.AbsoluteSize.X, 0, current.AbsoluteSize.X * 0.25)
 
-		p3.motor:setGoal(Otter.instant(v12))
-		p3.motor:step(0)
-		p3.motor:setGoal(p3:getGoal())
+function extended:didUpdate(p, _)
+	if self.props.childWidgetIndex and self.props.childWidgetIndex ~= p.childWidgetIndex then
+		local current = self.props.scrollingFrameRef.current
+		local v2 = math.clamp(current.AbsoluteCanvasSize.X - current.AbsoluteSize.X, 0, current.AbsoluteSize.X * 0.25)
+
+		self.motor:setGoal(Otter.instant(v2))
+		self.motor:step(0)
+
+		self.motor:setGoal(self:getGoal())
 	end
 end
-function v6.getGoal(_, _) -- line: 48
-	-- upvalues: Otter (copy), t1 (copy)
-	return Otter.spring(0, t1)
+
+function extended:getGoal(_)
+	return Otter.spring(0, v)
 end
-function v6.render(_) -- line: 52
+
+function extended.render(_): nil
 	return nil
 end
-function v6.willUnmount(p9) -- line: 56
-	if p9.motor then
-		p9.motor:destroy()
-		p9.motor = nil
+
+function extended:willUnmount()
+	if self.motor then
+		self.motor:destroy()
+		self.motor = nil
 	end
 end
 
-return v6
+return extended

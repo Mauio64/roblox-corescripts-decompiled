@@ -1,20 +1,18 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
-local Text = require(ProfilePlatformParent.Foundation).Text
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
 
-local function CommunityLocked(_: {[any]: any}) -- line: 13
-	-- upvalues: useLocalization (copy), TextKeys (copy), React (copy), Text (copy)
-	local v9 = useLocalization({
-		groupLocked = TextKeys.GroupLocked
-	})
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-	return React.createElement(Text, {
-		tag = "padding-top-xlarge",
-		Text = v9.groupLocked
-	})
+local function CommunityLocked(_)
+	local v = useLocalization({ groupLocked = TextKeys.GroupLocked })
+
+	return React.createElement(Text, { Text = v.groupLocked, tag = "padding-top-xlarge" })
 end
 
 return CommunityLocked

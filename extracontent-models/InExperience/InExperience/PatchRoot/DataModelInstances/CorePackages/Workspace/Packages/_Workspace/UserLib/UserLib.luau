@@ -1,19 +1,11 @@
-local Enum = require(script.Enum)
-local Models = require(script.Models)
-local Reducers = require(script.Reducers)
-local Actions = require(script.Actions)
-local Utils = require(script.Utils)
-local Thunks = require(script.Thunks)
-local Requests = require(script.Requests)
-local Handlers = require(script.Handlers)
-
 return {
-	Enum = Enum,
-	Models = Models,
-	Reducers = Reducers,
-	Actions = Actions,
-	Utils = Utils,
-	Thunks = Thunks,
-	Requests = Requests,
-	Handlers = Handlers
+	Enum = require(script.Enum),
+	Models = require(script.Models),
+	Reducers = require(script.Reducers),
+	Actions = require(script.Actions),
+	Utils = require(script.Utils),
+	Thunks = require(script.Thunks),
+	Requests = require(script.Requests),
+	Handlers = require(script.Handlers),
+	Stores = require(script.Stores)
 }

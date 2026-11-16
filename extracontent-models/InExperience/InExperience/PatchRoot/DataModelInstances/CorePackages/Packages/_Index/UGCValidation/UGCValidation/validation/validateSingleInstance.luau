@@ -1,22 +1,32 @@
-local ParentParent = script.Parent.Parent
-local Analytics = require(ParentParent.Analytics)
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+local Analytics = require(parent.Analytics)
 
-local function validateSingleInstance(t1: {[any]: any}, p1) -- line: 7
-	-- upvalues: Analytics (copy)
-	local assetTypeEnum = p1.assetTypeEnum
+require(parent.util.Types)
 
-	if #t1 == 0 then
-		Analytics.reportFailure(Analytics.ErrorType.validateSingleInstance_ZeroInstances, nil, p1)
+local function validateSingleInstance(list, p)
+	local assetTypeEnum = p.assetTypeEnum
 
-		return false, { string.format("Failed to find an instance of the asset type '%s'. Make sure one exists and try again.", assetTypeEnum.Name) }
+	if #list == 0 then
+		Analytics.reportFailure(Analytics.ErrorType.validateSingleInstance_ZeroInstances, nil, p)
+
+		return
+			false,
+			{ string.format(
+					"Failed to find an instance of the asset type '%s'. Make sure one exists and try again.",
+					assetTypeEnum.Name
+				) }
 	end
 
-	if #t1 > 1 then
-		Analytics.reportFailure(Analytics.ErrorType.validateSingleInstance_MultipleInstances, nil, p1)
+	if #list > 1 then
+		Analytics.reportFailure(Analytics.ErrorType.validateSingleInstance_MultipleInstances, nil, p)
 
-		return false, { string.format("Selected more than one instance of type '%s'. Please, select a single instance of this type and try again.", assetTypeEnum.Name) }
+		return
+			false,
+			{ string.format(
+					"Selected more than one instance of type '%s'. Please, select a single instance of this type and try again.",
+					assetTypeEnum.Name
+				) }
 	end
 
 	return true

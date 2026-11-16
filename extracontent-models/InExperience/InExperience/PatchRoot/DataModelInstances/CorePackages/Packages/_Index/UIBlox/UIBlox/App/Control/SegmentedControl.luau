@@ -1,67 +1,66 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParent.Core
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local Cryo = require(ParentParentParent.Cryo)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local Otter = require(ParentParentParent.Otter)
-local Images = require(ParentParent.App.ImageSet.Images)
-local RoactGamepad = require(ParentParentParent.RoactGamepad)
-local ControlState = require(Core.Control.Enum.ControlState)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local core = parent.Core
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+local Cryo = require(parent2.Cryo)
+local withStyle = require(parent.Core.Style.withStyle)
+local Otter = require(parent2.Otter)
+local Images = require(parent.App.ImageSet.Images)
+
+local RoactGamepad = require(parent2.RoactGamepad)
+
+local ControlState = require(core.Control.Enum.ControlState)
 local SegmentedControlTabName = require(script.Parent.SegmentedControlTabName)
-local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
-local getContentStyle = require(Core.Button.getContentStyle)
-local getIconSize = require(ParentParent.App.ImageSet.getIconSize)
-local IconSize = require(ParentParent.App.ImageSet.Enum.IconSize)
-local GetTextSize = require(ParentParent.Core.Text.GetTextSize)
-local v18 = getIconSize(IconSize.Medium)
-local t1 = {
-	frequency = 10,
-	dampingRatio = 1
-}
-local v20 = Images["component_assets/circle_17"]
-local t2 = {
-	[ControlState.Default] = "BackgroundUIDefault"
-}
-local t3 = {
-	[ControlState.Default] = "Divider"
-}
-local t4 = {
-	[ControlState.Default] = "UIEmphasis"
-}
-local t5 = {
+local ImageSetComponent = require(core.ImageSet.ImageSetComponent)
+local getContentStyle = require(core.Button.getContentStyle)
+local getIconSize = require(parent.App.ImageSet.getIconSize)
+local IconSize = require(parent.App.ImageSet.Enum.IconSize)
+local GetTextSize = require(parent.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent.Core.Text.GetFontFromFontStyle)
+
+local iconSize = getIconSize(IconSize.Medium)
+local v = { frequency = 10, dampingRatio = 1 }
+
+local component_assetscircle_17 = Images["component_assets/circle_17"]
+local v2 = { [ControlState.Default] = "BackgroundUIDefault" }
+
+local v3 = { [ControlState.Default] = "Divider" }
+
+local v4 = { [ControlState.Default] = "UIEmphasis" }
+
+local iconStateColorMap = {
 	[ControlState.Default] = "SecondaryDefault",
 	[ControlState.Hover] = "SecondaryOnHover"
 }
-local v25 = Roact.Component:extend("SegmentedControl")
 
-v25.validateProps = t.strictInterface({
-	tabs = function(p1) -- line: 49
-		-- upvalues: t (copy)
-		local v27, v28 = t.array(t.strictInterface({
+local extended = Roact.Component:extend("SegmentedControl")
+extended.validateProps = t.strictInterface({
+	tabs = function(list)
+		local v5, v6 = t.array(t.strictInterface({
 			tabName = t.string,
 			isDisabled = t.optional(t.boolean),
 			icon = t.optional(t.table)
-		}))(p1)
+		}))(list)
 
-		if not v27 then
-			return v27, v28
+		if not v5 then
+			return v5, v6
 		end
 
-		local v29, v30 = t.numberMin(2)(#p1)
+		local v7, v8 = t.numberMin(2)(#list)
 
-		if not v29 then
-			return v29, v30
+		if not v7 then
+			return v7, v8
 		end
 
-		local v31, v32 = t.numberMax(4)(#p1)
+		local v9, v10 = t.numberMax(4)(#list)
 
-		if not v31 then
-			return v31, v32
+		if v9 then
+			return true
 		end
 
-		return true
+		return v9, v10
 	end,
 	width = t.UDim,
 	height = t.optional(t.number),
@@ -74,254 +73,262 @@ v25.validateProps = t.strictInterface({
 	NextSelectionDown = t.optional(t.table),
 	layoutOrder = t.optional(t.number)
 })
-v25.defaultProps = {
-	height = 44
-}
 
-function v25.init(p2) -- line: 112
-	-- upvalues: Roact (copy), RoactGamepad (copy), Otter (copy), t1 (copy)
-	p2.rootRef = Roact.createRef()
-	p2.tabRefs = RoactGamepad.createRefCache()
+extended.defaultProps = { height = 44 }
 
-	local v34, v35 = Roact.createBinding(0)
+function extended:init()
+	self.rootRef = Roact.createRef()
+	self.tabRefs = RoactGamepad.createRefCache()
 
-	p2.selectedBackgroundPositionX = v34
-	p2.setSelectedBackgroundPositionX = v35
-	p2.selectedBackgroundMotor = Otter.createSingleMotor(4)
-	p2.selectedBackgroundMotor:onStep(function(p3) -- line: 118
-		-- upvalues: p2 (copy)
-		p2.setSelectedBackgroundPositionX(p3)
+	local binding, setSelectedBackgroundPositionX = Roact.createBinding(0)
+	self.selectedBackgroundPositionX = binding
+	self.setSelectedBackgroundPositionX = setSelectedBackgroundPositionX
+	self.selectedBackgroundMotor = Otter.createSingleMotor(4)
+	self.selectedBackgroundMotor:onStep(function(p)
+		self.setSelectedBackgroundPositionX(p)
 	end)
-	p2:setState({
-		tabWidth = 0,
-		computedMinFrameWidth = 0
-	})
 
-	function p2.onTabActivated(p4) -- line: 127
-		-- upvalues: p2 (copy)
-		p2.props.onTabActivated(p4)
+	self:setState({ tabWidth = 0, computedMinFrameWidth = 0 })
+
+	function self.onTabActivated(p)
+		self.props.onTabActivated(p)
 	end
-	function p2.setSize(p5) -- line: 131
-		-- upvalues: p2 (copy), Otter (copy), t1 (copy)
-		local v42 = math.floor((math.max(p5.AbsoluteSize.X, p2.state.computedMinFrameWidth) - 8) / #p2.props.tabs)
 
-		p2.selectedBackgroundMotor:setGoal(Otter.spring(4 + v42 * (p2.props.selectedTabIndex - 1), t1))
-		p2:setState({
-			tabWidth = v42
-		})
+	function self.setSize(p)
+		local tabWidth = math.floor((math.max(p.AbsoluteSize.X, self.state.computedMinFrameWidth) - 8) / #self.props.tabs)
+		self.selectedBackgroundMotor:setGoal(Otter.spring(4 + tabWidth * (self.props.selectedTabIndex - 1), v))
+
+		self:setState({ tabWidth = tabWidth })
 	end
 end
-function v25.render(p6) -- line: 144
-	-- upvalues: withStyle (copy), ControlState (copy), getContentStyle (copy), t2 (copy), t3 (copy), t4 (copy), v18 (copy), GetTextSize (copy), Roact (copy), RoactGamepad (copy), Cryo (copy), SegmentedControlTabName (copy), t5 (copy), ImageSetComponent (copy), v20 (copy)
-	return withStyle(function(p7) -- line: 145
-		-- upvalues: p6 (copy), ControlState (copy), getContentStyle (copy), t2 (copy), t3 (copy), t4 (copy), v18 (copy), GetTextSize (copy), Roact (copy), RoactGamepad (copy), Cryo (copy), SegmentedControlTabName (copy), t5 (copy), ImageSetComponent (copy), v20 (copy)
-		local controlState = p6.state.controlState
-		local v45 = #p6.props.tabs
-		local v46 = p6.props.tabs[p6.props.selectedTabIndex].isDisabled and ControlState.Disabled or controlState
-		local v47 = getContentStyle(t2, controlState, p7)
-		local v48 = getContentStyle(t3, controlState, p7)
-		local v49 = getContentStyle(t4, v46, p7)
-		local tabWidth = p6.state.tabWidth
-		local v51 = not p6.props.icon and 0 or v18
-		local height = p6.props.height
-		local v53 = p6.props.height - 12
-		local v54 = p6.props.height - 16
-		local v55 = p7.Font.Header2.RelativeSize * p7.Font.BaseSize
 
-		if p6.state.computedMinFrameWidth == 0 then
-			local n1 = 0
+function extended.render(object)
+	return withStyle(function(p)
+		local controlState = object.state.controlState
+		local count = #object.props.tabs
+		local v5
 
-			for i = 1, v45 do
-				local tabName = p6.props.tabs[i].tabName
-
-				n1 = math.max(n1, GetTextSize(tabName, v55, Enum.Font.BuilderSans, Vector2.new(1e999, 1e999)).X)
-			end
-
-			local v59 = n1 + 8
-			local v60 = (v51 + 80) * v45 + 8
-			local v61 = (v51 + v59) * v45 + 8
-
-			p6:setState({
-				computedMinFrameWidth = if not p6.props.maxWidth then math.max(v61, v60) else math.min(v61, p6.props.maxWidth)
-			})
+		if object.props.tabs[object.props.selectedTabIndex].isDisabled then
+			v5 = ControlState.Disabled or controlState
+		else
+			v5 = controlState
 		end
 
-		local t6 = {}
+		local contentStyle = getContentStyle(v2, controlState, p)
+		local contentStyle2 = getContentStyle(v3, controlState, p)
 
-		for i = 1, v45 - 1 do
-			if i ~= p6.props.selectedTabIndex and i ~= p6.props.selectedTabIndex - 1 then
-				table.insert(t6, i, Roact.createElement("Frame", {
-					Size = UDim2.fromOffset(1, v54),
-					BackgroundTransparency = v48.Transparency,
-					BackgroundColor3 = v48.Color,
-					Position = UDim2.fromOffset(4 + tabWidth * i, (height - v54) / 2)
+		local contentStyle3 = getContentStyle(v4, v5, p)
+		local tabWidth = object.state.tabWidth
+		local v6 = not object.props.icon and 0 or iconSize
+
+		local height = object.props.height
+		local v7 = object.props.height - 12
+		local v8 = object.props.height - 16
+
+		local v9 = p.Font.Header2.RelativeSize * p.Font.BaseSize
+
+		if object.state.computedMinFrameWidth == 0 then
+			local maxX = 0
+
+			for i = 1, count do
+				maxX = math.max(
+					maxX,
+					GetTextSize(
+						object.props.tabs[i].tabName,
+						v9,
+						GetFontFromFontStyle(p.Font.Header2),
+						Vector2.new(1e999, 1e999)
+					).X
+				)
+			end
+
+			local v10 = maxX + 8
+			local v11 = (v6 + 80) * count + 8
+			local v12 = (v6 + v10) * count + 8
+			local computedMinFrameWidth
+
+			if object.props.maxWidth then
+				computedMinFrameWidth = math.min(v12, object.props.maxWidth)
+			else
+				computedMinFrameWidth = math.max(v12, v11)
+			end
+
+			object:setState({ computedMinFrameWidth = computedMinFrameWidth })
+		end
+
+		local v10 = {}
+
+		for i = 1, count - 1 do
+			if i ~= object.props.selectedTabIndex and i ~= object.props.selectedTabIndex - 1 then
+				table.insert(v10, i, Roact.createElement("Frame", {
+					Size = UDim2.fromOffset(1, v8),
+					BackgroundTransparency = contentStyle2.Transparency,
+					BackgroundColor3 = contentStyle2.Color,
+					Position = UDim2.fromOffset(4 + tabWidth * i, (height - v8) / 2)
 				}))
 			end
 		end
 
-		return RoactGamepad.withFocusController(function(p8) -- line: 204
-			-- upvalues: p6 (copy), v45 (copy), Cryo (copy), Roact (copy), RoactGamepad (copy), tabWidth (copy), height (copy), SegmentedControlTabName (copy), t5 (copy), ImageSetComponent (copy), v53 (copy), v20 (copy), v47 (copy), t6 (copy), v54 (copy), v49 (copy)
-			local function v65() -- line: 215
-				-- upvalues: p8 (copy), p6 (copy)
-				p8.moveFocusTo(p6.rootRef)
+		return RoactGamepad.withFocusController(function(p2)
+			local function fn()
+				p2.moveFocusTo(object.rootRef)
 			end
 
-			local v66 = Cryo.List.map(p6.props.tabs, function(p9, p10) -- line: 220
-				-- upvalues: Roact (copy), RoactGamepad (copy), tabWidth (copy), height (copy), p6 (copy), v45 (copy), v65 (copy), p8 (copy), SegmentedControlTabName (copy), t5 (copy)
-				return Roact.createElement(RoactGamepad.Focusable.Frame, {
-					key = p9.tabName,
-					LayoutOrder = p10,
+			local function fn2(p3) -- 3 equivalent calls inferred from this helper
+				if p3 > 1 then
+					p2.moveFocusTo(object.tabRefs[p3 - 1])
+				end
+			end
+			local function fn3(p3) -- 3 equivalent calls inferred from this helper
+				if p3 < count then
+					p2.moveFocusTo(object.tabRefs[p3 + 1])
+				end
+			end
+
+			local mapped = Cryo.List.map(object.props.tabs, function(props, layoutOrder)
+				local createElement = Roact.createElement
+				local frame = RoactGamepad.Focusable.Frame
+				local v11 = {
+					key = props.tabName,
+					LayoutOrder = layoutOrder,
 					Size = UDim2.fromOffset(tabWidth, height),
 					BackgroundTransparency = 1,
-					[Roact.Ref] = p6.tabRefs[p10],
-					NextSelectionLeft = p10 > 1 and p6.tabRefs[p10 - 1] or nil,
-					NextSelectionRight = p10 < v45 and p6.tabRefs[p10 + 1] or nil,
-					inputBindings = {
-						LeaveA = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, v65),
-						LeaveB = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonB, v65),
-						SelectNext1 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonR1, function() -- line: 232
-							-- upvalues: p10 (copy), v45 (copy), p8 (copy), p6 (copy)
-							local v72 = p10
+					[Roact.Ref] = object.tabRefs[layoutOrder]
+				}
+				local nextSelectionLeft
 
-							if v72 < v45 then
-								p8.moveFocusTo(p6.tabRefs[v72 + 1])
-							end
-						end),
-						SelectPre1 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonL1, function() -- line: 235
-							-- upvalues: p10 (copy), p8 (copy), p6 (copy)
-							local v73 = p10
+				if layoutOrder > 1 then
+					nextSelectionLeft = object.tabRefs[layoutOrder - 1] or nil
+				end
 
-							if v73 > 1 then
-								p8.moveFocusTo(p6.tabRefs[v73 - 1])
-							end
-						end),
-						SelectNext2 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonR2, function() -- line: 238
-							-- upvalues: p10 (copy), v45 (copy), p8 (copy), p6 (copy)
-							local v74 = p10
+				v11.NextSelectionLeft = nextSelectionLeft
+				local nextSelectionRight
 
-							if v74 < v45 then
-								p8.moveFocusTo(p6.tabRefs[v74 + 1])
-							end
-						end),
-						SelectPre2 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonL2, function() -- line: 241
-							-- upvalues: p10 (copy), p8 (copy), p6 (copy)
-							local v75 = p10
+				if layoutOrder < count then
+					nextSelectionRight = object.tabRefs[layoutOrder + 1] or nil
+				end
 
-							if v75 > 1 then
-								p8.moveFocusTo(p6.tabRefs[v75 - 1])
-							end
-						end),
-						SelectNext3 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonR3, function() -- line: 244
-							-- upvalues: p10 (copy), v45 (copy), p8 (copy), p6 (copy)
-							local v76 = p10
-
-							if v76 < v45 then
-								p8.moveFocusTo(p6.tabRefs[v76 + 1])
-							end
-						end),
-						SelectPre3 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonL3, function() -- line: 247
-							-- upvalues: p10 (copy), p8 (copy), p6 (copy)
-							local v77 = p10
-
-							if v77 > 1 then
-								p8.moveFocusTo(p6.tabRefs[v77 - 1])
-							end
-						end)
-					}
-				}, {
+				v11.NextSelectionRight = nextSelectionRight
+				v11.inputBindings = {
+					LeaveA = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, fn),
+					LeaveB = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonB, fn),
+					SelectNext1 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonR1, function()
+						fn3(layoutOrder) -- inferred equivalent call
+					end),
+					SelectPre1 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonL1, function()
+						fn2(layoutOrder) -- inferred equivalent call
+					end),
+					SelectNext2 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonR2, function()
+						fn3(layoutOrder) -- inferred equivalent call
+					end),
+					SelectPre2 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonL2, function()
+						fn2(layoutOrder) -- inferred equivalent call
+					end),
+					SelectNext3 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonR3, function()
+						fn3(layoutOrder) -- inferred equivalent call
+					end),
+					SelectPre3 = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonL3, function()
+						fn2(layoutOrder) -- inferred equivalent call
+					end)
+				}
+				return createElement(frame, v11, {
 					Tab = Roact.createElement(SegmentedControlTabName, {
-						text = p9.tabName,
-						onActivated = function() -- line: 254
-							-- upvalues: p6 (copy), p10 (copy)
-							p6.onTabActivated(p10)
+						text = props.tabName,
+						onActivated = function()
+							object.onTabActivated(layoutOrder)
 						end,
 						Size = UDim2.fromScale(1, 1),
-						isDisabled = p9.isDisabled,
-						isSelectedStyle = p10 == p6.props.selectedTabIndex,
-						icon = p9.icon,
-						iconStateColorMap = t5
+						isDisabled = props.isDisabled,
+						isSelectedStyle = object.props.selectedTabIndex == layoutOrder,
+						icon = props.icon,
+						iconStateColorMap = iconStateColorMap
 					})
 				})
 			end)
 
-			return Roact.createElement("Frame", {
-				Size = UDim2.new(p6.props.width.Scale, p6.props.width.Offset, 0, height),
-				BackgroundTransparency = 1,
-				[Roact.Change.AbsoluteSize] = p6.setSize,
-				LayoutOrder = p6.props.layoutOrder
-			}, {
-				SizeConstraint = Roact.createElement("UISizeConstraint", {
-					MinSize = Vector2.new(p6.state.computedMinFrameWidth, height),
-					MaxSize = Vector2.new(640, height)
-				}),
-				Background = Roact.createElement(ImageSetComponent.Label, {
+			return Roact.createElement(
+				"Frame",
+				{
+					Size = UDim2.new(object.props.width.Scale, object.props.width.Offset, 0, height),
 					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					ZIndex = 1,
-					Size = UDim2.new(1, 0, 0, v53),
-					Position = UDim2.fromOffset(0, (height - v53) / 2),
-					Image = v20,
-					ImageColor3 = v47.Color,
-					ImageTransparency = v47.Transparency,
-					ScaleType = Enum.ScaleType.Slice,
-					SliceCenter = Rect.new(8, 8, 9, 9)
-				}),
-				Dividers = Roact.createElement(RoactGamepad.Focusable.Frame, {
-					Size = UDim2.new(1, 0, 0, height),
-					Position = UDim2.fromOffset(0, 0),
-					BackgroundTransparency = 1,
-					ZIndex = 2,
-					NextSelectionLeft = p6.props.NextSelectionLeft,
-					NextSelectionRight = p6.props.NextSelectionRight,
-					NextSelectionUp = p6.props.NextSelectionUp,
-					NextSelectionDown = p6.props.NextSelectionDown,
-					[Roact.Ref] = p6.rootRef,
-					inputBindings = {
-						Enter = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, function() -- line: 301
-							-- upvalues: p8 (copy), p6 (copy)
-							p8.moveFocusTo(p6.tabRefs[p6.props.selectedTabIndex])
-						end)
-					}
-				}, t6),
-				SelectedBackground = Roact.createElement(ImageSetComponent.Label, {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					ZIndex = 4,
-					Size = UDim2.fromOffset(tabWidth, v54),
-					Position = p6.selectedBackgroundPositionX:map(function(p11) -- line: 309
-						-- upvalues: height (copy), v54 (copy)
-						return UDim2.fromOffset(p11, (height - v54) / 2)
-					end),
-					Image = v20,
-					ImageColor3 = v49.Color,
-					ImageTransparency = v49.Transparency,
-					ScaleType = Enum.ScaleType.Slice,
-					SliceCenter = Rect.new(8, 8, 9, 9)
-				}),
-				TabContainer = Roact.createElement(RoactGamepad.Focusable.Frame, {
-					BackgroundTransparency = 1,
-					ZIndex = 5,
-					Size = UDim2.fromScale(1, 1),
-					Position = UDim2.fromScale(0, 0),
-					defaultChild = p6.tabRefs[p6.props.selectedTabIndex]
-				}, {
-					TabLayout = Roact.createElement("UIListLayout", {
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						FillDirection = Enum.FillDirection.Horizontal,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						SortOrder = Enum.SortOrder.LayoutOrder
+					[Roact.Change.AbsoluteSize] = object.setSize,
+					LayoutOrder = object.props.layoutOrder
+				},
+				{
+					SizeConstraint = Roact.createElement("UISizeConstraint", {
+						MinSize = Vector2.new(object.state.computedMinFrameWidth, height),
+						MaxSize = Vector2.new(640, height)
 					}),
-					Roact.createFragment(v66)
-				})
-			})
+					Background = Roact.createElement(ImageSetComponent.Label, {
+						Size = UDim2.new(1, 0, 0, v7),
+						Position = UDim2.fromOffset(0, (height - v7) / 2),
+						BackgroundTransparency = 1,
+						Image = component_assetscircle_17,
+						ImageColor3 = contentStyle.Color,
+						ImageTransparency = contentStyle.Transparency,
+						LayoutOrder = 1,
+						ScaleType = Enum.ScaleType.Slice,
+						SliceCenter = Rect.new(8, 8, 9, 9),
+						ZIndex = 1
+					}),
+					Dividers = Roact.createElement(RoactGamepad.Focusable.Frame, {
+						Size = UDim2.new(1, 0, 0, height),
+						Position = UDim2.fromOffset(0, 0),
+						BackgroundTransparency = 1,
+						ZIndex = 2,
+						NextSelectionLeft = object.props.NextSelectionLeft,
+						NextSelectionRight = object.props.NextSelectionRight,
+						NextSelectionUp = object.props.NextSelectionUp,
+						NextSelectionDown = object.props.NextSelectionDown,
+						[Roact.Ref] = object.rootRef,
+						inputBindings = {
+							Enter = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, function()
+								p2.moveFocusTo(object.tabRefs[object.props.selectedTabIndex])
+							end)
+						}
+					}, v10),
+					SelectedBackground = Roact.createElement(ImageSetComponent.Label, {
+						Size = UDim2.fromOffset(tabWidth, v8),
+						Position = object.selectedBackgroundPositionX:map(function(p3)
+							return UDim2.fromOffset(p3, (height - v8) / 2)
+						end),
+						BackgroundTransparency = 1,
+						Image = component_assetscircle_17,
+						ImageColor3 = contentStyle3.Color,
+						ImageTransparency = contentStyle3.Transparency,
+						LayoutOrder = 2,
+						ScaleType = Enum.ScaleType.Slice,
+						SliceCenter = Rect.new(8, 8, 9, 9),
+						ZIndex = 4
+					}),
+					TabContainer = Roact.createElement(RoactGamepad.Focusable.Frame, {
+						Size = UDim2.fromScale(1, 1),
+						BackgroundTransparency = 1,
+						Position = UDim2.fromScale(0, 0),
+						ZIndex = 5,
+						defaultChild = object.tabRefs[object.props.selectedTabIndex]
+					}, {
+						TabLayout = Roact.createElement("UIListLayout", {
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							FillDirection = Enum.FillDirection.Horizontal,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							SortOrder = Enum.SortOrder.LayoutOrder
+						}),
+						Roact.createFragment(mapped)
+					})
+				}
+			)
 		end)
 	end)
 end
-function v25.didUpdate(p12, p13) -- line: 342
-	-- upvalues: Otter (copy), t1 (copy)
-	if p13.selectedTabIndex ~= p12.props.selectedTabIndex then
-		p12.selectedBackgroundMotor:setGoal(Otter.spring(4 + p12.state.tabWidth * (p12.props.selectedTabIndex - 1), t1))
+
+function extended.didUpdate(data, p)
+	if p.selectedTabIndex ~= data.props.selectedTabIndex then
+		data.selectedBackgroundMotor:setGoal(Otter.spring(
+			4 + data.state.tabWidth * (data.props.selectedTabIndex - 1),
+			v
+		))
 	end
 end
 
-return v25
+return extended

@@ -5,6 +5,7 @@ return {
 	HomePageFriendsCarousel = "homePageFriendsCarousel",
 	HomePageSelfWidget = "homePageSelfWidget",
 	ChartsPageSelfWidget = "chartsPageSelfWidget",
+	CampaignPageSelfWidget = "campaignPageSelfWidget",
 	MorePageSelfWidget = "morePageSelfWidget",
 	MorePageTile = "morePageTile",
 	ShareLink = "shareLink",
@@ -14,5 +15,6 @@ return {
 	ProfilePlatform = "profilePlatform",
 	OmniSearchBar = "omniSearchBar",
 	ConnectionsHub = "connectionsHub",
-	ChatDetails = "chatDetails"
+	ChatDetails = "chatDetails",
+	PartyChatConversationUpsell = "partyChatConversationUpsell"
 }

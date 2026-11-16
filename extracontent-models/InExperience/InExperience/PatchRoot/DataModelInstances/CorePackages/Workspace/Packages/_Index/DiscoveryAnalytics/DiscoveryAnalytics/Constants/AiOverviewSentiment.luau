@@ -1,4 +1,1 @@
-return {
-	ThumbsUp = "thumbs_up",
-	ThumbsDown = "thumbs_down"
-}
+return { ThumbsUp = "thumbs_up", ThumbsDown = "thumbs_down" }

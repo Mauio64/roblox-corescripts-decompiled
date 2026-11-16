@@ -1,148 +1,158 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
 local instanceof = LuauPolyfill.instanceof
+
 local Error = LuauPolyfill.Error
-local t1 = {}
-local formatValue = nil
-local formatObjectValue = nil
-local formatArray = nil
-local isJSONable = nil
-local formatObject = nil
-local getObjectTag = nil
-local GraphQLError = require(ParentParent.GraphQL).GraphQLError
-local isAggregateError = require(script.Parent.AggregateError).isAggregateError
 
-function t1.inspect(p1) -- line: 40
-	-- upvalues: formatValue (ref)
-	return formatValue(p1, {})
-end
-function formatValue(p2, p3) -- line: 46
-	-- upvalues: Boolean (copy), formatObjectValue (ref)
-	local v21 = typeof(p2)
+local formatValue
+local formatObjectValue
+local formatArray
+local isJSONable
+local formatObject
+local getObjectTag
 
-	if v21 == "string" then
-		return "\"" .. p2 .. "\""
+local GraphQL = require(parent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
+
+local AggregateError = require(script.Parent.AggregateError)
+local isAggregateError = AggregateError.isAggregateError
+local Inspect = {
+	inspect = function(p)
+		return formatValue(p, {})
+	end
+}
+
+formatValue = function(p, p2)
+	local typeName = typeof(p)
+
+	if typeName == "string" then
+		return "\"" .. p .. "\""
 	end
 
-	if v21 == "function" then
-		local v22 = debug.info(p2, "n")
+	if typeName == "function" then
+		local v = debug.info(p, "n")
 
-		if Boolean.toJSBoolean(v22) then
-			return (("[function %s]"):format(v22))
+		if Boolean.toJSBoolean(v) then
+			return (("[function %s]"):format(v))
 		end
 
 		return "[function]"
+	elseif typeName == "table" then
+		return formatObjectValue(p, p2)
+	else
+		return (tostring(p))
 	end
-
-	if v21 == "table" then
-		return formatObjectValue(p2, p3)
-	end
-
-	return (tostring(p2))
 end
 
-local function formatError(p4) -- line: 75
-	-- upvalues: instanceof (copy), GraphQLError (copy)
-	if instanceof(p4, GraphQLError) then
-		return (tostring(p4))
+local function formatError(object)
+	if instanceof(object, GraphQLError) then
+		return (tostring(object))
 	end
 
-	return ("%s: %s;\n %s"):format(tostring(p4.name), tostring(p4.message), (tostring(p4.stack)))
+	return ("%s: %s;\n %s"):format(tostring(object.name), tostring(object.message), (tostring(object.stack)))
 end
 
-function formatObjectValue(p5, p6) -- line: 83
-	-- upvalues: instanceof (copy), Error (copy), isAggregateError (copy), GraphQLError (copy), formatArray (ref), formatError (copy), Boolean (copy), Array (copy), isJSONable (ref), formatValue (ref), formatObject (ref)
-	if p5 == nil then
+formatObjectValue = function(object, p)
+	if object == nil then
 		return "null"
 	end
 
-	if instanceof(p5, Error) then
-		if isAggregateError(p5) then
-			return ((if not instanceof(p5, GraphQLError) then ("%s: %s;\n %s"):format(tostring(p5.name), tostring(p5.message), (tostring(p5.stack))) else tostring(p5))) .. "\n" .. formatArray(p5.errors, p6)
+	if instanceof(object, Error) then
+		if not isAggregateError(object) then
+			return formatError(object)
 		end
 
-		return formatError(p5)
-	end
+		local v
 
-	if Boolean.toJSBoolean(Array.includes(p6, p5)) then
-		return "[Circular]"
-	end
+		if instanceof(object, GraphQLError) then
+			v = tostring(object)
+		else
+			v = ("%s: %s;\n %s"):format(tostring(object.name), tostring(object.message), (tostring(object.stack)))
+		end
 
-	local v26 = Array.concat({}, p6, { p5 })
+		return v .. "\n" .. formatArray(object.errors, p)
+	else
+		if Boolean.toJSBoolean(Array.includes(p, object)) then
+			return "[Circular]"
+		end
 
-	if Boolean.toJSBoolean(isJSONable(p5)) then
-		local v27 = p5:toJSON()
+		local joined = Array.concat({}, p, { object })
 
-		if v27 ~= p5 then
-			if typeof(v27) == "string" then
-				return v27
+		if Boolean.toJSBoolean(isJSONable(object)) then
+			local json = object:toJSON()
+
+			if json ~= object then
+				if typeof(json) == "string" then
+					return json
+				end
+
+				return (formatValue(json, joined))
 			end
-
-			return (formatValue(v27, v26))
+		elseif Boolean.toJSBoolean(Array.isArray(object)) then
+			return formatArray(object, joined)
 		end
-	elseif Boolean.toJSBoolean(Array.isArray(p5)) then
-		return formatArray(p5, v26)
+
+		return formatObject(object, joined)
 	end
-
-	return formatObject(p5, v26)
 end
-function isJSONable(p7) -- line: 139
-	return typeof(p7.toJSON) == "function"
-end
-function formatObject(p8, p9) -- line: 147
-	-- upvalues: Object (copy), getObjectTag (ref), Array (copy), formatValue (ref)
-	local v31 = Object.entries(p8)
 
-	if #v31 == 0 then
+isJSONable = function(object): boolean
+	return typeof(object.toJSON) == "function"
+end
+
+formatObject = function(object, joined)
+	local entries = Object.entries(object)
+
+	if #entries == 0 then
 		return "{}"
 	end
 
-	if #p9 > 3 then
-		return "[" .. tostring(getObjectTag(p8)) .. "]"
+	if #joined > 3 then
+		return "[" .. tostring(getObjectTag(object)) .. "]"
 	end
 
-	local v32 = Array.map(v31, function(p10) -- line: 165
-		-- upvalues: formatValue (ref), p9 (copy)
-		local v41, v42 = table.unpack(p10, 1, 2)
-
-		return tostring(v41) .. ": " .. tostring(formatValue(v42, p9))
+	local mapped = Array.map(entries, function(list)
+		local v, v2 = table.unpack(list, 1, 2)
+		return tostring(v) .. ": " .. tostring(formatValue(v2, joined))
 	end)
 
-	return "{ " .. tostring(Array.join(v32, ", ")) .. " }"
+	return "{ " .. tostring(Array.join(mapped, ", ")) .. " }"
 end
-function formatArray(p11, p12) -- line: 175
-	-- upvalues: formatValue (ref), Array (copy)
-	if #p11 == 0 then
+
+formatArray = function(list, list2)
+	if #list == 0 then
 		return "[]"
 	end
 
-	if #p12 > 3 then
+	if #list2 > 3 then
 		return "[Array]"
 	end
 
-	local v35 = #p11
-	local v36 = #p11
-	local t2 = {}
-	local n1 = 1
+	local v = #list
+	local count = #list
+	local v2 = 1
+	local v3 = {}
 
-	while n1 <= v35 do
-		table.insert(t2, formatValue(p11[n1], p12))
-		n1 += 1
+	while v2 <= v do
+		table.insert(v3, formatValue(list[v2], list2))
+
+		v2 += 1
 	end
 
-	if v36 == 1 then
-		table.insert(t2, "... 1 more item")
-	elseif v36 > 1 then
-		table.insert(t2, ("... %s more items"):format((tostring(v36))))
+	if count == 1 then
+		table.insert(v3, "... 1 more item")
+	elseif count > 1 then
+		table.insert(v3, ("... %s more items"):format((tostring(count))))
 	end
 
-	return "[" .. tostring(Array.join(t2, ", ")) .. "]"
+	return "[" .. tostring(Array.join(v3, ", ")) .. "]"
 end
-function getObjectTag(_) -- line: 230
+
+getObjectTag = function(_): string
 	return "Object"
 end
 
-return t1
+return Inspect

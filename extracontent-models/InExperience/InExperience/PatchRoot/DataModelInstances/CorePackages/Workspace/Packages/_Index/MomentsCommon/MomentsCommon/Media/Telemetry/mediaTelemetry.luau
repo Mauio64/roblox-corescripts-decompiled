@@ -1,5 +1,4 @@
-local function noop() -- line: 52
-end
+local function noop() end
 
 return {
 	noopSink = {
@@ -10,33 +9,26 @@ return {
 		recordSoftwareFallback = noop,
 		recordDwell = noop
 	},
-	createLoggingSink = function(p1: ((...any) -> ...any)?) -- line: 63
-		local v3 = p1 or print
-
+	createLoggingSink = function(callback)
+		local v = callback or print
 		return {
-			recordDownload = function(p2) -- line: 67
-				-- upvalues: v3 (copy)
-				v3(`[media] download moment={ p2.momentId } kind={ p2.assetKind } dt={ p2.durationSeconds }s ok={ p2.success }`)
+			recordDownload = function(data)
+				v(`[media] download moment={data.momentId} kind={data.assetKind} dt={data.durationSeconds}s ok={data.success}`)
 			end,
-			recordDecode = function(p3) -- line: 72
-				-- upvalues: v3 (copy)
-				v3(`[media] decode moment={ p3.momentId } dt={ p3.durationSeconds }s ok={ p3.success }`)
+			recordDecode = function(data)
+				v(`[media] decode moment={data.momentId} dt={data.durationSeconds}s ok={data.success}`)
 			end,
-			recordTimeToFirstFrame = function(p4) -- line: 75
-				-- upvalues: v3 (copy)
-				v3(`[media] ttff moment={ p4.momentId } dt={ p4.durationSeconds }s`)
+			recordTimeToFirstFrame = function(p)
+				v(`[media] ttff moment={p.momentId} dt={p.durationSeconds}s`)
 			end,
-			recordCache = function(p5) -- line: 78
-				-- upvalues: v3 (copy)
-				v3(`[media] cache moment={ p5.momentId } stage={ p5.stage } kind={ p5.assetKind } hit={ p5.hit }`)
+			recordCache = function(data)
+				v(`[media] cache moment={data.momentId} stage={data.stage} kind={data.assetKind} hit={data.hit}`)
 			end,
-			recordSoftwareFallback = function(p6) -- line: 81
-				-- upvalues: v3 (copy)
-				v3(`[media] software-fallback moment={ p6.momentId }`)
+			recordSoftwareFallback = function(p)
+				v(`[media] software-fallback moment={p.momentId}`)
 			end,
-			recordDwell = function(p7) -- line: 84
-				-- upvalues: v3 (copy)
-				v3(`[media] dwell moment={ p7.momentId } dt={ p7.durationSeconds }s`)
+			recordDwell = function(p)
+				v(`[media] dwell moment={p.momentId} dt={p.durationSeconds}s`)
 			end
 		}
 	end

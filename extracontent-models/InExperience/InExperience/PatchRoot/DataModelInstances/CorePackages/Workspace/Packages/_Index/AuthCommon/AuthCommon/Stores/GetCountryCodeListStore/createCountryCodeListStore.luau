@@ -1,25 +1,21 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
+local parent = AuthCommon.Parent
 
-require(AuthCommonParent.Signals)
-
-local createSessionScopedSignal = require(AuthCommonParent.SignalsUtils).createSessionScopedSignal
-
+require(parent.Signals)
+local SignalsUtils = require(parent.SignalsUtils)
+local createSessionScopedSignal = SignalsUtils.createSessionScopedSignal
 require(AuthCommon.Common.Types)
 
-return function() -- line: 14
-	-- upvalues: createSessionScopedSignal (copy)
-	local v4, v5 = createSessionScopedSignal({})
+return function()
+	local sessionScopedSignal, v = createSessionScopedSignal({})
 
 	return {
-		getCountryCodeList = v4,
-		setCountryCodeList = function(p1) -- line: 17
-			-- upvalues: v5 (copy)
-			v5(p1)
+		getCountryCodeList = sessionScopedSignal,
+		setCountryCodeList = function(p)
+			v(p)
 		end,
-		reset = function() -- line: 21
-			-- upvalues: v5 (copy)
-			v5({})
+		reset = function()
+			v({})
 		end
 	}
 end

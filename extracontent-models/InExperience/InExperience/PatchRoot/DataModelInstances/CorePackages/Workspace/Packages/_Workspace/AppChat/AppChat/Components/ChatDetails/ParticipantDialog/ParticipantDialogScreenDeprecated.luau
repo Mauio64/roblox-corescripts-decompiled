@@ -1,9 +1,11 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local EnumScreens = require(AppChat.EnumScreens)
-local React = require(AppChatParent.React)
-local RoactRodux = require(AppChatParent.RoactRodux)
-local SocialCommon = require(AppChatParent.SocialCommon)
+local React = require(parent.React)
+local RoactRodux = require(parent.RoactRodux)
+local SocialCommon = require(parent.SocialCommon)
+
 local GenericDialogType = require(script.Parent.Parent.Dialogs.GenericDialogType)
 local Logger = require(script.Parent.Logger)
 local ParticipantDialogContainerDeprecated = require(script.Parent.ParticipantDialogContainerDeprecated)
@@ -12,136 +14,124 @@ local RoactChatAnalytics = require(AppChat.LegacyAnalytics.RoactChatAnalytics)
 local createConversation = require(AppChat.Conversations.Thunks.createConversation)
 local parseCreateConversationErrors = require(AppChat.Conversations.Thunks.parseCreateConversationErrors)
 local ChatEntryPointNames = SocialCommon.Enums.ChatEntryPointNames
-local EnteredChatFromEntryPoint = require(AppChat.Actions).EnteredChatFromEntryPoint
-local FFlagDisableBlockAndReport = require(AppChatParent.SharedFlags).FFlagDisableBlockAndReport
-local FFlagEnableChatDetailsOpenChat = require(AppChat.Flags.FFlagEnableChatDetailsOpenChat)
-local v18 = React.PureComponent:extend("ParticipantDialogScreenDeprecated")
+local Actions = require(AppChat.Actions)
+local EnteredChatFromEntryPoint = Actions.EnteredChatFromEntryPoint
 
-v18.defaultProps = {
-	navigation = nil
-}
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDisableBlockAndReport = SharedFlags.FFlagDisableBlockAndReport
 
-function v18.init(p1) -- line: 32
-	-- upvalues: Logger (copy), GenericDialogType (copy), EnumScreens (copy), RoactChatAnalytics (copy), EnteredChatFromEntryPoint (copy), ChatEntryPointNames (copy), createConversation (copy), parseCreateConversationErrors (copy), FFlagDisableBlockAndReport (copy)
-	function p1.onDismiss() -- line: 33
-		-- upvalues: p1 (copy)
-		p1.props.navigation.goBack()
+local extended = React.PureComponent:extend("ParticipantDialogScreenDeprecated")
+
+extended.defaultProps = { navigation = nil }
+
+function extended:init()
+	function self.onDismiss()
+		self.props.navigation.goBack()
 	end
-	function p1.openRemoveUserDialog(p2, p3) -- line: 36
-		-- upvalues: Logger (copy), p1 (copy), GenericDialogType (copy)
-		Logger:info("User activated removeFromGroup | userId: {}, conversationId: {}", p2, p3)
-		p1.props.navigation.replace(GenericDialogType.RemoveUserDialog, {
-			conversationId = p3,
-			participantId = p2
+	function self.openRemoveUserDialog(participantId, conversationId)
+		Logger:info("User activated removeFromGroup | userId: {}, conversationId: {}", participantId, conversationId)
+		self.props.navigation.replace(GenericDialogType.RemoveUserDialog, {
+			conversationId = conversationId,
+			participantId = participantId
 		})
 	end
-	function p1.openViewProfile(p4) -- line: 44
-		-- upvalues: p1 (copy), EnumScreens (copy), Logger (copy), RoactChatAnalytics (copy)
-		local v33 = p1.props.navigation.getScreenProps("navigateToLuaAppPages", {})[EnumScreens.ViewUserProfile]
 
-		if v33 then
-			Logger:info("Navigate To UserProfile from {screen}")
-			p1.props.analytics:navigate(RoactChatAnalytics.NavigationEvents.ChatDetailsProfile)
-			v33(p4, {})
+	function self.openViewProfile(p)
+		local v = self.props.navigation.getScreenProps("navigateToLuaAppPages", {})[EnumScreens.ViewUserProfile]
+
+		if not v then
+			Logger:warning("UserProfile page was not set in navigateToLuaAppPages screenProps")
 
 			return
 		end
 
-		Logger:warning("UserProfile page was not set in navigateToLuaAppPages screenProps")
+		Logger:info("Navigate To UserProfile from {screen}")
+		self.props.analytics:navigate(RoactChatAnalytics.NavigationEvents.ChatDetailsProfile)
+		v(p, {})
 	end
-	function p1.openChat(p5) -- line: 56
-		-- upvalues: Logger (copy), p1 (copy), EnteredChatFromEntryPoint (copy), ChatEntryPointNames (copy), createConversation (copy), EnumScreens (copy), parseCreateConversationErrors (copy)
-		Logger:info("User activated openChat | userId: {}", p5)
-		p1.props.dispatch(EnteredChatFromEntryPoint(ChatEntryPointNames.ChatDetailsParticipantDialog))
-		p1.props.navigation.goBack()
-		p1.props.dispatch(createConversation("one_to_one", { (tostring(p5)) })):andThen(function(p6) -- line: 62
-			-- upvalues: p1 (copy), EnumScreens (copy)
-			p1.props.navigation.navigate(EnumScreens.ChatConversation, {
-				conversationId = p6.id
-			})
-		end):catch(function(p7) -- line: 67
-			-- upvalues: Logger (copy), p5 (copy), parseCreateConversationErrors (copy), p1 (copy), EnumScreens (copy)
-			Logger:warning("Error creating 1:1 conversation for userId {}: {}", p5, (tostring(p7)))
 
-			local v41 = parseCreateConversationErrors(p7) ~= "participant_chat_disabled" and "Feature.Toast.NetworkingError.SomethingIsWrong" or "Feature.Chat.Message.PartyUnavailableWithUser"
+	function self.openChat(p)
+		Logger:info("User activated openChat | userId: {}", p)
+		self.props.dispatch(EnteredChatFromEntryPoint(ChatEntryPointNames.ChatDetailsParticipantDialog))
+		self.props.navigation.goBack()
+		self.props.dispatch(createConversation("one_to_one", { (tostring(p)) })):andThen(function(p2)
+			self.props.navigation.navigate(EnumScreens.ChatConversation, { conversationId = p2.id })
+		end):catch(function(p2)
+			Logger:warning("Error creating 1:1 conversation for userId {}: {}", p, (tostring(p2)))
+			local toastTitle = parseCreateConversationErrors(p2) == "participant_chat_disabled"
+				and "Feature.Chat.Message.PartyUnavailableWithUser"
+				or "Feature.Toast.NetworkingError.SomethingIsWrong"
 
-			p1.props.navigation.navigate(EnumScreens.RoactChatToast, {
+			self.props.navigation.navigate(EnumScreens.RoactChatToast, {
 				toastProps = {
-					toastContent = {
-						toastTitle = v41
-					}
+					toastContent = { toastTitle = toastTitle }
 				}
 			})
 		end)
 	end
-	function p1.openReportUser(p8, p9) -- line: 82
-		-- upvalues: p1 (copy), EnumScreens (copy)
-		p1.props.navigation.replace(EnumScreens.AppChatReportAbuse, {
-			participantId = p8,
-			conversationId = p9
+
+	function self.openReportUser(participantId, conversationId)
+		self.props.navigation.replace(EnumScreens.AppChatReportAbuse, {
+			participantId = participantId,
+			conversationId = conversationId
 		})
 	end
-	function p1.openBlockingModal(p10, p11) -- line: 89
-		-- upvalues: p1 (copy), EnumScreens (copy), FFlagDisableBlockAndReport (copy)
-		p1.props.navigation.replace(EnumScreens.BlockingModal, {
+
+	function self.openBlockingModal(p, conversationId)
+		local function fn()
+			self.props.navigation.pop()
+			self.props.navigation.navigate(EnumScreens.AppChatReportAbuse, {
+				participantId = p,
+				conversationId = conversationId
+			})
+		end
+
+		self.props.navigation.replace(EnumScreens.BlockingModal, {
 			navProps = {
-				userId = p10,
-				openReportUser = function() -- line: 90
-					-- upvalues: p1 (copy), EnumScreens (copy), p10 (copy), p11 (copy)
-					p1.props.navigation.pop()
-					p1.props.navigation.navigate(EnumScreens.AppChatReportAbuse, {
-						participantId = p10,
-						conversationId = p11
-					})
-				end,
+				userId = p,
+				openReportUser = fn,
 				disableReportOption = FFlagDisableBlockAndReport
 			}
 		})
 	end
 end
-function v18.render(p12) -- line: 108
-	-- upvalues: Logger (copy), React (copy), ParticipantDialogContainerDeprecated (copy), FFlagEnableChatDetailsOpenChat (copy)
-	local navigation = p12.props.navigation
 
+function extended.render(props)
+	local navigation = props.props.navigation
 	assert(type(navigation) ~= "nil", "ParticipantDialogScreenDeprecated should be wrapped with navigation")
 
-	local v23 = navigation.getParam("conversationId", nil)
-	local v24 = navigation.getParam("participantId", nil)
-	local v25 = navigation.getParam("showRemoveUserButton", false)
-	local v26 = navigation.getScreenProps("wideMode", false)
+	local param = navigation.getParam("conversationId", nil)
+	local param2 = navigation.getParam("participantId", nil)
+	local param3 = navigation.getParam("showRemoveUserButton", false)
+	local screenProps = navigation.getScreenProps("wideMode", false)
 
-	if v23 == nil or v24 == nil then
-		Logger:warning("ConversationId and participantId are required to open {screen}")
-
-		return nil
+	if param ~= nil and param2 ~= nil then
+		return React.createElement(ParticipantDialogContainerDeprecated, {
+			conversationId = param,
+			participantId = param2,
+			showRemoveUserButton = param3,
+			isWideMode = screenProps,
+			onDismiss = props.onDismiss,
+			openRemoveUserDialog = props.openRemoveUserDialog,
+			openReportUser = props.openReportUser,
+			openViewProfile = props.openViewProfile,
+			openChat = props.openChat,
+			openBlockingModal = props.openBlockingModal
+		})
 	end
 
-	return React.createElement(ParticipantDialogContainerDeprecated, {
-		conversationId = v23,
-		participantId = v24,
-		showRemoveUserButton = v25,
-		isWideMode = v26,
-		onDismiss = p12.onDismiss,
-		openRemoveUserDialog = p12.openRemoveUserDialog,
-		openReportUser = p12.openReportUser,
-		openViewProfile = p12.openViewProfile,
-		openChat = if not FFlagEnableChatDetailsOpenChat then nil else p12.openChat,
-		openBlockingModal = p12.openBlockingModal
-	})
+	Logger:warning("ConversationId and participantId are required to open {screen}")
+	return nil
 end
-function v18.didMount(_) -- line: 137
-	-- upvalues: Logger (copy)
+
+function extended.didMount(_)
 	Logger:info("{screen} mounted")
 end
 
-local v19 = connectAnalytics(function(p14) -- line: 141
-	return {
-		analytics = p14
-	}
-end)(v18)
+local v = connectAnalytics(function(analytics)
+	return { analytics = analytics }
+end)(extended)
 
-return (RoactRodux.connect(nil, function(p15) -- line: 145
-	return {
-		dispatch = p15
-	}
-end)(v19))
+return (RoactRodux.connect(nil, function(dispatch)
+	return { dispatch = dispatch }
+end)(v))

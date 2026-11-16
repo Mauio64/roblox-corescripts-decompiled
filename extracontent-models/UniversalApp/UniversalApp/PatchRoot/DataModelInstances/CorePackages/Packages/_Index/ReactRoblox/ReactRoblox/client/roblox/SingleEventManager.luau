@@ -1,100 +1,92 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local console = require(ParentParent.Shared).console
-local _ = {
-	Disabled = "Disabled",
-	Suspended = "Suspended",
-	Enabled = "Enabled"
-}
-local t1 = {}
+local parent = script.Parent.Parent.Parent.Parent
 
-t1.__index = t1
+local Shared = require(parent.Shared)
+local console = Shared.console
 
-function t1.new(p1) -- line: 49
-	-- upvalues: t1 (copy)
+local _ = { Disabled = "Disabled", Suspended = "Suspended", Enabled = "Enabled" }
+
+local SingleEventManager = {}
+SingleEventManager.__index = SingleEventManager
+
+function SingleEventManager.new(instance)
 	return (setmetatable({
-		_status = "Disabled",
-		_isResuming = false,
 		_suspendedEventQueue = {},
 		_connections = {},
 		_listeners = {},
-		_instance = p1
-	}, t1))
+		_status = "Disabled",
+		_isResuming = false,
+		_instance = instance
+	}, SingleEventManager))
 end
-function t1.connectEvent(p2, p3, p4) -- line: 77
-	p2:_connect(p3, p2._instance[p3], p4)
-end
-function t1.connectPropertyChange(p5, p6, p7) -- line: 81
-	local ok, result = pcall(p5._instance.GetPropertyChangedSignal, p5._instance, p6)
 
-	if not ok then
-		error(string.format("Cannot get changed signal on property %q: %s", tostring(p6), result), 0)
+function SingleEventManager:connectEvent(p, p2)
+	self:_connect(p, self._instance[p], p2)
+end
+
+function SingleEventManager:connectPropertyChange(p, p2)
+	local success, propertyChangedSignal = pcall(self._instance.GetPropertyChangedSignal, self._instance, p)
+
+	if not success then
+		error(string.format("Cannot get changed signal on property %q: %s", tostring(p), propertyChangedSignal), 0)
 	end
 
-	p5:_connect("Change." .. p6, result, p7)
+	self:_connect("Change." .. p, propertyChangedSignal, p2)
 end
-function t1._connect(p8, p9, p10, p11) -- line: 99
-	if p11 == nil then
-		if p8._connections[p9] ~= nil then
-			p8._connections[p9]:Disconnect()
-			p8._connections[p9] = nil
+
+function SingleEventManager:_connect(p, object, p2)
+	if p2 == nil then
+		if self._connections[p] ~= nil then
+			self._connections[p]:Disconnect()
+			self._connections[p] = nil
 		end
 
-		p8._listeners[p9] = nil
+		self._listeners[p] = nil
+	else
+		if self._connections[p] == nil then
+			self._connections[p] = object:Connect(function(...)
+				if self._status == "Enabled" then
+					self._listeners[p](self._instance, ...)
+				elseif self._status == "Suspended" then
+					local v = { p, select("#", ...), ... }
+					table.insert(self._suspendedEventQueue, v)
+				end
+			end)
+		end
 
+		self._listeners[p] = p2
+	end
+end
+
+function SingleEventManager:suspend()
+	self._status = "Suspended"
+end
+
+function SingleEventManager:resume()
+	if self._isResuming then
 		return
 	end
 
-	if p8._connections[p9] == nil then
-		p8._connections[p9] = p10:Connect(function(...) -- line: 110
-			-- upvalues: p8 (copy), p9 (copy)
-			if p8._status == "Enabled" then
-				p8._listeners[p9](p8._instance, ...)
+	self._isResuming = true
 
-				return
-			end
+	for _, list in self._suspendedEventQueue do
+		local listener = self._listeners[list[1]]
+		local item = list[2]
 
-			if p8._status == "Suspended" then
-				local v27 = select("#", ...)
+		if listener == nil then
+			continue
+		end
 
-				table.insert(p8._suspendedEventQueue, {
-					p9,
-					v27,
-					...
-				})
-			end
-		end)
-	end
+		local thread = coroutine.create(listener)
+		local v, v2 = coroutine.resume(thread, self._instance, unpack(list, 3, 2 + item))
 
-	p8._listeners[p9] = p11
-end
-function t1.suspend(p12) -- line: 130
-	p12._status = "Suspended"
-end
-function t1.resume(p13) -- line: 134
-	-- upvalues: console (copy)
-	if p13._isResuming then
-		return
-	end
-
-	p13._isResuming = true
-
-	for _, v21 in p13._suspendedEventQueue do
-		local v22 = p13._listeners[v21[1]]
-		local v23 = v21[2]
-
-		if v22 ~= nil then
-			local co = coroutine.create(v22)
-			local ok, result = coroutine.resume(co, p13._instance, unpack(v21, 3, 2 + v23))
-
-			if not ok then
-				console.warn("%s", result)
-			end
+		if not v then
+			console.warn("%s", v2)
 		end
 	end
 
-	p13._isResuming = false
-	p13._status = "Enabled"
-	table.clear(p13._suspendedEventQueue)
+	self._isResuming = false
+	self._status = "Enabled"
+	table.clear(self._suspendedEventQueue)
 end
 
-return t1
+return SingleEventManager

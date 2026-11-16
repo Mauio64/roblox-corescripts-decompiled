@@ -1,39 +1,35 @@
-local scriptParent = script.Parent
-local Cryo = require(scriptParent.Parent.Cryo)
-local ValidationRulesUtil = require(scriptParent.util.ValidationRulesUtil)
-local ValidationEnums = require(scriptParent.validationSystem.ValidationEnums)
-local getFFlagUGCValidationFixConstantsTypoLeg = require(scriptParent.flags.getFFlagUGCValidationFixConstantsTypoLeg)
-local getFFlagUGCValidationEyebrowEyelashSupport = require(scriptParent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
-local getFFlagUGCValidateCheckHSROwner = require(scriptParent.flags.getFFlagUGCValidateCheckHSROwner)
-local getFFlagUGCValidateCheckTexturePackOwner = require(scriptParent.flags.getFFlagUGCValidateCheckTexturePackOwner)
-local getFFlagUGCValidationAnimationPackSupport = require(scriptParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local v10 = game:DefineFastFlag("UGCValidateMakeupDecalUVProperties", false)
-local getFFlagUGCValidationAllowEngineDefaultPartSurfaces = require(scriptParent.flags.getFFlagUGCValidationAllowEngineDefaultPartSurfaces)
-local getFFlagUGCValidateAllowEmissives = require(scriptParent.flags.getFFlagUGCValidateAllowEmissives)
+local parent = script.Parent
 
-local function convertArrayToTable(p1) -- line: 19
-	local t1 = {}
+local Cryo = require(parent.Parent.Cryo)
 
-	for _, v in pairs(p1) do
-		t1[v] = true
+local ValidationRulesUtil = require(parent.util.ValidationRulesUtil)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local getFFlagUGCValidationEyebrowEyelashSupport = require(parent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
+local getFFlagUGCValidateCheckHSROwner = require(parent.flags.getFFlagUGCValidateCheckHSROwner)
+local getFFlagUGCValidateCheckTexturePackOwner = require(parent.flags.getFFlagUGCValidateCheckTexturePackOwner)
+local defineFastFlag = game:DefineFastFlag("UGCValidateMakeupDecalUVProperties", false)
+local getFFlagUGCValidateMakeupCategoryParity = require(parent.flags.getFFlagUGCValidateMakeupCategoryParity)
+local getFFlagUGCValidateDisallowAeroMeshData = require(parent.flags.getFFlagUGCValidateDisallowAeroMeshData)
+
+local function convertArrayToTable(items) -- 1 equivalent call inferred from this helper
+	local result = {}
+
+	for _, item in pairs(items) do
+		result[item] = true
 	end
 
-	return t1
+	return result
 end
 
-local t2 = {
-	MAX_HAT_TRIANGLES = ValidationRulesUtil:getRules().MeshRules.AccessoryMaxTriangles,
-	MAX_TEXTURE_SIZE = ValidationRulesUtil:getRules().TextureRules.MaxTextureSize
-}
-local t3 = { Enum.Material.Plastic }
-local t4 = {}
+local Constants = {}
 
-for _, v in pairs(t3) do
-	t4[v] = true
-end
+Constants.MAX_HAT_TRIANGLES = ValidationRulesUtil:getRules().MeshRules.AccessoryMaxTriangles
 
-t2.MATERIAL_WHITELIST = t4
-t2.BANNED_CLASS_NAMES = {
+Constants.MAX_TEXTURE_SIZE = ValidationRulesUtil:getRules().TextureRules.MaxTextureSize
+
+Constants.MATERIAL_WHITELIST = convertArrayToTable({ Enum.Material.Plastic }) -- inferred equivalent call
+
+Constants.BANNED_CLASS_NAMES = {
 	"Script",
 	"LocalScript",
 	"ModuleScript",
@@ -42,14 +38,10 @@ t2.BANNED_CLASS_NAMES = {
 	"Smoke",
 	"Sparkles"
 }
-t2.R6_BODY_PARTS = {
-	"Torso",
-	"Left Leg",
-	"Right Leg",
-	"Left Arm",
-	"Right Arm"
-}
-t2.R15_BODY_PARTS = {
+
+Constants.R6_BODY_PARTS = { "Torso", "Left Leg", "Right Leg", "Left Arm", "Right Arm" }
+
+Constants.R15_BODY_PARTS = {
 	"Head",
 	"UpperTorso",
 	"LowerTorso",
@@ -66,7 +58,8 @@ t2.R15_BODY_PARTS = {
 	"RightLowerArm",
 	"RightHand"
 }
-t2.R15_CAGE_PARTS = {
+
+Constants.R15_CAGE_PARTS = {
 	"Head_OuterCage",
 	"UpperTorso_OuterCage",
 	"LowerTorso_OuterCage",
@@ -83,21 +76,23 @@ t2.R15_CAGE_PARTS = {
 	"RightLowerArm_OuterCage",
 	"RightHand_OuterCage"
 }
-t2.NAMED_R15_BODY_PARTS = {}
 
-for _, v20 in t2.R15_BODY_PARTS do
-	t2.NAMED_R15_BODY_PARTS[v20] = v20
+Constants.NAMED_R15_BODY_PARTS = {}
+
+for _, v in Constants.R15_BODY_PARTS do
+	Constants.NAMED_R15_BODY_PARTS[v] = v
 end
 
-t2.NAMED_R15_BODY_PARTS.Head = "Head"
-setmetatable(t2.NAMED_R15_BODY_PARTS, {
-	__index = function() -- line: 108
-		error("NAMED_R15_BODY_PARTS key does not exist")
+Constants.NAMED_R15_BODY_PARTS.Head = "Head"
 
+setmetatable(Constants.NAMED_R15_BODY_PARTS, {
+	__index = function(): nil
+		error("NAMED_R15_BODY_PARTS key does not exist")
 		return nil
 	end
 })
-t2.R15_STANDARD_JOINT_NAMES = {
+
+Constants.R15_STANDARD_JOINT_NAMES = {
 	Root = true,
 	HumanoidRootNode = true,
 	DynamicHead = true,
@@ -117,16 +112,14 @@ t2.R15_STANDARD_JOINT_NAMES = {
 	RightLowerArm = true,
 	RightHand = true
 }
-t2.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES = {
-	RBX_Leader = true,
-	RBX_Follower = true
-}
 
-for _, v22 in t2.R15_BODY_PARTS do
-	t2.R15_STANDARD_JOINT_NAMES[v22] = true
+Constants.ALLOWED_SKINNING_TRANSFER_JOINT_NAMES = { RBX_Leader = true, RBX_Follower = true }
+
+for _, v in Constants.R15_BODY_PARTS do
+	Constants.R15_STANDARD_JOINT_NAMES[v] = true
 end
 
-t2.UGC_BODY_PARTS = {
+Constants.UGC_BODY_PARTS = {
 	"Head",
 	"UpperTorso",
 	"LowerTorso",
@@ -146,7 +139,8 @@ t2.UGC_BODY_PARTS = {
 	"EyelashAccessory",
 	"HairAccessory"
 }
-t2.UGC_BODY_PART_NAMES_TO_ASSET_TYPE = {
+
+Constants.UGC_BODY_PART_NAMES_TO_ASSET_TYPE = {
 	Head = Enum.AssetType.DynamicHead,
 	UpperTorso = Enum.AssetType.Torso,
 	LowerTorso = Enum.AssetType.Torso,
@@ -166,71 +160,63 @@ t2.UGC_BODY_PART_NAMES_TO_ASSET_TYPE = {
 	EyelashAccessory = Enum.AssetType.EyelashAccessory,
 	HairAccessory = Enum.AssetType.HairAccessory
 }
-t2.UGC_SHOE_NAMES_TO_ASSET_TYPE = {
+
+Constants.UGC_SHOE_NAMES_TO_ASSET_TYPE = {
 	LeftShoeAccessory = Enum.AssetType.LeftShoeAccessory,
 	RightShoeAccessory = Enum.AssetType.RightShoeAccessory
 }
-t2.BUNDLE_TO_ASSET_MAPPING = {
-	[Enum.BundleType.BodyParts] = t2.UGC_BODY_PART_NAMES_TO_ASSET_TYPE,
-	[Enum.BundleType.BodyParts] = t2.UGC_SHOE_NAMES_TO_ASSET_TYPE
+
+Constants.BUNDLE_TO_ASSET_MAPPING = {
+	[Enum.BundleType.BodyParts] = Constants.UGC_BODY_PART_NAMES_TO_ASSET_TYPE,
+	[Enum.BundleType.BodyParts] = Constants.UGC_SHOE_NAMES_TO_ASSET_TYPE
 }
-t2.ASSET_TYPES_THAT_SKIP_FOLDER = {
+
+Constants.ASSET_TYPES_THAT_SKIP_FOLDER = {
 	Enum.AssetType.DynamicHead,
 	Enum.AssetType.EyebrowAccessory,
 	Enum.AssetType.EyelashAccessory,
 	Enum.AssetType.HairAccessory
 }
-t2.FOLDER_NAMES = {
-	R6 = "R6",
-	R15ArtistIntent = "R15ArtistIntent",
-	R15Fixed = "R15Fixed"
-}
-t2.EXTRA_BANNED_NAMES = {
-	"Head",
-	"HumanoidRootPart",
-	"Humanoid"
-}
 
-for _, v in ipairs({
-	"Body Colors",
-	"Shirt Graphic",
-	"Shirt",
-	"Pants",
-	"Health",
-	"Animate"
-}) do
-	table.insert(t2.EXTRA_BANNED_NAMES, v)
+Constants.FOLDER_NAMES = { R6 = "R6", R15ArtistIntent = "R15ArtistIntent", R15Fixed = "R15Fixed" }
+
+Constants.EXTRA_BANNED_NAMES = { "Head", "HumanoidRootPart", "Humanoid" }
+
+for _, v in ipairs({ "Body Colors", "Shirt Graphic", "Shirt", "Pants", "Health", "Animate" }) do
+	table.insert(Constants.EXTRA_BANNED_NAMES, v)
 end
 
-t2.BANNED_NAMES = {}
+Constants.BANNED_NAMES = {}
 
-for _, v26 in {
-	t2.R6_BODY_PARTS,
-	t2.R15_BODY_PARTS,
-	t2.EXTRA_BANNED_NAMES
-} do
-	for _, v28 in v26 do
-		t2.BANNED_NAMES[v28] = true
+for _, v in { Constants.R6_BODY_PARTS, Constants.R15_BODY_PARTS, Constants.EXTRA_BANNED_NAMES } do
+	for _, v2 in v do
+		Constants.BANNED_NAMES[v2] = true
 	end
 end
 
-t2.ASSET_STATUS = {
+Constants.ASSET_STATUS = {
 	UNKNOWN = "Unknown",
 	REVIEW_PENDING = "ReviewPending",
 	MODERATED = "Moderated"
 }
-t2.MAKEUP_INFO = ValidationRulesUtil:getMakeupRules()
-t2.ASSET_TYPE_INFO = {}
-ValidationRulesUtil:getAccessoryRules(t2.ASSET_TYPE_INFO)
-t2.FULL_BODY_BOUNDS = ValidationRulesUtil:getFullBodyRulesBounds()
-t2.AvatarPartScaleTypes = {
+
+Constants.MAKEUP_INFO = ValidationRulesUtil:getMakeupRules()
+
+Constants.ASSET_TYPE_INFO = {}
+ValidationRulesUtil:getAccessoryRules(Constants.ASSET_TYPE_INFO)
+
+Constants.FULL_BODY_BOUNDS = ValidationRulesUtil:getFullBodyRulesBounds()
+
+Constants.AvatarPartScaleTypes = {
 	Classic = true,
 	ProportionsSlender = true,
 	ProportionsNormal = true
 }
-ValidationRulesUtil:getBodyPartRules(t2.ASSET_TYPE_INFO)
-t2.BODYPART_TO_PARENT = {
-	Head = nil,
+
+ValidationRulesUtil:getBodyPartRules(Constants.ASSET_TYPE_INFO)
+
+Constants.BODYPART_TO_PARENT = {
+	["Head"] = nil,
 	LowerTorso = nil,
 	UpperTorso = "LowerTorso",
 	LeftUpperArm = nil,
@@ -245,16 +231,12 @@ t2.BODYPART_TO_PARENT = {
 	RightLowerLeg = "RightUpperLeg"
 }
 
-if getFFlagUGCValidationFixConstantsTypoLeg() then
-	t2.BODYPART_TO_PARENT.RightFoot = "RightLowerLeg"
-	t2.BODYPART_TO_PARENT.LeftFoot = "LeftLowerLeg"
-else
-	t2.BODYPART_TO_PARENT.RightLeg = "RightLowerLeg"
-	t2.BODYPART_TO_PARENT.LeftLeg = "LeftLowerLeg"
-end
+Constants.BODYPART_TO_PARENT.RightFoot = "RightLowerLeg"
+Constants.BODYPART_TO_PARENT.LeftFoot = "LeftLowerLeg"
 
-t2.RenderVsWrapMeshMaxDiff = ValidationRulesUtil:getRules().MeshRules.CageMeshMaxDistanceFromRenderMesh
-t2.COMPARISON_METHODS = {
+Constants.RenderVsWrapMeshMaxDiff = ValidationRulesUtil:getRules().MeshRules.CageMeshMaxDistanceFromRenderMesh
+
+Constants.COMPARISON_METHODS = {
 	SMALLER = "<",
 	SMALLER_EQ = "<=",
 	FUZZY_EQ = "=",
@@ -263,38 +245,48 @@ t2.COMPARISON_METHODS = {
 	GREATER = ">",
 	FOUND_IN = "one of the following:"
 }
-setmetatable(t2.COMPARISON_METHODS, {
-	__index = function(_, p3) -- line: 306
-		return error("Invalid COMPARISON_METHOD " .. tostring(p3))
+
+setmetatable(Constants.COMPARISON_METHODS, {
+	__index = function(_, p)
+		return error("Invalid COMPARISON_METHOD " .. tostring(p))
 	end
 })
-t2.INCLUSION_METHODS = {
+
+Constants.INCLUSION_METHODS = {
 	RUN_ON_ALL = "RUN_ON_ALL",
 	INCLUSION_LIST = "INCLUSION_LIST",
 	EXCLUSION_LIST = "EXCLUSION_LIST"
 }
-setmetatable(t2.INCLUSION_METHODS, {
-	__index = function(_, p5) -- line: 321
-		return error("Invalid INCLUSION_METHOD " .. tostring(p5))
+
+setmetatable(Constants.INCLUSION_METHODS, {
+	__index = function(_, p)
+		return error("Invalid INCLUSION_METHOD " .. tostring(p))
 	end
 })
-t2.PROPERTIES = {
-	Instance = {
-		Archivable = true
-	},
-	Attachment = {
-		Visible = false
-	},
-	Decal = {
-		Transparency = 0,
-		Color3 = Color3.new(1, 1, 1),
-		UVOffset = if not v10 then nil else Vector2.new(0, 0),
-		UVScale = if not v10 then nil else Vector2.new(1, 1)
-	},
+
+local decal = { Color3 = Color3.new(1, 1, 1), Transparency = 0, UVOffset = 0, UVScale = 0 }
+local uvOffset
+
+if defineFastFlag then
+	uvOffset = Vector2.new(0, 0)
+end
+
+decal.UVOffset = uvOffset
+local uvScale
+
+if defineFastFlag then
+	uvScale = Vector2.new(1, 1)
+end
+
+decal.UVScale = uvScale
+local properties = {
+	Instance = { Archivable = true },
+	Attachment = { Visible = false },
+	Decal = decal,
 	SpecialMesh = {
+		MeshType = Enum.MeshType.FileMesh,
 		Offset = Vector3.new(0, 0, 0),
-		VertexColor = Vector3.new(1, 1, 1),
-		MeshType = Enum.MeshType.FileMesh
+		VertexColor = Vector3.new(1, 1, 1)
 	},
 	BasePart = {
 		Anchored = false,
@@ -327,27 +319,19 @@ t2.PROPERTIES = {
 		TopParamB = 0.5,
 		TopSurfaceInput = Enum.InputType.NoInput,
 		BackSurface = Enum.SurfaceType.Smooth,
-		BottomSurface = if not getFFlagUGCValidationAllowEngineDefaultPartSurfaces() then Enum.SurfaceType.Smooth else {
-			[t2.COMPARISON_METHODS.FOUND_IN] = {
-				Enum.SurfaceType.Smooth,
-				Enum.SurfaceType.Inlet
-			}
+		BottomSurface = {
+			[Constants.COMPARISON_METHODS.FOUND_IN] = { Enum.SurfaceType.Smooth, Enum.SurfaceType.Inlet }
 		},
 		FrontSurface = Enum.SurfaceType.Smooth,
 		LeftSurface = Enum.SurfaceType.Smooth,
 		RightSurface = Enum.SurfaceType.Smooth,
-		TopSurface = if not getFFlagUGCValidationAllowEngineDefaultPartSurfaces() then Enum.SurfaceType.Smooth else {
-			[t2.COMPARISON_METHODS.FOUND_IN] = {
-				Enum.SurfaceType.Smooth,
-				Enum.SurfaceType.Studs
-			}
+		TopSurface = {
+			[Constants.COMPARISON_METHODS.FOUND_IN] = { Enum.SurfaceType.Smooth, Enum.SurfaceType.Studs }
 		},
-		Transparency = {
-			[t2.COMPARISON_METHODS.EXACT_EQ] = 0
-		},
+		Transparency = { [Constants.COMPARISON_METHODS.EXACT_EQ] = 0 },
 		Color = {
-			[t2.COMPARISON_METHODS.FUZZY_EQ] = BrickColor.new("Medium stone grey").Color,
-			[t2.INCLUSION_METHODS.EXCLUSION_LIST] = {
+			[Constants.COMPARISON_METHODS.FUZZY_EQ] = BrickColor.new("Medium stone grey").Color,
+			[Constants.INCLUSION_METHODS.EXCLUSION_LIST] = {
 				Enum.AssetType.DynamicHead,
 				Enum.AssetType.Torso,
 				Enum.AssetType.LeftArm,
@@ -357,151 +341,113 @@ t2.PROPERTIES = {
 			}
 		}
 	},
-	Part = {
-		Shape = Enum.PartType.Block
-	},
-	SurfaceAppearance = {
-		AlphaMode = if not getFFlagUGCValidationEyebrowEyelashSupport() then Enum.AlphaMode.Overlay else {
-			{
-				[t2.COMPARISON_METHODS.FOUND_IN] = {
-					Enum.AlphaMode.Overlay,
-					Enum.AlphaMode.Transparency
-				},
-				[t2.INCLUSION_METHODS.INCLUSION_LIST] = {
-					Enum.AssetType.EyelashAccessory,
-					Enum.AssetType.EyebrowAccessory
-				}
-			},
-			{
-				[t2.COMPARISON_METHODS.EXACT_EQ] = Enum.AlphaMode.Overlay,
-				[t2.INCLUSION_METHODS.EXCLUSION_LIST] = {
-					Enum.AssetType.EyelashAccessory,
-					Enum.AssetType.EyebrowAccessory
-				}
+	Part = { Shape = Enum.PartType.Block },
+	MeshPart = 0,
+	SurfaceAppearance = 0,
+	WrapLayer = 0,
+	WrapTarget = 0
+}
+local fluidFidelity
+
+if getFFlagUGCValidateDisallowAeroMeshData() then
+	fluidFidelity = Enum.FluidFidelity.Automatic
+end
+
+properties.MeshPart = { FluidFidelity = fluidFidelity }
+local alphaMode
+
+if getFFlagUGCValidationEyebrowEyelashSupport() then
+	alphaMode = {
+		{
+			[Constants.COMPARISON_METHODS.FOUND_IN] = { Enum.AlphaMode.Overlay, Enum.AlphaMode.Transparency },
+			[Constants.INCLUSION_METHODS.INCLUSION_LIST] = {
+				Enum.AssetType.EyelashAccessory,
+				Enum.AssetType.EyebrowAccessory
 			}
 		},
-		EmissiveMaskContent = if not getFFlagUGCValidateAllowEmissives() then Content.none else nil,
-		EmissiveStrength = not getFFlagUGCValidateAllowEmissives() and 1 or {
-			[t2.COMPARISON_METHODS.GREATER_EQ] = 0,
-			[t2.COMPARISON_METHODS.SMALLER_EQ] = 40
-		},
-		EmissiveTint = if not getFFlagUGCValidateAllowEmissives() then Color3.new(1, 1, 1) else nil
-	},
-	WrapLayer = {
-		Enabled = true,
-		CageOrigin = {
-			PositionMagnitude = {
-				[t2.COMPARISON_METHODS.SMALLER_EQ] = 10
-			},
-			Orientation = {
-				[t2.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0)
-			}
-		},
-		ReferenceOrigin = {
-			PositionMagnitude = {
-				[t2.COMPARISON_METHODS.SMALLER_EQ] = 10
-			},
-			Orientation = {
-				[t2.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0)
-			}
-		},
-		ImportOrigin = {
-			PositionMagnitude = {
-				[t2.COMPARISON_METHODS.SMALLER_EQ] = 8
-			}
-		},
-		BindOffset = {
-			Position = {
-				[t2.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0)
-			},
-			Orientation = {
-				[t2.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0)
-			}
-		}
-	},
-	WrapTarget = {
-		CageOrigin = {
-			PositionMagnitude = {
-				[t2.COMPARISON_METHODS.SMALLER_EQ] = 10
-			},
-			Orientation = {
-				[t2.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0)
-			}
-		},
-		ImportOrigin = {
-			PositionMagnitude = {
-				[t2.COMPARISON_METHODS.SMALLER_EQ] = 8
+		{
+			[Constants.COMPARISON_METHODS.EXACT_EQ] = Enum.AlphaMode.Overlay,
+			[Constants.INCLUSION_METHODS.EXCLUSION_LIST] = {
+				Enum.AssetType.EyelashAccessory,
+				Enum.AssetType.EyebrowAccessory
 			}
 		}
 	}
+else
+	alphaMode = Enum.AlphaMode.Overlay
+end
+
+properties.SurfaceAppearance = {
+	AlphaMode = alphaMode,
+	EmissiveStrength = {
+		[Constants.COMPARISON_METHODS.GREATER_EQ] = 0,
+		[Constants.COMPARISON_METHODS.SMALLER_EQ] = 40
+	}
 }
-t2.CONTENT_ID_FIELDS = {
-	SpecialMesh = {
-		"MeshId",
-		"TextureId"
+
+properties.WrapLayer = {
+	Enabled = true,
+	CageOrigin = {
+		PositionMagnitude = { [Constants.COMPARISON_METHODS.SMALLER_EQ] = 10 },
+		Orientation = { [Constants.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0) }
 	},
-	MeshPart = {
-		"MeshId",
-		"TextureID"
+	ReferenceOrigin = {
+		PositionMagnitude = { [Constants.COMPARISON_METHODS.SMALLER_EQ] = 10 },
+		Orientation = { [Constants.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0) }
 	},
-	SurfaceAppearance = {
-		"ColorMap",
-		"MetalnessMap",
-		"NormalMap",
-		"RoughnessMap"
+	ImportOrigin = {
+		PositionMagnitude = { [Constants.COMPARISON_METHODS.SMALLER_EQ] = 8 }
 	},
-	Decal = {
-		"ColorMap",
-		"MetalnessMap",
-		"NormalMap",
-		"RoughnessMap"
+	BindOffset = {
+		Position = { [Constants.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0) },
+		Orientation = { [Constants.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0) }
+	}
+}
+
+properties.WrapTarget = {
+	CageOrigin = {
+		PositionMagnitude = { [Constants.COMPARISON_METHODS.SMALLER_EQ] = 10 },
+		Orientation = { [Constants.COMPARISON_METHODS.EXACT_EQ] = Vector3.new(0, 0, 0) }
 	},
-	WrapLayer = {
-		"CageMeshId",
-		"ReferenceMeshId"
-	},
+	ImportOrigin = {
+		PositionMagnitude = { [Constants.COMPARISON_METHODS.SMALLER_EQ] = 8 }
+	}
+}
+Constants.PROPERTIES = properties
+
+Constants.CONTENT_ID_FIELDS = {
+	SpecialMesh = { "MeshId", "TextureId" },
+	MeshPart = { "MeshId", "TextureID" },
+	SurfaceAppearance = { "ColorMap", "MetalnessMap", "NormalMap", "RoughnessMap" },
+	Decal = { "ColorMap", "MetalnessMap", "NormalMap", "RoughnessMap" },
+	WrapLayer = { "CageMeshId", "ReferenceMeshId" },
 	WrapTarget = { "CageMeshId" },
 	Animation = { "AnimationId" }
 }
-t2.CONTENT_FIELDS_WITHOUT_CONTENTID = {
+
+Constants.CONTENT_FIELDS_WITHOUT_CONTENTID = {
 	SurfaceAppearance = { "EmissiveMaskContent" }
 }
 
 if getFFlagUGCValidateCheckTexturePackOwner() then
-	table.insert(t2.CONTENT_ID_FIELDS.SurfaceAppearance, "TexturePack")
+	table.insert(Constants.CONTENT_ID_FIELDS.SurfaceAppearance, "TexturePack")
 end
 
 if getFFlagUGCValidateCheckHSROwner() then
-	table.insert(t2.CONTENT_ID_FIELDS.WrapLayer, "HSRAssetId")
+	table.insert(Constants.CONTENT_ID_FIELDS.WrapLayer, "HSRAssetId")
 end
 
-t2.CONTENT_ID_REQUIRED_FIELDS = {
-	SpecialMesh = {
-		MeshId = true,
-		TextureId = true
-	},
-	MeshPart = {
-		MeshId = true
-	},
-	WrapTarget = {
-		CageMeshId = true
-	},
-	Animation = {
-		AnimationId = true
-	}
+Constants.CONTENT_ID_REQUIRED_FIELDS = {
+	SpecialMesh = { MeshId = true, TextureId = true },
+	MeshPart = { MeshId = true },
+	WrapTarget = { CageMeshId = true },
+	Animation = { AnimationId = true }
 }
-t2.CONTENT_ID_EDITABLE_PROPERTY = {
-	MeshPart = {
-		MeshId = "MeshContent",
-		TextureID = "TextureContent"
-	},
-	WrapTarget = {
-		CageMeshId = "CageMeshContent"
-	},
-	WrapLayer = {
-		CageMeshId = "CageMeshContent",
-		ReferenceMeshId = "ReferenceMeshContent"
-	},
+
+Constants.CONTENT_ID_EDITABLE_PROPERTY = {
+	MeshPart = { MeshId = "MeshContent", TextureID = "TextureContent" },
+	WrapTarget = { CageMeshId = "CageMeshContent" },
+	WrapLayer = { CageMeshId = "CageMeshContent", ReferenceMeshId = "ReferenceMeshContent" },
 	SurfaceAppearance = {
 		ColorMap = "ColorMapContent",
 		MetalnessMap = "MetalnessMapContent",
@@ -509,32 +455,37 @@ t2.CONTENT_ID_EDITABLE_PROPERTY = {
 		RoughnessMap = "RoughnessMapContent"
 	}
 }
-t2.MESH_CONTENT_ID_FIELDS = {
+
+Constants.CONTENT_TYPED_PROPERTIES_BY_CLASS = {
+	MeshPart = { "MeshContent", "TextureContent" },
+	WrapTarget = { "CageMeshContent" },
+	WrapLayer = { "CageMeshContent", "ReferenceMeshContent" },
+	SurfaceAppearance = {
+		"ColorMapContent",
+		"MetalnessMapContent",
+		"NormalMapContent",
+		"RoughnessMapContent",
+		"EmissiveMaskContent"
+	},
+	Decal = { "ColorMapContent", "MetalnessMapContent", "NormalMapContent", "RoughnessMapContent" },
+	WrapTextureTransfer = { "ReferenceCageMeshContent" }
+}
+
+Constants.MESH_CONTENT_ID_FIELDS = {
 	SpecialMesh = { "MeshId" },
 	MeshPart = { "MeshId" },
 	WrapTarget = { "CageMeshId" },
-	WrapLayer = {
-		"CageMeshId",
-		"ReferenceMeshId"
-	}
+	WrapLayer = { "CageMeshId", "ReferenceMeshId" }
 }
-t2.TEXTURE_CONTENT_ID_FIELDS = {
+
+Constants.TEXTURE_CONTENT_ID_FIELDS = {
 	SpecialMesh = { "TextureId" },
 	MeshPart = { "TextureID" },
-	SurfaceAppearance = {
-		"ColorMap",
-		"MetalnessMap",
-		"NormalMap",
-		"RoughnessMap"
-	},
-	Decal = {
-		"ColorMap",
-		"MetalnessMap",
-		"NormalMap",
-		"RoughnessMap"
-	}
+	SurfaceAppearance = { "ColorMap", "MetalnessMap", "NormalMap", "RoughnessMap" },
+	Decal = { "ColorMap", "MetalnessMap", "NormalMap", "RoughnessMap" }
 }
-t2.ASSET_RENDER_MESH_MAX_TRIANGLES = {
+
+Constants.ASSET_RENDER_MESH_MAX_TRIANGLES = {
 	DynamicHead = ValidationRulesUtil:getBodyPartMaxTrianglesRule(Enum.AssetType.DynamicHead),
 	LeftArm = ValidationRulesUtil:getBodyPartMaxTrianglesRule(Enum.AssetType.LeftArm),
 	RightArm = ValidationRulesUtil:getBodyPartMaxTrianglesRule(Enum.AssetType.RightArm),
@@ -542,7 +493,8 @@ t2.ASSET_RENDER_MESH_MAX_TRIANGLES = {
 	LeftLeg = ValidationRulesUtil:getBodyPartMaxTrianglesRule(Enum.AssetType.LeftLeg),
 	RightLeg = ValidationRulesUtil:getBodyPartMaxTrianglesRule(Enum.AssetType.RightLeg)
 }
-t2.WRAP_TARGET_CAGE_MESH_UV_COUNTS = {
+
+Constants.WRAP_TARGET_CAGE_MESH_UV_COUNTS = {
 	Head = 343,
 	LeftUpperArm = 77,
 	LeftLowerArm = 77,
@@ -559,27 +511,15 @@ t2.WRAP_TARGET_CAGE_MESH_UV_COUNTS = {
 	RightLowerLeg = 88,
 	RightFoot = 86
 }
-t2.PACKAGE_CONTENT_ID_FIELDS = Cryo.Dictionary.join(t2.CONTENT_ID_FIELDS, {
+
+Constants.PACKAGE_CONTENT_ID_FIELDS = Cryo.Dictionary.join(Constants.CONTENT_ID_FIELDS, {
 	Sound = { "SoundId" },
 	Decal = { "Texture" },
 	VideoFrame = { "Video" },
 	PackageLink = { "PackageId" },
-	CharacterMesh = {
-		"baseTextureAssetId",
-		"overlayTextureAssetId",
-		"meshAssetId"
-	},
+	CharacterMesh = { "baseTextureAssetId", "overlayTextureAssetId", "meshAssetId" },
 	Tool = { "TextureId" },
-	Sky = {
-		"SkyUp",
-		"SkyLf",
-		"SkyRt",
-		"SkyBk",
-		"SkyFt",
-		"SkyDn",
-		"Sun",
-		"Moon"
-	},
+	Sky = { "SkyUp", "SkyLf", "SkyRt", "SkyBk", "SkyFt", "SkyDn", "Sun", "Moon" },
 	Trail = { "texture" },
 	Beam = { "texture" },
 	ShirtGraphic = { "Graphic" },
@@ -587,103 +527,107 @@ t2.PACKAGE_CONTENT_ID_FIELDS = Cryo.Dictionary.join(t2.CONTENT_ID_FIELDS, {
 	Pants = { "PantsTemplate" },
 	AdGui = { "FallbackImage" }
 })
-t2.ExperienceAuthHeaderKey = "RBX-ExperienceAuthorization"
-t2.ContentType = "Content-Type"
-t2.ApplicationJson = "application/json"
-t2.GUIDAttributeName = "RBXGUID"
-t2.GUIDAttributeMaxLength = 100
-t2.AlternateMeshIdAttributeName = "RBX_ALT_MESH_ID"
-t2.MESH_CONTENT_TYPE = {
+
+Constants.ExperienceAuthHeaderKey = "RBX-ExperienceAuthorization"
+Constants.ContentType = "Content-Type"
+Constants.ApplicationJson = "application/json"
+
+Constants.GUIDAttributeName = "RBXGUID"
+Constants.GUIDAttributeMaxLength = 100
+
+Constants.EmoteIsUGCAttributeName = "RBXisUGCEmote"
+Constants.EmoteMaxPartTranslationAttributeName = "RBXmaxPartTranslation"
+
+Constants.AlternateMeshIdAttributeName = "RBX_ALT_MESH_ID"
+Constants.MESH_CONTENT_TYPE = {
 	RENDER_MESH = "RenderMesh",
 	OUTER_CAGE = "OuterCage",
 	INNER_CAGE = "InnerCage"
 }
-t2.MESH_CONTENT_TYPE_TO_FIELD_NAME = {
-	[t2.MESH_CONTENT_TYPE.RENDER_MESH] = "MeshId",
-	[t2.MESH_CONTENT_TYPE.OUTER_CAGE] = "CageMeshId",
-	[t2.MESH_CONTENT_TYPE.INNER_CAGE] = "ReferenceMeshId"
+
+Constants.MESH_CONTENT_TYPE_TO_FIELD_NAME = {
+	[Constants.MESH_CONTENT_TYPE.RENDER_MESH] = "MeshId",
+	[Constants.MESH_CONTENT_TYPE.OUTER_CAGE] = "CageMeshId",
+	[Constants.MESH_CONTENT_TYPE.INNER_CAGE] = "ReferenceMeshId"
 }
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	t2.ANIMATION_ASSET_INFO = {
-		[Enum.AssetType.ClimbAnimation] = {
-			modelName = "ClimbAnimation",
-			stringValueNames = { "climb" }
-		},
-		[Enum.AssetType.FallAnimation] = {
-			modelName = "FallAnimation",
-			stringValueNames = { "fall" }
-		},
-		[Enum.AssetType.IdleAnimation] = {
-			modelName = "IdleAnimation",
-			stringValueNames = { "idle" }
-		},
-		[Enum.AssetType.JumpAnimation] = {
-			modelName = "JumpAnimation",
-			stringValueNames = { "jump" }
-		},
-		[Enum.AssetType.RunAnimation] = {
-			modelName = "RunAnimation",
-			stringValueNames = { "run" }
-		},
-		[Enum.AssetType.SwimAnimation] = {
-			modelName = "SwimAnimation",
-			stringValueNames = {
-				"swim",
-				"swimidle"
-			}
-		},
-		[Enum.AssetType.WalkAnimation] = {
-			modelName = "WalkAnimation",
-			stringValueNames = { "walk" }
-		}
+Constants.ANIMATION_ASSET_INFO = {
+	[Enum.AssetType.ClimbAnimation] = {
+		modelName = "ClimbAnimation",
+		stringValueNames = { "climb" }
+	},
+	[Enum.AssetType.FallAnimation] = {
+		modelName = "FallAnimation",
+		stringValueNames = { "fall" }
+	},
+	[Enum.AssetType.IdleAnimation] = {
+		modelName = "IdleAnimation",
+		stringValueNames = { "idle" }
+	},
+	[Enum.AssetType.JumpAnimation] = {
+		modelName = "JumpAnimation",
+		stringValueNames = { "jump" }
+	},
+	[Enum.AssetType.RunAnimation] = {
+		modelName = "RunAnimation",
+		stringValueNames = { "run" }
+	},
+	[Enum.AssetType.SwimAnimation] = {
+		modelName = "SwimAnimation",
+		stringValueNames = { "swim", "swimidle" }
+	},
+	[Enum.AssetType.WalkAnimation] = {
+		modelName = "WalkAnimation",
+		stringValueNames = { "walk" }
 	}
-end
+}
 
-t2.AllAssetUploadCategories = {
+Constants.AllAssetUploadCategories = {
 	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 	ValidationEnums.UploadCategory.DYNAMIC_HEAD,
 	ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+	ValidationEnums.UploadCategory.EYEBROW_EYELASH,
 	ValidationEnums.UploadCategory.RIGID_ACCESSORY,
 	ValidationEnums.UploadCategory.EMOTE_ANIMATION
 }
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t2.AllAssetUploadCategories, ValidationEnums.UploadCategory.ANIMATION)
+table.insert(Constants.AllAssetUploadCategories, ValidationEnums.UploadCategory.ANIMATION)
+
+Constants.AllAssetUploadCategoriesIncludingMakeup = {}
+
+for _, allAssetUploadCategory in Constants.AllAssetUploadCategories do
+	table.insert(Constants.AllAssetUploadCategoriesIncludingMakeup, allAssetUploadCategory)
 end
 
-t2.AllAssetUploadCategoriesIncludingMakeup = {}
+table.insert(Constants.AllAssetUploadCategoriesIncludingMakeup, ValidationEnums.UploadCategory.MAKEUP)
 
-for _, v30 in t2.AllAssetUploadCategories do
-	table.insert(t2.AllAssetUploadCategoriesIncludingMakeup, v30)
+if getFFlagUGCValidateMakeupCategoryParity() then
+	table.insert(Constants.AllAssetUploadCategories, ValidationEnums.UploadCategory.MAKEUP)
 end
 
-table.insert(t2.AllAssetUploadCategoriesIncludingMakeup, ValidationEnums.UploadCategory.MAKEUP)
-t2.AllBundleUploadCategories = {
+Constants.AllBundleUploadCategories = {
 	ValidationEnums.UploadCategory.FULL_BODY,
 	ValidationEnums.UploadCategory.BOTH_SHOES
 }
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t2.AllBundleUploadCategories, ValidationEnums.UploadCategory.ANIMATION_PACK)
+table.insert(Constants.AllBundleUploadCategories, ValidationEnums.UploadCategory.ANIMATION_PACK)
+
+Constants.AllUploadCategories = {}
+
+for _, v in ValidationEnums.UploadCategory do
+	table.insert(Constants.AllUploadCategories, v)
 end
 
-t2.AllUploadCategories = {}
-
-for _, v32 in ValidationEnums.UploadCategory do
-	table.insert(t2.AllUploadCategories, v32)
-end
-
-t2.AssetUploadsWithFolderStructure = {
+local set = {
 	[Enum.AssetType.Torso] = true,
 	[Enum.AssetType.LeftArm] = true,
 	[Enum.AssetType.RightArm] = true,
 	[Enum.AssetType.LeftLeg] = true,
 	[Enum.AssetType.RightLeg] = true
 }
-t2.SkinningTransferRequiredTypes = {
-	[Enum.AssetType.EyebrowAccessory] = true,
-	[Enum.AssetType.EyelashAccessory] = true
-}
+Constants.AssetUploadsWithFolderStructure = set
 
-return t2
+local set2 = { [Enum.AssetType.EyebrowAccessory] = true, [Enum.AssetType.EyelashAccessory] = true }
+Constants.SkinningTransferRequiredTypes = set2
+
+return Constants

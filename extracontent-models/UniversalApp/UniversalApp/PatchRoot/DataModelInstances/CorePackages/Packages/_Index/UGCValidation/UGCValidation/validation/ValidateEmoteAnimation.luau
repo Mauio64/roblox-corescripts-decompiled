@@ -1,117 +1,66 @@
-local ParentParent = script.Parent.Parent
-local Analytics = require(ParentParent.Analytics)
-local util = ParentParent.util
+local parent = script.Parent.Parent
 
+local util = parent.util
 require(util.Types)
-
 local createEmoteSchema = require(util.createEmoteSchema)
 local FailureReasonsAccumulator = require(util.FailureReasonsAccumulator)
-local pcallDeferred = require(util.pcallDeferred)
-local validation = ParentParent.validation
+local validation = parent.validation
 local validateSingleInstance = require(validation.validateSingleInstance)
 local validateInstanceTree = require(validation.validateInstanceTree)
 local validateTags = require(validation.validateTags)
-local validateAttributes = require(validation.validateAttributes)
 local validateDependencies = require(validation.validateDependencies)
-local validateModeration = require(validation.validateModeration)
-local ValidateCurveAnimation = require(validation.ValidateCurveAnimation)
 local ValidatePropertiesSensible = require(validation.ValidatePropertiesSensible)
-local getEngineFeatureEngineUGCValidatePropertiesSensible = require(ParentParent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local getFFlagUGCValidationCombineEntrypointResults = require(ParentParent.flags.getFFlagUGCValidationCombineEntrypointResults)
-local t1 = {}
 
-local function reportError(s1: string, s2: string, p1) -- line: 34
-	-- upvalues: Analytics (copy)
-	if p1.isServer ~= nil and p1.isServer then
-		error(s1)
+local getEngineFeatureEngineUGCValidatePropertiesSensible = require(parent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
+
+local ValidateEmoteAnimation = {}
+
+function ValidateEmoteAnimation.validateStructure(p)
+	local v, v2 = validateSingleInstance(p.instances or {}, p)
+
+	if not v then
+		return false, v2
 	end
 
-	Analytics.reportFailure(s2, nil, p1)
+	local instance = p.instances[1]
 
-	return false, { s1 }
+	local v3, v4 = validateInstanceTree(createEmoteSchema(), instance, p)
+
+	if v3 then
+		return true, nil, instance
+	end
+
+	return false, v4
 end
 
-function t1.validateStructure(p2) -- line: 49
-	-- upvalues: validateSingleInstance (copy), validateInstanceTree (copy), createEmoteSchema (copy)
-	local v26, v27 = validateSingleInstance(p2.instances or {}, p2)
+function ValidateEmoteAnimation.validate(p)
+	local v, v2, v3 = ValidateEmoteAnimation.validateStructure(p)
 
-	if not v26 then
-		return false, v27
+	if not v then
+		return false, v2
 	end
-
-	local v28 = p2.instances[1]
-	local v29, v30 = validateInstanceTree(createEmoteSchema(), v28, p2)
-
-	if not v29 then
-		return false, v30
-	end
-
-	return true, nil, v28
-end
-function t1.validate(p3) -- line: 70
-	-- upvalues: t1 (copy), getEngineFeatureEngineUGCValidatePropertiesSensible (copy), ValidatePropertiesSensible (copy), getFFlagUGCValidateMigrateSchemaProperties (copy), getFFlagUGCValidationCombineEntrypointResults (copy), validateDependencies (copy), FailureReasonsAccumulator (copy), validateTags (copy), validateAttributes (copy), getFFlagUGCValidateMigrateCurveAnim (copy), pcallDeferred (copy), reportError (copy), Analytics (copy), ValidateCurveAnimation (copy), validateModeration (copy)
-	local v32, v33, v34 = t1.validateStructure(p3)
-
-	if not v32 then
-		return false, v33
-	end
-
-	local u35 = v34
 
 	if getEngineFeatureEngineUGCValidatePropertiesSensible() then
-		local v36, v37 = ValidatePropertiesSensible.validate(u35, p3)
+		local v4, v5 = ValidatePropertiesSensible.validate(v3, p)
 
-		if not v36 then
-			return false, v37
+		if not v4 then
+			return false, v5
 		end
 	end
 
-	local t2 = {
-		skipExistenceCheck = getFFlagUGCValidateMigrateSchemaProperties() and getFFlagUGCValidationCombineEntrypointResults(),
-		skipOwnershipCheck = getFFlagUGCValidateMigrateSchemaProperties() and getFFlagUGCValidationCombineEntrypointResults()
-	}
-	local v39, v40 = validateDependencies(u35, p3, t2)
+	local v4, v5 = validateDependencies(v3, p, {
+		skipExistenceCheck = true,
+		skipOwnershipCheck = true
+	})
 
-	if not v39 then
-		return false, v40
+	if not v4 then
+		return false, v5
 	end
 
-	local v41 = FailureReasonsAccumulator.new()
+	local v6 = FailureReasonsAccumulator.new()
+	v6:updateReasons(validateTags(v3, p))
 
-	v41:updateReasons(validateTags(u35, p3))
-
-	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
-		v41:updateReasons(validateAttributes(u35, p3))
-	end
-
-	if not getFFlagUGCValidateMigrateCurveAnim() or not getFFlagUGCValidationCombineEntrypointResults() then
-		local v42, v43 = pcallDeferred(function() -- line: 109
-			-- upvalues: u35 (ref)
-			return (game:GetObjectsAllOrNone(u35.AnimationId))
-		end, p3)
-
-		if not v42 or not v43 then
-			return reportError("Could not download Curve animation.", Analytics.ErrorType.validateEmoteAnimation_FailedToDownloadCurveAnimation, p3)
-		end
-
-		if #v43 ~= 1 then
-			Analytics.reportFailure(Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, nil, p3)
-
-			return false, { "Downloaded Curve animation did not have exactly one root. Please fix the animation." }
-		end
-
-		local v44 = v43[1]
-
-		v41:updateReasons(ValidateCurveAnimation.validate(v44, p3))
-	end
-
-	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
-		v41:updateReasons(validateModeration(u35, p3.restrictedUserIds, p3))
-	end
-
-	return v41:getFinalResults()
+	return v6:getFinalResults()
 end
 
-return t1
+return ValidateEmoteAnimation

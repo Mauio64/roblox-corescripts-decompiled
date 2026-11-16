@@ -1,3 +1,1 @@
-return {
-	Sort = require(script.Sort)
-}
+return { Sort = require(script.Sort) }

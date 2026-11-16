@@ -1,22 +1,19 @@
 local Badges = script:FindFirstAncestor("Badges")
-local BadgesParent = Badges.Parent
-local AppPage = require(BadgesParent.RobloxAppEnums).AppPage
-local SduiLoadTimer = require(BadgesParent.SduiSharedUtilities).SduiLoadTimer
+local parent = Badges.Parent
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
 local fetchBadgesSeeAllPageIfNeeded = require(Badges.BadgesSeeAllPage.fetchBadgesSeeAllPageIfNeeded)
 
-local function navigateToBadgesSeeAll(p1, s1: string) -- line: 9
-	-- upvalues: SduiLoadTimer (copy), AppPage (copy), fetchBadgesSeeAllPageIfNeeded (copy)
-	local v9 = SduiLoadTimer.createLoadTimer(AppPage.BadgesSeeAll)
+local function navigateToBadgesSeeAll(p, universeId: string)
+	local loadTimer = SduiLoadTimer.createLoadTimer(AppPage.BadgesSeeAll)
+	loadTimer.start("navigate")
 
-	v9.start("navigate")
+	local url = fetchBadgesSeeAllPageIfNeeded(universeId, loadTimer)
 
-	local v10 = fetchBadgesSeeAllPageIfNeeded(s1, v9)
-
-	p1.navigate(AppPage.BadgesSeeAll, {
-		universeId = s1,
-		pageTimer = v9,
-		url = v10
-	})
+	p.navigate(AppPage.BadgesSeeAll, { universeId = universeId, pageTimer = loadTimer, url = url })
 end
 
 return navigateToBadgesSeeAll

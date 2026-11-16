@@ -1,13 +1,15 @@
 local CorePackages = game:GetService("CorePackages")
 
-if not require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlatformLeaderboardRccEnabled then
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+
+if not SharedFlags.FFlagPlatformLeaderboardRccEnabled then
 	return
 end
 
 local PlatformLeaderboardsRcc = require(CorePackages.Workspace.Packages.PlatformLeaderboardsRcc)
-local v3 = assert(PlatformLeaderboardsRcc.PlatformLeaderboardFetcher)
-local v4 = assert(PlatformLeaderboardsRcc.PlatformLeaderboardConfigService)
-local v5 = assert(PlatformLeaderboardsRcc.PlatformLeaderboardController)
-local v6 = v4.new(v3)
+local v = assert(PlatformLeaderboardsRcc.PlatformLeaderboardFetcher)
+local v2 = assert(PlatformLeaderboardsRcc.PlatformLeaderboardConfigService)
+local v3 = assert(PlatformLeaderboardsRcc.PlatformLeaderboardController)
 
-v5.new(v6, v3):initialize()
+local v4 = v2.new(v)
+v3.new(v4, v):initialize()

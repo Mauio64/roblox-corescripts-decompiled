@@ -1,97 +1,104 @@
 local TrustAndSafetyIxp = script:FindFirstAncestor("TrustAndSafetyIxp")
-local TrustAndSafetyIxpParent = TrustAndSafetyIxp.Parent
-local GetFFlagReportAnythingAnnotationIXP = require(TrustAndSafetyIxpParent.SharedFlags).GetFFlagReportAnythingAnnotationIXP
-local GetFStringReportAnythingAnnotationIXPLayerName = require(TrustAndSafetyIxpParent.SharedFlags).GetFStringReportAnythingAnnotationIXPLayerName
+local parent = TrustAndSafetyIxp.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagReportAnythingAnnotationIXP = SharedFlags.GetFFlagReportAnythingAnnotationIXP
+
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFStringReportAnythingAnnotationIXPLayerName = SharedFlags2.GetFStringReportAnythingAnnotationIXPLayerName
+
 local GetFFlagForceReportAnythingAnnotationEnabled = require(TrustAndSafetyIxp.Flags.GetFFlagForceReportAnythingAnnotationEnabled)
-local IXPServiceWrapper = require(TrustAndSafetyIxpParent.IxpServiceWrapper).IXPServiceWrapper
-local v7 = require(TrustAndSafetyIxpParent.CoreScriptsInitializer).CoreLogger:new(script.Name)
-local t1 = {}
+local IxpServiceWrapper = require(parent.IxpServiceWrapper)
+local IXPServiceWrapper = IxpServiceWrapper.IXPServiceWrapper
+local CoreScriptsInitializer = require(parent.CoreScriptsInitializer)
+local v = CoreScriptsInitializer.CoreLogger:new(script.Name)
 
-t1.__index = t1
+local TrustAndSafetyIXPManager = {}
+TrustAndSafetyIXPManager.__index = TrustAndSafetyIXPManager
 
-function t1.new(p1) -- line: 19
-	-- upvalues: IXPServiceWrapper (copy), t1 (copy)
-	local t2 = {
+function TrustAndSafetyIXPManager.new(p)
+	local v2 = {
+		_ixpServiceWrapper = p or IXPServiceWrapper,
 		_initialized = false,
 		_ixpInitialized = false,
 		_optionalScreenshotEnabled = false,
 		_reportAnythingExperienceEnabled = false,
 		_reportAnythingAvatarEnabled = false,
-		_ixpServiceWrapper = p1 or IXPServiceWrapper,
 		_callbacks = {}
 	}
 
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v2, TrustAndSafetyIXPManager)
+	return v2
 end
-function t1.getReportAnythingExperienceEnabled(p2) -- line: 33
-	-- upvalues: GetFFlagForceReportAnythingAnnotationEnabled (copy)
+
+function TrustAndSafetyIXPManager:getReportAnythingExperienceEnabled()
 	if GetFFlagForceReportAnythingAnnotationEnabled() then
 		return true
 	end
 
-	return p2._reportAnythingExperienceEnabled or p2._optionalScreenshotEnabled
+	return self._reportAnythingExperienceEnabled or self._optionalScreenshotEnabled
 end
-function t1.getReportAnythingAvatarEnabled(p3) -- line: 40
-	-- upvalues: GetFFlagForceReportAnythingAnnotationEnabled (copy)
+
+function TrustAndSafetyIXPManager:getReportAnythingAvatarEnabled()
 	if GetFFlagForceReportAnythingAnnotationEnabled() then
 		return true
 	end
 
-	return p3._reportAnythingAvatarEnabled or p3._optionalScreenshotEnabled
+	return self._reportAnythingAvatarEnabled or self._optionalScreenshotEnabled
 end
-function t1.waitForInitialization(p4, p5) -- line: 47
-	if p4._ixpInitialized then
-		p5()
 
+function TrustAndSafetyIXPManager:waitForInitialization(callback)
+	if self._ixpInitialized then
+		callback()
+	else
+		table.insert(self._callbacks, callback)
+	end
+end
+
+function TrustAndSafetyIXPManager:initialize()
+	if self._initialized then
 		return
 	end
 
-	table.insert(p4._callbacks, p5)
-end
-function t1.initialize(p6) -- line: 55
-	-- upvalues: GetFFlagReportAnythingAnnotationIXP (copy), GetFStringReportAnythingAnnotationIXPLayerName (copy), v7 (copy)
-	if p6._initialized then
-		return
-	end
+	self._initialized = true
 
-	p6._initialized = true
-
-	local function invokeCallbacks() -- line: 61
-		-- upvalues: p6 (copy)
-		for _, v in ipairs(p6._callbacks) do
-			v()
+	local function invokeCallbacks()
+		for _, callback in ipairs(self._callbacks) do
+			callback()
 		end
 
-		p6._callbacks = {}
+		self._callbacks = {}
 	end
 
-	if not GetFFlagReportAnythingAnnotationIXP() then
-		p6._ixpInitialized = true
-		invokeCallbacks()
+	if GetFFlagReportAnythingAnnotationIXP() then
+		task.spawn(function()
+			self._ixpServiceWrapper:WaitForInitialization()
+			local layerData = self._ixpServiceWrapper:GetLayerData(GetFStringReportAnythingAnnotationIXPLayerName())
 
+			if layerData then
+				self._optionalScreenshotEnabled = layerData.OptionalScreenshotEnabled or false
+				self._reportAnythingExperienceEnabled = layerData.OptionalScreenshotExperience or false
+				self._reportAnythingAvatarEnabled = layerData.OptionalScreenshotAvatar or false
+			end
+
+			v:debug(
+				"RA Optional Screenshot enabled (Avatar and/or Experience) or Select In Scene enabled? Both Avatar and Exp: {}, Exp: {}, Avatar: {}, Select in Scene: {}. Invoking {} callbacks.",
+				self._optionalScreenshotEnabled,
+				self._reportAnythingExperienceEnabled,
+				self._reportAnythingAvatarEnabled,
+				self._selectInSceneEnabled,
+				#self._callbacks
+			)
+
+			self._ixpInitialized = true
+			invokeCallbacks()
+		end)
 		return
 	end
 
-	task.spawn(function() -- line: 74
-		-- upvalues: p6 (copy), GetFStringReportAnythingAnnotationIXPLayerName (copy), v7 (copy), invokeCallbacks (copy)
-		p6._ixpServiceWrapper:WaitForInitialization()
-
-		local LayerData = p6._ixpServiceWrapper:GetLayerData(GetFStringReportAnythingAnnotationIXPLayerName())
-
-		if LayerData then
-			p6._optionalScreenshotEnabled = LayerData.OptionalScreenshotEnabled or false
-			p6._reportAnythingExperienceEnabled = LayerData.OptionalScreenshotExperience or false
-			p6._reportAnythingAvatarEnabled = LayerData.OptionalScreenshotAvatar or false
-		end
-
-		v7:debug("RA Optional Screenshot enabled (Avatar and/or Experience) or Select In Scene enabled? Both Avatar and Exp: {}, Exp: {}, Avatar: {}, Select in Scene: {}. Invoking {} callbacks.", p6._optionalScreenshotEnabled, p6._reportAnythingExperienceEnabled, p6._reportAnythingAvatarEnabled, p6._selectInSceneEnabled, #p6._callbacks)
-		p6._ixpInitialized = true
-		invokeCallbacks()
-	end)
+	self._ixpInitialized = true
+	invokeCallbacks()
 end
 
-t1.default = t1.new()
-
-return t1
+TrustAndSafetyIXPManager.default = TrustAndSafetyIXPManager.new()
+return TrustAndSafetyIXPManager

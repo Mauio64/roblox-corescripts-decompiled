@@ -1,0 +1,1 @@
+return game:DefineFastFlag("ProfileInspectAndBuyKeepUpsellDialogOpen", false) and require("@game/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform/ProfilePlatform/Flags/FFlagProfileInspectAndBuyRefreshBalanceAfterPurchase")

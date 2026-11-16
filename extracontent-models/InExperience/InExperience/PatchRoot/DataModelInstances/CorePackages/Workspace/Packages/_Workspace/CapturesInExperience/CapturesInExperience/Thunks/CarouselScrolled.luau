@@ -1,14 +1,10 @@
-local ParentParent = script.Parent.Parent
-local CarouselIndexSelected = require(ParentParent.Actions.CarouselIndexSelected)
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
 
-return function(n1: number) -- line: 6
-	-- upvalues: Constants (copy), CarouselIndexSelected (copy)
-	return function(p1) -- line: 7
-		-- upvalues: Constants (copy), n1 (copy), CarouselIndexSelected (copy)
-		local Captures = p1:getState()[Constants.RoduxKey].Captures
-		local v7 = math.clamp(n1, 1, #Captures)
+local CarouselIndexSelected = require(parent.Actions.CarouselIndexSelected)
+local Constants = require(parent.Constants)
 
-		p1:dispatch(CarouselIndexSelected(v7))
+return function(value: number)
+	return function(object)
+		object:dispatch(CarouselIndexSelected((math.clamp(value, 1, #object:getState()[Constants.RoduxKey].Captures))))
 	end
 end

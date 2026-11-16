@@ -1,24 +1,28 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local Foundation = require(Parent.Foundation)
-local GetFFlagIsSquadEnabled = require(Parent.SharedFlags).GetFFlagIsSquadEnabled
-local FFlagConnectionsToFriendsRename = require(Parent.SharedFlags).FFlagConnectionsToFriendsRename
-local t1 = {
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Foundation = require(parent.Foundation)
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
+
+local v = {
 	friends = {
 		icon = "rbxasset://textures/ui/LuaChat/icons/ic-friends.png",
-		copy = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.MakeConnectionsToChat" or (not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.MakeConnectionsToParty" or "Feature.Chat.Message.MakeFriendsToParty"),
-		cta = not FFlagConnectionsToFriendsRename and "Feature.SettingsHub.Label.NoConnectionsScreen" or "Feature.SettingsHub.Label.NoFriendsScreen"
+		copy = GetFFlagIsSquadEnabled() and "Feature.Chat.Message.MakeFriendsToParty" or "Feature.Chat.Message.MakeConnectionsToChat",
+		cta = "Feature.SettingsHub.Label.NoFriendsScreen"
 	},
 	regional = {
 		icon = "icons/status/oof_xlarge",
-		cta = nil,
-		copy = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.ChatUnavailableRegion" or "Feature.Chat.Message.PartyUnavailableRegion"
+		copy = GetFFlagIsSquadEnabled() and "Feature.Chat.Message.PartyUnavailableRegion" or "Feature.Chat.Message.ChatUnavailableRegion",
+		cta = nil
 	},
 	privacy = {
 		icon = "rbxasset://textures/ui/LuaChat/icons/ic-friends.png",
-		cta = "Feature.Chat.Label.PrivacySettings",
-		copy = if not GetFFlagIsSquadEnabled() then not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.EnableChat" or "Feature.Chat.Message.EnableChat.FriendsRename" else not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.EnableParty" or "Feature.Chat.Message.EnableParty.FriendsRename"
+		copy = GetFFlagIsSquadEnabled() and "Feature.Chat.Message.EnableParty.FriendsRename" or "Feature.Chat.Message.EnableChat.FriendsRename",
+		cta = "Feature.Chat.Label.PrivacySettings"
 	},
 	thirdParty = {
 		icon = "rbxasset://textures/ui/LuaChat/icons/ic-friends.png",
@@ -32,66 +36,58 @@ local t1 = {
 	}
 }
 
-local function getEmptyStateFromProps(t2: {[any]: any}) -- line: 72
-	if t2.chatEnabled then
+local function getEmptyStateFromProps(props): string -- 1 equivalent call inferred from this helper
+	if props.chatEnabled then
 		return "friends"
 	end
 
-	if not t2.globalRulesEnabled then
+	if not props.globalRulesEnabled then
 		return "regional"
 	end
 
-	if not t2.privacySettingsEnabled then
+	if not props.privacySettingsEnabled then
 		return "privacy"
 	end
 
-	if not t2.thirdPartyPrivacySettingsEnabled then
-		return "thirdParty"
+	if props.thirdPartyPrivacySettingsEnabled then
+		return "fallback"
 	end
 
-	return "fallback"
+	return "thirdParty"
 end
-local function NoConversationsLanding(t3: {[any]: any}) -- line: 87
-	-- upvalues: t1 (copy), useLocalization (copy), React (copy), Foundation (copy)
-	local v12 = if not t3.chatEnabled then if t3.globalRulesEnabled then if t3.privacySettingsEnabled then t3.thirdPartyPrivacySettingsEnabled and "fallback" or "thirdParty" else "privacy" else "regional" else "friends"
-	local v13 = t1[v12]
-	local v14 = v13.cta ~= nil
 
-	if v12 == "friends" and not t3.canNavigateToAddFriends then
-		v14 = false
-	elseif v12 == "privacy" and not t3.canNavigateToPrivacySettings then
-		v14 = false
+local function NoConversationsLanding(props)
+	local emptyStateFromProps = getEmptyStateFromProps(props) -- inferred equivalent call
+	local v2 = v[emptyStateFromProps]
+	local v3 = v2.cta ~= nil
+
+	if emptyStateFromProps == "friends" and not props.canNavigateToAddFriends then
+		v3 = false
+	elseif emptyStateFromProps == "privacy" and not props.canNavigateToPrivacySettings then
+		v3 = false
 	end
 
-	local v15 = useLocalization({
-		callToAction = v13.cta or "Feature.Chat.Label.PrivacySettings",
-		copy = v13.copy
+	local v4 = useLocalization({
+		callToAction = v2.cta or "Feature.Chat.Label.PrivacySettings",
+		copy = v2.copy
 	})
 
-	React.useEffect(function() -- line: 102
-		-- upvalues: t3 (copy), v12 (copy)
-		if t3.fireRenderEvent then
-			t3.fireRenderEvent(v12)
+	React.useEffect(function()
+		if props.fireRenderEvent then
+			props.fireRenderEvent(emptyStateFromProps)
 		end
-	end, {
-		t3.fireRenderEvent,
-		v12
-	})
+	end, { props.fireRenderEvent, emptyStateFromProps })
 
 	return React.createElement(Foundation.Empty, {
-		icon = {
-			size = "XLarge",
-			name = v13.icon
-		},
-		text = v15.copy,
-		button = if not v14 then nil else {
+		icon = { name = v2.icon, size = "XLarge" },
+		text = v4.copy,
+		button = v3 and {
+			text = v4.callToAction,
 			icon = "icons/navigation/externallink_medium",
-			text = v15.callToAction,
-			onActivated = function() -- line: 118
-				-- upvalues: t3 (copy), v12 (copy)
-				t3.onCallToAction(v12)
+			onActivated = function()
+				props.onCallToAction(emptyStateFromProps)
 			end
-		}
+		} or nil
 	})
 end
 

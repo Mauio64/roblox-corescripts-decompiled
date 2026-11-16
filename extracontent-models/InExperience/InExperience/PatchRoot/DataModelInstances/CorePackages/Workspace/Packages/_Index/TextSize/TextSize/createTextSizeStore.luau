@@ -1,109 +1,124 @@
 local TextService = game:GetService("TextService")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local Parent = script:FindFirstAncestor("TextSize").Parent
-local Signals = require(Parent.Signals)
 
-local function calculateTextSizeOffset() -- line: 26
-	-- upvalues: TextService (copy)
-	local co = coroutine.create(function() -- line: 27
-		-- upvalues: TextService (copy)
-		local v17 = Font.fromEnum(Enum.Font.BuilderSans)
-		local ok, result = pcall(function() -- line: 31
-			-- upvalues: TextService (copy), v17 (copy)
-			return TextService:GetTextSizeOffsetAsync(0, v17)
+local parent = script:FindFirstAncestor("TextSize").Parent
+local Foundation = require(parent.Foundation)
+local Signals = require(parent.Signals)
+
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
+local function calculateTextSizeOffset()
+	local function fn()
+		local font = Font.fromEnum(Enum.Font.BuilderSans)
+
+		local success, result = pcall(function()
+			return TextService:GetTextSizeOffsetAsync(0, font)
 		end)
 
-		if not ok then
-			warn(result)
-
-			return 0
+		if success then
+			return result or 0
 		end
 
-		return result or 0
-	end)
+		warn(result)
+		return 0
+	end
 
-	return (function(p1: thread, b1: boolean, ...) -- line: 10
-		if not b1 then
+	local thread = coroutine.create(fn)
+	return (function(thread2: thread, flag: boolean, ...)
+		if not flag then
 			return nil
 		end
 
-		if coroutine.status(p1) ~= "dead" then
-			return nil
+		if coroutine.status(thread2) == "dead" then
+			return ...
 		end
 
-		return ...
-	end)(co, coroutine.resume(co)) or 0
+		return nil
+	end)(thread, coroutine.resume(thread)) or 0
 end
-local function createTextSizeStore() -- line: 45
-	-- upvalues: Signals (copy), TextService (copy), UserGameSettings (copy)
+
+local function createTextSizeStore()
 	local createSignal = Signals.createSignal
-	local co = coroutine.create(function() -- line: 27
-		-- upvalues: TextService (copy)
-		local v22 = Font.fromEnum(Enum.Font.BuilderSans)
-		local ok, result = pcall(function() -- line: 31
-			-- upvalues: TextService (copy), v22 (copy)
-			return TextService:GetTextSizeOffsetAsync(0, v22)
-		end)
+	local v
 
-		if not ok then
-			warn(result)
+	if FoundationFontFaceMigration then
+		v = Foundation.Utility.getTextSizeOffset() or 0
+	else
+		local function fn()
+			local font = Font.fromEnum(Enum.Font.BuilderSans)
 
-			return 0
-		end
-
-		return result or 0
-	end)
-	local v12, v13 = createSignal((function(p2: thread, b2: boolean, ...) -- line: 10
-		if not b2 then
-			return nil
-		end
-
-		if coroutine.status(p2) ~= "dead" then
-			return nil
-		end
-
-		return ...
-	end)(co, coroutine.resume(co)) or 0)
-	local connection = UserGameSettings:GetPropertyChangedSignal("PreferredTextSize"):Connect(function() -- line: 48
-		-- upvalues: v13 (copy), TextService (copy)
-		local v27 = v13
-		local co2 = coroutine.create(function() -- line: 27
-			-- upvalues: TextService (copy)
-			local v29 = Font.fromEnum(Enum.Font.BuilderSans)
-			local ok, result = pcall(function() -- line: 31
-				-- upvalues: TextService (copy), v29 (copy)
-				return TextService:GetTextSizeOffsetAsync(0, v29)
+			local success, result = pcall(function()
+				return TextService:GetTextSizeOffsetAsync(0, font)
 			end)
 
-			if not ok then
-				warn(result)
+			if success then
+				return result or 0
+			end
 
+			warn(result)
+			return 0
+		end
+
+		local thread = coroutine.create(fn)
+		v = (function(thread2: thread, flag: boolean, ...)
+			if not flag then
+				return nil
+			end
+
+			if coroutine.status(thread2) == "dead" then
+				return ...
+			end
+
+			return nil
+		end)(thread, coroutine.resume(thread)) or 0
+	end
+
+	local signal, v2 = createSignal(v)
+
+	local preferredTextSizeChangedConnection = UserGameSettings:GetPropertyChangedSignal("PreferredTextSize"):Connect(function()
+		local v3
+
+		if FoundationFontFaceMigration then
+			v3 = Foundation.Utility.getTextSizeOffset() or 0
+		else
+			local function fn()
+				local font = Font.fromEnum(Enum.Font.BuilderSans)
+
+				local success, result = pcall(function()
+					return TextService:GetTextSizeOffsetAsync(0, font)
+				end)
+
+				if success then
+					return result or 0
+				end
+
+				warn(result)
 				return 0
 			end
 
-			return result or 0
-		end)
+			local thread = coroutine.create(fn)
+			v3 = (function(thread2: thread, flag: boolean, ...)
+				if not flag then
+					return nil
+				end
 
-		v27((function(p3: thread, b3: boolean, ...) -- line: 10
-			if not b3 then
+				if coroutine.status(thread2) == "dead" then
+					return ...
+				end
+
 				return nil
-			end
+			end)(thread, coroutine.resume(thread)) or 0
+		end
 
-			if coroutine.status(p3) ~= "dead" then
-				return nil
-			end
-
-			return ...
-		end)(co2, coroutine.resume(co2)) or 0)
+		v2(v3)
 	end)
 
 	return {
-		getTextSizeOffset = v12,
-		cleanup = function() -- line: 54
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
-				connection = nil
+		getTextSizeOffset = signal,
+		cleanup = function()
+			if preferredTextSizeChangedConnection then
+				preferredTextSizeChangedConnection:Disconnect()
+				preferredTextSizeChangedConnection = nil
 			end
 		end
 	}

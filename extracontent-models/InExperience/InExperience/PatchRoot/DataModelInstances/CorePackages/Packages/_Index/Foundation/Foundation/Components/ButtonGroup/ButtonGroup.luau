@@ -1,64 +1,72 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Button = require(Foundation.Components.Button)
-
 require(Foundation.Enums.ButtonVariant)
-
 local FillBehavior = require(Foundation.Enums.FillBehavior)
 local InputSize = require(Foundation.Enums.InputSize)
 local Orientation = require(Foundation.Enums.Orientation)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
+local devAssert = require(Foundation.Utility.devAssert)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
-local t1 = {
-	testId = "--foundation-button-group",
+
+local v = {
+	maxButtonCount = 3,
 	orientation = Orientation.Horizontal,
-	size = InputSize.Medium
+	size = InputSize.Medium,
+	testId = "--foundation-button-group"
 }
 
-local function ButtonGroup(p1, p2) -- line: 52
-	-- upvalues: withDefaults (copy), t1 (copy), Orientation (copy), FillBehavior (copy), React (copy), Button (copy), View (copy), withCommonProps (copy)
-	local v15 = withDefaults(p1, t1)
+local function ButtonGroup(p, ref)
+	local v2 = withDefaults(p, v)
 
-	assert(#v15.buttons <= 3, `ButtonGroup: a maximum of 3 buttons is supported, got { #v15.buttons }.`)
+	devAssert(
+		#v2.buttons <= v2.maxButtonCount,
+		`ButtonGroup: a maximum of {v2.maxButtonCount} buttons is supported, got {#v2.buttons}.`
+	)
 
-	local v16 = v15.orientation == Orientation.Vertical
-	local v17 = v16 or v15.fillBehavior == FillBehavior.Fill
-	local v18 = if v16 or not v17 then nil else FillBehavior.Fill
-	local t2 = {}
+	local colflexxfill = v2.orientation == Orientation.Vertical
+	local sizefull0autoy = colflexxfill or v2.fillBehavior == FillBehavior.Fill
+	local fill
 
-	for v20, v21 in v15.buttons do
-		t2["Button" .. v20] = React.createElement(Button, {
-			text = v21.text,
-			onActivated = v21.onActivated,
-			variant = v21.variant,
-			isDisabled = v21.isDisabled,
-			isLoading = v21.isLoading,
-			icon = v21.icon,
-			inputDelay = v21.inputDelay,
-			ref = v21.ref,
-			size = v15.size,
-			fillBehavior = v18,
-			LayoutOrder = v20,
-			testId = `{ v15.testId }--button-{ v20 }`
+	if not (colflexxfill or not sizefull0autoy) then
+		fill = FillBehavior.Fill
+	end
+
+	local children = {}
+
+	for k, button in v2.buttons do
+		children[`{k}-{button.text}`] = React.createElement(Button, {
+			text = button.text,
+			onActivated = button.onActivated,
+			variant = button.variant,
+			isDisabled = button.isDisabled,
+			isLoading = button.isLoading,
+			icon = button.icon,
+			inputDelay = button.inputDelay,
+			ref = button.ref,
+			size = v2.size,
+			fillBehavior = fill,
+			LayoutOrder = k,
+			testId = button.testId or `{v2.testId}--button-{k}`
 		})
 	end
 
-	return React.createElement(View, withCommonProps(v15, {
+	return React.createElement(View, withCommonProps(v2, {
 		tag = {
 			["gap-small"] = true,
-			["col flex-x-fill"] = v16,
-			row = not v16 and v17,
-			["row wrap"] = not v16 and not v17,
-			["size-full-0 auto-y"] = v17,
-			["auto-xy"] = not v17
+			["col flex-x-fill"] = colflexxfill,
+			row = not colflexxfill and sizefull0autoy,
+			["row wrap"] = not (colflexxfill or sizefull0autoy),
+			["size-full-0 auto-y"] = sizefull0autoy,
+			["auto-xy"] = not sizefull0autoy
 		},
-		ref = p2
-	}), t2)
+		ref = ref
+	}), children)
 end
 
 return React.memo(React.forwardRef(ButtonGroup))

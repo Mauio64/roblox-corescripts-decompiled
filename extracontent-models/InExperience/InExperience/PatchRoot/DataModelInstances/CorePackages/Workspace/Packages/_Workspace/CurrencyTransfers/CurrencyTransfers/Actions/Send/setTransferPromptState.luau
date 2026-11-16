@@ -1,22 +1,13 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-
 require(CurrencyTransfers.Stores.createTransferStore)
-
 local PromptState = require(CurrencyTransfers.Enums.PromptState)
-
 require(CurrencyTransfers.Models.InitiateTransferModel)
 
-local t1 = {
+local v = {
 	[PromptState.TransferRequested] = { PromptState.TransferStarted },
 	[PromptState.TransferStarted] = { PromptState.TransferInput },
-	[PromptState.TransferInput] = {
-		PromptState.TransferConfirm,
-		PromptState.TransferInsufficientBalance
-	},
-	[PromptState.TransferInsufficientBalance] = {
-		PromptState.TransferInput,
-		PromptState.TransferConfirm
-	},
+	[PromptState.TransferInput] = { PromptState.TransferConfirm, PromptState.TransferInsufficientBalance },
+	[PromptState.TransferInsufficientBalance] = { PromptState.TransferInput, PromptState.TransferConfirm },
 	[PromptState.TransferConfirm] = {
 		PromptState.TransferInput,
 		PromptState.TransferProcessing,
@@ -26,49 +17,26 @@ local t1 = {
 	[PromptState.TransferProcessing] = { PromptState.TransferSuccess }
 }
 
-local function isValidPromptStateTransition(p1, p2) -- line: 26
-	-- upvalues: t1 (copy)
-	local v8 = t1[p1]
+local function isValidPromptStateTransition(p, p2): boolean -- 1 equivalent call inferred from this helper
+	local v2 = v[p]
 
-	for _, v in ipairs(v8) do
-		if v == p2 then
+	for _, v3 in ipairs(v2) do
+		if v3 == p2 then
 			return true
 		end
 	end
 
 	return false
 end
-local function setTransferPromptState(p3, p4) -- line: 36
-	-- upvalues: t1 (copy), PromptState (copy)
-	local setPromptState = p3.setPromptState
-	local v14 = t1[p3.getPromptState(false)]
-	local g18 = nil
-	local v17 = nil
 
-	for _, v in ipairs(v14) do
-		if v == p4 then
-			v17 = true
-			g18 = true
-		end
+local function setTransferPromptState(p, p2)
+	local setPromptState = p.setPromptState
 
-		if g18 then
-			break
-		end
-	end
-
-	if not g18 then
-		v17 = false
-	end
-
-	g18 = false
-
-	if not v17 then
+	if isValidPromptStateTransition(p.getPromptState(false), p2) then -- inferred equivalent call
+		setPromptState(p2)
+	else
 		setPromptState(PromptState.TransferError)
-
-		return
 	end
-
-	setPromptState(p4)
 end
 
 return setTransferPromptState

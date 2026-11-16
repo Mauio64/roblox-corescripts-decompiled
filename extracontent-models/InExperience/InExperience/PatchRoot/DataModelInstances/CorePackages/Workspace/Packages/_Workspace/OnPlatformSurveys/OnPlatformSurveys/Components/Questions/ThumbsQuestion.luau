@@ -1,144 +1,143 @@
 local OnPlatformSurveys = script:FindFirstAncestor("OnPlatformSurveys")
-local OnPlatformSurveysParent = OnPlatformSurveys.Parent
-local Foundation = require(OnPlatformSurveysParent.Foundation)
-local React = require(OnPlatformSurveysParent.React)
+local parent = OnPlatformSurveys.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local Icon = Foundation.Icon
 local IconVariant = Foundation.Enums.IconVariant
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
 
 require(OnPlatformSurveys.Types.InlineSurveyTypes)
 
-local t1 = {}
-local t2 = {
-	{
-		id = "1",
-		icon = "thumb-down"
-	},
-	{
-		id = "2",
-		icon = "thumb-up"
-	}
+local v = {}
+
+local v2 = {
+	{ id = "1", icon = "thumb-down" },
+	{ id = "2", icon = "thumb-up" }
 }
 
-local function findChoice(p1, s1: string) -- line: 44
-	-- upvalues: t1 (copy)
-	for _, v17 in p1.choices or t1 do
-		if s1 == v17.id then
-			return v17
+local function findChoice(question, id: string) -- 1 equivalent call inferred from this helper
+	for _, v3 in question.choices or v do
+		if v3.id == id then
+			return v3
 		end
 	end
 
 	return nil
 end
-local function ThumbsQuestion(t3: {[any]: any}) -- line: 53
-	-- upvalues: useTokens (copy), React (copy), t2 (copy), t1 (copy), View (copy), Icon (copy), IconVariant (copy), FoundationText (copy)
-	local v19 = useTokens()
-	local question = t3.question
-	local answer = t3.answer
-	local v22 = t3.isDisabled == true
-	local v23 = if answer.choiceIds == nil then nil else answer.choiceIds[1]
-	local v24, v25 = React.useState(nil)
-	local DefaultColor3 = v19.Color.Content.Default.Color3
-	local t4 = {}
-	local g34 = nil
-	local v33 = nil
 
-	for v28, v29 in t2 do
-		local id = v29.id
+local function ThumbsQuestion(props)
+	local v3 = useTokens()
+	local question = props.question
+	local answer = props.answer
+	local isDisabled = props.isDisabled == true
+	local v4
 
-		for _, v32 in question.choices or t1 do
-			if id == v32.id then
-				v33 = v32
-				g34 = true
-			end
-
-			if g34 then
-				break
-			end
-		end
-
-		if not g34 then
-			v33 = nil
-		end
-
-		g34 = false
-
-		if v33 ~= nil then
-			local v35 = v23 == v29.id
-			local v36 = v24 == v29.id
-			local v37 = if not v35 then not v36 and 0.92 or 0.85 else 0.75
-
-			t4["Cell_" .. v29.id] = React.createElement(View, {
-				tag = "col align-x-center gap-small auto-xy",
-				LayoutOrder = v28
-			}, {
-				Button = React.createElement("TextButton", {
-					Size = UDim2.fromOffset(76, 76),
-					BackgroundTransparency = 1,
-					Text = "",
-					AutoButtonColor = false,
-					Active = not v22,
-					Selectable = not v22,
-					LayoutOrder = 1,
-					[React.Tag] = "data-testid=thumb-" .. v29.id,
-					[React.Event.Activated] = function() -- line: 91
-						-- upvalues: v22 (copy), t3 (copy), v35 (copy), v29 (copy)
-						if v22 then
-							return
-						end
-
-						t3.onAnswerChanged({
-							choiceIds = if not v35 then { v29.id } else {}
-						})
-					end,
-					[React.Event.MouseEnter] = function() -- line: 100
-						-- upvalues: v25 (copy), v29 (copy)
-						v25(v29.id)
-					end,
-					[React.Event.MouseLeave] = function() -- line: 103
-						-- upvalues: v25 (copy), v29 (copy)
-						v25(function(s2: string?) -- line: 104
-							-- upvalues: v29 (copy)
-							if s2 == v29.id then
-								return nil
-							end
-
-							return s2
-						end)
-					end
-				}, {
-					Backplate = React.createElement(View, {
-						tag = "size-full radius-circle",
-						ZIndex = 1,
-						backgroundStyle = {
-							Color3 = DefaultColor3,
-							Transparency = v37
-						}
-					}),
-					Icon = React.createElement(Icon, {
-						size = 40,
-						ZIndex = 2,
-						name = v29.icon,
-						variant = if not v35 then IconVariant.Regular else IconVariant.Filled,
-						AnchorPoint = Vector2.new(0.5, 0.5),
-						Position = UDim2.fromScale(0.5, 0.5)
-					})
-				}),
-				Label = React.createElement(FoundationText, {
-					tag = "auto-xy text-body-medium text-align-x-center content-default",
-					LayoutOrder = 2,
-					Text = v33.label
-				})
-			})
-		end
+	if answer.choiceIds ~= nil then
+		v4 = answer.choiceIds[1]
 	end
 
-	return React.createElement(View, {
-		tag = "row flex-around align-y-top size-full-0 auto-y",
-		LayoutOrder = t3.layoutOrder
-	}, t4)
+	local state, setState = React.useState(nil)
+
+	local color3 = v3.Color.Content.Default.Color3
+
+	local children = {}
+
+	for k, v5 in v2 do
+		local choice = findChoice(question, v5.id) -- inferred equivalent call
+
+		if choice == nil then
+			continue
+		end
+
+		local v6 = v4 == v5.id
+		local v7 = state == v5.id
+
+		local v8 = "Cell_" .. v5.id
+		local createElement = React.createElement
+
+		local createElement2 = React.createElement
+		local v9 = {
+			Size = UDim2.fromOffset(76, 76),
+			BackgroundTransparency = 1,
+			Text = "",
+			AutoButtonColor = false,
+			Active = not isDisabled,
+			Selectable = not isDisabled,
+			LayoutOrder = 1,
+			[React.Tag] = "data-testid=thumb-" .. v5.id,
+			[React.Event.Activated] = function()
+				if isDisabled then
+					return
+				end
+
+				props.onAnswerChanged({
+					choiceIds = v6 and {} or { v5.id }
+				})
+			end,
+			[React.Event.MouseEnter] = function()
+				setState(v5.id)
+			end,
+			[React.Event.MouseLeave] = function()
+				setState(function(p: string?)
+					return if p ~= v5.id then p else nil
+				end)
+			end
+		}
+		local children2 = {
+			Backplate = React.createElement(View, {
+				tag = "size-full radius-circle",
+				backgroundStyle = {
+					Color3 = color3,
+					Transparency = v6 and 0.75 or v7 and 0.85 or 0.92
+				},
+				ZIndex = 1
+			}),
+			Icon = 0
+		}
+
+		local createElement3 = React.createElement
+		local v10 = {
+			name = v5.icon,
+			size = 40,
+			variant = 0,
+			AnchorPoint = 0,
+			Position = 0,
+			ZIndex = 2
+		}
+		local variant
+
+		if v6 then
+			variant = IconVariant.Filled
+		else
+			variant = IconVariant.Regular
+		end
+
+		v10.variant = variant
+		v10.AnchorPoint = Vector2.new(0.5, 0.5)
+		v10.Position = UDim2.fromScale(0.5, 0.5)
+		children2.Icon = createElement3(Icon, v10)
+		children[v8] = createElement(View, {
+			tag = "col align-x-center gap-small auto-xy",
+			LayoutOrder = k
+		}, {
+			Button = createElement2("TextButton", v9, children2),
+			Label = React.createElement(Text, {
+				Text = choice.label,
+				tag = "auto-xy text-body-medium text-align-x-center content-default",
+				LayoutOrder = 2
+			})
+		})
+	end
+
+	return React.createElement(
+		View,
+		{ tag = "row flex-around align-y-top size-full-0 auto-y", LayoutOrder = props.layoutOrder },
+		children
+	)
 end
 
 return React.memo(ThumbsQuestion)

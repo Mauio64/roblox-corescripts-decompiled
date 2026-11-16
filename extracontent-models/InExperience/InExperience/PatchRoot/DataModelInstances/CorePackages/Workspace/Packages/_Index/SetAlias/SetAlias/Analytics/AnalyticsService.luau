@@ -1,19 +1,18 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+
 local EventIngestService = game:GetService("EventIngestService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local Analytics = dependencies.Analytics
-local v6 = Analytics.Analytics.new(RbxAnalyticsService)
-local getPlatformTarget = Analytics.getPlatformTarget
+
+local analytics = dependencies.Analytics
+local analytics2 = analytics.Analytics.new(RbxAnalyticsService)
+local getPlatformTarget = analytics.getPlatformTarget
 
 return {
-	Diag = v6.Diag,
+	Diag = analytics2.Diag,
 	EventStream = {
-		setRBXEventStream = function(_, s1: string, s2: string, t1: {[any]: any}?) -- line: 13
-			-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
-			local v12 = t1 or {}
-
-			EventIngestService:SetRBXEventStream(getPlatformTarget(), s1, s2, v12)
+		setRBXEventStream = function(_, p: string, p2: string, options)
+			EventIngestService:SetRBXEventStream(getPlatformTarget(), p, p2, options or {})
 		end
 	}
 }

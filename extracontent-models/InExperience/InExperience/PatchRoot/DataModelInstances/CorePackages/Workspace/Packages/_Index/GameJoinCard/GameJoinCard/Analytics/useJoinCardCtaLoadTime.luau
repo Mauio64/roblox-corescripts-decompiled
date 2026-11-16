@@ -1,49 +1,60 @@
 local GameJoinCard = script:FindFirstAncestor("GameJoinCard")
-local GameJoinCardParent = GameJoinCard.Parent
-local React = require(GameJoinCardParent.React)
+local parent = GameJoinCard.Parent
+
+local React = require(parent.React)
+
 local GameJoinCardTTI = require(GameJoinCard.Telemetry.GameJoinCardTTI)
 local useGameJoinCardAnalytics = require(script.Parent.useGameJoinCardAnalytics)
-local FFlagJoinCardAgeCheckUpsell = require(GameJoinCardParent.SharedFlags).FFlagJoinCardAgeCheckUpsell
+local SharedFlags = require(parent.SharedFlags)
+local FFlagGameJoinCardOptionalActions = SharedFlags.FFlagGameJoinCardOptionalActions
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagGameJoinCardContent = SharedFlags2.FFlagGameJoinCardContent
 
-local function useJoinCardCtaLoadTime(t1: {[any]: any}) -- line: 46
-	-- upvalues: React (copy), FFlagJoinCardAgeCheckUpsell (copy), GameJoinCardTTI (copy), useGameJoinCardAnalytics (copy)
-	local v9 = React.useRef(tick())
-	local v10 = React.useRef(nil)
-	local v11 = React.useRef(false)
-	local v12 = React.useRef(false)
-	local v13 = React.useRef(t1.ctaType)
+local function useJoinCardCtaLoadTime(data)
+	local ref = React.useRef(tick())
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(false)
+	local ref4 = React.useRef(false)
 
-	v13.current = t1.ctaType
+	local ref5 = React.useRef(data.ctaType)
+	ref5.current = data.ctaType
+	local ref6 = React.useRef(data.wasCached)
+	ref6.current = data.wasCached
 
-	local v14 = React.useRef(t1.wasCached)
-
-	v14.current = t1.wasCached
-	React.useEffect(function() -- line: 57
-		-- upvalues: FFlagJoinCardAgeCheckUpsell (copy), v11 (copy), v10 (copy), GameJoinCardTTI (copy), v12 (copy), t1 (copy), v9 (copy), useGameJoinCardAnalytics (copy), v13 (copy), v14 (copy)
-		if not FFlagJoinCardAgeCheckUpsell then
+	local useEffect = React.useEffect
+	local function fn()
+		if (FFlagGameJoinCardOptionalActions or FFlagGameJoinCardContent) and data.isDisabled then
 			return
 		end
 
-		if not v11.current then
-			v11.current = true
-			v10.current = GameJoinCardTTI.consumeMobileCardClickStartMs()
+		if not ref3.current then
+			ref3.current = true
+			ref2.current = GameJoinCardTTI.consumeMobileCardClickStartMs()
 		end
 
-		if v12.current or t1.isLoading then
+		if ref4.current or data.isLoading then
 			return
 		end
 
-		v12.current = true
+		ref4.current = true
 
-		local v15 = tick() * 1000
-		local v16 = v10.current or v9.current * 1000
-
+		local v = tick() * 1000
+		local current = ref2.current or ref.current * 1000
 		useGameJoinCardAnalytics.logJoinCardCtaLoadTime({
-			durationMs = v15 - v16,
-			ctaType = v13.current,
-			wasCached = v14.current == true
+			durationMs = v - current,
+			ctaType = ref5.current,
+			wasCached = ref6.current == true
 		})
-	end, { t1.isLoading })
+	end
+
+	local isLoading = data.isLoading
+	local v
+
+	if FFlagGameJoinCardOptionalActions or FFlagGameJoinCardContent then
+		v = data.isDisabled
+	end
+
+	useEffect(fn, { isLoading, v })
 end
 
 return useJoinCardCtaLoadTime

@@ -1,4 +1,1 @@
-return {
-	Reply = "Reply",
-	MessageContextMenu = "MessageContextMenu"
-}
+return { Reply = "Reply", MessageContextMenu = "MessageContextMenu" }

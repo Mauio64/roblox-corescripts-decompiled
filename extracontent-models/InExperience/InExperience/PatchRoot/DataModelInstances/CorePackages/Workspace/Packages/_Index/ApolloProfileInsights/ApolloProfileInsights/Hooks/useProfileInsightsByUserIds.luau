@@ -1,19 +1,17 @@
-local Parent = script:FindFirstAncestor("ApolloProfileInsights").Parent
-local ApolloClient = require(Parent.ApolloClient)
-local ApolloLocalState = require(Parent.ApolloLocalState)
+local parent = script:FindFirstAncestor("ApolloProfileInsights").Parent
+
+local ApolloClient = require(parent.ApolloClient)
+local ApolloLocalState = require(parent.ApolloLocalState)
+
 local useQuery = ApolloClient.useQuery
 local queries = ApolloLocalState.queries
 
-local function useProfileInsightsByUserIds(t1: {[any]: any}) -- line: 17
-	-- upvalues: useQuery (copy), queries (copy)
+local function useProfileInsightsByUserIds(data)
 	return (useQuery(queries.profilesInsightsByUserIds, {
 		errorPolicy = "all",
-		skip = not t1.userIds or t1.skip,
-		variables = {
-			userIds = t1.userIds,
-			rankingStrategy = t1.rankingStrategy
-		},
-		fetchPolicy = t1.fetchPolicy
+		skip = not data.userIds or data.skip,
+		variables = { userIds = data.userIds, rankingStrategy = data.rankingStrategy },
+		fetchPolicy = data.fetchPolicy
 	}))
 end
 

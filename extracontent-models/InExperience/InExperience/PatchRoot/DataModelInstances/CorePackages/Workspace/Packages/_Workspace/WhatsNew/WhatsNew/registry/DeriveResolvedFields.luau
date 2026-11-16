@@ -1,132 +1,131 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
 local Enums = require(WhatsNew.Enums)
-
 require(WhatsNew.Types)
 
-local t1 = {}
+local DeriveResolvedFields = {}
 
-local function clientGatesPass(p1, p2) -- line: 13
-	-- upvalues: Enums (copy)
-	if p1 == Enums.TourType.Onboarding then
-		return p2.grandfathered ~= true
-	end
-
-	return true
+local function clientGatesPass(p, p2) -- 1 equivalent call inferred from this helper
+	return p ~= Enums.TourType.Onboarding or p2.onboardingEligible
 end
-local function isNonEmptyString(s1: string?) -- line: 20
-	return s1 ~= nil and s1 ~= ""
-end
-local function isoDateToUnix(s2: string) -- line: 24
-	local dateTime = DateTime.fromIsoDate(s2)
 
+local function isNonEmptyString(p: string?): boolean -- 2 equivalent calls inferred from this helper
+	return p ~= nil and p ~= ""
+end
+
+local function isoDateToUnix(p: string) -- 2 equivalent calls inferred from this helper
+	local dateTime = DateTime.fromIsoDate(p)
 	return dateTime and dateTime.UnixTimestamp or nil
 end
 
-function t1.isEntryInScopeSubtree(p3, s3: string, t2: {[any]: any}) -- line: 29
-	local scopeId = p3.scopeId
+function DeriveResolvedFields.isEntryInScopeSubtree(p, p2: string, p3): boolean
+	local v = p.scopeId
 
-	while scopeId ~= nil do
-		if scopeId == s3 then
+	while v ~= nil do
+		if v == p2 then
 			return true
 		end
 
-		local v16 = t2[scopeId]
+		local v2 = p3[v]
 
-		if v16 == nil then
+		if v2 == nil then
 			return false
 		end
 
-		scopeId = v16.parentScopeId
+		v = v2.parentScopeId
 	end
 
 	return false
 end
-function t1.isEntryExpired(p4, p5, p6, p7) -- line: 48
-	-- upvalues: Enums (copy)
-	if p5 == Enums.TourType.Onboarding then
+
+function DeriveResolvedFields.isEntryExpired(p, p2, p3): boolean
+	local v
+
+	if p.publishedTime ~= nil then
+		v = isoDateToUnix(p.publishedTime) -- inferred equivalent call
+	end
+
+	if v ~= nil and p3.currentTime < v then
+		return true
+	end
+
+	if p2 == Enums.TourType.Onboarding then
 		return false
 	end
 
-	if p4.disableTime ~= nil then
-		local disableTime = p4.disableTime
-		local dateTime = DateTime.fromIsoDate(disableTime)
-		local v23 = dateTime and dateTime.UnixTimestamp or nil
+	if p.disabledTime ~= nil then
+		local v2 = isoDateToUnix(p.disabledTime) -- inferred equivalent call
 
-		if v23 ~= nil and v23 <= p6.currentTime then
-			return true
-		end
-	end
-
-	if p4.publishedTime ~= nil then
-		local publishedTime = p4.publishedTime
-		local dateTime = DateTime.fromIsoDate(publishedTime)
-		local v26 = dateTime and dateTime.UnixTimestamp or nil
-
-		if v26 ~= nil and v26 + p7.updateEntryDuration * 86400 <= p6.currentTime then
+		if v2 ~= nil and v2 <= p3.currentTime then
 			return true
 		end
 	end
 
 	return false
 end
-function t1.deriveEntryDisplay(p8, p9, p10, p11) -- line: 81
-	-- upvalues: t1 (copy), Enums (copy)
-	local v31 = t1.isEntryExpired(p8, p9, p10, p11)
-	local v32 = p10.storage[p8.id]
-	local v33 = if not v32 then nil else v32.seen
-	local meta = p10.meta
-	local v35 = p9 ~= Enums.TourType.Onboarding or meta.grandfathered ~= true
 
-	return {
-		id = p8.id,
-		scopeId = p8.scopeId,
-		title = p8.title,
-		text = p8.text,
-		icon = p8.icon,
-		enabled = p8.enabled,
-		publishedTime = p8.publishedTime,
-		disableTime = p8.disableTime,
-		expired = v31,
-		seen = v33,
-		optOutCount = not v32 and 0 or v32.optOutCount,
-		adopted = not not v32 and v32.adopted,
-		toShow = p8.enabled and (not v31 and (v33 == nil and v35))
+function DeriveResolvedFields.deriveEntryDisplay(data, p, p2)
+	local entryExpired = DeriveResolvedFields.isEntryExpired(data, p, p2)
+	local v = p2.storage[data.id]
+	local seen
+
+	if v then
+		seen = v.seen
+	end
+
+	local v2 = clientGatesPass(p, p2) -- inferred equivalent call
+	local v3 = {
+		id = data.id,
+		scopeId = data.scopeId,
+		title = data.title,
+		text = data.text,
+		icon = data.icon,
+		enabled = data.enabled,
+		publishedTime = data.publishedTime,
+		disabledTime = data.disabledTime,
+		expired = entryExpired,
+		seen = seen,
+		optOutCount = not v and 0 or v.optOutCount,
+		adopted = 0,
+		toShow = 0
 	}
+	local adopted = if v then v.adopted else false
+	v3.adopted = adopted
+	local toShow = data.enabled and not entryExpired
+
+	if toShow then
+		toShow = seen == nil and v2
+	end
+
+	v3.toShow = toShow
+	return v3
 end
-function t1.getLabels(p12, p13) -- line: 110
-	-- upvalues: Enums (copy)
-	if p13 == Enums.TourType.Onboarding then
+
+function DeriveResolvedFields.getLabels(data, p)
+	if p == Enums.TourType.Onboarding then
 		return {
-			title = p12.onboardingTitle or "",
-			text = p12.onboardingText or ""
+			title = data.onboardingTitle or "",
+			text = data.onboardingText or ""
 		}
 	end
 
 	return {
-		title = p12.updatesTitle or "",
-		text = p12.updatesText or ""
+		title = data.updatesTitle or "",
+		text = data.updatesText or ""
 	}
 end
-function t1.hasLabels(p14) -- line: 124
-	local title = p14.title
-	local v40 = title ~= nil and title ~= ""
 
-	if not v40 then
-		local text = p14.text
-
-		v40 = text ~= nil and text ~= ""
-	end
-
-	return v40
-end
-function t1.countScopeSteps(p15) -- line: 128
-	local n1 = 0
-
-	for _, v45 in p15.tourTips do
-		n1 += v45.stepCount
-	end
-
-	return n1
+function DeriveResolvedFields.hasLabels(p)
+	return isNonEmptyString(p.title) or isNonEmptyString(p.text) -- inferred equivalent call
 end
 
-return t1
+function DeriveResolvedFields.countScopeSteps(p)
+	local total = 0
+
+	for _, tourTip in p.tourTips do
+		total += tourTip.stepCount
+	end
+
+	return total
+end
+
+return DeriveResolvedFields

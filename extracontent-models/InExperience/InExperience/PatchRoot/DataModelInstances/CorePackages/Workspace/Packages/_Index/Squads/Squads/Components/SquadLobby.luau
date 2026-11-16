@@ -1,1 +1,3 @@
-return (require(script.SquadLobby))
+local SquadLobby = require(script.SquadLobby)
+
+return SquadLobby

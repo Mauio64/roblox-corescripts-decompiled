@@ -1,21 +1,36 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 
-local function ComponentSubtext(t1: {[any]: any}) -- line: 16
-	-- upvalues: useTokens (copy), React (copy), FoundationText (copy)
-	local v8 = useTokens()
+local function ComponentSubtext(props)
+	local v = useTokens()
 
-	return React.createElement(FoundationText, {
+	local createElement = React.createElement
+	local v2 = {
+		Text = props.requirementMessage,
+		textStyle = 0,
+		fontStyle = 0,
 		tag = "auto-xy",
-		Text = t1.requirementMessage,
-		textStyle = if not t1.isOptional then v8.Color.System.Alert else v8.Color.Content.Muted,
-		fontStyle = v8.Typography.CaptionMedium,
-		Visible = (t1.isOptional or t1.isErrorState) and true or false,
-		LayoutOrder = t1.layoutOrder
-	})
+		Visible = 0,
+		LayoutOrder = 0
+	}
+	local textStyle
+
+	if props.isOptional then
+		textStyle = v.Color.Content.Muted
+	else
+		textStyle = v.Color.System.Alert
+	end
+
+	v2.textStyle = textStyle
+	v2.fontStyle = v.Typography.CaptionMedium
+
+	v2.Visible = (props.isOptional or props.isErrorState) and true or false
+	v2.LayoutOrder = props.layoutOrder
+	return createElement(Text, v2)
 end
 
 return React.memo(ComponentSubtext)

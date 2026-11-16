@@ -1,34 +1,36 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
+local parent = CurrencyTransfers.Parent
+
+local React = require(parent.React)
 local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
-local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local AmpWizardTransferConstants = require(CurrencyTransfers.Constants.AmpWizardTransferConstants)
-local InExpAmpWizardController = require(CurrencyTransfersParent.AmpUpsell).InExpAmpWizardController
-local RobloxSubscriptionPurchaseApp = require(CurrencyTransfersParent.RobloxSubscriptionPurchaseApp)
+
+local AmpUpsell = require(parent.AmpUpsell)
+local InExpAmpWizardController = AmpUpsell.InExpAmpWizardController
+
+local RobloxSubscriptionPurchaseApp = require(parent.RobloxSubscriptionPurchaseApp)
 local SurfaceName = RobloxSubscriptionPurchaseApp.SurfaceName
 local SurfaceContext = RobloxSubscriptionPurchaseApp.SurfaceContext
 
-local function InExperienceRobuxTransferSubscriptionUpsell(t1: {[any]: any}) -- line: 32
-	-- upvalues: useLocalization (copy), TransferLocalizationKeys (copy), React (copy), SurfaceName (copy), SurfaceContext (copy), InExpAmpWizardController (copy), AmpWizardTransferConstants (copy)
-	local v13 = useLocalization(TransferLocalizationKeys.Presets.SubscriptionUpsellContainer)
-	local onClose = t1.onClose
-	local v15 = v13.UpsellSubscriptionTitle or ""
+local function InExperienceRobuxTransferSubscriptionUpsell(p)
+	local v = useLocalization(TransferLocalizationKeys.Presets.SubscriptionUpsellContainer)
+	local onClose = p.onClose
+	local upsellSubscriptionTitle = v.UpsellSubscriptionTitle or ""
 
-	React.useEffect(function() -- line: 43
-		-- upvalues: v15 (copy), SurfaceName (copy), SurfaceContext (copy), InExpAmpWizardController (copy), onClose (copy), AmpWizardTransferConstants (copy)
-		local t2 = {
-			purchaseUIOptions = {
-				title = v15
-			},
+	React.useEffect(function()
+		local v2 = {
+			purchaseUIOptions = { title = upsellSubscriptionTitle },
 			surfaceName = SurfaceName.RobuxTransferUpsell,
 			surfaceContext = SurfaceContext.InGame
 		}
 
-		InExpAmpWizardController.OpenAmpWizardContainerInExp("CanInitiateRobuxTransfer", function() -- line: 57
-			-- upvalues: onClose (copy)
+		InExpAmpWizardController.OpenAmpWizardContainerInExp("CanInitiateRobuxTransfer", function()
 			onClose()
-		end, t2, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, nil, AmpWizardTransferConstants.NAMESPACE_NAME)
+		end, v2, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, nil, AmpWizardTransferConstants.NAMESPACE_NAME)
 	end, {})
 
 	return React.createElement(React.Fragment, {})

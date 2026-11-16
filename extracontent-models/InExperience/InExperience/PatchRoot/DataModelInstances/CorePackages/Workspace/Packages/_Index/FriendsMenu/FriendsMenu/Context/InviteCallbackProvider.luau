@@ -1,14 +1,14 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local React = require(ParentParent.React)
-local InviteCallbackContext = require(scriptParent.InviteCallbackContext)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
 
-return function(t1: {[any]: any}) -- line: 14
-	-- upvalues: React (copy), InviteCallbackContext (copy)
+local React = require(parent2.React)
+local InviteCallbackContext = require(parent.InviteCallbackContext)
+
+return function(props)
 	return React.createElement(InviteCallbackContext.Provider, {
 		value = {
-			inviteSingleFriend = t1.inviteSingleFriend,
-			inviteMultiFriends = t1.inviteMultiFriends
+			inviteSingleFriend = props.inviteSingleFriend,
+			inviteMultiFriends = props.inviteMultiFriends
 		}
-	}, t1.children)
+	}, props.children)
 end

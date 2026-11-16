@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("Http").Parent
+local parent = script:FindFirstAncestor("Http").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 6
-	return {
-		key = p1,
-		status = p2
-	}
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(p, status)
+	return { key = p, status = status }
 end)

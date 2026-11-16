@@ -1,23 +1,51 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Display = require(Parent.Display)
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function createAssistantBuildStore() -- line: 13
-	-- upvalues: Signals (copy), Display (copy)
-	local v5 = Signals.createComputed(function(p1) -- line: 14
-		-- upvalues: Display (copy)
-		local v9 = Display.GetDisplayStore(p1)
-		local v10 = v9.getDisplaySize(p1)
-		local v11 = v9.getViewportSize(p1)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceInGameShell = SharedFlags.FFlagBuildExperienceInGameShell
+local Display
 
-		return v10 == Enum.DisplaySize.Small and v11.X > v11.Y
-	end)
-	local v6, v7 = Signals.createSignal(false)
+if FFlagBuildExperienceInGameShell then
+	Display = nil
+else
+	Display = require(parent.Display)
+end
+
+local Signals = require(parent.Signals)
+
+local function createAssistantBuildStore()
+	local getIsDisabled
+
+	if FFlagBuildExperienceInGameShell then
+		getIsDisabled = Signals.createSignal(false)
+	else
+		getIsDisabled = Signals.createComputed(function(p): boolean
+			local displayStore = Display.GetDisplayStore(p)
+			local displaySize = displayStore.getDisplaySize(p)
+			local viewportSize = displayStore.getViewportSize(p)
+
+			return displaySize == Enum.DisplaySize.Small and viewportSize.X > viewportSize.Y
+		end)
+	end
+
+	local signal, setIsDisabledTooltipOpen = Signals.createSignal(false)
+	local signal2, setIsOverlayVisible = Signals.createSignal(true)
+	local function activate()
+		if getIsDisabled(false) then
+			setIsDisabledTooltipOpen(not signal(false))
+			return
+		end
+
+		setIsDisabledTooltipOpen(false)
+		setIsOverlayVisible(not signal2(false))
+	end
 
 	return {
-		getIsDisabled = v5,
-		getIsDisabledTooltipOpen = v6,
-		setIsDisabledTooltipOpen = v7
+		getIsDisabled = getIsDisabled,
+		getIsDisabledTooltipOpen = signal,
+		getIsOverlayVisible = signal2,
+		activate = activate,
+		setIsDisabledTooltipOpen = setIsDisabledTooltipOpen,
+		setIsOverlayVisible = setIsOverlayVisible
 	}
 end
 

@@ -1,138 +1,165 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Signals = require(BuildExperienceParent.Signals)
-local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
-local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
-local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+local parent = BuildExperience.Parent
+
+local Signals = require(parent.Signals)
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration)
 
 require(BuildExperience.Chat.chatTypes)
 
-local BUILD_ASSISTANT_FALLBACK_NAME = LocalizationStrings.BUILD_ASSISTANT_FALLBACK_NAME
-
-local function resolveUniverseIdFromSessionLoad(p1) -- line: 37
-	if p1 == nil then
+local function resolveUniverseIdFromSessionLoad(p)
+	if p == nil then
 		return nil
 	end
 
-	local _meta = p1._meta
-	local v14 = if _meta == nil then nil else _meta._roblox
-	local v15 = if v14 == nil then nil else v14.universeId
+	local meta = p._meta
+	local roblox
 
-	if typeof(v15) == "number" and v15 ~= 0 then
-		return v15
+	if meta ~= nil then
+		roblox = meta._roblox
+	end
+
+	local universeId
+
+	if roblox ~= nil then
+		universeId = roblox.universeId
+	end
+
+	if typeof(universeId) == "number" and universeId ~= 0 then
+		return universeId
 	end
 
 	return nil
 end
-local function gameIconForUniverseId(n1: number) -- line: 50
-	return string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", n1)
+
+local function gameIconForUniverseId(p: number) -- 1 equivalent call inferred from this helper
+	return string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", p)
 end
-local function makeTarget(n2: number?, s1: string?, p2) -- line: 54
-	-- upvalues: BUILD_ASSISTANT_FALLBACK_NAME (copy)
-	local v20 = n2 or 0
+
+local function makeTarget(universeId: number?, sessionId: string?, p, fallbackExperienceName: string)
+	local universeId2 = universeId or 0
+	local placeId
+
+	if p ~= nil then
+		placeId = p.rootPlaceId
+	end
+
+	if p ~= nil and p.name ~= "" then
+		fallbackExperienceName = p.name
+	end
+
+	local gameIcon
+
+	if universeId2 ~= 0 then
+		gameIcon = gameIconForUniverseId(universeId2) -- inferred equivalent call
+	end
 
 	return {
-		universeId = v20,
-		placeId = if p2 == nil then nil else p2.rootPlaceId,
-		sessionId = s1,
-		experienceName = if p2 == nil or p2.name == "" then BUILD_ASSISTANT_FALLBACK_NAME else p2.name,
-		gameIcon = if v20 == 0 then nil else string.format("rbxthumb://type=GameIcon&id=%d&w=150&h=150", v20)
+		universeId = universeId2,
+		placeId = placeId,
+		sessionId = sessionId,
+		experienceName = fallbackExperienceName,
+		gameIcon = gameIcon
 	}
 end
-local function resumeBuildChat(t1: {[any]: any}) -- line: 65
-	-- upvalues: CreatorAgentChat (copy), UniverseConfiguration (copy), Signals (copy), BUILD_ASSISTANT_FALLBACK_NAME (copy), makeTarget (copy)
-	local sessionId = t1.sessionId
-	local v23 = typeof(sessionId) == "string" and sessionId ~= ""
-	local v24 = t1.universeId ~= nil and t1.universeId ~= 0
 
-	if not v24 and not v23 then
+local function resumeBuildChat(data)
+	local sessionId = data.sessionId
+	local v
+
+	if typeof(sessionId) == "string" then
+		v = sessionId ~= ""
+	else
+		v = false
+	end
+
+	local v2
+
+	if data.universeId == nil then
+		v2 = false
+	else
+		v2 = data.universeId ~= 0
+	end
+
+	if not (v2 or v) then
 		return nil
 	end
 
-	local u25 = nil
+	local fallbackExperienceName = data.fallbackExperienceName
+	local v3
 
-	if not v24 and v23 then
-		u25 = (t1.creatorAgentChatStore or CreatorAgentChat.getCreatorAgentChatStore()).sessionLoad(sessionId)
+	if v2 or not v then
+		v3 = nil
+	else
+		v3 = (data.creatorAgentChatStore or CreatorAgentChat.getCreatorAgentChatStore()).sessionLoad(sessionId)
 	end
 
-	local configurationStore = t1.configurationStore
-
-	local function getConfigurationStore() -- line: 81
-		-- upvalues: configurationStore (ref), UniverseConfiguration (copy)
-		local v29 = configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
-
-		configurationStore = v29
-
-		return v29
+	local v4 = data.configurationStore
+	local function getConfigurationStore() -- 1 equivalent call inferred from this helper
+		local configurationStore = v4 or UniverseConfiguration.getUniverseConfigurationStore()
+		v4 = configurationStore
+		return configurationStore
 	end
 
-	local u28 = false
+	local flag = false
 
-	return Signals.createEffect(function(p3) -- line: 89
-		-- upvalues: u28 (ref), v24 (copy), t1 (copy), u25 (ref), sessionId (copy), BUILD_ASSISTANT_FALLBACK_NAME (copy), configurationStore (ref), UniverseConfiguration (copy), makeTarget (copy)
-		if u28 then
+	return Signals.createEffect(function(p)
+		if flag then
 			return
 		end
 
 		local universeId
 
-		if v24 then
-			universeId = t1.universeId
-		elseif u25 ~= nil then
-			local v32 = u25.state(p3)
+		if v2 then
+			universeId = data.universeId
+		elseif v3 ~= nil then
+			local state = v3.state(p)
 
-			if v32.status == "pending" then
+			if state.status == "pending" then
 				return
 			end
 
-			if v32.status == "succeeded" then
-				local result = v32.result
+			if state.status == "succeeded" then
+				local result = state.result
 
-				if result == nil then
-					universeId = nil
-				else
-					local _meta = result._meta
-					local v35 = if _meta == nil then nil else _meta._roblox
-					local v36 = if v35 == nil then nil else v35.universeId
+				if result ~= nil then
+					local meta = result._meta
+					local roblox
 
-					universeId = if typeof(v36) ~= "number" or v36 == 0 then nil else v36
+					if meta ~= nil then
+						roblox = meta._roblox
+					end
+
+					if roblox ~= nil then
+						universeId = roblox.universeId
+					end
+
+					if typeof(universeId) ~= "number" or universeId == 0 then
+						universeId = nil
+					end
 				end
-			else
-				universeId = nil
 			end
-		else
-			universeId = nil
 		end
 
 		if universeId == nil then
-			u28 = true
-
-			local onOpenChat = t1.onOpenChat
-			local v38 = sessionId
-
-			onOpenChat({
+			flag = true
+			data.onOpenChat({
 				universeId = 0,
 				placeId = nil,
-				gameIcon = nil,
-				sessionId = v38,
-				experienceName = BUILD_ASSISTANT_FALLBACK_NAME
+				sessionId = sessionId,
+				experienceName = fallbackExperienceName,
+				gameIcon = nil
 			})
+		else
+			local fetchSummary = getConfigurationStore().getAndFetchSummary(universeId) -- inferred equivalent call
 
-			return
+			if fetchSummary.status(p) == "NotReady" then
+				return
+			end
+
+			flag = true
+			data.onOpenChat(makeTarget(universeId, sessionId, fetchSummary.data(p), fallbackExperienceName))
 		end
-
-		local v39 = configurationStore or UniverseConfiguration.getUniverseConfigurationStore()
-
-		configurationStore = v39
-
-		local v40 = v39.getAndFetchSummary(universeId)
-
-		if v40.status(p3) == "NotReady" then
-			return
-		end
-
-		u28 = true
-		t1.onOpenChat((makeTarget(universeId, sessionId, v40.data(p3))))
 	end)
 end
 

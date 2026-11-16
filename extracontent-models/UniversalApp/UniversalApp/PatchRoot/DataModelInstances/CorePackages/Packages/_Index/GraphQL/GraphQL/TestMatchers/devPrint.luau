@@ -1,17 +1,15 @@
-local ParentParent = script.Parent.Parent.Parent
-local inspect = require(ParentParent.LuauPolyfill).util.inspect
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local inspect = LuauPolyfill.util.inspect
 
-local function devPrint(...) -- line: 19
-	-- upvalues: inspect (copy)
-	local t1 = {}
+local function devPrint(...)
+	local v = {}
 
 	for i = 1, select("#", ...) do
-		local v6 = select(i, ...)
-
-		t1[i] = inspect(v6)
+		v[i] = inspect((select(i, ...)))
 	end
 
-	print(table.unpack(t1))
+	print(table.unpack(v))
 end
 
 return devPrint

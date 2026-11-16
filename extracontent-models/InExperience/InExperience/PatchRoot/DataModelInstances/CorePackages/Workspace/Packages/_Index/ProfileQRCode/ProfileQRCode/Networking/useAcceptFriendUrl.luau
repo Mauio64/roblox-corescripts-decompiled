@@ -1,18 +1,29 @@
 local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
-local ProfileQRCodeParent = ProfileQRCode.Parent
-local RoactUtils = require(ProfileQRCodeParent.RoactUtils)
+local parent = ProfileQRCode.Parent
+
+local RoactUtils = require(parent.RoactUtils)
+
 local configureRoduxFriends = require(ProfileQRCode.Networking.configureRoduxFriends)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMigrateFriendshipStatusesRemainingActions = SharedFlags.FFlagMigrateFriendshipStatusesRemainingActions
+
+local DataHydration = require(parent.DataHydration)
+local v = DataHydration.Friends.FriendsStore.get()
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 
-return function() -- line: 10
-	-- upvalues: useDispatch (copy), configureRoduxFriends (copy)
-	local v6 = useDispatch()
+return function()
+	local v2 = useDispatch()
 
-	return function(s1: string, s2: string) -- line: 13
-		-- upvalues: v6 (copy), configureRoduxFriends (copy)
-		return v6(configureRoduxFriends.AcceptFriendRequestFromUserId.API({
-			currentUserId = s1,
-			targetUserId = s2
+	return function(currentUserId: string, targetUserId: string)
+		if FFlagMigrateFriendshipStatusesRemainingActions then
+			return v.AcceptFriendRequest(targetUserId)
+		end
+
+		return v2(configureRoduxFriends.AcceptFriendRequestFromUserId.API({
+			currentUserId = currentUserId,
+			targetUserId = targetUserId
 		}))
 	end
 end

@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.UiShellEvents.UiShellEvents))
+local UiShellEvents = require(Workspace.UiShellEvents.UiShellEvents)
+
+return UiShellEvents

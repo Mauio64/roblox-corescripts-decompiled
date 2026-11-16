@@ -1,5 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
+
 local Immutable = require(script.Parent.Parent.Immutable)
 local Constants = require(script.Parent.Parent.Constants)
 local LineWidth = Constants.GeneralFormatting.LineWidth
@@ -7,44 +8,48 @@ local LineColor = Constants.GeneralFormatting.LineColor
 local ArrowWidth = Constants.GeneralFormatting.ArrowWidth
 local RightArrow = Constants.Image.RightArrow
 local DownArrow = Constants.Image.DownArrow
-local v10 = Roact.Component:extend("BannerButton")
 
-function v10.render(p1) -- line: 14
-	-- upvalues: Roact (copy), DownArrow (copy), RightArrow (copy), ArrowWidth (copy), LineWidth (copy), LineColor (copy), Immutable (copy)
-	local v12 = p1.props[Roact.Children] or {}
-	local size = p1.props.size
-	local pos = p1.props.pos
-	local isExpandable = p1.props.isExpandable
-	local isExpanded = p1.props.isExpanded
-	local layoutOrder = p1.props.layoutOrder
-	local v18 = p1.props.inset or 0
-	local hideLines = p1.props.hideLines
-	local onButtonPress = p1.props.onButtonPress
-	local onMouseEnter = p1.props.onMouseEnter
-	local onMouseLeave = p1.props.onMouseLeave
-	local onMouseMove = p1.props.onMouseMove
-	local onMouse2Click = p1.props.onMouse2Click
-	local t1 = {
+local extended = Roact.Component:extend("BannerButton")
+
+function extended.render(p)
+	local v = p.props[Roact.Children] or {}
+
+	local size = p.props.size
+	local pos = p.props.pos
+	local isExpandable = p.props.isExpandable
+	local isExpanded = p.props.isExpanded
+	local layoutOrder = p.props.layoutOrder
+	local inset = p.props.inset or 0
+	local hideLines = p.props.hideLines
+
+	local onButtonPress = p.props.onButtonPress
+	local onMouseEnter = p.props.onMouseEnter
+	local onMouseLeave = p.props.onMouseLeave
+	local onMouseMove = p.props.onMouseMove
+	local onMouse2Click = p.props.onMouse2Click
+
+	local children = {
 		BannerButtonArrow = onButtonPress and Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
 			Visible = isExpandable,
 			Image = isExpanded and DownArrow or RightArrow,
+			BackgroundTransparency = 1,
 			Size = UDim2.new(0, ArrowWidth, 0, ArrowWidth),
-			Position = UDim2.new(0, v18, 0.5, -ArrowWidth / 2)
+			Position = UDim2.new(0, inset, 0.5, -ArrowWidth / 2)
 		})
 	}
 
 	if not hideLines then
-		t1.HorizontalLineTop = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
+		children.HorizontalLineTop = Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, LineWidth),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		})
-		t1.HorizontalLineBottom = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
+
+		children.HorizontalLineBottom = Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, LineWidth),
 			Position = UDim2.new(0, 0, 1, -LineWidth),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		})
 	end
 
@@ -58,7 +63,7 @@ function v10.render(p1) -- line: 14
 		[Roact.Event.MouseLeave] = onMouseLeave,
 		[Roact.Event.MouseMoved] = onMouseMove,
 		[Roact.Event.MouseButton2Click] = onMouse2Click
-	}, Immutable.JoinDictionaries(t1, v12))
+	}, Immutable.JoinDictionaries(children, v))
 end
 
-return v10
+return extended

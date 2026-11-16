@@ -1,37 +1,32 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
-local React = require(InExperienceInterventionParent.React)
-local Cryo = require(InExperienceInterventionParent.Cryo)
+local parent = InExperienceIntervention.Parent
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+
 local InExperienceInterventionEventReceiver = require(InExperienceIntervention.InExperienceInterventionEventReceiver)
 local InExperienceInterventionUIStateReducer = require(InExperienceIntervention.Reducers.InExperienceInterventionUIStateReducer)
 local InExperienceInterventionDialogManager = require(InExperienceIntervention.InExperienceInterventionDialogManager)
-local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
-local useLocalization = require(InExperienceInterventionParent.Localization).Hooks.useLocalization
+local InterventionShared = require(parent.InterventionShared)
+local Constants = InterventionShared.Utils.Constants
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-function InExperienceInterventionContainer() -- line: 12
-	-- upvalues: React (copy), InExperienceInterventionUIStateReducer (copy), Constants (copy), useLocalization (copy), Cryo (copy), InExperienceInterventionEventReceiver (copy), InExperienceInterventionDialogManager (copy)
-	local v10, v11 = React.useReducer(InExperienceInterventionUIStateReducer, Constants.InitialUIState)
-	local v12 = useLocalization(Constants.localizationKeys)
-	local v13 = React.useCallback(function(p1) -- line: 18
-		-- upvalues: Cryo (copy), v11 (copy)
-		local v15 = Cryo.Dictionary.join(p1, {
-			dispatchTimestamp = DateTime.now().UnixTimestamp
-		})
+function InExperienceInterventionContainer()
+	local uiState, v = React.useReducer(InExperienceInterventionUIStateReducer, Constants.InitialUIState)
+	local localizedText = useLocalization(Constants.localizationKeys)
 
-		v11(v15)
-	end, { v11 })
+	local uiStateDispatch = React.useCallback(function(p)
+		v((Cryo.Dictionary.join(p, { dispatchTimestamp = DateTime.now().UnixTimestamp })))
+	end, { v })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
+	return React.createElement("Frame", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }, {
 		EventReceiver = React.createElement(InExperienceInterventionEventReceiver, {
-			uiStateDispatch = v13,
-			localizedText = v12
+			uiStateDispatch = uiStateDispatch,
+			localizedText = localizedText
 		}),
 		DialogManager = React.createElement(InExperienceInterventionDialogManager, {
-			uiState = v10,
-			uiStateDispatch = v13
+			uiState = uiState,
+			uiStateDispatch = uiStateDispatch
 		})
 	})
 end

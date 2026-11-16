@@ -1,13 +1,13 @@
-function FindFirstAncestorWithTag(p1, s1: string) -- line: 1
-	if p1 == nil then
+function FindFirstAncestorWithTag(instance, tag: string)
+	if instance == nil then
 		return nil
 	end
 
-	if p1:HasTag(s1) then
-		return p1
+	if instance:HasTag(tag) then
+		return instance
 	end
 
-	return FindFirstAncestorWithTag(p1.Parent, s1)
+	return FindFirstAncestorWithTag(instance.Parent, tag)
 end
 
 return FindFirstAncestorWithTag

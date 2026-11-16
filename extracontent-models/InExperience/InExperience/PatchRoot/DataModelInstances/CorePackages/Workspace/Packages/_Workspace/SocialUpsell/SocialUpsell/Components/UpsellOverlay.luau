@@ -1,277 +1,275 @@
 local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
-local SocialUpsellParent = SocialUpsell.Parent
-local Foundation = require(SocialUpsellParent.Foundation)
-local React = require(SocialUpsellParent.React)
-local Responsive = require(SocialUpsellParent.Responsive)
-local AppBlox = require(SocialUpsellParent.AppBlox)
-local Display = require(SocialUpsellParent.Display)
-local SignalsReact = require(SocialUpsellParent.SignalsReact)
-local ReactFocusNavigation = require(SocialUpsellParent.ReactFocusNavigation)
-local ReactUtils = require(SocialUpsellParent.ReactUtils)
-local useLocalization = require(SocialUpsellParent.Localization).Hooks.useLocalization
-local useSelector = require(SocialUpsellParent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = SocialUpsell.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
+local AppBlox = require(parent.AppBlox)
+local Display = require(parent.Display)
+local SignalsReact = require(parent.SignalsReact)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local ReactUtils = require(parent.ReactUtils)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local HttpService = game:GetService("HttpService")
-local FFlagEnableAEGIS2CommsFAEUpsell = require(SocialUpsellParent.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableAEGIS2CommsFAEUpsell = SharedFlags.FFlagEnableAEGIS2CommsFAEUpsell
+
 local SocialUpsellAnalytics = require(SocialUpsell.Analytics.SocialUpsellAnalytics)
-
 require(SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType)
-
 local UpsellComponent = require(SocialUpsell.Analytics.Enum.UpsellComponent)
-
 require(SocialUpsell.Enum.SocialUpsellType)
-
 local Constants = require(SocialUpsell.Constants)
-local SocialLuaAnalytics = require(SocialUpsellParent.SocialLuaAnalytics)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
 local BannerBadge = AppBlox.BannerBadge
 local EventTypes = SocialLuaAnalytics.Analytics.Enums.EventTypes
 local FIntMaxDaysToShowCountDownLabel = require(SocialUpsell.Flag.FIntMaxDaysToShowCountDownLabel)
 local FIntMinDaysToShowCountdownLabel = require(SocialUpsell.Flag.FIntMinDaysToShowCountdownLabel)
 local useSocialUpsellOverlayController = require(SocialUpsell.Hooks.useSocialUpsellOverlayController)
-local FFlagAddUpsellEntryComponentToAnalytics = require(SocialUpsell.Flag.FFlagAddUpsellEntryComponentToAnalytics)
-local v25 = Responsive.BreakpointConfig.getMinHeightFor(Responsive.Keys.Medium)
+
+local minHeightFor = Responsive.BreakpointConfig.getMinHeightFor(Responsive.Keys.Medium)
+
 local BadgeVariant = Foundation.Enums.BadgeVariant
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
 local IconName = Foundation.Enums.IconName
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local FoundationImage = Foundation.Image
+local Image = Foundation.Image
 local useScaledValue = Foundation.Hooks.useScaledValue
-local t1 = {
-	isInExperience = true
-}
 
-local function v36(n1: number?, p1) -- line: 81
-	-- upvalues: FIntMinDaysToShowCountdownLabel (copy), FIntMaxDaysToShowCountDownLabel (copy)
-	if not n1 or n1 == 0 then
+local v = { isInExperience = true }
+
+local function fn(deadlineUtcTimestamp: number?, p)
+	if not deadlineUtcTimestamp or deadlineUtcTimestamp == 0 then
 		return nil
 	end
 
-	local v40 = math.floor((n1 - os.time()) / 86400)
+	local v2 = math.floor((deadlineUtcTimestamp - os.time()) / 86400)
 
-	if v40 < FIntMinDaysToShowCountdownLabel or v40 > FIntMaxDaysToShowCountDownLabel then
+	if v2 < FIntMinDaysToShowCountdownLabel or FIntMaxDaysToShowCountDownLabel < v2 then
 		return nil
 	end
 
-	if v40 < 1 then
-		return p1.dayLeft
+	if v2 < 1 then
+		return p.dayLeft
 	end
 
-	return p1.daysLeft:gsub("{(.-)}", {
-		daysLeft = tostring(v40)
-	})
+	return p.daysLeft:gsub("{(.-)}", { daysLeft = tostring(v2) })
 end
 
-local getViewportSize = nil
+local getViewportSize
 
 if FFlagEnableAEGIS2CommsFAEUpsell then
 	getViewportSize = Display.GetDisplayStore(false).getViewportSize
+else
+	getViewportSize = nil
 end
 
-return function(p2) -- line: 109
-	-- upvalues: t1 (copy), useSocialUpsellOverlayController (copy), React (copy), useScaledValue (copy), ReactFocusNavigation (copy), ReactUtils (copy), HttpService (copy), SocialUpsellAnalytics (copy), UpsellComponent (copy), useLocalization (copy), v36 (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), SignalsReact (copy), getViewportSize (ref), useSelector (copy), v25 (copy), EventTypes (copy), FFlagAddUpsellEntryComponentToAnalytics (copy), Constants (copy), ButtonVariant (copy), Dialog (copy), DialogSize (copy), View (copy), FoundationImage (copy), BannerBadge (copy), Foundation (copy), IconName (copy), BadgeVariant (copy), FoundationText (copy)
-	local v42 = p2 or t1
-	local v43 = useSocialUpsellOverlayController(v42.isInExperience)
-	local v44 = React.useRef(nil)
+return function(p)
+	local v2 = p or v
+	local v3 = useSocialUpsellOverlayController(v2.isInExperience)
+	local ref = React.useRef(nil)
 	local vector2 = Vector2.new(useScaledValue(320), useScaledValue(180))
-	local v46, v47 = ReactFocusNavigation.useDefaultFocusBehavior()
-	local v48 = React.useRef(nil)
-	local v49 = ReactUtils.useComposedRef(v47, v48)
+	local ref3, v4 = ReactFocusNavigation.useDefaultFocusBehavior()
+	local ref2 = React.useRef(nil)
+	local ref4 = ReactUtils.useComposedRef(v4, ref2)
 
-	React.useEffect(function() -- line: 118
-		-- upvalues: v48 (copy)
-		if v48.current then
-			local ScrollingFrame = v48.current:FindFirstChildWhichIsA("ScrollingFrame", true)
+	React.useEffect(function()
+		local scrollingFrame = ref2.current and ref2.current:FindFirstChildWhichIsA("ScrollingFrame", true)
 
-			if ScrollingFrame then
-				ScrollingFrame.Selectable = false
-			end
+		if scrollingFrame then
+			scrollingFrame.Selectable = false
 		end
 	end, {})
 
-	local v50 = React.useMemo(function() -- line: 129
-		-- upvalues: v42 (copy), HttpService (copy)
-		return v42.impressionId or HttpService:GenerateGUID(false)
-	end, {
-		v42.impressionId,
-		v42.upsellEntrySurface,
-		v42.upsellPurpose,
-		v42.upsellEntryComponent
-	})
-	local v51 = React.useMemo(function() -- line: 140
-		-- upvalues: SocialUpsellAnalytics (copy), v42 (copy), UpsellComponent (copy)
-		return SocialUpsellAnalytics.evaluateUpsellStage(v42.upsellEntrySurface, UpsellComponent.Modal, v42.upsellEntryComponent)
-	end, {
-		v42.upsellEntrySurface,
-		v42.upsellEntryComponent
-	})
-	local v52 = useLocalization({
+	local v5 = React.useMemo(function()
+		return v2.impressionId or HttpService:GenerateGUID(false)
+	end, { v2.impressionId, v2.upsellEntrySurface, v2.upsellPurpose, v2.upsellEntryComponent })
+
+	local upsellStage = React.useMemo(function()
+		return SocialUpsellAnalytics.evaluateUpsellStage(
+			v2.upsellEntrySurface,
+			UpsellComponent.Modal,
+			v2.upsellEntryComponent
+		)
+	end, { v2.upsellEntrySurface, v2.upsellEntryComponent })
+
+	local v6 = useLocalization({
 		daysLeft = "Feature.FAE.Label.DaysLeft",
 		dayLeft = "Feature.FAE.Label.DayLeft"
 	})
-	local v53 = React.useMemo(function() -- line: 153
-		-- upvalues: v42 (copy), v36 (copy), v52 (copy)
-		if v42.countDownBadge then
-			return v36(v42.countDownBadge.deadlineUtcTimestamp, v52)
+
+	local v7 = React.useMemo(function()
+		if v2.countDownBadge then
+			return fn(v2.countDownBadge.deadlineUtcTimestamp, v6)
 		end
 
 		return nil
-	end, {
-		v42.countDownBadge,
-		v52
-	})
-	local v54 = React.useMemo(function() -- line: 160
-		-- upvalues: v42 (copy), v53 (copy)
-		if v42.countDownBadge then
-			if v42.countDownBadge.text then
-				return v42.countDownBadge.text
-			end
+	end, { v2.countDownBadge, v6 })
 
-			return v53
+	local text = React.useMemo(function()
+		if not v2.countDownBadge then
+			return nil
 		end
 
-		return nil
-	end, {
-		v53,
-		v42.countDownBadge
-	})
-	local v55 = ((if not FFlagEnableAEGIS2CommsFAEUpsell then useSelector(function(p3) -- line: 173
-		return p3.ScreenSize
-	end) else SignalsReact.useSignalState(getViewportSize))).Y >= v25
+		if v2.countDownBadge.text then
+			return v2.countDownBadge.text
+		end
 
-	React.useEffect(function() -- line: 181
-		-- upvalues: v50 (copy), v44 (copy), SocialUpsellAnalytics (copy), EventTypes (copy), v42 (copy), v51 (copy), UpsellComponent (copy), FFlagAddUpsellEntryComponentToAnalytics (copy)
-		if v50 and v44.current ~= v50 then
+		return v7
+	end, { v7, v2.countDownBadge })
+	local v8
+
+	if FFlagEnableAEGIS2CommsFAEUpsell then
+		v8 = SignalsReact.useSignalState(getViewportSize)
+	else
+		v8 = useSelector(function(p2)
+			return p2.ScreenSize
+		end)
+	end
+
+	local v9 = minHeightFor <= v8.Y
+
+	React.useEffect(function()
+		if v5 and ref.current ~= v5 then
 			SocialUpsellAnalytics.logUpsellEvent(EventTypes.SocialUpsellShown, {
-				upsellPurpose = v42.upsellPurpose,
-				upsellEntrySurface = v42.upsellEntrySurface,
-				upsellStage = v51,
-				upsellImpressionId = v50,
+				upsellPurpose = v2.upsellPurpose,
+				upsellEntrySurface = v2.upsellEntrySurface,
+				upsellStage = upsellStage,
+				upsellImpressionId = v5,
 				upsellComponent = UpsellComponent.Modal,
-				upsellEntryComponent = if not FFlagAddUpsellEntryComponentToAnalytics then nil else v42.upsellEntryComponent
+				upsellEntryComponent = v2.upsellEntryComponent
 			})
-			v44.current = v50
-		end
-	end, {
-		v42.upsellEntrySurface,
-		v42.upsellPurpose,
-		v50,
-		v51,
-		if not FFlagAddUpsellEntryComponentToAnalytics then nil else v42.upsellEntryComponent
-	})
 
-	local v56 = React.useCallback(function(s1: string) -- line: 207
-		-- upvalues: SocialUpsellAnalytics (copy), EventTypes (copy), v42 (copy), v51 (copy), v50 (copy), UpsellComponent (copy), FFlagAddUpsellEntryComponentToAnalytics (copy)
+			ref.current = v5
+		end
+	end, { v2.upsellEntrySurface, v2.upsellPurpose, v5, upsellStage, v2.upsellEntryComponent })
+
+	local v10 = React.useCallback(function(btn: string)
 		SocialUpsellAnalytics.logUpsellEvent(EventTypes.SocialUpsellButtonClick, {
-			upsellPurpose = v42.upsellPurpose,
-			upsellEntrySurface = v42.upsellEntrySurface,
-			upsellStage = v51,
-			upsellImpressionId = v50,
+			upsellPurpose = v2.upsellPurpose,
+			upsellEntrySurface = v2.upsellEntrySurface,
+			upsellStage = upsellStage,
+			upsellImpressionId = v5,
 			upsellComponent = UpsellComponent.Modal,
-			btn = s1,
-			upsellEntryComponent = if not FFlagAddUpsellEntryComponentToAnalytics then nil else v42.upsellEntryComponent
+			btn = btn,
+			upsellEntryComponent = v2.upsellEntryComponent
 		})
-	end, {
-		v42.upsellEntrySurface,
-		v42.upsellPurpose,
-		v50,
-		v51,
-		if not FFlagAddUpsellEntryComponentToAnalytics then nil else v42.upsellEntryComponent
-	})
-	local v57 = React.useCallback(function() -- line: 231
-		-- upvalues: v56 (copy), Constants (copy), v42 (copy)
-		v56(Constants.UPSELL_OVERLAY_BUTTON_ACTION.Primary)
-		v42.primaryAction.onActivated()
-	end, {
-		v42.primaryAction,
-		v56
-	})
-	local v58 = React.useCallback(function() -- line: 243
-		-- upvalues: v56 (copy), Constants (copy), v43 (copy), v42 (copy)
-		v56(Constants.UPSELL_OVERLAY_BUTTON_ACTION.Dismiss)
-		v43.closeSocialOverlay()
+	end, { v2.upsellEntrySurface, v2.upsellPurpose, v5, upsellStage, v2.upsellEntryComponent })
 
-		if v42.onClose then
-			v42.onClose()
+	local onActivated = React.useCallback(function()
+		v10(Constants.UPSELL_OVERLAY_BUTTON_ACTION.Primary)
+		v2.primaryAction.onActivated()
+	end, { v2.primaryAction, v10 })
+
+	local onClose = React.useCallback(function()
+		v10(Constants.UPSELL_OVERLAY_BUTTON_ACTION.Dismiss)
+		v3.closeSocialOverlay()
+
+		if v2.onClose then
+			v2.onClose()
 		end
-	end, {
-		v56,
-		v42.onClose,
-		v43.closeSocialOverlay
-	})
-	local v59 = React.useMemo(function() -- line: 257
-		-- upvalues: v42 (copy), ButtonVariant (copy), v57 (copy), v46 (copy)
-		local t2 = {}
+	end, { v10, v2.onClose, v3.closeSocialOverlay })
 
-		table.insert(t2, {
-			text = v42.primaryAction.text,
+	local actions = React.useMemo(function()
+		local v11 = {}
+		table.insert(v11, {
+			text = v2.primaryAction.text,
 			variant = ButtonVariant.Emphasis,
-			onActivated = v57,
-			ref = v46
+			onActivated = onActivated,
+			ref = ref3
 		})
 
-		return t2
-	end, {
-		v57,
-		v42.primaryAction,
-		v46
-	})
+		return v11
+	end, { onActivated, v2.primaryAction, ref3 })
 
-	return React.createElement(Dialog.Root, {
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v11 = {
+		size = DialogSize.Medium,
 		hasBackdrop = true,
 		closeOnClickOutside = true,
-		size = DialogSize.Medium,
-		onClose = v58,
-		ref = v49
-	}, {
-		DialogContent = React.createElement(Dialog.Content, {}, {
-			Content = React.createElement(View, {
-				tag = "col auto-y size-full-0 gap-medium padding-top-xlarge",
-				LayoutOrder = 1
-			}, {
-				Image = if not v42.imageId or not v55 then nil else React.createElement(FoundationImage, {
-					tag = "size-full-full self-center content-emphasis",
-					aspectRatio = 1.7777777777777777,
-					Image = v42.imageId,
-					sizeConstraint = {
-						MaxSize = vector2
-					}
-				}),
-				Badge = if not v54 then nil else React.createElement(BannerBadge, {
-					LayoutOrder = 1,
-					icon = {
-						variant = Foundation.Enums.IconVariant.Filled,
-						position = Foundation.Enums.IconPosition.Left,
-						name = IconName.Clock
-					},
-					text = v54,
-					variant = BadgeVariant.Neutral
-				}),
-				TextContainer = React.createElement(View, {
-					tag = "col gap-medium size-full-0 auto-y padding-right-xxlarge padding-bottom-xsmall",
-					LayoutOrder = 2
-				}, {
-					Title = if not v42.title then nil else React.createElement(View, {
-						tag = "size-full-0 auto-y",
-						LayoutOrder = 2
-					}, {
-						TitleText = React.createElement(FoundationText, {
-							tag = "size-full-0 auto-y content-emphasis text-wrap text-align-x-left text-heading-medium",
-							Text = v42.title
-						})
-					}),
-					BodyText = if not v42.bodyText then nil else React.createElement(FoundationText, {
-						tag = "size-full-0 auto-y text-wrap text-align-x-left text-body-medium",
-						LayoutOrder = 3,
-						Text = v42.bodyText
-					})
-				})
+		onClose = onClose,
+		ref = ref4
+	}
+
+	local createElement2 = React.createElement
+	local content = Dialog.Content
+	local createElement3 = React.createElement
+	local image
+
+	if v2.imageId and v9 then
+		image = React.createElement(Image, {
+			tag = "size-full-full self-center content-emphasis",
+			Image = v2.imageId,
+			aspectRatio = 16 / 9,
+			sizeConstraint = { MaxSize = vector2 }
+		})
+	end
+
+	local badge
+
+	if text then
+		badge = React.createElement(BannerBadge, {
+			LayoutOrder = 1,
+			icon = {
+				variant = Foundation.Enums.IconVariant.Filled,
+				position = Foundation.Enums.IconPosition.Left,
+				name = IconName.Clock
+			},
+			text = text,
+			variant = BadgeVariant.Neutral
+		})
+	end
+
+	local createElement4 = React.createElement
+	local title
+
+	if v2.title then
+		title = React.createElement(View, { tag = "size-full-0 auto-y", LayoutOrder = 2 }, {
+			TitleText = React.createElement(Text, {
+				Text = v2.title,
+				tag = "size-full-0 auto-y content-emphasis text-wrap text-align-x-left text-heading-medium"
 			})
+		})
+	end
+
+	local bodyText
+
+	if v2.bodyText then
+		bodyText = React.createElement(Text, {
+			tag = "size-full-0 auto-y text-wrap text-align-x-left text-body-medium",
+			Text = v2.bodyText,
+			LayoutOrder = 3
+		})
+	end
+
+	return createElement(root, v11, {
+		DialogContent = createElement2(content, {}, {
+			Content = createElement3(
+				View,
+				{ tag = "col auto-y size-full-0 gap-medium padding-top-xlarge", LayoutOrder = 1 },
+				{
+					Image = image,
+					Badge = badge,
+					TextContainer = createElement4(
+						View,
+						{
+							tag = "col gap-medium size-full-0 auto-y padding-right-xxlarge padding-bottom-xsmall",
+							LayoutOrder = 2
+						},
+						{ Title = title, BodyText = bodyText }
+					)
+				}
+			)
 		}),
 		DialogActions = React.createElement(Dialog.Actions, {
-			LayoutOrder = not v54 and 4 or 3,
-			actions = v59
+			LayoutOrder = text and 3 or 4,
+			actions = actions
 		})
 	})
 end

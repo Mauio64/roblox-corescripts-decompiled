@@ -1,40 +1,24 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Signals = require(scriptParentParent.Signals)
+local parent = script.Parent
+local parent2 = parent.Parent
 
-require(scriptParentParent.HttpSignals)
-require(scriptParent.HttpStoreTypes)
+local Signals = require(parent2.Signals)
+require(parent2.HttpSignals)
 
-local function createParsedResponse(p1, p2) -- line: 13
-	-- upvalues: Signals (copy)
-	return Signals.createComputed(function(p3) -- line: 17
-		-- upvalues: p1 (copy), p2 (copy)
-		local v8 = p1(p3)
+require(parent.HttpStoreTypes)
 
-		if v8.status == "success" then
-			local data = v8.data
+local function createParsedResponse(callback, config)
+	return Signals.createComputed(function(p)
+		local v = callback(p)
 
-			return {
-				status = "Success",
-				config = p2,
-				response = data
-			}
+		if v.status == "success" then
+			return { status = "Success", config = config, response = v.data }
 		end
 
-		if v8.status == "error" then
-			local error = v8.error
-
-			return {
-				status = "Failed",
-				config = p2,
-				response = error
-			}
+		if v.status == "error" then
+			return { status = "Failed", config = config, response = v.error }
 		end
 
-		return {
-			status = "Fetching",
-			config = p2
-		}
+		return { status = "Fetching", config = config }
 	end)
 end
 

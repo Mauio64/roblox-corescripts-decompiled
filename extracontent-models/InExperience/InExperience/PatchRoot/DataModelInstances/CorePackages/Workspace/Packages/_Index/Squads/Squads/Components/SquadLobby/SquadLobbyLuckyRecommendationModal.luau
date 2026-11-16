@@ -1,53 +1,75 @@
 local Squads = script:FindFirstAncestor("Squads")
-local SquadsParent = Squads.Parent
+local parent = Squads.Parent
+
+local FFlagSquadsEnableFoundationTestIds = require(Squads.Flags.FFlagSquadsEnableFoundationTestIds)
+
 local dependencies = require(Squads.dependencies)
-local React = dependencies.React
-local Foundation = dependencies.Foundation
-local LuauPolyfill = dependencies.LuauPolyfill
+local react = dependencies.React
+local foundation = dependencies.Foundation
+local luauPolyfill = dependencies.LuauPolyfill
 local useSelector = dependencies.Hooks.useSelector
 local useDispatch = dependencies.Hooks.useDispatch
 local useLocalization = dependencies.Hooks.useLocalization
-local setTimeout = LuauPolyfill.setTimeout
-local clearTimeout = LuauPolyfill.clearTimeout
-local ButtonVariant = Foundation.Enums.ButtonVariant
-local DialogSize = Foundation.Enums.DialogSize
-local IconSize = Foundation.Enums.IconSize
-local ProgressShape = Foundation.Enums.ProgressShape
-local ProgressSize = Foundation.Enums.ProgressSize
-local Button = Foundation.Button
-local Dialog = Foundation.Dialog
-local Icon = Foundation.Icon
-local FoundationImage = Foundation.Image
-local OverlayProvider = Foundation.OverlayProvider
-local Progress = Foundation.Progress
-local FoundationText = Foundation.Text
-local View = Foundation.View
-local useTokens = Foundation.Hooks.useTokens
-local ReactOtter = require(SquadsParent.ReactOtter)
-local getRbxthumbWithTypeSizeAndOptions = require(SquadsParent.UserLib).Utils.getRbxthumbWithTypeSizeAndOptions
-local Constants = require(SquadsParent.UserLib).Utils.Constants
+
+local setTimeout = luauPolyfill.setTimeout
+local clearTimeout = luauPolyfill.clearTimeout
+
+local buttonVariant = foundation.Enums.ButtonVariant
+local dialogSize = foundation.Enums.DialogSize
+local iconSize = foundation.Enums.IconSize
+local progressShape = foundation.Enums.ProgressShape
+local progressSize = foundation.Enums.ProgressSize
+local button = foundation.Button
+local dialog = foundation.Dialog
+local icon = foundation.Icon
+local image = foundation.Image
+local overlayProvider = foundation.OverlayProvider
+local progress = foundation.Progress
+local text = foundation.Text
+local view = foundation.View
+local useTokens = foundation.Hooks.useTokens
+
+local ReactOtter = require(parent.ReactOtter)
+
+local UserLib = require(parent.UserLib)
+local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+local UserLib2 = require(parent.UserLib)
+local Constants = UserLib2.Utils.Constants
+
 local CreateExperienceInvite = require(Squads.Thunks.CreateExperienceInvite)
-local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
-local Enums = require(SquadsParent.SquadsCore.Enums)
+
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
+local Enums = require(parent.SquadsCore.Enums)
 local SquadExperienceInviteSource = Enums.SquadExperienceInviteSource
 local SquadLuckyRecommendationPhase = Enums.SquadLuckyRecommendationPhase
-local Hooks = require(SquadsParent.SquadsCore.Hooks)
+local Hooks = require(parent.SquadsCore.Hooks)
 local useLuckyRecommendation = Hooks.useLuckyRecommendation
 local useLuckyRecommendationAnalytics = Hooks.useLuckyRecommendationAnalytics
-local EventNames = require(SquadsParent.SquadsCore.EventNames)
+local useIsExperienceInviteRetryBlocked = Hooks.useIsExperienceInviteRetryBlocked
+local fFlagUseSignalsForSquadExperienceInvite = dependencies.SharedFlags.FFlagUseSignalsForSquadExperienceInvite
+local Stores = require(parent.SquadsCore.Stores)
+local GetSquadExperienceInviteStore = Stores.GetSquadExperienceInviteStore
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local EventNames = require(parent.SquadsCore.EventNames)
 
-local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 67
-	-- upvalues: useTokens (copy), useDispatch (copy), React (copy), SquadExternalContractContext (copy), useLuckyRecommendation (copy), useLuckyRecommendationAnalytics (copy), useLocalization (copy), SquadLuckyRecommendationPhase (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), useSelector (copy), EventNames (copy), CreateExperienceInvite (copy), SquadExperienceInviteSource (copy), setTimeout (copy), clearTimeout (copy), ReactOtter (copy), FoundationText (copy), View (copy), FoundationImage (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy), OverlayProvider (copy), Dialog (copy), DialogSize (copy), Button (copy), ButtonVariant (copy), Icon (copy), IconSize (copy)
-	local v40 = useTokens()
-	local v41 = useDispatch()
-	local Size_300 = v40.Size.Size_300
-	local v43 = React.useContext(SquadExternalContractContext)
-	local v44 = useLuckyRecommendation()
-	local state = v44.state
-	local actions = v44.actions
-	local sessionId = t1.sessionId
-	local v48 = useLuckyRecommendationAnalytics(sessionId)
-	local v49 = useLocalization({
+local Constants2 = require(Squads.Common.Constants)
+local SQUAD_LOBBY_MODAL_DISPLAY_ORDER = Constants2.SQUAD_LOBBY_MODAL_DISPLAY_ORDER
+
+local function SquadLobbyLuckyRecommendationModal(props)
+	local v = useTokens()
+	local v2 = useDispatch()
+
+	local size_300 = v.Size.Size_300
+	local v3 = react.useContext(SquadExternalContractContext)
+	local v4 = useLuckyRecommendation()
+	local state = v4.state
+	local actions = v4.actions
+
+	local v5 = useLuckyRecommendationAnalytics(props.sessionId)
+
+	local v6 = useLocalization({
 		rollingTitle = "Feature.Squads.Label.LuckyRecommendationRolling",
 		rollingSubtitle = "Feature.Squads.Description.LuckyRecommendationRolling",
 		revealedTitle = "Feature.Squads.Label.LuckyRecommendationRevealed",
@@ -57,278 +79,286 @@ local function SquadLobbyLuckyRecommendationModal(t1: {[any]: any}) -- line: 67
 		cancelText = "CommonUI.Controls.Action.Cancel",
 		retryText = "Feature.Squads.Action.Retry"
 	})
+
 	local phase = state.phase
-	local v51 = phase == SquadLuckyRecommendationPhase.Rolling
-	local v52 = phase == SquadLuckyRecommendationPhase.Revealed
-	local v53 = v52 or phase == SquadLuckyRecommendationPhase.Errored
-	local v54 = if state.phase ~= SquadLuckyRecommendationPhase.Revealed then nil else state.recommendation
-	local v55 = v54 and v54.universeId
-	local v56 = v54 and v54.rootPlaceId
-	local v57 = if v55 == nil then nil else getRbxthumbWithTypeSizeAndOptions(tostring(v55), Constants.RbxthumbTypes.GameIcon, 150, false)
-	local v58 = React.useCallback(function(p1) -- line: 107
-		return p1.Squad and (p1.Squad.Squad and (p1.Squad.Squad.currentSquad and p1.Squad.Squad.currentSquad.squadId))
-	end, {})
-	local v59 = useSelector(v58)
-	local v60 = React.useCallback(function(p2) -- line: 115
-		return p2.Squad and (p2.Squad.Squad and p2.Squad.Squad.currentExperienceInvite)
-	end, {})
-	local v61 = useSelector(v60)
-	local v62 = React.useCallback(function() -- line: 120
-		-- upvalues: v48 (copy), EventNames (copy), phase (copy), t1 (copy)
-		v48.fire(EventNames.LuckyRecommendationDismissed, {
-			phaseAtDismiss = phase
-		})
-		t1.onClose()
-	end, {
-		v48,
-		phase,
-		t1.onClose
-	})
-	local v63 = React.useCallback(function() -- line: 127
-		-- upvalues: v48 (copy), EventNames (copy), phase (copy), actions (copy), v59 (copy)
-		v48.fire(EventNames.LuckyRecommendationRerolled, {
-			phaseAtReroll = phase
-		})
-		actions.startRoll(v59, false)
-	end, {
-		actions.startRoll,
-		v59,
-		v48,
-		phase
-	})
-	local v64 = React.useCallback(function() -- line: 134
-		-- upvalues: v48 (copy), EventNames (copy), v56 (copy), v41 (copy), CreateExperienceInvite (copy), v43 (copy), SquadExperienceInviteSource (copy)
-		local v72 = v48.getContext()
+	local v7 = phase == SquadLuckyRecommendationPhase.Rolling
+	local v8 = phase == SquadLuckyRecommendationPhase.Revealed
+	local v9 = v8 or phase == SquadLuckyRecommendationPhase.Errored
+	local recommendation
 
-		v48.fire(EventNames.LuckyRecommendationJoinTapped, {
-			rootPlaceId = v56
-		})
+	if state.phase == SquadLuckyRecommendationPhase.Revealed then
+		recommendation = state.recommendation
+	end
 
-		if v56 == nil then
+	local universeId = recommendation and recommendation.universeId
+	local rootPlaceId = recommendation and recommendation.rootPlaceId
+	local image2
+
+	if universeId ~= nil then
+		image2 = getRbxthumbWithTypeSizeAndOptions(tostring(universeId), Constants.RbxthumbTypes.GameIcon, 150, false)
+	end
+
+	local v10 = useSelector((react.useCallback(function(p)
+		return p.Squad and p.Squad.Squad and p.Squad.Squad.currentSquad and p.Squad.Squad.currentSquad.squadId
+	end, {})))
+
+	local v11 = react.useCallback(function(p)
+		return p.Squad and p.Squad.Squad and p.Squad.Squad.currentExperienceInvite
+	end, {})
+	local v12
+
+	if fFlagUseSignalsForSquadExperienceInvite then
+		v12 = useSignalState(GetSquadExperienceInviteStore(false).getHasCurrentExperienceInvite)
+	else
+		v12 = useSelector(v11) ~= nil
+	end
+
+	local v13 = useIsExperienceInviteRetryBlocked(v10)
+
+	local v14 = react.useCallback(function()
+		v5.fire(EventNames.LuckyRecommendationDismissed, { phaseAtDismiss = phase })
+
+		props.onClose()
+	end, { v5, phase, props.onClose })
+
+	local v15 = react.useCallback(function()
+		v5.fire(EventNames.LuckyRecommendationRerolled, { phaseAtReroll = phase })
+
+		actions.startRoll(v10, false)
+	end, { actions.startRoll, v10, v5, phase })
+
+	local onAction = react.useCallback(function()
+		local context = v5.getContext()
+		v5.fire(EventNames.LuckyRecommendationJoinTapped, { rootPlaceId = rootPlaceId })
+
+		if rootPlaceId == nil then
 			return
 		end
 
-		v41(CreateExperienceInvite(tostring(v56), v43, SquadExperienceInviteSource.LuckyRecommendation)):andThen(function(s1: string) -- line: 144
-			-- upvalues: v48 (copy), EventNames (copy), v72 (copy), v56 (copy)
-			if s1 then
-				v48.fire(EventNames.LuckyRecommendationExperienceInviteCreated, {
-					pickRequestId = v72.pickRequestId,
-					revealType = v72.revealType,
-					rootPlaceId = v56,
-					experienceInviteId = s1
+		v2(CreateExperienceInvite(tostring(rootPlaceId), v3, SquadExperienceInviteSource.LuckyRecommendation)):andThen(function(experienceInviteId: string)
+			if experienceInviteId then
+				v5.fire(EventNames.LuckyRecommendationExperienceInviteCreated, {
+					pickRequestId = context.pickRequestId,
+					revealType = context.revealType,
+					rootPlaceId = rootPlaceId,
+					experienceInviteId = experienceInviteId
 				})
 			end
 		end)
-	end, {
-		v41,
-		v56,
-		v43,
-		v48
-	})
+	end, { v2, rootPlaceId, v3, v5 })
 
-	React.useLayoutEffect(function() -- line: 156
-		-- upvalues: actions (copy), v59 (copy)
-		actions.startRoll(v59, true)
-	end, {
-		actions.startRoll,
-		v59
-	})
-	React.useEffect(function() -- line: 160
-		-- upvalues: phase (copy), SquadLuckyRecommendationPhase (copy), setTimeout (copy), actions (copy), clearTimeout (copy)
+	react.useLayoutEffect(function()
+		actions.startRoll(v10, true)
+	end, { actions.startRoll, v10 })
+
+	react.useEffect(function()
 		if phase ~= SquadLuckyRecommendationPhase.Rolling then
 			return
 		end
 
-		local v73 = setTimeout(actions.endRoll, 1000)
-
-		return function() -- line: 165
-			-- upvalues: clearTimeout (copy), v73 (copy)
-			clearTimeout(v73)
+		local v16 = setTimeout(actions.endRoll, 1000)
+		return function()
+			clearTimeout(v16)
 		end
-	end, {
-		phase,
-		actions.endRoll
-	})
-	React.useEffect(function() -- line: 170
-		-- upvalues: actions (copy)
-		return function() -- line: 171
-			-- upvalues: actions (copy)
+	end, { phase, actions.endRoll })
+
+	react.useEffect(function()
+		return function()
 			actions.cancelFetch()
 		end
 	end, { actions.cancelFetch })
-	React.useEffect(function() -- line: 176
-		-- upvalues: phase (copy), SquadLuckyRecommendationPhase (copy), v48 (copy), EventNames (copy), v55 (copy), state (copy)
+
+	react.useEffect(function()
 		if phase == SquadLuckyRecommendationPhase.Revealed then
-			v48.fire(EventNames.LuckyRecommendationRevealShown, {
-				universeId = v55
-			})
-
-			return
+			v5.fire(EventNames.LuckyRecommendationRevealShown, { universeId = universeId })
+		elseif phase == SquadLuckyRecommendationPhase.Errored then
+			v5.fire(EventNames.LuckyRecommendationErrorShown, { errorType = state.error })
 		end
+	end, { phase, v5, state, universeId })
 
-		if phase == SquadLuckyRecommendationPhase.Errored then
-			v48.fire(EventNames.LuckyRecommendationErrorShown, {
-				errorType = state.error
-			})
-		end
-	end, {
-		phase,
-		v48,
-		state,
-		v55
-	})
+	local v16, v17 = ReactOtter.useAnimatedBinding(0)
 
-	local v65, v66 = ReactOtter.useAnimatedBinding(0)
-
-	React.useEffect(function() -- line: 190
-		-- upvalues: v51 (copy), v66 (copy), ReactOtter (copy), v53 (copy)
-		if v51 then
-			v66(ReactOtter.ease(100, {
+	react.useEffect(function()
+		if v7 then
+			v17(ReactOtter.ease(100, {
 				duration = 1,
-				startingValue = 0,
-				easingStyle = Enum.EasingStyle.Quad
+				easingStyle = Enum.EasingStyle.Quad,
+				startingValue = 0
 			}))
-
-			return
+		elseif v9 then
+			v17(ReactOtter.ease(100, { duration = 0 }))
 		end
+	end, { v7, v9, v17 })
+	local v18
 
-		if v53 then
-			v66(ReactOtter.ease(100, {
-				duration = 0
-			}))
-		end
-	end, {
-		v51,
-		v53,
-		v66
+	if v8 then
+		v18 = {
+			title = v6.revealedTitle,
+			subtitle = v6.revealedSubtitle,
+			actionText = v6.joinText,
+			onAction = onAction,
+			isActionDisabled = v12 or v13
+		}
+	elseif v9 then
+		v18 = { title = v6.errorTitle, actionText = v6.retryText, onAction = v15 }
+	else
+		v18 = {
+			title = v6.rollingTitle,
+			subtitle = v6.rollingSubtitle,
+			actionText = v6.cancelText,
+			onAction = v14
+		}
+	end
+
+	local v19 = {}
+
+	v19.Title = react.createElement(text, {
+		tag = "size-full-0 auto-y text-heading-small text-align-x-left content-emphasis",
+		LayoutOrder = 1,
+		Text = v18.title,
+		testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog--title" or nil
 	})
 
-	local v67 = if not v52 then if v53 then {
-		title = v49.errorTitle,
-		actionText = v49.retryText,
-		onAction = v63
-	} else {
-		title = v49.rollingTitle,
-		subtitle = v49.rollingSubtitle,
-		actionText = v49.cancelText,
-		onAction = v62
-	} else {
-		title = v49.revealedTitle,
-		subtitle = v49.revealedSubtitle,
-		actionText = v49.joinText,
-		onAction = v64,
-		isActionDisabled = v61 ~= nil
-	}
-	local t2 = {
-		Title = React.createElement(FoundationText, {
-			tag = "size-full-0 auto-y text-heading-small text-align-x-left content-emphasis",
-			LayoutOrder = 1,
-			Text = v67.title
-		})
-	}
-
-	if v67.subtitle ~= nil then
-		t2.Subtitle = React.createElement(FoundationText, {
+	if v18.subtitle ~= nil then
+		v19.Subtitle = react.createElement(text, {
 			tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-default",
 			LayoutOrder = 2,
-			Text = v67.subtitle
+			Text = v18.subtitle,
+			testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog--subtitle" or nil
 		})
 	end
 
-	local t3 = {
-		Header = React.createElement(View, {
-			tag = "col gap-small size-full-0 auto-y",
-			LayoutOrder = 1
-		}, t2)
-	}
+	local children = {}
 
-	if v54 then
-		t3.GameResult = React.createElement(View, {
-			tag = "row align-y-center gap-medium size-full-0 auto-y padding-large stroke-standard stroke-position-inner stroke-default radius-medium bg-surface-200",
-			LayoutOrder = 2
-		}, {
-			Thumbnail = if not v57 then nil else React.createElement(FoundationImage, {
+	children.Header = react.createElement(view, {
+		tag = "col gap-small size-full-0 auto-y",
+		LayoutOrder = 1
+	}, v19)
+
+	if recommendation then
+		local createElement = react.createElement
+		local thumbnail
+
+		if image2 then
+			thumbnail = react.createElement(image, {
 				tag = "radius-small",
 				LayoutOrder = 1,
-				Image = v57,
-				Size = UDim2.fromOffset(v40.Size.Size_1000, v40.Size.Size_1000)
-			}),
-			GameInfo = React.createElement(View, {
-				tag = "col align-y-center fill",
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v40.Size.Size_1000)
-			}, {
-				GameName = React.createElement(FoundationText, {
-					tag = "size-full-0 auto-y text-title-medium text-no-wrap text-align-x-left text-truncate-end content-emphasis",
-					LayoutOrder = 1,
-					Text = v54.universeName
-				})
+				Image = image2,
+				Size = UDim2.fromOffset(v.Size.Size_1000, v.Size.Size_1000),
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog--game-thumbnail" or nil
 			})
-		})
-	end
+		end
 
-	if not v53 then
-		t3.ProgressBar = React.createElement(View, {
-			tag = "row align-y-center size-full-0",
-			LayoutOrder = 3,
-			Size = UDim2.new(1, 0, 0, v40.Size.Size_500)
-		}, {
-			Bar = React.createElement(Progress, {
-				shape = ProgressShape.Bar,
-				size = ProgressSize.Medium,
-				value = v65,
-				width = UDim.new(1, 0)
-			})
-		})
-	end
-
-	return (React.createElement(OverlayProvider, {
-		DisplayOrder = 11
-	}, {
-		Dialog = React.createElement(Dialog.Root, {
-			onClose = v62,
-			size = DialogSize.Small,
-			hasBackdrop = t1.hasBackdrop == nil or t1.hasBackdrop,
-			disablePortal = t1.disablePortal ~= nil and t1.disablePortal
-		}, {
-			Content = React.createElement(View, {
-				tag = "size-full-0 auto-y",
-				LayoutOrder = 1
-			}, {
-				Main = React.createElement(View, {
-					tag = "col size-full-0 auto-y",
-					padding = {
-						top = UDim.new(0, Size_300 + v40.Size.Size_200)
-					}
-				}, {
-					Body = React.createElement(View, {
-						tag = "col gap-large size-full-0 auto-y padding-bottom-large",
-						LayoutOrder = 1
-					}, t3),
-					ActionButton = React.createElement(Button, {
+		children.GameResult = createElement(
+			view,
+			{
+				tag = "row align-y-center gap-medium size-full-0 auto-y padding-large stroke-standard stroke-position-inner stroke-default radius-medium bg-surface-200",
+				LayoutOrder = 2
+			},
+			{
+				Thumbnail = thumbnail,
+				GameInfo = react.createElement(
+					view,
+					{
+						tag = "col align-y-center fill",
 						LayoutOrder = 2,
-						onActivated = v67.onAction,
-						text = v67.actionText,
-						variant = ButtonVariant.Standard,
-						width = UDim.new(1, 0),
-						isDisabled = v67.isActionDisabled
-					})
-				}),
-				ResetButton = if not v52 then nil else React.createElement(View, {
-					tag = "row align-x-center align-y-center auto-xy padding-small radius-circle clip bg-over-media-100",
-					ZIndex = 2,
-					onActivated = v63,
-					Size = UDim2.fromOffset(v40.Size.Size_1000, v40.Size.Size_1000),
-					AnchorPoint = Vector2.new(1, 0),
-					Position = UDim2.new(1, -v40.Size.Size_1000, 0, Size_300)
-				}, {
-					Icon = React.createElement(Icon, {
-						name = "arrow-spin-clockwise",
-						size = IconSize.Small,
-						style = v40.Color.Content.Emphasis
-					})
+						Size = UDim2.new(1, 0, 0, v.Size.Size_1000)
+					},
+					{
+						GameName = react.createElement(text, {
+							tag = "size-full-0 auto-y text-title-medium text-no-wrap text-align-x-left text-truncate-end content-emphasis",
+							LayoutOrder = 1,
+							Text = recommendation.universeName,
+							testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog--game-name" or nil
+						})
+					}
+				)
+			}
+		)
+	end
+
+	if not v9 then
+		children.ProgressBar = react.createElement(
+			view,
+			{
+				tag = "row align-y-center size-full-0",
+				LayoutOrder = 3,
+				Size = UDim2.new(1, 0, 0, v.Size.Size_500)
+			},
+			{
+				Bar = react.createElement(progress, {
+					shape = progressShape.Bar,
+					size = progressSize.Medium,
+					value = v16,
+					width = UDim.new(1, 0),
+					testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog--progress" or nil
 				})
+			}
+		)
+	end
+
+	local createElement = react.createElement
+
+	local createElement2 = react.createElement
+	local root = dialog.Root
+	local v20 = {
+		onClose = v14,
+		size = dialogSize.Small,
+		hasBackdrop = props.hasBackdrop == nil or props.hasBackdrop,
+		disablePortal = props.disablePortal ~= nil and props.disablePortal,
+		testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog" or nil
+	}
+
+	local createElement3 = react.createElement
+
+	local v21 = {
+		Main = react.createElement(view, {
+			tag = "col size-full-0 auto-y",
+			padding = {
+				top = UDim.new(0, size_300 + v.Size.Size_200)
+			}
+		}, {
+			Body = react.createElement(
+				view,
+				{ tag = "col gap-large size-full-0 auto-y padding-bottom-large", LayoutOrder = 1 },
+				children
+			),
+			ActionButton = react.createElement(button, {
+				LayoutOrder = 2,
+				onActivated = v18.onAction,
+				text = v18.actionText,
+				variant = buttonVariant.Standard,
+				width = UDim.new(1, 0),
+				isDisabled = v18.isActionDisabled,
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog--action-button" or nil
 			})
+		}),
+		ResetButton = 0
+	}
+	local resetButton
+
+	if v8 then
+		resetButton = react.createElement(view, {
+			tag = "row align-x-center align-y-center auto-xy padding-small radius-circle clip bg-over-media-100",
+			onActivated = v15,
+			Size = UDim2.fromOffset(v.Size.Size_1000, v.Size.Size_1000),
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.new(1, -v.Size.Size_1000, 0, size_300),
+			ZIndex = 2,
+			testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-lucky-recommendation-dialog--reroll-button" or nil
+		}, {
+			Icon = react.createElement(icon, {
+				name = "arrow-spin-clockwise",
+				size = iconSize.Small,
+				style = v.Color.Content.Emphasis
+			})
+		})
+	end
+
+	v21.ResetButton = resetButton
+	return (createElement(overlayProvider, { DisplayOrder = SQUAD_LOBBY_MODAL_DISPLAY_ORDER }, {
+		Dialog = createElement2(root, v20, {
+			Content = createElement3(view, { tag = "size-full-0 auto-y", LayoutOrder = 1 }, v21)
 		})
 	}))
 end

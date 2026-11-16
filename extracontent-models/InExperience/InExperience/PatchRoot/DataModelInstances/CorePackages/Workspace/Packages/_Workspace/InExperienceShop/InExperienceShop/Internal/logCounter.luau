@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
 
-local function logCounter(p1, n1: number?) -- line: 18
-	-- upvalues: LoggingProtocol (copy)
-	LoggingProtocol.default:logRobloxTelemetryCounter(p1, n1 or 1, {})
+local LoggingProtocol = require(parent.LoggingProtocol)
+
+local function logCounter(p, value: number?)
+	LoggingProtocol.default:logRobloxTelemetryCounter(p, value or 1, {})
 end
 
 return logCounter

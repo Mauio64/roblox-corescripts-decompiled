@@ -1,59 +1,75 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
 require(AppChat.types)
-
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local ChatDetailsTelemetryEvents = require(AppChat.Components.ChatDetails.ChatDetailsTelemetryEvents)
 local ChatDetailsTelemetryLayer = require(AppChat.Telemetry.Layers.ChatDetailsTelemetryLayer)
-local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMount
-local useStyle = require(AppChatParent.UIBlox).Core.Style.useStyle
+local RoactUtils = require(parent.RoactUtils)
+local useEffectOnMount = RoactUtils.Hooks.useEffectOnMount
+
+local UIBlox = require(parent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+
 local FlexIconWithTextCell = require(AppChat.Components.Cells.FlexIconWithTextCell)
-local useTokens = require(AppChatParent.Foundation).Hooks.useTokens
+
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
-local t1 = {
+
+local v = {
 	bodyText = "Placeholder body",
 	subTitleText = "Placeholder subtitle",
 	iconImage = nil,
 	cellHeight = 48,
-	onActivated = function() -- line: 39
-	end
+	onActivated = function() end
 }
 
-local function CreateUnfilteredChatCell(t2: {[any]: any}) -- line: 44
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useTokens (copy), useIsInExperience (copy), useTelemetry (copy), ChatDetailsTelemetryLayer (copy), useEffectOnMount (copy), ChatDetailsTelemetryEvents (copy), React (copy), FlexIconWithTextCell (copy)
-	local v16 = Cryo.Dictionary.join(t1, t2)
-	local v17 = useStyle()
-	local v18 = v16.style or v17
-	local v19 = useTokens()
-	local v20 = useIsInExperience()
-	local v21 = useTelemetry(ChatDetailsTelemetryLayer.Context)
+local function CreateUnfilteredChatCell(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local v2 = useStyle()
+	local style = joined.style or v2
+	local v3 = useTokens()
+	local v4 = useIsInExperience()
+	local v5 = useTelemetry(ChatDetailsTelemetryLayer.Context)
 
-	useEffectOnMount(function() -- line: 52
-		-- upvalues: v21 (copy), ChatDetailsTelemetryEvents (copy)
-		v21.emit(ChatDetailsTelemetryEvents.ChatDetailsCreateUnfilteredChatCellRendered, {})
+	useEffectOnMount(function()
+		v5.emit(ChatDetailsTelemetryEvents.ChatDetailsCreateUnfilteredChatCellRendered, {})
 	end)
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
+	local createElement = React.createElement
+	local v6 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = v16.layoutOrder,
+		BackgroundTransparency = 1,
+		LayoutOrder = joined.layoutOrder,
 		Size = UDim2.fromScale(1, 0)
-	}, {
-		CreateUnfilteredChatRow = React.createElement(FlexIconWithTextCell, {
-			showDivider = false,
-			LayoutOrder = v16.layoutOrder,
-			onActivated = v16.onActivated,
-			primaryIcon = v16.iconImage,
-			Size = UDim2.new(1, 0, 0, v16.cellHeight),
-			style = v18,
-			Text = v16.bodyText,
-			SubTitleText = v16.subTitleText,
-			isDisabled = v16.isLoading,
-			BackgroundTransparency = if not v20 then nil else v19.Color.None.Transparency
-		})
+	}
+
+	local createElement2 = React.createElement
+	local v7 = {
+		LayoutOrder = joined.layoutOrder,
+		onActivated = joined.onActivated,
+		primaryIcon = joined.iconImage,
+		showDivider = false,
+		Size = UDim2.new(1, 0, 0, joined.cellHeight),
+		style = style,
+		Text = joined.bodyText,
+		SubTitleText = joined.subTitleText,
+		isDisabled = joined.isLoading,
+		BackgroundTransparency = 0
+	}
+	local backgroundTransparency
+
+	if v4 then
+		backgroundTransparency = v3.Color.None.Transparency
+	end
+
+	v7.BackgroundTransparency = backgroundTransparency
+	return createElement("Frame", v6, {
+		CreateUnfilteredChatRow = createElement2(FlexIconWithTextCell, v7)
 	})
 end
 

@@ -1,4 +1,1 @@
-return {
-	PlayerProfile = "playerProfile",
-	ShareLinkErrorDialog = "shareLinkErrorDialog"
-}
+return { PlayerProfile = "playerProfile", ShareLinkErrorDialog = "shareLinkErrorDialog" }

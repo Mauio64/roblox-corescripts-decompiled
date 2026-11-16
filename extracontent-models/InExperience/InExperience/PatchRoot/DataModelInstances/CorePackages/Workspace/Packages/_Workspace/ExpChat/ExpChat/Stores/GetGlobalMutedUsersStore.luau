@@ -1,53 +1,36 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Signals = require(ExpChatParent.Signals)
+local parent = ExpChat.Parent
+local Signals = require(parent.Signals)
 
-if require(ExpChat.Flags.FFlagExpChatUseChatMuteStore) then
-	local ChatMute = require(ExpChatParent.ChatMute)
+local FFlagExpChatUseChatMuteStore = require(ExpChat.Flags.FFlagExpChatUseChatMuteStore)
 
-	return Signals.createComputed(function() -- line: 11
-		-- upvalues: ChatMute (copy)
+if FFlagExpChatUseChatMuteStore then
+	local ChatMute = require(parent.ChatMute)
+
+	return Signals.createComputed(function()
 		return {
 			getMutedGlobalUsernames = ChatMute.getMutedUsernames(),
 			getMutedGlobalDisplayNames = ChatMute.getMutedDisplayNames(),
 			getMutedGlobalUserIds = ChatMute.getMutedUserIds(),
-			muteGlobalUsername = function(s1: string) -- line: 16
-				-- upvalues: ChatMute (copy)
-				ChatMute.mutePlayer({
-					username = s1
-				})
+			muteGlobalUsername = function(username: string)
+				ChatMute.mutePlayer({ username = username })
 			end,
-			unmuteGlobalUsername = function(s2: string) -- line: 19
-				-- upvalues: ChatMute (copy)
-				ChatMute.unmutePlayer({
-					username = s2
-				})
+			unmuteGlobalUsername = function(username: string)
+				ChatMute.unmutePlayer({ username = username })
 			end,
-			muteGlobalDisplayName = function(s3: string) -- line: 22
-				-- upvalues: ChatMute (copy)
-				ChatMute.mutePlayer({
-					displayName = s3
-				})
+			muteGlobalDisplayName = function(displayName: string)
+				ChatMute.mutePlayer({ displayName = displayName })
 			end,
-			unmuteGlobalDisplayName = function(s4: string) -- line: 25
-				-- upvalues: ChatMute (copy)
-				ChatMute.unmutePlayer({
-					displayName = s4
-				})
+			unmuteGlobalDisplayName = function(displayName: string)
+				ChatMute.unmutePlayer({ displayName = displayName })
 			end,
 			isUsernameMuted = ChatMute.isUsernameMuted,
 			isDisplayNameMuted = ChatMute.isDisplayNameMuted,
-			muteGlobalUserId = function(p1) -- line: 30
-				-- upvalues: ChatMute (copy)
-				ChatMute.mutePlayer({
-					userId = tostring(p1)
-				})
+			muteGlobalUserId = function(p)
+				ChatMute.mutePlayer({ userId = tostring(p) })
 			end,
-			unmuteGlobalUserId = function(p2) -- line: 33
-				-- upvalues: ChatMute (copy)
-				ChatMute.unmutePlayer({
-					userId = tostring(p2)
-				})
+			unmuteGlobalUserId = function(p)
+				ChatMute.unmutePlayer({ userId = tostring(p) })
 			end,
 			isUserIdMuted = ChatMute.isUserIdMuted
 		}
@@ -55,5 +38,4 @@ if require(ExpChat.Flags.FFlagExpChatUseChatMuteStore) then
 end
 
 local createGlobalMutedUsersStore = require(script.createGlobalMutedUsersStore)
-
 return Signals.createComputed(createGlobalMutedUsersStore)

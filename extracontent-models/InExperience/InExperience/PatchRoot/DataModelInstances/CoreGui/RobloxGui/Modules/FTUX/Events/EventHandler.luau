@@ -1,32 +1,33 @@
-local ParentParent = script.Parent.Parent
-local PlatformEnum = require(ParentParent.Enums.PlatformEnum)
-local VRFTUXEventHandler = require(ParentParent.Events.VR.VRFTUXEventHandler)
-local Events = require(ParentParent.Events.Events)
-local t1 = {
-	[PlatformEnum.QuestVR] = VRFTUXEventHandler
-}
+local parent = script.Parent.Parent
+local PlatformEnum = require(parent.Enums.PlatformEnum)
+local VRFTUXEventHandler = require(parent.Events.VR.VRFTUXEventHandler)
+local Events = require(parent.Events.Events)
 
-return {
-	StartEvents = function(p1, n1: number, p2: ((...any) -> ...any)) -- line: 14
-		-- upvalues: t1 (copy), Events (copy)
-		local v9 = t1[p1]
-		local v10 = Events[p1][n1]
+local VRFTUXEventHandlersByQuestVR = { [PlatformEnum.QuestVR] = VRFTUXEventHandler }
+local EventHandler = {}
 
-		if v10 then
-			for _, v in pairs(v10) do
-				v9.StartEvent(v, p2)
-			end
-		end
-	end,
-	StopEvents = function(p3, n2: number) -- line: 25
-		-- upvalues: t1 (copy), Events (copy)
-		local v15 = t1[p3]
-		local v16 = Events[p3][n2]
+function EventHandler.StartEvents(p, p2: number, callback)
+	local v = VRFTUXEventHandlersByQuestVR[p]
 
-		if v16 then
-			for _, v in pairs(v16) do
-				v15.StopEvent(v)
-			end
+	local v2 = Events[p][p2]
+
+	if v2 then
+		for _, v3 in pairs(v2) do
+			v.StartEvent(v3, callback)
 		end
 	end
-}
+end
+
+function EventHandler.StopEvents(p, p2: number)
+	local v = VRFTUXEventHandlersByQuestVR[p]
+
+	local v2 = Events[p][p2]
+
+	if v2 then
+		for _, v3 in pairs(v2) do
+			v.StopEvent(v3)
+		end
+	end
+end
+
+return EventHandler

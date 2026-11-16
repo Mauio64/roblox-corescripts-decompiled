@@ -1,36 +1,32 @@
 local CoreGui = game:GetService("CoreGui")
+
 local SystemScrim = script:FindFirstAncestor("SystemScrim")
-local SystemScrimParent = SystemScrim.Parent
-local React = require(SystemScrimParent.React)
-local ReactRoblox = require(SystemScrimParent.ReactRoblox)
+local parent = SystemScrim.Parent
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+
 local SystemScrim2 = require(SystemScrim.SystemScrim)
 local SystemScrimSignalStore = require(SystemScrim["data-model"].SystemScrimSignalStore)
 
-local function renderSystemScrim() -- line: 13
-	-- upvalues: SystemScrimSignalStore (copy), CoreGui (copy), React (copy), SystemScrim2 (copy), ReactRoblox (copy)
-	local v9 = SystemScrimSignalStore(false)
-	local ScreenGui = Instance.new("ScreenGui")
+local function renderSystemScrim()
+	local store = SystemScrimSignalStore(false)
 
-	ScreenGui.Name = "SystemScrim"
-	ScreenGui.DisplayOrder = -2147483648
-	ScreenGui.IgnoreGuiInset = true
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	ScreenGui.ClipToDeviceSafeArea = false
-	ScreenGui.ScreenInsets = Enum.ScreenInsets.None
-	ScreenGui.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
-	ScreenGui.Parent = CoreGui
+	local systemScrim = Instance.new("ScreenGui")
+	systemScrim.Name = "SystemScrim"
+	systemScrim.DisplayOrder = -2147483648
+	systemScrim.IgnoreGuiInset = true
+	systemScrim.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	systemScrim.ClipToDeviceSafeArea = false
+	systemScrim.ScreenInsets = Enum.ScreenInsets.None
+	systemScrim.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
+	systemScrim.Parent = CoreGui
 
-	local v11 = React.createElement(SystemScrim2, {
-		store = v9
-	})
-	local v12 = ReactRoblox.createRoot(ScreenGui)
+	local element = React.createElement(SystemScrim2, { store = store })
 
-	v12:render(v11)
+	local root = ReactRoblox.createRoot(systemScrim)
+	root:render(element)
 
-	return {
-		root = v12,
-		store = v9
-	}
+	return { root = root, store = store }
 end
 
 return renderSystemScrim

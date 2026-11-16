@@ -1,23 +1,23 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-require(ParentParent.util.Types)
+local getFIntUGCValidationDynamicHeadMinimumQualityPercent = require(parent.flags.getFIntUGCValidationDynamicHeadMinimumQualityPercent)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFIntUGCValidationDynamicHeadMinimumQualityPercent = require(ParentParent.flags.getFIntUGCValidationDynamicHeadMinimumQualityPercent)
-local getFFlagUGCValidationAddGeometryToExports = require(ParentParent.flags.getFFlagUGCValidationAddGeometryToExports)
-local getFFlagUGCValidateAQScoreWarnings = require(ParentParent.flags.getFFlagUGCValidateAQScoreWarnings)
-local t1 = {
+local getFFlagUGCValidateAQScoreWarnings = require(parent.flags.getFFlagUGCValidateAQScoreWarnings)
+
+local MeasureDynamicHead = {
 	categories = { ValidationEnums.UploadCategory.DYNAMIC_HEAD },
-	fflag = require(ParentParent.flags.getFFlagUGCValidateIsDynamicHead),
-	shadowFlag = require(ParentParent.flags.getFFlagUGCValidationShadowIsDynamicHead),
+	["shadowFlag"] = require(parent.flags.getFFlagUGCValidationShadowIsDynamicHead),
 	knownAqsUserErrors = {
 		INVALID_LANDMARKS = ErrorSourceStrings.Keys.DynamicHeadCageMisaligned,
 		NO_FACS = ErrorSourceStrings.Keys.DynamicHeadNOFACS,
 		MISSING_CAGE_INFO = ErrorSourceStrings.Keys.DynamicHeadMISSINGCAGE
 	}
 }
-local t2 = {
+
+local v = {
 	left_eye_close = ErrorSourceStrings.Keys.DynamicHeadLeftEyeNotClose,
 	right_eye_close = ErrorSourceStrings.Keys.DynamicHeadRightEyeNotClose,
 	mouth_open = ErrorSourceStrings.Keys.DynamicHeadMouthNotOpen,
@@ -25,27 +25,31 @@ local t2 = {
 	is_sad = ErrorSourceStrings.Keys.DynamicHeadSadNotShown
 }
 
-function t1.run(p1, p2) -- line: 31
-	-- upvalues: getFFlagUGCValidationAddGeometryToExports (copy), t2 (copy), getFIntUGCValidationDynamicHeadMinimumQualityPercent (copy), getFFlagUGCValidateAQScoreWarnings (copy), ErrorSourceStrings (copy)
-	local v11 = if not getFFlagUGCValidationAddGeometryToExports() then p2.aqsSummaryData.Measure_Dynamic_Head.Head else p2.aqsSummaryData.Measure_Dynamic_Head.Head or p2.aqsSummaryData.Measure_Dynamic_Head.Head_Geo
+function MeasureDynamicHead.run(object, p)
+	local head = p.aqsSummaryData.Measure_Dynamic_Head.Head or p.aqsSummaryData.Measure_Dynamic_Head.Head_Geo
 
-	if v11 == nil then
+	if head == nil then
 		error("Measure_Dynamic_Head: AQS summary missing required fields")
-
 		return
 	end
 
-	for v12, v13 in t2 do
-		if v11[v12] ~= nil and tonumber(v11[v12]) <= getFIntUGCValidationDynamicHeadMinimumQualityPercent() / 100 then
-			p1:fail(v13)
+	for k, v2 in v do
+		if not (head[k] ~= nil and tonumber(head[k]) <= getFIntUGCValidationDynamicHeadMinimumQualityPercent() / 100) then
+			continue
 		end
+
+		object:fail(v2)
 	end
 
-	if getFFlagUGCValidateAQScoreWarnings() and v11.score ~= nil and tonumber(v11.score) ~= 100 then
-		p1:warn(ErrorSourceStrings.Keys.AQSWarn_DynamicHead, {
-			score = tostring((math.floor(tonumber(v11.score) or 0)))
+	if getFFlagUGCValidateAQScoreWarnings() and head.score ~= nil and tonumber(head.score) ~= 100 then
+		object:warn(ErrorSourceStrings.Keys.AQSWarn_DynamicHead, {
+			left_eye_close = string.format("%.2f", tonumber(head.left_eye_close) or 0),
+			right_eye_close = string.format("%.2f", tonumber(head.right_eye_close) or 0),
+			mouth_open = string.format("%.2f", tonumber(head.mouth_open) or 0),
+			is_happy = string.format("%.2f", tonumber(head.is_happy) or 0),
+			is_sad = string.format("%.2f", tonumber(head.is_sad) or 0)
 		})
 	end
 end
 
-return t1
+return MeasureDynamicHead

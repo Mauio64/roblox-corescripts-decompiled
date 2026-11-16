@@ -3,8 +3,10 @@ local Enums = require(script.Parent.Enums)
 local VPCErrorCategoriesEnum = Enums.VPCErrorCategoriesEnum
 local VPCRetryBehaviorEnum = Enums.VPCRetryBehaviorEnum
 local VPCErrorCodesEnum = Enums.VPCErrorCodesEnum
-local vpcErrorCategoryToMessageStrings = require(AmpUpsell.Common.LocalizationStrings).vpcErrorCategoryToMessageStrings
-local t1 = {
+local LocalizationStrings = require(AmpUpsell.Common.LocalizationStrings)
+local vpcErrorCategoryToMessageStrings = LocalizationStrings.vpcErrorCategoryToMessageStrings
+
+local v = {
 	[VPCErrorCodesEnum.InvalidEmailAddress] = VPCErrorCategoriesEnum.InvalidEmail,
 	[VPCErrorCodesEnum.EmailNotUnique] = VPCErrorCategoriesEnum.InvalidEmail,
 	[VPCErrorCodesEnum.LinkingIneligible] = VPCErrorCategoriesEnum.InvalidEmail,
@@ -31,7 +33,8 @@ local t1 = {
 	[VPCErrorCodesEnum.UnsupportedRequestType] = VPCErrorCategoriesEnum.GenericError,
 	[VPCErrorCodesEnum.ChildIneligibleForConsent] = VPCErrorCategoriesEnum.GenericError
 }
-local t2 = {
+
+local v2 = {
 	[VPCErrorCategoriesEnum.InternalVPCError] = VPCRetryBehaviorEnum.RetryVPC,
 	[VPCErrorCategoriesEnum.InvalidEmail] = VPCRetryBehaviorEnum.RetryVPC,
 	[VPCErrorCategoriesEnum.Flooded] = VPCRetryBehaviorEnum.NoRetry,
@@ -43,36 +46,36 @@ local t2 = {
 	[VPCErrorCategoriesEnum.GenericError] = VPCRetryBehaviorEnum.NoRetry,
 	[VPCErrorCategoriesEnum.ConflictingPendingConsent] = VPCRetryBehaviorEnum.NoRetry
 }
+local VPCErrorUtils = {}
 
-return {
-	getStringsFromErrorCodeAndRetryNum = function(s1: string, n1: number) -- line: 69
-		-- upvalues: VPCErrorCodesEnum (copy), t1 (copy), VPCErrorCategoriesEnum (copy), vpcErrorCategoryToMessageStrings (copy)
-		if n1 >= 4 then
-			s1 = VPCErrorCodesEnum.SenderFlooded
-		end
+function VPCErrorUtils.getStringsFromErrorCodeAndRetryNum(p: string, p2: number)
+	if p2 >= 4 then
+		p = VPCErrorCodesEnum.SenderFlooded
+	end
 
-		local v14 = t1[s1]
+	local v3 = v[p]
 
-		if v14 == nil then
-			v14 = VPCErrorCategoriesEnum.GenericError
-		end
+	if v3 == nil then
+		v3 = VPCErrorCategoriesEnum.GenericError
+	end
 
-		return vpcErrorCategoryToMessageStrings[v14]
-	end,
-	getRetryBehaviorFromErrorCodeAndRetryNum = function(s2: string, n2: number) -- line: 55
-		-- upvalues: VPCErrorCodesEnum (copy), t1 (copy), VPCErrorCategoriesEnum (copy), t2 (copy)
-		if n2 >= 4 then
-			s2 = VPCErrorCodesEnum.SenderFlooded
-		end
+	return vpcErrorCategoryToMessageStrings[v3]
+end
 
-		local v11 = t1[s2]
+function VPCErrorUtils.getRetryBehaviorFromErrorCodeAndRetryNum(p: string, p2: number)
+	if p2 >= 4 then
+		p = VPCErrorCodesEnum.SenderFlooded
+	end
 
-		if v11 == nil then
-			v11 = VPCErrorCategoriesEnum.GenericError
-		end
+	local v3 = v[p]
 
-		return t2[v11]
-	end,
-	VPCErrorCategoriesEnum = VPCErrorCategoriesEnum,
-	VPCRetryBehaviorEnum = VPCRetryBehaviorEnum
-}
+	if v3 == nil then
+		v3 = VPCErrorCategoriesEnum.GenericError
+	end
+
+	return v2[v3]
+end
+
+VPCErrorUtils.VPCErrorCategoriesEnum = VPCErrorCategoriesEnum
+VPCErrorUtils.VPCRetryBehaviorEnum = VPCRetryBehaviorEnum
+return VPCErrorUtils

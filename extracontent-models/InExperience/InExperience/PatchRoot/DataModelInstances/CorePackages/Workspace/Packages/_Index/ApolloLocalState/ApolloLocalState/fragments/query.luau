@@ -1,95 +1,67 @@
 return {
-	kind = "Document",
-	definitions = {{
-		kind = "FragmentDefinition",
-		selectionSet = {
-			kind = "SelectionSet",
-			selections = {
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "id",
-						kind = "Name"
+	definitions = {
+		{
+			selectionSet = {
+				kind = "SelectionSet",
+				selections = {
+					{
+						arguments = {},
+						name = { value = "id", kind = "Name" },
+						kind = "Field",
+						directives = {}
 					},
-					directives = {}
-				},
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "userPresenceType",
-						kind = "Name"
+					{
+						arguments = {},
+						name = { value = "userPresenceType", kind = "Name" },
+						kind = "Field",
+						directives = {}
 					},
-					directives = {}
-				},
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "lastLocation",
-						kind = "Name"
+					{
+						arguments = {},
+						name = { value = "lastLocation", kind = "Name" },
+						kind = "Field",
+						directives = {}
 					},
-					directives = {}
-				},
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "lastOnline",
-						kind = "Name"
+					{
+						arguments = {},
+						name = { value = "lastOnline", kind = "Name" },
+						kind = "Field",
+						directives = {}
 					},
-					directives = {}
-				},
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "placeId",
-						kind = "Name"
+					{
+						arguments = {},
+						name = { value = "placeId", kind = "Name" },
+						kind = "Field",
+						directives = {}
 					},
-					directives = {}
-				},
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "rootPlaceId",
-						kind = "Name"
+					{
+						arguments = {},
+						name = { value = "rootPlaceId", kind = "Name" },
+						kind = "Field",
+						directives = {}
 					},
-					directives = {}
-				},
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "gameId",
-						kind = "Name"
+					{
+						arguments = {},
+						name = { value = "gameId", kind = "Name" },
+						kind = "Field",
+						directives = {}
 					},
-					directives = {}
-				},
-				{
-					kind = "Field",
-					arguments = {},
-					name = {
-						value = "universeId",
-						kind = "Name"
-					},
-					directives = {}
+					{
+						arguments = {},
+						name = { value = "universeId", kind = "Name" },
+						kind = "Field",
+						directives = {}
+					}
 				}
-			}
-		},
-		directives = {},
-		name = {
-			value = "UserPresenceAllFields",
-			kind = "Name"
-		},
-		typeCondition = {
-			kind = "NamedType",
-			name = {
-				value = "UserPresence",
-				kind = "Name"
+			},
+			directives = {},
+			name = { value = "UserPresenceAllFields", kind = "Name" },
+			kind = "FragmentDefinition",
+			typeCondition = {
+				kind = "NamedType",
+				name = { value = "UserPresence", kind = "Name" }
 			}
 		}
-	}}
+	},
+	kind = "Document"
 }

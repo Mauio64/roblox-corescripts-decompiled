@@ -1,341 +1,728 @@
 local GameJoinCard = script:FindFirstAncestor("GameJoinCard")
-local GameJoinCardParent = GameJoinCard.Parent
+local parent = GameJoinCard.Parent
 local HttpService = game:GetService("HttpService")
-local React = require(GameJoinCardParent.React)
-local Foundation = require(GameJoinCardParent.Foundation)
-local Responsive = require(GameJoinCardParent.Responsive)
-local GameDetail = require(GameJoinCardParent.GameDetail)
-
-require(GameJoinCardParent.SocialCommon)
-
-local DiscoveryAnalytics = require(GameJoinCardParent.DiscoveryAnalytics)
-local SocialExperienceJoin = require(GameJoinCardParent.SocialExperienceJoin)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Responsive = require(parent.Responsive)
+local GameDetail = require(parent.GameDetail)
+local DataHydration = require(parent.DataHydration)
+local UserCtaCommon = require(parent.UserCtaCommon)
+local UserCtaAction = UserCtaCommon.Enums.UserCtaAction
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local SocialCommon = require(parent.SocialCommon)
+local ChatEntryPointNames = SocialCommon.Enums.ChatEntryPointNames
+local EnteredChatFromEntryPoint = SocialCommon.Actions.EnteredChatFromEntryPoint
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local SocialExperienceJoin = require(parent.SocialExperienceJoin)
 local gamePlayIntent = DiscoveryAnalytics.Events.gamePlayIntent
 local gameDetailReferral = DiscoveryAnalytics.Events.gameDetailReferral
 local PeopleListInHomePage = DiscoveryAnalytics.Constants.Context.PeopleListInHomePage
-local RobloxAppEnums = require(GameJoinCardParent.RobloxAppEnums)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
 local AppPage = RobloxAppEnums.AppPage
 local NotificationType = RobloxAppEnums.NotificationType
-local RoactServiceTags = require(GameJoinCardParent.RoactServiceTags)
+
+local RoactServiceTags = require(parent.RoactServiceTags)
 local AppEventIngestService = RoactServiceTags.AppEventIngestService
 local AppSessionService = RoactServiceTags.AppSessionService
 local AppGuiService = RoactServiceTags.AppGuiService
-local SetGamePlaySession = require(GameJoinCardParent.RobloxAppSessionization).SetGamePlaySession
-local SessionType = require(GameJoinCardParent.RobloxAppSessionization).SessionType
-local useRoactService = require(GameJoinCardParent.RobloxAppHooks).useRoactService
+local RobloxAppSessionization = require(parent.RobloxAppSessionization)
+local SetGamePlaySession = RobloxAppSessionization.SetGamePlaySession
+local RobloxAppSessionization2 = require(parent.RobloxAppSessionization)
+local SessionType = RobloxAppSessionization2.SessionType
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local useDeviceType = RobloxAppHooks.useDeviceType
 local ContentProvider = game:GetService("ContentProvider")
 local DesktopGameJoinCard = require(script.Parent.DesktopGameJoinCard)
 local GamepadJoinFocusBehavior = require(script.Parent.GamepadJoinFocusBehavior)
 local OpenGameDetails = GameDetail.OpenGameDetails
-local useNavigation = require(GameJoinCardParent.Navigation).useNavigation
-local useNavigationFocus = require(GameJoinCardParent.Navigation).useNavigationFocus
-local Hooks = require(GameJoinCardParent.RoactUtils).Hooks
+
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local Navigation2 = require(parent.Navigation)
+local useNavigationFocus = Navigation2.useNavigationFocus
+local RoactUtils = require(parent.RoactUtils)
+local Hooks = RoactUtils.Hooks
 local dependencyArray = Hooks.dependencyArray
 local useDispatch = Hooks.RoactRodux.useDispatch
 local getRbxThumb = Foundation.Utility.getRbxThumb
 local ThumbnailType = Foundation.Enums.ThumbnailType
 local ThumbnailSize = Foundation.Enums.ThumbnailSize
+
 local useJoinUserInExperience = SocialExperienceJoin.useJoinUserInExperience
 local usePreferredInput = Responsive.usePreferredInput
-local useAppPolicy = require(GameJoinCardParent.UniversalAppPolicy).useAppPolicy
-local FocusNavigationUtils = require(GameJoinCardParent.FocusNavigationUtils)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local useAppFocusRoot = FocusNavigationUtils.useAppFocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
-local SharedFlags = require(GameJoinCardParent.SharedFlags)
-local FFlagEnableConsoleGameJoinCard = SharedFlags.FFlagEnableConsoleGameJoinCard
-local FFlagJoinCardAgeCheckUpsell = SharedFlags.FFlagJoinCardAgeCheckUpsell
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDesktopGameJoinCardGamepadSupport = SharedFlags.FFlagDesktopGameJoinCardGamepadSupport
+local FFlagConsoleOpenGameJoinCard = SharedFlags.FFlagConsoleOpenGameJoinCard
 local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
+local FFlagEnableOnScreenAPIIntegration = SharedFlags.FFlagEnableOnScreenAPIIntegration
+local FFlagGameJoinCardAnalyticsCardId = SharedFlags.FFlagGameJoinCardAnalyticsCardId
+local FFlagJoinabilityCTARefactor = SharedFlags.FFlagJoinabilityCTARefactor
+local FFlagJoinUserCTAsIxpEnabled = SharedFlags.FFlagJoinUserCTAsIxpEnabled
+local FStringJoinUserCTAsIxpLayer = SharedFlags.FStringJoinUserCTAsIxpLayer
+local ixpServiceWrapper
+
+if FFlagJoinUserCTAsIxpEnabled then
+	local IXPServiceWrapper = require(parent.IXPServiceWrapper)
+	ixpServiceWrapper = IXPServiceWrapper.IXPServiceWrapper
+else
+	ixpServiceWrapper = nil
+end
+
+local FFlagGameJoinCardChatEntryPoint = require(GameJoinCard.Flags.FFlagGameJoinCardChatEntryPoint)
+local useIsRouteOnScreen
+
+if FFlagEnableOnScreenAPIIntegration then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	useIsRouteOnScreen = RobloxAppNavigation.useIsRouteOnScreen
+else
+	useIsRouteOnScreen = nil
+end
+
 local getPlatformFriendsService = require(GameJoinCard.Utils.getPlatformFriendsService)
+
 local AnalyticsConstants = require(script.Parent.Parent.Parent.Analytics.AnalyticsConstants)
 local GameJoinCardButtonAction = AnalyticsConstants.GameJoinCardButtonAction
+local GameJoinCardSurface = AnalyticsConstants.GameJoinCardSurface
 local viewEDPsourceValues = AnalyticsConstants.viewEDPsourceValues
 local viewProfileSourceValues = AnalyticsConstants.viewProfileSourceValues
 local useGameJoinCardAnalytics = require(script.Parent.Parent.Parent.Analytics.useGameJoinCardAnalytics)
 local useAgeCheckUpsellAnalytics = require(script.Parent.Parent.Parent.Analytics.useAgeCheckUpsellAnalytics)
 local useAgeCheckCompletionLogger = useAgeCheckUpsellAnalytics.useAgeCheckCompletionLogger
 local useAgeCheckPressLogger = useAgeCheckUpsellAnalytics.useAgeCheckPressLogger
+local Actions = require(GameJoinCard.Components.Actions)
+local containsAction = require(GameJoinCard.Components.Actions.containsAction)
+local useJoinUserActions = require(GameJoinCard.Hooks.useJoinUserActions)
+local useLogActionsResolveTime = require(GameJoinCard.Telemetry.useLogActionsResolveTime)
 
-local function DesktopGameJoinCardContainer(t1: {[any]: any}) -- line: 91
-	-- upvalues: useDispatch (copy), useNavigation (copy), useNavigationFocus (copy), React (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), ContentProvider (copy), FFlagJoinCardAgeCheckUpsell (copy), useAgeCheckCompletionLogger (copy), useJoinUserInExperience (copy), useAgeCheckPressLogger (copy), useGameJoinCardAnalytics (copy), dependencyArray (copy), usePreferredInput (copy), Responsive (copy), FFlagEnableConsoleGameJoinCard (copy), getPlatformFriendsService (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), useRoactService (copy), AppEventIngestService (copy), AppSessionService (copy), AppGuiService (copy), useAppPolicy (copy), gamePlayIntent (copy), PeopleListInHomePage (copy), HttpService (copy), SetGamePlaySession (copy), SessionType (copy), gameDetailReferral (copy), OpenGameDetails (copy), viewEDPsourceValues (copy), GameJoinCardButtonAction (copy), viewProfileSourceValues (copy), FFlagEnableSplitPane (copy), AppPage (copy), NotificationType (copy), DesktopGameJoinCard (copy), GamepadJoinFocusBehavior (copy)
-	local v56 = useDispatch()
-	local v57 = useNavigation()
-	local v58 = useNavigationFocus() ~= false
-	local layoutOrder = t1.layoutOrder
-	local playerName = t1.playerName
-	local platformName = t1.platformName
-	local presence = t1.presence
-	local str = tostring(presence.universeId)
-	local lastLocation = presence.lastLocation
-	local v65 = React.useMemo(function() -- line: 101
-		-- upvalues: getRbxThumb (copy), ThumbnailType (copy), str (copy), ThumbnailSize (copy)
-		return getRbxThumb(ThumbnailType.GameIcon, str, ThumbnailSize.Small)
-	end, { str })
-	local v66, v67 = React.useState(Enum.AssetFetchStatus.None)
+local DataStatus = DataHydration.DataStatus
 
-	React.useEffect(function() -- line: 105
-		-- upvalues: v67 (copy), ContentProvider (copy), v65 (copy)
-		v67(ContentProvider:GetAssetFetchStatus(v65))
-	end, { v65 })
-	React.useEffect(function() -- line: 108
-		-- upvalues: ContentProvider (copy), v65 (copy), v67 (copy)
-		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(v65):Connect(v67)
+local function DesktopGameJoinCardContainer(props)
+	local dispatch = useDispatch()
+	local navigation = useNavigation()
+	local v
 
-		return function() -- line: 111
-			-- upvalues: connection (copy)
-			connection:Disconnect()
-		end
-	end, { v65 })
-
-	local v68 = if not FFlagJoinCardAgeCheckUpsell then nil else useAgeCheckCompletionLogger(str)
-	local v69 = useJoinUserInExperience(t1.userId, {
-		isHomePageCarousel = true,
-		homepageCarouselAbsolutePosition = t1.homepageCarouselAbsolutePosition,
-		presence = t1.presence,
-		onAgeCheckCompletion = v68
-	})
-	local v70 = if not FFlagJoinCardAgeCheckUpsell then nil else useAgeCheckPressLogger({
-		userId = t1.userId,
-		universeId = str,
-		absolutePosition = t1.homepageCarouselAbsolutePosition,
-		joinAgeCheckUpsellFlow = v69.joinAgeCheckUpsellFlow
-	})
-	local v71 = FFlagJoinCardAgeCheckUpsell and v69.ageCheckRequired == true
-	local v72 = React.useRef(false)
-
-	React.useEffect(function() -- line: 138
-		-- upvalues: t1 (copy), v58 (copy), v72 (copy), useGameJoinCardAnalytics (copy)
-		local v92 = t1.isOpen == true and v58
-
-		if v92 and not v72.current then
-			local universeId = t1.presence.universeId
-
-			useGameJoinCardAnalytics.logGameJoinCardPageLoaded({
-				friendId = t1.userId,
-				universeId = if universeId == nil or tostring(universeId) == "" then nil else tostring(universeId),
-				absolutePosition = t1.homepageCarouselAbsolutePosition
-			})
-		end
-
-		v72.current = v92
-	end, dependencyArray(t1.isOpen, v58, t1.userId, t1.presence, t1.homepageCarouselAbsolutePosition))
-	React.useEffect(function() -- line: 162
-		-- upvalues: t1 (copy), v58 (copy)
-		if t1.isOpen and not v58 then
-			t1.onClose()
-		end
-	end, dependencyArray(v58, t1))
-	React.useEffect(function() -- line: 169
-		-- upvalues: t1 (copy), v58 (copy), v71 (copy), useGameJoinCardAnalytics (copy), str (copy)
-		if not t1.isOpen or not v58 or not v71 then
-			return
-		end
-
-		useGameJoinCardAnalytics.logJoinCardAgeCheckUpsellImpression({
-			universeId = if str == "" then nil else str
-		})
-	end, dependencyArray(t1.isOpen, v58, v71, str))
-
-	local v73 = str == "" or (lastLocation == nil or (lastLocation == "" or v66 == Enum.AssetFetchStatus.Loading))
-	local v74 = usePreferredInput() == Responsive.Input.Directional
-	local v75 = nil
-
-	if FFlagEnableConsoleGameJoinCard then
-		local platformProfileId = t1.platformProfileId
-
-		v75 = React.useCallback(function() -- line: 190
-			-- upvalues: getPlatformFriendsService (copy), platformProfileId (copy)
-			if getPlatformFriendsService == nil or (platformProfileId == nil or platformProfileId == "") then
-				return
-			end
-
-			getPlatformFriendsService:ShowProfile(platformProfileId)
-		end, { platformProfileId })
+	if FFlagEnableOnScreenAPIIntegration then
+		v = useIsRouteOnScreen()
+	else
+		v = useNavigationFocus() ~= false
 	end
 
-	local v77 = if not FFlagEnableConsoleGameJoinCard then nil else useAppFocusRoot({
-		isAutoFocusRoot = false,
-		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
-		isFocusable = t1.isFocused == true and v58
+	local state, setState
+
+	if FFlagGameJoinCardAnalyticsCardId then
+		state, setState = React.useState(nil)
+	else
+		state = nil
+		setState = nil
+	end
+
+	local layoutOrder = props.layoutOrder
+	local playerName = props.playerName
+	local platformName = props.platformName
+	local presence = props.presence
+	local universeId = tostring(presence.universeId)
+	local lastLocation = presence.lastLocation
+	local gameIconUrl = React.useMemo(function()
+		return getRbxThumb(ThumbnailType.GameIcon, universeId, ThumbnailSize.Small)
+	end, { universeId })
+	local state2, setState2 = React.useState(Enum.AssetFetchStatus.None)
+	React.useEffect(function()
+		setState2(ContentProvider:GetAssetFetchStatus(gameIconUrl))
+	end, { gameIconUrl })
+	React.useEffect(function()
+		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(gameIconUrl):Connect(setState2)
+		return function()
+			connection:Disconnect()
+		end
+	end, { gameIconUrl })
+
+	local onAgeCheckCompletion = useAgeCheckCompletionLogger(universeId)
+	local v2 = useJoinUserInExperience(props.userId, {
+		isHomePageCarousel = true,
+		homepageCarouselAbsolutePosition = props.homepageCarouselAbsolutePosition,
+		presence = props.presence,
+		onAgeCheckCompletion = onAgeCheckCompletion
 	})
-	local v78 = React.useRef(nil)
-	local v79 = React.useCallback(function(p1) -- line: 208
-		-- upvalues: FFlagEnableConsoleGameJoinCard (copy), v78 (copy), v77 (copy), t1 (copy)
-		if not FFlagEnableConsoleGameJoinCard then
+
+	local v3 = {
+		userId = props.userId,
+		universeId = universeId,
+		absolutePosition = props.homepageCarouselAbsolutePosition,
+		joinGameCardId = 0,
+		joinAgeCheckUpsellFlow = 0
+	}
+	local joinGameCardId
+
+	if FFlagGameJoinCardAnalyticsCardId then
+		joinGameCardId = state
+	end
+
+	v3.joinGameCardId = joinGameCardId
+	v3.joinAgeCheckUpsellFlow = v2.joinAgeCheckUpsellFlow
+	local onAgeCheckPressed = useAgeCheckPressLogger(v3)
+	local v4, v5, localized
+
+	if FFlagJoinabilityCTARefactor then
+		local formatted = `{tostring(presence.userPresenceType)}:{tostring(presence.universeId)}:{tostring(presence.placeId)}:{tostring(presence.rootPlaceId)}:{tostring(v2.ageCheckRequired)}`
+
+		local userId = props.userId
+		local v6 = props.isOpen == true and v
+		v4, v5 = useJoinUserActions(userId, v6, formatted)
+		localized = useLocalization(Actions.TextKeys)
+	end
+
+	local v6
+
+	if FFlagJoinabilityCTARefactor then
+		v6 = v5
+	end
+
+	useLogActionsResolveTime(v6, props.isOpen == true and v, GameJoinCardSurface.Desktop)
+	local v7
+
+	if FFlagJoinabilityCTARefactor then
+		if v5 == DataStatus.Ready then
+			v7 = containsAction(v4, UserCtaAction.UnlockExperience)
+		else
+			v7 = false
+		end
+	else
+		v7 = v2.ageCheckRequired == true
+	end
+
+	local ref = React.useRef(false)
+	React.useEffect(function()
+		local current = props.isOpen == true and v
+
+		if current and not ref.current then
+			local joinGameCardId2
+
+			if FFlagGameJoinCardAnalyticsCardId then
+				joinGameCardId2 = HttpService:GenerateGUID(false)
+			end
+
+			if FFlagGameJoinCardAnalyticsCardId then
+				setState(joinGameCardId2)
+			end
+
+			if FFlagJoinUserCTAsIxpEnabled then
+				ixpServiceWrapper:LogFlagLinkedUserLayerExposure(FStringJoinUserCTAsIxpLayer)
+			end
+
+			local universeId2 = props.presence.universeId
+			local logGameJoinCardPageLoaded = useGameJoinCardAnalytics.logGameJoinCardPageLoaded
+			local v8 = {
+				friendId = props.userId,
+				universeId = 0,
+				absolutePosition = 0,
+				joinGameCardId = 0
+			}
+			local universeId3
+
+			if not (universeId2 == nil or tostring(universeId2) == "") then
+				universeId3 = tostring(universeId2)
+			end
+
+			v8.universeId = universeId3
+
+			v8.absolutePosition = props.homepageCarouselAbsolutePosition
+
+			if not FFlagGameJoinCardAnalyticsCardId then
+				joinGameCardId2 = nil
+			end
+
+			v8.joinGameCardId = joinGameCardId2
+			logGameJoinCardPageLoaded(v8)
+		end
+
+		ref.current = current
+	end, dependencyArray(props.isOpen, v, props.userId, props.presence, props.homepageCarouselAbsolutePosition))
+
+	React.useEffect(function()
+		if props.isOpen and not v then
+			props.onClose()
+		end
+	end, dependencyArray(v, props))
+
+	React.useEffect(function()
+		if not (props.isOpen and v and v7) then
 			return
 		end
 
-		v78.current = p1
+		local logJoinCardAgeCheckUpsellImpression = useGameJoinCardAnalytics.logJoinCardAgeCheckUpsellImpression
+		local universeId2
 
-		if v77 then
-			v77(p1)
+		if universeId ~= "" then
+			universeId2 = universeId
 		end
 
-		if t1.onCardGuiObjectChanged then
-			t1.onCardGuiObjectChanged(p1)
+		logJoinCardAgeCheckUpsellImpression({ universeId = universeId2 })
+	end, dependencyArray(props.isOpen, v, v7, universeId))
+
+	local isLoading = universeId == ""
+		or lastLocation == nil
+		or lastLocation == ""
+		or state2 == Enum.AssetFetchStatus.Loading
+
+	local v8 = usePreferredInput()
+	local v9
+
+	if FFlagDesktopGameJoinCardGamepadSupport then
+		v9 = useDeviceType()
+	end
+
+	local isConsole
+
+	if v8 == Responsive.Input.Directional then
+		isConsole = not FFlagDesktopGameJoinCardGamepadSupport or v9 ~= RobloxAppEnums.DeviceType.Desktop
+	else
+		isConsole = false
+	end
+
+	if props.isConsole ~= nil then
+		isConsole = props.isConsole
+	end
+
+	local platformProfileId = props.platformProfileId
+	local onPlatformProfilePressed = React.useCallback(function()
+		if getPlatformFriendsService == nil or platformProfileId == nil or platformProfileId == "" then
+			return
 		end
-	end, {
-		v77,
-		t1.onCardGuiObjectChanged
+
+		getPlatformFriendsService:ShowProfile(platformProfileId)
+	end, { platformProfileId })
+
+	local v10 = useAppFocusRoot({
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+		isAutoFocusRoot = false,
+		isFocusable = props.isFocused == true and v
 	})
-	local v80 = useRoactService(AppEventIngestService)
-	local v81 = useRoactService(AppSessionService)
-	local v82 = useRoactService(AppGuiService)
-	local v83 = useAppPolicy(function(p2) -- line: 225
-		return p2.getCanUsePlatformChat()
+
+	local ref2 = React.useRef(nil)
+	local v11 = ((not FFlagDesktopGameJoinCardGamepadSupport or isConsole) and true or false)
+		and not (FFlagConsoleOpenGameJoinCard and isConsole)
+	local focusRootRef = React.useCallback(function(current)
+		ref2.current = current
+
+		if v10 and v11 then
+			v10(current)
+		end
+
+		if props.onCardGuiObjectChanged then
+			props.onCardGuiObjectChanged(current)
+		end
+	end, { v10, props.onCardGuiObjectChanged, v11 })
+
+	local eventIngest = useRoactService(AppEventIngestService)
+	local v12 = useRoactService(AppSessionService)
+	local guiService = useRoactService(AppGuiService)
+
+	local v13 = useAppPolicy(function(p)
+		return p.getCanUsePlatformChat()
 	end)
-	local v84 = React.useCallback(function() -- line: 229
-		-- upvalues: t1 (copy), presence (copy), gamePlayIntent (copy), v80 (copy), PeopleListInHomePage (copy), HttpService (copy)
-		local userId = t1.userId
+	local areActionsLoading, joinCardActions
+
+	if FFlagJoinabilityCTARefactor then
+		areActionsLoading = v5 == DataStatus.NotReady
+		joinCardActions = {}
+
+		if v5 == DataStatus.Ready and localized ~= nil then
+			local resolveJoinCardActions = Actions.resolveJoinCardActions
+			local v14 = {
+				localized = localized,
+				userId = props.userId,
+				telemetry = 0,
+				presence = 0,
+				experience = 0,
+				eventIngest = 0,
+				dispatch = 0,
+				guiService = 0,
+				navigation = 0,
+				joinAgeCheckUpsellFlow = 0
+			}
+			local universeId2
+
+			if universeId ~= "" then
+				universeId2 = universeId
+			end
+
+			local telemetry = {
+				universeId = universeId2,
+				absolutePosition = props.homepageCarouselAbsolutePosition,
+				joinGameCardId = 0
+			}
+			local joinGameCardId2
+
+			if FFlagGameJoinCardAnalyticsCardId then
+				joinGameCardId2 = state
+			end
+
+			telemetry.joinGameCardId = joinGameCardId2
+			v14.telemetry = telemetry
+			local placeId
+
+			if presence.placeId ~= nil then
+				placeId = tostring(presence.placeId)
+			end
+
+			local rootPlaceId
+
+			if presence.rootPlaceId ~= nil then
+				rootPlaceId = tostring(presence.rootPlaceId)
+			end
+
+			v14.presence = { placeId = placeId, rootPlaceId = rootPlaceId }
+
+			v14.experience = {
+				isLoading = isLoading,
+				isInExperience = v2.isInExperience,
+				joinExperience = v2.joinExperience,
+				playExperience = v2.playExperience
+			}
+
+			v14.eventIngest = eventIngest
+			v14.dispatch = dispatch
+			v14.guiService = guiService
+			v14.navigation = navigation
+			v14.joinAgeCheckUpsellFlow = v2.joinAgeCheckUpsellFlow
+			local joinCardActions2 = resolveJoinCardActions(v4, v14)
+
+			for _, joinCardAction in joinCardActions2 do
+				if joinCardAction.id ~= UserCtaAction.Chat or v13 then
+					table.insert(joinCardActions, joinCardAction)
+				end
+			end
+		end
+	else
+		areActionsLoading = false
+	end
+
+	local v14 = React.useCallback(function()
+		local userId = props.userId
 
 		if userId == "" then
 			return
 		end
 
-		local v97 = (presence.placeId == nil or tostring(presence.placeId) == "") and "" or tostring(presence.placeId)
-		local num = tonumber(presence.rootPlaceId)
+		local placeId = (presence.placeId == nil or tostring(presence.placeId) == "") and ""
+			or tostring(presence.placeId)
 
-		if v97 == "" or num == nil then
+		local rootPlaceId = tonumber(presence.rootPlaceId)
+
+		if placeId == "" or rootPlaceId == nil then
 			return
 		end
 
-		gamePlayIntent(v80, PeopleListInHomePage, {
-			placeId = v97,
-			rootPlaceId = num,
+		gamePlayIntent(eventIngest, PeopleListInHomePage, {
+			placeId = placeId,
+			rootPlaceId = rootPlaceId,
 			friendId = userId,
 			joinAttemptId = HttpService:GenerateGUID(false)
 		})
-	end, dependencyArray(t1.userId, presence))
-	local v85 = React.useCallback(function() -- line: 250
-		-- upvalues: str (copy), presence (copy), t1 (copy), v81 (copy), SetGamePlaySession (copy), SessionType (copy), gameDetailReferral (copy), v80 (copy), v56 (copy), OpenGameDetails (copy), v57 (copy)
-		if str == "" then
+	end, dependencyArray(props.userId, presence))
+
+	local v15 = React.useCallback(function()
+		if universeId == "" then
 			return
 		end
 
 		local rootPlaceId = presence.rootPlaceId
-		local v100 = if rootPlaceId == nil or tostring(rootPlaceId) == "" then str else tostring(rootPlaceId)
-		local v101 = t1.homepageCarouselAbsolutePosition or 0
+		local pid
 
-		if v81 then
-			SetGamePlaySession(v81, SessionType.StructuralIdentifier.GameDetailSource, false)
+		if rootPlaceId == nil or tostring(rootPlaceId) == "" then
+			pid = universeId
+		else
+			pid = tostring(rootPlaceId)
 		end
 
-		gameDetailReferral(v80, "home", {
+		local homepageCarouselAbsolutePosition = props.homepageCarouselAbsolutePosition or 0
+
+		if v12 then
+			SetGamePlaySession(v12, SessionType.StructuralIdentifier.GameDetailSource, false)
+		end
+
+		gameDetailReferral(eventIngest, "home", {
 			ad = "no",
+			friendId = props.userId,
 			pg = "home",
+			pid = pid,
+			pos = homepageCarouselAbsolutePosition,
 			rowOnPage = 1,
+			sortPos = props.layoutOrder,
 			tis = 1,
-			friendId = t1.userId,
-			pid = v100,
-			pos = v101,
-			sortPos = t1.layoutOrder,
-			universeId = str
+			universeId = universeId
 		})
-		v56(OpenGameDetails(str, v57))
-	end, dependencyArray(v56, v57, str, presence, t1.homepageCarouselAbsolutePosition, t1.layoutOrder, t1.userId))
-	local v86 = React.useCallback(function(p3) -- line: 286
-		-- upvalues: str (copy), t1 (copy), viewEDPsourceValues (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), v85 (copy)
-		if str == "" then
+
+		dispatch(OpenGameDetails(universeId, navigation))
+	end, dependencyArray(
+		dispatch,
+		navigation,
+		universeId,
+		presence,
+		props.homepageCarouselAbsolutePosition,
+		props.layoutOrder,
+		props.userId
+	))
+
+	local onViewExperienceDetails = React.useCallback(function(p)
+		if universeId == "" then
 			return
 		end
 
-		if t1.userId ~= "" then
-			local t2 = {
-				friendId = t1.userId,
-				universeId = if str == "" then nil else str,
-				absolutePosition = t1.homepageCarouselAbsolutePosition
+		if props.userId ~= "" then
+			local v16 = {
+				friendId = props.userId,
+				universeId = 0,
+				absolutePosition = 0,
+				joinGameCardId = 0
 			}
+			local universeId2
 
-			if p3 == viewEDPsourceValues.Thumbnail then
-				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.ViewExperienceDetailsFromThumbnail, t2)
-			elseif p3 == viewEDPsourceValues.Title then
-				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.ViewExperienceDetailsFromTitle, t2)
+			if universeId ~= "" then
+				universeId2 = universeId
+			end
+
+			v16.universeId = universeId2
+			v16.absolutePosition = props.homepageCarouselAbsolutePosition
+			local joinGameCardId2
+
+			if FFlagGameJoinCardAnalyticsCardId then
+				joinGameCardId2 = state
+			end
+
+			v16.joinGameCardId = joinGameCardId2
+
+			if p == viewEDPsourceValues.Thumbnail then
+				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(
+					GameJoinCardButtonAction.ViewExperienceDetailsFromThumbnail,
+					v16
+				)
+			elseif p == viewEDPsourceValues.Title then
+				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(
+					GameJoinCardButtonAction.ViewExperienceDetailsFromTitle,
+					v16
+				)
 			end
 		end
 
-		v85()
-	end, dependencyArray(v85, str, t1.userId, t1.homepageCarouselAbsolutePosition))
-	local v87 = React.useCallback(function() -- line: 312
-		-- upvalues: t1 (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), str (copy), v84 (copy), v69 (copy)
-		if t1.userId ~= "" then
-			useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.JoinGame, {
-				friendId = t1.userId,
-				universeId = if str == "" then nil else str,
-				absolutePosition = t1.homepageCarouselAbsolutePosition
-			})
+		v15()
+	end, dependencyArray(v15, universeId, props.userId, props.homepageCarouselAbsolutePosition, state))
+
+	local v16 = React.useCallback(function()
+		if props.userId ~= "" then
+			local logGameJoinCardButtonEvent = useGameJoinCardAnalytics.logGameJoinCardButtonEvent
+			local joinGame = GameJoinCardButtonAction.JoinGame
+			local v16 = {
+				friendId = props.userId,
+				universeId = 0,
+				absolutePosition = 0,
+				joinGameCardId = 0
+			}
+			local universeId2
+
+			if universeId ~= "" then
+				universeId2 = universeId
+			end
+
+			v16.universeId = universeId2
+			v16.absolutePosition = props.homepageCarouselAbsolutePosition
+			local joinGameCardId2
+
+			if FFlagGameJoinCardAnalyticsCardId then
+				joinGameCardId2 = state
+			end
+
+			v16.joinGameCardId = joinGameCardId2
+			logGameJoinCardButtonEvent(joinGame, v16)
 		end
 
-		v84()
-		v69.joinExperience()
-		t1.onClose()
-	end, dependencyArray(v84, v69.joinExperience, t1.userId, str, t1.homepageCarouselAbsolutePosition, t1.onClose))
-	local v88 = React.useCallback(function(p4) -- line: 334
-		-- upvalues: t1 (copy), str (copy), viewProfileSourceValues (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), FFlagEnableSplitPane (copy), v57 (copy), AppPage (copy)
-		if t1.userId ~= "" then
-			local t3 = {
-				friendId = t1.userId,
-				universeId = if str == "" then nil else str,
-				absolutePosition = t1.homepageCarouselAbsolutePosition
+		v14()
+		v2.joinExperience()
+		props.onClose()
+	end, dependencyArray(
+		v14,
+		v2.joinExperience,
+		props.userId,
+		universeId,
+		props.homepageCarouselAbsolutePosition,
+		props.onClose,
+		state
+	))
+
+	local onViewProfile = React.useCallback(function(p)
+		if props.userId ~= "" then
+			local v17 = {
+				friendId = props.userId,
+				universeId = 0,
+				absolutePosition = 0,
+				joinGameCardId = 0
 			}
+			local universeId2
 
-			if p4 == viewProfileSourceValues.UserTile then
-				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.OpenProfileFromUserTile, t3)
-			elseif p4 == viewProfileSourceValues.ViewProfileButton then
-				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.OpenProfileFromViewProfile, t3)
+			if universeId ~= "" then
+				universeId2 = universeId
 			end
-		end;
 
-		((if not FFlagEnableSplitPane then v57.navigate else v57.push))(AppPage.ProfilePlatform, {
-			detail = t1.userId
-		})
-		t1.onClose()
-	end, dependencyArray(v57, t1.userId, str, t1.homepageCarouselAbsolutePosition, t1.onClose))
-	local v89 = React.useCallback(function() -- line: 360
-		-- upvalues: t1 (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), str (copy), v82 (copy), NotificationType (copy)
-		if t1.userId == "" then
+			v17.universeId = universeId2
+			v17.absolutePosition = props.homepageCarouselAbsolutePosition
+			local joinGameCardId2
+
+			if FFlagGameJoinCardAnalyticsCardId then
+				joinGameCardId2 = state
+			end
+
+			v17.joinGameCardId = joinGameCardId2
+
+			if p == viewProfileSourceValues.UserTile then
+				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(
+					GameJoinCardButtonAction.OpenProfileFromUserTile,
+					v17
+				)
+			elseif p == viewProfileSourceValues.ViewProfileButton then
+				useGameJoinCardAnalytics.logGameJoinCardButtonEvent(
+					GameJoinCardButtonAction.OpenProfileFromViewProfile,
+					v17
+				)
+			end
+		end
+
+		local v17
+
+		if FFlagEnableSplitPane then
+			v17 = navigation.push
+		else
+			v17 = navigation.navigate
+		end
+
+		v17(AppPage.ProfilePlatform, { detail = props.userId })
+
+		props.onClose()
+	end, dependencyArray(
+		navigation,
+		props.userId,
+		universeId,
+		props.homepageCarouselAbsolutePosition,
+		props.onClose,
+		state
+	))
+
+	local onChat = React.useCallback(function()
+		if props.userId == "" then
 			return
 		end
 
-		useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.Chat, {
-			friendId = t1.userId,
-			universeId = if str == "" then nil else str,
-			absolutePosition = t1.homepageCarouselAbsolutePosition
-		})
-		v82:BroadcastNotification(t1.userId, NotificationType.LAUNCH_CONVERSATION)
-		t1.onClose()
-	end, dependencyArray(t1.userId, str, t1.homepageCarouselAbsolutePosition, v82, t1.onClose))
-	local v90 = React.createElement(DesktopGameJoinCard, {
+		local logGameJoinCardButtonEvent = useGameJoinCardAnalytics.logGameJoinCardButtonEvent
+		local chat = GameJoinCardButtonAction.Chat
+		local v17 = {
+			friendId = props.userId,
+			universeId = 0,
+			absolutePosition = 0,
+			joinGameCardId = 0
+		}
+		local universeId2
+
+		if universeId ~= "" then
+			universeId2 = universeId
+		end
+
+		v17.universeId = universeId2
+		v17.absolutePosition = props.homepageCarouselAbsolutePosition
+		local joinGameCardId2
+
+		if FFlagGameJoinCardAnalyticsCardId then
+			joinGameCardId2 = state
+		end
+
+		v17.joinGameCardId = joinGameCardId2
+		logGameJoinCardButtonEvent(chat, v17)
+
+		if FFlagGameJoinCardChatEntryPoint then
+			dispatch(EnteredChatFromEntryPoint(ChatEntryPointNames.GameJoinCard))
+		end
+
+		guiService:BroadcastNotification(props.userId, NotificationType.LAUNCH_CONVERSATION)
+		props.onClose()
+	end, dependencyArray(
+		props.userId,
+		universeId,
+		props.homepageCarouselAbsolutePosition,
+		guiService,
+		props.onClose,
+		state,
+		dispatch
+	))
+
+	local createElement = React.createElement
+	local v17 = {
 		layoutOrder = layoutOrder,
 		playerName = playerName,
 		experienceName = lastLocation,
-		gameIconUrl = v65,
-		isLoading = v73,
-		onJoin = v87,
-		onViewExperienceDetails = v86,
-		anchorRef = t1.anchorRef,
-		isOpen = t1.isOpen and v58,
-		onClose = t1.onClose,
-		isConsole = v74,
+		gameIconUrl = gameIconUrl,
+		isLoading = isLoading,
+		onJoin = v16,
+		onViewExperienceDetails = onViewExperienceDetails,
+		anchorRef = props.anchorRef,
+		isOpen = props.isOpen and v,
+		onClose = props.onClose,
+		isConsole = isConsole,
 		consolePlatformLabel = platformName,
-		focusRootRef = if not FFlagEnableConsoleGameJoinCard then nil else v79,
-		ageCheckRequired = if not FFlagJoinCardAgeCheckUpsell then nil else v69.ageCheckRequired,
-		onAgeCheckPressed = v70,
-		onPlatformProfilePressed = if not FFlagEnableConsoleGameJoinCard or not v74 then nil else v75,
-		onChat = if v74 or not v83 then nil else v89,
-		onViewProfile = if v74 then nil else v88
-	})
+		focusRootRef = focusRootRef,
+		ageCheckRequired = v2.ageCheckRequired,
+		onAgeCheckPressed = onAgeCheckPressed,
+		onPlatformProfilePressed = 0,
+		onChat = 0,
+		onViewProfile = 0,
+		actions = 0,
+		areActionsLoading = 0
+	}
 
-	if t1.showGamepadJoinFocus then
+	if not isConsole then
+		onPlatformProfilePressed = nil
+	end
+
+	v17.onPlatformProfilePressed = onPlatformProfilePressed
+
+	if isConsole or not v13 then
+		onChat = nil
+	end
+
+	v17.onChat = onChat
+
+	if isConsole then
+		onViewProfile = nil
+	end
+
+	v17.onViewProfile = onViewProfile
+	v17.actions = not FFlagJoinabilityCTARefactor and {} or joinCardActions
+
+	if not FFlagJoinabilityCTARefactor then
+		areActionsLoading = nil
+	end
+
+	v17.areActionsLoading = areActionsLoading
+	local element = createElement(DesktopGameJoinCard, v17)
+
+	if props.showGamepadJoinFocus then
 		return React.createElement(React.Fragment, nil, {
 			GamepadJoinFocus = React.createElement(GamepadJoinFocusBehavior, {
-				tileRef = t1.anchorRef,
-				cardRef = if not FFlagEnableConsoleGameJoinCard then nil else v78,
-				joinExperience = v87
+				tileRef = props.anchorRef,
+				cardRef = ref2,
+				joinExperience = v16
 			}),
-			Card = v90
+			Card = element
 		})
 	end
 
-	return v90
+	return element
 end
 
 return DesktopGameJoinCardContainer

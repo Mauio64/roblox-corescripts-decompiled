@@ -1,25 +1,26 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent2 = Foundation.Parent
+local React = require(parent2.React)
+
 local BreakpointConfig = require(Foundation.Utility.Responsive.BreakpointConfig)
 local GridConfig = require(Foundation.Utility.Responsive.GridConfig)
-local ResponsiveContext = require(scriptParent.ResponsiveContext)
+local ResponsiveContext = require(parent.ResponsiveContext)
+
 local withDefaults = require(Foundation.Utility.withDefaults)
-local t1 = {
-	config = {
-		breakpoint = BreakpointConfig,
-		grid = GridConfig
-	}
+
+local v = {
+	config = { breakpoint = BreakpointConfig, grid = GridConfig }
 }
 
-local function ResponsiveProvider(t2: {[any]: any}) -- line: 26
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), ResponsiveContext (copy)
-	local v12 = withDefaults(t2, t1)
+local function ResponsiveProvider(p)
+	local v2 = React.useMemo(function()
+		return {
+			config = withDefaults(p.config or {}, v.config)
+		}
+	end, { p.config })
 
-	return React.createElement(ResponsiveContext.Provider, {
-		value = v12
-	}, v12.children)
+	return React.createElement(ResponsiveContext.Provider, { value = v2 }, p.children)
 end
 
 return ResponsiveProvider

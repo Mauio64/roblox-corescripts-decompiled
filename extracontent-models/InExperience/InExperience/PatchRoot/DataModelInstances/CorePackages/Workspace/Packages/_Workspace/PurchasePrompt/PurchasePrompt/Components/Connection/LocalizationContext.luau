@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
 
-return (require(Parent.Roact).createContext(nil))
+local Roact = require(parent.Roact)
+
+return (Roact.createContext(nil))

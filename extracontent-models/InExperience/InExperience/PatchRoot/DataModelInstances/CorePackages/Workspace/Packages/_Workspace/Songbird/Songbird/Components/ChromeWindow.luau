@@ -1,215 +1,184 @@
 local Songbird = script:FindFirstAncestor("Songbird")
-local UserInputService = game:GetService("UserInputService")
+
 local constants = require(Songbird.constants)
 local Cryo = require(Songbird.Parent.Cryo)
 local Foundation = require(Songbird.Parent.Foundation)
 local React = require(Songbird.Parent.React)
 local ReactUtils = require(Songbird.Parent.ReactUtils)
 local Localization = require(Songbird.Parent.Localization)
+
 local ChromeWindowFrame = require(Songbird.Components.ChromeWindowFrame)
 local MarqueeScroller = require(Songbird.Components.MarqueeScroller)
 local MusicIcon = require(Songbird.Components.MusicIcon)
 local LikeButton = require(Songbird.Components.LikeButton)
 local TrackingAudioIcon = require(Songbird.Components.TrackingAudioIcon)
-local AnalyticActions = require(Songbird.Analytics.AnalyticActions)
-local sendChromeWindowAnalytics = require(Songbird.Analytics.sendChromeWindowAnalytics)
-local isInputInsideObject = require(Songbird.Internal.isInputInsideObject)
-local getFFlagSongbirdPopoverSubmenu = require(Songbird.Flags.getFFlagSongbirdPopoverSubmenu)
+
 local useLocalization = Localization.Hooks.useLocalization
 local createNextOrder = ReactUtils.createNextOrder
-local useEventConnection = ReactUtils.useEventConnection
 local useCallback = React.useCallback
 local useMemo = React.useMemo
-local useRef = React.useRef
-local useState = React.useState
-local _ = {
-	Loading = "Loading",
-	Unverified = "Unverified",
-	MeetsCriteria = "MeetsCriteria"
-}
-local t1 = {
-	isLoading = false,
-	maxSize = Vector2.new(300, 1e999)
-}
 
-local function ChromeWindow(t2: {[any]: any}) -- line: 64
-	-- upvalues: Cryo (copy), t1 (copy), createNextOrder (copy), useMemo (copy), useLocalization (copy), useCallback (copy), useState (copy), sendChromeWindowAnalytics (copy), AnalyticActions (copy), getFFlagSongbirdPopoverSubmenu (copy), useRef (copy), useEventConnection (copy), UserInputService (copy), isInputInsideObject (copy), Foundation (copy), React (copy), LikeButton (copy), constants (copy), ChromeWindowFrame (copy), TrackingAudioIcon (copy), MusicIcon (copy), MarqueeScroller (copy)
-	local v29 = Cryo.Dictionary.join(t1, t2)
-	local v30 = createNextOrder()
-	local v31 = useMemo(function() -- line: 68
-		-- upvalues: v29 (copy)
-		if v29.isLoading then
+local _ = { Loading = "Loading", Unverified = "Unverified", MeetsCriteria = "MeetsCriteria" }
+
+local v = { isLoading = false, maxSize = Vector2.new(300, 1e999) }
+
+local function ChromeWindow(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local nextOrder = createNextOrder()
+
+	local v2 = useMemo(function(): string
+		if joined.isLoading or not joined.song then
 			return "Loading"
 		end
 
-		if v29.song then
-			if v29.song.meetsCriteria then
-				return "MeetsCriteria"
-			end
-
-			return "Unverified"
+		if joined.song.meetsCriteria then
+			return "MeetsCriteria"
 		end
 
-		return "Loading"
-	end, {
-		v29.isLoading,
-		v29.song
-	})
-	local v32 = v31 ~= "MeetsCriteria"
-	local v33 = useLocalization({
+		return "Unverified"
+	end, { joined.isLoading, joined.song })
+	local v3 = v2 ~= "MeetsCriteria"
+	local v4 = useLocalization({
 		windowTitle = "CoreScripts.TopBar.Music",
 		musicLoading = "CoreScripts.TopBar.MusicLoading",
-		musicUnverified = "CoreScripts.TopBar.MusicNotVerified",
-		report = "CoreScripts.TopBar.Label.Report"
+		musicUnverified = "CoreScripts.TopBar.MusicNotVerified"
 	})
-	local v34 = useCallback(function() -- line: 93
-		-- upvalues: v29 (copy)
-		if v29.onToggleLike then
-			v29.onToggleLike()
+
+	local onFavorite = useCallback(function()
+		if joined.onToggleLike then
+			joined.onToggleLike()
 		end
-	end, { v29.onToggleLike })
-	local v35 = useMemo(function() -- line: 99
-		-- upvalues: v29 (copy)
-		if v29.song then
-			return table.concat(v29.song.artists, ", ")
+	end, { joined.onToggleLike })
+
+	local text2 = useMemo(function()
+		if joined.song then
+			return table.concat(joined.song.artists, ", ")
 		end
 
 		return nil
-	end, { v29.song })
-	local v36, v37 = useState(false)
-	local v38 = useCallback(function() -- line: 107
-		-- upvalues: v37 (copy), sendChromeWindowAnalytics (copy), AnalyticActions (copy)
-		v37(function(p1) -- line: 108
-			return not p1
-		end)
-		sendChromeWindowAnalytics({
-			action = AnalyticActions.SeeMore
-		})
-	end, {})
-	local u39 = nil
+	end, { joined.song })
+	local actions
 
-	if not getFFlagSongbirdPopoverSubmenu() then
-		u39 = useRef(nil)
-		useEventConnection(UserInputService.InputBegan, function(p2) -- line: 117
-			-- upvalues: v36 (copy), isInputInsideObject (copy), u39 (ref), v37 (copy)
-			if v36 and not isInputInsideObject(p2.Position, u39.current) then
-				v37(false)
-			end
-		end, { v36 })
-	end
+	if v3 then
+		actions = {}
+	else
+		actions = { LikeButtonWrapper = 0 }
+		local createElement = React.createElement
+		local view = Foundation.View
 
-	local v40 = useCallback(function(p3) -- line: 126
-		-- upvalues: Foundation (copy), v29 (copy), v38 (copy)
-		if p3 == Foundation.Enums.ControlState.Pressed then
-			if v29.onReport then
-				v29.onReport()
-			end
+		local createElement2 = React.createElement
+		local isFavorited
 
-			v38()
+		if joined.song then
+			isFavorited = joined.song.isLiked
+		else
+			isFavorited = false
 		end
-	end, { v29.onReport })
-	local v41 = if v32 then {} else {
-		LikeButton = React.createElement(LikeButton, {
-			isFavorited = not not v29.song and v29.song.isLiked,
-			onFavorite = v34
-		})
-	}
-	local v42 = if not getFFlagSongbirdPopoverSubmenu() then {
-		Menu = React.createElement(Foundation.View, {
-			tag = "auto-y col gap-small",
-			Size = UDim2.fromOffset(constants.SUBMENU_WIDTH, 0),
-			sizeConstraint = {
-				MaxSize = Vector2.new(constants.SUBMENU_WIDTH, 1e999)
-			}
-		}, {
-			ReportButton = React.createElement(Foundation.View, {
-				tag = "size-full-0 auto-y row gap-small align-y-center radius-medium",
-				onStateChanged = v40
-			}, {
-				Icon = React.createElement(Foundation.Icon, {
-					name = "icons/actions/feedback",
-					LayoutOrder = v30()
-				}),
-				Label = React.createElement(Foundation.Text, {
-					tag = "auto-xy text-title-medium content-emphasis",
-					Text = v33.report,
-					LayoutOrder = v30()
-				})
+
+		actions.LikeButtonWrapper = createElement(view, { tag = "auto-xy padding-right-xsmall" }, {
+			LikeButton = createElement2(LikeButton, {
+				isFavorited = isFavorited,
+				onFavorite = onFavorite
 			})
 		})
-	} else nil
-	local v43 = if not getFFlagSongbirdPopoverSubmenu() then nil else {{
-		id = "report",
-		icon = "icons/actions/feedback",
-		text = v33.report,
-		onActivated = function() -- line: 180
-			-- upvalues: v29 (copy), v37 (copy)
-			if v29.onReport then
-				v29.onReport()
-			end
+	end
 
-			v37(false)
-		end
-	}}
+	local createElement = React.createElement
+	local v5 = {
+		title = v4.windowTitle,
+		maxSize = joined.maxSize,
+		actions = actions,
+		isFocused = joined.isFocused,
+		onClose = joined.onClose,
+		onUnfocus = joined.onUnfocus
+	}
 
-	return React.createElement(ChromeWindowFrame, {
-		title = v33.windowTitle,
-		maxSize = v29.maxSize,
-		actions = v41,
-		menuItems = if not getFFlagSongbirdPopoverSubmenu() then nil else if v31 ~= "MeetsCriteria" and v31 ~= "Unverified" then nil else v43,
-		submenu = if not getFFlagSongbirdPopoverSubmenu() then if v31 ~= "MeetsCriteria" and v31 ~= "Unverified" then nil else v42 else nil,
-		isSubMenuOpen = v36,
-		isFocused = v29.isFocused,
-		onToggleSubMenu = v38,
-		onClose = v29.onClose,
-		onUnfocus = v29.onUnfocus,
-		overflowButtonRef = if not getFFlagSongbirdPopoverSubmenu() then u39 else nil
-	}, {
-		Body = React.createElement(Foundation.View, {
-			tag = "col auto-x align-y-center",
-			Size = UDim2.new(1, 0, 0, constants.WINDOW_HEIGHT)
-		}, {
-			InvalidAudio = if v31 == "MeetsCriteria" then nil else React.createElement(Foundation.View, {
-				tag = "auto-x size-0-full gap-medium row align-y-center"
-			}, {
-				Icon = React.createElement(TrackingAudioIcon, {
-					isMoving = v31 == "Unverified"
-				}),
-				Alert = React.createElement(Foundation.Text, {
-					tag = "auto-xy text-body-medium content-emphasis shrink text-wrap text-align-x-left text-align-y-center",
-					Text = if v31 ~= "Unverified" then v33.musicLoading else v33.musicUnverified,
-					LayoutOrder = v30()
-				})
+	local createElement2 = React.createElement
+	local view = Foundation.View
+	local v6 = {
+		Size = UDim2.new(1, 0, 0, constants.WINDOW_HEIGHT),
+		tag = "col auto-x align-y-center"
+	}
+	local invalidAudio
+
+	if v2 ~= "MeetsCriteria" then
+		local createElement3 = React.createElement
+		local view2 = Foundation.View
+
+		local v7 = {
+			Icon = React.createElement(TrackingAudioIcon, {
+				isMoving = v2 == "Unverified"
 			}),
-			NowPlaying = v31 == "MeetsCriteria" and React.createElement(Foundation.View, {
-				tag = "auto-xy row gap-medium flex-between align-y-center"
-			}, {
-				Icon = React.createElement(MusicIcon, {
-					layoutOrder = v30(),
-					thumbnailUrl = if not v29.song then nil else v29.song.thumbnailUrl
-				}),
-				SongInfo = React.createElement(Foundation.View, {
-					tag = "auto-xy col gap-xsmall shrink clip",
-					LayoutOrder = v30()
-				}, {
+			Alert = 0
+		}
+
+		local createElement4 = React.createElement
+		local text = Foundation.Text
+		local text3
+
+		if v2 == "Unverified" then
+			text3 = v4.musicUnverified
+		else
+			text3 = v4.musicLoading
+		end
+
+		v7.Alert = createElement4(text, {
+			tag = "auto-xy text-body-medium content-emphasis shrink text-wrap text-align-x-left text-align-y-center",
+			Text = text3,
+			LayoutOrder = nextOrder()
+		})
+		invalidAudio = createElement3(view2, {
+			tag = "auto-x size-0-full gap-medium row align-y-center"
+		}, v7)
+	end
+
+	local nowPlaying
+
+	if v2 == "MeetsCriteria" then
+		local createElement3 = React.createElement
+		local view2 = Foundation.View
+
+		local createElement4 = React.createElement
+		local v7 = { layoutOrder = nextOrder(), thumbnailUrl = 0 }
+		local thumbnailUrl
+
+		if joined.song then
+			thumbnailUrl = joined.song.thumbnailUrl
+		end
+
+		v7.thumbnailUrl = thumbnailUrl
+		nowPlaying = createElement3(view2, {
+			tag = "auto-xy row gap-medium flex-between align-y-center"
+		}, {
+			Icon = createElement4(MusicIcon, v7),
+			SongInfo = React.createElement(
+				Foundation.View,
+				{ tag = "auto-xy col gap-xsmall shrink clip", LayoutOrder = nextOrder() },
+				{
 					Title = React.createElement(MarqueeScroller, {
-						speed = if not v32 then nil else 0,
-						LayoutOrder = v30()
+						speed = v3 and 0 or nil,
+						LayoutOrder = nextOrder()
 					}, {
 						Label = React.createElement(Foundation.Text, {
 							tag = "auto-xy shrink text-title-medium content-emphasis",
-							Text = not v29.song and "" or v29.song.title
+							Text = not joined.song and "" or joined.song.title
 						})
 					}),
 					Artists = React.createElement(Foundation.Text, {
 						tag = "auto-xy shrink text-body-small content-default",
-						Text = v35,
+						Text = text2,
 						TextTruncate = Enum.TextTruncate.AtEnd,
-						LayoutOrder = v30()
+						LayoutOrder = nextOrder()
 					})
-				})
-			})
+				}
+			)
 		})
+	else
+		nowPlaying = false
+	end
+
+	return createElement(ChromeWindowFrame, v5, {
+		Body = createElement2(view, v6, { InvalidAudio = invalidAudio, NowPlaying = nowPlaying })
 	})
 end
 

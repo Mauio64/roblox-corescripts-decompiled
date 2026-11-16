@@ -1,45 +1,32 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local Promise = require(Parent.Promise)
-local getProductInfo = require(script.Parent.getProductInfo)
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
 
+local Promise = require(parent.Promise)
+local getProductInfo = require(script.Parent.getProductInfo)
 require(script.Parent.multiGetProductInfo)
 
-local function streamMultiGetProductInfo(t1: {[any]: any}, t2: {[any]: any}) -- line: 20
-	-- upvalues: Promise (copy), getProductInfo (copy)
-	local v7 = #t1
+local function streamMultiGetProductInfo(list, p)
+	local count = #list
 
-	if v7 == 0 then
+	if count == 0 then
 		return Promise.resolve({})
 	end
 
-	local t3 = table.create(v7)
-	local n1 = 0
+	local v = table.create(count)
+	local count2 = 0
 
-	return Promise.new(function(resolve) -- line: 32
-		-- upvalues: t1 (copy), getProductInfo (copy), t3 (copy), t2 (copy), n1 (ref), v7 (copy)
-		for i, v in ipairs(t1) do
-			getProductInfo(v.id, v.infoType):andThen(function(p1) -- line: 35
-				-- upvalues: v (copy)
-				return {
-					ok = true,
-					request = v,
-					value = p1
-				}
-			end):catch(function(p2) -- line: 38
-				-- upvalues: v (copy)
-				return {
-					ok = false,
-					request = v,
-					err = p2
-				}
-			end):andThen(function(p3) -- line: 41
-				-- upvalues: t3 (copy), i (copy), t2 (copy), n1 (ref), v7 (copy), resolve (copy)
-				t3[i] = p3
-				t2.onResult(p3)
-				n1 += 1
+	return Promise.new(function(callback)
+		for i, item in ipairs(list) do
+			getProductInfo(item.id, item.infoType):andThen(function(p2)
+				return { request = item, ok = true, value = p2 }
+			end):catch(function(err)
+				return { request = item, ok = false, err = err }
+			end):andThen(function(p2)
+				v[i] = p2
+				p.onResult(p2)
+				count2 += 1
 
-				if n1 == v7 then
-					resolve(t3)
+				if count2 == count then
+					callback(v)
 				end
 			end)
 		end

@@ -1,144 +1,210 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
+local BuilderIcons = require(parent.BuilderIcons)
 local Icon = require(Foundation.Components.Icon)
 local Image = require(Foundation.Components.Image)
 local StatusIndicator = require(Foundation.Components.StatusIndicator)
-
 require(Foundation.Enums.StatusIndicatorShape)
 require(Foundation.Enums.StatusIndicatorVariant)
-
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local uiblox = BuilderIcons.Migration.uiblox
 local FillBehavior = require(Foundation.Enums.FillBehavior)
-
+local Flags = require(Foundation.Utility.Flags)
 require(Foundation.Enums.InputSize)
-
 local getIconScale = require(Foundation.Utility.getIconScale)
 local iconMigrationUtils = require(Foundation.Utility.iconMigrationUtils)
 local isMigrated = iconMigrationUtils.isMigrated
 local isBuilderOrMigratedIcon = iconMigrationUtils.isBuilderOrMigratedIcon
-local Constants = require(Foundation.Constants)
-local useTabItemVariants = require(script.Parent.useTabItemVariants)
-local Flags = require(Foundation.Utility.Flags)
 
-local function TabItem(p1, p2) -- line: 68
-	-- upvalues: useTokens (copy), FillBehavior (copy), useTabItemVariants (copy), React (copy), BuilderIcons (copy), isBuilderOrMigratedIcon (copy), Icon (copy), isMigrated (copy), uiblox (copy), getIconScale (copy), Image (copy), Flags (copy), View (copy), Constants (copy), Text (copy), StatusIndicator (copy)
-	local v23 = useTokens()
-	local v24 = if not p1.isActive then v23.Color.Content.Emphasis else v23.Color.Content.Default
-	local v25 = p1.fillBehavior == FillBehavior.Fill
-	local v26 = useTabItemVariants(v23, p1.size, v25)
-	local v27 = React.useMemo(function() -- line: 77
-		-- upvalues: v23 (copy)
-		return {
-			offset = 0,
-			radius = UDim.new(0, 0),
-			borderWidth = v23.Stroke.Thicker
-		}
-	end, { v23 })
-	local v28 = React.useMemo(function() -- line: 85
-		-- upvalues: p1 (copy), BuilderIcons (copy)
-		if p1.icon == nil then
+local Constants = require(Foundation.Constants)
+
+local TabItemAccessory = require(script.Parent.TabItemAccessory)
+local tabItemAccessory = TabItemAccessory.TabItemAccessory
+local resolve = TabItemAccessory.resolve
+local useTabItemVariants = require(script.Parent.useTabItemVariants)
+
+local function TabItem(props, ref)
+	local v = useTokens()
+	local v2
+
+	if props.isActive then
+		v2 = v.Color.Content.Default
+	else
+		v2 = v.Color.Content.Emphasis
+	end
+
+	local v3 = props.fillBehavior == FillBehavior.Fill
+
+	local v4 = useTabItemVariants(v, props.size, v3)
+
+	local cursor = React.useMemo(function()
+		return { radius = UDim.new(0, 0), offset = 0, borderWidth = v.Stroke.Thicker }
+	end, { v })
+
+	local v5 = React.useMemo(function()
+		if props.icon == nil then
 			return nil
 		end
 
-		if typeof(p1.icon) == "string" then
-			return {
-				name = p1.icon,
-				variant = BuilderIcons.IconVariant.Regular
-			}
+		if typeof(props.icon) == "string" then
+			return { name = props.icon, variant = BuilderIcons.IconVariant.Regular }
 		end
 
-		return p1.icon
-	end, { p1.icon })
-	local v29 = nil
+		return props.icon
+	end, { props.icon })
+	local resolved, accessory
 
-	if v28 then
-		if isBuilderOrMigratedIcon(v28.name) then
-			v29 = React.createElement(Icon, {
-				name = if not isMigrated(v28.name) then v28.name else uiblox[v28.name].name,
-				variant = if not isMigrated(v28.name) then v28.variant else uiblox[v28.name].variant,
-				size = v26.icon.size,
-				style = v24
+	if Flags.FoundationTabsAccessory then
+		resolved, accessory = resolve(props.leading, props.trailing, props.icon, props.indicator)
+	end
+
+	local icon = nil
+
+	if v5 and not Flags.FoundationTabsAccessory then
+		if isBuilderOrMigratedIcon(v5.name) then
+			local createElement = React.createElement
+			local name
+
+			if isMigrated(v5.name) then
+				name = uiblox[v5.name].name
+			else
+				name = v5.name
+			end
+
+			local variant
+
+			if isMigrated(v5.name) then
+				variant = uiblox[v5.name].variant
+			else
+				variant = v5.variant
+			end
+
+			icon = createElement(Icon, {
+				name = name,
+				variant = variant,
+				size = v4.icon.size,
+				style = v2
 			})
 		else
-			local v30, v31 = getIconScale(v28.name, v26.icon.size)
+			local iconScale, scale = getIconScale(v5.name, v4.icon.size)
 
-			if v30 then
-				v29 = React.createElement(Image, {
-					Image = v28.name,
-					Size = UDim2.fromOffset(v30.X, v30.Y),
-					imageStyle = v24,
-					scale = v31
+			if iconScale then
+				icon = React.createElement(Image, {
+					Image = v5.name,
+					Size = UDim2.fromOffset(iconScale.X, iconScale.Y),
+					imageStyle = v2,
+					scale = scale
 				})
 			end
 		end
 	end
 
-	local uDim2, v33
+	local createElement = React.createElement
+	local v6 = { tag = v4.container.tag, GroupTransparency = 0, testId = 0 }
+	local groupTransparency
 
-	if v25 or Flags.FoundationFixTabsFitBorderWidth then
-		uDim2 = UDim2.fromScale(1, 1)
-		v33 = nil
-	else
-		local Size_100 = v23.Size.Size_100
-
-		uDim2 = UDim2.new(1, Size_100 * 2, 1, 0)
-		v33 = UDim2.fromOffset(-Size_100, 0)
+	if props.isDisabled then
+		groupTransparency = Constants.DISABLED_TRANSPARENCY
 	end
 
-	return React.createElement(View, {
-		tag = v26.container.tag,
-		GroupTransparency = if not p1.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
-		testId = p1.testId
-	}, {
+	v6.GroupTransparency = groupTransparency
+	v6.testId = props.testId
+	local v7 = {
 		Interactive = React.createElement(View, {
 			LayoutOrder = 1,
-			Size = uDim2,
-			Position = v33,
-			onActivated = function() -- line: 140
-				-- upvalues: p1 (copy)
-				p1.onActivated(p1.id)
+			Size = UDim2.fromScale(1, 1),
+			onActivated = function()
+				props.onActivated(props.id)
 			end,
 			selection = {
-				Selectable = not p1.isDisabled
+				Selectable = not props.isDisabled
 			},
-			cursor = v27,
-			isDisabled = p1.isDisabled,
-			ref = p2
+			cursor = cursor,
+			isDisabled = props.isDisabled,
+			ref = ref
 		}),
-		Content = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = v26.content.tag,
-			Size = v26.content.Size
-		}, {
-			Icon = if not p1.icon then nil else v29,
-			Text = React.createElement(Text, {
-				LayoutOrder = 2,
-				Text = p1.text,
-				style = v24,
-				tag = v26.text.tag
-			}),
-			Indicator = if not p1.indicator then nil else React.createElement(StatusIndicator, if not p1.indicator.value then {
-				LayoutOrder = 3,
-				variant = p1.indicator.variant,
-				shape = p1.indicator.shape,
-				testId = `{ p1.testId }--indicator`
-			} else {
-				LayoutOrder = 3,
-				value = p1.indicator.value,
-				variant = p1.indicator.variant,
-				max = p1.indicator.max,
-				testId = `{ p1.testId }--indicator`
-			})
+		Content = 0
+	}
+
+	local createElement2 = React.createElement
+	local v8 = { LayoutOrder = 2, tag = v4.content.tag, Size = v4.content.Size }
+
+	if Flags.FoundationTabsAccessory or not props.icon then
+		icon = nil
+	end
+
+	local leading
+
+	if Flags.FoundationTabsAccessory and resolved then
+		leading = React.createElement(tabItemAccessory, {
+			accessory = resolved,
+			contentStyle = v2,
+			iconSize = v4.icon.size,
+			LayoutOrder = 1,
+			testId = `{props.testId}--leading`
 		})
-	})
+	end
+
+	local v9 = {
+		Icon = icon,
+		Leading = leading,
+		Text = React.createElement(Text, {
+			Text = props.text,
+			style = v2,
+			tag = v4.text.tag,
+			LayoutOrder = 2
+		}),
+		Indicator = 0,
+		Trailing = 0
+	}
+	local indicator
+
+	if not (Flags.FoundationTabsAccessory or not props.indicator) then
+		local createElement3 = React.createElement
+		local v10
+
+		if props.indicator.value then
+			v10 = {
+				value = props.indicator.value,
+				variant = props.indicator.variant,
+				max = props.indicator.max,
+				LayoutOrder = 3,
+				testId = `{props.testId}--indicator`
+			}
+		else
+			v10 = {
+				variant = props.indicator.variant,
+				shape = props.indicator.shape,
+				LayoutOrder = 3,
+				testId = `{props.testId}--indicator`
+			}
+		end
+
+		indicator = createElement3(StatusIndicator, v10)
+	end
+
+	v9.Indicator = indicator
+	local trailing
+
+	if Flags.FoundationTabsAccessory and accessory then
+		trailing = React.createElement(tabItemAccessory, {
+			accessory = accessory,
+			contentStyle = v2,
+			iconSize = v4.icon.size,
+			LayoutOrder = 3,
+			testId = `{props.testId}--trailing`
+		})
+	end
+
+	v9.Trailing = trailing
+	v7.Content = createElement2(View, v8, v9)
+	return createElement(View, v6, v7)
 end
 
 return React.memo(React.forwardRef(TabItem))

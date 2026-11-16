@@ -1,12 +1,13 @@
 local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
 local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
 
-return require(script.Parent.RoduxNetworking).POST(script.Name, function(p1, p2) -- line: 32
-	-- upvalues: CHAT_PLATFORM_BASE_URL (copy)
-	return p1(CHAT_PLATFORM_BASE_URL):path("v2"):path("get-modal-sequence"):body({
-		is_in_experience = p2.isInExperience,
-		modal_sequence = p2.modalSequence,
-		conversation_id = p2.conversationId,
-		friend_id = p2.friendId
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
+
+return RoduxNetworking.POST(script.Name, function(callback, data)
+	return callback(CHAT_PLATFORM_BASE_URL):path("v2"):path("get-modal-sequence"):body({
+		is_in_experience = data.isInExperience,
+		modal_sequence = data.modalSequence,
+		conversation_id = data.conversationId,
+		friend_id = data.friendId
 	})
 end)

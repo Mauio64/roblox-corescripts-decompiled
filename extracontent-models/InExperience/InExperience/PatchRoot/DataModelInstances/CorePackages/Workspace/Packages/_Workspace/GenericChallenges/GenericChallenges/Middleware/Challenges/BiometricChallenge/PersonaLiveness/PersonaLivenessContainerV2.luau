@@ -1,265 +1,291 @@
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
-local GenericChallengesParent = GenericChallenges.Parent
+local parent = GenericChallenges.Parent
+
 local Players = game:GetService("Players")
-local React = require(GenericChallengesParent.React)
-local useDispatch = require(GenericChallengesParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useSelector = require(GenericChallengesParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useLocalization = require(GenericChallengesParent.Localization).Hooks.useLocalization
-local Foundation = require(GenericChallengesParent.Foundation)
+
+local React = require(parent.React)
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
-local FullscreenPageWithSafeArea = require(GenericChallengesParent.AppBlox).FullscreenPageWithSafeArea
-local FocusNavigationUtils = require(GenericChallengesParent.FocusNavigationUtils)
+
+local AppBlox = require(parent.AppBlox)
+local FullscreenPageWithSafeArea = AppBlox.FullscreenPageWithSafeArea
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+
 local PersonaLivenessContainer = require(script.Parent.PersonaLivenessContainer)
 local PersonaLivenessServiceWrapper = require(script.Parent.PersonaLivenessServiceWrapper)
-local QRDeepLinkDialog = require(GenericChallengesParent.IdentityVerification).QRDeepLinkDialog
-local BiometricTypeEnum = require(script.Parent.Parent.Common.Enums).BiometricTypeEnum
+local IdentityVerification = require(parent.IdentityVerification)
+local QRDeepLinkDialog = IdentityVerification.QRDeepLinkDialog
+local Enums = require(script.Parent.Parent.Common.Enums)
+local BiometricTypeEnum = Enums.BiometricTypeEnum
 local TelemetryReasons = require(script.Parent.Parent.Common.TelemetryReasons)
-local useRoactService = require(GenericChallengesParent.RobloxAppHooks).useRoactService
-local AppLogging = require(GenericChallengesParent.RoactServiceTags).AppLogging
-local RoactNetworking = require(GenericChallengesParent.RoactServiceTags).RoactNetworking
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppLogging = RoactServiceTags.AppLogging
+local RoactServiceTags2 = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags2.RoactNetworking
 local BiometricChallengeEvent = require(script.Parent.Parent.Common.BiometricChallengeEvent)
 local ChallengeEventConstants = require(GenericChallenges.Utils.ChallengeEventConstants)
-local GetFFlagEnhancedPersonaLivenessEvents = require(GenericChallengesParent.SharedFlags).GetFFlagEnhancedPersonaLivenessEvents
-local v26 = game:DefineFastInt("PersonaLivenessV2QrPollDelaySec", 6)
-local v27 = game:DefineFastInt("PersonaLivenessV2QrPollMaxRetries", 60)
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnhancedPersonaLivenessEvents = SharedFlags.GetFFlagEnhancedPersonaLivenessEvents
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUseSignalsForUserAccess = SharedFlags2.FFlagUseSignalsForUserAccess
 
-local function defaultGetLocalUserId() -- line: 66
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local getUserAccessStore
 
-	if not LocalPlayer then
-		return nil
+if FFlagUseSignalsForUserAccess then
+	local UserAccessStore = require(parent.UserAccessStore)
+	getUserAccessStore = UserAccessStore.GetUserAccessStore
+else
+	getUserAccessStore = nil
+end
+
+local defineFastInt = game:DefineFastInt("PersonaLivenessV2QrPollDelaySec", 6)
+local defineFastInt2 = game:DefineFastInt("PersonaLivenessV2QrPollMaxRetries", 60)
+
+local function defaultGetLocalUserId()
+	local localPlayer = Players.LocalPlayer
+
+	return if localPlayer then localPlayer.UserId else nil
+end
+
+local function buildDeeplink(p: number) -- 1 equivalent call inferred from this helper
+	return "https://ro.blox.com/Ebh5" .. "?pid=QR_code&c=liveness_onelink" .. "&is_retargeting=false" .. "&af_dp=" .. "roblox%3A%2F%2Fnavigation%2Faccount_unlock%3Fuser_id=" .. tostring(p) .. "&deep_link_value=" .. "roblox%3A%2F%2Fnavigation%2Faccount_unlock%3Fuser_id=" .. tostring(p)
+end
+
+local function PersonaLivenessQRFlow(props)
+	local v = useDispatch()
+	local v2 = useRoactService(AppLogging)
+	local v3 = useRoactService(RoactNetworking)
+	local v4
+
+	if FFlagUseSignalsForUserAccess then
+		v4 = useSignalState(getUserAccessStore(false).getUserAccessRestrictionDetail)
+	else
+		v4 = useSelector(function(p)
+			return p.UserAccess and p.UserAccess.restrictionDetail
+		end)
 	end
 
-	return LocalPlayer.UserId
-end
-local function buildDeeplink(n1: number) -- line: 76
-	return "https://ro.blox.com/Ebh5" .. "?pid=QR_code&c=liveness_onelink" .. "&is_retargeting=false" .. "&af_dp=" .. "roblox%3A%2F%2Fnavigation%2Faccount_unlock%3Fuser_id=" .. tostring(n1) .. "&deep_link_value=" .. "roblox%3A%2F%2Fnavigation%2Faccount_unlock%3Fuser_id=" .. tostring(n1)
-end
-local function PersonaLivenessQRFlow(t1: {[any]: any}) -- line: 88
-	-- upvalues: useDispatch (copy), useRoactService (copy), AppLogging (copy), RoactNetworking (copy), useSelector (copy), defaultGetLocalUserId (copy), useLocalization (copy), React (copy), GetFFlagEnhancedPersonaLivenessEvents (copy), BiometricChallengeEvent (copy), ChallengeEventConstants (copy), BiometricTypeEnum (copy), TelemetryReasons (copy), v27 (copy), v26 (copy), Loading (copy), IconSize (copy), FullscreenPageWithSafeArea (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigableSurfaceIdentifierEnum (copy), QRDeepLinkDialog (copy)
-	local v35 = useDispatch()
-	local v36 = useRoactService(AppLogging)
-	local v37 = useRoactService(RoactNetworking)
-	local v38 = useSelector(function(p1) -- line: 93
-		return p1.UserAccess and p1.UserAccess.restrictionDetail
-	end)
-	local v39 = (t1.getLocalUserId or defaultGetLocalUserId)()
-	local v40 = if not v39 or not (v39 > 0) then nil else "https://ro.blox.com/Ebh5" .. "?pid=QR_code&c=liveness_onelink" .. "&is_retargeting=false" .. "&af_dp=" .. "roblox%3A%2F%2Fnavigation%2Faccount_unlock%3Fuser_id=" .. tostring(v39) .. "&deep_link_value=" .. "roblox%3A%2F%2Fnavigation%2Faccount_unlock%3Fuser_id=" .. tostring(v39)
-	local v41 = useLocalization({
-		prompt = "Feature.BiometricChallenge.Content.QRHelpPrompt"
-	})
-	local v42 = useLocalization({
+	local v5 = (props.getLocalUserId or defaultGetLocalUserId)()
+	local deeplink
+
+	if v5 and v5 > 0 then
+		deeplink = buildDeeplink(v5) -- inferred equivalent call
+	else
+		deeplink = nil
+	end
+
+	local v6 = useLocalization({
 		title = "Feature.BiometricChallenge.Title.QRHandoff",
 		description = "Feature.BiometricChallenge.Content.ScanQR",
 		footer = {
 			"Feature.BiometricChallenge.Content.QRHelpFull",
-			prompt = "<b>" .. v41.prompt .. "</b>"
+			prompt = "<b>" .. useLocalization({
+				prompt = "Feature.BiometricChallenge.Content.QRHelpPrompt"
+			}).prompt .. "</b>"
 		}
 	})
-	local v43 = React.useRef(false)
-	local v44 = React.useCallback(function(p2) -- line: 119
-		-- upvalues: v43 (copy), t1 (copy), GetFFlagEnhancedPersonaLivenessEvents (copy), v36 (copy), BiometricChallengeEvent (copy), ChallengeEventConstants (copy), BiometricTypeEnum (copy)
-		if v43.current then
+
+	local ref = React.useRef(false)
+
+	local v7 = React.useCallback(function(reason)
+		if ref.current then
 			return
 		end
 
-		v43.current = true
-		t1.onChallengeAbandoned("")
+		ref.current = true
+		props.onChallengeAbandoned("")
 
 		if GetFFlagEnhancedPersonaLivenessEvents() then
-			v36:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
+			v2:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
 				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeAbandoned,
-				challengeId = t1.challengeId,
+				challengeId = props.challengeId,
 				biometricType = BiometricTypeEnum.PersonaLiveness,
-				reason = p2
+				reason = reason
 			})
+		else
+			v2:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
+				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeAbandoned,
+				challengeId = props.challengeId,
+				biometricType = BiometricTypeEnum.PersonaLiveness
+			})
+		end
+	end, { v2, props.challengeId, props.onChallengeAbandoned })
 
+	local v8 = React.useCallback(function(p: string, reason)
+		if ref.current then
 			return
 		end
 
-		v36:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
-			context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeAbandoned,
-			challengeId = t1.challengeId,
-			biometricType = BiometricTypeEnum.PersonaLiveness
-		})
-	end, {
-		v36,
-		t1.challengeId,
-		t1.onChallengeAbandoned
-	})
-	local v45 = React.useCallback(function(s1: string, p3) -- line: 142
-		-- upvalues: v43 (copy), t1 (copy), GetFFlagEnhancedPersonaLivenessEvents (copy), v36 (copy), BiometricChallengeEvent (copy), ChallengeEventConstants (copy), BiometricTypeEnum (copy)
-		if v43.current then
-			return
-		end
-
-		v43.current = true
-		t1.onChallengeFailed(s1)
+		ref.current = true
+		props.onChallengeFailed(p)
 
 		if GetFFlagEnhancedPersonaLivenessEvents() then
-			v36:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
+			v2:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
 				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
-				challengeId = t1.challengeId,
+				challengeId = props.challengeId,
 				biometricType = BiometricTypeEnum.PersonaLiveness,
-				reason = p3
+				reason = reason
 			})
-
-			return
+		else
+			v2:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
+				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
+				challengeId = props.challengeId,
+				biometricType = BiometricTypeEnum.PersonaLiveness
+			})
 		end
-
-		v36:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
-			context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
-			challengeId = t1.challengeId,
-			biometricType = BiometricTypeEnum.PersonaLiveness
-		})
 	end, {})
 
-	React.useEffect(function() -- line: 165
-		-- upvalues: v40 (copy), GetFFlagEnhancedPersonaLivenessEvents (copy), v45 (copy), TelemetryReasons (copy)
-		if not v40 then
+	React.useEffect(function()
+		if not deeplink then
 			if GetFFlagEnhancedPersonaLivenessEvents() then
-				v45("MissingLocalUserId", TelemetryReasons.NullUserId)
-
-				return
+				v8("MissingLocalUserId", TelemetryReasons.NullUserId)
+			else
+				v8("MissingLocalUserId")
 			end
-
-			v45("MissingLocalUserId")
 		end
-	end, {
-		v40,
-		v45
-	})
-	React.useEffect(function() -- line: 177
-		-- upvalues: v40 (copy), v38 (copy), GetFFlagEnhancedPersonaLivenessEvents (copy), v43 (copy), v36 (copy), BiometricChallengeEvent (copy), ChallengeEventConstants (copy), t1 (copy), BiometricTypeEnum (copy), TelemetryReasons (copy), v44 (copy)
-		if not v40 or v38 ~= nil then
+	end, { deeplink, v8 })
+
+	React.useEffect(function()
+		if not deeplink or v4 ~= nil then
+			return
+		end
+
+		if not GetFFlagEnhancedPersonaLivenessEvents() then
+			v7()
+
+			return
+		end
+
+		if ref.current then
+			return
+		end
+
+		ref.current = true
+
+		v2:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
+			context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeCompleted,
+			challengeId = props.challengeId,
+			biometricType = BiometricTypeEnum.PersonaLiveness,
+			reason = TelemetryReasons.QRCompleted
+		})
+
+		props.onChallengeAbandoned("")
+	end, { v4, deeplink, v7, v2, props.challengeId, props.onChallengeAbandoned })
+
+	React.useEffect(function()
+		if not deeplink then
 			return
 		end
 
 		if GetFFlagEnhancedPersonaLivenessEvents() then
-			if v43.current then
-				return
-			end
-
-			v43.current = true
-			v36:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
-				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeCompleted,
-				challengeId = t1.challengeId,
-				biometricType = BiometricTypeEnum.PersonaLiveness,
-				reason = TelemetryReasons.QRCompleted
-			})
-			t1.onChallengeAbandoned("")
-
-			return
-		end
-
-		v44()
-	end, {
-		v38,
-		v40,
-		v44,
-		v36,
-		t1.challengeId,
-		t1.onChallengeAbandoned
-	})
-	React.useEffect(function() -- line: 208
-		-- upvalues: v40 (copy), GetFFlagEnhancedPersonaLivenessEvents (copy), v36 (copy), BiometricChallengeEvent (copy), ChallengeEventConstants (copy), t1 (copy), BiometricTypeEnum (copy), TelemetryReasons (copy), v27 (copy), v26 (copy), v35 (copy), v37 (copy), v45 (copy)
-		if not v40 then
-			return
-		end
-
-		if GetFFlagEnhancedPersonaLivenessEvents() then
-			v36:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
+			v2:logRobloxTelemetryEvent(BiometricChallengeEvent, {}, {
 				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeDisplayed,
-				challengeId = t1.challengeId,
+				challengeId = props.challengeId,
 				biometricType = BiometricTypeEnum.PersonaLiveness,
 				reason = TelemetryReasons.QRDisplayed
 			})
 		end
 
-		local u51 = false
+		local flag = false
+		task.spawn(function()
+			for _ = 1, defineFastInt2 do
+				task.wait(defineFastInt)
 
-		task.spawn(function() -- line: 223
-			-- upvalues: v27 (copy), v26 (copy), u51 (ref), t1 (copy), v35 (copy), v37 (copy), GetFFlagEnhancedPersonaLivenessEvents (copy), v45 (copy), TelemetryReasons (copy)
-			for _ = 1, v27 do
-				task.wait(v26)
-
-				if u51 then
+				if flag then
 					return
 				end
 
-				if t1.ApiFetchAccessStatus then
-					v35(t1.ApiFetchAccessStatus(v37))
+				if props.ApiFetchAccessStatus then
+					v(props.ApiFetchAccessStatus(v3))
 				end
 			end
 
-			if not u51 then
+			if not flag then
 				if GetFFlagEnhancedPersonaLivenessEvents() then
-					v45("Timeout", TelemetryReasons.QRPollingTimeout)
-
-					return
+					v8("Timeout", TelemetryReasons.QRPollingTimeout)
+				else
+					v8("Timeout")
 				end
-
-				v45("Timeout")
 			end
 		end)
 
-		return function() -- line: 244
-			-- upvalues: u51 (ref)
-			u51 = true
+		return function()
+			flag = true
 		end
 	end, {})
 
-	if not v40 then
-		return React.createElement(Loading, {
-			size = IconSize.Medium,
-			Position = UDim2.fromScale(0.5, 0.5),
-			AnchorPoint = Vector2.new(0.5, 0.5)
-		})
+	if deeplink then
+		return React.createElement(
+			"ScreenGui",
+			{
+				ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+				DisplayOrder = 200,
+				IgnoreGuiInset = true
+			},
+			{
+				Overlay = React.createElement(
+					FullscreenPageWithSafeArea,
+					{ includeStatusBar = false, useFullScalePage = true },
+					{
+						FocusNavigableSurface = React.createElement(
+							FocusNavigableSurfaceWrapper,
+							{
+								surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay,
+								isIsolated = true
+							},
+							{
+								Dialog = React.createElement(QRDeepLinkDialog, {
+									deeplink = deeplink,
+									title = v6.title,
+									description = v6.description,
+									footer = v6.footer,
+									onClose = GetFFlagEnhancedPersonaLivenessEvents() and function()
+										v7(TelemetryReasons.QRUserAbandon)
+									end or v7
+								})
+							}
+						)
+					}
+				)
+			}
+		)
 	end
 
-	return React.createElement("ScreenGui", {
-		DisplayOrder = 200,
-		IgnoreGuiInset = true,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, {
-		Overlay = React.createElement(FullscreenPageWithSafeArea, {
-			includeStatusBar = false,
-			useFullScalePage = true
-		}, {
-			FocusNavigableSurface = React.createElement(FocusNavigableSurfaceWrapper, {
-				isIsolated = true,
-				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay
-			}, {
-				Dialog = React.createElement(QRDeepLinkDialog, {
-					deeplink = v40,
-					title = v42.title,
-					description = v42.description,
-					footer = v42.footer,
-					onClose = if not GetFFlagEnhancedPersonaLivenessEvents() then v44 else function() -- line: 282
-						-- upvalues: v44 (copy), TelemetryReasons (copy)
-						v44(TelemetryReasons.QRUserAbandon)
-					end
-				})
-			})
-		})
+	return React.createElement(Loading, {
+		size = IconSize.Medium,
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5)
 	})
 end
-local function PersonaLivenessContainerV2(t2: {[any]: any}) -- line: 292
-	-- upvalues: PersonaLivenessServiceWrapper (copy), React (copy), PersonaLivenessContainer (copy), PersonaLivenessQRFlow (copy)
+
+local function PersonaLivenessContainerV2(props)
 	if PersonaLivenessServiceWrapper.isAvailable() then
 		return React.createElement(PersonaLivenessContainer, {
-			challengeId = t2.challengeId,
-			onChallengeCompleted = t2.onChallengeCompleted,
-			onChallengeAbandoned = t2.onChallengeAbandoned,
-			onChallengeFailed = t2.onChallengeFailed
+			challengeId = props.challengeId,
+			onChallengeCompleted = props.onChallengeCompleted,
+			onChallengeAbandoned = props.onChallengeAbandoned,
+			onChallengeFailed = props.onChallengeFailed
 		})
 	end
 
-	return React.createElement(PersonaLivenessQRFlow, t2)
+	return React.createElement(PersonaLivenessQRFlow, props)
 end
 
 return PersonaLivenessContainerV2

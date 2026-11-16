@@ -1,37 +1,60 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local v4 = require(AppChat.Logger):new(script.Name)
+local parent = AppChat.Parent
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
+
 local MessageModel = require(AppChat.Models.MessageModel)
 local SendChatMessagePolicy = require(script.Parent.SendChatMessagePolicy)
-local self = setmetatable({}, SendChatMessagePolicy)
 
-self.__index = self
+local object = setmetatable({}, SendChatMessagePolicy)
+object.__index = object
 
-function self.new(p1, p2, p3, p4, p5) -- line: 13
-	-- upvalues: v4 (copy), SendChatMessagePolicy (copy)
-	v4:info("New policy constructed for conversationId: {} messageText: {}, replyingToId: {}", p2, p3, if not p4 then nil else p4.id)
+function object:new(p, messageText, p2, decorators)
+	local v2
 
-	local v13 = SendChatMessagePolicy:new(p2, p4)
+	if p2 then
+		v2 = p2.id
+	end
 
-	setmetatable(v13, p1)
-	v13.messageText = p3
-	v13.decorators = p5
+	v:info("New policy constructed for conversationId: {} messageText: {}, replyingToId: {}", p, messageText, v2)
 
-	return v13
-end
-function self.sendMessage(p6, _) -- line: 31
-	-- upvalues: v4 (copy), AppChatNetworking (copy)
-	v4:info("sendMessage - conversationId: {} messageText: {}, replyingToId: {}", p6.conversationId, p6.messageText, if not p6.replyingToMessage then nil else p6.replyingToMessage.id)
+	local v3 = SendChatMessagePolicy:new(p, p2)
+	setmetatable(v3, self)
 
-	return AppChatNetworking.http.SendChatTextMessage(nil, p6.conversationId, p6.messageText, if not p6.replyingToMessage then nil else p6.replyingToMessage.id)
-end
-function self.sendingMessagePayload(p8) -- line: 47
-	-- upvalues: MessageModel (copy)
-	return {
-		messageType = MessageModel.MessageTypes.PlainText,
-		content = p8.messageText
-	}
+	v3.messageText = messageText
+	v3.decorators = decorators
+
+	return v3
 end
 
-return self
+function object.sendMessage(data, _)
+	local conversationId = data.conversationId
+	local messageText = data.messageText
+	local v2
+
+	if data.replyingToMessage then
+		v2 = data.replyingToMessage.id
+	end
+
+	v:info("sendMessage - conversationId: {} messageText: {}, replyingToId: {}", conversationId, messageText, v2)
+
+	local sendChatTextMessage = AppChatNetworking.http.SendChatTextMessage
+
+	local conversationId2 = data.conversationId
+	local messageText2 = data.messageText
+	local v3
+
+	if data.replyingToMessage then
+		v3 = data.replyingToMessage.id
+	end
+
+	return sendChatTextMessage(nil, conversationId2, messageText2, v3)
+end
+
+function object.sendingMessagePayload(p)
+	return { messageType = MessageModel.MessageTypes.PlainText, content = p.messageText }
+end
+
+return object

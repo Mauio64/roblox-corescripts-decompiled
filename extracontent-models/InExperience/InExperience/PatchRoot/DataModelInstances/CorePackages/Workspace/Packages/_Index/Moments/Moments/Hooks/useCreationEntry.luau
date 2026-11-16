@@ -1,89 +1,120 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
-local AppTabBarRodux = require(MomentsParent.AppTabBarRodux)
-local useDispatch = require(MomentsParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local parent = Moments.Parent
+
+local React = require(parent.React)
+local AppTabBarRodux = require(parent.AppTabBarRodux)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local MomentsCommon = require(parent.MomentsCommon)
+
 local SetTabBarVisible = AppTabBarRodux.Actions.SetTabBarVisible
+local Analytics = MomentsCommon.Analytics
+local FunnelEventNames = Analytics.FunnelEventNames
+
 local createGalleryCaptureSource = require(Moments.Capture.createGalleryCaptureSource)
-local isStudio = require(MomentsParent.MomentsCommon.isStudio)
+local isStudio = require(parent.MomentsCommon.isStudio)
 local hasGalleryApi = require(Moments.Capture.hasGalleryApi)
+local logCreationEntryResolved = require(Moments.Analytics.logCreationEntryResolved)
+local FFlagMomentsCreationEntryOutcome = require(Moments.Flags.FFlagMomentsCreationEntryOutcome)
 
-local function useCreationEntry() -- line: 41
-	-- upvalues: React (copy), useDispatch (copy), isStudio (copy), hasGalleryApi (copy), createGalleryCaptureSource (copy), SetTabBarVisible (copy)
-	local v11, v12 = React.useState(false)
-	local v13, v14 = React.useState(false)
-	local v15 = React.useRef(nil)
-	local v16 = React.useRef(false)
-	local v17 = useDispatch()
-	local v18 = isStudio()
-	local v19 = hasGalleryApi()
-	local v20 = v18 or not v19
-	local v21 = React.useCallback(function() -- line: 53
-		-- upvalues: v20 (copy), v12 (copy), v16 (copy), v15 (copy), createGalleryCaptureSource (copy), v14 (copy)
-		if v20 then
-			v12(true)
+local function useCreationEntry(p)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(false)
 
-			return
+	local v = useDispatch()
+	local v2 = p == nil or p.manageTabBarVisibility ~= false
+
+	local studio = isStudio()
+	local galleryApi = hasGalleryApi()
+	local v3 = studio or not galleryApi
+	local onCreatePressed = React.useCallback(function()
+		local v4
+
+		if FFlagMomentsCreationEntryOutcome then
+			v4 = Analytics.SessionManager.getSessionId(FunnelEventNames.FunnelTypes.CreationFlow)
+		else
+			v4 = nil
 		end
 
-		if v16.current then
-			return
-		end
+		if v3 then
+			setState(true)
 
-		v16.current = true
-		task.spawn(function() -- line: 63
-			-- upvalues: v15 (copy), createGalleryCaptureSource (copy), v16 (copy), v14 (copy), v12 (copy)
-			v15.current = createGalleryCaptureSource(nil, function(p1, p2) -- line: 64
-				-- upvalues: v16 (copy), v14 (copy), v12 (copy)
-				v16.current = false
+			if FFlagMomentsCreationEntryOutcome then
+				logCreationEntryResolved.log(logCreationEntryResolved.Outcome.GalleryUnavailable, v4)
+			end
+		elseif ref2.current then
+			if FFlagMomentsCreationEntryOutcome then
+				logCreationEntryResolved.log(logCreationEntryResolved.Outcome.RequestInFlight, v4)
+			end
+		else
+			ref2.current = true
+			task.spawn(function()
+				ref.current = createGalleryCaptureSource(nil, function(list, p2, p3)
+					ref2.current = false
 
-				if p2 and #p1 == 0 then
-					v14(true)
+					if p2 and #list == 0 then
+						setState2(true)
+					else
+						setState(true)
+					end
 
-					return
-				end
-
-				v12(true)
+					if FFlagMomentsCreationEntryOutcome then
+						logCreationEntryResolved.log(logCreationEntryResolved.resolveGalleryOutcome(p2, #list, p3), v4)
+					end
+				end)
 			end)
-		end)
-	end, { v20 })
+		end
+	end, { v3 })
 
-	React.useEffect(function() -- line: 75
-		-- upvalues: v11 (copy), v17 (copy), SetTabBarVisible (copy)
-		if v11 then
-			v17(SetTabBarVisible(false))
+	React.useEffect(function()
+		if v2 and state then
+			v(SetTabBarVisible(false))
 		end
 
-		return function() -- line: 79
-			-- upvalues: v11 (copy), v17 (copy), SetTabBarVisible (copy)
-			if v11 then
-				v17(SetTabBarVisible(true))
+		return function()
+			if v2 and state then
+				v(SetTabBarVisible(true))
 			end
 		end
-	end, {
-		v11,
-		v17
-	})
+	end, { state, v, v2 })
 
-	local v22 = React.useCallback(function() -- line: 86
-		-- upvalues: v15 (copy), v12 (copy)
-		v15.current = nil
-		v12(false)
-	end, {})
-	local v23 = React.useCallback(function() -- line: 91
-		-- upvalues: v15 (copy), v14 (copy)
-		v15.current = nil
-		v14(false)
+	local onExitCreation = React.useCallback(function()
+		ref.current = nil
+		setState(false)
 	end, {})
 
-	return {
-		isCreating = v11,
-		showFtux = not v20 and v13,
-		captureSource = if not v20 then v15.current else nil,
-		onCreatePressed = v21,
-		onExitCreation = v22,
-		onExitFtux = v23
+	local onExitFtux = React.useCallback(function()
+		ref.current = nil
+		setState2(false)
+	end, {})
+
+	local v4 = {
+		isCreating = state,
+		showFtux = nil,
+		captureSource = 0,
+		onCreatePressed = 0,
+		onExitCreation = 0,
+		onExitFtux = 0
 	}
+
+	if v3 then
+		state2 = false
+	end
+
+	v4.showFtux = state2
+	local captureSource
+
+	if not v3 then
+		captureSource = ref.current
+	end
+
+	v4.captureSource = captureSource
+	v4.onCreatePressed = onCreatePressed
+	v4.onExitCreation = onExitCreation
+	v4.onExitFtux = onExitFtux
+	return v4
 end
 
 return useCreationEntry

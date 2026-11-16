@@ -1,32 +1,29 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local parent = PurchasePrompt.Parent
 
-require(Parent.IAPExperience)
+require(parent.IAPExperience)
 
+require(PurchasePrompt.types)
 local deriveSelectedOfferIdsFromCartPricing = require(script.Parent.deriveSelectedOfferIdsFromCartPricing)
 
-local function derivePurchaseOptionsFromCartPricingResponse(p1) -- line: 18
-	-- upvalues: deriveSelectedOfferIdsFromCartPricing (copy)
-	if p1 == nil then
+local function derivePurchaseOptionsFromCartPricingResponse(p)
+	if p == nil then
 		return nil
 	end
 
-	local v5 = deriveSelectedOfferIdsFromCartPricing(p1)
+	local v = deriveSelectedOfferIdsFromCartPricing(p)
 
-	if #v5 == 0 then
+	if #v == 0 then
 		return nil
 	end
 
-	local t1 = {}
+	local offers = {}
 
-	for _, v8 in v5 do
-		table.insert(t1, {
-			Id = v8
-		})
+	for _, id in v do
+		table.insert(offers, { Id = id })
 	end
 
-	return {
-		Offers = t1
-	}
+	return { Offers = offers }
 end
 
 return derivePurchaseOptionsFromCartPricingResponse

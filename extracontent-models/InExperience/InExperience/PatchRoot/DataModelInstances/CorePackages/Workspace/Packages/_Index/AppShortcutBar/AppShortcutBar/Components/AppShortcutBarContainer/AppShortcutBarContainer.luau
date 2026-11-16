@@ -1,27 +1,36 @@
 local AppShortcutBar = script:FindFirstAncestor("AppShortcutBar")
-local AppShortcutBarParent = AppShortcutBar.Parent
-local React = require(AppShortcutBarParent.React)
+local parent = AppShortcutBar.Parent
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
 local AppShortcutBar2 = require(AppShortcutBar.Components.AppShortcutBar)
 local AppStickyShortcutBar = require(AppShortcutBar.Components.AppStickyShortcutBar)
+
 local useAppShortcutBarProps = require(script.Parent.useAppShortcutBarProps)
-local useIsStickyShortcutBarEnabled = require(AppShortcutBar.Hooks).useIsStickyShortcutBarEnabled
-local useAppPolicy = require(AppShortcutBarParent.UniversalAppPolicy).useAppPolicy
-local SharedFlags = require(AppShortcutBarParent.SharedFlags)
-local FFlagLuaAppEnableStickyShortcutBar = SharedFlags.FFlagLuaAppEnableStickyShortcutBar
-local FFlagGuacStickyShortcutBarEnabled = SharedFlags.FFlagGuacStickyShortcutBarEnabled
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
 
-function AppShortcutBarContainer() -- line: 15
-	-- upvalues: useAppShortcutBarProps (copy), FFlagGuacStickyShortcutBarEnabled (copy), useAppPolicy (copy), FFlagLuaAppEnableStickyShortcutBar (copy), useIsStickyShortcutBarEnabled (copy), React (copy), AppStickyShortcutBar (copy), AppShortcutBar2 (copy)
-	local v12 = useAppShortcutBarProps()
-	local v13 = if not FFlagGuacStickyShortcutBarEnabled then if not FFlagLuaAppEnableStickyShortcutBar then nil else useIsStickyShortcutBarEnabled() else useAppPolicy(function(p1) -- line: 20
-		return p1.getStickyShortcutBarEnabled()
-	end)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableStickyShortcutBarOnAllPlatforms = SharedFlags.FFlagEnableStickyShortcutBarOnAllPlatforms
 
-	if (FFlagLuaAppEnableStickyShortcutBar or FFlagGuacStickyShortcutBarEnabled) and v13 then
-		return React.createElement(AppStickyShortcutBar, v12)
+function AppShortcutBarContainer(p)
+	local joined = useAppShortcutBarProps()
+
+	if not (useAppPolicy(function(p2)
+		return p2.getStickyShortcutBarEnabled()
+	end) or FFlagEnableStickyShortcutBarOnAllPlatforms) then
+		return React.createElement(AppShortcutBar2, joined)
 	end
 
-	return React.createElement(AppShortcutBar2, v12)
+	local createElement = React.createElement
+
+	if FFlagEnableStickyShortcutBarOnAllPlatforms then
+		joined = Cryo.Dictionary.join(joined, {
+			isLeftNavVisible = p.isLeftNavVisible,
+			currentPage = p.currentPage
+		})
+	end
+
+	return createElement(AppStickyShortcutBar, joined)
 end
 
 return AppShortcutBarContainer

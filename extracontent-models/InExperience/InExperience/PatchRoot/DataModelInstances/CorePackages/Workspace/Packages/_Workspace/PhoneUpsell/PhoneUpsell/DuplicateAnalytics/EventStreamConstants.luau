@@ -13,9 +13,5 @@ return {
 		PhoneNumber = "phoneNumber",
 		ErrorMessage = "errorMessage"
 	},
-	ActionType = {
-		Focus = "focus",
-		Shown = "shown",
-		Dismiss = "dismissed"
-	}
+	ActionType = { Focus = "focus", Shown = "shown", Dismiss = "dismissed" }
 }

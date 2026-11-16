@@ -1,22 +1,43 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local ImageSet = require(Parent.UIBlox).App.ImageSet
+local parent = script:FindFirstAncestor("AppBlox").Parent
+local UIBlox = require(parent.UIBlox)
+local ImageSet = UIBlox.App.ImageSet
 local IconSize = ImageSet.Enum.IconSize
-local v4 = ImageSet.getIconSize(IconSize.Medium)
+local iconSize = ImageSet.getIconSize(IconSize.Medium)
 
-function calcMediaGallerySizesFromWidth(n1: number, n2: number, b1: boolean?) -- line: 15
-	-- upvalues: v4 (copy)
-	local v8 = if not b1 then n1 - v4 * 2 else n1
-	local v9 = math.floor(v8 / 1.7777777777777777)
-	local v10 = if not b1 then math.floor((n1 - (n2 - 1) * 12 - v4 * 2) / n2) else math.floor((n1 - (n2 - 1) * 12) / n2)
-	local v11 = if not b1 then n1 else n1 + v4 * 2
-	local v12 = math.floor(v10 / 1.7777777777777777)
-	local v13 = v9 + v12 + 24
+function calcMediaGallerySizesFromWidth(p: number, p2: number, flag: boolean?)
+	local v
+
+	if flag then
+		v = p
+	else
+		v = p - iconSize * 2
+	end
+
+	local v2 = math.floor(v / (16 / 9))
+	local v3
+
+	if flag then
+		v3 = math.floor((p - (p2 - 1) * 12) / p2)
+	else
+		v3 = math.floor((p - (p2 - 1) * 12 - iconSize * 2) / p2)
+	end
+
+	local v4
+
+	if flag then
+		v4 = p + iconSize * 2
+	else
+		v4 = p
+	end
+
+	local v5 = math.floor(v3 / (16 / 9))
+	local v6 = v2 + v5 + 24
 
 	return {
-		contentSize = UDim2.fromOffset(n1, v13),
-		previewSize = UDim2.fromOffset(v8, v9),
-		paginationSize = UDim2.fromOffset(v11, v12),
-		thumbnailSize = UDim2.fromOffset(v10, v12)
+		contentSize = UDim2.fromOffset(p, v6),
+		previewSize = UDim2.fromOffset(v, v2),
+		paginationSize = UDim2.fromOffset(v4, v5),
+		thumbnailSize = UDim2.fromOffset(v3, v5)
 	}
 end
 

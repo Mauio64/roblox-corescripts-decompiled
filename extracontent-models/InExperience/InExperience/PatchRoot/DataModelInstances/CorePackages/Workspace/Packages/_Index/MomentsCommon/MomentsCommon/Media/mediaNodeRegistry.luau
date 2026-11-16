@@ -2,38 +2,31 @@ local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
 
 require(MomentsCommon.Media.MediaTypes)
 
-local function createMediaNodeRegistry() -- line: 45
-	local t1 = {}
+local function createMediaNodeRegistry()
+	local v = {}
 
 	return {
-		register = function(t2: {[any]: any}) -- line: 48
-			-- upvalues: t1 (copy)
-			assert(not t1[t2.kind], `mediaNodeRegistry: kind "{ t2.kind }" already registered`)
-			t1[t2.kind] = t2
+		register = function(p)
+			assert(not v[p.kind], `mediaNodeRegistry: kind "{p.kind}" already registered`)
+			v[p.kind] = p
 		end,
-		getFactory = function(s1: string) -- line: 55
-			-- upvalues: t1 (copy)
-			return t1[s1]
+		getFactory = function(p: string)
+			return v[p]
 		end,
-		create = function(s2: string, t3: {[any]: any}, p1) -- line: 59
-			-- upvalues: t1 (copy)
-			local v9 = t1[s2]
-
-			assert(v9, `mediaNodeRegistry: no factory registered for kind "{ s2 }"`)
-
-			return v9.create(t3, p1)
+		create = function(p: string, p2, p3)
+			local v2 = v[p]
+			assert(v2, `mediaNodeRegistry: no factory registered for kind "{p}"`)
+			return v2.create(p2, p3)
 		end,
-		getKinds = function() -- line: 65
-			-- upvalues: t1 (copy)
-			local t4 = {}
+		getKinds = function()
+			local kinds = {}
 
-			for v11 in t1 do
-				table.insert(t4, v11)
+			for k in v do
+				table.insert(kinds, k)
 			end
 
-			table.sort(t4)
-
-			return t4
+			table.sort(kinds)
+			return kinds
 		end
 	}
 end

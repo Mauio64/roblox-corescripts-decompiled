@@ -1,21 +1,37 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local isPageAvailable = require(AppChat.Utils.isPageAvailable)
-local useChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext).useChatPlacementContext
-local FFlagAppChatOnConsoles = require(AppChatParent.SharedFlags).FFlagAppChatOnConsoles
-local useAppPolicy = require(AppChatParent.UniversalAppPolicy).useAppPolicy
 
-return function(t1: {[any]: any}) -- line: 21
-	-- upvalues: useChatPlacementContext (copy), FFlagAppChatOnConsoles (copy), useAppPolicy (copy), isPageAvailable (copy)
+local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+local useChatPlacementContext = ChatPlacementContext.useChatPlacementContext
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatOnConsoles = SharedFlags.FFlagAppChatOnConsoles
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+
+return function(items)
 	local chatPlacement = useChatPlacementContext().chatPlacement
-	local v9 = if not FFlagAppChatOnConsoles then nil else useAppPolicy(function(p1) -- line: 24
-		return p1.getWebViewSupport()
-	end)
-	local t2 = {}
+	local v
 
-	for _, v12 in t1 do
-		t2[v12] = isPageAvailable(v12, chatPlacement, if not FFlagAppChatOnConsoles then nil else v9)
+	if FFlagAppChatOnConsoles then
+		v = useAppPolicy(function(p)
+			return p.getWebViewSupport()
+		end)
 	end
 
-	return t2
+	local result = {}
+
+	for _, item in items do
+		local v2
+
+		if FFlagAppChatOnConsoles then
+			v2 = v
+		end
+
+		result[item] = isPageAvailable(item, chatPlacement, v2)
+	end
+
+	return result
 end

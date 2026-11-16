@@ -1,0 +1,14 @@
+local FFlagVirtualizedFeedFooterWrapperProp = require(script.Parent.FFlagVirtualizedFeedFooterWrapperProp)
+local FFlagEditProfileImageR15UpgradePrompt = require(script.Parent.FFlagEditProfileImageR15UpgradePrompt)
+local FFlagAppBloxConfirmationDialogFocusNav = require(script.Parent.FFlagAppBloxConfirmationDialogFocusNav)
+local FFlagEditProfileImageV2ConsoleEnabled = require(script.Parent.FFlagEditProfileImageV2ConsoleEnabled)
+
+local defineFastFlag = game:DefineFastFlag("EditProfileImageV2Enabled7", false)
+
+local engineFeature = game:GetEngineFeature("AvatarEditorServiceApplyProfileConfigurationEnabled")
+	and game:GetEngineFeature("ThumbnailCustomizationsInProfileConfigurationEnabled")
+
+return (defineFastFlag or FFlagEditProfileImageV2ConsoleEnabled and FFlagAppBloxConfirmationDialogFocusNav)
+	and engineFeature
+	and FFlagVirtualizedFeedFooterWrapperProp
+	and FFlagEditProfileImageR15UpgradePrompt

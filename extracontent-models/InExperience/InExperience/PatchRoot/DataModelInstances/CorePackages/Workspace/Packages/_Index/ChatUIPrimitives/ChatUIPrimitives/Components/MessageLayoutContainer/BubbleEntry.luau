@@ -1,11 +1,11 @@
 local ChatUIPrimitives = script:FindFirstAncestor("ChatUIPrimitives")
-local ChatUIPrimitivesParent = ChatUIPrimitives.Parent
-local React = require(ChatUIPrimitivesParent.React)
+local parent = ChatUIPrimitives.Parent
 
-require(ChatUIPrimitivesParent.Signals)
+local React = require(parent.React)
+require(parent.Signals)
 require(ChatUIPrimitives.Types)
 
-local function BubbleEntry(_: {[any]: any}) -- line: 19
+local function BubbleEntry(_): nil
 	return nil
 end
 

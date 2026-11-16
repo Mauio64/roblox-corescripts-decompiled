@@ -1,35 +1,36 @@
 local CorePackages = game:GetService("CorePackages")
-local ShareGame = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame
-local Immutable = require(CorePackages.Workspace.Packages.AppCommonLib).Immutable
+
+local CoreGui = game:GetService("CoreGui")
+local ShareGame = CoreGui.RobloxGui.Modules.Settings.Pages.ShareGame
+
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
 local ReceivedUserInviteStatus = require(ShareGame.Actions.ReceivedUserInviteStatus)
 local StoppedToastTimer = require(ShareGame.Actions.StoppedToastTimer)
-local InviteStatus = require(ShareGame.Constants).InviteStatus
 
-return function(p1, p2) -- line: 13
-	-- upvalues: ReceivedUserInviteStatus (copy), InviteStatus (copy), Immutable (copy), StoppedToastTimer (copy)
-	local v9 = p1 or {
-		failedInvites = {}
-	}
+local Constants = require(ShareGame.Constants)
+local InviteStatus = Constants.InviteStatus
 
-	if p2.type == ReceivedUserInviteStatus.name then
-		local inviteStatus = p2.inviteStatus
+return function(p, data)
+	p = p or { failedInvites = {} }
 
-		if inviteStatus == InviteStatus.Moderated or inviteStatus == InviteStatus.Failed then
-			local t1 = {
-				timeStamp = tick(),
-				userId = p2.userId,
-				status = inviteStatus
-			}
+	if data.type == ReceivedUserInviteStatus.name then
+		local inviteStatus = data.inviteStatus
 
-			return (Immutable.JoinDictionaries(v9, {
-				failedInvites = Immutable.JoinDictionaries(v9.failedInvites, Immutable.Append(v9.failedInvites, t1))
-			}))
+		if inviteStatus ~= InviteStatus.Moderated and inviteStatus ~= InviteStatus.Failed then
+			return p
 		end
-	elseif p2.type == StoppedToastTimer.name then
-		v9 = Immutable.JoinDictionaries(v9, {
-			failedInvites = {}
-		})
+
+		local v = { timeStamp = tick(), userId = data.userId, status = inviteStatus }
+
+		return (Immutable.JoinDictionaries(p, {
+			failedInvites = Immutable.JoinDictionaries(p.failedInvites, Immutable.Append(p.failedInvites, v))
+		}))
 	end
 
-	return v9
+	if data.type == StoppedToastTimer.name then
+		p = Immutable.JoinDictionaries(p, { failedInvites = {} })
+	end
+
+	return p
 end

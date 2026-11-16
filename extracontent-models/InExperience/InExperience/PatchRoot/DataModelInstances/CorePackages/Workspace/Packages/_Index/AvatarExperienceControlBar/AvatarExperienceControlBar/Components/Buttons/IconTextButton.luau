@@ -1,73 +1,122 @@
 local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
-local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
-local React = require(AvatarExperienceControlBarParent.React)
-local Foundation = require(AvatarExperienceControlBarParent.Foundation)
-local Localization = require(AvatarExperienceControlBarParent.Localization)
+
+local parent = AvatarExperienceControlBar.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+
 local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
 local useLocalization = Localization.Hooks.useLocalization
 local useHoverBinding = require(AvatarExperienceControlBar.Hooks.useHoverBinding)
+
 local isBuilderIcon = Foundation.Utility.isBuilderIcon
-local FFlagAXMigrateBuilderIcons = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
-local FFlagAXResetAvatarButton = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXResetAvatarButton
 
-return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 29
-	-- upvalues: useSemanticTokens (copy), useHoverBinding (copy), useLocalization (copy), FFlagAXMigrateBuilderIcons (copy), isBuilderIcon (copy), React (copy), Foundation (copy), FFlagAXResetAvatarButton (copy)
-	local v14 = useSemanticTokens()
-	local v15, v16 = useHoverBinding()
-	local v17 = if not t1.radius then v14.defaultIconTextButtonRadius else t1.radius
-	local v18 = useLocalization({
-		text = t1.localizedTextKey
-	})
-	local v19 = if not v18.text then t1.text else v18.text
-	local v20 = if not t1.iconSize then v14.defaultIconSize else t1.iconSize
-	local v21 = FFlagAXMigrateBuilderIcons and isBuilderIcon(t1.icon)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
+local AvatarExperienceFlags2 = require(parent.AvatarExperienceFlags)
+local FFlagAXResetAvatarButton = AvatarExperienceFlags2.FFlagAXResetAvatarButton
 
-	return React.createElement(Foundation.View, {
+return (React.forwardRef(function(props, ref)
+	local v = useSemanticTokens()
+	local v2, onStateChanged = useHoverBinding()
+	local v3
+
+	if props.radius then
+		v3 = props.radius
+	else
+		v3 = v.defaultIconTextButtonRadius
+	end
+
+	local v4 = useLocalization({ text = props.localizedTextKey })
+
+	local text = if v4.text then v4.text else props.text
+	local size
+
+	if props.iconSize then
+		size = props.iconSize
+	else
+		size = v.defaultIconSize
+	end
+
+	local rowalignxcenteralignycenter = FFlagAXMigrateBuilderIcons and isBuilderIcon(props.icon)
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v5 = {
+		onActivated = props.onActivated,
+		isDisabled = props.disabled,
 		tag = "auto-xy size-full-0 clip row gap-xsmall items-center",
-		onActivated = t1.onActivated,
-		isDisabled = t1.disabled,
-		ref = p1,
-		onStateChanged = v16,
-		GroupTransparency = if not FFlagAXResetAvatarButton then nil else if not t1.disabled then v14.contentForegroundStyle.Transparency else v14.contentDisabledTransparency,
-		backgroundStyle = v15:map(function(p2) -- line: 55
-			-- upvalues: v14 (copy)
-			return {
-				Color3 = v14.hoverIconBackgroundStyle.Color3,
-				Transparency = not p2 and 1 or v14.hoverIconBackgroundStyle.Transparency
-			}
-		end),
-		cornerRadius = UDim.new(0, v17),
-		padding = {
-			left = UDim.new(0, v14.textButtonPaddingLeft),
-			right = UDim.new(0, v14.textButtonPaddingRight),
-			top = UDim.new(0, v14.textButtonPaddingY),
-			bottom = UDim.new(0, v14.textButtonPaddingY)
-		},
-		Visible = t1.Visible,
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		Icon = React.createElement(Foundation.View, {
-			Size = UDim2.new(0, v14.iconTextButtonIconContainerSize, 0, v14.iconTextButtonIconContainerSize),
-			tag = not FFlagAXMigrateBuilderIcons and "radius-circle" or {
-				["radius-circle"] = true,
-				["row align-x-center align-y-center"] = v21
-			}
-		}, {
-			IconImage = if not v21 then React.createElement(Foundation.Image, {
-				tag = "position-center-center anchor-center-center",
-				Image = t1.icon,
-				Size = UDim2.new(0, v20, 0, v20),
-				imageStyle = v14.contentForegroundStyle
-			}) else React.createElement(Foundation.Icon, {
-				tag = "position-center-center anchor-center-center",
-				name = t1.icon,
-				size = v20,
-				style = v14.contentForegroundStyle
-			})
-		}),
+		ref = ref,
+		onStateChanged = onStateChanged,
+		GroupTransparency = 0,
+		backgroundStyle = 0,
+		cornerRadius = 0,
+		padding = 0,
+		Visible = 0,
+		LayoutOrder = 0
+	}
+	local groupTransparency
+
+	if FFlagAXResetAvatarButton then
+		if props.disabled then
+			groupTransparency = v.contentDisabledTransparency
+		else
+			groupTransparency = v.contentForegroundStyle.Transparency
+		end
+	end
+
+	v5.GroupTransparency = groupTransparency
+
+	v5.backgroundStyle = v2:map(function(p)
+		return {
+			Color3 = v.hoverIconBackgroundStyle.Color3,
+			Transparency = not p and 1 or v.hoverIconBackgroundStyle.Transparency
+		}
+	end)
+
+	v5.cornerRadius = UDim.new(0, v3)
+	v5.padding = {
+		left = UDim.new(0, v.textButtonPaddingLeft),
+		right = UDim.new(0, v.textButtonPaddingRight),
+		top = UDim.new(0, v.textButtonPaddingY),
+		bottom = UDim.new(0, v.textButtonPaddingY)
+	}
+
+	v5.Visible = props.Visible
+	v5.LayoutOrder = props.LayoutOrder
+
+	local createElement2 = React.createElement
+	local view2 = Foundation.View
+	local v6 = {
+		Size = UDim2.new(0, v.iconTextButtonIconContainerSize, 0, v.iconTextButtonIconContainerSize),
+		tag = FFlagAXMigrateBuilderIcons and {
+			["radius-circle"] = true,
+			["row align-x-center align-y-center"] = rowalignxcenteralignycenter
+		} or "radius-circle"
+	}
+	local iconImage
+
+	if rowalignxcenteralignycenter then
+		iconImage = React.createElement(Foundation.Icon, {
+			tag = "position-center-center anchor-center-center",
+			name = props.icon,
+			size = size,
+			style = v.contentForegroundStyle
+		})
+	else
+		iconImage = React.createElement(Foundation.Image, {
+			tag = "position-center-center anchor-center-center",
+			Image = props.icon,
+			Size = UDim2.new(0, size, 0, size),
+			imageStyle = v.contentForegroundStyle
+		})
+	end
+
+	return createElement(view, v5, {
+		Icon = createElement2(view2, v6, { IconImage = iconImage }),
 		Text = React.createElement(Foundation.Text, {
-			tag = "auto-xy text-title-medium content-emphasis",
-			Text = v19
+			Text = text,
+			tag = "auto-xy text-title-medium content-emphasis"
 		})
 	})
 end))

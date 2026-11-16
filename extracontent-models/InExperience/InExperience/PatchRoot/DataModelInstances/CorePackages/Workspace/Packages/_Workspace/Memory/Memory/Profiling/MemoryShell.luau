@@ -1,173 +1,146 @@
 local HttpService = game:GetService("HttpService")
+
 local MemoryTracker = require(script.Parent.Parent.Common.MemoryTracker)
 local GarbageCollector = require(script.Parent.Parent.Common.GarbageCollector)
-local v4 = game:DefineFastString("MemoryShellHost", "ws://localhost:5013")
-local t1 = {}
 
-t1.__index = t1
+local defineFastString = game:DefineFastString("MemoryShellHost", "ws://localhost:5013")
 
-local function getMemoryTracker() -- line: 23
-	-- upvalues: MemoryTracker (copy)
+local class = {}
+class.__index = class
+
+local function getMemoryTracker() -- 2 equivalent calls inferred from this helper
 	return MemoryTracker()
 end
 
-local t2 = {
-	getLuaHeap = function() -- line: 28
-		-- upvalues: GarbageCollector (copy), MemoryTracker (copy)
+local v = {
+	getLuaHeap = function()
 		GarbageCollector.collect()
+		local memoryTracker = getMemoryTracker() -- inferred equivalent call
 
-		local v10 = MemoryTracker()
-
-		if v10 then
-			return v10.getLuaHeapOnly()
+		if memoryTracker then
+			return memoryTracker.getLuaHeapOnly()
 		end
 
-		return {
-			luaHeapMb = "-1"
-		}
+		return { luaHeapMb = "-1" }
 	end,
-	getSnapshot = function() -- line: 36
-		-- upvalues: GarbageCollector (copy), MemoryTracker (copy)
+	getSnapshot = function()
 		GarbageCollector.collect()
+		local memoryTracker = getMemoryTracker() -- inferred equivalent call
 
-		local v11 = MemoryTracker()
-
-		if v11 then
-			return v11.getSnapshot()
+		if memoryTracker then
+			return memoryTracker.getSnapshot()
 		end
 
-		return {
-			luaHeapMb = "-1"
-		}
+		return { luaHeapMb = "-1" }
 	end,
-	forceGC = function() -- line: 44
-		-- upvalues: GarbageCollector (copy)
+	forceGC = function(): string
 		GarbageCollector.collect()
-
 		return "ok"
 	end
 }
 
-local function handleRequest(p1) -- line: 50
-	-- upvalues: t2 (copy)
-	local t3 = {
-		result = nil,
-		error = nil,
-		id = p1.id,
-		jsonrpc = p1.jsonrpc
-	}
-	local v14 = t2[p1.method]
+local function handleRequest(data)
+	local v2 = { id = data.id, jsonrpc = data.jsonrpc, result = nil, error = nil }
 
-	if v14 == nil then
-		t3.error = {
-			message = string.format("Unknown method \"%s\"", (tostring(p1.method)))
+	local v3 = v[data.method]
+
+	if v3 == nil then
+		v2.error = {
+			message = string.format("Unknown method \"%s\"", (tostring(data.method)))
 		}
-
-		return t3
+		return v2
 	end
 
-	local ok, result = xpcall(v14, function(err) -- line: 62
-		return debug.traceback(err)
+	local success, result = xpcall(v3, function(p)
+		return debug.traceback(p)
 	end)
 
-	if ok then
-		t3.result = result
-
-		return t3
+	if success then
+		v2.result = result
+		return v2
 	end
 
-	t3.error = {
-		message = result
-	}
+	v2.error = { message = result }
 
-	return t3
+	return v2
 end
-local function tryConnect(p2) -- line: 75
-	-- upvalues: v4 (copy), HttpService (copy), handleRequest (copy)
-	if not p2._WebSocketService then
+
+local function tryConnect(object): boolean
+	if not object._WebSocketService then
 		return false
 	end
 
-	if p2._connected then
+	if object._connected then
 		return true
 	end
 
-	local v18 = v4
-	local u19 = nil
+	local v2 = defineFastString
+	local v3 = nil
 
-	if not pcall(function() -- line: 86
-		-- upvalues: u19 (ref), p2 (copy), v18 (copy)
-		u19 = p2._WebSocketService:CreateClient(v18)
-	end) or not u19 then
+	if not (pcall(function()
+		v3 = object._WebSocketService:CreateClient(v2)
+	end) and v3) then
 		return false
 	end
 
-	p2._connected = true
-	u19.Closed:Connect(function() -- line: 95
-		-- upvalues: p2 (copy)
-		p2._connected = false
-		p2:_connectWithRetry()
-	end)
-	u19.MessageReceived:Connect(function(p3) -- line: 100
-		-- upvalues: HttpService (copy), handleRequest (copy), u19 (ref)
-		xpcall(function() -- line: 101
-			-- upvalues: HttpService (copy), p3 (copy), handleRequest (copy), u19 (ref)
-			local data = HttpService:JSONDecode(p3)
-			local v27 = handleRequest(data)
+	object._connected = true
 
-			u19:Send(HttpService:JSONEncode(v27))
-		end, function() -- line: 105
-		end)
+	v3.Closed:Connect(function()
+		object._connected = false
+		object:_connectWithRetry()
+	end)
+
+	v3.MessageReceived:Connect(function(json)
+		xpcall(function()
+			local v4 = handleRequest(HttpService:JSONDecode(json))
+			v3:Send(HttpService:JSONEncode(v4))
+		end, function() end)
 	end)
 
 	return true
 end
 
-function t1._connectWithRetry(p4) -- line: 111
-	-- upvalues: tryConnect (copy)
-	if p4._retrying then
+function class:_connectWithRetry()
+	if self._retrying then
 		return
 	end
 
-	task.spawn(function() -- line: 115
-		-- upvalues: p4 (copy), tryConnect (copy)
-		p4._retrying = true
+	task.spawn(function()
+		self._retrying = true
 
-		while not p4._connected and not tryConnect(p4) do
+		while not (self._connected or tryConnect(self)) do
 			task.wait(5)
 		end
 
-		p4._retrying = false
+		self._retrying = false
 	end)
 end
-function t1.new() -- line: 127
-	-- upvalues: t1 (copy)
-	return (setmetatable({
-		_connected = false,
-		_retrying = false,
-		_WebSocketService = nil
-	}, t1))
-end
-function t1.start(p5) -- line: 136
-	if not p5._WebSocketService then
-		local WebSocketService = nil
 
-		if not pcall(function() -- line: 139
-			-- upvalues: WebSocketService (ref)
-			WebSocketService = game:GetService("WebSocketService")
-		end) or not WebSocketService then
+function class.new()
+	return (setmetatable({ _connected = false, _retrying = false, _WebSocketService = nil }, class))
+end
+
+function class:start()
+	if not self._WebSocketService then
+		local webSocketService = nil
+
+		if pcall(function()
+			local WebSocketService = game:GetService("WebSocketService")
+			webSocketService = WebSocketService
+		end) and webSocketService then
+			self._WebSocketService = webSocketService
+		else
 			return
 		end
-
-		p5._WebSocketService = WebSocketService
 	end
 
-	p5:_connectWithRetry()
-end
-function t1.reconnect(p6) -- line: 151
-	p6._connected = false
-	p6._retrying = false
-	p6:_connectWithRetry()
+	self:_connectWithRetry()
 end
 
-return t1.new()
+function class:reconnect()
+	self._connected = false
+	self._retrying = false
+	self:_connectWithRetry()
+end
+
+return class.new()

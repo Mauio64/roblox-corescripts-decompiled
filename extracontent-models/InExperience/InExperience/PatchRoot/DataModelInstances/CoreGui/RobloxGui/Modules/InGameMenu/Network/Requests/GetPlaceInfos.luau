@@ -1,16 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent
-local Url = require(ParentParent.Network.Url)
+local parent = script.Parent.Parent.Parent
+local Url = require(parent.Network.Url)
 
-return function(p1, p2) -- line: 4
-	-- upvalues: Url (copy)
-	for i, v in ipairs(p2) do
-		p2[i] = tostring(v)
+return function(callback, placeIds)
+	for i, item in ipairs(placeIds) do
+		placeIds[i] = tostring(item)
 	end
 
-	local t1 = {
-		placeIds = p2
-	}
-	local v8 = Url:makeQueryString(t1)
-
-	return p1(string.format("%s/v1/games/multiget-place-details?%s", Url.GAME_URL, v8), "GET")
+	local queryString = Url:makeQueryString({ placeIds = placeIds })
+	return callback(string.format("%s/v1/games/multiget-place-details?%s", Url.GAME_URL, queryString), "GET")
 end

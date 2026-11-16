@@ -1,131 +1,166 @@
 local Style = script:FindFirstAncestor("Style")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local StyleParent = Style.Parent
-local Cryo = require(StyleParent.Cryo)
-local React = require(StyleParent.React)
-local SignalsReact = require(StyleParent.SignalsReact)
-local useDeviceType = require(StyleParent.RobloxAppHooks).useDeviceType
-local ThemeContext = require(script.Parent.ThemeContext)
+local parent = Style.Parent
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useDeviceType = RobloxAppHooks.useDeviceType
+local AppearanceContext = require(script.Parent.AppearanceContext)
 local SceneOverridesRegistry = require(script.Parent.SceneOverridesRegistry)
-local AppStyleProvider = require(StyleParent.UIBlox).App.Style.AppStyleProvider
-local Foundation = require(StyleParent.Foundation)
+local UIBlox = require(parent.UIBlox)
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Foundation = require(parent.Foundation)
 local FoundationProvider = Foundation.FoundationProvider
-local Theme = Foundation.Enums.Theme
-local getUIScale = require(StyleParent.Display).GetDisplayStore(false).getUIScale
-local v15 = game:DefineFastFlag("LuaAppEnableWindowsHandheldTokenScale", false) and game:GetEngineFeature("EnableDisplaySize")
-local v16 = game:DefineFastFlag("DebugLuaAppEnableTokenScale", false)
-local v17 = v15 or v16
-local FFlagAppNavBarPerItemThemeOverride = require(StyleParent.SharedFlags).FFlagAppNavBarPerItemThemeOverride
-local t1 = {
-	dark = Theme.Dark,
-	light = Theme.Light
+local ColorMode = Foundation.Enums.ColorMode
+local ThemeName = Foundation.Enums.ThemeName
+local Display = require(parent.Display)
+local getUIScale = Display.GetDisplayStore(false).getUIScale
+
+local engineFeature = game:DefineFastFlag("LuaAppEnableWindowsHandheldTokenScale", false)
+	and game:GetEngineFeature("EnableDisplaySize")
+local defineFastFlag = game:DefineFastFlag("DebugLuaAppEnableTokenScale", false)
+
+local v = engineFeature or defineFastFlag
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppNavBarPerItemThemeOverride = SharedFlags.FFlagAppNavBarPerItemThemeOverride
+local UiModeBrandThemeContext
+
+if FFlagAppNavBarPerItemThemeOverride then
+	UiModeBrandThemeContext = require(script.Parent.UiModeBrandThemeContext)
+else
+	UiModeBrandThemeContext = nil
+end
+
+local defineFastFlag2 = game:DefineFastFlag("AppClassicThemeGreenButtonColors", false)
+
+local v2 = {
+	["Color.ActionEmphasis.Background.Color3"] = Color3.fromHex("#137F1F"),
+	["Color.ActionSoftEmphasis.Background.Color3"] = Color3.fromHex("#137F1F"),
+	["Color.ActionSoftEmphasis.Foreground.Color3"] = Color3.fromHex("#E2F8E3")
 }
 
-local function useTokenScale() -- line: 52
-	-- upvalues: SignalsReact (copy), getUIScale (copy)
+local v3 = {
+	["Color.ActionEmphasis.Background.Color3"] = Color3.fromHex("#12891D"),
+	["Color.ActionEmphasis.Foreground.Color3"] = Color3.fromHex("#FFFFFF"),
+	["Color.ActionSoftEmphasis.Background.Color3"] = Color3.fromHex("#12891D"),
+	["Color.ActionSoftEmphasis.Foreground.Color3"] = Color3.fromHex("#022708")
+}
+
+local v4 = { ["dark"] = ColorMode.Dark, light = ColorMode.Light }
+
+local function useTokenScale() -- 1 equivalent call inferred from this helper
 	return (SignalsReact.useSignalState(getUIScale))
 end
-local function UiModeStyleProvider(t2: {[any]: any}) -- line: 57
-	-- upvalues: useDeviceType (copy), v17 (copy), SignalsReact (copy), getUIScale (copy), React (copy), UserGameSettings (copy), Cryo (copy), FoundationProvider (copy), t1 (copy), SceneOverridesRegistry (copy), AppStyleProvider (copy)
-	local v24 = useDeviceType()
-	local u25 = nil
 
-	if v17 then
-		u25 = SignalsReact.useSignalState(getUIScale)
+local function UiModeStyleProvider(p)
+	local v5 = useDeviceType()
+	local scale
+
+	if v then
+		scale = useTokenScale() -- inferred equivalent call
+	else
+		scale = nil
 	end
 
-	local v26, v27 = React.useState({
+	local state, setState = React.useState({
 		preferredTransparency = UserGameSettings.PreferredTransparency,
 		reducedMotion = UserGameSettings.ReducedMotion,
 		preferredTextSize = UserGameSettings.PreferredTextSize
 	})
 
-	React.useEffect(function() -- line: 71
-		-- upvalues: v27 (copy), UserGameSettings (copy)
-		local function updateSettings() -- line: 72
-			-- upvalues: v27 (copy), UserGameSettings (copy)
-			v27({
+	React.useEffect(function()
+		local function updateSettings()
+			setState({
 				preferredTransparency = UserGameSettings.PreferredTransparency,
 				reducedMotion = UserGameSettings.ReducedMotion,
 				preferredTextSize = UserGameSettings.PreferredTextSize
 			})
 		end
+		local preferredTransparencyChangedConnection = UserGameSettings:GetPropertyChangedSignal("PreferredTransparency"):Connect(updateSettings)
+		local reducedMotionChangedConnection = UserGameSettings:GetPropertyChangedSignal("ReducedMotion"):Connect(updateSettings)
+		local preferredTextSizeChangedConnection = UserGameSettings:GetPropertyChangedSignal("PreferredTextSize"):Connect(updateSettings)
 
-		local connection = UserGameSettings:GetPropertyChangedSignal("PreferredTransparency"):Connect(updateSettings)
-		local connection2 = UserGameSettings:GetPropertyChangedSignal("ReducedMotion"):Connect(updateSettings)
-		local connection3 = UserGameSettings:GetPropertyChangedSignal("PreferredTextSize"):Connect(updateSettings)
-
-		return function() -- line: 86
-			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
-			connection3:Disconnect()
+		return function()
+			preferredTransparencyChangedConnection:Disconnect()
+			reducedMotionChangedConnection:Disconnect()
+			preferredTextSizeChangedConnection:Disconnect()
 		end
 	end, {})
 
-	local style = t2.style
-	local v29 = React.useMemo(function() -- line: 94
-		-- upvalues: Cryo (copy), style (copy), v24 (copy), v17 (copy), v26 (copy), u25 (ref)
-		return Cryo.Dictionary.join({
-			deviceType = style.deviceType or v24
-		}, style, {
-			settings = if not v17 then v26 else Cryo.Dictionary.join(v26, {
-				scale = u25
-			})
-		})
-	end, {
-		style,
-		v24,
-		v26,
-		u25
-	})
-	local v30 = v29.tokenOverrides ~= nil
+	local style = p.style
+	local style2 = React.useMemo(function()
+		local join = Cryo.Dictionary.join
+		local v6 = {
+			deviceType = style.deviceType or v5
+		}
+		local settings
+
+		if v then
+			settings = Cryo.Dictionary.join(state, { scale = scale })
+		else
+			settings = state
+		end
+
+		return join(v6, style, { settings = settings })
+	end, { style, v5, state, scale })
+
+	local isActive = style2.foundationThemeName ~= nil
+	local tokenOverrides
+
+	if defineFastFlag2 and style2.foundationThemeName == ThemeName.Classic then
+		if v4[style2.themeName:lower()] == ColorMode.Light then
+			tokenOverrides = v3
+		else
+			tokenOverrides = v2
+		end
+	end
 
 	return React.createElement(FoundationProvider, {
-		device = v29.deviceType,
-		theme = t1[v29.themeName:lower()],
-		preferences = v29.settings,
-		tokenOverrides = v29.tokenOverrides
-	}, React.createElement(SceneOverridesRegistry, {
-		isActive = v30
-	}, React.createElement(AppStyleProvider, {
-		style = v29
-	}, t2.children)))
+		device = style2.deviceType,
+		colorMode = v4[style2.themeName:lower()],
+		themeName = style2.foundationThemeName,
+		preferences = style2.settings,
+		tokenOverrides = tokenOverrides
+	}, React.createElement(
+		SceneOverridesRegistry,
+		{ isActive = isActive },
+		React.createElement(AppStyleProvider, { style = style2 }, p.children)
+	))
 end
-local function ThemeProvider(t3: {[any]: any}) -- line: 132
-	-- upvalues: React (copy), FFlagAppNavBarPerItemThemeOverride (copy), t1 (copy), Cryo (copy), ThemeContext (copy), UiModeStyleProvider (copy)
-	local v32, v33 = React.useState(t3.style.themeName)
-	local v34 = if not FFlagAppNavBarPerItemThemeOverride or not t3.syncThemeFromProps then v32 else t3.style.themeName
-	local v35 = table.clone(t3)
-	local tokenOverrides = t3.style.tokenOverrides
 
-	if t3.tokenOverridesByTheme then
-		local v37 = t1[v34:lower()]
+local function ThemeProvider(props)
+	local state, setState = React.useState(props.style.themeName)
 
-		tokenOverrides = t3.tokenOverridesByTheme[v37] or tokenOverrides
+	if FFlagAppNavBarPerItemThemeOverride and props.syncThemeFromProps then
+		state = props.style.themeName
 	end
 
-	v35.style = Cryo.Dictionary.join(v35.style, {
-		themeName = v34,
-		tokenOverrides = tokenOverrides or Cryo.None
-	})
+	local clone = table.clone(props)
 
-	local v38 = React.createElement(ThemeContext.Provider, {
-		value = {
-			theme = v34,
-			setTheme = v33
-		}
-	}, React.createElement(UiModeStyleProvider, v35))
+	local join = Cryo.Dictionary.join
+	local style = clone.style
+	local foundationThemeName
+
+	if props.foundationThemeName then
+		foundationThemeName = props.foundationThemeName
+	else
+		foundationThemeName = Cryo.None
+	end
+
+	clone.style = join(style, { themeName = state, foundationThemeName = foundationThemeName })
+
+	local element = React.createElement(AppearanceContext.Provider, {
+		value = { theme = state, setTheme = setState }
+	}, React.createElement(UiModeStyleProvider, clone))
 
 	if FFlagAppNavBarPerItemThemeOverride then
-		local UiModeTokenOverridesContext = require(script.Parent.UiModeTokenOverridesContext)
-
-		return React.createElement(UiModeTokenOverridesContext.Provider, {
-			value = t3.tokenOverridesByTheme or {}
-		}, v38)
+		return React.createElement(UiModeBrandThemeContext.Provider, {
+			value = { foundationThemeName = props.foundationThemeName }
+		}, element)
 	end
 
-	return v38
+	return element
 end
 
 return ThemeProvider

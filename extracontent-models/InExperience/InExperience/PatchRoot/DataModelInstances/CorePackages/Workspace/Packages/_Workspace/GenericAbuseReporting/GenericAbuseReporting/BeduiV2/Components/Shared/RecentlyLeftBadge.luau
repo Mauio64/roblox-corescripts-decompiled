@@ -1,22 +1,23 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 
 require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
+local arTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation)
+local useArTranslation = arTranslation.useArTranslation
 
-local useArTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation).useArTranslation
 local Badge = Foundation.Badge
 local BadgeVariant = Foundation.Enums.BadgeVariant
 
-local function RecentlyLeftBadge(t1: {[any]: any}) -- line: 23
-	-- upvalues: useArTranslation (copy), React (copy), Badge (copy), BadgeVariant (copy)
+local function RecentlyLeftBadge(p)
 	local translateIntoString = useArTranslation().translateIntoString
 
 	return React.createElement(Badge, {
-		text = translateIntoString(t1.text),
+		text = translateIntoString(p.text),
 		variant = BadgeVariant.Neutral,
-		LayoutOrder = t1.layoutOrder
+		LayoutOrder = p.layoutOrder
 	})
 end
 

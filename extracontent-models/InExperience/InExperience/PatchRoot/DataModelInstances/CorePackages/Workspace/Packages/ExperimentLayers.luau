@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.ExperimentLayers.ExperimentLayers))
+local ExperimentLayers = require(Workspace.ExperimentLayers.ExperimentLayers)
+
+return ExperimentLayers

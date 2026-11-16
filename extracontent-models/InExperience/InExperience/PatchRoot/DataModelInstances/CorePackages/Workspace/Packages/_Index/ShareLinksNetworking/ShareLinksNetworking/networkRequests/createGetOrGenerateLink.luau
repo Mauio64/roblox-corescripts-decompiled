@@ -1,38 +1,37 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.networkingShareLinkTypes)
+local API_URL = require(parent.API_URL)
+require(parent.networkingShareLinkTypes)
+local tutils = require(parent2.tutils)
 
-local tutils = require(ParentParentParent.tutils)
 local HttpService = game:GetService("HttpService")
 
-return function(p1) -- line: 10
-	-- upvalues: tutils (copy), API_URL (copy), HttpService (copy)
-	local v7 = p1.roduxNetworking.POST({
-		Name = "get-or-create-link"
-	}, function(p2, p3) -- line: 15
-		-- upvalues: tutils (copy), API_URL (copy), HttpService (copy)
-		local v10 = tutils.deepCopy(p3)
+return function(p)
+	local post = p.roduxNetworking.POST("get-or-create-link", function(callback, p2)
+		local copy = tutils.deepCopy(p2)
+		copy.linkType = nil
 
-		v10.linkType = nil
+		local path = callback(API_URL):path("sharelinks"):path("v1"):path("get-or-create-link")
+		local v = { linkType = p2.linkType, data = 0 }
+		local v2
 
-		return p2(API_URL):path("sharelinks"):path("v1"):path("get-or-create-link"):body({
-			linkType = p3.linkType,
-			data = if next(v10) == nil then nil else HttpService:JSONEncode(v10)
-		})
+		if next(copy) ~= nil then
+			v2 = HttpService:JSONEncode(copy)
+		end
+
+		v.data = v2
+		return path:body(v)
 	end)
 
-	if p1.useMockedResponse then
-		v7.Mock.clear()
-		v7.Mock.reply(function() -- line: 28
+	if p.useMockedResponse then
+		post.Mock.clear()
+		post.Mock.reply(function()
 			return {
-				responseBody = {
-					linkId = "42685"
-				}
+				responseBody = { linkId = "42685" }
 			}
 		end)
 	end
 
-	return v7
+	return post
 end

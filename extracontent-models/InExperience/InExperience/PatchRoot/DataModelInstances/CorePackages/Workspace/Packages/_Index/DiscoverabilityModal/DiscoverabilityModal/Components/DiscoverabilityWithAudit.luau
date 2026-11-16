@@ -1,1 +1,3 @@
-return (require(script.DiscoverabilityWithAudit))
+local DiscoverabilityWithAudit = require(script.DiscoverabilityWithAudit)
+
+return DiscoverabilityWithAudit

@@ -1,9 +1,9 @@
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
-local useProperty = require(CorePackages.Workspace.Packages.GuiObjectUtils).useProperty
+local GuiObjectUtils = require(CorePackages.Workspace.Packages.GuiObjectUtils)
+local useProperty = GuiObjectUtils.useProperty
 
-local function useLocalPlayer() -- line: 5
-	-- upvalues: useProperty (copy), Players (copy)
+local function useLocalPlayer()
 	return useProperty(Players, "LocalPlayer")
 end
 

@@ -1,1 +1,3 @@
-return (require(script.instanceof))
+local instanceof = require(script.instanceof)
+
+return instanceof

@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-
-require(Parent.React)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+require(parent.React)
 
 return {}

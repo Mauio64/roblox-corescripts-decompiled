@@ -1,61 +1,53 @@
 local AppStorageService = game:GetService("AppStorageService")
 local HttpService = game:GetService("HttpService")
-local t1 = {}
 
-t1.__index = t1
+local AppStorageJsonCacheUtils = {}
 
-function t1.new(p1) -- line: 20
-	-- upvalues: AppStorageService (copy), HttpService (copy), t1 (copy)
-	local t2 = {
-		_appStorageService = p1 or AppStorageService,
+AppStorageJsonCacheUtils.__index = AppStorageJsonCacheUtils
+
+function AppStorageJsonCacheUtils.new(p)
+	local v = {
+		_appStorageService = p or AppStorageService,
 		_httpService = HttpService,
 		_jsonDecodeCache = {}
 	}
 
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v, AppStorageJsonCacheUtils)
+	return v
 end
-function t1.getCachedJsonForKey(t3: {[any]: any}, s1: string, b1: boolean?) -- line: 30
-	local v9
 
-	if t3._jsonDecodeCache[s1] == nil or b1 then
-		v9 = t3:decodeInternal(s1)
-		t3._jsonDecodeCache[s1] = v9
+function AppStorageJsonCacheUtils:getCachedJsonForKey(p: string, flag: boolean?)
+	local v
+
+	if self._jsonDecodeCache[p] == nil or flag then
+		v = self:decodeInternal(p)
+		self._jsonDecodeCache[p] = v
 	else
-		v9 = t3._jsonDecodeCache[s1]
+		v = self._jsonDecodeCache[p]
 	end
 
-	return v9.result
-end
-function t1.decodeInternal(t4: {[any]: any}, s2: string) -- line: 41
-	local ok, result = pcall(function() -- line: 42
-		-- upvalues: t4 (copy), s2 (copy)
-		return t4._appStorageService:GetItem(s2)
-	end)
-
-	if not ok then
-		return {
-			result = nil
-		}
-	end
-
-	local ok2, result2 = pcall(function() -- line: 50
-		-- upvalues: t4 (copy), result (copy)
-		return t4._httpService:JSONDecode(result)
-	end)
-
-	if not ok2 then
-		return {
-			result = nil
-		}
-	end
-
-	return {
-		result = result2
-	}
+	return v.result
 end
 
-t1.default = t1.new(nil)
+function AppStorageJsonCacheUtils:decodeInternal(p: string)
+	local success, result = pcall(function()
+		return self._appStorageService:GetItem(p)
+	end)
 
-return t1
+	if not success then
+		return { result = nil }
+	end
+
+	local success2, result2 = pcall(function()
+		return self._httpService:JSONDecode(result)
+	end)
+
+	if success2 then
+		return { result = result2 }
+	end
+
+	return { result = nil }
+end
+
+AppStorageJsonCacheUtils.default = AppStorageJsonCacheUtils.new(nil)
+return AppStorageJsonCacheUtils

@@ -1,180 +1,176 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
+
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 local GamepadService = game:GetService("GamepadService")
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagVirtualCursorForTVRemoteKeycodes = SharedFlags.FFlagVirtualCursorForTVRemoteKeycodes
 
-local Properties = require(scriptParent.Properties)
-local Interface = require(scriptParent.Interface)
-local t1 = {}
+local Properties = require(parent.Properties)
+local Interface = require(parent.Interface)
+local getDirectionalMoveVector = require(parent.getDirectionalMoveVector)
+
+local Input = {}
+
+local thumbstickVector = Vector2.new()
 local vector2 = Vector2.new()
-local vector2_2 = Vector2.new()
-local u11 = false
-local u12 = false
-local SelectedObject = nil
-
+local flag = false
+local v = false
+local selectedObject = nil
 os.clock()
+local selectedObjectChangedConnection = nil
+local gamepadThumbstick1ChangedConnection = nil
+local selectionRect2DChangedConnection = nil
+local v2 = false
+local v3 = {}
 
-local connection = nil
-local connection2 = nil
-local connection3 = nil
-local u17 = false
+local function processThumbstickInput(data)
+	local v4, v5
 
-local function processThumbstickInput(p1) -- line: 29
-	-- upvalues: Properties (copy)
-	local n1 = 0
-	local n2 = 0
+	if data.Magnitude >= Properties.ThumbstickDeadzone then
+		local v6 = math.atan2(data.y, data.x)
+		local v7 = math.abs(math.cos(v6) * Properties.ThumbstickDeadzone)
+		local v8 = math.abs(math.sin(v6) * Properties.ThumbstickDeadzone)
 
-	if p1.Magnitude >= Properties.ThumbstickDeadzone then
-		local v27 = math.atan2(p1.y, p1.x)
-		local v28 = math.abs(math.cos(v27) * Properties.ThumbstickDeadzone)
-		local v29 = math.abs(math.sin(v27) * Properties.ThumbstickDeadzone)
-
-		n1 = math.max(math.abs(p1.x) - v28, 0) / (1 - v28) * math.sign(p1.x)
-		n2 = math.max(math.abs(p1.y) - v29, 0) / (1 - v29) * math.sign(p1.y)
+		v4 = math.max(math.abs(data.x) - v7, 0) / (1 - v7) * math.sign(data.x)
+		v5 = math.max(math.abs(data.y) - v8, 0) / (1 - v8) * math.sign(data.y)
+	else
+		v4 = 0
+		v5 = 0
 	end
 
-	return Vector2.new(n1, -n2)
+	return Vector2.new(v4, -v5)
 end
-local function onThumbstick2Input(_, p3, p4) -- line: 42
-	-- upvalues: vector2_2 (ref)
-	if p3 == Enum.UserInputState.Change then
-		vector2_2 = Vector2.new(p4.Position.x, p4.Position.y * -1)
 
+local function onThumbstick2Input(_, p, p2)
+	if p == Enum.UserInputState.Change then
+		vector2 = Vector2.new(p2.Position.x, p2.Position.y * -1)
 		return Enum.ContextActionResult.Sink
 	end
 
-	vector2_2 = Vector2.new()
-
+	vector2 = Vector2.new()
 	return Enum.ContextActionResult.Pass
 end
-local function getRectCenter(rect: Rect) -- line: 53
-	return (rect.Min + rect.Max) / 2
-end
-local function processPreviewEnabled(b1: boolean) -- line: 57
-	-- upvalues: u12 (ref), SelectedObject (ref), Interface (copy), GuiService (copy), connection3 (ref)
-	if b1 and not u12 then
-		if SelectedObject then
-			local v35 = Interface
-			local SelectionRect2D = SelectedObject.SelectionRect2D
 
-			v35:EnableUI((SelectionRect2D.Min + SelectionRect2D.Max) / 2)
+local function getRectCenter(selectionRect2D: Rect) -- 4 equivalent calls inferred from this helper
+	return (selectionRect2D.Min + selectionRect2D.Max) / 2
+end
+
+local function processPreviewEnabled(flag2: boolean) -- 1 equivalent call inferred from this helper
+	if flag2 and not v then
+		if selectedObject then
+			Interface:EnableUI(getRectCenter(selectedObject.SelectionRect2D)) -- inferred equivalent call
 		else
-			local v37 = Interface
-			local SelectionRect2D = GuiService.SelectedObject.SelectionRect2D
-
-			v37:EnableUI((SelectionRect2D.Min + SelectionRect2D.Max) / 2)
+			Interface:EnableUI(getRectCenter(GuiService.SelectedObject.SelectionRect2D)) -- inferred equivalent call
 		end
 
-		u12 = true
-	elseif not b1 and u12 then
+		v = true
+	elseif not flag2 and v then
 		Interface:DisableUI()
-		u12 = false
+		v = false
 	end
 
-	if connection3 then
-		connection3:Disconnect()
+	if selectionRect2DChangedConnection then
+		selectionRect2DChangedConnection:Disconnect()
 	end
 
-	if u12 and GuiService.SelectedObject then
-		local SelectedObject2 = GuiService.SelectedObject
-
-		connection3 = SelectedObject2:GetPropertyChangedSignal("SelectionRect2D"):Connect(function() -- line: 78
-			-- upvalues: SelectedObject2 (copy), u12 (ref), Interface (copy)
-			if SelectedObject2 and u12 then
-				local v58 = Interface
-				local SelectionRect2D = SelectedObject2.SelectionRect2D
-
-				v58:TweenCursorPosition((SelectionRect2D.Min + SelectionRect2D.Max) / 2)
+	if v and GuiService.SelectedObject then
+		local selectedObject2 = GuiService.SelectedObject
+		selectionRect2DChangedConnection = selectedObject2:GetPropertyChangedSignal("SelectionRect2D"):Connect(function()
+			if selectedObject2 and v then
+				Interface:TweenCursorPosition(getRectCenter(selectedObject2.SelectionRect2D)) -- inferred equivalent call
 			end
 		end)
 	end
 
-	if b1 then
-		local v40 = Interface
-		local SelectionRect2D = GuiService.SelectedObject.SelectionRect2D
-
-		v40:TweenCursorPosition((SelectionRect2D.Min + SelectionRect2D.Max) / 2)
+	if flag2 then
+		Interface:TweenCursorPosition(getRectCenter(GuiService.SelectedObject.SelectionRect2D)) -- inferred equivalent call
 	end
 end
-local function onThumbstick1Input() -- line: 90
-	-- upvalues: GuiService (copy), UserInputService (copy), processThumbstickInput (copy), u17 (ref), processPreviewEnabled (copy), u12 (ref), Interface (copy), connection3 (ref)
+
+local function onThumbstick1Input()
 	if GuiService.SelectedObject then
-		local GamepadState = UserInputService:GetGamepadState(Enum.UserInputType.Gamepad1)
-		local zero = Vector2.zero
+		local gamepadState = UserInputService:GetGamepadState(Enum.UserInputType.Gamepad1)
 
-		for _, v45 in GamepadState do
-			if v45.KeyCode == Enum.KeyCode.Thumbstick1 then
-				zero = processThumbstickInput(v45.Position)
+		local v4 = Vector2.zero
+
+		for _, v5 in gamepadState do
+			if v5.KeyCode == Enum.KeyCode.Thumbstick1 then
+				v4 = processThumbstickInput(v5.Position)
 			end
 		end
 
-		if u17 and zero == Vector2.zero then
-			u17 = false
+		if v2 and v4 == Vector2.zero then
+			v2 = false
 		end
 
-		processPreviewEnabled(zero ~= Vector2.zero and (u17 and GuiService.SelectedCoreObject == nil))
-
-		return
-	end
-
-	if u12 then
-		Interface:DisableUI()
-		u12 = false
-	end
-
-	if connection3 then
-		connection3:Disconnect()
-	end
-
-	if u12 and GuiService.SelectedObject then
-		local SelectedObject3 = GuiService.SelectedObject
-
-		connection3 = SelectedObject3:GetPropertyChangedSignal("SelectionRect2D"):Connect(function() -- line: 78
-			-- upvalues: SelectedObject3 (copy), u12 (ref), Interface (copy)
-			if SelectedObject3 and u12 then
-				local v60 = Interface
-				local SelectionRect2D = SelectedObject3.SelectionRect2D
-
-				v60:TweenCursorPosition((SelectionRect2D.Min + SelectionRect2D.Max) / 2)
-			end
-		end)
+		processPreviewEnabled(v4 ~= Vector2.zero and v2 and GuiService.SelectedCoreObject == nil)
+	else
+		processPreviewEnabled(false) -- inferred equivalent call
 	end
 end
-local function onSelectedObjectChanged() -- line: 115
-	-- upvalues: u17 (ref), onThumbstick1Input (copy), SelectedObject (ref), GuiService (copy)
-	u17 = true
+
+local function onDirectionalButtonsInput(_: string, p, p2)
+	if not (FFlagVirtualCursorForTVRemoteKeycodes and flag) then
+		return Enum.ContextActionResult.Pass
+	end
+
+	local v4 = Enum.ContextActionResult.Pass
+
+	if p == Enum.UserInputState.Begin or p == Enum.UserInputState.Change then
+		v3[p2.KeyCode] = p2.Position.Z
+		v4 = Enum.ContextActionResult.Sink
+	else
+		v3[p2.KeyCode] = nil
+	end
+
+	thumbstickVector = getDirectionalMoveVector(v3)
+
+	return v4
+end
+
+local function onSelectedObjectChanged()
+	v2 = true
+
 	onThumbstick1Input()
-	SelectedObject = GuiService.SelectedObject
+
+	selectedObject = GuiService.SelectedObject
 end
 
-UserInputService.InputBegan:Connect(function(input) -- line: 123
-	-- upvalues: u11 (ref), GuiService (copy), Interface (copy)
-	if not u11 then
+UserInputService.InputBegan:Connect(function(input)
+	if not flag then
 		return
 	end
 
-	if input.UserInputType == Enum.UserInputType.Gamepad1 and input.KeyCode == Enum.KeyCode.ButtonA and (GuiService.SelectedObject or GuiService.SelectedCoreObject) then
+	if
+		input.UserInputType == Enum.UserInputType.Gamepad1
+		and (input.KeyCode == Enum.KeyCode.ButtonA or FFlagVirtualCursorForTVRemoteKeycodes and input.KeyCode == Enum.KeyCode.ButtonCenter)
+		and (GuiService.SelectedObject or GuiService.SelectedCoreObject)
+	then
 		Interface:PlayCursorTweenActivate()
 	end
 end)
-UserInputService.InputEnded:Connect(function(input) -- line: 136
-	-- upvalues: u11 (ref), Interface (copy), onThumbstick1Input (copy)
-	if u11 then
-		if input.UserInputType == Enum.UserInputType.Gamepad1 and input.KeyCode == Enum.KeyCode.ButtonA then
-			Interface:PlayCursorTweenDefault()
 
-			return
+UserInputService.InputEnded:Connect(function(input)
+	if flag then
+		if
+			input.UserInputType == Enum.UserInputType.Gamepad1
+			and (input.KeyCode == Enum.KeyCode.ButtonA or FFlagVirtualCursorForTVRemoteKeycodes and input.KeyCode == Enum.KeyCode.ButtonCenter)
+		then
+			Interface:PlayCursorTweenDefault()
 		end
 	elseif input.UserInputType == Enum.UserInputType.Gamepad1 and input.KeyCode == Enum.KeyCode.Thumbstick1 then
 		onThumbstick1Input()
 	end
 end)
-UserInputService.InputChanged:Connect(function(input) -- line: 152
-	-- upvalues: u11 (ref), onThumbstick1Input (copy)
-	if u11 then
+
+UserInputService.InputChanged:Connect(function(input)
+	if flag then
 		return
 	end
 
@@ -183,59 +179,88 @@ UserInputService.InputChanged:Connect(function(input) -- line: 152
 	end
 end)
 
-function t1.GetThumbstickVector(_) -- line: 163
-	-- upvalues: vector2 (ref)
+function Input.GetThumbstickVector(_)
+	return thumbstickVector
+end
+
+function Input.GetThumbstick2Vector(_)
 	return vector2
 end
-function t1.GetThumbstick2Vector(_) -- line: 167
-	-- upvalues: vector2_2 (ref)
-	return vector2_2
+
+function Input.EnablePreview(_)
+	selectedObjectChangedConnection = GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(onSelectedObjectChanged)
 end
-function t1.EnablePreview(_) -- line: 171
-	-- upvalues: connection (ref), GuiService (copy), onSelectedObjectChanged (copy)
-	connection = GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(onSelectedObjectChanged)
-end
-function t1.DisablePreview(_) -- line: 176
-	-- upvalues: connection (ref)
-	if connection then
-		connection:Disconnect()
-		connection = nil
+
+function Input.DisablePreview(_)
+	if selectedObjectChangedConnection then
+		selectedObjectChangedConnection:Disconnect()
+		selectedObjectChangedConnection = nil
 	end
 end
-function t1.EnableInput(_) -- line: 183
-	-- upvalues: connection2 (ref), GamepadService (copy), vector2 (ref), processThumbstickInput (copy), ContextActionService (copy), onThumbstick2Input (copy), u11 (ref)
-	connection2 = GamepadService.GamepadThumbstick1Changed:Connect(function(p10) -- line: 184
-		-- upvalues: vector2 (ref), processThumbstickInput (copy)
-		vector2 = processThumbstickInput(p10)
+
+function Input.EnableInput(_)
+	gamepadThumbstick1ChangedConnection = GamepadService.GamepadThumbstick1Changed:Connect(function(p)
+		thumbstickVector = processThumbstickInput(p)
 	end)
-	ContextActionService:BindCoreActionAtPriority("VirtualCursorThumbstick1Movement", function(_, _, _) -- line: 190
-	end, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Thumbstick1)
-	ContextActionService:BindCoreActionAtPriority("VirtualCursorThumbstick2Movement", onThumbstick2Input, false, Enum.ContextActionPriority.High.Value, Enum.KeyCode.Thumbstick2)
-	u11 = true
-end
-function t1.DisableInput(_) -- line: 207
-	-- upvalues: connection2 (ref), vector2 (ref), vector2_2 (ref), ContextActionService (copy), u11 (ref)
-	if connection2 then
-		connection2:Disconnect()
-		connection2 = nil
+
+	ContextActionService:BindCoreActionAtPriority(
+		"VirtualCursorThumbstick1Movement",
+		function(_, _, _) end,
+		false,
+		Enum.ContextActionPriority.High.Value,
+		Enum.KeyCode.Thumbstick1
+	)
+
+	ContextActionService:BindCoreActionAtPriority(
+		"VirtualCursorThumbstick2Movement",
+		onThumbstick2Input,
+		false,
+		Enum.ContextActionPriority.High.Value,
+		Enum.KeyCode.Thumbstick2
+	)
+
+	if FFlagVirtualCursorForTVRemoteKeycodes then
+		ContextActionService:BindCoreActionAtPriority(
+			"VirtualCursorDirectionalButtonsMovement",
+			onDirectionalButtonsInput,
+			false,
+			Enum.ContextActionPriority.High.Value,
+			Enum.KeyCode.ButtonUp,
+			Enum.KeyCode.ButtonDown,
+			Enum.KeyCode.ButtonLeft,
+			Enum.KeyCode.ButtonRight
+		)
 	end
 
+	flag = true
+end
+
+function Input.DisableInput(_)
+	if gamepadThumbstick1ChangedConnection then
+		gamepadThumbstick1ChangedConnection:Disconnect()
+		gamepadThumbstick1ChangedConnection = nil
+	end
+
+	thumbstickVector = Vector2.new()
 	vector2 = Vector2.new()
-	vector2_2 = Vector2.new()
+
 	ContextActionService:UnbindCoreAction("VirtualCursorThumbstick1Movement")
 	ContextActionService:UnbindCoreAction("VirtualCursorThumbstick2Movement")
 
-	if Enum.UserInputState.Cancel == Enum.UserInputState.Change then
-		vector2_2 = Vector2.new((nil).Position.x, (nil).Position.y * -1)
-
-		local _ = Enum.ContextActionResult.Sink
-	else
-		vector2_2 = Vector2.new()
-
-		local _ = Enum.ContextActionResult.Pass
+	if FFlagVirtualCursorForTVRemoteKeycodes then
+		ContextActionService:UnbindCoreAction("VirtualCursorDirectionalButtonsMovement")
+		table.clear(v3)
 	end
 
-	u11 = false
+	if Enum.UserInputState.Cancel == Enum.UserInputState.Change then
+		vector2 = Vector2.new((nil).Position.x, (nil).Position.y * -1)
+		local _sink = Enum.ContextActionResult.Sink
+	else
+		vector2 = Vector2.new()
+		local _pass = Enum.ContextActionResult.Pass
+	end
+
+	flag = false
 end
 
-return t1
+return Input

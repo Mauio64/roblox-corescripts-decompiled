@@ -1,11 +1,15 @@
-return {
-	isActivationInput = function(p1) -- line: 3
-		return p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Touch
-	end,
-	isPointerInput = function(p2) -- line: 8
-		return p2.UserInputType == Enum.UserInputType.MouseMovement or p2.UserInputType == Enum.UserInputType.Touch
-	end,
-	isTouchInput = function(p3) -- line: 13
-		return p3.UserInputType == Enum.UserInputType.Touch
-	end
-}
+local InputUtilities = {}
+
+function InputUtilities.isActivationInput(p): boolean
+	return p.UserInputType == Enum.UserInputType.MouseButton1 or p.UserInputType == Enum.UserInputType.Touch
+end
+
+function InputUtilities.isPointerInput(p): boolean
+	return p.UserInputType == Enum.UserInputType.MouseMovement or p.UserInputType == Enum.UserInputType.Touch
+end
+
+function InputUtilities.isTouchInput(p): boolean
+	return p.UserInputType == Enum.UserInputType.Touch
+end
+
+return InputUtilities

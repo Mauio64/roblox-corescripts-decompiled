@@ -1,14 +1,21 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
+require(Foundation.Enums.FillBehavior)
+
+local OptionSelectorGroupSize = require(Foundation.Enums.OptionSelectorGroupSize)
 local Orientation = require(Foundation.Enums.Orientation)
 
 return React.createContext({
 	value = nil,
-	Selectable = true,
-	testId = "",
-	onValueChanged = function(_: string?) -- line: 10
+	onValueChanged = function(_: string?)
 		warn("No OptionSelectorGroupProvider found for OptionSelectorGroup")
 	end,
-	orientation = Orientation.Vertical
+	orientation = Orientation.Vertical,
+	Selectable = true,
+	testId = "",
+	size = OptionSelectorGroupSize.Medium,
+	fillBehavior = nil
 })

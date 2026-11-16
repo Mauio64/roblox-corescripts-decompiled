@@ -1,41 +1,41 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local parent = AvatarExperienceCommon.Parent
+
 local OutfitTypes = require(AvatarExperienceCommon.Enums.OutfitTypes)
-
 require(AvatarExperienceCommon.Types.CategoryTypes.CategoryTypes)
+local AvatarExperienceModel = require(parent.AvatarExperienceModel)
+local InventoryOutfitType = AvatarExperienceModel.Enums.InventoryOutfitType
 
-local InventoryOutfitType = require(AvatarExperienceCommon.Enums.InventoryOutfitType)
-
-local function getInventoryOutfitType(p1, b1: boolean?) -- line: 15
-	-- upvalues: OutfitTypes (copy), InventoryOutfitType (copy)
-	if p1 == OutfitTypes.Avatar then
-		if b1 ~= false then
-			return InventoryOutfitType.Avatar
+local function getInventoryOutfitType(p, flag: boolean?)
+	if p == OutfitTypes.Avatar then
+		if flag == false then
+			return InventoryOutfitType.Body
 		end
 
-		return InventoryOutfitType.Body
+		return InventoryOutfitType.Avatar
 	end
 
-	if p1 == OutfitTypes.DynamicHead then
+	if p == OutfitTypes.DynamicHead then
 		return InventoryOutfitType.DynamicHead
 	end
 
-	if p1 == OutfitTypes.Shoes then
+	if p == OutfitTypes.Shoes then
 		return InventoryOutfitType.Shoes
 	end
 
-	if p1 == OutfitTypes.Animations then
+	if p == OutfitTypes.Animations then
 		return InventoryOutfitType.Animations
 	end
 
-	if p1 == OutfitTypes.Makeup then
-		if b1 ~= false then
-			return InventoryOutfitType.CreatedMakeup
-		end
+	if p ~= OutfitTypes.Makeup then
+		return nil
+	end
 
+	if flag == false then
 		return InventoryOutfitType.PurchasedMakeup
 	end
 
-	return nil
+	return InventoryOutfitType.CreatedMakeup
 end
 
 return getInventoryOutfitType

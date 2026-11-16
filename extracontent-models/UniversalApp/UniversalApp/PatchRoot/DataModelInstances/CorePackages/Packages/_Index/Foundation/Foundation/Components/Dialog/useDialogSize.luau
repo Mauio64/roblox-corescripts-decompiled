@@ -1,44 +1,35 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(parent.React)
 
-local function useDialogSize(t1: {[any]: any}) -- line: 5
-	-- upvalues: React (copy)
-	local v5, v6 = React.useBinding(Vector2.new(0, 0))
+local function useDialogSize(p)
+	local v, v2 = React.useBinding(Vector2.new(0, 0))
 
-	React.useEffect(function() -- line: 8
-		-- upvalues: t1 (copy), v6 (copy)
-		local current = t1.current
+	React.useEffect(function()
+		local current = p.current
 
 		if not current then
 			return
 		end
 
-		local function updateDialogSize() -- line: 14
-			-- upvalues: current (copy), v6 (copy)
-			local AbsoluteSize = current.AbsoluteSize
+		local function updateDialogSize() -- 1 equivalent call inferred from this helper
+			local absoluteSize = current.AbsoluteSize
 
-			if AbsoluteSize.X == 0 or AbsoluteSize.Y == 0 then
+			if absoluteSize.X == 0 or absoluteSize.Y == 0 then
 				return
 			end
 
-			v6(AbsoluteSize)
+			v2(absoluteSize)
 		end
 
-		local AbsoluteSize = current.AbsoluteSize
+		updateDialogSize() -- inferred equivalent call
+		local absoluteSizeChangedConnection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateDialogSize)
 
-		if AbsoluteSize.X ~= 0 and AbsoluteSize.Y ~= 0 then
-			v6(AbsoluteSize)
-		end
-
-		local connection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateDialogSize)
-
-		return function() -- line: 26
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			absoluteSizeChangedConnection:Disconnect()
 		end
 	end, {})
 
-	return v5
+	return v
 end
 
 return useDialogSize

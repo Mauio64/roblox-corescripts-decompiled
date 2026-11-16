@@ -1,703 +1,745 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
+
+local v = {}
+
+local client_capabilities = require(script.Parent.Parent.Parent.shared.v1beta1.client_capabilities)
+
 local hydration_content = require(script.Parent.Parent.Parent.shared.v1beta1.hydration_content)
+
 local template_entry = require(script.Parent.Parent.Parent.shared.v1beta1.template_entry)
+
 local page_entry_content = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry_content)
-local t2 = {}
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.new(t3: {[any]: any}?) -- line: 165
-	-- upvalues: t1 (copy), t2 (copy)
-	return (setmetatable({
-		search_query = if t3 ~= nil and t3.search_query ~= nil then t3.search_query else "",
-		session_id = if t3 ~= nil and t3.session_id ~= nil then t3.session_id else "",
-		vertical_type = if t3 ~= nil and t3.vertical_type ~= nil then t3.vertical_type else assert(t1.SearchResultsPageVerticalType.fromNumber(0), "Enum has no 0 default"),
-		global_session_id = if t3 ~= nil and t3.global_session_id ~= nil then t3.global_session_id else ""
-	}, t2))
+function class.new(data)
+	local v2 = {
+		search_query = (data == nil or data.search_query == nil) and "" or data.search_query,
+		session_id = (data == nil or data.session_id == nil) and "" or data.session_id,
+		vertical_type = 0,
+		global_session_id = 0,
+		client_capabilities = 0
+	}
+	local vertical_type
+
+	if data == nil or data.vertical_type == nil then
+		vertical_type = assert(v.SearchResultsPageVerticalType.fromNumber(0), "Enum has no 0 default")
+	else
+		vertical_type = data.vertical_type
+	end
+
+	v2.vertical_type = vertical_type
+
+	v2.global_session_id = (data == nil or data.global_session_id == nil) and "" or data.global_session_id
+	local client_capabilities2
+
+	if not (data == nil or data.client_capabilities == nil) then
+		client_capabilities2 = data.client_capabilities
+	end
+
+	v2.client_capabilities = client_capabilities2
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 178
-	-- upvalues: proto (copy), t1 (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.search_query ~= nil and p1.search_query ~= "" then
-		local v15, v16 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v15, v16, p1.search_query)
+	if self.search_query ~= nil and self.search_query ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.search_query)
 	end
 
-	if p1.session_id ~= nil and p1.session_id ~= "" then
-		local v17, v18 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v17, v18, p1.session_id)
+	if self.session_id ~= nil and self.session_id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.session_id)
 	end
 
-	if p1.vertical_type ~= nil and (p1.vertical_type ~= nil and p1.vertical_type ~= 0 or p1.vertical_type ~= t1.SearchResultsPageVerticalType.fromNumber(0)) then
-		local v19, v20 = proto.writeTag(buf, n1, 3, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v19, v20, t1.SearchResultsPageVerticalType.toNumber(p1.vertical_type))
+	if
+		self.vertical_type ~= nil
+		and (self.vertical_type ~= nil and self.vertical_type ~= 0 or self.vertical_type ~= v.SearchResultsPageVerticalType.fromNumber(0))
+	then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, v.SearchResultsPageVerticalType.toNumber(self.vertical_type))
 	end
 
-	if p1.global_session_id ~= nil and p1.global_session_id ~= "" then
-		local v21, v22 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v21, v22, p1.global_session_id)
+	if self.global_session_id ~= nil and self.global_session_id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.global_session_id)
 	end
 
-	local buf2 = buffer.create(n1)
+	if self.client_capabilities ~= nil then
+		local encoded = self.client_capabilities:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 217
-	-- upvalues: t2 (copy), proto (copy), t1 (copy)
-	local v25 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v27, v28
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v27, v28, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v28 == proto.wireTypes.varint then
-			if v27 == 3 then
-				local v29
-
-				v29, n2 = proto.readVarIntI32(p2, n2)
-				v25.vertical_type = t1.SearchResultsPageVerticalType.fromNumber(v29) or v29
+		if v4 == proto.wireTypes.varint then
+			if v3 == 3 then
+				local v5
+				v5, v2 = proto.readVarIntI32(buf, v2)
+				result.vertical_type = v.SearchResultsPageVerticalType.fromNumber(v5) or v5
 			else
-				local v30
-
-				v30, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v28 == proto.wireTypes.lengthDelimited then
-			if v27 == 1 then
-				local v31
-
-				v31, n2 = proto.readBuffer(p2, n2)
-				v25.search_query = buffer.tostring(v31)
-			elseif v27 == 2 then
-				local v32
-
-				v32, n2 = proto.readBuffer(p2, n2)
-				v25.session_id = buffer.tostring(v32)
-			elseif v27 == 4 then
-				local v33
-
-				v33, n2 = proto.readBuffer(p2, n2)
-				v25.global_session_id = buffer.tostring(v33)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.search_query = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.session_id = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.global_session_id = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.client_capabilities = client_capabilities.ClientCapabilities.decode(v5)
 			else
-				local v34, v35 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v35 + v34
+				v2 = v5 + varInt
 			end
-		elseif v28 == proto.wireTypes.i32 then
-			local v36
-
-			v36, n2 = proto.readFixed32(p2, n2)
-		elseif v28 == proto.wireTypes.i64 then
-			local v37
-
-			v37, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v28)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v25
-end
-function t2.jsonEncode(p3) -- line: 275
-	-- upvalues: t1 (copy)
-	local t4 = {}
-
-	if p3.search_query ~= nil and p3.search_query ~= "" then
-		t4.searchQuery = p3.search_query
-	end
-
-	if p3.session_id ~= nil and p3.session_id ~= "" then
-		t4.sessionId = p3.session_id
-	end
-
-	if p3.vertical_type ~= nil and (p3.vertical_type ~= nil and p3.vertical_type ~= 0 or p3.vertical_type ~= t1.SearchResultsPageVerticalType.fromNumber(0)) then
-		t4.verticalType = if typeof(p3.vertical_type) ~= "number" then t1.SearchResultsPageVerticalType.toNumber(p3.vertical_type) else p3.vertical_type
-	end
-
-	if p3.global_session_id ~= nil and p3.global_session_id ~= "" then
-		t4.globalSessionId = p3.global_session_id
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 305
-	-- upvalues: t2 (copy), t1 (copy)
-	local v41 = t2.new()
-
-	if t5.search_query ~= nil then
-		v41.search_query = t5.search_query
-	end
-
-	if t5.searchQuery ~= nil then
-		v41.search_query = t5.searchQuery
-	end
-
-	if t5.session_id ~= nil then
-		v41.session_id = t5.session_id
-	end
-
-	if t5.sessionId ~= nil then
-		v41.session_id = t5.sessionId
-	end
-
-	if t5.vertical_type ~= nil then
-		v41.vertical_type = if typeof(t5.vertical_type) ~= "number" then t1.SearchResultsPageVerticalType.fromName(t5.vertical_type) or t5.vertical_type else t1.SearchResultsPageVerticalType.fromNumber(t5.vertical_type) or t5.vertical_type
-	end
-
-	if t5.verticalType ~= nil then
-		v41.vertical_type = if typeof(t5.verticalType) ~= "number" then t1.SearchResultsPageVerticalType.fromName(t5.verticalType) or t5.verticalType else t1.SearchResultsPageVerticalType.fromNumber(t5.verticalType) or t5.verticalType
-	end
-
-	if t5.global_session_id ~= nil then
-		v41.global_session_id = t5.global_session_id
-	end
-
-	if t5.globalSessionId ~= nil then
-		v41.global_session_id = t5.globalSessionId
-	end
-
-	return v41
+	return result
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.search_query ~= nil and self.search_query ~= "" then
+		v2.searchQuery = self.search_query
+	end
+
+	if self.session_id ~= nil and self.session_id ~= "" then
+		v2.sessionId = self.session_id
+	end
+
+	if
+		self.vertical_type ~= nil
+		and (self.vertical_type ~= nil and self.vertical_type ~= 0 or self.vertical_type ~= v.SearchResultsPageVerticalType.fromNumber(0))
+	then
+		local verticalType
+
+		if typeof(self.vertical_type) == "number" then
+			verticalType = self.vertical_type
+		else
+			verticalType = v.SearchResultsPageVerticalType.toNumber(self.vertical_type)
+		end
+
+		v2.verticalType = verticalType
+	end
+
+	if self.global_session_id ~= nil and self.global_session_id ~= "" then
+		v2.globalSessionId = self.global_session_id
+	end
+
+	if self.client_capabilities ~= nil then
+		v2.clientCapabilities = self.client_capabilities:jsonEncode()
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.search_query ~= nil then
+		v2.search_query = data.search_query
+	end
+
+	if data.searchQuery ~= nil then
+		v2.search_query = data.searchQuery
+	end
+
+	if data.session_id ~= nil then
+		v2.session_id = data.session_id
+	end
+
+	if data.sessionId ~= nil then
+		v2.session_id = data.sessionId
+	end
+
+	if data.vertical_type ~= nil then
+		local vertical_type
+
+		if typeof(data.vertical_type) == "number" then
+			vertical_type = v.SearchResultsPageVerticalType.fromNumber(data.vertical_type) or data.vertical_type
+		else
+			vertical_type = v.SearchResultsPageVerticalType.fromName(data.vertical_type) or data.vertical_type
+		end
+
+		v2.vertical_type = vertical_type
+	end
+
+	if data.verticalType ~= nil then
+		local vertical_type
+
+		if typeof(data.verticalType) == "number" then
+			vertical_type = v.SearchResultsPageVerticalType.fromNumber(data.verticalType) or data.verticalType
+		else
+			vertical_type = v.SearchResultsPageVerticalType.fromName(data.verticalType) or data.verticalType
+		end
+
+		v2.vertical_type = vertical_type
+	end
+
+	if data.global_session_id ~= nil then
+		v2.global_session_id = data.global_session_id
+	end
+
+	if data.globalSessionId ~= nil then
+		v2.global_session_id = data.globalSessionId
+	end
+
+	if data.client_capabilities ~= nil then
+		v2.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(data.client_capabilities)
+	end
+
+	if data.clientCapabilities ~= nil then
+		v2.client_capabilities = client_capabilities.ClientCapabilities.jsonDecode(data.clientCapabilities)
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "GetSearchResultsPageRequest",
 	fullName = "roblox.apppageplatform.search.v1beta1.GetSearchResultsPageRequest"
 }
-t1.GetSearchResultsPageRequest = t2
-typeRegistry.default:register(t1.GetSearchResultsPageRequest)
 
-local t6 = {}
+v.GetSearchResultsPageRequest = class
 
-t6.__index = t6
+typeRegistry.default:register(v.GetSearchResultsPageRequest)
 
-function t6.new(t7: {[any]: any}?) -- line: 361
-	-- upvalues: t6 (copy)
-	return (setmetatable({
-		page_entries = if t7 ~= nil and t7.page_entries ~= nil then t7.page_entries else {},
-		hydration_data = if t7 ~= nil and t7.hydration_data ~= nil then t7.hydration_data else nil,
-		templates = if t7 ~= nil and t7.templates ~= nil then t7.templates else {},
-		localized_literals = if t7 ~= nil and t7.localized_literals ~= nil then t7.localized_literals else {}
-	}, t6))
+local class2 = {}
+class2.__index = class2
+
+function class2.new(data)
+	local v2 = {
+		page_entries = (data == nil or data.page_entries == nil) and {} or data.page_entries,
+		hydration_data = 0,
+		templates = 0,
+		localized_literals = 0
+	}
+	local hydration_data
+
+	if not (data == nil or data.hydration_data == nil) then
+		hydration_data = data.hydration_data
+	end
+
+	v2.hydration_data = hydration_data
+	v2.templates = (data == nil or data.templates == nil) and {} or data.templates
+	v2.localized_literals = (data == nil or data.localized_literals == nil) and {} or data.localized_literals
+	return (setmetatable(v2, class2))
 end
-function t6.encode(p4) -- line: 372
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n3 = 0
 
-	if p4.page_entries ~= nil and #p4.page_entries > 0 then
-		for _, v47 in p4.page_entries do
-			local v48 = v47:encode()
-			local v49, v50 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-			buf, n3 = proto.writeBuffer(v49, v50, v48, buffer.len(v48))
+	if self.page_entries ~= nil and #self.page_entries > 0 then
+		for _, page_entry in self.page_entries do
+			local encoded = page_entry:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	if p4.hydration_data ~= nil then
-		local v51 = p4.hydration_data:encode()
-		local v52, v53 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n3 = proto.writeBuffer(v52, v53, v51, buffer.len(v51))
+	if self.hydration_data ~= nil then
+		local encoded = self.hydration_data:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	if p4.templates ~= nil and next(p4.templates) ~= nil then
-		for v54, v55 in p4.templates do
-			local buf3 = buffer.create(0)
-			local v57, v58 = proto.writeTag(buf3, 0, 1, proto.wireTypes.lengthDelimited)
-			local v59, v60 = proto.writeString(v57, v58, v54)
-			local v61 = v55:encode()
-			local v62, v63 = proto.writeTag(v59, v60, 2, proto.wireTypes.lengthDelimited)
-			local v64, v65 = proto.writeBuffer(v62, v63, v61, buffer.len(v61))
-			local v66, v67 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
+	if self.templates ~= nil and next(self.templates) ~= nil then
+		for k, template in self.templates do
+			local buf = buffer.create(0)
 
-			buf, n3 = proto.writeBuffer(v66, v67, v64, v65)
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local encoded = template:encode()
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeBuffer(v8, v9, encoded, buffer.len(encoded))
+			local v12, v13 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
 		end
 	end
 
-	if p4.localized_literals ~= nil and next(p4.localized_literals) ~= nil then
-		for v68, v69 in p4.localized_literals do
-			local buf4 = buffer.create(0)
-			local v71, v72 = proto.writeTag(buf4, 0, 1, proto.wireTypes.lengthDelimited)
-			local v73, v74 = proto.writeString(v71, v72, v68)
-			local v75, v76 = proto.writeTag(v73, v74, 2, proto.wireTypes.lengthDelimited)
-			local v77, v78 = proto.writeString(v75, v76, v69)
-			local v79, v80 = proto.writeTag(buf, n3, 4, proto.wireTypes.lengthDelimited)
+	if self.localized_literals ~= nil and next(self.localized_literals) ~= nil then
+		for k, localized_literal in self.localized_literals do
+			local buf = buffer.create(0)
 
-			buf, n3 = proto.writeBuffer(v79, v80, v77, v78)
+			local v4, v5 = proto.writeTag(buf, 0, 1, proto.wireTypes.lengthDelimited)
+			local v6, v7 = proto.writeString(v4, v5, k)
+			local v8, v9 = proto.writeTag(v6, v7, 2, proto.wireTypes.lengthDelimited)
+			local v10, v11 = proto.writeString(v8, v9, localized_literal)
+			local v12, v13 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v12, v13, v10, v11)
 		end
 	end
 
-	local buf5 = buffer.create(n3)
-
-	buffer.copy(buf5, 0, buf, 0, n3)
-
-	return buf5
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t6.decode(p5: buffer) -- line: 422
-	-- upvalues: t6 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
-	local v83 = t6.new()
-	local n4 = 0
 
-	while n4 < buffer.len(p5) do
-		local v85, v86
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
 
-		v85, v86, n4 = proto.readTag(p5, n4)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v86 == proto.wireTypes.varint then
-			local v87
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.page_entries, page_entry_content.UniversalPageEntry.decode(v5))
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.hydration_data = hydration_content.HydrationContent.decode(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
 
-			v87, n4 = proto.readVarInt(p5, n4)
-		elseif v86 == proto.wireTypes.lengthDelimited then
-			if v85 == 1 then
-				local v88
+				local decoded = v.GetSearchResultsPageResponse_TemplatesEntry.decode(v5)
 
-				v88, n4 = proto.readBuffer(p5, n4)
-				table.insert(v83.page_entries, page_entry_content.UniversalPageEntry.decode(v88))
-			elseif v85 == 2 then
-				local v89
+				local templateEntry = template_entry.TemplateEntry.new()
 
-				v89, n4 = proto.readBuffer(p5, n4)
-				v83.hydration_data = hydration_content.HydrationContent.decode(v89)
-			elseif v85 == 3 then
-				local v90
+				result.templates[decoded.key or ""] = decoded.value or templateEntry
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
 
-				v90, n4 = proto.readBuffer(p5, n4)
+				local decoded = v.GetSearchResultsPageResponse_LocalizedLiteralsEntry.decode(v5)
 
-				local v91 = t1.GetSearchResultsPageResponse_TemplatesEntry.decode(v90)
-				local v92 = template_entry.TemplateEntry.new()
-
-				v83.templates[v91.key or ""] = v91.value or v92
-			elseif v85 == 4 then
-				local v93
-
-				v93, n4 = proto.readBuffer(p5, n4)
-
-				local v94 = t1.GetSearchResultsPageResponse_LocalizedLiteralsEntry.decode(v93)
-
-				v83.localized_literals[v94.key or ""] = v94.value or ""
+				result.localized_literals[decoded.key or ""] = decoded.value or ""
 			else
-				local v95, v96 = proto.readVarInt(p5, n4)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n4 = v96 + v95
+				v2 = v5 + varInt
 			end
-		elseif v86 == proto.wireTypes.i32 then
-			local v97
-
-			v97, n4 = proto.readFixed32(p5, n4)
-		elseif v86 == proto.wireTypes.i64 then
-			local v98
-
-			v98, n4 = proto.readFixed64(p5, n4)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v86)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v83
-end
-function t6.jsonEncode(p6) -- line: 498
-	local t8 = {}
-
-	if p6.page_entries ~= nil and #p6.page_entries > 0 then
-		local t9 = {}
-
-		for _, v103 in p6.page_entries do
-			table.insert(t9, v103:jsonEncode())
-		end
-
-		t8.pageEntries = t9
-	end
-
-	if p6.hydration_data ~= nil then
-		t8.hydrationData = p6.hydration_data:jsonEncode()
-	end
-
-	if p6.templates ~= nil and next(p6.templates) ~= nil then
-		local t10 = {}
-
-		for v105, v106 in p6.templates do
-			t10[v105] = v106:jsonEncode()
-		end
-
-		t8.templates = t10
-	end
-
-	if p6.localized_literals ~= nil and next(p6.localized_literals) ~= nil then
-		local t11 = {}
-
-		for v108, v109 in p6.localized_literals do
-			t11[v108] = v109
-		end
-
-		t8.localizedLiterals = t11
-	end
-
-	return t8
-end
-function t6.jsonDecode(t12: {[any]: any}) -- line: 532
-	-- upvalues: t6 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
-	local v111 = t6.new()
-
-	if t12.page_entries ~= nil then
-		local t13 = {}
-
-		for _, v114 in t12.page_entries do
-			table.insert(t13, page_entry_content.UniversalPageEntry.jsonDecode(v114))
-		end
-
-		v111.page_entries = t13
-	end
-
-	if t12.pageEntries ~= nil then
-		local t14 = {}
-
-		for _, v117 in t12.pageEntries do
-			table.insert(t14, page_entry_content.UniversalPageEntry.jsonDecode(v117))
-		end
-
-		v111.page_entries = t14
-	end
-
-	if t12.hydration_data ~= nil then
-		v111.hydration_data = hydration_content.HydrationContent.jsonDecode(t12.hydration_data)
-	end
-
-	if t12.hydrationData ~= nil then
-		v111.hydration_data = hydration_content.HydrationContent.jsonDecode(t12.hydrationData)
-	end
-
-	if t12.templates ~= nil then
-		local t15 = {}
-
-		for v119, v120 in t12.templates do
-			t15[v119] = template_entry.TemplateEntry.jsonDecode(v120)
-		end
-
-		v111.templates = t15
-	end
-
-	if t12.localized_literals ~= nil then
-		local t16 = {}
-
-		for v122, v123 in t12.localized_literals do
-			t16[v122] = v123
-		end
-
-		v111.localized_literals = t16
-	end
-
-	if t12.localizedLiterals ~= nil then
-		local t17 = {}
-
-		for v125, v126 in t12.localizedLiterals do
-			t17[v125] = v126
-		end
-
-		v111.localized_literals = t17
-	end
-
-	return v111
+	return result
 end
 
-t6.descriptor = {
+function class2:jsonEncode()
+	local v2 = {}
+
+	if self.page_entries ~= nil and #self.page_entries > 0 then
+		local pageEntries = {}
+
+		for _, page_entry in self.page_entries do
+			table.insert(pageEntries, page_entry:jsonEncode())
+		end
+
+		v2.pageEntries = pageEntries
+	end
+
+	if self.hydration_data ~= nil then
+		v2.hydrationData = self.hydration_data:jsonEncode()
+	end
+
+	if self.templates ~= nil and next(self.templates) ~= nil then
+		local templates = {}
+
+		for k, template in self.templates do
+			templates[k] = template:jsonEncode()
+		end
+
+		v2.templates = templates
+	end
+
+	if self.localized_literals == nil or next(self.localized_literals) == nil then
+		return v2
+	end
+
+	local localized_literals = {}
+
+	for k, localized_literal in self.localized_literals do
+		localized_literals[k] = localized_literal
+	end
+
+	v2.localizedLiterals = localized_literals
+
+	return v2
+end
+
+function class2.jsonDecode(data)
+	local v2 = class2.new()
+
+	if data.page_entries ~= nil then
+		local page_entries = {}
+
+		for _, page_entry in data.page_entries do
+			table.insert(page_entries, page_entry_content.UniversalPageEntry.jsonDecode(page_entry))
+		end
+
+		v2.page_entries = page_entries
+	end
+
+	if data.pageEntries ~= nil then
+		local page_entries = {}
+
+		for _, pageEntry in data.pageEntries do
+			table.insert(page_entries, page_entry_content.UniversalPageEntry.jsonDecode(pageEntry))
+		end
+
+		v2.page_entries = page_entries
+	end
+
+	if data.hydration_data ~= nil then
+		v2.hydration_data = hydration_content.HydrationContent.jsonDecode(data.hydration_data)
+	end
+
+	if data.hydrationData ~= nil then
+		v2.hydration_data = hydration_content.HydrationContent.jsonDecode(data.hydrationData)
+	end
+
+	if data.templates ~= nil then
+		local templates = {}
+
+		for k, template in data.templates do
+			templates[k] = template_entry.TemplateEntry.jsonDecode(template)
+		end
+
+		v2.templates = templates
+	end
+
+	if data.localized_literals ~= nil then
+		local localized_literals = {}
+
+		for k, localized_literal in data.localized_literals do
+			localized_literals[k] = localized_literal
+		end
+
+		v2.localized_literals = localized_literals
+	end
+
+	if data.localizedLiterals == nil then
+		return v2
+	end
+
+	local localizedLiterals = {}
+
+	for k, localizedLiteral in data.localizedLiterals do
+		localizedLiterals[k] = localizedLiteral
+	end
+
+	v2.localized_literals = localizedLiterals
+
+	return v2
+end
+
+class2.descriptor = {
 	name = "GetSearchResultsPageResponse",
 	fullName = "roblox.apppageplatform.search.v1beta1.GetSearchResultsPageResponse"
 }
-t1.GetSearchResultsPageResponse = t6
-typeRegistry.default:register(t1.GetSearchResultsPageResponse)
 
-local t18 = {}
+v.GetSearchResultsPageResponse = class2
 
-t18.__index = t18
+typeRegistry.default:register(v.GetSearchResultsPageResponse)
 
-function t18.new(t19: {[any]: any}?) -- line: 615
-	-- upvalues: t18 (copy)
-	return (setmetatable({
-		key = if t19 ~= nil and t19.key ~= nil then t19.key else "",
-		value = if t19 ~= nil and t19.value ~= nil then t19.value else nil
-	}, t18))
-end
-function t18.encode(p7) -- line: 624
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n5 = 0
+local class3 = {}
+class3.__index = class3
 
-	if p7.key ~= nil and p7.key ~= "" then
-		local v131, v132 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+function class3.new(p)
+	local v2 = {
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = 0
+	}
+	local v3
 
-		buf, n5 = proto.writeString(v131, v132, p7.key)
+	if not (p == nil or p.value == nil) then
+		v3 = p.value
 	end
 
-	if p7.value ~= nil then
-		local v133 = p7.value:encode()
-		local v134, v135 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
+	v2.value = v3
+	return (setmetatable(v2, class3))
+end
 
-		buf, n5 = proto.writeBuffer(v134, v135, v133, buffer.len(v133))
+function class3:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
 	end
 
-	local buf6 = buffer.create(n5)
+	if self.value ~= nil then
+		local encoded = self.value:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
 
-	buffer.copy(buf6, 0, buf, 0, n5)
-
-	return buf6
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t18.decode(p8: buffer) -- line: 646
-	-- upvalues: t18 (copy), proto (copy), template_entry (copy)
-	local v138 = t18.new()
-	local n6 = 0
 
-	while n6 < buffer.len(p8) do
-		local v140, v141
+function class3.decode(buf: buffer)
+	local result = class3.new()
+	local v2 = 0
 
-		v140, v141, n6 = proto.readTag(p8, n6)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v141 == proto.wireTypes.varint then
-			local v142
-
-			v142, n6 = proto.readVarInt(p8, n6)
-		elseif v141 == proto.wireTypes.lengthDelimited then
-			if v140 == 1 then
-				local v143
-
-				v143, n6 = proto.readBuffer(p8, n6)
-				v138.key = buffer.tostring(v143)
-			elseif v140 == 2 then
-				local v144
-
-				v144, n6 = proto.readBuffer(p8, n6)
-				v138.value = template_entry.TemplateEntry.decode(v144)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = template_entry.TemplateEntry.decode(v5)
 			else
-				local v145, v146 = proto.readVarInt(p8, n6)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n6 = v146 + v145
+				v2 = v5 + varInt
 			end
-		elseif v141 == proto.wireTypes.i32 then
-			local v147
-
-			v147, n6 = proto.readFixed32(p8, n6)
-		elseif v141 == proto.wireTypes.i64 then
-			local v148
-
-			v148, n6 = proto.readFixed64(p8, n6)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v141)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v138
-end
-function t18.jsonEncode(p9) -- line: 696
-	local t20 = {}
-
-	if p9.key ~= nil and p9.key ~= "" then
-		t20.key = p9.key
-	end
-
-	if p9.value ~= nil then
-		t20.value = p9.value:jsonEncode()
-	end
-
-	return t20
-end
-function t18.jsonDecode(t21: {[any]: any}) -- line: 712
-	-- upvalues: t18 (copy), template_entry (copy)
-	local v152 = t18.new()
-
-	if t21.key ~= nil then
-		v152.key = t21.key
-	end
-
-	if t21.value ~= nil then
-		v152.value = template_entry.TemplateEntry.jsonDecode(t21.value)
-	end
-
-	return v152
+	return result
 end
 
-t18.descriptor = {
+function class3:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil then
+		v2.value = self.value:jsonEncode()
+	end
+
+	return v2
+end
+
+function class3.jsonDecode(p)
+	local v2 = class3.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = template_entry.TemplateEntry.jsonDecode(p.value)
+	end
+
+	return v2
+end
+
+class3.descriptor = {
 	name = "GetSearchResultsPageResponse_TemplatesEntry",
 	fullName = "roblox.apppageplatform.search.v1beta1.TemplatesEntry"
 }
-t1.GetSearchResultsPageResponse_TemplatesEntry = t18
-typeRegistry.default:register(t1.GetSearchResultsPageResponse_TemplatesEntry)
 
-local t22 = {}
+v.GetSearchResultsPageResponse_TemplatesEntry = class3
 
-t22.__index = t22
+typeRegistry.default:register(v.GetSearchResultsPageResponse_TemplatesEntry)
 
-function t22.new(t23: {[any]: any}?) -- line: 743
-	-- upvalues: t22 (copy)
+local class4 = {}
+class4.__index = class4
+
+function class4.new(p)
 	return (setmetatable({
-		key = if t23 ~= nil and t23.key ~= nil then t23.key else "",
-		value = if t23 ~= nil and t23.value ~= nil then t23.value else ""
-	}, t22))
+		key = (p == nil or p.key == nil) and "" or p.key,
+		value = (p == nil or p.value == nil) and "" or p.value
+	}, class4))
 end
-function t22.encode(p10) -- line: 755
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n7 = 0
 
-	if p10.key ~= nil and p10.key ~= "" then
-		local v157, v158 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+function class4:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n7 = proto.writeString(v157, v158, p10.key)
+	if self.key ~= nil and self.key ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.key)
 	end
 
-	if p10.value ~= nil and p10.value ~= "" then
-		local v159, v160 = proto.writeTag(buf, n7, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n7 = proto.writeString(v159, v160, p10.value)
+	if self.value ~= nil and self.value ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.value)
 	end
 
-	local buf7 = buffer.create(n7)
-
-	buffer.copy(buf7, 0, buf, 0, n7)
-
-	return buf7
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t22.decode(p11: buffer) -- line: 776
-	-- upvalues: t22 (copy), proto (copy)
-	local v163 = t22.new()
-	local n8 = 0
 
-	while n8 < buffer.len(p11) do
-		local v165, v166
+function class4.decode(buf: buffer)
+	local result = class4.new()
+	local v2 = 0
 
-		v165, v166, n8 = proto.readTag(p11, n8)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v166 == proto.wireTypes.varint then
-			local v167
-
-			v167, n8 = proto.readVarInt(p11, n8)
-		elseif v166 == proto.wireTypes.lengthDelimited then
-			if v165 == 1 then
-				local v168
-
-				v168, n8 = proto.readBuffer(p11, n8)
-				v163.key = buffer.tostring(v168)
-			elseif v165 == 2 then
-				local v169
-
-				v169, n8 = proto.readBuffer(p11, n8)
-				v163.value = buffer.tostring(v169)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.key = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.value = buffer.tostring(v5)
 			else
-				local v170, v171 = proto.readVarInt(p11, n8)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n8 = v171 + v170
+				v2 = v5 + varInt
 			end
-		elseif v166 == proto.wireTypes.i32 then
-			local v172
-
-			v172, n8 = proto.readFixed32(p11, n8)
-		elseif v166 == proto.wireTypes.i64 then
-			local v173
-
-			v173, n8 = proto.readFixed64(p11, n8)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v166)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v163
-end
-function t22.jsonEncode(p12) -- line: 826
-	local t24 = {}
-
-	if p12.key ~= nil and p12.key ~= "" then
-		t24.key = p12.key
-	end
-
-	if p12.value ~= nil and p12.value ~= "" then
-		t24.value = p12.value
-	end
-
-	return t24
-end
-function t22.jsonDecode(t25: {[any]: any}) -- line: 842
-	-- upvalues: t22 (copy)
-	local v177 = t22.new()
-
-	if t25.key ~= nil then
-		v177.key = t25.key
-	end
-
-	if t25.value ~= nil then
-		v177.value = t25.value
-	end
-
-	return v177
+	return result
 end
 
-t22.descriptor = {
+function class4:jsonEncode()
+	local v2 = {}
+
+	if self.key ~= nil and self.key ~= "" then
+		v2.key = self.key
+	end
+
+	if self.value ~= nil and self.value ~= "" then
+		v2.value = self.value
+	end
+
+	return v2
+end
+
+function class4.jsonDecode(p)
+	local v2 = class4.new()
+
+	if p.key ~= nil then
+		v2.key = p.key
+	end
+
+	if p.value ~= nil then
+		v2.value = p.value
+	end
+
+	return v2
+end
+
+class4.descriptor = {
 	name = "GetSearchResultsPageResponse_LocalizedLiteralsEntry",
 	fullName = "roblox.apppageplatform.search.v1beta1.LocalizedLiteralsEntry"
 }
-t1.GetSearchResultsPageResponse_LocalizedLiteralsEntry = t22
-typeRegistry.default:register(t1.GetSearchResultsPageResponse_LocalizedLiteralsEntry)
-t1.SearchResultsPageVerticalType = {
-	fromNumber = function(n9: number) -- line: 870
-		if n9 == 0 then
+
+v.GetSearchResultsPageResponse_LocalizedLiteralsEntry = class4
+
+typeRegistry.default:register(v.GetSearchResultsPageResponse_LocalizedLiteralsEntry)
+
+v.SearchResultsPageVerticalType = {
+	fromNumber = function(p: number): nil | string
+		if p == 0 then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_INVALID"
-		end
-
-		if n9 == 1 then
+		elseif p == 1 then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_BLENDED"
-		end
-
-		if n9 == 2 then
+		elseif p == 2 then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_GAME"
-		end
-
-		if n9 == 3 then
+		elseif p == 3 then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_USER"
 		end
 
 		return nil
 	end,
-	toNumber = function(p13) -- line: 884
-		if p13 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_INVALID" then
+	toNumber = function(p)
+		if p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_INVALID" then
 			return 0
-		end
-
-		if p13 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_BLENDED" then
+		elseif p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_BLENDED" then
 			return 1
-		end
-
-		if p13 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_GAME" then
+		elseif p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_GAME" then
 			return 2
-		end
-
-		if p13 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_USER" then
+		elseif p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_USER" then
 			return 3
 		end
 
-		return p13
+		return p
 	end,
-	fromName = function(s1: string) -- line: 898
-		if s1 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_INVALID" then
+	fromName = function(p: string): nil | string
+		if p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_INVALID" then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_INVALID"
-		end
-
-		if s1 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_BLENDED" then
+		elseif p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_BLENDED" then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_BLENDED"
-		end
-
-		if s1 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_GAME" then
+		elseif p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_GAME" then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_GAME"
-		end
-
-		if s1 == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_USER" then
+		elseif p == "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_USER" then
 			return "SEARCH_RESULTS_PAGE_VERTICAL_TYPE_USER"
 		end
 
@@ -706,7 +748,7 @@ t1.SearchResultsPageVerticalType = {
 }
 
 return {
-	GetSearchResultsPageRequest = t1.GetSearchResultsPageRequest,
-	GetSearchResultsPageResponse = t1.GetSearchResultsPageResponse,
-	SearchResultsPageVerticalType = t1.SearchResultsPageVerticalType
+	GetSearchResultsPageRequest = v.GetSearchResultsPageRequest,
+	GetSearchResultsPageResponse = v.GetSearchResultsPageResponse,
+	SearchResultsPageVerticalType = v.SearchResultsPageVerticalType
 }

@@ -1,73 +1,76 @@
 local RunService = game:GetService("RunService")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local EventConnection = require(ParentParentParent.ReactUtils).EventConnection
-local useStyle = require(ParentParent.Core.Style.useStyle)
-local v7 = React.forwardRef(function(t1: {[any]: any}, p1) -- line: 22
-	-- upvalues: useStyle (copy), React (copy), EventConnection (copy), RunService (copy)
-	local v10 = useStyle()
-	local SelectionCursor = v10.Tokens.Component.SelectionCursor
-	local ReducedMotion = v10.Settings.ReducedMotion
+
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+
+local ReactUtils = require(parent2.ReactUtils)
+local EventConnection = ReactUtils.EventConnection
+
+local useStyle = require(parent.Core.Style.useStyle)
+
+local forwardRef = React.forwardRef(function(props, ref)
+	local v = useStyle()
+	local selection = v.Tokens.Color.Selection
+	local reducedMotion = v.Settings.ReducedMotion
 	local colorSequence = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, SelectionCursor.Gradient.Start.Color3),
-		ColorSequenceKeypoint.new(1, SelectionCursor.Gradient.End.Color3)
+		ColorSequenceKeypoint.new(0, selection.Start.Color3),
+		ColorSequenceKeypoint.new(1, selection.End.Color3)
 	})
+
 	local numberSequence = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, SelectionCursor.Gradient.Start.Transparency),
-		NumberSequenceKeypoint.new(1, SelectionCursor.Gradient.End.Transparency)
+		NumberSequenceKeypoint.new(0, selection.Start.Transparency),
+		NumberSequenceKeypoint.new(1, selection.End.Transparency)
 	})
-	local v15, v16 = React.useBinding(0)
-	local v17, v18 = React.useBinding(colorSequence)
-	local v19, v20 = React.useBinding(numberSequence)
+
+	local rotation, v2 = React.useBinding(0)
+	local color, v3 = React.useBinding(colorSequence)
+	local transparency, v4 = React.useBinding(numberSequence)
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(-t1.offset, -t1.offset),
-		Size = UDim2.new(1, t1.offset * 2, 1, t1.offset * 2),
-		ref = p1
+		Position = UDim2.fromOffset(-props.offset, -props.offset),
+		Size = UDim2.new(1, props.offset * 2, 1, props.offset * 2),
+		ref = ref
 	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = t1.cornerRadius
-		}),
-		UIStroke = React.createElement("UIStroke", {
-			Transparency = 0,
-			Color = Color3.new(1, 1, 1),
-			Thickness = t1.borderWidth
-		}, {
-			UIGradient = React.createElement("UIGradient", {
-				Rotation = v15,
-				Color = v17,
-				Transparency = v19
-			})
-		}),
-		HeartbeatConnection = t1.isVisible and React.createElement(EventConnection, {
+		UICorner = React.createElement("UICorner", { CornerRadius = props.cornerRadius }),
+		UIStroke = React.createElement(
+			"UIStroke",
+			{ Color = Color3.new(1, 1, 1), Transparency = 0, Thickness = props.borderWidth },
+			{
+				UIGradient = React.createElement("UIGradient", {
+					Rotation = rotation,
+					Color = color,
+					Transparency = transparency
+				})
+			}
+		),
+		HeartbeatConnection = props.isVisible and React.createElement(EventConnection, {
 			event = RunService.Heartbeat,
-			callback = function(_) -- line: 60
-				-- upvalues: v15 (copy), colorSequence (copy), numberSequence (copy), ReducedMotion (copy), v16 (copy), v18 (copy), v20 (copy)
-				local v22 = v15:getValue() + 2
-				local v23 = colorSequence
-				local v24 = numberSequence
+			callback = function(_)
+				local v5 = rotation:getValue() + 2
+				local v6 = colorSequence
+				local v7 = numberSequence
 
-				if ReducedMotion then
-					local v25 = (math.sin((math.rad(v22))) + 1) / 2
-					local Value = v23.Keypoints[1].Value
-					local Value2 = v23.Keypoints[#v23.Keypoints].Value
+				if reducedMotion then
+					local midpoint = (math.sin((math.rad(v5))) + 1) / 2
 
-					v23 = ColorSequence.new(Value:Lerp(Value2, v25))
+					local value = v6.Keypoints[1].Value
+					local value2 = v6.Keypoints[#v6.Keypoints].Value
+					v6 = ColorSequence.new(value:Lerp(value2, midpoint))
 
-					local Value3 = v24.Keypoints[1].Value
-					local Value4 = v24.Keypoints[#v24.Keypoints].Value
-
-					v24 = NumberSequence.new(Value3 + (Value4 - Value3) * v25)
+					local value3 = v7.Keypoints[1].Value
+					local value4 = v7.Keypoints[#v7.Keypoints].Value
+					v7 = NumberSequence.new(value3 + (value4 - value3) * midpoint)
 				end
 
-				v16(v22)
-				v18(v23)
-				v20(v24)
+				v2(v5)
+				v3(v6)
+				v4(v7)
 			end
 		})
 	})
 end)
 
-return React.memo(v7)
+return React.memo(forwardRef)

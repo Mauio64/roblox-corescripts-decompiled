@@ -1,17 +1,13 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local t = require(ParentParent.t)
+local parent = script.Parent.Parent.Parent.Parent
 
-return function(p1) -- line: 8
-	-- upvalues: t (copy)
-	assert(t.number(p1))
+local t = require(parent.t)
 
-	if p1 < 360 then
+return function(p): number
+	assert(t.number(p))
+
+	if p < 360 then
 		return 12
 	end
 
-	if p1 < 600 then
-		return 24
-	end
-
-	return 48
+	return if p < 600 then 24 else 48
 end

@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.VerifiedBadges.VerifiedBadges))
+local VerifiedBadges = require(Workspace.VerifiedBadges.VerifiedBadges)
+
+return VerifiedBadges

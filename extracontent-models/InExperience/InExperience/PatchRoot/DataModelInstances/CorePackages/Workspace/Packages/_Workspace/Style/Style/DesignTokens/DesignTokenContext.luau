@@ -1,6 +1,5 @@
-local Parent = script:FindFirstAncestor("Style").Parent
-local React = require(Parent.React)
-
-require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("Style").Parent
+local React = require(parent.React)
+require(parent.UIBlox)
 
 return React.createContext(nil)

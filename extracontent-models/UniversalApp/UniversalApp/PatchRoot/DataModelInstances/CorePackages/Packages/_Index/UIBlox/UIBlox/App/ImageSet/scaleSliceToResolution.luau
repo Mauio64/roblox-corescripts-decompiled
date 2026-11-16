@@ -1,11 +1,12 @@
-return function(p1, p2) -- line: 10
-	if p1.SliceCenter then
-		local v3 = p1.SliceCenter.Min * p2
-		local v4 = p1.SliceCenter.Max * p2
-
-		p1.SliceCenter = Rect.new(v3, v4)
-		p1.SliceScale = (p1.SliceScale or 1) / p2
+return function(state, p)
+	if not state.SliceCenter then
+		return state
 	end
 
-	return p1
+	local v = state.SliceCenter.Min * p
+	local v2 = state.SliceCenter.Max * p
+	state.SliceCenter = Rect.new(v, v2)
+	state.SliceScale = (state.SliceScale or 1) / p
+
+	return state
 end

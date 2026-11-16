@@ -1,5 +1,5 @@
-local function escapeRichText(s1: string) -- line: 5
-	return s1:gsub("[&<>\"']", {
+local function escapeRichText(value: string)
+	return value:gsub("[&<>\"']", {
 		["&"] = "&amp;",
 		["<"] = "&lt;",
 		[">"] = "&gt;",

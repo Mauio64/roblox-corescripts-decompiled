@@ -1,20 +1,19 @@
-local function push(p1, ...) -- line: 2
-	local v3 = type(p1)
+local function push(list, ...)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+	local count = #list
+	local result = {}
 
-	local t1 = {}
-	local v5 = #p1
-
-	for i = 1, v5 do
-		t1[i] = p1[i]
+	for i = 1, count do
+		result[i] = list[i]
 	end
 
 	for i = 1, select("#", ...) do
-		t1[v5 + i] = select(i, ...)
+		result[count + i] = select(i, ...)
 	end
 
-	return t1
+	return result
 end
 
 return push

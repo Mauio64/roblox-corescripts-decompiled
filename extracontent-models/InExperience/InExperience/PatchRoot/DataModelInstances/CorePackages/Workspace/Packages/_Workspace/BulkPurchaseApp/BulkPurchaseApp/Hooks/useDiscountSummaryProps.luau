@@ -1,42 +1,48 @@
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
-local BulkPurchaseAppParent = BulkPurchaseApp.Parent
-local React = require(BulkPurchaseAppParent.React)
-local DiscountType = require(BulkPurchaseAppParent.IAPExperience).DiscountType
+local parent = BulkPurchaseApp.Parent
+local React = require(parent.React)
+
+local IAPExperience = require(parent.IAPExperience)
+local DiscountType = IAPExperience.DiscountType
 
 require(BulkPurchaseApp.Store.Types)
 
-local FFlagPurchasePromptFetchCartPricing = require(BulkPurchaseAppParent.SharedFlags).FFlagPurchasePromptFetchCartPricing
+local FFlagAXAddOffersToBulkPurchase = require(BulkPurchaseApp.Flags.FFlagAXAddOffersToBulkPurchase)
 
-local function useDiscountSummaryProps(p1, n1: number) -- line: 16
-	-- upvalues: React (copy), DiscountType (copy), FFlagPurchasePromptFetchCartPricing (copy)
-	return React.useMemo(function() -- line: 20
-		-- upvalues: p1 (copy), DiscountType (copy), FFlagPurchasePromptFetchCartPricing (copy), n1 (copy)
-		if not p1 then
+local function useDiscountSummaryProps(p, priceInRobux: number, p2: string?)
+	return React.useMemo(function()
+		if not p then
 			return nil
 		end
 
-		local t1 = {}
+		local discounts = {}
 
-		for _, v11 in p1.discounts do
-			table.insert(t1, {
-				type = DiscountType[v11.discountCampaign] or DiscountType.Uncategorized,
-				amountInRobux = v11.robuxDiscountAmount or 0,
-				percent = v11.robuxDiscountPercentage or 0,
-				localizedDiscountAttribution = if not FFlagPurchasePromptFetchCartPricing then nil else v11.localizedDiscountAttribution
+		for _, discount in p.discounts do
+			table.insert(discounts, {
+				type = DiscountType[discount.discountCampaign] or DiscountType.Uncategorized,
+				amountInRobux = discount.robuxDiscountAmount or 0,
+				percent = discount.robuxDiscountPercentage or 0,
+				localizedDiscountAttribution = discount.localizedDiscountAttribution
 			})
 		end
 
-		return {
+		local v = {
 			itemPrice = {
-				basePriceInRobux = p1.originalPrice,
-				priceInRobux = n1,
-				discounts = t1
-			}
+				basePriceInRobux = p.originalPrice,
+				priceInRobux = priceInRobux,
+				discounts = discounts
+			},
+			savingsSummary = 0
 		}
-	end, {
-		p1,
-		n1
-	})
+		local savingsSummary
+
+		if FFlagAXAddOffersToBulkPurchase then
+			savingsSummary = p2
+		end
+
+		v.savingsSummary = savingsSummary
+		return v
+	end, { p, priceInRobux, p2 })
 end
 
 return useDiscountSummaryProps

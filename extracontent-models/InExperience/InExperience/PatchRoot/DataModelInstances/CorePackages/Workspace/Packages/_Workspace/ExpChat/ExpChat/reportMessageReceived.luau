@@ -1,77 +1,71 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local Analytics = require(ExpChat.Parent.ExpChatShared).Analytics
+local ExpChatShared = require(ExpChat.Parent.ExpChatShared)
+local Analytics = ExpChatShared.Analytics
 
-local function getCounterName(p1) -- line: 5
-	if p1.Status == Enum.TextChatMessageStatus.Success then
-		local TextChannel = p1.TextChannel
+local function getCounterName(p): nil | string
+	local textChannel = p.Status == Enum.TextChatMessageStatus.Success and p.TextChannel
 
-		if TextChannel then
-			local TextChannelName = TextChannel.Name
+	if textChannel then
+		local name = textChannel.Name
 
-			if string.find(TextChannelName, "^RBX") == nil then
-				return "expChatMessageReceivedSuccessCustom"
-			end
-
-			if TextChannelName == "RBXGeneral" then
-				return "expChatMessageReceivedSuccessGeneral"
-			end
-
-			if TextChannelName == "RBXSystem" then
-				return "expChatMessageReceivedSuccessSystem"
-			end
-
-			if string.find(TextChannelName, "^RBXWhisper") then
-				return "expChatMessageReceivedSuccessWhisper"
-			end
-
-			if string.find(TextChannelName, "^RBXTeam") then
-				return "expChatMessageReceivedSuccessTeam"
-			end
-
+		if string.find(name, "^RBX") == nil then
 			return "expChatMessageReceivedSuccessCustom"
 		end
+
+		if name == "RBXGeneral" then
+			return "expChatMessageReceivedSuccessGeneral"
+		elseif name == "RBXSystem" then
+			return "expChatMessageReceivedSuccessSystem"
+		end
+
+		if string.find(name, "^RBXWhisper") then
+			return "expChatMessageReceivedSuccessWhisper"
+		end
+
+		if string.find(name, "^RBXTeam") then
+			return "expChatMessageReceivedSuccessTeam"
+		end
+
+		return "expChatMessageReceivedSuccessCustom"
 	end
 
-	if p1.Status == Enum.TextChatMessageStatus.Unknown then
+	if p.Status == Enum.TextChatMessageStatus.Unknown then
 		return "expChatMessageReceivedUnknown"
 	end
 
-	if p1.Status == Enum.TextChatMessageStatus.InvalidTextChannelPermissions then
+	if p.Status == Enum.TextChatMessageStatus.InvalidTextChannelPermissions then
 		return "expChatMessageReceivedInvalidTextChannelPermissions"
 	end
 
-	if p1.Status == Enum.TextChatMessageStatus.InvalidPrivacySettings then
+	if p.Status == Enum.TextChatMessageStatus.InvalidPrivacySettings then
 		return "expChatMessageReceivedInvalidPrivacySettings"
 	end
 
-	if p1.Status == Enum.TextChatMessageStatus.TextFilterFailed then
+	if p.Status == Enum.TextChatMessageStatus.TextFilterFailed then
 		return "expChatMessageReceivedTextFilterFailed"
 	end
 
-	if p1.Status == Enum.TextChatMessageStatus.Floodchecked then
+	if p.Status == Enum.TextChatMessageStatus.Floodchecked then
 		return "expChatMessageReceivedFloodchecked"
 	end
 
-	if p1.Status == Enum.TextChatMessageStatus.MessageTooLong then
+	if p.Status == Enum.TextChatMessageStatus.MessageTooLong then
 		return "expChatMessageReceivedMessageTooLong"
 	end
 
-	if p1.Status == Enum.TextChatMessageStatus.ModerationTimeout then
+	if p.Status == Enum.TextChatMessageStatus.ModerationTimeout then
 		return "expChatMessageReceivedModerationTimeout"
 	end
 
 	return nil
 end
 
-return function(n1: number, p2) -- line: 47
-	-- upvalues: getCounterName (copy), Analytics (copy)
-	local TextSource = p2.TextSource
+return function(p: number, p2)
+	local textSource = p2.TextSource
 
-	if TextSource and n1 == TextSource.UserId then
-		local v10 = getCounterName(p2)
+	local v = textSource and p == textSource.UserId and getCounterName(p2)
 
-		if v10 then
-			Analytics.reportCounter(v10)
-		end
+	if v then
+		Analytics.reportCounter(v)
 	end
 end

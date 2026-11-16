@@ -1,15 +1,16 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
+local BuilderIcons = require(parent.BuilderIcons)
 local uiblox = BuilderIcons.Migration.uiblox
 local IconVariant = BuilderIcons.IconVariant
+
 local Icon = require(Foundation.Components.Icon)
 local Image = require(Foundation.Components.Image)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local getIconScale = require(Foundation.Utility.getIconScale)
 local iconMigrationUtils = require(Foundation.Utility.iconMigrationUtils)
@@ -22,97 +23,199 @@ local isMigrated = iconMigrationUtils.isMigrated
 local isBuilderOrMigratedIcon = iconMigrationUtils.isBuilderOrMigratedIcon
 local Flags = require(Foundation.Utility.Flags)
 local useScaledValue = require(Foundation.Utility.useScaledValue)
+
 local BadgeVariant = require(Foundation.Enums.BadgeVariant)
+
 local BadgeShape = require(Foundation.Enums.BadgeShape)
+
 local BadgeSize = require(Foundation.Enums.BadgeSize)
+
 local IconSize = require(Foundation.Enums.IconSize)
+
 local IconPosition = require(Foundation.Enums.IconPosition)
-local t1 = {
-	testId = "--foundation-badge",
+
+local v = {
 	variant = BadgeVariant.Contrast,
 	shape = BadgeShape.Pill,
-	size = BadgeSize.XSmall
-}
-local t2 = {
-	[BadgeVariant.Primary] = BadgeVariant.Contrast,
-	[BadgeVariant.Secondary] = if not Flags.FoundationBadgeBetaUpdate then BadgeVariant.Neutral else BadgeVariant.Standard,
-	[BadgeVariant.Neutral] = if not Flags.FoundationBadgeBetaUpdate then nil else BadgeVariant.Standard
+	size = BadgeSize.Small,
+	testId = "--foundation-badge"
 }
 
-local function Badge(p1, p2) -- line: 72
-	-- upvalues: withDefaults (copy), t1 (copy), t2 (copy), useScaledValue (copy), useTokens (copy), React (copy), IconPosition (copy), useBadgeVariants (copy), Flags (copy), IconSize (copy), useIconSize (copy), isBuilderOrMigratedIcon (copy), Icon (copy), isMigrated (copy), uiblox (copy), IconVariant (copy), getIconScale (copy), View (copy), Image (copy), withCommonProps (copy), Text (copy)
-	local v32 = withDefaults(p1, t1)
-	local v33 = t2[v32.variant] or v32.variant
-	local v34 = useScaledValue(200)
-	local v35 = useTokens()
-	local v36 = React.useMemo(function() -- line: 79
-		-- upvalues: v32 (copy), IconPosition (copy)
-		if typeof(v32.icon) == "string" then
-			return {
-				name = v32.icon,
-				position = IconPosition.Left
-			}
+local v2 = { [BadgeVariant.Primary] = BadgeVariant.Contrast }
+local Secondary = BadgeVariant.Secondary
+local v3
+
+if Flags.FoundationBadgeBetaUpdate then
+	v3 = BadgeVariant.Standard
+else
+	v3 = BadgeVariant.Neutral
+end
+
+v2[Secondary] = v3
+local Neutral = BadgeVariant.Neutral
+local v4
+
+if Flags.FoundationBadgeBetaUpdate then
+	v4 = BadgeVariant.Standard
+end
+
+v2[Neutral] = v4
+
+local function Badge(p, ref)
+	local v5 = withDefaults(p, v)
+	local v6 = v2[v5.variant] or v5.variant
+	local v7 = useScaledValue(200)
+
+	local v8 = useTokens()
+
+	local v9 = React.useMemo(function()
+		if typeof(v5.icon) == "string" then
+			return { name = v5.icon, position = IconPosition.Left }
 		end
 
-		return v32.icon
-	end, { v32.icon })
-	local v37 = v32.text ~= nil and #v32.text > 0
-	local v38 = useBadgeVariants(v35, v33, v32.shape, if not Flags.FoundationBadgeBetaUpdate then nil else v32.size, if not Flags.FoundationBadgeBetaUpdate or not v36 then nil else v36.position, if not Flags.FoundationBadgeBetaUpdate then not v37 else nil)
-	local v39 = if not Flags.FoundationBadgeBetaUpdate then IconSize.XSmall else v38.icon.size
-	local v40 = useIconSize(v39, true)
-	local v41 = nil
+		return v5.icon
+	end, { v5.icon })
+	local v10
 
-	if v36 ~= nil then
-		local v42 = v36.position ~= IconPosition.Left and 3 or 1
+	if v5.text == nil then
+		v10 = false
+	else
+		v10 = #v5.text > 0
+	end
 
-		if isBuilderOrMigratedIcon(v36.name) then
-			v41 = React.createElement(Icon, {
-				name = if not isMigrated(v36.name) then v36.name else uiblox[v36.name].name,
-				variant = if not isMigrated(v36.name) then if not Flags.FoundationBadgeBetaUpdate then v36.variant else v36.variant or IconVariant.Filled else uiblox[v36.name].variant,
-				size = v39,
-				style = if not Flags.FoundationBadgeBetaUpdate then v38.content.style else v38.icon.style,
-				LayoutOrder = v42,
-				testId = `{ v32.testId }--icon`
+	local v11 = not v10
+
+	local shape = v5.shape
+	local size
+
+	if Flags.FoundationBadgeBetaUpdate then
+		size = v5.size
+	end
+
+	local position
+
+	if Flags.FoundationBadgeBetaUpdate and v9 then
+		position = v9.position
+	end
+
+	if Flags.FoundationBadgeBetaUpdate then
+		v11 = nil
+	end
+
+	local v12 = useBadgeVariants(v8, v6, shape, size, position, v11)
+	local size2
+
+	if Flags.FoundationBadgeBetaUpdate then
+		size2 = v12.icon.size
+	else
+		size2 = IconSize.XSmall
+	end
+
+	local size3 = useIconSize(size2, true)
+
+	local icon = nil
+
+	if v9 ~= nil then
+		local layoutOrder = v9.position == IconPosition.Left and 1 or 3
+
+		if isBuilderOrMigratedIcon(v9.name) then
+			local createElement = React.createElement
+			local name
+
+			if isMigrated(v9.name) then
+				name = uiblox[v9.name].name
+			else
+				name = v9.name
+			end
+
+			local variant
+
+			if isMigrated(v9.name) then
+				variant = uiblox[v9.name].variant
+			elseif Flags.FoundationBadgeBetaUpdate then
+				variant = v9.variant or IconVariant.Filled
+			else
+				variant = v9.variant
+			end
+
+			local style
+
+			if Flags.FoundationBadgeBetaUpdate then
+				style = v12.icon.style
+			else
+				style = v12.content.style
+			end
+
+			icon = createElement(Icon, {
+				name = name,
+				variant = variant,
+				size = size2,
+				style = style,
+				LayoutOrder = layoutOrder,
+				testId = `{v5.testId}--icon`
 			})
 		else
-			local v43, v44 = getIconScale(v36.name, v39)
+			local iconScale, scale = getIconScale(v9.name, size2)
 
-			if v43 then
-				v41 = React.createElement(View, {
-					Size = v40
-				}, React.createElement(Image, {
-					Image = v36.name,
-					Size = UDim2.fromOffset(v43.X, v43.Y),
-					imageStyle = if not Flags.FoundationBadgeBetaUpdate then v38.content.style else v38.icon.style,
-					scale = v44,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.fromScale(0.5, 0.5),
-					LayoutOrder = v42,
-					testId = `{ v32.testId }--icon`
-				}))
+			if iconScale then
+				local createElement = React.createElement
+
+				local createElement2 = React.createElement
+				local v13 = {
+					Image = v9.name,
+					Size = UDim2.fromOffset(iconScale.X, iconScale.Y),
+					imageStyle = 0,
+					scale = 0,
+					AnchorPoint = 0,
+					Position = 0,
+					LayoutOrder = 0,
+					testId = 0
+				}
+				local imageStyle
+
+				if Flags.FoundationBadgeBetaUpdate then
+					imageStyle = v12.icon.style
+				else
+					imageStyle = v12.content.style
+				end
+
+				v13.imageStyle = imageStyle
+
+				v13.scale = scale
+				v13.AnchorPoint = Vector2.new(0.5, 0.5)
+				v13.Position = UDim2.fromScale(0.5, 0.5)
+				v13.LayoutOrder = layoutOrder
+				v13.testId = `{v5.testId}--icon`
+				icon = createElement(View, { Size = size3 }, createElement2(Image, v13))
 			end
 		end
 	end
 
-	return React.createElement(View, withCommonProps(v32, {
-		backgroundStyle = v38.container.backgroundStyle,
-		stroke = if not Flags.FoundationBadgeBetaUpdate then v38.container.stroke else nil,
-		tag = v38.container.tag,
-		ref = p2
-	}), {
-		Icon = v41,
-		Text = if not v37 then nil else React.createElement(Text, {
+	local createElement = React.createElement
+
+	local v13 = withCommonProps(v5, {
+		backgroundStyle = v12.container.backgroundStyle,
+		stroke = v12.container.stroke,
+		tag = v12.container.tag,
+		ref = ref
+	})
+	local text
+
+	if v10 then
+		text = React.createElement(Text, {
+			Text = v5.text,
+			textStyle = v12.content.style,
 			RichText = true,
 			LayoutOrder = 2,
-			Text = v32.text,
-			textStyle = v38.content.style,
-			tag = v38.text.tag,
-			testId = `{ v32.testId }--text`,
-			sizeConstraint = if not Flags.FoundationBadgeBetaUpdate then nil else {
-				MaxSize = Vector2.new(v34, 1e999)
-			}
+			tag = v12.text.tag,
+			testId = `{v5.testId}--text`,
+			sizeConstraint = Flags.FoundationBadgeBetaUpdate and {
+				MaxSize = Vector2.new(v7, 1e999)
+			} or nil
 		})
-	})
+	end
+
+	return createElement(View, v13, { Icon = icon, Text = text })
 end
 
 return React.memo(React.forwardRef(Badge))

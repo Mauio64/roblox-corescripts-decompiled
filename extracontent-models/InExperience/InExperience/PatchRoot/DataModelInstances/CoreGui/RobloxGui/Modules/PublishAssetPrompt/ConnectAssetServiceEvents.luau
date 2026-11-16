@@ -2,130 +2,134 @@ local AssetService = game:GetService("AssetService")
 local AvatarCreationService = game:GetService("AvatarCreationService")
 local ExperienceAuthService = game:GetService("ExperienceAuthService")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
-local scriptParent = script.Parent
-local OpenPublishAssetPrompt = require(scriptParent.Thunks.OpenPublishAssetPrompt)
-local OpenPublishAvatarPrompt = require(scriptParent.Thunks.OpenPublishAvatarPrompt)
-local OpenPublishAvatarAssetPrompt = require(scriptParent.Thunks.OpenPublishAvatarAssetPrompt)
-local OpenPublishMakeupLookPrompt = require(scriptParent.Thunks.OpenPublishMakeupLookPrompt)
-local OpenResultModal = require(scriptParent.Thunks.OpenResultModal)
-local SetHumanoidModel = require(scriptParent.Actions.SetHumanoidModel)
-local SetAccessoryInstance = require(scriptParent.Actions.SetAccessoryInstance)
-local SetPriceInRobux = require(scriptParent.Actions.SetPriceInRobux)
-local OpenValidationErrorModal = require(scriptParent.Actions.OpenValidationErrorModal)
-local GetFFlagUploadMakeupSupport = require(scriptParent.Flags.GetFFlagUploadMakeupSupport)
-local EngineFeature = game:GetEngineFeature("PromptImportAnimationClipFromVideoAsyncEnabled")
+local CorePackages = game:GetService("CorePackages")
 
-local function updateModelAttachmentsWithWrapDeformers(p1) -- line: 28
-	-- upvalues: RobloxReplicatedStorage (copy)
-	p1.Parent = RobloxReplicatedStorage
+local parent = script.Parent
+local OpenPublishAssetPrompt = require(parent.Thunks.OpenPublishAssetPrompt)
+local OpenPublishAvatarPrompt = require(parent.Thunks.OpenPublishAvatarPrompt)
+local OpenPublishAvatarAssetPrompt = require(parent.Thunks.OpenPublishAvatarAssetPrompt)
+local OpenPublishMakeupLookPrompt = require(parent.Thunks.OpenPublishMakeupLookPrompt)
+local OpenResultModal = require(parent.Thunks.OpenResultModal)
+local SetHumanoidModel = require(parent.Actions.SetHumanoidModel)
+local SetAccessoryInstance = require(parent.Actions.SetAccessoryInstance)
+local SetPriceInRobux = require(parent.Actions.SetPriceInRobux)
+local OpenValidationErrorModal = require(parent.Actions.OpenValidationErrorModal)
+local PurchasePrompt = require(CorePackages.Workspace.Packages.PurchasePrompt)
+local PublishAssetAnalytics = PurchasePrompt.PublishAssetAnalytics
 
-	for _, child in p1:GetChildren() do
-		if child:IsA("MeshPart") then
-			local WrapDeformer = child:FindFirstChildWhichIsA("WrapDeformer")
+local GetFFlagUploadMakeupSupport = require(parent.Flags.GetFFlagUploadMakeupSupport)
 
-			if WrapDeformer then
-				for _, child2 in child:GetChildren() do
-					if child2:IsA("Attachment") then
-						child2.CFrame = WrapDeformer:GetDeformedCFrameAsync(child2.CFrame)
-					end
-				end
+local FFlagPublishAssetPromptItemDetailsTelemetry = require(parent.Flags.FFlagPublishAssetPromptItemDetailsTelemetry)
+
+local engineFeature = game:GetEngineFeature("PromptImportAnimationClipFromVideoAsyncEnabled")
+
+local function updateModelAttachmentsWithWrapDeformers(instance)
+	instance.Parent = RobloxReplicatedStorage
+
+	for _, part in instance:GetChildren() do
+		if not part:IsA("MeshPart") then
+			continue
+		end
+
+		local wrapDeformer = part:FindFirstChildWhichIsA("WrapDeformer")
+
+		if not wrapDeformer then
+			continue
+		end
+
+		for _, attachment in part:GetChildren() do
+			if attachment:IsA("Attachment") then
+				attachment.CFrame = wrapDeformer:GetDeformedCFrameAsync(attachment.CFrame)
 			end
 		end
 	end
 end
-local function ConnectAssetServiceEvents(p2) -- line: 52
-	-- upvalues: ExperienceAuthService (copy), EngineFeature (copy), OpenPublishAssetPrompt (copy), AssetService (copy), OpenPublishAvatarPrompt (copy), GetFFlagUploadMakeupSupport (copy), OpenPublishMakeupLookPrompt (copy), OpenPublishAvatarAssetPrompt (copy), OpenResultModal (copy), AvatarCreationService (copy), SetAccessoryInstance (copy), SetPriceInRobux (copy), updateModelAttachmentsWithWrapDeformers (copy), SetHumanoidModel (copy), OpenValidationErrorModal (copy)
-	local t1 = {}
 
-	table.insert(t1, ExperienceAuthService.OpenAuthPrompt:Connect(function(p3, p4, p5) -- line: 58
-		-- upvalues: EngineFeature (copy), p2 (copy), OpenPublishAssetPrompt (copy), AssetService (copy), OpenPublishAvatarPrompt (copy), GetFFlagUploadMakeupSupport (copy), OpenPublishMakeupLookPrompt (copy), OpenPublishAvatarAssetPrompt (copy)
-		local v31 = EngineFeature and p5.isVideoToAnimationFlow
+local function setAnalyticsItemDetails(data)
+	if data.instanceToPublish or data.serializedInstance then
+		PublishAssetAnalytics.setItemDetails(PublishAssetAnalytics.ItemType.Asset, data.assetType.Name)
+	elseif data.outfitToPublish then
+		PublishAssetAnalytics.setItemDetails(PublishAssetAnalytics.ItemType.Outfit, Enum.OutfitType.Avatar.Name)
+	elseif data.makeupLookToPublish then
+		PublishAssetAnalytics.setItemDetails(PublishAssetAnalytics.ItemType.Outfit, Enum.OutfitType.Makeup.Name)
+	elseif data.accessoryToPublish then
+		PublishAssetAnalytics.setItemDetails(PublishAssetAnalytics.ItemType.Asset, data.accessoryType.Name)
+	end
+end
 
-		if #p4 == 1 and (p4[1] == Enum.ExperienceAuthScope.CreatorAssetsCreate and not v31) then
-			if p5.instanceToPublish then
-				p2:dispatch(OpenPublishAssetPrompt(p5.instanceToPublish, p5.assetType, p3, p4))
+local function ConnectAssetServiceEvents(object)
+	local connections = {}
 
-				return
+	table.insert(connections, ExperienceAuthService.OpenAuthPrompt:Connect(function(p, list, data)
+		local isVideoToAnimationFlow = engineFeature and data.isVideoToAnimationFlow
+
+		if #list == 1 and list[1] == Enum.ExperienceAuthScope.CreatorAssetsCreate and not isVideoToAnimationFlow then
+			if FFlagPublishAssetPromptItemDetailsTelemetry then
+				setAnalyticsItemDetails(data)
 			end
 
-			if p5.serializedInstance then
-				local v32 = AssetService:DeserializeInstance(p5.serializedInstance)
-
-				p2:dispatch(OpenPublishAssetPrompt(v32, p5.assetType, p3, p4))
-
-				return
-			end
-
-			if p5.outfitToPublish then
-				p2:dispatch(OpenPublishAvatarPrompt(p3, p4))
-
-				return
-			end
-
-			if GetFFlagUploadMakeupSupport() and p5.makeupLookToPublish then
-				local makeupEntries = p5.makeupEntries
-
-				p2:dispatch(OpenPublishMakeupLookPrompt(p3, p4, makeupEntries))
-
-				return
-			end
-
-			if p5.accessoryToPublish then
-				local accessoryType = p5.accessoryType
-
-				p2:dispatch(OpenPublishAvatarAssetPrompt(accessoryType, p3, p4))
+			if data.instanceToPublish then
+				object:dispatch(OpenPublishAssetPrompt(data.instanceToPublish, data.assetType, p, list))
+			elseif data.serializedInstance then
+				object:dispatch(OpenPublishAssetPrompt(
+					AssetService:DeserializeInstance(data.serializedInstance),
+					data.assetType,
+					p,
+					list
+				))
+			elseif data.outfitToPublish then
+				object:dispatch(OpenPublishAvatarPrompt(p, list))
+			elseif GetFFlagUploadMakeupSupport() and data.makeupLookToPublish then
+				object:dispatch(OpenPublishMakeupLookPrompt(p, list, data.makeupEntries))
+			elseif data.accessoryToPublish then
+				object:dispatch(OpenPublishAvatarAssetPrompt(data.accessoryType, p, list))
 			end
 		end
 	end))
-	table.insert(t1, AssetService.OpenPublishResultModal:Connect(function(p6) -- line: 91
-		-- upvalues: p2 (copy), OpenResultModal (copy)
-		p2:dispatch(OpenResultModal(p6))
+
+	table.insert(connections, AssetService.OpenPublishResultModal:Connect(function(p)
+		object:dispatch(OpenResultModal(p))
 	end))
 
-	local function checkNewEventsExist() -- line: 95
-		-- upvalues: AvatarCreationService (copy)
+	local function checkNewEventsExist()
 		return AvatarCreationService.UgcValidationSuccess and AvatarCreationService.UgcValidationFailure
 	end
 
 	if pcall(checkNewEventsExist) then
-		table.insert(t1, AvatarCreationService.UgcValidationSuccess:Connect(function(p7, p8, p9) -- line: 103
-			-- upvalues: p2 (copy), GetFFlagUploadMakeupSupport (copy), AvatarCreationService (copy), SetAccessoryInstance (copy), SetPriceInRobux (copy), updateModelAttachmentsWithWrapDeformers (copy), SetHumanoidModel (copy)
-			local v39 = p2:getState()
+		table.insert(connections, AvatarCreationService.UgcValidationSuccess:Connect(function(p, p2, p3)
+			local state = object:getState()
 
-			if v39 and (v39.promptRequest.promptInfo.promptType == "PublishAvatarAsset" or GetFFlagUploadMakeupSupport() and v39.promptRequest.promptInfo.promptType == "PublishMakeupLook") then
-				local v40 = AvatarCreationService:DeserializeAvatarModel(p8)
+			if
+				state
+				and (state.promptRequest.promptInfo.promptType == "PublishAvatarAsset" or GetFFlagUploadMakeupSupport() and state.promptRequest.promptInfo.promptType == "PublishMakeupLook")
+			then
+				object:dispatch(SetAccessoryInstance((AvatarCreationService:DeserializeAvatarModel(p2))))
 
-				p2:dispatch(SetAccessoryInstance(v40))
-
-				if p9 then
-					p2:dispatch(SetPriceInRobux(p9))
+				if p3 then
+					object:dispatch(SetPriceInRobux(p3))
 				end
+			elseif state and state.promptRequest.promptInfo.guid == p then
+				local deserializeAvatarModel = AvatarCreationService:DeserializeAvatarModel(p2)
 
-				return
-			end
+				updateModelAttachmentsWithWrapDeformers(deserializeAvatarModel)
 
-			if v39 and p7 == v39.promptRequest.promptInfo.guid then
-				local v41 = AvatarCreationService:DeserializeAvatarModel(p8)
-
-				updateModelAttachmentsWithWrapDeformers(v41)
-				p2:dispatch(SetHumanoidModel(v41))
-				p2:dispatch(SetPriceInRobux(p9))
+				object:dispatch(SetHumanoidModel(deserializeAvatarModel))
+				object:dispatch(SetPriceInRobux(p3))
 			end
 		end))
 	end
 
 	if pcall(checkNewEventsExist) then
-		table.insert(t1, AvatarCreationService.UgcValidationFailure:Connect(function(p10, p11) -- line: 142
-			-- upvalues: p2 (copy), OpenValidationErrorModal (copy)
-			local v44 = p2:getState()
+		table.insert(connections, AvatarCreationService.UgcValidationFailure:Connect(function(p, p2)
+			local state = object:getState()
 
-			if v44 and p10 == v44.promptRequest.promptInfo.guid then
-				p2:dispatch(OpenValidationErrorModal(p11))
+			if state and state.promptRequest.promptInfo.guid == p then
+				object:dispatch(OpenValidationErrorModal(p2))
 			end
 		end))
 	end
 
-	return t1
+	return connections
 end
 
 return ConnectAssetServiceEvents

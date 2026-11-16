@@ -1,17 +1,23 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
-local Checkbox = require(CorePackages.Packages.Foundation).Checkbox
+local Foundation = require(CorePackages.Packages.Foundation)
+local Checkbox = Foundation.Checkbox
+
 local t = require(CorePackages.Packages.t)
-local ParentParent = script.Parent.Parent
-local Dependencies = require(ParentParent.Dependencies)
+
+local parent = script.Parent.Parent
+local Dependencies = require(parent.Dependencies)
 local Divider = require(Dependencies.Divider)
 local ThemedTextLabel = require(Dependencies.ThemedTextLabel)
 local withStyle = UIBlox.Style.withStyle
-local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v12 = Roact.PureComponent:extend("BlockPlayerItem")
 
-v12.validateProps = t.strictInterface({
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+
+local extended = Roact.PureComponent:extend("BlockPlayerItem")
+
+extended.validateProps = t.strictInterface({
 	layoutOrder = t.optional(t.number),
 	size = t.UDim2,
 	text = t.string,
@@ -22,27 +28,22 @@ v12.validateProps = t.strictInterface({
 	isCheckBoxSelected = t.boolean,
 	onCheckBoxActivated = t.callback
 })
-v12.defaultProps = {
-	isDisabled = false,
-	isCheckBoxSelected = false
-}
 
-function v12.init(p1) -- line: 39
-	function p1.onClicked() -- line: 40
-		-- upvalues: p1 (copy)
-		if p1.props.onCheckBoxActivated and not p1.props.isDisabled then
-			p1.props.onCheckBoxActivated(not p1.props.isCheckBoxSelected)
+extended.defaultProps = { isDisabled = false, isCheckBoxSelected = false }
+
+function extended:init()
+	function self.onClicked()
+		if self.props.onCheckBoxActivated and not self.props.isDisabled then
+			self.props.onCheckBoxActivated(not self.props.isCheckBoxSelected)
 		end
 	end
 end
-function v12.render(p2) -- line: 47
-	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), Checkbox (copy), ThemedTextLabel (copy), Divider (copy)
-	local props = p2.props
 
-	return withStyle(function(p3) -- line: 50
-		-- upvalues: Roact (copy), props (copy), p2 (copy), ImageSetLabel (copy), Checkbox (copy), ThemedTextLabel (copy), Divider (copy)
-		local _ = p3.Theme
+function extended.render(p)
+	local props = p.props
 
+	return withStyle(function(p2)
+		local _theme = p2.Theme
 		return Roact.createElement("TextButton", {
 			BackgroundTransparency = 1,
 			LayoutOrder = props.layoutOrder,
@@ -50,69 +51,75 @@ function v12.render(p2) -- line: 47
 			AutoButtonColor = false,
 			BorderSizePixel = 0,
 			Text = "",
-			[Roact.Event.Activated] = p2.onClicked
+			[Roact.Event.Activated] = p.onClicked
 		}, {
 			BlockIcon = Roact.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0, 0.5),
+				BackgroundTransparency = 1,
 				Image = props.icon,
-				ImageTransparency = if not props.isDisabled then nil else 0.5,
+				ImageTransparency = props.isDisabled and 0.5 or nil,
 				Position = UDim2.new(0, 16, 0.5, 0),
 				Size = props.iconSize
 			}),
-			CheckBoxFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.new(1, -20, 0.5, 0),
-				Size = UDim2.fromOffset(24, 24)
-			}, {
-				CheckBox = Roact.createElement(Checkbox, {
-					label = "",
-					isDisabled = props.isDisabled,
-					onActivated = props.onCheckBoxActivated,
-					isChecked = props.isCheckBoxSelected
-				})
-			}),
-			TextFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(0, 0.5),
-				Position = UDim2.new(0, 60, 0.5, 0),
-				Size = UDim2.new(1, -124, 1, 0)
-			}, {
-				Layout = Roact.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 4)
-				}),
-				Text = Roact.createElement(ThemedTextLabel, {
-					LayoutOrder = 1,
-					fontKey = "SubHeader1",
-					themeKey = "TextEmphasis",
-					TextTransparency = if not props.isDisabled then nil else 0.5,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Text = props.text,
-					TextTruncate = Enum.TextTruncate.AtEnd,
-					TextXAlignment = Enum.TextXAlignment.Left
-				}),
-				Description = Roact.createElement(ThemedTextLabel, {
-					LayoutOrder = 2,
-					fontKey = "Footer",
-					TextWrapped = true,
-					themeKey = "TextDefault",
-					LineHeight = 1.25,
-					TextTransparency = if not props.isDisabled then nil else 0.5,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Text = props.description,
-					TextXAlignment = Enum.TextXAlignment.Left
-				})
-			}),
-			Divider = Roact.createElement(Divider, {
-				Position = UDim2.new(0, 0, 1, 0)
-			})
+			CheckBoxFrame = Roact.createElement(
+				"Frame",
+				{
+					AnchorPoint = Vector2.new(1, 0.5),
+					BackgroundTransparency = 1,
+					Position = UDim2.new(1, -20, 0.5, 0),
+					Size = UDim2.fromOffset(24, 24)
+				},
+				{
+					CheckBox = Roact.createElement(Checkbox, {
+						label = "",
+						isDisabled = props.isDisabled,
+						onActivated = props.onCheckBoxActivated,
+						isChecked = props.isCheckBoxSelected
+					})
+				}
+			),
+			TextFrame = Roact.createElement(
+				"Frame",
+				{
+					AnchorPoint = Vector2.new(0, 0.5),
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 60, 0.5, 0),
+					Size = UDim2.new(1, -124, 1, 0)
+				},
+				{
+					Layout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Left,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 4)
+					}),
+					Text = Roact.createElement(ThemedTextLabel, {
+						LayoutOrder = 1,
+						TextTransparency = props.isDisabled and 0.5 or nil,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						fontKey = "SubHeader1",
+						themeKey = "TextEmphasis",
+						Text = props.text,
+						TextTruncate = Enum.TextTruncate.AtEnd,
+						TextXAlignment = Enum.TextXAlignment.Left
+					}),
+					Description = Roact.createElement(ThemedTextLabel, {
+						LayoutOrder = 2,
+						TextTransparency = props.isDisabled and 0.5 or nil,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						fontKey = "Footer",
+						TextWrapped = true,
+						themeKey = "TextDefault",
+						Text = props.description,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						LineHeight = 1.25
+					})
+				}
+			),
+			Divider = Roact.createElement(Divider, { Position = UDim2.new(0, 0, 1, 0) })
 		})
 	end)
 end
 
-return v12
+return extended

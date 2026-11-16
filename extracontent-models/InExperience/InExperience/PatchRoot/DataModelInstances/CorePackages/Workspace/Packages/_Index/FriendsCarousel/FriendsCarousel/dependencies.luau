@@ -1,84 +1,109 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local SocialLuaAnalytics = require(scriptParentParent.SocialLuaAnalytics)
-local LuaSocialLibrariesDeps = require(scriptParentParent.LuaSocialLibrariesDeps)
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local SocialLuaAnalytics = require(parent2.SocialLuaAnalytics)
+local LuaSocialLibrariesDeps = require(parent2.LuaSocialLibrariesDeps)
+
 local httpRequest = LuaSocialLibrariesDeps.httpRequest
-local v6 = require(scriptParentParent.Loggers).Logger:new("FriendsCarousel")
-local v7 = v6:new("FriendsCarousel Networking")
-local v8 = game:DefineFastInt("FriendsCarouselHttpRetryCount", 3)
-local getFFlagMigrateSocialNetworking = require(scriptParentParent.SharedFlags).getFFlagMigrateSocialNetworking
-local FFlagFriendsCarouselDeprecateUnusedReducers = require(scriptParentParent.SharedFlags).FFlagFriendsCarouselDeprecateUnusedReducers
-local v11 = httpRequest.config({
-	requestFunction = function(p1, p2, p3) -- line: 20
-		-- upvalues: v7 (copy), getFFlagMigrateSocialNetworking (copy), httpRequest (copy)
-		v7:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+local Loggers = require(parent2.Loggers)
+local logger = Loggers.Logger:new("FriendsCarousel")
+
+local v = logger:new("FriendsCarousel Networking")
+local defineFastInt = game:DefineFastInt("FriendsCarouselHttpRetryCount", 3)
+
+local SharedFlags = require(parent2.SharedFlags)
+local getFFlagMigrateSocialNetworking = SharedFlags.getFFlagMigrateSocialNetworking
+
+local config = httpRequest.config({
+	requestFunction = function(p, p2, p3)
+		v:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p))
 
 		if getFFlagMigrateSocialNetworking() then
-			return httpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+			return httpRequest.requestFunctions.RequestInternal(p, p2, p3)
 		end
 
-		return httpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+		return httpRequest.requestFunctions.HttpRbxApi(p, p2, p3)
 	end,
-	postRequestFunction = function(p4, p5) -- line: 28
-		-- upvalues: v7 (copy)
-		v7:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s ]", p5.requestMethod, p5.url, p4.StatusCode))
+	postRequestFunction = function(p, p2)
+		v:debug(
+			"Returned: {}",
+			string.format("[ requestMethod = %q, url = %q, statusCode = %s ]", p2.requestMethod, p2.url, p.StatusCode)
+		)
 	end,
-	maxRetryCount = v8
+	maxRetryCount = defineFastInt
 })
-local RODUX_KEY = require(scriptParent.Common.Constants).RODUX_KEY
-local v13 = LuaSocialLibrariesDeps.RoduxNetworking.config({
+
+local Constants = require(parent.Common.Constants)
+local RODUX_KEY = Constants.RODUX_KEY
+
+local config2 = LuaSocialLibrariesDeps.RoduxNetworking.config({
 	keyPath = RODUX_KEY .. ".NetworkStatus",
-	networkImpl = v11
+	networkImpl = config
 })
-local UIBlox = require(scriptParentParent.UIBlox)
 
-require(scriptParentParent.RobloxAppHooks)
+local UIBlox = require(parent2.UIBlox)
 
-return {
-	logger = v6,
+require(parent2.RobloxAppHooks)
+
+local Dependencies = {
+	logger = logger,
 	SocialLuaAnalytics = SocialLuaAnalytics,
-	Promise = require(scriptParentParent.Promise),
+	Promise = require(parent2.Promise),
 	UIBlox = UIBlox,
-	Roact = require(scriptParentParent.Roact),
-	React = require(scriptParentParent.React),
-	Rodux = require(scriptParentParent.Rodux),
-	RoactRodux = require(scriptParentParent.RoactRodux),
-	t = require(scriptParentParent.t),
-	Dash = require(scriptParentParent.Dash),
+	Roact = require(parent2.Roact),
+	React = require(parent2.React),
+	Rodux = require(parent2.Rodux),
+	RoactRodux = require(parent2.RoactRodux),
+	t = require(parent2.t),
+	Dash = require(parent2.Dash),
 	llama = LuaSocialLibrariesDeps.llama,
 	SocialLibraries = LuaSocialLibrariesDeps.SocialLibraries.config({}),
-	SocialCommon = require(scriptParentParent.SocialCommon),
-	RoduxNetworking = v13,
-	NetworkingFriends = require(scriptParentParent.FriendsNetworking).config({
-		roduxNetworking = v13
-	}),
-	NetworkingAliases = LuaSocialLibrariesDeps.NetworkingAliases.config({
-		roduxNetworking = v13
-	}),
-	RoduxUsers = if not FFlagFriendsCarouselDeprecateUnusedReducers then LuaSocialLibrariesDeps.RoduxUsers.config({
-		keyPath = RODUX_KEY .. ".Users"
-	}) else nil,
-	RoduxFriends = require(scriptParentParent.FriendsRodux).config({
-		keyPath = RODUX_KEY .. ".Friends"
-	}),
-	RoduxPresence = if not FFlagFriendsCarouselDeprecateUnusedReducers then LuaSocialLibrariesDeps.RoduxPresence.config({
-		keyPath = RODUX_KEY .. ".Presence"
-	}) else nil,
-	RoduxUserPermissions = if not FFlagFriendsCarouselDeprecateUnusedReducers then LuaSocialLibrariesDeps.RoduxUserPermissions.config({
-		keyPath = RODUX_KEY .. ".UserPermissions"
-	}) else nil,
-	RoduxAnalytics = SocialLuaAnalytics.Analytics.RoduxAnalytics.config({
-		keyPath = RODUX_KEY .. ".Analytics"
-	}),
-	convertActions = require(scriptParentParent.SocialReducerAdaptors).convertActions,
-	usersActionAdaptor = require(scriptParentParent.SocialReducerAdaptors).usersActionAdaptor,
-	friendsActionAdaptor = require(scriptParentParent.SocialReducerAdaptors).friendsActionAdaptor,
-	presenceActionAdaptor = require(scriptParentParent.SocialReducerAdaptors).presenceActionAdaptor,
-	Text = require(scriptParentParent.AppCommonLib).Text,
-	enumerate = require(scriptParentParent.enumerate),
-	RetrievalStatus = require(scriptParentParent.Http).Enum.RetrievalStatus,
-	AnalyticsService = require(scriptParentParent.Analytics).Analytics.new(game:GetService("RbxAnalyticsService")),
-	ShowContactImporterParams = require(scriptParentParent.ContactImporter).ShowContactImporterParams,
-	isSubjectToDesktopPolicies = require(scriptParentParent.SharedFlags).isSubjectToDesktopPolicies,
-	isSubjectTo10ftPolicies = require(scriptParent.isSubjectTo10ftPolicies)
+	SocialCommon = require(parent2.SocialCommon),
+	RoduxNetworking = config2,
+	NetworkingFriends = 0,
+	NetworkingAliases = 0,
+	RoduxFriends = 0,
+	RoduxAnalytics = 0,
+	convertActions = 0,
+	friendsActionAdaptor = 0,
+	Text = 0,
+	enumerate = 0,
+	RetrievalStatus = 0,
+	AnalyticsService = 0,
+	isSubjectToDesktopPolicies = 0,
+	isSubjectTo10ftPolicies = 0
 }
+
+local FriendsNetworking = require(parent2.FriendsNetworking)
+Dependencies.NetworkingFriends = FriendsNetworking.config({ roduxNetworking = config2 })
+
+Dependencies.NetworkingAliases = LuaSocialLibrariesDeps.NetworkingAliases.config({
+	roduxNetworking = config2
+})
+
+local FriendsRodux = require(parent2.FriendsRodux)
+Dependencies.RoduxFriends = FriendsRodux.config({
+	keyPath = RODUX_KEY .. ".Friends"
+})
+
+Dependencies.RoduxAnalytics = SocialLuaAnalytics.Analytics.RoduxAnalytics.config({
+	keyPath = RODUX_KEY .. ".Analytics"
+})
+
+local SocialReducerAdaptors = require(parent2.SocialReducerAdaptors)
+Dependencies.convertActions = SocialReducerAdaptors.convertActions
+local SocialReducerAdaptors2 = require(parent2.SocialReducerAdaptors)
+Dependencies.friendsActionAdaptor = SocialReducerAdaptors2.friendsActionAdaptor
+local AppCommonLib = require(parent2.AppCommonLib)
+Dependencies.Text = AppCommonLib.Text
+Dependencies.enumerate = require(parent2.enumerate)
+local Http = require(parent2.Http)
+Dependencies.RetrievalStatus = Http.Enum.RetrievalStatus
+
+local Analytics = require(parent2.Analytics)
+Dependencies.AnalyticsService = Analytics.Analytics.new(game:GetService("RbxAnalyticsService"))
+
+local SharedFlags2 = require(parent2.SharedFlags)
+Dependencies.isSubjectToDesktopPolicies = SharedFlags2.isSubjectToDesktopPolicies
+Dependencies.isSubjectTo10ftPolicies = require(parent.isSubjectTo10ftPolicies)
+return Dependencies

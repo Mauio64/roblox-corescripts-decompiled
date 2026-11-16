@@ -1,32 +1,30 @@
 local checkListConsistency = require(script.Parent.checkListConsistency)
+local function recursiveToString(item, value)
+	local v = value or ""
 
-local function recursiveToString(p1, p2) -- line: 6
-	-- upvalues: checkListConsistency (copy), recursiveToString (copy)
-	local v5 = p2 or ""
-
-	if type(p1) == "table" then
-		local s1 = ""
-
-		if not checkListConsistency(p1) then
-			s1 ..= "-- WARNING: this table fails the list consistency test\n"
-		end
-
-		local v7 = s1 .. "{\n"
-
-		for k, v in pairs(p1) do
-			if type(k) == "string" then
-				v7 ..= "  " .. v5 .. tostring(k) .. " = " .. recursiveToString(v, "  " .. v5) .. ";\n"
-			end
-
-			if type(k) == "number" then
-				v7 ..= "  " .. v5 .. recursiveToString(v, "  " .. v5) .. ",\n"
-			end
-		end
-
-		return v7 .. v5 .. "}"
+	if type(item) ~= "table" then
+		return (tostring(item))
 	end
 
-	return (tostring(p1))
+	local v2 = ""
+
+	if not checkListConsistency(item) then
+		v2 ..= "-- WARNING: this table fails the list consistency test\n"
+	end
+
+	local v3 = v2 .. "{\n"
+
+	for k, item2 in pairs(item) do
+		if type(k) == "string" then
+			v3 ..= "  " .. v .. tostring(k) .. " = " .. recursiveToString(item2, "  " .. v) .. ";\n"
+		end
+
+		if type(k) == "number" then
+			v3 ..= "  " .. v .. recursiveToString(item2, "  " .. v) .. ",\n"
+		end
+	end
+
+	return v3 .. v .. "}"
 end
 
 return recursiveToString

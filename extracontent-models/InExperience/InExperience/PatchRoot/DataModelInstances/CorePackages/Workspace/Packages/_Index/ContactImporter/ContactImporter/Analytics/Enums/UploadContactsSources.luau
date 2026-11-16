@@ -1,4 +1,1 @@
-return {
-	AutoSync = "AutoSync",
-	CI = "CI"
-}
+return { AutoSync = "AutoSync", CI = "CI" }

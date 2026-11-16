@@ -1,68 +1,47 @@
-local Parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
-local Promise = require(Parent.Promise)
-local t1 = {}
+local parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
 
-t1.__index = t1
+local Promise = require(parent.Promise)
 
-function t1.new(p1) -- line: 9
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
+local HttpRequest = {}
+HttpRequest.__index = HttpRequest
 
-	self.http = p1 or game:GetService("HttpService")
-
+function HttpRequest.new(p)
+	local self = setmetatable({}, HttpRequest)
+	self.http = p or game:GetService("HttpService")
 	return self
 end
-function t1.get(t2: {[any]: any}, s1: string) -- line: 15
-	-- upvalues: Promise (copy)
-	return Promise.new(function(resolve, reject) -- line: 16
-		-- upvalues: t2 (copy), s1 (copy)
-		t2.http:RequestInternal({
+
+function HttpRequest.get(p, url: string)
+	return Promise.new(function(callback, callback2)
+		p.http:RequestInternal({
+			Url = url,
 			Method = "GET",
-			Url = s1,
-			Headers = {
-				Accept = "application/json"
-			}
-		}):Start(function(_, p3) -- line: 25
-			-- upvalues: resolve (copy), t2 (copy), reject (copy)
-			if p3.StatusCode == 200 then
-				resolve(t2.http:JSONDecode(p3.Body))
-
-				return
+			Headers = { Accept = "application/json" }
+		}):Start(function(_, p2)
+			if p2.StatusCode == 200 then
+				callback(p.http:JSONDecode(p2.Body))
+			else
+				callback2({ status = p2.StatusCode, body = p2.Body })
 			end
-
-			reject({
-				status = p3.StatusCode,
-				body = p3.Body
-			})
 		end)
 	end)
 end
-function t1.post(t3: {[any]: any}, s2: string, t4: {[any]: any}) -- line: 38
-	-- upvalues: Promise (copy)
-	return Promise.new(function(resolve, reject) -- line: 39
-		-- upvalues: t3 (copy), s2 (copy), t4 (copy)
-		t3.http:RequestInternal({
+
+function HttpRequest.post(p, url: string, p2)
+	return Promise.new(function(callback, callback2)
+		p.http:RequestInternal({
+			Url = url,
 			Method = "POST",
-			Url = s2,
-			Headers = {
-				["Content-Type"] = "application/json",
-				Accept = "application/json"
-			},
-			Body = t3.http:JSONEncode(t4)
-		}):Start(function(_, p5) -- line: 50
-			-- upvalues: resolve (copy), t3 (copy), reject (copy)
-			if p5.StatusCode == 200 then
-				resolve(t3.http:JSONDecode(p5.Body))
-
-				return
+			Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
+			Body = p.http:JSONEncode(p2)
+		}):Start(function(_, p3)
+			if p3.StatusCode == 200 then
+				callback(p.http:JSONDecode(p3.Body))
+			else
+				callback2({ status = p3.StatusCode, body = p3.Body })
 			end
-
-			reject({
-				status = p5.StatusCode,
-				body = p5.Body
-			})
 		end)
 	end)
 end
 
-return t1
+return HttpRequest

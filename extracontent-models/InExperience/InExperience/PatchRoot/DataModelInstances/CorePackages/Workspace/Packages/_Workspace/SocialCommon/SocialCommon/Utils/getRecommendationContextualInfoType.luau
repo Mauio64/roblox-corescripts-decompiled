@@ -1,21 +1,27 @@
 local SocialCommon = script:FindFirstAncestor("SocialCommon")
 local RecommendationContextType = require(SocialCommon.Enums.RecommendationContextType)
 local ContextualInfoTypes = require(SocialCommon.Enums.ContextualInfoTypes)
+local parent = SocialCommon.Parent
+local FFlagShowClassmatesOnPYMK = require(parent.SharedFlags.FFlagShowClassmatesOnPYMK)
 
-local function getRecommendationContextualInfoType(p1) -- line: 11
-	-- upvalues: RecommendationContextType (copy), ContextualInfoTypes (copy)
-	local v6 = p1.contextType and p1.contextType.rawValue()
+local function getRecommendationContextualInfoType(p)
+	local contextType = p.contextType
+	local v = contextType and contextType.rawValue()
 
-	if v6 == RecommendationContextType.MutualFriends.rawValue() then
+	if v == RecommendationContextType.MutualFriends.rawValue() then
 		return ContextualInfoTypes.MutualFriends
 	end
 
-	if v6 == RecommendationContextType.Frequents.rawValue() then
+	if v == RecommendationContextType.Frequents.rawValue() then
 		return ContextualInfoTypes.Frequents
 	end
 
-	if v6 == RecommendationContextType.Contacts.rawValue() then
+	if v == RecommendationContextType.Contacts.rawValue() then
 		return ContextualInfoTypes.Contacts
+	end
+
+	if FFlagShowClassmatesOnPYMK and v == RecommendationContextType.Classmates.rawValue() then
+		return ContextualInfoTypes.Classmates
 	end
 
 	return nil

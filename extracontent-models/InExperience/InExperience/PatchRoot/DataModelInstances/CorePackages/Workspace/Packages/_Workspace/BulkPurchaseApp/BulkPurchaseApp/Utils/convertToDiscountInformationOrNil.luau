@@ -2,16 +2,12 @@ local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
 
 require(BulkPurchaseApp.Store.Types)
 
-local function convertToDiscountInformationOrNil(p1) -- line: 6
-	if type(p1) == "table" then
-		if next(p1) == nil then
-			return nil
-		end
-
-		return p1
+local function convertToDiscountInformationOrNil(items)
+	if not (type(items) == "table" and next(items) ~= nil) then
+		return nil
 	end
 
-	return nil
+	return items
 end
 
 return convertToDiscountInformationOrNil

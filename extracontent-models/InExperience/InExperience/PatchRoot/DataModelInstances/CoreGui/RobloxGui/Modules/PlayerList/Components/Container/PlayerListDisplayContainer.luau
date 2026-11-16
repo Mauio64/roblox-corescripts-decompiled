@@ -1,78 +1,86 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent.Parent
+
+local parent = script.Parent.Parent.Parent
+
 local React = require(CorePackages.Packages.React)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-
 require(CorePackages.Workspace.Packages.LeaderboardStore)
 
 local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
-local PlayerListDisplayView = require(ParentParent.Components.PresentationCommon.PlayerListDisplayView)
-local SetPlayerListVisibility = require(ParentParent.Actions.SetPlayerListVisibility)
+
+local PlayerListDisplayView = require(parent.Components.PresentationCommon.PlayerListDisplayView)
+local SetPlayerListVisibility = require(parent.Actions.SetPlayerListVisibility)
+
 local FFlagAddNewPlayerListFocusNav = PlayerList.Flags.FFlagAddNewPlayerListFocusNav
 
-local function PlayerListDisplayContainer(t1: {[any]: any}) -- line: 46
-	-- upvalues: useLeaderboardStore (copy), SignalsReact (copy), React (copy), PlayerListDisplayView (copy)
-	local v16 = useLeaderboardStore()
-	local v17 = v16.getGameStatsList()
-	local v18 = v16.getTeamList()
-	local v19 = SignalsReact.useSignalState(v17.getCount)
-	local v20 = SignalsReact.useSignalState(v18.getCount)
+local function PlayerListDisplayContainer(props)
+	local v = useLeaderboardStore()
 
-	if v16 then
+	local gameStatsList = v.getGameStatsList()
+	local teamList = v.getTeamList()
+
+	local gameStatsCount = SignalsReact.useSignalState(gameStatsList.getCount)
+	local teamListCount = SignalsReact.useSignalState(teamList.getCount)
+
+	if v then
 		return (React.createElement(React.Fragment, nil, React.createElement(PlayerListDisplayView, {
-			teamList = v18,
-			teamListCount = v20,
-			gameStatsCount = v19,
-			entrySizeX = t1.entrySize,
-			screenSizeY = t1.screenSizeY,
-			playerIconInfo = t1.playerIconInfo,
-			playerRelationship = t1.playerRelationship,
-			dropDownPlayer = t1.dropDownPlayer,
-			dropDownVisible = t1.dropDownVisible,
-			dismissPlayerList = t1.dismissPlayerList,
-			isVisible = t1.isVisible,
-			isMinimized = t1.isMinimized,
-			isSmallTouchDevice = t1.isSmallTouchDevice,
-			isDirectionalPreferred = t1.isDirectionalPreferred,
-			isUsingGamepad = t1.isUsingGamepad
+			teamList = teamList,
+			teamListCount = teamListCount,
+			gameStatsCount = gameStatsCount,
+			entrySizeX = props.entrySize,
+			screenSizeY = props.screenSizeY,
+			playerIconInfo = props.playerIconInfo,
+			playerRelationship = props.playerRelationship,
+			dropDownPlayer = props.dropDownPlayer,
+			dropDownVisible = props.dropDownVisible,
+			dismissPlayerList = props.dismissPlayerList,
+			isVisible = props.isVisible,
+			isMinimized = props.isMinimized,
+			isSmallTouchDevice = props.isSmallTouchDevice,
+			isDirectionalPreferred = props.isDirectionalPreferred,
+			isUsingGamepad = props.isUsingGamepad
 		})))
 	end
 
 	return nil
 end
-local function PlayerListDisplayContainerWithLeaderboardStore(t2: {[any]: any}) -- line: 77
-	-- upvalues: useLeaderboardStore (copy), PlayerListDisplayContainer (copy)
+
+local function PlayerListDisplayContainerWithLeaderboardStore(p)
 	if useLeaderboardStore() then
-		return (PlayerListDisplayContainer(t2))
+		return PlayerListDisplayContainer(p)
 	end
 
 	return nil
 end
-local function mapDispatchToProps(p1) -- line: 85
-	-- upvalues: SetPlayerListVisibility (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		dismissPlayerList = function() -- line: 87
-			-- upvalues: p1 (copy), SetPlayerListVisibility (copy)
-			return p1(SetPlayerListVisibility(false))
+		dismissPlayerList = function()
+			return callback(SetPlayerListVisibility(false))
 		end
 	}
 end
-local function mapStateToProps(p2) -- line: 93
-	-- upvalues: FFlagAddNewPlayerListFocusNav (copy)
-	local isMinimized = p2.displayOptions.isMinimized
+
+local function mapStateToProps(data)
+	local isMinimized = data.displayOptions.isMinimized
+	local isVisible
+
+	if not FFlagAddNewPlayerListFocusNav then
+		isVisible = data.displayOptions.isVisible
+	end
 
 	return {
-		isVisible = if not FFlagAddNewPlayerListFocusNav then p2.displayOptions.isVisible else nil,
+		isVisible = isVisible,
 		isMinimized = isMinimized,
-		isDirectionalPreferred = p2.displayOptions.isTenFootInterface,
-		isUsingGamepad = p2.displayOptions.isUsingGamepad,
-		isSmallTouchDevice = p2.displayOptions.isSmallTouchDevice,
-		playerIconInfo = p2.playerIconInfo,
-		playerRelationship = p2.playerRelationship,
-		dropDownPlayer = p2.playerDropDown.selectedPlayer,
-		dropDownVisible = p2.playerDropDown.isVisible
+		isDirectionalPreferred = data.displayOptions.isTenFootInterface,
+		isUsingGamepad = data.displayOptions.isUsingGamepad,
+		isSmallTouchDevice = data.displayOptions.isSmallTouchDevice,
+		playerIconInfo = data.playerIconInfo,
+		playerRelationship = data.playerRelationship,
+		dropDownPlayer = data.playerDropDown.selectedPlayer,
+		dropDownVisible = data.playerDropDown.isVisible
 	}
 end
 

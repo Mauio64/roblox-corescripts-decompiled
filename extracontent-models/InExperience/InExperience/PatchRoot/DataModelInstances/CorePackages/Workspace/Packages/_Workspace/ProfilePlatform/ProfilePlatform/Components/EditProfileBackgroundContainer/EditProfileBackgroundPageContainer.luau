@@ -1,42 +1,45 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local useDispatch = require(ProfilePlatformParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local EditProfileBackground = require(ProfilePlatformParent.EditProfileBackground)
+local parent = ProfilePlatform.Parent
+
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local EditProfileBackground = require(parent.EditProfileBackground)
 local refreshProfilePlatformUserInfo = require(ProfilePlatform.Networking.refreshProfilePlatformUserInfo)
-local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
 local Enums = require(ProfilePlatform.Common.Enums)
-local DefaultAnalyticsService = require(ProfilePlatformParent.SocialLuaAnalytics).Analytics.DefaultAnalyticsService
-local Analytics = require(ProfilePlatformParent.EditProfileBackground).Analytics
 
-local function EditProfileBackgroundPageWrapper(_) -- line: 17
-	-- upvalues: useDispatch (copy), useLocalUserId (copy), useProfileJsonComponent (copy), Enums (copy), React (copy), refreshProfilePlatformUserInfo (copy), Analytics (copy), DefaultAnalyticsService (copy), EditProfileBackground (copy)
-	local v14 = useDispatch()
-	local v15 = useLocalUserId()
-	local v16 = useProfileJsonComponent(Enums.Components.ProfileBackground)
-	local v17 = React.useCallback(function() -- line: 23
-		-- upvalues: v14 (copy), refreshProfilePlatformUserInfo (copy), v15 (copy)
-		v14(refreshProfilePlatformUserInfo((tostring(v15))))
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+local EditProfileBackground2 = require(parent.EditProfileBackground)
+local Analytics = EditProfileBackground2.Analytics
+
+local function EditProfileBackgroundPageWrapper(_)
+	local v = useDispatch()
+	local v2 = useLocalUserId()
+
+	local profileBackgroundData = useProfileJsonComponent(Enums.Components.ProfileBackground)
+
+	local onBackgroundChanged = React.useCallback(function()
+		v(refreshProfilePlatformUserInfo((tostring(v2))))
 	end)
-	local v18 = Analytics.setupFireAnalyticsEvents({
+
+	local fireAnalyticsEvent = Analytics.setupFireAnalyticsEvents({
 		analytics = {
 			EventStream = DefaultAnalyticsService.EventStream,
 			Telemetry = DefaultAnalyticsService.Telemetry
 		},
-		infoForAllEvents = {
-			uid = tostring(v15)
-		}
+		infoForAllEvents = { uid = tostring(v2) }
 	})
 
 	return React.createElement(Analytics.Context.Provider, {
-		value = {
-			fireAnalyticsEvent = v18
-		}
+		value = { fireAnalyticsEvent = fireAnalyticsEvent }
 	}, { React.createElement(EditProfileBackground.EditProfileBackgroundPage, {
-		onBackgroundChanged = v17,
-		profileBackgroundData = v16
-	}) })
+			onBackgroundChanged = onBackgroundChanged,
+			profileBackgroundData = profileBackgroundData
+		}) })
 end
 
 return EditProfileBackgroundPageWrapper

@@ -1,3 +1,5 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 
-return (require(AppChat.Http.RoduxFriends).installReducer())
+local RoduxFriends = require(AppChat.Http.RoduxFriends)
+
+return (RoduxFriends.installReducer())

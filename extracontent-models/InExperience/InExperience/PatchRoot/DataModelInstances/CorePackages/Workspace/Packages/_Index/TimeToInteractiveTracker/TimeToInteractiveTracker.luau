@@ -1,8 +1,5 @@
-local TimeToInteractiveTracker = require(script.TimeToInteractiveTracker)
-local types = require(script.Stores.types)
-
 return {
-	TimeToInteractiveTracker = TimeToInteractiveTracker,
-	Types = types,
+	TimeToInteractiveTracker = require(script.TimeToInteractiveTracker),
+	Types = require(script.Stores.types),
 	["jest.config"] = script["jest.config"]
 }

@@ -1,4 +1,1 @@
-return {
-	Stacked = "Stacked",
-	Inline = "Inline"
-}
+return { Stacked = "Stacked", Inline = "Inline" }

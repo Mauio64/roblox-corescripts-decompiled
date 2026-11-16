@@ -1,20 +1,16 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
+local parent = ProfilePlatform.Parent
 local Enums = require(ProfilePlatform.Common.Enums)
-local SetAlias = require(ProfilePlatformParent.SetAlias)
+local SetAlias = require(parent.SetAlias)
 local ProfileContextualMenu = require(ProfilePlatform.Components.ProfileContextualMenu)
-local EditProfilePage = require(ProfilePlatformParent.EditProfile.EditProfilePage)
-local EditProfileLanding = require(ProfilePlatformParent.EditProfile.EditProfileLanding)
-local EditDisplayNameModal = require(ProfilePlatformParent.EditProfile.EditDisplayNameModal)
-local EditDisplayNameErrorModal = require(ProfilePlatformParent.EditProfile.EditDisplayNameErrorModal)
-local UsernameInsufficientFundsModal = require(ProfilePlatformParent.EditProfile.UsernameInsufficientFundsModal)
-local EditDescriptionModal = require(ProfilePlatformParent.EditProfile.EditDescriptionModal)
-local Enums2 = require(ProfilePlatformParent.EditProfile.Enums)
+local EditProfileLanding = require(parent.EditProfile.EditProfileLanding)
+local EditDisplayNameErrorModal = require(parent.EditProfile.EditDisplayNameErrorModal)
+local UsernameInsufficientFundsModal = require(parent.EditProfile.UsernameInsufficientFundsModal)
+local Enums2 = require(parent.EditProfile.Enums)
 local ProfilePlatformViewAdaptor = require(ProfilePlatform.Components.ProfilePlatformViewAdaptor)
-local VideoFullscreenPage = require(ProfilePlatform.Components.Videos.VideoFullscreenPage)
 local SetAliasModal = SetAlias.SetAliasModal
-local EditProfileScreenViewAdapter = require(ProfilePlatformParent.EditProfile.EditProfileScreenViewAdapter)
-local EditProfileToastScreen = require(ProfilePlatformParent.EditProfile.EditProfileToastScreen)
+local EditProfileScreenViewAdapter = require(parent.EditProfile.EditProfileScreenViewAdapter)
+local EditProfileToastScreen = require(parent.EditProfile.EditProfileToastScreen)
 local EditProfileBackgroundContainer = require(ProfilePlatform.Components.EditProfileBackgroundContainer)
 local CommunityVerificationModal = require(ProfilePlatform.Components.CommunityVerificationModal)
 local InspectAvatarSheetContainer = require(ProfilePlatform.Components.InspectAvatar.InspectAvatarSheetContainer)
@@ -22,82 +18,73 @@ local PurchaseConfirmationModal = require(ProfilePlatform.Components.InspectAvat
 local InsufficientRobuxDialog = require(ProfilePlatform.Components.InspectAvatar.InsufficientRobuxDialog)
 local MomentsGridPage = require(ProfilePlatform.Components.Moments.MomentsGridPage)
 local MomentsFeedPage = require(ProfilePlatform.Components.Moments.MomentsFeedPage)
-local FFlagSocialEnableProfileInspectAndBuy = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuy
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialEnableProfileInspectAndBuy = SharedFlags.FFlagSocialEnableProfileInspectAndBuy
 local FFlagProfilePlatformEnableMoments = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableMoments)
-local RoactNavigation = require(ProfilePlatformParent.RoactNavigation)
-local FFlagAddVideoToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddVideoToCommunityProfile
-local FFlagEditProfileBackgroundEnabled = require(ProfilePlatformParent.SharedFlags).FFlagEditProfileBackgroundEnabled
+
+local React = require(parent.React)
+local RoactNavigation = require(parent.RoactNavigation)
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEditProfileBackgroundEnabled = SharedFlags2.FFlagEditProfileBackgroundEnabled
 local FFlagEnableCommunityVerificationModal = require(ProfilePlatform.Flags.FFlagEnableCommunityVerificationModal)
-local FFlagEditProfileMigration = require(ProfilePlatformParent.EditProfile.Flags).FFlagEditProfileMigration
-local FFlagAXEnableProfileTab = require(ProfilePlatformParent.SharedFlags).FFlagAXEnableProfileTab
-local t1 = {
-	overlayEnabled = true,
-	overlayTransparency = 0.5,
-	absorbInput = true
-}
-local t2 = {
-	overlayEnabled = false,
-	absorbInput = true,
-	renderUnderlyingPage = true
-}
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEditProfileImageV2Enabled = SharedFlags3.FFlagEditProfileImageV2Enabled
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagAXEnableProfileTab = SharedFlags4.FFlagAXEnableProfileTab
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagAXHideBottomNavForEditProfileImage = SharedFlags5.FFlagAXHideBottomNavForEditProfileImage
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagEnableBottomNavOnMarketplace = SharedFlags6.FFlagEnableBottomNavOnMarketplace
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagAXSaveManagerOutsideAX = SharedFlags7.FFlagAXSaveManagerOutsideAX
 
-local function makeFullBleedNavigationOptions(t3: {[any]: any}) -- line: 56
-	-- upvalues: t2 (copy)
-	return function(p1) -- line: 57
-		-- upvalues: t2 (copy), t3 (copy)
-		if p1.navigation.getParam("fullBleed") then
-			return t2
-		end
+local navigationOptions = { overlayEnabled = true, overlayTransparency = 0.5, absorbInput = true }
 
-		return t3
+local v = { overlayEnabled = false, absorbInput = true, renderUnderlyingPage = true }
+
+local function makeFullBleedNavigationOptions(p, p2) -- 1 equivalent call inferred from this helper
+	local v2 = p2 or v
+	return function(p3)
+		return if p3.navigation.getParam("fullBleed") then v2 else p
 	end
 end
 
-local t4 = {
-	{
-		[Enums.Screens.ProfileMain] = ProfilePlatformViewAdaptor
-	},
+local function LazyEditProfileImageContainer(p)
+	local EditProfileImageContainer = require(ProfilePlatform.Components.EditProfileImage.EditProfileImageContainer)
+	return React.createElement(EditProfileImageContainer, p)
+end
+
+local v2 = {
+	{ [Enums.Screens.ProfileMain] = ProfilePlatformViewAdaptor },
 	{
 		[Enums.Screens.EditProfilePage] = {
-			screen = if not FFlagEditProfileMigration then EditProfilePage else EditProfileLanding,
-			navigationOptions = if not FFlagAXEnableProfileTab then t1 else function(p2) -- line: 57
-				-- upvalues: t2 (copy), t1 (copy)
-				if p2.navigation.getParam("fullBleed") then
-					return t2
+			screen = EditProfileLanding,
+			navigationOptions = FFlagAXEnableProfileTab and function(p)
+				if p.navigation.getParam("fullBleed") then
+					return v
 				end
 
-				return t1
-			end
-		}
-	},
-	{
-		[Enums.Screens.EditDisplayNameModal] = {
-			screen = EditDisplayNameModal,
-			navigationOptions = t1
-		}
-	},
-	{
-		[Enums.Screens.EditDescriptionModal] = {
-			screen = EditDescriptionModal,
-			navigationOptions = t1
+				return navigationOptions
+			end or navigationOptions
 		}
 	},
 	{
 		[Enums.Screens.EditDisplayNameErrorModal] = {
 			screen = EditDisplayNameErrorModal,
-			navigationOptions = t1
+			navigationOptions = navigationOptions
 		}
 	},
 	{
 		[Enums.Screens.UsernameInsufficientFundsModal] = {
 			screen = UsernameInsufficientFundsModal,
-			navigationOptions = t1
+			navigationOptions = navigationOptions
 		}
 	},
 	{
 		[Enums.Screens.SetAliasModal] = {
 			screen = SetAliasModal,
-			navigationOptions = t1
+			navigationOptions = navigationOptions
 		}
 	},
 	{
@@ -112,26 +99,18 @@ local t4 = {
 	}
 }
 
-if FFlagAddVideoToCommunityProfile then
-	table.insert(t4, {
-		[Enums.Screens.VideoFullscreen] = {
-			screen = VideoFullscreenPage,
-			navigationOptions = t1
-		}
-	})
-end
-
 if FFlagEnableCommunityVerificationModal then
-	table.insert(t4, {
+	local v3 = {
 		[Enums.Screens.CommunityVerificationModal] = {
 			screen = CommunityVerificationModal,
-			navigationOptions = t1
+			navigationOptions = navigationOptions
 		}
-	})
+	}
+	table.insert(v2, v3)
 end
 
 if FFlagEditProfileBackgroundEnabled then
-	table.insert(t4, {
+	local v3 = {
 		[Enums.Screens.EditProfileBackground] = {
 			screen = EditProfileBackgroundContainer,
 			navigationOptions = {
@@ -140,57 +119,81 @@ if FFlagEditProfileBackgroundEnabled then
 				renderUnderlyingPage = true
 			}
 		}
-	})
+	}
+	table.insert(v2, v3)
 end
 
-if FFlagEditProfileMigration then
-	local t5 = {}
-	local EditProfileSubScreen = Enums2.Screens.EditProfileSubScreen
-	local t6 = {
-		screen = EditProfileScreenViewAdapter
+local EditProfileSubScreen = Enums2.Screens.EditProfileSubScreen
+local navigationOptions2
+
+if FFlagAXEnableProfileTab then
+	local v3 = { overlayEnabled = true, overlayTransparency = 0.5, absorbInput = false }
+
+	navigationOptions2 = function(p)
+		return if p.navigation.getParam("fullBleed") then v else v3
+	end
+else
+	navigationOptions2 = { overlayEnabled = true, overlayTransparency = 0.5, absorbInput = false }
+end
+
+local v3 = {
+	[EditProfileSubScreen] = {
+		screen = EditProfileScreenViewAdapter,
+		navigationOptions = navigationOptions2
 	}
-	local t8
+}
+table.insert(v2, v3)
 
-	if FFlagAXEnableProfileTab then
-		local t7 = {
-			overlayEnabled = true,
-			overlayTransparency = 0.5,
-			absorbInput = false
-		}
+local v4 = {
+	[Enums2.Screens.EditProfileToast] = {
+		screen = EditProfileToastScreen,
+		navigationOptions = { overlayEnabled = true, overlayTransparency = 1, absorbInput = false }
+	}
+}
+table.insert(v2, v4)
 
-		function t8(p3) -- line: 57
-			-- upvalues: t2 (copy), t7 (copy)
-			if p3.navigation.getParam("fullBleed") then
-				return t2
-			end
+if FFlagEditProfileImageV2Enabled then
+	local tabBarVisible
 
-			return t7
-		end
-	else
-		t8 = {
-			overlayEnabled = true,
-			overlayTransparency = 0.5,
-			absorbInput = false
-		}
+	if FFlagAXHideBottomNavForEditProfileImage and FFlagEnableBottomNavOnMarketplace then
+		tabBarVisible = false
 	end
 
-	t6.navigationOptions = t8
-	t5[EditProfileSubScreen] = t6
-	table.insert(t4, t5)
-	table.insert(t4, {
-		[Enums2.Screens.EditProfileToast] = {
-			screen = EditProfileToastScreen,
-			navigationOptions = {
-				overlayEnabled = true,
-				overlayTransparency = 1,
-				absorbInput = false
-			}
-		}
-	})
+	local v5 = {
+		overlayEnabled = true,
+		overlayTransparency = 1,
+		absorbInput = true,
+		tabBarVisible = tabBarVisible
+	}
+
+	local v6 = {
+		overlayEnabled = false,
+		absorbInput = true,
+		renderUnderlyingPage = true,
+		tabBarVisible = tabBarVisible
+	}
+
+	local editProfileImageProfilePlatform = Enums2.Screens.EditProfileImageProfilePlatform
+	local v7 = {
+		screen = LazyEditProfileImageContainer,
+		params = FFlagAXSaveManagerOutsideAX and { runAvatarSaveManager = true } or nil,
+		navigationOptions = 0
+	}
+	local navigationOptions3
+
+	if FFlagAXEnableProfileTab then
+		navigationOptions3 = makeFullBleedNavigationOptions(v5, v6) -- inferred equivalent call
+	else
+		navigationOptions3 = v5
+	end
+
+	v7.navigationOptions = navigationOptions3
+	local v8 = { [editProfileImageProfilePlatform] = v7 }
+	table.insert(v2, v8)
 end
 
 if FFlagSocialEnableProfileInspectAndBuy then
-	table.insert(t4, {
+	local v5 = {
 		[Enums.Screens.InspectAvatarSheet] = {
 			screen = InspectAvatarSheetContainer,
 			navigationOptions = {
@@ -199,23 +202,28 @@ if FFlagSocialEnableProfileInspectAndBuy then
 				absorbInput = true
 			}
 		}
-	})
-	table.insert(t4, {
+	}
+	table.insert(v2, v5)
+
+	local v6 = {
 		[Enums.Screens.PurchaseConfirmationModal] = {
 			screen = PurchaseConfirmationModal,
-			navigationOptions = t1
+			navigationOptions = navigationOptions
 		}
-	})
-	table.insert(t4, {
+	}
+	table.insert(v2, v6)
+
+	local v7 = {
 		[Enums.Screens.InsufficientRobuxDialog] = {
 			screen = InsufficientRobuxDialog,
-			navigationOptions = t1
+			navigationOptions = navigationOptions
 		}
-	})
+	}
+	table.insert(v2, v7)
 end
 
 if FFlagProfilePlatformEnableMoments then
-	table.insert(t4, {
+	local v5 = {
 		[Enums.Screens.MomentsAll] = {
 			screen = MomentsGridPage,
 			navigationOptions = {
@@ -224,19 +232,19 @@ if FFlagProfilePlatformEnableMoments then
 				renderUnderlyingPage = true
 			}
 		}
-	})
-	table.insert(t4, {
+	}
+	table.insert(v2, v5)
+
+	local v6 = {
 		[Enums.Screens.MomentsFeed] = {
 			screen = MomentsFeedPage,
-			navigationOptions = {
-				overlayEnabled = false,
-				absorbInput = true
-			}
+			navigationOptions = { overlayEnabled = false, absorbInput = true }
 		}
-	})
+	}
+	table.insert(v2, v6)
 end
 
-return (RoactNavigation.createRobloxStackNavigator(t4, {
+return (RoactNavigation.createRobloxStackNavigator(v2, {
 	defaultNavigationOptions = {
 		overlayEnabled = true,
 		absorbInput = true,

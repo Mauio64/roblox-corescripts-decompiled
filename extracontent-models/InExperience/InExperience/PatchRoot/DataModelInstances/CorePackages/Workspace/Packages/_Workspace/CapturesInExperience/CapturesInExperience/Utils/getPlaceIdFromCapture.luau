@@ -1,15 +1,10 @@
-local ParentParent = script.Parent.Parent
-local getCaptureMetadata = require(ParentParent.Utils.getCaptureMetadata)
+local parent = script.Parent.Parent
 
-require(ParentParent.Types)
+local getCaptureMetadata = require(parent.Utils.getCaptureMetadata)
+require(parent.Types)
 
-return function(p1) -- line: 6
-	-- upvalues: getCaptureMetadata (copy)
-	local v4 = getCaptureMetadata(p1)
+return function(p)
+	local captureMetadata = getCaptureMetadata(p)
 
-	if v4 then
-		return v4.placeId
-	end
-
-	return nil
+	return if captureMetadata then captureMetadata.placeId else nil
 end

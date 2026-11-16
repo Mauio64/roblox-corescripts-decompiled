@@ -1,58 +1,46 @@
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local React = require(SocialTabsPageParent.React)
-local useSignalProfileInsightsByUserId = require(SocialTabsPageParent.ProfileInsights).useSignalProfileInsightsByUserId
+local parent = SocialTabsPage.Parent
+
+local React = require(parent.React)
+local ProfileInsights = require(parent.ProfileInsights)
+local useSignalProfileInsightsByUserId = ProfileInsights.useSignalProfileInsightsByUserId
+
 local usePageSize = require(SocialTabsPage.Hooks.usePageSize)
 
-local function useMutualsList(s1: string) -- line: 24
-	-- upvalues: usePageSize (copy), useSignalProfileInsightsByUserId (copy), React (copy)
-	local v8 = usePageSize()
-	local v9, v10 = useSignalProfileInsightsByUserId({
-		rankingStrategy = "tc_info_boost",
-		userId = s1
-	})
-	local v11 = if not v9 or not v9.mutualFriends then {} else v9.mutualFriends
-	local v12, v13 = React.useState(v8)
+local function useMutualsList(userId: string)
+	local v = usePageSize()
 
-	React.useEffect(function() -- line: 38
-		-- upvalues: v13 (copy), v8 (copy)
-		v13(v8)
-	end, {
-		s1,
-		v8
+	local v2, isLoading = useSignalProfileInsightsByUserId({
+		userId = userId,
+		rankingStrategy = "tc_info_boost"
 	})
 
-	local v14 = React.useMemo(function() -- line: 42
-		-- upvalues: v12 (copy), v11 (copy)
-		local t1 = {}
+	local v3 = not (v2 and v2.mutualFriends) and {} or v2.mutualFriends
 
-		for i = 1, math.min(v12, #v11) do
-			table.insert(t1, v11[i])
-		end
+	local state, setState = React.useState(v)
 
-		return t1
-	end, {
-		v11,
-		v12
-	})
-	local v15 = v12 < #v11
-	local v16 = React.useCallback(function() -- line: 52
-		-- upvalues: v13 (copy), v8 (copy), v11 (copy)
-		v13(function(n1: number) -- line: 53
-			-- upvalues: v8 (copy), v11 (copy)
-			return (math.min(n1 + v8, #v11))
-		end)
-	end, {
-		v11,
-		v8
-	})
+	React.useEffect(function()
+		setState(v)
+	end, { userId, v })
 
 	return {
-		mutualFriends = v14,
-		isLoading = v10,
-		hasMore = v15,
-		loadMore = v16,
-		totalCount = #v11
+		mutualFriends = React.useMemo(function()
+			local result = {}
+
+			for i = 1, math.min(state, #v3) do
+				table.insert(result, v3[i])
+			end
+
+			return result
+		end, { v3, state }),
+		isLoading = isLoading,
+		hasMore = state < #v3,
+		loadMore = React.useCallback(function()
+			setState(function(p: number)
+				return (math.min(p + v, #v3))
+			end)
+		end, { v3, v }),
+		totalCount = #v3
 	}
 end
 

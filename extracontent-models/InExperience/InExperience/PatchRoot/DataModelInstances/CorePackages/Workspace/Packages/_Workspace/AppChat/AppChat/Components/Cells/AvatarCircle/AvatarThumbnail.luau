@@ -1,15 +1,16 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local LoadableImage = require(Parent.UIBlox).App.Loading.LoadableImage
+local parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
 
-local function AvatarThumbnail(t1: {[any]: any}) -- line: 13
-	-- upvalues: React (copy), LoadableImage (copy)
+local LoadableImage = UIBlox.App.Loading.LoadableImage
+
+local function AvatarThumbnail(p)
 	return React.createElement(LoadableImage, {
+		Size = UDim2.fromScale(1, 1),
+		Image = p.thumbnail,
 		useShimmerAnimationWhileLoading = true,
 		showFailedStateWhenLoadingFailed = true,
-		Size = UDim2.fromScale(1, 1),
-		Image = t1.thumbnail,
-		cornerRadius = t1.cornerRadius
+		cornerRadius = p.cornerRadius
 	})
 end
 

@@ -14,5 +14,9 @@ return {
 	PartyNotificationPush = "PartyNotificationPush",
 	ChatDetailsParticipantDialog = "ChatDetailsParticipantDialog",
 	SchoolMemberList = "SchoolMemberList",
+	SocialTabsPage = "SocialTabsPage",
+	FriendsLandingPage = "FriendsLandingPage",
+	GameJoinCard = "GameJoinCard",
+	BuildJoinCard = "BuildJoinCard",
 	Unknown = "Unknown"
 }

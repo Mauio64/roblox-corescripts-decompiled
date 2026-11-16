@@ -1,25 +1,22 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Signals = require(ParentParent.Signals)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.CoreScriptsRoactCommon)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
 
-local function useSignalMapState(p1) -- line: 10
-	-- upvalues: React (copy), Signals (copy)
-	local v6, v7 = React.useState(p1)
+require(parent.CoreScriptsRoactCommon)
 
-	React.useLayoutEffect(function() -- line: 13
-		-- upvalues: v7 (copy), p1 (copy), Signals (copy)
-		v7(p1)
+local function useSignalMapState(p)
+	local state, setState = React.useState(p)
 
-		return Signals.createEffect(function(p2) -- line: 15
-			-- upvalues: p1 (copy), v7 (copy)
-			p1.getCount(p2)
-			v7(p1)
+	React.useLayoutEffect(function()
+		setState(p)
+		return Signals.createEffect(function(p2)
+			p.getCount(p2)
+			setState(p)
 		end)
-	end, { p1 })
+	end, { p })
 
-	return v6
+	return state
 end
 
 return useSignalMapState

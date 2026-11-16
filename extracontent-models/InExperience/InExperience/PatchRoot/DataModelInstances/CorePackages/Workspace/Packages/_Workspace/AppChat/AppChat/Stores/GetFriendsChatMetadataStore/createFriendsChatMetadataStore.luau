@@ -1,54 +1,49 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local DataHydration = require(AppChatParent.DataHydration)
+local parent = AppChat.Parent
 
-require(AppChatParent.Signals)
+local AppChatNetworking = require(parent.AppChatNetworking)
+local DataHydration = require(parent.DataHydration)
+require(parent.Signals)
+local LocalUserIdStore = require(parent.LocalUserIdStore)
+local localUserIdStore = LocalUserIdStore.LocalUserIdStore
 
-local LocalUserIdStore = require(AppChatParent.LocalUserIdStore).LocalUserIdStore
-local v6 = require(AppChat.Logger):new(script.Name)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 
-local function resolveLocalUserId(p1) -- line: 24
-	-- upvalues: LocalUserIdStore (copy)
-	return LocalUserIdStore.getCurrentUserId(p1)
+local function resolveLocalUserId(p) -- 1 equivalent call inferred from this helper
+	return localUserIdStore.getCurrentUserId(p)
 end
-local function createFriendsChatMetadataStore() -- line: 28
-	-- upvalues: DataHydration (copy), AppChatNetworking (copy), v6 (copy), resolveLocalUserId (copy), LocalUserIdStore (copy)
-	local v10 = DataHydration.createDataCache()
-	local v11 = DataHydration.createDataResolver({
+
+local function createFriendsChatMetadataStore()
+	local dataCache = DataHydration.createDataCache()
+	local dataResolver = DataHydration.createDataResolver({
+		cache = dataCache,
 		supportsMultiGet = false,
-		cache = v10,
-		fetchFn = function(_: string) -- line: 33
-			-- upvalues: AppChatNetworking (copy)
-			return AppChatNetworking.http.GetMetadata():andThen(function(p2) -- line: 34
-				return p2.responseBody
+		fetchFn = function(_: string)
+			return AppChatNetworking.http.GetMetadata():andThen(function(p)
+				return p.responseBody
 			end)
 		end,
-		logError = function(p3) -- line: 38
-			-- upvalues: v6 (copy)
-			v6:warning(`Failed to fetch Friends Chat metadata: { tostring(p3) }`)
+		logError = function(p)
+			v:warning(`Failed to fetch Friends Chat metadata: {tostring(p)}`)
 		end
 	})
 
 	return {
-		getFriendsChatMetadata = function(p4) -- line: 43
-			-- upvalues: v11 (copy), resolveLocalUserId (copy)
-			return v11.getAndFetchItem(resolveLocalUserId(p4))
+		getFriendsChatMetadata = function(p)
+			return dataResolver.getAndFetchItem(resolveLocalUserId(p))
 		end,
-		getCachedFriendsChatMetadata = function(p5) -- line: 47
-			-- upvalues: v11 (copy), resolveLocalUserId (copy)
-			return v11.getCachedItem(resolveLocalUserId(p5))
+		getCachedFriendsChatMetadata = function(p)
+			return dataResolver.getCachedItem(resolveLocalUserId(p))
 		end,
-		fetchFriendsChatMetadata = function() -- line: 51
-			-- upvalues: v11 (copy), resolveLocalUserId (copy)
-			return v11.fetchItem(resolveLocalUserId(false))
+		fetchFriendsChatMetadata = function()
+			return dataResolver.fetchItem(resolveLocalUserId(false))
 		end,
-		updateFriendsChatMetadata = function(p6) -- line: 55
-			-- upvalues: v10 (copy), LocalUserIdStore (copy)
-			v10.replaceItem(LocalUserIdStore.getCurrentUserId(false), p6)
+		updateFriendsChatMetadata = function(p)
+			dataCache.replaceItem(resolveLocalUserId(false), p) -- inferred equivalent call
 		end,
-		clear = v11.clear,
-		dispose = v11.dispose
+		clear = dataResolver.clear,
+		dispose = dataResolver.dispose
 	}
 end
 

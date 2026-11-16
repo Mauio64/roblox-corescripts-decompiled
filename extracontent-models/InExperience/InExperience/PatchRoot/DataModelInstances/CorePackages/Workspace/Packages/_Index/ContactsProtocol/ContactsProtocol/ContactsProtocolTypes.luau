@@ -1,5 +1,4 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent.MessageBus)
+local parent = script.Parent.Parent
+require(parent.MessageBus)
 
 return nil

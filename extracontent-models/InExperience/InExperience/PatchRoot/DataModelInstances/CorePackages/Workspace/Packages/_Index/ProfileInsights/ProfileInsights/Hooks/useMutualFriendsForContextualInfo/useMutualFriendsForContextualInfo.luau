@@ -1,4 +1,3 @@
-local function useMutualFriendsForContextualInfo(_) -- line: 1
-end
+local function useMutualFriendsForContextualInfo(_) end
 
 return useMutualFriendsForContextualInfo

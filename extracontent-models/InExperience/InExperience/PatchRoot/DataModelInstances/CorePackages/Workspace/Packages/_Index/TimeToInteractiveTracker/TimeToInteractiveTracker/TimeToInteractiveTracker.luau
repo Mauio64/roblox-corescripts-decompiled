@@ -1,3 +1,4 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+local createTimeToInteractiveStore = require(parent.Stores.createTimeToInteractiveStore)
 
-return require(scriptParent.Stores.createTimeToInteractiveStore)()
+return createTimeToInteractiveStore()

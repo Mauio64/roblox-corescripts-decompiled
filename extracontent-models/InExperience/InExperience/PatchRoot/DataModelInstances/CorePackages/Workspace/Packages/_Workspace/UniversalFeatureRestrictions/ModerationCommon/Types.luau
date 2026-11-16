@@ -1,3 +1,4 @@
-local _Index = script.Parent.Parent.Parent.Parent._Index
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Types = require(Workspace.ModerationCommon.ModerationCommon.Types)
 
-return (require(_Index.ModerationCommon.ModerationCommon.Types))
+return Types

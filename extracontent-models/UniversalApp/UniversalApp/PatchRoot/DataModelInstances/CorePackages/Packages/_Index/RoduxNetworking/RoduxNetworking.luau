@@ -1,44 +1,34 @@
 local RoduxNetworking = require(script.RoduxNetworking)
 local NetworkStatus = require(script.NetworkStatus)
 local mockRoduxNetworking = require(script.mockRoduxNetworking)
-
 require(script.Types)
 
 return {
-	config = function(p1) -- line: 11
-		-- upvalues: RoduxNetworking (copy), NetworkStatus (copy)
-		local v5 = RoduxNetworking(p1)
-		local v6 = NetworkStatus(p1)
+	config = function(p)
+		local roduxNetworking = RoduxNetworking(p)
+		local networkStatus = NetworkStatus(p)
 
 		return {
-			GET = function(p2, p3) -- line: 16
-				-- upvalues: v5 (copy)
-				return v5.GET(p2, p3)
+			GET = function(p2, p3)
+				return roduxNetworking.GET(p2, p3)
 			end,
-			POST = function(p4, p5) -- line: 19
-				-- upvalues: v5 (copy)
-				return v5.POST(p4, p5)
+			POST = function(p2, p3)
+				return roduxNetworking.POST(p2, p3)
 			end,
-			PATCH = function(p6, p7) -- line: 22
-				-- upvalues: v5 (copy)
-				return v5.PATCH(p6, p7)
+			PATCH = function(p2, p3)
+				return roduxNetworking.PATCH(p2, p3)
 			end,
-			DELETE = function(p8, p9) -- line: 25
-				-- upvalues: v5 (copy)
-				return v5.DELETE(p8, p9)
+			DELETE = function(p2, p3)
+				return roduxNetworking.DELETE(p2, p3)
 			end,
-			getNetworkImpl = function() -- line: 28
-				-- upvalues: v5 (copy)
-				return v5.getNetworkImpl()
+			getNetworkImpl = function()
+				return roduxNetworking.getNetworkImpl()
 			end,
-			setNetworkImpl = function(...) -- line: 31
-				-- upvalues: v5 (copy)
-				v5.setNetworkImpl(...)
+			setNetworkImpl = function(...)
+				roduxNetworking.setNetworkImpl(...)
 			end,
-			installReducer = v6.installReducer,
-			Enum = {
-				NetworkStatus = v6.Enum.Status
-			}
+			installReducer = networkStatus.installReducer,
+			Enum = { NetworkStatus = networkStatus.Enum.Status }
 		}
 	end,
 	mock = mockRoduxNetworking

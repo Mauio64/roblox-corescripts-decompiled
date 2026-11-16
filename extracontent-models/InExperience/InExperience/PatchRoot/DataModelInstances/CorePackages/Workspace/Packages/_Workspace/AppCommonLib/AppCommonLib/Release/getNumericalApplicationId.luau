@@ -1,30 +1,19 @@
 local AppStorageService = game:GetService("AppStorageService")
-
 game:DefineFastFlag("EnableContactInvitesForNonPhoneVerifiedForAll", false)
 game:DefineFastInt("EnableContactInvitesForNonPhoneVerifiedRollout", 0)
 
-return function(t1: {[any]: any}?) -- line: 7
-	-- upvalues: AppStorageService (copy)
-	local v3 = AppStorageService
+return function(p)
+	local item = (p or AppStorageService):GetItem("AppInstallationId")
 
-	if t1 then
-		v3 = t1
+	local typeName = typeof(item)
+
+	if typeName == "number" then
+		return item
 	end
 
-	local Item = v3:GetItem("AppInstallationId")
-	local v5 = typeof(Item)
-
-	if v5 == "number" then
-		return Item
+	if typeName ~= "string" or string.len(item) <= 0 then
+		return nil
 	end
 
-	if v5 == "string" then
-		if string.len(Item) <= 0 then
-			return nil
-		end
-
-		return (tonumber((string.sub(Item, -2))))
-	end
-
-	return nil
+	return (tonumber((string.sub(item, -2))))
 end

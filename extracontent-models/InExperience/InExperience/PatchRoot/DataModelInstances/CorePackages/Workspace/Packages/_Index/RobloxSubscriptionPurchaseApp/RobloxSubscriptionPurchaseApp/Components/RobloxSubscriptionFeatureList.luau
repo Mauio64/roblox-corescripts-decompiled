@@ -1,157 +1,222 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
-local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
-local React = require(RobloxSubscriptionPurchaseAppParent.React)
-local Foundation = require(RobloxSubscriptionPurchaseAppParent.Foundation)
-local LuauPolyfill = require(RobloxSubscriptionPurchaseAppParent.LuauPolyfill)
+local parent = RobloxSubscriptionPurchaseApp.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
-
 require(RobloxSubscriptionPurchaseApp.Models.GetRobloxSubscriptionProductsModel)
-
-local useLocalization = require(RobloxSubscriptionPurchaseAppParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local getPeriodTypeDisplayLabel = require(RobloxSubscriptionPurchaseApp.Utils.getPeriodTypeDisplayLabel)
-local SignalsReact = require(RobloxSubscriptionPurchaseAppParent.SignalsReact)
-local v10 = game:DefineFastFlag("RobloxPlusUpdateDiscountIcons", false)
-local FFlagRobloxPlusFAEFreeTrial = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusFAEFreeTrial)
+local getFreeTrialOffer = require(RobloxSubscriptionPurchaseApp.Utils.getFreeTrialOffer)
+local getTrialUnlockDays = require(RobloxSubscriptionPurchaseApp.Utils.getTrialUnlockDays)
+local isSupportedTrialPeriodType = require(RobloxSubscriptionPurchaseApp.Utils.isSupportedTrialPeriodType)
+local SignalsReact = require(parent.SignalsReact)
+
+local defineFastFlag = game:DefineFastFlag("RobloxPlusUpdateDiscountIcons", false)
+local FFlagRobloxPlusEnableNewFeatureList = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusEnableNewFeatureList)
+local FFlagRobloxPlusTrialDiscountTiming = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusTrialDiscountTiming)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnablePlusReferralLandingSheet = SharedFlags.FFlagEnablePlusReferralLandingSheet
+
 local Array = LuauPolyfill.Array
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Icon = Foundation.Icon
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 
-local function FeatureRow(t1: {[any]: any}) -- line: 33
-	-- upvalues: React (copy), View (copy), Icon (copy), IconSize (copy), FoundationText (copy)
-	return React.createElement(View, {
-		tag = "row auto-y size-full-0 align-y-center align-x-left gap-medium",
-		LayoutOrder = t1.layoutOrder
-	}, {
-		Icon = React.createElement(Icon, {
-			name = t1.iconName,
-			size = IconSize.Medium
-		}),
-		FeatureText = React.createElement(FoundationText, {
-			tag = "size-full-0 auto-y text-body-medium content-default text-align-x-left",
-			Text = t1.text
-		})
-	})
+local function FeatureRow(props)
+	return React.createElement(
+		View,
+		{
+			tag = "row auto-y size-full-0 align-y-center align-x-left gap-medium",
+			LayoutOrder = props.layoutOrder
+		},
+		{
+			Icon = React.createElement(Icon, { name = props.iconName, size = IconSize.Medium }),
+			FeatureText = React.createElement(Text, {
+				Text = props.text,
+				tag = "size-full-0 auto-y text-body-medium content-default text-align-x-left"
+			})
+		}
+	)
 end
-local function getVirtualTransactionDiscounts(p1) -- line: 49
-	if not p1 or not p1.VirtualTransactionDiscounts then
+
+local function getVirtualTransactionDiscounts(featureConfig)
+	if not (featureConfig and featureConfig.VirtualTransactionDiscounts) then
 		return nil, nil
 	end
 
-	local v24 = nil
-	local v25 = nil
+	local v = nil
+	local v2 = nil
 
-	for _, v in ipairs(p1.VirtualTransactionDiscounts) do
-		if typeof(v) == "table" and typeof(v.PeriodIndex) == "number" then
-			if v.PeriodIndex == 0 then
-				v24 = v24 or v
-			elseif v.PeriodIndex > 0 and (v25 == nil or v.PeriodIndex < v25.PeriodIndex) then
-				v25 = v
-			end
+	for _, virtualTransactionDiscount in ipairs(featureConfig.VirtualTransactionDiscounts) do
+		if not (typeof(virtualTransactionDiscount) == "table" and typeof(virtualTransactionDiscount.PeriodIndex) == "number") then
+			continue
+		end
+
+		if virtualTransactionDiscount.PeriodIndex == 0 then
+			v2 = v2 or virtualTransactionDiscount
+		elseif
+			virtualTransactionDiscount.PeriodIndex > 0
+			and (v == nil or virtualTransactionDiscount.PeriodIndex < v.PeriodIndex)
+		then
+			v = virtualTransactionDiscount
 		end
 	end
 
-	return v24, v25
+	return v2, v
 end
-local function getPrivateServerDiscount(p2) -- line: 77
-	-- upvalues: Array (copy)
-	if not p2 or not p2.PrivateServerDiscounts then
-		return nil
+
+local function getPrivateServerDiscount(p)
+	if p and p.PrivateServerDiscounts then
+		return Array.find(p.PrivateServerDiscounts, function(p2): boolean
+			return typeof(p2) == "table" and typeof(p2.PeriodIndex) == "number" and p2.PeriodIndex == 0
+		end)
 	end
 
-	return Array.find(p2.PrivateServerDiscounts, function(p3) -- line: 82
-		return typeof(p3) == "table" and (typeof(p3.PeriodIndex) == "number" and p3.PeriodIndex == 0)
-	end)
+	return nil
 end
-local function RobloxSubscriptionFeatureList(t2: {[any]: any}) -- line: 87
-	-- upvalues: RobloxSubscriptionStore (copy), SignalsReact (copy), getPeriodTypeDisplayLabel (copy), useLocalization (copy), getVirtualTransactionDiscounts (copy), Array (copy), FeatureRow (copy), v10 (copy), IconName (copy), FFlagRobloxPlusFAEFreeTrial (copy), React (copy), View (copy)
-	local v30 = RobloxSubscriptionStore.get()
-	local v31 = SignalsReact.useSignalState(v30.getRobloxSubscriptionProduct)
-	local v32 = v31 and (not not v31.PeriodType and tostring(v31.PeriodType)) or ""
-	local v33 = getPeriodTypeDisplayLabel(v32, true)
-	local v34 = useLocalization({
-		periodType = v33
-	})
-	local v35 = v31 and (v31.ProductTypeDetails and (v31.ProductTypeDetails.RobloxSubscriptionProductDetails and v31.ProductTypeDetails.RobloxSubscriptionProductDetails.FeatureConfig))
-	local v36, v37 = getVirtualTransactionDiscounts(v35)
-	local v38 = if not not v35 and v35.PrivateServerDiscounts then Array.find(v35.PrivateServerDiscounts, function(p4) -- line: 82
-		return typeof(p4) == "table" and (typeof(p4.PeriodIndex) == "number" and p4.PeriodIndex == 0)
-	end) else nil
-	local v39 = useLocalization({
-		robuxTransfersText = "Feature.RobloxSubscription.Label.BlackbirdTr",
-		privateServerDiscountText = "Feature.RobloxSubscription.Label.BlackbirdPSDiscount",
+
+local function RobloxSubscriptionFeatureList(props)
+	local v = RobloxSubscriptionStore.get()
+	local v2 = SignalsReact.useSignalState(v.getRobloxSubscriptionProduct)
+
+	local periodType = v2 and v2.PeriodType and tostring(v2.PeriodType) or ""
+	local periodTypeDisplayLabel = getPeriodTypeDisplayLabel(periodType, true)
+	local v3
+
+	if FFlagRobloxPlusTrialDiscountTiming then
+		v3 = getFreeTrialOffer(v2)
+	end
+
+	local v4 = FFlagRobloxPlusTrialDiscountTiming
+
+	if v4 then
+		if v3 == nil then
+			v4 = false
+		else
+			v4 = isSupportedTrialPeriodType(v3.PeriodType)
+		end
+	end
+
+	local v5 = useLocalization({ periodType = periodTypeDisplayLabel })
+
+	local featureConfig = v2
+		and v2.ProductTypeDetails
+		and v2.ProductTypeDetails.RobloxSubscriptionProductDetails
+		and v2.ProductTypeDetails.RobloxSubscriptionProductDetails.FeatureConfig
+
+	local virtualTransactionDiscounts, v6 = getVirtualTransactionDiscounts(featureConfig)
+	local v7
+
+	if featureConfig and featureConfig.PrivateServerDiscounts then
+		v7 = Array.find(featureConfig.PrivateServerDiscounts, function(p): boolean
+			return typeof(p) == "table" and typeof(p.PeriodIndex) == "number" and p.PeriodIndex == 0
+		end)
+	end
+
+	local trialUnlockDays
+
+	if v4 then
+		trialUnlockDays = getTrialUnlockDays(v3, v6 and v6.PeriodIndex, periodType)
+	end
+
+	local v8 = useLocalization({
 		baseVirtualTransactionDiscountText = {
 			"Feature.RobloxSubscription.Label.BlackbirdVTDiscountFirst",
-			discountPercent = v36 and v36.DiscountPercent or 0
+			discountPercent = virtualTransactionDiscounts and virtualTransactionDiscounts.DiscountPercent or 0
 		},
 		nextVirtualTransactionDiscountText = {
 			"Feature.RobloxSubscription.Label.BlackbirdVTDiscountSecond",
-			discountPercent = v37 and v37.DiscountPercent or 0,
-			periodIndex = v37 and v37.PeriodIndex or 0,
-			periodType = v34.periodType
-		}
+			discountPercent = v6 and v6.DiscountPercent or 0,
+			periodIndex = v6 and v6.PeriodIndex or 0,
+			periodType = v5.periodType
+		},
+		robuxTransfersText = "Feature.RobloxSubscription.Label.BlackbirdTr",
+		privateServerDiscountText = "Feature.RobloxSubscription.Label.BlackbirdPSDiscount",
+		discountFeatureText = "Feature.RobloxSubscription.Description.Benefit.DiscountV2",
+		discountFeatureTextV3 = v4 and {
+			"Feature.RobloxSubscription.Description.Benefit.DiscountV3",
+			trialUnlockDays = trialUnlockDays
+		} or nil,
+		customizeFeatureText = "Feature.RobloxSubscription.Description.Benefit.Customize"
 	})
-	local t3 = {}
 
-	local function addRow(p5, p6) -- line: 124
-		-- upvalues: t3 (copy), FeatureRow (copy)
-		table.insert(t3, FeatureRow({
-			layoutOrder = #t3 + 1,
-			iconName = p5,
-			text = p6
+	local v9 = {}
+
+	local function addRow(iconName, text) -- 8 equivalent calls inferred from this helper
+		table.insert(v9, FeatureRow({
+			layoutOrder = #v9 + 1,
+			iconName = iconName,
+			text = text
 		}))
 	end
 
-	if v36 and typeof(v36.DiscountPercent) == "number" then
-		local v42 = if not v10 then IconName.TagSparkle else IconName.Tag
-		local baseVirtualTransactionDiscountText = v39.baseVirtualTransactionDiscountText
+	if FFlagRobloxPlusEnableNewFeatureList then
+		if props.noPurchaseMethodRequired then
+			if virtualTransactionDiscounts then
+				addRow(IconName.Tag, v8.baseVirtualTransactionDiscountText) -- inferred equivalent call
+			end
+		else
+			if virtualTransactionDiscounts and v6 then
+				local tag = IconName.Tag
+				local v10
 
-		table.insert(t3, FeatureRow({
-			layoutOrder = #t3 + 1,
-			iconName = v42,
-			text = baseVirtualTransactionDiscountText
-		}))
+				if v4 then
+					v10 = v8.discountFeatureTextV3
+				else
+					v10 = v8.discountFeatureText
+				end
+
+				addRow(tag, v10) -- inferred equivalent call
+			elseif virtualTransactionDiscounts and not v6 then
+				addRow(IconName.Tag, v8.baseVirtualTransactionDiscountText) -- inferred equivalent call
+			end
+
+			addRow(IconName.PaintBrush, v8.customizeFeatureText) -- inferred equivalent call
+		end
+	else
+		if virtualTransactionDiscounts and typeof(virtualTransactionDiscounts.DiscountPercent) == "number" then
+			local v10
+
+			if defineFastFlag then
+				v10 = IconName.Tag
+			else
+				v10 = IconName.TagSparkle
+			end
+
+			addRow(v10, v8.baseVirtualTransactionDiscountText) -- inferred equivalent call
+		end
+
+		if v6 and typeof(v6.DiscountPercent) == "number" and not props.noPurchaseMethodRequired then
+			local v10
+
+			if defineFastFlag then
+				v10 = IconName.TagArrowUp
+			else
+				v10 = IconName.TagSparkleArrowUp
+			end
+
+			addRow(v10, v8.nextVirtualTransactionDiscountText) -- inferred equivalent call
+		end
 	end
 
-	if v37 and typeof(v37.DiscountPercent) == "number" and (not FFlagRobloxPlusFAEFreeTrial or not t2.noPurchaseMethodRequired) then
-		local v44 = if not v10 then IconName.TagSparkleArrowUp else IconName.TagArrowUp
-		local nextVirtualTransactionDiscountText = v39.nextVirtualTransactionDiscountText
-
-		table.insert(t3, FeatureRow({
-			layoutOrder = #t3 + 1,
-			iconName = v44,
-			text = nextVirtualTransactionDiscountText
-		}))
+	if v7 and typeof(v7.DiscountPercent) == "number" then
+		addRow(IconName.Controller, v8.privateServerDiscountText) -- inferred equivalent call
 	end
 
-	if v38 and typeof(v38.DiscountPercent) == "number" then
-		local Controller = IconName.Controller
-		local privateServerDiscountText = v39.privateServerDiscountText
-
-		table.insert(t3, FeatureRow({
-			layoutOrder = #t3 + 1,
-			iconName = Controller,
-			text = privateServerDiscountText
-		}))
-	end
-
-	if v35 and v35.IsRobuxTransferEnabled then
-		local Robux = IconName.Robux
-		local robuxTransfersText = v39.robuxTransfersText
-
-		table.insert(t3, FeatureRow({
-			layoutOrder = #t3 + 1,
-			iconName = Robux,
-			text = robuxTransfersText
-		}))
+	if featureConfig and featureConfig.IsRobuxTransferEnabled then
+		addRow(IconName.Robux, v8.robuxTransfersText) -- inferred equivalent call
 	end
 
 	return React.createElement(View, {
-		tag = "col auto-y size-full-0 align-x-left gap-medium padding-top-large",
-		LayoutOrder = t2.layoutOrder
-	}, t3)
+		tag = FFlagEnablePlusReferralLandingSheet and props.compact and "col auto-y size-full-0 align-x-left gap-small padding-top-small" or "col auto-y size-full-0 align-x-left gap-medium padding-top-large",
+		LayoutOrder = props.layoutOrder
+	}, v9)
 end
 
 return RobloxSubscriptionFeatureList

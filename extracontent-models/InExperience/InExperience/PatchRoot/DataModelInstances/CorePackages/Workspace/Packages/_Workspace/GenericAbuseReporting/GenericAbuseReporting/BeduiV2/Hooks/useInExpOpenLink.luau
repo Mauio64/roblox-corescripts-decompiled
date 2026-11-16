@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local default = require(Parent.LinkingProtocol).LinkingProtocol.default
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 
-local function useInExpOpenLink() -- line: 13
-	-- upvalues: React (copy), default (copy)
-	return React.useCallback(function(s1: string) -- line: 14
-		-- upvalues: default (copy)
-		if s1 ~= nil and s1 ~= "" then
-			default:openURL(s1)
+local LinkingProtocol = require(parent.LinkingProtocol)
+local default = LinkingProtocol.LinkingProtocol.default
+local React = require(parent.React)
+
+local function useInExpOpenLink()
+	return React.useCallback(function(p: string)
+		if p ~= nil and p ~= "" then
+			default:openURL(p)
 		end
 	end, {})
 end

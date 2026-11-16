@@ -1,59 +1,75 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Localization = require(ParentParentParent.Localization)
-local React = require(ParentParentParent.React)
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local SegmentedControl = require(ParentParentParent.UIBlox).App.Control.SegmentedControl
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Localization = require(parent2.Localization)
+local React = require(parent2.React)
+local RoactUtils = require(parent2.RoactUtils)
+local UIBlox = require(parent2.UIBlox)
+
+local SegmentedControl = UIBlox.App.Control.SegmentedControl
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useLocalization = Localization.Hooks.useLocalization
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local Constants = require(ParentParent.Constants)
-local EventNames = require(ParentParent.Analytics.EventNames)
-local onToggleActivation = require(ParentParent.Utils.onToggleActivation)
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
 
-return function(t1: {[any]: any}) -- line: 25
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useSelector (copy), Constants (copy), useLocalization (copy), React (copy), onToggleActivation (copy), EventNames (copy), SegmentedControl (copy)
-	local v15 = useAnalytics()
-	local v16 = useDispatch()
-	local v17 = useSelector(function(p1) -- line: 29
-		-- upvalues: Constants (copy)
-		return p1[Constants.RoduxKey].IsCapturesCoreGuiEnabled
+local Constants = require(parent.Constants)
+local EventNames = require(parent.Analytics.EventNames)
+local onToggleActivation = require(parent.Utils.onToggleActivation)
+local useAnalytics = require(parent.Analytics.useAnalytics)
+
+return function(p)
+	local v = useAnalytics()
+	local v2 = useDispatch()
+
+	local v3 = useSelector(function(p2)
+		return p2[Constants.RoduxKey].IsCapturesCoreGuiEnabled
 	end)
-	local v18 = useSelector(function(p2) -- line: 33
-		-- upvalues: Constants (copy)
+
+	local v4 = useSelector(function(p2)
 		return p2[Constants.RoduxKey].IsActive
 	end)
-	local v19 = useLocalization({
+
+	local v5 = useLocalization({
 		offText = "Feature.Captures.Control.Off",
 		onText = "Feature.Captures.Control.On"
 	})
-	local v20 = React.useCallback(function(p3) -- line: 42
-		-- upvalues: onToggleActivation (copy), v18 (copy), v15 (copy), v16 (copy), EventNames (copy)
-		onToggleActivation(v18, p3, v15.fireEvent, v16, EventNames.CapturesActivatedInGameMenu, EventNames.CapturesDeactivatedInGameMenu)
-	end, { v18 })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(t1.width, t1.height)
-	}, {
-		Control = React.createElement(SegmentedControl, {
-			height = t1.height,
-			onTabActivated = v20,
-			selectedTabIndex = not v18 and 2 or 1,
-			tabs = {
-				{
-					tabName = v19.onText,
-					isDisabled = not v17
+	local onTabActivated = React.useCallback(function(p2)
+		onToggleActivation(
+			v4,
+			p2,
+			v.fireEvent,
+			v2,
+			EventNames.CapturesActivatedInGameMenu,
+			EventNames.CapturesDeactivatedInGameMenu
+		)
+	end, { v4 })
+
+	return React.createElement(
+		"Frame",
+		{
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(p.width, p.height)
+		},
+		{
+			Control = React.createElement(SegmentedControl, {
+				height = p.height,
+				onTabActivated = onTabActivated,
+				selectedTabIndex = v4 and 1 or 2,
+				tabs = {
+					{
+						tabName = v5.onText,
+						isDisabled = not v3
+					},
+					{
+						tabName = v5.offText,
+						isDisabled = not v3
+					}
 				},
-				{
-					tabName = v19.offText,
-					isDisabled = not v17
-				}
-			},
-			width = UDim.new(0, t1.width)
-		})
-	})
+				width = UDim.new(0, p.width)
+			})
+		}
+	)
 end

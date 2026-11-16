@@ -1,1 +1,3 @@
-return game:GetService("RunService").Heartbeat
+local RunService = game:GetService("RunService")
+
+return RunService.Heartbeat

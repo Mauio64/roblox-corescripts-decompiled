@@ -1,39 +1,35 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local NetworkingContacts = require(ParentParent.dependencies).NetworkingContacts
-local contactImporterSync = require(ParentParent.Utils.contactImporterSync)
-local formatContacts = require(ParentParent.Utils.formatContacts)
-local UploadContactsSources = require(ParentParent.Analytics.Enums.UploadContactsSources)
-local PermissionsProtocol = require(ParentParentParent.PermissionsProtocol).PermissionsProtocol
-local default = PermissionsProtocol.default
-local t1 = { PermissionsProtocol.Permissions.CONTACTS_ACCESS }
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local dependencies = require(parent.dependencies)
 
-return function(s1: string, p1, p2, b1: boolean?) -- line: 14
-	-- upvalues: default (copy), t1 (copy), PermissionsProtocol (copy), contactImporterSync (copy), formatContacts (copy), UploadContactsSources (copy), NetworkingContacts (copy)
-	return function(p3) -- line: 15
-		-- upvalues: default (copy), t1 (copy), PermissionsProtocol (copy), contactImporterSync (copy), p2 (copy), s1 (copy), b1 (copy), p1 (copy), formatContacts (copy), UploadContactsSources (copy), NetworkingContacts (copy)
-		default:hasPermissions(t1):andThen(function(p4) -- line: 18
-			-- upvalues: PermissionsProtocol (copy), contactImporterSync (copy), p2 (copy), s1 (copy), b1 (copy), p1 (copy), formatContacts (copy), UploadContactsSources (copy), p3 (copy), NetworkingContacts (copy)
-			if p4 and p4.status == PermissionsProtocol.Status.AUTHORIZED then
-				local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
-				local v17 = contactImporterSync:shouldSyncContacts(p2, s1, UnixTimestampMillis)
+local networkingContacts = dependencies.NetworkingContacts
+local contactImporterSync = require(parent.Utils.contactImporterSync)
+local formatContacts = require(parent.Utils.formatContacts)
+local UploadContactsSources = require(parent.Analytics.Enums.UploadContactsSources)
+local PermissionsProtocol = require(parent2.PermissionsProtocol)
+local permissionsProtocol = PermissionsProtocol.PermissionsProtocol
 
-				if b1 or v17 then
-					return p1:getContacts():andThen(function(p5) -- line: 27
-						-- upvalues: formatContacts (copy), UploadContactsSources (copy), p3 (copy), NetworkingContacts (copy)
-						local v19 = formatContacts(p5)
+local default = permissionsProtocol.default
+local v = { permissionsProtocol.Permissions.CONTACTS_ACCESS }
 
-						v19.source = UploadContactsSources.AutoSync
+return function(p: string, object, p2, flag: boolean?)
+	return function(object2)
+		default:hasPermissions(v):andThen(function(p3)
+			if p3 and p3.status == permissionsProtocol.Status.AUTHORIZED then
+				local unixTimestampMillis = DateTime.now().UnixTimestampMillis
 
-						return p3:dispatch(NetworkingContacts.UploadContactsByUser.API(v19))
-					end):andThen(function() -- line: 32
-						-- upvalues: contactImporterSync (copy), p2 (copy), s1 (copy), UnixTimestampMillis (copy)
-						return contactImporterSync:updateSyncTimestamp(p2, s1, UnixTimestampMillis)
-					end):catch(function() -- line: 35
-					end)
+				local shouldSyncContacts = contactImporterSync:shouldSyncContacts(p2, p, unixTimestampMillis)
+
+				if flag or shouldSyncContacts then
+					return object:getContacts():andThen(function(p4)
+						local v2 = formatContacts(p4)
+						v2.source = UploadContactsSources.AutoSync
+						return object2:dispatch(networkingContacts.UploadContactsByUser.API(v2))
+					end):andThen(function()
+						return contactImporterSync:updateSyncTimestamp(p2, p, unixTimestampMillis)
+					end):catch(function() end)
 				end
 			end
-		end):catch(function() -- line: 39
-		end)
+		end):catch(function() end)
 	end
 end

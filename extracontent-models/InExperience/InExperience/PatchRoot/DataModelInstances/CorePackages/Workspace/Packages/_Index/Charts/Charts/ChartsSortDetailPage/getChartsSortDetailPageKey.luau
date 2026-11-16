@@ -1,38 +1,46 @@
-local function serializeFilterSelections(t1: {[any]: any}?) -- line: 3
-	if t1 == nil then
+local function serializeFilterSelections(items)
+	if items == nil then
 		return nil
 	end
 
-	local t2 = {}
+	local v = {}
 
-	for v5 in t1 do
-		table.insert(t2, v5)
+	for k in items do
+		table.insert(v, k)
 	end
 
-	if #t2 == 0 then
+	if #v == 0 then
 		return nil
 	end
 
-	table.sort(t2)
+	table.sort(v)
+	local v2 = {}
 
-	local t3 = {}
-
-	for _, v8 in t2 do
-		table.insert(t3, `{ v8 }={ t1[v8] }`)
+	for _, v3 in v do
+		table.insert(v2, `{v3}={items[v3]}`)
 	end
 
-	return table.concat(t3, "&")
+	return table.concat(v2, "&")
 end
-local function getChartsSortDetailPageKey(s1: string?, s2: string?, t4: {[any]: any}?) -- line: 22
-	-- upvalues: serializeFilterSelections (copy)
-	local v12 = if s1 ~= nil and s1 ~= "" then if not s2 or s2 == "" then `ChartsSortDetail-{ s1 }` else `ChartsSortDetail-{ s1 }-{ s2 }` else "ChartsSortDetail-Unknown"
-	local v13 = serializeFilterSelections(t4)
 
-	if v13 then
-		return `{ v12 }?{ v13 }`
+local function getChartsSortDetailPageKey(p: string?, p2: string?, p3)
+	local v
+
+	if p == nil or p == "" then
+		v = "ChartsSortDetail-Unknown"
+	elseif p2 and p2 ~= "" then
+		v = `ChartsSortDetail-{p}-{p2}`
+	else
+		v = `ChartsSortDetail-{p}`
 	end
 
-	return v12
+	local v2 = serializeFilterSelections(p3)
+
+	if v2 then
+		return `{v}?{v2}`
+	end
+
+	return v
 end
 
 return getChartsSortDetailPageKey

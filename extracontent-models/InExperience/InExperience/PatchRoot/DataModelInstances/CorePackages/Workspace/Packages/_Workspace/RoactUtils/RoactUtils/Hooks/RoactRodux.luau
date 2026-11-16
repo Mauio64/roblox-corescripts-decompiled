@@ -1,9 +1,5 @@
-local useDispatch = require(script.useDispatch)
-local useSelector = require(script.useSelector)
-local useStore = require(script.useStore)
-
 return {
-	useDispatch = useDispatch,
-	useSelector = useSelector,
-	useStore = useStore
+	useDispatch = require(script.useDispatch),
+	useSelector = require(script.useSelector),
+	useStore = require(script.useStore)
 }

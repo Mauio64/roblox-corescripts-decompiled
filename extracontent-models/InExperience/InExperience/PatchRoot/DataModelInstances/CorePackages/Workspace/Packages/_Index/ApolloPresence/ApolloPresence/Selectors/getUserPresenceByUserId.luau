@@ -1,13 +1,11 @@
-local Parent = script:FindFirstAncestor("ApolloPresence").Parent
-local fragments = require(Parent.ApolloLocalState).fragments
+local parent = script:FindFirstAncestor("ApolloPresence").Parent
 
-local function getUserPresenceByUserId(p1, p2) -- line: 11
-	-- upvalues: fragments (copy)
-	return (p1.cache:readFragment({
-		id = p1.cache:identify({
-			__typename = "UserPresence",
-			id = p2.userId
-		}),
+local ApolloLocalState = require(parent.ApolloLocalState)
+local fragments = ApolloLocalState.fragments
+
+local function getUserPresenceByUserId(p, p2)
+	return (p.cache:readFragment({
+		id = p.cache:identify({ __typename = "UserPresence", id = p2.userId }),
 		fragment = fragments.userPresenceAllFields
 	}))
 end

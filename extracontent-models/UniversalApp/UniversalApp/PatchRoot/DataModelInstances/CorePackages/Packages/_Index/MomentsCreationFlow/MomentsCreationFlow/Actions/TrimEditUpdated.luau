@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
+local parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
 
-require(Parent.MomentsCommon)
+require(parent.MomentsCommon)
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 13
-	return {
-		trimEdit = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(trimEdit)
+	return { trimEdit = trimEdit }
 end)

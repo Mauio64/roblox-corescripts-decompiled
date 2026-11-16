@@ -1,119 +1,161 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local Core = scriptParentParentParent.Core
-local Foundation = require(scriptParentParentParentParent.Foundation)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
+local core = parent3.Core
+
+local Foundation = require(parent4.Foundation)
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
-local uiblox = require(scriptParentParentParentParent.BuilderIcons).Migration.uiblox
-local ButtonType = require(scriptParent.Enum.ButtonType)
-local StandardButtonSize = require(Core.Button.Enum.StandardButtonSize)
-local ImagesInverse = require(scriptParentParent.ImageSet.ImagesInverse)
-local t1 = {
+
+local GetTextSize = require(core.Text.GetTextSize)
+
+local BuilderIcons = require(parent4.BuilderIcons)
+local uiblox = BuilderIcons.Migration.uiblox
+
+local ButtonType = require(parent.Enum.ButtonType)
+local StandardButtonSize = require(core.Button.Enum.StandardButtonSize)
+
+local ImagesInverse = require(parent2.ImageSet.ImagesInverse)
+
+local buttonMapping = {
 	[ButtonType.Alert] = ButtonVariant.Alert,
 	[ButtonType.PrimaryContextual] = ButtonVariant.Emphasis,
 	[ButtonType.PrimarySystem] = ButtonVariant.SubEmphasis,
 	[ButtonType.Secondary] = ButtonVariant.Subtle
 }
-local t2 = {
+
+local sizeMapping = {
 	[StandardButtonSize.Regular] = InputSize.Large,
 	[StandardButtonSize.Small] = InputSize.Small,
 	[StandardButtonSize.XSmall] = InputSize.XSmall
 }
-local t3 = {
+
+local v = {
 	[StandardButtonSize.Regular] = false,
 	[StandardButtonSize.Small] = false,
 	[StandardButtonSize.XSmall] = true
 }
 
-return {
-	buttonMapping = t1,
-	sizeMapping = t2,
-	findIcon = function(p1) -- line: 38
-		-- upvalues: uiblox (copy), ImagesInverse (copy)
-		if not p1 then
-			return nil
-		end
+local v2 = {
+	[InputSize.XSmall] = { padding = "Small", typography = "Small", height = "Size_600" },
+	[InputSize.Small] = { padding = "Small", typography = "Small", height = "Size_800" },
+	[InputSize.Medium] = { padding = "Medium", typography = "Medium", height = "Size_1000" },
+	[InputSize.Large] = { padding = "Medium", typography = "Large", height = "Size_1200" }
+}
 
-		local v17 = if not (p1.Image and uiblox[p1.Image] ~= nil) then ImagesInverse[p1] else p1.Image
+local vector2 = Vector2.new(10000, 10000)
+local FoundationButtonUtils = {}
+FoundationButtonUtils.buttonMapping = buttonMapping
+FoundationButtonUtils.sizeMapping = sizeMapping
 
-		if v17 == nil then
-			warn("Icon not found")
-		end
-
-		return v17
-	end,
-	getSizeMapping = function(p2, uDim2: UDim2?, p3) -- line: 52
-		-- upvalues: t2 (copy), InputSize (copy)
-		if p2 then
-			return t2[p2]
-		end
-
-		if uDim2 then
-			if uDim2.Y.Offset >= p3.Size.Size_1200 then
-				return InputSize.Large
-			end
-
-			if uDim2.Y.Scale > 0 then
-				return InputSize.Medium
-			end
-
-			if uDim2.Y.Offset >= p3.Size.Size_1000 then
-				return InputSize.Medium
-			end
-
-			if uDim2.Y.Offset >= p3.Size.Size_800 then
-				return InputSize.Small
-			end
-
-			return InputSize.XSmall
-		end
-
+function FoundationButtonUtils.findIcon(p)
+	if not p then
 		return nil
-	end,
-	getWidth = function(s1: string?, uDim2: UDim2?, b1: boolean?) -- line: 71
-		-- upvalues: t3 (copy)
-		if s1 then
-			local v24 = t3[s1]
+	end
 
-			if b1 == nil then
-				b1 = v24
-			end
+	local v3
 
-			if b1 then
-				return nil
-			end
+	if p.Image and uiblox[p.Image] ~= nil then
+		v3 = p.Image
+	else
+		v3 = ImagesInverse[p]
+	end
 
-			return UDim.new(1, 0)
+	if v3 == nil then
+		warn("Icon not found")
+	end
+
+	return v3
+end
+
+function FoundationButtonUtils.getSizeMapping(p, udim: UDim2?, p2)
+	if p then
+		return sizeMapping[p]
+	end
+
+	if not udim then
+		return nil
+	end
+
+	if udim.Y.Offset >= p2.Size.Size_1200 then
+		return InputSize.Large
+	end
+
+	if udim.Y.Scale > 0 or udim.Y.Offset >= p2.Size.Size_1000 then
+		return InputSize.Medium
+	end
+
+	if udim.Y.Offset >= p2.Size.Size_800 then
+		return InputSize.Small
+	end
+
+	return InputSize.XSmall
+end
+
+function FoundationButtonUtils.getWidth(p: string?, udim: UDim2?, flag: boolean?)
+	if p then
+		local v3 = v[p]
+
+		if flag == nil then
+			flag = v3
 		end
 
-		if uDim2 then
-			return uDim2.X
-		end
-
-		if b1 then
+		if flag then
 			return nil
 		end
 
 		return UDim.new(1, 0)
-	end,
-	getMaxWidth = function(s2: string?, n1: number?) -- line: 92
-		if s2 == nil then
-			return nil
-		end
-
-		if n1 == nil then
-			return 640
-		end
-
-		return n1
-	end,
-	getTestId = function(s3: string?) -- line: 100
-		if not s3 or #s3 == 0 then
-			return nil
-		end
-
-		return s3:match("data%-testid=([^%s]+)")
 	end
-}
+
+	if udim then
+		return udim.X
+	end
+
+	if flag then
+		return nil
+	end
+
+	return UDim.new(1, 0)
+end
+
+function FoundationButtonUtils.getMaxWidth(p: string?, p2: number?)
+	if p == nil then
+		return nil
+	end
+
+	return if p2 == nil then 640 else p2
+end
+
+function FoundationButtonUtils.getFitContentSize(p: string, p2: string?, data)
+	local v3
+
+	if p2 then
+		v3 = sizeMapping[p2]
+	end
+
+	local v4
+
+	if v3 then
+		v4 = v2[v3]
+	end
+
+	if not v4 then
+		return nil
+	end
+
+	local v5 = data.Typography["Label" .. v4.typography]
+	local x = GetTextSize(p, v5.FontSize, v5.Font, vector2).X
+
+	return Vector2.new(math.ceil(x) + data.Padding[v4.padding] * 2, data.Size[v4.height])
+end
+
+function FoundationButtonUtils.getTestId(value: string?)
+	if value and #value ~= 0 then
+		return value:match("data%-testid=([^%s]+)")
+	end
+
+	return nil
+end
+
+return FoundationButtonUtils

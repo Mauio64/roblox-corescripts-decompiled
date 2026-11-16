@@ -1,17 +1,37 @@
-local Parent = script:FindFirstAncestor("RobloxAppHooks").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("RobloxAppHooks").Parent
 
-require(Parent.RobloxAppEnums)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
 
-local getDeviceType = require(Parent.AppCommonLib).getDeviceType
+require(parent.RobloxAppEnums)
+local AppCommonLib = require(parent.AppCommonLib)
+local getDeviceType = AppCommonLib.getDeviceType
 
-local function useDeviceType() -- line: 15
-	-- upvalues: useSelector (copy), getDeviceType (copy)
-	local v5 = useSelector(function(p1) -- line: 16
-		return p1.DeviceOrientation
-	end)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUseSignalsForDeviceOrientation = SharedFlags.FFlagUseSignalsForDeviceOrientation
+local getDeviceOrientationStore
 
-	return getDeviceType(v5)
+if FFlagUseSignalsForDeviceOrientation then
+	local DeviceOrientationStore = require(parent.DeviceOrientationStore)
+	getDeviceOrientationStore = DeviceOrientationStore.GetDeviceOrientationStore
+else
+	getDeviceOrientationStore = nil
+end
+
+local function useDeviceType()
+	local v
+
+	if FFlagUseSignalsForDeviceOrientation then
+		v = useSignalState(getDeviceOrientationStore(false).getDeviceOrientation)
+	else
+		v = useSelector(function(p)
+			return p.DeviceOrientation
+		end)
+	end
+
+	return getDeviceType(v)
 end
 
 return useDeviceType

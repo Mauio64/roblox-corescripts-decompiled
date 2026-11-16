@@ -1,17 +1,17 @@
 local Util = require(script.Parent:WaitForChild("Util"))
 
-function ProcessMessage(p1, p2, _) -- line: 8
-	if string.sub(p1, 1, 4):lower() == "/cls" or string.sub(p1, 1, 6):lower() == "/clear" then
-		local CurrentChannel = p2:GetCurrentChannel()
-
-		if CurrentChannel then
-			CurrentChannel:ClearMessageLog()
-		end
-
-		return true
+function ProcessMessage(value, object, _): boolean
+	if string.sub(value, 1, 4):lower() ~= "/cls" and string.sub(value, 1, 6):lower() ~= "/clear" then
+		return false
 	end
 
-	return false
+	local currentChannel = object:GetCurrentChannel()
+
+	if currentChannel then
+		currentChannel:ClearMessageLog()
+	end
+
+	return true
 end
 
 return {

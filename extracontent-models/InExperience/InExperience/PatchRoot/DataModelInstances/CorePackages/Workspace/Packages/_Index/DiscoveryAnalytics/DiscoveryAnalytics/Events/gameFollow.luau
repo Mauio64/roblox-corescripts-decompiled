@@ -1,38 +1,48 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("GameFollowThrottleHundrethsPercent", 10000)
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppAddUniverseIdToEngagementEvents = SharedFlags.FFlagLuaAppAddUniverseIdToEngagementEvents
+
+local defineFastInt = game:DefineFastInt("GameFollowThrottleHundrethsPercent", 10000)
+
+local strictInterface = t.strictInterface
+local v = {
 	placeId = t.string,
 	state = t.union(t.literal("on"), t.literal("off")),
 	ctx = t.string,
-	uid = t.string
-})
+	uid = t.string,
+	universeId = 0
+}
+local universeId
 
-return function(p1, s1: string) -- line: 17
-	-- upvalues: v6 (copy), DiscoveryEventErrorLogger (copy), v5 (copy), TelemetryService (copy)
-	local v9, v10 = v6(p1)
+if FFlagLuaAppAddUniverseIdToEngagementEvents then
+	universeId = t.optional(t.string)
+end
 
-	if not v9 then
-		DiscoveryEventErrorLogger.reportError("GameFollowInvalidInterface", v10)
+v.universeId = universeId
+local v2 = strictInterface(v)
+
+return function(customFields, eventContext: string)
+	local v3, v4 = v2(customFields)
+
+	if not v3 then
+		DiscoveryEventErrorLogger.reportError("GameFollowInvalidInterface", v4)
 	end
 
-	local t1 = {
+	TelemetryService:LogEvent({
 		eventName = "follow",
-		description = "User has followed/unfollowed a game",
 		backends = { "EventIngest" },
-		throttlingPercentage = v5,
-		lastUpdated = {
-			25,
-			11,
-			11
-		}
-	}
-
-	TelemetryService:LogEvent(t1, {
-		eventContext = s1,
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 25, 11, 11 },
+		description = "User has followed/unfollowed a game"
+	}, {
+		eventContext = eventContext,
 		standardizedFields = { "addSessionInfo" },
-		customFields = p1
+		customFields = customFields
 	})
 end

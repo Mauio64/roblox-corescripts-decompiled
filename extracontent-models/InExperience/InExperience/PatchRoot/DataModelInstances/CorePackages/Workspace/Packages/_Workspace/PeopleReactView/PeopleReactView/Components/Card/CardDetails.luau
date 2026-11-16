@@ -1,11 +1,16 @@
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local GuiService = game:GetService("GuiService")
+
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local React = require(PeopleReactViewParent.React)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
-local formatUsername = require(PeopleReactViewParent.UserProfiles).Formatters.formatUsername
-local Foundation = require(PeopleReactViewParent.Foundation)
+local parent = PeopleReactView.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local UserProfiles = require(parent.UserProfiles)
+local formatUsername = UserProfiles.Formatters.formatUsername
+
+local Foundation = require(parent.Foundation)
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local ControlState = Foundation.Enums.ControlState
 local IconName = Foundation.Enums.IconName
@@ -13,129 +18,193 @@ local IconVariant = Foundation.Enums.IconVariant
 local InputSize = Foundation.Enums.InputSize
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
 local IconButton = Foundation.IconButton
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+
+local ConnectButton = require(PeopleReactView.Components.Card.ConnectButton)
+
 local PersonButtonConfigs = require(PeopleReactView.Configs.PersonButtonConfigs)
 local useGetPeopleService = require(PeopleReactView.Hooks.useGetPeopleService)
 local useInExperienceCombinedName = require(PeopleReactView.Hooks.useInExperienceCombinedName)
 local useIsComponentInputEnded = require(PeopleReactView.Hooks.useIsComponentInputEnded)
-local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
-local FFlagAddIEMProfilePage = require(PeopleReactViewParent.SharedFlags).FFlagAddIEMProfilePage
 
-local function CardDetails(t1: {[any]: any}) -- line: 42
-	-- upvalues: React (copy), useGetPeopleService (copy), FFlagAddIEMProfilePage (copy), PersonButtonConfigs (copy), useInExperienceCombinedName (copy), SignalsReact (copy), IconName (copy), IconVariant (copy), useIsComponentInputEnded (copy), ControlState (copy), EngineFeature (copy), RbxAnalyticsService (copy), GuiService (copy), View (copy), StateLayerAffordance (copy), FoundationText (copy), formatUsername (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy)
-	local v26 = React.useRef(nil)
-	local v27 = useGetPeopleService("FriendStatusStore")
-	local v28 = useGetPeopleService("Constants")
-	local v29 = if not FFlagAddIEMProfilePage then nil else useGetPeopleService("PeopleAnalyticsManager")
-	local v30 = if not FFlagAddIEMProfilePage then nil else useGetPeopleService("SettingsHubService")
-	local v31 = PersonButtonConfigs(t1.person.UserId)
-	local v32 = React.useMemo(function() -- line: 56
-		-- upvalues: v31 (copy), v28 (copy)
-		return v31[v28.PERSON_BUTTONS.ADD_FRIEND]
-	end, { v31 })
-	local v33 = useInExperienceCombinedName(t1.person.UserId, t1.person.DisplayName)
-	local v34 = SignalsReact.useSignalState(v27.getFriendStatus(t1.person.UserId))
-	local v35 = SignalsReact.useSignalState(v27.getIsFriendButtonGrayedOut(t1.person.UserId))
-	local v36 = React.useMemo(function() -- line: 66
-		-- upvalues: v34 (copy), IconName (copy), IconVariant (copy), v35 (copy)
-		if v34 then
-			return {
-				name = IconName.PersonCheck,
-				variant = IconVariant.Filled
-			}
-		end
+local engineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
 
-		if v35 then
-			return {
-				name = IconName.Clock,
-				variant = IconVariant.Filled
-			}
-		end
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddIEMProfilePage = SharedFlags.FFlagAddIEMProfilePage
+local FFlagSideSheetOpenPeoplePage = SharedFlags.FFlagSideSheetOpenPeoplePage
 
-		return {
-			name = IconName.PersonPlus,
-			variant = IconVariant.Regular
-		}
-	end, {
-		v34,
-		v35
-	})
-	local v37 = useIsComponentInputEnded(v26)
-	local v38 = SignalsReact.useSignalState(v27.getIsFriendButtonDisabled(t1.person.UserId))
-	local v39, v40 = React.useState(false)
-	local v41 = React.useCallback(function(p1) -- line: 91
-		-- upvalues: v40 (copy), ControlState (copy)
-		v40(p1 == ControlState.Hover or p1 == ControlState.Pressed)
+local function CardDetails(props)
+	local ref = React.useRef(nil)
+	local v
+
+	if FFlagAddIEMProfilePage then
+		v = useGetPeopleService("PeopleAnalyticsManager")
+	else
+		v = nil
+	end
+
+	local v2
+
+	if FFlagAddIEMProfilePage then
+		v2 = useGetPeopleService("SettingsHubService")
+	else
+		v2 = nil
+	end
+
+	local text = useInExperienceCombinedName(props.person.UserId, props.person.DisplayName)
+
+	local v3 = useIsComponentInputEnded(ref)
+
+	local state, setState = React.useState(false)
+
+	local onStateChanged = React.useCallback(function(p)
+		setState(p == ControlState.Hover or p == ControlState.Pressed)
 	end, {})
-	local v42 = if not FFlagAddIEMProfilePage then nil else React.useCallback(function() -- line: 96
-		-- upvalues: v30 (copy), t1 (copy), EngineFeature (copy), RbxAnalyticsService (copy), v29 (copy), GuiService (copy)
-		local v45 = v30.hubRef()
+	local icon, isDisabled, v4, onActivated
 
-		if v45 then
-			v45:SwitchToReactPage(v45.PlayerProfilePage, {
-				userId = t1.person.UserId,
-				inspectAvatar = function() -- line: 101
-					-- upvalues: EngineFeature (copy), RbxAnalyticsService (copy), v29 (copy), GuiService (copy), t1 (copy), v45 (copy)
-					local v46 = if not EngineFeature then nil else RbxAnalyticsService:GetPlaySessionId()
+	if FFlagSideSheetOpenPeoplePage then
+		v4 = nil
+	else
+		local v5 = useGetPeopleService("FriendStatusStore")
+		local v6 = useGetPeopleService("Constants")
 
-					v29:trackInspectButton(game.GameId, v46, "player_profile")
-					GuiService:InspectPlayerFromUserIdWithCtx(t1.person.UserId, "playerProfile")
-					v45:SetVisibility(false)
-				end,
-				closePage = function() -- line: 110
-					-- upvalues: v45 (copy)
-					v45:CloseReactPage()
-				end
+		local personButtonConfigs = PersonButtonConfigs(props.person.UserId)
+
+		v4 = React.useMemo(function()
+			return personButtonConfigs[v6.PERSON_BUTTONS.ADD_FRIEND]
+		end, { personButtonConfigs })
+
+		local v7 = SignalsReact.useSignalState(v5.getFriendStatus(props.person.UserId))
+
+		local v8 = SignalsReact.useSignalState(v5.getIsFriendButtonGrayedOut(props.person.UserId))
+
+		icon = React.useMemo(function()
+			if v7 then
+				return { name = IconName.PersonCheck, variant = IconVariant.Filled }
+			end
+
+			if v8 then
+				return { name = IconName.Clock, variant = IconVariant.Filled }
+			end
+
+			return { name = IconName.PersonPlus, variant = IconVariant.Regular }
+		end, { v7, v8 })
+
+		isDisabled = SignalsReact.useSignalState(v5.getIsFriendButtonDisabled(props.person.UserId))
+
+		onActivated = React.useCallback(function()
+			v4.onActivated(v6.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+		end, { v4.onActivated })
+	end
+
+	local onActivated2
+
+	if FFlagAddIEMProfilePage then
+		onActivated2 = React.useCallback(function()
+			local hubRef = v2.hubRef()
+
+			if hubRef then
+				hubRef:SwitchToReactPage(hubRef.PlayerProfilePage, {
+					userId = props.person.UserId,
+					inspectAvatar = function()
+						local v5
+
+						if engineFeature then
+							v5 = RbxAnalyticsService:GetPlaySessionId()
+						end
+
+						v:trackInspectButton(game.GameId, v5, "player_profile")
+
+						GuiService:InspectPlayerFromUserIdWithCtx(props.person.UserId, "playerProfile")
+						hubRef:SetVisibility(false)
+					end,
+					closePage = function()
+						hubRef:CloseReactPage()
+					end
+				})
+			end
+		end, {})
+	end
+
+	local connectButtonBackground
+
+	if FFlagSideSheetOpenPeoplePage then
+		if not props.isCompactCardLayout then
+			connectButtonBackground = React.createElement(ConnectButton, {
+				person = props.person,
+				layoutOrder = 2,
+				onStateChanged = onStateChanged
 			})
 		end
-	end, {})
-	local v43 = React.useCallback(function() -- line: 118
-		-- upvalues: v32 (copy), v28 (copy)
-		v32.onActivated(v28.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
-	end, { v32.onActivated })
-
-	return React.createElement(View, {
-		tag = "row size-full-1400 align-y-center padding-x-small radius-medium",
-		LayoutOrder = t1.layoutOrder,
-		stateLayer = {
-			affordance = if not v39 and not v37 then StateLayerAffordance.Background else StateLayerAffordance.None
-		},
-		onActivated = if not FFlagAddIEMProfilePage then nil else v42,
-		ref = v26
-	}, {
-		NameContainer = React.createElement(View, {
-			tag = "col fill auto-y",
-			LayoutOrder = 1
-		}, {
-			Name = React.createElement(FoundationText, {
-				tag = "size-full-0 auto-y content-emphasis text-title-medium text-align-x-left text-truncate-end padding-right-small",
-				LayoutOrder = 1,
-				Text = v33
-			}),
-			Handle = React.createElement(FoundationText, {
-				tag = "size-full-0 auto-y content-default text-body-medium text-align-x-left text-truncate-end padding-right-small",
-				LayoutOrder = 2,
-				Text = formatUsername(t1.person.Name)
-			})
-		}),
-		ConnectButtonBackground = React.createElement(View, {
-			LayoutOrder = 2,
+	else
+		local createElement = React.createElement
+		local v5 = {
 			AutomaticSize = Enum.AutomaticSize.XY,
-			stateLayer = {
-				affordance = StateLayerAffordance.None
-			},
-			onStateChanged = v41
-		}, {
-			ConnectButton = React.createElement(IconButton, {
-				icon = v36,
-				variant = if not v38 then ButtonVariant.Standard else ButtonVariant.Utility,
+			LayoutOrder = 2,
+			stateLayer = { affordance = StateLayerAffordance.None },
+			onStateChanged = onStateChanged
+		}
+
+		local createElement2 = React.createElement
+		local variant
+
+		if isDisabled then
+			variant = ButtonVariant.Utility
+		else
+			variant = ButtonVariant.Standard
+		end
+
+		connectButtonBackground = createElement(View, v5, {
+			ConnectButton = createElement2(IconButton, {
+				icon = icon,
+				variant = variant,
 				size = InputSize.Medium,
-				isDisabled = v38,
-				Visible = v32.shouldShow(),
-				onActivated = v43
+				isDisabled = isDisabled,
+				Visible = v4.shouldShow(),
+				onActivated = onActivated
 			})
 		})
+	end
+
+	local createElement = React.createElement
+	local v5 = {
+		tag = "row size-full-1400 align-y-center padding-x-small radius-medium",
+		LayoutOrder = props.layoutOrder,
+		stateLayer = 0,
+		onActivated = 0,
+		ref = 0
+	}
+	local affordance
+
+	if state or v3 then
+		affordance = StateLayerAffordance.None
+	else
+		affordance = StateLayerAffordance.Background
+	end
+
+	v5.stateLayer = { affordance = affordance }
+
+	if not FFlagAddIEMProfilePage then
+		onActivated2 = nil
+	end
+
+	v5.onActivated = onActivated2
+	v5.ref = ref
+	return createElement(View, v5, {
+		NameContainer = React.createElement(View, { tag = "col fill auto-y", LayoutOrder = 1 }, {
+			Name = React.createElement(Text, {
+				tag = "size-full-0 auto-y content-emphasis text-title-medium text-align-x-left text-truncate-end padding-right-small",
+				Text = text,
+				LayoutOrder = 1
+			}),
+			Handle = React.createElement(Text, {
+				tag = "size-full-0 auto-y content-default text-body-medium text-align-x-left text-truncate-end padding-right-small",
+				Text = formatUsername(props.person.Name),
+				LayoutOrder = 2
+			})
+		}),
+		ConnectButtonBackground = connectButtonBackground
 	})
 end
 

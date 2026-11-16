@@ -1,208 +1,218 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local TelemetryService = require(ParentParentParent.MockableProxyServices).TelemetryService
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Enum.Placement)
+local MockableProxyServices = require(parent2.MockableProxyServices)
+local TelemetryService = MockableProxyServices.TelemetryService
+require(parent.Enum.Placement)
+local Devices = require(parent2.Devices)
+local DeviceTier = Devices.DeviceTier
 
-local DeviceTier = require(ParentParentParent.Devices).DeviceTier
-local v5 = game:DefineFastFlag("AppNavDeviceTier", false)
-local FFlagAppNavTelemetryLogger = require(ParentParentParent.SharedFlags).FFlagAppNavTelemetryLogger
-local u7 = nil
+local defineFastFlag = game:DefineFastFlag("AppNavDeviceTier", false)
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagAppNavTelemetryLogger = SharedFlags.FFlagAppNavTelemetryLogger
+local v
 
 if FFlagAppNavTelemetryLogger then
-	u7 = require(ParentParentParent.Loggers).Logger:new("AppNavTelemetry")
+	local Loggers = require(parent2.Loggers)
+	v = Loggers.Logger:new("AppNavTelemetry")
+else
+	v = nil
 end
 
-local t1 = {
-	"addOSInfo",
-	"addSessionId",
-	"addSessionInfo"
-}
-local v9 = if not v5 then nil else DeviceTier.GetDeviceMemoryTier()
-local t2 = {
+local standardizedFields = { "addOSInfo", "addSessionId", "addSessionInfo" }
+local v2
+
+if defineFastFlag then
+	v2 = DeviceTier.GetDeviceMemoryTier()
+else
+	v2 = nil
+end
+
+local v3 = {
 	eventName = "AppNav_SwitchTab",
-	throttlingPercentage = 10000,
-	description = "App Nav switch tab",
-	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE",
 	backends = { "RobloxTelemetryStat" },
-	lastUpdated = {
-		2026,
-		3,
-		12
-	}
+	throttlingPercentage = 10000,
+	lastUpdated = { 2026, 3, 12 },
+	description = "App Nav switch tab",
+	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE"
 }
-local t3 = {
+
+local v4 = {
 	eventName = "AppNav_SwitchTab",
+	backends = { "EventIngest" },
 	throttlingPercentage = 10000,
+	lastUpdated = { 2026, 3, 12 },
 	description = "App Nav switch tab",
-	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE",
-	backends = { "EventIngest" },
-	lastUpdated = {
-		2026,
-		3,
-		12
-	}
+	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE"
 }
-local t4 = {
+
+local v5 = {
 	eventName = "AppNav_IsVisibleChanged",
-	throttlingPercentage = 10000,
-	description = "App Nav isVisible prop changed",
-	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE",
 	backends = { "RobloxTelemetryStat" },
-	lastUpdated = {
-		26,
-		3,
-		17
-	}
-}
-local t5 = {
-	eventName = "AppNav_IsVisibleChanged",
 	throttlingPercentage = 10000,
+	lastUpdated = { 26, 3, 17 },
 	description = "App Nav isVisible prop changed",
-	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE",
-	backends = { "EventIngest" },
-	lastUpdated = {
-		26,
-		3,
-		17
-	}
+	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE"
 }
-local t6 = {
+
+local v6 = {
+	eventName = "AppNav_IsVisibleChanged",
+	backends = { "EventIngest" },
+	throttlingPercentage = 10000,
+	lastUpdated = { 26, 3, 17 },
+	description = "App Nav isVisible prop changed",
+	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE"
+}
+
+local v7 = {
 	eventName = "AppNav_PlacementChanged",
-	throttlingPercentage = 10000,
-	description = "App Nav placement prop changed",
-	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		26,
-		3,
-		17
-	}
+	throttlingPercentage = 10000,
+	lastUpdated = { 26, 3, 17 },
+	description = "App Nav placement prop changed",
+	links = "https://roblox.atlassian.net/wiki/x/1ACaAQE"
 }
-local t7 = nil
 
-local function reportSwitchTab(s1: string, s2: string, n1: number) -- line: 88
-	-- upvalues: TelemetryService (copy), t2 (copy), v5 (copy), v9 (copy), t3 (copy), t1 (copy), FFlagAppNavTelemetryLogger (copy), u7 (ref)
-	TelemetryService:LogStat(t2, {
+local v8 = nil
+
+local function logSwitchTabStart(previousPage: string, nextPage: string)
+	v8 = { previousPage = previousPage, nextPage = nextPage, startTime = os.clock() }
+end
+
+local function reportSwitchTab(previousPage: string, current_page: string, duration: number)
+	local device_tier
+
+	if defineFastFlag then
+		device_tier = v2
+	end
+
+	TelemetryService:LogStat(v3, {
 		customFields = {
-			previous_page = s1,
-			current_page = s2,
-			device_tier = if not v5 then nil else v9
+			previous_page = previousPage,
+			current_page = current_page,
+			device_tier = device_tier
 		}
-	}, n1)
-	TelemetryService:LogEvent(t3, {
+	}, duration)
+
+	TelemetryService:LogEvent(v4, {
 		customFields = {
-			previous_page = s1,
-			current_page = s2,
-			duration = n1
+			previous_page = previousPage,
+			current_page = current_page,
+			duration = duration
 		},
-		standardizedFields = t1
+		standardizedFields = standardizedFields
 	})
 
 	if FFlagAppNavTelemetryLogger then
-		u7:info("AppNav switch_tab previous={} current={} duration_ms={} device_tier={}", tostring(s1), tostring(s2), string.format("%.2f", n1), (tostring(v9)))
+		v:info(
+			"AppNav switch_tab previous={} current={} duration_ms={} device_tier={}",
+			tostring(previousPage),
+			tostring(current_page),
+			string.format("%.2f", duration),
+			(tostring(v2))
+		)
 	end
 end
 
-local t8 = nil
+local function logSwitchTabEnd(current_page: string)
+	if not v8 then
+		return
+	end
 
-local function reportVisibility(b1: boolean, n2: number) -- line: 141
-	-- upvalues: TelemetryService (copy), t4 (copy), v5 (copy), v9 (copy), t5 (copy), t1 (copy), FFlagAppNavTelemetryLogger (copy), u7 (ref)
-	TelemetryService:LogStat(t4, {
-		customFields = {
-			is_visible = b1,
-			device_tier = if not v5 then nil else v9
-		}
-	}, n2)
-	TelemetryService:LogEvent(t5, {
-		customFields = {
-			is_visible = b1,
-			duration = n2
-		},
-		standardizedFields = t1
+	if current_page ~= v8.nextPage then
+		v8 = nil
+		return
+	end
+
+	local previousPage = v8.previousPage
+	local duration = (os.clock() - v8.startTime) * 1000
+	v8 = nil
+	reportSwitchTab(previousPage, current_page, duration)
+end
+
+local v9 = nil
+
+local function logVisibilityStart(nextValue: boolean)
+	v9 = { nextValue = nextValue, startTime = os.clock() }
+end
+
+local function reportVisibility(is_visible: boolean, duration: number)
+	local device_tier
+
+	if defineFastFlag then
+		device_tier = v2
+	end
+
+	TelemetryService:LogStat(v5, {
+		customFields = { is_visible = is_visible, device_tier = device_tier }
+	}, duration)
+
+	TelemetryService:LogEvent(v6, {
+		customFields = { is_visible = is_visible, duration = duration },
+		standardizedFields = standardizedFields
 	})
 
 	if FFlagAppNavTelemetryLogger then
-		u7:info("AppNav is_visible_changed is_visible={} duration_ms={} device_tier={}", tostring(b1), string.format("%.2f", n2), (tostring(v9)))
+		v:info(
+			"AppNav is_visible_changed is_visible={} duration_ms={} device_tier={}",
+			tostring(is_visible),
+			string.format("%.2f", duration),
+			(tostring(v2))
+		)
 	end
 end
 
-local u19 = nil
+local function logVisibilityEnd(is_visible: boolean)
+	if not v9 then
+		return
+	end
+
+	if is_visible ~= v9.nextValue then
+		v9 = nil
+		return
+	end
+
+	local duration = (os.clock() - v9.startTime) * 1000
+	v9 = nil
+	reportVisibility(is_visible, duration)
+end
+
+local previous_placement = nil
+
+local function logPlacement(current_placement)
+	if current_placement == previous_placement then
+		return
+	end
+
+	TelemetryService:LogCounter(v7, {
+		customFields = {
+			previous_placement = previous_placement,
+			current_placement = current_placement
+		}
+	})
+
+	if FFlagAppNavTelemetryLogger then
+		v:info(
+			"AppNav placement_changed previous={} current={}",
+			tostring(previous_placement),
+			(tostring(current_placement))
+		)
+	end
+
+	previous_placement = current_placement
+end
+
+local function reset()
+	v8 = nil
+	v9 = nil
+	previous_placement = nil
+end
 
 return {
-	logSwitchTabStart = function(s3: string, s4: string) -- line: 80
-		-- upvalues: t7 (ref)
-		t7 = {
-			previousPage = s3,
-			nextPage = s4,
-			startTime = os.clock()
-		}
-	end,
-	logSwitchTabEnd = function(s5: string) -- line: 115
-		-- upvalues: t7 (ref), reportSwitchTab (copy)
-		if not t7 then
-			return
-		end
-
-		if s5 ~= t7.nextPage then
-			t7 = nil
-
-			return
-		end
-
-		local previousPage = t7.previousPage
-		local v27 = (os.clock() - t7.startTime) * 1000
-
-		t7 = nil
-		reportSwitchTab(previousPage, s5, v27)
-	end,
-	logVisibilityStart = function(b2: boolean) -- line: 134
-		-- upvalues: t8 (ref)
-		t8 = {
-			nextValue = b2,
-			startTime = os.clock()
-		}
-	end,
-	logVisibilityEnd = function(b3: boolean) -- line: 165
-		-- upvalues: t8 (ref), reportVisibility (copy)
-		if not t8 then
-			return
-		end
-
-		if b3 ~= t8.nextValue then
-			t8 = nil
-
-			return
-		end
-
-		local v32 = (os.clock() - t8.startTime) * 1000
-
-		t8 = nil
-		reportVisibility(b3, v32)
-	end,
-	logPlacement = function(p1) -- line: 183
-		-- upvalues: u19 (ref), TelemetryService (copy), t6 (copy), FFlagAppNavTelemetryLogger (copy), u7 (ref)
-		if p1 == u19 then
-			return
-		end
-
-		TelemetryService:LogCounter(t6, {
-			customFields = {
-				previous_placement = u19,
-				current_placement = p1
-			}
-		})
-
-		if FFlagAppNavTelemetryLogger then
-			u7:info("AppNav placement_changed previous={} current={}", tostring(u19), (tostring(p1)))
-		end
-
-		u19 = p1
-	end,
-	reset = function() -- line: 201
-		-- upvalues: t7 (ref), t8 (ref), u19 (ref)
-		t7 = nil
-		t8 = nil
-		u19 = nil
-	end
+	logSwitchTabStart = logSwitchTabStart,
+	logSwitchTabEnd = logSwitchTabEnd,
+	logVisibilityStart = logVisibilityStart,
+	logVisibilityEnd = logVisibilityEnd,
+	logPlacement = logPlacement,
+	reset = reset
 }

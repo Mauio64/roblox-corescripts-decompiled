@@ -1,224 +1,279 @@
 local Squads = script:FindFirstAncestor("Squads")
-local SquadsParent = Squads.Parent
-local Foundation = require(SquadsParent.Foundation)
-local CrossExperienceVoice = require(SquadsParent.CrossExperienceVoice)
+local parent = Squads.Parent
+
+local FFlagSquadsEnableFoundationTestIds = require(Squads.Flags.FFlagSquadsEnableFoundationTestIds)
+
+local Foundation = require(parent.Foundation)
+
+local CrossExperienceVoice = require(parent.CrossExperienceVoice)
 local CrossExperienceVoiceManager = CrossExperienceVoice.CrossExperienceVoiceManager
+
 local dependencies = require(Squads.dependencies)
-local Cryo = dependencies.Cryo
-local React = require(SquadsParent.React)
+
+local cryo = dependencies.Cryo
+local React = require(parent.React)
 local useParticipant = CrossExperienceVoice.Hooks.useParticipant
-local useLocalUserId = require(SquadsParent.RobloxAppHooks).useLocalUserId
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 local useNavigation = dependencies.useNavigation
-local BuilderIcons = require(SquadsParent.BuilderIcons)
+local BuilderIcons = require(parent.BuilderIcons)
+
 local VoicePackButton = require(script.Parent.VoicePackButton)
+
 local Enums = Foundation.Enums
 local IconSize = Enums.IconSize
 local InputSize = Enums.InputSize
-local t1 = {
+
+local v = {
 	enableTestingTheme = false,
-	closeCentralOverlayThunk = function() -- line: 32
-		return {
-			type = "CloseCentralOverlay"
-		}
+	closeCentralOverlayThunk = function()
+		return { type = "CloseCentralOverlay" }
 	end
 }
 
-local function SquadVoiceChangers(p1) -- line: 39
-	-- upvalues: Cryo (copy), t1 (copy), useNavigation (copy), useLocalUserId (copy), useParticipant (copy), React (copy), VoicePackButton (copy), CrossExperienceVoiceManager (copy), Foundation (copy), BuilderIcons (copy), IconSize (copy), Enums (copy), InputSize (copy)
-	local v20 = Cryo.Dictionary.join(t1, p1)
-	local v21 = useNavigation()
-	local v22 = tonumber(useLocalUserId()) or -1
-	local v23 = useParticipant(v22)
-	local v24 = if not v23 then nil else v23.selectedVoicePack
-	local v25 = if not v23 then nil else v23.isVoiceChangerActive
-	local v26 = if not v23 then nil else v23.isVoiceChangerHearMyselfActive
-	local v27 = v21.getScreenProps("wideMode", false)
-	local s1 = "bg-surface-0"
-	local s2 = "bg-surface-0"
+local function SquadVoiceChangers(p)
+	local joined = cryo.Dictionary.join(v, p)
+	local v2 = useNavigation()
+	local v3 = tonumber(useLocalUserId()) or -1
+	local v4 = useParticipant(v3)
+	local selectedVoicePack
 
-	if v20.enableTestingTheme then
-		s1 = "bg-system-alert"
-		s2 = "bg-system-warning"
+	if v4 then
+		selectedVoicePack = v4.selectedVoicePack
+	else
+		selectedVoicePack = nil
 	end
 
-	local t2 = {}
-	local t3 = {
-		{
-			name = "None"
-		},
-		{
-			name = "Basic"
-		},
-		{
-			name = "Chipmunk"
-		},
-		{
-			name = "Robot"
-		},
-		{
-			name = "HighPitchRobot"
-		},
-		{
-			name = "Monster"
-		},
-		{
-			name = "Dreamy"
-		},
-		{
-			name = "Powerful"
-		},
-		{
-			name = "Ghost"
-		}
+	local isVoiceChangerActive
+
+	if v4 then
+		isVoiceChangerActive = v4.isVoiceChangerActive
+	else
+		isVoiceChangerActive = nil
+	end
+
+	local isVoiceChangerHearMyselfActive
+
+	if v4 then
+		isVoiceChangerHearMyselfActive = v4.isVoiceChangerHearMyselfActive
+	else
+		isVoiceChangerHearMyselfActive = nil
+	end
+
+	local screenProps = v2.getScreenProps("wideMode", false)
+	local v5, v6
+
+	if joined.enableTestingTheme then
+		v5 = "bg-system-warning"
+		v6 = "bg-system-alert"
+	else
+		v5 = "bg-surface-0"
+		v6 = "bg-surface-0"
+	end
+
+	local v7 = {
+		{ name = "None" },
+		{ name = "Basic" },
+		{ name = "Chipmunk" },
+		{ name = "Robot" },
+		{ name = "HighPitchRobot" },
+		{ name = "Monster" },
+		{ name = "Dreamy" },
+		{ name = "Powerful" },
+		{ name = "Ghost" }
 	}
 
-	local function makeButton(p2, p3) -- line: 75
-		-- upvalues: t3 (copy), v20 (copy), React (copy), VoicePackButton (copy), v25 (copy), v24 (copy), CrossExperienceVoiceManager (copy), v22 (copy)
-		local v37 = t3[p2] or {
-			name = "Voicepack " .. p2
+	local function makeButton(i, i2)
+		local v8 = v7[i] or {
+			name = "Voicepack " .. i
 		}
-		local v38 = if not v20.fillListWithExtraVoicePacks then v37.name else v37.name or "Voicepack " .. p2
+		local name
 
-		return React.createElement(VoicePackButton, {
-			LayoutOrder = p3,
-			voicePackName = v38,
-			isVoiceChangerActive = v25,
-			isSelected = not not v24 and v38 == v24,
-			onActivated = function() -- line: 86
-				-- upvalues: CrossExperienceVoiceManager (copy), v38 (copy), v25 (copy), v22 (copy)
-				CrossExperienceVoiceManager.default:setVoicePack(v38)
+		if joined.fillListWithExtraVoicePacks then
+			name = v8.name or "Voicepack " .. i
+		else
+			name = v8.name
+		end
 
-				if v38 == "None" and v25 then
-					CrossExperienceVoiceManager.default:disableVoiceChanger(v22)
+		local createElement = React.createElement
+		local v9 = {
+			LayoutOrder = i2,
+			voicePackName = name,
+			isVoiceChangerActive = isVoiceChangerActive,
+			isSelected = 0,
+			onActivated = 0
+		}
+		local isSelected
 
-					return
-				end
+		if selectedVoicePack then
+			isSelected = name == selectedVoicePack
+		else
+			isSelected = false
+		end
 
-				if v38 ~= "None" and not v25 then
-					CrossExperienceVoiceManager.default:enableVoiceChanger(v22)
-				end
+		v9.isSelected = isSelected
+		function v9.onActivated()
+			CrossExperienceVoiceManager.default:setVoicePack(name)
+
+			if name == "None" and isVoiceChangerActive then
+				CrossExperienceVoiceManager.default:disableVoiceChanger(v3)
+			elseif name ~= "None" and not isVoiceChangerActive then
+				CrossExperienceVoiceManager.default:enableVoiceChanger(v3)
 			end
+		end
+
+		return createElement(VoicePackButton, v9)
+	end
+
+	local v8 = {}
+
+	for i = 1, #v7 + (joined.fillListWithExtraVoicePacks and 25 or 0) do
+		v8["VoicePackButton_" .. i] = makeButton(i, i)
+	end
+
+	local topBar
+
+	if screenProps then
+		topBar = React.createElement(Foundation.View, {
+			tag = "size-full-0 auto-y",
+			LayoutOrder = 1
+		}, {
+			Title = React.createElement(Foundation.Text, {
+				tag = "position-center-center anchor-center-center text-align-x-center text-align-y-center size-full-0 auto-xy text-heading-small radius-medium " .. v5,
+				Text = "Choose voice pack",
+				LayoutOrder = 1,
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--title" or nil
+			}),
+			CloseButton = React.createElement(Foundation.View, {
+				tag = "position-center-left anchor-center-left auto-xy radius-circle bg-action-subtle padding-xsmall",
+				ZIndex = 2,
+				onActivated = joined.closeSquadVoiceChangers,
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--close-button" or nil
+			}, {
+				Icon = React.createElement(Foundation.Icon, {
+					tag = "position-center-center anchor-center-center auto-xy",
+					name = BuilderIcons.Icon.ArrowLargeLeft,
+					size = IconSize.Large
+				})
+			}),
+			DoneButton = React.createElement(Foundation.Text, {
+				Text = "Done",
+				tag = "position-center-right anchor-center-right text-align-x-center text-align-y-center size-2200-0 auto-y text-label-large radius-medium padding-small text-wrap bg-action-subtle",
+				LayoutOrder = 2,
+				onActivated = joined.closeSquadVoiceChangers,
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--done-button" or nil
+			})
+		})
+	else
+		topBar = React.createElement(Foundation.View, {
+			tag = "size-full-0 auto-y",
+			LayoutOrder = 1
+		}, {
+			Title = React.createElement(Foundation.Text, {
+				tag = "position-center-left anchor-center-left text-align-x-left text-align-y-center size-full-0 auto-xy text-heading-small radius-medium " .. v5,
+				Text = "Choose voice pack",
+				LayoutOrder = 1,
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--title" or nil
+			}),
+			CloseButton = React.createElement(Foundation.View, {
+				tag = "position-center-right anchor-center-right auto-xy radius-circle bg-action-subtle padding-xsmall",
+				LayoutOrder = 2,
+				ZIndex = 2,
+				onActivated = joined.closeSquadVoiceChangers,
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--close-button" or nil
+			}, {
+				Icon = React.createElement(Foundation.Icon, {
+					tag = "position-center-center anchor-center-center auto-xy",
+					name = BuilderIcons.Icon.X,
+					size = IconSize.Large
+				})
+			})
 		})
 	end
 
-	for i = 1, #t3 + (not v20.fillListWithExtraVoicePacks and 0 or 25) do
-		t2["VoicePackButton_" .. i] = makeButton(i, i)
-	end
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v9 = {
+		tag = "size-full-full col align-x-center align-y-top gap-large padding-large radius-medium stroke-emphasis " .. v6,
+		testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers" or nil
+	}
 
-	local v34 = if not v27 then React.createElement(Foundation.View, {
-		tag = "size-full-0 auto-y",
-		LayoutOrder = 1
-	}, {
-		Title = React.createElement(Foundation.Text, {
-			Text = "Choose voice pack",
-			LayoutOrder = 1,
-			tag = "position-center-left anchor-center-left text-align-x-left text-align-y-center size-full-0 auto-xy text-heading-small radius-medium " .. s2
-		}),
-		CloseButton = React.createElement(Foundation.View, {
-			tag = "position-center-right anchor-center-right auto-xy radius-circle bg-action-subtle padding-xsmall",
-			LayoutOrder = 2,
-			ZIndex = 2,
-			onActivated = v20.closeSquadVoiceChangers
-		}, {
-			Icon = React.createElement(Foundation.Icon, {
-				tag = "position-center-center anchor-center-center auto-xy",
-				name = BuilderIcons.Icon.X,
-				size = IconSize.Large
-			})
-		})
-	}) else React.createElement(Foundation.View, {
-		tag = "size-full-0 auto-y",
-		LayoutOrder = 1
-	}, {
-		Title = React.createElement(Foundation.Text, {
-			Text = "Choose voice pack",
-			LayoutOrder = 1,
-			tag = "position-center-center anchor-center-center text-align-x-center text-align-y-center size-full-0 auto-xy text-heading-small radius-medium " .. s2
-		}),
-		CloseButton = React.createElement(Foundation.View, {
-			tag = "position-center-left anchor-center-left auto-xy radius-circle bg-action-subtle padding-xsmall",
-			ZIndex = 2,
-			onActivated = v20.closeSquadVoiceChangers
-		}, {
-			Icon = React.createElement(Foundation.Icon, {
-				tag = "position-center-center anchor-center-center auto-xy",
-				name = BuilderIcons.Icon.ArrowLargeLeft,
-				size = IconSize.Large
-			})
-		}),
-		DoneButton = React.createElement(Foundation.Text, {
-			Text = "Done",
-			tag = "position-center-right anchor-center-right text-align-x-center text-align-y-center size-2200-0 auto-y text-label-large radius-medium padding-small text-wrap bg-action-subtle",
-			LayoutOrder = 2,
-			onActivated = v20.closeSquadVoiceChangers
-		})
-	})
-
-	return React.createElement(Foundation.View, {
-		tag = "size-full-full col align-x-center align-y-top gap-large padding-large radius-medium stroke-emphasis " .. s1
-	}, {
-		TopBar = v34,
+	local v10 = {
+		TopBar = topBar,
 		Divider = React.createElement(Foundation.Divider, {
-			LayoutOrder = 2,
-			variant = Enums.DividerVariant.Default
+			variant = Enums.DividerVariant.Default,
+			LayoutOrder = 2
 		}),
 		HearMyselfBar = React.createElement(Foundation.View, {
-			LayoutOrder = 3,
 			tag = {
 				["size-full-0 auto-y row align-x-left align-y-center padding-left-xxlarge padding-right-xxlarge"] = true,
-				["bg-system-warning"] = v20.enableTestingTheme
-			}
+				["bg-system-warning"] = joined.enableTestingTheme
+			},
+			LayoutOrder = 3
 		}, {
 			HearMyselfLabel = React.createElement(Foundation.Text, {
 				Text = "Hear myself",
 				tag = "text-align-x-left text-align-y-center size-0-0 auto-xy fill text-label-medium padding-left-large radius-medium text-wrap bg-action-subtle",
-				LayoutOrder = 1
+				LayoutOrder = 1,
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--hear-myself-label" or nil
 			}),
-			HearMyselfToggleHolder = React.createElement(Foundation.View, {
-				tag = "row align-x-center align-y-center size-0-0 auto-xy padding-right-large",
-				LayoutOrder = 2
-			}, {
-				HearMyselfToggle = React.createElement(Foundation.Toggle, {
-					label = "",
-					size = InputSize.Medium,
-					onActivated = function(_: boolean) -- line: 191
-						-- upvalues: v26 (copy), CrossExperienceVoiceManager (copy), v22 (copy)
-						if v26 then
-							CrossExperienceVoiceManager.default:disableHearMyself(v22)
-
-							return
-						end
-
-						CrossExperienceVoiceManager.default:enableHearMyself(v22)
-					end,
-					isChecked = v26
-				})
-			})
+			HearMyselfToggleHolder = React.createElement(
+				Foundation.View,
+				{
+					tag = "row align-x-center align-y-center size-0-0 auto-xy padding-right-large",
+					LayoutOrder = 2
+				},
+				{
+					HearMyselfToggle = React.createElement(Foundation.Toggle, {
+						size = InputSize.Medium,
+						label = "",
+						onActivated = function(_: boolean)
+							if isVoiceChangerHearMyselfActive then
+								CrossExperienceVoiceManager.default:disableHearMyself(v3)
+							else
+								CrossExperienceVoiceManager.default:enableHearMyself(v3)
+							end
+						end,
+						isChecked = isVoiceChangerHearMyselfActive,
+						testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--hear-myself-toggle" or nil
+					})
+				}
+			)
 		}),
 		ButtonsView = React.createElement(Foundation.View, {
-			LayoutOrder = 4,
-			tag = "fill padding-left-medium padding-right-medium padding-bottom-medium radius-medium size-full-full auto-y col align-x-center align-y-top " .. s2
+			tag = "fill padding-left-medium padding-right-medium padding-bottom-medium radius-medium size-full-full auto-y col align-x-center align-y-top " .. v5,
+			LayoutOrder = 4
 		}, {
 			ButtonsScroller = React.createElement(Foundation.ScrollView, {
 				tag = "size-full-0 fill bg-action-subtle",
-				BorderSizePixel = 0,
-				scroll = {
-					AutomaticCanvasSize = Enum.AutomaticSize.Y,
-					CanvasSize = UDim2.new()
-				}
+				scroll = { AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new() },
+				BorderSizePixel = 0
 			}, {
-				Buttons = React.createElement(Foundation.View, {
-					tag = "size-full-0 auto-y col align-x-center align-y-top padding-medium fill"
-				}, t2)
+				Buttons = React.createElement(
+					Foundation.View,
+					{
+						tag = "size-full-0 auto-y col align-x-center align-y-top padding-medium fill"
+					},
+					v8
+				)
 			})
 		}),
-		BottomDoneButton = if v27 then nil else React.createElement(Foundation.Text, {
+		BottomDoneButton = 0
+	}
+	local bottomDoneButton
+
+	if not screenProps then
+		bottomDoneButton = React.createElement(Foundation.Text, {
 			Text = "Done",
 			tag = "position-center-center anchor-center-center text-align-x-center text-align-y-center size-full-0 auto-y text-label-large radius-medium padding-small text-wrap bg-action-subtle",
 			LayoutOrder = 5,
-			onActivated = v20.closeSquadVoiceChangers
+			onActivated = joined.closeSquadVoiceChangers,
+			testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-voice-changers--done-button" or nil
 		})
-	})
+	end
+
+	v10.BottomDoneButton = bottomDoneButton
+	return createElement(view, v9, v10)
 end
 
 return SquadVoiceChangers

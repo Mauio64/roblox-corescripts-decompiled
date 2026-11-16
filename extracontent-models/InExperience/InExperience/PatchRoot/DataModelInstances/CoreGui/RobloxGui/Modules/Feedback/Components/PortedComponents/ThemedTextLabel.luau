@@ -1,13 +1,31 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local Cryo = InGameMenuDependencies.Cryo
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
 local t = InGameMenuDependencies.t
+
 local withStyle = UIBlox.Core.Style.withStyle
-local ParentParent = script.Parent.Parent.Parent
-local GlobalConfig = require(ParentParent.GlobalConfig)
-local v10 = t.strictInterface({
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local parent = script.Parent.Parent.Parent
+local GlobalConfig = require(parent.GlobalConfig)
+
+local v = {
+	Title = "HeadingLarge",
+	Header1 = "HeadingSmall",
+	Header2 = "TitleLarge",
+	SubHeader1 = "TitleLarge",
+	Body = "BodyLarge",
+	CaptionHeader = "CaptionMedium",
+	CaptionSubHeader = "CaptionMedium",
+	CaptionBody = "BodySmall",
+	Footer = "CaptionSmall"
+}
+
+local v2 = t.strictInterface({
 	themeKey = t.optional(t.string),
 	fontKey = t.optional(t.string),
 	AnchorPoint = t.optional(t.Vector2),
@@ -27,28 +45,47 @@ local v10 = t.strictInterface({
 	[Roact.Children] = t.optional(t.table)
 })
 
-local function ThemedTextLabel(p1) -- line: 35
-	-- upvalues: GlobalConfig (copy), v10 (copy), withStyle (copy), Cryo (copy), Roact (copy)
+local function ThemedTextLabel(p)
 	if GlobalConfig.propValidation then
-		assert(v10(p1))
+		assert(v2(p))
 	end
 
-	return withStyle(function(p2) -- line: 39
-		-- upvalues: p1 (copy), Cryo (copy), Roact (copy)
-		local v14 = p2.Theme[p1.themeKey or "TextDefault"]
-		local v15 = p2.Font[p1.fontKey or "Body"]
-		local v16 = Cryo.Dictionary.join({
-			TextColor3 = v14.Color,
-			TextTransparency = v14.Transparency
-		}, p1, {
-			BackgroundTransparency = 1,
+	return withStyle(function(props)
+		local v3 = props.Theme[p.themeKey or "TextDefault"]
+		local v4 = props.Font[p.fontKey or "Body"]
+
+		local join = Cryo.Dictionary.join
+		local v5 = { TextColor3 = v3.Color, TextTransparency = v3.Transparency }
+
+		local v6 = {
 			fontKey = Cryo.None,
 			themeKey = Cryo.None,
-			Font = v15.Font,
-			TextSize = v15.RelativeSize * p2.Font.BaseSize
-		})
+			BackgroundTransparency = 1,
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0
+		}
+		local font
 
-		return Roact.createElement("TextLabel", v16)
+		if FoundationFontFaceMigration then
+			font = Cryo.None
+		else
+			font = v4.Font
+		end
+
+		v6.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(props.Tokens.Typography[v[p.fontKey or "Body"]].Font)
+		end
+
+		v6.FontFace = fontFace
+
+		v6.TextSize = v4.RelativeSize * props.Font.BaseSize
+		local v7 = join(v5, p, v6)
+
+		return Roact.createElement("TextLabel", v7)
 	end)
 end
 

@@ -1,24 +1,23 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local React = require(ParentParentParentParent.React)
-local ControlState = require(ParentParentParent.Core.Control.Enum.ControlState)
-local useGuiControlState = require(ParentParent.Control.Hooks.useGuiControlState)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-local function useGuiControlStateWithBinding(p1, p2, b1: boolean) -- line: 14
-	-- upvalues: React (copy), ControlState (copy), useGuiControlState (copy)
-	local v11, v12 = React.useBinding(ControlState.Initialize)
-	local v13 = React.useCallback(function(p3, p4) -- line: 20
-		-- upvalues: v12 (copy), p2 (copy)
-		v12((tostring(p4)))
+local React = require(parent3.React)
 
-		if p2 then
-			p2(p3, p4)
+local ControlState = require(parent2.Core.Control.Enum.ControlState)
+local useGuiControlState = require(parent.Control.Hooks.useGuiControlState)
+
+local function useGuiControlStateWithBinding(p, callback, flag: boolean)
+	local v, v2 = React.useBinding(ControlState.Initialize)
+	local v3, _ = useGuiControlState(p, React.useCallback(function(p2, p3)
+		v2((tostring(p3)))
+
+		if callback then
+			callback(p2, p3)
 		end
-	end, {})
-	local v14, _ = useGuiControlState(p1, v13, b1)
+	end, {}), flag)
 
-	return v14, v11
+	return v3, v
 end
 
 return useGuiControlStateWithBinding

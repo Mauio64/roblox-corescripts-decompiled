@@ -1,120 +1,122 @@
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
-local RobloxGui = game:GetService("CoreGui").RobloxGui
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui.RobloxGui
 local Modules = RobloxGui.Modules
 local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
-local InspectAndBuy = Modules.InspectAndBuy
+local inspectAndBuy = Modules.InspectAndBuy
 local Roact = require(CorePackages.Packages.Roact)
-local InspectAndBuy2 = require(InspectAndBuy.Components.InspectAndBuy)
-local u9 = nil
+local InspectAndBuy = require(inspectAndBuy.Components.InspectAndBuy)
+local v = nil
+
 local renderWithCoreScriptsStyleProvider = require(RobloxGui.Modules.Common.renderWithCoreScriptsStyleProvider)
-local FFlagAXEnableNewInspectAndBuyContainer = require(InspectAndBuy.Flags.FFlagAXEnableNewInspectAndBuyContainer)
+
+local FFlagAXEnableNewInspectAndBuyContainer = require(inspectAndBuy.Flags.FFlagAXEnableNewInspectAndBuyContainer)
+
 local TopBar = require(RobloxGui.Modules.TopBar)
+
 local FFlagTopBarSignalizeMenuOpen = CoreGuiCommon.Flags.FFlagTopBarSignalizeMenuOpen
-local v14 = game:DefineFastFlag("InspectAndBuyFixStyleLink", false)
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
-local isSpatial = nil
-local UIManager = nil
-local PanelType = nil
+local defineFastFlag = game:DefineFastFlag("InspectAndBuyFixStyleLink", false)
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
+local isSpatial, uiManager, panelType
 
 if isInExperienceUIVREnabled then
-	isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
+	local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+	isSpatial = AppCommonLib.isSpatial
 
 	local VrSpatialUi = require(CorePackages.Workspace.Packages.VrSpatialUi)
-
-	UIManager = VrSpatialUi.UIManager
-	PanelType = VrSpatialUi.Constants.PanelType
+	uiManager = VrSpatialUi.UIManager
+	panelType = VrSpatialUi.Constants.PanelType
+else
+	isSpatial = nil
+	uiManager = nil
+	panelType = nil
 end
 
-local function mount(p1, p2, p3, p4) -- line: 38
-	-- upvalues: u9 (ref), Roact (copy), renderWithCoreScriptsStyleProvider (copy), InspectAndBuy2 (copy), FFlagAXEnableNewInspectAndBuyContainer (copy), v14 (copy), isInExperienceUIVREnabled (copy), isSpatial (ref), UIManager (ref), PanelType (ref), RobloxGui (copy), GuiService (copy), FFlagTopBarSignalizeMenuOpen (copy), CoreGuiCommon (copy), TopBar (copy)
-	if u9 then
-		Roact.unmount(u9)
-		u9 = nil
+local function mount(humanoidDescription, playerName, playerId, ctx)
+	if v then
+		Roact.unmount(v)
+		v = nil
 	end
 
-	local v28 = renderWithCoreScriptsStyleProvider({
-		inspectAndBuy = Roact.createElement(InspectAndBuy2, {
-			humanoidDescription = p1,
-			playerName = p2,
-			playerId = p3,
-			ctx = p4
+	local v2 = renderWithCoreScriptsStyleProvider({
+		inspectAndBuy = Roact.createElement(InspectAndBuy, {
+			humanoidDescription = humanoidDescription,
+			playerName = playerName,
+			playerId = playerId,
+			ctx = ctx
 		})
 	})
 
 	if FFlagAXEnableNewInspectAndBuyContainer then
-		v28 = Roact.createElement(InspectAndBuy2, {
-			humanoidDescription = p1,
-			playerName = p2,
-			playerId = p3,
-			ctx = p4
+		v2 = Roact.createElement(InspectAndBuy, {
+			humanoidDescription = humanoidDescription,
+			playerName = playerName,
+			playerId = playerId,
+			ctx = ctx
 		})
 	end
 
-	if v14 then
-		v28 = Roact.createElement("Folder", nil, v28)
+	if defineFastFlag then
+		v2 = Roact.createElement("Folder", nil, v2)
 	end
 
 	if isInExperienceUIVREnabled and isSpatial() then
-		local v29 = UIManager.getInstance():getPanelObject(PanelType.MoreMenu)
-
-		u9 = Roact.mount(v28, v29, "InspectAndBuy")
+		local panelObject = uiManager.getInstance():getPanelObject(panelType.MoreMenu)
+		v = Roact.mount(v2, panelObject, "InspectAndBuy")
 	else
-		u9 = Roact.mount(v28, RobloxGui, "InspectAndBuy")
+		v = Roact.mount(v2, RobloxGui, "InspectAndBuy")
 	end
 
 	GuiService:SetMenuIsOpen(true, "InspectMenu")
 
 	if FFlagTopBarSignalizeMenuOpen then
 		CoreGuiCommon.Stores.GetInspectAndBuyStore(false).setInspectAndBuyOpen(true)
-
-		return
+	else
+		TopBar:setInspectMenuOpen(true)
 	end
-
-	TopBar:setInspectMenuOpen(true)
 end
-local function unmountInspectAndBuy() -- line: 82
-	-- upvalues: u9 (ref), Roact (copy), GuiService (copy), FFlagTopBarSignalizeMenuOpen (copy), CoreGuiCommon (copy), TopBar (copy)
-	if u9 then
-		Roact.unmount(u9)
-		u9 = nil
+
+local function unmountInspectAndBuy()
+	if v then
+		Roact.unmount(v)
+		v = nil
 		GuiService:SetMenuIsOpen(false, "InspectMenu")
 
 		if FFlagTopBarSignalizeMenuOpen then
 			CoreGuiCommon.Stores.GetInspectAndBuyStore(false).setInspectAndBuyOpen(false)
-
-			return
+		else
+			TopBar:setInspectMenuOpen(false)
 		end
-
-		TopBar:setInspectMenuOpen(false)
 	end
 end
-local function mountInspectAndBuyFromHumanoidDescription(p5, p6, p7) -- line: 97
-	-- upvalues: mount (copy)
-	mount(p5, p6, nil, p7)
-end
-local function mountInspectAndBuyFromUserId(p8, p9) -- line: 101
-	-- upvalues: mount (copy)
-	mount(nil, nil, p8, p9)
+
+local function mountInspectAndBuyFromHumanoidDescription(humanoidDescription, playerName, ctx) -- 1 equivalent call inferred from this helper
+	mount(humanoidDescription, playerName, nil, ctx)
 end
 
-GuiService.InspectPlayerFromHumanoidDescriptionRequest:Connect(function(p10, p11) -- line: 105
-	-- upvalues: mount (copy)
-	mount(p10, p11, nil, "developerThroughHumanoidDescription")
+local function mountInspectAndBuyFromUserId(playerId, ctx) -- 1 equivalent call inferred from this helper
+	mount(nil, nil, playerId, ctx)
+end
+
+GuiService.InspectPlayerFromHumanoidDescriptionRequest:Connect(function(humanoidDescription, playerName)
+	mountInspectAndBuyFromHumanoidDescription(humanoidDescription, playerName, "developerThroughHumanoidDescription") -- inferred equivalent call
 end)
-GuiService.InspectPlayerFromUserIdWithCtxRequest:Connect(function(p12, p13) -- line: 109
-	-- upvalues: mount (copy)
-	mount(nil, nil, p12, p13)
+
+GuiService.InspectPlayerFromUserIdWithCtxRequest:Connect(function(playerId, ctx)
+	mountInspectAndBuyFromUserId(playerId, ctx) -- inferred equivalent call
 end)
-GuiService.CloseInspectMenuRequest:Connect(function() -- line: 113
-	-- upvalues: u9 (ref), unmountInspectAndBuy (copy)
-	if u9 then
+
+GuiService.CloseInspectMenuRequest:Connect(function()
+	if v then
 		unmountInspectAndBuy()
 	end
 end)
-GuiService.InspectMenuEnabledChangedSignal:Connect(function(p14) -- line: 119
-	-- upvalues: u9 (ref), unmountInspectAndBuy (copy)
-	if not p14 and u9 then
+
+GuiService.InspectMenuEnabledChangedSignal:Connect(function(p)
+	if not p and v then
 		unmountInspectAndBuy()
 	end
 end)

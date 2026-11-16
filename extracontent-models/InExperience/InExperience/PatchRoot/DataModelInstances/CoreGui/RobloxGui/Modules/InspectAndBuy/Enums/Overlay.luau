@@ -1,3 +1,1 @@
-return {
-	AttributionTraversal = "AttributionTraversal"
-}
+return { AttributionTraversal = "AttributionTraversal" }

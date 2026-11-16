@@ -1,28 +1,20 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCageUV = require(ParentParent.flags.getFFlagUGCValidateMigrateCageUV)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
 return {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
-	},
+	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS, ValidationEnums.UploadCategory.DYNAMIC_HEAD },
 	requiredData = { ValidationEnums.SharedDataMember.outerCagesData },
 	conditionalData = {},
-	fflag = getFFlagUGCValidateMigrateCageUV,
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 36
-		-- upvalues: UGCValidationService (copy), ErrorSourceStrings (copy)
-		for v8, v9 in p2.outerCagesData do
-			if not UGCValidationService:ValidateEditableMeshCageUVTriangleArea(v9.editable) then
-				p1:fail(ErrorSourceStrings.Keys.CageUV_ZeroAreaTriangle, {
-					partName = v8
-				})
+	run = function(object, p)
+		for k, v in p.outerCagesData do
+			if not UGCValidationService:ValidateEditableMeshCageUVTriangleArea(v.editable) then
+				object:fail(ErrorSourceStrings.Keys.CageUV_ZeroAreaTriangle, { partName = k })
 			end
 		end
 	end

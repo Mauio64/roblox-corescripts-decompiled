@@ -1,4 +1,1 @@
-return {
-	Highlight = "Highlight",
-	Danger = "Danger"
-}
+return { Highlight = "Highlight", Danger = "Danger" }

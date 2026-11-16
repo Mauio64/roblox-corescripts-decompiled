@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local ImpressionCacheImpl = require(Parent.SocialCommon).Utils.ImpressionCacheImpl
-local EngineFeature = game:GetEngineFeature("ProfileInspectAndBuyImpressionCountStorageKey")
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
 
-return ImpressionCacheImpl({
+local SocialCommon = require(parent.SocialCommon)
+return SocialCommon.Utils.ImpressionCacheImpl({
 	appStorageKey = "ProfileInspectAndBuyImpressionCount",
 	dismissedValue = -1,
-	isKeyAvailableInEngine = EngineFeature
+	isKeyAvailableInEngine = game:GetEngineFeature("ProfileInspectAndBuyImpressionCountStorageKey")
 })

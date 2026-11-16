@@ -1,31 +1,28 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local parent = script.Parent.Parent.Parent
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
 
 return {
-	UniqueArgumentNamesRule = function(p1) -- line: 20
-		-- upvalues: GraphQLError (copy)
-		local t1 = {}
+	UniqueArgumentNamesRule = function(object)
+		local names = {}
 
 		return {
-			Field = function() -- line: 24
-				-- upvalues: t1 (ref)
-				t1 = {}
+			Field = function()
+				names = {}
 			end,
-			Directive = function() -- line: 27
-				-- upvalues: t1 (ref)
-				t1 = {}
+			Directive = function()
+				names = {}
 			end,
-			Argument = function(_, p3) -- line: 30
-				-- upvalues: t1 (ref), p1 (copy), GraphQLError (copy)
-				local value = p3.name.value
+			Argument = function(_, p): boolean
+				local value = p.name.value
 
-				if t1[value] then
-					p1:reportError(GraphQLError.new(("There can be only one argument named \"%s\"."):format(value), {
-						t1[value],
-						p3.name
-					}))
+				if names[value] then
+					object:reportError(graphQLError.new(
+						("There can be only one argument named \"%s\"."):format(value),
+						{ names[value], p.name }
+					))
 				else
-					t1[value] = p3.name
+					names[value] = p.name
 				end
 
 				return false

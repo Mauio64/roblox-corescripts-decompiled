@@ -1,45 +1,40 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local React = require(Parent.React)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useNavigation = require(Parent.Navigation).useNavigation
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
 
 require(script.Parent.OutfitDetailsActionBar)
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
 
-local AvatarScreen = require(Parent.AvatarExperienceNavigation).Enums.AvatarScreen
+local function useOutfitDetailsActionBarProps(p)
+	local v = useNavigation()
+	local outfitId = p.outfitId
 
-local function useOutfitDetailsActionBarProps(t1: {[any]: any}) -- line: 17
-	-- upvalues: useNavigation (copy), useLocalization (copy), React (copy), AvatarScreen (copy)
-	local v8 = useNavigation()
-	local outfitId = t1.outfitId
-	local v10 = useLocalization({
+	local v2 = useLocalization({
 		rename = "Feature.Avatar.Action.Rename",
 		delete = "Feature.Avatar.Action.Delete"
 	})
-	local v11 = React.useCallback(function() -- line: 26
-		-- upvalues: v8 (copy), AvatarScreen (copy), outfitId (copy)
-		v8.navigate(AvatarScreen.RenameOutfitDialog, {
-			outfitId = outfitId
-		})
-	end, {
-		v8,
-		outfitId
-	})
-	local v12 = React.useCallback(function() -- line: 32
-		-- upvalues: v8 (copy), AvatarScreen (copy), outfitId (copy)
-		v8.navigate(AvatarScreen.DeleteOutfitDialog, {
+
+	local onRenameOutfit = React.useCallback(function()
+		v.navigate(AvatarScreen.RenameOutfitDialog, { outfitId = outfitId })
+	end, { v, outfitId })
+
+	local onDeleteOutfit = React.useCallback(function()
+		v.navigate(AvatarScreen.DeleteOutfitDialog, {
 			outfitIds = { outfitId }
 		})
-	end, {
-		v8,
-		outfitId
-	})
+	end, { v, outfitId })
 
 	return {
-		renameText = v10.rename,
-		deleteText = v10.delete,
-		onRenameOutfit = v11,
-		onDeleteOutfit = v12,
-		LayoutOrder = t1.LayoutOrder
+		renameText = v2.rename,
+		deleteText = v2.delete,
+		onRenameOutfit = onRenameOutfit,
+		onDeleteOutfit = onDeleteOutfit,
+		LayoutOrder = p.LayoutOrder
 	}
 end
 

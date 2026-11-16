@@ -1,51 +1,40 @@
 local RunService = game:GetService("RunService")
-local EngineFeature = game:GetEngineFeature("AvatarJointUpgradeFeature")
-local t1 = {}
-local t2 = {
-	UpperAngle = 45,
-	TwistLowerAngle = -40,
-	TwistUpperAngle = 40,
-	FrictionTorque = 400,
-	StrengthTorque = 400,
-	ReferenceMass = 1.0249234437943
-}
-local t3 = {
-	UpperAngle = 20,
-	TwistLowerAngle = -40,
-	TwistUpperAngle = 20,
-	FrictionTorque = 750,
-	StrengthTorque = 5000,
-	ReferenceMass = 2.861558675766
-}
-local t4 = {
+
+local engineFeature = game:GetEngineFeature("AvatarJointUpgradeFeature")
+
+local v = {
 	UpperAngle = 10,
 	TwistLowerAngle = -10,
 	TwistUpperAngle = 10,
 	StrengthTorque = 400,
 	ReferenceMass = 0.43671694397926
 }
-local t5 = {
+
+local v2 = {
 	UpperAngle = 20,
 	TwistLowerAngle = 5,
 	TwistUpperAngle = 120,
 	StrengthTorque = 1200,
 	ReferenceMass = 0.70196455717087
 }
-local t6 = {
+
+local v3 = {
 	UpperAngle = 30,
 	TwistLowerAngle = -10,
 	TwistUpperAngle = 10,
 	StrengthTorque = 400,
 	ReferenceMass = 0.69132566452026
 }
-local t7 = {
+
+local v4 = {
 	UpperAngle = 5,
 	TwistLowerAngle = -120,
 	TwistUpperAngle = -5,
 	StrengthTorque = 2000,
 	ReferenceMass = 0.65389388799667
 }
-local t8 = {
+
+local v5 = {
 	UpperAngle = 110,
 	TwistLowerAngle = -85,
 	TwistUpperAngle = 85,
@@ -53,7 +42,8 @@ local t8 = {
 	StrengthTorque = 4000,
 	ReferenceMass = 0.90918225049973
 }
-local t9 = {
+
+local v6 = {
 	UpperAngle = 40,
 	TwistLowerAngle = -5,
 	TwistUpperAngle = 80,
@@ -61,780 +51,591 @@ local t9 = {
 	StrengthTorque = 4000,
 	ReferenceMass = 1.9175016880035
 }
-local t10 = {
-	UpperAngle = 30,
-	TwistLowerAngle = -40,
-	TwistUpperAngle = 40
-}
-local t11 = {
-	UpperAngle = 110,
-	TwistLowerAngle = -85,
-	TwistUpperAngle = 85
-}
-local t12 = {
-	UpperAngle = 40,
-	TwistLowerAngle = -5,
-	TwistUpperAngle = 80
-}
+
+local v7 = { UpperAngle = 110, TwistLowerAngle = -85, TwistUpperAngle = 85 }
+
+local v8 = { UpperAngle = 40, TwistLowerAngle = -5, TwistUpperAngle = 80 }
+
 local vector3 = Vector3.new()
-local t13 = {
+
+local v9 = {
 	{
 		"UpperTorso",
 		"RightShoulderRagdollAttachment",
-		CFrame.fromMatrix(vector3, Vector3.new(1, 0, 0), (Vector3.new(0, 1, 0))),
+		CFrame.fromMatrix(vector3, Vector3.new(1, 0, 0), Vector3.new(0, 1, 0)),
 		"RightShoulderRigAttachment"
 	},
 	{
 		"RightUpperArm",
 		"RightShoulderRagdollAttachment",
-		CFrame.fromMatrix(vector3, Vector3.new(0, -1, 0), (Vector3.new(1, 0, 0))),
+		CFrame.fromMatrix(vector3, Vector3.new(0, -1, 0), Vector3.new(1, 0, 0)),
 		"RightShoulderRigAttachment"
 	},
 	{
 		"UpperTorso",
 		"LeftShoulderRagdollAttachment",
-		CFrame.fromMatrix(vector3, Vector3.new(-1, 0, 0), (Vector3.new(0, 1, 0))),
+		CFrame.fromMatrix(vector3, Vector3.new(-1, 0, 0), Vector3.new(0, 1, 0)),
 		"LeftShoulderRigAttachment"
 	},
 	{
 		"LeftUpperArm",
 		"LeftShoulderRagdollAttachment",
-		CFrame.fromMatrix(vector3, Vector3.new(0, -1, 0), (Vector3.new(-1, 0, 0))),
+		CFrame.fromMatrix(vector3, Vector3.new(0, -1, 0), Vector3.new(-1, 0, 0)),
 		"LeftShoulderRigAttachment"
 	}
 }
-local t14 = {
+local v10 = {
 	{
 		"UpperTorso",
 		"Head",
 		"NeckRigAttachment",
-		t2
+		{
+			UpperAngle = 45,
+			TwistLowerAngle = -40,
+			TwistUpperAngle = 40,
+			FrictionTorque = 400,
+			StrengthTorque = 400,
+			ReferenceMass = 1.0249234437943
+		}
 	},
 	{
 		"LowerTorso",
 		"UpperTorso",
 		"WaistRigAttachment",
-		t3
+		{
+			UpperAngle = 20,
+			TwistLowerAngle = -40,
+			TwistUpperAngle = 20,
+			FrictionTorque = 750,
+			StrengthTorque = 5000,
+			ReferenceMass = 2.861558675766
+		}
 	},
-	{
-		"UpperTorso",
-		"LeftUpperArm",
-		"LeftShoulderRagdollAttachment",
-		t8
-	},
-	{
-		"LeftUpperArm",
-		"LeftLowerArm",
-		"LeftElbowRigAttachment",
-		t5
-	},
-	{
-		"LeftLowerArm",
-		"LeftHand",
-		"LeftWristRigAttachment",
-		t6
-	},
-	{
-		"UpperTorso",
-		"RightUpperArm",
-		"RightShoulderRagdollAttachment",
-		t8
-	},
-	{
-		"RightUpperArm",
-		"RightLowerArm",
-		"RightElbowRigAttachment",
-		t5
-	},
-	{
-		"RightLowerArm",
-		"RightHand",
-		"RightWristRigAttachment",
-		t6
-	},
-	{
-		"LowerTorso",
-		"LeftUpperLeg",
-		"LeftHipRigAttachment",
-		t9
-	},
-	{
-		"LeftUpperLeg",
-		"LeftLowerLeg",
-		"LeftKneeRigAttachment",
-		t7
-	},
-	{
-		"LeftLowerLeg",
-		"LeftFoot",
-		"LeftAnkleRigAttachment",
-		t4
-	},
-	{
-		"LowerTorso",
-		"RightUpperLeg",
-		"RightHipRigAttachment",
-		t9
-	},
-	{
-		"RightUpperLeg",
-		"RightLowerLeg",
-		"RightKneeRigAttachment",
-		t7
-	},
-	{
-		"RightLowerLeg",
-		"RightFoot",
-		"RightAnkleRigAttachment",
-		t4
-	}
+	{ "UpperTorso", "LeftUpperArm", "LeftShoulderRagdollAttachment", v5 },
+	{ "LeftUpperArm", "LeftLowerArm", "LeftElbowRigAttachment", v2 },
+	{ "LeftLowerArm", "LeftHand", "LeftWristRigAttachment", v3 },
+	{ "UpperTorso", "RightUpperArm", "RightShoulderRagdollAttachment", v5 },
+	{ "RightUpperArm", "RightLowerArm", "RightElbowRigAttachment", v2 },
+	{ "RightLowerArm", "RightHand", "RightWristRigAttachment", v3 },
+	{ "LowerTorso", "LeftUpperLeg", "LeftHipRigAttachment", v6 },
+	{ "LeftUpperLeg", "LeftLowerLeg", "LeftKneeRigAttachment", v4 },
+	{ "LeftLowerLeg", "LeftFoot", "LeftAnkleRigAttachment", v },
+	{ "LowerTorso", "RightUpperLeg", "RightHipRigAttachment", v6 },
+	{ "RightUpperLeg", "RightLowerLeg", "RightKneeRigAttachment", v4 },
+	{ "RightLowerLeg", "RightFoot", "RightAnkleRigAttachment", v }
 }
-local t15 = {
-	{
-		"LowerTorso",
-		"LeftUpperArm"
-	},
-	{
-		"LeftUpperArm",
-		"LeftHand"
-	},
-	{
-		"LowerTorso",
-		"RightUpperArm"
-	},
-	{
-		"RightUpperArm",
-		"RightHand"
-	},
-	{
-		"LeftUpperLeg",
-		"RightUpperLeg"
-	},
-	{
-		"UpperTorso",
-		"RightUpperLeg"
-	},
-	{
-		"RightUpperLeg",
-		"RightFoot"
-	},
-	{
-		"UpperTorso",
-		"LeftUpperLeg"
-	},
-	{
-		"LeftUpperLeg",
-		"LeftFoot"
-	},
-	{
-		"UpperTorso",
-		"LeftLowerLeg"
-	},
-	{
-		"UpperTorso",
-		"RightLowerLeg"
-	},
-	{
-		"LowerTorso",
-		"LeftLowerLeg"
-	},
-	{
-		"LowerTorso",
-		"RightLowerLeg"
-	},
-	{
-		"UpperTorso",
-		"LeftLowerArm"
-	},
-	{
-		"UpperTorso",
-		"RightLowerArm"
-	},
-	{
-		"Head",
-		"LeftUpperArm"
-	},
-	{
-		"Head",
-		"RightUpperArm"
-	}
+
+local v11 = {
+	{ "LowerTorso", "LeftUpperArm" },
+	{ "LeftUpperArm", "LeftHand" },
+	{ "LowerTorso", "RightUpperArm" },
+	{ "RightUpperArm", "RightHand" },
+	{ "LeftUpperLeg", "RightUpperLeg" },
+	{ "UpperTorso", "RightUpperLeg" },
+	{ "RightUpperLeg", "RightFoot" },
+	{ "UpperTorso", "LeftUpperLeg" },
+	{ "LeftUpperLeg", "LeftFoot" },
+	{ "UpperTorso", "LeftLowerLeg" },
+	{ "UpperTorso", "RightLowerLeg" },
+	{ "LowerTorso", "LeftLowerLeg" },
+	{ "LowerTorso", "RightLowerLeg" },
+	{ "UpperTorso", "LeftLowerArm" },
+	{ "UpperTorso", "RightLowerArm" },
+	{ "Head", "LeftUpperArm" },
+	{ "Head", "RightUpperArm" }
 }
-local t16 = {
-	{
-		"Waist",
-		"UpperTorso"
-	},
-	{
-		"Neck",
-		"Head"
-	},
-	{
-		"LeftShoulder",
-		"LeftUpperArm"
-	},
-	{
-		"LeftElbow",
-		"LeftLowerArm"
-	},
-	{
-		"LeftWrist",
-		"LeftHand"
-	},
-	{
-		"RightShoulder",
-		"RightUpperArm"
-	},
-	{
-		"RightElbow",
-		"RightLowerArm"
-	},
-	{
-		"RightWrist",
-		"RightHand"
-	},
-	{
-		"LeftHip",
-		"LeftUpperLeg"
-	},
-	{
-		"LeftKnee",
-		"LeftLowerLeg"
-	},
-	{
-		"LeftAnkle",
-		"LeftFoot"
-	},
-	{
-		"RightHip",
-		"RightUpperLeg"
-	},
-	{
-		"RightKnee",
-		"RightLowerLeg"
-	},
-	{
-		"RightAnkle",
-		"RightFoot"
-	}
+
+local v12 = {
+	{ "Waist", "UpperTorso" },
+	{ "Neck", "Head" },
+	{ "LeftShoulder", "LeftUpperArm" },
+	{ "LeftElbow", "LeftLowerArm" },
+	{ "LeftWrist", "LeftHand" },
+	{ "RightShoulder", "RightUpperArm" },
+	{ "RightElbow", "RightLowerArm" },
+	{ "RightWrist", "RightHand" },
+	{ "LeftHip", "LeftUpperLeg" },
+	{ "LeftKnee", "LeftLowerLeg" },
+	{ "LeftAnkle", "LeftFoot" },
+	{ "RightHip", "RightUpperLeg" },
+	{ "RightKnee", "RightLowerLeg" },
+	{ "RightAnkle", "RightFoot" }
 }
-local t17 = {
-	{
-		"Head",
-		"NeckAttachment",
-		CFrame.new(0, -0.5, 0)
-	},
+
+local v13 = {
+	{ "Head", "NeckAttachment", CFrame.new(0, -0.5, 0) },
 	{
 		"Torso",
 		"RightShoulderRagdollAttachment",
-		CFrame.fromMatrix(Vector3.new(1, 0.5, 0), Vector3.new(1, 0, 0), (Vector3.new(0, 1, 0)))
+		CFrame.fromMatrix(Vector3.new(1, 0.5, 0), Vector3.new(1, 0, 0), Vector3.new(0, 1, 0))
 	},
 	{
 		"Right Arm",
 		"RightShoulderRagdollAttachment",
-		CFrame.fromMatrix(Vector3.new(-0.5, 0.5, 0), Vector3.new(0, -1, 0), (Vector3.new(1, 0, 0)))
+		CFrame.fromMatrix(Vector3.new(-0.5, 0.5, 0), Vector3.new(0, -1, 0), Vector3.new(1, 0, 0))
 	},
 	{
 		"Torso",
 		"LeftShoulderRagdollAttachment",
-		CFrame.fromMatrix(Vector3.new(-1, 0.5, 0), Vector3.new(-1, 0, 0), (Vector3.new(0, 1, 0)))
+		CFrame.fromMatrix(Vector3.new(-1, 0.5, 0), Vector3.new(-1, 0, 0), Vector3.new(0, 1, 0))
 	},
 	{
 		"Left Arm",
 		"LeftShoulderRagdollAttachment",
-		CFrame.fromMatrix(Vector3.new(0.5, 0.5, 0), Vector3.new(0, -1, 0), (Vector3.new(-1, 0, 0)))
+		CFrame.fromMatrix(Vector3.new(0.5, 0.5, 0), Vector3.new(0, -1, 0), Vector3.new(-1, 0, 0))
 	},
-	{
-		"Torso",
-		"RightHipAttachment",
-		CFrame.new(0.5, -1, 0)
-	},
-	{
-		"Right Leg",
-		"RightHipAttachment",
-		CFrame.new(0, 1, 0)
-	},
-	{
-		"Torso",
-		"LeftHipAttachment",
-		CFrame.new(-0.5, -1, 0)
-	},
-	{
-		"Left Leg",
-		"LeftHipAttachment",
-		CFrame.new(0, 1, 0)
-	}
+	{ "Torso", "RightHipAttachment", CFrame.new(0.5, -1, 0) },
+	{ "Right Leg", "RightHipAttachment", CFrame.new(0, 1, 0) },
+	{ "Torso", "LeftHipAttachment", CFrame.new(-0.5, -1, 0) },
+	{ "Left Leg", "LeftHipAttachment", CFrame.new(0, 1, 0) }
 }
-local t18 = {
+local v14 = {
 	{
 		"Torso",
 		"Head",
 		"NeckAttachment",
-		t10
+		{ UpperAngle = 30, TwistLowerAngle = -40, TwistUpperAngle = 40 }
 	},
-	{
-		"Torso",
-		"Left Leg",
-		"LeftHipAttachment",
-		t12
-	},
-	{
-		"Torso",
-		"Right Leg",
-		"RightHipAttachment",
-		t12
-	},
-	{
-		"Torso",
-		"Left Arm",
-		"LeftShoulderRagdollAttachment",
-		t11
-	},
-	{
-		"Torso",
-		"Right Arm",
-		"RightShoulderRagdollAttachment",
-		t11
-	}
-}
-local t19 = {
-	{
-		"Left Leg",
-		"Right Leg"
-	},
-	{
-		"Head",
-		"Right Arm"
-	},
-	{
-		"Head",
-		"Left Arm"
-	}
-}
-local t20 = {
-	{
-		"Neck",
-		"Torso"
-	},
-	{
-		"Left Shoulder",
-		"Torso"
-	},
-	{
-		"Right Shoulder",
-		"Torso"
-	},
-	{
-		"Left Hip",
-		"Torso"
-	},
-	{
-		"Right Hip",
-		"Torso"
-	}
+	{ "Torso", "Left Leg", "LeftHipAttachment", v8 },
+	{ "Torso", "Right Leg", "RightHipAttachment", v8 },
+	{ "Torso", "Left Arm", "LeftShoulderRagdollAttachment", v7 },
+	{ "Torso", "Right Arm", "RightShoulderRagdollAttachment", v7 }
 }
 
-local function indexParts(p1) -- line: 238
-	local t21 = {}
+local v15 = {
+	{ "Left Leg", "Right Leg" },
+	{ "Head", "Right Arm" },
+	{ "Head", "Left Arm" }
+}
 
-	for _, child in ipairs(p1:GetChildren()) do
-		if child:IsA("BasePart") then
-			local name = child.name
+local v16 = {
+	{ "Neck", "Torso" },
+	{ "Left Shoulder", "Torso" },
+	{ "Right Shoulder", "Torso" },
+	{ "Left Hip", "Torso" },
+	{ "Right Hip", "Torso" }
+}
 
-			if not t21[name] then
-				t21[name] = child
-			end
+local function indexParts(instance)
+	local partsByName = {}
+
+	for _, part in ipairs(instance:GetChildren()) do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
+		local name = part.name
+
+		if not partsByName[name] then
+			partsByName[name] = part
 		end
 	end
 
-	return t21
+	return partsByName
 end
-local function createRigJoints(p2, p3, p4) -- line: 252
-	if p4 then
-		local AnimationConstraint = Instance.new("AnimationConstraint")
 
-		AnimationConstraint.Name = "Root"
-		AnimationConstraint.Attachment0 = p2.HumanoidRootPart.RootRigAttachment
-		AnimationConstraint.Attachment1 = p2.LowerTorso.RootRigAttachment
-		AnimationConstraint.IsKinematic = true
-		p2.LowerTorso.Root:Destroy()
-		AnimationConstraint.Parent = p2.LowerTorso
+local function createRigJoints(p, list, p2)
+	if p2 then
+		local root = Instance.new("AnimationConstraint")
+		root.Name = "Root"
+		root.Attachment0 = p.HumanoidRootPart.RootRigAttachment
+		root.Attachment1 = p.LowerTorso.RootRigAttachment
+		root.IsKinematic = true
+		p.LowerTorso.Root:Destroy()
+		root.Parent = p.LowerTorso
 	end
 
-	for _, v in ipairs(p3) do
-		local v44, v45, v46, v47 = unpack(v)
-		local v48 = p2[v44]
-		local v49 = p2[v45]
+	for _, list2 in ipairs(list) do
+		local v17, v18, v19, v20 = unpack(list2)
+		local v21 = p[v17]
+		local parent = p[v18]
 
-		if v48 and v49 then
-			local v50 = v48:FindFirstChild(v46)
-			local v51 = v49:FindFirstChild(v46)
-
-			if v50 and v51 and v50:IsA("Attachment") and v51:IsA("Attachment") then
-				local RagdollBallSocket = v49:FindFirstChild("RagdollBallSocket")
-
-				if not RagdollBallSocket then
-					RagdollBallSocket = Instance.new("BallSocketConstraint")
-					RagdollBallSocket.Name = "RagdollBallSocket"
-				end
-
-				RagdollBallSocket.Attachment0 = v50
-				RagdollBallSocket.Attachment1 = v51
-				RagdollBallSocket.LimitsEnabled = true
-				RagdollBallSocket.UpperAngle = v47.UpperAngle
-				RagdollBallSocket.TwistLimitsEnabled = true
-				RagdollBallSocket.TwistLowerAngle = v47.TwistLowerAngle
-				RagdollBallSocket.TwistUpperAngle = v47.TwistUpperAngle
-
-				local v53 = workspace.Gravity / 196.2
-
-				if p4 then
-					v53 = math.max(v53, 0.2)
-				end
-
-				local ReferenceMass = v47.ReferenceMass
-				local v55 = ReferenceMass and v49:GetMass() / ReferenceMass or 1
-
-				RagdollBallSocket.MaxFrictionTorque = (v47.FrictionTorque or 500) * v55 * v53
-
-				if p4 then
-					RagdollBallSocket.MaxFrictionTorque = RagdollBallSocket.MaxFrictionTorque / 100
-				end
-
-				RagdollBallSocket.Parent = v49
-
-				if p4 then
-					local Motor6D = v49:FindFirstChildWhichIsA("Motor6D")
-
-					assert(Motor6D)
-
-					local AnimationConstraint = Instance.new("AnimationConstraint")
-
-					AnimationConstraint.Name = Motor6D.Name
-					AnimationConstraint.Attachment0 = Motor6D.Part0:FindFirstChild(Motor6D.Name .. "RigAttachment")
-					AnimationConstraint.Attachment1 = Motor6D.Part1:FindFirstChild(Motor6D.Name .. "RigAttachment")
-					AnimationConstraint.IsKinematic = true
-					AnimationConstraint.MaxTorque = (v47.StrengthTorque or 500) * v55 * v53
-					AnimationConstraint.MaxForce = 0
-					AnimationConstraint.Parent = Motor6D.parent
-					Motor6D:Destroy()
-				end
-			end
+		if not (v21 and parent) then
+			continue
 		end
-	end
-end
-local function createAdditionalAttachments(p5, p6) -- line: 320
-	for _, v in ipairs(p6) do
-		local v62, v63, v64, v65 = unpack(v)
-		local v66 = p5[v62]
 
-		if v66 then
-			local v67 = v66:FindFirstChild(v63)
+		local attachment = v21:FindFirstChild(v19)
+		local attachment2 = parent:FindFirstChild(v19)
 
-			if not v67 or v67:IsA("Attachment") then
-				if v65 then
-					local v68 = v66:FindFirstChild(v65)
-
-					if v68 and v68:IsA("Attachment") then
-						v64 = v68.CFrame * v64
-					end
-				end
-
-				if not v67 then
-					local Attachment = Instance.new("Attachment")
-
-					Attachment.Name = v63
-					Attachment.CFrame = v64
-					Attachment.Parent = v66
-				else
-					v67.CFrame = v64
-				end
-			end
+		if not (attachment and attachment2 and attachment:IsA("Attachment") and attachment2:IsA("Attachment")) then
+			continue
 		end
+
+		local ragdollBallSocket = parent:FindFirstChild("RagdollBallSocket")
+
+		if not ragdollBallSocket then
+			ragdollBallSocket = Instance.new("BallSocketConstraint")
+			ragdollBallSocket.Name = "RagdollBallSocket"
+		end
+
+		ragdollBallSocket.Attachment0 = attachment
+		ragdollBallSocket.Attachment1 = attachment2
+		ragdollBallSocket.LimitsEnabled = true
+		ragdollBallSocket.UpperAngle = v20.UpperAngle
+		ragdollBallSocket.TwistLimitsEnabled = true
+		ragdollBallSocket.TwistLowerAngle = v20.TwistLowerAngle
+		ragdollBallSocket.TwistUpperAngle = v20.TwistUpperAngle
+
+		local v22 = workspace.Gravity / 196.2
+
+		if p2 then
+			v22 = math.max(v22, 0.2)
+		end
+
+		local referenceMass = v20.ReferenceMass
+		local v23 = referenceMass and parent:GetMass() / referenceMass or 1
+		ragdollBallSocket.MaxFrictionTorque = (v20.FrictionTorque or 500) * v23 * v22
+
+		if p2 then
+			ragdollBallSocket.MaxFrictionTorque /= 100
+		end
+
+		ragdollBallSocket.Parent = parent
+
+		if not p2 then
+			continue
+		end
+
+		local motor6D = parent:FindFirstChildWhichIsA("Motor6D")
+		assert(motor6D)
+
+		local animationConstraint = Instance.new("AnimationConstraint")
+		animationConstraint.Name = motor6D.Name
+		animationConstraint.Attachment0 = motor6D.Part0:FindFirstChild(motor6D.Name .. "RigAttachment")
+		animationConstraint.Attachment1 = motor6D.Part1:FindFirstChild(motor6D.Name .. "RigAttachment")
+		animationConstraint.IsKinematic = true
+		animationConstraint.MaxTorque = (v20.StrengthTorque or 500) * v23 * v22
+		animationConstraint.MaxForce = 0
+		animationConstraint.Parent = motor6D.parent
+		motor6D:Destroy()
 	end
 end
-local function createNoCollides(p7, p8) -- line: 348
-	local t22 = {}
 
-	for _, v in ipairs(p8) do
-		local v75, v76 = unpack(v)
-		local v77 = p7[v75]
-		local v78 = p7[v76]
+local function createAdditionalAttachments(p, list)
+	for _, list2 in ipairs(list) do
+		local v17, name, cframe, v18 = unpack(list2)
+		local parent = p[v17]
 
-		if v77 and v78 then
-			local v79 = t22[v78]
-
-			if not v79 then
-				v79 = {}
-				t22[v78] = v79
-			end
-
-			v79[v77] = true
+		if not parent then
+			continue
 		end
-	end
 
-	local t23 = {}
+		local attachment = parent:FindFirstChild(name)
 
-	for k, v in pairs(t22) do
-		local t24 = {}
+		if not (not attachment or attachment:IsA("Attachment")) then
+			continue
+		end
 
-		for _, child in ipairs(k:GetChildren()) do
-			if child:IsA("NoCollisionConstraint") and child.Name == "RagdollNoCollision" then
-				local childPart0 = child.Part0
+		if v18 then
+			local attachment2 = parent:FindFirstChild(v18)
 
-				if k == child.Part1 and v[childPart0] then
-					v[childPart0] = nil
-				else
-					table.insert(t24, child)
-				end
+			if attachment2 and attachment2:IsA("Attachment") then
+				cframe = attachment2.CFrame * cframe
 			end
 		end
 
-		t23[k] = t24
-	end
-
-	for k, v in pairs(t22) do
-		local v89 = t23[k]
-
-		for k2, _ in pairs(v) do
-			local v92 = table.remove(v89) or Instance.new("NoCollisionConstraint")
-
-			v92.Name = "RagdollNoCollision"
-			v92.Part0 = k2
-			v92.Part1 = k
-			v92.Parent = k
+		if attachment then
+			attachment.CFrame = cframe
+		else
+			local attachment2 = Instance.new("Attachment")
+			attachment2.Name = name
+			attachment2.CFrame = cframe
+			attachment2.Parent = parent
 		end
 	end
 end
-local function isAttachmetInPart(p9, p10) -- line: 407
-	return not not p9 and (p10 == p9.Parent or false)
-end
-local function checkValidAttachment(p11, p12, p13, p14) -- line: 411
-	if not not p13 and (p11 == p13.Parent or false) and (not not p14 and (p12 == p14.Parent or false)) then
-		return true
+
+local function createNoCollides(p, list)
+	local v17 = {}
+
+	for _, list2 in ipairs(list) do
+		local v18, v19 = unpack(list2)
+		local v20 = p[v18]
+		local v21 = p[v19]
+
+		if not (v20 and v21) then
+			continue
+		end
+
+		local v22 = v17[v21]
+
+		if not v22 then
+			v22 = {}
+			v17[v21] = v22
+		end
+
+		v22[v20] = true
 	end
 
-	if not not p13 and (p12 == p13.Parent or false) and (not not p14 and (p11 == p14.Parent or false)) then
+	local v18 = {}
+
+	for k, v19 in pairs(v17) do
+		local noCollisionConstraints = {}
+
+		for _, noCollisionConstraint in ipairs(k:GetChildren()) do
+			if not (noCollisionConstraint:IsA("NoCollisionConstraint") and noCollisionConstraint.Name == "RagdollNoCollision") then
+				continue
+			end
+
+			local part0 = noCollisionConstraint.Part0
+
+			if noCollisionConstraint.Part1 == k and v19[part0] then
+				v19[part0] = nil
+			else
+				table.insert(noCollisionConstraints, noCollisionConstraint)
+			end
+		end
+
+		v18[k] = noCollisionConstraints
+	end
+
+	for k, v19 in pairs(v17) do
+		local v20 = v18[k]
+
+		for k2, _ in pairs(v19) do
+			local ragdollNoCollision = table.remove(v20) or Instance.new("NoCollisionConstraint")
+
+			ragdollNoCollision.Name = "RagdollNoCollision"
+			ragdollNoCollision.Part0 = k2
+			ragdollNoCollision.Part1 = k
+			ragdollNoCollision.Parent = k
+		end
+	end
+end
+
+local function isAttachmetInPart(p, p2)
+	return p and p.Parent == p2 and true or false
+end
+
+local function checkValidAttachment(p, p2, p3, p4): boolean
+	if p3 and p3.Parent == p and p4 and p4.Parent == p2 or p3 and p3.Parent == p2 and p4 and p4.Parent == p then
 		return true
 	end
 
 	return false
 end
-local function hasValidConstraint(p15, p16) -- line: 423
-	for _, child in ipairs(p16:GetChildren()) do
-		if not child:IsA("BallSocketConstraint") then
+
+local function hasValidConstraint(p, instance): boolean
+	for _, ballSocketConstraint in ipairs(instance:GetChildren()) do
+		if not ballSocketConstraint:IsA("BallSocketConstraint") then
 			continue
 		end
 
-		local childAttachment0 = child.Attachment0
-		local childAttachment1 = child.Attachment1
+		local attachment0 = ballSocketConstraint.Attachment0
+		local attachment1 = ballSocketConstraint.Attachment1
+		local v17
 
-		if not not childAttachment0 and (p15 == childAttachment0.Parent or false) and not not (not not childAttachment1 and (p16 == childAttachment1.Parent or false)) or not not (not not childAttachment0 and (p16 == childAttachment0.Parent or false)) and not not (not not childAttachment1 and (p15 == childAttachment1.Parent or false)) then
+		if attachment0 and attachment0.Parent == p and attachment1 and attachment1.Parent == instance then
+			v17 = true
+		elseif attachment0 and attachment0.Parent == instance then
+			v17 = attachment1 and attachment1.Parent == p and true or false
+		else
+			v17 = false
+		end
+
+		if v17 then
 			return true
 		end
 	end
 
 	return false
 end
-local function hasRagdollJoint(p17) -- line: 438
-	-- upvalues: EngineFeature (copy), hasValidConstraint (copy)
-	if EngineFeature and (not p17:IsA("Motor6D") and not p17:IsA("AnimationConstraint")) then
+
+local function hasRagdollJoint(motor6D): boolean
+	if engineFeature and not (motor6D:IsA("Motor6D") or motor6D:IsA("AnimationConstraint")) then
 		return false
 	end
 
-	local p17Part0 = nil
-	local p17Part1 = nil
+	local v17 = nil
+	local v18 = nil
 
-	if p17:IsA("Motor6D") then
-		p17Part0 = p17.Part0
-		p17Part1 = p17.Part1
-	elseif EngineFeature and p17:IsA("AnimationConstraint") then
-		local p17Attachment0 = p17.Attachment0
-		local p17Attachment1 = p17.Attachment1
-
-		p17Part0 = p17Attachment0 and p17Attachment0.Parent
-		p17Part1 = p17Attachment1 and p17Attachment1.Parent
+	if motor6D:IsA("Motor6D") then
+		v17 = motor6D.Part0
+		v18 = motor6D.Part1
+	elseif engineFeature and motor6D:IsA("AnimationConstraint") then
+		local attachment0 = motor6D.Attachment0
+		local attachment1 = motor6D.Attachment1
+		v17 = attachment0 and attachment0.Parent
+		v18 = attachment1 and attachment1.Parent
 	end
 
-	if not p17Part0 or not p17Part1 then
+	if not (v17 and v18) then
 		return false
 	end
 
-	if hasValidConstraint(p17Part0, p17Part1) then
-		return true
-	end
-
-	if hasValidConstraint(p17Part1, p17Part0) then
+	if hasValidConstraint(v17, v18) or hasValidConstraint(v18, v17) then
 		return true
 	end
 
 	return false
 end
-local function disableMotorSet(p18, p19) -- line: 470
-	-- upvalues: EngineFeature (copy), hasRagdollJoint (copy)
-	local t25 = {}
 
-	for _, v in ipairs(p19) do
-		local v115 = p18:FindFirstChild(v[2])
+local function disableMotorSet(instance, list)
+	local motor6Ds = {}
 
-		if v115 then
-			local v116 = v115:FindFirstChild(v[1])
+	for _, item in ipairs(list) do
+		local child = instance:FindFirstChild(item[2])
 
-			if v116 and ((EngineFeature or v116:IsA("Motor6D")) and hasRagdollJoint(v116)) then
-				table.insert(t25, v116)
-				v116.Enabled = false
-			end
+		if not child then
+			continue
 		end
+
+		local motor6D = child:FindFirstChild(item[1])
+
+		if not (motor6D and (engineFeature or motor6D:IsA("Motor6D")) and hasRagdollJoint(motor6D)) then
+			continue
+		end
+
+		table.insert(motor6Ds, motor6D)
+		motor6D.Enabled = false
 	end
 
-	return t25
+	return motor6Ds
 end
 
-function t1.createRagdollJoints(p20, p21, p22) -- line: 486
-	-- upvalues: indexParts (copy), createAdditionalAttachments (copy), t17 (copy), createRigJoints (copy), t18 (copy), createNoCollides (copy), t19 (copy), t13 (copy), t14 (copy), t15 (copy)
-	local v120 = indexParts(p20)
+local RagdollRigging = {}
 
-	if p21 == Enum.HumanoidRigType.R6 then
-		createAdditionalAttachments(v120, t17)
-		createRigJoints(v120, t18, false)
-		createNoCollides(v120, t19)
+function RagdollRigging.createRagdollJoints(p, p2, p3)
+	local v17 = indexParts(p)
 
-		return
+	if p2 == Enum.HumanoidRigType.R6 then
+		createAdditionalAttachments(v17, v13)
+		createRigJoints(v17, v14, false)
+		createNoCollides(v17, v15)
+	else
+		if p2 ~= Enum.HumanoidRigType.R15 then
+			error("unknown rig type", 2)
+
+			return
+		end
+
+		createAdditionalAttachments(v17, v9)
+		createRigJoints(v17, v10, p3)
+		createNoCollides(v17, v11)
 	end
-
-	if p21 == Enum.HumanoidRigType.R15 then
-		createAdditionalAttachments(v120, t13)
-		createRigJoints(v120, t14, p22)
-		createNoCollides(v120, t15)
-
-		return
-	end
-
-	error("unknown rig type", 2)
 end
-function t1.disableMotors(p23, p24) -- line: 501
-	-- upvalues: disableMotorSet (copy), t20 (copy), t16 (copy)
-	local v123 = nil
 
-	if p24 == Enum.HumanoidRigType.R6 then
-		v123 = disableMotorSet(p23, t20)
-	elseif p24 == Enum.HumanoidRigType.R15 then
-		v123 = disableMotorSet(p23, t16)
+function RagdollRigging.disableMotors(instance, p)
+	local v17 = nil
+
+	if p == Enum.HumanoidRigType.R6 then
+		v17 = disableMotorSet(instance, v16)
+	elseif p == Enum.HumanoidRigType.R15 then
+		v17 = disableMotorSet(instance, v12)
 	else
 		error("unknown rig type", 2)
 	end
 
-	local v124 = p23.PrimaryPart or p23:FindFirstChild("HumanoidRootPart")
+	local primaryPart = instance.PrimaryPart or instance:FindFirstChild("HumanoidRootPart")
 
-	if v124 and v124:IsA("BasePart") then
-		v124.CanCollide = false
+	if primaryPart and primaryPart:IsA("BasePart") then
+		primaryPart.CanCollide = false
 	end
 
-	local Head = p23:FindFirstChild("Head")
+	local head = instance:FindFirstChild("Head")
 
-	if Head and Head:IsA("BasePart") then
-		Head.CanCollide = true
+	if head and head:IsA("BasePart") then
+		head.CanCollide = true
 	end
 
-	return v123
+	return v17
 end
-function t1.disableParticleEmittersAndFadeOut(p25, p26) -- line: 530
-	-- upvalues: RunService (copy)
+
+function RagdollRigging.disableParticleEmittersAndFadeOut(folder, p)
 	if RunService:IsServer() then
 		error("disableParticleEmittersAndFadeOut should not be called on the server.", 2)
 	end
 
-	local descendants = p25:GetDescendants()
-	local t26 = {}
+	local descendants = folder:GetDescendants()
+	local transparenciesByInstance = {}
 
-	for _, v in pairs(descendants) do
-		if v:IsA("BasePart") or v:IsA("Decal") then
-			t26[v] = v.Transparency
-		elseif v:IsA("ParticleEmitter") then
-			v.Enabled = false
+	for _, instance in pairs(descendants) do
+		if instance:IsA("BasePart") or instance:IsA("Decal") then
+			transparenciesByInstance[instance] = instance.Transparency
+		elseif instance:IsA("ParticleEmitter") then
+			instance.Enabled = false
 		end
 	end
 
-	local n1 = 0
+	local total = 0
 
-	while n1 < p26 do
-		n1 += RunService.Heartbeat:Wait()
+	while total < p do
+		total += RunService.Heartbeat:Wait()
+		local v17 = math.min(total / p, 1)
 
-		local v133 = math.min(n1 / p26, 1)
-
-		for k, v in pairs(t26) do
-			k.Transparency = (1 - v133) * v + v133
-		end
-	end
-end
-function t1.easeNongraphicJointFriction(p27, p28) -- line: 558
-	-- upvalues: RunService (copy)
-	local descendants = p27:GetDescendants()
-	local t27 = {}
-
-	for _, v in pairs(descendants) do
-		if v:IsA("BallSocketConstraint") and v.Name == "RagdollBallSocket" then
-			v.MaxFrictionTorque = v.MaxFrictionTorque * 100
-
-			local MaxFrictionTorque = v.MaxFrictionTorque
-			local ParentName = v.Parent.Name
-
-			t27[v] = {
-				v,
-				MaxFrictionTorque,
-				MaxFrictionTorque * (ParentName ~= "UpperTorso" and ParentName ~= "Head" and 0.05 or 0.5)
-			}
-		end
-	end
-
-	local n2 = 0
-
-	while n2 < p28 do
-		local _, dt = RunService.Stepped:Wait()
-
-		n2 += dt
-
-		local v147 = math.min(n2 / p28, 1)
-
-		for _, v in pairs(t27) do
-			local v150, v151, v152 = unpack(v)
-
-			v150.MaxFrictionTorque = (1 - v147) * v151 + v147 * v152
-		end
-	end
-end
-function t1.easeJointFriction_OLD(p29, p30) -- line: 587
-	-- upvalues: RunService (copy)
-	local descendants = p29:GetDescendants()
-	local t28 = {}
-
-	for _, v in pairs(descendants) do
-		if v:IsA("BallSocketConstraint") and v.Name == "RagdollBallSocket" then
-			local MaxFrictionTorque = v.MaxFrictionTorque
-			local ParentName = v.Parent.Name
-
-			t28[v] = {
-				v,
-				MaxFrictionTorque,
-				MaxFrictionTorque * (ParentName ~= "UpperTorso" and ParentName ~= "Head" and 0.05 or 0.5)
-			}
-		end
-	end
-
-	local n3 = 0
-
-	while n3 < p30 do
-		local _, dt = RunService.Stepped:Wait()
-
-		n3 += dt
-
-		local v164 = math.min(n3 / p30, 1)
-
-		for _, v in pairs(t28) do
-			local v167, v168, v169 = unpack(v)
-
-			v167.MaxFrictionTorque = (1 - v164) * v168 + v164 * v169
+		for k, v18 in pairs(transparenciesByInstance) do
+			k.Transparency = (1 - v17) * v18 + v17
 		end
 	end
 end
 
-return t1
+function RagdollRigging.easeNongraphicJointFriction(folder, p)
+	local descendants = folder:GetDescendants()
+
+	local v17 = {}
+
+	for _, ballSocketConstraint in pairs(descendants) do
+		if not (ballSocketConstraint:IsA("BallSocketConstraint") and ballSocketConstraint.Name == "RagdollBallSocket") then
+			continue
+		end
+
+		ballSocketConstraint.MaxFrictionTorque *= 100
+		local maxFrictionTorque = ballSocketConstraint.MaxFrictionTorque
+
+		local name = ballSocketConstraint.Parent.Name
+		v17[ballSocketConstraint] = {
+			ballSocketConstraint,
+			maxFrictionTorque,
+			maxFrictionTorque * ((name == "UpperTorso" or name == "Head") and 0.5 or 0.05)
+		}
+	end
+
+	local total = 0
+
+	while total < p do
+		local _, v18 = RunService.Stepped:Wait()
+		total += v18
+		local v19 = math.min(total / p, 1)
+
+		for _, list in pairs(v17) do
+			local v20, v21, v22 = unpack(list)
+			v20.MaxFrictionTorque = (1 - v19) * v21 + v19 * v22
+		end
+	end
+end
+
+function RagdollRigging.easeJointFriction_OLD(folder, p)
+	local descendants = folder:GetDescendants()
+
+	local v17 = {}
+
+	for _, ballSocketConstraint in pairs(descendants) do
+		if not (ballSocketConstraint:IsA("BallSocketConstraint") and ballSocketConstraint.Name == "RagdollBallSocket") then
+			continue
+		end
+
+		local maxFrictionTorque = ballSocketConstraint.MaxFrictionTorque
+
+		local name = ballSocketConstraint.Parent.Name
+		v17[ballSocketConstraint] = {
+			ballSocketConstraint,
+			maxFrictionTorque,
+			maxFrictionTorque * ((name == "UpperTorso" or name == "Head") and 0.5 or 0.05)
+		}
+	end
+
+	local total = 0
+
+	while total < p do
+		local _, v18 = RunService.Stepped:Wait()
+		total += v18
+		local v19 = math.min(total / p, 1)
+
+		for _, list in pairs(v17) do
+			local v20, v21, v22 = unpack(list)
+			v20.MaxFrictionTorque = (1 - v19) * v21 + v19 * v22
+		end
+	end
+end
+
+return RagdollRigging

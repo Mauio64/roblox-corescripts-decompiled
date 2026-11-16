@@ -1,6 +1,6 @@
-return function(p1) -- line: 1
+return function(p)
 	return {
-		metadata = p1.fromString("accountinformation:metadata"),
-		phone = p1.fromString("accountinformation:phone")
+		["metadata"] = p.fromString("accountinformation:metadata"),
+		phone = p.fromString("accountinformation:phone")
 	}
 end

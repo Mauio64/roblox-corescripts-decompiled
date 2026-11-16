@@ -1,8 +1,3 @@
-local function debugPrint(_, ...) -- line: 3
-end
+local function debugPrint(_, ...) end
 
-return (setmetatable({
-	isEnabled = false
-}, {
-	__call = debugPrint
-}))
+return (setmetatable({ isEnabled = false }, { __call = debugPrint }))

@@ -1,4 +1,7 @@
-local Foundation = game:GetService("CorePackages").Packages._Index.Foundation.Foundation
-local SheetContext = require(script.Parent.SheetContext)
+local CorePackages = game:GetService("CorePackages")
+local foundation = CorePackages.Packages._Index.Foundation.Foundation
 
-return require(Foundation.Utility.createUseModalNavigation)(SheetContext)
+local SheetContext = require(script.Parent.SheetContext)
+local createUseModalNavigation = require(foundation.Utility.createUseModalNavigation)
+
+return createUseModalNavigation(SheetContext)

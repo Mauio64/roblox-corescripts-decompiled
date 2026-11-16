@@ -1,23 +1,32 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local dependencies = require(ParentParent.dependencies)
-local React = require(ParentParentParent.React)
-local ContactsProtocol = require(ParentParentParent.ContactsProtocol).ContactsProtocol
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local dependencies = require(parent.dependencies)
+local React = require(parent2.React)
+
+local ContactsProtocol = require(parent2.ContactsProtocol)
+local contactsProtocol = ContactsProtocol.ContactsProtocol
 local AppStorageService = game:GetService("AppStorageService")
+
 local useSelector = dependencies.useSelector
 local useDispatch = dependencies.useDispatch
-local AutoSyncContacts = require(ParentParent.Networking.AutoSyncContacts)
+local useEffectOnce = dependencies.useEffectOnce
+local AutoSyncContacts = require(parent.Networking.AutoSyncContacts)
 
-return function(p1) -- line: 20
-	-- upvalues: useDispatch (copy), useSelector (copy), AutoSyncContacts (copy), ContactsProtocol (copy), AppStorageService (copy), React (copy)
-	local v11 = useDispatch()
-	local v12 = useSelector(function(p2) -- line: 22
+local FFlagGateContactAutoSyncByPolicy = require(parent.Flags.FFlagGateContactAutoSyncByPolicy)
+
+return function(flag: boolean?, p)
+	local v = useDispatch()
+	local v2 = useSelector(function(p2)
 		return p2.LocalUserId
 	end)
-	local v13 = p1 or function() -- line: 27
-		-- upvalues: v11 (copy), AutoSyncContacts (copy), v12 (copy), ContactsProtocol (copy), AppStorageService (copy)
-		v11(AutoSyncContacts(v12, ContactsProtocol.default, AppStorageService))
+
+	local v3 = p or function()
+		v(AutoSyncContacts(v2, contactsProtocol.default, AppStorageService))
 	end
 
-	React.useEffect(v13, {})
+	if FFlagGateContactAutoSyncByPolicy then
+		useEffectOnce(v3, flag)
+	else
+		React.useEffect(v3, {})
+	end
 end

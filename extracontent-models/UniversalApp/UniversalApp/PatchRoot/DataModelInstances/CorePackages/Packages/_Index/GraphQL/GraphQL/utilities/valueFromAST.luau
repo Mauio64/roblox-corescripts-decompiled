@@ -1,158 +1,148 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.jsutils.ObjMap)
 
-require(ParentParent.jsutils.ObjMap)
+local keyMap = require(parent.jsutils.keyMap)
+local keyMap2 = keyMap.keyMap
+local inspect = require(parent.jsutils.inspect)
+local inspect2 = inspect.inspect
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
 
-local keyMap = require(ParentParent.jsutils.keyMap).keyMap
-local inspect = require(ParentParent.jsutils.inspect).inspect
-local invariant = require(ParentParent.jsutils.invariant).invariant
+require(parent.language.ast)
 
-require(ParentParent.language.ast)
+local kinds = require(parent.language.kinds)
+local kind = kinds.Kind
 
-local Kind = require(ParentParent.language.kinds).Kind
-local definition = require(ParentParent.type.definition)
+local definition = require(parent.type.definition)
+
 local isLeafType = definition.isLeafType
 local isInputObjectType = definition.isInputObjectType
 local isListType = definition.isListType
 local isNonNullType = definition.isNonNullType
-local null = require(ParentParent.luaUtils.null)
-local isMissingVariable = nil
 
-local function valueFromAST(p1, p2, p3) -- line: 37
-	-- upvalues: Kind (copy), null (copy), isNonNullType (copy), valueFromAST (copy), isListType (copy), isMissingVariable (ref), isInputObjectType (copy), keyMap (copy), isLeafType (copy), invariant (copy), inspect (copy)
-	if not p1 then
+local null = require(parent.luaUtils.null)
+
+local isMissingVariable
+local function valueFromAST(data, object, p)
+	if not data then
 		return
 	end
 
-	if p1.kind == Kind.VARIABLE then
-		local value = p1.name.value
+	if data.kind == kind.VARIABLE then
+		local value = data.name.value
 
-		if p3 == nil or p3[value] == nil then
+		if p == nil or p[value] == nil then
 			return
 		end
 
-		local v18 = p3[value]
+		local v = p[value]
 
-		if v18 == null and isNonNullType(p2) then
+		if v == null and isNonNullType(object) then
 			return
 		end
 
-		return v18
-	end
-
-	if isNonNullType(p2) then
-		if p1.kind == Kind.NULL then
+		return v
+	elseif isNonNullType(object) then
+		if data.kind == kind.NULL then
 			return
 		end
 
-		return valueFromAST(p1, p2.ofType, p3)
-	end
+		return valueFromAST(data, object.ofType, p)
+	else
+		if data.kind == kind.NULL then
+			return null
+		end
 
-	if p1.kind == Kind.NULL then
-		return null
-	end
+		if isListType(object) then
+			local ofType = object.ofType
 
-	if isListType(p2) then
-		local ofType = p2.ofType
+			if data.kind == kind.LIST then
+				local result = {}
 
-		if p1.kind == Kind.LIST then
-			local t1 = {}
+				for _, value in ipairs(data.values) do
+					if isMissingVariable(value, p) then
+						if isNonNullType(ofType) then
+							return
+						end
 
-			for _, v in ipairs(p1.values) do
-				if isMissingVariable(v, p3) then
-					if isNonNullType(ofType) then
-						return
+						table.insert(result, null)
+					else
+						local v = valueFromAST(value, ofType, p)
+
+						if v == nil then
+							return
+						end
+
+						table.insert(result, v)
 					end
-
-					table.insert(t1, null)
-
-					continue
 				end
 
-				local v23 = valueFromAST(v, ofType, p3)
+				return result
+			else
+				local v = valueFromAST(data, ofType, p)
 
-				if v23 == nil then
+				if v == nil then
 					return
 				end
 
-				table.insert(t1, v23)
+				return { v }
 			end
-
-			return t1
-		end
-
-		local v24 = valueFromAST(p1, ofType, p3)
-
-		if v24 == nil then
-			return
-		end
-
-		return { v24 }
-	end
-
-	if isInputObjectType(p2) then
-		if p1.kind ~= Kind.OBJECT then
-			return
-		end
-
-		local t2 = {}
-		local v26 = keyMap(p1.fields, function(p4) -- line: 118
-			return p4.name.value
-		end)
-
-		for _, v in ipairs(p2:getFields():values()) do
-			local v29 = v26[v.name]
-
-			if not v29 or isMissingVariable(v29.value, p3) then
-				if v.defaultValue ~= nil then
-					t2[v.name] = v.defaultValue
-
-					continue
-				end
-
-				if not isNonNullType(v.type) then
-					continue
-				end
-
+		elseif isInputObjectType(object) then
+			if data.kind ~= kind.OBJECT then
 				return
 			end
 
-			local v30 = valueFromAST(v29.value, v.type, p3)
+			local v = keyMap2(data.fields, function(p2)
+				return p2.name.value
+			end)
+			local result = {}
 
-			if v30 == nil then
+			for _, v2 in ipairs(object:getFields():values()) do
+				local v3 = v[v2.name]
+
+				if v3 and not isMissingVariable(v3.value, p) then
+					local v4 = valueFromAST(v3.value, v2.type, p)
+
+					if v4 == nil then
+						return
+					end
+
+					result[v2.name] = v4
+				elseif v2.defaultValue == nil then
+					if isNonNullType(v2.type) then
+						return
+					end
+				else
+					result[v2.name] = v2.defaultValue
+				end
+			end
+
+			return result
+		else
+			if not isLeafType(object) then
+				invariant2(false, "Unexpected input type: " .. inspect2(object))
 				return
 			end
 
-			t2[v.name] = v30
-		end
+			local v = nil
 
-		return t2
+			if not pcall(function()
+				v = object:parseLiteral(data, p)
+			end) then
+				return
+			end
+
+			if v == nil then
+				return
+			end
+
+			return v
+		end
 	end
-
-	if isLeafType(p2) then
-		local u31 = nil
-
-		if not pcall(function() -- line: 148
-			-- upvalues: u31 (ref), p2 (copy), p1 (copy), p3 (copy)
-			u31 = p2:parseLiteral(p1, p3)
-		end) then
-			return
-		end
-
-		if u31 == nil then
-			return
-		end
-
-		return u31
-	end
-
-	invariant(false, "Unexpected input type: " .. inspect(p2))
 end
 
-function isMissingVariable(p5, p6) -- line: 170
-	-- upvalues: Kind (copy)
-	return p5.kind == Kind.VARIABLE and (p6 == nil or p6[p5.name.value] == nil)
+isMissingVariable = function(value, p): boolean
+	return value.kind == kind.VARIABLE and (p == nil or p[value.name.value] == nil)
 end
 
-return {
-	valueFromAST = valueFromAST
-}
+return { valueFromAST = valueFromAST }

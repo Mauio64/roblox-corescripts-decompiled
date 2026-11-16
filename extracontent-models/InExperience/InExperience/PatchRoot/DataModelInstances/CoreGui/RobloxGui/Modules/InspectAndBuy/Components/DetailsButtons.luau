@@ -1,296 +1,339 @@
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local Constants = require(ParentParent.Constants)
-local UtilityFunctions = require(ParentParent.UtilityFunctions)
-local FavoritesButton = require(ParentParent.Components.FavoritesButton)
-local TryOnButton = require(ParentParent.Components.TryOnButton)
-local BuyButton = require(ParentParent.Components.BuyButton)
-local InspectAndBuyControllerBar = require(ParentParent.Components.InspectAndBuyControllerBar)
-local GetIsFavorite = require(ParentParent.Selectors.GetIsFavorite)
+local Constants = require(parent.Constants)
+local UtilityFunctions = require(parent.UtilityFunctions)
+local FavoritesButton = require(parent.Components.FavoritesButton)
+local TryOnButton = require(parent.Components.TryOnButton)
+local BuyButton = require(parent.Components.BuyButton)
+local InspectAndBuyControllerBar = require(parent.Components.InspectAndBuyControllerBar)
+local GetIsFavorite = require(parent.Selectors.GetIsFavorite)
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
 local tutils = require(CorePackages.Packages.tutils)
-local GetFFlagIBGateUGC4ACollectibleAssetsBundles = require(ParentParent.Flags.GetFFlagIBGateUGC4ACollectibleAssetsBundles)
-local GetFFlagIBEnableCollectiblesSystemSupport = require(ParentParent.Flags.GetFFlagIBEnableCollectiblesSystemSupport)
-local v18 = Roact.PureComponent:extend("DetailsButtons")
 
-local function isAnimationAsset(p1) -- line: 35
-	-- upvalues: Constants (copy)
-	return Constants.AnimationAssetTypes[p1] ~= nil
+local GetFFlagIBGateUGC4ACollectibleAssetsBundles = require(parent.Flags.GetFFlagIBGateUGC4ACollectibleAssetsBundles)
+
+local GetFFlagIBEnableCollectiblesSystemSupport = require(parent.Flags.GetFFlagIBEnableCollectiblesSystemSupport)
+
+local extended = Roact.PureComponent:extend("DetailsButtons")
+
+local function isAnimationAsset(assetTypeId): boolean -- 1 equivalent call inferred from this helper
+	return Constants.AnimationAssetTypes[assetTypeId] ~= nil
 end
-local function getBuyText(p2, p3, p4, p5) -- line: 39
-	-- upvalues: GetFFlagIBEnableCollectiblesSystemSupport (copy), RobloxTranslator (copy), Constants (copy), Players (copy)
-	local price = nil
-	local v27 = p2.isLimited or GetFFlagIBEnableCollectiblesSystemSupport() and p2.isLimitedUnique
 
-	if p5 then
-		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Action.FromResale", p3, {
-			PRICE = tostring(p5)
+local function getBuyText(data, p, p2, collectibleLowestResalePrice)
+	local price = nil
+
+	local isLimited = data.isLimited or GetFFlagIBEnableCollectiblesSystemSupport() and data.isLimitedUnique
+
+	if collectibleLowestResalePrice then
+		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Action.FromResale", p, {
+			PRICE = tostring(collectibleLowestResalePrice)
 		}))
 	end
 
-	if p4 and p2.isForSale then
-		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Action.LimitReached", p3))
+	if p2 and data.isForSale then
+		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Action.LimitReached", p))
 	end
 
-	if p2.price ~= nil and p2.productType == Constants.ProductType.CollectibleItem and p2.isForSale then
-		return p2.price
+	if data.price ~= nil and data.productType == Constants.ProductType.CollectibleItem and data.isForSale then
+		return data.price
 	end
 
-	if p2.owned then
-		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.Owned", p3))
+	if data.owned then
+		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.Owned", p))
 	end
 
-	if v27 then
-		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.Limited", p3))
+	if isLimited then
+		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.Limited", p))
 	end
 
-	if not p2.isForSale and not v27 then
-		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.Offsale", p3))
+	if not (data.isForSale or isLimited) then
+		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.Offsale", p))
 	end
 
-	if p2.isForSale then
-		if p2.premiumPricing ~= nil then
-			if Players.LocalPlayer.MembershipType == Enum.MembershipType.Premium then
-				return p2.premiumPricing.premiumPriceInRobux
-			end
-
-			if p2.price == nil then
-				return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.PremiumOnly", p3))
-			end
-
-			return p2.price
-		end
-
-		price = p2.price
+	if not data.isForSale then
+		return price
 	end
 
-	return price
+	if data.premiumPricing == nil then
+		price = data.price
+
+		return price
+	end
+
+	if Players.LocalPlayer.MembershipType == Enum.MembershipType.Premium then
+		return data.premiumPricing.premiumPriceInRobux
+	end
+
+	if data.price == nil then
+		return (RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Label.PremiumOnly", p))
+	end
+
+	return data.price
 end
 
-function v18.init(p6) -- line: 83
-	-- upvalues: Roact (copy)
-	p6.tryOnButtonRef = Roact.createRef()
-	p6.buyButtonRef = Roact.createRef()
-	p6.favoriteButtonRef = Roact.createRef()
+function extended:init()
+	self.tryOnButtonRef = Roact.createRef()
+	self.buyButtonRef = Roact.createRef()
+	self.favoriteButtonRef = Roact.createRef()
 end
-function v18.didUpdate(p7, p8) -- line: 89
-	-- upvalues: GuiService (copy)
-	local detailsInformation = p7.props.detailsInformation
-	local gamepadEnabled = p7.props.gamepadEnabled
+
+function extended.didUpdate(data, p)
+	local detailsInformation = data.props.detailsInformation
+	local gamepadEnabled = data.props.gamepadEnabled
 
 	if detailsInformation.viewingDetails then
-		local visible = p7.props.visible
+		local visible = data.props.visible
 
 		if gamepadEnabled and visible then
-			GuiService.SelectedCoreObject = p7.favoriteButtonRef.current
+			GuiService.SelectedCoreObject = data.favoriteButtonRef.current
 		end
-	elseif p7.props.assetInfo.bundlesAssetIsIn == nil and detailsInformation.viewingDetails and gamepadEnabled then
+	elseif data.props.assetInfo.bundlesAssetIsIn == nil and detailsInformation.viewingDetails and gamepadEnabled then
 		GuiService.SelectedCoreObject = nil
 	end
 
-	local overlay = p7.props.overlay
-	local overlay2 = p8.overlay
+	local overlay = data.props.overlay
+	local overlay2 = p.overlay
 
 	if gamepadEnabled and overlay and overlay.overlay == nil and overlay2 and overlay2.overlay ~= nil then
-		GuiService.SelectedCoreObject = p7.tryOnButtonRef.current
+		GuiService.SelectedCoreObject = data.tryOnButtonRef.current
 	end
 end
-function v18.calculateBuyStatusForLimitedItem(p9, p10, p11, _) -- line: 113
-	-- upvalues: UtilityFunctions (copy), tutils (copy), Players (copy), getBuyText (copy), Constants (copy)
-	local v40 = UtilityFunctions.isLimited2Point0_Or_LimitedCollectible(p10)
-	local v41 = UtilityFunctions.isLimited1Point0(p10) or UtilityFunctions.isLimited1Point0_LimitedUnique(p10)
-	local v42 = nil
+
+function extended:calculateBuyStatusForLimitedItem(data, p, _)
+	local limited2Point0_Or_LimitedCollectible = UtilityFunctions.isLimited2Point0_Or_LimitedCollectible(data)
+	local v = UtilityFunctions.isLimited1Point0(data) or UtilityFunctions.isLimited1Point0_LimitedUnique(data)
+	local collectibleQuantityLimitReached = nil
 	local collectibleLowestResalePrice = nil
 	local collectibleLowestAvailableResaleItemInstanceId = nil
 	local collectibleLowestAvailableResaleProductId = nil
 	local collectibleItemId = nil
-	local isForSale
+	local forSale
 
-	if v40 then
-		isForSale = p10.isForSale
+	if limited2Point0_Or_LimitedCollectible then
+		forSale = data.isForSale
 
-		local resellableInstances = p9.props.resellableInstances
-		local v49 = resellableInstances and (resellableInstances[p10.collectibleItemId] and tutils.fieldCount(resellableInstances[p10.collectibleItemId]))
+		local resellableInstances = self.props.resellableInstances
 
-		v42 = v49 and (p10.collectibleQuantityLimitPerUser ~= nil and (p10.collectibleQuantityLimitPerUser > 0 and v49 >= p10.collectibleQuantityLimitPerUser))
+		collectibleQuantityLimitReached = resellableInstances
+			and resellableInstances[data.collectibleItemId]
+			and tutils.fieldCount(resellableInstances[data.collectibleItemId])
 
-		local v50 = p10.collectibleLowestAvailableResaleProductId and p10.collectibleLowestAvailableResaleProductId ~= ""
-		local v51 = if not (p10.remaining > 0) then v50 and p10.collectibleLowestResalePrice else v50 and (p10.price or 0) > p10.collectibleLowestResalePrice
-
-		if v50 then
-			if not isForSale or v42 or v51 then
-				collectibleLowestResalePrice = p10.collectibleLowestResalePrice
-				collectibleLowestAvailableResaleItemInstanceId = p10.collectibleLowestAvailableResaleItemInstanceId
-				collectibleLowestAvailableResaleProductId = p10.collectibleLowestAvailableResaleProductId
-				collectibleItemId = p10.collectibleItemId
-				isForSale = true
+		if collectibleQuantityLimitReached then
+			if data.collectibleQuantityLimitPerUser == nil or not (data.collectibleQuantityLimitPerUser > 0) then
+				collectibleQuantityLimitReached = false
+			else
+				collectibleQuantityLimitReached = data.collectibleQuantityLimitPerUser <= collectibleQuantityLimitReached
 			end
-		elseif v42 then
-			isForSale = false
+		end
+
+		local v2 = data.collectibleLowestAvailableResaleProductId
+			and data.collectibleLowestAvailableResaleProductId ~= ""
+		local v3
+
+		if data.remaining > 0 then
+			v3 = v2 and (data.price or 0) > data.collectibleLowestResalePrice
+		else
+			v3 = v2 and data.collectibleLowestResalePrice
+		end
+
+		if v2 then
+			if not forSale or collectibleQuantityLimitReached or v3 then
+				collectibleLowestResalePrice = data.collectibleLowestResalePrice
+				collectibleLowestAvailableResaleItemInstanceId = data.collectibleLowestAvailableResaleItemInstanceId
+				collectibleLowestAvailableResaleProductId = data.collectibleLowestAvailableResaleProductId
+				collectibleItemId = data.collectibleItemId
+				forSale = true
+			end
+		elseif collectibleQuantityLimitReached then
+			forSale = false
 		end
 	else
-		isForSale = p10.isForSale and (not p10.owned and not v41)
+		forSale = data.isForSale and not (data.owned or v)
 	end
 
-	if isForSale and p10.price == nil and p10.premiumPricing ~= nil then
-		isForSale = Players.LocalPlayer.MembershipType == Enum.MembershipType.Premium
+	if forSale and data.price == nil and data.premiumPricing ~= nil then
+		forSale = Players.LocalPlayer.MembershipType == Enum.MembershipType.Premium
 	end
 
-	local v52 = getBuyText(p10, p11, v42, collectibleLowestResalePrice)
-	local v53 = p10.price ~= nil and (not p10.owned and isForSale) or (collectibleLowestResalePrice ~= nil or p10.price ~= nil and (p10.productType == Constants.ProductType.CollectibleItem and isForSale))
+	local buyText = getBuyText(data, p, collectibleQuantityLimitReached, collectibleLowestResalePrice)
+	local showRobuxIcon
+
+	if data.price == nil or data.owned or not forSale then
+		if collectibleLowestResalePrice == nil then
+			if data.price == nil then
+				showRobuxIcon = false
+			elseif data.productType == Constants.ProductType.CollectibleItem then
+				showRobuxIcon = forSale
+			else
+				showRobuxIcon = false
+			end
+		else
+			showRobuxIcon = true
+		end
+	else
+		showRobuxIcon = forSale
+	end
 
 	return {
-		buyText = v52,
-		showRobuxIcon = v53,
-		forSale = isForSale,
-		collectibleQuantityLimitReached = v42,
+		buyText = buyText,
+		showRobuxIcon = showRobuxIcon,
+		forSale = forSale,
+		collectibleQuantityLimitReached = collectibleQuantityLimitReached,
 		collectibleLowestResalePrice = collectibleLowestResalePrice,
 		collectibleLowestAvailableResaleItemInstanceId = collectibleLowestAvailableResaleItemInstanceId,
 		collectibleLowestAvailableResaleProductId = collectibleLowestAvailableResaleProductId,
 		collectibleItemId = collectibleItemId
 	}
 end
-function v18.render(p13) -- line: 188
-	-- upvalues: UtilityFunctions (copy), Constants (copy), GetFFlagIBGateUGC4ACollectibleAssetsBundles (copy), Roact (copy), InspectAndBuyControllerBar (copy), FavoritesButton (copy), TryOnButton (copy), BuyButton (copy)
-	local locale = p13.props.locale
-	local assetInfo = p13.props.assetInfo
-	local v57 = false
-	local v58 = false
-	local buyText = nil
+
+function extended:render()
+	local locale = self.props.locale
+	local assetInfo = self.props.assetInfo
+
 	local forSale = nil
-	local v61 = nil
-	local v62 = nil
-	local Bundle = nil
-	local v64 = nil
-	local v65 = nil
-	local collectibleItemId = nil
-	local collectibleLowestResalePrice = nil
-	local collectibleLowestAvailableResaleProductId = nil
-	local collectibleLowestAvailableResaleItemInstanceId = nil
+	local bundleId = nil
+	local v, partOfBundleAndOffsale, itemType, itemId, buyText, showRobuxIcon, collectibleLowestResalePrice, collectibleLowestAvailableResaleProductId, collectibleLowestAvailableResaleItemInstanceId, collectibleItemId, showTryOn
 
 	if assetInfo then
-		v61 = assetInfo.parentBundleId ~= nil
-		v65 = v61 and not assetInfo.isForSale
+		v = assetInfo.parentBundleId ~= nil
 
-		if v61 then
-			v62 = UtilityFunctions.getBundleId(assetInfo)
-			Bundle = Constants.ItemType.Bundle
-			v64 = v62
+		partOfBundleAndOffsale = v and not assetInfo.isForSale
+
+		if v then
+			bundleId = UtilityFunctions.getBundleId(assetInfo)
+			itemType = Constants.ItemType.Bundle
+			itemId = bundleId
 		else
-			Bundle = Constants.ItemType.Asset
-			v64 = assetInfo.assetId
+			itemType = Constants.ItemType.Asset
+			itemId = assetInfo.assetId
 		end
 
-		local v70 = p13:calculateBuyStatusForLimitedItem(assetInfo, locale, forSale)
+		local buyStatusForLimitedItem = self:calculateBuyStatusForLimitedItem(assetInfo, locale, forSale)
 
-		buyText = v70.buyText
-		v57 = v70.showRobuxIcon
-		forSale = v70.forSale
+		buyText = buyStatusForLimitedItem.buyText
+		showRobuxIcon = buyStatusForLimitedItem.showRobuxIcon
+		forSale = buyStatusForLimitedItem.forSale
+		local _collectibleQuantityLimitReached = buyStatusForLimitedItem.collectibleQuantityLimitReached
+		collectibleLowestResalePrice = buyStatusForLimitedItem.collectibleLowestResalePrice
+		collectibleLowestAvailableResaleProductId = buyStatusForLimitedItem.collectibleLowestAvailableResaleProductId
+		collectibleLowestAvailableResaleItemInstanceId = buyStatusForLimitedItem.collectibleLowestAvailableResaleItemInstanceId
+		collectibleItemId = buyStatusForLimitedItem.collectibleItemId
 
-		local _ = v70.collectibleQuantityLimitReached
+		local animationAsset = isAnimationAsset(assetInfo.assetTypeId) -- inferred equivalent call
 
-		collectibleLowestResalePrice = v70.collectibleLowestResalePrice
-		collectibleLowestAvailableResaleProductId = v70.collectibleLowestAvailableResaleProductId
-		collectibleLowestAvailableResaleItemInstanceId = v70.collectibleLowestAvailableResaleItemInstanceId
-		collectibleItemId = v70.collectibleItemId
-
-		local assetTypeId = assetInfo.assetTypeId
-
-		v58 = Constants.AnimationAssetTypes[assetTypeId] == nil
-
-		if Constants.AssetTypeIdStringToHumanoidDescriptionProp[assetInfo.assetTypeId] == nil and Constants.AssetTypeIdToAccessoryTypeEnum[assetInfo.assetTypeId] == nil then
-			v58 = false
+		if
+			Constants.AssetTypeIdStringToHumanoidDescriptionProp[assetInfo.assetTypeId] == nil
+			and Constants.AssetTypeIdToAccessoryTypeEnum[assetInfo.assetTypeId] == nil
+		then
+			showTryOn = false
+		else
+			showTryOn = not animationAsset
 		end
+	else
+		showTryOn = false
+		showRobuxIcon = false
 	end
 
-	local v73 = nil
+	local v2
 
 	if GetFFlagIBGateUGC4ACollectibleAssetsBundles() then
-		v73 = UtilityFunctions.isUnlimitedCollectibleAsset(Bundle, assetInfo) or (UtilityFunctions.isLimitedBundle(Bundle, assetInfo) or UtilityFunctions.isUnlimitedCollectibleBundle(Bundle, assetInfo))
+		v2 = UtilityFunctions.isUnlimitedCollectibleAsset(itemType, assetInfo)
+			or UtilityFunctions.isLimitedBundle(itemType, assetInfo)
+			or UtilityFunctions.isUnlimitedCollectibleBundle(itemType, assetInfo)
 	end
 
 	if assetInfo then
 		collectibleItemId = assetInfo.collectibleItemId
 
-		local v74 = p13.props.assetBundles[assetInfo.assetId]
-
-		v73 = v61 and #v74 > 1
+		local assetBundle = self.props.assetBundles[assetInfo.assetId]
+		v2 = v and #assetBundle > 1
 	end
 
-	local v75 = p13.props.detailsInformation.viewingDetails and p13.props.gamepadEnabled
+	local gamepadEnabled = self.props.detailsInformation.viewingDetails and self.props.gamepadEnabled
 
-	return Roact.createElement("Frame", {
+	local createElement = Roact.createElement
+	local v3 = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0, 51),
 		Position = UDim2.new(0, 0, 1, -51)
-	}, {
+	}
+	local v4 = {
 		UIListLayout = Roact.createElement("UIListLayout", {
 			Padding = UDim.new(0, 10),
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		ControllerBar = v75 and Roact.createElement(InspectAndBuyControllerBar, {
+		ControllerBar = gamepadEnabled and Roact.createElement(InspectAndBuyControllerBar, {
+			showTryOn = showTryOn,
+			tryingOn = self.props.tryingOn,
 			showFavorite = true,
-			showTryOn = v58,
-			tryingOn = p13.props.tryingOn,
-			isFavorited = p13.props.isFavorited
+			isFavorited = self.props.isFavorited
 		}),
 		FavoriteButton = Roact.createElement(FavoritesButton, {
-			favoriteButtonRef = p13.favoriteButtonRef
+			favoriteButtonRef = self.favoriteButtonRef
 		}),
 		TryOnButton = Roact.createElement(TryOnButton, {
-			showTryOn = v58,
+			showTryOn = showTryOn,
 			assetInfo = assetInfo,
-			partOfBundleAndOffsale = v65,
-			bundleId = v62,
-			tryOnButtonRef = p13.tryOnButtonRef,
-			localPlayerModel = p13.props.localPlayerModel
+			partOfBundleAndOffsale = partOfBundleAndOffsale,
+			bundleId = bundleId,
+			tryOnButtonRef = self.tryOnButtonRef,
+			localPlayerModel = self.props.localPlayerModel
 		}),
 		TryOnFiller = Roact.createElement("ImageLabel", {
+			AnchorPoint = Vector2.new(0.5, 0),
 			BackgroundTransparency = 1,
+			Size = UDim2.new(0.5, -32, 0, 44),
+			Visible = not showTryOn,
 			LayoutOrder = 2,
 			Image = "",
-			AnchorPoint = Vector2.new(0.5, 0),
-			Size = UDim2.new(0.5, -32, 0, 44),
-			Visible = not v58,
 			ScaleType = Enum.ScaleType.Slice,
 			SliceCenter = Rect.new(5, 5, 120, 20)
 		}),
-		BuyButton = if not GetFFlagIBGateUGC4ACollectibleAssetsBundles() or not v73 then Roact.createElement(BuyButton, {
-			itemType = Bundle,
-			itemId = v64,
-			showRobuxIcon = v57,
+		BuyButton = 0
+	}
+	local buyButton
+
+	if not (GetFFlagIBGateUGC4ACollectibleAssetsBundles() and v2) then
+		buyButton = Roact.createElement(BuyButton, {
+			itemType = itemType,
+			itemId = itemId,
+			showRobuxIcon = showRobuxIcon,
 			forSale = forSale,
 			buyText = buyText,
-			buyButtonRef = p13.buyButtonRef,
+			buyButtonRef = self.buyButtonRef,
 			collectibleItemId = collectibleItemId,
 			collectibleLowestAvailableResaleProductId = collectibleLowestAvailableResaleProductId,
 			collectibleLowestAvailableResaleItemInstanceId = collectibleLowestAvailableResaleItemInstanceId,
 			collectibleLowestResalePrice = collectibleLowestResalePrice
-		}) else nil
-	})
+		})
+	end
+
+	v4.BuyButton = buyButton
+	return createElement("Frame", v3, v4)
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p14, _) -- line: 315
-	-- upvalues: GetIsFavorite (copy)
-	local assetId = p14.detailsInformation.assetId
-	local v79 = GetIsFavorite(p14)
+return RoactRodux.UNSTABLE_connect2(function(data, _)
+	local assetId = data.detailsInformation.assetId
+
+	local isFavorited = GetIsFavorite(data)
 
 	return {
-		visible = p14.visible,
-		assetInfo = p14.assets[assetId] or {},
-		assetBundles = p14.assetBundles,
-		detailsInformation = p14.detailsInformation,
-		bundleInfo = p14.bundles,
-		locale = p14.locale,
-		gamepadEnabled = p14.gamepadEnabled,
-		isFavorited = v79,
-		tryingOn = p14.tryingOnInfo.tryingOn,
-		resellableInstances = p14.collectibleResellableInstances,
-		overlay = p14.overlay
+		visible = data.visible,
+		assetInfo = data.assets[assetId] or {},
+		assetBundles = data.assetBundles,
+		detailsInformation = data.detailsInformation,
+		bundleInfo = data.bundles,
+		locale = data.locale,
+		gamepadEnabled = data.gamepadEnabled,
+		isFavorited = isFavorited,
+		tryingOn = data.tryingOnInfo.tryingOn,
+		resellableInstances = data.collectibleResellableInstances,
+		overlay = data.overlay
 	}
-end)(v18)
+end)(extended)

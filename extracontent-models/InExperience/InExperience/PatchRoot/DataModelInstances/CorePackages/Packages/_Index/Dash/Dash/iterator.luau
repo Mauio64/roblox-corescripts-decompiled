@@ -1,21 +1,20 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
 
-require(scriptParent.Types)
-
-local function iterator(p1) -- line: 13
-	if typeof(p1) == "function" then
-		return p1
+local function iterator(value)
+	if typeof(value) == "function" then
+		return value
 	end
 
-	if typeof(p1) == "table" then
-		if #p1 > 0 then
-			return ipairs(p1)
-		end
-
-		return pairs(p1)
+	if typeof(value) ~= "table" then
+		return nil
 	end
 
-	return nil
+	if #value > 0 then
+		return ipairs(value)
+	end
+
+	return pairs(value)
 end
 
 return iterator

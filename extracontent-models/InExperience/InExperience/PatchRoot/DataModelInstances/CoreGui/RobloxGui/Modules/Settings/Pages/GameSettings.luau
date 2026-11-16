@@ -10,91 +10,125 @@ local Players = game:GetService("Players")
 local VRService = game:GetService("VRService")
 local SoundService = game:GetService("SoundService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local v13 = UserSettings()
-local GameSettings = v13.GameSettings
+local v = UserSettings()
+local gameSettings = v.GameSettings
 local VideoCaptureService = game:GetService("VideoCaptureService")
-local UserGameSettings = v13:GetService("UserGameSettings")
-local Url = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Url
+local UserGameSettings = v:GetService("UserGameSettings")
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local Url = CoreScriptsCommon.Url
 local TextChatService = game:GetService("TextChatService")
 local SafetyService = game:GetService("SafetyService")
-local ExperienceStateCaptureService = nil
+local ExperienceStateCaptureService
 
 if game:GetEngineFeature("CaptureModeEnabled") then
 	ExperienceStateCaptureService = game:GetService("ExperienceStateCaptureService")
+else
+	ExperienceStateCaptureService = nil
 end
 
-local GetFFlagEnableConnectDisconnectInSettingsAndChrome = require(RobloxGui.Modules.Flags.GetFFlagEnableConnectDisconnectInSettingsAndChrome)
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
 local FFlagIEMSettingsGroups = require(RobloxGui.Modules.Settings.Flags.FFlagIEMSettingsGroups)
-local u24 = nil
 
-if GetFFlagEnableConnectDisconnectInSettingsAndChrome() or isInExperienceUIVREnabled then
-	local LocalizationService = game:GetService("LocalizationService")
-
-	u24 = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization.new(LocalizationService.RobloxLocaleId)
-end
+local LocalizationService = game:GetService("LocalizationService")
+local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
+local localization = InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
 
 local getCamMicPermissions = require(RobloxGui.Modules.Settings.getCamMicPermissions)
 local isCamEnabledForUserAndPlace = require(RobloxGui.Modules.Settings.isCamEnabledForUserAndPlace)
-local renderSettingsHeader = nil
-local renderSettingsDivider = nil
+local renderSettingsHeader, renderSettingsDivider
 
 if FFlagIEMSettingsGroups then
 	renderSettingsHeader = require(RobloxGui.Modules.Settings.Components.renderSettingsHeader)
 	renderSettingsDivider = require(RobloxGui.Modules.Settings.Components.renderSettingsDivider)
+else
+	renderSettingsHeader = nil
+	renderSettingsDivider = nil
 end
 
-local default = require(CorePackages.Workspace.Packages.PermissionsProtocol).PermissionsProtocol.default
-local isVoiceFocused = require(CorePackages.Workspace.Packages.CrossExperience).Utils.isVoiceFocused
-local observeIsVoiceFocused = require(CorePackages.Workspace.Packages.CrossExperience).Utils.observeIsVoiceFocused
+local FFlagEnablePioneerIGMSettingsBanner = require(RobloxGui.Modules.Settings.Flags.FFlagEnablePioneerIGMSettingsBanner)
+local renderMoreSettingsBanner = nil
+
+if FFlagEnablePioneerIGMSettingsBanner then
+	local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
+
+	if PioneerUtils.isPioneerLaunch() then
+		renderMoreSettingsBanner = require(RobloxGui.Modules.Settings.Components.renderMoreSettingsBanner)
+	end
+end
+
+local PermissionsProtocol = require(CorePackages.Workspace.Packages.PermissionsProtocol)
+local default = PermissionsProtocol.PermissionsProtocol.default
+local CrossExperience = require(CorePackages.Workspace.Packages.CrossExperience)
+local isVoiceFocused = CrossExperience.Utils.isVoiceFocused
+local CrossExperience2 = require(CorePackages.Workspace.Packages.CrossExperience)
+local observeIsVoiceFocused = CrossExperience2.Utils.observeIsVoiceFocused
+
 local cameraDevicePermissionGrantedSignal = require(CoreGui.RobloxGui.Modules.Settings.cameraDevicePermissionGrantedSignal)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local GetFFlagEnablePartyVoiceVolumeOnlyWhenInEligibleParty = SharedFlags.GetFFlagEnablePartyVoiceVolumeOnlyWhenInEligibleParty
 local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
 local GetFFlagSelfViewCameraSettings = SharedFlags.GetFFlagSelfViewCameraSettings
 local GetFFlagAlwaysShowVRToggle = require(RobloxGui.Modules.Flags.GetFFlagAlwaysShowVRToggle)
+
 local GetFIntDebounceDisconnectButtonDelay = require(RobloxGui.Modules.Flags.GetFIntDebounceDisconnectButtonDelay)
 local GetFIntDebounceAIRephraseSettingDelay = require(RobloxGui.Modules.Flags.GetFIntDebounceAIRephraseSettingDelay)
 local GetFIntDebounceChatSummariesSettingDelay = require(RobloxGui.Modules.Flags.GetFIntDebounceChatSummariesSettingDelay)
 local TouchEnabled = UserInputService.TouchEnabled
 local GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice = SharedFlags.GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice
-local FFlagIEMFocusNavToButtons = SharedFlags.FFlagIEMFocusNavToButtons
 local FFlagIEMTabFocusNav = SharedFlags.FFlagIEMTabFocusNav
-local v46 = game:DefineFastFlag("ShowAntiHarassmentSettings", false)
+local defineFastFlag = game:DefineFastFlag("ShowAntiHarassmentSettings", false)
 local GetFFlagEnablePlayerNamesEnabledSetting = require(RobloxGui.Modules.Settings.Flags.GetFFlagEnablePlayerNamesEnabledSetting)
 local FFlagUpdatePeopleNamesSettingCopy = require(RobloxGui.Modules.Settings.Flags.FFlagUpdatePeopleNamesSettingCopy)
 local FFlagBadgeVisibilitySettingEnabled = SharedFlags.FFlagBadgeVisibilitySettingEnabled
-local GetFFlagEnableVoiceUxUpdates = SharedFlags.GetFFlagEnableVoiceUxUpdates
-local GetFFlagEnableVrVoiceConnectDisconnect = SharedFlags.GetFFlagEnableVrVoiceConnectDisconnect
-local v52 = game:DefineFastFlag("EnableVoiceSelectorTranslations_AEGIS2", false)
-local v53 = game:DefineFastFlag("HideVoiceChatSelectorForFae_AEGIS2", false)
-local v54 = game:DefineFastFlag("CenterShiftLockOverride", true)
-local v55 = game:DefineFastFlag("VoiceChatSelectorReconnectFocus2_AEGIS2", false)
-local v56 = game:DefineFastFlag("MicroProfilerReadOnlyInformationLabel", false)
+local defineFastFlag2 = game:DefineFastFlag("HideVoiceChatSelectorForFae_AEGIS2", false)
+local defineFastFlag3 = game:DefineFastFlag("CenterShiftLockOverride", true)
+local defineFastFlag4 = game:DefineFastFlag("VoiceChatSelectorReconnectFocus2_AEGIS2", false)
+local defineFastFlag5 = game:DefineFastFlag("MicroProfilerReadOnlyInformationLabel", false)
 local FFlagEnableModerateChatRemoteEvent = SharedFlags.FFlagEnableModerateChatRemoteEvent
-local v58 = game:DefineFastFlag("VoiceSelectorAvailableAfterFae", false)
-local v59 = game:DefineFastFlag("DifferentiateVoiceSelectorSystemAndUser", false)
-local v60 = game:DefineFastFlag("DeferProgrammaticChange", false)
+local defineFastFlag6 = game:DefineFastFlag("VoiceSelectorAvailableAfterFae", false)
+local defineFastFlag7 = game:DefineFastFlag("InGameGraphicsFollowsSavedQuality", false)
+local defineFastFlag8 = game:DefineFastFlag("DifferentiateVoiceSelectorSystemAndUser", false)
+local defineFastFlag9 = game:DefineFastFlag("DeferProgrammaticChange", false)
 local FFlagRenameVolumeToMainVolume = require(RobloxGui.Modules.Flags.FFlagRenameVolumeToMainVolume)
-local FFlagAIRephraseSettingEnabled = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAIRephraseSettingEnabled
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagAIRephraseSettingEnabled = SharedFlags2.FFlagAIRephraseSettingEnabled
 local FFlagChatSummariesSettingEnabled = SharedFlags.FFlagChatSummariesSettingEnabled
+
+local fFlagExpChatDictation = SharedFlags.FFlagExpChatDictationVoiceTypingModeSetting
+	and (SharedFlags.FFlagExpChatDictation or SharedFlags.FFlagExpChatContinuousDictation)
 local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local FFlagVoiceRewarmTelemetry = SharedFlags.FFlagVoiceRewarmTelemetry
-local v66 = game:DefineFastFlag("DebounceVoiceSelectorIndexChange", false)
-local v67 = game:DefineFastFlag("VoiceSelectorIgnoreFailedStateDisconnect", false)
+local defineFastFlag10 = game:DefineFastFlag("DebounceVoiceSelectorIndexChange", false)
+local defineFastFlag11 = game:DefineFastFlag("VoiceSelectorIgnoreFailedStateDisconnect", false)
+
 local FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider = require(RobloxGui.Modules.Settings.Flags.FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider)
-local v69 = game:DefineFastFlag("VoiceVolumeControlsFixSliderVisibilityOnEligibleGames", false)
-local v70 = game:DefineFastFlag("VoiceVolumeControlsDisableInteractionWhenNoMasterVolume", false)
-local v71 = require(CorePackages.Workspace.Packages.VoiceChatCore).Flags.GetFFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry()
+
+local defineFastFlag12 = game:DefineFastFlag("VoiceVolumeControlsFixSliderVisibilityOnEligibleGames", false)
+
+local defineFastFlag13 = game:DefineFastFlag("VoiceVolumeControlsDisableInteractionWhenNoMasterVolume", false)
+
+local VoiceChatCore = require(CorePackages.Workspace.Packages.VoiceChatCore)
+local fFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry = VoiceChatCore.Flags.GetFFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry()
+
 local FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast = require(RobloxGui.Modules.VoiceChat.Flags.FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast)
-local v73 = game:DefineFastFlag("VoiceVolumeControlsSuppressInExperienceUiForPartyVoice", false)
+
+local defineFastFlag14 = game:DefineFastFlag("VoiceVolumeControlsSuppressInExperienceUiForPartyVoice", false)
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local default2 = require(CorePackages.Workspace.Packages.CrossExperienceVoice).IXPManager.default
-local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
+
+local CrossExperienceVoice = require(CorePackages.Workspace.Packages.CrossExperienceVoice)
+local default2 = CrossExperienceVoice.IXPManager.default
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
+
 local GameSettingsConstants = require(RobloxGui.Modules.Settings.Resources.GameSettingsConstants)
-local v78 = default2 and default2.getHasPartyVoiceVolume()
+
+local v2 = default2 and default2.getHasPartyVoiceVolume()
+
 local Constants = require(RobloxGui:WaitForChild("Modules"):WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
-local t1 = {
+
+local v3 = {
 	["Enum.SavedQualitySetting.Automatic"] = 0,
 	["Enum.SavedQualitySetting.QualityLevel1"] = 1,
 	["Enum.SavedQualitySetting.QualityLevel2"] = 2,
@@ -108,62 +142,57 @@ local t1 = {
 	["Enum.SavedQualitySetting.QualityLevel10"] = 10
 }
 
-local function voiceChatVolumeToSlider(n1: number) -- line: 143
-	return (math.floor(n1 * 5 + 0.5))
-end
-local function voiceChatVolumeFromSlider(n2: number) -- line: 147
-	return n2 / 5
+local function voiceChatVolumeToSlider(voiceChatVolume: number) -- 4 equivalent calls inferred from this helper
+	return (math.floor(voiceChatVolume * 5 + 0.5))
 end
 
-local t2 = {
+local function voiceChatVolumeFromSlider(p: number) -- 1 equivalent call inferred from this helper
+	return p / 5
+end
+
+local v4 = {
 	DevComputerMovementMode = true,
 	DevComputerCameraMode = true,
 	DevEnableMouseLock = true
 }
-local t3 = {
-	DevTouchMovementMode = true,
-	DevTouchCameraMode = true
-}
-local t4 = {
-	DEFAULT_FOLLOW = "Default (Follow)",
-	DEFAULT_CLASSIC = "Default (Classic)"
-}
-local t5 = {
-	Input = "Input",
-	Output = "Output"
-}
-local t6 = {
+
+local v5 = { DevTouchMovementMode = true, DevTouchCameraMode = true }
+
+local v6 = { DEFAULT_FOLLOW = "Default (Follow)", DEFAULT_CLASSIC = "Default (Classic)" }
+
+local v7 = { Input = "Input", Output = "Output" }
+
+local v8 = {
 	DEFAULT_THUMBSTICK = "Default (Dynamic Thumbstick)",
 	DEFAULT_KEYBOARD = "Default (Keyboard)",
 	TAP_TO_MOVE = "Tap to Move",
 	CLICK_TO_MOVE = "Click to Move"
 }
-local v88 = RobloxTranslator:FormatByKey("Feature.SettingsHub.TouchMovementMode.ClassicThumbstick")
-local v89 = RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.Unavailable")
-local v90 = RobloxTranslator:FormatByKey("CoreScripts.Feedback.EntryPoint.ButtonText")
-local t7 = {
-	On = 1,
-	Off = 2
-}
 
-local function getDefaultCameraMode() -- line: 190
-	-- upvalues: UserInputService (copy)
+local formatByKey = RobloxTranslator:FormatByKey("Feature.SettingsHub.TouchMovementMode.ClassicThumbstick")
+
+local formatByKey2 = RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.Unavailable")
+local formatByKey3 = RobloxTranslator:FormatByKey("CoreScripts.Feedback.EntryPoint.ButtonText")
+
+local v9 = { On = 1, Off = 2 }
+
+local function getDefaultCameraMode(): string
 	if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
 		return "Default (Follow)"
 	end
 
 	return "Default (Classic)"
 end
-local function getDefaultMovementMode() -- line: 199
-	-- upvalues: UserInputService (copy), RobloxTranslator (copy), Constants (copy)
+
+local function getDefaultMovementMode()
 	if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
 		return RobloxTranslator:FormatByKey(Constants.MovementModeDynamicThumbstickKey)
 	end
 
 	return "Default (Keyboard)"
 end
-local function getDefaultSelectToMove() -- line: 208
-	-- upvalues: UserInputService (copy)
+
+local function getDefaultSelectToMove(): string
 	if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
 		return "Tap to Move"
 	end
@@ -172,381 +201,440 @@ local function getDefaultSelectToMove() -- line: 208
 end
 
 local SETTINGS_MENU_LAYOUT_ORDER = GameSettingsConstants.SETTINGS_MENU_LAYOUT_ORDER
-local IXPServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper
+
+local IxpServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper)
+local IXPServiceWrapper = IxpServiceWrapper.IXPServiceWrapper
+
 local GetFFlagChatTranslationSettingEnabled = require(RobloxGui.Modules.Flags.GetFFlagChatTranslationSettingEnabled)
 local GetFStringChatTranslationLayerName = require(RobloxGui.Modules.Flags.GetFStringChatTranslationLayerName)
 local GetFFlagChatTranslationHoldoutEnabled = require(RobloxGui.Modules.Flags.GetFFlagChatTranslationHoldoutEnabled)
 local GetFFlagChatTranslationWaitForIXP = require(RobloxGui.Modules.Flags.GetFFlagChatTranslationWaitForIXP)
 local GetFFlagChatTranslationForceSetting = require(RobloxGui.Modules.Flags.GetFFlagChatTranslationForceSetting)
 local GetFFlagChatTranslationNewDefaults = require(RobloxGui.Modules.Flags.GetFFlagChatTranslationNewDefaults)
-local EngineFeature = game:GetEngineFeature("TextChatServiceSettingsSaved")
+
+local engineFeature = game:GetEngineFeature("TextChatServiceSettingsSaved")
 local ChatTranslationOptionsWithChatLanguageSwitcherInitializer = require(RobloxGui.Modules.Settings.Pages.GameSettingsRowInitializers.ChatTranslationOptionsWithChatLanguageSwitcherInitializer)
-local EngineFeature2 = game:GetEngineFeature("GameBasicSettingsFramerateCap")
+
+local engineFeature2 = game:GetEngineFeature("GameBasicSettingsFramerateCap")
+local engineFeature3 = game:GetEngineFeature("RUUserScalePreferenceAPI")
+local FFlagUIScaleEngineOptions = SharedFlags.FFlagUIScaleEngineOptions
+local Responsive = require(CorePackages.Workspace.Packages.Responsive)
+local UIScaleOptions = Responsive.UIScaleOptions
+
+local defineFastFlag15 = game:DefineFastFlag("FramerateCapIOSOptions", false)
+
 local Utility = require(RobloxGui.Modules.Settings.Utility)
+
 local CoreUtility = require(RobloxGui.Modules.CoreUtility)
+
 local PlayerPermissionsModule = require(RobloxGui.Modules.PlayerPermissionsModule)
 local GetHasGuiHidingPermission = require(RobloxGui.Modules.Common.GetHasGuiHidingPermission)
 local Theme = require(RobloxGui.Modules.Settings.Theme)
 local Cryo = require(CorePackages.Packages.Cryo)
 local GfxReset = require(script.Parent.Parent.GfxReset)
-local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local AppCommonLib2 = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Create = AppCommonLib2.Create
 local ThrottleFunctionCall = require(CoreGui.RobloxGui.Modules.Settings.Pages.ShareGame.ThrottleFunctionCall)
+local SavedQualityFollower = require(RobloxGui.Modules.Settings.Pages.SavedQualityFollower)
 local BuilderIcons = require(CorePackages.Packages.BuilderIcons)
 local Signals = require(CorePackages.Packages.Signals)
 local Migration = BuilderIcons.Migration
 
 RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
 RobloxGui:WaitForChild("Modules"):WaitForChild("Settings"):WaitForChild("SettingsHub")
+local TenFootInterface = require(RobloxGui.Modules.TenFootInterface)
+local isEnabled = TenFootInterface:IsEnabled()
 
-local v118 = require(RobloxGui.Modules.TenFootInterface):IsEnabled()
 local LocalPlayer = Players.LocalPlayer
-local Platform = UserInputService:GetPlatform()
+local platform = UserInputService:GetPlatform()
 local CachedPolicyService = require(CorePackages.Workspace.Packages.CachedPolicyService)
-local default3 = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
-local VoiceVolumeControlsEligibility = require(CorePackages.Workspace.Packages.VoiceChatCore).VoiceVolumeControlsEligibility
-local default4 = require(CorePackages.Workspace.Packages.CrossExperienceVoice).CrossExperienceVoiceManager.default
-local getAppFeaturePolicies = require(CorePackages.Workspace.Packages.UniversalAppPolicy).getAppFeaturePolicies
-local v126 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Video.SystemDefault")
-local v127 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Video.VideoCamera")
-local v128 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default3 = VoiceChatServiceManager.default
 
+local VoiceChatCore2 = require(CorePackages.Workspace.Packages.VoiceChatCore)
+local VoiceVolumeControlsEligibility = VoiceChatCore2.VoiceVolumeControlsEligibility
+local CrossExperienceVoice2 = require(CorePackages.Workspace.Packages.CrossExperienceVoice)
+local default4 = CrossExperienceVoice2.CrossExperienceVoiceManager.default
+
+local UniversalAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
+
+local formatByKey4 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Video.SystemDefault")
+local formatByKey5 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Video.VideoCamera")
+
+local CoreScriptsInitializer = require(CorePackages.Workspace.Packages.CoreScriptsInitializer)
+local v10 = CoreScriptsInitializer.CoreLogger:new(script.Name)
 game:DefineFastInt("RomarkStartWithGraphicQualityLevel", -1)
+local fastInt = game:GetFastInt("RomarkStartWithGraphicQualityLevel")
 
-local FastInt = game:GetFastInt("RomarkStartWithGraphicQualityLevel")
-local v130 = not CachedPolicyService:IsSubjectToChinaPolicies()
-local v131 = Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.UWP)
-local v132 = Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android
-local v133 = if not isInExperienceUIVREnabled then (v132 or v131) and v130 else (v132 or (v131 or isSpatial())) and v130
+local v11 = not CachedPolicyService:IsSubjectToChinaPolicies()
+
+local v12 = platform == Enum.Platform.Windows or platform == Enum.Platform.OSX or platform == Enum.Platform.UWP
+local v13 = platform == Enum.Platform.IOS or platform == Enum.Platform.Android
+
+if isInExperienceUIVREnabled then
+	if not (v13 or v12) then
+		v11 = isSpatial() and v11
+	end
+elseif not (v13 or v12) then
+	v11 = v12
+end
+
 local GetFIntVoiceChatDeviceChangeDebounceDelay = require(RobloxGui.Modules.Flags.GetFIntVoiceChatDeviceChangeDebounceDelay)
 local GetFFlagVoiceChatUILogging = require(RobloxGui.Modules.Flags.GetFFlagVoiceChatUILogging)
 local Constants2 = require(RobloxGui.Modules.VoiceChat.Constants)
 local GetFFlagEnableUniveralVoiceToasts = require(RobloxGui.Modules.Flags.GetFFlagEnableUniveralVoiceToasts)
+
 local GetFFlagEnableExplicitSettingsChangeAnalytics = require(RobloxGui.Modules.Settings.Flags.GetFFlagEnableExplicitSettingsChangeAnalytics)
+
 local GetFFlagFixCyclicFullscreenIndexEvent = require(RobloxGui.Modules.Settings.Flags.GetFFlagFixCyclicFullscreenIndexEvent)
-local v140 = game:DefineFastFlag("DisableFeedbackSoothsayerCheck", false)
-local v141 = game:DefineFastFlag("UserShowGuiHideToggles", false)
-local v142 = game:DefineFastFlag("UserFreecamGuiDestabilization", false)
-local v143 = game:DefineFastFlag("FixDeveloperConsoleButtonSizeAndPositioning", false)
-local v144 = game:DefineFastFlag("EnableTFFeedbackModeEntryCheck", false)
-local v145 = game:DefineFastFlag("FeedbackEntryPointButtonSizeAdjustment2", false)
-local v146 = game:DefineFastFlag("FeedbackEntryPointImprovedStrictnessCheck", false)
+local defineFastFlag16 = game:DefineFastFlag("DisableFeedbackSoothsayerCheck", false)
+local defineFastFlag17 = game:DefineFastFlag("UserShowGuiHideToggles", false)
+local defineFastFlag18 = game:DefineFastFlag("UserFreecamGuiDestabilization", false)
+
+local defineFastFlag19 = game:DefineFastFlag("FixDeveloperConsoleButtonSizeAndPositioning", false)
+local defineFastFlag20 = game:DefineFastFlag("EnableTFFeedbackModeEntryCheck", false)
+
+local defineFastFlag21 = game:DefineFastFlag("FeedbackEntryPointButtonSizeAdjustment2", false)
+
+local defineFastFlag22 = game:DefineFastFlag("FeedbackEntryPointImprovedStrictnessCheck", false)
 local GetFFlagEnableLocalesForExperienceLanguageSwitcher = require(RobloxGui.Modules.Settings.Flags.GetFFlagEnableLocalesForExperienceLanguageSwitcher)
 local GetFFlagLazyInitiateExperienceLanguageSwitcher = require(RobloxGui.Modules.Settings.Flags.GetFFlagLazyInitiateExperienceLanguageSwitcher)
 local ExperienceLanguageSwitcherInitializer = require(RobloxGui.Modules.Settings.Pages.GameSettingsRowInitializers.ExperienceLanguageSwitcherInitializer)
-local PlayerChoiceTranslationSettingInitializer = require(RobloxGui.Modules.Settings.Pages.GameSettingsRowInitializers.PlayerChoiceTranslationSettingInitializer)
-local v151 = game:DefineFastFlag("UpdateVisibilitySettingsCopy", false)
-local v152 = game:DefineFastFlag("ExpChatDebounceRephraseIndexSelection", false)
-local v153 = game:DefineFastFlag("EraseFPSFromDefaultSetting", false)
 
-local function reportSettingsChangeForAnalytics(p1, p2, p3, p4) -- line: 335
-	-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), UserInputService (copy), Cryo (copy), RbxAnalyticsService (copy), Constants (copy)
-	if not GetFFlagEnableExplicitSettingsChangeAnalytics() or (p2 == p3 or p2 == nil or p3 == nil) then
+local PlayerChoiceTranslationSettingInitializer = require(RobloxGui.Modules.Settings.Pages.GameSettingsRowInitializers.PlayerChoiceTranslationSettingInitializer)
+
+local defineFastFlag23 = game:DefineFastFlag("UpdateVisibilitySettingsCopy", false)
+local defineFastFlag24 = game:DefineFastFlag("ExpChatDebounceRephraseIndexSelection", false)
+local defineFastFlag25 = game:DefineFastFlag("EraseFPSFromDefaultSetting", false)
+
+local function reportSettingsChangeForAnalytics(name, p, p2, p3)
+	if not GetFFlagEnableExplicitSettingsChangeAnalytics() or p == p2 or p == nil or p2 == nil then
 		return
 	end
 
-	local t8 = {
+	local joined = {
 		universe_id = tostring(game.GameId),
-		name = p1,
-		old_value = tostring(p2),
-		new_value = tostring(p3),
+		name = name,
+		old_value = tostring(p),
+		new_value = tostring(p2),
 		has_touch = UserInputService.TouchEnabled,
 		has_mouse = UserInputService.MouseEnabled,
 		has_gamepad = UserInputService.GamepadEnabled
 	}
 
-	if p4 then
-		t8 = Cryo.Dictionary.join(t8, p4)
+	if p3 then
+		joined = Cryo.Dictionary.join(joined, p3)
 	end
 
-	RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsInGameMenuName, Constants.AnalyticsExplicitSettingsChangeName, t8)
+	RbxAnalyticsService:SetRBXEventStream(
+		Constants.AnalyticsTargetName,
+		Constants.AnalyticsInGameMenuName,
+		Constants.AnalyticsExplicitSettingsChangeName,
+		joined
+	)
 end
-local function reportSettingsForAnalytics() -- line: 366
-	-- upvalues: UserInputService (copy), GameSettings (copy), FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider (copy), EngineFeature2 (copy), GetFFlagEnablePlayerNamesEnabledSetting (copy), RbxAnalyticsService (copy), Constants (copy)
-	local t9 = {}
-	local v168 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
 
-	if v168 then
-		t9.camera_mode_touch = tostring(GameSettings.TouchCameraMovementMode)
+local function reportSettingsForAnalytics()
+	local v14 = {}
+	local v15 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
+
+	if v15 then
+		v14.camera_mode_touch = tostring(gameSettings.TouchCameraMovementMode)
 	else
-		t9.camera_mode_desktop = tostring(GameSettings.ComputerCameraMovementMode)
+		v14.camera_mode_desktop = tostring(gameSettings.ComputerCameraMovementMode)
 	end
 
-	if v168 then
-		t9.movement_mode_touch = tostring(GameSettings.TouchMovementMode)
+	if v15 then
+		v14.movement_mode_touch = tostring(gameSettings.TouchMovementMode)
 	else
-		t9.movement_mode_desktop = tostring(GameSettings.ComputerMovementMode)
+		v14.movement_mode_desktop = tostring(gameSettings.ComputerMovementMode)
 	end
 
 	if UserInputService.MouseEnabled then
-		t9.shift_lock_enabled = tostring(GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch)
+		v14.shift_lock_enabled = tostring(gameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch)
 	end
 
-	if UserInputService.GamepadEnabled and GameSettings.IsUsingGamepadCameraSensitivity then
-		local GamepadCameraSensitivity = GameSettings.GamepadCameraSensitivity
-
-		t9.camera_sensitivity_gamepad = tostring((tonumber(string.format("%.2f", GamepadCameraSensitivity))))
+	if UserInputService.GamepadEnabled and gameSettings.IsUsingGamepadCameraSensitivity then
+		local gamepadCameraSensitivity = gameSettings.GamepadCameraSensitivity
+		v14.camera_sensitivity_gamepad = tostring((tonumber(string.format("%.2f", gamepadCameraSensitivity))))
 	end
 
 	if UserInputService.MouseEnabled then
-		local MouseSensitivityFirstPersonX = GameSettings.MouseSensitivityFirstPerson.X
-
-		t9.camera_sensitivity_mouse = tostring((tonumber(string.format("%.2f", MouseSensitivityFirstPersonX))))
+		local x = gameSettings.MouseSensitivityFirstPerson.X
+		v14.camera_sensitivity_mouse = tostring((tonumber(string.format("%.2f", x))))
 	end
 
-	t9.camera_y_inverted = tostring(GameSettings.CameraYInverted)
-	t9.show_performance_stats = tostring(GameSettings.PerformanceStatsVisible)
-	t9.volume = tostring((math.floor(GameSettings.MasterVolume * 10 + 0.5)))
+	v14.camera_y_inverted = tostring(gameSettings.CameraYInverted)
+	v14.show_performance_stats = tostring(gameSettings.PerformanceStatsVisible)
+	v14.volume = tostring((math.floor(gameSettings.MasterVolume * 10 + 0.5)))
 
 	if FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider then
-		t9.voice_chat_volume = tostring((math.floor(GameSettings.VoiceChatVolume * 5 + 0.5)))
+		v14.voice_chat_volume = tostring(voiceChatVolumeToSlider(gameSettings.VoiceChatVolume)) -- inferred equivalent call
 	end
 
-	t9.gfx_quality_level = tostring(settings().Rendering.QualityLevel)
+	v14.gfx_quality_level = tostring(settings().Rendering.QualityLevel)
 
-	if EngineFeature2 then
-		t9.framerate_cap = tostring(GameSettings.FramerateCap)
+	if engineFeature2 then
+		v14.framerate_cap = tostring(gameSettings.FramerateCap)
 	end
 
-	t9.fullscreen_enabled = tostring(GameSettings:InFullScreen())
-	t9.microprofiler_enabled = tostring(GameSettings.OnScreenProfilerEnabled)
-	t9.microprofiler_webserver_enabled = tostring(GameSettings.MicroProfilerWebServerEnabled)
-	t9.reduced_motion = tostring(GameSettings.ReducedMotion)
-	t9.preferred_transparency = tostring(GameSettings.PreferredTransparency)
-	t9.preferred_text_size = tostring(GameSettings.PreferredTextSize)
-	t9.ui_navigation_key_bind_enabled = tostring(GameSettings.UiNavigationKeyBindEnabled)
-	t9.universeid = tostring(game.GameId)
+	v14.fullscreen_enabled = tostring(gameSettings:InFullScreen())
+	v14.microprofiler_enabled = tostring(gameSettings.OnScreenProfilerEnabled)
+	v14.microprofiler_webserver_enabled = tostring(gameSettings.MicroProfilerWebServerEnabled)
+
+	v14.reduced_motion = tostring(gameSettings.ReducedMotion)
+	v14.preferred_transparency = tostring(gameSettings.PreferredTransparency)
+	v14.preferred_text_size = tostring(gameSettings.PreferredTextSize)
+	v14.ui_navigation_key_bind_enabled = tostring(gameSettings.UiNavigationKeyBindEnabled)
+
+	v14.universeid = tostring(game.GameId)
 
 	if GetFFlagEnablePlayerNamesEnabledSetting() then
-		t9.player_names_enabled = tostring(GameSettings.PlayerNamesEnabled)
+		v14.player_names_enabled = tostring(gameSettings.PlayerNamesEnabled)
 	end
 
-	RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsInGameMenuName, Constants.AnalyticsSettingsChangeName, t9)
+	RbxAnalyticsService:SetRBXEventStream(
+		Constants.AnalyticsTargetName,
+		Constants.AnalyticsInGameMenuName,
+		Constants.AnalyticsSettingsChangeName,
+		v14
+	)
 end
 
 game:DefineFastInt("V1MenuLanguageSelectionFeaturePerMillageRollout", 0)
 game:DefineFastString("V1MenuLanguageSelectionFeatureForcedUserIds", "")
+local defineFastFlag26 = game:DefineFastFlag("IGMEnableGFXReset", false)
 
-local v156 = game:DefineFastFlag("IGMEnableGFXReset", false)
+local function getLastValueChangerFrame(newPage)
+	local layoutOrder = nil
+	local lastValueChangerFrame = nil
 
-local function getLastValueChangerFrame(p5) -- line: 435
-	-- upvalues: FFlagIEMFocusNavToButtons (copy)
-	if not FFlagIEMFocusNavToButtons then
-		return
-	end
+	for k, v14 in pairs(newPage:GetRows()) do
+		local selectionFrame = v14.SelectionFrame
 
-	local SelectionFrameLayoutOrder = nil
-	local v173 = nil
-
-	for __, v in pairs(p5:GetRows()) do
-		local SelectionFrame = v.SelectionFrame
-
-		if not SelectionFrameLayoutOrder or SelectionFrameLayoutOrder <= SelectionFrame.LayoutOrder then
-			SelectionFrameLayoutOrder = SelectionFrame.LayoutOrder
-			v173 = p5:getValueChangerFrame(v.ValueChanger)
+		if not (not layoutOrder or layoutOrder <= selectionFrame.LayoutOrder) then
+			continue
 		end
+
+		layoutOrder = selectionFrame.LayoutOrder
+		lastValueChangerFrame = newPage:getValueChangerFrame(v14.ValueChanger)
 	end
 
-	return v173
+	return lastValueChangerFrame
 end
-local function getFirstValueChangerFrame(p6) -- line: 454
-	-- upvalues: FFlagIEMTabFocusNav (copy)
+
+local function getFirstValueChangerFrame(newPage)
 	if not FFlagIEMTabFocusNav then
 		return
 	end
 
-	local SelectionFrameLayoutOrder = nil
-	local v179 = nil
+	local layoutOrder = nil
+	local v14 = nil
 
-	for __, v in pairs(p6:GetRows()) do
-		local SelectionFrame = v.SelectionFrame
+	for k, v15 in pairs(newPage:GetRows()) do
+		local selectionFrame = v15.SelectionFrame
 
-		if not SelectionFrameLayoutOrder or SelectionFrameLayoutOrder > SelectionFrame.LayoutOrder then
-			SelectionFrameLayoutOrder = SelectionFrame.LayoutOrder
-			v179 = p6:getValueChangerFrame(v.ValueChanger)
+		if not (not layoutOrder or selectionFrame.LayoutOrder < layoutOrder) then
+			continue
 		end
+
+		layoutOrder = selectionFrame.LayoutOrder
+		v14 = newPage:getValueChangerFrame(v15.ValueChanger)
 	end
 
-	return v179
+	return v14
 end
-local function Initialize() -- line: 473
-	-- upvalues: v156 (copy), GfxReset (copy), RobloxGui (copy), GetFFlagLazyInitiateExperienceLanguageSwitcher (copy), VRService (copy), GameSettings (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GuiService (copy), GetFFlagFixCyclicFullscreenIndexEvent (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy), RbxAnalyticsService (copy), Constants (copy), EngineFeature2 (copy), v153 (copy), RobloxTranslator (copy), FastInt (copy), t1 (copy), v151 (copy), FFlagUpdatePeopleNamesSettingCopy (copy), t7 (copy), UserInputService (copy), Create (copy), Theme (copy), v54 (copy), v56 (copy), TouchEnabled (copy), v132 (copy), v131 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), LocalPlayer (copy), CoreUtility (copy), t4 (copy), GetFFlagAlwaysShowVRToggle (copy), getAppFeaturePolicies (copy), t6 (copy), v88 (copy), t3 (copy), t2 (copy), Url (copy), HttpService (copy), v146 (copy), SafetyService (copy), ExperienceStateCaptureService (ref), v145 (copy), v90 (copy), v140 (copy), v128 (copy), Players (copy), v89 (copy), RunService (copy), GetFFlagChatTranslationWaitForIXP (copy), IXPServiceWrapper (copy), GetFFlagChatTranslationNewDefaults (copy), FFlagRenameVolumeToMainVolume (copy), GetFFlagEnablePartyVoiceVolumeOnlyWhenInEligibleParty (copy), default4 (copy), u24 (ref), v70 (copy), FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast (copy), CorePackages (copy), ContextActionService (copy), v143 (copy), PlayerPermissionsModule (copy), v142 (copy), v141 (copy), SoundService (copy), GetFIntVoiceChatDeviceChangeDebounceDelay (copy), default3 (copy), GetFFlagEnableCrossExpVoice (copy), Signals (copy), GetFIntDebounceAIRephraseSettingDelay (copy), TextChatService (copy), v152 (copy), ThrottleFunctionCall (copy), GetFIntDebounceChatSummariesSettingDelay (copy), v127 (copy), UserGameSettings (copy), GetFFlagVoiceChatUILogging (copy), VideoCaptureService (copy), v126 (copy), v59 (copy), v58 (copy), v52 (copy), GetFIntDebounceDisconnectButtonDelay (copy), FFlagVoiceRewarmTelemetry (copy), Constants2 (copy), v67 (copy), v55 (copy), v66 (copy), v60 (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), GetFFlagEnableVrVoiceConnectDisconnect (copy), GetFFlagEnableVoiceUxUpdates (copy), v53 (copy), observeIsVoiceFocused (copy), FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider (copy), v69 (copy), v73 (copy), VoiceVolumeControlsEligibility (copy), GetFFlagEnableUniveralVoiceToasts (copy), GetFFlagEnableConnectDisconnectInSettingsAndChrome (copy), t5 (copy), GetFFlagSelfViewCameraSettings (copy), isCamEnabledForUserAndPlace (copy), getCamMicPermissions (copy), default (copy), cameraDevicePermissionGrantedSignal (copy), v118 (copy), v71 (copy), v78 (copy), v46 (copy), GetFFlagEnablePlayerNamesEnabledSetting (copy), PlayerChoiceTranslationSettingInitializer (copy), CachedPolicyService (copy), v133 (copy), FFlagBadgeVisibilitySettingEnabled (copy), FFlagEnableModerateChatRemoteEvent (copy), FFlagAIRephraseSettingEnabled (copy), FFlagChatSummariesSettingEnabled (copy), FFlagExpChatEnableFriendsTab (copy), GetHasGuiHidingPermission (copy), FFlagIEMSettingsGroups (copy), renderSettingsHeader (ref), renderSettingsDivider (ref), Migration (copy), BuilderIcons (copy), v144 (copy), GetFFlagEnableLocalesForExperienceLanguageSwitcher (copy), ExperienceLanguageSwitcherInitializer (copy), FFlagIEMFocusNavToButtons (copy), getLastValueChangerFrame (copy), FFlagIEMTabFocusNav (copy), getFirstValueChangerFrame (copy), GetFFlagChatTranslationSettingEnabled (copy), GetFFlagChatTranslationHoldoutEnabled (copy), GetFStringChatTranslationLayerName (copy), EngineFeature (copy), GetFFlagChatTranslationForceSetting (copy), ChatTranslationOptionsWithChatLanguageSwitcherInitializer (copy)
-	if v156 then
+
+local function Initialize()
+	if defineFastFlag26 then
 		GfxReset.RunGfxReset()
 	end
 
-	local v183 = require(RobloxGui.Modules.Settings.SettingsPageFactory):CreateNewPage()
+	local SettingsPageFactory = require(RobloxGui.Modules.Settings.SettingsPageFactory)
+	local newPage = SettingsPageFactory:CreateNewPage()
 
 	if GetFFlagLazyInitiateExperienceLanguageSwitcher() then
-		v183.LanguageSwitcherInitialized = false
+		newPage.LanguageSwitcherInitialized = false
 	end
 
-	local u184 = false
-	local t10 = {}
+	local v14 = false
+	local set = {}
+	local function onVRSettingsReady() -- 2 equivalent calls inferred from this helper
+		local vrEnabled = VRService.VREnabled
 
-	local function onVRSettingsReady() -- line: 486
-		-- upvalues: VRService (copy), t10 (copy)
-		local VREnabled = VRService.VREnabled
-
-		for k, __ in pairs(t10) do
-			k.Visible = not VREnabled
-		end
-	end
-	local function onVREnabled() -- line: 493
-		-- upvalues: VRService (copy), u184 (ref), t10 (copy)
-		if VRService.VREnabled and u184 then
-			local VREnabled = VRService.VREnabled
-
-			for k, __ in pairs(t10) do
-				k.Visible = not VREnabled
-			end
+		for k, v15 in pairs(set) do
+			k.Visible = not vrEnabled
 		end
 	end
 
+	local function onVREnabled() -- 1 equivalent call inferred from this helper
+		if VRService.VREnabled and v14 then
+			onVRSettingsReady() -- inferred equivalent call
+		end
+	end
 	VRService:GetPropertyChangedSignal("VREnabled"):connect(onVREnabled)
+	onVREnabled() -- inferred equivalent call
 
-	if VRService.VREnabled and u184 then
-		local VREnabled = VRService.VREnabled
+	local function createGraphicsOptions()
+		local fullscreenFrame, fullscreenLabel, fullscreenEnabler = Utility:AddNewRow(
+			newPage,
+			"Fullscreen",
+			"Selector",
+			{ "On", "Off" },
+			gameSettings:InFullScreen() and 1 or 2
+		)
+		newPage.FullscreenFrame = fullscreenFrame
+		newPage.FullscreenLabel = fullscreenLabel
+		newPage.FullscreenEnabler = fullscreenEnabler
 
-		for k, __ in pairs(t10) do
-			k.Visible = not VREnabled
-		end
-	end
+		newPage.FullscreenFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FullScreenFrame
 
-	local function createGraphicsOptions() -- line: 505
-		-- upvalues: GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), t10 (copy), GuiService (copy), GetFFlagFixCyclicFullscreenIndexEvent (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy), RbxAnalyticsService (copy), Constants (copy), EngineFeature2 (copy), VRService (copy), v153 (copy), RobloxTranslator (copy), v156 (copy), GfxReset (copy), FastInt (copy), t1 (copy)
-		local n3 = 1
+		set[newPage.FullscreenFrame] = true
 
-		if not GameSettings:InFullScreen() then
-			n3 = 2
-		end
+		newPage.FullscreenEnabler.IndexChanged:connect(function(p)
+			local v15 = gameSettings:InFullScreen()
 
-		local v264 = v183
-		local v265 = v183
-		local v266 = v183
-		local v267, v268, v269 = Utility:AddNewRow(v183, "Fullscreen", "Selector", {
-			"On",
-			"Off"
-		}, n3)
-
-		v264.FullscreenFrame = v267
-		v265.FullscreenLabel = v268
-		v266.FullscreenEnabler = v269
-		v183.FullscreenFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FullScreenFrame
-		t10[v183.FullscreenFrame] = true
-		v183.FullscreenEnabler.IndexChanged:connect(function(p7) -- line: 518
-			-- upvalues: GameSettings (copy), GuiService (copy), GetFFlagFixCyclicFullscreenIndexEvent (copy), v183 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local v775 = GameSettings:InFullScreen()
-
-			if p7 == 1 then
-				if not GameSettings:InFullScreen() then
+			if p == 1 then
+				if not gameSettings:InFullScreen() then
 					GuiService:ToggleFullscreen()
 
 					if GetFFlagFixCyclicFullscreenIndexEvent() then
-						if v183.FullscreenEnabler.GetSelectedIndex() ~= 1 then
-							v183.FullscreenEnabler:SetSelectionIndex(1)
+						if newPage.FullscreenEnabler.GetSelectedIndex() ~= 1 then
+							newPage.FullscreenEnabler:SetSelectionIndex(1)
 						end
 					else
-						v183.FullscreenEnabler:SetSelectionIndex(1)
+						newPage.FullscreenEnabler:SetSelectionIndex(1)
 					end
 				end
-			elseif p7 == 2 and GameSettings:InFullScreen() then
+			elseif p == 2 and gameSettings:InFullScreen() then
 				GuiService:ToggleFullscreen()
 
 				if GetFFlagFixCyclicFullscreenIndexEvent() then
-					if v183.FullscreenEnabler.GetSelectedIndex() ~= 2 then
-						v183.FullscreenEnabler:SetSelectionIndex(2)
+					if newPage.FullscreenEnabler.GetSelectedIndex() ~= 2 then
+						newPage.FullscreenEnabler:SetSelectionIndex(2)
 					end
 				else
-					v183.FullscreenEnabler:SetSelectionIndex(2)
+					newPage.FullscreenEnabler:SetSelectionIndex(2)
 				end
 			end
 
-			spawn(function() -- line: 543
-				-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), v775 (copy), GameSettings (copy), reportSettingsForAnalytics (copy)
+			spawn(function()
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					reportSettingsChangeForAnalytics("fullscreen_enabled", v775, GameSettings:InFullScreen())
+					reportSettingsChangeForAnalytics("fullscreen_enabled", v15, gameSettings:InFullScreen())
 				end
 
 				reportSettingsForAnalytics()
 			end)
 		end)
-		GameSettings.FullscreenChanged:connect(function(p8) -- line: 551
-			-- upvalues: v183 (copy), RbxAnalyticsService (copy), Constants (copy)
-			if p8 then
-				if v183.FullscreenEnabler:GetSelectedIndex() ~= 1 then
-					v183.FullscreenEnabler:SetSelectionIndex(1)
+
+		gameSettings.FullscreenChanged:connect(function(enabled)
+			if enabled then
+				if newPage.FullscreenEnabler:GetSelectedIndex() ~= 1 then
+					newPage.FullscreenEnabler:SetSelectionIndex(1)
 				end
-			elseif v183.FullscreenEnabler:GetSelectedIndex() ~= 2 then
-				v183.FullscreenEnabler:SetSelectionIndex(2)
+			elseif newPage.FullscreenEnabler:GetSelectedIndex() ~= 2 then
+				newPage.FullscreenEnabler:SetSelectionIndex(2)
 			end
 
-			RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsInGameMenuName, Constants.AnalyticsFullscreenModeName, {
-				enabled = p8
-			})
+			RbxAnalyticsService:SetRBXEventStream(
+				Constants.AnalyticsTargetName,
+				Constants.AnalyticsInGameMenuName,
+				Constants.AnalyticsFullscreenModeName,
+				{ enabled = enabled }
+			)
 		end)
 
-		local n4 = 1
+		local graphicsEnablerFrame, graphicsEnablerLabel, graphicsQualityEnabler = Utility:AddNewRow(
+			newPage,
+			"Graphics Mode",
+			"Selector",
+			{ "Automatic", "Manual" },
+			gameSettings.SavedQualityLevel == Enum.SavedQualitySetting.Automatic and 1 or 2
+		)
+		newPage.GraphicsEnablerFrame = graphicsEnablerFrame
+		newPage.GraphicsEnablerLabel = graphicsEnablerLabel
+		newPage.GraphicsQualityEnabler = graphicsQualityEnabler
 
-		if GameSettings.SavedQualityLevel ~= Enum.SavedQualitySetting.Automatic then
-			n4 = 2
-		end
+		newPage.GraphicsEnablerFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.GraphicsEnablerFrame
 
-		local v271 = v183
-		local v272 = v183
-		local v273 = v183
-		local v274, v275, v276 = Utility:AddNewRow(v183, "Graphics Mode", "Selector", {
-			"Automatic",
-			"Manual"
-		}, n4)
+		local graphicsQualityFrame, graphicsQualityLabel, graphicsQualitySlider = Utility:AddNewRow(
+			newPage,
+			"Graphics Quality",
+			"Slider",
+			10,
+			1
+		)
+		newPage.GraphicsQualityFrame = graphicsQualityFrame
+		newPage.GraphicsQualityLabel = graphicsQualityLabel
+		newPage.GraphicsQualitySlider = graphicsQualitySlider
 
-		v271.GraphicsEnablerFrame = v274
-		v272.GraphicsEnablerLabel = v275
-		v273.GraphicsQualityEnabler = v276
-		v183.GraphicsEnablerFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.GraphicsEnablerFrame
+		newPage.GraphicsQualityFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.GraphicsQualityFrame
+		newPage.GraphicsQualitySlider:SetMinStep(1)
 
-		local v277 = v183
-		local v278 = v183
-		local v279 = v183
-		local v280, v281, v282 = Utility:AddNewRow(v183, "Graphics Quality", "Slider", 10, 1)
+		if engineFeature2 and not VRService.VREnabled then
+			local v15 = Constants.FramerateCaps
 
-		v277.GraphicsQualityFrame = v280
-		v278.GraphicsQualityLabel = v281
-		v279.GraphicsQualitySlider = v282
-		v183.GraphicsQualityFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.GraphicsQualityFrame
-		v183.GraphicsQualitySlider:SetMinStep(1)
-
-		if EngineFeature2 and not VRService.VREnabled then
-			local v283 = table.clone(Constants.FramerateCaps)
-			local t11 = { if not v153 then RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.FramerateCapDefaultEntry", {
-				Frames = GameSettings:GetDefaultFramerateCap()
-			}) else RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.Default") }
-
-			for __, v286 in v283 do
-				table.insert(t11, RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.FramerateEntry", {
-					Frames = v286
-				}))
+			if defineFastFlag15 and platform == Enum.Platform.IOS then
+				v15 = Constants.FramerateCapsIOS
 			end
 
-			table.insert(v283, 1, -1)
-			task.defer(function() -- line: 617
-				-- upvalues: v183 (copy), Utility (copy), RobloxTranslator (copy), t11 (copy), v283 (copy), GameSettings (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-				local v777 = v183
-				local v778 = v183
-				local v779 = v183
-				local v780, v781, v782 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MaximumFramerate"), "DropDown", t11, table.find(v283, GameSettings.FramerateCap), nil, RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MaximumFramerate.Description"))
+			local clone = table.clone(v15)
+			local v16 = { nil }
+			local v17
 
-				v777.FramerateCapFrame = v780
-				v778.FramerateCapLabel = v781
-				v779.FramerateCapMode = v782
-				v183.FramerateCapFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FramerateCap
-				v183.FramerateCapMode.IndexChanged:Connect(function(p9) -- line: 629
-					-- upvalues: GameSettings (copy), v283 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-					local FramerateCap = GameSettings.FramerateCap
+			if defineFastFlag25 then
+				v17 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.Default")
+			else
+				v17 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.FramerateCapDefaultEntry", {
+					Frames = gameSettings:GetDefaultFramerateCap()
+				})
+			end
 
-					GameSettings.FramerateCap = v283[p9]
+			v16[1] = v17
+
+			for k, frames in clone do
+				table.insert(
+					v16,
+					RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.FramerateEntry", {
+						Frames = frames
+					})
+				)
+			end
+
+			table.insert(clone, 1, -1)
+
+			task.defer(function()
+				local formatByKey6 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MaximumFramerate")
+				local v18
+
+				if defineFastFlag15 then
+					v18 = table.find(clone, gameSettings.FramerateCap) or 1
+				else
+					v18 = table.find(clone, gameSettings.FramerateCap)
+				end
+
+				local framerateCapFrame, framerateCapLabel, framerateCapMode = Utility:AddNewRow(
+					newPage,
+					formatByKey6,
+					"DropDown",
+					v16,
+					v18,
+					nil,
+					RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MaximumFramerate.Description")
+				)
+				newPage.FramerateCapFrame = framerateCapFrame
+				newPage.FramerateCapLabel = framerateCapLabel
+				newPage.FramerateCapMode = framerateCapMode
+
+				newPage.FramerateCapFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FramerateCap
+
+				newPage.FramerateCapMode.IndexChanged:Connect(function(p)
+					local framerateCap = gameSettings.FramerateCap
+					gameSettings.FramerateCap = clone[p]
 
 					if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-						reportSettingsChangeForAnalytics("framerate_cap", FramerateCap, GameSettings.FramerateCap)
+						reportSettingsChangeForAnalytics("framerate_cap", framerateCap, gameSettings.FramerateCap)
 					end
 
 					reportSettingsForAnalytics()
@@ -554,1099 +642,1330 @@ local function Initialize() -- line: 473
 			end)
 		end
 
-		settings().Rendering.EnableFRM = true
+		local settings_2 = settings()
+		settings_2.Rendering.EnableFRM = true
+		local v15
 
-		function SetGraphicsQuality(p10, p11) -- line: 647
-			-- upvalues: v156 (copy), GfxReset (copy), GameSettings (copy)
-			if v156 then
-				local v785, v786 = GfxReset.TemporaryOverride(p10)
-
-				if v785 then
-					settings().Rendering.QualityLevel = v786
-
-					return
-				end
-			end
-
-			local v787 = p10 / 10
-			local v788 = math.floor((settings().Rendering:GetMaxQualityLevel() - 1) * v787)
-
-			if v788 == 20 then
-				v788 = 21
-			elseif p10 == 1 then
-				v788 = 1
-			elseif p10 < 1 and not p11 then
-				p10 = 1
-				v788 = 1
-			elseif v788 > settings().Rendering:GetMaxQualityLevel() then
-				v788 = settings().Rendering:GetMaxQualityLevel() - 1
-			end
-
-			GameSettings.SavedQualityLevel = p10
-			settings().Rendering.QualityLevel = v788
+		if defineFastFlag7 then
+			v15 = SavedQualityFollower.new(newPage.GraphicsQualityEnabler, newPage.GraphicsQualitySlider)
+		else
+			v15 = nil
 		end
 
-		local function setGraphicsToAuto() -- line: 673
-			-- upvalues: v183 (copy)
-			v183.GraphicsQualitySlider:SetZIndex(1)
-			v183.GraphicsQualityLabel.ZIndex = 1
-			v183.GraphicsQualitySlider:SetInteractable(false)
-			SetGraphicsQuality(Enum.QualityLevel.Automatic.Value, true)
-		end
-		local function setGraphicsToManual(p12) -- line: 681
-			-- upvalues: v183 (copy)
-			v183.GraphicsQualitySlider:SetZIndex(2)
-			v183.GraphicsQualityLabel.ZIndex = 2
-			v183.GraphicsQualitySlider:SetInteractable(true)
-
-			if p12 == v183.GraphicsQualitySlider:GetValue() then
-				SetGraphicsQuality(p12)
-
+		function SetGraphicsQuality(savedQualityLevel, p)
+			if defineFastFlag7 and v15:isShowing() then
 				return
 			end
 
-			v183.GraphicsQualitySlider:SetValue(p12)
+			if defineFastFlag26 then
+				local temporaryOverride, qualityLevel = GfxReset.TemporaryOverride(savedQualityLevel)
+
+				if temporaryOverride then
+					local settings = settings()
+					settings.Rendering.QualityLevel = qualityLevel
+					return
+				end
+			end
+
+			local v16 = savedQualityLevel / 10
+			local qualityLevel = math.floor((settings().Rendering:GetMaxQualityLevel() - 1) * v16)
+
+			if qualityLevel == 20 then
+				qualityLevel = 21
+			elseif savedQualityLevel == 1 then
+				qualityLevel = 1
+			elseif savedQualityLevel < 1 and not p then
+				savedQualityLevel = 1
+				qualityLevel = 1
+			elseif settings().Rendering:GetMaxQualityLevel() < qualityLevel then
+				qualityLevel = settings().Rendering:GetMaxQualityLevel() - 1
+			end
+
+			gameSettings.SavedQualityLevel = savedQualityLevel
+			local settings = settings()
+			settings.Rendering.QualityLevel = qualityLevel
 		end
 
-		local u289 = false
+		local function setGraphicsToAuto() -- 3 equivalent calls inferred from this helper
+			newPage.GraphicsQualitySlider:SetZIndex(1)
+			newPage.GraphicsQualityLabel.ZIndex = 1
+			newPage.GraphicsQualitySlider:SetInteractable(false)
 
-		v183.GraphicsQualitySlider.ValueChanged:connect(function(p13) -- line: 695
-			-- upvalues: u289 (ref), reportSettingsForAnalytics (copy)
-			SetGraphicsQuality(p13)
+			SetGraphicsQuality(Enum.QualityLevel.Automatic.Value, true)
+		end
 
-			if u289 == true then
+		local function setGraphicsToManual(p)
+			newPage.GraphicsQualitySlider:SetZIndex(2)
+			newPage.GraphicsQualityLabel.ZIndex = 2
+			newPage.GraphicsQualitySlider:SetInteractable(true)
+
+			if newPage.GraphicsQualitySlider:GetValue() == p then
+				SetGraphicsQuality(p)
+			else
+				newPage.GraphicsQualitySlider:SetValue(p)
+			end
+		end
+
+		local v16 = false
+		newPage.GraphicsQualitySlider.ValueChanged:connect(function(p)
+			SetGraphicsQuality(p)
+
+			if v16 == true and not (defineFastFlag7 and v15:isShowing()) then
 				reportSettingsForAnalytics()
 			end
 
-			u289 = true
+			v16 = true
 		end)
-		v183.GraphicsQualityEnabler.IndexChanged:connect(function(p14) -- line: 703
-			-- upvalues: v183 (copy), setGraphicsToManual (copy), reportSettingsForAnalytics (copy), reportSettingsChangeForAnalytics (copy)
-			local t12 = {
-				Automatic = {
-					Name = "Automatic",
-					Value = 1
-				},
-				Manual = {
-					Name = "Manual",
-					Value = 2
-				}
+
+		newPage.GraphicsQualityEnabler.IndexChanged:connect(function(p)
+			local v17 = {
+				Automatic = { Name = "Automatic", Value = 1 },
+				Manual = { Name = "Manual", Value = 2 }
 			}
-			local AutomaticName = t12.Automatic.Name
-			local ManualName = t12.Manual.Name
 
-			if p14 == t12.Automatic.Value then
-				AutomaticName = t12.Manual.Name
-				ManualName = t12.Automatic.Name
-				v183.GraphicsQualitySlider:SetZIndex(1)
-				v183.GraphicsQualityLabel.ZIndex = 1
-				v183.GraphicsQualitySlider:SetInteractable(false)
-				SetGraphicsQuality(Enum.QualityLevel.Automatic.Value, true)
-			elseif p14 == t12.Manual.Value then
-				setGraphicsToManual(v183.GraphicsQualitySlider:GetValue())
+			local name = v17.Automatic.Name
+			local name2 = v17.Manual.Name
+
+			if p == v17.Automatic.Value then
+				name = v17.Manual.Name
+				name2 = v17.Automatic.Name
+				setGraphicsToAuto() -- inferred equivalent call
+			elseif p == v17.Manual.Value then
+				setGraphicsToManual(newPage.GraphicsQualitySlider:GetValue())
 			end
 
-			reportSettingsForAnalytics()
-			reportSettingsChangeForAnalytics("gfx_mode", AutomaticName, ManualName)
-		end)
-		game.GraphicsQualityChangeRequest:Connect(function(p15) -- line: 721
-			-- upvalues: GameSettings (copy), v183 (copy)
-			if GameSettings.SavedQualityLevel ~= Enum.SavedQualitySetting.Automatic then
-				local Value = v183.GraphicsQualitySlider:GetValue()
-				local v797 = if not p15 then Value - 1 else Value + 1
-
-				v183.GraphicsQualitySlider:SetValue(v797)
+			if not (defineFastFlag7 and v15:isShowing()) then
+				reportSettingsForAnalytics()
+				reportSettingsChangeForAnalytics("gfx_mode", name, name2)
 			end
 		end)
 
-		if FastInt >= 0 then
-			if FastInt == 0 then
-				v183.GraphicsQualityEnabler:SetSelectionIndex(1)
-				v183.GraphicsQualitySlider:SetZIndex(1)
-				v183.GraphicsQualityLabel.ZIndex = 1
-				v183.GraphicsQualitySlider:SetInteractable(false)
-				SetGraphicsQuality(Enum.QualityLevel.Automatic.Value, true)
+		game.GraphicsQualityChangeRequest:Connect(function(p)
+			if gameSettings.SavedQualityLevel ~= Enum.SavedQualitySetting.Automatic then
+				local value = newPage.GraphicsQualitySlider:GetValue()
+				local v17
+
+				if p then
+					v17 = value + 1
+				else
+					v17 = value - 1
+				end
+
+				newPage.GraphicsQualitySlider:SetValue(v17)
+			end
+		end)
+
+		if fastInt >= 0 then
+			if fastInt == 0 then
+				newPage.GraphicsQualityEnabler:SetSelectionIndex(1)
+				setGraphicsToAuto() -- inferred equivalent call
 			else
-				v183.GraphicsQualityEnabler:SetSelectionIndex(2)
-				setGraphicsToManual(FastInt)
+				newPage.GraphicsQualityEnabler:SetSelectionIndex(2)
+				setGraphicsToManual(fastInt)
 			end
-		elseif GameSettings.SavedQualityLevel == Enum.SavedQualitySetting.Automatic then
-			v183.GraphicsQualitySlider:SetValue(5)
-			v183.GraphicsQualitySlider:SetZIndex(1)
-			v183.GraphicsQualityLabel.ZIndex = 1
-			v183.GraphicsQualitySlider:SetInteractable(false)
-			SetGraphicsQuality(Enum.QualityLevel.Automatic.Value, true)
+		elseif gameSettings.SavedQualityLevel == Enum.SavedQualitySetting.Automatic then
+			newPage.GraphicsQualitySlider:SetValue(5)
+			setGraphicsToAuto() -- inferred equivalent call
 		else
-			local str = tostring(GameSettings.SavedQualityLevel)
-			local u291 = not t1[str] and 10 or t1[str]
+			local savedQualityLevel = tostring(gameSettings.SavedQualityLevel)
+			local v17 = not v3[savedQualityLevel] and 10 or v3[savedQualityLevel]
 
-			SetGraphicsQuality(u291)
-			spawn(function() -- line: 754
-				-- upvalues: v183 (copy), u291 (ref)
-				v183.GraphicsQualitySlider:SetValue(u291)
+			SetGraphicsQuality(v17)
+			spawn(function()
+				newPage.GraphicsQualitySlider:SetValue(v17)
+			end)
+		end
+
+		if defineFastFlag7 then
+			gameSettings:GetPropertyChangedSignal("SavedQualityLevel"):Connect(function()
+				v15:show(gameSettings.SavedQualityLevel)
 			end)
 		end
 	end
-	local function createReducedMotionOptions() -- line: 760
-		-- upvalues: GameSettings (copy), RobloxTranslator (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local n5 = 2
 
-		if GameSettings.ReducedMotion then
-			n5 = 1
-		end
+	local function createReducedMotionOptions()
+		local v15 = gameSettings.ReducedMotion and 1 or 2
 
-		local v293 = RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.ReducedMotion")
-		local v294 = RobloxTranslator:FormatByKey("Feature.Accessibility.Description.ReducedMotion")
-		local v295 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
-		local v296 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
-		local v297 = v183
-		local v298 = v183
-		local v299 = v183
-		local v300, v301, v302 = Utility:AddNewRow(v183, v293, "Selector", {
-			v295,
-			v296
-		}, n5, nil, v294)
+		local formatByKey6 = RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.ReducedMotion")
+		local formatByKey7 = RobloxTranslator:FormatByKey("Feature.Accessibility.Description.ReducedMotion")
+		local reducedMotionFrame, reducedMotionLabel, reducedMotionMode = Utility:AddNewRow(
+			newPage,
+			formatByKey6,
+			"Selector",
+			{
+				RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On"),
+				(RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off"))
+			},
+			v15,
+			nil,
+			formatByKey7
+		)
+		newPage.ReducedMotionFrame = reducedMotionFrame
+		newPage.ReducedMotionLabel = reducedMotionLabel
+		newPage.ReducedMotionMode = reducedMotionMode
 
-		v297.ReducedMotionFrame = v300
-		v298.ReducedMotionLabel = v301
-		v299.ReducedMotionMode = v302
-		v183.ReducedMotionFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ReducedMotionFrame
-		v183.ReducedMotionMode.IndexChanged:connect(function(p16) -- line: 782
-			-- upvalues: GameSettings (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local ReducedMotion = GameSettings.ReducedMotion
+		newPage.ReducedMotionFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ReducedMotionFrame
 
-			GameSettings.ReducedMotion = p16 == 1
+		newPage.ReducedMotionMode.IndexChanged:connect(function(p)
+			local reducedMotion = gameSettings.ReducedMotion
+			gameSettings.ReducedMotion = p == 1
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("reduced_motion", ReducedMotion, GameSettings.ReducedMotion)
+				reportSettingsChangeForAnalytics("reduced_motion", reducedMotion, gameSettings.ReducedMotion)
 			end
 
 			reportSettingsForAnalytics()
 		end)
 	end
-	local function createPlayerNamesEnabledOptions() -- line: 793
-		-- upvalues: v151 (copy), RobloxTranslator (copy), FFlagUpdatePeopleNamesSettingCopy (copy), GameSettings (copy), t7 (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local v303 = if not v151 then if not FFlagUpdatePeopleNamesSettingCopy then RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PlayerNames") else RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PeopleNames") else RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PeoplesNames")
-		local v304 = if not FFlagUpdatePeopleNamesSettingCopy then nil else RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PeopleNames.Description")
 
-		local function GetPlayerNamesEnabledStartIndex() -- line: 801
-			-- upvalues: GameSettings (copy)
-			if GameSettings.PlayerNamesEnabled then
-				return 1
-			end
+	local function createPlayerNamesEnabledOptions()
+		local v15
 
-			return 2
+		if defineFastFlag23 then
+			v15 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PeoplesNames")
+		elseif FFlagUpdatePeopleNamesSettingCopy then
+			v15 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PeopleNames")
+		else
+			v15 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PlayerNames")
 		end
 
-		local v306 = if not GameSettings.PlayerNamesEnabled then t7.Off else t7.On
-		local v307 = if not v151 then RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On") else RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Show")
-		local v308 = if not v151 then RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off") else RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Hide")
-		local v309 = v183
-		local v310 = v183
-		local v311 = v183
-		local v312, v313, v314 = Utility:AddNewRow(v183, v303, "Selector", {
-			v307,
-			v308
-		}, v306, nil, v304)
+		local v16
 
-		v309.PlayerNamesEnabledFrame = v312
-		v310.playerNamesEnabledLabel = v313
-		v311.playerNamesEnabledMode = v314
-		v183.PlayerNamesEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PlayerNamesEnabledFrame
-		v183.playerNamesEnabledMode.IndexChanged:connect(function(p17) -- line: 820
-			-- upvalues: GameSettings (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local PlayerNamesEnabled = GameSettings.PlayerNamesEnabled
-
-			GameSettings.PlayerNamesEnabled = p17 == 1
-			reportSettingsChangeForAnalytics("player_names_enabled", PlayerNamesEnabled, GameSettings.PlayerNamesEnabled)
-			reportSettingsForAnalytics()
-		end)
-	end
-	local function createPreferredTransparencyOptions() -- line: 829
-		-- upvalues: GameSettings (copy), RobloxTranslator (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local v315 = 10 - math.clamp(math.floor(GameSettings.PreferredTransparency * 10 + 0.5), 0, 10)
-		local v316 = RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.PreferredTransparency")
-		local v317 = RobloxTranslator:FormatByKey("Feature.Accessibility.Description.PreferredTransparency")
-		local v318 = RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTransparency.Transparent")
-		local v319 = RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTransparency.Opaque")
-		local v320 = v183
-		local v321 = v183
-		local v322 = v183
-		local v323, v324, v325 = Utility:AddNewRow(v183, v316, "Slider", 10, v315, nil, v317, v318, v319)
-
-		v320.PreferredTransparencyFrame = v323
-		v321.PreferredTransparencyLabel = v324
-		v322.PreferredTransparencySlider = v325
-		v183.PreferredTransparencyFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PreferredTransparencyFrame
-		v183.PreferredTransparencySlider.ValueChanged:connect(function(p18) -- line: 855
-			-- upvalues: GameSettings (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local v803 = (10 - math.clamp(math.floor(p18), 0, 10)) / 10
-			local PreferredTransparency = GameSettings.PreferredTransparency
-
-			GameSettings.PreferredTransparency = v803
-
-			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("preferred_transparency", PreferredTransparency, GameSettings.PreferredTransparency)
-			end
-
-			reportSettingsForAnalytics()
-		end)
-	end
-	local function createPreferredTextSizeOptions() -- line: 867
-		-- upvalues: GameSettings (copy), RobloxTranslator (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local EnumItems = Enum.PreferredTextSize:GetEnumItems()
-		local v327 = GameSettings.PreferredTextSize.Value - 1
-		local v328 = RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.PreferredTextSize")
-		local v329 = RobloxTranslator:FormatByKey("Feature.Accessibility.Description.PreferredTextSize")
-		local v330 = RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTextSize.Default")
-		local v331 = RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTextSize.Largest")
-		local v332 = v183
-		local v333 = v183
-		local v334 = v183
-		local v335, v336, v337 = Utility:AddNewRow(v183, v328, "Slider", 3, v327, nil, v329, v330, v331)
-
-		v332.PreferredTextSizeFrame = v335
-		v333.PreferredTextSizeLabel = v336
-		v334.PreferredTextSizeSlider = v337
-		v183.PreferredTextSizeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PreferredTextSizeFrame
-		v183.PreferredTextSizeSlider.ValueChanged:connect(function(p19) -- line: 892
-			-- upvalues: GameSettings (copy), EnumItems (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local PreferredTextSize = GameSettings.PreferredTextSize
-
-			GameSettings.PreferredTextSize = EnumItems[p19 + 1]
-
-			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("preferred_text_size", PreferredTextSize, GameSettings.PreferredTextSize)
-			end
-
-			reportSettingsForAnalytics()
-		end)
-	end
-	local function createUiNavigationKeyBindOptions() -- line: 902
-		-- upvalues: GameSettings (copy), RobloxTranslator (copy), UserInputService (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local t13 = {
-			On = 1,
-			Off = 2
-		}
-		local Off = t13.Off
-
-		if GameSettings.UiNavigationKeyBindEnabled then
-			Off = t13.On
+		if FFlagUpdatePeopleNamesSettingCopy then
+			v16 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.PeopleNames.Description")
 		end
 
-		local v340 = RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.UiNavigationKeyBind")
-		local v341 = RobloxTranslator:FormatByKey("Feature.Accessibility.Description.UiNavigationKeyBind", {
+		local function GetPlayerNamesEnabledStartIndex(): number
+			return if gameSettings.PlayerNamesEnabled then 1 else 2
+		end
+
+		local v17
+
+		if gameSettings.PlayerNamesEnabled then
+			v17 = v9.On
+		else
+			v17 = v9.Off
+		end
+
+		local v18
+
+		if defineFastFlag23 then
+			v18 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Show")
+		else
+			v18 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
+		end
+
+		local v19
+
+		if defineFastFlag23 then
+			v19 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Hide")
+		else
+			v19 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
+		end
+
+		local playerNamesEnabledFrame, playerNamesEnabledLabel, playerNamesEnabledMode = Utility:AddNewRow(
+			newPage,
+			v15,
+			"Selector",
+			{ v18, v19 },
+			v17,
+			nil,
+			v16
+		)
+		newPage.PlayerNamesEnabledFrame = playerNamesEnabledFrame
+		newPage.playerNamesEnabledLabel = playerNamesEnabledLabel
+		newPage.playerNamesEnabledMode = playerNamesEnabledMode
+
+		newPage.PlayerNamesEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PlayerNamesEnabledFrame
+
+		newPage.playerNamesEnabledMode.IndexChanged:connect(function(p)
+			local playerNamesEnabled = gameSettings.PlayerNamesEnabled
+			gameSettings.PlayerNamesEnabled = p == 1
+
+			reportSettingsChangeForAnalytics(
+				"player_names_enabled",
+				playerNamesEnabled,
+				gameSettings.PlayerNamesEnabled
+			)
+			reportSettingsForAnalytics()
+		end)
+	end
+
+	local function createPreferredTransparencyOptions()
+		local v15 = 10 - math.clamp(math.floor(gameSettings.PreferredTransparency * 10 + 0.5), 0, 10)
+
+		local preferredTransparencyFrame, preferredTransparencyLabel, preferredTransparencySlider = Utility:AddNewRow(
+			newPage,
+			RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.PreferredTransparency"),
+			"Slider",
+			10,
+			v15,
+			nil,
+			RobloxTranslator:FormatByKey("Feature.Accessibility.Description.PreferredTransparency"),
+			RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTransparency.Transparent"),
+			(RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTransparency.Opaque"))
+		)
+		newPage.PreferredTransparencyFrame = preferredTransparencyFrame
+		newPage.PreferredTransparencyLabel = preferredTransparencyLabel
+		newPage.PreferredTransparencySlider = preferredTransparencySlider
+
+		newPage.PreferredTransparencyFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PreferredTransparencyFrame
+
+		newPage.PreferredTransparencySlider.ValueChanged:connect(function(p)
+			local preferredTransparency2 = (10 - math.clamp(math.floor(p), 0, 10)) / 10
+			local preferredTransparency = gameSettings.PreferredTransparency
+			gameSettings.PreferredTransparency = preferredTransparency2
+
+			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
+				reportSettingsChangeForAnalytics(
+					"preferred_transparency",
+					preferredTransparency,
+					gameSettings.PreferredTransparency
+				)
+			end
+
+			reportSettingsForAnalytics()
+		end)
+	end
+
+	local function createPreferredTextSizeOptions()
+		local enumItems = Enum.PreferredTextSize:GetEnumItems()
+		local v15 = gameSettings.PreferredTextSize.Value - 1
+
+		local preferredTextSizeFrame, preferredTextSizeLabel, preferredTextSizeSlider = Utility:AddNewRow(
+			newPage,
+			RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.PreferredTextSize"),
+			"Slider",
+			3,
+			v15,
+			nil,
+			RobloxTranslator:FormatByKey("Feature.Accessibility.Description.PreferredTextSize"),
+			RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTextSize.Default"),
+			(RobloxTranslator:FormatByKey("Feature.Accessibility.PreferredTextSize.Largest"))
+		)
+		newPage.PreferredTextSizeFrame = preferredTextSizeFrame
+		newPage.PreferredTextSizeLabel = preferredTextSizeLabel
+		newPage.PreferredTextSizeSlider = preferredTextSizeSlider
+
+		newPage.PreferredTextSizeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PreferredTextSizeFrame
+
+		newPage.PreferredTextSizeSlider.ValueChanged:connect(function(p)
+			local preferredTextSize = gameSettings.PreferredTextSize
+			gameSettings.PreferredTextSize = enumItems[p + 1]
+
+			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
+				reportSettingsChangeForAnalytics(
+					"preferred_text_size",
+					preferredTextSize,
+					gameSettings.PreferredTextSize
+				)
+			end
+
+			reportSettingsForAnalytics()
+		end)
+	end
+
+	local v15 = nil
+	local v16 = nil
+
+	local function createUIScaleOptionsImpl()
+		local autoUIScaleHundredths = GuiService:GetAutoUIScaleHundredths()
+		local rawScreenScale = GuiService:GetRawScreenScale()
+		local currentCamera = workspace.CurrentCamera
+
+		if not currentCamera then
+			return
+		end
+
+		local v17 = currentCamera.ViewportSize.Y * rawScreenScale * GuiService:GetEffectiveUIScaleHundredths() / 100
+
+		local v18 = math.ceil(100 / rawScreenScale / 25) * 25
+		local v19 = math.floor(v17 / (540 * rawScreenScale) * 4) / 4 * 100
+		local v20 = math.round((v19 - v18) / 25)
+
+		if v20 <= 0 then
+			v15 = nil
+			v16 = nil
+
+			if newPage.UIScaleModeFrame then
+				newPage.UIScaleModeFrame:Destroy()
+				newPage.UIScaleModeFrame = nil
+			end
+
+			if newPage.UIScaleFrame then
+				newPage.UIScaleFrame:Destroy()
+				newPage.UIScaleFrame = nil
+			end
+		else
+			if newPage.UIScaleModeFrame and v18 == v15 and v19 == v16 then
+				return
+			end
+
+			v15 = v18
+			v16 = v19
+
+			if newPage.UIScaleModeFrame then
+				newPage.UIScaleModeFrame:Destroy()
+				newPage.UIScaleModeFrame = nil
+			end
+
+			if newPage.UIScaleFrame then
+				newPage.UIScaleFrame:Destroy()
+				newPage.UIScaleFrame = nil
+			end
+
+			local function indexToHundredths(p) -- 2 equivalent calls inferred from this helper
+				return v18 + p * 25
+			end
+			local function hundredthsToIndex(p) -- 2 equivalent calls inferred from this helper
+				return (math.clamp(math.round((p - v18) / 25), 0, v20))
+			end
+
+			local uiScaleMultiplierHundredths = UserGameSettings.UIScaleMultiplierHundredths
+			local visible = uiScaleMultiplierHundredths ~= 0
+			local v21 = not visible and 0 or hundredthsToIndex(uiScaleMultiplierHundredths) -- inferred equivalent call
+			local v22 = {
+				modeTitle = "CoreScripts.InGameMenu.GameSettings.UIScaleMode",
+				modeAuto = "CoreScripts.InGameMenu.GameSettings.UIScaleModeAuto",
+				modeManual = "CoreScripts.InGameMenu.GameSettings.UIScaleModeManual",
+				sliderTitle = "CoreScripts.InGameMenu.GameSettings.UIScale",
+				smallest = "CoreScripts.InGameMenu.GameSettings.UIScaleSmallest",
+				largest = "CoreScripts.InGameMenu.GameSettings.UIScaleLargest"
+			}
+
+			local uiScaleModeFrame, uiScaleModeLabel, uiScaleModeSelector = Utility:AddNewRow(
+				newPage,
+				localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleMode"),
+				"Selector",
+				{
+					localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleModeAuto"),
+					localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleModeManual")
+				},
+				visible and 2 or 1
+			)
+			newPage.UIScaleModeFrame = uiScaleModeFrame
+			newPage.UIScaleModeLabel = uiScaleModeLabel
+			newPage.UIScaleModeSelector = uiScaleModeSelector
+
+			newPage.UIScaleModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UIScaleModeFrame
+
+			local uiScaleFrame, uiScaleLabel, uiScaleSlider = Utility:AddNewRow(
+				newPage,
+				localization:Format("CoreScripts.InGameMenu.GameSettings.UIScale"),
+				"Slider",
+				v20,
+				v21,
+				nil,
+				nil,
+				localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleSmallest"),
+				localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleLargest")
+			)
+			newPage.UIScaleFrame = uiScaleFrame
+			newPage.UIScaleLabel = uiScaleLabel
+			newPage.UIScaleSlider = uiScaleSlider
+
+			newPage.UIScaleFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UIScaleFrame
+			newPage.UIScaleFrame.Visible = visible
+
+			newPage.UIScaleModeSelector.IndexChanged:connect(function(p)
+				local visible2 = p == 2
+				newPage.UIScaleFrame.Visible = visible2
+
+				if visible2 then
+					local v23 = math.clamp(math.round(autoUIScaleHundredths / 25) * 25, v18, indexToHundredths(v20)) -- inferred equivalent call
+
+					newPage.UIScaleSlider:SetValue(hundredthsToIndex(v23)) -- inferred equivalent call
+					GuiService:SetUIScaleMultiplier(v23)
+					reportSettingsChangeForAnalytics("ui_scale_mode", "auto", "manual")
+				else
+					GuiService:SetUIScaleMultiplier(0)
+					reportSettingsChangeForAnalytics("ui_scale_mode", "manual", "auto")
+				end
+
+				reportSettingsForAnalytics()
+			end)
+
+			newPage.UIScaleSlider.ValueChanged:connect(function(p)
+				local uiScaleMultiplierHundredths2 = UserGameSettings.UIScaleMultiplierHundredths
+				local v23 = indexToHundredths(p) -- inferred equivalent call
+				GuiService:SetUIScaleMultiplier(v23)
+				reportSettingsChangeForAnalytics("ui_scale_value", uiScaleMultiplierHundredths2, v23)
+				reportSettingsForAnalytics()
+			end)
+		end
+	end
+
+	local function createUIScaleOptions() -- 3 equivalent calls inferred from this helper
+		local success, result = pcall(createUIScaleOptionsImpl)
+
+		if not success then
+			warn("createUIScaleOptions failed: " .. tostring(result))
+		end
+	end
+
+	local v17 = nil
+	local flag = false
+
+	local function getUIScaleModeIndex(p): number -- 2 equivalent calls inferred from this helper
+		return if p.savedHundredths == 0 then 1 else 2
+	end
+
+	local function refreshUIScaleRows()
+		local v18 = UIScaleOptions.get(GuiService)
+
+		if not (newPage.UIScaleModeFrame and v18) or v17 and UIScaleOptions.equal(v18, v17) then
+			return
+		end
+
+		v17 = v18
+		local uiScaleModeIndex = getUIScaleModeIndex(v18) -- inferred equivalent call
+		local visible = uiScaleModeIndex == 2
+		local selectedIndex = v18.selectedIndex
+		flag = true
+		newPage.UIScaleFrame.Visible = visible
+
+		if newPage.UIScaleModeSelector:GetSelectedIndex() ~= uiScaleModeIndex then
+			newPage.UIScaleModeSelector:SetSelectionIndex(uiScaleModeIndex)
+		end
+
+		newPage.UIScaleSlider:SetEnabledSteps(v18.enabled)
+		newPage.UIScaleSlider:SetValue(selectedIndex)
+		flag = false
+	end
+
+	local function onUIScaleModeChanged(p)
+		if flag or p ~= newPage.UIScaleModeSelector:GetSelectedIndex() then
+			return
+		end
+
+		local v18 = p == 2
+		local v19 = UIScaleOptions.get(GuiService)
+		local v20
+
+		if v19 then
+			v20 = UIScaleOptions.valueForMode(v19, v18)
+		end
+
+		if v20 == nil then
+			return
+		end
+
+		GuiService:SetUIScaleMultiplier(v20)
+		reportSettingsChangeForAnalytics("ui_scale_mode", v18 and "auto" or "manual", v18 and "manual" or "auto")
+
+		refreshUIScaleRows()
+	end
+
+	local function onUIScaleSliderChanged(p)
+		if flag then
+			return
+		end
+
+		local v18 = UIScaleOptions.get(GuiService)
+
+		if not v18 then
+			return
+		end
+
+		local valueFromSlider = UIScaleOptions.valueFromSlider(p, newPage.UIScaleSlider:GetValue(), v17, v18)
+
+		if valueFromSlider then
+			GuiService:SetUIScaleMultiplier(valueFromSlider)
+			reportSettingsChangeForAnalytics("ui_scale_value", v18.savedHundredths, valueFromSlider)
+		end
+
+		refreshUIScaleRows()
+	end
+
+	local function createUIScaleRows()
+		local v18 = UIScaleOptions.get(GuiService)
+
+		if not v18 then
+			return
+		end
+
+		local uiScaleModeFrame, uiScaleModeLabel, uiScaleModeSelector = Utility:AddNewRow(
+			newPage,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleMode"),
+			"Selector",
+			{
+				localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleModeAuto"),
+				localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleModeManual")
+			},
+			getUIScaleModeIndex(v18), -- inferred equivalent call
+			nil,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleModeDescription")
+		)
+		newPage.UIScaleModeFrame = uiScaleModeFrame
+		newPage.UIScaleModeLabel = uiScaleModeLabel
+		newPage.UIScaleModeSelector = uiScaleModeSelector
+
+		newPage.UIScaleModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UIScaleEngineModeFrame
+		local uiScaleFrame, uiScaleLabel, uiScaleSlider = Utility:AddNewRow(
+			newPage,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.UIScale"),
+			"Slider",
+			#v18.values,
+			v18.selectedIndex,
+			nil,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleDescription"),
+			localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleSmallest"),
+			localization:Format("CoreScripts.InGameMenu.GameSettings.UIScaleLargest")
+		)
+		newPage.UIScaleFrame = uiScaleFrame
+		newPage.UIScaleLabel = uiScaleLabel
+		newPage.UIScaleSlider = uiScaleSlider
+
+		newPage.UIScaleFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UIScaleEngineFrame
+		newPage.UIScaleSlider:SetMinStep(1)
+
+		newPage.UIScaleModeSelector.IndexChanged:Connect(onUIScaleModeChanged)
+		newPage.UIScaleSlider.ValueChanged:connect(onUIScaleSliderChanged)
+
+		refreshUIScaleRows()
+	end
+
+	local function createUiNavigationKeyBindOptions()
+		local v18 = { On = 1, Off = 2 }
+
+		local v19 = gameSettings.UiNavigationKeyBindEnabled and 1 or 2
+
+		local formatByKey6 = RobloxTranslator:FormatByKey("Feature.Accessibility.Heading.UiNavigationKeyBind")
+
+		local formatByKey7 = RobloxTranslator:FormatByKey("Feature.Accessibility.Description.UiNavigationKeyBind", {
 			uiNavigationKey = UserInputService:GetStringForKeyCode(Enum.KeyCode.BackSlash)
 		})
-		local v342 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
-		local v343 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
-		local v344 = v183
-		local v345 = v183
-		local v346 = v183
-		local v347, v348, v349 = Utility:AddNewRow(v183, v340, "Selector", {
-			v342,
-			v343
-		}, Off, nil, v341)
 
-		v344.UiNavigationKeyBindEnabledFrame = v347
-		v345.UiNavigationKeyBindEnabledLabel = v348
-		v346.UiNavigationKeyBindEnabledMode = v349
-		v183.UiNavigationKeyBindEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UiNavigationKeyBindEnabledFrame
-		v183.UiNavigationKeyBindEnabledMode.IndexChanged:connect(function(p20) -- line: 933
-			-- upvalues: GameSettings (copy), t13 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local UiNavigationKeyBindEnabled = GameSettings.UiNavigationKeyBindEnabled
+		local uiNavigationKeyBindEnabledFrame, uiNavigationKeyBindEnabledLabel, uiNavigationKeyBindEnabledMode = Utility:AddNewRow(
+			newPage,
+			formatByKey6,
+			"Selector",
+			{
+				RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On"),
+				(RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off"))
+			},
+			v19,
+			nil,
+			formatByKey7
+		)
+		newPage.UiNavigationKeyBindEnabledFrame = uiNavigationKeyBindEnabledFrame
+		newPage.UiNavigationKeyBindEnabledLabel = uiNavigationKeyBindEnabledLabel
+		newPage.UiNavigationKeyBindEnabledMode = uiNavigationKeyBindEnabledMode
 
-			GameSettings.UiNavigationKeyBindEnabled = p20 == t13.On
+		newPage.UiNavigationKeyBindEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UiNavigationKeyBindEnabledFrame
+
+		newPage.UiNavigationKeyBindEnabledMode.IndexChanged:connect(function(p)
+			local uiNavigationKeyBindEnabled = gameSettings.UiNavigationKeyBindEnabled
+			gameSettings.UiNavigationKeyBindEnabled = p == 1
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("ui_navigation_key_bind_enabled", UiNavigationKeyBindEnabled, GameSettings.UiNavigationKeyBindEnabled)
+				reportSettingsChangeForAnalytics(
+					"ui_navigation_key_bind_enabled",
+					uiNavigationKeyBindEnabled,
+					gameSettings.UiNavigationKeyBindEnabled
+				)
 			end
 
 			reportSettingsForAnalytics()
 		end)
+		local function updateUiNavigationKeyBindVisibility()
+			local keyboardEnabled = UserInputService.KeyboardEnabled
 
-		local function updateUiNavigationKeyBindVisibility() -- line: 946
-			-- upvalues: UserInputService (copy), v183 (copy), GameSettings (copy), t13 (copy)
-			local KeyboardEnabled = UserInputService.KeyboardEnabled
+			if newPage.UiNavigationKeyBindEnabledFrame then
+				newPage.UiNavigationKeyBindEnabledFrame.Visible = keyboardEnabled
 
-			if v183.UiNavigationKeyBindEnabledFrame then
-				v183.UiNavigationKeyBindEnabledFrame.Visible = KeyboardEnabled
-
-				if KeyboardEnabled then
-					v183.UiNavigationKeyBindEnabledMode:SetSelectionIndex(GameSettings.UiNavigationKeyBindEnabled and t13.On or t13.Off)
-
-					return
+				if keyboardEnabled then
+					newPage.UiNavigationKeyBindEnabledMode:SetSelectionIndex(gameSettings.UiNavigationKeyBindEnabled and 1 or 2)
+				else
+					newPage.UiNavigationKeyBindEnabledMode:SetSelectionIndex(2)
+					gameSettings.UiNavigationKeyBindEnabled = false
 				end
-
-				v183.UiNavigationKeyBindEnabledMode:SetSelectionIndex(t13.Off)
-				GameSettings.UiNavigationKeyBindEnabled = false
 			end
 		end
 
-		local KeyboardEnabled = UserInputService.KeyboardEnabled
+		local keyboardEnabled = UserInputService.KeyboardEnabled
 
-		if v183.UiNavigationKeyBindEnabledFrame then
-			v183.UiNavigationKeyBindEnabledFrame.Visible = KeyboardEnabled
+		if newPage.UiNavigationKeyBindEnabledFrame then
+			newPage.UiNavigationKeyBindEnabledFrame.Visible = keyboardEnabled
 
-			if KeyboardEnabled then
-				v183.UiNavigationKeyBindEnabledMode:SetSelectionIndex(GameSettings.UiNavigationKeyBindEnabled and t13.On or t13.Off)
+			if keyboardEnabled then
+				newPage.UiNavigationKeyBindEnabledMode:SetSelectionIndex(gameSettings.UiNavigationKeyBindEnabled and v18.On or v18.Off)
 			else
-				v183.UiNavigationKeyBindEnabledMode:SetSelectionIndex(t13.Off)
-				GameSettings.UiNavigationKeyBindEnabled = false
+				newPage.UiNavigationKeyBindEnabledMode:SetSelectionIndex(v18.Off)
+				gameSettings.UiNavigationKeyBindEnabled = false
 			end
 		end
 
-		UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function() -- line: 961
-			-- upvalues: UserInputService (copy), v183 (copy), GameSettings (copy), t13 (copy)
-			local KeyboardEnabled2 = UserInputService.KeyboardEnabled
+		UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function()
+			local keyboardEnabled2 = UserInputService.KeyboardEnabled
 
-			if v183.UiNavigationKeyBindEnabledFrame then
-				v183.UiNavigationKeyBindEnabledFrame.Visible = KeyboardEnabled2
+			if newPage.UiNavigationKeyBindEnabledFrame then
+				newPage.UiNavigationKeyBindEnabledFrame.Visible = keyboardEnabled2
 
-				if KeyboardEnabled2 then
-					v183.UiNavigationKeyBindEnabledMode:SetSelectionIndex(GameSettings.UiNavigationKeyBindEnabled and t13.On or t13.Off)
-
-					return
+				if keyboardEnabled2 then
+					newPage.UiNavigationKeyBindEnabledMode:SetSelectionIndex(gameSettings.UiNavigationKeyBindEnabled and v18.On or v18.Off)
+				else
+					newPage.UiNavigationKeyBindEnabledMode:SetSelectionIndex(v18.Off)
+					gameSettings.UiNavigationKeyBindEnabled = false
 				end
-
-				v183.UiNavigationKeyBindEnabledMode:SetSelectionIndex(t13.Off)
-				GameSettings.UiNavigationKeyBindEnabled = false
 			end
 		end)
 	end
-	local function createPerformanceStatsOptions() -- line: 966
-		-- upvalues: v183 (copy), GameSettings (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), Create (copy), Theme (copy), v54 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local v352 = v183
-		local v353 = v183
-		local v354 = v183
-		local v355 = v183
 
-		v352.PerformanceStatsFrame = nil
-		v353.PerformanceStatsLabel = nil
-		v354.PerformanceStatsMode = nil
-		v355.PerformanceStatsOverrideText = nil
+	local function createPerformanceStatsOptions()
+		newPage.PerformanceStatsFrame = nil
+		newPage.PerformanceStatsLabel = nil
+		newPage.PerformanceStatsMode = nil
+		newPage.PerformanceStatsOverrideText = nil
 
-		function GetDesiredPerformanceStatsIndex() -- line: 972
-			-- upvalues: GameSettings (copy)
-			if GameSettings.PerformanceStatsVisible then
-				return 1
-			end
-
-			return 2
+		function GetDesiredPerformanceStatsIndex(): number
+			return if gameSettings.PerformanceStatsVisible then 1 else 2
 		end
 
-		local v356 = GetDesiredPerformanceStatsIndex()
-		local v357 = v183
-		local v358 = v183
-		local v359 = v183
-		local v360, v361, v362 = Utility:AddNewRow(v183, "Performance Stats", "Selector", {
-			"On",
-			"Off"
-		}, v356)
+		local performanceStatsFrame, performanceStatsLabel2, performanceStatsMode = Utility:AddNewRow(
+			newPage,
+			"Performance Stats",
+			"Selector",
+			{ "On", "Off" },
+			(GetDesiredPerformanceStatsIndex())
+		)
+		newPage.PerformanceStatsFrame = performanceStatsFrame
+		newPage.PerformanceStatsLabel = performanceStatsLabel2
+		newPage.PerformanceStatsMode = performanceStatsMode
 
-		v357.PerformanceStatsFrame = v360
-		v358.PerformanceStatsLabel = v361
-		v359.PerformanceStatsMode = v362
-		v183.PerformanceStatsFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PerformanceStatsFrame
-		v183.PerformanceStatsOverrideText = Create("TextLabel")({
+		newPage.PerformanceStatsFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PerformanceStatsFrame
+
+		local create = Create("TextLabel")
+		local performanceStatsLabel = {
 			Name = "PerformanceStatsLabel",
 			Text = "Set by Developer",
-			BackgroundTransparency = 1,
-			Visible = false,
-			ZIndex = 2,
 			TextColor3 = Color3.new(1, 1, 1),
 			Font = Theme.font(Enum.Font.SourceSans, "GameSettings"),
 			FontSize = Theme.fontSize(Enum.FontSize.Size24, "GameSettings"),
-			Size = if not v54 then UDim2.new(0, 200, 1, 0) else UDim2.new(0.6, 0, 1, 0),
-			Position = if not v54 then UDim2.new(1, -350, 0, 0) else UDim2.new(1, 0, 0.5, 0),
-			AnchorPoint = if not v54 then nil else Vector2.new(1, 0.5),
-			Parent = v183.PerformanceStatsFrame
-		})
-		v183.PerformanceStatsMode.IndexChanged:connect(function(p21) -- line: 1001
-			-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), GameSettings (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local PerformanceStatsVisible = nil
+			BackgroundTransparency = 1,
+			Size = 0,
+			Position = 0,
+			AnchorPoint = 0,
+			Visible = false,
+			ZIndex = 2,
+			Parent = 0
+		}
+		local size
+
+		if defineFastFlag3 then
+			size = UDim2.new(0.6, 0, 1, 0)
+		else
+			size = UDim2.new(0, 200, 1, 0)
+		end
+
+		performanceStatsLabel.Size = size
+		local position
+
+		if defineFastFlag3 then
+			position = UDim2.new(1, 0, 0.5, 0)
+		else
+			position = UDim2.new(1, -350, 0, 0)
+		end
+
+		performanceStatsLabel.Position = position
+		local anchorPoint
+
+		if defineFastFlag3 then
+			anchorPoint = Vector2.new(1, 0.5)
+		end
+
+		performanceStatsLabel.AnchorPoint = anchorPoint
+
+		performanceStatsLabel.Parent = newPage.PerformanceStatsFrame
+		newPage.PerformanceStatsOverrideText = create(performanceStatsLabel)
+
+		newPage.PerformanceStatsMode.IndexChanged:connect(function(p)
+			local performanceStatsVisible
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				PerformanceStatsVisible = GameSettings.PerformanceStatsVisible
+				performanceStatsVisible = gameSettings.PerformanceStatsVisible
 			end
 
-			if p21 == 1 then
-				GameSettings.PerformanceStatsVisible = true
+			if p == 1 then
+				gameSettings.PerformanceStatsVisible = true
 			else
-				GameSettings.PerformanceStatsVisible = false
+				gameSettings.PerformanceStatsVisible = false
 			end
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("show_performance_stats", PerformanceStatsVisible, GameSettings.PerformanceStatsVisible)
+				reportSettingsChangeForAnalytics(
+					"show_performance_stats",
+					performanceStatsVisible,
+					gameSettings.PerformanceStatsVisible
+				)
 			end
 
 			reportSettingsForAnalytics()
 		end)
-		GameSettings.PerformanceStatsVisibleChanged:connect(function() -- line: 1023
-			-- upvalues: v183 (copy)
-			local v813 = GetDesiredPerformanceStatsIndex()
 
-			if v813 ~= v183.PerformanceStatsMode.CurrentIndex then
-				v183.PerformanceStatsMode:SetSelectionIndex(v813)
+		gameSettings.PerformanceStatsVisibleChanged:connect(function()
+			local v18 = GetDesiredPerformanceStatsIndex()
+
+			if v18 ~= newPage.PerformanceStatsMode.CurrentIndex then
+				newPage.PerformanceStatsMode:SetSelectionIndex(v18)
 			end
 		end)
 	end
-	local function createWebServerInformationRow() -- line: 1033
-		-- upvalues: v183 (copy), Utility (copy), v56 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), TouchEnabled (copy), Create (copy), Theme (copy)
-		local v363 = v183
-		local v364 = v183
-		local v365 = v183
-		local v366, v367, v368 = Utility:AddNewRow(v183, "MicroProfiler Information", "TextBox", nil, nil, 5, nil, nil, nil, not v56 and nil)
 
-		v363.InformationFrame = v366
-		v364.InformationLabel = v367
-		v365.InformationTextBox = v368
-		v183.InformationFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.InformationFrame
-		v183.InformationFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	local function createWebServerInformationRow()
+		local v18
+
+		if defineFastFlag5 then
+			v18 = false
+		end
+
+		local informationFrame, informationLabel, informationTextBox = Utility:AddNewRow(
+			newPage,
+			"MicroProfiler Information",
+			"TextBox",
+			nil,
+			nil,
+			5,
+			nil,
+			nil,
+			nil,
+			v18
+		)
+		newPage.InformationFrame = informationFrame
+		newPage.InformationLabel = informationLabel
+		newPage.InformationTextBox = informationTextBox
+
+		newPage.InformationFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.InformationFrame
+
+		newPage.InformationFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 
 		if TouchEnabled then
-			v183.InformationText = Create("TextLabel")({
+			newPage.InformationText = Create("TextLabel")({
 				Name = "InformationLabel",
 				Text = "Information Loading",
-				BackgroundTransparency = 1,
-				Visible = true,
-				ZIndex = 2,
 				Font = Theme.font(Enum.Font.SourceSans),
 				FontSize = Theme.fontSize(Enum.FontSize.Size18),
+				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 800, 1, 0),
 				Position = UDim2.new(0, 5, 0, 0),
-				Parent = v183.InformationFrame
-			})
-		else
-			v183.InformationText = Create("TextLabel")({
-				Name = "InformationLabel",
-				Text = "Information Loading",
-				BackgroundTransparency = 1,
 				Visible = true,
 				ZIndex = 2,
+				Parent = newPage.InformationFrame
+			})
+		else
+			newPage.InformationText = Create("TextLabel")({
+				Name = "InformationLabel",
+				Text = "Information Loading",
 				Font = Theme.font(Enum.Font.SourceSans),
 				FontSize = Theme.fontSize(Enum.FontSize.Size14),
+				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 800, 1, 0),
 				Position = UDim2.new(1, -650, 0, 20),
-				Parent = v183.InformationFrame
+				Visible = true,
+				ZIndex = 2,
+				Parent = newPage.InformationFrame
 			})
 		end
 
-		return v183.InformationFrame, v183.InformationText
+		return newPage.InformationFrame, newPage.InformationText
 	end
-	local function createMicroProfilerOptions() -- line: 1073
-		-- upvalues: v183 (copy), GameSettings (copy), createWebServerInformationRow (copy), v132 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), v131 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), RbxAnalyticsService (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy), RobloxTranslator (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-		local v369 = v183
-		local v370 = v183
-		local v371 = v183
-		local v372 = v183
 
-		v369.MicroProfilerFrame = nil
-		v370.MicroProfilerLabel = nil
-		v371.MicroProfilerMode = nil
-		v372.MicroProfilerOverrideText = nil
+	local function createMicroProfilerOptions()
+		newPage.MicroProfilerFrame = nil
+		newPage.MicroProfilerLabel = nil
+		newPage.MicroProfilerMode = nil
+		newPage.MicroProfilerOverrideText = nil
 
-		local function tryContentLabel() -- line: 1078
-			-- upvalues: GameSettings (copy), v183 (copy), createWebServerInformationRow (copy)
-			local MicroProfilerWebServerPort = GameSettings.MicroProfilerWebServerPort
+		local function tryContentLabel(): boolean -- 2 equivalent calls inferred from this helper
+			local microProfilerWebServerPort = gameSettings.MicroProfilerWebServerPort
 
-			if MicroProfilerWebServerPort ~= 0 then
-				local v815 = v183
-				local v816 = v183
-				local v817, v818 = createWebServerInformationRow()
-
-				v815.InformationFrame = v817
-				v816.InformationText = v818
-				v183.InformationText.Text = GameSettings.MicroProfilerWebServerIP .. MicroProfilerWebServerPort
-
-				return true
+			if microProfilerWebServerPort == 0 then
+				return false
 			end
 
-			return false
+			local webServerInformationRow, informationText = createWebServerInformationRow()
+			newPage.InformationFrame = webServerInformationRow
+			newPage.InformationText = informationText
+			newPage.InformationText.Text = gameSettings.MicroProfilerWebServerIP .. microProfilerWebServerPort
+			return true
 		end
-		local function setMicroProfilerIndex(p22) -- line: 1090
-			-- upvalues: GameSettings (copy), v183 (copy), v132 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), createWebServerInformationRow (copy), v131 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), RbxAnalyticsService (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local function hideContentLabel() -- line: 1091
-				-- upvalues: GameSettings (copy), v183 (copy)
-				GameSettings.MicroProfilerWebServerEnabled = false
 
-				if v183.InformationFrame or v183.InformationText then
-					v183.InformationFrame.Visible = false
-					v183.InformationFrame.Parent = nil
-					v183.InformationText.Parent = nil
-					v183.InformationFrame = nil
-					v183.InformationText = nil
+		local function setMicroProfilerIndex(p)
+			local function hideContentLabel() -- 2 equivalent calls inferred from this helper
+				gameSettings.MicroProfilerWebServerEnabled = false
+
+				if newPage.InformationFrame or newPage.InformationText then
+					newPage.InformationFrame.Visible = false
+					newPage.InformationFrame.Parent = nil
+					newPage.InformationText.Parent = nil
+					newPage.InformationFrame = nil
+					newPage.InformationText = nil
 				end
 			end
 
-			local s1 = nil
-			local MicroProfilerWebServerEnabled = nil
-			local MicroProfilerWebServerEnabled2 = nil
+			local microprofiler_type = nil
+			local v18 = nil
+			local v19 = nil
 
-			if v132 then
+			if v13 then
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					s1 = "webserver"
-					MicroProfilerWebServerEnabled = GameSettings.MicroProfilerWebServerEnabled
+					v18 = gameSettings.MicroProfilerWebServerEnabled
+					microprofiler_type = "webserver"
 				end
 
-				if p22 == 1 then
-					GameSettings.MicroProfilerWebServerEnabled = true
+				if p == 1 then
+					gameSettings.MicroProfilerWebServerEnabled = true
+					local v20 = 30
 
-					local n6 = 30
-
-					while n6 >= 1 do
-						local MicroProfilerWebServerPort = GameSettings.MicroProfilerWebServerPort
-						local v830
-
-						if MicroProfilerWebServerPort ~= 0 then
-							local v826 = v183
-							local v827 = v183
-							local v828, v829 = createWebServerInformationRow()
-
-							v826.InformationFrame = v828
-							v827.InformationText = v829
-							v183.InformationText.Text = GameSettings.MicroProfilerWebServerIP .. MicroProfilerWebServerPort
-							v830 = true
-						else
-							v830 = false
-						end
-
-						if v830 then
+					while v20 >= 1 do
+						if tryContentLabel() then -- inferred equivalent call
 							break
 						end
 
-						n6 -= 1
+						v20 -= 1
 						wait(0.1)
 					end
 
-					if n6 <= 0 then
-						v183.MicroProfilerMode:SetSelectionIndex(2)
-						GameSettings.MicroProfilerWebServerEnabled = false
-
-						if v183.InformationFrame or v183.InformationText then
-							v183.InformationFrame.Visible = false
-							v183.InformationFrame.Parent = nil
-							v183.InformationText.Parent = nil
-							v183.InformationFrame = nil
-							v183.InformationText = nil
-						end
+					if v20 <= 0 then
+						newPage.MicroProfilerMode:SetSelectionIndex(2)
+						hideContentLabel() -- inferred equivalent call
 					end
 				else
-					GameSettings.MicroProfilerWebServerEnabled = false
-
-					if v183.InformationFrame or v183.InformationText then
-						v183.InformationFrame.Visible = false
-						v183.InformationFrame.Parent = nil
-						v183.InformationText.Parent = nil
-						v183.InformationFrame = nil
-						v183.InformationText = nil
-					end
+					hideContentLabel() -- inferred equivalent call
 				end
 
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					MicroProfilerWebServerEnabled2 = GameSettings.MicroProfilerWebServerEnabled
+					v19 = gameSettings.MicroProfilerWebServerEnabled
 				end
-			elseif v131 or isInExperienceUIVREnabled and isSpatial() then
+			elseif v12 or isInExperienceUIVREnabled and isSpatial() then
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					s1 = "regular"
-					MicroProfilerWebServerEnabled = GameSettings.OnScreenProfilerEnabled
+					v18 = gameSettings.OnScreenProfilerEnabled
+					microprofiler_type = "regular"
 				end
 
-				GameSettings.OnScreenProfilerEnabled = p22 == 1
+				gameSettings.OnScreenProfilerEnabled = p == 1
 
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					MicroProfilerWebServerEnabled2 = GameSettings.OnScreenProfilerEnabled
+					v19 = gameSettings.OnScreenProfilerEnabled
 				end
 			end
 
 			RbxAnalyticsService:ReportCounter("MicroprofilerSettingsPressed")
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("microprofiler_enabled", MicroProfilerWebServerEnabled, MicroProfilerWebServerEnabled2, {
-					microprofiler_type = s1
+				reportSettingsChangeForAnalytics("microprofiler_enabled", v18, v19, {
+					microprofiler_type = microprofiler_type
 				})
 			end
 
 			reportSettingsForAnalytics()
 		end
-		local function GetDesiredWebServerIndex() -- line: 1164
-			-- upvalues: v132 (copy), GameSettings (copy), v131 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy)
-			if v132 then
-				if GameSettings.MicroProfilerWebServerEnabled then
+
+		local function GetDesiredWebServerIndex(): number -- 1 equivalent call inferred from this helper
+			if v13 then
+				if gameSettings.MicroProfilerWebServerEnabled then
 					return 1
 				end
-
-				return 2
-			end
-
-			if v131 or isInExperienceUIVREnabled and isSpatial() then
-				if GameSettings.OnScreenProfilerEnabled then
-					return 1
-				end
-
-				return 2
+			elseif (v12 or isInExperienceUIVREnabled and isSpatial()) and gameSettings.OnScreenProfilerEnabled then
+				return 1
 			end
 
 			return 2
 		end
 
-		local v376 = if not v132 then not v131 and (not isInExperienceUIVREnabled or not isSpatial()) and 2 or (not GameSettings.OnScreenProfilerEnabled and 2 or 1) else not GameSettings.MicroProfilerWebServerEnabled and 2 or 1
-		local v377 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MicroProfiler")
-		local v378 = v183
-		local v379 = v183
-		local v380 = v183
-		local v381, v382, v383 = Utility:AddNewRow(v183, v377, "Selector", {
-			"On",
-			"Off"
-		}, v376)
+		local desiredWebServerIndex = GetDesiredWebServerIndex() -- inferred equivalent call
+		local microProfilerFrame, microProfilerLabel, microProfilerMode = Utility:AddNewRow(
+			newPage,
+			RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MicroProfiler"),
+			"Selector",
+			{ "On", "Off" },
+			desiredWebServerIndex
+		)
+		newPage.MicroProfilerFrame = microProfilerFrame
+		newPage.MicroProfilerLabel = microProfilerLabel
+		newPage.MicroProfilerMode = microProfilerMode
 
-		v378.MicroProfilerFrame = v381
-		v379.MicroProfilerLabel = v382
-		v380.MicroProfilerMode = v383
-		v183.MicroProfilerFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.MicroProfilerFrame
+		newPage.MicroProfilerFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.MicroProfilerFrame
+		tryContentLabel() -- inferred equivalent call
+		local flag2 = false
 
-		local MicroProfilerWebServerPort = GameSettings.MicroProfilerWebServerPort
+		gameSettings:GetPropertyChangedSignal("OnScreenProfilerEnabled"):Connect(function()
+			flag2 = true
 
-		if MicroProfilerWebServerPort ~= 0 then
-			local v385 = v183
-			local v386 = v183
-			local v387, v388 = createWebServerInformationRow()
-
-			v385.InformationFrame = v387
-			v386.InformationText = v388
-			v183.InformationText.Text = GameSettings.MicroProfilerWebServerIP .. MicroProfilerWebServerPort
-		end
-
-		local u389 = false
-
-		GameSettings:GetPropertyChangedSignal("OnScreenProfilerEnabled"):Connect(function() -- line: 1193
-			-- upvalues: u389 (ref), GameSettings (copy), v183 (copy)
-			u389 = true
-
-			if GameSettings.OnScreenProfilerEnabled then
-				v183.MicroProfilerMode:SetSelectionIndex(1)
-
-				return
+			if gameSettings.OnScreenProfilerEnabled then
+				newPage.MicroProfilerMode:SetSelectionIndex(1)
+			else
+				newPage.MicroProfilerMode:SetSelectionIndex(2)
 			end
-
-			v183.MicroProfilerMode:SetSelectionIndex(2)
 		end)
 
-		local function onIndexChanged(...) -- line: 1203
-			-- upvalues: u389 (ref), setMicroProfilerIndex (copy)
-			if u389 then
-				u389 = false
-
-				return
+		local function onIndexChanged(...)
+			if flag2 then
+				flag2 = false
+			else
+				setMicroProfilerIndex(...)
 			end
-
-			setMicroProfilerIndex(...)
 		end
 
-		v183.MicroProfilerMode.IndexChanged:connect(onIndexChanged)
+		newPage.MicroProfilerMode.IndexChanged:connect(onIndexChanged)
 	end
-	local function createCameraModeOptions(p23) -- line: 1214
-		-- upvalues: v183 (copy), GameSettings (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), t10 (copy), Create (copy), Theme (copy), v54 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy), LocalPlayer (copy), UserInputService (copy), CoreUtility (copy), t4 (copy), VRService (copy), GetFFlagAlwaysShowVRToggle (copy), getAppFeaturePolicies (copy), RobloxTranslator (copy), Constants (copy), t6 (copy), v88 (copy), t3 (copy), t2 (copy)
-		local v392 = v183
-		local v393 = v183
-		local v394 = v183
-		local v395 = v183
 
-		v392.ShiftLockFrame = nil
-		v393.ShiftLockLabel = nil
-		v394.ShiftLockMode = nil
-		v395.ShiftLockOverrideText = nil
+	local function createCameraModeOptions(touchEnabled)
+		newPage.ShiftLockFrame = nil
+		newPage.ShiftLockLabel = nil
+		newPage.ShiftLockMode = nil
+		newPage.ShiftLockOverrideText = nil
 
-		local n7 = 2
+		local shiftLockFrame, shiftLockLabel, shiftLockMode = Utility:AddNewRow(
+			newPage,
+			"Shift Lock Switch",
+			"Selector",
+			{ "On", "Off" },
+			gameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch and 1 or 2
+		)
+		newPage.ShiftLockFrame = shiftLockFrame
+		newPage.ShiftLockLabel = shiftLockLabel
+		newPage.ShiftLockMode = shiftLockMode
 
-		if GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch then
-			n7 = 1
-		end
+		newPage.ShiftLockFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ShiftLockFrame
 
-		local v397 = v183
-		local v398 = v183
-		local v399 = v183
-		local v400, v401, v402 = Utility:AddNewRow(v183, "Shift Lock Switch", "Selector", {
-			"On",
-			"Off"
-		}, n7)
+		set[newPage.ShiftLockFrame] = true
 
-		v397.ShiftLockFrame = v400
-		v398.ShiftLockLabel = v401
-		v399.ShiftLockMode = v402
-		v183.ShiftLockFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ShiftLockFrame
-		t10[v183.ShiftLockFrame] = true
-		v183.ShiftLockOverrideText = Create("TextLabel")({
+		local create = Create("TextLabel")
+		local shiftLockOverrideLabel = {
 			Name = "ShiftLockOverrideLabel",
 			Text = "Set by Developer",
-			BackgroundTransparency = 1,
-			Visible = false,
-			ZIndex = 2,
 			TextColor3 = Color3.new(1, 1, 1),
 			Font = Theme.font(Enum.Font.SourceSans, "GameSettings"),
 			FontSize = Theme.fontSize(Enum.FontSize.Size24, "GameSettings"),
-			Size = if not v54 then UDim2.new(0, 200, 1, 0) else UDim2.new(0.6, 0, 1, 0),
-			Position = if not v54 then UDim2.new(1, -350, 0, 0) else UDim2.new(1, 0, 0.5, 0),
-			AnchorPoint = if not v54 then nil else Vector2.new(1, 0.5),
-			Parent = v183.ShiftLockFrame
-		})
-		v183.ShiftLockMode.IndexChanged:connect(function(p24) -- line: 1245
-			-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), GameSettings (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local v832 = nil
+			BackgroundTransparency = 1,
+			Size = 0,
+			Position = 0,
+			AnchorPoint = 0,
+			Visible = false,
+			ZIndex = 2,
+			Parent = 0
+		}
+		local size
+
+		if defineFastFlag3 then
+			size = UDim2.new(0.6, 0, 1, 0)
+		else
+			size = UDim2.new(0, 200, 1, 0)
+		end
+
+		shiftLockOverrideLabel.Size = size
+		local position
+
+		if defineFastFlag3 then
+			position = UDim2.new(1, 0, 0.5, 0)
+		else
+			position = UDim2.new(1, -350, 0, 0)
+		end
+
+		shiftLockOverrideLabel.Position = position
+		local anchorPoint
+
+		if defineFastFlag3 then
+			anchorPoint = Vector2.new(1, 0.5)
+		end
+
+		shiftLockOverrideLabel.AnchorPoint = anchorPoint
+
+		shiftLockOverrideLabel.Parent = newPage.ShiftLockFrame
+		newPage.ShiftLockOverrideText = create(shiftLockOverrideLabel)
+
+		newPage.ShiftLockMode.IndexChanged:connect(function(p)
+			local v18
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				v832 = GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch
+				v18 = gameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch
 			end
 
-			if p24 == 1 then
-				GameSettings.ControlMode = Enum.ControlMode.MouseLockSwitch
+			if p == 1 then
+				gameSettings.ControlMode = Enum.ControlMode.MouseLockSwitch
 			else
-				GameSettings.ControlMode = Enum.ControlMode.Classic
+				gameSettings.ControlMode = Enum.ControlMode.Classic
 			end
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("shift_lock_enabled", v832, GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch)
+				reportSettingsChangeForAnalytics(
+					"shift_lock_enabled",
+					v18,
+					gameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch
+				)
 			end
 
 			reportSettingsForAnalytics()
 		end)
 
-		local function setShiftLockSelectorVisible(b1: boolean) -- line: 1267
-			-- upvalues: LocalPlayer (copy), v183 (copy)
-			local v834 = b1 and LocalPlayer.DevEnableMouseLock
+		local function setShiftLockSelectorVisible(flag2: boolean) -- 1 equivalent call inferred from this helper
+			local devEnableMouseLock = flag2 and LocalPlayer.DevEnableMouseLock
 
-			if v183.ShiftLockMode then
-				v183.ShiftLockMode.SelectorFrame.Visible = v834
-				v183.ShiftLockMode:SetInteractable(v834)
-			end
-		end
-		local function applyDevOverrideShiftLockSelector() -- line: 1275
-			-- upvalues: LocalPlayer (copy), v183 (copy)
-			local v835 = not LocalPlayer.DevEnableMouseLock
-
-			if v183.ShiftLockOverrideText then
-				v183.ShiftLockOverrideText.Visible = v835
-
-				local v836 = not v835 and LocalPlayer.DevEnableMouseLock
-
-				if v183.ShiftLockMode then
-					v183.ShiftLockMode.SelectorFrame.Visible = v836
-					v183.ShiftLockMode:SetInteractable(v836)
-				end
-			end
-		end
-		local function updateShiftLockVisibility() -- line: 1283
-			-- upvalues: UserInputService (copy), v183 (copy), LocalPlayer (copy)
-			local v837 = UserInputService.MouseEnabled and UserInputService.KeyboardEnabled
-
-			if v183.ShiftLockFrame then
-				v183.ShiftLockFrame.Visible = v837
-			end
-
-			local v838 = not LocalPlayer.DevEnableMouseLock
-
-			if v183.ShiftLockOverrideText then
-				v183.ShiftLockOverrideText.Visible = v838
-
-				local v839 = not v838 and LocalPlayer.DevEnableMouseLock
-
-				if v183.ShiftLockMode then
-					v183.ShiftLockMode.SelectorFrame.Visible = v839
-					v183.ShiftLockMode:SetInteractable(v839)
-				end
+			if newPage.ShiftLockMode then
+				newPage.ShiftLockMode.SelectorFrame.Visible = devEnableMouseLock
+				newPage.ShiftLockMode:SetInteractable(devEnableMouseLock)
 			end
 		end
 
-		local v406 = UserInputService.MouseEnabled and UserInputService.KeyboardEnabled
+		local function applyDevOverrideShiftLockSelector() -- 3 equivalent calls inferred from this helper
+			local visible = not LocalPlayer.DevEnableMouseLock
 
-		if v183.ShiftLockFrame then
-			v183.ShiftLockFrame.Visible = v406
-		end
-
-		local v407 = not LocalPlayer.DevEnableMouseLock
-
-		if v183.ShiftLockOverrideText then
-			v183.ShiftLockOverrideText.Visible = v407
-
-			local v408 = not v407 and LocalPlayer.DevEnableMouseLock
-
-			if v183.ShiftLockMode then
-				v183.ShiftLockMode.SelectorFrame.Visible = v408
-				v183.ShiftLockMode:SetInteractable(v408)
+			if newPage.ShiftLockOverrideText then
+				newPage.ShiftLockOverrideText.Visible = visible
+				setShiftLockSelectorVisible(not visible) -- inferred equivalent call
 			end
 		end
 
-		UserInputService:GetPropertyChangedSignal("MouseEnabled"):Connect(function() -- line: 1293
-			-- upvalues: UserInputService (copy), v183 (copy), LocalPlayer (copy)
-			local v840 = UserInputService.MouseEnabled and UserInputService.KeyboardEnabled
+		local function updateShiftLockVisibility() -- 3 equivalent calls inferred from this helper
+			local keyboardEnabled = UserInputService.MouseEnabled and UserInputService.KeyboardEnabled
 
-			if v183.ShiftLockFrame then
-				v183.ShiftLockFrame.Visible = v840
+			if newPage.ShiftLockFrame then
+				newPage.ShiftLockFrame.Visible = keyboardEnabled
 			end
 
-			local v841 = not LocalPlayer.DevEnableMouseLock
+			applyDevOverrideShiftLockSelector() -- inferred equivalent call
+		end
 
-			if v183.ShiftLockOverrideText then
-				v183.ShiftLockOverrideText.Visible = v841
-
-				local v842 = not v841 and LocalPlayer.DevEnableMouseLock
-
-				if v183.ShiftLockMode then
-					v183.ShiftLockMode.SelectorFrame.Visible = v842
-					v183.ShiftLockMode:SetInteractable(v842)
-				end
-			end
-		end)
-		UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function() -- line: 1297
-			-- upvalues: UserInputService (copy), v183 (copy), LocalPlayer (copy)
-			local v843 = UserInputService.MouseEnabled and UserInputService.KeyboardEnabled
-
-			if v183.ShiftLockFrame then
-				v183.ShiftLockFrame.Visible = v843
-			end
-
-			local v844 = not LocalPlayer.DevEnableMouseLock
-
-			if v183.ShiftLockOverrideText then
-				v183.ShiftLockOverrideText.Visible = v844
-
-				local v845 = not v844 and LocalPlayer.DevEnableMouseLock
-
-				if v183.ShiftLockMode then
-					v183.ShiftLockMode.SelectorFrame.Visible = v845
-					v183.ShiftLockMode:SetInteractable(v845)
-				end
-			end
+		updateShiftLockVisibility() -- inferred equivalent call
+		UserInputService:GetPropertyChangedSignal("MouseEnabled"):Connect(function()
+			updateShiftLockVisibility() -- inferred equivalent call
 		end)
 
-		function cameraModeIsUserChoice() -- line: 1303
-			-- upvalues: UserInputService (copy), LocalPlayer (copy)
+		UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function()
+			updateShiftLockVisibility() -- inferred equivalent call
+		end)
+
+		function cameraModeIsUserChoice(): boolean
 			if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
 				return LocalPlayer.DevTouchCameraMode == Enum.DevTouchCameraMovementMode.UserChoice
 			end
 
 			return LocalPlayer.DevComputerCameraMode == Enum.DevComputerCameraMovementMode.UserChoice
 		end
-		function setCameraModeVisible(p25) -- line: 1312
-			-- upvalues: v183 (copy)
-			if v183.CameraMode then
-				v183.CameraMode.SelectorFrame.Visible = p25
-				v183.CameraMode:SetInteractable(p25)
-				v183.CameraModeOverrideText.Visible = not p25
+
+		function setCameraModeVisible(visible)
+			if newPage.CameraMode then
+				newPage.CameraMode.SelectorFrame.Visible = visible
+				newPage.CameraMode:SetInteractable(visible)
+				newPage.CameraModeOverrideText.Visible = not visible
 			end
 		end
 
-		local v409 = CoreUtility.waitForChildOfClass(LocalPlayer, "PlayerScripts")
-		local t14 = {}
-		local t15 = {}
+		local v18 = CoreUtility.waitForChildOfClass(LocalPlayer, "PlayerScripts")
 
-		local function updateCurrentCameraMovementIndex(p26) -- line: 1326
-			-- upvalues: t15 (ref), t14 (ref), UserInputService (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), GameSettings (copy), reportSettingsChangeForAnalytics (copy)
-			local u848 = nil
+		local v19 = {}
+		local v20 = {}
 
-			if not pcall(function() -- line: 1328
-				-- upvalues: u848 (ref), t15 (ref), t14 (ref), p26 (copy)
-				u848 = t15[t14[p26]]
-			end) or u848 == nil then
+		local function updateCurrentCameraMovementIndex(p)
+			local v21 = nil
+
+			if not pcall(function()
+				v21 = v20[v19[p]]
+			end) or v21 == nil then
 				return false
 			end
 
-			local TouchCameraMovementModeValue = nil
-			local v850
+			local value = nil
+			local v22
 
 			if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					TouchCameraMovementModeValue = GameSettings.TouchCameraMovementMode.Value
+					value = gameSettings.TouchCameraMovementMode.Value
 				end
 
-				v850 = GameSettings.TouchCameraMovementMode.Value ~= u848
-				GameSettings.TouchCameraMovementMode = u848
+				v22 = gameSettings.TouchCameraMovementMode.Value ~= v21
+				gameSettings.TouchCameraMovementMode = v21
 			else
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					TouchCameraMovementModeValue = GameSettings.ComputerCameraMovementMode.Value
+					value = gameSettings.ComputerCameraMovementMode.Value
 				end
 
-				v850 = GameSettings.ComputerCameraMovementMode.Value ~= u848
-				GameSettings.ComputerCameraMovementMode = u848
+				v22 = gameSettings.ComputerCameraMovementMode.Value ~= v21
+				gameSettings.ComputerCameraMovementMode = v21
 			end
 
-			if GetFFlagEnableExplicitSettingsChangeAnalytics() and v850 then
-				reportSettingsChangeForAnalytics("camera_mode", TouchCameraMovementModeValue, u848)
+			if GetFFlagEnableExplicitSettingsChangeAnalytics() and v22 then
+				reportSettingsChangeForAnalytics("camera_mode", value, v21)
 			end
 
-			return v850
+			return v22
 		end
-		local function updateCameraMovementModes() -- line: 1362
-			-- upvalues: v409 (copy), UserInputService (copy), t14 (ref), t15 (ref), t4 (copy), v183 (copy), GameSettings (copy), updateCurrentCameraMovementIndex (copy)
-			local t16 = {}
 
-			if v409 then
-				t16 = if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then v409:GetRegisteredComputerCameraMovementModes() else v409:GetRegisteredTouchCameraMovementModes()
+		local function updateCameraMovementModes()
+			local v21
+
+			if v18 then
+				if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
+					v21 = v18:GetRegisteredTouchCameraMovementModes()
+				else
+					v21 = v18:GetRegisteredComputerCameraMovementModes()
+				end
+			else
+				v21 = {}
 			end
 
-			t14 = {}
-			t15 = {}
+			v19 = {}
+			v20 = {}
 
-			if #t16 <= 0 then
+			if #v21 <= 0 then
 				setCameraModeVisible(false)
-
 				return
 			end
 
-			for i = 1, #t16 do
-				local v853 = t16[i]
-				local Name = v853.Name
+			for i = 1, #v21 do
+				local v22 = v21[i]
+				local v23 = v22.Name
 
-				if Name == "Default" then
-					Name = if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then t4.DEFAULT_CLASSIC else t4.DEFAULT_FOLLOW
+				if v23 == "Default" then
+					if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
+						v23 = v6.DEFAULT_FOLLOW
+					else
+						v23 = v6.DEFAULT_CLASSIC
+					end
 				end
 
-				t14[#t14 + 1] = Name
-				t15[Name] = v853.Value
+				v19[#v19 + 1] = v23
+				v20[v23] = v22.Value
 			end
 
-			if v183.CameraMode then
-				v183.CameraMode:UpdateOptions(t14)
+			if newPage.CameraMode then
+				newPage.CameraMode:UpdateOptions(v19)
 			end
 
-			local v855 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
-			local v856 = if not v855 then GameSettings.ComputerCameraMovementMode.Value else GameSettings.TouchCameraMovementMode.Value
+			local v22 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
+			local value
 
-			if v856 > -1 then
-				if v855 or GameSettings.ComputerCameraMovementMode ~= Enum.ComputerCameraMovementMode.CameraToggle then
-					v856 += 1
+			if v22 then
+				value = gameSettings.TouchCameraMovementMode.Value
+			else
+				value = gameSettings.ComputerCameraMovementMode.Value
+			end
+
+			if value > -1 then
+				if v22 or gameSettings.ComputerCameraMovementMode ~= Enum.ComputerCameraMovementMode.CameraToggle then
+					value += 1
 				end
 
-				updateCurrentCameraMovementIndex(v856)
-				v183.CameraMode:SetSelectionIndex(v856)
+				updateCurrentCameraMovementIndex(value)
+				newPage.CameraMode:SetSelectionIndex(value)
 			end
 
 			setCameraModeVisible(cameraModeIsUserChoice())
 		end
 
-		local v414 = v183
-		local v415 = v183
-		local v416 = v183
-		local v417, v418, v419 = Utility:AddNewRow(v183, "Camera Mode", "Selector", t14, 1)
+		local cameraModeFrame, cameraModeLabel, cameraMode = Utility:AddNewRow(
+			newPage,
+			"Camera Mode",
+			"Selector",
+			v19,
+			1
+		)
+		newPage.CameraModeFrame = cameraModeFrame
+		newPage.CameraModeLabel = cameraModeLabel
+		newPage.CameraMode = cameraMode
 
-		v414.CameraModeFrame = v417
-		v415.CameraModeLabel = v418
-		v416.CameraMode = v419
-		v183.CameraModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.CameraModeFrame
-		t10[v183.CameraMode] = true
-		v183.CameraModeOverrideText = Create("TextLabel")({
+		newPage.CameraModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.CameraModeFrame
+
+		set[newPage.CameraMode] = true
+
+		newPage.CameraModeOverrideText = Create("TextLabel")({
 			Name = "CameraDevOverrideLabel",
 			Text = "Set by Developer",
-			BackgroundTransparency = 1,
-			Visible = false,
-			ZIndex = 2,
 			TextColor3 = Color3.new(1, 1, 1),
 			Font = Theme.font(Enum.Font.SourceSans, "GameSettings"),
 			FontSize = Theme.fontSize(Enum.FontSize.Size24, "GameSettings"),
+			BackgroundTransparency = 1,
 			Size = UDim2.new(0.6, 0, 1, 0),
 			AnchorPoint = Vector2.new(1, 0.5),
 			Position = UDim2.new(1, 0, 0.5, 0),
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextYAlignment = Enum.TextYAlignment.Center,
-			Parent = v183.CameraModeFrame
+			Visible = false,
+			ZIndex = 2,
+			Parent = newPage.CameraModeFrame
 		})
 
-		if v409 then
-			v409.TouchCameraMovementModeRegistered:connect(function(__) -- line: 1448
-				-- upvalues: UserInputService (copy), updateCameraMovementModes (copy)
+		if v18 then
+			v18.TouchCameraMovementModeRegistered:connect(function(p)
 				if UserInputService.TouchEnabled then
 					updateCameraMovementModes()
 				end
 			end)
-			v409.ComputerCameraMovementModeRegistered:connect(function(__) -- line: 1454
-				-- upvalues: UserInputService (copy), updateCameraMovementModes (copy)
+
+			v18.ComputerCameraMovementModeRegistered:connect(function(p)
 				if UserInputService.MouseEnabled then
 					updateCameraMovementModes()
 				end
 			end)
 		end
 
-		UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function() -- line: 1461
-			-- upvalues: updateCameraMovementModes (copy)
+		UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function()
 			updateCameraMovementModes()
 		end)
 
-		local u420 = false
-
-		v183.CameraMode.IndexChanged:connect(function(p29) -- line: 1466
-			-- upvalues: updateCurrentCameraMovementIndex (copy), u420 (ref), reportSettingsForAnalytics (copy)
-			if updateCurrentCameraMovementIndex(p29) then
-				if u420 then
+		local flag2 = false
+		newPage.CameraMode.IndexChanged:connect(function(p)
+			if updateCurrentCameraMovementIndex(p) then
+				if flag2 then
 					reportSettingsForAnalytics()
 				end
 
-				u420 = true
+				flag2 = true
 			end
 		end)
+
 		updateCameraMovementModes()
 
-		local u421 = false
+		local v21 = false
+		local function createVROption()
+			if not v21 then
+				v21 = true
 
-		local function createVROption() -- line: 1482
-			-- upvalues: u421 (ref), GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), reportSettingsChangeForAnalytics (copy)
-			if not u421 then
-				u421 = true
+				local v22 = gameSettings.VREnabled and { "On", "Off (restart pending)" }
+					or { "On (restart pending)", "Off" }
 
-				local u860 = if not GameSettings.VREnabled then {
-					"On (restart pending)",
-					"Off"
-				} else {
-					"On",
-					"Off (restart pending)"
-				}
-				local v861 = v183
-				local v862 = v183
-				local v863 = v183
-				local v864, v865, v866 = Utility:AddNewRow(v183, "VR", "Selector", u860, not GameSettings.VREnabled and 2 or 1)
+				local vrEnabledFrame, vrEnabledLabel, vrEnabledSelector = Utility:AddNewRow(
+					newPage,
+					"VR",
+					"Selector",
+					v22,
+					gameSettings.VREnabled and 1 or 2
+				)
+				newPage.VREnabledFrame = vrEnabledFrame
+				newPage.VREnabledLabel = vrEnabledLabel
+				newPage.VREnabledSelector = vrEnabledSelector
 
-				v861.VREnabledFrame = v864
-				v862.VREnabledLabel = v865
-				v863.VREnabledSelector = v866
-				v183.VREnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VREnabledFrame
-				v183.VREnabledSelector.IndexChanged:connect(function(p30) -- line: 1497
-					-- upvalues: GameSettings (copy), u860 (ref), reportSettingsChangeForAnalytics (copy)
-					local t17 = {
-						On = {
-							Name = "On",
-							Value = 1
-						},
-						Off = {
-							Name = "Off",
-							Value = 2
-						}
+				newPage.VREnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VREnabledFrame
+
+				newPage.VREnabledSelector.IndexChanged:connect(function(p)
+					local v23 = {
+						On = { Name = "On", Value = 1 },
+						Off = { Name = "Off", Value = 2 }
 					}
-					local v1109 = p30 == t17.On.Value
 
-					if v1109 ~= GameSettings.VREnabled then
-						GameSettings.VREnabled = v1109
+					local vrEnabled = p == v23.On.Value
 
-						local v1110 = u860[t17.On.Value]
-						local v1111 = u860[p30]
+					if gameSettings.VREnabled ~= vrEnabled then
+						gameSettings.VREnabled = vrEnabled
+						local v24 = v22[v23.On.Value]
+						local v25 = v22[p]
 
-						if v1111 == u860[t17.On.Value] then
-							v1110 = u860[t17.Off.Value]
+						if v25 == v22[v23.On.Value] then
+							v24 = v22[v23.Off.Value]
 						end
 
-						reportSettingsChangeForAnalytics("vr_mode", v1110, v1111)
+						reportSettingsChangeForAnalytics("vr_mode", v24, v25)
 					end
 				end)
 			end
 		end
-		local function onVREnabledChanged() -- line: 1516
-			-- upvalues: VRService (copy), GameSettings (copy), createVROption (copy)
+
+		local function onVREnabledChanged() -- 1 equivalent call inferred from this helper
 			if VRService.VREnabled then
-				GameSettings.HasEverUsedVR = true
+				gameSettings.HasEverUsedVR = true
 				createVROption()
-
-				return
-			end
-
-			if GameSettings.HasEverUsedVR then
+			elseif gameSettings.HasEverUsedVR then
 				createVROption()
 			end
 		end
@@ -1654,395 +1973,346 @@ local function Initialize() -- line: 473
 		if GetFFlagAlwaysShowVRToggle() and getAppFeaturePolicies().getIsLinkedVRModeAvailable() then
 			createVROption()
 		else
-			if VRService.VREnabled then
-				GameSettings.HasEverUsedVR = true
-				createVROption()
-			elseif GameSettings.HasEverUsedVR then
-				createVROption()
-			end
-
+			onVREnabledChanged() -- inferred equivalent call
 			VRService:GetPropertyChangedSignal("VREnabled"):connect(onVREnabledChanged)
 		end
 
-		local t18 = {}
-		local t19 = {}
-		local t20 = {}
-		local t21 = {}
+		local v22 = {}
+		local v23 = {}
+		local v24 = {}
+		local v25 = {}
 
-		local function u428(__: boolean) -- line: 1541
-		end
-		local function setMovementModeVisible(p31) -- line: 1545
-			-- upvalues: v183 (copy), t18 (ref)
-			if v183.MovementMode then
-				local v869 = p31 and #t18 > 0
-
-				v183.MovementMode.SelectorFrame.Visible = v869
-				v183.MovementMode:SetInteractable(v869)
-				v183.MovementModeOverrideText.Visible = not v869
+		local function setMovementModeVisible(p) -- 5 equivalent calls inferred from this helper
+			if newPage.MovementMode then
+				local visible = p and #v22 > 0
+				newPage.MovementMode.SelectorFrame.Visible = visible
+				newPage.MovementMode:SetInteractable(visible)
+				newPage.MovementModeOverrideText.Visible = not visible
 			end
 		end
 
-		if p23 then
-			local v430 = CoreUtility.waitForChildOfClass(LocalPlayer, "PlayerScripts")
+		local fn
 
-			local function getDisplayName(p32) -- line: 1559
-				-- upvalues: UserInputService (copy), RobloxTranslator (copy), Constants (copy), t6 (copy), v88 (copy)
-				if p32 == "Default" then
+		if touchEnabled then
+			local v26 = CoreUtility.waitForChildOfClass(LocalPlayer, "PlayerScripts")
+
+			local function getDisplayName(p)
+				if p == "Default" then
 					if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
 						return (RobloxTranslator:FormatByKey(Constants.MovementModeDynamicThumbstickKey))
 					end
 
-					return t6.DEFAULT_KEYBOARD
+					return v8.DEFAULT_KEYBOARD
 				end
 
-				if p32 == "KeyboardMouse" then
+				if p == "KeyboardMouse" then
 					return "Keyboard + Mouse"
 				end
 
-				if p32 == "ClickToMove" then
+				if p == "ClickToMove" then
 					if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
-						return t6.TAP_TO_MOVE
+						return v8.TAP_TO_MOVE
 					end
 
-					return t6.CLICK_TO_MOVE
+					return v8.CLICK_TO_MOVE
 				end
 
-				if p32 == "DynamicThumbstick" then
+				if p == "DynamicThumbstick" then
 					return "Dynamic Thumbstick"
 				end
 
-				if p32 == "Thumbstick" then
-					p32 = v88
+				if p == "Thumbstick" then
+					p = formatByKey
 				end
 
-				return p32
+				return p
 			end
 
-			local v432 = v183
-			local v433 = v183
-			local v434 = v183
-			local v435, v436, v437 = Utility:AddNewRow(v183, "Movement Mode", "Selector", {}, 1)
+			local movementModeFrame, movementModeLabel, movementMode = Utility:AddNewRow(
+				newPage,
+				"Movement Mode",
+				"Selector",
+				{},
+				1
+			)
+			newPage.MovementModeFrame = movementModeFrame
+			newPage.MovementModeLabel = movementModeLabel
+			newPage.MovementMode = movementMode
 
-			v432.MovementModeFrame = v435
-			v433.MovementModeLabel = v436
-			v434.MovementMode = v437
-			v183.MovementModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.MovementModeFrame
-			t10[v183.MovementMode] = true
-			v183.MovementModeOverrideText = Create("TextLabel")({
+			newPage.MovementModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.MovementModeFrame
+
+			set[newPage.MovementMode] = true
+
+			newPage.MovementModeOverrideText = Create("TextLabel")({
 				Name = "MovementDevOverrideLabel",
 				Text = "Set by Developer",
-				BackgroundTransparency = 1,
-				Visible = false,
-				ZIndex = 2,
 				TextColor3 = Color3.new(1, 1, 1),
 				Font = Theme.font(Enum.Font.SourceSans, "GameSettings"),
 				FontSize = Theme.fontSize(Enum.FontSize.Size24, "GameSettings"),
+				BackgroundTransparency = 1,
 				Size = UDim2.new(0.6, 0, 1, 0),
 				AnchorPoint = Vector2.new(1, 0.5),
 				Position = UDim2.new(1, 0, 0.5, 0),
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				Parent = v183.MovementModeFrame
+				Visible = false,
+				ZIndex = 2,
+				Parent = newPage.MovementModeFrame
 			})
 
-			local function setMovementMode(p33) -- line: 1600
-				-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), GameSettings (copy), reportSettingsChangeForAnalytics (copy)
-				local TouchMovementMode = nil
+			local function setMovementMode(p)
+				local v27 = nil
 
-				if p33.EnumType == Enum.TouchMovementMode then
+				if p.EnumType == Enum.TouchMovementMode then
 					if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-						TouchMovementMode = GameSettings.TouchMovementMode
+						v27 = gameSettings.TouchMovementMode
 					end
 
-					GameSettings.TouchMovementMode = p33
+					gameSettings.TouchMovementMode = p
 				else
 					if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-						TouchMovementMode = GameSettings.ComputerMovementMode
+						v27 = gameSettings.ComputerMovementMode
 					end
 
-					GameSettings.ComputerMovementMode = p33
+					gameSettings.ComputerMovementMode = p
 				end
 
 				if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-					reportSettingsChangeForAnalytics("movement_mode", TouchMovementMode, p33)
+					reportSettingsChangeForAnalytics("movement_mode", v27, p)
 				end
 			end
+			fn = function(flag3: boolean)
+				local v27
 
-			function u428(b3: boolean) -- line: 1617
-				-- upvalues: LocalPlayer (copy), v183 (copy), t18 (ref)
-				local v874 = if not b3 then LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.UserChoice else LocalPlayer.DevTouchMovementMode == Enum.DevTouchMovementMode.UserChoice
-
-				if v183.MovementMode then
-					local v875 = v874 and #t18 > 0
-
-					v183.MovementMode.SelectorFrame.Visible = v875
-					v183.MovementMode:SetInteractable(v875)
-					v183.MovementModeOverrideText.Visible = not v875
+				if flag3 then
+					v27 = LocalPlayer.DevTouchMovementMode == Enum.DevTouchMovementMode.UserChoice
+				else
+					v27 = LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.UserChoice
 				end
 
-				if v183.MovementModeOverrideText then
-					v183.MovementModeOverrideText.Visible = not v874
+				setMovementModeVisible(v27) -- inferred equivalent call
+
+				if newPage.MovementModeOverrideText then
+					newPage.MovementModeOverrideText.Visible = not v27
 				end
 			end
+			local function updateMovementModes()
+				local v27 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
 
-			local function updateMovementModes() -- line: 1629
-				-- upvalues: UserInputService (copy), v430 (copy), t18 (ref), t19 (ref), t20 (ref), t21 (ref), v183 (copy), RobloxTranslator (copy), Constants (copy), t6 (copy), v88 (copy), GameSettings (copy), setMovementMode (copy), u428 (ref)
-				local v876 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
-
-				if v430 then
-					if v876 then
-						t18 = v430:GetRegisteredTouchMovementModes()
+				if v26 then
+					if v27 then
+						v22 = v26:GetRegisteredTouchMovementModes()
 					else
-						t18 = v430:GetRegisteredComputerMovementModes()
+						v22 = v26:GetRegisteredComputerMovementModes()
 					end
 				end
 
-				t19 = {}
-				t20 = {}
-				t21 = {}
+				v23 = {}
+				v24 = {}
+				v25 = {}
 
-				if #t18 <= 0 then
-					if v183.MovementMode then
-						v183.MovementMode.SelectorFrame.Visible = false
-						v183.MovementMode:SetInteractable(false)
-						v183.MovementModeOverrideText.Visible = true
+				if #v22 <= 0 then
+					if newPage.MovementMode then
+						newPage.MovementMode.SelectorFrame.Visible = false
+						newPage.MovementMode:SetInteractable(false)
+						newPage.MovementModeOverrideText.Visible = true
+					end
+				else
+					setMovementModeVisible(true) -- inferred equivalent call
+
+					for k, v28 in v22 do
+						v24[k] = v28
+						local v29 = v25
+						local v30 = v28.Name
+
+						if v30 == "Default" then
+							if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
+								v30 = RobloxTranslator:FormatByKey(Constants.MovementModeDynamicThumbstickKey)
+							else
+								v30 = v8.DEFAULT_KEYBOARD
+							end
+						elseif v30 == "KeyboardMouse" then
+							v30 = "Keyboard + Mouse"
+						elseif v30 == "ClickToMove" then
+							if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
+								v30 = v8.TAP_TO_MOVE
+							else
+								v30 = v8.CLICK_TO_MOVE
+							end
+						elseif v30 == "DynamicThumbstick" then
+							v30 = "Dynamic Thumbstick"
+						elseif v30 == "Thumbstick" then
+							v30 = formatByKey
+						end
+
+						v29[k] = v30
+						v23[v28] = k
 					end
 
-					return
-				end
-
-				if v183.MovementMode then
-					local v877 = #t18 > 0
-
-					v183.MovementMode.SelectorFrame.Visible = v877
-					v183.MovementMode:SetInteractable(v877)
-					v183.MovementModeOverrideText.Visible = not v877
-				end
-
-				for v878, v879 in t18 do
-					t20[v878] = v879
-
-					local v880 = t21
-					local Name = v879.Name
-
-					if Name == "Default" then
-						Name = if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then t6.DEFAULT_KEYBOARD else RobloxTranslator:FormatByKey(Constants.MovementModeDynamicThumbstickKey)
-					elseif Name == "KeyboardMouse" then
-						Name = "Keyboard + Mouse"
-					elseif Name == "ClickToMove" then
-						Name = if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then t6.CLICK_TO_MOVE else t6.TAP_TO_MOVE
-					elseif Name == "DynamicThumbstick" then
-						Name = "Dynamic Thumbstick"
-					elseif Name == "Thumbstick" then
-						Name = v88
+					if newPage.MovementMode then
+						newPage.MovementMode:UpdateOptions(v25)
 					end
 
-					v880[v878] = Name
-					t19[v879] = v878
+					local v28
+
+					if v27 then
+						v28 = gameSettings.TouchMovementMode
+					else
+						v28 = gameSettings.ComputerMovementMode
+					end
+
+					if v28 then
+						setMovementMode(v28)
+						newPage.MovementMode:SetSelectionIndex(v23[v28])
+					end
+
+					fn(v27)
 				end
-
-				if v183.MovementMode then
-					v183.MovementMode:UpdateOptions(t21)
-				end
-
-				local v882 = if not v876 then GameSettings.ComputerMovementMode else GameSettings.TouchMovementMode
-
-				if v882 then
-					setMovementMode(v882)
-					v183.MovementMode:SetSelectionIndex(t19[v882])
-				end
-
-				u428(v876)
 			end
 
 			updateMovementModes()
 
-			if v430 then
-				v430.TouchMovementModeRegistered:connect(function(__) -- line: 1673
-					-- upvalues: UserInputService (copy), updateMovementModes (copy)
+			if v26 then
+				v26.TouchMovementModeRegistered:connect(function(p)
 					if UserInputService.TouchEnabled then
 						updateMovementModes()
 					end
 				end)
-				v430.ComputerMovementModeRegistered:connect(function(__) -- line: 1679
-					-- upvalues: UserInputService (copy), updateMovementModes (copy)
+
+				v26.ComputerMovementModeRegistered:connect(function(p)
 					if UserInputService.MouseEnabled then
 						updateMovementModes()
 					end
 				end)
 			end
 
-			UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function() -- line: 1686
-				-- upvalues: updateMovementModes (copy)
+			UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function()
 				updateMovementModes()
 			end)
-			v183.MovementMode.IndexChanged:connect(function(p36) -- line: 1690
-				-- upvalues: setMovementMode (copy), t20 (ref), reportSettingsForAnalytics (copy)
-				setMovementMode(t20[p36])
+
+			newPage.MovementMode.IndexChanged:connect(function(p)
+				setMovementMode(v24[p])
 				reportSettingsForAnalytics()
 			end)
-		end
-
-		local v440 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
-
-		if not if not v440 then LocalPlayer.DevComputerCameraMode == Enum.DevComputerCameraMovementMode.UserChoice else LocalPlayer.DevTouchCameraMode == Enum.DevTouchCameraMovementMode.UserChoice then
-			v183.CameraModeOverrideText.Visible = true
-			setCameraModeVisible(false)
 		else
-			v183.CameraModeOverrideText.Visible = false
+			fn = function(flag3: boolean) end
+		end
+
+		local v26 = UserInputService.PreferredInput == Enum.PreferredInput.Touch
+		local v27
+
+		if v26 then
+			v27 = LocalPlayer.DevTouchCameraMode == Enum.DevTouchCameraMovementMode.UserChoice
+		else
+			v27 = LocalPlayer.DevComputerCameraMode == Enum.DevComputerCameraMovementMode.UserChoice
+		end
+
+		if v27 then
+			newPage.CameraModeOverrideText.Visible = false
 			setCameraModeVisible(true)
+		else
+			newPage.CameraModeOverrideText.Visible = true
+			setCameraModeVisible(false)
 		end
 
-		local v441 = if not v440 then LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.UserChoice else LocalPlayer.DevTouchMovementMode == Enum.DevTouchMovementMode.UserChoice
+		local v28
 
-		if v183.MovementModeOverrideText then
-			if not v441 then
-				v183.MovementModeOverrideText.Visible = true
+		if v26 then
+			v28 = LocalPlayer.DevTouchMovementMode == Enum.DevTouchMovementMode.UserChoice
+		else
+			v28 = LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.UserChoice
+		end
 
-				if v183.MovementMode then
-					v183.MovementMode.SelectorFrame.Visible = false
-					v183.MovementMode:SetInteractable(false)
-					v183.MovementModeOverrideText.Visible = true
-				end
+		if newPage.MovementModeOverrideText then
+			if v28 then
+				newPage.MovementModeOverrideText.Visible = false
+				setMovementModeVisible(true) -- inferred equivalent call
 			else
-				v183.MovementModeOverrideText.Visible = false
+				newPage.MovementModeOverrideText.Visible = true
 
-				if v183.MovementMode then
-					local v442 = #t18 > 0
-
-					v183.MovementMode.SelectorFrame.Visible = v442
-					v183.MovementMode:SetInteractable(v442)
-					v183.MovementModeOverrideText.Visible = not v442
+				if newPage.MovementMode then
+					newPage.MovementMode.SelectorFrame.Visible = false
+					newPage.MovementMode:SetInteractable(false)
+					newPage.MovementModeOverrideText.Visible = true
 				end
 			end
 		end
 
-		local v443 = not LocalPlayer.DevEnableMouseLock
+		applyDevOverrideShiftLockSelector() -- inferred equivalent call
 
-		if v183.ShiftLockOverrideText then
-			v183.ShiftLockOverrideText.Visible = v443
-
-			local v444 = not v443 and LocalPlayer.DevEnableMouseLock
-
-			if v183.ShiftLockMode then
-				v183.ShiftLockMode.SelectorFrame.Visible = v444
-				v183.ShiftLockMode:SetInteractable(v444)
-			end
-		end
-
-		local function updateUserSettingsMenu(p37) -- line: 1736
-			-- upvalues: LocalPlayer (copy), v183 (copy), u428 (ref), t18 (ref)
-			if p37 == "DevEnableMouseLock" then
-				local v887 = not LocalPlayer.DevEnableMouseLock
-
-				if v183.ShiftLockOverrideText then
-					v183.ShiftLockOverrideText.Visible = v887
-
-					local v888 = not v887 and LocalPlayer.DevEnableMouseLock
-
-					if v183.ShiftLockMode then
-						v183.ShiftLockMode.SelectorFrame.Visible = v888
-						v183.ShiftLockMode:SetInteractable(v888)
-
-						return
-					end
-				end
-			else
-				if p37 == "DevComputerCameraMode" then
-					local v889 = LocalPlayer.DevComputerCameraMode == Enum.DevComputerCameraMovementMode.UserChoice
-
-					setCameraModeVisible(v889)
-					v183.CameraModeOverrideText.Visible = not v889
-
+		local function updateUserSettingsMenu(p)
+			if p == "DevEnableMouseLock" then
+				applyDevOverrideShiftLockSelector() -- inferred equivalent call
+			elseif p == "DevComputerCameraMode" then
+				local v29 = LocalPlayer.DevComputerCameraMode == Enum.DevComputerCameraMovementMode.UserChoice
+				setCameraModeVisible(v29)
+				newPage.CameraModeOverrideText.Visible = not v29
+			elseif p == "DevComputerMovementMode" then
+				if fn ~= nil then
+					fn(false)
 					return
 				end
 
-				if p37 == "DevComputerMovementMode" then
-					if u428 ~= nil then
-						u428(false)
+				local v29 = LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.UserChoice
+				setMovementModeVisible(v29) -- inferred equivalent call
 
-						return
-					end
-
-					local v890 = LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.UserChoice
-
-					if v183.MovementMode then
-						local v891 = v890 and #t18 > 0
-
-						v183.MovementMode.SelectorFrame.Visible = v891
-						v183.MovementMode:SetInteractable(v891)
-						v183.MovementModeOverrideText.Visible = not v891
-					end
-
-					if v183.MovementModeOverrideText then
-						v183.MovementModeOverrideText.Visible = not v890
-
-						return
-					end
-				elseif p37 == "DevTouchMovementMode" then
-					if u428 ~= nil then
-						u428(true)
-
-						return
-					end
-
-					local v892 = LocalPlayer.DevTouchMovementMode == Enum.DevTouchMovementMode.UserChoice
-
-					if v183.MovementMode then
-						local v893 = v892 and #t18 > 0
-
-						v183.MovementMode.SelectorFrame.Visible = v893
-						v183.MovementMode:SetInteractable(v893)
-						v183.MovementModeOverrideText.Visible = not v893
-					end
-
-					if v183.MovementModeOverrideText then
-						v183.MovementModeOverrideText.Visible = not v892
-
-						return
-					end
-				elseif p37 == "DevTouchCameraMode" then
-					local v894 = LocalPlayer.DevTouchCameraMode == Enum.DevTouchCameraMovementMode.UserChoice
-
-					setCameraModeVisible(v894)
-					v183.CameraModeOverrideText.Visible = not v894
+				if newPage.MovementModeOverrideText then
+					newPage.MovementModeOverrideText.Visible = not v29
 				end
+			elseif p == "DevTouchMovementMode" then
+				if fn ~= nil then
+					fn(true)
+					return
+				end
+
+				local v29 = LocalPlayer.DevTouchMovementMode == Enum.DevTouchMovementMode.UserChoice
+				setMovementModeVisible(v29) -- inferred equivalent call
+
+				if newPage.MovementModeOverrideText then
+					newPage.MovementModeOverrideText.Visible = not v29
+				end
+			elseif p == "DevTouchCameraMode" then
+				local v29 = LocalPlayer.DevTouchCameraMode == Enum.DevTouchCameraMovementMode.UserChoice
+				setCameraModeVisible(v29)
+				newPage.CameraModeOverrideText.Visible = not v29
 			end
 		end
 
-		LocalPlayer.Changed:connect(function(p38) -- line: 1771
-			-- upvalues: t3 (copy), updateUserSettingsMenu (copy), t2 (copy)
-			if t3[p38] then
-				updateUserSettingsMenu(p38)
+		LocalPlayer.Changed:connect(function(p)
+			if v5[p] then
+				updateUserSettingsMenu(p)
 			end
 
-			if t2[p38] then
-				updateUserSettingsMenu(p38)
+			if v4[p] then
+				updateUserSettingsMenu(p)
 			end
 		end)
 	end
-	local function createFeedbackModeOptions() -- line: 1784
-		-- upvalues: Url (copy), HttpService (copy), v146 (copy), v183 (copy), SafetyService (copy), ExperienceStateCaptureService (ref), reportSettingsChangeForAnalytics (copy), v145 (copy), Utility (copy), v90 (copy), RobloxTranslator (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), v140 (copy), v128 (copy)
-		local v446 = Url.ROLES_URL .. "v1/users/authenticated/roles"
-		local v447 = HttpService:RequestInternal({
-			Method = "GET",
-			Url = v446
-		})
 
-		local function rolesCheckCallback(p39) -- line: 1791
-			-- upvalues: v146 (copy), v183 (copy), SafetyService (copy), ExperienceStateCaptureService (ref), reportSettingsChangeForAnalytics (copy), v145 (copy), Utility (copy), v90 (copy), RobloxTranslator (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-			if p39 then
-				if not v146 and game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled") and not v183.FeedbackEntryPointEnabled then
+	local function createFeedbackModeOptions()
+		local url = Url.ROLES_URL .. "v1/users/authenticated/roles"
+		local internal = HttpService:RequestInternal({ Url = url, Method = "GET" })
+
+		local function rolesCheckCallback(p)
+			if p then
+				if
+					not defineFastFlag22
+					and game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled")
+					and not newPage.FeedbackEntryPointEnabled
+				then
 					return
 				end
 
-				local function onToggleFeedbackMode() -- line: 1803
-					-- upvalues: v146 (copy), v183 (copy), SafetyService (copy), ExperienceStateCaptureService (ref), reportSettingsChangeForAnalytics (copy)
-					if v146 and (game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled") and not v183.FeedbackEntryPointEnabled) then
+				local function onToggleFeedbackMode()
+					if
+						defineFastFlag22
+						and game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled")
+						and not newPage.FeedbackEntryPointEnabled
+					then
 						return
 					end
 
-					v183.HubRef:PopMenu(false, true)
+					newPage.HubRef:PopMenu(false, true)
 
 					if game:GetEngineFeature("SafetyServiceCaptureModeReportProp") then
 						SafetyService.IsCaptureModeForReport = false
@@ -2055,1234 +2325,1094 @@ local function Initialize() -- line: 473
 					reportSettingsChangeForAnalytics("translation_feedback", "", "pressed")
 				end
 
-				local v898, v899
+				local toggleFeedbackModeButton, toggleFeedbackModeText
 
-				if v145 then
-					v898, v899 = Utility:MakeStyledButton("toggleFeedbackModeButton", v90, UDim2.new(1, 0, 1, -20), onToggleFeedbackMode, v183)
-					v898.Size = UDim2.new(0.6, 0, 0, 40)
-					v898.Position = UDim2.new(0.4, 0, 0.5, 0)
-					v898.AnchorPoint = Vector2.new(0, 0.5)
+				if defineFastFlag21 then
+					toggleFeedbackModeButton, toggleFeedbackModeText = Utility:MakeStyledButton(
+						"toggleFeedbackModeButton",
+						formatByKey3,
+						UDim2.new(1, 0, 1, -20),
+						onToggleFeedbackMode,
+						newPage
+					)
+
+					toggleFeedbackModeButton.Size = UDim2.new(0.6, 0, 0, 40)
 				else
-					v898, v899 = Utility:MakeStyledButton("toggleFeedbackModeButton", v90, UDim2.new(0, 300, 1, -20), onToggleFeedbackMode, v183)
-					v898.Size = UDim2.new(0, 300, 0, 30)
-					v898.Position = UDim2.new(0.4, 0, 0.5, 0)
-					v898.AnchorPoint = Vector2.new(0, 0.5)
+					toggleFeedbackModeButton, toggleFeedbackModeText = Utility:MakeStyledButton(
+						"toggleFeedbackModeButton",
+						formatByKey3,
+						UDim2.new(0, 300, 1, -20),
+						onToggleFeedbackMode,
+						newPage
+					)
+
+					toggleFeedbackModeButton.Size = UDim2.new(0, 300, 0, 30)
 				end
 
-				v898.ZIndex = 2
-				v898.Selectable = true
-				v899.ZIndex = 2
+				toggleFeedbackModeButton.Position = UDim2.new(0.4, 0, 0.5, 0)
+				toggleFeedbackModeButton.AnchorPoint = Vector2.new(0, 0.5)
+
+				toggleFeedbackModeButton.ZIndex = 2
+				toggleFeedbackModeButton.Selectable = true
+				toggleFeedbackModeText.ZIndex = 2
 
 				if game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled") then
-					v183.toggleFeedbackModeButton = v898
-					v183.toggleFeedbackModeText = v899
+					newPage.toggleFeedbackModeButton = toggleFeedbackModeButton
+					newPage.toggleFeedbackModeText = toggleFeedbackModeText
 				end
 
-				if v145 then
-					Utility:AddNewRowObject(v183, RobloxTranslator:FormatByKey("CoreScripts.Feedback.EntryPoint.OptionText"), v898, nil, true).LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FeedbackModeButton
+				if defineFastFlag21 then
+					local addNewRowObject = Utility:AddNewRowObject(
+						newPage,
+						RobloxTranslator:FormatByKey("CoreScripts.Feedback.EntryPoint.OptionText"),
+						toggleFeedbackModeButton,
+						nil,
+						true
+					)
 
-					return
+					addNewRowObject.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FeedbackModeButton
+				else
+					local addNewRowObject = Utility:AddNewRowObject(
+						newPage,
+						RobloxTranslator:FormatByKey("CoreScripts.Feedback.EntryPoint.OptionText"),
+						toggleFeedbackModeButton
+					)
+
+					addNewRowObject.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FeedbackModeButton
 				end
-
-				Utility:AddNewRowObject(v183, RobloxTranslator:FormatByKey("CoreScripts.Feedback.EntryPoint.OptionText"), v898).LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FeedbackModeButton
 			end
 		end
 
-		if v140 then
+		if defineFastFlag16 then
 			rolesCheckCallback(true)
+		else
+			internal:Start(function(p, p2)
+				local v18 = false
+				local success = false
+				local result
 
-			return
-		end
-
-		v447:Start(function(p40, p41) -- line: 1887
-			-- upvalues: HttpService (copy), v128 (copy), v446 (copy), rolesCheckCallback (copy)
-			local u902 = false
-			local v903 = false
-			local s2
-
-			if not p40 then
-				s2 = "Roles Api Request: Connection error"
-			elseif p41.StatusCode == 401 then
-				s2 = "Roles Api Request: Unauthorized"
-			elseif p41.StatusCode < 200 or p41.StatusCode >= 400 then
-				s2 = "Roles Api Status code: " .. p41.StatusCode
-			else
-				v903, s2 = pcall(function() -- line: 1899
-					-- upvalues: HttpService (copy), p41 (copy), u902 (ref)
-					local data = HttpService:JSONDecode(p41.Body)
-
-					for __, v in pairs(data.roles) do
-						if v == "Soothsayer" then
-							u902 = true
-						end
-					end
-				end)
-			end
-
-			if not v903 then
-				v128:warning("Feedback Mode initialization api call failed with url: " .. v446 .. " and with error message: " .. s2)
-			end
-
-			rolesCheckCallback(u902)
-		end)
-	end
-	local function createTranslationOptions() -- line: 1927
-		-- upvalues: Players (copy), Url (copy), HttpService (copy), v128 (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), LocalPlayer (copy), reportSettingsChangeForAnalytics (copy), RunService (copy)
-		local n8 = 1
-		local n9 = 1
-		local u451 = false
-		local languageCode = nil
-		local localeCode = nil
-		local LocaleId = Players.LocalPlayer.LocaleId
-		local languageCode2 = nil
-		local u456 = nil
-		local t22 = {}
-		local t23 = {}
-		local t24 = {}
-		local t25 = {}
-		local t26 = {}
-		local v462 = Url.LOCALE_URL .. string.format("v1/locales?displayValueLocale=%s", Players.LocalPlayer.LocaleId:gsub("-", "_"))
-		local v463 = HttpService:RequestInternal({
-			Method = "GET",
-			Url = v462
-		})
-		local v464 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/source-language/games/%d", game.GameId)
-		local v465 = HttpService:RequestInternal({
-			Method = "GET",
-			Url = v464
-		})
-		local v466 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/supported-languages/games/%d/in-experience-language-selection", game.GameId)
-		local v467 = HttpService:RequestInternal({
-			Method = "GET",
-			Url = v466
-		})
-		local v468 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/user-localization-settings/universe/%d", game.GameId)
-		local v469 = HttpService:RequestInternal({
-			Method = "GET",
-			Url = v468
-		})
-
-		local function userExperienceLanguageSettingsCallback(p42, p43) -- line: 1992
-			-- upvalues: v128 (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), t26 (copy), t24 (copy), languageCode (ref), t22 (copy), u456 (ref), t23 (copy), n8 (ref), n9 (ref), LocalPlayer (copy), localeCode (ref), reportSettingsChangeForAnalytics (copy), Url (copy), HttpService (copy), u451 (ref), RunService (copy)
-			if not p42 then
-				if p43 == nil then
-					p43 = "Execution path did not set earliest error to non-nil value."
-				end
-
-				v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. p43)
-
-				local v907 = v183
-				local v908 = v183
-				local v909 = v183
-				local v910, v911, v912 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-				v907.LanguageSelectorFrame = v910
-				v908.LanguageSelectorLabel = v911
-				v909.LanguageSelectorMode = v912
-				v183.LanguageSelectorMode:SetInteractable(false)
-				v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
-
-				return
-			end
-
-			local v913 = false
-
-			table.insert(t26, t24[languageCode].languageName .. " (Original)")
-
-			for __, v in pairs(t22) do
-				if v == u456 then
-					v913 = true
-				end
-
-				if v ~= languageCode then
-					table.insert(t26, t24[v].languageName)
-				end
-			end
-
-			if v913 == true then
-				for k, v in pairs(t26) do
-					if k ~= 1 and t23[v] == u456 then
-						n8 = k
-						n9 = k
-					end
-				end
-			end
-
-			local v918 = v183
-			local v919 = v183
-			local v920 = v183
-			local v921, v922, v923 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", t26, n8)
-
-			v918.LanguageSelectorFrame = v921
-			v919.LanguageSelectorLabel = v922
-			v920.LanguageSelectorMode = v923
-			v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
-
-			if n8 == 1 then
-				LocalPlayer:SetExperienceSettingsLocaleId(localeCode)
-			else
-				local v924 = t23[t26[n8]]
-
-				LocalPlayer:SetExperienceSettingsLocaleId(t24[v924].localeCode)
-			end
-
-			v183.LanguageSelectorMode.CurrentLanguage = v183.LanguageSelectorMode.DropDownFrame.DropDownFrameTextLabel.Text
-
-			local function toggleTranslation(p44) -- line: 2072
-				-- upvalues: v183 (copy), t24 (copy), languageCode (ref), t23 (copy), t26 (copy), reportSettingsChangeForAnalytics (copy), Url (copy), HttpService (copy), n9 (ref), LocalPlayer (copy), localeCode (ref), v128 (copy), u451 (ref), RunService (copy)
-				v183.LanguageSelectorMode:SetInteractable(false)
-
-				local v1116 = if p44 ~= 1 then t24[t23[t26[p44]]].id else t24[languageCode].id
-				local CurrentLanguage = v183.LanguageSelectorMode.CurrentLanguage
-				local v1118 = t26[p44]
-
-				if CurrentLanguage ~= v1118 then
-					v183.LanguageSelectorMode.CurrentLanguage = v1118
-					reportSettingsChangeForAnalytics("experience_language", CurrentLanguage, v1118)
-				end
-
-				local t27 = {
-					settingValue = {
-						settingType = "LanguageFamily",
-						settingTargetId = v1116
-					}
-				}
-				local v1120 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/user-localization-settings/universe/%d", game.GameId)
-				local v1121 = HttpService:RequestInternal({
-					Method = "POST",
-					Url = v1120,
-					Headers = {
-						["Content-Type"] = "application/json"
-					},
-					Body = HttpService:JSONEncode(t27)
-				})
-
-				local function callback(p45, p46) -- line: 2119
-					-- upvalues: n9 (ref), p44 (copy), LocalPlayer (copy), localeCode (ref), t23 (copy), t26 (copy), t24 (copy), v128 (copy), u451 (ref), v183 (copy)
-					if p45 then
-						n9 = p44
-
-						if p44 == 1 then
-							LocalPlayer:SetExperienceSettingsLocaleId(localeCode)
-						else
-							local v1212 = t23[t26[p44]]
-
-							LocalPlayer:SetExperienceSettingsLocaleId(t24[v1212].localeCode)
-						end
+				if p then
+					if p2.StatusCode == 401 then
+						result = "Roles Api Request: Unauthorized"
+					elseif p2.StatusCode < 200 or p2.StatusCode >= 400 then
+						result = "Roles Api Status code: " .. p2.StatusCode
 					else
-						v128:warning("Request to update user experience language status failed, keeping language toggle disabled for the remainder of the session. Error: " .. p46)
-						u451 = true
-						v183.LanguageSelectorMode:SetSelectionIndex(n9)
-					end
+						success, result = pcall(function()
+							local jsonDecode = HttpService:JSONDecode(p2.Body)
 
-					v183.LanguageSelectorMode:SetInteractable(true)
-				end
-
-				if RunService:IsStudio() then
-					n9 = p44
-
-					if p44 == 1 then
-						LocalPlayer:SetExperienceSettingsLocaleId(localeCode)
-					else
-						local v1123 = t23[t26[p44]]
-
-						LocalPlayer:SetExperienceSettingsLocaleId(t24[v1123].localeCode)
-					end
-
-					v183.LanguageSelectorMode:SetInteractable(true)
-
-					return
-				end
-
-				if u451 then
-					u451 = false
-					n9 = p44
-
-					if p44 == 1 then
-						LocalPlayer:SetExperienceSettingsLocaleId(localeCode)
-					else
-						local v1124 = t23[t26[p44]]
-
-						LocalPlayer:SetExperienceSettingsLocaleId(t24[v1124].localeCode)
-					end
-
-					v183.LanguageSelectorMode:SetInteractable(true)
-
-					return
-				end
-
-				v1121:Start(function(p47, p48) -- line: 2162
-					-- upvalues: v128 (copy), v1120 (copy), callback (copy)
-					local v1215 = false
-					local s3 = nil
-
-					if not p47 then
-						s3 = "User Experience Language Settings Update Request: Connection error"
-					elseif p48.StatusCode == 401 then
-						s3 = "User Experience Language Settings Update Request: Unauthorized"
-					elseif p48.StatusCode < 200 or p48.StatusCode >= 400 then
-						s3 = "User Experience Language Settings Update Request Status Code: " .. p48.StatusCode
-					else
-						v128:info("User Experience Language Settings Update Request succeeded with code: " .. p48.StatusCode)
-						v1215 = true
-					end
-
-					if not v1215 then
-						v128:warning("GameSettings language selector toggle: Failed to update user experience language status from GameInternationalization API for " .. v1120 .. " with error message: " .. s3)
-					end
-
-					callback(v1215, s3)
-				end)
-			end
-
-			v183.LanguageSelectorMode.IndexChanged:connect(toggleTranslation)
-		end
-		local function experienceSupportedLanguagesCallback(p49, p50) -- line: 2197
-			-- upvalues: v469 (copy), HttpService (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v128 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-			if p49 then
-				v469:Start(function(p51, p52) -- line: 2199
-					-- upvalues: HttpService (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v128 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy)
-					local v1127 = false
-					local s4
-
-					if not p51 then
-						s4 = "User Experience Language Setting Request: Connection error"
-					elseif p52.StatusCode == 401 then
-						s4 = "User Experience Language Setting Request: Unauthorized"
-					elseif p52.StatusCode < 200 or p52.StatusCode >= 400 then
-						s4 = "User Experience Language Setting Request Status code: " .. p52.StatusCode
-					else
-						v1127, s4 = pcall(function() -- line: 2210
-							-- upvalues: HttpService (copy), p52 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy)
-							local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p52.Body).userUniverseLocalizationSettingValue
-
-							if userUniverseLocalizationSettingValue == nil then
-								u456 = languageCode2
-
-								return
-							end
-
-							if userUniverseLocalizationSettingValue.settingType == "SourceOrTranslation" then
-								if userUniverseLocalizationSettingValue.settingTargetId == 1 then
-									u456 = languageCode
-								else
-									u456 = languageCode2
+							for k, role in pairs(jsonDecode.roles) do
+								if role == "Soothsayer" then
+									v18 = true
 								end
 							end
+						end)
+					end
+				else
+					result = "Roles Api Request: Connection error"
+				end
 
-							if userUniverseLocalizationSettingValue.settingType == "LanguageFamily" then
-								if t25[userUniverseLocalizationSettingValue.settingTargetId] == nil then
-									u456 = languageCode2
+				if not success then
+					v10:warning("Feedback Mode initialization api call failed with url: " .. url .. " and with error message: " .. result)
+				end
 
+				rolesCheckCallback(v18)
+			end)
+		end
+	end
+
+	local function createTranslationOptions()
+		local v18 = 1
+		local v19 = 1
+		local v20 = false
+
+		local languageCode = nil
+		local localeCode = nil
+		local localeId = Players.LocalPlayer.LocaleId
+		local languageCode2 = nil
+
+		local v21 = nil
+		local languageCodes = {}
+		local languageCodesByName = {}
+		local v22 = {}
+		local languageCodesById = {}
+
+		local v23 = {}
+
+		local url = Url.LOCALE_URL .. string.format(
+			"v1/locales?displayValueLocale=%s",
+			Players.LocalPlayer.LocaleId:gsub("-", "_")
+		)
+		local internal = HttpService:RequestInternal({ Url = url, Method = "GET" })
+
+		local url2 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/source-language/games/%d", game.GameId)
+		local internal2 = HttpService:RequestInternal({ Url = url2, Method = "GET" })
+
+		local url3 = Url.GAME_INTERNATIONALIZATION_URL .. string.format(
+			"v1/supported-languages/games/%d/in-experience-language-selection",
+			game.GameId
+		)
+		local internal3 = HttpService:RequestInternal({ Url = url3, Method = "GET" })
+
+		local url4 = Url.GAME_INTERNATIONALIZATION_URL .. string.format(
+			"v1/user-localization-settings/universe/%d",
+			game.GameId
+		)
+		local internal4 = HttpService:RequestInternal({ Url = url4, Method = "GET" })
+
+		local function userExperienceLanguageSettingsCallback(success, result)
+			if success then
+				table.insert(v23, v22[languageCode].languageName .. " (Original)")
+				local v24 = false
+
+				for k, v25 in pairs(languageCodes) do
+					v24 = v25 == v21 or v24
+
+					if v25 ~= languageCode then
+						table.insert(v23, v22[v25].languageName)
+					end
+				end
+
+				if v24 == true then
+					for k, v25 in pairs(v23) do
+						if not (k ~= 1 and languageCodesByName[v25] == v21) then
+							continue
+						end
+
+						v18 = k
+						v19 = k
+					end
+				end
+
+				local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+					newPage,
+					RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+					"DropDown",
+					v23,
+					v18
+				)
+				newPage.LanguageSelectorFrame = languageSelectorFrame
+				newPage.LanguageSelectorLabel = languageSelectorLabel
+				newPage.LanguageSelectorMode = languageSelectorMode
+
+				newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+
+				if v18 == 1 then
+					LocalPlayer:SetExperienceSettingsLocaleId(localeCode)
+				else
+					LocalPlayer:SetExperienceSettingsLocaleId(v22[languageCodesByName[v23[v18]]].localeCode)
+				end
+
+				newPage.LanguageSelectorMode.CurrentLanguage = newPage.LanguageSelectorMode.DropDownFrame.DropDownFrameTextLabel.Text
+
+				local function toggleTranslation(p)
+					newPage.LanguageSelectorMode:SetInteractable(false)
+					local id
+
+					if p == 1 then
+						id = v22[languageCode].id
+					else
+						id = v22[languageCodesByName[v23[p]]].id
+					end
+
+					local currentLanguage = newPage.LanguageSelectorMode.CurrentLanguage
+					local currentLanguage2 = v23[p]
+
+					if currentLanguage ~= currentLanguage2 then
+						newPage.LanguageSelectorMode.CurrentLanguage = currentLanguage2
+						reportSettingsChangeForAnalytics("experience_language", currentLanguage, currentLanguage2)
+					end
+
+					local url5 = Url.GAME_INTERNATIONALIZATION_URL .. string.format(
+						"v1/user-localization-settings/universe/%d",
+						game.GameId
+					)
+					local internal5 = HttpService:RequestInternal({
+						Url = url5,
+						Method = "POST",
+						Headers = { ["Content-Type"] = "application/json" },
+						Body = HttpService:JSONEncode({
+							settingValue = { settingType = "LanguageFamily", settingTargetId = id }
+						})
+					})
+
+					local function callback(p2, p3)
+						if p2 then
+							v19 = p
+
+							if p == 1 then
+								LocalPlayer:SetExperienceSettingsLocaleId(localeCode)
+							else
+								LocalPlayer:SetExperienceSettingsLocaleId(v22[languageCodesByName[v23[p]]].localeCode)
+							end
+						else
+							v10:warning("Request to update user experience language status failed, keeping language toggle disabled for the remainder of the session. Error: " .. p3)
+
+							v20 = true
+							newPage.LanguageSelectorMode:SetSelectionIndex(v19)
+						end
+
+						newPage.LanguageSelectorMode:SetInteractable(true)
+					end
+
+					if not RunService:IsStudio() then
+						if not v20 then
+							internal5:Start(function(p2, p3)
+								local v25 = false
+								local v26 = nil
+
+								if p2 then
+									if p3.StatusCode == 401 then
+										v26 = "User Experience Language Settings Update Request: Unauthorized"
+									elseif p3.StatusCode < 200 or p3.StatusCode >= 400 then
+										v26 = "User Experience Language Settings Update Request Status Code: " .. p3.StatusCode
+									else
+										v10:info("User Experience Language Settings Update Request succeeded with code: " .. p3.StatusCode)
+										v25 = true
+									end
+								else
+									v26 = "User Experience Language Settings Update Request: Connection error"
+								end
+
+								if not v25 then
+									v10:warning("GameSettings language selector toggle: Failed to update user experience language status from GameInternationalization API for " .. url5 .. " with error message: " .. v26)
+								end
+
+								callback(v25, v26)
+							end)
+
+							return
+						end
+
+						v20 = false
+					end
+
+					v19 = p
+
+					if p == 1 then
+						LocalPlayer:SetExperienceSettingsLocaleId(localeCode)
+					else
+						LocalPlayer:SetExperienceSettingsLocaleId(v22[languageCodesByName[v23[p]]].localeCode)
+					end
+
+					newPage.LanguageSelectorMode:SetInteractable(true)
+				end
+
+				newPage.LanguageSelectorMode.IndexChanged:connect(toggleTranslation)
+			else
+				v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (result == nil and "Execution path did not set earliest error to non-nil value." or result))
+
+				local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+					newPage,
+					RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+					"DropDown",
+					{ formatByKey2 },
+					1
+				)
+				newPage.LanguageSelectorFrame = languageSelectorFrame
+				newPage.LanguageSelectorLabel = languageSelectorLabel
+				newPage.LanguageSelectorMode = languageSelectorMode
+
+				newPage.LanguageSelectorMode:SetInteractable(false)
+				newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+			end
+		end
+
+		local function experienceSupportedLanguagesCallback(p, p2) -- 3 equivalent calls inferred from this helper
+			if p then
+				internal4:Start(function(p3, p4)
+					local success = false
+					local result
+
+					if p3 then
+						if p4.StatusCode == 401 then
+							result = "User Experience Language Setting Request: Unauthorized"
+						elseif p4.StatusCode < 200 or p4.StatusCode >= 400 then
+							result = "User Experience Language Setting Request Status code: " .. p4.StatusCode
+						else
+							success, result = pcall(function()
+								local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p4.Body).userUniverseLocalizationSettingValue
+
+								if userUniverseLocalizationSettingValue == nil then
+									v21 = languageCode2
 									return
 								end
 
-								u456 = t25[userUniverseLocalizationSettingValue.settingTargetId]
-							end
-						end)
+								if userUniverseLocalizationSettingValue.settingType == "SourceOrTranslation" then
+									if userUniverseLocalizationSettingValue.settingTargetId == 1 then
+										v21 = languageCode
+									else
+										v21 = languageCode2
+									end
+								end
+
+								if userUniverseLocalizationSettingValue.settingType == "LanguageFamily" then
+									if languageCodesById[userUniverseLocalizationSettingValue.settingTargetId] == nil then
+										v21 = languageCode2
+									else
+										v21 = languageCodesById[userUniverseLocalizationSettingValue.settingTargetId]
+									end
+								end
+							end)
+						end
+					else
+						result = "User Experience Language Setting Request: Connection error"
 					end
 
-					if not v1127 then
-						v128:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v468 .. " with error message: " .. s4)
+					if not success then
+						v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. url4 .. " with error message: " .. result)
 					end
 
-					userExperienceLanguageSettingsCallback(v1127, s4)
+					userExperienceLanguageSettingsCallback(success, result)
 				end)
-
 				return
 			end
 
-			if p50 == nil then
-				p50 = "Execution path did not set earliest error to non-nil value."
-			end
+			v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (p2 == nil and "Execution path did not set earliest error to non-nil value." or p2))
 
-			v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. p50)
+			local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+				newPage,
+				RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+				"DropDown",
+				{ formatByKey2 },
+				1
+			)
+			newPage.LanguageSelectorFrame = languageSelectorFrame
+			newPage.LanguageSelectorLabel = languageSelectorLabel
+			newPage.LanguageSelectorMode = languageSelectorMode
 
-			local v928 = v183
-			local v929 = v183
-			local v930 = v183
-			local v931, v932, v933 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-			v928.LanguageSelectorFrame = v931
-			v929.LanguageSelectorLabel = v932
-			v930.LanguageSelectorMode = v933
-			v183.LanguageSelectorMode:SetInteractable(false)
-			v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+			newPage.LanguageSelectorMode:SetInteractable(false)
+			newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
 		end
-		local function experienceSourceLanguageCallback(p53, p54) -- line: 2259
-			-- upvalues: v467 (copy), HttpService (copy), t22 (copy), v128 (copy), v466 (copy), v469 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-			if p53 then
-				v467:Start(function(p55, p56) -- line: 2261
-					-- upvalues: HttpService (copy), t22 (copy), v128 (copy), v466 (copy), p54 (ref), p53 (copy), v469 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-					local v1131 = false
-					local s5
 
-					if not p55 then
-						s5 = "Experience Supported Language Request: Connection error"
-					elseif p56.StatusCode == 401 then
-						s5 = "Experience Supported Language Request: Unauthorized"
-					elseif p56.StatusCode < 200 or p56.StatusCode >= 400 then
-						s5 = "Experience Supported Language Request Status code: " .. p56.StatusCode
+		local function experienceSourceLanguageCallback(p, p2)
+			if p then
+				internal3:Start(function(p3, p4)
+					local success = false
+					local result
+
+					if p3 then
+						if p4.StatusCode == 401 then
+							result = "Experience Supported Language Request: Unauthorized"
+						elseif p4.StatusCode < 200 or p4.StatusCode >= 400 then
+							result = "Experience Supported Language Request Status code: " .. p4.StatusCode
+						else
+							success, result = pcall(function()
+								local jsonDecode = HttpService:JSONDecode(p4.Body)
+
+								for k, v24 in pairs(jsonDecode.data) do
+									languageCodes[k] = v24.languageCode
+								end
+							end)
+						end
 					else
-						v1131, s5 = pcall(function() -- line: 2271
-							-- upvalues: HttpService (copy), p56 (copy), t22 (copy)
-							local data = HttpService:JSONDecode(p56.Body)
-
-							for k, v in pairs(data.data) do
-								t22[k] = v.languageCode
-							end
-						end)
+						result = "Experience Supported Language Request: Connection error"
 					end
 
-					if not v1131 then
-						v128:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v466 .. " with error message: " .. s5)
+					if not success then
+						v10:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. url3 .. " with error message: " .. result)
 					end
 
-					if p54 == nil then
-						p54 = s5
+					if p2 == nil then
+						p2 = result
 					end
 
-					local v1133 = v1131 and p53
-					local v1134 = p54
+					local v24 = p2
 
-					if v1133 then
-						v469:Start(function(p57, p58) -- line: 2199
-							-- upvalues: HttpService (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v128 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy)
-							local v1223 = false
-							local s6
-
-							if not p57 then
-								s6 = "User Experience Language Setting Request: Connection error"
-							elseif p58.StatusCode == 401 then
-								s6 = "User Experience Language Setting Request: Unauthorized"
-							elseif p58.StatusCode < 200 or p58.StatusCode >= 400 then
-								s6 = "User Experience Language Setting Request Status code: " .. p58.StatusCode
-							else
-								v1223, s6 = pcall(function() -- line: 2210
-									-- upvalues: HttpService (copy), p58 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy)
-									local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p58.Body).userUniverseLocalizationSettingValue
-
-									if userUniverseLocalizationSettingValue == nil then
-										u456 = languageCode2
-
-										return
-									end
-
-									if userUniverseLocalizationSettingValue.settingType == "SourceOrTranslation" then
-										if userUniverseLocalizationSettingValue.settingTargetId == 1 then
-											u456 = languageCode
-										else
-											u456 = languageCode2
-										end
-									end
-
-									if userUniverseLocalizationSettingValue.settingType == "LanguageFamily" then
-										if t25[userUniverseLocalizationSettingValue.settingTargetId] == nil then
-											u456 = languageCode2
-
-											return
-										end
-
-										u456 = t25[userUniverseLocalizationSettingValue.settingTargetId]
-									end
-								end)
-							end
-
-							if not v1223 then
-								v128:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v468 .. " with error message: " .. s6)
-							end
-
-							userExperienceLanguageSettingsCallback(v1223, s6)
-						end)
-
+					if success and p then
+						experienceSupportedLanguagesCallback(true) -- inferred equivalent call
 						return
 					end
 
-					if v1134 == nil then
-						v1134 = "Execution path did not set earliest error to non-nil value."
-					end
+					v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (v24 == nil and "Execution path did not set earliest error to non-nil value." or v24))
 
-					v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v1134)
+					local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+						newPage,
+						RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+						"DropDown",
+						{ formatByKey2 },
+						1
+					)
+					newPage.LanguageSelectorFrame = languageSelectorFrame
+					newPage.LanguageSelectorLabel = languageSelectorLabel
+					newPage.LanguageSelectorMode = languageSelectorMode
 
-					local v1135 = v183
-					local v1136 = v183
-					local v1137 = v183
-					local v1138, v1139, v1140 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-					v1135.LanguageSelectorFrame = v1138
-					v1136.LanguageSelectorLabel = v1139
-					v1137.LanguageSelectorMode = v1140
-					v183.LanguageSelectorMode:SetInteractable(false)
-					v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+					newPage.LanguageSelectorMode:SetInteractable(false)
+					newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
 				end)
 			else
-				local v937 = p54
+				v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (p2 == nil and "Execution path did not set earliest error to non-nil value." or p2))
 
-				if v937 == nil then
-					v937 = "Execution path did not set earliest error to non-nil value."
-				end
+				local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+					newPage,
+					RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+					"DropDown",
+					{ formatByKey2 },
+					1
+				)
+				newPage.LanguageSelectorFrame = languageSelectorFrame
+				newPage.LanguageSelectorLabel = languageSelectorLabel
+				newPage.LanguageSelectorMode = languageSelectorMode
 
-				v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v937)
-
-				local v938 = v183
-				local v939 = v183
-				local v940 = v183
-				local v941, v942, v943 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-				v938.LanguageSelectorFrame = v941
-				v939.LanguageSelectorLabel = v942
-				v940.LanguageSelectorMode = v943
-				v183.LanguageSelectorMode:SetInteractable(false)
-				v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
-			end
-		end
-		local function localeCodeToLanguageCodeMappingCallback(p59, p60) -- line: 2300
-			-- upvalues: v465 (copy), HttpService (copy), languageCode (ref), localeCode (ref), t24 (copy), v128 (copy), v464 (copy), v467 (copy), t22 (copy), v466 (copy), v469 (copy), u456 (ref), languageCode2 (ref), t25 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-			if p59 then
-				v465:Start(function(p61, p62) -- line: 2302
-					-- upvalues: HttpService (copy), languageCode (ref), localeCode (ref), t24 (copy), v128 (copy), v464 (copy), p60 (ref), p59 (copy), v467 (copy), t22 (copy), v466 (copy), v469 (copy), u456 (ref), languageCode2 (ref), t25 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-					local v1143 = false
-					local s7
-
-					if not p61 then
-						s7 = "Experience Source Language Request: Connection error"
-					elseif p62.StatusCode == 401 then
-						s7 = "Experience Source Language Request: Unauthorized"
-					elseif p62.StatusCode < 200 or p62.StatusCode >= 400 then
-						s7 = "Experience Source Language Status code: " .. p62.StatusCode
-					else
-						v1143, s7 = pcall(function() -- line: 2313
-							-- upvalues: HttpService (copy), p62 (copy), languageCode (ref), localeCode (ref), t24 (copy)
-							languageCode = HttpService:JSONDecode(p62.Body).languageCode
-							localeCode = t24[languageCode].localeCode
-						end)
-					end
-
-					if not v1143 then
-						v128:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v464 .. " with error message: " .. s7)
-					end
-
-					if p60 == nil then
-						p60 = s7
-					end
-
-					local v1145 = v1143 and p59
-					local u1146 = p60
-
-					if v1145 then
-						v467:Start(function(p63, p64) -- line: 2261
-							-- upvalues: HttpService (copy), t22 (copy), v128 (copy), v466 (copy), u1146 (ref), v1145 (copy), v469 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-							local v1227 = false
-							local s8
-
-							if not p63 then
-								s8 = "Experience Supported Language Request: Connection error"
-							elseif p64.StatusCode == 401 then
-								s8 = "Experience Supported Language Request: Unauthorized"
-							elseif p64.StatusCode < 200 or p64.StatusCode >= 400 then
-								s8 = "Experience Supported Language Request Status code: " .. p64.StatusCode
-							else
-								v1227, s8 = pcall(function() -- line: 2271
-									-- upvalues: HttpService (copy), p64 (copy), t22 (copy)
-									local data = HttpService:JSONDecode(p64.Body)
-
-									for k, v in pairs(data.data) do
-										t22[k] = v.languageCode
-									end
-								end)
-							end
-
-							if not v1227 then
-								v128:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v466 .. " with error message: " .. s8)
-							end
-
-							if u1146 == nil then
-								u1146 = s8
-							end
-
-							local v1229 = v1227 and v1145
-							local v1230 = u1146
-
-							if v1229 then
-								v469:Start(function(p65, p66) -- line: 2199
-									-- upvalues: HttpService (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v128 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy)
-									local v1275 = false
-									local s9
-
-									if not p65 then
-										s9 = "User Experience Language Setting Request: Connection error"
-									elseif p66.StatusCode == 401 then
-										s9 = "User Experience Language Setting Request: Unauthorized"
-									elseif p66.StatusCode < 200 or p66.StatusCode >= 400 then
-										s9 = "User Experience Language Setting Request Status code: " .. p66.StatusCode
-									else
-										v1275, s9 = pcall(function() -- line: 2210
-											-- upvalues: HttpService (copy), p66 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy)
-											local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p66.Body).userUniverseLocalizationSettingValue
-
-											if userUniverseLocalizationSettingValue == nil then
-												u456 = languageCode2
-
-												return
-											end
-
-											if userUniverseLocalizationSettingValue.settingType == "SourceOrTranslation" then
-												if userUniverseLocalizationSettingValue.settingTargetId == 1 then
-													u456 = languageCode
-												else
-													u456 = languageCode2
-												end
-											end
-
-											if userUniverseLocalizationSettingValue.settingType == "LanguageFamily" then
-												if t25[userUniverseLocalizationSettingValue.settingTargetId] == nil then
-													u456 = languageCode2
-
-													return
-												end
-
-												u456 = t25[userUniverseLocalizationSettingValue.settingTargetId]
-											end
-										end)
-									end
-
-									if not v1275 then
-										v128:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v468 .. " with error message: " .. s9)
-									end
-
-									userExperienceLanguageSettingsCallback(v1275, s9)
-								end)
-
-								return
-							end
-
-							if v1230 == nil then
-								v1230 = "Execution path did not set earliest error to non-nil value."
-							end
-
-							v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v1230)
-
-							local v1231 = v183
-							local v1232 = v183
-							local v1233 = v183
-							local v1234, v1235, v1236 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-							v1231.LanguageSelectorFrame = v1234
-							v1232.LanguageSelectorLabel = v1235
-							v1233.LanguageSelectorMode = v1236
-							v183.LanguageSelectorMode:SetInteractable(false)
-							v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
-						end)
-					else
-						local v1147 = u1146
-
-						if v1147 == nil then
-							v1147 = "Execution path did not set earliest error to non-nil value."
-						end
-
-						v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v1147)
-
-						local v1148 = v183
-						local v1149 = v183
-						local v1150 = v183
-						local v1151, v1152, v1153 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-						v1148.LanguageSelectorFrame = v1151
-						v1149.LanguageSelectorLabel = v1152
-						v1150.LanguageSelectorMode = v1153
-						v183.LanguageSelectorMode:SetInteractable(false)
-						v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
-					end
-				end)
-			else
-				local v947 = p60
-
-				if v947 == nil then
-					v947 = "Execution path did not set earliest error to non-nil value."
-				end
-
-				v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v947)
-
-				local v948 = v183
-				local v949 = v183
-				local v950 = v183
-				local v951, v952, v953 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-				v948.LanguageSelectorFrame = v951
-				v949.LanguageSelectorLabel = v952
-				v950.LanguageSelectorMode = v953
-				v183.LanguageSelectorMode:SetInteractable(false)
-				v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+				newPage.LanguageSelectorMode:SetInteractable(false)
+				newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
 			end
 		end
 
-		v463:Start(function(p67, p68) -- line: 2344
-			-- upvalues: HttpService (copy), t24 (copy), t25 (copy), t23 (copy), LocaleId (copy), languageCode2 (ref), v128 (copy), v462 (copy), v465 (copy), languageCode (ref), localeCode (ref), v464 (copy), v467 (copy), t22 (copy), v466 (copy), v469 (copy), u456 (ref), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-			local v956 = false
-			local s10
+		local function localeCodeToLanguageCodeMappingCallback(p, p2)
+			if p then
+				internal2:Start(function(p3, p4)
+					local success = false
+					local result
 
-			if not p67 then
-				s10 = "Locale Code to Language Code Mapping Request: Connection error"
-			elseif p68.StatusCode == 401 then
-				s10 = "Locale Code to Language Code Mapping Request: Unauthorized"
-			elseif p68.StatusCode < 200 or p68.StatusCode >= 400 then
-				s10 = "Locale Code to Language Code Mapping Request Status code: " .. p68.StatusCode
-			else
-				v956, s10 = pcall(function() -- line: 2355
-					-- upvalues: HttpService (copy), p68 (copy), t24 (copy), t25 (copy), t23 (copy), LocaleId (copy), languageCode2 (ref)
-					local data = HttpService:JSONDecode(p68.Body)
-
-					for __, v in pairs(data.data) do
-						local languageCode3 = v.locale.language.languageCode
-						local locale = v.locale.locale
-						local name = v.locale.language.name
-						local id = v.locale.language.id
-
-						t24[languageCode3] = {
-							localeCode = locale,
-							languageName = name,
-							id = id
-						}
-						t25[id] = languageCode3
-						t23[name] = languageCode3
-
-						if v.locale.locale == LocaleId:gsub("-", "_") then
-							languageCode2 = v.locale.language.languageCode
+					if p3 then
+						if p4.StatusCode == 401 then
+							result = "Experience Source Language Request: Unauthorized"
+						elseif p4.StatusCode < 200 or p4.StatusCode >= 400 then
+							result = "Experience Source Language Status code: " .. p4.StatusCode
+						else
+							success, result = pcall(function()
+								languageCode = HttpService:JSONDecode(p4.Body).languageCode
+								localeCode = v22[languageCode].localeCode
+							end)
 						end
-					end
-				end)
-			end
-
-			if not v956 then
-				v128:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v462 .. " with error message: " .. s10)
-			end
-
-			local v958 = v956
-			local u959 = s10
-
-			if v958 then
-				v465:Start(function(p69, p70) -- line: 2302
-					-- upvalues: HttpService (copy), languageCode (ref), localeCode (ref), t24 (copy), v128 (copy), v464 (copy), u959 (ref), v958 (copy), v467 (copy), t22 (copy), v466 (copy), v469 (copy), u456 (ref), languageCode2 (ref), t25 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-					local v1163 = false
-					local s11
-
-					if not p69 then
-						s11 = "Experience Source Language Request: Connection error"
-					elseif p70.StatusCode == 401 then
-						s11 = "Experience Source Language Request: Unauthorized"
-					elseif p70.StatusCode < 200 or p70.StatusCode >= 400 then
-						s11 = "Experience Source Language Status code: " .. p70.StatusCode
 					else
-						v1163, s11 = pcall(function() -- line: 2313
-							-- upvalues: HttpService (copy), p70 (copy), languageCode (ref), localeCode (ref), t24 (copy)
-							languageCode = HttpService:JSONDecode(p70.Body).languageCode
-							localeCode = t24[languageCode].localeCode
-						end)
+						result = "Experience Source Language Request: Connection error"
 					end
 
-					if not v1163 then
-						v128:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v464 .. " with error message: " .. s11)
+					if not success then
+						v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. url2 .. " with error message: " .. result)
 					end
 
-					if u959 == nil then
-						u959 = s11
+					if p2 == nil then
+						p2 = result
 					end
 
-					local v1165 = v1163 and v958
-					local u1166 = u959
+					local v24 = success and p
+					local v25 = p2
 
-					if v1165 then
-						v467:Start(function(p71, p72) -- line: 2261
-							-- upvalues: HttpService (copy), t22 (copy), v128 (copy), v466 (copy), u1166 (ref), v1165 (copy), v469 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy), v183 (copy), Utility (copy), RobloxTranslator (copy), v89 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-							local v1239 = false
-							local s12
+					if v24 then
+						internal3:Start(function(p5, p6)
+							local success2 = false
+							local result2
 
-							if not p71 then
-								s12 = "Experience Supported Language Request: Connection error"
-							elseif p72.StatusCode == 401 then
-								s12 = "Experience Supported Language Request: Unauthorized"
-							elseif p72.StatusCode < 200 or p72.StatusCode >= 400 then
-								s12 = "Experience Supported Language Request Status code: " .. p72.StatusCode
+							if p5 then
+								if p6.StatusCode == 401 then
+									result2 = "Experience Supported Language Request: Unauthorized"
+								elseif p6.StatusCode < 200 or p6.StatusCode >= 400 then
+									result2 = "Experience Supported Language Request Status code: " .. p6.StatusCode
+								else
+									success2, result2 = pcall(function()
+										local jsonDecode = HttpService:JSONDecode(p6.Body)
+
+										for k, v26 in pairs(jsonDecode.data) do
+											languageCodes[k] = v26.languageCode
+										end
+									end)
+								end
 							else
-								v1239, s12 = pcall(function() -- line: 2271
-									-- upvalues: HttpService (copy), p72 (copy), t22 (copy)
-									local data = HttpService:JSONDecode(p72.Body)
-
-									for k, v in pairs(data.data) do
-										t22[k] = v.languageCode
-									end
-								end)
+								result2 = "Experience Supported Language Request: Connection error"
 							end
 
-							if not v1239 then
-								v128:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v466 .. " with error message: " .. s12)
+							if not success2 then
+								v10:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. url3 .. " with error message: " .. result2)
 							end
 
-							if u1166 == nil then
-								u1166 = s12
+							if v25 == nil then
+								v25 = result2
 							end
 
-							local v1241 = v1239 and v1165
-							local v1242 = u1166
+							local v26 = v25
 
-							if v1241 then
-								v469:Start(function(p73, p74) -- line: 2199
-									-- upvalues: HttpService (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy), v128 (copy), v468 (copy), userExperienceLanguageSettingsCallback (copy)
-									local v1282 = false
-									local s13
-
-									if not p73 then
-										s13 = "User Experience Language Setting Request: Connection error"
-									elseif p74.StatusCode == 401 then
-										s13 = "User Experience Language Setting Request: Unauthorized"
-									elseif p74.StatusCode < 200 or p74.StatusCode >= 400 then
-										s13 = "User Experience Language Setting Request Status code: " .. p74.StatusCode
-									else
-										v1282, s13 = pcall(function() -- line: 2210
-											-- upvalues: HttpService (copy), p74 (copy), u456 (ref), languageCode2 (ref), languageCode (ref), t25 (copy)
-											local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p74.Body).userUniverseLocalizationSettingValue
-
-											if userUniverseLocalizationSettingValue == nil then
-												u456 = languageCode2
-
-												return
-											end
-
-											if userUniverseLocalizationSettingValue.settingType == "SourceOrTranslation" then
-												if userUniverseLocalizationSettingValue.settingTargetId == 1 then
-													u456 = languageCode
-												else
-													u456 = languageCode2
-												end
-											end
-
-											if userUniverseLocalizationSettingValue.settingType == "LanguageFamily" then
-												if t25[userUniverseLocalizationSettingValue.settingTargetId] == nil then
-													u456 = languageCode2
-
-													return
-												end
-
-												u456 = t25[userUniverseLocalizationSettingValue.settingTargetId]
-											end
-										end)
-									end
-
-									if not v1282 then
-										v128:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v468 .. " with error message: " .. s13)
-									end
-
-									userExperienceLanguageSettingsCallback(v1282, s13)
-								end)
-
+							if success2 and v24 then
+								experienceSupportedLanguagesCallback(true) -- inferred equivalent call
 								return
 							end
 
-							if v1242 == nil then
-								v1242 = "Execution path did not set earliest error to non-nil value."
-							end
+							v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (v26 == nil and "Execution path did not set earliest error to non-nil value." or v26))
 
-							v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v1242)
+							local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+								newPage,
+								RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+								"DropDown",
+								{ formatByKey2 },
+								1
+							)
+							newPage.LanguageSelectorFrame = languageSelectorFrame
+							newPage.LanguageSelectorLabel = languageSelectorLabel
+							newPage.LanguageSelectorMode = languageSelectorMode
 
-							local v1243 = v183
-							local v1244 = v183
-							local v1245 = v183
-							local v1246, v1247, v1248 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-							v1243.LanguageSelectorFrame = v1246
-							v1244.LanguageSelectorLabel = v1247
-							v1245.LanguageSelectorMode = v1248
-							v183.LanguageSelectorMode:SetInteractable(false)
-							v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+							newPage.LanguageSelectorMode:SetInteractable(false)
+							newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
 						end)
 					else
-						local v1167 = u1166
+						v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (v25 == nil and "Execution path did not set earliest error to non-nil value." or v25))
 
-						if v1167 == nil then
-							v1167 = "Execution path did not set earliest error to non-nil value."
-						end
+						local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+							newPage,
+							RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+							"DropDown",
+							{ formatByKey2 },
+							1
+						)
+						newPage.LanguageSelectorFrame = languageSelectorFrame
+						newPage.LanguageSelectorLabel = languageSelectorLabel
+						newPage.LanguageSelectorMode = languageSelectorMode
 
-						v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v1167)
-
-						local v1168 = v183
-						local v1169 = v183
-						local v1170 = v183
-						local v1171, v1172, v1173 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
-
-						v1168.LanguageSelectorFrame = v1171
-						v1169.LanguageSelectorLabel = v1172
-						v1170.LanguageSelectorMode = v1173
-						v183.LanguageSelectorMode:SetInteractable(false)
-						v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+						newPage.LanguageSelectorMode:SetInteractable(false)
+						newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
 					end
 				end)
 			else
-				local v960 = u959
+				v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (p2 == nil and "Execution path did not set earliest error to non-nil value." or p2))
 
-				if v960 == nil then
-					v960 = "Execution path did not set earliest error to non-nil value."
+				local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+					newPage,
+					RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+					"DropDown",
+					{ formatByKey2 },
+					1
+				)
+				newPage.LanguageSelectorFrame = languageSelectorFrame
+				newPage.LanguageSelectorLabel = languageSelectorLabel
+				newPage.LanguageSelectorMode = languageSelectorMode
+
+				newPage.LanguageSelectorMode:SetInteractable(false)
+				newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+			end
+		end
+
+		internal:Start(function(p, p2)
+			local success = false
+			local result
+
+			if p then
+				if p2.StatusCode == 401 then
+					result = "Locale Code to Language Code Mapping Request: Unauthorized"
+				elseif p2.StatusCode < 200 or p2.StatusCode >= 400 then
+					result = "Locale Code to Language Code Mapping Request Status code: " .. p2.StatusCode
+				else
+					success, result = pcall(function()
+						local jsonDecode = HttpService:JSONDecode(p2.Body)
+
+						for k, v24 in pairs(jsonDecode.data) do
+							local languageCode3 = v24.locale.language.languageCode
+							local locale = v24.locale.locale
+							local name = v24.locale.language.name
+							local id = v24.locale.language.id
+							v22[languageCode3] = {
+								localeCode = locale,
+								languageName = name,
+								id = id
+							}
+
+							languageCodesById[id] = languageCode3
+							languageCodesByName[name] = languageCode3
+
+							if v24.locale.locale == localeId:gsub("-", "_") then
+								languageCode2 = v24.locale.language.languageCode
+							end
+						end
+					end)
 				end
+			else
+				result = "Locale Code to Language Code Mapping Request: Connection error"
+			end
 
-				v128:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v960)
+			if not success then
+				v10:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. url .. " with error message: " .. result)
+			end
 
-				local v961 = v183
-				local v962 = v183
-				local v963 = v183
-				local v964, v965, v966 = Utility:AddNewRow(v183, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { v89 }, 1)
+			local v24 = result
 
-				v961.LanguageSelectorFrame = v964
-				v962.LanguageSelectorLabel = v965
-				v963.LanguageSelectorMode = v966
-				v183.LanguageSelectorMode:SetInteractable(false)
-				v183.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+			if success then
+				internal2:Start(function(p3, p4)
+					local success2 = false
+					local result2
+
+					if p3 then
+						if p4.StatusCode == 401 then
+							result2 = "Experience Source Language Request: Unauthorized"
+						elseif p4.StatusCode < 200 or p4.StatusCode >= 400 then
+							result2 = "Experience Source Language Status code: " .. p4.StatusCode
+						else
+							success2, result2 = pcall(function()
+								languageCode = HttpService:JSONDecode(p4.Body).languageCode
+								localeCode = v22[languageCode].localeCode
+							end)
+						end
+					else
+						result2 = "Experience Source Language Request: Connection error"
+					end
+
+					if not success2 then
+						v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. url2 .. " with error message: " .. result2)
+					end
+
+					if v24 == nil then
+						v24 = result2
+					end
+
+					local v25 = success2 and success
+					local v26 = v24
+
+					if v25 then
+						internal3:Start(function(p5, p6)
+							local success3 = false
+							local result3
+
+							if p5 then
+								if p6.StatusCode == 401 then
+									result3 = "Experience Supported Language Request: Unauthorized"
+								elseif p6.StatusCode < 200 or p6.StatusCode >= 400 then
+									result3 = "Experience Supported Language Request Status code: " .. p6.StatusCode
+								else
+									success3, result3 = pcall(function()
+										local jsonDecode = HttpService:JSONDecode(p6.Body)
+
+										for k, v27 in pairs(jsonDecode.data) do
+											languageCodes[k] = v27.languageCode
+										end
+									end)
+								end
+							else
+								result3 = "Experience Supported Language Request: Connection error"
+							end
+
+							if not success3 then
+								v10:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. url3 .. " with error message: " .. result3)
+							end
+
+							if v26 == nil then
+								v26 = result3
+							end
+
+							local v27 = v26
+
+							if success3 and v25 then
+								experienceSupportedLanguagesCallback(true) -- inferred equivalent call
+								return
+							end
+
+							v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (v27 == nil and "Execution path did not set earliest error to non-nil value." or v27))
+
+							local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+								newPage,
+								RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+								"DropDown",
+								{ formatByKey2 },
+								1
+							)
+							newPage.LanguageSelectorFrame = languageSelectorFrame
+							newPage.LanguageSelectorLabel = languageSelectorLabel
+							newPage.LanguageSelectorMode = languageSelectorMode
+
+							newPage.LanguageSelectorMode:SetInteractable(false)
+							newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+						end)
+					else
+						v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (v26 == nil and "Execution path did not set earliest error to non-nil value." or v26))
+
+						local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+							newPage,
+							RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+							"DropDown",
+							{ formatByKey2 },
+							1
+						)
+						newPage.LanguageSelectorFrame = languageSelectorFrame
+						newPage.LanguageSelectorLabel = languageSelectorLabel
+						newPage.LanguageSelectorMode = languageSelectorMode
+
+						newPage.LanguageSelectorMode:SetInteractable(false)
+						newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
+					end
+				end)
+			else
+				v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. (v24 == nil and "Execution path did not set earliest error to non-nil value." or v24))
+
+				local languageSelectorFrame, languageSelectorLabel, languageSelectorMode = Utility:AddNewRow(
+					newPage,
+					RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"),
+					"DropDown",
+					{ formatByKey2 },
+					1
+				)
+				newPage.LanguageSelectorFrame = languageSelectorFrame
+				newPage.LanguageSelectorLabel = languageSelectorLabel
+				newPage.LanguageSelectorMode = languageSelectorMode
+
+				newPage.LanguageSelectorMode:SetInteractable(false)
+				newPage.LanguageSelectorFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageSelectorFrame
 			end
 		end)
 	end
-	local function getChatTranslationLayerData(p75) -- line: 2394
-		-- upvalues: GetFFlagChatTranslationWaitForIXP (copy), IXPServiceWrapper (copy), GetFFlagChatTranslationNewDefaults (copy)
-		local t28 = {
+
+	local function getChatTranslationLayerData(p)
+		local chatTranslationLayerData = {
 			ChatTranslationEnabled = false,
 			ChatTranslationToggleEnabled = false
 		}
 
-		if not p75 or p75 == "" then
-			return t28
+		if not p or p == "" then
+			return chatTranslationLayerData
 		end
 
-		if p75 == "override" then
-			t28.ChatTranslationEnabled = true
-
-			return t28
+		if p == "override" then
+			chatTranslationLayerData.ChatTranslationEnabled = true
+			return chatTranslationLayerData
 		end
 
 		if GetFFlagChatTranslationWaitForIXP() then
 			IXPServiceWrapper:WaitForInitialization()
 		end
 
-		local ok, result = pcall(function() -- line: 2416
-			-- upvalues: IXPServiceWrapper (copy), p75 (copy)
-			return IXPServiceWrapper:GetLayerData(p75)
+		local success, result = pcall(function()
+			return IXPServiceWrapper:GetLayerData(p)
 		end)
 
-		if ok then
-			if GetFFlagChatTranslationNewDefaults() then
-				t28.ChatTranslationEnabled = result.ChatTranslationEnabled or true
-				t28.ChatTranslationToggleEnabled = result.ChatTranslationToggleEnabled or false
-
-				return t28
-			end
-
-			t28.ChatTranslationEnabled = result.chatTranslationEnabled or false
-			t28.ChatTranslationToggleEnabled = result.chatTranslationToggleEnabled or false
+		if not success then
+			return chatTranslationLayerData
 		end
 
-		return t28
+		if GetFFlagChatTranslationNewDefaults() then
+			chatTranslationLayerData.ChatTranslationEnabled = result.ChatTranslationEnabled or true
+			chatTranslationLayerData.ChatTranslationToggleEnabled = result.ChatTranslationToggleEnabled or false
+			return chatTranslationLayerData
+		end
+
+		chatTranslationLayerData.ChatTranslationEnabled = result.chatTranslationEnabled or false
+		chatTranslationLayerData.ChatTranslationToggleEnabled = result.chatTranslationToggleEnabled or false
+
+		return chatTranslationLayerData
 	end
-	local function createVolumeOptions() -- line: 2434
-		-- upvalues: GameSettings (copy), v183 (copy), Utility (copy), FFlagRenameVolumeToMainVolume (copy), RobloxTranslator (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local v478 = math.floor(GameSettings.MasterVolume * 10)
-		local v479 = v183
-		local v480 = v183
-		local v481 = v183
-		local v482, v483, v484 = Utility:AddNewRow(v183, not FFlagRenameVolumeToMainVolume and "Volume" or RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.MainVolume"), "Slider", 10, v478)
 
-		v479.VolumeFrame = v482
-		v480.VolumeLabel = v483
-		v481.VolumeSlider = v484
-		v183.VolumeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VolumeFrame
+	local function createVolumeOptions()
+		local v18 = math.floor(gameSettings.MasterVolume * 10)
 
-		local Sound = Instance.new("Sound", game:GetService("CoreGui").RobloxGui.Sounds)
+		local volumeFrame, volumeLabel, volumeSlider = Utility:AddNewRow(
+			newPage,
+			not FFlagRenameVolumeToMainVolume and "Volume" or RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.MainVolume"),
+			"Slider",
+			10,
+			v18
+		)
+		newPage.VolumeFrame = volumeFrame
+		newPage.VolumeLabel = volumeLabel
+		newPage.VolumeSlider = volumeSlider
 
-		Sound.Name = "VolumeChangeSound"
-		Sound.SoundId = "rbxasset://sounds/uuhhh.mp3"
-		v183.VolumeSlider.ValueChanged:connect(function(p76) -- line: 2447
-			-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), GameSettings (copy), Sound (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local v968 = nil
+		newPage.VolumeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VolumeFrame
+
+		local CoreGui2 = game:GetService("CoreGui")
+		local volumeChangeSound = Instance.new("Sound", CoreGui2.RobloxGui.Sounds)
+		volumeChangeSound.Name = "VolumeChangeSound"
+		volumeChangeSound.SoundId = "rbxasset://sounds/uuhhh.mp3"
+
+		newPage.VolumeSlider.ValueChanged:connect(function(p)
+			local v19
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				v968 = math.floor(GameSettings.MasterVolume * 10 + 0.5)
+				v19 = math.floor(gameSettings.MasterVolume * 10 + 0.5)
 			end
 
-			local v969 = p76 / 10
-
-			Sound.Volume = v969
-			Sound:Play()
-			GameSettings.MasterVolume = v969
+			local v20 = p / 10
+			volumeChangeSound.Volume = v20
+			volumeChangeSound:Play()
+			gameSettings.MasterVolume = v20
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("volume", v968, (math.floor(GameSettings.MasterVolume * 10 + 0.5)))
+				reportSettingsChangeForAnalytics("volume", v19, (math.floor(gameSettings.MasterVolume * 10 + 0.5)))
 			end
 
 			reportSettingsForAnalytics()
 		end)
 	end
-	local function createPartyVoiceVolumeOptions() -- line: 2465
-		-- upvalues: GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnablePartyVoiceVolumeOnlyWhenInEligibleParty (copy), default4 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local v486 = math.floor(GameSettings.PartyVoiceVolume * 10)
-		local v487 = v183
-		local v488 = v183
-		local v489 = v183
-		local v490, v491, v492 = Utility:AddNewRow(v183, "Party Voice Volume", "Slider", 10, v486)
 
-		v487.PartyVoiceVolumeFrame = v490
-		v488.PartyVoiceVolumeLabel = v491
-		v489.PartyVoiceVolumeSlider = v492
-		v183.PartyVoiceVolumeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PartyVoiceVolumeFrame
+	local function createPartyVoiceVolumeOptions()
+		local v18 = math.floor(gameSettings.PartyVoiceVolume * 10)
+
+		local partyVoiceVolumeFrame, partyVoiceVolumeLabel, partyVoiceVolumeSlider = Utility:AddNewRow(
+			newPage,
+			"Party Voice Volume",
+			"Slider",
+			10,
+			v18
+		)
+		newPage.PartyVoiceVolumeFrame = partyVoiceVolumeFrame
+		newPage.PartyVoiceVolumeLabel = partyVoiceVolumeLabel
+		newPage.PartyVoiceVolumeSlider = partyVoiceVolumeSlider
+
+		newPage.PartyVoiceVolumeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.PartyVoiceVolumeFrame
 
 		if GetFFlagEnablePartyVoiceVolumeOnlyWhenInEligibleParty() then
-			v183.PartyVoiceVolumeFrame.Visible = default4.hasExperienceStarted
-			default4.ExperienceJoined.Event:Connect(function() -- line: 2474
-				-- upvalues: v183 (copy)
-				v183.PartyVoiceVolumeFrame.Visible = true
+			newPage.PartyVoiceVolumeFrame.Visible = default4.hasExperienceStarted
+			default4.ExperienceJoined.Event:Connect(function()
+				newPage.PartyVoiceVolumeFrame.Visible = true
 			end)
-			default4.ExperienceLeft.Event:Connect(function() -- line: 2477
-				-- upvalues: v183 (copy)
-				v183.PartyVoiceVolumeFrame.Visible = false
+			default4.ExperienceLeft.Event:Connect(function()
+				newPage.PartyVoiceVolumeFrame.Visible = false
 			end)
 		end
 
-		v183.PartyVoiceVolumeSlider.ValueChanged:connect(function(p77) -- line: 2482
-			-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), v486 (copy), GameSettings (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local v971 = nil
+		newPage.PartyVoiceVolumeSlider.ValueChanged:connect(function(p)
+			local v19
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				v971 = v486 == nil and 0 or math.floor(v486 * 10 + 0.5)
+				v19 = v18 == nil and 0 or math.floor(v18 * 10 + 0.5)
 			end
 
-			GameSettings.PartyVoiceVolume = p77 / 10
+			gameSettings.PartyVoiceVolume = p / 10
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("party_voice_volume", v971, (math.floor(p77 * 10 + 0.5)))
+				reportSettingsChangeForAnalytics("party_voice_volume", v19, (math.floor(p * 10 + 0.5)))
 			end
 
 			reportSettingsForAnalytics()
 		end)
 	end
-	local function createVoiceChatVolumeOptions() -- line: 2498
-		-- upvalues: GameSettings (copy), u24 (ref), v128 (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), v70 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local v493 = math.floor(GameSettings.VoiceChatVolume * 5 + 0.5)
-		local ok, result = pcall(function() -- line: 2500
-			-- upvalues: u24 (ref)
-			return u24:Format("CoreScripts.InGameMenu.GameSettings.VoiceChatVolume")
+
+	local function createVoiceChatVolumeOptions()
+		local v18 = voiceChatVolumeToSlider(gameSettings.VoiceChatVolume) -- inferred equivalent call
+		local success, result = pcall(function()
+			return localization:Format("CoreScripts.InGameMenu.GameSettings.VoiceChatVolume")
 		end)
 
-		if not ok then
+		if not success then
+			v10:debug("[GameSettings] createVoiceChatVolumeOptions failed to get translation for Voice Chat Volume label, using placeholder text instead")
 			result = "Voice Chat Volume"
-			v128:debug("[GameSettings] createVoiceChatVolumeOptions failed to get translation for Voice Chat Volume label, using placeholder text instead")
 		end
 
-		local v496 = v183
-		local v497 = v183
-		local v498 = v183
-		local v499, v500, v501 = Utility:AddNewRow(v183, result, "Slider", 10, v493)
+		local voiceChatVolumeFrame, voiceChatVolumeLabel, voiceChatVolumeSlider = Utility:AddNewRow(newPage, result, "Slider", 10, v18)
+		newPage.VoiceChatVolumeFrame = voiceChatVolumeFrame
+		newPage.VoiceChatVolumeLabel = voiceChatVolumeLabel
+		newPage.VoiceChatVolumeSlider = voiceChatVolumeSlider
 
-		v496.VoiceChatVolumeFrame = v499
-		v497.VoiceChatVolumeLabel = v500
-		v498.VoiceChatVolumeSlider = v501
-		v183.VoiceChatVolumeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VoiceChatVolumeFrame
-		v183.VoiceChatVolumeFrame.Visible = false
+		newPage.VoiceChatVolumeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VoiceChatVolumeFrame
+		newPage.VoiceChatVolumeFrame.Visible = false
 
-		if v70 then
-			local function updateVoiceChatVolumeSliderInteractable(n10: number?) -- line: 2515
-				-- upvalues: GameSettings (copy), v183 (copy)
-				if if n10 == nil then GameSettings.MasterVolume == 0 else n10 == 0 then
-					v183.VoiceChatVolumeSlider:SetZIndex(1)
-					v183.VoiceChatVolumeLabel.ZIndex = 1
-					v183.VoiceChatVolumeSlider:SetInteractable(false)
+		if defineFastFlag13 then
+			local function updateVoiceChatVolumeSliderInteractable(p: number?)
+				local v19
 
-					return
+				if p == nil then
+					v19 = gameSettings.MasterVolume == 0
+				else
+					v19 = p == 0
 				end
 
-				v183.VoiceChatVolumeSlider:SetZIndex(2)
-				v183.VoiceChatVolumeLabel.ZIndex = 2
-				v183.VoiceChatVolumeSlider:SetInteractable(true)
+				if v19 then
+					newPage.VoiceChatVolumeSlider:SetZIndex(1)
+					newPage.VoiceChatVolumeLabel.ZIndex = 1
+					newPage.VoiceChatVolumeSlider:SetInteractable(false)
+				else
+					newPage.VoiceChatVolumeSlider:SetZIndex(2)
+					newPage.VoiceChatVolumeLabel.ZIndex = 2
+					newPage.VoiceChatVolumeSlider:SetInteractable(true)
+				end
 			end
 
 			updateVoiceChatVolumeSliderInteractable()
-			v183.VolumeSlider.ValueChanged:connect(updateVoiceChatVolumeSliderInteractable)
+			newPage.VolumeSlider.ValueChanged:connect(updateVoiceChatVolumeSliderInteractable)
 		end
 
-		v183.VoiceChatVolumeSlider.ValueChanged:connect(function(p78) -- line: 2535
-			-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), GameSettings (copy), FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast (copy), v183 (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local v974 = nil
+		newPage.VoiceChatVolumeSlider.ValueChanged:connect(function(p)
+			local v19
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				v974 = math.floor(GameSettings.VoiceChatVolume * 5 + 0.5)
+				v19 = voiceChatVolumeToSlider(gameSettings.VoiceChatVolume) -- inferred equivalent call
 			end
 
-			GameSettings.VoiceChatVolume = p78 / 5
+			gameSettings.VoiceChatVolume = voiceChatVolumeFromSlider(p) -- inferred equivalent call
 
-			if FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast and v183.maxVoiceChatVolumeDuringSession ~= nil then
-				v183.maxVoiceChatVolumeDuringSession = math.max(v183.maxVoiceChatVolumeDuringSession, GameSettings.VoiceChatVolume)
+			if
+				FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast
+				and newPage.maxVoiceChatVolumeDuringSession ~= nil
+			then
+				newPage.maxVoiceChatVolumeDuringSession = math.max(
+					newPage.maxVoiceChatVolumeDuringSession,
+					gameSettings.VoiceChatVolume
+				)
 			end
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("voice_chat_volume", v974, (math.floor(GameSettings.VoiceChatVolume * 5 + 0.5)))
+				reportSettingsChangeForAnalytics(
+					"voice_chat_volume",
+					v19,
+					voiceChatVolumeToSlider(gameSettings.VoiceChatVolume) -- inferred equivalent call
+				)
 			end
 
 			reportSettingsForAnalytics()
 		end)
 	end
-	local function createHapticsToggle() -- line: 2560
-		-- upvalues: GameSettings (copy), getAppFeaturePolicies (copy), u24 (ref), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local v503 = GameSettings.HapticStrength ~= 0 and 2 or 1
-		local v504 = not getAppFeaturePolicies().getShouldUseVibrationInsteadOfHaptics() and "Haptics" or u24:Format("CoreScripts.InGameMenu.Vibration")
-		local v505 = v183
-		local v506 = v183
-		local v507, v508, v509 = Utility:AddNewRow(v183, v504, "Selector", {
-			"Off",
-			"On"
-		}, v503)
 
-		v505.HapticsFrame = v507
-		_ = v508
-		v506.HapticsSelector = v509
-		v183.HapticsFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.HapticsFrame
-		v183.HapticsSelector.IndexChanged:connect(function(p79) -- line: 2569
-			-- upvalues: GameSettings (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local HapticStrength = GameSettings.HapticStrength
+	local function createHapticsToggle()
+		local v18 = gameSettings.HapticStrength == 0 and 1 or 2
 
-			if p79 == 2 then
-				GameSettings.HapticStrength = 1
+		local hapticsFrame, v19, hapticsSelector = Utility:AddNewRow(
+			newPage,
+			not getAppFeaturePolicies().getShouldUseVibrationInsteadOfHaptics() and "Haptics" or localization:Format("CoreScripts.InGameMenu.Vibration"),
+			"Selector",
+			{ "Off", "On" },
+			v18
+		)
+		newPage.HapticsFrame = hapticsFrame
+		_ = v19
+		newPage.HapticsSelector = hapticsSelector
+
+		newPage.HapticsFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.HapticsFrame
+
+		newPage.HapticsSelector.IndexChanged:connect(function(p)
+			local hapticStrength = gameSettings.HapticStrength
+
+			if p == 2 then
+				gameSettings.HapticStrength = 1
 			else
-				GameSettings.HapticStrength = 0
+				gameSettings.HapticStrength = 0
 			end
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("haptics_toggle", HapticStrength, GameSettings.HapticStrength)
+				reportSettingsChangeForAnalytics("haptics_toggle", hapticStrength, gameSettings.HapticStrength)
 			end
 
 			reportSettingsForAnalytics()
 		end)
 	end
-	local function createCameraInvertedOptions() -- line: 2585
-		-- upvalues: GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), t10 (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local n11 = 1
 
-		if pcall(function() -- line: 2587
-			-- upvalues: GameSettings (copy), n11 (ref)
-			if GameSettings.CameraYInverted == true then
-				n11 = 2
+	local function createCameraInvertedOptions()
+		local v18 = 1
+
+		if pcall(function()
+			if gameSettings.CameraYInverted == true then
+				v18 = 2
 			end
 		end) == false then
 			return
 		end
 
-		local v511 = v183
-		local v512 = v183
-		local v513, v514, v515 = Utility:AddNewRow(v183, "Camera Inverted", "Selector", {
-			"Off",
-			"On"
-		}, n11)
+		local cameraInvertedFrame, v19, cameraInvertedSelector = Utility:AddNewRow(
+			newPage,
+			"Camera Inverted",
+			"Selector",
+			{ "Off", "On" },
+			v18
+		)
+		newPage.CameraInvertedFrame = cameraInvertedFrame
+		_ = v19
+		newPage.CameraInvertedSelector = cameraInvertedSelector
 
-		v511.CameraInvertedFrame = v513
-		_ = v514
-		v512.CameraInvertedSelector = v515
-		v183.CameraInvertedFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.CameraInvertedFrame
-		t10[v183.CameraInvertedFrame] = true
-		v183.CameraInvertedSelector.IndexChanged:connect(function(p80) -- line: 2602
-			-- upvalues: GetFFlagEnableExplicitSettingsChangeAnalytics (copy), GameSettings (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-			local CameraYInverted = nil
+		newPage.CameraInvertedFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.CameraInvertedFrame
+		set[newPage.CameraInvertedFrame] = true
+
+		newPage.CameraInvertedSelector.IndexChanged:connect(function(p)
+			local cameraYInverted
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				CameraYInverted = GameSettings.CameraYInverted
+				cameraYInverted = gameSettings.CameraYInverted
 			end
 
-			if p80 == 2 then
-				GameSettings.CameraYInverted = true
+			if p == 2 then
+				gameSettings.CameraYInverted = true
 			else
-				GameSettings.CameraYInverted = false
+				gameSettings.CameraYInverted = false
 			end
 
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				reportSettingsChangeForAnalytics("camera_y_inverted", CameraYInverted, GameSettings.CameraYInverted)
+				reportSettingsChangeForAnalytics("camera_y_inverted", cameraYInverted, gameSettings.CameraYInverted)
 			end
 
 			reportSettingsForAnalytics()
 		end)
 	end
-	local function setCameraSensitivity(p81) -- line: 2621
-		-- upvalues: UserInputService (copy), GameSettings (copy), GetFFlagEnableExplicitSettingsChangeAnalytics (copy), reportSettingsChangeForAnalytics (copy), reportSettingsForAnalytics (copy)
-		local s14 = nil
-		local GamepadCameraSensitivity = nil
 
-		if UserInputService.GamepadEnabled and GameSettings.IsUsingGamepadCameraSensitivity then
+	local function setCameraSensitivity(gamepadCameraSensitivity)
+		local sensitivity_type = nil
+		local v18 = nil
+
+		if UserInputService.GamepadEnabled and gameSettings.IsUsingGamepadCameraSensitivity then
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				s14 = "gamepad"
-				GamepadCameraSensitivity = GameSettings.GamepadCameraSensitivity
+				v18 = gameSettings.GamepadCameraSensitivity
+				sensitivity_type = "gamepad"
 			end
 
-			GameSettings.GamepadCameraSensitivity = p81
+			gameSettings.GamepadCameraSensitivity = gamepadCameraSensitivity
 		end
 
 		if UserInputService.MouseEnabled then
 			if GetFFlagEnableExplicitSettingsChangeAnalytics() then
-				s14 = "mouse"
-				GamepadCameraSensitivity = GameSettings.MouseSensitivityFirstPerson.X
+				v18 = gameSettings.MouseSensitivityFirstPerson.X
+				sensitivity_type = "mouse"
 			end
 
-			local vector2 = Vector2.new(p81, p81)
-
-			GameSettings.MouseSensitivityFirstPerson = vector2
-			GameSettings.MouseSensitivityThirdPerson = vector2
+			local vector2 = Vector2.new(gamepadCameraSensitivity, gamepadCameraSensitivity)
+			gameSettings.MouseSensitivityFirstPerson = vector2
+			gameSettings.MouseSensitivityThirdPerson = vector2
 		end
 
-		if GetFFlagEnableExplicitSettingsChangeAnalytics() and typeof(GamepadCameraSensitivity) == "number" and typeof(p81) == "number" then
-			reportSettingsChangeForAnalytics("camera_sensitivity", tonumber(string.format("%.2f", GamepadCameraSensitivity)), tonumber(string.format("%.2f", p81)), {
-				sensitivity_type = s14
-			})
+		if
+			GetFFlagEnableExplicitSettingsChangeAnalytics()
+			and typeof(v18) == "number"
+			and typeof(gamepadCameraSensitivity) == "number"
+		then
+			reportSettingsChangeForAnalytics(
+				"camera_sensitivity",
+				tonumber(string.format("%.2f", v18)),
+				tonumber(string.format("%.2f", gamepadCameraSensitivity)),
+				{ sensitivity_type = sensitivity_type }
+			)
 		end
 
 		reportSettingsForAnalytics()
 	end
-	local function createMouseOptions() -- line: 2659
-		-- upvalues: GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), t10 (copy), Create (copy), Theme (copy), setCameraSensitivity (copy)
-		local function translateEngineMouseSensitivityToGui(p82) -- line: 2664
-			local v980 = p82 <= 1 and math.floor((p82 - 0.2) / 0.16 + 0.5) or math.floor((p82 + 2) / 0.6 + 0.5)
 
-			if p82 <= 0.2 then
-				return 0
-			end
-
-			return v980
-		end
-		local function translateGuiMouseSensitivityToEngine(p83) -- line: 2672
-			local v982 = p83 <= 5 and 0.16 * p83 + 0.2 or 0.6 * p83 - 2
-
-			if v982 <= 0.2 then
-				return 0.2
-			end
-
-			return v982
+	local function createMouseOptions()
+		local function translateEngineMouseSensitivityToGui(p) -- 3 equivalent calls inferred from this helper
+			local v18 = p <= 1 and math.floor((p - 0.2) / 0.16 + 0.5) or math.floor((p + 2) / 0.6 + 0.5)
+			return if p <= 0.2 then 0 else v18
 		end
 
-		local MouseSensitivity = GameSettings.MouseSensitivity
-		local v523 = MouseSensitivity <= 1 and math.floor((MouseSensitivity - 0.2) / 0.16 + 0.5) or math.floor((MouseSensitivity + 2) / 0.6 + 0.5)
-		local v524 = if not (MouseSensitivity <= 0.2) then v523 else 0
-		local u525 = true
+		local function translateGuiMouseSensitivityToEngine(p) -- 1 equivalent call inferred from this helper
+			local v18 = p <= 5 and 0.16 * p + 0.2 or 0.6 * p - 2
+			return if v18 <= 0.2 then 0.2 else v18
+		end
 
-		tostring(GameSettings.MouseSensitivityFirstPerson.X)
+		local v18 = translateEngineMouseSensitivityToGui(gameSettings.MouseSensitivity) -- inferred equivalent call
 
-		local v526 = v183
-		local v527 = v183
-		local v528 = v183
-		local v529, v530, v531 = Utility:AddNewRow(v183, "Camera Sensitivity", "Slider", 10, v524)
+		local v19 = true
+		tostring(gameSettings.MouseSensitivityFirstPerson.X)
 
-		v526.MouseAdvancedFrame = v529
-		v527.MouseAdvancedLabel = v530
-		v528.MouseAdvancedEntry = v531
-		v183.MouseAdvancedFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.MouseAdvancedFrame
-		t10[v183.MouseAdvancedFrame] = true
-		v183.MouseAdvancedEntry.SliderFrame.Size = UDim2.new(v183.MouseAdvancedEntry.SliderFrame.Size.X.Scale, v183.MouseAdvancedEntry.SliderFrame.Size.X.Offset - 60 - 20, v183.MouseAdvancedEntry.SliderFrame.Size.Y.Scale, v183.MouseAdvancedEntry.SliderFrame.Size.Y.Offset - 6)
-		v183.MouseAdvancedEntry.SliderFrame.Position = UDim2.new(v183.MouseAdvancedEntry.SliderFrame.Position.X.Scale, v183.MouseAdvancedEntry.SliderFrame.Position.X.Offset - 60 - 20, v183.MouseAdvancedEntry.SliderFrame.Position.Y.Scale, v183.MouseAdvancedEntry.SliderFrame.Position.Y.Offset)
-		v183.MouseAdvancedLabel.ZIndex = 2
-		v183.MouseAdvancedEntry:SetInteractable(true)
+		local mouseAdvancedFrame, mouseAdvancedLabel, mouseAdvancedEntry = Utility:AddNewRow(
+			newPage,
+			"Camera Sensitivity",
+			"Slider",
+			10,
+			v18
+		)
+		newPage.MouseAdvancedFrame = mouseAdvancedFrame
+		newPage.MouseAdvancedLabel = mouseAdvancedLabel
+		newPage.MouseAdvancedEntry = mouseAdvancedEntry
 
-		local v532 = Create("TextBox")({
+		newPage.MouseAdvancedFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.MouseAdvancedFrame
+		set[newPage.MouseAdvancedFrame] = true
+
+		newPage.MouseAdvancedEntry.SliderFrame.Size = UDim2.new(
+			newPage.MouseAdvancedEntry.SliderFrame.Size.X.Scale,
+			newPage.MouseAdvancedEntry.SliderFrame.Size.X.Offset - 60 - 20,
+			newPage.MouseAdvancedEntry.SliderFrame.Size.Y.Scale,
+			newPage.MouseAdvancedEntry.SliderFrame.Size.Y.Offset - 6
+		)
+
+		newPage.MouseAdvancedEntry.SliderFrame.Position = UDim2.new(
+			newPage.MouseAdvancedEntry.SliderFrame.Position.X.Scale,
+			newPage.MouseAdvancedEntry.SliderFrame.Position.X.Offset - 60 - 20,
+			newPage.MouseAdvancedEntry.SliderFrame.Position.Y.Scale,
+			newPage.MouseAdvancedEntry.SliderFrame.Position.Y.Offset
+		)
+
+		newPage.MouseAdvancedLabel.ZIndex = 2
+		newPage.MouseAdvancedEntry:SetInteractable(true)
+
+		local parent = Create("TextBox")({
 			Name = "CameraSensitivityTextBox",
-			ZIndex = 3,
-			Selectable = false,
-			BorderSizePixel = 0,
 			TextColor3 = Color3.new(1, 1, 1),
 			BorderColor3 = Color3.new(0.8, 0.8, 0.8),
 			BackgroundColor3 = Color3.new(0.2, 0.2, 0.2),
@@ -3291,150 +3421,122 @@ local function Initialize() -- line: 473
 			Size = UDim2.new(0, 60, 0.8, 0),
 			Position = UDim2.new(1, 10, 0.5, 0),
 			AnchorPoint = Vector2.new(0, 0.5),
-			Parent = v183.MouseAdvancedEntry.SliderFrame
+			ZIndex = 3,
+			Selectable = false,
+			Parent = newPage.MouseAdvancedEntry.SliderFrame,
+			BorderSizePixel = 0
 		})
 
-		Create("UICorner")({
-			CornerRadius = Theme.DefaultCornerRadius,
-			Parent = v532
-		})
+		Create("UICorner")({ CornerRadius = Theme.DefaultCornerRadius, Parent = parent })
 
-		local function setMouseSensitivityText(p84) -- line: 2731
-			-- upvalues: v532 (copy)
-			local v984 = math.floor(p84 * 1000 + 0.5) / 1000
-
-			v532.Text = tostring((tonumber((string.format("%.3f", v984)))))
+		local function setMouseSensitivityText(p) -- 2 equivalent calls inferred from this helper
+			local v20 = math.floor(p * 1000 + 0.5) / 1000
+			parent.Text = tostring((tonumber((string.format("%.3f", v20)))))
 		end
 
-		local v534 = math.floor(GameSettings.MouseSensitivityFirstPerson.X * 1000 + 0.5) / 1000
+		setMouseSensitivityText(gameSettings.MouseSensitivityFirstPerson.X) -- inferred equivalent call
 
-		v532.Text = tostring((tonumber((string.format("%.3f", v534)))))
+		newPage.MouseAdvancedEntry:SetValue(translateEngineMouseSensitivityToGui(gameSettings.MouseSensitivityFirstPerson.X)) -- inferred equivalent call
 
-		local MouseAdvancedEntry = v183.MouseAdvancedEntry
-		local MouseSensitivityFirstPersonX = GameSettings.MouseSensitivityFirstPerson.X
-		local v537 = MouseSensitivityFirstPersonX <= 1 and math.floor((MouseSensitivityFirstPersonX - 0.2) / 0.16 + 0.5) or math.floor((MouseSensitivityFirstPersonX + 2) / 0.6 + 0.5)
-
-		MouseAdvancedEntry:SetValue(if not (MouseSensitivityFirstPersonX <= 0.2) then v537 else 0)
-
-		function clampMouseSensitivity(p85) -- line: 2746
-			if p85 < 0 then
-				p85 = -p85
+		function clampMouseSensitivity(p)
+			if p < 0 then
+				p = -p
 			end
 
-			if p85 > 100 then
+			if p > 100 then
 				return 100
 			end
 
-			if p85 < 0.001 then
-				p85 = 0.001
-			end
-
-			return p85
+			return p < 0.001 and 0.001 or p
 		end
-		function setMouseSensitivity(p86, p87) -- line: 2764
-			-- upvalues: u525 (ref), setCameraSensitivity (copy), v183 (copy), v532 (copy)
-			if not u525 then
+
+		function setMouseSensitivity(gamepadCameraSensitivity, p)
+			if not v19 then
 				return
 			end
 
-			setCameraSensitivity(p86)
-			u525 = false
+			setCameraSensitivity(gamepadCameraSensitivity)
 
-			if p87 ~= v183.MouseAdvancedEntry then
-				local MouseAdvancedEntry2 = v183.MouseAdvancedEntry
-				local v989 = p86 <= 1 and math.floor((p86 - 0.2) / 0.16 + 0.5) or math.floor((p86 + 2) / 0.6 + 0.5)
+			v19 = false
 
-				MouseAdvancedEntry2:SetValue(if not (p86 <= 0.2) then v989 else 0)
+			if p ~= newPage.MouseAdvancedEntry then
+				newPage.MouseAdvancedEntry:SetValue(translateEngineMouseSensitivityToGui(gamepadCameraSensitivity)) -- inferred equivalent call
 			end
 
-			local v990 = math.floor(p86 * 1000 + 0.5) / 1000
-
-			v532.Text = tostring((tonumber((string.format("%.3f", v990)))))
-			u525 = true
+			setMouseSensitivityText(gamepadCameraSensitivity) -- inferred equivalent call
+			v19 = true
 		end
 
-		v532.FocusLost:connect(function() -- line: 2782
-			-- upvalues: v183 (copy), v532 (copy), GameSettings (copy)
-			v183.MouseAdvancedEntry:SetInteractable(true)
+		parent.FocusLost:connect(function()
+			newPage.MouseAdvancedEntry:SetInteractable(true)
 
-			local num = tonumber((string.match(v532.Text, "([%d%.]+)")))
+			local v20 = tonumber((string.match(parent.Text, "([%d%.]+)")))
 
-			if num then
-				setMouseSensitivity(clampMouseSensitivity(num), v532)
-
-				return
+			if v20 then
+				setMouseSensitivity(clampMouseSensitivity(v20), parent)
+			else
+				setMouseSensitivity(gameSettings.MouseSensitivityFirstPerson.X, parent)
 			end
-
-			setMouseSensitivity(GameSettings.MouseSensitivityFirstPerson.X, v532)
 		end)
-		v532.Focused:connect(function() -- line: 2794
-			-- upvalues: v183 (copy)
-			v183.MouseAdvancedEntry:SetInteractable(false)
-		end)
-		v183.MouseAdvancedEntry.ValueChanged:connect(function(p88) -- line: 2798
-			-- upvalues: v183 (copy)
-			local v993 = clampMouseSensitivity(p88)
-			local v994 = v993 <= 5 and 0.16 * v993 + 0.2 or 0.6 * v993 - 2
-			local v995 = if not (v994 <= 0.2) then v994 else 0.2
 
-			setMouseSensitivity(v995, v183.MouseAdvancedEntry)
+		parent.Focused:connect(function()
+			newPage.MouseAdvancedEntry:SetInteractable(false)
+		end)
+
+		newPage.MouseAdvancedEntry.ValueChanged:connect(function(p)
+			local v20 = translateGuiMouseSensitivityToEngine(clampMouseSensitivity(p)) -- inferred equivalent call
+
+			setMouseSensitivity(v20, newPage.MouseAdvancedEntry)
 		end)
 	end
-	local function createGamepadOptions() -- line: 2805
-		-- upvalues: GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), setCameraSensitivity (copy)
-		local function translateEngineGamepadSensitivityToGui(p89) -- line: 2810
-			local v997 = p89 <= 1 and math.floor((p89 - 0.2) / 0.16 + 0.5) or math.floor((p89 + 2) / 0.6 + 0.5)
 
-			if p89 <= 0.2 then
-				return 0
-			end
-
-			return v997
-		end
-		local function translateGuiGamepadSensitivityToEngine(p90) -- line: 2817
-			local v999 = p90 <= 5 and 0.16 * p90 + 0.2 or 0.6 * p90 - 2
-
-			if v999 <= 0.2 then
-				return 0.2
-			end
-
-			return v999
+	local function createGamepadOptions()
+		local function translateEngineGamepadSensitivityToGui(gamepadCameraSensitivity) -- 1 equivalent call inferred from this helper
+			local v18 = gamepadCameraSensitivity <= 1 and math.floor((gamepadCameraSensitivity - 0.2) / 0.16 + 0.5)
+				or math.floor((gamepadCameraSensitivity + 2) / 0.6 + 0.5)
+			return if gamepadCameraSensitivity <= 0.2 then 0 else v18
 		end
 
-		local GamepadCameraSensitivity = GameSettings.GamepadCameraSensitivity
-		local v541 = GamepadCameraSensitivity <= 1 and math.floor((GamepadCameraSensitivity - 0.2) / 0.16 + 0.5) or math.floor((GamepadCameraSensitivity + 2) / 0.6 + 0.5)
-		local v542 = if not (GamepadCameraSensitivity <= 0.2) then v541 else 0
-		local v543 = v183
-		local v544 = v183
-		local v545 = v183
-		local v546, v547, v548 = Utility:AddNewRow(v183, "Camera Sensitivity", "Slider", 10, v542)
+		local function translateGuiGamepadSensitivityToEngine(p) -- 1 equivalent call inferred from this helper
+			local v18 = p <= 5 and 0.16 * p + 0.2 or 0.6 * p - 2
+			return if v18 <= 0.2 then 0.2 else v18
+		end
 
-		v543.GamepadSensitivityFrame = v546
-		v544.GamepadSensitivityLabel = v547
-		v545.GamepadSensitivitySlider = v548
-		v183.GamepadSensitivityFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.GamepadSensitivityFrame
-		v183.GamepadSensitivitySlider.ValueChanged:connect(function(p91) -- line: 2832
-			-- upvalues: setCameraSensitivity (copy)
-			local v1001 = setCameraSensitivity
-			local v1002 = p91 <= 5 and 0.16 * p91 + 0.2 or 0.6 * p91 - 2
+		local v18 = translateEngineGamepadSensitivityToGui(gameSettings.GamepadCameraSensitivity) -- inferred equivalent call
 
-			v1001(if not (v1002 <= 0.2) then v1002 else 0.2)
+		local gamepadSensitivityFrame, gamepadSensitivityLabel, gamepadSensitivitySlider = Utility:AddNewRow(
+			newPage,
+			"Camera Sensitivity",
+			"Slider",
+			10,
+			v18
+		)
+		newPage.GamepadSensitivityFrame = gamepadSensitivityFrame
+		newPage.GamepadSensitivityLabel = gamepadSensitivityLabel
+		newPage.GamepadSensitivitySlider = gamepadSensitivitySlider
+
+		newPage.GamepadSensitivityFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.GamepadSensitivityFrame
+		newPage.GamepadSensitivitySlider.ValueChanged:connect(function(p)
+			setCameraSensitivity(translateGuiGamepadSensitivityToEngine(p)) -- inferred equivalent call
 		end)
 	end
-	local function createOverscanOption() -- line: 2837
-		-- upvalues: RobloxGui (copy), CorePackages (copy), ContextActionService (copy), Utility (copy), v183 (copy), Theme (copy), RunService (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-		local v549, v550, v551 = Utility:MakeStyledButton("AdjustButton", "Adjust", UDim2.new(0, 300, 1, -20), function() -- line: 2838
-			-- upvalues: RobloxGui (copy), CorePackages (copy), ContextActionService (copy)
+
+	local function createOverscanOption()
+		local function fn()
 			local SettingsHub = require(RobloxGui.Modules.Settings.SettingsHub)
+
 			local Overscan = require(RobloxGui.Modules.Shell.Components.Overscan10ft.Overscan)
-			local v1005 = require(RobloxGui.Modules.Settings.Components.OverscanWrapper)(Overscan)
+			local OverscanWrapper = require(RobloxGui.Modules.Settings.Components.OverscanWrapper)
+			local overscanWrapper = OverscanWrapper(Overscan)
+
 			local Roact = require(CorePackages.Packages.Roact)
-			local u1007 = nil
-			local t29 = {
-				onUnmount = function() -- line: 2849
-					-- upvalues: u1007 (ref), Roact (copy), ContextActionService (copy), SettingsHub (copy)
-					if u1007 then
-						Roact.unmount(u1007)
+			local v18 = nil
+
+			local v19 = {
+				onUnmount = function()
+					if v18 then
+						Roact.unmount(v18)
+
 						ContextActionService:UnbindCoreAction("RbxStopOverscanMovement")
 						SettingsHub:SetVisibility(true, true)
 					end
@@ -3444,38 +3546,49 @@ local function Initialize() -- line: 473
 			}
 
 			SettingsHub:SetVisibility(false, true)
-			ContextActionService:BindCoreAction("RbxStopOverscanMovement", function() -- line: 2865
-			end, false, Enum.UserInputType.Gamepad1, Enum.UserInputType.Gamepad2, Enum.UserInputType.Gamepad3, Enum.UserInputType.Gamepad4)
 
-			local v1009 = Roact.createElement(v1005, t29)
+			ContextActionService:BindCoreAction(
+				"RbxStopOverscanMovement",
+				function() end,
+				false,
+				Enum.UserInputType.Gamepad1,
+				Enum.UserInputType.Gamepad2,
+				Enum.UserInputType.Gamepad3,
+				Enum.UserInputType.Gamepad4
+			)
 
-			u1007 = Roact.mount(v1009, RobloxGui, (tostring(v1005)))
-		end, v183)
-
-		v550.Font = Theme.font(Enum.Font.SourceSans)
-		v549.Position = UDim2.new(1, -400, 0, 12)
-		v549.Size = UDim2.new(0, 300, 0, 40)
-		v549.Position = UDim2.new(1, -400, 0.5, 0)
-		v549.AnchorPoint = Vector2.new(0, 0.5)
-
-		if RunService:IsStudio() then
-			v549.Selectable = false
-			v549.Active = false
-			v549.Enabled.Value = false
-			v550.TextColor3 = Color3.fromRGB(100, 100, 100)
+			local element = Roact.createElement(overscanWrapper, v19)
+			v18 = Roact.mount(element, RobloxGui, (tostring(overscanWrapper)))
 		end
 
-		local v552 = Utility:AddNewRowObject(v183, "Safe Zone", v549)
+		local styledButton, v18, v19 = Utility:MakeStyledButton(
+			"AdjustButton",
+			"Adjust",
+			UDim2.new(0, 300, 1, -20),
+			fn,
+			newPage
+		)
+		v18.Font = Theme.font(Enum.Font.SourceSans)
+		styledButton.Position = UDim2.new(1, -400, 0, 12)
+		styledButton.Size = UDim2.new(0, 300, 0, 40)
+		styledButton.Position = UDim2.new(1, -400, 0.5, 0)
+		styledButton.AnchorPoint = Vector2.new(0, 0.5)
 
-		v552.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.OverscanAdjustButton
-		v551(v552)
+		if RunService:IsStudio() then
+			styledButton.Selectable = false
+			styledButton.Active = false
+			styledButton.Enabled.Value = false
+			v18.TextColor3 = Color3.fromRGB(100, 100, 100)
+		end
+
+		local v20 = Utility:AddNewRowObject(newPage, "Safe Zone", styledButton)
+		v20.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.OverscanAdjustButton
+		v19(v20)
 	end
-	local function createDeveloperConsoleOption() -- line: 2904
-		-- upvalues: reportSettingsChangeForAnalytics (copy), v143 (copy), Utility (copy), v183 (copy), Theme (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), RunService (copy), PlayerPermissionsModule (copy), Players (copy)
-		local function makeDevConsoleOption() -- line: 2906
-			-- upvalues: reportSettingsChangeForAnalytics (copy), v143 (copy), Utility (copy), v183 (copy), Theme (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-			local function onOpenDevConsole() -- line: 2907
-				-- upvalues: reportSettingsChangeForAnalytics (copy)
+
+	local function createDeveloperConsoleOption()
+		local function makeDevConsoleOption()
+			local function onOpenDevConsole()
 				local DevConsoleMaster = require(script.Parent.Parent.Parent.DevConsoleMaster)
 
 				if DevConsoleMaster then
@@ -3491,954 +3604,1229 @@ local function Initialize() -- line: 473
 				end
 			end
 
-			if v143 then
-				local v1011, v1012, v1013 = Utility:MakeStyledButton("DevConsoleButton", "Open", UDim2.new(1, 0, 1, -20), onOpenDevConsole, v183)
+			if defineFastFlag19 then
+				local styledButton, v18, v19 = Utility:MakeStyledButton(
+					"DevConsoleButton",
+					"Open",
+					UDim2.new(1, 0, 1, -20),
+					onOpenDevConsole,
+					newPage
+				)
 
-				v1012.Font = Theme.font(Enum.Font.SourceSans)
-				v1011.Size = UDim2.new(0.6, -10, 0, 35)
-				v1011.Position = UDim2.new(0.4, 10, 0.5, 0)
-				v1011.AnchorPoint = Vector2.new(0, 0.5)
+				v18.Font = Theme.font(Enum.Font.SourceSans)
+				styledButton.Size = UDim2.new(0.6, -10, 0, 35)
+				styledButton.Position = UDim2.new(0.4, 10, 0.5, 0)
+				styledButton.AnchorPoint = Vector2.new(0, 0.5)
 
-				local v1014 = Utility:AddNewRowObject(v183, "Developer Console", v1011, nil, true)
+				local v20 = Utility:AddNewRowObject(newPage, "Developer Console", styledButton, nil, true)
+				v20.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DeveloperConsoleButton
+				v19(v20)
+			else
+				local styledButton, v18, v19 = Utility:MakeStyledButton(
+					"DevConsoleButton",
+					"Open",
+					UDim2.new(0, 300, 1, -20),
+					onOpenDevConsole,
+					newPage
+				)
 
-				v1014.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DeveloperConsoleButton
-				v1013(v1014)
+				v18.Font = Theme.font(Enum.Font.SourceSans)
+				styledButton.Size = UDim2.new(0.6, -10, 0, 35)
+				styledButton.Position = UDim2.new(1, -400, 0.5, 0)
+				styledButton.AnchorPoint = Vector2.new(0, 0.5)
 
-				return
+				local v20 = Utility:AddNewRowObject(newPage, "Developer Console", styledButton)
+				v20.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DeveloperConsoleButton
+				v19(v20)
 			end
-
-			local v1015, v1016, v1017 = Utility:MakeStyledButton("DevConsoleButton", "Open", UDim2.new(0, 300, 1, -20), onOpenDevConsole, v183)
-
-			v1016.Font = Theme.font(Enum.Font.SourceSans)
-			v1015.Size = UDim2.new(0.6, -10, 0, 35)
-			v1015.Position = UDim2.new(1, -400, 0.5, 0)
-			v1015.AnchorPoint = Vector2.new(0, 0.5)
-
-			local v1018 = Utility:AddNewRowObject(v183, "Developer Console", v1015)
-
-			v1018.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DeveloperConsoleButton
-			v1017(v1018)
 		end
 
 		if RunService:IsStudio() then
 			makeDevConsoleOption()
-
-			return
+		else
+			spawn(function()
+				if PlayerPermissionsModule.CanPlayerManagePlaceAsync(Players.LocalPlayer) then
+					makeDevConsoleOption()
+				end
+			end)
 		end
-
-		spawn(function() -- line: 2959
-			-- upvalues: PlayerPermissionsModule (copy), Players (copy), makeDevConsoleOption (copy)
-			if PlayerPermissionsModule.CanPlayerManagePlaceAsync(Players.LocalPlayer) then
-				makeDevConsoleOption()
-			end
-		end)
 	end
-	local function createUiToggleOptions() -- line: 2968
-		-- upvalues: v142 (copy), v141 (copy), RobloxTranslator (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GuiService (copy), LocalPlayer (copy)
-		if v142 or v141 then
-			local t30 = {
+
+	local function createUiToggleOptions()
+		if defineFastFlag18 or defineFastFlag17 then
+			local v18 = {
 				{
 					label = "Custom",
-					layoutOrderKey = "UiToggleRowCustom",
-					type = Enum.GuiType.Custom
+					type = Enum.GuiType.Custom,
+					layoutOrderKey = "UiToggleRowCustom"
 				},
 				{
 					label = "CustomBillboards",
-					layoutOrderKey = "UiToggleRowBillboards",
-					type = Enum.GuiType.CustomBillboards
+					type = Enum.GuiType.CustomBillboards,
+					layoutOrderKey = "UiToggleRowBillboards"
 				},
 				{
 					label = "PlayerNameplates",
-					layoutOrderKey = "UiToggleRowNameplates",
-					type = Enum.GuiType.PlayerNameplates
+					type = Enum.GuiType.PlayerNameplates,
+					layoutOrderKey = "UiToggleRowNameplates"
 				}
 			}
-			local v555 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
-			local v556 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
 
-			v183.uiToggleSelectors = {}
+			local formatByKey6 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
+			local formatByKey7 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
 
-			for __, v558 in t30 do
-				local v559 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.GuiVisibility.ShowGuiType", {
-					GuiType = v558.label
-				})
-				local v560, v561, v562 = Utility:AddNewRow(v183, v559, "Selector", {
-					v555,
-					v556
-				}, 1)
+			newPage.uiToggleSelectors = {}
 
-				v560.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER[v558.layoutOrderKey]
-				v562.IndexChanged:Connect(function(p92) -- line: 2996
-					-- upvalues: GuiService (copy), v558 (copy)
-					if p92 ~= (not GuiService:GetGuiIsVisible(v558.type) and 2 or 1) then
-						GuiService:ToggleGuiIsVisibleIfAllowed(v558.type)
+			for k, v19 in v18 do
+				local formatByKey8 = RobloxTranslator:FormatByKey(
+					"Feature.SettingsHub.GameSettings.GuiVisibility.ShowGuiType",
+					{ GuiType = v19.label }
+				)
+
+				local row, frame, selector = Utility:AddNewRow(
+					newPage,
+					formatByKey8,
+					"Selector",
+					{ formatByKey6, formatByKey7 },
+					1
+				)
+				row.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER[v19.layoutOrderKey]
+
+				selector.IndexChanged:Connect(function(p)
+					if (GuiService:GetGuiIsVisible(v19.type) and 1 or 2) ~= p then
+						GuiService:ToggleGuiIsVisibleIfAllowed(v19.type)
 					end
 				end)
-				v183.uiToggleSelectors[v558.label] = {
-					label = v559,
-					type = v558.type,
-					row = v560,
-					frame = v561,
-					selector = v562
+
+				newPage.uiToggleSelectors[v19.label] = {
+					label = formatByKey8,
+					type = v19.type,
+					row = row,
+					frame = frame,
+					selector = selector
 				}
 			end
 
-			local v563 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.GuiVisibility.Freecam")
-			local v564 = v183
-			local v565 = v183
-			local v566 = v183
-			local v567, v568, v569 = Utility:AddNewRow(v183, v563, "Selector", {
-				v556,
-				v555
-			}, 1)
+			local freecamRow, freecamFrame, freecamSelector = Utility:AddNewRow(
+				newPage,
+				RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.GuiVisibility.Freecam"),
+				"Selector",
+				{ formatByKey7, formatByKey6 },
+				1
+			)
+			newPage.freecamRow = freecamRow
+			newPage.freecamFrame = freecamFrame
+			newPage.freecamSelector = freecamSelector
 
-			v564.freecamRow = v567
-			v565.freecamFrame = v568
-			v566.freecamSelector = v569
-			v183.freecamRow.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FreecamToggleRow
-			v183.freecamSelector.IndexChanged:Connect(function(p93) -- line: 3018
-				-- upvalues: LocalPlayer (copy)
-				local v1021 = p93 == 2
-				local FreecamScript = LocalPlayer:FindFirstChild("FreecamScript", true)
+			newPage.freecamRow.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.FreecamToggleRow
 
-				if not FreecamScript then
+			newPage.freecamSelector.IndexChanged:Connect(function(p)
+				local v19 = p == 2
+				local freecamScript = LocalPlayer:FindFirstChild("FreecamScript", true)
+
+				if freecamScript then
+					freecamScript:SetAttribute("FreecamEnabled", v19)
+				else
 					warn("Freecam not present")
-
-					return
 				end
-
-				FreecamScript:SetAttribute("FreecamEnabled", v1021)
 			end)
+		else
+			local uiToggleRow, uiToggleFrame, uiToggleSelector = Utility:AddNewRow(
+				newPage,
+				"BillboardGui Visibility",
+				"Selector",
+				{ "All visible", "Hide nameplates/bubble chat" },
+				1
+			)
+			newPage.uiToggleRow = uiToggleRow
+			newPage.uiToggleFrame = uiToggleFrame
+			newPage.uiToggleSelector = uiToggleSelector
 
-			return
+			newPage.uiToggleRow.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UiToggleRow
+
+			newPage.uiToggleSelector.IndexChanged:connect(function(p)
+				GuiService:ToggleGuiIsVisibleIfAllowed(Enum.GuiType.PlayerNameplates)
+			end)
 		end
-
-		local v570 = v183
-		local v571 = v183
-		local v572 = v183
-		local v573, v574, v575 = Utility:AddNewRow(v183, "BillboardGui Visibility", "Selector", {
-			"All visible",
-			"Hide nameplates/bubble chat"
-		}, 1)
-
-		v570.uiToggleRow = v573
-		v571.uiToggleFrame = v574
-		v572.uiToggleSelector = v575
-		v183.uiToggleRow.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.UiToggleRow
-		v183.uiToggleSelector.IndexChanged:connect(function(__) -- line: 3037
-			-- upvalues: GuiService (copy)
-			GuiService:ToggleGuiIsVisibleIfAllowed(Enum.GuiType.PlayerNameplates)
-		end)
 	end
-	local function updateUiToggleSelection() -- line: 3043
-		-- upvalues: v142 (copy), v141 (copy), v183 (copy), GuiService (copy), LocalPlayer (copy)
-		if v142 or v141 then
-			if not v183.uiToggleSelectors then
+
+	local function updateUiToggleSelection()
+		if defineFastFlag18 or defineFastFlag17 then
+			if not newPage.uiToggleSelectors then
 				return
 			end
 
-			for __, v577 in v183.uiToggleSelectors do
-				local v578 = not GuiService:GetGuiIsVisible(v577.type) and 2 or 1
+			for k, uiToggleSelector in newPage.uiToggleSelectors do
+				local v18 = GuiService:GetGuiIsVisible(uiToggleSelector.type) and 1 or 2
 
-				if v578 ~= v577.selector:GetSelectedIndex() then
-					v577.selector:SetSelectionIndex(v578)
+				if v18 ~= uiToggleSelector.selector:GetSelectedIndex() then
+					uiToggleSelector.selector:SetSelectionIndex(v18)
 				end
 			end
 
-			local FreecamScript = LocalPlayer:FindFirstChild("FreecamScript", true)
+			local freecamScript = LocalPlayer:FindFirstChild("FreecamScript", true)
 
-			if FreecamScript then
-				local v580 = not FreecamScript:GetAttribute("FreecamEnabled") and 1 or 2
+			if freecamScript then
+				local v18 = freecamScript:GetAttribute("FreecamEnabled") and 2 or 1
 
-				v183.freecamSelector:SetSelectionIndex(v580)
-
-				return
+				newPage.freecamSelector:SetSelectionIndex(v18)
 			end
 		else
-			if not v183.uiToggleSelector then
+			if not newPage.uiToggleSelector then
 				return
 			end
 
-			local v581 = not GuiService:GetGuiIsVisible(Enum.GuiType.PlayerNameplates) and 2 or 1
+			local v18 = GuiService:GetGuiIsVisible(Enum.GuiType.PlayerNameplates) and 1 or 2
 
-			if v581 == v183.uiToggleSelector:GetSelectedIndex() then
+			if v18 == newPage.uiToggleSelector:GetSelectedIndex() then
 				return
 			end
 
-			v183.uiToggleSelector:SetSelectionIndex(v581)
+			newPage.uiToggleSelector:SetSelectionIndex(v18)
 		end
 	end
-	local function isValidDeviceList(p95, p96, p97) -- line: 3085
-		return p95 and (p96 and (p97 and (#p95 > 0 and (p97 > 0 and (p97 <= #p95 and #p95 == #p96)))))
-	end
-	local function SwitchOutputDevice(p98, p99) -- line: 3098
-		-- upvalues: SoundService (copy), v128 (copy)
-		SoundService:SetOutputDevice(p98, p99)
-		v128:info("[SwitchOutputDevice] Setting SS Speaker Device To {} {}", p98, p99)
-	end
-	local function createDeviceOptions(p100) -- line: 3103
-		-- upvalues: v183 (copy), RobloxTranslator (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFIntVoiceChatDeviceChangeDebounceDelay (copy), default3 (copy), SoundService (copy), v128 (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy), reportSettingsChangeForAnalytics (copy)
-		local v588 = v183[p100 .. "DeviceIndex"] or 0
-		local v589 = v183[p100 .. "DeviceNames"] or {}
-		local v590 = v183[p100 .. "DeviceGuids"] or {}
-		local v591 = p100 == "Input" and RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.InputDevice") or RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.OutputDevice")
-		local v592 = v183
-		local v593 = p100 .. "DeviceFrame"
-		local v594 = v183
-		local v595 = p100 .. "DeviceSelector"
-		local v596, v597, v598 = Utility:AddNewRow(v183, v591, "Selector", v589, v588)
 
-		v592[v593] = v596
-		_ = v597
-		v594[v595] = v598
-		v183[p100 .. "DeviceFrame"].LayoutOrder = p100 == "Input" and SETTINGS_MENU_LAYOUT_ORDER.DeviceFrameInput or SETTINGS_MENU_LAYOUT_ORDER.DeviceFrameOutput
-		v183[p100 .. "DeviceInfo"] = {
-			Name = v588 > 0 and v589[v588] or nil,
-			Guid = v588 > 0 and v590[v588] or nil
+	local function isValidDeviceList(list, list2, p)
+		if list then
+			if list2 then
+				if p then
+					if #list > 0 and p > 0 and p <= #list then
+						p = #list == #list2
+					else
+						p = false
+					end
+				end
+			else
+				p = list2
+			end
+		else
+			p = list
+		end
+
+		return p
+	end
+
+	local function SwitchOutputDevice(name, guid) -- 1 equivalent call inferred from this helper
+		SoundService:SetOutputDevice(name, guid)
+		v10:info("[SwitchOutputDevice] Setting SS Speaker Device To {} {}", name, guid)
+	end
+
+	local function createDeviceOptions(p)
+		local v18 = newPage[p .. "DeviceIndex"] or 0
+		local v19 = newPage[p .. "DeviceNames"] or {}
+		local v20 = newPage[p .. "DeviceGuids"] or {}
+
+		local v21 = p == "Input" and RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.InputDevice")
+			or RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.OutputDevice")
+		local v22 = p .. "DeviceFrame"
+		local v23 = p .. "DeviceSelector"
+		local v24, v25, v26 = Utility:AddNewRow(newPage, v21, "Selector", v19, v18)
+		newPage[v22] = v24
+		_ = v25
+		newPage[v23] = v26
+
+		newPage[p .. "DeviceFrame"].LayoutOrder = p == "Input" and SETTINGS_MENU_LAYOUT_ORDER.DeviceFrameInput
+			or SETTINGS_MENU_LAYOUT_ORDER.DeviceFrameOutput
+
+		local v27 = p .. "DeviceInfo"
+		local name2
+
+		if v18 > 0 then
+			name2 = v19[v18] or nil
+		end
+
+		newPage[v27] = {
+			Name = name2,
+			Guid = v18 > 0 and v20[v18] or nil
 		}
-		v183[p100 .. "PrevDeviceName"] = v183[p100 .. "DeviceInfo"].Name
 
-		local n12 = 0
-		local v600 = GetFIntVoiceChatDeviceChangeDebounceDelay()
+		newPage[p .. "PrevDeviceName"] = newPage[p .. "DeviceInfo"].Name
 
-		v183[p100 .. "DeviceSelector"].IndexChanged:connect(function(p101) -- line: 3126
-			-- upvalues: v183 (copy), p100 (copy), n12 (ref), v600 (copy), default3 (copy), SoundService (copy), v128 (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy), reportSettingsChangeForAnalytics (copy)
-			if v183[p100 .. "DeviceInfo"].Name == v183[p100 .. "DeviceNames"][p101] and v183[p100 .. "DeviceInfo"].Guid == v183[p100 .. "DeviceGuids"][p101] then
+		local v28 = 0
+		local fIntVoiceChatDeviceChangeDebounceDelay = GetFIntVoiceChatDeviceChangeDebounceDelay()
+		newPage[p .. "DeviceSelector"].IndexChanged:connect(function(p2)
+			if
+				newPage[p .. "DeviceInfo"].Name == newPage[p .. "DeviceNames"][p2]
+				and newPage[p .. "DeviceInfo"].Guid == newPage[p .. "DeviceGuids"][p2]
+			then
 				return
 			end
 
-			local v1025 = n12 + 1
+			local v29 = v28 + 1
+			v28 = v29
+			wait(fIntVoiceChatDeviceChangeDebounceDelay)
 
-			n12 = v1025
-			wait(v600)
-
-			if v1025 == n12 then
-				n12 = 0
-				v183[p100 .. "DeviceInfo"] = {
-					Name = v183[p100 .. "DeviceNames"][p101],
-					Guid = v183[p100 .. "DeviceGuids"][p101]
+			if v29 == v28 then
+				v28 = 0
+				newPage[p .. "DeviceInfo"] = {
+					Name = newPage[p .. "DeviceNames"][p2],
+					Guid = newPage[p .. "DeviceGuids"][p2]
 				}
 
-				local Name = v183[p100 .. "DeviceInfo"].Name
-				local Guid = v183[p100 .. "DeviceInfo"].Guid
+				local name = newPage[p .. "DeviceInfo"].Name
+				local guid = newPage[p .. "DeviceInfo"].Guid
 
-				if v183.VoiceChatOptionsEnabled then
-					default3:SwitchDevice(p100, Name, Guid)
+				if newPage.VoiceChatOptionsEnabled then
+					default3:SwitchDevice(p, name, guid)
 				else
-					SoundService:SetOutputDevice(Name, Guid)
-					v128:info("[SwitchOutputDevice] Setting SS Speaker Device To {} {}", Name, Guid)
+					SwitchOutputDevice(name, guid) -- inferred equivalent call
 				end
 
 				if GetFFlagEnableCrossExpVoice() then
-					v128:debug("[GameSettings] Changing {} device to {} {} ", p100, Name, Guid)
+					v10:debug("[GameSettings] Changing {} device to {} {} ", p, name, guid)
 
-					if p100 == "Input" then
-						default4:changeInputDevice(Name, Guid)
+					if p == "Input" then
+						default4:changeInputDevice(name, guid)
 					else
-						default4:changeOutputDevice(Name, Guid)
+						default4:changeOutputDevice(name, guid)
 					end
 				end
 
-				reportSettingsChangeForAnalytics(p100, v183[p100 .. "PrevDeviceName"], Name)
-				v183[p100 .. "PrevDeviceName"] = Name
+				reportSettingsChangeForAnalytics(p, newPage[p .. "PrevDeviceName"], name)
+				newPage[p .. "PrevDeviceName"] = name
 			end
 		end)
 	end
-	local function createBadgeVisibilityOptions() -- line: 3168
-		-- upvalues: PlayerPermissionsModule (copy), LocalPlayer (copy), RobloxTranslator (copy), v151 (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GameSettings (copy)
-		spawn(function() -- line: 3169
-			-- upvalues: PlayerPermissionsModule (copy), LocalPlayer (copy), RobloxTranslator (copy), v151 (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GameSettings (copy)
-			local n13 = 2
 
-			if PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(LocalPlayer) then
-				n13 = 1
+	local function createBadgeVisibilityOptions() -- 1 equivalent call inferred from this helper
+		spawn(function()
+			local v18 = PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(LocalPlayer) and 1 or 2
+
+			local formatByKey6 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Show")
+			local formatByKey7 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Hide")
+			local v19
+
+			if defineFastFlag23 then
+				v19 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MyBadges")
+			else
+				v19 = RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.DisplayBadges")
 			end
 
-			local v1029 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Show")
-			local v1030 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Hide")
-			local v1031 = if not v151 then RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.DisplayBadges") else RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MyBadges")
-			local v1032 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Description.PeoplesNames")
-			local v1033 = v183
-			local v1034 = v183
-			local v1035 = v183
-			local v1036, v1037, v1038 = Utility:AddNewRow(v183, v1031, "Selector", {
-				v1030,
-				v1029
-			}, n13, nil, v1032)
+			local badgeVisibleRow, badgeVisibleFrame, badgeVisibleSelector = Utility:AddNewRow(
+				newPage,
+				v19,
+				"Selector",
+				{ formatByKey7, formatByKey6 },
+				v18,
+				nil,
+				(RobloxTranslator:FormatByKey("Feature.SettingsHub.Description.PeoplesNames"))
+			)
+			newPage.badgeVisibleRow = badgeVisibleRow
+			newPage.badgeVisibleFrame = badgeVisibleFrame
+			newPage.badgeVisibleSelector = badgeVisibleSelector
 
-			v1033.badgeVisibleRow = v1036
-			v1034.badgeVisibleFrame = v1037
-			v1035.badgeVisibleSelector = v1038
-			v183.badgeVisibleRow.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.BadgeVisibilityFrame
-			v183.badgeVisibleSelector.IndexChanged:connect(function(p102) -- line: 3183
-				-- upvalues: GameSettings (copy), PlayerPermissionsModule (copy), LocalPlayer (copy)
-				GameSettings.BadgeVisible = p102 == 2
-				PlayerPermissionsModule.SetPlayerInExperienceNameEnabled(LocalPlayer, p102 == 1)
+			newPage.badgeVisibleRow.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.BadgeVisibilityFrame
+
+			newPage.badgeVisibleSelector.IndexChanged:connect(function(p)
+				gameSettings.BadgeVisible = p == 2
+				PlayerPermissionsModule.SetPlayerInExperienceNameEnabled(LocalPlayer, p == 1)
 			end)
 		end)
 	end
-	local function createChatModerationOptions() -- line: 3190
-		-- upvalues: v183 (copy), Utility (copy), u24 (ref), SETTINGS_MENU_LAYOUT_ORDER (copy), CorePackages (copy), Signals (copy), reportSettingsChangeForAnalytics (copy)
-		local __ = {
+
+	local function createChatModerationOptions()
+		local v18 = {
 			title = "CoreScripts.InGameMenu.GameSettings.ReadOnlyView",
 			description = "CoreScripts.InGameMenu.GameSettings.ReadOnlyViewDescription",
 			on = "InGame.CommonUI.Label.On",
 			off = "InGame.CommonUI.Label.Off"
 		}
-		local v602 = v183
-		local v603 = v183
-		local v604, v605, v606 = Utility:AddNewRow(v183, u24:Format("CoreScripts.InGameMenu.GameSettings.ReadOnlyView"), "Selector", {
-			u24:Format("InGame.CommonUI.Label.Off"),
-			u24:Format("InGame.CommonUI.Label.On")
-		}, 1, nil, u24:Format("CoreScripts.InGameMenu.GameSettings.ReadOnlyViewDescription"))
 
-		v602.ChatModerationFrame = v604
-		_ = v605
-		v603.ChatModerationSelector = v606
-		v183.ChatModerationFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ChatModerationFrame
-		v183.ChatModerationFrame.Visible = false
+		local chatModerationFrame, v19, chatModerationSelector = Utility:AddNewRow(
+			newPage,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.ReadOnlyView"),
+			"Selector",
+			{ localization:Format("InGame.CommonUI.Label.Off"), localization:Format("InGame.CommonUI.Label.On") },
+			1,
+			nil,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.ReadOnlyViewDescription")
+		)
+		newPage.ChatModerationFrame = chatModerationFrame
+		_ = v19
+		newPage.ChatModerationSelector = chatModerationSelector
 
-		local v607 = require(CorePackages.Workspace.Packages.ExpChat).Stores.GetChatModerationStore(false)
+		newPage.ChatModerationFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ChatModerationFrame
+		newPage.ChatModerationFrame.Visible = false
 
-		v183.ChatModerationDisposeEffect = Signals.createEffect(function(p103) -- line: 3214
-			-- upvalues: v183 (copy), v607 (copy)
-			v183.ChatModerationFrame.Visible = v607.getIsSettingVisible(p103)
+		local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
+		local chatModerationStore = ExpChat.Stores.GetChatModerationStore(false)
 
-			local v1040 = not v607.getIsSettingEnabled(p103) and 1 or 2
+		newPage.ChatModerationDisposeEffect = Signals.createEffect(function(p)
+			newPage.ChatModerationFrame.Visible = chatModerationStore.getIsSettingVisible(p)
 
-			if v1040 ~= v183.ChatModerationSelector:GetSelectedIndex() then
-				v183.ChatModerationSelector:SetSelectionIndex(v1040)
+			local v20 = chatModerationStore.getIsSettingEnabled(p) and 2 or 1
+
+			if newPage.ChatModerationSelector:GetSelectedIndex() ~= v20 then
+				newPage.ChatModerationSelector:SetSelectionIndex(v20)
 			end
 		end)
-		v183.ChatModerationSelector.IndexChanged:connect(function(p104) -- line: 3223
-			-- upvalues: v607 (copy), reportSettingsChangeForAnalytics (copy)
-			local v1042 = p104 == 2
-
-			v607.setIsSettingEnabled(v1042)
-			reportSettingsChangeForAnalytics("moderate_chat", not v1042, v1042)
+		newPage.ChatModerationSelector.IndexChanged:connect(function(p)
+			local v20 = p == 2
+			chatModerationStore.setIsSettingEnabled(v20)
+			reportSettingsChangeForAnalytics("moderate_chat", not v20, v20)
 		end)
-		v607.initialize()
+
+		chatModerationStore.initialize()
 	end
-	local function createAIRephraseSettingOptions() -- line: 3232
-		-- upvalues: RobloxTranslator (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), CorePackages (copy), GetFIntDebounceAIRephraseSettingDelay (copy), Signals (copy), TextChatService (copy), reportSettingsChangeForAnalytics (copy), v152 (copy), ThrottleFunctionCall (copy)
-		local v608 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.AIRephraseMessages")
-		local v609 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.AIRephraseMessagesDescription")
-		local v610 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
-		local v611 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
-		local v612 = v183
-		local v613 = v183
-		local v614, v615, v616 = Utility:AddNewRow(v183, v608, "Selector", {
-			v611,
-			v610
-		}, 1, nil, v609)
 
-		v612.AIRephraseFrame = v614
-		_ = v615
-		v613.AIRephraseSelector = v616
-		v183.AIRephraseFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AIRephraseFrame
-		v183.AIRephraseFrame.Visible = false
+	local function createAIRephraseSettingOptions()
+		local formatByKey6 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.AIRephraseMessages")
+		local formatByKey7 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.AIRephraseMessagesDescription")
+		local formatByKey8 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
+		local aiRephraseFrame, v18, aiRephraseSelector = Utility:AddNewRow(
+			newPage,
+			formatByKey6,
+			"Selector",
+			{ RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off"), formatByKey8 },
+			1,
+			nil,
+			formatByKey7
+		)
+		newPage.AIRephraseFrame = aiRephraseFrame
+		_ = v18
+		newPage.AIRephraseSelector = aiRephraseSelector
 
-		local v617 = require(CorePackages.Workspace.Packages.ExpChat).Stores.GetUserChatSettingsStore.getAIRephraseSettingStore(false)
-		local v618 = GetFIntDebounceAIRephraseSettingDelay()
-		local v619 = v618 > 0
-		local u620 = not v617.getIsSettingEnabled(false) and 1 or 2
+		newPage.AIRephraseFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AIRephraseFrame
+		newPage.AIRephraseFrame.Visible = false
 
-		v183.AIRephraseDisposeEffect = Signals.createEffect(function(p105) -- line: 3258
-			-- upvalues: v183 (copy), v617 (copy), u620 (ref)
-			v183.AIRephraseFrame.Visible = v617.getIsSettingVisible(p105)
+		local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
+		local v19 = ExpChat.Stores.GetUserChatSettingsStore.getAIRephraseSettingStore(false)
+		local fIntDebounceAIRephraseSettingDelay = GetFIntDebounceAIRephraseSettingDelay()
+		local v20 = fIntDebounceAIRephraseSettingDelay > 0
+		local v21 = v19.getIsSettingEnabled(false) and 2 or 1
 
-			local v1044 = not v617.getIsSettingEnabled(p105) and 1 or 2
+		newPage.AIRephraseDisposeEffect = Signals.createEffect(function(p)
+			newPage.AIRephraseFrame.Visible = v19.getIsSettingVisible(p)
 
-			if v1044 ~= v183.AIRephraseSelector:GetSelectedIndex() then
-				u620 = v1044
-				v183.AIRephraseSelector:SetSelectionIndex(v1044)
+			local v22 = v19.getIsSettingEnabled(p) and 2 or 1
+
+			if newPage.AIRephraseSelector:GetSelectedIndex() ~= v22 then
+				v21 = v22
+				newPage.AIRephraseSelector:SetSelectionIndex(v22)
 			end
 		end)
 
-		local function v621(p106) -- line: 3269
-			-- upvalues: u620 (ref), TextChatService (copy), v617 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-			if p106 == u620 then
+		local function fn(p)
+			if p == v21 then
 				return
 			end
 
-			local v1046 = p106 == 2
-
-			task.spawn(function() -- line: 3275
-				-- upvalues: TextChatService (copy), v1046 (copy), v617 (copy), u620 (ref), p106 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-				if TextChatService:OnUserChatSettingUpdateAsync("allowAIRephrase", not v1046 and "Disabled" or "Enabled") then
-					v617.setIsSettingEnabled(v1046)
-					u620 = p106
-					reportSettingsChangeForAnalytics("ai_rephrase", not v1046, v1046)
+			local v22 = p == 2
+			task.spawn(function()
+				if not TextChatService:OnUserChatSettingUpdateAsync("allowAIRephrase", v22 and "Enabled" or "Disabled") then
+					newPage.AIRephraseSelector:SetSelectionIndex(v21)
 
 					return
 				end
 
-				v183.AIRephraseSelector:SetSelectionIndex(u620)
+				v19.setIsSettingEnabled(v22)
+				v21 = p
+				reportSettingsChangeForAnalytics("ai_rephrase", not v22, v22)
 			end)
 		end
 
-		if v152 then
-			if v619 then
-				local u622 = nil
-
-				v183.AIRephraseSelector.IndexChanged:connect(function(p107) -- line: 3292
-					-- upvalues: u622 (ref), v618 (copy), u620 (ref), TextChatService (copy), v617 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-					if u622 then
-						task.cancel(u622)
+		if defineFastFlag24 then
+			if v20 then
+				local thread = nil
+				newPage.AIRephraseSelector.IndexChanged:connect(function(p)
+					if thread then
+						task.cancel(thread)
 					end
 
-					u622 = task.delay(v618, function() -- line: 3296
-						-- upvalues: u622 (ref), p107 (copy), u620 (ref), TextChatService (copy), v617 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-						u622 = nil
+					thread = task.delay(fIntDebounceAIRephraseSettingDelay, function()
+						thread = nil
+						local v22 = p
 
-						local v1177 = p107
-
-						if v1177 == u620 then
+						if v22 == v21 then
 							return
 						end
 
-						local v1178 = v1177 == 2
-
-						task.spawn(function() -- line: 3275
-							-- upvalues: TextChatService (copy), v1178 (copy), v617 (copy), u620 (ref), v1177 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-							if TextChatService:OnUserChatSettingUpdateAsync("allowAIRephrase", not v1178 and "Disabled" or "Enabled") then
-								v617.setIsSettingEnabled(v1178)
-								u620 = v1177
-								reportSettingsChangeForAnalytics("ai_rephrase", not v1178, v1178)
+						local v23 = v22 == 2
+						task.spawn(function()
+							if not TextChatService:OnUserChatSettingUpdateAsync(
+								"allowAIRephrase",
+								v23 and "Enabled" or "Disabled"
+							) then
+								newPage.AIRephraseSelector:SetSelectionIndex(v21)
 
 								return
 							end
 
-							v183.AIRephraseSelector:SetSelectionIndex(u620)
+							v19.setIsSettingEnabled(v23)
+							v21 = v22
+							reportSettingsChangeForAnalytics("ai_rephrase", not v23, v23)
 						end)
 					end)
 				end)
 			else
-				v183.AIRephraseSelector.IndexChanged:connect(v621)
+				newPage.AIRephraseSelector.IndexChanged:connect(fn)
 			end
 		else
-			v183.AIRephraseSelector.IndexChanged:connect(if not v619 then v621 else ThrottleFunctionCall(v618, v621))
+			local indexChanged = newPage.AIRephraseSelector.IndexChanged
+
+			if v20 then
+				fn = ThrottleFunctionCall(fIntDebounceAIRephraseSettingDelay, fn)
+			end
+
+			indexChanged:connect(fn)
 		end
 	end
-	local function createChatSummariesSettingOptions() -- line: 3309
-		-- upvalues: RobloxTranslator (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), CorePackages (copy), GetFIntDebounceChatSummariesSettingDelay (copy), Signals (copy), TextChatService (copy), reportSettingsChangeForAnalytics (copy)
-		local v623 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.ChatSummaries")
-		local v624 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.ChatSummariesDescription")
-		local v625 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
-		local v626 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
-		local v627 = v183
-		local v628 = v183
-		local v629, v630, v631 = Utility:AddNewRow(v183, v623, "Selector", {
-			v626,
-			v625
-		}, 1, nil, v624)
 
-		v627.ChatSummariesFrame = v629
-		_ = v630
-		v628.ChatSummariesSelector = v631
-		v183.ChatSummariesFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ChatSummariesFrame
-		v183.ChatSummariesFrame.Visible = false
+	local function createChatSummariesSettingOptions()
+		local formatByKey6 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.ChatSummaries")
+		local formatByKey7 = RobloxTranslator:FormatByKey("CoreScripts.InGameMenu.GameSettings.ChatSummariesDescription")
+		local formatByKey8 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
+		local chatSummariesFrame, v18, chatSummariesSelector = Utility:AddNewRow(
+			newPage,
+			formatByKey6,
+			"Selector",
+			{ RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off"), formatByKey8 },
+			1,
+			nil,
+			formatByKey7
+		)
+		newPage.ChatSummariesFrame = chatSummariesFrame
+		_ = v18
+		newPage.ChatSummariesSelector = chatSummariesSelector
 
-		local v632 = require(CorePackages.Workspace.Packages.ExpChat).Stores.GetUserChatSettingsStore.getChatSummariesSettingStore(false)
-		local v633 = GetFIntDebounceChatSummariesSettingDelay()
-		local v634 = v633 > 0
-		local u635 = not v632.getIsSettingEnabled(false) and 1 or 2
+		newPage.ChatSummariesFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ChatSummariesFrame
+		newPage.ChatSummariesFrame.Visible = false
 
-		v183.ChatSummariesDisposeEffect = Signals.createEffect(function(p108) -- line: 3335
-			-- upvalues: v183 (copy), v632 (copy), u635 (ref)
-			v183.ChatSummariesFrame.Visible = v632.getIsSettingVisible(p108)
+		local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
+		local chatSummariesSettingStore = ExpChat.Stores.GetUserChatSettingsStore.getChatSummariesSettingStore(false)
+		local fIntDebounceChatSummariesSettingDelay = GetFIntDebounceChatSummariesSettingDelay()
+		local v19 = fIntDebounceChatSummariesSettingDelay > 0
+		local v20 = chatSummariesSettingStore.getIsSettingEnabled(false) and 2 or 1
 
-			local v1049 = not v632.getIsSettingEnabled(p108) and 1 or 2
+		newPage.ChatSummariesDisposeEffect = Signals.createEffect(function(p)
+			newPage.ChatSummariesFrame.Visible = chatSummariesSettingStore.getIsSettingVisible(p)
 
-			if v1049 ~= v183.ChatSummariesSelector:GetSelectedIndex() then
-				u635 = v1049
-				v183.ChatSummariesSelector:SetSelectionIndex(v1049)
+			local v21 = chatSummariesSettingStore.getIsSettingEnabled(p) and 2 or 1
+
+			if newPage.ChatSummariesSelector:GetSelectedIndex() ~= v21 then
+				v20 = v21
+				newPage.ChatSummariesSelector:SetSelectionIndex(v21)
 			end
 		end)
 
-		if v634 then
-			local u636 = nil
+		local function fn(p) -- 1 equivalent call inferred from this helper
+			if p == v20 then
+				return
+			end
 
-			v183.ChatSummariesSelector.IndexChanged:connect(function(p109) -- line: 3368
-				-- upvalues: u636 (ref), v633 (copy), u635 (ref), TextChatService (copy), v632 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-				if u636 then
-					task.cancel(u636)
-				end
+			local v21 = p == 2
+			task.spawn(function()
+				if not TextChatService:OnUserChatSettingUpdateAsync(
+					"AllowThirdPartySummary",
+					v21 and "Enabled" or "Disabled"
+				) then
+					newPage.ChatSummariesSelector:SetSelectionIndex(v20)
 
-				u636 = task.delay(v633, function() -- line: 3372
-					-- upvalues: u636 (ref), p109 (copy), u635 (ref), TextChatService (copy), v632 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-					u636 = nil
-
-					local v1179 = p109
-
-					if v1179 == u635 then
-						return
-					end
-
-					local v1180 = v1179 == 2
-
-					task.spawn(function() -- line: 3352
-						-- upvalues: TextChatService (copy), v1180 (copy), v632 (copy), u635 (ref), v1179 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-						if TextChatService:OnUserChatSettingUpdateAsync("AllowThirdPartySummary", not v1180 and "Disabled" or "Enabled") then
-							v632.setIsSettingEnabled(v1180)
-							u635 = v1179
-							reportSettingsChangeForAnalytics("chat_summaries", not v1180, v1180)
-
-							return
-						end
-
-						v183.ChatSummariesSelector:SetSelectionIndex(u635)
-					end)
-				end)
-			end)
-		else
-			v183.ChatSummariesSelector.IndexChanged:connect(function(p110) -- line: 3346
-				-- upvalues: u635 (ref), TextChatService (copy), v632 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-				if p110 == u635 then
 					return
 				end
 
-				local v1051 = p110 == 2
-
-				task.spawn(function() -- line: 3352
-					-- upvalues: TextChatService (copy), v1051 (copy), v632 (copy), u635 (ref), p110 (copy), reportSettingsChangeForAnalytics (copy), v183 (copy)
-					if TextChatService:OnUserChatSettingUpdateAsync("AllowThirdPartySummary", not v1051 and "Disabled" or "Enabled") then
-						v632.setIsSettingEnabled(v1051)
-						u635 = p110
-						reportSettingsChangeForAnalytics("chat_summaries", not v1051, v1051)
-
-						return
-					end
-
-					v183.ChatSummariesSelector:SetSelectionIndex(u635)
-				end)
+				chatSummariesSettingStore.setIsSettingEnabled(v21)
+				v20 = p
+				reportSettingsChangeForAnalytics("chat_summaries", not v21, v21)
 			end)
 		end
+
+		if v19 then
+			local thread = nil
+			newPage.ChatSummariesSelector.IndexChanged:connect(function(p)
+				if thread then
+					task.cancel(thread)
+				end
+
+				thread = task.delay(fIntDebounceChatSummariesSettingDelay, function()
+					thread = nil
+					fn(p) -- inferred equivalent call
+				end)
+			end)
+		else
+			newPage.ChatSummariesSelector.IndexChanged:connect(fn)
+		end
 	end
-	local function createChatNotificationsSettingOptions() -- line: 3382
-		-- upvalues: CorePackages (copy), RobloxTranslator (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), reportSettingsChangeForAnalytics (copy)
+
+	local function createVoiceTypingModeSettingOptions()
+		local v18 = { "standard", "continuous" }
+
+		local function formatWithFallback(p: string, p2: string)
+			local success, result = pcall(function()
+				return localization:Format(p)
+			end)
+
+			if success then
+				return result
+			end
+
+			v10:debug("[GameSettings] createVoiceTypingModeSettingOptions missing translation for {}", p)
+			return p2
+		end
+
+		local v19
+		v19 = "CoreScripts.InGameMenu.GameSettings.VoiceTypingMode"
+		local success, result = pcall(function()
+			return localization:Format(v19)
+		end)
+
+		if not success then
+			v10:debug(
+				"[GameSettings] createVoiceTypingModeSettingOptions missing translation for {}",
+				"CoreScripts.InGameMenu.GameSettings.VoiceTypingMode"
+			)
+			result = "Voice typing mode"
+		end
+
+		local v20
+		v20 = "CoreScripts.InGameMenu.GameSettings.VoiceTypingModeStandard"
+		local success2, result2 = pcall(function()
+			return localization:Format(v20)
+		end)
+
+		if not success2 then
+			v10:debug(
+				"[GameSettings] createVoiceTypingModeSettingOptions missing translation for {}",
+				"CoreScripts.InGameMenu.GameSettings.VoiceTypingModeStandard"
+			)
+			result2 = "Manual Send"
+		end
+
+		local v21
+		v21 = "CoreScripts.InGameMenu.GameSettings.VoiceTypingModeContinuous"
+		local success3, result3 = pcall(function()
+			return localization:Format(v21)
+		end)
+
+		if not success3 then
+			v10:debug(
+				"[GameSettings] createVoiceTypingModeSettingOptions missing translation for {}",
+				"CoreScripts.InGameMenu.GameSettings.VoiceTypingModeContinuous"
+			)
+			result3 = "Auto Send"
+		end
+
+		local voiceTypingModeFrame, v22, voiceTypingModeSelector = Utility:AddNewRow(
+			newPage,
+			result,
+			"Selector",
+			{ result2, result3 },
+			1
+		)
+		newPage.VoiceTypingModeFrame = voiceTypingModeFrame
+		_ = v22
+		newPage.VoiceTypingModeSelector = voiceTypingModeSelector
+
+		newPage.VoiceTypingModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VoiceTypingModeFrame
+
+		local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
+		local dictationModeSettingStore = ExpChat.Stores.GetDictationModeSettingStore(false)
+
+		newPage.VoiceTypingModeDisposeEffect = Signals.createEffect(function(p)
+			local index = table.find(v18, dictationModeSettingStore.getMode(p)) or 1
+
+			if newPage.VoiceTypingModeSelector:GetSelectedIndex() ~= index then
+				newPage.VoiceTypingModeSelector:SetSelectionIndex(index)
+			end
+		end)
+
+		newPage.VoiceTypingModeSelector.IndexChanged:connect(function(p)
+			local mode = dictationModeSettingStore.getMode(false)
+			local v23 = v18[p]
+
+			if v23 == nil or v23 == mode then
+				return
+			end
+
+			dictationModeSettingStore.setMode(v23)
+			reportSettingsChangeForAnalytics("voice_typing_mode", mode, v23)
+		end)
+	end
+
+	local function createChatNotificationsSettingOptions()
 		local ToastNotification = require(CorePackages.Workspace.Packages.ToastNotification)
 		local default5 = ToastNotification.ToastNotificationSnoozeManager.default
-		local NotificationGroups = ToastNotification.NotificationGroups
-		local ToastNotificationTypeModule = ToastNotification.ToastNotificationTypeModule
-		local NotificationSnoozedSignal = ToastNotification.Signals.NotificationSnoozedSignal
-		local NotificationTypeEnum = ToastNotificationTypeModule.NotificationTypeEnum
-		local SnoozeActionEnum = ToastNotificationTypeModule.SnoozeActionEnum
-		local t31 = {
-			Off = 1,
-			On = 2
-		}
-		local v645 = RobloxTranslator:FormatByKey("Feature.Chat.Label.InGameFriendsChatNotifications")
-		local v646 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
-		local v647 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
+		local notificationGroups = ToastNotification.NotificationGroups
+		local toastNotificationTypeModule = ToastNotification.ToastNotificationTypeModule
+		local notificationSnoozedSignal = ToastNotification.Signals.NotificationSnoozedSignal
+		local notificationTypeEnum = toastNotificationTypeModule.NotificationTypeEnum
+		local snoozeActionEnum = toastNotificationTypeModule.SnoozeActionEnum
 
-		local function getSelectorIndex() -- line: 3400
-			-- upvalues: default5 (copy), NotificationTypeEnum (copy)
-			if default5:isSnoozedNotificationType(NotificationTypeEnum.ChatNewMessage) then
+		local v18 = { Off = 1, On = 2 }
+
+		local formatByKey6 = RobloxTranslator:FormatByKey("Feature.Chat.Label.InGameFriendsChatNotifications")
+		local formatByKey7 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.On")
+		local formatByKey8 = RobloxTranslator:FormatByKey("InGame.CommonUI.Label.Off")
+
+		local function getSelectorIndex(): number
+			if default5:isSnoozedNotificationType(notificationTypeEnum.ChatNewMessage) then
 				return 1
 			end
 
 			return 2
 		end
 
-		local u649 = if not default5:isSnoozedNotificationType(NotificationTypeEnum.ChatNewMessage) then t31.On else t31.Off
-		local v650 = v183
-		local v651 = v183
-		local v652, v653, v654 = Utility:AddNewRow(v183, v645, "Selector", {
-			v647,
-			v646
-		}, u649)
+		local v19
 
-		v650.ChatNotificationsFrame = v652
-		_ = v653
-		v651.ChatNotificationsSelector = v654
-		v183.ChatNotificationsFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ChatNotificationsFrame
-		v183.ChatNotificationsSelector.IndexChanged:connect(function(p111) -- line: 3415
-			-- upvalues: u649 (ref), default5 (copy), NotificationGroups (copy), reportSettingsChangeForAnalytics (copy)
-			if p111 == u649 then
+		if default5:isSnoozedNotificationType(notificationTypeEnum.ChatNewMessage) then
+			v19 = v18.Off
+		else
+			v19 = v18.On
+		end
+
+		local chatNotificationsFrame, v20, chatNotificationsSelector = Utility:AddNewRow(
+			newPage,
+			formatByKey6,
+			"Selector",
+			{ formatByKey8, formatByKey7 },
+			v19
+		)
+		newPage.ChatNotificationsFrame = chatNotificationsFrame
+		_ = v20
+		newPage.ChatNotificationsSelector = chatNotificationsSelector
+
+		newPage.ChatNotificationsFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ChatNotificationsFrame
+
+		newPage.ChatNotificationsSelector.IndexChanged:connect(function(p)
+			if p == v19 then
 				return
 			end
 
-			local v1054 = u649 == 2
-			local v1055 = p111 == 2
+			local v21 = v19 == 2
+			local v22 = p == 2
+			v19 = p
 
-			u649 = p111
-
-			if v1055 then
+			if v22 then
 				default5:unmuteNotification({
-					context = "InGameSettingsChatNotifications",
-					notificationType = NotificationGroups.ChatLandingNotificationsGroup
+					notificationType = notificationGroups.ChatLandingNotificationsGroup,
+					context = "InGameSettings"
 				})
 			else
 				default5:snoozeNotification({
+					notificationType = notificationGroups.ChatLandingNotificationsGroup,
 					durationMinutes = -1,
-					context = "InGameSettingsChatNotifications",
-					notificationType = NotificationGroups.ChatLandingNotificationsGroup
+					context = "InGameSettings"
 				})
 			end
 
-			reportSettingsChangeForAnalytics("chat_notifications", v1054, v1055)
+			reportSettingsChangeForAnalytics("chat_notifications", v21, v22)
 		end)
-		NotificationSnoozedSignal:connect(function(p112) -- line: 3441
-			-- upvalues: NotificationTypeEnum (copy), SnoozeActionEnum (copy), v183 (copy), u649 (ref)
-			if p112.notificationType ~= NotificationTypeEnum.ChatNewMessage then
+
+		notificationSnoozedSignal:connect(function(p)
+			if p.notificationType ~= notificationTypeEnum.ChatNewMessage then
 				return
 			end
 
-			local v1057 = p112.actionType ~= SnoozeActionEnum.Mute and 2 or 1
+			local v21 = p.actionType == snoozeActionEnum.Mute and 1 or 2
 
-			if v1057 ~= v183.ChatNotificationsSelector:GetSelectedIndex() then
-				u649 = v1057
-				v183.ChatNotificationsSelector:SetSelectionIndex(v1057)
+			if newPage.ChatNotificationsSelector:GetSelectedIndex() ~= v21 then
+				v19 = v21
+				newPage.ChatNotificationsSelector:SetSelectionIndex(v21)
 			end
 		end)
-		v183.Displayed.Event:Connect(function() -- line: 3456
-			-- upvalues: default5 (copy), NotificationTypeEnum (copy), t31 (copy), v183 (copy), u649 (ref)
-			local v1058 = if not default5:isSnoozedNotificationType(NotificationTypeEnum.ChatNewMessage) then t31.On else t31.Off
 
-			if v1058 ~= v183.ChatNotificationsSelector:GetSelectedIndex() then
-				u649 = v1058
-				v183.ChatNotificationsSelector:SetSelectionIndex(v1058)
+		newPage.Displayed.Event:Connect(function()
+			local v21
+
+			if default5:isSnoozedNotificationType(notificationTypeEnum.ChatNewMessage) then
+				v21 = v18.Off
+			else
+				v21 = v18.On
+			end
+
+			if newPage.ChatNotificationsSelector:GetSelectedIndex() ~= v21 then
+				v19 = v21
+				newPage.ChatNotificationsSelector:SetSelectionIndex(v21)
 			end
 		end)
 	end
-	local function createCameraDeviceOptions() -- line: 3468
-		-- upvalues: v183 (copy), v127 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), v128 (copy), UserGameSettings (copy), reportSettingsChangeForAnalytics (copy)
-		local v655 = v183.CameraDeviceIndex or 1
-		local v656 = v183.CameraDeviceNames or {}
-		local v657 = v183.CameraDeviceGuids or {}
-		local v658 = v127
-		local v659 = v183
-		local v660 = v183
-		local v661, v662, v663 = Utility:AddNewRow(v183, v658, "Selector", v656, v655)
 
-		v659.CameraDeviceFrame = v661
-		_ = v662
-		v660.CameraDeviceSelector = v663
-		v183.CameraDeviceFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.CameraDeviceFrame
-		v183.CameraDeviceInfo = {
-			Name = v655 > 0 and v656[v655] or nil,
-			Guid = v655 > 0 and v657[v655] or nil
+	local function createCameraDeviceOptions()
+		local cameraDeviceIndex = newPage.CameraDeviceIndex or 1
+		local cameraDeviceNames = newPage.CameraDeviceNames or {}
+		local cameraDeviceGuids = newPage.CameraDeviceGuids or {}
+
+		local cameraDeviceFrame, v18, cameraDeviceSelector = Utility:AddNewRow(
+			newPage,
+			formatByKey5,
+			"Selector",
+			cameraDeviceNames,
+			cameraDeviceIndex
+		)
+		newPage.CameraDeviceFrame = cameraDeviceFrame
+		_ = v18
+		newPage.CameraDeviceSelector = cameraDeviceSelector
+
+		newPage.CameraDeviceFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.CameraDeviceFrame
+		local name
+
+		if cameraDeviceIndex > 0 then
+			name = cameraDeviceNames[cameraDeviceIndex] or nil
+		end
+
+		newPage.CameraDeviceInfo = {
+			Name = name,
+			Guid = cameraDeviceIndex > 0 and cameraDeviceGuids[cameraDeviceIndex] or nil
 		}
-		v183.prevCameraDeviceName = v183.CameraDeviceInfo.Name
-		v183.CameraDeviceSelector.IndexChanged:connect(function(p113) -- line: 3485
-			-- upvalues: v183 (copy), v128 (copy), UserGameSettings (copy), reportSettingsChangeForAnalytics (copy)
-			if v183.CameraDeviceInfo.Name == v183.CameraDeviceNames[p113] and v183.CameraDeviceInfo.Guid == v183.CameraDeviceGuids[p113] then
+
+		newPage.prevCameraDeviceName = newPage.CameraDeviceInfo.Name
+
+		newPage.CameraDeviceSelector.IndexChanged:connect(function(p)
+			if
+				newPage.CameraDeviceInfo.Name == newPage.CameraDeviceNames[p]
+				and newPage.CameraDeviceInfo.Guid == newPage.CameraDeviceGuids[p]
+			then
 				return
 			end
 
-			v183.CameraDeviceInfo = {
-				Name = v183.CameraDeviceNames[p113],
-				Guid = v183.CameraDeviceGuids[p113]
+			newPage.CameraDeviceInfo = {
+				Name = newPage.CameraDeviceNames[p],
+				Guid = newPage.CameraDeviceGuids[p]
 			}
 
-			local Guid = v183.CameraDeviceInfo.Guid
+			local guid = newPage.CameraDeviceInfo.Guid
+			v10:info("Changed webcam to: {}", guid)
+			UserGameSettings.DefaultCameraID = guid
+			reportSettingsChangeForAnalytics(
+				"video_camera",
+				newPage.prevCameraDeviceName or "None",
+				newPage.CameraDeviceInfo.Name
+			)
 
-			v128:info("Changed webcam to: {}", Guid)
-			UserGameSettings.DefaultCameraID = Guid
-			reportSettingsChangeForAnalytics("video_camera", v183.prevCameraDeviceName or "None", v183.CameraDeviceInfo.Name)
-			v183.prevCameraDeviceName = v183.CameraDeviceInfo.Name
+			newPage.prevCameraDeviceName = newPage.CameraDeviceInfo.Name
 		end)
 	end
-	local function updateAudioDevices(p114) -- line: 3510
-		-- upvalues: SoundService (copy), u24 (ref), v183 (copy), GetFFlagVoiceChatUILogging (copy), v128 (copy), createDeviceOptions (copy)
-		local ok, result, v667, v668 = pcall(function() -- line: 3511
-			-- upvalues: p114 (copy), SoundService (copy)
-			if p114 == "Input" then
+
+	local function updateAudioDevices(p)
+		local success, result, v18, v19 = pcall(function()
+			if p == "Input" then
 				return SoundService:GetInputDevices()
 			end
 
 			return SoundService:GetOutputDevices()
 		end)
 
-		if ok and (result and (v667 and (v668 and (#result > 0 and (v668 > 0 and (v668 <= #result and #result == #v667)))))) then
-			if v667[1] == "" then
-				result[1] = u24:Format("CoreScripts.InGameMenu.GameSettings.Default") .. " (" .. result[1] .. ")"
+		if success then
+			local v20
+
+			if result then
+				if v18 then
+					if v19 then
+						if #result > 0 and v19 > 0 and v19 <= #result then
+							v20 = #result == #v18
+						else
+							v20 = false
+						end
+					else
+						v20 = v19
+					end
+				else
+					v20 = v18
+				end
+			else
+				v20 = result
 			end
 
-			v183[p114 .. "DeviceNames"] = result
-			v183[p114 .. "DeviceGuids"] = v667
-			v183[p114 .. "DeviceIndex"] = v668
+			if v20 then
+				if v18[1] == "" then
+					result[1] = localization:Format("CoreScripts.InGameMenu.GameSettings.Default") .. " (" .. result[1] .. ")"
+				end
+
+				newPage[p .. "DeviceNames"] = result
+				newPage[p .. "DeviceGuids"] = v18
+				newPage[p .. "DeviceIndex"] = v19
+			else
+				if GetFFlagVoiceChatUILogging() then
+					v10:warning("Errors in get {} device info", p)
+				end
+
+				newPage[p .. "DeviceNames"] = {}
+				newPage[p .. "DeviceGuids"] = {}
+				newPage[p .. "DeviceIndex"] = 0
+			end
 		else
 			if GetFFlagVoiceChatUILogging() then
-				v128:warning("Errors in get {} device info", p114)
+				v10:warning("Errors in get {} device info", p)
 			end
 
-			v183[p114 .. "DeviceNames"] = {}
-			v183[p114 .. "DeviceGuids"] = {}
-			v183[p114 .. "DeviceIndex"] = 0
+			newPage[p .. "DeviceNames"] = {}
+			newPage[p .. "DeviceGuids"] = {}
+			newPage[p .. "DeviceIndex"] = 0
 		end
 
-		if not v183[p114 .. "DeviceSelector"] then
-			createDeviceOptions(p114)
-
+		if not newPage[p .. "DeviceSelector"] then
+			createDeviceOptions(p)
 			return
 		end
 
-		v183[p114 .. "DeviceSelector"]:UpdateOptions(result)
-		v183[p114 .. "DeviceSelector"]:SetSelectionIndex(v668)
+		newPage[p .. "DeviceSelector"]:UpdateOptions(result)
+		newPage[p .. "DeviceSelector"]:SetSelectionIndex(v19)
 	end
-	local function updateVoiceChatDevices(p115) -- line: 3543
-		-- upvalues: GetFFlagVoiceChatUILogging (copy), v128 (copy), SoundService (copy), u24 (ref), v183 (copy), createDeviceOptions (copy)
-		if p115 ~= "Input" and (p115 ~= "Output" and GetFFlagVoiceChatUILogging()) then
-			v128:warning("{} is not supported in VoiceChat devices", p115)
+
+	local function updateVoiceChatDevices(p)
+		if p ~= "Input" and p ~= "Output" and GetFFlagVoiceChatUILogging() then
+			v10:warning("{} is not supported in VoiceChat devices", p)
 		end
 
-		local ok, result, v672, v673 = pcall(function() -- line: 3550
-			-- upvalues: p115 (copy), SoundService (copy)
-			if p115 == "Input" then
+		local success, result, v18, v19 = pcall(function()
+			if p == "Input" then
 				return SoundService:GetInputDevices()
 			end
 
 			return SoundService:GetOutputDevices()
 		end)
 
-		if ok and (result and (v672 and (v673 and (#result > 0 and (v673 > 0 and (v673 <= #result and #result == #v672)))))) then
-			if v672[1] == "" then
-				result[1] = u24:Format("CoreScripts.InGameMenu.GameSettings.Default") .. " (" .. result[1] .. ")"
+		if success then
+			local v20
+
+			if result then
+				if v18 then
+					if v19 then
+						if #result > 0 and v19 > 0 and v19 <= #result then
+							v20 = #result == #v18
+						else
+							v20 = false
+						end
+					else
+						v20 = v19
+					end
+				else
+					v20 = v18
+				end
+			else
+				v20 = result
 			end
 
-			v183[p115 .. "DeviceNames"] = result
-			v183[p115 .. "DeviceGuids"] = v672
-			v183[p115 .. "DeviceIndex"] = v673
+			if v20 then
+				if v18[1] == "" then
+					result[1] = localization:Format("CoreScripts.InGameMenu.GameSettings.Default") .. " (" .. result[1] .. ")"
+				end
+
+				newPage[p .. "DeviceNames"] = result
+				newPage[p .. "DeviceGuids"] = v18
+				newPage[p .. "DeviceIndex"] = v19
+			else
+				if GetFFlagVoiceChatUILogging() then
+					if #result > 0 then
+						v10:warning("Errors in get {} device info success: {}", p, success)
+					else
+						v10:warning("Empty deviceNames list for {}", p)
+					end
+				end
+
+				newPage[p .. "DeviceNames"] = {}
+				newPage[p .. "DeviceGuids"] = {}
+				newPage[p .. "DeviceIndex"] = 0
+			end
 		else
 			if GetFFlagVoiceChatUILogging() then
 				if #result > 0 then
-					v128:warning("Errors in get {} device info success: {}", p115, ok)
+					v10:warning("Errors in get {} device info success: {}", p, success)
 				else
-					v128:warning("Empty deviceNames list for {}", p115)
+					v10:warning("Empty deviceNames list for {}", p)
 				end
 			end
 
-			v183[p115 .. "DeviceNames"] = {}
-			v183[p115 .. "DeviceGuids"] = {}
-			v183[p115 .. "DeviceIndex"] = 0
+			newPage[p .. "DeviceNames"] = {}
+			newPage[p .. "DeviceGuids"] = {}
+			newPage[p .. "DeviceIndex"] = 0
 		end
 
-		if not v183[p115 .. "DeviceSelector"] then
-			createDeviceOptions(p115)
+		if newPage[p .. "DeviceSelector"] then
+			newPage[p .. "DeviceSelector"]:UpdateOptions(result)
+			newPage[p .. "DeviceSelector"]:SetSelectionIndex(v19)
 		else
-			v183[p115 .. "DeviceSelector"]:UpdateOptions(result)
-			v183[p115 .. "DeviceSelector"]:SetSelectionIndex(v673)
+			createDeviceOptions(p)
 		end
 
-		if v183[p115 .. "DeviceFrame"] then
+		if newPage[p .. "DeviceFrame"] then
 			if #result > 0 then
-				v183[p115 .. "DeviceFrame"].Visible = true
-
-				return
+				newPage[p .. "DeviceFrame"].Visible = true
+			else
+				newPage[p .. "DeviceFrame"].Visible = false
 			end
-
-			v183[p115 .. "DeviceFrame"].Visible = false
 		end
 	end
-	local function updateCameraDevices() -- line: 3602
-		-- upvalues: VideoCaptureService (copy), v126 (copy), UserGameSettings (copy), v183 (copy), createCameraDeviceOptions (copy)
-		local CameraDevices = VideoCaptureService:GetCameraDevices()
-		local t32 = {}
-		local t33 = {}
-		local n14 = 1
 
-		table.insert(t32, v126)
-		table.insert(t33, "{DefaultDeviceGuid}")
+	local function updateCameraDevices()
+		local cameraDevices = VideoCaptureService:GetCameraDevices()
+		local cameraDeviceNames = {}
+		local cameraDeviceGuids = {}
 
-		for k, v in pairs(CameraDevices) do
+		table.insert(cameraDeviceNames, formatByKey4)
+		table.insert(cameraDeviceGuids, "{DefaultDeviceGuid}")
+		local v18 = 1
+
+		for k, cameraDevice in pairs(cameraDevices) do
 			if k == UserGameSettings.DefaultCameraID then
-				n14 = #t32 + 1
+				v18 = #cameraDeviceNames + 1
 			end
 
-			table.insert(t32, v)
-			table.insert(t33, k)
+			table.insert(cameraDeviceNames, cameraDevice)
+			table.insert(cameraDeviceGuids, k)
 		end
 
-		v183.CameraDeviceNames = t32
-		v183.CameraDeviceGuids = t33
-		v183.CameraDeviceIndex = 0
+		newPage.CameraDeviceNames = cameraDeviceNames
+		newPage.CameraDeviceGuids = cameraDeviceGuids
+		newPage.CameraDeviceIndex = 0
 
-		if not v183.CameraDeviceSelector then
-			createCameraDeviceOptions()
+		if newPage.CameraDeviceSelector then
+			newPage.CameraDeviceSelector:UpdateOptions(cameraDeviceNames)
 		else
-			v183.CameraDeviceSelector:UpdateOptions(t32)
+			createCameraDeviceOptions()
 		end
 
-		v183.CameraDeviceSelector:SetSelectionIndex(n14)
+		newPage.CameraDeviceSelector:SetSelectionIndex(v18)
 	end
 
-	local connection = nil
-	local connection2 = nil
+	local deviceListChangedConnection = nil
+	local devicesChangedConnection = nil
 
-	local function updateAudioOptions() -- line: 3632
-		-- upvalues: v183 (copy), updateVoiceChatDevices (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy), updateAudioDevices (copy)
-		if v183.VoiceChatOptionsEnabled then
+	local function updateAudioOptions()
+		if newPage.VoiceChatOptionsEnabled then
 			updateVoiceChatDevices("Input")
 			updateVoiceChatDevices("Output")
+		else
+			if GetFFlagEnableCrossExpVoice() and default4:getIsConnected() then
+				updateAudioDevices("Input")
+			end
 
-			return
+			updateAudioDevices("Output")
 		end
-
-		if GetFFlagEnableCrossExpVoice() and default4:getIsConnected() then
-			updateAudioDevices("Input")
-		end
-
-		updateAudioDevices("Output")
 	end
-	local function setupDeviceChangedListener() -- line: 3644
-		-- upvalues: SoundService (copy), connection (ref), v183 (copy), updateAudioOptions (copy)
+
+	local function setupDeviceChangedListener() -- 1 equivalent call inferred from this helper
 		if SoundService.DeviceListChanged then
-			connection = SoundService.DeviceListChanged:Connect(function() -- line: 3646
-				-- upvalues: v183 (copy), updateAudioOptions (copy)
-				if v183.PageOpen then
+			deviceListChangedConnection = SoundService.DeviceListChanged:Connect(function()
+				if newPage.PageOpen then
 					updateAudioOptions()
 				end
 			end)
 		end
 	end
-	local function setupVideoCameraDeviceChangedListener() -- line: 3654
-		-- upvalues: VideoCaptureService (copy), connection2 (ref), v183 (copy), updateCameraDevices (copy)
+
+	local function setupVideoCameraDeviceChangedListener() -- 2 equivalent calls inferred from this helper
 		if VideoCaptureService.DevicesChanged then
-			connection2 = VideoCaptureService.DevicesChanged:Connect(function() -- line: 3656
-				-- upvalues: v183 (copy), updateCameraDevices (copy)
-				if v183.PageOpen then
+			devicesChangedConnection = VideoCaptureService.DevicesChanged:Connect(function()
+				if newPage.PageOpen then
 					updateCameraDevices()
 				end
 			end)
 		end
 	end
-	local function teardownDeviceChangedListener() -- line: 3664
-		-- upvalues: SoundService (copy), connection (ref)
-		if SoundService.DeviceListChanged and connection then
-			connection:Disconnect()
-		end
-	end
-	local function teardownVideoCameraDeviceChangedListener() -- line: 3670
-		-- upvalues: VideoCaptureService (copy), connection2 (ref)
-		if VideoCaptureService.DevicesChanged and connection2 then
-			connection2:Disconnect()
-			connection2 = nil
-		end
-	end
-	local function checkVoiceChatOptions() -- line: 3678
-		-- upvalues: default3 (copy), v183 (copy)
-		if default3:VoiceChatAvailable() then
-			v183.VoiceChatOptionsEnabled = true
-		end
-	end
-	local function updateInputDeviceVisibility() -- line: 3684
-		-- upvalues: v183 (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy)
-		local v680 = v183.VoiceChatOptionsEnabled or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
 
-		if v183.InputDeviceFrame then
-			v183.InputDeviceFrame.Visible = v680
+	local function teardownDeviceChangedListener() -- 1 equivalent call inferred from this helper
+		if SoundService.DeviceListChanged and deviceListChangedConnection then
+			deviceListChangedConnection:Disconnect()
 		end
 	end
 
-	local u237 = false
-	local u238 = nil
-
-	if v59 then
-		u238 = false
+	local function teardownVideoCameraDeviceChangedListener() -- 1 equivalent call inferred from this helper
+		if VideoCaptureService.DevicesChanged and devicesChangedConnection then
+			devicesChangedConnection:Disconnect()
+			devicesChangedConnection = nil
+		end
 	end
 
-	local function createVoiceChatSelector() -- line: 3697
-		-- upvalues: v58 (copy), v183 (copy), v52 (copy), u24 (ref), default3 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), v59 (copy), GetFIntDebounceDisconnectButtonDelay (copy), u238 (ref), FFlagVoiceRewarmTelemetry (copy), Constants2 (copy), v67 (copy), u237 (ref), ThrottleFunctionCall (copy), v55 (copy), GuiService (copy), v66 (copy), v60 (copy)
-		if v58 and (v183.VoiceConnectDisconnectFrame and v183.VoiceConnectDisconnectSelector) then
+	local heartbeatConnection = nil
+	local viewportSizeChangedConnection = nil
+	local currentCameraChangedConnection = nil
+
+	local function setupUIScaleViewportChangedListener()
+		if not engineFeature3 then
 			return
 		end
 
-		local s15 = "Voice Chat"
-		local s16 = "Disconnected"
-		local s17 = "Connected"
+		if FFlagUIScaleEngineOptions and not heartbeatConnection then
+			local total = 0
+			heartbeatConnection = RunService.Heartbeat:Connect(function(dt)
+				total += dt
 
-		if v52 then
-			s15 = u24:Format("Feature.GameDetails.Label.VoiceChat")
-			s16 = u24:Format("Feature.SettingsHub.Label.Disconnected")
-			s17 = u24:Format("Feature.SettingsHub.Label.Connected")
+				if total >= 0.1 and newPage.PageOpen then
+					total = 0
+					refreshUIScaleRows()
+				end
+			end)
 		end
 
-		local v684 = not default3:VoiceChatEnded() and 2 or 1
-		local v685 = v183
-		local v686 = v183
-		local v687, v688, v689 = Utility:AddNewRow(v183, s15, "Selector", {
-			s16,
-			s17
-		}, v684)
+		local function rebindToCurrentCamera()
+			if viewportSizeChangedConnection then
+				viewportSizeChangedConnection:Disconnect()
+				viewportSizeChangedConnection = nil
+			end
 
-		v685.VoiceConnectDisconnectFrame = v687
-		_ = v688
-		v686.VoiceConnectDisconnectSelector = v689
-		v183.VoiceConnectDisconnectFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VoiceConnectDisconnectSelector
+			local currentCamera = workspace.CurrentCamera
 
-		local v690 = default3:getService()
+			if not currentCamera then
+				return
+			end
 
-		if v690 and not v59 then
-			v690.StateChanged:Connect(function(oldState, newState) -- line: 3722
-				-- upvalues: v58 (copy), v183 (copy), default3 (copy)
-				if v58 then
-					if oldState == newState then
+			viewportSizeChangedConnection = currentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+				if newPage.PageOpen then
+					if FFlagUIScaleEngineOptions then
+						refreshUIScaleRows()
 						return
 					end
 
-					if newState == Enum.VoiceChatState.Joined and v183.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 2 then
-						v183.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
+					createUIScaleOptions() -- inferred equivalent call
+				end
+			end)
+		end
 
+		rebindToCurrentCamera()
+
+		currentCameraChangedConnection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(rebindToCurrentCamera)
+	end
+
+	local function teardownUIScaleViewportChangedListener() -- 1 equivalent call inferred from this helper
+		if heartbeatConnection then
+			heartbeatConnection:Disconnect()
+			heartbeatConnection = nil
+		end
+
+		if viewportSizeChangedConnection then
+			viewportSizeChangedConnection:Disconnect()
+			viewportSizeChangedConnection = nil
+		end
+
+		if currentCameraChangedConnection then
+			currentCameraChangedConnection:Disconnect()
+			currentCameraChangedConnection = nil
+		end
+
+		v15 = nil
+		v16 = nil
+	end
+
+	local function checkVoiceChatOptions() -- 1 equivalent call inferred from this helper
+		if default3:VoiceChatAvailable() then
+			newPage.VoiceChatOptionsEnabled = true
+		end
+	end
+
+	local function updateInputDeviceVisibility()
+		local voiceChatOptionsEnabled = newPage.VoiceChatOptionsEnabled
+			or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
+
+		if newPage.InputDeviceFrame then
+			newPage.InputDeviceFrame.Visible = voiceChatOptionsEnabled
+		end
+	end
+
+	local flag2 = false
+	local v18
+
+	if defineFastFlag8 then
+		v18 = false
+	else
+		v18 = nil
+	end
+
+	local function createVoiceChatSelector()
+		if defineFastFlag6 and newPage.VoiceConnectDisconnectFrame and newPage.VoiceConnectDisconnectSelector then
+			return
+		end
+
+		local formatted = localization:Format("Feature.GameDetails.Label.VoiceChat")
+		local formatted2 = localization:Format("Feature.SettingsHub.Label.Disconnected")
+		local formatted3 = localization:Format("Feature.SettingsHub.Label.Connected")
+
+		local v19 = default3:VoiceChatEnded() and 1 or 2
+
+		local voiceConnectDisconnectFrame, v20, voiceConnectDisconnectSelector = Utility:AddNewRow(
+			newPage,
+			formatted,
+			"Selector",
+			{ formatted2, formatted3 },
+			v19
+		)
+		newPage.VoiceConnectDisconnectFrame = voiceConnectDisconnectFrame
+		_ = v20
+		newPage.VoiceConnectDisconnectSelector = voiceConnectDisconnectSelector
+
+		newPage.VoiceConnectDisconnectFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VoiceConnectDisconnectSelector
+
+		local service = default3:getService()
+
+		if service and not defineFastFlag8 then
+			service.StateChanged:Connect(function(p, p2)
+				if defineFastFlag6 then
+					if p == p2 then
 						return
 					end
 
-					if (newState == Enum.VoiceChatState.Ended or newState == Enum.VoiceChatState.Failed or newState == Enum.VoiceChatState.Idle) and v183.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 1 then
-						v183.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
-
-						return
+					if
+						p2 == Enum.VoiceChatState.Joined
+						and newPage.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 2
+					then
+						newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
+					elseif
+						(p2 == Enum.VoiceChatState.Ended or p2 == Enum.VoiceChatState.Failed or p2 == Enum.VoiceChatState.Idle)
+						and newPage.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 1
+					then
+						newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
 					end
 				else
-					if oldState == newState then
+					if p == p2 then
 						return
 					end
 
-					if newState == Enum.VoiceChatState.Joined then
-						v183.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
-
-						return
-					end
-
-					if default3:VoiceChatEnded() then
-						v183.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
+					if p2 == Enum.VoiceChatState.Joined then
+						newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
+					elseif default3:VoiceChatEnded() then
+						newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
 					end
 				end
 			end)
 		end
 
-		local u691 = v684
-		local v692 = GetFIntDebounceDisconnectButtonDelay()
-		local v693 = v692 > 0
+		local v21 = v19
 
-		local function v694(p116) -- line: 3756
-			-- upvalues: u691 (ref), v59 (copy), u238 (ref), FFlagVoiceRewarmTelemetry (copy), default3 (copy), Constants2 (copy), v67 (copy), u237 (ref), v183 (copy)
-			if p116 == u691 then
+		local fIntDebounceDisconnectButtonDelay = GetFIntDebounceDisconnectButtonDelay()
+		local v22 = fIntDebounceDisconnectButtonDelay > 0
+
+		local function fn(p)
+			if p == v21 then
 				return
 			end
 
-			u691 = p116
+			v21 = p
 
-			if v59 and u238 then
+			if defineFastFlag8 and v18 then
 				return
 			end
 
 			if FFlagVoiceRewarmTelemetry then
-				local v1064, v1065, v1066, v1067 = default3:GetConnectDisconnectButtonAnalyticsData(p116 == 2)
-
-				default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("clicked", v1064, v1065, v1066, v1067, default3.joinVoiceButtonContext)
+				local connectDisconnectButtonAnalyticsData, v23, v24, v25 = default3:GetConnectDisconnectButtonAnalyticsData(p == 2)
+				default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId(
+					"clicked",
+					connectDisconnectButtonAnalyticsData,
+					v23,
+					v24,
+					v25,
+					default3.joinVoiceButtonContext
+				)
 			else
-				default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("clicked", default3:GetConnectDisconnectButtonAnalyticsData(p116 == 2))
+				default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId(
+					"clicked",
+					default3:GetConnectDisconnectButtonAnalyticsData(p == 2)
+				)
 			end
 
-			if p116 == 2 then
+			if p == 2 then
 				default3.pendingConnectionSource = Constants2.VOICE_CONNECTION_SOURCE.SETTINGS_TOGGLE_ON
 				default3:JoinVoice()
-			elseif v67 then
-				local v1068 = default3:getService()
-				local v1069 = v1068 ~= nil and v1068.VoiceChatState == Enum.VoiceChatState.Failed
+			elseif defineFastFlag11 then
+				local service2 = default3:getService()
+				local v23
 
-				if not default3:VoiceChatEnded() and not v1069 then
+				if service2 == nil then
+					v23 = false
+				else
+					v23 = service2.VoiceChatState == Enum.VoiceChatState.Failed
+				end
+
+				if not (default3:VoiceChatEnded() or v23) then
 					default3.pendingDisconnectReason = Constants2.VOICE_DISCONNECT_REASON.USER_DISCONNECT
 					default3:Leave()
 				end
@@ -4447,190 +4835,105 @@ local function Initialize() -- line: 473
 				default3:Leave()
 			end
 
-			if u237 then
-				task.spawn(function() -- line: 3800
-					-- upvalues: p116 (copy), v183 (copy)
+			if flag2 then
+				task.spawn(function()
 					task.wait(0.5)
 
-					if p116 ~= 1 then
-						v183.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
+					if p ~= 1 then
+						newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
 					end
 				end)
 			end
 		end
 
-		v183.VoiceConnectDisconnectSelector.IndexChanged:connect(if not v693 then v694 else ThrottleFunctionCall(v692, v694))
+		local indexChanged = newPage.VoiceConnectDisconnectSelector.IndexChanged
 
-		if v55 then
-			v183.VoiceConnectDisconnectFrame.SelectionChanged:Connect(function(__, p118, p119) -- line: 3814
-				-- upvalues: s15 (ref), v183 (copy), GuiService (copy)
-				if p119 and (p118 and p118.Parent and p118.Parent.Name == s15 .. "Frame" and p119.Name == "ImageButton" and v183.Active) then
-					GuiService.SelectedCoreObject = p118
+		if v22 then
+			fn = ThrottleFunctionCall(fIntDebounceDisconnectButtonDelay, fn)
+		end
+
+		indexChanged:connect(fn)
+
+		if defineFastFlag4 then
+			newPage.VoiceConnectDisconnectFrame.SelectionChanged:Connect(function(p, selectedCoreObject, p2)
+				if
+					p2
+					and selectedCoreObject
+					and selectedCoreObject.Parent
+					and selectedCoreObject.Parent.Name == formatted .. "Frame"
+					and p2.Name == "ImageButton"
+					and newPage.Active
+				then
+					GuiService.SelectedCoreObject = selectedCoreObject
 				end
 			end)
 		end
 
-		default3:subscribe("OnStateChanged", function(__, p121) -- line: 3821
-			-- upvalues: v59 (copy), u238 (ref), v66 (copy), v183 (copy), v60 (copy)
-			if v59 then
-				u238 = true
+		default3:subscribe("OnStateChanged", function(p, p2)
+			if defineFastFlag8 then
+				v18 = true
 
-				if v66 then
-					if p121 == Enum.VoiceChatState.Joined and v183.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 2 then
-						v183.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
+				if defineFastFlag10 then
+					if
+						p2 == Enum.VoiceChatState.Joined
+						and newPage.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 2
+					then
+						newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
 					end
-				elseif p121 == Enum.VoiceChatState.Joined then
-					v183.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
+				elseif p2 == Enum.VoiceChatState.Joined then
+					newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
 				end
 			end
 
-			if v66 then
-				if p121 == Enum.VoiceChatState.Failed and v183.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 1 then
-					v183.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
+			if defineFastFlag10 then
+				if
+					p2 == Enum.VoiceChatState.Failed
+					and newPage.VoiceConnectDisconnectSelector:GetSelectedIndex() ~= 1
+				then
+					newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
 				end
-			elseif p121 == Enum.VoiceChatState.Failed then
-				v183.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
+			elseif p2 == Enum.VoiceChatState.Failed then
+				newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
 			end
 
-			if v59 then
-				if v60 then
-					task.defer(function() -- line: 3853
-						-- upvalues: u238 (ref)
-						u238 = false
+			if defineFastFlag8 then
+				if defineFastFlag9 then
+					task.defer(function()
+						v18 = false
 					end)
-
-					return
-				end
-
-				u238 = false
-			end
-		end)
-		default3:subscribe("OnRequestMicPermissionRejected", function() -- line: 3862
-			-- upvalues: u237 (ref), v59 (copy), u238 (ref), v183 (copy), v60 (copy)
-			task.spawn(function() -- line: 3863
-				-- upvalues: u237 (ref), v59 (copy), u238 (ref), v183 (copy), v60 (copy)
-				task.wait(0.5)
-				u237 = true
-
-				if v59 then
-					u238 = true
-				end
-
-				v183.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
-
-				if v59 then
-					if v60 then
-						task.defer(function() -- line: 3872
-							-- upvalues: u238 (ref)
-							u238 = false
-						end)
-
-						return
-					end
-
-					u238 = false
-				end
-			end)
-		end)
-	end
-	local function createVoiceConnectDisconnect() -- line: 3883
-		-- upvalues: default3 (copy), u24 (ref), GetFIntDebounceDisconnectButtonDelay (copy), FFlagVoiceRewarmTelemetry (copy), Constants2 (copy), Utility (copy), ThrottleFunctionCall (copy), v183 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy)
-		if default3:IsSeamlessVoice() and not default3.isShowingFTUX then
-			local v695 = u24:Format("Feature.GameDetails.Label.VoiceChat")
-			local v696 = u24:Format("Feature.SettingsHub.Label.Connect")
-			local v697 = u24:Format("Feature.SettingsHub.Label.Disconnect")
-			local v698 = GetFIntDebounceDisconnectButtonDelay()
-			local v699 = v698 > 0
-
-			local function v700() -- line: 3893
-				-- upvalues: default3 (copy), FFlagVoiceRewarmTelemetry (copy), Constants2 (copy)
-				if default3:getService() then
-					local connection3 = nil
-
-					connection3 = default3:getService().StateChanged:Connect(function(__, newState) -- line: 3897
-						-- upvalues: FFlagVoiceRewarmTelemetry (copy), default3 (copy), connection3 (ref)
-						if newState == Enum.VoiceChatState.Joined then
-							if FFlagVoiceRewarmTelemetry then
-								local v1183, v1184, v1185, v1186 = default3:GetConnectDisconnectButtonAnalyticsData(true)
-
-								default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("clicked", v1183, v1184, v1185, v1186, default3.joinVoiceButtonContext)
-							else
-								default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("clicked", default3:GetConnectDisconnectButtonAnalyticsData(true))
-							end
-
-							connection3:Disconnect()
-						end
-					end)
-				elseif FFlagVoiceRewarmTelemetry then
-					local v1076, v1077, v1078, v1079 = default3:GetConnectDisconnectButtonAnalyticsData(false)
-
-					default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("clicked", v1076, v1077, v1078, v1079, default3.joinVoiceButtonContext)
 				else
-					default3.Analytics:reportJoinVoiceButtonEventWithVoiceSessionId("clicked", default3:GetConnectDisconnectButtonAnalyticsData(false))
+					v18 = false
+				end
+			end
+		end)
+
+		default3:subscribe("OnRequestMicPermissionRejected", function()
+			task.spawn(function()
+				task.wait(0.5)
+				flag2 = true
+
+				if defineFastFlag8 then
+					v18 = true
 				end
 
-				default3.pendingConnectionSource = Constants2.VOICE_CONNECTION_SOURCE.SETTINGS_TOGGLE_ON
-				default3:JoinVoice()
-			end
-			local function v701() -- line: 3930
-				-- upvalues: default3 (copy), Constants2 (copy)
-				default3.Analytics:reportLeaveVoiceButtonEvent("clicked", default3:GetConnectDisconnectButtonAnalyticsData(true))
-				default3.pendingDisconnectReason = Constants2.VOICE_DISCONNECT_REASON.USER_DISCONNECT
-				default3:Leave()
-			end
+				newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(1)
 
-			local v702, v703, v704 = Utility:MakeStyledButton("VoiceConnectButton", v696, UDim2.new(1, 0, 1, -20), if not v699 then v700 else ThrottleFunctionCall(v698, v700), v183)
-
-			voiceConnectSetRowRef = v704
-
-			local v705, v706, v707 = Utility:MakeStyledButton("VoiceDisconnectButton", v697, UDim2.new(1, 0, 1, -20), if not v699 then v701 else ThrottleFunctionCall(v698, v701), v183)
-
-			voiceDisconnectSetRowRef = v707
-			v702.Size = UDim2.new(0.6, 0, 0, 40)
-			v702.Position = UDim2.new(0.4, 0, 0.5, 0)
-			v702.AnchorPoint = Vector2.new(0, 0.5)
-			v702.ZIndex = 2
-			v702.Selectable = true
-			v703.ZIndex = 2
-			v705.Size = UDim2.new(0.6, 0, 0, 40)
-			v705.Position = UDim2.new(0.4, 0, 0.5, 0)
-			v705.AnchorPoint = Vector2.new(0, 0.5)
-			v705.ZIndex = 2
-			v705.Selectable = true
-			v706.ZIndex = 2
-
-			local v708 = Utility:AddNewRowObject(v183, v695, v702, nil, true)
-			local v709 = Utility:AddNewRowObject(v183, v695, v705, nil, true)
-
-			v183.VoiceConnectFrame = v708
-			v183.VoiceDisconnectFrame = v709
-			v708.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VoiceConnectFrame
-			v709.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VoiceDisconnectFrame
-			voiceConnectSetRowRef(v708)
-			voiceDisconnectSetRowRef(v709)
-
-			if GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and isVoiceFocused() then
-				v708.Visible = false
-				v709.Visible = false
-
-				return
-			end
-
-			if default3:ShouldShowJoinVoice() then
-				v708.Visible = true
-				v709.Visible = false
-
-				return
-			end
-
-			v708.Visible = false
-			v709.Visible = true
-		end
+				if defineFastFlag8 then
+					if defineFastFlag9 then
+						task.defer(function()
+							v18 = false
+						end)
+					else
+						v18 = false
+					end
+				end
+			end)
+		end)
 	end
-	local function createVRComfortSettingOptions() -- line: 3993
-		-- upvalues: u24 (ref), GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-		local EnumItems = Enum.VRComfortSetting:GetEnumItems()
-		local t34 = {
+
+	local function createVRComfortSettingOptions()
+		local enumItems = Enum.VRComfortSetting:GetEnumItems()
+		local v19 = {
 			title = "CoreScripts.InGameMenu.PageTitle.VRComfortSettings",
 			description = "CoreScripts.InGameMenu.GameSettings.ComfortSettingsDescription",
 			["Enum.VRComfortSetting.Comfort"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingComfort",
@@ -4643,458 +4946,326 @@ local function Initialize() -- line: 473
 			on = "InGame.CommonUI.Label.On",
 			off = "InGame.CommonUI.Label.Off"
 		}
-		local t35 = {}
 
-		for i, v in ipairs(EnumItems) do
-			t35[i] = u24:Format(t34[tostring(v)])
+		local v20 = {}
+
+		for i, enumItem in ipairs(enumItems) do
+			v20[i] = localization:Format(v19[tostring(enumItem)])
 		end
 
-		local v715 = table.find(EnumItems, GameSettings.VRComfortSetting)
-		local v716 = v183
-		local v717 = v183
-		local v718 = v183
-		local v719, v720, v721 = Utility:AddNewRow(v183, u24:Format("CoreScripts.InGameMenu.PageTitle.VRComfortSettings"), "Selector", t35, v715, nil, u24:Format("CoreScripts.InGameMenu.GameSettings.ComfortSettingsDescription"))
+		local index = table.find(enumItems, gameSettings.VRComfortSetting)
+		local vrComfortSettingFrame, vrComfortSettingLabel, vrComfortSettingSelector = Utility:AddNewRow(
+			newPage,
+			localization:Format("CoreScripts.InGameMenu.PageTitle.VRComfortSettings"),
+			"Selector",
+			v20,
+			index,
+			nil,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.ComfortSettingsDescription")
+		)
+		newPage.VRComfortSettingFrame = vrComfortSettingFrame
+		newPage.VRComfortSettingLabel = vrComfortSettingLabel
+		newPage.VRComfortSettingSelector = vrComfortSettingSelector
 
-		v716.VRComfortSettingFrame = v719
-		v717.VRComfortSettingLabel = v720
-		v718.VRComfortSettingSelector = v721
-		v183.VRComfortSettingFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRComfortSettingFrame
+		newPage.VRComfortSettingFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRComfortSettingFrame
 
-		local v722 = not GameSettings.VignetteEnabled and 2 or 1
-		local v723 = v183
-		local v724 = v183
-		local v725 = v183
-		local v726, v727, v728 = Utility:AddNewRow(v183, u24:Format("CoreScripts.InGameMenu.GameSettings.VignetteEnabled"), "Selector", {
-			u24:Format("InGame.CommonUI.Label.On"),
-			u24:Format("InGame.CommonUI.Label.Off")
-		}, v722)
+		local v21 = gameSettings.VignetteEnabled and 1 or 2
+		local vrVignetteEnabledFrame, vrVignetteEnabledLabel, vrVignetteEnabledSelector = Utility:AddNewRow(
+			newPage,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.VignetteEnabled"),
+			"Selector",
+			{ localization:Format("InGame.CommonUI.Label.On"), localization:Format("InGame.CommonUI.Label.Off") },
+			v21
+		)
+		newPage.VRVignetteEnabledFrame = vrVignetteEnabledFrame
+		newPage.VRVignetteEnabledLabel = vrVignetteEnabledLabel
+		newPage.VRVignetteEnabledSelector = vrVignetteEnabledSelector
 
-		v723.VRVignetteEnabledFrame = v726
-		v724.VRVignetteEnabledLabel = v727
-		v725.VRVignetteEnabledSelector = v728
-		v183.VRVignetteEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRVignetteEnabledFrame
+		newPage.VRVignetteEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRVignetteEnabledFrame
 
-		local v729 = not GameSettings.VRSmoothRotationEnabled and 1 or 2
-		local v730 = v183
-		local v731 = v183
-		local v732 = v183
-		local v733, v734, v735 = Utility:AddNewRow(v183, u24:Format("CoreScripts.InGameMenu.GameSettings.VRSteppedRotationEnabled"), "Selector", {
-			u24:Format("InGame.CommonUI.Label.On"),
-			u24:Format("InGame.CommonUI.Label.Off")
-		}, v729)
+		local v22 = gameSettings.VRSmoothRotationEnabled and 2 or 1
 
-		v730.VRSteppedRotationEnabledFrame = v733
-		v731.VRSteppedRotationEnabledLabel = v734
-		v732.VRSteppedRotationEnabledSelector = v735
-		v183.VRSteppedRotationEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRSteppedRotationEnabledFrame
+		local vrSteppedRotationEnabledFrame, vrSteppedRotationEnabledLabel, vrSteppedRotationEnabledSelector = Utility:AddNewRow(
+			newPage,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.VRSteppedRotationEnabled"),
+			"Selector",
+			{ localization:Format("InGame.CommonUI.Label.On"), localization:Format("InGame.CommonUI.Label.Off") },
+			v22
+		)
+		newPage.VRSteppedRotationEnabledFrame = vrSteppedRotationEnabledFrame
+		newPage.VRSteppedRotationEnabledLabel = vrSteppedRotationEnabledLabel
+		newPage.VRSteppedRotationEnabledSelector = vrSteppedRotationEnabledSelector
 
-		local v736 = not GameSettings.VRThirdPersonFollowCamEnabled and 1 or 2
-		local v737 = v183
-		local v738 = v183
-		local v739 = v183
-		local v740, v741, v742 = Utility:AddNewRow(v183, u24:Format("CoreScripts.InGameMenu.GameSettings.VRThirdPersonFixedCamEnabled"), "Selector", {
-			u24:Format("InGame.CommonUI.Label.On"),
-			u24:Format("InGame.CommonUI.Label.Off")
-		}, v736)
+		newPage.VRSteppedRotationEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRSteppedRotationEnabledFrame
 
-		v737.VRThirdPersonFixedCamEnabledFrame = v740
-		v738.VRThirdPersonFixedCamEnabledLabel = v741
-		v739.VRThirdPersonFixedCamEnabledSelector = v742
-		v183.VRThirdPersonFixedCamEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRThirdPersonFixedCamEnabledFrame
+		local v23 = gameSettings.VRThirdPersonFollowCamEnabled and 2 or 1
 
-		local function v743(p123) -- line: 4059
-			-- upvalues: v183 (copy)
-			if p123 == Enum.VRComfortSetting.Custom then
-				v183.VRVignetteEnabledSelector:SetZIndex(2)
-				v183.VRVignetteEnabledLabel.ZIndex = 2
-				v183.VRVignetteEnabledSelector:SetInteractable(true)
-				v183.VRSteppedRotationEnabledSelector:SetZIndex(2)
-				v183.VRSteppedRotationEnabledLabel.ZIndex = 2
-				v183.VRSteppedRotationEnabledSelector:SetInteractable(true)
-				v183.VRThirdPersonFixedCamEnabledSelector:SetZIndex(2)
-				v183.VRThirdPersonFixedCamEnabledLabel.ZIndex = 2
-				v183.VRThirdPersonFixedCamEnabledSelector:SetInteractable(true)
+		local vrThirdPersonFixedCamEnabledFrame, vrThirdPersonFixedCamEnabledLabel, vrThirdPersonFixedCamEnabledSelector = Utility:AddNewRow(
+			newPage,
+			localization:Format("CoreScripts.InGameMenu.GameSettings.VRThirdPersonFixedCamEnabled"),
+			"Selector",
+			{ localization:Format("InGame.CommonUI.Label.On"), localization:Format("InGame.CommonUI.Label.Off") },
+			v23
+		)
+		newPage.VRThirdPersonFixedCamEnabledFrame = vrThirdPersonFixedCamEnabledFrame
+		newPage.VRThirdPersonFixedCamEnabledLabel = vrThirdPersonFixedCamEnabledLabel
+		newPage.VRThirdPersonFixedCamEnabledSelector = vrThirdPersonFixedCamEnabledSelector
 
-				return
+		newPage.VRThirdPersonFixedCamEnabledFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRThirdPersonFixedCamEnabledFrame
+
+		local function fn(p)
+			if p == Enum.VRComfortSetting.Custom then
+				newPage.VRVignetteEnabledSelector:SetZIndex(2)
+				newPage.VRVignetteEnabledLabel.ZIndex = 2
+				newPage.VRVignetteEnabledSelector:SetInteractable(true)
+				newPage.VRSteppedRotationEnabledSelector:SetZIndex(2)
+				newPage.VRSteppedRotationEnabledLabel.ZIndex = 2
+				newPage.VRSteppedRotationEnabledSelector:SetInteractable(true)
+				newPage.VRThirdPersonFixedCamEnabledSelector:SetZIndex(2)
+				newPage.VRThirdPersonFixedCamEnabledLabel.ZIndex = 2
+				newPage.VRThirdPersonFixedCamEnabledSelector:SetInteractable(true)
+			else
+				newPage.VRVignetteEnabledSelector:SetZIndex(1)
+				newPage.VRVignetteEnabledLabel.ZIndex = 1
+				newPage.VRVignetteEnabledSelector:SetInteractable(false)
+				newPage.VRSteppedRotationEnabledSelector:SetZIndex(1)
+				newPage.VRSteppedRotationEnabledLabel.ZIndex = 1
+				newPage.VRSteppedRotationEnabledSelector:SetInteractable(false)
+				newPage.VRThirdPersonFixedCamEnabledSelector:SetZIndex(1)
+				newPage.VRThirdPersonFixedCamEnabledLabel.ZIndex = 1
+				newPage.VRThirdPersonFixedCamEnabledSelector:SetInteractable(false)
 			end
-
-			v183.VRVignetteEnabledSelector:SetZIndex(1)
-			v183.VRVignetteEnabledLabel.ZIndex = 1
-			v183.VRVignetteEnabledSelector:SetInteractable(false)
-			v183.VRSteppedRotationEnabledSelector:SetZIndex(1)
-			v183.VRSteppedRotationEnabledLabel.ZIndex = 1
-			v183.VRSteppedRotationEnabledSelector:SetInteractable(false)
-			v183.VRThirdPersonFixedCamEnabledSelector:SetZIndex(1)
-			v183.VRThirdPersonFixedCamEnabledLabel.ZIndex = 1
-			v183.VRThirdPersonFixedCamEnabledSelector:SetInteractable(false)
 		end
 
-		v183.VRComfortSettingSelector.IndexChanged:connect(function(p124) -- line: 4083
-			-- upvalues: EnumItems (copy), GameSettings (copy), v743 (copy)
-			local v1082 = EnumItems[p124]
+		newPage.VRComfortSettingSelector.IndexChanged:connect(function(p)
+			local enumItem = enumItems[p]
+			gameSettings.VRComfortSetting = enumItem
+			fn(enumItem)
+		end)
+		fn(gameSettings.VRComfortSetting)
 
-			GameSettings.VRComfortSetting = v1082
-			v743(v1082)
-		end)
-		v743(GameSettings.VRComfortSetting)
-		v183.VRVignetteEnabledSelector.IndexChanged:connect(function(p125) -- line: 4090
-			-- upvalues: GameSettings (copy)
-			if GameSettings.VRComfortSetting == Enum.VRComfortSetting.Custom then
-				GameSettings.VignetteEnabledCustomOption = p125 == 1
+		newPage.VRVignetteEnabledSelector.IndexChanged:connect(function(p)
+			if gameSettings.VRComfortSetting == Enum.VRComfortSetting.Custom then
+				gameSettings.VignetteEnabledCustomOption = p == 1
 			end
 		end)
-		v183.VRSteppedRotationEnabledSelector.IndexChanged:connect(function(p126) -- line: 4096
-			-- upvalues: GameSettings (copy)
-			if GameSettings.VRComfortSetting == Enum.VRComfortSetting.Custom then
-				GameSettings.VRSmoothRotationEnabledCustomOption = p126 == 2
-			end
-		end)
-		v183.VRThirdPersonFixedCamEnabledSelector.IndexChanged:connect(function(p127) -- line: 4102
-			-- upvalues: GameSettings (copy)
-			if GameSettings.VRComfortSetting == Enum.VRComfortSetting.Custom then
-				GameSettings.VRThirdPersonFollowCamEnabledCustomOption = p127 == 2
-			end
-		end)
-		GameSettings:GetPropertyChangedSignal("VRComfortSetting"):Connect(function() -- line: 4108
-			-- upvalues: EnumItems (copy), GameSettings (copy), v183 (copy)
-			local v1086 = table.find(EnumItems, GameSettings.VRComfortSetting)
 
-			if v1086 ~= v183.VRComfortSettingSelector:GetSelectedIndex() then
-				v183.VRComfortSettingSelector:SetSelectionIndex(v1086)
+		newPage.VRSteppedRotationEnabledSelector.IndexChanged:connect(function(p)
+			if gameSettings.VRComfortSetting == Enum.VRComfortSetting.Custom then
+				gameSettings.VRSmoothRotationEnabledCustomOption = p == 2
 			end
 		end)
-		GameSettings:GetPropertyChangedSignal("VignetteEnabled"):Connect(function() -- line: 4115
-			-- upvalues: GameSettings (copy), v183 (copy)
-			local v1087 = not GameSettings.VignetteEnabled and 2 or 1
 
-			if v1087 ~= v183.VRVignetteEnabledSelector:GetSelectedIndex() then
-				v183.VRVignetteEnabledSelector:SetSelectionIndex(v1087)
+		newPage.VRThirdPersonFixedCamEnabledSelector.IndexChanged:connect(function(p)
+			if gameSettings.VRComfortSetting == Enum.VRComfortSetting.Custom then
+				gameSettings.VRThirdPersonFollowCamEnabledCustomOption = p == 2
 			end
 		end)
-		GameSettings:GetPropertyChangedSignal("VRSmoothRotationEnabled"):Connect(function() -- line: 4122
-			-- upvalues: GameSettings (copy), v183 (copy)
-			local v1088 = not GameSettings.VRSmoothRotationEnabled and 1 or 2
 
-			if v1088 ~= v183.VRSteppedRotationEnabledSelector:GetSelectedIndex() then
-				v183.VRSteppedRotationEnabledSelector:SetSelectionIndex(v1088)
+		gameSettings:GetPropertyChangedSignal("VRComfortSetting"):Connect(function()
+			local index2 = table.find(enumItems, gameSettings.VRComfortSetting)
+
+			if newPage.VRComfortSettingSelector:GetSelectedIndex() ~= index2 then
+				newPage.VRComfortSettingSelector:SetSelectionIndex(index2)
 			end
 		end)
-		GameSettings:GetPropertyChangedSignal("VRThirdPersonFollowCamEnabled"):Connect(function() -- line: 4129
-			-- upvalues: GameSettings (copy), v183 (copy)
-			local v1089 = not GameSettings.VRThirdPersonFollowCamEnabled and 1 or 2
 
-			if v1089 ~= v183.VRThirdPersonFixedCamEnabledSelector:GetSelectedIndex() then
-				v183.VRThirdPersonFixedCamEnabledSelector:SetSelectionIndex(v1089)
+		gameSettings:GetPropertyChangedSignal("VignetteEnabled"):Connect(function()
+			local v24 = gameSettings.VignetteEnabled and 1 or 2
+
+			if newPage.VRVignetteEnabledSelector:GetSelectedIndex() ~= v24 then
+				newPage.VRVignetteEnabledSelector:SetSelectionIndex(v24)
+			end
+		end)
+
+		gameSettings:GetPropertyChangedSignal("VRSmoothRotationEnabled"):Connect(function()
+			local v24 = gameSettings.VRSmoothRotationEnabled and 2 or 1
+
+			if newPage.VRSteppedRotationEnabledSelector:GetSelectedIndex() ~= v24 then
+				newPage.VRSteppedRotationEnabledSelector:SetSelectionIndex(v24)
+			end
+		end)
+
+		gameSettings:GetPropertyChangedSignal("VRThirdPersonFollowCamEnabled"):Connect(function()
+			local v24 = gameSettings.VRThirdPersonFollowCamEnabled and 2 or 1
+
+			if newPage.VRThirdPersonFixedCamEnabledSelector:GetSelectedIndex() ~= v24 then
+				newPage.VRThirdPersonFixedCamEnabledSelector:SetSelectionIndex(v24)
 			end
 		end)
 	end
-	local function createVRSafetyBubbleModeOptions() -- line: 4137
-		-- upvalues: u24 (ref), GameSettings (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy)
-		local EnumItems = Enum.VRSafetyBubbleMode:GetEnumItems()
-		local t36 = {
+
+	local function createVRSafetyBubbleModeOptions()
+		local enumItems = Enum.VRSafetyBubbleMode:GetEnumItems()
+		local v19 = {
 			title = "CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeTitle",
 			description = "CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeDescription",
 			["Enum.VRSafetyBubbleMode.NoOne"] = "CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeNoOne",
 			["Enum.VRSafetyBubbleMode.OnlyFriends"] = "CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeOnlyFriends",
 			["Enum.VRSafetyBubbleMode.Anyone"] = "CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeAnyone"
 		}
-		local t37 = {}
 
-		for i, v in ipairs(EnumItems) do
-			t37[i] = u24:Format(t36[tostring(v)])
+		local v20 = {}
+
+		for i, enumItem in ipairs(enumItems) do
+			v20[i] = localization:Format(v19[tostring(enumItem)])
 		end
 
-		local v749 = table.find(EnumItems, GameSettings.VRSafetyBubbleMode)
+		local index = table.find(enumItems, gameSettings.VRSafetyBubbleMode)
+		task.defer(function()
+			local vrSafetyBubbleModeFrame, vrSafetyBubbleModeLabel, vrSafetyBubbleModeSelector = Utility:AddNewRow(
+				newPage,
+				localization:Format("CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeTitle"),
+				"DropDown",
+				v20,
+				index,
+				nil,
+				localization:Format("CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeDescription")
+			)
+			newPage.VRSafetyBubbleModeFrame = vrSafetyBubbleModeFrame
+			newPage.VRSafetyBubbleModeLabel = vrSafetyBubbleModeLabel
+			newPage.VRSafetyBubbleModeSelector = vrSafetyBubbleModeSelector
 
-		task.defer(function() -- line: 4153
-			-- upvalues: v183 (copy), Utility (copy), u24 (ref), t37 (copy), v749 (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), EnumItems (copy), GameSettings (copy)
-			local v1090 = v183
-			local v1091 = v183
-			local v1092 = v183
-			local v1093, v1094, v1095 = Utility:AddNewRow(v183, u24:Format("CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeTitle"), "DropDown", t37, v749, nil, u24:Format("CoreScripts.InGameMenu.GameSettings.SafetyBubbleModeDescription"))
+			newPage.VRSafetyBubbleModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRSafetyBubbleModeFrame
 
-			v1090.VRSafetyBubbleModeFrame = v1093
-			v1091.VRSafetyBubbleModeLabel = v1094
-			v1092.VRSafetyBubbleModeSelector = v1095
-			v183.VRSafetyBubbleModeFrame.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.VRSafetyBubbleModeFrame
-			v183.VRSafetyBubbleModeSelector.IndexChanged:connect(function(p128) -- line: 4166
-				-- upvalues: EnumItems (copy), GameSettings (copy)
-				GameSettings.VRSafetyBubbleMode = EnumItems[p128]
+			newPage.VRSafetyBubbleModeSelector.IndexChanged:connect(function(p)
+				gameSettings.VRSafetyBubbleMode = enumItems[p]
 			end)
-			GameSettings:GetPropertyChangedSignal("VRSafetyBubbleMode"):Connect(function() -- line: 4171
-				-- upvalues: EnumItems (copy), GameSettings (copy), v183 (copy)
-				local v1188 = table.find(EnumItems, GameSettings.VRSafetyBubbleMode)
 
-				if v1188 ~= v183.VRSafetyBubbleModeSelector:GetSelectedIndex() then
-					v183.VRSafetyBubbleModeSelector:SetSelectionIndex(v1188)
+			gameSettings:GetPropertyChangedSignal("VRSafetyBubbleMode"):Connect(function()
+				local index2 = table.find(enumItems, gameSettings.VRSafetyBubbleMode)
+
+				if newPage.VRSafetyBubbleModeSelector:GetSelectedIndex() ~= index2 then
+					newPage.VRSafetyBubbleModeSelector:SetSelectionIndex(index2)
 				end
 			end)
 		end)
 	end
 
-	v183.VoiceChatOptionsEnabled = false
+	newPage.VoiceChatOptionsEnabled = false
+	local eventConnection = nil
+	local eventConnection2 = nil
+	local fn
 
-	local connection4 = nil
-	local connection5 = nil
-	local u245 = nil
-
-	if game:GetEngineFeature("VoiceChatSupported") and (GetFFlagEnableVrVoiceConnectDisconnect() or (not isInExperienceUIVREnabled or not isSpatial())) then
-		spawn(function() -- line: 4185
-			-- upvalues: GetFFlagEnableVoiceUxUpdates (copy), v53 (copy), default3 (copy), createVoiceChatSelector (copy), isVoiceFocused (copy), v183 (copy), observeIsVoiceFocused (copy), FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider (copy), v69 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), VoiceVolumeControlsEligibility (copy), v128 (copy), v58 (copy), GetFFlagEnableUniveralVoiceToasts (copy), FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast (copy), v59 (copy), v60 (copy), u238 (ref), GetFFlagEnableConnectDisconnectInSettingsAndChrome (copy), createVoiceConnectDisconnect (copy), default4 (copy), t5 (copy), GetFFlagVoiceChatUILogging (copy)
-			if GetFFlagEnableVoiceUxUpdates() and ((not v53 and default3:EligibleForFaeUpsell() or default3:IsSeamlessVoice()) and default3:verifyUniverseAndPlaceCanUseVoice()) then
+	if game:GetEngineFeature("VoiceChatSupported") then
+		spawn(function()
+			if
+				(not defineFastFlag2 and default3:EligibleForFaeUpsell() or default3:IsSeamlessVoice())
+				and default3:verifyUniverseAndPlaceCanUseVoice()
+			then
 				createVoiceChatSelector()
 
-				if isVoiceFocused() and v183.VoiceConnectDisconnectFrame then
-					v183.VoiceConnectDisconnectFrame.Visible = false
+				if isVoiceFocused() and newPage.VoiceConnectDisconnectFrame then
+					newPage.VoiceConnectDisconnectFrame.Visible = false
 				end
 
-				observeIsVoiceFocused(function(p129) -- line: 4195
-					-- upvalues: v183 (copy)
-					if p129 then
-						if v183.VoiceConnectDisconnectFrame then
-							v183.VoiceConnectDisconnectFrame.Visible = false
-
-							return
+				observeIsVoiceFocused(function(p)
+					if p then
+						if newPage.VoiceConnectDisconnectFrame then
+							newPage.VoiceConnectDisconnectFrame.Visible = false
 						end
-					elseif v183.VoiceConnectDisconnectFrame then
-						v183.VoiceConnectDisconnectFrame.Visible = true
+					elseif newPage.VoiceConnectDisconnectFrame then
+						newPage.VoiceConnectDisconnectFrame.Visible = true
 					end
 				end)
 			end
 
-			default3:asyncInit():andThen(function() -- line: 4208
-				-- upvalues: default3 (copy), v183 (copy), FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider (copy), v69 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), VoiceVolumeControlsEligibility (copy), v128 (copy), observeIsVoiceFocused (copy), v58 (copy), GetFFlagEnableVoiceUxUpdates (copy), createVoiceChatSelector (copy), GetFFlagEnableUniveralVoiceToasts (copy), FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast (copy), v59 (copy), v60 (copy), u238 (ref), GetFFlagEnableConnectDisconnectInSettingsAndChrome (copy), createVoiceConnectDisconnect (copy), default4 (copy), t5 (copy)
+			default3:asyncInit():andThen(function()
 				VoiceChatService = default3:getService()
+				checkVoiceChatOptions() -- inferred equivalent call
 
-				if default3:VoiceChatAvailable() then
-					v183.VoiceChatOptionsEnabled = true
-				end
+				if FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider and newPage.VoiceChatVolumeFrame then
+					local function updateVoiceChatVolumeVisibility(p) -- 4 equivalent calls inferred from this helper
+						local success, result = pcall(function()
+							local VoiceChatService = game:GetService("VoiceChatService")
+							local service = default3:getService()
+							local v19
 
-				if FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider and v183.VoiceChatVolumeFrame then
-					local function updateVoiceChatVolumeVisibility(p130) -- line: 4212
-						-- upvalues: default3 (copy), v69 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy), v128 (copy)
-						local ok, result = pcall(function() -- line: 4213
-							-- upvalues: default3 (copy), v69 (copy), p130 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy)
-							local VoiceChatService2 = game:GetService("VoiceChatService")
-							local v1250 = default3:getService()
-							local v1251 = ((if not v69 then v1250 and v1250.VoiceChatState else p130 or v1250 and v1250.VoiceChatState)) == Enum.VoiceChatState.Joined
-							local v1252 = VoiceChatService2 and VoiceChatService2.UseNewAudioApi
-							local v1253 = v73 and (GetFFlagEnableCrossExpVoice() and (GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and isVoiceFocused()))
+							if defineFastFlag12 then
+								v19 = p or service and service.VoiceChatState
+							else
+								v19 = service and service.VoiceChatState
+							end
 
-							v183.VoiceChatVolumeFrame.Visible = VoiceVolumeControlsEligibility.isVoiceChatVolumeSliderVisible(v1251, v1252) and not v1253
+							local v20 = v19 == Enum.VoiceChatState.Joined
+							local useNewAudioApi = VoiceChatService and VoiceChatService.UseNewAudioApi
+
+							local v21 = defineFastFlag14
+								and GetFFlagEnableCrossExpVoice()
+								and GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice()
+								and isVoiceFocused()
+							newPage.VoiceChatVolumeFrame.Visible = VoiceVolumeControlsEligibility.isVoiceChatVolumeSliderVisible(
+									v20,
+									useNewAudioApi
+								)
+								and not v21
 						end)
 
-						if not ok then
-							v128:debug("[GameSettings] updateVoiceChatVolumeVisibility ERROR:", result)
+						if not success then
+							v10:debug("[GameSettings] updateVoiceChatVolumeVisibility ERROR:", result)
 						end
 					end
 
-					local v1098 = nil
-					local ok, result = pcall(function() -- line: 4213
-						-- upvalues: default3 (copy), v69 (copy), v1098 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy)
-						local VoiceChatService3 = game:GetService("VoiceChatService")
-						local v1193 = default3:getService()
-						local v1194 = ((if not v69 then v1193 and v1193.VoiceChatState else v1098 or v1193 and v1193.VoiceChatState)) == Enum.VoiceChatState.Joined
-						local v1195 = VoiceChatService3 and VoiceChatService3.UseNewAudioApi
-						local v1196 = v73 and (GetFFlagEnableCrossExpVoice() and (GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and isVoiceFocused()))
+					updateVoiceChatVolumeVisibility(nil) -- inferred equivalent call
 
-						v183.VoiceChatVolumeFrame.Visible = VoiceVolumeControlsEligibility.isVoiceChatVolumeSliderVisible(v1194, v1195) and not v1196
-					end)
-
-					if not ok then
-						v128:debug("[GameSettings] updateVoiceChatVolumeVisibility ERROR:", result)
-					end
-
-					if v73 and GetFFlagEnableCrossExpVoice() and GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() then
-						observeIsVoiceFocused(function() -- line: 4241
-							-- upvalues: default3 (copy), v69 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy), v128 (copy)
-							local v1197 = nil
-							local ok2, result2 = pcall(function() -- line: 4213
-								-- upvalues: default3 (copy), v69 (copy), v1197 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy)
-								local VoiceChatService4 = game:GetService("VoiceChatService")
-								local v1255 = default3:getService()
-								local v1256 = ((if not v69 then v1255 and v1255.VoiceChatState else v1197 or v1255 and v1255.VoiceChatState)) == Enum.VoiceChatState.Joined
-								local v1257 = VoiceChatService4 and VoiceChatService4.UseNewAudioApi
-								local v1258 = v73 and (GetFFlagEnableCrossExpVoice() and (GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and isVoiceFocused()))
-
-								v183.VoiceChatVolumeFrame.Visible = VoiceVolumeControlsEligibility.isVoiceChatVolumeSliderVisible(v1256, v1257) and not v1258
-							end)
-
-							if not ok2 then
-								v128:debug("[GameSettings] updateVoiceChatVolumeVisibility ERROR:", result2)
-							end
+					if
+						defineFastFlag14
+						and GetFFlagEnableCrossExpVoice()
+						and GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice()
+					then
+						observeIsVoiceFocused(function()
+							updateVoiceChatVolumeVisibility(nil) -- inferred equivalent call
 						end)
 					end
 
-					if v69 then
-						default3:subscribe("OnStateChanged", function(__, p132) -- line: 4246
-							-- upvalues: default3 (copy), v69 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy), v128 (copy)
-							local ok3, result3 = pcall(function() -- line: 4213
-								-- upvalues: default3 (copy), v69 (copy), p132 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy)
-								local VoiceChatService5 = game:GetService("VoiceChatService")
-								local v1260 = default3:getService()
-								local v1261 = ((if not v69 then v1260 and v1260.VoiceChatState else p132 or v1260 and v1260.VoiceChatState)) == Enum.VoiceChatState.Joined
-								local v1262 = VoiceChatService5 and VoiceChatService5.UseNewAudioApi
-								local v1263 = v73 and (GetFFlagEnableCrossExpVoice() and (GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and isVoiceFocused()))
-
-								v183.VoiceChatVolumeFrame.Visible = VoiceVolumeControlsEligibility.isVoiceChatVolumeSliderVisible(v1261, v1262) and not v1263
-							end)
-
-							if not ok3 then
-								v128:debug("[GameSettings] updateVoiceChatVolumeVisibility ERROR:", result3)
-							end
+					if defineFastFlag12 then
+						default3:subscribe("OnStateChanged", function(p, p2)
+							updateVoiceChatVolumeVisibility(p2) -- inferred equivalent call
 						end)
 					else
-						local v1101 = default3:getService()
+						local service = default3:getService()
 
-						if v1101 then
-							v1101.StateChanged:Connect(function() -- line: 4252
-								-- upvalues: default3 (copy), v69 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy), v128 (copy)
-								local v1204 = nil
-								local ok4, result4 = pcall(function() -- line: 4213
-									-- upvalues: default3 (copy), v69 (copy), v1204 (copy), v73 (copy), GetFFlagEnableCrossExpVoice (copy), GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), isVoiceFocused (copy), v183 (copy), VoiceVolumeControlsEligibility (copy)
-									local VoiceChatService6 = game:GetService("VoiceChatService")
-									local v1265 = default3:getService()
-									local v1266 = ((if not v69 then v1265 and v1265.VoiceChatState else v1204 or v1265 and v1265.VoiceChatState)) == Enum.VoiceChatState.Joined
-									local v1267 = VoiceChatService6 and VoiceChatService6.UseNewAudioApi
-									local v1268 = v73 and (GetFFlagEnableCrossExpVoice() and (GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and isVoiceFocused()))
-
-									v183.VoiceChatVolumeFrame.Visible = VoiceVolumeControlsEligibility.isVoiceChatVolumeSliderVisible(v1266, v1267) and not v1268
-								end)
-
-								if not ok4 then
-									v128:debug("[GameSettings] updateVoiceChatVolumeVisibility ERROR:", result4)
-								end
+						if service then
+							service.StateChanged:Connect(function()
+								updateVoiceChatVolumeVisibility(nil) -- inferred equivalent call
 							end)
 						end
 					end
 				end
 
-				if v58 and GetFFlagEnableVoiceUxUpdates() and default3:UserVoiceEnabled() and default3:verifyUniverseAndPlaceCanUseVoice() then
+				if defineFastFlag6 and default3:UserVoiceEnabled() and default3:verifyUniverseAndPlaceCanUseVoice() then
 					createVoiceChatSelector()
 				end
 
 				if not GetFFlagEnableUniveralVoiceToasts() then
 					default3:CheckAndShowNotAudiblePrompt()
 
-					local v1102 = v73 and (GetFFlagEnableCrossExpVoice() and (GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and isVoiceFocused()))
+					local v19 = defineFastFlag14
+						and GetFFlagEnableCrossExpVoice()
+						and GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice()
+						and isVoiceFocused()
 
-					if FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast and not v1102 then
+					if FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast and not v19 then
 						default3:ShowNotAudiblePromptVoiceChatVolume()
 					end
 				end
 
-				if GetFFlagEnableVoiceUxUpdates() then
-					if v59 and v60 then
-						u238 = true
-						v183.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
-						task.defer(function() -- line: 4290
-							-- upvalues: u238 (ref)
-							u238 = false
-						end)
-
-						return
-					end
-
-					v183.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
+				if not (defineFastFlag8 and defineFastFlag9) then
+					newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
 
 					return
 				end
 
-				local u1103 = false
+				v18 = true
 
-				if GetFFlagEnableConnectDisconnectInSettingsAndChrome() then
-					createVoiceConnectDisconnect()
+				newPage.VoiceConnectDisconnectSelector:SetSelectionIndex(2)
 
-					if GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() then
-						u1103 = isVoiceFocused()
-						observeIsVoiceFocused(function(p133) -- line: 4305
-							-- upvalues: u1103 (ref), v183 (copy), default3 (copy)
-							u1103 = p133
-
-							if p133 then
-								if v183.VoiceConnectFrame then
-									v183.VoiceConnectFrame.Visible = false
-								end
-
-								if v183.VoiceDisconnectFrame then
-									v183.VoiceDisconnectFrame.Visible = false
-
-									return
-								end
-							elseif default3:ShouldShowJoinVoice() then
-								if v183.VoiceConnectFrame then
-									v183.VoiceConnectFrame.Visible = true
-								end
-
-								if v183.VoiceDisconnectFrame then
-									v183.VoiceDisconnectFrame.Visible = false
-								end
-							end
-						end)
-					end
-				end
-
-				if GetFFlagEnableConnectDisconnectInSettingsAndChrome() and v183.VoiceConnectFrame then
-					v183.VoiceConnectFrame.Visible = false
-				end
-
-				if GetFFlagEnableConnectDisconnectInSettingsAndChrome() and v183.VoiceDisconnectFrame then
-					if GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() then
-						v183.VoiceDisconnectFrame.Visible = not u1103
-					else
-						v183.VoiceDisconnectFrame.Visible = true
-					end
-				end
-
-				default3.showVoiceUI.Event:Connect(function() -- line: 4338
-					-- upvalues: GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), u1103 (ref), v183 (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy), t5 (copy), GetFFlagEnableConnectDisconnectInSettingsAndChrome (copy)
-					if GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and u1103 then
-						return
-					end
-
-					v183.VoiceChatOptionsEnabled = true
-
-					local v1208 = v183.VoiceChatOptionsEnabled or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
-
-					if v183[t5.Input .. "DeviceFrame"] then
-						v183[t5.Input .. "DeviceFrame"].Visible = v1208
-					end
-
-					if GetFFlagEnableConnectDisconnectInSettingsAndChrome() and v183.VoiceConnectFrame then
-						v183.VoiceConnectFrame.Visible = false
-					end
-
-					if GetFFlagEnableConnectDisconnectInSettingsAndChrome() and v183.VoiceDisconnectFrame then
-						v183.VoiceDisconnectFrame.Visible = true
-					end
+				task.defer(function()
+					v18 = false
 				end)
-				default3.hideVoiceUI.Event:Connect(function() -- line: 4356
-					-- upvalues: GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice (copy), u1103 (ref), v183 (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy), t5 (copy), GetFFlagEnableConnectDisconnectInSettingsAndChrome (copy)
-					if GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() and u1103 then
-						return
-					end
-
-					v183.VoiceChatOptionsEnabled = false
-
-					local v1209 = v183.VoiceChatOptionsEnabled or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
-
-					if v183[t5.Input .. "DeviceFrame"] then
-						v183[t5.Input .. "DeviceFrame"].Visible = v1209
-					end
-
-					if GetFFlagEnableConnectDisconnectInSettingsAndChrome() and v183.VoiceConnectFrame then
-						v183.VoiceConnectFrame.Visible = true
-					end
-
-					if GetFFlagEnableConnectDisconnectInSettingsAndChrome() and v183.VoiceDisconnectFrame then
-						v183.VoiceDisconnectFrame.Visible = false
-					end
-				end)
-			end):catch(function() -- line: 4376
-				-- upvalues: GetFFlagVoiceChatUILogging (copy), v128 (copy), GetFFlagEnableUniveralVoiceToasts (copy), default3 (copy)
+			end):catch(function()
 				if GetFFlagVoiceChatUILogging() then
-					v128:warning("Failed to init VoiceChatServiceManager")
+					v10:warning("Failed to init VoiceChatServiceManager")
 				end
 
 				if not GetFFlagEnableUniveralVoiceToasts() then
@@ -5104,131 +5275,104 @@ local function Initialize() -- line: 473
 		end)
 	end
 
-	if GetFFlagEnableCrossExpVoice() and (not isInExperienceUIVREnabled or not isSpatial()) then
-		connection4 = default4.ExperienceJoined.Event:Connect(function() -- line: 4389
-			-- upvalues: v183 (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy), t5 (copy)
-			local v750 = v183.VoiceChatOptionsEnabled or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
+	if GetFFlagEnableCrossExpVoice() and not (isInExperienceUIVREnabled and isSpatial()) then
+		eventConnection = default4.ExperienceJoined.Event:Connect(function()
+			local voiceChatOptionsEnabled = newPage.VoiceChatOptionsEnabled
+				or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
 
-			if v183[t5.Input .. "DeviceFrame"] then
-				v183[t5.Input .. "DeviceFrame"].Visible = v750
+			if newPage[v7.Input .. "DeviceFrame"] then
+				newPage[v7.Input .. "DeviceFrame"].Visible = voiceChatOptionsEnabled
 			end
 		end)
-		connection5 = default4.ExperienceLeft.Event:Connect(function() -- line: 4392
-			-- upvalues: v183 (copy), GetFFlagEnableCrossExpVoice (copy), default4 (copy), t5 (copy)
-			local v751 = v183.VoiceChatOptionsEnabled or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
+		eventConnection2 = default4.ExperienceLeft.Event:Connect(function()
+			local voiceChatOptionsEnabled = newPage.VoiceChatOptionsEnabled
+				or GetFFlagEnableCrossExpVoice() and default4:getIsConnected()
 
-			if v183[t5.Input .. "DeviceFrame"] then
-				v183[t5.Input .. "DeviceFrame"].Visible = v751
+			if newPage[v7.Input .. "DeviceFrame"] then
+				newPage[v7.Input .. "DeviceFrame"].Visible = voiceChatOptionsEnabled
 			end
 		end)
-
-		function u245() -- line: 4395
-			-- upvalues: connection4 (ref), connection5 (ref)
-			if connection4 then
-				connection4:Disconnect()
-				connection4 = nil
+		fn = function()
+			if eventConnection then
+				eventConnection:Disconnect()
+				eventConnection = nil
 			end
 
-			if connection5 then
-				connection5:Disconnect()
-				connection5 = nil
+			if eventConnection2 then
+				eventConnection2:Disconnect()
+				eventConnection2 = nil
 			end
 		end
 	end
 
-	v183.VideoOptionsEnabled = false
+	newPage.VideoOptionsEnabled = false
+	local connection = nil
 
-	local u246 = nil
-
-	if GetFFlagSelfViewCameraSettings() and (not isInExperienceUIVREnabled or not isSpatial()) and isCamEnabledForUserAndPlace() then
-		getCamMicPermissions(function(p134) -- line: 4417
-			-- upvalues: v183 (copy)
-			v183.VideoOptionsEnabled = p134.hasCameraPermissions
-		end, { default.Permissions.CAMERA_ACCESS }, true)
-
-		if u246 then
-			u246:disconnect()
+	if GetFFlagSelfViewCameraSettings() and not (isInExperienceUIVREnabled and isSpatial()) then
+		local function fn2(p)
+			newPage.VideoOptionsEnabled = p.hasCameraPermissions
 		end
 
-		u246 = cameraDevicePermissionGrantedSignal:connect(function() -- line: 4433
-			-- upvalues: v183 (copy), updateCameraDevices (copy), VideoCaptureService (copy), connection2 (ref)
-			v183.VideoOptionsEnabled = true
-			updateCameraDevices()
+		if isCamEnabledForUserAndPlace() then
+			getCamMicPermissions(fn2, { default.Permissions.CAMERA_ACCESS }, true)
 
-			if VideoCaptureService.DevicesChanged then
-				connection2 = VideoCaptureService.DevicesChanged:Connect(function() -- line: 3656
-					-- upvalues: v183 (copy), updateCameraDevices (copy)
-					if v183.PageOpen then
-						updateCameraDevices()
-					end
-				end)
+			if connection then
+				connection:disconnect()
 			end
-		end)
+
+			connection = cameraDevicePermissionGrantedSignal:connect(function()
+				newPage.VideoOptionsEnabled = true
+				updateCameraDevices()
+				setupVideoCameraDeviceChangedListener() -- inferred equivalent call
+			end)
+		end
 	end
 
 	if not isInExperienceUIVREnabled then
-		createCameraModeOptions(not v118 and (UserInputService.TouchEnabled or (UserInputService.MouseEnabled or UserInputService.KeyboardEnabled)))
+		createCameraModeOptions(not isEnabled and (UserInputService.TouchEnabled or UserInputService.MouseEnabled or UserInputService.KeyboardEnabled))
+	end
+
+	local function fn2() -- 2 equivalent calls inferred from this helper
+		if gameSettings.IsUsingGamepadCameraSensitivity then
+			createGamepadOptions()
+			return
+		end
+
+		local isUsingGamepadCameraSensitivityChangedConnection = nil
+		isUsingGamepadCameraSensitivityChangedConnection = gameSettings:GetPropertyChangedSignal("IsUsingGamepadCameraSensitivity"):connect(function()
+			if gameSettings.IsUsingGamepadCameraSensitivity then
+				if isUsingGamepadCameraSensitivityChangedConnection then
+					isUsingGamepadCameraSensitivityChangedConnection:disconnect()
+				end
+
+				createGamepadOptions()
+			end
+		end)
 	end
 
 	if UserInputService.MouseEnabled then
 		createMouseOptions()
 	elseif UserInputService.GamepadEnabled then
-		if GameSettings.IsUsingGamepadCameraSensitivity then
-			createGamepadOptions()
-		else
-			local u247 = nil
-
-			u247 = GameSettings:GetPropertyChangedSignal("IsUsingGamepadCameraSensitivity"):connect(function() -- line: 4455
-				-- upvalues: GameSettings (copy), u247 (ref), createGamepadOptions (copy)
-				if GameSettings.IsUsingGamepadCameraSensitivity then
-					if u247 then
-						u247:disconnect()
-					end
-
-					createGamepadOptions()
-				end
-			end)
-		end
+		fn2() -- inferred equivalent call
 	else
-		local u248 = nil
-
-		u248 = UserInputService.GamepadConnected:connect(function() -- line: 4473
-			-- upvalues: u248 (ref), GameSettings (copy), createGamepadOptions (copy)
-			if u248 then
-				u248:disconnect()
+		local gamepadConnectedConnection = nil
+		gamepadConnectedConnection = UserInputService.GamepadConnected:connect(function()
+			if gamepadConnectedConnection then
+				gamepadConnectedConnection:disconnect()
 			end
 
-			if GameSettings.IsUsingGamepadCameraSensitivity then
-				createGamepadOptions()
-
-				return
-			end
-
-			local u754 = nil
-
-			u754 = GameSettings:GetPropertyChangedSignal("IsUsingGamepadCameraSensitivity"):connect(function() -- line: 4455
-				-- upvalues: GameSettings (copy), u754 (ref), createGamepadOptions (copy)
-				if GameSettings.IsUsingGamepadCameraSensitivity then
-					if u754 then
-						u754:disconnect()
-					end
-
-					createGamepadOptions()
-				end
-			end)
+			fn2() -- inferred equivalent call
 		end)
 	end
 
 	if not isInExperienceUIVREnabled then
-		if GameSettings.IsUsingCameraYInverted then
+		if gameSettings.IsUsingCameraYInverted then
 			createCameraInvertedOptions()
 		else
-			local u249 = nil
-
-			u249 = GameSettings.Changed:connect(function(p135) -- line: 4487
-				-- upvalues: GameSettings (copy), u249 (ref), createCameraInvertedOptions (copy)
-				if p135 == "IsUsingCameraYInverted" and GameSettings.IsUsingCameraYInverted then
-					u249:disconnect()
+			local changedConnection = nil
+			changedConnection = gameSettings.Changed:connect(function(p)
+				if p == "IsUsingCameraYInverted" and gameSettings.IsUsingCameraYInverted then
+					changedConnection:disconnect()
 					createCameraInvertedOptions()
 				end
 			end)
@@ -5240,17 +5384,15 @@ local function Initialize() -- line: 473
 			createVRComfortSettingOptions()
 			createVRSafetyBubbleModeOptions()
 		else
-			createCameraModeOptions(not v118 and (UserInputService.TouchEnabled or (UserInputService.MouseEnabled or UserInputService.KeyboardEnabled)))
+			createCameraModeOptions(not isEnabled and (UserInputService.TouchEnabled or UserInputService.MouseEnabled or UserInputService.KeyboardEnabled))
 
-			if GameSettings.IsUsingCameraYInverted then
+			if gameSettings.IsUsingCameraYInverted then
 				createCameraInvertedOptions()
 			else
-				local u250 = nil
-
-				u250 = GameSettings.Changed:connect(function(p136) -- line: 4516
-					-- upvalues: GameSettings (copy), u250 (ref), createCameraInvertedOptions (copy)
-					if p136 == "IsUsingCameraYInverted" and GameSettings.IsUsingCameraYInverted then
-						u250:disconnect()
+				local changedConnection = nil
+				changedConnection = gameSettings.Changed:connect(function(p)
+					if p == "IsUsingCameraYInverted" and gameSettings.IsUsingCameraYInverted then
+						changedConnection:disconnect()
 						createCameraInvertedOptions()
 					end
 				end)
@@ -5267,42 +5409,44 @@ local function Initialize() -- line: 473
 		createVoiceChatVolumeOptions()
 	end
 
-	if v71 and FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider then
-		local u251 = false
+	if
+		fFlagVoiceVolumeControlsEnableVoiceVolumeImpressionsTelemetry
+		and FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider
+	then
+		local v19 = false
 
-		v183.Displayed.Event:Connect(function() -- line: 4539
-			-- upvalues: u251 (ref), v183 (copy), default3 (copy)
-			u251 = true
+		newPage.Displayed.Event:Connect(function()
+			v19 = true
 
-			if v183.VoiceChatVolumeFrame and v183.VoiceChatVolumeFrame.Visible then
+			if newPage.VoiceChatVolumeFrame and newPage.VoiceChatVolumeFrame.Visible then
 				default3:RecordGameSettingsOpened()
 			end
 		end)
-		v183.Hidden.Event:Connect(function() -- line: 4546
-			-- upvalues: u251 (ref)
-			u251 = false
+
+		newPage.Hidden.Event:Connect(function()
+			v19 = false
 		end)
-		v183.VoiceChatVolumeFrame:GetPropertyChangedSignal("Visible"):Connect(function() -- line: 4550
-			-- upvalues: v183 (copy), u251 (ref), default3 (copy)
-			if v183.VoiceChatVolumeFrame.Visible and u251 then
+
+		newPage.VoiceChatVolumeFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+			if newPage.VoiceChatVolumeFrame.Visible and v19 then
 				default3:RecordGameSettingsOpened()
 			end
 		end)
 	end
 
-	if v78 then
+	if v2 then
 		createPartyVoiceVolumeOptions()
 	end
 
 	createHapticsToggle()
 	createGraphicsOptions()
 
-	if v46 and GetFFlagEnablePlayerNamesEnabledSetting() then
+	if defineFastFlag and GetFFlagEnablePlayerNamesEnabledSetting() then
 		createPlayerNamesEnabledOptions()
 	end
 
 	if game:GetEngineFeature("InExperiencePlayerChoiceToggle") then
-		PlayerChoiceTranslationSettingInitializer(v183, SETTINGS_MENU_LAYOUT_ORDER, reportSettingsChangeForAnalytics)
+		PlayerChoiceTranslationSettingInitializer(newPage, SETTINGS_MENU_LAYOUT_ORDER, reportSettingsChangeForAnalytics)
 	end
 
 	if not isInExperienceUIVREnabled then
@@ -5311,51 +5455,29 @@ local function Initialize() -- line: 473
 	end
 
 	createPreferredTextSizeOptions()
+
+	if FFlagUIScaleEngineOptions then
+		createUIScaleRows()
+	elseif engineFeature3 then
+		createUIScaleOptions() -- inferred equivalent call
+	end
+
 	createUiNavigationKeyBindOptions()
 
 	if not CachedPolicyService:IsSubjectToChinaPolicies() then
 		createPerformanceStatsOptions()
 	end
 
-	if v133 then
+	if v11 then
 		createMicroProfilerOptions()
 	end
 
-	if v118 and getAppFeaturePolicies().getSupportsOverscan() then
+	if isEnabled and getAppFeaturePolicies().getSupportsOverscan() then
 		createOverscanOption()
 	end
 
-	if v46 and FFlagBadgeVisibilitySettingEnabled then
-		spawn(function() -- line: 3169
-			-- upvalues: PlayerPermissionsModule (copy), LocalPlayer (copy), RobloxTranslator (copy), v151 (copy), v183 (copy), Utility (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), GameSettings (copy)
-			local n15 = 2
-
-			if PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(LocalPlayer) then
-				n15 = 1
-			end
-
-			local v758 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Show")
-			local v759 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Hide")
-			local v760 = if not v151 then RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.DisplayBadges") else RobloxTranslator:FormatByKey("Feature.SettingsHub.GameSettings.MyBadges")
-			local v761 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Description.PeoplesNames")
-			local v762 = v183
-			local v763 = v183
-			local v764 = v183
-			local v765, v766, v767 = Utility:AddNewRow(v183, v760, "Selector", {
-				v759,
-				v758
-			}, n15, nil, v761)
-
-			v762.badgeVisibleRow = v765
-			v763.badgeVisibleFrame = v766
-			v764.badgeVisibleSelector = v767
-			v183.badgeVisibleRow.LayoutOrder = SETTINGS_MENU_LAYOUT_ORDER.BadgeVisibilityFrame
-			v183.badgeVisibleSelector.IndexChanged:connect(function(p137) -- line: 3183
-				-- upvalues: GameSettings (copy), PlayerPermissionsModule (copy), LocalPlayer (copy)
-				GameSettings.BadgeVisible = p137 == 2
-				PlayerPermissionsModule.SetPlayerInExperienceNameEnabled(LocalPlayer, p137 == 1)
-			end)
-		end)
+	if defineFastFlag and FFlagBadgeVisibilitySettingEnabled then
+		createBadgeVisibilityOptions() -- inferred equivalent call
 	end
 
 	if FFlagEnableModerateChatRemoteEvent then
@@ -5370,211 +5492,241 @@ local function Initialize() -- line: 473
 		createChatSummariesSettingOptions()
 	end
 
+	if fFlagExpChatDictation then
+		createVoiceTypingModeSettingOptions()
+	end
+
 	if FFlagExpChatEnableFriendsTab then
 		createChatNotificationsSettingOptions()
 	end
 
 	createDeveloperConsoleOption()
-	GetHasGuiHidingPermission(RunService:IsStudio(), LocalPlayer, PlayerPermissionsModule):andThen(function(p138) -- line: 4615
-		-- upvalues: createUiToggleOptions (copy)
-		if p138 then
+
+	GetHasGuiHidingPermission(RunService:IsStudio(), LocalPlayer, PlayerPermissionsModule):andThen(function(p)
+		if p then
 			createUiToggleOptions()
 		end
-	end):catch(function(p139) -- line: 4620
-		warn(p139)
+	end):catch(function(p)
+		warn(p)
 	end)
-	u184 = true
+
+	v14 = true
 
 	if VRService.VREnabled then
-		local VREnabled = VRService.VREnabled
+		onVRSettingsReady() -- inferred equivalent call
+	end
 
-		for k, __ in pairs(t10) do
-			k.Visible = not VREnabled
-		end
+	if renderMoreSettingsBanner then
+		newPage.MoreSettingsBanner = renderMoreSettingsBanner({
+			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.MoreSettingsBanner,
+			parent = newPage.Page
+		})
 	end
 
 	if FFlagIEMSettingsGroups then
-		v183.AudioHeader = renderSettingsHeader({
+		newPage.AudioHeader = renderSettingsHeader({
 			headerText = "CoreScripts.InGameMenu.GameSettings.AudioHeader",
 			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AudioHeader,
-			parent = v183.Page
+			parent = newPage.Page
 		})
-		v183.AudioDivider = renderSettingsDivider({
+
+		newPage.AudioDivider = renderSettingsDivider({
 			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.AudioDivider,
-			parent = v183.Page
+			parent = newPage.Page
 		})
-		v183.DisplayHeader = renderSettingsHeader({
+
+		newPage.DisplayHeader = renderSettingsHeader({
 			headerText = "CoreScripts.InGameMenu.GameSettings.DisplayHeader",
 			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DisplayHeader,
-			parent = v183.Page
+			parent = newPage.Page
 		})
-		v183.DisplayDivider = renderSettingsDivider({
+
+		newPage.DisplayDivider = renderSettingsDivider({
 			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.DisplayDivider,
-			parent = v183.Page
+			parent = newPage.Page
 		})
 
 		if not isSpatial() then
-			v183.LanguageHeader = renderSettingsHeader({
+			newPage.LanguageHeader = renderSettingsHeader({
 				headerText = "CoreScripts.InGameMenu.GameSettings.LanguageHeader",
 				layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageHeader,
-				parent = v183.Page
+				parent = newPage.Page
 			})
-			v183.LanguageDivider = renderSettingsDivider({
+
+			newPage.LanguageDivider = renderSettingsDivider({
 				layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.LanguageDivider,
-				parent = v183.Page
+				parent = newPage.Page
 			})
 		end
 
-		v183.ViewAndControlsHeader = renderSettingsHeader({
+		newPage.ViewAndControlsHeader = renderSettingsHeader({
 			headerText = "CoreScripts.InGameMenu.GameSettings.ViewandControlsHeader",
 			layoutOrder = SETTINGS_MENU_LAYOUT_ORDER.ViewAndControlsHeader,
-			parent = v183.Page
+			parent = newPage.Page
 		})
 	end
 
-	v183.TabHeader.Name = "GameSettingsTab"
+	newPage.TabHeader.Name = "GameSettingsTab"
+	local iconscommonsettings = Migration.uiblox["icons/common/settings"]
+	newPage.TabHeader.TabLabel.Icon.Text = iconscommonsettings.name
+	newPage.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[iconscommonsettings.variant]
+	newPage.TabHeader.TabLabel.Title.Text = "Settings"
 
-	local v255 = Migration.uiblox["icons/common/settings"]
+	newPage.Page.ZIndex = 5
 
-	v183.TabHeader.TabLabel.Icon.Text = v255.name
-	v183.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v255.variant]
-	v183.TabHeader.TabLabel.Title.Text = "Settings"
-	v183.Page.ZIndex = 5
-
-	if v183.PageListLayout then
-		v183.PageListLayout.Padding = UDim.new(0, 0)
+	if newPage.PageListLayout then
+		newPage.PageListLayout.Padding = UDim.new(0, 0)
 	end
 
-	v183.PageOpen = false
+	newPage.PageOpen = false
 
 	if game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled") then
-		v183.FeedbackEntryPointEnabled = true
+		newPage.FeedbackEntryPointEnabled = true
 	end
 
-	local function staticFeedbackEntryPointChecksPassed() -- line: 4689
-		-- upvalues: RunService (copy), v144 (copy), v118 (copy)
+	local function staticFeedbackEntryPointChecksPassed(): boolean -- 1 equivalent call inferred from this helper
 		if RunService:IsStudio() then
 			return false
 		end
 
-		if game:GetEngineFeature("CaptureModeEnabled") == false then
-			return false
-		end
-
-		if v144 and v118 then
-			return false
-		end
-
-		return true
+		return game:GetEngineFeature("CaptureModeEnabled") ~= false and not (defineFastFlag20 and isEnabled)
 	end
 
-	function v183.OpenSettingsPage() -- line: 4705
-		-- upvalues: v183 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), GetFFlagLazyInitiateExperienceLanguageSwitcher (copy), GetFFlagEnableLocalesForExperienceLanguageSwitcher (copy), ExperienceLanguageSwitcherInitializer (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), reportSettingsChangeForAnalytics (copy), updateAudioOptions (copy), SoundService (copy), connection (ref), GameSettings (copy), FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast (copy), FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider (copy), GetFFlagSelfViewCameraSettings (copy), updateCameraDevices (copy), VideoCaptureService (copy), connection2 (ref), updateUiToggleSelection (copy), ExperienceStateCaptureService (ref), v90 (copy), Theme (copy), v89 (copy), FFlagIEMFocusNavToButtons (copy), getLastValueChangerFrame (copy), FFlagIEMTabFocusNav (copy), getFirstValueChangerFrame (copy)
-		v183.PageOpen = true
+	function newPage.OpenSettingsPage()
+		newPage.PageOpen = true
 
 		if isInExperienceUIVREnabled and isSpatial() then
 			return
 		end
 
-		if GetFFlagLazyInitiateExperienceLanguageSwitcher() and not v183.LanguageSwitcherInitialized and isLangaugeSelectionDropdownEnabled() and GetFFlagEnableLocalesForExperienceLanguageSwitcher() then
-			v183.LanguageSwitcherInitialized = true
-			ExperienceLanguageSwitcherInitializer(v183, SETTINGS_MENU_LAYOUT_ORDER, reportSettingsChangeForAnalytics)
+		if FFlagUIScaleEngineOptions then
+			refreshUIScaleRows()
+		elseif engineFeature3 then
+			createUIScaleOptions() -- inferred equivalent call
+		end
+
+		if
+			GetFFlagLazyInitiateExperienceLanguageSwitcher()
+			and not newPage.LanguageSwitcherInitialized
+			and isLangaugeSelectionDropdownEnabled()
+			and GetFFlagEnableLocalesForExperienceLanguageSwitcher()
+		then
+			newPage.LanguageSwitcherInitialized = true
+			ExperienceLanguageSwitcherInitializer(newPage, SETTINGS_MENU_LAYOUT_ORDER, reportSettingsChangeForAnalytics)
 		end
 
 		updateAudioOptions()
+		setupDeviceChangedListener() -- inferred equivalent call
 
-		if SoundService.DeviceListChanged then
-			connection = SoundService.DeviceListChanged:Connect(function() -- line: 3646
-				-- upvalues: v183 (copy), updateAudioOptions (copy)
-				if v183.PageOpen then
-					updateAudioOptions()
-				end
-			end)
+		if engineFeature3 then
+			setupUIScaleViewportChangedListener()
 		end
 
-		v183.startVolume = GameSettings.MasterVolume
+		newPage.startVolume = gameSettings.MasterVolume
 
-		if FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast and FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider then
-			v183.maxVoiceChatVolumeDuringSession = GameSettings.VoiceChatVolume
+		if
+			FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast
+			and FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider
+		then
+			newPage.maxVoiceChatVolumeDuringSession = gameSettings.VoiceChatVolume
 		end
 
-		if GetFFlagSelfViewCameraSettings() and v183.VideoOptionsEnabled and game:GetEngineFeature("VideoCaptureService") then
+		if
+			GetFFlagSelfViewCameraSettings()
+			and newPage.VideoOptionsEnabled
+			and game:GetEngineFeature("VideoCaptureService")
+		then
 			updateCameraDevices()
-
-			if VideoCaptureService.DevicesChanged then
-				connection2 = VideoCaptureService.DevicesChanged:Connect(function() -- line: 3656
-					-- upvalues: v183 (copy), updateCameraDevices (copy)
-					if v183.PageOpen then
-						updateCameraDevices()
-					end
-				end)
-			end
+			setupVideoCameraDeviceChangedListener() -- inferred equivalent call
 		end
 
 		updateUiToggleSelection()
 
-		if game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled") and v183.toggleFeedbackModeButton and v183.toggleFeedbackModeText then
-			v183.FeedbackEntryPointEnabled = ExperienceStateCaptureService ~= nil and ExperienceStateCaptureService:CanEnterCaptureMode()
+		if
+			game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled")
+			and newPage.toggleFeedbackModeButton
+			and newPage.toggleFeedbackModeText
+		then
+			newPage.FeedbackEntryPointEnabled = ExperienceStateCaptureService ~= nil
+				and ExperienceStateCaptureService:CanEnterCaptureMode()
 
-			if v183.FeedbackEntryPointEnabled then
-				v183.toggleFeedbackModeButton.Active = true
-				v183.toggleFeedbackModeButton.Enabled.Value = true
-				v183.toggleFeedbackModeText.Text = v90
+			if newPage.FeedbackEntryPointEnabled then
+				newPage.toggleFeedbackModeButton.Active = true
+				newPage.toggleFeedbackModeButton.Enabled.Value = true
+				newPage.toggleFeedbackModeText.Text = formatByKey3
 			else
-				v183.toggleFeedbackModeButton.Active = false
-				v183.toggleFeedbackModeButton.Enabled.Value = false
-				v183.toggleFeedbackModeText.TextColor3 = Theme.color("ButtonNonInteractable", Color3.fromRGB(100, 100, 100))
-				v183.toggleFeedbackModeText.Text = v89
+				newPage.toggleFeedbackModeButton.Active = false
+				newPage.toggleFeedbackModeButton.Enabled.Value = false
+				newPage.toggleFeedbackModeText.TextColor3 = Theme.color(
+					"ButtonNonInteractable",
+					Color3.fromRGB(100, 100, 100)
+				)
+				newPage.toggleFeedbackModeText.Text = formatByKey2
 			end
 		end
 
-		if FFlagIEMFocusNavToButtons then
-			table.insert(v183.LastSelectableObjects, getLastValueChangerFrame(v183))
-		end
+		table.insert(newPage.LastSelectableObjects, getLastValueChangerFrame(newPage))
 
 		if FFlagIEMTabFocusNav then
-			table.insert(v183.FirstSelectableObjects, getFirstValueChangerFrame(v183))
-			v183.FirstSelectableObjectsUpdated:fire()
+			table.insert(newPage.FirstSelectableObjects, getFirstValueChangerFrame(newPage))
+			newPage.FirstSelectableObjectsUpdated:fire()
 		end
 	end
-	function v183.CloseSettingsPage() -- line: 4776
-		-- upvalues: v183 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), SoundService (copy), connection (ref), GetFFlagEnableCrossExpVoice (copy), u245 (ref), GetFFlagSelfViewCameraSettings (copy), VideoCaptureService (copy), connection2 (ref), u246 (ref), default3 (copy), FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast (copy), FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider (copy)
-		v183.PageOpen = false
+
+	local function fn3() -- 1 equivalent call inferred from this helper
+		if connection then
+			connection:disconnect()
+			connection = nil
+		end
+	end
+
+	function newPage.CloseSettingsPage()
+		newPage.PageOpen = false
 
 		if isInExperienceUIVREnabled and isSpatial() then
 			return
 		end
 
-		if SoundService.DeviceListChanged and connection then
-			connection:Disconnect()
+		teardownDeviceChangedListener() -- inferred equivalent call
+
+		if engineFeature3 then
+			teardownUIScaleViewportChangedListener() -- inferred equivalent call
 		end
 
-		if GetFFlagEnableCrossExpVoice() and u245 then
-			u245()
+		if GetFFlagEnableCrossExpVoice() and fn then
+			fn()
 		end
 
 		if GetFFlagSelfViewCameraSettings() then
-			if game:GetEngineFeature("VideoCaptureService") and VideoCaptureService.DevicesChanged and connection2 then
-				connection2:Disconnect()
-				connection2 = nil
+			if game:GetEngineFeature("VideoCaptureService") then
+				teardownVideoCameraDeviceChangedListener() -- inferred equivalent call
 			end
 
-			if u246 then
-				u246:disconnect()
-				u246 = nil
-			end
+			fn3() -- inferred equivalent call
 		end
 
-		if game:GetEngineFeature("VoiceChatSupported") and v183.VoiceChatOptionsEnabled and v183.startVolume ~= nil and v183.startVolume > 0 then
+		if
+			game:GetEngineFeature("VoiceChatSupported")
+			and newPage.VoiceChatOptionsEnabled
+			and newPage.startVolume ~= nil
+			and newPage.startVolume > 0
+		then
 			default3:CheckAndShowNotAudiblePrompt()
 		end
 
-		if game:GetEngineFeature("VoiceChatSupported") and v183.VoiceChatOptionsEnabled and FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast and FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider and v183.maxVoiceChatVolumeDuringSession ~= nil and v183.maxVoiceChatVolumeDuringSession > 0 then
+		if
+			game:GetEngineFeature("VoiceChatSupported")
+			and newPage.VoiceChatOptionsEnabled
+			and FFlagVoiceVolumeControlsEnableNotAudibleVoiceChatVolumeToast
+			and FFlagVoiceVolumeControlsEnableVoiceChatVolumeSlider
+			and newPage.maxVoiceChatVolumeDuringSession ~= nil
+			and newPage.maxVoiceChatVolumeDuringSession > 0
+		then
 			default3:ShowNotAudiblePromptVoiceChatVolume()
 		end
 	end
-	function isLangaugeSelectionDropdownEnabled() -- line: 4820
-		-- upvalues: LocalPlayer (copy)
+
+	function isLangaugeSelectionDropdownEnabled(): boolean
 		if game:GetEngineFeature("EnableSetExperienceSettingsLocaleIdApi") ~= true then
 			return false
 		end
@@ -5583,17 +5735,17 @@ local function Initialize() -- line: 473
 			return true
 		end
 
-		for match in game:GetFastString("V1MenuLanguageSelectionFeatureForcedUserIds"):gmatch("%d+") do
-			if tonumber(match) == LocalPlayer.UserId then
+		for k in game:GetFastString("V1MenuLanguageSelectionFeatureForcedUserIds"):gmatch("%d+") do
+			if tonumber(k) == LocalPlayer.UserId then
 				return true
 			end
 		end
 
 		return false
 	end
-	function v183.SetHub(__, p141) -- line: 4843
-		-- upvalues: v183 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), GetFFlagEnableLocalesForExperienceLanguageSwitcher (copy), GetFFlagLazyInitiateExperienceLanguageSwitcher (copy), ExperienceLanguageSwitcherInitializer (copy), SETTINGS_MENU_LAYOUT_ORDER (copy), reportSettingsChangeForAnalytics (copy), createTranslationOptions (copy), GetFFlagChatTranslationSettingEnabled (copy), GetFFlagChatTranslationHoldoutEnabled (copy), GetFStringChatTranslationLayerName (copy), getChatTranslationLayerData (copy), EngineFeature (copy), GetFFlagChatTranslationNewDefaults (copy), GameSettings (copy), TextChatService (copy), GetFFlagChatTranslationForceSetting (copy), ChatTranslationOptionsWithChatLanguageSwitcherInitializer (copy), RunService (copy), v144 (copy), v118 (copy), createFeedbackModeOptions (copy)
-		v183.HubRef = p141
+
+	function newPage.SetHub(p, hubRef)
+		newPage.HubRef = hubRef
 
 		if isInExperienceUIVREnabled and isSpatial() then
 			return
@@ -5602,7 +5754,11 @@ local function Initialize() -- line: 473
 		if isLangaugeSelectionDropdownEnabled() then
 			if GetFFlagEnableLocalesForExperienceLanguageSwitcher() then
 				if not GetFFlagLazyInitiateExperienceLanguageSwitcher() then
-					ExperienceLanguageSwitcherInitializer(v183, SETTINGS_MENU_LAYOUT_ORDER, reportSettingsChangeForAnalytics)
+					ExperienceLanguageSwitcherInitializer(
+						newPage,
+						SETTINGS_MENU_LAYOUT_ORDER,
+						reportSettingsChangeForAnalytics
+					)
 				end
 			else
 				createTranslationOptions()
@@ -5611,38 +5767,38 @@ local function Initialize() -- line: 473
 
 		if game:GetEngineFeature("EnableTCSChatTranslation") and GetFFlagChatTranslationSettingEnabled() then
 			if GetFFlagChatTranslationHoldoutEnabled() then
-				local v773 = GetFStringChatTranslationLayerName()
-
-				if not getChatTranslationLayerData(v773).ChatTranslationEnabled then
-					if EngineFeature then
-						if GetFFlagChatTranslationNewDefaults() then
-							if GameSettings.ChatTranslationLocale == "" then
-								GameSettings.ChatTranslationEnabled = false
-								GameSettings.ChatTranslationLocale = "en_us"
-							end
-						else
-							GameSettings.ChatTranslationEnabled = false
+				if getChatTranslationLayerData(GetFStringChatTranslationLayerName()).ChatTranslationEnabled then
+					if GetFFlagChatTranslationForceSetting() then
+						gameSettings.ChatTranslationEnabled = true
+					end
+				elseif engineFeature then
+					if GetFFlagChatTranslationNewDefaults() then
+						if gameSettings.ChatTranslationLocale == "" then
+							gameSettings.ChatTranslationEnabled = false
+							gameSettings.ChatTranslationLocale = "en_us"
 						end
 					else
-						pcall(function() -- line: 4881
-							-- upvalues: TextChatService (copy)
-							TextChatService.ChatTranslationEnabled = false
-						end)
+						gameSettings.ChatTranslationEnabled = false
 					end
-				elseif GetFFlagChatTranslationForceSetting() then
-					GameSettings.ChatTranslationEnabled = true
+				else
+					pcall(function()
+						TextChatService.ChatTranslationEnabled = false
+					end)
 				end
 			end
 
-			ChatTranslationOptionsWithChatLanguageSwitcherInitializer(v183, SETTINGS_MENU_LAYOUT_ORDER, reportSettingsChangeForAnalytics)
+			ChatTranslationOptionsWithChatLanguageSwitcherInitializer(
+				newPage,
+				SETTINGS_MENU_LAYOUT_ORDER,
+				reportSettingsChangeForAnalytics
+			)
 		end
 
-		if not RunService:IsStudio() and (game:GetEngineFeature("CaptureModeEnabled") ~= false and (not v144 or not v118)) then
+		if staticFeedbackEntryPointChecksPassed() then -- inferred equivalent call
 			createFeedbackModeOptions()
 		end
 	end
-
-	return v183
+	return newPage
 end
 
-return (Initialize())
+return Initialize()

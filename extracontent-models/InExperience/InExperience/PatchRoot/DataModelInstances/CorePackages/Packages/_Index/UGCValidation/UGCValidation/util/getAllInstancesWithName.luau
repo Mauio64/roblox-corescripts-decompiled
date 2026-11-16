@@ -1,15 +1,14 @@
-return function(p1, s1: string) -- line: 1
-	local descendants = p1:GetDescendants()
+return function(folder, p: string)
+	local descendants = folder:GetDescendants()
+	table.insert(descendants, folder)
 
-	table.insert(descendants, p1)
+	local descendants2 = {}
 
-	local t1 = {}
-
-	for _, v6 in descendants do
-		if s1 == v6.Name then
-			table.insert(t1, v6)
+	for _, descendant in descendants do
+		if descendant.Name == p then
+			table.insert(descendants2, descendant)
 		end
 	end
 
-	return t1
+	return descendants2
 end

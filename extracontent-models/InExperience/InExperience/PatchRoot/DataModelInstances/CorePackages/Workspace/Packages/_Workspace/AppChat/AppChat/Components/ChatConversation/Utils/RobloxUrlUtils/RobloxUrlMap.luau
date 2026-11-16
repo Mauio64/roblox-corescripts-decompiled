@@ -1,94 +1,87 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Regex = require(AppChatParent.UrlMatching).Regex
-local FFlagAppChatResolveShareLinkV2 = require(AppChat.Flags.FFlagAppChatResolveShareLinkV2)
-local t1 = { "ExperienceDetails" }
+local parent = AppChat.Parent
 
-local function createGameLinkMessage(t2: {[any]: any}) -- line: 16
+local UrlMatching = require(parent.UrlMatching)
+
+local Regex = UrlMatching.Regex
+
+local FFlagAppChatResolveShareLinkV2 = require(AppChat.Flags.FFlagAppChatResolveShareLinkV2)
+local FFlagAppChatPlusReferralAssetCard = require(AppChat.Flags.FFlagAppChatPlusReferralAssetCard)
+local FFlagAppChatEarlyTestingLinks = require(AppChat.Flags.FFlagAppChatEarlyTestingLinks)
+
+local v = { "ExperienceDetails" }
+
+local function createGameLinkMessage(p)
 	return {
-		placeId = t2.id
+		placeId = p.id,
+		isEarlyTesting = FFlagAppChatEarlyTestingLinks and p.isEarlyTesting == "true" and true or nil
 	}
 end
-local function createShareLinkMessage(t3: {[any]: any}) -- line: 22
-	-- upvalues: FFlagAppChatResolveShareLinkV2 (copy)
-	if FFlagAppChatResolveShareLinkV2 then
-		if t3.v == "v2" then
-			return {
-				shareLink = {
-					version = 2,
-					linkId = t3.code
-				}
-			}
-		end
 
-		if t3.type then
-			return {
-				shareLink = {
-					version = 1,
-					linkId = t3.code,
-					linkType = t3.type
-				}
-			}
-		end
-
-		return nil
+local function createShareLinkMessage(data)
+	if not FFlagAppChatResolveShareLinkV2 then
+		return {
+			shareLink = { linkId = data.code, linkType = data.type }
+		}
 	end
 
-	return {
-		shareLink = {
-			linkId = t3.code,
-			linkType = t3.type
+	if data.v == "v2" then
+		return {
+			shareLink = { linkId = data.code, version = 2 }
 		}
-	}
+	end
+
+	if data.type then
+		return {
+			shareLink = { linkId = data.code, linkType = data.type, version = 1 }
+		}
+	end
+
+	return nil
 end
 
-local v8 = if not FFlagAppChatResolveShareLinkV2 then {
-	{
-		name = "code",
-		pattern = "[a-fA-F0-9]+"
-	},
-	{
-		name = "type",
-		pattern = Regex.oneOf(t1)
+local queryParams
+
+if FFlagAppChatResolveShareLinkV2 then
+	queryParams = {
+		{ name = "code", pattern = "[a-fA-F0-9-]+" },
+		{ name = "type", pattern = Regex.oneOf(v), optional = true },
+		{
+			name = "v",
+			pattern = Regex.oneOf({ "v2" }),
+			optional = true
+		}
 	}
-} else {
-	{
-		name = "code",
-		pattern = "[a-fA-F0-9-]+"
-	},
-	{
-		name = "type",
-		optional = true,
-		pattern = Regex.oneOf(t1)
-	},
-	{
-		name = "v",
-		optional = true,
-		pattern = Regex.oneOf({ "v2" })
+else
+	queryParams = {
+		{ name = "code", pattern = "[a-fA-F0-9]+" },
+		{ name = "type", pattern = Regex.oneOf(v) }
 	}
-}
+end
 
 return {
 	["/games"] = {
 		pathParams = {
-			{
-				name = "path",
-				pattern = "games"
-			},
-			{
-				name = "id",
-				pattern = "[0-9]+"
-			},
-			{
-				name = "name",
-				pattern = "[a-zA-Z0-9_-]+",
-				optional = true
-			}
+			{ name = "path", pattern = "games" },
+			{ name = "id", pattern = "[0-9]+" },
+			{ name = "name", pattern = "[a-zA-Z0-9_-]+", optional = true }
 		},
+		queryParams = FFlagAppChatEarlyTestingLinks and {
+			{ name = "isEarlyTesting", pattern = "true", optional = true }
+		} or nil,
 		paramCallback = createGameLinkMessage
 	},
-	["/share"] = {
-		queryParams = v8,
-		paramCallback = createShareLinkMessage
-	}
+	["/share"] = { queryParams = queryParams, paramCallback = createShareLinkMessage },
+	["/plus-referral"] = FFlagAppChatPlusReferralAssetCard and {
+		queryParams = queryParams,
+		paramCallback = function(p)
+			if p.code and p.code ~= "" then
+				return {
+					shareLink = { linkId = p.code, linkType = "PlusReferral", version = 2 }
+				}
+			end
+
+			return nil
+		end
+	} or nil
 }

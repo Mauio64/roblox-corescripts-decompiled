@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.AmpUpsell.AmpUpsell))
+local AmpUpsell = require(Workspace.AmpUpsell.AmpUpsell)
+
+return AmpUpsell

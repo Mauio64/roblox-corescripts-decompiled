@@ -1,10 +1,10 @@
-local scriptParent = script.Parent
-
-require(scriptParent.LuauPolyfill)
+local parent = script.Parent
+require(parent.LuauPolyfill)
 
 local React = require(script.React)
 
 require(script.ReactLazy)
-require(scriptParent.Shared)
+
+require(parent.Shared)
 
 return React

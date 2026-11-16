@@ -1,3 +1,1 @@
-return {
-	Recommendation = require(script.Recommendation)
-}
+return { Recommendation = require(script.Recommendation) }

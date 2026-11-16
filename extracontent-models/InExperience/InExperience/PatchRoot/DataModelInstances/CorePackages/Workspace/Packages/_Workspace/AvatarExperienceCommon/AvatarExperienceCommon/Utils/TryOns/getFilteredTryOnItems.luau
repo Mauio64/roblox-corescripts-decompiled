@@ -1,27 +1,24 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
 
-require(AvatarExperienceCommon.Enums.ItemTypeEnum)
+require(AvatarExperienceCommon.Parent.AvatarExperienceModel)
 
 local getTryOnItemComparisonData = require(script.Parent.getTryOnItemComparisonData)
 local getShouldReplaceTryOn = require(script.Parent.getShouldReplaceTryOn)
 
-function getFilteredTryOnItems(t1: {[any]: any}, t2: {[any]: any}) -- line: 8
-	-- upvalues: getTryOnItemComparisonData (copy), getShouldReplaceTryOn (copy)
-	local t3 = {}
-	local t4 = {}
-	local v8 = getTryOnItemComparisonData(t2)
+function getFilteredTryOnItems(items, p)
+	local tryOnItemComparisonData = getTryOnItemComparisonData(p)
+	local result = {}
+	local result2 = {}
 
-	for v9, v10 in t1 do
-		local v11 = getTryOnItemComparisonData(v10)
-
-		if getShouldReplaceTryOn(v8, v11) then
-			t4[v9] = v10
+	for k, item in items do
+		if getShouldReplaceTryOn(tryOnItemComparisonData, (getTryOnItemComparisonData(item))) then
+			result[k] = item
 		else
-			t3[v9] = v10
+			result2[k] = item
 		end
 	end
 
-	return t3, t4
+	return result2, result
 end
 
 return getFilteredTryOnItems

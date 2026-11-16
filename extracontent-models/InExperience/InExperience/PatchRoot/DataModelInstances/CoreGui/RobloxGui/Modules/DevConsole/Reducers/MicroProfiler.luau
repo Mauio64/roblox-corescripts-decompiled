@@ -1,34 +1,34 @@
 local Immutable = require(script.Parent.Parent.Immutable)
+
 local AppendRecentDumpPath = require(script.Parent.Parent.Actions.AppendRecentDumpPath)
 local SetRCCProfilerState = require(script.Parent.Parent.Actions.SetRCCProfilerState)
 
-return function(t1: {[any]: any}?, t2: {[any]: any}) -- line: 12
-	-- upvalues: SetRCCProfilerState (copy), Immutable (copy), AppendRecentDumpPath (copy)
-	local v6 = t1 or {
+return function(p, data)
+	local selected = p or {
 		waitingForRecording = false,
 		lastFileOutputLocation = "",
 		recentDumpPaths = {}
 	}
 
-	if t2.type == SetRCCProfilerState.name then
-		local t3 = {
-			waitingForRecording = t2.waitingForRecording,
-			lastFileOutputLocation = t2.lastFileOutputLocation,
-			recentDumpPaths = v6.recentDumpPaths
+	if data.type == SetRCCProfilerState.name then
+		local v = {
+			waitingForRecording = data.waitingForRecording,
+			lastFileOutputLocation = data.lastFileOutputLocation,
+			recentDumpPaths = selected.recentDumpPaths
 		}
 
-		return (Immutable.JoinDictionaries(v6, t3))
+		return (Immutable.JoinDictionaries(selected, v))
 	end
 
-	if t2.type == AppendRecentDumpPath.name then
-		local t4 = {
-			waitingForRecording = v6.waitingForRecording,
-			lastFileOutputLocation = v6.lastFileOutputLocation,
-			recentDumpPaths = Immutable.Append(v6.recentDumpPaths, t2.dumpPath)
-		}
-
-		return (Immutable.JoinDictionaries(v6, t4))
+	if data.type ~= AppendRecentDumpPath.name then
+		return selected
 	end
 
-	return v6
+	local v = {
+		waitingForRecording = selected.waitingForRecording,
+		lastFileOutputLocation = selected.lastFileOutputLocation,
+		recentDumpPaths = Immutable.Append(selected.recentDumpPaths, data.dumpPath)
+	}
+
+	return (Immutable.JoinDictionaries(selected, v))
 end

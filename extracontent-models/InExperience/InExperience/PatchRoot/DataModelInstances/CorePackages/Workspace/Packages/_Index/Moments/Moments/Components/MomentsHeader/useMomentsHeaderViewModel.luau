@@ -1,123 +1,184 @@
 local Players = game:GetService("Players")
+
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local AppComposition = require(MomentsParent.AppComposition)
-local Foundation = require(MomentsParent.Foundation)
-local MomentsCommon = require(MomentsParent.MomentsCommon)
-local React = require(MomentsParent.React)
+local parent = Moments.Parent
+
+local AppComposition = require(parent.AppComposition)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local MomentsCommon = require(parent.MomentsCommon)
+local React = require(parent.React)
+
 local useCompositionLayout = AppComposition.useCompositionLayout
 local useTokens = Foundation.Hooks.useTokens
 local useDeviceInsets = MomentsCommon.Hooks.useDeviceInsets
 local useStatusBarHeight = MomentsCommon.Hooks.useStatusBarHeight
-local useIsTvRemoteDevice = require(MomentsParent.RoactUtils).Hooks.useIsTvRemoteDevice
-local useSetDrawerVisible = require(MomentsParent.Drawer).Hooks.useSetDrawerVisible
-local GetFFlagMomentsAndroidTvEnabled = require(Moments.Flags.GetFFlagMomentsAndroidTvEnabled)
-local FFlagMomentsUseCompositionLibrary = require(Moments.Flags.FFlagMomentsUseCompositionLibrary)
-local FFlagMomentsUseFoundationHeaderBar = require(Moments.Flags.FFlagMomentsUseFoundationHeaderBar)
+local RoactUtils = require(parent.RoactUtils)
+local useIsTvRemoteDevice = RoactUtils.Hooks.useIsTvRemoteDevice
+local Drawer = require(parent.Drawer)
+local useSetDrawerVisible = Drawer.Hooks.useSetDrawerVisible
+local useLocalization = Localization.Hooks.useLocalization
 
+local GetFFlagMomentsAndroidTvEnabled = require(Moments.Flags.GetFFlagMomentsAndroidTvEnabled)
+local FFlagMomentsFtuxTooltipCreateCopy = require(Moments.Flags.FFlagMomentsFtuxTooltipCreateCopy)
+local FFlagMomentsFixFeedForDeviceSafeInsets = require(Moments.Flags.FFlagMomentsFixFeedForDeviceSafeInsets)
+local FFlagMomentsFollowingFeed = require(Moments.Flags.FFlagMomentsFollowingFeed)
+local Display = require(parent.Display)
+local shouldUseDeviceSafeInsets = Display.shouldUseDeviceSafeInsets
+local MomentsFeedType = require(Moments.Enums.MomentsFeedType)
 require(script.Parent.MomentsHeaderView)
+local useTrendingFeedLabel = require(Moments.Hooks.useTrendingFeedLabel)
 
 local Analytics = MomentsCommon.Analytics
 local EventNames = Analytics.EventNames
 local fireAnalyticsEvent = Analytics.fireAnalyticsEvent
 
-local function noop() -- line: 47
-end
-local function getAnalyticsFields() -- line: 49
-	-- upvalues: Players (copy)
+local v = {
+	title = "Feature.Moments.Tooltip.ShareFirstMomentTitle",
+	text = "Feature.Moments.Tooltip.ShareFirstMomentBody"
+}
+
+local v2 = { following = "Feature.Moments.Label.FeedFollowing" }
+
+local function noop() end
+
+local function getAnalyticsFields() -- 2 equivalent calls inferred from this helper
 	return {
 		userId = tostring(not Players.LocalPlayer and 0 or Players.LocalPlayer.UserId),
-		timestamp = tostring(os.time())
+		timestamp = tostring(os.time()),
+		identifier = "create_moment"
 	}
 end
-local function useMomentsHeaderViewModel(t1: {[any]: any}, b1: boolean, b2: boolean) -- line: 56
-	-- upvalues: useTokens (copy), useDeviceInsets (copy), useSetDrawerVisible (copy), useIsTvRemoteDevice (copy), FFlagMomentsUseCompositionLibrary (copy), FFlagMomentsUseFoundationHeaderBar (copy), useCompositionLayout (copy), useStatusBarHeight (copy), noop (copy), React (copy), fireAnalyticsEvent (copy), EventNames (copy), Players (copy), GetFFlagMomentsAndroidTvEnabled (copy)
-	local v26 = useTokens()
-	local v27 = useDeviceInsets()
-	local v28 = useSetDrawerVisible()
-	local v29 = useIsTvRemoteDevice()
-	local v30 = FFlagMomentsUseCompositionLibrary and FFlagMomentsUseFoundationHeaderBar
-	local v31 = nil
-	local v32 = nil
-	local n1 = 0
 
-	if v30 then
-		v31 = useCompositionLayout()
-		v32 = useStatusBarHeight()
-		n1 = v26.Size.Size_1400
+local function useMomentsHeaderViewModel(data, flag: boolean, showHamburger: boolean)
+	local v3 = useTokens()
+	local v4 = useDeviceInsets()
+	local v5 = useSetDrawerVisible()
+	local v6 = useIsTvRemoteDevice()
+	local v7 = useCompositionLayout()
+	local v8 = useStatusBarHeight()
+	local size_1400 = v3.Size.Size_1400
+
+	local showFtuxTooltip = data.showFtuxTooltip == true
+	local ftuxTooltipTitle, ftuxTooltipText
+
+	if FFlagMomentsFtuxTooltipCreateCopy then
+		local v9 = useLocalization(v)
+		ftuxTooltipTitle = v9.title
+		ftuxTooltipText = v9.text
+	else
+		ftuxTooltipTitle = ""
+		ftuxTooltipText = ""
 	end
 
-	local v34 = t1.showFtuxTooltip == true
-	local v35 = t1.onFtuxTooltipDismissed or noop
-	local v36 = t1.onCreatePressed or noop
+	local feedTypeChips = nil
 
-	React.useEffect(function() -- line: 79
-		-- upvalues: v34 (copy), fireAnalyticsEvent (copy), EventNames (copy), Players (copy)
-		if v34 then
-			fireAnalyticsEvent(EventNames.FTUXTooltipImpression, {
-				userId = tostring(not Players.LocalPlayer and 0 or Players.LocalPlayer.UserId),
-				timestamp = tostring(os.time())
-			})
+	if FFlagMomentsFollowingFeed then
+		local v9 = useLocalization(v2)
+
+		local text = useTrendingFeedLabel()
+		local onFeedTypeSelected = data.onFeedTypeSelected
+
+		if onFeedTypeSelected ~= nil then
+			local selectedFeedType = data.selectedFeedType or MomentsFeedType.Trending
+			feedTypeChips = {
+				{
+					id = MomentsFeedType.Trending,
+					text = text,
+					isChecked = selectedFeedType == MomentsFeedType.Trending,
+					onActivated = function()
+						onFeedTypeSelected(MomentsFeedType.Trending)
+					end
+				},
+				{
+					id = MomentsFeedType.Following,
+					text = v9.following,
+					isChecked = selectedFeedType == MomentsFeedType.Following,
+					onActivated = function()
+						onFeedTypeSelected(MomentsFeedType.Following)
+					end
+				}
+			}
 		end
-	end, { v34 })
-
-	local v37 = React.useCallback(function() -- line: 85
-		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), Players (copy), v35 (copy)
-		fireAnalyticsEvent(EventNames.FTUXTooltipDismissed, {
-			userId = tostring(not Players.LocalPlayer and 0 or Players.LocalPlayer.UserId),
-			timestamp = tostring(os.time())
-		})
-		v35()
-	end, { v35 })
-	local v38 = React.useCallback(function() -- line: 90
-		-- upvalues: v34 (copy), v37 (copy), v36 (copy)
-		if v34 then
-			v37()
-		end
-
-		v36()
-	end, {
-		v34,
-		v37,
-		v36
-	})
-	local v39 = React.useCallback(function() -- line: 97
-		-- upvalues: v28 (copy)
-		v28(true)
-	end, { v28 })
-	local v40 = v31 == nil and 0 or v31.margin
-	local top = v27.top
-
-	if v30 then
-		top = v32
 	end
 
-	local t2 = {
-		left = UDim.new(0, (math.max(v27.left, v40))),
-		right = UDim.new(0, (math.max(v27.right, v40))),
-		top = UDim.new(0, top)
+	local onFtuxTooltipDismissed = data.onFtuxTooltipDismissed or noop
+	local onCreatePressed = data.onCreatePressed or noop
+
+	React.useEffect(function()
+		if showFtuxTooltip then
+			fireAnalyticsEvent(EventNames.FTUXTooltipImpression, getAnalyticsFields()) -- inferred equivalent call
+		end
+	end, { showFtuxTooltip })
+
+	local onFtuxTooltipClosed = React.useCallback(function()
+		fireAnalyticsEvent(EventNames.FTUXTooltipDismissed, getAnalyticsFields()) -- inferred equivalent call
+		onFtuxTooltipDismissed()
+	end, { onFtuxTooltipDismissed })
+
+	local onCreateMomentButtonPressed = React.useCallback(function()
+		if showFtuxTooltip then
+			onFtuxTooltipClosed()
+		end
+
+		onCreatePressed()
+	end, { showFtuxTooltip, onFtuxTooltipClosed, onCreatePressed })
+
+	local onHamburgerPressed = React.useCallback(function()
+		v5(true)
+	end, { v5 })
+
+	local margin = v7.margin
+
+	local headerPadding = {
+		left = UDim.new(0, (math.max(v4.left, margin))),
+		right = UDim.new(0, (math.max(v4.right, margin))),
+		top = UDim.new(0, v8)
 	}
-	local v43 = v27.top + v26.Size.Size_2000 + v26.Size.Size_1600
+
+	local scrimHeight = v4.top + v3.Size.Size_2000 + v3.Size.Size_1600
+
+	if feedTypeChips ~= nil then
+		scrimHeight += v3.Size.Size_800
+	end
+
+	local scrimTopOffset
+
+	if FFlagMomentsFixFeedForDeviceSafeInsets and shouldUseDeviceSafeInsets then
+		scrimTopOffset = -v4.top
+	end
+
+	local layoutOrder
+
+	if not flag then
+		layoutOrder = data.layoutOrder
+	end
 
 	return {
-		layoutOrder = if not b1 then t1.layoutOrder else nil,
-		variant = t1.variant,
-		showFtuxTooltip = v34,
-		onCreateMomentButtonPressed = v38,
-		onFtuxTooltipClosed = v37,
-		onHamburgerPressed = v39,
-		onBack = t1.onBack or noop,
-		onClose = t1.onClose or noop,
-		onNavigateToTrending = t1.onNavigateToTrending or noop,
-		onNavigateToMyMoments = t1.onNavigateToMyMoments or noop,
-		title = t1.title or "",
-		showTopScrim = t1.showTopScrim == true,
-		showInteractiveButtons = not (GetFFlagMomentsAndroidTvEnabled() and v29),
-		showHamburger = b2,
-		headerHeight = n1,
-		headerPadding = t2,
-		titleTextStyle = v26.Color.Content.Emphasis,
-		scrimHeight = v43
+		layoutOrder = layoutOrder,
+		variant = data.variant,
+		showFtuxTooltip = showFtuxTooltip,
+		ftuxTooltipTitle = ftuxTooltipTitle,
+		ftuxTooltipText = ftuxTooltipText,
+		onCreateMomentButtonPressed = onCreateMomentButtonPressed,
+		onFtuxTooltipClosed = onFtuxTooltipClosed,
+		onHamburgerPressed = onHamburgerPressed,
+		onBack = data.onBack or noop,
+		onClose = data.onClose or noop,
+		onNavigateToTrending = data.onNavigateToTrending or noop,
+		onNavigateToMyMoments = data.onNavigateToMyMoments or noop,
+		title = data.title or "",
+		showTopScrim = data.showTopScrim == true,
+		showInteractiveButtons = not (GetFFlagMomentsAndroidTvEnabled() and v6),
+		showHamburger = showHamburger,
+		showCreateButton = data.onCreatePressed ~= nil,
+		showNavigationMenu = data.onNavigateToTrending ~= nil and data.onNavigateToMyMoments ~= nil,
+		headerHeight = size_1400,
+		headerPadding = headerPadding,
+		titleTextStyle = v3.Color.Content.Emphasis,
+		scrimHeight = scrimHeight,
+		scrimTopOffset = scrimTopOffset,
+		feedTypeChips = feedTypeChips
 	}
 end
 

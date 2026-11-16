@@ -1,5 +1,1 @@
-return {
-	View = "View",
-	Create = "Create",
-	Join = "Join"
-}
+return { View = "View", Create = "Create", Join = "Join" }

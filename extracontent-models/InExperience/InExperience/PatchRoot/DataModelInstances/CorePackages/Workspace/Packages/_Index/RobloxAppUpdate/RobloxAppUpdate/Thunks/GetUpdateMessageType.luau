@@ -1,39 +1,35 @@
 local RobloxAppUpdate = script:FindFirstAncestor("RobloxAppUpdate")
-local RobloxAppUpdateParent = RobloxAppUpdate.Parent
-
+local parent = RobloxAppUpdate.Parent
 require(RobloxAppUpdate.Types)
-
-local joinGamePlayButton = require(RobloxAppUpdateParent.DiscoveryAnalytics).Points.joinGamePlayButton
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local joinGamePlayButton = DiscoveryAnalytics.Points.joinGamePlayButton
 local UpdateMessageType = require(RobloxAppUpdate.UpdateMessageType)
-local Promise = require(RobloxAppUpdateParent.Promise)
-local t1 = {
+local Promise = require(parent.Promise)
+
+local v = {
 	[Enum.AppUpdateStatus.Available] = UpdateMessageType.Default,
 	[Enum.AppUpdateStatus.AvailableBoundChannel] = UpdateMessageType.InternalChannel,
 	[Enum.AppUpdateStatus.AvailableBetaProgram] = UpdateMessageType.BetaProgram
 }
 
-return function(p1, b1: boolean, p2, s1: string) -- line: 15
-	-- upvalues: Promise (copy), joinGamePlayButton (copy), t1 (copy)
-	return function(_: {[any]: any}) -- line: 21
-		-- upvalues: b1 (copy), p1 (copy), Promise (copy), joinGamePlayButton (copy), p2 (copy), s1 (copy), t1 (copy)
-		if b1 and not p1:canPerformBinaryUpdate() then
+return function(object, flag: boolean, p, ctx: string)
+	return function(_)
+		if flag and not object:canPerformBinaryUpdate() then
 			return Promise.resolve(nil)
 		end
 
-		return p1:checkForUpdate():andThen(function(p3) -- line: 26
-			-- upvalues: joinGamePlayButton (copy), p2 (copy), s1 (copy), Promise (copy), t1 (copy)
-			local appUpdateStatus = p3.appUpdateStatus
-
-			joinGamePlayButton(p2.InfluxDb, "checkForUpdate", {
-				ctx = s1,
+		return object:checkForUpdate():andThen(function(p2)
+			local appUpdateStatus = p2.appUpdateStatus
+			joinGamePlayButton(p.InfluxDb, "checkForUpdate", {
+				ctx = ctx,
 				appUpdateStatus = appUpdateStatus
 			})
 
-			if p3.errorMessage then
-				return Promise.reject(p3.errorMessage)
+			if p2.errorMessage then
+				return Promise.reject(p2.errorMessage)
 			end
 
-			return Promise.resolve(t1[appUpdateStatus])
+			return Promise.resolve(v[appUpdateStatus])
 		end)
 	end
 end

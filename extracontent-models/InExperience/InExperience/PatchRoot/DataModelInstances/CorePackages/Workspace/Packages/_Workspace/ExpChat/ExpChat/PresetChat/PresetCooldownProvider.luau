@@ -1,67 +1,54 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local React = require(ExpChatParent.React)
-local SignalsReact = require(ExpChatParent.SignalsReact)
+local parent = ExpChat.Parent
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local GetPresetChatStore = require(ExpChat.Stores.GetPresetChatStore)
 local PresetCooldownContext = require(script.Parent.PresetCooldownContext)
 
-local function PresetCooldownProvider(t1: {[any]: any}) -- line: 13
-	-- upvalues: GetPresetChatStore (copy), SignalsReact (copy), React (copy), PresetCooldownContext (copy)
-	local v9 = GetPresetChatStore(false)
-	local v10 = SignalsReact.useSignalState(v9.getPresetCooldownEndsAt)
-	local v11 = v10 ~= nil and v10 > os.clock()
+local function PresetCooldownProvider(p)
+	local presetChatStore = GetPresetChatStore(false)
+	local endsAt = SignalsReact.useSignalState(presetChatStore.getPresetCooldownEndsAt)
+	local isCooldownActive
 
-	React.useEffect(function() -- line: 18
-		-- upvalues: v10 (copy), v9 (copy)
-		if v10 == nil then
+	if endsAt == nil then
+		isCooldownActive = false
+	else
+		isCooldownActive = os.clock() < endsAt
+	end
+
+	React.useEffect(function()
+		if endsAt == nil then
 			return
 		end
 
-		local v13 = v10 - os.clock()
+		local v = endsAt - os.clock()
 
-		if v13 <= 0 then
-			v9.setPresetCooldownEndsAt(nil)
-
+		if v <= 0 then
+			presetChatStore.setPresetCooldownEndsAt(nil)
 			return
 		end
 
-		local u14 = false
-
-		task.delay(v13, function() -- line: 28
-			-- upvalues: u14 (ref), v9 (copy), v10 (copy)
-			if u14 then
+		local flag = false
+		task.delay(v, function()
+			if flag then
 				return
 			end
 
-			if v9.getPresetCooldownEndsAt(false) == v10 then
-				v9.setPresetCooldownEndsAt(nil)
+			if presetChatStore.getPresetCooldownEndsAt(false) == endsAt then
+				presetChatStore.setPresetCooldownEndsAt(nil)
 			end
 		end)
-
-		return function() -- line: 36
-			-- upvalues: u14 (ref)
-			u14 = true
+		return function()
+			flag = true
 		end
-	end, {
-		v10,
-		v9.setPresetCooldownEndsAt,
-		v9.getPresetCooldownEndsAt
-	})
+	end, { endsAt, presetChatStore.setPresetCooldownEndsAt, presetChatStore.getPresetCooldownEndsAt })
 
-	local v12 = React.useMemo(function() -- line: 41
-		-- upvalues: v10 (copy), v11 (copy)
-		return {
-			endsAt = v10,
-			isCooldownActive = v11
-		}
-	end, {
-		v10,
-		v11
-	})
+	local v = React.useMemo(function()
+		return { endsAt = endsAt, isCooldownActive = isCooldownActive }
+	end, { endsAt, isCooldownActive })
 
-	return React.createElement(PresetCooldownContext.Provider, {
-		value = v12
-	}, t1.children)
+	return React.createElement(PresetCooldownContext.Provider, { value = v }, p.children)
 end
 
 return PresetCooldownProvider

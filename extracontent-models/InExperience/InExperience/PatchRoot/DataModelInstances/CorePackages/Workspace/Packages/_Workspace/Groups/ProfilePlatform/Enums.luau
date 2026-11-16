@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Enums = require(Workspace.ProfilePlatform.ProfilePlatform.Common.Enums)
 
-return (require(_Workspace.ProfilePlatform.ProfilePlatform.Common.Enums))
+return Enums

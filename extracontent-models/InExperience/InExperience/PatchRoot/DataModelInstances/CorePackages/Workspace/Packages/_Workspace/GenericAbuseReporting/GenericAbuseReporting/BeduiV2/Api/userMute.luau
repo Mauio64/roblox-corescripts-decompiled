@@ -1,133 +1,91 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local ChatMute = require(Parent.ChatMute)
-local ExpChatShared = require(Parent.ExpChatShared)
-local UserMuted = require(Parent.ExpChatShared).Actions.UserMuted
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local ChatMute = require(parent.ChatMute)
+
+local ExpChatShared = require(parent.ExpChatShared)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagExpChatUseChatMuteStore = SharedFlags.FFlagExpChatUseChatMuteStore
-local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
 local FFlagAbuseReportVoiceMute = SharedFlags.FFlagAbuseReportVoiceMute
 
-local function voiceMutePlayer(n1: number, p1) -- line: 16
-	-- upvalues: FFlagAbuseReportVoiceMute (copy)
-	if not FFlagAbuseReportVoiceMute or not p1 then
+local function voiceMutePlayer(p: number, object)
+	if not (FFlagAbuseReportVoiceMute and object) then
 		return
 	end
 
-	local participants = p1.participants
+	local participants = object.participants
 
 	if not participants then
 		return
 	end
 
-	local v13 = participants[tostring(n1)]
+	local participant = participants[tostring(p)]
 
-	if v13 and not v13.isMutedLocally then
-		p1:ToggleMutePlayer(n1, "igm-report-v2")
+	if participant and not participant.isMutedLocally then
+		object:ToggleMutePlayer(p, "igm-report-v2")
 	end
 end
 
-function muteUser(n2: number, p2, p3) -- line: 31
-	-- upvalues: FFlagExpChatUseChatMuteStore (copy), ChatMute (copy), FFlagAbuseReportVoiceMute (copy), ExpChatShared (copy), FFlagExpChatUseMessagesStore (copy), UserMuted (copy)
-	if not n2 or not p2 then
-		return false
-	end
-
-	if n2 == p2.UserId then
+function muteUser(p: number, p2, object): boolean
+	if not (p and p2 and p ~= p2.UserId) then
 		return false
 	end
 
 	if FFlagExpChatUseChatMuteStore then
-		ChatMute.mutePlayer({
-			userId = tostring(n2)
-		})
+		ChatMute.mutePlayer({ userId = tostring(p) })
+		local participants = FFlagAbuseReportVoiceMute and FFlagAbuseReportVoiceMute and object and object.participants
 
-		if FFlagAbuseReportVoiceMute and FFlagAbuseReportVoiceMute and p3 then
-			local participants = p3.participants
+		if participants then
+			local participant = participants[tostring(p)]
 
-			if participants then
-				local v18 = participants[tostring(n2)]
+			if participant and not participant.isMutedLocally then
+				object:ToggleMutePlayer(p, "igm-report-v2")
+			end
+		end
 
-				if v18 and not v18.isMutedLocally then
-					p3:ToggleMutePlayer(n2, "igm-report-v2")
-				end
+		return true
+	else
+		local context = ExpChatShared.context
+
+		if not (context.store and context.messagesStore) then
+			return false
+		end
+
+		context.messagesStore.muteUser(p)
+		local participants = FFlagAbuseReportVoiceMute and FFlagAbuseReportVoiceMute and object and object.participants
+
+		if participants then
+			local participant = participants[tostring(p)]
+
+			if participant and not participant.isMutedLocally then
+				object:ToggleMutePlayer(p, "igm-report-v2")
 			end
 		end
 
 		return true
 	end
-
-	local context = ExpChatShared.context
-
-	if context.store then
-		if FFlagExpChatUseMessagesStore then
-			if context.messagesStore then
-				context.messagesStore.muteUser(n2)
-
-				if FFlagAbuseReportVoiceMute and FFlagAbuseReportVoiceMute and p3 then
-					local participants = p3.participants
-
-					if participants then
-						local v21 = participants[tostring(n2)]
-
-						if v21 and not v21.isMutedLocally then
-							p3:ToggleMutePlayer(n2, "igm-report-v2")
-						end
-					end
-				end
-
-				return true
-			end
-
-			return false
-		end
-
-		context.store:dispatch(UserMuted(n2))
-
-		if FFlagAbuseReportVoiceMute and FFlagAbuseReportVoiceMute and p3 then
-			local participants = p3.participants
-
-			if participants then
-				local v23 = participants[tostring(n2)]
-
-				if v23 and not v23.isMutedLocally then
-					p3:ToggleMutePlayer(n2, "igm-report-v2")
-				end
-			end
-		end
-
-		return true
-	end
-
-	return false
 end
-function isUserMuted(n3: number) -- line: 70
-	-- upvalues: FFlagExpChatUseChatMuteStore (copy), ChatMute (copy), ExpChatShared (copy), FFlagExpChatUseMessagesStore (copy)
-	if not n3 then
+
+function isUserMuted(p: number)
+	if not p then
 		return false
 	end
 
 	if FFlagExpChatUseChatMuteStore then
-		return ChatMute.isUserIdMuted((tostring(n3)))
+		return ChatMute.isUserIdMuted((tostring(p)))
 	end
 
 	local context = ExpChatShared.context
 
-	if context.store then
-		if FFlagExpChatUseMessagesStore then
-			if context.messagesStore then
-				return context.messagesStore.getMutedUserIds(false)[tostring(n3)] == true
-			end
+	if not context.store then
+		return false
+	end
 
-			return false
-		end
-
-		return context.store:getState().MutedUsers[tostring(n3)] == true
+	if context.messagesStore then
+		return context.messagesStore.getMutedUserIds(false)[tostring(p)] == true
 	end
 
 	return false
 end
 
-return {
-	isUserMuted = isUserMuted,
-	muteUser = muteUser
-}
+return { isUserMuted = isUserMuted, muteUser = muteUser }

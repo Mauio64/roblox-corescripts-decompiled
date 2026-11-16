@@ -1,120 +1,184 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local Images = require(AppChatParent.UIBlox).App.ImageSet.Images
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
-local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
-local useNavigation = require(AppChatParent.Navigation).useNavigation
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
 local EnumScreens = require(AppChat.EnumScreens)
-local TestStyle = require(AppChat.SocialLibraries).Components.TestStyle
+local SocialLibraries = require(AppChat.SocialLibraries)
+local TestStyle = SocialLibraries.Components.TestStyle
 local useIsUserPending = require(AppChat.Hooks.useIsUserPending)
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
 local getConversationTitle = require(AppChat.Conversations.getConversationTitle)
-local usePageTracker = require(AppChatParent.PageLoadTracker).usePageTracker
-local FFlagLuaAppEnableChatMilestones = require(AppChatParent.SharedFlags).FFlagLuaAppEnableChatMilestones
-local FFlagLuaAppEnablePageLoadTracker = require(AppChatParent.SharedFlags).FFlagLuaAppEnablePageLoadTracker
+
+local PageLoadTracker = require(parent.PageLoadTracker)
+local usePageTracker = PageLoadTracker.usePageTracker
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEnableChatMilestones = SharedFlags.FFlagLuaAppEnableChatMilestones
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppEnablePageLoadTracker = SharedFlags2.FFlagLuaAppEnablePageLoadTracker
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
-local FFlagEnableBlackbirdCheck = require(AppChatParent.SharedFlags).FFlagEnableBlackbirdCheck
-local useIsRobloxSubscriber = require(AppChatParent.UserProfiles).Hooks.useIsRobloxSubscriber
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags3.FFlagEnableBlackbirdCheck
+local UserProfiles = require(parent.UserProfiles)
+local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
 local useGetOneToOneFriendIdFromConversationId = require(AppChat.Hooks.useGetOneToOneFriendIdFromConversationId)
 local useConversationAvatarPresenceImage = require(AppChat.Hooks.useConversationAvatarPresenceImage)
 local PresenceBubbleCellStyled = require(script.Parent.PresenceBubbleCellStyled)
+
 local FFlagAppChatPresenceStoreMigration = require(AppChat.Flags.FFlagAppChatPresenceStoreMigration)
-local t1 = {
+local FFlagAppChatServerSideConversationSearch = require(AppChat.Flags.FFlagAppChatServerSideConversationSearch)
+
+local v = {
 	messageUnavailableKey = "Feature.Chat.Message.MessageUnavailable",
 	boldTitle = true,
 	childWidth = 0,
 	isLoading = false,
-	hideLeftAvatarPadding = false,
 	Size = UDim2.new(1, 0, 1, 0),
+	hideLeftAvatarPadding = false,
 	style = Cryo.Dictionary.join(TestStyle, {
 		Tokens = {
-			Color = {
-				None = {}
-			}
+			Color = { None = {} }
 		}
 	})
 }
 
-local function ConversationCell(t2: {[any]: any}) -- line: 69
-	-- upvalues: Cryo (copy), t1 (copy), useIsUserPending (copy), useIsInExperience (copy), useGetOneToOneFriendIdFromConversationId (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), FFlagAppChatPresenceStoreMigration (copy), useConversationAvatarPresenceImage (copy), FocusNavigationUtils (copy), useNavigation (copy), FFlagLuaAppEnablePageLoadTracker (copy), FFlagLuaAppEnableChatMilestones (copy), usePageTracker (copy), React (copy), EnumScreens (copy), getConversationTitle (copy), useLocalization (copy), PresenceBubbleCellStyled (copy), Images (copy), FFlagDebugAppChatEnableDomLocators (copy)
-	local v27 = Cryo.Dictionary.join(t1, t2)
-	local conversation = v27.conversation
-	local v29 = useIsUserPending(conversation or {})
-	local v30 = useIsInExperience()
-	local v31 = useGetOneToOneFriendIdFromConversationId(conversation and conversation.id)
-	local v32 = if not FFlagEnableBlackbirdCheck then nil else v31
-	local v33 = useIsRobloxSubscriber(v32)
-	local v34 = if not FFlagAppChatPresenceStoreMigration then nil else useConversationAvatarPresenceImage(v31)
-	local v35 = FocusNavigationUtils.useLastInputMode()
-	local v36 = useNavigation()
-	local u37 = nil
+local function ConversationCell(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local conversation = joined.conversation
 
-	if FFlagLuaAppEnablePageLoadTracker and FFlagLuaAppEnableChatMilestones then
-		u37 = usePageTracker()
+	local v2 = useIsUserPending(conversation or {})
+	local v3 = useIsInExperience()
+
+	local v4 = useGetOneToOneFriendIdFromConversationId(conversation and conversation.id)
+	local v5
+
+	if FFlagEnableBlackbirdCheck then
+		v5 = v4
 	end
 
-	React.useEffect(function() -- line: 91
-		-- upvalues: FFlagLuaAppEnablePageLoadTracker (copy), FFlagLuaAppEnableChatMilestones (copy), v30 (copy), u37 (ref)
-		if FFlagLuaAppEnablePageLoadTracker and (FFlagLuaAppEnableChatMilestones and not v30) then
-			u37:sendMilestone("main_cta_interactable")
+	local isRobloxSubscriber = useIsRobloxSubscriber(v5)
+	local avatarCirclePresenceImage
+
+	if FFlagAppChatPresenceStoreMigration then
+		avatarCirclePresenceImage = useConversationAvatarPresenceImage(v4)
+	end
+
+	local v6 = FocusNavigationUtils.useLastInputMode()
+	local v7 = useNavigation()
+	local v8
+
+	if FFlagLuaAppEnablePageLoadTracker and FFlagLuaAppEnableChatMilestones then
+		v8 = usePageTracker()
+	else
+		v8 = nil
+	end
+
+	React.useEffect(function()
+		if FFlagLuaAppEnablePageLoadTracker and FFlagLuaAppEnableChatMilestones and not v3 then
+			v8:sendMilestone("main_cta_interactable")
 		end
 	end, {})
 
-	local v38 = React.useCallback(function() -- line: 99
-		-- upvalues: v35 (copy), v36 (copy), EnumScreens (copy), v27 (copy)
-		if v35 == "Focus" and v36 then
-			v36.navigate(EnumScreens.ChatConversation, {
-				navigatedWithFocus = true,
-				conversationId = v27.conversation.id
-			})
+	local v9 = FFlagAppChatServerSideConversationSearch
 
-			return
+	if v9 then
+		if joined.conversation.isSearchResult == true then
+			v9 = joined.onActivated ~= nil
+		else
+			v9 = false
 		end
-
-		if v27.onActivated then
-			v27.onActivated(v27.conversation)
-		end
-	end, {
-		v27.onActivated,
-		v27.conversation,
-		v35,
-		v36
-	})
-	local v39 = getConversationTitle(conversation)
-	local v40 = v27.subTitleText and v27.subTitleText:split("\n")
-	local v41 = v40 and v40[1] or ""
-	local v42 = useLocalization({
-		subTitleText = v27.messageUnavailableKey
-	})
-
-	if v29 then
-		v41 = v42.subTitleText
 	end
 
-	return React.createElement(PresenceBubbleCellStyled, {
-		boldTitle = v27.boldTitle,
-		style = v27.style,
-		childWidth = v27.childWidth,
-		onActivated = v38,
-		onCircleActivated = v27.onCircleActivated,
-		subTitleText = v41,
-		subTitleTimestamp = v27.subTitleTimestamp,
-		subTitleIcon = v29 and Images["icons/status/private_small"] or nil,
-		secondaryTitleText = v27.secondaryTitleText,
-		testId = if not FFlagDebugAppChatEnableDomLocators then nil else v27.testId,
-		Size = v27.Size,
-		isLoading = v27.isLoading,
-		avatarCirclePresenceImage = if not FFlagAppChatPresenceStoreMigration then conversation.presenceImage else v34,
-		titleText = v39,
-		thumbnails = conversation.thumbnails,
-		conversationId = conversation.id,
-		hideLeftAvatarPadding = v27.hideLeftAvatarPadding,
-		paddingLeft = v27.paddingLeft,
-		paddingRight = v27.paddingRight,
-		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v33
-	}, v27.children or {})
+	local onActivated = React.useCallback(function()
+		if v6 == "Focus" and v7 and not v9 then
+			v7.navigate(EnumScreens.ChatConversation, {
+				conversationId = joined.conversation.id,
+				navigatedWithFocus = true
+			})
+		elseif joined.onActivated then
+			joined.onActivated(joined.conversation)
+		end
+	end, { joined.onActivated, joined.conversation, v6, v7, v9 })
+
+	local conversationTitle = getConversationTitle(conversation)
+	local v10 = joined.subTitleText and joined.subTitleText:split("\n")
+	local subTitleText = v10 and v10[1] or ""
+
+	local v11 = useLocalization({ subTitleText = joined.messageUnavailableKey })
+
+	if v2 then
+		subTitleText = v11.subTitleText
+	end
+
+	local createElement = React.createElement
+	local v12 = {
+		boldTitle = joined.boldTitle,
+		style = joined.style,
+		childWidth = joined.childWidth,
+		onActivated = onActivated,
+		onCircleActivated = joined.onCircleActivated,
+		subTitleText = subTitleText,
+		subTitleTimestamp = joined.subTitleTimestamp,
+		subTitleIcon = v2 and Images["icons/status/private_small"] or nil,
+		secondaryTitleText = joined.secondaryTitleText,
+		testId = 0,
+		Size = 0,
+		isLoading = 0,
+		avatarCirclePresenceImage = 0,
+		titleText = 0,
+		thumbnails = 0,
+		conversationId = 0,
+		participants = 0,
+		hideLeftAvatarPadding = 0,
+		paddingLeft = 0,
+		paddingRight = 0,
+		isRobloxSubscriber = 0
+	}
+	local testId
+
+	if FFlagDebugAppChatEnableDomLocators then
+		testId = joined.testId
+	end
+
+	v12.testId = testId
+	v12.Size = joined.Size
+	v12.isLoading = joined.isLoading
+
+	if not FFlagAppChatPresenceStoreMigration then
+		avatarCirclePresenceImage = conversation.presenceImage
+	end
+
+	v12.avatarCirclePresenceImage = avatarCirclePresenceImage
+
+	v12.titleText = conversationTitle
+	v12.thumbnails = conversation.thumbnails
+	v12.conversationId = conversation.id
+	local participants
+
+	if FFlagAppChatServerSideConversationSearch and conversation.isSearchResult then
+		participants = conversation.participants
+	end
+
+	v12.participants = participants
+
+	v12.hideLeftAvatarPadding = joined.hideLeftAvatarPadding
+	v12.paddingLeft = joined.paddingLeft
+	v12.paddingRight = joined.paddingRight
+
+	if not FFlagEnableBlackbirdCheck then
+		isRobloxSubscriber = nil
+	end
+
+	v12.isRobloxSubscriber = isRobloxSubscriber
+	return createElement(PresenceBubbleCellStyled, v12, joined.children or {})
 end
 
 return React.memo(ConversationCell)

@@ -1,7 +1,8 @@
 local SocialExperienceJoin = script:FindFirstAncestor("SocialExperienceJoin")
-local SocialExperienceJoinParent = SocialExperienceJoin.Parent
+local parent = SocialExperienceJoin.Parent
 local Constants = require(SocialExperienceJoin.Common.Constants)
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
 
-return require(SocialExperienceJoinParent.LuaSocialLibrariesDeps).RoduxGames.config({
+return LuaSocialLibrariesDeps.RoduxGames.config({
 	keyPath = Constants.RODUX_KEY .. ".Games"
 })

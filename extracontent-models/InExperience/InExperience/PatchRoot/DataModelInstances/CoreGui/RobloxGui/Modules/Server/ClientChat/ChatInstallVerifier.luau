@@ -1,33 +1,29 @@
 local Players = game:GetService("Players")
 local StarterPlayer = game:GetService("StarterPlayer")
 
-local function waitForChildOfClass(p1, p2) -- line: 10
-	local p2_2 = p1:FindFirstChildOfClass(p2)
+local function waitForChildOfClass(instance, className)
+	local v = instance:FindFirstChildOfClass(className)
 
-	while not p2_2 or p2 ~= p2_2.ClassName do
-		p2_2 = p1.ChildAdded:Wait()
+	while not v or v.ClassName ~= className do
+		v = instance.ChildAdded:Wait()
 	end
 
-	return p2_2
+	return v
 end
 
-local v4 = waitForChildOfClass(Players.LocalPlayer, "PlayerScripts")
-local v5 = waitForChildOfClass(StarterPlayer, "StarterPlayerScripts")
+local parent = waitForChildOfClass(Players.LocalPlayer, "PlayerScripts")
+local v = waitForChildOfClass(StarterPlayer, "StarterPlayerScripts")
 
-function VerifyScriptExistence() -- line: 22
-	-- upvalues: v4 (copy), v5 (copy)
-	local Value = script:WaitForChild("ScriptToVerify").Value
+function VerifyScriptExistence()
+	local value = script:WaitForChild("ScriptToVerify").Value
+	local child = not parent:FindFirstChild(value) and v:FindFirstChild(value)
 
-	if not v4:FindFirstChild(Value) then
-		local Value2 = v5:FindFirstChild(Value)
-
-		if Value2 then
-			local Archivable = Value2.Archivable
-
-			Value2.Archivable = true
-			Value2:Clone().Parent = v4
-			Value2.Archivable = Archivable
-		end
+	if child then
+		local archivable = child.Archivable
+		child.Archivable = true
+		local clone = child:Clone()
+		clone.Parent = parent
+		child.Archivable = archivable
 	end
 end
 

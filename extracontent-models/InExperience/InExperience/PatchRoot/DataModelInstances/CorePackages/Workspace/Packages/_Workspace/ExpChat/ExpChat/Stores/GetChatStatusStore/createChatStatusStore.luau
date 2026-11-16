@@ -1,12 +1,9 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local createSignal = require(Parent.Signals).createSignal
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(parent.Signals)
+local createSignal = Signals.createSignal
 
-return function() -- line: 28
-	-- upvalues: createSignal (copy)
-	local v3, v4 = createSignal("Unknown")
+return function()
+	local signal, setChatStatus = createSignal("Unknown")
 
-	return {
-		getChatStatus = v3,
-		setChatStatus = v4
-	}
+	return { getChatStatus = signal, setChatStatus = setChatStatus }
 end

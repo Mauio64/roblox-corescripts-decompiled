@@ -1,4 +1,1 @@
-return {
-	UniversalApp = 1,
-	InExperience = 2
-}
+return { UniversalApp = 1, InExperience = 2 }

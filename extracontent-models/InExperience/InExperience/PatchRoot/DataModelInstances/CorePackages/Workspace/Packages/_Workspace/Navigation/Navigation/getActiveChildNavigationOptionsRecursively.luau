@@ -1,26 +1,26 @@
 require(script.Parent.types)
 
-return function(p1, p2) -- line: 6
-	local state = p1.state
-	local router = p1.router
-	local getChildNavigation = p1.getChildNavigation
+return function(data, p)
+	local state = data.state
+	local router = data.router
+	local getChildNavigation = data.getChildNavigation
+
 	local routes = state.routes
-	local v7 = nil
+	local v = nil
 
 	while routes do
-		local v8 = getChildNavigation(routes[state.index].key)
+		local childNavigation = getChildNavigation(routes[state.index].key)
+		v = router.getScreenOptions(childNavigation, p)
 
-		v7 = router.getScreenOptions(v8, p2)
-
-		if not v8 then
-			return v7
+		if not childNavigation then
+			break
 		end
 
-		getChildNavigation = v8.getChildNavigation
-		state = v8.state
+		getChildNavigation = childNavigation.getChildNavigation
+		state = childNavigation.state
 		routes = state.routes
-		router = v8.router
+		router = childNavigation.router
 	end
 
-	return v7
+	return v
 end

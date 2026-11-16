@@ -1,31 +1,14 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-
-require(Parent.InteractionFeedback)
-
-local t1 = {
-	Default = "Default"
-}
-local t2 = {
-	Press = "Press",
-	Hover = "Hover",
-	Release = "Release"
-}
-local t3 = {
-	Default = {
-		Press = {
-			Haptic = Enum.HapticEffectType.UIClick
-		},
-		Hover = {
-			Haptic = Enum.HapticEffectType.UIHover
-		},
-		Release = {
-			Haptic = Enum.HapticEffectType.UIClick
-		}
-	}
-}
+local parent = script:FindFirstAncestor("AppChat").Parent
+require(parent.InteractionFeedback)
 
 return {
-	HapticFeedbackContext = t1,
-	HapticFeedbackType = t2,
-	HapticFeedbackConfig = t3
+	HapticFeedbackContext = { Default = "Default" },
+	HapticFeedbackType = { Press = "Press", Hover = "Hover", Release = "Release" },
+	HapticFeedbackConfig = {
+		Default = {
+			Press = { Haptic = Enum.HapticEffectType.UIClick },
+			Hover = { Haptic = Enum.HapticEffectType.UIHover },
+			Release = { Haptic = Enum.HapticEffectType.UIClick }
+		}
+	}
 }

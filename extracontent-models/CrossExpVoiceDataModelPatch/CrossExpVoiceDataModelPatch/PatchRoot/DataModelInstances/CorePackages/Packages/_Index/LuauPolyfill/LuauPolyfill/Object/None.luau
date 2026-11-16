@@ -1,7 +1,6 @@
-local v1 = newproxy(true)
-
-getmetatable(v1).__tostring = function() -- line: 6
+local v = newproxy(true)
+getmetatable(v).__tostring = function(): string
 	return "Object.None"
 end
 
-return v1
+return v

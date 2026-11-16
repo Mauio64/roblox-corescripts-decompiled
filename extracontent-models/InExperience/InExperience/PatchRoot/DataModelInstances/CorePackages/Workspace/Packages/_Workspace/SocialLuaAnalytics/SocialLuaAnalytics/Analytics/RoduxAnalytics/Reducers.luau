@@ -1,13 +1,10 @@
-local ParentParent = script.Parent.Parent.Parent
-local Rodux = require(ParentParent.dependencies).Rodux
-
+local parent = script.Parent.Parent.Parent
+local dependencies = require(parent.dependencies)
+local rodux = dependencies.Rodux
 require(script.Parent.AnalyticsTypes)
 
 local bySessionKey = require(script.bySessionKey)
 
-return function(p1) -- line: 8
-	-- upvalues: Rodux (copy), bySessionKey (copy)
-	return Rodux.combineReducers({
-		bySessionKey = bySessionKey(p1)
-	})
+return function(p)
+	return rodux.combineReducers({ bySessionKey = bySessionKey(p) })
 end

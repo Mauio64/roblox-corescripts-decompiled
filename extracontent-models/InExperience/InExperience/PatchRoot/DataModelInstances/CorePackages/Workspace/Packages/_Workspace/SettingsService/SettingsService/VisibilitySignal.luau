@@ -1,15 +1,13 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 
-require(scriptParent.Types)
+require(parent.Types)
+local ValueChangedSignal = require(parent.ValueChangedSignal)
 
-local ValueChangedSignal = require(scriptParent.ValueChangedSignal)
-local t1 = {}
+local VisibilitySignal = {}
+VisibilitySignal.__index = VisibilitySignal
 
-t1.__index = t1
-
-function t1.new(b1: boolean) -- line: 18
-	-- upvalues: ValueChangedSignal (copy)
-	return ValueChangedSignal.new(b1)
+function VisibilitySignal.new(flag: boolean)
+	return ValueChangedSignal.new(flag)
 end
 
-return t1
+return VisibilitySignal

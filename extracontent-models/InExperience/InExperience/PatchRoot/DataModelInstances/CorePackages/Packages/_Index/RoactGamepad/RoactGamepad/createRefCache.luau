@@ -1,31 +1,28 @@
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
+local parent = script.Parent.Parent
+local Roact = require(parent.Roact)
 
-local function createRefCache() -- line: 10
-	-- upvalues: Roact (copy)
-	local t1 = {}
+local function createRefCache()
+	local refs = {}
 
-	setmetatable(t1, {
-		__index = function(_, p2) -- line: 14
-			-- upvalues: Roact (copy), t1 (copy)
-			local v7 = Roact.createRef()
+	setmetatable(refs, {
+		__index = function(_, p)
+			local ref = Roact.createRef()
+			refs[p] = ref
 
-			t1[p2] = v7
-
-			return v7
+			return ref
 		end,
-		__tostring = function(p3) -- line: 20
-			local s1 = "{"
+		__tostring = function(items)
+			local v = "{"
 
-			for k, v in pairs(p3) do
-				s1 = ("%s\n\t%s -> %s"):format(s1, tostring(k), (tostring(v)))
+			for k, item in pairs(items) do
+				v = ("%s\n\t%s -> %s"):format(v, tostring(k), (tostring(item)))
 			end
 
-			return s1 .. "\n}"
+			return v .. "\n}"
 		end
 	})
 
-	return t1
+	return refs
 end
 
 return createRefCache

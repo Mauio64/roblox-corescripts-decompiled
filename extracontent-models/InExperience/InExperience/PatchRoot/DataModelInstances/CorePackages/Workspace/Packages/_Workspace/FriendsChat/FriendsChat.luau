@@ -1,3 +1,1 @@
-return {
-	["jest.config"] = script["jest.config"]
-}
+return { ["jest.config"] = script["jest.config"] }

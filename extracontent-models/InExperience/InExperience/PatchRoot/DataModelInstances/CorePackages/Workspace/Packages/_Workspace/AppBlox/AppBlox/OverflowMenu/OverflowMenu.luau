@@ -1,11 +1,13 @@
 local AppBlox = script:FindFirstAncestor("AppBlox")
-local AppBloxParent = AppBlox.Parent
-local BuilderIcons = require(AppBloxParent.BuilderIcons)
-local Cryo = require(AppBloxParent.Cryo)
-local FocusNavigationUtils = require(AppBloxParent.FocusNavigationUtils)
-local Foundation = require(AppBloxParent.Foundation)
-local React = require(AppBloxParent.React)
-local SharedFlags = require(AppBloxParent.SharedFlags)
+local parent = AppBlox.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
+local Cryo = require(parent.Cryo)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+
 local ThreeDotsHorizontal = BuilderIcons.Icon.ThreeDotsHorizontal
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local useFocusNavigableSurfaceRegistryConnection = FocusNavigationUtils.useFocusNavigableSurfaceRegistryConnection
@@ -17,152 +19,147 @@ local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local Menu = Foundation.Menu
 local View = Foundation.View
+
 local getOverflowMenuSignalStore = require(AppBlox.OverflowMenu.getOverflowMenuSignalStore)
 local useOverflowMenuOpen = require(AppBlox.OverflowMenu.useOverflowMenuOpen)
-local v22 = game:DefineFastFlag("OverflowMenuRemoveCloseMenuChecks", false)
-local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
+local FFlagLuaAppSduiGameTileFeedback = SharedFlags.FFlagLuaAppSduiGameTileFeedback
 
-local function OverflowMenu(t1: {[any]: any}) -- line: 59
-	-- upvalues: React (copy), v22 (copy), getOverflowMenuSignalStore (copy), useOverflowMenuOpen (copy), Cryo (copy), useFocusNavigableSurfaceRegistryConnection (copy), FocusNavigableSurfaceIdentifierEnum (copy), View (copy), FFlagSduiExperienceDetailsSupport (copy), IconButton (copy), ThreeDotsHorizontal (copy), IconSize (copy), ButtonVariant (copy), Menu (copy), PopoverAlign (copy), PopoverSide (copy), InputSize (copy)
-	local menuKey = t1.menuKey
-	local v27 = React.useRef(nil)
-	local v28 = if not v22 then React.useRef(nil) else nil
-	local v29 = getOverflowMenuSignalStore()
-	local v30 = useOverflowMenuOpen(menuKey)
-	local v31 = React.useCallback(function() -- line: 69
-		-- upvalues: v30 (copy), v29 (copy), menuKey (copy), t1 (copy)
-		local v39 = v30
+local function OverflowMenu(props)
+	local menuKey = props.menuKey
+	local ref = React.useRef(nil)
+	local overflowMenuSignalStore = getOverflowMenuSignalStore()
+	local v = useOverflowMenuOpen(menuKey)
 
-		v29.toggleMenu(menuKey)
+	local onActivated = React.useCallback(function()
+		overflowMenuSignalStore.toggleMenu(menuKey)
 
-		if t1.onMenuOpenChanged then
-			t1.onMenuOpenChanged(v39)
+		if props.onMenuOpenChanged then
+			props.onMenuOpenChanged(v)
 		end
-	end, {
-		menuKey,
-		v29,
-		v30,
-		t1.onMenuOpenChanged
-	})
-	local v32 = React.useCallback(function() -- line: 85
-		-- upvalues: v22 (copy), v28 (copy), t1 (copy), v29 (copy), menuKey (copy)
-		if v22 or (v28.current == Enum.GuiState.Idle or not t1.hasOverflowButton or not t1.shouldShowAnchor) then
-			v29.closeMenu(menuKey)
+	end, { menuKey, overflowMenuSignalStore, v, props.onMenuOpenChanged })
 
-			if t1.onMenuOpenChanged then
-				t1.onMenuOpenChanged(true)
-			end
+	local onPressedOutside = React.useCallback(function()
+		overflowMenuSignalStore.closeMenu(menuKey)
+
+		if props.onMenuOpenChanged then
+			props.onMenuOpenChanged(true)
 		end
-	end, {
-		if v22 then nil else t1.hasOverflowButton,
-		if v22 then nil else t1.shouldShowAnchor,
-		menuKey,
-		v29,
-		t1.onMenuOpenChanged
-	})
-	local v33 = React.useMemo(function() -- line: 111
-		-- upvalues: Cryo (copy), t1 (copy), v29 (copy), menuKey (copy)
-		return Cryo.List.map(t1.menuItems, function(p1) -- line: 112
-			-- upvalues: v29 (copy), menuKey (copy), t1 (copy)
+	end, { menuKey, overflowMenuSignalStore, props.onMenuOpenChanged })
+
+	local items = React.useMemo(function()
+		return Cryo.List.map(props.menuItems, function(data)
 			return {
-				icon = p1.icon,
-				id = p1.id,
-				text = p1.text,
-				onActivated = function() -- line: 117
-					-- upvalues: p1 (copy), v29 (copy), menuKey (copy), t1 (copy)
-					task.spawn(function() -- line: 118
-						-- upvalues: p1 (copy)
-						p1.onActivated()
+				icon = data.icon,
+				id = data.id,
+				text = data.text,
+				onActivated = function()
+					task.spawn(function()
+						data.onActivated()
 					end)
-					v29.closeMenu(menuKey)
+					overflowMenuSignalStore.closeMenu(menuKey)
 
-					if t1.onMenuOpenChanged then
-						t1.onMenuOpenChanged(true)
+					if props.onMenuOpenChanged then
+						props.onMenuOpenChanged(true)
 					end
 				end
 			}
 		end)
-	end, {
-		t1.menuItems,
-		menuKey,
-		v29,
-		t1.onMenuOpenChanged
-	})
-	local v34 = React.useRef(menuKey)
+	end, { props.menuItems, menuKey, overflowMenuSignalStore, props.onMenuOpenChanged })
 
-	React.useEffect(function() -- line: 139
-		-- upvalues: v34 (copy), menuKey (copy), v29 (copy)
-		if v34.current ~= menuKey and v29 then
-			v34.current = menuKey
-			v29.closeMenu(menuKey)
+	local ref2 = React.useRef(menuKey)
+	React.useEffect(function()
+		if ref2.current ~= menuKey and overflowMenuSignalStore then
+			ref2.current = menuKey
+			overflowMenuSignalStore.closeMenu(menuKey)
 		end
-	end, {
-		menuKey,
-		v29
-	})
+	end, { menuKey, overflowMenuSignalStore })
 
-	local v35 = nil
+	local state, setState = React.useState(nil)
+	local ref3 = React.useCallback(function(p)
+		setState(p)
 
-	if not v22 then
-		v35 = React.useCallback(function() -- line: 148
-			-- upvalues: v27 (copy), v28 (copy)
-			if v27.current then
-				v28.current = v27.current.GuiState
-			end
-		end, {})
+		if props.setFocusRef then
+			props.setFocusRef(p)
+		end
+	end, { props.setFocusRef })
+
+	useFocusNavigableSurfaceRegistryConnection(state, FocusNavigableSurfaceIdentifierEnum.ContextualMenu, true)
+
+	if not (props.shouldShowAnchor or v) then
+		return nil
 	end
 
-	local v36, v37 = React.useState(nil)
-	local v38 = React.useCallback(function(p2) -- line: 156
-		-- upvalues: v37 (copy), t1 (copy)
-		v37(p2)
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local menuAnchor
 
-		if t1.setFocusRef then
-			t1.setFocusRef(p2)
+	if props.hasOverflowButton and (props.shouldShowAnchor or v) then
+		local createElement2 = React.createElement
+		local v2 = {
+			AnchorPoint = props.anchorPoint,
+			Position = props.anchorPosition,
+			ZIndex = 0,
+			tag = 0,
+			backgroundStyle = 0,
+			ref = 0
+		}
+		local zIndex
+
+		if FFlagLuaAppSduiGameTileFeedback then
+			zIndex = props.zIndex
 		end
-	end, { t1.setFocusRef })
 
-	useFocusNavigableSurfaceRegistryConnection(v36, FocusNavigableSurfaceIdentifierEnum.ContextualMenu, true)
-
-	if t1.shouldShowAnchor or v30 then
-		return (React.createElement(React.Fragment, nil, {
-			MenuAnchor = if not t1.hasOverflowButton or not t1.shouldShowAnchor and not v30 then React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				AnchorPoint = t1.anchorPoint,
-				Position = t1.anchorPosition,
-				Size = UDim2.fromScale(0, 0),
-				ref = v27
-			}) else React.createElement(View, {
-				AnchorPoint = t1.anchorPoint,
-				Position = t1.anchorPosition,
-				onStateChanged = if not v22 then v35 else nil,
-				tag = (not FFlagSduiExperienceDetailsSupport or t1.buttonTag == nil) and "auto-xy radius-circle" or t1.buttonTag,
-				backgroundStyle = t1.buttonIconBackgroundStyle,
-				ref = v27
-			}, {
-				IconButton = React.createElement(IconButton, {
-					icon = t1.buttonIcon or ThreeDotsHorizontal,
-					isCircular = not FFlagSduiExperienceDetailsSupport or (t1.buttonIsCircular == nil or t1.buttonIsCircular),
-					onActivated = v31,
-					size = t1.buttonIconSize or IconSize.Medium,
-					variant = t1.buttonVariant or ButtonVariant.Utility
-				})
-			}),
-			OverflowMenu = if not v30 then nil else React.createElement(Menu, {
-				isOpen = true,
-				align = t1.popoverAlign or PopoverAlign.End,
-				items = v33,
-				onPressedOutside = v32,
-				side = t1.popoverSide or PopoverSide.Bottom,
-				size = t1.menuItemSize or InputSize.Medium,
-				width = t1.menuWidth,
-				anchorRef = v27,
-				ref = v38
+		v2.ZIndex = zIndex
+		v2.tag = props.buttonTag == nil and "auto-xy radius-circle" or props.buttonTag
+		v2.backgroundStyle = props.buttonIconBackgroundStyle
+		v2.ref = ref
+		menuAnchor = createElement2(View, v2, {
+			IconButton = React.createElement(IconButton, {
+				icon = props.buttonIcon or ThreeDotsHorizontal,
+				isCircular = props.buttonIsCircular == nil or props.buttonIsCircular,
+				onActivated = onActivated,
+				size = props.buttonIconSize or IconSize.Medium,
+				variant = props.buttonVariant or ButtonVariant.Utility
 			})
-		}))
+		})
+	else
+		local createElement2 = React.createElement
+		local v2 = {
+			AnchorPoint = props.anchorPoint,
+			BackgroundTransparency = 1,
+			Position = props.anchorPosition,
+			Size = UDim2.fromScale(0, 0),
+			ZIndex = 0,
+			ref = 0
+		}
+		local zIndex
+
+		if FFlagLuaAppSduiGameTileFeedback then
+			zIndex = props.zIndex
+		end
+
+		v2.ZIndex = zIndex
+		v2.ref = ref
+		menuAnchor = createElement2("Frame", v2)
 	end
 
-	return nil
+	local overflowMenu
+
+	if v then
+		overflowMenu = React.createElement(Menu, {
+			align = props.popoverAlign or PopoverAlign.End,
+			isOpen = true,
+			items = items,
+			onPressedOutside = onPressedOutside,
+			side = props.popoverSide or PopoverSide.Bottom,
+			size = props.menuItemSize or InputSize.Medium,
+			width = props.menuWidth,
+			anchorRef = ref,
+			ref = ref3
+		})
+	end
+
+	return (createElement(fragment, nil, { MenuAnchor = menuAnchor, OverflowMenu = overflowMenu }))
 end
 
 return React.memo(OverflowMenu)

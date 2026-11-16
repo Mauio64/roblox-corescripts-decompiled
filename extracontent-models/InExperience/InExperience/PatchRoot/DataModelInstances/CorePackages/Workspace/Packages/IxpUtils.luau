@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.IxpUtils.IxpUtils))
+local IxpUtils = require(Workspace.IxpUtils.IxpUtils)
+
+return IxpUtils

@@ -1,8 +1,8 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local t = require(DataHydrationParent.t)
+local parent = DataHydration.Parent
+local t = require(parent.t)
+require(parent.Signals)
 
-require(DataHydrationParent.Signals)
 require(DataHydration.DataHydrationTypes)
 
 return {

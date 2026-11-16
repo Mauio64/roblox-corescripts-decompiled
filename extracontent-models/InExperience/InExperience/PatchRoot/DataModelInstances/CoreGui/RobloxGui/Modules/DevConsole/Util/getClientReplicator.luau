@@ -1,19 +1,16 @@
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 
-local ClientReplicator = nil
+local clientReplicator = nil
+local function getClientReplicator()
+	local v = clientReplicator == nil and game:FindService("NetworkClient")
 
-local function getClientReplicator() -- line: 4
-	-- upvalues: ClientReplicator (ref)
-	if ClientReplicator == nil then
-		local Service = game:FindService("NetworkClient")
-
-		if Service then
-			ClientReplicator = Service:FindFirstChildOfClass("ClientReplicator")
-		end
+	if v then
+		clientReplicator = v:FindFirstChildOfClass("ClientReplicator")
 	end
 
-	if ClientReplicator and ClientReplicator:IsDescendantOf(game) then
-		return ClientReplicator
+	if clientReplicator and clientReplicator:IsDescendantOf(game) then
+		return clientReplicator
 	end
 
 	return nil

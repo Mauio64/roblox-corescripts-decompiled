@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local InExperienceDetailsPromptContainer = require(Workspace.InExperienceDetailsPrompt.InExperienceDetailsPrompt.Features.InExperienceDetailsPromptContainer)
 
-return (require(_Workspace.InExperienceDetailsPrompt.InExperienceDetailsPrompt.Features.InExperienceDetailsPromptContainer))
+return InExperienceDetailsPromptContainer

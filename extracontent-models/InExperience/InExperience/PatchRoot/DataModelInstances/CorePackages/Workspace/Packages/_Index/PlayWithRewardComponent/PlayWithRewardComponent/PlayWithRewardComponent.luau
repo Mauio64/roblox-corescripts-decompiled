@@ -1,27 +1,31 @@
 local AdService = game:GetService("AdService")
 local Players = game:GetService("Players")
-local PlayWithRewardComponent2 = script:FindFirstAncestor("PlayWithRewardComponent")
-local PlayWithRewardBlackoutCurtain = require(PlayWithRewardComponent2.PlayWithRewardBlackoutCurtain)
-local PlayWithRewardCoachmark = require(PlayWithRewardComponent2.PlayWithRewardCoachmark)
-local PlayWithRewardTelemetry = require(PlayWithRewardComponent2.PlayWithRewardTelemetry)
-local shouldRenderPlayWithRewardBanner = require(PlayWithRewardComponent2.shouldRenderPlayWithRewardBanner)
-local PlayWithRewardComponent2Parent = PlayWithRewardComponent2.Parent
-local PlayWithRewardState = require(PlayWithRewardComponent2Parent.PlayWithRewardState)
-local Foundation = require(PlayWithRewardComponent2Parent.Foundation)
-local GamePlayButton = require(PlayWithRewardComponent2Parent.GamePlayButton)
-local React = require(PlayWithRewardComponent2Parent.React)
-local RobloxAppHooks = require(PlayWithRewardComponent2Parent.RobloxAppHooks)
-local RobloxAppUpdate = require(PlayWithRewardComponent2Parent.RobloxAppUpdate)
-local RoactServiceTags = require(PlayWithRewardComponent2Parent.RoactServiceTags)
-local RoactUtils = require(PlayWithRewardComponent2Parent.RoactUtils)
-local SharedFlags = require(PlayWithRewardComponent2Parent.SharedFlags)
+
+local playWithRewardComponent = script:FindFirstAncestor("PlayWithRewardComponent")
+local PlayWithRewardBlackoutCurtain = require(playWithRewardComponent.PlayWithRewardBlackoutCurtain)
+local PlayWithRewardCoachmark = require(playWithRewardComponent.PlayWithRewardCoachmark)
+local PlayWithRewardTelemetry = require(playWithRewardComponent.PlayWithRewardTelemetry)
+local shouldRenderPlayWithRewardBanner = require(playWithRewardComponent.shouldRenderPlayWithRewardBanner)
+
+local parent = playWithRewardComponent.Parent
+local PlayWithRewardState = require(parent.PlayWithRewardState)
+local Foundation = require(parent.Foundation)
+local GamePlayButton = require(parent.GamePlayButton)
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local RobloxAppUpdate = require(parent.RobloxAppUpdate)
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RoactUtils = require(parent.RoactUtils)
+local SharedFlags = require(parent.SharedFlags)
+
 local SetPlayWithRewardState = PlayWithRewardState.SetPlayWithRewardState
+
 local Button = Foundation.Button
 local Enums = Foundation.Enums
 local Icon = Foundation.Icon
-local FoundationImage = Foundation.Image
+local Image = Foundation.Image
 local Skeleton = Foundation.Skeleton
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 local PlayButtonReferralSource = GamePlayButton.PlayButtonReferralSource
@@ -30,296 +34,475 @@ local RoactAnalytics = RoactServiceTags.RoactAnalytics
 local AppUpdateService = RoactServiceTags.AppUpdateService
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useRoactService = RobloxAppHooks.useRoactService
-local CheckForUpdate = RobloxAppUpdate.Thunks.CheckForUpdate
 local HandleUpdate = RobloxAppUpdate.HandleUpdate
-local EngineFeature = game:GetEngineFeature("AutoUpgradeEngineFeatureOnly")
-local EngineFeature2 = game:GetEngineFeature("CanPerformBinaryUpdateEnabled")
-local v37 = game:DefineFastInt("PlayWithRewardFallbackBannerProductImageAssetId", 0)
-local v38 = game:DefineFastInt("LuaAppPlayWithRewardMobileEdpLayoutOrder", 120)
+
+local engineFeature = game:GetEngineFeature("CanPerformBinaryUpdateEnabled")
+
+local FIntPlayWithRewardFallbackBannerProductImageAssetId = SharedFlags.FIntPlayWithRewardFallbackBannerProductImageAssetId
+local defineFastInt = game:DefineFastInt("LuaAppPlayWithRewardMobileEdpLayoutOrder", 120)
 local FFlagEnablePlayWithRewardNonPeekviewEdp = SharedFlags.FFlagEnablePlayWithRewardNonPeekviewEdp
 local FFlagSduiPlayWithReward = SharedFlags.FFlagSduiPlayWithReward
 local FFlagLuaAppEnableContainedRewardUi = PlayWithRewardState.FFlagLuaAppEnableContainedRewardUi
-local FFlagCheckForUpdatePromise = SharedFlags.FFlagCheckForUpdatePromise
 
-function PlayWithRewardComponent(t1: {[any]: any}) -- line: 69
-	-- upvalues: useTokens (copy), useRoactService (copy), RoactAnalytics (copy), AppUpdateService (copy), useDispatch (copy), Players (copy), React (copy), FFlagEnablePlayWithRewardNonPeekviewEdp (copy), shouldRenderPlayWithRewardBanner (copy), usePlayButtonLaunchGame (copy), PlayButtonReferralSource (copy), PlayWithRewardTelemetry (copy), PlayWithRewardBlackoutCurtain (copy), SetPlayWithRewardState (copy), AdService (copy), v37 (copy), EngineFeature (copy), FFlagCheckForUpdatePromise (copy), HandleUpdate (copy), EngineFeature2 (copy), CheckForUpdate (copy), FFlagLuaAppEnableContainedRewardUi (copy), FFlagSduiPlayWithReward (copy), v38 (copy), Skeleton (copy), Icon (copy), Enums (copy), FoundationImage (copy), View (copy), FoundationText (copy), Button (copy), PlayWithRewardCoachmark (copy)
-	local v44 = useTokens()
-	local v45 = useRoactService(RoactAnalytics)
-	local v46 = useRoactService(AppUpdateService)
-	local v47 = useDispatch()
-	local LocalPlayer = Players.LocalPlayer
-	local v49 = React.useRef(nil)
-	local v50 = React.useRef(false)
-	local playWithRewardAdData = t1.playWithRewardAdData
-	local v52 = playWithRewardAdData and playWithRewardAdData.productId or ""
-	local v53 = playWithRewardAdData and (not not playWithRewardAdData.experimentVariantData and playWithRewardAdData.experimentVariantData.variantId) or ""
-	local v54 = t1.flowId ~= "" and t1.isAdDataExpected
-	local u55 = if not FFlagEnablePlayWithRewardNonPeekviewEdp then LocalPlayer ~= nil and (t1.flowId ~= "" and (t1.fetchedUniverseId ~= nil and (t1.fetchedUniverseId == t1.universeId and (playWithRewardAdData ~= nil and (playWithRewardAdData.adAvailabilityResult == Enum.AdAvailabilityResult.IsAvailable and (playWithRewardAdData.experimentVariantData ~= nil and ((playWithRewardAdData.experimentVariantData.titleText ~= "" or playWithRewardAdData.experimentVariantData.subtitleText ~= "") and (tonumber(v52) or 0) ~= 0))))))) else shouldRenderPlayWithRewardBanner(t1.universeId, t1.flowId, t1.fetchedUniverseId, t1.playWithRewardAdData)
-	local v56 = t1.placeIdOverride or t1.placeId
-	local v57 = usePlayButtonLaunchGame(t1.universeId, v56, t1.placeId, PlayButtonReferralSource.PlayWithReward, "PlayWithRewardGameDetails", "PlayWithRewardButton", t1.experienceJoinData)
+function PlayWithRewardComponent(props)
+	local v = useTokens()
+	local v2 = useRoactService(RoactAnalytics)
+	local v3 = useRoactService(AppUpdateService)
+	local v4 = useDispatch()
+	local localPlayer = Players.LocalPlayer
+	local ref = React.useRef(nil)
 
-	React.useEffect(function() -- line: 119
-		-- upvalues: u55 (ref), v50 (copy), PlayWithRewardTelemetry (copy), t1 (copy), v52 (copy), v53 (copy)
-		if u55 then
-			v50.current = true
-			PlayWithRewardTelemetry.logPlayWithRewardBannerShown(t1.flowId, t1.universeId, "startShow", v52, v53)
+	local ref2 = React.useRef(false)
+
+	local playWithRewardAdData = props.playWithRewardAdData
+	local productId = playWithRewardAdData and playWithRewardAdData.productId or ""
+
+	local variantId = playWithRewardAdData
+		and playWithRewardAdData.experimentVariantData
+		and playWithRewardAdData.experimentVariantData.variantId
+		or ""
+
+	local v5 = not (props.flowId == "") and props.isAdDataExpected
+	local v6
+
+	if FFlagEnablePlayWithRewardNonPeekviewEdp then
+		v6 = shouldRenderPlayWithRewardBanner(
+			props.universeId,
+			props.flowId,
+			props.fetchedUniverseId,
+			props.playWithRewardAdData
+		)
+	elseif
+		localPlayer == nil
+		or props.flowId == ""
+		or props.fetchedUniverseId == nil
+		or props.fetchedUniverseId ~= props.universeId
+		or playWithRewardAdData == nil
+		or playWithRewardAdData.adAvailabilityResult ~= Enum.AdAvailabilityResult.IsAvailable
+		or playWithRewardAdData.experimentVariantData == nil
+		or playWithRewardAdData.experimentVariantData.titleText == ""
+		and playWithRewardAdData.experimentVariantData.subtitleText == ""
+	then
+		v6 = false
+	else
+		v6 = (tonumber(productId) or 0) ~= 0
+	end
+
+	local placeIdOverride = props.placeIdOverride or props.placeId
+	local v7 = usePlayButtonLaunchGame(
+		props.universeId,
+		placeIdOverride,
+		props.placeId,
+		PlayButtonReferralSource.PlayWithReward,
+		"PlayWithRewardGameDetails",
+		"PlayWithRewardButton",
+		props.experienceJoinData
+	)
+
+	React.useEffect(function()
+		if v6 then
+			ref2.current = true
+			PlayWithRewardTelemetry.logPlayWithRewardBannerShown(
+				props.flowId,
+				props.universeId,
+				"startShow",
+				productId,
+				variantId
+			)
 		end
 
-		return function() -- line: 131
-			-- upvalues: v50 (copy), PlayWithRewardTelemetry (copy), t1 (copy), v52 (copy), v53 (copy)
-			if v50.current then
-				v50.current = false
-				PlayWithRewardTelemetry.logPlayWithRewardBannerShown(t1.flowId, t1.universeId, "endShow", v52, v53)
+		return function()
+			if ref2.current then
+				ref2.current = false
+				PlayWithRewardTelemetry.logPlayWithRewardBannerShown(
+					props.flowId,
+					props.universeId,
+					"endShow",
+					productId,
+					variantId
+				)
 			end
 		end
-	end, {
-		u55,
-		t1.flowId,
-		t1.universeId,
-		v52,
-		v53
-	})
+	end, { v6, props.flowId, props.universeId, productId, variantId })
 
-	local v58 = not playWithRewardAdData and "" or playWithRewardAdData.productName
-	local v59 = not playWithRewardAdData and "" or playWithRewardAdData.productImageAssetId
-	local v60 = v59 == ""
-	local v61 = React.useCallback(function() -- line: 150
-		-- upvalues: PlayWithRewardTelemetry (copy), t1 (copy), v52 (copy), PlayWithRewardBlackoutCurtain (copy), v47 (copy), SetPlayWithRewardState (copy), AdService (copy), v58 (copy), v60 (copy), v37 (copy), v59 (copy), v57 (copy), EngineFeature (copy), FFlagCheckForUpdatePromise (copy), HandleUpdate (copy), v46 (copy), EngineFeature2 (copy), v45 (copy), CheckForUpdate (copy)
-		local function showAdThenLaunch() -- line: 151
-			-- upvalues: PlayWithRewardTelemetry (copy), t1 (copy), v52 (copy), PlayWithRewardBlackoutCurtain (copy), v47 (copy), SetPlayWithRewardState (copy), AdService (copy), v58 (copy), v60 (copy), v37 (copy), v59 (copy), v57 (copy)
-			PlayWithRewardTelemetry.logPlayWithRewardBlackoutCurtainAction(t1.flowId, t1.universeId, "shown", v52)
+	local v8 = not playWithRewardAdData and "" or playWithRewardAdData.productName
+	local v9 = not playWithRewardAdData and "" or playWithRewardAdData.productImageAssetId
+	local v10 = v9 == ""
+	local onActivated = React.useCallback(function()
+		local function showAdThenLaunch()
+			PlayWithRewardTelemetry.logPlayWithRewardBlackoutCurtainAction(
+				props.flowId,
+				props.universeId,
+				"shown",
+				productId
+			)
+
 			PlayWithRewardBlackoutCurtain.show()
-			PlayWithRewardTelemetry.logPlayWithRewardButtonClicked(t1.flowId, t1.universeId, v52)
 
-			local ok, result = pcall(function() -- line: 162
-				-- upvalues: v47 (copy), SetPlayWithRewardState (copy), t1 (copy), PlayWithRewardTelemetry (copy), v52 (copy), AdService (copy)
-				v47(SetPlayWithRewardState(t1.flowId, t1.universeId, false, nil))
-				PlayWithRewardTelemetry.logPlayWithRewardAdPlaybackAttempted(t1.flowId, t1.universeId, v52)
+			PlayWithRewardTelemetry.logPlayWithRewardButtonClicked(props.flowId, props.universeId, productId)
 
-				return AdService:ShowRewardedVideoAdAtClientAsync(t1.universeId)
+			local success, result = pcall(function()
+				v4(SetPlayWithRewardState(props.flowId, props.universeId, false, nil))
+				PlayWithRewardTelemetry.logPlayWithRewardAdPlaybackAttempted(props.flowId, props.universeId, productId)
+
+				return AdService:ShowRewardedVideoAdAtClientAsync(props.universeId)
 			end)
 
-			pcall(function() -- line: 172
-				-- upvalues: PlayWithRewardTelemetry (copy), t1 (copy), result (copy), v52 (copy), AdService (copy), ok (copy), v58 (copy), v60 (copy), v37 (copy), v59 (copy)
-				PlayWithRewardTelemetry.logPlayWithRewardAdPlaybackStopped(t1.flowId, t1.universeId, tostring(result), v52)
-				AdService:SubmitAdNotification(tonumber(t1.universeId) or 0, ok and result ~= nil, result == Enum.ShowAdResult.ShowCompleted, v58, if not v60 then tonumber(v59) or v37 else v37)
+			pcall(function()
+				PlayWithRewardTelemetry.logPlayWithRewardAdPlaybackStopped(
+					props.flowId,
+					props.universeId,
+					tostring(result),
+					productId
+				)
+
+				local universeId = tonumber(props.universeId) or 0
+				local v11 = success and result ~= nil
+				local v12 = result == Enum.ShowAdResult.ShowCompleted
+				local v13
+
+				if v10 then
+					v13 = FIntPlayWithRewardFallbackBannerProductImageAssetId
+				else
+					v13 = tonumber(v9) or FIntPlayWithRewardFallbackBannerProductImageAssetId
+				end
+
+				AdService:SubmitAdNotification(universeId, v11, v12, v8, v13)
 			end)
-			PlayWithRewardTelemetry.logPlayWithRewardBlackoutCurtainAction(t1.flowId, t1.universeId, "hidden", v52)
+
+			PlayWithRewardTelemetry.logPlayWithRewardBlackoutCurtainAction(
+				props.flowId,
+				props.universeId,
+				"hidden",
+				productId
+			)
+
 			PlayWithRewardBlackoutCurtain.hide()
 
-			if v57 then
-				PlayWithRewardTelemetry.logPlayWithRewardGameJoinInitiated(t1.flowId, t1.universeId, v52)
-				v57(nil)
+			if v7 then
+				PlayWithRewardTelemetry.logPlayWithRewardGameJoinInitiated(props.flowId, props.universeId, productId)
+
+				v7(nil)
 			end
 		end
 
-		if EngineFeature then
-			if FFlagCheckForUpdatePromise then
-				HandleUpdate(v47, v46, EngineFeature2, v45, "PlayWithRewardGameDetails", showAdThenLaunch)
-
-				return
-			end
-
-			v47(CheckForUpdate(v46, EngineFeature2, v45, showAdThenLaunch, {
-				ctx = "PlayWithRewardGameDetails"
-			}))
-
-			return
-		end
-
-		showAdThenLaunch()
+		HandleUpdate(v4, v3, engineFeature, v2, "PlayWithRewardGameDetails", showAdThenLaunch)
 	end, {
-		t1.flowId,
-		t1.universeId,
-		v47,
-		v46,
-		v45,
-		v57,
-		v59,
-		v58,
-		v60,
-		v52
+		props.flowId,
+		props.universeId,
+		v4,
+		v3,
+		v2,
+		v7,
+		v9,
+		v8,
+		v10,
+		productId
 	})
-	local n1 = nil
-	local XLarge = nil
-	local XLarge2 = nil
-	local XLarge3 = nil
-	local s1 = nil
-	local s2 = nil
-	local s3 = nil
-	local s4 = nil
-	local v70 = nil
-	local s5 = nil
-	local Size_1200 = nil
-	local v73 = nil
-	local v74 = if not FFlagLuaAppEnableContainedRewardUi then nil else not t1.useLargerStyles and 76 or 108
+
+	local v11 = FFlagLuaAppEnableContainedRewardUi and (props.useLargerStyles and 108 or 76) or nil
+	local v12, v13, v14, tag, size, v15, v16, flag, v17, v18, v19, v20
 
 	if not FFlagLuaAppEnableContainedRewardUi then
-		local XLarge4
+		local v21
 
-		if t1.useLargerStyles then
-			n1 = 98
-			XLarge = v44.Padding.XLarge
-			XLarge2 = v44.Padding.XLarge
-			XLarge3 = v44.Padding.XLarge
-			XLarge4 = v44.Gap.XLarge
-			s1 = "padding-top-large"
-			s2 = "text-heading-small"
-			s3 = "text-body-medium"
-			s4 = "gap-xxsmall"
-			v70 = true
-			s5 = "size-1000-1200"
-			Size_1200 = v44.Size.Size_1200
+		if props.useLargerStyles then
+			v12 = v.Padding.XLarge
+			v15 = v.Padding.XLarge
+			v14 = v.Padding.XLarge
+			v21 = v.Gap.XLarge
+
+			v13 = v.Size.Size_1200
+			size = 98
+			tag = "padding-top-large"
+			v16 = "gap-xxsmall"
+			flag = true
+			v17 = "size-1000-1200"
+			v18 = "text-body-medium"
+			v19 = "text-heading-small"
 		else
-			n1 = 66
-			XLarge = v44.Padding.Medium
-			XLarge2 = v44.Padding.Small
-			XLarge3 = v44.Padding.Medium
-			XLarge4 = v44.Gap.Medium
-			s1 = "padding-top-medium"
-			s2 = "text-title-medium"
-			s3 = "text-body-small"
-			s4 = ""
-			v70 = false
-			s5 = "size-800-1000"
-			Size_1200 = v44.Size.Size_1000
+			v12 = v.Padding.Medium
+			v15 = v.Padding.Small
+			v14 = v.Padding.Medium
+			v21 = v.Gap.Medium
+
+			v13 = v.Size.Size_1000
+			size = 66
+			tag = "padding-top-medium"
+			v16 = ""
+			flag = false
+			v17 = "size-800-1000"
+			v18 = "text-body-small"
+			v19 = "text-title-medium"
 		end
 
-		v73 = XLarge2 + n1 + XLarge4
+		v20 = v15 + size + v21
 	end
 
-	local v76 = if not FFlagSduiPlayWithReward then v38 else t1.layoutOrder or v38
+	local layoutOrder
 
-	if v54 then
-		return React.createElement(Skeleton, {
-			tag = if not FFlagLuaAppEnableContainedRewardUi then s1 else nil,
-			Size = UDim2.new(1, 0, 0, if not FFlagLuaAppEnableContainedRewardUi then Size_1200 + XLarge * 2 + XLarge3 else v74),
-			LayoutOrder = v76
+	if FFlagSduiPlayWithReward then
+		layoutOrder = props.layoutOrder or defineFastInt
+	else
+		layoutOrder = defineFastInt
+	end
+
+	if v5 then
+		local createElement = React.createElement
+
+		if FFlagLuaAppEnableContainedRewardUi then
+			tag = nil
+		end
+
+		if not FFlagLuaAppEnableContainedRewardUi then
+			v11 = v13 + v12 * 2 + v14
+		end
+
+		return createElement(Skeleton, {
+			tag = tag,
+			Size = UDim2.new(1, 0, 0, v11),
+			LayoutOrder = layoutOrder
 		})
-	end
-
-	if not u55 then
-		return nil
-	end
-
-	local titleText = playWithRewardAdData.experimentVariantData.titleText
-	local subtitleText = playWithRewardAdData.experimentVariantData.subtitleText
-	local buttonText = playWithRewardAdData.experimentVariantData.buttonText
-	local coachmarkTitleText = playWithRewardAdData.experimentVariantData.coachmarkTitleText
-	local coachmarkSubtitleText = playWithRewardAdData.experimentVariantData.coachmarkSubtitleText
-	local showButton = playWithRewardAdData.experimentVariantData.showButton
-	local v83 = FFlagLuaAppEnableContainedRewardUi and playWithRewardAdData.experimentVariantData.keepRewardContained
-	local v84 = not LocalPlayer and 0 or LocalPlayer.UserId
-	local v85 = coachmarkTitleText ~= "" and coachmarkSubtitleText ~= ""
-
-	if FFlagLuaAppEnableContainedRewardUi then
-		local XLarge5
-
-		if t1.useLargerStyles then
-			n1 = not v83 and 98 or 76
-			XLarge = if not v83 then v44.Padding.XLarge else v44.Padding.Large
-			XLarge2 = v44.Padding.XLarge
-			XLarge3 = v44.Padding.XLarge
-			XLarge5 = v44.Gap.XLarge
-			s1 = "padding-top-large"
-			s2 = not v83 and "text-heading-small" or "text-title-large"
-			s3 = "text-body-medium"
-			s4 = "gap-xxsmall"
-			v70 = true
-			s5 = "size-1000-1200"
-		else
-			n1 = not v83 and 66 or 60
-			XLarge = if not v83 then v44.Padding.Medium else v44.Padding.Small
-			XLarge2 = v44.Padding.Small
-			XLarge3 = v44.Padding.Medium
-			XLarge5 = v44.Gap.Medium
-			s1 = "padding-top-medium"
-			s2 = "text-title-medium"
-			s3 = "text-body-small"
-			s4 = ""
-			v70 = false
-			s5 = "size-800-1000"
+	else
+		if not v6 then
+			return nil
 		end
 
-		v73 = XLarge2 + n1 + XLarge5
-	end
+		local titleText = playWithRewardAdData.experimentVariantData.titleText
+		local subtitleText = playWithRewardAdData.experimentVariantData.subtitleText
+		local buttonText = playWithRewardAdData.experimentVariantData.buttonText
+		local coachmarkTitleText = playWithRewardAdData.experimentVariantData.coachmarkTitleText
+		local coachmarkSubtitleText = playWithRewardAdData.experimentVariantData.coachmarkSubtitleText
+		local showButton = playWithRewardAdData.experimentVariantData.showButton
 
-	local v87 = if not v60 then React.createElement(FoundationImage, {
-		BackgroundTransparency = 1,
-		ZIndex = 2,
-		Size = UDim2.fromOffset(n1, n1),
-		Position = if not v83 then UDim2.fromOffset(XLarge2, -XLarge3) else nil,
-		Image = "rbxassetid://" .. v59
-	}) else React.createElement(Icon, {
-		ZIndex = 2,
-		name = Enums.IconName.GiftBox,
-		size = n1,
-		Position = if not v83 then UDim2.fromOffset(XLarge2, -XLarge3) else nil
-	})
+		local keepRewardContained = FFlagLuaAppEnableContainedRewardUi
+			and playWithRewardAdData.experimentVariantData.keepRewardContained
+		local localUserId = not localPlayer and 0 or localPlayer.UserId
+		local v21
 
-	return React.createElement(View, {
-		tag = if not v83 then `size-full-0 auto-y { s1 }` else "size-full-0 auto-y",
-		LayoutOrder = v76
-	}, {
-		Banner = React.createElement(View, {
-			tag = "size-full-0 auto-y radius-medium no-clip bg-shift-300",
-			onActivated = if not showButton then v61 else nil,
-			ref = v49
-		}, {
-			ProductImage = if not v83 then v87 else nil,
-			ContentView = React.createElement(View, {
-				tag = "row align-y-center gap-medium size-full-0 auto-y",
-				padding = if not v83 then {
-					left = UDim.new(0, v73),
-					top = UDim.new(0, XLarge),
-					right = UDim.new(0, XLarge),
-					bottom = UDim.new(0, XLarge)
-				} else XLarge
-			}, {
-				ContainedProductImage = if not v83 then nil else v87,
-				TextContainer = React.createElement(View, {
-					LayoutOrder = 1,
-					tag = `col fill auto-y { s4 }`
-				}, {
-					RewardTitle = if titleText == "" then nil else React.createElement(FoundationText, {
-						LayoutOrder = 1,
-						tag = `auto-xy text-wrap text-align-x-left content-emphasis { s2 }`,
-						Text = titleText
-					}),
-					RewardDescription = if subtitleText == "" then nil else React.createElement(FoundationText, {
-						LayoutOrder = 2,
-						tag = `auto-xy text-wrap text-align-x-left content-emphasis { s3 }`,
-						Text = subtitleText
-					})
-				}),
-				ClickableIndicator = if not showButton then React.createElement(View, {
-					LayoutOrder = 2,
-					tag = `align-x-center align-y-center { s5 }`
-				}, {
-					Icon = React.createElement(Icon, {
-						name = Enums.IconName.ChevronLargeRight,
-						style = v44.Color.Content.Emphasis,
-						size = if not v70 then Enums.IconSize.Medium else Enums.IconSize.Large
-					})
-				}) else React.createElement(Button, {
-					LayoutOrder = 2,
-					text = buttonText,
-					onActivated = v61,
-					variant = Enums.ButtonVariant.SoftEmphasis,
-					size = if not v70 then Enums.InputSize.Medium else Enums.InputSize.Large
-				})
+		if coachmarkTitleText == "" then
+			v21 = false
+		else
+			v21 = coachmarkSubtitleText ~= ""
+		end
+
+		if FFlagLuaAppEnableContainedRewardUi then
+			local v22
+
+			if props.useLargerStyles then
+				size = keepRewardContained and 76 or 98
+
+				if keepRewardContained then
+					v12 = v.Padding.Large
+				else
+					v12 = v.Padding.XLarge
+				end
+
+				v15 = v.Padding.XLarge
+				v14 = v.Padding.XLarge
+				v22 = v.Gap.XLarge
+				v16 = "gap-xxsmall"
+				flag = true
+				v17 = "size-1000-1200"
+				v18 = "text-body-medium"
+				v19 = keepRewardContained and "text-title-large" or "text-heading-small"
+				tag = "padding-top-large"
+			else
+				size = keepRewardContained and 60 or 66
+
+				if keepRewardContained then
+					v12 = v.Padding.Small
+				else
+					v12 = v.Padding.Medium
+				end
+
+				v15 = v.Padding.Small
+				v14 = v.Padding.Medium
+				v22 = v.Gap.Medium
+				v16 = ""
+				flag = false
+				v17 = "size-800-1000"
+				v18 = "text-body-small"
+				v19 = "text-title-medium"
+				tag = "padding-top-medium"
+			end
+
+			v20 = v15 + size + v22
+		end
+
+		local containedProductImage
+
+		if v10 then
+			local createElement = React.createElement
+			local v22 = { name = Enums.IconName.GiftBox, size = size, Position = 0, ZIndex = 2 }
+			local position
+
+			if not keepRewardContained then
+				position = UDim2.fromOffset(v15, -v14)
+			end
+
+			v22.Position = position
+			containedProductImage = createElement(Icon, v22)
+		else
+			local createElement = React.createElement
+			local v22 = {
+				Size = UDim2.fromOffset(size, size),
+				Position = 0,
+				Image = 0,
+				BackgroundTransparency = 1,
+				ZIndex = 2
+			}
+			local position
+
+			if not keepRewardContained then
+				position = UDim2.fromOffset(v15, -v14)
+			end
+
+			v22.Position = position
+			v22.Image = "rbxassetid://" .. v9
+			containedProductImage = createElement(Image, v22)
+		end
+
+		local createElement = React.createElement
+		local v22 = {
+			tag = keepRewardContained and "size-full-0 auto-y" or `size-full-0 auto-y {tag}`,
+			LayoutOrder = layoutOrder
+		}
+
+		local createElement2 = React.createElement
+		local onActivated2
+
+		if not showButton then
+			onActivated2 = onActivated
+		end
+
+		local productImage
+
+		if not keepRewardContained then
+			productImage = containedProductImage
+		end
+
+		local createElement3 = React.createElement
+		local v23 = {
+			tag = "row align-y-center gap-medium size-full-0 auto-y",
+			padding = not keepRewardContained and {
+				left = UDim.new(0, v20),
+				top = UDim.new(0, v12),
+				right = UDim.new(0, v12),
+				bottom = UDim.new(0, v12)
+			} or v12
+		}
+
+		if not keepRewardContained then
+			containedProductImage = nil
+		end
+
+		local createElement4 = React.createElement
+		local v24 = { tag = `col fill auto-y {v16}`, LayoutOrder = 1 }
+		local rewardTitle
+
+		if titleText ~= "" then
+			rewardTitle = React.createElement(Text, {
+				tag = `auto-xy text-wrap text-align-x-left content-emphasis {v19}`,
+				Text = titleText,
+				LayoutOrder = 1
 			})
-		}),
-		PlayWithRewardCoachmark = if not v85 then nil else React.createElement(PlayWithRewardCoachmark, {
-			anchorRef = v49,
-			flowId = t1.flowId,
-			localUserId = v84,
-			productId = v52,
-			title = coachmarkTitleText,
-			text = coachmarkSubtitleText,
-			universeId = t1.universeId
-		})
-	})
+		end
+
+		local rewardDescription
+
+		if subtitleText ~= "" then
+			rewardDescription = React.createElement(Text, {
+				tag = `auto-xy text-wrap text-align-x-left content-emphasis {v18}`,
+				Text = subtitleText,
+				LayoutOrder = 2
+			})
+		end
+
+		local v25 = {
+			ContainedProductImage = containedProductImage,
+			TextContainer = createElement4(View, v24, {
+				RewardTitle = rewardTitle,
+				RewardDescription = rewardDescription
+			}),
+			ClickableIndicator = 0
+		}
+		local clickableIndicator
+
+		if showButton then
+			local createElement5 = React.createElement
+			local v26 = {
+				text = buttonText,
+				onActivated = onActivated,
+				variant = Enums.ButtonVariant.SoftEmphasis,
+				size = 0,
+				LayoutOrder = 2
+			}
+			local size2
+
+			if flag then
+				size2 = Enums.InputSize.Large
+			else
+				size2 = Enums.InputSize.Medium
+			end
+
+			v26.size = size2
+			clickableIndicator = createElement5(Button, v26)
+		else
+			local createElement5 = React.createElement
+			local v26 = {
+				tag = `align-x-center align-y-center {v17}`,
+				LayoutOrder = 2
+			}
+
+			local createElement6 = React.createElement
+			local v27 = {
+				name = Enums.IconName.ChevronLargeRight,
+				style = v.Color.Content.Emphasis,
+				size = 0
+			}
+			local size2
+
+			if flag then
+				size2 = Enums.IconSize.Large
+			else
+				size2 = Enums.IconSize.Medium
+			end
+
+			v27.size = size2
+			clickableIndicator = createElement5(View, v26, { Icon = createElement6(Icon, v27) })
+		end
+
+		v25.ClickableIndicator = clickableIndicator
+		local v26 = {
+			Banner = createElement2(
+				View,
+				{
+					tag = "size-full-0 auto-y radius-medium no-clip bg-shift-300",
+					onActivated = onActivated2,
+					ref = ref
+				},
+				{ ProductImage = productImage, ContentView = createElement3(View, v23, v25) }
+			),
+			PlayWithRewardCoachmark = 0
+		}
+		local playWithRewardCoachmark
+
+		if v21 then
+			playWithRewardCoachmark = React.createElement(PlayWithRewardCoachmark, {
+				anchorRef = ref,
+				flowId = props.flowId,
+				localUserId = localUserId,
+				productId = productId,
+				title = coachmarkTitleText,
+				text = coachmarkSubtitleText,
+				universeId = props.universeId
+			})
+		end
+
+		v26.PlayWithRewardCoachmark = playWithRewardCoachmark
+		return createElement(View, v22, v26)
+	end
 end
 
 return PlayWithRewardComponent

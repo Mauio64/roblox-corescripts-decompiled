@@ -9,8 +9,6 @@ local ReceivedUserPresence = require(script.ReceivedUserPresence)
 local SetUserPresence = require(script.SetUserPresence)
 local SetLocalUserId = require(script.SetLocalUserId)
 local SetLocalUserUnder13 = require(script.SetLocalUserUnder13)
-local SetUserHasRobloxSubscription = require(script.SetUserHasRobloxSubscription)
-
 return {
 	AddUser = AddUser,
 	AddUsers = AddUsers,
@@ -19,7 +17,7 @@ return {
 	RemoveUser = RemoveUser,
 	SetUserIsFriend = SetUserIsFriend,
 	SetUserMembershipType = SetUserMembershipType,
-	SetUserHasRobloxSubscription = SetUserHasRobloxSubscription,
+	SetUserHasRobloxSubscription = require(script.SetUserHasRobloxSubscription),
 	ReceivedUserPresence = ReceivedUserPresence,
 	SetUserPresence = SetUserPresence,
 	SetLocalUserId = SetLocalUserId,

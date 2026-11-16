@@ -1,6 +1,6 @@
-local function validateRefs(t1: {[any]: any}) -- line: 1
-	for _, v4 in t1 do
-		if v4.current == nil then
+local function validateRefs(items): boolean
+	for _, item in items do
+		if item.current == nil then
 			return false
 		end
 	end

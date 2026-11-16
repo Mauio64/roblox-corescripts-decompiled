@@ -1,34 +1,31 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+
 local ContentProvider = game:GetService("ContentProvider")
-local React = require(Parent.React)
 
-local function useAssetFetchStatus(s1: string?) -- line: 8
-	-- upvalues: React (copy), ContentProvider (copy)
-	local v6, v7 = React.useState(Enum.AssetFetchStatus.None)
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 11
-		-- upvalues: v7 (copy), s1 (copy), ContentProvider (copy)
-		v7(Enum.AssetFetchStatus.None)
+local function useAssetFetchStatus(p: string?)
+	local state, setState = React.useState(Enum.AssetFetchStatus.None)
 
-		if not s1 or s1 == "" then
+	React.useEffect(function()
+		setState(Enum.AssetFetchStatus.None)
+
+		if not p or p == "" then
 			return
 		end
 
-		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(s1):Connect(function(p1) -- line: 18
-			-- upvalues: v7 (copy)
-			v7(p1)
+		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(p):Connect(function(p2)
+			setState(p2)
 		end)
-		local AssetFetchStatus = ContentProvider:GetAssetFetchStatus(s1)
 
-		v7(AssetFetchStatus)
+		setState((ContentProvider:GetAssetFetchStatus(p)))
 
-		return function() -- line: 25
-			-- upvalues: connection (copy)
+		return function()
 			connection:Disconnect()
 		end
-	end, { s1 })
+	end, { p })
 
-	return v6
+	return state
 end
 
 return useAssetFetchStatus

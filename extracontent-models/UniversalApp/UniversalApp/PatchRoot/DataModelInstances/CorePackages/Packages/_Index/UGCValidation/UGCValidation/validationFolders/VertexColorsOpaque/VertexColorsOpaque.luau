@@ -1,33 +1,32 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
 return {
-	fflag = require(ParentParent.flags.getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality),
 	categories = {
 		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
 		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH,
 		ValidationEnums.UploadCategory.RIGID_ACCESSORY
 	},
 	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 35
-		-- upvalues: ValidationEnums (copy), UGCValidationService (copy), ErrorSourceStrings (copy)
-		local uploadCategory = p2.uploadCategory
-		local v8 = uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS or uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD
+	run = function(object, p)
+		local uploadCategory = p.uploadCategory
 
-		for v9, v10 in p2.renderMeshesData do
-			local editable = v10.editable
+		local v = uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS
+			or uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD
 
-			if not UGCValidationService:ValidateEditableMeshVertColors(editable, v8) then
-				p1:fail(ErrorSourceStrings.Keys.VertexColors_NotOpaque, {
-					MeshName = v9,
-					TransparencyNote = not v8 and "" or "with no transparency"
+		for k, v2 in p.renderMeshesData do
+			if not UGCValidationService:ValidateEditableMeshVertColors(v2.editable, v) then
+				object:fail(ErrorSourceStrings.Keys.VertexColors_NotOpaque, {
+					MeshName = k,
+					TransparencyNote = v and "with no transparency" or ""
 				})
 			end
 		end

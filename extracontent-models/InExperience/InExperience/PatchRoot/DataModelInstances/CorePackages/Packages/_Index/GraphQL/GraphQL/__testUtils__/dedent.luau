@@ -1,82 +1,79 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local String = LuauPolyfill.String
 
-function dedent(p1, ...) -- line: 18
-	-- upvalues: Array (copy)
-	local t1 = { ... }
-	local s1 = ""
+function dedent(list, ...)
+	local v = { ... }
 
-	if Array.isArray(p1) then
-		for i = 1, #p1 do
-			s1 ..= p1[i]
+	local v2 = ""
 
-			if i <= #t1 then
-				s1 ..= t1[i]
+	if Array.isArray(list) then
+		for i = 1, #list do
+			v2 ..= list[i]
+
+			if i <= #v then
+				v2 ..= v[i]
 			end
 		end
 	else
-		s1 = p1
+		v2 = list
 	end
 
-	local v9 = removeTrailingSpacesAndTabs(removeLeadingNewLines(s1))
-	local s2 = ""
+	local v3 = removeTrailingSpacesAndTabs(removeLeadingNewLines(v2))
+	local v4 = ""
 
-	for i = 1, string.len(v9) do
-		local v12 = string.sub(v9, i, i)
+	for i = 1, string.len(v3) do
+		local v5 = string.sub(v3, i, i)
 
-		if v12 ~= " " and v12 ~= "\t" then
-			return removeCommonIndent(v9, s2)
+		if v5 ~= " " and v5 ~= "\t" then
+			break
 		end
 
-		s2 ..= v12
+		v4 ..= v5
 	end
 
-	return removeCommonIndent(v9, s2)
+	return removeCommonIndent(v3, v4)
 end
-function removeLeadingNewLines(s3: string) -- line: 50
-	-- upvalues: String (copy)
-	local v14 = String.findOr(s3, { "\n*" })
 
-	if v14 ~= nil and v14.index == 1 then
-		s3 = string.sub(s3, string.len(v14.match) + 1)
+function removeLeadingNewLines(value: string)
+	local v = String.findOr(value, { "\n*" })
+
+	if v ~= nil and v.index == 1 then
+		value = string.sub(value, string.len(v.match) + 1)
 	end
 
-	return s3
+	return value
 end
-function removeTrailingSpacesAndTabs(s4: string) -- line: 59
-	-- upvalues: String (copy)
-	local v16 = nil
-	local n1 = 1
+
+function removeTrailingSpacesAndTabs(value: string)
+	local v = 1
+	local v2 = nil
 
 	repeat
-		local v18 = String.findOr(s4, {
-			" +",
-			"\t+"
-		}, n1)
+		local v3 = String.findOr(value, { " +", "\t+" }, v)
 
-		if v18 ~= nil then
-			v16 = if v16 == nil or v16.index + string.len(v16.match) ~= v18.index then v18 else {
-				index = v16.index,
-				match = v16.match .. v18.match
-			}
-			n1 = v18.index + string.len(v18.match)
+		if v3 ~= nil then
+			v2 = v2 ~= nil and v2.index + string.len(v2.match) == v3.index and {
+				index = v2.index,
+				match = v2.match .. v3.match
+			} or v3
+
+			v = v3.index + string.len(v3.match)
 		end
-	until v18 == nil or n1 > string.len(s4)
+	until v3 == nil or string.len(value) < v
 
-	if v16 ~= nil and v16.index + string.len(v16.match) == string.len(s4) + 1 then
-		return (string.sub(s4, 1, v16.index - 1))
+	if v2 == nil or v2.index + string.len(v2.match) ~= string.len(value) + 1 then
+		return value
 	end
 
-	return s4
-end
-function removeCommonIndent(s5: string, s6: string) -- line: 90
-	local v21 = string.gsub(s5, s6, "", 1)
-
-	return (string.gsub(v21, "\n" .. s6, "\n"))
+	return (string.sub(value, 1, v2.index - 1))
 end
 
-return {
-	dedent = dedent
-}
+function removeCommonIndent(value: string, p: string)
+	local v = string.gsub(value, p, "", 1)
+	return (string.gsub(v, "\n" .. p, "\n"))
+end
+
+return { dedent = dedent }

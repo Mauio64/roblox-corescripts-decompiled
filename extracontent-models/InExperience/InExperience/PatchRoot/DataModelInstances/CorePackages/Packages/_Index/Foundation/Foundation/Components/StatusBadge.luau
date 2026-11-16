@@ -1,1 +1,3 @@
-return (require(script.StatusBadge))
+local StatusBadge = require(script.StatusBadge)
+
+return StatusBadge

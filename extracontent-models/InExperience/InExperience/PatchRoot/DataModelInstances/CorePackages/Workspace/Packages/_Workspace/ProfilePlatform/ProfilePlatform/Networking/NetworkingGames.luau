@@ -1,8 +1,6 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local LuaSocialLibrariesDeps = require(ProfilePlatformParent.LuaSocialLibrariesDeps)
+local parent = ProfilePlatform.Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
 local myRoduxNetworking = require(ProfilePlatform.Networking.myRoduxNetworking)
 
-return (LuaSocialLibrariesDeps.NetworkingGames.config({
-	roduxNetworking = myRoduxNetworking
-}))
+return (LuaSocialLibrariesDeps.NetworkingGames.config({ roduxNetworking = myRoduxNetworking }))

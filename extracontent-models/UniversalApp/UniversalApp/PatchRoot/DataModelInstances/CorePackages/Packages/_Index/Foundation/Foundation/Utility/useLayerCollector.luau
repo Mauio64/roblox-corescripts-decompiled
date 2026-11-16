@@ -1,42 +1,42 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Wrappers = require(Foundation.Utility.Wrappers)
 local Signal = Wrappers.Signal
 local Connection = Wrappers.Connection
 
-local function findLayerCollector(p1) -- line: 10
-	if not p1 then
-		return nil
+local function findLayerCollector(instance)
+	if instance then
+		return instance:FindFirstAncestorWhichIsA("LayerCollector")
 	end
 
-	return p1:FindFirstAncestorWhichIsA("LayerCollector")
+	return nil
 end
-local function useLayerCollector(p2) -- line: 18
-	-- upvalues: React (copy), findLayerCollector (copy), Signal (copy), Connection (copy)
-	local v11, v12 = React.useState(nil)
-	local v13 = React.useCallback(function() -- line: 21
-		-- upvalues: v12 (copy), findLayerCollector (copy), p2 (copy)
-		v12(findLayerCollector(p2))
-	end, { p2 })
 
-	React.useEffect(function() -- line: 25
-		-- upvalues: p2 (copy), v13 (copy), Signal (copy), Connection (copy)
-		if p2 then
-			v13()
+local function useLayerCollector(instance)
+	local state, setState = React.useState(nil)
 
-			local v14 = Signal.Connect(p2.AncestryChanged, v13)
+	local v = React.useCallback(function()
+		setState(findLayerCollector(instance))
+	end, { instance })
 
-			return function() -- line: 31
-				-- upvalues: Connection (copy), v14 (copy)
-				Connection.Disconnect(v14)
-			end
+	React.useEffect(function()
+		if not instance then
+			return nil
 		end
 
-		return nil
-	end, { p2 })
+		v()
 
-	return v11
+		local v2 = Signal.Connect(instance.AncestryChanged, v)
+
+		return function()
+			Connection.Disconnect(v2)
+		end
+	end, { instance })
+
+	return state
 end
 
 return useLayerCollector

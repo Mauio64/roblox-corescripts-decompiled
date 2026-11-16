@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("SocialCarousel").Parent
+local parent = script:FindFirstAncestor("SocialCarousel").Parent
 local SocialCarouselContext = require(script.Parent.SocialCarouselContext)
-local React = require(Parent.React)
+local React = require(parent.React)
 
-return function() -- line: 6
-	-- upvalues: React (copy), SocialCarouselContext (copy)
+return function()
 	return React.useContext(SocialCarouselContext)
 end

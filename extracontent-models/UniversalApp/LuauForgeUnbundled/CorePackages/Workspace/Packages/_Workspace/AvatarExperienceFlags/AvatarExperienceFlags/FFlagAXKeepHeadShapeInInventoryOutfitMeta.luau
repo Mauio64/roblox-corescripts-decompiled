@@ -1,0 +1,4 @@
+local FFlagParseHeadShapeFromAPIResponse = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagParseHeadShapeFromAPIResponse")
+local FFlagHeadRefinementFacialAnimationToggle = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagHeadRefinementFacialAnimationToggle")
+
+return game:DefineFastFlag("AXKeepHeadShapeInInventoryOutfitMeta", false) and FFlagParseHeadShapeFromAPIResponse and FFlagHeadRefinementFacialAnimationToggle

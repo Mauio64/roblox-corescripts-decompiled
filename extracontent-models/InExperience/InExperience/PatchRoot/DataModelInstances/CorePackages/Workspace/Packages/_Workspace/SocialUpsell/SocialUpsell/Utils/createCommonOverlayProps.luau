@@ -1,10 +1,11 @@
-local Parent = script:FindFirstAncestor("SocialUpsell").Parent
-local Cryo = require(Parent.Cryo)
-local t1 = {}
+local parent = script:FindFirstAncestor("SocialUpsell").Parent
 
-return function(p1, p2) -- line: 8
-	-- upvalues: Cryo (copy), t1 (copy)
-	return Cryo.Dictionary.join(p1 or t1, {
-		isInExperience = not not p2 and p2.isInExperience
-	})
+local Cryo = require(parent.Cryo)
+
+local v = {}
+
+return function(p, p2)
+	local join = Cryo.Dictionary.join
+	local isInExperience = if p2 then p2.isInExperience else false
+	return join(p or v, { isInExperience = isInExperience })
 end

@@ -1,27 +1,29 @@
-local Parent = script:FindFirstAncestor("AppCommonLib").Parent
-local VRService = require(Parent.MockableProxyServices).VRService
+local parent = script:FindFirstAncestor("AppCommonLib").Parent
+
+local MockableProxyServices = require(parent.MockableProxyServices)
+local VRService = MockableProxyServices.VRService
+
 local isSpatial = require(script.Parent.isSpatial)
 
-local function connectToIsSpatialChanged(p1: ((...any) -> ...any), b1: boolean?) -- line: 8
-	-- upvalues: isSpatial (copy), VRService (copy)
-	local u7 = isSpatial()
-	local connection = VRService:GetPropertyChangedSignal("VREnabled"):Connect(function() -- line: 14
-		-- upvalues: isSpatial (copy), u7 (ref), p1 (copy)
-		local v9 = isSpatial()
+local function connectToIsSpatialChanged(callback, flag: boolean?)
+	local v = isSpatial()
 
-		if v9 == u7 then
+	local vREnabledChangedConnection = VRService:GetPropertyChangedSignal("VREnabled"):Connect(function()
+		local spatial = isSpatial()
+
+		if spatial == v then
 			return
 		end
 
-		u7 = v9
-		p1(v9)
+		v = spatial
+		callback(spatial)
 	end)
 
-	if b1 then
-		p1(u7)
+	if flag then
+		callback(v)
 	end
 
-	return connection
+	return vREnabledChangedConnection
 end
 
 return connectToIsSpatialChanged

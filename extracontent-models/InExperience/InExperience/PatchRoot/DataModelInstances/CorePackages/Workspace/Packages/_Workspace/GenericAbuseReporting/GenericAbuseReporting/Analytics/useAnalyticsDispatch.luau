@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local React = require(parent.React)
 local AnalyticsDispatchContext = require(script.Parent.AnalyticsDispatchContext)
 
-local function useAnalyticsDispatch() -- line: 6
-	-- upvalues: React (copy), AnalyticsDispatchContext (copy)
+local function useAnalyticsDispatch()
 	return (React.useContext(AnalyticsDispatchContext))
 end
 

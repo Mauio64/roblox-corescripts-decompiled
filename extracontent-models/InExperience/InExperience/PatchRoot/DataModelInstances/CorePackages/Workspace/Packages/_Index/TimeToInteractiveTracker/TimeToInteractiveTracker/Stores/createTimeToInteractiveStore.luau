@@ -1,7 +1,16 @@
 local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
-local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
-local createSignal = require(TimeToInteractiveTrackerParent.Signals).createSignal
-local FFlagEnableTTIRecordWebViewMilestones = require(TimeToInteractiveTrackerParent.SharedFlags).FFlagEnableTTIRecordWebViewMilestones
+local parent = TimeToInteractiveTracker.Parent
+
+local Signals = require(parent.Signals)
+local createSignal = Signals.createSignal
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableTTIRecordWebViewMilestones = SharedFlags.FFlagEnableTTIRecordWebViewMilestones
+local FFlagTTITrackerDropEventsOnAppHide = require(TimeToInteractiveTracker.Utils.FFlagTTITrackerDropEventsOnAppHide)
+local getAppLifecycleObserverService = require(TimeToInteractiveTracker.Utils.getAppLifecycleObserverService)
+local FFlagTTITrackerDropEventsOnJoinAttempt = require(TimeToInteractiveTracker.Utils.FFlagTTITrackerDropEventsOnJoinAttempt)
+local getOnNewJoinAttempt = require(TimeToInteractiveTracker.Utils.getOnNewJoinAttempt)
+
 local updateTTIEventMetadata = require(script.Parent.Actions.updateTTIEventMetadata)
 local trackTTIEventStart = require(script.Parent.Actions.trackTTIEventStart)
 local trackTTIEventEnd = require(script.Parent.Actions.trackTTIEventEnd)
@@ -11,30 +20,57 @@ local trackRequest = require(script.Parent.Actions.trackRequest)
 local recordWebViewMilestones = require(script.Parent.Actions.recordWebViewMilestones)
 local resetTTIEvent = require(script.Parent.Actions.resetTTIEvent)
 local destroyTTIEvent = require(script.Parent.Actions.destroyTTIEvent)
+local dropInFlightTTIEvents = require(script.Parent.Actions.dropInFlightTTIEvents)
+
 local constants = require(TimeToInteractiveTracker.Milestones.constants)
 local useTTIRenderAndMountedTracking = require(TimeToInteractiveTracker.Hooks.useTTIRenderAndMountedTracking)
 
 require(script.Parent.types)
 
-return function() -- line: 28
-	-- upvalues: createSignal (copy), updateTTIEventMetadata (copy), trackTTIEventStart (copy), trackTTIEventEnd (copy), trackMilestone (copy), trackSubphase (copy), trackRequest (copy), FFlagEnableTTIRecordWebViewMilestones (copy), recordWebViewMilestones (copy), resetTTIEvent (copy), destroyTTIEvent (copy), constants (copy), useTTIRenderAndMountedTracking (copy)
-	local v16, v17 = createSignal({})
+return function()
+	local signal, setEvents = createSignal({})
 
-	return {
-		getEvents = v16,
-		setEvents = v17,
-		updateMetadata = updateTTIEventMetadata(v17),
-		trackStart = trackTTIEventStart(v17),
-		trackEnd = trackTTIEventEnd(v17),
-		trackMilestone = trackMilestone(v16, v17),
-		trackSubphase = trackSubphase(v16, v17),
-		trackRequest = trackRequest(v16, v17),
-		recordWebViewMilestones = if not FFlagEnableTTIRecordWebViewMilestones then nil else recordWebViewMilestones(v16, v17),
-		resetEvent = resetTTIEvent(v17),
-		destroyEvent = destroyTTIEvent(v17),
-		Milestone = constants,
-		Hooks = {
-			useTTIRenderAndMountedTracking = useTTIRenderAndMountedTracking(trackMilestone(v16, v17))
-		}
+	local v = FFlagTTITrackerDropEventsOnAppHide and getAppLifecycleObserverService()
+
+	if v then
+		v.OnHide:Connect(dropInFlightTTIEvents(setEvents))
+	end
+
+	local v2 = FFlagTTITrackerDropEventsOnJoinAttempt and getOnNewJoinAttempt()
+
+	if v2 then
+		v2:Connect(dropInFlightTTIEvents(setEvents))
+	end
+
+	local v3 = {
+		getEvents = signal,
+		setEvents = setEvents,
+		updateMetadata = updateTTIEventMetadata(setEvents),
+		trackStart = trackTTIEventStart(setEvents),
+		trackEnd = trackTTIEventEnd(setEvents),
+		trackMilestone = trackMilestone(signal, setEvents),
+		trackSubphase = trackSubphase(signal, setEvents),
+		trackRequest = trackRequest(signal, setEvents),
+		recordWebViewMilestones = 0,
+		resetEvent = 0,
+		destroyEvent = 0,
+		Milestone = 0,
+		Hooks = 0
 	}
+	local recordWebViewMilestones2
+
+	if FFlagEnableTTIRecordWebViewMilestones then
+		recordWebViewMilestones2 = recordWebViewMilestones(signal, setEvents)
+	end
+
+	v3.recordWebViewMilestones = recordWebViewMilestones2
+
+	v3.resetEvent = resetTTIEvent(setEvents)
+	v3.destroyEvent = destroyTTIEvent(setEvents)
+	v3.Milestone = constants
+	v3.Hooks = {
+		useTTIRenderAndMountedTracking = useTTIRenderAndMountedTracking(trackMilestone(signal, setEvents))
+	}
+
+	return v3
 end

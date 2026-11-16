@@ -1,0 +1,22 @@
+return {
+	useCrossExperienceVoice = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useCrossExperienceVoice"),
+	useParticipants = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useParticipants"),
+	useParticipant = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useParticipant"),
+	useLastActiveParticipant = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useLastActiveParticipant"),
+	useIsActiveParticipant = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsActiveParticipant"),
+	useAnimatedTransparency = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useAnimatedTransparency"),
+	useSequentialAnimation = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useSequentialAnimation"),
+	useVoiceStatus = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useVoiceStatus"),
+	useIsVoiceConnected = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsVoiceConnected"),
+	useIsVoiceFocused = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsVoiceFocused"),
+	useBackgroundExperience = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useBackgroundExperience"),
+	useEnableAudioFocusToggle = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useEnableAudioFocusToggle"),
+	useIsVoiceRetriableError = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsVoiceRetriableError"),
+	useIsBackgroundDMActive = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsBackgroundDMActive"),
+	useIsParticipantMuted = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsParticipantMuted"),
+	useIsParticipantMutedLocally = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsParticipantMutedLocally"),
+	useIsParticipantInOtherAudioContext = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsParticipantInOtherAudioContext"),
+	useIsVoiceConnecting = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsVoiceConnecting"),
+	useIsVoiceDisconnected = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsVoiceDisconnected"),
+	useIsMicPermissionsError = require("@game/CorePackages/Workspace/Packages/_Workspace/CrossExperienceVoice/CrossExperienceVoice/Hooks/useIsMicPermissionsError")
+}

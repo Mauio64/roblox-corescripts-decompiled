@@ -1,205 +1,213 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
-local InGameAssetReportingParent = InGameAssetReporting.Parent
+local parent = InGameAssetReporting.Parent
 
 require(InGameAssetReporting.Analysis.SceneAnalysis)
+local GetHumanoidDescription = require(parent.GetHumanoidDescription)
+local getHumanoidDescription = GetHumanoidDescription.getHumanoidDescription
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDropUnroutableMultiReportOptions = SharedFlags.FFlagDropUnroutableMultiReportOptions
 
-local getHumanoidDescription = require(InGameAssetReportingParent.GetHumanoidDescription).getHumanoidDescription
 local HttpService = game:GetService("HttpService")
-local t1 = {
-	Variant = {
-		IGARv1 = "IGARv1",
-		IGARv3 = "IGARv3"
-	}
+
+local v = {
+	Variant = { IGARv1 = "IGARv1", IGARv3 = "IGARv3" }
 }
 
-function transformTargetPlayers(t2: {[any]: any}, n1: number) -- line: 37
-	-- upvalues: getHumanoidDescription (copy)
-	local t3 = {}
+function transformTargetPlayers(list, p: number)
+	local v2 = p == 0 and 1 or p
+	local result = {}
 
-	if n1 == 0 then
-		n1 = 1
-	end
-
-	for _, v in ipairs(t2) do
-		local player = v.player
-		local count = v.count
-		local v14, v15 = getHumanoidDescription(player.UserId)
-
-		table.insert(t3, {
+	for _, item in ipairs(list) do
+		local player = item.player
+		local count = item.count
+		local humanoidDescription, humanoidDescriptionStatus = getHumanoidDescription(player.UserId)
+		table.insert(result, {
 			userId = player.UserId,
 			hitCount = count,
-			hitPercentage = count / n1,
-			humanoidDescription = v14,
-			humanoidDescriptionStatus = v15
+			hitPercentage = count / v2,
+			humanoidDescription = humanoidDescription,
+			humanoidDescriptionStatus = humanoidDescriptionStatus
 		})
 	end
 
-	return t3
+	return result
 end
-function serializeTargetPlayersIntoTagValues(t4: {[any]: any}) -- line: 59
-	-- upvalues: HttpService (copy)
-	local t5 = {}
 
-	for _, v in ipairs(t4) do
-		table.insert(t5, {
-			data = HttpService:JSONEncode(v)
-		})
+function serializeTargetPlayersIntoTagValues(list)
+	local result = {}
+
+	for _, item in ipairs(list) do
+		table.insert(result, { data = HttpService:JSONEncode(item) })
 	end
 
-	return t5
+	return result
 end
 
-local function v6(t6: {[any]: any}) -- line: 69
-	local t7 = {}
+local function fn(list)
+	local result = {}
 
-	for _, v in ipairs(t6) do
-		t7[#t7 + 1] = {
-			v.X,
-			v.Y
-		}
+	for _, item in ipairs(list) do
+		result[#result + 1] = { item.X, item.Y }
 	end
 
-	return t7
+	return result
 end
 
-function buildReport(n2: number, s1: string, p1, s2: string, s3: string, s4: string, t8: {[any]: any}, p2, s5: string?) -- line: 86
-	-- upvalues: t1 (copy), HttpService (copy), v6 (copy)
-	local t9 = {
+local function fn2(p): boolean -- 1 equivalent call inferred from this helper
+	local extractedAssets = p.extractedAssets
+	return #extractedAssets.Image > 0
+		or #extractedAssets.Mesh > 0
+		or #extractedAssets.Model > 0
+		or #extractedAssets.Package > 0
+		or #extractedAssets.Text > 0
+end
+
+function buildReport(p: number, p2: string, data, p3: string, p4: string, p5: string, p6, p7, p8: string?)
+	local v2 = {
 		tags = {
 			ENTRY_POINT = {
-				valueList = {{
-					data = "in-experience"
-				}}
+				valueList = {
+					{ data = "in-experience" }
+				}
 			},
 			SUBMITTER_USER_ID = {
-				valueList = {{
-					data = tostring(n2)
-				}}
+				valueList = {
+					{ data = tostring(p) }
+				}
 			},
 			REPORTED_ABUSE_CATEGORY = {
-				valueList = {{
-					data = s2
-				}}
+				valueList = {
+					{ data = p3 }
+				}
 			},
 			REPORTED_ABUSE_SURFACE = {
-				valueList = {{
-					data = s3
-				}}
+				valueList = {
+					{ data = p4 }
+				}
 			},
 			PLACE_ID = {
-				valueList = {{
-					data = tostring(game.PlaceId)
-				}}
+				valueList = {
+					{ data = tostring(game.PlaceId) }
+				}
 			},
 			REPORTER_COMMENT = {
-				valueList = {{
-					data = s4
-				}}
+				valueList = {
+					{ data = p5 }
+				}
 			},
 			REPORTED_ABUSE_VECTOR = {
-				valueList = {{
-					data = if s3 ~= "username" then (s3 ~= "text" or not game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport")) and "multi" or "in-experience-text" else "user_profile"
-				}}
+				valueList = {
+					{
+						data = (FFlagDropUnroutableMultiReportOptions or p4 ~= "username") and (p4 == "text" and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") and "in-experience-text" or "multi") or "user_profile"
+					}
+				}
 			},
 			VARIANT = {
-				valueList = {{
-					data = t1.Variant.IGARv1
-				}}
+				valueList = {
+					{ data = v.Variant.IGARv1 }
+				}
 			},
 			IGAR_REPORT_TARGET_ASSETS = {
-				valueList = {{
-					data = HttpService:JSONEncode(p1.extractedAssets)
-				}}
+				valueList = {
+					{
+						data = HttpService:JSONEncode(data.extractedAssets)
+					}
+				}
 			},
 			IGAR_EXTRACTION_STATS = {
-				valueList = {{
-					data = HttpService:JSONEncode(p1.stats)
-				}}
+				valueList = {
+					{
+						data = HttpService:JSONEncode(data.stats)
+					}
+				}
 			},
 			IGAR_ANNOTATION_COORDINATES = {
-				valueList = {{
-					data = HttpService:JSONEncode((v6(t8)))
-				}}
+				valueList = {
+					{ data = HttpService:JSONEncode(fn(p6)) }
+				}
 			}
 		}
 	}
 
-	if game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") and #p1.extractedAssets.Text > 0 then
-		t9.tags.IGAR_REPORT_TARGET_IN_EXPERIENCE_TEXT = {
-			valueList = {{
-				data = HttpService:JSONEncode(p1.extractedAssets.Text)
-			}}
+	if game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") and #data.extractedAssets.Text > 0 then
+		v2.tags.IGAR_REPORT_TARGET_IN_EXPERIENCE_TEXT = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(data.extractedAssets.Text)
+				}
+			}
 		}
 	end
 
 	if game:GetEngineFeature("DeltaFactoryCloneJobId") then
-		t9.tags.IGAR_REPORT_JOBID = {
-			valueList = {{
-				data = HttpService:JSONEncode(game.JobId)
-			}}
+		v2.tags.IGAR_REPORT_JOBID = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(game.JobId)
+				}
+			}
 		}
+	end
+
+	if p7 and fn2(p7) then -- inferred equivalent call
+		v2.tags.IGAR_REPORT_TARGET_GUI_ASSETS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(p7.extractedAssets)
+				}
+			}
+		}
+
+		if game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
+			v2.tags.IGAR_REPORT_TARGET_GUI_IN_EXPERIENCE_TEXT = {
+				valueList = {
+					{
+						data = HttpService:JSONEncode(p7.extractedAssets.Text)
+					}
+				}
+			}
+		end
+
+		v2.tags.IGAR_GUI_EXTRACTION_STATS = {
+			valueList = {
+				{
+					data = HttpService:JSONEncode(p7.stats)
+				}
+			}
+		}
+	end
+
+	if #data.extractedPlayers > 0 then
+		local v3 = transformTargetPlayers(data.extractedPlayers, data.stats.raycastCompletedCount)
+		local valueList = serializeTargetPlayersIntoTagValues(v3)
+		v2.tags.IGAR_REPORT_TARGET_PLAYERS = { valueList = valueList }
+
+		if not FFlagDropUnroutableMultiReportOptions and p4 == "username" then
+			v2.tags.REPORT_TARGET_USER_ID = {
+				valueList = {
+					{ data = tostring(v3[1].userId) }
+				}
+			}
+		end
 	end
 
 	if p2 then
-		local extractedAssets = p2.extractedAssets
-
-		if #extractedAssets.Image > 0 or (#extractedAssets.Mesh > 0 or (#extractedAssets.Model > 0 or (#extractedAssets.Package > 0 or #extractedAssets.Text > 0))) then
-			t9.tags.IGAR_REPORT_TARGET_GUI_ASSETS = {
-				valueList = {{
-					data = HttpService:JSONEncode(p2.extractedAssets)
-				}}
+		v2.tags.SCREENSHOT_ID = {
+			valueList = {
+				{ data = p2 }
 			}
-
-			if game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-				t9.tags.IGAR_REPORT_TARGET_GUI_IN_EXPERIENCE_TEXT = {
-					valueList = {{
-						data = HttpService:JSONEncode(p2.extractedAssets.Text)
-					}}
-				}
-			end
-
-			t9.tags.IGAR_GUI_EXTRACTION_STATS = {
-				valueList = {{
-					data = HttpService:JSONEncode(p2.stats)
-				}}
-			}
-		end
-	end
-
-	if #p1.extractedPlayers > 0 then
-		local v37 = transformTargetPlayers(p1.extractedPlayers, p1.stats.raycastCompletedCount)
-		local v38 = serializeTargetPlayersIntoTagValues(v37)
-
-		t9.tags.IGAR_REPORT_TARGET_PLAYERS = {
-			valueList = v38
-		}
-
-		if s3 == "username" then
-			t9.tags.REPORT_TARGET_USER_ID = {
-				valueList = {{
-					data = tostring(v37[1].userId)
-				}}
-			}
-		end
-	end
-
-	if s1 then
-		t9.tags.SCREENSHOT_ID = {
-			valueList = {{
-				data = s1
-			}}
 		}
 	end
 
-	if s5 then
-		t9.tags.VARIANT.valueList[1].data = t1.Variant.IGARv3 .. "-" .. s5
+	if p8 then
+		v2.tags.VARIANT.valueList[1].data = v.Variant.IGARv3 .. "-" .. p8
 	end
 
-	if s3 == "username" and #p1.extractedPlayers == 0 then
-		return nil
+	if FFlagDropUnroutableMultiReportOptions or p4 ~= "username" or #data.extractedPlayers ~= 0 then
+		return HttpService:JSONEncode(v2)
 	end
 
-	return HttpService:JSONEncode(t9)
+	return nil
 end
 
 return buildReport

@@ -1,16 +1,22 @@
-local uDim2 = UDim2.new(1.1, 0, 1.1, 0)
-local uDim2_2 = UDim2.new(0.9, 0, 0.9, 0)
+local udim = UDim2.new(1.1, 0, 1.1, 0)
+
+local udim2 = UDim2.new(0.9, 0, 0.9, 0)
+
 local TweenService = game:GetService("TweenService")
 local CorePackages = game:GetService("CorePackages")
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Create = AppCommonLib.Create
+
 local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Sine)
 local tweenInfo2 = TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
-local v10 = game:DefineFastFlag("LocalizeGameplayPaused", false)
 
-local function build() -- line: 23
-	-- upvalues: Create (copy), uDim2_2 (copy), AppFonts (copy), v10 (copy), RobloxTranslator (copy)
+local defineFastFlag = game:DefineFastFlag("LocalizeGameplayPaused", false)
+
+local function build()
 	return Create("ImageLabel")({
 		Name = "NetworkPause",
 		Image = "rbxasset://textures/ui/PurchasePrompt/LoadingBG.png",
@@ -22,9 +28,7 @@ local function build() -- line: 23
 		ImageColor3 = Color3.fromRGB(122, 122, 122),
 		ImageTransparency = 0,
 		BackgroundTransparency = 1,
-		Create("UISizeConstraint")({
-			MaxSize = Vector2.new(312, 251)
-		}),
+		Create("UISizeConstraint")({ MaxSize = Vector2.new(312, 251) }),
 		Create("UIPadding")({
 			PaddingTop = UDim.new(0, 24),
 			PaddingLeft = UDim.new(0, 24),
@@ -34,10 +38,10 @@ local function build() -- line: 23
 		Create("Frame")({
 			Name = "Accent",
 			BorderSizePixel = 0,
-			BackgroundTransparency = 0,
 			BackgroundColor3 = Color3.fromRGB(66, 66, 66),
 			Size = UDim2.new(1, 0, 0, 1),
-			Position = UDim2.new(0, 0, 0, 88)
+			Position = UDim2.new(0, 0, 0, 88),
+			BackgroundTransparency = 0
 		}),
 		Create("Frame")({
 			Name = "Upper",
@@ -53,89 +57,83 @@ local function build() -- line: 23
 					Name = "Icon",
 					BackgroundTransparency = 1,
 					Image = "rbxasset://textures/ui/NetworkPause/no connection.png",
-					ImageTransparency = 0,
-					Size = uDim2_2,
+					Size = udim2,
 					Position = UDim2.new(0.5, 0, 0.88, 0),
-					AnchorPoint = Vector2.new(0.5, 0.88)
+					AnchorPoint = Vector2.new(0.5, 0.88),
+					ImageTransparency = 0
 				})
 			}),
 			Create("TextLabel")({
 				Name = "Label",
+				Font = AppFonts.default:getBold(),
+				Text = defineFastFlag and RobloxTranslator:FormatByKey("InGame.GameplayPaused.Title") or "Gameplay Paused",
 				TextSize = 22,
 				TextWrapped = true,
-				BackgroundTransparency = 1,
-				TextTransparency = 0,
-				Font = AppFonts.default:getBold(),
-				Text = v10 and RobloxTranslator:FormatByKey("InGame.GameplayPaused.Title") or "Gameplay Paused",
 				Size = UDim2.new(1, 0, 0, 22),
 				Position = UDim2.new(0, 0, 0, 54),
-				TextColor3 = Color3.fromRGB(255, 255, 255)
+				BackgroundTransparency = 1,
+				TextColor3 = Color3.fromRGB(255, 255, 255),
+				TextTransparency = 0
 			})
 		}),
 		Create("TextLabel")({
 			Name = "Lower",
+			Font = AppFonts.default:getDefault(),
+			Text = defineFastFlag and RobloxTranslator:FormatByKey("InGame.GameplayPaused.Body") or "Gameplay has been paused: please wait while the game content loads.",
+			TextColor3 = Color3.fromRGB(190, 190, 190),
 			TextSize = 18,
 			TextWrapped = true,
-			BackgroundTransparency = 1,
-			TextTransparency = 0,
-			Font = AppFonts.default:getDefault(),
-			Text = v10 and RobloxTranslator:FormatByKey("InGame.GameplayPaused.Body") or "Gameplay has been paused: please wait while the game content loads.",
-			TextColor3 = Color3.fromRGB(190, 190, 190),
 			Position = UDim2.new(0, 0, 0, 89),
-			Size = UDim2.new(1, 0, 1, -89)
+			Size = UDim2.new(1, 0, 1, -89),
+			BackgroundTransparency = 1,
+			TextTransparency = 0
 		})
 	})
 end
 
-local t1 = {}
+local NetworkPauseNotification = {}
+NetworkPauseNotification.__index = NetworkPauseNotification
 
-t1.__index = t1
+function NetworkPauseNotification.new()
+	local self = setmetatable({}, NetworkPauseNotification)
+	local gui = build()
 
-function t1.new() -- line: 122
-	-- upvalues: t1 (copy), build (copy), TweenService (copy), tweenInfo (copy), tweenInfo2 (copy), uDim2 (copy)
-	local self = setmetatable({}, t1)
-	local v14 = build()
-	local tween = TweenService:Create(v14, tweenInfo, {
-		ImageTransparency = 0
-	})
-	local tween2 = TweenService:Create(v14, tweenInfo, {
-		ImageTransparency = 1
-	})
-	local tween3 = TweenService:Create(v14.Upper.IconContainer.Icon, tweenInfo2, {
-		ImageTransparency = 0.75,
-		Size = uDim2
+	local tween = TweenService:Create(gui, tweenInfo, { ImageTransparency = 0 })
+	local tween2 = TweenService:Create(gui, tweenInfo, { ImageTransparency = 1 })
+
+	local tween3 = TweenService:Create(gui.Upper.IconContainer.Icon, tweenInfo2, {
+		Size = udim,
+		ImageTransparency = 0.75
 	})
 
-	self.__gui = v14
+	self.__gui = gui
 	self.__guiParent = nil
 	self.__show = false
-	self.__animations = {
-		show = tween,
-		hide = tween2,
-		pulse = tween3
-	}
+	self.__animations = { show = tween, hide = tween2, pulse = tween3 }
 
 	return self
 end
-function t1.Show(p1) -- line: 146
-	-- upvalues: uDim2_2 (copy)
-	p1.__gui.Upper.IconContainer.Icon.Size = uDim2_2
-	p1.__gui.Upper.IconContainer.Icon.ImageTransparency = 0
-	p1.__show = true
-	p1.__gui.Parent = p1.__guiParent
-	p1.__animations.pulse:Play()
-end
-function t1.Hide(p2) -- line: 154
-	p2.__show = false
-	p2.__gui.Parent = nil
-	p2.__animations.pulse:Cancel()
-end
-function t1.SetParent(p3, p4) -- line: 160
-	p3.__guiParent = p4
 
-	if p3.__show then
-		p3.__gui.Parent = p4
+function NetworkPauseNotification:Show()
+	self.__gui.Upper.IconContainer.Icon.Size = udim2
+	self.__gui.Upper.IconContainer.Icon.ImageTransparency = 0
+	self.__show = true
+	self.__gui.Parent = self.__guiParent
+	self.__animations.pulse:Play()
+end
+
+function NetworkPauseNotification:Hide()
+	self.__show = false
+	self.__gui.Parent = nil
+	self.__animations.pulse:Cancel()
+end
+
+function NetworkPauseNotification:SetParent(p)
+	self.__guiParent = p
+
+	if self.__show then
+		self.__gui.Parent = p
 	end
 end
 
-return t1
+return NetworkPauseNotification

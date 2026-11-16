@@ -1,50 +1,48 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateDynamicHeadData = require(ParentParent.flags.getFFlagUGCValidateMigrateDynamicHeadData)
-local getFIntFacsJointMaximumDistRatioDirect = require(ParentParent.flags.getFIntFacsJointMaximumDistRatioDirect)
-local getFIntFacsJointMaximumDistRatioAccumulated = require(ParentParent.flags.getFIntFacsJointMaximumDistRatioAccumulated)
-local getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds = require(ParentParent.flags.getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+
+local getFIntFacsJointMaximumDistRatioDirect = require(parent.flags.getFIntFacsJointMaximumDistRatioDirect)
+local getFIntFacsJointMaximumDistRatioAccumulated = require(parent.flags.getFIntFacsJointMaximumDistRatioAccumulated)
+
+local getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds = require(parent.flags.getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds)
 
 return {
-	fflag = getFFlagUGCValidateMigrateDynamicHeadData,
 	categories = { ValidationEnums.UploadCategory.DYNAMIC_HEAD },
 	prereqTests = { ValidationEnums.ValidationModule.DynamicHeadFacsPresent },
 	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 29
-		-- upvalues: getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds (copy), UGCValidationService (copy), ErrorSourceStrings (copy), getFIntFacsJointMaximumDistRatioDirect (copy), getFIntFacsJointMaximumDistRatioAccumulated (copy)
+	run = function(object, p)
 		if not getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds() then
 			return
 		end
 
-		local Head = p2.renderMeshesData.Head
-		local ok, result = pcall(function() -- line: 38
-			-- upvalues: UGCValidationService (copy), Head (copy)
-			return UGCValidationService:GetMaximalJointDistancesWithinFacs(Head.editable)
+		local head = p.renderMeshesData.Head
+
+		local success, result = pcall(function()
+			return UGCValidationService:GetMaximalJointDistancesWithinFacs(head.editable)
 		end)
 
-		if not ok then
-			p1:fail(ErrorSourceStrings.Keys.DynHead_JointBoundsCheckFailed)
-
+		if not success then
+			object:fail(ErrorSourceStrings.Keys.DynHead_JointBoundsCheckFailed)
 			return
 		end
 
-		local v14, v15, v16, v17 = unpack(result)
+		local v, actionName, v2, jointName = unpack(result)
 
-		if v14 > getFIntFacsJointMaximumDistRatioDirect() / 100 then
-			p1:fail(ErrorSourceStrings.Keys.DynHead_JointDirectExceeded, {
-				actionName = v15
+		if getFIntFacsJointMaximumDistRatioDirect() / 100 < v then
+			object:fail(ErrorSourceStrings.Keys.DynHead_JointDirectExceeded, {
+				actionName = actionName
 			})
 		end
 
-		if v16 > getFIntFacsJointMaximumDistRatioAccumulated() / 100 then
-			p1:fail(ErrorSourceStrings.Keys.DynHead_JointAccumulatedExceeded, {
-				jointName = v17
+		if getFIntFacsJointMaximumDistRatioAccumulated() / 100 < v2 then
+			object:fail(ErrorSourceStrings.Keys.DynHead_JointAccumulatedExceeded, {
+				jointName = jointName
 			})
 		end
 	end

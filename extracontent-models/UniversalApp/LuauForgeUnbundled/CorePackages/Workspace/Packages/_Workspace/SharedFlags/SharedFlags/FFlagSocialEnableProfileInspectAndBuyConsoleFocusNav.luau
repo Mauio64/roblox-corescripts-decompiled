@@ -1,0 +1,1 @@
+return game:DefineFastFlag("SocialEnableProfileInspectAndBuyConsoleFocusNav", false) and require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagSocialEnableProfileInspectAndBuy")

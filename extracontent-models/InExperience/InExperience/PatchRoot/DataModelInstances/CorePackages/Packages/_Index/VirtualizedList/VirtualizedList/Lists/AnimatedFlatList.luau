@@ -1,31 +1,45 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Object = require(ParentParent.LuauPolyfill).Object
-local FlatList = require(script.Parent.FlatList)
-local useFocusNavigationScrolling = require(script.Parent.Hooks).useFocusNavigationScrolling
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
-local function AnimatedFlatList(p1) -- line: 38
-	-- upvalues: React (copy), useFocusNavigationScrolling (copy), Object (copy), FlatList (copy)
-	local v8 = React.useRef(nil)
-	local v9, v10 = useFocusNavigationScrolling({
-		listRef = p1.listRef or v8,
-		onSelectedIndexChanged = p1.onSelectedIndexChanged,
-		initialIndex = p1.initialScrollIndex,
-		cellRendererKey = p1.cellRendererKey,
-		viewOffset = p1.viewOffset,
-		animated = p1.animated,
-		data = p1.data
+local FlatList = require(script.Parent.FlatList)
+
+local Hooks = require(script.Parent.Hooks)
+local useFocusNavigationScrolling = Hooks.useFocusNavigationScrolling
+
+local function AnimatedFlatList(props)
+	local ref = React.useRef(nil)
+	local onSelectionChanged, onScrollToIndexFailed = useFocusNavigationScrolling({
+		listRef = props.listRef or ref,
+		onSelectedIndexChanged = props.onSelectedIndexChanged,
+		initialIndex = props.initialScrollIndex,
+		cellRendererKey = props.cellRendererKey,
+		viewOffset = props.viewOffset,
+		animated = props.animated,
+		data = props.data
 	})
-	local v11 = Object.assign(table.clone(p1), {
+
+	local assign = Object.assign
+	local clone = table.clone(props)
+	local v = {
 		viewOffset = Object.None,
 		animated = Object.None,
 		onSelectedIndexChanged = Object.None,
-		ref = p1.listRef or v8,
-		onScrollToIndexFailed = if not p1.getItemLayout then v10 else nil,
-		onSelectionChanged = v9
-	})
+		ref = props.listRef or ref,
+		onScrollToIndexFailed = 0,
+		onSelectionChanged = 0
+	}
 
-	return React.createElement(FlatList, v11)
+	if props.getItemLayout then
+		onScrollToIndexFailed = nil
+	end
+
+	v.onScrollToIndexFailed = onScrollToIndexFailed
+	v.onSelectionChanged = onSelectionChanged
+	local v2 = assign(clone, v)
+
+	return React.createElement(FlatList, v2)
 end
 
 return AnimatedFlatList

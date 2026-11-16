@@ -1,4 +1,1 @@
-return {
-	InApp = "InApp",
-	InExperience = "InExperience"
-}
+return { InApp = "InApp", InExperience = "InExperience" }

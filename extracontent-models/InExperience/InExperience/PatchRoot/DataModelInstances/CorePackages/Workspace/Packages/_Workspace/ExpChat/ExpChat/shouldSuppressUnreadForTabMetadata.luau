@@ -1,9 +1,12 @@
-local function shouldSuppressUnreadForTabMetadata(s1: string?) -- line: 9
-	if s1 == nil or s1 == "" then
+local function shouldSuppressUnreadForTabMetadata(value: string?): boolean
+	if value == nil or value == "" then
 		return false
 	end
 
-	return string.sub(s1, 1, 18) == "Roblox.ChatEnabled" or (string.sub(s1, 1, 14) == "Roblox.Welcome" or string.sub(s1, 1, 14) == "Roblox.Summary")
+	return string.sub(value, 1, 18) == "Roblox.ChatEnabled"
+		or string.sub(value, 1, 14) == "Roblox.Welcome"
+		or string.sub(value, 1, 14) == "Roblox.Summary"
+		or string.sub(value, 1, 22) == "Roblox.Whisper.Welcome"
 end
 
 return shouldSuppressUnreadForTabMetadata

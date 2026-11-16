@@ -1,21 +1,24 @@
 local HttpService = game:GetService("HttpService")
+
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Dash = require(FoundationParent.Dash)
+local parent = Foundation.Parent
+
+local Dash = require(parent.Dash)
 local filter = Dash.filter
 local values = Dash.values
+
 local Flags = require(Foundation.Utility.Flags)
 local StudioUri = require(Foundation.Utility.Plugin.StudioUri)
+
 local Logger = require(Foundation.Utility.Logger)
-local t1 = {}
 
-t1.__index = t1
+local WidgetManager = {}
+WidgetManager.__index = WidgetManager
 
-function t1.new(t2: {[any]: any}) -- line: 54
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
+function WidgetManager.new(widgetsApi)
+	local self = setmetatable({}, WidgetManager)
 
-	self._widgetsApi = t2
+	self._widgetsApi = widgetsApi
 	self._pendingRegisters = {}
 	self._pendingDeregisters = {}
 	self._registeredWidgets = {}
@@ -25,242 +28,275 @@ function t1.new(t2: {[any]: any}) -- line: 54
 
 	return self
 end
-function t1.nextId(_) -- line: 70
-	-- upvalues: HttpService (copy)
+
+local function getWidgetHost(instance)
+	local pluginGui = instance:FindFirstAncestorWhichIsA("PluginGui")
+
+	if pluginGui then
+		return pluginGui
+	end
+
+	return instance:FindFirstAncestorWhichIsA("ScreenGui")
+end
+
+local function makeRegistration(uri, registeredWidget, pluginGui) -- 1 equivalent call inferred from this helper
+	return {
+		Uri = uri,
+		Widget = registeredWidget,
+		DEPRECATED_PluginGui = pluginGui,
+		Position = registeredWidget.AbsolutePosition,
+		Size = registeredWidget.AbsoluteSize,
+		Visible = registeredWidget:GetStyled("Visible")
+	}
+end
+
+function WidgetManager.nextId(_)
 	return HttpService:GenerateGUID(false)
 end
-function t1.flush(p2) -- line: 74
-	-- upvalues: Flags (copy)
+
+function WidgetManager:flush()
 	if Flags.FoundationWidgetManagerSnapshotFlush then
-		local _pendingDeregisters = p2._pendingDeregisters
-		local _pendingRegisters = p2._pendingRegisters
+		local pendingDeregisters = self._pendingDeregisters
+		local pendingRegisters = self._pendingRegisters
+		self._pendingDeregisters = {}
+		self._pendingRegisters = {}
 
-		p2._pendingDeregisters = {}
-		p2._pendingRegisters = {}
-		p2:_flushWith(_pendingDeregisters, _pendingRegisters)
-
-		return
+		self:_flushWith(pendingDeregisters, pendingRegisters)
+	else
+		self:_flushWith(self._pendingDeregisters, self._pendingRegisters)
+		self._pendingDeregisters = {}
+		self._pendingRegisters = {}
 	end
-
-	p2:_flushWith(p2._pendingDeregisters, p2._pendingRegisters)
-	p2._pendingDeregisters = {}
-	p2._pendingRegisters = {}
 end
-function t1._flushWith(p3, t3: {[any]: any}, t4: {[any]: any}) -- line: 89
-	-- upvalues: Flags (copy), filter (copy), values (copy), StudioUri (copy)
-	local t5 = {}
 
-	for v21, v22 in t3 do
-		table.insert(t5, v22)
-		p3._registeredWidgets[v21] = nil
+function WidgetManager:_flushWith(items, p)
+	local v = {}
+
+	for k, item in items do
+		table.insert(v, item)
+		self._registeredWidgets[k] = nil
 	end
 
-	if #t5 > 0 then
-		pcall(function() -- line: 100
-			-- upvalues: p3 (copy), t5 (copy)
-			p3._widgetsApi:DeregisterAsync(t5)
+	if #v > 0 then
+		pcall(function()
+			self._widgetsApi:DeregisterAsync(v)
 		end)
 	end
 
-	local v23 = if not Flags.FoundationWidgetManagerSnapshotFlush then nil else {}
-	local v24 = filter(values(t4), function(p4) -- line: 106
-		-- upvalues: Flags (copy), v23 (copy)
-		local v53 = p4.Widget:FindFirstAncestorWhichIsA("LayerCollector") ~= nil
+	local v2 = Flags.FoundationWidgetManagerSnapshotFlush and {} or nil
+	local filtered = filter(values(p), function(p2)
+		local v3 = p2.Widget:FindFirstAncestorWhichIsA("LayerCollector") ~= nil
 
-		if Flags.FoundationWidgetManagerSnapshotFlush and not v53 then
-			table.insert(v23, p4)
+		if Flags.FoundationWidgetManagerSnapshotFlush and not v3 then
+			table.insert(v2, p2)
 		end
 
-		return v53
+		return v3
 	end)
 
 	if Flags.FoundationWidgetManagerSnapshotFlush then
-		for _, v26 in v23 do
-			local v27 = StudioUri.toString(v26.Uri)
+		for _, v3 in v2 do
+			local str = StudioUri.toString(v3.Uri)
 
-			if not p3._deferredAncestrySignals[v27] then
-				p3._deferredAncestrySignals[v27] = v26.Widget.AncestryChanged:Connect(function(_, parent) -- line: 118
-					-- upvalues: p3 (copy), v27 (copy), v26 (copy)
-					if parent == nil then
-						local v56 = p3._deferredAncestrySignals[v27]
+			if not self._deferredAncestrySignals[str] then
+				self._deferredAncestrySignals[str] = v3.Widget.AncestryChanged:Connect(function(_, parent2)
+					if parent2 == nil then
+						local deferredAncestrySignal = self._deferredAncestrySignals[str]
 
-						if v56 then
-							v56:Disconnect()
-							p3._deferredAncestrySignals[v27] = nil
+						if deferredAncestrySignal then
+							deferredAncestrySignal:Disconnect()
+							self._deferredAncestrySignals[str] = nil
+						end
+					elseif v3.Widget:FindFirstAncestorWhichIsA("LayerCollector") then
+						local deferredAncestrySignal = self._deferredAncestrySignals[str]
+
+						if deferredAncestrySignal then
+							deferredAncestrySignal:Disconnect()
+							self._deferredAncestrySignals[str] = nil
 						end
 
-						return
-					end
-
-					if v26.Widget:FindFirstAncestorWhichIsA("LayerCollector") then
-						local v57 = p3._deferredAncestrySignals[v27]
-
-						if v57 then
-							v57:Disconnect()
-							p3._deferredAncestrySignals[v27] = nil
-						end
-
-						p3:register(v26.Uri, v26.Widget)
+						self:register(v3.Uri, v3.Widget)
 					end
 				end)
 			end
 		end
 	end
 
-	local t6 = {}
+	local uris = {}
 
-	for _, v30 in v24 do
-		v30.Position = v30.Widget.AbsolutePosition
-		v30.Size = v30.Widget.AbsoluteSize
-		v30.Visible = v30.Widget:GetStyled("Visible")
+	for _, v3 in filtered do
+		v3.Position = v3.Widget.AbsolutePosition
+		v3.Size = v3.Widget.AbsoluteSize
+		v3.Visible = v3.Widget:GetStyled("Visible")
+		local str = StudioUri.toString(v3.Uri)
+		local DEPRECATED_PluginGui = v3.DEPRECATED_PluginGui
 
-		local v31 = StudioUri.toString(v30.Uri)
-		local DEPRECATED_PluginGui = v30.DEPRECATED_PluginGui
-		local v33 = p3._signals[v31]
+		local signal = self._signals[str]
 
-		if v33 then
-			if v33.Widget == v30.Widget then
-				if Flags.FoundationPopoverPluginOverlayMeasurement and DEPRECATED_PluginGui ~= v33.Host then
-					v33.Host = DEPRECATED_PluginGui
-					table.insert(t6, v30.Uri)
+		if signal then
+			if signal.Widget == v3.Widget then
+				if Flags.FoundationPopoverPluginOverlayMeasurement and signal.Host ~= DEPRECATED_PluginGui then
+					signal.Host = DEPRECATED_PluginGui
+					table.insert(uris, v3.Uri)
 				end
 
 				continue
 			end
 
-			v33.PositionChanged:Disconnect()
-			v33.SizeChanged:Disconnect()
-			v33.VisibleChanged:Disconnect()
-			v33.AncestryChanged:Disconnect()
+			signal.PositionChanged:Disconnect()
+			signal.SizeChanged:Disconnect()
+			signal.VisibleChanged:Disconnect()
+			signal.AncestryChanged:Disconnect()
 		end
 
-		p3._signals[v31] = {
-			Widget = v30.Widget,
-			Host = if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else DEPRECATED_PluginGui,
-			PositionChanged = v30.Widget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 167
-				-- upvalues: p3 (copy), v30 (copy)
-				p3:register(v30.Uri, v30.Widget)
-			end),
-			SizeChanged = v30.Widget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 170
-				-- upvalues: p3 (copy), v30 (copy)
-				p3:register(v30.Uri, v30.Widget)
-			end),
-			VisibleChanged = v30.Widget:GetStyledPropertyChangedSignal("Visible"):Connect(function() -- line: 173
-				-- upvalues: p3 (copy), v30 (copy)
-				p3:register(v30.Uri, v30.Widget)
-			end),
-			AncestryChanged = v30.Widget.AncestryChanged:Connect(function(_, parent) -- line: 176
-				-- upvalues: p3 (copy), v30 (copy)
-				if not parent then
-					p3:deregister(v30.Uri)
-				end
-			end)
+		local signals = self._signals
+		local v4 = {
+			Widget = v3.Widget,
+			Host = 0,
+			PositionChanged = 0,
+			SizeChanged = 0,
+			VisibleChanged = 0,
+			AncestryChanged = 0
 		}
+
+		if not Flags.FoundationPopoverPluginOverlayMeasurement then
+			DEPRECATED_PluginGui = nil
+		end
+
+		v4.Host = DEPRECATED_PluginGui
+		v4.PositionChanged = v3.Widget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+			self:register(v3.Uri, v3.Widget)
+		end)
+		v4.SizeChanged = v3.Widget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+			self:register(v3.Uri, v3.Widget)
+		end)
+		v4.VisibleChanged = v3.Widget:GetStyledPropertyChangedSignal("Visible"):Connect(function()
+			self:register(v3.Uri, v3.Widget)
+		end)
+		v4.AncestryChanged = v3.Widget.AncestryChanged:Connect(function(_, parent2)
+			if not parent2 then
+				self:deregister(v3.Uri)
+			end
+		end)
+		signals[str] = v4
 	end
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement and #t6 > 0 then
-		pcall(function() -- line: 185
-			-- upvalues: p3 (copy), t6 (copy)
-			p3._widgetsApi:DeregisterAsync(t6)
+	if Flags.FoundationPopoverPluginOverlayMeasurement and #uris > 0 then
+		pcall(function()
+			self._widgetsApi:DeregisterAsync(uris)
 		end)
 	end
 
-	if #v24 > 0 then
-		p3._widgetsApi:RegisterAsync(v24)
+	if #filtered > 0 then
+		self._widgetsApi:RegisterAsync(filtered)
 	end
 end
-function t1._run(p7) -- line: 195
-	if p7._running then
+
+function WidgetManager:_run()
+	if self._running then
 		return
 	end
 
-	p7._running = true
-	task.defer(function() -- line: 200
-		-- upvalues: p7 (copy)
-		p7._running = false
-		p7:flush()
+	self._running = true
+	task.defer(function()
+		self._running = false
+		self:flush()
 	end)
 end
-function t1.register(p8, p9, p10) -- line: 210
-	-- upvalues: StudioUri (copy), Flags (copy)
-	local v38 = p10:FindFirstAncestorWhichIsA("PluginGui") or p10:FindFirstAncestorWhichIsA("ScreenGui")
 
-	if v38 then
-		local v39 = StudioUri.toString(p9)
+function WidgetManager:register(uri, instance)
+	local pluginGui = instance:FindFirstAncestorWhichIsA("PluginGui") or instance:FindFirstAncestorWhichIsA("ScreenGui")
 
-		if Flags.FoundationWidgetManagerSnapshotFlush then
-			local v40 = p8._deferredAncestrySignals[v39]
+	if pluginGui then
+		local str = StudioUri.toString(uri)
+		local connection = Flags.FoundationWidgetManagerSnapshotFlush and self._deferredAncestrySignals[str]
 
-			if v40 then
-				v40:Disconnect()
-				p8._deferredAncestrySignals[v39] = nil
-			end
+		if connection then
+			connection:Disconnect()
+			self._deferredAncestrySignals[str] = nil
 		end
 
-		p8._registeredWidgets[v39] = p10
-		p8._pendingRegisters[v39] = {
-			Uri = p9,
-			Widget = p10,
-			DEPRECATED_PluginGui = v38
+		self._registeredWidgets[str] = instance
+		self._pendingRegisters[str] = {
+			Uri = uri,
+			Widget = instance,
+			DEPRECATED_PluginGui = pluginGui
 		}
-		p8._pendingDeregisters[v39] = nil
-		p8:_run()
+		self._pendingDeregisters[str] = nil
+		self:_run()
 	end
 end
-function t1.deregister(p11, p12, p13) -- line: 231
-	-- upvalues: StudioUri (copy), Flags (copy), Logger (copy)
-	local v44 = StudioUri.toString(p12)
 
-	p11._pendingDeregisters[v44] = p12
+function WidgetManager:refreshAsync(uri): boolean
+	local str = StudioUri.toString(uri)
+	local registeredWidget = self._registeredWidgets[str]
+
+	if not registeredWidget then
+		return false
+	end
+
+	local pluginGui = registeredWidget:FindFirstAncestorWhichIsA("PluginGui")
+		or registeredWidget:FindFirstAncestorWhichIsA("ScreenGui")
+
+	if not pluginGui then
+		return false
+	end
+
+	self._widgetsApi:RegisterAsync({ makeRegistration(uri, registeredWidget, pluginGui) }) -- inferred equivalent call
+	return true
+end
+
+function WidgetManager:deregister(p, p2)
+	local str = StudioUri.toString(p)
+	self._pendingDeregisters[str] = p
 
 	if Flags.FoundationWidgetManagerSnapshotFlush then
-		p11._pendingRegisters[v44] = nil
+		self._pendingRegisters[str] = nil
+		local deferredAncestrySignal = self._deferredAncestrySignals[str]
 
-		local v45 = p11._deferredAncestrySignals[v44]
-
-		if v45 then
-			v45:Disconnect()
-			p11._deferredAncestrySignals[v44] = nil
+		if deferredAncestrySignal then
+			deferredAncestrySignal:Disconnect()
+			self._deferredAncestrySignals[str] = nil
 		end
 	end
 
-	local v46 = p11._signals[v44]
+	local signal = self._signals[str]
 
-	if v46 then
-		if p13 == nil or p13 == v46.Widget then
-			v46.PositionChanged:Disconnect()
-			v46.SizeChanged:Disconnect()
-			v46.VisibleChanged:Disconnect()
-			v46.AncestryChanged:Disconnect()
-			p11._signals[v44] = nil
+	if signal then
+		if p2 == nil or signal.Widget == p2 then
+			signal.PositionChanged:Disconnect()
+			signal.SizeChanged:Disconnect()
+			signal.VisibleChanged:Disconnect()
+			signal.AncestryChanged:Disconnect()
+			self._signals[str] = nil
 		else
-			Logger:warning(`WidgetManager:deregister called with mismatched widget for uri { v44 }`)
+			Logger:warning(`WidgetManager:deregister called with mismatched widget for uri {str}`)
 		end
 	end
 
-	p11:_run()
+	self:_run()
 end
-function t1.destroy(p14) -- line: 257
-	-- upvalues: Flags (copy)
-	for _, v49 in p14._signals do
-		v49.PositionChanged:Disconnect()
-		v49.SizeChanged:Disconnect()
-		v49.VisibleChanged:Disconnect()
-		v49.AncestryChanged:Disconnect()
+
+function WidgetManager:destroy()
+	for _, signal in self._signals do
+		signal.PositionChanged:Disconnect()
+		signal.SizeChanged:Disconnect()
+		signal.VisibleChanged:Disconnect()
+		signal.AncestryChanged:Disconnect()
 	end
 
 	if Flags.FoundationWidgetManagerSnapshotFlush then
-		for _, v51 in p14._deferredAncestrySignals do
-			v51:Disconnect()
+		for _, deferredAncestrySignal in self._deferredAncestrySignals do
+			deferredAncestrySignal:Disconnect()
 		end
 
-		p14._deferredAncestrySignals = {}
+		self._deferredAncestrySignals = {}
 	end
 
-	p14._signals = {}
-	p14._pendingRegisters = {}
-	p14._pendingDeregisters = {}
-	p14._registeredWidgets = {}
+	self._signals = {}
+	self._pendingRegisters = {}
+	self._pendingDeregisters = {}
+	self._registeredWidgets = {}
 end
 
-return t1
+return WidgetManager

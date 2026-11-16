@@ -1,5 +1,5 @@
 require(script.Analytics.VideoAnalyticsTypes)
-
+local ViewportVideoAutoplayMode = require(script.ViewportVideoAutoplayMode)
 local FeedVideoPlaybackContext = require(script.FeedVideoPlaybackContext)
 local VideoPlaybackCoordinator = require(script.VideoPlaybackCoordinator)
 local VideoPlaybackDetectionMethod = require(script.VideoPlaybackDetectionMethod)
@@ -11,6 +11,7 @@ local EdpVideoBlockingConfig = require(script.EdpVideoBlockingConfig)
 return {
 	FeedVideoPlaybackContext = FeedVideoPlaybackContext,
 	VideoPlaybackCoordinator = VideoPlaybackCoordinator,
+	ViewportVideoAutoplayMode = ViewportVideoAutoplayMode,
 	VideoPlaybackDetectionMethod = VideoPlaybackDetectionMethod,
 	VideoPlaybackDetector = VideoPlaybackDetector,
 	ViewportVideoAutoplayController = ViewportVideoAutoplayController,
@@ -20,8 +21,10 @@ return {
 	VideoLogger = require(script.Analytics.VideoLogger),
 	getIsInstanceVisible = require(script.getIsInstanceVisible),
 	getPlaybackDetectionMethod = require(script.getPlaybackDetectionMethod),
+	isVideoEligibleForPlayability = require(script.isVideoEligibleForPlayability),
 	RoundIconButton = require(script.RoundIconButton),
 	useCanDevicePlayVideoPreview = require(script.useCanDevicePlayVideoPreview),
+	useFeedVideoPlaybackContext = require(script.useFeedVideoPlaybackContext),
 	useTagAsViewportAutoplayCandidate = require(script.useTagAsViewportAutoplayCandidate),
 	EdpVideoBlockingConfig = EdpVideoBlockingConfig,
 	VideoBlockingHelpers = require(script.VideoBlockingHelpers),

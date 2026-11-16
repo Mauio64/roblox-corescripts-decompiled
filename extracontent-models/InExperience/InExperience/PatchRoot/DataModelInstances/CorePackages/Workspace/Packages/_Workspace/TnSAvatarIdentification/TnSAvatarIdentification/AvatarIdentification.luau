@@ -1,529 +1,548 @@
 local TnSAvatarIdentification = script:FindFirstAncestor("TnSAvatarIdentification")
+
 local GetFIntReportAnythingAvatarIdentificationCloseDiscardDistanceHundredths = require(TnSAvatarIdentification.Flags.GetFIntReportAnythingAvatarIdentificationCloseDiscardDistanceHundredths)
+
 local GetFIntReportAnythingAvatarIdentificationDiscardFractionSkipThresholdPercent = require(TnSAvatarIdentification.Flags.GetFIntReportAnythingAvatarIdentificationDiscardFractionSkipThresholdPercent)
+
 local GetFIntReportAnythingAvatarIdentificationOffScreenDiscardDistancePercent = require(TnSAvatarIdentification.Flags.GetFIntReportAnythingAvatarIdentificationOffScreenDiscardDistancePercent)
 local Players = game:GetService("Players")
-local TnSAvatarIdentificationParent = TnSAvatarIdentification.Parent
-local SharedFlags = require(TnSAvatarIdentificationParent.SharedFlags)
-local GetFFlagAvatarIdentificationSafeAreaFix = SharedFlags.GetFFlagAvatarIdentificationSafeAreaFix
-local GetFFlagGetHumanoidDescriptionUpdatesV2E = SharedFlags.GetFFlagGetHumanoidDescriptionUpdatesV2E
-local GetHumanoidDescription = require(TnSAvatarIdentificationParent.GetHumanoidDescription)
-local IdentificationUtils = require(script.Parent.IdentificationUtils)
-local v12 = GetFIntReportAnythingAvatarIdentificationCloseDiscardDistanceHundredths() / 100
-local v13 = GetFIntReportAnythingAvatarIdentificationOffScreenDiscardDistancePercent() / 100
-local v14 = GetFIntReportAnythingAvatarIdentificationDiscardFractionSkipThresholdPercent() / 100
-local t1 = {}
 
-function getBBCorners(cFrame: CFrame, vector3: Vector3) -- line: 29
-	local t2 = table.create(8)
-	local XVector = cFrame.XVector
-	local YVector = cFrame.YVector
-	local ZVector = cFrame.ZVector
-	local n1 = 1
+local parent = TnSAvatarIdentification.Parent
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagGetHumanoidDescriptionUpdatesV2E = SharedFlags.GetFFlagGetHumanoidDescriptionUpdatesV2E
+
+local GetHumanoidDescription = require(parent.GetHumanoidDescription)
+
+local IdentificationUtils = require(script.Parent.IdentificationUtils)
+
+local v = GetFIntReportAnythingAvatarIdentificationCloseDiscardDistanceHundredths() / 100
+local v2 = GetFIntReportAnythingAvatarIdentificationOffScreenDiscardDistancePercent() / 100
+local v3 = GetFIntReportAnythingAvatarIdentificationDiscardFractionSkipThresholdPercent() / 100
+
+local AvatarIdentification = {}
+
+function getBBCorners(cframe: CFrame, vector3: Vector3)
+	local bbCorners = table.create(8)
+
+	local xVector = cframe.XVector
+	local yVector = cframe.YVector
+	local zVector = cframe.ZVector
+	local v4 = 1
 
 	for i = -0.5, 0.5 do
-		local v28 = XVector * i * vector3.X
+		local v5 = xVector * i * vector3.X
 
 		for j = -0.5, 0.5 do
-			local v30 = YVector * j * vector3.Y
+			local v6 = yVector * j * vector3.Y
 
 			for k = -0.5, 0.5 do
-				local v32 = ZVector * k * vector3.Z
+				local v7 = zVector * k * vector3.Z
 
-				t2[n1] = cFrame.Position + v28 + v30 + v32
-				n1 += 1
+				bbCorners[v4] = cframe.Position + v5 + v6 + v7
+				v4 += 1
 			end
 		end
 	end
 
-	return t2
+	return bbCorners
 end
 
-local v16 = v13 + 1
-local v17 = -v13
-local t3 = {
-	total = 0,
-	offScreenDiscardCount = 0,
-	tooCloseDiscardCount = 0,
-	wasSkipped = false
-}
+local v4 = v2 + 1
+local v5 = -v2
 
-function getCoveringPolygon(t4: {[any]: any}, p1, p2) -- line: 74
-	-- upvalues: t3 (copy), GetFFlagAvatarIdentificationSafeAreaFix (copy), IdentificationUtils (copy), v12 (copy), v16 (copy), v17 (copy), v14 (copy)
-	if #t4 == 0 then
-		return {}, t3
+local v6 = { total = 0, offScreenDiscardCount = 0, tooCloseDiscardCount = 0, wasSkipped = false }
+
+local function fn(worldToFullViewportPointNormalized: Vector2): boolean -- 1 equivalent call inferred from this helper
+	return v4 < worldToFullViewportPointNormalized.Y
+		or worldToFullViewportPointNormalized.Y < v5
+		or v4 < worldToFullViewportPointNormalized.X
+		or worldToFullViewportPointNormalized.X < v5
+end
+
+function getCoveringPolygon(list, p, p2)
+	if #list == 0 then
+		return {}, v6
 	end
 
-	local ViewportSize = p1.ViewportSize
-	local t5 = {}
+	local bbCorners = {}
 
-	for _, v in ipairs(t4) do
-		local target = v.target
-		local ExtentsCFrame = target.ExtentsCFrame
-		local ExtentsSize = target.ExtentsSize
+	for _, item in ipairs(list) do
+		local target = item.target
 
-		for _, v45 in (getBBCorners(ExtentsCFrame, ExtentsSize)) do
-			table.insert(t5, v45)
+		local extentsCFrame = target.ExtentsCFrame
+		local extentsSize = target.ExtentsSize
+		local bbCorners2 = getBBCorners(extentsCFrame, extentsSize)
+
+		for _, bbCorner in bbCorners2 do
+			table.insert(bbCorners, bbCorner)
 		end
 	end
 
-	local t6 = {}
-	local n2 = 0
-	local n3 = 0
+	assert(p2, "getCoveringPolygon requires viewportInfo")
+	local count = 0
+	local count2 = 0
+	local worldToFullViewportPointNormalizeds = {}
 
-	if GetFFlagAvatarIdentificationSafeAreaFix() then
-		assert(p2, "getCoveringPolygon requires viewportInfo when FFlagAvatarIdentificationSafeAreaFix is enabled")
+	for _, v7 in ipairs(bbCorners) do
+		local worldToFullViewportPointNormalized, v8, _ = IdentificationUtils.worldToFullViewportPointNormalized(
+			v7,
+			p,
+			p2
+		)
 
-		for _, v in ipairs(t5) do
-			local v51, v52, _ = IdentificationUtils.worldToFullViewportPointNormalized(v, p1, p2)
-
-			if v52 < v12 then
-				n2 += 1
-			elseif v51.Y > v16 or (v51.Y < v17 or (v51.X > v16 or v51.X < v17)) then
-				n3 += 1
-			else
-				t6[#t6 + 1] = v51
-			end
-		end
-	else
-		for _, v in ipairs(t5) do
-			local v56, _ = p1:WorldToViewportPoint(v)
-			local v58 = Vector2.new(v56.X, v56.Y) / ViewportSize
-
-			if v56.Z < v12 then
-				n2 += 1
-			elseif v58.Y > v16 or (v58.Y < v17 or (v58.X > v16 or v58.X < v17)) then
-				n3 += 1
-			else
-				t6[#t6 + 1] = v58
-			end
+		if v8 < v then
+			count += 1
+		elseif fn(worldToFullViewportPointNormalized) then -- inferred equivalent call
+			count2 += 1
+		else
+			worldToFullViewportPointNormalizeds[#worldToFullViewportPointNormalizeds + 1] = worldToFullViewportPointNormalized
 		end
 	end
 
-	local t7 = {
-		wasSkipped = false,
-		total = #t5,
-		offScreenDiscardCount = n3,
-		tooCloseDiscardCount = n2
+	local v7 = {
+		total = #bbCorners,
+		offScreenDiscardCount = count2,
+		tooCloseDiscardCount = count,
+		wasSkipped = false
 	}
 
-	if (n2 + n3) / #t5 > v14 then
-		t7.wasSkipped = true
-
-		return {}, t7
+	if v3 < (count + count2) / #bbCorners then
+		v7.wasSkipped = true
+		return {}, v7
 	end
 
-	return getConvexHull(t6), t7
+	return getConvexHull(worldToFullViewportPointNormalizeds), v7
 end
-function getDistanceAlongCamLookVector(cFrame: CFrame, p3) -- line: 149
-	local p3CFrame = p3.CFrame
 
-	return ((cFrame.Position - p3CFrame.Position):Dot(p3CFrame.LookVector))
+function getDistanceAlongCamLookVector(cframe: CFrame, p)
+	local cframe2 = p.CFrame
+
+	return ((cframe.Position - cframe2.Position):Dot(cframe2.LookVector))
 end
-function getVisibleParts(p4, p5, t8: {[any]: any}) -- line: 162
-	local CFramePosition = p4.CFrame.Position
-	local Character = p5.Character
 
-	if not Character or not Character.Parent then
+function getVisibleParts(p, player, filterDescendantsInstances)
+	local position = p.CFrame.Position
+
+	local character = player.Character
+
+	if not (character and character.Parent) then
 		return 0, {}
 	end
 
-	local children = Character:GetChildren()
+	local children = character:GetChildren()
 	local raycastParams = RaycastParams.new()
-
 	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-	raycastParams.FilterDescendantsInstances = t8
+	raycastParams.FilterDescendantsInstances = filterDescendantsInstances
 	raycastParams.IgnoreWater = true
+	local count = 0
+	local result = {}
 
-	local n4 = 0
-	local t9 = {}
+	for _, part in ipairs(children) do
+		if not part:IsA("BasePart") then
+			continue
+		end
 
-	for _, v in ipairs(children) do
-		if v:IsA("BasePart") then
-			local v74 = v.CFrame.Position - CFramePosition
+		local v7 = part.CFrame.Position - position
 
-			n4 += 1
+		count += 1
+		local raycastResult = workspace:Raycast(position, v7, raycastParams)
 
-			local raycastResult = workspace:Raycast(CFramePosition, v74, raycastParams)
-
-			if raycastResult and raycastResult.Instance:IsDescendantOf(Character) then
-				table.insert(t9, {
-					result = raycastResult,
-					target = v
-				})
-			end
+		if raycastResult and raycastResult.Instance:IsDescendantOf(character) then
+			table.insert(result, { result = raycastResult, target = part })
 		end
 	end
 
-	return n4, t9
+	return count, result
 end
 
-local function counterclockwise(vector2: Vector2, vector2_2: Vector2, vector2_3: Vector2) -- line: 203
+local function counterclockwise(vector2: Vector2, vector2_2: Vector2, vector2_3: Vector2) -- 1 equivalent call inferred from this helper
 	return (vector2_2 - vector2):Cross(vector2_3 - vector2_2)
 end
 
-function getConvexHull(t10: {[any]: any}) -- line: 207
-	if #t10 <= 2 then
+function getConvexHull(list)
+	if #list <= 2 then
 		return {}
 	end
 
-	local t11 = {}
-	local u81 = t10[1]
-	local t12 = {}
+	local v7 = list[1]
+	local result = {}
 
-	for i = 2, #t10 do
-		local v84 = t10[i]
+	local vector3s = {}
 
-		if v84.Y < u81.Y or v84.Y == u81.Y and v84.X < u81.X then
-			u81 = v84
+	for i = 2, #list do
+		local item = list[i]
+
+		if item.Y < v7.Y or item.Y == v7.Y and item.X < v7.X then
+			v7 = item
 		end
 	end
 
-	table.insert(t11, u81)
-
-	local function angleFromLowest(vector2: Vector2) -- line: 224
-		-- upvalues: u81 (ref)
-		local v212 = vector2 - u81
-
-		return (math.atan2(v212.Y, v212.X))
+	table.insert(result, v7)
+	local function angleFromLowest(item: Vector2) -- 1 equivalent call inferred from this helper
+		local v8 = item - v7
+		return (math.atan2(v8.Y, v8.X))
 	end
 
-	for _, v in ipairs(t10) do
-		if v ~= u81 then
-			local vX = v.X
-			local vY = v.Y
-			local v90 = v - u81
-
-			table.insert(t12, (Vector3.new(vX, vY, (math.atan2(v90.Y, v90.X)))))
-		end
-	end
-
-	local function compareByAngle(vector3: Vector3, vector3_2: Vector3) -- line: 236
-		-- upvalues: u81 (ref)
-		if vector3.Z ~= vector3_2.Z then
-			return vector3.Z < vector3_2.Z
+	for _, item in ipairs(list) do
+		if item == v7 then
+			continue
 		end
 
-		return (Vector2.new(vector3.X, vector3.Y) - u81).Magnitude < (Vector2.new(vector3_2.X, vector3_2.Y) - u81).Magnitude
+		local x = item.X
+		local y = item.Y
+		table.insert(vector3s, (Vector3.new(x, y, angleFromLowest(item)))) -- inferred equivalent call
 	end
 
-	table.sort(t12, compareByAngle)
-
-	local t13 = {}
-	local v93 = t12[1]
-
-	for i = 2, #t12 do
-		local v95 = t12[i]
-
-		if v93.Z == v95.Z then
-			v93 = v95
-		else
-			table.insert(t13, Vector2.new(v93.X, v93.Y))
-			v93 = v95
+	local function compareByAngle(vector3: Vector3, vector3_2: Vector3): boolean
+		if vector3.Z == vector3_2.Z then
+			return (Vector2.new(vector3.X, vector3.Y) - v7).Magnitude < (Vector2.new(vector3_2.X, vector3_2.Y) - v7).Magnitude
 		end
+
+		return vector3.Z < vector3_2.Z
 	end
 
-	table.insert(t13, Vector2.new(v93.X, v93.Y))
+	table.sort(vector3s, compareByAngle)
 
-	if #t13 == 1 then
+	local v8 = vector3s[1]
+	local vector2s = {}
+
+	for i = 2, #vector3s do
+		local v9 = vector3s[i]
+
+		if v8.Z ~= v9.Z then
+			table.insert(vector2s, Vector2.new(v8.X, v8.Y))
+		end
+
+		v8 = v9
+	end
+
+	table.insert(vector2s, Vector2.new(v8.X, v8.Y))
+
+	if #vector2s == 1 then
 		return {}
 	end
 
-	table.insert(t11, t13[1])
-	table.insert(t11, t13[2])
+	table.insert(result, vector2s[1])
+	table.insert(result, vector2s[2])
 
-	for i = 3, #t13 do
-		local v97 = t13[i]
+	for i = 3, #vector2s do
+		local v9 = vector2s[i]
 
-		while #t11 > 1 do
-			local v98 = t11[#t11 - 1]
-			local v99 = t11[#t11]
-
-			if not ((v99 - v98):Cross(v97 - v99) <= 0) then
+		while #result > 1 do
+			if counterclockwise(result[#result - 1], result[#result], v9) <= 0 then -- inferred equivalent call
+				table.remove(result)
+			else
 				break
 			end
-
-			table.remove(t11)
 		end
 
-		table.insert(t11, v97)
+		table.insert(result, v9)
 	end
 
-	return t11
+	return result
 end
-function projectVertices(t14: {[any]: any}, vector2: Vector2, vector2_4: Vector2) -- line: 308
-	local n5 = 1e999
-	local n6 = -1e999
 
-	for _, v in ipairs(t14) do
-		local v107 = (v * vector2_4):Dot(vector2)
+function projectVertices(list, vector2: Vector2, vector2_2: Vector2)
+	local v7 = 1e999
+	local v8 = -1e999
 
-		if v107 < n5 then
-			n5 = v107
+	for _, item in ipairs(list) do
+		local dot = (item * vector2_2):Dot(vector2)
+
+		if dot < v7 then
+			v7 = dot
 		end
 
-		if n6 < v107 then
-			n6 = v107
-		end
-	end
-
-	return n5, n6
-end
-function projectCircle(vector2: Vector2, n7: number, vector2_5: Vector2) -- line: 328
-	local v111 = vector2_5.Unit * n7
-	local v112 = vector2 + v111
-	local v113 = vector2 - v111
-	local v114 = v112:Dot(vector2_5)
-	local v115 = v113:Dot(vector2_5)
-
-	if v115 < v114 then
-		local v116 = v115
-
-		v115 = v114
-		v114 = v116
-	end
-
-	return v114, v115
-end
-function getClosestPoint(vector2: Vector2, t15: {[any]: any}, vector2_6: Vector2) -- line: 347
-	local n8 = -1
-	local n9 = 1e999
-
-	for i, v in ipairs(t15) do
-		local v124 = v * vector2_6
-		local v125 = math.sqrt(math.pow(v124.X - vector2.X, 2) + math.pow(v124.Y - vector2.Y, 2))
-
-		if v125 < n9 then
-			n9 = v125
-			n8 = i
+		if v8 < dot then
+			v8 = dot
 		end
 	end
 
-	return n8
+	return v7, v8
 end
-function intersectCirclePolygon(vector2: Vector2, n10: number, t16: {[any]: any}, vector2_7: Vector2) -- line: 361
-	for i, _ in ipairs(t16) do
-		local v132 = t16[i] * vector2_7
-		local v133 = t16[i % #t16 + 1] * vector2_7 - v132
-		local Unit = Vector2.new(v133.Y, -v133.X).Unit
-		local v135, v136 = projectVertices(t16, Unit, vector2_7)
-		local v137, v138 = projectCircle(vector2, n10, Unit)
 
-		if v138 <= v135 or v136 <= v137 then
+function projectCircle(vector2: Vector2, p: number, vector2_2: Vector2)
+	local v7 = vector2_2.Unit * p
+
+	local vector = vector2 + v7
+	local vector3 = vector2 - v7
+
+	local v8 = vector:Dot(vector2_2)
+	local v9 = vector3:Dot(vector2_2)
+
+	if v9 < v8 then
+		v9, v8 = v8, v9
+	end
+
+	return v8, v9
+end
+
+function getClosestPoint(vector2: Vector2, list, vector2_2: Vector2)
+	local v7 = 1e999
+	local closestPoint = -1
+
+	for i, item in ipairs(list) do
+		local v8 = item * vector2_2
+		local v9 = math.sqrt(math.pow(v8.X - vector2.X, 2) + math.pow(v8.Y - vector2.Y, 2))
+
+		if not (v9 < v7) then
+			continue
+		end
+
+		closestPoint = i
+		v7 = v9
+	end
+
+	return closestPoint
+end
+
+function intersectCirclePolygon(vector2: Vector2, p: number, list, vector2_2: Vector2): boolean
+	for i, _ in ipairs(list) do
+		local v7 = list[i] * vector2_2
+		local v8 = list[i % #list + 1] * vector2_2 - v7
+
+		local unit = Vector2.new(v8.Y, -v8.X).Unit
+		local v9, v10 = projectVertices(list, unit, vector2_2)
+		local v11, v12 = projectCircle(vector2, p, unit)
+
+		if v12 <= v9 or v10 <= v11 then
 			return false
 		end
 	end
 
-	local v139 = getClosestPoint(vector2, t16, vector2_7)
+	local closestPoint = getClosestPoint(vector2, list, vector2_2)
 
-	if v139 == -1 then
+	if closestPoint == -1 then
 		return false
 	end
 
-	local Unit = (t16[v139] - vector2).Unit
-	local v141, v142 = projectVertices(t16, Unit, vector2_7)
-	local v143, v144 = projectCircle(vector2, n10, Unit)
+	local unit = (list[closestPoint] - vector2).Unit
+	local v7, v8 = projectVertices(list, unit, vector2_2)
+	local v9, v10 = projectCircle(vector2, p, unit)
 
-	if v144 <= v141 or v142 <= v143 then
-		return false
-	end
-
-	return true
+	return not (v10 <= v7 or v8 <= v9)
 end
-function intersectCircleBox(vector2: Vector2, n11: number, vector2_8: Vector2, vector2_9: Vector2, _: Vector2) -- line: 392
-	local vector2X = vector2.X
-	local vector2Y = vector2.Y
-	local v152 = vector2X
-	local v153 = vector2Y
-	local vector2_8X = vector2_8.X
-	local vector2_8Y = vector2_8.Y
-	local v156 = vector2_9.X - vector2_8.X
-	local v157 = vector2_9.Y - vector2_8.Y
 
-	if vector2X < vector2_8X then
-		v152 = vector2_8X
-	elseif vector2X > vector2_8X + v156 then
-		v152 = vector2_8X + v156
-	end
+function intersectCircleBox(vector2: Vector2, p: number, vector2_2: Vector2, vector2_3: Vector2, _: Vector2): boolean
+	local x = vector2.X
+	local y = vector2.Y
 
-	if vector2Y < vector2_8Y then
-		v153 = vector2_8Y
-	elseif vector2Y > vector2_8Y + v157 then
-		v153 = vector2_8Y + v157
-	end
+	local v7 = vector2_2.X
+	local v8 = vector2_2.Y
 
-	local v158 = vector2X - v152
-	local v159 = vector2Y - v153
+	local v9 = vector2_3.X - vector2_2.X
+	local v10 = vector2_3.Y - vector2_2.Y
 
-	if n11 >= math.sqrt(v158 * v158 + v159 * v159) then
-		return true
-	end
-
-	return false
-end
-function t1.getAvatarsForRegion(t17: {[any]: any}, vector2: Vector2, n12: number, n13: number, n14: number) -- line: 431
-	local t18 = {}
-	local v166 = n14 < n13
-	local v167 = if not v166 then n14 / n13 else n13 / n14
-	local v168 = if not v166 then Vector2.new(1, v167) else Vector2.new(v167, 1)
-
-	for _, v in pairs(t17) do
-		if intersectCircleBox(vector2 * v168, n12 * v167, v.boundingBox.min * v168, v.boundingBox.max * v168, v168) and not (#v.convexHull < 3) and intersectCirclePolygon(vector2 * v168, n12 * v167, v.convexHull, v168) then
-			t18[v.player.UserId] = v.player
+	if not (x < v7) then
+		if v7 + v9 < x then
+			v7 += v9
+		else
+			v7 = x
 		end
 	end
 
-	return t18
-end
-function t1.getAvatarsForPoint(t19: {[any]: any}, vector2: Vector2) -- line: 478
-	local t20 = {}
-
-	for _, v in pairs(t19) do
-		local boundingBox = v.boundingBox
-
-		if not (vector2.X < boundingBox.min.X) and not (vector2.Y < boundingBox.min.Y) and not (vector2.X > boundingBox.max.X) and not (vector2.Y > boundingBox.max.Y) then
-			local convexHull = v.convexHull
-
-			if not (#convexHull < 3) then
-				local v178 = convexHull[#convexHull]
-				local v179 = true
-				local v180 = true
-
-				for _, v2 in ipairs(convexHull) do
-					local v183 = (v2 - v178):Cross(vector2 - v178)
-
-					v180 = v180 and v183 <= 0
-					v179 = v179 and v183 >= 0
-					v178 = v2
-				end
-
-				if v179 or v180 then
-					t20[v.player.UserId] = v.player
-				end
-			end
+	if not (y < v8) then
+		if v8 + v10 < y then
+			v8 += v10
+		else
+			v8 = y
 		end
 	end
 
-	return t20
+	local v11 = x - v7
+	local v12 = y - v8
+
+	return math.sqrt(v11 * v11 + v12 * v12) <= p
 end
-function t1.getVisibleAvatars(b1: boolean?, n15: number?) -- line: 515
-	-- upvalues: Players (copy), IdentificationUtils (copy), GetFFlagAvatarIdentificationSafeAreaFix (copy), GetFFlagGetHumanoidDescriptionUpdatesV2E (copy), GetHumanoidDescription (copy)
+
+function AvatarIdentification.getAvatarsForRegion(items, vector2: Vector2, p: number, p2: number, p3: number)
+	local playersByUserId = {}
+
+	local v7 = p3 < p2
+	local v8
+
+	if v7 then
+		v8 = p2 / p3
+	else
+		v8 = p3 / p2
+	end
+
+	local vector2_2
+
+	if v7 then
+		vector2_2 = Vector2.new(v8, 1)
+	else
+		vector2_2 = Vector2.new(1, v8)
+	end
+
+	for _, item in pairs(items) do
+		if
+			not intersectCircleBox(
+				vector2 * vector2_2,
+				p * v8,
+				item.boundingBox.min * vector2_2,
+				item.boundingBox.max * vector2_2,
+				vector2_2
+			)
+			or #item.convexHull < 3
+		then
+			continue
+		end
+
+		if not intersectCirclePolygon(vector2 * vector2_2, p * v8, item.convexHull, vector2_2) then
+			continue
+		end
+
+		playersByUserId[item.player.UserId] = item.player
+	end
+
+	return playersByUserId
+end
+
+function AvatarIdentification.getAvatarsForPoint(items, vector2: Vector2)
+	local playersByUserId = {}
+
+	for _, item in pairs(items) do
+		local boundingBox = item.boundingBox
+
+		if
+			vector2.X < boundingBox.min.X
+			or vector2.Y < boundingBox.min.Y
+			or vector2.X > boundingBox.max.X
+			or vector2.Y > boundingBox.max.Y
+		then
+			continue
+		end
+
+		local convexHull = item.convexHull
+
+		if #convexHull < 3 then
+			continue
+		end
+
+		local v7 = convexHull[#convexHull]
+		local v8 = true
+		local v9 = true
+
+		for _, v10 in ipairs(convexHull) do
+			local cross = (v10 - v7):Cross(vector2 - v7)
+
+			v8 = v8 and cross <= 0
+			v9 = v9 and cross >= 0
+			v7 = v10
+		end
+
+		if v9 or v8 then
+			playersByUserId[item.player.UserId] = item.player
+		end
+	end
+
+	return playersByUserId
+end
+
+function AvatarIdentification.getVisibleAvatars(flag: boolean?, value: number?)
 	local players = Players:GetPlayers()
-	local t21 = {
-		totalPlayers = 0,
-		checkedPlayers = 0,
-		duration = 0
-	}
-	local CurrentCamera = workspace.CurrentCamera
+	local result = { totalPlayers = 0, checkedPlayers = 0, duration = 0 }
 
-	if not CurrentCamera then
-		return {}, t21
+	local currentCamera = workspace.CurrentCamera
+
+	if not currentCamera then
+		return {}, result
 	end
 
-	local LocalPlayer = Players.LocalPlayer
+	local localPlayer = Players.LocalPlayer
 
-	if not LocalPlayer then
-		return {}, t21
+	if not localPlayer then
+		return {}, result
 	end
 
-	local Character = LocalPlayer.Character
-	local t22 = {}
-	local u192
+	local character = localPlayer.Character
 
-	if Character then
-		u192 = IdentificationUtils.getLocalCharacterPosition(Character) or CurrentCamera.CFrame.Position
+	local characters = {}
+	local v7
 
-		if IdentificationUtils.shouldIgnoreLocalCharacter(Character) then
-			t22[#t22 + 1] = Character
+	if character then
+		v7 = IdentificationUtils.getLocalCharacterPosition(character) or currentCamera.CFrame.Position
+
+		if IdentificationUtils.shouldIgnoreLocalCharacter(character) then
+			characters[#characters + 1] = character
 		end
 	else
-		u192 = CurrentCamera.CFrame.Position
+		v7 = currentCamera.CFrame.Position
 	end
 
-	local v193 = nil
+	local viewportInfo = IdentificationUtils.getViewportInfo()
+	result.viewportInfo = viewportInfo
 
-	if GetFFlagAvatarIdentificationSafeAreaFix() then
-		v193 = IdentificationUtils.getViewportInfo()
-		t21.viewportInfo = v193
-	end
+	local result2 = {}
+	local lastTime = os.clock()
+	result.totalPlayers = #players - 1
 
-	local t23 = {}
-	local elapsed = os.clock()
-
-	t21.totalPlayers = #players - 1
-
-	if u192 then
-		table.sort(players, function(p6, p7) -- line: 570
-			-- upvalues: u192 (ref)
-			return p6:DistanceFromCharacter(u192) < p7:DistanceFromCharacter(u192)
+	if v7 then
+		table.sort(players, function(a, b): boolean
+			return a:DistanceFromCharacter(v7) < b:DistanceFromCharacter(v7)
 		end)
 	end
 
-	for _, v in ipairs(players) do
-		if v == LocalPlayer and not b1 or not v.Character then
-			continue
-		end
-
-		if (n15 or 0.5) < os.clock() - elapsed then
-			t21.duration = os.clock() - elapsed
-
-			return t23, t21
-		end
-
-		local v198, v199 = v.Character:GetBoundingBox()
-		local Magnitude = (v198.Position - u192).Magnitude
-
-		if not (getDistanceAlongCamLookVector(v198, CurrentCamera) < 0) then
-			local v201 = getBBCorners(v198, v199)
-			local v202, v203 = IdentificationUtils.getViewportCorners(v201, CurrentCamera, v193)
-
-			if v203.X == 0 or v203.Y == 0 then
-				t21.checkedPlayers = t21.checkedPlayers + 1
-
-				continue
-			end
-
-			local v204, v205 = getVisibleParts(CurrentCamera, v, t22)
-
-			if (n15 or 0.5) < os.clock() - elapsed then
-				t21.duration = os.clock() - elapsed
-
-				return t23, t21
-			end
-
-			local v206 = #v205 / v204
-			local v207, v208 = getCoveringPolygon(v205, CurrentCamera, v193)
-			local v209 = nil
-			local v210 = nil
-
-			if GetFFlagGetHumanoidDescriptionUpdatesV2E() then
-				v209, v210 = GetHumanoidDescription.getHumanoidDescription(v.UserId)
-			end
-
-			t23[v.UserId] = {
-				player = v,
-				distance = Magnitude,
-				boundingBox = {
-					min = v202,
-					max = v203
-				},
-				hitRate = v206,
-				convexHull = v207,
-				pointProcessingStats = v208,
-				humanoidDescription = v209,
-				humanoidDescriptionStatus = v210
-			}
-			t21.checkedPlayers = t21.checkedPlayers + 1
-
-			continue
-		end
-
-		t21.checkedPlayers = t21.checkedPlayers + 1
+	local function fn2() -- 3 equivalent calls inferred from this helper
+		result.duration = os.clock() - lastTime
+		return result
 	end
 
-	t21.duration = os.clock() - elapsed
+	for _, player in ipairs(players) do
+		if not ((player ~= localPlayer or flag) and player.Character) then
+			continue
+		end
 
-	return t23, t21
+		if (value or 0.5) < os.clock() - lastTime then
+			return result2, fn2() -- inferred equivalent call
+		end
+
+		local boundingBox, v8 = player.Character:GetBoundingBox()
+
+		local magnitude = (boundingBox.Position - v7).Magnitude
+
+		if getDistanceAlongCamLookVector(boundingBox, currentCamera) < 0 then
+			result.checkedPlayers += 1
+		else
+			local bbCorners = getBBCorners(boundingBox, v8)
+
+			local viewportCorners, max = IdentificationUtils.getViewportCorners(bbCorners, currentCamera, viewportInfo)
+
+			if max.X == 0 or max.Y == 0 then
+				result.checkedPlayers += 1
+			else
+				local visibleParts, v9 = getVisibleParts(currentCamera, player, characters)
+
+				if (value or 0.5) < os.clock() - lastTime then
+					return result2, fn2() -- inferred equivalent call
+				end
+
+				local hitRate = #v9 / visibleParts
+				local coveringPolygon, pointProcessingStats = getCoveringPolygon(v9, currentCamera, viewportInfo)
+				local humanoidDescription, humanoidDescriptionStatus
+
+				if GetFFlagGetHumanoidDescriptionUpdatesV2E() then
+					humanoidDescription, humanoidDescriptionStatus = GetHumanoidDescription.getHumanoidDescription(player.UserId)
+				end
+
+				result2[player.UserId] = {
+					player = player,
+					distance = magnitude,
+					boundingBox = { min = viewportCorners, max = max },
+					hitRate = hitRate,
+					convexHull = coveringPolygon,
+					pointProcessingStats = pointProcessingStats,
+					humanoidDescription = humanoidDescription,
+					humanoidDescriptionStatus = humanoidDescriptionStatus
+				}
+
+				result.checkedPlayers += 1
+			end
+		end
+	end
+
+	return result2, fn2() -- inferred equivalent call
 end
 
-return t1
+return AvatarIdentification

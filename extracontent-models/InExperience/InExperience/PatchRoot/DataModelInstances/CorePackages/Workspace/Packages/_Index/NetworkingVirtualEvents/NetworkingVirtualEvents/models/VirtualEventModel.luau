@@ -1,63 +1,58 @@
 local NetworkingVirtualEvents = script:FindFirstAncestor("NetworkingVirtualEvents")
 
 require(NetworkingVirtualEvents.types)
+local VirtualEventModel = {}
 
-return {
-	mock = function(s1: string) -- line: 7
-		local dateTime = DateTime.now()
-		local dateTime2 = DateTime.fromUnixTimestamp(dateTime.UnixTimestamp + 86400)
+function VirtualEventModel.mock(id: string)
+	local now = DateTime.now()
+	return {
+		id = id,
+		title = "Event Name",
+		description = "Event description goes here...",
+		host = { hostType = "user", hostId = 1, hostName = "Roblox", hasVerifiedBadge = true },
+		eventTime = {
+			startTime = now,
+			endTime = DateTime.fromUnixTimestamp(now.UnixTimestamp + 86400),
+			startUtc = now:ToIsoDate(),
+			endUtc = now:ToIsoDate()
+		},
+		universeId = 3531439676,
+		placeId = 123456789,
+		eventStatus = "active",
+		createdTime = now,
+		updatedTime = now,
+		userRsvpStatus = "none"
+	}
+end
 
+function VirtualEventModel.fromResponse(data)
+	local dateTime = DateTime.fromIsoDate(data.eventTime.startUtc)
+	local dateTime2 = DateTime.fromIsoDate(data.eventTime.endUtc)
+	local dateTime3 = DateTime.fromIsoDate(data.createdUtc)
+	local dateTime4 = DateTime.fromIsoDate(data.updatedUtc)
+
+	if dateTime and dateTime2 and dateTime3 and dateTime4 then
 		return {
-			title = "Event Name",
-			description = "Event description goes here...",
-			universeId = 3531439676,
-			placeId = 123456789,
-			eventStatus = "active",
-			userRsvpStatus = "none",
-			id = s1,
-			host = {
-				hostType = "user",
-				hostId = 1,
-				hostName = "Roblox",
-				hasVerifiedBadge = true
-			},
+			id = data.id,
+			title = data.title,
+			description = data.description,
+			host = data.host,
 			eventTime = {
 				startTime = dateTime,
 				endTime = dateTime2,
-				startUtc = dateTime:ToIsoDate(),
-				endUtc = dateTime:ToIsoDate()
+				startUtc = data.eventTime.startUtc,
+				endUtc = data.eventTime.endUtc
 			},
-			createdTime = dateTime,
-			updatedTime = dateTime
+			universeId = data.universeId,
+			placeId = data.placeId,
+			eventStatus = data.eventStatus,
+			createdTime = dateTime3,
+			updatedTime = dateTime4,
+			userRsvpStatus = data.userRsvpStatus
 		}
-	end,
-	fromResponse = function(p1) -- line: 38
-		local dateTime = DateTime.fromIsoDate(p1.eventTime.startUtc)
-		local dateTime3 = DateTime.fromIsoDate(p1.eventTime.endUtc)
-		local dateTime4 = DateTime.fromIsoDate(p1.createdUtc)
-		local dateTime5 = DateTime.fromIsoDate(p1.updatedUtc)
-
-		if dateTime and (dateTime3 and dateTime4 and dateTime5) then
-			return {
-				id = p1.id,
-				title = p1.title,
-				description = p1.description,
-				host = p1.host,
-				eventTime = {
-					startTime = dateTime,
-					endTime = dateTime3,
-					startUtc = p1.eventTime.startUtc,
-					endUtc = p1.eventTime.endUtc
-				},
-				universeId = p1.universeId,
-				placeId = p1.placeId,
-				eventStatus = p1.eventStatus,
-				createdTime = dateTime4,
-				updatedTime = dateTime5,
-				userRsvpStatus = p1.userRsvpStatus
-			}
-		end
-
-		return nil
 	end
-}
+
+	return nil
+end
+
+return VirtualEventModel

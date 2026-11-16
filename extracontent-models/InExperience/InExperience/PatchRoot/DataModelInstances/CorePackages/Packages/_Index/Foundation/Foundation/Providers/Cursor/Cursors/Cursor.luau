@@ -1,7 +1,9 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local FoundationImages = require(FoundationParent.FoundationImages)
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local FoundationImages = require(parent.FoundationImages)
+local React = require(parent.React)
+
 local Images = FoundationImages.Images
 local CursorComponent = require(script.Parent.Parent.CursorComponent)
 local CursorType = require(Foundation.Enums.CursorType)
@@ -9,9 +11,11 @@ local CursorType = require(Foundation.Enums.CursorType)
 require(Foundation.Enums.ColorNamespace)
 
 local useTokens = require(Foundation.Providers.Style.useTokens)
+
 local Components = script.Parent.Parent.Parent.Parent.Components
 local getScaledSlice = require(Components.Image.ImageSet.getScaledSlice)
-local t1 = {
+
+local v = {
 	[CursorType.BulletUp] = {
 		Tag = "SlicedImage",
 		Image = "component_assets/bulletUp_17_stroke_3",
@@ -33,9 +37,9 @@ local t1 = {
 	[CursorType.SelectionCell] = {
 		Tag = "SlicedImage",
 		Image = "component_assets/square_7_stroke_3",
-		Padding = 50,
 		SliceCenter = Rect.new(3.5, 3.5, 3.5, 3.5),
-		InsetAdjustment = Vector2.new(2, 2)
+		InsetAdjustment = Vector2.new(2, 2),
+		Padding = 50
 	},
 	[CursorType.SelectedKnob] = {
 		Tag = "FixedSizeImage",
@@ -49,144 +53,141 @@ local t1 = {
 	},
 	[CursorType.InputButton] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 11),
 		Offset = 11,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 11)
+		BorderWidth = 3
 	},
 	[CursorType.RoundedRect] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 8),
 		Offset = 9,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 8)
+		BorderWidth = 3
 	},
 	[CursorType.RoundedRectNoInset] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 8),
 		Offset = 0,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 8)
+		BorderWidth = 3
 	},
 	[CursorType.RoundedSlot] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 7),
 		Offset = 0,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 7)
+		BorderWidth = 3
 	},
 	[CursorType.SkinToneCircle] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0.5, 0),
 		Offset = 0,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0.5, 0)
+		BorderWidth = 3
 	},
 	[CursorType.SmallPill] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 15),
 		Offset = 0,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 15)
+		BorderWidth = 3
 	},
 	[CursorType.LargePill] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 26),
 		Offset = 0,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 26)
+		BorderWidth = 3
 	},
 	[CursorType.Square] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 0),
 		Offset = 2,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 0)
+		BorderWidth = 3
 	},
 	[CursorType.Toggle] = {
 		Tag = "RoundedImage",
+		CornerRadius = UDim.new(0, 13),
 		Offset = 0,
-		BorderWidth = 3,
-		CornerRadius = UDim.new(0, 13)
+		BorderWidth = 3
 	}
 }
 
-return (React.forwardRef(function(t2: {[any]: any}, p1) -- line: 140
-	-- upvalues: useTokens (copy), CursorType (copy), React (copy), t1 (copy), Images (copy), getScaledSlice (copy), CursorComponent (copy)
-	local v14 = useTokens()
-	local colorNamespace = t2.colorNamespace
+return (React.forwardRef(function(props, ref)
+	local v2 = useTokens()
+	local colorNamespace = props.colorNamespace
 
-	if t2.cursorType == CursorType.NavHighlight then
+	if props.cursorType == CursorType.NavHighlight then
 		return React.createElement("Frame", {
-			BorderSizePixel = 1,
-			BackgroundTransparency = 0,
 			AnchorPoint = Vector2.new(0, 1),
 			Position = UDim2.new(0, 0, 1, -3),
 			Size = UDim2.new(1, 0, 0, 3),
-			BackgroundColor3 = v14[colorNamespace].Selection.Start.Color3,
-			BorderColor3 = v14[colorNamespace].Selection.Start.Color3,
-			ref = p1
+			BorderSizePixel = 1,
+			BackgroundColor3 = v2[colorNamespace].Selection.Start.Color3,
+			BackgroundTransparency = 0,
+			BorderColor3 = v2[colorNamespace].Selection.Start.Color3,
+			ref = ref
 		})
 	end
 
-	if t2.cursorType == CursorType.Invisible then
+	if props.cursorType == CursorType.Invisible then
 		return React.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
-			ref = p1
+			ref = ref
 		})
 	end
 
-	local v16 = t1[t2.cursorType]
+	local v3 = v[props.cursorType]
 
-	if v16.Tag == "FixedSizeImage" then
-		local uDim2 = UDim2.fromOffset(v16.Size, v16.Size)
-		local uDim2_2 = UDim2.new(0.5, -uDim2.X.Offset / 2, 0.5, -uDim2.Y.Offset / 2)
-
-		return React.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			Image = Images[v16.Image].Image,
-			ImageRectOffset = Images[v16.Image].ImageRectOffset,
-			ImageRectSize = Images[v16.Image].ImageRectSize,
-			Size = uDim2,
-			Position = uDim2_2,
-			ImageColor3 = v14[colorNamespace].Selection.Start.Color3,
-			ImageTransparency = v14[colorNamespace].Selection.Start.Transparency,
-			ref = p1
-		})
-	end
-
-	if v16.Tag == "SlicedImage" then
-		local InsetAdjustment = v16.InsetAdjustment
-		local uDim2 = UDim2.new(1, InsetAdjustment.X * 2, 1, InsetAdjustment.Y * 2)
-		local v21 = getScaledSlice(v16.SliceCenter)
-		local v22 = if not v16.Padding then nil else React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v16.Padding),
-			PaddingBottom = UDim.new(0, v16.Padding),
-			PaddingLeft = UDim.new(0, v16.Padding),
-			PaddingRight = UDim.new(0, v16.Padding)
-		})
+	if v3.Tag == "FixedSizeImage" then
+		local udim = UDim2.fromOffset(v3.Size, v3.Size)
+		local udim2 = UDim2.new(0.5, -udim.X.Offset / 2, 0.5, -udim.Y.Offset / 2)
 
 		return React.createElement("ImageLabel", {
+			Image = Images[v3.Image].Image,
 			BackgroundTransparency = 1,
-			Image = Images[v16.Image].Image,
-			ImageRectOffset = Images[v16.Image].ImageRectOffset,
-			ImageRectSize = Images[v16.Image].ImageRectSize,
-			SliceCenter = v21.center,
-			SliceScale = v21.scale,
+			ImageRectOffset = Images[v3.Image].ImageRectOffset,
+			ImageRectSize = Images[v3.Image].ImageRectSize,
+			Size = udim,
+			Position = udim2,
+			ImageColor3 = v2[colorNamespace].Selection.Start.Color3,
+			ImageTransparency = v2[colorNamespace].Selection.Start.Transparency,
+			ref = ref
+		})
+	elseif v3.Tag == "SlicedImage" then
+		local insetAdjustment = v3.InsetAdjustment
+		local udim = UDim2.new(1, insetAdjustment.X * 2, 1, insetAdjustment.Y * 2)
+		local scaledSlice = getScaledSlice(v3.SliceCenter)
+		local padding
+
+		if v3.Padding then
+			padding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, v3.Padding),
+				PaddingBottom = UDim.new(0, v3.Padding),
+				PaddingLeft = UDim.new(0, v3.Padding),
+				PaddingRight = UDim.new(0, v3.Padding)
+			})
+		end
+
+		return React.createElement("ImageLabel", {
+			Image = Images[v3.Image].Image,
+			BackgroundTransparency = 1,
+			ImageRectOffset = Images[v3.Image].ImageRectOffset,
+			ImageRectSize = Images[v3.Image].ImageRectSize,
+			SliceCenter = scaledSlice.center,
+			SliceScale = scaledSlice.scale,
 			ScaleType = Enum.ScaleType.Slice,
-			Size = uDim2,
-			Position = UDim2.fromOffset(-InsetAdjustment.X, -InsetAdjustment.Y),
-			ImageColor3 = v14[colorNamespace].Selection.Start.Color3,
-			ImageTransparency = v14[colorNamespace].Selection.Start.Transparency,
-			ref = p1
-		}, {
-			Padding = v22
-		})
-	end
-
-	if v16.Tag == "RoundedImage" then
+			Size = udim,
+			Position = UDim2.fromOffset(-insetAdjustment.X, -insetAdjustment.Y),
+			ImageColor3 = v2[colorNamespace].Selection.Start.Color3,
+			ImageTransparency = v2[colorNamespace].Selection.Start.Transparency,
+			ref = ref
+		}, { Padding = padding })
+	elseif v3.Tag == "RoundedImage" then
 		return React.createElement(CursorComponent, {
-			isVisible = t2.isVisible,
-			cornerRadius = v16.CornerRadius,
-			offset = v16.Offset - v16.BorderWidth,
-			borderWidth = v16.BorderWidth,
-			colorNamespace = t2.colorNamespace,
-			ref = p1
+			isVisible = props.isVisible,
+			cornerRadius = v3.CornerRadius,
+			offset = v3.Offset - v3.BorderWidth,
+			borderWidth = v3.BorderWidth,
+			colorNamespace = props.colorNamespace,
+			ref = ref
 		})
+	else
+		return nil
 	end
-
-	return nil
 end))

@@ -1,13 +1,11 @@
 local HttpService = game:GetService("HttpService")
 
-local function getDecodedJSON(s1: string) -- line: 3
-	-- upvalues: HttpService (copy)
-	local ok, result = pcall(function() -- line: 4
-		-- upvalues: HttpService (copy), s1 (copy)
-		return HttpService:JSONDecode(s1)
+local function getDecodedJSON(json: string)
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(json)
 	end)
 
-	if ok then
+	if success then
 		return result
 	end
 
@@ -15,8 +13,7 @@ local function getDecodedJSON(s1: string) -- line: 3
 		return nil
 	end
 
-	warn(debug.traceback("Failed to decode JSON: " .. s1))
-
+	warn(debug.traceback("Failed to decode JSON: " .. json))
 	return nil
 end
 

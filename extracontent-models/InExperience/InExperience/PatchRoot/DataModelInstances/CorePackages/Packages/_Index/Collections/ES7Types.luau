@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.ES7Types.ES7Types))
+local ES7Types = require(index.ES7Types.ES7Types)
+
+return ES7Types

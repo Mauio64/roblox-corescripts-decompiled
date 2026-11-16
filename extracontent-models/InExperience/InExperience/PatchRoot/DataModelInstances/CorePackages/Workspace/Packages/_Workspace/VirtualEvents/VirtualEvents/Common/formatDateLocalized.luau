@@ -1,11 +1,19 @@
 local LocalizationService = game:GetService("LocalizationService")
 
-local function formatDate(s1: string, p1) -- line: 3
-	-- upvalues: LocalizationService (copy)
-	local dateTime = DateTime.now()
-	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+local function formatDate(value: string, object)
+	local now = DateTime.now()
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
 
-	return s1:gsub("{date}", p1:FormatLocalTime(not (p1:ToLocalTime().Year > dateTime:ToLocalTime().Year) and "ddd, MMM DD" or "ll", RobloxLocaleId)):gsub("{time}", p1:FormatLocalTime("LT", RobloxLocaleId))
+	return value:gsub(
+		"{date}",
+		object:FormatLocalTime(
+			object:ToLocalTime().Year > now:ToLocalTime().Year and "ll" or "ddd, MMM DD",
+			robloxLocaleId
+		)
+	):gsub(
+		"{time}",
+		object:FormatLocalTime("LT", robloxLocaleId)
+	)
 end
 
 return formatDate

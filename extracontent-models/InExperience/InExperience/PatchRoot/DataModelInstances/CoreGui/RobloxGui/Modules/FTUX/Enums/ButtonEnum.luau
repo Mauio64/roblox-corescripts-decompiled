@@ -1,4 +1,1 @@
-return {
-	SkipButton = "SkipButton",
-	NextButton = "NextButton"
-}
+return { SkipButton = "SkipButton", NextButton = "NextButton" }

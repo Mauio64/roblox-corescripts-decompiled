@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(t1: {[any]: any}) -- line: 15
+return Rodux.makeActionCreator(script.Name, function(data)
 	return {
-		context = t1.context,
-		place_id = t1.place_id,
-		accumulated_time_ms = t1.accumulated_time_ms
+		context = data.context,
+		place_id = data.place_id,
+		accumulated_time_ms = data.accumulated_time_ms
 	}
 end)

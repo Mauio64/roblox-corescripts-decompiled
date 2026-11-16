@@ -1,24 +1,14 @@
 local CorePackages = game:GetService("CorePackages")
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local OpenOverlay = require(ParentParent.Actions.OpenOverlay)
-local CloseOverlay = require(ParentParent.Actions.CloseOverlay)
-local t1 = {
-	overlay = nil,
-	overlayProps = {}
-}
+local parent = script.Parent.Parent
+local OpenOverlay = require(parent.Actions.OpenOverlay)
+local CloseOverlay = require(parent.Actions.CloseOverlay)
 
-return Rodux.createReducer(t1, {
-	[OpenOverlay.name] = function(_, p2) -- line: 25
-		return {
-			overlay = p2.overlay,
-			overlayProps = p2.overlayProps
-		}
+return Rodux.createReducer({ overlay = nil, overlayProps = {} }, {
+	[OpenOverlay.name] = function(_, p)
+		return { overlay = p.overlay, overlayProps = p.overlayProps }
 	end,
-	[CloseOverlay.name] = function(_, _) -- line: 33
-		return {
-			overlay = nil,
-			overlayProps = {}
-		}
+	[CloseOverlay.name] = function(_, _)
+		return { overlay = nil, overlayProps = {} }
 	end
 })

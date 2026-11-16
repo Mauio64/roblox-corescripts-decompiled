@@ -1,4 +1,1 @@
-return {
-	Frequency = 0,
-	FriendshipScore = 1
-}
+return { Frequency = 0, FriendshipScore = 1 }

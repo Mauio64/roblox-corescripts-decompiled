@@ -1,30 +1,51 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local v4 = if not require(scriptParentParent.Flags.FFlagUpdateInvitesToUsePaginatedFriends) then require(scriptParent.FriendsListContextProvider) else require(scriptParent.FriendsListContextProvider2)
-local InviteCallbackProvider = require(scriptParent.InviteCallbackProvider)
-local SelectedUsersContextProvider = require(scriptParent.SelectedUsersContextProvider)
-local Cryo = require(scriptParentParentParent.Cryo)
-local React = require(scriptParentParentParent.React)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-return function(t1: {[any]: any}) -- line: 29
-	-- upvalues: Cryo (copy), React (copy), v4 (copy), InviteCallbackProvider (copy), SelectedUsersContextProvider (copy)
-	local excludedFriendsSet = t1.excludedFriendsSet
+local FFlagUpdateInvitesToUsePaginatedFriends = require(parent2.Flags.FFlagUpdateInvitesToUsePaginatedFriends)
+local v
 
-	if t1.preselectedUsersUnremovable and t1.preselectedUsers then
-		excludedFriendsSet = Cryo.Dictionary.union(excludedFriendsSet or {}, Cryo.List.toSet(t1.preselectedUsers))
+if FFlagUpdateInvitesToUsePaginatedFriends then
+	v = require(parent.FriendsListContextProvider2)
+else
+	v = require(parent.FriendsListContextProvider)
+end
+
+local InviteCallbackProvider = require(parent.InviteCallbackProvider)
+local SelectedUsersContextProvider = require(parent.SelectedUsersContextProvider)
+
+local Cryo = require(parent3.Cryo)
+local React = require(parent3.React)
+
+return function(props)
+	local excludedFriendsSet = props.excludedFriendsSet
+
+	if props.preselectedUsersUnremovable and props.preselectedUsers then
+		excludedFriendsSet = Cryo.Dictionary.union(excludedFriendsSet or {}, Cryo.List.toSet(props.preselectedUsers))
 	end
 
-	return React.createElement(v4, {
-		excludedFriendsSet = excludedFriendsSet,
-		isLoadingCustomParams = t1.isLoadingCustomParams
-	}, React.createElement(InviteCallbackProvider, {
-		inviteSingleFriend = t1.inviteSingleFriend,
-		inviteMultiFriends = t1.inviteMultiFriends
-	}, React.createElement(SelectedUsersContextProvider, {
-		selectionLimit = t1.selectionLimit,
-		preselectedUsers = t1.preselectedUsers,
-		preselectedUsersUnremovable = t1.preselectedUsersUnremovable,
-		onRemoveCallback = t1.onRemoveCallback
-	}, t1.children)))
+	return React.createElement(
+		v,
+		{
+			excludedFriendsSet = excludedFriendsSet,
+			isLoadingCustomParams = props.isLoadingCustomParams
+		},
+		React.createElement(
+			InviteCallbackProvider,
+			{
+				inviteSingleFriend = props.inviteSingleFriend,
+				inviteMultiFriends = props.inviteMultiFriends
+			},
+			React.createElement(
+				SelectedUsersContextProvider,
+				{
+					selectionLimit = props.selectionLimit,
+					preselectedUsers = props.preselectedUsers,
+					preselectedUsersUnremovable = props.preselectedUsersUnremovable,
+					onRemoveCallback = props.onRemoveCallback
+				},
+				props.children
+			)
+		)
+	)
 end

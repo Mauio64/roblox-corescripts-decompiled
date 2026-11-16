@@ -1,7 +1,7 @@
-local function getFirstFocusableDescendant(p1) -- line: 1
-	for _, descendant in p1:GetDescendants() do
-		if descendant:IsA("GuiObject") and descendant.Selectable and descendant.Visible then
-			return descendant
+local function getFirstFocusableDescendant(folder)
+	for _, guiObject in folder:GetDescendants() do
+		if guiObject:IsA("GuiObject") and guiObject.Selectable and guiObject.Visible then
+			return guiObject
 		end
 	end
 

@@ -1,63 +1,57 @@
 local HttpService = game:GetService("HttpService")
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local Promise = dependencies.Promise
-local UrlBuilder = dependencies.UrlBuilder
-local UrlBase = dependencies.UrlBase
-local Fetch = dependencies.Fetch
-local fetch = Fetch.fetch
-local Response = Fetch.Response
-local ConsentName = require(ParentParent.Enums.ConsentName)
-local v11 = UrlBuilder.new({
-	path = "user-consents-api/v1/user-consents/one-time",
-	base = UrlBase.APIS
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+local promise = dependencies.Promise
+local urlBuilder = dependencies.UrlBuilder
+local urlBase = dependencies.UrlBase
+local fetch = dependencies.Fetch
+local fetch2 = fetch.fetch
+local response = fetch.Response
+local ConsentName = require(parent.Enums.ConsentName)
+
+local v = urlBuilder.new({
+	base = urlBase.APIS,
+	path = "user-consents-api/v1/user-consents/one-time"
 })
 
 return {
-	grantOneTimeUserConsent = function(p1, n1: number?, s1: string) -- line: 18
-		-- upvalues: ConsentName (copy), Promise (copy), v11 (copy), fetch (copy), HttpService (copy), Response (copy)
-		local v15 = ConsentName[p1]
+	grantOneTimeUserConsent = function(p, ttlSeconds: number?, rbxauditdata: string)
+		local consentType = ConsentName[p]
 
-		if not v15 then
-			return Promise.reject(`Invalid consent name type: { p1 }`)
+		if not consentType then
+			return promise.reject(`Invalid consent name type: {p}`)
 		end
 
-		local v16 = v11()
-
-		return Promise.new(function(resolve, reject) -- line: 25
-			-- upvalues: fetch (copy), v16 (copy), HttpService (copy), v15 (copy), n1 (copy), s1 (copy), Response (copy)
-			local ok, result = pcall(function() -- line: 26
-				-- upvalues: fetch (copy), v16 (copy), HttpService (copy), v15 (copy), n1 (copy), s1 (copy), Response (copy)
-				return fetch(v16, {
+		local v2 = v()
+		return promise.new(function(callback, callback2)
+			local success, result = pcall(function()
+				return fetch2(v2, {
 					method = "POST",
 					body = HttpService:JSONEncode({
-						consentType = v15,
-						ttlSeconds = n1
+						consentType = consentType,
+						ttlSeconds = ttlSeconds
 					}),
 					headers = {
 						["Content-Type"] = "application/json",
 						Accept = "application/json",
-						["rbx-audit-data"] = s1
+						["rbx-audit-data"] = rbxauditdata
 					}
-				}):catch(function(_) -- line: 39
-					-- upvalues: Response (copy)
-					return Response.error()
+				}):catch(function(_)
+					return response.error()
 				end):expect()
 			end)
 
-			if not ok then
-				reject("Failed to make request: " .. tostring(result))
-
-				return
+			if not success then
+				callback2("Failed to make request: " .. tostring(result))
+			elseif result.ok then
+				callback()
+			else
+				callback2((string.format(
+					"Got grant one time user consent HTTP Response: %d - %s",
+					result.status,
+					result.statusText
+				)))
 			end
-
-			if not result.ok then
-				reject((string.format("Got grant one time user consent HTTP Response: %d - %s", result.status, result.statusText)))
-
-				return
-			end
-
-			resolve()
 		end)
 	end
 }

@@ -1,39 +1,73 @@
 local GameInvite = script:FindFirstAncestor("GameInvite")
-local GameInviteParent = GameInvite.Parent
-local React = require(GameInviteParent.React)
-local UIBlox = require(GameInviteParent.UIBlox)
+local parent = GameInvite.Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local GameInviteConstants = require(GameInvite.GameInviteConstants)
+
 local useStyle = UIBlox.Core.Style.useStyle
+
 local SidePadding = GameInviteConstants.Layout.SidePadding
 
-return function(t1: {[any]: any}) -- line: 17
-	-- upvalues: useStyle (copy), React (copy), SidePadding (copy)
-	local v9 = useStyle()
-	local Theme = v9.Theme
-	local Font = v9.Font
-	local v12 = Font.BaseSize * Font.Body.RelativeSize
+return function(props)
+	local v = useStyle()
+	local theme = v.Theme
+	local font = v.Font
 
-	return React.createElement("Frame", {
+	local textSize = font.BaseSize * font.Body.RelativeSize
+
+	local createElement = React.createElement
+	local v2 = {
+		Size = props.size,
+		LayoutOrder = props.layoutOrder,
 		BackgroundTransparency = 1,
-		ClipsDescendants = true,
-		Size = t1.size,
-		LayoutOrder = t1.layoutOrder
-	}, {
+		ClipsDescendants = true
+	}
+
+	local v3 = {
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, SidePadding),
 			PaddingRight = UDim.new(0, SidePadding)
 		}),
-		CustomText = React.createElement("TextLabel", {
-			TextWrapped = true,
-			BackgroundTransparency = 1,
-			Text = t1.promptMessage,
-			TextSize = v12,
-			TextColor3 = Theme.TextEmphasis.Color,
-			TextTransparency = Theme.TextEmphasis.Transparency,
-			Font = Font.Body.Font,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextTruncate = Enum.TextTruncate.AtEnd,
-			Size = UDim2.new(1, 0, 1, 0)
-		})
-	})
+		CustomText = 0
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		Text = props.promptMessage,
+		TextSize = textSize,
+		TextColor3 = theme.TextEmphasis.Color,
+		TextTransparency = theme.TextEmphasis.Transparency,
+		Font = 0,
+		FontFace = 0,
+		TextXAlignment = 0,
+		TextWrapped = true,
+		TextTruncate = 0,
+		Size = 0,
+		BackgroundTransparency = 1
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Body.Font
+	end
+
+	v4.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
+	end
+
+	v4.FontFace = fontFace
+
+	v4.TextXAlignment = Enum.TextXAlignment.Left
+
+	v4.TextTruncate = Enum.TextTruncate.AtEnd
+	v4.Size = UDim2.new(1, 0, 1, 0)
+	v3.CustomText = createElement2("TextLabel", v4)
+	return createElement("Frame", v2, v3)
 end

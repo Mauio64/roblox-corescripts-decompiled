@@ -1,19 +1,13 @@
-local function ceilToEven(n1: number) -- line: 1
-	local v3 = math.ceil(n1)
+local function ceilToEven(p: number) -- 1 equivalent call inferred from this helper
+	local v = math.ceil(p)
 
-	if v3 % 2 == 1 then
-		v3 += 1
+	if v % 2 == 1 then
+		v += 1
 	end
 
-	return (math.max(0, v3))
+	return (math.max(0, v))
 end
 
-return function(n2: number) -- line: 9
-	local v5 = math.ceil(n2 * 3 / 4)
-
-	if v5 % 2 == 1 then
-		v5 += 1
-	end
-
-	return (math.max(0, v5))
+return function(p: number)
+	return ceilToEven(p * 3 / 4) -- inferred equivalent call
 end

@@ -1,40 +1,66 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local mutedError = require(Parent.Loggers).mutedError
-local t = require(Parent.t)
-local FFlagLuaAppChartsFilterOptionTextTag = require(Parent.SharedFlags).FFlagLuaAppChartsFilterOptionTextTag
-local FFlagLuaAppChartsActiveFilterChips = require(Parent.SharedFlags).FFlagLuaAppChartsActiveFilterChips
-local v7 = t.strictInterface({
+local parent = script:FindFirstAncestor("GameFilters").Parent
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+local t = require(parent.t)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppChartsFilterOptionTextTag = SharedFlags.FFlagLuaAppChartsFilterOptionTextTag
+
+local strictInterface = t.strictInterface
+local v = {
 	buttonName = t.string,
 	filterId = t.string,
 	selectedOptionId = t.string,
 	previousOptionId = t.optional(t.string),
-	selectedOptionContextTag = if not FFlagLuaAppChartsFilterOptionTextTag then nil else t.optional(t.string),
-	previousOptionContextTag = if not FFlagLuaAppChartsFilterOptionTextTag then nil else t.optional(t.string),
-	gameSetTypeId = t.string,
-	gameSetTargetId = t.optional(t.number),
-	sortPos = t.number,
-	isActive = if not FFlagLuaAppChartsActiveFilterChips then nil else t.optional(t.boolean)
-})
-local t1 = {
-	[AppPage.Games] = v7
+	selectedOptionContextTag = 0,
+	previousOptionContextTag = 0,
+	gameSetTypeId = 0,
+	gameSetTargetId = 0,
+	sortPos = 0,
+	isActive = 0
 }
+local selectedOptionContextTag
 
-local function gamesFilterClickEvent(p1, p2, p3) -- line: 31
-	-- upvalues: t1 (copy), mutedError (copy)
-	local v13 = t1[p2]
+if FFlagLuaAppChartsFilterOptionTextTag then
+	selectedOptionContextTag = t.optional(t.string)
+end
 
-	if v13 then
-		local v14, v15 = v13(p3)
+v.selectedOptionContextTag = selectedOptionContextTag
+local previousOptionContextTag
 
-		if not v14 then
-			mutedError(v15)
+if FFlagLuaAppChartsFilterOptionTextTag then
+	previousOptionContextTag = t.optional(t.string)
+end
+
+v.previousOptionContextTag = previousOptionContextTag
+v.gameSetTypeId = t.string
+v.gameSetTargetId = t.optional(t.number)
+v.sortPos = t.number
+v.isActive = t.optional(t.boolean)
+local v2 = strictInterface(v)
+
+local v3 = { [AppPage.Games] = v2 }
+
+local function gamesFilterClickEvent(object, p, p2)
+	local v4 = v3[p]
+
+	if v4 then
+		local v5, v6 = v4(p2)
+
+		if not v5 then
+			mutedError(v6)
 		end
 	else
-		mutedError(string.format("Missing interface for eventContext %s to type check gamesFilterClick event parameters", p2))
+		mutedError(string.format(
+			"Missing interface for eventContext %s to type check gamesFilterClick event parameters",
+			p
+		))
 	end
 
-	p1:sendEventDeferred(p2, "gamesFilterClick", p3)
+	object:sendEventDeferred(p, "gamesFilterClick", p2)
 end
 
 return gamesFilterClickEvent

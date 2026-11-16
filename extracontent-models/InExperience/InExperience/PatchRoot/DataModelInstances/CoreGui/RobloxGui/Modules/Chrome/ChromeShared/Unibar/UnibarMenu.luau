@@ -1,8 +1,10 @@
 local ChromeShared = script:FindFirstAncestor("ChromeShared")
+
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 local ContextActionService = game:GetService("ContextActionService")
 local React = require(CorePackages.Packages.React)
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local GetFFlagDebugEnableUnibarDummyIntegrations = SharedFlags.GetFFlagDebugEnableUnibarDummyIntegrations
 local GetFIntIconSelectionTimeout = SharedFlags.GetFIntIconSelectionTimeout
@@ -10,20 +12,22 @@ local GetFFlagChromeCentralizedConfiguration = SharedFlags.GetFFlagChromeCentral
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagAddUILessMode = SharedFlags.FFlagAddUILessMode
 local FIntAddUILessModeVariant = SharedFlags.FIntAddUILessModeVariant
-local FFlagEnableInExperienceAvatarSwitcher = SharedFlags.FFlagEnableInExperienceAvatarSwitcher
-local FFlagAddMapToNineDot = SharedFlags.FFlagAddMapToNineDot
-local FFlagEnableInExperienceShop = SharedFlags.FFlagEnableInExperienceShop
 local FFlagAppNavMyStatsTab = SharedFlags.FFlagAppNavMyStatsTab
-local FFlagUnibarMenuOpenSubmenu = require(script.Parent.Parent.Parent.Flags).FFlagUnibarMenuOpenSubmenu
-local FFlagTokenizeUnibarConstantsWithStyleProvider = require(ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider
+
+local Flags = require(script.Parent.Parent.Parent.Flags)
+local FFlagUnibarMenuOpenSubmenu = Flags.FFlagUnibarMenuOpenSubmenu
+
+local Flags2 = require(ChromeShared.Flags)
+local FFlagTokenizeUnibarConstantsWithStyleProvider = Flags2.FFlagTokenizeUnibarConstantsWithStyleProvider
 local FFlagEnablePlaytestModeUnibar = SharedFlags.FFlagEnablePlaytestModeUnibar
-local useStyle = require(CorePackages.Packages.UIBlox).Core.Style.useStyle
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
 local PlaytestModeThemeProvider = require(ChromeShared.Unibar.PlaytestModeThemeProvider)
 local Service = require(ChromeShared.Service)
-local UnibarStyle = require(CorePackages.Workspace.Packages.Chrome).UnibarStyle
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local UnibarStyle = Chrome.UnibarStyle
 
-if GetFFlagChromeCentralizedConfiguration() then
-else
+if not GetFFlagChromeCentralizedConfiguration() then
 	require(ChromeShared.Parent.Integrations)
 end
 
@@ -32,179 +36,157 @@ local WindowManager = require(ChromeShared.Unibar.WindowManager)
 local ShortcutBar = require(ChromeShared.Shortcuts.ShortcutBar)
 local Constants = require(ChromeShared.Unibar.Constants)
 local buildMenuOrder = require(ChromeShared.Unibar.buildMenuOrder)
+
 local useChromeMenuItems = require(ChromeShared.Hooks.useChromeMenuItems)
 local useObservableValue = require(ChromeShared.Hooks.useObservableValue)
 local useMappedObservableValue = require(ChromeShared.Hooks.useMappedObservableValue)
+
 local IconHost = require(ChromeShared.Unibar.ComponentHosts.IconHost)
+
 local ReactOtter = require(CorePackages.Packages.ReactOtter)
-local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
 local FFlagReduceTopBarInsetsWhileHidden = SharedFlags.FFlagReduceTopBarInsetsWhileHidden
-local Stores = require(CorePackages.Workspace.Packages.CoreGuiCommon).Stores
-local createEffect = require(CorePackages.Packages.Signals).createEffect
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local Stores = CoreGuiCommon.Stores
+local Signals = require(CorePackages.Packages.Signals)
+local createEffect = Signals.createEffect
+
 local Constants2 = require(ChromeShared.Parent.Integrations.Party.Constants)
 local isConnectUnibarEnabled = require(ChromeShared.Parent.Integrations.Connect.isConnectUnibarEnabled)
-local isConnectDropdownEnabled = require(ChromeShared.Parent.Integrations.Connect.isConnectDropdownEnabled)
-local v41 = if not FFlagEnableConsoleExpControls then nil else require(ChromeShared.Parent.Parent.TopBar.Components.GamepadConnector)
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
-local Panel3DInSpatialUI = nil
-local PanelType = nil
-local u45 = nil
+local GamepadConnector
+
+if FFlagEnableConsoleExpControls then
+	GamepadConnector = require(ChromeShared.Parent.Parent.TopBar.Components.GamepadConnector)
+else
+	GamepadConnector = nil
+end
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
+local panel3DInSpatialUI, panelType, observableValue
 
 if isInExperienceUIVREnabled then
 	local VrSpatialUi = require(CorePackages.Workspace.Packages.VrSpatialUi)
-
-	Panel3DInSpatialUI = VrSpatialUi.Panel3DInSpatialUI
-	PanelType = VrSpatialUi.Constants.PanelType
-	u45 = require(CorePackages.Workspace.Packages.Observable).ObservableValue.new(true)
+	panel3DInSpatialUI = VrSpatialUi.Panel3DInSpatialUI
+	panelType = VrSpatialUi.Constants.PanelType
+	local Observable = require(CorePackages.Workspace.Packages.Observable)
+	observableValue = Observable.ObservableValue.new(true)
+else
+	panel3DInSpatialUI = nil
+	observableValue = nil
+	panelType = nil
 end
 
-local ArgoPartyExperimentation = require(CorePackages.Workspace.Packages.SocialExperiments).ArgoPartyExperimentation
-local FFlagRemoveFriendsChatUnibarEntrypoints = SharedFlags.FFlagRemoveFriendsChatUnibarEntrypoints
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-
 if not GetFFlagChromeCentralizedConfiguration() then
-	function configureUnibar() -- line: 83
-		-- upvalues: FFlagAddMapToNineDot (copy), buildMenuOrder (copy), isConnectDropdownEnabled (copy), FFlagRemoveFriendsChatUnibarEntrypoints (copy), ArgoPartyExperimentation (copy), FFlagExpChatEnableFriendsTab (copy), GetFFlagDebugEnableUnibarDummyIntegrations (copy), isConnectUnibarEnabled (copy), Constants2 (copy), FFlagAppNavMyStatsTab (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), Service (copy), FFlagEnableInExperienceAvatarSwitcher (copy), Constants (copy), GuiService (copy), FFlagEnableInExperienceShop (copy)
-		local v54
+	function configureUnibar()
+		local menuOrder = buildMenuOrder()
 
-		if FFlagAddMapToNineDot then
-			v54 = buildMenuOrder()
-		else
-			v54 = {
-				"leaderboard",
-				"emotes",
-				"backpack"
-			}
-			table.insert(v54, "respawn")
-			table.insert(v54, 1, "trust_and_safety")
-
-			if isConnectDropdownEnabled() and (not FFlagRemoveFriendsChatUnibarEntrypoints or not ArgoPartyExperimentation.getIsRenameEnabled() or not FFlagExpChatEnableFriendsTab) then
-				table.insert(v54, 1, "connect_dropdown")
-			end
-		end
-
-		local t1 = {
-			"nine_dot",
-			"chat",
-			"toggle_mic_mute"
-		}
-
-		table.insert(t1, 3, "join_voice")
+		local v = { "nine_dot", "chat", "toggle_mic_mute" }
+		table.insert(v, 3, "join_voice")
 
 		if GetFFlagDebugEnableUnibarDummyIntegrations() then
-			table.insert(t1, "dummy_window")
-			table.insert(t1, "dummy_window_2")
+			table.insert(v, "dummy_window")
+			table.insert(v, "dummy_window_2")
 		end
 
 		if isConnectUnibarEnabled() then
-			table.insert(t1, not ArgoPartyExperimentation.getIsRenameEnabled() and "connect_unibar" or "party_entrypoint")
+			table.insert(v, "party_entrypoint")
 		end
 
-		local v56 = table.find(t1, "toggle_mic_mute")
+		local index = table.find(v, "toggle_mic_mute")
 
-		if v56 then
-			table.insert(t1, v56, Constants2.TOGGLE_MIC_INTEGRATION_ID)
+		if index then
+			table.insert(v, index, Constants2.TOGGLE_MIC_INTEGRATION_ID)
 		end
 
 		if FFlagAppNavMyStatsTab then
-			table.insert(t1, "assistant_build")
+			table.insert(v, "assistant_build")
 		end
 
 		if isInExperienceUIVREnabled and isSpatial() then
 			Service:configureMenu({
-				{
-					"vr_toggle_button",
-					"vr_safety_bubble"
-				},
-				t1
+				{ "vr_toggle_button", "vr_safety_bubble" },
+				v
 			})
 		else
-			Service:configureMenu({ t1 })
+			Service:configureMenu({ v })
 		end
 
-		if not FFlagAddMapToNineDot then
-			if isInExperienceUIVREnabled then
-				if not isSpatial() then
-					table.insert(v54, 2, "camera_entrypoint")
-					table.insert(v54, 2, "selfie_view")
-				end
-			else
-				table.insert(v54, 2, "camera_entrypoint")
-				table.insert(v54, 2, "selfie_view")
-			end
-
-			if FFlagEnableInExperienceAvatarSwitcher then
-				table.insert(v54, 3, Constants.AVATAR_SWITCHER_ID)
-			end
-
-			if not isSpatial() and not GuiService:IsTenFootInterface() then
-				table.insert(v54, 4, "music_entrypoint")
-			end
-
-			if FFlagEnableInExperienceShop then
-				table.insert(v54, 2, Constants.IN_EXPERIENCE_SHOP_ID)
-			end
-		end
-
-		Service:configureSubMenu("nine_dot", v54)
+		Service:configureSubMenu("nine_dot", menuOrder)
 	end
 
 	configureUnibar()
 
 	if FFlagEnableConsoleExpControls then
-		require(script.Parent.Parent.Shortcuts.ConfigureShortcuts)()
+		local ConfigureShortcuts = require(script.Parent.Parent.Shortcuts.ConfigureShortcuts)
+		ConfigureShortcuts()
 	end
 end
 
-function IconDivider(t2: {[any]: any}) -- line: 189
-	-- upvalues: useStyle (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy)
-	local v58 = useStyle()
-	local v59 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_DIVIDER_POSITION else UnibarStyle.use().ICON_DIVIDER_POSITION
+function IconDivider(props)
+	local v = useStyle()
+	local ICON_DIVIDER_POSITION
 
-	return React.createElement("Frame", {
+	if FFlagTokenizeUnibarConstantsWithStyleProvider then
+		ICON_DIVIDER_POSITION = UnibarStyle.use().ICON_DIVIDER_POSITION
+	else
+		ICON_DIVIDER_POSITION = Constants.ICON_DIVIDER_POSITION
+	end
+
+	local createElement = React.createElement
+	local v2 = {
+		Position = props.position,
+		Size = UDim2.new(0, Constants.DIVIDER_CELL_WIDTH, 1, 0),
 		BorderSizePixel = 0,
-		BackgroundTransparency = 1,
-		Position = t2.position,
-		Size = UDim2.new(0, Constants.DIVIDER_CELL_WIDTH, 1, 0)
-	}, {
-		DividerBar = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			Position = v59,
-			AnchorPoint = Vector2.new(0, 0.5),
-			Size = Constants.ICON_DIVIDER_SIZE,
-			BackgroundColor3 = v58.Theme.Divider.Color,
-			BackgroundTransparency = if not t2.toggleTransition then v58.Theme.Divider.Transparency else t2.toggleTransition:map(function(p1) -- line: 213
-				-- upvalues: v58 (copy)
-				return v58.Theme.Divider.Transparency + (1 - p1) * (1 - v58.Theme.Divider.Transparency)
-			end),
-			Visible = t2.visible or true
-		})
-	})
+		BackgroundTransparency = 1
+	}
+
+	local createElement2 = React.createElement
+	local v3 = {
+		Position = ICON_DIVIDER_POSITION,
+		AnchorPoint = Vector2.new(0, 0.5),
+		Size = Constants.ICON_DIVIDER_SIZE,
+		BorderSizePixel = 0,
+		BackgroundColor3 = v.Theme.Divider.Color,
+		BackgroundTransparency = 0,
+		Visible = 0
+	}
+	local backgroundTransparency
+
+	if props.toggleTransition then
+		backgroundTransparency = props.toggleTransition:map(function(p)
+			return v.Theme.Divider.Transparency + (1 - p) * (1 - v.Theme.Divider.Transparency)
+		end)
+	else
+		backgroundTransparency = v.Theme.Divider.Transparency
+	end
+
+	v3.BackgroundTransparency = backgroundTransparency
+
+	v3.Visible = props.visible or true
+	return createElement("Frame", v2, { DividerBar = createElement2("Frame", v3) })
 end
 
-local function getSelectedChild(t3: {[any]: any}, s1: string?) -- line: 222
-	-- upvalues: Constants (copy)
-	return t3.current:FindFirstChild(Constants.ICON_NAME_PREFIX .. tostring(s1), true)
+local function getSelectedChild(menuFrameRef, p: string?) -- 2 equivalent calls inferred from this helper
+	return menuFrameRef.current:FindFirstChild(Constants.ICON_NAME_PREFIX .. tostring(p), true)
 end
 
-function AnimationStateHelper(p2) -- line: 228
-	-- upvalues: useObservableValue (copy), Service (copy), React (copy), FFlagEnableConsoleExpControls (copy), ContextActionService (copy), GuiService (copy), Constants (copy), FFlagUnibarMenuOpenSubmenu (copy), ReactOtter (copy), GetFIntIconSelectionTimeout (copy)
-	local v63 = useObservableValue(Service:currentSubMenu())
-	local v64 = useObservableValue(Service:selectedItem())
-	local v65 = useObservableValue(Service:inFocusNav())
+function AnimationStateHelper(data): nil
+	local v = useObservableValue(Service:currentSubMenu())
 
-	React.useEffect(function() -- line: 234
-		-- upvalues: v65 (copy), FFlagEnableConsoleExpControls (copy), ContextActionService (copy), Service (copy), GuiService (copy), p2 (copy), v64 (copy), Constants (copy), FFlagUnibarMenuOpenSubmenu (copy)
-		if v65 then
+	local v2 = useObservableValue(Service:selectedItem())
+	local v3 = useObservableValue(Service:inFocusNav())
+
+	React.useEffect(function()
+		if v3 then
 			if not FFlagEnableConsoleExpControls then
-				ContextActionService:BindCoreAction("RBXEscapeUnibar", function(_, p4, _) -- line: 237
-					-- upvalues: FFlagEnableConsoleExpControls (copy), Service (copy), GuiService (copy)
+				ContextActionService:BindCoreAction("RBXEscapeUnibar", function(_, p, _)
 					if FFlagEnableConsoleExpControls then
-						if p4 == Enum.UserInputState.End then
+						if p == Enum.UserInputState.End then
 							Service:disableFocusNav()
 							GuiService.SelectedCoreObject = nil
-
-							return
 						end
 					else
 						Service:disableFocusNav()
@@ -213,511 +195,522 @@ function AnimationStateHelper(p2) -- line: 228
 			end
 
 			if FFlagEnableConsoleExpControls then
-				if p2.menuFrameRef.current then
-					local menuFrameRef = p2.menuFrameRef
-					local v169 = v64
-					local v170 = menuFrameRef.current:FindFirstChild(Constants.ICON_NAME_PREFIX .. tostring(v169), true)
+				if data.menuFrameRef.current then
+					local selectedChild = getSelectedChild(data.menuFrameRef, v2) -- inferred equivalent call
 
-					if v170 then
-						GuiService.SelectedCoreObject = v170
-
+					if selectedChild then
+						GuiService.SelectedCoreObject = selectedChild
 						return
 					end
 
-					if FFlagUnibarMenuOpenSubmenu then
-						if FFlagEnableConsoleExpControls then
-							Service:selectedItem():set("nine_dot")
-						end
-
-						Service:toggleSubMenu("nine_dot")
-
+					if not FFlagUnibarMenuOpenSubmenu then
+						GuiService:Select(data.menuFrameRef.current)
 						return
 					end
 
-					GuiService:Select(p2.menuFrameRef.current)
+					if FFlagEnableConsoleExpControls then
+						Service:selectedItem():set("nine_dot")
+					end
 
-					return
+					Service:toggleSubMenu("nine_dot")
 				end
-			elseif p2.menuFrameRef.current then
-				GuiService:Select(p2.menuFrameRef.current)
-
-				return
+			elseif data.menuFrameRef.current then
+				GuiService:Select(data.menuFrameRef.current)
 			end
 		else
 			ContextActionService:UnbindCoreAction("RBXEscapeUnibar")
 
-			if GuiService.SelectedCoreObject and p2.menuFrameRef.current:IsAncestorOf(GuiService.SelectedCoreObject) then
+			if
+				GuiService.SelectedCoreObject
+				and data.menuFrameRef.current:IsAncestorOf(GuiService.SelectedCoreObject)
+			then
 				GuiService.SelectedCoreObject = nil
 			end
 		end
-	end, { v65 })
-	React.useEffect(function() -- line: 282
-		-- upvalues: v63 (copy), FFlagUnibarMenuOpenSubmenu (copy), v65 (copy), GuiService (copy), p2 (copy), ReactOtter (copy), Constants (copy)
-		if v63 == "nine_dot" then
-			if FFlagUnibarMenuOpenSubmenu and v65 then
-				GuiService:Select(p2.subMenuHostRef.current)
-			end
+	end, { v3 })
 
-			p2.setToggleSubmenuTransition((ReactOtter.spring(1, Constants.MENU_ANIMATION_SPRING)))
+	React.useEffect(function()
+		if v ~= "nine_dot" then
+			data.setToggleSubmenuTransition((ReactOtter.spring(0, Constants.MENU_ANIMATION_SPRING)))
 
 			return
 		end
 
-		p2.setToggleSubmenuTransition((ReactOtter.spring(0, Constants.MENU_ANIMATION_SPRING)))
-	end, { v63 })
-	React.useEffect(function() -- line: 293
-		-- upvalues: FFlagEnableConsoleExpControls (copy), v63 (copy), v64 (copy), GetFIntIconSelectionTimeout (copy), p2 (copy), Constants (copy), GuiService (copy)
-		if FFlagEnableConsoleExpControls and v63 == v64 then
+		if FFlagUnibarMenuOpenSubmenu and v3 then
+			GuiService:Select(data.subMenuHostRef.current)
+		end
+
+		data.setToggleSubmenuTransition((ReactOtter.spring(1, Constants.MENU_ANIMATION_SPRING)))
+	end, { v })
+
+	local useEffect = React.useEffect
+	local function fn()
+		if FFlagEnableConsoleExpControls and v == v2 then
 			return
 		end
 
-		local co = coroutine.create(function() -- line: 298
-			-- upvalues: GetFIntIconSelectionTimeout (copy), p2 (copy), v64 (copy), FFlagEnableConsoleExpControls (copy), Constants (copy), GuiService (copy)
-			local n1 = 0
-			local v200
+		local thread = coroutine.create(function()
+			local count = 0
 
-			repeat
-				repeat
-					if not (n1 < GetFIntIconSelectionTimeout()) then
-						return
-					end
+			while count < GetFIntIconSelectionTimeout() do
+				count += 1
+				task.wait()
 
-					n1 += 1
-					task.wait()
-				until p2.menuFrameRef.current and v64
+				if not (data.menuFrameRef.current and v2) then
+					continue
+				end
+
+				local selectedCoreObject
 
 				if FFlagEnableConsoleExpControls then
-					local menuFrameRef = p2.menuFrameRef
-					local v199 = v64
-
-					v200 = menuFrameRef.current:FindFirstChild(Constants.ICON_NAME_PREFIX .. tostring(v199), true)
+					selectedCoreObject = getSelectedChild(data.menuFrameRef, v2) -- inferred equivalent call
 				else
-					v200 = p2.menuFrameRef.current:FindFirstChild("IconHitArea_" .. v64, true)
+					selectedCoreObject = data.menuFrameRef.current:FindFirstChild("IconHitArea_" .. v2, true)
 				end
-			until v200
 
-			GuiService.SelectedCoreObject = v200
+				if selectedCoreObject then
+					GuiService.SelectedCoreObject = selectedCoreObject
+					break
+				end
+			end
 		end)
+		coroutine.resume(thread)
+	end
 
-		coroutine.resume(co)
-	end, {
-		v64,
-		if not FFlagEnableConsoleExpControls then nil else v63
-	})
+	local v4
+
+	if FFlagEnableConsoleExpControls then
+		v4 = v
+	end
+
+	useEffect(fn, { v2, v4 })
 
 	return nil
 end
-function linearInterpolation(n2: number, n3: number, n4: number) -- line: 324
-	return n2 * (1 - n4) + n3 * n4
+
+function linearInterpolation(p: number, p2: number, p3: number)
+	return p * (1 - p3) + p2 * p3
 end
-function IconPositionBinding(p6, n5: number, n6: number, n7: number, p7, p8, b1: boolean, b2: boolean?, p9) -- line: 328
-	-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy)
-	local u78 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.UNIBAR_END_PADDING else UnibarStyle.use().UNIBAR_END_PADDING
 
-	return (React.joinBindings({
-		p6,
-		p7,
-		p8
-	}):map(function(t4: {[any]: any}) -- line: 348
-		-- upvalues: p9 (copy), n6 (copy), n5 (copy), n7 (copy), b2 (copy), b1 (copy), u78 (ref)
-		local v173 = if not p9.current then linearInterpolation(n5, n6, t4[2]) else linearInterpolation(n6, n5, t4[2])
-		local v174 = n7
+function IconPositionBinding(p, p2: number, p3: number, p4: number, p5, p6, flag: boolean, flag2: boolean?, p7)
+	local UNIBAR_END_PADDING
 
-		if b2 and not b1 then
-			v174 = n7 - t4[3]
+	if FFlagTokenizeUnibarConstantsWithStyleProvider then
+		UNIBAR_END_PADDING = UnibarStyle.use().UNIBAR_END_PADDING
+	else
+		UNIBAR_END_PADDING = Constants.UNIBAR_END_PADDING
+	end
+
+	return (React.joinBindings({ p, p5, p6 }):map(function(list)
+		local v
+
+		if p7.current then
+			v = linearInterpolation(p3, p2, list[2])
+		else
+			v = linearInterpolation(p2, p3, list[2])
 		end
 
-		local v175 = v173 - v174
+		local v2 = p4
 
-		return UDim2.new(0, u78 + v174 + v175 * t4[1], 0, 0)
+		if flag2 and not flag then
+			v2 = p4 - list[3]
+		end
+
+		local v3 = v - v2
+
+		return UDim2.new(0, UNIBAR_END_PADDING + v2 + v3 * list[1], 0, 0)
 	end))
 end
 
-local function onUnibarSelectionChanged(p10, _: boolean, _, p12) -- line: 366
-	-- upvalues: Service (copy)
-	if not p10:IsAncestorOf(p12) then
+local function onUnibarSelectionChanged(instance, _: boolean, _, descendant)
+	if not instance:IsAncestorOf(descendant) then
 		Service:disableFocusNav()
 	end
 end
 
-function isLeft(p13) -- line: 385
-	return p13 == Enum.HorizontalAlignment.Left
+function isLeft(p): boolean
+	return p == Enum.HorizontalAlignment.Left
 end
-function Unibar(t5: {[any]: any}) -- line: 389
-	-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), Stores (copy), useChromeMenuItems (copy), ReactOtter (copy), Service (copy), FFlagReduceTopBarInsetsWhileHidden (copy), v41 (copy), useMappedObservableValue (copy), IconHost (copy), createEffect (copy), useStyle (copy), FFlagUnibarMenuOpenSubmenu (copy)
+
+function Unibar(props)
 	local ICON_CELL_WIDTH, UNIBAR_END_PADDING
 
 	if FFlagTokenizeUnibarConstantsWithStyleProvider then
-		local v85 = UnibarStyle.use()
-
-		ICON_CELL_WIDTH = v85.ICON_CELL_WIDTH
-		UNIBAR_END_PADDING = v85.UNIBAR_END_PADDING
+		local v = UnibarStyle.use()
+		ICON_CELL_WIDTH = v.ICON_CELL_WIDTH
+		UNIBAR_END_PADDING = v.UNIBAR_END_PADDING
 	else
 		ICON_CELL_WIDTH = Constants.ICON_CELL_WIDTH
 		UNIBAR_END_PADDING = Constants.UNIBAR_END_PADDING
 	end
 
-	local t6 = {}
-	local v89 = React.useRef({})
-	local v90 = React.useRef(Vector2.zero)
-	local v91 = React.useRef(Vector2.zero)
-	local u92 = nil
+	local current3 = {}
+	local ref = React.useRef({})
+	local ref2 = React.useRef(Vector2.zero)
+
+	local ref3 = React.useRef(Vector2.zero)
+	local ref4
 
 	if FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and Stores.GetUILessStore then
-		u92 = React.useRef(Stores.GetUILessStore(false))
+		ref4 = React.useRef(Stores.GetUILessStore(false))
+	else
+		ref4 = nil
 	end
 
-	local v93 = false
-	local v94 = v89.current or {}
-	local v95 = useChromeMenuItems()
-	local v96, v97 = ReactOtter.useAnimatedBinding(1)
-	local v98, v99 = ReactOtter.useAnimatedBinding(1)
-	local v100, v101 = ReactOtter.useAnimatedBinding(0)
-	local v102 = React.useRef(0)
-	local v103, v104 = ReactOtter.useAnimatedBinding(1)
-	local v105 = React.useRef(false)
-	local v106 = React.useRef(0)
-	local v107 = Service:currentSubMenu():get() == "nine_dot"
-	local v108, v109 = ReactOtter.useAnimatedBinding(not v107 and 0 or 1)
-	local t7 = {}
-	local n8 = 0
-	local n9 = 0
-	local n10 = 0
-	local n11 = 0
-	local v115 = React.useCallback(function(p14) -- line: 437
-		-- upvalues: v90 (copy), Service (copy), FFlagReduceTopBarInsetsWhileHidden (copy), v91 (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), u92 (ref), v41 (copy), t5 (copy), Constants (copy)
-		local zero = Vector2.zero
-		local zero2 = Vector2.zero
+	local v = false
+	local current = ref.current or {}
 
-		if p14 then
-			zero = p14.AbsolutePosition
-			zero2 = p14.AbsoluteSize
+	local v2 = useChromeMenuItems()
 
-			if zero ~= v90.current then
-				v90.current = zero
-				Service:setMenuAbsolutePosition(zero)
+	local v3, setToggleIconTransition = ReactOtter.useAnimatedBinding(1)
+	local toggleTransition, setToggleWidthTransition = ReactOtter.useAnimatedBinding(1)
+	local v4, v5 = ReactOtter.useAnimatedBinding(0)
+	local ref5 = React.useRef(0)
+	local v6, v7 = ReactOtter.useAnimatedBinding(1)
+	local ref6 = React.useRef(false)
+	local ref7 = React.useRef(0)
+
+	local v8 = Service:currentSubMenu():get() == "nine_dot"
+
+	local toggleTransition2, setToggleSubmenuTransition = ReactOtter.useAnimatedBinding(v8 and 1 or 0)
+
+	local children = {}
+	local count = 0
+	local total = 0
+	local total2 = 0
+	local v9 = 0
+
+	local v10 = React.useCallback(function(p)
+		local current2 = Vector2.zero
+		local current4 = Vector2.zero
+
+		if p then
+			current2 = p.AbsolutePosition
+			current4 = p.AbsoluteSize
+
+			if current2 ~= ref2.current then
+				ref2.current = current2
+				Service:setMenuAbsolutePosition(current2)
 			end
 
-			if FFlagReduceTopBarInsetsWhileHidden and zero2 ~= v91.current then
-				v91.current = zero2
+			if FFlagReduceTopBarInsetsWhileHidden and current4 ~= ref3.current then
+				ref3.current = current4
 			end
 
-			if FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and u92.current.getUILessModeEnabled(false) then
-				if zero ~= v90.current then
-					v90.current = zero
-					Service:setMenuAbsolutePosition(zero)
+			if FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and ref4.current.getUILessModeEnabled(false) then
+				if current2 ~= ref2.current then
+					ref2.current = current2
+					Service:setMenuAbsolutePosition(current2)
 				end
 
-				if zero2 ~= v91.current then
-					v91.current = zero2
+				if current4 ~= ref3.current then
+					ref3.current = current4
 				end
 			end
 		end
 
-		if FFlagReduceTopBarInsetsWhileHidden and v41 then
-			if p14 and t5.onAreaChanged and v41:getShowTopBar():get() then
-				t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, zero, zero2)
-
-				return
+		if FFlagReduceTopBarInsetsWhileHidden and GamepadConnector then
+			if p and props.onAreaChanged and GamepadConnector:getShowTopBar():get() then
+				props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, current2, current4)
 			end
-		elseif FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and u92.current.getUILessModeEnabled(false) then
-			if p14 and t5.onAreaChanged and u92.current.getUIVisible(false) then
-				t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, zero, zero2)
-
-				return
+		elseif FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and ref4.current.getUILessModeEnabled(false) then
+			if p and props.onAreaChanged and ref4.current.getUIVisible(false) then
+				props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, current2, current4)
 			end
-		elseif p14 and t5.onAreaChanged then
-			t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, zero, p14.AbsoluteSize)
+		elseif p and props.onAreaChanged then
+			props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, current2, p.AbsoluteSize)
 		end
 	end, {})
-	local v116 = React.joinBindings({
-		v98,
-		v100
-	}):map(function(t8: {[any]: any}) -- line: 486
-		-- upvalues: n11 (ref), ICON_CELL_WIDTH (ref)
-		return UDim2.new(0, linearInterpolation(n11, t8[2], t8[1]), 0, ICON_CELL_WIDTH)
+
+	local mapped = React.joinBindings({ toggleTransition, v4 }):map(function(list)
+		return UDim2.new(0, linearInterpolation(v9, list[2], list[1]), 0, ICON_CELL_WIDTH)
 	end)
-	local v117 = useMappedObservableValue(Service:orderAlignment(), isLeft)
 
-	for _, v119 in v95 do
-		if v119.integration.availability:get() == Service.AvailabilitySignal.Pinned then
-			n8 += 1
+	local v11 = useMappedObservableValue(Service:orderAlignment(), isLeft)
+
+	for _, v12 in v2 do
+		if v12.integration.availability:get() == Service.AvailabilitySignal.Pinned then
+			count += 1
 		end
 	end
 
-	local v120 = if not v117 then math.max(n8 - 1, 0) else 1
+	local v12 = v11 and 1 or math.max(count - 1, 0)
 
-	for v121, v122 in v95 do
-		if v122.isDivider then
-			local v123 = n9 + ICON_CELL_WIDTH * v120
-			local v124 = v94[v122.id] or n9
+	for k, integration in v2 do
+		if integration.isDivider then
+			local v13 = total + ICON_CELL_WIDTH * v12
 
-			t6[v122.id] = n9
-			v93 = v93 or v124 ~= n9
+			local v14 = current[integration.id] or total
+			current3[integration.id] = total
+			v = v or v14 ~= total
+			local position = IconPositionBinding(v3, v14, total, v13, v6, v4, false, v11, ref6)
+			local visible
 
-			local v125 = IconPositionBinding(v96, v124, n9, v123, v103, v100, false, v117, v105)
-			local v126 = if not v117 then React.joinBindings({
-				v125,
-				v116
-			}):map(function(p15) -- line: 533
-				-- upvalues: ICON_CELL_WIDTH (ref)
-				local v182 = p15[1]
-				local v183 = p15[2]
-
-				return v182.X.Offset <= v183.X.Offset - ICON_CELL_WIDTH
-			end) else React.joinBindings({
-				v125,
-				v116
-			}):map(function(p16) -- line: 528
-				-- upvalues: ICON_CELL_WIDTH (ref)
-				return p16[1].X.Offset >= ICON_CELL_WIDTH * 0.5
-			end)
-
-			t7[v122.id or "icon" .. v121] = React.createElement(IconDivider, {
-				position = v125,
-				visible = v126,
-				toggleTransition = v98
-			})
-			n9 += Constants.DIVIDER_CELL_WIDTH
-		elseif v122.integration then
-			local v127 = false
-			local v128 = n9 + ICON_CELL_WIDTH * v120
-
-			if v122.integration.availability:get() == Service.AvailabilitySignal.Pinned then
-				v127 = true
-				v128 = n10
+			if v11 then
+				visible = React.joinBindings({ position, mapped }):map(function(list): boolean
+					local offset = list[1].X.Offset
+					return ICON_CELL_WIDTH * 0.5 <= offset
+				end)
+			else
+				visible = React.joinBindings({ position, mapped }):map(function(list): boolean
+					local item = list[1]
+					local item2 = list[2]
+					return item.X.Offset <= item2.X.Offset - ICON_CELL_WIDTH
+				end)
 			end
 
-			local v129 = if v94[v122.id] ~= nil then v94[v122.id] else n9
-
-			t6[v122.id] = n9
-			v93 = v93 or v129 ~= n9
-
-			local v130 = IconPositionBinding(v96, v129, n9, v128, v103, v100, v127, v117, v105)
-			local v131 = if not v117 then React.joinBindings({
-				v130,
-				v116
-			}):map(function(p17) -- line: 577
-				-- upvalues: ICON_CELL_WIDTH (ref)
-				local v186 = p17[1]
-				local v187 = p17[2]
-
-				return v186.X.Offset <= v187.X.Offset - ICON_CELL_WIDTH * 1.5
-			end) else React.joinBindings({
-				v130,
-				v116
-			}):map(function(p18) -- line: 572
-				-- upvalues: ICON_CELL_WIDTH (ref)
-				return p18[1].X.Offset >= ICON_CELL_WIDTH * 0.5
-			end)
-
-			t7[v122.id or "icon" .. v121] = React.createElement(IconHost, {
-				position = v130,
-				visible = v127 or v131,
-				toggleTransition = v108,
-				integration = v122
+			children[integration.id or "icon" .. k] = React.createElement(IconDivider, {
+				position = position,
+				visible = visible,
+				toggleTransition = toggleTransition
 			})
-			n9 += ICON_CELL_WIDTH
 
-			if v127 then
-				n10 += ICON_CELL_WIDTH
+			total += Constants.DIVIDER_CELL_WIDTH
+		elseif integration.integration then
+			local v13 = total + ICON_CELL_WIDTH * v12
+			local flag
+
+			if integration.integration.availability:get() == Service.AvailabilitySignal.Pinned then
+				v13 = total2
+				flag = true
+			else
+				flag = false
+			end
+
+			local v14
+
+			if current[integration.id] == nil then
+				v14 = total
+			else
+				v14 = current[integration.id]
+			end
+
+			current3[integration.id] = total
+			v = v or v14 ~= total
+			local position = IconPositionBinding(v3, v14, total, v13, v6, v4, flag, v11, ref6)
+			local v15
+
+			if v11 then
+				v15 = React.joinBindings({ position, mapped }):map(function(list): boolean
+					local offset = list[1].X.Offset
+					return ICON_CELL_WIDTH * 0.5 <= offset
+				end)
+			else
+				v15 = React.joinBindings({ position, mapped }):map(function(list): boolean
+					local item = list[1]
+					local item2 = list[2]
+					return item.X.Offset <= item2.X.Offset - ICON_CELL_WIDTH * 1.5
+				end)
+			end
+
+			children[integration.id or "icon" .. k] = React.createElement(IconHost, {
+				position = position,
+				visible = flag or v15,
+				toggleTransition = toggleTransition2,
+				integration = integration
+			})
+
+			total += ICON_CELL_WIDTH
+
+			if flag then
+				total2 += ICON_CELL_WIDTH
 			end
 		end
 	end
 
-	n11 = n9
+	v9 = total
 
-	if t5.onMinWidthChanged then
-		t5.onMinWidthChanged(n11)
+	if props.onMinWidthChanged then
+		props.onMinWidthChanged(v9)
 	end
 
-	local u132 = UNIBAR_END_PADDING * 2 + n9
+	local current4 = UNIBAR_END_PADDING * 2 + total
 
-	React.useEffect(function() -- line: 603
-		-- upvalues: v102 (copy), v100 (copy), v101 (copy), ReactOtter (copy), u132 (ref), Constants (copy), Service (copy), ICON_CELL_WIDTH (ref)
-		local current = v102.current
+	React.useEffect(function()
+		local current2 = ref5.current
 
-		if v100:getValue() == 0 then
-			v101((ReactOtter.instant(u132)))
-			v102.current = u132
-		elseif current ~= u132 then
-			v101(ReactOtter.spring(u132, Constants.MENU_ANIMATION_SPRING))
-			v102.current = u132
+		if v4:getValue() == 0 then
+			v5((ReactOtter.instant(current4)))
+			ref5.current = current4
+		elseif current2 ~= current4 then
+			v5(ReactOtter.spring(current4, Constants.MENU_ANIMATION_SPRING))
+			ref5.current = current4
 		end
 
-		Service:setMenuAbsoluteSize(Vector2.new(u132, ICON_CELL_WIDTH))
-	end, { u132 })
+		Service:setMenuAbsoluteSize(Vector2.new(current4, ICON_CELL_WIDTH))
+	end, { current4 })
 
-	if v93 then
-		v106.current = (v106.current or 0) + 1
+	if v then
+		ref7.current = (ref7.current or 0) + 1
 	end
 
-	v89.current = t6
-	React.useEffect(function() -- line: 621
-		-- upvalues: v105 (copy), v104 (copy), ReactOtter (copy), Constants (copy)
-		if not v105.current then
-			v104(ReactOtter.spring(0, Constants.MENU_ANIMATION_SPRING))
-			v105.current = true
+	ref.current = current3
 
-			return
+	React.useEffect(function()
+		if ref6.current then
+			v7(ReactOtter.spring(1, Constants.MENU_ANIMATION_SPRING))
+			ref6.current = false
+		else
+			v7(ReactOtter.spring(0, Constants.MENU_ANIMATION_SPRING))
+			ref6.current = true
 		end
+	end, { ref7.current, ref6 })
 
-		v104(ReactOtter.spring(1, Constants.MENU_ANIMATION_SPRING))
-		v105.current = false
-	end, {
-		v106.current,
-		v105
-	})
-	React.useEffect(function() -- line: 633
-		-- upvalues: FFlagReduceTopBarInsetsWhileHidden (copy), v41 (copy), t5 (copy), Constants (copy), v90 (copy), v91 (copy)
-		if FFlagReduceTopBarInsetsWhileHidden and v41 then
-			local v189 = v41:getShowTopBar()
-
-			v189:connect(function() -- line: 636
-				-- upvalues: v189 (copy), t5 (copy), Constants (copy), v90 (copy), v91 (copy)
-				if v189:get() then
-					t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, v90.current, v91.current)
-
-					return
+	React.useEffect(function()
+		if FFlagReduceTopBarInsetsWhileHidden and GamepadConnector then
+			local showTopBar = GamepadConnector:getShowTopBar()
+			showTopBar:connect(function()
+				if showTopBar:get() then
+					props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, ref2.current, ref3.current)
+				else
+					props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
 				end
-
-				t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
 			end)
-			t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
+			props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
 		end
 	end, {})
-	React.useEffect(function() -- line: 651
-		-- upvalues: FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), u92 (ref), createEffect (copy), t5 (copy), Constants (copy), v90 (copy), v91 (copy)
-		local u190 = nil
 
-		if FFlagAddUILessMode and (FIntAddUILessModeVariant ~= 0 and u92.current.getUILessModeEnabled(false)) then
-			u190 = createEffect(function(p19) -- line: 654
-				-- upvalues: u92 (ref), t5 (copy), Constants (copy), v90 (copy), v91 (copy)
-				if u92.current.getUIVisible(p19) then
-					t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, v90.current, v91.current)
+	React.useEffect(function()
+		local v13
 
-					return
+		if FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and ref4.current.getUILessModeEnabled(false) then
+			v13 = createEffect(function(p)
+				if ref4.current.getUIVisible(p) then
+					props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, ref2.current, ref3.current)
+				else
+					props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
 				end
-
-				t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
 			end)
-			t5.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
+			props.onAreaChanged(Constants.UNIBAR_KEEP_OUT_AREA_ID, Vector2.zero, Vector2.zero)
+		else
+			v13 = nil
 		end
 
-		return function() -- line: 668
-			-- upvalues: u190 (ref)
-			if u190 then
-				u190()
+		return function()
+			if v13 then
+				v13()
 			end
 		end
 	end, {})
 
-	local v133 = useStyle()
+	local v13 = useStyle()
 
-	return React.createElement("Frame", {
-		Size = v116,
+	local createElement = React.createElement
+
+	local v14 = {
+		Size = mapped,
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		SelectionGroup = true,
-		ref = t5.menuFrameRef,
-		[React.Change.AbsoluteSize] = v115,
-		[React.Change.AbsolutePosition] = v115
-	}, {
-		React.createElement(AnimationStateHelper, {
-			setToggleIconTransition = v97,
-			setToggleWidthTransition = v99,
-			setToggleSubmenuTransition = v109,
-			menuFrameRef = t5.menuFrameRef,
-			subMenuHostRef = if not FFlagUnibarMenuOpenSubmenu then nil else t5.subMenuHostRef
-		}),
+		ref = props.menuFrameRef,
+		[React.Change.AbsoluteSize] = v10,
+		[React.Change.AbsolutePosition] = v10
+	}
+
+	local createElement2 = React.createElement
+	local animationStateHelper = AnimationStateHelper
+	local v15 = {
+		setToggleIconTransition = setToggleIconTransition,
+		setToggleWidthTransition = setToggleWidthTransition,
+		setToggleSubmenuTransition = setToggleSubmenuTransition,
+		menuFrameRef = props.menuFrameRef,
+		subMenuHostRef = 0
+	}
+	local subMenuHostRef
+
+	if FFlagUnibarMenuOpenSubmenu then
+		subMenuHostRef = props.subMenuHostRef
+	end
+
+	v15.subMenuHostRef = subMenuHostRef
+	return createElement("Frame", v14, {
+		createElement2(animationStateHelper, v15),
 		React.createElement("Frame", {
-			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundColor3 = v133.Theme.BackgroundUIContrast.Color,
-			BackgroundTransparency = v133.Theme.BackgroundUIContrast.Transparency * v133.Settings.PreferredTransparency
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			})
-		}),
-		React.createElement("Frame", {
 			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, t7)
+			BackgroundColor3 = v13.Theme.BackgroundUIContrast.Color,
+			BackgroundTransparency = v13.Theme.BackgroundUIContrast.Transparency * v13.Settings.PreferredTransparency
+		}, {
+			UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
+		}),
+		React.createElement(
+			"Frame",
+			{ Size = UDim2.new(1, 0, 1, 0), BorderSizePixel = 0, BackgroundTransparency = 1 },
+			children
+		)
 	})
 end
 
-local function UnibarPills(t9: {[any]: any}) -- line: 723
-	-- upvalues: useStyle (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), useChromeMenuItems (copy), Service (copy), ReactOtter (copy), React (copy), IconHost (copy)
-	local v135 = useStyle()
+local function UnibarPills(p)
+	local v = useStyle()
 	local UNIBAR_END_PADDING, MENU_SUBMENU_PADDING
 
 	if FFlagTokenizeUnibarConstantsWithStyleProvider then
-		local v136 = UnibarStyle.use()
-
-		UNIBAR_END_PADDING = v136.UNIBAR_END_PADDING
-		MENU_SUBMENU_PADDING = v136.MENU_SUBMENU_PADDING
+		local v2 = UnibarStyle.use()
+		UNIBAR_END_PADDING = v2.UNIBAR_END_PADDING
+		MENU_SUBMENU_PADDING = v2.MENU_SUBMENU_PADDING
 	else
 		UNIBAR_END_PADDING = Constants.UNIBAR_END_PADDING
 		MENU_SUBMENU_PADDING = Constants.MENU_SUBMENU_PADDING
 	end
 
-	local v139 = useChromeMenuItems()
-	local v140 = Service:currentSubMenu():get() == "nine_dot"
-	local v141, v142 = ReactOtter.useAnimatedBinding(not v140 and 0 or 1)
+	local v2 = useChromeMenuItems()
 
-	assert(v139 ~= nil, "Menu items should not be nil")
+	local v3 = Service:currentSubMenu():get() == "nine_dot"
 
-	local t10 = {}
-	local t11 = {}
+	local toggleTransition, setToggleSubmenuTransition = ReactOtter.useAnimatedBinding(v3 and 1 or 0)
 
-	for v145, v146 in v139 do
-		if v146.integration and v146.isDivider == false then
-			t11["icon_host" .. v145] = React.createElement(IconHost, {
-				toggleTransition = v141,
-				integration = v146
+	assert(v2 ~= nil, "Menu items should not be nil")
+
+	local children = {}
+	local elements = {}
+
+	for k, integration in v2 do
+		if integration.integration and integration.isDivider == false then
+			children["icon_host" .. k] = React.createElement(IconHost, {
+				toggleTransition = toggleTransition,
+				integration = integration
 			})
 		end
 
-		if v146.isDivider or v145 == #v139 then
-			local v147 = React.createElement("Frame", {
-				BorderSizePixel = 0,
-				Size = UDim2.new(0, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.XY,
-				BackgroundColor3 = v135.Theme.BackgroundUIContrast.Color,
-				BackgroundTransparency = v135.Theme.BackgroundUIContrast.Transparency * v135.Settings.PreferredTransparency
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(1, 0)
-				}),
-				Padding = React.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, UNIBAR_END_PADDING),
-					PaddingRight = UDim.new(0, UNIBAR_END_PADDING)
-				}),
-				PillsHorizontalList = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				})
-			}, t11)
-
-			t10["pill_" .. v145] = v147
-			t11 = {}
+		if not (integration.isDivider or k == #v2) then
+			continue
 		end
+
+		local element = React.createElement("Frame", {
+			Size = UDim2.new(0, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			BorderSizePixel = 0,
+			BackgroundColor3 = v.Theme.BackgroundUIContrast.Color,
+			BackgroundTransparency = v.Theme.BackgroundUIContrast.Transparency * v.Settings.PreferredTransparency
+		}, {
+			UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+			Padding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, UNIBAR_END_PADDING),
+				PaddingRight = UDim.new(0, UNIBAR_END_PADDING)
+			}),
+			PillsHorizontalList = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			})
+		}, children)
+
+		elements["pill_" .. k] = element
+		children = {}
 	end
 
 	return React.createElement("Frame", {
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
 		SelectionGroup = true,
-		ref = t9.menuFrameRef,
+		ref = p.menuFrameRef,
 		AutomaticSize = Enum.AutomaticSize.XY
 	}, {
 		React.createElement(AnimationStateHelper, {
-			setToggleSubmenuTransition = v142,
-			menuFrameRef = t9.menuFrameRef,
-			subMenuHostRef = t9.subMenuHostRef
+			setToggleSubmenuTransition = setToggleSubmenuTransition,
+			menuFrameRef = p.menuFrameRef,
+			subMenuHostRef = p.subMenuHostRef
 		}),
 		React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
@@ -725,182 +718,245 @@ local function UnibarPills(t9: {[any]: any}) -- line: 723
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			Padding = UDim.new(0, MENU_SUBMENU_PADDING)
 		})
-	}, t10)
+	}, elements)
 end
-local function SubMenuWrapper(p20) -- line: 815
-	-- upvalues: isInExperienceUIVREnabled (copy), isSpatial (copy), Panel3DInSpatialUI (ref), useObservableValue (copy), Service (copy), u45 (ref), React (copy), SubMenu (copy), PanelType (ref)
-	if isInExperienceUIVREnabled and (isSpatial() and Panel3DInSpatialUI) then
-		local v149 = useObservableValue(Service:currentSubMenu())
 
-		u45:set(v149 ~= nil)
+local function SubMenuWrapper(p)
+	if isInExperienceUIVREnabled and isSpatial() and panel3DInSpatialUI then
+		observableValue:set(useObservableValue(Service:currentSubMenu()) ~= nil)
 	end
 
-	local v150 = React.useCallback(function(vector2: Vector2) -- line: 820
-		-- upvalues: React (copy), SubMenu (copy), p20 (copy)
+	local renderFunction = React.useCallback(function(panelSize: Vector2)
 		return (React.createElement(SubMenu, {
-			subMenuHostRef = p20.subMenuHostRef,
-			panelSize = vector2
+			subMenuHostRef = p.subMenuHostRef,
+			panelSize = panelSize
 		}))
-	end, { p20.subMenuHostRef })
+	end, { p.subMenuHostRef })
 
-	if isInExperienceUIVREnabled and isSpatial() and Panel3DInSpatialUI then
-		return (React.createElement(Panel3DInSpatialUI, {
-			panelType = PanelType.ChromeSubMenu,
-			renderFunction = v150,
-			visibilityObservable = u45
+	if isInExperienceUIVREnabled and isSpatial() and panel3DInSpatialUI then
+		return (React.createElement(panel3DInSpatialUI, {
+			panelType = panelType.ChromeSubMenu,
+			renderFunction = renderFunction,
+			visibilityObservable = observableValue
 		}))
 	end
 
-	return (React.createElement(SubMenu, {
-		subMenuHostRef = p20.subMenuHostRef
-	}))
+	return (React.createElement(SubMenu, { subMenuHostRef = p.subMenuHostRef }))
 end
 
-return React.memo(function(t12: {[any]: any}) -- line: 839
-	-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy), FFlagEnableConsoleExpControls (copy), FFlagUnibarMenuOpenSubmenu (copy), useMappedObservableValue (copy), Service (copy), v41 (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), Stores (copy), createEffect (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), UnibarPills (copy), FFlagEnablePlaytestModeUnibar (copy), PlaytestModeThemeProvider (copy), onUnibarSelectionChanged (copy), SubMenuWrapper (copy), SubMenu (copy), ShortcutBar (copy), WindowManager (copy)
-	local v152 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.MENU_SUBMENU_PADDING else UnibarStyle.use().MENU_SUBMENU_PADDING
-	local u153 = React.useRef(nil)
+return React.memo(function(props)
+	local MENU_SUBMENU_PADDING
 
-	if FFlagEnableConsoleExpControls and t12.menuRef then
-		u153 = t12.menuRef
+	if FFlagTokenizeUnibarConstantsWithStyleProvider then
+		MENU_SUBMENU_PADDING = UnibarStyle.use().MENU_SUBMENU_PADDING
+	else
+		MENU_SUBMENU_PADDING = Constants.MENU_SUBMENU_PADDING
 	end
 
-	local v154 = React.useRef(nil)
-	local v155 = nil
+	local menuFrameRef = React.useRef(nil)
+
+	if FFlagEnableConsoleExpControls and props.menuRef then
+		menuFrameRef = props.menuRef
+	end
+
+	local ref = React.useRef(nil)
+	local ref2
 
 	if FFlagUnibarMenuOpenSubmenu then
-		v155 = React.useRef(nil)
+		ref2 = React.useRef(nil)
 	end
 
-	local function updateSize() -- line: 861
-		-- upvalues: v154 (copy), u153 (ref)
-		if v154.current and u153.current then
-			v154.current.Size = u153.current.Size
+	local function updateSize() -- 1 equivalent call inferred from this helper
+		if ref.current and menuFrameRef.current then
+			ref.current.Size = menuFrameRef.current.Size
 		end
 	end
 
-	local v157 = useMappedObservableValue(Service:orderAlignment(), isLeft)
-	local v158 = nil
-	local u159 = nil
-	local u160 = nil
+	local v = useMappedObservableValue(Service:orderAlignment(), isLeft)
+	local visible, v2, v3
 
-	if FFlagEnableConsoleExpControls and v41 then
-		local v161
-
-		v158, v161 = React.useBinding(v41:getShowTopBar():get())
-		u159 = v161
-		u160 = v41:getShowTopBar()
+	if FFlagEnableConsoleExpControls and GamepadConnector then
+		visible, v2 = React.useBinding(GamepadConnector:getShowTopBar():get())
+		v3 = GamepadConnector:getShowTopBar()
+	else
+		v3 = nil
+		v2 = nil
 	end
 
-	local u162 = nil
+	local ref3
 
 	if FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and Stores.GetUILessStore then
-		u162 = React.useRef(Stores.GetUILessStore(false))
+		ref3 = React.useRef(Stores.GetUILessStore(false))
 
-		if u162.current.getUILessModeEnabled(false) then
-			local v163
-
-			v158, v163 = React.useBinding(true)
-			u159 = v163
+		if ref3.current.getUILessModeEnabled(false) then
+			visible, v2 = React.useBinding(true)
 		end
+	else
+		ref3 = nil
 	end
 
-	React.useEffect(function() -- line: 886
-		-- upvalues: u153 (ref), updateSize (copy), v154 (copy), FFlagEnableConsoleExpControls (copy), u160 (ref), u159 (ref)
-		local connection = nil
+	React.useEffect(function()
+		local sizeChangedConnection
 
-		if u153 and u153.current then
-			connection = u153.current:GetPropertyChangedSignal("Size"):Connect(updateSize)
+		if menuFrameRef and menuFrameRef.current then
+			sizeChangedConnection = menuFrameRef.current:GetPropertyChangedSignal("Size"):Connect(updateSize)
+		else
+			sizeChangedConnection = nil
 		end
 
-		if v154.current and u153.current then
-			v154.current.Size = u153.current.Size
-		end
+		updateSize() -- inferred equivalent call
 
 		if FFlagEnableConsoleExpControls then
-			u160:connect(function() -- line: 895
-				-- upvalues: u159 (ref), u160 (ref)
-				u159(u160:get())
+			v3:connect(function()
+				v2(v3:get())
 			end)
 		end
 
-		return function() -- line: 900
-			-- upvalues: connection (ref)
-			if connection then
-				connection:disconnect()
+		return function()
+			if sizeChangedConnection then
+				sizeChangedConnection:disconnect()
 			end
 		end
 	end)
-	React.useEffect(function() -- line: 907
-		-- upvalues: FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), u162 (ref), createEffect (copy), u159 (ref)
-		local u193 = nil
 
-		if FFlagAddUILessMode and (FIntAddUILessModeVariant ~= 0 and u162.current.getUILessModeEnabled(false)) then
-			u193 = createEffect(function(p21) -- line: 910
-				-- upvalues: u159 (ref), u162 (ref)
-				u159(u162.current.getUIVisible(p21))
+	React.useEffect(function()
+		local v4
+
+		if FFlagAddUILessMode and FIntAddUILessModeVariant ~= 0 and ref3.current.getUILessModeEnabled(false) then
+			v4 = createEffect(function(p)
+				v2(ref3.current.getUIVisible(p))
 			end)
+		else
+			v4 = nil
 		end
 
-		return function() -- line: 915
-			-- upvalues: u193 (ref)
-			if u193 then
-				u193()
+		return function()
+			if v4 then
+				v4()
 			end
 		end
 	end, {})
+	local unibar2
 
-	local v164 = if not isInExperienceUIVREnabled or not isSpatial() then React.createElement(Unibar, {
-		menuFrameRef = u153,
-		subMenuHostRef = if not FFlagUnibarMenuOpenSubmenu then nil else v155,
-		onAreaChanged = t12.onAreaChanged,
-		onMinWidthChanged = t12.onMinWidthChanged
-	}) else React.createElement(UnibarPills, {
-		menuFrameRef = u153,
-		subMenuHostRef = v155
-	})
-
-	if FFlagEnablePlaytestModeUnibar then
-		v164 = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			AutomaticSize = Enum.AutomaticSize.XY
-		}, {
-			PlaytestModeThemeProvider = React.createElement(PlaytestModeThemeProvider, nil, {
-				Unibar = v164
-			})
+	if isInExperienceUIVREnabled and isSpatial() then
+		unibar2 = React.createElement(UnibarPills, {
+			menuFrameRef = menuFrameRef,
+			subMenuHostRef = ref2
 		})
+	else
+		local createElement = React.createElement
+		local unibar = Unibar
+		local v4 = {
+			menuFrameRef = menuFrameRef,
+			subMenuHostRef = nil,
+			onAreaChanged = 0,
+			onMinWidthChanged = 0
+		}
+		local subMenuHostRef
+
+		if FFlagUnibarMenuOpenSubmenu then
+			subMenuHostRef = ref2
+		end
+
+		v4.subMenuHostRef = subMenuHostRef
+		v4.onAreaChanged = props.onAreaChanged
+		v4.onMinWidthChanged = props.onMinWidthChanged
+		unibar2 = createElement(unibar, v4)
 	end
 
-	return { React.createElement("Frame", {
-		Name = "UnibarMenu",
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BorderSizePixel = 0,
-		BackgroundTransparency = 1,
-		LayoutOrder = t12.layoutOrder,
-		SelectionGroup = true,
-		SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
-		SelectionBehaviorLeft = if not FFlagEnableConsoleExpControls then Enum.SelectionBehavior.Stop else nil,
-		SelectionBehaviorRight = Enum.SelectionBehavior.Stop,
-		ref = v154,
-		[React.Event.SelectionChanged] = if not FFlagEnableConsoleExpControls then nil else onUnibarSelectionChanged,
-		Visible = if not FFlagEnableConsoleExpControls and (not FFlagAddUILessMode or (FIntAddUILessModeVariant == 0 or not u162.current.getUILessModeEnabled(false))) then nil else v158
-	}, {
-		React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = if not v157 then Enum.HorizontalAlignment.Right else Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Top,
-			Padding = UDim.new(0, v152)
-		}),
-		v164,
-		if not isInExperienceUIVREnabled then React.createElement(SubMenu, {
-			subMenuHostRef = v155
-		}) else React.createElement(SubMenuWrapper, {
-			subMenuHostRef = v155
-		}),
-		if not FFlagEnableConsoleExpControls then nil else React.createElement(ShortcutBar),
-		(React.createElement(WindowManager))
-	}) }
-end, function(_, _) -- line: 987
+	if FFlagEnablePlaytestModeUnibar then
+		unibar2 = React.createElement(
+			"Frame",
+			{
+				AutomaticSize = Enum.AutomaticSize.XY,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0
+			},
+			{
+				PlaytestModeThemeProvider = React.createElement(PlaytestModeThemeProvider, nil, {
+					Unibar = unibar2
+				})
+			}
+		)
+	end
+
+	local createElement = React.createElement
+	local v4 = {}
+	v4.Name = "UnibarMenu"
+	v4.AutomaticSize = Enum.AutomaticSize.Y
+	v4.BorderSizePixel = 0
+	v4.BackgroundTransparency = 1
+	v4.LayoutOrder = props.layoutOrder
+	v4.SelectionGroup = true
+	v4.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+	local selectionBehaviorLeft
+
+	if not FFlagEnableConsoleExpControls then
+		selectionBehaviorLeft = Enum.SelectionBehavior.Stop
+	end
+
+	v4.SelectionBehaviorLeft = selectionBehaviorLeft
+	v4.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+	v4.ref = ref
+	local selectionChanged = React.Event.SelectionChanged
+	local v5
+
+	if FFlagEnableConsoleExpControls then
+		v5 = onUnibarSelectionChanged
+	end
+
+	v4[selectionChanged] = v5
+
+	if
+		not FFlagEnableConsoleExpControls
+		and (not FFlagAddUILessMode or FIntAddUILessModeVariant == 0 or not ref3.current.getUILessModeEnabled(false))
+	then
+		visible = nil
+	end
+
+	v4.Visible = visible
+
+	local createElement2 = React.createElement
+	local v6 = {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = 0,
+		VerticalAlignment = 0,
+		Padding = 0
+	}
+	local horizontalAlignment
+
+	if v then
+		horizontalAlignment = Enum.HorizontalAlignment.Left
+	else
+		horizontalAlignment = Enum.HorizontalAlignment.Right
+	end
+
+	v6.HorizontalAlignment = horizontalAlignment
+
+	v6.VerticalAlignment = Enum.VerticalAlignment.Top
+	v6.Padding = UDim.new(0, MENU_SUBMENU_PADDING)
+	local element = createElement2("UIListLayout", v6)
+	local v7
+
+	if isInExperienceUIVREnabled then
+		v7 = React.createElement(SubMenuWrapper, { subMenuHostRef = ref2 })
+	else
+		v7 = React.createElement(SubMenu, { subMenuHostRef = ref2 })
+	end
+
+	local v8
+
+	if FFlagEnableConsoleExpControls then
+		v8 = React.createElement(ShortcutBar)
+	end
+
+	return { createElement("Frame", v4, {
+			element,
+			unibar2,
+			v7,
+			v8,
+			(React.createElement(WindowManager))
+		}) }
+end, function(_, _): boolean
 	return true
 end)

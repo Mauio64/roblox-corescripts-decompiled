@@ -1,55 +1,52 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local withStyle = UIBlox.Core.Style.withStyle
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Badge = UIBlox.App.Indicator.Badge
-local v10 = Images["icons/menu/chat_on"]
-local v11 = Images["icons/menu/chat_off"]
-local v12 = Roact.PureComponent:extend("ChatIcon")
 
-v12.validateProps = t.strictInterface({
-	chatVisible = t.boolean,
-	unreadMessages = t.integer
-})
+local iconsmenuchat_on = Images["icons/menu/chat_on"]
+local iconsmenuchat_off = Images["icons/menu/chat_off"]
 
-function v12.render(p1) -- line: 24
-	-- upvalues: withStyle (copy), v10 (copy), v11 (copy), Roact (copy), ImageSetLabel (copy), Badge (copy)
-	return withStyle(function(p2) -- line: 25
-		-- upvalues: v10 (copy), p1 (copy), v11 (copy), Roact (copy), ImageSetLabel (copy), Badge (copy)
-		local Theme = p2.Theme
-		local v18 = v10
+local extended = Roact.PureComponent:extend("ChatIcon")
 
-		if not p1.props.chatVisible then
-			v18 = v11
+extended.validateProps = t.strictInterface({ chatVisible = t.boolean, unreadMessages = t.integer })
+
+function extended.render(p)
+	return withStyle(function(p2)
+		local theme = p2.Theme
+
+		local image = iconsmenuchat_on
+
+		if not p.props.chatVisible then
+			image = iconsmenuchat_off
 		end
 
 		return Roact.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
-			ZIndex = 2,
 			Size = UDim2.fromScale(1, 1),
-			Image = v18,
-			ImageColor3 = Theme.IconEmphasis.Color,
-			ImageTransparency = Theme.IconEmphasis.Transparency
+			BackgroundTransparency = 1,
+			Image = image,
+			ImageColor3 = theme.IconEmphasis.Color,
+			ImageTransparency = theme.IconEmphasis.Transparency,
+			ZIndex = 2
 		}, {
-			Badge = p1.props.unreadMessages > 0 and Roact.createElement(Badge, {
-				hasShadow = false,
+			Badge = p.props.unreadMessages > 0 and Roact.createElement(Badge, {
 				position = UDim2.new(0, 24, 0.5, 0),
 				anchorPoint = Vector2.new(0, 0.5),
-				value = p1.props.unreadMessages
+				hasShadow = false,
+				value = p.props.unreadMessages
 			})
 		})
 	end)
 end
 
-local function mapStateToProps(p3) -- line: 52
-	return {
-		chatVisible = p3.chat.visible,
-		unreadMessages = p3.chat.unreadMessages
-	}
+local function mapStateToProps(p)
+	return { chatVisible = p.chat.visible, unreadMessages = p.chat.unreadMessages }
 end
 
-return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(v12)
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(extended)

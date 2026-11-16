@@ -1,20 +1,13 @@
-local ParentParent = script.Parent.Parent
-local Parent = script:FindFirstAncestor("RoduxFriends").Parent
-local llama = require(Parent.llama)
-local getDeepValue = require(ParentParent.getDeepValue)
+local parent = script.Parent.Parent
+local parent2 = script:FindFirstAncestor("RoduxFriends").Parent
+local llama = require(parent2.llama)
 
-return function(p1) -- line: 8
-	-- upvalues: getDeepValue (copy), llama (copy)
-	local keyPath = p1.keyPath
+local getDeepValue = require(parent.getDeepValue)
 
-	return function(p2, p3, p4) -- line: 10
-		-- upvalues: getDeepValue (copy), keyPath (copy), llama (copy)
-		local v10 = getDeepValue(p2, keyPath .. ".byUserId")
-
-		if v10[p3] ~= nil and llama.List.find(v10[p3], p4) then
-			return true
-		end
-
-		return false
+return function(p)
+	local keyPath = p.keyPath
+	return function(p2, p3, p4)
+		local deepValue = getDeepValue(p2, keyPath .. ".byUserId")
+		return deepValue[p3] ~= nil and llama.List.find(deepValue[p3], p4) and true or false
 	end
 end

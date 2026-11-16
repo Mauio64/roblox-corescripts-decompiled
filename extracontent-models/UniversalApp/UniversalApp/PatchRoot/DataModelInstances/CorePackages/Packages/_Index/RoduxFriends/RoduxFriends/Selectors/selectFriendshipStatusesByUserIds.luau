@@ -1,25 +1,20 @@
-local ParentParent = script.Parent.Parent
-local getDeepValue = require(ParentParent.getDeepValue)
+local parent = script.Parent.Parent
 
-require(ParentParent.roduxFriendsTypes)
-
+local getDeepValue = require(parent.getDeepValue)
+require(parent.roduxFriendsTypes)
 local filterByKeys = require(script.Parent.filterByKeys)
 
-return function(p1) -- line: 9
-	-- upvalues: getDeepValue (copy), filterByKeys (copy)
-	local keyPath = p1.keyPath
+return function(p)
+	local keyPath = p.keyPath
+	return function(p2)
+		return function(p3)
+			local selected = getDeepValue(p2, string.format("%s.friendshipStatus", keyPath)) or {}
 
-	return function(p2) -- line: 11
-		-- upvalues: getDeepValue (copy), keyPath (copy), filterByKeys (copy)
-		return function(t1: {[any]: any}?) -- line: 12
-			-- upvalues: getDeepValue (copy), p2 (copy), keyPath (copy), filterByKeys (copy)
-			local v8 = getDeepValue(p2, string.format("%s.friendshipStatus", keyPath)) or {}
-
-			if not t1 then
-				return v8
+			if p3 then
+				return filterByKeys(p3, selected)
 			end
 
-			return filterByKeys(t1, v8)
+			return selected
 		end
 	end
 end

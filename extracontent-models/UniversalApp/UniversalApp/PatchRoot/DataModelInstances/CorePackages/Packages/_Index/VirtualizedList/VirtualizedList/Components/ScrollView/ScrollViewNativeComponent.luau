@@ -1,155 +1,178 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local console = LuauPolyfill.console
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
-local React = require(ParentParent.React)
+
+local React = require(parent.React)
 local Change = React.Change
 local Event = React.Event
-local Otter = require(ParentParent.Otter)
-local t1 = {
-	restingPositionLimit = 1,
-	restingVelocityLimit = 10
-}
-local v11 = React.Component:extend("ScrollViewNativeComponent")
 
-function v11.init(t2: {[any]: any}, t3: {[any]: any}) -- line: 62
-	-- upvalues: React (copy), t1 (copy), Otter (copy)
-	t2.props = t3
-	t2._nativeRef = React.createRef()
-	t2.lastScrollEventTime = 0
-	t2.animationConfig = if not t2.props.animationConfig then t1 else t2.props.animationConfig
-	t2.motor = Otter.createGroupMotor({
-		x = 0,
-		y = 0
-	})
-	t2.motorStepDisconnect = t2.motor:onStep(function(p1) -- line: 74
-		-- upvalues: t2 (copy)
-		t2._nativeRef.current.CanvasPosition = Vector2.new(p1.x, p1.y)
+local Otter = require(parent.Otter)
+
+local v = { restingPositionLimit = 1, restingVelocityLimit = 10 }
+
+local extended = React.Component:extend("ScrollViewNativeComponent")
+function extended:init(props)
+	self.props = props
+	self._nativeRef = React.createRef()
+	self.lastScrollEventTime = 0
+	local animationConfig
+
+	if self.props.animationConfig then
+		animationConfig = self.props.animationConfig
+	else
+		animationConfig = v
+	end
+
+	self.animationConfig = animationConfig
+
+	self.motor = Otter.createGroupMotor({ x = 0, y = 0 })
+
+	self.motorStepDisconnect = self.motor:onStep(function(p)
+		self._nativeRef.current.CanvasPosition = Vector2.new(p.x, p.y)
 	end)
 
-	function t2._nativeRef.animateScrollTo(p2, p3) -- line: 78
-		-- upvalues: t2 (copy)
-		t2:_startAnimatedScroll(p2, p3)
+	function self._nativeRef.animateScrollTo(p, p2)
+		self:_startAnimatedScroll(p, p2)
 	end
 end
-function v11._validateAnimatedScrollInputs(t4: {[any]: any}, n1: number, n2: number) -- line: 83
-	-- upvalues: console (copy)
-	if not t4._nativeRef.current then
+
+function extended:_validateAnimatedScrollInputs(p: number, p2: number)
+	if not self._nativeRef.current then
 		console.error("scrollTo animation failed: ScrollViewNativeComponent._nativeRef instance is undefined")
 	end
 
-	if t4._nativeRef.current.ScrollingDirection == Enum.ScrollingDirection.X then
-		if n1 > t4._nativeRef.current.AbsoluteCanvasSize.X then
-			console.warn("scrollTo animation goal out of bounds, setting X goal to: " .. tostring(t4._nativeRef.current.AbsoluteCanvasSize.X - t4._nativeRef.current.AbsoluteWindowSize.X))
-
-			return
-		end
-
-		if n1 < 0 then
+	if self._nativeRef.current.ScrollingDirection == Enum.ScrollingDirection.X then
+		if self._nativeRef.current.AbsoluteCanvasSize.X < p then
+			console.warn("scrollTo animation goal out of bounds, setting X goal to: " .. tostring(self._nativeRef.current.AbsoluteCanvasSize.X - self._nativeRef.current.AbsoluteWindowSize.X))
+		elseif p < 0 then
 			console.warn("scrollTo animation goal out of bounds, setting X goal to: 0")
-
-			return
 		end
-	else
-		if n2 > t4._nativeRef.current.AbsoluteCanvasSize.Y then
-			console.warn("scrollTo animation goal out of bounds, setting Y goal to: " .. tostring(t4._nativeRef.current.AbsoluteCanvasSize.Y - t4._nativeRef.current.AbsoluteWindowSize.Y))
-
-			return
-		end
-
-		if n2 < 0 then
-			console.warn("scrollTo animation goal out of bounds, setting Y goal to: 0")
-		end
+	elseif self._nativeRef.current.AbsoluteCanvasSize.Y < p2 then
+		console.warn("scrollTo animation goal out of bounds, setting Y goal to: " .. tostring(self._nativeRef.current.AbsoluteCanvasSize.Y - self._nativeRef.current.AbsoluteWindowSize.Y))
+	elseif p2 < 0 then
+		console.warn("scrollTo animation goal out of bounds, setting Y goal to: 0")
 	end
 end
-function v11._startAnimatedScroll(p4, p5, p6) -- line: 113
-	-- upvalues: Otter (copy)
+
+function extended:_startAnimatedScroll(p, p2)
 	if _G.__DEV__ then
-		p4:_validateAnimatedScrollInputs(p5, p6)
+		self:_validateAnimatedScrollInputs(p, p2)
 	end
 
-	local CanvasPosition = p4._nativeRef.current.CanvasPosition
+	local canvasPosition = self._nativeRef.current.CanvasPosition
 
-	p4.motor:setGoal({
-		x = Otter.instant(CanvasPosition.X),
-		y = Otter.instant(CanvasPosition.Y)
+	self.motor:setGoal({
+		x = Otter.instant(canvasPosition.X),
+		y = Otter.instant(canvasPosition.Y)
 	})
-	p4.motor:step(0)
-	p4.motor:setGoal({
-		x = Otter.spring(p5, p4.animationConfig),
-		y = Otter.spring(p6, p4.animationConfig)
+
+	self.motor:step(0)
+
+	self.motor:setGoal({
+		x = Otter.spring(p, self.animationConfig),
+		y = Otter.spring(p2, self.animationConfig)
 	})
 end
-function v11.render(p7) -- line: 136
-	-- upvalues: Array (copy), Object (copy), Change (copy), Event (copy), React (copy)
-	local v22 = if not Array.isArray(p7.props.style) then p7.props.style else Array.reduce(p7.props.style, function(p8, p9) -- line: 138
-		-- upvalues: Object (copy)
-		return Object.assign(p8, p9)
-	end, {})
-	local v23 = Object.assign({
+
+function extended:render()
+	local v2
+
+	if Array.isArray(self.props.style) then
+		v2 = Array.reduce(self.props.style, function(p, p2)
+			return Object.assign(p, p2)
+		end, {})
+	else
+		v2 = self.props.style
+	end
+
+	local v3 = Object.assign({
 		Name = "RCTScrollView",
-		ScrollingEnabled = p7.props.scrollEnabled == nil or p7.props.scrollEnabled,
+		ScrollingEnabled = self.props.scrollEnabled == nil or self.props.scrollEnabled,
 		Size = UDim2.new(1, 0, 1, 0),
-		CanvasPosition = p7.props.CanvasPosition,
-		CanvasSize = p7.props.CanvasSize or UDim2.new(0, 0, 0, 0),
-		AutomaticCanvasSize = p7.props.AutomaticCanvasSize or Enum.AutomaticSize.XY,
-		ScrollBarThickness = if not (not not p7.props.horizontal and p7.props.showsHorizontalScrollIndicator == false) and (p7.props.horizontal or p7.props.showsVerticalScrollIndicator ~= false) then nil else 0,
-		ref = p7._nativeRef,
-		[Change.AbsoluteWindowSize] = p7.props.onLayout,
-		[Change.CanvasPosition] = function(p10) -- line: 157
-			-- upvalues: p7 (copy)
-			local v31 = os.clock() * 1000
+		CanvasPosition = self.props.CanvasPosition,
+		CanvasSize = self.props.CanvasSize or UDim2.new(0, 0, 0, 0),
+		AutomaticCanvasSize = self.props.AutomaticCanvasSize or Enum.AutomaticSize.XY,
+		ScrollBarThickness = (self.props.horizontal and self.props.showsHorizontalScrollIndicator == false or not self.props.horizontal and self.props.showsVerticalScrollIndicator == false) and 0 or nil,
+		ref = self._nativeRef,
+		[Change.AbsoluteWindowSize] = self.props.onLayout,
+		[Change.CanvasPosition] = function(p)
+			local lastScrollEventTime = os.clock() * 1000
 
-			if (p7.props.scrollEventThrottle or 0) < v31 - p7.lastScrollEventTime then
-				p7.props.onScroll(p10)
-				p7.lastScrollEventTime = v31
+			if (self.props.scrollEventThrottle or 0) < lastScrollEventTime - self.lastScrollEventTime then
+				self.props.onScroll(p)
+				self.lastScrollEventTime = lastScrollEventTime
 			end
 		end,
-		[Event.InputBegan] = function(p11, p12) -- line: 165
-			-- upvalues: p7 (copy)
-			if (p12.UserInputType == Enum.UserInputType.MouseWheel or p12.UserInputType == Enum.UserInputType.Touch) and p7.motor ~= nil then
-				p7.motor:stop()
+		[Event.InputBegan] = function(p, p2)
+			if
+				(p2.UserInputType == Enum.UserInputType.MouseWheel or p2.UserInputType == Enum.UserInputType.Touch)
+				and self.motor ~= nil
+			then
+				self.motor:stop()
 			end
 
-			if p12.UserInputType == Enum.UserInputType.Touch then
-				p7.props.onTouchStart(p11, p12)
+			if p2.UserInputType == Enum.UserInputType.Touch then
+				self.props.onTouchStart(p, p2)
 			end
 		end,
-		[Event.InputEnded] = function(p13, p14) -- line: 179
-			-- upvalues: p7 (copy)
-			if p14.UserInputType == Enum.UserInputType.Touch then
-				p7.props.onTouchEnd(p13, p14)
+		[Event.InputEnded] = function(p, p2)
+			if p2.UserInputType == Enum.UserInputType.Touch then
+				self.props.onTouchEnd(p, p2)
 			end
 		end,
-		[Event.InputChanged] = function(p15, p16) -- line: 184
-			-- upvalues: p7 (copy)
-			if p16.UserInputType == Enum.UserInputType.Touch then
-				p7.props.onTouchMove(p15, p16)
+		[Event.InputChanged] = function(p, p2)
+			if p2.UserInputType == Enum.UserInputType.Touch then
+				self.props.onTouchMove(p, p2)
 			end
 		end,
-		[Event.SelectionChanged] = if not p7.props.onSelectionChanged then nil else function(p17, p18, p19, p20) -- line: 190
-			-- upvalues: p7 (copy)
-			p7.props.onSelectionChanged(p17, p18, p19, p20)
+		[Event.SelectionChanged] = self.props.onSelectionChanged and function(p, p2, p3, p4)
+			self.props.onSelectionChanged(p, p2, p3, p4)
+		end or nil
+	}, v2)
+
+	local createElement = React.createElement
+	local layout
+
+	if self.props.inverted and not self.props.getItemLayout then
+		local createElement2 = React.createElement
+		local horizontalAlignment
+
+		if self.props.horizontal then
+			horizontalAlignment = Enum.HorizontalAlignment.Right
+		else
+			horizontalAlignment = Enum.HorizontalAlignment.Center
 		end
-	}, v22)
 
-	return React.createElement("ScrollingFrame", v23, {
-		Layout = if not p7.props.inverted or p7.props.getItemLayout then nil else React.createElement("UIListLayout", {
-			HorizontalAlignment = if not p7.props.horizontal then Enum.HorizontalAlignment.Center else Enum.HorizontalAlignment.Right,
-			VerticalAlignment = if not p7.props.horizontal then Enum.VerticalAlignment.Bottom else Enum.VerticalAlignment.Center
-		}),
-		[1] = p7.props.children
+		local verticalAlignment
+
+		if self.props.horizontal then
+			verticalAlignment = Enum.VerticalAlignment.Center
+		else
+			verticalAlignment = Enum.VerticalAlignment.Bottom
+		end
+
+		layout = createElement2("UIListLayout", {
+			HorizontalAlignment = horizontalAlignment,
+			VerticalAlignment = verticalAlignment
+		})
+	end
+
+	return createElement("ScrollingFrame", v3, {
+		Layout = layout,
+		self.props.children
 	})
 end
-function v11.willUnmount(p21) -- line: 212
-	if p21.motor ~= nil then
-		p21.motor:destroy()
+
+function extended.willUnmount(p)
+	if p.motor ~= nil then
+		p.motor:destroy()
 	end
 
-	if p21.motorStepDisconnect ~= nil then
-		p21.motorStepDisconnect()
+	if p.motorStepDisconnect ~= nil then
+		p.motorStepDisconnect()
 	end
 end
 
-return v11
+return extended

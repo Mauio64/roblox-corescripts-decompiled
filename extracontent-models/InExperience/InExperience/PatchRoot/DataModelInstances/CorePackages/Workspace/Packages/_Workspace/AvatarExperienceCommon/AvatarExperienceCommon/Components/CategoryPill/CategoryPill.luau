@@ -1,73 +1,148 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local React = require(AvatarExperienceCommonParent.React)
-local Foundation = require(AvatarExperienceCommonParent.Foundation)
+
+local parent = AvatarExperienceCommon.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local useTokens = Foundation.Hooks.useTokens
-local useLocalization = require(AvatarExperienceCommonParent.Localization).Hooks.useLocalization
-local AvatarExperienceFlags = require(AvatarExperienceCommonParent.AvatarExperienceFlags)
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXCategoryPillColorAnimation = AvatarExperienceFlags.FFlagAXCategoryPillColorAnimation
 local FFlagAXCategoryPillPositionAnimation = AvatarExperienceFlags.FFlagAXCategoryPillPositionAnimation
 local FFlagAXDisableHiddenCatalogCategoryPills = AvatarExperienceFlags.FFlagAXDisableHiddenCatalogCategoryPills
 local FFlagAXCatalogCategoriesSDUI = AvatarExperienceFlags.FFlagAXCatalogCategoriesSDUI
+
 local useCategoryPillColorAnimation = require(AvatarExperienceCommon.Hooks.useCategoryPillColorAnimation)
 
-local function CategoryPill(t1: {[any]: any}) -- line: 43
-	-- upvalues: useTokens (copy), useLocalization (copy), FFlagAXCatalogCategoriesSDUI (copy), React (copy), FFlagAXCategoryPillColorAnimation (copy), useCategoryPillColorAnimation (copy), Foundation (copy), FFlagAXCategoryPillPositionAnimation (copy), FFlagAXDisableHiddenCatalogCategoryPills (copy)
-	local v15 = useTokens()
-	local v16 = useLocalization({
-		title = if not FFlagAXCatalogCategoriesSDUI or not t1.localizedTitle then t1.title else nil
-	})
-	local pillIndex = t1.pillIndex
-	local navButtonRefs = t1.navButtonRefs
-	local categories = t1.categories
-	local u20 = React.useRef(nil)
+local function CategoryPill(props)
+	local v = useTokens()
+	local title
 
-	if t1.pillRef then
-		u20 = t1.pillRef
+	if not (FFlagAXCatalogCategoriesSDUI and props.localizedTitle) then
+		title = props.title
 	end
 
-	local v21 = if not FFlagAXCategoryPillColorAnimation then nil else useCategoryPillColorAnimation(t1.isChecked)
+	local v2 = useLocalization({ title = title })
 
-	React.useEffect(function() -- line: 64
-		-- upvalues: u20 (ref), t1 (copy), pillIndex (copy)
-		if u20.current then
-			t1.categoryButtonRefs[t1.id] = u20
-			t1.navButtonRefs[pillIndex] = u20
+	local pillIndex = props.pillIndex
+	local navButtonRefs = props.navButtonRefs
+	local categories = props.categories
+
+	local ref = React.useRef(nil)
+
+	if props.pillRef then
+		ref = props.pillRef
+	end
+
+	local v3
+
+	if FFlagAXCategoryPillColorAnimation then
+		v3 = useCategoryPillColorAnimation(props.isChecked)
+	end
+
+	React.useEffect(function()
+		if ref.current then
+			props.categoryButtonRefs[props.id] = ref
+			props.navButtonRefs[pillIndex] = ref
 		end
 	end, {})
 
-	local ActionStandard = v15.Color.ActionStandard
+	local v4 = v.Color.ActionStandard
 
-	if t1.isChecked and not t1.isSubcategory then
-		ActionStandard = v15.Color.ActionSubEmphasis
+	if props.isChecked and not props.isSubcategory then
+		v4 = v.Color.ActionSubEmphasis
 	end
 
-	return React.createElement(Foundation.View, {
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v5 = {
 		tag = "auto-xy radius-circle padding-small align-x-center align-y-center",
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, 0, 0.5, 0),
-		Size = UDim2.new(0, 0, 0, v15.Size.Size_800),
-		backgroundStyle = if not FFlagAXCategoryPillColorAnimation or (t1.isSubcategory or v21 == nil) then ActionStandard.Background else v21.animatedBackgroundStyle,
-		onActivated = t1.onActivated,
-		LayoutOrder = t1.layoutOrder or nil,
-		ref = u20,
-		NextSelectionLeft = if not FFlagAXCategoryPillPositionAnimation then pillIndex > 1 and navButtonRefs[pillIndex - 1] or nil else nil,
-		NextSelectionRight = if not FFlagAXCategoryPillPositionAnimation then pillIndex < #categories and navButtonRefs[pillIndex + 1] or nil else nil,
-		isDisabled = if not FFlagAXDisableHiddenCatalogCategoryPills then nil else not t1.isSelectable,
-		selection = if not FFlagAXCategoryPillPositionAnimation then nil else {
-			Selectable = t1.isSelectable
-		},
-		stroke = if not t1.isSubcategory or not t1.isChecked then nil else {
-			Thickness = 1,
-			Color = v15.Color.System.Contrast.Color3,
-			Transparency = v15.Color.System.Contrast.Transparency
+		Size = UDim2.new(0, 0, 0, v.Size.Size_800),
+		backgroundStyle = 0,
+		onActivated = 0,
+		LayoutOrder = 0,
+		ref = 0,
+		NextSelectionLeft = 0,
+		NextSelectionRight = 0,
+		isDisabled = 0,
+		selection = 0,
+		stroke = 0
+	}
+	local backgroundStyle
+
+	if FFlagAXCategoryPillColorAnimation and not props.isSubcategory and v3 ~= nil then
+		backgroundStyle = v3.animatedBackgroundStyle
+	else
+		backgroundStyle = v4.Background
+	end
+
+	v5.backgroundStyle = backgroundStyle
+
+	v5.onActivated = props.onActivated
+	v5.LayoutOrder = props.layoutOrder or nil
+	v5.ref = ref
+	local nextSelectionLeft
+
+	if not (FFlagAXCategoryPillPositionAnimation or not (pillIndex > 1)) then
+		nextSelectionLeft = navButtonRefs[pillIndex - 1] or nil
+	end
+
+	v5.NextSelectionLeft = nextSelectionLeft
+	local nextSelectionRight
+
+	if not FFlagAXCategoryPillPositionAnimation then
+		nextSelectionRight = pillIndex < #categories and navButtonRefs[pillIndex + 1] or nil
+	end
+
+	v5.NextSelectionRight = nextSelectionRight
+	local isDisabled
+
+	if FFlagAXDisableHiddenCatalogCategoryPills then
+		isDisabled = not props.isSelectable
+	end
+
+	v5.isDisabled = isDisabled
+	v5.selection = FFlagAXCategoryPillPositionAnimation and { Selectable = props.isSelectable } or nil
+
+	v5.stroke = props.isSubcategory
+		and props.isChecked
+		and {
+			Color = v.Color.System.Contrast.Color3,
+			Transparency = v.Color.System.Contrast.Transparency,
+			Thickness = 1
 		}
-	}, {
-		PillText = React.createElement(Foundation.Text, {
-			tag = "auto-xy text-align-x-center text-align-y-center text-no-wrap padding-x-xsmall text-truncate-end",
-			Text = if not FFlagAXCatalogCategoriesSDUI or not t1.localizedTitle then v16.title else t1.localizedTitle,
-			textStyle = if not FFlagAXCategoryPillColorAnimation or (t1.isSubcategory or v21 == nil) then ActionStandard.Foreground else v21.animatedTextStyle,
-			fontStyle = v15.Typography.CaptionLarge
+		or nil
+
+	local createElement2 = React.createElement
+	local text = Foundation.Text
+	local text2
+
+	if FFlagAXCatalogCategoriesSDUI and props.localizedTitle then
+		text2 = props.localizedTitle
+	else
+		text2 = v2.title
+	end
+
+	local textStyle
+
+	if FFlagAXCategoryPillColorAnimation and not props.isSubcategory and v3 ~= nil then
+		textStyle = v3.animatedTextStyle
+	else
+		textStyle = v4.Foreground
+	end
+
+	return createElement(view, v5, {
+		PillText = createElement2(text, {
+			Text = text2,
+			textStyle = textStyle,
+			fontStyle = v.Typography.CaptionLarge,
+			tag = "auto-xy text-align-x-center text-align-y-center text-no-wrap padding-x-xsmall text-truncate-end"
 		})
 	})
 end

@@ -1,28 +1,29 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local jest = require(Parent.Dev.JestGlobals).jest
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
 
-local function mockUseLocalization() -- line: 22
-	-- upvalues: jest (copy), Parent (copy)
-	jest.mock(Parent.Localization, function() -- line: 23
+local JestGlobals = require(parent.Dev.JestGlobals)
+local jest = JestGlobals.jest
+
+local function mockUseLocalization()
+	jest.mock(parent.Localization, function()
 		return {
 			Hooks = {
-				useLocalization = function(t1: {[any]: any}) -- line: 26
-					local t2 = {}
+				useLocalization = function(items)
+					local result = {}
 
-					for v6, v7 in t1 do
-						if typeof(v7) == "table" then
-							t2[v6] = v7[1]
+					for k, item in items do
+						if typeof(item) == "table" then
+							result[k] = item[1]
 						else
-							t2[v6] = v7
+							result[k] = item
 						end
 					end
 
-					return t2
+					return result
 				end
 			},
 			NumberLocalization = {
-				localize = function(s1: string, _: string) -- line: 39
-					return s1
+				localize = function(p: string, _: string)
+					return p
 				end
 			}
 		}

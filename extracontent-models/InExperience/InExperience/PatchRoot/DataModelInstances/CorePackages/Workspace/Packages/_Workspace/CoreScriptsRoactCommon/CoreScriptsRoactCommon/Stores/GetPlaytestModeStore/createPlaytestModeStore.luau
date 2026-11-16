@@ -1,68 +1,128 @@
+local AppStorageService = game:GetService("AppStorageService")
 local RunService = game:GetService("RunService")
+
 local CoreScriptsRoactCommon = script:FindFirstAncestor("CoreScriptsRoactCommon")
-local CoreScriptsRoactCommonParent = CoreScriptsRoactCommon.Parent
-local Signals = require(CoreScriptsRoactCommonParent.Signals)
+local parent = CoreScriptsRoactCommon.Parent
+
+local Signals = require(parent.Signals)
 local createSignal = Signals.createSignal
-local getIsPrivatePlaytesterStore = require(CoreScriptsRoactCommonParent.DataHydration.IsPrivatePlaytester).getIsPrivatePlaytesterStore
-local UniverseConfiguration = require(CoreScriptsRoactCommonParent.DataHydration.UniverseConfiguration)
+
+local IsPrivatePlaytester = require(parent.DataHydration.IsPrivatePlaytester)
+local getIsPrivatePlaytesterStore = IsPrivatePlaytester.getIsPrivatePlaytesterStore
+
+local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration)
 local getUniverseConfigurationStore = UniverseConfiguration.getUniverseConfigurationStore
 local PrivacyType = UniverseConfiguration.PrivacyType
+
 local PlaytestModeAnalytics = require(CoreScriptsRoactCommon.Analytics.PlaytestModeAnalytics)
-local BuildModeLaunch = require(CoreScriptsRoactCommonParent.BuildExperience.BuildModeLaunch)
-local v12 = game:DefineFastFlag("DebugEnablePlaytestMode", false)
+
+local BuildModeLaunch = require(parent.BuildExperiencePlaytestLaunch.BuildModeLaunch)
+
+local defineFastFlag = game:DefineFastFlag("DebugEnablePlaytestMode", false)
 local FFlagAddPlaytestModeAnalytics = require(CoreScriptsRoactCommon.Flags.FFlagAddPlaytestModeAnalytics)
 local FFlagPlaytestModeExcludeBuildMode = require(CoreScriptsRoactCommon.Flags.FFlagPlaytestModeExcludeBuildMode)
 local FFlagPlaytestModeExcludeStudio = require(CoreScriptsRoactCommon.Flags.FFlagPlaytestModeExcludeStudio)
+local FFlagPlaytestModeIncludeTeamTest = require(CoreScriptsRoactCommon.Flags.FFlagPlaytestModeIncludeTeamTest)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPlaytestModeTooltipOncePerWeek = SharedFlags.FFlagPlaytestModeTooltipOncePerWeek
 
-return function() -- line: 31
-	-- upvalues: createSignal (copy), Signals (copy), getIsPrivatePlaytesterStore (copy), getUniverseConfigurationStore (copy), PrivacyType (copy), v12 (copy), FFlagPlaytestModeExcludeStudio (copy), RunService (copy), FFlagPlaytestModeExcludeBuildMode (copy), BuildModeLaunch (copy), FFlagAddPlaytestModeAnalytics (copy), PlaytestModeAnalytics (copy)
-	local v16, v17 = createSignal(false)
-	local v18 = Signals.createComputed(function(p1) -- line: 34
-		-- upvalues: getIsPrivatePlaytesterStore (copy)
-		local v21 = getIsPrivatePlaytesterStore(p1).getAndFetch(game.GameId).data(p1)
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagPlaytestModeTooltipOnlyPrivateTesters = SharedFlags2.FFlagPlaytestModeTooltipOnlyPrivateTesters
 
-		return v21 ~= nil and v21.isPlaytester == true
+return function()
+	local signal, setHasEditAccess = createSignal(false)
+
+	local function getHasTooltipCooldownExpired(): boolean
+		local success, result = pcall(function()
+			return AppStorageService:GetItem("PlaytestModeTooltipSeenAt")
+		end)
+
+		if not success or type(result) ~= "string" then
+			return true
+		end
+
+		local v = tonumber(result)
+		return v == nil or os.time() - v >= 604800
+	end
+
+	local function markTooltipSeen()
+		pcall(function()
+			AppStorageService:SetItem("PlaytestModeTooltipSeenAt", (tostring(os.time())))
+			AppStorageService:Flush()
+		end)
+	end
+
+	local computed = Signals.createComputed(function(p): boolean
+		local data = getIsPrivatePlaytesterStore(p).getAndFetch(game.GameId).data(p)
+		return data ~= nil and data.isPlaytester == true
 	end)
-	local v19 = Signals.createComputed(function(p2) -- line: 40
-		-- upvalues: getUniverseConfigurationStore (copy), PrivacyType (copy)
-		local v23 = getUniverseConfigurationStore(p2).getAndFetchSummary(game.GameId).data(p2)
 
-		return v23 ~= nil and v23.privacyType == PrivacyType.Private
+	local computed2 = Signals.createComputed(function(p): boolean
+		local data = getUniverseConfigurationStore(p).getAndFetchSummary(game.GameId).data(p)
+		return data ~= nil and data.privacyType == PrivacyType.Private
 	end)
 
-	return {
-		getIsPlaytestMode = Signals.createComputed(function(p3) -- line: 46
-			-- upvalues: v12 (copy), FFlagPlaytestModeExcludeStudio (copy), RunService (copy), FFlagPlaytestModeExcludeBuildMode (copy), BuildModeLaunch (copy), v18 (copy), FFlagAddPlaytestModeAnalytics (copy), PlaytestModeAnalytics (copy), v16 (copy), v19 (copy)
-			if v12 then
+	local v = {
+		getIsPlaytestMode = Signals.createComputed(function(p): boolean
+			if defineFastFlag then
 				return true
-			end
-
-			if FFlagPlaytestModeExcludeStudio and RunService:IsStudio() then
-				return false
 			end
 
 			if FFlagPlaytestModeExcludeBuildMode and BuildModeLaunch:hasBuildMode() then
 				return false
 			end
 
-			if v18(p3) then
+			if FFlagPlaytestModeIncludeTeamTest and RunService:IsTeamTest() then
+				if FFlagAddPlaytestModeAnalytics then
+					if RunService:IsStudio() then
+						PlaytestModeAnalytics.logPlaytestModeEnabled("studio_team_test")
+					else
+						PlaytestModeAnalytics.logPlaytestModeEnabled("team_test_server")
+					end
+				end
+
+				return true
+			elseif computed(p) then
 				if FFlagAddPlaytestModeAnalytics then
 					PlaytestModeAnalytics.logPlaytestModeEnabled("private_playtester")
 				end
 
 				return true
-			end
-
-			if v16(p3) and v19(p3) then
+			elseif signal(p) and computed2(p) and not (FFlagPlaytestModeExcludeStudio and RunService:IsStudio()) then
 				if FFlagAddPlaytestModeAnalytics then
 					PlaytestModeAnalytics.logPlaytestModeEnabled("private_game")
 				end
 
 				return true
+			else
+				return false
 			end
-
-			return false
 		end),
-		setHasEditAccess = v17
+		getIsPrivatePlaytester = 0,
+		setHasEditAccess = 0,
+		getHasTooltipCooldownExpired = 0,
+		markTooltipSeen = 0
 	}
+	local getIsPrivatePlaytester
+
+	if FFlagPlaytestModeTooltipOnlyPrivateTesters then
+		getIsPrivatePlaytester = computed
+	end
+
+	v.getIsPrivatePlaytester = getIsPrivatePlaytester
+
+	v.setHasEditAccess = setHasEditAccess
+
+	if not FFlagPlaytestModeTooltipOncePerWeek then
+		getHasTooltipCooldownExpired = nil
+	end
+
+	v.getHasTooltipCooldownExpired = getHasTooltipCooldownExpired
+
+	if not FFlagPlaytestModeTooltipOncePerWeek then
+		markTooltipSeen = nil
+	end
+
+	v.markTooltipSeen = markTooltipSeen
+	return v
 end

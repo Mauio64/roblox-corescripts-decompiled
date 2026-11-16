@@ -1,21 +1,21 @@
 local TweenService = game:GetService("TweenService")
 
-local function linearInterpolate(n1: number, n2: number, n3: number) -- line: 3
-	return n1 + (n2 - n1) * n3
+local function linearInterpolate(p: number, p2: number, value: number) -- 1 equivalent call inferred from this helper
+	return p + (p2 - p) * value
 end
-local function getEasingNumberSequence(n4: number, n5: number, n6: number, p1, p2) -- line: 7
-	-- upvalues: TweenService (copy)
-	local t1 = {}
 
-	for i = 0, n6 do
-		local v14 = i / n6
-		local Value = TweenService:GetValue(v14, p1, p2)
-		local v16 = n4 + (n5 - n4) * Value
+local function getEasingNumberSequence(p: number, p2: number, p3: number, p4, p5)
+	local numberSequenceKeypoints = {}
 
-		table.insert(t1, (NumberSequenceKeypoint.new(v14, v16)))
+	for i = 0, p3 do
+		local v = i / p3
+		table.insert(
+			numberSequenceKeypoints,
+			(NumberSequenceKeypoint.new(v, linearInterpolate(p, p2, TweenService:GetValue(v, p4, p5)))) -- inferred equivalent call
+		)
 	end
 
-	return t1
+	return numberSequenceKeypoints
 end
 
 return getEasingNumberSequence

@@ -1,14 +1,31 @@
-local function isSelectableGuiObject(p1) -- line: 3
-	if not p1:IsA("GuiButton") and not p1:IsA("TextBox") then
+local parent = script:FindFirstAncestor("VirtualCursorModular").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppGamepadSelectionRespectsInteractable = SharedFlags.FFlagLuaAppGamepadSelectionRespectsInteractable
+
+local function isSelectableGuiObject(instance): boolean
+	if not ((instance:IsA("GuiButton") or instance:IsA("TextBox")) and (instance.Visible and instance.Active and instance.Selectable)) then
 		return false
 	end
 
-	if not p1.Active or not p1.Selectable then
+	if instance.AbsoluteSize.Magnitude == 0 then
 		return false
 	end
 
-	if p1.AbsoluteSize.X == 0 or p1.AbsoluteSize.Y == 0 then
-		return false
+	if not FFlagLuaAppGamepadSelectionRespectsInteractable then
+		return true
+	end
+
+	while instance do
+		if instance:IsA("GuiObject") then
+			if not instance.Interactable then
+				return false
+			end
+		elseif not instance:IsA("Folder") then
+			break
+		end
+
+		instance = instance.Parent
 	end
 
 	return true

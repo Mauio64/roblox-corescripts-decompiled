@@ -1,78 +1,78 @@
 local AcpProtocol = require(script.Parent.Parent.Acp.AcpProtocol)
-
 require(script.Parent.Parent.createTurnHandle)
 require(script.Parent.Parent.types)
 
 return {
-	ingestFrame = function(t1: {[any]: any}, p1, p2) -- line: 22
-		-- upvalues: AcpProtocol (copy)
-		assert(p1 and (p1.kind == "notification" or p1.kind == "response"), "ingestFrame requires an IncomingFrame")
+	ingestFrame = function(data, data2, p)
+		assert(
+			data2 and (data2.kind == "notification" or data2.kind == "response"),
+			"ingestFrame requires an IncomingFrame"
+		)
+		local v
 
-		local v10
+		if data2.kind == "notification" then
+			local sessionId = data2.notification.params and data2.notification.params.sessionId
 
-		if p1.kind == "notification" then
-			local v5 = p1.notification.params and p1.notification.params.sessionId
-
-			if typeof(v5) ~= "string" or v5 == "" then
-				warn(("[CAS] dropped notification without sessionId: %s"):format(p1.notification.method))
-
+			if typeof(sessionId) ~= "string" or sessionId == "" then
+				warn(("[CAS] dropped notification without sessionId: %s"):format(data2.notification.method))
 				return
 			end
 
-			if p1.notification.method == AcpProtocol.Notifications.SessionUpdate then
-				local v6 = p1.notification.params and p1.notification.params.update
-				local v7 = if p2 == nil then nil else p2.sequenceNumber
+			if data2.notification.method == AcpProtocol.Notifications.SessionUpdate then
+				local update = data2.notification.params and data2.notification.params.update
+				local sequenceNumber
 
-				if v6 ~= nil and typeof(v7) == "number" then
-					local v8 = t1.getSessionByCasSessionId(v5)
+				if p ~= nil then
+					sequenceNumber = p.sequenceNumber
+				end
 
-					if v8 == nil then
-						local v9 = p1.notification.params and p1.notification.params.universeId
+				if update ~= nil and typeof(sequenceNumber) == "number" then
+					local v2 = data.getSessionByCasSessionId(sessionId)
 
-						if typeof(v9) == "number" then
-							v8 = t1.getSessionForProject(v9, nil, v5)
+					if v2 == nil then
+						local universeId = data2.notification.params and data2.notification.params.universeId
+
+						if typeof(universeId) == "number" then
+							v2 = data.getSessionForProject(universeId, nil, sessionId)
 						end
 					end
 
-					if v8 ~= nil then
-						v8.ingestRealtimeUpdate(v6, v7)
+					if v2 ~= nil then
+						v2.ingestRealtimeUpdate(update, sequenceNumber)
 					end
 				end
 			end
 
-			v10 = t1.getActiveTurnBySession(v5)
+			v = data.getActiveTurnBySession(sessionId)
 
-			if v10 == nil then
+			if v == nil then
 				return
 			end
 		else
-			local id = p1.response.id
+			local id = data2.response.id
 
 			if id == nil then
 				warn("[CAS] dropped response frame with no id")
-
 				return
 			end
 
-			local str = tostring(id)
+			local v2 = tostring(id)
+			v = data.getActiveTurnByRequestId(v2)
 
-			v10 = t1.getActiveTurnByRequestId(str)
-
-			if v10 == nil then
-				t1.logger:debug(`[CAS] no active handle for response id={ str }`)
-
+			if v == nil then
+				data.logger:debug(`[CAS] no active handle for response id={v2}`)
 				return
 			end
 		end
 
-		if v10 == nil then
+		if v == nil then
 			return
 		end
 
-		v10.dispatchFrame(p1, p2)
+		v.dispatchFrame(data2, p)
 
-		if v10.isDone() then
-			t1.onTurnDone(v10)
+		if v.isDone() then
+			data.onTurnDone(v)
 		end
 	end
 }

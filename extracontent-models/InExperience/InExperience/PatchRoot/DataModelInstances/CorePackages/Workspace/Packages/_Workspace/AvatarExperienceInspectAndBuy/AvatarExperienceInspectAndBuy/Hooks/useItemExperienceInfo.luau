@@ -1,15 +1,14 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local tutils = require(Parent.tutils)
+local parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local tutils = require(parent.tutils)
 
-return function(p1) -- line: 11
-	-- upvalues: useSelector (copy), tutils (copy)
-	return (useSelector(function(p2) -- line: 12
-		-- upvalues: p1 (copy)
-		if not p1 then
-			return nil
+return function(p)
+	return (useSelector(function(p2)
+		if p then
+			return p2.creatingExperiences[tostring(p)]
 		end
 
-		return p2.creatingExperiences[tostring(p1)]
+		return nil
 	end, tutils.deepEqual))
 end

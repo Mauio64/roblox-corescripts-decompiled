@@ -1,60 +1,57 @@
 local CorePackages = game:GetService("CorePackages")
 local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local Actions = script.Parent.Parent.Parent.Actions
 local AppendRecentDumpPath = require(Actions.AppendRecentDumpPath)
 local SetRCCProfilerState = require(Actions.SetRCCProfilerState)
-local v8 = Roact.Component:extend("RCCProfilerDataCompleteListener")
 
-function v8.didMount(p1) -- line: 13
-	-- upvalues: getClientReplicator (copy)
-	local v12 = getClientReplicator()
+local extended = Roact.Component:extend("RCCProfilerDataCompleteListener")
 
-	if v12 then
-		p1.completeSignal = v12.RCCProfilerDataComplete:Connect(function(p2, p3) -- line: 16
-			-- upvalues: p1 (copy)
-			if p1.props.waitingForRecording then
-				if not p2 then
-					warn(p3)
-					p1.props.dispatchSetRCCProfilerState(false)
+function extended:didMount()
+	local clientReplicator = getClientReplicator()
 
-					return
+	if clientReplicator then
+		self.completeSignal = clientReplicator.RCCProfilerDataComplete:Connect(function(p, p2)
+			if self.props.waitingForRecording then
+				if p then
+					self.props.dispatchSetRCCProfilerState(false, p2)
+					self.props.dispatchAppendRecentDumpPath(p2)
+				else
+					warn(p2)
+					self.props.dispatchSetRCCProfilerState(false)
 				end
-
-				p1.props.dispatchSetRCCProfilerState(false, p3)
-				p1.props.dispatchAppendRecentDumpPath(p3)
 			end
 		end)
 	end
 end
-function v8.willUnmount(p4) -- line: 30
-	if p4.completeSignal then
-		p4.completeSignal:Disconnect()
-		p4.completeSignal = nil
+
+function extended:willUnmount()
+	if self.completeSignal then
+		self.completeSignal:Disconnect()
+		self.completeSignal = nil
 	end
 end
-function v8.render(_) -- line: 37
+
+function extended.render(_): nil
 	return nil
 end
 
-local function mapStateToProps(p6, _) -- line: 41
-	return {
-		waitingForRecording = p6.MicroProfiler.waitingForRecording
-	}
+local function mapStateToProps(p, _)
+	return { waitingForRecording = p.MicroProfiler.waitingForRecording }
 end
-local function mapDispatchToProps(p8) -- line: 47
-	-- upvalues: AppendRecentDumpPath (copy), SetRCCProfilerState (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		dispatchAppendRecentDumpPath = function(s1: string) -- line: 49
-			-- upvalues: p8 (copy), AppendRecentDumpPath (copy)
-			p8(AppendRecentDumpPath(s1))
+		dispatchAppendRecentDumpPath = function(p: string)
+			callback(AppendRecentDumpPath(p))
 		end,
-		dispatchSetRCCProfilerState = function(p9, p10) -- line: 52
-			-- upvalues: p8 (copy), SetRCCProfilerState (copy)
-			p8(SetRCCProfilerState(p9, p10))
+		dispatchSetRCCProfilerState = function(p, p2)
+			callback(SetRCCProfilerState(p, p2))
 		end
 	}
 end
 
-return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(v8)
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(extended)

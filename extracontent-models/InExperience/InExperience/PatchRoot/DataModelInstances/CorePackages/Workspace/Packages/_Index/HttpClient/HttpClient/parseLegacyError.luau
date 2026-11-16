@@ -1,30 +1,30 @@
 require(script.Parent.types)
 
-local function parseLegacyError(p1) -- line: 6
-	if typeof(p1) ~= "table" or typeof(p1.errors) ~= "table" then
+local function parseLegacyError(p)
+	if typeof(p) ~= "table" or typeof(p.errors) ~= "table" then
 		return nil
 	end
 
-	local t1 = {}
+	local errors = {}
 
-	for _, v5 in p1.errors do
-		if typeof(v5) == "table" and typeof(v5.code) == "number" and typeof(v5.message) == "string" then
-			table.insert(t1, {
-				code = v5.code,
-				message = v5.message,
-				userFacingMessage = v5.userFacingMessage,
-				field = v5.field
-			})
+	for _, err in p.errors do
+		if not (typeof(err) == "table" and typeof(err.code) == "number" and typeof(err.message) == "string") then
+			continue
 		end
+
+		table.insert(errors, {
+			code = err.code,
+			message = err.message,
+			userFacingMessage = err.userFacingMessage,
+			field = err.field
+		})
 	end
 
-	if #t1 == 0 then
+	if #errors == 0 then
 		return nil
 	end
 
-	return {
-		errors = t1
-	}
+	return { errors = errors }
 end
 
 return parseLegacyError

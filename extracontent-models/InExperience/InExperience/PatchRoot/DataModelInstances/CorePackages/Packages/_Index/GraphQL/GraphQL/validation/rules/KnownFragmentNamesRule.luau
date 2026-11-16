@@ -1,16 +1,15 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local parent = script.Parent.Parent.Parent
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
 
 return {
-	KnownFragmentNamesRule = function(p1) -- line: 19
-		-- upvalues: GraphQLError (copy)
+	KnownFragmentNamesRule = function(object)
 		return {
-			FragmentSpread = function(_, p3) -- line: 21
-				-- upvalues: p1 (copy), GraphQLError (copy)
-				local value = p3.name.value
+			FragmentSpread = function(_, p)
+				local value = p.name.value
 
-				if not p1:getFragment(value) then
-					p1:reportError(GraphQLError.new(("Unknown fragment \"%s\"."):format(value), p3.name))
+				if not object:getFragment(value) then
+					object:reportError(graphQLError.new(("Unknown fragment \"%s\"."):format(value), p.name))
 				end
 			end
 		}

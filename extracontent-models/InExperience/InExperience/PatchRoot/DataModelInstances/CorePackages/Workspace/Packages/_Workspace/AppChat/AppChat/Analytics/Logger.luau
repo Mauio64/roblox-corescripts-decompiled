@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return (require(Parent.Loggers).Logger:new("AppChat Analytics"))
+local Loggers = require(parent.Loggers)
+local logger = Loggers.Logger
+return (logger.new(logger, "AppChat Analytics"))

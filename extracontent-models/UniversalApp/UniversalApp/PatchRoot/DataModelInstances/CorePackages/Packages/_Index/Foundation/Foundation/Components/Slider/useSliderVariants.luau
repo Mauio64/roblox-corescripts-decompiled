@@ -1,6 +1,9 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+
 local InputSize = require(Foundation.Enums.InputSize)
+
 local SliderVariant = require(Foundation.Enums.SliderVariant)
+
 local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
 
 require(Foundation.Providers.Style.Tokens)
@@ -9,89 +12,92 @@ local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
 
 require(Foundation.Components.Types)
 
-local function variantsFactory(p1) -- line: 38
-	-- upvalues: SliderVariant (copy), InputSize (copy)
-	local t1 = {
-		bar = {
-			tag = "position-center-center anchor-center-center size-full-100 radius-small"
+local Flags = require(Foundation.Utility.Flags)
+
+local function variantsFactory(data)
+	return {
+		common = {
+			bar = { tag = "position-center-center anchor-center-center radius-circle" },
+			fill = { tag = "radius-circle" }
 		},
-		fill = {
-			tag = "radius-small"
-		}
-	}
-	local t2 = {
-		[SliderVariant.Emphasis] = {
-			bar = {
-				tag = "bg-shift-400"
+		variants = {
+			[SliderVariant.Emphasis] = {
+				bar = { tag = "bg-shift-200" },
+				fill = { tag = "bg-emphasis" },
+				knob = {
+					style = data.Color.Extended.White.White_100,
+					dragStyle = data.Color.System.Emphasis,
+					hasShadow = true
+				}
 			},
-			fill = {
-				tag = "bg-emphasis"
+			[SliderVariant.Standard] = {
+				bar = { tag = "bg-shift-200" },
+				fill = { tag = "bg-system-contrast" },
+				knob = {
+					style = data.Color.System.Contrast,
+					dragStyle = data.Color.System.Contrast,
+					stroke = {
+						Color = data.Color.Stroke.Default.Color3,
+						Transparency = data.Color.Stroke.Default.Transparency,
+						Thickness = data.Stroke.Standard
+					},
+					hasShadow = true
+				}
 			},
-			knob = {
-				hasShadow = true,
-				style = p1.Color.Extended.White.White_100,
-				dragStyle = p1.Color.ActionEmphasis.Background
+			[SliderVariant.Utility] = {
+				knob = {
+					style = data.Color.None,
+					dragStyle = data.Color.None,
+					stroke = {
+						Color = data.Color.System.Contrast.Color3,
+						Transparency = data.Color.System.Contrast.Transparency,
+						Thickness = data.Stroke.Thicker
+					},
+					hasShadow = true
+				}
 			}
 		},
-		[SliderVariant.Standard] = {
-			bar = {
-				tag = "bg-shift-400"
+		sizes = {
+			[InputSize.XSmall] = {
+				bar = { height = data.Size.Size_100 }
 			},
-			fill = {
-				tag = "bg-system-contrast"
+			[InputSize.Small] = {
+				bar = { height = data.Size.Size_150 }
 			},
-			knob = {
-				hasShadow = false,
-				style = p1.Color.System.Contrast,
-				dragStyle = p1.Color.System.Contrast
+			[InputSize.Medium] = {
+				bar = { height = data.Size.Size_200 }
+			},
+			[InputSize.Large] = {
+				bar = { height = data.Size.Size_250 }
 			}
 		},
-		[SliderVariant.Utility] = {
-			knob = {
-				hasShadow = true,
-				style = p1.Color.None,
-				dragStyle = p1.Color.None,
-				stroke = {
-					Color = p1.Color.System.Contrast.Color3,
-					Transparency = p1.Color.System.Contrast.Transparency,
-					Thickness = p1.Stroke.Thicker
+		orientation = {
+			[true] = {
+				selectionGroup = {
+					SelectionBehaviorLeft = Enum.SelectionBehavior.Escape,
+					SelectionBehaviorRight = Enum.SelectionBehavior.Escape,
+					SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+					SelectionBehaviorDown = Enum.SelectionBehavior.Stop
+				}
+			},
+			[false] = {
+				selectionGroup = {
+					SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+					SelectionBehaviorRight = Enum.SelectionBehavior.Stop,
+					SelectionBehaviorUp = Enum.SelectionBehavior.Escape,
+					SelectionBehaviorDown = Enum.SelectionBehavior.Escape
 				}
 			}
 		}
 	}
-	local t3 = {
-		[InputSize.XSmall] = {
-			hitbox = {
-				height = p1.Size.Size_300
-			}
-		},
-		[InputSize.Small] = {
-			hitbox = {
-				height = p1.Size.Size_400
-			}
-		},
-		[InputSize.Medium] = {
-			hitbox = {
-				height = p1.Size.Size_500
-			}
-		},
-		[InputSize.Large] = {
-			hitbox = {
-				height = p1.Size.Size_700
-			}
-		}
-	}
-
-	return {
-		common = t1,
-		variants = t2,
-		sizes = t3
-	}
 end
 
-return function(p2, p3, p4) -- line: 91
-	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
-	local v14 = VariantsContext.useVariants("Slider", variantsFactory, p2)
+return function(p, p2, p3, flag: boolean)
+	local v = VariantsContext.useVariants("Slider", variantsFactory, p)
 
-	return composeStyleVariant(v14.common, v14.variants[p4], v14.sizes[p3])
+	if Flags.FoundationSliderCapture then
+		return composeStyleVariant(v.common, v.variants[p3], v.sizes[p2])
+	end
+
+	return composeStyleVariant(v.common, v.variants[p3], v.sizes[p2], v.orientation[flag])
 end

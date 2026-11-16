@@ -1,15 +1,19 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local memo = React.memo
-local Foundation = require(AppChatParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local useTokens = Foundation.Hooks.useTokens
+
 local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
-local t1 = {
+
+local itemList = {
 	{
 		heightFactor = 1,
 		isIncoming = true,
@@ -17,12 +21,7 @@ local t1 = {
 		widthPercentage = 0.5,
 		addBottomPadding = true
 	},
-	{
-		heightFactor = 1,
-		isIncoming = true,
-		showAvatarCircle = false,
-		widthPercentage = 0.2
-	},
+	{ heightFactor = 1, isIncoming = true, showAvatarCircle = false, widthPercentage = 0.2 },
 	{
 		heightFactor = 1,
 		isIncoming = false,
@@ -44,12 +43,7 @@ local t1 = {
 		widthPercentage = 0.75,
 		addBottomPadding = true
 	},
-	{
-		heightFactor = 1,
-		isIncoming = false,
-		showAvatarCircle = false,
-		widthPercentage = 0.4
-	},
+	{ heightFactor = 1, isIncoming = false, showAvatarCircle = false, widthPercentage = 0.4 },
 	{
 		heightFactor = 1,
 		isIncoming = true,
@@ -57,73 +51,90 @@ local t1 = {
 		widthPercentage = 0.7,
 		addBottomPadding = true
 	},
-	{
-		heightFactor = 1,
-		isIncoming = true,
-		showAvatarCircle = false,
-		widthPercentage = 0.5
-	}
-}
-local t2 = {
-	size = UDim2.fromScale(1, 1),
-	itemList = t1
+	{ heightFactor = 1, isIncoming = true, showAvatarCircle = false, widthPercentage = 0.5 }
 }
 
-local function renderSkeletonRow(t3: {[any]: any}, p1, t4: {[any]: any}, n1: number) -- line: 50
-	-- upvalues: React (copy), View (copy), Skeleton (copy), EnumsRadius (copy)
-	local v20 = t3.heightFactor * p1.Size.Size_500 + p1.Size.Size_400
-	local Size_900 = p1.Size.Size_900
-	local v22 = if not t3.addBottomPadding then p1.Size.Size_100 else p1.Size.Size_600
+local v = { size = UDim2.fromScale(1, 1), itemList = itemList }
 
-	return React.createElement(View, {
+local function renderSkeletonRow(props, p, p2, k: number)
+	local v2 = props.heightFactor * p.Size.Size_500 + p.Size.Size_400
+	local size_900 = p.Size.Size_900
+	local v3
+
+	if props.addBottomPadding then
+		v3 = p.Size.Size_600
+	else
+		v3 = p.Size.Size_100
+	end
+
+	local createElement = React.createElement
+	local v4 = {
 		testId = "ConversationMessageSkeletonRow",
-		LayoutOrder = n1,
+		LayoutOrder = k,
 		tag = {
 			["row align-y-bottom gap-small size-full-0 auto-y"] = true,
-			["align-x-left"] = t3.isIncoming,
-			["align-x-right"] = not t3.isIncoming
+			["align-x-left"] = props.isIncoming,
+			["align-x-right"] = not props.isIncoming
 		},
-		padding = {
-			left = UDim.new(0, t4.left),
-			right = UDim.new(0, t4.right),
-			bottom = UDim.new(0, v22),
-			top = if not t3.addTopPadding then nil else UDim.new(0, p1.Size.Size_600)
-		}
-	}, {
-		Avatar = if not t3.isIncoming or not t3.showAvatarCircle then nil else React.createElement(Skeleton, {
+		padding = 0
+	}
+
+	local padding = {
+		left = UDim.new(0, p2.left),
+		right = UDim.new(0, p2.right),
+		bottom = UDim.new(0, v3),
+		top = 0
+	}
+	local top
+
+	if props.addTopPadding then
+		top = UDim.new(0, p.Size.Size_600)
+	end
+
+	padding.top = top
+	v4.padding = padding
+	local avatar
+
+	if props.isIncoming and props.showAvatarCircle then
+		avatar = React.createElement(Skeleton, {
 			LayoutOrder = 1,
-			radius = EnumsRadius.Circle,
-			Size = UDim2.fromOffset(Size_900, Size_900)
-		}),
+			radius = Radius.Circle,
+			Size = UDim2.fromOffset(size_900, size_900)
+		})
+	end
+
+	return createElement(View, v4, {
+		Avatar = avatar,
 		Bubble = React.createElement(Skeleton, {
 			LayoutOrder = 2,
-			radius = EnumsRadius.Medium,
-			Size = UDim2.new(t3.widthPercentage, 0, 0, v20)
+			radius = Radius.Medium,
+			Size = UDim2.new(props.widthPercentage, 0, 0, v2)
 		})
 	})
 end
-local function ConversationMessageSkeletonList(t5: {[any]: any}) -- line: 90
-	-- upvalues: Cryo (copy), t2 (copy), useTokens (copy), useChatPagePadding (copy), t1 (copy), renderSkeletonRow (copy), React (copy), View (copy)
-	local v24 = Cryo.Dictionary.union(t2, t5)
-	local v25 = useTokens()
-	local v26 = useChatPagePadding()
-	local t6 = {}
 
-	for v28, v29 in v24.itemList or t1 do
-		t6["SkeletonRow" .. v28] = renderSkeletonRow(v29, v25, v26, v28)
+local function ConversationMessageSkeletonList(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local v2 = useTokens()
+	local v3 = useChatPagePadding()
+
+	local v4 = {}
+
+	for k, v5 in union.itemList or itemList do
+		v4["SkeletonRow" .. k] = renderSkeletonRow(v5, v2, v3, k)
 	end
 
 	return React.createElement(View, {
 		testId = "ConversationMessageSkeletonList",
+		Size = union.size,
+		LayoutOrder = union.layoutOrder,
 		tag = "size-full clip",
-		Size = v24.size,
-		LayoutOrder = v24.layoutOrder,
 		layout = {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Bottom
 		}
-	}, t6)
+	}, v4)
 end
 
 return memo(ConversationMessageSkeletonList)

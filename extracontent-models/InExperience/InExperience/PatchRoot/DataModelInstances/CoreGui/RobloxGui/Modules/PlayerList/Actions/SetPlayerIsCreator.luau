@@ -1,7 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerIsCreator", function(p1, p2) -- line: 4
-	return {
-		player = p1,
-		userId = p1.UserId,
-		isCreator = p2
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetPlayerIsCreator", function(player, isCreator)
+	return { player = player, userId = player.UserId, isCreator = isCreator }
 end)

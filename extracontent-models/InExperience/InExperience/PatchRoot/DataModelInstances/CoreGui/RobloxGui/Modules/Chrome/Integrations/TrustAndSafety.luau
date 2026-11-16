@@ -1,68 +1,61 @@
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+
 local Service = require(Chrome.Service)
 local CommonIcon = require(Chrome.Integrations.CommonIcon)
-local Signal = require(CorePackages.Workspace.Packages.AppCommonLib).Signal
-local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
-local MappedSignal = require(Chrome.ChromeShared.Service.ChromeUtils).MappedSignal
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Signal = AppCommonLib.Signal
+
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
+
+local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
+local MappedSignal = ChromeUtils.MappedSignal
 local FFlagStandardizeSafetyIcon = SharedFlags.FFlagStandardizeSafetyIcon
-local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
-local u13 = false
-local v14 = Signal.new()
-local v15 = MappedSignal.new(v14, function() -- line: 27
-	-- upvalues: u13 (ref)
-	return u13
+
+local v = false
+local v2 = Signal.new()
+local isActivated = MappedSignal.new(v2, function()
+	return v
 end)
 
-task.defer(function() -- line: 32
-	-- upvalues: RobloxGui (copy), u13 (ref), v14 (copy)
+task.defer(function()
 	local SettingsHub = require(RobloxGui.Modules.Settings.SettingsHub)
-
-	SettingsHub.CurrentPageSignal:connect(function(p1) -- line: 34
-		-- upvalues: u13 (ref), SettingsHub (copy), v14 (copy)
-		u13 = p1 == SettingsHub.Instance.ReportAbusePage.Page.Name
-		v14:fire()
+	SettingsHub.CurrentPageSignal:connect(function(p)
+		v = p == SettingsHub.Instance.ReportAbusePage.Page.Name
+		v2:fire()
 	end)
 end)
 
 return Service:register({
+	initialAvailability = Service.AvailabilitySignal.Available,
 	id = "trust_and_safety",
 	label = "CoreScripts.InGameMenu.QuickActions.Report",
-	initialAvailability = Service.AvailabilitySignal.Available,
-	sideSheetPlacement = SideSheetPlacement.Page,
-	activated = function(_) -- line: 45
-		-- upvalues: RobloxGui (copy), u13 (ref)
+	sideSheetPlacement = SideSheetPlacement.AboveFold,
+	activated = function(_)
 		local SettingsHub = require(RobloxGui.Modules.Settings.SettingsHub)
 
-		if SettingsHub:GetVisibility() then
-			if u13 then
-				SettingsHub:SetVisibility(false)
-
-				return
-			end
-
+		if not SettingsHub:GetVisibility() then
+			SettingsHub:SetVisibility(true, false, SettingsHub.Instance.ReportAbusePage)
+		elseif v then
+			SettingsHub:SetVisibility(false)
+		else
 			SettingsHub:SwitchToPage(SettingsHub.Instance.ReportAbusePage, true)
-
-			return
 		end
-
-		SettingsHub:SetVisibility(true, false, SettingsHub.Instance.ReportAbusePage)
 	end,
-	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 59
-		-- upvalues: v15 (copy)
-		return v15:get()
-	end or v15,
+	isActivated = isActivated,
 	components = {
-		Icon = function(_) -- line: 63
-			-- upvalues: FFlagStandardizeSafetyIcon (copy), CommonIcon (copy), v15 (copy)
+		Icon = function(_)
 			if FFlagStandardizeSafetyIcon then
-				return CommonIcon("Flag", nil, v15)
+				return CommonIcon("Flag", nil, isActivated)
 			end
 
-			return CommonIcon("icons/menu/safety_off", "icons/menu/safety_on", v15)
+			return CommonIcon("icons/menu/safety_off", "icons/menu/safety_on", isActivated)
 		end
 	}
 })

@@ -1,212 +1,491 @@
 local LocalizationService = game:GetService("LocalizationService")
+
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Signals = require(AppChatParent.Signals)
+local parent = AppChat.Parent
+
+local Signals = require(parent.Signals)
 local DomLocators = require(AppChat.Utils.DomLocators)
 local getConversationTitle = require(AppChat.Conversations.getConversationTitle)
 local useIsUserPending = require(AppChat.Hooks.useIsUserPending)
 local shouldShowOSAForConversation = require(AppChat.Utils.shouldShowOSAForConversation)
 local shouldShowU13ChatOptInForConversation = require(AppChat.Utils.shouldShowU13ChatOptInForConversation)
-
 require(AppChat.Stores.GetConversationStore.createConversationStore)
+
 require(AppChat.Stores.GetConversationMessageStore.createConversationMessageStore)
 
+require(AppChat.Stores.GetConversationMessageListStore.createConversationMessageListStore)
+local getPreciseUnixTimestamp = require(AppChat.Utils.getPreciseUnixTimestamp)
 local Enums = require(AppChat.MessageData.Enums)
-
 require(AppChat.MessageData.Types)
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
 
-local Localization = require(AppChatParent.RobloxAppLocales).Localization
+local FFlagAppChatDerivedConversationLatestActivity = require(AppChat.Flags.FFlagAppChatDerivedConversationLatestActivity)
+
 local MessageType = Enums.MessageType
 local MessageVisibility = Enums.MessageVisibility
 
-local function getFirstCardAltText(p1) -- line: 28
-	if type(p1) ~= "table" or type(p1[1]) ~= "table" then
+local function getFirstCardAltText(list)
+	if type(list) ~= "table" or type(list[1]) ~= "table" then
 		return nil
 	end
 
-	if type(p1[1].alt_text) == "string" then
-		return p1[1].alt_text
+	if type(list[1].alt_text) == "string" then
+		return list[1].alt_text
 	end
 
 	return nil
 end
-local function getContentFirstLine(s1: string?) -- line: 49
-	if type(s1) ~= "string" then
+
+local function getContentFirstLine(value: string?) -- 2 equivalent calls inferred from this helper
+	if type(value) ~= "string" then
 		return ""
 	end
 
-	local parts = s1:split("\n")
-
+	local parts = value:split("\n")
 	return parts and parts[1] or ""
 end
-local function getHiddenMessageText() -- line: 57
-	-- upvalues: Localization (copy), LocalizationService (copy)
+
+local function getHiddenMessageText() -- 1 equivalent call inferred from this helper
 	return Localization.new(LocalizationService.RobloxLocaleId):Format("Feature.Chat.Label.MessageNotAvailable")
 end
-local function getUnixTime(p2) -- line: 61
-	if p2 == nil then
+
+local function getUnixTime(value)
+	if value == nil then
 		return nil
 	end
 
-	if typeof(p2) == "DateTime" then
-		return p2.UnixTimestamp
+	if typeof(value) == "DateTime" then
+		return value.UnixTimestamp
 	end
 
-	if type(p2) == "table" and p2.GetUnixTimestamp ~= nil then
-		return p2:GetUnixTimestamp()
+	if type(value) == "table" and value.GetUnixTimestamp ~= nil then
+		return value:GetUnixTimestamp()
 	end
 
 	return nil
 end
-local function getSubtitle(p3, p4) -- line: 74
-	-- upvalues: MessageVisibility (copy), Localization (copy), LocalizationService (copy), MessageType (copy)
-	if p4 ~= nil then
-		local v29 = if p4.visibility ~= MessageVisibility.Hidden then p4.preview_content or (p4.content_to_display or p4.content) else Localization.new(LocalizationService.RobloxLocaleId):Format("Feature.Chat.Label.MessageNotAvailable")
 
-		if v29 == nil and p4.type == MessageType.System then
-			local cards = p4.cards
+local function getLatestUnixTime(conversation, p) -- 1 equivalent call inferred from this helper
+	local preciseUnixTimestamp = getPreciseUnixTimestamp(conversation.lastUpdated)
+	local v
 
-			v29 = if type(cards) == "table" and type(cards[1]) == "table" then if type(cards[1].alt_text) ~= "string" then nil else cards[1].alt_text else nil
-		end
-
-		if type(v29) ~= "string" then
-			return ""
-		end
-
-		local parts = v29:split("\n")
-
-		return parts and parts[1] or ""
+	if p ~= nil then
+		v = getPreciseUnixTimestamp(p.created_at)
 	end
 
-	local previewContent = p3.previewContent
-
-	if type(previewContent) ~= "string" then
-		return ""
+	if v == nil or preciseUnixTimestamp ~= nil and not (preciseUnixTimestamp < v) then
+		return preciseUnixTimestamp
 	end
 
-	local parts = previewContent:split("\n")
-
-	return parts and parts[1] or ""
+	return v
 end
-local function getTitle(p5) -- line: 88
-	-- upvalues: getConversationTitle (copy)
-	return getConversationTitle(p5) or ""
-end
-local function getLocatorTitle(p6) -- line: 92
-	-- upvalues: getConversationTitle (copy)
-	return p6.title or (getConversationTitle(p6) or "")
-end
-local function getCachedGetter(t1: {[any]: any}, s2: string, s3: string, p7: ((...any) -> ...any)) -- line: 98
-	-- upvalues: Signals (copy)
-	local v40 = t1[s2]
 
-	if v40 then
-		local v41 = v40[s3]
+local function isNewerPreviewThanServer(conversation, p): boolean -- 1 equivalent call inferred from this helper
+	local preciseUnixTimestamp = getPreciseUnixTimestamp(conversation.lastUpdated)
+	local preciseUnixTimestamp2 = getPreciseUnixTimestamp(p.created_at)
+	return preciseUnixTimestamp2 ~= nil
+		and (preciseUnixTimestamp == nil or preciseUnixTimestamp <= preciseUnixTimestamp2)
+end
 
-		if v41 ~= nil then
-			return v41
+local function getSubtitle(conversation, data)
+	if data == nil then
+		return getContentFirstLine(conversation.previewContent) -- inferred equivalent call
+	else
+		local v
+
+		if data.visibility == MessageVisibility.Hidden then
+			v = getHiddenMessageText() -- inferred equivalent call
+		else
+			v = data.preview_content or data.content_to_display or data.content
+		end
+
+		if v == nil and data.type == MessageType.System then
+			local cards = data.cards
+
+			if type(cards) == "table" and type(cards[1]) == "table" and type(cards[1].alt_text) == "string" then
+				v = cards[1].alt_text
+			else
+				v = nil
+			end
+		end
+
+		return getContentFirstLine(v) -- inferred equivalent call
+	end
+end
+
+local function getTitle(p) -- 3 equivalent calls inferred from this helper
+	return getConversationTitle(p) or ""
+end
+
+local function getLocatorTitle(conversation) -- 1 equivalent call inferred from this helper
+	return conversation.title or getTitle(conversation) -- inferred equivalent call
+end
+
+local function getCachedGetter(p, p2: string, p3: string, callback)
+	local computeds = p[p2]
+
+	if computeds then
+		local v = computeds[p3]
+
+		if v ~= nil then
+			return v
 		end
 	else
-		v40 = {}
-		t1[s2] = v40
+		computeds = {}
+		p[p2] = computeds
 	end
 
-	local v42 = Signals.createComputed(p7)
-
-	v40[s3] = v42
-
-	return v42
+	local computed = Signals.createComputed(callback)
+	computeds[p3] = computed
+	return computed
 end
-local function createConversationViewModelStore(p8, p9) -- line: 120
-	-- upvalues: getConversationTitle (copy), Signals (copy), getSubtitle (copy), useIsUserPending (copy), shouldShowOSAForConversation (copy), shouldShowU13ChatOptInForConversation (copy), DomLocators (copy)
-	local t2 = {}
 
-	local function getTitleGetter(s4: string) -- line: 126
-		-- upvalues: t2 (copy), p8 (copy), getConversationTitle (copy), Signals (copy)
-		local v51 = t2
-		local v52 = v51[s4]
+local function createConversationViewModelStore(p, p2, p3)
+	local v = {}
 
-		if v52 then
-			local title = v52.title
+	local function getTitleGetter(p4: string)
+		local v2 = v
+		local function fn(p5)
+			local conversation = p.getConversation(p4, p5)
+
+			if conversation == nil then
+				return nil
+			end
+
+			return getTitle(conversation) -- inferred equivalent call
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local title = v3.title
 
 			if title ~= nil then
 				return title
 			end
 		else
-			v52 = {}
-			v51[s4] = v52
+			v3 = {}
+			v2[p4] = v3
 		end
 
-		local v54 = Signals.createComputed(function(p10) -- line: 127
-			-- upvalues: p8 (copy), s4 (copy), getConversationTitle (copy)
-			local v106 = p8.getConversation(s4, p10)
+		local title = Signals.createComputed(fn)
+		v3.title = title
+		return title
+	end
 
-			if v106 ~= nil then
-				return getConversationTitle(v106) or ""
+	local function getNewestPreviewableMessageGetter(p4: string)
+		local v2 = v
+		local function fn(p5)
+			for _, v3 in p3.getOrderedIds(p4, p5) do
+				local message = p2.getMessage(v3, p5)
+
+				if message ~= nil and message.is_previewable == true then
+					return message
+				end
 			end
 
 			return nil
-		end)
+		end
 
-		v52.title = v54
+		local v3 = v2[p4]
 
-		return v54
+		if v3 then
+			local newestPreviewableMessage = v3.newestPreviewableMessage
+
+			if newestPreviewableMessage ~= nil then
+				return newestPreviewableMessage
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local newestPreviewableMessage = Signals.createComputed(fn)
+		v3.newestPreviewableMessage = newestPreviewableMessage
+		return newestPreviewableMessage
 	end
-	local function getSubtitleGetter(s5: string) -- line: 133
-		-- upvalues: t2 (copy), p8 (copy), p9 (copy), getSubtitle (copy), Signals (copy)
-		local v56 = t2
-		local v57 = v56[s5]
 
-		if v57 then
-			local subtitle = v57.subtitle
+	local function getSubtitleGetter(p4: string)
+		local v2 = v
+		local function fn(p5)
+			local conversation = p.getConversation(p4, p5)
+
+			if conversation == nil then
+				return ""
+			end
+
+			if FFlagAppChatDerivedConversationLatestActivity then
+				local v3 = p4
+				local v4 = v
+				local function fn2(p6)
+					for _, v5 in p3.getOrderedIds(v3, p6) do
+						local message = p2.getMessage(v5, p6)
+
+						if message ~= nil and message.is_previewable == true then
+							return message
+						end
+					end
+
+					return nil
+				end
+
+				local v5 = v4[v3]
+				local newestPreviewableMessage
+
+				if v5 then
+					newestPreviewableMessage = v5.newestPreviewableMessage
+
+					if newestPreviewableMessage == nil then
+						newestPreviewableMessage = Signals.createComputed(fn2)
+						v5.newestPreviewableMessage = newestPreviewableMessage
+					end
+				else
+					v5 = {}
+					v4[v3] = v5
+
+					newestPreviewableMessage = Signals.createComputed(fn2)
+					v5.newestPreviewableMessage = newestPreviewableMessage
+				end
+
+				local v6 = newestPreviewableMessage(p5)
+
+				if v6 ~= nil and isNewerPreviewThanServer(conversation, v6) then -- inferred equivalent call
+					return (getSubtitle(conversation, v6))
+				end
+			end
+
+			local v3
+
+			if conversation.previewMessageId ~= nil then
+				v3 = p2.getMessage(conversation.previewMessageId, p5)
+			end
+
+			return (getSubtitle(conversation, v3))
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local subtitle = v3.subtitle
 
 			if subtitle ~= nil then
 				return subtitle
 			end
 		else
-			v57 = {}
-			v56[s5] = v57
+			v3 = {}
+			v2[p4] = v3
 		end
 
-		local v59 = Signals.createComputed(function(p11) -- line: 134
-			-- upvalues: p8 (copy), s5 (copy), p9 (copy), getSubtitle (copy)
-			local v108 = p8.getConversation(s5, p11)
-
-			if v108 == nil then
-				return ""
-			end
-
-			local v109 = if v108.previewMessageId == nil then nil else p9.getMessage(v108.previewMessageId, p11)
-
-			return (getSubtitle(v108, v109))
-		end)
-
-		v57.subtitle = v59
-
-		return v59
+		local subtitle = Signals.createComputed(fn)
+		v3.subtitle = subtitle
+		return subtitle
 	end
-	local function getUnixTimeGetter(s6: string) -- line: 189
-		-- upvalues: t2 (copy), p8 (copy), Signals (copy)
-		local v91 = t2
-		local v92 = v91[s6]
 
-		if v92 then
-			local unixTime = v92.unixTime
+	local function getIsSubtitlePending(p4: string)
+		local v2 = v
+		local function fn(p5)
+			local conversation = p.getConversation(p4, p5)
+			return conversation ~= nil and useIsUserPending(conversation)
+		end
 
-			if unixTime ~= nil then
-				return unixTime
+		local v3 = v2[p4]
+
+		if v3 then
+			local isSubtitlePending = v3.isSubtitlePending
+
+			if isSubtitlePending ~= nil then
+				return isSubtitlePending
 			end
 		else
-			v92 = {}
-			v91[s6] = v92
+			v3 = {}
+			v2[p4] = v3
 		end
 
-		local v94 = Signals.createComputed(function(p12) -- line: 190
-			-- upvalues: p8 (copy), s6 (copy)
-			local v123 = p8.getConversation(s6, p12)
+		local isSubtitlePending = Signals.createComputed(fn)
+		v3.isSubtitlePending = isSubtitlePending
+		return isSubtitlePending
+	end
 
-			if v123 ~= nil then
-				local lastUpdated = v123.lastUpdated
+	local function getHasUnreadMessages(p4: string)
+		local v2 = v
+		local function fn(p5): boolean
+			local conversation = p.getConversation(p4, p5)
+			return conversation ~= nil and conversation.hasUnreadMessages == true
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local hasUnreadMessages = v3.hasUnreadMessages
+
+			if hasUnreadMessages ~= nil then
+				return hasUnreadMessages
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local hasUnreadMessages = Signals.createComputed(fn)
+		v3.hasUnreadMessages = hasUnreadMessages
+		return hasUnreadMessages
+	end
+
+	local function getHasGroupUp(p4: string)
+		local v2 = v
+		local function fn(p5): boolean
+			local conversation = p.getConversation(p4, p5)
+			return conversation ~= nil and conversation.hasGroupUp == true
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local hasGroupUp = v3.hasGroupUp
+
+			if hasGroupUp ~= nil then
+				return hasGroupUp
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local hasGroupUp = Signals.createComputed(fn)
+		v3.hasGroupUp = hasGroupUp
+		return hasGroupUp
+	end
+
+	local function getShouldShowOSA(p4: string)
+		local v2 = v
+		local function fn(p5): boolean
+			local conversation = p.getConversation(p4, p5)
+			return conversation ~= nil and shouldShowOSAForConversation(conversation) == true
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local shouldShowOSA = v3.shouldShowOSA
+
+			if shouldShowOSA ~= nil then
+				return shouldShowOSA
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local shouldShowOSA = Signals.createComputed(fn)
+		v3.shouldShowOSA = shouldShowOSA
+		return shouldShowOSA
+	end
+
+	local function getShouldShowU13ChatOptIn(p4: string)
+		local v2 = v
+		local function fn(p5): boolean
+			local conversation = p.getConversation(p4, p5)
+			return conversation ~= nil and shouldShowU13ChatOptInForConversation(conversation) == true
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local shouldShowU13ChatOptIn = v3.shouldShowU13ChatOptIn
+
+			if shouldShowU13ChatOptIn ~= nil then
+				return shouldShowU13ChatOptIn
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local shouldShowU13ChatOptIn = Signals.createComputed(fn)
+		v3.shouldShowU13ChatOptIn = shouldShowU13ChatOptIn
+		return shouldShowU13ChatOptIn
+	end
+
+	local function getConversationType(p4: string)
+		local v2 = v
+		local function fn(p5)
+			local conversation = p.getConversation(p4, p5)
+
+			if conversation == nil then
+				return nil
+			end
+
+			return conversation.conversationType
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local conversationType = v3.conversationType
+
+			if conversationType ~= nil then
+				return conversationType
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local conversationType = Signals.createComputed(fn)
+		v3.conversationType = conversationType
+		return conversationType
+	end
+
+	local function getUnixTimeGetter(p4: string)
+		local v2 = v
+		local function fn(p5)
+			local conversation = p.getConversation(p4, p5)
+
+			if FFlagAppChatDerivedConversationLatestActivity then
+				if conversation == nil then
+					return nil
+				end
+
+				local v3 = p4
+				local v4 = v
+				local function fn2(p6)
+					for _, v5 in p3.getOrderedIds(v3, p6) do
+						local message = p2.getMessage(v5, p6)
+
+						if message ~= nil and message.is_previewable == true then
+							return message
+						end
+					end
+
+					return nil
+				end
+
+				local v5 = v4[v3]
+				local newestPreviewableMessage
+
+				if v5 then
+					newestPreviewableMessage = v5.newestPreviewableMessage
+
+					if newestPreviewableMessage == nil then
+						newestPreviewableMessage = Signals.createComputed(fn2)
+						v5.newestPreviewableMessage = newestPreviewableMessage
+					end
+				else
+					v5 = {}
+					v4[v3] = v5
+
+					newestPreviewableMessage = Signals.createComputed(fn2)
+					v5.newestPreviewableMessage = newestPreviewableMessage
+				end
+
+				return getLatestUnixTime(conversation, newestPreviewableMessage(p5)) -- inferred equivalent call
+			else
+				if conversation == nil then
+					return nil
+				end
+
+				local lastUpdated = conversation.lastUpdated
 
 				if lastUpdated == nil then
 					return nil
@@ -222,258 +501,104 @@ local function createConversationViewModelStore(p8, p9) -- line: 120
 
 				return nil
 			end
+		end
 
-			return nil
-		end)
+		local v3 = v2[p4]
 
-		v92.unixTime = v94
+		if v3 then
+			local unixTime = v3.unixTime
 
-		return v94
+			if unixTime ~= nil then
+				return unixTime
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local unixTime = Signals.createComputed(fn)
+		v3.unixTime = unixTime
+		return unixTime
 	end
-	local function getLocatorTitleGetter(s7: string) -- line: 206
-		-- upvalues: t2 (copy), p8 (copy), getConversationTitle (copy), Signals (copy)
-		local v101 = t2
-		local v102 = v101[s7]
 
-		if v102 then
-			local locatorTitle = v102.locatorTitle
+	local function getTestId(p4: string)
+		local v2 = v
+		local function fn(p5)
+			local conversation = p.getConversation(p4, p5)
+
+			if conversation == nil then
+				return nil
+			end
+
+			return DomLocators.chatLandingConversationEntry(getLocatorTitle(conversation)) -- inferred equivalent call
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local testId = v3.testId
+
+			if testId ~= nil then
+				return testId
+			end
+		else
+			v3 = {}
+			v2[p4] = v3
+		end
+
+		local testId = Signals.createComputed(fn)
+		v3.testId = testId
+		return testId
+	end
+
+	local function getLocatorTitleGetter(p4: string)
+		local v2 = v
+		local function fn(p5)
+			local conversation = p.getConversation(p4, p5)
+			local title
+
+			if conversation == nil then
+				return title
+			end
+
+			title = conversation.title
+
+			if title then
+				return title
+			end
+
+			return getTitle(conversation) -- inferred equivalent call
+		end
+
+		local v3 = v2[p4]
+
+		if v3 then
+			local locatorTitle = v3.locatorTitle
 
 			if locatorTitle ~= nil then
 				return locatorTitle
 			end
 		else
-			v102 = {}
-			v101[s7] = v102
+			v3 = {}
+			v2[p4] = v3
 		end
 
-		local v104 = Signals.createComputed(function(p13) -- line: 207
-			-- upvalues: p8 (copy), s7 (copy), getConversationTitle (copy)
-			local v128 = p8.getConversation(s7, p13)
-			local title
-
-			if v128 ~= nil then
-				title = v128.title
-
-				if not title then
-					return getConversationTitle(v128) or ""
-				end
-			else
-				title = nil
-			end
-
-			return title
-		end)
-
-		v102.locatorTitle = v104
-
-		return v104
+		local locatorTitle = Signals.createComputed(fn)
+		v3.locatorTitle = locatorTitle
+		return locatorTitle
 	end
 
 	return {
 		getTitle = getTitleGetter,
 		getSubtitle = getSubtitleGetter,
-		getIsSubtitlePending = function(s8: string) -- line: 147
-			-- upvalues: t2 (copy), p8 (copy), useIsUserPending (copy), Signals (copy)
-			local v61 = t2
-			local v62 = v61[s8]
-
-			if v62 then
-				local isSubtitlePending = v62.isSubtitlePending
-
-				if isSubtitlePending ~= nil then
-					return isSubtitlePending
-				end
-			else
-				v62 = {}
-				v61[s8] = v62
-			end
-
-			local v64 = Signals.createComputed(function(p14) -- line: 148
-				-- upvalues: p8 (copy), s8 (copy), useIsUserPending (copy)
-				local v111 = p8.getConversation(s8, p14)
-
-				if v111 ~= nil then
-					return (useIsUserPending(v111))
-				end
-
-				return false
-			end)
-
-			v62.isSubtitlePending = v64
-
-			return v64
-		end,
-		getHasUnreadMessages = function(s9: string) -- line: 154
-			-- upvalues: t2 (copy), p8 (copy), Signals (copy)
-			local v66 = t2
-			local v67 = v66[s9]
-
-			if v67 then
-				local hasUnreadMessages = v67.hasUnreadMessages
-
-				if hasUnreadMessages ~= nil then
-					return hasUnreadMessages
-				end
-			else
-				v67 = {}
-				v66[s9] = v67
-			end
-
-			local v69 = Signals.createComputed(function(p15) -- line: 155
-				-- upvalues: p8 (copy), s9 (copy)
-				local v113 = p8.getConversation(s9, p15)
-
-				return v113 ~= nil and v113.hasUnreadMessages == true
-			end)
-
-			v67.hasUnreadMessages = v69
-
-			return v69
-		end,
-		getHasGroupUp = function(s10: string) -- line: 161
-			-- upvalues: t2 (copy), p8 (copy), Signals (copy)
-			local v71 = t2
-			local v72 = v71[s10]
-
-			if v72 then
-				local hasGroupUp = v72.hasGroupUp
-
-				if hasGroupUp ~= nil then
-					return hasGroupUp
-				end
-			else
-				v72 = {}
-				v71[s10] = v72
-			end
-
-			local v74 = Signals.createComputed(function(p16) -- line: 162
-				-- upvalues: p8 (copy), s10 (copy)
-				local v115 = p8.getConversation(s10, p16)
-
-				return v115 ~= nil and v115.hasGroupUp == true
-			end)
-
-			v72.hasGroupUp = v74
-
-			return v74
-		end,
-		getShouldShowOSA = function(s11: string) -- line: 168
-			-- upvalues: t2 (copy), p8 (copy), shouldShowOSAForConversation (copy), Signals (copy)
-			local v76 = t2
-			local v77 = v76[s11]
-
-			if v77 then
-				local shouldShowOSA = v77.shouldShowOSA
-
-				if shouldShowOSA ~= nil then
-					return shouldShowOSA
-				end
-			else
-				v77 = {}
-				v76[s11] = v77
-			end
-
-			local v79 = Signals.createComputed(function(p17) -- line: 169
-				-- upvalues: p8 (copy), s11 (copy), shouldShowOSAForConversation (copy)
-				local v117 = p8.getConversation(s11, p17)
-
-				return v117 ~= nil and shouldShowOSAForConversation(v117) == true
-			end)
-
-			v77.shouldShowOSA = v79
-
-			return v79
-		end,
-		getShouldShowU13ChatOptIn = function(s12: string) -- line: 175
-			-- upvalues: t2 (copy), p8 (copy), shouldShowU13ChatOptInForConversation (copy), Signals (copy)
-			local v81 = t2
-			local v82 = v81[s12]
-
-			if v82 then
-				local shouldShowU13ChatOptIn = v82.shouldShowU13ChatOptIn
-
-				if shouldShowU13ChatOptIn ~= nil then
-					return shouldShowU13ChatOptIn
-				end
-			else
-				v82 = {}
-				v81[s12] = v82
-			end
-
-			local v84 = Signals.createComputed(function(p18) -- line: 176
-				-- upvalues: p8 (copy), s12 (copy), shouldShowU13ChatOptInForConversation (copy)
-				local v119 = p8.getConversation(s12, p18)
-
-				return v119 ~= nil and shouldShowU13ChatOptInForConversation(v119) == true
-			end)
-
-			v82.shouldShowU13ChatOptIn = v84
-
-			return v84
-		end,
-		getConversationType = function(s13: string) -- line: 182
-			-- upvalues: t2 (copy), p8 (copy), Signals (copy)
-			local v86 = t2
-			local v87 = v86[s13]
-
-			if v87 then
-				local conversationType = v87.conversationType
-
-				if conversationType ~= nil then
-					return conversationType
-				end
-			else
-				v87 = {}
-				v86[s13] = v87
-			end
-
-			local v89 = Signals.createComputed(function(p19) -- line: 183
-				-- upvalues: p8 (copy), s13 (copy)
-				local v121 = p8.getConversation(s13, p19)
-
-				if v121 ~= nil then
-					return v121.conversationType
-				end
-
-				return nil
-			end)
-
-			v87.conversationType = v89
-
-			return v89
-		end,
+		getIsSubtitlePending = getIsSubtitlePending,
+		getHasUnreadMessages = getHasUnreadMessages,
+		getHasGroupUp = getHasGroupUp,
+		getShouldShowOSA = getShouldShowOSA,
+		getShouldShowU13ChatOptIn = getShouldShowU13ChatOptIn,
+		getConversationType = getConversationType,
 		getUnixTime = getUnixTimeGetter,
-		getTestId = function(s14: string) -- line: 196
-			-- upvalues: t2 (copy), p8 (copy), DomLocators (copy), getConversationTitle (copy), Signals (copy)
-			local v96 = t2
-			local v97 = v96[s14]
-
-			if v97 then
-				local testId = v97.testId
-
-				if testId ~= nil then
-					return testId
-				end
-			else
-				v97 = {}
-				v96[s14] = v97
-			end
-
-			local v99 = Signals.createComputed(function(p20) -- line: 197
-				-- upvalues: p8 (copy), s14 (copy), DomLocators (copy), getConversationTitle (copy)
-				local v126 = p8.getConversation(s14, p20)
-
-				if v126 == nil then
-					return nil
-				end
-
-				return DomLocators.chatLandingConversationEntry(v126.title or (getConversationTitle(v126) or ""))
-			end)
-
-			v97.testId = v99
-
-			return v99
-		end,
+		getTestId = getTestId,
 		getLocatorTitle = getLocatorTitleGetter
 	}
 end

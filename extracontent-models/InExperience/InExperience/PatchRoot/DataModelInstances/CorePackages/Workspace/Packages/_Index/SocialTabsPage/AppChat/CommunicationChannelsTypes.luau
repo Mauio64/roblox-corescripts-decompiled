@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local CommunicationChannelsTypes = require(Workspace.AppChat.AppChat.Components.EventReceivers.CommunicationChannelsTypes)
 
-return (require(_Workspace.AppChat.AppChat.Components.EventReceivers.CommunicationChannelsTypes))
+return CommunicationChannelsTypes

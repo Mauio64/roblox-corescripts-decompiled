@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagAXMISEnableMultiShopping) and game:DefineFastFlag("AXMISSmallUIChanges", false)
+local FFlagAXMISEnableMultiShopping = require(script.Parent.FFlagAXMISEnableMultiShopping)
+
+return FFlagAXMISEnableMultiShopping and game:DefineFastFlag("AXMISSmallUIChanges", false)

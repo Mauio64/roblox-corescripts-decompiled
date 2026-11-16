@@ -1,18 +1,14 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
+
 local getFFlagOverridePlayerVerifiedBadge = require(ExpChat.Flags.getFFlagOverridePlayerVerifiedBadge)
 local getFStringWhitelistVerifiedUserId = require(ExpChat.Flags.getFStringWhitelistVerifiedUserId)
 
-local function isPlayerVerified(p1) -- line: 16
-	-- upvalues: getFFlagOverridePlayerVerifiedBadge (copy), getFStringWhitelistVerifiedUserId (copy)
+local function isPlayerVerified(p)
 	if getFFlagOverridePlayerVerifiedBadge() then
 		return true
 	end
 
-	if tostring(p1.UserId) == getFStringWhitelistVerifiedUserId() then
-		return true
-	end
-
-	return p1.HasVerifiedBadge
+	return tostring(p.UserId) == getFStringWhitelistVerifiedUserId() or p.HasVerifiedBadge
 end
 
 return isPlayerVerified

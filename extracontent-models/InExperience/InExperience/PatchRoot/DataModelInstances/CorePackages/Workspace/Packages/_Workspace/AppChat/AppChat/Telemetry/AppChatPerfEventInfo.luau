@@ -1,25 +1,16 @@
 local AppChat = script:FindFirstAncestor("AppChat")
+
 local AppChatPerfEvent = require(AppChat.Telemetry.AppChatPerfEvent)
 local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
-local t1 = {
-	ChatLandingTTI = {
-		baseName = "AppChat_TTI_ChatLanding",
-		page = "ChatLanding"
-	},
-	ChatConversationTTI = {
-		baseName = "AppChat_TTI_ChatConversation",
-		page = "ChatConversation"
-	},
-	MessageSendTTI = {
-		baseName = "AppChat_TTI_MessageSend",
-		page = "ChatConversation"
-	},
-	MessageReceiveTTI = {
-		baseName = "AppChat_TTI_MessageReceive",
-		page = "ChatConversation"
-	}
+
+local v = {
+	ChatLandingTTI = { baseName = "AppChat_TTI_ChatLanding", page = "ChatLanding" },
+	ChatConversationTTI = { baseName = "AppChat_TTI_ChatConversation", page = "ChatConversation" },
+	MessageSendTTI = { baseName = "AppChat_TTI_MessageSend", page = "ChatConversation" },
+	MessageReceiveTTI = { baseName = "AppChat_TTI_MessageReceive", page = "ChatConversation" }
 }
-local t2 = {
+
+local v2 = {
 	ScrollConversationList = {
 		name = "AppChat_Scroll_ConversationList",
 		parentTTI = AppChatPerfEvent.ChatLandingTTI
@@ -58,50 +49,54 @@ local t2 = {
 	}
 }
 
-return {
-	TTI_CATEGORY = "AppChat",
-	Events = AppChatPerfEvent,
-	isTTIEvent = function(p1) -- line: 104
-		-- upvalues: t1 (copy)
-		return t1[p1] ~= nil
-	end,
-	isIntervalEvent = function(p2) -- line: 108
-		-- upvalues: t2 (copy)
-		return t2[p2] ~= nil
-	end,
-	getTTIBaseName = function(p3) -- line: 116
-		-- upvalues: t1 (copy)
-		return t1[p3].baseName
-	end,
-	getTTIPage = function(p4) -- line: 120
-		-- upvalues: t1 (copy)
-		return t1[p4].page
-	end,
-	getTTICategory = function() -- line: 124
-		return "AppChat"
-	end,
-	buildTTIEventName = function(p5, p6, b1: boolean) -- line: 129
-		-- upvalues: t1 (copy), ChatPlacementContext (copy)
-		return t1[p5].baseName .. (not ChatPlacementContext.isPlacementInExperience(p6) and "_UA" or "_InExp") .. (not b1 and "_Warm" or "_Cold")
-	end,
-	getIntervalName = function(p7) -- line: 145
-		-- upvalues: t2 (copy)
-		return t2[p7].name
-	end,
-	getParentTTI = function(p8) -- line: 149
-		-- upvalues: t2 (copy)
-		return t2[p8].parentTTI
-	end,
-	getIntervalsForTTI = function(p9) -- line: 154
-		-- upvalues: t2 (copy)
-		local t3 = {}
+local function getTTIBaseName(p) -- 1 equivalent call inferred from this helper
+	return v[p].baseName
+end
 
-		for v17, v18 in t2 do
-			if p9 == v18.parentTTI then
-				table.insert(t3, v17)
-			end
+local AppChatPerfEventInfo = {}
+AppChatPerfEventInfo.Events = AppChatPerfEvent
+AppChatPerfEventInfo.TTI_CATEGORY = "AppChat"
+
+function AppChatPerfEventInfo.isTTIEvent(p): boolean
+	return v[p] ~= nil
+end
+
+function AppChatPerfEventInfo.isIntervalEvent(p): boolean
+	return v2[p] ~= nil
+end
+
+AppChatPerfEventInfo.getTTIBaseName = getTTIBaseName
+
+function AppChatPerfEventInfo.getTTIPage(p)
+	return v[p].page
+end
+
+function AppChatPerfEventInfo.getTTICategory(): string
+	return "AppChat"
+end
+
+function AppChatPerfEventInfo.buildTTIEventName(p, p2, flag: boolean)
+	return getTTIBaseName(p) .. (ChatPlacementContext.isPlacementInExperience(p2) and "_InExp" or "_UA") .. (flag and "_Cold" or "_Warm") -- inferred equivalent call
+end
+
+function AppChatPerfEventInfo.getIntervalName(p)
+	return v2[p].name
+end
+
+function AppChatPerfEventInfo.getParentTTI(p)
+	return v2[p].parentTTI
+end
+
+function AppChatPerfEventInfo.getIntervalsForTTI(p)
+	local intervalsForTTI = {}
+
+	for k, v3 in v2 do
+		if v3.parentTTI == p then
+			table.insert(intervalsForTTI, k)
 		end
-
-		return t3
 	end
-}
+
+	return intervalsForTTI
+end
+
+return AppChatPerfEventInfo

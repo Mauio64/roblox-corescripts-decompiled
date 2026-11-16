@@ -1,163 +1,161 @@
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local Localization = require(Parent.Localization)
-local Localization2 = require(Parent.RobloxAppLocales).Localization
+local parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local localization = RobloxAppLocales.Localization
 local useLocalization = Localization.Hooks.useLocalization
 local useTokens = Foundation.Hooks.useTokens
 
-require(Parent.AvatarExperienceCommon)
+require(parent.AvatarExperienceCommon)
 
 local FFlagAXDurablesForMIS = AvatarExperienceFlags.FFlagAXDurablesForMIS
 
-local function getPermanentPrice(p1) -- line: 52
-	for _, v15 in p1 do
-		if v15.days == 0 then
-			return v15.price
+local function getPermanentPrice(items)
+	for _, item in items do
+		if item.days == 0 then
+			return item.price
 		end
 	end
 
 	return 0
 end
-local function useWearTimeSelectedOptionViewModel(t1: {[any]: any}) -- line: 62
-	-- upvalues: useTokens (copy), React (copy), Localization2 (copy), LocalizationService (copy), FFlagAXDurablesForMIS (copy), useLocalization (copy)
-	local v17 = useTokens()
-	local v18 = React.useMemo(function() -- line: 65
-		-- upvalues: Localization2 (copy), LocalizationService (copy)
-		return Localization2.new(LocalizationService.RobloxLocaleId)
+
+local function useWearTimeSelectedOptionViewModel(data)
+	local tokens = useTokens()
+
+	local localization2 = React.useMemo(function()
+		return localization.new(LocalizationService.RobloxLocaleId)
 	end, {})
-	local v19, v20 = React.useState(nil)
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: FFlagAXDurablesForMIS (copy), t1 (copy), v20 (copy)
-		if FFlagAXDurablesForMIS and t1.selectedTimedOptionIndexInReducer ~= nil then
-			v20(t1.selectedTimedOptionIndexInReducer)
+	local state, setState = React.useState(nil)
 
+	local useEffect = React.useEffect
+	local function fn()
+		if FFlagAXDurablesForMIS and data.selectedTimedOptionIndexInReducer ~= nil then
+			setState(data.selectedTimedOptionIndexInReducer)
 			return
 		end
 
-		for v35, v36 in t1.options do
-			if v36.selected then
-				v20(v35)
-
-				return
+		for k, option in data.options do
+			if option.selected then
+				setState(k)
+				break
 			end
 		end
-	end, {
-		t1.options,
-		if not FFlagAXDurablesForMIS then nil else t1.selectedTimedOptionIndexInReducer
-	})
+	end
+	local options = data.options
+	local v
 
-	local v21 = if not v19 then nil else t1.options[v19]
-	local v22 = not v21 and 0 or v21.days
-	local v23 = useLocalization({
+	if FFlagAXDurablesForMIS then
+		v = data.selectedTimedOptionIndexInReducer
+	end
+
+	useEffect(fn, { options, v })
+	local selectedOption
+
+	if state then
+		selectedOption = data.options[state]
+	end
+
+	local v2 = not selectedOption and 0 or selectedOption.days
+	local localizedText = useLocalization({
 		infinite = "Feature.Durables.ItemDetails.WearTimeOptions.Button.Infinite",
 		xDay = {
 			"Feature.Durables.BottomBar.RentalDuration",
-			num = v22
+			num = v2
 		},
 		xDays = {
 			"Feature.Durables.BottomBar.RentalDurationPlural",
-			num = v22
+			num = v2
 		},
 		xDayList = {
 			"Feature.Durables.ItemDetails.WearTimeOptions.Button.XDay",
-			num = v22
+			num = v2
 		},
 		xDaysList = {
 			"Feature.Durables.ItemDetails.WearTimeOptions.Button.XDays",
-			num = v22
+			num = v2
 		}
 	})
-	local v24, v25 = React.useState(false)
-	local v26 = React.useRef(nil)
-	local price, g30
 
-	if v21 then
-		price = v21.price
+	local state2, setState2 = React.useState(false)
+	local ref = React.useRef(nil)
+	local price
+
+	if selectedOption then
+		price = selectedOption.price
 	else
-		g30 = nil
-		price = nil
+		local flag = true
 
-		for _, v29 in t1.options do
-			if v29.days == 0 then
-				price = v29.price
-				g30 = true
-			end
-
-			if g30 then
+		for _, option in data.options do
+			if option.days == 0 then
+				price = option.price
+				flag = false
 				break
 			end
 		end
 
-		if not g30 then
+		if flag then
 			price = 0
 		end
 	end
 
-	g30 = false
+	local subLabelText, listLabelText
 
-	local infinite, infinite2
-
-	if v22 == 0 then
-		infinite = v23.infinite
-		infinite2 = v23.infinite
-	elseif v22 == 1 then
-		infinite = v23.xDay
-		infinite2 = v23.xDayList
+	if v2 == 0 then
+		subLabelText = localizedText.infinite
+		listLabelText = localizedText.infinite
+	elseif v2 == 1 then
+		subLabelText = localizedText.xDay
+		listLabelText = localizedText.xDayList
 	else
-		infinite = v23.xDays
-		infinite2 = v23.xDaysList
+		subLabelText = localizedText.xDays
+		listLabelText = localizedText.xDaysList
 	end
 
-	local v33 = React.useCallback(function(n1: number) -- line: 113
-		-- upvalues: v20 (copy), t1 (copy), v25 (copy)
-		v20(n1)
-
-		if t1.onOptionActivated then
-			t1.onOptionActivated(n1)
-		end
-
-		v25(false)
-	end, { t1.onOptionActivated })
-	local v34 = React.useMemo(function() -- line: 121
-		-- upvalues: t1 (copy), v19 (copy)
-		local t2 = {}
-
-		for v39, v40 in t1.options do
-			t2[v39] = {
-				days = v40.days,
-				price = v40.price,
-				selected = v39 == v19,
-				discountInformation = v40.discountInformation
-			}
-		end
-
-		return t2
-	end, {
-		t1.options,
-		v19
-	})
-
 	return {
-		tokens = v17,
-		localization = v18,
-		selectedIndex = v19,
-		setSelectedIndex = v20,
-		selectedOption = v21,
-		days = v22,
-		localizedText = v23,
-		isOpen = v24,
-		setIsOpen = v25,
-		anchorRef = v26,
+		tokens = tokens,
+		localization = localization2,
+		selectedIndex = state,
+		setSelectedIndex = setState,
+		selectedOption = selectedOption,
+		days = v2,
+		localizedText = localizedText,
+		isOpen = state2,
+		setIsOpen = setState2,
+		anchorRef = ref,
 		price = price,
-		subLabelText = infinite,
-		listLabelText = infinite2,
-		handleOptionActivated = v33,
-		updatedOptions = v34,
-		disableOptionSelection = t1.disableOptionSelection
+		subLabelText = subLabelText,
+		listLabelText = listLabelText,
+		handleOptionActivated = React.useCallback(function(p: number)
+			setState(p)
+
+			if data.onOptionActivated then
+				data.onOptionActivated(p)
+			end
+
+			setState2(false)
+		end, { data.onOptionActivated }),
+		updatedOptions = React.useMemo(function()
+			local result = {}
+
+			for k, option in data.options do
+				result[k] = {
+					days = option.days,
+					price = option.price,
+					selected = k == state,
+					discountInformation = option.discountInformation
+				}
+			end
+
+			return result
+		end, { data.options, state }),
+		disableOptionSelection = data.disableOptionSelection
 	}
 end
 

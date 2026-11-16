@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent
-local RequestType = require(ParentParent.Enums.RequestType)
+local parent = script.Parent.Parent
 
-return function(p1) -- line: 5
-	-- upvalues: RequestType (copy)
-	return p1.promptRequest.requestType ~= RequestType.None
+local RequestType = require(parent.Enums.RequestType)
+
+return function(p): boolean
+	return p.promptRequest.requestType ~= RequestType.None
 end

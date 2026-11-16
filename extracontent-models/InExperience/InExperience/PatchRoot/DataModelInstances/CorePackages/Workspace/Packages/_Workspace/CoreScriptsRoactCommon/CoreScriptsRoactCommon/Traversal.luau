@@ -6,9 +6,6 @@ local HistoryPage = require(script.HistoryPage)
 local LocalTraversalHistory = require(script.LocalTraversalHistory)
 local TeleportBackButton = require(script.TeleportBackButton)
 local TeleportLeaveConfirmation = require(script.TeleportLeaveConfirmation)
-local TraversalTelemetry = require(script.TraversalTelemetry)
-local useHistoryItems = require(script.Parent.Hooks.useHistoryItems)
-
 return {
 	Constants = Constants,
 	Flags = Flags,
@@ -16,8 +13,8 @@ return {
 	HistoryMenu = HistoryMenu,
 	HistoryPage = HistoryPage,
 	LocalTraversalHistory = LocalTraversalHistory,
-	TraversalTelemetry = TraversalTelemetry,
+	TraversalTelemetry = require(script.TraversalTelemetry),
 	TeleportBackButton = TeleportBackButton,
 	TeleportLeaveConfirmation = TeleportLeaveConfirmation,
-	useHistoryItems = useHistoryItems
+	useHistoryItems = require(script.Parent.Hooks.useHistoryItems)
 }

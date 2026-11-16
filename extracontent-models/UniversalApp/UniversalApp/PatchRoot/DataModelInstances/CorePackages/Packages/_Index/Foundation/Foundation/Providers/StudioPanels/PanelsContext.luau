@@ -1,10 +1,10 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
+
+local React = require(parent.React)
 
 require(script.Parent.Types)
 
-local v3 = React.createContext(nil)
+local context = React.createContext(nil)
+context.displayName = "PanelsContext"
 
-v3.displayName = "PanelsContext"
-
-return v3
+return context

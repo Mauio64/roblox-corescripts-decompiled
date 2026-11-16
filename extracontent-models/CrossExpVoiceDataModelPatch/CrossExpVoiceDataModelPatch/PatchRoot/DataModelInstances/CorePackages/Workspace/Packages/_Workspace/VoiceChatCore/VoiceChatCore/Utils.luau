@@ -1,123 +1,120 @@
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
-local t1 = {}
 
-t1.__index = t1
+local class = {}
 
-function t1.new() -- line: 18
-	-- upvalues: t1 (copy)
-	return (setmetatable({
-		listeners = {}
-	}, t1))
+class.__index = class
+
+function class.new()
+	return (setmetatable({ listeners = {} }, class))
 end
-function t1.addListener(t2: {[any]: any}, s1: string, p1: ((...any) -> ...any)) -- line: 26
-	if not t2.listeners[s1] then
-		t2.listeners[s1] = {}
+
+function class.addListener(p, p2: string, callback)
+	if not p.listeners[p2] then
+		p.listeners[p2] = {}
 	end
 
-	table.insert(t2.listeners[s1], p1)
+	table.insert(p.listeners[p2], callback)
 end
-function t1.removeListener(t3: {[any]: any}, s2: string, p2: ((...any) -> ...any)) -- line: 33
-	local v10 = t3.listeners[s2]
 
-	if not v10 then
+function class.removeListener(p, p2: string, callback)
+	local listener = p.listeners[p2]
+
+	if not listener then
 		return
 	end
 
-	local v11 = table.find(v10, p2)
+	local index = table.find(listener, callback)
 
-	if v11 then
-		table.remove(v10, v11)
+	if index then
+		table.remove(listener, index)
 
-		if #v10 == 0 then
-			t3.listeners[s2] = nil
+		if #listener == 0 then
+			p.listeners[p2] = nil
 		end
 	end
 end
-function t1.removeAllListeners(p3) -- line: 48
-	table.clear(p3.listeners)
-end
-function t1.emit(t4: {[any]: any}, s3: string, ...) -- line: 52
-	local v15 = t4.listeners[s3]
 
-	if not v15 then
+function class.removeAllListeners(p)
+	table.clear(p.listeners)
+end
+
+function class.emit(p, p2: string, ...)
+	local listener = p.listeners[p2]
+
+	if not listener then
 		return
 	end
 
-	for _, v17 in (table.clone(v15)) do
-		pcall(function(...) -- line: 60
-			-- upvalues: v17 (copy)
-			v17(...)
+	local clone = table.clone(listener)
 
+	for _, v in clone do
+		pcall(function(...): nil
+			v(...)
 			return nil
 		end, ...)
 	end
 end
 
-return {
-	jsonDecode = function(p4) -- line: 67
-		-- upvalues: HttpService (copy)
-		local ok, result = pcall(function() -- line: 68
-			-- upvalues: HttpService (copy), p4 (copy)
-			return HttpService:JSONDecode(p4)
-		end)
+local Utils = {}
 
-		if ok and result then
-			return result
-		end
+function Utils.jsonDecode(json)
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(json)
+	end)
 
-		return {}
-	end,
-	EventEmitter = t1,
-	shorten = function(p5) -- line: 78
-		return "..." .. string.sub(tostring(p5), -4)
-	end,
-	avoidEmitting = function(p6) -- line: 82
-		local function prune(p7) -- line: 83
-			if p7:HasTag("RbxDefaultVoiceEmitter") then
-				task.defer(function() -- line: 86
-					-- upvalues: p7 (copy)
-					p7:Destroy()
-				end)
-			end
-		end
+	if success and result then
+		return result
+	end
 
-		p6.DescendantAdded:Connect(prune)
+	return {}
+end
 
-		for _, descendant in p6:GetDescendants() do
-			if descendant:HasTag("RbxDefaultVoiceEmitter") then
-				task.defer(function() -- line: 86
-					-- upvalues: descendant (copy)
-					descendant:Destroy()
-				end)
-			end
-		end
-	end,
-	destroyDefaultEmitter = function(p8) -- line: 97
-		-- upvalues: Players (copy)
-		local LocalPlayer = Players.LocalPlayer
+Utils.EventEmitter = class
 
-		if not LocalPlayer then
-			return
-		end
+function Utils.shorten(p)
+	return "..." .. string.sub(tostring(p), -4)
+end
 
-		local Character = LocalPlayer.Character
-
-		if not Character then
-			return
-		end
-
-		if p8:IsDescendantOf(Character) then
-			task.defer(function() -- line: 108
-				-- upvalues: p8 (copy)
-				p8:Destroy()
+function Utils.avoidEmitting(folder)
+	local function prune(descendant) -- 1 equivalent call inferred from this helper
+		if descendant:HasTag("RbxDefaultVoiceEmitter") then
+			task.defer(function()
+				descendant:Destroy()
 			end)
 		end
-	end,
-	bind = function(p9, p10) -- line: 114
-		return function(...) -- line: 115
-			-- upvalues: p9 (copy), p10 (copy)
-			return p9[p10](p9, ...)
-		end
 	end
-}
+	folder.DescendantAdded:Connect(prune)
+
+	for _, descendant in folder:GetDescendants() do
+		prune(descendant) -- inferred equivalent call
+	end
+end
+
+function Utils.destroyDefaultEmitter(instance)
+	local localPlayer = Players.LocalPlayer
+
+	if not localPlayer then
+		return
+	end
+
+	local character = localPlayer.Character
+
+	if not character then
+		return
+	end
+
+	if instance:IsDescendantOf(character) then
+		task.defer(function()
+			instance:Destroy()
+		end)
+	end
+end
+
+function Utils.bind(p, p2)
+	return function(...)
+		return p[p2](p, ...)
+	end
+end
+
+return Utils

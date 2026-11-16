@@ -1,1 +1,3 @@
-return (require(script.DialogActions))
+local DialogActions = require(script.DialogActions)
+
+return DialogActions

@@ -1,38 +1,35 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCageUV = require(ParentParent.flags.getFFlagUGCValidateMigrateCageUV)
-local getFIntUniqueUVTolerance = require(ParentParent.flags.getFIntUniqueUVTolerance)
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+
+local getFIntUniqueUVTolerance = require(parent.flags.getFIntUniqueUVTolerance)
 
 return {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
-	},
+	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS, ValidationEnums.UploadCategory.DYNAMIC_HEAD },
 	requiredData = { ValidationEnums.SharedDataMember.outerCagesData },
 	conditionalData = {},
-	fflag = getFFlagUGCValidateMigrateCageUV,
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 38
-		-- upvalues: Constants (copy), UGCValidationService (copy), getFIntUniqueUVTolerance (copy), ErrorSourceStrings (copy)
-		for v10, v11 in p2.outerCagesData do
-			local v12 = Constants.WRAP_TARGET_CAGE_MESH_UV_COUNTS[v10]
+	run = function(object, p)
+		for k, v in p.outerCagesData do
+			local v2 = Constants.WRAP_TARGET_CAGE_MESH_UV_COUNTS[k]
 
-			if v12 then
-				local v13 = UGCValidationService:CalculateEditableMeshUniqueUVCount(v11.editable)
+			if not v2 then
+				continue
+			end
 
-				if math.abs(v13 - v12) > getFIntUniqueUVTolerance() then
-					p1:fail(ErrorSourceStrings.Keys.CageUV_IncorrectUVCount, {
-						partName = v10,
-						requiredUVCount = tostring(v12),
-						actualUVCount = tostring(v13)
-					})
-				end
+			local editableMeshUniqueUVCount = UGCValidationService:CalculateEditableMeshUniqueUVCount(v.editable)
+
+			if math.abs(editableMeshUniqueUVCount - v2) > getFIntUniqueUVTolerance() then
+				object:fail(ErrorSourceStrings.Keys.CageUV_IncorrectUVCount, {
+					partName = k,
+					requiredUVCount = tostring(v2),
+					actualUVCount = tostring(editableMeshUniqueUVCount)
+				})
 			end
 		end
 	end

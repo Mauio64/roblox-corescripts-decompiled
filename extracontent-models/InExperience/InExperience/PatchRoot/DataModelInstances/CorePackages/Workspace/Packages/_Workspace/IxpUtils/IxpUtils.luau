@@ -1,1 +1,3 @@
-return (require(script.IXPUtils))
+local IXPUtils = require(script.IXPUtils)
+
+return IXPUtils

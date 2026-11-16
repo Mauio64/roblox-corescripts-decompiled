@@ -1,22 +1,31 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local NavigationRodux = require(Parent.NavigationRodux)
-local FFlagAppIaHomeSubTab = require(Parent.SharedFlags).FFlagAppIaHomeSubTab
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
 
-return function(p1, p2, p3) -- line: 13
-	-- upvalues: AppPage (copy), FFlagAppIaHomeSubTab (copy), NavigationRodux (copy)
-	local v8 = p1 == AppPage.Home or (p1 == AppPage.Games or FFlagAppIaHomeSubTab and p1 == NavigationRodux.Constants.HomeContainerName)
-	local v9 = p2 == AppPage.Home or p2 == AppPage.Games
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local NavigationRodux = require(parent.NavigationRodux)
 
-	if not v8 and not v9 then
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppIaHomeSubTab = SharedFlags.FFlagAppIaHomeSubTab
+
+return function(p, p2, p3)
+	local v = p == AppPage.Home
+		or p == AppPage.Games
+		or FFlagAppIaHomeSubTab and p == NavigationRodux.Constants.HomeContainerName
+	local v2 = p2 == AppPage.Home or p2 == AppPage.Games
+
+	if not (v or v2) then
 		return false
 	end
 
-	if not v8 or p2 ~= p1 then
+	if not v or p2 ~= p then
 		return true
 	end
 
-	local v10 = v8 and p2 == AppPage.GameDetail
+	local v3 = v and p2 == AppPage.GameDetail
 
-	return (v9 or v10) and not p3
+	if v2 or v3 then
+		return not p3
+	end
+
+	return v3
 end

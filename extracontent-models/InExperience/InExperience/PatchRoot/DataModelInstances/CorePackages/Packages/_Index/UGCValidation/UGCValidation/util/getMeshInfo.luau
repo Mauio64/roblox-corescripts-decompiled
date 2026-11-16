@@ -1,50 +1,46 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+local Constants = require(parent.Constants)
 
-local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
+require(parent.util.Types)
+local getEditableMeshFromContext = require(parent.util.getEditableMeshFromContext)
 
-local function getContent(p1, s1: string) -- line: 12
-	-- upvalues: Constants (copy)
-	if s1 == Constants.MESH_CONTENT_TYPE.RENDER_MESH then
-		assert(p1:IsA("MeshPart"), "Only MESH_TYPE.RENDER_MESH is only supported for MeshPart")
-
-		return p1.MeshId
+local function getContent(instance, p: string)
+	if p == Constants.MESH_CONTENT_TYPE.RENDER_MESH then
+		assert(instance:IsA("MeshPart"), "Only MESH_TYPE.RENDER_MESH is only supported for MeshPart")
+		return instance.MeshId
 	end
 
-	if s1 == Constants.MESH_CONTENT_TYPE.OUTER_CAGE then
-		assert(p1:IsA("BaseWrap"), "Only MESH_TYPE.OUTER_CAGE is only supported for BaseWrap")
-
-		return p1.CageMeshId
+	if p == Constants.MESH_CONTENT_TYPE.OUTER_CAGE then
+		assert(instance:IsA("BaseWrap"), "Only MESH_TYPE.OUTER_CAGE is only supported for BaseWrap")
+		return instance.CageMeshId
 	end
 
-	if s1 == Constants.MESH_CONTENT_TYPE.INNER_CAGE then
-		assert(p1:IsA("WrapLayer"), "Only MESH_TYPE.INNER_CAGE is only supported for WrapLayer")
-
-		return p1.ReferenceMeshId
+	if p == Constants.MESH_CONTENT_TYPE.INNER_CAGE then
+		assert(instance:IsA("WrapLayer"), "Only MESH_TYPE.INNER_CAGE is only supported for WrapLayer")
+		return instance.ReferenceMeshId
 	end
 
 	error("No valid mesh content type was provided")
 end
-local function getMeshInfo(p2, s2: string, p3) -- line: 27
-	-- upvalues: getContent (copy), Constants (copy), getEditableMeshFromContext (copy)
-	local v11 = getContent(p2, s2)
-	local FullName = p2:GetFullName()
-	local v13 = Constants.MESH_CONTENT_TYPE_TO_FIELD_NAME[s2]
-	local v14, v15 = getEditableMeshFromContext(p2, v13, p3)
 
-	if not v14 then
-		return false, { string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", FullName) }
+local function getMeshInfo(instance, p: string, p2)
+	local content = getContent(instance, p)
+	local fullName = instance:GetFullName()
+	local fieldName = Constants.MESH_CONTENT_TYPE_TO_FIELD_NAME[p]
+	local editableMeshFromContext, editableMesh = getEditableMeshFromContext(instance, fieldName, p2)
+
+	if editableMeshFromContext then
+		return true, nil, {
+			fullName = fullName,
+			fieldName = fieldName,
+			contentId = content,
+			context = instance.ClassName,
+			editableMesh = editableMesh
+		}
 	end
 
-	return true, nil, {
-		fullName = FullName,
-		fieldName = v13,
-		contentId = v11,
-		context = p2.ClassName,
-		editableMesh = v15
-	}
+	return false, { string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", fullName) }
 end
 
 return getMeshInfo

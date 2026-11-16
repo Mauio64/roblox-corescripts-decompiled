@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index["Util-31ab8d40-0.7.0"].Util))
+local Util = require(index.Util.Util)
+
+return Util

@@ -1,4 +1,5 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
 local createGameInfoStore = require(script.GameInfo.createGameInfoStore)
 local createFavoritesStore = require(script.Favorites.createFavoritesStore)
 local createFollowingsStore = require(script.Followings.createFollowingsStore)
@@ -9,37 +10,38 @@ local createAgeRecommendationStore = require(script.AgeRecommendations.createAge
 local createGameMediaStore = require(script.GameMedia.createGameMediaStore)
 local createGameIconStore = require(script.GameIcon.createGameIconStore)
 local GameIconSize = require(script.GameIcon.GameIconSize)
+
 local getFavoritesStore = require(script.Favorites.getFavoritesStore)
 local getGameInfoStore = require(script.GameInfo.getGameInfoStore)
 local getGameIconStore = require(script.GameIcon.getGameIconStore)
 local getFollowingsStore = require(script.Followings.getFollowingsStore)
 local getVotesStore = require(script.Votes.getVotesStore)
 local getUserVoteFeedbackMetadataStore = require(script.Votes.getUserVoteFeedbackMetadataStore)
+
 local getAgeRecommendationStore = require(script.AgeRecommendations.getAgeRecommendationStore)
 local getPlayabilityStore = require(script.Playability.getPlayabilityStore)
 local getGameMediaStore = require(script.GameMedia.getGameMediaStore)
 local getConnectionsPlayedStore = require(script.ConnectionsPlayed.getConnectionsPlayedStore)
 local createConnectionsPlayedStore = require(script.ConnectionsPlayed.createConnectionsPlayedStore)
+
 local GamePass = require(script.GamePass)
 local createGamePassStore = GamePass.createGamePassStore
 local getGamePassStore = GamePass.getGamePassStore
+
 local GameDeveloperProduct = require(script.GameDeveloperProduct)
 local createGameDeveloperProductStore = GameDeveloperProduct.createGameDeveloperProductStore
 local getGameDeveloperProductStore = GameDeveloperProduct.getGameDeveloperProductStore
+
 local GameSubscription = require(script.GameSubscription)
 local createGameSubscriptionStore = GameSubscription.createGameSubscriptionStore
 local getGameSubscriptionStore = GameSubscription.getGameSubscriptionStore
 
 require(script.Followings.FollowingsStoreTypes)
 require(script.Votes.VotesStoreTypes)
-
 local VotesUtils = require(script.Votes.VotesUtils)
-
 require(script.Favorites.FavoritesStoreTypes)
 require(script.AgeRecommendations.AgeRecommendationStoreTypes)
-
 local AgeRecommendationUtils = require(script.AgeRecommendations.AgeRecommendationUtils)
-
 require(script.GameInfo.GameInfoStoreTypes)
 require(script.GameIcon.GameIconStoreTypes)
 require(script.Playability.PlayabilityStoreTypes)
@@ -49,7 +51,16 @@ require(script.GamePass.GamePassStoreTypes)
 require(script.GameDeveloperProduct.GameDeveloperProductStoreTypes)
 require(script.GameSubscription.GameSubscriptionStoreTypes)
 
-local FFlagLuaAppDataHydrationConnectionsPlayedStore = require(Parent.SharedFlags).FFlagLuaAppDataHydrationConnectionsPlayedStore
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDataHydrationConnectionsPlayedStore = SharedFlags.FFlagLuaAppDataHydrationConnectionsPlayedStore
+
+if not FFlagLuaAppDataHydrationConnectionsPlayedStore then
+	createConnectionsPlayedStore = nil
+end
+
+if not FFlagLuaAppDataHydrationConnectionsPlayedStore then
+	getConnectionsPlayedStore = nil
+end
 
 return {
 	createGamePassStore = createGamePassStore,
@@ -65,7 +76,7 @@ return {
 	createPlayabilityStore = createPlayabilityStore,
 	createVotesStore = createVotesStore,
 	createUserVoteFeedbackMetadataStore = createUserVoteFeedbackMetadataStore,
-	createConnectionsPlayedStore = if not FFlagLuaAppDataHydrationConnectionsPlayedStore then nil else createConnectionsPlayedStore,
+	createConnectionsPlayedStore = createConnectionsPlayedStore,
 	getFavoritesStore = getFavoritesStore,
 	getAgeRecommendationStore = getAgeRecommendationStore,
 	getFollowingsStore = getFollowingsStore,
@@ -75,7 +86,7 @@ return {
 	getUserVoteFeedbackMetadataStore = getUserVoteFeedbackMetadataStore,
 	VotesUtils = VotesUtils,
 	AgeRecommendationUtils = AgeRecommendationUtils,
-	getConnectionsPlayedStore = if not FFlagLuaAppDataHydrationConnectionsPlayedStore then nil else getConnectionsPlayedStore,
+	getConnectionsPlayedStore = getConnectionsPlayedStore,
 	createGameMediaStore = createGameMediaStore,
 	getGameMediaStore = getGameMediaStore,
 	createGameIconStore = createGameIconStore,

@@ -1,190 +1,211 @@
-local Parent = script:FindFirstAncestor("HttpClient").Parent
-local mutedError = require(Parent.Loggers).mutedError
+local parent = script:FindFirstAncestor("HttpClient").Parent
+
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
 
 require(script.Parent.types)
+local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
 
-local t1 = {
-	maxRetryCount = 4,
-	retryJitterMinMs = 0,
-	retryJitterMaxMs = 4000
-}
-local t2 = {
-	[408] = true,
-	[503] = true,
-	[504] = true
-}
+local _ = { maxRetryCount = 4, retryJitterMinMs = 0, retryJitterMaxMs = 4000 }
 
-local function backoffSeconds(n1: number, n2: number, n3: number) -- line: 16
-	return (n2 + math.random() * (n3 - n2)) * math.pow(2, n1 - 1) / 1000
+local v = { [408] = true, [503] = true, [504] = true }
+
+local function backoffSeconds(count: number, p: number, p2: number) -- 1 equivalent call inferred from this helper
+	return (p + math.random() * (p2 - p)) * math.pow(2, count - 1) / 1000
 end
-local function shouldRetry(p1, t3: {[any]: any}) -- line: 20
-	if t3[p1.statusCode] then
+
+local function shouldRetry(data, retryOnStatuses, retryOnHttpErrors)
+	if FFlagHttpClientRetryExtensions then
+		if
+			data.wasTransportFailure and retryOnHttpErrors == nil
+			or retryOnHttpErrors ~= nil
+			and data.httpError ~= nil
+			and data.httpError ~= Enum.HttpError.OK
+			and retryOnHttpErrors[data.httpError]
+		then
+			return true, nil
+		end
+	end
+
+	if retryOnStatuses[data.statusCode] then
 		return true, nil
 	end
 
-	if p1.statusCode == 429 and p1.headers ~= nil then
-		local num = tonumber(p1.headers["retry-after"])
+	if data.statusCode == 429 and data.headers ~= nil then
+		local retryafter = tonumber(data.headers["retry-after"])
 
-		if num ~= nil and num <= 16 then
-			return true, num
+		if retryafter ~= nil and retryafter <= 16 then
+			return true, retryafter
 		end
 	end
 
 	return false, nil
 end
-local function withRetry(p2, p3) -- line: 33
-	-- upvalues: t1 (copy), t2 (copy), mutedError (copy)
-	local v16 = p3 or {}
-	local u17 = v16.maxRetryCount or t1.maxRetryCount
-	local u18 = v16.retryJitterMinMs or t1.retryJitterMinMs
-	local u19 = v16.retryJitterMaxMs or t1.retryJitterMaxMs
-	local v20 = v16.retryOnStatuses or t2
 
-	if u17 < 0 then
-		mutedError(`withRetry: maxRetryCount must be >= 0, got { u17 }; falling back to default`)
-		u17 = t1.maxRetryCount
+local function withRetry(p, options)
+	local v2 = options or {}
+	local v3 = v2.maxRetryCount or 4
+	local v4 = v2.retryJitterMinMs or 0
+	local v5 = v2.retryJitterMaxMs or 4000
+	local retryOnStatuses = v2.retryOnStatuses or v
+	local retryOnHttpErrors
+
+	if FFlagHttpClientRetryExtensions then
+		retryOnHttpErrors = v2.retryOnHttpErrors
+	else
+		retryOnHttpErrors = nil
 	end
 
-	if u19 <= u18 then
-		mutedError(`withRetry: retryJitterMinMs ({ u18 }) must be < retryJitterMaxMs ({ u19 }); falling back to default`)
-		u18 = t1.retryJitterMinMs
-		u19 = t1.retryJitterMaxMs
+	local retryBudgetSec
+
+	if FFlagHttpClientRetryExtensions then
+		retryBudgetSec = v2.retryBudgetSec
+	else
+		retryBudgetSec = nil
+	end
+
+	if v3 < 0 then
+		mutedError(`withRetry: maxRetryCount must be >= 0, got {v3}; falling back to default`)
+		v3 = 4
+	end
+
+	if v5 <= v4 then
+		mutedError(`withRetry: retryJitterMinMs ({v4}) must be < retryJitterMaxMs ({v5}); falling back to default`)
+		v4 = 0
+		v5 = 4000
+	end
+
+	if retryBudgetSec ~= nil and retryBudgetSec <= 0 then
+		mutedError(`withRetry: retryBudgetSec must be > 0, got {retryBudgetSec}; ignoring the budget`)
+		retryBudgetSec = nil
 	end
 
 	return {
-		request = function(p4, p5: ((...any) -> ...any)) -- line: 53
-			-- upvalues: p2 (copy), v20 (copy), u17 (ref), u18 (ref), u19 (ref)
-			local n4 = 0
-			local u24 = false
-			local u25 = nil
-			local u26 = nil
+		request = function(data, callback)
+			local count = 0
+			local lastTime
 
-			local function u27() -- line: 63
-				-- upvalues: u24 (ref), p4 (copy), n4 (ref), u25 (ref), p2 (copy), v20 (copy), u17 (ref), p5 (copy), u26 (ref), u18 (ref), u19 (ref), u27 (ref)
-				if u24 then
+			if FFlagHttpClientRetryExtensions then
+				lastTime = os.clock()
+			else
+				lastTime = nil
+			end
+
+			local flag = false
+			local v6 = false
+			local v7 = nil
+			local thread = nil
+
+			local onMessage = data.onMessage
+
+			local function handleMessage(p2: string)
+				v6 = true
+				onMessage(p2)
+			end
+
+			local function fn()
+				if flag then
 					return
 				end
 
-				local v28 = p4
+				local v8 = data
 
-				if n4 > 0 then
-					local v29 = if not p4.headers then {} else table.clone(p4.headers)
-
-					v29["X-Retry-Attempt"] = tostring(n4)
-					v28 = {
-						url = p4.url,
-						method = p4.method,
-						body = p4.body,
-						headers = v29
-					}
+				if FFlagHttpClientRetryExtensions and onMessage ~= nil then
+					v8 = table.clone(data)
+					v8.onMessage = handleMessage
 				end
 
-				u25 = p2.request(v28, function(p6, p7) -- line: 74
-					-- upvalues: u25 (ref), u24 (ref), v20 (copy), n4 (ref), u17 (ref), p5 (copy), u26 (ref), u18 (ref), u19 (ref), u27 (ref)
-					u25 = nil
+				if count > 0 then
+					local headers = not data.headers and {} or table.clone(data.headers)
+					headers["X-Retry-Attempt"] = tostring(count)
 
-					if u24 then
+					if FFlagHttpClientRetryExtensions then
+						if v8 == data then
+							v8 = table.clone(data)
+						end
+
+						v8.headers = headers
+					else
+						v8 = {
+							url = data.url,
+							method = data.method,
+							body = data.body,
+							headers = headers
+						}
+					end
+
+					if FFlagHttpClientRetryExtensions and v2.onRetry ~= nil then
+						v2.onRetry(count)
+					end
+				end
+
+				v7 = p.request(v8, function(p2, p3)
+					v7 = nil
+
+					if flag then
 						return
 					end
 
-					local v32 = nil
-					local g33 = nil
-					local g35 = nil
-					local v34 = nil
+					if FFlagHttpClientRetryExtensions and v6 then
+						callback(p2, p3)
+						return
+					end
 
-					if not p6 then
-						if n4 >= u17 then
-							p5(false, p7)
+					local v9 = nil
 
+					if p2 then
+						local v10
+						v10, v9 = shouldRetry(p3, retryOnStatuses, retryOnHttpErrors)
+
+						if not (v10 and count < v3) then
+							callback(true, p3)
 							return
 						end
-
-						g33 = true
+					elseif retryOnHttpErrors ~= nil or v3 <= count then
+						callback(false, p3)
+						return
 					end
 
-					if not g33 then
-						if v20[p7.statusCode] then
-							v34 = true
-							v32 = nil
-							g35 = true
-						end
+					count += 1
+
+					if not v9 then
+						v9 = backoffSeconds(count, v4, v5) -- inferred equivalent call
 					end
 
-					repeat
-						if g33 or (g35 or (g35 or p7.statusCode == 429 and p7.headers ~= nil)) then
-							if not g33 then
-								if not g35 then
-									if not g35 then
-										v32 = tonumber(p7.headers["retry-after"])
-									end
-								end
-							end
+					if
+						FFlagHttpClientRetryExtensions
+						and retryBudgetSec ~= nil
+						and lastTime ~= nil
+						and retryBudgetSec <= os.clock() - lastTime + v9
+					then
+						callback(p2, p3)
+						return
+					end
 
-							if g33 or (g35 or (g35 or v32 ~= nil and v32 <= 16)) then
-								if not g33 then
-									if not g35 then
-										if not g35 then
-											v34 = true
-										end
-									end
-
-									g35 = false
-
-									if not v34 or not (n4 < u17) then
-										p5(true, p7)
-
-										return
-									end
-								end
-
-								g33 = false
-								n4 += 1
-
-								local delay = task.delay
-
-								if not v32 then
-									local v37 = n4
-									local v38 = u18
-									local v39 = u19
-
-									v32 = (v38 + math.random() * (v39 - v38)) * math.pow(2, v37 - 1) / 1000
-								end
-
-								u26 = delay(v32, function() -- line: 95
-									-- upvalues: u26 (ref), u27 (ref)
-									u26 = nil
-									u27()
-								end)
-
-								return
-							end
-						end
-
-						v34 = false
-						v32 = nil
-						g35 = true
-					until not g35
+					thread = task.delay(v9, function()
+						thread = nil
+						fn()
+					end)
 				end)
 			end
 
-			u27()
+			fn()
 
-			return function() -- line: 104
-				-- upvalues: u24 (ref), u26 (ref), u25 (ref)
-				if u24 then
+			return function()
+				if flag then
 					return
 				end
 
-				u24 = true
+				flag = true
 
-				if u26 ~= nil then
-					task.cancel(u26)
-					u26 = nil
+				if thread ~= nil then
+					task.cancel(thread)
+					thread = nil
 				end
 
-				if u25 ~= nil then
-					u25()
-					u25 = nil
+				if v7 ~= nil then
+					v7()
+					v7 = nil
 				end
 			end
 		end

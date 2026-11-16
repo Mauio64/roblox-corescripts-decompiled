@@ -1,24 +1,12 @@
 return {
-	mock = function(n1: number?) -- line: 41
+	mock = function(value: number?)
 		return {
+			id = value or -1,
 			rootPlaceId = -2,
 			name = "Experience name",
 			description = "Experience description",
 			sourceName = "Source name",
 			sourceDescription = "Source description",
-			price = 0,
-			isGenreEnforced = false,
-			copyingAllowed = false,
-			playing = 0,
-			visits = 0,
-			maxPlayers = 10,
-			studioAccessToApisAllowed = false,
-			universeAvatarType = "MorphR6",
-			genre = "",
-			isAllGenre = false,
-			isFavoritedByUser = false,
-			favoritedCount = 0,
-			id = n1 or -1,
 			creator = {
 				id = -3,
 				name = "CreatorName",
@@ -26,10 +14,22 @@ return {
 				isRNVAccount = false,
 				hasVerifiedBadge = false
 			},
+			price = 0,
 			allowedGearGenres = {},
 			allowedGearCategories = {},
+			isGenreEnforced = false,
+			copyingAllowed = false,
+			playing = 0,
+			visits = 0,
+			maxPlayers = 10,
 			created = DateTime.now():ToIsoDate(),
-			updated = DateTime.now():ToIsoDate()
+			updated = DateTime.now():ToIsoDate(),
+			studioAccessToApisAllowed = false,
+			universeAvatarType = "MorphR6",
+			genre = "",
+			isAllGenre = false,
+			isFavoritedByUser = false,
+			favoritedCount = 0
 		}
 	end
 }

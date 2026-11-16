@@ -1,4 +1,3 @@
-return {
-	start = require(script.TextChannelWindowRoot).start,
-	["jest.config"] = script["jest.config"]
-}
+local TextChannelWindowRoot = require(script.TextChannelWindowRoot)
+
+return { start = TextChannelWindowRoot.start, ["jest.config"] = script["jest.config"] }

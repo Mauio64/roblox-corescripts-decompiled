@@ -1,88 +1,97 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
-local Badge = Foundation.Badge
 local Button = Foundation.Button
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local BadgeVariant = Foundation.Enums.BadgeVariant
-local BadgeShape = Foundation.Enums.BadgeShape
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
 
-local function VersionHistoryCard(t1: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), View (copy), FoundationText (copy), Badge (copy), BadgeShape (copy), BadgeVariant (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v17 = t1.testId or "version-history-card"
-	local v18 = React.useCallback(function() -- line: 32
-		-- upvalues: t1 (copy)
-		t1.onRestore()
-	end, { t1.onRestore })
+local function VersionHistoryCard(props)
+	local testId = props.testId or "version-history-card"
+	local restore = useLocalization({
+		autosaved = LocalizationStrings.VERSION_HISTORY_AUTOSAVED,
+		previouslyPublished = LocalizationStrings.VERSION_HISTORY_PREVIOUSLY_PUBLISHED,
+		published = LocalizationStrings.VERSION_HISTORY_PUBLISHED,
+		restore = LocalizationStrings.VERSION_HISTORY_RESTORE
+	}).restore
+	local onActivated = React.useCallback(function()
+		props.onRestore()
+	end, { props.onRestore })
 
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y stroke-standard stroke-default radius-large clip bg-surface-100",
-		LayoutOrder = t1.layoutOrder,
-		testId = v17
-	}, {
-		Content = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "col size-full-0 auto-y padding-x-large padding-bottom-large padding-top-medium"
-		}, {
-			Header = React.createElement(View, {
-				LayoutOrder = 1,
-				tag = "col gap-xxsmall size-full-0 auto-y"
-			}, {
-				Version = React.createElement(FoundationText, {
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = props.layoutOrder,
+			tag = "size-full-0 auto-y stroke-standard stroke-default radius-large clip bg-surface-100",
+			testId = testId
+		},
+		{
+			Content = React.createElement(
+				View,
+				{
 					LayoutOrder = 1,
-					tag = "size-full-0 auto-y padding-bottom-xxsmall text-caption-large text-align-x-left content-default",
-					Text = t1.versionLabel
-				}),
-				TitleRow = React.createElement(View, {
-					LayoutOrder = 2,
-					tag = "row align-y-center gap-small size-full-0 auto-y"
-				}, {
-					Title = React.createElement(FoundationText, {
-						LayoutOrder = 1,
-						tag = "shrink auto-xy text-title-medium text-wrap text-align-x-left text-truncate-none content-emphasis",
-						Text = t1.title
-					}),
-					Badge = if not t1.badgeText then nil else React.createElement(Badge, {
+					tag = "col size-full-0 auto-y padding-x-large padding-bottom-large padding-top-medium"
+				},
+				{
+					Header = React.createElement(
+						View,
+						{
+							LayoutOrder = 1,
+							tag = "col align-x-left align-y-top gap-xxsmall size-full-0 auto-y",
+							testId = `{testId}-header`
+						},
+						{
+							Version = React.createElement(Text, {
+								LayoutOrder = 1,
+								Text = props.versionLabel,
+								tag = "size-full-0 auto-y text-caption-medium text-align-x-left content-muted",
+								testId = `{testId}-version`
+							}),
+							Title = React.createElement(Text, {
+								LayoutOrder = 2,
+								Text = props.title,
+								tag = "size-full-0 auto-y text-title-medium text-wrap text-align-x-left content-emphasis",
+								testId = `{testId}-title`
+							})
+						}
+					),
+					Slot = React.createElement(View, {
 						LayoutOrder = 2,
-						text = t1.badgeText,
-						shape = BadgeShape.Box,
-						variant = BadgeVariant.Neutral
+						tag = "col gap-large size-full-0 auto-y"
+					}, {
+						Description = React.createElement(Text, {
+							LayoutOrder = 1,
+							Text = props.description,
+							tag = "size-full-0 auto-y text-body-small text-wrap text-align-x-left content-emphasis",
+							testId = `{testId}-description`
+						}),
+						RestoreRow = React.createElement(View, {
+							tag = "row size-full-0 auto-y",
+							LayoutOrder = 2
+						}, {
+							Restore = React.createElement(Button, {
+								text = restore,
+								size = InputSize.Small,
+								variant = ButtonVariant.Standard,
+								fillBehavior = FillBehavior.Fill,
+								isDisabled = props.isRestoreDisabled,
+								onActivated = onActivated,
+								testId = `{testId}-restore`
+							})
+						})
 					})
-				})
-			}),
-			Slot = React.createElement(View, {
-				LayoutOrder = 2,
-				tag = "col gap-large size-full-0 auto-y"
-			}, {
-				Description = React.createElement(FoundationText, {
-					LayoutOrder = 1,
-					tag = "size-full-0 auto-y text-body-small text-wrap text-align-x-left content-emphasis",
-					Text = t1.description,
-					testId = `{ v17 }-description`
-				}),
-				RestoreRow = React.createElement(View, {
-					tag = "row size-full-0 auto-y",
-					LayoutOrder = 2
-				}, {
-					Restore = React.createElement(Button, {
-						text = LocalizationStrings.VERSION_HISTORY_RESTORE,
-						size = InputSize.Small,
-						variant = ButtonVariant.Standard,
-						fillBehavior = FillBehavior.Fill,
-						isDisabled = t1.isRestoreDisabled,
-						onActivated = v18,
-						testId = `{ v17 }-restore`
-					})
-				})
-			})
-		})
-	})
+				}
+			)
+		}
+	)
 end
 
 return VersionHistoryCard

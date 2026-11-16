@@ -1,17 +1,15 @@
-local scriptParent = script.Parent
-local isArray = require(scriptParent.isArray)
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local isArray = require(parent.isArray)
+local parent2 = parent.Parent
+require(parent2.types)
 
-require(scriptParentParent.types)
-
-return function(p1) -- line: 8
-	-- upvalues: isArray (copy)
-	if _G.__DEV__ and not isArray(p1) then
-		error(string.format("Array.shift called on non-array %s", (typeof(p1))))
+return function(list)
+	if _G.__DEV__ and not isArray(list) then
+		error(string.format("Array.shift called on non-array %s", (typeof(list))))
 	end
 
-	if #p1 > 0 then
-		return table.remove(p1, 1)
+	if #list > 0 then
+		return table.remove(list, 1)
 	end
 
 	return nil

@@ -5,11 +5,13 @@ local RBXUnmuteCommand = require(script.RBXUnmuteCommand)
 local RBXVersionCommand = require(script.RBXVersionCommand)
 local RBXEmoteCommand = require(script.RBXEmoteCommand)
 local RBXTeamCommand = require(script.RBXTeamCommand)
-local RBXWhisperCommand = require(script.Whisper).RBXWhisperCommand
+local Whisper = require(script.Whisper)
+local RBXWhisperCommand = Whisper.RBXWhisperCommand
 local RBXClearCommand = require(script.RBXClearCommand)
 local RBXOnlineCommand = require(script.RBXOnlineCommand)
-local EngineFeature = game:GetEngineFeature("ExpChatLocalUserCountEnabled")
-local v12 = game:DefineFastFlag("ExpChatEnableVirtualLocalOnlineCommand", false)
+
+local engineFeature = game:GetEngineFeature("ExpChatLocalUserCountEnabled")
+local defineFastFlag = game:DefineFastFlag("ExpChatEnableVirtualLocalOnlineCommand", false)
 
 require(script.types)
 
@@ -25,15 +27,14 @@ return {
 		RBXWhisperCommand,
 		RBXClearCommand
 	},
-	getVirtualLocalEnabledCommands = function() -- line: 33
-		-- upvalues: EngineFeature (copy), v12 (copy), RBXOnlineCommand (copy)
-		local t1 = {}
+	getVirtualLocalEnabledCommands = function()
+		local RBXOnlineCommands = {}
 
-		if EngineFeature and v12 then
-			table.insert(t1, RBXOnlineCommand)
+		if engineFeature and defineFastFlag then
+			table.insert(RBXOnlineCommands, RBXOnlineCommand)
 		end
 
-		return t1
+		return RBXOnlineCommands
 	end,
 	autoCastCommand = require(script.autoCastCommand),
 	RBXClearCommand = RBXClearCommand,

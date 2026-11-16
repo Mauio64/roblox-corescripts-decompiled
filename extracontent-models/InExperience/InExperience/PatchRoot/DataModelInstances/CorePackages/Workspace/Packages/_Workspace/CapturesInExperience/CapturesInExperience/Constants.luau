@@ -1,6 +1,7 @@
 return {
 	AnalyticsSource = "Captures",
 	CapturesContext = "Captures",
+	CarouselDirection = { Left = "Left", Right = "Right" },
 	CapturesActiveLocalStorageKey = "ScreenshotsFeatureActiveUserIds",
 	DeleteWarningModalOptOutStorageKey = "CapturesDeleteModalOptOutUserIds",
 	LastFlashOccurrenceTsLocalStorageKey = "LastFlashOccurrenceTimestampMs",
@@ -13,20 +14,10 @@ return {
 	OverlayDisplayOrder = 5,
 	ReactName = "CapturesApp",
 	RoduxKey = "CapturesInExperience",
+	StatusCodes = { OK = 200, FORBIDDEN = 403 },
 	FlashTimeout = 1,
 	ToastDuration = 2,
-	CarouselDirection = {
-		Left = "Left",
-		Right = "Right"
-	},
-	StatusCodes = {
-		OK = 200,
-		FORBIDDEN = 403
-	},
-	ZIndex = {
-		Entrypoint = 1,
-		Toasts = 5
-	},
+	ZIndex = { Entrypoint = 1, Toasts = 5 },
 	AssetTypeIdToAccessoryTypeEnum = {
 		[tostring(Enum.AssetType.Hat.Value)] = Enum.AccessoryType.Hat,
 		[tostring(Enum.AssetType.HairAccessory.Value)] = Enum.AccessoryType.Hair,

@@ -1,12 +1,12 @@
-local NO_BACKGROUND_ASSET_ID = require(script.Parent.constants).NO_BACKGROUND_ASSET_ID
+local constants = require(script.Parent.constants)
+local NO_BACKGROUND_ASSET_ID = constants.NO_BACKGROUND_ASSET_ID
 
-local function normalizeBackgroundId(n1: number?) -- line: 5
-	-- upvalues: NO_BACKGROUND_ASSET_ID (copy)
-	if n1 == nil or n1 == NO_BACKGROUND_ASSET_ID then
+local function normalizeBackgroundId(p: number?)
+	if p == nil or p == NO_BACKGROUND_ASSET_ID then
 		return nil
 	end
 
-	return n1
+	return p
 end
 
 return normalizeBackgroundId

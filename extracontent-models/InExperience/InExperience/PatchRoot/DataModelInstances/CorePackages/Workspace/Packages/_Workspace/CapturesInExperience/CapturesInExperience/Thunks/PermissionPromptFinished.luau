@@ -1,15 +1,15 @@
-local ParentParent = script.Parent.Parent
-local CaptureService = game:GetService("CaptureService")
-local PromptDismissed = require(ParentParent.Actions.PromptDismissed)
+local parent = script.Parent.Parent
 
-return function(n1: number, b1: boolean) -- line: 7
-	-- upvalues: PromptDismissed (copy), CaptureService (copy)
-	return function(p1) -- line: 8
-		-- upvalues: PromptDismissed (copy), n1 (copy), CaptureService (copy), b1 (copy)
-		p1:dispatch(PromptDismissed(n1))
+local CaptureService = game:GetService("CaptureService")
+
+local PromptDismissed = require(parent.Actions.PromptDismissed)
+
+return function(p: number, flag: boolean)
+	return function(object)
+		object:dispatch(PromptDismissed(p))
 
 		if game:GetEngineFeature("CaptureServiceGalleryPermissionPrompt") then
-			CaptureService:OnCapturePermissionsPromptFinished(n1, b1)
+			CaptureService:OnCapturePermissionsPromptFinished(p, flag)
 		end
 	end
 end

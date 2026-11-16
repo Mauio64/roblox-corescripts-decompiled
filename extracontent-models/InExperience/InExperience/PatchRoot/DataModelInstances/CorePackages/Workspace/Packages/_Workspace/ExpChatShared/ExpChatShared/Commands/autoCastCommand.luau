@@ -1,14 +1,15 @@
 local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
-local ExpChatSharedParent = ExpChatShared.Parent
-local Promise = require(ExpChatSharedParent.Promise)
-local context = require(ExpChatShared.context)
-local Commands = script:FindFirstAncestor("Commands")
+local parent = ExpChatShared.Parent
+local Promise = require(parent.Promise)
 
+local context = require(ExpChatShared.context)
+
+local Commands = script:FindFirstAncestor("Commands")
 require(Commands.types)
 
-local function matchesAlias(t1: {[any]: any}, s1: string) -- line: 10
-	for _, v in pairs(t1) do
-		if string.find(s1, "^" .. v .. " ") then
+local function matchesAlias(items, value: string): boolean
+	for _, item in pairs(items) do
+		if string.find(value, "^" .. item .. " ") then
 			return true
 		end
 	end
@@ -16,19 +17,15 @@ local function matchesAlias(t1: {[any]: any}, s1: string) -- line: 10
 	return false
 end
 
-return function(p1, n1: number, s2: string) -- line: 20
-	-- upvalues: Promise (copy), context (copy), matchesAlias (copy)
-	return Promise.try(function() -- line: 21
-		-- upvalues: context (copy), p1 (copy), matchesAlias (copy), s2 (copy), n1 (copy), Promise (copy)
+return function(p, p2: number, p3: string)
+	return Promise.try(function()
 		assert(context.store, "Store should exist")
 
-		local v14 = context.store:getState().AutoCastCommands[p1.name]
+		if matchesAlias(context.store:getState().AutoCastCommands[p.name], p3) then
+			local clientRun = p.clientRun(context.store, p2, p3)
 
-		if matchesAlias(v14, s2) then
-			local v15 = p1.clientRun(context.store, n1, s2)
-
-			if v15 and string.find(v15.metadata, "Success") then
-				return Promise.resolve(v15)
+			if clientRun and string.find(clientRun.metadata, "Success") then
+				return Promise.resolve(clientRun)
 			end
 		end
 

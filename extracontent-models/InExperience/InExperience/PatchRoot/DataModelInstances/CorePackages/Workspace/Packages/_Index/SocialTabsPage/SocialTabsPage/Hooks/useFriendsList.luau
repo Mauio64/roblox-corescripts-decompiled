@@ -1,179 +1,174 @@
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local React = require(SocialTabsPageParent.React)
-local Dash = require(SocialTabsPageParent.Dash)
-local useDispatch = require(SocialTabsPageParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local FindFriendsFromUserId = require(SocialTabsPage.Networking.NetworkingFriends).FindFriendsFromUserId
+local parent = SocialTabsPage.Parent
+
+local React = require(parent.React)
+local Dash = require(parent.Dash)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+local NetworkingFriends = require(SocialTabsPage.Networking.NetworkingFriends)
+local FindFriendsFromUserId = NetworkingFriends.FindFriendsFromUserId
+
 local usePageSize = require(SocialTabsPage.Hooks.usePageSize)
 
-local function mapPageItemsToFriends(p1) -- line: 33
-	-- upvalues: Dash (copy)
-	return Dash.map(p1, function(p2) -- line: 34
+local function mapPageItemsToFriends(pageItems)
+	local mapped = Dash.map(pageItems, function(p)
 		return {
-			id = tostring(p2.id),
-			hasVerifiedBadge = p2.hasVerifiedBadge or false
+			id = tostring(p.id),
+			hasVerifiedBadge = p.hasVerifiedBadge or false
 		}
 	end)
-end
-local function useFriendsList(t1: {[any]: any}) -- line: 42
-	-- upvalues: useDispatch (copy), usePageSize (copy), React (copy), FindFriendsFromUserId (copy), Dash (copy)
-	local v12 = useDispatch()
-	local v13 = usePageSize()
-	local v14 = t1.skip == true or (not t1.targetUserId or t1.targetUserId == "")
-	local v15, v16 = React.useState({})
-	local v17, v18 = React.useState(not v14)
-	local v19, v20 = React.useState(nil)
-	local v21, v22 = React.useState(nil)
-	local v23 = React.useRef(0)
-	local v24 = React.useRef(false)
-	local v25 = React.useRef(true)
 
-	React.useEffect(function() -- line: 55
-		-- upvalues: v25 (copy)
-		return function() -- line: 56
-			-- upvalues: v25 (copy)
-			v25.current = false
+	local result = {}
+
+	for _, v in mapped do
+		local id = tonumber(v.id)
+
+		if id ~= nil and id > 0 then
+			table.insert(result, v)
+		end
+	end
+
+	return result
+end
+
+local function useFriendsList(p)
+	local v = useDispatch()
+	local limit = usePageSize()
+	local v2 = p.skip == true or (not p.targetUserId or p.targetUserId == "")
+
+	local state, setState = React.useState({})
+	local state2, setState2 = React.useState(not v2)
+	local state3, setState3 = React.useState(nil)
+	local state4, setState4 = React.useState(nil)
+	local ref = React.useRef(0)
+	local ref2 = React.useRef(false)
+	local ref3 = React.useRef(true)
+
+	React.useEffect(function()
+		return function()
+			ref3.current = false
 		end
 	end, {})
 
-	local v26 = React.useCallback(function(s1: string, s2: string?, n1: number) -- line: 61
-		-- upvalues: v18 (copy), v24 (copy), v20 (copy), v12 (copy), FindFriendsFromUserId (copy), v13 (copy), v23 (copy), v25 (copy), v22 (copy), Dash (copy), v16 (copy)
-		local v34 = not s2 or s2 == ""
+	local v3 = React.useCallback(function(p2: string, cursor: string?, p3: number)
+		local v3 = not cursor or cursor == ""
 
-		if v34 then
-			v18(true)
+		if v3 then
+			setState2(true)
 		end
 
-		v24.current = true
-		v20(nil)
-		v12(FindFriendsFromUserId.API(s1, {
-			limit = v13,
-			cursor = if not s2 or s2 == "" then nil else s2
-		})):andThen(function(p3) -- line: 74
-			-- upvalues: v23 (copy), n1 (copy), v25 (copy), v24 (copy), v22 (copy), Dash (copy), v34 (copy), v16 (copy), v18 (copy)
-			if v23.current ~= n1 or not v25.current then
-				v24.current = false
+		ref2.current = true
+		setState3(nil)
 
+		local api = FindFriendsFromUserId.API
+		local v4 = { limit = limit, cursor = nil }
+
+		if not cursor or cursor == "" then
+			cursor = nil
+		end
+
+		v4.cursor = cursor
+		v(api(p2, v4)):andThen(function(p4)
+			if ref.current ~= p3 or not ref3.current then
+				ref2.current = false
 				return
 			end
 
-			local v40 = if not p3 then nil else p3.responseBody
-			local v41 = if not v40 then nil else v40.PageItems
-			local v42 = if not v40 or (not v40.NextCursor or v40.NextCursor == "") then nil else v40.NextCursor
+			local responseBody
 
-			v22(v42)
+			if p4 then
+				responseBody = p4.responseBody
+			end
 
-			if v41 then
-				local v43 = Dash.map(v41, function(p4) -- line: 34
-					return {
-						id = tostring(p4.id),
-						hasVerifiedBadge = p4.hasVerifiedBadge or false
-					}
-				end)
+			local pageItems
 
-				if v34 then
-					v16(v43)
+			if responseBody then
+				pageItems = responseBody.PageItems
+			end
+
+			local v5
+
+			if responseBody and responseBody.NextCursor and responseBody.NextCursor ~= "" then
+				v5 = responseBody.NextCursor
+			end
+
+			setState4(v5)
+
+			if pageItems then
+				local v6 = mapPageItemsToFriends(pageItems)
+
+				if v3 then
+					setState(v6)
 				else
-					v16(function(t2: {[any]: any}) -- line: 94
-						-- upvalues: v43 (copy)
-						local v47 = table.clone(t2)
+					setState(function(p5)
+						local clone = table.clone(p5)
 
-						for _, v49 in v43 do
-							table.insert(v47, v49)
+						for _, v7 in v6 do
+							table.insert(clone, v7)
 						end
 
-						return v47
+						return clone
 					end)
 				end
-			elseif v34 then
-				v16({})
+			elseif v3 then
+				setState({})
 			end
 
-			if v34 then
-				v18(false)
+			if v3 then
+				setState2(false)
 			end
 
-			v24.current = false
-		end):catch(function(p5) -- line: 111
-			-- upvalues: v23 (copy), n1 (copy), v25 (copy), v24 (copy), v20 (copy), v34 (copy), v18 (copy)
-			if v23.current ~= n1 or not v25.current then
-				v24.current = false
-
+			ref2.current = false
+		end):catch(function(p4)
+			if ref.current ~= p3 or not ref3.current then
+				ref2.current = false
 				return
 			end
 
-			v20(p5)
+			setState3(p4)
 
-			if v34 then
-				v18(false)
+			if v3 then
+				setState2(false)
 			end
 
-			v24.current = false
+			ref2.current = false
 		end)
-	end, {
-		v12,
-		v13
-	})
+	end, { v, limit })
 
-	React.useEffect(function() -- line: 124
-		-- upvalues: v14 (copy), v23 (copy), v22 (copy), v16 (copy), v26 (copy), t1 (copy)
-		if v14 then
+	React.useEffect(function(): nil
+		if v2 then
 			return nil
 		end
 
-		local v35 = v23
-
-		v35.current = v35.current + 1
-
-		local current = v23.current
-
-		v22(nil)
-		v16({})
-		v26(t1.targetUserId, nil, current)
+		ref.current += 1
+		local current = ref.current
+		setState4(nil)
+		setState({})
+		v3(p.targetUserId, nil, current)
 
 		return nil
-	end, {
-		v14,
-		t1.targetUserId,
-		v26
-	})
-
-	local v27 = v21 ~= nil
-	local v28 = React.useCallback(function() -- line: 140
-		-- upvalues: v24 (copy), v21 (copy), v26 (copy), t1 (copy), v23 (copy)
-		if v24.current or not v21 then
-			return
-		end
-
-		v26(t1.targetUserId, v21, v23.current)
-	end, {
-		v21,
-		v26,
-		t1.targetUserId
-	})
-	local v29 = React.useCallback(function() -- line: 147
-		-- upvalues: v23 (copy), v22 (copy), v16 (copy), v26 (copy), t1 (copy)
-		local v37 = v23
-
-		v37.current = v37.current + 1
-
-		local current = v23.current
-
-		v22(nil)
-		v16({})
-		v26(t1.targetUserId, nil, current)
-	end, {
-		v26,
-		t1.targetUserId
-	})
+	end, { v2, p.targetUserId, v3 })
 
 	return {
-		friends = v15,
-		loading = v17,
-		hasMore = v27,
-		fetchMore = v28,
-		refresh = v29,
-		error = v19
+		friends = state,
+		loading = state2,
+		hasMore = state4 ~= nil,
+		fetchMore = React.useCallback(function()
+			if ref2.current or not state4 then
+				return
+			end
+
+			v3(p.targetUserId, state4, ref.current)
+		end, { state4, v3, p.targetUserId }),
+		refresh = React.useCallback(function()
+			ref.current += 1
+			local current = ref.current
+			setState4(nil)
+			setState({})
+			v3(p.targetUserId, nil, current)
+		end, { v3, p.targetUserId }),
+		error = state3
 	}
 end
 

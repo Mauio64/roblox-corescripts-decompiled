@@ -1,11 +1,9 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local PlatformEnum = require(parent.Enums.PlatformEnum)
 
 return {
-	[require(ParentParent.Enums.PlatformEnum).QuestVR] = {
-		ExperienceIds = {
-			UniverseId = "4510252459",
-			PlaceId = "12887241816"
-		},
+	[PlatformEnum.QuestVR] = {
+		ExperienceIds = { UniverseId = "4510252459", PlaceId = "12887241816" },
 		PanelConstants = {
 			MAIN_SCREEN_SIZE_WIDTH = 1920,
 			MAIN_SCREEN_SIZE_HEIGHT = 1080,

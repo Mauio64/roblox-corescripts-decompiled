@@ -1,122 +1,118 @@
 local CircularBuffer = require(script.Parent.Parent.Parent.CircularBuffer)
 local Signal = require(script.Parent.Parent.Parent.Signal)
-local num = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"))
+
+local fVariable = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"))
+
 local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
-local t1 = {}
 
-t1.__index = t1
+local DataStoresData = {}
+DataStoresData.__index = DataStoresData
 
-function t1.new() -- line: 12
-	-- upvalues: t1 (copy), Signal (copy)
-	local t2 = {}
+function DataStoresData.new()
+	local v = {}
+	setmetatable(v, DataStoresData)
 
-	setmetatable(t2, t1)
-	t2._dataStoresUpdated = Signal.new()
-	t2._dataStoresData = {}
-	t2._dataStoresDataCount = 0
-	t2._lastUpdateTime = 0
-	t2._isRunning = false
-
-	return t2
+	v._dataStoresUpdated = Signal.new()
+	v._dataStoresData = {}
+	v._dataStoresDataCount = 0
+	v._lastUpdateTime = 0
+	v._isRunning = false
+	return v
 end
-function t1.Signal(p1) -- line: 24
-	return p1._dataStoresUpdated
+
+function DataStoresData:Signal()
+	return self._dataStoresUpdated
 end
-function t1.getCurrentData(p2) -- line: 28
-	return p2._dataStoresData, p2._dataStoresDataCount
+
+function DataStoresData:getCurrentData()
+	return self._dataStoresData, self._dataStoresDataCount
 end
-function t1.updateValue(p3, p4, p5) -- line: 32
-	-- upvalues: CircularBuffer (copy), num (copy)
-	if not p3._dataStoresData[p4] then
-		local v12 = CircularBuffer.new(num)
 
-		v12:push_back({
-			value = p5,
-			time = p3._lastUpdateTime
-		})
-		p3._dataStoresData[p4] = {
-			max = p5,
-			min = p5,
-			dataSet = v12
-		}
+function DataStoresData:updateValue(p, min)
+	if self._dataStoresData[p] then
+		local v = self._dataStoresData[p]
+		local v2 = v.max
+		local v3 = v.min
 
-		return
-	end
+		local v4 = { value = min, time = self._lastUpdateTime }
 
-	local v13 = p3._dataStoresData[p4]
-	local max = v13.max
-	local min = v13.min
-	local t3 = {
-		value = p5,
-		time = p3._lastUpdateTime
-	}
-	local v17 = p3._dataStoresData[p4].dataSet:push_back(t3)
+		local push_back = self._dataStoresData[p].dataSet:push_back(v4)
 
-	if v17 then
-		local v18 = p3._dataStoresData[p4].dataSet:iterator()
-		local v19 = v18:next()
+		if push_back then
+			local iterator = self._dataStoresData[p].dataSet:iterator()
+			local v5 = iterator:next()
 
-		if max == v17.value then
-			max = min
+			if v2 == push_back.value then
+				v2 = v3
 
-			while v19 do
-				max = max > v19.value and max or v19.value
-				v19 = v18:next()
+				while v5 do
+					v2 = v5.value < v2 and v2 or v5.value
+					v5 = iterator:next()
+				end
+			end
+
+			if v3 == push_back.value then
+				v3 = v2
+
+				while v5 do
+					v3 = v3 < v5.value and v3 or v5.value
+					v5 = iterator:next()
+				end
 			end
 		end
 
-		if min == v17.value then
-			min = max
+		self._dataStoresData[p].max = v2 < min and min or v2
+		local v5 = self._dataStoresData[p]
+		min = v3 < min and v3 or min
+		v5.min = min
+	else
+		local dataSet = CircularBuffer.new(fVariable)
+		dataSet:push_back({ value = min, time = self._lastUpdateTime })
 
-			while v19 do
-				min = min < v19.value and min or v19.value
-				v19 = v18:next()
-			end
-		end
+		self._dataStoresData[p] = { max = min, min = min, dataSet = dataSet }
 	end
-
-	p3._dataStoresData[p4].max = max < p5 and p5 or max
-	p3._dataStoresData[p4].min = min < p5 and min or p5
 end
-function t1.isRunning(p6) -- line: 80
-	return p6._isRunning
+
+function DataStoresData:isRunning()
+	return self._isRunning
 end
-function t1.start(p7) -- line: 84
-	-- upvalues: getClientReplicator (copy)
-	local v22 = getClientReplicator()
 
-	if v22 and not p7._statsListenerConnection then
-		p7._statsListenerConnection = v22.StatsReceived:connect(function(p8) -- line: 87
-			-- upvalues: p7 (copy)
-			local DataStoreBudget = p8.DataStoreBudget
+function DataStoresData:start()
+	local clientReplicator = getClientReplicator()
 
-			p7._lastUpdateTime = os.time()
+	if clientReplicator and not self._statsListenerConnection then
+		self._statsListenerConnection = clientReplicator.StatsReceived:connect(function(p)
+			local dataStoreBudget = p.DataStoreBudget
+			self._lastUpdateTime = os.time()
 
-			if DataStoreBudget then
-				local n1 = 0
+			if dataStoreBudget then
+				local count = 0
 
-				for k, v in pairs(DataStoreBudget) do
-					if type(v) == "number" then
-						p7:updateValue(k, v)
-						n1 += 1
+				for k, v in pairs(dataStoreBudget) do
+					if type(v) ~= "number" then
+						continue
 					end
+
+					self:updateValue(k, v)
+					count += 1
 				end
 
-				p7._dataStoresDataCount = n1
-				p7._dataStoresUpdated:Fire(p7._dataStoresData, p7._dataStoresDataCount)
+				self._dataStoresDataCount = count
+				self._dataStoresUpdated:Fire(self._dataStoresData, self._dataStoresDataCount)
 			end
 		end)
-		v22:RequestServerStats(true)
-		p7._isRunning = true
+		clientReplicator:RequestServerStats(true)
+		self._isRunning = true
 	end
 end
-function t1.stop(p9) -- line: 107
-	if p9._statsListenerConnection then
-		p9._statsListenerConnection:Disconnect()
-		p9._statsListenerConnection = nil
+
+function DataStoresData:stop()
+	if self._statsListenerConnection then
+		self._statsListenerConnection:Disconnect()
+		self._statsListenerConnection = nil
 	end
 
-	p9._isRunning = false
+	self._isRunning = false
 end
 
-return t1
+return DataStoresData

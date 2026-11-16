@@ -1,91 +1,81 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local bodyAssetMasksRenderer = require(ParentParent.util.bodyAssetMasksRenderer)
-local AccurateBoundingBoxRasterUtil = require(ParentParent.util.AccurateBoundingBoxRasterUtil)
-local getFFlagUGCValidateMigratePoseBlocking = require(ParentParent.flags.getFFlagUGCValidateMigratePoseBlocking)
-local t1 = {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
-	},
-	requiredData = {
-		ValidationEnums.SharedDataMember.rootInstance,
-		ValidationEnums.SharedDataMember.renderMeshesData
-	},
-	fflag = getFFlagUGCValidateMigratePoseBlocking,
+local bodyAssetMasksRenderer = require(parent.util.bodyAssetMasksRenderer)
+local AccurateBoundingBoxRasterUtil = require(parent.util.AccurateBoundingBoxRasterUtil)
+
+local BoundingBoxAccurate = {
+	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS, ValidationEnums.UploadCategory.DYNAMIC_HEAD },
+	requiredData = { ValidationEnums.SharedDataMember.rootInstance, ValidationEnums.SharedDataMember.renderMeshesData },
 	expectedFailures = {}
 }
 
-local function getAssetTypeFromUploadEnum(p1) -- line: 37
-	if p1.uploadEnum and p1.uploadEnum.assetType then
-		return p1.uploadEnum.assetType
+local function getAssetTypeFromUploadEnum(p) -- 1 equivalent call inferred from this helper
+	if p.uploadEnum and p.uploadEnum.assetType then
+		return p.uploadEnum.assetType
 	end
 
 	return nil
 end
-local function buildEditableMeshesFromSharedData(p2) -- line: 44
-	local t2 = {}
 
-	for v13, v14 in p2.renderMeshesData do
-		local v15 = p2.rootInstance:FindFirstChild(v13, true) or (v13 ~= p2.rootInstance.Name or p2.rootInstance)
+local function buildEditableMeshesFromSharedData(p)
+	local editableMeshesFromSharedData = {}
 
-		if v15 and v14.editable then
-			t2[v15] = {
-				MeshId = {
-					created = false,
-					instance = v14.editable
-				}
+	for childName, v in p.renderMeshesData do
+		local v2 = p.rootInstance:FindFirstChild(childName, true)
+
+		if not v2 and p.rootInstance.Name == childName then
+			v2 = p.rootInstance
+		end
+
+		if v2 and v.editable then
+			editableMeshesFromSharedData[v2] = {
+				MeshId = { instance = v.editable, created = false }
 			}
 		end
 	end
 
-	return t2
+	return editableMeshesFromSharedData
 end
 
-function t1.run(p3, p4) -- line: 61
-	-- upvalues: buildEditableMeshesFromSharedData (copy), ValidationEnums (copy), AccurateBoundingBoxRasterUtil (copy), bodyAssetMasksRenderer (copy), ErrorSourceStrings (copy)
-	local v18 = if not p4.uploadEnum or not p4.uploadEnum.assetType then nil else p4.uploadEnum.assetType
+function BoundingBoxAccurate.run(object, p)
+	local assetTypeFromUploadEnum = getAssetTypeFromUploadEnum(p) -- inferred equivalent call
 
-	if not v18 then
+	if not assetTypeFromUploadEnum then
 		return
 	end
 
-	local rootInstance = p4.rootInstance
-	local v20 = buildEditableMeshesFromSharedData(p4)
-	local t3 = {
-		shouldYield = false,
-		assetTypeEnum = v18,
-		isServer = p4.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend,
-		editableMeshes = v20
-	}
-	local v22 = AccurateBoundingBoxRasterUtil.getBoundsViewsForAssetType(v18)
-	local v23, v24 = bodyAssetMasksRenderer.new(rootInstance, v22, t3)
+	local rootInstance = p.rootInstance
+	local editableMeshesFromSharedData = buildEditableMeshesFromSharedData(p)
 
-	if not v23 then
-		if v24 then
-			for _, v26 in v24 do
-				p3:fail(ErrorSourceStrings.Keys.BoundingBox_ValidationFailed, {
-					reason = v26
+	local v = {
+		assetTypeEnum = assetTypeFromUploadEnum,
+		isServer = p.consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend,
+		editableMeshes = editableMeshesFromSharedData,
+		shouldYield = false
+	}
+
+	local boundsViewsForAssetType = AccurateBoundingBoxRasterUtil.getBoundsViewsForAssetType(assetTypeFromUploadEnum)
+	local v2, v3 = bodyAssetMasksRenderer.new(rootInstance, boundsViewsForAssetType, v)
+
+	if v2 then
+		local v4, v5 = AccurateBoundingBoxRasterUtil.validate(rootInstance, v3, v)
+
+		if not v4 and v5 then
+			for _, reason in v5 do
+				object:fail(ErrorSourceStrings.Keys.BoundingBox_ValidationFailed, {
+					reason = reason
 				})
 			end
 		end
-
-		return
-	end
-
-	local v27, v28 = AccurateBoundingBoxRasterUtil.validate(rootInstance, v24, t3)
-
-	if not v27 and v28 then
-		for _, v30 in v28 do
-			p3:fail(ErrorSourceStrings.Keys.BoundingBox_ValidationFailed, {
-				reason = v30
-			})
+	elseif v3 then
+		for _, reason in v3 do
+			object:fail(ErrorSourceStrings.Keys.BoundingBox_ValidationFailed, { reason = reason })
 		end
 	end
 end
 
-return t1
+return BoundingBoxAccurate

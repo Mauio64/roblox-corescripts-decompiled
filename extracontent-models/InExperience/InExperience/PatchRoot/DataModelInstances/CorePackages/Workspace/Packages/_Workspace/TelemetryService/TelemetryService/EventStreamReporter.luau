@@ -1,36 +1,31 @@
-local t1 = {}
+local EventStreamReporter = {}
+EventStreamReporter.__index = EventStreamReporter
 
-t1.__index = t1
+function EventStreamReporter.new(reporter)
+	local v = { _reporter = reporter, _isEnabled = true }
 
-function t1.new(p1) -- line: 9
-	-- upvalues: t1 (copy)
-	local t2 = {
-		_isEnabled = true,
-		_reporter = p1
-	}
+	setmetatable(v, EventStreamReporter)
 
-	setmetatable(t2, t1)
-
-	return t2
-end
-function t1.setEnabled(t3: {[any]: any}, b1: boolean) -- line: 19
-	t3._isEnabled = b1
-end
-function t1.sendTelemetryEvent(t4: {[any]: any}, s1: string, s2: string, t5: {[any]: any}?) -- line: 26
-	local v10 = t5 or {}
-
-	assert(type(s1) == "string", "Expected eventContext to be a string")
-	assert(type(s2) == "string", "Expected eventName to be a string")
-	assert(type(v10) == "table", "Expected additionalArgs to be a table")
-	assert(t4._isEnabled, "This reporting service is disabled")
-	t4._reporter:logRobloxTelemetryEvent({
-		throttlingPercentage = 10000,
-		eventName = s2,
-		backends = { "EventIngest" }
-	}, {
-		"addSessionId",
-		"addSessionInfo"
-	}, v10, s1)
+	return v
 end
 
-return t1
+function EventStreamReporter:setEnabled(isEnabled: boolean)
+	self._isEnabled = isEnabled
+end
+
+function EventStreamReporter:sendTelemetryEvent(value: string, value2: string, options)
+	local v = options or {}
+
+	assert(type(value) == "string", "Expected eventContext to be a string")
+	assert(type(value2) == "string", "Expected eventName to be a string")
+	assert(type(v) == "table", "Expected additionalArgs to be a table")
+	assert(self._isEnabled, "This reporting service is disabled")
+
+	self._reporter:logRobloxTelemetryEvent({
+		eventName = value2,
+		backends = { "EventIngest" },
+		throttlingPercentage = 10000
+	}, { "addSessionId", "addSessionInfo" }, v, value)
+end
+
+return EventStreamReporter

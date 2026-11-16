@@ -1,1 +1,3 @@
-return (require(script.DialogTitle))
+local DialogTitle = require(script.DialogTitle)
+
+return DialogTitle

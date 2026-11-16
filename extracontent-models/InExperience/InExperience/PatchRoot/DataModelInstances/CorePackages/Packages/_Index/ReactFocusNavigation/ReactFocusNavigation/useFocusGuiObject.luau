@@ -1,24 +1,24 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local mockableWarn = require(ParentParent.FocusNavigationUtils).mockableWarn
+local parent = script.Parent.Parent
+local React = require(parent.React)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+
+local mockableWarn = FocusNavigationUtils.mockableWarn
+
 local FocusNavigationContext = require(script.Parent.FocusNavigationContext)
 
-local function useFocusGuiObject() -- line: 10
-	-- upvalues: React (copy), FocusNavigationContext (copy), mockableWarn (copy)
-	local v6 = React.useContext(FocusNavigationContext)
+local function useFocusGuiObject()
+	local v = React.useContext(FocusNavigationContext)
 
-	return React.useCallback(function(p1, b1: boolean?) -- line: 13
-		-- upvalues: v6 (copy), mockableWarn (copy)
-		if v6 then
-			v6:focusGuiObject(p1, not not b1)
+	return React.useCallback(function(p, flag: boolean?)
+		if v then
+			v:focusGuiObject(p, flag and true or false)
+		elseif _G.__DEV__ then
+			mockableWarn([[
+Could not capture focus with no FocusNavigationService.
 
-			return
+Introduce a ReactFocusNavigation.FocusNavigationProvider above this component in the tree and provide it with a value returned from FocusNavigationService.new(...)]])
 		end
-
-		if _G.__DEV__ then
-			mockableWarn("Could not capture focus with no FocusNavigationService.\n\nIntroduce a ReactFocusNavigation.FocusNavigationProvider above this component in the tree and provide it with a value returned from FocusNavigationService.new(...)")
-		end
-	end, { v6 })
+	end, { v })
 end
 
 return useFocusGuiObject

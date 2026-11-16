@@ -1,18 +1,16 @@
-local Parent = script:FindFirstAncestor("ApolloProfileInsights").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("ApolloProfileInsights").Parent
+local Cryo = require(parent.Cryo)
 
-require(Parent.GraphQLServer)
+require(parent.GraphQLServer)
 
-return function(t1: {[any]: any}?, p1) -- line: 12
-	-- upvalues: Cryo (copy)
-	if not t1 or not t1.profilesInsightsByUserIds then
-		return nil
+return function(p, p2)
+	if p and p.profilesInsightsByUserIds then
+		local profilesInsightsByUserIds = p.profilesInsightsByUserIds
+
+		return profilesInsightsByUserIds[Cryo.List.findWhere(profilesInsightsByUserIds, function(p3, _): boolean
+			return p3.targetUserId == tostring(p2)
+		end)]
 	end
 
-	local profilesInsightsByUserIds = t1.profilesInsightsByUserIds
-
-	return profilesInsightsByUserIds[Cryo.List.findWhere(profilesInsightsByUserIds, function(p2, _) -- line: 20
-		-- upvalues: p1 (copy)
-		return p2.targetUserId == tostring(p1)
-	end)]
+	return nil
 end

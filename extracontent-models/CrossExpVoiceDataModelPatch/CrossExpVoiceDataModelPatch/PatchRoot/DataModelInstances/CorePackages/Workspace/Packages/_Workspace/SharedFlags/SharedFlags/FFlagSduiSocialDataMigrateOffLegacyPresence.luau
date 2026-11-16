@@ -1,0 +1,6 @@
+local FFlagFriendsStoreSortOnlineFriendsByRank = require(script.Parent.FFlagFriendsStoreSortOnlineFriendsByRank)
+local FFlagDataHydrationAccountReset = require(script.Parent.FFlagDataHydrationAccountReset)
+
+return game:DefineFastFlag("SduiSocialDataMigrateOffLegacyPresence2", false)
+	and FFlagFriendsStoreSortOnlineFriendsByRank
+	and FFlagDataHydrationAccountReset

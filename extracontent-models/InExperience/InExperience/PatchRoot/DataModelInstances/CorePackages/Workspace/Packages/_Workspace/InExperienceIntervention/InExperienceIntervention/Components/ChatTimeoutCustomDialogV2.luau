@@ -1,55 +1,67 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
+local parent = InExperienceIntervention.Parent
+
 local IXPService = game:GetService("IXPService")
 local LocalizationService = game:GetService("LocalizationService")
-local React = require(InExperienceInterventionParent.React)
-local AppUserLayers = require(InExperienceInterventionParent.ExperimentLayers).AppUserLayers
-local GenericInterventionDialog = require(InExperienceInterventionParent.InterventionShared).Components.GenericInterventionDialog
-local useTimeoutInfoBinding = require(InExperienceInterventionParent.InterventionShared).Hooks.useTimeoutInfoBinding
-local InterventionAnalytics = require(InExperienceInterventionParent.InterventionShared).InterventionAnalytics
-local useParsedBadUtterances = require(InExperienceInterventionParent.InterventionShared).Hooks.useParsedBadUtterances
-local v11 = require(InExperienceInterventionParent.RobloxAppLocales).Localization.new(LocalizationService.RobloxLocaleId)
-local FFlagNotApprovedPageIXPExposure = require(InExperienceInterventionParent.SharedFlags).FFlagNotApprovedPageIXPExposure
+
+local React = require(parent.React)
+
+local ExperimentLayers = require(parent.ExperimentLayers)
+local AppUserLayers = ExperimentLayers.AppUserLayers
+local InterventionShared = require(parent.InterventionShared)
+local GenericInterventionDialog = InterventionShared.Components.GenericInterventionDialog
+local InterventionShared2 = require(parent.InterventionShared)
+local useTimeoutInfoBinding = InterventionShared2.Hooks.useTimeoutInfoBinding
+local InterventionShared3 = require(parent.InterventionShared)
+local InterventionAnalytics = InterventionShared3.InterventionAnalytics
+local InterventionShared4 = require(parent.InterventionShared)
+local useParsedBadUtterances = InterventionShared4.Hooks.useParsedBadUtterances
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local localization = RobloxAppLocales.Localization.new(LocalizationService.RobloxLocaleId)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagNotApprovedPageIXPExposure = SharedFlags.FFlagNotApprovedPageIXPExposure
 
 require(InExperienceIntervention.Utils.Types)
 
-local function ChatTimeoutCustomDialogV2(t1: {[any]: any}) -- line: 34
-	-- upvalues: React (copy), FFlagNotApprovedPageIXPExposure (copy), IXPService (copy), AppUserLayers (copy), useTimeoutInfoBinding (copy), useParsedBadUtterances (copy), v11 (copy), GenericInterventionDialog (copy), InterventionAnalytics (copy)
-	local moderationDetail = t1.moderationDetail
+local function ChatTimeoutCustomDialogV2(p)
+	local moderationDetail = p.moderationDetail
 
-	React.useEffect(function() -- line: 37
-		-- upvalues: FFlagNotApprovedPageIXPExposure (copy), IXPService (copy), AppUserLayers (copy)
+	React.useEffect(function()
 		if FFlagNotApprovedPageIXPExposure and game:GetEngineFeature("EnableLogFlagLinkedUserLayerExposure") then
 			IXPService:LogFlagLinkedUserLayerExposure(AppUserLayers.NotApprovedPageUserIDLayer)
 		end
 	end, {})
 
-	local v16 = useTimeoutInfoBinding(moderationDetail.endDate, moderationDetail.duration)
-	local heading = v16.heading
-	local description = v16.description
+	local v = useTimeoutInfoBinding(moderationDetail.endDate, moderationDetail.duration)
+	local heading = v.heading
+	local description = v.description
+
 	local consequenceTransparencyMessage = moderationDetail.consequenceTransparencyMessage
 	local interventionId = moderationDetail.interventionId
 	local acknowledgeable = moderationDetail.acknowledgeable
-	local badUtterances = moderationDetail.badUtterances
-	local v23 = useParsedBadUtterances(badUtterances or {})
-	local v24 = table.concat(v23.textItems, "\n")
-	local v25 = table.concat(v23.abuseTypes, ", ")
+	local v2 = useParsedBadUtterances(moderationDetail.badUtterances or {}, {
+		shouldAddPlayerName = true
+	})
 
-	if v25 == "" then
-		v25 = v11:Format("Feature.NotApproved.Label.AbuseType.Other")
+	local joined = table.concat(v2.textItems, "\n")
+	local violationReason = table.concat(v2.abuseTypes, ", ")
+
+	if violationReason == "" then
+		violationReason = localization:Format("Feature.NotApproved.Label.AbuseType.Other")
 	end
 
 	return React.createElement(GenericInterventionDialog, {
-		isAppealable = true,
-		titleText = heading:map(function(p1) -- line: 62
-			return p1
-		end),
-		bodyText = description:map(function(p2) -- line: 66
+		titleText = heading:map(function(p2)
 			return p2
 		end),
-		evidence = v24,
-		violationReason = v25,
-		onDismiss = t1.onDismiss,
+		isAppealable = true,
+		bodyText = description:map(function(p2)
+			return p2
+		end),
+		evidence = joined,
+		violationReason = violationReason,
+		onDismiss = p.onDismiss,
 		dsaMessage = consequenceTransparencyMessage,
 		interventionId = interventionId,
 		acknowledgeable = acknowledgeable,

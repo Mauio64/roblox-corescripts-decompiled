@@ -1,49 +1,60 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Cryo = require(ParentParentParent.Cryo)
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.App.Style.StyleTypes)
-require(ParentParent.Core.Style.Validator.validateFontInfo)
-require(ParentParent.Core.Style.Validator.validateColorInfo)
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
 
-local useStyle = require(ParentParent.Core.Style.useStyle)
-local GetTextSize = require(ParentParent.Core.Text.GetTextSize)
-local Emoji = ParentParent.Core.Emoji
-local Emoji2 = require(Emoji.Emoji)
-local Emoji3 = require(Emoji.Enum.Emoji)
-local GenericTextLabel = require(ParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local t1 = {
-	fluidSizing = false,
-	maxSize = Vector2.new(10000, 10000)
-}
+require(parent.App.Style.StyleTypes)
+require(parent.Core.Style.Validator.validateFontInfo)
+require(parent.Core.Style.Validator.validateColorInfo)
+local useStyle = require(parent.Core.Style.useStyle)
+local GetTextSize = require(parent.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent.Core.Text.GetFontFromFontStyle)
 
-local function EmojiTextLabel(t2: {[any]: any}) -- line: 47
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), Emoji3 (copy), GetTextSize (copy), React (copy), GenericTextLabel (copy), Emoji2 (copy)
-	local v14 = Cryo.Dictionary.join(t1, t2)
-	local v15 = useStyle()
-	local v16 = Emoji3.isEnumValue(v14.emoji)
-	local BaseSize = v15.Font.BaseSize
-	local colorStyle = v14.colorStyle
-	local fontStyle = v14.fontStyle
-	local fontStyleFont = fontStyle.Font
-	local v21 = if not fontStyle.RelativeSize then fontStyle.FontSize else BaseSize * fontStyle.RelativeSize
-	local maxSize = v14.maxSize
-	local v23 = GetTextSize(v14.Text, v21, fontStyleFont, maxSize)
-	local v24 = math.min(v23.X, maxSize.X - v21)
-	local v25 = Cryo.Dictionary.join(v14, {
+local emoji = parent.Core.Emoji
+local Emoji = require(emoji.Emoji)
+local Emoji2 = require(emoji.Enum.Emoji)
+
+local GenericTextLabel = require(parent.Core.Text.GenericTextLabel.GenericTextLabel)
+
+local v = { maxSize = Vector2.new(10000, 10000), fluidSizing = false }
+
+local function EmojiTextLabel(p)
+	local joined = Cryo.Dictionary.join(v, p)
+
+	local v2 = useStyle()
+	local enumValue = Emoji2.isEnumValue(joined.emoji)
+	local baseSize = v2.Font.BaseSize
+	local colorStyle = joined.colorStyle
+
+	local fontStyle = joined.fontStyle
+	local textFont = GetFontFromFontStyle(fontStyle)
+	local textSize
+
+	if fontStyle.RelativeSize then
+		textSize = baseSize * fontStyle.RelativeSize
+	else
+		textSize = fontStyle.FontSize
+	end
+
+	local maxSize = joined.maxSize
+
+	local textSize2 = GetTextSize(joined.Text, textSize, textFont, maxSize)
+	local v3 = math.min(textSize2.X, maxSize.X - textSize)
+
+	local joined2 = Cryo.Dictionary.join(joined, {
 		emoji = Cryo.None,
 		emojiOnActivated = Cryo.None,
 		colorStyle = colorStyle,
-		Size = UDim2.fromOffset(v24, v23.Y)
+		Size = UDim2.fromOffset(v3, textSize2.Y)
 	})
 
-	return React.createElement(GenericTextLabel, v25, {
-		Emoji = v16 and React.createElement(Emoji2, {
-			emoji = v14.emoji,
-			onActivated = v14.emojiOnActivated,
-			textFont = fontStyleFont,
-			textSize = v21,
+	return React.createElement(GenericTextLabel, joined2, {
+		Emoji = enumValue and React.createElement(Emoji, {
+			emoji = joined.emoji,
+			onActivated = joined.emojiOnActivated,
+			textFont = textFont,
+			textSize = textSize,
 			Position = UDim2.fromScale(1, 0)
 		})
 	})

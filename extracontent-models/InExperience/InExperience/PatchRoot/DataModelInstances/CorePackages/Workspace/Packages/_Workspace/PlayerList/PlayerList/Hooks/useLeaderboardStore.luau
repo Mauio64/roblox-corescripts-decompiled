@@ -1,10 +1,11 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local LeaderboardStoreContext = require(ParentParent.Common.LeaderboardStoreContext)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local function useLeaderboardStore() -- line: 8
-	-- upvalues: React (copy), LeaderboardStoreContext (copy)
+local React = require(parent2.React)
+
+local LeaderboardStoreContext = require(parent.Common.LeaderboardStoreContext)
+
+local function useLeaderboardStore()
 	return (React.useContext(LeaderboardStoreContext))
 end
 

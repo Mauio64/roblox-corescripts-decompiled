@@ -1,13 +1,9 @@
-local function getMessageTextSize(t1: {[any]: any}?, b1: boolean?) -- line: 13
-	if t1 == nil then
+local function getMessageTextSize(p, flag: boolean?)
+	if p == nil then
 		return nil
 	end
 
-	if b1 then
-		return t1.SpatialPanelTextSize
-	end
-
-	return t1.TextSize
+	return if flag then p.SpatialPanelTextSize else p.TextSize
 end
 
 return getMessageTextSize

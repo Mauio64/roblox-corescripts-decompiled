@@ -1,3 +1,1 @@
-return {
-	current = false
-}
+return { current = false }

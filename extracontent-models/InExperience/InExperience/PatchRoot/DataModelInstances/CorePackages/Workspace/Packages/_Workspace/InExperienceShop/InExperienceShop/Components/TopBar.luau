@@ -1,63 +1,70 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local React = require(InExperienceShopParent.React)
-local Foundation = require(InExperienceShopParent.Foundation)
-local useLocalization = require(InExperienceShopParent.Localization).Hooks.useLocalization
+local parent = InExperienceShop.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local shopOverflowConstants = require(InExperienceShop.Components.Shared.shopOverflowConstants)
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local IconButton = Foundation.IconButton
 local Menu = Foundation.Menu
 local IconName = Foundation.Enums.IconName
+local IconVariant = Foundation.Enums.IconVariant
 local InputSize = Foundation.Enums.InputSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local PopoverSide = Foundation.Enums.PopoverSide
 local PopoverAlign = Foundation.Enums.PopoverAlign
+local Chip = Foundation.Chip
+local ChipSize = Foundation.Enums.ChipSize
+local ChipVariant = Foundation.Enums.ChipVariant
+
 local OVERFLOW_ICON = shopOverflowConstants.OVERFLOW_ICON
 local REPORT_ICON = shopOverflowConstants.REPORT_ICON
 local REPORT_MENU_ITEM_ID = shopOverflowConstants.REPORT_MENU_ITEM_ID
-local t1 = {
-	title = "Feature.Avatar.Action.Shop",
-	report = "Feature.Catalog.Action.Report"
-}
 
-local function TopBar(t2: {[any]: any}) -- line: 39
-	-- upvalues: useLocalization (copy), t1 (copy), REPORT_MENU_ITEM_ID (copy), REPORT_ICON (copy), React (copy), Menu (copy), InputSize (copy), PopoverSide (copy), PopoverAlign (copy), IconButton (copy), OVERFLOW_ICON (copy), ButtonVariant (copy), View (copy), IconName (copy), FoundationText (copy)
-	local v22 = useLocalization(t1)
-	local t3 = {}
+local v = { title = "Feature.Avatar.Action.Shop", report = "Feature.Catalog.Action.Report" }
 
-	if t2.isReportingEnabled then
-		table.insert(t3, {
-			id = REPORT_MENU_ITEM_ID,
-			icon = REPORT_ICON,
-			text = v22.report
+local function TopBar(props)
+	local v2 = useLocalization(v)
+
+	local items = {}
+
+	if props.isReportingEnabled then
+		table.insert(items, { id = REPORT_MENU_ITEM_ID, icon = REPORT_ICON, text = v2.report })
+	end
+
+	local overflow
+
+	if props.isReportingEnabled then
+		overflow = React.createElement(Menu, {
+			isOpen = props.isOverflowMenuOpen,
+			items = items,
+			size = InputSize.Medium,
+			side = PopoverSide.Top,
+			align = PopoverAlign.End,
+			onPressedOutside = props.onOverflowMenuClosed,
+			onActivated = props.onMenuItemActivated,
+			LayoutOrder = 2,
+			testId = "TopBar_OverflowMenu"
+		}, {
+			Trigger = React.createElement(IconButton, {
+				icon = OVERFLOW_ICON,
+				isCircular = false,
+				size = InputSize.Medium,
+				variant = ButtonVariant.Utility,
+				onActivated = props.onOverflowActivated,
+				testId = "TopBar_OverflowButton"
+			})
 		})
 	end
 
-	local v24 = if not t2.isReportingEnabled then nil else React.createElement(Menu, {
-		LayoutOrder = 1,
-		testId = "TopBar_OverflowMenu",
-		isOpen = t2.isOverflowMenuOpen,
-		items = t3,
-		size = InputSize.Medium,
-		side = PopoverSide.Top,
-		align = PopoverAlign.End,
-		onPressedOutside = t2.onOverflowMenuClosed,
-		onActivated = t2.onMenuItemActivated
-	}, {
-		Trigger = React.createElement(IconButton, {
-			isCircular = false,
-			testId = "TopBar_OverflowButton",
-			icon = OVERFLOW_ICON,
-			size = InputSize.Medium,
-			variant = ButtonVariant.Utility,
-			onActivated = t2.onOverflowActivated
-		})
-	})
+	local createElement = React.createElement
 
-	return React.createElement(View, {
-		tag = "row flex-between align-y-center size-full-1200 padding-x-xlarge radius-medium bg-surface-0"
-	}, {
+	local v3 = {
 		Leading = React.createElement(View, {
 			tag = "row align-y-center gap-small auto-xy",
 			LayoutOrder = 1
@@ -67,35 +74,63 @@ local function TopBar(t2: {[any]: any}) -- line: 39
 				LayoutOrder = 1
 			}, {
 				CloseButton = React.createElement(IconButton, {
-					isCircular = false,
 					icon = IconName.X,
+					isCircular = false,
 					size = InputSize.Medium,
 					variant = ButtonVariant.Utility,
-					onActivated = t2.onClose
+					onActivated = props.onClose
 				})
 			}),
-			Title = React.createElement(FoundationText, {
+			Title = React.createElement(Text, {
 				tag = "size-0-1000 auto-x text-heading-small text-align-y-center content-emphasis",
-				LayoutOrder = 2,
-				Text = v22.title
+				Text = v2.title,
+				LayoutOrder = 2
 			})
 		}),
-		Trailing = React.createElement(View, {
-			tag = "row align-y-center gap-small auto-xy",
-			LayoutOrder = 2
-		}, {
-			Overflow = v24,
-			SearchButton = React.createElement(IconButton, {
-				isCircular = false,
-				LayoutOrder = 2,
-				testId = "SearchButton",
-				icon = IconName.MagnifyingGlass,
-				size = InputSize.Medium,
-				variant = ButtonVariant.Utility,
-				onActivated = t2.onSearchOpen
-			})
+		Trailing = 0
+	}
+
+	local createElement2 = React.createElement
+	local offerChip
+
+	if props.showOfferChip then
+		offerChip = React.createElement(Chip, {
+			text = props.offerChipText,
+			leading = {
+				iconName = props.offerChipIcon and IconName[props.offerChipIcon] or IconName.Tag,
+				iconVariant = IconVariant.Filled
+			},
+			size = ChipSize.Small,
+			variant = ChipVariant.Standard,
+			onActivated = props.onOfferChipActivated,
+			LayoutOrder = 1,
+			testId = "OfferChip"
+		})
+	end
+
+	v3.Trailing = createElement2(View, {
+		tag = "row align-y-center gap-small auto-xy",
+		LayoutOrder = 3
+	}, {
+		OfferChip = offerChip,
+		Overflow = overflow,
+		SearchButton = React.createElement(IconButton, {
+			icon = IconName.MagnifyingGlass,
+			isCircular = false,
+			size = InputSize.Medium,
+			variant = ButtonVariant.Utility,
+			onActivated = props.onSearchOpen,
+			LayoutOrder = 3,
+			testId = "SearchButton"
 		})
 	})
+	return createElement(
+		View,
+		{
+			tag = "row flex-between align-y-center size-full-1200 padding-x-xlarge radius-medium bg-surface-0"
+		},
+		v3
+	)
 end
 
 return TopBar

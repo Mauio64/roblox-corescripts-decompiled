@@ -1,39 +1,33 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("OpenSearchResultsWithQueryDeeplinkEventThrottlingHundredthsPercent", 10000)
-local t1 = {
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local v = {
 	eventName = "openSearchResultsWithQueryDeeplink",
-	description = "User opened Search Results via SDUI OpenSearchResultsWithQuery",
 	backends = { "EventIngest" },
-	throttlingPercentage = v5,
-	lastUpdated = {
-		26,
-		6,
-		17
-	}
+	throttlingPercentage = game:DefineFastInt(
+		"OpenSearchResultsWithQueryDeeplinkEventThrottlingHundredthsPercent",
+		10000
+	),
+	lastUpdated = { 26, 6, 17 },
+	description = "User opened Search Results via SDUI OpenSearchResultsWithQuery"
 }
-local v7 = t.strictInterface({
-	kwd = t.string,
-	searchType = t.string
-})
 
-return function(s1: string, t2: {[any]: any}) -- line: 24
-	-- upvalues: v7 (copy), DiscoveryEventErrorLogger (copy), TelemetryService (copy), t1 (copy)
-	local v10, v11 = v7(t2)
+local strictInterface = t.strictInterface({ kwd = t.string, searchType = t.string })
 
-	if not v10 then
-		DiscoveryEventErrorLogger.reportError("OpenSearchResultsWithQueryDeeplinkInvalidInterface", v11)
+return function(eventContext: string, customFields)
+	local v2, v3 = strictInterface(customFields)
+
+	if not v2 then
+		DiscoveryEventErrorLogger.reportError("OpenSearchResultsWithQueryDeeplinkInvalidInterface", v3)
 	end
 
-	TelemetryService:LogEvent(t1, {
-		eventContext = s1,
-		standardizedFields = {
-			"addSessionInfo",
-			"addSessionId",
-			"addOSInfo"
-		},
-		customFields = t2
+	TelemetryService:LogEvent(v, {
+		eventContext = eventContext,
+		standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" },
+		customFields = customFields
 	})
 end

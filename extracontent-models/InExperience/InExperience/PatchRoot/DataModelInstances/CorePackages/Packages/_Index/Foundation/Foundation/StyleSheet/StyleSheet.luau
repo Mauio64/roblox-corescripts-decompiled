@@ -1,61 +1,44 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-
+local parent2 = Foundation.Parent
+local React = require(parent2.React)
 require(Foundation.Providers.Style.Tokens)
-require(scriptParent.Rules.Types)
-
-local createStyleSheetRules = require(scriptParent.createStyleSheetRules)
-local getOverrideAttributes = require(scriptParent.getOverrideAttributes)
+require(parent.Rules.Types)
+local createStyleSheetRules = require(parent.createStyleSheetRules)
+local getOverrideAttributes = require(parent.getOverrideAttributes)
 local useGeneratedRules = require(Foundation.Utility.useGeneratedRules)
 
+require(Foundation.Enums.ColorMode)
 require(Foundation.Enums.Device)
-require(Foundation.Enums.Theme)
+require(Foundation.Enums.ThemeName)
 
-local function StyleSheet(t1: {[any]: any}) -- line: 31
-	-- upvalues: React (copy), useGeneratedRules (copy), getOverrideAttributes (copy), createStyleSheetRules (copy)
-	local v10, v11 = React.useState(nil)
-	local v12 = React.useRef({})
+local function StyleSheet(props)
+	local state, setState = React.useState(nil)
+	local ref = React.useRef({})
 
-	React.useLayoutEffect(function() -- line: 35
-		-- upvalues: t1 (copy), v10 (copy)
-		if t1.setStyleSheetRef and t1.setStyleSheetRef.current then
-			t1.setStyleSheetRef.current(v10)
+	React.useLayoutEffect(function()
+		if props.setStyleSheetRef and props.setStyleSheetRef.current then
+			props.setStyleSheetRef.current(state)
 		end
-	end, { v10 })
+	end, { state })
 
-	local v13 = useGeneratedRules(t1.theme, t1.device)
-	local v14 = React.useMemo(function() -- line: 43
-		-- upvalues: getOverrideAttributes (copy), t1 (copy)
-		return getOverrideAttributes(t1.theme, t1.device, t1.tokenOverrides)
-	end, {
-		t1.theme,
-		t1.device,
-		t1.tokenOverrides
-	})
-	local v15 = React.useMemo(function() -- line: 47
-		-- upvalues: v10 (copy), createStyleSheetRules (copy), v13 (copy), t1 (copy), v12 (copy), v14 (copy)
-		if v10 then
-			return createStyleSheetRules(v13, t1.tags, v10, v12.current, t1.scale, v14)
+	local v = useGeneratedRules(props.themeName, props.colorMode, props.device)
+
+	local v2 = React.useMemo(function()
+		return getOverrideAttributes(props.themeName, props.colorMode, props.device, props.tokenOverrides)
+	end, { props.themeName, props.colorMode, props.device, props.tokenOverrides })
+
+	local v3 = React.useMemo(function()
+		if state then
+			return createStyleSheetRules(v, props.tags, state, ref.current, props.scale, v2)
 		end
 
 		return nil
-	end, {
-		v10,
-		v13,
-		t1.tags,
-		t1.scale,
-		v14
-	})
+	end, { state, v, props.tags, props.scale, v2 })
 
 	return React.createElement(React.Fragment, nil, {
-		FoundationStyleSheet = React.createElement("StyleSheet", {
-			ref = v11
-		}, v15),
-		FoundationStyleLink = React.createElement("StyleLink", {
-			StyleSheet = v10
-		})
+		FoundationStyleSheet = React.createElement("StyleSheet", { ref = setState }, v3),
+		FoundationStyleLink = React.createElement("StyleLink", { StyleSheet = state })
 	})
 end
 

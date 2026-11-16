@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent
-local assign = require(ParentParent.Collections).Object.assign
+local parent = script.Parent.Parent
+local Collections = require(parent.Collections)
+local assign = Collections.Object.assign
 
 require(script.Parent.types)
 
@@ -9,110 +10,120 @@ local sin = math.sin
 local cos = math.cos
 local sqrt = math.sqrt
 
-local function translateParameters(n1: number, n2: number, n3: number) -- line: 54
-	-- upvalues: sqrt (copy)
-	return n1 / (sqrt(n3 * n2) * 2), sqrt(n2 / n3) / 2 / 3.141592653589793
+local function translateParameters(p: number, p2: number, p3: number)
+	return p / (sqrt(p3 * p2) * 2), sqrt(p2 / p3) / 2 / 3.141592653589793
 end
-local function spring(n4: number, p1) -- line: 60
-	-- upvalues: assign (copy), sqrt (copy), exp (copy), cos (copy), sin (copy), abs (copy)
-	local t1 = {
+
+local function spring(p: number, p2)
+	local v = {
 		dampingRatio = 1,
 		frequency = 1,
 		restingVelocityLimit = 0.001,
 		restingPositionLimit = 0.01
 	}
 
-	if p1 ~= nil then
-		assign(t1, p1)
+	if p2 ~= nil then
+		assign(v, p2)
 	end
 
-	local restingVelocityLimit = t1.restingVelocityLimit
-	local restingPositionLimit = t1.restingPositionLimit
-	local damping = t1.damping
-	local stiffness = t1.stiffness
-	local mass = t1.mass
-	local v21, v22
+	local restingVelocityLimit = v.restingVelocityLimit
+	local restingPositionLimit = v.restingPositionLimit
+
+	local damping = v.damping
+	local stiffness = v.stiffness
+	local mass = v.mass
+	local v2, v3
 
 	if typeof(damping) == "number" and typeof(stiffness) == "number" and typeof(mass) == "number" then
-		v21 = damping / (sqrt(mass * stiffness) * 2)
-		v22 = sqrt(stiffness / mass) / 2 / 3.141592653589793
+		v2 = damping / (sqrt(mass * stiffness) * 2)
+		v3 = sqrt(stiffness / mass) / 2 / 3.141592653589793
 	else
-		v21 = t1.dampingRatio
-		v22 = t1.frequency
+		v2 = v.dampingRatio
+		v3 = v.frequency
 	end
 
-	local v23 = v21
-	local v24 = v22 * 2 * 3.141592653589793
+	local v4 = v3 * 2 * 3.141592653589793
 
 	assert(restingVelocityLimit >= 0, "Expected restingVelocityLimit >= 0")
 	assert(restingPositionLimit >= 0, "Expected restingPositionLimit >= 0")
 
-	return {
-		step = function(p2, n5: number) -- line: 97
-			-- upvalues: n4 (copy), v23 (copy), v24 (copy), exp (copy), sqrt (copy), cos (copy), sin (copy), n4 (copy), abs (copy), restingVelocityLimit (copy), restingPositionLimit (copy)
-			local value = p2.value
-			local v28 = p2.velocity or 0
-			local v29 = value - n4
-			local v30 = exp(-n5 * v23 * v24)
-			local v31, v32
+	local v5 = {
+		step = function(p3, p4: number)
+			local value = p3.value
+			local velocity = p3.velocity or 0
 
-			if v23 == 1 then
-				v31 = (v28 * n5 + v29 * (v24 * n5 + 1)) * v30 + n4
-				v32 = (v28 - v24 * n5 * (v29 * v24 + v28)) * v30
-			elseif v23 < 1 then
-				local v33 = sqrt(1 - v23 * v23)
-				local v34 = cos(v24 * v33 * n5)
-				local v35 = sin(v24 * v33 * n5)
-				local v36
+			local v5 = value - p
+			local v6 = exp(-p4 * v2 * v4)
+			local v7, velocity2
 
-				if v33 > 0.0001 then
-					v36 = v35 / v33
+			if v2 == 1 then
+				v7 = (velocity * p4 + v5 * (v4 * p4 + 1)) * v6 + p
+				velocity2 = (velocity - v4 * p4 * (v5 * v4 + velocity)) * v6
+			elseif v2 < 1 then
+				local v8 = sqrt(1 - v2 * v2)
+
+				local v9 = cos(v4 * v8 * p4)
+				local v10 = sin(v4 * v8 * p4)
+				local v11
+
+				if v8 > 0.0001 then
+					v11 = v10 / v8
 				else
-					local v37 = n5 * v24
-
-					v36 = v37 + (v37 * v37 * (v33 * v33) * (v33 * v33) / 20 - v33 * v33) * (v37 * v37 * v37) / 6
+					local v12 = p4 * v4
+					v11 = v12 + (v12 * v12 * (v8 * v8) * (v8 * v8) / 20 - v8 * v8) * (v12 * v12 * v12) / 6
 				end
 
-				local v38
+				local v12
 
-				if v24 * v33 > 0.0001 then
-					v38 = v35 / (v24 * v33)
+				if v4 * v8 > 0.0001 then
+					v12 = v10 / (v4 * v8)
 				else
-					local v39 = v24 * v33
-
-					v38 = n5 + (n5 * n5 * (v39 * v39) * (v39 * v39) / 20 - v39 * v39) * (n5 * n5 * n5) / 6
+					local v13 = v4 * v8
+					v12 = p4 + (p4 * p4 * (v13 * v13) * (v13 * v13) / 20 - v13 * v13) * (p4 * p4 * p4) / 6
 				end
 
-				v31 = (v29 * (v34 + v23 * v36) + v28 * v38) * v30 + n4
-				v32 = (v28 * (v34 - v36 * v23) - v29 * (v36 * v24)) * v30
+				v7 = (v5 * (v9 + v2 * v11) + velocity * v12) * v6 + p
+				velocity2 = (velocity * (v9 - v11 * v2) - v5 * (v11 * v4)) * v6
 			else
-				local v40 = sqrt(v23 * v23 - 1)
-				local v41 = -v24 * (v23 - v40)
-				local v42 = -v24 * (v23 + v40)
-				local v43 = (v28 - v41 * v29) / (2 * v24 * v40)
-				local v44 = (v29 - v43) * exp(v41 * n5)
-				local v45 = v43 * exp(v42 * n5)
+				local v8 = sqrt(v2 * v2 - 1)
 
-				v31 = v44 + v45 + n4
-				v32 = v41 * v44 + v42 * v45
+				local v9 = -v4 * (v2 - v8)
+				local v10 = -v4 * (v2 + v8)
+
+				local v11 = (velocity - v9 * v5) / (2 * v4 * v8)
+				local v12 = (v5 - v11) * exp(v9 * p4)
+				local v13 = v11 * exp(v10 * p4)
+
+				v7 = v12 + v13 + p
+				velocity2 = v9 * v12 + v10 * v13
 			end
 
-			local v46 = abs(v31 - n4)
-			local v47 = abs(v32) < restingVelocityLimit and v46 < restingPositionLimit
+			local v8 = abs(v7 - p)
+			local complete
 
-			if v47 then
-				v31 = n4
-				v32 = 0
+			if abs(velocity2) < restingVelocityLimit then
+				complete = v8 < restingPositionLimit
+			else
+				complete = false
 			end
 
-			return {
-				value = v31,
-				velocity = v32,
-				complete = v47
-			}
+			if complete then
+				v7 = p
+				velocity2 = 0
+			end
+
+			return { value = v7, velocity = velocity2, complete = complete }
 		end,
-		startingValue = if not p1 then nil else p1.startingValue
+		startingValue = 0
 	}
+	local startingValue
+
+	if p2 then
+		startingValue = p2.startingValue
+	end
+
+	v5.startingValue = startingValue
+	return v5
 end
 
 return spring

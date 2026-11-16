@@ -1,50 +1,88 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local React = require(AvatarExperienceCommonParent.React)
-local useSignalState = require(AvatarExperienceCommonParent.SignalsReact).useSignalState
-local useLocalization = require(AvatarExperienceCommonParent.Localization).Hooks.useLocalization
-local useNavigation = require(AvatarExperienceCommonParent.Navigation).useNavigation
-local AvatarScreen = require(AvatarExperienceCommonParent.AvatarExperienceNavigation).Enums.AvatarScreen
+local parent = AvatarExperienceCommon.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
+
 local getTimeoutStatusStore = require(AvatarExperienceCommon.Stores.TimeoutStatusStore.getTimeoutStatusStore)
 local formatTimeoutEndTime = require(AvatarExperienceCommon.Utils.formatTimeoutEndTime)
+local useIsAvatarChangeTimeoutActive = require(AvatarExperienceCommon.Hooks.useIsAvatarChangeTimeoutActive)
+local showAvatarChangeFeatureRestriction = require(AvatarExperienceCommon.Utils.showAvatarChangeFeatureRestriction)
 
-local function useTimeoutBannerProps(t1: {[any]: any}?) -- line: 28
-	-- upvalues: getTimeoutStatusStore (copy), useSignalState (copy), useNavigation (copy), React (copy), formatTimeoutEndTime (copy), useLocalization (copy), AvatarScreen (copy)
-	local v12 = not not t1 and (t1.shouldFetch ~= nil and t1.shouldFetch)
-	local v13 = not t1 or (t1.shouldNavigateOnClick == nil or t1.shouldNavigateOnClick)
-	local v14 = getTimeoutStatusStore()
-	local v15 = useSignalState(v14.getStatus)
-	local v16 = useSignalState(v14.getIsTimedOut)
-	local v17 = useNavigation()
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXUseUFRForTimeoutPromptInApp = AvatarExperienceFlags.FFlagAXUseUFRForTimeoutPromptInApp
+local AvatarExperienceFlags2 = require(parent.AvatarExperienceFlags)
+local FFlagAXTimeoutAcknowledgementGating = AvatarExperienceFlags2.FFlagAXTimeoutAcknowledgementGating
 
-	React.useEffect(function() -- line: 39
-		-- upvalues: v12 (copy), v14 (copy)
-		if v12 then
-			v14.fetchStatus()
+local function useTimeoutBannerProps(p)
+	local v
+
+	if p and p.shouldFetch ~= nil then
+		v = p.shouldFetch
+	else
+		v = false
+	end
+
+	local v2 = not p or p.shouldNavigateOnClick == nil or p.shouldNavigateOnClick
+
+	local timeoutStatusStore = getTimeoutStatusStore()
+	local v3 = useSignalState(timeoutStatusStore.getStatus)
+	local shouldShow = useSignalState(timeoutStatusStore.getIsTimedOut)
+	local v4 = useNavigation()
+
+	React.useEffect(function()
+		if v then
+			timeoutStatusStore.fetchStatus()
 		end
-	end, {
-		v12,
-		v14
-	})
+	end, { v, timeoutStatusStore })
 
-	local v18 = v15.timeoutAction and v15.timeoutAction.endTime or v15.details and v15.details.endDate
-	local v19 = formatTimeoutEndTime(v18)
-	local v20 = useLocalization({
-		messageText = not v19 and "Feature.Timeout.WarningBanner.DisabledMessage" or {
+	local time = formatTimeoutEndTime(v3.timeoutAction and v3.timeoutAction.endTime or v3.details and v3.details.endDate)
+
+	local v5 = useLocalization({
+		messageText = time and {
 			"Feature.Timeout.WarningBanner.DisabledUntilMessage",
-			time = v19
-		}
+			time = time
+		} or "Feature.Timeout.WarningBanner.DisabledMessage"
 	})
-	local v21 = React.useCallback(function() -- line: 54
-		-- upvalues: v17 (copy), AvatarScreen (copy)
-		v17.navigate(AvatarScreen.TimeoutStatusPrompt)
-	end, { v17 })
 
-	return {
-		messageText = v20.messageText,
-		onBannerActivated = if not v13 then nil else v21,
-		shouldShow = v16
-	}
+	local onBannerActivated = React.useCallback(function()
+		v4.navigate(AvatarScreen.TimeoutStatusPrompt)
+	end, { v4 })
+
+	if FFlagAXTimeoutAcknowledgementGating then
+		local v6 = useIsAvatarChangeTimeoutActive()
+		shouldShow = shouldShow and v6
+	end
+
+	if FFlagAXUseUFRForTimeoutPromptInApp then
+		local v6 = { messageText = v5.messageText, onBannerActivated = 0, shouldShow = 0 }
+		local onBannerActivated2
+
+		if v2 then
+			onBannerActivated2 = showAvatarChangeFeatureRestriction
+		end
+
+		v6.onBannerActivated = onBannerActivated2
+		v6.shouldShow = shouldShow
+		return v6
+	else
+		local v6 = { messageText = v5.messageText, onBannerActivated = 0, shouldShow = 0 }
+
+		if not v2 then
+			onBannerActivated = nil
+		end
+
+		v6.onBannerActivated = onBannerActivated
+		v6.shouldShow = shouldShow
+		return v6
+	end
 end
 
 return useTimeoutBannerProps

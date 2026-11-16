@@ -1,51 +1,55 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local React = require(AvatarExperienceCommonParent.React)
-local useLocalization = require(AvatarExperienceCommonParent.Localization).Hooks.useLocalization
-local useIsSpatial = require(AvatarExperienceCommonParent.Responsive).useIsSpatial
-local useEarlyIsFocused = require(AvatarExperienceCommonParent.Navigation).useEarlyIsFocused
-local SignalsReact = require(AvatarExperienceCommonParent.SignalsReact)
+local parent = AvatarExperienceCommon.Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Responsive = require(parent.Responsive)
+local useIsSpatial = Responsive.useIsSpatial
+local Navigation = require(parent.Navigation)
+local useEarlyIsFocused = Navigation.useEarlyIsFocused
+local SignalsReact = require(parent.SignalsReact)
 local AXTooltipStore = require(AvatarExperienceCommon.Stores.AXTooltipStore)
-local v9 = game:DefineFastInt("AXTooltipTimeToDismiss", 5)
 
-require(AvatarExperienceCommonParent.AvatarExperienceUIKit)
+local defineFastInt = game:DefineFastInt("AXTooltipTimeToDismiss", 5)
 
-local function useAXTooltipViewModel(t1: {[any]: any}) -- line: 36
-	-- upvalues: AXTooltipStore (copy), useLocalization (copy), useIsSpatial (copy), useEarlyIsFocused (copy), SignalsReact (copy), React (copy), v9 (copy)
-	local v12 = AXTooltipStore(false)
-	local v13 = useLocalization({
-		tooltipText = t1.tooltipLocalizationKey
-	})
-	local v14 = t1.localizedText or v13.tooltipText
-	local v15 = useIsSpatial()
-	local v16 = useEarlyIsFocused()
-	local v17 = SignalsReact.useSignalState(v12.getIsTooltipAllowedToBeShown(t1.tooltipStorageKey))
-	local v18 = t1.showTooltip and (v17 and (v16 and not v15))
-	local v19 = React.useCallback(function() -- line: 49
-		-- upvalues: v12 (copy), t1 (copy)
-		v12.dismissTooltip(t1.tooltipStorageKey)
-	end, { t1.tooltipStorageKey })
+require(parent.AvatarExperienceUIKit)
 
-	if t1.dismissTooltipRef and t1.showTooltip then
-		t1.dismissTooltipRef.current = v19
+local function useAXTooltipViewModel(data)
+	local aXTooltipStore = AXTooltipStore(false)
+
+	local v = useLocalization({ tooltipText = data.tooltipLocalizationKey })
+	local localizedText = data.localizedText or v.tooltipText
+
+	local v2 = useIsSpatial()
+	local v3 = useEarlyIsFocused()
+
+	local v4 = SignalsReact.useSignalState(aXTooltipStore.getIsTooltipAllowedToBeShown(data.tooltipStorageKey))
+
+	local isOpen = data.showTooltip and v4 and v3 and not v2
+
+	local v5 = React.useCallback(function()
+		aXTooltipStore.dismissTooltip(data.tooltipStorageKey)
+	end, { data.tooltipStorageKey })
+
+	if data.dismissTooltipRef and data.showTooltip then
+		data.dismissTooltipRef.current = v5
 	end
 
-	React.useEffect(function() -- line: 57
-		-- upvalues: v18 (copy), v9 (copy), v12 (copy), t1 (copy)
-		if v18 then
-			task.spawn(function() -- line: 59
-				-- upvalues: v9 (copy), v12 (copy), t1 (copy)
-				task.wait(v9)
-				v12.dismissTooltip(t1.tooltipStorageKey, true)
+	React.useEffect(function()
+		if isOpen then
+			task.spawn(function()
+				task.wait(defineFastInt)
+				aXTooltipStore.dismissTooltip(data.tooltipStorageKey, true)
 			end)
 		end
-	end, { v18 })
+	end, { isOpen })
 
 	return {
-		isOpen = v18,
-		popoverSide = t1.popoverSide,
-		tooltipText = v14,
-		onTooltipActivated = v19
+		isOpen = isOpen,
+		popoverSide = data.popoverSide,
+		tooltipText = localizedText,
+		onTooltipActivated = v5
 	}
 end
 

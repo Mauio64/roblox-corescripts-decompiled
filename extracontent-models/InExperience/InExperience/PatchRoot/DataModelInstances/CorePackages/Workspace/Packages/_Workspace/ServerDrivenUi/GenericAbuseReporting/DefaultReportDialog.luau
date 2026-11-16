@@ -1,0 +1,4 @@
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local ReportWithReasonAndComment = require(Workspace.GenericAbuseReporting.GenericAbuseReporting.UXFlow.ReportWithReasonAndComment.ReportWithReasonAndComment)
+
+return ReportWithReasonAndComment

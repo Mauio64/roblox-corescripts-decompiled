@@ -1,24 +1,22 @@
-return function(p1, p2, p3) -- line: 5
-	if not p1 or not p2 then
+return function(items, items2, options): boolean
+	if not (items and items2) then
 		return false
 	end
 
-	if p1 == p2 then
+	if items == items2 then
 		return true
 	end
 
-	if not p3 then
-		p3 = {}
-	end
+	local v = options or {}
 
-	for k, v in pairs(p1) do
-		if v ~= p2[k] and not p3[k] then
+	for k, item in pairs(items) do
+		if items2[k] ~= item and not v[k] then
 			return false
 		end
 	end
 
-	for k, v in pairs(p2) do
-		if v ~= p1[k] and not p3[k] then
+	for k, item in pairs(items2) do
+		if items[k] ~= item and not v[k] then
 			return false
 		end
 	end

@@ -1,9 +1,9 @@
 local CorePackages = game:GetService("CorePackages")
-local GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints = SharedFlags.GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints
 
 game:DefineFastFlag("EnableLeaveGameUpsellEntrypoint", false)
 
-return function() -- line: 6
-	-- upvalues: GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints (copy)
+return function()
 	return GetFFlagEnableInExpPhoneVoiceUpsellEntrypoints() and game:GetFastFlag("EnableLeaveGameUpsellEntrypoint")
 end

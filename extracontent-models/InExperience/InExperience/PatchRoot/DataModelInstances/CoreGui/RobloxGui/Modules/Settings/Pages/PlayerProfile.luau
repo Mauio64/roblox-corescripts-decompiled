@@ -1,14 +1,17 @@
-local RobloxGui = game:GetService("CoreGui").RobloxGui
+local CoreGui = game:GetService("CoreGui")
+
+local RobloxGui = CoreGui.RobloxGui
+
 local ReactPageFactory = require(RobloxGui.Modules.Settings.ReactPageFactory)
+
 local PlayerProfileContainer = require(script.PlayerProfileContainer)
 
-function createPlayerProfilePage() -- line: 9
-	-- upvalues: ReactPageFactory (copy), PlayerProfileContainer (copy)
-	local v4 = ReactPageFactory:createNewPage("PlayerProfile")
+function createPlayerProfilePage()
+	local newPage = ReactPageFactory:createNewPage("PlayerProfile")
 
-	v4:setPage(PlayerProfileContainer)
+	newPage:setPage(PlayerProfileContainer)
 
-	return v4
+	return newPage
 end
 
 return createPlayerProfilePage()

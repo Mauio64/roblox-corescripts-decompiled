@@ -1,6 +1,10 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local DeviceType = require(Parent.RobloxAppEnums).DeviceType
-local t1 = {
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+
+local DeviceType = RobloxAppEnums.DeviceType
+
+local v = {
 	[DeviceType.Desktop] = {
 		startingOffsetPosition = 500,
 		thumbnailHeight = 200,
@@ -38,15 +42,14 @@ local t1 = {
 	}
 }
 
-local function getPlatformConfig(p1) -- line: 60
-	-- upvalues: t1 (copy), DeviceType (copy)
-	local v6 = t1[p1]
+local function getPlatformConfig(p)
+	local v2 = v[p]
 
-	if v6 == nil then
-		return t1[DeviceType.Desktop]
+	if v2 == nil then
+		return v[DeviceType.Desktop]
 	end
 
-	return v6
+	return v2
 end
 
 return getPlatformConfig

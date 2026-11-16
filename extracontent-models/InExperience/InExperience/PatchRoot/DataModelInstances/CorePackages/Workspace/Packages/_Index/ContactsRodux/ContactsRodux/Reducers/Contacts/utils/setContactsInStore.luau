@@ -1,23 +1,17 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Types = ParentParent.Types
+local parent = script.Parent.Parent.Parent.Parent
+local types = parent.Types
+require(types.ReducerTypes)
+local parent2 = parent.Parent
+require(types.ActionTypes)
+local Dash = require(parent2.Dash)
 
-require(Types.ReducerTypes)
+return function(p)
+	local userContactIds = p.responseBody.userContactIds
+	local v = {}
 
-local ParentParentParent = ParentParent.Parent
-
-require(Types.ActionTypes)
-
-local Dash = require(ParentParentParent.Dash)
-
-return function(p1) -- line: 8
-	-- upvalues: Dash (copy)
-	local userContactIds = p1.responseBody.userContactIds
-	local t1 = {}
-
-	Dash.forEach(userContactIds, function(p2) -- line: 12
-		-- upvalues: t1 (copy)
-		t1[p2] = {}
+	Dash.forEach(userContactIds, function(p2)
+		v[p2] = {}
 	end)
 
-	return t1
+	return v
 end

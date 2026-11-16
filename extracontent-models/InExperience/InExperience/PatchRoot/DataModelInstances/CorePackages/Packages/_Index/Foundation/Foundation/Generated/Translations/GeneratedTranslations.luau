@@ -881,7 +881,7 @@ return {
 			["en-us"] = "{current:int} of {total:int}",
 			es = "{current:int} de {total:int}",
 			["es-es"] = "{current:int} de {total:int}",
-			fr = "{current:int}\194\160sur {total:int}",
+			fr = "{current:int} sur {total:int}",
 			id = "{current:int} dari {total:int}",
 			it = "{current:int} di {total:int}",
 			ja = "{current:int}/{total:int}",
@@ -893,7 +893,7 @@ return {
 			["zh-cn"] = "第 {current:int} 步，共 {total:int} 步",
 			["zh-tw"] = "第 {current:int} 步（共 {total:int} 步）",
 			["zh-cjv"] = "第 {current:int} 步，共 {total:int} 步",
-			pl = "{current:int} z\194\160{total:int}",
+			pl = "{current:int} z {total:int}",
 			vi = "{current:int}/{total:int}",
 			tr = "{current:int}/{total:int}",
 			ar = "{current:int} من {total:int}"

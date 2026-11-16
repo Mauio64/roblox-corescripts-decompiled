@@ -1,13 +1,10 @@
-require(script.Api.PaymentsGateway.GetUpsellSuggestionsTypes)
+local GetUpsellSuggestionsTypes = require(script.Api.PaymentsGateway.GetUpsellSuggestionsTypes)
 require(script.Enums.CheckUserPurchaseSettingsFailureReason)
 require(script.Enums.EconomicRestrictionsViolationType)
 require(script.ProductPurchase.v3.UnifiedProductPurchaseModalTypes)
-
 local UnifiedPurchaseModalTypeEnum = require(script.Enums.UnifiedPurchaseModalTypeEnum)
 local PricingTypes = require(script.ProductPurchase.PricingTypes)
-
 require(script.ProductPurchase.v4.cartPricingResponseLineItem)
-
 local deriveCartPricingView = require(script.ProductPurchase.v4.deriveCartPricingView)
 
 return {
@@ -32,11 +29,13 @@ return {
 	PreparePaymentCheck = require(script.Generic.PreparePaymentCheck),
 	Api = {
 		PaymentsGateway = {
-			GetUpsellSuggestions = require(script.Api.PaymentsGateway.GetUpsellSuggestions)
+			GetUpsellSuggestions = require(script.Api.PaymentsGateway.GetUpsellSuggestions),
+			GetUpsellSuggestionsTypes = GetUpsellSuggestionsTypes
 		}
 	},
 	Flags = {
 		FFlagMobilePopularItemBadgingExperimentEnabled = require(script.Flags.FFlagMobilePopularItemBadgingExperimentEnabled),
+		FFlagEnableRobuxUpsellPlusButtonExperiment = require(script.Flags.FFlagEnableRobuxUpsellPlusButtonExperiment),
 		GetFStringMobilePopularItemBadgingLayer = require(script.Flags.GetFStringMobilePopularItemBadgingLayer),
 		FFlagPopularFillIconEnabled = require(script.Flags.FFlagPopularFillIconEnabled),
 		GetFStringPopularFillIconLocation = require(script.Flags.GetFStringPopularFillIconLocation)

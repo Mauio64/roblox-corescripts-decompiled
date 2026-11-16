@@ -1,3 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Workspace.Packages.Localization).LocalizationConsumer
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+return Localization.LocalizationConsumer

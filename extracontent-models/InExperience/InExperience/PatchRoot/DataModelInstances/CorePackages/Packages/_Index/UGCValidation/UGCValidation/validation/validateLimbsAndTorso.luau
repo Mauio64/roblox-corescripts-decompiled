@@ -1,214 +1,163 @@
-local ParentParent = script.Parent.Parent
-local Analytics = require(ParentParent.Analytics)
-local Constants = require(ParentParent.Constants)
-local validateMeshPartBodyPart = require(ParentParent.validation.validateMeshPartBodyPart)
-local validateTags = require(ParentParent.validation.validateTags)
-local validatePropertyRequirements = require(ParentParent.validation.validatePropertyRequirements)
-local validateAttributes = require(ParentParent.validation.validateAttributes)
-local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
-local createLimbsAndTorsoSchema = require(ParentParent.util.createLimbsAndTorsoSchema)
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+local Analytics = require(parent.Analytics)
+local Constants = require(parent.Constants)
 
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local getFFlagUGCValidationCombineEntrypointResults = require(ParentParent.flags.getFFlagUGCValidationCombineEntrypointResults)
+local validateMeshPartBodyPart = require(parent.validation.validateMeshPartBodyPart)
+local validateTags = require(parent.validation.validateTags)
 
-local function getInstance(t1: {[any]: any}, s1: string) -- line: 18
-	for _, v in pairs(t1) do
-		if s1 == v.Name then
-			return v
+local FailureReasonsAccumulator = require(parent.util.FailureReasonsAccumulator)
+local createLimbsAndTorsoSchema = require(parent.util.createLimbsAndTorsoSchema)
+require(parent.util.Types)
+
+local function getInstance(items, p: string) -- 3 equivalent calls inferred from this helper
+	for _, item in pairs(items) do
+		if item.Name == p then
+			return item
 		end
 	end
 
 	return nil
 end
-local function areTopLevelFoldersCorrect(t2: {[any]: any}, t3: {[any]: any}) -- line: 27
-	if #t2 ~= #t3 then
+
+local function areTopLevelFoldersCorrect(instances, list): boolean
+	if #instances ~= #list then
 		return false
 	end
 
-	local g30 = nil
-	local v29 = nil
+	for _, item in list do
+		local instance = getInstance(instances, item) -- inferred equivalent call
 
-	for _, v26 in t3 do
-		for _, v in pairs(t2) do
-			if v26 == v.Name then
-				v29 = v
-				g30 = true
-			end
-
-			if g30 then
-				break
-			end
-		end
-
-		if not g30 then
-			v29 = nil
-		end
-
-		g30 = false
-
-		if not v29 or v29.ClassName ~= "Folder" then
+		if not instance or instance.ClassName ~= "Folder" then
 			return false
 		end
 	end
 
 	return true
 end
-local function getFullNameWithoutRootFolder(p1, s2: string) -- line: 41
-	local FullName = p1:GetFullName()
-	local start, stop = string.find(FullName, s2 .. "%.")
 
-	assert(start and stop)
-
-	return (string.sub(FullName, stop + 1, #FullName))
+local function getFullNameWithoutRootFolder(descendant, item: string) -- 1 equivalent call inferred from this helper
+	local fullName = descendant:GetFullName()
+	local v, v2 = string.find(fullName, item .. "%.")
+	assert(v and v2)
+	return (string.sub(fullName, v2 + 1, #fullName))
 end
-local function compareFolderInfo(p2, p3, p4) -- line: 48
-	-- upvalues: FailureReasonsAccumulator (copy), Analytics (copy)
-	local v39 = FailureReasonsAccumulator.new()
 
-	for v40, v41 in p2 do
-		if p3[v40] == nil or v41 ~= p3[v40] then
-			Analytics.reportFailure(Analytics.ErrorType.validateLimbsAndTorso_FolderInfoMismatch, nil, p4)
-			v39:updateReasons(false, { `Attribute { v40 } has different values in different children folders. You need to use the same value in all folders.` })
+local function compareFolderInfo(items, p, p2)
+	local v = FailureReasonsAccumulator.new()
+
+	for k, item in items do
+		if not (p[k] == nil or p[k] ~= item) then
+			continue
 		end
+
+		Analytics.reportFailure(Analytics.ErrorType.validateLimbsAndTorso_FolderInfoMismatch, nil, p2)
+
+		v:updateReasons(false, {
+			`Attribute {k} has different values in different children folders. You need to use the same value in all folders.`
+		})
 	end
 
-	return v39:getFinalResults()
+	return v:getFinalResults()
 end
-local function validateFolderAssetIdsMatch(t4: {[any]: any}, t5: {[any]: any}, p5) -- line: 70
-	-- upvalues: FailureReasonsAccumulator (copy), Constants (copy), compareFolderInfo (copy)
-	if #t5 == 1 then
+
+local function validateFolderAssetIdsMatch(instances, list, data)
+	if #list == 1 then
 		return true
 	end
 
-	local v45 = nil
-	local v46 = FailureReasonsAccumulator.new()
-	local g52 = nil
-	local v51 = nil
+	local v = FailureReasonsAccumulator.new()
+	local v2 = nil
 
-	for _, v48 in t5 do
-		if v48 ~= Constants.FOLDER_NAMES.R6 then
-			for _, v in pairs(t4) do
-				if v48 == v.Name then
-					v51 = v
-					g52 = true
-				end
+	for _, item in list do
+		if item == Constants.FOLDER_NAMES.R6 then
+			continue
+		end
 
-				if g52 then
-					break
-				end
+		local instance = getInstance(instances, item) -- inferred equivalent call
+		assert(instance)
+
+		local v3 = {}
+
+		for _, descendant in instance:GetDescendants() do
+			local v4 = Constants.CONTENT_ID_FIELDS[descendant.ClassName]
+
+			if not v4 then
+				continue
 			end
 
-			if not g52 then
-				v51 = nil
+			for _, v5 in v4 do
+				v3[getFullNameWithoutRootFolder(descendant, item) .. "." .. v5] = descendant[v5] -- inferred equivalent call
 			end
+		end
 
-			g52 = false
-			assert(v51)
-
-			local t6 = {}
-
-			for _, descendant in v51:GetDescendants() do
-				local v56 = Constants.CONTENT_ID_FIELDS[descendant.ClassName]
-
-				if v56 then
-					for _, v58 in v56 do
-						local FullName = descendant:GetFullName()
-						local start, stop = string.find(FullName, v48 .. "%.")
-
-						assert(start and stop)
-						t6[string.sub(FullName, stop + 1, #FullName) .. "." .. v58] = descendant[v58]
-					end
-				end
-			end
-
-			if not v45 then
-				v45 = t6
-			else
-				v46:updateReasons(compareFolderInfo(v45, t6, p5))
-				v46:updateReasons(compareFolderInfo(t6, v45, p5))
-			end
+		if v2 then
+			v:updateReasons(compareFolderInfo(v2, v3, data))
+			v:updateReasons(compareFolderInfo(v3, v2, data))
+		else
+			v2 = v3
 		end
 	end
 
-	return v46:getFinalResults()
+	return v:getFinalResults()
 end
-local function validateR6Folder(p6, p7, p8) -- line: 113
-	-- upvalues: FailureReasonsAccumulator (copy), Analytics (copy), validateTags (copy), getFFlagUGCValidateMigrateSchemaProperties (copy), getFFlagUGCValidationCombineEntrypointResults (copy), validatePropertyRequirements (copy), validateAttributes (copy)
-	local v65 = FailureReasonsAccumulator.new()
 
-	if #p6:GetChildren() > 0 then
-		Analytics.reportFailure(Analytics.ErrorType.validateLimbsAndTorso_R6FolderHasChildren, nil, p8)
-		v65:updateReasons(false, { string.format("Deprecated R6 folder for '%s' should be empty. You need to clear that folder and try again.", p7.Name) })
+local function validateR6Folder(instance, assetTypeEnum, data)
+	local v = FailureReasonsAccumulator.new()
+
+	if #instance:GetChildren() > 0 then
+		Analytics.reportFailure(Analytics.ErrorType.validateLimbsAndTorso_R6FolderHasChildren, nil, data)
+		v:updateReasons(false, {
+			string.format(
+				"Deprecated R6 folder for '%s' should be empty. You need to clear that folder and try again.",
+				assetTypeEnum.Name
+			)
+		})
 	end
 
-	v65:updateReasons(validateTags(p6, p8))
+	v:updateReasons(validateTags(instance, data))
 
-	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
-		v65:updateReasons(validatePropertyRequirements(p6, p7, p8))
-		v65:updateReasons(validateAttributes(p6, p8))
-	end
-
-	return v65:getFinalResults()
+	return v:getFinalResults()
 end
-local function validateLimbsAndTorso(p9) -- line: 141
-	-- upvalues: Constants (copy), areTopLevelFoldersCorrect (copy), Analytics (copy), validateR6Folder (copy), validateMeshPartBodyPart (copy), createLimbsAndTorsoSchema (copy), validateFolderAssetIdsMatch (copy)
-	assert(p9.instances ~= nil, "instances required in validationContext for validateLimbsAndTorso")
 
-	local instances = p9.instances
+local function validateLimbsAndTorso(data)
+	assert(data.instances ~= nil, "instances required in validationContext for validateLimbsAndTorso")
+	local instances = data.instances
 
-	assert(p9.assetTypeEnum ~= nil, "assetTypeEnum required in validationContext for validateLimbsAndTorso")
+	assert(data.assetTypeEnum ~= nil, "assetTypeEnum required in validationContext for validateLimbsAndTorso")
 
-	local requireAllFolders = p9.requireAllFolders
-	local assetTypeEnum = p9.assetTypeEnum
-	local t7 = { Constants.FOLDER_NAMES.R15ArtistIntent }
-	local g76 = nil
-	local v75 = nil
+	local requireAllFolders = data.requireAllFolders
+	local assetTypeEnum = data.assetTypeEnum
+
+	local v = { Constants.FOLDER_NAMES.R15ArtistIntent }
 
 	if requireAllFolders then
-		table.insert(t7, Constants.FOLDER_NAMES.R15Fixed)
-		table.insert(t7, Constants.FOLDER_NAMES.R6)
+		table.insert(v, Constants.FOLDER_NAMES.R15Fixed)
+		table.insert(v, Constants.FOLDER_NAMES.R6)
 	end
 
-	if not areTopLevelFoldersCorrect(instances, t7) then
-		Analytics.reportFailure(Analytics.ErrorType.validateLimbsAndTorso_TopLevelFolders, nil, p9)
+	if not areTopLevelFoldersCorrect(instances, v) then
+		Analytics.reportFailure(Analytics.ErrorType.validateLimbsAndTorso_TopLevelFolders, nil, data)
 
-		return false, { "Incorrect hierarchy for asset with the following missing folders: " .. table.concat(t7, ", ") }
+		return false, { "Incorrect hierarchy for asset with the following missing folders: " .. table.concat(v, ", ") }
 	end
 
-	for _, v72 in t7 do
-		for _, v in pairs(instances) do
-			if v72 == v.Name then
-				v75 = v
-				g76 = true
-			end
+	for _, v2 in v do
+		local instance = getInstance(instances, v2) -- inferred equivalent call
+		local selected, v3
 
-			if g76 then
-				break
-			end
-		end
-
-		if not g76 then
-			v75 = nil
-		end
-
-		g76 = false
-
-		local v77, v78
-
-		if v72 == Constants.FOLDER_NAMES.R6 then
-			v77, v78 = validateR6Folder(v75, assetTypeEnum, p9)
+		if v2 == Constants.FOLDER_NAMES.R6 then
+			selected, v3 = validateR6Folder(instance, assetTypeEnum, data)
 		else
-			v77, v78 = validateMeshPartBodyPart(v75, createLimbsAndTorsoSchema(assetTypeEnum, v72, p9), p9)
+			selected, v3 = validateMeshPartBodyPart(instance, createLimbsAndTorsoSchema(assetTypeEnum, v2, data), data)
 		end
 
-		if not v77 then
-			return v77, v78
+		if not selected then
+			return selected, v3
 		end
 	end
 
-	return validateFolderAssetIdsMatch(instances, t7, p9)
+	return validateFolderAssetIdsMatch(instances, v, data)
 end
 
 return validateLimbsAndTorso

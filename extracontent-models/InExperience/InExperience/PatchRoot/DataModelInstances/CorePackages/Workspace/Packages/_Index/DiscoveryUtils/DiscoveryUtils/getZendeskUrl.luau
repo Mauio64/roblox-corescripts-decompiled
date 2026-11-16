@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	["zh-cn"] = "zh-cn",
 	zh_cn = "zh-cn",
 	["zh-cjv"] = "zh-cn",
@@ -21,27 +21,26 @@ local t1 = {
 	nb_no = "no"
 }
 
-local function v2(s1: string) -- line: 24
-	-- upvalues: t1 (copy)
-	if t1[s1] then
-		return t1[s1]
+local function fn(value: string)
+	if v[value] then
+		return v[value]
 	end
 
-	local t2 = {}
+	local v2 = {}
 
-	for match in s1:gmatch("([^%-_]+)") do
-		table.insert(t2, match)
+	for k in value:gmatch("([^%-_]+)") do
+		table.insert(v2, k)
 	end
 
-	if t2[1] then
-		return t2[1]
-	end
-
-	return "en-us"
+	return if v2[1] then v2[1] else "en-us"
 end
-local function getZendeskUrl(s2: string?, s3: string?, s4: string?) -- line: 52
-	-- upvalues: v2 (copy)
-	return `{ s2 or "https://en.help.roblox.com/hc" }/{ not (s3 and string.match(s3, "^[%w%-_]+$") ~= nil) and "en-us" or v2(s3) }/{ not (s4 and string.match(s4, "^[a-zA-Z0-9]+$") ~= nil) and "" or `articles/{ s4 }` }`
+
+local function fn2(value: string?) -- 1 equivalent call inferred from this helper
+	return value and string.match(value, "^[a-zA-Z0-9]+$") ~= nil
+end
+
+local function getZendeskUrl(value: string?, value2: string?, value3: string?)
+	return `{value or "https://en.help.roblox.com/hc"}/{(not value2 or string.match(value2, "^[%w%-_]+$") == nil) and "en-us" or fn(value2)}/{not fn2(value3) and "" or `articles/{value3}`}` -- inferred equivalent call
 end
 
 return getZendeskUrl

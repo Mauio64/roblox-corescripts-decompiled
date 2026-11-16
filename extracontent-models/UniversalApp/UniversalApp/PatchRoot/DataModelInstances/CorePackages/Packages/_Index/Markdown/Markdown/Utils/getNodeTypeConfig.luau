@@ -1,20 +1,18 @@
-local Parent = script:FindFirstAncestor("Utils").Parent
+local parent = script:FindFirstAncestor("Utils").Parent
 
-require(Parent.Types)
+require(parent.Types)
 
 local NodeTypeConfig = require(script.Parent.NodeTypeConfig)
 
-local function getNodeTypeConfig(p1) -- line: 7
-	-- upvalues: NodeTypeConfig (copy)
-	local v5 = NodeTypeConfig[p1.type]
+local function getNodeTypeConfig(data)
+	local v = NodeTypeConfig[data.type]
 
-	if not v5 then
-		warn(`No node type config found for node: { p1.name } { p1.text } of type: { p1.type }`)
-
-		return nil
+	if v then
+		return v
 	end
 
-	return v5
+	warn(`No node type config found for node: {data.name} {data.text} of type: {data.type}`)
+	return nil
 end
 
 return getNodeTypeConfig

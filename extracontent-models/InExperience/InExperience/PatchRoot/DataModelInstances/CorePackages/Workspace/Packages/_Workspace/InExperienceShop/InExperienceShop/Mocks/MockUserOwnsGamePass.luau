@@ -1,8 +1,8 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
 
-local function userOwnsGamePass(_: number) -- line: 15
-	-- upvalues: Promise (copy)
+local Promise = require(parent.Promise)
+
+local function userOwnsGamePass(_: number)
 	return Promise.resolve(false)
 end
 

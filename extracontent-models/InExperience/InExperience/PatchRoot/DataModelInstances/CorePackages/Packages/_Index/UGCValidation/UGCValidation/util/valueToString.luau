@@ -1,42 +1,44 @@
-local ParentParent = script.Parent.Parent
-local Cryo = require(ParentParent.Parent.Cryo)
-local getFFlagUGCValidationEyebrowEyelashSupport = require(ParentParent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
-local v4 = game:DefineFastFlag("UGCValidationValueToStringVector3Precision", false)
+local parent = script.Parent.Parent
+local Cryo = require(parent.Parent.Cryo)
 
-local function round(p1, p2) -- line: 9
-	local v9 = 10 ^ (p2 or 0)
+local getFFlagUGCValidationEyebrowEyelashSupport = require(parent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
 
-	return math.floor(p1 * v9 + 0.5) / v9
+local defineFastFlag = game:DefineFastFlag("UGCValidationValueToStringVector3Precision", false)
+
+local function round(p, value) -- 3 equivalent calls inferred from this helper
+	local v = 10 ^ (value or 0)
+	return math.floor(p * v + 0.5) / v
 end
-local function valueToString(p3) -- line: 14
-	-- upvalues: Cryo (copy), v4 (copy), getFFlagUGCValidationEyebrowEyelashSupport (copy), valueToString (copy)
-	local v11 = typeof(p3)
 
-	if p3 == Cryo.None then
+local function valueToString(p)
+	local typeName = typeof(p)
+
+	if p == Cryo.None then
 		return "not defined"
 	end
 
-	if v11 == "Vector3" then
-		local v12 = not v4 and "%d, %d, %d" or "%g, %g, %g"
-
-		return string.format(v12, math.floor(p3.X * 100 + 0.5) / 100, math.floor(p3.Y * 100 + 0.5) / 100, math.floor(p3.Z * 100 + 0.5) / 100)
+	if typeName == "Vector3" then
+		return string.format(
+			defineFastFlag and "%g, %g, %g" or "%d, %d, %d",
+			round(p.X, 2), -- inferred equivalent call
+			round(p.Y, 2), -- inferred equivalent call
+			round(p.Z, 2) -- inferred equivalent call
+		)
+	elseif typeName == "Color3" then
+		return string.format("%d, %d, %d", math.floor(p.r * 255), math.floor(p.g * 255), (math.floor(p.b * 255)))
 	end
 
-	if v11 == "Color3" then
-		return string.format("%d, %d, %d", math.floor(p3.r * 255), math.floor(p3.g * 255), (math.floor(p3.b * 255)))
+	if not getFFlagUGCValidationEyebrowEyelashSupport() or typeName ~= "table" or p[1] == nil then
+		return (tostring(p))
 	end
 
-	if getFFlagUGCValidationEyebrowEyelashSupport() and v11 == "table" and p3[1] ~= nil then
-		local str = tostring(p3[1])
+	local v = tostring(p[1])
 
-		for i = 2, #p3 do
-			str ..= ", " .. valueToString(p3[i])
-		end
-
-		return str
+	for i = 2, #p do
+		v ..= ", " .. valueToString(p[i])
 	end
 
-	return (tostring(p3))
+	return v
 end
 
 return valueToString

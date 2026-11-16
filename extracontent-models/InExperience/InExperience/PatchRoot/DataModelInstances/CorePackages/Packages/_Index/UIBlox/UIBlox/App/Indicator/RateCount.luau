@@ -1,28 +1,32 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local Roact = require(scriptParentParentParentParent.Roact)
-local t = require(scriptParentParentParentParent.t)
-local Label = require(scriptParentParentParent.Core.ImageSet.ImageSetComponent).Label
-local Cryo = require(scriptParentParentParentParent.Cryo)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-require(scriptParentParent.Style.StyleTypes)
+local Roact = require(parent4.Roact)
+local t = require(parent4.t)
+local ImageSetComponent = require(parent3.Core.ImageSet.ImageSetComponent)
+local Label = ImageSetComponent.Label
+local Cryo = require(parent4.Cryo)
 
-local validateColorInfo = require(scriptParentParentParent.Core.Style.Validator.validateColorInfo)
-local Images = require(scriptParentParent.ImageSet.Images)
-local IconButton = require(scriptParentParent.Button.IconButton)
-local getIconSize = require(scriptParentParent.ImageSet.getIconSize)
-local IconSize = require(scriptParentParent.ImageSet.Enum.IconSize)
-local GenericTextLabel = require(scriptParentParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local withStyle = require(scriptParentParentParent.Core.Style.withStyle)
-local VoteStates = require(scriptParent.Enum.VoteStates)
-local v17 = Images["icons/status/games/rating_large"]
-local v18 = Images["icons/actions/vote/voteDownOff"]
-local v19 = Images["icons/actions/vote/voteDownOn"]
-local v20 = Images["icons/actions/vote/voteUpOff"]
-local v21 = Images["icons/actions/vote/voteUpOn"]
-local t1 = {
+require(parent2.Style.StyleTypes)
+local validateColorInfo = require(parent3.Core.Style.Validator.validateColorInfo)
+
+local Images = require(parent2.ImageSet.Images)
+local IconButton = require(parent2.Button.IconButton)
+local getIconSize = require(parent2.ImageSet.getIconSize)
+local IconSize = require(parent2.ImageSet.Enum.IconSize)
+local GenericTextLabel = require(parent3.Core.Text.GenericTextLabel.GenericTextLabel)
+local withStyle = require(parent3.Core.Style.withStyle)
+local VoteStates = require(parent.Enum.VoteStates)
+
+local iconsstatusgamesrating_large = Images["icons/status/games/rating_large"]
+local iconsactionsvotevoteDownOff = Images["icons/actions/vote/voteDownOff"]
+local iconsactionsvotevoteDownOn = Images["icons/actions/vote/voteDownOn"]
+local iconsactionsvotevoteUpOff = Images["icons/actions/vote/voteUpOff"]
+local iconsactionsvotevoteUpOn = Images["icons/actions/vote/voteUpOn"]
+
+local v = {
 	containerSpacingTop = 12,
 	containerSpacingTrailing = 12,
 	containerSpacingBottom = 12,
@@ -30,15 +34,16 @@ local t1 = {
 	containerBorderRadius = 8,
 	containerGap = 12,
 	statWidgetContainerGap = 12,
+	statWidgetIconSize = getIconSize(IconSize.Large),
 	statWidgetDataGap = 0,
 	buttonGroupGap = 12,
 	buttonSize = 44,
-	statWidgetIconSize = getIconSize(IconSize.Large),
 	buttonIconSizeEnum = IconSize.Medium
 }
-local v23 = Roact.PureComponent:extend("RateCount")
 
-v23.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("RateCount")
+
+extended.validateProps = t.strictInterface({
 	position = t.optional(t.UDim2),
 	layoutOrder = t.optional(t.integer),
 	anchorPoint = t.optional(t.Vector2),
@@ -68,71 +73,80 @@ v23.validateProps = t.strictInterface({
 		buttonIconSizeEnum = t.optional(IconSize.isEnumValue)
 	}))
 })
-v23.defaultProps = {
+
+extended.defaultProps = {
 	height = 72,
 	rateText = "",
 	rateLabel = "",
 	voteState = VoteStates.notVoted
 }
 
-function v23.init(p1) -- line: 151
-	function p1.onVoteDownActivated() -- line: 152
-		-- upvalues: p1 (copy)
-		local onVoteDownActivated = p1.props.onVoteDownActivated
+function extended:init()
+	function self.onVoteDownActivated()
+		local onVoteDownActivated = self.props.onVoteDownActivated
 
 		if onVoteDownActivated then
 			onVoteDownActivated()
 		end
 	end
-	function p1.onVoteUpActivated() -- line: 159
-		-- upvalues: p1 (copy)
-		local onVoteUpActivated = p1.props.onVoteUpActivated
+
+	function self.onVoteUpActivated()
+		local onVoteUpActivated = self.props.onVoteUpActivated
 
 		if onVoteUpActivated then
 			onVoteUpActivated()
 		end
 	end
 end
-function v23.render(p2) -- line: 167
-	-- upvalues: VoteStates (copy), withStyle (copy), Cryo (copy), t1 (copy), getIconSize (copy), Roact (copy), Label (copy), v17 (copy), GenericTextLabel (copy), IconButton (copy), v19 (copy), v18 (copy), v21 (copy), v20 (copy)
-	local position = p2.props.position
-	local layoutOrder = p2.props.layoutOrder
-	local anchorPoint = p2.props.anchorPoint
-	local width = p2.props.width
-	local height = p2.props.height
-	local u31 = if not width then UDim2.new(1, 0, 0, height) else UDim2.new(0, width, 0, height)
-	local rateText = p2.props.rateText
-	local rateLabel = p2.props.rateLabel
-	local voteState = p2.props.voteState
-	local v35 = voteState == VoteStates.votedDown
-	local v36 = voteState == VoteStates.votedUp
 
-	return withStyle(function(p3) -- line: 187
-		-- upvalues: Cryo (copy), t1 (copy), p2 (copy), getIconSize (copy), Roact (copy), u31 (ref), position (copy), anchorPoint (copy), layoutOrder (copy), Label (copy), v17 (copy), GenericTextLabel (copy), rateText (copy), rateLabel (copy), IconButton (copy), v35 (copy), v19 (copy), v18 (copy), v36 (copy), v21 (copy), v20 (copy)
-		local v40 = Cryo.Dictionary.join(t1, p2.props.styleProps or {})
-		local containerSpacingLeading = v40.containerSpacingLeading
-		local containerSpacingTrailing = v40.containerSpacingTrailing
-		local containerBorderRadius = v40.containerBorderRadius
-		local v44 = v40.containerBackgroundColor or p3.Theme.BackgroundContrast
-		local containerGap = v40.containerGap
-		local statWidgetContainerGap = v40.statWidgetContainerGap
-		local statWidgetIconSize = v40.statWidgetIconSize
-		local v48 = v40.statWidgetIconContentColor or p3.Theme.IconEmphasis
-		local statWidgetDataGap = v40.statWidgetDataGap
-		local v50 = v40.statWidgetDataContentColor or p3.Theme.TextEmphasis
-		local v51 = v40.statWidgetDataLabelContentColor or p3.Theme.TextEmphasis
-		local buttonGroupGap = v40.buttonGroupGap
-		local buttonSize = v40.buttonSize
-		local buttonIconSizeEnum = v40.buttonIconSizeEnum
-		local v55 = -(statWidgetIconSize + math.max(getIconSize(buttonIconSizeEnum, p3), buttonSize) * 2 + statWidgetContainerGap + containerGap + buttonGroupGap)
+function extended.render(data)
+	local position = data.props.position
+	local layoutOrder = data.props.layoutOrder
+	local anchorPoint = data.props.anchorPoint
+
+	local width = data.props.width
+	local height = data.props.height
+	local udim
+
+	if width then
+		udim = UDim2.new(0, width, 0, height)
+	else
+		udim = UDim2.new(1, 0, 0, height)
+	end
+
+	local rateText = data.props.rateText
+	local rateLabel = data.props.rateLabel
+	local voteState = data.props.voteState
+	local v2 = voteState == VoteStates.votedDown
+	local v3 = voteState == VoteStates.votedUp
+
+	return withStyle(function(p)
+		local joined = Cryo.Dictionary.join(v, data.props.styleProps or {})
+		local containerSpacingLeading = joined.containerSpacingLeading
+		local containerSpacingTrailing = joined.containerSpacingTrailing
+		local containerBorderRadius = joined.containerBorderRadius
+		local containerBackgroundColor = joined.containerBackgroundColor or p.Theme.BackgroundContrast
+		local containerGap = joined.containerGap
+
+		local statWidgetContainerGap = joined.statWidgetContainerGap
+		local statWidgetIconSize = joined.statWidgetIconSize
+		local statWidgetIconContentColor = joined.statWidgetIconContentColor or p.Theme.IconEmphasis
+		local statWidgetDataGap = joined.statWidgetDataGap
+		local statWidgetDataContentColor = joined.statWidgetDataContentColor or p.Theme.TextEmphasis
+		local statWidgetDataLabelContentColor = joined.statWidgetDataLabelContentColor or p.Theme.TextEmphasis
+
+		local buttonGroupGap = joined.buttonGroupGap
+		local buttonSize = joined.buttonSize
+		local buttonIconSizeEnum = joined.buttonIconSizeEnum
+		local v4 = -(statWidgetIconSize + math.max(getIconSize(buttonIconSizeEnum, p), buttonSize) * 2 + statWidgetContainerGap + containerGap + buttonGroupGap)
 
 		return Roact.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = u31,
+			Size = udim,
 			Position = position,
 			AnchorPoint = anchorPoint,
-			BackgroundColor3 = v44.Color,
-			BackgroundTransparency = v44.Transparency,
+			BackgroundColor3 = containerBackgroundColor.Color,
+			BackgroundTransparency = containerBackgroundColor.Transparency,
+			BorderSizePixel = 0,
 			LayoutOrder = layoutOrder
 		}, {
 			RoundCorner = Roact.createElement("UICorner", {
@@ -151,60 +165,64 @@ function v23.render(p2) -- line: 167
 			}),
 			Icon = Roact.createElement(Label, {
 				LayoutOrder = 1,
-				BackgroundTransparency = 1,
 				Size = UDim2.fromOffset(statWidgetIconSize, statWidgetIconSize),
-				Image = v17,
-				ImageColor3 = v48.Color,
-				ImageTransparency = v48.Transparency
+				Image = iconsstatusgamesrating_large,
+				ImageColor3 = statWidgetIconContentColor.Color,
+				ImageTransparency = statWidgetIconContentColor.Transparency,
+				BackgroundTransparency = 1
 			}),
-			TextSection = Roact.createElement("Frame", {
-				LayoutOrder = 2,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, v55, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				ListLayout = Roact.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Vertical,
-					Padding = UDim.new(0, statWidgetDataGap)
-				}),
-				RateText = Roact.createElement(GenericTextLabel, {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Text = rateText,
-					colorStyle = v50,
-					fontStyle = p3.Font.Title
-				}),
-				RateLabel = Roact.createElement(GenericTextLabel, {
+			TextSection = Roact.createElement(
+				"Frame",
+				{
 					LayoutOrder = 2,
+					Size = UDim2.new(1, v4, 0, 0),
 					BackgroundTransparency = 1,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Text = rateLabel,
-					colorStyle = v51,
-					fontStyle = p3.Font.CaptionHeader
-				})
-			}),
+					AutomaticSize = Enum.AutomaticSize.Y
+				},
+				{
+					ListLayout = Roact.createElement("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						FillDirection = Enum.FillDirection.Vertical,
+						Padding = UDim.new(0, statWidgetDataGap)
+					}),
+					RateText = Roact.createElement(GenericTextLabel, {
+						LayoutOrder = 1,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						Text = rateText,
+						colorStyle = statWidgetDataContentColor,
+						fontStyle = p.Font.Title,
+						BackgroundTransparency = 1
+					}),
+					RateLabel = Roact.createElement(GenericTextLabel, {
+						LayoutOrder = 2,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						Text = rateLabel,
+						colorStyle = statWidgetDataLabelContentColor,
+						fontStyle = p.Font.CaptionHeader,
+						BackgroundTransparency = 1
+					})
+				}
+			),
 			VoteDown = Roact.createElement(IconButton, {
 				layoutOrder = 3,
-				showBackground = true,
 				size = UDim2.fromOffset(buttonSize, buttonSize),
-				icon = v35 and v19 or v18,
-				iconColor3 = p3.Theme.IconEmphasis.Color,
+				icon = v2 and iconsactionsvotevoteDownOn or iconsactionsvotevoteDownOff,
+				iconColor3 = p.Theme.IconEmphasis.Color,
 				iconSize = buttonIconSizeEnum,
-				onActivated = p2.onVoteDownActivated
+				onActivated = data.onVoteDownActivated,
+				showBackground = true
 			}),
 			VoteUp = Roact.createElement(IconButton, {
 				layoutOrder = 4,
-				showBackground = true,
 				size = UDim2.fromOffset(buttonSize, buttonSize),
-				icon = v36 and v21 or v20,
-				iconColor3 = p3.Theme.IconEmphasis.Color,
+				icon = v3 and iconsactionsvotevoteUpOn or iconsactionsvotevoteUpOff,
+				iconColor3 = p.Theme.IconEmphasis.Color,
 				iconSize = buttonIconSizeEnum,
-				onActivated = p2.onVoteUpActivated
+				onActivated = data.onVoteUpActivated,
+				showBackground = true
 			})
 		})
 	end)
 end
 
-return v23
+return extended

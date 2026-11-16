@@ -1,48 +1,60 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+
 local inspect = LuauPolyfill.util.inspect
 local setTimeout = LuauPolyfill.setTimeout
-local Shared = require(ParentParent.Shared)
+
+local Shared = require(parent.Shared)
 local console = Shared.console
 local errorToString = Shared.errorToString
 
 require(script.Parent.ReactInternalTypes)
+
 require(script.Parent.ReactCapturedValue)
 
-local showErrorDialog = require(script.Parent.ReactFiberErrorDialog).showErrorDialog
-local ClassComponent = require(script.Parent.ReactWorkTags).ClassComponent
-local getComponentName = require(ParentParent.Shared).getComponentName
+local ReactFiberErrorDialog = require(script.Parent.ReactFiberErrorDialog)
+local showErrorDialog = ReactFiberErrorDialog.showErrorDialog
+local ReactWorkTags = require(script.Parent.ReactWorkTags)
+local ClassComponent = ReactWorkTags.ClassComponent
+local Shared2 = require(parent.Shared)
+local getComponentName = Shared2.getComponentName
 
 return {
-	logCapturedError = function(p1, p2) -- line: 34
-		-- upvalues: showErrorDialog (copy), ReactGlobals (copy), ClassComponent (copy), console (copy), getComponentName (copy), inspect (copy), setTimeout (copy), errorToString (copy)
-		local ok, result = pcall(function() -- line: 35
-			-- upvalues: showErrorDialog (copy), p1 (copy), p2 (copy), ReactGlobals (copy), ClassComponent (copy), console (copy), getComponentName (copy), inspect (copy)
-			if showErrorDialog(p1, p2) == false then
+	logCapturedError = function(p, data)
+		local success, result = pcall(function()
+			if showErrorDialog(p, data) == false then
 				return nil
 			end
 
-			local value = p2.value
+			local value = data.value
 
 			if ReactGlobals.__DEV__ then
-				local source = p2.source
-				local v18 = p2.stack or ""
+				local source = data.source
+				local stack = data.stack or ""
 
 				if value ~= nil and value._suppressLogging then
-					if p1.tag == ClassComponent then
+					if p.tag == ClassComponent then
 						return
 					end
 
 					console.error(value)
 				end
 
-				local v19 = if source == nil then nil else getComponentName(source.type)
-				local v20 = not v19 and "The above error occurred in one of your React components:" or "The above error occurred in the <" .. tostring(v19) .. "> component:"
-				local v21 = getComponentName(p1.type)
-				local v22 = v20 .. "\n" .. v18 .. "\n\n" .. (not v21 and "Consider adding an error boundary to your tree to customize error handling behavior.\nVisit https://reactjs.org/link/error-boundaries to learn more about error boundaries." or "React will try to recreate this component tree from scratch " .. "using the error boundary you provided, " .. v21 .. ".")
+				local v
 
-				console.error(v22)
+				if source ~= nil then
+					v = getComponentName(source.type)
+				end
+
+				local v2 = not v and "The above error occurred in one of your React components:"
+					or "The above error occurred in the <" .. tostring(v) .. "> component:"
+
+				local componentName = getComponentName(p.type)
+
+				local v3 = v2 .. "\n" .. stack .. "\n\n" .. (not componentName and "Consider adding an error boundary to your tree to customize error handling behavior.\nVisit https://reactjs.org/link/error-boundaries to learn more about error boundaries." or "React will try to recreate this component tree from scratch " .. "using the error boundary you provided, " .. componentName .. ".")
+
+				console.error(v3)
 			else
 				console.error(inspect(value))
 			end
@@ -50,10 +62,10 @@ return {
 			return nil
 		end)
 
-		if not ok then
+		if not success then
 			warn("failed to error with error: " .. inspect(result))
-			setTimeout(function() -- line: 126
-				-- upvalues: errorToString (copy), result (copy)
+
+			setTimeout(function()
 				error(errorToString(result))
 			end)
 		end

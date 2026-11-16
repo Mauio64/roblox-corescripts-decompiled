@@ -1,47 +1,15 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local ReactionType = require(Parent.MomentsTypes).Enums.ReactionType
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local MomentsTypes = require(parent.MomentsTypes)
+
+local ReactionType = MomentsTypes.Enums.ReactionType
 
 return {
-	{
-		assetSource = nil,
-		unicode = nil,
-		id = ReactionType.ThumbsUp,
-		name = ReactionType.ThumbsUp
-	},
-	{
-		assetSource = nil,
-		unicode = nil,
-		id = ReactionType.Heart,
-		name = ReactionType.Heart
-	},
-	{
-		assetSource = nil,
-		unicode = nil,
-		id = ReactionType.LaughJoy,
-		name = ReactionType.LaughJoy
-	},
-	{
-		assetSource = nil,
-		unicode = nil,
-		id = ReactionType.Wow,
-		name = ReactionType.Wow
-	},
-	{
-		assetSource = nil,
-		unicode = nil,
-		id = ReactionType.Cry,
-		name = ReactionType.Cry
-	},
-	{
-		assetSource = nil,
-		unicode = nil,
-		id = ReactionType.Fire,
-		name = ReactionType.Fire
-	},
-	{
-		assetSource = nil,
-		unicode = nil,
-		id = ReactionType.Skull,
-		name = ReactionType.Skull
-	}
+	{ id = ReactionType.ThumbsUp, name = ReactionType.ThumbsUp, assetSource = nil, unicode = nil },
+	{ id = ReactionType.Heart, name = ReactionType.Heart, assetSource = nil, unicode = nil },
+	{ id = ReactionType.LaughJoy, name = ReactionType.LaughJoy, assetSource = nil, unicode = nil },
+	{ id = ReactionType.Wow, name = ReactionType.Wow, assetSource = nil, unicode = nil },
+	{ id = ReactionType.Cry, name = ReactionType.Cry, assetSource = nil, unicode = nil },
+	{ id = ReactionType.Fire, name = ReactionType.Fire, assetSource = nil, unicode = nil },
+	{ id = ReactionType.Skull, name = ReactionType.Skull, assetSource = nil, unicode = nil }
 }

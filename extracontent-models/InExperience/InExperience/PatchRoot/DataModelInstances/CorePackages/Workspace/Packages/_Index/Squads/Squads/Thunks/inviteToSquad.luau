@@ -1,62 +1,61 @@
 local Squads = script:FindFirstAncestor("Squads")
 local HttpService = game:GetService("HttpService")
+
 local dependencies = require(Squads.dependencies)
-local Cryo = dependencies.Cryo
-local NetworkingSquads = dependencies.NetworkingSquads
 
-local function encodeInvitees(t1: {[any]: any}) -- line: 9
-	-- upvalues: Cryo (copy), HttpService (copy)
-	local v8 = Cryo.List.map(t1, function(p1) -- line: 10
-		return (tonumber(p1))
-	end)
-	local ok, result = pcall(function() -- line: 14
-		-- upvalues: HttpService (copy), v8 (copy)
-		return HttpService:JSONEncode(v8)
+local cryo = dependencies.Cryo
+local networkingSquads = dependencies.NetworkingSquads
+
+local function encodeInvitees(list)
+	local mapped = cryo.List.map(list, function(p)
+		return (tonumber(p))
 	end)
 
-	if ok then
-		return result
-	end
-
-	return "[]"
+	local success, result = pcall(function()
+		return HttpService:JSONEncode(mapped)
+	end)
+	return if success then result else "[]"
 end
 
-return function(s1: string, s2: string, s3: string, t2: {[any]: any}, p2: ((...any) -> ...any), b1: boolean) -- line: 25
-	-- upvalues: NetworkingSquads (copy), encodeInvitees (copy), HttpService (copy)
-	return function(p3) -- line: 33
-		-- upvalues: NetworkingSquads (copy), s1 (copy), s2 (copy), t2 (copy), b1 (copy), encodeInvitees (copy), p2 (copy), s3 (copy), HttpService (copy)
-		return p3:dispatch(NetworkingSquads.SquadInvite.API({
-			squadId = s1,
-			parentChannelId = s2,
-			invitedUserIds = t2,
-			isReparented = b1
-		})):andThen(function() -- line: 41
-			-- upvalues: encodeInvitees (copy), t2 (copy), p2 (copy), s3 (copy)
-			local v19 = encodeInvitees(t2)
-
-			p2({
+return function(squadId: string, parentChannelId: string, p: string, invitedUserIds, callback, isReparented: boolean)
+	return function(object)
+		return object:dispatch(networkingSquads.SquadInvite.API({
+			squadId = squadId,
+			parentChannelId = parentChannelId,
+			invitedUserIds = invitedUserIds,
+			isReparented = isReparented
+		})):andThen(function()
+			callback({
 				isSuccess = true,
-				inviteeUserIds = v19,
-				inviteeCount = #t2,
-				userId = tonumber(s3)
+				inviteeUserIds = encodeInvitees(invitedUserIds),
+				inviteeCount = #invitedUserIds,
+				userId = tonumber(p)
 			})
-		end):catch(function(t3: {[any]: any}) -- line: 51
-			-- upvalues: HttpService (copy), encodeInvitees (copy), t2 (copy), p2 (copy), s3 (copy)
-			local Body = t3.Body
-			local ok, result = pcall(function() -- line: 53
-				-- upvalues: HttpService (copy), Body (copy)
-				return HttpService:JSONDecode(Body)
+		end):catch(function(p2)
+			local body = p2.Body
+			local success, result = pcall(function()
+				return HttpService:JSONDecode(body)
 			end)
-			local v24 = if not ok then nil else result.errorType
-			local v25 = encodeInvitees(t2)
+			local errorType
 
-			p2({
+			if success then
+				errorType = result.errorType
+			end
+
+			local inviteeUserIds = encodeInvitees(invitedUserIds)
+			local errorType2
+
+			if p2.StatusCode then
+				errorType2 = tostring(p2.StatusCode)
+			end
+
+			callback({
 				isSuccess = false,
-				errorMessage = v24,
-				errorType = if not t3.StatusCode then nil else tostring(t3.StatusCode),
-				inviteeUserIds = v25,
-				inviteeCount = #t2,
-				userId = tonumber(s3)
+				errorMessage = errorType,
+				errorType = errorType2,
+				inviteeUserIds = inviteeUserIds,
+				inviteeCount = #invitedUserIds,
+				userId = tonumber(p)
 			})
 		end)
 	end

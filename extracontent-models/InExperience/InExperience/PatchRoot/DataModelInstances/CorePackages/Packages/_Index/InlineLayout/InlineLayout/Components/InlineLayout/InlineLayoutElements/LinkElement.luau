@@ -1,38 +1,46 @@
-local ParentParent = script:FindFirstAncestor("Components").Parent.Parent
+local parent = script:FindFirstAncestor("Components").Parent.Parent
 local InlineLayoutElements = script:FindFirstAncestor("InlineLayoutElements")
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local useTokens = Foundation.Hooks.useTokens
 local InlineSpanElement = require(InlineLayoutElements.InlineSpanElement)
 local HoverContext = require(InlineLayoutElements.HoverContext)
-
 require(InlineLayoutElements.RenderableInlineElement)
 
-local t1 = {}
+local LinkElement = {}
 
-function HoverContextWrapper(p1) -- line: 25
-	-- upvalues: HoverContext (copy), React (copy), Foundation (copy), useTokens (copy)
-	local v10, v11 = HoverContext.useHoverContext(p1.id)
-	local v12 = React.useCallback(function(p2) -- line: 27
-		-- upvalues: v11 (copy), Foundation (copy)
-		v11(p2 == Foundation.Enums.ControlState.Hover)
-	end, { v11 })
-	local Hover = useTokens().Color.State.Hover
+function HoverContextWrapper(props)
+	local v, v2 = HoverContext.useHoverContext(props.id)
+	local onStateChanged = React.useCallback(function(p)
+		v2(p == Foundation.Enums.ControlState.Hover)
+	end, { v2 })
+	local hover = useTokens().Color.State.Hover
 
-	return React.createElement(Foundation.View, {
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v3 = {
 		tag = "size-0-0 auto-xy row",
-		LayoutOrder = p1.LayoutOrder,
-		onActivated = p1.onActivated,
-		backgroundStyle = if not v10 then nil else Hover,
-		onStateChanged = v12,
-		stateLayer = {
-			affordance = Foundation.Enums.StateLayerAffordance.None
-		}
-	}, p1.children)
-end
-function t1.new(t2: {[any]: any}, t3: {[any]: any}) -- line: 45
-	-- upvalues: InlineSpanElement (copy)
-	return InlineSpanElement.new(HoverContextWrapper, t3, t2)
+		LayoutOrder = props.LayoutOrder,
+		onActivated = props.onActivated,
+		backgroundStyle = 0,
+		onStateChanged = 0,
+		stateLayer = 0
+	}
+
+	if not v then
+		hover = nil
+	end
+
+	v3.backgroundStyle = hover
+	v3.onStateChanged = onStateChanged
+	v3.stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None }
+	return createElement(view, v3, props.children)
 end
 
-return t1
+function LinkElement.new(p, p2)
+	return InlineSpanElement.new(HoverContextWrapper, p2, p)
+end
+
+return LinkElement

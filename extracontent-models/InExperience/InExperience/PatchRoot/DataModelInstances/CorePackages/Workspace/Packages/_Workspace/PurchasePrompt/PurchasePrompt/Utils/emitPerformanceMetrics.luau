@@ -1,38 +1,63 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local PurchasePromptLite = require(PurchasePromptParent.PurchasePromptLite)
-local Enums = require(PurchasePromptParent.PurchasePromptLite).Enums
-
+local parent = PurchasePrompt.Parent
+local PurchasePromptLite = require(parent.PurchasePromptLite)
+local PurchasePromptLite2 = require(parent.PurchasePromptLite)
+local Enums = PurchasePromptLite2.Enums
 require(PurchasePrompt.types)
-
 local getTTIEventName = PurchasePromptLite.getTTIEventName
-local IntervalPerformanceTracker = require(PurchasePromptParent.IntervalPerformanceTracker).IntervalPerformanceTracker
-local TimeToInteractiveTracker = require(PurchasePromptParent.TimeToInteractiveTracker).TimeToInteractiveTracker
+local IntervalPerformanceTracker = require(parent.IntervalPerformanceTracker)
+local intervalPerformanceTracker = IntervalPerformanceTracker.IntervalPerformanceTracker
+local TimeToInteractiveTracker = require(parent.TimeToInteractiveTracker)
+local timeToInteractiveTracker = TimeToInteractiveTracker.TimeToInteractiveTracker
+
 local Constants = require(PurchasePrompt.Misc.Constants)
-local v9 = game:DefineFastInt("ProductPurchaseContainerFPSDuration", 2)
-local FIntTTIUnifiedPurchaseSamplingRate = require(PurchasePromptParent.SharedFlags).FIntTTIUnifiedPurchaseSamplingRate
-local t1 = {
+local defineFastInt = game:DefineFastInt("ProductPurchaseContainerFPSDuration", 2)
+local SharedFlags = require(parent.SharedFlags)
+local FIntTTIUnifiedPurchaseSamplingRate = SharedFlags.FIntTTIUnifiedPurchaseSamplingRate
+local FFlagEnableEdpPreviewPurchaseSurface = SharedFlags.FFlagEnableEdpPreviewPurchaseSurface
+local FFlagEnableInExperiencePurchaseModalMetrics = require(PurchasePrompt.Flags.FFlagEnableInExperiencePurchaseModalMetrics)
+
+local set = {
 	[Enums.ProductPurchaseSurface.Catalog] = true,
 	[Enums.ProductPurchaseSurface.EDP] = true
 }
 
-function emitPerformanceMetrics(s1: string, p1) -- line: 22
-	-- upvalues: t1 (copy)
-	if p1 ~= nil and t1[p1] then
-		emitFPSMetrics(s1, p1)
-		emitTTIMetrics(p1)
+if FFlagEnableInExperiencePurchaseModalMetrics then
+	set[Enums.ProductPurchaseSurface.InExperience] = true
+end
+
+if FFlagEnableEdpPreviewPurchaseSurface then
+	set[Enums.ProductPurchaseSurface.EDPPreview] = true
+end
+
+function emitPerformanceMetrics(p: string, p2)
+	if p2 ~= nil and set[p2] then
+		emitFPSMetrics(p, p2)
+		emitTTIMetrics(p2)
 	end
 end
-function emitFPSMetrics(s2: string, p2) -- line: 30
-	-- upvalues: IntervalPerformanceTracker (copy), Constants (copy), v9 (copy)
-	IntervalPerformanceTracker:startTracking(Constants.PerformanceMetrics.Prefix.UnifiedPurchaseModal .. "_" .. s2 .. "_" .. p2, v9, nil, true, true)
-	IntervalPerformanceTracker:startTracking(Constants.PerformanceMetrics.Prefix.PurchaseModal .. "_" .. s2 .. "_" .. p2, v9, nil, true, true)
-end
-function emitTTIMetrics(p3) -- line: 51
-	-- upvalues: getTTIEventName (copy), TimeToInteractiveTracker (copy), FIntTTIUnifiedPurchaseSamplingRate (copy)
-	local v17 = getTTIEventName(p3)
 
-	TimeToInteractiveTracker.trackEnd(v17, {
+function emitFPSMetrics(p: string, p2)
+	intervalPerformanceTracker:startTracking(
+		Constants.PerformanceMetrics.Prefix.UnifiedPurchaseModal .. "_" .. p .. "_" .. p2,
+		defineFastInt,
+		nil,
+		true,
+		true
+	)
+
+	intervalPerformanceTracker:startTracking(
+		Constants.PerformanceMetrics.Prefix.PurchaseModal .. "_" .. p .. "_" .. p2,
+		defineFastInt,
+		nil,
+		true,
+		true
+	)
+end
+
+function emitTTIMetrics(p)
+	local ttiEventName = getTTIEventName(p)
+	timeToInteractiveTracker.trackEnd(ttiEventName, {
 		samplingRateOverride = FIntTTIUnifiedPurchaseSamplingRate
 	})
 end

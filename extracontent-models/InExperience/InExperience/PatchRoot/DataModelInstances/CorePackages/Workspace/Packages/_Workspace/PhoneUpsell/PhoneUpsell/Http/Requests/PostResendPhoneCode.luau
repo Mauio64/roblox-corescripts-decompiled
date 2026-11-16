@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("PhoneUpsell").Parent
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local parent = script:FindFirstAncestor("PhoneUpsell").Parent
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 
-return function(p1) -- line: 18
-	-- upvalues: UrlBuilder (copy)
-	return p1(UrlBuilder.fromString("accountinformation:phone/resend")(), "POST", {
+return function(callback)
+	return callback(urlBuilder.fromString("accountinformation:phone/resend")(), "POST", {
 		postBody = ""
 	})
 end

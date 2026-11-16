@@ -1,85 +1,68 @@
-local ParentParent = script.Parent.Parent
-local ChatSettings = require(ParentParent:WaitForChild("ChatSettings"))
-local ChatConstants = require(ParentParent:WaitForChild("ChatConstants"))
+local parent = script.Parent.Parent
+local ChatSettings = require(parent:WaitForChild("ChatSettings"))
+local ChatConstants = require(parent:WaitForChild("ChatConstants"))
 local Util = require(script.Parent:WaitForChild("Util"))
 
-pcall(function() -- line: 12
-	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+pcall(function()
+	local Chat = game:GetService("Chat")
+	ChatLocalization = require(Chat.ClientChatModules.ChatLocalization)
 end)
 
-function CreateWelcomeMessageLabel(p1, p2) -- line: 14
-	-- upvalues: ChatSettings (copy), Util (copy)
-	local p1Message = p1.Message
+function CreateWelcomeMessageLabel(data, p)
+	local message = data.Message
 
 	if ChatLocalization and ChatLocalization.LocalizeFormattedMessage then
-		p1Message = ChatLocalization:LocalizeFormattedMessage(p1Message)
+		message = ChatLocalization:LocalizeFormattedMessage(message)
 	end
 
-	local v8 = p1.ExtraData or {}
-	local v9 = v8.Font or ChatSettings.DefaultFont
-	local v10 = v8.FontSize or ChatSettings.ChatWindowTextSize
-	local v11 = v8.ChatColor or ChatSettings.DefaultMessageColor
-	local v12 = v8.ChannelColor or v11
-	local v13, v14 = Util:CreateBaseMessage(p1Message, v9, v10, v11)
-	local v15 = nil
+	local extraData = data.ExtraData or {}
+	local font = extraData.Font or ChatSettings.DefaultFont
+	local fontSize = extraData.FontSize or ChatSettings.ChatWindowTextSize
+	local chatColor = extraData.ChatColor or ChatSettings.DefaultMessageColor
+	local channelColor = extraData.ChannelColor or chatColor
 
-	if p2 ~= p1.OriginalChannel then
-		local OriginalChannel = p1.OriginalChannel
+	local baseMessage, v = Util:CreateBaseMessage(message, font, fontSize, chatColor)
+	local v2
+
+	if p ~= data.OriginalChannel then
+		local v3 = data.OriginalChannel
 
 		if ChatLocalization.tryLocalize then
-			OriginalChannel = ChatLocalization:tryLocalize(p1.OriginalChannel)
+			v3 = ChatLocalization:tryLocalize(data.OriginalChannel)
 		end
 
-		local v17 = string.format("{%s}", OriginalChannel)
-
-		v15 = Util:AddChannelButtonToBaseMessage(v14, v12, v17, p1.OriginalChannel)
-
-		local v18 = Util:GetNumberOfSpaces(v17, v9, v10) + 1
-
-		v14.Text = Util:CreateLeadingSpaces(v18) .. Util:SanitizeForRichText(p1Message)
+		local v4 = string.format("{%s}", v3)
+		v2 = Util:AddChannelButtonToBaseMessage(v, channelColor, v4, data.OriginalChannel)
+		v.Text = Util:CreateLeadingSpaces(Util:GetNumberOfSpaces(v4, font, fontSize) + 1) .. Util:SanitizeForRichText(message)
 	end
 
-	local function GetHeightFunction(p3) -- line: 39
-		-- upvalues: Util (copy), v14 (copy), v13 (copy)
-		return Util:GetMessageHeight(v14, v13, p3)
+	local function GetHeightFunction(p2)
+		return Util:GetMessageHeight(v, baseMessage, p2)
 	end
 
-	local t1 = {
-		[v14] = {
-			TextTransparency = {
-				FadedIn = 0,
-				FadedOut = 1
-			},
-			TextStrokeTransparency = {
-				FadedIn = 0.75,
-				FadedOut = 1
-			}
-		}
+	local v3 = {}
+	v3[v] = {
+		TextTransparency = { FadedIn = 0, FadedOut = 1 },
+		TextStrokeTransparency = { FadedIn = 0.75, FadedOut = 1 }
 	}
 
-	if v15 then
-		t1[v15] = {
-			TextTransparency = {
-				FadedIn = 0,
-				FadedOut = 1
-			},
-			TextStrokeTransparency = {
-				FadedIn = 0.75,
-				FadedOut = 1
-			}
+	if v2 then
+		v3[v2] = {
+			TextTransparency = { FadedIn = 0, FadedOut = 1 },
+			TextStrokeTransparency = { FadedIn = 0.75, FadedOut = 1 }
 		}
 	end
 
-	local v21, v22, v23 = Util:CreateFadeFunctions(t1)
+	local fadeFunctions, v4, v5 = Util:CreateFadeFunctions(v3)
 
 	return {
-		[Util.KEY_BASE_FRAME] = v13,
-		[Util.KEY_BASE_MESSAGE] = v14,
+		[Util.KEY_BASE_FRAME] = baseMessage,
+		[Util.KEY_BASE_MESSAGE] = v,
 		[Util.KEY_UPDATE_TEXT_FUNC] = nil,
 		[Util.KEY_GET_HEIGHT] = GetHeightFunction,
-		[Util.KEY_FADE_IN] = v21,
-		[Util.KEY_FADE_OUT] = v22,
-		[Util.KEY_UPDATE_ANIMATION] = v23
+		[Util.KEY_FADE_IN] = fadeFunctions,
+		[Util.KEY_FADE_OUT] = v4,
+		[Util.KEY_UPDATE_ANIMATION] = v5
 	}
 end
 

@@ -1,96 +1,126 @@
 local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
-local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
-local React = require(ServerTriggeredModalsParent.React)
-local SduiFeatureEntryPoint = require(ServerTriggeredModalsParent.SduiSharedUtilities).SduiFeatureEntryPoint
+local parent = ServerTriggeredModals.Parent
+
+local React = require(parent.React)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local SharedFlags = require(parent.SharedFlags)
+
+local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
+
 local Logger = require(ServerTriggeredModals.Logger)
 local reportPromptImpression = require(ServerTriggeredModals.reportPromptImpression)
-local sendModalImpressionEvent = require(ServerTriggeredModalsParent.ServerTriggeredModalImpressions).sendModalImpressionEvent
+local ServerTriggeredModalImpressions = require(parent.ServerTriggeredModalImpressions)
+local sendModalImpressionEvent = ServerTriggeredModalImpressions.sendModalImpressionEvent
 local PromptStyle = require(ServerTriggeredModals.SduiV2.PromptStyle)
 local usePromptEntries = require(ServerTriggeredModals.SduiV2.usePromptEntries)
 local useModalSignalStore = require(ServerTriggeredModals.SignalStores.useModalSignalStore)
+local FFlagPromptsActionEventLogging = require(ServerTriggeredModals.Flags.FFlagPromptsActionEventLogging)
+local FFlagPromptsCoachmarkImpressionOnShow = SharedFlags.FFlagPromptsCoachmarkImpressionOnShow
 
-local function CoachmarkRenderer(t1: {[any]: any}) -- line: 38
-	-- upvalues: useModalSignalStore (copy), React (copy), usePromptEntries (copy), PromptStyle (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy), SduiFeatureEntryPoint (copy)
-	local surfaceConfig = t1.surfaceConfig
-	local hasShownKey = t1.hasShownKey
-	local v15 = useModalSignalStore()
-	local v16, v17 = React.useState(false)
+local function CoachmarkRenderer(p)
+	local surfaceConfig = p.surfaceConfig
+	local hasShownKey = p.hasShownKey
+	local v = useModalSignalStore()
+	local state, setState = React.useState(false)
 
-	React.useEffect(function() -- line: 44
-		-- upvalues: v16 (copy), v15 (copy), hasShownKey (copy), v17 (copy)
-		if not v16 and v15.tryClaimPrimaryHandler(hasShownKey) then
-			v17(true)
+	React.useEffect(function()
+		if not state and v.tryClaimPrimaryHandler(hasShownKey) then
+			setState(true)
 		end
 
-		return function() -- line: 48
-			-- upvalues: v16 (copy), v15 (copy), hasShownKey (copy)
-			if v16 then
-				v15.releasePrimaryHandler(hasShownKey)
+		return function()
+			if state then
+				v.releasePrimaryHandler(hasShownKey)
 			end
 		end
-	end, {
-		v16,
-		hasShownKey,
-		v15
-	})
+	end, { state, hasShownKey, v })
 
-	local v18 = usePromptEntries(surfaceConfig.configKey, PromptStyle.Coachmark)
-	local v19 = React.useMemo(function() -- line: 57
-		-- upvalues: v16 (copy), v18 (copy)
-		if not v16 then
-			return ""
-		end
+	local v2 = usePromptEntries(surfaceConfig.configKey, PromptStyle.Coachmark)
 
-		local t2 = {}
-
-		for _, v25 in v18 do
-			if v25.identifier and v25.title and v25.config then
-				table.insert(t2, `{ v25.identifier }:{ v25.title }`)
+	if not FFlagPromptsCoachmarkImpressionOnShow then
+		local v3 = React.useMemo(function()
+			if not state then
+				return ""
 			end
-		end
 
-		return table.concat(t2, "|")
-	end, {
-		v16,
-		v18
-	})
+			local v3 = {}
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: v19 (copy), v18 (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy)
-		if v19 == "" then
-			return
-		end
+			for _, v4 in v2 do
+				if v4.identifier and v4.title and v4.config then
+					table.insert(v3, `{v4.identifier}:{v4.title}`)
+				end
+			end
 
-		for _, v27 in v18 do
-			if v27.identifier and v27.title and v27.config then
-				reportPromptImpression(v27.title, v27.identifier):catch(function() -- line: 78
-					-- upvalues: Logger (copy)
+			return table.concat(v3, "|")
+		end, { state, v2 })
+
+		React.useEffect(function()
+			if v3 == "" then
+				return
+			end
+
+			for _, v4 in v2 do
+				if not (v4.identifier and v4.title and v4.config) then
+					continue
+				end
+
+				reportPromptImpression(v4.title, v4.identifier):catch(function()
 					Logger:warning("Failed to report coachmark prompt impression")
 				end)
-				sendModalImpressionEvent(v27.identifier, v27.title)
+				sendModalImpressionEvent(v4.identifier, v4.title)
 			end
-		end
-	end, { v19 })
+		end, { v3 })
+	end
 
-	if not v16 then
+	if not state then
 		return nil
 	end
 
-	local t3 = {}
+	local children = {}
 
-	for _, v22 in v18 do
-		if v22.config ~= nil and v22.identifier ~= nil and v22.title ~= nil then
-			t3[v22.identifier] = React.createElement(SduiFeatureEntryPoint, {
-				shouldDisplayLoading = false,
-				shouldDisplayError = false,
-				configKey = surfaceConfig.configKey,
-				identifier = v22.identifier,
-				appPage = surfaceConfig.appPage
-			})
+	for _, v3 in v2 do
+		if not (v3.config ~= nil and v3.identifier ~= nil and v3.title ~= nil) then
+			continue
 		end
+
+		local identifier = v3.identifier
+		local createElement = React.createElement
+		local v4 = {
+			configKey = surfaceConfig.configKey,
+			identifier = v3.identifier,
+			appPage = surfaceConfig.appPage,
+			additionalAnalyticsData = 0,
+			shouldDisplayLoading = false,
+			shouldDisplayError = false,
+			extraLocalProps = 0
+		}
+		local additionalAnalyticsData
+
+		if FFlagPromptsActionEventLogging then
+			additionalAnalyticsData = { promptInstanceId = 0 }
+			local promptInstanceId
+
+			if v3.identifier then
+				promptInstanceId = v3.identifier
+			end
+
+			additionalAnalyticsData.promptInstanceId = promptInstanceId
+		end
+
+		v4.additionalAnalyticsData = additionalAnalyticsData
+
+		v4.extraLocalProps = FFlagPromptsCoachmarkImpressionOnShow and {
+			onShown = function()
+				reportPromptImpression(v3.title, v3.identifier):catch(function()
+					Logger:warning("Failed to report coachmark prompt impression")
+				end)
+				sendModalImpressionEvent(v3.identifier, v3.title)
+			end
+		} or nil
+		children[identifier] = createElement(SduiFeatureEntryPoint, v4)
 	end
 
-	return React.createElement(React.Fragment, nil, t3)
+	return React.createElement(React.Fragment, nil, children)
 end
 
 return React.memo(CoachmarkRenderer)

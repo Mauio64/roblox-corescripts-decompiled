@@ -1,5 +1,6 @@
 local FFlagForceEnableSquadRegroup = require(script.Parent.FFlagForceEnableSquadRegroup)
-local v2 = game:DefineFastFlag("EnableSquadRegroupExperimentation1", false)
+local defineFastFlag = game:DefineFastFlag("EnableSquadRegroupExperimentation1", false)
+
 local FFlagEnableSquadRegroupExperimentationSmallScreenFix = require(script.Parent.FFlagEnableSquadRegroupExperimentationSmallScreenFix)
 
-return FFlagForceEnableSquadRegroup or (v2 or FFlagEnableSquadRegroupExperimentationSmallScreenFix)
+return FFlagForceEnableSquadRegroup or defineFastFlag or FFlagEnableSquadRegroupExperimentationSmallScreenFix

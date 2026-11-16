@@ -1,204 +1,188 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local getMeshMinMax = require(parent.util.getMeshMinMax)
+local getMeshSize = require(parent.util.getMeshSize)
+local getEditableMeshFromContext = require(parent.util.getEditableMeshFromContext)
+local getExpectedPartSize = require(parent.util.getExpectedPartSize)
+local getMeshInfo = require(parent.util.getMeshInfo)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getMeshMinMax = require(ParentParent.util.getMeshMinMax)
-local getMeshSize = require(ParentParent.util.getMeshSize)
-local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
-local getExpectedPartSize = require(ParentParent.util.getExpectedPartSize)
-local getMeshInfo = require(ParentParent.util.getMeshInfo)
-local getFFlagUGCValidateMigrateBodyPartBounds = require(ParentParent.flags.getFFlagUGCValidateMigrateBodyPartBounds)
-local t1 = {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
-	},
-	requiredData = {
-		ValidationEnums.SharedDataMember.rootInstance,
-		ValidationEnums.SharedDataMember.uploadEnum,
-		ValidationEnums.SharedDataMember.consumerConfig
-	},
-	conditionalData = {
-		ValidationEnums.SharedDataMember.renderMeshesData,
-		ValidationEnums.SharedDataMember.outerCagesData
-	},
-	fflag = getFFlagUGCValidateMigrateBodyPartBounds,
-	expectedFailures = {}
+local BodyMeshSizesConsistent = {}
+
+BodyMeshSizesConsistent.categories = {
+	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
+	ValidationEnums.UploadCategory.DYNAMIC_HEAD
 }
 
-local function calculateMeshSizeForPart(p1, p2) -- line: 33
-	-- upvalues: getEditableMeshFromContext (copy), getMeshSize (copy)
-	local t2 = {
-		fieldName = "MeshId",
-		fullName = p1:GetFullName(),
-		contentId = p1.MeshId,
-		context = p1.Name
-	}
-	local v17, v18 = getEditableMeshFromContext(p1, "MeshId", p2)
+BodyMeshSizesConsistent.requiredData = {
+	ValidationEnums.SharedDataMember.rootInstance,
+	ValidationEnums.SharedDataMember.uploadEnum,
+	ValidationEnums.SharedDataMember.consumerConfig
+}
 
-	if not v17 then
+BodyMeshSizesConsistent.conditionalData = {
+	ValidationEnums.SharedDataMember.renderMeshesData,
+	ValidationEnums.SharedDataMember.outerCagesData
+}
+
+BodyMeshSizesConsistent.expectedFailures = {}
+
+local function calculateMeshSizeForPart(instance, p)
+	local v = {
+		fullName = instance:GetFullName(),
+		fieldName = "MeshId",
+		contentId = instance.MeshId,
+		context = instance.Name
+	}
+
+	local editableMeshFromContext, editableMesh = getEditableMeshFromContext(instance, "MeshId", p)
+
+	if not editableMeshFromContext then
 		return false, nil
 	end
 
-	t2.editableMesh = v18
+	v.editableMesh = editableMesh
 
-	return true, (getMeshSize(t2))
+	return true, (getMeshSize(v))
 end
-local function validateWrapTargetComparison(vector3: Vector3, p3, p4, p5) -- line: 52
-	-- upvalues: getMeshInfo (copy), Constants (copy), ErrorSourceStrings (copy), getMeshMinMax (copy)
-	local v23, _, v25 = getMeshInfo(p3, Constants.MESH_CONTENT_TYPE.RENDER_MESH, p4)
 
-	if not v23 then
-		p5:fail(ErrorSourceStrings.Keys.BodyMesh_LoadFailed, {
-			meshName = p3:GetFullName()
-		}, p3)
+local function validateWrapTargetComparison(scale: Vector3, instance, p, object)
+	local meshInfo, _, v = getMeshInfo(instance, Constants.MESH_CONTENT_TYPE.RENDER_MESH, p)
 
+	if not meshInfo then
+		object:fail(ErrorSourceStrings.Keys.BodyMesh_LoadFailed, {
+			meshName = instance:GetFullName()
+		}, instance)
 		return
 	end
 
-	local WrapTarget = p3:FindFirstChildWhichIsA("WrapTarget")
+	local wrapTarget = instance:FindFirstChildWhichIsA("WrapTarget")
 
-	if not WrapTarget then
+	if not wrapTarget then
 		return
 	end
 
-	local v27, _, v29 = getMeshInfo(WrapTarget, Constants.MESH_CONTENT_TYPE.OUTER_CAGE, p4)
+	local meshInfo2, _, v2 = getMeshInfo(wrapTarget, Constants.MESH_CONTENT_TYPE.OUTER_CAGE, p)
 
-	if not v27 then
-		p5:fail(ErrorSourceStrings.Keys.BodyMesh_LoadFailed, {
-			meshName = WrapTarget:GetFullName()
-		}, p3)
-
+	if not meshInfo2 then
+		object:fail(ErrorSourceStrings.Keys.BodyMesh_LoadFailed, {
+			meshName = wrapTarget:GetFullName()
+		}, instance)
 		return
 	end
 
-	v25.scale = vector3
-	v29.scale = vector3
+	v.scale = scale
+	v2.scale = scale
 
-	local RenderVsWrapMeshMaxDiff = Constants.RenderVsWrapMeshMaxDiff
-	local v31, _, v33, v34 = getMeshMinMax(v25, p4)
+	local renderVsWrapMeshMaxDiff = Constants.RenderVsWrapMeshMaxDiff
 
-	if not v31 then
-		p5:fetchError("Failed to read mesh: " .. v25.fullName)
+	local meshMinMax, _, v3, v4 = getMeshMinMax(v, p)
 
+	if not meshMinMax then
+		object:fetchError("Failed to read mesh: " .. v.fullName)
 		return
 	end
 
-	local v35, _, v37, v38 = getMeshMinMax(v29, p4)
+	local meshMinMax2, _, v5, v6 = getMeshMinMax(v2, p)
 
-	if not v35 then
-		p5:fetchError("Failed to read mesh: " .. v29.fullName)
-
-		return
-	end
-
-	if RenderVsWrapMeshMaxDiff < (v33 - v37).Magnitude or RenderVsWrapMeshMaxDiff < (v34 - v38).Magnitude then
-		local v39 = v25.fullName .. "." .. v25.fieldName
-		local v40 = v29.fullName .. "." .. v29.fieldName
-
-		p5:fail(ErrorSourceStrings.Keys.BodyMesh_SizeMismatch, {
-			meshContext = v39,
-			maxDiff = string.format("%.2f", RenderVsWrapMeshMaxDiff),
-			otherMeshContext = v40
-		}, p3)
+	if not meshMinMax2 then
+		object:fetchError("Failed to read mesh: " .. v2.fullName)
+	elseif renderVsWrapMeshMaxDiff < (v3 - v5).Magnitude or renderVsWrapMeshMaxDiff < (v4 - v6).Magnitude then
+		local meshContext = v.fullName .. "." .. v.fieldName
+		local otherMeshContext = v2.fullName .. "." .. v2.fieldName
+		object:fail(
+			ErrorSourceStrings.Keys.BodyMesh_SizeMismatch,
+			{
+				meshContext = meshContext,
+				maxDiff = string.format("%.2f", renderVsWrapMeshMaxDiff),
+				otherMeshContext = otherMeshContext
+			},
+			instance
+		)
 	end
 end
 
-function t1.run(p6, p7) -- line: 112
-	-- upvalues: ValidationEnums (copy), calculateMeshSizeForPart (copy), ErrorSourceStrings (copy), getExpectedPartSize (copy), validateWrapTargetComparison (copy), Constants (copy)
-	local rootInstance = p7.rootInstance
-	local assetType = p7.uploadEnum.assetType
-	local v45 = p7.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend
-	local t3 = {}
+function BodyMeshSizesConsistent.run(object, data)
+	local rootInstance = data.rootInstance
+	local assetType = data.uploadEnum.assetType
+	local isServer = data.consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend
 
-	if p7.renderMeshesData then
+	local editableMeshes = {}
+
+	if data.renderMeshesData then
 		local descendants = rootInstance:GetDescendants()
-
 		table.insert(descendants, rootInstance)
 
-		for _, v49 in descendants do
-			local v50 = p7.renderMeshesData[v49.Name]
+		for _, descendant in descendants do
+			local v = data.renderMeshesData[descendant.Name]
 
-			if v50 and v50.editable then
-				t3[v49] = {
-					MeshId = {
-						instance = v50.editable,
-						created = v50.createdInValidation
-					}
+			if v and v.editable then
+				editableMeshes[descendant] = {
+					MeshId = { instance = v.editable, created = v.createdInValidation }
 				}
 			end
 		end
 	end
 
-	if p7.outerCagesData then
+	if data.outerCagesData then
 		local descendants = rootInstance:GetDescendants()
-
 		table.insert(descendants, rootInstance)
 
-		for _, v53 in descendants do
-			if v53:IsA("BaseWrap") and v53.Parent then
-				local v54 = p7.outerCagesData[v53.Parent.Name]
+		for _, baseWrap in descendants do
+			if not (baseWrap:IsA("BaseWrap") and baseWrap.Parent) then
+				continue
+			end
 
-				if v54 and v54.editable then
-					t3[v53] = {
-						CageMeshId = {
-							instance = v54.editable,
-							created = v54.createdInValidation
-						}
-					}
-				end
+			local v = data.outerCagesData[baseWrap.Parent.Name]
+
+			if v and v.editable then
+				editableMeshes[baseWrap] = {
+					CageMeshId = { instance = v.editable, created = v.createdInValidation }
+				}
 			end
 		end
 	end
 
-	local t4 = {
+	local v = {
 		assetTypeEnum = assetType,
-		isServer = v45,
-		editableMeshes = t3,
-		bypassFlags = {
-			skipPhysicsDataReset = true
-		}
+		isServer = isServer,
+		editableMeshes = editableMeshes,
+		bypassFlags = { skipPhysicsDataReset = true }
 	}
 
-	local function validateSingleMeshPart(p8) -- line: 156
-		-- upvalues: calculateMeshSizeForPart (copy), t4 (copy), p6 (copy), ErrorSourceStrings (copy), getExpectedPartSize (copy), validateWrapTargetComparison (copy)
-		local v61, v62 = calculateMeshSizeForPart(p8, t4)
+	local function validateSingleMeshPart(instance)
+		local v2, v3 = calculateMeshSizeForPart(instance, v)
 
-		if not v61 or not v62 then
-			p6:fail(ErrorSourceStrings.Keys.BodyMesh_LoadFailed, {
-				meshName = p8:GetFullName()
-			}, p8)
-
-			return
+		if v2 and v3 then
+			validateWrapTargetComparison(getExpectedPartSize(instance, v) / v3, instance, v, object)
+		else
+			object:fail(ErrorSourceStrings.Keys.BodyMesh_LoadFailed, {
+				meshName = instance:GetFullName()
+			}, instance)
 		end
-
-		local v63 = getExpectedPartSize(p8, t4) / v62
-
-		validateWrapTargetComparison(v63, p8, t4, p6)
 	end
 
-	local v57 = Constants.ASSET_TYPE_INFO[assetType]
+	local v2 = Constants.ASSET_TYPE_INFO[assetType]
 
-	if assetType == Enum.AssetType.DynamicHead then
+	if Enum.AssetType.DynamicHead == assetType then
 		validateSingleMeshPart(rootInstance)
-
 		return
 	end
 
-	if not v57 then
+	if not v2 then
 		return
 	end
 
-	for k in pairs(v57.subParts) do
-		local k2 = rootInstance:FindFirstChild(k)
+	for childName in pairs(v2.subParts) do
+		local child = rootInstance:FindFirstChild(childName)
 
-		if k2 then
-			validateSingleMeshPart(k2)
+		if child then
+			validateSingleMeshPart(child)
 		end
 	end
 end
 
-return t1
+return BodyMeshSizesConsistent

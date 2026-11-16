@@ -1,46 +1,43 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local PlatformLeaderboardsClient = require(ParentParentParent.PlatformLeaderboardsClient)
-local SharedFlags = require(ParentParentParent.SharedFlags)
-local PlatformLeaderboardStoreContext = require(ParentParent.Common.PlatformLeaderboardStoreContext)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local React = require(parent2.React)
+local PlatformLeaderboardsClient = require(parent2.PlatformLeaderboardsClient)
+local SharedFlags = require(parent2.SharedFlags)
+
+local PlatformLeaderboardStoreContext = require(parent.Common.PlatformLeaderboardStoreContext)
+
 local FFlagPlatformLeaderboardPersistStoreOnRemount = SharedFlags.FFlagPlatformLeaderboardPersistStoreOnRemount
+
 local PlatformLeaderboardClientStore = PlatformLeaderboardsClient.PlatformLeaderboardClientStore
 
-return React.memo(function(t1: {[any]: any}) -- line: 19
-	-- upvalues: FFlagPlatformLeaderboardPersistStoreOnRemount (copy), PlatformLeaderboardsClient (copy), React (copy), PlatformLeaderboardClientStore (copy), PlatformLeaderboardStoreContext (copy)
-	local v10 = nil
+return React.memo(function(p)
+	local v
 
-	if FFlagPlatformLeaderboardPersistStoreOnRemount and t1.store == nil then
-		v10 = PlatformLeaderboardsClient.getPlatformLeaderboardClientStore()
+	if FFlagPlatformLeaderboardPersistStoreOnRemount and p.store == nil then
+		v = PlatformLeaderboardsClient.getPlatformLeaderboardClientStore()
 	end
 
-	local v11 = React.useMemo(function() -- line: 26
-		-- upvalues: FFlagPlatformLeaderboardPersistStoreOnRemount (copy), t1 (copy), PlatformLeaderboardClientStore (copy)
-		if FFlagPlatformLeaderboardPersistStoreOnRemount or (t1.store ~= nil or not PlatformLeaderboardClientStore) then
+	local v2 = React.useMemo(function()
+		if FFlagPlatformLeaderboardPersistStoreOnRemount or p.store ~= nil or not PlatformLeaderboardClientStore then
 			return nil
 		end
 
 		return PlatformLeaderboardClientStore.new()
 	end, {})
 
-	React.useEffect(function() -- line: 34
-		-- upvalues: FFlagPlatformLeaderboardPersistStoreOnRemount (copy), v11 (copy)
-		return function() -- line: 35
-			-- upvalues: FFlagPlatformLeaderboardPersistStoreOnRemount (copy), v11 (copy)
-			if not FFlagPlatformLeaderboardPersistStoreOnRemount and v11 then
-				v11:destroy()
+	React.useEffect(function()
+		return function()
+			if not FFlagPlatformLeaderboardPersistStoreOnRemount and v2 then
+				v2:destroy()
 			end
 		end
-	end, { v11 })
+	end, { v2 })
 
-	local v12 = t1.store or (v10 or v11)
+	local store = p.store or v or v2
 
-	if v12 == nil then
-		return t1.children
+	if store == nil then
+		return p.children
 	end
 
-	return React.createElement(PlatformLeaderboardStoreContext.Provider, {
-		value = v12
-	}, t1.children)
+	return React.createElement(PlatformLeaderboardStoreContext.Provider, { value = store }, p.children)
 end)

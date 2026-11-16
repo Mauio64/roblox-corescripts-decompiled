@@ -1,10 +1,11 @@
 local CorePackages = game:GetService("CorePackages")
 local PolicyProvider = require(CorePackages.Packages.PolicyProvider)
-local v3 = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
-local v4 = PolicyProvider.withGetPolicyImplementation(v3)
 
-function v4.Mapper(_) -- line: 7
+local memStorageService = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+local v = PolicyProvider.withGetPolicyImplementation(memStorageService)
+
+function v.Mapper(_)
 	return {}
 end
 
-return v4
+return v

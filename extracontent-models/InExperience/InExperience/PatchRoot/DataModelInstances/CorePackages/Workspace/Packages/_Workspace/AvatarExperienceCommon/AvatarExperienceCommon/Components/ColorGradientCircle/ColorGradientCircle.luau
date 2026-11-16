@@ -1,40 +1,56 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local generateColorSequence = require(script.Parent.Utils.generateColorSequence)
-local v6 = game:DefineFastFlag("AXColorGradientRenderFlatWithJustOneColor", false)
 
-local function ColorGradientCircle(t1: {[any]: any}) -- line: 28
-	-- upvalues: useTokens (copy), React (copy), v6 (copy), Foundation (copy), generateColorSequence (copy)
-	local v9 = useTokens()
+local defineFastFlag = game:DefineFastFlag("AXColorGradientRenderFlatWithJustOneColor", false)
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 0,
-		Size = t1.Size,
-		Position = t1.Position,
-		AnchorPoint = t1.AnchorPoint
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0.5, 0)
-		}),
-		UIGradient = if not v6 or #t1.Colors ~= 1 then React.createElement("UIGradient", {
-			Rotation = t1.Rotation or 45,
-			Color = generateColorSequence(t1.Colors),
-			Transparency = t1.Transparency or NumberSequence.new(0),
-			Offset = t1.Offset or Vector2.new(0, 0)
-		}) else React.createElement(Foundation.View, {
+local function ColorGradientCircle(props)
+	local v = useTokens()
+
+	local createElement = React.createElement
+	local v2 = {
+		Size = props.Size,
+		Position = props.Position,
+		AnchorPoint = props.AnchorPoint,
+		BackgroundTransparency = 0
+	}
+
+	local v3 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0.5, 0) }),
+		UIGradient = 0,
+		UIStroke = 0
+	}
+	local uiGradient
+
+	if defineFastFlag and #props.Colors == 1 then
+		uiGradient = React.createElement(Foundation.View, {
 			tag = "size-full-full radius-circle",
-			backgroundStyle = {
-				Transparency = 0,
-				Color3 = t1.Colors[1]
-			}
-		}),
-		UIStroke = if not t1.hasBorder then nil else React.createElement("UIStroke", {
-			Thickness = 2,
-			Color = v9.Color.System.Contrast.Color3
+			backgroundStyle = { Color3 = props.Colors[1], Transparency = 0 }
 		})
-	})
+	else
+		uiGradient = React.createElement("UIGradient", {
+			Rotation = props.Rotation or 45,
+			Color = generateColorSequence(props.Colors),
+			Transparency = props.Transparency or NumberSequence.new(0),
+			Offset = props.Offset or Vector2.new(0, 0)
+		})
+	end
+
+	v3.UIGradient = uiGradient
+	local uiStroke
+
+	if props.hasBorder then
+		uiStroke = React.createElement("UIStroke", {
+			Thickness = 2,
+			Color = v.Color.System.Contrast.Color3
+		})
+	end
+
+	v3.UIStroke = uiStroke
+	return createElement("Frame", v2, v3)
 end
 
 return ColorGradientCircle

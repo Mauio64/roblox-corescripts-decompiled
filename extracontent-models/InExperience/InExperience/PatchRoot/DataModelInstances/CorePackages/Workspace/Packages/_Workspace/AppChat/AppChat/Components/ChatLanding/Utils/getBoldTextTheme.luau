@@ -1,31 +1,32 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function(p1) -- line: 6
-	-- upvalues: Cryo (copy)
-	local t1 = {
+local Cryo = require(parent.Cryo)
+
+return function(data)
+	local v = {
 		TextDefault = {
-			Color = p1.Theme.TextEmphasis.Color,
-			Transparency = p1.Theme.TextEmphasis.Transparency
+			Color = data.Theme.TextEmphasis.Color,
+			Transparency = data.Theme.TextEmphasis.Transparency
 		}
 	}
-	local t2 = {
+
+	local v2 = {
 		Body = {
-			Font = p1.Font.Header1.Font,
-			RelativeSize = p1.Font.Body.RelativeSize,
-			RelativeMinSize = p1.Font.Body.RelativeMinSize
+			Font = data.Font.Header1.Font,
+			RelativeSize = data.Font.Body.RelativeSize,
+			RelativeMinSize = data.Font.Body.RelativeMinSize
 		},
 		CaptionBody = {
-			Font = p1.Font.Header1.Font,
-			RelativeSize = p1.Font.CaptionBody.RelativeSize,
-			RelativeMinSize = p1.Font.CaptionBody.RelativeMinSize
+			Font = data.Font.Header1.Font,
+			RelativeSize = data.Font.CaptionBody.RelativeSize,
+			RelativeMinSize = data.Font.CaptionBody.RelativeMinSize
 		}
 	}
 
 	return {
+		Theme = Cryo.Dictionary.join(data.Theme, v),
+		Font = Cryo.Dictionary.join(data.Font, v2),
 		Settings = nil,
-		Theme = Cryo.Dictionary.join(p1.Theme, t1),
-		Font = Cryo.Dictionary.join(p1.Font, t2),
-		Tokens = p1.Tokens
+		Tokens = data.Tokens
 	}
 end

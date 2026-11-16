@@ -1,40 +1,30 @@
-local Parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
-local React = require(Parent.React)
-local ReactRoblox = require(Parent.ReactRoblox)
-local UIBlox = require(Parent.UIBlox)
-local DesignTokenProvider = require(Parent.Style).DesignTokenProvider
-local LocalizationProvider = require(Parent.Localization).LocalizationProvider
-local Localization = require(Parent.AppLocales).Localization
-local RoactRodux = require(Parent.RoactRodux)
-local Rodux = require(Parent.Rodux)
+local parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+local UIBlox = require(parent.UIBlox)
+local Style = require(parent.Style)
+local DesignTokenProvider = Style.DesignTokenProvider
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local AppLocales = require(parent.AppLocales)
+local localization = AppLocales.Localization
+local RoactRodux = require(parent.RoactRodux)
+local Rodux = require(parent.Rodux)
 
-pcall(function() -- line: 13
-	-- upvalues: UIBlox (copy), Parent (copy)
-	UIBlox.init(require(Parent.Dev.RobloxAppUIBloxConfig))
+pcall(function()
+	UIBlox.init(require(parent.Dev.RobloxAppUIBloxConfig))
 end)
-
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 
-local function createStore() -- line: 18
-	-- upvalues: Rodux (copy)
-	local v13 = Rodux.createReducer({}, {})
-
-	return Rodux.Store.new(v13, nil, { Rodux.makeThunkMiddleware({}) })
+local function createStore()
+	local reducer = Rodux.createReducer({}, {})
+	return Rodux.Store.new(reducer, nil, { Rodux.makeThunkMiddleware({}) })
 end
 
-local t1 = {
-	Default = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	},
-	Light = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Dark = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	}
+local v = {
+	Default = { themeName = "Dark", fontName = "Gotham" },
+	Light = { themeName = "Light", fontName = "Gotham" },
+	Dark = { themeName = "Dark", fontName = "Gotham" }
 }
 
 return {
@@ -42,15 +32,13 @@ return {
 	storyRoot = script.Parent.Parent,
 	roact = React,
 	reactRoblox = ReactRoblox,
-	mapStory = function(p1) -- line: 45
-		-- upvalues: React (copy), LocalizationProvider (copy), Localization (copy), AppStyleProvider (copy), t1 (copy), RoactRodux (copy), createStore (copy), DesignTokenProvider (copy)
-		return function(p2) -- line: 46
-			-- upvalues: React (copy), LocalizationProvider (copy), Localization (copy), AppStyleProvider (copy), t1 (copy), RoactRodux (copy), createStore (copy), DesignTokenProvider (copy), p1 (copy)
+	mapStory = function(p)
+		return function(p2)
 			return React.createElement(LocalizationProvider, {
-				localization = Localization.new("en-us")
+				localization = localization.new("en-us")
 			}, {
 				AppStyleProvider = React.createElement(AppStyleProvider, {
-					style = p2 and t1[p2.theme] or t1.Default
+					style = p2 and v[p2.theme] or v.Default
 				}, {
 					StoreProvider = React.createElement(RoactRodux.StoreProvider, {
 						store = createStore()
@@ -58,7 +46,7 @@ return {
 						DesignTokenProvider = React.createElement(DesignTokenProvider, {
 							tokenMappers = {}
 						}, {
-							Child = React.createElement(p1, p2)
+							Child = React.createElement(p, p2)
 						})
 					})
 				})

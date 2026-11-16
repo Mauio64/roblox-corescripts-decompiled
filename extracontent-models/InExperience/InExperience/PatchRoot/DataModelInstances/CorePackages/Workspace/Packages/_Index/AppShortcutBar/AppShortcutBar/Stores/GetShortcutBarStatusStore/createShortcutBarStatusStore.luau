@@ -1,18 +1,22 @@
-local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
+local parent = script:FindFirstAncestor("AppShortcutBar").Parent
 
-local function createShortcutBarStatusStore() -- line: 13
-	-- upvalues: Signals (copy), SignalsReact (copy)
-	local v5, v6 = Signals.createSignal(false)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local function createShortcutBarStatusStore()
+	local signal, setShortcutBarVisible = Signals.createSignal(false)
+	local signal2, setShortcutBarReservedHeight = Signals.createSignal(0)
+
+	local function useShortcutBarVisible()
+		return SignalsReact.useSignalState(signal)
+	end
 
 	return {
-		getShortcutBarVisible = v5,
-		setShortcutBarVisible = v6,
-		useShortcutBarVisible = function() -- line: 16
-			-- upvalues: SignalsReact (copy), v5 (copy)
-			return SignalsReact.useSignalState(v5)
-		end
+		getShortcutBarVisible = signal,
+		setShortcutBarVisible = setShortcutBarVisible,
+		useShortcutBarVisible = useShortcutBarVisible,
+		getShortcutBarReservedHeight = signal2,
+		setShortcutBarReservedHeight = setShortcutBarReservedHeight
 	}
 end
 

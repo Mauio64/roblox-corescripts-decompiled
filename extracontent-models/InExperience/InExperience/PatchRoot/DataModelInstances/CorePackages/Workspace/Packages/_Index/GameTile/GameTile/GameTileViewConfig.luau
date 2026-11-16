@@ -1,127 +1,146 @@
 local GameTile = script:FindFirstAncestor("GameTile")
-local GameTileParent = GameTile.Parent
+local parent = GameTile.Parent
 
-require(GameTileParent.Style)
-require(GameTileParent.Foundation)
+require(parent.Style)
 
-local memoize = require(GameTileParent.AppCommonLib).memoize
+require(parent.Foundation)
 
+local AppCommonLib = require(parent.AppCommonLib)
+local memoize = AppCommonLib.memoize
 require(GameTile.GameTileTypes)
 
-local FFlagLuaAppMigrateGameTileFooterValueFixes = require(GameTileParent.SharedFlags).FFlagLuaAppMigrateGameTileFooterValueFixes
-local FFlagLuaAppUnifyPlayButtonTile = require(GameTileParent.SharedFlags).FFlagLuaAppUnifyPlayButtonTile
-local FFlagLuaAppUnifyPlayButtonTileIxp = require(GameTileParent.SharedFlags).FFlagLuaAppUnifyPlayButtonTileIxp
-local GameTileExperimentation = require(GameTile.GameTileExperimentation)
-local v8 = memoize(function(p1, n1: number?, n2: number?, p2, b1: boolean?, n3: number?) -- line: 75
-	-- upvalues: FFlagLuaAppUnifyPlayButtonTileIxp (copy), GameTileExperimentation (copy), FFlagLuaAppUnifyPlayButtonTile (copy)
-	local v20 = if not FFlagLuaAppUnifyPlayButtonTileIxp then nil else GameTileExperimentation.getIsPlayButtonMigrationEnabled()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppMigrateGameTileFooterValueFixes = SharedFlags.FFlagLuaAppMigrateGameTileFooterValueFixes
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppUnifyPlayButtonTile = SharedFlags2.FFlagLuaAppUnifyPlayButtonTile
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppUnifyPlayButtonTileIxp = SharedFlags3.FFlagLuaAppUnifyPlayButtonTileIxp
 
-	if p2 and b1 then
-		return {
-			paddingAboveMetadata = 0,
-			footerTopPadding = p2.Gap.Medium,
-			titleHeight = (n2 or 1) * (p2.Size.Size_500 + (n1 or 0)),
-			metadataHeight = (n3 or 1) * (p2.Size.Size_500 + (n1 or 0)),
-			footerBottomPadding = p2.Gap.Medium,
-			playButtonHeight = if not FFlagLuaAppUnifyPlayButtonTile or not not FFlagLuaAppUnifyPlayButtonTileIxp and not v20 then p2.Size.Size_900 else p2.Size.Size_1000
-		}
+local GameTileExperimentation = require(GameTile.GameTileExperimentation)
+
+local getElementSizes = memoize(function(p, value: number?, value2: number?, p2, flag: boolean?, value3: number?)
+	local v
+
+	if FFlagLuaAppUnifyPlayButtonTileIxp then
+		v = GameTileExperimentation.getIsPlayButtonMigrationEnabled()
 	end
 
-	return {
-		paddingAboveMetadata = 0,
-		footerTopPadding = p1.Size.Size_300,
-		titleHeight = (n2 or 1) * (p1.Size.Size_500 + (n1 or 0)),
-		metadataHeight = (n3 or 1) * (p1.Size.Size_500 + (n1 or 0)),
-		footerBottomPadding = p1.Size.Size_300,
-		playButtonHeight = if not FFlagLuaAppUnifyPlayButtonTile or not not FFlagLuaAppUnifyPlayButtonTileIxp and not v20 then p1.Size.Size_900 else p1.Size.Size_1000
-	}
+	if p2 and flag then
+		local v2 = {
+			footerTopPadding = p2.Gap.Medium,
+			titleHeight = (value2 or 1) * (p2.Size.Size_500 + (value or 0)),
+			paddingAboveMetadata = 0,
+			metadataHeight = (value3 or 1) * (p2.Size.Size_500 + (value or 0)),
+			footerBottomPadding = p2.Gap.Medium,
+			playButtonHeight = 0
+		}
+		local playButtonHeight
+
+		if FFlagLuaAppUnifyPlayButtonTile and (not FFlagLuaAppUnifyPlayButtonTileIxp or v) then
+			playButtonHeight = p2.Size.Size_1000
+		else
+			playButtonHeight = p2.Size.Size_900
+		end
+
+		v2.playButtonHeight = playButtonHeight
+		return v2
+	else
+		local v2 = {
+			footerTopPadding = p.Size.Size_300,
+			titleHeight = (value2 or 1) * (p.Size.Size_500 + (value or 0)),
+			paddingAboveMetadata = 0,
+			metadataHeight = (value3 or 1) * (p.Size.Size_500 + (value or 0)),
+			footerBottomPadding = p.Size.Size_300,
+			playButtonHeight = 0
+		}
+		local playButtonHeight
+
+		if FFlagLuaAppUnifyPlayButtonTile and (not FFlagLuaAppUnifyPlayButtonTileIxp or v) then
+			playButtonHeight = p.Size.Size_1000
+		else
+			playButtonHeight = p.Size.Size_900
+		end
+
+		v2.playButtonHeight = playButtonHeight
+		return v2
+	end
 end)
 
-return {
-	getTileHeight = function(p3, n4: number, p4, b2: boolean?, b3: boolean?, b4: boolean?, n5: number?, n6: number?, n7: number?, n8: number?, p5, b5: boolean?) -- line: 151
-		-- upvalues: v8 (copy)
-		local v45 = n4 * (p4 ~= "Wide" and p4 ~= "Event" and 1 or 0.5625)
-		local v46 = v8(p3, n5, n7, p5, b5, n8)
-		local footerTopPadding = v46.footerTopPadding
+local function getFooterHeight(p, flag: boolean?, flag2: boolean?, flag3: boolean?, p2: number?, p3: number?, p4: number?, p5, flag4: boolean?, p6: number?) -- 1 equivalent call inferred from this helper
+	local v = getElementSizes(p, p2, p4, p5, flag4, p6)
 
-		if not b4 then
-			footerTopPadding += v46.titleHeight
-		end
+	local footerTopPadding = v.footerTopPadding
 
-		if not b3 then
-			footerTopPadding += v46.paddingAboveMetadata + v46.metadataHeight
-		end
-
-		if b2 then
-			footerTopPadding += v46.footerBottomPadding
-		end
-
-		if n6 then
-			footerTopPadding += n6
-		end
-
-		return v45 + footerTopPadding
-	end,
-	getFooterHeight = function(p6, b6: boolean?, b7: boolean?, b8: boolean?, n9: number?, n10: number?, n11: number?, p7, b9: boolean?, n12: number?) -- line: 114
-		-- upvalues: v8 (copy)
-		local v31 = v8(p6, n9, n11, p7, b9, n12)
-		local footerTopPadding = v31.footerTopPadding
-
-		if not b8 then
-			footerTopPadding += v31.titleHeight
-		end
-
-		if not b7 then
-			footerTopPadding += v31.paddingAboveMetadata + v31.metadataHeight
-		end
-
-		if b6 then
-			footerTopPadding += v31.footerBottomPadding
-		end
-
-		if n10 then
-			footerTopPadding += n10
-		end
-
-		return footerTopPadding
-	end,
-	getImageAspectRatio = function(p8) -- line: 25
-		if p8 == "Wide" or p8 == "Event" then
-			return 1.7777777777777777
-		end
-
-		return 1
-	end,
-	getInverseImageAspectRatio = function(p9) -- line: 33
-		if p9 == "Wide" or p9 == "Event" then
-			return 0.5625
-		end
-
-		return 1
-	end,
-	getElementSizes = v8,
-	getContainmentSidePadding = function(p10, p11, p12) -- line: 41
-		-- upvalues: FFlagLuaAppMigrateGameTileFooterValueFixes (copy)
-		if p12 then
-			if p11 == "Wide" or p11 == "Event" then
-				if FFlagLuaAppMigrateGameTileFooterValueFixes then
-					return p12.Padding.Medium
-				end
-
-				return p12.Padding.Large
-			end
-
-			if FFlagLuaAppMigrateGameTileFooterValueFixes then
-				return p12.Size.Size_150
-			end
-
-			return p12.Padding.Small
-		end
-
-		if p11 == "Wide" or p11 == "Event" then
-			return p10.Size.Size_300
-		end
-
-		return p10.Size.Size_150
+	if not flag3 then
+		footerTopPadding += v.titleHeight
 	end
-}
+
+	if not flag2 then
+		footerTopPadding += v.paddingAboveMetadata + v.metadataHeight
+	end
+
+	if flag then
+		footerTopPadding += v.footerBottomPadding
+	end
+
+	if p3 then
+		footerTopPadding += p3
+	end
+
+	return footerTopPadding
+end
+
+local GameTileViewConfig = {}
+
+function GameTileViewConfig.getTileHeight(p, p2: number, p3, flag: boolean?, flag2: boolean?, flag3: boolean?, p4: number?, p5: number?, p6: number?, p7: number?, p8, flag4: boolean?)
+	return p2 * ((p3 == "Wide" or p3 == "Event") and 0.5625 or 1) + getFooterHeight( -- inferred equivalent call
+		p,
+		flag,
+		flag2,
+		flag3,
+		p4,
+		p5,
+		p6,
+		p8,
+		flag4,
+		p7
+	)
+end
+
+GameTileViewConfig.getFooterHeight = getFooterHeight
+
+function GameTileViewConfig.getImageAspectRatio(p): number
+	if p == "Wide" or p == "Event" then
+		return 16 / 9
+	end
+
+	return 1
+end
+
+function GameTileViewConfig.getInverseImageAspectRatio(p): number
+	return if p == "Wide" or p == "Event" then 0.5625 else 1
+end
+
+GameTileViewConfig.getElementSizes = getElementSizes
+
+function GameTileViewConfig.getContainmentSidePadding(p, p2, p3)
+	if p3 then
+		if p2 == "Wide" or p2 == "Event" then
+			if FFlagLuaAppMigrateGameTileFooterValueFixes then
+				return p3.Padding.Medium
+			end
+
+			return p3.Padding.Large
+		elseif FFlagLuaAppMigrateGameTileFooterValueFixes then
+			return p3.Size.Size_150
+		else
+			return p3.Padding.Small
+		end
+	elseif p2 == "Wide" or p2 == "Event" then
+		return p.Size.Size_300
+	else
+		return p.Size.Size_150
+	end
+end
+
+return GameTileViewConfig

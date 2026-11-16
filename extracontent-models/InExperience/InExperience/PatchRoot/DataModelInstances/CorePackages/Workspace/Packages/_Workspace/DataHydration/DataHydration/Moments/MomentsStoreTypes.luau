@@ -1,6 +1,6 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
-require(Parent.HttpClient)
-require(Parent.MomentsTypes)
+require(parent.HttpClient)
+require(parent.MomentsTypes)
 
 return nil

@@ -1,87 +1,127 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
 require(AppChat.types)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local UIBlox = require(AppChatParent.UIBlox)
+local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local IconButton = UIBlox.App.Button.IconButton
 local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+
 local BaseCell = require(AppChat.Components.Cells.BaseCell)
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
-local Foundation = require(AppChatParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local t1 = {
+
+local v = {
 	bodyText = "Placeholder body",
 	iconImage = nil,
-	iconCellWidth = 30,
-	cellHeight = 28,
 	iconSize = IconSize.Small,
-	onIconActivated = function() -- line: 37
-	end
+	iconCellWidth = 30,
+	shouldShowIcon = true,
+	cellHeight = 28,
+	onIconActivated = function() end
 }
 
-local function ConversationTypeCell(t2: {[any]: any}) -- line: 42
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useTokens (copy), useIsInExperience (copy), React (copy), BaseCell (copy), Foundation (copy), IconButton (copy)
-	local v16 = Cryo.Dictionary.join(t1, t2)
-	local v17 = useStyle()
-	local v18 = v16.style or v17
-	local Theme = v18.Theme
-	local Size_300 = v18.Tokens.Size.Size_300
-	local v21 = useTokens()
-	local v22 = useIsInExperience()
-	local v23, v24 = React.useBinding(0)
-	local v25 = React.useCallback(function(p1) -- line: 51
-		-- upvalues: v24 (copy)
-		v24(p1.AbsoluteSize.X)
+local function ConversationTypeCell(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local v2 = useStyle()
+	local style = joined.style or v2
+	local theme = style.Theme
+	local size_300 = style.Tokens.Size.Size_300
+	local v3 = useTokens()
+	local v4 = useIsInExperience()
+	local v5, v6 = React.useBinding(0)
+	local onAbsoluteSizeChanged = React.useCallback(function(p2)
+		v6(p2.AbsoluteSize.X)
 	end, {})
 
-	return React.createElement(BaseCell, {
+	local createElement = React.createElement
+	local v7 = {
+		Size = UDim2.new(1, 0, 0, joined.cellHeight),
+		BackgroundColor3 = 0,
+		BackgroundTransparency = 0,
+		LayoutOrder = 0,
 		Selectable = false,
+		dividerColor3 = 0,
+		dividerTransparency = 0,
 		isDisabled = true,
-		showDivider = false,
-		Size = UDim2.new(1, 0, 0, v16.cellHeight),
-		BackgroundColor3 = if not v22 then Theme.BackgroundDefault.Color else v21.Color.None.Color3,
-		BackgroundTransparency = if not v22 then v18.Theme.BackgroundDefault.Transparency else v21.Color.None.Transparency,
-		LayoutOrder = v16.layoutOrder,
-		dividerColor3 = Theme.Divider.Color,
-		dividerTransparency = Theme.Divider.Transparency
-	}, {
-		UIPadding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, Size_300),
-			PaddingRight = UDim.new(0, Size_300)
-		}),
-		Content = React.createElement(Foundation.View, {
-			tag = "row size-full align-y-center",
-			onAbsoluteSizeChanged = v25
-		}, {
-			Text = React.createElement(Foundation.Text, {
-				LayoutOrder = 1,
-				tag = "size-0-full auto-x content-emphasis text-align-x-left text-title-large text-truncate-end",
-				Text = v16.bodyText,
-				sizeConstraint = {
-					MaxSize = v23:map(function(n1: number) -- line: 80
-						-- upvalues: v16 (copy)
-						local v28 = n1 - v16.iconCellWidth
+		showDivider = false
+	}
+	local backgroundColor
 
-						return Vector2.new(not (v28 > 0) and 1e999 or v28, 1e999)
-					end)
-				}
-			}),
-			InfoIcon = React.createElement(IconButton, {
-				backgroundTransparency = 1,
-				layoutOrder = 2,
-				icon = v16.iconImage,
-				iconColor3 = Theme.IconDefault.Color,
-				iconSize = v16.iconSize,
-				iconTransparency = Theme.IconDefault.Transparency,
-				size = UDim2.fromOffset(v16.iconCellWidth, v16.iconCellWidth),
-				onActivated = v16.onIconActivated
-			})
+	if v4 then
+		backgroundColor = v3.Color.None.Color3
+	else
+		backgroundColor = theme.BackgroundDefault.Color
+	end
+
+	v7.BackgroundColor3 = backgroundColor
+	local backgroundTransparency
+
+	if v4 then
+		backgroundTransparency = v3.Color.None.Transparency
+	else
+		backgroundTransparency = style.Theme.BackgroundDefault.Transparency
+	end
+
+	v7.BackgroundTransparency = backgroundTransparency
+
+	v7.LayoutOrder = joined.layoutOrder
+
+	v7.dividerColor3 = theme.Divider.Color
+	v7.dividerTransparency = theme.Divider.Transparency
+
+	local v8 = {
+		UIPadding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, size_300),
+			PaddingRight = UDim.new(0, size_300)
+		}),
+		Content = 0
+	}
+
+	local createElement2 = React.createElement
+	local view = Foundation.View
+
+	local v9 = {
+		Text = React.createElement(Foundation.Text, {
+			LayoutOrder = 1,
+			Text = joined.bodyText,
+			sizeConstraint = {
+				MaxSize = v5:map(function(p2: number)
+					local v9 = p2 - (not joined.shouldShowIcon and 0 or joined.iconCellWidth)
+					return Vector2.new(not (v9 > 0) and 1e999 or v9, 1e999)
+				end)
+			},
+			tag = "size-0-full auto-x content-emphasis text-align-x-left text-title-large text-truncate-end"
+		}),
+		InfoIcon = 0
+	}
+	local infoIcon
+
+	if joined.shouldShowIcon then
+		infoIcon = React.createElement(IconButton, {
+			backgroundTransparency = 1,
+			icon = joined.iconImage,
+			iconColor3 = theme.IconDefault.Color,
+			iconSize = joined.iconSize,
+			iconTransparency = theme.IconDefault.Transparency,
+			layoutOrder = 2,
+			size = UDim2.fromOffset(joined.iconCellWidth, joined.iconCellWidth),
+			onActivated = joined.onIconActivated
 		})
-	})
+	end
+
+	v9.InfoIcon = infoIcon
+	v8.Content = createElement2(
+		view,
+		{ tag = "row size-full align-y-center", onAbsoluteSizeChanged = onAbsoluteSizeChanged },
+		v9
+	)
+	return createElement(BaseCell, v7, v8)
 end
 
 return ConversationTypeCell

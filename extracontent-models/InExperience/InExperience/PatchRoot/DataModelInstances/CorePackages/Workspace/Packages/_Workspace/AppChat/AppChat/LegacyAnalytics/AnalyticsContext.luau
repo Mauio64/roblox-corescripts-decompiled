@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return (require(Parent.Roact).createContext(nil))
+local Roact = require(parent.Roact)
+
+return (Roact.createContext(nil))

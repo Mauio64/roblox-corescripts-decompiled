@@ -1,383 +1,376 @@
-local ParentParent = script.Parent.Parent
-local Cryo = require(ParentParent.Cryo)
+local parent = script.Parent.Parent
+local Cryo = require(parent.Cryo)
+
 local Input = require(script.Parent.Input)
 local createSignal = require(script.Parent.createSignal)
 local debugPrint = require(script.Parent.debugPrint)
+
 local FocusControllerInternalApi = require(script.Parent.FocusControllerInternalApi)
-local t1 = {}
 
-t1.__index = t1
+local FocusController = {}
+FocusController.__index = FocusController
 
-function t1.new() -- line: 16
-	-- upvalues: createSignal (copy), t1 (copy)
+function FocusController.new()
 	return (setmetatable({
-		rootRef = nil,
-		engineInterface = nil,
-		captureFocusOnInitialize = false,
-		moveFocusToOnInitialize = nil,
-		focusedLeaf = nil,
-		inProgressFocus = nil,
 		selectionChangedSignal = createSignal(),
 		boundInputsChangedSignal = createSignal(),
 		focusNodeTree = {},
 		allNodes = {},
+		rootRef = nil,
+		engineInterface = nil,
+		captureFocusOnInitialize = false,
+		moveFocusToOnInitialize = nil,
 		inputDisconnectors = {},
-		boundInputs = {}
-	}, t1))
+		boundInputs = {},
+		focusedLeaf = nil,
+		inProgressFocus = nil
+	}, FocusController))
 end
-function t1.isInitialized(p1) -- line: 37
-	return p1.engineInterface ~= nil
-end
-function t1.moveFocusTo(p2, p3) -- line: 41
-	-- upvalues: debugPrint (copy)
-	if p2.engineInterface == nil then
-		p2.moveFocusToOnInitialize = p3
 
+function FocusController.isInitialized(p): boolean
+	return p.engineInterface ~= nil
+end
+
+function FocusController:moveFocusTo(moveFocusToOnInitialize)
+	if self.engineInterface == nil then
+		self.moveFocusToOnInitialize = moveFocusToOnInitialize
 		return
 	end
 
-	debugPrint("[FOCUS] Move focus to", p3)
+	debugPrint("[FOCUS] Move focus to", moveFocusToOnInitialize)
+	local allNode = self.allNodes[moveFocusToOnInitialize]
 
-	local v11 = p2.allNodes[p3]
-
-	if v11 ~= nil and not p2:isNodeFocused(v11) then
-		v11:focus()
+	if allNode ~= nil and not self:isNodeFocused(allNode) then
+		allNode:focus()
 	end
 
-	p2:debugPrintTree()
+	self:debugPrintTree()
 end
-function t1.moveFocusToNeighbor(p4, p5) -- line: 56
-	-- upvalues: debugPrint (copy)
-	if p4.engineInterface == nil then
+
+function FocusController:moveFocusToNeighbor(p)
+	if self.engineInterface == nil then
 		error("FocusController is not connected to a component hierarchy!", 2)
 	end
 
-	if p4.focusedLeaf ~= nil then
-		debugPrint("[FOCUS] Move focus to", p5, "from", p4.focusedLeaf.ref)
+	if self.focusedLeaf ~= nil then
+		debugPrint("[FOCUS] Move focus to", p, "from", self.focusedLeaf.ref)
+		local value = self.focusedLeaf.ref:getValue()
 
-		local v14 = p4.focusedLeaf.ref:getValue()
-
-		if v14 ~= nil and v14[p5] ~= nil then
-			p4:setSelection(v14[p5])
+		if value ~= nil and value[p] ~= nil then
+			self:setSelection(value[p])
 		end
 	end
 end
-function t1.getSelection(p6) -- line: 70
-	return p6.engineInterface.getSelection()
+
+function FocusController.getSelection(p)
+	return p.engineInterface.getSelection()
 end
-function t1.setSelection(p7, p8) -- line: 74
-	p7.engineInterface.setSelection(p8)
+
+function FocusController.setSelection(p, p2)
+	p.engineInterface.setSelection(p2)
 end
-function t1.registerNode(p9, p10, p11, p12) -- line: 78
-	-- upvalues: debugPrint (copy)
-	if p10 ~= nil then
-		debugPrint("[TREE ] Registering child node", p11)
 
-		local v22 = p9.focusNodeTree[p10] or {}
+function FocusController:registerNode(p, rootRef, p2)
+	if p == nil then
+		debugPrint("[TREE ] Registering root node", rootRef)
+		self.rootRef = rootRef
+		self.allNodes[rootRef] = p2
 
-		v22[p11] = p12
-		p9.focusNodeTree[p10] = v22
-		p9.allNodes[p11] = p12
-		p9:descendantAddedRefocus()
+		if self.captureFocusOnRootRegistered then
+			self.captureFocusOnRootRegistered = false
+			self:captureFocus()
+		end
+	else
+		debugPrint("[TREE ] Registering child node", rootRef)
 
+		local v = self.focusNodeTree[p] or {}
+		v[rootRef] = p2
+		self.focusNodeTree[p] = v
+		self.allNodes[rootRef] = p2
+
+		self:descendantAddedRefocus()
+	end
+end
+
+function FocusController:deregisterNode(p, p2)
+	if p == nil then
+		debugPrint("[TREE ] Deregistering root node", p2)
+		self.allNodes[p2] = nil
+	else
+		debugPrint("[TREE ] Deregistering child node", p2)
+		self.focusNodeTree[p][p2] = nil
+		self.allNodes[p2] = nil
+
+		self:descendantRemovedRefocus()
+	end
+end
+
+function FocusController:needsDescendantRemovedRefocus()
+	if self.focusedLeaf == nil then
 		return
 	end
 
-	debugPrint("[TREE ] Registering root node", p11)
-	p9.rootRef = p11
-	p9.allNodes[p11] = p12
-
-	if p9.captureFocusOnRootRegistered then
-		p9.captureFocusOnRootRegistered = false
-		p9:captureFocus()
-	end
+	return self.focusedLeaf.ref:getValue() == nil
 end
-function t1.deregisterNode(p13, p14, p15) -- line: 103
-	-- upvalues: debugPrint (copy)
-	if p14 ~= nil then
-		debugPrint("[TREE ] Deregistering child node", p15)
-		p13.focusNodeTree[p14][p15] = nil
-		p13.allNodes[p15] = nil
-		p13:descendantRemovedRefocus()
 
-		return
-	end
-
-	debugPrint("[TREE ] Deregistering root node", p15)
-	p13.allNodes[p15] = nil
-end
-function t1.needsDescendantRemovedRefocus(p16) -- line: 119
-	if p16.focusedLeaf == nil then
-		return
-	end
-
-	return p16.focusedLeaf.ref:getValue() == nil
-end
-function t1.descendantRemovedRefocus(p17) -- line: 132
-	-- upvalues: debugPrint (copy)
-	if p17:needsDescendantRemovedRefocus() then
+function FocusController:descendantRemovedRefocus()
+	if self:needsDescendantRemovedRefocus() then
 		debugPrint("[FOCUS] Focused node was removed; refocusing from nearest existing ancestor")
 
-		local parent = p17.focusedLeaf.parent
+		local parent2 = self.focusedLeaf.parent
 
-		while parent ~= nil and p17.allNodes[parent.ref] == nil do
-			parent = parent.parent
+		while parent2 ~= nil and self.allNodes[parent2.ref] == nil do
+			parent2 = parent2.parent
 		end
 
-		if parent ~= nil then
-			parent:focus()
+		if parent2 ~= nil then
+			parent2:focus()
 		end
 	end
 end
-function t1.needsDescendantAddedRefocus(p18) -- line: 149
-	-- upvalues: Cryo (copy)
-	if p18.focusedLeaf == nil then
+
+function FocusController:needsDescendantAddedRefocus(): nil | boolean
+	if self.focusedLeaf == nil then
 		return nil
 	end
 
-	return not Cryo.isEmpty(p18:getChildren(p18.focusedLeaf))
+	return not Cryo.isEmpty(self:getChildren(self.focusedLeaf))
 end
-function t1.descendantAddedRefocus(p19) -- line: 162
-	-- upvalues: debugPrint (copy)
-	if p19:needsDescendantAddedRefocus() then
-		debugPrint("[FOCUS] Currently-focused node is no longer a leaf; refocusing", p19.focusedLeaf.ref)
-		p19.focusedLeaf:focus()
+
+function FocusController:descendantAddedRefocus()
+	if self:needsDescendantAddedRefocus() then
+		debugPrint("[FOCUS] Currently-focused node is no longer a leaf; refocusing", self.focusedLeaf.ref)
+		self.focusedLeaf:focus()
 	end
 end
-function t1.getChildren(p20, p21) -- line: 171
-	return p20.focusNodeTree[p21] or {}
+
+function FocusController:getChildren(p)
+	return self.focusNodeTree[p] or {}
 end
-function t1.isNodeFocused(p22, p23) -- line: 175
-	if p22.focusedLeaf == nil then
+
+function FocusController:isNodeFocused(p): boolean
+	if self.focusedLeaf == nil then
 		return false
 	end
 
-	if p23 == p22.focusedLeaf then
+	if self.focusedLeaf == p then
 		return true
 	end
 
-	local parent = p22.focusedLeaf.parent
+	local parent2 = self.focusedLeaf.parent
 
-	while parent ~= nil do
-		if parent == p23 then
+	while parent2 ~= nil do
+		if parent2 == p then
 			return true
 		end
 
-		parent = parent.parent
+		parent2 = parent2.parent
 	end
 
 	return false
 end
-function t1.setFocusedLeaf(p24, p25) -- line: 198
-	p24.focusedLeaf = p25
+
+function FocusController:setFocusedLeaf(focusedLeaf)
+	self.focusedLeaf = focusedLeaf
 end
-function t1.setInProgressFocus(p26, p27) -- line: 202
-	p26.inProgressFocus = p27
+
+function FocusController:setInProgressFocus(inProgressFocus)
+	self.inProgressFocus = inProgressFocus
 end
-function t1.isInProgressFocus(p28, p29) -- line: 206
-	return p29 == p28.inProgressFocus
+
+function FocusController.isInProgressFocus(p, p2): boolean
+	return p.inProgressFocus == p2
 end
-function t1.debugPrintTree(p30) -- line: 211
-	-- upvalues: debugPrint (copy)
+
+function FocusController:debugPrintTree()
 	if not debugPrint.isEnabled then
 		return
 	end
 
-	local function recursePrintTree(p31, p32) -- line: 216
-		-- upvalues: p30 (copy), debugPrint (copy), recursePrintTree (copy)
-		local str = tostring(p31.ref)
+	local function recursePrintTree(p, p2)
+		local v = tostring(p.ref)
 
-		if p30:isNodeFocused(p31) then
-			str ..= "*"
+		if self:isNodeFocused(p) then
+			v ..= "*"
 		end
 
-		debugPrint(p32, str)
+		debugPrint(p2, v)
 
-		local v67 = p30:getChildren(p31)
+		local children = self:getChildren(p)
 
-		for _, v in pairs(v67) do
-			recursePrintTree(v, p32 .. "  ")
+		for _, child in pairs(children) do
+			recursePrintTree(child, p2 .. "  ")
 		end
 	end
 
 	debugPrint("Focus Node Tree:")
-	recursePrintTree(p30.allNodes[p30.rootRef], "  ")
+	recursePrintTree(self.allNodes[self.rootRef], "  ")
 end
-function t1.updateInputBindings(p33) -- line: 236
-	-- upvalues: Input (copy), debugPrint (copy)
-	local t2 = {}
-	local focusedLeaf = p33.focusedLeaf
 
-	while focusedLeaf ~= nil do
-		for _, v in pairs(focusedLeaf.inputBindings) do
-			local v49 = Input.getUniqueKey(v)
+function FocusController:updateInputBindings()
+	local v = self.focusedLeaf
+	local inputBindingsByUniqueKey = {}
 
-			if t2[v49] == nil then
-				debugPrint("[INPUT] Bind input", v49)
-				t2[v49] = v
+	while v ~= nil do
+		for _, inputBinding in pairs(v.inputBindings) do
+			local uniqueKey = Input.getUniqueKey(inputBinding)
+
+			if inputBindingsByUniqueKey[uniqueKey] ~= nil then
+				continue
 			end
+
+			debugPrint("[INPUT] Bind input", uniqueKey)
+			inputBindingsByUniqueKey[uniqueKey] = inputBinding
 		end
 
-		focusedLeaf = focusedLeaf.parent
+		v = v.parent
 	end
 
-	for _, v in pairs(p33.inputDisconnectors) do
-		v()
+	for _, inputDisconnector in pairs(self.inputDisconnectors) do
+		inputDisconnector()
 	end
 
-	p33.inputDisconnectors = {}
-	p33.boundInputs = {}
+	self.inputDisconnectors = {}
+	self.boundInputs = {}
 
-	for k, v in pairs(t2) do
-		p33.inputDisconnectors[k] = Input.connectToEvent(v, p33.engineInterface)
+	for k, v2 in pairs(inputBindingsByUniqueKey) do
+		self.inputDisconnectors[k] = Input.connectToEvent(v2, self.engineInterface)
 
-		if v.keyCode then
-			p33.boundInputs[v.keyCode] = v.meta or {}
+		if v2.keyCode then
+			self.boundInputs[v2.keyCode] = v2.meta or {}
 		end
 	end
 
-	p33.boundInputsChangedSignal:fire(p33.boundInputs)
+	self.boundInputsChangedSignal:fire(self.boundInputs)
 end
-function t1.initialize(p34, p35) -- line: 271
-	-- upvalues: debugPrint (copy)
-	if p34.engineInterface ~= nil then
+
+function FocusController:initialize(engineInterface)
+	if self.engineInterface ~= nil then
 		error("FocusController cannot be initialized more than once; make sure you are not passing it to multiple components")
 	end
 
-	p34.engineInterface = p35
-	p34.guiServiceConnection = p35.subscribeToSelectionChanged(function() -- line: 284
-		-- upvalues: p34 (copy), p35 (copy), debugPrint (copy)
-		if p34.rootRef == nil then
+	self.engineInterface = engineInterface
+
+	self.guiServiceConnection = engineInterface.subscribeToSelectionChanged(function()
+		if self.rootRef == nil then
 			return
 		end
 
-		local v70 = p34.focusedLeaf ~= nil
+		local v = self.focusedLeaf ~= nil
 
-		p34.focusedLeaf = nil
+		self.focusedLeaf = nil
+		local selection = engineInterface.getSelection()
+		local value = self.rootRef:getValue()
 
-		local v71 = p35.getSelection()
-		local v72 = p34.rootRef:getValue()
+		if selection ~= nil and (value == selection or selection:IsDescendantOf(value)) then
+			debugPrint("[EVENT] Selection changed to", selection, "in focus hierarchy beginning at", value)
 
-		if v71 ~= nil and (v72 == v71 or v71:IsDescendantOf(v72)) then
-			debugPrint("[EVENT] Selection changed to", v71, "in focus hierarchy beginning at", v72)
-
-			for k, v in pairs(p34.allNodes) do
-				if v71 == k:getValue() then
-					p34.focusedLeaf = v
-
+			for k, allNode in pairs(self.allNodes) do
+				if selection == k:getValue() then
+					self.focusedLeaf = allNode
 					break
 				end
 			end
 		end
 
-		if p34.focusedLeaf ~= nil or v70 then
-			p34.selectionChangedSignal:fire()
-			p34:updateInputBindings()
+		if self.focusedLeaf ~= nil or v then
+			self.selectionChangedSignal:fire()
+
+			self:updateInputBindings()
 		end
 	end)
 
-	if p34.captureFocusOnInitialize then
-		p34:captureFocus()
+	if self.captureFocusOnInitialize then
+		self:captureFocus()
 	end
 
-	if p34.moveFocusToOnInitialize then
-		p34:moveFocusTo(p34.moveFocusToOnInitialize)
+	if self.moveFocusToOnInitialize then
+		self:moveFocusTo(self.moveFocusToOnInitialize)
 	end
 end
-function t1.captureFocus(p36) -- line: 344
-	if p36.engineInterface == nil then
-		p36.captureFocusOnInitialize = true
 
+function FocusController:captureFocus()
+	if self.engineInterface == nil then
+		self.captureFocusOnInitialize = true
 		return
 	end
 
-	if p36.rootRef == nil then
-		p36.captureFocusOnRootRegistered = true
-
+	if self.rootRef == nil then
+		self.captureFocusOnRootRegistered = true
 		return
 	end
 
-	p36.allNodes[p36.rootRef]:focus()
-	p36:debugPrintTree()
+	self.allNodes[self.rootRef]:focus()
+	self:debugPrintTree()
 end
-function t1.releaseFocus(p37) -- line: 355
-	if p37.engineInterface ~= nil then
-		p37.engineInterface.setSelection(nil)
+
+function FocusController:releaseFocus()
+	if self.engineInterface ~= nil then
+		self.engineInterface.setSelection(nil)
 	end
 
-	p37.captureFocusOnInitialize = false
-	p37.captureFocusOnRootRegistered = false
+	self.captureFocusOnInitialize = false
+	self.captureFocusOnRootRegistered = false
 end
-function t1.teardown(p38) -- line: 363
-	if p38.guiServiceConnection ~= nil then
-		p38.guiServiceConnection:Disconnect()
+
+function FocusController:teardown()
+	if self.guiServiceConnection ~= nil then
+		self.guiServiceConnection:Disconnect()
 	end
 
-	for _, v in pairs(p38.inputDisconnectors) do
-		v()
+	for _, inputDisconnector in pairs(self.inputDisconnectors) do
+		inputDisconnector()
 	end
 
-	p38.rootRef = nil
-	p38.engineInterface = nil
-	p38.captureFocusOnInitialize = false
-	p38.captureFocusOnRootRegistered = false
-	p38.focusedLeaf = nil
+	self.rootRef = nil
+	self.engineInterface = nil
+	self.captureFocusOnInitialize = false
+	self.captureFocusOnRootRegistered = false
+	self.focusedLeaf = nil
 end
-function t1.subscribeToSelectionChange(p39, p40) -- line: 382
-	-- upvalues: debugPrint (copy)
+
+function FocusController.subscribeToSelectionChange(p, p2)
 	debugPrint("[TREE ] New subscription to selection change event")
-
-	return p39.selectionChangedSignal:subscribe(p40)
+	return p.selectionChangedSignal:subscribe(p2)
 end
-function t1.createPublicApiWrapper() -- line: 389
-	-- upvalues: t1 (copy), FocusControllerInternalApi (copy)
-	local v63 = t1.new()
+
+function FocusController.createPublicApiWrapper()
+	local v = FocusController.new()
 
 	return {
-		[FocusControllerInternalApi] = v63,
-		moveFocusTo = function(...) -- line: 394
-			-- upvalues: v63 (copy)
-			v63:moveFocusTo(...)
+		[FocusControllerInternalApi] = v,
+		moveFocusTo = function(...)
+			v:moveFocusTo(...)
 		end,
-		moveFocusLeft = function() -- line: 397
-			-- upvalues: v63 (copy)
-			v63:moveFocusToNeighbor("NextSelectionLeft")
+		moveFocusLeft = function()
+			v:moveFocusToNeighbor("NextSelectionLeft")
 		end,
-		moveFocusRight = function() -- line: 400
-			-- upvalues: v63 (copy)
-			v63:moveFocusToNeighbor("NextSelectionRight")
+		moveFocusRight = function()
+			v:moveFocusToNeighbor("NextSelectionRight")
 		end,
-		moveFocusUp = function() -- line: 403
-			-- upvalues: v63 (copy)
-			v63:moveFocusToNeighbor("NextSelectionUp")
+		moveFocusUp = function()
+			v:moveFocusToNeighbor("NextSelectionUp")
 		end,
-		moveFocusDown = function() -- line: 406
-			-- upvalues: v63 (copy)
-			v63:moveFocusToNeighbor("NextSelectionDown")
+		moveFocusDown = function()
+			v:moveFocusToNeighbor("NextSelectionDown")
 		end,
-		captureFocus = function() -- line: 409
-			-- upvalues: v63 (copy)
-			v63:captureFocus()
+		captureFocus = function()
+			v:captureFocus()
 		end,
-		releaseFocus = function() -- line: 412
-			-- upvalues: v63 (copy)
-			v63:releaseFocus()
+		releaseFocus = function()
+			v:releaseFocus()
 		end,
-		getCurrentFocus = function() -- line: 415
-			-- upvalues: v63 (copy)
-			local focusedLeaf = v63.focusedLeaf
-
+		getCurrentFocus = function()
+			local focusedLeaf = v.focusedLeaf
 			return focusedLeaf and focusedLeaf.ref or nil
 		end,
-		getBoundInputs = function() -- line: 419
-			-- upvalues: v63 (copy)
-			return v63.boundInputs
+		getBoundInputs = function()
+			return v.boundInputs
 		end,
-		subscribeToBoundInputsChanged = function(p41) -- line: 422
-			-- upvalues: v63 (copy)
-			return v63.boundInputsChangedSignal:subscribe(p41)
+		subscribeToBoundInputsChanged = function(p)
+			return v.boundInputsChangedSignal:subscribe(p)
 		end
 	}
 end
 
-return t1
+return FocusController

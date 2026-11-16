@@ -1,65 +1,52 @@
-local Parent = script:FindFirstAncestor("AppLaunchTracker").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
-
+local parent = script:FindFirstAncestor("AppLaunchTracker").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
 require(script.Parent.AppLaunchTrackerTypes)
 
-local v3 = game:DefineFastInt("DiscoveryAppLaunchMilestonesHundredthsPercent", 0)
-local v4 = game:DefineFastInt("DiscoveryAppLaunchErrorHundredthsPercent", 0)
-local t1 = {
+local defineFastInt = game:DefineFastInt("DiscoveryAppLaunchMilestonesHundredthsPercent", 0)
+local defineFastInt2 = game:DefineFastInt("DiscoveryAppLaunchErrorHundredthsPercent", 0)
+
+local v = {
 	eventName = "DiscoveryAppLaunch_Milestones",
+	backends = { LoggingProtocol.TelemetryBackends.Points, LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 24, 11, 4 },
 	description = "App launch rodux actions",
-	links = "",
-	backends = {
-		LoggingProtocol.TelemetryBackends.Points,
-		LoggingProtocol.TelemetryBackends.EventIngest
-	},
-	throttlingPercentage = v3,
-	lastUpdated = {
-		24,
-		11,
-		4
-	}
+	links = ""
 }
-local t2 = {
+
+local v2 = {
 	eventName = "DiscoveryAppLaunch_Error",
-	description = "Error related to discovery app launch metric tracking",
 	backends = { LoggingProtocol.TelemetryBackends.Counter },
-	throttlingPercentage = v4,
-	lastUpdated = {
-		24,
-		11,
-		4
-	}
+	throttlingPercentage = defineFastInt2,
+	lastUpdated = { 24, 11, 4 },
+	description = "Error related to discovery app launch metric tracking"
 }
+local DiscoveryAppLaunchEvents = {}
 
-return {
-	reportStatsforMilestone = function(p1, s1: string, s2: string, n1: number, p2, n2: number, n3: number, n4: number, n5: number, n6: number) -- line: 37
-		-- upvalues: v3 (copy), t1 (copy)
-		assert(p1, "LoggingProtocol must exist")
+function DiscoveryAppLaunchEvents.reportStatsforMilestone(object, milestone: string, p: string, durationMs: number, items, numTilesInit: number, numTileRenders: number, numFeedItems: number, numFeedRenders: number, totalSduiDurationMs: number)
+	assert(object, "LoggingProtocol must exist")
 
-		if v3 > 0 then
-			local t3 = {
-				milestone = s1,
-				milestoneSpan = `{ s2 }-{ s1 }`,
-				durationMs = n1,
-				numTilesInit = n2,
-				numTileRenders = n3,
-				numFeedItems = n4,
-				numFeedRenders = n5,
-				totalSduiDurationMs = n6
-			}
+	if defineFastInt > 0 then
+		local v3 = {}
+		v3.milestone = milestone
+		v3.milestoneSpan = `{p}-{milestone}`
+		v3.durationMs = durationMs
+		v3.numTilesInit = numTilesInit
+		v3.numTileRenders = numTileRenders
+		v3.numFeedItems = numFeedItems
+		v3.numFeedRenders = numFeedRenders
+		v3.totalSduiDurationMs = totalSduiDurationMs
 
-			for v18, v19 in p2 do
-				t3[v18] = v19
-			end
-
-			p1:logRobloxTelemetryEvent(t1, { p1.StandardizedFields.addOsInfo }, t3)
+		for k, item in items do
+			v3[k] = item
 		end
-	end,
-	reportError = function(p3, s3: string) -- line: 72
-		-- upvalues: t2 (copy)
-		p3:logRobloxTelemetryCounter(t2, 1, {
-			errorTag = s3
-		})
+
+		object:logRobloxTelemetryEvent(v, { object.StandardizedFields.addOsInfo }, v3)
 	end
-}
+end
+
+function DiscoveryAppLaunchEvents.reportError(object, errorTag: string)
+	object:logRobloxTelemetryCounter(v2, 1, { errorTag = errorTag })
+end
+
+return DiscoveryAppLaunchEvents

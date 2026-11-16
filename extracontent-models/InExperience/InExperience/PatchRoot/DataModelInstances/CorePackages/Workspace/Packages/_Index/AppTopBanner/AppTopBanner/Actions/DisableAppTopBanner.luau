@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("AppTopBanner").Parent
+local parent = script:FindFirstAncestor("AppTopBanner").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
-	return {
-		isDisabled = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(isDisabled)
+	return { isDisabled = isDisabled }
 end)

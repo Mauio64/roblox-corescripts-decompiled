@@ -1,34 +1,25 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.Types)
+require(parent.Types)
 
-local function getLocalId(p1) -- line: 5
-	if p1 and p1.LocalId then
-		return p1.LocalId
-	end
-
-	return nil
+local function getLocalId(p) -- 2 equivalent calls inferred from this helper
+	return if p and p.LocalId then p.LocalId else nil
 end
-local function findMatchingCapture(t1: {[any]: any}, p2) -- line: 12
-	local v7 = if not p2 or not p2.LocalId then nil else p2.LocalId
 
-	if v7 == nil then
+local function findMatchingCapture(items, p)
+	local localId = getLocalId(p) -- inferred equivalent call
+
+	if localId == nil then
 		return nil
 	end
 
-	for _, v9 in t1 do
-		if v7 == v9.LocalId then
-			return v9
+	for _, item in items do
+		if item.LocalId == localId then
+			return item
 		end
 
-		if v9.videoCapture then
-			local videoCapture = v9.videoCapture
-
-			if v7 ~= if not videoCapture or not videoCapture.LocalId then nil else videoCapture.LocalId then
-				continue
-			end
-
-			return v9.videoCapture
+		if item.videoCapture and getLocalId(item.videoCapture) == localId then -- inferred equivalent call
+			return item.videoCapture
 		end
 	end
 

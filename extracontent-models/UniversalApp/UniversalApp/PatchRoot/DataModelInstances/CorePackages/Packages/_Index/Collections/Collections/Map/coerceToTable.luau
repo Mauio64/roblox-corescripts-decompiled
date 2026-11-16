@@ -1,23 +1,21 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local Map = require(scriptParent.Map)
-local InstanceOf = require(scriptParentParentParent.InstanceOf)
-local reduce = require(scriptParentParent.Array.reduce)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-require(scriptParentParentParent.ES7Types)
+local Map = require(parent.Map)
+local InstanceOf = require(parent3.InstanceOf)
+local reduce = require(parent2.Array.reduce)
+require(parent3.ES7Types)
 
-local function coerceToTable(p1) -- line: 27
-	-- upvalues: InstanceOf (copy), Map (copy), reduce (copy)
-	if not InstanceOf(p1, Map) then
-		return p1
+local function coerceToTable(object)
+	if InstanceOf(object, Map) then
+		return reduce(object:entries(), function(p, list)
+			p[list[1]] = list[2]
+			return p
+		end, {})
 	end
 
-	return reduce(p1:entries(), function(p2, p3) -- line: 33
-		p2[p3[1]] = p3[2]
-
-		return p2
-	end, {})
+	return object
 end
 
 return coerceToTable

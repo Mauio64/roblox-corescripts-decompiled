@@ -2,173 +2,186 @@ local CorePackages = game:GetService("CorePackages")
 local TextService = game:GetService("TextService")
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local DataConsumer = require(script.Parent.Parent.Components.DataConsumer)
+
 local Actions = script.Parent.Parent.Actions
 local SetActiveTab = require(Actions.SetActiveTab)
+
 local Constants = require(script.Parent.Parent.Constants)
 local MsgTypeNamesOrdered = Constants.MsgTypeNamesOrdered
+
 local TopBar = Constants.DefaultFontSize.TopBar
-local ColorText = Constants.Color.Text
-local TopBar2 = Constants.Font.TopBar
-local uDim2 = UDim2.new(0, TopBar, 0, TopBar)
-local TextSize = TextService:GetTextSize("Client Mem:", TopBar, TopBar2, Vector2.new(0, 0))
-local TextSize2 = TextService:GetTextSize("Client Memory Usage:", TopBar, TopBar2, Vector2.new(0, 0))
-local TextSize3 = TextService:GetTextSize("Avg. Data Ping:", TopBar, TopBar2, Vector2.new(0, 0))
-local v17 = Roact.PureComponent:extend("LiveUpdateElement")
+local Text = Constants.Color.Text
+local topBar = Constants.Font.TopBar
 
-function v17.didMount(p1) -- line: 35
-	p1.totalMemConnector = p1.props.ClientMemoryData:totalMemSignal():Connect(function(p2) -- line: 37
-		-- upvalues: p1 (copy)
-		p1:setState({
-			totalClientMemory = p2
-		})
-	end)
-	p1.avgPingConnector = p1.props.ServerStatsData:avgPing():Connect(function(p3) -- line: 41
-		-- upvalues: p1 (copy)
-		p1:setState({
-			averagePing = p3
-		})
-	end)
-	p1.logWarningErrorConnector = p1.props.ClientLogData:errorWarningSignal():Connect(function(p4, p5) -- line: 45
-		-- upvalues: p1 (copy)
-		p1:setState({
-			numErrors = p4,
-			numWarnings = p5
-		})
-	end)
-	p1:doSizeCheck()
-end
-function v17.didUpdate(p6) -- line: 55
-	p6:doSizeCheck()
-end
-function v17.doSizeCheck(p7) -- line: 59
-	if p7.ref.current then
-		local v22 = p7.state.formFactorThreshold > p7.ref.current.AbsoluteSize.X
+local udim = UDim2.new(0, TopBar, 0, TopBar)
 
-		if v22 ~= p7.state.isSmallerThanFormFactorThreshold then
-			p7:setState({
-				isSmallerThanFormFactorThreshold = v22
-			})
+local textSize = TextService:GetTextSize("Client Mem:", TopBar, topBar, Vector2.new(0, 0))
+
+local textSize2 = TextService:GetTextSize("Client Memory Usage:", TopBar, topBar, Vector2.new(0, 0))
+
+local textSize3 = TextService:GetTextSize("Avg. Data Ping:", TopBar, topBar, Vector2.new(0, 0))
+
+local extended = Roact.PureComponent:extend("LiveUpdateElement")
+
+function extended:didMount()
+	self.totalMemConnector = self.props.ClientMemoryData:totalMemSignal():Connect(function(totalClientMemory)
+		self:setState({ totalClientMemory = totalClientMemory })
+	end)
+
+	self.avgPingConnector = self.props.ServerStatsData:avgPing():Connect(function(averagePing)
+		self:setState({ averagePing = averagePing })
+	end)
+
+	self.logWarningErrorConnector = self.props.ClientLogData:errorWarningSignal():Connect(function(numErrors, numWarnings)
+		self:setState({ numErrors = numErrors, numWarnings = numWarnings })
+	end)
+
+	self:doSizeCheck()
+end
+
+function extended:didUpdate()
+	self:doSizeCheck()
+end
+
+function extended:doSizeCheck()
+	if self.ref.current then
+		local isSmallerThanFormFactorThreshold = self.state.formFactorThreshold > self.ref.current.AbsoluteSize.X
+
+		if isSmallerThanFormFactorThreshold ~= self.state.isSmallerThanFormFactorThreshold then
+			self:setState({ isSmallerThanFormFactorThreshold = isSmallerThanFormFactorThreshold })
 		end
 	end
 end
-function v17.willUnmount(p8) -- line: 72
-	p8.totalMemConnector:Disconnect()
-	p8.totalMemConnector = nil
-	p8.avgPingConnector:Disconnect()
-	p8.avgPingConnector = nil
-	p8.logWarningErrorConnector:Disconnect()
-	p8.logWarningErrorConnector = nil
+
+function extended:willUnmount()
+	self.totalMemConnector:Disconnect()
+	self.totalMemConnector = nil
+
+	self.avgPingConnector:Disconnect()
+	self.avgPingConnector = nil
+
+	self.logWarningErrorConnector:Disconnect()
+	self.logWarningErrorConnector = nil
 end
-function v17.init(p9) -- line: 83
-	-- upvalues: MsgTypeNamesOrdered (copy), Roact (copy)
-	local v25, v26 = p9.props.ClientLogData:getErrorWarningCount()
 
-	function p9.onLogWarningButton() -- line: 85
-		-- upvalues: MsgTypeNamesOrdered (copy), p9 (copy)
-		local t1 = {}
+function extended:init()
+	local errorWarningCount, numWarnings = self.props.ClientLogData:getErrorWarningCount()
+	function self.onLogWarningButton()
+		local v = {}
 
-		for _, v in pairs(MsgTypeNamesOrdered) do
-			t1[v] = false
+		for _, v2 in pairs(MsgTypeNamesOrdered) do
+			v[v2] = false
 		end
 
-		t1.Warning = true
-		p9.props.ClientLogData:setFilters(t1)
-		p9.props.dispatchChangeTabClientLog()
+		v.Warning = true
+		self.props.ClientLogData:setFilters(v)
+		self.props.dispatchChangeTabClientLog()
 	end
-	function p9.onLogErrorButton() -- line: 96
-		-- upvalues: MsgTypeNamesOrdered (copy), p9 (copy)
-		local t2 = {}
 
-		for _, v in pairs(MsgTypeNamesOrdered) do
-			t2[v] = false
+	function self.onLogErrorButton()
+		local v = {}
+
+		for _, v2 in pairs(MsgTypeNamesOrdered) do
+			v[v2] = false
 		end
 
-		t2.Error = true
-		p9.props.ClientLogData:setFilters(t2)
-		p9.props.dispatchChangeTabClientLog()
+		v.Error = true
+		self.props.ClientLogData:setFilters(v)
+		self.props.dispatchChangeTabClientLog()
 	end
 
-	p9.ref = Roact.createRef()
-	p9.state = {
+	self.ref = Roact.createRef()
+
+	self.state = {
+		numErrors = errorWarningCount,
+		numWarnings = numWarnings,
 		totalClientMemory = 0,
 		averagePing = 0,
 		formFactorThreshold = 380,
-		isSmallerThanFormFactorThreshold = false,
-		numErrors = v25,
-		numWarnings = v26
+		isSmallerThanFormFactorThreshold = false
 	}
 end
-function v17.render(p10) -- line: 119
-	-- upvalues: TextSize2 (copy), Constants (copy), TextSize (copy), TextService (copy), TopBar (copy), TopBar2 (copy), TextSize3 (copy), Roact (copy), uDim2 (copy), ColorText (copy)
-	local size = p10.props.size
-	local position = p10.props.position
-	local formFactor = p10.props.formFactor
-	local numErrors = p10.state.numErrors
-	local numWarnings = p10.state.numWarnings
-	local totalClientMemory = p10.state.totalClientMemory
-	local averagePing = p10.state.averagePing
-	local isSmallerThanFormFactorThreshold = p10.state.isSmallerThanFormFactorThreshold
-	local v36 = false
-	local TextSize2X = TextSize2.X
-	local Center = Enum.HorizontalAlignment.Center
+
+function extended.render(props)
+	local size = props.props.size
+	local position = props.props.position
+	local formFactor = props.props.formFactor
+
+	local numErrors = props.state.numErrors
+	local numWarnings = props.state.numWarnings
+	local totalClientMemory = props.state.totalClientMemory
+	local averagePing = props.state.averagePing
+	local isSmallerThanFormFactorThreshold = props.state.isSmallerThanFormFactorThreshold
+
+	local x = textSize2.X
+	local horizontalAlignment = Enum.HorizontalAlignment.Center
+	local v
 
 	if formFactor == Constants.FormFactor.Small or isSmallerThanFormFactorThreshold then
 		position += UDim2.new(0, 12, 0, 0)
-		TextSize2X = TextSize.X
-		v36 = true
-		Center = Enum.HorizontalAlignment.Left
+		x = textSize.X
+
+		horizontalAlignment = Enum.HorizontalAlignment.Left
+		v = true
+	else
+		v = false
 	end
 
-	local v39 = string.format("%d", numErrors)
-	local TextSize4 = TextService:GetTextSize(v39, TopBar, TopBar2, Vector2.new(0, 0))
-	local v41 = string.format("%d", numWarnings)
-	local TextSize5 = TextService:GetTextSize(v41, TopBar, TopBar2, Vector2.new(0, 0))
-	local v43 = string.format("%d MB", totalClientMemory)
-	local TextSize6 = TextService:GetTextSize(v43, TopBar, TopBar2, Vector2.new(0, 0))
-	local v45 = string.format("%d ms", averagePing)
-	local TextSize7 = TextService:GetTextSize(v45, TopBar, TopBar2, Vector2.new(0, 0))
+	local text = string.format("%d", numErrors)
+	local textSize4 = TextService:GetTextSize(text, TopBar, topBar, Vector2.new(0, 0))
+
+	local text2 = string.format("%d", numWarnings)
+	local textSize5 = TextService:GetTextSize(text2, TopBar, topBar, Vector2.new(0, 0))
+
+	local text3 = string.format("%d MB", totalClientMemory)
+	local textSize6 = TextService:GetTextSize(text3, TopBar, topBar, Vector2.new(0, 0))
+
+	local text4 = string.format("%d ms", averagePing)
+	local textSize7 = TextService:GetTextSize(text4, TopBar, topBar, Vector2.new(0, 0))
 
 	if formFactor == Constants.FormFactor.Small or isSmallerThanFormFactorThreshold then
 		position += UDim2.new(0, 12, 0, 0)
-		TextSize2X = TextSize.X
-		v36 = true
-		Center = Enum.HorizontalAlignment.Left
+		x = textSize.X
+
+		horizontalAlignment = Enum.HorizontalAlignment.Left
+		v = true
 	end
 
-	local v47 = averagePing > 0
-	local v48 = TextSize3
-
-	return Roact.createElement("Frame", {
+	local v2 = averagePing > 0
+	local createElement = Roact.createElement
+	local refsByRef = {
 		Position = position,
 		Size = size,
 		BackgroundTransparency = 1,
-		[Roact.Ref] = p10.ref
-	}, {
+		[Roact.Ref] = props.ref
+	}
+	local children = {
 		UIListLayout = Roact.createElement("UIListLayout", {
 			Padding = UDim.new(0, 6),
-			HorizontalAlignment = Center,
+			HorizontalAlignment = horizontalAlignment,
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
 		LogErrorIcon = Roact.createElement("ImageButton", {
 			Image = Constants.Image.Error,
-			Size = uDim2,
+			Size = udim,
 			BackgroundTransparency = 1,
 			LayoutOrder = 1,
-			[Roact.Event.Activated] = p10.onLogErrorButton
+			[Roact.Event.Activated] = props.onLogErrorButton
 		}),
 		LogErrorCount = Roact.createElement("TextButton", {
-			Text = v39,
+			Text = text,
 			TextSize = TopBar,
-			TextColor3 = ColorText,
+			TextColor3 = Text,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = TopBar2,
-			Size = UDim2.new(0, TextSize4.X, 1, 0),
+			Font = topBar,
+			Size = UDim2.new(0, textSize4.X, 1, 0),
 			BackgroundTransparency = 1,
 			LayoutOrder = 2,
-			[Roact.Event.Activated] = p10.onLogErrorButton
+			[Roact.Event.Activated] = props.onLogErrorButton
 		}),
 		ErrorWarningPad = Roact.createElement("Frame", {
 			BackgroundTransparency = 1,
@@ -176,93 +189,116 @@ function v17.render(p10) -- line: 119
 		}),
 		LogWarningIcon = Roact.createElement("ImageButton", {
 			Image = Constants.Image.Warning,
-			Size = uDim2,
+			Size = udim,
 			BackgroundTransparency = 1,
 			LayoutOrder = 4,
-			[Roact.Event.Activated] = p10.onLogWarningButton
+			[Roact.Event.Activated] = props.onLogWarningButton
 		}),
 		LogWarningCount = Roact.createElement("TextButton", {
-			Text = v41,
+			Text = text2,
 			TextSize = TopBar,
-			TextColor3 = ColorText,
+			TextColor3 = Text,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = TopBar2,
-			Size = UDim2.new(0, TextSize5.X, 1, 0),
+			Font = topBar,
+			Size = UDim2.new(0, textSize5.X, 1, 0),
 			BackgroundTransparency = 9,
 			LayoutOrder = 5,
-			[Roact.Event.Activated] = p10.onLogWarningButton
+			[Roact.Event.Activated] = props.onLogWarningButton
 		}),
 		WarningMemoryPad = Roact.createElement("Frame", {
 			BackgroundTransparency = 1,
 			LayoutOrder = 6
 		}),
 		MemoryUsage = Roact.createElement("TextButton", {
-			Text = not v36 and "Client Memory Usage:" or "Client Mem:",
+			Text = v and "Client Mem:" or "Client Memory Usage:",
 			TextSize = TopBar,
 			TextColor3 = Constants.Color.WarningYellow,
 			TextXAlignment = Enum.TextXAlignment.Right,
-			Font = TopBar2,
-			Size = UDim2.new(0, TextSize2X, 1, 0),
+			Font = topBar,
+			Size = UDim2.new(0, x, 1, 0),
 			BackgroundTransparency = 1,
 			LayoutOrder = 7,
-			[Roact.Event.Activated] = p10.props.dispatchChangeTabClientMemory
+			[Roact.Event.Activated] = props.props.dispatchChangeTabClientMemory
 		}),
 		MemoryUsage_MB = Roact.createElement("TextButton", {
-			Text = v43,
+			Text = text3,
 			TextSize = TopBar,
-			TextColor3 = ColorText,
+			TextColor3 = Text,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = TopBar2,
-			Size = UDim2.new(0, TextSize6.X, 1, 0),
+			Font = topBar,
+			Size = UDim2.new(0, textSize6.X, 1, 0),
 			BackgroundTransparency = 1,
 			LayoutOrder = 8,
-			[Roact.Event.Activated] = p10.props.dispatchChangeTabClientMemory
+			[Roact.Event.Activated] = props.props.dispatchChangeTabClientMemory
 		}),
-		MemoryPingPad = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 9
-		}),
-		AvgPing = not v36 and (v47 and Roact.createElement("TextButton", {
-			Text = "Avg. Data Ping:",
-			TextSize = TopBar,
-			TextColor3 = Constants.Color.WarningYellow,
-			TextXAlignment = Enum.TextXAlignment.Right,
-			Font = TopBar2,
-			Size = UDim2.new(0, v48.X, 1, 0),
-			BackgroundTransparency = 1,
-			LayoutOrder = 10,
-			[Roact.Event.Activated] = p10.props.dispatchChangeTabNetworkPing
-		})),
-		AvgPing_ms = not v36 and (v47 and Roact.createElement("TextButton", {
-			Text = v45,
-			TextSize = TopBar,
-			TextColor3 = ColorText,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = TopBar2,
-			Size = UDim2.new(0, TextSize7.X, 1, 0),
-			BackgroundTransparency = 1,
-			LayoutOrder = 11,
-			[Roact.Event.Activated] = p10.props.dispatchChangeTabNetworkPing
-		}))
-	})
+		MemoryPingPad = Roact.createElement("Frame", { BackgroundTransparency = 1, LayoutOrder = 9 }),
+		AvgPing = 0,
+		AvgPing_ms = 0
+	}
+
+	local avgPing = not v
+
+	if avgPing then
+		if v2 then
+			avgPing = Roact.createElement("TextButton", {
+				Text = "Avg. Data Ping:",
+				TextSize = TopBar,
+				TextColor3 = Constants.Color.WarningYellow,
+				TextXAlignment = Enum.TextXAlignment.Right,
+				Font = topBar,
+				Size = UDim2.new(0, textSize3.X, 1, 0),
+				BackgroundTransparency = 1,
+				LayoutOrder = 10,
+				[Roact.Event.Activated] = props.props.dispatchChangeTabNetworkPing
+			})
+		else
+			avgPing = v2
+		end
+	end
+
+	children.AvgPing = avgPing
+
+	local avgPing_ms = not v
+
+	if avgPing_ms then
+		if v2 then
+			avgPing_ms = Roact.createElement("TextButton", {
+				Text = text4,
+				TextSize = TopBar,
+				TextColor3 = Text,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Font = topBar,
+				Size = UDim2.new(0, textSize7.X, 1, 0),
+				BackgroundTransparency = 1,
+				LayoutOrder = 11,
+				[Roact.Event.Activated] = props.props.dispatchChangeTabNetworkPing
+			})
+		else
+			avgPing_ms = v2
+		end
+	end
+
+	children.AvgPing_ms = avgPing_ms
+	return createElement("Frame", refsByRef, children)
 end
 
-local function mapDispatchToProps(p11) -- line: 286
-	-- upvalues: SetActiveTab (copy)
+local function mapDispatchToProps(callback)
 	return {
-		dispatchChangeTabClientLog = function() -- line: 288
-			-- upvalues: p11 (copy), SetActiveTab (copy)
-			p11(SetActiveTab("Log", true))
+		dispatchChangeTabClientLog = function()
+			callback(SetActiveTab("Log", true))
 		end,
-		dispatchChangeTabClientMemory = function() -- line: 291
-			-- upvalues: p11 (copy), SetActiveTab (copy)
-			p11(SetActiveTab("Memory", true))
+		dispatchChangeTabClientMemory = function()
+			callback(SetActiveTab("Memory", true))
 		end,
-		dispatchChangeTabNetworkPing = function() -- line: 294
-			-- upvalues: p11 (copy), SetActiveTab (copy)
-			p11(SetActiveTab("ServerStats", true))
+		dispatchChangeTabNetworkPing = function()
+			callback(SetActiveTab("ServerStats", true))
 		end
 	}
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(DataConsumer(v17, "ServerStatsData", "ClientMemoryData", "ClientLogData"))
+return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(DataConsumer(
+	extended,
+	"ServerStatsData",
+	"ClientMemoryData",
+	"ClientLogData"
+))

@@ -1,165 +1,177 @@
 local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
-local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
-local React = require(ServerTriggeredModalsParent.React)
-local RobloxAppEnums = require(ServerTriggeredModalsParent.RobloxAppEnums)
-local CentralOverlay = require(ServerTriggeredModalsParent.CentralOverlay)
-local DeepLink = require(ServerTriggeredModalsParent.DeepLink)
-local useSignalState = require(ServerTriggeredModalsParent.SignalsReact).useSignalState
-local useDispatch = require(ServerTriggeredModalsParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local RoactServiceTags = require(ServerTriggeredModalsParent.RoactServiceTags)
-local useRoactService = require(ServerTriggeredModalsParent.RobloxAppHooks).useRoactService
-local RoactNavigation = require(ServerTriggeredModalsParent.RoactNavigation)
-local SharedFlags = require(ServerTriggeredModalsParent.SharedFlags)
-local NotificationsUpsell = require(ServerTriggeredModalsParent.NotificationsUpsell)
+local parent = ServerTriggeredModals.Parent
+
+local React = require(parent.React)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local CentralOverlay = require(parent.CentralOverlay)
+local DeepLink = require(parent.DeepLink)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactNavigation = require(parent.RoactNavigation)
+local SharedFlags = require(parent.SharedFlags)
+local NotificationsUpsell = require(parent.NotificationsUpsell)
+
 local CentralOverlayType = RobloxAppEnums.CentralOverlayType
 local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
+
 local useModalSignalStore = require(ServerTriggeredModals.SignalStores.useModalSignalStore)
 local Logger = require(ServerTriggeredModals.Logger)
 local EntryPoint = require(ServerTriggeredModals.EntryPoint)
 local fetchModalMetadata = require(ServerTriggeredModals.fetchModalMetadata)
 local useHandleCustomModalCallback = require(ServerTriggeredModals.useHandleCustomModalCallback)
+
 local FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals = SharedFlags.FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals
 local FFlagEnableDeepLinkHistoryWithModalAPI = SharedFlags.FFlagEnableDeepLinkHistoryWithModalAPI
-local v23 = game:DefineFastInt("ServerTriggeredModalTrafficPercent", 0)
-local v24 = game:DefineFastFlag("LuaAppAvoidPushUpsellConflicts", false)
 
-local function CheckForSduiModal(t1: {[any]: any}) -- line: 36
-	-- upvalues: useRoactService (copy), RoactServiceTags (copy), useDispatch (copy), useModalSignalStore (copy), useSignalState (copy), EntryPoint (copy), FFlagEnableDeepLinkHistoryWithModalAPI (copy), DeepLink (copy), v24 (copy), React (copy), FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals (copy), useHandleCustomModalCallback (copy), NotificationsUpsell (copy), Logger (copy), v23 (copy), fetchModalMetadata (copy), SetCentralOverlay (copy), CentralOverlayType (copy)
-	local v28 = useRoactService(RoactServiceTags.RoactNetworking)
-	local v29 = useDispatch()
-	local v30 = useModalSignalStore()
-	local v31 = useSignalState(v30.getMetadataGetter(EntryPoint.HomepageLaunch))
-	local v32 = useSignalState(v30.getHasShownGetter(EntryPoint.HomepageLaunch))
-	local u33 = nil
+local defineFastInt = game:DefineFastInt("ServerTriggeredModalTrafficPercent", 0)
+local defineFastFlag = game:DefineFastFlag("LuaAppAvoidPushUpsellConflicts", false)
+
+local function CheckForSduiModal(p): nil
+	local v = useRoactService(RoactServiceTags.RoactNetworking)
+	local v2 = useDispatch()
+	local v3 = useModalSignalStore()
+	local v4 = useSignalState(v3.getMetadataGetter(EntryPoint.HomepageLaunch))
+	local v5 = useSignalState(v3.getHasShownGetter(EntryPoint.HomepageLaunch))
+	local v6
 
 	if FFlagEnableDeepLinkHistoryWithModalAPI then
-		local v34 = DeepLink.DeepLinkLuaReceiverStatusStore(false)
-
-		u33 = useSignalState(v34.getDeepLinkLuaPostAuthReceiverStatus)
+		v6 = useSignalState(DeepLink.DeepLinkLuaReceiverStatusStore(false).getDeepLinkLuaPostAuthReceiverStatus)
+	else
+		v6 = nil
 	end
 
-	local u35 = nil
-	local u36 = nil
+	local state, setState
 
-	if v24 then
-		local v37, v38 = React.useState(false)
-
-		u35 = v37
-		u36 = v38
+	if defineFastFlag then
+		state, setState = React.useState(false)
+	else
+		setState = nil
+		state = nil
 	end
 
-	local u39 = nil
-	local u40 = nil
+	local state2, setState2
 
-	if v24 then
-		local v41, v42 = React.useState(false)
-
-		u39 = v41
-		u40 = v42
+	if defineFastFlag then
+		state2, setState2 = React.useState(false)
+	else
+		setState2 = nil
+		state2 = nil
 	end
 
-	local isFocused = t1.isFocused
-	local v44 = if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then nil else useHandleCustomModalCallback(EntryPoint.HomepageLaunch, v28)
+	local isFocused = p.isFocused
+	local v7
 
-	if v24 then
-		React.useEffect(function() -- line: 67
-			-- upvalues: u40 (ref), NotificationsUpsell (copy), u36 (ref), Logger (copy)
-			u40(true)
-			NotificationsUpsell.setupPushNotificationsUpsell.ShouldShowUpsell(NotificationsUpsell.NotificationsUpsellConstants.ModalKey.PushUpsellHome, false):andThen(function(p1) -- line: 71
-				-- upvalues: u36 (ref)
-				if p1 then
-					u36(true)
+	if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+		v7 = useHandleCustomModalCallback(EntryPoint.HomepageLaunch, v)
+	else
+		v7 = nil
+	end
 
+	if defineFastFlag then
+		React.useEffect(function()
+			setState2(true)
+			NotificationsUpsell.setupPushNotificationsUpsell.ShouldShowUpsell(
+				NotificationsUpsell.NotificationsUpsellConstants.ModalKey.PushUpsellHome,
+				false
+			):andThen(function(p2)
+				if not p2 then
 					return
 				end
-			end):catch(function(p2) -- line: 77
-				-- upvalues: Logger (copy)
-				Logger:error(`Failed to evaluate push upsell: { p2 }`)
-			end):finally(function() -- line: 80
-				-- upvalues: u40 (ref)
-				u40(false)
+
+				setState(true)
+			end):catch(function(p2)
+				Logger:error(`Failed to evaluate push upsell: {p2}`)
+			end):finally(function()
+				setState2(false)
 			end)
 		end, {})
 	end
 
-	React.useEffect(function() -- line: 86
-		-- upvalues: v23 (copy), FFlagEnableDeepLinkHistoryWithModalAPI (copy), u33 (ref), DeepLink (copy), fetchModalMetadata (copy), v28 (copy), EntryPoint (copy), Logger (copy)
-		if v23 <= math.random(0, 99) then
+	local useEffect = React.useEffect
+	local function fn()
+		if
+			defineFastInt <= math.random(0, 99)
+			or FFlagEnableDeepLinkHistoryWithModalAPI and v6 ~= DeepLink.DeepLinkLuaPostAuthReceiverStatus.Ready
+		then
 			return
 		end
 
-		if FFlagEnableDeepLinkHistoryWithModalAPI and u33 ~= DeepLink.DeepLinkLuaPostAuthReceiverStatus.Ready then
-			return
-		end
-
-		local v45 = fetchModalMetadata(v28, EntryPoint.HomepageLaunch):catch(function(p3) -- line: 97
-			-- upvalues: Logger (copy)
-			Logger:error(`Failed to fetch modal metadata for home page launch: { p3 }`)
+		local v8 = fetchModalMetadata(v, EntryPoint.HomepageLaunch):catch(function(p2)
+			Logger:error(`Failed to fetch modal metadata for home page launch: {p2}`)
 		end)
 
-		return function() -- line: 101
-			-- upvalues: v45 (copy)
-			v45:cancel()
+		return function()
+			v8:cancel()
 		end
-	end, {
-		v28,
-		if not FFlagEnableDeepLinkHistoryWithModalAPI then nil else u33
-	})
-	React.useEffect(function() -- line: 107
-		-- upvalues: v32 (copy), v31 (copy), isFocused (copy), v24 (copy), u39 (ref), u35 (ref), v30 (copy), EntryPoint (copy), FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals (copy), v44 (copy), v29 (copy), SetCentralOverlay (copy), CentralOverlayType (copy)
-		if v32 then
+	end
+
+	local v8
+
+	if FFlagEnableDeepLinkHistoryWithModalAPI then
+		v8 = v6
+	end
+
+	useEffect(fn, { v, v8 })
+
+	local useEffect2 = React.useEffect
+	local function fn2()
+		if v5 or not v4 or not isFocused or defineFastFlag and (state2 or state) then
 			return
 		end
 
-		if not v31 then
-			return
-		end
+		v3.setHasShown(EntryPoint.HomepageLaunch, true)
 
-		if not isFocused then
-			return
-		end
-
-		if v24 and (u39 or u35) then
-			return
-		end
-
-		v30.setHasShown(EntryPoint.HomepageLaunch, true)
-
-		if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
-			if v31.isCustomHandler then
-				v44(v31)
-
-				return
-			end
-
-			v29(SetCentralOverlay(CentralOverlayType.SduiModal, {
-				sduiComponentConfig = v31.sduiConfig,
-				modalId = v31.modalId,
-				modalType = v31.modalType
+		if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+			v2(SetCentralOverlay(CentralOverlayType.SduiModal, {
+				sduiComponentConfig = v4.sduiConfig,
+				modalId = v4.modalId,
+				modalType = v4.modalType
 			}))
-
-			return
+		elseif v4.isCustomHandler then
+			v7(v4)
+		else
+			v2(SetCentralOverlay(CentralOverlayType.SduiModal, {
+				sduiComponentConfig = v4.sduiConfig,
+				modalId = v4.modalId,
+				modalType = v4.modalType
+			}))
 		end
+	end
 
-		v29(SetCentralOverlay(CentralOverlayType.SduiModal, {
-			sduiComponentConfig = v31.sduiConfig,
-			modalId = v31.modalId,
-			modalType = v31.modalType
-		}))
-	end, {
-		v32,
-		v31,
-		isFocused,
-		v29,
-		if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then nil else v44,
-		if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then nil else v30,
-		if not v24 then nil else u39,
-		if not v24 then nil else u35
-	})
+	local v9
+
+	if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+		v9 = v7
+	end
+
+	local v10
+
+	if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+		v10 = v3
+	end
+
+	local v11
+
+	if defineFastFlag then
+		v11 = state2
+	end
+
+	local v12
+
+	if defineFastFlag then
+		v12 = state
+	end
+
+	useEffect2(fn2, { v5, v4, isFocused, v2, v9, v10, v11, v12 })
 
 	return nil
 end
 
-local v26 = RoactNavigation.withNavigationFocus(CheckForSduiModal)
+local v = RoactNavigation.withNavigationFocus(CheckForSduiModal)
 
-return React.memo(v26)
+return React.memo(v)

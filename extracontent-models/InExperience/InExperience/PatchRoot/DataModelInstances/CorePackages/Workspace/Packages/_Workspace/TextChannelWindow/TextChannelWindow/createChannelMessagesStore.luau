@@ -1,140 +1,164 @@
-local Parent = script:FindFirstAncestor("TextChannelWindow").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("TextChannelWindow").Parent
 
+local Signals = require(parent.Signals)
 require(script.Parent.Message)
 
-local function createChannelMessagesStore() -- line: 42
-	-- upvalues: Signals (copy)
-	local t1 = {}
+local function createChannelMessagesStore()
+	local v = {}
 
-	local function getOrCreate(p1) -- line: 46
-		-- upvalues: t1 (copy), Signals (copy)
-		if not t1[p1] then
-			local v8, v9 = Signals.createSignal({})
-			local v10, v11 = Signals.createSignal({})
-			local v12 = Signals.createComputed(function(p2) -- line: 51
-				-- upvalues: v10 (copy), v8 (copy)
-				local v27 = v10(p2)
-				local v28 = v8(p2)
-				local t2 = table.create(#v27)
+	local function getOrCreate(p)
+		if not v[p] then
+			local signal, setByMessageId = Signals.createSignal({})
+			local signal2, setOrderedIds = Signals.createSignal({})
 
-				for _, v31 in v27 do
-					local v32 = v28[v31]
+			v[p] = {
+				getByMessageId = signal,
+				setByMessageId = setByMessageId,
+				getOrderedIds = signal2,
+				setOrderedIds = setOrderedIds,
+				getMessages = Signals.createComputed(function(p2)
+					local v2 = signal2(p2)
+					local v3 = signal(p2)
+					local result = table.create(#v2)
 
-					if v32 then
-						table.insert(t2, v32)
+					for _, v4 in v2 do
+						local v5 = v3[v4]
+
+						if v5 then
+							table.insert(result, v5)
+						end
 					end
-				end
 
-				return t2
-			end)
-
-			t1[p1] = {
-				getByMessageId = v8,
-				setByMessageId = v9,
-				getOrderedIds = v10,
-				setOrderedIds = v11,
-				getMessages = v12,
+					return result
+				end),
 				messageGetters = {}
 			}
 		end
 
-		return t1[p1]
+		return v[p]
 	end
-	local function upsertMessage(p3, p4) -- line: 76
-		-- upvalues: getOrCreate (copy)
-		local v15 = getOrCreate(p3)
-		local messageId = p4.messageId
 
-		v15.setByMessageId(function(p5) -- line: 80
-			-- upvalues: messageId (copy), p4 (copy)
-			local v34 = table.clone(p5)
+	local function upsertMessage(p, p2)
+		local v2 = getOrCreate(p)
+		local messageId = p2.messageId
 
-			v34[messageId] = p4
-
-			return v34
+		v2.setByMessageId(function(p3)
+			local clone = table.clone(p3)
+			clone[messageId] = p2
+			return clone
 		end)
-		v15.setOrderedIds(function(p6) -- line: 86
-			-- upvalues: messageId (copy)
-			for _, v37 in p6 do
-				if v37 == messageId then
-					return p6
+
+		local v3 = {}
+		v2.setOrderedIds(function(items)
+			for _, item in items do
+				if item == messageId then
+					return items
 				end
 			end
 
-			local v38 = table.clone(p6)
+			local clone = table.clone(items)
+			table.insert(clone, messageId)
 
-			table.insert(v38, messageId)
-
-			if #v38 > 200 then
-				local t3 = table.create(200)
-
-				table.move(v38, #v38 - 200 + 1, #v38, 1, t3)
-
-				return t3
+			if not (#clone > 200) then
+				return clone
 			end
 
-			return v38
+			local v4 = table.create(200)
+			table.move(clone, #clone - 200 + 1, #clone, 1, v4)
+
+			if v3 then
+				for i = 1, #clone - 200 do
+					table.insert(v3, clone[i])
+				end
+			end
+
+			return v4
 		end)
+
+		if v3 and #v3 > 0 then
+			v2.setByMessageId(function(p3)
+				local clone = table.clone(p3)
+
+				for _, v4 in v3 do
+					clone[v4] = nil
+				end
+
+				return clone
+			end)
+
+			for _, v4 in v3 do
+				v2.messageGetters[v4] = nil
+			end
+		end
 	end
 
 	return {
 		upsertMessage = upsertMessage,
-		removeMessage = function(p7, s1: string) -- line: 103
-			-- upvalues: getOrCreate (copy)
-			local v19 = getOrCreate(p7)
+		removeMessage = function(p, p2: string)
+			local v2 = getOrCreate(p)
 
-			v19.setByMessageId(function(p8) -- line: 106
-				-- upvalues: s1 (copy)
-				if p8[s1] == nil then
-					return p8
+			v2.setByMessageId(function(p3)
+				if p3[p2] == nil then
+					return p3
 				end
 
-				local v41 = table.clone(p8)
-
-				v41[s1] = nil
-
-				return v41
+				local clone = table.clone(p3)
+				clone[p2] = nil
+				return clone
 			end)
-			v19.setOrderedIds(function(p9) -- line: 115
-				-- upvalues: s1 (copy)
-				local v43 = table.find(p9, s1)
 
-				if not v43 then
-					return p9
+			v2.setOrderedIds(function(list)
+				local index = table.find(list, p2)
+
+				if not index then
+					return list
 				end
 
-				local v44 = table.clone(p9)
-
-				table.remove(v44, v43)
-
-				return v44
+				local clone = table.clone(list)
+				table.remove(clone, index)
+				return clone
 			end)
 		end,
-		insertIfAbsent = function(p10, p11) -- line: 126
-			-- upvalues: getOrCreate (copy), upsertMessage (copy)
-			if getOrCreate(p10).getByMessageId(false)[p11.messageId] ~= nil then
+		insertIfAbsent = function(p, p2)
+			if getOrCreate(p).getByMessageId(false)[p2.messageId] ~= nil then
 				return
 			end
 
-			upsertMessage(p10, p11)
+			upsertMessage(p, p2)
 		end,
-		getMessagesForChannel = function(p12) -- line: 134
-			-- upvalues: getOrCreate (copy)
-			return getOrCreate(p12).getMessages
+		removeChannelEntry = function(p)
+			v[p] = nil
 		end,
-		getMessageById = function(p13, s2: string) -- line: 138
-			-- upvalues: getOrCreate (copy), Signals (copy)
-			local v25 = getOrCreate(p13)
+		clearChannel = function(p)
+			local v2 = v[p]
 
-			if not v25.messageGetters[s2] then
-				v25.messageGetters[s2] = Signals.createComputed(function(p14) -- line: 141
-					-- upvalues: v25 (copy), s2 (copy)
-					return v25.getByMessageId(p14)[s2]
+			if not v2 then
+				return
+			end
+
+			v2.setByMessageId(function()
+				return {}
+			end)
+
+			v2.setOrderedIds(function()
+				return {}
+			end)
+
+			table.clear(v2.messageGetters)
+		end,
+		getMessagesForChannel = function(p)
+			return getOrCreate(p).getMessages
+		end,
+		getMessageById = function(p, p2: string)
+			local v2 = getOrCreate(p)
+
+			if not v2.messageGetters[p2] then
+				v2.messageGetters[p2] = Signals.createComputed(function(p3)
+					return v2.getByMessageId(p3)[p2]
 				end)
 			end
 
-			return v25.messageGetters[s2]
+			return v2.messageGetters[p2]
 		end
 	}
 end

@@ -1,112 +1,113 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactIs = require(FoundationParent.ReactIs)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+
 local getTestIdTag = require(Foundation.Utility.getTestIdTag)
 local mapBindable = require(Foundation.Utility.mapBindable)
 
 require(Foundation.Components.Types)
 
-local function toUDim(p1) -- line: 16
-	-- upvalues: mapBindable (copy)
-	if p1 == nil then
+local function toUDim(p)
+	if p == nil then
 		return nil
 	end
 
-	return mapBindable(p1, function(p2) -- line: 20
-		if typeof(p2) == "number" then
-			return UDim.new(0, p2)
+	return mapBindable(p, function(value)
+		if typeof(value) == "number" then
+			return UDim.new(0, value)
 		end
 
-		return p2
+		return value
 	end)
 end
-local function getCornerRadius(p3) -- line: 28
-	-- upvalues: ReactIs (copy), mapBindable (copy)
-	if ReactIs.isBinding(p3) then
+
+local function getCornerRadius(value)
+	if ReactIs.isBinding(value) then
 		return {
-			TopLeftRadius = p3,
-			TopRightRadius = p3,
-			BottomRightRadius = p3,
-			BottomLeftRadius = p3
+			TopLeftRadius = value,
+			TopRightRadius = value,
+			BottomRightRadius = value,
+			BottomLeftRadius = value
 		}
 	end
 
-	if typeof(p3) == "number" then
+	if typeof(value) == "number" then
 		return {
-			TopLeftRadius = UDim.new(0, p3),
-			TopRightRadius = UDim.new(0, p3),
-			BottomRightRadius = UDim.new(0, p3),
-			BottomLeftRadius = UDim.new(0, p3)
+			TopLeftRadius = UDim.new(0, value),
+			TopRightRadius = UDim.new(0, value),
+			BottomRightRadius = UDim.new(0, value),
+			BottomLeftRadius = UDim.new(0, value)
 		}
 	end
 
-	if typeof(p3) == "UDim" then
+	if typeof(value) == "UDim" then
 		return {
-			TopLeftRadius = p3,
-			TopRightRadius = p3,
-			BottomRightRadius = p3,
-			BottomLeftRadius = p3
+			TopLeftRadius = value,
+			TopRightRadius = value,
+			BottomRightRadius = value,
+			BottomLeftRadius = value
 		}
 	end
 
-	if typeof(p3) == "table" then
-		local t1 = {}
-		local topLeft = p3.topLeft
-
-		t1.TopLeftRadius = if topLeft ~= nil then mapBindable(topLeft, function(p4) -- line: 20
-			if typeof(p4) == "number" then
-				return UDim.new(0, p4)
-			end
-
-			return p4
-		end) else nil
-
-		local topRight = p3.topRight
-
-		t1.TopRightRadius = if topRight ~= nil then mapBindable(topRight, function(p5) -- line: 20
-			if typeof(p5) == "number" then
-				return UDim.new(0, p5)
-			end
-
-			return p5
-		end) else nil
-
-		local bottomRight = p3.bottomRight
-
-		t1.BottomRightRadius = if bottomRight ~= nil then mapBindable(bottomRight, function(p6) -- line: 20
-			if typeof(p6) == "number" then
-				return UDim.new(0, p6)
-			end
-
-			return p6
-		end) else nil
-
-		local bottomLeft = p3.bottomLeft
-
-		t1.BottomLeftRadius = if bottomLeft ~= nil then mapBindable(bottomLeft, function(p7) -- line: 20
-			if typeof(p7) == "number" then
-				return UDim.new(0, p7)
-			end
-
-			return p7
-		end) else nil
-
-		return t1
+	if typeof(value) ~= "table" then
+		return {}
 	end
 
-	return {}
+	local topLeft = value.topLeft
+	local topLeftRadius
+
+	local function fn(value2)
+		if typeof(value2) == "number" then
+			return UDim.new(0, value2)
+		end
+
+		return value2
+	end
+
+	if topLeft ~= nil then
+		topLeftRadius = mapBindable(topLeft, fn)
+	end
+
+	local topRight = value.topRight
+	local topRightRadius
+
+	if topRight ~= nil then
+		topRightRadius = mapBindable(topRight, fn)
+	end
+
+	local bottomRight = value.bottomRight
+	local bottomRightRadius
+
+	if bottomRight ~= nil then
+		bottomRightRadius = mapBindable(bottomRight, fn)
+	end
+
+	local bottomLeft = value.bottomLeft
+	local bottomLeftRadius
+
+	if bottomLeft ~= nil then
+		bottomLeftRadius = mapBindable(bottomLeft, fn)
+	end
+
+	return {
+		TopLeftRadius = topLeftRadius,
+		TopRightRadius = topRightRadius,
+		BottomRightRadius = bottomRightRadius,
+		BottomLeftRadius = bottomLeftRadius
+	}
 end
-local function CornerRadius(t2: {[any]: any}) -- line: 73
-	-- upvalues: getCornerRadius (copy), React (copy), getTestIdTag (copy)
-	local v18 = getCornerRadius(t2.value)
+
+local function CornerRadius(p)
+	local cornerRadius = getCornerRadius(p.value)
 
 	return React.createElement("UICorner", {
-		TopLeftRadius = v18.TopLeftRadius,
-		TopRightRadius = v18.TopRightRadius,
-		BottomRightRadius = v18.BottomRightRadius,
-		BottomLeftRadius = v18.BottomLeftRadius,
-		[React.Tag] = getTestIdTag(t2.testId)
+		TopLeftRadius = cornerRadius.TopLeftRadius,
+		TopRightRadius = cornerRadius.TopRightRadius,
+		BottomRightRadius = cornerRadius.BottomRightRadius,
+		BottomLeftRadius = cornerRadius.BottomLeftRadius,
+		[React.Tag] = getTestIdTag(p.testId)
 	})
 end
 

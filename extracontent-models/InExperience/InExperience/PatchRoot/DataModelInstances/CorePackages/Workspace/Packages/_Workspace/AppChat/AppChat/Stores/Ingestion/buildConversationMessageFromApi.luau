@@ -1,30 +1,43 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
-require(AppChatParent.AppChatNetworking)
-
-local GetFFlagEnableSocialCards = require(AppChatParent.SharedFlags).GetFFlagEnableSocialCards
+require(parent.AppChatNetworking)
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnableSocialCards = SharedFlags.GetFFlagEnableSocialCards
 
 require(AppChat.MessageData.Types)
 
-local function buildConversationMessageFromApi(p1, s1: string) -- line: 22
-	-- upvalues: GetFFlagEnableSocialCards (copy)
-	return {
-		id = p1.id,
-		type = p1.type,
-		content = p1.content,
-		created_at = p1.created_at,
-		sender_user_id = p1.sender_user_id,
-		moderation_type = p1.moderation_type,
-		visibility = p1.visibility,
-		preview_content = p1.preview_content,
-		content_to_display = p1.content_to_display or p1.content,
-		replies_to = p1.replies_to,
-		cards = if not GetFFlagEnableSocialCards() then nil else p1.cards,
-		filtered_for_receivers = p1.filtered_for_receivers,
-		conversationId = s1,
-		stableKey = p1.id
+local function buildConversationMessageFromApi(data, conversationId: string)
+	local conversationMessageFromApi = {
+		id = data.id,
+		type = data.type,
+		content = data.content,
+		created_at = data.created_at,
+		sender_user_id = data.sender_user_id,
+		moderation_type = data.moderation_type,
+		visibility = data.visibility,
+		preview_content = data.preview_content,
+		content_to_display = data.content_to_display or data.content,
+		replies_to = data.replies_to,
+		cards = 0,
+		filtered_for_receivers = 0,
+		is_previewable = 0,
+		conversationId = 0,
+		stableKey = 0
 	}
+	local cards
+
+	if GetFFlagEnableSocialCards() then
+		cards = data.cards
+	end
+
+	conversationMessageFromApi.cards = cards
+	conversationMessageFromApi.filtered_for_receivers = data.filtered_for_receivers
+	conversationMessageFromApi.is_previewable = data.is_previewable
+
+	conversationMessageFromApi.conversationId = conversationId
+	conversationMessageFromApi.stableKey = data.id
+	return conversationMessageFromApi
 end
 
 return buildConversationMessageFromApi

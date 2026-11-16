@@ -1,26 +1,32 @@
 local UserLib = script:FindFirstAncestor("UserLib")
-local UserLibParent = UserLib.Parent
+local parent = UserLib.Parent
+
 local User = require(UserLib.Models.User)
 local WebPresenceMap = require(UserLib.Enum.WebPresenceMap)
-local ConvertUniverseIdToString = require(UserLibParent.SharedFlags).ConvertUniverseIdToString
+local SharedFlags = require(parent.SharedFlags)
+local ConvertUniverseIdToString = SharedFlags.ConvertUniverseIdToString
 
 game:DefineFastFlag("LuaAppFixActiveGameLoadingCheck", false)
 
-return function(p1, p2) -- line: 10
-	-- upvalues: ConvertUniverseIdToString (copy), WebPresenceMap (copy), User (copy)
-	local t1 = {}
+return function(items, object)
+	local placeIds = {}
 
-	if game:GetFastFlag("LuaAppFixActiveGameLoadingCheck") and not p2:getState().UniversePlaceInfos then
-		return t1
+	if game:GetFastFlag("LuaAppFixActiveGameLoadingCheck") and not object:getState().UniversePlaceInfos then
+		return placeIds
 	end
 
-	for _, v in pairs(p1) do
-		local v11 = ConvertUniverseIdToString(v.universeId)
+	for _, item in pairs(items) do
+		local convertUniverseIdToString = ConvertUniverseIdToString(item.universeId)
 
-		if WebPresenceMap[v.userPresenceType] == User.PresenceType.IN_GAME and not p2:getState().UniversePlaceInfos[v11] then
-			table.insert(t1, v.placeId)
+		if
+			WebPresenceMap[item.userPresenceType] ~= User.PresenceType.IN_GAME
+			or object:getState().UniversePlaceInfos[convertUniverseIdToString]
+		then
+			continue
 		end
+
+		table.insert(placeIds, item.placeId)
 	end
 
-	return t1
+	return placeIds
 end

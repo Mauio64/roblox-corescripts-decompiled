@@ -1,15 +1,22 @@
-local function isShopInstanceVisible(p1, t1: {[any]: any}) -- line: 6
-	local v4 = t1.max - t1.min
+local function isShopInstanceVisible(p, p2)
+	local v = p2.max - p2.min
 
-	if v4.X <= 0 or v4.Y <= 0 then
+	if v.X <= 0 or v.Y <= 0 then
 		return false
 	end
 
-	local v5 = p1.AbsolutePosition + p1.AbsoluteSize / 2
-	local v6 = v5.X > t1.min.X and v5.X < t1.max.X
-	local v7 = v5.Y > t1.min.Y and v5.Y < t1.max.Y
+	local v2 = p.AbsolutePosition + p.AbsoluteSize / 2
+	local v3
 
-	return v6 and v7
+	if v2.X > p2.min.X then
+		v3 = v2.X < p2.max.X
+	else
+		v3 = false
+	end
+
+	local v4 = v2.Y > p2.min.Y and v2.Y < p2.max.Y
+
+	return v3 and v4
 end
 
 return isShopInstanceVisible

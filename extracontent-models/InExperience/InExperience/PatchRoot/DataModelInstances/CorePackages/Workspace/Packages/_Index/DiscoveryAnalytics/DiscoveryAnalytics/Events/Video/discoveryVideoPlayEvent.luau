@@ -1,44 +1,119 @@
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
-local mutedError = require(Parent.Loggers).mutedError
-local t = require(Parent.t)
-local v5 = game:DefineFastInt("DiscoveryVideoPlayEventHundredthsPercent", 0)
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
+
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+local t = require(parent.t)
+local getVideoEventParamsValidator = require(script.Parent.getVideoEventParamsValidator)
+local VideoEventInterfaceKey = require(script.Parent.VideoEventInterfaceKey)
+
+local defineFastInt = game:DefineFastInt("DiscoveryVideoPlayEventHundredthsPercent", 0)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppDiscoveryMomentVideoTelemetry = SharedFlags2.FFlagLuaAppDiscoveryMomentVideoTelemetry
+
+local strictInterface = t.strictInterface
+local v = {
 	videoAssetId = t.string,
 	videoPlaybackSessionId = t.string,
 	universeId = t.string,
 	rootPlaceId = t.string,
 	gameSetTypeId = t.optional(t.string),
-	sortPos = t.optional(t.number)
-})
-local t1 = {
+	sortPos = t.optional(t.number),
+	nativeAdData = t.optional(t.string),
+	tileType = t.optional(t.string),
+	contentType = t.optional(t.string),
+	isMoment = 0
+}
+local isMoment
+
+if FFlagLuaAppDiscoveryMomentVideoTelemetry then
+	isMoment = t.optional(t.boolean)
+end
+
+v.isMoment = isMoment
+local v2 = strictInterface(v)
+local v3
+
+if FFlagLuaAppEnableHomepageOneByTwoTile then
+	v3 = t.strictInterface({
+		videoAssetId = t.string,
+		videoPlaybackSessionId = t.string,
+		gameSetTypeId = t.optional(t.string),
+		sortPos = t.optional(t.number),
+		nativeAdData = t.string,
+		tileType = t.string,
+		contentType = t.optional(t.string)
+	})
+end
+
+local v4
+
+if FFlagLuaAppEnableHomepageOneByTwoTile then
+	v4 = t.strictInterface({
+		videoAssetId = t.string,
+		videoPlaybackSessionId = t.string,
+		universeId = t.string,
+		rootPlaceId = t.string,
+		gameSetTypeId = t.optional(t.string),
+		sortPos = t.optional(t.number),
+		nativeAdData = t.string,
+		tileType = t.string,
+		contentType = t.optional(t.string)
+	})
+end
+
+local v5 = { [VideoEventInterfaceKey.DefaultGameTile] = v2 }
+local OneByTwoTileAdLink = VideoEventInterfaceKey.OneByTwoTileAdLink
+
+if not FFlagLuaAppEnableHomepageOneByTwoTile then
+	v3 = nil
+end
+
+v5[OneByTwoTileAdLink] = v3
+
+local OneByTwoTileGame = VideoEventInterfaceKey.OneByTwoTileGame
+
+if not FFlagLuaAppEnableHomepageOneByTwoTile then
+	v4 = nil
+end
+
+v5[OneByTwoTileGame] = v4
+
+local v6 = {
 	eventName = "discoveryVideoPlay",
+	backends = { LoggingProtocol.TelemetryBackends.Points, LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 25, 4, 23 },
 	description = "Fire when discovery video playback session starts",
-	links = "",
-	backends = {
-		LoggingProtocol.TelemetryBackends.Points,
-		LoggingProtocol.TelemetryBackends.EventIngest
-	},
-	throttlingPercentage = v5,
-	lastUpdated = {
-		25,
-		4,
-		23
-	}
+	links = ""
 }
 
-local function discoveryVideoPlayEvent(p1, p2) -- line: 34
-	-- upvalues: v6 (copy), mutedError (copy), LoggingProtocol (copy), t1 (copy)
-	local v11, v12 = v6(p2)
+local function discoveryVideoPlayEvent(p, p2)
+	local videoEventParamsValidator = getVideoEventParamsValidator(p2)
+	local v7 = v5[videoEventParamsValidator]
 
-	if not v11 then
-		mutedError(v12)
+	if v7 == nil then
+		DiscoveryEventErrorLogger.reportError(
+			"DiscoveryVideoPlayEventMissingInterface",
+			"No validator registered for video event interface key",
+			{ interfaceKey = videoEventParamsValidator }
+		)
+	else
+		local v8, v9 = v7(p2)
+
+		if not v8 then
+			DiscoveryEventErrorLogger.reportError("DiscoveryVideoPlayEventInvalidInterface", v9)
+		end
 	end
 
-	LoggingProtocol.default:logRobloxTelemetryEvent(t1, {
-		"addSessionInfo",
-		LoggingProtocol.StandardizedFields.addOsInfo
-	}, p2, p1)
+	LoggingProtocol.default:logRobloxTelemetryEvent(
+		v6,
+		{ "addSessionInfo", LoggingProtocol.StandardizedFields.addOsInfo },
+		p2,
+		p
+	)
 end
 
 return discoveryVideoPlayEvent

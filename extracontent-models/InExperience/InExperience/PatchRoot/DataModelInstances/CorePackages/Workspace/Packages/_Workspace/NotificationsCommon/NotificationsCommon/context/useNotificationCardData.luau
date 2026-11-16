@@ -1,10 +1,9 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local React = require(ParentParent.React)
-local NotificationCardContext = require(scriptParent.NotificationCardContext)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local React = require(parent2.React)
+local NotificationCardContext = require(parent.NotificationCardContext)
 
-local function useNotificationCardData() -- line: 7
-	-- upvalues: React (copy), NotificationCardContext (copy)
+local function useNotificationCardData()
 	return (React.useContext(NotificationCardContext))
 end
 

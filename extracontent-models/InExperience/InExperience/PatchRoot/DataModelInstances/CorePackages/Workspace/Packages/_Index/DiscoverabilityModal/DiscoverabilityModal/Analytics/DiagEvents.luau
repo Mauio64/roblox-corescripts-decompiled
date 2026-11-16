@@ -11,6 +11,9 @@ return {
 		name = game:DefineFastString("DiscoverabilityModalCloseCounter", "DiscoverabilityModalClose")
 	},
 	[EventNames.DiscoverabilityModalRadioButtonClick] = {
-		name = game:DefineFastString("DiscoverabilityModalRadioButtonClickCounter", "DiscoverabilityModalRadioButtonClick")
+		name = game:DefineFastString(
+			"DiscoverabilityModalRadioButtonClickCounter",
+			"DiscoverabilityModalRadioButtonClick"
+		)
 	}
 }

@@ -1,27 +1,40 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local RoactAppExperiment = require(SocialCarouselParent.RoactAppExperiment)
-local getDeepValue = require(SocialCarousel.Utils.getDeepValue)
-local useSelector = require(SocialCarouselParent.RoactUtils).Hooks.RoactRodux.useSelector
-local FStringNewFriendRequestsBadgeLayer = require(SocialCarouselParent.SharedFlags).FStringNewFriendRequestsBadgeLayer
+local parent = SocialCarousel.Parent
+
+local React = require(parent.React)
+local RoactAppExperiment = require(parent.RoactAppExperiment)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local FriendsRequests = require(parent.DataHydration.FriendsRequests)
+local FriendsRequestsStore = FriendsRequests.FriendsRequestsStore
+local UnseenRequestsStore = FriendsRequests.UnseenRequestsStore
+local SharedFlags = require(parent.SharedFlags)
+local FStringNewFriendRequestsBadgeLayer = SharedFlags.FStringNewFriendRequestsBadgeLayer
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAddFriendsPageHighlightUnseenTrustedRequests = SharedFlags2.FFlagAddFriendsPageHighlightUnseenTrustedRequests
+
 local FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll = require(SocialCarousel.Flags.FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll)
 
-return function() -- line: 11
-	-- upvalues: FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll (copy), RoactAppExperiment (copy), FStringNewFriendRequestsBadgeLayer (copy), useSelector (copy), getDeepValue (copy)
-	local v8 = not not FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll or RoactAppExperiment.useUserExperiment({ FStringNewFriendRequestsBadgeLayer }, function(p1) -- line: 19
-		-- upvalues: FStringNewFriendRequestsBadgeLayer (copy)
-		return (p1[FStringNewFriendRequestsBadgeLayer] or {}).showNewFriendRequestsBadge
-	end)
-	local v9 = useSelector(function(p2) -- line: 25
-		-- upvalues: getDeepValue (copy)
-		return getDeepValue(p2, "FriendsCarousel.Friends.requests.newFriendRequestsCount") or 0
-	end)
-	local v10 = v9 > 0
-	local str = tostring(v9)
+return function()
+	local v
 
-	if v8 and v10 then
-		return str
+	if FFlagSocialCarouselEnableNewFriendRequestsBadgeForAll then
+		v = true
+	else
+		v = RoactAppExperiment.useUserExperiment({ FStringNewFriendRequestsBadgeLayer }, function(p)
+			return (p[FStringNewFriendRequestsBadgeLayer] or {}).showNewFriendRequestsBadge
+		end)
 	end
 
-	return nil
+	local v2 = useSignalState(React.useMemo(function()
+		if FFlagAddFriendsPageHighlightUnseenTrustedRequests then
+			return UnseenRequestsStore.get().getUnseenRequestCount()
+		end
+
+		return FriendsRequestsStore.get().getNewFriendsRequestCount()
+	end, {}).data) or 0
+	local v3 = v2 > 0
+	local v4 = tostring(v2)
+	return if v and v3 then v4 else nil
 end

@@ -1,114 +1,135 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
 
-require(ParentParent.util.Types)
+local getFFlagDebugUGCValidationPrintNewStructureResults = require(parent.flags.getFFlagDebugUGCValidationPrintNewStructureResults)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local getFFlagDebugUGCValidationPrintNewStructureResults = require(ParentParent.flags.getFFlagDebugUGCValidationPrintNewStructureResults)
+local getFFlagUGCValidationLogFailureInfo = require(parent.flags.getFFlagUGCValidationLogFailureInfo)
 
-local function getRelativePath(p1, p2) -- line: 10
-	if p2 == nil or p2 == p1 then
+local defineFastInt = game:DefineFastInt("UGCValidationLogFailureLength", 100)
+
+local function getRelativePath(rootInstance, instance)
+	if instance == nil or instance == rootInstance then
 		return ""
 	end
 
-	local v8 = p1:GetFullName() .. "."
-	local FullName = p2:GetFullName()
+	local v = rootInstance:GetFullName() .. "."
+	local fullName = instance:GetFullName()
+	assert(
+		string.sub(fullName, 1, #v) == v,
+		`instance {fullName} is not a descendant of root {rootInstance:GetFullName()}`
+	)
 
-	assert(v8 == string.sub(FullName, 1, #v8), `instance { FullName } is not a descendant of root { p1:GetFullName() }`)
-
-	return (string.sub(FullName, #v8 + 1))
+	return (string.sub(fullName, #v + 1))
 end
 
-local t1 = {}
+local ValidationReporter = {}
+ValidationReporter.__index = ValidationReporter
 
-t1.__index = t1
-
-function t1.new(s1: string, p3) -- line: 26
-	-- upvalues: t1 (copy), ValidationEnums (copy)
-	local self = setmetatable({}, t1)
-
-	self._testEnum = s1
+function ValidationReporter.new(testEnum: string, p)
+	local self = setmetatable({}, ValidationReporter)
+	self._testEnum = testEnum
 	self._status = ValidationEnums.Status.CANNOT_START
 	self._telemetryContext = ""
 	self._currentInstance = nil
-	assert(p3, "ValidationReporter.new requires sharedData")
-	self._rootInstance = p3.rootInstance
+
+	assert(p, "ValidationReporter.new requires sharedData")
+	self._rootInstance = p.rootInstance
 	self._failures = {}
 	self._warnings = {}
 
 	return self
 end
-function t1.begin(p4) -- line: 41
-	-- upvalues: ValidationEnums (copy)
-	p4._startTime = os.clock()
-	p4._status = ValidationEnums.Status.IN_PROGRESS
+
+function ValidationReporter:begin()
+	self._startTime = os.clock()
+	self._status = ValidationEnums.Status.IN_PROGRESS
 end
-function t1.setReportingInstance(t2: {[any]: any}, p5) -- line: 48
-	t2._currentInstance = p5
+
+function ValidationReporter:setReportingInstance(currentInstance)
+	self._currentInstance = currentInstance
 end
-function t1.fail(t3: {[any]: any}, s2: string, t4: {[any]: any}?, p6) -- line: 52
-	-- upvalues: ValidationEnums (copy), getRelativePath (copy)
-	t3._status = ValidationEnums.Status.FAIL
-	table.insert(t3._failures, {
-		failureStringKey = s2,
-		failureStringParams = t4 or {},
-		instancePath = getRelativePath(t3._rootInstance, p6 or t3._currentInstance)
+
+function ValidationReporter:setReportingRoot(rootInstance)
+	self._rootInstance = rootInstance
+end
+
+function ValidationReporter:setTelemetryContext(telemetryContext: string)
+	self._telemetryContext = telemetryContext
+end
+
+function ValidationReporter:fail(failureStringKey: string, options, p)
+	self._status = ValidationEnums.Status.FAIL
+	table.insert(self._failures, {
+		failureStringKey = failureStringKey,
+		failureStringParams = options or {},
+		instancePath = getRelativePath(self._rootInstance, p or self._currentInstance)
 	})
 end
-function t1.warn(t5: {[any]: any}, s3: string, t6: {[any]: any}?, p7) -- line: 61
-	-- upvalues: getRelativePath (copy)
-	table.insert(t5._warnings, {
-		failureStringKey = s3,
-		failureStringParams = t6 or {},
-		instancePath = getRelativePath(t5._rootInstance, p7 or t5._currentInstance)
+
+function ValidationReporter:warn(failureStringKey: string, options, p)
+	table.insert(self._warnings, {
+		failureStringKey = failureStringKey,
+		failureStringParams = options or {},
+		instancePath = getRelativePath(self._rootInstance, p or self._currentInstance)
 	})
 end
-function t1.forceError(_: {[any]: any}, s4: string) -- line: 70
-	error({
-		__forceError = true,
-		message = s4
-	})
+
+function ValidationReporter.forceError(_, message: string)
+	error({ __forceError = true, message = message })
 end
-function t1.fetchError(_: {[any]: any}, s5: string) -- line: 77
-	error({
-		__fetchError = true,
-		message = s5
-	})
+
+function ValidationReporter.fetchError(_, message: string)
+	error({ __fetchError = true, message = message })
 end
-function t1.err(t9: {[any]: any}, s6: string) -- line: 81
-	-- upvalues: getFFlagDebugUGCValidationPrintNewStructureResults (copy), ValidationEnums (copy)
+
+function ValidationReporter:err(telemetryContext: string)
 	if getFFlagDebugUGCValidationPrintNewStructureResults() then
-		print("Reporting:", t9._testEnum, "has error:", s6)
+		print("Reporting:", self._testEnum, "has error:", telemetryContext)
 	end
 
-	t9._status = ValidationEnums.Status.ERROR
-	t9._telemetryContext = s6
-	t9._failures = {}
-	t9._warnings = {}
+	self._status = ValidationEnums.Status.ERROR
+	self._telemetryContext = telemetryContext
+
+	self._failures = {}
+	self._warnings = {}
 end
-function t1.complete(p8) -- line: 92
-	-- upvalues: ValidationEnums (copy), getFFlagDebugUGCValidationPrintNewStructureResults (copy)
-	local n1 = 0
 
-	if p8._startTime then
-		n1 = 1000 * (os.clock() - p8._startTime)
+function ValidationReporter:complete()
+	local duration = not self._startTime and 0 or 1000 * (os.clock() - self._startTime)
+
+	if self._status == ValidationEnums.Status.IN_PROGRESS then
+		self._status = ValidationEnums.Status.PASS
 	end
 
-	if p8._status == ValidationEnums.Status.IN_PROGRESS then
-		p8._status = ValidationEnums.Status.PASS
+	if getFFlagDebugUGCValidationPrintNewStructureResults() and self._status ~= ValidationEnums.Status.PASS then
+		print("Reporting:", self._testEnum, "has status", self._status, "in", duration)
 	end
 
-	if getFFlagDebugUGCValidationPrintNewStructureResults() and p8._status ~= ValidationEnums.Status.PASS then
-		print("Reporting:", p8._testEnum, "has status", p8._status, "in", n1)
+	if getFFlagUGCValidationLogFailureInfo() and self._status == ValidationEnums.Status.FAIL then
+		for _, failure in self._failures do
+			self._telemetryContext ..= failure.failureStringKey .. ";"
+
+			if not failure.failureStringParams then
+				continue
+			end
+
+			for _, failureStringParam in failure.failureStringParams do
+				self._telemetryContext ..= tostring(failureStringParam) .. ";"
+			end
+		end
+
+		self._telemetryContext = string.sub(self._telemetryContext, 1, defineFastInt)
 	end
 
 	return {
-		validationEnum = p8._testEnum,
-		status = p8._status,
-		failures = p8._failures,
-		warnings = p8._warnings,
-		duration = n1,
-		telemetryContext = p8._telemetryContext
+		validationEnum = self._testEnum,
+		status = self._status,
+		failures = self._failures,
+		warnings = self._warnings,
+		duration = duration,
+		telemetryContext = self._telemetryContext
 	}
 end
 
-return t1
+return ValidationReporter

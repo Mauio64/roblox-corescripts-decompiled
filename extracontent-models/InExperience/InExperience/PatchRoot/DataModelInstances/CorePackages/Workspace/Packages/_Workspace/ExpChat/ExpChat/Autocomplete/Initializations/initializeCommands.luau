@@ -1,44 +1,43 @@
 local TextChatService = game:GetService("TextChatService")
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local List = require(Parent.llama).List
-local ExpChatShared = require(Parent.ExpChatShared)
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local llama = require(parent.llama)
+local list = llama.List
+local ExpChatShared = require(parent.ExpChatShared)
 local initialCommands = require(script.Parent.initialCommands)
-local t1 = {}
 
-local function getCommandKeys() -- line: 10
-	-- upvalues: TextChatService (copy), t1 (copy)
-	local t2 = {}
-	local descendants = TextChatService:GetDescendants()
+local descendants = {}
 
-	for _, v in ipairs(descendants) do
-		if v.ClassName == "TextChatCommand" and string.sub(v.PrimaryAlias, 1, 1) == "/" then
-			if v.AutocompleteVisible then
-				table.insert(t2, v.PrimaryAlias)
-			end
+local function getCommandKeys()
+	local descendants2 = TextChatService:GetDescendants()
+	local primaryAlias = {}
 
-			table.insert(t1, v)
+	for _, descendant in ipairs(descendants2) do
+		if not (descendant.ClassName == "TextChatCommand" and string.sub(descendant.PrimaryAlias, 1, 1) == "/") then
+			continue
 		end
+
+		if descendant.AutocompleteVisible then
+			table.insert(primaryAlias, descendant.PrimaryAlias)
+		end
+
+		table.insert(descendants, descendant)
 	end
 
-	return t2
+	return primaryAlias
 end
 
-return function(p1) -- line: 25
-	-- upvalues: getCommandKeys (copy), List (copy), ExpChatShared (copy), initialCommands (copy), t1 (copy)
-	local v13 = getCommandKeys()
-
-	List.map(v13, function(p2) -- line: 27
-		-- upvalues: p1 (copy)
-		p1.trie:insert(p2)
+return function(p)
+	local commandKeys = getCommandKeys()
+	list.map(commandKeys, function(p2)
+		p.trie:insert(p2)
 	end)
 
-	for _, v15 in ExpChatShared.Commands.getVirtualLocalEnabledCommands() do
-		for _, v17 in v15.alias do
-			p1.trie:insert(v17)
+	for _, v in ExpChatShared.Commands.getVirtualLocalEnabledCommands() do
+		for _, alia in v.alias do
+			p.trie:insert(alia)
 		end
 	end
 
-	initialCommands(t1)
-
-	return p1.trie
+	initialCommands(descendants)
+	return p.trie
 end

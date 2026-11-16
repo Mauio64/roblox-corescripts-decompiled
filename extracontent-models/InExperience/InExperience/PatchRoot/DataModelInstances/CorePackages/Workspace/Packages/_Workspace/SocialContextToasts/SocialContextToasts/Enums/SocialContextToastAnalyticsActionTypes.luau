@@ -1,5 +1,1 @@
-return {
-	Shown = "Shown",
-	ForceDismissed = "ForceDismissed",
-	ButtonClicked = "ButtonClicked"
-}
+return { Shown = "Shown", ForceDismissed = "ForceDismissed", ButtonClicked = "ButtonClicked" }

@@ -1,31 +1,34 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
-local t1 = {}
-local isObjectType = require(ParentParent.GraphQL).isObjectType
 
-function t1.getImplementingTypes(s1: string, p1) -- line: 17
-	-- upvalues: Boolean (copy), isObjectType (copy), Array (copy)
-	local v9 = p1:getTypeMap()
-	local t2 = {}
+local GraphQL = require(parent.GraphQL)
 
-	for _, v12 in v9 do
-		local v13 = v9:get((table.unpack(v12)))
+local isObjectType = GraphQL.isObjectType
+return {
+	getImplementingTypes = function(p: string, object)
+		local typeMap = object:getTypeMap()
+		local names = {}
 
-		if Boolean.toJSBoolean(isObjectType(v13)) then
-			local v14 = v13:getInterfaces()
+		for _, list in typeMap do
+			local v = typeMap:get((table.unpack(list)))
 
-			if Boolean.toJSBoolean(Array.find(v14, function(p2) -- line: 36
-				-- upvalues: s1 (copy)
-				return p2.name == s1
-			end)) then
-				table.insert(t2, v13.name)
+			if not Boolean.toJSBoolean(isObjectType(v)) then
+				continue
 			end
+
+			local interfaces = v:getInterfaces()
+
+			if not Boolean.toJSBoolean(Array.find(interfaces, function(p2): boolean
+				return p2.name == p
+			end)) then
+				continue
+			end
+
+			table.insert(names, v.name)
 		end
+
+		return names
 	end
-
-	return t2
-end
-
-return t1
+}

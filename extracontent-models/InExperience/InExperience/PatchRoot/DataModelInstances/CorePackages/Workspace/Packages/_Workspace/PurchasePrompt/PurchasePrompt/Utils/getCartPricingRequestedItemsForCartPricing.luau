@@ -1,76 +1,90 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
+local types = require(PurchasePrompt.types)
+local productTypeEnum = types.ProductTypeEnum
 
-local function buildPermanentRowsFromIds(t1: {[any]: any}) -- line: 27
-	local t2 = table.create(#t1)
+local function buildPermanentRowsFromIds(collectibleItemIds)
+	local permanentRowsFromIds = table.create(#collectibleItemIds)
 
-	for _, v8 in t1 do
-		if type(v8) == "string" and v8 ~= "" then
-			table.insert(t2, {
-				isPermanent = true,
-				collectibleItemId = v8
-			})
+	for _, item in collectibleItemIds do
+		if type(item) == "string" and item ~= "" then
+			table.insert(permanentRowsFromIds, { collectibleItemId = item, isPermanent = true })
 		end
 	end
 
-	return t2
+	return permanentRowsFromIds
 end
-local function getCartPricingRequestedItemsForCartPricing(s1: string?, p1, p2) -- line: 37
-	-- upvalues: ProductTypeEnum (copy), buildPermanentRowsFromIds (copy)
-	if type(p1) == "table" and p1.kind == ProductTypeEnum.Look then
-		local cartPricingRequestedItems = p1.cartPricingRequestedItems
+
+local function getCartPricingRequestedItemsForCartPricing(collectibleItemId: string?, data, p)
+	if type(data) == "table" and data.kind == productTypeEnum.Look then
+		local cartPricingRequestedItems = data.cartPricingRequestedItems
 
 		if type(cartPricingRequestedItems) == "table" and #cartPricingRequestedItems > 0 then
-			local t3 = table.create(#cartPricingRequestedItems)
+			local result = table.create(#cartPricingRequestedItems)
 
-			for _, v15 in cartPricingRequestedItems do
-				local rentalDays = v15.rentalDays
-				local v17 = type(rentalDays) == "number" and rentalDays > 0
+			for _, cartPricingRequestedItem in cartPricingRequestedItems do
+				local rentalDays = cartPricingRequestedItem.rentalDays
+				local v
 
-				table.insert(t3, {
-					collectibleItemId = v15.collectibleItemId,
-					rentalDays = if not v17 then nil else rentalDays,
-					isPermanent = not v17 or nil
-				})
+				if type(rentalDays) == "number" then
+					v = rentalDays > 0
+				else
+					v = false
+				end
+
+				local v2 = {
+					collectibleItemId = cartPricingRequestedItem.collectibleItemId,
+					rentalDays = 0,
+					isPermanent = 0
+				}
+
+				if not v then
+					rentalDays = nil
+				end
+
+				v2.rentalDays = rentalDays
+				v2.isPermanent = not v or nil
+				table.insert(result, v2)
 			end
 
-			return t3
+			return result
+		else
+			local collectibleItemIds
+
+			if type(p) == "table" then
+				collectibleItemIds = p.collectibleItemIds
+			end
+
+			if type(collectibleItemIds) == "table" and #collectibleItemIds > 0 then
+				local permanentRowsFromIds = buildPermanentRowsFromIds(collectibleItemIds)
+
+				if #permanentRowsFromIds > 0 then
+					return permanentRowsFromIds
+				end
+			end
+
+			return nil
+		end
+	else
+		if collectibleItemId == nil or collectibleItemId == "" then
+			return nil
 		end
 
-		local v18 = if type(p2) ~= "table" then nil else p2.collectibleItemIds
+		local v = { collectibleItemId = collectibleItemId }
 
-		if type(v18) == "table" and #v18 > 0 then
-			local v19 = buildPermanentRowsFromIds(v18)
+		if type(data) == "table" and data.kind == productTypeEnum.Asset then
+			local timedOptionDays = data.timedOptionDays
 
-			if #v19 > 0 then
-				return v19
+			if type(timedOptionDays) == "number" and timedOptionDays > 0 then
+				v.rentalDays = timedOptionDays
 			end
 		end
 
-		return nil
-	end
-
-	if s1 == nil or s1 == "" then
-		return nil
-	end
-
-	local t4 = {
-		collectibleItemId = s1
-	}
-
-	if type(p1) == "table" and p1.kind == ProductTypeEnum.Asset then
-		local timedOptionDays = p1.timedOptionDays
-
-		if type(timedOptionDays) == "number" and timedOptionDays > 0 then
-			t4.rentalDays = timedOptionDays
+		if v.rentalDays == nil then
+			v.isPermanent = true
 		end
-	end
 
-	if t4.rentalDays == nil then
-		t4.isPermanent = true
+		return { v }
 	end
-
-	return { t4 }
 end
 
 return getCartPricingRequestedItemsForCartPricing

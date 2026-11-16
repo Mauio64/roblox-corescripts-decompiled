@@ -1,21 +1,20 @@
-local Parent = script:FindFirstAncestor("CrossExperienceVoice").Parent
-local Promise = require(Parent.Promise)
-local React = require(Parent.React)
-local ReactOtter = require(Parent.ReactOtter)
-local Rodux = require(Parent.Rodux)
-local RoactUtils = require(Parent.RoactUtils)
-local t = require(Parent.t)
-local Cryo = require(Parent.Cryo)
-local CrossExperience = require(Parent.CrossExperience)
-local Dash = require(Parent.Dash)
-local SharedFlags = require(Parent.SharedFlags)
-local Lumberyak = require(Parent.Lumberyak)
-local LuauPolyfill = require(Parent.LuauPolyfill)
-local ExperienceService = require(Parent.ExperienceService)
-local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
-local ExperimentCacheManager = require(Parent.ExperimentCacheManager)
-local LoggingProtocol = require(Parent.LoggingProtocol)
+local parent = script:FindFirstAncestor("CrossExperienceVoice").Parent
 
+local Promise = require(parent.Promise)
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local Rodux = require(parent.Rodux)
+local RoactUtils = require(parent.RoactUtils)
+local t = require(parent.t)
+local Cryo = require(parent.Cryo)
+local CrossExperience = require(parent.CrossExperience)
+local Dash = require(parent.Dash)
+local SharedFlags = require(parent.SharedFlags)
+local Lumberyak = require(parent.Lumberyak)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local ExperienceService = require(parent.ExperienceService)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local ExperimentCacheManager = require(parent.ExperimentCacheManager)
 return {
 	React = React,
 	ReactOtter = ReactOtter,
@@ -27,7 +26,7 @@ return {
 	RoactUtils = RoactUtils,
 	CrossExperience = CrossExperience,
 	SharedFlags = SharedFlags,
-	LoggingProtocol = LoggingProtocol,
+	LoggingProtocol = require(parent.LoggingProtocol),
 	Lumberyak = Lumberyak,
 	LuauPolyfill = LuauPolyfill,
 	SocialLuaAnalytics = SocialLuaAnalytics,

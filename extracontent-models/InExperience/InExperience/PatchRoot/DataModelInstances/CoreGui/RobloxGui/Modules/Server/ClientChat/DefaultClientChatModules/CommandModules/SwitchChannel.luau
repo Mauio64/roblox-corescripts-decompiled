@@ -1,45 +1,62 @@
 local Util = require(script.Parent:WaitForChild("Util"))
-local ChatLocalization = nil
 
-pcall(function() -- line: 10
-	-- upvalues: ChatLocalization (ref)
-	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+local v = nil
+
+pcall(function()
+	local Chat = game:GetService("Chat")
+	v = require(Chat.ClientChatModules.ChatLocalization)
 end)
 
-if ChatLocalization == nil then
-	ChatLocalization = {
-		Get = function(_, _, p3) -- line: 11
-			return p3
+if v == nil then
+	v = {
+		Get = function(self, _, p)
+			return p
 		end
 	}
 end
 
-function ProcessMessage(p4, p5, p6) -- line: 13
-	-- upvalues: Util (copy), ChatLocalization (ref)
-	if string.sub(p4, 1, 3):lower() ~= "/c " then
+function ProcessMessage(value, object, p): boolean
+	if string.sub(value, 1, 3):lower() ~= "/c " then
 		return false
 	end
 
-	local v9 = string.sub(p4, 4)
-	local Channel = p5:GetChannel(v9)
+	local v2 = string.sub(value, 4)
 
-	if Channel then
-		p5:SwitchCurrentChannel(v9)
+	local channel = object:GetChannel(v2)
 
-		if not p6.ShowChannelsBar and p5:GetCurrentChannel() then
-			Util:SendSystemMessageToSelf(string.gsub(ChatLocalization:Get("GameChat_SwitchChannel_NowInChannel", string.format("You are now chatting in channel: '%s'", v9), {
-				RBX_NAME = v9
-			}), "{RBX_NAME}", v9), Channel, {})
+	if channel then
+		object:SwitchCurrentChannel(v2)
+
+		if not p.ShowChannelsBar and object:GetCurrentChannel() then
+			Util:SendSystemMessageToSelf(
+				string.gsub(
+					v:Get(
+						"GameChat_SwitchChannel_NowInChannel",
+						string.format("You are now chatting in channel: '%s'", v2),
+						{ RBX_NAME = v2 }
+					),
+					"{RBX_NAME}",
+					v2
+				),
+				channel,
+				{}
+			)
 		end
 	else
-		local CurrentChannel = p5:GetCurrentChannel()
+		local currentChannel = object:GetCurrentChannel()
 
-		if CurrentChannel then
-			Util:SendSystemMessageToSelf(string.gsub(ChatLocalization:Get("GameChat_SwitchChannel_NotInChannel", string.format("You are not in channel: '%s'", v9), {
-				RBX_NAME = v9
-			}), "{RBX_NAME}", v9), CurrentChannel, {
-				ChatColor = Color3.fromRGB(245, 50, 50)
-			})
+		if currentChannel then
+			Util:SendSystemMessageToSelf(
+				string.gsub(
+					v:Get("GameChat_SwitchChannel_NotInChannel", string.format("You are not in channel: '%s'", v2), {
+						RBX_NAME = v2
+					}),
+					"{RBX_NAME}",
+					v2
+				),
+				currentChannel,
+				{ ChatColor = Color3.fromRGB(245, 50, 50) }
+			)
 		end
 	end
 

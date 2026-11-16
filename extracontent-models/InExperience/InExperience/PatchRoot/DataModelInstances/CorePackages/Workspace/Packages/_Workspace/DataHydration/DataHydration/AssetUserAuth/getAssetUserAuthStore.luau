@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Signals = require(parent.Signals)
+
 local createAssetUserAuthStore = require(script.Parent.createAssetUserAuthStore)
 
-return Signals.createComputed(function() -- line: 8
-	-- upvalues: createAssetUserAuthStore (copy)
+return Signals.createComputed(function()
 	return createAssetUserAuthStore()
 end)

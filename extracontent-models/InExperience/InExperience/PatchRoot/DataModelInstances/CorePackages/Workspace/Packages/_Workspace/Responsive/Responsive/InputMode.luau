@@ -1,38 +1,40 @@
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("Responsive").Parent
-local AppCommonLib = require(Parent.AppCommonLib)
+
+local parent = script:FindFirstAncestor("Responsive").Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
 local Signal = AppCommonLib.Signal
-local FFlagLuaAppResponsiveEnginePreferredInput = require(Parent.SharedFlags).FFlagLuaAppResponsiveEnginePreferredInput
-local t1 = {
-	Pointer = "Pointer",
-	Touch = "Touch",
-	Directional = "Directional"
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppResponsiveEnginePreferredInput = SharedFlags.FFlagLuaAppResponsiveEnginePreferredInput
+local FFlagLuaSupportMicroGamepadPreferredInput = SharedFlags.FFlagLuaSupportMicroGamepadPreferredInput
+
+local enum = { Pointer = "Pointer", Touch = "Touch", Directional = "Directional" }
+
+local v = {
+	[Enum.UserInputType.MouseButton1] = enum.Pointer,
+	[Enum.UserInputType.MouseButton2] = enum.Pointer,
+	[Enum.UserInputType.MouseButton3] = enum.Pointer,
+	[Enum.UserInputType.MouseWheel] = enum.Pointer,
+	[Enum.UserInputType.MouseMovement] = enum.Pointer,
+	[Enum.UserInputType.Keyboard] = enum.Pointer,
+	[Enum.UserInputType.TextInput] = enum.Pointer,
+	[Enum.UserInputType.Gamepad1] = enum.Directional,
+	[Enum.UserInputType.Gamepad2] = enum.Directional,
+	[Enum.UserInputType.Gamepad3] = enum.Directional,
+	[Enum.UserInputType.Gamepad4] = enum.Directional,
+	[Enum.UserInputType.Gamepad5] = enum.Directional,
+	[Enum.UserInputType.Gamepad6] = enum.Directional,
+	[Enum.UserInputType.Gamepad7] = enum.Directional,
+	[Enum.UserInputType.Gamepad8] = enum.Directional,
+	[Enum.UserInputType.Touch] = enum.Touch,
+	[Enum.UserInputType.None] = enum.Pointer
 }
-local t2 = {
-	[Enum.UserInputType.MouseButton1] = t1.Pointer,
-	[Enum.UserInputType.MouseButton2] = t1.Pointer,
-	[Enum.UserInputType.MouseButton3] = t1.Pointer,
-	[Enum.UserInputType.MouseWheel] = t1.Pointer,
-	[Enum.UserInputType.MouseMovement] = t1.Pointer,
-	[Enum.UserInputType.Keyboard] = t1.Pointer,
-	[Enum.UserInputType.TextInput] = t1.Pointer,
-	[Enum.UserInputType.Gamepad1] = t1.Directional,
-	[Enum.UserInputType.Gamepad2] = t1.Directional,
-	[Enum.UserInputType.Gamepad3] = t1.Directional,
-	[Enum.UserInputType.Gamepad4] = t1.Directional,
-	[Enum.UserInputType.Gamepad5] = t1.Directional,
-	[Enum.UserInputType.Gamepad6] = t1.Directional,
-	[Enum.UserInputType.Gamepad7] = t1.Directional,
-	[Enum.UserInputType.Gamepad8] = t1.Directional,
-	[Enum.UserInputType.Touch] = t1.Touch,
-	[Enum.UserInputType.None] = t1.Pointer
-}
-local v8 = Signal.new()
-local t3 = {
-	preferred = nil,
-	last = nil
-}
-local t4 = {
+
+local v2 = Signal.new()
+local v3 = { preferred = nil, last = nil }
+
+local set = {
 	[Enum.Platform.XBoxOne] = true,
 	[Enum.Platform.XBox360] = true,
 	[Enum.Platform.WiiU] = true,
@@ -42,66 +44,68 @@ local t4 = {
 	[Enum.Platform.Ouya] = true,
 	[Enum.Platform.AndroidTV] = true
 }
-local t5 = {
-	[Enum.Platform.IOS] = true,
-	[Enum.Platform.Android] = true
-}
-local v12 = if not FFlagLuaAppResponsiveEnginePreferredInput then nil else {
-	[Enum.PreferredInput.Gamepad] = t1.Directional,
-	[Enum.PreferredInput.Touch] = t1.Touch,
-	[Enum.PreferredInput.KeyboardAndMouse] = t1.Pointer
-}
 
-function getPreferredInput() -- line: 70
-	-- upvalues: FFlagLuaAppResponsiveEnginePreferredInput (copy), UserInputService (copy), v12 (copy), t1 (copy), AppCommonLib (copy), t4 (copy), t5 (copy)
-	if FFlagLuaAppResponsiveEnginePreferredInput then
-		return v12[UserInputService.PreferredInput or Enum.PreferredInput.KeyboardAndMouse] or t1.Pointer
-	end
+local set2 = { [Enum.Platform.IOS] = true, [Enum.Platform.Android] = true }
+local v4
 
-	local Platform = UserInputService:GetPlatform()
-	local v16 = AppCommonLib.isSpatial()
-	local v17 = t4[Platform] or false
-	local v18 = t5[Platform] or false
-
-	if v16 then
-		return t1.Pointer
-	end
-
-	if v17 then
-		return t1.Directional
-	end
-
-	if v18 then
-		return t1.Touch
-	end
-
-	return t1.Pointer
+if FFlagLuaAppResponsiveEnginePreferredInput then
+	v4 = {}
+	v4[Enum.PreferredInput.Gamepad] = enum.Directional
+	v4[Enum.PreferredInput.Touch] = enum.Touch
+	v4[Enum.PreferredInput.KeyboardAndMouse] = enum.Pointer
+else
+	v4 = nil
 end
-function updatePreferredInput() -- line: 92
-	-- upvalues: t3 (copy), v8 (copy)
-	local v19 = getPreferredInput()
 
-	if v19 ~= t3.preferred then
-		t3.preferred = v19
+if FFlagLuaAppResponsiveEnginePreferredInput and FFlagLuaSupportMicroGamepadPreferredInput then
+	v4[Enum.PreferredInput.MicroGamepad] = enum.Directional
+end
 
-		if t3.last == nil then
-			t3.last = t3.preferred
+function getPreferredInput()
+	if FFlagLuaAppResponsiveEnginePreferredInput then
+		return v4[UserInputService.PreferredInput or Enum.PreferredInput.KeyboardAndMouse] or enum.Pointer
+	end
+
+	local platform = UserInputService:GetPlatform()
+	local spatial = AppCommonLib.isSpatial()
+	local v5 = set[platform] or false
+	local v6 = set2[platform] or false
+
+	if spatial then
+		return enum.Pointer
+	end
+
+	if v5 then
+		return enum.Directional
+	end
+
+	return if v6 then enum.Touch else enum.Pointer
+end
+
+function updatePreferredInput()
+	local preferredInput = getPreferredInput()
+
+	if preferredInput ~= v3.preferred then
+		v3.preferred = preferredInput
+
+		if v3.last == nil then
+			v3.last = v3.preferred
 		end
 
-		v8:fire()
+		v2:fire()
 	end
 end
-function updateLastInput() -- line: 103
-	-- upvalues: t2 (copy), UserInputService (copy), t3 (copy), v8 (copy)
-	local v20 = t2[UserInputService:GetLastInputType()]
 
-	if v20 and v20 ~= t3.last then
-		t3.last = v20
-		v8:fire()
+function updateLastInput()
+	local last = v[UserInputService:GetLastInputType()]
+
+	if last and last ~= v3.last then
+		v3.last = last
+		v2:fire()
 	end
 end
-function init() -- line: 111
-	-- upvalues: FFlagLuaAppResponsiveEnginePreferredInput (copy), UserInputService (copy), AppCommonLib (copy)
+
+function init()
 	if FFlagLuaAppResponsiveEnginePreferredInput then
 		UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(updatePreferredInput)
 	end
@@ -118,50 +122,30 @@ function init() -- line: 111
 end
 
 init()
-
-local t6 = {
-	{
-		Key = t1.Directional,
-		preferredInput = t1.Directional
-	},
-	{
-		Key = t1.Pointer,
-		preferredInput = t1.Pointer
-	},
-	{
-		Key = t1.Touch,
-		preferredInput = t1.Touch
-	}
-}
-local t7 = {
-	{
-		Key = t1.Directional,
-		lastInput = t1.Directional
-	},
-	{
-		Key = t1.Pointer,
-		lastInput = t1.Pointer
-	},
-	{
-		Key = t1.Touch,
-		lastInput = t1.Touch
-	}
+local InputMode = {}
+InputMode.Enum = enum
+InputMode.preferredInputRules = {
+	{ Key = enum.Directional, preferredInput = enum.Directional },
+	{ Key = enum.Pointer, preferredInput = enum.Pointer },
+	{ Key = enum.Touch, preferredInput = enum.Touch }
 }
 
-return {
-	Enum = t1,
-	preferredInputRules = t6,
-	lastInputRules = t7,
-	connect = function(p1) -- line: 144
-		-- upvalues: v8 (copy)
-		return v8:connect(p1)
-	end,
-	preferred = function() -- line: 147
-		-- upvalues: t3 (copy)
-		return t3.preferred
-	end,
-	last = function() -- line: 150
-		-- upvalues: t3 (copy)
-		return t3.last
-	end
+InputMode.lastInputRules = {
+	{ Key = enum.Directional, lastInput = enum.Directional },
+	{ Key = enum.Pointer, lastInput = enum.Pointer },
+	{ Key = enum.Touch, lastInput = enum.Touch }
 }
+
+function InputMode:connect()
+	return v2:connect(self)
+end
+
+function InputMode.preferred()
+	return v3.preferred
+end
+
+function InputMode.last()
+	return v3.last
+end
+
+return InputMode

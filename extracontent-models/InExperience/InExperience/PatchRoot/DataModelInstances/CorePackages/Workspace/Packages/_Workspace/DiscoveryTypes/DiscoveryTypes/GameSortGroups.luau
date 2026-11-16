@@ -1,6 +1,3 @@
-local ParentParent = script.Parent.Parent
-local FFlagSearchOmniAutocompletePage = require(ParentParent.SharedFlags).FFlagSearchOmniAutocompletePage
-
 return {
 	ChatGames = "ChatGames",
 	Games = "Games",
@@ -8,5 +5,5 @@ return {
 	GamesSeeAll = "GamesSeeAll",
 	GamesList = "GamesList",
 	UnifiedHomeSorts = "UnifiedHomeSorts",
-	SearchLandingPage = if not FFlagSearchOmniAutocompletePage then nil else "SearchLandingPage"
+	SearchLandingPage = "SearchLandingPage"
 }

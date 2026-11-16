@@ -1,0 +1,4 @@
+local FFlagLuaAppSduiSponsoredTwoByOneTile = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppSduiSponsoredTwoByOneTile")
+local FFlagLuaAppEnableHomepageOneByTwoTile = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppEnableHomepageOneByTwoTile")
+
+return game:DefineFastFlag("LuaAppSduiSponsoredOneByTwoTile", false) and FFlagLuaAppSduiSponsoredTwoByOneTile and FFlagLuaAppEnableHomepageOneByTwoTile

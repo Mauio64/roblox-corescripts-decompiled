@@ -1,4 +1,1 @@
-return {
-	Thunks = require(script.Thunks),
-	["jest.config"] = script["jest.config"]
-}
+return { Thunks = require(script.Thunks), ["jest.config"] = script["jest.config"] }

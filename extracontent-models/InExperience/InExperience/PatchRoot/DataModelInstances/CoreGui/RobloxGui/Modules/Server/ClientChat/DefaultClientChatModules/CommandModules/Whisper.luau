@@ -1,11 +1,13 @@
 local Util = require(script.Parent:WaitForChild("Util"))
 local ChatSettings = require(script.Parent.Parent:WaitForChild("ChatSettings"))
+
 local Players = game:GetService("Players")
+
 local ChatLocalization = nil
 
-pcall(function() -- line: 13
-	-- upvalues: ChatLocalization (ref)
-	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+pcall(function()
+	local Chat = game:GetService("Chat")
+	ChatLocalization = require(Chat.ClientChatModules.ChatLocalization)
 end)
 
 local LocalPlayer = Players.LocalPlayer
@@ -15,209 +17,228 @@ while LocalPlayer == nil do
 	LocalPlayer = Players.LocalPlayer
 end
 
-local t1 = {}
+local class = {}
+class.__index = class
 
-t1.__index = t1
+local v = {}
 
-local t2 = {}
-
-function t1.TrimWhisperCommand(_, p2) -- line: 26
-	if string.sub(p2, 1, 3):lower() == "/w " then
-		return (string.sub(p2, 4))
+function class:TrimWhisperCommand(value)
+	if string.sub(value, 1, 3):lower() == "/w " then
+		return (string.sub(value, 4))
 	end
 
-	if string.sub(p2, 1, 9):lower() == "/whisper " then
-		return (string.sub(p2, 10))
-	end
-
-	return nil
-end
-function t1.TrimWhiteSpace(_, p4) -- line: 35
-	return string.gsub(p4, "%s+", ""), p4[#p4] == " "
-end
-function t1.ShouldAutoCompleteNames(_) -- line: 41
-	-- upvalues: ChatSettings (copy)
-	if ChatSettings.WhisperCommandAutoCompletePlayerNames ~= nil then
-		return ChatSettings.WhisperCommandAutoCompletePlayerNames
-	end
-
-	return true
-end
-function t1.GetWhisperingPlayer(p6, p7) -- line: 48
-	-- upvalues: Players (copy), LocalPlayer (ref), ChatSettings (copy)
-	local v15 = p6:TrimWhisperCommand((p7:lower()))
-
-	if v15 then
-		local v16, v17 = p6:TrimWhiteSpace(v15)
-		local t3 = {}
-		local t4 = {}
-		local players = Players:GetPlayers()
-
-		for i = 1, #players do
-			if players[i] ~= LocalPlayer then
-				if v16 == string.sub(players[i].Name:lower(), 1, (string.len(v16))) then
-					t3[players[i]] = players[i].Name:lower()
-				end
-
-				if ChatSettings.WhisperByDisplayName then
-					local v22 = players[i].DisplayName:lower()
-
-					if v16 == string.sub(v22, 1, (string.len(v16))) then
-						t4[players[i]] = v22
-					end
-				end
-			end
-		end
-
-		local n1 = 0
-		local v24 = nil
-		local v25 = nil
-
-		for k, v in pairs(t3) do
-			n1 += 1
-			v24 = k
-			v25 = v
-
-			if v == v16 and v17 then
-				return k
-			end
-		end
-
-		if ChatSettings.WhisperByDisplayName then
-			for k, v in pairs(t4) do
-				if v24 ~= k then
-					n1 += 1
-					v24 = k
-					v25 = v
-				end
-			end
-		end
-
-		if n1 == 1 then
-			if p6:ShouldAutoCompleteNames() then
-				return v24
-			end
-
-			if v25 == v16 then
-				return v24
-			end
-		end
+	if string.sub(value, 1, 9):lower() == "/whisper " then
+		return (string.sub(value, 10))
 	end
 
 	return nil
 end
-function t1.GetWhisperChanneNameColor(p8) -- line: 106
-	if p8.ChatSettings.WhisperChannelNameColor then
-		return p8.ChatSettings.WhisperChannelNameColor
+
+function class:TrimWhiteSpace(value)
+	return string.gsub(value, "%s+", ""), value[#value] == " "
+end
+
+function class:ShouldAutoCompleteNames()
+	if ChatSettings.WhisperCommandAutoCompletePlayerNames == nil then
+		return true
+	end
+
+	return ChatSettings.WhisperCommandAutoCompletePlayerNames
+end
+
+function class:GetWhisperingPlayer(value)
+	local trimWhisperCommand = self:TrimWhisperCommand((value:lower()))
+
+	if not trimWhisperCommand then
+		return nil
+	end
+
+	local trimWhiteSpace, v2 = self:TrimWhiteSpace(trimWhisperCommand)
+
+	local players = Players:GetPlayers()
+	local names = {}
+	local displayNames = {}
+
+	for i = 1, #players do
+		if players[i] == LocalPlayer then
+			continue
+		end
+
+		if string.sub(players[i].Name:lower(), 1, (string.len(trimWhiteSpace))) == trimWhiteSpace then
+			names[players[i]] = players[i].Name:lower()
+		end
+
+		if not ChatSettings.WhisperByDisplayName then
+			continue
+		end
+
+		local displayName = players[i].DisplayName:lower()
+
+		if string.sub(displayName, 1, (string.len(trimWhiteSpace))) ~= trimWhiteSpace then
+			continue
+		end
+
+		displayNames[players[i]] = displayName
+	end
+
+	local count = 0
+	local v3 = nil
+	local v4 = nil
+
+	for k, v5 in pairs(names) do
+		count += 1
+
+		if v5 == trimWhiteSpace and v2 then
+			return k
+		end
+
+		v4 = v5
+		v3 = k
+	end
+
+	if ChatSettings.WhisperByDisplayName then
+		for k, v5 in pairs(displayNames) do
+			if v3 == k then
+				continue
+			end
+
+			count += 1
+			v4 = v5
+			v3 = k
+		end
+	end
+
+	if count == 1 then
+		if self:ShouldAutoCompleteNames() or v4 == trimWhiteSpace then
+			return v3
+		end
+	end
+
+	return nil
+end
+
+function class:GetWhisperChanneNameColor()
+	if self.ChatSettings.WhisperChannelNameColor then
+		return self.ChatSettings.WhisperChannelNameColor
 	end
 
 	return Color3.fromRGB(102, 14, 102)
 end
-function t1.EnterWhisperState(p9, p10) -- line: 113
-	-- upvalues: ChatSettings (copy), ChatLocalization (ref)
-	p9.PlayerNameEntered = true
-	p9.PlayerName = p10.Name
-	p9.PlayerDisplayName = p10.DisplayName
-	p9.MessageModeButton.Size = UDim2.new(0, 1000, 1, 0)
 
-	local v33 = if not ChatSettings.PlayerDisplayNamesEnabled or not ChatSettings.WhisperByDisplayName then string.format("[To %s]", p10.Name) else string.format("[To %s]", p10.DisplayName)
+function class:EnterWhisperState(p)
+	self.PlayerNameEntered = true
+	self.PlayerName = p.Name
+	self.PlayerDisplayName = p.DisplayName
+
+	self.MessageModeButton.Size = UDim2.new(0, 1000, 1, 0)
+	local text
+
+	if ChatSettings.PlayerDisplayNamesEnabled and ChatSettings.WhisperByDisplayName then
+		text = string.format("[To %s]", p.DisplayName)
+	else
+		text = string.format("[To %s]", p.Name)
+	end
 
 	if ChatLocalization.tryLocalize then
-		v33 = ChatLocalization:tryLocalize(v33)
+		text = ChatLocalization:tryLocalize(text)
 	end
 
-	p9.MessageModeButton.Text = v33
-	p9.MessageModeButton.TextColor3 = p9:GetWhisperChanneNameColor()
+	self.MessageModeButton.Text = text
 
-	local v34 = math.ceil(p9.MessageModeButton.TextBounds.X)
+	self.MessageModeButton.TextColor3 = self:GetWhisperChanneNameColor()
 
-	p9.MessageModeButton.Size = UDim2.new(0, v34, 1, 0)
-	p9.TextBox.Size = UDim2.new(1, -v34, 1, 0)
-	p9.TextBox.Position = UDim2.new(0, v34, 0, 0)
-	p9.TextBox.Text = " "
+	local x = math.ceil(self.MessageModeButton.TextBounds.X)
+	self.MessageModeButton.Size = UDim2.new(0, x, 1, 0)
+	self.TextBox.Size = UDim2.new(1, -x, 1, 0)
+	self.TextBox.Position = UDim2.new(0, x, 0, 0)
+	self.TextBox.Text = " "
 end
-function t1.TextUpdated(p11) -- line: 142
-	local TextBoxText = p11.TextBox.Text
 
-	if not p11.PlayerNameEntered then
-		local WhisperingPlayer = p11:GetWhisperingPlayer(TextBoxText)
+function class:TextUpdated()
+	local text = self.TextBox.Text
 
-		if WhisperingPlayer then
-			p11:EnterWhisperState(WhisperingPlayer)
+	if self.PlayerNameEntered then
+		if text == "" then
+			self.MessageModeButton.Text = ""
+			self.MessageModeButton.Size = UDim2.new(0, 0, 0, 0)
+			self.TextBox.Size = UDim2.new(1, 0, 1, 0)
+			self.TextBox.Position = UDim2.new(0, 0, 0, 0)
+			self.TextBox.Text = ""
 
-			return
+			self.PlayerNameEntered = false
+
+			self.ChatBar:ResetCustomState()
+			self.ChatBar:CaptureFocus()
 		end
-	elseif TextBoxText == "" then
-		p11.MessageModeButton.Text = ""
-		p11.MessageModeButton.Size = UDim2.new(0, 0, 0, 0)
-		p11.TextBox.Size = UDim2.new(1, 0, 1, 0)
-		p11.TextBox.Position = UDim2.new(0, 0, 0, 0)
-		p11.TextBox.Text = ""
-		p11.PlayerNameEntered = false
-		p11.ChatBar:ResetCustomState()
-		p11.ChatBar:CaptureFocus()
+	else
+		local whisperingPlayer = self:GetWhisperingPlayer(text)
+
+		if whisperingPlayer then
+			self:EnterWhisperState(whisperingPlayer)
+		end
 	end
 end
-function t1.GetMessage(p12) -- line: 166
-	if p12.PlayerNameEntered then
-		return "/w " .. p12.PlayerName .. " " .. p12.TextBox.Text
+
+function class.GetMessage(data)
+	if data.PlayerNameEntered then
+		return "/w " .. data.PlayerName .. " " .. data.TextBox.Text
 	end
 
-	return p12.TextBox.Text
+	return data.TextBox.Text
 end
-function t1.ProcessCompletedMessage(_) -- line: 173
+
+function class.ProcessCompletedMessage(_): boolean
 	return false
 end
-function t1.Destroy(p14) -- line: 177
-	p14.MessageModeConnection:disconnect()
-	p14.Destroyed = true
+
+function class:Destroy()
+	self.MessageModeConnection:disconnect()
+	self.Destroyed = true
 end
-function t2.new(p15, p16, p17, p18) -- line: 182
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
 
-	self.Destroyed = false
-	self.ChatWindow = p15
-	self.ChatBar = p16
-	self.ChatSettings = p17
-	self.TextBox = p16:GetTextBox()
-	self.MessageModeButton = p16:GetMessageModeTextButton()
-	self.OriginalWhisperText = ""
-	self.PlayerNameEntered = false
-	self.MessageModeConnection = self.MessageModeButton.MouseButton1Click:connect(function() -- line: 193
-		-- upvalues: self (copy)
-		local TextBoxText = self.TextBox.Text
+function v.new(chatWindow, chatBar, chatSettings, p)
+	local object = setmetatable({}, class)
+	object.Destroyed = false
+	object.ChatWindow = chatWindow
+	object.ChatBar = chatBar
+	object.ChatSettings = chatSettings
+	object.TextBox = chatBar:GetTextBox()
+	object.MessageModeButton = chatBar:GetMessageModeTextButton()
+	object.OriginalWhisperText = ""
+	object.PlayerNameEntered = false
 
-		if string.sub(TextBoxText, 1, 1) == " " then
-			TextBoxText = string.sub(TextBoxText, 2)
+	object.MessageModeConnection = object.MessageModeButton.MouseButton1Click:connect(function()
+		local text = object.TextBox.Text
+
+		if string.sub(text, 1, 1) == " " then
+			text = string.sub(text, 2)
 		end
 
-		self.ChatBar:ResetCustomState()
-		self.ChatBar:SetTextBoxText(TextBoxText)
-		self.ChatBar:CaptureFocus()
+		object.ChatBar:ResetCustomState()
+		object.ChatBar:SetTextBoxText(text)
+		object.ChatBar:CaptureFocus()
 	end)
 
-	if p18 then
-		self:EnterWhisperState(p18)
-
-		return self
+	if p then
+		object:EnterWhisperState(p)
+		return object
 	end
 
-	self:TextUpdated()
+	object:TextUpdated()
 
-	return self
+	return object
 end
-function ProcessMessage(p19, p20, p21, p22) -- line: 212
-	-- upvalues: t2 (copy)
-	if string.sub(p19, 1, 3):lower() == "/w " or string.sub(p19, 1, 9):lower() == "/whisper " then
-		return t2.new(p20, p21, p22)
+
+function ProcessMessage(value, p, p2, p3)
+	if string.sub(value, 1, 3):lower() == "/w " or string.sub(value, 1, 9):lower() == "/whisper " then
+		return v.new(p, p2, p3)
 	end
 
 	return nil
 end
-function CreateCustomState(p23, p24, p25, p26) -- line: 219
-	-- upvalues: t2 (copy)
-	return t2.new(p24, p25, p26, p23)
+
+function CreateCustomState(p, p2, p3, p4)
+	return v.new(p2, p3, p4, p)
 end
 
 return {

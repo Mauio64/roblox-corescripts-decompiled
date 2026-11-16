@@ -1,74 +1,104 @@
-local Array = require(script.Parent.Parent.Parent.LuauPolyfill).Array
-local devAssert = require(script.Parent.Parent.jsutils.devAssert).devAssert
-
+local LuauPolyfill = require(script.Parent.Parent.Parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local devAssert = require(script.Parent.Parent.jsutils.devAssert)
+local devAssert2 = devAssert.devAssert
 require(script.Parent.Parent.language.source)
+
 require(script.Parent.Parent.language.ast)
 
 local parser = require(script.Parent.Parent.language.parser)
-local Kind = require(script.Parent.Parent.language.kinds).Kind
+
+local kinds = require(script.Parent.Parent.language.kinds)
+local kind = kinds.Kind
 local parse = parser.parse
-local assertValidSDL = require(script.Parent.Parent.validation.validate).assertValidSDL
-local GraphQLSchema = require(script.Parent.Parent.type.schema).GraphQLSchema
-local specifiedDirectives = require(script.Parent.Parent.type.directives).specifiedDirectives
-local extendSchemaImpl = require(script.Parent.extendSchema).extendSchemaImpl
 
-local function v10(p1, p2) -- line: 44
-	-- upvalues: devAssert (copy), Kind (copy), assertValidSDL (copy), extendSchemaImpl (copy), specifiedDirectives (copy), Array (copy), GraphQLSchema (copy)
-	devAssert(p1 ~= nil and p1.kind == Kind.DOCUMENT, "Must provide valid Document AST.")
+local validate = require(script.Parent.Parent.validation.validate)
+local assertValidSDL = validate.assertValidSDL
 
-	if p2 ~= nil and (not p2.assumeValid and not p2.assumeValidSDL) then
-		assertValidSDL(p1)
+local schema = require(script.Parent.Parent.type.schema)
+
+local graphQLSchema = schema.GraphQLSchema
+local directives = require(script.Parent.Parent.type.directives)
+local specifiedDirectives = directives.specifiedDirectives
+
+local extendSchema = require(script.Parent.extendSchema)
+local extendSchemaImpl = extendSchema.extendSchemaImpl
+
+local function fn(parsed, p)
+	devAssert2(parsed ~= nil and parsed.kind == kind.DOCUMENT, "Must provide valid Document AST.")
+
+	if p ~= nil and not (p.assumeValid or p.assumeValidSDL) then
+		assertValidSDL(parsed)
 	end
 
-	local t1 = {
+	local v = extendSchemaImpl({
 		description = nil,
-		extensions = nil,
-		assumeValid = false,
 		types = {},
 		directives = {},
-		extensionASTNodes = {}
-	}
-	local v14 = extendSchemaImpl(t1, p1, p2)
+		extensions = nil,
+		extensionASTNodes = {},
+		assumeValid = false
+	}, parsed, p)
 
-	if v14.astNode == nil then
-		for _, v in ipairs(v14.types) do
-			if v.name == "Query" then
-				v14.query = v
-			elseif v.name == "Mutation" then
-				v14.mutation = v
-			elseif v.name == "Subscription" then
-				v14.subscription = v
+	if v.astNode == nil then
+		for _, kind2 in ipairs(v.types) do
+			if kind2.name == "Query" then
+				v.query = kind2
+			elseif kind2.name == "Mutation" then
+				v.mutation = kind2
+			elseif kind2.name == "Subscription" then
+				v.subscription = kind2
 			end
 		end
 	end
 
-	local directives = v14.directives
+	local directives2 = v.directives
 
-	for _, v in ipairs(specifiedDirectives) do
-		if Array.every(directives, function(p3) -- line: 86
-			-- upvalues: v (copy)
-			return p3.name ~= v.name
+	for _, specifiedDirective in ipairs(specifiedDirectives) do
+		if not Array.every(directives2, function(p2): boolean
+			return p2.name ~= specifiedDirective.name
 		end) then
-			table.insert(directives, v)
+			continue
 		end
+
+		table.insert(directives2, specifiedDirective)
 	end
 
-	return GraphQLSchema.new(v14)
+	return graphQLSchema.new(v)
 end
 
 return {
-	buildASTSchema = v10,
-	buildSchema = function(p4, p5) -- line: 97
-		-- upvalues: parse (copy), v10 (copy)
-		local v22 = parse(p4, {
-			noLocation = if not p5 then nil else p5.noLocation,
-			experimentalFragmentVariables = if not p5 then nil else p5.experimentalFragmentVariables
-		})
+	buildASTSchema = fn,
+	buildSchema = function(p, data)
+		local noLocation
 
-		return v10(v22, {
-			assumeValidSDL = if not p5 then nil else p5.assumeValidSDL,
-			assumeValid = if not p5 then nil else p5.assumeValid
+		if data then
+			noLocation = data.noLocation
+		end
+
+		local experimentalFragmentVariables
+
+		if data then
+			experimentalFragmentVariables = data.experimentalFragmentVariables
+		end
+
+		local parsed = parse(p, {
+			noLocation = noLocation,
+			experimentalFragmentVariables = experimentalFragmentVariables
 		})
+		local assumeValidSDL
+
+		if data then
+			assumeValidSDL = data.assumeValidSDL
+		end
+
+		local assumeValid
+
+		if data then
+			assumeValid = data.assumeValid
+		end
+
+		return fn(parsed, { assumeValidSDL = assumeValidSDL, assumeValid = assumeValid })
 	end,
 	parse = parse
 }

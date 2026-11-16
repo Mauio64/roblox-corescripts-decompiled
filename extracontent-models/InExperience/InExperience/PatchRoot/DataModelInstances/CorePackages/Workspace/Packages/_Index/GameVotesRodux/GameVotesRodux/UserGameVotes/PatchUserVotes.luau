@@ -1,132 +1,160 @@
 local HttpService = game:GetService("HttpService")
 local GameVotesRodux = script:FindFirstAncestor("GameVotesRodux")
-local GameVotesRoduxParent = GameVotesRodux.Parent
-local Promise = require(GameVotesRoduxParent.Promise)
-local StatusCodes = require(GameVotesRoduxParent.Http).StatusCodes
+local parent = GameVotesRodux.Parent
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
+local StatusCodes = Http.StatusCodes
 local ReasonForNotVoteable = require(GameVotesRodux.Enums.ReasonForNotVoteable)
 local VoteStatus = require(GameVotesRodux.Enums.VoteStatus)
 local SetUserGameVotes = require(GameVotesRodux.UserGameVotes.SetUserGameVotes)
 local GamesPatchUserVotes = require(GameVotesRodux.UserGameVotes.GamesPatchUserVotes)
-local ToastType = require(GameVotesRoduxParent.ToastRodux).Enums.ToastType
-local SetCurrentToastMessage = require(GameVotesRoduxParent.ToastRodux).Actions.SetCurrentToastMessage
+local ToastRodux = require(parent.ToastRodux)
+local ToastType = ToastRodux.Enums.ToastType
+local ToastRodux2 = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux2.Actions.SetCurrentToastMessage
 local SetGameVotes = require(GameVotesRodux.GameVotes.SetGameVotes)
-local SetNetworkingErrorToast = require(GameVotesRoduxParent.RobloxAppToastsRodux).Thunks.SetNetworkingErrorToast
-local PerformFetch = require(GameVotesRoduxParent.Http).PerformFetch
+local RobloxAppToastsRodux = require(parent.RobloxAppToastsRodux)
+local SetNetworkingErrorToast = RobloxAppToastsRodux.Thunks.SetNetworkingErrorToast
+local Http2 = require(parent.Http)
+local PerformFetch = Http2.PerformFetch
 
-local function getNewGameVotes(p1, p2, p3) -- line: 19
-	-- upvalues: VoteStatus (copy)
-	if p2 == p3 then
-		return p1
+local function getNewGameVotes(p, value, value2)
+	if value == value2 then
+		return p
 	end
 
-	local v22 = p1 and p1.upVotes
-	local v23 = p1 and p1.downVotes
+	local upVotes = p and p.upVotes
+	local downVotes = p and p.downVotes
 
-	if p3 == VoteStatus.VotedUp then
-		v22 += 1
+	if value2 == VoteStatus.VotedUp then
+		upVotes += 1
 
-		if p2 == VoteStatus.VotedDown then
-			v23 -= 1
+		if value == VoteStatus.VotedDown then
+			downVotes -= 1
 		end
-	elseif p3 == VoteStatus.VotedDown then
-		v23 += 1
+	elseif value2 == VoteStatus.VotedDown then
+		downVotes += 1
 
-		if p2 == VoteStatus.VotedUp then
-			v22 -= 1
+		if value == VoteStatus.VotedUp then
+			upVotes -= 1
 		end
-	elseif p3 == VoteStatus.NotVoted then
-		if p2 == VoteStatus.VotedUp then
-			v22 -= 1
-		elseif p2 == VoteStatus.VotedDown then
-			v23 -= 1
+	elseif value2 == VoteStatus.NotVoted then
+		if value == VoteStatus.VotedUp then
+			upVotes -= 1
+		elseif value == VoteStatus.VotedDown then
+			downVotes -= 1
 		end
 	end
 
-	return {
-		upVotes = v22,
-		downVotes = v23
-	}
+	return { upVotes = upVotes, downVotes = downVotes }
 end
-local function isTooManyRequestsError(p4) -- line: 50
-	-- upvalues: StatusCodes (copy)
-	return p4 and (p4.HttpError == Enum.HttpError.OK and p4.StatusCode == StatusCodes.TOO_MANY_REQUESTS)
-end
-local function isPlayGameError(p5) -- line: 54
-	-- upvalues: StatusCodes (copy), HttpService (copy)
-	if p5 and (p5.HttpError == Enum.HttpError.OK and p5.StatusCode == StatusCodes.FORBIDDEN) then
-		local ok, result = pcall(function() -- line: 56
-			-- upvalues: HttpService (copy), p5 (copy)
-			return HttpService:JSONDecode(p5.Body)
-		end)
 
-		if ok and result and result.errors then
-			for _, v in ipairs(result.errors) do
-				if v.code == 6 then
-					return true
-				end
+local function isTooManyRequestsError(p)
+	if p then
+		if p.HttpError == Enum.HttpError.OK then
+			p = p.StatusCode == StatusCodes.TOO_MANY_REQUESTS
+		else
+			p = false
+		end
+	end
+
+	return p
+end
+
+local function isPlayGameError(data): boolean
+	if not data or data.HttpError ~= Enum.HttpError.OK or data.StatusCode ~= StatusCodes.FORBIDDEN then
+		return false
+	end
+
+	local success, result = pcall(function()
+		return HttpService:JSONDecode(data.Body)
+	end)
+
+	if success and result and result.errors then
+		for _, err in ipairs(result.errors) do
+			if err.code == 6 then
+				return true
 			end
 		end
 	end
 
 	return false
 end
-local function fetchKeymapper(p6) -- line: 70
-	return "luaapp.gamesapi.patch-user-votes" .. p6
+
+local function fetchKeymapper(p) -- 2 equivalent calls inferred from this helper
+	return "luaapp.gamesapi.patch-user-votes" .. p
 end
 
-return {
-	getNewGameVotes = getNewGameVotes,
-	Patch = function(p7, p8, p9, p10) -- line: 78
-		-- upvalues: Promise (copy), PerformFetch (copy), GamesPatchUserVotes (copy), getNewGameVotes (copy), SetGameVotes (copy), SetUserGameVotes (copy), StatusCodes (copy), ReasonForNotVoteable (copy), SetCurrentToastMessage (copy), ToastType (copy), isPlayGameError (copy), SetNetworkingErrorToast (copy)
-		assert(type(p8) == "string", string.format("PatchUserVotes thunk expects universeId to be a string, was %s", (type(p8))))
-		assert(type(p9) == "string", string.format("PatchUserVotes thunk expects vote to be a string, was %s", (type(p9))))
-		assert(type(p10) == "string", string.format("PatchUserVotes thunk expects curVote to be a string, was %s", (type(p10))))
+local PatchUserVotes = {}
+PatchUserVotes.getNewGameVotes = getNewGameVotes
 
-		if p9 == p10 then
-			return Promise.resolve()
-		end
+function PatchUserVotes.Patch(p, value, value2, value3)
+	assert(
+		type(value) == "string",
+		string.format("PatchUserVotes thunk expects universeId to be a string, was %s", (type(value)))
+	)
 
-		return PerformFetch.Single("luaapp.gamesapi.patch-user-votes" .. p8, function(p11) -- line: 97
-			-- upvalues: GamesPatchUserVotes (copy), p7 (copy), p8 (copy), p9 (copy), getNewGameVotes (copy), p10 (copy), SetGameVotes (copy), SetUserGameVotes (copy), Promise (copy), StatusCodes (copy), ReasonForNotVoteable (copy), SetCurrentToastMessage (copy), ToastType (copy), isPlayGameError (copy), SetNetworkingErrorToast (copy)
-			return GamesPatchUserVotes(p7, p8, p9):andThen(function(p12) -- line: 98
-				-- upvalues: p11 (copy), p8 (copy), getNewGameVotes (copy), p10 (copy), p9 (copy), SetGameVotes (copy), SetUserGameVotes (copy), Promise (copy)
-				local v39 = p11:getState().GameVotes[p8]
-				local v40 = getNewGameVotes(v39, p10, p9)
+	assert(
+		type(value2) == "string",
+		string.format("PatchUserVotes thunk expects vote to be a string, was %s", (type(value2)))
+	)
 
-				p11:dispatch(SetGameVotes(p8, v40.upVotes, v40.downVotes))
-				p11:dispatch(SetUserGameVotes(p8, true, p9, ""))
+	assert(
+		type(value3) == "string",
+		string.format("PatchUserVotes thunk expects curVote to be a string, was %s", (type(value3)))
+	)
 
-				return Promise.resolve(p12)
-			end, function(p13) -- line: 105
-				-- upvalues: StatusCodes (copy), p11 (copy), SetUserGameVotes (copy), p8 (copy), p10 (copy), ReasonForNotVoteable (copy), SetCurrentToastMessage (copy), ToastType (copy), Promise (copy), isPlayGameError (copy), SetNetworkingErrorToast (copy)
-				if p13 and (p13.HttpError == Enum.HttpError.OK and p13.StatusCode == StatusCodes.TOO_MANY_REQUESTS) then
-					p11:dispatch(SetUserGameVotes(p8, false, p10, ReasonForNotVoteable.FloodCheckThresholdMet))
-					p11:dispatch(SetCurrentToastMessage({
-						toastMessage = "Feature.Toast.VoteError.FloodCheckThresholdMet",
-						toastType = ToastType.NetworkingError
-					}))
-
-					return Promise.reject(p13)
-				end
-
-				if isPlayGameError(p13) then
-					p11:dispatch(SetUserGameVotes(p8, false, p10, ReasonForNotVoteable.PlayGame))
-					p11:dispatch(SetCurrentToastMessage({
-						toastMessage = "Feature.Toast.VoteError.PlayGame",
-						toastType = ToastType.NetworkingError
-					}))
-
-					return Promise.reject(p13)
-				end
-
-				p11:dispatch(SetNetworkingErrorToast(p13))
-
-				return Promise.reject(p13)
-			end)
-		end)
-	end,
-	GetPatchingStatus = function(p14, p15) -- line: 129
-		-- upvalues: PerformFetch (copy)
-		return PerformFetch.GetStatus(p14, "luaapp.gamesapi.patch-user-votes" .. p15)
+	if value2 == value3 then
+		return Promise.resolve()
 	end
-}
+
+	return PerformFetch.Single(fetchKeymapper(value), function(object) -- inferred equivalent call
+		return GamesPatchUserVotes(p, value, value2):andThen(function(p2)
+			local newGameVotes = getNewGameVotes(object:getState().GameVotes[value], value3, value2)
+
+			object:dispatch(SetGameVotes(value, newGameVotes.upVotes, newGameVotes.downVotes))
+			object:dispatch(SetUserGameVotes(value, true, value2, ""))
+			return Promise.resolve(p2)
+		end, function(p2)
+			local v
+
+			if p2 then
+				if p2.HttpError == Enum.HttpError.OK then
+					v = p2.StatusCode == StatusCodes.TOO_MANY_REQUESTS
+				else
+					v = false
+				end
+			else
+				v = p2
+			end
+
+			if v then
+				object:dispatch(SetUserGameVotes(value, false, value3, ReasonForNotVoteable.FloodCheckThresholdMet))
+
+				object:dispatch(SetCurrentToastMessage({
+					toastType = ToastType.NetworkingError,
+					toastMessage = "Feature.Toast.VoteError.FloodCheckThresholdMet"
+				}))
+			else
+				if not isPlayGameError(p2) then
+					object:dispatch(SetNetworkingErrorToast(p2))
+					return Promise.reject(p2)
+				end
+
+				object:dispatch(SetUserGameVotes(value, false, value3, ReasonForNotVoteable.PlayGame))
+				object:dispatch(SetCurrentToastMessage({
+					toastType = ToastType.NetworkingError,
+					toastMessage = "Feature.Toast.VoteError.PlayGame"
+				}))
+			end
+
+			return Promise.reject(p2)
+		end)
+	end)
+end
+
+function PatchUserVotes.GetPatchingStatus(p, p2)
+	return PerformFetch.GetStatus(p, fetchKeymapper(p2)) -- inferred equivalent call
+end
+
+return PatchUserVotes

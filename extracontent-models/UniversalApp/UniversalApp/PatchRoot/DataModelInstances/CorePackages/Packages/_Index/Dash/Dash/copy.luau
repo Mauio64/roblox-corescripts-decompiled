@@ -1,9 +1,8 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
 
-require(scriptParent.Types)
-
-local function copy(p1) -- line: 15
-	return table.clone(p1)
+local function copy(p)
+	return table.clone(p)
 end
 
 return copy

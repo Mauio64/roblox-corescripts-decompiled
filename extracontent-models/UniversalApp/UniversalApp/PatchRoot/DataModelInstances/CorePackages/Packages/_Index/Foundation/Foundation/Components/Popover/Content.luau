@@ -1,1 +1,3 @@
-return (require(script.PopoverContent))
+local PopoverContent = require(script.PopoverContent)
+
+return PopoverContent

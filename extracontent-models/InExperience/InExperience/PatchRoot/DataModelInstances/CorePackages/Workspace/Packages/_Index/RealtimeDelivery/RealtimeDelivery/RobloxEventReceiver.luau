@@ -1,79 +1,77 @@
-local Parent = script:FindFirstAncestor("RealtimeDelivery").Parent
-local Signal = require(Parent.AppCommonLib).Signal
+local parent = script:FindFirstAncestor("RealtimeDelivery").Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+
+local Signal = AppCommonLib.Signal
+
 local HttpService = game:GetService("HttpService")
-local t1 = {}
 
-t1.__index = t1
+local RobloxEventReceiver = {}
+RobloxEventReceiver.__index = RobloxEventReceiver
 
-function t1.observeEvent(p1, p2, p3) -- line: 14
-	-- upvalues: Signal (copy)
-	assert(type(p2) == "string", "Expected namespace to be a string")
-	assert(type(p3) == "function", "Expected callback to be a function")
+function RobloxEventReceiver.observeEvent(p, value, callback)
+	assert(type(value) == "string", "Expected namespace to be a string")
+	assert(type(callback) == "function", "Expected callback to be a function")
 
-	local v8 = p1.namespaceTable[p2]
+	local v = p.namespaceTable[value]
 
-	if v8 == nil then
-		v8 = Signal.new()
-		p1.namespaceTable[p2] = v8
+	if v == nil then
+		v = Signal.new()
+		p.namespaceTable[value] = v
 	end
 
-	return v8:connect(p3)
+	return v:connect(callback)
 end
-function t1.new(p4) -- line: 27
-	-- upvalues: t1 (copy), HttpService (copy)
-	local t2 = {
-		namespaceTable = {}
-	}
 
-	setmetatable(t2, t1)
-	t2.connections = {
-		p4.RobloxEventReceived:Connect(function(p5) -- line: 34
-			-- upvalues: t2 (copy), HttpService (copy)
-			local v12 = t2.namespaceTable[p5.namespace]
+function RobloxEventReceiver.new(p)
+	local v = { namespaceTable = {} }
 
-			if v12 == nil then
+	setmetatable(v, RobloxEventReceiver)
+
+	v.connections = {
+		p.RobloxEventReceived:Connect(function(data)
+			local v2 = v.namespaceTable[data.namespace]
+
+			if v2 == nil then
 				return
 			end
 
-			local v15
+			local v3
 
-			if p5.detail and p5.detail ~= "" then
-				local ok, result = pcall(function() -- line: 43
-					-- upvalues: HttpService (copy), p5 (copy)
-					return HttpService:JSONDecode(p5.detail)
+			if data.detail and data.detail ~= "" then
+				local success, result = pcall(function()
+					return HttpService:JSONDecode(data.detail)
 				end)
 
-				v15 = ok and result or p5.detail
+				v3 = success and result or data.detail
 			else
-				v15 = {}
+				v3 = {}
 			end
 
-			v12:fire(v15, p5.detailType)
+			v2:fire(v3, data.detailType)
 		end),
-		p4.RobloxConnectionChanged:Connect(function(p6, p7, p8, p9) -- line: 60
-			-- upvalues: t2 (copy), HttpService (copy)
-			local v20 = t2.namespaceTable[p6]
+		p.RobloxConnectionChanged:Connect(function(p2, p3, p4, json)
+			local v2 = v.namespaceTable[p2]
 
-			if v20 == nil then
+			if v2 == nil then
 				return
 			end
 
-			local v21 = nil
+			local v3
 
-			if p9 then
-				local ok, result = pcall(function() -- line: 69
-					-- upvalues: HttpService (copy), p9 (copy)
-					return HttpService:JSONDecode(p9)
+			if json then
+				local success, result = pcall(function()
+					return HttpService:JSONDecode(json)
 				end)
 
-				v21 = if not ok then {} else result
+				v3 = not success and {} or result
 			end
 
-			v20:fire(p7, p8, v21)
+			v2:fire(p3, p4, v3)
 		end)
 	}
 
-	return t2
+	return v
 end
 
-return t1
+return RobloxEventReceiver

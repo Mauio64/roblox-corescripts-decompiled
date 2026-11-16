@@ -1,24 +1,31 @@
-local Packages = game:GetService("CorePackages").Packages
+local CorePackages = game:GetService("CorePackages")
+local Packages = CorePackages.Packages
 local React = require(Packages.React)
-local useStyle = require(Packages.UIBlox).Core.Style.useStyle
-local uDim2 = UDim2.fromOffset(4, 4)
+local UIBlox = require(Packages.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+
+local udim = UDim2.fromOffset(4, 4)
 local vector2 = Vector2.new(0.5, 0.5)
-local uDim2_2 = UDim2.fromScale(0.8, 0.8)
+local udim2 = UDim2.fromScale(0.8, 0.8)
 
-local function CameraStatusDot(t1: {[any]: any}) -- line: 18
-	-- upvalues: useStyle (copy), React (copy), vector2 (copy), uDim2 (copy), uDim2_2 (copy)
-	local v9 = useStyle()
+local function CameraStatusDot(props)
+	local v = useStyle()
 
-	return React.createElement("Frame", {
-		AnchorPoint = t1.AnchorPoint or vector2,
-		Size = if not t1.Size then uDim2 else t1.Size,
-		BackgroundColor3 = v9.Theme.OnlineStatus.Color,
-		Position = t1.Position or uDim2_2,
-		ZIndex = t1.ZIndex
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(1, 0)
-		})
+	local createElement = React.createElement
+	local v2 = {
+		AnchorPoint = props.AnchorPoint or vector2,
+		Size = 0,
+		BackgroundColor3 = 0,
+		Position = 0,
+		ZIndex = 0
+	}
+	local size = if props.Size then props.Size else udim
+	v2.Size = size
+	v2.BackgroundColor3 = v.Theme.OnlineStatus.Color
+	v2.Position = props.Position or udim2
+	v2.ZIndex = props.ZIndex
+	return createElement("Frame", v2, {
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
 	})
 end
 

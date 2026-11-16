@@ -1,9 +1,5 @@
-local ChatPolicies = require(script.ChatPolicies)
-local SharePolicies = require(script.SharePolicies)
-local ShareTargetGamePolicies = require(script.ShareTargetGamePolicies)
-
 return {
-	ChatPolicies = ChatPolicies,
-	SharePolicies = SharePolicies,
-	ShareTargetGamePolicies = ShareTargetGamePolicies
+	ChatPolicies = require(script.ChatPolicies),
+	SharePolicies = require(script.SharePolicies),
+	ShareTargetGamePolicies = require(script.ShareTargetGamePolicies)
 }

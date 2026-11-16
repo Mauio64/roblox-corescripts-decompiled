@@ -1,151 +1,151 @@
 local StarterGui = game:GetService("StarterGui")
+
 local CoreGuiCommon = script:FindFirstAncestor("CoreGuiCommon")
-local CoreGuiCommonParent = CoreGuiCommon.Parent
+local parent = CoreGuiCommon.Parent
+
 local Constants = require(CoreGuiCommon.Constants)
-local Foundation = require(CoreGuiCommonParent.Foundation)
-local React = require(CoreGuiCommonParent.React)
-local RobloxAppHooks = require(CoreGuiCommonParent.RobloxAppHooks)
-local RobloxAppEnums = require(CoreGuiCommonParent.RobloxAppEnums)
-local Signals = require(CoreGuiCommonParent.Signals)
-local SignalsReact = require(CoreGuiCommonParent.SignalsReact)
-local GetLocalHumanoidStore = require(CoreGuiCommon.Stores).GetLocalHumanoidStore
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local Stores = require(CoreGuiCommon.Stores)
+local GetLocalHumanoidStore = Stores.GetLocalHumanoidStore
 local View = Foundation.View
 local useDeviceOrientation = RobloxAppHooks.useDeviceOrientation
 local useTokens = Foundation.Hooks.useTokens
 local HealthBarColors = Constants.HealthBarColors
 
-local function getHealthBarColor(p1) -- line: 25
-	-- upvalues: HealthBarColors (copy)
-	if p1 <= HealthBarColors.Red.Fraction then
+local function getHealthBarColor(p)
+	if p <= HealthBarColors.Red.Fraction then
 		return HealthBarColors.Red.Color
 	end
 
-	if p1 >= HealthBarColors.Green.Fraction then
+	if HealthBarColors.Green.Fraction <= p then
 		return HealthBarColors.Green.Color
 	end
 
-	local vector3 = Vector3.new(0, 0, 0)
-	local n1 = 0
+	local total = Vector3.new(0, 0, 0)
+	local total2 = 0
 
-	for _, v22 in HealthBarColors do
-		local vector3_2 = Vector3.new(v22.Color.R, v22.Color.G, v22.Color.B)
-		local v24 = p1 - v22.Fraction
+	for _, healthBarColor in HealthBarColors do
+		local vector3 = Vector3.new(healthBarColor.Color.R, healthBarColor.Color.G, healthBarColor.Color.B)
+		local v = p - healthBarColor.Fraction
 
-		if v24 == 0 then
-			return Color3.new(vector3_2.X, vector3_2.Y, vector3_2.Z)
+		if v == 0 then
+			return Color3.new(vector3.X, vector3.Y, vector3.Z)
 		end
 
-		local v25 = 1 / (v24 * v24)
-
-		vector3 += v25 * vector3_2
-		n1 += v25
+		local v2 = 1 / (v * v)
+		total += v2 * vector3
+		total2 += v2
 	end
 
-	local v26 = vector3 / n1
-
-	return Color3.new(v26.X, v26.Y, v26.Z)
+	local v = total / total2
+	return Color3.new(v.X, v.Y, v.Z)
 end
-local function HealthBar(t1: {[any]: any}) -- line: 54
-	-- upvalues: StarterGui (copy), useTokens (copy), useDeviceOrientation (copy), SignalsReact (copy), GetLocalHumanoidStore (copy), React (copy), Constants (copy), Signals (copy), View (copy), RobloxAppEnums (copy), getHealthBarColor (copy)
-	local v28 = t1.mockStarterGui or StarterGui
-	local v29 = useTokens()
-	local v30 = useDeviceOrientation()
-	local v31 = SignalsReact.useSignalState(GetLocalHumanoidStore)
-	local v32, v33 = React.useState(v28:GetCoreGuiEnabled(Enum.CoreGuiType.Health))
-	local v34, v35 = React.useBinding(Constants.InitialHealth)
-	local v36, v37 = React.useBinding(Constants.InitialHealth)
-	local v38, v39 = React.useBinding(false)
-	local v40 = React.joinBindings({
-		v34,
-		v36,
-		v38
-	}):map(function(p2) -- line: 67
-		local v43 = p2[1]
-		local v44 = p2[2]
-		local n2 = 1
 
-		if p2[3] then
+local function HealthBar(p)
+	local mockStarterGui = p.mockStarterGui or StarterGui
+
+	local v = useTokens()
+	local v2 = useDeviceOrientation()
+	local v3 = SignalsReact.useSignalState(GetLocalHumanoidStore)
+
+	local state, setState = React.useState(mockStarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Health))
+
+	local v4, v5 = React.useBinding(Constants.InitialHealth)
+	local v6, v7 = React.useBinding(Constants.InitialHealth)
+	local v8, v9 = React.useBinding(false)
+
+	local mapped = React.joinBindings({ v4, v6, v8 }):map(function(list)
+		local item = list[1]
+		local item2 = list[2]
+
+		local v10 = 1
+
+		if list[3] then
 			return 0
 		end
 
-		if v44 > 0 then
-			n2 = math.clamp(v43 / v44, 0, 1)
+		if item2 > 0 then
+			return (math.clamp(item / item2, 0, 1))
 		end
 
-		return n2
-	end)
-	local v41 = React.joinBindings({
-		v34,
-		v36
-	}):map(function(t2: {[any]: any}) -- line: 82
-		return t2[1] < t2[2]
+		return v10
 	end)
 
-	React.useEffect(function() -- line: 86
-		-- upvalues: Signals (copy), v31 (copy), v35 (copy), Constants (copy), v37 (copy), v39 (copy), v28 (copy), v33 (copy)
-		local v47 = Signals.createEffect(function(p3) -- line: 87
-			-- upvalues: v31 (copy), v35 (copy), Constants (copy), v37 (copy), v39 (copy)
-			local v52 = v31.getHealthValue(p3)
+	local mapped2 = React.joinBindings({ v4, v6 }):map(function(list): boolean
+		return list[1] < list[2]
+	end)
 
-			v35(v52.health or Constants.InitialHealth)
-			v37(v52.maxHealth or Constants.InitialHealth)
-			v39(v52.isDead or false)
+	React.useEffect(function()
+		local effect = Signals.createEffect(function(p2)
+			local healthValue = v3.getHealthValue(p2)
+
+			v5(healthValue.health or Constants.InitialHealth)
+			v7(healthValue.maxHealth or Constants.InitialHealth)
+			v9(healthValue.isDead or false)
 		end)
-		local connection = v28.CoreGuiChangedSignal:Connect(function(p4, b1: boolean) -- line: 96
-			-- upvalues: v33 (copy)
-			if p4 == Enum.CoreGuiType.Health or p4 == Enum.CoreGuiType.All then
-				v33(b1)
+
+		local coreGuiChangedSignalConnection = mockStarterGui.CoreGuiChangedSignal:Connect(function(p2, flag: boolean)
+			if p2 == Enum.CoreGuiType.Health or p2 == Enum.CoreGuiType.All then
+				setState(flag)
 			end
 		end)
 
-		return function() -- line: 103
-			-- upvalues: v47 (copy), connection (copy)
-			v47()
-			connection:Disconnect()
+		return function()
+			effect()
+			coreGuiChangedSignalConnection:Disconnect()
 		end
-	end, { v31 })
+	end, { v3 })
 
-	if v32 then
-		return (React.createElement(View, {
-			tag = "anchor-top-right position-top-right",
-			testId = "health-bar",
-			Visible = v41,
-			Size = UDim2.fromOffset(if v30 ~= RobloxAppEnums.DeviceOrientationMode.Portrait then v29.Size.Size_3000 else v29.Size.Size_2000, v29.Size.Size_400),
-			LayoutOrder = t1.layoutOrder
-		}, {
-			HealthBar = React.createElement(View, {
-				tag = "bg-surface-300 radius-medium size-full",
-				backgroundStyle = {
-					Transparency = 0.2,
-					Color3 = v29.Color.Extended.Gray.Gray_700.Color3
-				},
-				stroke = {
-					Transparency = 0.2,
-					Thickness = v29.Stroke.Thicker,
-					BorderStrokePosition = Enum.BorderStrokePosition.Outer
-				},
-				Position = UDim2.fromScale(0, 0.5),
-				AnchorPoint = Vector2.new(0, 0.5)
-			}, {
-				Fill = React.createElement(View, {
-					tag = "anchor-left-center radius-medium",
-					testId = "health-bar-fill",
-					backgroundStyle = v40:map(function(p5) -- line: 138
-						-- upvalues: getHealthBarColor (copy)
-						return {
-							Transparency = 0,
-							Color3 = getHealthBarColor(p5)
-						}
-					end),
-					Size = v40:map(function(p6) -- line: 144
-						return UDim2.fromScale(p6, 1)
-					end)
-				})
-			})
-		}))
+	if not state then
+		return nil
 	end
 
-	return nil
+	local createElement = React.createElement
+	local v10
+
+	if v2 == RobloxAppEnums.DeviceOrientationMode.Portrait then
+		v10 = v.Size.Size_2000
+	else
+		v10 = v.Size.Size_3000
+	end
+
+	return (createElement(View, {
+		tag = "anchor-top-right position-top-right",
+		Visible = mapped2,
+		Size = UDim2.fromOffset(v10, v.Size.Size_400),
+		LayoutOrder = p.layoutOrder,
+		testId = "health-bar"
+	}, {
+		HealthBar = React.createElement(View, {
+			tag = "bg-surface-300 radius-medium size-full",
+			backgroundStyle = { Color3 = v.Color.Extended.Gray.Gray_700.Color3, Transparency = 0.2 },
+			stroke = {
+				Thickness = v.Stroke.Thicker,
+				Transparency = 0.2,
+				BorderStrokePosition = Enum.BorderStrokePosition.Outer
+			},
+			Position = UDim2.fromScale(0, 0.5),
+			AnchorPoint = Vector2.new(0, 0.5)
+		}, {
+			Fill = React.createElement(View, {
+				tag = "anchor-left-center radius-medium",
+				backgroundStyle = mapped:map(function(p2)
+					return { Color3 = getHealthBarColor(p2), Transparency = 0 }
+				end),
+				Size = mapped:map(function(p2)
+					return UDim2.fromScale(p2, 1)
+				end),
+				testId = "health-bar-fill"
+			})
+		})
+	}))
 end
 
 return React.memo(HealthBar)

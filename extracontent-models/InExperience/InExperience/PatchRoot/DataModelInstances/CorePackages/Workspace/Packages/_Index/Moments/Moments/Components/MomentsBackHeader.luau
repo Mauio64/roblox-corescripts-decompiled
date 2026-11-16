@@ -1,15 +1,18 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
+local parent = Moments.Parent
+
+local React = require(parent.React)
 local MomentsHeaderContainer = require(Moments.Components.MomentsHeader.MomentsHeaderContainer)
 
-local function MomentsBackHeader(t1: {[any]: any}) -- line: 12
-	-- upvalues: React (copy), MomentsHeaderContainer (copy)
+local function MomentsBackHeader(props)
 	return React.createElement(MomentsHeaderContainer, {
+		layoutOrder = props.layoutOrder,
 		variant = "back",
 		showTopScrim = true,
-		layoutOrder = t1.layoutOrder,
-		onBack = t1.onBack
+		onBack = props.onBack,
+		onCreatePressed = props.onCreatePressed,
+		onNavigateToTrending = props.onNavigateToTrending,
+		onNavigateToMyMoments = props.onNavigateToMyMoments
 	})
 end
 

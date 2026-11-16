@@ -1,40 +1,40 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
-local React = require(InExperienceInterventionParent.React)
-local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
+local parent = InExperienceIntervention.Parent
+
+local React = require(parent.React)
+
+local InterventionShared = require(parent.InterventionShared)
+local Constants = InterventionShared.Utils.Constants
 local InExperienceInterventionAnalytics = require(InExperienceIntervention.InExperienceInterventionAnalytics)
 local ChatInterventionGenericToast = require(InExperienceIntervention.Components.ChatInterventionGenericToast)
-local useLocalization = require(InExperienceInterventionParent.Localization).Hooks.useLocalization
-local determineToastDuration = require(InExperienceInterventionParent.InterventionShared).Utils.determineToastDuration
 
-function ChatTimeoutToast(t1: {[any]: any}) -- line: 21
-	-- upvalues: React (copy), useLocalization (copy), Constants (copy), determineToastDuration (copy), ChatInterventionGenericToast (copy), InExperienceInterventionAnalytics (copy)
-	local v10, v11 = React.useState(0)
-	local v12 = useLocalization({
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local InterventionShared2 = require(parent.InterventionShared)
+local determineToastDuration = InterventionShared2.Utils.determineToastDuration
+
+function ChatTimeoutToast(p)
+	local state, setState = React.useState(0)
+
+	local v = useLocalization({
 		cannotSend1MinText = Constants.localizationKeys.CannotSend1MinText,
 		beRespectfulText = Constants.localizationKeys.BeRespectfulText
 	})
 
-	React.useEffect(function() -- line: 29
-		-- upvalues: t1 (copy), v11 (copy)
-		if t1.endTime then
-			local UnixTimestamp = DateTime.now().UnixTimestamp
-			local v15 = math.ceil((t1.endTime - UnixTimestamp) / 60)
-
-			v11(v15)
+	React.useEffect(function()
+		if p.endTime then
+			local unixTimestamp = DateTime.now().UnixTimestamp
+			setState((math.ceil((p.endTime - unixTimestamp) / 60)))
 		end
-	end, {
-		t1.endTime,
-		t1.dispatchTimestamp
-	})
+	end, { p.endTime, p.dispatchTimestamp })
 
-	local v13 = determineToastDuration(v10)
+	local toastTitle = determineToastDuration(state)
 
 	return React.createElement(ChatInterventionGenericToast, {
-		toastTitle = v13,
-		toastBody = v12.beRespectfulText,
+		toastTitle = toastTitle,
+		toastBody = v.beRespectfulText,
 		interventionType = InExperienceInterventionAnalytics.Constants.InterventionTypes.Timeout,
-		remainingDurationSec = v10,
+		remainingDurationSec = state,
 		toastAppearEventName = InExperienceInterventionAnalytics.Constants.EventTypes.ChatAttemptToastAppeared,
 		toastDismissEventName = InExperienceInterventionAnalytics.Constants.EventTypes.ChatAttemptToastDismissed
 	})

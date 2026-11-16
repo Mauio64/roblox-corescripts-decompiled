@@ -1,8 +1,13 @@
-return {
+local SocialExperienceJoin = {
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
 	["jest.config"] = script["jest.config"],
-	installReducer = require(script.Rodux.installReducer),
-	RoduxKey = require(script.Common.Constants).RODUX_KEY,
-	PurchaseExperienceModal = require(script.Components.PurchaseExperienceModal),
-	UnableToJoinExperienceModal = require(script.Components.UnableToJoinExperienceModal),
-	useJoinUserInExperience = require(script.Hooks.useJoinUserInExperience)
+	installReducer = require(script.Rodux.installReducer)
 }
+local Constants = require(script.Common.Constants)
+SocialExperienceJoin.RoduxKey = Constants.RODUX_KEY
+SocialExperienceJoin.PurchaseExperienceModal = require(script.Components.PurchaseExperienceModal)
+SocialExperienceJoin.UnableToJoinExperienceModal = require(script.Components.UnableToJoinExperienceModal)
+SocialExperienceJoin.useJoinUserInExperience = require(script.Hooks.useJoinUserInExperience)
+return SocialExperienceJoin

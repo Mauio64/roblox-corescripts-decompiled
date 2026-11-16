@@ -1,3 +1,1 @@
-return {
-	SquadContract = require(script.Squads)
-}
+return { SquadContract = require(script.Squads) }

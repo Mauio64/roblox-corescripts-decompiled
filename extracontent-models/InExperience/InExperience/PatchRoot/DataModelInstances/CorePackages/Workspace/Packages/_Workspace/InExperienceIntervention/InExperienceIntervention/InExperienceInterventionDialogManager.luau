@@ -1,168 +1,190 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
-local React = require(InExperienceInterventionParent.React)
+local parent = InExperienceIntervention.Parent
+local React = require(parent.React)
+
 local ChatNudgeCustomDialog = require(InExperienceIntervention.Components.ChatNudgeCustomDialog)
 local ChatNudgeCustomDialogV2 = require(InExperienceIntervention.Components.ChatNudgeCustomDialogV2)
 local ChatTimeoutCustomDialog = require(InExperienceIntervention.Components.ChatTimeoutCustomDialog)
 local ChatNudgeToast = require(InExperienceIntervention.Components.ChatNudgeToast)
 local ChatTimeoutToast = require(InExperienceIntervention.Components.ChatTimeoutToast)
 local ChatTimeoutCustomDialogV2 = require(InExperienceIntervention.Components.ChatTimeoutCustomDialogV2)
-local PartyChatNudgeCustomDialog = require(InExperienceInterventionParent.InterventionShared).Components.PartyChatNudgeCustomDialog
-local PartyChatTimeoutCustomDialog = require(InExperienceInterventionParent.InterventionShared).Components.PartyChatTimeoutCustomDialog
-local TemporaryAvatarKickWarningDialog = require(InExperienceInterventionParent.InterventionShared.TemporaryAvatarKickWarningDialog)
-local UniversalFeatureRestrictionDialog = require(InExperienceInterventionParent.InterventionShared).Components.UniversalFeatureRestrictionDialog
-local CursorProvider = require(InExperienceInterventionParent.UIBlox).App.SelectionCursor.CursorProvider
-local ReactFocusNavigation = require(InExperienceInterventionParent.ReactFocusNavigation)
-local v16 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
-local Provider = require(InExperienceInterventionParent.FocusNavigationUtils).FocusNavigableSurfaceRegistry.Provider
-local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
+local DictationSafetyReminderToast = require(InExperienceIntervention.Components.DictationSafetyReminderToast)
+local InterventionShared = require(parent.InterventionShared)
+local PartyChatNudgeCustomDialog = InterventionShared.Components.PartyChatNudgeCustomDialog
+local InterventionShared2 = require(parent.InterventionShared)
+local PartyChatTimeoutCustomDialog = InterventionShared2.Components.PartyChatTimeoutCustomDialog
 
+local InterventionShared3 = require(parent.InterventionShared)
+local UniversalFeatureRestrictionDialog = InterventionShared3.Components.UniversalFeatureRestrictionDialog
+
+local UIBlox = require(parent.UIBlox)
+local CursorProvider = UIBlox.App.SelectionCursor.CursorProvider
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+
+local focusNavigationService = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Provider = FocusNavigationUtils.FocusNavigableSurfaceRegistry.Provider
+
+local InterventionShared4 = require(parent.InterventionShared)
+local Constants = InterventionShared4.Utils.Constants
 require(InExperienceIntervention.Utils.Types)
+local reportChatSuspensionDialogVisibility = require(InExperienceIntervention.Utils.reportChatSuspensionDialogVisibility)
 
-local GetFFlagGameJoinTimeoutChatAttemptEnabled = require(InExperienceInterventionParent.SharedFlags).GetFFlagGameJoinTimeoutChatAttemptEnabled
-local FFlagTemporaryAvatarKickWarningDialog = require(InExperienceInterventionParent.InterventionShared.FFlagTemporaryAvatarKickWarningDialog)
-local FFlagUniversalFeatureRestrictionReceivers = require(InExperienceInterventionParent.SharedFlags).FFlagUniversalFeatureRestrictionReceivers
-local EngineFeature = game:GetEngineFeature("SSUIMetaLua")
-local v23 = React.memo(function(p1) -- line: 39
-	-- upvalues: React (copy), ReactFocusNavigation (copy), v16 (copy), Provider (copy), CursorProvider (copy)
-	return React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
-		value = v16
-	}, {
-		RegistryProvider = React.createElement(Provider, nil, {
-			CursorProvider = React.createElement(CursorProvider, {}, p1.children)
-		})
-	})
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagGameJoinTimeoutChatAttemptEnabled = SharedFlags.GetFFlagGameJoinTimeoutChatAttemptEnabled
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagExpChatDictationContinuousSafetyReminder = SharedFlags2.FFlagExpChatDictationContinuousSafetyReminder
+
+local memo = React.memo(function(p)
+	return React.createElement(
+		ReactFocusNavigation.FocusNavigationContext.Provider,
+		{ value = focusNavigationService },
+		{
+			RegistryProvider = React.createElement(Provider, nil, {
+				CursorProvider = React.createElement(CursorProvider, {}, p.children)
+			})
+		}
+	)
 end)
 
-function InExperienceInterventionDialogManager(t1: {[any]: any}) -- line: 49
-	-- upvalues: React (copy), Constants (copy), FFlagUniversalFeatureRestrictionReceivers (copy), FFlagTemporaryAvatarKickWarningDialog (copy), EngineFeature (copy), ChatNudgeCustomDialog (copy), ChatTimeoutCustomDialog (copy), ChatNudgeToast (copy), ChatTimeoutToast (copy), GetFFlagGameJoinTimeoutChatAttemptEnabled (copy), v23 (copy), PartyChatNudgeCustomDialog (copy), PartyChatTimeoutCustomDialog (copy), ChatTimeoutCustomDialogV2 (copy), ChatNudgeCustomDialogV2 (copy), UniversalFeatureRestrictionDialog (copy), TemporaryAvatarKickWarningDialog (copy)
-	local v26 = React.useCallback(function() -- line: 50
-		-- upvalues: t1 (copy), Constants (copy)
-		t1.uiStateDispatch({
-			isShown = false,
+function InExperienceInterventionDialogManager(p)
+	local onDismiss = React.useCallback(function()
+		p.uiStateDispatch({
 			type = Constants.UIStateActions.ToggleNotificationDialog,
-			treatmentType = Constants.TreatmentType.None
+			treatmentType = Constants.TreatmentType.None,
+			isShown = false
 		})
-	end, { t1.uiStateDispatch })
-	local uiState = t1.uiState
+	end, { p.uiStateDispatch })
+
+	local uiState = p.uiState
 	local treatmentType = uiState.treatmentType
 	local detail = uiState.detail
-	local v30 = if not FFlagUniversalFeatureRestrictionReceivers or not detail then nil else detail.options
-	local v31 = if not FFlagTemporaryAvatarKickWarningDialog or not detail then nil else detail.extras
+	local options
 
-	React.useEffect(function() -- line: 65
-		-- upvalues: EngineFeature (copy), uiState (copy)
-		if EngineFeature then
-			pcall(function() -- line: 67
-				-- upvalues: uiState (copy)
-				local SafetyService = game:GetService("SafetyService")
+	if detail then
+		options = detail.options
+	end
 
-				if uiState.isShown then
-					SafetyService:ReportChatSuspensionDialogOpen()
+	local v = uiState.isShown
 
-					return
-				end
+	if
+		FFlagExpChatDictationContinuousSafetyReminder
+		and treatmentType == Constants.TreatmentType.DictationSafetyReminderToast
+	then
+		v = false
+	end
 
-				SafetyService:ReportChatSuspensionDialogClose()
-			end)
-		end
-	end, { uiState.isShown })
+	React.useEffect(function()
+		reportChatSuspensionDialogVisibility(v)
+	end, { v })
 
-	if uiState.isShown then
-		if treatmentType == Constants.TreatmentType.ChatNudgeDialog then
-			return React.createElement(ChatNudgeCustomDialog, {
-				violatingChatLine = detail.evidence,
-				onDismiss = v26,
-				eventId = detail.decisionEventId
-			})
-		end
+	if not uiState.isShown then
+		return nil
+	end
 
-		if treatmentType == Constants.TreatmentType.ChatTimeoutDialog and (detail.timeoutDurationSeconds or 0) > 0 then
-			return React.createElement(ChatTimeoutCustomDialog, {
-				duration = detail.timeoutDurationSeconds,
-				onDismiss = v26,
+	if treatmentType == Constants.TreatmentType.ChatNudgeDialog then
+		return React.createElement(ChatNudgeCustomDialog, {
+			violatingChatLine = detail.evidence,
+			onDismiss = onDismiss,
+			eventId = detail.decisionEventId
+		})
+	end
+
+	if treatmentType == Constants.TreatmentType.ChatTimeoutDialog and (detail.timeoutDurationSeconds or 0) > 0 then
+		return React.createElement(ChatTimeoutCustomDialog, {
+			duration = detail.timeoutDurationSeconds,
+			onDismiss = onDismiss,
+			eventId = detail.decisionEventId,
+			violatingChatLine = detail.evidence
+		})
+	end
+
+	if treatmentType == Constants.TreatmentType.ChatNudgeToast then
+		return React.createElement(ChatNudgeToast, {
+			violatingChatLine = detail.evidence,
+			eventId = detail.decisionEventId
+		})
+	end
+
+	if treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt then
+		return React.createElement(ChatTimeoutToast, {
+			endTime = uiState.endTime,
+			treatmentType = Constants.TreatmentType.ChatTimeoutChatAttempt,
+			dispatchTimestamp = uiState.dispatchTimestamp
+		})
+	end
+
+	if GetFFlagGameJoinTimeoutChatAttemptEnabled() and treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin then
+		return React.createElement(ChatTimeoutToast, {
+			endTime = uiState.endTime,
+			treatmentType = Constants.TreatmentType.ChatTimeoutGameJoin,
+			dispatchTimestamp = uiState.dispatchTimestamp
+		})
+	end
+
+	if treatmentType == Constants.TreatmentType.PartyChatNudgeDialog then
+		return React.createElement(memo, {}, {
+			dialog = React.createElement(PartyChatNudgeCustomDialog, {
+				evidence = detail.evidence,
 				eventId = detail.decisionEventId,
-				violatingChatLine = detail.evidence
+				onDismiss = onDismiss
 			})
-		end
+		})
+	end
 
-		if treatmentType == Constants.TreatmentType.ChatNudgeToast then
-			return React.createElement(ChatNudgeToast, {
-				violatingChatLine = detail.evidence,
-				eventId = detail.decisionEventId
-			})
-		end
-
-		if treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt then
-			return React.createElement(ChatTimeoutToast, {
-				endTime = uiState.endTime,
-				treatmentType = Constants.TreatmentType.ChatTimeoutChatAttempt,
-				dispatchTimestamp = uiState.dispatchTimestamp
-			})
-		end
-
-		if GetFFlagGameJoinTimeoutChatAttemptEnabled() and treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin then
-			return React.createElement(ChatTimeoutToast, {
-				endTime = uiState.endTime,
-				treatmentType = Constants.TreatmentType.ChatTimeoutGameJoin,
-				dispatchTimestamp = uiState.dispatchTimestamp
-			})
-		end
-
-		if treatmentType == Constants.TreatmentType.PartyChatNudgeDialog then
-			return React.createElement(v23, {}, {
-				dialog = React.createElement(PartyChatNudgeCustomDialog, {
-					evidence = detail.evidence,
-					eventId = detail.decisionEventId,
-					onDismiss = v26
-				})
-			})
-		end
-
-		if treatmentType == Constants.TreatmentType.PartyChatTimeoutDialog then
-			return React.createElement(v23, {}, { React.createElement(PartyChatTimeoutCustomDialog, {
+	if treatmentType == Constants.TreatmentType.PartyChatTimeoutDialog then
+		return React.createElement(memo, {}, { React.createElement(PartyChatTimeoutCustomDialog, {
 				endTimestamp = uiState.endTime,
 				evidence = detail.evidence,
 				eventId = detail.decisionEventId,
 				durationForAnalytics = detail.timeoutDurationSeconds,
-				onDismiss = v26
+				onDismiss = onDismiss
 			}) })
-		end
+	end
 
-		if treatmentType == Constants.TreatmentType.ChatTimeoutDialogV2 and detail.moderationDetail then
-			return React.createElement(v23, {}, { React.createElement(ChatTimeoutCustomDialogV2, {
-				onDismiss = v26,
+	if treatmentType == Constants.TreatmentType.ChatTimeoutDialogV2 and detail.moderationDetail then
+		return React.createElement(memo, {}, {
+			React.createElement(ChatTimeoutCustomDialogV2, {
+				onDismiss = onDismiss,
 				moderationDetail = detail.moderationDetail
-			}) })
-		end
+			})
+		})
+	end
 
-		if treatmentType == Constants.TreatmentType.ChatNudgeDialogV2 and detail.moderationDetail then
-			return React.createElement(v23, {}, { React.createElement(ChatNudgeCustomDialogV2, {
-				onDismiss = v26,
+	if treatmentType == Constants.TreatmentType.ChatNudgeDialogV2 and detail.moderationDetail then
+		return React.createElement(memo, {}, {
+			React.createElement(ChatNudgeCustomDialogV2, {
+				onDismiss = onDismiss,
 				moderationDetail = detail.moderationDetail
-			}) })
-		end
+			})
+		})
+	end
 
-		if FFlagUniversalFeatureRestrictionReceivers and treatmentType == Constants.TreatmentType.UniversalFeatureRestriction and detail.moderationDetail then
-			return React.createElement(v23, {}, { React.createElement(UniversalFeatureRestrictionDialog, {
-				onDismiss = v26,
+	if treatmentType == Constants.TreatmentType.UniversalFeatureRestriction and detail.moderationDetail then
+		return React.createElement(memo, {}, {
+			UniversalFeatureRestrictionDialog = React.createElement(UniversalFeatureRestrictionDialog, {
+				onDismiss = onDismiss,
 				moderationDetail = detail.moderationDetail,
 				abuseVector = detail.abuseVector,
-				onDismissCallback = v30 and v30.onDismiss,
-				titleOverride = v30 and v30.titleOverride,
-				bodyOverride = v30 and v30.bodyOverride,
-				onAppeal = v30 and v30.onAppeal
-			}) })
-		end
+				onDismissCallback = options and options.onDismiss,
+				titleOverride = options and options.titleOverride,
+				bodyOverride = options and options.bodyOverride,
+				onAppeal = options and options.onAppeal,
+				onShownCallback = options and options.onShown,
+				onAcknowledgementSuccess = options and options.onAcknowledgementSuccess,
+				onAcknowledgementFailure = options and options.onAcknowledgementFailure,
+				onClosedCallback = detail.onClosed,
+				analyticsEventId = options and options.analyticsEventId
+			})
+		})
+	end
 
-		if FFlagTemporaryAvatarKickWarningDialog and treatmentType == Constants.TreatmentType.TemporaryAvatarKickWarning then
-			return React.createElement(v23, {}, { React.createElement(TemporaryAvatarKickWarningDialog, {
-				avatarEntityId = v31 and v31.avatarEntityId,
-				violationType = v31 and v31.violationType,
-				placeId = v31 and v31.placeId,
-				onDismiss = v26
-			}) })
-		end
+	if
+		FFlagExpChatDictationContinuousSafetyReminder
+		and treatmentType == Constants.TreatmentType.DictationSafetyReminderToast
+	then
+		return React.createElement(DictationSafetyReminderToast)
 	end
 
 	return nil

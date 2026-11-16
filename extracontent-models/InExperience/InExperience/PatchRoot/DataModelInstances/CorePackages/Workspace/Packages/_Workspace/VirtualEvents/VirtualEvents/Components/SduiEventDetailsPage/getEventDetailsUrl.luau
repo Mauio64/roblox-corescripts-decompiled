@@ -1,16 +1,26 @@
-local Parent = script:FindFirstAncestor("VirtualEvents").Parent
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
-local Url = require(Parent.Http).Url
-local v4 = UrlBuilder.new({
-	path = "virtual-events/v1beta1/event-details-page",
-	base = Url.APIS_URL
-})
+local parent = script:FindFirstAncestor("VirtualEvents").Parent
 
-local function getEventDetailsUrl(s1: string) -- line: 12
-	-- upvalues: UrlBuilder (copy), v4 (copy)
-	return (UrlBuilder.addQueryString(v4(), {
-		eventId = s1
-	}))
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local Http = require(parent.Http)
+local Url = Http.Url
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local SduiCapabilities = SduiSharedUtilities.SduiCapabilities
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiCapabilityBindings = SharedFlags.FFlagSduiCapabilityBindings
+
+local v = urlBuilder.new({ base = Url.APIS_URL, path = "virtual-events/v1beta1/event-details-page" })
+
+local function getEventDetailsUrl(eventId: string)
+	local v2 = { eventId = eventId }
+
+	if FFlagSduiCapabilityBindings then
+		require(parent.ServiceContractsProto)
+
+		SduiCapabilities.addToQueryParams(v2, { "CAPABILITY_SUPPORTS_EVENT_RSVP_FACE_PILE" })
+	end
+
+	return urlBuilder.addQueryString(v(), v2)
 end
 
 return getEventDetailsUrl

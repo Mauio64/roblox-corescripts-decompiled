@@ -1,41 +1,43 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local getFFlagUGCValidateCurveAnimMinTimeFix = require(ParentParent.flags.getFFlagUGCValidateCurveAnimMinTimeFix)
-local GetFStringUGCValidateCurveAnimationMinLength = require(ParentParent.flags.GetFStringUGCValidateCurveAnimationMinLength)
-local GetFStringUGCValidationMaxAnimationLength = require(ParentParent.flags.GetFStringUGCValidationMaxAnimationLength)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
-}
+local GetFStringUGCValidateCurveAnimationMinLength = require(parent.flags.GetFStringUGCValidateCurveAnimationMinLength)
+local GetFStringUGCValidationMaxAnimationLength = require(parent.flags.GetFStringUGCValidationMaxAnimationLength)
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
+local getEngineFeatureEngineUGCValidateEmoteAnimationExport = require(parent.flags.getEngineFeatureEngineUGCValidateEmoteAnimationExport)
+local getFFlagUGCValidateAQEmoteDuration = require(parent.flags.getFFlagUGCValidateAQEmoteDuration)
+
+local CurveAnimLengthBounded = {}
+
+CurveAnimLengthBounded.categories = {}
+
+if not (getEngineFeatureEngineUGCValidateEmoteAnimationExport() and getFFlagUGCValidateAQEmoteDuration()) then
+	table.insert(CurveAnimLengthBounded.categories, ValidationEnums.UploadCategory.EMOTE_ANIMATION)
 end
 
-t1.requiredData = {
+table.insert(CurveAnimLengthBounded.categories, ValidationEnums.UploadCategory.ANIMATION)
+CurveAnimLengthBounded.requiredData = {
 	ValidationEnums.SharedDataMember.curveAnimations,
 	ValidationEnums.SharedDataMember.curveAnimComputedFrames
 }
-t1.fflag = getFFlagUGCValidateMigrateCurveAnim
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 
-function t1.run(p1, p2) -- line: 27
-	-- upvalues: getFFlagUGCValidateCurveAnimMinTimeFix (copy), GetFStringUGCValidateCurveAnimationMinLength (copy), GetFStringUGCValidationMaxAnimationLength (copy), ErrorSourceStrings (copy)
-	local animLength = p2.curveAnimComputedFrames.animLength
-	local v13 = not getFFlagUGCValidateCurveAnimMinTimeFix() and 0 or GetFStringUGCValidateCurveAnimationMinLength.asNumber()
+CurveAnimLengthBounded.expectedFailures = {}
+CurveAnimLengthBounded.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
 
-	if animLength <= v13 or animLength > GetFStringUGCValidationMaxAnimationLength.asNumber() then
-		p1:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidLength, {
-			minLength = tostring(v13),
+function CurveAnimLengthBounded.run(object, p)
+	local animLength = p.curveAnimComputedFrames.animLength
+
+	local number = GetFStringUGCValidateCurveAnimationMinLength.asNumber()
+
+	if animLength <= number or GetFStringUGCValidationMaxAnimationLength.asNumber() < animLength then
+		object:fail(ErrorSourceStrings.Keys.CurveAnim_InvalidLength, {
+			minLength = tostring(number),
 			maxLength = GetFStringUGCValidationMaxAnimationLength.asString()
 		})
 	end
 end
 
-return t1
+return CurveAnimLengthBounded

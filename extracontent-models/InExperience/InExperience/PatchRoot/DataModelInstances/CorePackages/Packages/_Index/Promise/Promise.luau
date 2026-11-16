@@ -1,47 +1,45 @@
-local t1 = {
-	__mode = "k"
-}
-local ok, result = pcall(game.DefineFastFlag, game, "ReducePromiseTaskDefer", false)
+local v = { __mode = "k" }
 
-if not ok then
+local success, result = pcall(game.DefineFastFlag, game, "ReducePromiseTaskDefer", false)
+
+if not success then
 	result = false
 end
 
-local function isCallable(p1) -- line: 16
-	if type(p1) == "function" then
+local function isCallable(value): boolean -- 17 equivalent calls inferred from this helper
+	if type(value) == "function" then
 		return true
 	end
 
-	if type(p1) == "table" then
-		local mt = getmetatable(p1)
+	if type(value) == "table" then
+		local metatable = getmetatable(value)
 
-		if mt and type((rawget(mt, "__call"))) == "function" then
+		if metatable and type((rawget(metatable, "__call"))) == "function" then
 			return true
 		end
 	end
 
 	return false
 end
-local function makeEnum(p2, p3) -- line: 34
-	local t2 = {}
 
-	for _, v in ipairs(p3) do
-		t2[v] = v
+local function makeEnum(p, list)
+	local v2 = {}
+
+	for _, item in ipairs(list) do
+		v2[item] = item
 	end
 
-	return (setmetatable(t2, {
-		__index = function(_, p5) -- line: 42
-			-- upvalues: p2 (copy)
-			error(string.format("%s is not in %s!", p5, p2), 2)
+	return (setmetatable(v2, {
+		__index = function(_, p2)
+			error(string.format("%s is not in %s!", p2, p), 2)
 		end,
-		__newindex = function() -- line: 45
-			-- upvalues: p2 (copy)
-			error(string.format("Creating new members in %s is not allowed!", p2), 2)
+		__newindex = function()
+			error(string.format("Creating new members in %s is not allowed!", p), 2)
 		end
 	}))
 end
 
-local t3 = {
+local err = {
 	Kind = makeEnum("Promise.Error.Kind", {
 		"ExecutionError",
 		"AlreadyCancelled",
@@ -50,1878 +48,1158 @@ local t3 = {
 	})
 }
 
-t3.__index = t3
+err.__index = err
 
-function t3.new(p6, p7) -- line: 70
-	-- upvalues: t3 (ref)
-	local v30 = p6 or {}
-
+function err.new(options, parent)
+	local v2 = options or {}
 	return (setmetatable({
-		error = tostring(v30.error) or "[This error has no error text.]",
-		trace = v30.trace,
-		context = v30.context,
-		kind = v30.kind,
-		parent = p7,
+		error = tostring(v2.error) or "[This error has no error text.]",
+		trace = v2.trace,
+		context = v2.context,
+		kind = v2.kind,
+		parent = parent,
 		createdTick = os.clock(),
 		createdTrace = debug.traceback()
-	}, t3))
+	}, err))
 end
-function t3.is(p8) -- line: 83
-	if type(p8) == "table" then
-		local mt = getmetatable(p8)
 
-		if type(mt) == "table" then
-			return rawget(p8, "error") ~= nil and type((rawget(mt, "extend"))) == "function"
-		end
+function err.is(p): boolean
+	if type(p) ~= "table" then
+		return false
+	end
+
+	local metatable = getmetatable(p)
+
+	if type(metatable) == "table" then
+		return rawget(p, "error") ~= nil and type((rawget(metatable, "extend"))) == "function"
 	end
 
 	return false
 end
-function t3.isKind(p9, p10) -- line: 95
-	-- upvalues: t3 (ref)
-	assert(p10 ~= nil, "Argument #2 to Promise.Error.isKind must not be nil")
 
-	return t3.is(p9) and p10 == p9.kind
+function err.isKind(p, p2)
+	assert(p2 ~= nil, "Argument #2 to Promise.Error.isKind must not be nil")
+
+	return err.is(p) and p.kind == p2
 end
-function t3.extend(p11, p12) -- line: 101
-	-- upvalues: t3 (ref)
-	local v37 = p12 or {}
 
-	v37.kind = v37.kind or p11.kind
+function err:extend(options)
+	local v2 = options or {}
 
-	return t3.new(v37, p11)
+	v2.kind = v2.kind or self.kind
+
+	return err.new(v2, self)
 end
-function t3.getErrorChain(p13) -- line: 109
-	local t4 = { p13 }
 
-	while t4[#t4].parent do
-		table.insert(t4, t4[#t4].parent)
+function err:getErrorChain()
+	local parents = { self }
+
+	while parents[#parents].parent do
+		table.insert(parents, parents[#parents].parent)
 	end
 
-	return t4
+	return parents
 end
-function t3.__tostring(p14) -- line: 119
-	local t5 = { string.format("-- Promise.Error(%s) --", p14.kind or "?") }
 
-	for _, v in ipairs(p14:getErrorChain()) do
-		table.insert(t5, table.concat({
-			v.trace or v.error,
-			v.context
-		}, "\n"))
+function err:__tostring()
+	local values = { string.format("-- Promise.Error(%s) --", self.kind or "?") }
+
+	for _, v2 in ipairs(self:getErrorChain()) do
+		table.insert(values, table.concat({ v2.trace or v2.error, v2.context }, "\n"))
 	end
 
-	return table.concat(t5, "\n")
+	return table.concat(values, "\n")
 end
 
-local function pack(...) -- line: 143
+local function pack(...)
 	return select("#", ...), { ... }
 end
-local function packResult(p15, ...) -- line: 150
-	return p15, select("#", ...), { ... }
-end
-local function makeErrorHandler(p16) -- line: 154
-	-- upvalues: t3 (ref)
-	assert(p16 ~= nil, "traceback is nil")
 
-	return function(p17) -- line: 157
-		-- upvalues: t3 (ref), p16 (copy)
-		if type(p17) == "table" then
-			return p17
+local function packResult(p, ...)
+	return p, select("#", ...), { ... }
+end
+
+local function makeErrorHandler(p) -- 1 equivalent call inferred from this helper
+	assert(p ~= nil, "traceback is nil")
+
+	return function(err2)
+		if type(err2) == "table" then
+			return err2
 		end
 
-		return t3.new({
-			error = p17,
-			kind = t3.Kind.ExecutionError,
-			trace = debug.traceback(tostring(p17), 2),
-			context = "Promise created at:\n\n" .. p16
+		return err.new({
+			error = err2,
+			kind = err.Kind.ExecutionError,
+			trace = debug.traceback(tostring(err2), 2),
+			context = "Promise created at:\n\n" .. p
 		})
 	end
 end
-local function runExecutor(p18, p19, ...) -- line: 177
-	-- upvalues: packResult (copy), t3 (ref)
-	local v48 = packResult
-	local _xpcall = xpcall
 
-	assert(p18 ~= nil, "traceback is nil")
-
-	return v48(_xpcall(p19, function(p20) -- line: 157
-		-- upvalues: t3 (ref), p18 (copy)
-		if type(p20) == "table" then
-			return p20
-		end
-
-		return t3.new({
-			error = p20,
-			kind = t3.Kind.ExecutionError,
-			trace = debug.traceback(tostring(p20), 2),
-			context = "Promise created at:\n\n" .. p18
-		})
-	end, ...))
+local function runExecutor(p, callback, ...)
+	return packResult(xpcall(callback, makeErrorHandler(p), ...)) -- inferred equivalent call
 end
-local function createAdvancer(p21, p22, p23, p24) -- line: 185
-	-- upvalues: runExecutor (copy)
-	return function(...) -- line: 186
-		-- upvalues: runExecutor (copy), p21 (copy), p22 (copy), p23 (copy), p24 (copy)
-		local v252, v253, v254 = runExecutor(p21, p22, ...)
 
-		if v252 then
-			p23(unpack(v254, 1, v253))
+local function createAdvancer(p, p2, callback, callback2) -- 3 equivalent calls inferred from this helper
+	return function(...)
+		local v2, v3, v4 = runExecutor(p, p2, ...)
 
-			return
+		if v2 then
+			callback(unpack(v4, 1, v3))
+		else
+			callback2(v4[1])
 		end
-
-		p24(v254[1])
 	end
 end
-local function isEmpty(p25) -- line: 197
-	return next(p25) == nil
+
+local function isEmpty(queuedReject): boolean -- 1 equivalent call inferred from this helper
+	return next(queuedReject) == nil
 end
 
-local t6 = {
-	Error = t3,
-	Status = makeEnum("Promise.Status", {
-		"Started",
-		"Resolved",
-		"Rejected",
-		"Cancelled"
-	}),
+local Promise = {
+	Error = err,
+	Status = makeEnum("Promise.Status", { "Started", "Resolved", "Rejected", "Cancelled" }),
 	_getTime = os.clock,
-	_timeEvent = game:GetService("RunService").Heartbeat,
-	_unhandledRejectionCallbacks = {},
-	prototype = {}
+	_timeEvent = 0,
+	_unhandledRejectionCallbacks = 0
 }
+local RunService = game:GetService("RunService")
+Promise._timeEvent = RunService.Heartbeat
+Promise._unhandledRejectionCallbacks = {}
 
-t6.__index = t6.prototype
+Promise.prototype = {}
+Promise.__index = Promise.prototype
 
-function t6._new(p26, p27, p28) -- line: 236
-	-- upvalues: t6 (copy), t1 (copy), runExecutor (copy)
-	if p28 ~= nil and not t6.is(p28) then
+function Promise._new(source, p, parent)
+	if parent ~= nil and not Promise.is(parent) then
 		error("Argument #2 to Promise.new must be a promise or nil", 2)
 	end
 
-	local t7 = {
+	local v2 = {
 		_thread = nil,
+		_source = source,
+		_status = Promise.Status.Started,
 		_values = nil,
 		_valuesLength = -1,
 		_unhandledRejection = true,
-		_cancellationHook = nil,
-		_source = p26,
-		_status = t6.Status.Started,
 		_queuedResolve = {},
 		_queuedReject = {},
 		_queuedFinally = {},
-		_parent = p28,
-		_consumers = setmetatable({}, t1)
+		_cancellationHook = nil,
+		_parent = parent,
+		_consumers = setmetatable({}, v)
 	}
 
-	if p28 and p28._status == t6.Status.Started then
-		p28._consumers[t7] = true
+	if parent and parent._status == Promise.Status.Started then
+		parent._consumers[v2] = true
 	end
 
-	setmetatable(t7, t6)
+	setmetatable(v2, Promise)
 
-	local function resolve(...) -- line: 284
-		-- upvalues: t7 (copy)
-		t7:_resolve(...)
+	local function resolve(...)
+		v2:_resolve(...)
 	end
-	local function reject(...) -- line: 288
-		-- upvalues: t7 (copy)
-		t7:_reject(...)
+
+	local function reject(...)
+		v2:_reject(...)
 	end
-	local function onCancel(p29) -- line: 292
-		-- upvalues: t7 (copy), t6 (copy)
-		if p29 then
-			if t7._status == t6.Status.Cancelled then
-				p29()
+
+	local function onCancel(cancellationHook): boolean
+		if cancellationHook then
+			if v2._status == Promise.Status.Cancelled then
+				cancellationHook()
 			else
-				t7._cancellationHook = p29
+				v2._cancellationHook = cancellationHook
 			end
 		end
 
-		return t7._status == t6.Status.Cancelled
+		return v2._status == Promise.Status.Cancelled
 	end
 
-	t7._thread = coroutine.create(function() -- line: 304
-		-- upvalues: runExecutor (copy), t7 (copy), p27 (copy), resolve (copy), reject (copy), onCancel (copy)
-		local v256, _, v258 = runExecutor(t7._source, p27, resolve, reject, onCancel)
+	v2._thread = coroutine.create(function()
+		local v3, _, v4 = runExecutor(v2._source, p, resolve, reject, onCancel)
 
-		if not v256 then
-			reject(v258[1])
+		if not v3 then
+			reject(v4[1])
 		end
 	end)
-	task.spawn(t7._thread)
 
-	return t7
-end
-function t6.new(p30) -- line: 355
-	-- upvalues: t6 (copy)
-	return t6._new(debug.traceback(nil, 2), p30)
-end
-function t6.__tostring(p31) -- line: 359
-	return string.format("Promise(%s)", p31._status)
-end
-function t6.defer(p32) -- line: 381
-	-- upvalues: t6 (copy), runExecutor (copy)
-	local trace = debug.traceback(nil, 2)
+	task.spawn(v2._thread)
 
-	return (t6._new(trace, function(p33, p34, p35) -- line: 384
-		-- upvalues: t6 (copy), runExecutor (copy), trace (copy), p32 (copy)
+	return v2
+end
+
+function Promise.new(p)
+	return Promise._new(debug.traceback(nil, 2), p)
+end
+
+function Promise:__tostring()
+	return string.format("Promise(%s)", self._status)
+end
+
+function Promise.defer(p)
+	local traceback = debug.traceback(nil, 2)
+
+	return (Promise._new(traceback, function(p2, callback, p3)
 		local connection = nil
-
-		connection = t6._timeEvent:Connect(function() -- line: 386
-			-- upvalues: connection (ref), runExecutor (copy), trace (copy), p32 (copy), p33 (copy), p34 (copy), p35 (copy)
+		connection = Promise._timeEvent:Connect(function()
 			connection:Disconnect()
+			local v2, _, v3 = runExecutor(traceback, p, p2, callback, p3)
 
-			local v370, _, v372 = runExecutor(trace, p32, p33, p34, p35)
-
-			if not v370 then
-				p34(v372[1])
+			if not v2 then
+				callback(v3[1])
 			end
 		end)
 	end))
 end
 
-t6.async = t6.defer
+Promise.async = Promise.defer
 
-function t6.resolve(...) -- line: 424
-	-- upvalues: pack (copy), t6 (copy)
-	local v66, v67 = pack(...)
-
-	return t6._new(debug.traceback(nil, 2), function(p36) -- line: 426
-		-- upvalues: v67 (copy), v66 (copy)
-		p36(unpack(v67, 1, v66))
+function Promise.resolve(...)
+	local v2, v3 = pack(...)
+	return Promise._new(debug.traceback(nil, 2), function(callback)
+		callback(unpack(v3, 1, v2))
 	end)
 end
-function t6.reject(...) -- line: 441
-	-- upvalues: pack (copy), t6 (copy)
-	local v68, v69 = pack(...)
 
-	return t6._new(debug.traceback(nil, 2), function(_, p38) -- line: 443
-		-- upvalues: v69 (copy), v68 (copy)
-		p38(unpack(v69, 1, v68))
+function Promise.reject(...)
+	local v2, v3 = pack(...)
+	return Promise._new(debug.traceback(nil, 2), function(_, callback)
+		callback(unpack(v3, 1, v2))
 	end)
 end
-function t6._try(p39, p40, ...) -- line: 452
-	-- upvalues: pack (copy), t6 (copy)
-	local v72, v73 = pack(...)
 
-	return t6._new(p39, function(p41) -- line: 455
-		-- upvalues: p40 (copy), v73 (copy), v72 (copy)
-		p41(p40(unpack(v73, 1, v72)))
+function Promise._try(p, callback, ...)
+	local v2, v3 = pack(...)
+
+	return Promise._new(p, function(callback2)
+		callback2(callback(unpack(v3, 1, v2)))
 	end)
 end
-function t6.try(p42, ...) -- line: 483
-	-- upvalues: t6 (copy)
-	return t6._try(debug.traceback(nil, 2), p42, ...)
+
+function Promise.try(p, ...)
+	return Promise._try(debug.traceback(nil, 2), p, ...)
 end
-function t6._all(p43, p44, p45) -- line: 492
-	-- upvalues: t6 (copy)
-	if type(p44) ~= "table" then
+
+function Promise._all(p, list, p2)
+	if type(list) ~= "table" then
 		error(string.format("Please pass a list of promises to %s", "Promise.all"), 3)
 	end
 
-	for k, v in pairs(p44) do
-		if not t6.is(v) then
+	for k, item in pairs(list) do
+		if not Promise.is(item) then
 			error(string.format("Non-promise value passed into %s at index %s", "Promise.all", (tostring(k))), 3)
 		end
 	end
 
-	if #p44 == 0 or p45 == 0 then
-		return t6.resolve({})
+	if #list == 0 or p2 == 0 then
+		return Promise.resolve({})
 	end
 
-	return t6._new(p43, function(p46, p47, p48) -- line: 510
-		-- upvalues: p45 (copy), p44 (copy)
-		local t8 = {}
-		local t9 = {}
-		local n1 = 0
-		local n2 = 0
-		local u274 = false
+	return Promise._new(p, function(callback, callback2, callback3)
+		local v2 = {}
+		local v3 = {}
 
-		local function cancel() -- line: 521
-			-- upvalues: t9 (copy)
-			for _, v in ipairs(t9) do
-				v:cancel()
+		local count = 0
+		local count2 = 0
+		local flag = false
+
+		local function cancel() -- 3 equivalent calls inferred from this helper
+			for _, v4 in ipairs(v3) do
+				v4:cancel()
 			end
 		end
-		local function resolveOne(p49, ...) -- line: 528
-			-- upvalues: u274 (ref), n1 (ref), p45 (copy), t8 (copy), p44 (copy), p46 (copy), t9 (copy)
-			if u274 then
+
+		local function resolveOne(i, ...)
+			if flag then
 				return
 			end
 
-			n1 += 1
+			count += 1
 
-			if p45 == nil then
-				t8[p49] = ...
+			if p2 == nil then
+				v2[i] = ...
 			else
-				t8[n1] = ...
+				v2[count] = ...
 			end
 
-			if n1 >= (p45 or #p44) then
-				u274 = true
-				p46(t8)
-
-				for _, v in ipairs(t9) do
-					v:cancel()
-				end
+			if count >= (p2 or #list) then
+				flag = true
+				callback(v2)
+				cancel() -- inferred equivalent call
 			end
 		end
 
-		p48(cancel)
+		callback3(cancel)
 
-		for i, v in ipairs(p44) do
-			t9[i] = v:andThen(function(...) -- line: 553
-				-- upvalues: resolveOne (copy), i (copy)
+		for i, item in ipairs(list) do
+			v3[i] = item:andThen(function(...)
 				resolveOne(i, ...)
-			end, function(...) -- line: 555
-				-- upvalues: n2 (ref), p45 (copy), p44 (copy), t9 (copy), u274 (ref), p47 (copy)
-				n2 += 1
+			end, function(...)
+				count2 += 1
 
-				if p45 == nil or #p44 - n2 < p45 then
-					for _, v2 in ipairs(t9) do
-						v2:cancel()
-					end
+				if p2 == nil or #list - count2 < p2 then
+					cancel() -- inferred equivalent call
+					flag = true
 
-					u274 = true
-					p47(...)
+					callback2(...)
 				end
 			end)
 		end
 
-		if u274 then
-			for _, v in ipairs(t9) do
-				v:cancel()
-			end
+		if flag then
+			cancel() -- inferred equivalent call
 		end
 	end)
 end
-function t6.all(...) -- line: 597
-	-- upvalues: t6 (copy)
-	local t10 = { ... }
 
-	if type(t10[1]) == "table" and not t6.is(t10[1]) then
-		t10 = t10[1]
+function Promise.all(...)
+	local v2 = { ... }
+
+	if type(v2[1]) == "table" and not Promise.is(v2[1]) then
+		v2 = v2[1]
 	end
 
-	return t6._all(debug.traceback(nil, 2), t10)
+	return Promise._all(debug.traceback(nil, 2), v2)
 end
-function t6.fold(p50, p51, p52) -- line: 634
-	-- upvalues: t6 (copy)
-	assert(type(p50) == "table", "Bad argument #1 to Promise.fold: must be a table")
 
-	local g85 = nil
-	local mt = nil
-	local v84 = nil
+function Promise.fold(p, callback, p2)
+	assert(type(p) == "table", "Bad argument #1 to Promise.fold: must be a table")
+	assert(isCallable(callback), "Bad argument #2 to Promise.fold: must be a function") -- inferred equivalent call
 
-	if type(p51) == "function" then
-		v84 = true
-		g85 = true
-	end
-
-	repeat
-		if g85 or (g85 or type(p51) == "table") then
-			if not g85 then
-				if not g85 then
-					mt = getmetatable(p51)
-				end
-			end
-
-			if g85 or (g85 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g85 then
-					if not g85 then
-						v84 = true
-					end
-				end
-
-				g85 = false
-				assert(v84, "Bad argument #2 to Promise.fold: must be a function")
-
-				local u87 = t6.resolve(p52)
-
-				return t6.each(p50, function(p53, p54) -- line: 639
-					-- upvalues: u87 (ref), p51 (copy)
-					u87 = u87:andThen(function(p55) -- line: 640
-						-- upvalues: p51 (copy), p53 (copy), p54 (copy)
-						return p51(p55, p53, p54)
-					end)
-				end):andThen(function() -- line: 643
-					-- upvalues: u87 (ref)
-					return u87
-				end)
-			end
-		end
-
-		v84 = false
-		g85 = true
-	until not g85
-end
-function t6.some(p56, p57) -- line: 667
-	-- upvalues: t6 (copy)
-	assert(type(p57) == "number", "Bad argument #2 to Promise.some: must be a number")
-
-	return t6._all(debug.traceback(nil, 2), p56, p57)
-end
-function t6.any(p58) -- line: 691
-	-- upvalues: t6 (copy)
-	return t6._all(debug.traceback(nil, 2), p58, 1):andThen(function(p59) -- line: 692
-		return p59[1]
+	local resolved = Promise.resolve(p2)
+	return Promise.each(p, function(p3, p4)
+		resolved = resolved:andThen(function(p5)
+			return callback(p5, p3, p4)
+		end)
+	end):andThen(function()
+		return resolved
 	end)
 end
-function t6.allSettled(p60) -- line: 713
-	-- upvalues: t6 (copy)
-	if type(p60) ~= "table" then
+
+function Promise.some(p, value)
+	assert(type(value) == "number", "Bad argument #2 to Promise.some: must be a number")
+
+	return Promise._all(debug.traceback(nil, 2), p, value)
+end
+
+function Promise.any(p)
+	return Promise._all(debug.traceback(nil, 2), p, 1):andThen(function(list)
+		return list[1]
+	end)
+end
+
+function Promise.allSettled(list)
+	if type(list) ~= "table" then
 		error(string.format("Please pass a list of promises to %s", "Promise.allSettled"), 2)
 	end
 
-	for k, v in pairs(p60) do
-		if not t6.is(v) then
+	for k, item in pairs(list) do
+		if not Promise.is(item) then
 			error(string.format("Non-promise value passed into %s at index %s", "Promise.allSettled", (tostring(k))), 2)
 		end
 	end
 
-	if #p60 == 0 then
-		return t6.resolve({})
+	if #list == 0 then
+		return Promise.resolve({})
 	end
 
-	return t6._new(debug.traceback(nil, 2), function(p61, _, p63) -- line: 731
-		-- upvalues: p60 (copy)
-		local t11 = {}
-		local t12 = {}
-		local n3 = 0
+	return Promise._new(debug.traceback(nil, 2), function(callback, _, callback2)
+		local v2 = {}
+		local v3 = {}
 
-		local function resolveOne(p64, ...) -- line: 741
-			-- upvalues: n3 (ref), t11 (copy), p60 (copy), p61 (copy)
-			n3 += 1
-			t11[p64] = ...
+		local count = 0
 
-			if n3 >= #p60 then
-				p61(t11)
+		local function resolveOne(i, ...)
+			count += 1
+
+			v2[i] = ...
+
+			if count >= #list then
+				callback(v2)
 			end
 		end
 
-		p63(function() -- line: 751
-			-- upvalues: t12 (copy)
-			for _, v in ipairs(t12) do
-				v:cancel()
+		callback2(function()
+			for _, v4 in ipairs(v3) do
+				v4:cancel()
 			end
 		end)
 
-		for i, v in ipairs(p60) do
-			t12[i] = v:finally(function(...) -- line: 760
-				-- upvalues: resolveOne (copy), i (copy)
+		for i, item in ipairs(list) do
+			v3[i] = item:finally(function(...)
 				resolveOne(i, ...)
 			end)
 		end
 	end)
 end
-function t6.race(p65) -- line: 791
-	-- upvalues: t6 (copy)
-	assert(type(p65) == "table", string.format("Please pass a list of promises to %s", "Promise.race"))
 
-	for k, v in pairs(p65) do
-		assert(t6.is(v), string.format("Non-promise value passed into %s at index %s", "Promise.race", (tostring(k))))
+function Promise.race(list)
+	assert(type(list) == "table", string.format("Please pass a list of promises to %s", "Promise.race"))
+
+	for k, item in pairs(list) do
+		assert(
+			Promise.is(item),
+			string.format("Non-promise value passed into %s at index %s", "Promise.race", (tostring(k)))
+		)
 	end
 
-	return t6._new(debug.traceback(nil, 2), function(p66, p67, p68) -- line: 798
-		-- upvalues: p65 (copy)
-		local t13 = {}
-		local u297 = false
+	return Promise._new(debug.traceback(nil, 2), function(callback, callback2, callback3)
+		local v2 = {}
+		local flag = false
 
-		local function cancel() -- line: 802
-			-- upvalues: t13 (copy)
-			for _, v in ipairs(t13) do
-				v:cancel()
-			end
-		end
-		local function finalize(p69) -- line: 808
-			-- upvalues: t13 (copy), u297 (ref)
-			return function(...) -- line: 809
-				-- upvalues: t13 (copy), u297 (ref), p69 (copy)
-				for _, v in ipairs(t13) do
-					v:cancel()
-				end
-
-				u297 = true
-
-				return p69(...)
+		local function cancel() -- 2 equivalent calls inferred from this helper
+			for _, v3 in ipairs(v2) do
+				v3:cancel()
 			end
 		end
 
-		if p68(function(...) -- line: 809
-			-- upvalues: t13 (copy), u297 (ref), p67 (copy)
-			for _, v in ipairs(t13) do
-				v:cancel()
+		local function finalize(callback4) -- 3 equivalent calls inferred from this helper
+			return function(...)
+				cancel() -- inferred equivalent call
+				flag = true
+				return callback4(...)
 			end
+		end
 
-			u297 = true
-
-			return p67(...)
-		end) then
+		if callback3(finalize(callback2)) then -- inferred equivalent call
 			return
 		end
 
-		for i, v in ipairs(p65) do
-			t13[i] = v:andThen(function(...) -- line: 809
-				-- upvalues: t13 (copy), u297 (ref), p66 (copy)
-				for _, v3 in ipairs(t13) do
-					v3:cancel()
-				end
-
-				u297 = true
-
-				return p66(...)
-			end, function(...) -- line: 809
-				-- upvalues: t13 (copy), u297 (ref), p67 (copy)
-				for _, v4 in ipairs(t13) do
-					v4:cancel()
-				end
-
-				u297 = true
-
-				return p67(...)
-			end)
+		for i, item in ipairs(list) do
+			v2[i] = item:andThen(finalize(callback), finalize(callback2)) -- inferred equivalent call
 		end
 
-		if u297 then
-			for _, v in ipairs(t13) do
-				v:cancel()
-			end
+		if flag then
+			cancel() -- inferred equivalent call
 		end
 	end)
 end
-function t6.each(p70, p71) -- line: 886
-	-- upvalues: t6 (copy), t3 (ref)
-	assert(type(p70) == "table", string.format("Please pass a list of promises to %s", "Promise.each"))
 
-	local g100 = nil
-	local mt = nil
-	local v99 = nil
+function Promise.each(list, callback)
+	assert(type(list) == "table", string.format("Please pass a list of promises to %s", "Promise.each"))
+	assert(isCallable(callback), string.format("Please pass a handler function to %s!", "Promise.each")) -- inferred equivalent call
 
-	if type(p71) == "function" then
-		v99 = true
-		g100 = true
-	end
+	return Promise._new(debug.traceback(nil, 2), function(callback2, callback3, callback4)
+		local v2 = {}
+		local values = {}
 
-	repeat
-		if g100 or (g100 or type(p71) == "table") then
-			if not g100 then
-				if not g100 then
-					mt = getmetatable(p71)
-				end
+		local flag = false
+
+		local function cancel() -- 5 equivalent calls inferred from this helper
+			for _, v3 in ipairs(values) do
+				v3:cancel()
 			end
+		end
 
-			if g100 or (g100 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g100 then
-					if not g100 then
-						v99 = true
-					end
-				end
+		callback4(function()
+			flag = true
+			cancel() -- inferred equivalent call
+		end)
 
-				g100 = false
-				assert(v99, string.format("Please pass a handler function to %s!", "Promise.each"))
+		local v3 = {}
 
-				return t6._new(debug.traceback(nil, 2), function(p72, p73, p74) -- line: 890
-					-- upvalues: p70 (copy), t6 (copy), t3 (ref), p71 (copy)
-					local t14 = {}
-					local t15 = {}
-					local u309 = false
-
-					local function cancel() -- line: 896
-						-- upvalues: t15 (copy)
-						for _, v in ipairs(t15) do
-							v:cancel()
-						end
-					end
-
-					p74(function() -- line: 902
-						-- upvalues: u309 (ref), t15 (copy)
-						u309 = true
-
-						for _, v in ipairs(t15) do
-							v:cancel()
-						end
+		for i, item in ipairs(list) do
+			if Promise.is(item) then
+				if item:getStatus() == Promise.Status.Cancelled then
+					cancel() -- inferred equivalent call
+					return callback3(err.new({
+						error = "Promise is cancelled",
+						kind = err.Kind.AlreadyCancelled,
+						context = string.format(
+							"The Promise that was part of the array at index %d passed into Promise.each was already cancelled when Promise.each began.\n\nThat Promise was created at:\n\n%s",
+							i,
+							item._source
+						)
+					}))
+				elseif item:getStatus() == Promise.Status.Rejected then
+					cancel() -- inferred equivalent call
+					return callback3(select(2, item:await()))
+				else
+					local v4 = item:andThen(function(...)
+						return ...
 					end)
 
-					local t16 = {}
-
-					for i, v in ipairs(p70) do
-						if t6.is(v) then
-							if v:getStatus() == t6.Status.Cancelled then
-								for _, v5 in ipairs(t15) do
-									v5:cancel()
-								end
-
-								return p73(t3.new({
-									error = "Promise is cancelled",
-									kind = t3.Kind.AlreadyCancelled,
-									context = string.format("The Promise that was part of the array at index %d passed into Promise.each was already cancelled when Promise.each began.\n\nThat Promise was created at:\n\n%s", i, v._source)
-								}))
-							end
-
-							if v:getStatus() == t6.Status.Rejected then
-								for _, v6 in ipairs(t15) do
-									v6:cancel()
-								end
-
-								return p73(select(2, v:await()))
-							end
-
-							local v318 = v:andThen(function(...) -- line: 935
-								return ...
-							end)
-
-							table.insert(t15, v318)
-							t16[i] = v318
-
-							continue
-						end
-
-						t16[i] = v
-					end
-
-					for i, v in ipairs(t16) do
-						local v321 = v
-
-						if t6.is(v321) then
-							local v322
-
-							v322, v321 = v321:await()
-
-							if not v322 then
-								for _, v7 in ipairs(t15) do
-									v7:cancel()
-								end
-
-								return p73(v321)
-							end
-						end
-
-						if u309 then
-							return
-						end
-
-						local v325 = t6.resolve(p71(v321, i))
-
-						table.insert(t15, v325)
-
-						local v326, v327 = v325:await()
-
-						if not v326 then
-							for _, v8 in ipairs(t15) do
-								v8:cancel()
-							end
-
-							return p73(v327)
-						end
-
-						t14[i] = v327
-					end
-
-					p72(t14)
-				end)
+					table.insert(values, v4)
+					v3[i] = v4
+				end
+			else
+				v3[i] = item
 			end
 		end
 
-		v99 = false
-		g100 = true
-	until not g100
-end
-function t6.is(p75) -- line: 985
-	-- upvalues: t6 (copy)
-	if type(p75) ~= "table" then
-		return false
-	end
+		for i, v4 in ipairs(v3) do
+			if Promise.is(v4) then
+				local v5
+				v5, v4 = v4:await()
 
-	local mt = getmetatable(p75)
-
-	if mt == t6 then
-		return true
-	end
-
-	if mt == nil then
-		local andThen = p75.andThen
-
-		if type(andThen) == "function" then
-			return true
-		end
-
-		if type(andThen) == "table" then
-			local mt2 = getmetatable(andThen)
-
-			if mt2 and type((rawget(mt2, "__call"))) == "function" then
-				return true
-			end
-		end
-
-		return false
-	end
-
-	if type(mt) ~= "table" or type((rawget(mt, "__index"))) ~= "table" then
-		return false
-	end
-
-	local v106 = rawget(rawget(mt, "__index"), "andThen")
-	local g108 = nil
-	local mt3 = nil
-	local v107 = nil
-
-	if type(v106) == "function" then
-		v107 = true
-		g108 = true
-	end
-
-	repeat
-		if g108 or (g108 or type(v106) == "table") then
-			if not g108 then
-				if not g108 then
-					mt3 = getmetatable(v106)
+				if not v5 then
+					cancel() -- inferred equivalent call
+					return callback3(v4)
 				end
 			end
 
-			if g108 or (g108 or mt3 and type((rawget(mt3, "__call"))) == "function") then
-				if not g108 then
-					if not g108 then
-						v107 = true
-					end
-				end
-
-				g108 = false
-
-				if v107 then
-					return true
-				end
-
-				return false
-			end
-		end
-
-		v107 = false
-		g108 = true
-	until not g108
-end
-function t6.promisify(p76) -- line: 1034
-	-- upvalues: t6 (copy)
-	return function(...) -- line: 1035
-		-- upvalues: t6 (copy), p76 (copy)
-		return t6._try(debug.traceback(nil, 2), p76, ...)
-	end
-end
-
-local u14 = nil
-local u15 = nil
-
-function t6.delay(p77) -- line: 1065
-	-- upvalues: t6 (copy), u15 (ref), u14 (ref)
-	assert(type(p77) == "number", "Bad argument #1 to Promise.delay, must be a number.")
-
-	if not (p77 >= 0.016666666666666666) or p77 == 1e999 then
-		p77 = 0.016666666666666666
-	end
-
-	return t6._new(debug.traceback(nil, 2), function(p78, _, p80) -- line: 1073
-		-- upvalues: t6 (copy), p77 (ref), u15 (ref), u14 (ref)
-		local v333 = t6._getTime()
-		local v334 = v333 + p77
-		local t17 = {
-			resolve = p78,
-			startTime = v333,
-			endTime = v334
-		}
-
-		if u15 == nil then
-			u14 = t17
-			u15 = t6._timeEvent:Connect(function() -- line: 1085
-				-- upvalues: t6 (copy), u14 (ref), u15 (ref)
-				local v397 = t6._getTime()
-
-				while u14 ~= nil and v397 > u14.endTime do
-					local v398 = u14
-
-					u14 = v398.next
-
-					if u14 == nil then
-						u15:Disconnect()
-						u15 = nil
-					else
-						u14.previous = nil
-					end
-
-					v398.resolve(t6._getTime() - v398.startTime)
-				end
-			end)
-		elseif v334 > u14.endTime then
-			local v336 = u14
-			local next2 = v336.next
-
-			while next2 ~= nil and v334 > next2.endTime do
-				v336 = next2
-				next2 = v336.next
-			end
-
-			v336.next = t17
-			t17.previous = v336
-
-			if next2 ~= nil then
-				t17.next = next2
-				next2.previous = t17
-			end
-		else
-			t17.next = u14
-			u14.previous = t17
-			u14 = t17
-		end
-
-		p80(function() -- line: 1130
-			-- upvalues: t17 (copy), u14 (ref), u15 (ref)
-			local next3 = t17.next
-
-			if u14 == t17 then
-				if next3 == nil then
-					u15:Disconnect()
-					u15 = nil
-				else
-					next3.previous = nil
-				end
-
-				u14 = next3
-
+			if flag then
 				return
 			end
 
-			local previous = t17.previous
+			local resolved = Promise.resolve(callback(v4, i))
 
-			previous.next = next3
+			table.insert(values, resolved)
 
-			if next3 ~= nil then
-				next3.previous = previous
+			local v5, v6 = resolved:await()
+
+			if v5 then
+				v2[i] = v6
+			else
+				cancel() -- inferred equivalent call
+				return callback3(v6)
+			end
+		end
+
+		callback2(v2)
+	end)
+end
+
+function Promise.is(p)
+	if type(p) ~= "table" then
+		return false
+	end
+
+	local metatable = getmetatable(p)
+
+	if metatable == Promise then
+		return true
+	end
+
+	if metatable == nil then
+		return isCallable(p.andThen) -- inferred equivalent call
+	end
+
+	if
+		type(metatable) == "table"
+		and type((rawget(metatable, "__index"))) == "table"
+		and isCallable(rawget(rawget(metatable, "__index"), "andThen")) -- inferred equivalent call
+	then
+		return true
+	end
+
+	return false
+end
+
+function Promise.promisify(p)
+	return function(...)
+		return Promise._try(debug.traceback(nil, 2), p, ...)
+	end
+end
+
+local nextNode2 = nil
+local connection = nil
+
+function Promise.delay(value)
+	assert(type(value) == "number", "Bad argument #1 to Promise.delay, must be a number.")
+	local v2 = (not (value >= 1 / 60) or value == 1e999) and 1 / 60 or value
+	return Promise._new(debug.traceback(nil, 2), function(resolve, _, callback)
+		local time = Promise._getTime()
+		local endTime = time + v2
+
+		local v3 = { resolve = resolve, startTime = time, endTime = endTime }
+
+		if connection == nil then
+			nextNode2 = v3
+			connection = Promise._timeEvent:Connect(function()
+				local time2 = Promise._getTime()
+
+				while nextNode2 ~= nil and nextNode2.endTime < time2 do
+					local v4 = nextNode2
+					nextNode2 = v4.next
+
+					if nextNode2 == nil then
+						connection:Disconnect()
+						connection = nil
+					else
+						nextNode2.previous = nil
+					end
+
+					v4.resolve(Promise._getTime() - v4.startTime)
+				end
+			end)
+		elseif nextNode2.endTime < endTime then
+			local previous = nextNode2
+			local nextNode = previous.next
+
+			while nextNode ~= nil and nextNode.endTime < endTime do
+				previous = nextNode
+				nextNode = nextNode.next
+			end
+
+			previous.next = v3
+			v3.previous = previous
+
+			if nextNode ~= nil then
+				v3.next = nextNode
+				nextNode.previous = v3
+			end
+		else
+			v3.next = nextNode2
+			nextNode2.previous = v3
+			nextNode2 = v3
+		end
+
+		callback(function()
+			local nextNode = v3.next
+
+			if nextNode2 == v3 then
+				if nextNode == nil then
+					connection:Disconnect()
+					connection = nil
+				else
+					nextNode.previous = nil
+				end
+
+				nextNode2 = nextNode
+			else
+				local previous = v3.previous
+
+				previous.next = nextNode
+
+				if nextNode ~= nil then
+					nextNode.previous = previous
+				end
 			end
 		end)
 	end)
 end
-function t6.prototype.timeout(p81, p82, p83) -- line: 1194
-	-- upvalues: t6 (copy), t3 (ref)
-	local trace = debug.traceback(nil, 2)
 
-	return t6.race({
-		t6.delay(p82):andThen(function() -- line: 1198
-			-- upvalues: t6 (copy), p83 (copy), t3 (ref), p82 (copy), trace (copy)
-			return t6.reject(p83 == nil and t3.new({
+function Promise.prototype.timeout(p, p2, p3)
+	local traceback = debug.traceback(nil, 2)
+
+	return Promise.race({
+		Promise.delay(p2):andThen(function()
+			return Promise.reject(p3 == nil and err.new({
+				kind = err.Kind.TimedOut,
 				error = "Timed out",
-				kind = t3.Kind.TimedOut,
-				context = string.format("Timeout of %d seconds exceeded.\n:timeout() called at:\n\n%s", p82, trace)
-			}) or p83)
+				context = string.format("Timeout of %d seconds exceeded.\n:timeout() called at:\n\n%s", p2, traceback)
+			}) or p3)
 		end),
-		p81
+		p
 	})
 end
-function t6.prototype.getStatus(p84) -- line: 1218
-	return p84._status
+
+function Promise.prototype:getStatus()
+	return self._status
 end
-function t6.prototype._andThen(p85, p86, p87, p88) -- line: 1227
-	-- upvalues: t6 (copy), runExecutor (copy), t3 (ref)
-	p85._unhandledRejection = false
 
-	return t6._new(p86, function(p89, p90) -- line: 1231
-		-- upvalues: p87 (copy), p86 (copy), runExecutor (copy), p88 (copy), p85 (copy), t6 (copy), t3 (ref)
-		local v340 = p89
+function Promise.prototype._andThen(state, p, p2, p3)
+	state._unhandledRejection = false
 
-		if p87 then
-			local v341 = p86
-			local v342 = p87
+	return Promise._new(p, function(callback, callback2)
+		local v2
 
-			function v340(...) -- line: 186
-				-- upvalues: runExecutor (copy), v341 (copy), v342 (copy), p89 (copy), p90 (copy)
-				local v401, v402, v403 = runExecutor(v341, v342, ...)
-
-				if v401 then
-					p89(unpack(v403, 1, v402))
-
-					return
-				end
-
-				p90(v403[1])
-			end
+		if p2 then
+			v2 = createAdvancer(p, p2, callback, callback2) -- inferred equivalent call
+		else
+			v2 = callback
 		end
 
-		local v343 = p90
+		local v3
 
-		if p88 then
-			local v344 = p86
-			local v345 = p88
-
-			function v343(...) -- line: 186
-				-- upvalues: runExecutor (copy), v344 (copy), v345 (copy), p89 (copy), p90 (copy)
-				local v404, v405, v406 = runExecutor(v344, v345, ...)
-
-				if v404 then
-					p89(unpack(v406, 1, v405))
-
-					return
-				end
-
-				p90(v406[1])
-			end
+		if p3 then
+			v3 = createAdvancer(p, p3, callback, callback2) -- inferred equivalent call
+		else
+			v3 = callback2
 		end
 
-		if p85._status == t6.Status.Started then
-			table.insert(p85._queuedResolve, v340)
-			table.insert(p85._queuedReject, v343)
-
-			return
-		end
-
-		if p85._status == t6.Status.Resolved then
-			v340(unpack(p85._values, 1, p85._valuesLength))
-
-			return
-		end
-
-		if p85._status == t6.Status.Rejected then
-			v343(unpack(p85._values, 1, p85._valuesLength))
-
-			return
-		end
-
-		if p85._status == t6.Status.Cancelled then
-			p90(t3.new({
+		if state._status == Promise.Status.Started then
+			table.insert(state._queuedResolve, v2)
+			table.insert(state._queuedReject, v3)
+		elseif state._status == Promise.Status.Resolved then
+			v2(unpack(state._values, 1, state._valuesLength))
+		elseif state._status == Promise.Status.Rejected then
+			v3(unpack(state._values, 1, state._valuesLength))
+		elseif state._status == Promise.Status.Cancelled then
+			callback2(err.new({
 				error = "Promise is cancelled",
-				kind = t3.Kind.AlreadyCancelled,
-				context = "Promise created at\n\n" .. p86
+				kind = err.Kind.AlreadyCancelled,
+				context = "Promise created at\n\n" .. p
 			}))
 		end
-	end, p85)
+	end, state)
 end
-function t6.prototype.andThen(p91, p92, p93) -- line: 1288
-	local v125 = true
-	local g129 = nil
-	local g126
 
-	if p92 ~= nil then
-		g126 = nil
+function Promise.prototype:andThen(value, value2)
+	assert(value == nil or isCallable(value), string.format("Please pass a handler function to %s!", "Promise:andThen")) -- inferred equivalent call
+	assert(
+		value2 == nil or isCallable(value2), -- inferred equivalent call
+		string.format("Please pass a handler function to %s!", "Promise:andThen")
+	)
 
-		if type(p92) == "function" then
-			v125 = true
-			g126 = true
-		end
-
-		if not g126 then
-			if type(p92) == "table" then
-				local mt = getmetatable(p92)
-
-				if mt and type((rawget(mt, "__call"))) == "function" then
-					v125 = true
-					g126 = true
-				end
-			end
-
-			if not g126 then
-				v125 = false
-				g126 = true
-			end
-		end
-	end
-
-	g126 = false
-	assert(v125, string.format("Please pass a handler function to %s!", "Promise:andThen"))
-
-	local v128 = true
-
-	if p93 ~= nil then
-		if type(p93) == "function" then
-			v128 = true
-			g129 = true
-		end
-
-		if not g129 then
-			if type(p93) == "table" then
-				local mt = getmetatable(p93)
-
-				if mt and type((rawget(mt, "__call"))) == "function" then
-					v128 = true
-					g129 = true
-				end
-			end
-
-			if not g129 then
-				v128 = false
-				g129 = true
-			end
-		end
-	end
-
-	g129 = false
-	assert(v128, string.format("Please pass a handler function to %s!", "Promise:andThen"))
-
-	return p91:_andThen(debug.traceback(nil, 2), p92, p93)
+	return self:_andThen(debug.traceback(nil, 2), value, value2)
 end
-function t6.prototype.andThenAsync(p94, p95, p96) -- line: 1316
-	-- upvalues: pack (copy), t6 (copy)
-	local v134 = true
-	local g138 = nil
-	local g135
 
-	if p95 ~= nil then
-		g135 = nil
+function Promise.prototype.andThenAsync(object, value, value2)
+	assert(
+		value == nil or isCallable(value), -- inferred equivalent call
+		string.format("Please pass a handler function to %s!", "Promise:andThenAsync")
+	)
+	assert(
+		value2 == nil or isCallable(value2), -- inferred equivalent call
+		string.format("Please pass a handler function to %s!", "Promise:andThenAsync")
+	)
 
-		if type(p95) == "function" then
-			v134 = true
-			g135 = true
-		end
-
-		if not g135 then
-			if type(p95) == "table" then
-				local mt = getmetatable(p95)
-
-				if mt and type((rawget(mt, "__call"))) == "function" then
-					v134 = true
-					g135 = true
-				end
-			end
-
-			if not g135 then
-				v134 = false
-				g135 = true
-			end
-		end
-	end
-
-	g135 = false
-	assert(v134, string.format("Please pass a handler function to %s!", "Promise:andThenAsync"))
-
-	local v137 = true
-
-	if p96 ~= nil then
-		if type(p96) == "function" then
-			v137 = true
-			g138 = true
-		end
-
-		if not g138 then
-			if type(p96) == "table" then
-				local mt = getmetatable(p96)
-
-				if mt and type((rawget(mt, "__call"))) == "function" then
-					v137 = true
-					g138 = true
-				end
-			end
-
-			if not g138 then
-				v137 = false
-				g138 = true
-			end
-		end
-	end
-
-	g138 = false
-	assert(v137, string.format("Please pass a handler function to %s!", "Promise:andThenAsync"))
-
-	return p94:_andThen(debug.traceback(nil, 2), function(...) -- line: 1323
-		-- upvalues: pack (copy), t6 (copy)
-		local v346, v347 = pack(...)
-
-		return t6.defer(function(p97) -- line: 1325
-			-- upvalues: v347 (copy), v346 (copy)
-			p97(unpack(v347, 1, v346))
+	return object:_andThen(debug.traceback(nil, 2), function(...)
+		local v2, v3 = pack(...)
+		return Promise.defer(function(callback)
+			callback(unpack(v3, 1, v2))
 		end)
-	end, function(...) -- line: 1329
-		-- upvalues: pack (copy), t6 (copy)
-		local v348, v349 = pack(...)
-
-		return t6.defer(function(_, p99) -- line: 1331
-			-- upvalues: v349 (copy), v348 (copy)
-			p99(unpack(v349, 1, v348))
+	end, function(...)
+		local v2, v3 = pack(...)
+		return Promise.defer(function(_, callback)
+			callback(unpack(v3, 1, v2))
 		end)
-	end):andThen(p95, p96)
+	end):andThen(value, value2)
 end
-function t6.prototype.catch(p100, p101) -- line: 1358
-	local v142 = true
-	local g143
 
-	if p101 ~= nil then
-		g143 = nil
+function Promise.prototype:catch(value)
+	assert(value == nil or isCallable(value), string.format("Please pass a handler function to %s!", "Promise:catch")) -- inferred equivalent call
+	return self:_andThen(debug.traceback(nil, 2), nil, value)
+end
 
-		if type(p101) == "function" then
-			v142 = true
-			g143 = true
+function Promise.prototype.tap(object, callback)
+	assert(isCallable(callback), string.format("Please pass a handler function to %s!", "Promise:tap")) -- inferred equivalent call
+	return object:_andThen(debug.traceback(nil, 2), function(...)
+		local v2 = callback(...)
+
+		if not Promise.is(v2) then
+			return ...
 		end
 
-		if not g143 then
-			if type(p101) == "table" then
-				local mt = getmetatable(p101)
-
-				if mt and type((rawget(mt, "__call"))) == "function" then
-					v142 = true
-					g143 = true
-				end
-			end
-
-			if not g143 then
-				v142 = false
-				g143 = true
-			end
-		end
-	end
-
-	g143 = false
-	assert(v142, string.format("Please pass a handler function to %s!", "Promise:catch"))
-
-	return p100:_andThen(debug.traceback(nil, 2), nil, p101)
-end
-function t6.prototype.tap(p102, p103) -- line: 1379
-	-- upvalues: t6 (copy), pack (copy)
-	local g148 = nil
-	local mt = nil
-	local v147 = nil
-
-	if type(p103) == "function" then
-		v147 = true
-		g148 = true
-	end
-
-	repeat
-		if g148 or (g148 or type(p103) == "table") then
-			if not g148 then
-				if not g148 then
-					mt = getmetatable(p103)
-				end
-			end
-
-			if g148 or (g148 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g148 then
-					if not g148 then
-						v147 = true
-					end
-				end
-
-				g148 = false
-				assert(v147, string.format("Please pass a handler function to %s!", "Promise:tap"))
-
-				return p102:_andThen(debug.traceback(nil, 2), function(...) -- line: 1381
-					-- upvalues: p103 (copy), t6 (copy), pack (copy)
-					local v350 = p103(...)
-
-					if t6.is(v350) then
-						local v351, v352 = pack(...)
-
-						return v350:andThen(function() -- line: 1386
-							-- upvalues: v352 (copy), v351 (copy)
-							return unpack(v352, 1, v351)
-						end)
-					end
-
-					return ...
-				end)
-			end
-		end
-
-		v147 = false
-		g148 = true
-	until not g148
-end
-function t6.prototype.andThenCall(p104, p105, ...) -- line: 1414
-	-- upvalues: pack (copy)
-	local g153 = nil
-	local mt = nil
-	local v152 = nil
-
-	if type(p105) == "function" then
-		v152 = true
-		g153 = true
-	end
-
-	repeat
-		if g153 or (g153 or type(p105) == "table") then
-			if not g153 then
-				if not g153 then
-					mt = getmetatable(p105)
-				end
-			end
-
-			if g153 or (g153 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g153 then
-					if not g153 then
-						v152 = true
-					end
-				end
-
-				g153 = false
-				assert(v152, string.format("Please pass a handler function to %s!", "Promise:andThenCall"))
-
-				local v155, v156 = pack(...)
-
-				return p104:_andThen(debug.traceback(nil, 2), function() -- line: 1417
-					-- upvalues: p105 (copy), v156 (copy), v155 (copy)
-					return p105(unpack(v156, 1, v155))
-				end)
-			end
-		end
-
-		v152 = false
-		g153 = true
-	until not g153
-end
-function t6.prototype.andThenReturn(p106, ...) -- line: 1444
-	-- upvalues: pack (copy)
-	local v158, v159 = pack(...)
-
-	return p106:_andThen(debug.traceback(nil, 2), function() -- line: 1446
-		-- upvalues: v159 (copy), v158 (copy)
-		return unpack(v159, 1, v158)
+		local v3, v4 = pack(...)
+		return v2:andThen(function()
+			return unpack(v4, 1, v3)
+		end)
 	end)
 end
-function t6.prototype.cancel(p107) -- line: 1462
-	-- upvalues: t6 (copy)
-	if p107._status ~= t6.Status.Started then
+
+function Promise.prototype.andThenCall(object, callback, ...)
+	assert(isCallable(callback), string.format("Please pass a handler function to %s!", "Promise:andThenCall")) -- inferred equivalent call
+	local v2, v3 = pack(...)
+	return object:_andThen(debug.traceback(nil, 2), function()
+		return callback(unpack(v3, 1, v2))
+	end)
+end
+
+function Promise.prototype.andThenReturn(object, ...)
+	local v2, v3 = pack(...)
+	return object:_andThen(debug.traceback(nil, 2), function()
+		return unpack(v3, 1, v2)
+	end)
+end
+
+function Promise.prototype:cancel()
+	if self._status ~= Promise.Status.Started then
 		return
 	end
 
-	p107._status = t6.Status.Cancelled
+	self._status = Promise.Status.Cancelled
 
-	if p107._cancellationHook then
-		p107._cancellationHook()
+	if self._cancellationHook then
+		self._cancellationHook()
 	end
 
-	coroutine.close(p107._thread)
+	coroutine.close(self._thread)
 
-	if p107._parent then
-		p107._parent:_consumerCancelled(p107)
+	if self._parent then
+		self._parent:_consumerCancelled(self)
 	end
 
-	for k in pairs(p107._consumers) do
+	for k in pairs(self._consumers) do
 		k:cancel()
 	end
 
-	p107:_finalize()
+	self:_finalize()
 end
-function t6.prototype._consumerCancelled(p108, p109) -- line: 1490
-	-- upvalues: t6 (copy)
-	if p108._status ~= t6.Status.Started then
+
+function Promise.prototype:_consumerCancelled(p)
+	if self._status ~= Promise.Status.Started then
 		return
 	end
 
-	p108._consumers[p109] = nil
+	self._consumers[p] = nil
 
-	if next(p108._consumers) == nil then
-		p108:cancel()
+	if next(self._consumers) == nil then
+		self:cancel()
 	end
 end
-function t6.prototype._finally(p110, p111, p112, p113) -- line: 1506
-	-- upvalues: t6 (copy), runExecutor (copy)
-	if not p113 then
-		p110._unhandledRejection = false
+
+function Promise.prototype:_finally(p, p2, p3)
+	if not p3 then
+		self._unhandledRejection = false
 	end
 
-	return t6._new(p111, function(p114, p115) -- line: 1512
-		-- upvalues: p112 (copy), p111 (copy), runExecutor (copy), p113 (copy), p110 (copy), t6 (copy)
-		local v355 = p114
+	return Promise._new(p, function(callback, callback2)
+		local v2
 
-		if p112 then
-			local v356 = p111
-			local v357 = p112
+		if p2 then
+			v2 = createAdvancer(p, p2, callback, callback2) -- inferred equivalent call
+		else
+			v2 = callback
+		end
 
-			function v355(...) -- line: 186
-				-- upvalues: runExecutor (copy), v356 (copy), v357 (copy), p114 (copy), p115 (copy)
-				local v410, v411, v412 = runExecutor(v356, v357, ...)
-
-				if v410 then
-					p114(unpack(v412, 1, v411))
-
-					return
-				end
-
-				p115(v412[1])
+		local fn = p3 and function(...)
+			if self._status == Promise.Status.Rejected then
+				return callback(self)
 			end
+
+			return v2(...)
+		end or v2
+
+		if self._status == Promise.Status.Started then
+			table.insert(self._queuedFinally, fn)
+		else
+			fn(self._status)
 		end
-
-		if p113 then
-			local v358 = v355
-
-			function v355(...) -- line: 1520
-				-- upvalues: p110 (copy), t6 (copy), p114 (copy), v358 (copy)
-				if p110._status == t6.Status.Rejected then
-					return p114(p110)
-				end
-
-				return v358(...)
-			end
-		end
-
-		if p110._status == t6.Status.Started then
-			table.insert(p110._queuedFinally, v355)
-
-			return
-		end
-
-		v355(p110._status)
-	end, p110)
+	end, self)
 end
-function t6.prototype.finally(p116, p117) -- line: 1588
-	local v170 = true
-	local g171
 
-	if p117 ~= nil then
-		g171 = nil
-
-		if type(p117) == "function" then
-			v170 = true
-			g171 = true
-		end
-
-		if not g171 then
-			if type(p117) == "table" then
-				local mt = getmetatable(p117)
-
-				if mt and type((rawget(mt, "__call"))) == "function" then
-					v170 = true
-					g171 = true
-				end
-			end
-
-			if not g171 then
-				v170 = false
-				g171 = true
-			end
-		end
-	end
-
-	g171 = false
-	assert(v170, string.format("Please pass a handler function to %s!", "Promise:finally"))
-
-	return p116:_finally(debug.traceback(nil, 2), p117)
+function Promise.prototype:finally(value)
+	assert(value == nil or isCallable(value), string.format("Please pass a handler function to %s!", "Promise:finally")) -- inferred equivalent call
+	return self:_finally(debug.traceback(nil, 2), value)
 end
-function t6.prototype.finallyCall(p118, p119, ...) -- line: 1602
-	-- upvalues: pack (copy)
-	local g176 = nil
-	local mt = nil
-	local v175 = nil
 
-	if type(p119) == "function" then
-		v175 = true
-		g176 = true
-	end
-
-	repeat
-		if g176 or (g176 or type(p119) == "table") then
-			if not g176 then
-				if not g176 then
-					mt = getmetatable(p119)
-				end
-			end
-
-			if g176 or (g176 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g176 then
-					if not g176 then
-						v175 = true
-					end
-				end
-
-				g176 = false
-				assert(v175, string.format("Please pass a handler function to %s!", "Promise:finallyCall"))
-
-				local v178, v179 = pack(...)
-
-				return p118:_finally(debug.traceback(nil, 2), function() -- line: 1605
-					-- upvalues: p119 (copy), v179 (copy), v178 (copy)
-					return p119(unpack(v179, 1, v178))
-				end)
-			end
-		end
-
-		v175 = false
-		g176 = true
-	until not g176
-end
-function t6.prototype.finallyReturn(p120, ...) -- line: 1628
-	-- upvalues: pack (copy)
-	local v181, v182 = pack(...)
-
-	return p120:_finally(debug.traceback(nil, 2), function() -- line: 1630
-		-- upvalues: v182 (copy), v181 (copy)
-		return unpack(v182, 1, v181)
+function Promise.prototype:finallyCall(callback, ...)
+	assert(isCallable(callback), string.format("Please pass a handler function to %s!", "Promise:finallyCall")) -- inferred equivalent call
+	local v2, v3 = pack(...)
+	return self:_finally(debug.traceback(nil, 2), function()
+		return callback(unpack(v3, 1, v2))
 	end)
 end
-function t6.prototype.done(p121, p122) -- line: 1638
-	local v185 = true
-	local g186
 
-	if p122 ~= nil then
-		g186 = nil
-
-		if type(p122) == "function" then
-			v185 = true
-			g186 = true
-		end
-
-		if not g186 then
-			if type(p122) == "table" then
-				local mt = getmetatable(p122)
-
-				if mt and type((rawget(mt, "__call"))) == "function" then
-					v185 = true
-					g186 = true
-				end
-			end
-
-			if not g186 then
-				v185 = false
-				g186 = true
-			end
-		end
-	end
-
-	g186 = false
-	assert(v185, string.format("Please pass a handler function to %s!", "Promise:done"))
-
-	return p121:_finally(debug.traceback(nil, 2), p122, true)
+function Promise.prototype:finallyReturn(...)
+	local v2, v3 = pack(...)
+	return self:_finally(debug.traceback(nil, 2), function()
+		return unpack(v3, 1, v2)
+	end)
 end
-function t6.prototype.doneCall(p123, p124, ...) -- line: 1649
-	-- upvalues: pack (copy)
-	local g191 = nil
-	local mt = nil
-	local v190 = nil
 
-	if type(p124) == "function" then
-		v190 = true
-		g191 = true
-	end
+function Promise.prototype:done(value)
+	assert(value == nil or isCallable(value), string.format("Please pass a handler function to %s!", "Promise:done")) -- inferred equivalent call
 
-	repeat
-		if g191 or (g191 or type(p124) == "table") then
-			if not g191 then
-				if not g191 then
-					mt = getmetatable(p124)
-				end
-			end
-
-			if g191 or (g191 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g191 then
-					if not g191 then
-						v190 = true
-					end
-				end
-
-				g191 = false
-				assert(v190, string.format("Please pass a handler function to %s!", "Promise:doneCall"))
-
-				local v193, v194 = pack(...)
-
-				return p123:_finally(debug.traceback(nil, 2), function() -- line: 1652
-					-- upvalues: p124 (copy), v194 (copy), v193 (copy)
-					return p124(unpack(v194, 1, v193))
-				end, true)
-			end
-		end
-
-		v190 = false
-		g191 = true
-	until not g191
+	return self:_finally(debug.traceback(nil, 2), value, true)
 end
-function t6.prototype.doneReturn(p125, ...) -- line: 1660
-	-- upvalues: pack (copy)
-	local v196, v197 = pack(...)
 
-	return p125:_finally(debug.traceback(nil, 2), function() -- line: 1662
-		-- upvalues: v197 (copy), v196 (copy)
-		return unpack(v197, 1, v196)
+function Promise.prototype:doneCall(callback, ...)
+	assert(isCallable(callback), string.format("Please pass a handler function to %s!", "Promise:doneCall")) -- inferred equivalent call
+	local v2, v3 = pack(...)
+	return self:_finally(debug.traceback(nil, 2), function()
+		return callback(unpack(v3, 1, v2))
 	end, true)
 end
-function t6.prototype.awaitStatus(p126) -- line: 1674
-	-- upvalues: t6 (copy)
-	p126._unhandledRejection = false
 
-	if p126._status == t6.Status.Started then
+function Promise.prototype:doneReturn(...)
+	local v2, v3 = pack(...)
+	return self:_finally(debug.traceback(nil, 2), function()
+		return unpack(v3, 1, v2)
+	end, true)
+end
+
+function Promise.prototype:awaitStatus()
+	self._unhandledRejection = false
+
+	if self._status == Promise.Status.Started then
 		local thread = coroutine.running()
 
-		p126:finally(function() -- line: 1680
-			-- upvalues: thread (copy)
+		self:finally(function()
 			task.spawn(thread)
 		end)
+
 		coroutine.yield()
 	end
 
-	if p126._status == t6.Status.Resolved then
-		return p126._status, unpack(p126._values, 1, p126._valuesLength)
+	if not (self._status ~= Promise.Status.Resolved and self._status ~= Promise.Status.Rejected) then
+		return self._status, unpack(self._values, 1, self._valuesLength)
 	end
 
-	if p126._status == t6.Status.Rejected then
-		return p126._status, unpack(p126._values, 1, p126._valuesLength)
-	end
-
-	return p126._status
+	return self._status
 end
 
-local function awaitHelper(p127, ...) -- line: 1696
-	-- upvalues: t6 (copy)
-	return p127 == t6.Status.Resolved, ...
+local function awaitHelper(p, ...)
+	return p == Promise.Status.Resolved, ...
 end
 
-function t6.prototype.await(p128) -- line: 1721
-	-- upvalues: awaitHelper (copy)
-	return awaitHelper(p128:awaitStatus())
+function Promise.prototype:await()
+	return awaitHelper(self:awaitStatus())
 end
 
-local function expectHelper(p129, ...) -- line: 1725
-	-- upvalues: t6 (copy)
-	if p129 ~= t6.Status.Resolved then
-		error(if ... ~= nil then ... else "Expected Promise rejected with no value.", 3)
+local function expectHelper(p, ...)
+	if p ~= Promise.Status.Resolved then
+		error(... == nil and "Expected Promise rejected with no value." or ..., 3)
 	end
 
 	return ...
 end
 
-function t6.prototype.expect(p130) -- line: 1758
-	-- upvalues: expectHelper (copy)
-	return expectHelper(p130:awaitStatus())
+function Promise.prototype:expect()
+	return expectHelper(self:awaitStatus())
 end
 
-t6.prototype.awaitValue = t6.prototype.expect
+Promise.prototype.awaitValue = Promise.prototype.expect
 
-function t6.prototype._unwrap(p131) -- line: 1772
-	-- upvalues: t6 (copy)
-	if p131._status == t6.Status.Started then
+function Promise.prototype:_unwrap()
+	if self._status == Promise.Status.Started then
 		error("Promise has not resolved or rejected.", 2)
 	end
 
-	return p131._status == t6.Status.Resolved, unpack(p131._values, 1, p131._valuesLength)
+	return self._status == Promise.Status.Resolved, unpack(self._values, 1, self._valuesLength)
 end
-function t6.prototype._resolve(p132, ...) -- line: 1782
-	-- upvalues: t6 (copy), t3 (ref), pack (copy)
-	if p132._status ~= t6.Status.Started then
-		if t6.is((...)) then
-			(...):_consumerCancelled(p132)
-		end
 
-		return
-	end
+function Promise.prototype._resolve(object, ...)
+	if object._status == Promise.Status.Started then
+		if Promise.is((...)) then
+			if select("#", ...) > 1 then
+				local v2 = string.format(
+					"When returning a Promise from andThen, extra arguments are discarded! See:\n\n%s",
+					object._source
+				)
 
-	if t6.is((...)) then
-		if select("#", ...) > 1 then
-			local v206 = string.format("When returning a Promise from andThen, extra arguments are discarded! See:\n\n%s", p132._source)
-
-			warn(v206)
-		end
-
-		local v207 = ...
-		local v208 = v207:andThen(function(...) -- line: 1803
-			-- upvalues: p132 (copy)
-			p132:_resolve(...)
-		end, function(...) -- line: 1805
-			-- upvalues: v207 (copy), t3 (ref), p132 (copy)
-			local v359 = v207._values[1]
-
-			if v207._error then
-				v359 = t3.new({
-					context = "[No stack trace available as this Promise originated from an older version of the Promise library (< v2)]",
-					error = v207._error,
-					kind = t3.Kind.ExecutionError
-				})
+				warn(v2)
 			end
 
-			if t3.isKind(v359, t3.Kind.ExecutionError) then
-				return p132:_reject(v359:extend({
-					error = "This Promise was chained to a Promise that errored.",
-					trace = "",
-					context = string.format("The Promise at:\n\n%s\n...Rejected because it was chained to the following Promise, which encountered an error:\n", p132._source)
-				}))
+			local v2 = ...
+
+			local parent = v2:andThen(function(...)
+				object:_resolve(...)
+			end, function(...)
+				local v3 = v2._values[1]
+
+				if v2._error then
+					v3 = err.new({
+						error = v2._error,
+						kind = err.Kind.ExecutionError,
+						context = "[No stack trace available as this Promise originated from an older version of the Promise library (< v2)]"
+					})
+				end
+
+				if err.isKind(v3, err.Kind.ExecutionError) then
+					return object:_reject(v3:extend({
+						error = "This Promise was chained to a Promise that errored.",
+						trace = "",
+						context = string.format(
+							"The Promise at:\n\n%s\n...Rejected because it was chained to the following Promise, which encountered an error:\n",
+							object._source
+						)
+					}))
+				end
+
+				object:_reject(...)
+			end)
+
+			if parent._status == Promise.Status.Cancelled then
+				object:cancel()
+			elseif parent._status == Promise.Status.Started then
+				object._parent = parent
+				parent._consumers[object] = true
+			end
+		else
+			object._status = Promise.Status.Resolved
+			local valuesLength, values = pack(...)
+			object._valuesLength = valuesLength
+			object._values = values
+
+			for _, callback in ipairs(object._queuedResolve) do
+				coroutine.wrap(callback)(...)
 			end
 
-			p132:_reject(...)
-		end)
-
-		if v208._status == t6.Status.Cancelled then
-			p132:cancel()
-
-			return
+			object:_finalize()
 		end
-
-		if v208._status == t6.Status.Started then
-			p132._parent = v208
-			v208._consumers[p132] = true
-		end
-
-		return
+	elseif Promise.is((...)) then
+		(...):_consumerCancelled(object)
 	end
-
-	p132._status = t6.Status.Resolved
-
-	local v209, v210 = pack(...)
-
-	p132._valuesLength = v209
-	p132._values = v210
-
-	for _, v in ipairs(p132._queuedResolve) do
-		coroutine.wrap(v)(...)
-	end
-
-	p132:_finalize()
 end
-function t6.prototype._reject(p133, ...) -- line: 1853
-	-- upvalues: t6 (copy), pack (copy)
-	if p133._status ~= t6.Status.Started then
+
+function Promise.prototype:_reject(...)
+	if self._status ~= Promise.Status.Started then
 		return
 	end
 
-	p133._status = t6.Status.Rejected
+	self._status = Promise.Status.Rejected
+	local valuesLength, values = pack(...)
+	self._valuesLength = valuesLength
+	self._values = values
 
-	local v214, v215 = pack(...)
+	if isEmpty(self._queuedReject) then -- inferred equivalent call
+		local v2 = tostring((...))
 
-	p133._valuesLength = v214
-	p133._values = v215
+		coroutine.wrap(function()
+			Promise._timeEvent:Wait()
 
-	local _queuedReject = p133._queuedReject
-
-	if next(_queuedReject) ~= nil then
-		for _, v in ipairs(p133._queuedReject) do
-			coroutine.wrap(v)(...)
-		end
-	else
-		local str = tostring((...))
-
-		coroutine.wrap(function() -- line: 1875
-			-- upvalues: t6 (copy), p133 (copy), str (copy)
-			t6._timeEvent:Wait()
-
-			if not p133._unhandledRejection then
+			if not self._unhandledRejection then
 				return
 			end
 
-			local v360 = string.format("Unhandled Promise rejection:\n\n%s\n\n%s", str, p133._source)
+			local v3 = string.format("Unhandled Promise rejection:\n\n%s\n\n%s", v2, self._source)
 
-			for _, v in ipairs(t6._unhandledRejectionCallbacks) do
-				task.spawn(v, p133, unpack(p133._values, 1, p133._valuesLength))
+			for _, callback in ipairs(Promise._unhandledRejectionCallbacks) do
+				task.spawn(callback, self, unpack(self._values, 1, self._valuesLength))
 			end
 
-			if t6.TEST then
+			if Promise.TEST then
 				return
 			end
 
-			warn(v360)
+			warn(v3)
 		end)()
+	else
+		for _, callback in ipairs(self._queuedReject) do
+			coroutine.wrap(callback)(...)
+		end
 	end
 
-	p133:_finalize()
+	self:_finalize()
 end
 
-local t18 = {}
-local u19 = nil
+local threads = {}
+local thread = nil
 
-local function closeThreads() -- line: 1906
-	-- upvalues: u19 (ref), t18 (ref)
-	u19 = nil
+local function closeThreads()
+	thread = nil
+	local v2 = threads
+	threads = {}
 
-	local v220 = t18
-
-	t18 = {}
-
-	for _, v222 in v220 do
-		coroutine.close(v222)
+	for _, v3 in v2 do
+		coroutine.close(v3)
 	end
 end
 
-function t6.prototype._finalize(p134) -- line: 1920
-	-- upvalues: t6 (copy), result (ref), t18 (ref), u19 (ref), closeThreads (copy)
-	for _, v in ipairs(p134._queuedFinally) do
-		coroutine.wrap(v)(p134._status)
+local function _finalize(state)
+	for _, callback in ipairs(state._queuedFinally) do
+		coroutine.wrap(callback)(state._status)
 	end
 
-	p134._queuedFinally = nil
-	p134._queuedReject = nil
-	p134._queuedResolve = nil
+	state._queuedFinally = nil
+	state._queuedReject = nil
+	state._queuedResolve = nil
 
-	if not t6.TEST then
-		p134._parent = nil
-		p134._consumers = nil
+	if not Promise.TEST then
+		state._parent = nil
+		state._consumers = nil
 	end
 
 	if result then
-		table.insert(t18, p134._thread)
+		table.insert(threads, state._thread)
 
-		if not u19 then
-			u19 = task.defer(closeThreads)
-
-			return
+		if not thread then
+			thread = task.defer(closeThreads)
 		end
 	else
-		task.defer(coroutine.close, p134._thread)
+		task.defer(coroutine.close, state._thread)
 	end
 end
-function t6.prototype.now(p135, p136) -- line: 1965
-	-- upvalues: t6 (copy), t3 (ref)
-	local trace = debug.traceback(nil, 2)
 
-	if p135._status == t6.Status.Resolved then
-		return p135:_andThen(trace, function(...) -- line: 1968
+Promise.prototype._finalize = _finalize
+
+function Promise.prototype.now(object, p)
+	local traceback = debug.traceback(nil, 2)
+
+	if object._status == Promise.Status.Resolved then
+		return object:_andThen(traceback, function(...)
 			return ...
 		end)
 	end
 
-	return t6.reject(p136 == nil and t3.new({
+	local reject = Promise.reject
+	p = p == nil and err.new({
+		kind = err.Kind.NotResolvedInTime,
 		error = "This Promise was not resolved in time for :now()",
-		kind = t3.Kind.NotResolvedInTime,
-		context = ":now() was called at:\n\n" .. trace
-	}) or p136)
+		context = ":now() was called at:\n\n" .. traceback
+	}) or p
+	return reject(p)
 end
-function t6.retry(p137, p138, ...) -- line: 2010
-	-- upvalues: t6 (copy)
-	local g232 = nil
-	local mt = nil
-	local v231 = nil
 
-	if type(p137) == "function" then
-		v231 = true
-		g232 = true
-	end
+function Promise.retry(callback, value, ...)
+	assert(isCallable(callback), "Parameter #1 to Promise.retry must be a function") -- inferred equivalent call
+	assert(type(value) == "number", "Parameter #2 to Promise.retry must be a number")
 
-	repeat
-		if g232 or (g232 or type(p137) == "table") then
-			if not g232 then
-				if not g232 then
-					mt = getmetatable(p137)
-				end
-			end
+	local v2 = { ... }
+	local v3 = select("#", ...)
 
-			if g232 or (g232 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g232 then
-					if not g232 then
-						v231 = true
-					end
-				end
-
-				g232 = false
-				assert(v231, "Parameter #1 to Promise.retry must be a function")
-				assert(type(p138) == "number", "Parameter #2 to Promise.retry must be a number")
-
-				local t19 = { ... }
-				local v235 = select("#", ...)
-
-				return t6.resolve(p137(...)):catch(function(...) -- line: 2016
-					-- upvalues: p138 (copy), t6 (copy), p137 (copy), t19 (copy), v235 (copy)
-					if p138 > 0 then
-						return t6.retry(p137, p138 - 1, unpack(t19, 1, v235))
-					end
-
-					return t6.reject(...)
-				end)
-			end
+	return Promise.resolve(callback(...)):catch(function(...)
+		if value > 0 then
+			return Promise.retry(callback, value - 1, unpack(v2, 1, v3))
 		end
 
-		v231 = false
-		g232 = true
-	until not g232
+		return Promise.reject(...)
+	end)
 end
-function t6.retryWithDelay(p139, p140, p141, ...) -- line: 2038
-	-- upvalues: t6 (copy)
-	local g240 = nil
-	local mt = nil
-	local v239 = nil
 
-	if type(p139) == "function" then
-		v239 = true
-		g240 = true
-	end
+function Promise.retryWithDelay(callback, value, value2, ...)
+	assert(isCallable(callback), "Parameter #1 to Promise.retry must be a function") -- inferred equivalent call
+	assert(type(value) == "number", "Parameter #2 (times) to Promise.retry must be a number")
+	assert(type(value2) == "number", "Parameter #3 (seconds) to Promise.retry must be a number")
 
-	repeat
-		if g240 or (g240 or type(p139) == "table") then
-			if not g240 then
-				if not g240 then
-					mt = getmetatable(p139)
-				end
-			end
+	local v2 = { ... }
+	local v3 = select("#", ...)
 
-			if g240 or (g240 or mt and type((rawget(mt, "__call"))) == "function") then
-				if not g240 then
-					if not g240 then
-						v239 = true
-					end
-				end
+	return Promise.resolve(callback(...)):catch(function(...)
+		if value > 0 then
+			Promise.delay(value2):await()
 
-				g240 = false
-				assert(v239, "Parameter #1 to Promise.retry must be a function")
-				assert(type(p140) == "number", "Parameter #2 (times) to Promise.retry must be a number")
-				assert(type(p141) == "number", "Parameter #3 (seconds) to Promise.retry must be a number")
-
-				local t20 = { ... }
-				local v243 = select("#", ...)
-
-				return t6.resolve(p139(...)):catch(function(...) -- line: 2045
-					-- upvalues: p140 (copy), t6 (copy), p141 (copy), p139 (copy), t20 (copy), v243 (copy)
-					if p140 > 0 then
-						t6.delay(p141):await()
-
-						return t6.retryWithDelay(p139, p140 - 1, p141, unpack(t20, 1, v243))
-					end
-
-					return t6.reject(...)
-				end)
-			end
+			return Promise.retryWithDelay(callback, value - 1, value2, unpack(v2, 1, v3))
 		end
 
-		v239 = false
-		g240 = true
-	until not g240
+		return Promise.reject(...)
+	end)
 end
-function t6.fromEvent(p142, p143) -- line: 2080
-	-- upvalues: t6 (copy)
-	local u246 = p143 or function() -- line: 2081
+
+function Promise.fromEvent(object, p)
+	local v2 = p or function(): boolean
 		return true
 	end
 
-	return t6._new(debug.traceback(nil, 2), function(p144, _, p146) -- line: 2085
-		-- upvalues: p142 (copy), u246 (ref)
-		local u366 = nil
-		local u367 = false
+	return Promise._new(debug.traceback(nil, 2), function(callback, _, callback2)
+		local connection2 = nil
+		local v3 = false
 
-		local function disconnect() -- line: 2089
-			-- upvalues: u366 (ref)
-			u366:Disconnect()
-			u366 = nil
+		local function disconnect() -- 1 equivalent call inferred from this helper
+			connection2:Disconnect()
+			connection2 = nil
 		end
 
-		u366 = p142:Connect(function(...) -- line: 2098
-			-- upvalues: u246 (ref), p144 (copy), u366 (ref), u367 (ref)
-			local v413 = u246(...)
+		connection2 = object:Connect(function(...)
+			local v4 = v2(...)
 
-			if v413 == true then
-				p144(...)
+			if v4 == true then
+				callback(...)
 
-				if u366 then
-					u366:Disconnect()
-					u366 = nil
-
+				if not connection2 then
+					v3 = true
 					return
 				end
 
-				u367 = true
-
-				return
-			end
-
-			if type(v413) ~= "boolean" then
+				disconnect() -- inferred equivalent call
+			elseif type(v4) ~= "boolean" then
 				error("Promise.fromEvent predicate should always return a boolean")
 			end
 		end)
 
-		if u367 and u366 then
+		if v3 and connection2 then
 			return disconnect()
 		end
 
-		p146(disconnect)
+		callback2(disconnect)
 	end)
 end
-function t6.onUnhandledRejection(p147) -- line: 2132
-	-- upvalues: t6 (copy)
-	table.insert(t6._unhandledRejectionCallbacks, p147)
 
-	return function() -- line: 2135
-		-- upvalues: t6 (copy), p147 (copy)
-		local v369 = table.find(t6._unhandledRejectionCallbacks, p147)
+function Promise.onUnhandledRejection(p)
+	table.insert(Promise._unhandledRejectionCallbacks, p)
 
-		if v369 then
-			table.remove(t6._unhandledRejectionCallbacks, v369)
+	return function()
+		local index = table.find(Promise._unhandledRejectionCallbacks, p)
+
+		if index then
+			table.remove(Promise._unhandledRejectionCallbacks, index)
 		end
 	end
 end
 
-return t6
+return Promise

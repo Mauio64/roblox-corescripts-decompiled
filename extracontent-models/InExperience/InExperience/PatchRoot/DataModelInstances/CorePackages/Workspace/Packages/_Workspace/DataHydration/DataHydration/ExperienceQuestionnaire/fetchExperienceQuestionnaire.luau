@@ -1,95 +1,88 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local HttpClient = require(DataHydrationParent.HttpClient)
-local UrlBase = require(DataHydrationParent.UrlBuilder).UrlBase
-local withCsrfRetry = require(DataHydration.withCsrfRetry)
+local parent = DataHydration.Parent
 
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
+
+local withCsrfRetry = require(DataHydration.withCsrfRetry)
 require(script.Parent.ExperienceQuestionnaireStoreTypes)
 
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function resolveBase(t1: {[any]: any}?) -- line: 20
-	-- upvalues: UrlBase (copy)
-	local v13 = t1 or {}
+local function resolveBase(options) -- 1 equivalent call inferred from this helper
+	local v = options or {}
+	return v.network, v.baseUrl or UrlBase.APIS
+end
 
-	return v13.network, v13.baseUrl or UrlBase.APIS
+local function resolveMutatingNetwork(options) -- 1 equivalent call inferred from this helper
+	return (options or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
 end
-local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 25
-	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
-	return (t2 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
-end
-local function get(t3: {[any]: any}?, s1: string, s2: string) -- line: 30
-	-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
-	local v18 = t3 or {}
-	local network = v18.network
-	local v20 = v18.baseUrl or UrlBase.APIS
-	local v21 = fetch({
+
+local function get(options, p: string, analyticsKey: string)
+	local v = options or {}
+	return asPromise((fetch({
+		network = v.network,
 		method = "GET",
-		network = network,
-		url = v20 .. "/experience-questionnaire/v1" .. s1,
-		analyticsKey = s2,
-		decode = function(p1) -- line: 41
-			return p1
+		url = (v.baseUrl or UrlBase.APIS) .. "/experience-questionnaire/v1" .. p,
+		analyticsKey = analyticsKey,
+		decode = function(p2)
+			return p2
 		end
-	})
-
-	return asPromise(v21)
+	})))
 end
-local function post(t4: {[any]: any}?, s3: string, p2, s4: string) -- line: 48
-	-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), asPromise (copy)
-	local v26 = t4 or {}
-	local _ = v26.network
-	local v28 = v26.baseUrl or UrlBase.APIS
-	local v29 = fetch({
+
+local function post(options, p: string, body, analyticsKey: string)
+	local _, v = resolveBase(options) -- inferred equivalent call
+	return asPromise((fetch({
+		network = resolveMutatingNetwork(options), -- inferred equivalent call
 		method = "POST",
-		network = (t4 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
-		url = v28 .. "/experience-questionnaire/v1" .. s3,
-		body = p2,
-		analyticsKey = s4,
-		decode = function(p3) -- line: 61
-			return p3
+		url = v .. "/experience-questionnaire/v1" .. p,
+		body = body,
+		analyticsKey = analyticsKey,
+		decode = function(p2)
+			return p2
 		end
-	})
-
-	return asPromise(v29)
+	})))
 end
 
-return {
-	fetchEligibility = function(n1: number, t5: {[any]: any}?) -- line: 70
-		-- upvalues: get (copy)
-		return get(t5, ("/eligibility/%d"):format(n1), "experience-questionnaire.get-eligibility")
-	end,
-	fetchMetadataStatus = function(n2: number, t6: {[any]: any}?) -- line: 77
-		-- upvalues: get (copy)
-		return get(t6, ("/metadata/%d/status"):format(n2), "experience-questionnaire.get-metadata-status")
-	end,
-	fetchActiveResponse = function(n3: number, t7: {[any]: any}?) -- line: 84
-		-- upvalues: get (copy)
-		return get(t7, ("/responses/%d"):format(n3), "experience-questionnaire.get-active-response")
-	end,
-	fetchLatestQuestionnaire = function(n4: number, t8: {[any]: any}?) -- line: 91
-		-- upvalues: get (copy)
-		return get(t8, ("/questionnaires/%d/latest"):format(n4), "experience-questionnaire.get-latest-questionnaire")
-	end,
-	fetchQuestionnaireById = function(s5: string, t9: {[any]: any}?) -- line: 102
-		-- upvalues: get (copy)
-		return get(t9, "/questionnaires/" .. s5, "experience-questionnaire.get-questionnaire-by-id")
-	end,
-	fetchLatestSubmission = function(n5: number, t10: {[any]: any}?) -- line: 109
-		-- upvalues: get (copy)
-		return get(t10, ("/responses/%d/submissions/latest"):format(n5), "experience-questionnaire.get-latest-submission")
-	end,
-	saveSubmission = function(n6: number, p4, t11: {[any]: any}?) -- line: 120
-		-- upvalues: post (copy)
-		return post(t11, ("/responses/%d/submissions"):format(n6), p4, "experience-questionnaire.save-submission")
-	end,
-	validateResponses = function(p5, t12: {[any]: any}?) -- line: 133
-		-- upvalues: post (copy)
-		return post(t12, "/responses/validate", p5, "experience-questionnaire.validate-responses")
-	end,
-	previewSubmission = function(p6, t13: {[any]: any}?) -- line: 140
-		-- upvalues: post (copy)
-		return post(t13, "/responses/preview", p6, "experience-questionnaire.preview-submission")
-	end
-}
+local FetchExperienceQuestionnaire = {}
+
+function FetchExperienceQuestionnaire.fetchEligibility(p: number, p2)
+	return get(p2, ("/eligibility/%d"):format(p), "experience-questionnaire.get-eligibility")
+end
+
+function FetchExperienceQuestionnaire.fetchMetadataStatus(p: number, p2)
+	return get(p2, ("/metadata/%d/status"):format(p), "experience-questionnaire.get-metadata-status")
+end
+
+function FetchExperienceQuestionnaire.fetchActiveResponse(p: number, p2)
+	return get(p2, ("/responses/%d"):format(p), "experience-questionnaire.get-active-response")
+end
+
+function FetchExperienceQuestionnaire.fetchLatestQuestionnaire(p: number, p2)
+	return get(p2, ("/questionnaires/%d/latest"):format(p), "experience-questionnaire.get-latest-questionnaire")
+end
+
+function FetchExperienceQuestionnaire.fetchQuestionnaireById(p: string, p2)
+	return get(p2, "/questionnaires/" .. p, "experience-questionnaire.get-questionnaire-by-id")
+end
+
+function FetchExperienceQuestionnaire.fetchLatestSubmission(p: number, p2)
+	return get(p2, ("/responses/%d/submissions/latest"):format(p), "experience-questionnaire.get-latest-submission")
+end
+
+function FetchExperienceQuestionnaire.saveSubmission(p: number, body, p2)
+	return post(p2, ("/responses/%d/submissions"):format(p), body, "experience-questionnaire.save-submission")
+end
+
+function FetchExperienceQuestionnaire.validateResponses(body, p)
+	return post(p, "/responses/validate", body, "experience-questionnaire.validate-responses")
+end
+
+function FetchExperienceQuestionnaire.previewSubmission(body, p)
+	return post(p, "/responses/preview", body, "experience-questionnaire.preview-submission")
+end
+
+return FetchExperienceQuestionnaire

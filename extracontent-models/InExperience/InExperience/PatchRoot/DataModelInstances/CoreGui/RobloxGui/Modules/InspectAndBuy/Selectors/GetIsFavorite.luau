@@ -1,32 +1,30 @@
-local ParentParent = script.Parent.Parent
-local IsDetailsItemPartOfBundleAndOffsale = require(ParentParent.Selectors.IsDetailsItemPartOfBundleAndOffsale)
-local UtilityFunctions = require(ParentParent.UtilityFunctions)
+local parent = script.Parent.Parent
+local IsDetailsItemPartOfBundleAndOffsale = require(parent.Selectors.IsDetailsItemPartOfBundleAndOffsale)
+local UtilityFunctions = require(parent.UtilityFunctions)
 
-return function(p1) -- line: 8
-	-- upvalues: IsDetailsItemPartOfBundleAndOffsale (copy), UtilityFunctions (copy)
-	local assetId = p1.detailsInformation.assetId
+return function(data)
+	local assetId = data.detailsInformation.assetId
 
 	if not assetId then
 		return false
 	end
 
-	local v6 = IsDetailsItemPartOfBundleAndOffsale(p1)
+	local detailsItemPartOfBundleAndOffsale = IsDetailsItemPartOfBundleAndOffsale(data)
 
-	if v6 == nil then
+	if detailsItemPartOfBundleAndOffsale == nil then
 		return false
 	end
 
-	local v7 = p1.assets[assetId]
+	local asset = data.assets[assetId]
 
-	if not v7 then
+	if not asset then
 		return false
 	end
 
-	if v6 then
-		local v8 = UtilityFunctions.getBundleId(v7)
-
-		return p1.favorites.bundles[v8]
+	if not detailsItemPartOfBundleAndOffsale then
+		return data.favorites.assets[assetId]
 	end
 
-	return p1.favorites.assets[assetId]
+	local bundleId = UtilityFunctions.getBundleId(asset)
+	return data.favorites.bundles[bundleId]
 end

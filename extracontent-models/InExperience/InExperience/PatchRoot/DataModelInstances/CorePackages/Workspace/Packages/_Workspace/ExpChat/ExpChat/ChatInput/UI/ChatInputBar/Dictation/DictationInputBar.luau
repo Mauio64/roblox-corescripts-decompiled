@@ -1,9 +1,16 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local React = require(ExpChatParent.React)
-local Foundation = require(ExpChatParent.Foundation)
+local parent = ExpChat.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local FFlagExpChatDictationFTUX = require(ExpChat.Flags.FFlagExpChatDictationFTUX)
+local FFlagExpChatDictationFadeOverride = require(ExpChat.Flags.FFlagExpChatDictationFadeOverride)
+local FFlagExpChatContinuousDictationIdleFade = require(ExpChat.Flags.FFlagExpChatContinuousDictationIdleFade)
+local v = FFlagExpChatDictationFadeOverride and FFlagExpChatContinuousDictationIdleFade
+
 local Config = require(ExpChat.Config)
+
 local ChannelChip = require(script.Parent.Parent.ChannelChip)
 local DictationFTUX = require(script.Parent.DictationFTUX)
 local StopCountdown = require(script.Parent.Parent.StopCountdown)
@@ -12,278 +19,348 @@ local useDictationInputBar = require(script.Parent.useDictationInputBar)
 local useDictationTextArea = require(script.Parent.useDictationTextArea)
 local DictationAffordances = require(script.Parent.DictationAffordances)
 
-local function lerp(n1: number, n2: number, n3: number) -- line: 23
-	return n1 + (n2 - n1) * n3
+local function lerp(p: number, p2: number, p3: number) -- 2 equivalent calls inferred from this helper
+	return p + (p2 - p) * p3
 end
-local function setTransparency(p1, p2) -- line: 29
-	return p2:map(function(n4: number) -- line: 30
-		-- upvalues: p1 (copy)
-		local v51 = p1
 
-		return v51 + (1 - v51) * n4
+local function setTransparency(p, transparencyValue) -- 3 equivalent calls inferred from this helper
+	return transparencyValue:map(function(p2: number)
+		return lerp(p, 1, p2) -- inferred equivalent call
 	end)
 end
-local function DictationInputBar(p3) -- line: 35
-	-- upvalues: Foundation (copy), useDictationInputBar (copy), DictationAffordances (copy), React (copy), useDictationTextArea (copy), Config (copy), StopCountdown (copy), ChannelChip (copy), DictationWaveform (copy), FFlagExpChatDictationFTUX (copy), DictationFTUX (copy)
-	local v23 = Foundation.Hooks.useTokens()
-	local v24 = useDictationInputBar({
-		inputText = p3.inputText,
-		setInputText = p3.setInputText,
-		chatInputBarSettings = p3.chatInputBarSettings,
-		customTextBoxRef = p3.customTextBoxRef,
-		textBoxRef = p3.textBoxRef,
-		targetTextChannel = p3.targetTextChannel,
-		isGlobalChatTabActive = p3.isGlobalChatTabActive,
-		onDictationActivityChanged = p3.onDictationActivityChanged,
-		onSendRecordingTap = p3.onSendRecordingTap,
-		onTranscriptionStaged = p3.onTranscriptionStaged
+
+local function DictationInputBar(props)
+	local v2 = Foundation.Hooks.useTokens()
+
+	local v3 = useDictationInputBar({
+		inputText = props.inputText,
+		setInputText = props.setInputText,
+		chatInputBarSettings = props.chatInputBarSettings,
+		customTextBoxRef = props.customTextBoxRef,
+		textBoxRef = props.textBoxRef,
+		targetTextChannel = props.targetTextChannel,
+		isGlobalChatTabActive = props.isGlobalChatTabActive,
+		onDictationActivityChanged = props.onDictationActivityChanged,
+		onDictationStateChanged = props.onDictationStateChanged,
+		onSendRecordingTap = props.onSendRecordingTap,
+		onTranscriptionStaged = props.onTranscriptionStaged
 	})
-	local v25 = DictationAffordances.deriveMicSendButton(v24, {
-		idleSendDisabled = false,
-		hasEmptyInputText = p3.inputText == "",
+
+	local micSendButton = DictationAffordances.deriveMicSendButton(v3, {
+		hasEmptyInputText = props.inputText == "",
 		idleSendIcon = Foundation.Enums.IconName.PaperAirplane,
 		idleSendVariant = Foundation.Enums.ButtonVariant.Emphasis,
-		idleSendActivated = p3.onSendActivated
+		idleSendActivated = props.onSendActivated,
+		idleSendDisabled = false
 	})
-	local v26 = DictationAffordances.deriveBackgroundColors(v24, {
-		defaultColor3 = p3.chatInputBarSettings.BackgroundColor3,
-		defaultTransparency = p3.chatInputBarBackgroundTransparency,
-		listeningColor3 = v23.Color.Shift.Shift_200.Color3,
-		listeningTransparency = v23.Color.Shift.Shift_200.Transparency
+
+	local backgroundColors = DictationAffordances.deriveBackgroundColors(v3, {
+		defaultColor3 = props.chatInputBarSettings.BackgroundColor3,
+		defaultTransparency = props.chatInputBarBackgroundTransparency,
+		listeningColor3 = v2.Color.Shift.Shift_200.Color3,
+		listeningTransparency = v2.Color.Shift.Shift_200.Transparency
 	})
-	local v27 = React.useMemo(function() -- line: 70
-		-- upvalues: p3 (copy), v26 (copy)
-		return p3.transparencyValue:map(function(n5: number) -- line: 71
-			-- upvalues: v26 (copy)
-			local t1 = {
-				Color3 = v26.color3
+
+	local backgroundStyle = React.useMemo(function()
+		return props.transparencyValue:map(function(p: number)
+			return {
+				Color3 = backgroundColors.color3,
+				Transparency = lerp(backgroundColors.baseTransparency, 1, p) -- inferred equivalent call
 			}
-			local baseTransparency = v26.baseTransparency
-
-			t1.Transparency = baseTransparency + (1 - baseTransparency) * n5
-
-			return t1
 		end)
-	end, {
-		p3.transparencyValue,
-		v26.color3,
-		v26.baseTransparency
-	})
-	local v28 = DictationAffordances.shouldPreventFade(v24)
-	local v29 = React.useMemo(function() -- line: 83
-		-- upvalues: v28 (copy), p3 (copy)
-		if v28 then
-			return p3.transparencyValue:map(function(_: number) -- line: 85
+	end, { props.transparencyValue, backgroundColors.color3, backgroundColors.baseTransparency })
+
+	local shouldPreventFade = DictationAffordances.shouldPreventFade(v3, v)
+	local groupTransparency = React.useMemo(function()
+		if shouldPreventFade then
+			return props.transparencyValue:map(function(_: number): number
 				return 0
 			end)
 		end
 
-		return p3.transparencyValue
-	end, {
-		v28,
-		p3.transparencyValue
+		return props.transparencyValue
+	end, { shouldPreventFade, props.transparencyValue })
+
+	local v4 = useDictationTextArea(v3, {
+		transparencyValue = props.transparencyValue,
+		showPlaceholderText = props.showPlaceholderText
 	})
-	local v30 = useDictationTextArea(v24, {
-		transparencyValue = p3.transparencyValue,
-		showPlaceholderText = p3.showPlaceholderText
-	})
-	local useLongPressOverlay = v25.useLongPressOverlay
-	local micGestureHandlers = v24.micGestureHandlers
+
+	local useLongPressOverlay = micSendButton.useLongPressOverlay
+	local micGestureHandlers = v3.micGestureHandlers
+
 	local createElement = React.createElement
-	local View = Foundation.View
-	local t2 = {
+	local view = Foundation.View
+	local background = {
 		Name = "Background",
 		tag = "row align-y-center gap-small size-full-0 auto-y padding-x-xsmall radius-medium",
-		backgroundStyle = v27
+		backgroundStyle = backgroundStyle,
+		stroke = {
+			Color = Config.ChatInputBarBorderColor3,
+			Transparency = setTransparency(Config.ChatInputBarBorderTransparency, props.transparencyValue) -- inferred equivalent call
+		}
 	}
-	local t3 = {
-		Color = Config.ChatInputBarBorderColor3
-	}
-	local ChatInputBarBorderTransparency = Config.ChatInputBarBorderTransparency
 
-	t3.Transparency = p3.transparencyValue:map(function(n7: number) -- line: 30
-		-- upvalues: ChatInputBarBorderTransparency (copy)
-		local v53 = ChatInputBarBorderTransparency
-
-		return v53 + (1 - v53) * n7
-	end)
-	t2.stroke = t3
-
-	local t4 = {
+	local children = {
 		StopCountdown = React.createElement(StopCountdown, {
 			LayoutOrder = 1,
-			countdownProgress = v24.dictation.bindings.countdownProgress,
-			onActivated = v24.dictation.stopDictation,
-			Visible = v24.dictation.bindings.isRecording
-		})
+			countdownProgress = v3.dictation.bindings.countdownProgress,
+			onActivated = v3.dictation.stopDictation,
+			Visible = v3.dictation.bindings.isRecording
+		}),
+		TextArea = 0,
+		MicButton = 0,
+		FTUX = 0,
+		SendIcon = 0
 	}
+
 	local createElement2 = React.createElement
-	local t5 = {
+	local v5 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		LayoutOrder = 2,
-		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.fromScale(0, 0),
-		SelectionBehaviorDown = p3.selectionBehavior,
-		SelectionBehaviorLeft = p3.selectionBehavior,
-		SelectionBehaviorRight = p3.selectionBehavior,
-		SelectionBehaviorUp = p3.selectionBehavior,
-		SelectionGroup = p3.selectionGroup
+		SelectionBehaviorDown = props.selectionBehavior,
+		SelectionBehaviorLeft = props.selectionBehavior,
+		SelectionBehaviorRight = props.selectionBehavior,
+		SelectionBehaviorUp = props.selectionBehavior,
+		SelectionGroup = props.selectionGroup
 	}
-	local t6 = {}
-	local createElement3 = React.createElement
-	local v43 = ChannelChip
-	local t7 = {}
-	local n8 = 0
+	local children2 = {
+		TargetChannelChip = React.createElement(ChannelChip, {
+			transparency = setTransparency(0, props.transparencyValue), -- inferred equivalent call
+			onAbsoluteSizeChanged = props.onChannelChipAbsoluteSizeChanged,
+			onChannelChipActivated = props.onChannelChipActivated,
+			targetTextChannelDisplayName = props.targetTextChannelDisplayName or "",
+			isChannelBarVisible = props.isChannelBarVisible,
+			developerChannelTabsEnabled = props.developerChannelTabsEnabled
+		}),
+		DisabledPlaceholderLabel = 0,
+		TextBoxContainer = 0,
+		WaveformOverlay = 0,
+		UIFlexItem = 0
+	}
 
-	t7.transparency = p3.transparencyValue:map(function(n9: number) -- line: 30
-		-- upvalues: n8 (copy)
-		local v55 = n8
+	local disabledPlaceholderLabel = not props.canLocalUserChat
 
-		return v55 + (1 - v55) * n9
-	end)
-	t7.onAbsoluteSizeChanged = p3.onChannelChipAbsoluteSizeChanged
-	t7.onChannelChipActivated = p3.onChannelChipActivated
-	t7.targetTextChannelDisplayName = p3.targetTextChannelDisplayName or ""
-	t7.isChannelBarVisible = p3.isChannelBarVisible
-	t7.developerChannelTabsEnabled = p3.developerChannelTabsEnabled
-	t6.TargetChannelChip = createElement3(v43, t7)
-
-	local v46 = not p3.canLocalUserChat
-
-	if v46 then
-		local createElement4 = React.createElement
-		local t8 = {
-			BackgroundTransparency = 1,
-			TextWrapped = true,
+	if disabledPlaceholderLabel then
+		local createElement3 = React.createElement
+		local v6 = {
 			AnchorPoint = Vector2.new(1, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
 			Font = Config.ChatInputBarFont,
-			Text = p3.disabledChatPlaceholderText,
+			Text = props.disabledChatPlaceholderText,
 			Position = UDim2.fromScale(1, 0),
-			Size = p3.targetChannelWidth:map(function(n10: number) -- line: 141
-				return UDim2.new(1, -(n10 + 8), 0, 0)
+			Size = props.targetChannelWidth:map(function(p: number)
+				return UDim2.new(1, -(p + 8), 0, 0)
 			end),
-			TextColor3 = p3.showPlaceholderText and p3.chatInputBarSettings.PlaceholderColor3 or p3.chatInputBarSettings.TextColor3,
-			TextSize = if not p3.isSpatialUIEnabled then p3.chatInputBarSettings.TextSize else p3.chatInputBarSettings.SpatialPanelTextSize
+			TextColor3 = props.showPlaceholderText and props.chatInputBarSettings.PlaceholderColor3 or props.chatInputBarSettings.TextColor3,
+			TextSize = 0,
+			TextTransparency = 0,
+			Selectable = 0,
+			SelectionImageObject = 0,
+			TextWrapped = true,
+			TextXAlignment = 0,
+			TextYAlignment = 0,
+			ref = 0
 		}
-		local v49 = not p3.showPlaceholderText and 0 or 0.5
+		local textSize
 
-		t8.TextTransparency = p3.transparencyValue:map(function(n11: number) -- line: 30
-			-- upvalues: v49 (copy)
-			local v58 = v49
+		if props.isSpatialUIEnabled then
+			textSize = props.chatInputBarSettings.SpatialPanelTextSize
+		else
+			textSize = props.chatInputBarSettings.TextSize
+		end
 
-			return v58 + (1 - v58) * n11
-		end)
-		t8.Selectable = p3.isPlaceholderSelectable
-		t8.SelectionImageObject = p3.placeholderSelectionImageObject
-		t8.TextXAlignment = Enum.TextXAlignment.Left
-		t8.TextYAlignment = Enum.TextYAlignment.Top
-		t8.ref = p3.placeholderRef
-		v46 = createElement4("TextLabel", t8)
+		v6.TextSize = textSize
+
+		v6.TextTransparency = setTransparency(props.showPlaceholderText and 0.5 or 0, props.transparencyValue) -- inferred equivalent call
+
+		v6.Selectable = props.isPlaceholderSelectable
+		v6.SelectionImageObject = props.placeholderSelectionImageObject
+
+		v6.TextXAlignment = Enum.TextXAlignment.Left
+		v6.TextYAlignment = Enum.TextYAlignment.Top
+		v6.ref = props.placeholderRef
+		disabledPlaceholderLabel = createElement3("TextLabel", v6)
 	end
 
-	t6.DisabledPlaceholderLabel = v46
-	t6.TextBoxContainer = p3.canLocalUserChat and React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		AnchorPoint = Vector2.new(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = UDim2.fromScale(1, 0),
-		Size = p3.targetChannelWidth:map(function(n12: number) -- line: 165
-			return UDim2.new(1, -(n12 + 8), 0, 0)
-		end)
-	}, {
-		TextBox = React.createElement("TextBox", {
-			AnchorPoint = Vector2.new(0, 0),
-			AutomaticSize = Enum.AutomaticSize.XY,
+	children2.DisabledPlaceholderLabel = disabledPlaceholderLabel
+	local textBoxContainer
+
+	if props.canLocalUserChat then
+		local createElement3 = React.createElement
+		local v6 = {
+			AnchorPoint = Vector2.new(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
-			ClearTextOnFocus = false,
-			FontFace = p3.chatInputBarSettings.FontFace,
-			PlaceholderText = p3.showPlaceholderText and p3.placeholderText or "",
-			Selectable = p3.isTextBoxSelectable,
-			SelectionImageObject = p3.cursor,
-			Size = UDim2.fromScale(1, 0),
-			Text = "",
-			PlaceholderColor3 = p3.chatInputBarSettings.PlaceholderColor3,
-			TextColor3 = p3.chatInputBarSettings.TextColor3,
-			TextSize = if not p3.isSpatialUIEnabled then p3.chatInputBarSettings.TextSize else p3.chatInputBarSettings.SpatialPanelTextSize,
-			TextTransparency = v30.textTransparency,
-			TextStrokeTransparency = v30.textStrokeTransparency,
-			TextStrokeColor3 = p3.chatInputBarSettings.TextStrokeColor3,
-			TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			ZIndex = 2,
-			[React.Event.Focused] = p3.onFocused,
-			[React.Event.FocusLost] = p3.onFocusLost,
-			[React.Change.Text] = p3.onTextChanged,
-			[React.Event.ReturnPressedFromOnScreenKeyboard] = p3.onReturnPressedFromOnScreenKeyboard,
-			ref = if not p3.chatInputBarSettings.TextBox then p3.textBoxRef else p3.customTextBoxRef
-		})
-	}) or nil
-	t6.WaveformOverlay = React.createElement("Frame", {
+			Position = UDim2.fromScale(1, 0),
+			Size = props.targetChannelWidth:map(function(p: number)
+				return UDim2.new(1, -(p + 8), 0, 0)
+			end)
+		}
+
+		local createElement4 = React.createElement
+		local v7 = {}
+		v7.AnchorPoint = Vector2.new(0, 0)
+		v7.AutomaticSize = Enum.AutomaticSize.XY
+		v7.BackgroundTransparency = 1
+		v7.ClearTextOnFocus = false
+		v7.FontFace = props.chatInputBarSettings.FontFace
+		v7.PlaceholderText = props.showPlaceholderText and props.placeholderText or ""
+		v7.Selectable = props.isTextBoxSelectable
+		v7.SelectionImageObject = props.cursor
+		v7.Size = UDim2.fromScale(1, 0)
+		v7.Text = ""
+		v7.PlaceholderColor3 = props.chatInputBarSettings.PlaceholderColor3
+		v7.TextColor3 = props.chatInputBarSettings.TextColor3
+		local textSize
+
+		if props.isSpatialUIEnabled then
+			textSize = props.chatInputBarSettings.SpatialPanelTextSize
+		else
+			textSize = props.chatInputBarSettings.TextSize
+		end
+
+		v7.TextSize = textSize
+
+		v7.TextTransparency = v4.textTransparency
+		v7.TextStrokeTransparency = v4.textStrokeTransparency
+		v7.TextStrokeColor3 = props.chatInputBarSettings.TextStrokeColor3
+		v7.TextWrapped = true
+		v7.TextXAlignment = Enum.TextXAlignment.Left
+		v7.TextYAlignment = Enum.TextYAlignment.Top
+		v7.ZIndex = 2
+
+		v7[React.Event.Focused] = props.onFocused
+		v7[React.Event.FocusLost] = props.onFocusLost
+		v7[React.Change.Text] = props.onTextChanged
+		v7[React.Event.ReturnPressedFromOnScreenKeyboard] = props.onReturnPressedFromOnScreenKeyboard
+		local ref
+
+		if props.chatInputBarSettings.TextBox then
+			ref = props.customTextBoxRef
+		else
+			ref = props.textBoxRef
+		end
+
+		v7.ref = ref
+		textBoxContainer = createElement3("Frame", v6, { TextBox = createElement4("TextBox", v7) }) or nil
+	end
+
+	children2.TextBoxContainer = textBoxContainer
+
+	local createElement3 = React.createElement
+	local v6 = {
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
-		ZIndex = 3,
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.fromScale(0, 0.5),
-		Size = UDim2.new(1, 0, 0, if not p3.isSpatialUIEnabled then p3.chatInputBarSettings.TextSize else p3.chatInputBarSettings.SpatialPanelTextSize),
-		Visible = v24.dictation.bindings.isAudioActive
-	}, {
-		List = React.createElement(DictationWaveform, {
-			isActive = v24.isRecording or v24.isListening,
-			audioDeviceInput = v24.dictation.audioDeviceInput,
-			transcribedSamplesBinding = v24.transcribedSamplesBinding,
-			onSample = v24.onWaveformSample
-		})
+		Size = 0,
+		Visible = 0,
+		ZIndex = 3
+	}
+	local v7
+
+	if props.isSpatialUIEnabled then
+		v7 = props.chatInputBarSettings.SpatialPanelTextSize
+	else
+		v7 = props.chatInputBarSettings.TextSize
+	end
+
+	v6.Size = UDim2.new(1, 0, 0, v7)
+
+	v6.Visible = v3.dictation.bindings.isAudioActive
+
+	local createElement4 = React.createElement
+	local v8 = {
+		isActive = v3.isRecording or v3.isListening,
+		audioDeviceInput = v3.dictation.audioDeviceInput,
+		transcribedSamplesBinding = v3.transcribedSamplesBinding,
+		transparencyValue = 0,
+		onSample = 0
+	}
+	local transparencyValue
+
+	if v3.isListening and not shouldPreventFade then
+		transparencyValue = props.transparencyValue
+	end
+
+	v8.transparencyValue = transparencyValue
+
+	v8.onSample = v3.onWaveformSample
+	children2.WaveformOverlay = createElement3("Frame", v6, {
+		List = createElement4(DictationWaveform, v8)
 	})
-	t6.UIFlexItem = React.createElement("UIFlexItem", {
-		FlexMode = Enum.UIFlexMode.Fill
-	})
-	t4.TextArea = createElement2("Frame", t5, t6)
-	t4.MicButton = React.createElement(Foundation.View, {
+
+	children2.UIFlexItem = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
+	children.TextArea = createElement2("Frame", v5, children2)
+
+	local createElement5 = React.createElement
+	local view2 = Foundation.View
+	local v9 = {
+		ref = v3.micButtonSlotRef,
 		tag = "auto-xy padding-xsmall",
-		LayoutOrder = 3,
-		ref = v24.micButtonSlotRef,
-		GroupTransparency = v29
-	}, {
+		GroupTransparency = groupTransparency,
+		LayoutOrder = 3
+	}
+
+	local v10 = {
 		IconButton = React.createElement(Foundation.IconButton, {
-			isCircular = true,
-			icon = v25.icon,
+			icon = micSendButton.icon,
 			size = Foundation.Enums.InputSize.Small,
-			variant = v25.variant,
-			isDisabled = v25.isDisabled,
-			onActivated = if not useLongPressOverlay then v25.onActivated else function() -- line: 253
-			end,
+			variant = micSendButton.variant,
+			isCircular = true,
+			isDisabled = micSendButton.isDisabled,
+			onActivated = useLongPressOverlay and function() end or micSendButton.onActivated,
 			Selectable = not useLongPressOverlay and nil
 		}),
-		InputTarget = if not useLongPressOverlay or micGestureHandlers == nil then nil else React.createElement("TextButton", {
+		InputTarget = 0
+	}
+	local inputTarget
+
+	if useLongPressOverlay and micGestureHandlers ~= nil then
+		inputTarget = React.createElement("TextButton", {
 			Active = true,
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
 			Text = "",
 			ZIndex = 2,
 			Selectable = true,
-			SelectionImageObject = v24.micCursor,
+			SelectionImageObject = v3.micCursor,
 			[React.Event.Activated] = micGestureHandlers[React.Event.Activated],
 			[React.Event.InputBegan] = micGestureHandlers[React.Event.InputBegan],
 			[React.Event.InputEnded] = micGestureHandlers[React.Event.InputEnded]
 		})
-	})
-	t4.FTUX = if not FFlagExpChatDictationFTUX or (not v24.ftux or not v24.ftux.shouldShow) then nil else React.createElement(DictationFTUX, {
-		anchorRef = v24.micButtonSlotRef,
-		onDismiss = if not FFlagExpChatDictationFTUX then nil else v24.ftux.dismiss
-	})
-	t4.SendIcon = React.createElement(Foundation.Icon, {
-		Visible = false,
-		name = Foundation.Enums.IconName.PaperAirplane,
-		style = {
-			Transparency = 0,
-			Color3 = p3.chatInputBarSettings.PlaceholderColor3
-		},
-		size = Foundation.Enums.IconSize.Small
-	})
+	end
 
-	return createElement(View, t2, t4)
+	v10.InputTarget = inputTarget
+	children.MicButton = createElement5(view2, v9, v10)
+	local ftux
+
+	if FFlagExpChatDictationFTUX and v3.ftux and v3.ftux.shouldShow then
+		local createElement6 = React.createElement
+		local v11 = { anchorRef = v3.micButtonSlotRef, onDismiss = 0 }
+		local onDismiss
+
+		if FFlagExpChatDictationFTUX then
+			onDismiss = v3.ftux.dismiss
+		end
+
+		v11.onDismiss = onDismiss
+		ftux = createElement6(DictationFTUX, v11)
+	end
+
+	children.FTUX = ftux
+
+	children.SendIcon = React.createElement(Foundation.Icon, {
+		name = Foundation.Enums.IconName.PaperAirplane,
+		style = { Color3 = props.chatInputBarSettings.PlaceholderColor3, Transparency = 0 },
+		size = Foundation.Enums.IconSize.Small,
+		Visible = false
+	})
+	return createElement(view, background, children)
 end
 
 return React.memo(DictationInputBar)

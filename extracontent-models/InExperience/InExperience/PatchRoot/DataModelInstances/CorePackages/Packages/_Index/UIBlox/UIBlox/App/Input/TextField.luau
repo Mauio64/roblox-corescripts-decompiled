@@ -1,251 +1,324 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local React = require(scriptParentParentParentParent.React)
-local InputLabel = require(scriptParent.InputLabel)
-local HelperText = require(scriptParent.HelperText)
-local ImageSetComponent = require(scriptParentParentParent.Core.ImageSet.ImageSetComponent)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-require(scriptParentParent.ImageSet.ImagesTypes)
+local React = require(parent4.React)
+local Foundation = require(parent4.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
-local useStyle = require(scriptParentParentParent.Core.Style.useStyle)
-local useCursor = require(scriptParentParentParent.App.SelectionCursor.useCursor)
-local UIBloxConfig = require(scriptParentParentParent.UIBloxConfig)
-local t1 = {
-	width = UDim.new(0, 400)
-}
+local InputLabel = require(parent.InputLabel)
+local HelperText = require(parent.HelperText)
+local ImageSetComponent = require(parent3.Core.ImageSet.ImageSetComponent)
+require(parent2.ImageSet.ImagesTypes)
 
-local function TextField(t2: {[any]: any}) -- line: 54
-	-- upvalues: useStyle (copy), React (copy), useCursor (copy), t1 (copy), InputLabel (copy), ImageSetComponent (copy), UIBloxConfig (copy), HelperText (copy)
-	local Tokens = useStyle().Tokens
-	local v16 = React.useRef(nil)
-	local v17, v18 = React.useState(false)
-	local v19, v20 = React.useState(false)
-	local TextField2 = Tokens.Component.TextField
-	local Focus = Tokens.Semantic.Stroke.Focus
-	local Small = Tokens.Semantic.Icon.Size.Small
-	local Input = Tokens.Semantic.Stroke.Input
-	local v25 = math.ceil(Input) * 2
-	local Focus2 = Tokens.Semantic.Stroke.Focus
-	local v27 = math.ceil(Focus2) * 2
-	local v28 = useCursor(UDim.new(0, TextField2.Base.Field.BorderRadius), Focus, Focus)
-	local v29 = useCursor(UDim.new(0.5), Small / 2, Focus)
-	local v30 = if t2.width == nil then t1.width else t2.width
+local useStyle = require(parent3.Core.Style.useStyle)
+local useCursor = require(parent3.App.SelectionCursor.useCursor)
+local UIBloxConfig = require(parent3.UIBloxConfig)
 
-	local function canUseTextInputType() -- line: 80
-		local ok, result = pcall(function() -- line: 81
+local v = { width = UDim.new(0, 400) }
+
+local function TextField(props)
+	local tokens = useStyle().Tokens
+
+	local ref = React.useRef(nil)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
+
+	local thick = tokens.Stroke.Thick
+	local size_400 = tokens.Size.Size_400
+
+	local standard = tokens.Stroke.Standard
+	local v2 = math.ceil(standard) * 2
+	local thick2 = tokens.Stroke.Thick
+	local v3 = math.ceil(thick2) * 2
+
+	local selectionImageObject = useCursor(UDim.new(0, tokens.Radius.Medium), thick, thick)
+	local selectionImageObject2 = useCursor(UDim.new(0.5), size_400 / 2, thick)
+
+	local width = if props.width == nil then v.width else props.width
+
+	local function canUseTextInputType()
+		local success, result = pcall(function()
 			local CoreGui = game:GetService("CoreGui")
-			local _ = CoreGui.Name
-
+			local _name = CoreGui.Name
 			return CoreGui
 		end)
 
-		return ok and result ~= nil
+		return success and result ~= nil
 	end
-	local function getTextBoxWidthOffset() -- line: 89
-		-- upvalues: t2 (copy), Small (copy), TextField2 (copy)
-		local n1 = 0
 
-		if t2.iconLeading then
-			n1 = n1 - Small - TextField2.Base.Field.Gap * 2
+	local function getTextBoxWidthOffset() -- 1 equivalent call inferred from this helper
+		local textBoxWidthOffset = 0
+
+		if props.iconLeading then
+			textBoxWidthOffset = textBoxWidthOffset - size_400 - tokens.Gap.Small * 2
 		end
 
-		if t2.iconButton then
-			n1 = n1 - Small - TextField2.Base.Field.Gap * 2
+		if props.iconButton then
+			textBoxWidthOffset = textBoxWidthOffset - size_400 - tokens.Gap.Small * 2
 		end
 
-		return n1
+		return textBoxWidthOffset
 	end
-	local function onTextChange(p1) -- line: 102
-		-- upvalues: t2 (copy)
-		if p1 == nil then
-			t2.onChange("")
 
+	local function onTextChange(p)
+		if p == nil then
+			props.onChange("")
+		else
+			props.onChange(p.Text)
+		end
+	end
+
+	local function onFocusGained()
+		if props.disabled and ref.current then
+			ref.current:ReleaseFocus()
 			return
 		end
 
-		t2.onChange(p1.Text)
-	end
-	local function onFocusGained() -- line: 110
-		-- upvalues: t2 (copy), v16 (copy), v20 (copy)
-		if t2.disabled and v16.current then
-			v16.current:ReleaseFocus()
+		setState2(true)
 
-			return
-		end
-
-		v20(true)
-
-		if t2.onFocusGained then
-			t2.onFocusGained()
+		if props.onFocusGained then
+			props.onFocusGained()
 		end
 	end
-	local function onFocusLost() -- line: 121
-		-- upvalues: v20 (copy)
-		v20(false)
+
+	local function onFocusLost()
+		setState2(false)
 	end
 
 	local createElement = React.createElement
-	local t3 = {
+	local v4 = {
 		BackgroundTransparency = 1,
-		Size = UDim2.new(v30, UDim.new(0, 0)),
+		Size = UDim2.new(width, UDim.new(0, 0)),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t2.LayoutOrder
+		LayoutOrder = props.LayoutOrder
 	}
-	local t4 = {
+	local v5 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, Tokens.Component.InputLabel.Base.Spacing.Bottom)
+			Padding = UDim.new(0, tokens.Size.Size_100)
 		}),
-		InputLabel = if not t2.label then nil else React.createElement(InputLabel, {
-			LayoutOrder = 1,
-			text = t2.label,
-			required = t2.required
-		})
+		InputLabel = 0,
+		InputCanvas = 0,
+		HelperText = 0
 	}
+	local inputLabel
+
+	if props.label then
+		inputLabel = React.createElement(InputLabel, {
+			text = props.label,
+			required = props.required,
+			LayoutOrder = 1
+		})
+	end
+
+	v5.InputLabel = inputLabel
+
 	local createElement2 = React.createElement
-	local t5 = {
+	local v6 = {
+		Size = UDim2.new(1, 0, 0, tokens.Size.Size_1200),
 		BackgroundTransparency = 1,
 		LayoutOrder = 2,
-		Size = UDim2.new(1, 0, 0, Tokens.Global.Size_600),
-		GroupTransparency = not t2.disabled and 0 or 1 - TextField2.Disabled.Field.Opacity
+		GroupTransparency = props.disabled and 0.68 or 0
 	}
-	local t6 = {}
+
 	local createElement3 = React.createElement
-	local t7 = {
-		Size = UDim2.new(1, -v25, 1, -v25),
-		Position = UDim2.new(0, v25 / 2, 0, v25 / 2),
+	local v7 = {
+		Size = UDim2.new(1, -v2, 1, -v2),
+		Position = UDim2.new(0, v2 / 2, 0, v2 / 2),
 		BackgroundTransparency = 1,
-		Selectable = not t2.disabled,
+		Selectable = not props.disabled,
 		Image = "",
-		SelectionImageObject = v28,
-		[React.Event.Activated] = function() -- line: 159
-			-- upvalues: v16 (copy)
-			if v16.current then
-				v16.current:CaptureFocus()
+		SelectionImageObject = selectionImageObject,
+		[React.Event.Activated] = function()
+			if ref.current then
+				ref.current:CaptureFocus()
 			end
 		end,
-		[React.Event.MouseEnter] = function() -- line: 164
-			-- upvalues: v18 (copy)
-			v18(true)
+		[React.Event.MouseEnter] = function()
+			setState(true)
 		end,
-		[React.Event.MouseLeave] = function() -- line: 167
-			-- upvalues: v18 (copy)
-			v18(false)
+		[React.Event.MouseLeave] = function()
+			setState(false)
 		end
 	}
-	local t8 = {
+	local children = {
 		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, TextField2.Base.Field.BorderRadius)
+			CornerRadius = UDim.new(0, tokens.Radius.Medium)
 		}),
-		Border = React.createElement("UIStroke", {
-			Color = if not t2.error then TextField2.Base.Field.BorderColor.Color3 else TextField2.Error.Field.BorderColor.Color3,
-			Transparency = if not t2.error then if not v19 then TextField2.Base.Field.BorderColor.Transparency else 0 else TextField2.Error.Field.BorderColor.Transparency,
-			Thickness = Input
-		})
+		Border = 0,
+		BorderFrame = 0
 	}
-	local createElement4 = React.createElement
-	local t9 = {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, -v27, 1, -v27),
-		Position = UDim2.new(0, v27 / 2, 0, v27 / 2)
-	}
-	local t10 = {
-		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, TextField2.Base.Field.BorderRadius - v27 / 2)
-		}),
-		Focus = if t2.disabled or not v17 and not v19 then nil else React.createElement("UIStroke", {
-			Color = TextField2.Base.Field.BorderColor.Color3,
-			Transparency = Tokens.Global.Opacity_12,
-			Thickness = Focus2
-		}),
-		Padding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, TextField2.Base.Field.Spacing.Leading),
-			PaddingRight = UDim.new(0, TextField2.Base.Field.Spacing.Trailing)
-		}),
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Horizontal,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, TextField2.Base.Field.Gap * 2)
-		}),
-		IconLeading = if not t2.iconLeading then nil else React.createElement(ImageSetComponent.Label, {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Image = t2.iconLeading,
-			Size = UDim2.new(0, Small, 0, Small),
-			ImageColor3 = TextField2.Base.IconLeading.ContentColor.Color3,
-			ImageTransparency = TextField2.Base.IconLeading.ContentColor.Transparency
-		})
-	}
-	local createElement5 = React.createElement
-	local t11 = {
-		ref = v16,
-		Text = t2.text
-	}
-	local ok, result = pcall(function() -- line: 81
-		local CoreGui = game:GetService("CoreGui")
-		local _ = CoreGui.Name
 
+	local createElement4 = React.createElement
+	local color
+
+	if props.error then
+		color = tokens.Color.ActionAlert.Border.Color3
+	else
+		color = tokens.Color.Stroke.Emphasis.Color3
+	end
+
+	local transparency
+
+	if props.error then
+		transparency = tokens.Color.ActionAlert.Border.Transparency
+	else
+		transparency = state2 and 0 or tokens.Color.Stroke.Emphasis.Transparency
+	end
+
+	children.Border = createElement4("UIStroke", {
+		Color = color,
+		Transparency = transparency,
+		Thickness = standard
+	})
+
+	local createElement5 = React.createElement
+	local v8 = {
+		Size = UDim2.new(1, -v3, 1, -v3),
+		Position = UDim2.new(0, v3 / 2, 0, v3 / 2),
+		BackgroundTransparency = 1
+	}
+
+	local children2 = {
+		Corner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, tokens.Radius.Medium - v3 / 2)
+		}),
+		Focus = 0,
+		Padding = 0,
+		Layout = 0,
+		IconLeading = 0,
+		TextBox = 0,
+		IconButton = 0
+	}
+	local focus
+
+	if not (props.disabled or not (state or state2)) then
+		focus = React.createElement("UIStroke", {
+			Color = tokens.Color.Stroke.Emphasis.Color3,
+			Transparency = 0.88,
+			Thickness = thick2
+		})
+	end
+
+	children2.Focus = focus
+
+	children2.Padding = React.createElement("UIPadding", {
+		PaddingLeft = UDim.new(0, tokens.Size.Size_300),
+		PaddingRight = UDim.new(0, tokens.Size.Size_300)
+	})
+
+	children2.Layout = React.createElement("UIListLayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, tokens.Gap.Small * 2)
+	})
+	local iconLeading
+
+	if props.iconLeading then
+		iconLeading = React.createElement(ImageSetComponent.Label, {
+			BackgroundTransparency = 1,
+			Image = props.iconLeading,
+			Size = UDim2.new(0, size_400, 0, size_400),
+			ImageColor3 = tokens.Color.Content.Muted.Color3,
+			ImageTransparency = tokens.Color.Content.Muted.Transparency,
+			LayoutOrder = 1
+		})
+	end
+
+	children2.IconLeading = iconLeading
+
+	local createElement6 = React.createElement
+	local v9 = {}
+	v9.ref = ref
+	v9.Text = props.text
+	local success, result = pcall(function()
+		local CoreGui = game:GetService("CoreGui")
+		local _name = CoreGui.Name
 		return CoreGui
 	end)
+	local textInputType
 
-	t11.TextInputType = ok and result ~= nil and t2.textInputType or nil
-	t11.ClearTextOnFocus = false
-
-	local new = UDim2.new
-	local n2 = 0
-
-	if t2.iconLeading then
-		n2 = n2 - Small - TextField2.Base.Field.Gap * 2
+	if success and result ~= nil then
+		textInputType = props.textInputType or nil
 	end
 
-	if t2.iconButton then
-		n2 = n2 - Small - TextField2.Base.Field.Gap * 2
+	v9.TextInputType = textInputType
+	v9.ClearTextOnFocus = false
+	v9.Size = UDim2.new(1, getTextBoxWidthOffset(), 1, 0) -- inferred equivalent call
+	v9.TextEditable = not props.disabled
+	v9.BackgroundTransparency = 1
+	v9.TextXAlignment = Enum.TextXAlignment.Left
+	v9.TextYAlignment = Enum.TextYAlignment.Center
+	v9.FontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font)
+	local openTypeFeatures
+
+	if UIBloxConfig.enableOpenTypeSupport and props.openTypeFeatures then
+		openTypeFeatures = props.openTypeFeatures
 	end
 
-	t11.Size = new(1, n2, 1, 0)
-	t11.TextEditable = not t2.disabled
-	t11.BackgroundTransparency = 1
-	t11.TextXAlignment = Enum.TextXAlignment.Left
-	t11.TextYAlignment = Enum.TextYAlignment.Center
-	t11.Font = TextField2.Base.Field.Typography.Font
-	t11.OpenTypeFeatures = if not UIBloxConfig.enableOpenTypeSupport or not t2.openTypeFeatures then nil else t2.openTypeFeatures
-	t11.TextSize = TextField2.Base.Field.Typography.FontSize
-	t11.LineHeight = 1
-	t11.TextColor3 = TextField2.Base.FieldValue.ContentColor.Color3
-	t11.TextTransparency = TextField2.Base.FieldValue.ContentColor.Transparency
-	t11.PlaceholderText = t2.placeholder
-	t11.PlaceholderColor3 = Tokens.Semantic.Color.Text.Default.Color3
-	t11.ClipsDescendants = true
-	t11.Selectable = false
-	t11.LayoutOrder = 2
-	t11[React.Event.Focused] = onFocusGained
-	t11[React.Event.FocusLost] = onFocusLost
-	t11[React.Change.Text] = onTextChange
-	t10.TextBox = createElement5("TextBox", t11)
-	t10.IconButton = if not t2.iconButton then nil else React.createElement(ImageSetComponent.Button, {
-		BackgroundTransparency = 1,
-		Image = t2.iconButton,
-		Size = UDim2.new(0, Small, 0, Small),
-		ImageColor3 = TextField2.Base.IconLeading.ContentColor.Color3,
-		Selectable = not t2.disabled,
-		SelectionImageObject = v29,
-		LayoutOrder = 3,
-		[React.Event.Activated] = if t2.disabled then nil else t2.onButtonPress
-	})
-	t8.BorderFrame = createElement4("Frame", t9, t10)
-	t6.Input = createElement3("ImageButton", t7, t8)
-	t4.InputCanvas = createElement2("CanvasGroup", t5, t6)
-	t4.HelperText = if not t2.hint then nil else React.createElement(HelperText, {
-		LayoutOrder = 3,
-		text = t2.hint,
-		error = t2.error
-	})
+	v9.OpenTypeFeatures = openTypeFeatures
 
-	return createElement("Frame", t3, t4)
+	v9.TextSize = tokens.Typography.BodyLarge.FontSize
+	v9.LineHeight = 1
+	v9.TextColor3 = tokens.Color.Content.Emphasis.Color3
+	v9.TextTransparency = tokens.Color.Content.Emphasis.Transparency
+	v9.PlaceholderText = props.placeholder
+	v9.PlaceholderColor3 = tokens.Color.Content.Default.Color3
+	v9.ClipsDescendants = true
+	v9.Selectable = false
+	v9.LayoutOrder = 2
+
+	v9[React.Event.Focused] = onFocusGained
+	v9[React.Event.FocusLost] = onFocusLost
+	v9[React.Change.Text] = onTextChange
+	children2.TextBox = createElement6("TextBox", v9)
+	local iconButton
+
+	if props.iconButton then
+		local createElement7 = React.createElement
+		local button = ImageSetComponent.Button
+		local v10 = {
+			BackgroundTransparency = 1,
+			["Image"] = props.iconButton,
+			Size = UDim2.new(0, size_400, 0, size_400),
+			ImageColor3 = tokens.Color.Content.Muted.Color3,
+			Selectable = not props.disabled,
+			SelectionImageObject = selectionImageObject2,
+			LayoutOrder = 3
+		}
+
+		local activated = React.Event.Activated
+		local v11
+
+		if not props.disabled then
+			v11 = props.onButtonPress
+		end
+
+		v10[activated] = v11
+		iconButton = createElement7(button, v10)
+	end
+
+	children2.IconButton = iconButton
+	children.BorderFrame = createElement5("Frame", v8, children2)
+	v5.InputCanvas = createElement2("CanvasGroup", v6, {
+		Input = createElement3("ImageButton", v7, children)
+	})
+	local helperText
+
+	if props.hint then
+		helperText = React.createElement(HelperText, {
+			text = props.hint,
+			error = props.error,
+			LayoutOrder = 3
+		})
+	end
+
+	v5.HelperText = helperText
+	return createElement("Frame", v4, v5)
 end
 
 return TextField

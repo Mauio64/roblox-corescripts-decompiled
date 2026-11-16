@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local DualDropdownReport = require(Workspace.GenericAbuseReporting.GenericAbuseReporting.UXFlow.DualDropdownReport.DualDropdownReport)
 
-return (require(_Workspace.GenericAbuseReporting.GenericAbuseReporting.UXFlow.DualDropdownReport.DualDropdownReport))
+return DualDropdownReport

@@ -1,116 +1,84 @@
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local Parent = script:FindFirstAncestor("ToastNotification").Parent
-local React = require(Parent.React)
 
-local function useKeyCodeHold(p1, n1: number, n2: number, p2: ((...any) -> ...any), b1: boolean?) -- line: 14
-	-- upvalues: React (copy), UserInputService (copy), RunService (copy)
-	local v11, v12 = React.useState(false)
-	local v13, v14 = React.useBinding(0)
-	local v15 = React.useRef(nil)
+local parent = script:FindFirstAncestor("ToastNotification").Parent
 
-	React.useEffect(function() -- line: 25
-		-- upvalues: b1 (copy), UserInputService (copy), p1 (copy), v12 (copy)
-		if b1 then
+local React = require(parent.React)
+
+local function useKeyCodeHold(p, p2: number, p3: number, callback, flag: boolean?)
+	local state, setState = React.useState(false)
+	local holdProgress, v = React.useBinding(0)
+	local ref = React.useRef(nil)
+
+	React.useEffect(function()
+		if flag then
 			return
 		end
 
-		local connection = UserInputService.InputBegan:Connect(function(input, gameProcessed) -- line: 30
-			-- upvalues: p1 (copy), v12 (copy)
+		local inputBeganConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
 			if gameProcessed then
 				return
 			end
 
-			if input.KeyCode == p1 then
-				v12(true)
-			end
-		end)
-		local connection2 = UserInputService.InputEnded:Connect(function(input) -- line: 40
-			-- upvalues: p1 (copy), v12 (copy)
-			if input.KeyCode == p1 then
-				v12(false)
+			if input.KeyCode == p then
+				setState(true)
 			end
 		end)
 
-		return function() -- line: 46
-			-- upvalues: connection (copy), connection2 (copy), v12 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
-			v12(false)
+		local inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
+			if input.KeyCode == p then
+				setState(false)
+			end
+		end)
+
+		return function()
+			inputBeganConnection:Disconnect()
+			inputEndedConnection:Disconnect()
+			setState(false)
 		end
-	end, {
-		b1,
-		p1
-	})
-	React.useEffect(function() -- line: 53
-		-- upvalues: v11 (copy), v15 (copy), RunService (copy), n1 (copy), n2 (copy), p2 (copy), v14 (copy)
-		if not v11 then
+	end, { flag, p })
+
+	React.useEffect(function()
+		if not state then
 			return
 		end
 
-		local function disconnect() -- line: 58
-			-- upvalues: v15 (copy)
-			if v15.current then
-				v15.current:Disconnect()
-				v15.current = nil
+		local function disconnect() -- 3 equivalent calls inferred from this helper
+			if ref.current then
+				ref.current:Disconnect()
+				ref.current = nil
 			end
 		end
 
-		local n3 = 0
+		local total = 0
+		ref.current = RunService.Heartbeat:Connect(function(dt)
+			total += dt
 
-		v15.current = RunService.Heartbeat:Connect(function(dt) -- line: 66
-			-- upvalues: n3 (ref), n1 (copy), n2 (copy), v15 (copy), p2 (copy), v14 (copy)
-			n3 += dt
-
-			if n3 < n1 then
+			if total < p2 then
 				return
 			end
 
-			if n2 == 0 then
-				if v15.current then
-					v15.current:Disconnect()
-					v15.current = nil
+			if p3 == 0 then
+				disconnect() -- inferred equivalent call
+				callback()
+			else
+				local v2 = math.clamp((total - p2) / p3, 0, 1)
+				v(v2)
+
+				if v2 >= 1 then
+					disconnect() -- inferred equivalent call
+					callback()
 				end
-
-				p2()
-
-				return
-			end
-
-			local v24 = math.clamp((n3 - n1) / n2, 0, 1)
-
-			v14(v24)
-
-			if v24 >= 1 then
-				if v15.current then
-					v15.current:Disconnect()
-					v15.current = nil
-				end
-
-				p2()
 			end
 		end)
 
-		return function() -- line: 89
-			-- upvalues: v15 (copy), v14 (copy)
-			if v15.current then
-				v15.current:Disconnect()
-				v15.current = nil
-			end
-
-			v14(0)
+		return function()
+			disconnect() -- inferred equivalent call
+			v(0)
 		end
-	end, {
-		v11,
-		p2,
-		n1,
-		n2
-	})
+	end, { state, callback, p2, p3 })
 
-	return {
-		holding = v11,
-		holdProgress = v13
-	}
+	return { holding = state, holdProgress = holdProgress }
 end
 
 return useKeyCodeHold

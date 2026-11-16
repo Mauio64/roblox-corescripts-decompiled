@@ -1,34 +1,30 @@
-local Parent = script:FindFirstAncestor("Navigation").Parent
-local React = require(Parent.React)
-local RoactNavigation = require(Parent.RoactNavigation)
+local parent = script:FindFirstAncestor("Navigation").Parent
+
+local React = require(parent.React)
+local RoactNavigation = require(parent.RoactNavigation)
 local useNavigation = require(script.Parent.useNavigation)
 
-local function useNavigationFocus() -- line: 13
-	-- upvalues: useNavigation (copy), React (copy), RoactNavigation (copy)
-	local v6 = useNavigation()
-	local v7, v8 = React.useState(v6.isFocused())
+local function useNavigationFocus()
+	local v = useNavigation()
 
-	React.useEffect(function() -- line: 18
-		-- upvalues: v6 (copy), RoactNavigation (copy), v8 (copy)
-		local v9 = v6.addListener(RoactNavigation.Events.WillFocus, function() -- line: 19
-			-- upvalues: v8 (copy)
-			v8(true)
+	local state, setState = React.useState(v.isFocused())
+
+	React.useEffect(function()
+		local v2 = v.addListener(RoactNavigation.Events.WillFocus, function()
+			setState(true)
 		end)
-		local v10 = v6.addListener(RoactNavigation.Events.WillBlur, function() -- line: 22
-			-- upvalues: v8 (copy)
-			v8(false)
+		local v3 = v.addListener(RoactNavigation.Events.WillBlur, function()
+			setState(false)
 		end)
+		setState(v.isFocused())
 
-		v8(v6.isFocused())
-
-		return function() -- line: 27
-			-- upvalues: v9 (copy), v10 (copy)
-			v9.remove()
-			v10.remove()
+		return function()
+			v2.remove()
+			v3.remove()
 		end
 	end, {})
 
-	return v7
+	return state
 end
 
 return useNavigationFocus

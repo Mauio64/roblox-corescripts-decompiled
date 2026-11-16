@@ -1,128 +1,120 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 44
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		can_follow = t3 ~= nil and (t3.can_follow ~= nil and t3.can_follow),
-		is_following = t3 ~= nil and (t3.is_following ~= nil and t3.is_following)
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(p)
+	local v2 = {
+		can_follow = p ~= nil and p.can_follow ~= nil and p.can_follow,
+		is_following = p ~= nil and p.is_following ~= nil and p.is_following
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 51
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.can_follow then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class.encode(p)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v9, v10, not p1.can_follow and 0 or 1)
+	if p.can_follow then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.can_follow and 1 or 0)
 	end
 
-	if p1.is_following then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v11, v12, not p1.is_following and 0 or 1)
+	if p.is_following then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.is_following and 1 or 0)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 70
-	-- upvalues: t2 (copy), proto (copy)
-	local v15 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v17, v18
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v17, v18, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v18 == proto.wireTypes.varint then
-			if v17 == 1 then
-				local v19
-
-				v19, n2 = proto.readVarInt(p2, n2)
-				v15.can_follow = v19 ~= 0
-			elseif v17 == 2 then
-				local v20
-
-				v20, n2 = proto.readVarInt(p2, n2)
-				v15.is_following = v20 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.can_follow = v5 ~= 0
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_following = v5 ~= 0
 			else
-				local v21
-
-				v21, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v18 == proto.wireTypes.lengthDelimited then
-			local v22, v23 = proto.readVarInt(p2, n2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			local varInt, v5 = proto.readVarInt(buf, v2)
 
-			n2 = v23 + v22
-		elseif v18 == proto.wireTypes.i32 then
-			local v24
-
-			v24, n2 = proto.readFixed32(p2, n2)
-		elseif v18 == proto.wireTypes.i64 then
-			local v25
-
-			v25, n2 = proto.readFixed64(p2, n2)
+			v2 = v5 + varInt
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v18)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v15
-end
-function t2.jsonEncode(p3) -- line: 118
-	local t4 = {}
-
-	if p3.can_follow then
-		t4.canFollow = p3.can_follow
-	end
-
-	if p3.is_following then
-		t4.isFollowing = p3.is_following
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 132
-	-- upvalues: t2 (copy)
-	local v29 = t2.new()
-
-	if t5.can_follow ~= nil then
-		v29.can_follow = t5.can_follow
-	end
-
-	if t5.canFollow ~= nil then
-		v29.can_follow = t5.canFollow
-	end
-
-	if t5.is_following ~= nil then
-		v29.is_following = t5.is_following
-	end
-
-	if t5.isFollowing ~= nil then
-		v29.is_following = t5.isFollowing
-	end
-
-	return v29
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(p)
+	local v2 = {}
+
+	if p.can_follow then
+		v2.canFollow = p.can_follow
+	end
+
+	if p.is_following then
+		v2.isFollowing = p.is_following
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.can_follow ~= nil then
+		v2.can_follow = data.can_follow
+	end
+
+	if data.canFollow ~= nil then
+		v2.can_follow = data.canFollow
+	end
+
+	if data.is_following ~= nil then
+		v2.is_following = data.is_following
+	end
+
+	if data.isFollowing ~= nil then
+		v2.is_following = data.isFollowing
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "UniverseUserFollowData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseUserFollowData"
 }
-t1.UniverseUserFollowData = t2
-typeRegistry.default:register(t1.UniverseUserFollowData)
 
-return {
-	UniverseUserFollowData = t1.UniverseUserFollowData
-}
+v.UniverseUserFollowData = class
+
+typeRegistry.default:register(v.UniverseUserFollowData)
+
+return { UniverseUserFollowData = v.UniverseUserFollowData }

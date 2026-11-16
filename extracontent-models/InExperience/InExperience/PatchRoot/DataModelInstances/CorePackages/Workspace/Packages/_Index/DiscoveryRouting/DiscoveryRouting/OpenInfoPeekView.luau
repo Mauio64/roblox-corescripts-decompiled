@@ -1,36 +1,57 @@
-local Parent = script:FindFirstAncestor("DiscoveryRouting").Parent
-local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
-local RobloxAppEnums = require(Parent.RobloxAppEnums)
+local parent = script:FindFirstAncestor("DiscoveryRouting").Parent
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local RobloxAppEnums = require(parent.RobloxAppEnums)
 local AppPage = RobloxAppEnums.AppPage
 local DeviceType = RobloxAppEnums.DeviceType
-local getDeviceType = require(Parent.AppCommonLib).getDeviceType
-local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v8 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local AppCommonLib = require(parent.AppCommonLib)
+local getDeviceType = AppCommonLib.getDeviceType
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
 
-return function(s1: string, s2: string) -- line: 14
-	-- upvalues: getDeviceType (copy), DeviceType (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), NavigateDown (copy)
-	return function(p1) -- line: 15
-		-- upvalues: getDeviceType (copy), DeviceType (copy), AppPage (copy), s1 (copy), s2 (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), NavigateDown (copy)
-		local v12 = getDeviceType(p1:getState().DeviceOrientation)
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
 
-		if v12 ~= DeviceType.Phone and v12 ~= DeviceType.Tablet then
+local FFlagUseSignalsForDeviceOrientation = SharedFlags.FFlagUseSignalsForDeviceOrientation
+local getDeviceOrientationStore
+
+if FFlagUseSignalsForDeviceOrientation then
+	local DeviceOrientationStore = require(parent.DeviceOrientationStore)
+	getDeviceOrientationStore = DeviceOrientationStore.GetDeviceOrientationStore
+else
+	getDeviceOrientationStore = nil
+end
+
+return function(title: string, body: string)
+	return function(object)
+		local v
+
+		if FFlagUseSignalsForDeviceOrientation then
+			v = getDeviceOrientationStore(false).getDeviceOrientation(false)
+		else
+			v = object:getState().DeviceOrientation
+		end
+
+		local deviceType = getDeviceType(v)
+
+		if deviceType ~= DeviceType.Phone and deviceType ~= DeviceType.Tablet then
 			return
 		end
 
-		local t1 = {
+		local v2 = {
 			name = AppPage.InfoPeekView,
-			extraProps = {
-				title = s1,
-				body = s2
-			}
+			extraProps = { title = title, body = body }
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v8.down(v8.fromLegacyPage(t1))
-
-			return
+			navigationCommands.down(navigationCommands.fromLegacyPage(v2))
+		else
+			object:dispatch(NavigateDown(v2))
 		end
-
-		p1:dispatch(NavigateDown(t1))
 	end
 end

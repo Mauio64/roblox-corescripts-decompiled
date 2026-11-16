@@ -18,10 +18,5 @@ return {
 		backgroundOverlay = "backgroundOverlay",
 		focusNavigationBack = "focusNavigationBack"
 	},
-	Context = {
-		seen = "seen",
-		impression = "impression",
-		click = "click",
-		fetched = "fetched"
-	}
+	Context = { seen = "seen", impression = "impression", click = "click", fetched = "fetched" }
 }

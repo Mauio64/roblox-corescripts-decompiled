@@ -1,13 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
 require(AppChat.types)
-
 local SocialLibraries = require(AppChat.SocialLibraries)
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+
 local Warning = SocialLibraries.Components.AlertViews.Warning
-local t1 = {
+
+local v = {
 	titleText = "Placeholder title",
 	bodyText = "Placeholder body",
 	cancelText = "TempCancel",
@@ -15,19 +17,17 @@ local t1 = {
 	failureTitleText = "FailureTitle",
 	failureBodyText = "FailureBody",
 	failureButtonText = "FailureButton",
+	soakAreaColor3 = Color3.fromRGB(25, 25, 25),
 	soakAreaTransparency = 0.8,
+	width = UDim.new(0.8, 0),
 	displayFailed = false,
 	onActivated = nil,
-	onModalClose = nil,
-	soakAreaColor3 = Color3.fromRGB(25, 25, 25),
-	width = UDim.new(0.8, 0)
+	onModalClose = nil
 }
 
-function RemoveUserDialog(t2: {[any]: any}) -- line: 55
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), Warning (copy)
-	local v9 = Cryo.Dictionary.join(t1, t2)
-
-	return React.createElement(Warning, v9)
+function RemoveUserDialog(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	return React.createElement(Warning, joined)
 end
 
 return RemoveUserDialog

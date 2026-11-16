@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	["catalog/sponsored-items"] = "avatar_experience_sponsored_items",
 	["marketplace-widgets/v1/widgets?requestId"] = "avatar_experience_marketplace_widgets",
 	["v3/outfits"] = "avatar_experience_outfits",
@@ -11,36 +11,34 @@ local t1 = {
 	["widgets/hydrate"] = "avatar_experience_widget_hydrate",
 	["marketplace-widgets/v1/pills"] = "avatar_experience_catalog_categories"
 }
-local t3 = {
-	isSuccessStatusCode = function(_: {[any]: any}, n1: number) -- line: 25
-		return n1 >= 200 and n1 < 300
-	end
-}
 
-function t3.getMatchingName(s1: string, n2: number) -- line: 32
-	-- upvalues: t3 (copy), t1 (copy)
-	local str = tostring(n2)
-	local v8 = not t3:isSuccessStatusCode(n2) and "api_error_" or "api_success_"
+local GreenlistedEndpointsForLogging = {}
 
-	for v9, v10 in t1 do
-		if string.find(s1, v9, 1, true) then
-			return v8 .. v10 .. "_" .. str
+function GreenlistedEndpointsForLogging:isSuccessStatusCode(p: number): boolean
+	return p >= 200 and p < 300
+end
+
+function GreenlistedEndpointsForLogging.getMatchingName(value: string, p: number)
+	local v2 = tostring(p)
+	local v3 = GreenlistedEndpointsForLogging:isSuccessStatusCode(p) and "api_success_" or "api_error_"
+
+	for k, v4 in v do
+		if string.find(value, k, 1, true) then
+			return v3 .. v4 .. "_" .. v2
 		end
 	end
 
 	return nil
 end
-function t3.sendStatusCodeCounter(s2: string, n3: number, p1) -- line: 49
-	-- upvalues: t3 (copy)
-	if not p1 then
-		p1 = game:GetService("RbxAnalyticsService")
-	end
 
-	local v14 = t3.getMatchingName(s2, n3)
+function GreenlistedEndpointsForLogging.sendStatusCodeCounter(p: string, p2: number, object)
+	object = object or game:GetService("RbxAnalyticsService")
 
-	if v14 and p1 then
-		p1:ReportCounter(v14, 1)
+	local matchingName = GreenlistedEndpointsForLogging.getMatchingName(p, p2)
+
+	if matchingName and object then
+		object:ReportCounter(matchingName, 1)
 	end
 end
 
-return t3
+return GreenlistedEndpointsForLogging

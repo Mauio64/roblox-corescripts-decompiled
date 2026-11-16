@@ -1,17 +1,19 @@
 local CorePackages = game:GetService("CorePackages")
-local ShareGame = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame
-local Immutable = require(CorePackages.Workspace.Packages.AppCommonLib).Immutable
+
+local CoreGui = game:GetService("CoreGui")
+local ShareGame = CoreGui.RobloxGui.Modules.Settings.Pages.ShareGame
+
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
+
 local SetGameInfoCreated = require(ShareGame.Actions.SetGameInfoCreated)
 
-return function(p1, p2) -- line: 10
-	-- upvalues: SetGameInfoCreated (copy), Immutable (copy)
-	local v7 = p1 or {
-		Created = nil
-	}
+return function(p, p2)
+	local v = p or { Created = nil }
 
 	if p2.type == SetGameInfoCreated.name then
-		v7 = Immutable.Set(v7, "Created", p2.Created)
+		return (Immutable.Set(v, "Created", p2.Created))
 	end
 
-	return v7
+	return v
 end

@@ -1,354 +1,349 @@
 local Players = game:GetService("Players")
+
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
 
 require(InGameAssetReporting.Analysis.Types)
-
 local GetFIntIGARRaycastTargetCount = require(InGameAssetReporting.Flags.GetFIntIGARRaycastTargetCount)
 local GetFIntIGARSubtreeDivergenceThresholdPerMille = require(InGameAssetReporting.Flags.GetFIntIGARSubtreeDivergenceThresholdPerMille)
 local extractAssetIdsFromInstance = require(InGameAssetReporting.Analysis.extractAssetIdsFromInstance)
-local random = Random.new()
 
-function getRandomSampleUniformDisk(vector2: Vector2, n1: number, vector2_2: Vector2) -- line: 70
-	-- upvalues: random (ref)
-	local n2 = 0
-	local v15, v16
+local v = Random.new()
 
-	repeat
-		local v11 = random:NextNumber() * 2 * 3.141592653589793
-		local v12 = math.sqrt((random:NextNumber())) * n1
-		local v13 = math.cos(v11) * v12
-		local v14 = math.sin(v11) * v12
+function getRandomSampleUniformDisk(vector2: Vector2, p: number, vector2_2: Vector2)
+	local count = 0
 
-		v15 = vector2.X + v13
-		v16 = vector2.Y + v14
-		n2 += 1
+	while true do
+		local v2 = v:NextNumber() * 2 * 3.141592653589793
+		local v3 = math.sqrt((v:NextNumber())) * p
+		local v4 = math.cos(v2) * v3
+		local v5 = math.sin(v2) * v3
+		local v6 = vector2.X + v4
+		local v7 = vector2.Y + v5
+		count += 1
 
-		if n2 > 6 then
+		if count > 6 then
 			return vector2
 		end
-	until v15 >= 0 and v15 <= vector2_2.X and v16 >= 0 and v16 <= vector2_2.Y
 
-	return Vector2.new(v15, v16)
+		if v6 >= 0 and v6 <= vector2_2.X and v7 >= 0 and v7 <= vector2_2.Y then
+			return Vector2.new(v6, v7)
+		end
+	end
 end
-function interpretAnnotation(vector2: Vector2, n3: number, p1: ((...any) -> ...any)) -- line: 89
-	-- upvalues: GetFIntIGARRaycastTargetCount (copy), Players (copy)
-	local u20 = false
-	local t1 = {
-		errorReason = nil,
+
+function interpretAnnotation(vector2: Vector2, p: number, callback)
+	local flag = false
+
+	local v2 = {
 		hitCountMap = {},
 		stats = {
+			targetCount = GetFIntIGARRaycastTargetCount(),
 			completedCount = 0,
 			hitCount = 0,
 			resumptionCount = 0,
 			wallTime = 0,
-			computeTime = 0,
-			targetCount = GetFIntIGARRaycastTargetCount()
+			computeTime = 0
 		},
 		highlights = {},
 		topLevelObjects = {},
-		cancel = function() -- line: 110
-			-- upvalues: u20 (ref)
-			u20 = true
+		errorReason = nil,
+		cancel = function()
+			flag = true
 		end
 	}
 
-	t1.raycastComputation = coroutine.create(function() -- line: 116
-		-- upvalues: p1 (copy), t1 (copy)
-		p1(t1)
+	v2.raycastComputation = coroutine.create(function()
+		callback(v2)
 	end)
 
-	local CurrentCamera = workspace.CurrentCamera
+	local currentCamera = workspace.CurrentCamera
 
-	if CurrentCamera == nil then
-		t1.errorReason = "No camera"
-
-		return t1
+	if currentCamera == nil then
+		v2.errorReason = "No camera"
+		return v2
 	end
 
-	local ViewportSize = CurrentCamera.ViewportSize
+	local viewportSize = currentCamera.ViewportSize
 
-	if vector2.X < 0 or vector2.X > ViewportSize.X or vector2.Y < 0 or vector2.Y > ViewportSize.Y then
-		t1.errorReason = "Coordinates out of bounds"
-
-		return t1
+	if vector2.X < 0 or vector2.X > viewportSize.X or vector2.Y < 0 or vector2.Y > viewportSize.Y then
+		v2.errorReason = "Coordinates out of bounds"
+		return v2
 	end
 
-	if n3 <= 0 or n3 > math.max(ViewportSize.X, ViewportSize.Y) then
-		t1.errorReason = "Invalid radius"
-
-		return t1
+	if p <= 0 or math.max(viewportSize.X, viewportSize.Y) < p then
+		v2.errorReason = "Invalid radius"
+		return v2
 	end
 
-	local LocalPlayer = Players.LocalPlayer
+	local localPlayer = Players.LocalPlayer
 
-	if LocalPlayer == nil then
-		t1.errorReason = "No local player"
-
-		return t1
+	if localPlayer == nil then
+		v2.errorReason = "No local player"
+		return v2
 	end
 
-	local t2 = { LocalPlayer.Character }
+	local instances = { localPlayer.Character }
 
-	t1.raycastComputation = coroutine.create(function() -- line: 147
-		-- upvalues: t2 (copy), t1 (copy), u20 (ref), vector2 (copy), n3 (copy), ViewportSize (copy), CurrentCamera (copy), p1 (copy)
+	v2.raycastComputation = coroutine.create(function()
 		local raycastParams = RaycastParams.new()
-
 		raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-		raycastParams.FilterDescendantsInstances = t2
+		raycastParams.FilterDescendantsInstances = instances
 		raycastParams.IgnoreWater = true
 
-		local elapsed = os.clock()
-		local elapsed2 = os.clock()
+		local lastTime = os.clock()
+		local lastTime2 = os.clock()
 
-		for _ = 1, t1.stats.targetCount do
-			if u20 then
+		for _ = 1, v2.stats.targetCount do
+			if flag then
 				break
 			end
 
-			if elapsed2 + 0.011111111111111112 < os.clock() then
-				local stats = t1.stats
-
-				stats.computeTime = stats.computeTime + (os.clock() - elapsed2)
+			if lastTime2 + 1 / 90 < os.clock() then
+				v2.stats.computeTime += os.clock() - lastTime2
 				task.wait()
-				elapsed2 = os.clock()
+				lastTime2 = os.clock()
+				v2.stats.resumptionCount += 1
 
-				local stats2 = t1.stats
-
-				stats2.resumptionCount = stats2.resumptionCount + 1
-
-				if u20 then
+				if flag then
 					break
 				end
 			end
 
-			local v128 = getRandomSampleUniformDisk(vector2, n3, ViewportSize)
-			local v129 = CurrentCamera:ViewportPointToRay(v128.X, v128.Y)
+			local randomSampleUniformDisk = getRandomSampleUniformDisk(vector2, p, viewportSize)
+
+			local viewportPointToRay = currentCamera:ViewportPointToRay(
+				randomSampleUniformDisk.X,
+				randomSampleUniformDisk.Y
+			)
 			local raycastResult = nil
 
 			for _ = 1, 5 do
-				raycastResult = workspace:Raycast(v129.Origin, v129.Direction * 5000, raycastParams)
+				raycastResult = workspace:Raycast(
+					viewportPointToRay.Origin,
+					viewportPointToRay.Direction * 5000,
+					raycastParams
+				)
 
 				if raycastResult == nil then
 					break
 				end
 
-				local Instance = raycastResult.Instance
+				local instance = raycastResult.Instance
 
-				if (1 - Instance.Transparency) * (1 - Instance.LocalTransparencyModifier) > 0.05 then
+				if (1 - instance.Transparency) * (1 - instance.LocalTransparencyModifier) > 0.05 then
 					break
 				end
 
-				table.insert(t2, Instance)
-				raycastParams.FilterDescendantsInstances = t2
+				table.insert(instances, instance)
+				raycastParams.FilterDescendantsInstances = instances
 				raycastResult = nil
 			end
 
 			if raycastResult then
-				local Instance = raycastResult.Instance
+				local instance = raycastResult.Instance
 
-				if Instance ~= nil then
-					local stats = t1.stats
-
-					stats.hitCount = stats.hitCount + 1
+				if instance ~= nil then
+					v2.stats.hitCount += 1
 				end
 
-				local v135 = nil
+				local v3 = nil
 
-				while Instance ~= nil and ((Instance:IsA("PVInstance") or Instance:IsA("Accessory")) and Instance ~= workspace) do
-					if not t1.hitCountMap[Instance] then
-						t1.hitCountMap[Instance] = {
-							raycastHits = 0,
-							children = {}
-						}
+				while
+					instance ~= nil
+					and (instance:IsA("PVInstance") or instance:IsA("Accessory"))
+					and instance ~= workspace
+				do
+					if not v2.hitCountMap[instance] then
+						v2.hitCountMap[instance] = { raycastHits = 0, children = {} }
 					end
 
-					local v136 = t1.hitCountMap[Instance]
+					v2.hitCountMap[instance].raycastHits += 1
 
-					v136.raycastHits = v136.raycastHits + 1
-
-					if v135 then
-						t1.hitCountMap[Instance].children[v135] = true
+					if v3 then
+						v2.hitCountMap[instance].children[v3] = true
 					end
 
-					v135 = Instance
-					Instance = Instance.Parent
+					v3 = instance
+					instance = instance.Parent
 				end
 
-				if v135 then
-					t1.topLevelObjects[v135] = (t1.topLevelObjects[v135] or 0) + 1
+				if v3 then
+					v2.topLevelObjects[v3] = (v2.topLevelObjects[v3] or 0) + 1
 				end
 			end
 
-			local stats = t1.stats
-
-			stats.completedCount = stats.completedCount + 1
+			v2.stats.completedCount += 1
 		end
 
-		t1.stats.wallTime = os.clock() - elapsed
+		v2.stats.wallTime = os.clock() - lastTime
+		v2.stats.computeTime += os.clock() - lastTime2
 
-		local stats = t1.stats
-
-		stats.computeTime = stats.computeTime + (os.clock() - elapsed2)
-		p1(t1)
+		callback(v2)
 	end)
 
-	return t1
+	return v2
 end
-function createPlayerCharacterReferenceToPlayerMap(t3: {[any]: any}) -- line: 238
-	local t4 = {}
 
-	for _, v in ipairs(t3) do
-		local Character = v.Character
+function createPlayerCharacterReferenceToPlayerMap(list)
+	local playerCharacterReferenceToPlayerMap = {}
 
-		if Character then
-			t4[Character] = v
+	for _, item in ipairs(list) do
+		local character = item.Character
+
+		if character then
+			playerCharacterReferenceToPlayerMap[character] = item
 		end
 	end
 
-	return t4
+	return playerCharacterReferenceToPlayerMap
 end
-function descendingOrderBySecondElement(t5: {[any]: any}, t6: {[any]: any}) -- line: 249
-	return t5[2] > t6[2]
-end
-function createTraversalTaskList(t7: {[any]: any}, t8: {[any]: any}) -- line: 256
-	-- upvalues: Players (copy), GetFIntIGARSubtreeDivergenceThresholdPerMille (copy)
-	local t9 = {}
-	local t10 = {}
-	local v37 = createPlayerCharacterReferenceToPlayerMap(Players:GetPlayers())
-	local t11 = {}
 
-	for k, v in pairs(t8) do
-		table.insert(t11, {
-			k,
-			v
-		})
+function descendingOrderBySecondElement(list, list2): boolean
+	return list[2] > list2[2]
+end
+
+function createTraversalTaskList(p, items)
+	local playerCharacterReferenceToPlayerMap = createPlayerCharacterReferenceToPlayerMap(Players:GetPlayers())
+
+	local v2 = {}
+	local result = {}
+	local result2 = {}
+
+	for k, item in pairs(items) do
+		table.insert(v2, { k, item })
 	end
 
-	table.sort(t11, descendingOrderBySecondElement)
+	table.sort(v2, descendingOrderBySecondElement)
 
-	local v41 = GetFIntIGARSubtreeDivergenceThresholdPerMille() / 1000
+	local v3 = GetFIntIGARSubtreeDivergenceThresholdPerMille() / 1000
 
-	for _, v in ipairs(t11) do
-		local v44 = v[1]
-		local v45 = v[2]
+	for _, v4 in ipairs(v2) do
+		local instance = v4[1]
+		local count3 = v4[2]
 
-		if v37[v44] == nil then
-			local n4 = 0
-			local v47 = v44
+		if playerCharacterReferenceToPlayerMap[instance] == nil then
+			local instance2 = instance
+			local count = 0
 
-			while t7[v47] do
-				local v48 = t7[v47]
-				local raycastHits = v48.raycastHits
-				local children = v48.children
-				local n5 = 0
+			while p[instance2] do
+				local v5 = p[instance2]
+				local raycastHits = v5.raycastHits
+				local children = v5.children
+				local count2 = 0
 
 				for k, _ in pairs(children) do
-					if t7[k] then
-						n5 += 1
+					if p[k] then
+						count2 += 1
 					end
 				end
 
-				if n5 == 0 then
+				if count2 == 0 then
 					break
 				end
 
-				local n6 = 0
+				local maxRaycastHits = 0
 
 				for k, _ in pairs(children) do
-					if t7[k] then
-						n6 = math.max(n6, t7[k].raycastHits)
+					if p[k] then
+						maxRaycastHits = math.max(maxRaycastHits, p[k].raycastHits)
 					end
 				end
 
-				if v41 > n6 / raycastHits then
+				if maxRaycastHits / raycastHits < v3 then
 					break
 				end
 
-				v47 = nil
-
-				local n7 = 0
+				local v6 = 0
+				instance2 = nil
 
 				for k, _ in pairs(children) do
-					if t7[k] and n7 < t7[k].raycastHits then
-						v47 = k
-						n7 = t7[k].raycastHits
+					if not (p[k] and v6 < p[k].raycastHits) then
+						continue
 					end
+
+					v6 = p[k].raycastHits
+					instance2 = k
 				end
 
-				n4 += 1
+				count += 1
 			end
 
-			table.insert(t9, {
-				instance = v47,
-				count = v45
+			table.insert(result, { instance = instance2, count = count3 })
+
+			if instance2 ~= instance then
+				table.insert(result, { instance = instance, count = count3 })
+			end
+		else
+			table.insert(result2, {
+				player = playerCharacterReferenceToPlayerMap[instance],
+				count = count3
 			})
+		end
+	end
 
-			if v47 ~= v44 then
-				table.insert(t9, {
-					instance = v44,
-					count = v45
-				})
-			end
+	return result, result2
+end
 
+function mutateMergeExtractedAssets(p, data, data2)
+	for _, v2 in ipairs(data2.Image) do
+		if p[v2] then
 			continue
 		end
 
-		table.insert(t10, {
-			player = v37[v44],
-			count = v45
-		})
+		p[v2] = true
+		table.insert(data.Image, v2)
 	end
 
-	return t9, t10
-end
-function mutateMergeExtractedAssets(t12: {[any]: any}, p2, p3) -- line: 344
-	for _, v in ipairs(p3.Image) do
-		if not t12[v] then
-			t12[v] = true
-			table.insert(p2.Image, v)
+	for _, v2 in ipairs(data2.Mesh) do
+		if p[v2] then
+			continue
 		end
+
+		p[v2] = true
+		table.insert(data.Mesh, v2)
 	end
 
-	for _, v in ipairs(p3.Mesh) do
-		if not t12[v] then
-			t12[v] = true
-			table.insert(p2.Mesh, v)
+	for _, v2 in ipairs(data2.Video) do
+		if p[v2] then
+			continue
 		end
+
+		p[v2] = true
+		table.insert(data.Video, v2)
 	end
 
-	for _, v in ipairs(p3.Video) do
-		if not t12[v] then
-			t12[v] = true
-			table.insert(p2.Video, v)
+	for _, v2 in ipairs(data2.Model) do
+		if p[v2] then
+			continue
 		end
+
+		p[v2] = true
+		table.insert(data.Model, v2)
 	end
 
-	for _, v in ipairs(p3.Model) do
-		if not t12[v] then
-			t12[v] = true
-			table.insert(p2.Model, v)
+	for _, v2 in ipairs(data2.Package) do
+		if p[v2.id] then
+			continue
 		end
-	end
 
-	for _, v in ipairs(p3.Package) do
-		if not t12[v.id] then
-			t12[v.id] = true
-			table.insert(p2.Package, v)
-		end
+		p[v2.id] = true
+		table.insert(data.Package, v2)
 	end
 
 	if game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-		for _, v in ipairs(p3.Text) do
-			if not t12[v] then
-				t12[v] = true
-				table.insert(p2.Text, v)
+		for _, v2 in ipairs(data2.Text) do
+			if p[v2] then
+				continue
 			end
+
+			p[v2] = true
+			table.insert(data.Text, v2)
 		end
 	end
 end
-function interpretInstanceListForGUIObjects(t13: {[any]: any}) -- line: 396
-	local t14 = {
-		errorReason = nil,
+
+function interpretInstanceListForGUIObjects(list)
+	local v2 = {
 		hitCountMap = {},
 		stats = {
 			targetCount = 0,
@@ -360,44 +355,38 @@ function interpretInstanceListForGUIObjects(t13: {[any]: any}) -- line: 396
 		},
 		highlights = {},
 		topLevelObjects = {},
-		cancel = function() -- line: 410
-		end
+		errorReason = nil,
+		cancel = function() end
 	}
 
-	for _, v in ipairs(t13) do
-		local v79 = v
-		local v80 = nil
+	for _, guiObject in ipairs(list) do
+		local v3 = nil
 
-		while v79 ~= nil and v79:IsA("GuiObject") do
-			if not t14.hitCountMap[v79] then
-				t14.hitCountMap[v79] = {
-					raycastHits = 0,
-					children = {}
-				}
+		while guiObject ~= nil and guiObject:IsA("GuiObject") do
+			if not v2.hitCountMap[guiObject] then
+				v2.hitCountMap[guiObject] = { raycastHits = 0, children = {} }
 			end
 
-			local v81 = t14.hitCountMap[v79]
+			v2.hitCountMap[guiObject].raycastHits += 1
 
-			v81.raycastHits = v81.raycastHits + 1
-
-			if v80 then
-				t14.hitCountMap[v79].children[v80] = true
+			if v3 then
+				v2.hitCountMap[guiObject].children[v3] = true
 			end
 
-			v80 = v79
-			v79 = v79.Parent
+			v3 = guiObject
+			guiObject = guiObject.Parent
 		end
 
-		if v80 then
-			t14.topLevelObjects[v80] = (t14.topLevelObjects[v80] or 0) + 1
+		if v3 then
+			v2.topLevelObjects[v3] = (v2.topLevelObjects[v3] or 0) + 1
 		end
 	end
 
-	return t14
+	return v2
 end
-function interpretAndExtractItemsFromInstanceForPreciseSelection(p4) -- line: 439
-	-- upvalues: extractAssetIdsFromInstance (copy), Players (copy)
-	local t15 = {
+
+function interpretAndExtractItemsFromInstanceForPreciseSelection(instance)
+	local v2 = {
 		extractedAssets = {
 			Package = {},
 			Model = {},
@@ -407,8 +396,7 @@ function interpretAndExtractItemsFromInstanceForPreciseSelection(p4) -- line: 43
 			Video = {}
 		},
 		extractedPlayers = {},
-		cancel = function() -- line: 450
-		end,
+		cancel = function() end,
 		stats = {
 			hitCountMapSize = 0,
 			topLevelObjectsSize = 0,
@@ -423,61 +411,63 @@ function interpretAndExtractItemsFromInstanceForPreciseSelection(p4) -- line: 43
 			raycastCompletedCount = 0,
 			raycastResumptionCount = 0,
 			raycastComputeTime = 0
-		},
-		computation = coroutine.create(function() -- line: 469
-		end)
+		}
 	}
 
-	if not p4 then
-		return t15
+	v2.computation = coroutine.create(function() end)
+
+	if not instance then
+		return v2
 	end
 
-	local t16 = {}
-	local v85 = createPlayerCharacterReferenceToPlayerMap(Players:GetPlayers())
-	local v86 = p4
+	local playerCharacterReferenceToPlayerMap = createPlayerCharacterReferenceToPlayerMap(Players:GetPlayers())
+	local instance2 = instance
+	local v3 = {}
 
-	while v86 ~= nil and ((v86:IsA("PVInstance") or v86:IsA("Accessory") or v86:IsA("GuiObject") or v86:IsA("FaceInstance")) and v86 ~= workspace) do
-		if v85[v86] ~= nil then
-			table.insert(t15.extractedPlayers, {
-				count = 1,
-				player = v85[v86]
+	while
+		instance2 ~= nil
+		and (instance2:IsA("PVInstance") or instance2:IsA("Accessory") or instance2:IsA("GuiObject") or instance2:IsA("FaceInstance"))
+		and instance2 ~= workspace
+	do
+		if playerCharacterReferenceToPlayerMap[instance2] ~= nil then
+			table.insert(v2.extractedPlayers, {
+				player = playerCharacterReferenceToPlayerMap[instance2],
+				count = 1
 			})
 
-			return t15
+			return v2
 		end
 
-		local v87 = extractAssetIdsFromInstance(v86)
+		local v4 = extractAssetIdsFromInstance(instance2)
 
-		if v87 then
-			mutateMergeExtractedAssets(t16, t15.extractedAssets, v87)
+		if v4 then
+			mutateMergeExtractedAssets(v3, v2.extractedAssets, v4)
 		end
 
-		local stats = t15.stats
+		v2.stats.instancesTraversed += 1
 
-		stats.instancesTraversed = stats.instancesTraversed + 1
-		v86 = v86.Parent
+		instance2 = instance2.Parent
 	end
 
-	local children = p4:GetChildren()
+	local children = instance:GetChildren()
 
-	for _, v in ipairs(children) do
-		local v92 = extractAssetIdsFromInstance(v)
+	for _, child in ipairs(children) do
+		local v4 = extractAssetIdsFromInstance(child)
 
-		if v92 then
-			mutateMergeExtractedAssets(t16, t15.extractedAssets, v92)
+		if v4 then
+			mutateMergeExtractedAssets(v3, v2.extractedAssets, v4)
 		end
 
-		local stats = t15.stats
-
-		stats.instancesTraversed = stats.instancesTraversed + 1
+		v2.stats.instancesTraversed += 1
 	end
 
-	return t15
+	return v2
 end
-function extractItemsFromInterpretations(t17: {[any]: any}, p5: ((...any) -> ...any)) -- line: 516
-	-- upvalues: extractAssetIdsFromInstance (copy)
-	local u96 = false
-	local t18 = {
+
+function extractItemsFromInterpretations(list, callback)
+	local flag = false
+
+	local itemsFromInterpretations = {
 		extractedAssets = {
 			Package = {},
 			Model = {},
@@ -487,9 +477,8 @@ function extractItemsFromInterpretations(t17: {[any]: any}, p5: ((...any) -> ...
 			Video = {}
 		},
 		extractedPlayers = {},
-		cancel = function() -- line: 532
-			-- upvalues: u96 (ref)
-			u96 = true
+		cancel = function()
+			flag = true
 		end,
 		stats = {
 			hitCountMapSize = 0,
@@ -508,185 +497,145 @@ function extractItemsFromInterpretations(t17: {[any]: any}, p5: ((...any) -> ...
 		}
 	}
 
-	t18.computation = coroutine.create(function() -- line: 551
-		-- upvalues: p5 (copy), t18 (copy)
-		p5(t18)
+	itemsFromInterpretations.computation = coroutine.create(function()
+		callback(itemsFromInterpretations)
 	end)
 
-	for _, v in ipairs(t17) do
-		v.cancel()
-
-		local stats = t18.stats
-
-		stats.raycastTargetCount = stats.raycastTargetCount + v.stats.targetCount
-
-		local stats3 = t18.stats
-
-		stats3.raycastCompletedCount = stats3.raycastCompletedCount + v.stats.completedCount
-
-		local stats4 = t18.stats
-
-		stats4.raycastResumptionCount = stats4.raycastResumptionCount + v.stats.resumptionCount
-
-		local stats5 = t18.stats
-
-		stats5.raycastComputeTime = stats5.raycastComputeTime + v.stats.computeTime
+	for _, item in ipairs(list) do
+		item.cancel()
+		itemsFromInterpretations.stats.raycastTargetCount += item.stats.targetCount
+		itemsFromInterpretations.stats.raycastCompletedCount += item.stats.completedCount
+		itemsFromInterpretations.stats.raycastResumptionCount += item.stats.resumptionCount
+		itemsFromInterpretations.stats.raycastComputeTime += item.stats.computeTime
 	end
 
-	local elapsed = os.clock()
-	local t19 = {}
-	local t20 = {}
+	local lastTime = os.clock()
 
-	for _, v in ipairs(t17) do
-		for k, v2 in pairs(v.hitCountMap) do
-			if not t19[k] then
-				t19[k] = {
-					raycastHits = 0,
-					children = {}
-				}
+	local v2 = {}
+	local v3 = {}
 
-				local stats = t18.stats
+	for _, item in ipairs(list) do
+		for k, hitCount in pairs(item.hitCountMap) do
+			if not v2[k] then
+				v2[k] = { raycastHits = 0, children = {} }
 
-				stats.hitCountMapSize = stats.hitCountMapSize + 1
+				itemsFromInterpretations.stats.hitCountMapSize += 1
 			end
 
-			local v112 = t19[k]
+			v2[k].raycastHits += hitCount.raycastHits
 
-			v112.raycastHits = v112.raycastHits + v2.raycastHits
-
-			for k2, _ in pairs(v2.children) do
-				t19[k].children[k2] = true
+			for k2, _ in pairs(hitCount.children) do
+				v2[k].children[k2] = true
 			end
 		end
 
-		for k, v3 in pairs(v.topLevelObjects) do
-			local v117 = t20[k]
+		for k, topLevelObject in pairs(item.topLevelObjects) do
+			local v4 = v3[k]
 
-			if not v117 then
-				local stats = t18.stats
-
-				stats.topLevelObjectsSize = stats.topLevelObjectsSize + 1
+			if not v4 then
+				itemsFromInterpretations.stats.topLevelObjectsSize += 1
 			end
 
-			t20[k] = (v117 or 0) + v3
+			v3[k] = (v4 or 0) + topLevelObject
 		end
 	end
 
-	local v119, v120 = createTraversalTaskList(t19, t20)
+	local traversalTaskList, extractedPlayers = createTraversalTaskList(v2, v3)
 
-	t18.extractedPlayers = v120
-	t18.stats.playersCount = #v120
-	t18.stats.wallTime = os.clock() - elapsed
-	t18.stats.traversalTaskListSize = #v119
-	t18.computation = coroutine.create(function() -- line: 599
-		-- upvalues: t18 (copy), v119 (copy), u96 (ref), p5 (copy), t19 (copy), extractAssetIdsFromInstance (copy)
-		local elapsed3 = os.clock()
-		local elapsed4 = os.clock()
-		local t21 = {}
+	itemsFromInterpretations.extractedPlayers = extractedPlayers
+	itemsFromInterpretations.stats.playersCount = #extractedPlayers
 
-		for _, v in ipairs(v119) do
-			local t22 = {}
-			local t23 = {}
+	itemsFromInterpretations.stats.wallTime = os.clock() - lastTime
+	itemsFromInterpretations.stats.traversalTaskListSize = #traversalTaskList
 
-			table.insert(t22, v.instance)
+	itemsFromInterpretations.computation = coroutine.create(function()
+		local lastTime2 = os.clock()
+		local lastTime3 = os.clock()
 
-			while #t22 > 0 do
-				if elapsed4 + 0.011111111111111112 < os.clock() then
-					local stats = t18.stats
+		local set = {}
+		local v4 = {}
 
-					stats.computeTime = stats.computeTime + (os.clock() - elapsed4)
-					task.wait()
-					elapsed4 = os.clock()
+		local function fn(): boolean -- 2 equivalent calls inferred from this helper
+			return lastTime3 + 1 / 90 < os.clock()
+		end
 
-					local stats6 = t18.stats
+		local function fn2() -- 2 equivalent calls inferred from this helper
+			itemsFromInterpretations.stats.computeTime += os.clock() - lastTime3
+			task.wait()
+			lastTime3 = os.clock()
+			itemsFromInterpretations.stats.resumptionCount += 1
+		end
 
-					stats6.resumptionCount = stats6.resumptionCount + 1
+		for _, traversalTask in ipairs(traversalTaskList) do
+			local v5 = {}
 
-					if u96 then
-						local stats7 = t18.stats
+			table.insert(v5, traversalTask.instance)
+			local v6 = {}
 
-						stats7.wallTime = stats7.wallTime + (os.clock() - elapsed3)
-						p5(t18)
+			while #v5 > 0 do
+				if fn() then -- inferred equivalent call
+					fn2() -- inferred equivalent call
 
+					if flag then
+						itemsFromInterpretations.stats.wallTime += os.clock() - lastTime2
+						callback(itemsFromInterpretations)
 						return
 					end
 				end
 
-				local v152 = table.remove(t22)
+				local v7 = table.remove(v5)
 
-				if not t21[v152] then
-					table.insert(t23, v152)
-
-					local children = v152:GetChildren()
-					local t24 = {}
-
-					for _, v4 in pairs(children) do
-						table.insert(t24, {
-							v4,
-							not t19[v4] and 0 or t19[v4].raycastHits
-						})
-					end
-
-					table.sort(t24, descendingOrderBySecondElement)
-
-					for _, v5 in ipairs(t24) do
-						table.insert(t22, v5[1])
-					end
-
-					t21[v152] = true
+				if set[v7] then
+					continue
 				end
+
+				table.insert(v6, v7)
+
+				local children = v7:GetChildren()
+				local v8 = {}
+
+				for _, child in pairs(children) do
+					table.insert(v8, { child, not v2[child] and 0 or v2[child].raycastHits })
+				end
+
+				table.sort(v8, descendingOrderBySecondElement)
+
+				for _, v9 in ipairs(v8) do
+					table.insert(v5, v9[1])
+				end
+
+				set[v7] = true
 			end
 
-			while #t23 > 0 do
-				if elapsed4 + 0.011111111111111112 < os.clock() then
-					local stats = t18.stats
+			while #v6 > 0 do
+				if fn() then -- inferred equivalent call
+					fn2() -- inferred equivalent call
 
-					stats.computeTime = stats.computeTime + (os.clock() - elapsed4)
-					task.wait()
-					elapsed4 = os.clock()
-
-					local stats8 = t18.stats
-
-					stats8.resumptionCount = stats8.resumptionCount + 1
-
-					if u96 then
-						local stats9 = t18.stats
-
-						stats9.wallTime = stats9.wallTime + (os.clock() - elapsed3)
-						p5(t18)
-
+					if flag then
+						itemsFromInterpretations.stats.wallTime += os.clock() - lastTime2
+						callback(itemsFromInterpretations)
 						return
 					end
 				end
 
-				local v162 = table.remove(t23)
-				local v163 = extractAssetIdsFromInstance(v162)
+				local v7 = extractAssetIdsFromInstance((table.remove(v6)))
 
-				if v163 then
-					mutateMergeExtractedAssets({}, t18.extractedAssets, v163)
+				if v7 then
+					mutateMergeExtractedAssets(v4, itemsFromInterpretations.extractedAssets, v7)
 				end
 
-				local stats = t18.stats
-
-				stats.instancesTraversed = stats.instancesTraversed + 1
+				itemsFromInterpretations.stats.instancesTraversed += 1
 			end
 
-			local stats = t18.stats
-
-			stats.traversalTasksCompleted = stats.traversalTasksCompleted + 1
+			itemsFromInterpretations.stats.traversalTasksCompleted += 1
 		end
 
-		local stats = t18.stats
-
-		stats.wallTime = stats.wallTime + (os.clock() - elapsed3)
-
-		local stats10 = t18.stats
-
-		stats10.computeTime = stats10.computeTime + (os.clock() - elapsed4)
-		p5(t18)
+		itemsFromInterpretations.stats.wallTime += os.clock() - lastTime2
+		itemsFromInterpretations.stats.computeTime += os.clock() - lastTime3
+		callback(itemsFromInterpretations)
 	end)
 
-	return t18
+	return itemsFromInterpretations
 end
 
 return {
@@ -694,8 +643,7 @@ return {
 	extractItemsFromInterpretations = extractItemsFromInterpretations,
 	interpretInstanceListForGUIObjects = interpretInstanceListForGUIObjects,
 	interpretAndExtractItemsFromInstanceForPreciseSelection = interpretAndExtractItemsFromInstanceForPreciseSelection,
-	__setRandomGenerator = function(p6) -- line: 698
-		-- upvalues: random (ref)
-		random = p6
+	__setRandomGenerator = function(p)
+		v = p
 	end
 }

@@ -1,41 +1,30 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
-local UIBlox = require(InlineRichTextParent.UIBlox)
-local RobloxAppUIBloxConfig = require(InlineRichTextParent.Dev.RobloxAppUIBloxConfig)
+local parent = InlineRichText.Parent
+local UIBlox = require(parent.UIBlox)
+local RobloxAppUIBloxConfig = require(parent.Dev.RobloxAppUIBloxConfig)
 
 UIBlox.init(RobloxAppUIBloxConfig)
 
-local Roact = require(InlineRichTextParent.Dev.Roact)
-local Cryo = require(InlineRichTextParent.Cryo)
+local Roact = require(parent.Dev.Roact)
+local Cryo = require(parent.Cryo)
+
 local MockProviders = require(InlineRichText.MockProviders)
-local t1 = {
-	Default = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Light = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Dark = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	}
+
+local v = {
+	Default = { themeName = "Light", fontName = "Gotham" },
+	Light = { themeName = "Light", fontName = "Gotham" },
+	Dark = { themeName = "Dark", fontName = "Gotham" }
 }
 
 return {
 	roact = Roact,
-	mapStory = function(p1) -- line: 35
-		-- upvalues: t1 (copy), Roact (copy), MockProviders (copy), Cryo (copy)
-		return function(p2) -- line: 36
-			-- upvalues: t1 (copy), Roact (copy), MockProviders (copy), p1 (copy), Cryo (copy)
-			local v11 = p2 and (not not p2.definition and p2.definition.props) or {}
-			local v12 = p2 and t1[p2.theme] or t1.Default
+	mapStory = function(p)
+		return function(p2)
+			local props = p2 and p2.definition and p2.definition.props or {}
+			local v2 = p2 and v[p2.theme] or v.Default
 
-			return Roact.createElement(MockProviders, {
-				themeName = v12.themeName
-			}, {
-				story = Roact.createElement(p1, Cryo.Dictionary.union(v11, p2))
+			return Roact.createElement(MockProviders, { themeName = v2.themeName }, {
+				story = Roact.createElement(p, Cryo.Dictionary.union(props, p2))
 			})
 		end
 	end

@@ -1,15 +1,13 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Signal = require(Parent.AppCommonLib).Signal
+local parent = script:FindFirstAncestor("AppChat").Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
 require(script.Parent.MessageFtuxTooltipVariant)
 
-local t1 = {
-	dismissed = Signal.new()
-}
+local MessageFtuxTooltipDismissSignal = { dismissed = Signal.new() }
 
-function t1.dismiss(p1) -- line: 17
-	-- upvalues: t1 (copy)
-	t1.dismissed:fire(p1)
+function MessageFtuxTooltipDismissSignal.dismiss(p)
+	MessageFtuxTooltipDismissSignal.dismissed:fire(p)
 end
 
-return t1
+return MessageFtuxTooltipDismissSignal

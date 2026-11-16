@@ -1,35 +1,39 @@
 local Util = require(script.Parent:WaitForChild("Util"))
 local RunService = game:GetService("RunService")
-local ChatLocalization = nil
 
-pcall(function() -- line: 12
-	-- upvalues: ChatLocalization (ref)
-	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+local v = nil
+
+pcall(function()
+	local Chat = game:GetService("Chat")
+	v = require(Chat.ClientChatModules.ChatLocalization)
 end)
 
-if ChatLocalization == nil then
-	ChatLocalization = {
-		Get = function(_, _, p3) -- line: 13
-			return p3
-		end
-	}
+if v == nil then
+	v = {}
+	function v:Get(_, p)
+		return p
+	end
 end
 
-function ProcessMessage(_, p5, _) -- line: 15
-	-- upvalues: RunService (copy), Util (copy), ChatLocalization (ref)
-	local LocalPlayer = game:GetService("Players").LocalPlayer
+function ProcessMessage(_, object, _): boolean
+	local Players = game:GetService("Players")
+	local localPlayer = Players.LocalPlayer
 
-	if LocalPlayer and (LocalPlayer.UserId < 0 and not RunService:IsStudio()) then
-		local CurrentChannel = p5:GetCurrentChannel()
-
-		if CurrentChannel then
-			Util:SendSystemMessageToSelf(ChatLocalization:Get("GameChat_SwallowGuestChat_Message", "Create a free account to get access to chat permissions!"), CurrentChannel, {})
-		end
-
-		return true
+	if not localPlayer or not (localPlayer.UserId < 0) or RunService:IsStudio() then
+		return false
 	end
 
-	return false
+	local currentChannel = object:GetCurrentChannel()
+
+	if currentChannel then
+		Util:SendSystemMessageToSelf(
+			v:Get("GameChat_SwallowGuestChat_Message", "Create a free account to get access to chat permissions!"),
+			currentChannel,
+			{}
+		)
+	end
+
+	return true
 end
 
 return {

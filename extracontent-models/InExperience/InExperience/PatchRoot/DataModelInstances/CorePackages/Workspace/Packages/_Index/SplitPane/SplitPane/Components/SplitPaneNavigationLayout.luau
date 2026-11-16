@@ -1,53 +1,240 @@
-local Parent = script:FindFirstAncestor("SplitPane").Parent
-local React = require(Parent.React)
-local AppSplitView = require(Parent.AppSplitView)
+local parent = script:FindFirstAncestor("SplitPane").Parent
+
+local React = require(parent.React)
+local AppSplitView = require(parent.AppSplitView)
+local NavigationRodux = require(parent.NavigationRodux)
+local Constants = NavigationRodux.Constants
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local SharedFlags = require(parent.SharedFlags)
+
 local SplitView = AppSplitView.SplitView
 local Enums = AppSplitView.Enums
+
 local useSplitPaneRender = require(script.Parent.Parent.Hooks.useSplitPaneRender)
 
-local function SplitPaneNavigationLayout(t1: {[any]: any}) -- line: 21
-	-- upvalues: useSplitPaneRender (copy), React (copy), Enums (copy), SplitView (copy)
-	local v9 = useSplitPaneRender(t1.screens, t1.cards, t1.paneIndices, t1.isRouteActiveOnPane)
+local useSplitPaneFocusNavBridge = require(script.Parent.Parent.Hooks.useSplitPaneFocusNavBridge)
+local FFlagSplitPaneEducationalTour = SharedFlags.FFlagSplitPaneEducationalTour
+local FFlagNavigationCommandHandle = SharedFlags.FFlagNavigationCommandHandle
+local SplitPaneEducationalTour
 
-	if not v9.isBreakpointEnabled then
-		local v10 = table.clone(v9.primarySlotChildren)
+if FFlagSplitPaneEducationalTour then
+	SplitPaneEducationalTour = require(script.Parent.SplitPaneEducationalTour)
+else
+	SplitPaneEducationalTour = nil
+end
 
-		for v11, v12 in v9.overlaySlotChildren do
-			v10[v11] = v12
-		end
+local SupportPaneTopRoutePublisher
 
-		return React.createElement(React.Fragment, nil, v10)
+if FFlagNavigationCommandHandle then
+	SupportPaneTopRoutePublisher = require(script.Parent.SupportPaneTopRoutePublisher)
+else
+	SupportPaneTopRoutePublisher = nil
+end
+
+local set = { [Constants.TempRnSwitchNavigatorName] = true }
+
+if Constants.HomeContainerName ~= nil then
+	set[Constants.HomeContainerName] = true
+end
+
+local function getActiveRouteName(data)
+	while data ~= nil and set[data.routeName] and data.routes ~= nil and data.index ~= nil do
+		data = data.routes[data.index]
 	end
 
-	local supportPaneMode = v9.supportPaneMode
-	local v14 = if v9.renderSupportContent == nil then React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = UDim2.fromScale(1, 1)
-	}, v9.supportSlotChildren) else v9.renderSupportContent(v9.supportContentProps, v9.supportSlotChildren)
-	local t2 = {
-		width = v9.supportWidth,
-		minWidth = v9.supportMinWidth,
-		maxWidth = v9.supportMaxWidth,
-		resizable = if supportPaneMode ~= Enums.SupportPaneMode.Normal or not v9.supportPaneResizable then Enums.PaneResizable.None else Enums.PaneResizable.Horizontal,
-		element = v14
-	}
-	local v16 = next(v9.overlaySlotChildren) ~= nil
+	return if data ~= nil then data.routeName else nil
+end
 
-	return React.createElement(React.Fragment, nil, {
-		SplitView = React.createElement(SplitView, {
-			supportPane = t2,
-			supportPaneMode = supportPaneMode,
-			onSupportPaneWidthChanged = v9.onSupportPaneWidthChanged,
-			onContentRegionRectChanged = v9.onContentRegionRectChanged
-		}, v9.primarySlotChildren),
-		Overlay = if not v16 then nil else React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			ZIndex = 10,
-			Size = UDim2.fromScale(1, 1)
-		}, v9.overlaySlotChildren)
-	})
+local function isHomeActive(screens): boolean
+	local item = screens[1]
+	local v
+
+	if not (item == nil or item.descriptor == nil) then
+		v = item.descriptor.state
+	end
+
+	if getActiveRouteName(v) ~= RobloxAppEnums.AppPage.Home then
+		return false
+	end
+
+	for i = 2, #screens do
+		local options
+
+		if screens[i].descriptor ~= nil then
+			options = screens[i].descriptor.options
+		end
+
+		if options == nil or options.splitPaneEligibility ~= Enums.SplitPaneSlot.Support then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function useSupportPaneAnchorRef()
+	local ref = React.useRef(nil)
+
+	return ref, (React.useCallback(function(current)
+		ref.current = current
+	end, {}))
+end
+
+local function SplitPaneNavigationLayout(props)
+	local v = useSplitPaneRender(props.screens, props.cards, props.paneIndices, props.isRouteActiveOnPane)
+	local ref = React.useRef(nil)
+
+	useSplitPaneFocusNavBridge(ref)
+	local isRootAppStack = FFlagSplitPaneEducationalTour and v.isRootAppStack
+	local supportPaneRef, ref2
+
+	if FFlagSplitPaneEducationalTour then
+		supportPaneRef, ref2 = useSupportPaneAnchorRef()
+	end
+
+	if v.isBreakpointEnabled then
+		local state
+
+		if FFlagNavigationCommandHandle and props.isRouteActiveOnPane and #props.paneIndices > 0 then
+			local screen = props.screens[props.paneIndices[#props.paneIndices]]
+
+			if screen ~= nil then
+				state = screen.descriptor.state
+			end
+		end
+
+		local supportPaneMode = v.supportPaneMode
+		local isSupportSurfaceEligible
+
+		if isRootAppStack then
+			if v.supportContentProps.paneCount == 0 then
+				isSupportSurfaceEligible = not v.supportContentProps.hasDetailOnTop and isHomeActive(props.screens)
+			else
+				isSupportSurfaceEligible = false
+			end
+		else
+			isSupportSurfaceEligible = isRootAppStack
+		end
+
+		local v2
+
+		if v.renderSupportContent == nil then
+			v2 = React.createElement(
+				"Frame",
+				{ BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.fromScale(1, 1) },
+				v.supportSlotChildren
+			)
+		else
+			v2 = v.renderSupportContent(v.supportContentProps, v.supportSlotChildren)
+		end
+
+		if isRootAppStack and ref2 ~= nil then
+			v2 = React.createElement(
+				"Frame",
+				{
+					ref = ref2,
+					Size = UDim2.fromScale(1, 1),
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0
+				},
+				{ SupportContent = v2 }
+			)
+		end
+
+		local supportPane = {
+			width = v.supportWidth,
+			minWidth = v.supportMinWidth,
+			maxWidth = v.supportMaxWidth,
+			resizable = 0,
+			element = 0
+		}
+		local resizable
+
+		if supportPaneMode == Enums.SupportPaneMode.Normal and v.supportPaneResizable then
+			resizable = Enums.PaneResizable.Horizontal
+		else
+			resizable = Enums.PaneResizable.None
+		end
+
+		supportPane.resizable = resizable
+
+		supportPane.element = v2
+
+		local v3 = next(v.overlaySlotChildren) ~= nil
+
+		local v4 = {
+			ContentPaneSurface = React.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Size = UDim2.fromScale(1, 1),
+					ref = ref
+				},
+				v.primarySlotChildren
+			)
+		}
+
+		local createElement = React.createElement
+		local fragment = React.Fragment
+		local v5 = {
+			SplitView = React.createElement(SplitView, {
+				supportPane = supportPane,
+				supportPaneMode = supportPaneMode,
+				supportResizerAbovePane = v.supportResizerAbovePane,
+				onSupportPaneWidthChanged = v.onSupportPaneWidthChanged,
+				onContentRegionRectChanged = v.onContentRegionRectChanged
+			}, v4),
+			TopRoutePublisher = 0,
+			EducationalTour = 0,
+			Overlay = 0
+		}
+		local topRoutePublisher
+
+		if state ~= nil then
+			topRoutePublisher = React.createElement(SupportPaneTopRoutePublisher, {
+				routeState = state
+			})
+		end
+
+		v5.TopRoutePublisher = topRoutePublisher
+		local educationalTour
+
+		if isRootAppStack then
+			educationalTour = React.createElement(SplitPaneEducationalTour, {
+				supportPaneRef = supportPaneRef,
+				supportPaneMode = supportPaneMode,
+				isSupportSurfaceEligible = isSupportSurfaceEligible
+			})
+		end
+
+		v5.EducationalTour = educationalTour
+		local overlay
+
+		if v3 then
+			overlay = React.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Size = UDim2.fromScale(1, 1),
+					ZIndex = 10
+				},
+				v.overlaySlotChildren
+			)
+		end
+
+		v5.Overlay = overlay
+		return createElement(fragment, nil, v5)
+	else
+		local clone = table.clone(v.primarySlotChildren)
+
+		for k, v2 in v.overlaySlotChildren do
+			clone[k] = v2
+		end
+
+		return React.createElement(React.Fragment, nil, clone)
+	end
 end
 
 return SplitPaneNavigationLayout

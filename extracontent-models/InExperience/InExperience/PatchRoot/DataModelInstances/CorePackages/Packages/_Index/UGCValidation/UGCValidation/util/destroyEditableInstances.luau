@@ -1,19 +1,17 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.util.Types)
 
-require(ParentParent.util.Types)
-
-local function destroyHelper(t1: {[any]: any}) -- line: 6
-	for _, v5 in t1 do
-		for _, v7 in v5 do
-			if v7.created and v7.instance then
-				v7.instance:Destroy()
+local function destroyHelper(items)
+	for _, item in items do
+		for _, v in item do
+			if v.created and v.instance then
+				v.instance:Destroy()
 			end
 		end
 	end
 end
 
-return function(p1, p2) -- line: 18
-	-- upvalues: destroyHelper (copy)
-	destroyHelper(p1)
+return function(p, p2)
+	destroyHelper(p)
 	destroyHelper(p2)
 end

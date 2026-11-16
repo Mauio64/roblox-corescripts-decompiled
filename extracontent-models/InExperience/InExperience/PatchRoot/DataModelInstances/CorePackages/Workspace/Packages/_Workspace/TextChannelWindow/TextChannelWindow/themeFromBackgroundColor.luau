@@ -1,13 +1,13 @@
-local ParentParent = script.Parent.Parent
-local Foundation = require(ParentParent.Foundation)
+local parent = script.Parent.Parent
 
-local function themeFromBackgroundColor(color3: Color3) -- line: 14
-	-- upvalues: Foundation (copy)
-	if 0.299 * color3.R + 0.587 * color3.G + 0.114 * color3.B >= 0.5 then
-		return Foundation.Enums.Theme.Light
+local Foundation = require(parent.Foundation)
+
+local function themeFromBackgroundColor(color: Color3)
+	if 0.299 * color.R + 0.587 * color.G + 0.114 * color.B >= 0.5 then
+		return Foundation.Enums.ColorMode.Light
 	end
 
-	return Foundation.Enums.Theme.Dark
+	return Foundation.Enums.ColorMode.Dark
 end
 
 return themeFromBackgroundColor

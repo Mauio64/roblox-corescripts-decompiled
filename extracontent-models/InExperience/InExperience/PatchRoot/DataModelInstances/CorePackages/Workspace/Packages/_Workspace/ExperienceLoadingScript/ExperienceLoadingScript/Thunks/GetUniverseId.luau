@@ -1,59 +1,52 @@
 local ExperienceLoadingScript = script:FindFirstAncestor("ExperienceLoadingScript")
-local ExperienceLoadingScriptParent = ExperienceLoadingScript.Parent
+local parent = ExperienceLoadingScript.Parent
 local SetUniverseId = require(ExperienceLoadingScript.Actions.SetUniverseId)
-local Url = require(ExperienceLoadingScriptParent.Http).Url
+local Http = require(parent.Http)
+local Url = Http.Url
 
-return function(p1, p2) -- line: 6
-	-- upvalues: SetUniverseId (copy), Url (copy)
-	local function v7(p3) -- line: 7
-		-- upvalues: SetUniverseId (copy)
-		local PlaceId = game.PlaceId
-		local GameId = game.GameId
+return function(callback, p)
+	local function fn(object)
+		local placeId = game.PlaceId
+		local gameId = game.GameId
 
-		while PlaceId <= 0 or GameId <= 0 do
+		while placeId <= 0 or gameId <= 0 do
 			wait()
-			PlaceId = game.PlaceId
-			GameId = game.GameId
+			placeId = game.PlaceId
+			gameId = game.GameId
 		end
 
-		p3:dispatch(SetUniverseId({
-			universeId = GameId,
-			placeId = PlaceId
-		}))
+		object:dispatch(SetUniverseId({ universeId = gameId, placeId = placeId }))
 	end
 
-	return function(p4) -- line: 23
-		-- upvalues: p2 (copy), Url (copy), p1 (copy), SetUniverseId (copy), v7 (copy)
-		coroutine.wrap(function() -- line: 24
-			-- upvalues: p2 (copy), Url (copy), p1 (copy), p4 (copy), SetUniverseId (copy), v7 (copy)
-			local v12 = p2
-			local GameId = game.GameId
+	return function(object)
+		coroutine.wrap(function()
+			local placeId = p
+			local universeId = game.GameId
 
-			if v12 > 0 and GameId <= 0 then
-				local v14 = string.format("%suniverses/v1/places/%d/universe", Url.APIS_URL, v12)
+			if placeId > 0 and universeId <= 0 then
+				callback(string.format("%suniverses/v1/places/%d/universe", Url.APIS_URL, placeId), "GET"):andThen(
+					function(p2)
+						if p2 and p2.responseBody then
+							universeId = p2.responseBody.universeId
 
-				p1(v14, "GET"):andThen(function(p5) -- line: 31
-					-- upvalues: GameId (ref), p4 (copy), SetUniverseId (copy), v12 (copy), v7 (copy)
-					if p5 and p5.responseBody then
-						GameId = p5.responseBody.universeId
+							if universeId and universeId >= 0 then
+								object:dispatch(SetUniverseId({
+									universeId = universeId,
+									placeId = placeId
+								}))
 
-						if GameId and GameId >= 0 then
-							p4:dispatch(SetUniverseId({
-								universeId = GameId,
-								placeId = v12
-							}))
-
-							return
+								return
+							end
 						end
-					end
 
-					v7(p4)
-				end, function(_) -- line: 44
-					-- upvalues: v7 (copy), p4 (copy)
-					v7(p4)
-				end)
+						fn(object)
+					end,
+					function(_)
+						fn(object)
+					end
+				)
 			else
-				v7(p4)
+				fn(object)
 			end
 		end)()
 	end

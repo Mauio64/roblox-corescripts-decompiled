@@ -1,11 +1,12 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Dash = require(GenericAbuseReportingParent.Dash)
-local FocusBehaviors = require(GenericAbuseReportingParent.FocusBehaviors)
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local React = require(GenericAbuseReportingParent.React)
-local ReactFocusNavigation = require(GenericAbuseReportingParent.ReactFocusNavigation)
-local FFlagAbuseReportSelectItemAddId = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportSelectItemAddId
+local parent = GenericAbuseReporting.Parent
+
+local Dash = require(parent.Dash)
+local FocusBehaviors = require(parent.FocusBehaviors)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Empty = Foundation.Empty
@@ -14,414 +15,475 @@ local IconName = Foundation.Enums.IconName
 local List = Foundation.List
 local ListItemInputType = Foundation.Enums.ListItemInputType
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
+
 local AbuseReportAnalyticsContext = require(GenericAbuseReporting.BeduiV2.Analytics.AbuseReportAnalyticsContext)
-
 require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
-
 local analyticsService = require(GenericAbuseReporting.BeduiV2.Analytics.analyticsService)
 local Eyebrow = require(GenericAbuseReporting.BeduiV2.Components.Eyebrow)
 local Footer = require(GenericAbuseReporting.BeduiV2.Components.Footer)
 local LayoutSlots = require(GenericAbuseReporting.BeduiV2.Components.LayoutSlots)
 local scrollToItem = require(GenericAbuseReporting.BeduiV2.Utils.scrollToItem)
 local TextWithTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.TextWithTranslation)
-
 require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
+local arTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation)
+local useArTranslation = arTranslation.useArTranslation
+local useLoader = require(GenericAbuseReporting.BeduiV2.Loaders.useLoader)
+local useListLoader = useLoader.useListLoader
 
-local useArTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation).useArTranslation
-local useListLoader = require(GenericAbuseReporting.BeduiV2.Loaders.useLoader).useListLoader
-local TelemetryEventType = analyticsService.TelemetryEventType
+local formatErrorDetailForAnalytics = analyticsService.formatErrorDetailForAnalytics
+local telemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local useLayoutSlots = LayoutSlots.useLayoutSlots
-local FFlagAbuseReportInExpPlayerListV3 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3
-local t1 = {
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAbuseReportInExpPlayerListV3 = SharedFlags.FFlagAbuseReportInExpPlayerListV3
+local FFlagAbuseReportListNodeFullBleed = require(GenericAbuseReporting.Flags.FFlagAbuseReportListNodeFullBleed)
+local FFlagAbuseReportImproveErrorEvents = require(GenericAbuseReporting.Flags.FFlagAbuseReportImproveErrorEvents)
+
+local v = {
 	chevron = nil,
 	radio = ListItemInputType.Radio,
 	toggle = ListItemInputType.Toggle,
 	checkbox = ListItemInputType.Checkbox
 }
 
-local function ListNodeLoading(t2: {[any]: any}) -- line: 76
-	-- upvalues: React (copy), Eyebrow (copy), View (copy), Skeleton (copy), EnumsRadius (copy)
-	local title = t2.title
-	local eyebrow = t2.eyebrow
-	local tokens = t2.tokens
-
-	return React.createElement(t2.layout, {
+local function ListNodeLoading(props)
+	local title = props.title
+	local eyebrow = props.eyebrow
+	local tokens = props.tokens
+	return React.createElement(props.layout, {
 		body = React.createElement(React.Fragment, nil, {
 			Eyebrow = eyebrow and React.createElement(Eyebrow, {
-				layoutOrder = 0,
-				eyebrow = eyebrow
+				eyebrow = eyebrow,
+				layoutOrder = 0
 			}),
-			Title = React.createElement(t2.titleSlot, {
-				layoutOrder = 1,
-				input = title
-			}),
-			SkeletonContainer = React.createElement(View, {
-				tag = "col gap-medium size-full-0 auto-y",
-				LayoutOrder = 2
-			}, {
-				Skeleton1 = React.createElement(Skeleton, {
-					radius = EnumsRadius.Medium,
-					Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
-				}),
-				Skeleton2 = React.createElement(Skeleton, {
-					radius = EnumsRadius.Medium,
-					Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
-				}),
-				Skeleton3 = React.createElement(Skeleton, {
-					radius = EnumsRadius.Medium,
-					Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
-				}),
-				Skeleton4 = React.createElement(Skeleton, {
-					radius = EnumsRadius.Medium,
-					Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
-				}),
-				Skeleton5 = React.createElement(Skeleton, {
-					radius = EnumsRadius.Medium,
-					Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
-				})
-			})
+			Title = React.createElement(props.titleSlot, { input = title, layoutOrder = 1 }),
+			SkeletonContainer = React.createElement(
+				View,
+				{ tag = "col gap-medium size-full-0 auto-y", LayoutOrder = 2 },
+				{
+					Skeleton1 = React.createElement(Skeleton, {
+						radius = Radius.Medium,
+						Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
+					}),
+					Skeleton2 = React.createElement(Skeleton, {
+						radius = Radius.Medium,
+						Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
+					}),
+					Skeleton3 = React.createElement(Skeleton, {
+						radius = Radius.Medium,
+						Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
+					}),
+					Skeleton4 = React.createElement(Skeleton, {
+						radius = Radius.Medium,
+						Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
+					}),
+					Skeleton5 = React.createElement(Skeleton, {
+						radius = Radius.Medium,
+						Size = UDim2.new(1, 0, 0, tokens.Size.Size_600)
+					})
+				}
+			)
 		})
 	})
 end
-local function ListNodeError(t3: {[any]: any}) -- line: 125
-	-- upvalues: useArTranslation (copy), React (copy), Eyebrow (copy), TextWithTranslation (copy), Button (copy), ButtonVariant (copy), Foundation (copy)
+
+local function ListNodeError(props)
 	local translateIntoString = useArTranslation().translateIntoString
 
-	return React.createElement(t3.layout, {
+	return React.createElement(props.layout, {
 		body = React.createElement(React.Fragment, nil, {
-			Eyebrow = t3.eyebrow and React.createElement(Eyebrow, {
-				layoutOrder = 0,
-				eyebrow = t3.eyebrow
+			Eyebrow = props.eyebrow and React.createElement(Eyebrow, {
+				eyebrow = props.eyebrow,
+				layoutOrder = 0
 			}),
-			Title = React.createElement(t3.titleSlot, {
-				layoutOrder = 1,
-				input = t3.title
-			}),
+			Title = React.createElement(props.titleSlot, { input = props.title, layoutOrder = 1 }),
 			ErrorText = React.createElement(TextWithTranslation, {
+				input = translateIntoString(props.errorText),
 				tag = "size-full-0 auto-y text-body-small",
-				layoutOrder = 2,
-				input = translateIntoString(t3.errorText)
+				layoutOrder = 2
 			}),
 			RetryButton = React.createElement(Button, {
-				LayoutOrder = 3,
-				text = translateIntoString(t3.retryButtonText),
+				text = translateIntoString(props.retryButtonText),
 				variant = ButtonVariant.Standard,
 				fillBehavior = Foundation.Enums.FillBehavior.Fit,
-				onActivated = t3.retry
+				onActivated = props.retry,
+				LayoutOrder = 3
 			})
 		})
 	})
 end
-local function ListNode(t4: {[any]: any}) -- line: 166
-	-- upvalues: useTokens (copy), React (copy), useArTranslation (copy), useAbuseReportAnalytics (copy), useListLoader (copy), useLayoutSlots (copy), ReactFocusNavigation (copy), FocusBehaviors (copy), scrollToItem (copy), TelemetryEventType (copy), FFlagAbuseReportSelectItemAddId (copy), Dash (copy), ListNodeLoading (copy), ListNodeError (copy), Empty (copy), Eyebrow (copy), View (copy), List (copy), FFlagAbuseReportInExpPlayerListV3 (copy), IconName (copy), t1 (copy), Footer (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v44 = useTokens()
-	local v45, v46 = React.useState(t4.initialValue or nil)
+
+local function ListNode(props)
+	local tokens = useTokens()
+	local state, setState = React.useState(props.initialValue or nil)
 	local translateIntoString = useArTranslation().translateIntoString
 	local sendEvent = useAbuseReportAnalytics().sendEvent
-	local v49 = React.useRef(nil)
-	local v50, v51 = React.useState(false)
-	local v52, v53 = React.useState(false)
-	local v54 = React.useRef(false)
-	local v55 = React.useRef(false)
-	local v56 = useListLoader(t4.items)
-	local loading = v56.loading
-	local error = v56.error
-	local retry = v56.retry
-	local data = v56.data
-	local v61 = useLayoutSlots()
-	local Layout = v61.Layout
-	local v63 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
-	local v64 = React.useRef(nil)
+	local ref = React.useRef(nil)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
+	local ref2 = React.useRef(false)
+	local ref3 = React.useRef(false)
 
-	React.useEffect(function() -- line: 188
-		-- upvalues: v49 (copy), v63 (copy), data (copy), FocusBehaviors (copy), v64 (copy)
-		local current = v49.current
+	local v2 = useListLoader(props.items)
+	local loading = v2.loading
+	local err = v2.error
+	local retry = v2.retry
+	local data = v2.data
 
-		if not current or not v63 then
+	local v3 = useLayoutSlots()
+	local layout = v3.Layout
+	local contentInset = v3.ContentInset
+
+	local v4 = data ~= nil and #data > 0
+
+	local v5 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+	local ref4 = React.useRef(nil)
+	React.useEffect(function()
+		local current = ref.current
+
+		if not (current and v5) or (not data or #data == 0) then
 			return
 		end
 
-		if not data or #data == 0 then
-			return
+		local mostRecentOrDefault = FocusBehaviors.mostRecentOrDefault(ref4.current)
+		v5:registerFocusBehavior(current, mostRecentOrDefault)
+
+		return function()
+			v5:deregisterFocusBehavior(current, mostRecentOrDefault)
 		end
+	end, { v5, data, ref4 })
 
-		local v76 = FocusBehaviors.mostRecentOrDefault(v64.current)
-
-		v63:registerFocusBehavior(current, v76)
-
-		return function() -- line: 200
-			-- upvalues: v63 (copy), current (copy), v76 (copy)
-			v63:deregisterFocusBehavior(current, v76)
-		end
-	end, {
-		v63,
-		data,
-		v64
-	})
-	React.useEffect(function() -- line: 206
-		-- upvalues: v49 (copy), v51 (copy), v53 (copy)
-		local current = v49.current
+	React.useEffect(function()
+		local current = ref.current
 
 		if not current then
 			return
 		end
 
-		local ScrollingFrame = current:FindFirstChildWhichIsA("ScrollingFrame", true)
+		local scrollingFrame = current:FindFirstChildWhichIsA("ScrollingFrame", true)
 
-		if not ScrollingFrame then
+		if not scrollingFrame then
 			return
 		end
 
-		local function checkScrollbar() -- line: 219
-			-- upvalues: ScrollingFrame (copy), v51 (copy)
-			local v93 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
-
-			v51(v93)
+		local function checkScrollbar() -- 1 equivalent call inferred from this helper
+			setState2(scrollingFrame.AbsoluteCanvasSize.Y > scrollingFrame.AbsoluteWindowSize.Y)
 		end
-		local function onScroll() -- line: 224
-			-- upvalues: ScrollingFrame (copy), v53 (copy)
-			if ScrollingFrame.CanvasPosition.Y > 0 then
-				v53(true)
+
+		local function onScroll()
+			if scrollingFrame.CanvasPosition.Y > 0 then
+				setState3(true)
 			end
 		end
 
-		local v81 = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
+		checkScrollbar() -- inferred equivalent call
+		local absoluteCanvasSizeChangedConnection = scrollingFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(checkScrollbar)
 
-		v51(v81)
+		local absoluteWindowSizeChangedConnection = scrollingFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(checkScrollbar)
+		local canvasPositionChangedConnection = scrollingFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(onScroll)
 
-		local connection = ScrollingFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(checkScrollbar)
-		local connection2 = ScrollingFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(checkScrollbar)
-		local connection3 = ScrollingFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(onScroll)
-
-		return function() -- line: 237
-			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
-			connection3:Disconnect()
+		return function()
+			absoluteCanvasSizeChangedConnection:Disconnect()
+			absoluteWindowSizeChangedConnection:Disconnect()
+			canvasPositionChangedConnection:Disconnect()
 		end
 	end, { loading })
 
-	local v65 = React.useRef({})
-	local v66 = React.useRef(nil)
+	local ref5 = React.useRef({})
+	local ref6 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 247
-		-- upvalues: v45 (copy), v66 (copy), v65 (copy), scrollToItem (copy), v49 (copy)
-		if v45 then
-			v66.current = v65.current[v45]
-			scrollToItem(v49, v66)
+	React.useEffect(function()
+		if not state then
+			ref6.current = nil
 
 			return
 		end
 
-		v66.current = nil
-	end, { v45 })
-	React.useEffect(function() -- line: 256
-		-- upvalues: error (copy), v54 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if error and not v54.current then
-			v54.current = true
-			sendEvent({
-				sub_event_type = TelemetryEventType.Error,
-				error_detail = {
-					error_message = "list: async load failed: " .. error
-				}
-			})
-		end
-	end, {
-		error,
-		sendEvent
-	})
-	React.useEffect(function() -- line: 266
-		-- upvalues: loading (copy), error (copy), data (copy), v55 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if not loading and not error and ((data == nil or #data == 0) and not v55.current) then
-			v55.current = true
-			sendEvent({
-				sub_event_type = TelemetryEventType.EmptyState
-			})
-		end
-	end, {
-		loading,
-		error,
-		data,
-		sendEvent
-	})
+		ref6.current = ref5.current[state]
+		scrollToItem(ref, ref6)
+	end, { state })
 
-	local v67 = t4.variant or "radio"
-	local v68 = v67 == "chevron"
-	local v69 = React.useCallback(function(n1: number, s1: string?) -- line: 283
-		-- upvalues: data (copy), sendEvent (copy), TelemetryEventType (copy), FFlagAbuseReportSelectItemAddId (copy), v50 (copy), v52 (copy)
+	React.useEffect(function()
+		if err and not ref2.current then
+			ref2.current = true
+			local v6 = { sub_event_type = telemetryEventType.Error, error_detail = 0 }
+			local error_detail
+
+			if FFlagAbuseReportImproveErrorEvents then
+				error_detail = formatErrorDetailForAnalytics("list: async load failed", err)
+			else
+				error_detail = {
+					error_message = "list: async load failed: " .. err
+				}
+			end
+
+			v6.error_detail = error_detail
+			sendEvent(v6)
+		end
+	end, { err, sendEvent })
+
+	React.useEffect(function()
+		if not loading and not err and (data == nil or #data == 0) and not ref3.current then
+			ref3.current = true
+			sendEvent({ sub_event_type = telemetryEventType.EmptyState })
+		end
+	end, { loading, err, data, sendEvent })
+
+	local variant = props.variant or "radio"
+	local v6 = variant == "chevron"
+	local v7 = React.useCallback(function(selected_index: number, selected_id: string)
 		if not data then
 			return
 		end
 
 		sendEvent({
-			sub_event_type = TelemetryEventType.SelectItem,
+			sub_event_type = telemetryEventType.SelectItem,
 			select_item_detail = {
-				selected_index = n1,
-				selected_id = if not FFlagAbuseReportSelectItemAddId then nil else s1,
+				selected_index = selected_index,
+				selected_id = selected_id,
 				list_length = #data,
-				has_scroll = v50,
-				did_scroll = v52
+				has_scroll = state2,
+				did_scroll = state3
 			}
 		})
-	end, {
-		sendEvent,
-		v50,
-		v52,
-		data
-	})
-	local v70 = React.useCallback(function(s2: string) -- line: 299
-		-- upvalues: data (copy), v46 (copy), Dash (copy), v69 (copy), FFlagAbuseReportSelectItemAddId (copy)
+	end, { sendEvent, state2, state3, data })
+
+	local v8 = React.useCallback(function(p: string)
 		if not data then
 			return
 		end
 
-		v46(s2)
-
-		local n2 = 0
-
-		Dash.forEach(data, function(p1, p2) -- line: 306
-			-- upvalues: s2 (copy), n2 (ref)
-			if p1.id == s2 then
-				n2 = p2
-
+		setState(p)
+		local v8 = 0
+		Dash.forEach(data, function(p2, p3)
+			if p2.id ~= p then
 				return
 			end
+
+			v8 = p3
 		end)
-		v69(n2, if not FFlagAbuseReportSelectItemAddId then nil else s2)
-	end, {
-		v69,
-		data
-	})
-	local v71 = React.useCallback(function() -- line: 315
-		-- upvalues: data (copy), Dash (copy), v45 (copy), t4 (copy)
+		v7(v8, p)
+	end, { v7, data })
+
+	local onActivated = React.useCallback(function()
 		if not data then
 			return
 		end
 
-		local v89 = Dash.find(data, function(p3) -- line: 320
-			-- upvalues: v45 (copy)
-			return p3.id == v45
+		local v9 = Dash.find(data, function(p): boolean
+			return p.id == state
 		end)
 
-		if t4.onNext then
-			t4.onNext(v45, v89)
+		if props.onNext then
+			props.onNext(state, v9)
 		end
-	end, {
-		data,
-		t4.onNext,
-		v45
-	})
-	local Title = v61.Title
+	end, { data, props.onNext, state })
+
+	local title = v3.Title
 
 	if loading then
 		return React.createElement(ListNodeLoading, {
-			layout = Layout,
-			titleSlot = Title,
-			title = t4.title,
-			eyebrow = t4.eyebrow,
-			tokens = v44
+			layout = layout,
+			titleSlot = title,
+			title = props.title,
+			eyebrow = props.eyebrow,
+			tokens = tokens
 		})
 	end
 
-	if error then
+	if err then
 		return React.createElement(ListNodeError, {
-			layout = Layout,
-			titleSlot = Title,
-			title = t4.title,
-			eyebrow = t4.eyebrow,
-			errorText = t4.errorText,
-			retryButtonText = t4.retryButtonText,
-			tokens = v44,
+			layout = layout,
+			titleSlot = title,
+			title = props.title,
+			eyebrow = props.eyebrow,
+			errorText = props.errorText,
+			retryButtonText = props.retryButtonText,
+			tokens = tokens,
 			retry = retry
 		})
 	end
 
-	local v73 = React.createElement(React.Fragment, nil, if data ~= nil and #data ~= 0 then {
-		Eyebrow = React.createElement(Eyebrow, {
-			layoutOrder = 0,
-			eyebrow = t4.eyebrow
-		}),
-		Title = React.createElement(Title, {
-			layoutOrder = 1,
-			input = t4.title,
-			subtitle = t4.subtitle
-		}),
-		ItemListContainer = React.createElement(View, {
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local children
+
+	if data == nil or #data == 0 then
+		children = { Empty = 0 }
+		local createElement2 = React.createElement
+		local text
+
+		if props.emptyText then
+			text = translateIntoString(props.emptyText)
+		end
+
+		children.Empty = createElement2(Empty, { text = text })
+	else
+		children = {
+			Eyebrow = 0,
+			Title = 0,
+			Header = 0,
+			ItemListContainer = 0,
+			Footer = 0
+		}
+		local eyebrow
+
+		if not FFlagAbuseReportListNodeFullBleed then
+			eyebrow = React.createElement(Eyebrow, { eyebrow = props.eyebrow, layoutOrder = 0 })
+		end
+
+		children.Eyebrow = eyebrow
+		local title2
+
+		if not FFlagAbuseReportListNodeFullBleed then
+			title2 = React.createElement(title, {
+				input = props.title,
+				subtitle = props.subtitle,
+				layoutOrder = 1
+			})
+		end
+
+		children.Title = title2
+		local header
+
+		if FFlagAbuseReportListNodeFullBleed then
+			header = React.createElement(contentInset, { layoutOrder = 0 }, {
+				Eyebrow = props.eyebrow and React.createElement(Eyebrow, {
+					eyebrow = props.eyebrow,
+					layoutOrder = 0
+				}),
+				Title = React.createElement(title, {
+					input = props.title,
+					subtitle = props.subtitle,
+					layoutOrder = 1
+				})
+			})
+		end
+
+		children.Header = header
+
+		children.ItemListContainer = React.createElement(View, {
 			tag = "size-full-0 auto-y",
 			LayoutOrder = 2
 		}, {
 			ItemList = React.createElement(List.Root, {
-				hasDivider = {
-					hasDivider = true,
-					isInset = false
-				},
-				isContained = {
-					isContained = false,
-					hasMargin = true
-				}
-			}, { Dash.map(data, function(p4, n3: number) -- line: 387
-				-- upvalues: FFlagAbuseReportInExpPlayerListV3 (copy), t4 (copy), React (copy), List (copy), IconName (copy), translateIntoString (copy), v68 (copy), v69 (copy), FFlagAbuseReportSelectItemAddId (copy), v70 (copy), t1 (copy), v67 (copy), v45 (copy), v65 (copy), v64 (copy)
-				local v92 = if not FFlagAbuseReportInExpPlayerListV3 or not t4.renderTrailingAccessory then nil else t4.renderTrailingAccessory(p4)
+				hasDivider = { hasDivider = true, isInset = false },
+				isContained = { isContained = false, hasMargin = true }
+			}, { Dash.map(data, function(props2, layoutOrder: number)
+					local trailing
 
-				return React.createElement(List.Item, {
-					leading = if type(p4.leading) ~= "string" then p4.leading else IconName[p4.leading],
-					title = translateIntoString(p4.label),
-					description = if not p4.description then nil else translateIntoString(p4.description),
-					trailing = v92,
-					onActivated = {
-						onActivated = not v68 and function() -- line: 410
-							-- upvalues: v70 (copy), p4 (copy)
-							v70(p4.id)
-						end or function() -- line: 401
-							-- upvalues: v69 (copy), n3 (copy), FFlagAbuseReportSelectItemAddId (copy), p4 (copy), t4 (copy)
-							v69(n3, if not FFlagAbuseReportSelectItemAddId then nil else p4.id)
+					if FFlagAbuseReportInExpPlayerListV3 and props.renderTrailingAccessory then
+						trailing = props.renderTrailingAccessory(props2)
+					end
 
-							if t4.onNext then
-								t4.onNext(p4.id, p4)
+					local createElement2 = React.createElement
+					local item = List.Item
+					local leading
+
+					if type(props2.leading) == "string" then
+						leading = IconName[props2.leading]
+					else
+						leading = props2.leading
+					end
+
+					local v9 = {
+						leading = leading,
+						title = translateIntoString(props2.label),
+						description = 0,
+						trailing = 0,
+						onActivated = 0,
+						LayoutOrder = 0,
+						ref = 0
+					}
+					local description
+
+					if props2.description then
+						description = translateIntoString(props2.description)
+					end
+
+					v9.description = description
+					v9.trailing = trailing
+					local onActivated2
+
+					if v6 then
+						onActivated2 = function()
+							v7(layoutOrder, props2.id)
+
+							if props.onNext then
+								props.onNext(props2.id, props2)
 							end
-						end,
-						inputType = t1[v67],
-						isChecked = v45 == p4.id
-					},
-					LayoutOrder = n3,
-					ref = function(p5) -- line: 417
-						-- upvalues: v65 (copy), p4 (copy), n3 (copy), v64 (copy)
-						v65.current[p4.id] = p5
-
-						if n3 == 1 then
-							v64.current = p5
+						end
+					else
+						onActivated2 = function()
+							v8(props2.id)
 						end
 					end
-				})
-			end) })
-		}),
-		Footer = t4.footerItems and React.createElement(Footer, {
-			additionalTag = "padding-top-medium",
-			layoutOrder = 3,
-			footerItems = t4.footerItems
-		})
-	} else {
-		Empty = React.createElement(Empty, {
-			text = if not t4.emptyText then nil else translateIntoString(t4.emptyText)
-		})
-	})
-	local v74 = if not t4.onNext or (v68 or v45 == nil) then nil else React.createElement(Button, {
-		text = translateIntoString(t4.nextButtonText),
-		variant = ButtonVariant.Emphasis,
-		fillBehavior = FillBehavior.Fill,
-		isLoading = t4.isSubmitting,
-		isDisabled = t4.isSubmitting,
-		onActivated = v71
-	})
 
-	return React.createElement(Layout, {
-		ref = v49,
-		body = v73,
-		actions = v74
+					v9.onActivated = {
+						onActivated = onActivated2,
+						inputType = v[variant],
+						isChecked = state == props2.id
+					}
+
+					v9.LayoutOrder = layoutOrder
+					function v9.ref(current)
+						ref5.current[props2.id] = current
+
+						if layoutOrder == 1 then
+							ref4.current = current
+						end
+					end
+
+					return createElement2(item, v9)
+				end) })
+		})
+		local footer
+
+		if FFlagAbuseReportListNodeFullBleed then
+			footer = props.footerItems
+				and React.createElement(
+					contentInset,
+					{ layoutOrder = 3 },
+					React.createElement(Footer, {
+						footerItems = props.footerItems,
+						additionalTag = "padding-top-medium"
+					})
+				)
+		else
+			footer = props.footerItems
+				and React.createElement(Footer, {
+					footerItems = props.footerItems,
+					additionalTag = "padding-top-medium",
+					layoutOrder = 3
+				})
+		end
+
+		children.Footer = footer
+	end
+
+	local element = createElement(fragment, nil, children)
+	local actions
+
+	if props.onNext and not v6 and state ~= nil then
+		actions = React.createElement(Button, {
+			text = translateIntoString(props.nextButtonText),
+			variant = ButtonVariant.Emphasis,
+			fillBehavior = FillBehavior.Fill,
+			isLoading = props.isSubmitting,
+			isDisabled = props.isSubmitting,
+			onActivated = onActivated
+		})
+	end
+
+	return React.createElement(layout, {
+		ref = ref,
+		body = element,
+		actions = actions,
+		isContentFullBleed = FFlagAbuseReportListNodeFullBleed and v4
 	})
 end
 

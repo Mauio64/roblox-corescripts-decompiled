@@ -1,31 +1,28 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local React = require(MomentsCreationParent.React)
+local parent = MomentsCreation.Parent
+
+local React = require(parent.React)
+
 local CreationControllerContext = require(MomentsCreation.CreationController.CreationControllerContext)
 local createCreationController = require(MomentsCreation.CreationController.createCreationController)
 local GetCreationFlowStore = require(MomentsCreation.Stores.GetCreationFlowStore)
-
 require(MomentsCreation.Types.CreationFlowTypes)
 
-local function CreationControllerProvider(t1: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), createCreationController (copy), GetCreationFlowStore (copy), CreationControllerContext (copy)
-	local host = t1.host
-	local excludeGallery = t1.excludeGallery
-	local v11 = React.useMemo(function() -- line: 28
-		-- upvalues: createCreationController (copy), GetCreationFlowStore (copy), host (copy), excludeGallery (copy)
+local function CreationControllerProvider(props)
+	local host = props.host
+	local excludeGallery = props.excludeGallery
+	local initialAvatarMoment = props.initialAvatarMoment
+
+	local v = React.useMemo(function()
 		return createCreationController({
 			store = GetCreationFlowStore(false),
 			host = host,
-			excludeGallery = excludeGallery
+			excludeGallery = excludeGallery,
+			initialAvatarMoment = initialAvatarMoment
 		})
-	end, {
-		host,
-		excludeGallery
-	})
+	end, { host, excludeGallery, initialAvatarMoment })
 
-	return React.createElement(CreationControllerContext.Provider, {
-		value = v11
-	}, t1.children)
+	return React.createElement(CreationControllerContext.Provider, { value = v }, props.children)
 end
 
 return CreationControllerProvider

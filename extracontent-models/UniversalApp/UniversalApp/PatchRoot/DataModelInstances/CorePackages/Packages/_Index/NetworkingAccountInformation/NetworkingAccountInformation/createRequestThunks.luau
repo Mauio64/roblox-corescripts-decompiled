@@ -1,12 +1,8 @@
-local scriptParent = script.Parent
-local networkRequests = scriptParent.networkRequests
+local parent = script.Parent
+local networkRequests = parent.networkRequests
 local createGetPhoneInformation = require(networkRequests.createGetPhoneInformation)
+require(parent.Types.networkRequestsTypes)
 
-require(scriptParent.Types.networkRequestsTypes)
-
-return function(p1) -- line: 6
-	-- upvalues: createGetPhoneInformation (copy)
-	return {
-		GetPhoneInformation = createGetPhoneInformation(p1)
-	}
+return function(p)
+	return { GetPhoneInformation = createGetPhoneInformation(p) }
 end

@@ -1,100 +1,146 @@
 local FriendsRodux = script:FindFirstAncestor("FriendsRodux")
-local FriendsRoduxParent = FriendsRodux.Parent
+local parent = FriendsRodux.Parent
 local mockId = require(script.Parent.mockId)
-
 require(script.Parent.Parent.roduxFriendsTypes)
-
-local llama = require(FriendsRoduxParent.llama)
+local llama = require(parent.llama)
 local RecommendationContextType = require(FriendsRodux.Enums.RecommendationContextType)
-local t1 = {}
 
-function t1.new(p1) -- line: 10
-	-- upvalues: t1 (copy)
-	assert(t1.isValid(p1))
-	t1.__index = t1
+local Recommendation = {}
 
-	local t2 = {
-		id = p1.id,
-		entityId = p1.entityId,
-		rank = p1.rank,
-		contextType = p1.contextType,
-		mutualFriendsList = p1.mutualFriendsList,
-		mutualFriendsCount = p1.mutualFriendsCount,
-		thumbnailEntities = p1.thumbnailEntities,
-		entityDisplayName = p1.entityDisplayName
+function Recommendation.new(data)
+	assert(Recommendation.isValid(data))
+
+	Recommendation.__index = Recommendation
+
+	local v = {
+		id = data.id,
+		entityId = data.entityId,
+		rank = data.rank,
+		contextType = data.contextType,
+		mutualFriendsList = data.mutualFriendsList,
+		mutualFriendsCount = data.mutualFriendsCount,
+		thumbnailEntities = data.thumbnailEntities,
+		entityDisplayName = data.entityDisplayName
 	}
 
-	setmetatable(t2, t1)
+	setmetatable(v, Recommendation)
 
-	return t2
+	return v
 end
-function t1.mock(t3: {[any]: any}?) -- line: 31
-	-- upvalues: mockId (copy), RecommendationContextType (copy), llama (copy), t1 (copy)
-	local t4 = {
-		id = mockId(),
-		contextType = RecommendationContextType.MutualFriends
+
+function Recommendation.mock(p)
+	local v = { id = mockId(), contextType = RecommendationContextType.MutualFriends }
+	local joined = llama.Dictionary.join(v, p)
+
+	local new = Recommendation.new
+	local v2 = {
+		id = joined.id,
+		mutualFriendsList = joined.mutualFriendsList,
+		rank = joined.rank or tonumber(joined.id),
+		contextType = joined.contextType,
+		mutualFriendsCount = 0
 	}
-	local v11 = llama.Dictionary.join(t4, t3)
+	local mutualFriendsCount
 
-	return (t1.new({
-		id = v11.id,
-		mutualFriendsList = v11.mutualFriendsList,
-		rank = v11.rank or tonumber(v11.id),
-		contextType = v11.contextType,
-		mutualFriendsCount = if not v11.mutualFriendsCount then v11.mutualFriendsList and #v11.mutualFriendsList or 0 else v11.mutualFriendsCount
-	}))
+	if joined.mutualFriendsCount then
+		mutualFriendsCount = joined.mutualFriendsCount
+	else
+		mutualFriendsCount = joined.mutualFriendsList and #joined.mutualFriendsList or 0
+	end
+
+	v2.mutualFriendsCount = mutualFriendsCount
+	return (new(v2))
 end
-function t1.isValid(p2) -- line: 50
-	-- upvalues: RecommendationContextType (copy)
-	if not p2 then
+
+function Recommendation.isValid(data): (boolean, string)
+	if not data then
 		return false, "Expected recommendation information to be given"
 	end
 
-	if not p2.id then
+	if not data.id then
 		return false, "Expected user's id to be given"
 	end
 
-	if not p2.rank then
+	if not data.rank then
 		return false, "Expected user's rank to be given"
 	end
 
-	if not p2.contextType or not RecommendationContextType.isEnumValue(p2.contextType) then
+	if not (data.contextType and RecommendationContextType.isEnumValue(data.contextType)) then
 		return false, "Expected contextType to be given"
 	end
 
-	if p2.mutualFriendsList and type(p2.mutualFriendsList) ~= "table" then
+	if data.mutualFriendsList and type(data.mutualFriendsList) ~= "table" then
 		return false, "mutualFriendList must be a table of strings"
 	end
 
-	if p2.mutualFriendsCount and type(p2.mutualFriendsCount) ~= "number" then
+	if data.mutualFriendsCount and type(data.mutualFriendsCount) ~= "number" then
 		return false, "mutualFriendsCount must be a number"
 	end
 
-	if p2.contextType == RecommendationContextType.Contacts and not p2.entityId then
+	if data.contextType == RecommendationContextType.Contacts and not data.entityId then
 		return false, "entity Id must be given for Contacts recommendation type"
 	end
 
 	return true, "Valid Recommendation"
 end
-function t1.isEqual(p3, p4) -- line: 76
-	-- upvalues: llama (copy)
-	return p3.id == p4.id and (llama.List.equals(p3.mutualFriendsList, p4.mutualFriendsList) and (p3.rank == p4.rank and (p3.contextType == p4.contextType and p3.mutualFriendsCount == p4.mutualFriendsCount)))
-end
-function t1.format(p5) -- line: 84
-	-- upvalues: RecommendationContextType (copy), t1 (copy), llama (copy)
-	local v16 = if not p5.contextType then RecommendationContextType.None else RecommendationContextType.fromRawValue(p5.contextType) or RecommendationContextType.None
-	local v17 = if not p5.mutualFriendsCount then not p5.mutualFriendsList and 0 or #p5.mutualFriendsList else p5.mutualFriendsCount
-	local v18 = if p5.contactId == "" then nil else p5.contactId
-	local v19 = if v16 ~= RecommendationContextType.Contacts then nil else p5.displayName
 
-	return t1.new(llama.Dictionary.join(p5, {
-		id = p5.id,
-		entityId = v18,
-		contextType = v16,
-		mutualFriendsCount = v17,
-		thumbnailEntities = p5.thumbnailEntities,
-		entityDisplayName = v19
+function Recommendation.isEqual(data, data2)
+	local v
+
+	if data.id == data2.id then
+		v = llama.List.equals(data.mutualFriendsList, data2.mutualFriendsList)
+
+		if v then
+			if data.rank == data2.rank and data.contextType == data2.contextType then
+				return data.mutualFriendsCount == data2.mutualFriendsCount
+			end
+
+			return false
+		end
+	else
+		return false
+	end
+
+	return v
+end
+
+function Recommendation.format(data)
+	local contextType
+
+	if data.contextType then
+		contextType = RecommendationContextType.fromRawValue(data.contextType) or RecommendationContextType.None
+	else
+		contextType = RecommendationContextType.None
+	end
+
+	local mutualFriendsCount
+
+	if data.mutualFriendsCount then
+		mutualFriendsCount = data.mutualFriendsCount
+	else
+		mutualFriendsCount = data.mutualFriendsList and #data.mutualFriendsList or 0
+	end
+
+	local contactId
+
+	if data.contactId ~= "" then
+		contactId = data.contactId
+	end
+
+	local entityDisplayName
+
+	if contextType == RecommendationContextType.Contacts then
+		entityDisplayName = data.displayName
+	end
+
+	return Recommendation.new(llama.Dictionary.join(data, {
+		id = data.id,
+		entityId = contactId,
+		contextType = contextType,
+		mutualFriendsCount = mutualFriendsCount,
+		thumbnailEntities = data.thumbnailEntities,
+		entityDisplayName = entityDisplayName
 	}))
 end
 
-return t1
+return Recommendation

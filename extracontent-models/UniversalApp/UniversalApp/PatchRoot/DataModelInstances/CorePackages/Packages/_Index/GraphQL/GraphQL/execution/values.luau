@@ -1,188 +1,221 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Array = require(ParentParentParent.LuauPolyfill).Array
-local null = require(ParentParent.luaUtils.null)
-local isNillish = require(ParentParent.luaUtils.isNillish).isNillish
+local parent = script.Parent.Parent
 
-require(ParentParent.jsutils.ObjMap)
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
 
-local keyMap = require(ParentParent.jsutils.keyMap).keyMap
-local inspect = require(ParentParent.jsutils.inspect).inspect
-local printPathArray = require(ParentParent.jsutils.printPathArray).printPathArray
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local language = ParentParent.language
+local Array = LuauPolyfill.Array
 
+local null = require(parent.luaUtils.null)
+local isNillish = require(parent.luaUtils.isNillish)
+local isNillish2 = isNillish.isNillish
+
+require(parent.jsutils.ObjMap)
+
+local keyMap = require(parent.jsutils.keyMap)
+local keyMap2 = keyMap.keyMap
+local inspect = require(parent.jsutils.inspect)
+local inspect2 = inspect.inspect
+local printPathArray = require(parent.jsutils.printPathArray)
+local printPathArray2 = printPathArray.printPathArray
+
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+
+local language = parent.language
 require(language.ast)
 
-local Kind = require(language.kinds).Kind
-local print = require(language.printer).print
-local type = ParentParent.type
+local kinds = require(language.kinds)
+local kind = kinds.Kind
+local printer = require(language.printer)
+local Print = printer.print
 
-require(type.schema)
-require(type.definition)
-require(type.directives)
+local kind2 = parent.type
+require(kind2.schema)
 
-local definition = require(ParentParent.type.definition)
+require(kind2.definition)
+
+require(kind2.directives)
+
+local definition = require(parent.type.definition)
 local isInputType = definition.isInputType
 local isNonNullType = definition.isNonNullType
-local typeFromAST = require(ParentParent.utilities.typeFromAST).typeFromAST
-local valueFromAST = require(ParentParent.utilities.valueFromAST).valueFromAST
-local coerceInputValue = require(ParentParent.utilities.coerceInputValue).coerceInputValue
-local coerceVariableValues = nil
-local hasOwnProperty = nil
 
-function coerceVariableValues(p1, p2, t1: {[any]: any}, p3: ((...any) -> ...any)) -- line: 113
-	-- upvalues: typeFromAST (copy), isInputType (copy), print (copy), GraphQLError (copy), hasOwnProperty (ref), valueFromAST (copy), isNonNullType (copy), inspect (copy), null (copy), coerceInputValue (copy), printPathArray (copy)
-	local t2 = {}
+local typeFromAST = require(parent.utilities.typeFromAST)
+local typeFromAST2 = typeFromAST.typeFromAST
+local valueFromAST = require(parent.utilities.valueFromAST)
+local valueFromAST2 = valueFromAST.valueFromAST
+local coerceInputValue = require(parent.utilities.coerceInputValue)
+local coerceInputValue2 = coerceInputValue.coerceInputValue
 
-	for _, v in ipairs(p2) do
-		local value = v.variable.name.value
-		local v39 = typeFromAST(p1, v.type)
+local coerceVariableValues
 
-		if not isInputType(v39) then
-			local v40 = print(v.type)
+local hasOwnProperty
 
-			p3(GraphQLError.new(("Variable \"$%s\" expected value of type \"%s\" which cannot be used as an input type."):format(value, v40), v.type))
-		elseif not hasOwnProperty(t1, value) then
-			if v.defaultValue then
-				t2[value] = valueFromAST(v.defaultValue, v39)
-			elseif isNonNullType(v39) then
-				local v41 = inspect(v39)
+local function fn(p, p2, p3, p4)
+	local errors = {}
+	local maxErrors
 
-				p3(GraphQLError.new(("Variable \"$%s\" of required type \"%s\" was not provided."):format(value, v41), v))
+	if p4 == nil then
+		maxErrors = nil
+	else
+		maxErrors = p4.maxErrors
+	end
+
+	local success, result = pcall(coerceVariableValues, p, p2, p3, function(p5)
+		if maxErrors ~= nil and maxErrors <= #errors then
+			error(graphQLError.new("Too many errors processing variables, error limit reached. Execution aborted."))
+		end
+
+		table.insert(errors, p5)
+	end)
+
+	if not success then
+		table.insert(errors, result)
+	end
+
+	if #errors == 0 then
+		return { coerced = result }
+	end
+
+	return { errors = errors }
+end
+
+coerceVariableValues = function(p, list, p2, callback)
+	local result = {}
+
+	for _, item in ipairs(list) do
+		local value = item.variable.name.value
+		local v = typeFromAST2(p, item.type)
+
+		if isInputType(v) then
+			if hasOwnProperty(p2, value) then
+				local v2 = p2[value]
+
+				if v2 == null and isNonNullType(v) then
+					local v3 = inspect2(v)
+					callback(graphQLError.new(
+						("Variable \"$%s\" of non-null type \"%s\" must not be null."):format(value, v3),
+						item
+					))
+				else
+					result[value] = coerceInputValue2(v2, v, function(list2, p3, p4)
+						local v3 = ("Variable \"$%s\" got invalid value "):format(value) .. inspect2(p3)
+
+						if #list2 > 0 then
+							v3 ..= (" at \"%s%s\""):format(value, printPathArray2(list2))
+						end
+
+						callback(graphQLError.new(v3 .. "; " .. p4.message, item, nil, nil, nil, p4.originalError))
+					end)
+				end
+			elseif item.defaultValue then
+				result[value] = valueFromAST2(item.defaultValue, v)
+			elseif isNonNullType(v) then
+				local v2 = inspect2(v)
+				callback(graphQLError.new(
+					("Variable \"$%s\" of required type \"%s\" was not provided."):format(value, v2),
+					item
+				))
 			end
 		else
-			local v42 = t1[value]
-
-			if v42 == null and isNonNullType(v39) then
-				local v43 = inspect(v39)
-
-				p3(GraphQLError.new(("Variable \"$%s\" of non-null type \"%s\" must not be null."):format(value, v43), v))
-			else
-				t2[value] = coerceInputValue(v42, v39, function(p4, p5, p6) -- line: 174
-					-- upvalues: value (copy), inspect (copy), printPathArray (copy), p3 (copy), GraphQLError (copy), v (copy)
-					local v69 = ("Variable \"$%s\" got invalid value "):format(value) .. inspect(p5)
-
-					if #p4 > 0 then
-						v69 ..= (" at \"%s%s\""):format(value, printPathArray(p4))
-					end
-
-					p3(GraphQLError.new(v69 .. "; " .. p6.message, v, nil, nil, nil, p6.originalError))
-				end)
-			end
+			local Print2 = Print(item.type)
+			callback(graphQLError.new(
+				("Variable \"$%s\" expected value of type \"%s\" which cannot be used as an input type."):format(
+					value,
+					Print2
+				),
+				item.type
+			))
 		end
 	end
 
-	return t2
+	return result
 end
 
-local function getArgumentValues(p7, p8, p9) -- line: 207
-	-- upvalues: keyMap (copy), isNonNullType (copy), GraphQLError (copy), inspect (copy), Kind (copy), hasOwnProperty (ref), isNillish (copy), valueFromAST (copy), print (copy)
-	local t3 = {}
-	local v48 = if not p8.arguments then {} else p8.arguments
-	local v49 = keyMap(v48, function(p10) -- line: 217
-		return p10.name.value
+local function getArgumentValues(p, p2, p3)
+	local v = keyMap2(not p2.arguments and {} or p2.arguments, function(p4)
+		return p4.name.value
 	end)
+	local argumentValues = {}
 
-	for _, v in ipairs(p7.args) do
-		local name = v.name
-		local type2 = v.type
-		local v54 = v49[name]
+	for _, arg in ipairs(p.args) do
+		local name = arg.name
+		local kind3 = arg.type
 
-		if v54 then
-			local value = v54.value
-			local v56 = value.kind == Kind.NULL
+		local v2 = v[name]
 
-			if value.kind == Kind.VARIABLE then
+		if v2 then
+			local value = v2.value
+			local v3 = value.kind == kind.NULL
+
+			if value.kind == kind.VARIABLE then
 				local value2 = value.name.value
 
-				if p9 == nil or not hasOwnProperty(p9, value2) then
-					if v.defaultValue ~= nil then
-						t3[name] = v.defaultValue
-					elseif isNonNullType(type2) then
-						error(GraphQLError.new(("Argument \"%s\" of required type \"%s\" "):format(name, inspect(type2)) .. ("was provided the variable \"$%s\" which was not provided a runtime value."):format(value2), value))
+				if p3 == nil or not hasOwnProperty(p3, value2) then
+					if arg.defaultValue == nil then
+						if isNonNullType(kind3) then
+							error(graphQLError.new(
+								("Argument \"%s\" of required type \"%s\" "):format(name, inspect2(kind3)) .. ("was provided the variable \"$%s\" which was not provided a runtime value."):format(value2),
+								value
+							))
+						end
+					else
+						argumentValues[name] = arg.defaultValue
 					end
 
 					continue
 				end
 
-				v56 = isNillish(p9[value2])
+				v3 = isNillish2(p3[value2])
 			end
 
-			if v56 and isNonNullType(type2) then
-				error(GraphQLError.new(("Argument \"%s\" of non-null type \"%s\" "):format(name, inspect(type2)) .. "must not be null.", value))
+			if v3 and isNonNullType(kind3) then
+				error(graphQLError.new(
+					("Argument \"%s\" of non-null type \"%s\" "):format(name, inspect2(kind3)) .. "must not be null.",
+					value
+				))
 			end
 
-			local v58 = valueFromAST(value, type2, p9)
+			local v4 = valueFromAST2(value, kind3, p3)
 
-			if v58 == nil then
-				error(GraphQLError.new(("Argument \"%s\" has invalid value %s."):format(name, print(value)), value))
+			if v4 == nil then
+				error(graphQLError.new(("Argument \"%s\" has invalid value %s."):format(name, Print(value)), value))
 			end
 
-			t3[name] = v58
-
-			continue
-		end
-
-		if v.defaultValue ~= nil then
-			t3[name] = v.defaultValue
-		elseif isNonNullType(type2) then
-			error(GraphQLError.new(("Argument \"%s\" of required type \"%s\" "):format(name, inspect(type2)) .. "was not provided.", p8))
+			argumentValues[name] = v4
+		elseif arg.defaultValue == nil then
+			if isNonNullType(kind3) then
+				error(graphQLError.new(
+					("Argument \"%s\" of required type \"%s\" "):format(name, inspect2(kind3)) .. "was not provided.",
+					p2
+				))
+			end
+		else
+			argumentValues[name] = arg.defaultValue
 		end
 	end
 
-	return t3
+	return argumentValues
 end
 
-function hasOwnProperty(p11, s1: string) -- line: 325
-	return p11[s1] ~= nil
-end
+local function fn2(p, p2, p3)
+	local v
 
-return {
-	getVariableValues = function(p12, p13, t4: {[any]: any}, t5: {[any]: any}?) -- line: 79
-		-- upvalues: coerceVariableValues (ref), GraphQLError (copy)
-		local t6 = {}
-		local maxErrors = nil
-
-		if t5 ~= nil then
-			maxErrors = t5.maxErrors
-		end
-
-		local ok, result = pcall(coerceVariableValues, p12, p13, t4, function(p14) -- line: 91
-			-- upvalues: maxErrors (ref), t6 (copy), GraphQLError (copy)
-			if maxErrors ~= nil and #t6 >= maxErrors then
-				error(GraphQLError.new("Too many errors processing variables, error limit reached. Execution aborted."))
-			end
-
-			table.insert(t6, p14)
+	if p2.directives then
+		v = Array.find(p2.directives, function(p4): boolean
+			return p4.name.value == p.name
 		end)
-
-		if not ok then
-			table.insert(t6, result)
-		end
-
-		if #t6 == 0 then
-			return {
-				coerced = result
-			}
-		end
-
-		return {
-			errors = t6
-		}
-	end,
-	getArgumentValues = getArgumentValues,
-	getDirectiveValues = function(p15, t7: {[any]: any}, p16) -- line: 305
-		-- upvalues: Array (copy), getArgumentValues (ref)
-		local v62 = if not t7.directives then nil else Array.find(t7.directives, function(p17) -- line: 312
-			-- upvalues: p15 (copy)
-			return p17.name.value == p15.name
-		end)
-
-		if v62 then
-			return getArgumentValues(p15, v62, p16)
-		end
-
-		return nil
 	end
-}
+
+	if v then
+		return getArgumentValues(p, v, p3)
+	end
+
+	return nil
+end
+
+hasOwnProperty = function(p, value: string): boolean
+	return p[value] ~= nil
+end
+
+return { getVariableValues = fn, getArgumentValues = getArgumentValues, getDirectiveValues = fn2 }

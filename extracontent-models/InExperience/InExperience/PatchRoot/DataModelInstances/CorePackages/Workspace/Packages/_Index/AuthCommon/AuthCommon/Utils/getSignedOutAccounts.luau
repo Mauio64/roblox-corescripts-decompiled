@@ -1,54 +1,76 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
 local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
-
 require(AuthCommon.Utils.PreviousAccountEntry)
+local parent = AuthCommon.Parent
+local Cryo = require(parent.Cryo)
 
-local AuthCommonParent = AuthCommon.Parent
-local Cryo = require(AuthCommonParent.Cryo)
-local GetFFlagShowInvoluntarilySignedOutAccounts = require(AuthCommonParent.SharedFlags).GetFFlagShowInvoluntarilySignedOutAccounts
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagShowInvoluntarilySignedOutAccounts = SharedFlags.GetFFlagShowInvoluntarilySignedOutAccounts
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagFixPreviousAccountsListEntries = SharedFlags2.FFlagFixPreviousAccountsListEntries
 
-local function subarray(p1, p2, p3) -- line: 12
-	local t1 = {}
+local function subarray(list, p, p2)
+	local result = {}
 
-	for i = p2, p3 do
-		table.insert(t1, p1[i])
+	for i = p, p2 do
+		table.insert(result, list[i])
 	end
 
-	return t1
+	return result
 end
-local function getSignedOutAccounts(n1: number, t2: {[any]: any}?, b1: boolean?) -- line: 20
-	-- upvalues: AppStorageUtilities (copy), GetFFlagShowInvoluntarilySignedOutAccounts (copy), Cryo (copy)
-	local v16 = AppStorageUtilities.getPreviousAccountsList()
-	local v17 = GetFFlagShowInvoluntarilySignedOutAccounts()
-	local v18 = Cryo.Dictionary.values(v16)
-	local v19 = Cryo.List.filter(v18, function(p4) -- line: 29
-		-- upvalues: v17 (copy), t2 (copy), b1 (copy)
-		if not v17 then
-			return p4.signOutTimestamp
+
+local function getSignedOutAccounts(p: number, p2, flag: boolean?)
+	local previousAccountsList = AppStorageUtilities.getPreviousAccountsList()
+	local fFlagShowInvoluntarilySignedOutAccounts = GetFFlagShowInvoluntarilySignedOutAccounts()
+
+	local values = Cryo.Dictionary.values(previousAccountsList)
+	local filtered = Cryo.List.filter(values, function(data)
+		if FFlagFixPreviousAccountsListEntries then
+			local userId = data.userId
+
+			if userId == nil or userId == "" then
+				return false
+			end
 		end
 
-		local v24 = t2 ~= nil and (p4.userId ~= nil and t2[p4.userId] == true)
-		local v25 = b1 == true and p4.showInAccountPicker == false
-
-		return not v24 and not v25
-	end)
-	local v20 = if not v17 then Cryo.List.sort(v19, function(p5, p6) -- line: 52
-		return p5.signOutTimestamp > p6.signOutTimestamp
-	end) else Cryo.List.sort(v19, function(p7, p8) -- line: 43
-		return (p7.signOutTimestamp or (p7.signInTimestamp or 0)) > (p8.signOutTimestamp or (p8.signInTimestamp or 0))
-	end)
-
-	if v20 then
-		local t3 = {}
-
-		for i = 1, math.min(n1, #v20) do
-			table.insert(t3, v20[i])
+		if not fFlagShowInvoluntarilySignedOutAccounts then
+			return data.signOutTimestamp
 		end
 
-		return t3
+		local v
+
+		if p2 == nil or data.userId == nil then
+			v = false
+		else
+			v = p2[data.userId] == true
+		end
+
+		local v2 = flag == true and data.showInAccountPicker == false
+		return not (v or v2)
+	end)
+	local sorted
+
+	if fFlagShowInvoluntarilySignedOutAccounts then
+		sorted = Cryo.List.sort(filtered, function(p3, p4): boolean
+			return (p3.signOutTimestamp or p3.signInTimestamp or 0) > (p4.signOutTimestamp or p4.signInTimestamp or 0)
+		end)
+	else
+		sorted = Cryo.List.sort(filtered, function(p3, p4): boolean
+			return p3.signOutTimestamp > p4.signOutTimestamp
+		end)
 	end
 
-	return {}
+	if not sorted then
+		return {}
+	end
+
+	local result = {}
+
+	for i = 1, math.min(p, #sorted) do
+		table.insert(result, sorted[i])
+	end
+
+	return result
 end
 
 return getSignedOutAccounts

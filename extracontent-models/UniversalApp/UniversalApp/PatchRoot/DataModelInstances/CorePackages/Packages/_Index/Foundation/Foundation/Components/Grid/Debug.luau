@@ -1,1 +1,3 @@
-return (require(script.GridDebug))
+local GridDebug = require(script.GridDebug)
+
+return GridDebug

@@ -1,3 +1,1 @@
-return {
-	BackdropClick = "BackdropClick"
-}
+return { BackdropClick = "BackdropClick" }

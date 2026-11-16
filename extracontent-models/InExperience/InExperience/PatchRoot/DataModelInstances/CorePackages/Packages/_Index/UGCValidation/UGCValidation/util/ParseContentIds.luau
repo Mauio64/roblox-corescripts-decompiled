@@ -1,234 +1,267 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
-local t1 = {}
+local parent = script.Parent.Parent
 
-local function getRbxAssetId(p1) -- line: 16
-	return (string.match(p1, "^rbxassetid://(%d+)$"))
+local Constants = require(parent.Constants)
+local FailureReasonsAccumulator = require(parent.util.FailureReasonsAccumulator)
+
+local getFFlagUGCValidateVersionedContentIds = require(parent.flags.getFFlagUGCValidateVersionedContentIds)
+
+local ParseContentIds = {}
+
+local function getRbxAssetId(value) -- 2 equivalent calls inferred from this helper
+	return (string.match(value, "^rbxassetid://(%d+)$"))
 end
-local function getAssetUrlId(p2) -- line: 22
-	local v14 = string.match(p2, "^https?://www%.(.+)") or string.match(p2, "^https?://(.+)")
 
-	if not v14 then
+local function getAssetUrlId(value)
+	local v = string.match(value, "^https?://www%.(.+)") or string.match(value, "^https?://(.+)")
+
+	if not v then
 		return nil
 	end
 
-	local v15 = string.match(v14, "^sitetest%d%.robloxlabs(.+)") or string.match(v14, "^roblox(.+)")
+	local v2 = string.match(v, "^sitetest%d%.robloxlabs(.+)") or string.match(v, "^roblox(.+)")
 
-	if not v15 then
-		return nil
-	end
-
-	return (string.match(v15, "^%.com//?asset/%?id=(%d+)$"))
-end
-local function getAssetDeliveryAssetUrlId(p3) -- line: 37
-	local match = string.match(p3, "^https?://assetdelivery%.(.+)")
-
-	if not match then
-		return nil
-	end
-
-	local v18 = string.match(match, "^sitetest%d%.robloxlabs(.+)") or string.match(match, "^roblox(.+)")
-
-	if not v18 then
-		return nil
-	end
-
-	return (string.match(v18, "^%.com/v1/asset/%?id=(%d+)$"))
-end
-local function tryGetAssetIdFromContentIdInternal(p4) -- line: 51
-	-- upvalues: getAssetUrlId (copy), getAssetDeliveryAssetUrlId (copy)
-	local num = tonumber(p4)
-
-	if num ~= nil then
-		return num
-	end
-
-	local match = string.match(p4, "^rbxassetid://(%d+)$")
-
-	if match ~= nil then
-		return match
-	end
-
-	local v22 = getAssetUrlId(p4)
-
-	if v22 ~= nil then
-		return v22
-	end
-
-	local v23 = getAssetDeliveryAssetUrlId(p4)
-
-	if v23 ~= nil then
-		return v23
+	if v2 then
+		return (string.match(v2, "^%.com//?asset/%?id=(%d+)$"))
 	end
 
 	return nil
 end
-local function hasInExpCreatedEditableInstance(p5, p6, p7) -- line: 75
-	if not p7 then
+
+local function getAssetDeliveryAssetUrlId(value)
+	local v = string.match(value, "^https?://assetdelivery%.(.+)")
+
+	if not v then
+		return nil
+	end
+
+	local v2 = string.match(v, "^sitetest%d%.robloxlabs(.+)") or string.match(v, "^roblox(.+)")
+
+	if v2 then
+		return (string.match(v2, "^%.com/v1/asset/%?id=(%d+)$"))
+	end
+
+	return nil
+end
+
+local function splitVersionPin(value: string)
+	local v, v2, v3 = string.match(value, "^(.*)&(%a+)=(%d+)$")
+
+	if v == nil or string.lower(v2) ~= "version" or #v3 > 10 then
+		return value, nil
+	end
+
+	local v4 = tonumber(v3)
+
+	if v4 == nil or v4 < 1 then
+		return value, nil
+	end
+
+	return v, v4
+end
+
+local function tryParseVersionedContentId(value: string)
+	local v, v2, v3 = string.match(value, "^(.*)&(%a+)=(%d+)$")
+	local v4
+
+	if not (v == nil or string.lower(v2) ~= "version" or #v3 > 10) then
+		v4 = tonumber(v3)
+
+		if v4 == nil or v4 < 1 then
+			v4 = nil
+		else
+			value = v
+		end
+	end
+
+	local v5 = string.match(value, "^%d+$")
+
+	if v5 ~= nil and v4 ~= nil then
+		return nil, nil
+	end
+
+	local v6 = v5 or getRbxAssetId(value) or getAssetUrlId(value) or getAssetDeliveryAssetUrlId(value) -- inferred equivalent call
+
+	if v6 == nil then
+		return nil, nil
+	end
+
+	return string.gsub(v6, "^0+(%d)", "%1"), v4
+end
+
+local function tryGetAssetIdFromContentIdInternal(value)
+	if getFFlagUGCValidateVersionedContentIds() then
+		return (tryParseVersionedContentId(value))
+	end
+
+	local v = tonumber(value)
+
+	if v ~= nil then
+		return v
+	end
+
+	local rbxAssetId = getRbxAssetId(value) -- inferred equivalent call
+
+	if rbxAssetId ~= nil then
+		return rbxAssetId
+	end
+
+	local assetUrlId = getAssetUrlId(value)
+
+	if assetUrlId ~= nil then
+		return assetUrlId
+	end
+
+	local assetDeliveryAssetUrlId = getAssetDeliveryAssetUrlId(value)
+
+	if assetDeliveryAssetUrlId == nil then
+		return nil
+	end
+
+	return assetDeliveryAssetUrlId
+end
+
+local function hasInExpCreatedEditableInstance(instance, p, data): boolean -- 1 equivalent call inferred from this helper
+	if not (data and data.allowEditableInstances) then
 		return false
 	end
 
-	if not p7.allowEditableInstances then
-		return false
-	end
+	local editableImage = data.editableImages[instance]
 
-	local v27 = p7.editableImages[p5]
-
-	if v27 and v27[p6] and v27[p6].instance then
+	if editableImage and editableImage[p] and editableImage[p].instance then
 		return true
 	end
 
-	local v28 = p7.editableMeshes[p5]
+	local editableMesh = data.editableMeshes[instance]
 
-	if v28 and v28[p6] and v28[p6].instance then
+	if editableMesh and editableMesh[p] and editableMesh[p].instance then
 		return true
 	end
 
 	return false
 end
-local function parseContentId(p8, p9, p10, p11, p12, p13, p14) -- line: 105
-	-- upvalues: getAssetUrlId (copy), getAssetDeliveryAssetUrlId (copy)
-	local v36 = p11[p12]
 
-	if v36 == "" then
-		local v37
+local function parseContentId(list, p, list2, descendant, fieldName, p2, data)
+	local v = descendant[fieldName]
 
-		if not p14 then
-			v37 = false
-		elseif not p14.allowEditableInstances then
-			v37 = false
-		else
-			local v38 = p14.editableImages[p11]
-
-			if v38 and v38[p12] and v38[p12].instance then
-				v37 = true
-			else
-				local v39 = p14.editableMeshes[p11]
-
-				v37 = not not v39 and (not not v39[p12] and not not v39[p12].instance)
+	if v == "" then
+		if hasInExpCreatedEditableInstance(descendant, fieldName, data) then -- inferred equivalent call
+			if list2 then
+				table.insert(list2, { fieldName = fieldName, instance = descendant })
 			end
+		elseif p2 then
+			return false, { string.format("%s.%s cannot be empty", descendant:GetFullName(), fieldName) }
 		end
 
-		if v37 then
-			if p10 then
-				table.insert(p10, {
-					fieldName = p12,
-					instance = p11
-				})
-			end
-		elseif p13 then
-			return false, { string.format("%s.%s cannot be empty", p11:GetFullName(), p12) }
+		return true
+	else
+		local id = tryGetAssetIdFromContentIdInternal(v)
+
+		if id == nil then
+			return
+				false,
+				{ string.format(
+						"Could not parse ContentId %s in %s.%s. Please make sure you are using a valid URL with a valid ID.",
+						v,
+						descendant:GetFullName(),
+						fieldName
+					) }
+		end
+
+		if p[id] == nil then
+			p[id] = { fieldName = fieldName, instance = descendant }
+
+			table.insert(list, id)
+		end
+
+		if list2 then
+			table.insert(list2, { fieldName = fieldName, instance = descendant, id = id })
 		end
 
 		return true
 	end
+end
 
-	local num = tonumber(v36)
+local function parseWithErrorCheckInternal(p, p2, p3, folder, p4, p5, p6)
+	local v = p4 or Constants.CONTENT_ID_FIELDS
+	local v2 = FailureReasonsAccumulator.new()
 
-	if num ~= nil then
-	else
-		num = string.match(v36, "^rbxassetid://(%d+)$")
+	local descendants = folder:GetDescendants()
+	table.insert(descendants, folder)
 
-		if num ~= nil then
-		else
-			num = getAssetUrlId(v36)
+	for _, descendant in pairs(descendants) do
+		local v3 = v[descendant.ClassName]
 
-			if num ~= nil then
-			else
-				local v41 = getAssetDeliveryAssetUrlId(v36)
+		if not v3 then
+			continue
+		end
 
-				num = if v41 == nil then nil else v41
-			end
+		local v4 = p5 and p5[descendant.ClassName]
+
+		for _, v5 in ipairs(v3) do
+			v2:updateReasons(parseContentId(p, p2, p3, descendant, v5, v4 and v4[v5], p6))
 		end
 	end
 
-	if num == nil then
-		return false, { string.format("Could not parse ContentId %s in %s.%s. Please make sure you are using a valid URL with a valid ID.", v36, p11:GetFullName(), p12) }
-	end
-
-	if p9[num] == nil then
-		p9[num] = {
-			fieldName = p12,
-			instance = p11
-		}
-		table.insert(p8, num)
-	end
-
-	if p10 then
-		table.insert(p10, {
-			fieldName = p12,
-			instance = p11,
-			id = num
-		})
-	end
-
-	return true
+	return v2:getFinalResults()
 end
-local function parseWithErrorCheckInternal(p15, p16, p17, p18, p19, p20, p21) -- line: 150
-	-- upvalues: Constants (copy), FailureReasonsAccumulator (copy), parseContentId (copy)
-	local v49 = p19 or Constants.CONTENT_ID_FIELDS
-	local v50 = FailureReasonsAccumulator.new()
-	local descendants = p18:GetDescendants()
 
-	table.insert(descendants, p18)
+function ParseContentIds.tryGetAssetIdFromContentId(p: string)
+	return tryGetAssetIdFromContentIdInternal(p)
+end
 
-	for _, v in pairs(descendants) do
-		local v54 = v49[v.ClassName]
+function ParseContentIds.tryParseContentId(p: string)
+	if getFFlagUGCValidateVersionedContentIds() then
+		return tryParseVersionedContentId(p)
+	end
 
-		if v54 then
-			local v55 = p20 and p20[v.ClassName]
+	return tryGetAssetIdFromContentIdInternal(p), nil
+end
 
-			for _, v2 in ipairs(v54) do
-				local v58 = v55 and v55[v2]
+function ParseContentIds.getReferenceKey(p: string, p2: number?)
+	if p2 == nil then
+		return p
+	end
 
-				v50:updateReasons(parseContentId(p15, p16, p17, v, v2, v58, p21))
+	return string.format("%s&version=%d", p, p2)
+end
+
+function ParseContentIds.toAssetUri(p: string, p2: number?)
+	return "rbxassetid://" .. ParseContentIds.getReferenceKey(p, p2)
+end
+
+function ParseContentIds.getDistinctReferences(items)
+	local referenceKeySet = {}
+	local distinctReferences = {}
+
+	for k, item in items do
+		for _, entry in item do
+			local referenceKey = ParseContentIds.getReferenceKey(k, entry.version)
+
+			if referenceKeySet[referenceKey] then
+				continue
 			end
+
+			referenceKeySet[referenceKey] = true
+			table.insert(distinctReferences, {
+				key = referenceKey,
+				uri = ParseContentIds.toAssetUri(k, entry.version),
+				assetId = k,
+				entry = entry
+			})
 		end
 	end
 
-	return v50:getFinalResults()
+	return distinctReferences
 end
 
-function t1.tryGetAssetIdFromContentId(s1: string) -- line: 189
-	-- upvalues: getAssetUrlId (copy), getAssetDeliveryAssetUrlId (copy)
-	local num = tonumber(s1)
-
-	if num ~= nil then
-		return num
-	end
-
-	local match = string.match(s1, "^rbxassetid://(%d+)$")
-
-	if match ~= nil then
-		return match
-	end
-
-	local v62 = getAssetUrlId(s1)
-
-	if v62 ~= nil then
-		return v62
-	end
-
-	local v63 = getAssetDeliveryAssetUrlId(s1)
-
-	if v63 ~= nil then
-		return v63
-	end
-
-	return nil
-end
-function t1.parseWithErrorCheck(p22, p23, p24, p25, p26, p27) -- line: 193
-	-- upvalues: parseWithErrorCheckInternal (copy)
-	return parseWithErrorCheckInternal(p22, p23, nil, p24, p25, p26, p27)
-end
-function t1.parse(p28, p29, p30) -- line: 212
-	-- upvalues: parseWithErrorCheckInternal (copy)
-	local t2 = {}
-
-	assert((parseWithErrorCheckInternal({}, {}, t2, p28, p29, nil, p30)))
-
-	return t2
+function ParseContentIds.parseWithErrorCheck(p, p2, p3, p4, p5, p6)
+	return parseWithErrorCheckInternal(p, p2, nil, p3, p4, p5, p6)
 end
 
-return t1
+function ParseContentIds.parse(p, p2, p3)
+	local v = {}
+	assert((parseWithErrorCheckInternal({}, {}, v, p, p2, nil, p3)))
+	return v
+end
+
+return ParseContentIds

@@ -1,152 +1,158 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
-local RobloxGui = game:GetService("CoreGui").RobloxGui
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui.RobloxGui
 local React = require(CorePackages.Packages.React)
 local Cryo = require(CorePackages.Packages.Cryo)
+
 local getMenuItemsFromConfigs = require(AbuseReportMenu.MenuConfigs.getMenuItemsFromConfigs)
 local getMenuItemSizings = require(AbuseReportMenu.Utility.getMenuItemSizings)
-
 require(AbuseReportMenu.Components.Types)
-
 local Constants = require(AbuseReportMenu.Components.Constants)
 local ReportPlayerMenuItemConfigList = require(AbuseReportMenu.MenuConfigs.Players.ReportPlayerMenuItemConfigList)
 local reportPersonUIStateReducer = require(AbuseReportMenu.Reducers.reportPersonUIStateReducer)
 local handlePreselectedPlayer = require(AbuseReportMenu.Utility.handlePreselectedPlayer)
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
 
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 require(RobloxGui.Modules.VoiceChat.VoiceUsersByProximity)
+local VoiceChatCore = require(CorePackages.Workspace.Packages.VoiceChatCore)
+local constants = VoiceChatCore.Constants
 
-local Constants2 = require(CorePackages.Workspace.Packages.VoiceChatCore).Constants
 local PlayerMenuActions = Constants.PlayerMenuActions
-local v16 = game:DefineFastFlag("PreselectedPlayerReportBugfix", false)
 
-local function alphabeticalSort(p1, p2) -- line: 31
-	return p1.Name:lower() < p2.Name:lower()
+local defineFastFlag = game:DefineFastFlag("PreselectedPlayerReportBugfix", false)
+
+local function alphabeticalSort(p, p2): boolean
+	return p.Name:lower() < p2.Name:lower()
 end
-local function ReportPersonMenuItemsContainer(t1: {[any]: any}) -- line: 35
-	-- upvalues: getMenuItemSizings (copy), React (copy), reportPersonUIStateReducer (copy), Constants (copy), v16 (copy), default (copy), Constants2 (copy), handlePreselectedPlayer (copy), PlayerMenuActions (copy), alphabeticalSort (copy), Players (copy), Cryo (copy), getMenuItemsFromConfigs (copy), ReportPlayerMenuItemConfigList (copy)
-	local v22 = getMenuItemSizings()
-	local v23, v24 = React.useReducer(reportPersonUIStateReducer, Constants.InitPersonUIState)
 
-	React.useEffect(function() -- line: 39
-		-- upvalues: t1 (copy), Constants (copy), v16 (copy), default (copy), Constants2 (copy), handlePreselectedPlayer (copy), v24 (copy), PlayerMenuActions (copy)
-		if t1.utilityProps.isReportTabVisible ~= true then
+local function ReportPersonMenuItemsContainer(p)
+	local menuItemSizings = getMenuItemSizings()
+	local v, v2 = React.useReducer(reportPersonUIStateReducer, Constants.InitPersonUIState)
+
+	React.useEffect(function()
+		if p.utilityProps.isReportTabVisible ~= true then
 			return
 		end
 
-		t1.utilityProps.analyticsDispatch({
+		p.utilityProps.analyticsDispatch({
 			type = Constants.AnalyticsActions.SwitchToPersonInitialSelections
 		})
 
-		if v16 and (not default:UserVoiceEnabled() or default:GetVoiceJoinProgress() == Constants2.VOICE_JOIN_PROGRESS.Suspended) then
-			if t1.utilityProps.preselectedPlayer then
-				handlePreselectedPlayer(t1.utilityProps.preselectedPlayer, false, v24, t1.utilityProps.analyticsDispatch)
-			end
+		if
+			not defineFastFlag
+			or default:UserVoiceEnabled() and default:GetVoiceJoinProgress() ~= constants.VOICE_JOIN_PROGRESS.Suspended
+		then
+			default:asyncInit():andThen(function()
+				if p.utilityProps.preselectedPlayer then
+					handlePreselectedPlayer(
+						p.utilityProps.preselectedPlayer,
+						true,
+						v2,
+						p.utilityProps.analyticsDispatch
+					)
+				end
 
-			v24({
-				enabled = false,
-				type = PlayerMenuActions.SetVoiceEnabled
-			})
-
+				v2({ type = PlayerMenuActions.SetVoiceEnabled, enabled = true })
+			end):catch(function()
+				if p.utilityProps.preselectedPlayer then
+					handlePreselectedPlayer(
+						p.utilityProps.preselectedPlayer,
+						false,
+						v2,
+						p.utilityProps.analyticsDispatch
+					)
+				end
+			end)
 			return
 		end
 
-		default:asyncInit():andThen(function() -- line: 67
-			-- upvalues: t1 (copy), handlePreselectedPlayer (copy), v24 (copy), PlayerMenuActions (copy)
-			if t1.utilityProps.preselectedPlayer then
-				handlePreselectedPlayer(t1.utilityProps.preselectedPlayer, true, v24, t1.utilityProps.analyticsDispatch)
-			end
-
-			v24({
-				enabled = true,
-				type = PlayerMenuActions.SetVoiceEnabled
-			})
-		end):catch(function() -- line: 81
-			-- upvalues: t1 (copy), handlePreselectedPlayer (copy), v24 (copy)
-			if t1.utilityProps.preselectedPlayer then
-				handlePreselectedPlayer(t1.utilityProps.preselectedPlayer, false, v24, t1.utilityProps.analyticsDispatch)
-			end
-		end)
-	end, { t1.utilityProps.isReportTabVisible })
-	React.useEffect(function() -- line: 96
-		-- upvalues: v23 (copy), Constants (copy), default (copy), alphabeticalSort (copy), Players (copy), Cryo (copy), v24 (copy), PlayerMenuActions (copy)
-		local t2 = {}
-
-		if v23.methodOfAbuse == Constants.AbuseMethods.VoiceChat then
-			local v28 = default:getRecentUsersInteractionData()
-
-			for _, v in pairs(v28) do
-				table.insert(t2, v.player)
-			end
-
-			table.sort(t2, alphabeticalSort)
-		elseif v23.methodOfAbuse == Constants.AbuseMethods.TextChat or v23.methodOfAbuse == Constants.AbuseMethods.Other or v23.methodOfAbuse == Constants.AbuseMethods.Avatar or v23.methodOfAbuse == nil then
-			t2 = Players:GetPlayers()
-			table.sort(t2, alphabeticalSort)
+		if p.utilityProps.preselectedPlayer then
+			handlePreselectedPlayer(p.utilityProps.preselectedPlayer, false, v2, p.utilityProps.analyticsDispatch)
 		end
 
-		local u31 = false
-		local u32 = false
-		local v33 = Cryo.List.filter(t2, function(p3) -- line: 175
-			-- upvalues: v23 (copy), u31 (ref), u32 (ref), Players (copy)
-			if v23.preselectedPlayer and p3.UserId == v23.preselectedPlayer.UserId then
-				u31 = true
+		v2({ type = PlayerMenuActions.SetVoiceEnabled, enabled = false })
+	end, { p.utilityProps.isReportTabVisible })
+
+	React.useEffect(function()
+		local players = {}
+
+		if v.methodOfAbuse == Constants.AbuseMethods.VoiceChat then
+			local recentUsersInteractionData = default:getRecentUsersInteractionData()
+
+			for _, v3 in pairs(recentUsersInteractionData) do
+				table.insert(players, v3.player)
 			end
 
-			if v23.allegedAbuser and p3.UserId == v23.allegedAbuserId then
-				u32 = true
+			table.sort(players, alphabeticalSort)
+		elseif
+			v.methodOfAbuse == Constants.AbuseMethods.TextChat
+			or v.methodOfAbuse == Constants.AbuseMethods.Other
+			or v.methodOfAbuse == Constants.AbuseMethods.Avatar
+			or v.methodOfAbuse == nil
+		then
+			players = Players:GetPlayers()
+			table.sort(players, alphabeticalSort)
+		end
+
+		local v3 = false
+		local v4 = false
+
+		local filtered = Cryo.List.filter(players, function(p2): boolean
+			if v.preselectedPlayer and p2.UserId == v.preselectedPlayer.UserId then
+				v3 = true
 			end
 
-			return p3 ~= Players.LocalPlayer and p3.UserId > 0
+			if v.allegedAbuser and p2.UserId == v.allegedAbuserId then
+				v4 = true
+			end
+
+			return p2 ~= Players.LocalPlayer and p2.UserId > 0
 		end)
 
-		v24({
-			type = PlayerMenuActions.UpdatePlayerNameMap,
-			playerObjects = v33
-		})
+		v2({ type = PlayerMenuActions.UpdatePlayerNameMap, playerObjects = filtered })
 
-		if v23.preselectedPlayer and u31 then
-			v24({
+		if v.preselectedPlayer and v3 then
+			v2({
 				type = Constants.PlayerMenuActions.UpdateAbuser,
-				abuseId = v23.preselectedPlayer.UserId,
-				abuser = v23.preselectedPlayer
+				abuseId = v.preselectedPlayer.UserId,
+				abuser = v.preselectedPlayer
 			})
-			v24({
-				player = nil,
-				type = Constants.PlayerMenuActions.SetPreselectedPlayer
-			})
-		elseif not u32 then
-			v24({
-				abuseId = nil,
-				abuser = nil,
-				type = Constants.PlayerMenuActions.UpdateAbuser
-			})
+
+			v2({ type = Constants.PlayerMenuActions.SetPreselectedPlayer, player = nil })
+		elseif not v4 then
+			v2({ type = Constants.PlayerMenuActions.UpdateAbuser, abuseId = nil, abuser = nil })
 		end
 	end, {
-		v23.methodOfAbuse,
-		v23.isVoiceEnabled,
-		t1.utilityProps.isReportTabVisible,
-		v23.preselectedPlayer
+		v.methodOfAbuse,
+		v.isVoiceEnabled,
+		p.utilityProps.isReportTabVisible,
+		v.preselectedPlayer
 	})
 
-	local v25 = getMenuItemsFromConfigs(v23, v24, t1.utilityProps, ReportPlayerMenuItemConfigList, t1.isSmallPortraitViewport)
-	local v26 = Cryo.Dictionary.join({
+	local menuItemsFromConfigs = getMenuItemsFromConfigs(
+		v,
+		v2,
+		p.utilityProps,
+		ReportPlayerMenuItemConfigList,
+		p.isSmallPortraitViewport
+	)
+
+	local joined = Cryo.Dictionary.join({
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v22.ItemPadding)
+			Padding = UDim.new(0, menuItemSizings.ItemPadding)
 		})
-	}, v25)
+	}, menuItemsFromConfigs)
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
+	return React.createElement("Frame", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }, {
 		MenuItems = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, v26)
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1
+		}, joined)
 	})
 end
 

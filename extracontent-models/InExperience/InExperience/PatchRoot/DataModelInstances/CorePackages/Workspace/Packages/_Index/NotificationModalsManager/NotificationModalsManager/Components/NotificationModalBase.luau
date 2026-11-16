@@ -1,175 +1,207 @@
 local LocalizationService = game:GetService("LocalizationService")
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local ReactRoblox = require(ParentParent.ReactRoblox)
-local ReactOtter = require(ParentParent.ReactOtter)
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+local ReactOtter = require(parent.ReactOtter)
 local useState = React.useState
 local useEffect = React.useEffect
 local useMemo = React.useMemo
-local Localization = require(ParentParent.InExperienceLocales).Localization
-local LocalizationProvider = require(ParentParent.Localization).LocalizationProvider
-local StyleProviderWithDefaultTheme = require(ParentParent.Style).StyleProviderWithDefaultTheme
-local SettingsShowSignal = require(ParentParent.CoreScriptsCommon).SettingsShowSignal
+
+local InExperienceLocales = require(parent.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+local Localization2 = require(parent.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+local Style = require(parent.Style)
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
+
+local CoreScriptsCommon = require(parent.CoreScriptsCommon)
+local SettingsShowSignal = CoreScriptsCommon.SettingsShowSignal
+
 local GetFFlagManagerAddDisplayOrderAndBackgroundDismiss = require(script.Parent.Parent.Flags.GetFFlagManagerAddDisplayOrderAndBackgroundDismiss)
-local GetFFlagEnablePushNotificationsUpsellModal = require(ParentParent.SharedFlags).GetFFlagEnablePushNotificationsUpsellModal
-local GetFFlagNotificationModalSetMenuIsOpen = require(ParentParent.SharedFlags).GetFFlagNotificationModalSetMenuIsOpen
-local t1 = {
-	stiffness = 400,
-	damping = 40,
-	mass = 1
-}
 
-return function(t2: {[any]: any}) -- line: 46
-	-- upvalues: useState (copy), GuiService (copy), useEffect (copy), GetFFlagNotificationModalSetMenuIsOpen (copy), SettingsShowSignal (copy), ReactOtter (copy), UserInputService (copy), useMemo (copy), t1 (copy), React (copy), GetFFlagManagerAddDisplayOrderAndBackgroundDismiss (copy), ReactRoblox (copy), LocalizationProvider (copy), GetFFlagEnablePushNotificationsUpsellModal (copy), Localization (copy), LocalizationService (copy), StyleProviderWithDefaultTheme (copy)
-	local v20, v21 = useState({})
-	local v22, v23 = useState(GuiService.MenuIsOpen)
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnablePushNotificationsUpsellModal = SharedFlags.GetFFlagEnablePushNotificationsUpsellModal
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagNotificationModalSetMenuIsOpen = SharedFlags2.GetFFlagNotificationModalSetMenuIsOpen
 
-	useEffect(function() -- line: 54
-		-- upvalues: GetFFlagNotificationModalSetMenuIsOpen (copy), SettingsShowSignal (copy), t2 (copy), v23 (copy), GuiService (copy)
-		local u27 = if not GetFFlagNotificationModalSetMenuIsOpen() then GuiService.MenuOpened:Connect(function() -- line: 68
-			-- upvalues: t2 (copy), v23 (copy)
-			if t2.CloseModal then
-				t2.CloseModal()
-			end
+local v = { stiffness = 400, damping = 40, mass = 1 }
 
-			v23(true)
-		end) else SettingsShowSignal:connect(function(b1: boolean) -- line: 57
-			-- upvalues: t2 (copy), v23 (copy)
-			if b1 then
-				if t2.CloseModal then
-					t2.CloseModal()
+return function(props)
+	local state, setState = useState({})
+	local state2, setState2 = useState(GuiService.MenuIsOpen)
+
+	useEffect(function()
+		local connection
+
+		if GetFFlagNotificationModalSetMenuIsOpen() then
+			connection = SettingsShowSignal:connect(function(flag: boolean)
+				if not flag then
+					setState2(false)
+
+					return
 				end
 
-				v23(true)
+				if props.CloseModal then
+					props.CloseModal()
+				end
 
-				return
-			end
+				setState2(true)
+			end)
+		else
+			connection = GuiService.MenuOpened:Connect(function()
+				if props.CloseModal then
+					props.CloseModal()
+				end
 
-			v23(false)
-		end)
-		local v28 = if not GetFFlagNotificationModalSetMenuIsOpen() then GuiService.MenuClosed:Connect(function() -- line: 77
-			-- upvalues: v23 (copy)
-			v23(false)
-		end) else nil
+				setState2(true)
+			end)
+		end
 
-		return function() -- line: 81
-			-- upvalues: GetFFlagNotificationModalSetMenuIsOpen (copy), u27 (ref), v28 (copy)
+		local menuClosedConnection
+
+		if GetFFlagNotificationModalSetMenuIsOpen() then
+			menuClosedConnection = nil
+		else
+			menuClosedConnection = GuiService.MenuClosed:Connect(function()
+				setState2(false)
+			end)
+		end
+
+		return function()
 			if GetFFlagNotificationModalSetMenuIsOpen() then
-				u27:disconnect()
-
+				connection:disconnect()
 				return
 			end
 
-			u27:Disconnect()
+			connection:Disconnect()
 
-			if v28 ~= nil then
-				v28:Disconnect()
+			if menuClosedConnection ~= nil then
+				menuClosedConnection:Disconnect()
 			end
 		end
 	end, {})
 
-	local v24, v25 = ReactOtter.useAnimatedBinding(0, function() -- line: 93
-		-- upvalues: v20 (copy), t2 (copy), v21 (copy)
-		if v20 ~= t2 then
-			v21(t2)
+	local v2, v3 = ReactOtter.useAnimatedBinding(0, function()
+		if state ~= props then
+			setState(props)
 		end
 	end)
 
-	useEffect(function() -- line: 102
-		-- upvalues: t2 (copy), v21 (copy), UserInputService (copy)
-		local connection = nil
+	useEffect(function()
+		local inputBeganConnection
 
-		if t2.ModalKey then
-			v21(t2)
-			connection = UserInputService.InputBegan:Connect(function(input) -- line: 112
-				-- upvalues: UserInputService (copy), t2 (copy)
-				if (input.KeyCode == Enum.KeyCode.Backspace or input.KeyCode == Enum.KeyCode.ButtonB) and (UserInputService:GetFocusedTextBox() == nil and t2.CloseModal) then
-					t2.CloseModal()
+		if props.ModalKey then
+			setState(props)
+
+			inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
+				if
+					(input.KeyCode == Enum.KeyCode.Backspace or input.KeyCode == Enum.KeyCode.ButtonB)
+					and UserInputService:GetFocusedTextBox() == nil
+					and props.CloseModal
+				then
+					props.CloseModal()
 				end
 			end)
+		else
+			inputBeganConnection = nil
 		end
 
-		return function() -- line: 123
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if inputBeganConnection then
+				inputBeganConnection:Disconnect()
 			end
 		end
-	end, { t2 })
+	end, { props })
 
-	local v26 = useMemo(function() -- line: 130
-		-- upvalues: t2 (copy), v22 (copy)
-		if t2.ModalKey ~= nil and not v22 then
-			return 1
-		end
+	local v4 = useMemo(function(): number
+		return if props.ModalKey == nil or state2 then 0 else 1
+	end, { props.ModalKey, state2 })
 
-		return 0
-	end, {
-		t2.ModalKey,
-		v22
-	})
-
-	useEffect(function() -- line: 134
-		-- upvalues: v25 (copy), ReactOtter (copy), v26 (copy), t1 (copy), GetFFlagNotificationModalSetMenuIsOpen (copy), t2 (copy), GuiService (copy)
-		v25(ReactOtter.spring(v26, t1))
+	useEffect(function()
+		v3(ReactOtter.spring(v4, v))
 
 		if GetFFlagNotificationModalSetMenuIsOpen() then
-			if t2.Params and t2.Params.BlockNonCoreUserInput and v26 == 1 then
+			if props.Params and props.Params.BlockNonCoreUserInput and v4 == 1 then
 				GuiService:SetMenuIsOpen(true, "NotificationModal")
-
-				return
+			else
+				GuiService:SetMenuIsOpen(false, "NotificationModal")
 			end
-
-			GuiService:SetMenuIsOpen(false, "NotificationModal")
 		end
-	end, { v26 })
+	end, { v4 })
 
-	return React.createElement("ScreenGui", {
+	local createElement = React.createElement
+	local v5 = {
 		IgnoreGuiInset = true,
-		ResetOnSpawn = false,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-		DisplayOrder = not GetFFlagManagerAddDisplayOrderAndBackgroundDismiss() and 0 or (v20.Params and v20.Params.DisplayOrder or 0),
-		Enabled = v24:map(function(p1) -- line: 152
-			return p1 > 0
+		ResetOnSpawn = false,
+		DisplayOrder = GetFFlagManagerAddDisplayOrderAndBackgroundDismiss() and state.Params and state.Params.DisplayOrder or 0,
+		Enabled = v2:map(function(p): boolean
+			return p > 0
 		end)
-	}, {
+	}
+
+	local v6 = {
 		Background = React.createElement("Frame", {
-			BorderSizePixel = 1,
-			ZIndex = 0,
 			BackgroundColor3 = Color3.new(0, 0, 0),
 			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = v24:map(function(n1: number) -- line: 160
-				return 1 - n1 * 0.5
-			end)
-		}),
-		Container = React.createElement("TextButton", {
-			ZIndex = 1,
-			Text = "",
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0),
-			Modal = true,
-			Selectable = false,
-			Position = v24:map(function(p2) -- line: 173
-				return UDim2.new(0, 0, 1 - p2, 0)
+			BorderSizePixel = 1,
+			BackgroundTransparency = v2:map(function(p: number)
+				return 1 - p * 0.5
 			end),
-			[ReactRoblox.Event.Activated] = function() -- line: 178
-				-- upvalues: GetFFlagManagerAddDisplayOrderAndBackgroundDismiss (copy), v20 (copy), t2 (copy)
-				local v33 = if not GetFFlagManagerAddDisplayOrderAndBackgroundDismiss() then nil else v20.Params and v20.Params.DisableBackgroundDismiss
+			ZIndex = 0
+		}),
+		Container = 0
+	}
 
-				if t2.CloseModal and not v33 then
-					t2.CloseModal()
-				end
+	local createElement2 = React.createElement
+	local v7 = {
+		ZIndex = 1,
+		Text = "",
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		Modal = true,
+		Selectable = false,
+		Position = v2:map(function(p)
+			return UDim2.new(0, 0, 1 - p, 0)
+		end),
+		[ReactRoblox.Event.Activated] = function()
+			local v7
+
+			if GetFFlagManagerAddDisplayOrderAndBackgroundDismiss() then
+				v7 = state.Params and state.Params.DisableBackgroundDismiss
 			end
-		}, {
-			LocalizationProvider = React.createElement(LocalizationProvider, {
-				localization = if not GetFFlagEnablePushNotificationsUpsellModal() then Localization.new(LocalizationService.RobloxLocaleId) else v20.Params and v20.Params.Localization or Localization.new(LocalizationService.RobloxLocaleId)
-			}, {
-				StyleProvider = React.createElement(StyleProviderWithDefaultTheme, {}, {
-					ModalComponent = if not v20.Component then nil else React.createElement(v20.Component, v20.Params and v20.Params.Props or {})
-				})
+
+			if props.CloseModal and not v7 then
+				props.CloseModal()
+			end
+		end
+	}
+
+	local createElement3 = React.createElement
+	local localization
+
+	if GetFFlagEnablePushNotificationsUpsellModal() then
+		localization = state.Params and state.Params.Localization
+			or Localization.new(LocalizationService.RobloxLocaleId)
+	else
+		localization = Localization.new(LocalizationService.RobloxLocaleId)
+	end
+
+	local createElement4 = React.createElement
+	local modalComponent
+
+	if state.Component then
+		modalComponent = React.createElement(state.Component, state.Params and state.Params.Props or {})
+	end
+
+	v6.Container = createElement2("TextButton", v7, {
+		LocalizationProvider = createElement3(LocalizationProvider, { localization = localization }, {
+			StyleProvider = createElement4(StyleProviderWithDefaultTheme, {}, {
+				ModalComponent = modalComponent
 			})
 		})
 	})
+	return createElement("ScreenGui", v5, v6)
 end

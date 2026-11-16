@@ -1,6 +1,7 @@
 local useClientCacheFallbackBannerConfig = require(script.useClientCacheFallbackBannerConfig)
 local Signals = require(script.Signals)
-local GameSortLoadSource = require(script.Utils).GameSortLoadSource
+local Utils = require(script.Utils)
+local GameSortLoadSource = Utils.GameSortLoadSource
 
 return {
 	ClientCacheFallbackBanner = require(script.ClientCacheFallbackBanner),

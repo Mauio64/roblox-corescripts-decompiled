@@ -1,205 +1,215 @@
-local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local Motion = require(Parent.Motion)
+local parent = script:FindFirstAncestor("AppShortcutBar").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Motion = require(parent.Motion)
 local isBuilderIcon = Foundation.Utility.isBuilderIcon
+
 local useTokens = Foundation.Hooks.useTokens
 local Icon = Foundation.Icon
 
-local function useAnimationValues(p1) -- line: 35
-	-- upvalues: React (copy), Motion (copy)
-	local v11 = React.useMemo(function() -- line: 36
-		-- upvalues: Motion (copy)
+local function useAnimationValues(progress)
+	local v = React.useMemo(function()
 		return {
-			initial = Motion.createState({
-				scale = 1,
-				ringScale = 1
-			}, {
-				default = Motion.transition({
-					duration = 0.2
-				})
+			initial = Motion.createState({ scale = 1, ringScale = 1 }, {
+				default = Motion.transition({ duration = 0.2 })
 			}),
-			target = Motion.createState({
-				scale = 0.8,
-				ringScale = 1.15
-			}, {
-				default = Motion.transition({
-					duration = 0.3
-				})
+			target = Motion.createState({ scale = 0.8, ringScale = 1.15 }, {
+				default = Motion.transition({ duration = 0.3 })
 			})
 		}
 	end, {})
-	local v12, v13 = Motion.useMotion(v11.initial)
 
-	React.useEffect(function() -- line: 55
-		-- upvalues: v13 (copy), p1 (copy), v11 (copy)
-		v13(if not p1 then v11.initial else v11.target)
-	end, {
-		p1,
-		v13,
-		v11
-	})
+	local v2, v3 = Motion.useMotion(v.initial)
+	React.useEffect(function()
+		local v4 = if progress then v.target else v.initial
+		v3(v4)
+	end, { progress, v3, v })
 
-	return v12
+	return v2
 end
-local function CircularProgress(t1: {[any]: any}) -- line: 62
-	-- upvalues: useTokens (copy), React (copy)
-	local v15 = useTokens()
-	local size = t1.size
-	local progress = t1.progress
-	local v18 = React.useMemo(function() -- line: 67
-		-- upvalues: v15 (copy)
+
+local function CircularProgress(p)
+	local v = useTokens()
+	local size = p.size
+	local progress = p.progress
+
+	local transparency = React.useMemo(function()
 		return NumberSequence.new({
-			NumberSequenceKeypoint.new(0, v15.Color.Content.Emphasis.Transparency),
-			NumberSequenceKeypoint.new(0.4999, v15.Color.Content.Emphasis.Transparency),
+			NumberSequenceKeypoint.new(0, v.Color.Content.Emphasis.Transparency),
+			NumberSequenceKeypoint.new(0.4999, v.Color.Content.Emphasis.Transparency),
 			NumberSequenceKeypoint.new(0.5, 0.5),
 			NumberSequenceKeypoint.new(1, 0.5)
 		})
-	end, { v15 })
-	local v19 = React.useMemo(function() -- line: 76
-		-- upvalues: v15 (copy)
+	end, { v })
+
+	local color = React.useMemo(function()
 		return ColorSequence.new({
-			ColorSequenceKeypoint.new(0, v15.Color.Content.Emphasis.Color3),
-			ColorSequenceKeypoint.new(0.4999, v15.Color.Content.Emphasis.Color3),
-			ColorSequenceKeypoint.new(0.5, v15.Color.Content.Muted.Color3),
-			ColorSequenceKeypoint.new(1, v15.Color.Content.Muted.Color3)
+			ColorSequenceKeypoint.new(0, v.Color.Content.Emphasis.Color3),
+			ColorSequenceKeypoint.new(0.4999, v.Color.Content.Emphasis.Color3),
+			ColorSequenceKeypoint.new(0.5, v.Color.Content.Muted.Color3),
+			ColorSequenceKeypoint.new(1, v.Color.Content.Muted.Color3)
 		})
-	end, { v15 })
-	local v20 = React.useMemo(function() -- line: 85
-		-- upvalues: progress (copy)
+	end, { v })
+
+	local rotation = React.useMemo(function()
 		if progress then
-			return (progress:map(function(n1: number) -- line: 87
-				return (math.clamp(n1 * 360, 180, 360))
+			return (progress:map(function(p2: number)
+				return (math.clamp(p2 * 360, 180, 360))
 			end))
 		end
 
 		return 180
 	end, { progress })
-	local v21 = React.useMemo(function() -- line: 93
-		-- upvalues: progress (copy)
+
+	local rotation2 = React.useMemo(function()
 		if progress then
-			return (progress:map(function(n2: number) -- line: 95
-				return (math.clamp(n2 * 360, 0, 180))
+			return (progress:map(function(p2: number)
+				return (math.clamp(p2 * 360, 0, 180))
 			end))
 		end
 
 		return 0
 	end, { progress })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = size
-	}, {
-		Left = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ClipsDescendants = true,
-			Size = UDim2.fromScale(0.5, 1)
-		}, {
-			Image = React.createElement("ImageLabel", {
-				Image = "rbxasset://textures/ui/Controls/RadialFill@3x.png",
+	return React.createElement("Frame", { Size = size, BackgroundTransparency = 1 }, {
+		Left = React.createElement(
+			"Frame",
+			{ Size = UDim2.fromScale(0.5, 1), BackgroundTransparency = 1, ClipsDescendants = true },
+			{
+				Image = React.createElement(
+					"ImageLabel",
+					{
+						Image = "rbxasset://textures/ui/Controls/RadialFill@3x.png",
+						Size = UDim2.fromScale(2, 1),
+						BackgroundTransparency = 1
+					},
+					{
+						Gradient = React.createElement("UIGradient", {
+							Transparency = transparency,
+							Color = color,
+							Rotation = rotation
+						})
+					}
+				)
+			}
+		),
+		Right = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.fromScale(0.5, 1),
 				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(2, 1)
-			}, {
-				Gradient = React.createElement("UIGradient", {
-					Transparency = v18,
-					Color = v19,
-					Rotation = v20
-				})
-			})
-		}),
-		Right = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ClipsDescendants = true,
-			Size = UDim2.fromScale(0.5, 1),
-			Position = UDim2.fromScale(0.5, 0)
-		}, {
-			Image = React.createElement("ImageLabel", {
-				Image = "rbxasset://textures/ui/Controls/RadialFill@3x.png",
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(2, 1),
-				Position = UDim2.fromScale(-1, 0)
-			}, {
-				Gradient = React.createElement("UIGradient", {
-					Transparency = v18,
-					Color = v19,
-					Rotation = v21
-				})
-			})
-		})
+				ClipsDescendants = true,
+				Position = UDim2.fromScale(0.5, 0)
+			},
+			{
+				Image = React.createElement(
+					"ImageLabel",
+					{
+						Image = "rbxasset://textures/ui/Controls/RadialFill@3x.png",
+						Size = UDim2.fromScale(2, 1),
+						Position = UDim2.fromScale(-1, 0),
+						BackgroundTransparency = 1
+					},
+					{
+						Gradient = React.createElement("UIGradient", {
+							Transparency = transparency,
+							Color = color,
+							Rotation = rotation2
+						})
+					}
+				)
+			}
+		)
 	})
 end
 
-function IconWithHoldAnimation(t2: {[any]: any}) -- line: 144
-	-- upvalues: useAnimationValues (copy), React (copy), useTokens (copy), CircularProgress (copy), isBuilderIcon (copy), Icon (copy)
-	local layoutOrder = t2.layoutOrder
-	local size = t2.size
-	local position = t2.position
-	local anchorPoint = t2.anchorPoint
-	local progress = t2.progress
-	local icon = t2.icon
-	local iconSize = t2.iconSize
-	local v30 = useAnimationValues(progress)
-	local v31, v32 = React.useBinding(iconSize)
+function IconWithHoldAnimation(props)
+	local layoutOrder = props.layoutOrder
+	local size = props.size
+	local position = props.position
+	local anchorPoint = props.anchorPoint
+	local progress = props.progress
+	local icon = props.icon
+	local iconSize = props.iconSize
 
-	React.useEffect(function() -- line: 156
-		-- upvalues: v32 (copy), iconSize (copy)
-		v32(iconSize)
+	local v = useAnimationValues(progress)
+
+	local size2, v2 = React.useBinding(iconSize)
+	React.useEffect(function()
+		v2(iconSize)
 	end, { iconSize })
 
-	local Default = useTokens().Color.Content.Default
+	local default = useTokens().Color.Content.Default
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = layoutOrder,
-		Size = size,
-		Position = position,
-		AnchorPoint = anchorPoint
-	}, {
-		AnimationFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5)
-		}, {
-			UIScale = React.createElement("UIScale", {
-				Scale = v30.scale
-			}),
-			RingFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+	local v3 = {
+		Size = UDim2.fromScale(1, 1),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		BackgroundTransparency = 1
+	}
+
+	local v4 = {
+		UIScale = React.createElement("UIScale", { Scale = v.scale }),
+		RingFrame = React.createElement(
+			"Frame",
+			{
 				Size = UDim2.fromScale(1, 1),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5)
-			}, {
-				RingScale = React.createElement("UIScale", {
-					Scale = v30.ringScale
-				}),
+				Position = UDim2.fromScale(0.5, 0.5),
+				BackgroundTransparency = 1
+			},
+			{
+				RingScale = React.createElement("UIScale", { Scale = v.ringScale }),
 				Progress = React.createElement(CircularProgress, {
 					size = UDim2.fromScale(1, 1),
 					progress = progress
 				})
-			}),
-			IconFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5)
-			}, {
-				Icon = if isBuilderIcon(icon) then React.createElement(Icon, {
-					name = icon,
-					size = v31,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.fromScale(0.5, 0.5)
-				}) else React.createElement("ImageLabel", {
-					BackgroundTransparency = 1,
-					Image = icon,
-					ImageColor3 = Default.Color3,
-					ImageTransparency = Default.Transparency,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.fromScale(0.5, 0.5),
-					Size = UDim2.fromOffset(iconSize, iconSize)
-				})
-			})
+			}
+		),
+		IconFrame = 0
+	}
+
+	local createElement3 = React.createElement
+	local v5 = {
+		Size = UDim2.fromScale(1, 1),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		BackgroundTransparency = 1
+	}
+	local icon2
+
+	if isBuilderIcon(icon) then
+		icon2 = React.createElement(Icon, {
+			name = icon,
+			size = size2,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5)
 		})
+	else
+		icon2 = React.createElement("ImageLabel", {
+			Image = icon,
+			BackgroundTransparency = 1,
+			ImageColor3 = default.Color3,
+			ImageTransparency = default.Transparency,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(iconSize, iconSize)
+		})
+	end
+
+	v4.IconFrame = createElement3("Frame", v5, { Icon = icon2 })
+	return createElement("Frame", {
+		LayoutOrder = layoutOrder,
+		Size = size,
+		Position = position,
+		AnchorPoint = anchorPoint,
+		BackgroundTransparency = 1
+	}, {
+		AnimationFrame = createElement2("Frame", v3, v4)
 	})
 end
 

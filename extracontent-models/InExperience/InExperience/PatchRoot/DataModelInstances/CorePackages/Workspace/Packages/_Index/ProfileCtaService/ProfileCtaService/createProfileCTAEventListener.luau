@@ -1,61 +1,67 @@
 local NotificationService = game:GetService("NotificationService")
 local Players = game:GetService("Players")
-local Parent = script:FindFirstAncestor("ProfileCtaService").Parent
-local v4 = require(Parent.RealtimeDelivery).RobloxEventReceiver.new(NotificationService)
-local getLocalPlayerUserId = require(Parent.DataHydration).DataHydrationUtils.getLocalPlayerUserId
+
+local parent = script:FindFirstAncestor("ProfileCtaService").Parent
+
+local RealtimeDelivery = require(parent.RealtimeDelivery)
+local robloxEventReceiver = RealtimeDelivery.RobloxEventReceiver.new(NotificationService)
+local DataHydration = require(parent.DataHydration)
+local getLocalPlayerUserId = DataHydration.DataHydrationUtils.getLocalPlayerUserId
+
 local Constants = require(script.Parent.Constants)
 
-local function createProfileCTAEventListener(p1: ((...any) -> ...any)) -- line: 24
-	-- upvalues: getLocalPlayerUserId (copy), Players (copy), v4 (copy), Constants (copy)
-	local u9 = getLocalPlayerUserId()
-	local connection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 27
-		-- upvalues: getLocalPlayerUserId (copy), u9 (ref)
-		local v13 = getLocalPlayerUserId()
+local function createProfileCTAEventListener(callback)
+	local v = getLocalPlayerUserId()
+	local localPlayerChangedConnection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function()
+		local localPlayerUserId = getLocalPlayerUserId()
 
-		if v13 ~= u9 then
-			u9 = v13
+		if localPlayerUserId ~= v then
+			v = localPlayerUserId
 		end
 	end)
-	local u11 = v4:observeEvent(Constants.FRIENDSHIP_NOTIFICATIONS, function(t1: {[any]: any}) -- line: 36
-		-- upvalues: u9 (ref), p1 (copy)
-		if not t1.EventArgs or (not t1.EventArgs.UserId1 or not t1.EventArgs.UserId2) then
+
+	local v2 = robloxEventReceiver:observeEvent(Constants.FRIENDSHIP_NOTIFICATIONS, function(p)
+		if not (p.EventArgs and p.EventArgs.UserId1 and p.EventArgs.UserId2) then
 			return
 		end
 
-		local v15 = if tostring(u9) ~= tostring(t1.EventArgs.UserId1) then tostring(t1.EventArgs.UserId1) else tostring(t1.EventArgs.UserId2)
+		local v2
 
-		p1(v15)
+		if tostring(v) == tostring(p.EventArgs.UserId1) then
+			v2 = tostring(p.EventArgs.UserId2)
+		else
+			v2 = tostring(p.EventArgs.UserId1)
+		end
+
+		callback(v2)
 	end)
-	local u12 = v4:observeEvent(Constants.PRESENCE_BULK_NOTIFICATIONS, function(t2: {[any]: any}) -- line: 50
-		-- upvalues: p1 (copy)
-		if not t2 or type(t2) ~= "table" then
+
+	local v3 = robloxEventReceiver:observeEvent(Constants.PRESENCE_BULK_NOTIFICATIONS, function(list)
+		if not list or type(list) ~= "table" then
 			return
 		end
 
-		for _, v in ipairs(t2) do
-			if v and v.UserId then
-				local str = tostring(v.UserId)
-
-				p1(str)
+		for _, item in ipairs(list) do
+			if item and item.UserId then
+				callback((tostring(item.UserId)))
 			end
 		end
 	end)
 
-	return function() -- line: 63
-		-- upvalues: connection (ref), u11 (ref), u12 (ref)
-		if connection then
-			connection:Disconnect()
-			connection = nil
+	return function()
+		if localPlayerChangedConnection then
+			localPlayerChangedConnection:Disconnect()
+			localPlayerChangedConnection = nil
 		end
 
-		if u11 then
-			u11:disconnect()
-			u11 = nil
+		if v2 then
+			v2:disconnect()
+			v2 = nil
 		end
 
-		if u12 then
-			u12:disconnect()
-			u12 = nil
+		if v3 then
+			v3:disconnect()
+			v3 = nil
 		end
 	end
 end

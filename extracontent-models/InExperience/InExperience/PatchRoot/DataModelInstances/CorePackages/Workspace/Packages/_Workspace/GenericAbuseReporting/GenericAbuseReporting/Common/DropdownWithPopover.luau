@@ -1,12 +1,14 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local parent = GenericAbuseReporting.Parent
 local CoreGui = game:GetService("CoreGui")
-local FocusNavigationUtils = require(GenericAbuseReportingParent.FocusNavigationUtils)
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local InputHandlers = require(GenericAbuseReportingParent.InputHandlers)
-local React = require(GenericAbuseReportingParent.React)
-local ReactFocusNavigation = require(GenericAbuseReportingParent.ReactFocusNavigation)
-local UIBlox = require(GenericAbuseReportingParent.UIBlox)
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Foundation = require(parent.Foundation)
+local InputHandlers = require(parent.InputHandlers)
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local UIBlox = require(parent.UIBlox)
+
 local AppFocusRoot = FocusNavigationUtils.AppFocusRoot
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
@@ -16,165 +18,204 @@ local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
 local ScrollView = Foundation.ScrollView
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
+
 local SideModalDropdownButton = require(GenericAbuseReporting.Common.SideModalDropdownButton)
 local useScrollbarOffset = require(GenericAbuseReporting.Common.useScrollbarOffset)
 
-local function DropdownWithPopover(t1: {[any]: any}) -- line: 44
-	-- upvalues: useLayerCollector (copy), useTokens (copy), React (copy), useScrollbarOffset (copy), ReactFocusNavigation (copy), CoreGui (copy), View (copy), FoundationText (copy), OverlayProvider (copy), Popover (copy), SideModalDropdownButton (copy), PopoverAlign (copy), PopoverSide (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), ScrollView (copy), ScrollBarVisibility (copy)
-	local v27 = useLayerCollector()
-	local v28 = useTokens()
-	local absoluteSize = v27.absoluteSize
-	local v30, v31 = React.useState(false)
-	local v32, v33 = React.useState({})
-	local v34, v35 = React.useState(Vector2.new(0, 0))
-	local v36, v37 = React.useState(Vector2.new(0, 0))
-	local v38, v39 = React.useState(Vector2.new(0, 0))
-	local v40, v41 = React.useState(Vector2.new(0, 0))
-	local v42 = useScrollbarOffset(v38, v40)
-	local v43 = ReactFocusNavigation.useFocusGuiObject()
-	local v44 = React.useRef(nil)
-	local v45 = React.useRef(nil)
-	local VRCentralOverlay = CoreGui:FindFirstChild("VRCentralOverlay")
-	local v47 = if not VRCentralOverlay then nil else VRCentralOverlay:FindFirstChild("CentralOverlay_SurfaceGui")
-	local v48 = React.useCallback(function() -- line: 68
-		-- upvalues: v47 (copy), v43 (copy), v44 (copy), v31 (copy)
-		if not v47 then
-			v43(v44.current)
+local function DropdownWithPopover(props)
+	local v = useLayerCollector()
+	local v2 = useTokens()
+	local absoluteSize = v.absoluteSize
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState({})
+	local state3, setState3 = React.useState(Vector2.new(0, 0))
+	local state4, setState4 = React.useState(Vector2.new(0, 0))
+	local state5, setState5 = React.useState(Vector2.new(0, 0))
+	local state6, setState6 = React.useState(Vector2.new(0, 0))
+	local v3 = useScrollbarOffset(state5, state6)
+
+	local v4 = ReactFocusNavigation.useFocusGuiObject()
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+
+	local vrCentralOverlay = CoreGui:FindFirstChild("VRCentralOverlay")
+	local centralOverlay_SurfaceGui
+
+	if vrCentralOverlay then
+		centralOverlay_SurfaceGui = vrCentralOverlay:FindFirstChild("CentralOverlay_SurfaceGui")
+	else
+		centralOverlay_SurfaceGui = nil
+	end
+
+	local onPressedOutside = React.useCallback(function()
+		if not centralOverlay_SurfaceGui then
+			v4(ref.current)
 		end
 
-		v31(false)
-	end, {
-		v44.current,
-		v43,
-		v47
-	})
-	local v49 = React.useMemo(function() -- line: 76
-		-- upvalues: t1 (copy), v33 (copy), v48 (copy), React (copy), View (copy), v32 (copy), FoundationText (copy)
-		local t2 = {}
+		setState(false)
+	end, { ref.current, v4, centralOverlay_SurfaceGui })
 
-		for _, v in ipairs(t1.cellDatas) do
-			table.insert(t2, React.createElement(View, {
-				onActivated = function() -- line: 79
-					-- upvalues: t1 (copy), v (copy), v33 (copy), v48 (copy)
-					t1.onChange(if v.value ~= nil then v.value else v.text)
-					v33(v)
-					v48()
-				end,
-				selection = {
-					Selectable = true
-				},
+	local v5 = React.useMemo(function()
+		local children = {}
+
+		for _, cellData in ipairs(props.cellDatas) do
+			local function onActivated()
+				local onChange = props.onChange
+				local v5
+
+				if cellData.value == nil then
+					v5 = cellData.text
+				else
+					v5 = cellData.value
+				end
+
+				onChange(v5)
+				setState2(cellData)
+				onPressedOutside()
+			end
+
+			table.insert(children, React.createElement(View, {
+				onActivated = onActivated,
+				selection = { Selectable = true },
 				tag = {
 					["size-full-0"] = true,
 					["auto-y"] = true,
 					["padding-small"] = true,
 					["radius-medium"] = true,
-					["bg-shift-200"] = v == v32
+					["bg-shift-200"] = state2 == cellData
 				}
 			}, {
-				TextContainer = React.createElement(View, {
-					tag = "size-full-0 auto-y"
-				}, {
-					Text = React.createElement(FoundationText, {
+				TextContainer = React.createElement(View, { tag = "size-full-0 auto-y" }, {
+					Text = React.createElement(Text, {
+						Text = cellData.text,
+						TextXAlignment = Enum.TextXAlignment.Left,
 						TextWrapped = true,
-						tag = "auto-xy",
-						Text = v.text,
-						TextXAlignment = Enum.TextXAlignment.Left
+						tag = "auto-xy"
 					})
 				})
 			}))
 		end
 
-		return t2
-	end, {
-		t1.cellDatas,
-		v32,
-		t1.onChange,
-		v48
-	})
-	local v50 = React.useCallback(function() -- line: 116
-		-- upvalues: v31 (copy), v30 (copy)
-		v31(not v30)
-	end, { v30 })
+		return children
+	end, { props.cellDatas, state2, props.onChange, onPressedOutside })
 
-	return React.createElement(OverlayProvider, {
-		gui = v47
-	}, {
-		DropdownWithPopover = React.createElement(View, {
-			tag = "size-full-0 auto-y",
-			ref = v44,
-			onAbsoluteSizeChanged = function(p1) -- line: 126
-				-- upvalues: v35 (copy)
-				v35(p1.AbsoluteSize)
-			end,
-			LayoutOrder = t1.layoutOrder
-		}, {
-			Popover = React.createElement(Popover.Root, {
-				isOpen = v30
-			}, {
-				Anchor = React.createElement(Popover.Anchor, nil, React.createElement(View, {
-					Size = UDim2.new(0, v34.X, 0, v34.Y)
-				}, {
-					DropdownButton = React.createElement(SideModalDropdownButton, {
-						onActivated = v50,
-						text = if not v32.text or not (#v32.text > 0) then t1.placeholder else v32.text,
-						isDropdownError = t1.errorState
-					})
-				})),
-				Content = React.createElement(Popover.Content, {
-					hasArrow = false,
-					align = PopoverAlign.Center,
-					side = PopoverSide.Bottom,
-					onPressedOutside = v48,
-					selection = {
-						Selectable = true
-					}
-				}, {
-					DropdownPopup = React.createElement(View, {
-						tag = "auto-xy"
-					}, {
-						AppFocusRoot = React.createElement(AppFocusRoot, {
-							surfaceIdentifier = if not v30 then FocusNavigableSurfaceIdentifierEnum.PopUp else FocusNavigableSurfaceIdentifierEnum.ModerationOverlay,
-							isIsolated = v30,
-							customEventHandlers = {
-								[FocusNavigationEventNameEnum.NavigateBack] = {
-									handler = InputHandlers.onRelease(v48)
-								}
-							}
-						}, { React.createElement(ScrollView, {
-							gradientHeight = 15,
-							Size = UDim2.new(0, math.min(absoluteSize.X, v36.X + v42), 0, (math.min(absoluteSize.Y, v36.Y))),
-							scroll = {
-								AutomaticCanvasSize = Enum.AutomaticSize.Y,
-								CanvasSize = UDim2.new(1, 0, 0, 0),
-								ScrollingDirection = Enum.ScrollingDirection.Y,
-								scrollBarVisibility = ScrollBarVisibility.Always
-							},
-							onAbsoluteCanvasSizeChanged = function(p2) -- line: 194
-								-- upvalues: v39 (copy)
-								v39(p2.AbsoluteCanvasSize)
-							end,
-							onAbsoluteWindowSizeChanged = function(p3) -- line: 197
-								-- upvalues: v41 (copy)
-								v41(p3.AbsoluteWindowSize)
-							end
-						}, {
-							BaseMenu = React.createElement(View, {
-								tag = "auto-y col align-y-center gap-xsmall padding-xsmall",
-								Size = UDim2.new(0, v34.X + v28.Stroke.Standard * 2, 0, 0),
-								onAbsoluteSizeChanged = function(p4) -- line: 204
-									-- upvalues: v37 (copy)
-									v37(p4.AbsoluteSize)
-								end,
-								ref = v45
-							}, v49)
-						}) })
-					})
-				})
+	local onActivated = React.useCallback(function()
+		setState(not state)
+	end, { state })
+
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+	local v6 = {
+		tag = "size-full-0 auto-y",
+		ref = ref,
+		onAbsoluteSizeChanged = function(p)
+			setState3(p.AbsoluteSize)
+		end,
+		LayoutOrder = props.layoutOrder
+	}
+
+	local createElement3 = React.createElement
+	local root = Popover.Root
+
+	local createElement4 = React.createElement
+	local anchor = Popover.Anchor
+
+	local createElement5 = React.createElement
+	local v7 = {
+		Size = UDim2.new(0, state3.X, 0, state3.Y)
+	}
+
+	local createElement6 = React.createElement
+	local text
+
+	if state2.text and #state2.text > 0 then
+		text = state2.text
+	else
+		text = props.placeholder
+	end
+
+	local children = {
+		Anchor = createElement4(anchor, nil, createElement5(View, v7, {
+			DropdownButton = createElement6(SideModalDropdownButton, {
+				onActivated = onActivated,
+				text = text,
+				isDropdownError = props.errorState
 			})
+		})),
+		Content = 0
+	}
+
+	local createElement7 = React.createElement
+	local content = Popover.Content
+	local v8 = {
+		align = PopoverAlign.Center,
+		side = PopoverSide.Bottom,
+		hasArrow = false,
+		onPressedOutside = onPressedOutside,
+		selection = { Selectable = true }
+	}
+
+	local createElement8 = React.createElement
+
+	local createElement9 = React.createElement
+	local surfaceIdentifier
+
+	if state then
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay
+	else
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
+	end
+
+	children.Content = createElement7(content, v8, {
+		DropdownPopup = createElement8(View, { tag = "auto-xy" }, {
+			AppFocusRoot = createElement9(AppFocusRoot, {
+				surfaceIdentifier = surfaceIdentifier,
+				isIsolated = state,
+				customEventHandlers = {
+					[FocusNavigationEventNameEnum.NavigateBack] = {
+						handler = InputHandlers.onRelease(onPressedOutside)
+					}
+				}
+			}, { React.createElement(ScrollView, {
+					Size = UDim2.new(
+						0,
+						math.min(absoluteSize.X, state4.X + v3),
+						0,
+						(math.min(absoluteSize.Y, state4.Y))
+					),
+					scroll = {
+						AutomaticCanvasSize = Enum.AutomaticSize.Y,
+						CanvasSize = UDim2.new(1, 0, 0, 0),
+						ScrollingDirection = Enum.ScrollingDirection.Y,
+						scrollBarVisibility = ScrollBarVisibility.Always
+					},
+					onAbsoluteCanvasSizeChanged = function(p)
+						setState5(p.AbsoluteCanvasSize)
+					end,
+					onAbsoluteWindowSizeChanged = function(p)
+						setState6(p.AbsoluteWindowSize)
+					end,
+					gradientHeight = 15
+				}, {
+					BaseMenu = React.createElement(View, {
+						Size = UDim2.new(0, state3.X + v2.Stroke.Standard * 2, 0, 0),
+						onAbsoluteSizeChanged = function(p)
+							setState4(p.AbsoluteSize)
+						end,
+						tag = "auto-y col align-y-center gap-xsmall padding-xsmall",
+						ref = ref2
+					}, v5)
+				}) })
+		})
+	})
+	return createElement(OverlayProvider, { gui = centralOverlay_SurfaceGui }, {
+		DropdownWithPopover = createElement2(View, v6, {
+			Popover = createElement3(root, { isOpen = state }, children)
 		})
 	})
 end

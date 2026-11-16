@@ -1,118 +1,203 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent
 
-local getFFlagUGCValidateMeshMaxScale = require(ParentParent.flags.getFFlagUGCValidateMeshMaxScale)
-local getFIntUGCValidateMeshCenteringHundredsThreshold = require(ParentParent.flags.getFIntUGCValidateMeshCenteringHundredsThreshold)
-local getMeshMinMax = require(ParentParent.util.getMeshMinMax)
-local Analytics = require(ParentParent.Analytics)
-local v7 = game:DefineFastInt("UGCValidationScaleMinimumThousandths", 10)
-local v8 = game:DefineFastInt("FIntUGCValidationScaleMaximumThousandths", 10000)
-local v9 = game:DefineFastFlag("RenderBoundsCheckAttachmentOrientation", false)
+require(parent.util.Types)
+local getFFlagUGCValidateMeshMaxScale = require(parent.flags.getFFlagUGCValidateMeshMaxScale)
 
-local function pointInBounds(p1, p2, p3) -- line: 19
-	local v19 = p2:PointToObjectSpace(p1)
+local getFIntUGCValidateMeshCenteringHundredsThreshold = require(parent.flags.getFIntUGCValidateMeshCenteringHundredsThreshold)
+local getMeshMinMax = require(parent.util.getMeshMinMax)
+local Analytics = require(parent.Analytics)
 
-	return v19.X >= -p3.X / 2 and (v19.X <= p3.X / 2 and (v19.Y >= -p3.Y / 2 and (v19.Y <= p3.Y / 2 and (v19.Z >= -p3.Z / 2 and v19.Z <= p3.Z / 2))))
+local defineFastInt = game:DefineFastInt("UGCValidationScaleMinimumThousandths", 10)
+local defineFastInt2 = game:DefineFastInt("FIntUGCValidationScaleMaximumThousandths", 10000)
+
+local function pointInBounds(p, cframe, size): boolean
+	local pointToObjectSpace = cframe:PointToObjectSpace(p)
+	return pointToObjectSpace.X >= -size.X / 2
+		and pointToObjectSpace.X <= size.X / 2
+		and pointToObjectSpace.Y >= -size.Y / 2
+		and pointToObjectSpace.Y <= size.Y / 2
+		and pointToObjectSpace.Z >= -size.Z / 2
+		and pointToObjectSpace.Z <= size.Z / 2
 end
-local function isSizeWithinBounds_deprecated(p4, p5) -- line: 29
-	return p4.Size.X <= p5.X and (p4.Size.Y <= p5.Y and p4.Size.Z <= p5.Z)
-end
-local function isSizeWithinBounds(p6, vector3: Vector3, cFrame: CFrame) -- line: 33
-	local v25 = (cFrame * p6.Size):Abs()
 
-	return v25.X <= vector3.X and (v25.Y <= vector3.Y and v25.Z <= vector3.Z)
+local function isSizeWithinBounds(p, vector3: Vector3, cframe: CFrame): boolean
+	local abs = (cframe * p.Size):Abs()
+	return abs.X <= vector3.X and abs.Y <= vector3.Y and abs.Z <= vector3.Z
 end
-local function truncate(n1: number) -- line: 40
-	return math.floor(n1 * 100) / 100
-end
-local function getErrors(s1: string, s2: string, vector3: Vector3) -- line: 44
-	return { string.format("%s has size larger than max allowed bounding size. The max size for type %s is [%.2f, %.2f, %.2f]", s1, s2, math.floor(vector3.X * 100) / 100, math.floor(vector3.Y * 100) / 100, math.floor(vector3.Z * 100) / 100) }
-end
-local function validateMeshBounds(p7, p8, p9, vector3: Vector3, p10, s3: string, p11) -- line: 57
-	-- upvalues: v7 (copy), getFFlagUGCValidateMeshMaxScale (copy), v8 (copy), UGCValidationService (copy), Analytics (copy), pointInBounds (copy), getErrors (copy), v9 (copy), getMeshMinMax (copy), getFIntUGCValidateMeshCenteringHundredsThreshold (copy)
-	local isServer = p11.isServer
-	local size = p10.size
-	local v39 = p10.offset or Vector3.new(0, 0, 0)
-	local v40 = p7.CFrame * p8.CFrame * CFrame.new(v39)
 
-	if p7.Position.X > 10000 or (p7.Position.X < -10000 or p7.Position.Y > 10000 or p7.Position.Y < -10000 or p7.Position.Z > 10000 or p7.Position.Z < -10000) then
+local function truncate(p: number) -- 3 equivalent calls inferred from this helper
+	return math.floor(p * 100) / 100
+end
+
+local function getErrors(p: string, p2: string, size: Vector3)
+	return { string.format(
+			"%s has size larger than max allowed bounding size. The max size for type %s is [%.2f, %.2f, %.2f]",
+			p,
+			p2,
+			truncate(size.X), -- inferred equivalent call
+			truncate(size.Y), -- inferred equivalent call
+			truncate(size.Z) -- inferred equivalent call
+		) }
+end
+
+local function validateMeshBounds(instance, p, data, scale: Vector3, p2, p3: string, p4)
+	local isServer = p4.isServer
+	local size = p2.size
+	local offset = p2.offset or Vector3.new(0, 0, 0)
+	local v = instance.CFrame * p.CFrame * CFrame.new(offset)
+
+	if
+		instance.Position.X > 10000
+		or instance.Position.X < -10000
+		or instance.Position.Y > 10000
+		or instance.Position.Y < -10000
+		or instance.Position.Z > 10000
+		or instance.Position.Z < -10000
+	then
 		return false, { "Position is outside of bounds" }
 	end
 
-	if v40.Position.X > 10000 or v40.Position.X < -10000 or v40.Position.Y > 10000 or v40.Position.Y < -10000 or v40.Position.Z > 10000 or v40.Position.Z < -10000 then
+	if
+		v.Position.X > 10000
+		or v.Position.X < -10000
+		or v.Position.Y > 10000
+		or v.Position.Y < -10000
+		or v.Position.Z > 10000
+		or v.Position.Z < -10000
+	then
 		return false, { "Position is outside of bounds" }
 	end
 
-	if vector3.X < v7 / 1000 or vector3.Y < v7 / 1000 or vector3.Z < v7 / 1000 then
+	if scale.X < defineFastInt / 1000 or scale.Y < defineFastInt / 1000 or scale.Z < defineFastInt / 1000 then
 		return false, { "Mesh scale is too small" }
 	end
 
-	if getFFlagUGCValidateMeshMaxScale() and (vector3.X > v8 / 1000 or vector3.Y > v8 / 1000 or vector3.Z > v8 / 1000) then
-		return false, { `{ p7.Name } mesh scale is too large` }
+	local success, result, _, v2, _, v3, v4, v5, v6, _
+
+	-- [DEDUP] synthesized from 2 duplicated terminal regions
+	local function deduplicatedTail()
+		local v7
+
+		if not v3 then
+			return false, v4
+		end
+
+		if p4.allowEditableInstances then
+			return true
+		end
+
+		v7 = (v5 + v6) / 2
+
+		if getFIntUGCValidateMeshCenteringHundredsThreshold() / 100 < v7.Magnitude then
+			Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_Shifted, nil, p4)
+
+			return
+				false,
+				{ `{data.fullName}.{data.fieldName} has mesh data that is not centered. Please reimport this mesh with the roblox 3d importer, and ensure there is no loose geometry in the source file.` }
+		end
+
+		return true
 	end
 
-	local ok, result = pcall(function() -- line: 110
-		-- upvalues: UGCValidationService (copy), p9 (copy)
-		return UGCValidationService:GetEditableMeshVerts(p9.editableMesh)
+	-- [DEDUP] synthesized from 2 duplicated terminal regions
+	local function deduplicatedTail2()
+		local clone
+
+		if not v2 then
+			Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_TooLarge, nil, p4)
+			return false, getErrors(instance:GetFullName(), p3, size)
+		end
+
+		clone = table.clone(data)
+		clone.scale = scale
+		v3, v4, v5, v6 = getMeshMinMax(clone, p4)
+		return deduplicatedTail()
+	end
+
+	-- [DEDUP] synthesized from 2 duplicated terminal regions
+	local function deduplicatedTail3()
+		local v7
+
+		for _, v8 in pairs(result) do
+			if not pointInBounds(instance.CFrame:PointToWorldSpace(v8 * scale), v, size) then
+				Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_TooLarge, nil, p4)
+				return false, getErrors(data.context, p3, size)
+			end
+		end
+
+		v7 = (p.CFrame.Rotation * instance.Size):Abs()
+
+		if v7.X <= size.X and v7.Y <= size.Y then
+			v2 = v7.Z <= size.Z
+		else
+			v2 = false
+		end
+
+		return deduplicatedTail2()
+	end
+
+	if getFFlagUGCValidateMeshMaxScale() then
+		local x = scale.X
+
+		if not (defineFastInt2 / 1000 < x) then
+			local y = scale.Y
+
+			if not (defineFastInt2 / 1000 < y) then
+				local z = scale.Z
+
+				if not (defineFastInt2 / 1000 < z) then
+					success, result = pcall(function()
+						return UGCValidationService:GetEditableMeshVerts(data.editableMesh)
+					end)
+
+					if success then
+						return deduplicatedTail3()
+					end
+
+					Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_FailedToLoadMesh, nil, p4)
+
+					if isServer ~= nil and isServer then
+						error(string.format(
+							"Failed to load body part mesh %s. Make sure body part exists and try again.",
+							data.fullName
+						))
+					end
+
+					return
+						false,
+						{ string.format(
+								"Failed to load body part mesh %s. Make sure body part exists and try again.",
+								data.fullName
+							) }
+				end
+			end
+		end
+
+		return false, { `{instance.Name} mesh scale is too large` }
+	end
+
+	success, result = pcall(function()
+		return UGCValidationService:GetEditableMeshVerts(data.editableMesh)
 	end)
 
-	if not ok then
-		Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_FailedToLoadMesh, nil, p11)
-
-		if isServer ~= nil and isServer then
-			error(string.format("Failed to load body part mesh %s. Make sure body part exists and try again.", p9.fullName))
-		end
-
-		return false, { string.format("Failed to load body part mesh %s. Make sure body part exists and try again.", p9.fullName) }
+	if success then
+		return deduplicatedTail3()
 	end
 
-	for _, v in pairs(result) do
-		local v45 = p7.CFrame:PointToWorldSpace(v * vector3)
+	Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_FailedToLoadMesh, nil, p4)
 
-		if not pointInBounds(v45, v40, size) then
-			Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_TooLarge, nil, p11)
-
-			return false, (getErrors(p9.context, s3, size))
-		end
+	if isServer ~= nil and isServer then
+		error(string.format(
+			"Failed to load body part mesh %s. Make sure body part exists and try again.",
+			data.fullName
+		))
 	end
 
-	if v9 then
-		local v46 = (p8.CFrame.Rotation * p7.Size):Abs()
-
-		if not (v46.X <= size.X) or (not (v46.Y <= size.Y) or not (v46.Z <= size.Z)) then
-			Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_TooLarge, nil, p11)
-
-			return false, (getErrors(p7:GetFullName(), s3, size))
-		end
-	elseif not (p7.Size.X <= size.X) or (not (p7.Size.Y <= size.Y) or not (p7.Size.Z <= size.Z)) then
-		Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_TooLarge, nil, p11)
-
-		return false, (getErrors(p7:GetFullName(), s3, size))
-	end
-
-	local v47 = table.clone(p9)
-
-	v47.scale = vector3
-
-	local v48, v49, v50, v51 = getMeshMinMax(v47, p11)
-
-	if not v48 then
-		return false, v49
-	end
-
-	if not p11.allowEditableInstances then
-		local v52 = (v50 + v51) / 2
-
-		if getFIntUGCValidateMeshCenteringHundredsThreshold() / 100 < v52.Magnitude then
-			Analytics.reportFailure(Analytics.ErrorType.validateMeshBounds_Shifted, nil, p11)
-
-			return false, { `{ p9.fullName }.{ p9.fieldName } has mesh data that is not centered. Please reimport this mesh with the roblox 3d importer, and ensure there is no loose geometry in the source file.` }
-		end
-	end
-
-	return true
+	return
+		false,
+		{ string.format("Failed to load body part mesh %s. Make sure body part exists and try again.", data.fullName) }
 end
 
 return validateMeshBounds

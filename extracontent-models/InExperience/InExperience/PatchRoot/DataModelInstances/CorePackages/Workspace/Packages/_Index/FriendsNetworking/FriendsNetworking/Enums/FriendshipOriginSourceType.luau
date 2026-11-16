@@ -1,6 +1,7 @@
-local Parent = script:FindFirstAncestor("FriendsNetworking").Parent
+local parent = script:FindFirstAncestor("FriendsNetworking").Parent
+local enumerate = require(parent.enumerate)
 
-return require(Parent.enumerate)(script.Name, {
+return enumerate(script.Name, {
 	Unknown = "Unknown",
 	PlayerSearch = "PlayerSearch",
 	QrCode = "QrCode",
@@ -11,5 +12,6 @@ return require(Parent.enumerate)(script.Name, {
 	ProfileShare = "ProfileShare",
 	PhoneContactImporter = "PhoneContactImporter",
 	FriendRecommendations = "FriendRecommendations",
-	SchoolMemberList = "SchoolMemberList"
+	SchoolMemberList = "SchoolMemberList",
+	SocialTabsPage = "SocialTabsPage"
 })

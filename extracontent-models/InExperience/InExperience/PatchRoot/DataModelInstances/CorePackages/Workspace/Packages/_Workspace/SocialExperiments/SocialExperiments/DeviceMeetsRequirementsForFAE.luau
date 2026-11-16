@@ -1,62 +1,54 @@
-local Parent = script:FindFirstAncestor("SocialExperiments").Parent
-local SystemInfoProtocol = require(Parent.SystemInfoProtocol).SystemInfoProtocol
+local parent = script:FindFirstAncestor("SocialExperiments").Parent
+local SystemInfoProtocol = require(parent.SystemInfoProtocol)
+local systemInfoProtocol = SystemInfoProtocol.SystemInfoProtocol
 local FFlagTestDeviceForFAEUpsell = require(script.Parent.FFlagTestDeviceForFAEUpsell)
-local v4 = game:DefineFastString("FAEUpsellDeviceNamePipeDenyList", "")
-local v5 = game:DefineFastString("FAEUpsellSystemVersionPipeDenyList", "")
-local u6 = nil
+local defineFastString = game:DefineFastString("FAEUpsellDeviceNamePipeDenyList", "")
+local defineFastString2 = game:DefineFastString("FAEUpsellSystemVersionPipeDenyList", "")
 
-local function deviceMeetsRequirementsForFAE() -- line: 9
-	-- upvalues: FFlagTestDeviceForFAEUpsell (copy), u6 (ref), SystemInfoProtocol (copy), v4 (copy), v5 (copy)
+local v = nil
+local function deviceMeetsRequirementsForFAE()
 	if not FFlagTestDeviceForFAEUpsell then
 		return true
 	end
 
-	if u6 ~= nil then
-		return u6
+	if v ~= nil then
+		return v
 	end
 
-	local ok, result = pcall(function() -- line: 16
-		-- upvalues: SystemInfoProtocol (copy), v4 (copy), u6 (ref), v5 (copy)
-		local t1 = {
-			SystemInfoProtocol.InfoNames.DEVICE_NAME,
-			SystemInfoProtocol.InfoNames.SYSTEM_VERSION,
-			SystemInfoProtocol.InfoNames.BASE_OS
+	local success, result = pcall(function()
+		local v2 = {
+			systemInfoProtocol.InfoNames.DEVICE_NAME,
+			systemInfoProtocol.InfoNames.SYSTEM_VERSION,
+			systemInfoProtocol.InfoNames.BASE_OS
 		}
-		local v11 = SystemInfoProtocol.default:getSystemInfo(t1)
-		local v12 = v11.deviceName or "Unknown"
 
-		if typeof(v12) == "string" then
-			for match in v4:gmatch("([^|]+)") do
-				if v12:lower():find(match:lower()) then
-					u6 = false
+		local systemInfo = systemInfoProtocol.default:getSystemInfo(v2)
+		local deviceName = systemInfo.deviceName or "Unknown"
 
-					return u6
+		if typeof(deviceName) == "string" then
+			for k in defineFastString:gmatch("([^|]+)") do
+				if deviceName:lower():find(k:lower()) then
+					v = false
+					return v
 				end
 			end
 		end
 
-		local v14 = (v11.baseOs or "UnknownOS") .. ":" .. (v11.systemVersion or "UnknownVersion")
+		local v3 = (systemInfo.baseOs or "UnknownOS") .. ":" .. (systemInfo.systemVersion or "UnknownVersion")
 
-		if typeof(v14) == "string" then
-			for match in v5:gmatch("([^|]+)") do
-				if v14:lower():find(match:lower()) then
-					u6 = false
-
-					return u6
+		if typeof(v3) == "string" then
+			for k in defineFastString2:gmatch("([^|]+)") do
+				if v3:lower():find(k:lower()) then
+					v = false
+					return v
 				end
 			end
 		end
 
-		u6 = true
-
-		return u6
+		v = true
+		return v
 	end)
-
-	if ok then
-		return result
-	end
-
-	return true
+	return not success or result
 end
 
 return deviceMeetsRequirementsForFAE

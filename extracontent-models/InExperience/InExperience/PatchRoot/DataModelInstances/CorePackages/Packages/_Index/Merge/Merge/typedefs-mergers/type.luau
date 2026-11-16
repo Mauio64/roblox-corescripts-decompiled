@@ -1,47 +1,68 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
 local Error = LuauPolyfill.Error
 local Object = LuauPolyfill.Object
-local t1 = {}
+local Type = {}
 
 require(script.Parent["merge-typedefs_types"])
 
-local Kind = require(ParentParent.GraphQL).Kind
-local mergeFields = require(script.Parent.fields).mergeFields
-local mergeDirectives = require(script.Parent.directives).mergeDirectives
-local mergeNamedTypeArray = require(script.Parent["merge-named-type-array"]).mergeNamedTypeArray
+local GraphQL = require(parent.GraphQL)
+local Kind = GraphQL.Kind
 
-function t1.mergeType(p1, p2, p3) -- line: 29
-	-- upvalues: Boolean (copy), mergeFields (copy), mergeDirectives (copy), mergeNamedTypeArray (copy), Error (copy), Object (copy), Kind (copy)
-	if p2 then
-		local ok, result = pcall(function() -- line: 41
-			-- upvalues: p1 (copy), Boolean (copy), p2 (copy), p3 (copy), mergeFields (copy), mergeDirectives (copy), mergeNamedTypeArray (copy)
-			return {
-				name = p1.name,
-				description = if not Boolean.toJSBoolean(p1.description) then p2.description else p1.description,
-				kind = not (not not p3 and Boolean.toJSBoolean(p3.convertExtensions)) and (p1.kind ~= "ObjectTypeDefinition" and p2.kind ~= "ObjectTypeDefinition") and "ObjectTypeExtension" or "ObjectTypeDefinition",
-				loc = p1.loc,
-				fields = mergeFields(p1, p1.fields, p2.fields, p3),
-				directives = mergeDirectives(p1.directives, p2.directives, p3),
-				interfaces = mergeNamedTypeArray(p1.interfaces, p2.interfaces, p3)
+local fields = require(script.Parent.fields)
+local mergeFields = fields.mergeFields
+local directives = require(script.Parent.directives)
+local mergeDirectives = directives.mergeDirectives
+local mergenamedtypearray = require(script.Parent["merge-named-type-array"])
+local mergeNamedTypeArray = mergenamedtypearray.mergeNamedTypeArray
+
+function Type.mergeType(data, data2, p)
+	if data2 then
+		local success, result = pcall(function()
+			local v = {
+				name = data.name,
+				description = 0,
+				kind = 0,
+				loc = 0,
+				fields = 0,
+				directives = 0,
+				interfaces = 0
 			}
+			local description
+
+			if Boolean.toJSBoolean(data.description) then
+				description = data.description
+			else
+				description = data2.description
+			end
+
+			v.description = description
+
+			v.kind = p and Boolean.toJSBoolean(p.convertExtensions) and "ObjectTypeDefinition"
+				or (data.kind == "ObjectTypeDefinition" or data2.kind == "ObjectTypeDefinition")
+				and "ObjectTypeDefinition"
+				or "ObjectTypeExtension"
+
+			v.loc = data.loc
+			v.fields = mergeFields(data, data.fields, data2.fields, p)
+			v.directives = mergeDirectives(data.directives, data2.directives, p)
+			v.interfaces = mergeNamedTypeArray(data.interfaces, data2.interfaces, p)
+			return v
 		end)
 
-		if not ok then
-			error(Error.new(("Unable to merge GraphQL type \"%s\": %s"):format(tostring(p1.name.value), (tostring(result.message)))))
+		if not success then
+			error(Error.new(("Unable to merge GraphQL type \"%s\": %s"):format(
+				tostring(data.name.value),
+				(tostring(result.message))
+			)))
 		end
 
 		return result
+	elseif p and Boolean.toJSBoolean(p.convertExtensions) then
+		return (Object.assign({}, data, { kind = Kind.OBJECT_TYPE_DEFINITION }))
+	else
+		return data
 	end
-
-	if p3 and Boolean.toJSBoolean(p3.convertExtensions) then
-		return (Object.assign({}, p1, {
-			kind = Kind.OBJECT_TYPE_DEFINITION
-		}))
-	end
-
-	return p1
 end
-
-return t1
+return Type

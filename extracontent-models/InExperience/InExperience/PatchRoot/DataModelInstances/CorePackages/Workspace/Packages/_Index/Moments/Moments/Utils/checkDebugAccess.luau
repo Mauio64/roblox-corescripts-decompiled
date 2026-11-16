@@ -1,17 +1,18 @@
 local Players = game:GetService("Players")
+
 local Moments = script:FindFirstAncestor("Moments")
+
 local GetFStringMomentsDebugModeAllowList = require(Moments.Flags.GetFStringMomentsDebugModeAllowList)
 local parseUserAllowList = require(Moments.Utils.parseUserAllowList)
 
-local function checkDebugAccess() -- line: 15
-	-- upvalues: Players (copy), parseUserAllowList (copy), GetFStringMomentsDebugModeAllowList (copy)
-	local LocalPlayer = Players.LocalPlayer
+local function checkDebugAccess()
+	local localPlayer = Players.LocalPlayer
 
-	if not LocalPlayer then
-		return false
+	if localPlayer then
+		return parseUserAllowList(GetFStringMomentsDebugModeAllowList(), localPlayer.UserId)
 	end
 
-	return parseUserAllowList(GetFStringMomentsDebugModeAllowList(), LocalPlayer.UserId)
+	return false
 end
 
 return checkDebugAccess

@@ -1,32 +1,41 @@
-local ParentParent = script.Parent.Parent
-local getFFlagExpChatProtectedChatInternalAPIs = require(ParentParent.SharedFlags).getFFlagExpChatProtectedChatInternalAPIs
+local parent = script.Parent.Parent
+local SharedFlags = require(parent.SharedFlags)
+local getFFlagExpChatProtectedChatInternalAPIs = SharedFlags.getFFlagExpChatProtectedChatInternalAPIs
 local isWhitespaceOnly = require(script.Parent.isWhitespaceOnly)
 
-local function getTextAndTranslation(p1) -- line: 5
-	-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy), isWhitespaceOnly (copy)
-	local v6 = if not getFFlagExpChatProtectedChatInternalAPIs() then p1.Text else p1.TextInternal
-	local v7 = if not getFFlagExpChatProtectedChatInternalAPIs() then p1.Translation else p1.TranslationInternal
+local function getTextAndTranslation(data)
+	local v
 
-	if not v6 or isWhitespaceOnly(v6) then
-		v6 = ""
+	if getFFlagExpChatProtectedChatInternalAPIs() then
+		v = data.TextInternal
+	else
+		v = data.Text
 	end
 
-	if p1.WasRewritten and p1.RewrittenText and not isWhitespaceOnly(p1.RewrittenText) then
-		local RewrittenTranslation = p1.RewrittenTranslation
-		local RewrittenText = p1.RewrittenText
+	local v2
 
-		if RewrittenTranslation and RewrittenTranslation ~= "" then
-			return RewrittenText, RewrittenTranslation
+	if getFFlagExpChatProtectedChatInternalAPIs() then
+		v2 = data.TranslationInternal
+	else
+		v2 = data.Translation
+	end
+
+	local v3 = (not v or isWhitespaceOnly(v)) and "" or v
+
+	if data.WasRewritten and data.RewrittenText and not isWhitespaceOnly(data.RewrittenText) then
+		local rewrittenTranslation = data.RewrittenTranslation
+		local rewrittenText = data.RewrittenText
+
+		if rewrittenTranslation and rewrittenTranslation ~= "" then
+			return rewrittenText, rewrittenTranslation
 		end
 
-		return RewrittenText, nil
+		return rewrittenText, nil
+	elseif v2 and v2 ~= "" then
+		return v3, v2
+	else
+		return v3, nil
 	end
-
-	if v7 and v7 ~= "" then
-		return v6, v7
-	end
-
-	return v6, nil
 end
 
 return getTextAndTranslation

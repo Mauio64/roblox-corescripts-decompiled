@@ -1,21 +1,23 @@
-local ParentParent = script.Parent.Parent
-local Boolean = require(ParentParent.LuauPolyfill).Boolean
-local t1 = {}
-local isObjectType = require(ParentParent.GraphQL).isObjectType
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+
+local GetObjectTypeFromTypeMap = {}
+local GraphQL = require(parent.GraphQL)
+
+local isObjectType = GraphQL.isObjectType
 
 require(script.Parent.types)
 
-function t1.getObjectTypeFromTypeMap(p1, p2) -- line: 26
-	-- upvalues: Boolean (copy), isObjectType (copy)
-	if p2 then
-		local v7 = p1:get(p2.name)
+function GetObjectTypeFromTypeMap.getObjectTypeFromTypeMap(object, p)
+	if p then
+		local v = object:get(p.name)
 
-		if Boolean.toJSBoolean(isObjectType(v7)) then
-			return v7
+		if Boolean.toJSBoolean(isObjectType(v)) then
+			return v
 		end
 	end
 
 	return nil
 end
-
-return t1
+return GetObjectTypeFromTypeMap

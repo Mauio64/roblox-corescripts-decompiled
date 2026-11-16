@@ -1,0 +1,4 @@
+local FFlagLuaAppEnableOneByTwoTileFunnelTelemetry = require(script.Parent.FFlagLuaAppEnableOneByTwoTileFunnelTelemetry)
+
+return game:DefineFastFlag("LuaAppEnableOneByTwoTileFunnelTelemetrySdui", false)
+	and FFlagLuaAppEnableOneByTwoTileFunnelTelemetry

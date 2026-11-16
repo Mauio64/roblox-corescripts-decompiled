@@ -1,61 +1,62 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
 local Config = require(ExpChat.Config)
 
-return function(p1) -- line: 4
-	-- upvalues: Config (copy)
-	local t1 = {}
+return function(instance)
+	local result = {}
 
 	for k, _ in pairs(Config.DefaultBubbleChatMessagePropertiesInstanceSettings) do
-		t1[k] = p1[k]
+		result[k] = instance[k]
 	end
 
-	local ImageLabel = p1:FindFirstChildOfClass("ImageLabel")
+	local imageLabel = instance:FindFirstChildOfClass("ImageLabel")
 
-	if ImageLabel then
-		local t2 = {}
+	if imageLabel then
+		local imageLabel2 = {}
 
 		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.ImageLabel) do
-			t2[k] = ImageLabel[k]
+			imageLabel2[k] = imageLabel[k]
 		end
 
-		t1.ImageLabel = t2
+		result.ImageLabel = imageLabel2
 	end
 
-	local UIGradient = p1:FindFirstChildOfClass("UIGradient")
+	local uiGradient = instance:FindFirstChildOfClass("UIGradient")
 
-	if UIGradient then
-		local t3 = {}
+	if uiGradient then
+		local uiGradient2 = {}
 
 		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.UIGradient) do
-			t3[k] = UIGradient[k]
+			uiGradient2[k] = uiGradient[k]
 		end
 
-		t1.UIGradient = t3
+		result.UIGradient = uiGradient2
 	end
 
-	local UICorner = p1:FindFirstChildOfClass("UICorner")
+	local uiCorner = instance:FindFirstChildOfClass("UICorner")
 
-	if UICorner then
-		local t4 = {}
+	if uiCorner then
+		local uiCorner2 = {}
 
 		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.UICorner) do
-			t4[k] = UICorner[k]
+			uiCorner2[k] = uiCorner[k]
 		end
 
-		t1.UICorner = t4
+		result.UICorner = uiCorner2
 	end
 
-	local UIPadding = p1:FindFirstChildOfClass("UIPadding")
+	local uiPadding = instance:FindFirstChildOfClass("UIPadding")
 
-	if UIPadding then
-		local t5 = {}
-
-		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.UIPadding) do
-			t5[k] = UIPadding[k]
-		end
-
-		t1.UIPadding = t5
+	if not uiPadding then
+		return result
 	end
 
-	return t1
+	local uiPadding2 = {}
+
+	for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.UIPadding) do
+		uiPadding2[k] = uiPadding[k]
+	end
+
+	result.UIPadding = uiPadding2
+
+	return result
 end

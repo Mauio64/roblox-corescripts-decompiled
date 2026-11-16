@@ -1,24 +1,26 @@
-local Parent = script:FindFirstAncestor("UserList").Parent
-local React = require(Parent.React)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("UserList").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
 
-local function useCompactTileHeight() -- line: 21
-	-- upvalues: useTokens (copy), React (copy)
-	local v5 = useTokens()
+local function useCompactTileHeight()
+	local v = useTokens()
 
-	return (React.useMemo(function() -- line: 24
-		-- upvalues: v5 (copy)
-		local Size_1400 = v5.Size.Size_1400
-		local Medium = v5.Padding.Medium
-		local Small = v5.Gap.Small
-		local FontSize = v5.Typography.TitleSmall.FontSize
-		local FontSize2 = v5.Typography.LabelSmall.FontSize
-		local FontSize3 = v5.Typography.BodySmall.FontSize
-		local Size_800 = v5.Size.Size_800
-		local v13 = FontSize + FontSize2 + FontSize3
+	return (React.useMemo(function()
+		local size_1400 = v.Size.Size_1400
+		local medium = v.Padding.Medium
+		local small = v.Gap.Small
 
-		return Medium + Size_1400 + Small + v13 + Small + Size_800 + Medium
-	end, { v5 }))
+		local fontSize = v.Typography.TitleSmall.FontSize
+		local fontSize2 = v.Typography.LabelSmall.FontSize
+		local fontSize3 = v.Typography.BodySmall.FontSize
+
+		local size_800 = v.Size.Size_800
+
+		local v2 = fontSize + fontSize2 + fontSize3
+
+		return medium + size_1400 + small + v2 + small + size_800 + medium
+	end, { v }))
 end
 
 return useCompactTileHeight

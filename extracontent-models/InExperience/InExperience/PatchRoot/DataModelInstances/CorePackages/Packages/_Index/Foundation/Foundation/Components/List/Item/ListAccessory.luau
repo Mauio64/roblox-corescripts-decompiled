@@ -1,63 +1,96 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local uiblox = require(FoundationParent.BuilderIcons).Migration.uiblox
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
+local BuilderIcons = require(parent.BuilderIcons)
+local uiblox = BuilderIcons.Migration.uiblox
+
 local Icon = require(Foundation.Components.Icon)
 local Image = require(Foundation.Components.Image)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local iconMigrationUtils = require(Foundation.Utility.iconMigrationUtils)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local isMigrated = iconMigrationUtils.isMigrated
 local isBuilderOrMigratedIcon = iconMigrationUtils.isBuilderOrMigratedIcon
-local StateLayerAffordance = require(FoundationParent.Foundation.Enums.StateLayerAffordance)
+local StateLayerAffordance = require(parent.Foundation.Enums.StateLayerAffordance)
+
 local AccessoryType = require(Foundation.Enums.AccessoryType)
+
 local Avatar = require(Foundation.Components.Avatar)
+
 local useListAccessoryVariants = require(script.Parent.useListAccessoryVariants)
 
 require(Foundation.Enums.InputSize)
 
-local function ListAccessory(t1: {[any]: any}) -- line: 45
-	-- upvalues: useTokens (copy), React (copy), AccessoryType (copy), isBuilderOrMigratedIcon (copy), useListAccessoryVariants (copy), Avatar (copy), Icon (copy), isMigrated (copy), uiblox (copy), Image (copy), View (copy), StateLayerAffordance (copy)
-	local v18 = useTokens()
-	local v19 = React.useMemo(function() -- line: 47
-		-- upvalues: t1 (copy)
-		if type(t1.config) == "string" then
-			return {
-				iconName = t1.config
-			}
+local function ListAccessory(props)
+	local v = useTokens()
+	local v2 = React.useMemo(function()
+		if type(props.config) == "string" then
+			return { iconName = props.config }
 		end
 
-		return t1.config
-	end, { t1.config })
-	local v20 = if v19.type ~= AccessoryType.Avatar then if type(t1.config) ~= "string" and not isBuilderOrMigratedIcon(v19.iconName) then AccessoryType.Media else AccessoryType.Icon else AccessoryType.Avatar
-	local v21 = useListAccessoryVariants(v18, t1.size, v20)
-	local v22 = if v19.type ~= AccessoryType.Avatar then if not isBuilderOrMigratedIcon(v19.iconName) then React.createElement(Image, {
-		Image = v19.iconName,
-		Size = v21.accessory.Size,
-		cornerRadius = v21.accessory.cornerRadius
-	}) else React.createElement(Icon, {
-		name = if not isMigrated(v19.iconName) then v19.iconName else uiblox[v19.iconName].name,
-		variant = if not isMigrated(v19.iconName) then v19.iconVariant else uiblox[v19.iconName].variant,
-		size = v21.accessory.Size.Y.Offset
-	}) else React.createElement(Avatar, {
-		userId = v19.userId,
-		backplateStyle = v18.Color.Shift.Shift_200,
-		size = t1.size
-	})
+		return props.config
+	end, { props.config })
+	local v3
+
+	if v2.type == AccessoryType.Avatar then
+		v3 = AccessoryType.Avatar
+	elseif type(props.config) == "string" or isBuilderOrMigratedIcon(v2.iconName) then
+		v3 = AccessoryType.Icon
+	else
+		v3 = AccessoryType.Media
+	end
+
+	local v4 = useListAccessoryVariants(v, props.size, v3)
+	local v5
+
+	if v2.type == AccessoryType.Avatar then
+		v5 = React.createElement(Avatar, {
+			userId = v2.userId,
+			backplateStyle = v.Color.Shift.Shift_200,
+			size = props.size
+		})
+	elseif isBuilderOrMigratedIcon(v2.iconName) then
+		local createElement = React.createElement
+		local name
+
+		if isMigrated(v2.iconName) then
+			name = uiblox[v2.iconName].name
+		else
+			name = v2.iconName
+		end
+
+		local variant
+
+		if isMigrated(v2.iconName) then
+			variant = uiblox[v2.iconName].variant
+		else
+			variant = v2.iconVariant
+		end
+
+		v5 = createElement(Icon, {
+			name = name,
+			variant = variant,
+			size = v4.accessory.Size.Y.Offset
+		})
+	else
+		v5 = React.createElement(Image, {
+			Image = v2.iconName,
+			Size = v4.accessory.Size,
+			cornerRadius = v4.accessory.cornerRadius
+		})
+	end
 
 	return React.createElement(View, {
+		Size = v4.container.Size,
 		tag = "align-x-center align-y-center",
-		Size = v21.container.Size,
-		stateLayer = {
-			affordance = StateLayerAffordance.None
-		},
-		isDisabled = t1.isDisabled,
-		LayoutOrder = t1.LayoutOrder,
-		testId = t1.testId
-	}, v22)
+		stateLayer = { affordance = StateLayerAffordance.None },
+		isDisabled = props.isDisabled,
+		LayoutOrder = props.LayoutOrder,
+		testId = props.testId
+	}, v5)
 end
 
 return React.memo(ListAccessory)

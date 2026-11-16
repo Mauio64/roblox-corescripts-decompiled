@@ -1,72 +1,67 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+local parent = DataHydration.Parent
+
+local DiscoveryUtils = require(parent.DiscoveryUtils)
 local logResponseError = DiscoveryUtils.logResponseError
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
-require(script.Parent.GamePassStoreTypes)
 
+require(script.Parent.GamePassStoreTypes)
 local fetchGamePasses = require(script.Parent.fetchGamePasses)
 
-local function createGamePassStore() -- line: 23
-	-- upvalues: createDataCache (copy), createDataResolver (copy), logResponseError (copy), DiscoveryEventErrorLogger (copy), fetchGamePasses (copy)
-	local v10 = createDataCache()
-	local v11 = createDataCache()
-	local v12 = createDataResolver({
-		supportsMultiGet = false,
-		cache = v11,
-		logError = function(p1) -- line: 33
-			-- upvalues: logResponseError (copy), DiscoveryEventErrorLogger (copy)
-			local v14 = if type(p1) ~= "table" or not p1.StatusCode then nil else p1.StatusCode
+local function createGamePassStore()
+	local dataCache = createDataCache()
 
-			logResponseError("game-passes/v1/universes/.../game-passes", {
-				StatusCode = v14
-			})
+	local dataCache2 = createDataCache()
+	local dataResolver = createDataResolver({
+		cache = dataCache2,
+		supportsMultiGet = false,
+		logError = function(p)
+			local statusCode
+
+			if type(p) == "table" and p.StatusCode then
+				statusCode = p.StatusCode
+			end
+
+			logResponseError("game-passes/v1/universes/.../game-passes", { StatusCode = statusCode })
 			DiscoveryEventErrorLogger.reportError("GamePassStore", "Failed to fetch game passes", {
-				err = tostring(p1)
+				err = tostring(p)
 			})
 		end,
-		fetchFn = function(s1: string, _) -- line: 40
-			-- upvalues: fetchGamePasses (copy), v10 (copy)
-			return fetchGamePasses(s1):andThen(function(p3) -- line: 41
-				-- upvalues: v10 (copy)
-				local t1 = {}
+		fetchFn = function(p: string, _)
+			return fetchGamePasses(p):andThen(function(p2)
+				local ids = {}
 
-				for _, v20 in p3.gamePasses do
-					local str = tostring(v20.id)
-
-					table.insert(t1, str)
-					v10.updateItems({
-						[str] = v20
-					})
+				for _, gamePass in p2.gamePasses do
+					local id = tostring(gamePass.id)
+					table.insert(ids, id)
+					dataCache.updateItems({ [id] = gamePass })
 				end
 
-				return t1
+				return ids
 			end)
 		end
 	})
 
 	return {
-		getPassesForUniverse = v12.getCachedItem,
-		getAndFetchPassesForUniverse = v12.getAndFetchItem,
-		fetchPassesForUniverse = v12.fetchItem,
-		getGamePassInfo = v10.getItem,
-		updateGamePassInfo = v10.updateItem,
-		updateGamePassInfos = v10.updateItems,
-		updateUniversePasses = v11.updateItems,
-		clear = function() -- line: 55
-			-- upvalues: v11 (copy), v12 (copy), v10 (copy)
-			v11.clear()
-			v12.clear()
-			v10.clear()
+		getPassesForUniverse = dataResolver.getCachedItem,
+		getAndFetchPassesForUniverse = dataResolver.getAndFetchItem,
+		fetchPassesForUniverse = dataResolver.fetchItem,
+		getGamePassInfo = dataCache.getItem,
+		updateGamePassInfo = dataCache.updateItem,
+		updateGamePassInfos = dataCache.updateItems,
+		updateUniversePasses = dataCache2.updateItems,
+		clear = function()
+			dataCache2.clear()
+			dataResolver.clear()
+			dataCache.clear()
 		end,
-		dispose = function() -- line: 61
-			-- upvalues: v12 (copy), v10 (copy)
-			v12.dispose()
-			v10.dispose()
+		dispose = function()
+			dataResolver.dispose()
+			dataCache.dispose()
 		end
 	}
 end

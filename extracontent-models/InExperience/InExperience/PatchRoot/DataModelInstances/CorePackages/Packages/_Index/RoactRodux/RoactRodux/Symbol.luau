@@ -1,24 +1,27 @@
-return {
-	named = function(p1) -- line: 15
-		assert(type(p1) == "string", "Symbols must be created using a string name!")
+local Symbol = {}
 
-		local v2 = newproxy(true)
-		local v3 = ("Symbol(%s)"):format(p1)
+function Symbol.named(value)
+	assert(type(value) == "string", "Symbols must be created using a string name!")
 
-		getmetatable(v2).__tostring = function() -- line: 22
-			-- upvalues: v3 (copy)
-			return v3
-		end
+	local v = newproxy(true)
 
-		return v2
-	end,
-	unnamed = function() -- line: 33
-		local v4 = newproxy(true)
+	local formatted = ("Symbol(%s)"):format(value)
 
-		getmetatable(v4).__tostring = function() -- line: 36
-			return "Unnamed Symbol"
-		end
-
-		return v4
+	getmetatable(v).__tostring = function()
+		return formatted
 	end
-}
+
+	return v
+end
+
+function Symbol.unnamed()
+	local v = newproxy(true)
+
+	getmetatable(v).__tostring = function(): string
+		return "Unnamed Symbol"
+	end
+
+	return v
+end
+
+return Symbol

@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("EconomyCommonCoreScriptHooks").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("EconomyCommonCoreScriptHooks").Parent
+local React = require(parent.React)
+
 local NetworkContext = require(script.Parent.NetworkContext)
 
-local function useNetwork() -- line: 7
-	-- upvalues: React (copy), NetworkContext (copy)
+local function useNetwork()
 	return React.useContext(NetworkContext)
 end
 

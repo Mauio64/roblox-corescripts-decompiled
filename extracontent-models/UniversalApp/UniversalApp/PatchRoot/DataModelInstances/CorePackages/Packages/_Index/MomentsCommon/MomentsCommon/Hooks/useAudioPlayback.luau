@@ -1,8 +1,11 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
+local parent = MomentsCommon.Parent
+
 local Players = game:GetService("Players")
-local Cryo = require(MomentsCommonParent.Cryo)
-local React = require(MomentsCommonParent.React)
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+
 local useCallback = React.useCallback
 local useEffect = React.useEffect
 local useMemo = React.useMemo
@@ -14,145 +17,116 @@ require(MomentsCommon.Types)
 
 local LocalPlayer = Players.LocalPlayer
 
-local function assetIdAsContent(n1: number?) -- line: 22
-	if not n1 then
-		return nil
+local function assetIdAsContent(asset: number?) -- 1 equivalent call inferred from this helper
+	if asset then
+		return `rbxassetid://{asset}`
 	end
 
-	return `rbxassetid://{ n1 }`
+	return nil
 end
 
-local t1 = {
-	autoplay = false,
-	looping = false,
-	playbackRegion = NumberRange.new(0, 1e999)
-}
+local v = { autoplay = false, looping = false, playbackRegion = NumberRange.new(0, 1e999) }
 
-local function useAudioPlayback(b1: boolean, n2: number?, t2: {[any]: any}?) -- line: 46
-	-- upvalues: Cryo (copy), t1 (copy), useRef (copy), useToggleState (copy), useState (copy), useCallback (copy), useMemo (copy), useEffect (copy), LocalPlayer (copy)
-	local v21 = Cryo.Dictionary.union(t1, t2 or {})
-	local v22 = useRef(nil)
-	local v23 = useToggleState(v21.autoplay)
-	local v24 = useToggleState(false)
-	local v25, v26 = useState(0)
-	local v27, v28 = useState(0)
-	local v29, v30 = useState(0)
-	local v31, v32 = useState(0)
-	local v33 = useCallback(function(n3: number) -- line: 64
-		-- upvalues: v22 (copy), v21 (copy), v25 (copy)
-		local current = v22.current
+local function useAudioPlayback(flag: boolean, asset: number?, options)
+	local union = Cryo.Dictionary.union(v, options or {})
+
+	local ref = useRef(nil)
+
+	local v2 = useToggleState(union.autoplay)
+	local v3 = useToggleState(false)
+
+	local state, setState = useState(0)
+	local state2, setState2 = useState(0)
+
+	local state3, setState3 = useState(0)
+	local state4, setState4 = useState(0)
+
+	local seek = useCallback(function(p: number)
+		local current = ref.current
 
 		if current then
-			current.TimePosition = math.clamp(n3 + v21.playbackRegion.Min, 0, v25)
+			current.TimePosition = math.clamp(p + union.playbackRegion.Min, 0, state)
 		end
-	end, {
-		v25,
-		v21.playbackRegion
-	})
-	local v34 = useCallback(function() -- line: 72
-		-- upvalues: b1 (copy), v22 (copy), v32 (copy), v21 (copy), v28 (copy)
-		if not b1 then
+	end, { state, union.playbackRegion })
+
+	local v4 = useCallback(function()
+		if not flag then
 			return
 		end
 
-		local current = v22.current
+		local current = ref.current
 
 		if current then
-			v32(current.TimePosition - v21.playbackRegion.Min)
-			v28(current.TimePosition)
+			setState4(current.TimePosition - union.playbackRegion.Min)
+			setState2(current.TimePosition)
 		end
-	end, {
-		b1,
-		n2,
-		v21.playbackRegion
-	})
+	end, { flag, asset, union.playbackRegion })
 
-	n2 = useMemo(function() -- line: 87
-		-- upvalues: n2 (ref)
-		local v39 = n2
+	asset = useMemo(function()
+		return assetIdAsContent(asset) -- inferred equivalent call
+	end, { asset })
 
-		if not v39 then
-			return nil
-		end
-
-		return `rbxassetid://{ v39 }`
-	end, { n2 })
-	useEffect(function() -- line: 91
-		-- upvalues: n2 (ref), v21 (copy), v26 (copy), v22 (copy), LocalPlayer (copy)
-		if not n2 then
+	useEffect(function()
+		if not asset then
 			return
 		end
 
-		local Folder = Instance.new("Folder")
+		local folder = Instance.new("Folder")
+		folder.Name = `AudioPlayback_{asset}`
 
-		Folder.Name = `AudioPlayback_{ n2 }`
+		local audioPlayer = Instance.new("AudioPlayer")
+		audioPlayer.Asset = asset
+		audioPlayer.PlaybackRegion = union.playbackRegion
+		audioPlayer.Looping = union.looping or false
+		audioPlayer.Parent = folder
+		audioPlayer.Volume = 0.2
 
-		local AudioPlayer = Instance.new("AudioPlayer")
-
-		AudioPlayer.Asset = n2
-		AudioPlayer.PlaybackRegion = v21.playbackRegion
-		AudioPlayer.Looping = v21.looping or false
-		AudioPlayer.Parent = Folder
-		AudioPlayer.Volume = 0.2
-
-		local function updateTimeLength() -- line: 106
-			-- upvalues: v26 (copy), AudioPlayer (copy)
-			v26(AudioPlayer.TimeLength)
+		local function updateTimeLength() -- 1 equivalent call inferred from this helper
+			setState(audioPlayer.TimeLength)
 		end
 
-		AudioPlayer:GetPropertyChangedSignal("TimeLength"):Connect(updateTimeLength)
-		v26(AudioPlayer.TimeLength)
+		audioPlayer:GetPropertyChangedSignal("TimeLength"):Connect(updateTimeLength)
+		updateTimeLength() -- inferred equivalent call
+		local audioDeviceOutput = Instance.new("AudioDeviceOutput")
+		audioDeviceOutput.Parent = folder
 
-		local AudioDeviceOutput = Instance.new("AudioDeviceOutput")
+		local wire = Instance.new("Wire")
+		wire.SourceInstance = audioPlayer
+		wire.TargetInstance = audioDeviceOutput
+		wire.Parent = folder
 
-		AudioDeviceOutput.Parent = Folder
-
-		local Wire = Instance.new("Wire")
-
-		Wire.SourceInstance = AudioPlayer
-		Wire.TargetInstance = AudioDeviceOutput
-		Wire.Parent = Folder
-		v22.current = AudioPlayer
-		task.spawn(function() -- line: 123
-			-- upvalues: Folder (copy), LocalPlayer (copy)
-			Folder.Parent = LocalPlayer:WaitForChild("PlayerGui")
+		ref.current = audioPlayer
+		task.spawn(function()
+			folder.Parent = LocalPlayer:WaitForChild("PlayerGui")
 		end)
 
-		return function() -- line: 127
-			-- upvalues: Folder (copy)
-			Folder:Destroy()
+		return function()
+			folder:Destroy()
 		end
-	end, { n2 })
-	useEffect(function() -- line: 132
-		-- upvalues: v22 (copy), v21 (copy)
-		local current = v22.current
+	end, { asset })
+
+	useEffect(function()
+		local current = ref.current
 
 		if current then
-			current.PlaybackRegion = v21.playbackRegion
+			current.PlaybackRegion = union.playbackRegion
 			current.TimePosition = 0
 		end
-	end, { v21.playbackRegion })
-	useEffect(function() -- line: 140
-		-- upvalues: v21 (copy), v30 (copy), v25 (copy)
-		local v46 = v21.playbackRegion.Max - v21.playbackRegion.Min
+	end, { union.playbackRegion })
 
-		v30((math.min(v46, v25)))
-	end, {
-		v25,
-		v21.playbackRegion
-	})
-	useEffect(function() -- line: 145
-		-- upvalues: v22 (copy), v23 (copy)
-		local current = v22.current
+	useEffect(function()
+		setState3((math.min(union.playbackRegion.Max - union.playbackRegion.Min, state)))
+	end, { state, union.playbackRegion })
+
+	useEffect(function()
+		local current = ref.current
 
 		if current then
-			if v23.enabled then
+			if v2.enabled then
 				current.PlaybackSpeed = 1
 
 				if not current.IsPlaying then
 					current:Play()
-
-					return
 				end
 			else
 				current.PlaybackSpeed = 0
@@ -162,74 +136,56 @@ local function useAudioPlayback(b1: boolean, n2: number?, t2: {[any]: any}?) -- 
 				end
 			end
 		end
-	end, {
-		n2,
-		v23.enabled
-	})
-	useEffect(function() -- line: 163
-		-- upvalues: v22 (copy), v24 (copy), v23 (copy)
-		local current = v22.current
+	end, { asset, v2.enabled })
+
+	useEffect(function()
+		local current = ref.current
 
 		if current then
-			if v24.enabled or not v23.enabled then
+			if v3.enabled or not v2.enabled then
 				current.Volume = 0
-
-				return
+			else
+				current.Volume = 0.2
 			end
-
-			current.Volume = 0.2
 		end
-	end, {
-		v24.enabled,
-		v23.enabled
-	})
+	end, { v3.enabled, v2.enabled })
 
-	local v35 = useCallback(function() -- line: 180
-		-- upvalues: v23 (copy)
-		v23.disable()
+	local v5 = useCallback(function()
+		v2.disable()
 	end, {})
 
-	useEffect(function() -- line: 184
-		-- upvalues: v22 (copy), v34 (copy), v35 (copy)
-		local t3 = {}
+	useEffect(function()
+		local connections = {}
 
-		if v22.current then
-			table.insert(t3, game:GetService("RunService").RenderStepped:Connect(v34))
-			table.insert(t3, v22.current.Ended:Connect(v35))
+		if ref.current then
+			local RunService = game:GetService("RunService")
+			table.insert(connections, RunService.RenderStepped:Connect(v4))
+			table.insert(connections, ref.current.Ended:Connect(v5))
 		end
 
-		return function() -- line: 192
-			-- upvalues: t3 (copy)
-			for _, v51 in t3 do
-				v51:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, {
-		v34,
-		v35
-	})
+	end, { v4, v5 })
 
 	return {
 		timeline = {
-			duration = v29,
-			elapsed = v31,
-			seek = v33,
-			timeLength = v25,
-			timePosition = v27
+			duration = state3,
+			elapsed = state4,
+			seek = seek,
+			timeLength = state,
+			timePosition = state2
 		},
 		playback = {
-			isPlaying = v23.enabled,
-			pause = v23.disable,
-			play = v23.enable,
-			toggle = v23.toggle
+			isPlaying = v2.enabled,
+			pause = v2.disable,
+			play = v2.enable,
+			toggle = v2.toggle
 		},
-		volume = {
-			isMuted = v24.enabled,
-			mute = v24.enable,
-			unmute = v24.disable,
-			toggle = v24.toggle
-		},
-		ref = v22
+		volume = { isMuted = v3.enabled, mute = v3.enable, unmute = v3.disable, toggle = v3.toggle },
+		ref = ref
 	}
 end
 

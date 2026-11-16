@@ -1,15 +1,50 @@
 local CoreGuiCommon = script:FindFirstAncestor("CoreGuiCommon")
-local CoreGuiCommonParent = CoreGuiCommon.Parent
-local FFlagAddUILessMode = require(CoreGuiCommonParent.SharedFlags).FFlagAddUILessMode
-local FFlagTopBarSignalizeMenuOpen = require(CoreGuiCommon.Flags).FFlagTopBarSignalizeMenuOpen
-local FFlagTopBarSignalizeKeepOutAreas = require(CoreGuiCommon.Flags).FFlagTopBarSignalizeKeepOutAreas
-local FFlagTopBarSignalizeHealthBar = require(CoreGuiCommon.Flags).FFlagTopBarSignalizeHealthBar
-local FFlagEnableUISelector = require(CoreGuiCommon.Flags).FFlagEnableUISelector
+local parent = CoreGuiCommon.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddUILessMode = SharedFlags.FFlagAddUILessMode
+local Flags = require(CoreGuiCommon.Flags)
+local FFlagTopBarSignalizeMenuOpen = Flags.FFlagTopBarSignalizeMenuOpen
+local Flags2 = require(CoreGuiCommon.Flags)
+local FFlagTopBarSignalizeKeepOutAreas = Flags2.FFlagTopBarSignalizeKeepOutAreas
+local Flags3 = require(CoreGuiCommon.Flags)
+local FFlagTopBarSignalizeHealthBar = Flags3.FFlagTopBarSignalizeHealthBar
+local Flags4 = require(CoreGuiCommon.Flags)
+local FFlagEnableUISelector = Flags4.FFlagEnableUISelector
+local getUILessStore
+
+if FFlagAddUILessMode then
+	getUILessStore = require(script.GetUILessStore)
+end
+
+local getInspectAndBuyStore
+
+if FFlagTopBarSignalizeMenuOpen then
+	getInspectAndBuyStore = require(script.GetInspectAndBuyStore)
+end
+
+local getKeepOutAreasStore
+
+if FFlagTopBarSignalizeKeepOutAreas then
+	getKeepOutAreasStore = require(script.GetKeepOutAreasStore)
+end
+
+local getLocalHumanoidStore
+
+if FFlagTopBarSignalizeHealthBar then
+	getLocalHumanoidStore = require(script.GetLocalHumanoidStore)
+end
+
+local getUiSelectorSignalStore
+
+if FFlagEnableUISelector then
+	getUiSelectorSignalStore = require(script.GetUiSelectorSignalStore)
+end
 
 return {
-	GetUILessStore = if not FFlagAddUILessMode then nil else require(script.GetUILessStore),
-	GetInspectAndBuyStore = if not FFlagTopBarSignalizeMenuOpen then nil else require(script.GetInspectAndBuyStore),
-	GetKeepOutAreasStore = if not FFlagTopBarSignalizeKeepOutAreas then nil else require(script.GetKeepOutAreasStore),
-	GetLocalHumanoidStore = if not FFlagTopBarSignalizeHealthBar then nil else require(script.GetLocalHumanoidStore),
-	GetUiSelectorSignalStore = if not FFlagEnableUISelector then nil else require(script.GetUiSelectorSignalStore)
+	GetUILessStore = getUILessStore,
+	GetInspectAndBuyStore = getInspectAndBuyStore,
+	GetKeepOutAreasStore = getKeepOutAreasStore,
+	GetLocalHumanoidStore = getLocalHumanoidStore,
+	GetUiSelectorSignalStore = getUiSelectorSignalStore
 }

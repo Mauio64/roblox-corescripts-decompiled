@@ -1,67 +1,62 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
+local includes = require(parent.includes)
+local keys = require(parent.keys)
 
-require(scriptParent.Types)
-
-local includes = require(scriptParent.includes)
-local keys = require(scriptParent.keys)
 local sort = table.sort
 
-local function getDefaultCycles() -- line: 19
-	return {
-		nextRef = 1,
-		visited = {},
-		refs = {},
-		omit = {}
-	}
+local function getDefaultCycles()
+	return { visited = {}, refs = {}, nextRef = 1, omit = {} }
 end
-local function cycles(p1, n1: number?, p2) -- line: 41
-	-- upvalues: getDefaultCycles (copy), keys (copy), sort (copy), includes (copy), cycles (copy)
-	if n1 == -1 then
-		return p2
+
+local function cycles(p, p2: number?, p3)
+	if p2 == -1 then
+		return p3
 	end
 
-	if typeof(p1) == "table" then
-		local v10 = p2 or getDefaultCycles()
+	if typeof(p) ~= "table" then
+		return nil
+	end
 
-		if v10.visited[p1] then
-			if not v10.refs[p1] then
-				v10.refs[p1] = v10.nextRef
-				v10.nextRef = v10.nextRef + 1
-			end
+	local v = p3 or getDefaultCycles()
 
-			return nil
+	if v.visited[p] then
+		if not v.refs[p] then
+			v.refs[p] = v.nextRef
+			v.nextRef += 1
 		end
 
-		v10.visited[p1] = true
+		return nil
+	else
+		v.visited[p] = true
 
-		local v11 = keys(p1)
-
-		sort(v11, function(p3, p4) -- line: 62
-			if typeof(p3) == "number" and typeof(p4) == "number" then
-				return p3 < p4
+		local v2 = keys(p)
+		sort(v2, function(value, value2): boolean
+			if typeof(value) == "number" and typeof(value2) == "number" then
+				return value < value2
 			end
 
-			return tostring(p3) < tostring(p4)
+			return tostring(value) < tostring(value2)
 		end)
 
-		for _, v in ipairs(v11) do
-			local v14 = p1[v]
+		for _, v3 in ipairs(v2) do
+			local v4 = p[v3]
 
-			if not includes(v10.omit, v) then
-				if n1 then
-					cycles(v, n1 - 1, v10)
-					cycles(v14, n1 - 1, v10)
-				else
-					cycles(v, nil, v10)
-					cycles(v14, nil, v10)
-				end
+			if includes(v.omit, v3) then
+				continue
+			end
+
+			if p2 then
+				cycles(v3, p2 - 1, v)
+				cycles(v4, p2 - 1, v)
+			else
+				cycles(v3, nil, v)
+				cycles(v4, nil, v)
 			end
 		end
 
-		return v10
+		return v
 	end
-
-	return nil
 end
 
 return cycles

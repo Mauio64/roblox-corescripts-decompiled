@@ -1,1 +1,2 @@
-return (require(script.ChromeService).new())
+local ChromeService = require(script.ChromeService)
+return (ChromeService.new())

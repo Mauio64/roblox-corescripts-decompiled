@@ -1,17 +1,11 @@
-local function mapFriendshipStatusToEnum(s1: string?) -- line: 1
-	if s1 == "NotFriends" then
+local function mapFriendshipStatusToEnum(p: string?)
+	if p == "NotFriends" then
 		return Enum.FriendStatus.NotFriend
-	end
-
-	if s1 == "Friends" then
+	elseif p == "Friends" then
 		return Enum.FriendStatus.Friend
-	end
-
-	if s1 == "RequestSent" then
+	elseif p == "RequestSent" then
 		return Enum.FriendStatus.FriendRequestSent
-	end
-
-	if s1 == "RequestReceived" then
+	elseif p == "RequestReceived" then
 		return Enum.FriendStatus.FriendRequestReceived
 	end
 

@@ -1,18 +1,16 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
+local ReactFiberHostConfig = require(script.Parent.ReactFiberHostConfig)
+local supportsTestSelectors = ReactFiberHostConfig.supportsTestSelectors
 
-local supportsTestSelectors = require(script.Parent.ReactFiberHostConfig).supportsTestSelectors
-local t1 = {}
-local t2 = {}
-
-function t1.onCommitRoot() -- line: 512
-	-- upvalues: supportsTestSelectors (copy), t2 (copy)
-	if supportsTestSelectors then
-		for _, v6 in t2 do
-			v6()
+local v = {}
+return {
+	onCommitRoot = function()
+		if supportsTestSelectors then
+			for _, v2 in v do
+				v2()
+			end
 		end
 	end
-end
-
-return t1
+}

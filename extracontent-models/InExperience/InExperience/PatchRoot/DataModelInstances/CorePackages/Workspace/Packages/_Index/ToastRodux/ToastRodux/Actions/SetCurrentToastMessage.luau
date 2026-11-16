@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("ToastRodux").Parent
+local parent = script:FindFirstAncestor("ToastRodux").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
-	assert(type(p1) == "table", "SetCurrentToastMessage action expects toastMessage to be a table")
+return Rodux.makeActionCreator(script.Name, function(toastMessage)
+	assert(type(toastMessage) == "table", "SetCurrentToastMessage action expects toastMessage to be a table")
 
-	return {
-		toastMessage = p1
-	}
+	return { toastMessage = toastMessage }
 end)

@@ -1,34 +1,34 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.ES7Types)
 
-require(ParentParent.ES7Types)
-
-return function(p1, n1: number, n2: number?, ...) -- line: 24
-	if n1 > #p1 then
+return function(list, p: number, p2: number?, ...)
+	if #list < p then
 		for i = 1, select("#", ...) do
-			table.insert(p1, (select(i, ...)))
+			table.insert(list, (select(i, ...)))
 		end
 
 		return {}
-	end
+	else
+		local count = #list
 
-	local v6 = #p1
-
-	if n1 < 1 then
-		n1 = math.max(v6 - math.abs(n1), 1)
-	end
-
-	local t1 = {}
-	local v8 = n2 or v6
-
-	if v8 > 0 then
-		for _ = n1, math.min(v6, n1 + math.max(0, v8 - 1)) do
-			table.insert(t1, (table.remove(p1, n1)))
+		if p < 1 then
+			p = math.max(count - math.abs(p), 1)
 		end
-	end
 
-	for i = select("#", ...), 1, -1 do
-		table.insert(p1, n1, (select(i, ...)))
-	end
+		local result = {}
 
-	return t1
+		local v = p2 or count
+
+		if v > 0 then
+			for _ = p, math.min(count, p + math.max(0, v - 1)) do
+				table.insert(result, (table.remove(list, p)))
+			end
+		end
+
+		for i = select("#", ...), 1, -1 do
+			table.insert(list, p, (select(i, ...)))
+		end
+
+		return result
+	end
 end

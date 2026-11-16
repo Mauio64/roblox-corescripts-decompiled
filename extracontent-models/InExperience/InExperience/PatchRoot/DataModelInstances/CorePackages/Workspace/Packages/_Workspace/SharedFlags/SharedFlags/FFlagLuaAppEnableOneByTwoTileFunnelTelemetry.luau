@@ -1,0 +1,3 @@
+local FFlagLuaAppEnableHomepageOneByTwoTile = require(script.Parent.FFlagLuaAppEnableHomepageOneByTwoTile)
+
+return game:DefineFastFlag("LuaAppEnableOneByTwoTileFunnelTelemetry", false) and FFlagLuaAppEnableHomepageOneByTwoTile

@@ -1,96 +1,106 @@
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local React = require(Parent.React)
 
-local function isPointerInput(p1) -- line: 22
-	return p1.UserInputType == Enum.UserInputType.MouseButton1 or p1.UserInputType == Enum.UserInputType.Touch
-end
-local function isGamepadActivation(p2) -- line: 26
-	return p2.KeyCode == Enum.KeyCode.ButtonA
-end
-local function isGestureInput(p3) -- line: 33
-	-- upvalues: UserInputService (copy)
-	if p3.UserInputType == Enum.UserInputType.MouseButton1 or p3.UserInputType == Enum.UserInputType.Touch then
-		return true
-	end
+local parent = script:FindFirstAncestor("ExpChat").Parent
 
-	if UserInputService.GamepadEnabled and p3.KeyCode == Enum.KeyCode.ButtonA then
+local React = require(parent.React)
+
+local function isPointerInput(p): boolean -- 3 equivalent calls inferred from this helper
+	return p.UserInputType == Enum.UserInputType.MouseButton1 or p.UserInputType == Enum.UserInputType.Touch
+end
+
+local function isGamepadActivation(p): boolean -- 3 equivalent calls inferred from this helper
+	return p.KeyCode == Enum.KeyCode.ButtonA
+end
+
+local function isGestureInput(p): boolean
+	if isPointerInput(p) or UserInputService.GamepadEnabled and isGamepadActivation(p) then -- inferred equivalent call
 		return true
 	end
 
 	return false
 end
-local function useLongPress(t1: {[any]: any}) -- line: 53
-	-- upvalues: React (copy), UserInputService (copy)
-	local onLongPress = t1.onLongPress
-	local onTap = t1.onTap
-	local v14 = t1.thresholdSeconds or 0.5
-	local v15 = React.useRef(nil)
-	local v16 = React.useRef(false)
 
-	React.useEffect(function() -- line: 67
-		-- upvalues: v15 (copy)
-		return function() -- line: 68
-			-- upvalues: v15 (copy)
-			local current = v15.current
+local function useLongPress(data)
+	local onLongPress = data.onLongPress
+	local onTap = data.onTap
+	local thresholdSeconds = data.thresholdSeconds or 0.5
+
+	local ref = React.useRef(nil)
+
+	local ref2 = React.useRef(false)
+
+	React.useEffect(function()
+		return function()
+			local current = ref.current
 
 			if current ~= nil then
 				pcall(task.cancel, current)
-				v15.current = nil
+				ref.current = nil
 			end
 		end
 	end, {})
 
-	local v17 = React.useCallback(function() -- line: 77
-		-- upvalues: v16 (copy), onTap (copy)
-		if v16.current then
-			v16.current = false
-
-			return
-		end
-
-		if onTap ~= nil then
+	local v = React.useCallback(function()
+		if ref2.current then
+			ref2.current = false
+		elseif onTap ~= nil then
 			onTap()
 		end
 	end, { onTap })
-	local v18 = React.useCallback(function(_, p5) -- line: 87
-		-- upvalues: onLongPress (copy), UserInputService (copy), v15 (copy), v16 (copy), v14 (copy)
-		if onLongPress == nil or p5.UserInputType ~= Enum.UserInputType.MouseButton1 and p5.UserInputType ~= Enum.UserInputType.Touch and (not UserInputService.GamepadEnabled or p5.KeyCode ~= Enum.KeyCode.ButtonA) then
-			return
-		end
 
-		local current = v15.current
+	local v2 = React.useCallback(function(_, p)
+		if onLongPress ~= nil then
+			local v2
 
-		if current ~= nil then
-			pcall(task.cancel, current)
-			v15.current = nil
-		end
-
-		v16.current = false
-		v15.current = task.delay(v14, function() -- line: 100
-			-- upvalues: v15 (copy), v16 (copy), onLongPress (copy)
-			v15.current = nil
-			v16.current = true
-
-			if onLongPress ~= nil then
-				onLongPress()
+			if isPointerInput(p) then -- inferred equivalent call
+				v2 = true
+			elseif UserInputService.GamepadEnabled then
+				v2 = isGamepadActivation(p) and true or false -- inferred equivalent call
+			else
+				v2 = false
 			end
-		end)
-	end, {
-		onLongPress,
-		v14
-	})
-	local v19 = React.useCallback(function(_, p7) -- line: 109
-		-- upvalues: onLongPress (copy), UserInputService (copy), v15 (copy)
-		if onLongPress == nil or p7.UserInputType ~= Enum.UserInputType.MouseButton1 and p7.UserInputType ~= Enum.UserInputType.Touch and (not UserInputService.GamepadEnabled or p7.KeyCode ~= Enum.KeyCode.ButtonA) then
-			return
+
+			if v2 then
+				local current = ref.current
+
+				if current ~= nil then
+					pcall(task.cancel, current)
+					ref.current = nil
+				end
+
+				ref2.current = false
+				ref.current = task.delay(thresholdSeconds, function()
+					ref.current = nil
+					ref2.current = true
+
+					if onLongPress ~= nil then
+						onLongPress()
+					end
+				end)
+			end
 		end
+	end, { onLongPress, thresholdSeconds })
 
-		local current = v15.current
+	local v3 = React.useCallback(function(_, p)
+		if onLongPress ~= nil then
+			local v3
 
-		if current ~= nil then
-			pcall(task.cancel, current)
-			v15.current = nil
+			if isPointerInput(p) then -- inferred equivalent call
+				v3 = true
+			elseif UserInputService.GamepadEnabled then
+				v3 = isGamepadActivation(p) and true or false -- inferred equivalent call
+			else
+				v3 = false
+			end
+
+			if v3 then
+				local current = ref.current
+
+				if current ~= nil then
+					pcall(task.cancel, current)
+					ref.current = nil
+				end
+			end
 		end
 	end, { onLongPress })
 
@@ -99,9 +109,9 @@ local function useLongPress(t1: {[any]: any}) -- line: 53
 	end
 
 	return {
-		[React.Event.Activated] = v17,
-		[React.Event.InputBegan] = v18,
-		[React.Event.InputEnded] = v19
+		[React.Event.Activated] = v,
+		[React.Event.InputBegan] = v2,
+		[React.Event.InputEnded] = v3
 	}
 end
 

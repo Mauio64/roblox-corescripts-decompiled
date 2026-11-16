@@ -1,25 +1,21 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
+local parent = script:FindFirstAncestor("GameTile").Parent
+require(parent.Foundation)
 
-require(Parent.Foundation)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppMigrateGameTileFixConsoleMetadataText = SharedFlags.FFlagLuaAppMigrateGameTileFixConsoleMetadataText
 
-local FFlagLuaAppMigrateGameTileFixConsoleMetadataText = require(Parent.SharedFlags).FFlagLuaAppMigrateGameTileFixConsoleMetadataText
-local FFlagLuaAppNarrowTileSmallerFooterFont = require(Parent.SharedFlags).FFlagLuaAppNarrowTileSmallerFooterFont
-
-local function getGameTileMetadataFont(b1: boolean?, p1, p2, b2: boolean?, b3: boolean?) -- line: 11
-	-- upvalues: FFlagLuaAppNarrowTileSmallerFooterFont (copy), FFlagLuaAppMigrateGameTileFixConsoleMetadataText (copy)
-	if b2 and p2 then
-		if FFlagLuaAppNarrowTileSmallerFooterFont and b3 or FFlagLuaAppMigrateGameTileFixConsoleMetadataText and b1 == false then
+local function getGameTileMetadataFont(flag: boolean?, p, p2, flag2: boolean?, flag3: boolean?)
+	if flag2 and p2 then
+		if flag3 or FFlagLuaAppMigrateGameTileFixConsoleMetadataText and flag == false then
 			return p2.Typography.BodySmall
 		end
 
 		return p2.Typography.BodyMedium
+	elseif flag then
+		return p.Typography.BodyLarge
+	else
+		return p.Typography.CaptionMedium
 	end
-
-	if b1 then
-		return p1.Typography.BodyLarge
-	end
-
-	return p1.Typography.CaptionMedium
 end
 
 return getGameTileMetadataFont

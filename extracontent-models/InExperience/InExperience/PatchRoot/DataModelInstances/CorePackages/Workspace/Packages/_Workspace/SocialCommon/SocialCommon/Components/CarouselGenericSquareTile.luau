@@ -1,8 +1,11 @@
-local Parent = script:FindFirstAncestor("SocialCommon").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
-local Dash = require(Parent.Dash)
-local Text = require(Parent.AppCommonLib).Text
+local parent = script:FindFirstAncestor("SocialCommon").Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Dash = require(parent.Dash)
+local AppCommonLib = require(parent.AppCommonLib)
+local Text = AppCommonLib.Text
+
 local useStyle = UIBlox.Core.Style.useStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
@@ -10,54 +13,61 @@ local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local IconSize = UIBlox.App.Constant.IconSize
 local Badge = UIBlox.App.Indicator.Badge
 local Colors = UIBlox.App.Style.Colors
-local useImpressionsTagger = require(Parent.Impressions).useImpressionsTagger
-local t1 = {
+
+local Impressions = require(parent.Impressions)
+local useImpressionsTagger = Impressions.useImpressionsTagger
+
+local v = {
 	badgeValue = nil,
 	icon = "",
 	labelText = "",
+	onActivated = function() end,
 	tileSize = 100,
-	borderThickness = 0,
-	onActivated = function() -- line: 62
-	end,
 	iconSize = IconSize.Large,
+	borderThickness = 0,
 	cornerRadius = UDim.new(0, 8),
-	styleProps = {
-		containFooterInTileSize = false,
-		textXAlignment = Enum.TextXAlignment.Center
-	}
+	styleProps = { textXAlignment = Enum.TextXAlignment.Center, containFooterInTileSize = false }
 }
 
-return function(p1) -- line: 73
-	-- upvalues: Dash (copy), t1 (copy), useStyle (copy), Text (copy), React (copy), useImpressionsTagger (copy), ImageSetButton (copy), ImageSetLabel (copy), Colors (copy), Badge (copy), StyledTextLabel (copy)
-	local v16 = Dash.join(t1, p1 or {})
-	local v17 = useStyle()
-	local Font = v17.Font
-	local styleProps = v16.styleProps
-	local v20 = if not styleProps.font then Font.CaptionHeader else styleProps.font
-	local v21 = Font.BaseSize * v20.RelativeSize
-	local v22 = Text.GetTextHeight(v16.labelText, v20.Font, v21)
-	local v23 = v16.tileSize - v16.borderThickness
+return function(options)
+	local joined = Dash.join(v, options or {})
+	local v2 = useStyle()
+	local font = v2.Font
 
-	if v16.styleProps.containFooterInTileSize then
-		v23 = v23 - v22 * 2 - 8
+	local styleProps = joined.styleProps
+	local fontStyle
+
+	if styleProps.font then
+		fontStyle = styleProps.font
+	else
+		fontStyle = font.CaptionHeader
 	end
 
-	local v24 = nil
+	local v3 = font.BaseSize * fontStyle.RelativeSize
+	local textHeight = Text.GetTextHeight(joined.labelText, fontStyle.Font, v3)
 
-	if v16.impressionsTag then
-		v24 = React.useRef(nil)
-		useImpressionsTagger(v24, v16.impressionsTag, v16.LayoutOrder)
+	local v4 = joined.tileSize - joined.borderThickness
+
+	if joined.styleProps.containFooterInTileSize then
+		v4 = v4 - textHeight * 2 - 8
+	end
+
+	local ref
+
+	if joined.impressionsTag then
+		ref = React.useRef(nil)
+		useImpressionsTagger(ref, joined.impressionsTag, joined.LayoutOrder)
 	end
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = v16.LayoutOrder,
+		LayoutOrder = joined.LayoutOrder,
 		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.fromOffset(v23, 0),
-		ref = v24
+		Size = UDim2.fromOffset(v4, 0),
+		BackgroundTransparency = 1,
+		ref = ref
 	}, {
 		UIPadding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v16.borderThickness)
+			PaddingTop = UDim.new(0, joined.borderThickness)
 		}),
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
@@ -66,53 +76,51 @@ return function(p1) -- line: 73
 			Padding = UDim.new(0, 8)
 		}),
 		Tile = React.createElement(ImageSetButton, {
-			Size = UDim2.fromOffset(v23, v23),
-			BackgroundColor3 = v17.Theme.BackgroundUIDefault.Color,
-			BackgroundTransparency = v17.Theme.BackgroundUIDefault.Transparency,
-			[React.Event.Activated] = v16.onActivated,
+			Size = UDim2.fromOffset(v4, v4),
+			BackgroundColor3 = v2.Theme.BackgroundUIDefault.Color,
+			BackgroundTransparency = v2.Theme.BackgroundUIDefault.Transparency,
+			[React.Event.Activated] = joined.onActivated,
 			LayoutOrder = 1
 		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = v16.cornerRadius
-			}),
+			UICorner = React.createElement("UICorner", { CornerRadius = joined.cornerRadius }),
 			UIStroke = React.createElement("UIStroke", {
-				Color = v17.Theme.Divider.Color,
-				Transparency = v17.Theme.Divider.Transparency,
-				Thickness = v16.borderThickness
+				Color = v2.Theme.Divider.Color,
+				Transparency = v2.Theme.Divider.Transparency,
+				Thickness = joined.borderThickness
 			}),
 			Icon = React.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				ImageTransparency = v17.Theme.IconEmphasis.Transparency,
+				BackgroundTransparency = 1,
+				ImageTransparency = v2.Theme.IconEmphasis.Transparency,
 				ImageColor3 = Colors.White,
-				Image = v16.icon,
-				Size = UDim2.fromOffset(v16.iconSize, v16.iconSize),
+				Image = joined.icon,
+				Size = UDim2.fromOffset(joined.iconSize, joined.iconSize),
 				Position = UDim2.fromScale(0.5, 0.5)
 			}),
-			Badge = v16.badgeValue and React.createElement(Badge, {
+			Badge = joined.badgeValue and React.createElement(Badge, {
 				anchorPoint = Vector2.new(1, 0),
-				position = UDim2.fromOffset(v16.tileSize - 8, 8),
-				value = v16.badgeValue
+				position = UDim2.fromOffset(joined.tileSize - 8, 8),
+				value = joined.badgeValue
 			})
 		}),
 		Label = React.createElement(ImageSetButton, {
 			BackgroundTransparency = 1,
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Size = UDim2.fromScale(1, 0),
-			[React.Event.Activated] = v16.onActivated,
+			[React.Event.Activated] = joined.onActivated,
 			LayoutOrder = 2
 		}, {
 			Text = React.createElement(StyledTextLabel, {
-				fluidSizing = false,
-				richText = false,
-				lineHeight = 1,
-				text = v16.labelText,
-				fontStyle = v20,
-				colorStyle = v17.Theme.TextEmphasis,
-				size = UDim2.fromOffset(v23, v22 * 2),
+				text = joined.labelText,
+				fontStyle = fontStyle,
+				colorStyle = v2.Theme.TextEmphasis,
+				size = UDim2.fromOffset(v4, textHeight * 2),
 				textTruncate = Enum.TextTruncate.AtEnd,
 				textXAlignment = styleProps.textXAlignment,
-				textYAlignment = Enum.TextYAlignment.Top
+				textYAlignment = Enum.TextYAlignment.Top,
+				fluidSizing = false,
+				richText = false,
+				lineHeight = 1
 			})
 		})
 	})

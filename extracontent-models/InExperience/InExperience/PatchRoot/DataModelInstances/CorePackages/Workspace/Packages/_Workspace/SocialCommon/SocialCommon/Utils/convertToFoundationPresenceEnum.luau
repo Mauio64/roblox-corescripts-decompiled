@@ -1,8 +1,10 @@
 local SocialCommon = script:FindFirstAncestor("SocialCommon")
-local SocialCommonParent = SocialCommon.Parent
+local parent = SocialCommon.Parent
 local PresenceTypes = require(SocialCommon.Enums.PresenceTypes)
-local Foundation = require(SocialCommonParent.Foundation)
-local t1 = {
+
+local Foundation = require(parent.Foundation)
+
+local v = {
 	[PresenceTypes.Offline] = Foundation.Enums.UserPresence.Away,
 	[PresenceTypes.Online] = Foundation.Enums.UserPresence.Active,
 	[PresenceTypes.InGame] = Foundation.Enums.UserPresence.InExperience,
@@ -13,7 +15,6 @@ local t1 = {
 	InStudio = Foundation.Enums.UserPresence.Active
 }
 
-return function(s1: string) -- line: 18
-	-- upvalues: t1 (copy), Foundation (copy)
-	return t1[s1] or Foundation.Enums.UserPresence.None
+return function(p: string)
+	return v[p] or Foundation.Enums.UserPresence.None
 end

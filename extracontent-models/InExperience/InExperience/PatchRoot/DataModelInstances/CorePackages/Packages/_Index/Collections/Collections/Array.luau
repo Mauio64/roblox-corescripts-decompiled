@@ -1,6 +1,5 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent.ES7Types)
+local parent = script.Parent.Parent
+require(parent.ES7Types)
 
 return {
 	concat = require(script.concat),

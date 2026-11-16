@@ -1,65 +1,52 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
 
-return {
-	networkError = function(s1: string, p1) -- line: 21
-		return {
-			kind = "Network",
-			message = s1,
-			cause = p1
-		}
-	end,
-	parseError = function(s2: string, p2) -- line: 30
-		return {
-			kind = "Parse",
-			message = s2,
-			cause = p2
-		}
-	end,
-	schemaError = function(s3: string, p3) -- line: 38
-		return {
-			kind = "Schema",
-			message = s3,
-			cause = p3
-		}
-	end,
-	engineError = function(s4: string, p4) -- line: 42
-		return {
-			kind = "Engine",
-			message = s4,
-			cause = p4
-		}
-	end,
-	rejectNetwork = function(s5: string, p5) -- line: 49
-		-- upvalues: Promise (copy)
-		return Promise.reject({
-			kind = "Network",
-			message = s5,
-			cause = p5
-		})
-	end,
-	rejectParse = function(s6: string, p6) -- line: 53
-		-- upvalues: Promise (copy)
-		return Promise.reject({
-			kind = "Parse",
-			message = s6,
-			cause = p6
-		})
-	end,
-	rejectSchema = function(s7: string, p7) -- line: 57
-		-- upvalues: Promise (copy)
-		return Promise.reject({
-			kind = "Schema",
-			message = s7,
-			cause = p7
-		})
-	end,
-	rejectEngine = function(s8: string, p8) -- line: 61
-		-- upvalues: Promise (copy)
-		return Promise.reject({
-			kind = "Engine",
-			message = s8,
-			cause = p8
-		})
-	end
-}
+local Promise = require(parent.Promise)
+
+local function networkError(message: string, cause) -- 1 equivalent call inferred from this helper
+	return { kind = "Network", message = message, cause = cause }
+end
+
+local function parseError(message: string, cause) -- 1 equivalent call inferred from this helper
+	return { kind = "Parse", message = message, cause = cause }
+end
+
+local function schemaError(message: string, cause) -- 1 equivalent call inferred from this helper
+	return { kind = "Schema", message = message, cause = cause }
+end
+
+local function engineError(message: string, cause) -- 1 equivalent call inferred from this helper
+	return { kind = "Engine", message = message, cause = cause }
+end
+
+local function badRequestError(message: string, cause) -- 1 equivalent call inferred from this helper
+	return { kind = "BadRequest", message = message, cause = cause }
+end
+
+local Errors = {}
+Errors.networkError = networkError
+Errors.parseError = parseError
+Errors.schemaError = schemaError
+Errors.engineError = engineError
+Errors.badRequestError = badRequestError
+
+function Errors.rejectNetwork(message: string, cause)
+	return Promise.reject(networkError(message, cause)) -- inferred equivalent call
+end
+
+function Errors.rejectParse(message: string, cause)
+	return Promise.reject(parseError(message, cause)) -- inferred equivalent call
+end
+
+function Errors.rejectSchema(message: string, cause)
+	return Promise.reject(schemaError(message, cause)) -- inferred equivalent call
+end
+
+function Errors.rejectEngine(message: string, cause)
+	return Promise.reject(engineError(message, cause)) -- inferred equivalent call
+end
+
+function Errors.rejectBadRequest(message: string, cause)
+	return Promise.reject(badRequestError(message, cause)) -- inferred equivalent call
+end
+
+return Errors

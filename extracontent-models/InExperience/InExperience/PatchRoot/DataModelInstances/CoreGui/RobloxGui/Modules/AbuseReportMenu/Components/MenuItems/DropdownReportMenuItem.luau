@@ -1,52 +1,82 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+
 local CorePackages = game:GetService("CorePackages")
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local React = require(CorePackages.Packages.React)
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
 local DropdownMenu = UIBlox.App.Menu.DropdownMenu
 local ReportMenuItem = require(AbuseReportMenu.Components.MenuItems.ReportMenuItem)
 local useStyle = UIBlox.Core.Style.useStyle
 local getMenuItemSizings = require(AbuseReportMenu.Utility.getMenuItemSizings)
+
 local FFlagHideShortcutsOnReportDropdown = require(AbuseReportMenu.Flags.FFlagHideShortcutsOnReportDropdown)
+
 local Cryo = require(CorePackages.Packages.Cryo)
 
-local function DropdownReportMenuItem(p1) -- line: 29
-	-- upvalues: useStyle (copy), getMenuItemSizings (copy), React (copy), AppFonts (copy), DropdownMenu (copy), Cryo (copy), FFlagHideShortcutsOnReportDropdown (copy), ReportMenuItem (copy)
-	local Theme = useStyle().Theme
-	local v15 = getMenuItemSizings()
-	local v16 = if p1.readonlyValue == nil then React.createElement(DropdownMenu, {
-		errorState = false,
-		showDropShadow = true,
-		fixedListHeight = 180,
-		placeholder = p1.placeholderText,
-		onChange = p1.onSelect,
-		height = UDim.new(0, 48),
-		screenSize = Vector2.new(2400, 1800),
-		cellDatas = Cryo.List.map(p1.selections, function(p2) -- line: 58
-			return {
-				text = p2
-			}
-		end),
-		onMenuOpenChange = if not FFlagHideShortcutsOnReportDropdown then nil else p1.onMenuOpenChange
-	}) else React.createElement("TextLabel", {
-		TextWrapped = true,
-		BackgroundTransparency = 1,
-		Text = p1.readonlyValue,
-		Font = AppFonts.default:getMedium(),
-		TextColor3 = Theme.TextEmphasis.Color,
-		TextTransparency = Theme.TextMuted.Transparency,
-		TextSize = v15.DropdownTextSize,
-		TextXAlignment = if not p1.isSmallPortraitViewport then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.new(1, 0, 0, p1.minHeight)
-	})
+local function DropdownReportMenuItem(props)
+	local theme = useStyle().Theme
+	local menuItemSizings = getMenuItemSizings()
+	local rightComponent
+
+	if props.readonlyValue == nil then
+		local createElement = React.createElement
+		local v = {
+			placeholder = props.placeholderText,
+			onChange = props.onSelect,
+			height = UDim.new(0, 48),
+			screenSize = Vector2.new(2400, 1800),
+			errorState = false,
+			showDropShadow = true,
+			fixedListHeight = 180,
+			cellDatas = Cryo.List.map(props.selections, function(text)
+				return { text = text }
+			end),
+			onMenuOpenChange = 0
+		}
+		local onMenuOpenChange
+
+		if FFlagHideShortcutsOnReportDropdown then
+			onMenuOpenChange = props.onMenuOpenChange
+		end
+
+		v.onMenuOpenChange = onMenuOpenChange
+		rightComponent = createElement(DropdownMenu, v)
+	else
+		local createElement = React.createElement
+		local v = {
+			Text = props.readonlyValue,
+			Font = AppFonts.default:getMedium(),
+			TextColor3 = theme.TextEmphasis.Color,
+			TextTransparency = theme.TextMuted.Transparency,
+			TextSize = menuItemSizings.DropdownTextSize,
+			TextWrapped = true,
+			TextXAlignment = 0,
+			AutomaticSize = 0,
+			Size = 0,
+			BackgroundTransparency = 1
+		}
+		local textXAlignment
+
+		if props.isSmallPortraitViewport then
+			textXAlignment = Enum.TextXAlignment.Left
+		else
+			textXAlignment = Enum.TextXAlignment.Center
+		end
+
+		v.TextXAlignment = textXAlignment
+
+		v.AutomaticSize = Enum.AutomaticSize.Y
+		v.Size = UDim2.new(1, 0, 0, props.minHeight)
+		rightComponent = createElement("TextLabel", v)
+	end
 
 	return React.createElement(ReportMenuItem, {
-		label = p1.label,
-		layoutOrder = p1.layoutOrder,
-		rightComponent = v16,
-		menuContainerWidth = p1.menuContainerWidth,
-		isSmallPortraitViewport = p1.isSmallPortraitViewport
+		label = props.label,
+		layoutOrder = props.layoutOrder,
+		rightComponent = rightComponent,
+		menuContainerWidth = props.menuContainerWidth,
+		isSmallPortraitViewport = props.isSmallPortraitViewport
 	})
 end
 

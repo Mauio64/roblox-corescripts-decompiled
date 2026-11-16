@@ -1,149 +1,151 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
-local React = require(Parent.React)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
 local Enums = Foundation.Enums
 
-require(Parent.AvatarExperienceCommon)
-
+require(parent.AvatarExperienceCommon)
 local WearTimeOptionButton = require(script.Parent.WearTimeOptionButton)
-local AXTooltip = require(Parent.AvatarExperienceUIKit).AXTooltipComponents.AXTooltip
 
-local function WearTimeOptionsCarousel(t1: {[any]: any}) -- line: 27
-	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), WearTimeOptionButton (copy), View (copy), FoundationText (copy), Foundation (copy), Enums (copy), AXTooltip (copy)
-	local v13 = useTokens()
-	local v14 = useLocalization({
+local AvatarExperienceUIKit = require(parent.AvatarExperienceUIKit)
+local AXTooltip = AvatarExperienceUIKit.AXTooltipComponents.AXTooltip
+
+local function WearTimeOptionsCarousel(props)
+	local v = useTokens()
+
+	local v2 = useLocalization({
 		wearTimeOptions = "Feature.Durables.ItemDetails.WearTimeOptions.Title",
 		tooltipText = "Feature.Durables.FTUX.Tooltip"
 	})
-	local v15, v16 = React.useState(false)
 
-	React.useEffect(function() -- line: 36
-		-- upvalues: v16 (copy)
-		local thread = task.delay(5, function() -- line: 37
-			-- upvalues: v16 (copy)
-			v16(false)
+	local state, setState = React.useState(false)
+	React.useEffect(function()
+		local thread = task.delay(5, function()
+			setState(false)
 		end)
 
-		return function() -- line: 41
-			-- upvalues: thread (copy)
+		return function()
 			task.cancel(thread)
 		end
 	end, {})
 
-	local v17, v18 = React.useState(function() -- line: 46
-		-- upvalues: t1 (copy)
-		for v23, v24 in t1.options do
-			if v24.selected then
-				return v23
+	local state2, setState2 = React.useState(function()
+		for k, option in props.options do
+			if option.selected then
+				return k
 			end
 		end
 
 		return 1
 	end)
-	local v19 = React.useMemo(function() -- line: 57
-		-- upvalues: t1 (copy), React (copy), WearTimeOptionButton (copy), v17 (copy), v18 (copy)
-		local t2 = {}
 
-		for v26, v27 in t1.options do
-			t2[v26] = React.createElement(WearTimeOptionButton, {
+	local v3 = React.useMemo(function()
+		local children = {}
+
+		for k, option in props.options do
+			children[k] = React.createElement(WearTimeOptionButton, {
 				option = {
-					days = v27.days,
-					price = v27.price,
-					selected = v26 == v17
+					days = option.days,
+					price = option.price,
+					selected = k == state2
 				},
-				onActivated = function() -- line: 66
-					-- upvalues: v18 (copy), v26 (copy), t1 (copy)
-					v18(v26)
+				onActivated = function()
+					setState2(k)
 
-					if t1.onOptionActivated then
-						t1.onOptionActivated(v26)
+					if props.onOptionActivated then
+						props.onOptionActivated(k)
 					end
 				end,
-				LayoutOrder = v26
+				LayoutOrder = k
 			})
 		end
 
-		return t2
-	end, {
-		t1.options,
-		v17,
-		t1.onOptionActivated
+		return children
+	end, { props.options, state2, props.onOptionActivated })
+
+	local element = React.createElement(View, { tag = "row gap-medium align-y-center auto-xy" }, {
+		Options = React.createElement(React.Fragment, nil, v3)
 	})
-	local v20 = React.createElement(View, {
-		tag = "row gap-medium align-y-center auto-xy"
-	}, {
-		Options = React.createElement(React.Fragment, nil, v19)
-	})
-	local v21 = if not t1.useWrapping then React.createElement(View, {
-		tag = "size-full-0",
-		LayoutOrder = 2,
-		Size = UDim2.new(1, 0, 0, v13.Size.Size_1200)
-	}, {
-		ScrollingFrame = React.createElement("ScrollingFrame", {
-			ScrollBarThickness = 0,
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
-			ClipsDescendants = false,
-			Selectable = false,
-			Size = UDim2.new(1, 0, 1, 0),
-			CanvasSize = UDim2.new(0, 0, 0, v13.Size.Size_1200),
-			AutomaticCanvasSize = Enum.AutomaticSize.X,
-			ScrollingDirection = Enum.ScrollingDirection.X,
-			ElasticBehavior = Enum.ElasticBehavior.Always
-		}, v20)
-	}) else React.createElement(View, {
-		tag = "row wrap gap-medium align-y-center size-full-0 auto-y",
-		LayoutOrder = 2,
-		wrap = true
-	}, v19)
+	local carouselContainer
+
+	if props.useWrapping then
+		carouselContainer = React.createElement(
+			View,
+			{
+				tag = "row wrap gap-medium align-y-center size-full-0 auto-y",
+				LayoutOrder = 2,
+				wrap = true
+			},
+			v3
+		)
+	else
+		carouselContainer = React.createElement(
+			View,
+			{
+				tag = "size-full-0",
+				Size = UDim2.new(1, 0, 0, v.Size.Size_1200),
+				LayoutOrder = 2
+			},
+			{
+				ScrollingFrame = React.createElement("ScrollingFrame", {
+					Size = UDim2.new(1, 0, 1, 0),
+					CanvasSize = UDim2.new(0, 0, 0, v.Size.Size_1200),
+					AutomaticCanvasSize = Enum.AutomaticSize.X,
+					ScrollBarThickness = 0,
+					ScrollingDirection = Enum.ScrollingDirection.X,
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					ClipsDescendants = false,
+					ElasticBehavior = Enum.ElasticBehavior.Always,
+					Selectable = false
+				}, element)
+			}
+		)
+	end
 
 	return React.createElement(View, {
-		tag = "size-full-0 auto-y col gap-medium",
-		LayoutOrder = t1.LayoutOrder
+		LayoutOrder = props.LayoutOrder,
+		tag = "size-full-0 auto-y col gap-medium"
 	}, {
 		Heading = React.createElement(View, {
 			tag = "auto-xy row gap-xxsmall align-y-center",
 			LayoutOrder = 1
 		}, {
-			HeadingText = React.createElement(FoundationText, {
-				LayoutOrder = 1,
-				Text = v14.wearTimeOptions,
-				textStyle = v13.Color.Content.Emphasis,
+			HeadingText = React.createElement(Text, {
+				Text = v2.wearTimeOptions,
+				textStyle = v.Color.Content.Emphasis,
 				fontStyle = {
-					Font = v13.Typography.TitleLarge.Font,
-					FontSize = v13.FontSize.FontSize_500
+					Font = v.Typography.TitleLarge.Font,
+					FontSize = v.FontSize.FontSize_500
 				},
-				AutomaticSize = Enum.AutomaticSize.XY
+				AutomaticSize = Enum.AutomaticSize.XY,
+				LayoutOrder = 1
 			}),
-			InfoIconContainer = React.createElement(View, {
-				tag = "auto-xy",
-				LayoutOrder = 2
-			}, {
+			InfoIconContainer = React.createElement(View, { tag = "auto-xy", LayoutOrder = 2 }, {
 				InfoIcon = React.createElement(Foundation.IconButton, {
 					icon = Enums.IconName.CircleI,
 					size = Enums.IconSize.Small,
-					onActivated = function() -- line: 144
-						-- upvalues: v16 (copy)
-						v16(true)
+					onActivated = function()
+						setState(true)
 					end
 				}),
 				Tooltip = React.createElement(AXTooltip, {
+					isOpen = state,
 					popoverSide = "Top",
-					isOpen = v15,
-					tooltipText = v14.tooltipText,
-					maxWidth = v13.Size.Size_1200 * 3,
-					onTooltipActivated = function() -- line: 153
-						-- upvalues: v16 (copy)
-						v16(false)
+					tooltipText = v2.tooltipText,
+					maxWidth = v.Size.Size_1200 * 3,
+					onTooltipActivated = function()
+						setState(false)
 					end
 				})
 			})
 		}),
-		CarouselContainer = v21
+		CarouselContainer = carouselContainer
 	})
 end
 

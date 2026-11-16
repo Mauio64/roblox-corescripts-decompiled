@@ -1,23 +1,26 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local SignalsReact = require(ParentParentParent.SignalsReact)
-local Foundation = require(ParentParentParent.Foundation)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local SignalsReact = require(parent2.SignalsReact)
+local Foundation = require(parent2.Foundation)
+
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
-local PlayerListVisibilityStore = require(ParentParent.Common.PlayerListVisibilityStore)
-local PlayerContextualMenuStore = require(ParentParent.Common.PlayerContextualMenuStore)
-local t1 = {
-	affordance = StateLayerAffordance.None
-}
 
-local function LeaderboardScrimMobile() -- line: 18
-	-- upvalues: useTokens (copy), SignalsReact (copy), PlayerListVisibilityStore (copy), React (copy), PlayerContextualMenuStore (copy), View (copy), t1 (copy)
-	local v14 = useTokens()
-	local v15 = SignalsReact.useSignalBinding(PlayerListVisibilityStore.getEffectiveVisible)
-	local v16 = React.useCallback(function() -- line: 22
-		-- upvalues: PlayerContextualMenuStore (copy), PlayerListVisibilityStore (copy)
+local PlayerListVisibilityStore = require(parent.Common.PlayerListVisibilityStore)
+local PlayerContextualMenuStore = require(parent.Common.PlayerContextualMenuStore)
+
+local Constants = require(parent.Common.Constants)
+
+local stateLayer = { affordance = StateLayerAffordance.None }
+
+local function LeaderboardScrimMobile()
+	local v = useTokens()
+	local visible = SignalsReact.useSignalBinding(PlayerListVisibilityStore.getEffectiveVisible)
+
+	local onActivated = React.useCallback(function()
 		PlayerContextualMenuStore.closeContextMenu()
 		PlayerListVisibilityStore.setVisible(false)
 	end, {})
@@ -25,19 +28,20 @@ local function LeaderboardScrimMobile() -- line: 18
 	return React.createElement(View, {
 		tag = "size-full",
 		ZIndex = 0,
-		backgroundStyle = v14.Color.Common.Scrim,
-		Visible = v15,
-		onActivated = v16,
-		stateLayer = t1
+		backgroundStyle = v.Color.Common.Scrim,
+		Visible = visible,
+		onActivated = onActivated,
+		stateLayer = stateLayer,
+		selection = Constants.NOT_SELECTABLE
 	})
 end
-local function LeaderboardScrim(t2: {[any]: any}) -- line: 38
-	-- upvalues: React (copy), LeaderboardScrimMobile (copy)
-	if not t2.isSmallTouchDevice then
-		return nil
+
+local function LeaderboardScrim(p)
+	if p.isSmallTouchDevice then
+		return React.createElement(LeaderboardScrimMobile)
 	end
 
-	return React.createElement(LeaderboardScrimMobile)
+	return nil
 end
 
 return React.memo(LeaderboardScrim)

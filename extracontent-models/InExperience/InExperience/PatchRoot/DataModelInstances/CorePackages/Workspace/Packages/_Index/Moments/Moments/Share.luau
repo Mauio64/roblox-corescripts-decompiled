@@ -1,9 +1,5 @@
-local fetchShareLink = require(script.fetchShareLink)
-local useShareMoment = require(script.useShareMoment)
-local shareMoment = require(script.shareMoment)
-
 return {
-	fetchShareLink = fetchShareLink,
-	useShareMoment = useShareMoment,
-	shareMoment = shareMoment
+	fetchShareLink = require(script.fetchShareLink),
+	useShareMoment = require(script.useShareMoment),
+	shareMoment = require(script.shareMoment)
 }

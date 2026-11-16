@@ -1,59 +1,53 @@
 local MediaGallery = script:FindFirstAncestor("MediaGallery")
-local MediaGalleryParent = MediaGallery.Parent
-local React = require(MediaGalleryParent.React)
+local parent = MediaGallery.Parent
+
+local React = require(parent.React)
+
 local MediaGalleryConstants = require(MediaGallery.MediaGalleryConstants)
 local useGuiObjectVisibility = require(MediaGallery.Hooks.useGuiObjectVisibility)
 
-local function useAutoAdvance(t1: {[any]: any}) -- line: 39
-	-- upvalues: MediaGalleryConstants (copy), React (copy), useGuiObjectVisibility (copy)
-	local v8 = t1.intervalSeconds or MediaGalleryConstants.AUTO_ADVANCE_DURATION_SECONDS
-	local v9, v10 = React.useBinding(0)
-	local v11, v12 = React.useBinding(0)
-	local v13 = React.useCallback(function() -- line: 45
-		-- upvalues: v10 (copy), v12 (copy)
-		v10(0)
-		v12(0)
+local function useAutoAdvance(data)
+	local intervalSeconds = data.intervalSeconds or MediaGalleryConstants.AUTO_ADVANCE_DURATION_SECONDS
+
+	local elapsedTimeBinding, v = React.useBinding(0)
+	local progressBinding, onVideoProgressChanged = React.useBinding(0)
+
+	local resetProgress = React.useCallback(function()
+		v(0)
+		onVideoProgressChanged(0)
 	end, {})
-	local v14 = React.useCallback(function() -- line: 50
-		-- upvalues: t1 (copy)
-		if not t1.enabled then
+
+	local onVideoEnded = React.useCallback(function()
+		if not data.enabled then
 			return
 		end
 
-		t1.scrollRight()
-	end, {
-		t1.enabled,
-		t1.scrollRight
-	})
-	local v15 = React.useCallback(function(n1: number) -- line: 57
-		-- upvalues: v9 (copy), v8 (copy), v10 (copy), v12 (copy), t1 (copy)
-		local v18 = v9:getValue() + n1
+		data.scrollRight()
+	end, { data.enabled, data.scrollRight })
 
-		if v18 >= v8 then
-			v10(0)
-			v12(0)
-			t1.scrollRight()
+	local v2 = React.useCallback(function(p: number)
+		local v2 = elapsedTimeBinding:getValue() + p
 
-			return
+		if intervalSeconds <= v2 then
+			v(0)
+			onVideoProgressChanged(0)
+			data.scrollRight()
+		else
+			v(v2)
+			onVideoProgressChanged(v2 / intervalSeconds)
 		end
+	end, { elapsedTimeBinding, data.scrollRight, intervalSeconds })
 
-		v10(v18)
-		v12(v18 / v8)
-	end, {
-		v9,
-		t1.scrollRight,
-		v8
-	})
-	local v16 = t1.enabled and (not t1.isMediaGalleryOccluded and not t1.isAutoAdvanceTimerSuspended)
+	local v3 = data.enabled and not (data.isMediaGalleryOccluded or data.isAutoAdvanceTimerSuspended)
 
-	useGuiObjectVisibility(t1.galleryRef, v16, v15, v13)
+	useGuiObjectVisibility(data.galleryRef, v3, v2, resetProgress)
 
 	return {
-		elapsedTimeBinding = v9,
-		progressBinding = v11,
-		resetProgress = v13,
-		onVideoEnded = v14,
-		onVideoProgressChanged = v12
+		elapsedTimeBinding = elapsedTimeBinding,
+		progressBinding = progressBinding,
+		resetProgress = resetProgress,
+		onVideoEnded = onVideoEnded,
+		onVideoProgressChanged = onVideoProgressChanged
 	}
 end
 

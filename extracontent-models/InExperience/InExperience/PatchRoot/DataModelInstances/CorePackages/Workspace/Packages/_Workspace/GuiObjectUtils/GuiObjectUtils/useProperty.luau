@@ -1,63 +1,47 @@
-local Parent = script:FindFirstAncestor("GuiObjectUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GuiObjectUtils").Parent
 
-local function getRefValue(p1) -- line: 10
-	if typeof(p1) == "table" then
-		return p1.current
-	end
+local React = require(parent.React)
 
-	return p1
+local function getRefValue(p) -- 3 equivalent calls inferred from this helper
+	return if typeof(p) == "table" then p.current else p
 end
-local function useProperty(p2, s1: string) -- line: 47
-	-- upvalues: React (copy)
-	local v8 = if typeof(p2) ~= "table" then p2 else p2.current
-	local v9, v10 = React.useState(function() -- line: 50
-		-- upvalues: v8 (copy), s1 (copy)
-		if v8 then
-			return v8[s1]
+
+local function useProperty(p, propertyName: string)
+	local refValue = getRefValue(p) -- inferred equivalent call
+	local state, setState = React.useState(function()
+		if refValue then
+			return refValue[propertyName]
 		end
 
 		return nil
 	end)
-	local v11 = React.useCallback(function() -- line: 55
-		-- upvalues: p2 (copy), s1 (copy), v10 (copy)
-		local v12 = p2
-		local v13 = if typeof(v12) ~= "table" then v12 else v12.current
 
-		if v13 then
-			local v14 = v13[s1]
+	local v = React.useCallback(function()
+		local refValue2 = getRefValue(p) -- inferred equivalent call
 
-			v10(v14)
+		if refValue2 then
+			setState(refValue2[propertyName])
 		end
-	end, {
-		p2,
-		s1
-	})
+	end, { p, propertyName })
 
-	React.useEffect(function() -- line: 66
-		-- upvalues: p2 (copy), s1 (copy), v11 (copy)
+	React.useEffect(function()
 		local connection = nil
-		local v16 = p2
-		local v17 = if typeof(v16) ~= "table" then v16 else v16.current
+		local refValue2 = getRefValue(p) -- inferred equivalent call
 
-		if v17 then
-			connection = v17:GetPropertyChangedSignal(s1):Connect(v11)
-			v11()
+		if refValue2 then
+			connection = refValue2:GetPropertyChangedSignal(propertyName):Connect(v)
+
+			v()
 		end
 
-		return function() -- line: 76
-			-- upvalues: connection (ref)
+		return function()
 			if connection then
 				connection:Disconnect()
 			end
 		end
-	end, {
-		v8,
-		s1,
-		v11
-	})
+	end, { refValue, propertyName, v })
 
-	return v9
+	return state
 end
 
 return useProperty

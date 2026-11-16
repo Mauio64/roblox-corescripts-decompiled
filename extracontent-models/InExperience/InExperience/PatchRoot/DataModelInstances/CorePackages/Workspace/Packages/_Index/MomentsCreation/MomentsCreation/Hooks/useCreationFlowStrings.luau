@@ -1,10 +1,13 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local useLocalization = require(MomentsCreationParent.Localization).Hooks.useLocalization
+local parent = MomentsCreation.Parent
+
+local Localization = require(parent.Localization)
+
+local useLocalization = Localization.Hooks.useLocalization
+
 local creationFlowStrings = require(MomentsCreation.creationFlowStrings)
 
-local function useCreationFlowStrings() -- line: 10
-	-- upvalues: useLocalization (copy), creationFlowStrings (copy)
+local function useCreationFlowStrings()
 	return useLocalization(creationFlowStrings)
 end
 

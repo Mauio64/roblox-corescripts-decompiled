@@ -1,29 +1,32 @@
 local UserProfiles = script:FindFirstAncestor("UserProfiles")
-local UserProfilesParent = UserProfiles.Parent
-local Signals = require(UserProfilesParent.Signals)
-local FFlagEnableBlackbirdCheck = require(UserProfilesParent.SharedFlags).FFlagEnableBlackbirdCheck
+local parent = UserProfiles.Parent
+
+local Signals = require(parent.Signals)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+
 local UserProfileStore = require(UserProfiles.Stores.UserProfileStore)
+
 local createComputed = Signals.createComputed
 
-local function createIsRobloxSubscriberGetter(s1: string?) -- line: 14
-	-- upvalues: FFlagEnableBlackbirdCheck (copy), createComputed (copy), UserProfileStore (copy)
-	if not FFlagEnableBlackbirdCheck or (s1 == nil or s1 == "") then
-		return createComputed(function() -- line: 16
+local function createIsRobloxSubscriberGetter(p: string?)
+	if not FFlagEnableBlackbirdCheck or p == nil or p == "" then
+		return createComputed(function(): boolean
 			return false
 		end)
 	end
 
-	local v9 = UserProfileStore.get().fetchNamesByUserIds({ s1 })
+	local namesByUserIds = UserProfileStore.get().fetchNamesByUserIds({ p })
 
-	return createComputed(function(p1) -- line: 24
-		-- upvalues: v9 (copy)
-		local ok, result = pcall(v9, p1)
+	return createComputed(function(p2)
+		local success, result = pcall(namesByUserIds, p2)
 
-		if ok and (result.status == "success" and #result.data > 0) then
-			local v13 = result.data[1]
+		if success and result.status == "success" and #result.data > 0 then
+			local v = result.data[1]
 
-			if v13.getHasRobloxSubscription ~= nil then
-				return v13.getHasRobloxSubscription(p1)
+			if v.getHasRobloxSubscription ~= nil then
+				return v.getHasRobloxSubscription(p2)
 			end
 		end
 

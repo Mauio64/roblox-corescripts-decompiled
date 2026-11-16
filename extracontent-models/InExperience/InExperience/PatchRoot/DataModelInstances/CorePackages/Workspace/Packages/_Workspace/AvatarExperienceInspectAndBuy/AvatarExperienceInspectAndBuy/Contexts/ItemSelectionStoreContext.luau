@@ -1,31 +1,27 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-local React = require(AvatarExperienceInspectAndBuyParent.React)
+local parent = AvatarExperienceInspectAndBuy.Parent
+local React = require(parent.React)
 local createItemSelectionStore = require(AvatarExperienceInspectAndBuy.Stores.createItemSelectionStore)
-local v5 = React.createContext(nil)
 
-local function ItemSelectionStoreProvider(t1: {[any]: any}) -- line: 20
-	-- upvalues: React (copy), createItemSelectionStore (copy), v5 (copy)
-	local v8 = React.useMemo(function() -- line: 22
-		-- upvalues: createItemSelectionStore (copy)
+local context = React.createContext(nil)
+
+local function ItemSelectionStoreProvider(p)
+	local v = React.useMemo(function()
 		return createItemSelectionStore()
 	end, {})
 
-	return React.createElement(v5.Provider, {
-		value = v8
-	}, t1.children)
+	return React.createElement(context.Provider, { value = v }, p.children)
 end
 
 return {
 	Provider = ItemSelectionStoreProvider,
-	useItemSelectionStore = function() -- line: 29
-		-- upvalues: React (copy), v5 (copy)
-		local v9 = React.useContext(v5)
+	useItemSelectionStore = function()
+		local v = React.useContext(context)
 
-		if not v9 then
+		if not v then
 			error("useItemSelectionStore must be used within an ItemSelectionStoreProvider")
 		end
 
-		return v9
+		return v
 	end
 }

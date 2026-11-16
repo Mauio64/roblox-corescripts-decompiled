@@ -1,13 +1,12 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local Constants = require(Parent.UserLib).Utils.Constants
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 
-local function getRbxThumbType(s1: string) -- line: 7
-	-- upvalues: Constants (copy)
-	if s1 == "Bundle" then
+local UserLib = require(parent.UserLib)
+local Constants = UserLib.Utils.Constants
+
+local function getRbxThumbType(p: string)
+	if p == "Bundle" then
 		return Constants.RbxthumbTypes.BundleThumbnail
-	end
-
-	if s1 == "Asset" then
+	elseif p == "Asset" then
 		return Constants.RbxthumbTypes.Asset
 	end
 

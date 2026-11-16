@@ -1,4 +1,1 @@
-return {
-	CloseCustomizeName = "closeCustomizeName",
-	SaveAlias = "saveAlias"
-}
+return { CloseCustomizeName = "closeCustomizeName", SaveAlias = "saveAlias" }

@@ -1,184 +1,165 @@
-local ParentParent = script.Parent.Parent
-local GetFFlagTextChatEnableUniverseChatTabs = require(ParentParent.ExpChatShared).Flags.GetFFlagTextChatEnableUniverseChatTabs
-local getFFlagExpChatProtectedChatInternalAPIs = require(ParentParent.SharedFlags).getFFlagExpChatProtectedChatInternalAPIs
+local parent = script.Parent.Parent
+local ExpChatShared = require(parent.ExpChatShared)
+local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
+local SharedFlags = require(parent.SharedFlags)
+local getFFlagExpChatProtectedChatInternalAPIs = SharedFlags.getFFlagExpChatProtectedChatInternalAPIs
 
-local function startDebug() -- line: 6
-	-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
+local function startDebug()
 	local CoreGui = game:GetService("CoreGui")
 	local TextChatService = game:GetService("TextChatService")
-	local EngineFeature = game:GetEngineFeature("ExpChatDebuggerIncomingMessageEvent")
-	local v8 = game:DefineFastFlag("ExpChatDebugGlobalChat", false)
-	local ScreenGui = Instance.new("ScreenGui")
+	local engineFeature = game:GetEngineFeature("ExpChatDebuggerIncomingMessageEvent")
+	local defineFastFlag = game:DefineFastFlag("ExpChatDebugGlobalChat", false)
 
-	ScreenGui.Name = "ExperienceChatDebug"
-	ScreenGui.ResetOnSpawn = false
-	ScreenGui.DisplayOrder = -1
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	local experienceChatDebug = Instance.new("ScreenGui")
+	experienceChatDebug.Name = "ExperienceChatDebug"
+	experienceChatDebug.ResetOnSpawn = false
+	experienceChatDebug.DisplayOrder = -1
+	experienceChatDebug.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-	local n1 = 7
-	local t1 = {
-		{
-			vertical = Enum.VerticalAlignment.Top,
-			horizontal = Enum.HorizontalAlignment.Left
-		},
-		{
-			vertical = Enum.VerticalAlignment.Top,
-			horizontal = Enum.HorizontalAlignment.Center
-		},
-		{
-			vertical = Enum.VerticalAlignment.Top,
-			horizontal = Enum.HorizontalAlignment.Right
-		},
-		{
-			vertical = Enum.VerticalAlignment.Center,
-			horizontal = Enum.HorizontalAlignment.Left
-		},
-		{
-			vertical = Enum.VerticalAlignment.Center,
-			horizontal = Enum.HorizontalAlignment.Center
-		},
-		{
-			vertical = Enum.VerticalAlignment.Center,
-			horizontal = Enum.HorizontalAlignment.Right
-		},
-		{
-			vertical = Enum.VerticalAlignment.Bottom,
-			horizontal = Enum.HorizontalAlignment.Left
-		},
-		{
-			vertical = Enum.VerticalAlignment.Bottom,
-			horizontal = Enum.HorizontalAlignment.Center
-		},
-		{
-			vertical = Enum.VerticalAlignment.Bottom,
-			horizontal = Enum.HorizontalAlignment.Right
-		}
+	local v = 7
+	local v2 = {
+		{ vertical = Enum.VerticalAlignment.Top, horizontal = Enum.HorizontalAlignment.Left },
+		{ vertical = Enum.VerticalAlignment.Top, horizontal = Enum.HorizontalAlignment.Center },
+		{ vertical = Enum.VerticalAlignment.Top, horizontal = Enum.HorizontalAlignment.Right },
+		{ vertical = Enum.VerticalAlignment.Center, horizontal = Enum.HorizontalAlignment.Left },
+		{ vertical = Enum.VerticalAlignment.Center, horizontal = Enum.HorizontalAlignment.Center },
+		{ vertical = Enum.VerticalAlignment.Center, horizontal = Enum.HorizontalAlignment.Right },
+		{ vertical = Enum.VerticalAlignment.Bottom, horizontal = Enum.HorizontalAlignment.Left },
+		{ vertical = Enum.VerticalAlignment.Bottom, horizontal = Enum.HorizontalAlignment.Center },
+		{ vertical = Enum.VerticalAlignment.Bottom, horizontal = Enum.HorizontalAlignment.Right }
 	}
-	local t2 = {}
-	local UIListLayout = Instance.new("UIListLayout")
 
-	UIListLayout.Parent = ScreenGui
+	local v3 = {}
 
-	local function updateContainerLayout() -- line: 36
-		-- upvalues: t1 (copy), n1 (ref), UIListLayout (copy)
-		local v23 = t1[n1]
+	local uiListLayout = Instance.new("UIListLayout")
+	uiListLayout.Parent = experienceChatDebug
 
-		UIListLayout.VerticalAlignment = v23.vertical
-		UIListLayout.HorizontalAlignment = v23.horizontal
+	local function updateContainerLayout() -- 2 equivalent calls inferred from this helper
+		local v4 = v2[v]
+		uiListLayout.VerticalAlignment = v4.vertical
+		uiListLayout.HorizontalAlignment = v4.horizontal
 	end
 
-	local v15 = t1[n1]
+	updateContainerLayout() -- inferred equivalent call
+	local imageButton = Instance.new("ImageButton")
+	imageButton.AutomaticSize = Enum.AutomaticSize.XY
+	imageButton.Size = UDim2.new(0, 200, 0, 20)
+	imageButton.BackgroundTransparency = 0.3
+	imageButton.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+	imageButton.Parent = experienceChatDebug
 
-	UIListLayout.VerticalAlignment = v15.vertical
-	UIListLayout.HorizontalAlignment = v15.horizontal
+	imageButton.Activated:Connect(function()
+		v += 1
 
-	local ImageButton = Instance.new("ImageButton")
-
-	ImageButton.AutomaticSize = Enum.AutomaticSize.XY
-	ImageButton.Size = UDim2.new(0, 200, 0, 20)
-	ImageButton.BackgroundTransparency = 0.3
-	ImageButton.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
-	ImageButton.Parent = ScreenGui
-	ImageButton.Activated:Connect(function() -- line: 50
-		-- upvalues: n1 (ref), t1 (copy), UIListLayout (copy)
-		n1 += 1
-
-		if n1 > #t1 then
-			n1 = 1
+		if v > #v2 then
+			v = 1
 		end
 
-		local v24 = t1[n1]
-
-		UIListLayout.VerticalAlignment = v24.vertical
-		UIListLayout.HorizontalAlignment = v24.horizontal
+		updateContainerLayout() -- inferred equivalent call
 	end)
 
-	local function clearEntries() -- line: 59
-		-- upvalues: t2 (ref)
-		for _, v26 in t2 do
-			v26:Destroy()
+	local function clearEntries()
+		for _, v4 in v3 do
+			v4:Destroy()
 		end
 
-		t2 = {}
+		v3 = {}
 	end
+	imageButton.MouseButton2Click:Connect(clearEntries)
+	imageButton.TouchLongPress:Connect(clearEntries)
 
-	ImageButton.MouseButton2Click:Connect(clearEntries)
-	ImageButton.TouchLongPress:Connect(clearEntries)
+	local uiListLayout2 = Instance.new("UIListLayout")
+	uiListLayout2.VerticalAlignment = Enum.VerticalAlignment.Bottom
+	uiListLayout2.Parent = imageButton
 
-	local UIListLayout2 = Instance.new("UIListLayout")
+	local function addEntryToContainer(text, color, backgroundTransparency)
+		local v4 = #v3 > 10 and table.remove(v3, 1)
 
-	UIListLayout2.VerticalAlignment = Enum.VerticalAlignment.Bottom
-	UIListLayout2.Parent = ImageButton
-
-	local function addEntryToContainer(p1, p2, p3) -- line: 72
-		-- upvalues: t2 (ref), ImageButton (copy)
-		if #t2 > 10 then
-			local v30 = table.remove(t2, 1)
-
-			if v30 then
-				v30:Destroy()
-			end
+		if v4 then
+			v4:Destroy()
 		end
 
-		local TextLabel = Instance.new("TextLabel")
+		local textLabel = Instance.new("TextLabel")
+		textLabel.AutomaticSize = Enum.AutomaticSize.X
+		textLabel.BackgroundTransparency = backgroundTransparency
+		textLabel.BackgroundColor3 = color
+		textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		textLabel.Text = text
+		textLabel.RichText = true
+		textLabel.TextTruncate = Enum.TextTruncate.AtEnd
+		textLabel.TextYAlignment = Enum.TextYAlignment.Top
+		textLabel.TextXAlignment = Enum.TextXAlignment.Left
+		textLabel.TextSize = 16
+		textLabel.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+		textLabel.Size = UDim2.new(0, 0, 0, 18)
+		textLabel.Parent = imageButton
 
-		TextLabel.AutomaticSize = Enum.AutomaticSize.X
-		TextLabel.BackgroundTransparency = p3
-		TextLabel.BackgroundColor3 = p2
-		TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TextLabel.Text = p1
-		TextLabel.RichText = true
-		TextLabel.TextTruncate = Enum.TextTruncate.AtEnd
-		TextLabel.TextYAlignment = Enum.TextYAlignment.Top
-		TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-		TextLabel.TextSize = 16
-		TextLabel.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
-		TextLabel.Size = UDim2.new(0, 0, 0, 18)
-		TextLabel.Parent = ImageButton
-		table.insert(t2, TextLabel)
+		table.insert(v3, textLabel)
 	end
 
-	local v20 = utf8.char(128227)
-	local v21 = utf8.char(128229)
+	local v4 = utf8.char(128227)
+	local v5 = utf8.char(128229)
 
-	local function formatEntry(p4, s1: string) -- line: 102
-		-- upvalues: v20 (copy), v21 (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), addEntryToContainer (copy)
-		local v34 = if p4.Status ~= Enum.TextChatMessageStatus.Sending then `{ v21 } Rec.` else `{ v20 } Sent`
-		local v35 = if s1 ~= "Global" then (not p4.TextChannel or s1 ~= "Local") and "Unknown" or p4.TextChannel.Name else "RBXGlobal"
-		local v36 = p4.Status ~= Enum.TextChatMessageStatus.Success and p4.Status ~= Enum.TextChatMessageStatus.Sending
-		local v37 = not v36 and "" or `({ p4.Status.Name })`
-		local v38 = if not v36 then Color3.fromRGB(32, 32, 32) else Color3.fromRGB(255, 0, 0)
-		local v39 = not v36 and 1 or 0.5
-		local v40 = (not p4.TextChannel or not p4.TextChannel.DirectChatRequester) and "" or " <font color='#00E344'>(Direct)</font>"
-		local v41 = if not getFFlagExpChatProtectedChatInternalAPIs() then p4.Text else p4.TextInternal
+	local function formatEntry(data, p: string)
+		local v6
 
-		addEntryToContainer(`{ v34 } [{ v35 }{ v40 }] { v41 } { v37 }`, v38, v39)
+		if data.Status == Enum.TextChatMessageStatus.Sending then
+			v6 = `{v4} Sent`
+		else
+			v6 = `{v5} Rec.`
+		end
+
+		local v7 = p == "Global" and "RBXGlobal"
+			or (not data.TextChannel or p ~= "Local") and "Unknown"
+			or data.TextChannel.Name
+
+		local v8 = data.Status ~= Enum.TextChatMessageStatus.Success
+			and data.Status ~= Enum.TextChatMessageStatus.Sending
+
+		local v9 = not v8 and "" or `({data.Status.Name})`
+		local color
+
+		if v8 then
+			color = Color3.fromRGB(255, 0, 0)
+		else
+			color = Color3.fromRGB(32, 32, 32)
+		end
+
+		local v10 = data.TextChannel
+			and data.TextChannel.DirectChatRequester
+			and " <font color='#00E344'>(Direct)</font>"
+			or ""
+		local v11
+
+		if getFFlagExpChatProtectedChatInternalAPIs() then
+			v11 = data.TextInternal
+		else
+			v11 = data.Text
+		end
+
+		addEntryToContainer(`{v6} [{v7}{v10}] {v11} {v9}`, color, v8 and 0.5 or 1)
 	end
 
-	if EngineFeature then
-		TextChatService.OnIncomingMessageEvent:Connect(function(p5) -- line: 135
-			-- upvalues: formatEntry (copy)
-			formatEntry(p5, "Local")
+	if engineFeature then
+		TextChatService.OnIncomingMessageEvent:Connect(function(p)
+			formatEntry(p, "Local")
 		end)
 	else
-		TextChatService.MessageReceived:Connect(function(p6) -- line: 139
-			-- upvalues: formatEntry (copy)
-			formatEntry(p6, "Local")
+		TextChatService.MessageReceived:Connect(function(p)
+			formatEntry(p, "Local")
 		end)
-		TextChatService.SendingMessage:Connect(function(message) -- line: 142
-			-- upvalues: formatEntry (copy)
-			formatEntry(message, "Local")
+		TextChatService.SendingMessage:Connect(function(p)
+			formatEntry(p, "Local")
 		end)
 	end
 
-	if GetFFlagTextChatEnableUniverseChatTabs() and v8 then
-		TextChatService.UniverseChatMessageReceived:Connect(function(p7) -- line: 148
-			-- upvalues: formatEntry (copy)
-			formatEntry(p7, "Global")
+	if GetFFlagTextChatEnableUniverseChatTabs() and defineFastFlag then
+		TextChatService.UniverseChatMessageReceived:Connect(function(p)
+			formatEntry(p, "Global")
 		end)
 	end
 
-	ScreenGui.Parent = CoreGui
+	experienceChatDebug.Parent = CoreGui
 end
 
 return startDebug

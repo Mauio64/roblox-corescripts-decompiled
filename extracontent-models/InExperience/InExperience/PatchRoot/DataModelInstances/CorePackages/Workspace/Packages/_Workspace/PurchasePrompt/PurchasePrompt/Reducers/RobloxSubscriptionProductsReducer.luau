@@ -1,10 +1,13 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local parent = PurchasePrompt.Parent
+
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local Rodux = PurchasePromptDeps.Rodux
+
 local SetRobloxSubscriptionProducts = require(PurchasePrompt.Actions.SetRobloxSubscriptionProducts)
 
 return (Rodux.createReducer(nil, {
-	[SetRobloxSubscriptionProducts.name] = function(_, p2) -- line: 10
-		return p2.robloxSubscriptionProducts
+	[SetRobloxSubscriptionProducts.name] = function(_, p)
+		return p.robloxSubscriptionProducts
 	end
 }))

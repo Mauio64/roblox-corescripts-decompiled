@@ -1,10 +1,14 @@
-local t1 = {}
-local CorePackages = game:GetService("CorePackages")
-local v3 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local EmoteHelper = {}
 
-t1.EMOTE_LOOP_TRANSITION_WAIT_TIME = 0.3
-t1.EMOTE_LOOP_WAIT_TIMEOUT = 5
-t1.LegacyDefaultEmotes = {
+local CorePackages = game:GetService("CorePackages")
+
+local CoreScriptsInitializer = require(CorePackages.Workspace.Packages.CoreScriptsInitializer)
+local v = CoreScriptsInitializer.CoreLogger:new(script.Name)
+
+EmoteHelper.EMOTE_LOOP_TRANSITION_WAIT_TIME = 0.3
+EmoteHelper.EMOTE_LOOP_WAIT_TIMEOUT = 5
+
+EmoteHelper.LegacyDefaultEmotes = {
 	wave = true,
 	point = true,
 	dance = true,
@@ -14,132 +18,116 @@ t1.LegacyDefaultEmotes = {
 	cheer = true
 }
 
-local function clearConnection(p1) -- line: 21
-	if p1 then
-		p1:Disconnect()
+local function clearConnection(connection) -- 2 equivalent calls inferred from this helper
+	if connection then
+		connection:Disconnect()
 	end
 end
 
-function t1.getAnyActiveDefaultChatTriggeredEmoteTrack(p2) -- line: 30
-	-- upvalues: t1 (copy)
-	if not p2.Character then
+function EmoteHelper.getAnyActiveDefaultChatTriggeredEmoteTrack(player)
+	if not player.Character then
 		return nil
 	end
 
-	local Humanoid = p2.Character:FindFirstChildOfClass("Humanoid")
+	local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 
-	if not Humanoid then
+	if not humanoid then
 		return nil
 	end
 
-	local Animator = Humanoid:FindFirstChildOfClass("Animator")
+	local animator = humanoid:FindFirstChildOfClass("Animator")
 
-	if not Animator then
+	if not animator then
 		return nil
 	end
 
-	local PlayingAnimationTracks = Animator:GetPlayingAnimationTracks()
+	local playingAnimationTracks = animator:GetPlayingAnimationTracks()
 
-	for _, v in pairs(PlayingAnimationTracks) do
-		if not v.Animation or not v.Animation.Parent or not v:IsA("AnimationTrack") then
+	for _, animationTrack in pairs(playingAnimationTracks) do
+		if not (animationTrack.Animation and animationTrack.Animation.Parent and animationTrack:IsA("AnimationTrack")) then
 			continue
 		end
 
-		local ParentName = v.Animation.Parent.Name
+		local name = animationTrack.Animation.Parent.Name
 
-		if t1.LegacyDefaultEmotes[ParentName] and v.IsPlaying then
-			return v
+		if EmoteHelper.LegacyDefaultEmotes[name] and animationTrack.IsPlaying then
+			return animationTrack
 		end
 	end
 
 	return nil
 end
 
-local function waitForEmoteEventInternal(p3, p4, p5, p6) -- line: 63
-	-- upvalues: v3 (copy), t1 (copy), waitForEmoteEventInternal (copy)
-	local BindableEvent = Instance.new("BindableEvent")
-	local elapsed = os.clock()
-	local u20 = true
-	local connection = p4.Stopped:Connect(function() -- line: 80
-		-- upvalues: v3 (copy), u20 (ref), BindableEvent (copy)
-		v3:trace("EmoteHelper.waitForEmoteEventInternal: Stopped")
+local function waitForEmoteEventInternal(p, anyActiveDefaultChatTriggeredEmoteTrack, p2, callback)
+	local bindableEvent = Instance.new("BindableEvent")
 
-		if u20 and BindableEvent then
-			u20 = false
-			BindableEvent:Fire()
+	local lastTime = os.clock()
+	local flag = true
+
+	local function fn() -- 3 equivalent calls inferred from this helper
+		if flag and bindableEvent then
+			flag = false
+			bindableEvent:Fire()
 		end
+	end
+
+	local stoppedConnection = anyActiveDefaultChatTriggeredEmoteTrack.Stopped:Connect(function()
+		v:trace("EmoteHelper.waitForEmoteEventInternal: Stopped")
+		fn() -- inferred equivalent call
 	end)
-	local connection2 = p4.KeyframeReached:Connect(function(keyframe) -- line: 90
-		-- upvalues: p4 (copy), p5 (copy), v3 (copy), u20 (ref), BindableEvent (copy), elapsed (ref)
-		if keyframe == "End" and (not p4.Looped or p5) then
-			v3:trace("EmoteHelper.waitForEmoteEventInternal: KeyframeReached")
 
-			if u20 and BindableEvent then
-				u20 = false
-				BindableEvent:Fire()
-
-				return
-			end
+	local keyframeReachedConnection = anyActiveDefaultChatTriggeredEmoteTrack.KeyframeReached:Connect(function(p3)
+		if p3 == "End" and (not anyActiveDefaultChatTriggeredEmoteTrack.Looped or p2) then
+			v:trace("EmoteHelper.waitForEmoteEventInternal: KeyframeReached")
+			fn() -- inferred equivalent call
 		else
-			elapsed = os.clock()
+			lastTime = os.clock()
 		end
 	end)
 
-	task.spawn(function() -- line: 101
-		-- upvalues: elapsed (ref), u20 (ref), t1 (copy), v3 (copy), BindableEvent (copy)
-		local v29 = os.clock() - elapsed
+	task.spawn(function()
+		local v2 = os.clock() - lastTime
 
-		while u20 and v29 < t1.EMOTE_LOOP_WAIT_TIMEOUT do
-			wait(t1.EMOTE_LOOP_WAIT_TIMEOUT - v29)
-			v29 = os.clock() - elapsed
+		while flag and v2 < EmoteHelper.EMOTE_LOOP_WAIT_TIMEOUT do
+			wait(EmoteHelper.EMOTE_LOOP_WAIT_TIMEOUT - v2)
+
+			v2 = os.clock() - lastTime
 		end
 
-		if u20 then
-			v3:trace("EmoteHelper.waitForEmoteEventInternal: Timeout!")
-
-			if u20 and BindableEvent then
-				u20 = false
-				BindableEvent:Fire()
-			end
+		if flag then
+			v:trace("EmoteHelper.waitForEmoteEventInternal: Timeout!")
+			fn() -- inferred equivalent call
 		end
 	end)
-	BindableEvent.Event:Wait()
-	BindableEvent:Destroy()
 
-	if connection then
-		connection:Disconnect()
-	end
+	bindableEvent.Event:Wait()
+	bindableEvent:Destroy()
+	clearConnection(stoppedConnection) -- inferred equivalent call
+	clearConnection(keyframeReachedConnection) -- inferred equivalent call
 
-	if connection2 then
-		connection2:Disconnect()
-	end
+	if p2 then
+		wait(EmoteHelper.EMOTE_LOOP_TRANSITION_WAIT_TIME)
+		local anyActiveDefaultChatTriggeredEmoteTrack2 = EmoteHelper.getAnyActiveDefaultChatTriggeredEmoteTrack(p)
 
-	if p5 then
-		wait(t1.EMOTE_LOOP_TRANSITION_WAIT_TIME)
-
-		local v23 = t1.getAnyActiveDefaultChatTriggeredEmoteTrack(p3)
-
-		if v23 then
-			waitForEmoteEventInternal(p3, v23, p5, p6)
-		elseif p6 then
-			p6()
+		if anyActiveDefaultChatTriggeredEmoteTrack2 then
+			waitForEmoteEventInternal(p, anyActiveDefaultChatTriggeredEmoteTrack2, p2, callback)
+		elseif callback then
+			callback()
 		end
-	elseif p6 then
-		p6()
+	elseif callback then
+		callback()
 	end
 end
 
-function t1.createEmoteFinishEvent(p7, p8, p9) -- line: 139
-	-- upvalues: waitForEmoteEventInternal (copy)
-	local BindableEvent = Instance.new("BindableEvent")
+function EmoteHelper.createEmoteFinishEvent(p, p2, p3)
+	local bindableEvent = Instance.new("BindableEvent")
 
-	task.spawn(waitForEmoteEventInternal, p7, p8, p9, function() -- line: 144
-		-- upvalues: BindableEvent (copy)
-		BindableEvent:Fire()
-		BindableEvent:Destroy()
+	task.spawn(waitForEmoteEventInternal, p, p2, p3, function()
+		bindableEvent:Fire()
+		bindableEvent:Destroy()
 	end)
 
-	return BindableEvent.Event
+	return bindableEvent.Event
 end
 
-return t1
+return EmoteHelper

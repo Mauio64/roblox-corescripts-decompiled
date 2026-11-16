@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator("SetLookDetailsPeekViewSelectedTab", function(p1) -- line: 10
-	return {
-		selectedTab = p1
-	}
+return Rodux.makeActionCreator("SetLookDetailsPeekViewSelectedTab", function(selectedTab)
+	return { selectedTab = selectedTab }
 end)

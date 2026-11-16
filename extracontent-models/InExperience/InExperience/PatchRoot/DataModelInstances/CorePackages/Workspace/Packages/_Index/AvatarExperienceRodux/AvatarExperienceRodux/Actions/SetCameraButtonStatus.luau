@@ -1,11 +1,8 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+local ArgCheck = require(parent.ArgCheck)
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 11
-	-- upvalues: ArgCheck (copy)
-	ArgCheck.isType(p1, "boolean", "Actions.SetCameraButton.status")
-
-	return {
-		status = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(status)
+	ArgCheck.isType(status, "boolean", "Actions.SetCameraButton.status")
+	return { status = status }
 end)

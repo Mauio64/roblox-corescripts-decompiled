@@ -1,1 +1,3 @@
-return (require(script.AppShortcutBarStatusListener))
+local AppShortcutBarStatusListener = require(script.AppShortcutBarStatusListener)
+
+return AppShortcutBarStatusListener

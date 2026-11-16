@@ -1,1 +1,3 @@
-return (require(script.ContactsGlimmer))
+local ContactsGlimmer = require(script.ContactsGlimmer)
+
+return ContactsGlimmer

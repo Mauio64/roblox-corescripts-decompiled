@@ -1,3 +1,4 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
 
-return require(SocialLibraries.dependencies).RoactFitComponents.FitFrameVertical
+return dependencies.RoactFitComponents.FitFrameVertical

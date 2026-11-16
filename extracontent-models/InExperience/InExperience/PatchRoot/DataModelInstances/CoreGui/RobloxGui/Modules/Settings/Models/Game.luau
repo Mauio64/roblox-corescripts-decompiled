@@ -1,36 +1,31 @@
-local t1 = {
-	new = function() -- line: 16
-		return {}
-	end
-}
+local Game = {}
 
-function t1.fromGameCache(p1) -- line: 21
-	-- upvalues: t1 (copy)
-	local v3 = t1.new()
-
-	v3.universeId = p1.UniverseId
-	v3.placeId = p1.PlaceId
-	v3.name = p1.Name
-	v3.playerCount = p1.PlayerCount
-	v3.imageToken = p1.ImageToken
-	v3.totalUpVotes = p1.VoteData.UpVotes
-	v3.totalDownVotes = p1.VoteData.DownVotes
-
-	return v3
-end
-function t1.fromJsonData(p2) -- line: 33
-	-- upvalues: t1 (copy)
-	local v5 = t1.new()
-
-	v5.universeId = p2.universeId
-	v5.placeId = p2.placeId
-	v5.name = p2.name
-	v5.playerCount = p2.playerCount
-	v5.imageToken = p2.imageToken
-	v5.totalUpVotes = p2.totalUpVotes
-	v5.totalDownVotes = p2.totalDownVotes
-
-	return v5
+function Game.new()
+	return {}
 end
 
-return t1
+function Game.fromGameCache(data)
+	local v = Game.new()
+	v.universeId = data.UniverseId
+	v.placeId = data.PlaceId
+	v.name = data.Name
+	v.playerCount = data.PlayerCount
+	v.imageToken = data.ImageToken
+	v.totalUpVotes = data.VoteData.UpVotes
+	v.totalDownVotes = data.VoteData.DownVotes
+	return v
+end
+
+function Game.fromJsonData(data)
+	local v = Game.new()
+	v.universeId = data.universeId
+	v.placeId = data.placeId
+	v.name = data.name
+	v.playerCount = data.playerCount
+	v.imageToken = data.imageToken
+	v.totalUpVotes = data.totalUpVotes
+	v.totalDownVotes = data.totalDownVotes
+	return v
+end
+
+return Game

@@ -1,31 +1,31 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
-local IXPUtils = require(Parent.IXPUtils)
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local ExperimentLayers = require(parent.ExperimentLayers)
+local AppUserLayers = ExperimentLayers.AppUserLayers
+local IXPUtils = require(parent.IXPUtils)
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXAvatarsTabIXP = AvatarExperienceFlags.FFlagAXAvatarsTabIXP
 local FFlagAXAvatarsTabIXPEnabledForAll = AvatarExperienceFlags.FFlagAXAvatarsTabIXPEnabledForAll
 
 return IXPUtils.defineIXPTest({
 	name = "AvatarExperience.UA.MarketplaceView.AvatarsTab",
-	recordExposure = false,
 	layer = AppUserLayers.AvatarExperienceUAMarketplaceView,
-	getIsUserInExperiment = function(p1) -- line: 27
-		return p1.IsAvatarsTabEnabled ~= nil
+	recordExposure = false,
+	getIsUserInExperiment = function(p): boolean
+		return p.IsAvatarsTabEnabled ~= nil
 	end,
-	getDependentFlagsEnabled = function() -- line: 31
+	getDependentFlagsEnabled = function(): boolean
 		return true
 	end,
-	getEnabledFlag = function() -- line: 35
-		-- upvalues: FFlagAXAvatarsTabIXP (copy)
+	getEnabledFlag = function()
 		return FFlagAXAvatarsTabIXP
 	end,
-	getEnabledForAllFlag = function() -- line: 39
-		-- upvalues: FFlagAXAvatarsTabIXPEnabledForAll (copy)
+	getEnabledForAllFlag = function()
 		return FFlagAXAvatarsTabIXPEnabledForAll
 	end,
 	variables = {
-		EnabledForUser = function(p2, p3) -- line: 44
-			return p3 or (p2.IsAvatarsTabEnabled or false)
+		EnabledForUser = function(p, p2)
+			return p2 or p.IsAvatarsTabEnabled or false
 		end
 	}
 })

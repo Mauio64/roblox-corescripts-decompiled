@@ -1,17 +1,18 @@
-local ParentParent = script.Parent.Parent.Parent
-local ReactUtils = require(ParentParent.ReactUtils)
+local parent = script.Parent.Parent.Parent
+local ReactUtils = require(parent.ReactUtils)
+
 local GuiService = game:GetService("GuiService")
-local React = require(ParentParent.React)
+
+local React = require(parent.React)
+
 local useEventConnection = ReactUtils.useEventConnection
 
-return function() -- line: 11
-	-- upvalues: React (copy), GuiService (copy), useEventConnection (copy)
-	local v6, v7 = React.useState(GuiService.TopbarInset)
+return function()
+	local state, setState = React.useState(GuiService.TopbarInset)
 
-	useEventConnection(GuiService:GetPropertyChangedSignal("TopbarInset"), function() -- line: 14
-		-- upvalues: v7 (copy), GuiService (copy)
-		v7(GuiService.TopbarInset)
+	useEventConnection(GuiService:GetPropertyChangedSignal("TopbarInset"), function()
+		setState(GuiService.TopbarInset)
 	end)
 
-	return v6
+	return state
 end

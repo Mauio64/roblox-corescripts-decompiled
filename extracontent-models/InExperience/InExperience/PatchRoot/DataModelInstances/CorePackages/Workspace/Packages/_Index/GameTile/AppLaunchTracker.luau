@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.AppLaunchTracker.AppLaunchTracker))
+local AppLaunchTracker = require(index.AppLaunchTracker.AppLaunchTracker)
+
+return AppLaunchTracker

@@ -1,24 +1,24 @@
-local function shallowEqual(p1, p2) -- line: 8
-	if p1 == p2 then
+local function shallowEqual(list, list2): boolean
+	if list == list2 then
 		return true
 	end
 
-	if typeof(p1) ~= "table" or typeof(p2) ~= "table" or #p1 ~= #p2 then
+	if typeof(list) ~= "table" or typeof(list2) ~= "table" or #list ~= #list2 then
 		return false
 	end
 
-	if p1 == nil or p2 == nil then
+	if list == nil or list2 == nil then
 		return false
 	end
 
-	for v4, v5 in p1 do
-		if v5 ~= p2[v4] then
+	for k, item in list do
+		if list2[k] ~= item then
 			return false
 		end
 	end
 
-	for v6, v7 in p2 do
-		if v7 ~= p1[v6] then
+	for k, item in list2 do
+		if list[k] ~= item then
 			return false
 		end
 	end

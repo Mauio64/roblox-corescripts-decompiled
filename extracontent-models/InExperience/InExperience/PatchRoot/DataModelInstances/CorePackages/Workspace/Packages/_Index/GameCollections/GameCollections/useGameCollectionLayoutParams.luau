@@ -1,24 +1,29 @@
 local GameCollections = script:FindFirstAncestor("GameCollections")
-local GameCollectionsParent = GameCollections.Parent
+local parent = GameCollections.Parent
 
-require(GameCollectionsParent.Style)
-
-local CollectionViews = require(GameCollectionsParent.CollectionViews)
+require(parent.Style)
+local CollectionViews = require(parent.CollectionViews)
 local GameCollectionLayoutCalculators = require(GameCollections.GameCollectionLayoutCalculators)
 local CollectionItemSize = CollectionViews.CollectionViewTypes.CollectionItemSize
 local useCollectionLayoutParams = CollectionViews.useCollectionLayoutParams
-local GameTileLayoutType = require(GameCollectionsParent.GameTile).GameTileTypes.GameTileLayoutType
-local t1 = {
+local GameTile = require(parent.GameTile)
+local GameTileLayoutType = GameTile.GameTileTypes.GameTileLayoutType
+
+local v = {
 	[GameTileLayoutType.Event] = CollectionItemSize.Large,
 	[GameTileLayoutType.Wide] = CollectionItemSize.Medium,
 	[GameTileLayoutType.Narrow] = CollectionItemSize.Small
 }
 
-local function useGameCollectionLayoutParams(p1, p2, b1: boolean?, t2: {[any]: any}?, vector2: Vector2?) -- line: 29
-	-- upvalues: t1 (copy), CollectionItemSize (copy), useCollectionLayoutParams (copy), GameCollectionLayoutCalculators (copy)
-	local v15 = t1[p1] or CollectionItemSize.Small
-
-	return useCollectionLayoutParams(v15, p2, b1, t2, GameCollectionLayoutCalculators, vector2)
+local function useGameCollectionLayoutParams(p, p2, flag: boolean?, p3, vector2: Vector2?)
+	return useCollectionLayoutParams(
+		v[p] or CollectionItemSize.Small,
+		p2,
+		flag,
+		p3,
+		GameCollectionLayoutCalculators,
+		vector2
+	)
 end
 
 return useGameCollectionLayoutParams

@@ -1,101 +1,108 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Url = require(ParentParentParent.Http).Url
-local IXPServiceWrapper = require(ParentParentParent.IXPServiceWrapper).IXPServiceWrapper
+local parent = script.Parent.Parent.Parent
+
+local parent2 = parent.Parent
+local Http = require(parent2.Http)
+local Url = Http.Url
+local IXPServiceWrapper = require(parent2.IXPServiceWrapper)
+local ixpServiceWrapper = IXPServiceWrapper.IXPServiceWrapper
+
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local HttpService = game:GetService("HttpService")
-local logger = require(ParentParent.Utility.logger)
 
-require(ParentParent.Api.PaymentsGateway.GetUpsellSuggestionsTypes)
+local logger = require(parent.Utility.logger)
+local GetUpsellSuggestionsTypes = require(parent.Api.PaymentsGateway.GetUpsellSuggestionsTypes)
+local FStringIXPLayerMobileUpsell = require(parent.Flags.FStringIXPLayerMobileUpsell)
 
-local FStringIXPLayerMobileUpsell = require(ParentParent.Flags.FStringIXPLayerMobileUpsell)
-local v9 = Url.APIS_URL .. "payments-gateway/v1/products/get-upsell-suggestions"
-local v10 = game:DefineFastFlag("EnableUpsellVirtualItemBadge", false)
+local FFlagEnableRobuxUpsellPlusButtonExperiment = require(parent.Flags.FFlagEnableRobuxUpsellPlusButtonExperiment)
 
-return function(p1, n1: number, n2: number, n3: number, n4: number?, s1: string?, n5: number?, s2: string?) -- line: 21
-	-- upvalues: v10 (copy), logger (copy), IXPServiceWrapper (copy), FStringIXPLayerMobileUpsell (copy), v9 (copy), HttpRbxApiService (copy), HttpService (copy)
+local url = Url.APIS_URL .. "payments-gateway/v1/products/get-upsell-suggestions"
+
+local defineFastFlag = game:DefineFastFlag("EnableUpsellVirtualItemBadge", false)
+
+return function(upsell_platform, user_robux_balance: number, attempt_robux_amount: number, max_packages: number, item_product_id: number?, item_name: string?, universe_id: number?, analytic_id: string?, flag: boolean?)
 	local badgingV2Variant = nil
 
-	if v10 then
-		logger.debug({
-			message = "Virtual item flag is on"
-		})
+	if defineFastFlag then
+		logger.debug({ message = "Virtual item flag is on" })
 
-		local LayerData = IXPServiceWrapper:GetLayerData(FStringIXPLayerMobileUpsell)
+		local layerData = ixpServiceWrapper:GetLayerData(FStringIXPLayerMobileUpsell)
+		logger.debug({ message = "Layer data", layerData = layerData })
 
-		logger.debug({
-			message = "Layer data",
-			layerData = LayerData
-		})
-
-		if LayerData and LayerData.badgingV2Variant then
-			badgingV2Variant = LayerData.badgingV2Variant
-			IXPServiceWrapper:LogUserLayerExposure(FStringIXPLayerMobileUpsell)
+		if layerData and layerData.badgingV2Variant then
+			badgingV2Variant = layerData.badgingV2Variant
+			ixpServiceWrapper:LogUserLayerExposure(FStringIXPLayerMobileUpsell)
 		end
 	end
 
-	local t1 = {
-		upsell_platform = p1,
-		user_robux_balance = n1,
-		attempt_robux_amount = n2,
-		max_packages = n3,
+	local v = {
+		upsell_platform = upsell_platform,
+		user_robux_balance = user_robux_balance,
+		attempt_robux_amount = attempt_robux_amount,
+		max_packages = max_packages,
 		virtual_item_badge_variant = badgingV2Variant
 	}
 
-	if n4 ~= nil then
-		t1.item_product_id = n4
+	if FFlagEnableRobuxUpsellPlusButtonExperiment then
+		v.is_eligible_for_experiment = flag == true
 	end
 
-	if s1 ~= nil then
-		t1.item_name = s1
+	if item_product_id ~= nil then
+		v.item_product_id = item_product_id
 	end
 
-	if n5 ~= nil then
-		t1.universe_id = n5
+	if item_name ~= nil then
+		v.item_name = item_name
 	end
 
-	if s2 ~= nil then
-		t1.analytic_id = s2
+	if universe_id ~= nil then
+		v.universe_id = universe_id
 	end
 
-	logger.debug({
-		message = "Making GetUpsellSuggestions API Call",
-		url = v9,
-		data = t1
-	})
+	if analytic_id ~= nil then
+		v.analytic_id = analytic_id
+	end
 
-	local ok, result = pcall(function() -- line: 76
-		-- upvalues: HttpRbxApiService (copy), v9 (copy), HttpService (copy), t1 (copy)
-		return HttpRbxApiService:PostAsyncFullUrl(v9, HttpService:JSONEncode(t1))
+	logger.debug({ message = "Making GetUpsellSuggestions API Call", url = url, data = v })
+
+	local success, result = pcall(function()
+		return HttpRbxApiService:PostAsyncFullUrl(url, HttpService:JSONEncode(v))
 	end)
 
 	logger.debug({
 		message = "GetUpsellSuggestions API Response",
 		response = result,
-		success = ok
+		success = success
 	})
 
-	if not ok then
+	if not success then
 		return false, nil
 	end
 
-	local data = HttpService:JSONDecode(result)
-	local t2 = {
+	local jsonDecode = HttpService:JSONDecode(result)
+	local v2 = {
 		products = {},
-		virtualItemBadgeType = data.virtual_item_badge_type
+		virtualItemBadgeType = jsonDecode.virtual_item_badge_type,
+		experimentVariant = 0
 	}
+	local experimentVariant
 
-	for i, v in ipairs(data.products) do
-		t2.products[i] = {
-			productId = v.roblox_product_id,
-			providerId = v.provider_product_id,
-			productName = v.roblox_product_name,
-			robuxAmount = v.robux_amount,
-			robuxAmountBeforeBonus = v.robux_amount_before_bonus,
-			price = v.price,
-			badgeType = v.badge_type
+	if FFlagEnableRobuxUpsellPlusButtonExperiment then
+		experimentVariant = GetUpsellSuggestionsTypes.normalizeExperimentVariant(jsonDecode.experiment_variant)
+	end
+
+	v2.experimentVariant = experimentVariant
+
+	for i, product in ipairs(jsonDecode.products) do
+		v2.products[i] = {
+			productId = product.roblox_product_id,
+			providerId = product.provider_product_id,
+			productName = product.roblox_product_name,
+			robuxAmount = product.robux_amount,
+			robuxAmountBeforeBonus = product.robux_amount_before_bonus,
+			price = product.price,
+			badgeType = product.badge_type
 		}
 	end
 
-	return true, t2
+	return true, v2
 end

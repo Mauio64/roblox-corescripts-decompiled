@@ -1,49 +1,92 @@
 local AvatarExperienceUIKit = script:FindFirstAncestor("AvatarExperienceUIKit")
-local AvatarExperienceUIKitParent = AvatarExperienceUIKit.Parent
-local React = require(AvatarExperienceUIKitParent.React)
-local Foundation = require(AvatarExperienceUIKitParent.Foundation)
+local parent = AvatarExperienceUIKit.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
+
 local getFixedTabHeight = require(AvatarExperienceUIKit.Utils.getFixedTabHeight)
-local FFlagAXCategoryMenuVisualFixes = require(AvatarExperienceUIKitParent.AvatarExperienceFlags).FFlagAXCategoryMenuVisualFixes
-local FoundationText = Foundation.Text
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXCategoryMenuVisualFixes = AvatarExperienceFlags.FFlagAXCategoryMenuVisualFixes
+
+local Text = Foundation.Text
 local View = Foundation.View
-local t1 = {
-	Transparency = 1
-}
-local t2 = {
+
+local backgroundStyle = { Transparency = 1 }
+
+local v = {
 	FillDirection = Enum.FillDirection.Vertical,
 	HorizontalAlignment = Enum.HorizontalAlignment.Left,
 	VerticalAlignment = Enum.VerticalAlignment.Center,
 	SortOrder = Enum.SortOrder.LayoutOrder
 }
-local t3 = {
-	Transparency = 1
-}
 
-local function TabGroupTabComponent(t4: {[any]: any}, p1) -- line: 48
-	-- upvalues: useTokens (copy), React (copy), View (copy), t1 (copy), FFlagAXCategoryMenuVisualFixes (copy), getFixedTabHeight (copy), t2 (copy), FoundationText (copy), t3 (copy)
-	local v16 = useTokens()
-	local v17 = if not t4.isActive then t4.textStyle or v16.Color.Content.Muted else t4.activeTextStyle or v16.Color.Content.Emphasis
-	local v18 = t4.fontStyle or v16.Typography.TitleLarge
-	local v19 = t4.padding or Vector2.new(v16.Padding.Small, v16.Padding.Medium)
+local backgroundStyle2 = { Transparency = 1 }
 
-	return React.createElement(View, {
-		ref = p1,
-		onActivated = t4.onActivated,
-		backgroundStyle = t1,
-		padding = if not FFlagAXCategoryMenuVisualFixes then v19 else Vector2.new(v19.X, 0),
-		Size = if not FFlagAXCategoryMenuVisualFixes then UDim2.fromScale(0, 0) else UDim2.fromOffset(0, getFixedTabHeight(v16)),
-		AutomaticSize = if not FFlagAXCategoryMenuVisualFixes then Enum.AutomaticSize.XY else Enum.AutomaticSize.X,
-		layout = if not FFlagAXCategoryMenuVisualFixes then nil else t2,
-		LayoutOrder = t4.LayoutOrder
-	}, {
-		Text = React.createElement(FoundationText, {
-			Text = t4.text,
-			textStyle = v17,
-			fontStyle = v18,
+local function TabGroupTabComponent(props, ref)
+	local v2 = useTokens()
+	local textStyle
+
+	if props.isActive then
+		textStyle = props.activeTextStyle or v2.Color.Content.Emphasis
+	else
+		textStyle = props.textStyle or v2.Color.Content.Muted
+	end
+
+	local fontStyle = props.fontStyle or v2.Typography.TitleLarge
+	local padding = props.padding or Vector2.new(v2.Padding.Small, v2.Padding.Medium)
+
+	local createElement = React.createElement
+	local v3 = {
+		ref = ref,
+		onActivated = props.onActivated,
+		backgroundStyle = backgroundStyle,
+		padding = 0,
+		Size = 0,
+		AutomaticSize = 0,
+		layout = 0,
+		LayoutOrder = 0
+	}
+
+	if FFlagAXCategoryMenuVisualFixes then
+		padding = Vector2.new(padding.X, 0)
+	end
+
+	v3.padding = padding
+	local size
+
+	if FFlagAXCategoryMenuVisualFixes then
+		size = UDim2.fromOffset(0, getFixedTabHeight(v2))
+	else
+		size = UDim2.fromScale(0, 0)
+	end
+
+	v3.Size = size
+	local automaticSize
+
+	if FFlagAXCategoryMenuVisualFixes then
+		automaticSize = Enum.AutomaticSize.X
+	else
+		automaticSize = Enum.AutomaticSize.XY
+	end
+
+	v3.AutomaticSize = automaticSize
+	local layout
+
+	if FFlagAXCategoryMenuVisualFixes then
+		layout = v
+	end
+
+	v3.layout = layout
+	v3.LayoutOrder = props.LayoutOrder
+	return createElement(View, v3, {
+		Text = React.createElement(Text, {
+			Text = props.text,
+			textStyle = textStyle,
+			fontStyle = fontStyle,
 			Size = UDim2.fromScale(0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY,
-			backgroundStyle = t3
+			backgroundStyle = backgroundStyle2
 		})
 	})
 end

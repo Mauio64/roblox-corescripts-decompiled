@@ -1,83 +1,93 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local useTokens = Foundation.Hooks.useTokens
 local Icon = Foundation.Icon
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local withDefaults = Foundation.Utility.withDefaults
 local withCommonProps = Foundation.Utility.withCommonProps
-local IconSize = Foundation.Enums.IconSize
-local IconPosition = Foundation.Enums.IconPosition
-local t1 = {
-	testId = "--badge"
-}
 
-local function BannerBadge(p1, p2) -- line: 54
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), IconSize (copy), React (copy), IconPosition (copy), Icon (copy), View (copy), withCommonProps (copy), FoundationText (copy)
-	local v16 = withDefaults(p1, t1)
-	local v17 = useTokens()
-	local XSmall = IconSize.XSmall
-	local v19 = React.useMemo(function() -- line: 61
-		-- upvalues: v16 (copy), IconPosition (copy)
-		if typeof(v16.icon) == "string" then
-			return {
-				name = v16.icon,
-				position = IconPosition.Left
-			}
+local IconSize = Foundation.Enums.IconSize
+
+local IconPosition = Foundation.Enums.IconPosition
+
+local v = { testId = "--badge" }
+
+local function BannerBadge(p, ref)
+	local v2 = withDefaults(p, v)
+
+	local v3 = useTokens()
+
+	local xSmall = IconSize.XSmall
+
+	local v4 = React.useMemo(function()
+		if typeof(v2.icon) == "string" then
+			return { name = v2.icon, position = IconPosition.Left }
 		end
 
-		return v16.icon
-	end, { v16.icon })
-	local v20 = v16.text ~= nil and #v16.text > 0
-	local t2 = {
+		return v2.icon
+	end, { v2.icon })
+	local v5
+
+	if v2.text == nil then
+		v5 = false
+	else
+		v5 = #v2.text > 0
+	end
+
+	local v6 = {
 		container = {
 			tag = "radius-circle row align-y-center align-x-center gap-xsmall",
-			stroke = nil,
-			backgroundStyle = v17.Color.Shift.Shift_300
+			backgroundStyle = v3.Color.Shift.Shift_300,
+			stroke = nil
 		},
-		text = {
-			tag = "auto-xy text-label-small"
-		},
-		content = {
-			style = v17.Color.Content.Emphasis
-		}
+		text = { tag = "auto-xy text-label-small" },
+		content = { style = v3.Color.Content.Emphasis }
 	}
 
-	if not v20 then
-		t2.container.tag = t2.container.tag .. " size-600"
+	if v5 then
+		v6.container.tag = v6.container.tag .. " size-0-600 auto-x padding-x-small"
 	else
-		t2.container.tag = t2.container.tag .. " size-0-600 auto-x padding-x-small"
+		v6.container.tag = v6.container.tag .. " size-600"
 	end
 
-	local v22 = nil
+	local icon
 
-	if v19 ~= nil then
-		v22 = React.createElement(Icon, {
-			name = v19.name,
-			variant = v19.variant,
-			size = XSmall,
-			style = t2.content.style,
-			LayoutOrder = v19.position ~= IconPosition.Left and 3 or 1,
-			testId = `{ v16.testId }--icon`
+	if v4 ~= nil then
+		icon = React.createElement(Icon, {
+			name = v4.name,
+			variant = v4.variant,
+			size = xSmall,
+			style = v6.content.style,
+			LayoutOrder = v4.position == IconPosition.Left and 1 or 3,
+			testId = `{v2.testId}--icon`
 		})
 	end
 
-	return React.createElement(View, withCommonProps(v16, {
-		backgroundStyle = t2.container.backgroundStyle,
-		tag = t2.container.tag,
-		ref = p2
-	}), {
-		Icon = v22,
-		Text = if not v20 then nil else React.createElement(FoundationText, {
+	local createElement = React.createElement
+
+	local v7 = withCommonProps(v2, {
+		backgroundStyle = v6.container.backgroundStyle,
+		tag = v6.container.tag,
+		ref = ref
+	})
+	local text
+
+	if v5 then
+		text = React.createElement(Text, {
+			Text = v2.text,
+			textStyle = v6.content.style,
 			RichText = true,
 			LayoutOrder = 2,
-			Text = v16.text,
-			textStyle = t2.content.style,
-			tag = t2.text.tag,
-			testId = `{ v16.testId }--text`
+			tag = v6.text.tag,
+			testId = `{v2.testId}--text`
 		})
-	})
+	end
+
+	return createElement(View, v7, { Icon = icon, Text = text })
 end
 
 return React.memo(React.forwardRef(BannerBadge))

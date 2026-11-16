@@ -1,1 +1,3 @@
-return (require(script.Skeleton))
+local Skeleton = require(script.Skeleton)
+
+return Skeleton

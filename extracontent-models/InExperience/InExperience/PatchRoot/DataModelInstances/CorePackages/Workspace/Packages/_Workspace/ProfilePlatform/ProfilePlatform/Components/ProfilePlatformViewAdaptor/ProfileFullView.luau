@@ -1,181 +1,285 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
+local parent = ProfilePlatform.Parent
+
 local UserInputService = game:GetService("UserInputService")
-local React = require(ProfilePlatformParent.React)
-local UIBlox = require(ProfilePlatformParent.UIBlox)
-local Foundation = require(ProfilePlatformParent.Foundation)
-local FullscreenPageWithSafeArea = require(ProfilePlatformParent.AppBlox).FullscreenPageWithSafeArea
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+
+local AppBlox = require(parent.AppBlox)
+local FullscreenPageWithSafeArea = AppBlox.FullscreenPageWithSafeArea
+
 local Enums = require(ProfilePlatform.Common.Enums)
 local useProfileFormFactor = require(ProfilePlatform.Hooks.useProfileFormFactor)
 local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 local useIsMeTab = require(ProfilePlatform.Hooks.useIsMeTab)
 local Constants = require(ProfilePlatform.Common.Constants)
-local VisibilityControl = require(ProfilePlatformParent.AppNavBar).VisibilityControl
-local FFlagAXEnableProfileTab = require(ProfilePlatformParent.SharedFlags).FFlagAXEnableProfileTab
+local AppNavBar = require(parent.AppNavBar)
+local VisibilityControl = AppNavBar.VisibilityControl
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAXEnableProfileTab = SharedFlags.FFlagAXEnableProfileTab
 local FFlagProfilePlatformMeTabScrollAway = require(ProfilePlatform.Flags.FFlagProfilePlatformMeTabScrollAway)
+
 local View = Foundation.View
 local IconButton = Foundation.IconButton
 local IconSize = Foundation.Enums.IconSize
 local useStyle = UIBlox.Core.Style.useStyle
 
-local function ProfileFullView(t1: {[any]: any}) -- line: 48
-	-- upvalues: useStyle (copy), useProfileFormFactor (copy), Enums (copy), FFlagAXEnableProfileTab (copy), useProfileWrapperContext (copy), useIsMeTab (copy), useProfileJsonComponent (copy), Constants (copy), React (copy), FFlagProfilePlatformMeTabScrollAway (copy), VisibilityControl (copy), UserInputService (copy), View (copy), IconButton (copy), IconSize (copy), FullscreenPageWithSafeArea (copy)
-	local Theme = useStyle().Theme
-	local v24 = useProfileFormFactor().formFactor == Enums.ProfileFormFactor.Wide
-	local v25 = if not FFlagAXEnableProfileTab then nil else useProfileWrapperContext()
-	local v26 = if not FFlagAXEnableProfileTab then nil else v25.forceFullView == true
-	local v27 = if not FFlagAXEnableProfileTab then nil else useIsMeTab()
-	local v28 = not v24 and 16 or 36
-	local v29 = not v24 and 16 or 24
-	local v30 = (not v24 or not not FFlagAXEnableProfileTab and v27) and 1e999 or 1018
-	local v31 = useProfileJsonComponent(Enums.Components.CoverPhoto) or {}
-	local v32 = if not v26 then v31.coverPhotoId == nil and 56 or -Constants.PAGE_PADDING else 0
-	local v33, v34 = React.useState(0)
-	local v35 = v33 > 50
-	local v36 = if not FFlagProfilePlatformMeTabScrollAway then nil else v26
-	local v37 = if not FFlagProfilePlatformMeTabScrollAway then nil else React.useRef(false)
-	local v38 = if not FFlagProfilePlatformMeTabScrollAway then nil else React.useRef(0)
-	local v39 = React.useCallback(function(p1) -- line: 93
-		-- upvalues: v34 (copy), v36 (copy), v37 (copy), v38 (copy), VisibilityControl (copy)
-		local CanvasPosition = p1.CanvasPosition
-		local v44 = math.abs(CanvasPosition.Y)
+local function ProfileFullView(p)
+	local theme = useStyle().Theme
 
-		v34(v44)
+	local v = useProfileFormFactor().formFactor == Enums.ProfileFormFactor.Wide
+	local v2
 
-		if v36 then
-			if v37.current then
-				local v45 = CanvasPosition.Y - v38.current
-
-				if v45 ~= 0 then
-					VisibilityControl.onTouchMoved(-v45)
-				end
-			end
-
-			v38.current = CanvasPosition.Y
-		end
-	end, { if not FFlagProfilePlatformMeTabScrollAway then nil else v36 })
-
-	if FFlagProfilePlatformMeTabScrollAway then
-		React.useEffect(function() -- line: 116
-			-- upvalues: v36 (copy), UserInputService (copy), v37 (copy), VisibilityControl (copy)
-			if not v36 then
-				return function() -- line: 118
-				end
-			end
-
-			local connection = UserInputService.TouchStarted:Connect(function() -- line: 120
-				-- upvalues: v37 (copy)
-				v37.current = true
-			end)
-			local connection2 = UserInputService.TouchEnded:Connect(function() -- line: 123
-				-- upvalues: v37 (copy), VisibilityControl (copy)
-				v37.current = false
-				VisibilityControl.onTouchEnded()
-			end)
-
-			return function() -- line: 127
-				-- upvalues: connection (copy), connection2 (copy), VisibilityControl (copy)
-				connection:Disconnect()
-				connection2:Disconnect()
-				VisibilityControl.show()
-			end
-		end, { v36 })
+	if FFlagAXEnableProfileTab then
+		v2 = useProfileWrapperContext()
 	end
 
-	local v40 = React.createElement("Frame", {
-		BorderSizePixel = 0,
-		ZIndex = 1000,
+	local v3
+
+	if FFlagAXEnableProfileTab then
+		v3 = v2.forceFullView == true
+	end
+
+	local v4
+
+	if FFlagAXEnableProfileTab then
+		v4 = useIsMeTab()
+	end
+
+	local v5 = v and 36 or 16
+	local v6 = v and 24 or 16
+	local v7 = v and not (FFlagAXEnableProfileTab and v4) and 1018 or 1e999
+	local v8 = useProfileJsonComponent(Enums.Components.CoverPhoto) or {}
+
+	local v9 = v3 and 0 or v8.coverPhotoId == nil and 56 or -Constants.PAGE_PADDING
+
+	local state, setState = React.useState(0)
+	local v10 = state > 50
+	local v11
+
+	if FFlagProfilePlatformMeTabScrollAway then
+		v11 = v3
+	else
+		v11 = nil
+	end
+
+	local ref
+
+	if FFlagProfilePlatformMeTabScrollAway then
+		ref = React.useRef(false)
+	else
+		ref = nil
+	end
+
+	local ref2
+
+	if FFlagProfilePlatformMeTabScrollAway then
+		ref2 = React.useRef(0)
+	else
+		ref2 = nil
+	end
+
+	local useCallback = React.useCallback
+	local function fn(p2)
+		local canvasPosition = p2.CanvasPosition
+		setState((math.abs(canvasPosition.Y)))
+
+		if v11 then
+			if ref.current then
+				local v12 = canvasPosition.Y - ref2.current
+
+				if v12 ~= 0 then
+					VisibilityControl.onTouchMoved(-v12)
+				end
+			end
+
+			ref2.current = canvasPosition.Y
+		end
+	end
+
+	local v12
+
+	if FFlagProfilePlatformMeTabScrollAway then
+		v12 = v11
+	end
+
+	local v13 = useCallback(fn, { v12 })
+
+	if FFlagProfilePlatformMeTabScrollAway then
+		React.useEffect(function()
+			if not v11 then
+				return function() end
+			end
+
+			local touchStartedConnection = UserInputService.TouchStarted:Connect(function()
+				ref.current = true
+			end)
+			local touchEndedConnection = UserInputService.TouchEnded:Connect(function()
+				ref.current = false
+				VisibilityControl.onTouchEnded()
+			end)
+			return function()
+				touchStartedConnection:Disconnect()
+				touchEndedConnection:Disconnect()
+				VisibilityControl.show()
+			end
+		end, { v11 })
+	end
+
+	local element = React.createElement("Frame", {
 		Size = UDim2.new(1, 0, 0, 56),
 		Position = UDim2.fromOffset(0, 0),
-		BackgroundColor3 = Theme.BackgroundDefault.Color,
-		BackgroundTransparency = not v35 and 1 or 0.1
+		BackgroundColor3 = theme.BackgroundDefault.Color,
+		BackgroundTransparency = v10 and 0.1 or 1,
+		BorderSizePixel = 0,
+		ZIndex = 1000
 	}, {
 		DropShadow = React.createElement("Frame", {
-			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 2),
 			Position = UDim2.new(0, 0, 1, 0),
-			BackgroundColor3 = Theme.DropShadow.Color,
-			BackgroundTransparency = not v35 and 1 or Theme.DropShadow.Transparency
+			BackgroundColor3 = theme.DropShadow.Color,
+			BackgroundTransparency = not v10 and 1 or theme.DropShadow.Transparency,
+			BorderSizePixel = 0
 		}),
 		HeaderContent = React.createElement(View, {
-			tag = "padding-medium",
-			Size = UDim2.fromScale(1, 1)
+			Size = UDim2.fromScale(1, 1),
+			tag = "padding-medium"
 		}, {
 			CloseButton = React.createElement(IconButton, {
-				icon = "icons/navigation/close",
-				backgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0, 0.5),
 				Position = UDim2.new(0, 0, 0.5, 0),
 				iconSize = IconSize.Medium,
-				onActivated = t1.navigateBack
+				icon = "icons/navigation/close",
+				onActivated = p.navigateBack,
+				backgroundTransparency = 1
 			})
 		})
 	})
-	local v41 = React.createElement("Frame", {
+
+	local createElement = React.createElement
+	local v14 = {
+		Size = UDim2.fromScale(1, v and 0 or 1),
+		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Size = UDim2.fromScale(1, not v24 and 1 or 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = UDim2.new(0, 0, 0, v32)
-	}, {
-		UIListLayout = if not v24 then nil else React.createElement("UIListLayout", {
+		Position = UDim2.new(0, 0, 0, v9)
+	}
+	local uiListLayout
+
+	if v then
+		uiListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 0)
-		}),
-		ConstrainedContent = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, not v24 and 1 or 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = if not v24 then nil else 1
-		}, {
-			UISizeConstraint = if not v24 then nil else React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(v30, 1e999)
+		})
+	end
+
+	local createElement2 = React.createElement
+	local v15 = {
+		Size = UDim2.fromScale(1, v and 0 or 1),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = v and 1 or nil
+	}
+	local uiSizeConstraint
+
+	if v then
+		uiSizeConstraint = React.createElement("UISizeConstraint", {
+			MaxSize = Vector2.new(v7, 1e999)
+		})
+	end
+
+	local createElement3 = React.createElement
+	local paddingLeft
+
+	if not (FFlagAXEnableProfileTab and v4 or not v) then
+		paddingLeft = UDim.new(0, v5)
+	end
+
+	local paddingRight
+
+	if not (FFlagAXEnableProfileTab and v4 or not v) then
+		paddingRight = UDim.new(0, v5)
+	end
+
+	local udim
+
+	if FFlagAXEnableProfileTab and v4 then
+		udim = UDim.new(0, 24)
+	elseif v then
+		udim = UDim.new(0, v6)
+	end
+
+	local element2 = createElement("Frame", v14, {
+		UIListLayout = uiListLayout,
+		ConstrainedContent = createElement2("Frame", v15, {
+			UISizeConstraint = uiSizeConstraint,
+			UIPadding = createElement3("UIPadding", {
+				PaddingLeft = paddingLeft,
+				PaddingRight = paddingRight,
+				PaddingTop = udim,
+				PaddingBottom = UDim.new(0, v6)
 			}),
-			UIPadding = React.createElement("UIPadding", {
-				PaddingLeft = if not FFlagAXEnableProfileTab or not v27 then if not v24 then nil else UDim.new(0, v28) else nil,
-				PaddingRight = if not FFlagAXEnableProfileTab or not v27 then if not v24 then nil else UDim.new(0, v28) else nil,
-				PaddingTop = if not FFlagAXEnableProfileTab or not v27 then if not v24 then nil else UDim.new(0, v29) else UDim.new(0, 24),
-				PaddingBottom = UDim.new(0, v29)
-			}),
-			Content = t1.renderContent()
+			Content = p.renderContent()
 		})
 	})
 
-	return React.createElement(FullscreenPageWithSafeArea, {
-		includeStatusBar = not FFlagAXEnableProfileTab or not v26,
-		useFullScalePage = if not FFlagAXEnableProfileTab then nil else v26 or nil,
-		BackgroundColor3 = Theme.BackgroundDefault.Color,
-		BackgroundTransparency = Theme.BackgroundDefault.Transparency
-	}, {
-		ContentContainer = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, 1),
-			Position = UDim2.fromOffset(0, 0)
-		}, {
-			ScrollingFrame = React.createElement("ScrollingFrame", {
+	local createElement4 = React.createElement
+	local v16 = {
+		includeStatusBar = not FFlagAXEnableProfileTab or not v3,
+		useFullScalePage = nil,
+		BackgroundColor3 = 0,
+		BackgroundTransparency = 0
+	}
+	local useFullScalePage
+
+	if FFlagAXEnableProfileTab then
+		useFullScalePage = v3 or nil
+	end
+
+	v16.useFullScalePage = useFullScalePage
+	v16.BackgroundColor3 = theme.BackgroundDefault.Color
+	v16.BackgroundTransparency = theme.BackgroundDefault.Transparency
+	local v17 = {
+		ContentContainer = React.createElement(
+			"Frame",
+			{
 				Size = UDim2.fromScale(1, 1),
 				Position = UDim2.fromOffset(0, 0),
 				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				ScrollBarThickness = 0,
-				ScrollingDirection = Enum.ScrollingDirection.Y,
-				CanvasSize = UDim2.new(1, 0, 0, 0),
-				AutomaticCanvasSize = Enum.AutomaticSize.Y,
-				Selectable = false,
-				ElasticBehavior = Enum.ElasticBehavior.Never,
-				[React.Change.CanvasPosition] = v39
-			}, {
-				ContentFrame = v41
-			})
-		}),
-		StickyHeader = if not FFlagAXEnableProfileTab or not v26 then v40 else nil
-	})
+				BorderSizePixel = 0
+			},
+			{
+				ScrollingFrame = React.createElement("ScrollingFrame", {
+					Size = UDim2.fromScale(1, 1),
+					Position = UDim2.fromOffset(0, 0),
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					ScrollBarThickness = 0,
+					ScrollingDirection = Enum.ScrollingDirection.Y,
+					CanvasSize = UDim2.new(1, 0, 0, 0),
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					Selectable = false,
+					ElasticBehavior = Enum.ElasticBehavior.Never,
+					[React.Change.CanvasPosition] = v13
+				}, { ContentFrame = element2 })
+			}
+		),
+		StickyHeader = 0
+	}
+
+	if FFlagAXEnableProfileTab and v3 then
+		element = nil
+	end
+
+	v17.StickyHeader = element
+	return createElement4(FullscreenPageWithSafeArea, v16, v17)
 end
 
 return ProfileFullView

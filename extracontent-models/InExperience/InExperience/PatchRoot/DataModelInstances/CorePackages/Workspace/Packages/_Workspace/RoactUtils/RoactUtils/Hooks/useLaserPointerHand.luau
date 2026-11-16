@@ -1,31 +1,32 @@
 local VRService = game:GetService("VRService")
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local React = require(Parent.React)
+
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+
+local React = require(parent.React)
 local useExternalEvent = require(script.Parent.useExternalEvent)
-local _ = {
-	Right = "Right",
-	Left = "Left"
-}
 
-local function useLaserPointerHand() -- line: 19
-	-- upvalues: React (copy), useExternalEvent (copy), VRService (copy)
-	local v7, v8 = React.useState("Right")
-	local v9 = React.useCallback(function(p1) -- line: 22
-		-- upvalues: v7 (copy), v8 (copy)
-		if (p1.KeyCode == Enum.KeyCode.ButtonR1 or (p1.KeyCode == Enum.KeyCode.ButtonR2 or p1.KeyCode == Enum.KeyCode.ButtonR3 or p1.KeyCode == Enum.KeyCode.ButtonA or p1.KeyCode == Enum.KeyCode.ButtonB)) and v7 ~= "Right" then
-			v8("Right")
+local _ = { Right = "Right", Left = "Left" }
 
-			return
-		end
+local function useLaserPointerHand()
+	local state, setState = React.useState("Right")
 
-		if (p1.KeyCode == Enum.KeyCode.ButtonL1 or p1.KeyCode == Enum.KeyCode.ButtonL2 or p1.KeyCode == Enum.KeyCode.ButtonL3 or p1.KeyCode == Enum.KeyCode.ButtonX or p1.KeyCode == Enum.KeyCode.ButtonY) and v7 ~= "Left" then
-			v8("Left")
+	local v = React.useCallback(function(p)
+		if
+			(p.KeyCode == Enum.KeyCode.ButtonR1 or p.KeyCode == Enum.KeyCode.ButtonR2 or p.KeyCode == Enum.KeyCode.ButtonR3 or p.KeyCode == Enum.KeyCode.ButtonA or p.KeyCode == Enum.KeyCode.ButtonB)
+			and state ~= "Right"
+		then
+			setState("Right")
+		elseif
+			(p.KeyCode == Enum.KeyCode.ButtonL1 or p.KeyCode == Enum.KeyCode.ButtonL2 or p.KeyCode == Enum.KeyCode.ButtonL3 or p.KeyCode == Enum.KeyCode.ButtonX or p.KeyCode == Enum.KeyCode.ButtonY)
+			and state ~= "Left"
+		then
+			setState("Left")
 		end
 	end)
 
-	useExternalEvent(VRService.LaserPointerTriggered, v9)
+	useExternalEvent(VRService.LaserPointerTriggered, v)
 
-	return v7
+	return state
 end
 
 return useLaserPointerHand

@@ -1,126 +1,118 @@
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local Foundation = require(PeopleReactViewParent.Foundation)
-local React = require(PeopleReactViewParent.React)
-local Signals = require(PeopleReactViewParent.Signals)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local parent = PeopleReactView.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
 local GetScrollingFrameStore = require(PeopleReactView.Stores.GetScrollingFrameStore)
+
 local PopoverSide = Foundation.Enums.PopoverSide
 
-local function choosePopoverSideForViewport(p1, p2, n1: number, n2: number, n3: number, n4: number, n5: number, n6: number) -- line: 16
-	-- upvalues: PopoverSide (copy)
-	if n5 <= 0 then
-		return p1
+local function choosePopoverSideForViewport(p, p2, y: number, p3: number, absolutePositionY: number, p4: number, p5: number, p6: number)
+	if p5 <= 0 then
+		return p
 	end
 
-	local v19 = n5 + n6
-	local v20 = n1 - n3
-	local v21 = n4 - n2
+	local v = p5 + p6
+	local v2 = y - absolutePositionY
+	local v3 = p4 - p3
 
-	local function spaceFor(p3) -- line: 34
-		-- upvalues: PopoverSide (copy), v20 (copy), v21 (copy)
-		if p3 == PopoverSide.Top then
-			return v20
-		end
-
-		return v21
-	end
-	local function fits(p4) -- line: 38
-		-- upvalues: PopoverSide (copy), v20 (copy), v21 (copy), v19 (copy)
-		return ((if p4 ~= PopoverSide.Top then v21 else v20)) >= v19
+	local function spaceFor(p7) -- 3 equivalent calls inferred from this helper
+		return if p7 == PopoverSide.Top then v2 else v3
 	end
 
-	local v24 = if p2 == nil then p1 else p2
-
-	if v19 <= if v24 ~= PopoverSide.Top then v21 else v20 then
-		return v24
+	local function fits(p7): boolean
+		return v <= spaceFor(p7) -- inferred equivalent call
 	end
 
-	local v25 = if v24 ~= PopoverSide.Top then PopoverSide.Top else PopoverSide.Bottom
-
-	if v19 <= if v25 ~= PopoverSide.Top then v21 else v20 then
-		return v25
+	if p2 ~= nil then
+		p = p2
 	end
 
-	if v20 < v21 then
-		return PopoverSide.Bottom
+	if v <= spaceFor(p) then -- inferred equivalent call
+		return p
 	end
 
-	return PopoverSide.Top
+	local v4
+
+	if p == PopoverSide.Top then
+		v4 = PopoverSide.Bottom
+	else
+		v4 = PopoverSide.Top
+	end
+
+	if v <= spaceFor(v4) then -- inferred equivalent call
+		return v4
+	end
+
+	return if v2 < v3 then PopoverSide.Bottom else PopoverSide.Top
 end
-local function usePopoverSideToFitScrollingViewport(b1: boolean, p5, p6, n7: number, n8: number) -- line: 55
-	-- upvalues: SignalsReact (copy), GetScrollingFrameStore (copy), React (copy), choosePopoverSideForViewport (copy), Signals (copy)
-	local v31 = SignalsReact.useSignalState(GetScrollingFrameStore)
-	local v32, v33 = React.useState(nil)
 
-	React.useEffect(function() -- line: 65
-		-- upvalues: b1 (copy), v33 (copy), p6 (copy), v31 (copy), choosePopoverSideForViewport (copy), p5 (copy), n7 (copy), n8 (copy), Signals (copy)
-		if not b1 then
-			v33(nil)
+local function usePopoverSideToFitScrollingViewport(flag: boolean, p, p2, p3: number, p4: number)
+	local v = SignalsReact.useSignalState(GetScrollingFrameStore)
+	local state, setState = React.useState(nil)
 
+	React.useEffect(function()
+		if not flag then
+			setState(nil)
 			return
 		end
 
-		local function updateSide() -- line: 71
-			-- upvalues: p6 (copy), v31 (copy), v33 (copy), choosePopoverSideForViewport (copy), p5 (copy), n7 (copy), n8 (copy)
-			local current = p6.current
+		local function updateSide()
+			local current = p2.current
 
 			if not current then
 				return
 			end
 
-			local v40 = v31.getAbsolutePositionY(false)
-			local v41 = v31.getAbsoluteSizeY(false)
+			local absolutePositionY = v.getAbsolutePositionY(false)
+			local absoluteSizeY = v.getAbsoluteSizeY(false)
 
-			if v41 <= 0 then
+			if absoluteSizeY <= 0 then
 				return
 			end
 
-			local AbsolutePositionY = current.AbsolutePosition.Y
-			local v43 = AbsolutePositionY + current.AbsoluteSize.Y
-			local v44 = v40 + v41
+			local y = current.AbsolutePosition.Y
+			local v2 = y + current.AbsoluteSize.Y
+			local v3 = absolutePositionY + absoluteSizeY
 
-			v33(function(p7) -- line: 87
-				-- upvalues: choosePopoverSideForViewport (copy), p5 (copy), AbsolutePositionY (copy), v43 (copy), v40 (copy), v44 (copy), n7 (copy), n8 (copy)
-				return (choosePopoverSideForViewport(p5, p7, AbsolutePositionY, v43, v40, v44, n7, n8))
+			setState(function(p5)
+				return choosePopoverSideForViewport(p, p5, y, v2, absolutePositionY, v3, p3, p4)
 			end)
 		end
 
-		local v37 = Signals.createEffect(function(p8) -- line: 101
-			-- upvalues: v31 (copy), updateSide (copy)
-			v31.getCanvasPositionY(p8)
-			v31.getAbsolutePositionY(p8)
-			v31.getAbsoluteSizeY(p8)
+		local effect = Signals.createEffect(function(p5)
+			v.getCanvasPositionY(p5)
+			v.getAbsolutePositionY(p5)
+			v.getAbsoluteSizeY(p5)
+
 			updateSide()
 		end)
-		local t1 = {}
 
-		if p6.current then
-			table.insert(t1, p6.current:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateSide))
-			table.insert(t1, p6.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSide))
+		local connections = {}
+
+		if p2.current then
+			table.insert(connections, p2.current:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateSide))
+
+			table.insert(connections, p2.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSide))
 		end
 
-		return function() -- line: 121
-			-- upvalues: v37 (copy), t1 (copy)
-			v37()
+		return function()
+			effect()
 
-			for _, v47 in t1 do
-				v47:Disconnect()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, {
-		b1,
-		p5,
-		n7,
-		n8,
-		v31
-	})
+	end, { flag, p, p3, p4, v })
 
-	if b1 then
-		return v32 or p5
+	if flag then
+		return state or p
 	end
 
-	return p5
+	return p
 end
 
 return usePopoverSideToFitScrollingViewport

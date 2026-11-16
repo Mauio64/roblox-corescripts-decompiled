@@ -1,24 +1,25 @@
 local SocialCommon = script:FindFirstAncestor("SocialCommon")
-local SocialCommonParent = SocialCommon.Parent
-local useLocalization = require(SocialCommonParent.Localization).Hooks.useLocalization
+local parent = SocialCommon.Parent
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local getRecommendationContextualInfoDisplay = require(SocialCommon.Utils.getRecommendationContextualInfoDisplay)
-local FFlagConnectionsToFriendsRename = require(SocialCommonParent.SharedFlags).FFlagConnectionsToFriendsRename
+local FFlagShowClassmatesOnPYMK = require(parent.SharedFlags.FFlagShowClassmatesOnPYMK)
 
-return function(t1: {[any]: any}) -- line: 31
-	-- upvalues: useLocalization (copy), FFlagConnectionsToFriendsRename (copy), getRecommendationContextualInfoDisplay (copy)
-	local v7 = useLocalization({
-		frequents = "Feature.Friends.Label.Frequent",
-		contacts = "Feature.Friends.Description.FromContacts",
-		singularMutualConnection = not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.MutualConnection" or "Feature.Friends.Label.MutualFriendTitle",
-		mutualConnections = {
-			not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.MutualConnections" or "Feature.Friends.Label.MutualFriendsTitle",
-			numConnections = t1.mutualFriendsCount
-		},
-		connectionRequests = not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.ConnectionRequest" or "Feature.Friends.Label.FriendRequest"
-	})
-
+return function(recommendation)
 	return getRecommendationContextualInfoDisplay({
-		recommendation = t1,
-		localized = v7
+		recommendation = recommendation,
+		localized = useLocalization({
+			singularMutualConnection = "Feature.Friends.Label.MutualFriendTitle",
+			mutualConnections = {
+				"Feature.Friends.Label.MutualFriendsTitle",
+				numConnections = recommendation.mutualFriendsCount
+			},
+			frequents = "Feature.Friends.Label.Frequent",
+			connectionRequests = "Feature.Friends.Label.FriendRequest",
+			contacts = "Feature.Friends.Description.FromContacts",
+			classmates = FFlagShowClassmatesOnPYMK and "Feature.Schools.Label.Classmates" or nil
+		})
 	})
 end

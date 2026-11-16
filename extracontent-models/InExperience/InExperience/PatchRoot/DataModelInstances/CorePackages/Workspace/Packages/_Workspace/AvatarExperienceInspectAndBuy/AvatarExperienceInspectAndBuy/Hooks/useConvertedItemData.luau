@@ -1,89 +1,104 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-
+local parent = AvatarExperienceInspectAndBuy.Parent
 require(AvatarExperienceInspectAndBuy.Types)
-
-local AXCommon = require(AvatarExperienceInspectAndBuy.Parent.AXCommon)
-local React = require(AvatarExperienceInspectAndBuyParent.React)
+local AvatarExperienceModel = require(AvatarExperienceInspectAndBuy.Parent.AvatarExperienceModel)
+local React = require(parent.React)
 local useMemo = React.useMemo
 local useCallback = React.useCallback
-local RoactUtils = require(AvatarExperienceInspectAndBuyParent.RoactUtils)
+local RoactUtils = require(parent.RoactUtils)
 local convertAssetInfoToItemData = require(AvatarExperienceInspectAndBuy.Utils.convertAssetInfoToItemData)
 local convertBundleInfoToItemData = require(AvatarExperienceInspectAndBuy.Utils.convertBundleInfoToItemData)
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local tutils = require(AvatarExperienceInspectAndBuyParent.tutils)
-local PerformFetch = require(AvatarExperienceInspectAndBuyParent.Http).PerformFetch
-local ItemTypeEnum = AXCommon.Enums.ItemTypeEnum
-local FFlagAXEnableBatchItemDetailsFetchV2 = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags).FFlagAXEnableBatchItemDetailsFetchV2
-local BatchItemDetailsPerformFetchKey = require(AvatarExperienceInspectAndBuy.Constants).BatchItemDetailsPerformFetchKey
+local tutils = require(parent.tutils)
+local Http = require(parent.Http)
+local PerformFetch = Http.PerformFetch
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXEnableBatchItemDetailsFetchV2 = AvatarExperienceFlags.FFlagAXEnableBatchItemDetailsFetchV2
+local Constants = require(AvatarExperienceInspectAndBuy.Constants)
+local BatchItemDetailsPerformFetchKey = Constants.BatchItemDetailsPerformFetchKey
 
-local function getResellableInsances(p1) -- line: 28
-	return p1.collectibleResellableInstances
+local function getResellableInsances(p)
+	return p.collectibleResellableInstances
 end
-local function useConvertedItemData(p2) -- line: 36
-	-- upvalues: useCallback (copy), ItemTypeEnum (copy), FFlagAXEnableBatchItemDetailsFetchV2 (copy), PerformFetch (copy), BatchItemDetailsPerformFetchKey (copy), useSelector (copy), tutils (copy), getResellableInsances (copy), useMemo (copy), convertAssetInfoToItemData (copy), convertBundleInfoToItemData (copy)
-	local v20 = if not p2 then nil else p2.id
-	local v21 = if not p2 then nil else p2.itemType
-	local v22 = useCallback(function(p3) -- line: 40
-		-- upvalues: v21 (copy), ItemTypeEnum (copy), v20 (copy)
-		if v21 == ItemTypeEnum.Asset then
-			return p3.assets[v20]
+
+local function useConvertedItemData(p)
+	local id
+
+	if p then
+		id = p.id
+	else
+		id = nil
+	end
+
+	local itemType
+
+	if p then
+		itemType = p.itemType
+	else
+		itemType = nil
+	end
+
+	local v = useCallback(function(p2)
+		if itemType == ItemTypeEnum.Asset then
+			return p2.assets[id]
 		end
 
-		if v21 == ItemTypeEnum.Bundle then
-			return p3.bundles[v20]
+		if itemType == ItemTypeEnum.Bundle then
+			return p2.bundles[id]
 		end
 
 		return nil
-	end, {
-		v20,
-		v21
-	})
-	local v23 = useCallback(function(p4) -- line: 49
-		-- upvalues: FFlagAXEnableBatchItemDetailsFetchV2 (copy), PerformFetch (copy), BatchItemDetailsPerformFetchKey (copy), v20 (copy), v21 (copy), ItemTypeEnum (copy)
+	end, { id, itemType })
+
+	local v2 = useCallback(function(p2)
 		if FFlagAXEnableBatchItemDetailsFetchV2 then
-			return PerformFetch.GetStatus(p4, BatchItemDetailsPerformFetchKey)
+			return PerformFetch.GetStatus(p2, BatchItemDetailsPerformFetchKey)
 		end
 
-		if v20 and v21 then
-			local v29 = string.format("inspectAndBuy.%d.getItemDetails.%s.%s", p4.storeId, v20, if v21 ~= ItemTypeEnum.Asset then tostring(Enum.AvatarItemType.Bundle) else tostring(Enum.AvatarItemType.Asset))
+		if not (id and itemType) then
+			return nil
+		end
 
-			return PerformFetch.GetStatus(p4, v29)
+		local storeId = p2.storeId
+		local v2
+
+		if itemType == ItemTypeEnum.Asset then
+			v2 = tostring(Enum.AvatarItemType.Asset)
+		else
+			v2 = tostring(Enum.AvatarItemType.Bundle)
+		end
+
+		local v3 = string.format("inspectAndBuy.%d.getItemDetails.%s.%s", storeId, id, v2)
+
+		return PerformFetch.GetStatus(p2, v3)
+	end, { id, itemType })
+
+	local v3 = useSelector(v, tutils.deepEqual)
+	local v4 = useSelector(getResellableInsances, tutils.deepEqual)
+	local v5 = useSelector(v2, tutils.deepEqual)
+
+	return useMemo(function()
+		local v6
+
+		if v3 and v3.collectibleItemId ~= nil and v4 ~= nil then
+			v6 = v4[v3.collectibleItemId]
+		end
+
+		if not v3 then
+			return nil
+		end
+
+		if itemType == ItemTypeEnum.Asset then
+			return (convertAssetInfoToItemData(v3, v6))
+		end
+
+		if itemType == ItemTypeEnum.Bundle then
+			return (convertBundleInfoToItemData(v3, v6))
 		end
 
 		return nil
-	end, {
-		v20,
-		v21
-	})
-	local v24 = useSelector(v22, tutils.deepEqual)
-	local v25 = useSelector(getResellableInsances, tutils.deepEqual)
-	local v26 = useSelector(v23, tutils.deepEqual)
-
-	return useMemo(function() -- line: 74
-		-- upvalues: v24 (copy), v25 (copy), v21 (copy), ItemTypeEnum (copy), convertAssetInfoToItemData (copy), convertBundleInfoToItemData (copy)
-		local v30 = nil
-
-		if v24 and (v24.collectibleItemId ~= nil and v25 ~= nil) then
-			v30 = v25[v24.collectibleItemId]
-		end
-
-		if v24 then
-			if v21 == ItemTypeEnum.Asset then
-				return (convertAssetInfoToItemData(v24, v30))
-			end
-
-			if v21 == ItemTypeEnum.Bundle then
-				return (convertBundleInfoToItemData(v24, v30))
-			end
-		end
-
-		return nil
-	end, {
-		v24,
-		v25,
-		v21
-	}), v26
+	end, { v3, v4, itemType }), v5
 end
 
 return useConvertedItemData

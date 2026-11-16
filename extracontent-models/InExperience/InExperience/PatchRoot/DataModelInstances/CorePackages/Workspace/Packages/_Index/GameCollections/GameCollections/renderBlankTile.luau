@@ -1,15 +1,14 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local GameCollectionItemTypes = require(Parent.DiscoveryTypes).GameCollectionItemTypes
-local React = require(Parent.React)
-local v4 = React.memo(function(t1: {[any]: any}) -- line: 15
-	-- upvalues: React (copy)
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = t1.index
-	})
+local parent = script:FindFirstAncestor("GameCollections").Parent
+
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local GameCollectionItemTypes = DiscoveryTypes.GameCollectionItemTypes
+
+local React = require(parent.React)
+
+local memo = React.memo(function(p)
+	return React.createElement("Frame", { BackgroundTransparency = 1, LayoutOrder = p.index })
 end)
 
-return function(t2: {[any]: any}) -- line: 23
-	-- upvalues: React (copy), v4 (copy), GameCollectionItemTypes (copy)
-	return React.createElement(v4, t2), GameCollectionItemTypes.GameCollectionItemType.Blank
+return function(p)
+	return React.createElement(memo, p), GameCollectionItemTypes.GameCollectionItemType.Blank
 end

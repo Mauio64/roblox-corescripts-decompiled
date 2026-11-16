@@ -1,52 +1,46 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-
+local parent = Foundation.Parent
+require(Foundation.Enums.ColorMode)
 require(Foundation.Enums.Device)
-
-local React = require(FoundationParent.React)
-
-require(Foundation.Enums.Theme)
+local React = require(parent.React)
+require(Foundation.Enums.ThemeName)
 require(Foundation.Providers.Style.Tokens)
 
 local StyleSheetRegistry = require(Foundation.StyleSheet.StyleSheetRegistry)
 
-local function useRegistryStyleSheet(p1, p2, n1: number, p3) -- line: 14
-	-- upvalues: React (copy), StyleSheetRegistry (copy)
-	local v10 = React.useRef({})
-	local v11 = React.useMemo(function() -- line: 21
-		-- upvalues: StyleSheetRegistry (copy), p1 (copy), p2 (copy), n1 (copy), p3 (copy)
-		return StyleSheetRegistry.getStyleSheet(p1, p2, n1, p3)
-	end, {
-		p1,
-		p2,
-		n1,
-		p3
-	})
-	local v12 = React.useRef(v11)
+local function useRegistryStyleSheet(p, p2, p3, p4: number, p5)
+	local ref = React.useRef({})
 
-	v12.current = v11
+	local current = React.useMemo(function()
+		return StyleSheetRegistry.resolveStyleSheet(p2, p3, p4, p5, p)
+	end, { p, p2, p3, p4, p5 })
+	local ref2 = React.useRef(current)
+	ref2.current = current
 
-	local v13 = React.useCallback(function(p4) -- line: 27
-		-- upvalues: v10 (copy), StyleSheetRegistry (copy), v12 (copy)
-		for _, v16 in p4 do
-			v10.current[v16] = true
+	local v = React.useCallback(function(items)
+		for _, item in items do
+			ref.current[item] = true
 		end
 
-		StyleSheetRegistry.addStyleTags(v12.current, p4)
+		StyleSheetRegistry.addStyleTags(ref2.current, items)
 	end, {})
 
-	React.useLayoutEffect(function() -- line: 34
-		-- upvalues: v10 (copy), StyleSheetRegistry (copy), v11 (copy)
-		local t1 = {}
+	React.useLayoutEffect(function()
+		local v2 = {}
 
-		for v18 in v10.current do
-			table.insert(t1, v18)
+		for k in ref.current do
+			table.insert(v2, k)
 		end
 
-		StyleSheetRegistry.addStyleTags(v11, t1)
-	end, { v11 })
+		StyleSheetRegistry.addStyleTags(current, v2)
 
-	return v11, v13
+		StyleSheetRegistry.acquireStyleSheet(current)
+		return function()
+			StyleSheetRegistry.releaseStyleSheet(current)
+		end
+	end, { current })
+
+	return current, v
 end
 
 return useRegistryStyleSheet

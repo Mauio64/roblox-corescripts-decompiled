@@ -1,3 +1,5 @@
 local Moments = script:FindFirstAncestor("Moments")
 
-return (require(Moments.Enums.NavigationRoute))
+local NavigationRoute = require(Moments.Enums.NavigationRoute)
+
+return NavigationRoute

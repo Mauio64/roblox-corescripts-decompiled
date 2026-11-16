@@ -1,16 +1,19 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParent2 = ParentParentParent.Parent.Parent
-local Roact = require(ParentParent2.Roact)
-local t = require(ParentParent2.t)
-local ArrowNav = require(ParentParent.HorizontalNav.ArrowNav)
-local NavigationDirection = require(ParentParent.HorizontalNav.NavigationDirection)
-local Images = require(ParentParentParent.ImageSet.Images)
-local v9 = Images["icons/actions/cycleLeft"]
-local v10 = Images["icons/actions/cycleRight"]
-local v11 = Roact.PureComponent:extend("ArrowFrame")
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent.Parent
 
-v11.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local ArrowNav = require(parent.HorizontalNav.ArrowNav)
+local NavigationDirection = require(parent.HorizontalNav.NavigationDirection)
+local Images = require(parent2.ImageSet.Images)
+
+local iconsactionscycleLeft = Images["icons/actions/cycleLeft"]
+local iconsactionscycleRight = Images["icons/actions/cycleRight"]
+
+local extended = Roact.PureComponent:extend("ArrowFrame")
+
+extended.validateProps = t.strictInterface({
 	ZIndex = t.optional(t.number),
 	isVisibleLeft = t.optional(t.union(t.boolean, t.table)),
 	isVisibleRight = t.optional(t.union(t.boolean, t.table)),
@@ -26,50 +29,40 @@ v11.validateProps = t.strictInterface({
 		updateCanvasPosition = t.callback
 	}))
 })
-v11.defaultProps = {
-	ZIndex = 1,
-	isVisibleRight = true,
-	isVisibleLeft = true
-}
 
-function v11.init(p1) -- line: 52
-	p1.state = {
-		isHovered = false
-	}
+extended.defaultProps = { ZIndex = 1, isVisibleRight = true, isVisibleLeft = true }
 
-	function p1.onMouseEnter() -- line: 57
-		-- upvalues: p1 (copy)
-		p1:setState({
-			isHovered = true
-		})
+function extended:init()
+	self.state = { isHovered = false }
+
+	function self.onMouseEnter()
+		self:setState({ isHovered = true })
 	end
-	function p1.onMouseLeave() -- line: 63
-		-- upvalues: p1 (copy)
-		p1:setState({
-			isHovered = false
-		})
+
+	function self.onMouseLeave()
+		self:setState({ isHovered = false })
 	end
 end
-function v11.render(p2) -- line: 70
-	-- upvalues: Roact (copy), ArrowNav (copy), v9 (copy), NavigationDirection (copy), v10 (copy)
-	local isVisibleLeft = p2.props.isVisibleLeft
-	local isVisibleRight = p2.props.isVisibleRight
-	local defaultUseProps = p2.props.defaultUseProps
-	local onPressHoldInputBegan = p2.props.onPressHoldInputBegan
-	local onPressHoldInputEnded = p2.props.onPressHoldInputEnded
+
+function extended.render(props)
+	local isVisibleLeft = props.props.isVisibleLeft
+	local isVisibleRight = props.props.isVisibleRight
+	local defaultUseProps = props.props.defaultUseProps
+	local onPressHoldInputBegan = props.props.onPressHoldInputBegan
+	local onPressHoldInputEnded = props.props.onPressHoldInputEnded
 
 	return Roact.createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
-		ZIndex = p2.props.ZIndex,
-		[Roact.Event.MouseEnter] = p2.onMouseEnter,
-		[Roact.Event.MouseLeave] = p2.onMouseLeave
+		ZIndex = props.props.ZIndex,
+		[Roact.Event.MouseEnter] = props.onMouseEnter,
+		[Roact.Event.MouseLeave] = props.onMouseLeave
 	}, {
 		ArrowLeft = Roact.createElement(ArrowNav, {
 			AnchorPoint = Vector2.new(0, 0.5),
 			Position = UDim2.new(0, -6, 0.5, 0),
-			Image = v9,
-			Visible = p2.state.isHovered and isVisibleLeft,
+			Image = iconsactionscycleLeft,
+			Visible = props.state.isHovered and isVisibleLeft,
 			navDirection = NavigationDirection.IsLeft,
 			defaultUseProps = defaultUseProps,
 			onPressHoldInputBegan = onPressHoldInputBegan,
@@ -78,8 +71,8 @@ function v11.render(p2) -- line: 70
 		ArrowRight = Roact.createElement(ArrowNav, {
 			AnchorPoint = Vector2.new(0, 0.5),
 			Position = UDim2.new(1, -30, 0.5, 0),
-			Image = v10,
-			Visible = p2.state.isHovered and isVisibleRight,
+			Image = iconsactionscycleRight,
+			Visible = props.state.isHovered and isVisibleRight,
 			navDirection = NavigationDirection.IsRight,
 			defaultUseProps = defaultUseProps,
 			onPressHoldInputBegan = onPressHoldInputBegan,
@@ -88,4 +81,4 @@ function v11.render(p2) -- line: 70
 	})
 end
 
-return v11
+return extended

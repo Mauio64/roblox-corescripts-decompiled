@@ -1,1 +1,3 @@
-return (require(script.ProfileQRCodeEntryPoint))
+local ProfileQRCodeEntryPoint = require(script.ProfileQRCodeEntryPoint)
+
+return ProfileQRCodeEntryPoint

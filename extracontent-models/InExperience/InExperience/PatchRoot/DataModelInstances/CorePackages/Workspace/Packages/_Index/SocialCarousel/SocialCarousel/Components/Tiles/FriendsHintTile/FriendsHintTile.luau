@@ -1,62 +1,87 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local React = require(SocialCarouselParent.React)
-local Foundation = require(SocialCarouselParent.Foundation)
-local useLocalization = require(SocialCarouselParent.Localization).Hooks.useLocalization
+local parent = SocialCarousel.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+
+local useLocalization = Localization.Hooks.useLocalization
 local Constants = require(SocialCarousel.Common.Constants)
 local useSocialCarouselContext = require(SocialCarousel.Contexts.useSocialCarouselContext)
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local FFlagConnectionsToFriendsRename = require(SocialCarouselParent.SharedFlags).FFlagConnectionsToFriendsRename
-local FFlagSocialCarouselShareQREnabled = require(SocialCarouselParent.SharedFlags).FFlagSocialCarouselShareQREnabled
 
-local function FriendsHintTile(t1: {[any]: any}) -- line: 22
-	-- upvalues: useSocialCarouselContext (copy), FFlagSocialCarouselShareQREnabled (copy), Constants (copy), FFlagConnectionsToFriendsRename (copy), useLocalization (copy), React (copy), View (copy), FoundationText (copy)
-	local v14 = useSocialCarouselContext()
-	local v15 = if not FFlagSocialCarouselShareQREnabled then {
-		friendsHintTitle = if not FFlagConnectionsToFriendsRename then Constants.LOCALIZATION.CONNECTIONS_HINT_TITLE else Constants.LOCALIZATION.FRIENDS_HINT_TITLE,
-		friendsHintBody = if not FFlagConnectionsToFriendsRename then Constants.LOCALIZATION.CONNECTIONS_HINT_BODY else Constants.LOCALIZATION.FRIENDS_HINT_BODY
-	} else {
-		friendsHintBold = Constants.LOCALIZATION.FRIENDS_HINT_BOLD,
-		friendsHintPlain = Constants.LOCALIZATION.FRIENDS_HINT_PLAIN
-	}
-	local v16 = useLocalization(v15)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
 
-	React.useEffect(function() -- line: 41
-		-- upvalues: v14 (copy), Constants (copy)
-		v14.onSuccessfulRender(Constants.ANALYTICS.UI_LOADING_EVENTS.EMPTY_HINT)
+local function FriendsHintTile(p)
+	local v = useSocialCarouselContext()
+	local v2
+
+	if FFlagSocialCarouselShareQREnabled then
+		v2 = {
+			friendsHintBold = Constants.LOCALIZATION.FRIENDS_HINT_BOLD,
+			friendsHintPlain = Constants.LOCALIZATION.FRIENDS_HINT_PLAIN
+		}
+	else
+		v2 = {
+			friendsHintTitle = Constants.LOCALIZATION.FRIENDS_HINT_TITLE,
+			friendsHintBody = Constants.LOCALIZATION.FRIENDS_HINT_BODY
+		}
+	end
+
+	local v3 = useLocalization(v2)
+
+	React.useEffect(function()
+		v.onSuccessfulRender(Constants.ANALYTICS.UI_LOADING_EVENTS.EMPTY_HINT)
 	end, {})
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v4 = {
+		Size = UDim2.new(
+			p.itemSize.X.Scale,
+			p.itemSize.X.Offset + Constants.TILE_TEXT_WIDTH,
+			p.itemSize.Y.Scale,
+			p.itemSize.Y.Offset - Constants.TILE_TEXT_HEIGHT
+		),
+		LayoutOrder = p.index,
 		BackgroundTransparency = 1,
-		tag = "col auto-none align-y-center",
-		Size = UDim2.new(t1.itemSize.X.Scale, t1.itemSize.X.Offset + Constants.TILE_TEXT_WIDTH, t1.itemSize.Y.Scale, t1.itemSize.Y.Offset - Constants.TILE_TEXT_HEIGHT),
-		LayoutOrder = t1.index
-	}, {
-		Content = React.createElement(View, {
+		tag = "col auto-none align-y-center"
+	}
+
+	local createElement2 = React.createElement
+	local v5
+
+	if FFlagSocialCarouselShareQREnabled then
+		v5 = {
+			HintText = React.createElement(Text, {
+				Text = `<b>{v3.friendsHintBold}</b> {v3.friendsHintPlain}`,
+				RichText = true,
+				tag = "text-body-small text-align-x-left auto-xy text-wrap"
+			})
+		}
+	else
+		v5 = {
+			Title = React.createElement(Text, {
+				Text = v3.friendsHintTitle,
+				tag = "text-title-medium text-align-x-left auto-xy text-wrap",
+				LayoutOrder = 1
+			}),
+			Subtitle = React.createElement(Text, {
+				Text = v3.friendsHintBody,
+				tag = "text-body-small text-align-x-left auto-xy text-wrap",
+				LayoutOrder = 2
+			})
+		}
+	end
+
+	return createElement(View, v4, {
+		Content = createElement2(View, {
 			BackgroundTransparency = 1,
 			tag = {
 				["auto-xy"] = FFlagSocialCarouselShareQREnabled,
 				["col gap-xxsmall auto-xy"] = not FFlagSocialCarouselShareQREnabled
 			}
-		}, if not FFlagSocialCarouselShareQREnabled then {
-			Title = React.createElement(FoundationText, {
-				tag = "text-title-medium text-align-x-left auto-xy text-wrap",
-				LayoutOrder = 1,
-				Text = v16.friendsHintTitle
-			}),
-			Subtitle = React.createElement(FoundationText, {
-				tag = "text-body-small text-align-x-left auto-xy text-wrap",
-				LayoutOrder = 2,
-				Text = v16.friendsHintBody
-			})
-		} else {
-			HintText = React.createElement(FoundationText, {
-				RichText = true,
-				tag = "text-body-small text-align-x-left auto-xy text-wrap",
-				Text = `<b>{ v16.friendsHintBold }</b> { v16.friendsHintPlain }`
-			})
-		})
+		}, v5)
 	})
 end
 

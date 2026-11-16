@@ -1,7 +1,6 @@
-local ParentParent = script.Parent.Parent
-local FFlagLuaAppInExperienceDetailsPrompt = require(ParentParent.SharedFlags).FFlagLuaAppInExperienceDetailsPrompt
-
+local parent = script.Parent.Parent
+local SharedFlags = require(parent.SharedFlags)
 return {
 	ExperienceUnavailable = "ExperienceUnavailable",
-	NetworkError = if not FFlagLuaAppInExperienceDetailsPrompt then nil else "NetworkError"
+	NetworkError = SharedFlags.FFlagLuaAppInExperienceDetailsPrompt and "NetworkError" or nil
 }

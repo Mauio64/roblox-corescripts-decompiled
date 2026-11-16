@@ -1,16 +1,14 @@
 local copy = require(script.Parent.copy)
 
-local function sort(p1, p2) -- line: 4
-	-- upvalues: copy (copy)
-	local v5 = type(p1)
+local function sort(p, p2)
+	local typeName = type(p)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+	local v = copy(p)
 
-	local v6 = copy(p1)
+	table.sort(v, p2)
 
-	table.sort(v6, p2)
-
-	return v6
+	return v
 end
 
 return sort

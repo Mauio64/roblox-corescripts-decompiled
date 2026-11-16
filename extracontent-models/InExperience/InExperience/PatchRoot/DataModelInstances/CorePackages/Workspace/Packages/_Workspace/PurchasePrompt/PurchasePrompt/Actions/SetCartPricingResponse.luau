@@ -1,5 +1,7 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
 
-require(Parent.IAPExperience)
+require(parent.IAPExperience)
 
-return require(script.Parent.makeActionCreator)(script.Name, "response")
+local makeActionCreator = require(script.Parent.makeActionCreator)
+
+return makeActionCreator(script.Name, "response")

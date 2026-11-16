@@ -1,42 +1,40 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Wrappers = require(Foundation.Utility.Wrappers)
 local Signal = Wrappers.Signal
 local Connection = Wrappers.Connection
 
-local function usePointerPosition(p1) -- line: 10
-	-- upvalues: React (copy), Signal (copy), Connection (copy)
-	local v9, v10 = React.useBinding(Vector2.zero)
+local function usePointerPosition(data)
+	local v, v2 = React.useBinding(Vector2.zero)
 
-	React.useEffect(function() -- line: 13
-		-- upvalues: p1 (copy), v10 (copy), Signal (copy), Connection (copy)
-		if not p1 then
+	React.useEffect(function()
+		if not data then
 			return
 		end
 
-		local function setPositionFromInput(p2) -- line: 18
-			-- upvalues: v10 (copy)
-			if p2.Position.X > 0 or p2.Position.Y > 0 then
-				v10(Vector2.new(p2.Position.X, p2.Position.Y))
+		local function setPositionFromInput(p)
+			if p.Position.X > 0 or p.Position.Y > 0 then
+				v2(Vector2.new(p.Position.X, p.Position.Y))
 			end
 		end
 
-		local t1 = {
-			Signal.Connect(p1.InputBegan, setPositionFromInput),
-			Signal.Connect(p1.InputChanged, setPositionFromInput),
-			Signal.Connect(p1.InputEnded, setPositionFromInput)
+		local v3 = {
+			Signal.Connect(data.InputBegan, setPositionFromInput),
+			Signal.Connect(data.InputChanged, setPositionFromInput),
+			Signal.Connect(data.InputEnded, setPositionFromInput)
 		}
 
-		return function() -- line: 30
-			-- upvalues: t1 (copy), Connection (copy)
-			for _, v15 in t1 do
-				Connection.Disconnect(v15)
+		return function()
+			for _, v4 in v3 do
+				Connection.Disconnect(v4)
 			end
 		end
-	end, { p1 })
+	end, { data })
 
-	return v9
+	return v
 end
 
 return usePointerPosition

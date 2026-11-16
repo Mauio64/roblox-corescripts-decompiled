@@ -1,8 +1,5 @@
 require(script.Parent.SharedTypes)
 
 return {
-	ChannelTypeAllowlist = {
-		"PlatformChatGroup",
-		"PlatformChatOneToOne"
-	}
+	ChannelTypeAllowlist = { "PlatformChatGroup", "PlatformChatOneToOne" }
 }

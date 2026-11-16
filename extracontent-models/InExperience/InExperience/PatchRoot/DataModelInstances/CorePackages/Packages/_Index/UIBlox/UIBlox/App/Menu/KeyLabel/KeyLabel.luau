@@ -1,94 +1,101 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local React = require(ParentParentParentParent.React)
-local LuauPolyfill = require(ParentParentParentParent.LuauPolyfill)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
+local Foundation = require(parent4.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
-require(scriptParent.Types)
+local React = require(parent4.React)
+local LuauPolyfill = require(parent4.LuauPolyfill)
 
-local Constants = require(scriptParent.Constants)
-local Utilities = require(scriptParent.Utilities)
-local useStyle = require(ParentParentParent.Core.Style.useStyle)
-local Images = require(ParentParent.ImageSet.Images)
-local Label = require(ParentParentParent.Core.ImageSet.ImageSetComponent).Label
+require(parent.Types)
+local Constants = require(parent.Constants)
+local Utilities = require(parent.Utilities)
+local useStyle = require(parent3.Core.Style.useStyle)
+local GetFontFromFontStyle = require(parent3.Core.Text.GetFontFromFontStyle)
+local Images = require(parent2.ImageSet.Images)
+local ImageSetComponent = require(parent3.Core.ImageSet.ImageSetComponent)
+local Label = ImageSetComponent.Label
 
-local function KeyLabel(t1: {[any]: any}) -- line: 40
-	-- upvalues: useStyle (copy), Constants (copy), Utilities (copy), React (copy), Images (copy), Label (copy), LuauPolyfill (copy)
-	local v14 = useStyle()
-	local v15 = v14.Theme[t1.iconThemeKey or Constants.DEFAULT_ICON_THEME]
-	local v16 = Utilities.getKeyCodeContent(t1.keyCode)
-	local v17 = Utilities.getWidthFromContent(v16, v14.Font)
-	local t2 = {
-		AnchorPoint = t1.AnchorPoint,
-		Position = t1.Position,
-		LayoutOrder = t1.LayoutOrder,
-		ZIndex = t1.ZIndex,
-		[React.Change.AbsoluteSize] = t1[React.Change.AbsoluteSize],
-		Size = UDim2.fromOffset(v17, Constants.HEIGHT)
+local function KeyLabel(data)
+	local v = useStyle()
+
+	local v2 = v.Theme[data.iconThemeKey or Constants.DEFAULT_ICON_THEME]
+	local keyCodeContent = Utilities.getKeyCodeContent(data.keyCode)
+	local widthFromContent = Utilities.getWidthFromContent(keyCodeContent, v.Font)
+
+	local v3 = {
+		AnchorPoint = data.AnchorPoint,
+		Position = data.Position,
+		LayoutOrder = data.LayoutOrder,
+		ZIndex = data.ZIndex,
+		[React.Change.AbsoluteSize] = data[React.Change.AbsoluteSize],
+		Size = UDim2.fromOffset(widthFromContent, Constants.HEIGHT)
 	}
 
-	if v16.inputType == "keyboard" then
-		local v19 = v14.Theme[t1.textThemeKey or Constants.DEFAULT_TEXT_THEME]
-		local Font = v14.Font
-		local BaseSize = Font.BaseSize
-		local CaptionHeader = Font.CaptionHeader
-		local v23 = BaseSize * CaptionHeader.RelativeSize
-		local s1 = ""
-		local v25 = nil
+	if keyCodeContent.inputType == "keyboard" then
+		local v4 = v.Theme[data.textThemeKey or Constants.DEFAULT_TEXT_THEME]
+		local font = v.Font
+		local baseSize = font.BaseSize
 
-		if type(v16.content) == "string" then
-			s1 = v16.content
+		local captionHeader = font.CaptionHeader
+		local textSize = baseSize * captionHeader.RelativeSize
+
+		local text = ""
+		local icon = nil
+
+		if type(keyCodeContent.content) == "string" then
+			text = keyCodeContent.content
 		else
-			local v26 = v16.content.ImageRectSize / Images.ImagesResolutionScale
-
-			v25 = React.createElement(Label, {
+			local v5 = keyCodeContent.content.ImageRectSize / Images.ImagesResolutionScale
+			icon = React.createElement(Label, {
+				Image = keyCodeContent.content,
+				ImageColor3 = v4.Color,
+				ImageTransparency = v4.Transparency,
 				BackgroundTransparency = 1,
-				Image = v16.content,
-				ImageColor3 = v19.Color,
-				ImageTransparency = v19.Transparency,
-				Size = UDim2.fromOffset(v26.X, v26.Y),
+				Size = UDim2.fromOffset(v5.X, v5.Y),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5)
 			})
 		end
 
-		return React.createElement(Label, LuauPolyfill.Object.assign(t2, {
+		return React.createElement(Label, LuauPolyfill.Object.assign(v3, {
 			BackgroundTransparency = 1,
-			ImageTransparency = v15.Transparency,
-			ImageColor3 = v15.Color,
+			ImageTransparency = v2.Transparency,
+			ImageColor3 = v2.Color,
 			Image = Images["icons/controls/keys/key_single"],
 			ScaleType = Enum.ScaleType.Slice,
 			SliceCenter = Rect.new(Vector2.new(10, 9), Vector2.new(25, 25))
 		}), {
 			LabelContent = React.createElement("TextLabel", {
+				Text = text,
 				BackgroundTransparency = 1,
-				RichText = false,
-				Text = s1,
-				TextColor3 = v19.Color,
-				TextTransparency = v19.Transparency,
+				TextColor3 = v4.Color,
+				TextTransparency = v4.Transparency,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				TextSize = v23,
-				Font = CaptionHeader.Font,
+				TextSize = textSize,
+				FontFace = normalizeFontFace(GetFontFromFontStyle(captionHeader)),
+				RichText = false,
 				Position = UDim2.fromOffset(0, Constants.TEXT_CENTER_OFFSET),
 				Size = UDim2.fromScale(1, 1)
-			}, {
-				Icon = v25
-			})
+			}, { Icon = icon })
 		})
 	end
 
-	if v16.inputType == "gamepad" then
-		return React.createElement(Label, LuauPolyfill.Object.assign(t2, {
-			BackgroundTransparency = 1,
-			Image = v16.content,
-			ImageColor3 = v15.Color,
-			ImageTransparency = v15.Transparency
-		}))
+	if keyCodeContent.inputType == "gamepad" then
+		return React.createElement(
+			Label,
+			LuauPolyfill.Object.assign(v3, {
+				Image = keyCodeContent.content,
+				ImageColor3 = v2.Color,
+				ImageTransparency = v2.Transparency,
+				BackgroundTransparency = 1
+			})
+		)
 	end
 
-	assert(false, string.format("Unreachable: Invalid inputType value: \"%s\"", v16.inputType))
+	assert(false, string.format("Unreachable: Invalid inputType value: \"%s\"", keyCodeContent.inputType))
 end
 
 return KeyLabel

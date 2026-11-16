@@ -1,0 +1,1 @@
+return game:DefineFastFlag("EnablePlayerSupportCaptureAttachments2", false)

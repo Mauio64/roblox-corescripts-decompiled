@@ -1,26 +1,26 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-local UserModel = require(SocialLibraries.dependencies).UserModel
+local dependencies = require(SocialLibraries.dependencies)
+local userModel = dependencies.UserModel
 
-return function(p1) -- line: 5
-	-- upvalues: UserModel (copy)
-	local presence = p1.presence
-	local lastLocation = p1.lastLocation
+return function(p)
+	local presence = p.presence
+	local lastLocation = p.lastLocation
 
-	if presence == UserModel.PresenceType.OFFLINE then
+	if presence == userModel.PresenceType.OFFLINE then
 		return "Common.Presence.Label.Offline"
 	end
 
-	if presence == UserModel.PresenceType.ONLINE then
+	if presence == userModel.PresenceType.ONLINE then
 		return "Common.Presence.Label.Online"
 	end
 
-	if presence == UserModel.PresenceType.IN_GAME or presence == UserModel.PresenceType.IN_STUDIO then
-		if lastLocation then
-			return (tostring(lastLocation))
-		end
-
-		return "Common.Presence.Label.Online"
+	if presence ~= userModel.PresenceType.IN_GAME and presence ~= userModel.PresenceType.IN_STUDIO then
+		return ""
 	end
 
-	return ""
+	if lastLocation then
+		return (tostring(lastLocation))
+	end
+
+	return "Common.Presence.Label.Online"
 end

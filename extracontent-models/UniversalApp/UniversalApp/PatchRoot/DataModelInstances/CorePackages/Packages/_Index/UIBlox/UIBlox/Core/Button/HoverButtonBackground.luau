@@ -1,43 +1,68 @@
-local ParentParent = script.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
-local Roact = require(ParentParent2.Roact)
-local t = require(ParentParent2.t)
-local ImageSetComponent = require(ParentParent.ImageSet.ImageSetComponent)
-local validateImage = require(ParentParent.ImageSet.Validator.validateImage)
-local withStyle = require(ParentParent.Style.withStyle)
-local v8 = Roact.PureComponent:extend("HoverButtonBackground")
+local parent = script.Parent.Parent
+local parent2 = parent.Parent.Parent
 
-v8.validateProps = t.strictInterface({
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+
+local ImageSetComponent = require(parent.ImageSet.ImageSetComponent)
+local validateImage = require(parent.ImageSet.Validator.validateImage)
+local withStyle = require(parent.Style.withStyle)
+
+local extended = Roact.PureComponent:extend("HoverButtonBackground")
+
+extended.validateProps = t.strictInterface({
 	sidePadding = t.optional(t.number),
 	image = t.optional(validateImage),
 	sliceCenter = t.optional(t.Rect)
 })
 
-function v8.render(p1) -- line: 32
-	-- upvalues: withStyle (copy), Roact (copy), ImageSetComponent (copy)
-	local v10 = if not p1.props.sidePadding then UDim2.new() else UDim2.new(p1.props.sidePadding, UDim.new()) + UDim2.new(p1.props.sidePadding, UDim.new())
+function extended.render(p)
+	local v
 
-	return withStyle(function(p2) -- line: 37
-		-- upvalues: Roact (copy), ImageSetComponent (copy), v10 (copy), p1 (copy)
-		local BackgroundOnHover = p2.Theme.BackgroundOnHover
+	if p.props.sidePadding then
+		v = UDim2.new(p.props.sidePadding, UDim.new()) + UDim2.new(p.props.sidePadding, UDim.new())
+	else
+		v = UDim2.new()
+	end
 
-		return Roact.createElement(ImageSetComponent.Label, {
-			Size = UDim2.fromScale(1, 1) + v10,
+	return withStyle(function(p2)
+		local backgroundOnHover = p2.Theme.BackgroundOnHover
+
+		local createElement = Roact.createElement
+		local label = ImageSetComponent.Label
+		local v2 = {
+			Size = UDim2.fromScale(1, 1) + v,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
-			BackgroundColor3 = if not p1.props.image then BackgroundOnHover.Color else nil,
-			BackgroundTransparency = if not p1.props.image then BackgroundOnHover.Transparency else 1,
-			Image = p1.props.image,
-			ImageColor3 = BackgroundOnHover.Color,
-			ImageTransparency = BackgroundOnHover.Transparency,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = p1.props.sliceCenter
-		}, {
-			corner = if not p1.props.image then Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 8)
-			}) else nil
-		})
+			BackgroundColor3 = 0,
+			BackgroundTransparency = 0,
+			Image = 0,
+			ImageColor3 = 0,
+			ImageTransparency = 0,
+			ScaleType = 0,
+			SliceCenter = 0
+		}
+		local backgroundColor
+
+		if not p.props.image then
+			backgroundColor = backgroundOnHover.Color
+		end
+
+		v2.BackgroundColor3 = backgroundColor
+		v2.BackgroundTransparency = p.props.image and 1 or backgroundOnHover.Transparency
+		v2.Image = p.props.image
+		v2.ImageColor3 = backgroundOnHover.Color
+		v2.ImageTransparency = backgroundOnHover.Transparency
+		v2.ScaleType = Enum.ScaleType.Slice
+		v2.SliceCenter = p.props.sliceCenter
+		local corner
+
+		if not p.props.image then
+			corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) })
+		end
+
+		return createElement(label, v2, { corner = corner })
 	end)
 end
 
-return v8
+return extended

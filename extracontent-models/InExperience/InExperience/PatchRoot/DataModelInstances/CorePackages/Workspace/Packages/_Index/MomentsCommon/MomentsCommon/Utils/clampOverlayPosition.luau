@@ -1,51 +1,31 @@
-local function clampAxis(n1: number, n2: number, n3: number, n4: number) -- line: 1
-	if n3 <= 0 or n4 <= 0 then
-		return n1
+local function clampAxis(value: number, p: number, p2: number, p3: number) -- 2 equivalent calls inferred from this helper
+	if p2 <= 0 or p3 <= 0 then
+		return value
 	end
 
-	local v7 = n2 + n4 / 2
-	local v8 = n2 + n3 - n4 / 2
+	local v = p + p3 / 2
+	local v2 = p + p2 - p3 / 2
 
-	if v8 < v7 then
-		return n2 + n3 / 2
+	if v2 < v then
+		return p + p2 / 2
 	end
 
-	return (math.clamp(n1, v7, v8))
+	return (math.clamp(value, v, v2))
 end
-local function clampOverlayPosition(uDim2: UDim2, vector2: Vector2, vector2_2: Vector2, vector2_3: Vector2?, vector2_4: Vector2?) -- line: 16
+
+local function clampOverlayPosition(udim: UDim2, vector2: Vector2, vector2_2: Vector2, vector2_3: Vector2?, vector2_4: Vector2?)
 	if vector2.X <= 0 or vector2.Y <= 0 then
-		return uDim2
+		return udim
 	end
 
-	local v14 = vector2_3 or Vector2.zero
-	local v15 = vector2_4 or vector2
-	local v16 = uDim2.X.Scale * vector2.X + uDim2.X.Offset
-	local v17 = uDim2.Y.Scale * vector2.Y + uDim2.Y.Offset
-	local X = v14.X
-	local X2 = v15.X
-	local vector2_2X = vector2_2.X
+	local v = vector2_3 or Vector2.zero
+	local v2 = vector2_4 or vector2
+	local v3 = udim.X.Scale * vector2.X + udim.X.Offset
+	local v4 = udim.Y.Scale * vector2.Y + udim.Y.Offset
+	v3 = clampAxis(v3, v.X, v2.X, vector2_2.X) -- inferred equivalent call
+	v4 = clampAxis(v4, v.Y, v2.Y, vector2_2.Y) -- inferred equivalent call
 
-	if X2 <= 0 or vector2_2X <= 0 then
-	else
-		local v21 = X + vector2_2X / 2
-		local v22 = X + X2 - vector2_2X / 2
-
-		v16 = if not (v22 < v21) then math.clamp(v16, v21, v22) else X + X2 / 2
-	end
-
-	local Y = v14.Y
-	local Y2 = v15.Y
-	local vector2_2Y = vector2_2.Y
-
-	if Y2 <= 0 or vector2_2Y <= 0 then
-	else
-		local v26 = Y + vector2_2Y / 2
-		local v27 = Y + Y2 - vector2_2Y / 2
-
-		v17 = if not (v27 < v26) then math.clamp(v17, v26, v27) else Y + Y2 / 2
-	end
-
-	return UDim2.fromScale(v16 / vector2.X, v17 / vector2.Y)
+	return UDim2.fromScale(v3 / vector2.X, v4 / vector2.Y)
 end
 
 return clampOverlayPosition

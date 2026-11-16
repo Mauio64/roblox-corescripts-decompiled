@@ -1,4 +1,1 @@
-return {
-	Word = "Word",
-	Symbol = "Symbol"
-}
+return { Word = "Word", Symbol = "Symbol" }

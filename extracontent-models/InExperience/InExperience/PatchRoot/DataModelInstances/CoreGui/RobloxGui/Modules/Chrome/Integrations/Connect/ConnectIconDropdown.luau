@@ -1,10 +1,12 @@
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local Service = require(Chrome.Service)
 local registerConnectIntegration = require(script.Parent.registerConnectIntegration)
-local v4 = nil
+local isConnectDropdownEnabled = require(script.Parent.isConnectDropdownEnabled)
+local v
 
-if require(script.Parent.isConnectDropdownEnabled)() then
-	v4 = registerConnectIntegration("connect_dropdown", Service.AvailabilitySignal.Available)
+if isConnectDropdownEnabled() then
+	return (registerConnectIntegration("connect_dropdown", Service.AvailabilitySignal.Available))
 end
 
-return v4
+return v

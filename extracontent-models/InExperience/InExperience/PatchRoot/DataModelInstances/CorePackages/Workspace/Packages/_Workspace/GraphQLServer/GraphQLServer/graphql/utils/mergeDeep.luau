@@ -1,41 +1,35 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local LuauPolyfill = require(Parent.LuauPolyfill)
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Object = LuauPolyfill.Object
 local Array = LuauPolyfill.Array
 
-local function isObject(p1) -- line: 9
-	-- upvalues: Array (copy)
-	return typeof(p1) == "table" and not (Array.isArray(p1) and #p1 > 0)
+local function isObject(list): boolean -- 2 equivalent calls inferred from this helper
+	return typeof(list) == "table" and not (Array.isArray(list) and #list > 0)
 end
-local function mergeDeep(p2, b1: boolean?) -- line: 13
-	-- upvalues: Array (copy), Object (copy), mergeDeep (copy)
-	local v10 = p2[1] or {}
-	local t1 = {}
 
-	for _, v13 in p2 do
-		if typeof(v10) == "table" and not (Array.isArray(v10) and #v10 > 0) and (typeof(v13) == "table" and not (Array.isArray(v13) and #v13 > 0)) then
-			for v14, v15 in v13 do
-				if type(v15) == "table" then
-					if t1[v14] == nil then
-						Object.assign(t1, {
-							[v14] = v15
-						})
-					else
-						t1[v14] = mergeDeep({
-							t1[v14],
-							v15
-						}, b1)
-					end
+local function mergeDeep(list, flag: boolean?)
+	local v = list[1] or {}
+	local result = {}
+
+	for _, item in list do
+		if not (isObject(v) and isObject(item)) then -- inferred equivalent call
+			continue
+		end
+
+		for k, v2 in item do
+			if type(v2) == "table" then
+				if result[k] == nil then
+					Object.assign(result, { [k] = v2 })
 				else
-					Object.assign(t1, {
-						[v14] = v15
-					})
+					result[k] = mergeDeep({ result[k], v2 }, flag)
 				end
+			else
+				Object.assign(result, { [k] = v2 })
 			end
 		end
 	end
 
-	return t1
+	return result
 end
 
 return mergeDeep

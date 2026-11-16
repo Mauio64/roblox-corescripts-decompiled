@@ -1,76 +1,85 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Foundation = require(ProfilePlatformParent.Foundation)
-local CatalogRowItemCard = require(ProfilePlatformParent.AvatarExperienceCommon).Components.CatalogItemCard.CatalogRowItemCard
-local ItemCardThumbnail = require(ProfilePlatformParent.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail
-local getPriceLineContent = require(ProfilePlatformParent.AvatarExperienceInspectAndBuy).Utils.getPriceLineContent
+local parent = ProfilePlatform.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local CatalogRowItemCard = AvatarExperienceCommon.Components.CatalogItemCard.CatalogRowItemCard
+local AvatarExperienceUIKit = require(parent.AvatarExperienceUIKit)
+local ItemCardThumbnail = AvatarExperienceUIKit.ItemCardComponents.ItemCardThumbnail
+local AvatarExperienceInspectAndBuy = require(parent.AvatarExperienceInspectAndBuy)
+local getPriceLineContent = AvatarExperienceInspectAndBuy.Utils.getPriceLineContent
+
 local View = Foundation.View
 local Checkbox = Foundation.Checkbox
 local useTokens = Foundation.Hooks.useTokens
 local InputSize = Foundation.Enums.InputSize
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local FFlagProfileInspectAvatarBuyAll = require(ProfilePlatform.Flags.FFlagProfileInspectAvatarBuyAll)
 
 require(ProfilePlatform.Common.Types)
-
 local ItemDisplayHelpers = require(script.Parent.ItemDisplayHelpers)
 
-local function CatalogItemRowCardContainer(t1: {[any]: any}) -- line: 41
-	-- upvalues: useTokens (copy), ItemDisplayHelpers (copy), useLocalization (copy), React (copy), View (copy), FFlagProfileInspectAvatarBuyAll (copy), Checkbox (copy), InputSize (copy), CatalogRowItemCard (copy), ItemCardThumbnail (copy), getPriceLineContent (copy)
-	local v17 = useTokens()
-	local asset = t1.asset
+local function CatalogItemRowCardContainer(props)
+	local v = useTokens()
+	local asset = props.asset
 	local id = asset.id
-	local v20 = ItemDisplayHelpers.shouldShowBundleParts(asset)
-	local v21 = useLocalization(if not v20 then {} else {
+
+	local v2 = useLocalization(ItemDisplayHelpers.shouldShowBundleParts(asset) and {
 		bundleParts = {
 			"Feature.Catalog.Label.UsingBundleParts",
 			count = asset.bundlePartsCount
 		}
-	})
-	local v22 = ItemDisplayHelpers.getThumbnailUrl(asset)
+	} or {})
 
-	return React.createElement(View, {
+	local thumbnailUrl = ItemDisplayHelpers.getThumbnailUrl(asset)
+
+	local createElement = React.createElement
+	local v3 = {
 		tag = "row align-y-top gap-medium",
-		Size = UDim2.new(1, 0, 0, t1.rowHeight),
-		LayoutOrder = t1.index
-	}, {
-		ItemCheckbox = if not FFlagProfileInspectAvatarBuyAll then React.createElement(Checkbox, {
+		Size = UDim2.new(1, 0, 0, props.rowHeight),
+		LayoutOrder = props.index
+	}
+	local itemCheckbox
+
+	if not FFlagProfileInspectAvatarBuyAll then
+		itemCheckbox = React.createElement(Checkbox, {
 			label = "",
-			LayoutOrder = 1,
-			isChecked = t1.isPurchasable and t1.isChecked,
-			isDisabled = not t1.isPurchasable,
+			isChecked = props.isPurchasable and props.isChecked,
+			isDisabled = not props.isPurchasable,
 			size = InputSize.Small,
-			onActivated = function(_: boolean) -- line: 70
-				-- upvalues: t1 (copy), id (copy)
-				t1.onToggleItem(id)
-			end
-		}) else nil,
-		ItemCard = React.createElement(View, {
-			tag = "fill size-0-full",
-			LayoutOrder = 2
-		}, {
+			onActivated = function(_: boolean)
+				props.onToggleItem(id)
+			end,
+			LayoutOrder = 1
+		})
+	end
+
+	return createElement(View, v3, {
+		ItemCheckbox = itemCheckbox,
+		ItemCard = React.createElement(View, { tag = "fill size-0-full", LayoutOrder = 2 }, {
 			Card = React.createElement(CatalogRowItemCard, {
-				tag = "size-full",
 				title = asset.name,
-				presentationSlot = React.createElement(ItemCardThumbnail, {
-					url = v22
-				}),
-				creator = if not asset.creator or not asset.creator.creatorName then nil else {
+				tag = "size-full",
+				presentationSlot = React.createElement(ItemCardThumbnail, { url = thumbnailUrl }),
+				creator = asset.creator and asset.creator.creatorName and {
 					name = asset.creator.creatorName,
 					verified = asset.creator.creatorHasVerifiedBadge
-				},
-				itemSubType = ItemDisplayHelpers.getItemTypeDisplayName(asset, t1.localizedStrings),
-				bundlePartsText = v21.bundleParts,
-				priceLineContent = getPriceLineContent(asset, v17, t1.priceStatusLocalized, {
+				} or nil,
+				itemSubType = ItemDisplayHelpers.getItemTypeDisplayName(asset, props.localizedStrings),
+				bundlePartsText = v2.bundleParts,
+				priceLineContent = getPriceLineContent(asset, v, props.priceStatusLocalized, {
 					isShopContext = true
 				}),
-				headerSize = UDim2.fromOffset(t1.rowHeight, t1.rowHeight),
+				headerSize = UDim2.fromOffset(props.rowHeight, props.rowHeight),
 				footerSize = UDim2.fromScale(0, 1),
 				footerAutomaticSize = Enum.AutomaticSize.X,
-				onActivated = function() -- line: 99
-					-- upvalues: t1 (copy), id (copy), asset (copy)
-					t1.openItemDetails(id, asset.itemType or "Asset", t1.index)
+				onActivated = function()
+					props.openItemDetails(id, asset.itemType or "Asset", props.index)
 				end
 			})
 		})

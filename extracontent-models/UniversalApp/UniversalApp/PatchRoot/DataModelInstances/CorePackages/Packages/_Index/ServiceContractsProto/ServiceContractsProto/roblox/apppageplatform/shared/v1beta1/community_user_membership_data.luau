@@ -1,128 +1,120 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 47
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		can_join = t3 ~= nil and (t3.can_join ~= nil and t3.can_join),
-		is_pending_approval = t3 ~= nil and (t3.is_pending_approval ~= nil and t3.is_pending_approval)
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(p)
+	local v2 = {
+		can_join = p ~= nil and p.can_join ~= nil and p.can_join,
+		is_pending_approval = p ~= nil and p.is_pending_approval ~= nil and p.is_pending_approval
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 58
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.can_join then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class.encode(p)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v9, v10, not p1.can_join and 0 or 1)
+	if p.can_join then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.can_join and 1 or 0)
 	end
 
-	if p1.is_pending_approval then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v11, v12, not p1.is_pending_approval and 0 or 1)
+	if p.is_pending_approval then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.is_pending_approval and 1 or 0)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 77
-	-- upvalues: t2 (copy), proto (copy)
-	local v15 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v17, v18
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v17, v18, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v18 == proto.wireTypes.varint then
-			if v17 == 1 then
-				local v19
-
-				v19, n2 = proto.readVarInt(p2, n2)
-				v15.can_join = v19 ~= 0
-			elseif v17 == 2 then
-				local v20
-
-				v20, n2 = proto.readVarInt(p2, n2)
-				v15.is_pending_approval = v20 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.can_join = v5 ~= 0
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_pending_approval = v5 ~= 0
 			else
-				local v21
-
-				v21, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v18 == proto.wireTypes.lengthDelimited then
-			local v22, v23 = proto.readVarInt(p2, n2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			local varInt, v5 = proto.readVarInt(buf, v2)
 
-			n2 = v23 + v22
-		elseif v18 == proto.wireTypes.i32 then
-			local v24
-
-			v24, n2 = proto.readFixed32(p2, n2)
-		elseif v18 == proto.wireTypes.i64 then
-			local v25
-
-			v25, n2 = proto.readFixed64(p2, n2)
+			v2 = v5 + varInt
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v18)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v15
-end
-function t2.jsonEncode(p3) -- line: 125
-	local t4 = {}
-
-	if p3.can_join then
-		t4.canJoin = p3.can_join
-	end
-
-	if p3.is_pending_approval then
-		t4.isPendingApproval = p3.is_pending_approval
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 139
-	-- upvalues: t2 (copy)
-	local v29 = t2.new()
-
-	if t5.can_join ~= nil then
-		v29.can_join = t5.can_join
-	end
-
-	if t5.canJoin ~= nil then
-		v29.can_join = t5.canJoin
-	end
-
-	if t5.is_pending_approval ~= nil then
-		v29.is_pending_approval = t5.is_pending_approval
-	end
-
-	if t5.isPendingApproval ~= nil then
-		v29.is_pending_approval = t5.isPendingApproval
-	end
-
-	return v29
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(p)
+	local v2 = {}
+
+	if p.can_join then
+		v2.canJoin = p.can_join
+	end
+
+	if p.is_pending_approval then
+		v2.isPendingApproval = p.is_pending_approval
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.can_join ~= nil then
+		v2.can_join = data.can_join
+	end
+
+	if data.canJoin ~= nil then
+		v2.can_join = data.canJoin
+	end
+
+	if data.is_pending_approval ~= nil then
+		v2.is_pending_approval = data.is_pending_approval
+	end
+
+	if data.isPendingApproval ~= nil then
+		v2.is_pending_approval = data.isPendingApproval
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "CommunityUserMembershipData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.CommunityUserMembershipData"
 }
-t1.CommunityUserMembershipData = t2
-typeRegistry.default:register(t1.CommunityUserMembershipData)
 
-return {
-	CommunityUserMembershipData = t1.CommunityUserMembershipData
-}
+v.CommunityUserMembershipData = class
+
+typeRegistry.default:register(v.CommunityUserMembershipData)
+
+return { CommunityUserMembershipData = v.CommunityUserMembershipData }

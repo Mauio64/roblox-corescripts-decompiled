@@ -1,70 +1,47 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local UserModel = require(Parent.UserLib).Models.UserModel
-local t1 = {
+local parent = script:FindFirstAncestor("GameTile").Parent
+local UserLib = require(parent.UserLib)
+local UserModel = UserLib.Models.UserModel
+
+local v = {
 	[UserModel.PresenceType.IN_GAME] = 3,
 	[UserModel.PresenceType.ONLINE] = 2,
 	[UserModel.PresenceType.IN_STUDIO] = 1,
 	[UserModel.PresenceType.OFFLINE] = 0
 }
 
-local function useLastOnlineForSort(p1, p2) -- line: 12
-	return typeof(p1) == "number" and (typeof(p2) == "number" and p1 ~= p2)
-end
-local function getFriendWeight(p3) -- line: 16
-	-- upvalues: t1 (copy), UserModel (copy)
-	local v9 = nil
-
-	if p3 and p3.presence then
-		v9 = t1[p3.presence]
-	end
-
-	if v9 == nil then
-		v9 = t1[UserModel.PresenceType.OFFLINE]
-	end
-
-	return v9
+local function useLastOnlineForSort(lastOnline, lastOnline2): boolean -- 1 equivalent call inferred from this helper
+	return typeof(lastOnline) == "number" and typeof(lastOnline2) == "number" and lastOnline ~= lastOnline2
 end
 
-return function(s1: string) -- line: 27
-	-- upvalues: t1 (copy), UserModel (copy)
-	return function(p4, p5) -- line: 28
-		-- upvalues: t1 (copy), UserModel (copy), s1 (copy)
-		local v13 = nil
+local function getFriendWeight(p) -- 2 equivalent calls inferred from this helper
+	local friendWeight
 
-		if p4 and p4.presence then
-			v13 = t1[p4.presence]
+	if p and p.presence then
+		friendWeight = v[p.presence]
+	end
+
+	if friendWeight == nil then
+		friendWeight = v[UserModel.PresenceType.OFFLINE]
+	end
+
+	return friendWeight
+end
+
+return function(p: string)
+	return function(p2, p3): boolean
+		local friendWeight = getFriendWeight(p2) -- inferred equivalent call
+		local friendWeight2 = getFriendWeight(p3) -- inferred equivalent call
+
+		if friendWeight ~= friendWeight2 then
+			return friendWeight2 < friendWeight
 		end
 
-		if v13 == nil then
-			v13 = t1[UserModel.PresenceType.OFFLINE]
+		if p2.presence ~= UserModel.PresenceType.OFFLINE and useLastOnlineForSort(p2.lastOnline, p3.lastOnline) then -- inferred equivalent call
+			return p2.lastOnline > p3.lastOnline
 		end
 
-		local v14 = nil
-
-		if p5 and p5.presence then
-			v14 = t1[p5.presence]
-		end
-
-		if v14 == nil then
-			v14 = t1[UserModel.PresenceType.OFFLINE]
-		end
-
-		if v13 == v14 then
-			if p4.presence ~= UserModel.PresenceType.OFFLINE then
-				local lastOnline = p4.lastOnline
-				local lastOnline2 = p5.lastOnline
-
-				if typeof(lastOnline) == "number" and (typeof(lastOnline2) == "number" and lastOnline ~= lastOnline2) then
-					return p4.lastOnline > p5.lastOnline
-				end
-			end
-
-			local v17 = p4[s1] or ""
-			local v18 = p5[s1] or ""
-
-			return v17:lower() < v18:lower()
-		end
-
-		return v14 < v13
+		local v2 = p2[p] or ""
+		local v3 = p3[p] or ""
+		return v2:lower() < v3:lower()
 	end
 end

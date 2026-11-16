@@ -1,18 +1,12 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.networkingChatTypes)
+local CHAT_URL = require(parent.CHAT_URL)
 
-require(ParentParent.networkingChatTypes)
-
-local CHAT_URL = require(ParentParent.CHAT_URL)
-
-return function(p1) -- line: 6
-	-- upvalues: CHAT_URL (copy)
-	return p1.roduxNetworking.POST({
-		Name = "SetConversationUniverse"
-	}, function(p2, p3, p4) -- line: 9
-		-- upvalues: CHAT_URL (copy)
-		return p2(CHAT_URL):path("v2"):path("set-conversation-universe"):body({
-			conversationId = p3,
-			universeId = p4
-		}):setStatusIds({ p3 })
+return function(p)
+	return p.roduxNetworking.POST({ Name = "SetConversationUniverse" }, function(callback, conversationId, universeId)
+		return callback(CHAT_URL):path("v2"):path("set-conversation-universe"):body({
+			conversationId = conversationId,
+			universeId = universeId
+		}):setStatusIds({ conversationId })
 	end)
 end

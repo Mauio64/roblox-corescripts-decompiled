@@ -1,7 +1,8 @@
 local EventIngestService = game:GetService("EventIngestService")
+local sendEventDeferred = require(script.Parent.sendEventDeferred)
 
 return {
 	EventStream = {
-		sendEventDeferred = require(script.Parent.sendEventDeferred)(EventIngestService)
+		sendEventDeferred = sendEventDeferred(EventIngestService)
 	}
 }

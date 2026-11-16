@@ -1,10 +1,10 @@
-local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
-local getPlatformTarget = require(Parent.Analytics).getPlatformTarget
+local parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
 
-return function(p1) -- line: 6
-	-- upvalues: getPlatformTarget (copy)
-	return function(_, s1: string, s2: string, t1: {[any]: any}?) -- line: 7
-		-- upvalues: p1 (copy), getPlatformTarget (copy)
-		p1:sendEventDeferred(getPlatformTarget(), s1, s2, t1)
+local Analytics = require(parent.Analytics)
+local getPlatformTarget = Analytics.getPlatformTarget
+
+return function(object)
+	return function(_, p: string, p2: string, p3)
+		object:sendEventDeferred(getPlatformTarget(), p, p2, p3)
 	end
 end

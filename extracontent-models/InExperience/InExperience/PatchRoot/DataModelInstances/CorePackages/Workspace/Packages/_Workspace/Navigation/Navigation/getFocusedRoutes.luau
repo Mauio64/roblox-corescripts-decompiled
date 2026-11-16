@@ -1,29 +1,25 @@
 local Navigation = script:FindFirstAncestor("Navigation")
-
 require(script.Parent.types)
+local parent = Navigation.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local function getFocusedRoutes(route)
+	local joined = {}
 
-local NavigationParent = Navigation.Parent
-local Array = require(NavigationParent.LuauPolyfill).Array
-
-local function getFocusedRoutes(p1) -- line: 10
-	-- upvalues: Array (copy), getFocusedRoutes (copy)
-	local t1 = {}
-
-	if p1 == nil then
-		return t1
+	if route == nil then
+		return joined
 	end
 
-	if p1.key or p1.routeName then
-		table.insert(t1, p1)
+	if route.key or route.routeName then
+		table.insert(joined, route)
 	end
 
-	if p1.routes and p1.index ~= nil then
-		local v7 = p1.routes[p1.index]
-
-		t1 = Array.concat(t1, getFocusedRoutes(v7))
+	if route.routes and route.index ~= nil then
+		local route2 = route.routes[route.index]
+		joined = Array.concat(joined, getFocusedRoutes(route2))
 	end
 
-	return t1
+	return joined
 end
 
 return getFocusedRoutes

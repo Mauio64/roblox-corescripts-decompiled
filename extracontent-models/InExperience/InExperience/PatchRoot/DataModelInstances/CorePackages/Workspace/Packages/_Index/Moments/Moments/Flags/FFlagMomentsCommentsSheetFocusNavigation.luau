@@ -1,0 +1,3 @@
+local FFlagMomentsOverlaysInTopShellOnly = require(script.Parent.FFlagMomentsOverlaysInTopShellOnly)
+
+return game:DefineFastFlag("MomentsCommentsSheetFocusNavigation", false) and FFlagMomentsOverlaysInTopShellOnly

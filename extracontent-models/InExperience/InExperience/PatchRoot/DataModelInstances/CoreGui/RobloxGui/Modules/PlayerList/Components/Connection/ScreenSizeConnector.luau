@@ -1,93 +1,84 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local ParentParent = script.Parent.Parent.Parent
-local SetScreenSize = require(ParentParent.Actions.SetScreenSize)
+
+local parent = script.Parent.Parent.Parent
+
+local SetScreenSize = require(parent.Actions.SetScreenSize)
+
 local EventConnection = require(script.Parent.EventConnection)
-local v7 = Roact.PureComponent:extend("ScreenSizeConnector")
 
-function v7.init(p1) -- line: 15
-	-- upvalues: Roact (copy)
-	p1.state = {
-		layerCollector = nil
-	}
-	p1.folderRef = Roact.createRef()
+local extended = Roact.PureComponent:extend("ScreenSizeConnector")
+
+function extended:init()
+	self.state = { layerCollector = nil }
+
+	self.folderRef = Roact.createRef()
 end
-function v7.render(p2) -- line: 23
-	-- upvalues: Roact (copy), EventConnection (copy)
-	if p2.state.layerCollector then
-		local AbsoluteSize = p2.state.layerCollector.AbsoluteSize
 
-		p2.props.setScreenSize(AbsoluteSize.X, AbsoluteSize.Y)
-
+function extended.render(props)
+	if props.state.layerCollector then
+		local absoluteSize = props.state.layerCollector.AbsoluteSize
+		props.props.setScreenSize(absoluteSize.X, absoluteSize.Y)
 		return Roact.createElement(EventConnection, {
-			event = p2.state.layerCollector:GetPropertyChangedSignal("AbsoluteSize"),
-			callback = function() -- line: 29
-				-- upvalues: AbsoluteSize (ref), p2 (copy)
-				AbsoluteSize = p2.state.layerCollector.AbsoluteSize
-				p2.props.setScreenSize(AbsoluteSize.X, AbsoluteSize.Y)
+			event = props.state.layerCollector:GetPropertyChangedSignal("AbsoluteSize"),
+			callback = function()
+				absoluteSize = props.state.layerCollector.AbsoluteSize
+				props.props.setScreenSize(absoluteSize.X, absoluteSize.Y)
 			end
 		})
 	end
 
-	return Roact.createElement("Folder", {
-		[Roact.Ref] = p2.folderRef
-	})
+	return Roact.createElement("Folder", { [Roact.Ref] = props.folderRef })
 end
-function v7.watchFolderAncestery(p3) -- line: 41
-	if p3.folderRef.current and p3.ancesteryConnection == nil then
-		local LayerCollector = p3.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector")
 
-		if LayerCollector then
-			p3:setState({
-				layerCollector = LayerCollector
-			})
+function extended:watchFolderAncestery()
+	if self.folderRef.current and self.ancesteryConnection == nil then
+		local layerCollector = self.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector")
+
+		if layerCollector then
+			self:setState({ layerCollector = layerCollector })
 		else
-			p3.ancesteryConnection = p3.folderRef.current.AncestryChanged:Connect(function() -- line: 49
-				-- upvalues: p3 (copy), LayerCollector (ref)
-				if p3.folderRef.current then
-					LayerCollector = p3.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector")
+			self.ancesteryConnection = self.folderRef.current.AncestryChanged:Connect(function()
+				if self.folderRef.current then
+					layerCollector = self.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector")
 
-					if LayerCollector then
-						p3:setState({
-							layerCollector = LayerCollector
-						})
+					if layerCollector then
+						self:setState({ layerCollector = layerCollector })
 					end
 				end
 			end)
 		end
 	end
 end
-function v7.didMount(p4) -- line: 63
-	p4:watchFolderAncestery()
-end
-function v7.didUpdate(p5) -- line: 67
-	if not p5.state.layerCollector then
-		p5:watchFolderAncestery()
 
-		return
-	end
-
-	if p5.ancesteryConnection then
-		p5.ancesteryConnection:Disconnect()
-		p5.ancesteryConnection = nil
-	end
+function extended:didMount()
+	self:watchFolderAncestery()
 end
-function v7.willUnmount(p6) -- line: 76
-	if p6.ancesteryConnection then
-		p6.ancesteryConnection:Disconnect()
-		p6.ancesteryConnection = nil
+
+function extended:didUpdate()
+	if not self.state.layerCollector then
+		self:watchFolderAncestery()
+	elseif self.ancesteryConnection then
+		self.ancesteryConnection:Disconnect()
+		self.ancesteryConnection = nil
 	end
 end
 
-local function mapDispatchToProps(p7) -- line: 83
-	-- upvalues: SetScreenSize (copy)
+function extended:willUnmount()
+	if self.ancesteryConnection then
+		self.ancesteryConnection:Disconnect()
+		self.ancesteryConnection = nil
+	end
+end
+
+local function mapDispatchToProps(callback)
 	return {
-		setScreenSize = function(p8, p9) -- line: 85
-			-- upvalues: p7 (copy), SetScreenSize (copy)
-			return p7(SetScreenSize(p8, p9))
+		setScreenSize = function(p, p2)
+			return callback(SetScreenSize(p, p2))
 		end
 	}
 end
 
-return RoactRodux.connect(nil, mapDispatchToProps)(v7)
+return RoactRodux.connect(nil, mapDispatchToProps)(extended)

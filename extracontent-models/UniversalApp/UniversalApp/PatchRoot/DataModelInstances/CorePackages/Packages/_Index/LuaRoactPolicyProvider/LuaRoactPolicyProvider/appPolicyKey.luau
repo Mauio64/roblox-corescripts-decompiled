@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local Symbol = require(parent.Symbol)
 
-return require(ParentParent.Symbol).named("AppPolicy")
+return Symbol.named("AppPolicy")

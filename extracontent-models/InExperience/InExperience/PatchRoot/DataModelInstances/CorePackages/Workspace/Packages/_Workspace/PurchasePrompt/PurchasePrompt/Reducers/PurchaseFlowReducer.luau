@@ -1,16 +1,17 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local parent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local Rodux = PurchasePromptDeps.Rodux
+
 local SetPurchaseFlow = require(PurchasePrompt.Actions.SetPurchaseFlow)
 local CompleteRequest = require(PurchasePrompt.Actions.CompleteRequest)
 local PurchaseFlow = require(PurchasePrompt.Enums.PurchaseFlow)
 
 return Rodux.createReducer(false, {
-	[CompleteRequest.name] = function(_, _) -- line: 12
-		-- upvalues: PurchaseFlow (copy)
+	[CompleteRequest.name] = function(_, _)
 		return PurchaseFlow.None
 	end,
-	[SetPurchaseFlow.name] = function(_, p4) -- line: 15
-		return p4.purchaseFlow
+	[SetPurchaseFlow.name] = function(_, p)
+		return p.purchaseFlow
 	end
 })

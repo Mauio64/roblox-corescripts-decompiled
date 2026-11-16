@@ -1,4 +1,4 @@
-local t1 = {
+local Language = {
 	keyword = {
 		["and"] = "keyword",
 		["break"] = "keyword",
@@ -228,12 +228,7 @@ local t1 = {
 			huge = "number",
 			pi = "number"
 		},
-		os = {
-			clock = "function",
-			date = "function",
-			difftime = "function",
-			time = "function"
-		},
+		os = { clock = "function", date = "function", difftime = "function", time = "function" },
 		string = {
 			byte = "function",
 			char = "function",
@@ -283,9 +278,7 @@ local t1 = {
 			offset = "function",
 			charpattern = "string"
 		},
-		Axes = {
-			new = "function"
-		},
+		Axes = { new = "function" },
 		BrickColor = {
 			Black = "function",
 			Blue = "function",
@@ -301,9 +294,7 @@ local t1 = {
 			White = "function",
 			Yellow = "function"
 		},
-		CatalogSearchParams = {
-			new = "function"
-		},
+		CatalogSearchParams = { new = "function" },
 		CFrame = {
 			Angles = "function",
 			fromAxisAngle = "function",
@@ -323,12 +314,8 @@ local t1 = {
 			new = "function",
 			toHSV = "function"
 		},
-		ColorSequence = {
-			new = "function"
-		},
-		ColorSequenceKeypoint = {
-			new = "function"
-		},
+		ColorSequence = { new = "function" },
+		ColorSequenceKeypoint = { new = "function" },
 		DateTime = {
 			fromIsoDate = "function",
 			fromLocalTime = "function",
@@ -337,64 +324,30 @@ local t1 = {
 			fromUnixTimestampMillis = "function",
 			now = "function"
 		},
-		DockWidgetPluginGuiInfo = {
-			new = "function"
-		},
+		DockWidgetPluginGuiInfo = { new = "function" },
 		Enum = {},
-		Faces = {
-			new = "function"
-		},
-		FloatCurveKey = {
-			new = "function"
-		},
+		Faces = { new = "function" },
+		FloatCurveKey = { new = "function" },
 		Font = {
 			fromEnum = "function",
 			fromId = "function",
 			fromName = "function",
 			new = "function"
 		},
-		Instance = {
-			new = "function"
-		},
-		NumberRange = {
-			new = "function"
-		},
-		NumberSequence = {
-			new = "function"
-		},
-		NumberSequenceKeypoint = {
-			new = "function"
-		},
-		OverlapParams = {
-			new = "function"
-		},
-		PathWaypoint = {
-			new = "function"
-		},
-		PhysicalProperties = {
-			new = "function"
-		},
-		Random = {
-			new = "function"
-		},
-		Ray = {
-			new = "function"
-		},
-		RaycastParams = {
-			new = "function"
-		},
-		Rect = {
-			new = "function"
-		},
-		Region3 = {
-			new = "function"
-		},
-		Region3int16 = {
-			new = "function"
-		},
-		RotationCurveKey = {
-			new = "function"
-		},
+		Instance = { new = "function" },
+		NumberRange = { new = "function" },
+		NumberSequence = { new = "function" },
+		NumberSequenceKeypoint = { new = "function" },
+		OverlapParams = { new = "function" },
+		PathWaypoint = { new = "function" },
+		PhysicalProperties = { new = "function" },
+		Random = { new = "function" },
+		Ray = { new = "function" },
+		RaycastParams = { new = "function" },
+		Rect = { new = "function" },
+		Region3 = { new = "function" },
+		Region3int16 = { new = "function" },
+		RotationCurveKey = { new = "function" },
 		SharedTable = {
 			clear = "function",
 			clone = "function",
@@ -414,17 +367,9 @@ local t1 = {
 			synchronize = "function",
 			wait = "function"
 		},
-		TweenInfo = {
-			new = "function"
-		},
-		UDim = {
-			new = "function"
-		},
-		UDim2 = {
-			fromOffset = "function",
-			fromScale = "function",
-			new = "function"
-		},
+		TweenInfo = { new = "function" },
+		UDim = { new = "function" },
+		UDim2 = { fromOffset = "function", fromScale = "function", new = "function" },
 		Vector2 = {
 			new = "function",
 			one = "Vector2",
@@ -432,9 +377,7 @@ local t1 = {
 			yAxis = "Vector2",
 			zero = "Vector2"
 		},
-		Vector2int16 = {
-			new = "function"
-		},
+		Vector2int16 = { new = "function" },
 		Vector3 = {
 			fromAxis = "function",
 			FromAxis = "function",
@@ -447,15 +390,14 @@ local t1 = {
 			zAxis = "Vector3",
 			zero = "Vector3"
 		},
-		Vector3int16 = {
-			new = "function"
-		}
+		Vector3int16 = { new = "function" }
 	}
 }
-local Enum2 = t1.libraries.Enum
+
+local enum = Language.libraries.Enum
 
 for _, v in ipairs(Enum:GetEnums()) do
-	Enum2[tostring(v)] = "Enum"
+	enum[tostring(v)] = "Enum"
 end
 
-return t1
+return Language

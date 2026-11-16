@@ -1,41 +1,43 @@
-local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local dependencies = require(AuthCommon.dependencies)
-local CentralOverlayType = require(AuthCommonParent.RobloxAppEnums).CentralOverlayType
-local SetCentralOverlay = require(AuthCommonParent.CentralOverlay).Actions.SetCentralOverlay
-local NavigateDown = require(AuthCommonParent.NavigationRodux).Thunks.NavigateDown
-local AppPage = require(AuthCommonParent.RobloxAppEnums).AppPage
-local FFlagSignalsNavP3Dispatch = require(AuthCommonParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v9 = if not FFlagSignalsNavP3Dispatch then nil else require(AuthCommonParent.RobloxAppNavigation).NavigationCommands
-local GetFFlagEnableAccountSwitcherFoundationDesign = dependencies.SharedFlags.GetFFlagEnableAccountSwitcherFoundationDesign
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-return function(p1, p2, p3) -- line: 16
-	-- upvalues: GetFFlagEnableAccountSwitcherFoundationDesign (copy), SetCentralOverlay (copy), CentralOverlayType (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateDown (copy)
-	return function(p4) -- line: 17
-		-- upvalues: p2 (copy), GetFFlagEnableAccountSwitcherFoundationDesign (copy), p3 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), p1 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateDown (copy)
-		if p2 then
-			if GetFFlagEnableAccountSwitcherFoundationDesign() and p3 then
-				p4:dispatch(SetCentralOverlay(CentralOverlayType.AccountSwitcher, p1))
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local CentralOverlayType = RobloxAppEnums.CentralOverlayType
+local CentralOverlay = require(parent.CentralOverlay)
+local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local RobloxAppEnums2 = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums2.AppPage
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
 
-				return
-			end
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
 
-			local t1 = {
-				name = AppPage.AccountSelectorPeekView,
-				extraProps = p1
-			}
-
-			if FFlagSignalsNavP3Dispatch then
-				v9.down(v9.fromLegacyPage(t1))
-
-				return
-			end
-
-			p4:dispatch(NavigateDown(t1))
+return function(extraProps, p, p2)
+	return function(object)
+		if not p then
+			object:dispatch(SetCentralOverlay(CentralOverlayType.AccountSelector, extraProps))
 
 			return
 		end
 
-		p4:dispatch(SetCentralOverlay(CentralOverlayType.AccountSelector, p1))
+		if p2 then
+			object:dispatch(SetCentralOverlay(CentralOverlayType.AccountSwitcher, extraProps))
+			return
+		end
+
+		local v = { name = AppPage.AccountSelectorPeekView, extraProps = extraProps }
+
+		if FFlagSignalsNavP3Dispatch then
+			navigationCommands.down(navigationCommands.fromLegacyPage(v))
+		else
+			object:dispatch(NavigateDown(v))
+		end
 	end
 end

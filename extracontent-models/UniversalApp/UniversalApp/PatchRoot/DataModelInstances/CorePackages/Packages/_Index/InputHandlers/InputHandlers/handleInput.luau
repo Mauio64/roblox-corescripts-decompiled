@@ -1,142 +1,110 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent.FocusNavigation)
+local parent = script.Parent.Parent
+require(parent.FocusNavigation)
 
 local Heartbeat = require(script.Parent.Heartbeat)
 
-local function cancellableDelay(p1, p2) -- line: 28
-	local u7 = false
-
-	task.delay(p1, function() -- line: 30
-		-- upvalues: u7 (ref), p2 (copy)
-		if not u7 then
-			p2()
+local function cancellableDelay(durationSeconds, fn)
+	local v = false
+	task.delay(durationSeconds, function()
+		if not v then
+			fn()
 		end
 	end)
-
 	return {
-		cancel = function() -- line: 36
-			-- upvalues: u7 (ref)
-			u7 = true
+		cancel = function()
+			v = true
 		end
 	}
 end
-local function handleInput(t1: {[any]: any}) -- line: 42
-	-- upvalues: cancellableDelay (copy), Heartbeat (copy)
-	local hold = t1.hold
-	local u10 = nil
-	local u11 = nil
-	local u12 = false
 
-	local function clearHeldState() -- line: 49
-		-- upvalues: u10 (ref), u11 (ref), u12 (ref)
-		if u10 then
-			u10.cancel()
-			u10 = nil
+local function handleInput(data)
+	local hold = data.hold
+	local v = nil
+	local connection = nil
+
+	local v2 = false
+
+	local function clearHeldState() -- 4 equivalent calls inferred from this helper
+		if v then
+			v.cancel()
+			v = nil
 		end
 
-		if u11 then
-			u11:Disconnect()
-			u11 = nil
+		if connection then
+			connection:Disconnect()
+			connection = nil
 		end
 
-		u12 = false
+		v2 = false
 	end
 
-	return function(p3) -- line: 61
-		-- upvalues: u12 (ref), t1 (copy), u10 (ref), u11 (ref), hold (copy), cancellableDelay (copy), Heartbeat (copy)
-		local eventData = p3.eventData
-		local v16 = not not eventData and (eventData.immediateDispatch or false)
+	return function(p)
+		local eventData = p.eventData
+		local v3
 
-		u12 = v16 or u12
+		if eventData then
+			v3 = eventData.immediateDispatch or false
+		else
+			v3 = false
+		end
 
-		local v17 = if not eventData then nil else eventData.UserInputState
+		v2 = v3 or v2
+		local userInputState
 
-		if v17 == Enum.UserInputState.Begin then
-			if t1.onPress then
-				t1.onPress(p3)
+		if eventData then
+			userInputState = eventData.UserInputState
+		end
+
+		if userInputState == Enum.UserInputState.Begin then
+			if data.onPress then
+				data.onPress(p)
 			end
 
-			if u10 then
-				u10.cancel()
-				u10 = nil
-			end
-
-			if u11 then
-				u11:Disconnect()
-				u11 = nil
-			end
-
-			u12 = false
+			clearHeldState() -- inferred equivalent call
 
 			if hold then
-				if v16 then
+				if v3 then
 					hold.onComplete()
 				else
-					u10 = cancellableDelay(hold.durationSeconds, function() -- line: 81
-						-- upvalues: hold (copy), u12 (ref), u11 (ref)
+					v = cancellableDelay(hold.durationSeconds, function()
 						if not hold.allowReleaseAfterHold then
-							u12 = false
+							v2 = false
 						end
 
 						hold.onComplete()
 
-						if u11 then
-							u11:Disconnect()
-							u11 = nil
+						if connection then
+							connection:Disconnect()
+							connection = nil
 						end
 					end)
-					u11 = if not hold.onStep then nil else Heartbeat:Connect(hold.onStep)
+					local v4
+
+					if hold.onStep then
+						v4 = Heartbeat:Connect(hold.onStep)
+					end
+
+					connection = v4
 				end
 			end
 
-			if v16 then
-				if u10 then
-					u10.cancel()
-					u10 = nil
-				end
-
-				if u11 then
-					u11:Disconnect()
-					u11 = nil
-				end
-
-				u12 = false
+			if v3 then
+				clearHeldState() -- inferred equivalent call
 			else
-				u12 = true
+				v2 = true
 			end
 		end
 
-		if v17 == Enum.UserInputState.End then
-			if t1.onRelease and u12 then
-				t1.onRelease(p3)
+		if userInputState == Enum.UserInputState.End then
+			if data.onRelease and v2 then
+				data.onRelease(p)
 			end
 
-			if u10 then
-				u10.cancel()
-				u10 = nil
-			end
-
-			if u11 then
-				u11:Disconnect()
-				u11 = nil
-			end
-
-			u12 = false
+			clearHeldState() -- inferred equivalent call
 		end
 
-		if v17 == Enum.UserInputState.Cancel then
-			if u10 then
-				u10.cancel()
-				u10 = nil
-			end
-
-			if u11 then
-				u11:Disconnect()
-				u11 = nil
-			end
-
-			u12 = false
+		if userInputState == Enum.UserInputState.Cancel then
+			clearHeldState() -- inferred equivalent call
 		end
 	end
 end

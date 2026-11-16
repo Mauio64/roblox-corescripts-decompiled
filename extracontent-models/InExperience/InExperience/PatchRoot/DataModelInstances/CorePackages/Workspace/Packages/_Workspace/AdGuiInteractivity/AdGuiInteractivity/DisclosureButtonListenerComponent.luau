@@ -1,12 +1,15 @@
 local AdService = game:GetService("AdService")
+
 local AdGuiInteractivity = script:FindFirstAncestor("AdGuiInteractivity")
-local AdGuiInteractivityParent = AdGuiInteractivity.Parent
-local React = require(AdGuiInteractivityParent.React)
-local t = require(AdGuiInteractivityParent.t)
+local parent = AdGuiInteractivity.Parent
+local React = require(parent.React)
+local t = require(parent.t)
+
 local getScreenPositionFromGuiObjectInput = require(AdGuiInteractivity.getScreenPositionFromGuiObjectInput)
 local ImmersiveBrandedAdMenu = require(AdGuiInteractivity.ImmersiveBrandedAdMenu)
 local AdsInteractivityTelemetry = require(AdGuiInteractivity.AdsInteractivityTelemetry)
-local v9 = t.interface({
+
+local interface = t.interface({
 	disclosureButton = t.instanceIsA("GuiButton"),
 	inputObject = t.instanceIsA("InputObject"),
 	advertiserName = t.string,
@@ -14,50 +17,44 @@ local v9 = t.interface({
 	immersiveBrandedAdId = t.string
 })
 
-return function() -- line: 35
-	-- upvalues: React (copy), AdService (copy), v9 (copy), AdsInteractivityTelemetry (copy), getScreenPositionFromGuiObjectInput (copy), ImmersiveBrandedAdMenu (copy)
-	local v10, v11 = React.useState(nil)
+return function()
+	local state, setState = React.useState(nil)
 
-	React.useEffect(function() -- line: 39
-		-- upvalues: AdService (copy), v9 (copy), AdsInteractivityTelemetry (copy), v11 (copy), getScreenPositionFromGuiObjectInput (copy)
-		function AdService.OnImmersiveBrandedAdDisclosureButtonActivated(t1: {[any]: any}) -- line: 40
-			-- upvalues: v9 (copy), AdsInteractivityTelemetry (copy), v11 (copy), getScreenPositionFromGuiObjectInput (copy)
-			local v14, _ = v9(t1)
+	React.useEffect(function()
+		function AdService.OnImmersiveBrandedAdDisclosureButtonActivated(data)
+			local v, _ = interface(data)
 
-			if not v14 then
+			if not v then
 				return
 			end
 
 			AdsInteractivityTelemetry.logImmersiveBrandedAdButtonClickCounter("disclosure")
-			v11({
-				menuScreenPosition = getScreenPositionFromGuiObjectInput(t1.disclosureButton, t1.inputObject),
-				advertiserName = t1.advertiserName,
-				campaignId = t1.campaignId,
-				immersiveBrandedAdId = t1.immersiveBrandedAdId
+			setState({
+				menuScreenPosition = getScreenPositionFromGuiObjectInput(data.disclosureButton, data.inputObject),
+				advertiserName = data.advertiserName,
+				campaignId = data.campaignId,
+				immersiveBrandedAdId = data.immersiveBrandedAdId
 			})
 		end
 
-		return function() -- line: 55
-			-- upvalues: AdService (copy)
-			function AdService.OnImmersiveBrandedAdDisclosureButtonActivated() -- line: 56
-			end
+		return function()
+			function AdService.OnImmersiveBrandedAdDisclosureButtonActivated() end
 		end
 	end, {})
 
-	local v12 = React.useCallback(function() -- line: 60
-		-- upvalues: v11 (copy)
-		v11(nil)
+	local onDismiss = React.useCallback(function()
+		setState(nil)
 	end, {})
 
-	if not v10 then
-		return nil
+	if state then
+		return React.createElement(ImmersiveBrandedAdMenu, {
+			screenPosition = state.menuScreenPosition,
+			advertiserName = state.advertiserName,
+			campaignId = state.campaignId,
+			immersiveBrandedAdId = state.immersiveBrandedAdId,
+			onDismiss = onDismiss
+		})
 	end
 
-	return React.createElement(ImmersiveBrandedAdMenu, {
-		screenPosition = v10.menuScreenPosition,
-		advertiserName = v10.advertiserName,
-		campaignId = v10.campaignId,
-		immersiveBrandedAdId = v10.immersiveBrandedAdId,
-		onDismiss = v12
-	})
+	return nil
 end

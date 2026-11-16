@@ -1,6 +1,7 @@
-local Parent = script:FindFirstAncestor("RoduxPresence").Parent
+local parent = script:FindFirstAncestor("RoduxPresence").Parent
+local enumerate = require(parent.enumerate)
 
-return require(Parent.enumerate)(script.Name, {
+return enumerate(script.Name, {
 	Offline = 0,
 	Online = 1,
 	InGame = 2,

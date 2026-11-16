@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local React = require(parent.React)
+
 local VersionTitleDescriptionPageView = require(script.Parent.VersionTitleDescriptionPageView)
 local useVersionTitleDescriptionPageViewModel = require(script.Parent.useVersionTitleDescriptionPageViewModel)
 
-local function VersionTitleDescriptionPageContainer(p1) -- line: 11
-	-- upvalues: useVersionTitleDescriptionPageViewModel (copy), React (copy), VersionTitleDescriptionPageView (copy)
-	local v7 = useVersionTitleDescriptionPageViewModel(p1)
-
-	return React.createElement(VersionTitleDescriptionPageView, v7)
+local function VersionTitleDescriptionPageContainer(p)
+	local v = useVersionTitleDescriptionPageViewModel(p)
+	return React.createElement(VersionTitleDescriptionPageView, v)
 end
 
 return VersionTitleDescriptionPageContainer

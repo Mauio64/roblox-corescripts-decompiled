@@ -1,131 +1,206 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
 local HttpService = game:GetService("HttpService")
-local PurchasePromptParent = PurchasePrompt.Parent
-local IAPExperience = require(PurchasePromptParent.IAPExperience)
+local Players = game:GetService("Players")
+
+local parent = PurchasePrompt.Parent
+local IAPExperience = require(parent.IAPExperience)
 local isEconomicRestrictionResponse = IAPExperience.Utility.isEconomicRestrictionResponse
+
 local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
 local SetEconomicRestrictionError = require(PurchasePrompt.Actions.SetEconomicRestrictionError)
+local VIPServerCreated = require(PurchasePrompt.Actions.VIPServerCreated)
 local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
 local Network = require(PurchasePrompt.Services.Network)
 local Analytics = require(PurchasePrompt.Services.Analytics)
 local Thunk = require(PurchasePrompt.Thunk)
 local Promise = require(PurchasePrompt.Promise)
 local Constants = require(PurchasePrompt.Misc.Constants)
-
 require(PurchasePrompt.types)
-
-local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
+local types = require(PurchasePrompt.types)
+local productTypeEnum = types.ProductTypeEnum
 local completePurchase = require(script.Parent.completePurchase)
 local handlePriceChangedError = require(PurchasePrompt.Utils.handlePriceChangedError)
+
 local performDevProductEdpPurchase = require(PurchasePrompt.Network.performDevProductEdpPurchase)
 local performExperiencePurchase = require(PurchasePrompt.Network.performExperiencePurchase)
 local performLookPurchase = require(PurchasePrompt.Network.performLookPurchase)
 local performDeveloperSubscriptionRobuxPurchase = require(PurchasePrompt.Network.performDeveloperSubscriptionRobuxPurchase)
 local performDeveloperSubscriptionFiatPurchase = require(PurchasePrompt.Network.performDeveloperSubscriptionFiatPurchase)
+local performVIPServerPurchase = require(PurchasePrompt.Network.performVIPServerPurchase)
+
 local deriveSelectedOfferIdsFromCartPricing = require(PurchasePrompt.Utils.deriveSelectedOfferIdsFromCartPricing)
+local applyCartPricingOffersToLineItems = require(PurchasePrompt.Utils.applyCartPricingOffersToLineItems)
 local selectProductPrice = require(PurchasePrompt.Selectors.selectProductPrice)
-local FFlagEnableUnifiedPurchaseFlowForDevSubs = require(PurchasePromptParent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs
-local FFlagPurchasePromptFetchCartPricingForLooks = require(PurchasePromptParent.SharedFlags).FFlagPurchasePromptFetchCartPricingForLooks
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableUnifiedPurchaseFlowForDevSubs = SharedFlags.FFlagEnableUnifiedPurchaseFlowForDevSubs
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagPurchasePromptFetchCartPricingForLooks = SharedFlags2.FFlagPurchasePromptFetchCartPricingForLooks
 local FFlagEnablePriceChangedErrorHandling = require(PurchasePrompt.Flags.FFlagEnablePriceChangedErrorHandling)
-local parseEconomicRestrictionsFailureReason = IAPExperience.Utility.parseEconomicRestrictionsFailureReason
-local parseEconomicRestrictionsExpirationTimeInMinutes = IAPExperience.Utility.parseEconomicRestrictionsExpirationTimeInMinutes
-local t1 = {
-	Network,
-	Analytics
+local FFlagEnableRequestLocationTypeForSduiPurchase = require(PurchasePrompt.Flags.FFlagEnableRequestLocationTypeForSduiPurchase)
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableSearchGameItemOwnershipUpdate = SharedFlags3.FFlagEnableSearchGameItemOwnershipUpdate
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagEnableEdpPreviewPurchaseSurface = SharedFlags4.FFlagEnableEdpPreviewPurchaseSurface
+
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags5.FFlagLuaAppsEnablePromptVIPServerPurchase
+local RobloxTranslator = require(parent.RobloxTranslator)
+
+local PurchasePromptLite = require(parent.PurchasePromptLite)
+local ProductPurchaseSurface = PurchasePromptLite.Enums.ProductPurchaseSurface
+
+local v = {
+	[ProductPurchaseSurface.EDP] = "ExperienceDetailPage",
+	[ProductPurchaseSurface.EDPPreview] = FFlagEnableEdpPreviewPurchaseSurface and "ExperienceDetailPagePreview" or nil,
+	[ProductPurchaseSurface.HomePageGameItemShop] = "HomePageGameItemShop",
+	[ProductPurchaseSurface.SearchPageGameItemShop] = FFlagEnableSearchGameItemOwnershipUpdate and "SearchPageGameItemShop" or nil
 }
 
-local function handleGenericPurchaseError(p1, p2, s1: string?) -- line: 44
-	-- upvalues: isEconomicRestrictionResponse (copy), parseEconomicRestrictionsFailureReason (copy), parseEconomicRestrictionsExpirationTimeInMinutes (copy), SetEconomicRestrictionError (copy), ErrorOccurred (copy), PurchaseError (copy), handlePriceChangedError (copy)
-	if isEconomicRestrictionResponse(p2) then
-		local v35 = parseEconomicRestrictionsFailureReason(p2)
-		local v36 = parseEconomicRestrictionsExpirationTimeInMinutes(p2)
-
-		p1:dispatch(SetEconomicRestrictionError(v35, v36))
-		p1:dispatch(ErrorOccurred(PurchaseError.EconomicRestriction))
-
-		return
+local function decodePurchasePayload(value: string?)
+	if type(value) ~= "string" or value == "" then
+		return nil
 	end
 
-	if handlePriceChangedError(p1, p2, s1) then
-		return
+	local success, result = pcall(HttpService.JSONDecode, HttpService, value)
+
+	if success and type(result) == "table" and type(result.surface) == "table" then
+		return result
 	end
 
-	if PurchaseError.isMember(p2) then
-		p1:dispatch(ErrorOccurred(p2))
-
-		return
-	end
-
-	p1:dispatch(ErrorOccurred(PurchaseError.UnknownFailure))
+	return nil
 end
-local function performLuaPurchase() -- line: 65
-	-- upvalues: Thunk (copy), t1 (copy), Network (copy), Analytics (copy), Constants (copy), performDevProductEdpPurchase (copy), completePurchase (copy), Promise (copy), handleGenericPurchaseError (copy), FFlagEnablePriceChangedErrorHandling (copy), ProductTypeEnum (copy), performExperiencePurchase (copy), FFlagPurchasePromptFetchCartPricingForLooks (copy), selectProductPrice (copy), deriveSelectedOfferIdsFromCartPricing (copy), HttpService (copy), performLookPurchase (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy), performDeveloperSubscriptionRobuxPurchase (copy), performDeveloperSubscriptionFiatPurchase (copy)
-	return Thunk.new(script.Name, t1, function(p3, p4) -- line: 66
-		-- upvalues: Network (copy), Analytics (copy), Constants (copy), performDevProductEdpPurchase (copy), completePurchase (copy), Promise (copy), handleGenericPurchaseError (copy), FFlagEnablePriceChangedErrorHandling (copy), ProductTypeEnum (copy), performExperiencePurchase (copy), FFlagPurchasePromptFetchCartPricingForLooks (copy), selectProductPrice (copy), deriveSelectedOfferIdsFromCartPricing (copy), HttpService (copy), performLookPurchase (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy), performDeveloperSubscriptionRobuxPurchase (copy), performDeveloperSubscriptionFiatPurchase (copy)
-		local v39 = p4[Network]
-		local v40 = p4[Analytics]
-		local v41 = p3:getState()
-		local productInfo = v41.productInfo
+
+local parseEconomicRestrictionsFailureReason = IAPExperience.Utility.parseEconomicRestrictionsFailureReason
+
+local parseEconomicRestrictionsExpirationTimeInMinutes = IAPExperience.Utility.parseEconomicRestrictionsExpirationTimeInMinutes
+
+local v2 = { Network, Analytics }
+
+local function handleGenericPurchaseError(object, p, p2: string?)
+	if isEconomicRestrictionResponse(p) then
+		object:dispatch(SetEconomicRestrictionError(
+			parseEconomicRestrictionsFailureReason(p),
+			(parseEconomicRestrictionsExpirationTimeInMinutes(p))
+		))
+		object:dispatch(ErrorOccurred(PurchaseError.EconomicRestriction))
+	else
+		if handlePriceChangedError(object, p, p2) then
+			return
+		end
+
+		if PurchaseError.isMember(p) then
+			object:dispatch(ErrorOccurred(p))
+		else
+			object:dispatch(ErrorOccurred(PurchaseError.UnknownFailure))
+		end
+	end
+end
+
+local function performLuaPurchase()
+	return Thunk.new(script.Name, v2, function(object, p)
+		local v3 = p[Network]
+		local v4 = p[Analytics]
+
+		local state = object:getState()
+		local productInfo = state.productInfo
 		local price = productInfo.price
 		local productId = productInfo.productId
-		local _ = v41.promptRequest
-		local id = v41.promptRequest.id
-		local productPayload = v41.productPayload
+		local promptRequest = state.promptRequest
+		local id = state.promptRequest.id
+		local productPayload = state.productPayload
 
 		if productPayload.kind == "Product" then
-			local t2 = {
+			local v5 = {
 				expectedCurrency = Constants.Currency.Robux,
 				expectedPrice = price,
 				saleLocationId = productPayload.universeId
 			}
 
-			return performDevProductEdpPurchase(v39, productId, t2):andThen(function(p5) -- line: 92
-				-- upvalues: p3 (copy), completePurchase (copy), v40 (copy), id (copy), Promise (copy)
-				p3:dispatch(completePurchase(p5))
-				v40.signalPurchaseSuccess(id, Enum.InfoType.Product, nil, p5)
+			if FFlagEnableRequestLocationTypeForSduiPurchase then
+				local surface = state.purchaseAnalyticsMetadata and state.purchaseAnalyticsMetadata.surface
+				v5.requestLocationType = surface == nil and "" or v[surface] or ""
+			end
 
-				return Promise.resolve(p5)
-			end):catch(function(p6) -- line: 99
-				-- upvalues: handleGenericPurchaseError (copy), p3 (copy), FFlagEnablePriceChangedErrorHandling (copy), productPayload (copy)
-				handleGenericPurchaseError(p3, p6, if not FFlagEnablePriceChangedErrorHandling then nil else productPayload.kind)
-			end)
-		end
+			local purchasePayload = productPayload.purchasePayload
+			local result
 
-		if productPayload.kind == ProductTypeEnum.Experience then
-			local t3 = {
-				expectedCurrency = Constants.Currency.Robux,
-				expectedPrice = price,
-				sellerId = productInfo.sellerId
-			}
+			if type(purchasePayload) == "string" and purchasePayload ~= "" then
+				local success
+				success, result = pcall(HttpService.JSONDecode, HttpService, purchasePayload)
 
-			return performExperiencePurchase(v39, productId, t3):andThen(function(p7) -- line: 113
-				-- upvalues: p3 (copy), completePurchase (copy), Promise (copy)
-				p3:dispatch(completePurchase(p7))
-
-				return Promise.resolve(p7)
-			end):catch(function(p8) -- line: 118
-				-- upvalues: handleGenericPurchaseError (copy), p3 (copy), FFlagEnablePriceChangedErrorHandling (copy), productPayload (copy)
-				handleGenericPurchaseError(p3, p8, if not FFlagEnablePriceChangedErrorHandling then nil else productPayload.kind)
-			end)
-		end
-
-		if productPayload.kind == ProductTypeEnum.Look then
-			local expectedPrice = productPayload.expectedPrice
-			local v51 = nil
-
-			if FFlagPurchasePromptFetchCartPricingForLooks then
-				local cartPricing = v41.cartPricing
-				local v53 = cartPricing and cartPricing.response
-
-				if v53 ~= nil then
-					expectedPrice = selectProductPrice(v41) or expectedPrice
-					v51 = deriveSelectedOfferIdsFromCartPricing(v53)
-				else
-					v51 = {}
+				if not success or type(result) ~= "table" or type(result.surface) ~= "table" then
+					result = nil
 				end
 			end
 
-			local t4 = {
+			v5.purchasePayload = result
+
+			return performDevProductEdpPurchase(v3, productId, v5):andThen(function(p2)
+				object:dispatch(completePurchase(p2))
+
+				v4.signalPurchaseSuccess(id, Enum.InfoType.Product, nil, p2)
+
+				return Promise.resolve(p2)
+			end):catch(function(p2)
+				local v6
+
+				if FFlagEnablePriceChangedErrorHandling then
+					v6 = productPayload.kind
+				end
+
+				handleGenericPurchaseError(object, p2, v6)
+			end)
+		end
+
+		if productPayload.kind == productTypeEnum.Experience then
+			return performExperiencePurchase(v3, productId, {
+				expectedCurrency = Constants.Currency.Robux,
+				expectedPrice = price,
+				sellerId = productInfo.sellerId
+			}):andThen(function(p2)
+				object:dispatch(completePurchase(p2))
+
+				return Promise.resolve(p2)
+			end):catch(function(p2)
+				local v5
+
+				if FFlagEnablePriceChangedErrorHandling then
+					v5 = productPayload.kind
+				end
+
+				handleGenericPurchaseError(object, p2, v5)
+			end)
+		end
+
+		if productPayload.kind == productTypeEnum.Look then
+			local expectedPrice = productPayload.expectedPrice
+			local bulkPurchaseLineItems, selectedOfferIds
+
+			if FFlagPurchasePromptFetchCartPricingForLooks then
+				bulkPurchaseLineItems = productPayload.bulkPurchaseLineItems
+
+				local cartPricing = state.cartPricing
+				local response = cartPricing and cartPricing.response
+
+				if response == nil then
+					selectedOfferIds = {}
+				else
+					expectedPrice = selectProductPrice(state) or expectedPrice
+					selectedOfferIds = deriveSelectedOfferIdsFromCartPricing(response)
+
+					if bulkPurchaseLineItems ~= nil then
+						bulkPurchaseLineItems = applyCartPricingOffersToLineItems(
+							bulkPurchaseLineItems,
+							response,
+							selectedOfferIds
+						)
+					end
+				end
+			end
+
+			local v5 = {
 				lookId = productPayload.id,
 				idempotencyKey = HttpService:GenerateGUID(false),
 				expectedPrice = expectedPrice,
@@ -133,40 +208,94 @@ local function performLuaPurchase() -- line: 65
 				excludedAssets = productPayload.excludedAssetIds,
 				excludedBundles = productPayload.excludedBundleIds,
 				timedOptions = productPayload.timedOptions,
-				selectedOfferIds = v51
+				selectedOfferIds = selectedOfferIds,
+				bulkPurchaseLineItems = 0
 			}
 
-			return performLookPurchase(v39, productPayload.id, t4):andThen(function(p9) -- line: 163
-				-- upvalues: p3 (copy), completePurchase (copy), Promise (copy)
-				p3:dispatch(completePurchase(p9))
-
-				return Promise.resolve(p9)
-			end):catch(function(p10) -- line: 168
-				-- upvalues: handleGenericPurchaseError (copy), p3 (copy), FFlagEnablePriceChangedErrorHandling (copy), productPayload (copy)
-				handleGenericPurchaseError(p3, p10, if not FFlagEnablePriceChangedErrorHandling then nil else productPayload.kind)
-			end)
-		end
-
-		if FFlagEnableUnifiedPurchaseFlowForDevSubs and productPayload.kind == ProductTypeEnum.DeveloperSubscription then
-			local subscriptionId = productPayload.subscriptionId
-			local v57
-
-			if productPayload.isSubscriptionInRobux then
-				local expectedPrice = productPayload.expectedPrice
-
-				v57 = performDeveloperSubscriptionRobuxPurchase(v39, subscriptionId, expectedPrice)
-			else
-				v57 = performDeveloperSubscriptionFiatPurchase(v39, subscriptionId)
+			if not FFlagPurchasePromptFetchCartPricingForLooks then
+				bulkPurchaseLineItems = nil
 			end
 
-			return v57:andThen(function() -- line: 191
-				-- upvalues: p3 (copy), completePurchase (copy), Promise (copy)
-				p3:dispatch(completePurchase())
+			v5.bulkPurchaseLineItems = bulkPurchaseLineItems
 
+			return performLookPurchase(v3, productPayload.id, v5):andThen(function(p2)
+				object:dispatch(completePurchase(p2))
+
+				return Promise.resolve(p2)
+			end):catch(function(p2)
+				local v6
+
+				if FFlagEnablePriceChangedErrorHandling then
+					v6 = productPayload.kind
+				end
+
+				handleGenericPurchaseError(object, p2, v6)
+			end)
+		elseif
+			FFlagEnableUnifiedPurchaseFlowForDevSubs
+			and productPayload.kind == productTypeEnum.DeveloperSubscription
+		then
+			local subscriptionId = productPayload.subscriptionId
+			local v5
+
+			if productPayload.isSubscriptionInRobux then
+				v5 = performDeveloperSubscriptionRobuxPurchase(v3, subscriptionId, productPayload.expectedPrice)
+			else
+				v5 = performDeveloperSubscriptionFiatPurchase(v3, subscriptionId)
+			end
+
+			return v5:andThen(function()
+				object:dispatch(completePurchase())
 				return Promise.resolve()
-			end):catch(function(p11) -- line: 195
-				-- upvalues: handleGenericPurchaseError (copy), p3 (copy), FFlagEnablePriceChangedErrorHandling (copy), productPayload (copy)
-				handleGenericPurchaseError(p3, p11, if not FFlagEnablePriceChangedErrorHandling then nil else productPayload.kind)
+			end):catch(function(p2)
+				local v6
+
+				if FFlagEnablePriceChangedErrorHandling then
+					v6 = productPayload.kind
+				end
+
+				handleGenericPurchaseError(object, p2, v6)
+			end)
+		else
+			if not FFlagLuaAppsEnablePromptVIPServerPurchase or productPayload.kind ~= productTypeEnum.VIPServer then
+				return
+			end
+
+			local v5 = {
+				name = RobloxTranslator:FormatByKey("Feature.PrivateServers.Label.OwnersServer", {
+					displayName = Players.LocalPlayer.DisplayName
+				}),
+				expectedPrice = price,
+				idempotencyKey = promptRequest.idempotencyKey
+			}
+
+			return performVIPServerPurchase(v3, productPayload.universeId, v5):andThen(function(data)
+				local name
+
+				if type(data.name) == "string" then
+					name = data.name
+				else
+					name = v5.name
+				end
+
+				local v6
+
+				if type(data.accessCode) == "string" then
+					v6 = data.accessCode
+				end
+
+				object:dispatch(VIPServerCreated(data.vipServerId, name, v6))
+				object:dispatch(completePurchase(data))
+
+				return Promise.resolve(data)
+			end):catch(function(p2)
+				local v6
+
+				if FFlagEnablePriceChangedErrorHandling then
+					v6 = productPayload.kind
+				end
+
+				handleGenericPurchaseError(object, p2, v6)
 			end)
 		end
 	end)

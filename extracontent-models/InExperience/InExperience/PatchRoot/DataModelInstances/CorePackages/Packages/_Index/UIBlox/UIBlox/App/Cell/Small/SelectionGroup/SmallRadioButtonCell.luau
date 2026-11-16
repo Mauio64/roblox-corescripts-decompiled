@@ -1,14 +1,18 @@
-local ParentParent = script.Parent.Parent.Parent.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local Cryo = require(ParentParent.Cryo)
-local t = require(ParentParent.t)
-local Images = require(ParentParent.UIBlox.App.ImageSet.Images)
-local GenericSelectionCell = require(ParentParent.UIBlox.Core.Cell.GenericSelectionCell)
-local v7 = Images["component_assets/circle_24_stroke_1"]
-local v8 = Images["component_assets/circle_16"]
-local v9 = Roact.PureComponent:extend("SmallRadioButtonCell")
+local parent = script.Parent.Parent.Parent.Parent.Parent.Parent
 
-v9.validateProps = t.strictInterface({
+local Roact = require(parent.Roact)
+local Cryo = require(parent.Cryo)
+local t = require(parent.t)
+local Images = require(parent.UIBlox.App.ImageSet.Images)
+
+local GenericSelectionCell = require(parent.UIBlox.Core.Cell.GenericSelectionCell)
+
+local component_assetscircle_24_stroke_1 = Images["component_assets/circle_24_stroke_1"]
+local component_assetscircle_16 = Images["component_assets/circle_16"]
+
+local extended = Roact.PureComponent:extend("SmallRadioButtonCell")
+
+extended.validateProps = t.strictInterface({
 	id = t.string,
 	text = t.optional(t.string),
 	onActivated = t.optional(t.callback),
@@ -23,50 +27,48 @@ v9.validateProps = t.strictInterface({
 	NextSelectionDown = t.optional(t.table),
 	SelectionImageObject = t.optional(t.table)
 })
-v9.defaultProps = {
-	text = "",
-	isSelected = false
-}
 
-function v9.init(p1) -- line: 59
-	function p1.onSetValue() -- line: 60
-		-- upvalues: p1 (copy)
-		p1.props.onActivated(p1.props.id)
+extended.defaultProps = { text = "", isSelected = false }
+
+function extended:init()
+	function self.onSetValue()
+		self.props.onActivated(self.props.id)
 	end
 end
-function v9.render(p2) -- line: 65
-	-- upvalues: Roact (copy), GenericSelectionCell (copy), v7 (copy), v8 (copy)
-	assert(p2.validateProps(p2.props))
 
-	return Roact.createElement("Frame", {
-		BorderSizePixel = 0,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 56),
-		LayoutOrder = p2.props.layoutOrder
-	}, {
-		GenericSelectionCell = Roact.createElement(GenericSelectionCell, {
-			isSelected = p2.props.isSelected,
-			isDisabled = p2.props.isDisabled,
-			defaultImage = v7,
-			selectedImage = v8,
-			defaultImageSize = 24,
-			selectedImageSize = 16,
-			text = p2.props.text,
-			onActivated = p2.onSetValue,
-			useDefaultControlState = p2.props.useDefaultControlState,
-			[Roact.Ref] = p2.props.controlRef,
-			NextSelectionUp = p2.props.NextSelectionUp,
-			NextSelectionDown = p2.props.NextSelectionDown,
-			NextSelectionLeft = p2.props.NextSelectionLeft,
-			NextSelectionRight = p2.props.NextSelectionRight,
-			SelectionImageObject = p2.props.SelectionImageObject
-		})
-	})
+function extended.render(props)
+	assert(props.validateProps(props.props))
+
+	return Roact.createElement(
+		"Frame",
+		{
+			Size = UDim2.new(1, 0, 0, 56),
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = props.props.layoutOrder
+		},
+		{
+			GenericSelectionCell = Roact.createElement(GenericSelectionCell, {
+				isSelected = props.props.isSelected,
+				isDisabled = props.props.isDisabled,
+				defaultImage = component_assetscircle_24_stroke_1,
+				selectedImage = component_assetscircle_16,
+				defaultImageSize = 24,
+				selectedImageSize = 16,
+				text = props.props.text,
+				onActivated = props.onSetValue,
+				useDefaultControlState = props.props.useDefaultControlState,
+				[Roact.Ref] = props.props.controlRef,
+				NextSelectionUp = props.props.NextSelectionUp,
+				NextSelectionDown = props.props.NextSelectionDown,
+				NextSelectionLeft = props.props.NextSelectionLeft,
+				NextSelectionRight = props.props.NextSelectionRight,
+				SelectionImageObject = props.props.SelectionImageObject
+			})
+		}
+	)
 end
 
-return Roact.forwardRef(function(p3, p4) -- line: 95
-	-- upvalues: Roact (copy), v9 (copy), Cryo (copy)
-	return Roact.createElement(v9, Cryo.Dictionary.join(p3, {
-		controlRef = p4
-	}))
+return Roact.forwardRef(function(p, controlRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { controlRef = controlRef }))
 end)

@@ -1,28 +1,27 @@
-local function calculateCountdownTime(n1: number) -- line: 11
-	local v3 = n1 + 59
-	local n2 = 0
-	local n3 = 0
-	local n4 = 0
+local function calculateCountdownTime(p: number)
+	p += 59
 
-	if v3 >= 86400 then
-		n2 = math.floor(v3 / 86400)
-		v3 -= n2 * 86400
+	local hours = 0
+	local minutes = 0
+	local days
+
+	if p >= 86400 then
+		days = math.floor(p / 86400)
+		p -= days * 86400
+	else
+		days = 0
 	end
 
-	if v3 >= 3600 then
-		n3 = math.floor(v3 / 3600)
-		v3 -= n3 * 3600
+	if p >= 3600 then
+		hours = math.floor(p / 3600)
+		p -= hours * 3600
 	end
 
-	if v3 > 0 then
-		n4 = math.floor(v3 / 60)
+	if p > 0 then
+		minutes = math.floor(p / 60)
 	end
 
-	return {
-		days = n2,
-		hours = n3,
-		minutes = n4
-	}
+	return { days = days, hours = hours, minutes = minutes }
 end
 
 return calculateCountdownTime

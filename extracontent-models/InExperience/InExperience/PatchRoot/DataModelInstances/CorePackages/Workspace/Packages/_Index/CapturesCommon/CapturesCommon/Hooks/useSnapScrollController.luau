@@ -1,11 +1,16 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local UserInputService = game:GetService("UserInputService")
-local React = require(ParentParentParent.React)
-local ReactOtter = require(ParentParentParent.ReactOtter)
-local ReactUtils = require(ParentParentParent.ReactUtils)
-local NavigationType = require(ParentParent.Enums.NavigationType)
-local isPointWithinBounds = require(ParentParent.Utils.isPointWithinBounds)
+
+local React = require(parent2.React)
+local ReactOtter = require(parent2.ReactOtter)
+local ReactUtils = require(parent2.ReactUtils)
+
+local NavigationType = require(parent.Enums.NavigationType)
+
+local isPointWithinBounds = require(parent.Utils.isPointWithinBounds)
+
 local useCallback = React.useCallback
 local useEffect = React.useEffect
 local useEventConnection = ReactUtils.useEventConnection
@@ -13,223 +18,178 @@ local useMotor = ReactOtter.useMotor
 local useRef = React.useRef
 local useState = React.useState
 
-local function useSnapScrollController(b1: boolean, n1: number, vector2: Vector2, n2: number) -- line: 26
-	-- upvalues: useRef (copy), useState (copy), useCallback (copy), useMotor (copy), React (copy), ReactOtter (copy), NavigationType (copy), useEffect (copy), useEventConnection (copy), UserInputService (copy), isPointWithinBounds (copy)
-	local v20 = useRef(nil)
-	local v21, v22 = useState(n1)
-	local v23 = useRef(nil)
-	local v24 = useRef(false)
-	local v25 = useRef(nil)
-	local v26 = useRef(nil)
-	local v27 = useRef(nil)
-	local v28 = useRef(nil)
-	local v29 = useRef(false)
-	local v30 = useCallback(function(p1) -- line: 42
-		-- upvalues: v23 (copy)
-		if not v23.current then
+local function useSnapScrollController(flag: boolean, p: number, current: Vector2, max: number)
+	local v = useRef(nil)
+	local state, setState = useState(p)
+	local v2 = useRef(nil)
+	local v3 = useRef(false)
+	local v4 = useRef(nil)
+	local v5 = useRef(nil)
+	local v6 = useRef(nil)
+	local v7 = useRef(nil)
+	local v8 = useRef(false)
+
+	local v9 = useCallback(function(p2)
+		if not v2.current then
 			return
 		end
 
-		v23.current.Position = UDim2.new(0.5, 0, 0, p1)
+		v2.current.Position = UDim2.new(0.5, 0, 0, p2)
 	end, {})
-	local v31 = useCallback(function() -- line: 50
-		-- upvalues: v24 (copy)
-		v24.current = false
+
+	local v10 = useCallback(function()
+		v3.current = false
 	end, {})
-	local v32 = useMotor((n1 - 1) * -vector2.Y, v30, v31)
-	local v33 = React.useCallback(function(n3: number, b2: boolean?) -- line: 57
-		-- upvalues: b1 (copy), v23 (copy), v20 (copy), v24 (copy), v29 (copy), n2 (copy), vector2 (copy), v32 (copy), ReactOtter (copy), v22 (copy)
-		if not b1 or (not v23.current or not v20.current or v24.current or v29.current or n2 < 1) then
+
+	local v11 = useMotor((p - 1) * -current.Y, v9, v10)
+
+	local v12 = React.useCallback(function(value: number, flag2: boolean?)
+		if not flag or not v2.current or not v.current or v3.current or v8.current or max < 1 then
 			return
 		end
 
-		assert(v23.current ~= nil, "motionRef.current is nil")
-		v24.current = true
+		assert(v2.current ~= nil, "motionRef.current is nil")
 
-		local v44 = math.clamp(n3, 1, n2)
-		local v45 = (v44 - 1) * -vector2.Y
+		v3.current = true
 
-		if b2 then
-			v32(ReactOtter.instant(v45))
+		local v12 = math.clamp(value, 1, max)
+		local v13 = (v12 - 1) * -current.Y
+
+		if flag2 then
+			v11(ReactOtter.instant(v13))
 		else
-			v32(ReactOtter.spring(v45, {
-				frequency = 8
-			}))
+			v11(ReactOtter.spring(v13, { frequency = 8 }))
 		end
 
-		v22(v44)
-	end, {
-		b1,
-		vector2,
-		n2,
-		v32
-	})
-	local v34 = React.useCallback(function(p2, b3: boolean?) -- line: 86
-		-- upvalues: NavigationType (copy), v33 (copy), v21 (copy)
+		setState(v12)
+	end, { flag, current, max, v11 })
+
+	local v13 = React.useCallback(function(p2, flag2: boolean?)
 		if p2 == NavigationType.Previous then
-			v33(v21 - 1, b3)
-
-			return
-		end
-
-		if p2 == NavigationType.Next then
-			v33(v21 + 1, b3)
-
-			return
-		end
-
-		v33(v21, b3)
-	end, {
-		v21,
-		v33
-	})
-
-	useEffect(function() -- line: 96
-		-- upvalues: v23 (copy), v25 (copy), vector2 (copy), v24 (copy), v34 (copy), NavigationType (copy)
-		if not v23.current or v25.current == vector2 then
-			return
-		end
-
-		v24.current = false
-		v34(NavigationType.Current, true)
-		v25.current = vector2
-	end, {
-		vector2,
-		v34
-	})
-
-	local v35 = React.useCallback(function(_, _, _, p6, _) -- line: 106
-		-- upvalues: v34 (copy), NavigationType (copy), v29 (copy), v27 (copy)
-		if p6 == Enum.UserInputState.Begin then
-			v34(NavigationType.Current)
-			v29.current = true
-
-			return
-		end
-
-		if p6 == Enum.UserInputState.End then
-			v29.current = false
-			v27.current = nil
-		end
-	end, { v34 })
-
-	useEventConnection(UserInputService.TouchPinch, v35)
-
-	local v36 = React.useCallback(function(p8) -- line: 118
-		-- upvalues: b1 (copy), v23 (copy), v20 (copy), v27 (copy), isPointWithinBounds (copy), v26 (copy), v28 (copy), v32 (copy), ReactOtter (copy)
-		if not b1 or (not v23.current or not v20.current or v27.current) then
-			return
-		end
-
-		if not isPointWithinBounds(Vector2.new(p8.Position.X, p8.Position.Y), v20.current.AbsolutePosition, v20.current.AbsoluteSize) then
-			return
-		end
-
-		v26.current = v23.current.Position.Y.Offset
-		v28.current = p8.Position.Y
-		v27.current = p8
-		v32(ReactOtter.instant(v23.current.Position.Y.Offset))
-	end, {
-		b1,
-		v32
-	})
-
-	useEventConnection(UserInputService.TouchStarted, v36)
-
-	local v37 = React.useCallback(function(p9) -- line: 140
-		-- upvalues: b1 (copy), v23 (copy), v20 (copy), v27 (copy), v26 (copy), v28 (copy), v29 (copy), n2 (copy), vector2 (copy), v32 (copy), ReactOtter (copy)
-		if not b1 or (not v23.current or not v20.current or p9 ~= v27.current or not v26.current or not v28.current or v29.current) then
-			return
-		end
-
-		local v55 = p9.Position.Y - v28.current
-		local v56 = math.clamp(v26.current + v55, (n2 - 1) * -vector2.Y - 100, 100)
-
-		v32(ReactOtter.instant(v56))
-	end, {
-		b1,
-		vector2,
-		n2,
-		v32
-	})
-
-	useEventConnection(UserInputService.TouchMoved, v37)
-
-	local v38 = React.useCallback(function(p10) -- line: 166
-		-- upvalues: b1 (copy), v23 (copy), v20 (copy), v27 (copy), v29 (copy), v24 (copy), v34 (copy), NavigationType (copy)
-		if not b1 or (not v23.current or not v20.current or not v27.current or v29.current or v24.current) then
-			return
-		end
-
-		if p10 == Enum.SwipeDirection.Up then
-			v34(NavigationType.Next)
-
-			return
-		end
-
-		if p10 == Enum.SwipeDirection.Down then
-			v34(NavigationType.Previous)
-
-			return
-		end
-
-		v34(NavigationType.Current)
-	end, {
-		b1,
-		v34
-	})
-
-	useEventConnection(UserInputService.TouchSwipe, v38)
-
-	local v39 = React.useCallback(function(p11) -- line: 190
-		-- upvalues: b1 (copy), v23 (copy), v20 (copy), v27 (copy), v26 (copy), v24 (copy), vector2 (copy), v34 (copy), NavigationType (copy)
-		if not b1 or (not v23.current or not v20.current or p11 ~= v27.current or not v26.current or v24.current) then
-			return
-		end
-
-		local v59 = v23.current.Position.Y.Offset - v26.current
-
-		if -v59 > vector2.Y * 0.25 then
-			v34(NavigationType.Next)
-		elseif v59 > vector2.Y * 0.25 then
-			v34(NavigationType.Previous)
+			v12(state - 1, flag2)
+		elseif p2 == NavigationType.Next then
+			v12(state + 1, flag2)
 		else
-			v34(NavigationType.Current)
+			v12(state, flag2)
 		end
+	end, { state, v12 })
 
-		v27.current = nil
-		v26.current = nil
-	end, {
-		b1,
-		vector2,
-		v34
-	})
-
-	useEventConnection(UserInputService.TouchEnded, v39)
-
-	local v40 = React.useCallback(function(n4: number, vector2_2: Vector2) -- line: 218
-		-- upvalues: b1 (copy), v34 (copy), NavigationType (copy)
-		if not b1 then
+	useEffect(function()
+		if not v2.current or v4.current == current then
 			return
 		end
 
-		if n4 < 0 or vector2_2.Y < -0.1 then
-			v34(NavigationType.Next)
+		v3.current = false
+		v13(NavigationType.Current, true)
+		v4.current = current
+	end, { current, v13 })
 
+	local v14 = React.useCallback(function(_, _, _, p2, _)
+		if p2 == Enum.UserInputState.Begin then
+			v13(NavigationType.Current)
+			v8.current = true
+		elseif p2 == Enum.UserInputState.End then
+			v8.current = false
+			v6.current = nil
+		end
+	end, { v13 })
+
+	useEventConnection(UserInputService.TouchPinch, v14)
+
+	local v15 = React.useCallback(function(current2)
+		if not flag or not v2.current or not v.current or v6.current then
 			return
 		end
 
-		if n4 > 0 or vector2_2.Y > 0.1 then
-			v34(NavigationType.Previous)
+		if not isPointWithinBounds(
+			Vector2.new(current2.Position.X, current2.Position.Y),
+			v.current.AbsolutePosition,
+			v.current.AbsoluteSize
+		) then
+			return
 		end
-	end, {
-		b1,
-		v34
-	})
 
-	useEventConnection(UserInputService.PointerAction, v40)
+		v5.current = v2.current.Position.Y.Offset
+		v7.current = current2.Position.Y
+		v6.current = current2
+		v11(ReactOtter.instant(v2.current.Position.Y.Offset))
+	end, { flag, v11 })
 
-	return v21, v20, v23, v33, v34
+	useEventConnection(UserInputService.TouchStarted, v15)
+
+	local v16 = React.useCallback(function(p2)
+		if
+			not flag
+			or not v2.current
+			or not v.current
+			or v6.current ~= p2
+			or not v5.current
+			or not v7.current
+			or v8.current
+		then
+			return
+		end
+
+		local v16 = p2.Position.Y - v7.current
+		local v17 = math.clamp(v5.current + v16, (max - 1) * -current.Y - 100, 100)
+
+		v11(ReactOtter.instant(v17))
+	end, { flag, current, max, v11 })
+
+	useEventConnection(UserInputService.TouchMoved, v16)
+
+	local v17 = React.useCallback(function(p2)
+		if not flag or not v2.current or not v.current or not v6.current or v8.current or v3.current then
+			return
+		end
+
+		if p2 == Enum.SwipeDirection.Up then
+			v13(NavigationType.Next)
+		elseif p2 == Enum.SwipeDirection.Down then
+			v13(NavigationType.Previous)
+		else
+			v13(NavigationType.Current)
+		end
+	end, { flag, v13 })
+
+	useEventConnection(UserInputService.TouchSwipe, v17)
+
+	local v18 = React.useCallback(function(p2)
+		if not flag or not v2.current or not v.current or v6.current ~= p2 or not v5.current or v3.current then
+			return
+		end
+
+		local v18 = v2.current.Position.Y.Offset - v5.current
+
+		if -v18 > current.Y * 0.25 then
+			v13(NavigationType.Next)
+		elseif current.Y * 0.25 < v18 then
+			v13(NavigationType.Previous)
+		else
+			v13(NavigationType.Current)
+		end
+
+		v6.current = nil
+		v5.current = nil
+	end, { flag, current, v13 })
+
+	useEventConnection(UserInputService.TouchEnded, v18)
+
+	local v19 = React.useCallback(function(p2: number, vector2: Vector2)
+		if not flag then
+			return
+		end
+
+		if p2 < 0 or vector2.Y < -0.1 then
+			v13(NavigationType.Next)
+		elseif p2 > 0 or vector2.Y > 0.1 then
+			v13(NavigationType.Previous)
+		end
+	end, { flag, v13 })
+
+	useEventConnection(UserInputService.PointerAction, v19)
+
+	return state, v, v2, v12, v13
 end
 
 return useSnapScrollController

@@ -2,66 +2,62 @@ local RunService = game:GetService("RunService")
 local GuiService = game:GetService("GuiService")
 local TextService = game:GetService("TextService")
 local Players = game:GetService("Players")
-
 game:GetService("CoreGui")
-
 local LocalizationService = game:GetService("LocalizationService")
-local PlatformService = nil
 
-pcall(function() -- line: 10
-	-- upvalues: PlatformService (ref)
-	PlatformService = game:GetService("PlatformService")
+local v = nil
+pcall(function()
+	local PlatformService = game:GetService("PlatformService")
+	v = PlatformService
 end)
 
-local t1 = {
-	IsFinite = function(p1) -- line: 15
-		return p1 == p1 and (p1 ~= 1e999 and p1 ~= -1e999)
-	end
-}
+local Utility = {}
 
-function t1.FindAncestorOfType(p2, p3) -- line: 19
-	-- upvalues: t1 (copy)
-	local v20 = p2 and p2.Parent
-
-	if v20 then
-		if v20:IsA(p3) then
-			return v20
-		end
-
-		return t1.FindAncestorOfType(v20, p3)
-	end
-
-	return nil
+function Utility.IsFinite(p): boolean
+	return p == p and p ~= 1e999 and p ~= -1e999
 end
-function t1.CalculateRelativeDimensions(p4, p5, p6, _) -- line: 31
-	-- upvalues: GuiService (copy), t1 (copy)
-	local ScreenResolution = GuiService:GetScreenResolution()
-	local v26 = t1.FindAncestorOfType(p4, "SurfaceGui")
 
-	if v26 then
-		ScreenResolution = v26.CanvasSize
+function Utility.FindAncestorOfType(p, className)
+	local parent = p and p.Parent
+
+	if not parent then
+		return nil
 	end
 
-	local v27 = p5 / p6
+	if parent:IsA(className) then
+		return parent
+	end
 
-	if p6.y > 0 and ScreenResolution.y > 0 then
-		v27 *= p6.x / p6.y / (ScreenResolution.x / ScreenResolution.y)
+	return Utility.FindAncestorOfType(parent, className)
+end
 
-		local p4Parent = p4.Parent
+function Utility.CalculateRelativeDimensions(p, p2, p3, _)
+	local v2 = GuiService:GetScreenResolution()
+	local ancestorOfType = Utility.FindAncestorOfType(p, "SurfaceGui")
 
-		if p4Parent then
-			local v29 = 1 / (p4Parent.AbsoluteSize / ScreenResolution)
+	if ancestorOfType then
+		v2 = ancestorOfType.CanvasSize
+	end
 
-			if t1.IsFinite(v29.x) and t1.IsFinite(v29.y) then
-				return UDim2.new(v29.x * v27.x, 0, v29.y * v27.y, 0)
+	local v3 = p2 / p3
+
+	if p3.y > 0 and v2.y > 0 then
+		v3 *= p3.x / p3.y / (v2.x / v2.y)
+		local parent = p.Parent
+
+		if parent then
+			local v4 = 1 / (parent.AbsoluteSize / v2)
+
+			if Utility.IsFinite(v4.x) and Utility.IsFinite(v4.y) then
+				return UDim2.new(v4.x * v3.x, 0, v4.y * v3.y, 0)
 			end
 		end
 	end
 
-	return UDim2.new(v27.x, 0, v27.y, 0)
+	return UDim2.new(v3.x, 0, v3.y, 0)
 end
 
-t1.Enum = {
+Utility.Enum = {
 	Anchor = {
 		TopLeft = 1,
 		TopMiddle = 2,
@@ -75,479 +71,390 @@ t1.Enum = {
 	}
 }
 
-function t1.CalculateFit(p8, p9) -- line: 76
-	local v32 = p8.AbsoluteSize / p9
-	local v33 = p9 * math.min(v32.X, v32.Y)
+function Utility.CalculateFit(p, p2)
+	local v2 = p.AbsoluteSize / p2
+	local v3 = p2 * math.min(v2.X, v2.Y)
 
-	return UDim2.new(0, v33.X, 0, v33.Y)
-end
-function t1.CalculateFill(p10, p11) -- line: 84
-	local v36 = p10.AbsoluteSize / p11
-	local v37 = p11 * math.max(v36.X, v36.Y)
-
-	return UDim2.new(0, v37.X, 0, v37.Y)
+	return UDim2.new(0, v3.X, 0, v3.Y)
 end
 
-local t2 = {}
+function Utility.CalculateFill(p, p2)
+	local v2 = p.AbsoluteSize / p2
+	local v3 = p2 * math.max(v2.X, v2.Y)
 
-local function getActiveTween(p12, p13) -- line: 95
-	-- upvalues: t2 (copy)
-	return t2[p12] and t2[p12][p13]
-end
-local function setActiveTween(p14, p15, p16) -- line: 99
-	-- upvalues: t2 (copy)
-	if not t2[p14] then
-		t2[p14] = {}
-	end
-
-	t2[p14][p15] = p16
+	return UDim2.new(0, v3.X, 0, v3.Y)
 end
 
-function t1.Linear(p17, p18, p19, p20) -- line: 106
-	if p20 <= p17 then
-		return p18 + p19
-	end
+local v2 = {}
 
-	return p19 * p17 / p20 + p18
+local function getActiveTween(p, p2) -- 3 equivalent calls inferred from this helper
+	return v2[p] and v2[p][p2]
 end
-function t1.EaseOutQuad(p21, p22, p23, p24) -- line: 112
-	if p24 <= p21 then
-		return p22 + p23
+
+local function setActiveTween(p, p2, p3) -- 4 equivalent calls inferred from this helper
+	if not v2[p] then
+		v2[p] = {}
 	end
 
-	local v51 = p21 / p24
-
-	return -p23 * v51 * (v51 - 2) + p22
+	v2[p][p2] = p3
 end
-function t1.EaseInOutQuad(p25, p26, p27, p28) -- line: 119
-	if p28 <= p25 then
-		return p26 + p27
+
+function Utility.Linear(p, p2, p3, p4)
+	if p4 <= p then
+		return p2 + p3
 	end
 
-	local v56 = p25 / (p28 / 2)
-
-	if v56 < 1 then
-		return p27 / 2 * v56 * v56 + p26
-	end
-
-	local v57 = v56 - 1
-
-	return -p27 / 2 * (v57 * (v57 - 2) - 1) + p26
+	return p3 * p / p4 + p2
 end
-function t1.SCurveUDim2(p29, p30, p31, p32) -- line: 128
-	if p32 <= p29 then
-		return p30 + p31
+
+function Utility.EaseOutQuad(p, p2, p3, p4)
+	if p4 <= p then
+		return p2 + p3
 	end
 
-	local v62 = p29 / p32
-
-	if v62 < 0 then
-		v62 = 0
-	end
-
-	if v62 > 1 then
-		v62 = 1
-	end
-
-	local v63 = 3 * v62 * v62 - 2 * v62 * v62 * v62
-
-	return UDim2.new(v63 * p31.X.Scale, v63 * p31.X.Offset, v63 * p31.Y.Scale, v63 * p31.Y.Offset) + p30
+	p /= p4
+	return -p3 * p * (p - 2) + p2
 end
-function t1.SCurveVector2(p33, p34, p35, p36) -- line: 141
-	if p36 <= p33 then
-		return p34 + p35
+
+function Utility.EaseInOutQuad(p, p2, p3, p4)
+	if p4 <= p then
+		return p2 + p3
 	end
 
-	local v68 = p33 / p36
+	local v3 = p / (p4 / 2)
 
-	if v68 < 0 then
-		v68 = 0
+	if v3 < 1 then
+		return p3 / 2 * v3 * v3 + p2
 	end
 
-	if v68 > 1 then
-		v68 = 1
-	end
-
-	local v69 = 3 * v68 * v68 - 2 * v68 * v68 * v68
-
-	return Vector2.new(v69 * p35.X, v69 * p35.Y) + p34
+	v3 -= 1
+	return -p3 / 2 * (v3 * (v3 - 2) - 1) + p2
 end
-function t1.PropertyTweener(p37, p38, p39, p40, p41, p42, p43, p44) -- line: 152
-	-- upvalues: t1 (copy), t2 (copy), RunService (copy)
-	local u78 = p42 or t1.Linear
-	local v79 = p43 or false
-	local t3 = {
-		StartTime = tick()
-	}
 
-	t3.EndTime = t3.StartTime + p41
-	t3.Cancelled = false
-
-	local u81 = false
-	local n1 = 0
-
-	local function setValue(p45) -- line: 165
-		-- upvalues: p37 (copy), p38 (copy)
-		if p37 then
-			p37[p38] = p45
-		end
+function Utility.SCurveUDim2(p, p2, p3, p4)
+	if p4 <= p then
+		return p2 + p3
 	end
-	local function finalize() -- line: 171
-		-- upvalues: u78 (ref), p39 (copy), p40 (copy), p37 (copy), p38 (copy), u81 (ref), n1 (ref), t2 (copy), t3 (copy), p44 (copy)
-		local v207 = u78(1, p39, p40 - p39, 1)
 
-		if p37 then
-			p37[p38] = v207
-		end
+	p /= p4
+	local v3 = p < 0 and 0 or p
+	local v4 = v3 > 1 and 1 or v3
+	local v5 = 3 * v4 * v4 - 2 * v4 * v4 * v4
+	return UDim2.new(v5 * p3.X.Scale, v5 * p3.X.Offset, v5 * p3.Y.Scale, v5 * p3.Y.Offset) + p2
+end
 
-		u81 = true
-		n1 = 1
+function Utility.SCurveVector2(p, p2, p3, p4)
+	if p4 <= p then
+		return p2 + p3
+	end
 
-		local v208 = p38
-		local v209 = p37
+	p /= p4
+	local v3 = p < 0 and 0 or p
+	local v4 = v3 > 1 and 1 or v3
+	local v5 = 3 * v4 * v4 - 2 * v4 * v4 * v4
+	return Vector2.new(v5 * p3.X, v5 * p3.Y) + p2
+end
 
-		if (t2[v208] and t2[v208][v209]) == t3 then
-			local v210 = p38
-			local v211 = p37
+function Utility:PropertyTweener(p, p2, final, p3, p4, p5, callback)
+	local v3 = p4 or Utility.Linear
 
-			if not t2[v210] then
-				t2[v210] = {}
-			end
+	local v4 = {}
+	v4.StartTime = tick()
+	v4.EndTime = v4.StartTime + p3
+	v4.Cancelled = false
 
-			t2[v210][v211] = nil
-		end
+	local v5 = false
+	local percentComplete = 0
 
-		if p44 then
-			p44()
+	local function setValue(p6) -- 3 equivalent calls inferred from this helper
+		if self then
+			self[p] = p6
 		end
 	end
 
-	if v79 or (not t2[p38] or not t2[p38][p37]) then
-		if t2[p38] and t2[p38][p37] then
-			(t2[p38] and t2[p38][p37]):Cancel()
+	local function finalize()
+		setValue(v3(1, p2, final - p2, 1)) -- inferred equivalent call
+		v5 = true
+		percentComplete = 1
+
+		if getActiveTween(p, self) == v4 then -- inferred equivalent call
+			setActiveTween(p, self) -- inferred equivalent call
 		end
 
-		if not t2[p38] then
-			t2[p38] = {}
+		if callback then
+			callback()
+		end
+	end
+
+	if p5 or not (v2[p] and v2[p][self]) then
+		if v2[p] and v2[p][self] then
+			(v2[p] and v2[p][self]):Cancel()
 		end
 
-		t2[p38][p37] = t3
+		setActiveTween(p, self, v4) -- inferred equivalent call
+		setValue(v3(0, p2, final - p2, p3)) -- inferred equivalent call
+		spawn(function()
+			local now = tick()
 
-		local v85 = u78(0, p39, p40 - p39, p41)
-
-		if p37 then
-			p37[p38] = v85
-		end
-
-		spawn(function() -- line: 193
-			-- upvalues: t3 (copy), p37 (copy), u78 (ref), p39 (copy), p40 (copy), p41 (copy), p38 (copy), n1 (ref), t1 (copy), RunService (copy), finalize (copy), t2 (copy)
-			local timestamp = tick()
-
-			while timestamp < t3.EndTime and p37 and not t3.Cancelled do
-				local v213 = u78(timestamp - t3.StartTime, p39, p40 - p39, p41)
-
-				if p37 then
-					p37[p38] = v213
-				end
-
-				n1 = t1.Clamp(0, 1, (timestamp - t3.StartTime) / p41)
+			while now < v4.EndTime and self and not v4.Cancelled do
+				setValue(v3(now - v4.StartTime, p2, final - p2, p3)) -- inferred equivalent call
+				percentComplete = Utility.Clamp(0, 1, (now - v4.StartTime) / p3)
 				RunService.RenderStepped:wait()
-				timestamp = tick()
+				now = tick()
 			end
 
-			if t3.Cancelled == false and p37 then
+			if v4.Cancelled == false and self then
 				finalize()
 			end
 
-			local v214 = p38
-			local v215 = p37
-
-			if (t2[v214] and t2[v214][v215]) == t3 then
-				local v216 = p38
-				local v217 = p37
-
-				if not t2[v216] then
-					t2[v216] = {}
-				end
-
-				t2[v216][v217] = nil
+			if getActiveTween(p, self) == v4 then -- inferred equivalent call
+				setActiveTween(p, self) -- inferred equivalent call
 			end
 		end)
 	else
-		u81 = true
+		v5 = true
 	end
 
-	function t3.GetFinal(_) -- line: 213
-		-- upvalues: p40 (copy)
-		return p40
+	function v4.GetFinal(_)
+		return final
 	end
-	function t3.GetPercentComplete(_) -- line: 217
-		-- upvalues: n1 (ref)
-		return n1
+
+	function v4.GetPercentComplete(_)
+		return percentComplete
 	end
-	function t3.IsFinished(_) -- line: 221
-		-- upvalues: u81 (ref)
-		return u81
+
+	function v4.IsFinished(_)
+		return v5
 	end
-	function t3.Finish(p49) -- line: 225
-		-- upvalues: u81 (ref), finalize (copy)
-		if not u81 then
-			p49:Cancel()
+
+	function v4:Finish()
+		if not v5 then
+			self:Cancel()
 			finalize()
 		end
 	end
-	function t3.Cancel(_) -- line: 232
-		-- upvalues: t3 (copy), u81 (ref), p38 (copy), p37 (copy), t2 (copy)
-		t3.Cancelled = true
-		u81 = true
 
-		local v223 = p38
-		local v224 = p37
+	function v4.Cancel(_)
+		v4.Cancelled = true
+		v5 = true
 
-		if (t2[v223] and t2[v223][v224]) == t3 then
-			local v225 = p38
-			local v226 = p37
+		if getActiveTween(p, self) == v4 then -- inferred equivalent call
+			setActiveTween(p, self) -- inferred equivalent call
+		end
+	end
 
-			if not t2[v225] then
-				t2[v225] = {}
+	return v4
+end
+
+function Utility:CancelTweens()
+	for k, item in pairs(self) do
+		item:Finish()
+		self[k] = nil
+	end
+end
+
+function Utility.Signal()
+	local bindableEvent = Instance.new("BindableEvent")
+
+	local v3 = nil
+	local v4 = nil
+	return {
+		fire = function(_, ...)
+			v3 = { ... }
+			v4 = select("#", ...)
+			bindableEvent:Fire()
+		end,
+		connect = function(self, callback)
+			if not callback then
+				error("connect(nil)", 2)
 			end
 
-			t2[v225][v226] = nil
+			return bindableEvent.Event:connect(function()
+				callback(unpack(v3, 1, v4))
+			end)
+		end,
+		wait = function(self)
+			bindableEvent.Event:wait()
+			assert(v3, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
+			return unpack(v3, 1, v4)
 		end
-	end
-
-	return t3
+	}
 end
-function t1.CancelTweens(p51) -- line: 243
-	for k, v in pairs(p51) do
-		v:Finish()
-		p51[k] = nil
-	end
-end
-function t1.Signal() -- line: 252
-	local t4 = {}
-	local BindableEvent = Instance.new("BindableEvent")
-	local t5 = nil
-	local u92 = nil
 
-	function t4.fire(_, ...) -- line: 260
-		-- upvalues: t5 (ref), u92 (ref), BindableEvent (copy)
-		t5 = { ... }
-		u92 = select("#", ...)
-		BindableEvent:Fire()
-	end
-	function t4.connect(_, p54) -- line: 266
-		-- upvalues: BindableEvent (copy), t5 (ref), u92 (ref)
-		if not p54 then
-			error("connect(nil)", 2)
-		end
-
-		return BindableEvent.Event:connect(function() -- line: 268
-			-- upvalues: p54 (copy), t5 (ref), u92 (ref)
-			p54(unpack(t5, 1, u92))
-		end)
-	end
-	function t4.wait(_) -- line: 273
-		-- upvalues: BindableEvent (copy), t5 (ref), u92 (ref)
-		BindableEvent.Event:wait()
-		assert(t5, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
-
-		return unpack(t5, 1, u92)
-	end
-
-	return t4
-end
-function t1.DisconnectEvent(p56) -- line: 282
-	if p56 then
-		p56:disconnect()
+function Utility.DisconnectEvent(object): nil
+	if object then
+		object:disconnect()
 	end
 
 	return nil
 end
-function t1.DisconnectEvents(p57) -- line: 289
-	if p57 and type(p57) == "table" then
-		for _, v in pairs(p57) do
-			v:disconnect()
+
+function Utility.DisconnectEvents(items)
+	if items and type(items) == "table" then
+		for _, item in pairs(items) do
+			item:disconnect()
 		end
 	end
 end
-function t1.Clamp(p58, p59, p60) -- line: 299
-	return (math.max(p58, (math.min(p59, p60))))
-end
-function t1.ClampVector2(p61, p62, p63) -- line: 303
-	-- upvalues: t1 (copy)
-	return Vector2.new(t1.Clamp(p61.x, p62.x, p63.x), t1.Clamp(p61.y, p62.y, p63.y))
-end
-function t1.TweenPositionOrSet(p64, ...) -- line: 307
-	if p64:IsDescendantOf(game) then
-		p64:TweenPositionInternal(...)
 
-		return
+function Utility.Clamp(p, p2, p3)
+	return (math.max(p, (math.min(p2, p3))))
+end
+
+function Utility.ClampVector2(p, p2, p3)
+	return Vector2.new(Utility.Clamp(p.x, p2.x, p3.x), Utility.Clamp(p.y, p2.y, p3.y))
+end
+
+function Utility:TweenPositionOrSet(...)
+	if self:IsDescendantOf(game) then
+		self:TweenPositionInternal(...)
+	else
+		self.Position = select(1, ...)
 	end
-
-	p64.Position = select(1, ...)
-end
-function t1.ClampCanvasPosition(p65, p66) -- line: 316
-	-- upvalues: t1 (copy)
-	local v106 = p65.Parent and p65.Parent.AbsoluteSize or Vector2.new(0, 0)
-	local vector2 = Vector2.new(p65.CanvasSize.X.Scale * v106.X + p65.CanvasSize.X.Offset, p65.CanvasSize.Y.Scale * v106.Y + p65.CanvasSize.Y.Offset)
-	local v108 = t1.Clamp(0, vector2.X - p65.AbsoluteWindowSize.X, p66.X)
-	local v109 = t1.Clamp(0, vector2.Y - p65.AbsoluteWindowSize.Y, p66.Y)
-
-	return Vector2.new(v108, v109)
-end
-function t1.Round(p67, p68) -- line: 327
-	local v112 = p68 or 1
-
-	return math.floor((p67 + v112 / 2) / v112) * v112
-end
-function t1.ChompString(p69) -- line: 335
-	return tostring(p69):gsub("^%s+", ""):gsub("%s+$", "")
-end
-function t1.SpaceNormalizeString(p70) -- line: 340
-	return tostring(p70):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
 end
 
-local function getDelimiterByLocale() -- line: 344
-	-- upvalues: LocalizationService (copy)
-	local v115 = LocalizationService.RobloxLocaleId:lower()
-	local t6 = {
+function Utility.ClampCanvasPosition(data, p)
+	local absoluteSize = data.Parent and data.Parent.AbsoluteSize or Vector2.new(0, 0)
+	local vector2 = Vector2.new(
+		data.CanvasSize.X.Scale * absoluteSize.X + data.CanvasSize.X.Offset,
+		data.CanvasSize.Y.Scale * absoluteSize.Y + data.CanvasSize.Y.Offset
+	)
+	local clamped = Utility.Clamp(0, vector2.X - data.AbsoluteWindowSize.X, p.X)
+	local clamped2 = Utility.Clamp(0, vector2.Y - data.AbsoluteWindowSize.Y, p.Y)
+
+	return Vector2.new(clamped, clamped2)
+end
+
+function Utility.Round(p, value)
+	value = value or 1
+	return math.floor((p + value / 2) / value) * value
+end
+
+function Utility.ChompString(p)
+	return tostring(p):gsub("^%s+", ""):gsub("%s+$", "")
+end
+
+function Utility.SpaceNormalizeString(p)
+	return tostring(p):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+end
+
+local function getDelimiterByLocale()
+	local robloxLocaleId = LocalizationService.RobloxLocaleId:lower()
+
+	local v3 = {
 		["en-us"] = ",",
 		["zh-hk"] = "",
 		["zh-tw"] = "",
-		["nb-no"] = "\194\160",
+		["nb-no"] = " ",
 		["es-es"] = " ",
 		["nl-nl"] = ".",
 		["it-it"] = ".",
 		["tr-tr"] = ".",
 		["ru-ru"] = " ",
-		["fi-fi"] = "\194\160",
+		["fi-fi"] = " ",
 		["da-dk"] = ".",
 		["de-de"] = ".",
-		["fr-fr"] = "\194\160",
+		["fr-fr"] = " ",
 		["pt-br"] = ".",
 		["pt-pt"] = ".",
 		["pl-pl"] = " ",
 		["sv-se"] = " "
 	}
 
-	if t6[v115] then
-		return t6[v115]
+	if v3[robloxLocaleId] then
+		return v3[robloxLocaleId]
 	end
 
 	return ","
 end
 
-function t1.FormatNumberString(p71) -- line: 375
-	-- upvalues: getDelimiterByLocale (copy), t1 (copy)
-	local v118 = getDelimiterByLocale()
-	local v119 = t1.ChompString(p71)
-	local v120 = string.format("%%1%s%%2", v118)
+function Utility.FormatNumberString(p)
+	local delimiterByLocale = getDelimiterByLocale()
+
+	local chompString = Utility.ChompString(p)
+	local v3 = string.format("%%1%s%%2", delimiterByLocale)
 
 	repeat
-		local count
+		local v4
+		chompString, v4 = string.gsub(chompString, "^(-?%d+)(%d%d%d)", v3)
+	until v4 == 0
 
-		v119, count = string.gsub(v119, "^(-?%d+)(%d%d%d)", v120)
-	until count == 0
-
-	return v119
+	return chompString
 end
-function t1.PrettyPrint(p72) -- line: 391
-	-- upvalues: t1 (copy)
-	if type(p72) == "table" then
-		local s1 = "{"
 
-		for k, v in pairs(p72) do
-			local v126 = s1 == "{" and s1 or s1 .. ", "
+function Utility.PrettyPrint(value)
+	if type(value) == "table" then
+		local v3 = "{"
+
+		for k, item in pairs(value) do
+			local v4 = v3 == "{" and v3 or v3 .. ", "
 
 			if type(k) == "string" then
-				v126 ..= k .. " = "
+				v4 ..= k .. " = "
 			elseif type(k) ~= "number" then
-				v126 ..= "[" .. k .. "] = "
+				v4 ..= "[" .. k .. "] = "
 			end
 
-			s1 = v126 .. t1.PrettyPrint(v)
+			v3 = v4 .. Utility.PrettyPrint(item)
 		end
 
-		return s1 .. "}"
+		return v3 .. "}"
+	elseif type(value) == "string" then
+		return "'" .. value .. "'"
+	else
+		return (tostring(value))
+	end
+end
+
+local function SCurveTranform(p, value, value2) -- 1 equivalent call inferred from this helper
+	local v3 = value or 0.35
+	local v4 = value2 or 0.8
+	local clamped = Utility.Clamp(-1, 1, p)
+
+	if clamped >= 0 then
+		return v3 * clamped / (v3 - clamped + 1)
 	end
 
-	if type(p72) == "string" then
-		return "'" .. p72 .. "'"
+	return -(v4 * -clamped / (v4 + clamped + 1))
+end
+
+local function toSCurveSpace(p, value) -- 1 equivalent call inferred from this helper
+	local v3 = value or 0.1
+	return (1 + v3) * (math.abs(p) * 2 - 1) - v3
+end
+
+local function fromSCurveSpace(p) -- 1 equivalent call inferred from this helper
+	return p / 2 + 0.5
+end
+
+function Utility.GamepadLinearToCurve(p, value, _, _)
+	local function onAxis(y) -- 1 equivalent call inferred from this helper
+		local v3 = y < 0 and -1 or 1
+
+		local v4 = fromSCurveSpace(SCurveTranform(toSCurveSpace(math.abs(y), value), nil)) -- inferred equivalent call
+		return Utility.Clamp(-1, 1, v4 * v3)
 	end
 
-	return (tostring(p72))
+	return Vector2.new(onAxis(p.x), onAxis(p.y)) -- inferred equivalent call
 end
 
-local function SCurveTranform(p73, p74, p75) -- line: 415
-	-- upvalues: t1 (copy)
-	local v130 = p74 or 0.35
-	local v131 = p75 or 0.8
-	local v132 = t1.Clamp(-1, 1, p73)
-
-	if v132 >= 0 then
-		return v130 * v132 / (v130 - v132 + 1)
-	end
-
-	return -(v131 * -v132 / (v131 + v132 + 1))
-end
-local function toSCurveSpace(p76, p77) -- line: 425
-	local v135 = p77 or 0.1
-
-	return (1 + v135) * (math.abs(p76) * 2 - 1) - v135
-end
-local function fromSCurveSpace(p78) -- line: 430
-	return p78 / 2 + 0.5
-end
-
-function t1.GamepadLinearToCurve(p79, p80, _, _) -- line: 434
-	-- upvalues: t1 (copy)
-	local function onAxis(p83) -- line: 435
-		-- upvalues: p80 (copy), t1 (copy)
-		local v232 = not (p83 < 0) and 1 or -1
-		local v233 = math.abs(p83)
-		local v234 = p80 or 0.1
-		local v235 = (1 + v234) * (math.abs(v233) * 2 - 1) - v234
-		local v236 = nil or 0.35
-		local v237 = nil or 0.8
-		local v238 = t1.Clamp(-1, 1, v235)
-		local v239 = ((if not (v238 >= 0) then -(v237 * -v238 / (v237 + v238 + 1)) else v236 * v238 / (v236 - v238 + 1))) / 2 + 0.5
-
-		return t1.Clamp(-1, 1, v239 * v232)
-	end
-
-	local new = Vector2.new
-	local x = p79.x
-	local v144 = not (x < 0) and 1 or -1
-	local v145 = math.abs(x)
-	local v146 = p80 or 0.1
-	local v147 = (1 + v146) * (math.abs(v145) * 2 - 1) - v146
-	local v148 = nil or 0.35
-	local v149 = nil or 0.8
-	local v150 = t1.Clamp(-1, 1, v147)
-	local v151 = ((if not (v150 >= 0) then -(v149 * -v150 / (v149 + v150 + 1)) else v148 * v150 / (v148 - v150 + 1))) / 2 + 0.5
-
-	return new(t1.Clamp(-1, 1, v151 * v144), onAxis(p79.y))
-end
-function t1.IsFastFlagEnabled(p84) -- line: 444
-	local ok, result = pcall(function() -- line: 445
-		-- upvalues: p84 (copy)
-		return settings():GetFFlag(p84)
+function Utility.IsFastFlagEnabled(p)
+	local success, result = pcall(function()
+		return settings():GetFFlag(p)
 	end)
 
-	return ok and result
+	return success and result
 end
-function t1.GetFastVariable(p85) -- line: 452
-	local ok, result = pcall(function() -- line: 453
-		-- upvalues: p85 (copy)
-		return settings():GetFVariable(p85)
+
+function Utility.GetFastVariable(p)
+	local success, result = pcall(function()
+		return settings():GetFVariable(p)
 	end)
 
-	return ok and result
+	return success and result
 end
 
-local function getLocalPlayer() -- line: 460
-	-- upvalues: Players (copy)
+local function getLocalPlayer() -- 1 equivalent call inferred from this helper
 	while Players.LocalPlayer == nil do
 		wait()
 	end
@@ -555,171 +462,166 @@ local function getLocalPlayer() -- line: 460
 	return Players.LocalPlayer
 end
 
-function t1.IsFeatureNonZero(p86) -- line: 467
-	-- upvalues: t1 (copy)
-	return (tonumber(t1.GetFastVariable(p86)) or 0) ~= 0
+function Utility.IsFeatureNonZero(p): boolean
+	return (tonumber(Utility.GetFastVariable(p)) or 0) ~= 0
 end
-function t1.IsFeatureRolledOut(p87) -- line: 471
-	-- upvalues: Players (copy), t1 (copy)
-	while Players.LocalPlayer == nil do
-		wait()
-	end
 
-	return Players.LocalPlayer.UserId % 100 < (tonumber(t1.GetFastVariable(p87)) or 0)
+function Utility.IsFeatureRolledOut(p): boolean
+	return getLocalPlayer().UserId % 100 < (tonumber(Utility.GetFastVariable(p)) or 0) -- inferred equivalent call
 end
-function t1.ExponentialRepeat(p88, p89, p90) -- line: 476
-	local v163 = p90 or 6
-	local n2 = 1
 
-	while n2 <= v163 and p88() do
-		if p89() then
-			return
+function Utility.ExponentialRepeat(callback, callback2, value)
+	local v3 = 1
+	local v4 = value or 6
+
+	while v3 <= v4 and callback() do
+		if callback2() then
+			break
 		end
 
-		wait(n2 ^ 2)
-		n2 += 1
+		wait(v3 ^ 2)
+		v3 += 1
 	end
 end
-function t1.SplitString(p91, p92) -- line: 490
-	local t7 = {}
 
-	if p91 and p92 then
-		for match in string.gmatch(p91, "([^" .. p92 .. "]+)") do
-			table.insert(t7, match)
+function Utility.SplitString(value, p)
+	local result = {}
+
+	if value and p then
+		for k in string.gmatch(value, "([^" .. p .. "]+)") do
+			table.insert(result, k)
 		end
 	end
 
-	return t7
+	return result
 end
 
-local function findAssetsHelper(p93, p94, p95) -- line: 501
-	-- upvalues: findAssetsHelper (copy)
-	if not p93 then
+local function findAssetsHelper(instance, list, p)
+	if not instance then
 		return
 	end
 
-	if p93:IsA("CharacterMesh") then
-		if p93.MeshId > 0 then
-			table.insert(p94, p95 .. tostring(p93.MeshId))
+	if instance:IsA("CharacterMesh") then
+		if instance.MeshId > 0 then
+			table.insert(list, p .. tostring(instance.MeshId))
 		end
 
-		if p93.BaseTextureId > 0 then
-			table.insert(p94, p95 .. tostring(p93.BaseTextureId))
+		if instance.BaseTextureId > 0 then
+			table.insert(list, p .. tostring(instance.BaseTextureId))
 		end
 
-		if p93.OverlayTextureId > 0 then
-			table.insert(p94, p95 .. tostring(p93.OverlayTextureId))
+		if instance.OverlayTextureId > 0 then
+			table.insert(list, p .. tostring(instance.OverlayTextureId))
 		end
-	elseif p93:IsA("FileMesh") then
-		table.insert(p94, p93.MeshId)
-		table.insert(p94, p93.TextureId)
-	elseif p93:IsA("Decal") then
-		table.insert(p94, p93.Texture)
-	elseif p93:IsA("Pants") then
-		table.insert(p94, p93.PantsTemplate)
-	elseif p93:IsA("Shirt") then
-		table.insert(p94, p93.ShirtTemplate)
+	elseif instance:IsA("FileMesh") then
+		table.insert(list, instance.MeshId)
+		table.insert(list, instance.TextureId)
+	elseif instance:IsA("Decal") then
+		table.insert(list, instance.Texture)
+	elseif instance:IsA("Pants") then
+		table.insert(list, instance.PantsTemplate)
+	elseif instance:IsA("Shirt") then
+		table.insert(list, instance.ShirtTemplate)
 	end
 
-	for _, child in pairs(p93:GetChildren()) do
-		findAssetsHelper(child, p94, p95)
+	for _, child in pairs(instance:GetChildren()) do
+		findAssetsHelper(child, list, p)
 	end
 end
-
-function t1.FindAssetsInModel(p96, p97) -- line: 529
-	-- upvalues: findAssetsHelper (copy)
-	local v176 = p97 or "https://assetgame.roblox.com/asset/?id="
-	local t8 = {}
-
-	findAssetsHelper(p96, t8, v176)
-
-	return t8
+function Utility.FindAssetsInModel(p, value)
+	local assetsInModel = {}
+	findAssetsHelper(p, assetsInModel, value or "https://assetgame.roblox.com/asset/?id=")
+	return assetsInModel
 end
-function t1.ConvertFontSizeEnumToInt(p98) -- line: 536
-	local p98Name = p98.Name
 
-	return string.match(p98Name, "%d+") or 10
+function Utility.ConvertFontSizeEnumToInt(p)
+	local name = p.Name
+
+	return string.match(name, "%d+") or 10
 end
-function t1.Upper(p99) -- line: 543
-	-- upvalues: PlatformService (ref)
-	if PlatformService then
-		return PlatformService:Upper(p99)
+
+function Utility:Upper()
+	if v then
+		return v:Upper(self)
 	end
 
-	return string.upper(p99)
+	return string.upper(self)
 end
-function t1.SetSelectedCoreObject(p100) -- line: 551
-	-- upvalues: GuiService (copy)
-	GuiService.SelectedCoreObject = p100
-end
-function t1.AddSelectionParent(p101, p102) -- line: 555
-	-- upvalues: GuiService (copy)
-	GuiService:AddSelectionParent(p101, p102)
-end
-function t1.RemoveSelectionGroup(p103) -- line: 559
-	-- upvalues: GuiService (copy)
-	GuiService:RemoveSelectionGroup(p103)
-end
-function t1.GetTextBounds(p104) -- line: 563
-	-- upvalues: TextService (copy)
-	local v186 = false
-	local TextSize = nil
 
-	if p104 then
-		if p104.TextFits then
-			return true, p104.TextBounds
-		end
+function Utility.SetSelectedCoreObject(selectedCoreObject)
+	GuiService.SelectedCoreObject = selectedCoreObject
+end
 
-		if not p104.TextWrapped then
-			TextSize = TextService:GetTextSize(p104.Text, p104.TextSize, p104.Font, Vector2.new(0, 0))
-			v186 = true
+function Utility:AddSelectionParent(p)
+	GuiService:AddSelectionParent(self, p)
+end
+
+function Utility:RemoveSelectionGroup()
+	GuiService:RemoveSelectionGroup(self)
+end
+
+function Utility.GetTextBounds(data)
+	local v3 = false
+	local textSize = nil
+
+	if not data then
+		return false, textSize
+	end
+
+	if data.TextFits then
+		return true, data.TextBounds
+	end
+
+	if not data.TextWrapped then
+		textSize = TextService:GetTextSize(data.Text, data.TextSize, data.Font, Vector2.new(0, 0))
+		v3 = true
+	end
+
+	return v3, textSize
+end
+
+function Utility:ResizeButtonWithText(p, p2, p3)
+	local flag = false
+	local textBounds, v3 = Utility.GetTextBounds(p)
+
+	if not textBounds or self.Size.X.Scale ~= 0 or self.Size.Y.Scale ~= 0 then
+		return false
+	end
+
+	local vector2 = Vector2.new(self.Size.X.Offset, self.Size.Y.Offset)
+	local v4 = vector2.X
+	local v5 = vector2.Y
+
+	if p2 and vector2.X < v3.X + p2 * 2 then
+		v4 = v3.X + p2 * 2
+		flag = true
+	end
+
+	if p3 and vector2.Y < v3.Y + p3 * 2 then
+		v5 = v3.Y + p3 * 2
+		flag = true
+	end
+
+	if flag then
+		self.Size = UDim2.new(0, v4, 0, v5)
+	end
+
+	return flag
+end
+
+function Utility.ResizeButtonWithDynamicText(p, p2, list, p3, p4)
+	local v3 = Utility.ResizeButtonWithText(p, p2, p3, p4) or false
+	local text = p2.Text
+
+	if list and #list > 0 then
+		for i = 1, #list do
+			p2.Text = list[i]
+			v3 = Utility.ResizeButtonWithText(p, p2, p3, p4) or v3
 		end
 	end
 
-	return v186, TextSize
-end
-function t1.ResizeButtonWithText(p105, p106, p107, p108) -- line: 589
-	-- upvalues: t1 (copy)
-	local v192 = false
-	local v193, v194 = t1.GetTextBounds(p106)
-
-	if v193 and (p105.Size.X.Scale == 0 and p105.Size.Y.Scale == 0) then
-		local vector2 = Vector2.new(p105.Size.X.Offset, p105.Size.Y.Offset)
-		local vector2X = vector2.X
-		local vector2Y = vector2.Y
-
-		if p107 and vector2.X < v194.X + p107 * 2 then
-			vector2X = v194.X + p107 * 2
-			v192 = true
-		end
-
-		if p108 and vector2.Y < v194.Y + p108 * 2 then
-			vector2Y = v194.Y + p108 * 2
-			v192 = true
-		end
-
-		if v192 then
-			p105.Size = UDim2.new(0, vector2X, 0, vector2Y)
-		end
-	end
-
-	return v192
-end
-function t1.ResizeButtonWithDynamicText(p109, p110, p111, p112, p113) -- line: 616
-	-- upvalues: t1 (copy)
-	local v203 = t1.ResizeButtonWithText(p109, p110, p112, p113) or false
-	local p110Text = p110.Text
-
-	if p111 and #p111 > 0 then
-		for i = 1, #p111 do
-			p110.Text = p111[i]
-			v203 = t1.ResizeButtonWithText(p109, p110, p112, p113) or v203
-		end
-	end
-
-	p110.Text = p110Text
-
-	return v203
+	p2.Text = text
+	return v3
 end
 
-return t1
+return Utility

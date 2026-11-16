@@ -1,100 +1,101 @@
 local __DEV__ = _G.__DEV__
-local _, result = xpcall(function() -- line: 9
+
+local _, result = xpcall(function()
 	return game:DefineFastFlag("RoduxRemoveConnectTraceback", false)
-end, function() -- line: 11
+end, function(): boolean
 	return true
 end)
 
-local function immutableAppend(p1, ...) -- line: 15
-	local t1 = {}
-	local v9 = #p1
+local function immutableAppend(listeners, ...)
+	local count = #listeners
+	local result2 = {}
 
-	for i = 1, v9 do
-		t1[i] = p1[i]
+	for i = 1, count do
+		result2[i] = listeners[i]
 	end
 
 	for i = 1, select("#", ...) do
-		t1[v9 + i] = select(i, ...)
+		result2[count + i] = select(i, ...)
 	end
 
-	return t1
+	return result2
 end
-local function immutableRemoveValue(p2, p3) -- line: 30
-	local t2 = {}
 
-	for i = 1, #p2 do
-		if p3 ~= p2[i] then
-			table.insert(t2, p2[i])
+local function immutableRemoveValue(listeners, p)
+	local result2 = {}
+
+	for i = 1, #listeners do
+		if listeners[i] ~= p then
+			table.insert(result2, listeners[i])
 		end
 	end
 
-	return t2
+	return result2
 end
 
-local t3 = {}
+local Signal = {}
 
-t3.__index = t3
+Signal.__index = Signal
 
-function t3.new(p4) -- line: 46
-	-- upvalues: t3 (copy)
-	local t4 = {
-		_listeners = {},
-		_store = p4
-	}
+function Signal.new(store)
+	local v = { _listeners = {}, _store = store }
 
-	setmetatable(t4, t3)
+	setmetatable(v, Signal)
 
-	return t4
+	return v
 end
-function t3.connect(p5, p6) -- line: 57
-	-- upvalues: result (copy), __DEV__ (copy), immutableAppend (copy), immutableRemoveValue (copy)
-	if typeof(p6) ~= "function" then
+
+function Signal:connect(callback)
+	if typeof(callback) ~= "function" then
 		error("Expected the listener to be a function.")
 	end
 
-	if p5._store and p5._store._isDispatching then
+	if self._store and self._store._isDispatching then
 		error("You may not call store.changed:connect() while the reducer is executing. If you would like to be notified after the store has been updated, subscribe from a component and invoke store:getState() in the callback to access the latest state. ")
 	end
 
-	local t5 = {
+	local v = {
+		callback = callback,
 		disconnected = false,
 		connectTraceback = nil,
-		disconnectTraceback = nil,
-		callback = p6
+		disconnectTraceback = nil
 	}
 
 	if not result or __DEV__ then
-		t5.connectTraceback = debug.traceback()
+		v.connectTraceback = debug.traceback()
 	end
 
-	p5._listeners = immutableAppend(p5._listeners, t5)
+	self._listeners = immutableAppend(self._listeners, v)
 
 	return {
-		disconnect = function() -- line: 83
-			-- upvalues: t5 (copy), p5 (copy), result (copy), __DEV__ (copy), immutableRemoveValue (copy)
-			if t5.disconnected then
-				error(("Listener connected at: \n%s\nwas already disconnected at: \n%s\n"):format(tostring(t5.connectTraceback), (tostring(t5.disconnectTraceback))))
+		disconnect = function()
+			if v.disconnected then
+				error(("Listener connected at: \n%s\nwas already disconnected at: \n%s\n"):format(
+					tostring(v.connectTraceback),
+					(tostring(v.disconnectTraceback))
+				))
 			end
 
-			if p5._store and p5._store._isDispatching then
+			if self._store and self._store._isDispatching then
 				error("You may not unsubscribe from a store listener while the reducer is executing.")
 			end
 
 			if not result or __DEV__ then
-				t5.disconnectTraceback = debug.traceback()
+				v.disconnectTraceback = debug.traceback()
 			end
 
-			t5.disconnected = true
-			p5._listeners = immutableRemoveValue(p5._listeners, t5)
+			v.disconnected = true
+			self._listeners = immutableRemoveValue(self._listeners, v)
 		end
 	}
 end
-function t3.fire(p7, ...) -- line: 109
-	for _, v in ipairs(p7._listeners) do
-		if not v.disconnected then
-			v.callback(...)
+
+function Signal:fire(...)
+	for _, listener in ipairs(self._listeners) do
+		if not listener.disconnected then
+			listener.callback(...)
 		end
 	end
 end
 
-return t3
+return Signal

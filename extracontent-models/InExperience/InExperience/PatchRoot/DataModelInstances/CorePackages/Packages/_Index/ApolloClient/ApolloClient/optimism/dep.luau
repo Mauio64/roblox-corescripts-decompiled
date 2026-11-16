@@ -1,69 +1,76 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+
+local LuauPolyfill = require(parent.LuauPolyfill)
+
 local Set = LuauPolyfill.Set
 local Array = LuauPolyfill.Array
-local t1 = {}
+
+local Dep = {}
 
 require(script.Parent.anyEntryTypes)
+
 require(script.Parent.initTypes)
 
-local parentEntrySlot = require(script.Parent.context).parentEntrySlot
+local context = require(script.Parent.context)
+local parentEntrySlot = context.parentEntrySlot
 local helpers = require(script.Parent.helpers)
 local hasOwnProperty = helpers.hasOwnProperty
+
 local maybeUnsubscribe = helpers.maybeUnsubscribe
 local toArray = helpers.toArray
-local t2 = {
-	setDirty = true,
-	dispose = true,
-	forget = true
-}
+
+local v = { setDirty = true, dispose = true, forget = true }
 
 require(script.Parent.depTypes)
 
-function t1.dep(t3: {[any]: any}?) -- line: 66
-	-- upvalues: parentEntrySlot (copy), Set (copy), maybeUnsubscribe (copy), hasOwnProperty (copy), t2 (copy), Array (copy), toArray (copy)
-	local t4 = {}
-	local v14 = if t3 == nil then t3 else t3.subscribe
-	local self = setmetatable({}, {
-		__call = function(_, p2) -- line: 74
-			-- upvalues: parentEntrySlot (copy), t4 (copy), Set (copy), v14 (copy), maybeUnsubscribe (copy)
-			local v18 = parentEntrySlot:getValue()
+function Dep.dep(callback)
+	local v2 = {}
 
-			if v18 ~= nil then
-				local v19 = t4[p2]
+	if callback ~= nil then
+		callback = callback.subscribe
+	end
 
-				if not v19 then
-					v19 = Set.new()
-					t4[p2] = v19
+	local object = setmetatable({}, {
+		__call = function(_, p)
+			local value = parentEntrySlot:getValue()
+
+			if value ~= nil then
+				local v3 = v2[p]
+
+				if not v3 then
+					v3 = Set.new()
+
+					v2[p] = v3
 				end
 
-				v18:dependOn(v19)
+				value:dependOn(v3)
 
-				if type(v14) == "function" then
-					maybeUnsubscribe(v19)
-					v19.unsubscribe = v14(p2)
+				if type(callback) == "function" then
+					maybeUnsubscribe(v3)
+
+					v3.unsubscribe = callback(p)
 				end
 			end
 		end
 	})
 
-	function self.dirty(_, p4, s1: string?) -- line: 101
-		-- upvalues: t4 (copy), hasOwnProperty (copy), t2 (copy), Array (copy), toArray (copy), maybeUnsubscribe (copy)
-		local v23 = t4[p4]
+	function object.dirty(_, p, p2: string?)
+		local v3 = v2[p]
 
-		if v23 then
-			local v24 = (not s1 or not hasOwnProperty(t2, s1)) and "setDirty" or s1
+		if v3 then
+			local v4 = not (p2 and hasOwnProperty(v, p2)) and "setDirty" or p2
 
-			Array.forEach(toArray(v23), function(p5) -- line: 112
-				-- upvalues: v24 (copy)
-				p5[v24](p5)
+			Array.forEach(toArray(v3), function(p3)
+				p3[v4](p3)
 			end)
-			t4[p4] = nil
-			maybeUnsubscribe(v23)
+
+			v2[p] = nil
+
+			maybeUnsubscribe(v3)
 		end
 	end
 
-	return self
+	return object
 end
 
-return t1
+return Dep

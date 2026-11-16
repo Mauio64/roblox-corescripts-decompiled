@@ -1,108 +1,73 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
+local Constants = require(parent.Constants)
+require(parent.util.Types)
 
-require(ParentParent.util.Types)
+local R15plusUtils = {}
+local jointNameWhitelist = nil
 
-local t1 = {}
-local t8 = nil
-local flags = ParentParent.flags
+local flags = parent.flags
 local getFFlagUGCValidationAllowHRDUpload = require(flags.getFFlagUGCValidationAllowHRDUpload)
 local getFFlagDebugAllowHRDUploadOnBundleBackend = require(flags.getFFlagDebugAllowHRDUploadOnBundleBackend)
-local getFFlagUGCValidationExtendSchemaToIgnoreDescendants = require(flags.getFFlagUGCValidationExtendSchemaToIgnoreDescendants)
-local t2 = {
-	"Index",
-	"Middle",
-	"Pinky",
-	"Ring",
-	"Thumb"
-}
 
-local function buildDrdSchema(s1: string) -- line: 16
-	-- upvalues: t2 (copy)
-	local t3 = {}
+local fingerFlatSuffixes = { "Index", "Middle", "Pinky", "Ring", "Thumb" }
 
-	for _, v23 in t2 do
-		local v24 = `{ s1 }Hand{ v23 }`
-		local v25 = `{ v24 }1`
-		local v26 = `{ v24 }2`
-		local v27 = `{ v24 }3`
+local function buildDrdSchema(p: string)
+	local drdSchema = {}
 
-		t3[v25] = {
+	for _, v in fingerFlatSuffixes do
+		local formatted = `{p}Hand{v}`
+		local formatted2 = `{formatted}1`
+		drdSchema[formatted2] = {
 			ClassName = "Bone",
 			_children = {
-				[v26] = {
+				[`{formatted}2`] = {
 					ClassName = "Bone",
 					_children = {
-						[v27] = {
-							ClassName = "Bone"
-						}
+						[`{formatted}3`] = { ClassName = "Bone" }
 					}
 				}
 			}
 		}
 	end
 
-	return t3
+	return drdSchema
 end
 
-local t4 = {
+local v = {
 	HeadBase = {
 		ClassName = "Bone",
 		_children = {
-			FaceCenterAttachment = {
-				ClassName = "Attachment"
-			},
-			FaceFrontAttachment = {
-				ClassName = "Attachment"
-			},
-			HairAttachment = {
-				ClassName = "Attachment"
-			},
-			HatAttachment = {
-				ClassName = "Attachment"
-			}
+			FaceCenterAttachment = { ClassName = "Attachment" },
+			FaceFrontAttachment = { ClassName = "Attachment" },
+			HairAttachment = { ClassName = "Attachment" },
+			HatAttachment = { ClassName = "Attachment" }
 		}
 	}
 }
-local t5 = {
+
+local v2 = {
 	Spine = {
 		ClassName = "Bone",
 		_children = {
 			Chest = {
 				ClassName = "Bone",
 				_children = {
-					BodyBackAttachment = {
-						ClassName = "Attachment"
-					},
-					BodyFrontAttachment = {
-						ClassName = "Attachment"
-					},
-					NeckRigAttachment = {
-						ClassName = "Attachment"
-					},
-					NeckAttachment = {
-						ClassName = "Attachment"
-					},
+					BodyBackAttachment = { ClassName = "Attachment" },
+					BodyFrontAttachment = { ClassName = "Attachment" },
+					NeckRigAttachment = { ClassName = "Attachment" },
+					NeckAttachment = { ClassName = "Attachment" },
 					LeftClavicle = {
 						ClassName = "Bone",
 						_children = {
-							LeftCollarAttachment = {
-								ClassName = "Attachment"
-							},
-							LeftShoulderRigAttachment = {
-								ClassName = "Attachment"
-							}
+							LeftCollarAttachment = { ClassName = "Attachment" },
+							LeftShoulderRigAttachment = { ClassName = "Attachment" }
 						}
 					},
 					RightClavicle = {
 						ClassName = "Bone",
 						_children = {
-							RightCollarAttachment = {
-								ClassName = "Attachment"
-							},
-							RightShoulderRigAttachment = {
-								ClassName = "Attachment"
-							}
+							RightCollarAttachment = { ClassName = "Attachment" },
+							RightShoulderRigAttachment = { ClassName = "Attachment" }
 						}
 					}
 				}
@@ -110,169 +75,147 @@ local t5 = {
 		}
 	}
 }
-local t6 = {
-	LeftToeBase = {
-		ClassName = "Bone"
-	}
+
+local v3 = {
+	LeftToeBase = { ClassName = "Bone" }
 }
-local t7 = {
-	RightToeBase = {
-		ClassName = "Bone"
-	}
+
+local v4 = {
+	RightToeBase = { ClassName = "Bone" }
 }
-local v15 = buildDrdSchema("Left")
-local v16 = buildDrdSchema("Right")
 
-t1.JointRotationName = "JointRotation"
+local drdSchema = buildDrdSchema("Left")
+local drdSchema2 = buildDrdSchema("Right")
 
-local u17 = false
+R15plusUtils.JointRotationName = "JointRotation"
 
-function t1.setIsBackendBundleUpload(b1: boolean) -- line: 128
-	-- upvalues: u17 (ref)
-	u17 = b1
+local v5 = false
+
+function R15plusUtils.setIsBackendBundleUpload(flag: boolean)
+	v5 = flag
 end
-function t1.checkFlagEnabledForAllowHrd() -- line: 132
-	-- upvalues: getFFlagUGCValidationExtendSchemaToIgnoreDescendants (copy), getFFlagUGCValidationAllowHRDUpload (copy), getFFlagDebugAllowHRDUploadOnBundleBackend (copy), u17 (ref)
-	if not getFFlagUGCValidationExtendSchemaToIgnoreDescendants() then
-		return false
-	end
 
-	if getFFlagUGCValidationAllowHRDUpload() then
-		return true
-	end
-
-	if getFFlagDebugAllowHRDUploadOnBundleBackend() and u17 then
+function R15plusUtils.checkFlagEnabledForAllowHrd(): boolean
+	if getFFlagUGCValidationAllowHRDUpload() or getFFlagDebugAllowHRDUploadOnBundleBackend() and v5 then
 		return true
 	end
 
 	return false
 end
 
-local JointLabels = nil
-local JointLabels2 = nil
+local jointLabels = nil
+local jointLabels2 = nil
 
-function t1.getHrdJointLabels() -- line: 155
-	-- upvalues: JointLabels (ref)
-	if JointLabels == nil then
-		JointLabels = Instance.new("HumanoidRigDescription"):GetJointLabels()
+function R15plusUtils.getHrdJointLabels()
+	if jointLabels == nil then
+		jointLabels = Instance.new("HumanoidRigDescription"):GetJointLabels()
 	end
 
-	return JointLabels
+	return jointLabels
 end
-function t1.getDrdJointLabels() -- line: 162
-	-- upvalues: JointLabels2 (ref)
-	if JointLabels2 == nil then
-		JointLabels2 = Instance.new("DigitsRigDescription"):GetJointLabels()
+
+function R15plusUtils.getDrdJointLabels()
+	if jointLabels2 == nil then
+		jointLabels2 = Instance.new("DigitsRigDescription"):GetJointLabels()
 	end
 
-	return JointLabels2
+	return jointLabels2
 end
-function t1.getJointNameWhitelist() -- line: 169
-	-- upvalues: t8 (ref), Constants (copy), t1 (copy)
-	if t8 ~= nil then
-		return t8
+
+function R15plusUtils.getJointNameWhitelist()
+	if jointNameWhitelist ~= nil then
+		return jointNameWhitelist
 	end
 
-	t8 = {}
+	jointNameWhitelist = {}
 
-	for v29, _ in Constants.R15_STANDARD_JOINT_NAMES do
-		t8[v29] = true
+	for k, _ in Constants.R15_STANDARD_JOINT_NAMES do
+		jointNameWhitelist[k] = true
 	end
 
-	for _, v32 in t1.getHrdJointLabels() do
-		t8[v32.Name] = true
+	for _, v6 in R15plusUtils.getHrdJointLabels() do
+		jointNameWhitelist[v6.Name] = true
 	end
 
-	for _, v34 in t1.getDrdJointLabels() do
-		t8[`LeftHand{ v34.Name }`] = true
-		t8[`RightHand{ v34.Name }`] = true
+	for _, v6 in R15plusUtils.getDrdJointLabels() do
+		jointNameWhitelist[`LeftHand{v6.Name}`] = true
+		jointNameWhitelist[`RightHand{v6.Name}`] = true
 	end
 
-	return t8
+	return jointNameWhitelist
 end
-function t1.getNameWhitelistOfClassInSchema(p1, s2: string) -- line: 191
-	-- upvalues: t1 (copy)
-	local t9 = {}
 
-	for v38, v39 in p1 do
-		if s2 == v39.ClassName then
-			t9[v38] = true
+function R15plusUtils.getNameWhitelistOfClassInSchema(items, p: string)
+	local nameWhitelistOfClassInSchema = {}
+
+	for k, item in items do
+		if item.ClassName == p then
+			nameWhitelistOfClassInSchema[k] = true
 		end
 
-		if v39._children ~= nil then
-			for v40, v41 in t1.getNameWhitelistOfClassInSchema(v39._children, s2) do
-				t9[v40] = v41
-			end
+		if item._children == nil then
+			continue
 		end
-	end
 
-	return t9
-end
-function t1.getSchemaFlatHierarchyList(p2, t10: {[any]: any}) -- line: 211
-	-- upvalues: t1 (copy)
-	local t11 = {}
-
-	for v45, v46 in p2 do
-		local v47 = table.clone(t10)
-
-		table.insert(v47, v45)
-		t11[v45] = {
-			ClassName = v46.ClassName,
-			path = v47
-		}
-
-		if v46._children ~= nil then
-			for v48, v49 in t1.getSchemaFlatHierarchyList(v46._children, v47) do
-				t11[v48] = v49
-			end
+		for k2, v6 in R15plusUtils.getNameWhitelistOfClassInSchema(item._children, p) do
+			nameWhitelistOfClassInSchema[k2] = v6
 		end
 	end
 
-	return t11
+	return nameWhitelistOfClassInSchema
 end
-function t1.getFingerFlatSuffixes() -- line: 235
-	-- upvalues: t2 (copy)
-	return t2
+
+function R15plusUtils.getSchemaFlatHierarchyList(items, p)
+	local schemaFlatHierarchyList = {}
+
+	for k, item in items do
+		local clone = table.clone(p)
+		table.insert(clone, k)
+
+		schemaFlatHierarchyList[k] = { ClassName = item.ClassName, path = clone }
+
+		if item._children == nil then
+			continue
+		end
+
+		for k2, v6 in R15plusUtils.getSchemaFlatHierarchyList(item._children, clone) do
+			schemaFlatHierarchyList[k2] = v6
+		end
+	end
+
+	return schemaFlatHierarchyList
 end
-function t1.getDrdSchema(s3: string) -- line: 239
-	-- upvalues: v15 (copy), v16 (copy)
-	if s3 == "Left" then
-		return v15
-	end
 
-	if s3 == "Right" then
-		return v16
-	end
-
-	error("Invalid side: " .. s3)
+function R15plusUtils.getFingerFlatSuffixes()
+	return fingerFlatSuffixes
 end
-function t1.getAvatarBoneSchema(s4: string) -- line: 249
-	-- upvalues: t4 (copy), t5 (copy), t6 (copy), t7 (copy), v15 (copy), v16 (copy)
-	if s4 == "Head" then
-		return t4
+
+function R15plusUtils.getDrdSchema(p: string)
+	if p == "Left" then
+		return drdSchema
+	elseif p == "Right" then
+		return drdSchema2
 	end
 
-	if s4 == "UpperTorso" then
-		return t5
-	end
+	error("Invalid side: " .. p)
+end
 
-	if s4 == "LeftFoot" then
-		return t6
-	end
-
-	if s4 == "RightFoot" then
-		return t7
-	end
-
-	if s4 == "LeftHand" then
-		return v15
-	end
-
-	if s4 == "RightHand" then
-		return v16
+function R15plusUtils.getAvatarBoneSchema(p: string)
+	if p == "Head" then
+		return v
+	elseif p == "UpperTorso" then
+		return v2
+	elseif p == "LeftFoot" then
+		return v3
+	elseif p == "RightFoot" then
+		return v4
+	elseif p == "LeftHand" then
+		return drdSchema
+	elseif p == "RightHand" then
+		return drdSchema2
 	end
 
 	return {}
 end
 
-return t1
+return R15plusUtils

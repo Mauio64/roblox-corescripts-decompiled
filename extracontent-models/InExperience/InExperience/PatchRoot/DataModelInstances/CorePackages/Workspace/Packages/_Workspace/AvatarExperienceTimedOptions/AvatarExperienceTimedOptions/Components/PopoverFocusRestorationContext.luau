@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
 
-return (require(Parent.React).createContext(false))
+local React = require(parent.React)
+
+return (React.createContext(false))

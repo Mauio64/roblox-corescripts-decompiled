@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-require(CorePackages.Workspace.Packages.NotificationsUpsell).setupNotificationsUpsell()
+local NotificationsUpsell = require(CorePackages.Workspace.Packages.NotificationsUpsell)
+NotificationsUpsell.setupNotificationsUpsell()

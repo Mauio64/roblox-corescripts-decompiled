@@ -1,169 +1,164 @@
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
-
 RobloxGui:WaitForChild("Modules")
 
 local StarterGui = game:GetService("StarterGui")
-
 game:GetService("UserInputService")
 game:GetService("GuiService")
 
 local Players = game:GetService("Players")
+
 local ChatUtil = require(RobloxGui.Modules.ChatUtil)
+
 local ClassicChat = Players.ClassicChat
 local BubbleChat = Players.BubbleChat
+
 local VRService = game:GetService("VRService")
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
-local _ = SharedFlags.FFlagChromeChatGamepadSupportFix
-local NewChat = nil
-local Visibility = nil
-local t1 = {}
-local t2 = {
+local FFlagChromeChatGamepadSupportFix = SharedFlags.FFlagChromeChatGamepadSupportFix
+
+local v = nil
+
+local visibility = nil
+local v2 = {}
+local v3 = {
 	Visible = not VRService.VREnabled
 }
-local t5 = {
-	ToggleVisibility = function(_) -- line: 39
-		-- upvalues: NewChat (ref), t2 (copy)
-		if NewChat then
-			NewChat:ToggleVisibility()
+local ChatSelector = {}
 
-			return
-		end
-
-		t2.Visible = not t2.Visible
-	end,
-	SetVisible = function(_, p3) -- line: 47
-		-- upvalues: NewChat (ref), t2 (copy)
-		if NewChat then
-			NewChat:SetVisible(p3)
-
-			return
-		end
-
-		t2.Visible = p3
-	end,
-	FocusChatBar = function(_) -- line: 55
-		-- upvalues: NewChat (ref)
-		if NewChat then
-			NewChat:FocusChatBar()
-		end
-	end,
-	FocusSelectChatBar = function(_: {[any]: any}, p5: ((...any) -> ...any)?, t4: {[any]: any}?) -- line: 61
-		-- upvalues: NewChat (ref), FFlagEnableConsoleExpControls (copy)
-		if NewChat and FFlagEnableConsoleExpControls then
-			NewChat:FocusSelectChatBar(p5, t4)
-		end
-	end,
-	EnterWhisperState = function(_, p7) -- line: 69
-		-- upvalues: NewChat (ref)
-		if NewChat then
-			return NewChat:EnterWhisperState(p7)
-		end
-	end,
-	GetVisibility = function(_) -- line: 75
-		-- upvalues: NewChat (ref), t2 (copy)
-		if NewChat then
-			return NewChat:GetVisibility()
-		end
-
-		return t2.Visible
-	end,
-	GetMessageCount = function(_) -- line: 83
-		-- upvalues: NewChat (ref)
-		if NewChat then
-			return NewChat:GetMessageCount()
-		end
-
-		return 0
-	end,
-	TopbarEnabledChanged = function(_, ...) -- line: 91
-		-- upvalues: NewChat (ref)
-		if NewChat then
-			return NewChat:TopbarEnabledChanged(...)
-		end
-	end,
-	IsFocused = function(_, p12) -- line: 97
-		-- upvalues: NewChat (ref)
-		if NewChat then
-			return NewChat:IsFocused(p12)
-		end
-
-		return false
-	end,
-	ClassicChatEnabled = function(_) -- line: 105
-		-- upvalues: NewChat (ref), ClassicChat (copy)
-		if NewChat then
-			return NewChat:ClassicChatEnabled()
-		end
-
-		return ClassicChat
-	end,
-	IsBubbleChatOnly = function(_) -- line: 113
-		-- upvalues: NewChat (ref), BubbleChat (copy), ClassicChat (copy)
-		if NewChat then
-			return NewChat:IsBubbleChatOnly()
-		end
-
-		return BubbleChat and not ClassicChat
-	end,
-	IsDisabled = function(_) -- line: 120
-		-- upvalues: NewChat (ref), BubbleChat (copy), ClassicChat (copy)
-		if NewChat then
-			return NewChat:IsDisabled()
-		end
-
-		return not (BubbleChat or ClassicChat)
-	end
-}
-
-function t5.HideTemp(_: {[any]: any}, s1: string, b1: boolean) -- line: 127
-	-- upvalues: t1 (copy), Visibility (ref), t5 (copy)
-	local function isHideTempKeysEmpty() -- line: 128
-		-- upvalues: t1 (copy)
-		return next(t1) == nil
-	end
-
-	if next(t1) == nil then
-		Visibility = t5:GetVisibility()
-	end
-
-	if b1 then
-		t1[s1] = b1
+function ChatSelector:ToggleVisibility()
+	if v then
+		v:ToggleVisibility()
 	else
-		t1[s1] = nil
+		v3.Visible = not v3.Visible
 	end
-
-	t5:SetVisible(Visibility and next(t1) == nil)
 end
 
-t5.ChatBarFocusChanged = ChatUtil.Signal()
-t5.ChatWindowToggled = ChatUtil.Signal()
-t5.ChatActiveChanged = ChatUtil.Signal()
-t5.ChatActiveChanged:connect(function(p16) -- line: 149
-	-- upvalues: t5 (copy)
-	t5:SetVisible(p16)
+function ChatSelector:SetVisible(visible)
+	if v then
+		v:SetVisible(visible)
+	else
+		v3.Visible = visible
+	end
+end
+
+function ChatSelector:FocusChatBar()
+	if v then
+		v:FocusChatBar()
+	end
+end
+
+function ChatSelector:FocusSelectChatBar(callback, p)
+	if v and FFlagEnableConsoleExpControls then
+		v:FocusSelectChatBar(callback, p)
+	end
+end
+
+function ChatSelector:EnterWhisperState(p)
+	if v then
+		return v:EnterWhisperState(p)
+	end
+end
+
+function ChatSelector:GetVisibility()
+	if v then
+		return v:GetVisibility()
+	end
+
+	return v3.Visible
+end
+
+function ChatSelector:GetMessageCount()
+	if v then
+		return v:GetMessageCount()
+	end
+
+	return 0
+end
+
+function ChatSelector:TopbarEnabledChanged(...)
+	if v then
+		return v:TopbarEnabledChanged(...)
+	end
+end
+
+function ChatSelector:IsFocused(p)
+	if v then
+		return v:IsFocused(p)
+	end
+
+	return false
+end
+
+function ChatSelector:ClassicChatEnabled()
+	if v then
+		return v:ClassicChatEnabled()
+	end
+
+	return ClassicChat
+end
+
+function ChatSelector:IsBubbleChatOnly()
+	if v then
+		return v:IsBubbleChatOnly()
+	end
+
+	return BubbleChat and not ClassicChat
+end
+
+function ChatSelector:IsDisabled()
+	if v then
+		return v:IsDisabled()
+	end
+
+	return not (BubbleChat or ClassicChat)
+end
+
+function ChatSelector.HideTemp(_, p: string, flag: boolean)
+	local function isHideTempKeysEmpty(): boolean -- 2 equivalent calls inferred from this helper
+		return next(v2) == nil
+	end
+
+	if isHideTempKeysEmpty() then -- inferred equivalent call
+		visibility = ChatSelector:GetVisibility()
+	end
+
+	if flag then
+		v2[p] = flag
+	else
+		v2[p] = nil
+	end
+
+	ChatSelector:SetVisible(visibility and isHideTempKeysEmpty()) -- inferred equivalent call
+end
+
+ChatSelector.ChatBarFocusChanged = ChatUtil.Signal()
+ChatSelector.ChatWindowToggled = ChatUtil.Signal()
+ChatSelector.ChatActiveChanged = ChatUtil.Signal()
+ChatSelector.ChatActiveChanged:connect(function(p)
+	ChatSelector:SetVisible(p)
 end)
-t5.VisibilityStateChanged = ChatUtil.Signal()
-t5.MessagesChanged = ChatUtil.Signal()
-t5.BubbleChatOnlySet = ChatUtil.Signal()
-t5.ChatDisabled = ChatUtil.Signal()
 
-local u18 = false
-local t7 = {}
+ChatSelector.VisibilityStateChanged = ChatUtil.Signal()
+ChatSelector.MessagesChanged = ChatUtil.Signal()
 
-local function MakeSystemMessageQueueingFunction(p17) -- line: 163
-	-- upvalues: u18 (ref), t7 (copy)
-	if u18 then
+ChatSelector.BubbleChatOnlySet = ChatUtil.Signal()
+ChatSelector.ChatDisabled = ChatUtil.Signal()
+
+local flag = false
+local v4 = {}
+local function MakeSystemMessageQueueingFunction(p)
+	if flag then
 		return
 	end
 
-	table.insert(t7, p17)
-end
-local function NonFunc() -- line: 168
+	table.insert(v4, p)
 end
 
+local function NonFunc() end
 StarterGui:RegisterSetCore("ChatMakeSystemMessage", MakeSystemMessageQueueingFunction)
 StarterGui:RegisterSetCore("ChatWindowPosition", NonFunc)
 StarterGui:RegisterGetCore("ChatWindowPosition", NonFunc)
@@ -171,97 +166,84 @@ StarterGui:RegisterSetCore("ChatWindowSize", NonFunc)
 StarterGui:RegisterGetCore("ChatWindowSize", NonFunc)
 StarterGui:RegisterSetCore("ChatBarDisabled", NonFunc)
 StarterGui:RegisterGetCore("ChatBarDisabled", NonFunc)
-StarterGui:RegisterGetCore("ChatActive", function() -- line: 178
-	-- upvalues: t5 (copy)
-	return t5:GetVisibility()
-end)
-StarterGui:RegisterSetCore("ChatActive", function(p18) -- line: 181
-	-- upvalues: t5 (copy)
-	t5.ChatActiveChanged:fire(p18)
+
+StarterGui:RegisterGetCore("ChatActive", function()
+	return ChatSelector:GetVisibility()
 end)
 
-local function ConnectSignals(p19, p20, p21) -- line: 186
-	if p19[p21] then
-		p19[p21]:connect(function(...) -- line: 189
-			-- upvalues: p20 (copy), p21 (copy)
-			p20[p21]:fire(...)
+StarterGui:RegisterSetCore("ChatActive", function(p)
+	ChatSelector.ChatActiveChanged:fire(p)
+end)
+
+local function ConnectSignals(p, p2, p3)
+	if p[p3] then
+		p[p3]:connect(function(...)
+			p2[p3]:fire(...)
 		end)
 	end
 end
 
-coroutine.wrap(function() -- line: 193
-	-- upvalues: NewChat (ref), RobloxGui (copy), t5 (copy), Players (copy), StarterGui (copy), t2 (copy), u18 (ref), t7 (copy)
-	NewChat = require(RobloxGui.Modules.NewChat)
+coroutine.wrap(function()
+	local NewChat = require(RobloxGui.Modules.NewChat)
+	v = NewChat
 
-	local v50 = NewChat
-	local v51 = t5
+	local v5 = v
+	local v6 = ChatSelector
 
-	if v50.ChatBarFocusChanged then
-		local s2 = "ChatBarFocusChanged"
-
-		v50.ChatBarFocusChanged:connect(function(...) -- line: 189
-			-- upvalues: v51 (copy), s2 (copy)
-			v51[s2]:fire(...)
+	if v5.ChatBarFocusChanged then
+		local v7 = "ChatBarFocusChanged"
+		v5.ChatBarFocusChanged:connect(function(...)
+			v6[v7]:fire(...)
 		end)
 	end
 
-	local v53 = NewChat
-	local v54 = t5
+	local v7 = v
+	local v8 = ChatSelector
 
-	if v53.VisibilityStateChanged then
-		local s3 = "VisibilityStateChanged"
-
-		v53.VisibilityStateChanged:connect(function(...) -- line: 189
-			-- upvalues: v54 (copy), s3 (copy)
-			v54[s3]:fire(...)
+	if v7.VisibilityStateChanged then
+		local v9 = "VisibilityStateChanged"
+		v7.VisibilityStateChanged:connect(function(...)
+			v8[v9]:fire(...)
 		end)
 	end
 
-	local v56 = NewChat
-	local v57 = t5
+	local v9 = v
+	local v10 = ChatSelector
 
-	if v56.ChatWindowToggled then
-		local s4 = "ChatWindowToggled"
-
-		v56.ChatWindowToggled:connect(function(...) -- line: 189
-			-- upvalues: v57 (copy), s4 (copy)
-			v57[s4]:fire(...)
+	if v9.ChatWindowToggled then
+		local v11 = "ChatWindowToggled"
+		v9.ChatWindowToggled:connect(function(...)
+			v10[v11]:fire(...)
 		end)
 	end
 
-	local v59 = NewChat
-	local v60 = t5
+	local v11 = v
+	local v12 = ChatSelector
 
-	if v59.ChatActiveChanged then
-		local s5 = "ChatActiveChanged"
-
-		v59.ChatActiveChanged:connect(function(...) -- line: 189
-			-- upvalues: v60 (copy), s5 (copy)
-			v60[s5]:fire(...)
+	if v11.ChatActiveChanged then
+		local v13 = "ChatActiveChanged"
+		v11.ChatActiveChanged:connect(function(...)
+			v12[v13]:fire(...)
 		end)
 	end
 
-	local v62 = NewChat
-	local v63 = t5
+	local v13 = v
+	local v14 = ChatSelector
 
-	if v62.BubbleChatOnlySet then
-		local s6 = "BubbleChatOnlySet"
-
-		v62.BubbleChatOnlySet:connect(function(...) -- line: 189
-			-- upvalues: v63 (copy), s6 (copy)
-			v63[s6]:fire(...)
+	if v13.BubbleChatOnlySet then
+		local v15 = "BubbleChatOnlySet"
+		v13.BubbleChatOnlySet:connect(function(...)
+			v14[v15]:fire(...)
 		end)
 	end
 
-	local v65 = NewChat
-	local v66 = t5
+	local v15 = v
+	local v16 = ChatSelector
 
-	if v65.ChatDisabled then
-		local s7 = "ChatDisabled"
-
-		v65.ChatDisabled:connect(function(...) -- line: 189
-			-- upvalues: v66 (copy), s7 (copy)
-			v66[s7]:fire(...)
+	if v15.ChatDisabled then
+		local v17 = "ChatDisabled"
+		v15.ChatDisabled:connect(function(...)
+			v16[v17]:fire(...)
 		end)
 	end
 
@@ -269,32 +251,32 @@ coroutine.wrap(function() -- line: 193
 		Players.ChildAdded:wait()
 	end
 
-	local _ = Players.LocalPlayer
-	local v69 = NewChat
-	local v70 = t5
+	local _localPlayer = Players.LocalPlayer
 
-	if v69.MessagesChanged then
-		local s8 = "MessagesChanged"
+	local v17 = v
+	local v18 = ChatSelector
 
-		v69.MessagesChanged:connect(function(...) -- line: 189
-			-- upvalues: v70 (copy), s8 (copy)
-			v70[s8]:fire(...)
+	if v17.MessagesChanged then
+		local v19 = "MessagesChanged"
+		v17.MessagesChanged:connect(function(...)
+			v18[v19]:fire(...)
 		end)
 	end
 
-	StarterGui:RegisterGetCore("UseNewLuaChat", function() -- line: 208
+	StarterGui:RegisterGetCore("UseNewLuaChat", function(): boolean
 		return true
 	end)
-	NewChat:SetVisible(t2.Visible)
-	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Chat))
-	u18 = true
 
-	for _, v in pairs(t7) do
-		pcall(function() -- line: 215
-			-- upvalues: StarterGui (copy), v (copy)
-			StarterGui:SetCore("ChatMakeSystemMessage", v)
+	v:SetVisible(v3.Visible)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Chat))
+
+	flag = true
+
+	for _, v19 in pairs(v4) do
+		pcall(function()
+			StarterGui:SetCore("ChatMakeSystemMessage", v19)
 		end)
 	end
 end)()
 
-return t5
+return ChatSelector

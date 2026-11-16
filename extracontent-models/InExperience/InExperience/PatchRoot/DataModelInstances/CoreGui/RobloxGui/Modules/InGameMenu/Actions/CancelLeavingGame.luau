@@ -1,5 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator("CANCEL_LEAVING_GAME", function() -- line: 5
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("CANCEL_LEAVING_GAME", function()
 	return {}
 end)

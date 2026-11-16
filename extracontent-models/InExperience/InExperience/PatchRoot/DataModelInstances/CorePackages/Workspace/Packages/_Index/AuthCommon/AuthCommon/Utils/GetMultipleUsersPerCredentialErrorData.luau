@@ -1,15 +1,13 @@
 local HttpService = game:GetService("HttpService")
 
-return function(p1) -- line: 18
-	-- upvalues: HttpService (copy)
-	if p1 ~= nil and (p1.errors ~= nil and p1.errors[1] and p1.errors[1].fieldData) then
-		local fieldData = p1.errors[1].fieldData
-		local ok, result = pcall(function() -- line: 26
-			-- upvalues: HttpService (copy), fieldData (copy)
+return function(p)
+	if p ~= nil and p.errors ~= nil and p.errors[1] and p.errors[1].fieldData then
+		local fieldData = p.errors[1].fieldData
+		local success, result = pcall(function()
 			return HttpService:JSONDecode(fieldData)
 		end)
 
-		if ok then
+		if success then
 			return result.users or {}
 		end
 	end

@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
-local scriptParent = script.Parent
-local ChatConstants = require(scriptParent:WaitForChild("ChatConstants"))
-local t1 = {
+
+local parent = script.Parent
+local ChatConstants = require(parent:WaitForChild("ChatConstants"))
+
+local v = {
 	WindowDraggable = false,
 	WindowResizable = false,
 	ShowChannelsBar = false,
@@ -28,7 +30,7 @@ local t1 = {
 	ChatBarBoxColor = Color3.new(1, 1, 1),
 	ChatBarTextColor = Color3.new(0, 0, 0),
 	ChannelsTabUnselectedColor = Color3.new(0, 0, 0),
-	ChannelsTabSelectedColor = Color3.new(0.11764705882352941, 0.11764705882352941, 0.11764705882352941),
+	ChannelsTabSelectedColor = Color3.new(30 / 255, 30 / 255, 30 / 255),
 	DefaultChannelNameColor = Color3.fromRGB(35, 76, 142),
 	WhisperChannelNameColor = Color3.fromRGB(102, 14, 102),
 	ErrorMessageTextColor = Color3.fromRGB(245, 50, 50),
@@ -52,36 +54,27 @@ local t1 = {
 	MessageHistoryLengthPerChannel = 50,
 	ShowJoinAndLeaveHelpText = false,
 	MaximumMessageLength = 200,
-	DisallowedWhiteSpace = {
-		"\n",
-		"\r",
-		"\t",
-		"\v",
-		"\f"
-	},
+	DisallowedWhiteSpace = { "\n", "\r", "\t", "\11", "\f" },
 	ClickOnPlayerNameToWhisper = true,
 	ClickOnChannelNameToSetMainChannel = true,
-	BubbleChatMessageTypes = {
-		ChatConstants.MessageTypeDefault,
-		ChatConstants.MessageTypeWhisper
-	},
+	BubbleChatMessageTypes = { ChatConstants.MessageTypeDefault, ChatConstants.MessageTypeWhisper },
 	WhisperCommandAutoCompletePlayerNames = true,
 	PlayerDisplayNamesEnabled = true,
 	WhisperByDisplayName = true
 }
-local BindableEvent = Instance.new("BindableEvent")
+
+local bindableEvent = Instance.new("BindableEvent")
+
 local self = setmetatable({}, {
-	__index = function(_, p2) -- line: 107
-		-- upvalues: t1 (copy)
-		return t1[p2]
+	__index = function(_, p)
+		return v[p]
 	end,
-	__newindex = function(_, p4, p5) -- line: 110
-		-- upvalues: t1 (copy), BindableEvent (copy)
-		t1[p4] = p5
-		BindableEvent:Fire(p4, p5)
+	__newindex = function(_, p, p2)
+		v[p] = p2
+		bindableEvent:Fire(p, p2)
 	end
 })
 
-rawset(self, "SettingsChanged", BindableEvent.Event)
+rawset(self, "SettingsChanged", bindableEvent.Event)
 
 return self

@@ -1,16 +1,15 @@
 local GetTextHeight = require(script.Parent.Parent.GetTextHeight)
+local ExpandableTextUtils = {}
 
-return {
-	getExpandableTextHeights = function(p1, p2, p3, p4) -- line: 4
-		-- upvalues: GetTextHeight (copy)
-		local v6 = p1.BaseSize * p1.Body.RelativeSize
+function ExpandableTextUtils.getExpandableTextHeights(p, p2, p3, p4)
+	local v = p.BaseSize * p.Body.RelativeSize
+	return GetTextHeight(p3, p.Body.Font, v, p2), p4 * v
+end
 
-		return GetTextHeight(p3, p1.Body.Font, v6, p2), p4 * v6
-	end,
-	getCanExpand = function(p5, p6, p7, p8) -- line: 14
-		-- upvalues: GetTextHeight (copy)
-		local v11 = p5.BaseSize * p5.Body.RelativeSize
+function ExpandableTextUtils.getCanExpand(p, p2, p3, p4): boolean
+	local v = p.BaseSize * p.Body.RelativeSize
+	local textHeight = GetTextHeight(p3, p.Body.Font, v, p2)
+	return p4 * v < textHeight
+end
 
-		return GetTextHeight(p7, p5.Body.Font, v11, p6) > p8 * v11
-	end
-}
+return ExpandableTextUtils

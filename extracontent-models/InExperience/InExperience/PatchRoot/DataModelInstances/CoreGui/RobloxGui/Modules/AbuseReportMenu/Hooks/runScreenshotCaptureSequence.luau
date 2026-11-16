@@ -1,45 +1,48 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
 
 require(AbuseReportMenu.Components.Types)
 
-local FFlagIEMTabFocusNav = require(CorePackages.Workspace.Packages.SharedFlags).FFlagIEMTabFocusNav
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagIEMTabFocusNav = SharedFlags.FFlagIEMTabFocusNav
+
 local TnSAvatarIdentification = require(CorePackages.Workspace.Packages.TnSAvatarIdentification)
 local TnSAdIdentification = require(CorePackages.Workspace.Packages.TnSAdIdentification)
-local ScreenshotManager = require(CorePackages.Workspace.Packages.TnSScreenshot).ScreenshotManager
+local TnSScreenshot = require(CorePackages.Workspace.Packages.TnSScreenshot)
+local ScreenshotManager = TnSScreenshot.ScreenshotManager
+
 local AvatarIdentification = TnSAvatarIdentification.AvatarIdentification
 local AdIdentification = TnSAdIdentification.AdIdentification
-local v11 = game:DefineFastInt("AbuseReportMenuScreenshotReduceMotionWaitFrames", 20)
-local v12 = game:DefineFastInt("AbuseReportMenuScreenshotWaitFrames", 10)
+
+local defineFastInt = game:DefineFastInt("AbuseReportMenuScreenshotReduceMotionWaitFrames", 20)
+local defineFastInt2 = game:DefineFastInt("AbuseReportMenuScreenshotWaitFrames", 10)
+
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
-local function defaultGetWaitFrames() -- line: 62
-	-- upvalues: UserGameSettings (copy), v11 (copy), v12 (copy)
+local function defaultGetWaitFrames() -- 1 equivalent call inferred from this helper
 	if UserGameSettings.ReducedMotion then
-		return v11
+		return defineFastInt
 	end
 
-	return v12
+	return defineFastInt2
 end
-local function defaultGetWaitTime() -- line: 69
-	-- upvalues: UserGameSettings (copy), v11 (copy), v12 (copy)
-	return ((if not UserGameSettings.ReducedMotion then v12 else v11)) / 60
+
+local function defaultGetWaitTime()
+	return defaultGetWaitFrames() / 60 -- inferred equivalent call
 end
-local function defaultDeps() -- line: 73
-	-- upvalues: ScreenshotManager (copy), AvatarIdentification (copy), AdIdentification (copy), RunService (copy), defaultGetWaitFrames (copy), defaultGetWaitTime (copy)
+
+local function defaultDeps()
 	return {
-		takeScreenshot = function(p1) -- line: 75
-			-- upvalues: ScreenshotManager (copy)
-			return ScreenshotManager:TakeScreenshotWithCallback(p1)
+		takeScreenshot = function(p)
+			return ScreenshotManager:TakeScreenshotWithCallback(p)
 		end,
-		getVisibleAvatars = function() -- line: 78
-			-- upvalues: AvatarIdentification (copy)
+		getVisibleAvatars = function()
 			return AvatarIdentification.getVisibleAvatars()
 		end,
-		getVisibleAds = function() -- line: 81
-			-- upvalues: AdIdentification (copy)
+		getVisibleAds = function()
 			return AdIdentification.getVisibleAds()
 		end,
 		runService = RunService,
@@ -47,70 +50,59 @@ local function defaultDeps() -- line: 73
 		getWaitTime = defaultGetWaitTime
 	}
 end
-local function runIdentification(t1: {[any]: any}) -- line: 90
-	local v20, v21 = t1.getVisibleAvatars()
-	local v22, v23 = t1.getVisibleAds()
 
+local function runIdentification(p) -- 1 equivalent call inferred from this helper
+	local visibleAvatars, avatarIDStats = p.getVisibleAvatars()
+	local visibleAds, adIDStats = p.getVisibleAds()
 	return {
-		identifiedAvatars = v20,
-		identifiedAds = v22,
-		avatarIDStats = v21,
-		adIDStats = v23
+		identifiedAvatars = visibleAvatars,
+		identifiedAds = visibleAds,
+		avatarIDStats = avatarIDStats,
+		adIDStats = adIDStats
 	}
 end
-local function runScreenshotCaptureSequence(t2: {[any]: any}, t3: {[any]: any}?) -- line: 101
-	-- upvalues: defaultDeps (copy), FFlagIEMTabFocusNav (copy), GuiService (copy)
-	local v26 = t3 or defaultDeps()
-	local SelectedCoreObject = nil
+
+local function runScreenshotCaptureSequence(data, p)
+	local v = p or defaultDeps()
+	local selectedCoreObject
 
 	if FFlagIEMTabFocusNav then
-		SelectedCoreObject = GuiService.SelectedCoreObject
+		selectedCoreObject = GuiService.SelectedCoreObject
+	else
+		selectedCoreObject = nil
 	end
 
-	t2.hide()
+	data.hide()
 
-	local n1 = 0
-	local elapsed = os.clock()
-	local u30 = false
-	local connection = nil
+	local count = 0
+	local lastTime = os.clock()
+	local v2 = false
 
-	connection = v26.runService.Heartbeat:Connect(function() -- line: 116
-		-- upvalues: u30 (ref), n1 (ref), v26 (copy), t2 (copy), elapsed (copy), connection (ref), FFlagIEMTabFocusNav (copy), SelectedCoreObject (ref), GuiService (copy)
-		if not u30 and n1 >= 1 then
-			u30 = true
-			v26.takeScreenshot(t2.onScreenshotUploaded)
-			t2.onScreenshotTaken()
-
-			local onIdentificationCompleted = t2.onIdentificationCompleted
-			local v34 = v26
-			local v35, v36 = v34.getVisibleAvatars()
-			local v37, v38 = v34.getVisibleAds()
-
-			onIdentificationCompleted({
-				identifiedAvatars = v35,
-				identifiedAds = v37,
-				avatarIDStats = v36,
-				adIDStats = v38
-			})
+	local heartbeatConnection = nil
+	heartbeatConnection = v.runService.Heartbeat:Connect(function()
+		if not v2 and count >= 1 then
+			v2 = true
+			v.takeScreenshot(data.onScreenshotUploaded)
+			data.onScreenshotTaken()
+			data.onIdentificationCompleted(runIdentification(v)) -- inferred equivalent call
 		end
 
-		local v39 = n1 >= v26.getWaitFrames()
-		local v40 = os.clock() - elapsed >= v26.getWaitTime()
+		local v3 = count >= v.getWaitFrames()
+		local v4 = os.clock() - lastTime >= v.getWaitTime()
 
-		if u30 and v39 and v40 then
-			connection:Disconnect()
-			t2.show()
-
-			if FFlagIEMTabFocusNav and SelectedCoreObject and SelectedCoreObject:IsDescendantOf(game) then
-				GuiService.SelectedCoreObject = SelectedCoreObject
-			end
-
-			t2.onCaptureEnd()
-
+		if not (v2 and v3 and v4) then
+			count += 1
 			return
 		end
 
-		n1 += 1
+		heartbeatConnection:Disconnect()
+		data.show()
+
+		if FFlagIEMTabFocusNav and selectedCoreObject and selectedCoreObject:IsDescendantOf(game) then
+			GuiService.SelectedCoreObject = selectedCoreObject
+		end
+
+		data.onCaptureEnd()
 	end)
 end
 

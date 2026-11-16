@@ -1,31 +1,32 @@
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local Foundation = require(ParentParent.Foundation)
+local parent = script.Parent.Parent
+
+local Roact = require(parent.Roact)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local usePreferences = Foundation.Hooks.usePreferences
-local withStyle = require(ParentParent.UIBlox).Style.withStyle
-local FFlagCoreUiMigrateUIBloxToFoundation = require(ParentParent.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local UIBlox = require(parent.UIBlox)
+local withStyle = UIBlox.Style.withStyle
 
-local function FoundationStyleAdapter(p1) -- line: 15
-	-- upvalues: useTokens (copy), usePreferences (copy)
-	local v11 = useTokens()
-	local v12 = usePreferences()
-	local v13 = p1.tokenMapper(v11, v12)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
 
-	return p1.renderContent(v13)
+local function FoundationStyleAdapter(p)
+	local v = useTokens()
+	local v2 = usePreferences()
+	local tokenMapper = p.tokenMapper(v, v2)
+	return p.renderContent(tokenMapper)
 end
-local function withFoundationOrUIBloxStyle(p2, p3) -- line: 22
-	-- upvalues: FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), FoundationStyleAdapter (copy), withStyle (copy)
+
+local function withFoundationOrUIBloxStyle(tokenMapper, renderContent)
 	if FFlagCoreUiMigrateUIBloxToFoundation then
 		return Roact.createElement(FoundationStyleAdapter, {
-			tokenMapper = p2,
-			renderContent = p3
+			tokenMapper = tokenMapper,
+			renderContent = renderContent
 		})
 	end
 
-	return withStyle(function(p4) -- line: 29
-		-- upvalues: p3 (copy)
-		return p3(p4)
+	return withStyle(function(p)
+		return renderContent(p)
 	end)
 end
 

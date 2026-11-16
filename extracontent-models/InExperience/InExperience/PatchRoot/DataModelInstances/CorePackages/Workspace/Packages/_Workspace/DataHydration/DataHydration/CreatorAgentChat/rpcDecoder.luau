@@ -1,52 +1,68 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
 local HttpService = game:GetService("HttpService")
+require(parent.HttpClient)
 
-require(Parent.HttpClient)
-
-local function tryJsonDecode(p1) -- line: 10
-	-- upvalues: HttpService (copy)
-	if p1 == nil or p1 == "" then
+local function tryJsonDecode(buf)
+	if buf == nil or buf == "" then
 		return nil
 	end
 
-	local v6 = if typeof(p1) ~= "buffer" then p1 else buffer.tostring(p1)
-	local ok, result = pcall(HttpService.JSONDecode, HttpService, v6)
-
-	if ok then
-		return result
+	if typeof(buf) == "buffer" then
+		buf = buffer.tostring(buf)
 	end
 
-	return nil
+	local success, result = pcall(HttpService.JSONDecode, HttpService, buf)
+	return if success then result else nil
 end
-local function rpcDecoder() -- line: 19
-	-- upvalues: HttpService (copy)
-	return function(p2) -- line: 20
-		-- upvalues: HttpService (copy)
-		local responseBody = p2.responseBody
-		local v11
 
-		if responseBody == nil or responseBody == "" then
-			v11 = nil
+local function rpcDecoder(callback)
+	return function(p)
+		local responseBody = p.responseBody
+		local result
+
+		if not (responseBody == nil or responseBody == "") then
+			if typeof(responseBody) == "buffer" then
+				responseBody = buffer.tostring(responseBody)
+			end
+
+			local success
+			success, result = pcall(HttpService.JSONDecode, HttpService, responseBody)
+
+			if not success then
+				result = nil
+			end
+		end
+
+		if typeof(result) == "table" and result.error then
+			local err = result.error
+			return nil, tostring(err.message or "JSON-RPC error"), err.code
+		end
+
+		if p.statusCode >= 200 and p.statusCode < 300 then
+			local result2
+
+			if typeof(result) == "table" then
+				result2 = result.result
+			end
+
+			if callback == nil then
+				return result2, nil, nil
+			end
+
+			local v, v2 = callback(result2)
+			return v, v2, nil
 		else
-			local v12 = if typeof(responseBody) ~= "buffer" then responseBody else buffer.tostring(responseBody)
-			local ok, result = pcall(HttpService.JSONDecode, HttpService, v12)
+			local v
 
-			v11 = if not ok then nil else result
+			if typeof(p.responseBody) == "buffer" then
+				v = buffer.tostring(p.responseBody)
+			else
+				v = p.responseBody or ""
+			end
+
+			return nil, ("CAS HTTP %d: %s"):format(p.statusCode, v), nil
 		end
-
-		if typeof(v11) == "table" and v11.error then
-			local error = v11.error
-
-			return nil, tostring(error.message or "JSON-RPC error"), error.code
-		end
-
-		if p2.statusCode >= 200 and p2.statusCode < 300 then
-			return if typeof(v11) ~= "table" then nil else v11.result, nil, nil
-		end
-
-		local v16 = if typeof(p2.responseBody) ~= "buffer" then p2.responseBody or "" else buffer.tostring(p2.responseBody)
-
-		return nil, ("CAS HTTP %d: %s"):format(p2.statusCode, v16), nil
 	end
 end
 

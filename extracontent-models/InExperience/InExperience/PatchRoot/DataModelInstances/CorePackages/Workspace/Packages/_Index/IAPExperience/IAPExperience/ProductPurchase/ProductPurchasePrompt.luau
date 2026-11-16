@@ -1,33 +1,51 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local RoactFitComponents = require(ParentParentParent.RoactFitComponents)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+
+local RoactFitComponents = require(parent2.RoactFitComponents)
 local FitFrameVertical = RoactFitComponents.FitFrameVertical
 local FitTextLabel = RoactFitComponents.FitTextLabel
-local UIBlox = require(ParentParentParent.UIBlox)
+
+local UIBlox = require(parent2.UIBlox)
+local Foundation = require(parent2.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local withStyle = UIBlox.Core.Style.withStyle
-local useDefaultFocusBehavior = require(ParentParentParent.ReactFocusNavigation).useDefaultFocusBehavior
-local Cryo = require(ParentParentParent.Cryo)
-local ModelViewport = require(script.Parent.Parent.Generic.ModelViewport)
-local MultiTextLocalizer = require(ParentParent.Locale.MultiTextLocalizer)
-local shouldShowNewUpsellModalExperiment = require(ParentParent.Utility.Experiments.shouldShowNewUpsellModalExperiment)
-local DesktopUpsellExperiment = require(ParentParent.Utility.Experiments.DesktopUpsellExperiment)
-local ProductPurchaseModal = require(script.Parent.v2.ProductPurchaseModal)
-local v21 = Images["icons/common/robux"]
-local v22 = utf8.char(57346)
-local default = require(ParentParentParent.LoggingProtocol).default
-local PurchaseModalV1ShownCounter = require(ParentParent.Generic.Events.PurchaseModalCounter).PurchaseModalV1ShownCounter
-local logger = require(ParentParent.Utility.logger)
-local getAppContext = require(ParentParent.Utility.getAppContext)
-local FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt = require(ParentParent.Flags.FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt)
-local v28 = Roact.Component:extend(script.Name)
+local ReactFocusNavigation = require(parent2.ReactFocusNavigation)
+local useDefaultFocusBehavior = ReactFocusNavigation.useDefaultFocusBehavior
+local Cryo = require(parent2.Cryo)
 
-v28.validateProps = t.strictInterface({
+local ModelViewport = require(script.Parent.Parent.Generic.ModelViewport)
+local MultiTextLocalizer = require(parent.Locale.MultiTextLocalizer)
+
+local shouldShowNewUpsellModalExperiment = require(parent.Utility.Experiments.shouldShowNewUpsellModalExperiment)
+local DesktopUpsellExperiment = require(parent.Utility.Experiments.DesktopUpsellExperiment)
+
+local ProductPurchaseModal = require(script.Parent.v2.ProductPurchaseModal)
+
+local iconscommonrobux = Images["icons/common/robux"]
+local v = utf8.char(57346)
+
+local LoggingProtocol = require(parent2.LoggingProtocol)
+local default = LoggingProtocol.default
+local PurchaseModalCounter = require(parent.Generic.Events.PurchaseModalCounter)
+local PurchaseModalV1ShownCounter = PurchaseModalCounter.PurchaseModalV1ShownCounter
+
+local logger = require(parent.Utility.logger)
+local getAppContext = require(parent.Utility.getAppContext)
+
+local FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt = require(parent.Flags.FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt)
+
+local extended = Roact.Component:extend(script.Name)
+
+local strictInterface = t.strictInterface
+local v2 = {
 	anchorPoint = t.optional(t.Vector2),
 	position = t.optional(t.UDim2),
 	screenSize = t.Vector2,
@@ -48,10 +66,28 @@ v28.validateProps = t.strictInterface({
 	buyItemActivated = t.callback,
 	cancelPurchaseActivated = t.callback,
 	isLuobu = t.optional(t.boolean),
-	defaultFocusRef = if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then nil else t.callback,
-	containerRef = if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then nil else t.callback
-})
-v28.defaultProps = {
+	defaultFocusRef = 0,
+	containerRef = 0
+}
+local defaultFocusRef
+
+if FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
+	defaultFocusRef = t.callback
+end
+
+v2.defaultFocusRef = defaultFocusRef
+local containerRef
+
+if FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
+	containerRef = t.callback
+end
+
+v2.containerRef = containerRef
+extended.validateProps = strictInterface(v2)
+
+extended.defaultProps = {
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.new(0.5, 0, 0.5, 0),
 	isLoading = false,
 	isDisabled = false,
 	testPurchase = false,
@@ -59,97 +95,76 @@ v28.defaultProps = {
 	enableInputDelayed = false,
 	isLuobu = false,
 	isGamePass = false,
-	currentBalanceValid = true,
-	anchorPoint = Vector2.new(0.5, 0.5),
-	position = UDim2.new(0.5, 0, 0.5, 0)
+	currentBalanceValid = true
 }
 
-function v28.init(p1) -- line: 99
-	-- upvalues: Roact (copy)
-	p1.contentRef = Roact.createRef()
-	p1.footerRef = Roact.createRef()
-	p1.state = {
-		contentSize = Vector2.new(0, 0),
-		footerSize = Vector2.new(0, 0)
-	}
+function extended:init()
+	self.contentRef = Roact.createRef()
+	self.footerRef = Roact.createRef()
+	self.state = { contentSize = Vector2.new(0, 0), footerSize = Vector2.new(0, 0) }
 
-	function p1.changeContentSize(p2) -- line: 107
-		-- upvalues: p1 (copy)
-		if p1.state.contentSize ~= p2.AbsoluteSize then
-			p1:setState({
-				contentSize = p2.AbsoluteSize
-			})
+	function self.changeContentSize(p)
+		if self.state.contentSize ~= p.AbsoluteSize then
+			self:setState({ contentSize = p.AbsoluteSize })
 		end
 	end
-	function p1.changeFooterSize(p3) -- line: 115
-		-- upvalues: p1 (copy)
-		if p1.state.footerSize ~= p3.AbsoluteSize then
-			p1:setState({
-				footerSize = p3.AbsoluteSize
-			})
+
+	function self.changeFooterSize(p)
+		if self.state.footerSize ~= p.AbsoluteSize then
+			self:setState({ footerSize = p.AbsoluteSize })
 		end
 	end
 end
-function v28.render(p4) -- line: 124
-	-- upvalues: shouldShowNewUpsellModalExperiment (copy), DesktopUpsellExperiment (copy), Roact (copy), ProductPurchaseModal (copy), MultiTextLocalizer (copy)
-	local v32 = not p4.props.isLuobu and "IAPExperience.PurchasePrompt.Text.BuyItemQuestion" or "IAPExperience.PurchasePrompt.Text.BuyItemQuestionIncludingWarning"
-	local isGamePass = p4.props.isGamePass
+
+function extended:render()
+	local v3 = self.props.isLuobu and "IAPExperience.PurchasePrompt.Text.BuyItemQuestionIncludingWarning"
+		or "IAPExperience.PurchasePrompt.Text.BuyItemQuestion"
+
+	local isGamePass = self.props.isGamePass
 
 	if shouldShowNewUpsellModalExperiment() or DesktopUpsellExperiment.shouldShowNewModal() then
 		return Roact.createElement(ProductPurchaseModal, {
 			product = {
-				itemIcon = p4.props.itemIcon,
-				itemName = p4.props.itemName,
-				itemRobuxCost = p4.props.itemRobuxCost
+				itemIcon = self.props.itemIcon,
+				itemName = self.props.itemName,
+				itemRobuxCost = self.props.itemRobuxCost
 			},
-			balanceAmount = p4.props.currentBalance,
-			balanceAmountValid = p4.props.currentBalanceValid,
+			balanceAmount = self.props.currentBalance,
+			balanceAmountValid = self.props.currentBalanceValid,
 			buttons = {
-				buyItemActivated = p4.props.buyItemActivated,
-				buyItemControllerIcon = p4.props.buyItemControllerIcon,
-				buyItemIsDelayedInput = p4.props.isDelayedInput,
-				buyItemEnableInputDelayed = p4.props.enableInputDelayed,
-				cancelActivated = p4.props.cancelPurchaseActivated,
-				isDisabled = p4.props.isDisabled
+				buyItemActivated = self.props.buyItemActivated,
+				buyItemControllerIcon = self.props.buyItemControllerIcon,
+				buyItemIsDelayedInput = self.props.isDelayedInput,
+				buyItemEnableInputDelayed = self.props.enableInputDelayed,
+				cancelActivated = self.props.cancelPurchaseActivated,
+				isDisabled = self.props.isDisabled
 			},
-			screenSize = p4.props.screenSize
+			screenSize = self.props.screenSize
 		})
 	end
 
 	return Roact.createElement(MultiTextLocalizer, {
 		keys = {
 			BuyItemTitle = {
-				key = not isGamePass and "IAPExperience.PurchasePrompt.Title.BuyItem" or "IAPExperience.PurchasePrompt.Title.BuyGamepass"
+				key = isGamePass and "IAPExperience.PurchasePrompt.Title.BuyGamepass" or "IAPExperience.PurchasePrompt.Title.BuyItem"
 			},
 			BuyItemQuestion = {
-				key = v32,
-				params = {
-					name = p4.props.itemName
-				}
+				key = v3,
+				params = { name = self.props.itemName }
 			},
-			RemainingBalance = {
-				key = "IAPExperience.PurchasePrompt.Text.RemainingBalance"
-			},
-			TestPurchaseText = {
-				key = "IAPExperience.PurchasePrompt.Text.TestPurchase"
-			},
-			ButtonCancel = {
-				key = "IAPExperience.PurchasePrompt.Action.Cancel"
-			},
-			LoadingText = {
-				key = "IAPExperience.PurchasePrompt.Text.Loading"
-			}
+			RemainingBalance = { key = "IAPExperience.PurchasePrompt.Text.RemainingBalance" },
+			TestPurchaseText = { key = "IAPExperience.PurchasePrompt.Text.TestPurchase" },
+			ButtonCancel = { key = "IAPExperience.PurchasePrompt.Action.Cancel" },
+			LoadingText = { key = "IAPExperience.PurchasePrompt.Text.Loading" }
 		},
-		render = function(p5) -- line: 177
-			-- upvalues: p4 (copy)
-			return p4:renderAlert(p5)
+		render = function(p)
+			return self:renderAlert(p)
 		end
 	})
 end
-function v28.renderAlert(p6, p7) -- line: 183
-	-- upvalues: logger (copy), getAppContext (copy), default (copy), PurchaseModalV1ShownCounter (copy), withStyle (copy), v22 (copy), Roact (copy), ModelViewport (copy), ImageSetLabel (copy), InteractiveAlert (copy), FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt (copy), FitFrameVertical (copy), FitTextLabel (copy), ButtonType (copy), v21 (copy)
-	local props = p6.props
 
+function extended:renderAlert(data)
+	local props = self.props
 	logger.debug({
 		message = "Purchase Modal V1 Shown",
 		screenHeight = props.screenSize.Y,
@@ -157,6 +172,7 @@ function v28.renderAlert(p6, p7) -- line: 183
 		portrait = props.screenSize.X < props.screenSize.Y,
 		appContext = getAppContext()
 	})
+
 	default:logRobloxTelemetryCounter(PurchaseModalV1ShownCounter, 1, {
 		screenHeight = props.screenSize.Y,
 		screenWidth = props.screenSize.X,
@@ -164,40 +180,59 @@ function v28.renderAlert(p6, p7) -- line: 183
 		appContext = getAppContext()
 	})
 
-	return withStyle(function(p8) -- line: 200
-		-- upvalues: p6 (copy), p7 (copy), v22 (copy), Roact (copy), ModelViewport (copy), ImageSetLabel (copy), InteractiveAlert (copy), FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt (copy), FitFrameVertical (copy), FitTextLabel (copy), ButtonType (copy), v21 (copy)
-		local Theme = p8.Theme
-		local p8Font = p8.Font
-		local IconEmphasisColor = Theme.IconEmphasis.Color
-		local v47 = math.round(IconEmphasisColor.R * 255)
-		local v48 = math.round(IconEmphasisColor.G * 255)
-		local v49 = math.round(IconEmphasisColor.B * 255)
-		local v50 = string.format("rgb(%d,%d,%d)", v47, v48, v49)
-		local v51 = p6.state.contentSize.X * 0.85
-		local v52 = string.format("%s <font color=\"%s\">%s</font>%d", p7.RemainingBalance, v50, v22, p6.props.currentBalance - p6.props.itemRobuxCost)
-		local v53 = if not p6.props.model then Roact.createElement(ImageSetLabel, {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			ImageTransparency = 0,
-			Position = UDim2.new(0, 5, 0, 5),
-			Size = UDim2.new(0, 85, 0, 85),
-			ScaleType = Enum.ScaleType.Stretch,
-			Image = p6.props.itemIcon
-		}) else Roact.createElement(ModelViewport, {
-			LayoutOrder = 1,
-			model = p6.props.model,
-			Size = UDim2.fromOffset(85, 85),
-			Position = UDim2.fromOffset(5, 5)
-		})
+	return withStyle(function(props2)
+		local theme = props2.Theme
+		local font = props2.Font
+		local color = theme.IconEmphasis.Color
 
-		return Roact.createElement(InteractiveAlert, {
-			defaultChildRef = if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then nil else p6.props.containerRef,
-			screenSize = p6.props.screenSize,
-			position = p6.props.position,
-			anchorPoint = p6.props.anchorPoint,
-			title = p7.BuyItemTitle,
-			middleContent = function() -- line: 244
-				-- upvalues: Roact (copy), FitFrameVertical (copy), p6 (copy), v53 (copy), FitTextLabel (copy), p8Font (copy), p7 (copy), Theme (copy)
+		local v3 = math.round(color.R * 255)
+		local v4 = math.round(color.G * 255)
+		local v5 = math.round(color.B * 255)
+		local v6 = string.format("rgb(%d,%d,%d)", v3, v4, v5)
+		local v7 = self.state.contentSize.X * 0.85
+
+		local text = string.format(
+			"%s <font color=\"%s\">%s</font>%d",
+			data.RemainingBalance,
+			v6,
+			v,
+			self.props.currentBalance - self.props.itemRobuxCost
+		)
+		local itemIcon
+
+		if self.props.model then
+			itemIcon = Roact.createElement(ModelViewport, {
+				model = self.props.model,
+				LayoutOrder = 1,
+				Size = UDim2.fromOffset(85, 85),
+				Position = UDim2.fromOffset(5, 5)
+			})
+		else
+			itemIcon = Roact.createElement(ImageSetLabel, {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0, 5, 0, 5),
+				Size = UDim2.new(0, 85, 0, 85),
+				ScaleType = Enum.ScaleType.Stretch,
+				Image = self.props.itemIcon,
+				ImageTransparency = 0
+			})
+		end
+
+		local createElement = Roact.createElement
+		local defaultChildRef
+
+		if FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
+			defaultChildRef = self.props.containerRef
+		end
+
+		local v8 = {
+			defaultChildRef = defaultChildRef,
+			screenSize = self.props.screenSize,
+			position = self.props.position,
+			anchorPoint = self.props.anchorPoint,
+			title = data.BuyItemTitle,
+			middleContent = function()
 				return Roact.createElement(FitFrameVertical, {
 					BackgroundTransparency = 1,
 					width = UDim.new(1, 0),
@@ -205,84 +240,71 @@ function v28.renderAlert(p6, p7) -- line: 183
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					contentPadding = UDim.new(0, 24),
-					[Roact.Ref] = p6.contentRef,
-					[Roact.Change.AbsoluteSize] = p6.changeContentSize
+					[Roact.Ref] = self.contentRef,
+					[Roact.Change.AbsoluteSize] = self.changeContentSize
 				}, {
-					ItemIcon = v53,
+					ItemIcon = itemIcon,
 					ItemName = Roact.createElement(FitTextLabel, {
 						LayoutOrder = 2,
 						BackgroundTransparency = 1,
 						TextWrapped = true,
 						width = FitTextLabel.Width.FitToText,
-						maximumWidth = p6.state.contentSize.X,
-						Font = p8Font.Footer.Font,
-						Text = p7.BuyItemQuestion,
-						TextSize = p8Font.BaseSize * p8Font.Body.RelativeSize,
-						TextColor3 = Theme.TextDefault.Color
+						maximumWidth = self.state.contentSize.X,
+						Font = font.Footer.Font,
+						Text = data.BuyItemQuestion,
+						TextSize = font.BaseSize * font.Body.RelativeSize,
+						TextColor3 = theme.TextDefault.Color
 					})
 				})
 			end,
-			buttonStackInfo = {
-				disableGamepadRefs = not not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt or nil,
-				buttons = {
-					{
-						props = {
-							isDisabled = p6.props.isDisabled or p6.props.isLoading,
-							onActivated = p6.props.cancelPurchaseActivated,
-							text = p7.ButtonCancel,
-							inputIcon = p6.props.cancelControllerIcon
-						}
-					},
-					{
-						buttonType = ButtonType.PrimarySystem,
-						props = {
-							delayInputSeconds = 3,
-							isLoading = p6.props.isLoading,
-							isDisabled = p6.props.isDisabled,
-							isDelayedInput = p6.props.isDelayedInput,
-							enableInputDelayed = p6.props.enableInputDelayed,
-							onActivated = p6.props.buyItemActivated,
-							icon = v21,
-							text = tostring(p6.props.itemRobuxCost),
-							inputIcon = p6.props.buyItemControllerIcon,
-							buttonRef = if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then nil else p6.props.defaultFocusRef
-						}
-					}
-				}
-			},
-			footerContent = function() -- line: 302
-				-- upvalues: p6 (copy), Roact (copy), FitFrameVertical (copy), v51 (copy), p8Font (copy), v52 (copy), Theme (copy), FitTextLabel (copy), p7 (copy)
-				if not p6.props.currentBalanceValid then
-					return Roact.None
-				end
+			buttonStackInfo = 0,
+			footerContent = 0
+		}
 
-				if not p6.props.testPurchase then
-					return Roact.createElement(FitFrameVertical, {
-						BackgroundTransparency = 1,
-						width = UDim.new(1, 0),
-						FillDirection = Enum.FillDirection.Horizontal,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						contentPadding = UDim.new(0, 2),
-						[Roact.Ref] = p6.footerRef,
-						[Roact.Change.AbsoluteSize] = p6.changeFooterSize
-					}, {
-						RemainingBalanceText = Roact.createElement("TextLabel", {
-							LayoutOrder = 1,
-							BackgroundTransparency = 1,
-							RichText = true,
-							TextWrapped = true,
-							Position = UDim2.fromScale(0, 0.5),
-							Size = UDim2.fromOffset(v51, 0),
-							AutomaticSize = Enum.AutomaticSize.Y,
-							Font = p8Font.Footer.Font,
-							Text = v52,
-							TextSize = p8Font.BaseSize * p8Font.Footer.RelativeSize,
-							TextColor3 = Theme.TextDefault.Color
-						})
-					})
-				end
+		local buttonStackInfo = {
+			disableGamepadRefs = FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt and true or nil,
+			buttons = 0
+		}
 
+		local v9 = {
+			props = {
+				isDisabled = self.props.isDisabled or self.props.isLoading,
+				onActivated = self.props.cancelPurchaseActivated,
+				text = data.ButtonCancel,
+				inputIcon = self.props.cancelControllerIcon
+			}
+		}
+
+		local v10 = { buttonType = ButtonType.PrimarySystem, props = 0 }
+		local props3 = {
+			isLoading = self.props.isLoading,
+			isDisabled = self.props.isDisabled,
+			isDelayedInput = self.props.isDelayedInput,
+			enableInputDelayed = self.props.enableInputDelayed,
+			delayInputSeconds = 3,
+			onActivated = self.props.buyItemActivated,
+			icon = iconscommonrobux,
+			text = tostring(self.props.itemRobuxCost),
+			inputIcon = self.props.buyItemControllerIcon,
+			buttonRef = 0
+		}
+		local buttonRef
+
+		if FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
+			buttonRef = self.props.defaultFocusRef
+		end
+
+		props3.buttonRef = buttonRef
+		v10.props = props3
+		buttonStackInfo.buttons = { v9, v10 }
+		v8.buttonStackInfo = buttonStackInfo
+
+		function v8.footerContent()
+			if not self.props.currentBalanceValid then
+				return Roact.None
+			end
+
+			if self.props.testPurchase then
 				return Roact.createElement(FitFrameVertical, {
 					BackgroundTransparency = 1,
 					width = UDim.new(1, 0),
@@ -290,36 +312,80 @@ function v28.renderAlert(p6, p7) -- line: 183
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					contentPadding = UDim.new(0, 2),
-					[Roact.Ref] = p6.footerRef,
-					[Roact.Change.AbsoluteSize] = p6.changeFooterSize
+					[Roact.Ref] = self.footerRef,
+					[Roact.Change.AbsoluteSize] = self.changeFooterSize
 				}, {
 					TestPurchaseTest = Roact.createElement(FitTextLabel, {
 						LayoutOrder = 1,
 						BackgroundTransparency = 1,
 						width = FitTextLabel.Width.FitToText,
-						Font = p8Font.Footer.Font,
-						Text = p7.TestPurchaseText,
-						TextSize = p8Font.BaseSize * p8Font.Footer.RelativeSize,
-						TextColor3 = Theme.TextDefault.Color
+						Font = font.Footer.Font,
+						Text = data.TestPurchaseText,
+						TextSize = font.BaseSize * font.Footer.RelativeSize,
+						TextColor3 = theme.TextDefault.Color
 					})
 				})
+			else
+				local createElement2 = Roact.createElement
+				local v11 = {
+					BackgroundTransparency = 1,
+					width = UDim.new(1, 0),
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					contentPadding = UDim.new(0, 2),
+					[Roact.Ref] = self.footerRef,
+					[Roact.Change.AbsoluteSize] = self.changeFooterSize
+				}
+
+				local createElement3 = Roact.createElement
+				local v12 = {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					RichText = true,
+					Position = UDim2.fromScale(0, 0.5),
+					Size = UDim2.fromOffset(v7, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextWrapped = true,
+					Font = 0,
+					FontFace = 0,
+					Text = 0,
+					TextSize = 0,
+					TextColor3 = 0
+				}
+				local font2
+
+				if not FoundationFontFaceMigration then
+					font2 = font.Footer.Font
+				end
+
+				v12.Font = font2
+				local fontFace
+
+				if FoundationFontFaceMigration then
+					fontFace = normalizeFontFace(props2.Tokens.Typography.CaptionSmall.Font)
+				end
+
+				v12.FontFace = fontFace
+
+				v12.Text = text
+				v12.TextSize = font.BaseSize * font.Footer.RelativeSize
+				v12.TextColor3 = theme.TextDefault.Color
+				return createElement2(FitFrameVertical, v11, {
+					RemainingBalanceText = createElement3("TextLabel", v12)
+				})
 			end
-		})
+		end
+
+		return createElement(InteractiveAlert, v8)
 	end)
 end
 
-if FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
-	local v29 = v28
+return FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt and function(p)
+	local defaultFocusRef2, containerRef2 = useDefaultFocusBehavior()
 
-	function v28(p9) -- line: 363
-		-- upvalues: useDefaultFocusBehavior (copy), Roact (copy), v29 (copy), Cryo (copy)
-		local v38, v39 = useDefaultFocusBehavior()
-
-		return Roact.createElement(v29, Cryo.Dictionary.join(p9, {
-			defaultFocusRef = v38,
-			containerRef = v39
-		}))
-	end
-end
-
-return v28
+	return Roact.createElement(
+		extended,
+		Cryo.Dictionary.join(p, { defaultFocusRef = defaultFocusRef2, containerRef = containerRef2 })
+	)
+end or extended

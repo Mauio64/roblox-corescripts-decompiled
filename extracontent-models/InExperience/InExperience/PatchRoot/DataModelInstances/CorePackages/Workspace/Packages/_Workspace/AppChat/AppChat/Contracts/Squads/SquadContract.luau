@@ -1,13 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local RetrievalStatus = require(AppChatParent.Http).Enum.RetrievalStatus
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = AppChat.Parent
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local Http = require(parent.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
 local Conversation = require(AppChat.Models.Conversation)
 local ConversationChannels = require(AppChat.Models.ConversationChannels)
 local createConversation = require(AppChat.Conversations.Thunks.createConversation)
 local createFriendConversation = require(AppChat.Conversations.Thunks.createFriendConversation)
-local ModerationType = require(AppChat.Models.ConversationChannels).ModerationType
+local ConversationChannels2 = require(AppChat.Models.ConversationChannels)
+local ModerationType = ConversationChannels2.ModerationType
 local expandToGroupConversation = require(AppChat.Conversations.Thunks.expandToGroupConversation)
 local fetchLatestConversationDetails = require(AppChat.Conversations.Thunks.fetchLatestConversationDetails)
 local getConversationTitle = require(AppChat.Conversations.getConversationTitle)
@@ -17,112 +19,111 @@ local useGetConversationHasGroupUpFromId = require(AppChat.Hooks.useGetConversat
 local useIsUserPending = require(AppChat.Hooks.useIsUserPending)
 local useIsChatEnabled = require(AppChat.Hooks.useIsChatEnabled)
 local useIsChatUserMessagesEnabled = require(AppChat.Hooks.useIsChatUserMessagesEnabled)
-local getDeepValue = require(AppChat.Utils.getDeepValue)
-local FFlagReadAppChatFetchingVariable = require(AppChatParent.SharedFlags).FFlagReadAppChatFetchingVariable
-local FFlagAppChatNavigateBackIfOSAUnacknowledged = require(AppChatParent.SharedFlags).FFlagAppChatNavigateBackIfOSAUnacknowledged
-local FFlagEnableSquadRegroupExperimentation = require(AppChatParent.SharedFlags).FFlagEnableSquadRegroupExperimentation
-local FFlagEnableDialogAfterSquadJoin = require(AppChatParent.SharedFlags).FFlagEnableDialogAfterSquadJoin
+local useChatSettingsRetrievalStatus = require(AppChat.Hooks.useChatSettingsRetrievalStatus)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagReadAppChatFetchingVariable = SharedFlags.FFlagReadAppChatFetchingVariable
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAppChatNavigateBackIfOSAUnacknowledged = SharedFlags2.FFlagAppChatNavigateBackIfOSAUnacknowledged
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableSquadRegroupExperimentation = SharedFlags3.FFlagEnableSquadRegroupExperimentation
+
 local shouldShowOSAForConversation = require(AppChat.Utils.shouldShowOSAForConversation)
+
 local GetOverlayStore = require(AppChat.Stores.GetOverlayStore)
 local OverlayTypes = require(AppChat.Stores.GetOverlayStore.OverlayTypes)
 local HttpService = game:GetService("HttpService")
-local CreateExperienceInvite = require(AppChatParent.Squads.Thunks).CreateExperienceInvite
+local Thunks = require(parent.Squads.Thunks)
+local CreateExperienceInvite = Thunks.CreateExperienceInvite
 
-return {
-	fetchParentChannelDetails = function(p1, p2) -- line: 36
-		-- upvalues: fetchLatestConversationDetails (copy)
-		return p1(fetchLatestConversationDetails(p2))
+local function fn(conversationId: string, callback, callback2)
+	local overlayStore = GetOverlayStore(false)
+	overlayStore.showOverlay(OverlayTypes.GroupOSADialog, {
+		conversationId = conversationId,
+		impressionId = HttpService:GenerateGUID(false),
+		onJoin = function()
+			overlayStore.dismissOverlay()
+			callback()
+		end,
+		onDecline = function()
+			overlayStore.dismissOverlay()
+			callback2()
+		end
+	})
+end
+
+local SquadContract = {
+	fetchParentChannelDetails = function(callback, p)
+		return callback(fetchLatestConversationDetails(p))
 	end,
-	inviteToParentChannel = function(p3, p4, t1: {[any]: any}) -- line: 40
-		-- upvalues: Conversation (copy), AppChatNetworking (copy), expandToGroupConversation (copy)
-		if p4.conversationType == Conversation.Type.MULTI_USER_CONVERSATION then
-			return p3(AppChatNetworking.rodux.AddUserToConversation.API(p4.id, t1)):andThen(function() -- line: 44
-				-- upvalues: p4 (copy)
-				return p4.id
+	inviteToParentChannel = function(callback, p, p2)
+		if p.conversationType == Conversation.Type.MULTI_USER_CONVERSATION then
+			return callback(AppChatNetworking.rodux.AddUserToConversation.API(p.id, p2)):andThen(function()
+				return p.id
 			end)
 		end
 
-		return p3(expandToGroupConversation(p4.id, t1)):andThen(function(p5) -- line: 50
-			return p5.id
+		return callback(expandToGroupConversation(p.id, p2)):andThen(function(p3)
+			return p3.id
 		end)
 	end,
 	navigateIntoSquadLobby = NavigateIntoSquadLobby,
-	removeUserFromParentChannel = function(p6, p7, p8) -- line: 56
-		-- upvalues: AppChatNetworking (copy)
-		return p6(AppChatNetworking.rodux.RemoveUserFromConversation.API(p7, p8))
+	removeUserFromParentChannel = function(callback, p, p2)
+		return callback(AppChatNetworking.rodux.RemoveUserFromConversation.API(p, p2))
 	end,
 	createConversation = createConversation,
 	createFriendConversation = createFriendConversation,
-	createExperienceInvite = if not FFlagEnableSquadRegroupExperimentation then nil else function(s1: string, p9, s2: string) -- line: 132
-		-- upvalues: CreateExperienceInvite (copy)
-		return CreateExperienceInvite(s1, p9, s2)
-	end,
+	createExperienceInvite = FFlagEnableSquadRegroupExperimentation and function(p: string, p2, p3: string)
+		return CreateExperienceInvite(p, p2, p3)
+	end or nil,
 	useGetConversationFromId = useGetConversationFromId,
-	useParentChannelHasGroupUp = function(p10) -- line: 60
-		-- upvalues: useGetConversationHasGroupUpFromId (copy)
-		return useGetConversationHasGroupUpFromId(p10)
+	useParentChannelHasGroupUp = function(p)
+		return useGetConversationHasGroupUpFromId(p)
 	end,
-	useParentChannelHasSquadAccess = function(p11) -- line: 64
-		-- upvalues: useGetConversationFromId (copy), ConversationChannels (copy), useIsUserPending (copy)
-		assert(p11 ~= nil, "Missing parent channel ID")
+	useParentChannelHasSquadAccess = function(p): boolean
+		assert(p ~= nil, "Missing parent channel ID")
+		local v = useGetConversationFromId(p) or {}
 
-		local v40 = useGetConversationFromId(p11) or {}
-
-		if v40.source == "friends" then
+		if v.source == "friends" then
 			return true
 		end
 
-		local v41 = v40.participantPendingStatus == ConversationChannels.UserPendingStatus.Pending
+		local v2 = v.participantPendingStatus == ConversationChannels.UserPendingStatus.Pending
 
-		return not useIsUserPending(v40) and not v41
+		return not (useIsUserPending(v) or v2)
 	end,
-	useParentChannelIsPartyVoiceEligible = function(p12) -- line: 82
-		-- upvalues: useGetConversationFromId (copy), ModerationType (copy)
-		local v43 = useGetConversationFromId(p12)
+	useParentChannelIsPartyVoiceEligible = function(p): nil | boolean
+		local v = useGetConversationFromId(p)
 
-		if v43 and v43.moderationType ~= nil then
-			return v43.moderationType == ModerationType.TrustedComms
+		if v and v.moderationType ~= nil then
+			return v.moderationType == ModerationType.TrustedComms
 		end
 
 		return nil
 	end,
-	useParentChannelTitleSelector = function(p13) -- line: 90
-		-- upvalues: useGetConversationFromId (copy), getConversationTitle (copy)
-		local v45 = useGetConversationFromId(p13)
-
-		return getConversationTitle(v45)
+	useParentChannelTitleSelector = function(p)
+		return getConversationTitle((useGetConversationFromId(p)))
 	end,
 	useIsChatEnabled = useIsChatEnabled,
-	useIsLoadingChatSettings = function() -- line: 95
-		-- upvalues: useSelector (copy), FFlagReadAppChatFetchingVariable (copy), getDeepValue (copy), RetrievalStatus (copy)
-		return useSelector(function(p14) -- line: 96
-			-- upvalues: FFlagReadAppChatFetchingVariable (copy), getDeepValue (copy), RetrievalStatus (copy)
-			if FFlagReadAppChatFetchingVariable then
-				return getDeepValue(p14, "ChatAppReducer.ChatSettings.retrievalStatus") ~= RetrievalStatus.Done
-			end
+	useIsLoadingChatSettings = function(): nil | boolean
+		local v = useChatSettingsRetrievalStatus()
 
-			return nil
-		end)
+		if FFlagReadAppChatFetchingVariable then
+			return v ~= RetrievalStatus.Done
+		end
+
+		return nil
 	end,
 	useIsChatUserMessagesEnabled = useIsChatUserMessagesEnabled,
-	shouldShowOSAForConversation = if not FFlagAppChatNavigateBackIfOSAUnacknowledged then nil else shouldShowOSAForConversation,
-	showGroupOSADialog = if not FFlagEnableDialogAfterSquadJoin then nil else function(s3: string, p15: ((...any) -> ...any), p16: ((...any) -> ...any)) -- line: 107
-		-- upvalues: GetOverlayStore (copy), OverlayTypes (copy), HttpService (copy)
-		local v49 = GetOverlayStore(false)
-
-		v49.showOverlay(OverlayTypes.GroupOSADialog, {
-			conversationId = s3,
-			impressionId = HttpService:GenerateGUID(false),
-			onJoin = function() -- line: 112
-				-- upvalues: v49 (copy), p15 (copy)
-				v49.dismissOverlay()
-				p15()
-			end,
-			onDecline = function() -- line: 116
-				-- upvalues: v49 (copy), p16 (copy)
-				v49.dismissOverlay()
-				p16()
-			end
-		})
-	end
+	shouldShowOSAForConversation = 0,
+	showGroupOSADialog = 0
 }
+
+if not FFlagAppChatNavigateBackIfOSAUnacknowledged then
+	shouldShowOSAForConversation = nil
+end
+
+SquadContract.shouldShowOSAForConversation = shouldShowOSAForConversation
+
+SquadContract.showGroupOSADialog = fn
+return SquadContract

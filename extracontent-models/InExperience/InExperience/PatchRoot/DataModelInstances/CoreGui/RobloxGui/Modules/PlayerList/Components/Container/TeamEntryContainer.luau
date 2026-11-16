@@ -1,42 +1,66 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
-local ParentParent = script.Parent.Parent.Parent
+
+local parent = script.Parent.Parent.Parent
+
 local React = require(CorePackages.Packages.React)
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-
 require(CorePackages.Workspace.Packages.LeaderboardStore)
-
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
+
 local GameTranslator = require(RobloxGui.Modules.GameTranslator)
+
 local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
-local TeamEntryView = require(ParentParent.Components.PresentationCommon.TeamEntryView)
-local FFlagPlayerListFixLeaderstatsStacking = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking
 
-local function TeamEntryContainer(t1: {[any]: any}) -- line: 44
-	-- upvalues: useLeaderboardStore (copy), SignalsReact (copy), GameTranslator (copy), CoreGui (copy), FFlagPlayerListFixLeaderstatsStacking (copy), React (copy), TeamEntryView (copy)
-	local v14 = useLeaderboardStore().getGameStatsList()
-	local stats = t1.teamData.stats
-	local v16 = SignalsReact.useSignalBinding(function(p1) -- line: 50
-		-- upvalues: GameTranslator (copy), CoreGui (copy), t1 (copy)
-		return GameTranslator:TranslateGameText(CoreGui, t1.teamData.name(p1))
+local TeamEntryView = require(parent.Components.PresentationCommon.TeamEntryView)
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagPlayerListFixLeaderstatsStacking = SharedFlags.FFlagPlayerListFixLeaderstatsStacking
+
+local function TeamEntryContainer(props)
+	local gameStatsList = useLeaderboardStore().getGameStatsList()
+	local stats = props.teamData.stats
+
+	local teamName = SignalsReact.useSignalBinding(function(p)
+		return GameTranslator:TranslateGameText(CoreGui, props.teamData.name(p))
 	end)
-	local v17 = SignalsReact.useSignalState(t1.teamData.color)
-	local v18 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(v14.getCount) else nil
-	local v19 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(stats.getCount) else nil
 
-	return React.createElement(TeamEntryView, {
-		teamName = v16,
-		teamColor = v17,
-		gameStatsCount = if not FFlagPlayerListFixLeaderstatsStacking then v18 else nil,
-		teamStatsCount = if not FFlagPlayerListFixLeaderstatsStacking then v19 else nil,
-		gameStats = v14,
+	local teamColor = SignalsReact.useSignalState(props.teamData.color)
+	local gameStatsCount
+
+	if not FFlagPlayerListFixLeaderstatsStacking then
+		gameStatsCount = SignalsReact.useSignalState(gameStatsList.getCount)
+	end
+
+	local teamStatsCount
+
+	if not FFlagPlayerListFixLeaderstatsStacking then
+		teamStatsCount = SignalsReact.useSignalState(stats.getCount)
+	end
+
+	local createElement = React.createElement
+
+	if FFlagPlayerListFixLeaderstatsStacking then
+		gameStatsCount = nil
+	end
+
+	if FFlagPlayerListFixLeaderstatsStacking then
+		teamStatsCount = nil
+	end
+
+	return createElement(TeamEntryView, {
+		teamName = teamName,
+		teamColor = teamColor,
+		gameStatsCount = gameStatsCount,
+		teamStatsCount = teamStatsCount,
+		gameStats = gameStatsList,
 		teamStats = stats,
-		size = t1.size,
-		entrySizeX = t1.entrySizeX,
-		layoutOrder = t1.layoutOrder,
-		isSmallTouchDevice = t1.isSmallTouchDevice,
-		isDirectionalPreferred = t1.isDirectionalPreferred
+		size = props.size,
+		entrySizeX = props.entrySizeX,
+		layoutOrder = props.layoutOrder,
+		isSmallTouchDevice = props.isSmallTouchDevice,
+		isDirectionalPreferred = props.isDirectionalPreferred
 	})
 end
 

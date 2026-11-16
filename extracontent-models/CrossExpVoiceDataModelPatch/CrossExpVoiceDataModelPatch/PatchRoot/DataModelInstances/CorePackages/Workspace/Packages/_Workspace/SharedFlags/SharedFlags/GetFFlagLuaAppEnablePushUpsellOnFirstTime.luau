@@ -2,8 +2,7 @@ local GetFFlagLuaEnableShowUpsellMethod = require(script.Parent.GetFFlagLuaEnabl
 local GetFFlagLuaAppPushSystemUpsellDevOverride = require(script.Parent.GetFFlagLuaAppPushSystemUpsellDevOverride)
 
 game:DefineFastFlag("LuaAppEnablePushUpsellOnFirstTime", false)
-
-return function() -- line: 5
-	-- upvalues: GetFFlagLuaEnableShowUpsellMethod (copy), GetFFlagLuaAppPushSystemUpsellDevOverride (copy)
-	return GetFFlagLuaEnableShowUpsellMethod() and game:GetFastFlag("LuaAppEnablePushUpsellOnFirstTime") or GetFFlagLuaAppPushSystemUpsellDevOverride()
+return function()
+	return GetFFlagLuaEnableShowUpsellMethod() and game:GetFastFlag("LuaAppEnablePushUpsellOnFirstTime")
+		or GetFFlagLuaAppPushSystemUpsellDevOverride()
 end

@@ -1,3 +1,3 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-
-return (require(SocialLibraries.dependencies).Lumberyak.Logger.new(nil, script:GetFullName() .. ":SocialLibraries"))
+local dependencies = require(SocialLibraries.dependencies)
+return (dependencies.Lumberyak.Logger.new(nil, script:GetFullName() .. ":SocialLibraries"))

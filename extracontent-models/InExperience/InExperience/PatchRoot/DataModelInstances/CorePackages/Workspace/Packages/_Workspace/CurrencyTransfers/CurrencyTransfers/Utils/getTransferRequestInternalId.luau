@@ -1,13 +1,13 @@
-local function getTransferRequestInternalId(s1: string?) -- line: 6
-	if s1 == nil or s1 == "" then
+local function getTransferRequestInternalId(value: string?)
+	if value == nil or value == "" then
 		return ""
 	end
 
-	if #s1 >= 4 and string.lower((string.sub(s1, 1, 4))) == "rxt-" then
-		return (string.sub(s1, 5))
+	if #value >= 4 and string.lower((string.sub(value, 1, 4))) == "rxt-" then
+		return (string.sub(value, 5))
 	end
 
-	return s1
+	return value
 end
 
 return getTransferRequestInternalId

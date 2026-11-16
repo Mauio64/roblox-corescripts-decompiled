@@ -1,169 +1,235 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local Button = Foundation.Button
 local BannerBadge = require(script.Parent.BannerBadge)
 local Icon = Foundation.Icon
 local IconButton = Foundation.IconButton
 local View = Foundation.View
-local FoundationText = Foundation.Text
-local FoundationImage = Foundation.Image
-local t1 = {
+local Text = Foundation.Text
+local Image = Foundation.Image
+
+local v = {
 	isContained = true,
 	width = UDim.new(1, 0),
-	tags = {
-		container = "col auto-y"
-	}
+	tags = { container = "col auto-y" }
 }
 
-local function Banner(t2: {[any]: any}) -- line: 48
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), Button (copy), Foundation (copy), BannerBadge (copy), IconButton (copy), View (copy), Icon (copy), FoundationImage (copy), FoundationText (copy)
-	local v15 = Cryo.Dictionary.join(t1, t2)
-	local s1 = "col auto-y"
+local function Banner(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local tag = "col auto-y"
 
-	if v15.isContained then
-		s1 ..= " " .. "radius-medium padding-large stroke-standard stroke-default bg-shift-100"
+	if joined.isContained then
+		tag ..= " radius-medium padding-large stroke-standard stroke-default bg-shift-100"
 	end
 
-	local v17 = v15.badges and #v15.badges > 0
-	local v18 = v15.buttons and (#v15.buttons < 2 and (not v15.image and (not v15.body and (not v17 and not v15.onDismiss))))
-	local v19 = React.useMemo(function() -- line: 63
-		-- upvalues: v15 (copy), React (copy), Button (copy), Cryo (copy), Foundation (copy)
-		local t3 = {}
+	local v2 = joined.badges and #joined.badges > 0
+	local v3 = joined.buttons
 
-		if v15.buttons and #v15.buttons > 0 then
-			for v23, v24 in v15.buttons do
-				t3["banner-button-" .. v23] = React.createElement(Button, Cryo.Dictionary.join({
-					LayoutOrder = v23 + 1,
+	if v3 then
+		if #joined.buttons < 2 then
+			v3 = not (joined.image or joined.body or v2 or joined.onDismiss)
+		else
+			v3 = false
+		end
+	end
+
+	local v4 = React.useMemo(function()
+		local children = {}
+
+		if joined.buttons and #joined.buttons > 0 then
+			for k, button in joined.buttons do
+				children["banner-button-" .. k] = React.createElement(Button, Cryo.Dictionary.join({
+					LayoutOrder = k + 1,
 					size = Foundation.Enums.InputSize.Small,
-					testId = "--banner-button-" .. v23
-				}, v24))
+					testId = "--banner-button-" .. k
+				}, button))
 			end
 		end
 
-		return t3
-	end, { v15.buttons })
-	local v20 = React.useMemo(function() -- line: 80
-		-- upvalues: v15 (copy), React (copy), BannerBadge (copy), Cryo (copy)
-		local t4 = {}
+		return children
+	end, { joined.buttons })
 
-		if v15.badges then
-			for i, v in ipairs(v15.badges) do
-				t4["banner-badge-" .. i] = React.createElement(BannerBadge, Cryo.Dictionary.join({
+	local v5 = React.useMemo(function()
+		local children = {}
+
+		if joined.badges then
+			for i, badge in ipairs(joined.badges) do
+				children["banner-badge-" .. i] = React.createElement(BannerBadge, Cryo.Dictionary.join({
 					testId = "--banner-badge-" .. i,
 					LayoutOrder = i + 1
-				}, v))
+				}, badge))
 			end
 		end
 
-		return t4
-	end, { v15.badges })
-	local v21 = React.useMemo(function() -- line: 96
-		-- upvalues: v15 (copy), React (copy), IconButton (copy), v17 (copy), Foundation (copy)
-		if not v15.onDismiss then
-			return nil
+		return children
+	end, { joined.badges })
+
+	local dismiss = React.useMemo(function()
+		if joined.onDismiss then
+			return (React.createElement(IconButton, {
+				testId = v2 and "--banner-badges-dismiss" or "--banner-dismiss",
+				LayoutOrder = v2 and 1 or 3,
+				icon = Foundation.Enums.IconName.XSmall,
+				isCircular = true,
+				variant = Foundation.Enums.ButtonVariant.Utility,
+				onActivated = joined.onDismiss
+			}))
 		end
 
-		return (React.createElement(IconButton, {
-			isCircular = true,
-			testId = not v17 and "--banner-dismiss" or "--banner-badges-dismiss",
-			LayoutOrder = not v17 and 3 or 1,
-			icon = Foundation.Enums.IconName.XSmall,
-			variant = Foundation.Enums.ButtonVariant.Utility,
-			onActivated = v15.onDismiss
-		}))
-	end, {
-		v15.onDismiss,
-		v17
-	})
+		return nil
+	end, { joined.onDismiss, v2 })
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v6 = {
+		LayoutOrder = joined.LayoutOrder,
+		Size = UDim2.new(joined.width.Scale, joined.width.Offset, 0, 0),
 		testId = "--banner",
-		LayoutOrder = v15.LayoutOrder,
-		Size = UDim2.new(v15.width.Scale, v15.width.Offset, 0, 0),
-		tag = s1
-	}, {
-		BadgesRow = if not v17 then nil else React.createElement(View, {
-			tag = "row auto-y size-full-0 flex-between gap-large align-y-center padding-bottom-large",
-			LayoutOrder = 2
-		}, {
-			Badges = React.createElement(View, {
-				LayoutOrder = 1,
-				testId = "--banner-badges",
-				tag = "row auto-xy gap-small fill"
-			}, v20),
-			Dismiss = if not v21 then nil else React.createElement(View, {
-				tag = "auto-xy",
-				LayoutOrder = 2
-			}, {
-				Dismiss = v21
+		tag = tag
+	}
+	local badgesRow
+
+	if v2 then
+		local createElement2 = React.createElement
+
+		local v7 = {
+			Badges = React.createElement(
+				View,
+				{ LayoutOrder = 1, testId = "--banner-badges", tag = "row auto-xy gap-small fill" },
+				v5
+			),
+			Dismiss = 0
+		}
+		local dismiss2
+
+		if dismiss then
+			dismiss2 = React.createElement(View, { tag = "auto-xy", LayoutOrder = 2 }, {
+				Dismiss = dismiss
 			})
-		}),
-		ContentRow = React.createElement(View, {
-			LayoutOrder = 3,
-			tag = {
-				["row auto-y size-full-0 gap-large"] = true,
-				["align-y-center"] = v18
-			}
-		}, {
-			Icon = if not v15.icon or v15.image then nil else React.createElement(Icon, {
-				testId = "--banner-icon",
-				LayoutOrder = 1,
-				size = Foundation.Enums.IconSize.Large,
-				name = v15.icon,
-				variant = v15.iconVariant,
-				style = v15.iconStyle
-			}),
-			Image = if not v15.image then nil else React.createElement(View, {
-				tag = "auto-xy flex-none bg-shift-100 radius-medium"
-			}, {
-				Image = React.createElement(FoundationImage, {
-					testId = "--banner-image",
-					tag = "size-1800",
-					Image = v15.image,
-					ScaleType = Enum.ScaleType.Fit
-				})
-			}),
-			Content = React.createElement(View, {
-				LayoutOrder = 2,
-				tag = {
-					["auto-xy gap-small align-x-left fill"] = true,
-					["col flex-fill"] = not v18,
-					["row align-y-center flex-between"] = v18
-				}
-			}, {
-				Title = React.createElement(FoundationText, {
-					testId = "--banner-title",
-					tag = "auto-xy text-title-medium content-emphasis fill text-wrap text-align-x-left",
-					LayoutOrder = 1,
-					Text = v15.title
-				}),
-				InlineButton = if not v18 or (not v15.buttons or not v15.buttons[1]) then nil else React.createElement(Button, Cryo.Dictionary.join({
-					tag = "auto-xy shrink",
-					LayoutOrder = 2,
-					testId = "--banner-button-inline"
-				}, v15.buttons[1])),
-				Subcontent = if v18 then nil else React.createElement(View, {
-					tag = "auto-xy col gap-large shrink",
-					LayoutOrder = 2
-				}, {
-					Body = if not v15.body then nil else React.createElement(FoundationText, {
-						testId = "--banner-body",
-						tag = "auto-xy text-body-medium content-default text-wrap text-align-x-left",
-						LayoutOrder = 1,
-						RichText = true,
-						Text = v15.body
-					}),
-					Buttons = React.createElement(View, {
-						tag = "row auto-xy grow gap-small wrap",
-						LayoutOrder = 2,
-						testId = "--banner-buttons"
-					}, v19)
-				})
-			}),
-			Dismiss = if v17 then nil else v21
+		end
+
+		v7.Dismiss = dismiss2
+		badgesRow = createElement2(
+			View,
+			{
+				tag = "row auto-y size-full-0 flex-between gap-large align-y-center padding-bottom-large",
+				LayoutOrder = 2
+			},
+			v7
+		)
+	end
+
+	local createElement2 = React.createElement
+	local icon
+
+	if joined.icon and not joined.image then
+		icon = React.createElement(Icon, {
+			testId = "--banner-icon",
+			LayoutOrder = 1,
+			size = Foundation.Enums.IconSize.Large,
+			name = joined.icon,
+			variant = joined.iconVariant,
+			style = joined.iconStyle
 		})
+	end
+
+	local image
+
+	if joined.image then
+		image = React.createElement(View, { tag = "auto-xy flex-none bg-shift-100 radius-medium" }, {
+			Image = React.createElement(Image, {
+				Image = joined.image,
+				testId = "--banner-image",
+				tag = "size-1800",
+				ScaleType = Enum.ScaleType.Fit
+			})
+		})
+	end
+
+	local createElement3 = React.createElement
+
+	local v7 = {
+		Title = React.createElement(Text, {
+			Text = joined.title,
+			testId = "--banner-title",
+			tag = "auto-xy text-title-medium content-emphasis fill text-wrap text-align-x-left",
+			LayoutOrder = 1
+		}),
+		InlineButton = 0,
+		Subcontent = 0
+	}
+	local inlineButton
+
+	if v3 and joined.buttons and joined.buttons[1] then
+		inlineButton = React.createElement(
+			Button,
+			Cryo.Dictionary.join(
+				{ tag = "auto-xy shrink", LayoutOrder = 2, testId = "--banner-button-inline" },
+				joined.buttons[1]
+			)
+		)
+	end
+
+	v7.InlineButton = inlineButton
+	local subcontent
+
+	if not v3 then
+		local createElement4 = React.createElement
+		local body
+
+		if joined.body then
+			body = React.createElement(Text, {
+				testId = "--banner-body",
+				Text = joined.body,
+				tag = "auto-xy text-body-medium content-default text-wrap text-align-x-left",
+				LayoutOrder = 1,
+				RichText = true
+			})
+		end
+
+		subcontent = createElement4(View, { tag = "auto-xy col gap-large shrink", LayoutOrder = 2 }, {
+			Body = body,
+			Buttons = React.createElement(
+				View,
+				{
+					tag = "row auto-xy grow gap-small wrap",
+					LayoutOrder = 2,
+					testId = "--banner-buttons"
+				},
+				v4
+			)
+		})
+	end
+
+	v7.Subcontent = subcontent
+	local v8 = {
+		Icon = icon,
+		Image = image,
+		Content = createElement3(View, {
+			LayoutOrder = 2,
+			tag = {
+				["auto-xy gap-small align-x-left fill"] = true,
+				["col flex-fill"] = not v3,
+				["row align-y-center flex-between"] = v3
+			}
+		}, v7),
+		Dismiss = 0
+	}
+
+	if v2 then
+		dismiss = nil
+	end
+
+	v8.Dismiss = dismiss
+	return createElement(View, v6, {
+		BadgesRow = badgesRow,
+		ContentRow = createElement2(View, {
+			tag = { ["row auto-y size-full-0 gap-large"] = true, ["align-y-center"] = v3 },
+			LayoutOrder = 3
+		}, v8)
 	})
 end
 

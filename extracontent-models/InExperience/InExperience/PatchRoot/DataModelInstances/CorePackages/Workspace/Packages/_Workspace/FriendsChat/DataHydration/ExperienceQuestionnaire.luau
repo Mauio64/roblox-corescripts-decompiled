@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local ExperienceQuestionnaire = require(Workspace.DataHydration.DataHydration.ExperienceQuestionnaire)
 
-return (require(_Workspace.DataHydration.DataHydration.ExperienceQuestionnaire))
+return ExperienceQuestionnaire

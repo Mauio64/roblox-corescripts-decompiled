@@ -1,6 +1,5 @@
-local Parent = script:FindFirstAncestor("ProfileQRCode").Parent
+local parent = script:FindFirstAncestor("ProfileQRCode").Parent
 local configuredRoduxNetworking = require(script.Parent.configuredRoduxNetworking)
 
-return require(Parent.FriendsNetworking).config({
-	roduxNetworking = configuredRoduxNetworking
-})
+local FriendsNetworking = require(parent.FriendsNetworking)
+return FriendsNetworking.config({ roduxNetworking = configuredRoduxNetworking })

@@ -1,196 +1,204 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Dictionary = require(ExpChatParent.llama).Dictionary
-local Roact = require(ExpChatParent.Roact)
-local Otter = require(ExpChatParent.Otter)
+local parent = ExpChat.Parent
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local Roact = require(parent.Roact)
+local Otter = require(parent.Otter)
+
 local Config = require(ExpChat.Config)
+
 local BubbleChat = script:FindFirstAncestor("BubbleChat")
 local getSpringFromSettings = require(BubbleChat.Helpers.getSpringFromSettings)
 local ClientSettingsUtility = require(ExpChat.ClientSettings.ClientSettingsUtility)
-local v10 = Roact.PureComponent:extend("BlankBubble")
 
-function v10.init(p1, p2) -- line: 23
-	-- upvalues: Roact (copy), Otter (copy)
-	p1.state = {}
+local extended = Roact.PureComponent:extend("BlankBubble")
 
-	local v13, v14 = Roact.createBinding(0)
-
-	p1.width = v13
-	p1.updateWidth = v14
-	p1.widthMotor = Otter.createSingleMotor(0)
-	p1.widthMotor:onStep(function(p3) -- line: 27
-		-- upvalues: p1 (copy)
-		p1.updateWidth((math.round(p3)))
+function extended:init(p)
+	self.state = {}
+	local binding, updateWidth = Roact.createBinding(0)
+	self.width = binding
+	self.updateWidth = updateWidth
+	self.widthMotor = Otter.createSingleMotor(0)
+	self.widthMotor:onStep(function(p2)
+		self.updateWidth((math.round(p2)))
 	end)
-	p1.frameSize = p1.width:map(function(p4) -- line: 31
-		-- upvalues: p1 (copy)
-		if p1.props.insertSize then
-			return UDim2.fromOffset(p4, p1.props.insertSize.Y + p1.props.chatSettings.Padding * 2)
+
+	self.frameSize = self.width:map(function(p2)
+		if self.props.insertSize then
+			return UDim2.fromOffset(p2, self.props.insertSize.Y + self.props.chatSettings.Padding * 2)
 		end
 
-		return UDim2.fromOffset(p4, 0)
+		return UDim2.fromOffset(p2, 0)
 	end)
 
-	local v15, v16 = Roact.createBinding(1)
+	local binding2, updateTransparency = Roact.createBinding(1)
+	self.transparency = binding2
+	self.updateTransparency = updateTransparency
+	self.transparencyMotor = Otter.createSingleMotor(1)
+	self.transparencyMotor:onStep(self.updateTransparency)
 
-	p1.transparency = v15
-	p1.updateTransparency = v16
-	p1.transparencyMotor = Otter.createSingleMotor(1)
-	p1.transparencyMotor:onStep(p1.updateTransparency)
+	local binding3, updateBackgroundTransparency = Roact.createBinding(1)
+	self.backgroundTransparency = binding3
+	self.updateBackgroundTransparency = updateBackgroundTransparency
+	self.backgroundTransparencyMotor = Otter.createSingleMotor(1)
+	self.backgroundTransparencyMotor:onStep(self.updateBackgroundTransparency)
 
-	local v17, v18 = Roact.createBinding(1)
-
-	p1.backgroundTransparency = v17
-	p1.updateBackgroundTransparency = v18
-	p1.backgroundTransparencyMotor = Otter.createSingleMotor(1)
-	p1.backgroundTransparencyMotor:onStep(p1.updateBackgroundTransparency)
-
-	if p2.fadingOut then
-		p1:fadeOut()
+	if p.fadingOut then
+		self:fadeOut()
 	end
 end
-function v10.getDerivedStateFromProps(p5, p6) -- line: 54
-	local n1 = 0
 
-	if p5.insertSize then
-		n1 = p5.insertSize.X + p5.chatSettings.Padding * 2
+function extended.getDerivedStateFromProps(p, p2)
+	local fullWidth = not p.insertSize and 0 or p.insertSize.X + p.chatSettings.Padding * 2
+
+	if fullWidth == p2.fullWidth then
+		return nil
 	end
 
-	if n1 ~= p6.fullWidth then
-		return {
-			fullWidth = n1
-		}
-	end
-
-	return nil
+	return { fullWidth = fullWidth }
 end
-function v10.render(p7) -- line: 69
-	-- upvalues: Config (copy), Roact (copy), Dictionary (copy)
-	local chatSettings = p7.props.chatSettings
-	local ImageLabel = chatSettings.ImageLabel
-	local UIGradient = chatSettings.UIGradient
-	local UICorner = chatSettings.UICorner
-	local CornerRadius = Config.DefaultBubbleChatChildrenCustomizationProperties.UICorner.CornerRadius
-	local n2 = 0
 
-	if p7.props.insertSize then
-		n2 = p7.props.insertSize.Y + p7.props.chatSettings.Padding * 2
-	end
+function extended.render(props)
+	local chatSettings = props.props.chatSettings
+	local imageLabel = chatSettings.ImageLabel
+	local uiGradient = chatSettings.UIGradient
+	local uiCorner = chatSettings.UICorner
+	local cornerRadius = Config.DefaultBubbleChatChildrenCustomizationProperties.UICorner.CornerRadius
 
-	return Roact.createElement("Frame", {
-		Transparency = 1,
+	local v = not props.props.insertSize and 0 or props.props.insertSize.Y + props.props.chatSettings.Padding * 2
+
+	local createElement = Roact.createElement
+	local v2 = {
 		AnchorPoint = Vector2.new(0.5, 1),
-		Size = UDim2.fromOffset(p7.state.fullWidth, n2),
-		Position = UDim2.new(0.5, 0, 1, -8)
-	}, {
+		Size = UDim2.fromOffset(props.state.fullWidth, v),
+		Position = UDim2.new(0.5, 0, 1, -8),
+		Transparency = 1
+	}
+
+	local v3 = {
 		Scale = Roact.createElement("UIScale", {
-			Scale = not p7.props.isDistant and 1 or 0.75
+			Scale = props.props.isDistant and 0.75 or 1
 		}),
-		Caret = p7.props.chatSettings.TailVisible and Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			Image = "rbxasset://textures/ui/InGameChat/Caret.png",
+		Caret = 0,
+		RoundedFrame = 0
+	}
+
+	local caret = props.props.chatSettings.TailVisible
+
+	if caret then
+		caret = Roact.createElement("ImageLabel", {
 			AnchorPoint = Vector2.new(0.5, 0),
+			BackgroundTransparency = 1,
 			Position = UDim2.new(0.5, 0, 1, -1),
 			Size = UDim2.fromOffset(12, 8),
+			Image = "rbxasset://textures/ui/InGameChat/Caret.png",
 			ImageColor3 = chatSettings.BackgroundColor3,
-			ImageTransparency = p7.backgroundTransparency
+			ImageTransparency = props.backgroundTransparency
 		}, {
-			Gradient = UIGradient ~= nil and Roact.createElement("UIGradient", UIGradient)
-		}),
-		RoundedFrame = Roact.createElement("ImageLabel", Dictionary.join(ImageLabel, {
-			BorderSizePixel = 0,
-			ClipsDescendants = true,
-			Size = p7.frameSize,
-			BackgroundColor3 = chatSettings.BackgroundColor3,
-			BackgroundTransparency = if not ImageLabel or ImageLabel.Image == "" then p7.backgroundTransparency or p7.transparency else 1,
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 0, 0),
-			ImageTransparency = p7.backgroundTransparency or p7.transparency,
-			Image = ImageLabel and ImageLabel.Image or ""
-		}), {
-			UICorner = UICorner and Roact.createElement("UICorner", {
-				CornerRadius = UICorner.CornerRadius
-			}) or Roact.createElement("UICorner", {
-				CornerRadius = CornerRadius
-			}),
-			Contents = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1)
-			}, {
-				Padding = Roact.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, p7.props.chatSettings.Padding),
-					PaddingRight = UDim.new(0, p7.props.chatSettings.Padding),
-					PaddingBottom = UDim.new(0, p7.props.chatSettings.Padding),
-					PaddingLeft = UDim.new(0, p7.props.chatSettings.Padding)
-				}),
-				Insert = p7.props.renderInsert and p7.props.renderInsert()
-			}),
-			Gradient = UIGradient ~= nil and Roact.createElement("UIGradient", UIGradient)
+			Gradient = uiGradient ~= nil and Roact.createElement("UIGradient", uiGradient)
 		})
+	end
+
+	v3.Caret = caret
+
+	v3.RoundedFrame = Roact.createElement("ImageLabel", dictionary.join(imageLabel, {
+		Size = props.frameSize,
+		BackgroundColor3 = chatSettings.BackgroundColor3,
+		BackgroundTransparency = imageLabel and imageLabel.Image ~= "" and 1 or props.backgroundTransparency or props.transparency,
+		BorderSizePixel = 0,
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0, 0),
+		ClipsDescendants = true,
+		ImageTransparency = props.backgroundTransparency or props.transparency,
+		Image = imageLabel and imageLabel.Image or ""
+	}), {
+		UICorner = uiCorner and Roact.createElement("UICorner", {
+			CornerRadius = uiCorner.CornerRadius
+		}) or Roact.createElement("UICorner", { CornerRadius = cornerRadius }),
+		Contents = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1
+		}, {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, props.props.chatSettings.Padding),
+				PaddingRight = UDim.new(0, props.props.chatSettings.Padding),
+				PaddingBottom = UDim.new(0, props.props.chatSettings.Padding),
+				PaddingLeft = UDim.new(0, props.props.chatSettings.Padding)
+			}),
+			Insert = props.props.renderInsert and props.props.renderInsert()
+		}),
+		Gradient = uiGradient ~= nil and Roact.createElement("UIGradient", uiGradient)
 	})
+	return createElement("Frame", v2, v3)
 end
-function v10.fadeIn(p8) -- line: 143
-	-- upvalues: getSpringFromSettings (copy), ClientSettingsUtility (copy)
-	local v30 = getSpringFromSettings(p8.props.chatSettings, "transparency")
 
-	p8.transparencyMotor:setGoal(v30(p8.props.chatSettings.Transparency))
+function extended:fadeIn()
+	local springFromSettings = getSpringFromSettings(self.props.chatSettings, "transparency")
 
-	local v31 = ClientSettingsUtility.getBackgroundTransparency(p8.props.chatSettings, p8.props.clientSettings)
+	self.transparencyMotor:setGoal(springFromSettings(self.props.chatSettings.Transparency))
 
-	p8.backgroundTransparencyMotor:setGoal(v30(v31))
+	local backgroundTransparency = ClientSettingsUtility.getBackgroundTransparency(
+		self.props.chatSettings,
+		self.props.clientSettings
+	)
 
-	local v32 = getSpringFromSettings(p8.props.chatSettings, "size")
+	self.backgroundTransparencyMotor:setGoal(springFromSettings(backgroundTransparency))
 
-	p8.widthMotor:setGoal(v32(p8.state.fullWidth))
+	local springFromSettings2 = getSpringFromSettings(self.props.chatSettings, "size")
+	self.widthMotor:setGoal(springFromSettings2(self.state.fullWidth))
 end
-function v10.fadeOut(p9) -- line: 157
-	-- upvalues: getSpringFromSettings (copy)
-	p9.transparencyMotor:onComplete(function() -- line: 158
-		-- upvalues: p9 (copy)
-		if p9.props.onFadeOut then
-			p9.props.onFadeOut()
+
+function extended:fadeOut()
+	self.transparencyMotor:onComplete(function()
+		if self.props.onFadeOut then
+			self.props.onFadeOut()
 		end
 	end)
 
-	local v34 = getSpringFromSettings(p9.props.chatSettings, "transparency")
-
-	p9.transparencyMotor:setGoal(v34(1))
-	p9.backgroundTransparencyMotor:setGoal(v34(1))
+	local springFromSettings = getSpringFromSettings(self.props.chatSettings, "transparency")
+	self.transparencyMotor:setGoal(springFromSettings(1))
+	self.backgroundTransparencyMotor:setGoal(springFromSettings(1))
 end
-function v10.didUpdate(p10, p11, p12) -- line: 169
-	-- upvalues: getSpringFromSettings (copy)
-	if p11.fadingOut ~= p10.props.fadingOut then
-		if p10.props.fadingOut then
-			p10:fadeOut()
+
+function extended:didUpdate(p, p2)
+	if p.fadingOut ~= self.props.fadingOut then
+		if self.props.fadingOut then
+			self:fadeOut()
 		else
-			p10:fadeIn()
+			self:fadeIn()
 		end
 	end
 
-	if p10.state.fullWidth ~= p12.fullWidth then
-		local v38 = getSpringFromSettings(p10.props.chatSettings, "size")
-
-		p10.widthMotor:setGoal(v38(p10.state.fullWidth))
+	if self.state.fullWidth ~= p2.fullWidth then
+		local springFromSettings = getSpringFromSettings(self.props.chatSettings, "size")
+		self.widthMotor:setGoal(springFromSettings(self.state.fullWidth))
 	end
 end
-function v10.didMount(p13) -- line: 183
-	-- upvalues: getSpringFromSettings (copy), ClientSettingsUtility (copy)
-	if not p13.props.fadingOut then
-		local v40 = getSpringFromSettings(p13.props.chatSettings, "size")
-		local v41 = getSpringFromSettings(p13.props.chatSettings, "transparency")
 
-		p13.transparencyMotor:setGoal(v41(p13.props.chatSettings.Transparency))
+function extended.didMount(data)
+	if not data.props.fadingOut then
+		local springFromSettings = getSpringFromSettings(data.props.chatSettings, "size")
+		local springFromSettings2 = getSpringFromSettings(data.props.chatSettings, "transparency")
 
-		local v42 = ClientSettingsUtility.getBackgroundTransparency(p13.props.chatSettings, p13.props.clientSettings)
+		data.transparencyMotor:setGoal(springFromSettings2(data.props.chatSettings.Transparency))
 
-		p13.backgroundTransparencyMotor:setGoal(v41(v42))
-		p13.widthMotor:setGoal(v40(p13.state.fullWidth))
+		local backgroundTransparency = ClientSettingsUtility.getBackgroundTransparency(
+			data.props.chatSettings,
+			data.props.clientSettings
+		)
+
+		data.backgroundTransparencyMotor:setGoal(springFromSettings2(backgroundTransparency))
+
+		data.widthMotor:setGoal(springFromSettings(data.state.fullWidth))
 	end
 end
-function v10.willUnmount(p14) -- line: 199
-	p14.transparencyMotor:destroy()
-	p14.backgroundTransparencyMotor:destroy()
-	p14.widthMotor:destroy()
+
+function extended.willUnmount(data)
+	data.transparencyMotor:destroy()
+
+	data.backgroundTransparencyMotor:destroy()
+
+	data.widthMotor:destroy()
 end
 
-return v10
+return extended

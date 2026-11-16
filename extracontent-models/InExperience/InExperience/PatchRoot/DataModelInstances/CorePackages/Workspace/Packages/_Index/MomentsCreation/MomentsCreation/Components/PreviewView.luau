@@ -1,58 +1,72 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local Foundation = require(MomentsCreationParent.Foundation)
-local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
-local React = require(MomentsCreationParent.React)
+local parent = MomentsCreation.Parent
+
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+local React = require(parent.React)
+
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
 local View = Foundation.View
+
 local useDeviceInsets = MomentsCommon.Hooks.useDeviceInsets
 local useTokens = Foundation.Hooks.useTokens
+
 local Constants = require(MomentsCreation.Constants)
 local useCreationFlowStrings = require(MomentsCreation.Hooks.useCreationFlowStrings)
 
-return function(t1: {[any]: any}) -- line: 28
-	-- upvalues: useDeviceInsets (copy), useTokens (copy), useCreationFlowStrings (copy), React (copy), View (copy), Constants (copy), Button (copy), Foundation (copy), InputSize (copy), ButtonVariant (copy)
-	local v15 = useDeviceInsets()
-	local v16 = useTokens()
-	local v17 = useCreationFlowStrings()
-	local PublishingCtaReturn = v17.PublishingCtaReturn
+return function(props)
+	local v = useDeviceInsets()
+	local v2 = useTokens()
+	local v3 = useCreationFlowStrings()
 
-	return React.createElement(View, {
+	local publishingCtaReturn = v3.PublishingCtaReturn
+
+	local createElement = React.createElement
+	local v4 = {
+		LayoutOrder = props.layoutOrder,
 		tag = "align-x-center size-full-0 auto-y",
-		LayoutOrder = t1.layoutOrder,
 		padding = {
-			top = UDim.new(0, v16.Padding.Large),
-			bottom = UDim.new(0, (math.max(v15.bottom, v16.Padding.Large))),
-			left = UDim.new(0, (math.max(v15.left, v16.Padding.XLarge))),
-			right = UDim.new(0, (math.max(v15.right, v16.Padding.XLarge)))
+			top = UDim.new(0, v2.Padding.Large),
+			bottom = UDim.new(0, (math.max(v.bottom, v2.Padding.Large))),
+			left = UDim.new(0, (math.max(v.left, v2.Padding.XLarge))),
+			right = UDim.new(0, (math.max(v.right, v2.Padding.XLarge)))
 		}
-	}, {
-		SizeConstraint = React.createElement(View, {
-			tag = "row align-x-center gap-small size-full-0 auto-y",
-			sizeConstraint = {
-				MaxSize = Constants.BottomBarSizeConstraint
-			}
-		}, {
-			ContinueButton = React.createElement(Button, {
-				LayoutOrder = 1,
-				fillBehavior = Foundation.Enums.FillBehavior.Fill,
-				onActivated = t1.onContinueCallback,
-				size = InputSize.Medium,
-				text = v17.PublishingCtaContinue,
-				variant = ButtonVariant.Emphasis,
-				width = UDim.new(0.5, 0)
-			}),
-			ReturnToGalleryButton = if not t1.onReturnToGalleryCallback then nil else React.createElement(Button, {
-				LayoutOrder = 2,
-				fillBehavior = Foundation.Enums.FillBehavior.Fill,
-				text = PublishingCtaReturn,
-				variant = ButtonVariant.Standard,
-				width = UDim.new(0.5, 0),
-				onActivated = t1.onReturnToGalleryCallback,
-				size = InputSize.Medium
-			})
+	}
+
+	local createElement2 = React.createElement
+	local v5 = {
+		sizeConstraint = { MaxSize = Constants.BottomBarSizeConstraint },
+		tag = "row align-x-center gap-small size-full-0 auto-y"
+	}
+
+	local v6 = {
+		ContinueButton = React.createElement(Button, {
+			fillBehavior = Foundation.Enums.FillBehavior.Fill,
+			LayoutOrder = 1,
+			onActivated = props.onContinueCallback,
+			size = InputSize.Medium,
+			text = v3.PublishingCtaContinue,
+			variant = ButtonVariant.Emphasis,
+			width = UDim.new(0.5, 0)
+		}),
+		ReturnToGalleryButton = 0
+	}
+	local returnToGalleryButton
+
+	if props.onReturnToGalleryCallback then
+		returnToGalleryButton = React.createElement(Button, {
+			fillBehavior = Foundation.Enums.FillBehavior.Fill,
+			LayoutOrder = 2,
+			text = publishingCtaReturn,
+			variant = ButtonVariant.Standard,
+			width = UDim.new(0.5, 0),
+			onActivated = props.onReturnToGalleryCallback,
+			size = InputSize.Medium
 		})
-	})
+	end
+
+	v6.ReturnToGalleryButton = returnToGalleryButton
+	return createElement(View, v4, { SizeConstraint = createElement2(View, v5, v6) })
 end

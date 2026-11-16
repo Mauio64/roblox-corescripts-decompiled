@@ -1,107 +1,103 @@
-local EngineFeature = game:GetEngineFeature("AudioFocusManagement")
+local engineFeature = game:GetEngineFeature("AudioFocusManagement")
+
 local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
 local dependencies = require(CrossExperienceVoice.dependencies)
-local SharedFlags = dependencies.SharedFlags
-local v5 = SharedFlags.GetFFlagEnableCrossExperienceVoiceCaptureMute()
-local v6 = SharedFlags.GetFFlagEnableVoiceChatMuteForVideoCaptures()
-local v7 = if not v6 then nil else game:GetService("CaptureService")
-local React = dependencies.React
-local Cryo = dependencies.Cryo
+local sharedFlags = dependencies.SharedFlags
 
-local function useIsCapturingVideo() -- line: 18
-	-- upvalues: React (copy), v7 (copy)
-	local v12, v13 = React.useState(v7 and v7:IsCapturingVideo())
+local fFlagEnableCrossExperienceVoiceCaptureMute = sharedFlags.GetFFlagEnableCrossExperienceVoiceCaptureMute()
+local fFlagEnableVoiceChatMuteForVideoCaptures = sharedFlags.GetFFlagEnableVoiceChatMuteForVideoCaptures()
+local CaptureService
 
-	React.useEffect(function() -- line: 21
-		-- upvalues: v7 (copy), v13 (copy)
-		if not v7 then
+if fFlagEnableVoiceChatMuteForVideoCaptures then
+	CaptureService = game:GetService("CaptureService")
+else
+	CaptureService = nil
+end
+
+local react = dependencies.React
+local cryo = dependencies.Cryo
+
+local function useIsCapturingVideo()
+	local state, setState = react.useState(CaptureService and CaptureService:IsCapturingVideo())
+
+	react.useEffect(function()
+		if not CaptureService then
 			return
 		end
 
-		local connection = v7.VideoCaptureInProgress:Connect(function(b1: boolean) -- line: 26
-			-- upvalues: v13 (copy)
-			v13(b1)
+		local videoCaptureInProgressConnection = CaptureService.VideoCaptureInProgress:Connect(function(flag: boolean)
+			setState(flag)
 		end)
 
-		return function() -- line: 30
-			-- upvalues: v7 (copy), connection (copy)
-			if v7 then
-				connection:Disconnect()
+		return function()
+			if CaptureService then
+				videoCaptureInProgressConnection:Disconnect()
 			end
 		end
 	end, {})
 
-	return v12
+	return state
 end
-local function useEnableAudioFocusToggle() -- line: 40
-	-- upvalues: React (copy), v5 (copy), v6 (copy), useIsCapturingVideo (copy), Cryo (copy), EngineFeature (copy)
-	local v14, v15 = React.useState({})
-	local v16 = false
 
-	if v5 and v6 then
-		v16 = useIsCapturingVideo()
+local function useEnableAudioFocusToggle()
+	local state, setState = react.useState({})
+	local v
+
+	if fFlagEnableCrossExperienceVoiceCaptureMute and fFlagEnableVoiceChatMuteForVideoCaptures then
+		v = useIsCapturingVideo()
+	else
+		v = false
 	end
 
-	local v17 = React.useCallback(function(p1) -- line: 48
-		-- upvalues: v14 (copy), Cryo (copy), v15 (copy)
-		if not v14[p1] then
-			local v21 = Cryo.Dictionary.join(v14, {
-				[p1] = true
-			})
-
-			v15(v21)
+	local v2 = react.useCallback(function(p)
+		if not state[p] then
+			setState((cryo.Dictionary.join(state, { [p] = true })))
 		end
-	end, { v14 })
-	local v18 = React.useCallback(function(p2) -- line: 57
-		-- upvalues: v14 (copy), Cryo (copy), v15 (copy)
-		if v14[p2] then
-			local v23 = Cryo.Dictionary.join(v14, {
-				[p2] = nil
-			})
+	end, { state })
 
-			v15(v23)
+	local v3 = react.useCallback(function(p)
+		if state[p] then
+			setState((cryo.Dictionary.join(state, { [p] = nil })))
 		end
-	end, { v14 })
+	end, { state })
 
-	React.useEffect(function() -- line: 66
-		-- upvalues: EngineFeature (copy), v15 (copy), v17 (copy), v18 (copy)
-		if not EngineFeature then
+	react.useEffect(function()
+		if not engineFeature then
 			return
 		end
 
-		local ok, result = pcall(function() -- line: 71
+		local success, result = pcall(function()
 			return game:GetService("AudioFocusService")
 		end)
 
-		if not ok or not result then
+		if not (success and result) then
 			return
 		end
 
-		local t1 = {}
-		local RegisteredContexts = result:GetRegisteredContexts()
+		local registeredContexts = result:GetRegisteredContexts()
+		local set = {}
 
-		for k, _ in pairs(RegisteredContexts) do
-			t1[k] = true
+		for k, _ in pairs(registeredContexts) do
+			set[k] = true
 		end
 
-		v15(t1)
+		setState(set)
 
-		local connection = result.OnContextRegistered:Connect(v17)
-		local connection2 = result.OnContextUnregistered:Connect(v18)
+		local onContextRegisteredConnection = result.OnContextRegistered:Connect(v2)
+		local onContextUnregisteredConnection = result.OnContextUnregistered:Connect(v3)
 
-		return function() -- line: 88
-			-- upvalues: connection (copy), connection2 (copy)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if onContextRegisteredConnection then
+				onContextRegisteredConnection:Disconnect()
 			end
 
-			if connection2 then
-				connection2:Disconnect()
+			if onContextUnregisteredConnection then
+				onContextUnregisteredConnection:Disconnect()
 			end
 		end
 	end, {})
 
-	return v14[1] and (v14[2] and not v16)
+	return state[1] and state[2] and not v
 end
 
 return useEnableAudioFocusToggle

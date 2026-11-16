@@ -1,45 +1,68 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
+local parent = Moments.Parent
+
 local Players = game:GetService("Players")
-local BuilderIcons = require(MomentsParent.BuilderIcons)
-local Foundation = require(MomentsParent.Foundation)
-local Localization = require(MomentsParent.Localization)
-local MomentsCommon = require(MomentsParent.MomentsCommon)
 
-require(MomentsParent.MomentsTypes)
-
-local React = require(MomentsParent.React)
-local SharedFlags = require(MomentsParent.SharedFlags)
-local SignalsReact = require(MomentsParent.SignalsReact)
+local BuilderIcons = require(parent.BuilderIcons)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.MomentsTypes)
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local SignalsReact = require(parent.SignalsReact)
 local Speaker = BuilderIcons.Icon.Speaker
 local SpeakerSlash = BuilderIcons.Icon.SpeakerSlash
 local ThreeDotsVertical = BuilderIcons.Icon.ThreeDotsVertical
+
 local IconButton = Foundation.IconButton
 local Menu = Foundation.Menu
 local View = Foundation.View
+
 local useLocalization = Localization.Hooks.useLocalization
 local useToggleState = MomentsCommon.Hooks.useToggleState
+
 local checkDebugAccess = require(Moments.Utils.checkDebugAccess)
+local getPostFeedItemId = require(Moments.Utils.getPostFeedItemId)
 local fireAnalyticsEvent = MomentsCommon.Analytics.fireAnalyticsEvent
+local reportMomentsEngagement = MomentsCommon.Analytics.reportMomentsEngagement
 local EventNames = MomentsCommon.Analytics.EventNames
-local GetFFlagMomentsAnalyticsSchemaIdentity = MomentsCommon.Flags.GetFFlagMomentsAnalyticsSchemaIdentity
+local reportModalCovering = MomentsCommon.Media.reportModalCovering
 local makeFeedActionFields = require(Moments.Analytics.makeFeedActionFields)
 local makeRecommendationAttribution = require(Moments.Analytics.makeRecommendationAttribution)
+require(Moments.Analytics.RecommendationContentType)
 local reportMoment = require(Moments.Moderation.reportMoment)
-local useFeed = require(Moments.Components.Feed.FeedContext).useFeed
-local useMomentsSession = require(Moments.Stores.GetMomentsStore.MomentsSessionContext).useMomentsSession
+local FeedContext = require(Moments.Components.Feed.FeedContext)
+local useFeed = FeedContext.useFeed
+
+local MomentsSessionContext = require(Moments.Stores.GetMomentsStore.MomentsSessionContext)
+local useMomentsSession = MomentsSessionContext.useMomentsSession
 local GetMomentsPreferencesStore = require(Moments.Stores.GetMomentsPreferencesStore)
 local GetModeratedItemsStore = require(Moments.Stores.GetModeratedItemsStore)
 local GetToastStore = require(Moments.Stores.GetToastStore)
+
 local SignalActionType = require(Moments.Enums.SignalActionType)
-local FFlagMomentsIPReporting = SharedFlags.FFlagMomentsIPReporting
-local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
-local FFlagEnableReportingFlowForMomentsFeed = SharedFlags.FFlagEnableReportingFlowForMomentsFeed
-local FFlagMomentsReportWithFeedId = SharedFlags.FFlagMomentsReportWithFeedId
+local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
+local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
+local defineFastFlag = game:DefineFastFlag("MomentsUseSmallOverflowMenu", false)
+local defineFastFlag2 = game:DefineFastFlag("MomentsReportButtonAnalytics", false)
+local FFlagMomentsCreatorAnalytics = require(Moments.Flags.FFlagMomentsCreatorAnalytics)
+local FFlagMomentsRecommendationContentType = require(Moments.Flags.FFlagMomentsRecommendationContentType)
+local getPostInsightsPageStore = require(Moments.Components.PostInsights.getPostInsightsPageStore)
+local postInsightsStrings = require(Moments.Components.PostInsights.postInsightsStrings)
+local PostInsightsCoachmark = require(Moments.Components.PostInsights.PostInsightsCoachmark)
+local dismissPostInsightsCoachmark = require(Moments.Components.PostInsights.dismissPostInsightsCoachmark)
+local GetFFlagMomentsCoachmarkPersistence = MomentsCommon.Flags.GetFFlagMomentsCoachmarkPersistence
+require(Moments.Components.Feed.Items.Moment.createMomentStore)
 local ReportMomentDialog = require(Moments.Components.Feed.ReportMomentDialog)
-local useMomentsHost = require(Moments.MomentsHostContext).useMomentsHost
+local IpReportConfirmationDialog = require(Moments.Components.Feed.IpReportConfirmationDialog)
+
+local MomentsHostContext = require(Moments.MomentsHostContext)
+local useMomentsHost = MomentsHostContext.useMomentsHost
+
 local LocalPlayer = Players.LocalPlayer
-local t1 = {
+
+local v = {
 	showDetails = "Feature.Moments.Action.ShowDetails",
 	hideDetails = "Feature.Moments.Action.Hide",
 	expand = "Feature.Moments.Action.Expand",
@@ -50,326 +73,573 @@ local t1 = {
 	reportSubmittedBody = "Feature.Moments.Label.ReportSubmittedBody"
 }
 
-return function(t2: {[any]: any}) -- line: 80
-	-- upvalues: useLocalization (copy), t1 (copy), useFeed (copy), useMomentsHost (copy), useToggleState (copy), FFlagMomentsIPReporting (copy), React (copy), useMomentsSession (copy), GetMomentsPreferencesStore (copy), GetModeratedItemsStore (copy), GetToastStore (copy), SignalsReact (copy), fireAnalyticsEvent (copy), EventNames (copy), checkDebugAccess (copy), reportMoment (copy), FFlagMomentsReportWithFeedId (copy), makeRecommendationAttribution (copy), SignalActionType (copy), makeFeedActionFields (copy), MomentsCommon (copy), FFlagEnableReportingFlowForMomentsFeed (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), LocalPlayer (copy), Foundation (copy), Menu (copy), IconButton (copy), ThreeDotsVertical (copy), ReportMomentDialog (copy), View (copy), SpeakerSlash (copy), Speaker (copy)
-	local v41 = useLocalization(t1)
-	local v42 = useFeed()
+return function(props)
+	local v2 = useLocalization(v)
+
+	local text = not FFlagMomentsCreatorAnalytics and "" or useLocalization(postInsightsStrings.MENU_KEYS).analytics
+
+	local v3 = useFeed()
+	local v4 = FFlagMomentsServeEDPVideos and props.moment.entityType == "edpVideo"
+
 	local openMomentsFeedReport = useMomentsHost().openMomentsFeedReport
-	local v44 = useToggleState()
-	local v45 = nil
-	local u46 = nil
+	local v5 = useToggleState()
+	local state, setState = React.useState(false)
+	local state2 = nil
+	local v6 = nil
+	local v7, onCancel, onContinue
 
-	if FFlagMomentsIPReporting then
-		local v47
+	if FFlagMomentsServeEDPVideos then
+		local setState2
+		state2, setState2 = React.useState(false)
+		v6 = setState2
 
-		v45, v47 = React.useState(false)
-		u46 = v47
+		local ref = React.useRef(nil)
+
+		v7 = React.useCallback(function(current)
+			ref.current = current
+			v6(true)
+		end, {})
+
+		onCancel = React.useCallback(function()
+			ref.current = nil
+			v6(false)
+		end, {})
+
+		onContinue = React.useCallback(function()
+			local current = ref.current
+			onCancel()
+
+			if current then
+				current()
+			end
+		end, { onCancel })
+	else
+		v7 = nil
+		onCancel = nil
 	end
 
-	local v48 = React.useCallback(function() -- line: 95
-		-- upvalues: v44 (copy)
-		if v44.enabled then
-			v44.disable()
+	local state3, setState2 = React.useState(false)
+	local state4, setState3 = React.useState("------")
 
-			return
+	local onActivated = React.useCallback(function()
+		if v5.enabled then
+			v5.disable()
+		else
+			v5.enable()
 		end
+	end, { v5.enabled, v5.enable, v5.disable })
 
-		v44.enable()
-	end, {
-		v44.enabled,
-		v44.enable,
-		v44.disable
-	})
-	local v49 = useMomentsSession()
-	local v50 = GetMomentsPreferencesStore(false)
-	local v51 = GetModeratedItemsStore(false)
-	local v52 = GetToastStore(false)
-	local v53 = SignalsReact.useSignalState(v49.getHideDetails)
-	local v54 = SignalsReact.useSignalState(v50.getMinimized)
-	local v55 = React.useCallback(function() -- line: 111
-		-- upvalues: v44 (copy), v49 (copy), fireAnalyticsEvent (copy), EventNames (copy), t2 (copy)
-		v44.disable()
-		v49.toggleFeedDetailVisibility()
+	local v8 = useMomentsSession()
+	local momentsPreferencesStore = GetMomentsPreferencesStore(false)
+	local moderatedItemsStore = GetModeratedItemsStore(false)
+	local toastStore = GetToastStore(false)
+
+	local v9 = SignalsReact.useSignalState(v8.getHideDetails)
+	local v10 = SignalsReact.useSignalState(momentsPreferencesStore.getMinimized)
+
+	local onActivated2 = React.useCallback(function()
+		v5.disable()
+		v8.toggleFeedDetailVisibility()
 		fireAnalyticsEvent(EventNames.FeedHideDetailsButtonPressed, {
-			momentId = t2.moment.momentId
+			momentId = props.moment.momentId
 		})
-	end, {
-		t2.moment,
-		v44.disable,
-		v49.toggleFeedDetailVisibility
-	})
-	local v56 = React.useCallback(function() -- line: 119
-		-- upvalues: v44 (copy), v50 (copy), fireAnalyticsEvent (copy), EventNames (copy), t2 (copy)
-		v44.disable()
-		v50.toggleFeedScaleType()
+	end, { props.moment, v5.disable, v8.toggleFeedDetailVisibility })
+
+	local onActivated3 = React.useCallback(function()
+		v5.disable()
+		momentsPreferencesStore.toggleFeedScaleType()
 		fireAnalyticsEvent(EventNames.FeedMinimizeButtonPressed, {
-			momentId = t2.moment.momentId
+			momentId = props.moment.momentId
 		})
-	end, {
-		t2.moment,
-		v44.disable,
-		v50.toggleFeedScaleType
-	})
-	local v57 = React.useCallback(function() -- line: 127
-		-- upvalues: checkDebugAccess (copy), v50 (copy), v44 (copy)
+	end, { props.moment, v5.disable, momentsPreferencesStore.toggleFeedScaleType })
+
+	local onActivated4 = React.useCallback(function()
 		if checkDebugAccess() then
-			v50.toggleFeedDebugMode()
+			momentsPreferencesStore.toggleFeedDebugMode()
 		end
 
-		v44.disable()
-	end, {
-		v44.disable,
-		v50.toggleFeedDebugMode
-	})
-	local v58 = React.useCallback(function(s1: string?, b1: boolean?, b2: boolean?) -- line: 135
-		-- upvalues: t2 (copy), FFlagMomentsIPReporting (copy), reportMoment (copy), FFlagMomentsReportWithFeedId (copy), makeRecommendationAttribution (copy), v42 (copy), SignalActionType (copy), makeFeedActionFields (copy), MomentsCommon (copy), fireAnalyticsEvent (copy), EventNames (copy), v51 (copy), v52 (copy), v41 (copy)
-		if not t2.moment then
+		v5.disable()
+	end, { v5.disable, momentsPreferencesStore.toggleFeedDebugMode })
+
+	local onSubmitReport = React.useCallback(function(p: string?, flag: boolean?, flag2: boolean?)
+		if not props.moment then
 			return nil
 		end
 
-		local v71 = true
-		local v72 = true
-		local v73 = nil
+		local success, result, v11
 
-		if not b2 then
-			v71, v72, v73 = pcall(function() -- line: 144
-				-- upvalues: FFlagMomentsIPReporting (copy), reportMoment (copy), FFlagMomentsReportWithFeedId (copy), t2 (copy), s1 (copy)
-				if FFlagMomentsIPReporting then
-					return reportMoment((if not FFlagMomentsReportWithFeedId then t2.moment.momentId else t2.moment.recommendationMetadata.feedItemId), s1):await()
-				end
-
-				return reportMoment((if not FFlagMomentsReportWithFeedId then t2.moment.momentId else t2.moment.recommendationMetadata.feedItemId)):await()
+		if flag2 then
+			success = true
+			result = true
+		else
+			success, result, v11 = pcall(function()
+				return reportMoment(props.moment.recommendationMetadata.feedItemId, p):await()
 			end)
 		end
 
-		local recommendationMetadata = t2.moment.recommendationMetadata
-		local v75 = makeRecommendationAttribution(recommendationMetadata)
+		local recommendationMetadata = props.moment.recommendationMetadata
+		local v12
 
-		if v75 then
-			local ok, result = pcall(function() -- line: 170
-				-- upvalues: v42 (copy), SignalActionType (copy), v75 (copy)
-				v42.logAction(SignalActionType.Report, v75, {})
+		if FFlagMomentsRecommendationContentType then
+			v12 = props.contentType
+		end
+
+		local recommendationAttribution = makeRecommendationAttribution(recommendationMetadata, nil, v12)
+
+		if recommendationAttribution then
+			local success2, result2 = pcall(function()
+				v3.logAction(SignalActionType.Report, recommendationAttribution, {})
 			end)
 
-			if not ok then
-				warn("Failed to log action event", result)
+			if not success2 then
+				warn("Failed to log action event", result2)
 			end
 		end
 
-		local v78 = makeFeedActionFields(t2.moment.momentId, recommendationMetadata and recommendationMetadata.feedItemId, recommendationMetadata and recommendationMetadata.tracingId, if not MomentsCommon.Flags.GetFFlagMomentsAnalyticsSchemaIdentity() then nil else "report")
+		local feedActionFields = makeFeedActionFields(
+			props.moment.momentId,
+			recommendationMetadata and recommendationMetadata.feedItemId,
+			recommendationMetadata and recommendationMetadata.tracingId,
+			"report"
+		)
 
-		if v78 then
-			fireAnalyticsEvent(EventNames.FeedAbuseReported, v78)
+		if feedActionFields then
+			fireAnalyticsEvent(EventNames.FeedAbuseReported, feedActionFields)
 		end
 
-		if not b1 then
-			v51.markReported(t2.moment.momentId)
-			v42.removeCurrentItem()
-			v52.triggerToast({
-				title = v41.reportSubmittedTitle,
-				text = v41.reportSubmittedBody
+		if not flag then
+			moderatedItemsStore.markReported(props.moment.momentId)
+			v3.removeCurrentItem()
+
+			toastStore.triggerToast({
+				title = v2.reportSubmittedTitle,
+				text = v2.reportSubmittedBody
 			})
 		end
 
-		if v71 and v72 and type(v73) == "table" then
-			return v73.reportCode
+		if success and result and type(v11) == "table" then
+			return v11.reportCode
 		end
 
 		return nil
 	end, {
-		t2.moment,
-		v42.logAction,
-		v42.removeCurrentItem,
-		v51.markReported,
-		v52.triggerToast,
-		v41
+		props.moment,
+		v3.logAction,
+		v3.removeCurrentItem,
+		moderatedItemsStore.markReported,
+		toastStore.triggerToast,
+		v2
 	})
-	local v59 = React.useCallback(function() -- line: 217
-		-- upvalues: v44 (copy), t2 (copy), FFlagEnableReportingFlowForMomentsFeed (copy), openMomentsFeedReport (copy), v58 (copy), FFlagMomentsIPReporting (copy), u46 (ref)
-		v44.disable()
 
-		local v79 = t2.moment.recommendationMetadata and t2.moment.recommendationMetadata.feedItemId
+	local useCallback = React.useCallback
+	local function fn()
+		v5.disable()
 
-		if FFlagEnableReportingFlowForMomentsFeed and (v79 and v79 ~= "" and openMomentsFeedReport) then
-			openMomentsFeedReport({
-				feedItemId = v79,
-				onSubmit = function() -- line: 226
-					-- upvalues: v58 (copy)
-					v58(nil, false, true)
-				end
-			})
-
-			return
+		if defineFastFlag2 then
+			reportMomentsEngagement("report_click")
 		end
 
-		if FFlagMomentsIPReporting then
-			u46(true)
+		local feedItemId = getPostFeedItemId(props.moment)
 
-			return
+		if FFlagMomentsServeEDPVideos and v4 then
+			feedItemId = props.moment.recommendationMetadata.feedItemId
 		end
 
-		task.spawn(function() -- line: 233
-			-- upvalues: v58 (copy)
-			v58(nil, false)
-		end)
-	end, {
-		v44.disable,
-		v58,
-		openMomentsFeedReport,
-		t2.moment
-	})
-	local v60 = if not FFlagMomentsIPReporting then nil else React.useCallback(function() -- line: 240
-		-- upvalues: u46 (ref)
-		u46(false)
-	end, {})
-	local v61 = React.useCallback(function() -- line: 245
-		-- upvalues: v44 (copy), GetFFlagMomentsAnalyticsSchemaIdentity (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), v49 (copy), t2 (copy)
-		v44.disable()
-
-		local v80 = GetFFlagMomentsAnalyticsSchemaIdentity()
-
-		if FFlagMomentsPassFeedItemIdToBackendApis or v80 then
-			v49.requestDeletion(t2.moment.momentId, t2.moment.recommendationMetadata and t2.moment.recommendationMetadata.feedItemId, if not v80 or not t2.moment.recommendationMetadata then nil else t2.moment.recommendationMetadata.tracingId)
-
-			return
-		end
-
-		v49.requestDeletion(t2.moment.momentId)
-	end, {
-		t2.moment,
-		v44.disable,
-		v49.requestDeletion
-	})
-	local v62 = React.useCallback(function() -- line: 264
-		-- upvalues: t2 (copy)
-		if t2.isDisabled then
-			return
-		end
-
-		t2.playbackVolume.toggle()
-	end, {
-		t2.isDisabled,
-		t2.playbackVolume
-	})
-	local v63 = React.useCallback(function() -- line: 277
-		-- upvalues: t2 (copy), fireAnalyticsEvent (copy), EventNames (copy)
-		if t2.isDisabled then
-			return
-		end
-
-		fireAnalyticsEvent(if not t2.playbackVolume.isMuted then EventNames.FeedMuteButtonPressed else EventNames.FeedUnmuteButtonPressed, {
-			momentId = t2.moment.momentId
-		})
-		t2.playbackVolume.toggle()
-	end, {
-		t2.isDisabled,
-		t2.playbackVolume,
-		t2.moment
-	})
-	local v64 = if not t2.isFeedMuteButtonAnalyticsEnabled then v62 else v63
-	local v65 = React.useMemo(function() -- line: 303
-		-- upvalues: v53 (copy), v41 (copy), v55 (copy), v54 (copy), v56 (copy), t2 (copy), LocalPlayer (copy), FFlagMomentsReportWithFeedId (copy), Foundation (copy), v59 (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), v61 (copy), checkDebugAccess (copy), v57 (copy)
-		local t3 = {
-			{
-				id = "details",
-				icon = not v53 and "icons/actions/viewOff" or "icons/actions/viewOn",
-				text = if not v53 then v41.hideDetails else v41.showDetails,
-				onActivated = v55
-			},
-			{
-				id = "minimize",
-				icon = not v54 and "icons/actions/previewShrink" or "icons/actions/previewExpand",
-				text = if not v54 then v41.minimize else v41.expand,
-				onActivated = v56
+		if feedItemId and openMomentsFeedReport then
+			reportModalCovering.setCovering(true)
+			local v11 = {
+				feedItemId = feedItemId,
+				momentId = props.moment.momentId,
+				universeId = FFlagMomentsServeEDPVideos and (props.moment.metadata.universeId or 0) or nil,
+				onSubmit = function()
+					onSubmitReport(nil, false, true)
+				end,
+				onClose = function()
+					reportModalCovering.setCovering(false)
+				end,
+				onIpReportCode = function(p)
+					onSubmitReport(nil, true, true)
+					setState3((not p or p == "") and "------" or p)
+					setState2(true)
+				end,
+				isEdpVideo = 0,
+				onEdpVideoIpReport = 0
 			}
-		}
-		local v82 = t2.moment.recommendationMetadata ~= nil and (t2.moment.recommendationMetadata.feedItemId ~= nil and t2.moment.recommendationMetadata.feedItemId ~= "")
+			local isEdpVideo
 
-		if t2.moment.creatorId ~= (if not LocalPlayer then nil else LocalPlayer.UserId) and (not FFlagMomentsReportWithFeedId or v82) then
-			table.insert(t3, {
+			if FFlagMomentsServeEDPVideos then
+				isEdpVideo = v4
+			end
+
+			v11.isEdpVideo = isEdpVideo
+			local onEdpVideoIpReport
+
+			if FFlagMomentsServeEDPVideos then
+				onEdpVideoIpReport = v7
+			end
+
+			v11.onEdpVideoIpReport = onEdpVideoIpReport
+			openMomentsFeedReport(v11)
+		else
+			if FFlagMomentsServeEDPVideos and v4 then
+				return
+			end
+
+			setState(true)
+		end
+	end
+
+	local disable = v5.disable
+	local v11
+
+	if FFlagMomentsServeEDPVideos then
+		v11 = v7
+	end
+
+	local moment = props.moment
+	local v12 = if FFlagMomentsServeEDPVideos then v4 else false
+	local onActivated5 = useCallback(fn, {
+		disable,
+		onSubmitReport,
+		openMomentsFeedReport,
+		v11,
+		moment,
+		v12
+	})
+
+	local onClose = React.useCallback(function()
+		setState(false)
+	end, {})
+
+	local onClose2 = React.useCallback(function()
+		if setState2 then
+			setState2(false)
+		end
+	end, {})
+
+	local onActivated6 = React.useCallback(function()
+		v5.disable()
+
+		local requestDeletion = v8.requestDeletion
+		local momentId = props.moment.momentId
+		local feedItemId = props.moment.recommendationMetadata and props.moment.recommendationMetadata.feedItemId
+		local v13
+
+		if props.moment.recommendationMetadata then
+			v13 = props.moment.recommendationMetadata.tracingId
+		end
+
+		requestDeletion(momentId, feedItemId, v13)
+	end, { props.moment, v5.disable, v8.requestDeletion })
+	local onActivated7
+
+	if FFlagMomentsCreatorAnalytics then
+		onActivated7 = React.useCallback(function()
+			v5.disable()
+
+			if GetFFlagMomentsCoachmarkPersistence() then
+				dismissPostInsightsCoachmark()
+			end
+
+			if props.momentStore ~= nil then
+				getPostInsightsPageStore(false).open({
+					moment = props.moment,
+					momentStore = props.momentStore
+				})
+			end
+		end, { props.moment, props.momentStore or false, v5.disable })
+	else
+		onActivated7 = nil
+	end
+
+	local onActivated8 = React.useCallback(function()
+		if props.isDisabled then
+			return
+		end
+
+		props.playbackVolume.toggle()
+	end, { props.isDisabled, props.playbackVolume })
+
+	local v13 = React.useCallback(function()
+		if props.isDisabled then
+			return
+		end
+
+		local v13
+
+		if props.playbackVolume.isMuted then
+			v13 = EventNames.FeedUnmuteButtonPressed
+		else
+			v13 = EventNames.FeedMuteButtonPressed
+		end
+
+		fireAnalyticsEvent(v13, { momentId = props.moment.momentId })
+
+		props.playbackVolume.toggle()
+	end, { props.isDisabled, props.playbackVolume, props.moment })
+
+	if props.isFeedMuteButtonAnalyticsEnabled then
+		onActivated8 = v13
+	end
+
+	local useMemo = React.useMemo
+	local function fn2()
+		local v14 = {
+			id = "details",
+			icon = v9 and "icons/actions/viewOn" or "icons/actions/viewOff",
+			text = 0,
+			onActivated = 0
+		}
+
+		local text2 = if v9 then v2.showDetails else v2.hideDetails
+		v14.text = text2
+		v14.onActivated = onActivated2
+
+		local v15 = {
+			id = "minimize",
+			icon = v10 and "icons/actions/previewExpand" or "icons/actions/previewShrink",
+			text = 0,
+			onActivated = 0
+		}
+
+		local text3 = if v10 then v2.expand else v2.minimize
+		v15.text = text3
+		v15.onActivated = onActivated3
+		local v16 = { v14, v15 }
+		local v17
+
+		if props.moment.recommendationMetadata == nil or props.moment.recommendationMetadata.feedItemId == nil then
+			v17 = false
+		else
+			v17 = props.moment.recommendationMetadata.feedItemId ~= ""
+		end
+
+		if FFlagMomentsServeEDPVideos and v4 then
+			table.insert(v16, {
 				id = "reportAbuse",
 				icon = Foundation.Enums.IconName.Flag,
-				text = v41.report,
-				onActivated = v59
+				text = v2.report,
+				onActivated = onActivated5
 			})
-		elseif not FFlagMomentsPassFeedItemIdToBackendApis or v82 then
-			table.insert(t3, {
-				id = "delete",
-				icon = "icons/actions/delete",
-				text = v41.delete,
-				onActivated = v61
-			})
+		else
+			local creatorId = props.moment.creatorId
+			local v18
+
+			if LocalPlayer then
+				v18 = LocalPlayer.UserId
+			end
+
+			if creatorId == v18 or not v17 then
+				if v17 and (not FFlagMomentsOptimisticProfilePending or props.moment.status ~= "Pending") then
+					table.insert(v16, {
+						id = "delete",
+						icon = "icons/actions/delete",
+						text = v2.delete,
+						onActivated = onActivated6
+					})
+				end
+			else
+				table.insert(v16, {
+					id = "reportAbuse",
+					icon = Foundation.Enums.IconName.Flag,
+					text = v2.report,
+					onActivated = onActivated5
+				})
+			end
+		end
+
+		if FFlagMomentsCreatorAnalytics and props.momentStore ~= nil then
+			local creatorId = props.moment.creatorId
+			local v18
+
+			if LocalPlayer then
+				v18 = LocalPlayer.UserId
+			end
+
+			if creatorId == v18 then
+				table.insert(v16, {
+					id = "postInsights",
+					icon = Foundation.Enums.IconName.ChartThreeVerticalBars,
+					text = text,
+					onActivated = onActivated7
+				})
+			end
 		end
 
 		if checkDebugAccess() then
-			table.insert(t3, {
+			table.insert(v16, {
 				id = "debug",
 				icon = "icons/logo/block",
 				text = "Toggle Debug Mode",
-				onActivated = v57
+				onActivated = onActivated4
 			})
 		end
 
-		return t3
-	end, {
-		t2.moment,
-		v53,
-		v54,
-		v41,
-		v57,
-		v55,
-		v56,
-		v59,
-		v61
-	})
-	local v66 = React.createElement(Menu, {
-		align = Foundation.Enums.PopoverAlign.End,
-		isOpen = v44.enabled,
-		items = v65,
-		onPressedOutside = v44.disable,
-		side = Foundation.Enums.PopoverSide.Left
-	}, {
-		ContextualMenuButton = React.createElement(IconButton, {
-			testId = "FeedContextualMenuButton",
-			icon = ThreeDotsVertical,
-			isDisabled = t2.isDisabled,
-			onActivated = v48,
-			size = Foundation.Enums.InputSize.Large
-		})
-	})
-	local v67 = if not FFlagMomentsIPReporting then nil else React.createElement(ReportMomentDialog, {
-		isOpen = v45,
-		onClose = v60,
-		onSubmitReport = v58
+		return v16
+	end
+
+	local moment2 = props.moment
+	local v14 = if FFlagMomentsServeEDPVideos then v4 else false
+	local v15
+
+	if FFlagMomentsCreatorAnalytics then
+		v15 = props.momentStore or false
+	else
+		v15 = false
+	end
+
+	local v16
+
+	if FFlagMomentsCreatorAnalytics then
+		v16 = onActivated7 or false
+	else
+		v16 = false
+	end
+
+	local v17 = if FFlagMomentsCreatorAnalytics then text else false
+	local items = useMemo(fn2, {
+		moment2,
+		v9,
+		v10,
+		v2,
+		onActivated4,
+		onActivated2,
+		onActivated3,
+		onActivated5,
+		onActivated6,
+		v14,
+		v15,
+		v16,
+		v17
 	})
 
-	if not t2.isFeedMuteEnabled then
-		return React.createElement(View, {
-			tag = "col align-x-center auto-xy",
-			LayoutOrder = t2.layoutOrder
-		}, {
-			ContextMenuPopover = v66,
-			ReportDialog = v67
+	local createElement = React.createElement
+	local v18 = {
+		align = Foundation.Enums.PopoverAlign.End,
+		isOpen = v5.enabled,
+		items = items,
+		onPressedOutside = v5.disable,
+		side = Foundation.Enums.PopoverSide.Left,
+		size = 0
+	}
+	local size
+
+	if defineFastFlag then
+		size = Foundation.Enums.InputSize.Small
+	end
+
+	v18.size = size
+	local element = createElement(Menu, v18, {
+		ContextualMenuButton = React.createElement(IconButton, {
+			icon = ThreeDotsVertical,
+			isDisabled = props.isDisabled,
+			onActivated = onActivated,
+			size = Foundation.Enums.InputSize.Large,
+			testId = "FeedContextualMenuButton"
+		})
+	})
+
+	if FFlagMomentsCreatorAnalytics and GetFFlagMomentsCoachmarkPersistence() and props.momentStore ~= nil then
+		local creatorId = props.moment.creatorId
+		local v19
+
+		if LocalPlayer then
+			v19 = LocalPlayer.UserId
+		end
+
+		if creatorId == v19 then
+			element = React.createElement(
+				PostInsightsCoachmark,
+				{
+					moment = props.moment,
+					momentStore = props.momentStore,
+					isDisabled = props.isDisabled,
+					isMenuOpen = v5.enabled
+				},
+				element
+			)
+		end
+	end
+
+	local element2 = React.createElement(ReportMomentDialog, {
+		isOpen = state,
+		onClose = onClose,
+		onSubmitReport = onSubmitReport
+	})
+	local ipConfirmationDialog
+
+	if state3 then
+		ipConfirmationDialog = React.createElement(IpReportConfirmationDialog, {
+			reportCode = state4,
+			onClose = onClose2
 		})
 	end
 
-	return React.createElement(View, {
-		tag = "col align-x-right auto-xy",
-		LayoutOrder = t2.layoutOrder
-	}, {
-		MuteAndMenuRow = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "row align-x-right align-y-center gap-xsmall auto-xy"
-		}, {
-			FeedMuteButton = React.createElement(IconButton, {
-				testId = "FeedMuteButton",
-				icon = if not t2.playbackVolume.isMuted then Speaker else SpeakerSlash,
-				isDisabled = t2.isDisabled,
-				onActivated = v64,
-				size = Foundation.Enums.InputSize.Medium
-			}),
-			ContextMenuPopover = v66
-		}),
-		ReportDialog = v67
-	})
+	local edpVideoIpReportDialog
+
+	if FFlagMomentsServeEDPVideos and state2 then
+		local createElement2 = React.createElement
+		local EdpVideoIpReportDialog = require(Moments.Components.Feed.EdpVideoIpReportDialog)
+		edpVideoIpReportDialog = createElement2(EdpVideoIpReportDialog, {
+			onCancel = onCancel,
+			onContinue = onContinue
+		})
+	end
+
+	if props.isFeedMuteEnabled then
+		local createElement2 = React.createElement
+		local v19 = { LayoutOrder = props.layoutOrder, tag = "col align-x-right auto-xy" }
+
+		local createElement3 = React.createElement
+
+		local createElement4 = React.createElement
+		local icon
+
+		if props.playbackVolume.isMuted then
+			icon = SpeakerSlash
+		else
+			icon = Speaker
+		end
+
+		local v20 = {
+			MuteAndMenuRow = createElement3(
+				View,
+				{ LayoutOrder = 1, tag = "row align-x-right align-y-center gap-xsmall auto-xy" },
+				{
+					FeedMuteButton = createElement4(IconButton, {
+						icon = icon,
+						isDisabled = props.isDisabled,
+						onActivated = onActivated8,
+						size = Foundation.Enums.InputSize.Medium,
+						testId = "FeedMuteButton"
+					}),
+					ContextMenuPopover = element
+				}
+			),
+			ReportDialog = element2,
+			IpConfirmationDialog = ipConfirmationDialog,
+			EdpVideoIpReportDialog = 0
+		}
+
+		if not FFlagMomentsServeEDPVideos then
+			edpVideoIpReportDialog = nil
+		end
+
+		v20.EdpVideoIpReportDialog = edpVideoIpReportDialog
+		return createElement2(View, v19, v20)
+	else
+		local createElement2 = React.createElement
+		local v19 = { LayoutOrder = props.layoutOrder, tag = "col align-x-center auto-xy" }
+
+		if not FFlagMomentsServeEDPVideos then
+			edpVideoIpReportDialog = nil
+		end
+
+		return createElement2(View, v19, {
+			ContextMenuPopover = element,
+			ReportDialog = element2,
+			IpConfirmationDialog = ipConfirmationDialog,
+			EdpVideoIpReportDialog = edpVideoIpReportDialog
+		})
+	end
 end

@@ -1,11 +1,10 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+local Rodux = require(parent.Rodux)
 
-return require(ParentParent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
-	assert(type(p1) == "number", "Request count must be a number")
+return Rodux.makeActionCreator(script.Name, function(count)
+	assert(type(count) == "number", "Request count must be a number")
 
 	return {
-		payload = {
-			count = p1
-		}
+		payload = { count = count }
 	}
 end)

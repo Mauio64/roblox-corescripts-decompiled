@@ -1,45 +1,78 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local Signals = require(MomentsCreationParent.Signals)
+local parent = MomentsCreation.Parent
+
+local Signals = require(parent.Signals)
 
 require(MomentsCreation.Types.CreationFlowTypes)
 
+local GetFFlagMomentsCreationAccurateDirtyTracking = require(MomentsCreation.Flags.GetFFlagMomentsCreationAccurateDirtyTracking)
+
 local createSignal = Signals.createSignal
 
-local function createEditSession() -- line: 21
-	-- upvalues: createSignal (copy)
-	local v6, v7 = createSignal(nil)
-	local v8, v9 = createSignal(false)
-	local u10 = nil
+local function draftsEqual(items, items2): boolean
+	if items == items2 then
+		return true
+	end
+
+	if type(items) ~= "table" or type(items2) ~= "table" then
+		return false
+	end
+
+	for k, item in items do
+		if items2[k] ~= item then
+			return false
+		end
+	end
+
+	for k, item in items2 do
+		if items[k] ~= item then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function createEditSession()
+	local signal, v = createSignal(nil)
+	local signal2, v2 = createSignal(false)
+	local v3 = nil
+
+	local function begin(p)
+		v3 = p
+		v(p)
+		v2(false)
+	end
+
+	local function update(p)
+		v(p)
+
+		if GetFFlagMomentsCreationAccurateDirtyTracking then
+			v2(not draftsEqual(p, v3))
+		else
+			v2(true)
+		end
+	end
+
+	local function commit()
+		local v4 = signal(false)
+		v3 = v4
+		v2(false)
+		return v4
+	end
+
+	local function discard()
+		v(v3)
+		v2(false)
+	end
 
 	return {
-		getDraft = v6,
-		getIsDirty = v8,
-		begin = function(p1) -- line: 26
-			-- upvalues: u10 (ref), v7 (copy), v9 (copy)
-			u10 = p1
-			v7(p1)
-			v9(false)
-		end,
-		update = function(p2) -- line: 32
-			-- upvalues: v7 (copy), v9 (copy)
-			v7(p2)
-			v9(true)
-		end,
-		commit = function() -- line: 37
-			-- upvalues: v6 (copy), u10 (ref), v9 (copy)
-			local v13 = v6(false)
-
-			u10 = v13
-			v9(false)
-
-			return v13
-		end,
-		discard = function() -- line: 44
-			-- upvalues: v7 (copy), u10 (ref), v9 (copy)
-			v7(u10)
-			v9(false)
-		end
+		getDraft = signal,
+		getIsDirty = signal2,
+		begin = begin,
+		update = update,
+		commit = commit,
+		discard = discard
 	}
 end
 

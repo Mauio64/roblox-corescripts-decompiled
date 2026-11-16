@@ -1,7 +1,9 @@
-local Parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
-local Dash = require(Parent.Dash)
+local parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
 
-return require(Parent.React).createContext({
+local Dash = require(parent.Dash)
+local React = require(parent.React)
+
+return React.createContext({
 	captures = {},
 	capturesPagesIsFinished = Dash.noop,
 	createMoment = Dash.noop,

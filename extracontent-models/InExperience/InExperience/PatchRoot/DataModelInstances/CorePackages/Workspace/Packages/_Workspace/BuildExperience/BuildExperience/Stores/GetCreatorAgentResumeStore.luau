@@ -1,18 +1,19 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function createCreatorAgentResumeStore() -- line: 18
-	-- upvalues: Signals (copy), SignalsReact (copy)
-	local v5, v6 = Signals.createSignal(nil)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local function createCreatorAgentResumeStore()
+	local signal, setActiveTarget = Signals.createSignal(nil)
+
+	local function useActiveTarget()
+		return SignalsReact.useSignalState(signal)
+	end
 
 	return {
-		getActiveTarget = v5,
-		useActiveTarget = function() -- line: 21
-			-- upvalues: SignalsReact (copy), v5 (copy)
-			return SignalsReact.useSignalState(v5)
-		end,
-		setActiveTarget = v6
+		getActiveTarget = signal,
+		useActiveTarget = useActiveTarget,
+		setActiveTarget = setActiveTarget
 	}
 end
 

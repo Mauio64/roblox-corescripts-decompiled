@@ -1,32 +1,47 @@
 local chatConstants = require(script.Parent.chatConstants)
 
-return {
-	getBottomCanvasPosition = function(p1) -- line: 3
-		return (math.max(0, p1.AbsoluteCanvasSize.Y - p1.AbsoluteWindowSize.Y))
-	end,
-	getDistanceFromBottom = function(p2) -- line: 7
-		return (math.max(0, math.max(0, p2.AbsoluteCanvasSize.Y - p2.AbsoluteWindowSize.Y) - p2.CanvasPosition.Y))
-	end,
-	isScrolledToBottom = function(p3) -- line: 11
-		-- upvalues: chatConstants (copy)
-		return math.max(0, math.max(0, p3.AbsoluteCanvasSize.Y - p3.AbsoluteWindowSize.Y) - p3.CanvasPosition.Y) <= chatConstants.BOTTOM_SCROLL_THRESHOLD
-	end,
-	isScrolledToTop = function(p4) -- line: 15
-		return p4.CanvasPosition.Y <= 0
-	end,
-	scrollToBottom = function(p5) -- line: 19
-		p5.CanvasPosition = Vector2.new(0, (math.max(0, p5.AbsoluteCanvasSize.Y - p5.AbsoluteWindowSize.Y)))
-	end,
-	syncScrollFromBottom = function(p6, n1: number) -- line: 24
-		-- upvalues: chatConstants (copy)
-		local v9 = math.max(0, p6.AbsoluteCanvasSize.Y - p6.AbsoluteWindowSize.Y)
+local defineFastInt = game:DefineFastInt("BuildHistoryLoadTriggerViewportHeightPercent", 100)
 
-		if n1 <= chatConstants.BOTTOM_SCROLL_THRESHOLD then
-			p6.CanvasPosition = Vector2.new(0, v9)
+local function getBottomCanvasPosition(p) -- 3 equivalent calls inferred from this helper
+	return (math.max(0, p.AbsoluteCanvasSize.Y - p.AbsoluteWindowSize.Y))
+end
 
-			return
-		end
+local function getDistanceFromBottom(p) -- 1 equivalent call inferred from this helper
+	return (math.max(0, getBottomCanvasPosition(p) - p.CanvasPosition.Y)) -- inferred equivalent call
+end
 
-		p6.CanvasPosition = Vector2.new(0, (math.max(0, v9 - n1)))
+local ChatScroll = {}
+ChatScroll.getBottomCanvasPosition = getBottomCanvasPosition
+ChatScroll.getDistanceFromBottom = getDistanceFromBottom
+
+function ChatScroll.getOffsetInViewport(p, p2)
+	return p2.AbsolutePosition.Y - p.AbsolutePosition.Y
+end
+
+function ChatScroll.isScrolledToBottom(p): boolean
+	return getDistanceFromBottom(p) <= chatConstants.BOTTOM_SCROLL_THRESHOLD -- inferred equivalent call
+end
+
+function ChatScroll.isScrolledToTop(p): boolean
+	return p.CanvasPosition.Y <= 0
+end
+
+function ChatScroll.isScrolledNearTop(p): boolean
+	return p.CanvasPosition.Y / p.AbsoluteWindowSize.Y <= defineFastInt / 100
+end
+
+function ChatScroll.scrollToBottom(p)
+	p.CanvasPosition = Vector2.new(0, getBottomCanvasPosition(p)) -- inferred equivalent call
+end
+
+function ChatScroll.syncScrollFromBottom(p, p2: number)
+	local bottomCanvasPosition = getBottomCanvasPosition(p) -- inferred equivalent call
+
+	if p2 <= chatConstants.BOTTOM_SCROLL_THRESHOLD then
+		p.CanvasPosition = Vector2.new(0, bottomCanvasPosition)
+	else
+		p.CanvasPosition = Vector2.new(0, (math.max(0, bottomCanvasPosition - p2)))
 	end
-}
+end
+
+return ChatScroll

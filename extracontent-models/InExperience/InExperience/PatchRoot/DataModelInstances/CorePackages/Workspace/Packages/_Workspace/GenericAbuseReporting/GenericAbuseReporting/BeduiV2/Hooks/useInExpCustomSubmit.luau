@@ -1,16 +1,15 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Promise = require(GenericAbuseReportingParent.Promise)
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local Promise = require(parent.Promise)
+local React = require(parent.React)
 
 require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
-
 local computeImpactedUserCount = require(GenericAbuseReporting.BeduiV2.Utils.computeImpactedUserCount)
-
 require(GenericAbuseReporting.BeduiV2.Loaders.LoaderContext)
-
 local reportHelper = require(GenericAbuseReporting.BeduiV2.Utils.reportHelper)
-local useVoiceSnapshot = require(GenericAbuseReporting.BeduiV2.Hooks.Enrichment.useVoiceSnapshot).useVoiceSnapshot
+local useVoiceSnapshot = require(GenericAbuseReporting.BeduiV2.Hooks.Enrichment.useVoiceSnapshot)
+local useVoiceSnapshot2 = useVoiceSnapshot.useVoiceSnapshot
 
 require(GenericAbuseReporting.BeduiV2.Utils.appendReportAnythingTags)
 
@@ -19,89 +18,164 @@ local submitChatReport = reportHelper.submitChatReport
 local submitChatReportWithoutMessage = reportHelper.submitChatReportWithoutMessage
 local submitAvatarReport = reportHelper.submitAvatarReport
 local submitPlaceReport = reportHelper.submitPlaceReport
+local UseInExpCustomSubmit = {}
 
-return {
-	REPORT_MESSAGE_NOT_SHOWN_ITEM_ID = "__MSG_NOT_SHOWN_ID",
-	useInExpCustomSubmit = function(t1: {[any]: any}) -- line: 41
-		-- upvalues: useVoiceSnapshot (copy), React (copy), computeImpactedUserCount (copy), submitVoiceReport (copy), Promise (copy), submitChatReportWithoutMessage (copy), submitChatReport (copy), submitAvatarReport (copy), submitPlaceReport (copy)
-		local v14 = useVoiceSnapshot(t1.voiceChatServiceManager)
+function UseInExpCustomSubmit.useInExpCustomSubmit(data)
+	local v = useVoiceSnapshot2(data.voiceChatServiceManager)
 
-		return React.useCallback(function(p1) -- line: 45
-			-- upvalues: v14 (copy), computeImpactedUserCount (copy), t1 (copy), submitVoiceReport (copy), Promise (copy), submitChatReportWithoutMessage (copy), submitChatReport (copy), submitAvatarReport (copy), submitPlaceReport (copy)
-			if not p1.endpoint then
-				error("SubmissionConfig must have an endpoint")
+	return React.useCallback(function(p)
+		if not p.endpoint then
+			error("SubmissionConfig must have an endpoint")
+		end
+
+		if p.endpoint == "voice" then
+			local current = v.current
+			return submitVoiceReport(p, {
+				sortedPlayerListUserIds = current.sortedPlayerListUserIds,
+				channelId = current.channelId,
+				voiceUserCount = current.voiceUserCount,
+				voiceImpactedUserCount = computeImpactedUserCount(data.voiceChatServiceManager, p.data.targetIdStr),
+				menuOpenedUnixMilli = data.menuOpenTimeRef.current
+			})
+		end
+
+		if p.endpoint == "chat" then
+			local inExpChatMessagesLoader = data.inExpChatMessagesLoader
+
+			if not inExpChatMessagesLoader then
+				return Promise.reject("inExpChatMessagesLoader is required for chat reports")
 			end
 
-			if p1.endpoint == "voice" then
-				local current = v14.current
-				local t2 = {
-					sortedPlayerListUserIds = current.sortedPlayerListUserIds,
-					channelId = current.channelId,
-					voiceUserCount = current.voiceUserCount,
-					voiceImpactedUserCount = computeImpactedUserCount(t1.voiceChatServiceManager, p1.data.targetIdStr),
-					menuOpenedUnixMilli = t1.menuOpenTimeRef.current
-				}
+			local textChatMessageId = p.data.custom and p.data.custom.textChatMessageId
 
-				return submitVoiceReport(p1, t2)
+			if textChatMessageId == "__MSG_NOT_SHOWN_ID" then
+				return submitChatReportWithoutMessage(p)
 			end
 
-			if p1.endpoint == "chat" then
-				local inExpChatMessagesLoader = t1.inExpChatMessagesLoader
+			return inExpChatMessagesLoader.fetch({}):andThen(function(options)
+				local eligibleMessages = {}
+				local targetMessages = {}
 
-				if not inExpChatMessagesLoader then
-					return Promise.reject("inExpChatMessagesLoader is required for chat reports")
-				end
+				for _, v2 in ipairs(options or {}) do
+					for _, v3 in ipairs(v2.items or {}) do
+						table.insert(eligibleMessages, {
+							channel = v3.meta.textChannel,
+							messageId = v3.id
+						})
 
-				local v19 = p1.data.custom and p1.data.custom.textChatMessageId
-
-				if v19 == "__MSG_NOT_SHOWN_ID" then
-					return submitChatReportWithoutMessage(p1)
-				end
-
-				return inExpChatMessagesLoader.fetch({}):andThen(function(p2) -- line: 91
-					-- upvalues: v19 (copy), submitChatReport (copy), p1 (copy)
-					local t3 = {}
-					local t4 = {}
-
-					for _, v in ipairs(p2 or {}) do
-						for _, v2 in ipairs(v.items or {}) do
-							table.insert(t3, {
-								channel = v2.meta.textChannel,
-								messageId = v2.id
+						if v3.id == textChatMessageId then
+							table.insert(targetMessages, {
+								channel = v3.meta.textChannel,
+								messageId = v3.id,
+								presetId = v3.meta.presetId,
+								presetChatVersion = v3.meta.presetChatVersion
 							})
-
-							if v2.id == v19 then
-								table.insert(t4, {
-									channel = v2.meta.textChannel,
-									messageId = v2.id,
-									presetId = v2.meta.presetId,
-									presetChatVersion = v2.meta.presetChatVersion
-								})
-							end
 						end
 					end
+				end
 
-					return submitChatReport(p1, {
-						eligibleMessages = t3,
-						targetMessages = t4
-					})
-				end)
-			end
+				return submitChatReport(p, {
+					eligibleMessages = eligibleMessages,
+					targetMessages = targetMessages
+				})
+			end)
+		end
 
-			if p1.endpoint == "avatar" then
-				return submitAvatarReport(p1, t1.reportAnythingSnapshotRef and t1.reportAnythingSnapshotRef.current)
-			end
+		if p.endpoint == "avatar" then
+			return submitAvatarReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
+		end
 
-			if p1.endpoint == "place" then
-				return submitPlaceReport(p1, t1.reportAnythingSnapshotRef and t1.reportAnythingSnapshotRef.current)
-			end
+		if p.endpoint == "place" then
+			return submitPlaceReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
+		end
 
-			return Promise.reject("Unknown in-experience submission endpoint: " .. tostring(p1.endpoint))
-		end, {
-			t1.voiceChatServiceManager,
-			t1.inExpChatMessagesLoader,
-			t1.menuOpenTimeRef,
-			t1.reportAnythingSnapshotRef
+		return Promise.reject("Unknown in-experience submission endpoint: " .. tostring(p.endpoint))
+	end, {
+		data.voiceChatServiceManager,
+		data.inExpChatMessagesLoader,
+		data.menuOpenTimeRef,
+		data.reportAnythingSnapshotRef
+	})
+end
+
+function UseInExpCustomSubmit.useInExpClientActionHandlers(data)
+	local v = useVoiceSnapshot2(data.voiceChatServiceManager)
+
+	local voice = React.useCallback(function(p)
+		local current = v.current
+		return submitVoiceReport(p, {
+			sortedPlayerListUserIds = current.sortedPlayerListUserIds,
+			channelId = current.channelId,
+			voiceUserCount = current.voiceUserCount,
+			voiceImpactedUserCount = computeImpactedUserCount(data.voiceChatServiceManager, p.data.targetIdStr),
+			menuOpenedUnixMilli = data.menuOpenTimeRef.current
 		})
-	end
-}
+	end, { data.voiceChatServiceManager, data.menuOpenTimeRef })
+
+	local chat = React.useCallback(function(p)
+		local inExpChatMessagesLoader = data.inExpChatMessagesLoader
+
+		if not inExpChatMessagesLoader then
+			return Promise.reject("inExpChatMessagesLoader is required for chat reports")
+		end
+
+		local textChatMessageId = p.data.custom and p.data.custom.textChatMessageId
+
+		if textChatMessageId == "__MSG_NOT_SHOWN_ID" then
+			return submitChatReportWithoutMessage(p)
+		end
+
+		return inExpChatMessagesLoader.fetch({}):andThen(function(options)
+			local eligibleMessages = {}
+			local targetMessages = {}
+
+			for _, v2 in ipairs(options or {}) do
+				for _, v3 in ipairs(v2.items or {}) do
+					table.insert(eligibleMessages, {
+						channel = v3.meta.textChannel,
+						messageId = v3.id
+					})
+
+					if v3.id == textChatMessageId then
+						table.insert(targetMessages, {
+							channel = v3.meta.textChannel,
+							messageId = v3.id,
+							presetId = v3.meta.presetId,
+							presetChatVersion = v3.meta.presetChatVersion
+						})
+					end
+				end
+			end
+
+			return submitChatReport(p, {
+				eligibleMessages = eligibleMessages,
+				targetMessages = targetMessages
+			})
+		end)
+	end, { data.inExpChatMessagesLoader })
+
+	local avatar = React.useCallback(function(p)
+		return submitAvatarReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
+	end, { data.reportAnythingSnapshotRef })
+
+	local place = React.useCallback(function(p)
+		return submitPlaceReport(p, data.reportAnythingSnapshotRef and data.reportAnythingSnapshotRef.current)
+	end, { data.reportAnythingSnapshotRef })
+
+	local legacyChat = React.useCallback(function(p)
+		return submitChatReportWithoutMessage(p)
+	end, {})
+
+	return (React.useMemo(function()
+		return {
+			voice = voice,
+			chat = chat,
+			avatar = avatar,
+			place = place,
+			legacyChat = legacyChat
+		}
+	end, { voice, chat, avatar, place, legacyChat }))
+end
+
+UseInExpCustomSubmit.REPORT_MESSAGE_NOT_SHOWN_ITEM_ID = "__MSG_NOT_SHOWN_ID"
+return UseInExpCustomSubmit

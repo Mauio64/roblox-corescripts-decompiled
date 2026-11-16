@@ -1,13 +1,15 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
+local parent = UserList.Parent
+
 local RoduxPresence = require(UserList.Rodux.RoduxPresence)
-local convertActions = require(UserListParent.SocialReducerAdaptors).convertActions
-local presenceActionAdaptor = require(UserListParent.SocialReducerAdaptors).presenceActionAdaptor
-local t1 = {
+local SocialReducerAdaptors = require(parent.SocialReducerAdaptors)
+local convertActions = SocialReducerAdaptors.convertActions
+local SocialReducerAdaptors2 = require(parent.SocialReducerAdaptors)
+local presenceActionAdaptor = SocialReducerAdaptors2.presenceActionAdaptor
+
+return convertActions(RoduxPresence.installReducer(), presenceActionAdaptor(RoduxPresence), {
 	byUserId = {},
 	byGameId = {},
 	byGameInstanceId = {},
 	byPlaceId = {}
-}
-
-return convertActions(RoduxPresence.installReducer(), presenceActionAdaptor(RoduxPresence), t1)
+})

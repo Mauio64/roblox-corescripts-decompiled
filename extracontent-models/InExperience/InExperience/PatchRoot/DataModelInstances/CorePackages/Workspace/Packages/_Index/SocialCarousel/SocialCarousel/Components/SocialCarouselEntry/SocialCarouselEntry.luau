@@ -1,10 +1,14 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local React = require(SocialCarouselParent.React)
-local RoactUtils = require(SocialCarouselParent.RoactUtils)
-local AppEventIngestService = require(SocialCarouselParent.RoactServiceTags).AppEventIngestService
-local RoactAnalytics = require(SocialCarouselParent.RoactServiceTags).RoactAnalytics
-local useRoactService = require(SocialCarouselParent.RobloxAppHooks).useRoactService
+local parent = SocialCarousel.Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppEventIngestService = RoactServiceTags.AppEventIngestService
+local RoactServiceTags2 = require(parent.RoactServiceTags)
+local RoactAnalytics = RoactServiceTags2.RoactAnalytics
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
 local useThrottledCallback = RoactUtils.Hooks.useThrottledCallback
 
 require(SocialCarousel.Common.Enums)
@@ -17,64 +21,96 @@ local useSocialCarouselLoadTimer = require(SocialCarousel.Analytics.useSocialCar
 
 require(SocialCarousel.Analytics.AnalyticsTypes)
 
-local v14 = game:DefineFastInt("FriendCarouselRefreshThrottleInterval", 3)
-local FFlagLuaAppAddSortDataToSocialCarouselClicks = require(SocialCarouselParent.SharedFlags).FFlagLuaAppAddSortDataToSocialCarouselClicks
-local FFlagSocialCarouselShareQREnabled = require(SocialCarouselParent.SharedFlags).FFlagSocialCarouselShareQREnabled
-local FFlagEnableDesktopGameJoinCard = require(SocialCarouselParent.SharedFlags).FFlagEnableDesktopGameJoinCard
+local defineFastInt = game:DefineFastInt("FriendCarouselRefreshThrottleInterval", 3)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSocialCarouselBuildPresence = SharedFlags2.FFlagSocialCarouselBuildPresence
+
 local Carousel = require(SocialCarousel.Components.Carousel)
 
-return function(t1: {[any]: any}) -- line: 54
-	-- upvalues: useRoactService (copy), RoactAnalytics (copy), AppEventIngestService (copy), useSocialCarouselAnalytics (copy), useSocialCarouselLoadTimer (copy), React (copy), useSocialCarouselList (copy), FFlagEnableDesktopGameJoinCard (copy), useSocialCarouselUnifiedLogging (copy), useThrottledCallback (copy), v14 (copy), SocialCarouselContext (copy), FFlagLuaAppAddSortDataToSocialCarouselClicks (copy), FFlagSocialCarouselShareQREnabled (copy), Carousel (copy)
-	local v20 = useRoactService(RoactAnalytics)
-	local v21 = useRoactService(AppEventIngestService)
-	local v22 = useSocialCarouselAnalytics()
-	local v23 = useSocialCarouselLoadTimer(v22.reportLoadingEvent)
-	local v24 = React.useRef(os.clock())
-	local v25 = useSocialCarouselList(t1.roduxKey, t1.customTileList)
-	local v26 = nil
-	local v27 = nil
+return function(props)
+	local appAnalytics = useRoactService(RoactAnalytics)
+	local eventIngest = useRoactService(AppEventIngestService)
+	local v = useSocialCarouselLoadTimer(useSocialCarouselAnalytics().reportLoadingEvent)
+	local ref = React.useRef(os.clock())
+	local v2 = useSocialCarouselList(props.roduxKey, props.customTileList)
 
-	if FFlagEnableDesktopGameJoinCard then
-		v26, v27 = React.useState(nil)
+	local state, setState = React.useState(nil)
+	local state2, setState2
+
+	if FFlagSocialCarouselBuildPresence then
+		state2, setState2 = React.useState(nil)
 	end
 
-	local v28 = useSocialCarouselUnifiedLogging(v20, v21, t1.unifiedLogging, v25, v24)
-	local v29 = useThrottledCallback(function() -- line: 73
-		-- upvalues: v25 (copy)
-		v25.refreshFriendsList()
-	end, v14)
+	local unifiedLogging = useSocialCarouselUnifiedLogging(appAnalytics, eventIngest, props.unifiedLogging, v2, ref)
 
-	React.useEffect(function() -- line: 77
-		-- upvalues: t1 (copy), v29 (copy)
-		if not t1.refreshSignal then
+	local v3 = useThrottledCallback(function()
+		v2.refreshFriendsList()
+	end, defineFastInt)
+
+	React.useEffect(function()
+		if not props.refreshSignal then
 			return
 		end
 
-		t1.refreshSignal:connect(v29)
-	end, { t1.refreshSignal })
+		props.refreshSignal:connect(v3)
+	end, { props.refreshSignal })
 
-	return React.createElement(SocialCarouselContext.Provider, {
-		value = {
-			eventIngest = v21,
-			appAnalytics = v20,
-			hideCarouselHeader = t1.hideCarouselHeader,
-			openGameJoinCardUserId = if not FFlagEnableDesktopGameJoinCard then nil else v26,
-			setOpenGameJoinCardUserId = if not FFlagEnableDesktopGameJoinCard then nil else v27,
-			unifiedLogging = v28,
-			sortAnalyticsData = if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else t1.sortAnalyticsData,
-			friendRequestCount = v25.friendRequestCount,
-			recommendationCount = v25.recommendationCount,
-			friendCount = v25.friendCount,
-			tiles = v25.tiles,
-			isLoading = v25.isLoading,
-			onSuccessfulRender = v23.onSuccessfulRender,
-			selectionOrderBase = t1.selectionOrderBase,
-			source = t1.source,
-			navigateToQRCodePage = if not FFlagSocialCarouselShareQREnabled then nil else t1.navigateToQRCodePage
-		}
-	}, {
+	local createElement = React.createElement
+	local provider = SocialCarouselContext.Provider
+	local v4 = {
+		eventIngest = eventIngest,
+		appAnalytics = appAnalytics,
+		hideCarouselHeader = props.hideCarouselHeader,
+		openGameJoinCardUserId = state,
+		setOpenGameJoinCardUserId = setState,
+		openBuildCardUserId = 0,
+		setOpenBuildCardUserId = 0,
+		unifiedLogging = 0,
+		sortAnalyticsData = 0,
+		friendRequestCount = 0,
+		recommendationCount = 0,
+		friendCount = 0,
+		tiles = 0,
+		isLoading = 0,
+		onSuccessfulRender = 0,
+		selectionOrderBase = 0,
+		source = 0,
+		navigateToQRCodePage = 0
+	}
+
+	if not FFlagSocialCarouselBuildPresence then
+		state2 = nil
+	end
+
+	v4.openBuildCardUserId = state2
+
+	if not FFlagSocialCarouselBuildPresence then
+		setState2 = nil
+	end
+
+	v4.setOpenBuildCardUserId = setState2
+	v4.unifiedLogging = unifiedLogging
+	v4.sortAnalyticsData = props.sortAnalyticsData
+	v4.friendRequestCount = v2.friendRequestCount
+	v4.recommendationCount = v2.recommendationCount
+	v4.friendCount = v2.friendCount
+	v4.tiles = v2.tiles
+	v4.isLoading = v2.isLoading
+	v4.onSuccessfulRender = v.onSuccessfulRender
+	v4.selectionOrderBase = props.selectionOrderBase
+	v4.source = props.source
+	local navigateToQRCodePage
+
+	if FFlagSocialCarouselShareQREnabled then
+		navigateToQRCodePage = props.navigateToQRCodePage
+	end
+
+	v4.navigateToQRCodePage = navigateToQRCodePage
+	return createElement(provider, { value = v4 }, {
 		Carousel = React.createElement(Carousel, {
-			appCompositionEnabled = t1.appCompositionEnabled
+			appCompositionEnabled = props.appCompositionEnabled
 		})
 	})
 end

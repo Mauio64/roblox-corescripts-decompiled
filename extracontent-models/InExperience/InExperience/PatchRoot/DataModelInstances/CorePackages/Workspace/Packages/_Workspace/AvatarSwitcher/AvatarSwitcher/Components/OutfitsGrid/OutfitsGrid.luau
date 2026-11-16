@@ -1,94 +1,91 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
-local React = require(AvatarSwitcherParent.React)
-local Foundation = require(AvatarSwitcherParent.Foundation)
-local useTokens = Foundation.Hooks.useTokens
-local FlatList = require(AvatarSwitcherParent.VirtualizedList).FlatList
-local OutfitsRow = require(AvatarSwitcher.Components.OutfitsRow)
+local parent = AvatarSwitcher.Parent
 
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local VirtualizedList = require(parent.VirtualizedList)
+local FlatList = VirtualizedList.FlatList
+
+local OutfitsRow = require(AvatarSwitcher.Components.OutfitsRow)
 require(AvatarSwitcher.types)
 
-local v8 = game:DefineFastInt("AvatarSwitcherGridWindowSize", 10)
-local v9 = game:DefineFastInt("AvatarSwitcherGridInitialNumToRender", 10)
-local v10 = game:DefineFastInt("AvatarSwitcherGridOnEndReachedThreshold", 200) / 100
-local v11 = not require(AvatarSwitcherParent.AvatarExperienceFlags).FFlagAvatarSwitcherUiFixes and 108 or game:DefineFastInt("AvatarSwitcherTileSize", 98)
+local defineFastInt = game:DefineFastInt("AvatarSwitcherGridWindowSize", 10)
+local defineFastInt2 = game:DefineFastInt("AvatarSwitcherGridInitialNumToRender", 10)
+local onEndReachedThreshold = game:DefineFastInt("AvatarSwitcherGridOnEndReachedThreshold", 200) / 100
 
-local function OutfitsGrid(t1: {[any]: any}) -- line: 35
-	-- upvalues: useTokens (copy), React (copy), OutfitsRow (copy), v11 (copy), Foundation (copy), FlatList (copy), v8 (copy), v9 (copy), v10 (copy)
-	local v14 = useTokens()
-	local v15, v16 = React.useState(3)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local v = not AvatarExperienceFlags.FFlagAvatarSwitcherUiFixes and 108
+	or game:DefineFastInt("AvatarSwitcherTileSize", 98)
 
-	React.useEffect(function() -- line: 40
-		-- upvalues: t1 (copy)
-		task.spawn(function() -- line: 41
-			-- upvalues: t1 (copy)
-			t1.fetchNextOutfitsPage()
+local function OutfitsGrid(props)
+	local v2 = useTokens()
+
+	local state, setState = React.useState(3)
+
+	React.useEffect(function()
+		task.spawn(function()
+			props.fetchNextOutfitsPage()
 		end)
 	end, {})
 
-	local v17 = React.useMemo(function() -- line: 46
-		-- upvalues: t1 (copy), v15 (copy)
-		local t2 = {}
+	local v3 = React.useMemo(function()
+		local result = {}
 
-		for i = 1, #t1.outfits, v15 do
-			table.insert(t2, { unpack(t1.outfits, i, i + v15 - 1) })
+		for i = 1, #props.outfits, state do
+			table.insert(result, { unpack(props.outfits, i, i + state - 1) })
 		end
 
-		return t2
-	end, {
-		t1.outfits,
-		v15
-	})
-	local v18 = React.useCallback(function(p1) -- line: 55
-		-- upvalues: React (copy), OutfitsRow (copy), v15 (copy), t1 (copy)
-		return React.createElement(OutfitsRow, {
-			outfits = p1.item,
-			desiredItemsCount = v15,
-			rowNumber = p1.index,
-			disabled = t1.disabled
-		})
-	end, { v15 })
-	local v19 = React.useCallback(function(p2) -- line: 64
-		-- upvalues: v16 (copy), v11 (copy)
-		local AbsoluteSizeX = p2.AbsoluteSize.X
+		return result
+	end, { props.outfits, state })
 
-		v16((math.max(3, (math.floor(AbsoluteSizeX / v11)))))
+	local renderItem = React.useCallback(function(p)
+		return React.createElement(OutfitsRow, {
+			outfits = p.item,
+			desiredItemsCount = state,
+			rowNumber = p.index,
+			disabled = props.disabled
+		})
+	end, { state })
+
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState((math.max(3, (math.floor(p.AbsoluteSize.X / v)))))
 	end, {})
 
 	return (React.createElement(Foundation.View, {
 		tag = "size-full-full",
-		onAbsoluteSizeChanged = v19,
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
 		padding = {
-			left = UDim.new(0, -v14.Padding.XXSmall),
-			right = UDim.new(0, -v14.Padding.XXSmall)
+			left = UDim.new(0, -v2.Padding.XXSmall),
+			right = UDim.new(0, -v2.Padding.XXSmall)
 		}
 	}, {
 		ClipFrame = React.createElement(Foundation.View, {
 			tag = "size-full-full clip",
 			padding = {
-				top = UDim.new(0, v14.Padding.XXSmall),
-				left = UDim.new(0, v14.Padding.XXSmall),
-				right = UDim.new(0, v14.Padding.XXSmall)
+				top = UDim.new(0, v2.Padding.XXSmall),
+				left = UDim.new(0, v2.Padding.XXSmall),
+				right = UDim.new(0, v2.Padding.XXSmall)
 			}
 		}, {
 			OutfitsList = React.createElement(FlatList, {
-				renderItem = v18,
-				data = v17,
-				onEndReached = t1.fetchNextOutfitsPage,
-				windowSize = v8,
-				initialNumToRender = v9,
-				onEndReachedThreshold = v10,
-				contentContainerStyle = {
-					BackgroundTransparency = 1
-				},
+				renderItem = renderItem,
+				data = v3,
+				onEndReached = props.fetchNextOutfitsPage,
+				windowSize = defineFastInt,
+				initialNumToRender = defineFastInt2,
+				onEndReachedThreshold = onEndReachedThreshold,
+				contentContainerStyle = { BackgroundTransparency = 1 },
 				style = {
 					BackgroundTransparency = 1,
 					ScrollBarThickness = 0,
 					ClipsDescendants = false
 				},
-				ListFooterComponent = not t1.lastPageReached and React.createElement(Foundation.View, {
-					tag = "size-0-full position-top-center padding-small"
-				}, { React.createElement(Foundation.Loading) })
+				ListFooterComponent = not props.lastPageReached and React.createElement(
+					Foundation.View,
+					{ tag = "size-0-full position-top-center padding-small" },
+					{ React.createElement(Foundation.Loading) }
+				)
 			})
 		})
 	}))

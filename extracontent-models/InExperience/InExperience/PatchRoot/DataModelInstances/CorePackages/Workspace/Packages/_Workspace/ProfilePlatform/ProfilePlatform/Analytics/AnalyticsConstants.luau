@@ -4,6 +4,7 @@ return {
 		EditAvatar = "editAvatar",
 		EditLook = "editLook",
 		EditProfile = "editProfile",
+		Call = "callAttempt",
 		Chat = "chatAttempt",
 		OpenEditProfilePage = "OpenEditProfilePage",
 		Unfriend = "unfriend",
@@ -22,10 +23,12 @@ return {
 		ViewFullProfile = "ViewFullProfile",
 		Follow = "Follow",
 		CurrencyTransfer = "CurrencyTransfer",
+		TradeItems = "TradeItems",
 		EditAppearance = "editAppearance",
 		UnlockChat = "unlockChat"
 	},
 	ContextualMenuButtons = {
+		Call = "contextualMenu_call",
 		Chat = "contextualMenu_chat",
 		CopyLink = "contextualMenu_copyLink",
 		IgnoreFriendRequest = "contextualMenu_ignoreFriendRequest",
@@ -41,7 +44,8 @@ return {
 		AddTrustedConnection = "contextualMenu_addTrustedConnection",
 		AddIncomingTrustedConnection = "contextualMenu_addIncomingTrustedConnection",
 		ViewPlatformProfile = "contextualMenu_viewPlatformProfile",
-		CurrencyTransfer = "contextualMenu_currencyTransfer"
+		CurrencyTransfer = "contextualMenu_currencyTransfer",
+		TradeItems = "contextualMenu_tradeItems"
 	},
 	Btns = {
 		Friends = "friends",
@@ -55,6 +59,7 @@ return {
 		EditDisplayName = "editDisplayName",
 		SetAlias = "setAlias",
 		StoreHeader = "storeHeader",
+		CurrentlyWearingHeader = "currentlyWearingHeader",
 		FavoriteExperience = "favoriteExperience",
 		FavoriteExperienceSeeAll = "favoriteExperienceSeeAll",
 		Experience = "experience",
@@ -70,6 +75,8 @@ return {
 		InspectAvatar = "inspectAvatar",
 		InspectAvatarBuyItems = "inspectAvatarBuyItems",
 		InspectAvatarConfirmBuy = "inspectAvatarConfirmBuy",
+		InspectAvatarInsufficientRobux = "inspectAvatarInsufficientRobux",
+		InspectAvatarBuyRobux = "inspectAvatarBuyRobux",
 		MomentsSeeAll = "momentsSeeAll",
 		Moment = "moment"
 	}

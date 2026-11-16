@@ -1,124 +1,140 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local join = require(Parent.Dash).join
-local t1 = {}
-local t4 = {
-	equals = function(t2: {[any]: any}, t3: {[any]: any}) -- line: 26
-		if rawequal(t2, t3) then
-			return true
-		end
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-		return t2.DataModel == t3.DataModel and (t2.PluginType == t3.PluginType and (t2.PluginId == t3.PluginId and (t2.Category == t3.Category and t2.ItemId == t3.ItemId)))
+local Dash = require(parent.Dash)
+local join = Dash.join
+
+local v = {}
+local StudioUri = {}
+
+function StudioUri.equals(data, data2): boolean
+	if rawequal(data, data2) then
+		return true
 	end
-}
 
-t4.RESTRICTED_Mt = table.freeze({
-	__eq = function(t5: {[any]: any}, t6: {[any]: any}) -- line: 39
-		-- upvalues: t4 (copy)
-		return t4.equals(t5, t6)
+	return data.DataModel == data2.DataModel
+		and data.PluginType == data2.PluginType
+		and data.PluginId == data2.PluginId
+		and data.Category == data2.Category
+		and data.ItemId == data2.ItemId
+end
+
+StudioUri.RESTRICTED_Mt = table.freeze({
+	__eq = function(p, p2)
+		return StudioUri.equals(p, p2)
 	end
 })
 
-function t4.wrap(t7: {[any]: any}) -- line: 45
-	-- upvalues: t4 (copy)
-	if table.isfrozen(t7) and getmetatable(t7) == t4.RESTRICTED_Mt then
-		return t7
+function StudioUri.wrap(list)
+	if table.isfrozen(list) and getmetatable(list) == StudioUri.RESTRICTED_Mt then
+		return list
 	end
 
-	if table.isfrozen(t7) then
-		t7 = table.clone(t7)
+	if table.isfrozen(list) then
+		list = table.clone(list)
 	end
 
-	return table.freeze((setmetatable(t7, t4.RESTRICTED_Mt)))
+	return table.freeze((setmetatable(list, StudioUri.RESTRICTED_Mt)))
 end
-function t4.join(t8: {[any]: any}, t9: {[any]: any}) -- line: 57
-	-- upvalues: t4 (copy), join (copy)
-	return t4.wrap(join(t8, t9))
-end
-function t4.toString(t10: {[any]: any}?) -- line: 61
-	-- upvalues: t1 (copy)
-	local t11 = table.create(5)
-	local v14 = t10 or t1
 
-	if not v14 then
+function StudioUri.join(p, p2)
+	return StudioUri.wrap(join(p, p2))
+end
+
+function StudioUri.toString(p)
+	local v2 = table.create(5)
+	local v3 = p or v
+
+	if not v3 then
 		return ""
 	end
 
-	if v14.DataModel then
-		table.insert(t11, `DataModel:{ v14.DataModel }`)
+	if v3.DataModel then
+		table.insert(v2, `DataModel:{v3.DataModel}`)
 	end
 
-	if v14.PluginType then
-		table.insert(t11, `PluginType:{ v14.PluginType }`)
+	if v3.PluginType then
+		table.insert(v2, `PluginType:{v3.PluginType}`)
 	end
 
-	if v14.PluginId then
-		table.insert(t11, `PluginId:{ v14.PluginId }`)
+	if v3.PluginId then
+		table.insert(v2, `PluginId:{v3.PluginId}`)
 	end
 
-	if v14.Category then
-		table.insert(t11, `Category:{ v14.Category }`)
+	if v3.Category then
+		table.insert(v2, `Category:{v3.Category}`)
 	end
 
-	if v14.ItemId then
-		table.insert(t11, `ItemId:{ v14.ItemId }`)
+	if v3.ItemId then
+		table.insert(v2, `ItemId:{v3.ItemId}`)
 	end
 
-	return table.concat(t11, ", ")
+	return table.concat(v2, ", ")
 end
-function t4.child(t12: {[any]: any}, s1: string) -- line: 89
-	-- upvalues: t4 (copy)
-	return t4.join(t12, {
-		ItemId = if not t12.ItemId then s1 else `{ t12.ItemId }/{ s1 }`
-	})
-end
-function t4.isNull(t13: {[any]: any}) -- line: 95
-	return t13.DataModel == "Null"
-end
-function t4.isValid(p1) -- line: 99
-	return type(p1) == "table"
-end
-function t4.isStudioUri(p2) -- line: 105
-	if type(p2) ~= "table" then
-		return false
+
+function StudioUri.child(p, itemId: string)
+	local join2 = StudioUri.join
+
+	if p.ItemId then
+		itemId = `{p.ItemId}/{itemId}`
 	end
 
-	return p2.DataModel ~= nil or (p2.PluginType ~= nil or (p2.PluginId ~= nil or (p2.Category ~= nil or p2.ItemId ~= nil)))
+	return join2(p, { ItemId = itemId })
 end
-function t4.fromAction(s2: string, s3: string) -- line: 116
-	-- upvalues: t4 (copy)
-	return t4.wrap({
+
+function StudioUri.isNull(p): boolean
+	return p.DataModel == "Null"
+end
+
+function StudioUri.isValid(p): boolean
+	return type(p) == "table"
+end
+
+function StudioUri.isStudioUri(data): boolean
+	if type(data) == "table" then
+		return data.DataModel ~= nil
+			or data.PluginType ~= nil
+			or data.PluginId ~= nil
+			or data.Category ~= nil
+			or data.ItemId ~= nil
+	end
+
+	return false
+end
+
+function StudioUri.fromAction(pluginId: string, itemId: string)
+	return StudioUri.wrap({
 		DataModel = "Standalone",
+		PluginId = pluginId,
 		Category = "Actions",
-		PluginId = s2,
-		ItemId = s3
-	})
-end
-function t4.fromSetting(s4: string, s5: string) -- line: 125
-	-- upvalues: t4 (copy)
-	return t4.wrap({
-		DataModel = "Standalone",
-		Category = "Settings",
-		PluginId = s4,
-		ItemId = s5
-	})
-end
-function t4.fromWidget(s6: string, s7: string) -- line: 134
-	-- upvalues: t4 (copy)
-	return t4.wrap({
-		DataModel = "Standalone",
-		Category = "Widgets",
-		PluginId = s6,
-		ItemId = s7
-	})
-end
-function t4.fromPanel(s8: string, s9: string) -- line: 143
-	-- upvalues: t4 (copy)
-	return t4.wrap({
-		DataModel = "Standalone",
-		Category = "Panels",
-		PluginId = s8,
-		ItemId = s9
+		ItemId = itemId
 	})
 end
 
-return t4
+function StudioUri.fromSetting(pluginId: string, itemId: string)
+	return StudioUri.wrap({
+		DataModel = "Standalone",
+		PluginId = pluginId,
+		Category = "Settings",
+		ItemId = itemId
+	})
+end
+
+function StudioUri.fromWidget(pluginId: string, itemId: string)
+	return StudioUri.wrap({
+		DataModel = "Standalone",
+		PluginId = pluginId,
+		Category = "Widgets",
+		ItemId = itemId
+	})
+end
+
+function StudioUri.fromPanel(pluginId: string, itemId: string)
+	return StudioUri.wrap({
+		DataModel = "Standalone",
+		PluginId = pluginId,
+		Category = "Panels",
+		ItemId = itemId
+	})
+end
+
+return StudioUri

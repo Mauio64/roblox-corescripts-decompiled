@@ -1,18 +1,20 @@
 local GameInvite = script:FindFirstAncestor("GameInvite")
-local GameInviteParent = GameInvite.Parent
-local networkImpl = require(GameInvite.GameInviteDependencies).networkImpl
+local parent = GameInvite.Parent
 
+local GameInviteDependencies = require(GameInvite.GameInviteDependencies)
+local networkImpl = GameInviteDependencies.networkImpl
 require(GameInvite.gameInviteModalType)
 
 local GetCanSendAndCanCustomizeInvites = require(GameInvite.Requests.GetCanSendAndCanCustomizeInvites)
-local FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt = require(GameInviteParent.SharedFlags).FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt
 
-return function(p1, n1: number?) -- line: 13
-	-- upvalues: GetCanSendAndCanCustomizeInvites (copy), networkImpl (copy), FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt (copy)
-	local v8, v9 = GetCanSendAndCanCustomizeInvites(networkImpl, p1, n1):await()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt = SharedFlags.FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt
 
-	if v8 and (v9 and v9.responseBody) then
-		return v9.responseBody.canPrompt or false, v9.responseBody.canCustomize or false
+return function(p, p2: number?)
+	local v, v2 = GetCanSendAndCanCustomizeInvites(networkImpl, p, p2):await()
+
+	if v and v2 and v2.responseBody then
+		return v2.responseBody.canPrompt or false, v2.responseBody.canCustomize or false
 	end
 
 	if FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt then

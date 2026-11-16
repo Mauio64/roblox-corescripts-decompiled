@@ -1,4 +1,5 @@
-local CrossExperience = require(script.dependencies).CrossExperience
+local dependencies = require(script.dependencies)
+local crossExperience = dependencies.CrossExperience
 
 require(script.Common.Types)
 
@@ -9,7 +10,7 @@ return {
 	CrossExperienceVoiceAnalytics = require(script.CrossExperienceVoiceAnalytics),
 	CrossExperienceVoiceManager = require(script.CrossExperienceVoiceManager),
 	Hooks = require(script.Hooks),
-	installReducer = CrossExperience.installReducer,
+	installReducer = crossExperience.installReducer,
 	Utils = require(script.Utils),
 	IXPManager = require(script.IXPManager)
 }

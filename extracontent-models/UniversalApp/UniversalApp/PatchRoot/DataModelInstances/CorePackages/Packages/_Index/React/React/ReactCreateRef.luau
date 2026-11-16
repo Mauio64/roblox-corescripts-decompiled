@@ -1,43 +1,74 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local Shared = require(parent.Shared)
 
-require(ParentParent.Shared)
+local enableAllocationTrims = Shared.ReactFeatureFlags.enableAllocationTrims
 
-local lib = require(script.Parent["ReactBinding.roblox"])
+local ReactBindingroblox = require(script.Parent["ReactBinding.roblox"])
 
-return {
-	createRef = function() -- line: 26
-		-- upvalues: lib (copy), ReactGlobals (copy)
-		local v4, _ = lib.create(nil)
-		local t1 = {}
+local ReactCreateRef = {
+	createRef = function()
+		local v, _ = ReactBindingroblox.create(nil)
+
+		local v2 = {}
 
 		if ReactGlobals.__DEV__ then
-			v4._source = debug.traceback("Ref created at:", 1)
+			v._source = debug.traceback("Ref created at:", 1)
 		end
 
-		setmetatable(t1, {
-			__index = function(_, p2) -- line: 44
-				-- upvalues: v4 (copy)
-				if p2 == "current" then
-					return v4:getValue()
+		setmetatable(v2, {
+			__index = function(_, p)
+				if p == "current" then
+					return v:getValue()
 				end
 
-				return v4[p2]
+				return v[p]
 			end,
-			__newindex = function(_, p4, p5) -- line: 51
-				-- upvalues: lib (copy), v4 (copy)
-				if p4 == "current" then
-					lib.update(v4, p5)
+			__newindex = function(_, p, p2)
+				if p == "current" then
+					ReactBindingroblox.update(v, p2)
 				end
 
-				v4[p4] = p5
+				v[p] = p2
 			end,
-			__tostring = function(_) -- line: 62
-				-- upvalues: v4 (copy)
-				return string.format("Ref(%s)", (tostring(v4:getValue())))
+			__tostring = function(_)
+				return string.format("Ref(%s)", (tostring(v:getValue())))
 			end
 		})
 
-		return t1
+		return v2
 	end
 }
+
+local function refNewIndex(p, p2, p3)
+	local __index = getmetatable(p).__index
+	__index[p2] = p3
+
+	if p2 == "current" then
+		ReactBindingroblox.update(__index, p3)
+	end
+end
+
+local function refToString(p)
+	return string.format("Ref(%s)", (tostring(getmetatable(p).__index:getValue())))
+end
+
+local function createRefWithoutClosures()
+	local v
+
+	if ReactGlobals.__DEV__ then
+		v = debug.traceback("Ref created at:", 1)
+	end
+
+	return (setmetatable({}, {
+		__index = ReactBindingroblox.createWithoutUpdater(nil, v),
+		__newindex = refNewIndex,
+		__tostring = refToString
+	}))
+end
+
+if enableAllocationTrims then
+	ReactCreateRef.createRef = createRefWithoutClosures
+end
+
+return ReactCreateRef

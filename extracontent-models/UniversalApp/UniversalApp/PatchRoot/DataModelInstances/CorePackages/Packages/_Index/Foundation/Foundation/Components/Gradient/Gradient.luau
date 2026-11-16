@@ -1,15 +1,15 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-local function Gradient(t1: {[any]: any}) -- line: 11
-	-- upvalues: React (copy)
+local React = require(parent.React)
+
+local function Gradient(p)
 	return React.createElement("UIGradient", {
-		Rotation = t1.fillDirection ~= Enum.FillDirection.Vertical and 0 or 90,
+		Rotation = p.fillDirection == Enum.FillDirection.Vertical and 90 or 0,
 		Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, not t1.top and 1 or 0),
-			NumberSequenceKeypoint.new(0.5, not t1.top and 1 or 0),
-			NumberSequenceKeypoint.new(0.50001, not t1.top and 0 or 1),
-			NumberSequenceKeypoint.new(1, not t1.top and 0 or 1)
+			NumberSequenceKeypoint.new(0, p.top and 0 or 1),
+			NumberSequenceKeypoint.new(0.5, p.top and 0 or 1),
+			NumberSequenceKeypoint.new(0.50001, p.top and 1 or 0),
+			NumberSequenceKeypoint.new(1, p.top and 1 or 0)
 		})
 	})
 end

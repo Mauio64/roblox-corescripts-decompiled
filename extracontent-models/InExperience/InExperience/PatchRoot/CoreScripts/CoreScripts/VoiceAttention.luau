@@ -1,35 +1,26 @@
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
-
 game:GetService("CorePackages")
-
 local RobloxGui = CoreGui.RobloxGui
 local FaceAnimatorService = game:GetService("FaceAnimatorService")
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+VoiceChatServiceManager.default.participantsUpdate.Event:Connect(function(items)
+	for k, item in pairs(items) do
+		local playerByUserId = Players:GetPlayerByUserId(k)
 
-require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default.participantsUpdate.Event:Connect(function(p1) -- line: 14
-	-- upvalues: Players (copy)
-	for k, v in pairs(p1) do
-		local PlayerByUserId = Players:GetPlayerByUserId(k)
-
-		if PlayerByUserId then
-			PlayerByUserId:SetAttribute("RBXAttentionVoiceIsActive", v.isSignalActive)
+		if playerByUserId then
+			playerByUserId:SetAttribute("RBXAttentionVoiceIsActive", item.isSignalActive)
 		end
 	end
 end)
 
-local function setLocalPlayerVideoAnimationEnabled() -- line: 23
-	-- upvalues: Players (copy), FaceAnimatorService (copy)
-	local LocalPlayer = Players.LocalPlayer
+local function setLocalPlayerVideoAnimationEnabled() -- 1 equivalent call inferred from this helper
+	local localPlayer = Players.LocalPlayer
 
-	if LocalPlayer then
-		LocalPlayer:SetAttribute("RBXAttentionVideoAnimationEnabled", FaceAnimatorService.VideoAnimationEnabled)
+	if localPlayer then
+		localPlayer:SetAttribute("RBXAttentionVideoAnimationEnabled", FaceAnimatorService.VideoAnimationEnabled)
 	end
 end
 
-local LocalPlayer = Players.LocalPlayer
-
-if LocalPlayer then
-	LocalPlayer:SetAttribute("RBXAttentionVideoAnimationEnabled", FaceAnimatorService.VideoAnimationEnabled)
-end
-
+setLocalPlayerVideoAnimationEnabled() -- inferred equivalent call
 FaceAnimatorService:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(setLocalPlayerVideoAnimationEnabled)

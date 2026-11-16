@@ -1,3 +1,1 @@
-return {
-	FeedItemId = "feedItemId"
-}
+return { FeedItemId = "feedItemId" }

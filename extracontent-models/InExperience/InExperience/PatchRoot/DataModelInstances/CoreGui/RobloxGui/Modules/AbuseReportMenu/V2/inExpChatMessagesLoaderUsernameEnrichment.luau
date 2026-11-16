@@ -1,47 +1,55 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Promise = require(CorePackages.Packages.Promise)
-local UserProfileStore = require(CorePackages.Workspace.Packages.UserProfiles).Stores.UserProfileStore
+local UserProfiles = require(CorePackages.Workspace.Packages.UserProfiles)
 
-local function collectUserIdsMissingUsername(p1) -- line: 8
-	local t1 = {}
-	local t2 = {}
+local UserProfileStore = UserProfiles.Stores.UserProfileStore
 
-	for _, v10 in p1 do
-		for _, v12 in v10.items do
-			local meta = v12.meta
-			local v14 = meta and meta.userId
-			local v15 = meta and meta.username
+local function collectUserIdsMissingUsername(items)
+	local userIdSet = {}
+	local userIds = {}
 
-			if v14 and v14 ~= "0" and ((not v15 or v15 == "") and not t1[v14]) then
-				t1[v14] = true
-				table.insert(t2, v14)
+	for _, item in items do
+		for _, item2 in item.items do
+			local meta = item2.meta
+			local userId = meta and meta.userId
+			local username = meta and meta.username
+
+			if not userId or userId == "0" or not (not username or username == "") or userIdSet[userId] then
+				continue
 			end
+
+			userIdSet[userId] = true
+			table.insert(userIds, userId)
 		end
 	end
 
-	return t2
+	return userIds
 end
-local function enrichGroupsWithProfileUsernames(p2, p3) -- line: 27
-	local t3 = {}
 
-	for _, v20 in p3 do
-		local v21 = v20.names.getUsername(false)
+local function enrichGroupsWithProfileUsernames(items, data)
+	local usernamesByUserId = {}
 
-		if v21 and #v21 > 0 then
-			t3[v20.userId] = v21
+	for _, item in data do
+		local username = item.names.getUsername(false)
+
+		if username and #username > 0 then
+			usernamesByUserId[item.userId] = username
 		end
 	end
 
-	for _, v23 in p2 do
-		for _, v25 in v23.items do
-			local meta = v25.meta
+	for _, item in items do
+		for _, item2 in item.items do
+			local meta = item2.meta
 
-			if meta and (not meta.username or meta.username == "") then
-				local v27 = t3[meta.userId]
+			if not (meta and (not meta.username or meta.username == "")) then
+				continue
+			end
 
-				if v27 then
-					meta.username = v27
-				end
+			local username = usernamesByUserId[meta.userId]
+
+			if username then
+				meta.username = username
 			end
 		end
 	end
@@ -50,27 +58,20 @@ end
 return {
 	collectUserIdsMissingUsername = collectUserIdsMissingUsername,
 	enrichGroupsWithProfileUsernames = enrichGroupsWithProfileUsernames,
-	enrichMissingUsernames = function(p4) -- line: 50
-		-- upvalues: collectUserIdsMissingUsername (copy), Promise (copy), UserProfileStore (copy), enrichGroupsWithProfileUsernames (copy)
-		local v29 = collectUserIdsMissingUsername(p4)
+	enrichMissingUsernames = function(p)
+		local v = collectUserIdsMissingUsername(p)
 
-		if #v29 == 0 then
-			return Promise.resolve(p4)
+		if #v == 0 then
+			return Promise.resolve(p)
 		end
 
-		return Promise.new(function(resolve) -- line: 56
-			-- upvalues: UserProfileStore (copy), v29 (copy), enrichGroupsWithProfileUsernames (copy), p4 (copy)
-			UserProfileStore.get().fetchNamesByUserIds(v29, function(p5) -- line: 57
-				-- upvalues: enrichGroupsWithProfileUsernames (copy), p4 (copy), resolve (copy)
-				if p5.status == "success" and p5.data then
-					enrichGroupsWithProfileUsernames(p4, p5.data)
-					resolve(p4)
-
-					return
-				end
-
-				if p5.status == "failed" then
-					resolve(p4)
+		return Promise.new(function(callback)
+			UserProfileStore.get().fetchNamesByUserIds(v, function(p2)
+				if p2.status == "success" and p2.data then
+					enrichGroupsWithProfileUsernames(p, p2.data)
+					callback(p)
+				elseif p2.status == "failed" then
+					callback(p)
 				end
 			end)
 		end)

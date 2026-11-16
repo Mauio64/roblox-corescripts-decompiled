@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("PlaceInfoRodux").Parent
+local parent = script:FindFirstAncestor("PlaceInfoRodux").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 6
-	return {
-		placesInfos = p1
-	}
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(placesInfos)
+	return { placesInfos = placesInfos }
 end)

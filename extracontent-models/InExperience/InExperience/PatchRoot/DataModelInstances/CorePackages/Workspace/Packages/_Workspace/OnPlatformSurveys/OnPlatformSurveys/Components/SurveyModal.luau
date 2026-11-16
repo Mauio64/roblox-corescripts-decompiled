@@ -1,66 +1,82 @@
 local OnPlatformSurveys = script:FindFirstAncestor("OnPlatformSurveys")
-local OnPlatformSurveysParent = OnPlatformSurveys.Parent
-local FocusNavigationUtils = require(OnPlatformSurveysParent.FocusNavigationUtils)
-local Foundation = require(OnPlatformSurveysParent.Foundation)
-local React = require(OnPlatformSurveysParent.React)
+local parent = OnPlatformSurveys.Parent
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local DialogSize = Foundation.Enums.DialogSize
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local Sheet = Foundation.Sheet
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
 local useScaledValue = Foundation.Hooks.useScaledValue
+
 local useSurveyFocusRefs = require(OnPlatformSurveys.Hooks.useSurveyFocusRefs)
 
-local function SurveyModal(t1: {[any]: any}) -- line: 29
-	-- upvalues: React (copy), useScaledValue (copy), useSurveyFocusRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), Sheet (copy), DialogSize (copy), FoundationText (copy), View (copy)
-	local v15 = t1.isOpen ~= false
-	local onClose = t1.onClose
-	local v17, v18 = React.useState(0)
-	local v19, v20 = React.useState(0)
-	local v21 = React.useCallback(function(p1) -- line: 35
-		-- upvalues: v18 (copy)
-		v18(p1.AbsoluteSize.Y)
-	end, {})
-	local v22 = React.useCallback(function(p2) -- line: 38
-		-- upvalues: v20 (copy)
-		v20(p2.AbsoluteSize.Y)
-	end, {})
-	local v23 = useScaledValue(116)
-	local v24 = (not t1.children and 0 or v17) + v23 + (not t1.footer and 0 or v19)
-	local v25 = React.useMemo(function() -- line: 47
-		-- upvalues: v24 (copy)
-		return { v24 }
-	end, { v24 })
-	local v26 = useSurveyFocusRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, onClose)
+local function SurveyModal(props)
+	local isOpen = props.isOpen ~= false
+	local onClose = props.onClose
 
-	return React.createElement(Sheet.Root, {
-		preferCenterSheet = true,
-		isOpen = v15,
+	local state, setState = React.useState(0)
+	local state2, setState2 = React.useState(0)
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize.Y)
+	end, {})
+	local onAbsoluteSizeChanged2 = React.useCallback(function(p)
+		setState2(p.AbsoluteSize.Y)
+	end, {})
+
+	local v = useScaledValue(116)
+	local centerSheetHeight = (not props.children and 0 or state) + v + (not props.footer and 0 or state2)
+	local snapPoints = React.useMemo(function()
+		return { centerSheetHeight }
+	end, { centerSheetHeight })
+
+	local ref = useSurveyFocusRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, onClose)
+
+	local createElement = React.createElement
+	local root = Sheet.Root
+	local v2 = {
+		isOpen = isOpen,
 		onClose = onClose,
+		preferCenterSheet = true,
 		size = DialogSize.Large,
-		centerSheetHeight = v24,
-		snapPoints = v25,
-		ref = v26
-	}, {
-		Header = React.createElement(Sheet.Header, {
-			hasCloseAffordance = true
-		}, {
-			Title = t1.title and React.createElement(FoundationText, {
-				tag = "fill auto-y text-heading-small text-wrap text-align-x-left content-emphasis",
-				Text = t1.title
-			}) or nil
-		}),
+		centerSheetHeight = centerSheetHeight,
+		snapPoints = snapPoints,
+		ref = ref
+	}
+
+	local createElement2 = React.createElement
+	local header = Sheet.Header
+	local title
+
+	if props.title then
+		title = React.createElement(Text, {
+				Text = props.title,
+				tag = "fill auto-y text-heading-small text-wrap text-align-x-left content-emphasis"
+			})
+			or nil
+	end
+
+	return createElement(root, v2, {
+		Header = createElement2(header, { hasCloseAffordance = true }, { Title = title }),
 		Content = React.createElement(Sheet.Content, {}, {
-			Body = React.createElement(View, {
-				tag = "col size-full-0 auto-y padding-bottom-small",
-				onAbsoluteSizeChanged = v21
-			}, t1.children)
+			Body = React.createElement(
+				View,
+				{
+					tag = "col size-full-0 auto-y padding-bottom-small",
+					onAbsoluteSizeChanged = onAbsoluteSizeChanged
+				},
+				props.children
+			)
 		}),
-		Actions = t1.footer and React.createElement(Sheet.Actions, {}, {
-			Footer = React.createElement(View, {
-				tag = "row size-full-0 auto-y",
-				onAbsoluteSizeChanged = v22
-			}, t1.footer)
+		Actions = props.footer and React.createElement(Sheet.Actions, {}, {
+			Footer = React.createElement(
+				View,
+				{ tag = "row size-full-0 auto-y", onAbsoluteSizeChanged = onAbsoluteSizeChanged2 },
+				props.footer
+			)
 		}) or nil
 	})
 end

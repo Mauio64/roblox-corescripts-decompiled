@@ -1,108 +1,104 @@
 local CrossExperience = script:FindFirstAncestor("CrossExperience")
 local ExperienceService = game:GetService("ExperienceService")
 local HttpService = game:GetService("HttpService")
-local logEvent = require(CrossExperience.Analytics.CrossExperienceAnalytics).logEvent
+
+local CrossExperienceAnalytics = require(CrossExperience.Analytics.CrossExperienceAnalytics)
+local logEvent = CrossExperienceAnalytics.logEvent
 local Constants = require(CrossExperience.Constants)
 local getMemStorageKey = require(CrossExperience.Utils.getMemStorageKey)
 local EventNames = require(CrossExperience.Analytics.EventNames)
 local Logger = require(CrossExperience.Logger)
-
 require(CrossExperience.Types)
 
-local FFlagFixCrossExperienceVoiceExecutePrint = require(CrossExperience.dependencies).SharedFlags.FFlagFixCrossExperienceVoiceExecutePrint
+local dependencies = require(CrossExperience.dependencies)
+local fFlagFixCrossExperienceVoiceExecutePrint = dependencies.SharedFlags.FFlagFixCrossExperienceVoiceExecutePrint
 
-local function v10() -- line: 21
-end
-local function v11(s1: string, p1, p2: ((...any) -> ...any), p3: ((...any) -> ...any)) -- line: 23
-	-- upvalues: ExperienceService (copy), FFlagFixCrossExperienceVoiceExecutePrint (copy), Logger (copy)
-	local ok, result = pcall(function() -- line: 24
-		-- upvalues: ExperienceService (copy), s1 (copy), p1 (copy), p2 (copy), FFlagFixCrossExperienceVoiceExecutePrint (copy), Logger (copy), p3 (copy)
-		ExperienceService:ExecuteCrossExperienceCall(s1, p1, function(p4) -- line: 25
-			-- upvalues: p2 (copy)
-			if p2 then
-				p2(p4)
+local function fn() end
+
+local function fn2(p: string, p2, callback, callback2)
+	local success, result = pcall(function()
+		ExperienceService:ExecuteCrossExperienceCall(p, p2, function(p3)
+			if callback then
+				callback(p3)
 			end
-		end, function(s2: string) -- line: 29
-			-- upvalues: FFlagFixCrossExperienceVoiceExecutePrint (copy), Logger (copy), p3 (copy)
-			if FFlagFixCrossExperienceVoiceExecutePrint then
-				Logger:warning("Error executing call: {}", s2)
+		end, function(p3: string)
+			if fFlagFixCrossExperienceVoiceExecutePrint then
+				Logger:warning("Error executing call: {}", p3)
 			else
-				print("[CrossExperience] Error executing call", s2)
+				print("[CrossExperience] Error executing call", p3)
 			end
 
-			if p3 then
-				p3(s2)
+			if callback2 then
+				callback2(p3)
 			end
 		end)
 	end)
 
-	if not ok then
-		if FFlagFixCrossExperienceVoiceExecutePrint then
-			Logger:warning("Error executing call pcall: {} {}", s1, result)
+	if not success then
+		if fFlagFixCrossExperienceVoiceExecutePrint then
+			Logger:warning("Error executing call pcall: {} {}", p, result)
 		else
-			print("[CrossExperience] Error executing call pcall", s1, result)
+			print("[CrossExperience] Error executing call pcall", p, result)
 		end
 
-		if p3 then
-			p3("[CrossExperience] Error executing call pcall")
+		if callback2 then
+			callback2("[CrossExperience] Error executing call pcall")
 		end
 	end
 end
-local function v12(p5, p6, p7: ((...any) -> ...any), p8: ((...any) -> ...any)) -- line: 54
-	-- upvalues: getMemStorageKey (copy), Constants (copy), logEvent (copy), EventNames (copy), v11 (copy)
-	local t1 = {
-		eventName = p5.NOTIFY,
+
+local function fn3(p, p2, fn4, fn5)
+	local v = {
+		eventName = p.NOTIFY,
 		clientTimeStamp = os.time(),
 		cevJoinAttemptId = getMemStorageKey(Constants.CEV_JOIN_ATTEMPT_ID_KEY)
 	}
 
-	logEvent(EventNames.NotifyObserver, t1)
-	v11(p5.NOTIFY, p6, p7, p8)
+	logEvent(EventNames.NotifyObserver, v)
+	fn2(p.NOTIFY, p2, fn4, fn5)
 end
-local function v13(p9, p10, p11: ((...any) -> ...any), _: ((...any) -> ...any), p13: ((...any) -> ...any)) -- line: 74
-	-- upvalues: HttpService (copy), logEvent (copy), EventNames (copy), getMemStorageKey (copy), Constants (copy), v11 (copy)
-	local guid = HttpService:GenerateGUID(false)
 
+local function fn4(experienceType, p, callback, _, fn5)
+	local guid = HttpService:GenerateGUID(false)
 	logEvent(EventNames.AddObserver, {
-		eventName = p10.ADD_OBSERVER,
+		eventName = p.ADD_OBSERVER,
 		clientTimeStamp = os.time(),
 		cevJoinAttemptId = getMemStorageKey(Constants.CEV_JOIN_ATTEMPT_ID_KEY)
 	})
-	v11(p10.ADD_OBSERVER, {
-		observerId = guid,
-		experienceType = p9
-	}, p11, p13)
+
+	fn2(p.ADD_OBSERVER, { observerId = guid, experienceType = experienceType }, callback, fn5)
 
 	return guid
 end
-local function v14(p14, p15, s3: string, p16: ((...any) -> ...any), p17: ((...any) -> ...any)) -- line: 99
-	-- upvalues: logEvent (copy), EventNames (copy), getMemStorageKey (copy), Constants (copy), v11 (copy)
+
+local function fn5(experienceType, p, observerId: string, fn6, fn7)
 	logEvent(EventNames.RemoveObserver, {
-		eventName = p15.REMOVE_OBSERVER,
+		eventName = p.REMOVE_OBSERVER,
 		clientTimeStamp = os.time(),
 		cevJoinAttemptId = getMemStorageKey(Constants.CEV_JOIN_ATTEMPT_ID_KEY)
 	})
-	v11(p15.REMOVE_OBSERVER, {
-		observerId = s3,
-		experienceType = p14
-	}, p16, p17)
+
+	fn2(p.REMOVE_OBSERVER, { observerId = observerId, experienceType = experienceType }, fn6, fn7)
 end
 
-return {
-	execute = v11,
-	notify = function(p18, p19) -- line: 70
-		-- upvalues: v12 (copy), v10 (copy)
-		v12(p18, p19, v10, v10)
-	end,
-	notifyWithCallbacks = v12,
-	addObserver = function(p20, p21, p22: ((...any) -> ...any)) -- line: 95
-		-- upvalues: v13 (copy), v10 (copy)
-		return (v13(p20, p21, p22, v10, v10))
-	end,
-	addObserverWithCallbacks = v13,
-	removeObserver = function(p23, p24, s4: string) -- line: 117
-		-- upvalues: v14 (copy), v10 (copy)
-		return v14(p23, p24, s4, v10, v10)
-	end,
-	removeObserverWithCallbacks = v14
-}
+local Communication = {}
+Communication.execute = fn2
+
+function Communication.notify(p, p2)
+	fn3(p, p2, fn, fn)
+end
+
+Communication.notifyWithCallbacks = fn3
+
+function Communication.addObserver(experienceType, p, callback)
+	return fn4(experienceType, p, callback, fn, fn)
+end
+
+Communication.addObserverWithCallbacks = fn4
+
+function Communication.removeObserver(experienceType, p, observerId: string)
+	return fn5(experienceType, p, observerId, fn, fn)
+end
+
+Communication.removeObserverWithCallbacks = fn5
+return Communication

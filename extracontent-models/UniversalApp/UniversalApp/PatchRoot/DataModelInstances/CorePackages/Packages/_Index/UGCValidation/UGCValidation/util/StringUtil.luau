@@ -1,15 +1,15 @@
 return {
-	keysToString = function(t1: {[any]: any}, s1: string, b1: boolean?) -- line: 7
-		local t2 = {}
+	keysToString = function(items, p: string, flag: boolean?)
+		local v = {}
 
-		for v5 in t1 do
-			table.insert(t2, (tostring(v5)))
+		for k in items do
+			table.insert(v, (tostring(k)))
 		end
 
-		if b1 then
-			table.sort(t2)
+		if flag then
+			table.sort(v)
 		end
 
-		return table.concat(t2, s1)
+		return table.concat(v, p)
 	end
 }

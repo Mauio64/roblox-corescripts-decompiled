@@ -1,9 +1,12 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local parent = ProfilePlatform.Parent
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
 local Enums = require(ProfilePlatform.Common.Enums)
-local t1 = {
+
+local v = {
 	[Enums.DisabledReasons.BannedFromCommunity] = TextKeys.BannedFromGroup,
 	[Enums.DisabledReasons.CommunityIsClosed] = TextKeys.GroupClosed,
 	[Enums.DisabledReasons.MaxCommunitiesJoined] = TextKeys.PremiumMaxGroups,
@@ -17,11 +20,12 @@ local t1 = {
 	[Enums.DisabledReasons.InsufficientVerificationLevelLow] = nil
 }
 
-return function(p1) -- line: 24
-	-- upvalues: t1 (copy), useLocalization (copy)
-	local v8 = if not p1 then nil else t1[p1]
+return function(p)
+	local disabledReasonText
 
-	return useLocalization({
-		disabledReasonText = v8
-	}).disabledReasonText
+	if p then
+		disabledReasonText = v[p]
+	end
+
+	return useLocalization({ disabledReasonText = disabledReasonText }).disabledReasonText
 end

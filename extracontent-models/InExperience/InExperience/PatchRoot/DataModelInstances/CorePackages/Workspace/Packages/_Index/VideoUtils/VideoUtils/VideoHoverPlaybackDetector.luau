@@ -1,24 +1,19 @@
 local VideoUtils = script:FindFirstAncestor("VideoUtils")
-local VideoUtilsParent = VideoUtils.Parent
-local React = require(VideoUtilsParent.React)
-local VideoEndReason = require(VideoUtils.Analytics.Enums).VideoEndReason
+local parent = VideoUtils.Parent
 
-local function VideoHoverPlaybackDetector(t1: {[any]: any}) -- line: 14
-	-- upvalues: React (copy), VideoEndReason (copy)
-	React.useEffect(function() -- line: 16
-		-- upvalues: t1 (copy), VideoEndReason (copy)
-		if t1.isHovered then
-			t1.requestVideoPlayback(false)
+local React = require(parent.React)
 
-			return
+local Enums = require(VideoUtils.Analytics.Enums)
+local VideoEndReason = Enums.VideoEndReason
+
+local function VideoHoverPlaybackDetector(data): nil
+	React.useEffect(function()
+		if data.isHovered then
+			data.requestVideoPlayback(false)
+		else
+			data.cancelVideoPlayback(VideoEndReason.Unhovered)
 		end
-
-		t1.cancelVideoPlayback(VideoEndReason.Unhovered)
-	end, {
-		t1.isHovered,
-		t1.requestVideoPlayback,
-		t1.cancelVideoPlayback
-	})
+	end, { data.isHovered, data.requestVideoPlayback, data.cancelVideoPlayback })
 
 	return nil
 end

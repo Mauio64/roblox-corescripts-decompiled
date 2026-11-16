@@ -1,4 +1,4 @@
-local function waitForStylingToBeApplied() -- line: 1
+local function waitForStylingToBeApplied()
 	task.wait()
 	task.wait()
 end

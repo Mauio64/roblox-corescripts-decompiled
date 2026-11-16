@@ -1,37 +1,50 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local getAllInstancesIsA = require(parent.util.getAllInstancesIsA)
 
-local getAllInstancesIsA = require(ParentParent.util.getAllInstancesIsA)
+local getFFlagUGCValidateCurveAnimSingleRoot = require(parent.flags.getFFlagUGCValidateCurveAnimSingleRoot)
 
 return {
-	getData = function(p1) -- line: 17
-		-- upvalues: getAllInstancesIsA (copy)
-		local t1 = {}
+	getData = function(p, p2)
+		local result = {}
 
-		for _, v6 in getAllInstancesIsA(p1, "Animation") do
-			local AnimationId = v6.AnimationId
+		for _, v in getAllInstancesIsA(p, "Animation") do
+			local animationId = v.AnimationId
 
-			if AnimationId == "" then
+			if animationId == "" then
 				continue
 			end
 
-			local ok, result = pcall(function() -- line: 26
-				-- upvalues: AnimationId (copy)
-				return game:GetObjectsAllOrNone(AnimationId)
-			end)
+			local v2 = p2 and p2.preloadedCurveAnimations[animationId]
 
-			if not ok or result == nil then
-				return nil
-			end
+			if v2 then
+				table.insert(result, v2)
+			else
+				local success, result2 = pcall(function()
+					return game:GetObjectsAllOrNone(animationId)
+				end)
 
-			for _, v11 in result do
-				if v11:IsA("CurveAnimation") then
-					table.insert(t1, v11)
+				if not success or result2 == nil then
+					return nil
+				end
+
+				if getFFlagUGCValidateCurveAnimSingleRoot() then
+					if #result2 ~= 1 or not result2[1]:IsA("CurveAnimation") then
+						return nil
+					end
+
+					table.insert(result, result2[1])
+				else
+					for _, curveAnimation in result2 do
+						if curveAnimation:IsA("CurveAnimation") then
+							table.insert(result, curveAnimation)
+						end
+					end
 				end
 			end
 		end
 
-		return t1
+		return result
 	end
 }

@@ -1,12 +1,14 @@
-local Parent = script:FindFirstAncestor("ExperienceLoadingScript").Parent
-local Rodux = require(Parent.Rodux)
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("ExperienceLoadingScript").Parent
 
-return Rodux.makeActionCreator(script.Name, function(p1) -- line: 7
-	-- upvalues: ArgCheck (copy)
-	ArgCheck.isType(p1, "boolean", "SetIsSubjectToChinaPolicies action expects isSubjectToChinaPolicies to be a boolean")
+local Rodux = require(parent.Rodux)
+local ArgCheck = require(parent.ArgCheck)
 
-	return {
-		isSubjectToChinaPolicies = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(isSubjectToChinaPolicies)
+	ArgCheck.isType(
+		isSubjectToChinaPolicies,
+		"boolean",
+		"SetIsSubjectToChinaPolicies action expects isSubjectToChinaPolicies to be a boolean"
+	)
+
+	return { isSubjectToChinaPolicies = isSubjectToChinaPolicies }
 end)

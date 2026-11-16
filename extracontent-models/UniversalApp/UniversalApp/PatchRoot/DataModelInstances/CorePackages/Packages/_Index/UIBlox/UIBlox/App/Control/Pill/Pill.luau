@@ -1,25 +1,30 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Core = ParentParentParent.Core
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local Foundation = require(ParentParentParentParent.Foundation)
-local IconSize = require(ParentParent.ImageSet.Enum.IconSize)
-local getIconSize = require(ParentParent.ImageSet.getIconSize)
-local withStyle = require(Core.Style.withStyle)
-local validateImageSetData = require(Core.ImageSet.Validator.validateImageSetData)
-local ControlState = require(Core.Control.Enum.ControlState)
-local Interactable = require(Core.Control.Interactable)
-local getContentStyle = require(Core.Button.getContentStyle)
-local GenericTextLabel = require(Core.Text.GenericTextLabel.GenericTextLabel)
-local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
-local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
-local GetTextSize = require(ParentParentParent.Core.Text.GetTextSize)
-local v20 = Roact.PureComponent:extend("Pill")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local core = parent2.Core
 
-v20.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local Foundation = require(parent3.Foundation)
+
+local IconSize = require(parent.ImageSet.Enum.IconSize)
+local getIconSize = require(parent.ImageSet.getIconSize)
+local withStyle = require(core.Style.withStyle)
+local validateImageSetData = require(core.ImageSet.Validator.validateImageSetData)
+local ControlState = require(core.Control.Enum.ControlState)
+local Interactable = require(core.Control.Interactable)
+local getContentStyle = require(core.Button.getContentStyle)
+
+local GenericTextLabel = require(core.Text.GenericTextLabel.GenericTextLabel)
+local ImageSetComponent = require(parent2.Core.ImageSet.ImageSetComponent)
+local Skeleton = Foundation.Skeleton
+local Radius = Foundation.Enums.Radius
+local GetTextSize = require(parent2.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent2.Core.Text.GetFontFromFontStyle)
+
+local extended = Roact.PureComponent:extend("Pill")
+
+extended.validateProps = t.strictInterface({
 	text = t.optional(t.string),
 	isSelected = t.optional(t.boolean),
 	isDisabled = t.optional(t.boolean),
@@ -27,79 +32,101 @@ v20.validateProps = t.strictInterface({
 	icon = t.union(t.string, validateImageSetData),
 	onActivated = t.callback
 })
-v20.defaultProps = {
-	text = "",
-	isSelected = false,
-	isDisabled = false,
-	isLoading = false
-}
 
-function v20.init(p1) -- line: 55
-	-- upvalues: ControlState (copy)
-	p1.state = {
-		controlState = ControlState.Initialize
-	}
+extended.defaultProps = { text = "", isSelected = false, isDisabled = false, isLoading = false }
+
+function extended:init()
+	self.state = { controlState = ControlState.Initialize }
 end
-function v20.render(p2) -- line: 61
-	-- upvalues: withStyle (copy), ControlState (copy), getContentStyle (copy), getIconSize (copy), IconSize (copy), GetTextSize (copy), Roact (copy), Interactable (copy), ImageSetComponent (copy), GenericTextLabel (copy), Skeleton (copy), EnumsRadius (copy)
-	return withStyle(function(p3) -- line: 62
-		-- upvalues: p2 (copy), ControlState (copy), getContentStyle (copy), getIconSize (copy), IconSize (copy), GetTextSize (copy), Roact (copy), Interactable (copy), ImageSetComponent (copy), GenericTextLabel (copy), Skeleton (copy), EnumsRadius (copy)
-		local p3Font = p3.Font
-		local isSelected = p2.props.isSelected
-		local isDisabled = p2.props.isDisabled
-		local isLoading = p2.props.isLoading
-		local icon = p2.props.icon
-		local text = p2.props.text
-		local onActivated = p2.props.onActivated
-		local t1 = {
-			[ControlState.Default] = not isSelected and "IconDefault" or "SystemPrimaryContent",
-			[ControlState.Hover] = not isSelected and "IconEmphasis" or "SystemPrimaryContent"
-		}
-		local t2 = {
-			[ControlState.Default] = not isSelected and "TextDefault" or "SystemPrimaryContent",
-			[ControlState.Hover] = not isSelected and "TextEmphasis" or "SystemPrimaryContent"
-		}
-		local t3 = {
-			[ControlState.Default] = not isSelected and "BackgroundUIDefault" or "SystemPrimaryDefault",
-			[ControlState.Hover] = not isSelected and "BackgroundUIDefault" or "SystemPrimaryOnHover"
-		}
-		local v34 = getContentStyle(t1, p2.state.controlState, p3)
-		local v35 = getContentStyle(t2, p2.state.controlState, p3)
-		local v36 = getContentStyle(t3, p2.state.controlState, p3)
-		local v37 = getIconSize(IconSize.Small)
-		local BaseSize = p3Font.BaseSize
-		local v39 = p3Font.CaptionHeader.RelativeSize * BaseSize
-		local X = GetTextSize(text, v39, p3Font.CaptionHeader.Font, Vector2.new(10000, 10000)).X
-		local v41 = X + 24
-		local v42 = 240 - (28 + v37)
 
-		return not isLoading and Roact.createElement(Interactable, {
-			Size = UDim2.new(0, v41 + 4 + v37, 0, 28),
-			BackgroundColor3 = v36.Color,
-			BackgroundTransparency = v36.Transparency,
-			AutoButtonColor = false,
-			BorderSizePixel = 0,
-			LayoutOrder = 1,
-			isDisabled = isDisabled,
-			[Roact.Event.Activated] = not isLoading and onActivated or nil,
-			onStateChanged = function(_, p5) -- line: 106
-				-- upvalues: p2 (copy)
-				p2:setState({
-					controlState = p5
-				})
+function extended.render(object)
+	return withStyle(function(p)
+		local font = p.Font
+
+		local isSelected = object.props.isSelected
+		local isDisabled = object.props.isDisabled
+		local isLoading = object.props.isLoading
+		local icon = object.props.icon
+		local text = object.props.text
+		local onActivated = object.props.onActivated
+
+		local v = {
+			[ControlState.Default] = isSelected and "SystemPrimaryContent" or "IconDefault",
+			[ControlState.Hover] = isSelected and "SystemPrimaryContent" or "IconEmphasis"
+		}
+
+		local v2 = {
+			[ControlState.Default] = isSelected and "SystemPrimaryContent" or "TextDefault",
+			[ControlState.Hover] = isSelected and "SystemPrimaryContent" or "TextEmphasis"
+		}
+
+		local v3 = {
+			[ControlState.Default] = isSelected and "SystemPrimaryDefault" or "BackgroundUIDefault",
+			[ControlState.Hover] = isSelected and "SystemPrimaryOnHover" or "BackgroundUIDefault"
+		}
+
+		local contentStyle = getContentStyle(v, object.state.controlState, p)
+		local contentStyle2 = getContentStyle(v2, object.state.controlState, p)
+		local contentStyle3 = getContentStyle(v3, object.state.controlState, p)
+
+		local iconSize = getIconSize(IconSize.Small)
+		local baseSize = font.BaseSize
+		local v4 = font.CaptionHeader.RelativeSize * baseSize
+
+		local x = GetTextSize(text, v4, GetFontFromFontStyle(font.CaptionHeader), Vector2.new(10000, 10000)).X
+
+		local v5 = x + 24
+		local v6 = 240 - (28 + iconSize)
+
+		if isLoading then
+			return (Roact.createElement(Skeleton, {
+				Size = UDim2.fromOffset(v5 + 4 + iconSize, 28),
+				radius = Radius.Circle
+			}))
+		else
+			local createElement = Roact.createElement
+			local onActivatedsByActivated = {
+				["Size"] = nil,
+				["Size"] = nil,
+				Size = UDim2.new(0, v5 + 4 + iconSize, 0, 28),
+				BackgroundColor3 = contentStyle3.Color,
+				BackgroundTransparency = contentStyle3.Transparency,
+				AutoButtonColor = false,
+				BorderSizePixel = 0,
+				LayoutOrder = 1,
+				isDisabled = isDisabled
+			}
+
+			local activated = Roact.Event.Activated
+
+			if isLoading or not onActivated then
+				onActivated = nil
 			end
-		}, {
-			UIListLayout = Roact.createElement("UIListLayout", {
-				Padding = UDim.new(0, 0),
-				FillDirection = Enum.FillDirection.Horizontal,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center
-			}),
-			Content = Roact.createElement("Frame", {
+
+			onActivatedsByActivated[activated] = onActivated
+			function onActivatedsByActivated.onStateChanged(_, controlState)
+				object:setState({ controlState = controlState })
+			end
+			local children = {
+				UIListLayout = Roact.createElement("UIListLayout", {
+					Padding = UDim.new(0, 0),
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center
+				}),
+				Content = 0,
+				UICorner = 0,
+				UISizeConstraint = 0
+			}
+
+			local createElement2 = Roact.createElement
+			local v7 = {
+				Size = UDim2.new(0, x + 4 + iconSize, 1, 0),
 				ClipsDescendants = true,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0, X + 4 + v37, 1, 0)
-			}, {
+				BackgroundTransparency = 1
+			}
+
+			local v8 = {
 				UIListLayout = Roact.createElement("UIListLayout", {
 					Padding = UDim.new(0, 4),
 					FillDirection = Enum.FillDirection.Horizontal,
@@ -107,48 +134,59 @@ function v20.render(p2) -- line: 61
 					HorizontalAlignment = Enum.HorizontalAlignment.Center
 				}),
 				Icon = Roact.createElement(ImageSetComponent.Label, {
-					BackgroundTransparency = 1,
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					Size = UDim2.fromOffset(v37, v37),
-					Image = icon,
-					ImageColor3 = v34.Color,
-					ImageTransparency = v34.Transparency
-				}),
-				TextArea = string.len(text) > 0 and Roact.createElement("Frame", {
-					LayoutOrder = 2,
+					Size = UDim2.fromOffset(iconSize, iconSize),
 					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(X, v39)
-				}, {
-					PillText = Roact.createElement(GenericTextLabel, {
-						Text = text,
-						BackgroundTransparency = 1,
-						fontStyle = p3Font.CaptionHeader,
-						colorStyle = v35,
-						TextTruncate = Enum.TextTruncate.AtEnd,
-						Size = UDim2.fromOffset(v42, v39),
-						TextXAlignment = Enum.TextXAlignment.Left,
-						TextYAlignment = Enum.TextYAlignment.Center,
-						[Roact.Ref] = p2.PillText
-					}),
-					Roact.createElement("UISizeConstraint", {
-						MaxSize = Vector2.new(v42, 28)
-					})
+					Image = icon,
+					ImageColor3 = contentStyle.Color,
+					ImageTransparency = contentStyle.Transparency
 				}),
-				UISizeConstraint = Roact.createElement("UISizeConstraint", {
-					MaxSize = Vector2.new(216, 28)
-				})
-			}),
-			UICorner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			}),
-			UISizeConstraint = Roact.createElement("UISizeConstraint", {
+				TextArea = 0,
+				UISizeConstraint = 0
+			}
+			local textArea
+
+			if string.len(text) > 0 then
+				textArea = Roact.createElement(
+					"Frame",
+					{ Size = UDim2.fromOffset(x, v4), LayoutOrder = 2, BackgroundTransparency = 1 },
+					{
+						PillText = Roact.createElement(GenericTextLabel, {
+							Text = text,
+							BackgroundTransparency = 1,
+							fontStyle = font.CaptionHeader,
+							colorStyle = contentStyle2,
+							TextTruncate = Enum.TextTruncate.AtEnd,
+							Size = UDim2.fromOffset(v6, v4),
+							TextXAlignment = Enum.TextXAlignment.Left,
+							TextYAlignment = Enum.TextYAlignment.Center,
+							[Roact.Ref] = object.PillText
+						}),
+						Roact.createElement("UISizeConstraint", { MaxSize = Vector2.new(v6, 28) })
+					}
+				)
+			else
+				textArea = false
+			end
+
+			v8.TextArea = textArea
+
+			v8.UISizeConstraint = Roact.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(216, 28)
+			})
+			children.Content = createElement2("Frame", v7, v8)
+
+			children.UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
+
+			children.UISizeConstraint = Roact.createElement("UISizeConstraint", {
 				MaxSize = Vector2.new(240, 28)
 			})
-		}) or Roact.createElement(Skeleton, {
-			Size = UDim2.fromOffset(v41 + 4 + v37, 28),
-			radius = EnumsRadius.Circle
-		})
+			return createElement(Interactable, onActivatedsByActivated, children) or Roact.createElement(Skeleton, {
+				Size = UDim2.fromOffset(v5 + 4 + iconSize, 28),
+				radius = Radius.Circle
+			})
+		end
 	end)
 end
 
-return v20
+return extended

@@ -1,28 +1,33 @@
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local React = require(Parent.React)
-local Style = require(Parent.Style)
-local Foundation = require(Parent.Foundation)
-local Localization = require(Parent.AppLocales).Localization
-local LocalizationProvider = require(Parent.Localization).LocalizationProvider
 
-local function ContextProviders(t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), Foundation (copy), Style (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy)
-	return React.createElement(Foundation.FoundationProvider, {
-		theme = t1.theme,
-		overlayGui = t1.overlayGui
-	}, {
-		AppStyleProvider = React.createElement(Style.AppStyleProvider, {
-			style = {
-				fontName = "Gotham",
-				themeName = t1.theme
-			}
-		}, {
-			LocalizationProvider = React.createElement(LocalizationProvider, {
-				localization = Localization.new(LocalizationService.RobloxLocaleId)
-			}, t1.children)
-		})
-	})
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
+
+local React = require(parent.React)
+local Style = require(parent.Style)
+local Foundation = require(parent.Foundation)
+local AppLocales = require(parent.AppLocales)
+local Localization = AppLocales.Localization
+local Localization2 = require(parent.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+
+local function ContextProviders(props)
+	return React.createElement(
+		Foundation.FoundationProvider,
+		{ colorMode = props.theme, overlayGui = props.overlayGui },
+		{
+			AppStyleProvider = React.createElement(Style.AppStyleProvider, {
+				style = { themeName = props.theme, fontName = "Gotham" }
+			}, {
+				LocalizationProvider = React.createElement(
+					LocalizationProvider,
+					{
+						localization = Localization.new(LocalizationService.RobloxLocaleId)
+					},
+					props.children
+				)
+			})
+		}
+	)
 end
 
 return ContextProviders

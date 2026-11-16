@@ -1,11 +1,11 @@
-local function map(p1, p2) -- line: 4
-	local t1 = {}
+local function map(list, callback)
+	local result = {}
 
-	for i = 1, #p1 do
-		t1[i] = p2(p1[i], i)
+	for i = 1, #list do
+		result[i] = callback(list[i], i)
 	end
 
-	return t1
+	return result
 end
 
 return map

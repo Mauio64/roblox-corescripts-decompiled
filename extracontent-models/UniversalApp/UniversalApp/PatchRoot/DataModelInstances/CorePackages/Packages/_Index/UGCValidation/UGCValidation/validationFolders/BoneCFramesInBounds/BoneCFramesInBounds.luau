@@ -1,66 +1,59 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-require(ParentParent.util.Types)
+local getAllInstancesIsA = require(parent.util.getAllInstancesIsA)
+local R15plusUtils = require(parent.util.R15plusUtils)
+local Vector3Utils = require(parent.util.Vector3Utils)
+local CFrameUtils = require(parent.util.CFrameUtils)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getAllInstancesIsA = require(ParentParent.util.getAllInstancesIsA)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local Vector3Utils = require(ParentParent.util.Vector3Utils)
-local CFrameUtils = require(ParentParent.util.CFrameUtils)
-local t1 = {}
-local v9 = game:DefineFastInt("UGCValidationBoneCFrameBoundsMultiplierHundredths", 110)
-
-t1.categories = {
-	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-	ValidationEnums.UploadCategory.DYNAMIC_HEAD
+local defineFastInt = game:DefineFastInt("UGCValidationBoneCFrameBoundsMultiplierHundredths", 110)
+local BoneCFramesInBounds = {
+	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS, ValidationEnums.UploadCategory.DYNAMIC_HEAD },
+	requiredData = { ValidationEnums.SharedDataMember.rootInstance, ValidationEnums.SharedDataMember.renderMeshesData },
+	fflag = R15plusUtils.checkFlagEnabledForAllowHrd
 }
-t1.requiredData = {
-	ValidationEnums.SharedDataMember.rootInstance,
-	ValidationEnums.SharedDataMember.renderMeshesData
-}
-t1.fflag = R15plusUtils.checkFlagEnabledForAllowHrd
+local v = game:DefineFastInt("UGCValidationMinimumJointDistanceHundredths", 5) / 100
 
-local v10 = game:DefineFastInt("UGCValidationMinimumJointDistanceHundredths", 5) / 100
+function BoneCFramesInBounds.run(object, p)
+	local rootInstance = p.rootInstance
+	local v2 = defineFastInt / 100
 
-function t1.run(p1, p2) -- line: 22
-	-- upvalues: v9 (copy), getAllInstancesIsA (copy), Vector3Utils (copy), ErrorSourceStrings (copy), CFrameUtils (copy), v10 (copy)
-	local rootInstance = p2.rootInstance
-	local v14 = v9 / 100
+	for _, v3 in getAllInstancesIsA(rootInstance, "MeshPart"), nil, nil do
+		local v4 = p.renderMeshesData[v3.Name]
 
-	for _, v16 in (getAllInstancesIsA(rootInstance, "MeshPart")) do
-		local v17 = p2.renderMeshesData[v16.Name]
+		if not v4 then
+			continue
+		end
 
-		if v17 then
-			local v18 = v17.originalSize * v17.scale * v14 / 2
-			local v19 = v16.CFrame:Inverse()
+		local v5 = v4.originalSize * v4.scale * v2 / 2
+		local inverse = v3.CFrame:Inverse()
 
-			for _, v21 in (getAllInstancesIsA(v16, "Bone")) do
-				p1:setReportingInstance(v21)
+		for _, v6 in getAllInstancesIsA(v3, "Bone"), nil, nil do
+			object:setReportingInstance(v6)
+			local position = (inverse * v6.WorldCFrame).Position
 
-				local Position = (v19 * v21.WorldCFrame).Position
+			if not Vector3Utils.isInRange(position, -v5, v5) then
+				object:fail(ErrorSourceStrings.Keys.HrdBone_OutOfBounds, {
+					bonePath = v6:GetFullName(),
+					partName = v3.Name
+				})
+			end
 
-				if not Vector3Utils.isInRange(Position, -v18, v18) then
-					p1:fail(ErrorSourceStrings.Keys.HrdBone_OutOfBounds, {
-						bonePath = v21:GetFullName(),
-						partName = v16.Name
-					})
-				end
+			if not CFrameUtils.fuzzyEq(v6.Transform, CFrame.identity) then
+				object:fail(ErrorSourceStrings.Keys.HrdBone_TransformNotIdentity, {
+					bonePath = v6:GetFullName()
+				})
+			end
 
-				if not CFrameUtils.fuzzyEq(v21.Transform, CFrame.identity) then
-					p1:fail(ErrorSourceStrings.Keys.HrdBone_TransformNotIdentity, {
-						bonePath = v21:GetFullName()
-					})
-				end
-
-				if v21.Parent:IsA("Bone") and v21.Position.Magnitude < v10 then
-					p1:fail(ErrorSourceStrings.Keys.HrdBone_TooCloseToParent, {
-						bonePath = v21:GetFullName()
-					})
-				end
+			if v6.Parent:IsA("Bone") and v6.Position.Magnitude < v then
+				object:fail(ErrorSourceStrings.Keys.HrdBone_TooCloseToParent, {
+					bonePath = v6:GetFullName()
+				})
 			end
 		end
 	end
 end
 
-return t1
+return BoneCFramesInBounds

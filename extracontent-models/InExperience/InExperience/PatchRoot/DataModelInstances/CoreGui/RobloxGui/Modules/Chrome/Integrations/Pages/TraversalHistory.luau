@@ -1,29 +1,27 @@
 local Chrome = script:FindFirstAncestor("Chrome")
 local CorePackages = game:GetService("CorePackages")
+
 local Service = require(Chrome.Service)
 local CommonIcon = require(Chrome.Integrations.CommonIcon)
-local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
-local FFlagChromeActivatedMappedSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeActivatedMappedSignal
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
+
 local InGameMenuIntegrationUtils = require(script.Parent.InGameMenuIntegrationUtils)
-local v8 = InGameMenuIntegrationUtils.createPageOpenSignal("TraversalHistoryPage")
+
+local pageOpenSignal = InGameMenuIntegrationUtils.createPageOpenSignal("TraversalHistoryPage")
 
 return Service:register({
+	initialAvailability = Service.AvailabilitySignal.Available,
 	id = "traversal_history",
 	label = "CoreScripts.TopBar.Traversal.History",
-	initialAvailability = Service.AvailabilitySignal.Available,
-	sideSheetPlacement = SideSheetPlacement.Page,
-	activated = function(_) -- line: 21
-		-- upvalues: InGameMenuIntegrationUtils (copy), v8 (copy)
-		InGameMenuIntegrationUtils.toggleIGMPage("TraversalHistoryPage", v8:get())
+	sideSheetPlacement = SideSheetPlacement.BelowFold,
+	activated = function(_)
+		InGameMenuIntegrationUtils.toggleIGMPage("TraversalHistoryPage", pageOpenSignal:get())
 	end,
-	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 26
-		-- upvalues: v8 (copy)
-		return v8:get()
-	end or v8,
+	isActivated = pageOpenSignal,
 	components = {
-		Icon = function(_) -- line: 30
-			-- upvalues: CommonIcon (copy), v8 (copy)
-			return CommonIcon("Clock", nil, v8)
+		Icon = function(_)
+			return CommonIcon("Clock", nil, pageOpenSignal)
 		end
 	}
 })

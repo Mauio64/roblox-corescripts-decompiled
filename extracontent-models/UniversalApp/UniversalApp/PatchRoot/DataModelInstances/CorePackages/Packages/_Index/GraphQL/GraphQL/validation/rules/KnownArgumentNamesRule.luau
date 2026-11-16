@@ -1,81 +1,93 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local language = ParentParent.language
-local jsutils = ParentParent.jsutils
-local didYouMean = require(jsutils.didYouMean).didYouMean
-local suggestionList = require(jsutils.suggestionList).suggestionList
-local Kind = require(language.kinds).Kind
-local specifiedDirectives = require(ParentParent.type.directives).specifiedDirectives
-local t1 = {}
 
-function t1.KnownArgumentNamesRule(p1) -- line: 31
-	-- upvalues: Object (copy), t1 (copy), Array (copy), suggestionList (copy), GraphQLError (copy), didYouMean (copy)
-	return Object.assign({}, t1.KnownArgumentNamesOnDirectivesRule(p1), {
-		Argument = function(_, p3) -- line: 33
-			-- upvalues: p1 (copy), Array (copy), suggestionList (copy), GraphQLError (copy), didYouMean (copy)
-			local v27 = p1:getArgument()
-			local v28 = p1:getFieldDef()
-			local v29 = p1:getParentType()
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local language = parent.language
+local jsutils = parent.jsutils
+local didYouMean = require(jsutils.didYouMean)
+local didYouMean2 = didYouMean.didYouMean
+local suggestionList = require(jsutils.suggestionList)
+local suggestionList2 = suggestionList.suggestionList
+local kinds = require(language.kinds)
+local kind = kinds.Kind
+local directives = require(parent.type.directives)
+local specifiedDirectives = directives.specifiedDirectives
 
-			if not v27 and (v28 and v29) then
-				local value = p3.name.value
-				local v31 = Array.map(v28.args, function(p4) -- line: 40
-					return p4.name
-				end)
-				local v32 = suggestionList(value, v31)
+local KnownArgumentNamesRule = {}
 
-				p1:reportError(GraphQLError.new(("Unknown argument \"%s\" on field \"%s.%s\"."):format(value, v29.name, v28.name) .. didYouMean(v32), p3))
+function KnownArgumentNamesRule.KnownArgumentNamesRule(object)
+	return Object.assign({}, KnownArgumentNamesRule.KnownArgumentNamesOnDirectivesRule(object), {
+		Argument = function(_, p)
+			local argument = object:getArgument()
+			local fieldDef = object:getFieldDef()
+			local parentType = object:getParentType()
+
+			if not argument and fieldDef and parentType then
+				local value = p.name.value
+				local v = suggestionList2(value, (Array.map(fieldDef.args, function(p2)
+					return p2.name
+				end)))
+				object:reportError(graphQLError.new(
+					("Unknown argument \"%s\" on field \"%s.%s\"."):format(value, parentType.name, fieldDef.name) .. didYouMean2(v),
+					p
+				))
 			end
 		end
 	})
 end
-function t1.KnownArgumentNamesOnDirectivesRule(p5) -- line: 62
-	-- upvalues: specifiedDirectives (copy), Array (copy), Kind (copy), suggestionList (copy), GraphQLError (copy), didYouMean (copy)
-	local t2 = {}
-	local v17 = p5:getSchema()
-	local v18 = specifiedDirectives
 
-	if v17 then
-		v18 = v17:getDirectives()
+function KnownArgumentNamesRule.KnownArgumentNamesOnDirectivesRule(object)
+	local values = {}
+
+	local schema = object:getSchema()
+	local v = specifiedDirectives
+
+	if schema then
+		v = schema:getDirectives()
 	end
 
-	for _, v in ipairs(v18) do
-		t2[v.name] = Array.map(v.args, function(p6) -- line: 71
-			return p6.name
+	for _, v2 in ipairs(v) do
+		values[v2.name] = Array.map(v2.args, function(p)
+			return p.name
 		end)
 	end
 
-	local definitions = p5:getDocument().definitions
+	local definitions = object:getDocument().definitions
 
-	for _, v in ipairs(definitions) do
-		if v.kind == Kind.DIRECTIVE_DEFINITION then
-			local v24 = v.arguments or {}
-
-			t2[v.name.value] = Array.map(v24, function(p7) -- line: 82
-				return p7.name.value
-			end)
+	for _, definition in ipairs(definitions) do
+		if definition.kind ~= kind.DIRECTIVE_DEFINITION then
+			continue
 		end
+
+		local arguments = definition.arguments or {}
+
+		values[definition.name.value] = Array.map(arguments, function(p)
+			return p.name.value
+		end)
 	end
 
 	return {
-		Directive = function(_, p9) -- line: 89
-			-- upvalues: t2 (copy), Array (copy), suggestionList (copy), p5 (copy), GraphQLError (copy), didYouMean (copy)
-			local value = p9.name.value
-			local v38 = t2[value]
+		Directive = function(_, p): boolean
+			local value = p.name.value
+			local v2 = values[value]
 
-			if p9.arguments and v38 then
-				for _, v in ipairs(p9.arguments) do
-					local value2 = v.name.value
+			if p.arguments and v2 then
+				for _, argument in ipairs(p.arguments) do
+					local value2 = argument.name.value
 
-					if Array.indexOf(v38, value2) == -1 then
-						local v42 = suggestionList(value2, v38)
-
-						p5:reportError(GraphQLError.new(("Unknown argument \"%s\" on directive \"@%s\"."):format(value2, value) .. didYouMean(v42), v))
+					if Array.indexOf(v2, value2) ~= -1 then
+						continue
 					end
+
+					local v3 = suggestionList2(value2, v2)
+					object:reportError(graphQLError.new(
+						("Unknown argument \"%s\" on directive \"@%s\"."):format(value2, value) .. didYouMean2(v3),
+						argument
+					))
 				end
 			end
 
@@ -84,4 +96,4 @@ function t1.KnownArgumentNamesOnDirectivesRule(p5) -- line: 62
 	}
 end
 
-return t1
+return KnownArgumentNamesRule

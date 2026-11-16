@@ -1,66 +1,48 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Dash = require(scriptParentParent.Dash)
-local Roact = require(scriptParentParent.Roact)
-local SocialTestHelpers = require(scriptParentParent.Dev.SocialTestHelpers)
-local UIBlox = require(scriptParentParent.UIBlox)
-local RobloxAppUIBloxConfig = require(scriptParentParent.Dev.RobloxAppUIBloxConfig)
-local CapturesContext = require(scriptParent.Context.CapturesContext)
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local Dash = require(parent2.Dash)
+local Roact = require(parent2.Roact)
+local SocialTestHelpers = require(parent2.Dev.SocialTestHelpers)
+local UIBlox = require(parent2.UIBlox)
+local RobloxAppUIBloxConfig = require(parent2.Dev.RobloxAppUIBloxConfig)
+
+local CapturesContext = require(parent.Context.CapturesContext)
 local mockLocale = SocialTestHelpers.StoryHelpers.mockLocale
 
 UIBlox.init(RobloxAppUIBloxConfig)
 
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 
-Roact.setGlobalConfig({
-	elementTracing = true
-})
+Roact.setGlobalConfig({ elementTracing = true })
 
-local t1 = {
-	Default = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Light = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Dark = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	}
-}
-local t2 = {
-	language = "en-us"
+local v = {
+	Default = { themeName = "Light", fontName = "Gotham" },
+	Light = { themeName = "Light", fontName = "Gotham" },
+	Dark = { themeName = "Dark", fontName = "Gotham" }
 }
 
-return {
-	name = "CapturesInExperience",
-	storyRoot = scriptParent,
-	roact = Roact,
-	mapDefinition = function(p1) -- line: 45
-		-- upvalues: Dash (copy), t2 (copy)
-		local v14 = Dash.join(t2, p1.controls)
+local v2 = { language = "en-us" }
+local Storybook = {}
+Storybook.name = "CapturesInExperience"
+Storybook.storyRoot = parent
+Storybook.roact = Roact
 
-		return Dash.join(p1, {
-			controls = v14
+function Storybook.mapDefinition(p)
+	local joined = Dash.join(v2, p.controls)
+	return Dash.join(p, { controls = joined })
+end
+
+function Storybook.mapStory(p)
+	return function(p2)
+		return Roact.createElement(CapturesContext.Provider, {
+			value = { fireAnalyticsEvent = Dash.noop }
+		}, {
+			Element = Roact.createElement(AppStyleProvider, {
+				style = p2 and v[p2.theme] or v.Default
+			}, { Child = mockLocale(p, p2) })
 		})
-	end,
-	mapStory = function(p2) -- line: 49
-		-- upvalues: Roact (copy), CapturesContext (copy), Dash (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy)
-		return function(p3) -- line: 50
-			-- upvalues: Roact (copy), CapturesContext (copy), Dash (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy), p2 (copy)
-			return Roact.createElement(CapturesContext.Provider, {
-				value = {
-					fireAnalyticsEvent = Dash.noop
-				}
-			}, {
-				Element = Roact.createElement(AppStyleProvider, {
-					style = p3 and t1[p3.theme] or t1.Default
-				}, {
-					Child = mockLocale(p2, p3)
-				})
-			})
-		end
 	end
-}
+end
+
+return Storybook

@@ -1,5 +1,5 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
 local getEventManager = require(script.Parent.getEventManager)
@@ -7,163 +7,133 @@ local getChildRouter = require(script.Parent.getChildRouter)
 local getNavigationActionCreators = require(script.Parent.routers.getNavigationActionCreators)
 local getChildrenNavigationCache = require(script.Parent.getChildrenNavigationCache)
 
-local function createParamGetter(p1) -- line: 12
-	return function(p2, p3) -- line: 13
-		-- upvalues: p1 (copy)
-		local params = p1.params
+local function createParamGetter(route) -- 2 equivalent calls inferred from this helper
+	return function(p, p2)
+		local params = route.params
 
-		if params and params[p2] ~= nil then
-			return params[p2]
+		if params and params[p] ~= nil then
+			return params[p]
 		end
 
-		return p3
+		return p2
 	end
 end
-local function getChildNavigation(p4, p5, p6) -- line: 24
-	-- upvalues: getChildrenNavigationCache (copy), Array (copy), getChildRouter (copy), Object (copy), getNavigationActionCreators (copy), getChildNavigation (copy), getEventManager (copy)
-	local v15 = getChildrenNavigationCache(p4)
-	local v16 = Array.findIndex(p4.state.routes, function(p7) -- line: 27
-		-- upvalues: p5 (copy)
-		return p7.key == p5
+
+local function getChildNavigation(data, p, fn)
+	local childrenNavigationCache = getChildrenNavigationCache(data)
+
+	local index = Array.findIndex(data.state.routes, function(p2): boolean
+		return p2.key == p
 	end)
 
-	if v16 < 1 then
+	if index < 1 then
 		return nil
 	end
 
-	local v17 = p4.state.routes[v16]
-	local v18 = v15[p5]
+	local route = data.state.routes[index]
 
-	if v18 and v17 == v18.state then
-		return v18
+	local v = childrenNavigationCache[p]
+
+	if v and v.state == route then
+		return v
 	end
 
-	local v19 = getChildRouter(p4.router, v17.routeName)
-	local v20 = nil
+	local childRouter = getChildRouter(data.router, route.routeName)
+	local v2
 
-	if v17.routes and type(v17.index) == "number" then
-		v20 = v17.routes[v17.index]
+	if route.routes and type(route.index) == "number" then
+		v2 = route.routes[route.index]
 	end
 
-	local v21 = v19 and v19.getActionCreators(v20, v17.key) or {}
-	local v22 = Object.assign(if not p4.actions then {} else table.clone(p4.actions), p4.router.getActionCreators(v17, p4.state.key) or {}, v21 or {}, getNavigationActionCreators(v17) or {})
-	local t1 = {}
+	local v3 = childRouter and childRouter.getActionCreators(v2, route.key) or {}
 
-	for v24, v25 in v22 do
-		t1[v24] = function(...) -- line: 66
-			-- upvalues: v25 (copy), p4 (copy)
-			local v35 = v25(...)
+	local actions = Object.assign(
+		not data.actions and {} or table.clone(data.actions),
+		data.router.getActionCreators(route, data.state.key) or {},
+		v3 or {},
+		getNavigationActionCreators(route) or {}
+	)
 
-			return p4.dispatch(v35)
+	local v4 = {}
+
+	for k, v5 in actions do
+		v4[k] = function(...)
+			local v6 = v5(...)
+			return data.dispatch(v6)
 		end
 	end
 
-	local u26 = true
-	local v27 = p6()
+	local v5 = fn()
 
-	if v27 then
-		u26 = Array.indexOf(v27.state.routes, v17) == 1
-	end
+	local v6 = not v5 or Array.indexOf(v5.state.routes, route) == 1
 
-	if v18 and v18.isFirstRouteInParent() == u26 then
-		local u28 = nil
+	if v and v.isFirstRouteInParent() == v6 then
+		local v7 = nil
+		v7 = Object.assign(table.clone(v), v4, {
+			state = route,
+			router = childRouter,
+			actions = actions,
+			getParam = createParamGetter(route), -- inferred equivalent call
+			getChildNavigation = function(p2)
+				return getChildNavigation(v7, p2, function()
+					local v8 = fn()
 
-		u28 = Object.assign(table.clone(v18), t1, {
-			state = v17,
-			router = v19,
-			actions = v22,
-			getParam = function(p8, p9) -- line: 13
-				-- upvalues: v17 (copy)
-				local params = v17.params
-
-				if params and params[p8] ~= nil then
-					return params[p8]
-				end
-
-				return p9
-			end,
-			getChildNavigation = function(p10) -- line: 88
-				-- upvalues: getChildNavigation (copy), u28 (ref), p6 (copy), p5 (copy)
-				return getChildNavigation(u28, p10, function() -- line: 89
-					-- upvalues: p6 (copy), p5 (copy)
-					local v46 = p6()
-
-					if v46 then
-						return (v46.getChildNavigation(p5))
+					if v8 then
+						return (v8.getChildNavigation(p))
 					end
 
 					return nil
 				end)
 			end
 		})
-		v15[p5] = u28
 
-		return u28
-	end
+		childrenNavigationCache[p] = v7
 
-	local v29 = getEventManager(p5)
-	local u30 = nil
+		return v7
+	else
+		local eventManager = getEventManager(p)
 
-	u30 = Object.assign(table.clone(t1), {
-		state = v17,
-		router = v19,
-		actions = v22,
-		getParam = function(p11, p12) -- line: 13
-			-- upvalues: v17 (copy)
-			local params = v17.params
+		local v7 = nil
+		v7 = Object.assign(table.clone(v4), {
+			state = route,
+			router = childRouter,
+			actions = actions,
+			getParam = createParamGetter(route), -- inferred equivalent call
+			getChildNavigation = function(p2)
+				return getChildNavigation(v7, p2, function()
+					local v8 = fn()
 
-			if params and params[p11] ~= nil then
-				return params[p11]
-			end
+					if v8 then
+						return (v8.getChildNavigation(p))
+					end
 
-			return p12
-		end,
-		getChildNavigation = function(p13) -- line: 109
-			-- upvalues: getChildNavigation (copy), u30 (ref), p6 (copy), p5 (copy)
-			return getChildNavigation(u30, p13, function() -- line: 110
-				-- upvalues: p6 (copy), p5 (copy)
-				local v47 = p6()
+					return nil
+				end)
+			end,
+			isFocused = function(): boolean
+				local v8 = fn()
 
-				if v47 then
-					return (v47.getChildNavigation(p5))
+				if not (v8 and v8.isFocused()) then
+					return false
 				end
 
-				return nil
-			end)
-		end,
-		isFocused = function() -- line: 115
-			-- upvalues: p6 (copy), p5 (copy)
-			local v44 = p6()
+				local state = v8.state
+				return state.routes[state.index].key == p
+			end,
+			isFirstRouteInParent = function()
+				return v6
+			end,
+			dispatch = data.dispatch,
+			getScreenProps = data.getScreenProps,
+			_dangerouslyGetParent = fn,
+			addListener = eventManager.addListener,
+			emit = eventManager.emit
+		})
 
-			if not v44 then
-				return false
-			end
+		childrenNavigationCache[p] = v7
 
-			if not v44.isFocused() then
-				return false
-			end
-
-			local state = v44.state
-
-			if state.routes[state.index].key == p5 then
-				return true
-			end
-
-			return false
-		end,
-		isFirstRouteInParent = function() -- line: 135
-			-- upvalues: u26 (ref)
-			return u26
-		end,
-		dispatch = p4.dispatch,
-		getScreenProps = p4.getScreenProps,
-		_dangerouslyGetParent = p6,
-		addListener = v29.addListener,
-		emit = v29.emit
-	})
-	v15[p5] = u30
-
-	return u30
+		return v7
+	end
 end
 
 return getChildNavigation

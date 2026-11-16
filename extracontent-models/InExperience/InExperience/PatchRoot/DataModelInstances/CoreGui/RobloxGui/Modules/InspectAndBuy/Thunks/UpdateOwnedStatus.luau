@@ -1,29 +1,21 @@
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local Constants = require(ParentParent.Constants)
-local BundleInfo = require(ParentParent.Models.BundleInfo)
-local AssetInfo = require(ParentParent.Models.AssetInfo)
-local SetBundles = require(ParentParent.Actions.SetBundles)
-local SetAssets = require(ParentParent.Actions.SetAssets)
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local Constants = require(parent.Constants)
+local BundleInfo = require(parent.Models.BundleInfo)
+local AssetInfo = require(parent.Models.AssetInfo)
+local SetBundles = require(parent.Actions.SetBundles)
+local SetAssets = require(parent.Actions.SetAssets)
 
-local function UpdateOwnedStatus(p1, p2) -- line: 12
-	-- upvalues: Thunk (copy), Constants (copy), AssetInfo (copy), SetAssets (copy), BundleInfo (copy), SetBundles (copy)
-	return Thunk.new(script.Name, {}, function(p3, _) -- line: 13
-		-- upvalues: p2 (copy), Constants (copy), p1 (copy), AssetInfo (copy), SetAssets (copy), BundleInfo (copy), SetBundles (copy)
-		local v13 = p3:getState()
+local function UpdateOwnedStatus(p, p2)
+	return Thunk.new(script.Name, {}, function(object, _)
+		local state = object:getState()
 
 		if p2 == Constants.ItemType.Asset then
-			if v13.assets[p1] then
-				local v14 = AssetInfo.fromPurchaseSuccess(p1)
-
-				p3:dispatch(SetAssets({ v14 }))
-
-				return
+			if state.assets[p] then
+				object:dispatch(SetAssets({ (AssetInfo.fromPurchaseSuccess(p)) }))
 			end
-		elseif p2 == Constants.ItemType.Bundle and v13.bundles[p1] then
-			local v15 = BundleInfo.fromPurchaseSuccess(p1)
-
-			p3:dispatch(SetBundles({ v15 }))
+		elseif p2 == Constants.ItemType.Bundle and state.bundles[p] then
+			object:dispatch(SetBundles({ (BundleInfo.fromPurchaseSuccess(p)) }))
 		end
 	end)
 end

@@ -1,23 +1,22 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent
-local Analytics = require(ParentParent.Analytics)
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent
 
-local function validateCanLoad(s1: string, p1) -- line: 9
-	-- upvalues: UGCValidationService (copy), Analytics (copy)
-	local ok, result = pcall(function() -- line: 10
-		-- upvalues: UGCValidationService (copy), s1 (copy)
-		return UGCValidationService:CanLoadAsset(s1)
+local Analytics = require(parent.Analytics)
+
+require(parent.util.Types)
+
+local function validateCanLoad(p: string, p2)
+	local success, result = pcall(function()
+		return UGCValidationService:CanLoadAsset(p)
 	end)
 
-	if not ok or not result then
-		Analytics.reportFailure(Analytics.ErrorType.validateCanLoad, nil, p1)
-
-		return false, { "Asset could not be loaded" }
+	if success and result then
+		return true
 	end
 
-	return true
+	Analytics.reportFailure(Analytics.ErrorType.validateCanLoad, nil, p2)
+	return false, { "Asset could not be loaded" }
 end
 
 return validateCanLoad

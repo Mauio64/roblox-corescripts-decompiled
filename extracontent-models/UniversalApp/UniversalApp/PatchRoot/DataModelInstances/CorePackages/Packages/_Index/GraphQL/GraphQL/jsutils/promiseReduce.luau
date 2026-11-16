@@ -1,24 +1,23 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local Array = require(ParentParent.LuauPolyfill).Array
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-require(scriptParent.PromiseOrValue)
+require(parent.PromiseOrValue)
 
-local isPromise = require(scriptParent.isPromise).isPromise
+local isPromise = require(parent.isPromise)
+local isPromise2 = isPromise.isPromise
 
 return {
-	promiseReduce = function(p1, p2: ((...any) -> ...any), p3) -- line: 26
-		-- upvalues: Array (copy), isPromise (copy)
-		return Array.reduce(p1, function(p4, p5) -- line: 31
-			-- upvalues: isPromise (copy), p2 (copy)
-			if isPromise(p4) then
-				return p4:andThen(function(p6) -- line: 33
-					-- upvalues: p2 (copy), p5 (copy)
-					return p2(p6, p5)
+	promiseReduce = function(p, callback, p2)
+		return Array.reduce(p, function(object, p3)
+			if isPromise2(object) then
+				return object:andThen(function(p4)
+					return callback(p4, p3)
 				end)
 			end
 
-			return p2(p4, p5)
-		end, p3)
+			return callback(object, p3)
+		end, p2)
 	end
 }

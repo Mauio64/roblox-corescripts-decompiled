@@ -1,30 +1,30 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
 local MicroProfilerPanel = require(script.Parent.MicroProfilerPanel)
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local v6 = Roact.Component:extend("RecentlyCapturedDumpsView")
 
-function v6.render(p1) -- line: 11
-	-- upvalues: Roact (copy), Constants (copy), MicroProfilerPanel (copy)
-	if not p1.props.RecentDumpPaths then
-	end
+local extended = Roact.Component:extend("RecentlyCapturedDumpsView")
 
-	local t1 = {}
+function extended.render(p)
+	local _recentDumpPaths = p.props.RecentDumpPaths
+	local rows = {}
 
-	for _, v in ipairs(p1.props.RecentDumpPaths) do
-		table.insert(t1, {
+	for _, recentDumpPath in ipairs(p.props.RecentDumpPaths) do
+		table.insert(rows, {
 			DumpPathLabel = Roact.createElement("TextBox", {
+				Font = Constants.Font.Log,
+				Text = recentDumpPath,
+				TextColor3 = Constants.Color.Text,
 				TextSize = 14,
+				TextXAlignment = Enum.TextXAlignment.Left,
 				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1),
 				TextEditable = false,
 				ClearTextOnFocus = false,
-				ClipsDescendants = true,
-				Font = Constants.Font.Log,
-				Text = v,
-				TextColor3 = Constants.Color.Text,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				Size = UDim2.fromScale(1, 1)
+				ClipsDescendants = true
 			}, {
 				UIPadding = Roact.createElement("UIPadding", {
 					PaddingLeft = UDim.new(0, Constants.MicroProfilerFormatting.RecentDumpPathPadding),
@@ -34,15 +34,15 @@ function v6.render(p1) -- line: 11
 		})
 	end
 
-	if #t1 == 0 then
-		table.insert(t1, {
+	if #rows == 0 then
+		table.insert(rows, {
 			NoDumpsLabel = Roact.createElement("TextLabel", {
-				Text = "No recently captured MicroProfiler dumps.",
-				BackgroundTransparency = 1,
 				Font = Constants.Font.MainWindow,
+				Text = "No recently captured MicroProfiler dumps.",
 				TextColor3 = Constants.Color.Text,
 				TextSize = Constants.MicroProfilerFormatting.OptionTextSize,
 				TextXAlignment = Enum.TextXAlignment.Left,
+				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1)
 			}, {
 				UIPadding = Roact.createElement("UIPadding", {
@@ -54,18 +54,15 @@ function v6.render(p1) -- line: 11
 
 	return Roact.createElement(MicroProfilerPanel, {
 		Title = "Recently captured MicroProfiler dumps",
-		LayoutOrder = p1.props.LayoutOrder,
-		Sections = {{
-			Name = "RecentlyCapturedDumps",
-			Rows = t1
-		}}
+		LayoutOrder = p.props.LayoutOrder,
+		Sections = {
+			{ Name = "RecentlyCapturedDumps", Rows = rows }
+		}
 	})
 end
 
-local function mapStateToProps(p2, _) -- line: 67
-	return {
-		RecentDumpPaths = p2.MicroProfiler.recentDumpPaths
-	}
+local function mapStateToProps(p, _)
+	return { RecentDumpPaths = p.MicroProfiler.recentDumpPaths }
 end
 
-return RoactRodux.connect(mapStateToProps, nil)(v6)
+return RoactRodux.connect(mapStateToProps, nil)(extended)

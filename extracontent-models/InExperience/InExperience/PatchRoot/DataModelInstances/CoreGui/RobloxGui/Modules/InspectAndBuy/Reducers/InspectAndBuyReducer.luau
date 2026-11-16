@@ -1,37 +1,44 @@
 local CorePackages = game:GetService("CorePackages")
-local FetchingStatus = require(CorePackages.Workspace.Packages.Http).Reducers.FetchingStatus
-local scriptParent = script.Parent
+local Http = require(CorePackages.Workspace.Packages.Http)
+local FetchingStatus = Http.Reducers.FetchingStatus
+local parent = script.Parent
 local Rodux = require(CorePackages.Packages.Rodux)
-local View = require(scriptParent.View)
-local PlayerId = require(scriptParent.PlayerId)
-local PlayerName = require(scriptParent.PlayerName)
-local Assets = require(scriptParent.Assets)
-local AssetBundles = require(scriptParent.AssetBundles)
-local Bundles = require(scriptParent.Bundles)
-local EquippedAssets = require(scriptParent.EquippedAssets)
-local DetailsInformation = require(scriptParent.DetailsInformation)
-local TryingOnInfo = require(scriptParent.TryingOnInfo)
-local Favorites = require(scriptParent.Favorites)
-local Locale = require(scriptParent.Locale)
-local Visible = require(scriptParent.Visible)
-local ItemBeingPurchased = require(scriptParent.ItemBeingPurchased)
-local IsLoaded = require(scriptParent.IsLoaded)
-local IsSubjectToChinaPolicies = require(scriptParent.IsSubjectToChinaPolicies)
-local GamepadEnabled = require(scriptParent.GamepadEnabled)
-local StoreId = require(scriptParent.StoreId)
-local CollectibleResellableInstances = require(scriptParent.CollectibleResellableInstances)
-local CreatingExperiences = require(scriptParent.CreatingExperiences)
-local Overlay = require(scriptParent.Overlay)
-local ParentParent = script.Parent.Parent
-local FFlagAXEnableFetchAvatarPreview = require(ParentParent.Flags.FFlagAXEnableFetchAvatarPreview)
-local AvatarPreviewDetails = require(scriptParent.AvatarPreviewDetails)
+local View = require(parent.View)
+local PlayerId = require(parent.PlayerId)
+local PlayerName = require(parent.PlayerName)
+local Assets = require(parent.Assets)
+local AssetBundles = require(parent.AssetBundles)
+local Bundles = require(parent.Bundles)
+local EquippedAssets = require(parent.EquippedAssets)
+local DetailsInformation = require(parent.DetailsInformation)
+local TryingOnInfo = require(parent.TryingOnInfo)
+local Favorites = require(parent.Favorites)
+local Locale = require(parent.Locale)
+local Visible = require(parent.Visible)
+local ItemBeingPurchased = require(parent.ItemBeingPurchased)
+local IsLoaded = require(parent.IsLoaded)
+local IsSubjectToChinaPolicies = require(parent.IsSubjectToChinaPolicies)
+local GamepadEnabled = require(parent.GamepadEnabled)
+local StoreId = require(parent.StoreId)
+local CollectibleResellableInstances = require(parent.CollectibleResellableInstances)
+local CreatingExperiences = require(parent.CreatingExperiences)
+local Overlay = require(parent.Overlay)
+local parent2 = script.Parent.Parent
+local FFlagAXEnableFetchAvatarPreview = require(parent2.Flags.FFlagAXEnableFetchAvatarPreview)
+local AvatarPreviewDetails = require(parent.AvatarPreviewDetails)
 
-return Rodux.combineReducers({
+local combineReducers = Rodux.combineReducers
+
+if not FFlagAXEnableFetchAvatarPreview then
+	AvatarPreviewDetails = nil
+end
+
+return combineReducers({
 	view = View,
 	playerId = PlayerId,
 	playerName = PlayerName,
 	assets = Assets,
-	avatarPreviewDetails = if not FFlagAXEnableFetchAvatarPreview then nil else AvatarPreviewDetails,
+	avatarPreviewDetails = AvatarPreviewDetails,
 	bundles = Bundles,
 	assetBundles = AssetBundles,
 	equippedAssets = EquippedAssets,

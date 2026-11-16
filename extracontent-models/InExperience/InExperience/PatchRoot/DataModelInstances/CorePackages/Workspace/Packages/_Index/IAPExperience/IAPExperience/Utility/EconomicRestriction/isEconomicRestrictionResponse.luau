@@ -1,3 +1,13 @@
-return function(p1) -- line: 8
-	return p1 ~= nil and (type(p1) == "table" and (p1.failureReason ~= nil and p1.expirationTimeInMinutes ~= nil or p1.FailureReason ~= nil and p1.ExpirationTimeInMinutes ~= nil))
+return function(data): boolean
+	if data == nil or type(data) ~= "table" then
+		return false
+	elseif data.failureReason == nil or data.expirationTimeInMinutes == nil then
+		if data.FailureReason == nil then
+			return false
+		end
+
+		return data.ExpirationTimeInMinutes ~= nil
+	else
+		return true
+	end
 end

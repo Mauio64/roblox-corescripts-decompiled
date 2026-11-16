@@ -1,19 +1,19 @@
 local Songbird = script:FindFirstAncestor("Songbird")
-local AssetService = game:GetService("AssetService")
-local Cryo = require(Songbird.Parent.Cryo)
 
+local AssetService = game:GetService("AssetService")
+
+local Cryo = require(Songbird.Parent.Cryo)
 require(Songbird.types)
 
-local function getAudioMetadataAsync(t1: {[any]: any}) -- line: 12
-	-- upvalues: AssetService (copy), Cryo (copy)
-	local AudioMetadataAsync = AssetService:GetAudioMetadataAsync(t1)
+local function getAudioMetadataAsync(p)
+	local audioMetadataAsync = AssetService:GetAudioMetadataAsync(p)
 
-	return Cryo.List.map(AudioMetadataAsync, function(p1) -- line: 15
-		local v8 = table.clone(p1)
+	return Cryo.List.map(audioMetadataAsync, function(p2)
+		local clone = table.clone(p2)
 
-		v8.AlbumArt = "rbxassetid://11204867732"
+		clone.AlbumArt = "rbxassetid://11204867732"
 
-		return v8
+		return clone
 	end)
 end
 

@@ -1,10 +1,10 @@
 local CorePackages = game:GetService("CorePackages")
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local SetPlayerName = require(ParentParent.Actions.SetPlayerName)
+local parent = script.Parent.Parent
+local SetPlayerName = require(parent.Actions.SetPlayerName)
 
 return Rodux.createReducer("", {
-	[SetPlayerName.name] = function(_, p2) -- line: 7
-		return p2.playerName
+	[SetPlayerName.name] = function(_, p)
+		return p.playerName
 	end
 })

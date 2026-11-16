@@ -1,31 +1,35 @@
 local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
-local GraphQLServerParent = GraphQLServer.Parent
-local GraphqlToolsUtils = require(GraphQLServerParent.GraphqlToolsUtils)
-local LuauPolyfill = require(GraphQLServerParent.LuauPolyfill)
+local parent = GraphQLServer.Parent
+local GraphqlToolsUtils = require(parent.GraphqlToolsUtils)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local collectSubFields = GraphqlToolsUtils.collectSubFields
 local UserProfileNestedFields = require(GraphQLServer.graphql.enums.UserProfileNestedFields)
 
-return function(p1, p2) -- line: 8
-	-- upvalues: collectSubFields (copy), LuauPolyfill (copy), UserProfileNestedFields (copy)
-	local v9 = p2 or collectSubFields
-	local v10 = v9(p1.schema, p1.fragments, p1.variableValues, p1.returnType, p1.fieldNodes)
-	local t1 = {}
+return function(data, p)
+	local v = p or collectSubFields
+	local v2 = v(data.schema, data.fragments, data.variableValues, data.returnType, data.fieldNodes)
 
-	for _, v13 in v10 do
-		local v14 = v13[1]
+	local result = {}
 
-		if UserProfileNestedFields[v14] then
-			for _, v16 in (v9(p1.schema, p1.fragments, p1.variableValues, p1.returnType, v10[v14])) do
-				local v17 = `{ v14 }.{ v16[1] }`
+	for _, v3 in v2 do
+		local v4 = v3[1]
 
-				if v17 ~= nil and (v17 ~= "id" and not LuauPolyfill.String.endsWith(v17, "__typename")) then
-					table.insert(t1, v17)
+		if UserProfileNestedFields[v4] then
+			local v5 = v(data.schema, data.fragments, data.variableValues, data.returnType, v2[v4])
+
+			for _, v6 in v5 do
+				local formatted = `{v4}.{v6[1]}`
+
+				if formatted == nil or formatted == "id" or LuauPolyfill.String.endsWith(formatted, "__typename") then
+					continue
 				end
+
+				table.insert(result, formatted)
 			end
-		elseif v14 ~= nil and (v14 ~= "id" and not LuauPolyfill.String.endsWith(v14, "__typename")) then
-			table.insert(t1, v14)
+		elseif v4 ~= nil and v4 ~= "id" and not LuauPolyfill.String.endsWith(v4, "__typename") then
+			table.insert(result, v4)
 		end
 	end
 
-	return t1
+	return result
 end

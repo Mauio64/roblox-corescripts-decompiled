@@ -1,10 +1,9 @@
-local Parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
+local parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
 
-require(Parent.SduiCoreSystem)
+require(parent.SduiCoreSystem)
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
 
-local AvatarScreen = require(Parent.AvatarExperienceNavigation).Enums.AvatarScreen
-
-return function(_, _, p3, _) -- line: 12
-	-- upvalues: AvatarScreen (copy)
-	p3.dependencies.getNavigation().navigate(AvatarScreen.Catalog)
+return function(_, _, p, _)
+	p.dependencies.getNavigation().navigate(AvatarScreen.Catalog)
 end

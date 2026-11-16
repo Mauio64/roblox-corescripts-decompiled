@@ -1,22 +1,31 @@
 local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
 local Cryo = InGameMenuDependencies.Cryo
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
+
 local Foundation = require(CorePackages.Packages.Foundation)
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local ParentParent = script.Parent.Parent
-local withLocalization = require(ParentParent.Localization.withLocalization)
-local v17 = Roact.PureComponent:extend("SearchBar")
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-v17.validateProps = t.interface({
+local parent = script.Parent.Parent
+local withLocalization = require(parent.Localization.withLocalization)
+
+local extended = Roact.PureComponent:extend("SearchBar")
+
+extended.validateProps = t.interface({
 	size = t.UDim2,
 	text = t.optional(t.string),
 	onTextChanged = t.optional(t.callback),
@@ -27,127 +36,140 @@ v17.validateProps = t.interface({
 	zIndex = t.optional(t.number),
 	visible = t.optional(t.boolean)
 })
-v17.defaultProps = {
-	autoCaptureFocus = false,
-	visible = true,
-	size = UDim2.fromScale(1, 1)
-}
 
-function v17.init(p1) -- line: 52
-	-- upvalues: Roact (copy)
-	p1.textboxRef = Roact.createRef()
+extended.defaultProps = { size = UDim2.fromScale(1, 1), autoCaptureFocus = false, visible = true }
 
-	function p1.onAbsoluteSizeChanged(p2) -- line: 55
-		-- upvalues: p1 (copy)
-		local v27 = false
+function extended:init()
+	self.textboxRef = Roact.createRef()
 
-		if p1.width ~= p2.AbsoluteSize.X then
-			p1.width = p2.AbsoluteSize.X
-			v27 = true
+	function self.onAbsoluteSizeChanged(p)
+		local flag
+
+		if self.width == p.AbsoluteSize.X then
+			flag = false
+		else
+			self.width = p.AbsoluteSize.X
+			flag = true
 		end
 
-		if p1.height ~= p2.AbsoluteSize.Y then
-			p1.height = p2.AbsoluteSize.Y
-			v27 = true
+		if self.height ~= p.AbsoluteSize.Y then
+			self.height = p.AbsoluteSize.Y
+			flag = true
 		end
 
-		if v27 then
-			p1:setState({
-				width = p1.width - 2,
-				height = p1.height - 2
+		if flag then
+			self:setState({
+				width = self.width - 2,
+				height = self.height - 2
 			})
 		end
 	end
-	function p1.searchTextChanged(p3) -- line: 76
-		-- upvalues: p1 (copy)
-		if p1.props.onTextChanged then
-			p1.props.onTextChanged(p3.Text)
+
+	function self.searchTextChanged(p)
+		if self.props.onTextChanged then
+			self.props.onTextChanged(p.Text)
 		end
 	end
-	function p1.searchBoxFocused(_) -- line: 82
-		-- upvalues: p1 (copy)
-		if p1.props.onFocused then
-			p1.props.onFocused()
+
+	function self.searchBoxFocused(_)
+		if self.props.onFocused then
+			self.props.onFocused()
 		end
 	end
-	function p1.searchCancel() -- line: 88
-		-- upvalues: p1 (copy)
-		if p1.props.onCancelled then
-			p1.props.onCancelled()
+
+	function self.searchCancel()
+		if self.props.onCancelled then
+			self.props.onCancelled()
 		end
 	end
-	function p1.onFocusLost() -- line: 94
-		-- upvalues: p1 (copy)
-		if p1.props.onFocusLost then
-			p1.props.onFocusLost()
+
+	function self.onFocusLost()
+		if self.props.onFocusLost then
+			self.props.onFocusLost()
 		end
 	end
-	function p1.onTextboxTouchTap() -- line: 100
-		-- upvalues: p1 (copy)
-		if p1.props.onTextboxTouchTap then
-			p1.props.onTextboxTouchTap()
+
+	function self.onTextboxTouchTap()
+		if self.props.onTextboxTouchTap then
+			self.props.onTextboxTouchTap()
 		end
 	end
 end
-function v17.willUpdate(p5, p6) -- line: 107
-	if p5.props.autoCaptureFocus and (p5.props.visible == false and p6.visible) then
-		p5:focus()
+
+function extended:willUpdate(p)
+	if self.props.autoCaptureFocus and self.props.visible == false and p.visible then
+		self:focus()
 	end
 end
-function v17.didMount(p7) -- line: 113
-	if p7.props.autoCaptureFocus and p7.props.visible then
-		p7:focus()
+
+function extended:didMount()
+	if self.props.autoCaptureFocus and self.props.visible then
+		self:focus()
 	end
 end
-function v17.focus(p8) -- line: 119
-	if p8.textboxRef then
-		p8.textboxRef.current:CaptureFocus()
+
+function extended:focus()
+	if self.textboxRef then
+		self.textboxRef.current:CaptureFocus()
 	end
 end
-function v17.render(p9) -- line: 125
-	-- upvalues: withFoundationOrUIBloxStyle (copy), withLocalization (copy), Roact (copy), UserInputService (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
-	return withFoundationOrUIBloxStyle(function(p10) -- line: 126
+
+function extended.render(data)
+	return withFoundationOrUIBloxStyle(function(p)
+		local tokens
+
+		if FoundationFontFaceMigration then
+			tokens = p
+		end
+
 		return {
+			Tokens = tokens,
 			Theme = {
 				TextEmphasis = {
-					Color = p10.Color.Content.Emphasis.Color3,
-					Transparency = p10.Color.Content.Emphasis.Transparency
+					Color = p.Color.Content.Emphasis.Color3,
+					Transparency = p.Color.Content.Emphasis.Transparency
 				},
 				TextDefault = {
-					Color = p10.Color.Content.Default.Color3,
-					Transparency = p10.Color.Content.Default.Transparency
+					Color = p.Color.Content.Default.Color3,
+					Transparency = p.Color.Content.Default.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				Body = {
-					Font = p10.Typography.BodyLarge.Font,
-					RelativeSize = p10.Typography.BodyLarge.FontSize
+					Font = p.Typography.BodyLarge.Font,
+					RelativeSize = p.Typography.BodyLarge.FontSize
 				}
 			}
 		}
-	end, function(p11) -- line: 137
-		-- upvalues: withLocalization (copy), p9 (copy), Roact (copy), UserInputService (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
+	end, function(data2)
 		return withLocalization({
 			search = "CoreScripts.InGameMenu.InviteFriends.Search",
 			cancel = "CoreScripts.InGameMenu.Cancel"
-		})(function(p12) -- line: 141
-			-- upvalues: p11 (copy), p9 (copy), Roact (copy), UserInputService (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
-			local Body = p11.Font.Body
-			local v34 = p11.Font.BaseSize * Body.RelativeSize
-			local Body2 = p11.Font.Body
-			local v36 = p11.Font.BaseSize * Body2.RelativeSize
-			local t1 = {
+		})(function(p)
+			local body = data2.Font.Body
+			local textSize = data2.Font.BaseSize * body.RelativeSize
+			local body2 = data2.Font.Body
+			local textSize2 = data2.Font.BaseSize * body2.RelativeSize
+
+			local forwardRefsByRef = {
 				BackgroundTransparency = 1,
 				GroupTransparency = 0.5,
-				Size = p9.props.size,
-				ZIndex = p9.props.zIndex,
-				Visible = p9.props.visible,
-				[Roact.Ref] = p9.props.forwardRef or Roact.createRef()
+				Size = data.props.size,
+				ZIndex = data.props.zIndex,
+				Visible = data.props.visible,
+				[Roact.Ref] = data.props.forwardRef or Roact.createRef()
 			}
-			local v38 = if UserInputService:GetPlatform() ~= Enum.Platform.Android then Enum.TextInputType.NoSuggestions else Enum.TextInputType.PasswordShown
+			local textInputType
 
-			return Roact.createElement("CanvasGroup", t1, {
+			if UserInputService:GetPlatform() == Enum.Platform.Android then
+				textInputType = Enum.TextInputType.PasswordShown
+			else
+				textInputType = Enum.TextInputType.NoSuggestions
+			end
+
+			local createElement = Roact.createElement
+			local children = {
 				SearchPanelLayout = Roact.createElement("UIListLayout", {
 					FillDirection = Enum.FillDirection.Horizontal,
 					HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -155,85 +177,154 @@ function v17.render(p9) -- line: 125
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					Padding = UDim.new(0, 9)
 				}),
-				SearchBorder = Roact.createElement("Frame", {
-					Size = UDim2.new(1, -66, 0, 38),
-					BackgroundColor3 = Color3.new(136, 136, 136),
-					BackgroundTransparency = 0.8,
-					[Roact.Change.AbsoluteSize] = p9.onAbsoluteSizeChanged
-				}, {
-					BorderRadius = Roact.createElement("UICorner", {
-						CornerRadius = UDim.new(0, 4)
-					}),
-					SearchContainer = Roact.createElement("Frame", {
-						BackgroundTransparency = 0,
-						Size = UDim2.fromOffset(p9.state.width, p9.state.height),
-						BackgroundColor3 = Color3.new(0, 0, 0),
-						Position = UDim2.fromOffset(1, 1)
-					}, {
-						SearchContainerLayout = Roact.createElement("UIListLayout", {
-							FillDirection = Enum.FillDirection.Horizontal,
-							HorizontalAlignment = Enum.HorizontalAlignment.Left,
-							SortOrder = Enum.SortOrder.LayoutOrder,
-							VerticalAlignment = Enum.VerticalAlignment.Center,
-							Padding = UDim.new(0, 10)
-						}),
-						Padding = Roact.createElement("UIPadding", {
-							PaddingLeft = UDim.new(0, 12),
-							PaddingRight = UDim.new(0, 12)
-						}),
-						BorderRadius = Roact.createElement("UICorner", {
-							CornerRadius = UDim.new(0, 4)
-						}),
-						SearchImage = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
-							LayoutOrder = 1,
-							BackgroundTransparency = 1,
-							Image = Images["icons/common/search_small"],
-							Size = UDim2.fromOffset(18, 18)
-						}) else Roact.createElement(Icon, {
-							name = "icons/common/search_small",
-							LayoutOrder = 1,
-							size = IconSize.Medium
-						}),
-						SearchInput = Roact.createElement("TextBox", {
-							LayoutOrder = 2,
-							BackgroundTransparency = 1,
-							Size = UDim2.new(1, -28, 0, 20),
-							Font = Body2.Font,
-							Text = p9.props.text or "",
-							TextInputType = v38,
-							TextSize = v36,
-							TextColor3 = p11.Theme.TextEmphasis.Color,
-							TextXAlignment = Enum.TextXAlignment.Left,
-							PlaceholderText = p12.search,
-							PlaceholderColor3 = p11.Theme.TextDefault.Color,
-							ClearTextOnFocus = false,
-							ClipsDescendants = true,
-							[Roact.Change.Text] = p9.searchTextChanged,
-							[Roact.Event.Focused] = p9.searchBoxFocused,
-							[Roact.Event.FocusLost] = p9.onFocusLost,
-							[Roact.Ref] = p9.textboxRef,
-							[Roact.Event.TouchTap] = p9.onTextboxTouchTap
-						})
-					})
+				SearchBorder = 0,
+				CancelButton = 0
+			}
+
+			local createElement2 = Roact.createElement
+			local onAbsoluteSizeChangedsByAbsoluteSize = {
+				Size = UDim2.new(1, -66, 0, 38),
+				BackgroundColor3 = Color3.new(136, 136, 136),
+				BackgroundTransparency = 0.8,
+				[Roact.Change.AbsoluteSize] = data.onAbsoluteSizeChanged
+			}
+			local v = {
+				BorderRadius = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
+				SearchContainer = 0
+			}
+
+			local createElement3 = Roact.createElement
+			local v2 = {
+				BackgroundTransparency = 0,
+				Size = UDim2.fromOffset(data.state.width, data.state.height),
+				BackgroundColor3 = Color3.new(0, 0, 0),
+				Position = UDim2.fromOffset(1, 1)
+			}
+			local v3 = {
+				SearchContainerLayout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					Padding = UDim.new(0, 10)
 				}),
-				CancelButton = Roact.createElement("TextButton", {
-					LayoutOrder = 2,
-					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(57, 20),
-					Font = Body.Font,
-					TextSize = v34,
-					Text = p12.cancel,
-					TextColor3 = p11.Theme.TextEmphasis.Color,
-					[Roact.Event.Activated] = p9.searchCancel
+				Padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 12),
+					PaddingRight = UDim.new(0, 12)
+				}),
+				BorderRadius = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
+				SearchImage = 0,
+				SearchInput = 0
+			}
+			local searchImage
+
+			if FFlagCoreUiMigrateUIBloxToFoundation then
+				searchImage = Roact.createElement(Icon, {
+					name = "icons/common/search_small",
+					size = IconSize.Medium,
+					LayoutOrder = 1
 				})
-			})
+			else
+				searchImage = Roact.createElement(ImageSetLabel, {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					Image = Images["icons/common/search_small"],
+					Size = UDim2.fromOffset(18, 18)
+				})
+			end
+
+			v3.SearchImage = searchImage
+
+			local createElement4 = Roact.createElement
+			local v4 = {
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -28, 0, 20)
+			}
+			local font
+
+			if not FoundationFontFaceMigration then
+				font = body2.Font
+			end
+
+			v4.Font = font
+			local fontFace
+
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(data2.Tokens.Typography.BodyLarge.Font)
+			end
+
+			v4.FontFace = fontFace
+
+			v4.Text = data.props.text or ""
+			v4.TextInputType = textInputType
+			v4.TextSize = textSize2
+			v4.TextColor3 = data2.Theme.TextEmphasis.Color
+			v4.TextXAlignment = Enum.TextXAlignment.Left
+			v4.PlaceholderText = p.search
+			v4.PlaceholderColor3 = data2.Theme.TextDefault.Color
+			v4.ClearTextOnFocus = false
+			v4.ClipsDescendants = true
+			v4[Roact.Change.Text] = data.searchTextChanged
+			v4[Roact.Event.Focused] = data.searchBoxFocused
+			v4[Roact.Event.FocusLost] = data.onFocusLost
+			v4[Roact.Ref] = data.textboxRef
+			v4[Roact.Event.TouchTap] = data.onTextboxTouchTap
+			v3.SearchInput = createElement4("TextBox", v4)
+			v.SearchContainer = createElement3("Frame", v2, v3)
+			children.SearchBorder = createElement2("Frame", onAbsoluteSizeChangedsByAbsoluteSize, v)
+
+			local createElement5 = Roact.createElement
+			local searchCancelsByActivated = {
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				["LayoutOrder"] = nil,
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(57, 20)
+			}
+			local font2
+
+			if not FoundationFontFaceMigration then
+				font2 = body.Font
+			end
+
+			searchCancelsByActivated.Font = font2
+			local fontFace2
+
+			if FoundationFontFaceMigration then
+				fontFace2 = normalizeFontFace(data2.Tokens.Typography.BodyLarge.Font)
+			end
+
+			searchCancelsByActivated.FontFace = fontFace2
+
+			searchCancelsByActivated.TextSize = textSize
+			searchCancelsByActivated.Text = p.cancel
+			searchCancelsByActivated.TextColor3 = data2.Theme.TextEmphasis.Color
+			searchCancelsByActivated[Roact.Event.Activated] = data.searchCancel
+			children.CancelButton = createElement5("TextButton", searchCancelsByActivated)
+			return createElement("CanvasGroup", forwardRefsByRef, children)
 		end)
 	end)
 end
 
-return Roact.forwardRef(function(p13, p14) -- line: 259
-	-- upvalues: Roact (copy), v17 (copy), Cryo (copy)
-	return Roact.createElement(v17, Cryo.Dictionary.join(p13, {
-		forwardRef = p14
-	}))
+return Roact.forwardRef(function(p, forwardRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { forwardRef = forwardRef }))
 end)

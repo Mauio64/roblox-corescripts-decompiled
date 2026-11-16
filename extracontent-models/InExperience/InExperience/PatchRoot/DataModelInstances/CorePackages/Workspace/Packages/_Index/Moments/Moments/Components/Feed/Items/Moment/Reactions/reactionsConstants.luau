@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Medium = require(Parent.MomentsCommon).Enums.ReactionSize.Medium
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local MomentsCommon = require(parent.MomentsCommon)
 
 return {
+	REACTED_REACTION_SIZE = MomentsCommon.Enums.ReactionSize.Medium,
 	EXPLOSION_LAYER_ZINDEX = 4,
-	MAX_CONCURRENT_EXPLOSIONS = 3,
-	REACTED_REACTION_SIZE = Medium
+	MAX_CONCURRENT_EXPLOSIONS = 3
 }

@@ -1,15 +1,15 @@
-local Parent = script:FindFirstAncestor("TextChannelWindow").Parent
-local ChatMute = require(Parent.ChatMute)
+local parent = script:FindFirstAncestor("TextChannelWindow").Parent
+local ChatMute = require(parent.ChatMute)
 
-return function(p1) -- line: 8
-	-- upvalues: ChatMute (copy)
-	local str = tostring(p1.UserId)
+return function(p)
+	local userId = tostring(p.UserId)
 
-	if ChatMute.isUserIdMuted(str) then
+	if ChatMute.isUserIdMuted(userId) then
 		return true
 	end
 
-	local PlayerByUserId = game:GetService("Players"):GetPlayerByUserId(p1.UserId)
-
-	return PlayerByUserId ~= nil and (ChatMute.isUsernameMuted(PlayerByUserId.Name) or ChatMute.isDisplayNameMuted(PlayerByUserId.DisplayName))
+	local Players = game:GetService("Players")
+	local playerByUserId = Players:GetPlayerByUserId(p.UserId)
+	return playerByUserId ~= nil
+		and (ChatMute.isUsernameMuted(playerByUserId.Name) or ChatMute.isDisplayNameMuted(playerByUserId.DisplayName))
 end

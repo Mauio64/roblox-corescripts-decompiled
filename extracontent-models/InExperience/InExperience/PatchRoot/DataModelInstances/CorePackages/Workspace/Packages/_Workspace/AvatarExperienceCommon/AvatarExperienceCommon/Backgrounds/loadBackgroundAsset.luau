@@ -1,33 +1,27 @@
 local assetSource = require(script.Parent.assetSource)
-
 require(script.Parent.types)
 
 local default = assetSource.default
-local t1 = {}
 
-local function loadBackgroundAsset(n1: number) -- line: 14
-	-- upvalues: t1 (ref), default (copy)
-	local v6 = t1[n1]
+local v = {}
 
-	if v6 then
-		return v6
+local function loadBackgroundAsset(p: number)
+	local v2 = v[p]
+
+	if v2 then
+		return v2
 	end
 
-	local v7 = default(n1):catch(function(p1) -- line: 20
-		-- upvalues: t1 (ref), n1 (copy)
-		t1[n1] = nil
-		error(p1)
+	local v3 = default(p):catch(function(message)
+		v[p] = nil
+		error(message)
 	end)
-
-	t1[n1] = v7
-
-	return v7
+	v[p] = v3
+	return v3
 end
 
-return {
-	load = loadBackgroundAsset,
-	clearCache = function() -- line: 28
-		-- upvalues: t1 (ref)
-		t1 = {}
-	end
-}
+local function clearCache()
+	v = {}
+end
+
+return { load = loadBackgroundAsset, clearCache = clearCache }

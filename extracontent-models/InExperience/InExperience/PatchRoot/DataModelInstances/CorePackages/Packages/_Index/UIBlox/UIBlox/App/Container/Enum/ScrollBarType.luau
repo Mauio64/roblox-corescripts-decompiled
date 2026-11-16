@@ -1,5 +1,1 @@
-return {
-	Compact = "Compact",
-	Gamepad = "Gamepad",
-	Wide = "Wide"
-}
+return { Compact = "Compact", Gamepad = "Gamepad", Wide = "Wide" }

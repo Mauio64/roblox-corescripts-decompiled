@@ -1,10 +1,10 @@
-local function includes(t1: {[any]: any}, p1) -- line: 10
-	if p1 == nil then
+local function includes(items, p): boolean
+	if p == nil then
 		return false
 	end
 
-	for _, v5 in t1 do
-		if v5 == p1 then
+	for _, item in items do
+		if item == p then
 			return true
 		end
 	end

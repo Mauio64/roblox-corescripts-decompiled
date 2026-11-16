@@ -2,6 +2,7 @@ local UniverseConfigurationStoreTypes = require(script.UniverseConfigurationStor
 
 return {
 	PrivacyType = UniverseConfigurationStoreTypes.PrivacyType,
+	getPrivacyTypeForAudiences = require(script.getPrivacyTypeForAudiences),
 	createUniverseConfigurationStore = require(script.createUniverseConfigurationStore),
 	getUniverseConfigurationStore = require(script.getUniverseConfigurationStore),
 	UniverseConfigurationStoreTypes = UniverseConfigurationStoreTypes

@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local ConversationCell = require(Workspace.AppChat.AppChat.Components.Cells.ConversationCell)
 
-return (require(_Workspace.AppChat.AppChat.Components.Cells.ConversationCell))
+return ConversationCell

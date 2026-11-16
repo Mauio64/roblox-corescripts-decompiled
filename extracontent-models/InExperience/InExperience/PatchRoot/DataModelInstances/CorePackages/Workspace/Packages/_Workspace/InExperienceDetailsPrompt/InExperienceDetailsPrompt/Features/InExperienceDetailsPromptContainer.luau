@@ -1,29 +1,36 @@
-local TeleportService = game:GetService("TeleportService")
 local ContextActionService = game:GetService("ContextActionService")
-local Parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local DataHydration = require(Parent.DataHydration)
+local parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local DataHydration = require(parent.DataHydration)
 local Game = DataHydration.Game
 local VotesUtils = Game.VotesUtils
-local EnumGameDetailErrorTypes = require(Parent.DiscoveryTypes).EnumGameDetailErrorTypes
-local DiscoveryAnalytics = require(Parent.DiscoveryAnalytics)
+
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local EnumGameDetailErrorTypes = DiscoveryTypes.EnumGameDetailErrorTypes
+
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
 local fireInExperienceDetailsPromptClosedEvent = DiscoveryAnalytics.Events.fireInExperienceDetailsPromptClosedEvent
+
 local fireInExperienceDetailsPromptPlayButtonClickedEvent = DiscoveryAnalytics.Events.fireInExperienceDetailsPromptPlayButtonClickedEvent
 local fireInExperienceDetailsPromptLoadedEvent = DiscoveryAnalytics.Events.fireInExperienceDetailsPromptLoadedEvent
-local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local useFocusRoot = FocusNavigationUtils.useFocusRoot
-local InExperienceDetailsPrompt = require(script.Parent.InExperienceDetailsPrompt)
-local FFlagLuaAppIedpOverlayAndNavigationFix = require(Parent.SharedFlags).FFlagLuaAppIedpOverlayAndNavigationFix
-local FFlagLuaAppIedpFixPlayButton = require(Parent.SharedFlags).FFlagLuaAppIedpFixPlayButton
-local FFlagLuaAppIedpControlledJoin = require(Parent.SharedFlags).FFlagLuaAppIedpControlledJoin
-local v22 = if not FFlagLuaAppIedpOverlayAndNavigationFix then nil else "InExperienceDetailsPromptClose"
 
-local function getGameDetailErrorType(p1, p2) -- line: 45
-	-- upvalues: DataHydration (copy), EnumGameDetailErrorTypes (copy)
-	if p1 == DataHydration.DataStatus.Failed then
+local InExperienceDetailsPrompt = require(script.Parent.InExperienceDetailsPrompt)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppIedpOverlayAndNavigationFix = SharedFlags.FFlagLuaAppIedpOverlayAndNavigationFix
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppIedpFixPlayButton = SharedFlags2.FFlagLuaAppIedpFixPlayButton
+local v = FFlagLuaAppIedpOverlayAndNavigationFix and "InExperienceDetailsPromptClose" or nil
+
+local function getGameDetailErrorType(p, p2) -- 1 equivalent call inferred from this helper
+	if p == DataHydration.DataStatus.Failed then
 		return EnumGameDetailErrorTypes.NetworkError
 	end
 
@@ -33,191 +40,191 @@ local function getGameDetailErrorType(p1, p2) -- line: 45
 
 	return nil
 end
-local function InExperienceDetailsPromptContainer(t1: {[any]: any}) -- line: 60
-	-- upvalues: Game (copy), SignalsReact (copy), DataHydration (copy), EnumGameDetailErrorTypes (copy), useFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), React (copy), FFlagLuaAppIedpControlledJoin (copy), fireInExperienceDetailsPromptClosedEvent (copy), fireInExperienceDetailsPromptPlayButtonClickedEvent (copy), TeleportService (copy), DiscoveryEventErrorLogger (copy), FFlagLuaAppIedpOverlayAndNavigationFix (copy), v22 (copy), ContextActionService (copy), fireInExperienceDetailsPromptLoadedEvent (copy), InExperienceDetailsPrompt (copy), VotesUtils (copy), FFlagLuaAppIedpFixPlayButton (copy)
-	local v28 = Game.getGameInfoStore(false)
-	local v29 = Game.getAgeRecommendationStore(false)
-	local v30 = Game.getPlayabilityStore(false)
-	local v31 = Game.getVotesStore(false)
-	local v32 = v28.getAndFetchGameInfo(t1.universeId)
-	local v33 = v29.getAndFetchAgeRecommendation(t1.universeId)
-	local v34 = v30.getAndFetchPlayability(t1.universeId)
-	local v35 = v31.getAndFetchVote(t1.universeId)
-	local v36 = SignalsReact.useSignalState(v32.data)
-	local v37 = SignalsReact.useSignalState(v33.data)
-	local v38 = SignalsReact.useSignalState(v34.data)
-	local v39 = SignalsReact.useSignalState(v35.data)
-	local v40 = SignalsReact.useSignalState(v32.status)
-	local v41 = SignalsReact.useSignalState(v34.status)
-	local v42 = if not v36 or not v36.rootPlaceId then nil else tonumber(v36.rootPlaceId)
-	local v43 = if v40 ~= DataHydration.DataStatus.Failed then if not v36 or v36.isUnavailable ~= true then nil else EnumGameDetailErrorTypes.ExperienceUnavailable else EnumGameDetailErrorTypes.NetworkError
-	local v44 = useFocusRoot({
+
+local function InExperienceDetailsPromptContainer(props)
+	local gameInfoStore = Game.getGameInfoStore(false)
+	local ageRecommendationStore = Game.getAgeRecommendationStore(false)
+	local playabilityStore = Game.getPlayabilityStore(false)
+	local votesStore = Game.getVotesStore(false)
+
+	local fetchGameInfo = gameInfoStore.getAndFetchGameInfo(props.universeId)
+	local fetchAgeRecommendation = ageRecommendationStore.getAndFetchAgeRecommendation(props.universeId)
+	local fetchPlayability = playabilityStore.getAndFetchPlayability(props.universeId)
+	local fetchVote = votesStore.getAndFetchVote(props.universeId)
+
+	local v2 = SignalsReact.useSignalState(fetchGameInfo.data)
+	local ageRecommendation = SignalsReact.useSignalState(fetchAgeRecommendation.data)
+	local playability = SignalsReact.useSignalState(fetchPlayability.data)
+	local v3 = SignalsReact.useSignalState(fetchVote.data)
+
+	local gameInfoRetrievalStatus = SignalsReact.useSignalState(fetchGameInfo.status)
+	local playabilityRetrievalStatus = SignalsReact.useSignalState(fetchPlayability.status)
+	local rootPlaceId
+
+	if v2 and v2.rootPlaceId then
+		rootPlaceId = tonumber(v2.rootPlaceId)
+	else
+		rootPlaceId = nil
+	end
+
+	local gameDetailErrorType = getGameDetailErrorType(gameInfoRetrievalStatus, v2) -- inferred equivalent call
+	local focusRootRef = useFocusRoot({
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
 		isIsolated = true,
-		isAutoFocusRoot = true,
-		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
+		isAutoFocusRoot = true
 	})
-	local v45 = React.useCallback(function() -- line: 90
-		-- upvalues: FFlagLuaAppIedpControlledJoin (copy), t1 (copy), v42 (copy), fireInExperienceDetailsPromptClosedEvent (copy), v40 (copy), DataHydration (copy), v41 (copy), v38 (copy), v43 (copy), fireInExperienceDetailsPromptPlayButtonClickedEvent (copy), TeleportService (copy), DiscoveryEventErrorLogger (copy)
-		if FFlagLuaAppIedpControlledJoin then
-			if t1.onJoin then
-				t1.onJoin(v42)
-			end
 
-			if v42 then
-				fireInExperienceDetailsPromptClosedEvent({
-					targetUniverseId = t1.universeId,
-					targetRootPlaceId = v42,
-					closeReason = Enum.PromptExperienceDetailsResult.TeleportAttempted.Name,
-					isFullyLoaded = v40 ~= DataHydration.DataStatus.NotReady and v41 ~= DataHydration.DataStatus.NotReady,
-					isPlayable = v38 and v38.isPlayable,
-					playabilityStatus = v38 and v38.playabilityStatus,
-					gameInfoErrorType = v43
-				})
-			end
-
-			fireInExperienceDetailsPromptPlayButtonClickedEvent({
-				targetUniverseId = t1.universeId,
-				targetRootPlaceId = v42,
-				playabilityRetrievalStatus = v41
-			})
-
-			return
+	local onJoin = React.useCallback(function()
+		if props.onJoin then
+			props.onJoin(rootPlaceId)
 		end
 
-		if v42 then
-			t1.onClose()
-			TeleportService:PromptExperienceDetailsCompleted(Enum.PromptExperienceDetailsResult.TeleportAttempted)
-			TeleportService:Teleport(v42)
+		if rootPlaceId then
 			fireInExperienceDetailsPromptClosedEvent({
-				targetUniverseId = t1.universeId,
-				targetRootPlaceId = v42,
+				targetUniverseId = props.universeId,
+				targetRootPlaceId = rootPlaceId,
 				closeReason = Enum.PromptExperienceDetailsResult.TeleportAttempted.Name,
-				isFullyLoaded = v40 ~= DataHydration.DataStatus.NotReady and v41 ~= DataHydration.DataStatus.NotReady,
-				isPlayable = v38 and v38.isPlayable,
-				playabilityStatus = v38 and v38.playabilityStatus,
-				gameInfoErrorType = v43
-			})
-		else
-			DiscoveryEventErrorLogger.reportError("InExperienceDetailsPromptContainerOnJoinMissingRootPlaceId", "Missing valid root place id for universe id", {
-				universeId = t1.universeId,
-				rootPlaceId = v42
+				isFullyLoaded = gameInfoRetrievalStatus ~= DataHydration.DataStatus.NotReady and playabilityRetrievalStatus ~= DataHydration.DataStatus.NotReady,
+				isPlayable = playability and playability.isPlayable,
+				playabilityStatus = playability and playability.playabilityStatus,
+				gameInfoErrorType = gameDetailErrorType
 			})
 		end
 
 		fireInExperienceDetailsPromptPlayButtonClickedEvent({
-			targetUniverseId = t1.universeId,
-			targetRootPlaceId = v42,
-			playabilityRetrievalStatus = v41
+			targetUniverseId = props.universeId,
+			targetRootPlaceId = rootPlaceId,
+			playabilityRetrievalStatus = playabilityRetrievalStatus
 		})
 	end, {
-		t1.onClose,
-		v42,
-		t1.universeId,
-		v40,
-		v41,
-		v38,
-		v43,
-		if not FFlagLuaAppIedpControlledJoin then nil else t1.onJoin
+		props.onClose,
+		rootPlaceId,
+		props.universeId,
+		gameInfoRetrievalStatus,
+		playabilityRetrievalStatus,
+		playability,
+		gameDetailErrorType,
+		props.onJoin
 	})
-	local v46 = v38 and v38.isPlayable
-	local v47 = v38 and v38.playabilityStatus
-	local v48 = React.useCallback(function() -- line: 162
-		-- upvalues: t1 (copy), FFlagLuaAppIedpControlledJoin (copy), TeleportService (copy), fireInExperienceDetailsPromptClosedEvent (copy), v42 (copy), v43 (copy), v46 (copy), v47 (copy), v40 (copy), DataHydration (copy), v41 (copy)
-		t1.onClose()
 
-		if not FFlagLuaAppIedpControlledJoin then
-			TeleportService:PromptExperienceDetailsCompleted(Enum.PromptExperienceDetailsResult.PromptClosed)
-		end
+	local isPlayable = playability and playability.isPlayable
+	local playabilityStatus = playability and playability.playabilityStatus
 
+	local onClose = React.useCallback(function()
+		props.onClose()
 		fireInExperienceDetailsPromptClosedEvent({
-			targetUniverseId = t1.universeId,
-			targetRootPlaceId = v42,
-			gameInfoErrorType = v43,
+			targetUniverseId = props.universeId,
+			targetRootPlaceId = rootPlaceId,
+			gameInfoErrorType = gameDetailErrorType,
 			closeReason = Enum.PromptExperienceDetailsResult.PromptClosed.Name,
-			isPlayable = v46,
-			playabilityStatus = v47,
-			isFullyLoaded = v40 ~= DataHydration.DataStatus.NotReady and v41 ~= DataHydration.DataStatus.NotReady
+			isPlayable = isPlayable,
+			playabilityStatus = playabilityStatus,
+			isFullyLoaded = gameInfoRetrievalStatus ~= DataHydration.DataStatus.NotReady and playabilityRetrievalStatus ~= DataHydration.DataStatus.NotReady
 		})
 	end, {
-		t1.onClose,
-		t1.universeId,
-		v42,
-		v43,
-		v46,
-		v47,
-		v40,
-		v41
+		props.onClose,
+		props.universeId,
+		rootPlaceId,
+		gameDetailErrorType,
+		isPlayable,
+		playabilityStatus,
+		gameInfoRetrievalStatus,
+		playabilityRetrievalStatus
 	})
-	local u49 = nil
+	local ref
 
 	if FFlagLuaAppIedpOverlayAndNavigationFix then
-		u49 = React.useRef(nil)
-		React.useEffect(function() -- line: 194
-			-- upvalues: v22 (copy), u49 (ref), DiscoveryEventErrorLogger (copy), t1 (copy), ContextActionService (copy)
-			ContextActionService:BindCoreAction(v22, function(p3, p4) -- line: 195
-				-- upvalues: v22 (copy), u49 (ref), DiscoveryEventErrorLogger (copy), t1 (copy)
-				if p3 == v22 and p4 == Enum.UserInputState.Begin then
-					if u49.current and u49.current.close then
-						u49.current.close()
+		ref = React.useRef(nil)
+
+		React.useEffect(function()
+			ContextActionService:BindCoreAction(v, function(p, p2)
+				if p == v and p2 == Enum.UserInputState.Begin then
+					if ref.current and ref.current.close then
+						ref.current.close()
 					else
-						DiscoveryEventErrorLogger.reportError("InExperienceDetailsPromptCloseError", "SheetRef containing close function is not defined", {
-							sheetRef = u49,
-							universeId = t1.universeId
-						})
+						DiscoveryEventErrorLogger.reportError(
+							"InExperienceDetailsPromptCloseError",
+							"SheetRef containing close function is not defined",
+							{ sheetRef = ref, universeId = props.universeId }
+						)
 					end
 				end
 
 				return Enum.ContextActionResult.Pass
 			end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape, Enum.KeyCode.ButtonStart)
 
-			return function() -- line: 220
-				-- upvalues: ContextActionService (copy), v22 (copy)
-				ContextActionService:UnbindCoreAction(v22)
+			return function()
+				ContextActionService:UnbindCoreAction(v)
 			end
-		end, { t1.universeId })
+		end, { props.universeId })
+	else
+		ref = nil
 	end
 
-	local v50 = React.useRef(false)
-
-	React.useEffect(function() -- line: 228
-		-- upvalues: v50 (copy), v40 (copy), DataHydration (copy), v41 (copy), fireInExperienceDetailsPromptLoadedEvent (copy), t1 (copy), v42 (copy), v46 (copy), v47 (copy), v43 (copy)
-		if not v50.current and (v40 ~= DataHydration.DataStatus.NotReady and v41 ~= DataHydration.DataStatus.NotReady) then
+	local ref2 = React.useRef(false)
+	React.useEffect(function()
+		if
+			not ref2.current
+			and gameInfoRetrievalStatus ~= DataHydration.DataStatus.NotReady
+			and playabilityRetrievalStatus ~= DataHydration.DataStatus.NotReady
+		then
 			fireInExperienceDetailsPromptLoadedEvent({
-				targetUniverseId = t1.universeId,
-				gameInfoRetrievalStatus = v40,
-				playabilityRetrievalStatus = v41,
-				targetRootPlaceId = v42,
-				isPlayable = v46,
-				playabilityStatus = v47,
-				gameInfoErrorType = v43
+				targetUniverseId = props.universeId,
+				gameInfoRetrievalStatus = gameInfoRetrievalStatus,
+				playabilityRetrievalStatus = playabilityRetrievalStatus,
+				targetRootPlaceId = rootPlaceId,
+				isPlayable = isPlayable,
+				playabilityStatus = playabilityStatus,
+				gameInfoErrorType = gameDetailErrorType
 			})
-			v50.current = true
+
+			ref2.current = true
 		end
 	end, {
-		t1.universeId,
-		v40,
-		v41,
-		v42,
-		v46,
-		v47,
-		v43
+		props.universeId,
+		gameInfoRetrievalStatus,
+		playabilityRetrievalStatus,
+		rootPlaceId,
+		isPlayable,
+		playabilityStatus,
+		gameDetailErrorType
 	})
 
-	return React.createElement(InExperienceDetailsPrompt, {
-		name = v36 and v36.name,
-		imageUri = v36 and `rbxthumb://type=GameIcon&id={ t1.universeId }&w=150&h=150`,
-		creator = v36 and v36.creator,
-		ageRecommendation = v37,
-		rating = v39 and VotesUtils.getRatingDisplayText(v39),
-		playability = v38,
-		errorType = v43,
-		rootPlaceId = if not FFlagLuaAppIedpFixPlayButton then nil else v42,
-		onJoin = v45,
-		onClose = v48,
-		focusRootRef = v44,
-		sheetRef = if not FFlagLuaAppIedpOverlayAndNavigationFix then nil else u49,
-		playabilityRetrievalStatus = v41
-	})
+	local createElement = React.createElement
+	local v4 = {
+		name = v2 and v2.name,
+		imageUri = v2 and `rbxthumb://type=GameIcon&id={props.universeId}&w=150&h=150`,
+		creator = v2 and v2.creator,
+		ageRecommendation = ageRecommendation,
+		rating = v3 and VotesUtils.getRatingDisplayText(v3),
+		playability = playability,
+		errorType = gameDetailErrorType,
+		rootPlaceId = 0,
+		onJoin = 0,
+		onClose = 0,
+		focusRootRef = 0,
+		sheetRef = 0,
+		playabilityRetrievalStatus = 0
+	}
+	local rootPlaceId2
+
+	if FFlagLuaAppIedpFixPlayButton then
+		rootPlaceId2 = rootPlaceId
+	end
+
+	v4.rootPlaceId = rootPlaceId2
+	v4.onJoin = onJoin
+	v4.onClose = onClose
+	v4.focusRootRef = focusRootRef
+	local sheetRef
+
+	if FFlagLuaAppIedpOverlayAndNavigationFix then
+		sheetRef = ref
+	end
+
+	v4.sheetRef = sheetRef
+	v4.playabilityRetrievalStatus = playabilityRetrievalStatus
+	return createElement(InExperienceDetailsPrompt, v4)
 end
 
 return InExperienceDetailsPromptContainer

@@ -3,289 +3,320 @@ local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
 local GamepadService = game:GetService("GamepadService")
 local VRService = game:GetService("VRService")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local MouseIconOverrideService = require(CorePackages.Workspace.Packages.CoreScriptsCommon).MouseIconOverrideService
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Actions = scriptParentParent.Actions
-local Thunks = scriptParentParent.Thunks
-local Utility = scriptParentParent.Utility
-local Constants = require(scriptParentParent.Constants)
-local GetSegmentFromPosition = require(Utility.GetSegmentFromPosition)
-local EmotesButtons = require(scriptParent.EmotesButtons)
-local SlotNumbers = require(scriptParent.SlotNumbers)
-local WheelBackground = require(scriptParent.WheelBackground)
-local FocusSegment = require(Actions.FocusSegment)
-local HideMenu = require(Actions.HideMenu)
-local PlayEmote = require(Thunks.PlayEmote)
-local HighValue = Enum.ContextActionPriority.High.Value
-local v23 = Roact.PureComponent:extend("EmotesWheel")
 
-local function getRandomAssetId(p1) -- line: 36
-	if #p1 == 0 then
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local MouseIconOverrideService = CoreScriptsCommon.MouseIconOverrideService
+
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local actions = parent2.Actions
+local thunks = parent2.Thunks
+local utility = parent2.Utility
+
+local Constants = require(parent2.Constants)
+
+local GetSegmentFromPosition = require(utility.GetSegmentFromPosition)
+
+local EmotesButtons = require(parent.EmotesButtons)
+local SlotNumbers = require(parent.SlotNumbers)
+local WheelBackground = require(parent.WheelBackground)
+
+local FocusSegment = require(actions.FocusSegment)
+local HideMenu = require(actions.HideMenu)
+local PlayEmote = require(thunks.PlayEmote)
+
+local value = Enum.ContextActionPriority.High.Value
+
+local extended = Roact.PureComponent:extend("EmotesWheel")
+
+local function getRandomAssetId(list) -- 2 equivalent calls inferred from this helper
+	if #list == 0 then
 		return
 	end
 
-	return p1[math.random(1, #p1)]
+	return list[math.random(1, #list)]
 end
 
-function v23.bindActions(p2) -- line: 45
-	-- upvalues: Constants (copy), GetSegmentFromPosition (copy), ContextActionService (copy), HighValue (copy)
-	if p2.actionsBound then
+function extended:bindActions()
+	if self.actionsBound then
 		return
 	end
 
-	local function selectEmote(_, _, p5) -- line: 50
-		-- upvalues: Constants (copy), GetSegmentFromPosition (copy), p2 (copy)
-		local vector2 = Vector2.new(p5.Position.X, p5.Position.Y)
+	local function selectEmote(_, _, p)
+		local vector2 = Vector2.new(p.Position.X, p.Position.Y)
 
 		if vector2.Magnitude < Constants.ThumbstickThreshold then
 			return
 		end
 
-		local v51 = GetSegmentFromPosition(vector2)
+		local segmentFromPosition = GetSegmentFromPosition(vector2)
 
-		if v51 == p2.props.emotesWheel.focusedSegmentIndex then
+		if segmentFromPosition == self.props.emotesWheel.focusedSegmentIndex then
 			return
 		end
 
-		if p2.props.emotesPage.currentEmotes[v51] then
-			p2.props.focusSegment(v51)
-
-			return
+		if self.props.emotesPage.currentEmotes[segmentFromPosition] then
+			self.props.focusSegment(segmentFromPosition)
+		else
+			self.props.focusSegment(0)
 		end
-
-		p2.props.focusSegment(0)
 	end
 
-	ContextActionService:BindActionAtPriority(Constants.EmoteSelectionAction, selectEmote, false, HighValue, Constants.SelectionThumbstick)
+	ContextActionService:BindActionAtPriority(
+		Constants.EmoteSelectionAction,
+		selectEmote,
+		false,
+		value,
+		Constants.SelectionThumbstick
+	)
 
-	local function playSelected(_, p7, _) -- line: 78
-		-- upvalues: p2 (copy)
-		if p7 == Enum.UserInputState.Begin then
-			local focusedSegmentIndex = p2.props.emotesWheel.focusedSegmentIndex
-			local v56 = p2.props.emotesPage.currentEmotes[focusedSegmentIndex]
+	local function playSelected(_, p, _)
+		if p == Enum.UserInputState.Begin then
+			local focusedSegmentIndex = self.props.emotesWheel.focusedSegmentIndex
+			local currentEmote = self.props.emotesPage.currentEmotes[focusedSegmentIndex]
 
-			if not v56 then
+			if not currentEmote then
 				return
 			end
 
-			local v57 = p2.props.emotesPage.emotesInfo[v56]
+			local v = self.props.emotesPage.emotesInfo[currentEmote]
 
-			if not v57 then
+			if not v then
 				return
 			end
 
-			local v58 = if #v57 ~= 0 then v57[math.random(1, #v57)] else nil
-
-			p2.props.playEmote(v56, focusedSegmentIndex, v58)
+			local randomAssetId = getRandomAssetId(v) -- inferred equivalent call
+			self.props.playEmote(currentEmote, focusedSegmentIndex, randomAssetId)
 		end
 	end
 
-	ContextActionService:BindActionAtPriority(Constants.PlaySelectedAction, playSelected, false, HighValue, Constants.PlayEmoteButton)
+	ContextActionService:BindActionAtPriority(
+		Constants.PlaySelectedAction,
+		playSelected,
+		false,
+		value,
+		Constants.PlayEmoteButton
+	)
 
-	local function closeMenu(_, p10, _) -- line: 106
-		-- upvalues: p2 (copy)
-		if p10 == Enum.UserInputState.Begin then
-			p2.props.hideMenu()
+	local function closeMenu(_, p, _) -- 1 equivalent call inferred from this helper
+		if p == Enum.UserInputState.Begin then
+			self.props.hideMenu()
 		end
 	end
 
-	local t1 = {
-		Constants.EmoteMenuCloseKey,
-		Constants.EmoteMenuCloseButton,
-		Constants.EmoteMenuCloseButtonSecondary
-	}
+	local v = { Constants.EmoteMenuCloseKey, Constants.EmoteMenuCloseButton, Constants.EmoteMenuCloseButtonSecondary }
 
-	ContextActionService:BindActionAtPriority(Constants.CloseMenuAction, closeMenu, false, HighValue, unpack(t1))
+	ContextActionService:BindActionAtPriority(Constants.CloseMenuAction, closeMenu, false, value, unpack(v))
 
-	local function closeMenuNoSink(_, p13, _) -- line: 126
-		-- upvalues: p2 (copy)
-		if p13 == Enum.UserInputState.Begin then
-			p2.props.hideMenu()
-		end
-
+	local function closeMenuNoSink(_, p, _)
+		closeMenu(nil, p) -- inferred equivalent call
 		return Enum.ContextActionResult.Pass
 	end
 
-	ContextActionService:BindActionAtPriority(Constants.LeaveMenuDontSinkInputAction, closeMenuNoSink, false, HighValue, unpack(Constants.LeaveMenuNoSinkInputs))
+	ContextActionService:BindActionAtPriority(
+		Constants.LeaveMenuDontSinkInputAction,
+		closeMenuNoSink,
+		false,
+		value,
+		unpack(Constants.LeaveMenuNoSinkInputs)
+	)
 
-	local function activateEmoteByNumber(_, p16, p17) -- line: 141
-		-- upvalues: Constants (copy), p2 (copy)
-		if p16 ~= Enum.UserInputState.Begin then
+	local function activateEmoteByNumber(_, p, p2)
+		if p ~= Enum.UserInputState.Begin then
 			return
 		end
 
-		local v68 = nil
+		local v2 = nil
 
-		for i, v in ipairs(Constants.EmoteSlotKeys) do
-			if v == p17.KeyCode then
-				v68 = i
-
+		for i, emoteSlotKey in ipairs(Constants.EmoteSlotKeys) do
+			if emoteSlotKey == p2.KeyCode then
+				v2 = i
 				break
 			end
 		end
 
-		if not v68 then
+		if not v2 then
 			return
 		end
 
-		local v71 = p2.props.emotesPage.currentEmotes[v68]
+		local currentEmote = self.props.emotesPage.currentEmotes[v2]
 
-		if not v71 then
+		if not currentEmote then
 			return
 		end
 
-		local v72 = p2.props.emotesPage.emotesInfo[v71]
+		local v3 = self.props.emotesPage.emotesInfo[currentEmote]
 
-		if not v72 then
+		if not v3 then
 			return
 		end
 
-		local v73 = if #v72 ~= 0 then v72[math.random(1, #v72)] else nil
-
-		p2.props.playEmote(v71, v68, v73)
+		local randomAssetId = getRandomAssetId(v3) -- inferred equivalent call
+		self.props.playEmote(currentEmote, v2, randomAssetId)
 	end
 
-	ContextActionService:BindActionAtPriority(Constants.ActivateEmoteSlotAction, activateEmoteByNumber, false, HighValue, unpack(Constants.EmoteSlotKeys))
+	ContextActionService:BindActionAtPriority(
+		Constants.ActivateEmoteSlotAction,
+		activateEmoteByNumber,
+		false,
+		value,
+		unpack(Constants.EmoteSlotKeys)
+	)
 
-	local function sinkInput(_, _, _) -- line: 182
+	local function sinkInput(_, _, _)
 		return Enum.ContextActionResult.Sink
 	end
 
-	ContextActionService:BindCoreActionAtPriority(Constants.VirtualCursorSinkAction, sinkInput, false, HighValue, Enum.KeyCode.ButtonSelect)
-	p2.actionsBound = true
+	ContextActionService:BindCoreActionAtPriority(
+		Constants.VirtualCursorSinkAction,
+		sinkInput,
+		false,
+		value,
+		Enum.KeyCode.ButtonSelect
+	)
+
+	self.actionsBound = true
 end
-function v23.unbindActions(p21) -- line: 196
-	-- upvalues: ContextActionService (copy), Constants (copy)
-	if p21.actionsBound then
+
+function extended:unbindActions()
+	if self.actionsBound then
 		ContextActionService:UnbindAction(Constants.CloseMenuAction)
 		ContextActionService:UnbindAction(Constants.EmoteSelectionAction)
 		ContextActionService:UnbindAction(Constants.PlaySelectedAction)
 		ContextActionService:UnbindAction(Constants.LeaveMenuDontSinkInputAction)
 		ContextActionService:UnbindAction(Constants.ActivateEmoteSlotAction)
 		ContextActionService:UnbindCoreAction(Constants.VirtualCursorSinkAction)
-		p21.actionsBound = false
+
+		self.actionsBound = false
 	end
 end
-function v23.addCursorOverride(p22) -- line: 209
-	-- upvalues: VRService (copy), MouseIconOverrideService (copy), Constants (copy), GamepadService (copy)
+
+function extended:addCursorOverride()
 	if VRService.VREnabled then
 		return
 	end
 
-	if p22.isUsingGamepad and not p22.isCursorHidden then
+	if self.isUsingGamepad and not self.isCursorHidden then
 		MouseIconOverrideService.push(Constants.CursorOverrideName, Enum.OverrideMouseIconBehavior.ForceHide)
+
 		GamepadService.GamepadCursorEnabled = false
-		p22.isCursorHidden = true
+		self.isCursorHidden = true
 	end
 end
-function v23.removeCursorOverride(p23) -- line: 222
-	-- upvalues: MouseIconOverrideService (copy), Constants (copy)
-	if p23.isCursorHidden then
+
+function extended:removeCursorOverride()
+	if self.isCursorHidden then
 		MouseIconOverrideService.pop(Constants.CursorOverrideName)
-		p23.isCursorHidden = false
+
+		self.isCursorHidden = false
 	end
 end
-function v23.connectListeners(p24) -- line: 230
-	-- upvalues: UserInputService (copy), Constants (copy)
-	p24.inputTypeChangedListener = UserInputService.LastInputTypeChanged:Connect(function(p25) -- line: 231
-		-- upvalues: Constants (copy), p24 (copy)
-		if Constants.GamepadInputTypes[p25] then
-			p24.isUsingGamepad = true
 
-			if p24.props.displayOptions.menuVisible then
-				p24:addCursorOverride()
+function extended:connectListeners()
+	self.inputTypeChangedListener = UserInputService.LastInputTypeChanged:Connect(function(p)
+		if Constants.GamepadInputTypes[p] then
+			self.isUsingGamepad = true
 
-				return
+			if self.props.displayOptions.menuVisible then
+				self:addCursorOverride()
 			end
 		else
-			p24.isUsingGamepad = false
-			p24:removeCursorOverride()
+			self.isUsingGamepad = false
+
+			self:removeCursorOverride()
 		end
 	end)
 end
-function v23.disconnectListeners(p26) -- line: 246
-	p26.inputTypeChangedListener:Disconnect()
-end
-function v23.didUpdate(p27) -- line: 250
-	if p27.props.displayOptions.menuVisible then
-		p27:bindActions()
-		p27:addCursorOverride()
 
-		return
+function extended:disconnectListeners()
+	self.inputTypeChangedListener:Disconnect()
+end
+
+function extended:didUpdate()
+	if self.props.displayOptions.menuVisible then
+		self:bindActions()
+
+		self:addCursorOverride()
+	else
+		self:unbindActions()
+
+		self:removeCursorOverride()
+	end
+end
+
+function extended:didMount()
+	if self.props.displayOptions.menuVisible then
+		self:bindActions()
 	end
 
-	p27:unbindActions()
-	p27:removeCursorOverride()
-end
-function v23.didMount(p28) -- line: 262
-	if p28.props.displayOptions.menuVisible then
-		p28:bindActions()
-	end
-
-	p28:connectListeners()
-end
-function v23.willUnmount(p29) -- line: 270
-	p29:unbindActions()
-	p29:disconnectListeners()
-end
-function v23.render(p30) -- line: 276
-	-- upvalues: Roact (copy), WheelBackground (copy), EmotesButtons (copy), SlotNumbers (copy)
-	return Roact.createElement("Frame", {
-		Active = true,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		Visible = p30.props.displayOptions.menuVisible
-	}, {
-		MouseUnlock = Roact.createElement("TextButton", {
-			Modal = true,
-			Text = "",
-			Transparency = 1,
-			Size = UDim2.new(0, 0, 0, 0)
-		}),
-		Back = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 1,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, {
-			Background = Roact.createElement(WheelBackground)
-		}),
-		Front = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 2,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, {
-			EmotesButtons = Roact.createElement(EmotesButtons),
-			SlotNumbers = Roact.createElement(SlotNumbers)
-		})
-	})
+	self:connectListeners()
 end
 
-local function mapStateToProps(p31) -- line: 309
+function extended:willUnmount()
+	self:unbindActions()
+
+	self:disconnectListeners()
+end
+
+function extended.render(p)
+	return Roact.createElement(
+		"Frame",
+		{
+			Active = true,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			Visible = p.props.displayOptions.menuVisible
+		},
+		{
+			MouseUnlock = Roact.createElement("TextButton", {
+				Modal = true,
+				Size = UDim2.new(0, 0, 0, 0),
+				Text = "",
+				Transparency = 1
+			}),
+			Back = Roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 1 },
+				{
+					Background = Roact.createElement(WheelBackground)
+				}
+			),
+			Front = Roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 2 },
+				{
+					EmotesButtons = Roact.createElement(EmotesButtons),
+					SlotNumbers = Roact.createElement(SlotNumbers)
+				}
+			)
+		}
+	)
+end
+
+local function mapStateToProps(data)
 	return {
-		displayOptions = p31.displayOptions,
-		emotesWheel = p31.emotesWheel,
-		emotesPage = p31.emotesPage
+		displayOptions = data.displayOptions,
+		emotesWheel = data.emotesWheel,
+		emotesPage = data.emotesPage
 	}
 end
-local function mapDispatchToProps(p32) -- line: 317
-	-- upvalues: PlayEmote (copy), FocusSegment (copy), HideMenu (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		playEmote = function(p33, p34, p35) -- line: 319
-			-- upvalues: p32 (copy), PlayEmote (copy)
-			return p32(PlayEmote(p33, p34, p35))
+		playEmote = function(p, p2, p3)
+			return callback(PlayEmote(p, p2, p3))
 		end,
-		focusSegment = function(p36) -- line: 323
-			-- upvalues: p32 (copy), FocusSegment (copy)
-			return p32(FocusSegment(p36))
+		focusSegment = function(p)
+			return callback(FocusSegment(p))
 		end,
-		hideMenu = function() -- line: 327
-			-- upvalues: p32 (copy), HideMenu (copy)
-			return p32(HideMenu())
+		hideMenu = function()
+			return callback(HideMenu())
 		end
 	}
 end
 
-return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v23)
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(extended)

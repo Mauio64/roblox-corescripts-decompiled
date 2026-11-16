@@ -3,266 +3,253 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local CorePackages = game:GetService("CorePackages")
-
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
-
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
 local ConnectionUtil = CoreScriptsCommon.ConnectionUtil
 local AvatarUtil = CoreScriptsCommon.AvatarUtil
-local v10 = game:DefineFastFlag("DebugImmersionModeNonVR", false)
-local v11 = game:DefineFastInt("VRAvatarGesturesAnalyticsThrottleHundrethsPercent", 0)
-local t1 = {}
 
-t1.__index = t1
+local defineFastFlag = game:DefineFastFlag("DebugImmersionModeNonVR", false)
 
-function t1.new() -- line: 55
-	-- upvalues: t1 (copy), ConnectionUtil (copy), VRService (copy)
-	local self = setmetatable({}, t1)
+local defineFastFlag2 = game:DefineFastFlag("VRAvatarGesturesFixFirstPersonHeadScale", false)
 
-	self.partCFrameMap = {}
-	self.connections = ConnectionUtil.new()
-	self.analyticsSendEnabled = true
-	self.connections:connect("AvatarGestures", VRService:GetPropertyChangedSignal("AvatarGestures"), function() -- line: 60
-		-- upvalues: self (copy)
-		self:onAvatarGesturesChanged()
+local defineFastInt = game:DefineFastInt("VRAvatarGesturesAnalyticsThrottleHundrethsPercent", 0)
+
+local function isVRFirstPerson(currentCamera): boolean -- 3 equivalent calls inferred from this helper
+	return (not defineFastFlag2 and 5 or 5 * currentCamera.HeadScale) >= (currentCamera.CFrame.Position - currentCamera.Focus.Position).Magnitude
+end
+
+local class = {}
+class.__index = class
+
+function class.new()
+	local object = setmetatable({}, class)
+	object.partCFrameMap = {}
+	object.connections = ConnectionUtil.new()
+	object.analyticsSendEnabled = true
+	object.connections:connect("AvatarGestures", VRService:GetPropertyChangedSignal("AvatarGestures"), function()
+		object:onAvatarGesturesChanged()
 	end)
 
 	if VRService.AvatarGestures then
-		self:onAvatarGesturesChanged()
+		object:onAvatarGesturesChanged()
 	end
 
-	return self
+	return object
 end
-function t1.onCharacterChanged(p1, p2) -- line: 65
-	-- upvalues: VRService (copy)
-	local Humanoid = p2:FindFirstChild("Humanoid")
 
-	if not Humanoid then
+function class:onCharacterChanged(instance)
+	local humanoid = instance:FindFirstChild("Humanoid")
+
+	if not humanoid then
 		return
 	end
 
-	for _, v in pairs({
-		"TrackedIKLeftHand",
-		"TrackedIKRightHand",
-		"TrackedIKHead"
-	}) do
-		local v2 = Humanoid:FindFirstChild(v)
+	for _, childName in pairs({ "TrackedIKLeftHand", "TrackedIKRightHand", "TrackedIKHead" }) do
+		local child = humanoid:FindFirstChild(childName)
 
-		if v2 then
-			v2.SmoothTime = 0
+		if child then
+			child.SmoothTime = 0
 		end
 	end
 
-	local CurrentCamera = workspace.CurrentCamera
+	local currentCamera = workspace.CurrentCamera
 
-	if not CurrentCamera then
+	if not currentCamera then
 		return
 	end
 
-	local function updateSeated(p3) -- line: 86
-		-- upvalues: CurrentCamera (copy), Humanoid (copy)
-		local v49 = CurrentCamera.CameraSubject and CurrentCamera.CameraSubject:IsA("VehicleSeat")
-		local v50 = (CurrentCamera.CFrame.Position - CurrentCamera.Focus.Position).Magnitude <= 5
-		local TrackedIKHead = Humanoid:FindFirstChild("TrackedIKHead")
+	local function updateSeated(p)
+		local v = currentCamera.CameraSubject and currentCamera.CameraSubject:IsA("VehicleSeat")
+		local vrFirstPerson = isVRFirstPerson(currentCamera) -- inferred equivalent call
+		local trackedIKHead = humanoid:FindFirstChild("TrackedIKHead")
 
-		if TrackedIKHead then
-			if p3 and not v49 and v50 then
-				TrackedIKHead.Type = Enum.IKControlType.Transform
-
-				return
+		if trackedIKHead then
+			if p and not v and vrFirstPerson then
+				trackedIKHead.Type = Enum.IKControlType.Transform
+			else
+				trackedIKHead.Type = Enum.IKControlType.Rotation
 			end
-
-			TrackedIKHead.Type = Enum.IKControlType.Rotation
 		end
 	end
 
-	updateSeated(Humanoid.Sit)
-	p1.connections:connect("Seated", Humanoid.Seated, function(p4) -- line: 102
-		-- upvalues: updateSeated (copy), CurrentCamera (copy), VRService (copy)
-		updateSeated(p4)
+	updateSeated(humanoid.Sit)
+	self.connections:connect("Seated", humanoid.Seated, function(p)
+		updateSeated(p)
 
-		if p4 and (CurrentCamera.CFrame.Position - CurrentCamera.Focus.Position).Magnitude <= 5 then
+		if p and isVRFirstPerson(currentCamera) then -- inferred equivalent call
 			VRService:RecenterUserHeadCFrame()
 		end
 	end)
 end
-function t1.onAvatarGesturesChanged(p5) -- line: 111
-	-- upvalues: VRService (copy), v10 (copy), RobloxReplicatedStorage (copy), AvatarUtil (copy), Players (copy), RbxAnalyticsService (copy), v11 (copy)
+
+function class:onAvatarGesturesChanged()
 	if VRService.AvatarGestures then
-		if VRService.VREnabled or v10 then
-			local AvatarGesturesVRPlayer = RobloxReplicatedStorage:WaitForChild("AvatarGesturesVRPlayer", 5)
+		if VRService.VREnabled or defineFastFlag then
+			local avatarGesturesVRPlayer = RobloxReplicatedStorage:WaitForChild("AvatarGesturesVRPlayer", 5)
 
-			if not AvatarGesturesVRPlayer then
+			if not avatarGesturesVRPlayer then
 				warn("VRService.AvatarGestures failed to connect to server")
-
 				return
 			end
 
-			AvatarGesturesVRPlayer:FireServer(true)
-			p5:connectInputCFrames()
+			avatarGesturesVRPlayer:FireServer(true)
 
-			if not p5.avatarUtil then
-				p5.avatarUtil = AvatarUtil.new()
-				p5.avatarUtil:connectLocalCharacterChanges(function(p6) -- line: 128
-					-- upvalues: p5 (copy)
-					p5:onCharacterChanged(p6)
+			self:connectInputCFrames()
+
+			if self.avatarUtil then
+				if Players.LocalPlayer and Players.LocalPlayer.Character then
+					self:onCharacterChanged(Players.LocalPlayer.Character)
+				end
+			else
+				self.avatarUtil = AvatarUtil.new()
+				self.avatarUtil:connectLocalCharacterChanges(function(p)
+					self:onCharacterChanged(p)
 				end)
-			elseif Players.LocalPlayer and Players.LocalPlayer.Character then
-				p5:onCharacterChanged(Players.LocalPlayer.Character)
 			end
 
-			if p5.analyticsSendEnabled then
-				p5.analyticsSendEnabled = nil
-				RbxAnalyticsService:ReportInfluxSeries("VRAvatarGestures", {
-					calledFrom = "ClientJoined",
-					placeId = game.PlaceId
-				}, v11)
+			if self.analyticsSendEnabled then
+				self.analyticsSendEnabled = nil
 
-				return
+				RbxAnalyticsService:ReportInfluxSeries(
+					"VRAvatarGestures",
+					{ placeId = game.PlaceId, calledFrom = "ClientJoined" },
+					defineFastInt
+				)
 			end
 		end
 	else
-		if VRService.VREnabled or v10 then
-			local AvatarGesturesVRPlayer = RobloxReplicatedStorage:FindFirstChild("AvatarGesturesVRPlayer")
+		local avatarGesturesVRPlayer = (VRService.VREnabled or defineFastFlag)
+			and RobloxReplicatedStorage:FindFirstChild("AvatarGesturesVRPlayer")
 
-			if AvatarGesturesVRPlayer then
-				AvatarGesturesVRPlayer:FireServer(false)
-			end
+		if avatarGesturesVRPlayer then
+			avatarGesturesVRPlayer:FireServer(false)
 		end
 
-		p5.connections:disconnectAll()
-		p5.connections:connect("AvatarGestures", VRService:GetPropertyChangedSignal("AvatarGestures"), function() -- line: 157
-			-- upvalues: p5 (copy)
-			p5:onAvatarGesturesChanged()
+		self.connections:disconnectAll()
+		self.connections:connect("AvatarGestures", VRService:GetPropertyChangedSignal("AvatarGestures"), function()
+			self:onAvatarGesturesChanged()
 		end)
 	end
 end
-function t1.updateCFrames(_, p8, p9) -- line: 161
-	-- upvalues: Players (copy), VRService (copy)
-	local LocalPlayer = Players.LocalPlayer
+
+function class:updateCFrames(childName, p)
+	local localPlayer = Players.LocalPlayer
 
 	if not Players.LocalPlayer then
 		return
 	end
 
-	local Character = LocalPlayer.Character
+	local character = localPlayer.Character
 
-	if not LocalPlayer.Character then
+	if not localPlayer.Character then
 		return
 	end
 
-	local p8_2 = Character:FindFirstChild(p8)
+	local child = character:FindFirstChild(childName)
 
-	if not p8_2 then
+	if not child then
 		return
 	end
 
-	local CurrentCamera = workspace.CurrentCamera
+	local currentCamera = workspace.CurrentCamera
 
-	if not CurrentCamera then
+	if not (currentCamera and child:FindFirstChild(childName .. "Attachment")) then
 		return
 	end
 
-	if not p8_2:FindFirstChild(p8 .. "Attachment") then
+	local child2 = child:FindFirstChild(childName .. "AlignPosition")
+
+	if not child2 then
 		return
 	end
 
-	local v32 = p8_2:FindFirstChild(p8 .. "AlignPosition")
+	local child3 = child:FindFirstChild(childName .. "AlignOrientation")
 
-	if not v32 then
-		return
-	end
-
-	local v33 = p8_2:FindFirstChild(p8 .. "AlignOrientation")
-
-	if not v33 then
+	if not child3 then
 		return
 	end
 
 	if VRService.VREnabled then
-		local v34 = p9.Rotation + p9.Position * CurrentCamera.HeadScale
-		local v35 = CurrentCamera.CFrame * v34
-		local Head = Character:FindFirstChild("Head")
+		local v = p.Rotation + p.Position * currentCamera.HeadScale
+		local cframe3 = currentCamera.CFrame * v
 
-		if (CurrentCamera.CFrame.Position - CurrentCamera.Focus.Position).Magnitude > 5 and Head then
-			local UserCFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
-			local v38 = UserCFrame.Rotation + UserCFrame.Position * CurrentCamera.HeadScale
-			local v39 = CurrentCamera.CFrame * v38 * CFrame.new(0, 0, 0.5)
+		local head = character:FindFirstChild("Head")
 
-			if p8 ~= "TrackedHead" then
-				local v40 = Head.CFrame:ToWorldSpace(v39:ToObjectSpace(v35))
+		if isVRFirstPerson(currentCamera) or not head then -- inferred equivalent call
+			child2.Position = cframe3.Position
 
-				v32.Position = v40.Position
-				v33.CFrame = v40 * CFrame.Angles(1.5707963267948966, 0, 0)
+			if childName == "TrackedHead" then
+				child3.CFrame = cframe3
 			else
-				local PrimaryPartCFrame = Character.PrimaryPart.CFrame
-
-				v32.Position = (PrimaryPartCFrame * CFrame.new(0, PrimaryPartCFrame.Position.Y * 0.25, -PrimaryPartCFrame.Position.Y * 0.125)).Position
-				v33.CFrame = PrimaryPartCFrame * v34
+				child3.CFrame = cframe3 * CFrame.Angles(1.5707963267948966, 0, 0)
 			end
 		else
-			v32.Position = v35.Position
+			local userCFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
+			local v2 = userCFrame.Rotation + userCFrame.Position * currentCamera.HeadScale
+			local cframe = currentCamera.CFrame * v2 * CFrame.new(0, 0, 0.5)
 
-			if p8 ~= "TrackedHead" then
-				v33.CFrame = v35 * CFrame.Angles(1.5707963267948966, 0, 0)
+			if childName == "TrackedHead" then
+				local cframe2 = character.PrimaryPart.CFrame
+				child2.Position = (cframe2 * CFrame.new(0, cframe2.Position.Y * 0.25, -cframe2.Position.Y * 0.125)).Position
+
+				child3.CFrame = cframe2 * v
 			else
-				v33.CFrame = v35
+				local worldSpace = head.CFrame:ToWorldSpace(cframe:ToObjectSpace(cframe3))
+				child2.Position = worldSpace.Position
+				child3.CFrame = worldSpace * CFrame.Angles(1.5707963267948966, 0, 0)
 			end
 		end
 	else
-		local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-		local v43 = if p8 == "TrackedHead" then HumanoidRootPart.CFrame * p9 else HumanoidRootPart.CFrame * p9 * CFrame.Angles(0, 0, (math.rad(time() * 30))) * CFrame.new(1, 0, -0.5)
+		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+		local cframe
 
-		if HumanoidRootPart then
-			v32.Position = v43.Position
-			v33.CFrame = v43
+		if childName == "TrackedHead" then
+			cframe = humanoidRootPart.CFrame * p
+		else
+			cframe = humanoidRootPart.CFrame * p * CFrame.Angles(0, 0, (math.rad(time() * 30))) * CFrame.new(1, 0, -0.5)
+		end
+
+		if humanoidRootPart then
+			child2.Position = cframe.Position
+			child3.CFrame = cframe
 		end
 	end
 
-	p8_2.CFrame = CFrame.new(v32.Position) * v33.CFrame.Rotation
+	child.CFrame = CFrame.new(child2.Position) * child3.CFrame.Rotation
 end
-function t1.steppedCframes(p10) -- line: 253
-	for k, v in pairs(p10.partCFrameMap) do
-		p10:updateCFrames(k, v)
+
+function class:steppedCframes()
+	for k, partCFrame in pairs(self.partCFrameMap) do
+		self:updateCFrames(k, partCFrame)
 	end
 end
-function t1.connectInputCFrames(p11) -- line: 259
-	-- upvalues: VRService (copy), v10 (copy), RunService (copy)
+
+function class:connectInputCFrames()
 	if VRService.VREnabled then
-		p11.connections:connect("UserCFrameChanged", VRService.UserCFrameChanged, function(p12, p13) -- line: 261
-			-- upvalues: p11 (copy)
-			if p12 == Enum.UserCFrame.LeftHand then
-				p11.partCFrameMap.TrackedLeftHand = p13
-
-				return
-			end
-
-			if p12 == Enum.UserCFrame.RightHand then
-				p11.partCFrameMap.TrackedRightHand = p13
-
-				return
-			end
-
-			if p12 == Enum.UserCFrame.Head then
-				p11.partCFrameMap.TrackedHead = p13
+		self.connections:connect("UserCFrameChanged", VRService.UserCFrameChanged, function(p, p2)
+			if p == Enum.UserCFrame.LeftHand then
+				self.partCFrameMap.TrackedLeftHand = p2
+			elseif p == Enum.UserCFrame.RightHand then
+				self.partCFrameMap.TrackedRightHand = p2
+			elseif p == Enum.UserCFrame.Head then
+				self.partCFrameMap.TrackedHead = p2
 			end
 		end)
-	elseif v10 then
-		p11.connections:connect("NonVRSimulateInput", RunService.RenderStepped, function(_) -- line: 271
-			-- upvalues: p11 (copy)
-			p11.partCFrameMap.TrackedLeftHand = CFrame.new(-0.5, 0, -0.5)
-			p11.partCFrameMap.TrackedRightHand = CFrame.new(0.5, 0, -0.5)
-			p11.partCFrameMap.TrackedHead = CFrame.new(0, 1, 0)
+	elseif defineFastFlag then
+		self.connections:connect("NonVRSimulateInput", RunService.RenderStepped, function(_)
+			self.partCFrameMap.TrackedLeftHand = CFrame.new(-0.5, 0, -0.5)
+			self.partCFrameMap.TrackedRightHand = CFrame.new(0.5, 0, -0.5)
+			self.partCFrameMap.TrackedHead = CFrame.new(0, 1, 0)
 		end)
 	end
 
-	if VRService.VREnabled or v10 then
-		p11.connections:connect("RenderStepped", RunService.RenderStepped, function(_) -- line: 279
-			-- upvalues: p11 (copy)
-			p11:steppedCframes()
+	if VRService.VREnabled or defineFastFlag then
+		self.connections:connect("RenderStepped", RunService.RenderStepped, function(_)
+			self:steppedCframes()
 		end)
 	end
 end
 
-return t1.new()
+return class.new()

@@ -1,13 +1,60 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local FFlagAddIEMProfilePage = require(ProfilePlatformParent.SharedFlags).FFlagAddIEMProfilePage
-local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
-local FFlagEnableProfileCompletion = require(ProfilePlatformParent.SharedFlags).FFlagEnableProfileCompletion
+local parent = ProfilePlatform.Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddIEMProfilePage = SharedFlags.FFlagAddIEMProfilePage
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableCurrencyTransfer = SharedFlags2.FFlagProfilePlatformEnableCurrencyTransfer
+local FFlagProfilePlatformEnableTradeItems = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableTradeItems)
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableProfileCompletion = SharedFlags3.FFlagEnableProfileCompletion
+
 local FFlagProfilePlatformEnableEditAppearanceMenu = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
+
 local FFlagProfilePlatformEditBackgroundMenuItem = require(ProfilePlatform.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
-local FFlagSocialEnableProfileInspectAndBuy = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuy
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagSocialEnableProfileInspectAndBuy = SharedFlags4.FFlagSocialEnableProfileInspectAndBuy
 local FFlagProfilePlatformEnableMoments = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableMoments)
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagFriendsCallingClientGate_DEV = SharedFlags5.FFlagFriendsCallingClientGate_DEV
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagUseUserCtaCommonEnums = SharedFlags6.FFlagUseUserCtaCommonEnums
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagJoinabilityCTARefactor = SharedFlags7.FFlagJoinabilityCTARefactor
+
+local UserCtaCommon = require(parent.UserCtaCommon)
+local userCtaAction
+
+if FFlagUseUserCtaCommonEnums then
+	userCtaAction = UserCtaCommon.Enums.UserCtaAction
+else
+	userCtaAction = nil
+end
+
+local function buildSharedProfileActions()
+	local clone = table.clone(userCtaAction)
+
+	clone.Call = not FFlagFriendsCallingClientGate_DEV and "" or userCtaAction.Call
+	clone.EditAppearance = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or userCtaAction.EditAppearance
+
+	clone.EditEmotes = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or userCtaAction.EditEmotes
+	clone.SwitchAvatar = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or userCtaAction.SwitchAvatar
+
+	clone.EditBackground = not (FFlagProfilePlatformEnableEditAppearanceMenu and FFlagProfilePlatformEditBackgroundMenuItem)
+		and ""
+		or userCtaAction.EditBackground
+
+	clone.CurrencyTransfer = not FFlagProfilePlatformEnableCurrencyTransfer and "" or userCtaAction.CurrencyTransfer
+
+	clone.TradeItems = not FFlagProfilePlatformEnableTradeItems and "" or userCtaAction.TradeItems
+	clone.ContextualOverflow = userCtaAction.ContextualOverflow
+
+	clone.PlayExperience = not FFlagJoinabilityCTARefactor and "" or userCtaAction.PlayExperience
+	clone.ViewProfile = not FFlagJoinabilityCTARefactor and "" or userCtaAction.ViewProfile
+	clone.UnlockExperience = not FFlagJoinabilityCTARefactor and "" or userCtaAction.UnlockExperience
+
+	return clone
+end
 
 return {
 	Components = {
@@ -18,7 +65,6 @@ return {
 		FavoriteExperiences = "FavoriteExperiences",
 		Store = "Store",
 		SocialLinks = "SocialLinks",
-		Videos = "Videos",
 		UserProfileHeader = "UserProfileHeader",
 		ViewFullProfile = "ViewFullProfile",
 		Inventory = "Inventory",
@@ -27,13 +73,17 @@ return {
 		ContactProfileHeader = "ContactProfileHeader",
 		ContactDescription = "ContactDescription",
 		CommunityLocked = "CommunityLocked",
+		CommunityDeactivated = "CommunityDeactivated",
 		ProfileBackground = "ProfileBackground",
+		ProfileCompletion = FFlagEnableProfileCompletion and "ProfileCompletion" or "",
 		Events = "Events",
 		CurrentlyPlaying = "CurrentlyPlaying",
-		ProfileCompletion = not FFlagEnableProfileCompletion and "" or "ProfileCompletion",
-		Moments = not FFlagProfilePlatformEnableMoments and "" or "UserMoments"
+		Friends = "Friends",
+		Moments = FFlagProfilePlatformEnableMoments and "UserMoments" or "",
+		Announcements = "Announcements",
+		GroupForumsDiscovery = "ForumsDiscovery"
 	},
-	ProfileActions = {
+	ProfileActions = not FFlagUseUserCtaCommonEnums and {
 		AcceptFriendRequest = "AcceptFriendRequest",
 		AcceptOffNetworkFriendRequest = "AcceptOffNetworkFriendRequest",
 		AddFriend = "AddFriend",
@@ -46,14 +96,15 @@ return {
 		PendingIncomingTrustedConnection = "PendingIncomingTrustedConnection",
 		Block = "Block",
 		CannotAddFriend = "CannotAddFriend",
+		Call = FFlagFriendsCallingClientGate_DEV and "Call" or "",
 		Chat = "Chat",
 		EditAlias = "EditAlias",
-		EditAppearance = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or "EditAppearance",
+		EditAppearance = FFlagProfilePlatformEnableEditAppearanceMenu and "EditAppearance" or "",
 		EditAvatar = "EditAvatar",
 		EditLook = "EditLook",
-		EditEmotes = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or "EditEmotes",
-		SwitchAvatar = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or "SwitchAvatar",
-		EditBackground = (not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEditBackgroundMenuItem) and "" or "EditBackground",
+		EditEmotes = FFlagProfilePlatformEnableEditAppearanceMenu and "EditEmotes" or "",
+		SwitchAvatar = FFlagProfilePlatformEnableEditAppearanceMenu and "SwitchAvatar" or "",
+		EditBackground = FFlagProfilePlatformEnableEditAppearanceMenu and FFlagProfilePlatformEditBackgroundMenuItem and "EditBackground" or "",
 		EditProfile = "EditProfile",
 		IgnoreFriendRequest = "IgnoreFriendRequest",
 		JoinExperience = "JoinExperience",
@@ -76,10 +127,14 @@ return {
 		RemoveTrustedConnection = "RemoveTrustedConnection",
 		ViewPlatformProfile = "ViewPlatformProfile",
 		ViewAbout = "ViewAbout",
-		CurrencyTransfer = not FFlagProfilePlatformEnableCurrencyTransfer and "" or "CurrencyTransfer",
-		ContextualOverflow = not FFlagProfilePlatformCTAsRefactor and "" or "ContextualOverflow",
-		UnlockChat = "UnlockChat"
-	},
+		CurrencyTransfer = FFlagProfilePlatformEnableCurrencyTransfer and "CurrencyTransfer" or "",
+		TradeItems = FFlagProfilePlatformEnableTradeItems and "TradeItems" or "",
+		ContextualOverflow = "ContextualOverflow",
+		UnlockChat = "UnlockChat",
+		PlayExperience = FFlagJoinabilityCTARefactor and "PlayExperience" or "",
+		ViewProfile = "",
+		UnlockExperience = ""
+	} or buildSharedProfileActions(),
 	DisabledReasons = {
 		BannedFromCommunity = "BannedFromCommunity",
 		CommunityIsClosed = "CommunityIsClosed",
@@ -93,11 +148,7 @@ return {
 		AccountCreatedLessThanOneMonth = "AccountCreatedLessThanOneMonth",
 		AccountCreatedLessThanThreeMonths = "AccountCreatedLessThanThreeMonths"
 	},
-	ProfileTypes = {
-		User = "User",
-		Community = "Community",
-		Contact = "Contact"
-	},
+	ProfileTypes = { User = "User", Community = "Community", Contact = "Contact" },
 	Sources = {
 		HomepageFriendsCarousel = "HomepageFriendsCarousel",
 		OffNetworkFriendRequest = "OffNetworkFriendRequest",
@@ -108,10 +159,10 @@ return {
 		HomepageAd = "HomepageAd",
 		ItemDetailsPage = "ItemDetailsPage",
 		MutualConnectionsList = "MutualConnectionsList",
+		InExperienceProfile = FFlagAddIEMProfilePage and "InExperienceProfile" or "",
 		JoinGameCard = "JoinGameCard",
-		SchoolMemberList = "SchoolMemberList",
-		InExperienceProfile = not FFlagAddIEMProfilePage and "" or "InExperienceProfile",
-		MomentsFeed = not FFlagProfilePlatformEnableMoments and "" or "MomentsFeed"
+		MomentsFeed = FFlagProfilePlatformEnableMoments and "MomentsFeed" or "",
+		SchoolMemberList = "SchoolMemberList"
 	},
 	ContextualTypes = {
 		AccountDeleted = "AccountDeleted",
@@ -136,10 +187,7 @@ return {
 		ProfileMain = "ProfileMain",
 		ItemDetails = "ItemDetails",
 		ItemOrBundleDetails = "ItemOrBundleDetails",
-		VideoFullscreen = "VideoFullscreen",
 		EditProfilePage = "EditProfilePage",
-		EditDisplayNameModal = "EditDisplayNameModal",
-		EditDescriptionModal = "EditDescriptionModal",
 		EditDisplayNameErrorModal = "EditDisplayNameErrorModal",
 		UsernameInsufficientFundsModal = "UsernameInsufficientFundsModal",
 		SetAliasModal = "SetAliasModal",
@@ -147,26 +195,16 @@ return {
 		ContextualMenu = "ContextualMenu",
 		EditProfileBackground = "EditProfileBackground",
 		CommunityVerificationModal = "CommunityVerificationModal",
+		TransferRobuxFlow = FFlagProfilePlatformEnableCurrencyTransfer and "TransferRobuxFlow" or "",
 		PurchaseConfirmationModal = "PurchaseConfirmationModal",
-		TransferRobuxFlow = not FFlagProfilePlatformEnableCurrencyTransfer and "" or "TransferRobuxFlow",
-		InsufficientRobuxDialog = not FFlagSocialEnableProfileInspectAndBuy and "" or "InsufficientRobuxDialog",
-		InspectAvatarSheet = not FFlagSocialEnableProfileInspectAndBuy and "" or "InspectAvatarSheet",
-		MomentsAll = not FFlagProfilePlatformEnableMoments and "" or "MomentsAll",
-		MomentsFeed = not FFlagProfilePlatformEnableMoments and "" or "MomentsFeed"
+		InsufficientRobuxDialog = FFlagSocialEnableProfileInspectAndBuy and "InsufficientRobuxDialog" or "",
+		InspectAvatarSheet = FFlagSocialEnableProfileInspectAndBuy and "InspectAvatarSheet" or "",
+		MomentsAll = FFlagProfilePlatformEnableMoments and "MomentsAll" or "",
+		MomentsFeed = FFlagProfilePlatformEnableMoments and "MomentsFeed" or ""
 	},
-	NameTypes = {
-		Alias = "Alias",
-		DisplayName = "DisplayName",
-		Username = "Username"
-	},
-	ButtonSurface = {
-		Actions = "Actions",
-		ContextualMenu = "ContextualMenu"
-	},
-	ItemTypes = {
-		Asset = "Asset",
-		Bundle = "Bundle"
-	},
+	NameTypes = { Alias = "Alias", DisplayName = "DisplayName", Username = "Username" },
+	ButtonSurface = { Actions = "Actions", ContextualMenu = "ContextualMenu" },
+	ItemTypes = { Asset = "Asset", Bundle = "Bundle" },
 	FriendStatus = {
 		Self = "self",
 		NotFriends = "nonfriend",
@@ -176,10 +214,7 @@ return {
 		Ineligible = "ineligible",
 		Unknown = "unknown"
 	},
-	PriceLineContentType = {
-		Price = "price",
-		Text = "text"
-	},
+	PriceLineContentType = { Price = "price", Text = "text" },
 	SocialMediaTypes = {
 		Twitter = "twitter",
 		Facebook = "facebook",
@@ -189,27 +224,11 @@ return {
 		Guilded = "guilded",
 		X = "x"
 	},
-	ViewFullProfileTypes = {
-		Profile = "Profile",
-		Community = "Community"
-	},
-	ProfileFormFactor = {
-		Wide = "Wide",
-		PeekView = "PeekView"
-	},
-	ProfileTabVariants = {
-		Default = "Default",
-		MeTab = "MeTab"
-	},
-	ProfileAvatarLayoutVariant = {
-		Default = "Default",
-		MeTabMobile = "MeTabMobile"
-	},
-	LoadingState = {
-		Failed = "Failed",
-		Finished = "Finished",
-		Loading = "Loading"
-	},
+	ViewFullProfileTypes = { Profile = "Profile", Community = "Community" },
+	ProfileFormFactor = { Wide = "Wide", PeekView = "PeekView" },
+	ProfileTabVariants = { Default = "Default", MeTab = "MeTab" },
+	ProfileAvatarLayoutVariant = { Default = "Default", MeTabMobile = "MeTabMobile" },
+	LoadingState = { Failed = "Failed", Finished = "Finished", Loading = "Loading" },
 	SocialCountEnableKeys = {
 		IsFriendsCountEnabled = "isFriendsCountEnabled",
 		IsFollowersCountEnabled = "isFollowersCountEnabled",

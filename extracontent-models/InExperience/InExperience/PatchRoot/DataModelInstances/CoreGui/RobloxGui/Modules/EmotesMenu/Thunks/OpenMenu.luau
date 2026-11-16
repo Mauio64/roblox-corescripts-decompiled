@@ -2,21 +2,41 @@ local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 local VRService = game:GetService("VRService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local ParentParent = script.Parent.Parent
-local Actions = ParentParent.Actions
-local ParentParentParent = ParentParent.Parent
-local EventStream = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventStream
-local Analytics = require(ParentParent.Analytics)
-local FFlagEnableNewBackpack = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableNewBackpack
-local v11 = if not FFlagEnableNewBackpack then nil else require(CorePackages.Workspace.Packages.System).Features
-local v12 = if FFlagEnableNewBackpack then nil else require(ParentParentParent.BackpackScript)
-local ShowMenu = require(Actions.ShowMenu)
-local v14 = Analytics.new():withEventStream(EventStream.new(RbxAnalyticsService))
 
-local function OpenMenu(_) -- line: 23
-	-- upvalues: GuiService (copy), VRService (copy), FFlagEnableNewBackpack (copy), v11 (copy), v12 (copy), v14 (copy), ShowMenu (copy)
-	return function(p2) -- line: 24
-		-- upvalues: GuiService (copy), VRService (copy), FFlagEnableNewBackpack (copy), v11 (copy), v12 (copy), v14 (copy), ShowMenu (copy)
+local parent = script.Parent.Parent
+local actions = parent.Actions
+
+local parent2 = parent.Parent
+
+local Analytics = require(CorePackages.Workspace.Packages.Analytics)
+local EventStream = Analytics.AnalyticsReporters.EventStream
+
+local Analytics2 = require(parent.Analytics)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableNewBackpack = SharedFlags.FFlagEnableNewBackpack
+local features
+
+if FFlagEnableNewBackpack then
+	local System = require(CorePackages.Workspace.Packages.System)
+	features = System.Features
+else
+	features = nil
+end
+
+local BackpackScript
+
+if FFlagEnableNewBackpack then
+	BackpackScript = nil
+else
+	BackpackScript = require(parent2.BackpackScript)
+end
+
+local ShowMenu = require(actions.ShowMenu)
+
+local v = Analytics2.new():withEventStream(EventStream.new(RbxAnalyticsService))
+
+local function OpenMenu(_)
+	return function(object)
 		if GuiService.MenuIsOpen then
 			if not VRService.VREnabled then
 				return
@@ -26,23 +46,24 @@ local function OpenMenu(_) -- line: 23
 		end
 
 		if FFlagEnableNewBackpack then
-			v11.setVisibility(v11.FeatureName.Backpack, false)
+			features.setVisibility(features.FeatureName.Backpack, false)
 
-			if v11.getVisibility(v11.FeatureName.Backpack) then
+			if features.getVisibility(features.FeatureName.Backpack) then
 				return
 			end
 		else
-			if v12.IsOpen then
-				v12.OpenClose()
+			if BackpackScript.IsOpen then
+				BackpackScript.OpenClose()
 			end
 
-			if v12.IsOpen then
+			if BackpackScript.IsOpen then
 				return
 			end
 		end
 
-		v14:onMenuOpened()
-		p2:dispatch(ShowMenu())
+		v:onMenuOpened()
+
+		object:dispatch(ShowMenu())
 	end
 end
 

@@ -1,12 +1,13 @@
-local function formatDate(p1, b1: boolean?) -- line: 1
-	local dateTime = DateTime.now()
-	local v5 = not (p1:ToLocalTime().Year > dateTime:ToLocalTime().Year) and "ddd, MMM DD" or "ll"
+local function formatDate(object, flag: boolean?)
+	local now = DateTime.now()
 
-	if b1 then
-		return ("%s at %s"):format(p1:FormatLocalTime(v5, "en-us"), p1:FormatLocalTime("LT", "en-us"))
+	local v = object:ToLocalTime().Year > now:ToLocalTime().Year and "ll" or "ddd, MMM DD"
+
+	if flag then
+		return ("%s at %s"):format(object:FormatLocalTime(v, "en-us"), object:FormatLocalTime("LT", "en-us"))
 	end
 
-	return ("%s AT %s"):format(p1:FormatLocalTime(v5, "en-us"), p1:FormatLocalTime("LT", "en-us")):upper()
+	return (("%s AT %s"):format(object:FormatLocalTime(v, "en-us"), object:FormatLocalTime("LT", "en-us"))):upper()
 end
 
 return formatDate

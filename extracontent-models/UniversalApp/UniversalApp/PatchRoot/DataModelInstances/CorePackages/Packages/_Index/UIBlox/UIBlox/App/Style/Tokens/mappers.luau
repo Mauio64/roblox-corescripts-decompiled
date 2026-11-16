@@ -1,34 +1,29 @@
-local ParentParent = script.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent.Parent
-local Cryo = require(ParentParent2.Cryo)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent.Parent.Parent
+
+local Cryo = require(parent2.Cryo)
 
 require(script.Parent.Types)
-require(ParentParent.StyleTypes)
+require(parent.StyleTypes)
 
-local function getOnHoverColor(p1, p2) -- line: 29
-	local Hover = p2.Color.State.Hover
+local function getOnHoverColor(background, p)
+	local hover = p.Color.State.Hover
 
-	if Hover.Transparency == 1 then
-		return {
-			Color3 = p1.Color3,
-			Transparency = p1.Transparency
-		}
+	if hover.Transparency == 1 then
+		return { Color3 = background.Color3, Transparency = background.Transparency }
 	end
 
-	if p1.Color3 == nil or p1.Transparency == 1 then
-		return {
-			Color3 = Hover.Color3,
-			Transparency = Hover.Transparency
-		}
+	if background.Color3 == nil or background.Transparency == 1 then
+		return { Color3 = hover.Color3, Transparency = hover.Transparency }
 	end
 
 	return {
-		Color3 = p1.Color3:Lerp(Hover.Color3, 1 - Hover.Transparency),
-		Transparency = p1.Transparency
+		Color3 = background.Color3:Lerp(hover.Color3, 1 - hover.Transparency),
+		Transparency = background.Transparency
 	}
 end
 
-local t1 = {
+local v = {
 	"Color",
 	"Config",
 	"DarkMode",
@@ -48,68 +43,65 @@ local t1 = {
 	"Time",
 	"Typography"
 }
+local Mappers = {}
 
-return {
-	mapColorTokensToFoundation = function(p3, p4) -- line: 18
-		-- upvalues: Cryo (copy)
-		p3.Semantic.Color = Cryo.Dictionary.join(p3.Semantic.Color, p4.Semantic.Color)
-		p3.Global.Color = Cryo.Dictionary.join(p3.Global.Color, p4.Global.Color)
-		p3.Component = Cryo.Dictionary.join(p3.Component, p4.Component)
+function Mappers.mapColorTokensToFoundation(state, data)
+	state.Semantic.Color = Cryo.Dictionary.join(state.Semantic.Color, data.Semantic.Color)
+	state.Global.Color = Cryo.Dictionary.join(state.Global.Color, data.Global.Color)
+	state.Component = Cryo.Dictionary.join(state.Component, data.Component)
 
-		return p3
-	end,
-	mapThemeToFoundation = function(p5, p6) -- line: 50
-		-- upvalues: getOnHoverColor (copy), Cryo (copy)
-		local t2 = {
-			BackgroundDefault = p6.Color.Surface.Surface_0,
-			BackgroundContrast = p6.Color.Surface.Surface_100,
-			BackgroundMuted = p6.Color.Surface.Surface_200,
-			BackgroundUIDefault = p6.Color.Surface.Surface_300,
-			BackgroundUIContrast = p6.Color.OverMedia.OverMedia_0,
-			BackgroundOnHover = p6.Color.State.Hover,
-			BackgroundOnPress = p6.Color.State.Press,
-			UIDefault = p6.Color.Shift.Shift_200,
-			UIMuted = p6.Color.Shift.Shift_100,
-			UIEmphasis = p6.Color.Shift.Shift_400,
-			ContextualPrimaryDefault = p6.Color.ActionEmphasis.Background,
-			ContextualPrimaryOnHover = getOnHoverColor(p6.Color.ActionEmphasis.Background, p6),
-			ContextualPrimaryContent = p6.Color.ActionEmphasis.Foreground,
-			SystemPrimaryDefault = p6.Color.ActionSubEmphasis.Background,
-			SystemPrimaryOnHover = getOnHoverColor(p6.Color.ActionSubEmphasis.Background, p6),
-			SystemPrimaryContent = p6.Color.ActionSubEmphasis.Foreground,
-			IconDefault = p6.Color.Content.Default,
-			IconEmphasis = p6.Color.Content.Emphasis,
-			IconOnHover = p6.Color.Content.Emphasis,
-			TextEmphasis = p6.Color.Content.Emphasis,
-			TextDefault = p6.Color.Content.Default,
-			TextMuted = p6.Color.Content.Muted,
-			TextLink = p6.Color.Content.Link,
-			Divider = p6.Color.Stroke.Emphasis,
-			Overlay = p6.Color.Common.Scrim,
-			DropShadow = p6.Color.Common.Shadow,
-			NavigationBar = p6.Color.Common.NavigationBar,
-			PlaceHolder = p6.Color.Common.Shimmer,
-			OnlineStatus = p6.Color.System.Success,
-			OfflineStatus = p6.Color.System.Neutral,
-			Success = p6.Color.System.Success,
-			Alert = p6.Color.System.Alert,
-			Badge = p6.Color.System.Contrast,
-			BadgeContent = p6.Inverse.Content.Emphasis
-		}
+	return state
+end
 
-		return (Cryo.Dictionary.join(p5, Cryo.Dictionary.map(t2, function(p7) -- line: 90
-			return {
-				Color = p7.Color3,
-				Transparency = p7.Transparency
-			}
-		end)))
-	end,
-	addFoundationFlatKeys = function(p8, p9) -- line: 123
-		-- upvalues: t1 (copy)
-		for _, v17 in t1 do
-			p8[v17] = p9[v17]
-		end
+function Mappers.mapThemeToFoundation(p, p2)
+	local v2 = {
+		BackgroundDefault = p2.Color.Surface.Surface_0,
+		BackgroundContrast = p2.Color.Surface.Surface_100,
+		BackgroundMuted = p2.Color.Surface.Surface_200,
+		BackgroundUIDefault = p2.Color.Surface.Surface_300,
+		BackgroundUIContrast = p2.Color.OverMedia.OverMedia_0,
+		BackgroundOnHover = p2.Color.State.Hover,
+		BackgroundOnPress = p2.Color.State.Press,
+		UIDefault = p2.Color.Shift.Shift_200,
+		UIMuted = p2.Color.Shift.Shift_100,
+		UIEmphasis = p2.Color.Shift.Shift_400,
+		ContextualPrimaryDefault = p2.Color.ActionEmphasis.Background,
+		ContextualPrimaryOnHover = getOnHoverColor(p2.Color.ActionEmphasis.Background, p2),
+		ContextualPrimaryContent = p2.Color.ActionEmphasis.Foreground,
+		SystemPrimaryDefault = p2.Color.ActionSubEmphasis.Background,
+		SystemPrimaryOnHover = getOnHoverColor(p2.Color.ActionSubEmphasis.Background, p2),
+		SystemPrimaryContent = p2.Color.ActionSubEmphasis.Foreground,
+		IconDefault = p2.Color.Content.Default,
+		IconEmphasis = p2.Color.Content.Emphasis,
+		IconOnHover = p2.Color.Content.Emphasis,
+		TextEmphasis = p2.Color.Content.Emphasis,
+		TextDefault = p2.Color.Content.Default,
+		TextMuted = p2.Color.Content.Muted,
+		TextLink = p2.Color.Content.Link,
+		Divider = p2.Color.Stroke.Emphasis,
+		Overlay = p2.Color.Common.Scrim,
+		DropShadow = p2.Color.Common.Shadow,
+		NavigationBar = p2.Color.Common.NavigationBar,
+		PlaceHolder = p2.Color.Common.Shimmer,
+		OnlineStatus = p2.Color.System.Success,
+		OfflineStatus = p2.Color.System.Neutral,
+		Success = p2.Color.System.Success,
+		Alert = p2.Color.System.Alert,
+		Badge = p2.Color.System.Contrast,
+		BadgeContent = p2.Inverse.Content.Emphasis
+	}
 
-		return p8
+	return (Cryo.Dictionary.join(p, Cryo.Dictionary.map(v2, function(p3)
+		return { Color = p3.Color3, Transparency = p3.Transparency }
+	end)))
+end
+
+function Mappers.addFoundationFlatKeys(p, p2)
+	for _, v2 in v do
+		p[v2] = p2[v2]
 	end
-}
+
+	return p
+end
+
+return Mappers

@@ -1,68 +1,142 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-local React = require(AvatarExperienceInspectAndBuyParent.React)
-local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local parent = AvatarExperienceInspectAndBuy.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
 local BackButton = require(AvatarExperienceInspectAndBuy.Components.Common.BackButton)
-
 require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
-
 local SubheaderLabelPrice = require(AvatarExperienceInspectAndBuy.Components.Common.SubheaderLabelPrice)
-
 require(AvatarExperienceInspectAndBuy.Types)
 
-local function ItemsViewHeader(t1: {[any]: any}) -- line: 50
-	-- upvalues: useTokens (copy), ViewType (copy), React (copy), Foundation (copy), BackButton (copy), SubheaderLabelPrice (copy)
-	local v11 = useTokens()
-	local v12 = t1.view == ViewType.WideLandscape
-	local v13 = t1.view == ViewType.Compact
+local function ItemsViewHeader(props)
+	local v = useTokens()
+	local v2 = props.view == ViewType.WideLandscape
+	local v3 = props.view == ViewType.Compact
 
-	return React.createElement(Foundation.View, {
-		Size = UDim2.new(1, 0, 0, t1.headerHeight)
-	}, {
-		UIListLayout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Horizontal,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, if not v12 and not v13 then v11.Margin.Large * 2 else v11.Padding.Medium),
-			HorizontalFlex = if v12 then nil else Enum.UIFlexAlignment.SpaceBetween
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v4 = {
+		Size = UDim2.new(1, 0, 0, props.headerHeight)
+	}
+
+	local createElement2 = React.createElement
+	local v5 = {
+		FillDirection = Enum.FillDirection.Horizontal,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		Padding = 0,
+		HorizontalFlex = 0
+	}
+	local v6
+
+	if v2 or v3 then
+		v6 = v.Padding.Medium
+	else
+		v6 = v.Margin.Large * 2
+	end
+
+	v5.Padding = UDim.new(0, v6)
+	local horizontalFlex
+
+	if not v2 then
+		horizontalFlex = Enum.UIFlexAlignment.SpaceBetween
+	end
+
+	v5.HorizontalFlex = horizontalFlex
+	local children = {
+		UIListLayout = createElement2("UIListLayout", v5),
+		UIPadding = 0,
+		BackButton = 0,
+		HeaderTextAndSubheader = 0,
+		BuyButton = 0
+	}
+	local uiPadding
+
+	if props.padding then
+		uiPadding = React.createElement("UIPadding", {
+			PaddingLeft = props.padding.left,
+			PaddingRight = props.padding.right,
+			PaddingTop = props.padding.top,
+			PaddingBottom = props.padding.bottom
+		})
+	end
+
+	children.UIPadding = uiPadding
+	local backButton
+
+	if v2 then
+		backButton = React.createElement(BackButton, {
+			onBackButtonClick = props.onBackButtonClick,
+			Position = UDim2.new(0, v.Padding.Small, 0, v.Padding.Small)
+		})
+	end
+
+	children.BackButton = backButton
+
+	local createElement3 = React.createElement
+	local view2 = Foundation.View
+
+	local v7 = {
+		HeaderText = React.createElement(Foundation.Text, {
+			LayoutOrder = 1,
+			tag = "auto-xy text-heading-small content-emphasis text-truncate-end",
+			Text = props.headerText
 		}),
-		UIPadding = if not t1.padding then nil else React.createElement("UIPadding", {
-			PaddingLeft = t1.padding.left,
-			PaddingRight = t1.padding.right,
-			PaddingTop = t1.padding.top,
-			PaddingBottom = t1.padding.bottom
-		}),
-		BackButton = if not v12 then nil else React.createElement(BackButton, {
-			onBackButtonClick = t1.onBackButtonClick,
-			Position = UDim2.new(0, v11.Padding.Small, 0, v11.Padding.Small)
-		}),
-		HeaderTextAndSubheader = React.createElement(Foundation.View, {
+		SubheaderText = 0
+	}
+	local subheaderText
+
+	if props.subheaderText and not (v2 or v3) then
+		subheaderText = React.createElement(SubheaderLabelPrice, {
+			subheaderText = props.subheaderText,
+			LayoutOrder = 2
+		})
+	end
+
+	v7.SubheaderText = subheaderText
+	children.HeaderTextAndSubheader = createElement3(
+		view2,
+		{
 			BackgroundTransparency = 1,
 			tag = "size-0-full auto-x col align-y-center",
 			LayoutOrder = 2
-		}, {
-			HeaderText = React.createElement(Foundation.Text, {
-				LayoutOrder = 1,
-				tag = "auto-xy text-heading-small content-emphasis text-truncate-end",
-				Text = t1.headerText
-			}),
-			SubheaderText = if not t1.subheaderText or (v12 or v13) then nil else React.createElement(SubheaderLabelPrice, {
-				LayoutOrder = 2,
-				subheaderText = t1.subheaderText
-			})
-		}),
-		BuyButton = if v12 or v13 then nil else React.createElement(Foundation.Button, {
-			LayoutOrder = 3,
+		},
+		v7
+	)
+	local buyButton
+
+	if not (v2 or v3) then
+		local createElement4 = React.createElement
+		local button = Foundation.Button
+		local v8 = {
 			size = Foundation.Enums.InputSize.Medium,
-			width = if not v13 then UDim.new(0, v11.Size.Size_3000) else UDim.new(0, v11.Size.Size_2100),
-			text = t1.purchaseButtonProps.purchaseButtonText,
-			variant = Foundation.Enums.ButtonVariant.Emphasis,
-			isDisabled = t1.purchaseButtonProps.isDisabled,
-			onActivated = t1.purchaseButtonProps.onPurchase
-		})
-	})
+			width = 0,
+			LayoutOrder = 3,
+			text = 0,
+			variant = 0,
+			isDisabled = 0,
+			onActivated = 0
+		}
+		local width
+
+		if v3 then
+			width = UDim.new(0, v.Size.Size_2100)
+		else
+			width = UDim.new(0, v.Size.Size_3000)
+		end
+
+		v8.width = width
+
+		v8.text = props.purchaseButtonProps.purchaseButtonText
+		v8.variant = Foundation.Enums.ButtonVariant.Emphasis
+		v8.isDisabled = props.purchaseButtonProps.isDisabled
+		v8.onActivated = props.purchaseButtonProps.onPurchase
+		buyButton = createElement4(button, v8)
+	end
+
+	children.BuyButton = buyButton
+	return createElement(view, v4, children)
 end
 
 return ItemsViewHeader

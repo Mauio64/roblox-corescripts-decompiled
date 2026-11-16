@@ -1,12 +1,21 @@
 local NotificationService = game:GetService("NotificationService")
 local Players = game:GetService("Players")
+
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local v5 = require(DataHydrationParent.RealtimeDelivery).RobloxEventReceiver.new(NotificationService)
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
+local parent = DataHydration.Parent
+
+local RealtimeDelivery = require(parent.RealtimeDelivery)
+local robloxEventReceiver = RealtimeDelivery.RobloxEventReceiver.new(NotificationService)
+
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
+
 local TrustedConnectionStatus = require(DataHydration.TrustedConnections.Enums.TrustedConnectionStatus)
-local FFlagAddFriendsPageTrustedFriendRequestSection = require(DataHydrationParent.SharedFlags).FFlagAddFriendsPageTrustedFriendRequestSection
-local t1 = {
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddFriendsPageTrustedFriendRequestSection = SharedFlags.FFlagAddFriendsPageTrustedFriendRequestSection
+
+local v = {
 	Namespace = "TrustedConnectionNotifications",
 	EventTypes = {
 		TrustedConnectionCreated = 1,
@@ -17,66 +26,60 @@ local t1 = {
 	}
 }
 
-local function createTrustedConnectionEventListener(p1: ((...any) -> ...any)) -- line: 40
-	-- upvalues: getLocalPlayerUserId (copy), Players (copy), v5 (copy), t1 (copy), TrustedConnectionStatus (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy)
-	local u12 = getLocalPlayerUserId()
-	local connection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 48
-		-- upvalues: getLocalPlayerUserId (copy), u12 (ref)
-		local v15 = getLocalPlayerUserId()
+local function createTrustedConnectionEventListener(callback)
+	local v2 = getLocalPlayerUserId()
+	local localPlayerChangedConnection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function()
+		local localPlayerUserId = getLocalPlayerUserId()
 
-		if v15 ~= u12 then
-			u12 = v15
+		if localPlayerUserId ~= v2 then
+			v2 = localPlayerUserId
 		end
 	end)
-	local v14 = v5:observeEvent(t1.Namespace, function(t2: {[any]: any}) -- line: 57
-		-- upvalues: u12 (ref), t1 (copy), p1 (copy), TrustedConnectionStatus (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy)
-		if not t2.Actor or (not t2.Target or not u12) then
+
+	local v3 = robloxEventReceiver:observeEvent(v.Namespace, function(data)
+		if not (data.Actor and data.Target and v2) then
 			return
 		end
 
-		local str = tostring(t2.Actor)
-		local str2 = tostring(t2.Target)
-		local str3 = tostring(u12)
+		local actor = tostring(data.Actor)
+		local target = tostring(data.Target)
+		local v3 = tostring(v2)
 
-		if t2.EventType == t1.EventTypes.TrustedConnectionCreated then
-			local v20 = if str ~= str3 then str else str2
-
-			p1(v20, TrustedConnectionStatus.TrustedFriends)
+		if data.EventType == v.EventTypes.TrustedConnectionCreated then
+			local v4 = if actor == v3 then target else actor
+			callback(v4, TrustedConnectionStatus.TrustedFriends)
 		end
 
-		if t2.EventType == t1.EventTypes.TrustedConnectionDeleted then
-			if str3 == str then
+		if data.EventType == v.EventTypes.TrustedConnectionDeleted then
+			if v3 == actor then
 				if FFlagAddFriendsPageTrustedFriendRequestSection then
-					p1(str2, TrustedConnectionStatus.RequestIgnored)
+					callback(target, TrustedConnectionStatus.RequestIgnored)
 				else
-					p1(str2, TrustedConnectionStatus.RequestReceived)
+					callback(target, TrustedConnectionStatus.RequestReceived)
 				end
 			else
-				p1(str, TrustedConnectionStatus.RequestSent)
+				callback(actor, TrustedConnectionStatus.RequestSent)
 			end
 		end
 
-		if t2.EventType == t1.EventTypes.TrustedConnectionRequestSent then
-			if str3 == str then
-				p1(str2, TrustedConnectionStatus.RequestSent)
-
-				return
+		if data.EventType == v.EventTypes.TrustedConnectionRequestSent then
+			if v3 == actor then
+				callback(target, TrustedConnectionStatus.RequestSent)
+			else
+				callback(actor, TrustedConnectionStatus.RequestReceived)
 			end
-
-			p1(str, TrustedConnectionStatus.RequestReceived)
 		end
 	end)
 
-	return function() -- line: 93
-		-- upvalues: connection (ref), v14 (copy)
-		if connection then
-			connection:Disconnect()
-			connection = nil
+	return function()
+		if localPlayerChangedConnection then
+			localPlayerChangedConnection:Disconnect()
+			localPlayerChangedConnection = nil
 		end
 
-		if v14 then
-			v14:disconnect()
-			connection = nil
+		if v3 then
+			v3:disconnect()
+			localPlayerChangedConnection = nil
 		end
 	end
 end

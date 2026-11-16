@@ -1,34 +1,29 @@
 local CorePackages = game:GetService("CorePackages")
+
 local React = require(CorePackages.Packages.React)
-local t1 = {}
 
-local function createNewPage(s1: string) -- line: 19
-	-- upvalues: React (copy)
-	local t2 = {
-		page = nil,
-		hubRef = nil,
-		name = s1
-	}
+local ReactPageFactory = {}
 
-	function t2.setPage(_, p2) -- line: 26
-		-- upvalues: t2 (copy)
-		t2.page = p2
+local function createNewPage(name: string)
+	local newPage = { name = name, page = nil, hubRef = nil }
+
+	function newPage.setPage(_, page)
+		newPage.page = page
 	end
-	function t2.createPage(_, p4) -- line: 30
-		-- upvalues: t2 (copy), React (copy)
-		if not t2.page then
-			return nil
+
+	function newPage.createPage(_, p)
+		if newPage.page then
+			return React.createElement(newPage.page, p)
 		end
 
-		return React.createElement(t2.page, p4)
+		return nil
 	end
 
-	return t2
+	return newPage
 end
 
-function t1.createNewPage(_: {[any]: any}, s2: string) -- line: 41
-	-- upvalues: createNewPage (copy)
-	return (createNewPage(s2))
+function ReactPageFactory.createNewPage(_, name: string)
+	return createNewPage(name)
 end
 
-return t1
+return ReactPageFactory

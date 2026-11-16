@@ -1,38 +1,29 @@
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local Cryo = require(SocialTabsPageParent.Cryo)
-local React = require(SocialTabsPageParent.React)
-local useLocalization = require(SocialTabsPageParent.Localization).Hooks.useLocalization
+local parent = SocialTabsPage.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
 require(SocialTabsPage.Common.Types)
 
-local function useLocalizedTabs(p1) -- line: 11
-	-- upvalues: React (copy), useLocalization (copy), Cryo (copy)
-	local v8 = React.useMemo(function() -- line: 12
-		-- upvalues: p1 (copy)
-		local t1 = {}
+local function useLocalizedTabs(items)
+	local v = useLocalization((React.useMemo(function()
+		local tabLabelKeysById = {}
 
-		for _, v12 in p1 do
-			t1[v12.id] = v12.tabLabelKey
+		for _, item in items do
+			tabLabelKeysById[item.id] = item.tabLabelKey
 		end
 
-		return t1
-	end, { p1 })
-	local v9 = useLocalization(v8)
+		return tabLabelKeysById
+	end, { items })))
 
-	return React.useMemo(function() -- line: 22
-		-- upvalues: Cryo (copy), p1 (copy), v9 (copy)
-		return Cryo.List.map(p1, function(p2) -- line: 23
-			-- upvalues: v9 (copy)
-			return {
-				id = p2.id,
-				text = v9[p2.id]
-			}
+	return React.useMemo(function()
+		return Cryo.List.map(items, function(p)
+			return { id = p.id, text = v[p.id] }
 		end)
-	end, {
-		p1,
-		v9
-	})
+	end, { items, v })
 end
 
 return useLocalizedTabs

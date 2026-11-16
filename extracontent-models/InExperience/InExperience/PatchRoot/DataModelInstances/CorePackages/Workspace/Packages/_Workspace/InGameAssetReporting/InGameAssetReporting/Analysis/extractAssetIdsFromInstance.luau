@@ -1,9 +1,8 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
-
 require(InGameAssetReporting.Analysis.Types)
 
-function extractAssetIdsFromInstance(p1) -- line: 5
-	local t1 = {
+function extractAssetIdsFromInstance(instance)
+	local v = {
 		Package = {},
 		Model = {},
 		Image = {},
@@ -12,110 +11,105 @@ function extractAssetIdsFromInstance(p1) -- line: 5
 		Video = {}
 	}
 
-	if p1:IsA("PackageLink") and (p1.PackageId ~= "" and p1.VersionNumber > 0) then
-		table.insert(t1.Package, {
-			id = p1.PackageId,
-			version = p1.VersionNumber
-		})
-
-		return t1
+	if instance:IsA("PackageLink") and instance.PackageId ~= "" and instance.VersionNumber > 0 then
+		table.insert(v.Package, { id = instance.PackageId, version = instance.VersionNumber })
+		return v
 	end
 
-	if p1:IsA("Model") and p1.SourceAssetId > 0 then
-		table.insert(t1.Model, (tostring(p1.SourceAssetId)))
-
-		return t1
+	if instance:IsA("Model") and instance.SourceAssetId > 0 then
+		table.insert(v.Model, (tostring(instance.SourceAssetId)))
+		return v
 	end
 
-	if p1:IsA("MeshPart") and p1.MeshId ~= "" then
-		table.insert(t1.Mesh, p1.MeshId)
+	if instance:IsA("MeshPart") and instance.MeshId ~= "" then
+		table.insert(v.Mesh, instance.MeshId)
 
-		if p1.TextureID ~= "" then
-			table.insert(t1.Image, p1.TextureID)
-
-			return t1
+		if instance.TextureID ~= "" then
+			table.insert(v.Image, instance.TextureID)
+			return v
 		end
-	elseif (p1.ClassName == "FileMesh" or p1.ClassName == "SpecialMesh" and p1.MeshType == Enum.MeshType.FileMesh) and p1.MeshId ~= "" then
-		table.insert(t1.Mesh, p1.MeshId)
+	elseif
+		(instance.ClassName == "FileMesh" or instance.ClassName == "SpecialMesh" and instance.MeshType == Enum.MeshType.FileMesh)
+		and instance.MeshId ~= ""
+	then
+		table.insert(v.Mesh, instance.MeshId)
 
-		if p1.TextureId ~= "" then
-			table.insert(t1.Image, p1.TextureId)
-
-			return t1
+		if instance.TextureId ~= "" then
+			table.insert(v.Image, instance.TextureId)
+			return v
 		end
 	else
-		if p1:IsA("ImageLabel") and p1.Image ~= "" then
-			table.insert(t1.Image, p1.Image)
-
-			return t1
+		if instance:IsA("ImageLabel") and instance.Image ~= "" then
+			table.insert(v.Image, instance.Image)
+			return v
 		end
 
-		if p1:IsA("ImageButton") then
-			if p1.Image ~= "" then
-				table.insert(t1.Image, p1.Image)
+		if instance:IsA("ImageButton") then
+			if instance.Image ~= "" then
+				table.insert(v.Image, instance.Image)
 			end
 
-			if p1.HoverImage ~= "" then
-				table.insert(t1.Image, p1.HoverImage)
+			if instance.HoverImage ~= "" then
+				table.insert(v.Image, instance.HoverImage)
 			end
 
-			if p1.PressedImage ~= "" then
-				table.insert(t1.Image, p1.PressedImage)
-
-				return t1
+			if instance.PressedImage ~= "" then
+				table.insert(v.Image, instance.PressedImage)
+				return v
 			end
 		else
-			if p1:IsA("Decal") and p1.Texture ~= "" then
-				table.insert(t1.Image, p1.Texture)
-
-				return t1
+			if instance:IsA("Decal") and instance.Texture ~= "" then
+				table.insert(v.Image, instance.Texture)
+				return v
 			end
 
-			if p1:IsA("SurfaceAppearance") and p1.ColorMap ~= "" then
-				table.insert(t1.Image, p1.ColorMap)
-
-				return t1
+			if instance:IsA("SurfaceAppearance") and instance.ColorMap ~= "" then
+				table.insert(v.Image, instance.ColorMap)
+				return v
 			end
 
-			if p1:IsA("TextLabel") and p1.Text ~= "" and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-				table.insert(t1.Text, p1.Text)
-
-				return t1
+			if
+				instance:IsA("TextLabel")
+				and instance.Text ~= ""
+				and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport")
+			then
+				table.insert(v.Text, instance.Text)
+				return v
 			end
 
-			if p1:IsA("TextButton") and p1.Text ~= "" and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-				table.insert(t1.Text, p1.Text)
-
-				return t1
+			if
+				instance:IsA("TextButton")
+				and instance.Text ~= ""
+				and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport")
+			then
+				table.insert(v.Text, instance.Text)
+				return v
 			end
 
-			if p1:IsA("TextBox") and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-				if p1.Text ~= "" then
-					table.insert(t1.Text, p1.Text)
-
-					return t1
+			if instance:IsA("TextBox") and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
+				if instance.Text ~= "" then
+					table.insert(v.Text, instance.Text)
+					return v
 				end
 
-				if p1.PlaceholderText ~= "" then
-					table.insert(t1.Text, p1.PlaceholderText)
-
-					return t1
+				if instance.PlaceholderText ~= "" then
+					table.insert(v.Text, instance.PlaceholderText)
+					return v
 				end
 			else
-				if not p1:IsA("VideoFrame") then
+				if not instance:IsA("VideoFrame") then
 					return nil
 				end
 
-				if p1.Video ~= "" then
-					table.insert(t1.Video, p1.Video)
-
-					return t1
+				if instance.Video ~= "" then
+					table.insert(v.Video, instance.Video)
+					return v
 				end
 			end
 		end
 	end
 
-	return t1
+	return v
 end
 
 return extractAssetIdsFromInstance

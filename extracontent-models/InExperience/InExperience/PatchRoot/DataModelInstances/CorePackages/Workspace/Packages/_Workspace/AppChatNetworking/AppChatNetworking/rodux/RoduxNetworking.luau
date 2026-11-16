@@ -1,10 +1,10 @@
 local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
-local AppChatNetworkingParent = AppChatNetworking.Parent
-local RoduxNetworking = require(AppChatNetworkingParent.RoduxNetworking)
+local parent = AppChatNetworking.Parent
+local RoduxNetworking = require(parent.RoduxNetworking)
 local HttpRequest = require(AppChatNetworking.url.HttpRequest)
 
 return RoduxNetworking.config({
 	keyPath = "ChatAppReducer.networkStatus",
-	killRequestWithFilteredIds = true,
-	networkImpl = HttpRequest.default
+	networkImpl = HttpRequest.default,
+	killRequestWithFilteredIds = true
 })

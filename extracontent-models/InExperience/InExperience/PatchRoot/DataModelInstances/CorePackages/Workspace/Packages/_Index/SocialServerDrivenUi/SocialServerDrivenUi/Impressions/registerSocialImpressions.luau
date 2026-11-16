@@ -1,23 +1,24 @@
 local SocialServerDrivenUi = script:FindFirstAncestor("SocialServerDrivenUi")
-local SocialServerDrivenUiParent = SocialServerDrivenUi.Parent
-local SduiCoreSystem = require(SocialServerDrivenUiParent.SduiCoreSystem)
+local parent = SocialServerDrivenUi.Parent
+
+local SduiCoreSystem = require(parent.SduiCoreSystem)
 local SduiImpressionEventType = SduiCoreSystem.SduiImpressionEventType
 local getSduiImpressionHandlerRegistry = SduiCoreSystem.getSduiImpressionHandlerRegistry
-local FFlagSduiSearchPeoplePlayerTileTelemetry = require(SocialServerDrivenUiParent.SharedFlags).FFlagSduiSearchPeoplePlayerTileTelemetry
 
-local function registerSocialImpressions() -- line: 13
-	-- upvalues: SduiImpressionEventType (copy), FFlagSduiSearchPeoplePlayerTileTelemetry (copy), SocialServerDrivenUi (copy), getSduiImpressionHandlerRegistry (copy)
-	local t1 = {
-		[SduiImpressionEventType.playerTileImpressions] = if not FFlagSduiSearchPeoplePlayerTileTelemetry then nil else {
-			skipItemImpressionsLog = true,
-			lazyHandler = function() -- line: 17
-				-- upvalues: SocialServerDrivenUi (copy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiSearchPeoplePlayerTileTelemetry = SharedFlags.FFlagSduiSearchPeoplePlayerTileTelemetry
+
+local function registerSocialImpressions()
+	local v = {
+		[SduiImpressionEventType.playerTileImpressions] = FFlagSduiSearchPeoplePlayerTileTelemetry and {
+			lazyHandler = function()
 				return require(SocialServerDrivenUi.Impressions.SduiPlayerTileImpressionsHandler)
-			end
-		}
+			end,
+			skipItemImpressionsLog = true
+		} or nil
 	}
 
-	getSduiImpressionHandlerRegistry().registerImpressionHandlerConfigs(t1)
+	getSduiImpressionHandlerRegistry().registerImpressionHandlerConfigs(v)
 end
 
 return registerSocialImpressions

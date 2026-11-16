@@ -1,46 +1,49 @@
-local ParentParent = script.Parent.Parent
-local PaymentPlatform = require(ParentParent.Enums.PaymentPlatform)
+local parent = script.Parent.Parent
+local PaymentPlatform = require(parent.Enums.PaymentPlatform)
 
-return function(p1) -- line: 6
-	-- upvalues: PaymentPlatform (copy)
-	if p1 == PaymentPlatform.Web then
+return function(p): string
+	if p == PaymentPlatform.Web then
 		return "Web"
 	end
 
-	if p1 == PaymentPlatform.Apple then
+	if p == PaymentPlatform.Apple then
 		return "AppleAppStore"
 	end
 
-	if p1 == PaymentPlatform.Google then
+	if p == PaymentPlatform.Google then
 		return "GooglePlayStore"
 	end
 
-	if p1 == PaymentPlatform.Amazon then
+	if p == PaymentPlatform.Amazon then
 		return "AmazonStore"
 	end
 
-	if p1 == PaymentPlatform.UWP then
+	if p == PaymentPlatform.UWP then
 		return "WindowsStore"
 	end
 
-	if p1 == PaymentPlatform.Xbox then
+	if p == PaymentPlatform.Xbox then
 		return "XboxStore"
 	end
 
-	if p1 == PaymentPlatform.Maquettes then
+	if p == PaymentPlatform.Maquettes then
 		return "MaquettesStore"
 	end
 
-	if p1 == PaymentPlatform.Palisades then
+	if p == PaymentPlatform.Palisades then
 		return "PalisadesStore"
 	end
 
-	if p1 == PaymentPlatform.Microsoft then
+	if p == PaymentPlatform.Microsoft then
 		return "MicrosoftStore"
 	end
 
-	if p1 == PaymentPlatform.MilkyWay then
+	if p == PaymentPlatform.MilkyWay then
 		return "MilkyWayStore"
+	end
+
+	if p == PaymentPlatform.Pioneer then
+		return "PioneerStore"
 	end
 
 	return "None"

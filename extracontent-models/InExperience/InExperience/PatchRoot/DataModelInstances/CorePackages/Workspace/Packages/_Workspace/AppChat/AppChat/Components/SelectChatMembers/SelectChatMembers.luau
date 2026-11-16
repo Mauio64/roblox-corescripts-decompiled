@@ -1,11 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Foundation = require(AppChatParent.Foundation)
-local UIBlox = require(AppChatParent.UIBlox)
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local useDebouncedUserSearch = require(script.Parent.Utils.useDebouncedUserSearch)
 local UserCellWithCheckbox = require(script.Parent.UserCellWithCheckbox)
 local PaginatedChatMembers = require(script.Parent.PaginatedChatMembers)
@@ -13,96 +17,122 @@ local SelectedMembersBar = require(script.Parent.SelectedMembersBar)
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local DomLocators = require(AppChat.Utils.DomLocators)
 
-local function renderUserEntry(s1: string, b1: boolean, t1: {[any]: any}, p1, _) -- line: 32
-	-- upvalues: React (copy), Foundation (copy), UserCellWithCheckbox (copy)
-	local v22 = if not b1 then s1 else "search_" .. s1
+local function renderUserEntry(item: string, flag: boolean, p, style, _)
+	local v
 
-	return React.createElement(Foundation.View, {
-		tag = "size-full-0 auto-y",
-		key = v22
-	}, {
-		cellContent = React.createElement(UserCellWithCheckbox, {
-			style = p1,
-			userId = s1
-		}),
-		debugId = t1.isDebugEnabled and React.createElement(Foundation.Text, {
+	if flag then
+		v = "search_" .. item
+	else
+		v = item
+	end
+
+	return React.createElement(Foundation.View, { tag = "size-full-0 auto-y", key = v }, {
+		cellContent = React.createElement(UserCellWithCheckbox, { style = style, userId = item }),
+		debugId = p.isDebugEnabled and React.createElement(Foundation.Text, {
 			tag = "auto-xy position-bottom-right anchor-bottom-right",
-			Text = s1
+			Text = item
 		}) or nil
 	})
 end
-local function SelectChatMembers(t2: {[any]: any}) -- line: 58
-	-- upvalues: useLocalization (copy), useStyle (copy), useTextSizeOffset (copy), useDebouncedUserSearch (copy), React (copy), renderUserEntry (copy), Foundation (copy), SelectedMembersBar (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), PaginatedChatMembers (copy)
-	local v24 = useLocalization({
-		suggested = "Feature.Friends.Label.Suggested"
-	})
-	local v25 = useStyle()
-	local v26 = useTextSizeOffset()
-	local v27, v28, v29 = useDebouncedUserSearch(t2.conversation)
-	local v30 = React.useRef(nil)
-	local v31 = React.useCallback(function() -- line: 66
-		-- upvalues: v28 (copy), v30 (copy)
-		v28("")
 
-		if v30 and v30.current then
-			v30.current.focus()
+local function SelectChatMembers(props)
+	local v = useLocalization({ suggested = "Feature.Friends.Label.Suggested" })
+
+	local style = useStyle()
+	local v2 = useTextSizeOffset()
+	local userIds, onChanged, text = useDebouncedUserSearch(props.conversation)
+	local ref = React.useRef(nil)
+	local onActivated = React.useCallback(function()
+		onChanged("")
+
+		if ref and ref.current then
+			ref.current.focus()
 		end
-	end, { v28 })
-	local v32 = v29 ~= ""
-	local v33 = React.useCallback(function(t3: {[any]: any}) -- line: 76
-		-- upvalues: renderUserEntry (copy), v32 (copy), t2 (copy), v25 (copy), v26 (copy)
-		local item = t3.item
+	end, { onChanged })
+	local v3 = text ~= ""
+	local renderItem = React.useCallback(function(p)
+		return renderUserEntry(p.item, v3, { isDebugEnabled = props.isDebugEnabled }, style, v2)
+	end, { props.isDebugEnabled, v3, style, v2 })
 
-		return renderUserEntry(item, v32, {
-			isDebugEnabled = t2.isDebugEnabled
-		}, v25, v26)
-	end, {
-		t2.isDebugEnabled,
-		v32,
-		v25,
-		v26
-	})
-	local shouldShowSelectChatMembersBar = t2.shouldShowSelectChatMembersBar
+	local shouldShowSelectChatMembersBar = props.shouldShowSelectChatMembersBar
+	local createElement = React.createElement
+	local view = Foundation.View
 
-	return React.createElement(Foundation.View, {
-		tag = "size-full col gap-small bg-surface-0"
-	}, {
-		TopSection = React.createElement(Foundation.View, {
-			tag = "col size-full-0 auto-y gap-small padding-x-medium",
+	local createElement2 = React.createElement
+	local view2 = Foundation.View
+
+	local v4 = {
+		selectedMembersBar = shouldShowSelectChatMembersBar and React.createElement(SelectedMembersBar, {
 			LayoutOrder = 1
-		}, {
-			selectedMembersBar = shouldShowSelectChatMembersBar and React.createElement(SelectedMembersBar, {
-				LayoutOrder = 1
-			}) or nil,
-			searchBar = React.createElement(Foundation.TextInput, {
-				tag = "size-full-0 auto-y",
-				LayoutOrder = 2,
-				label = "",
-				leadingIcon = "icons/actions/friend_sort/search_people",
-				text = v29,
-				width = UDim.new(1, 0),
-				placeholder = t2.searchFriendsText,
-				onChanged = v28,
-				iconTrailing = if not v32 then nil else {
-					name = Foundation.Enums.IconName.CircleX,
-					onActivated = v31
-				},
-				textBoxRef = v30,
-				testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.selectChatMembersSearchInput(v29)
-			})
-		}),
-		friendsList = React.createElement(Foundation.View, {
-			LayoutOrder = 3,
-			tag = "size-full-0 fill"
-		}, {
-			paginatedFriendsList = React.createElement(PaginatedChatMembers, {
-				userIds = if not v32 then t2.friendIds else v27,
-				renderItem = v33,
-				fetchMoreFriends = if not v32 then t2.fetchMoreFriends else nil,
-				headerText = if not v32 then v24.suggested else nil
-			})
+		}) or nil,
+		searchBar = 0
+	}
+
+	local createElement3 = React.createElement
+	local textInput = Foundation.TextInput
+	local v5 = {
+		tag = "size-full-0 auto-y",
+		LayoutOrder = 2,
+		label = "",
+		text = text,
+		width = UDim.new(1, 0),
+		placeholder = props.searchFriendsText,
+		leadingIcon = "icons/actions/friend_sort/search_people",
+		onChanged = onChanged,
+		iconTrailing = v3 and {
+			name = Foundation.Enums.IconName.CircleX,
+			onActivated = onActivated
+		} or nil,
+		textBoxRef = ref,
+		testId = 0
+	}
+	local testId
+
+	if FFlagDebugAppChatEnableDomLocators then
+		testId = DomLocators.selectChatMembersSearchInput(text)
+	end
+
+	v5.testId = testId
+	v4.searchBar = createElement3(textInput, v5)
+	local children = {
+		TopSection = createElement2(
+			view2,
+			{ tag = "col size-full-0 auto-y gap-small padding-x-medium", LayoutOrder = 1 },
+			v4
+		),
+		friendsList = 0
+	}
+
+	local createElement4 = React.createElement
+	local view3 = Foundation.View
+
+	local createElement5 = React.createElement
+
+	if not v3 then
+		userIds = props.friendIds
+	end
+
+	local fetchMoreFriends
+
+	if not v3 then
+		fetchMoreFriends = props.fetchMoreFriends
+	end
+
+	local headerText
+
+	if not v3 then
+		headerText = v.suggested
+	end
+
+	children.friendsList = createElement4(view3, { LayoutOrder = 3, tag = "size-full-0 fill" }, {
+		paginatedFriendsList = createElement5(PaginatedChatMembers, {
+			userIds = userIds,
+			renderItem = renderItem,
+			fetchMoreFriends = fetchMoreFriends,
+			headerText = headerText
 		})
 	})
+	return createElement(view, { tag = "size-full col gap-small bg-surface-0" }, children)
 end
 
 return React.memo(SelectChatMembers)

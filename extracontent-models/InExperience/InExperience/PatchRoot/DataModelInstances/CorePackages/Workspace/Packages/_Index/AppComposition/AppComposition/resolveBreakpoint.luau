@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("AppComposition").Parent
-local Breakpoint = require(Parent.Foundation).Enums.Breakpoint
-local t1 = {
+local parent = script:FindFirstAncestor("AppComposition").Parent
+local Foundation = require(parent.Foundation)
+local Breakpoint = Foundation.Enums.Breakpoint
+
+local v = {
 	[Breakpoint.XSmall] = 360,
 	[Breakpoint.Small] = 600,
 	[Breakpoint.Medium] = 1140,
@@ -8,7 +10,8 @@ local t1 = {
 	[Breakpoint.XLarge] = 1920,
 	[Breakpoint.XXLarge] = 1e999
 }
-local t2 = {
+
+local v2 = {
 	Breakpoint.XSmall,
 	Breakpoint.Small,
 	Breakpoint.Medium,
@@ -17,11 +20,10 @@ local t2 = {
 	Breakpoint.XXLarge
 }
 
-local function resolveBreakpoint(n1: number) -- line: 26
-	-- upvalues: t2 (copy), t1 (copy), Breakpoint (copy)
-	for _, v8 in t2 do
-		if n1 <= (t1[v8] or 0) then
-			return v8
+local function resolveBreakpoint(p: number)
+	for _, v3 in v2 do
+		if p <= (v[v3] or 0) then
+			return v3
 		end
 	end
 

@@ -1,141 +1,128 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-
+local parent = InlineRichText.Parent
 require(InlineRichText.Types)
 
 local TokenName = require(InlineRichText.Enums.TokenName)
 local parseXmlAttributes = require(InlineRichText.Parser.parseXmlAttributes)
 local escapeRichFormatting = require(InlineRichText.Utils.escapeRichFormatting)
-local _ = {
-	Open = "OPEN",
-	Close = "CLOSE",
-	OpenClose = "OPEN_CLOSE"
-}
-local t1 = {
-	{
-		name = "OPEN_CLOSE",
-		pattern = "^<([%w-]+)%s?([^>]*)/>"
-	},
-	{
-		name = "OPEN",
-		pattern = "^<([%w-]+)%s?([^>]*)>"
-	},
-	{
-		name = "CLOSE",
-		pattern = "^</([%w-]+)%s?([^>]*)>"
-	}
-}
-local t5 = {
-	OPEN = function(t2: {[any]: any}, s1: string, s2: string) -- line: 32
-		-- upvalues: parseXmlAttributes (copy), TokenName (copy)
-		local v12 = parseXmlAttributes(s2)
+local unescapeRichFormatting = require(InlineRichText.Utils.unescapeRichFormatting)
 
-		table.insert(t2, {
-			name = TokenName.Open,
-			text = s1,
-			attributes = v12
-		})
-	end,
-	CLOSE = function(t3: {[any]: any}, s3: string) -- line: 40
-		-- upvalues: TokenName (copy)
-		table.insert(t3, {
-			name = TokenName.Close,
-			text = s3,
-			attributes = {}
-		})
-	end,
-	OPEN_CLOSE = function(t4: {[any]: any}, s4: string, s5: string) -- line: 47
-		-- upvalues: parseXmlAttributes (copy), TokenName (copy)
-		local v18 = parseXmlAttributes(s5)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagInlineRichTextSkipPlaintextEscape = SharedFlags.FFlagInlineRichTextSkipPlaintextEscape
 
-		table.insert(t4, {
-			name = TokenName.Open,
-			text = s4,
-			attributes = v18
-		})
-		table.insert(t4, {
-			name = TokenName.Close,
-			text = s4,
-			attributes = {}
-		})
+local _ = { Open = "OPEN", Close = "CLOSE", OpenClose = "OPEN_CLOSE" }
+
+local v = {
+	{ name = "OPEN_CLOSE", pattern = "^<([%w-]+)%s?([^>]*)/>" },
+	{ name = "OPEN", pattern = "^<([%w-]+)%s?([^>]*)>" },
+	{ name = "CLOSE", pattern = "^</([%w-]+)%s?([^>]*)>" }
+}
+
+local v2 = {
+	OPEN = function(list, text: string, p: string)
+		local attributes = parseXmlAttributes(p)
+		table.insert(list, { name = TokenName.Open, text = text, attributes = attributes })
+	end,
+	CLOSE = function(list, text: string)
+		table.insert(list, { name = TokenName.Close, text = text, attributes = {} })
+	end,
+	OPEN_CLOSE = function(list, text: string, p: string)
+		local attributes = parseXmlAttributes(p)
+		table.insert(list, { name = TokenName.Open, text = text, attributes = attributes })
+
+		table.insert(list, { name = TokenName.Close, text = text, attributes = {} })
 	end
 }
 
-local function tokenize(s6: string) -- line: 62
-	-- upvalues: t1 (copy), TokenName (copy), escapeRichFormatting (copy), t5 (copy)
-	local n1 = 0
-	local n2 = 0
-	local t6 = {}
-	local v23 = string.gsub(s6, "\n+", " ")
+local function tokenize(value: string)
+	local v3 = string.gsub(value, "\n+", " ")
+	local v4 = 0
+	local v5 = 0
+	local result = {}
 
-	for match in string.gmatch(v23, "()<") do
-		if not (match < n1) then
-			n1 = match
+	for k in string.gmatch(v3, "()<") do
+		if k < v4 then
+			continue
+		end
 
-			local v25 = false
+		v4 = k
+		local v6 = false
 
-			for _, v27 in t1 do
-				local name = v27.name
-				local pattern = v27.pattern
-				local start, stop = string.find(v23, pattern, n1)
+		for _, v7 in v do
+			local name = v7.name
+			local pattern = v7.pattern
+			local v8, v9 = string.find(v3, pattern, v4)
 
-				if not start or not stop then
-					continue
-				end
+			if not (v8 and v9) then
+				continue
+			end
 
-				local t7 = { string.match(v23, pattern, n1) }
-				local v33 = t7[1]
-				local v34 = t7[2] or ""
+			local v10 = { string.match(v3, pattern, v4) }
+			local v11 = v10[1]
+			local v12 = v10[2] or ""
 
-				if v33 then
-					if n1 ~= n2 then
-						table.insert(t6, {
-							name = TokenName.Text,
-							text = escapeRichFormatting((string.sub(v23, n2, n1 - 1))),
-							attributes = {}
-						})
-					end
+			if v11 then
+				if v4 ~= v5 then
+					local v13 = string.sub(v3, v5, v4 - 1)
+					local v14 = { name = TokenName.Text, text = 0, attributes = 0 }
+					local text
 
-					if v33 == "br" then
-						if name == "OPEN" or name == "OPEN_CLOSE" then
-							table.insert(t6, {
-								text = "",
-								name = TokenName.Break,
-								attributes = {}
-							})
-						end
+					if FFlagInlineRichTextSkipPlaintextEscape then
+						text = unescapeRichFormatting(v13)
 					else
-						t5[name](t6, v33, v34)
+						text = escapeRichFormatting(v13)
 					end
 
-					n1 += stop - start + 1
-					n2 = n1
-					v25 = true
+					v14.text = text
 
-					break
+					v14.attributes = {}
+					table.insert(result, v14)
 				end
-			end
 
-			if not v25 then
-				n1 += 1
+				if v11 == "br" then
+					if name == "OPEN" or name == "OPEN_CLOSE" then
+						table.insert(result, { name = TokenName.Break, text = "", attributes = {} })
+					end
+				else
+					v2[name](result, v11, v12)
+				end
+
+				v4 += v9 - v8 + 1
+				v5 = v4
+				v6 = true
+				break
 			end
+		end
+
+		if not v6 then
+			v4 += 1
 		end
 	end
 
-	local v35 = #v23 + 1
+	local v6 = #v3 + 1
 
-	if v35 ~= n2 then
-		table.insert(t6, {
-			name = TokenName.Text,
-			text = escapeRichFormatting((string.sub(v23, n2, v35 - 1))),
-			attributes = {}
-		})
+	if v6 ~= v5 then
+		local v7 = string.sub(v3, v5, v6 - 1)
+		local v8 = { name = TokenName.Text, text = 0, attributes = 0 }
+		local text
+
+		if FFlagInlineRichTextSkipPlaintextEscape then
+			text = unescapeRichFormatting(v7)
+		else
+			text = escapeRichFormatting(v7)
+		end
+
+		v8.text = text
+
+		v8.attributes = {}
+		table.insert(result, v8)
 	end
 
-	if t6[1] and t6[1].name == TokenName.Text and t6[1].text == "" then
-		table.remove(t6, 1)
+	if result[1] and result[1].name == TokenName.Text and result[1].text == "" then
+		table.remove(result, 1)
 	end
 
-	return t6
+	return result
 end
 
 return tokenize

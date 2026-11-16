@@ -1,11 +1,9 @@
-local function createNextOrder() -- line: 2
-	local n1 = 0
+local function createNextOrder()
+	local count = 0
 
-	return function() -- line: 5
-		-- upvalues: n1 (ref)
-		n1 += 1
-
-		return n1
+	return function()
+		count += 1
+		return count
 	end
 end
 

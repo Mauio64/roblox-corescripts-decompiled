@@ -1,3 +1,2 @@
-return {
-	concat = require(script.Parent.ApolloLink).ApolloLink.concat_
-}
+local ApolloLink = require(script.Parent.ApolloLink)
+return { concat = ApolloLink.ApolloLink.concat_ }

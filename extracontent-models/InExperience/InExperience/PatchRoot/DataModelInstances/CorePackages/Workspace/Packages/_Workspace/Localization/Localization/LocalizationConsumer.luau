@@ -1,67 +1,63 @@
-local Parent = script:FindFirstAncestor("Localization").Parent
+local parent = script:FindFirstAncestor("Localization").Parent
 local LocalizationService = game:GetService("LocalizationService")
-local React = require(Parent.React)
-local ArgCheck = require(Parent.ArgCheck)
+
+local React = require(parent.React)
+
+local ArgCheck = require(parent.ArgCheck)
 local RobloxLocaleIdKey = require(script.Parent.RobloxLocaleIdKey)
 local LocalizationRoactContext = require(script.Parent.LocalizationRoactContext)
 local localizeStrings = require(script.Parent.localizeStrings)
-local v8 = React.Component:extend("LocalizationConsumer")
 
-function v8.init(p1) -- line: 14
-	-- upvalues: LocalizationService (copy)
-	local localization = p1.props.localization
+local extended = React.Component:extend("LocalizationConsumer")
+
+function extended:init()
+	local localization = self.props.localization
 
 	if localization == nil then
 		error("LocalizationConsumer must be below a LocalizationProvider.")
 	end
 
-	p1.state = {
-		locale = LocalizationService.RobloxLocaleId
-	}
+	self.state = { locale = LocalizationService.RobloxLocaleId }
 
-	function p1.updateLocalization(_) -- line: 25
-		-- upvalues: localization (copy), p1 (copy)
-		local Locale = localization:GetLocale()
+	function self.updateLocalization(_)
+		local locale = localization:GetLocale()
 
-		if Locale ~= p1.state.locale then
-			p1:setState({
-				locale = Locale
-			})
+		if locale ~= self.state.locale then
+			self:setState({ locale = locale })
 		end
 	end
 
-	p1.connections = { localization.changed:connect(p1.updateLocalization) }
+	self.connections = { localization.changed:connect(self.updateLocalization) }
 end
-function v8.willUnmount(p3) -- line: 39
-	for _, v in pairs(p3.connections) do
-		v:disconnect()
+
+function extended.willUnmount(p)
+	for _, connection in pairs(p.connections) do
+		connection:disconnect()
 	end
 end
-function v8.render(p4) -- line: 45
-	-- upvalues: ArgCheck (copy), localizeStrings (copy), RobloxLocaleIdKey (copy)
-	local localization = p4.props.localization
-	local render = p4.props.render
-	local stringsToBeLocalized = p4.props.stringsToBeLocalized
+
+function extended.render(p)
+	local localization = p.props.localization
+
+	local render = p.props.render
+	local stringsToBeLocalized = p.props.stringsToBeLocalized
 
 	ArgCheck.isType(render, "function", "LocalizationConsumer.props.render")
 	ArgCheck.isType(stringsToBeLocalized, "table", "LocalizationConsumer.props.stringsToBeLocalized")
 
-	local v19 = localizeStrings(localization, stringsToBeLocalized)
+	local localesByRobloxLocaleIdKey = localizeStrings(localization, stringsToBeLocalized)
+	localesByRobloxLocaleIdKey[RobloxLocaleIdKey] = p.state.locale
 
-	v19[RobloxLocaleIdKey] = p4.state.locale
-
-	return render(v19)
+	return render(localesByRobloxLocaleIdKey)
 end
 
-local function LocalizationContextConsumer(p5) -- line: 60
-	-- upvalues: React (copy), LocalizationRoactContext (copy), v8 (copy)
+local function LocalizationContextConsumer(p)
 	return React.createElement(LocalizationRoactContext.Consumer, {
-		render = function(p6) -- line: 62
-			-- upvalues: React (copy), v8 (copy), p5 (copy)
-			return React.createElement(v8, {
-				localization = p6,
-				render = p5.render,
-				stringsToBeLocalized = p5.stringsToBeLocalized
+		render = function(localization)
+			return React.createElement(extended, {
+				localization = localization,
+				render = p.render,
+				stringsToBeLocalized = p.stringsToBeLocalized
 			})
 		end
 	})

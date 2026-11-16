@@ -1,44 +1,38 @@
 local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("MediaGallery").Parent
-local CentralOverlay = require(Parent.CentralOverlay)
-local RobloxAppEnums = require(Parent.RobloxAppEnums)
-local UniversalAppPolicy = require(Parent.UniversalAppPolicy)
+
+local parent = script:FindFirstAncestor("MediaGallery").Parent
+
+local CentralOverlay = require(parent.CentralOverlay)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+
 local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
 local CentralOverlayType = RobloxAppEnums.CentralOverlayType
 local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
 
-local function openYouTubeVideoWithAgeCheck(s1: string, s2: string?, p1: ((...any) -> ...any), p2: ((...any) -> ...any)?) -- line: 19
-	-- upvalues: HttpService (copy), GuiService (copy), getAppFeaturePolicies (copy), SetCentralOverlay (copy), CentralOverlayType (copy)
-	if not s1 or #s1 == 0 then
+local function openYouTubeVideoWithAgeCheck(list: string, value: string?, callback, callback2)
+	if not list or #list == 0 then
 		return
 	end
 
-	local function doOpen() -- line: 29
-		-- upvalues: s1 (copy), HttpService (copy), s2 (copy), GuiService (copy), p2 (copy)
-		local v16 = `https://www.youtube-nocookie.com/embed/{ s1 }?autoplay=1&controls=0&modestbranding=1&rel=0&loop=0&cc_load_policy=0&playsinline=0`
-		local json = HttpService:JSONEncode({
-			animated = true,
-			url = v16,
-			title = s2 or ""
-		})
+	local function doOpen()
+		GuiService:BroadcastNotification(HttpService:JSONEncode({
+			url = `https://www.youtube-nocookie.com/embed/{list}?autoplay=1&controls=0&modestbranding=1&rel=0&loop=0&cc_load_policy=0&playsinline=0`,
+			title = value or "",
+			animated = true
+		}), 23)
 
-		GuiService:BroadcastNotification(json, 23)
-
-		if p2 then
-			p2()
+		if callback2 then
+			callback2()
 		end
 	end
 
 	if getAppFeaturePolicies().getShowYouTubeAgeAlert() then
-		p1(SetCentralOverlay(CentralOverlayType.LeaveRobloxAlert, {
-			continueFunc = doOpen
-		}))
-
-		return
+		callback(SetCentralOverlay(CentralOverlayType.LeaveRobloxAlert, { continueFunc = doOpen }))
+	else
+		doOpen()
 	end
-
-	doOpen()
 end
 
 return openYouTubeVideoWithAgeCheck

@@ -1,27 +1,27 @@
 local Autocomplete = script:FindFirstAncestor("Autocomplete")
 local Trie = require(Autocomplete.Trie.Trie)
-local t1 = {}
 
-t1.__index = t1
+local AutocompleteText = {}
+AutocompleteText.__index = AutocompleteText
 
-function t1.new(p1: ((...any) -> ...any)) -- line: 11
-	-- upvalues: t1 (copy), Trie (copy)
-	local t2 = {}
+function AutocompleteText.new(callback)
+	local v = {}
+	setmetatable(v, AutocompleteText)
 
-	setmetatable(t2, t1)
-	t2.trie = Trie.new()
-	t2.trie = p1(t2)
+	v.trie = Trie.new()
+	v.trie = callback(v)
 
-	return t2
+	return v
 end
-function t1.getResults(t3: {[any]: any}, s1: string, p2: ((...any) -> ...any)?) -- line: 22
-	local v9 = t3.trie:autocomplete(s1)
 
-	if p2 then
-		return p2(v9)
+function AutocompleteText.getResults(p, p2: string, callback)
+	local autocomplete = p.trie:autocomplete(p2)
+
+	if callback then
+		return callback(autocomplete)
 	end
 
-	return v9
+	return autocomplete
 end
 
-return t1
+return AutocompleteText

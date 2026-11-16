@@ -1,31 +1,32 @@
-local t1 = {}
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Object = require(scriptParentParent.LuauPolyfill).Object
-local invariant = require(scriptParent.jsutils.invariant).invariant
-local DEV = require(scriptParent.utilities).DEV
+local parent = script.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
-invariant(typeof(DEV) == "boolean", (tostring(DEV)))
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
+local utilities = require(parent.utilities)
+local dev = utilities.DEV
+invariant2(typeof(dev) == "boolean", (tostring(dev)))
 
 local context = require(script.context)
+local React = {}
 
-t1.ApolloProvider = context.ApolloProvider
-t1.ApolloConsumer = context.ApolloConsumer
-t1.getApolloContext = context.getApolloContext
-t1.resetApolloContext = context.resetApolloContext
+React.ApolloProvider = context.ApolloProvider
+React.ApolloConsumer = context.ApolloConsumer
+React.getApolloContext = context.getApolloContext
+React.resetApolloContext = context.resetApolloContext
 
 local hooks = require(script.hooks)
-
-Object.assign(t1, hooks)
+Object.assign(React, hooks)
 
 local parser = require(script.parser)
 
-t1.DocumentType = parser.DocumentType
-t1.operationName = parser.operationName
-t1.parser = parser.parser
+React.DocumentType = parser.DocumentType
+React.operationName = parser.operationName
+React.parser = parser.parser
 
 local types = require(script.types.types)
+Object.assign(React, types)
 
-Object.assign(t1, types)
-
-return t1
+return React

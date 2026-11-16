@@ -1,9 +1,5 @@
 return {
-	new = function(b1: boolean, b2: boolean, b3: boolean) -- line: 9
-		return {
-			Playing = b1,
-			Reversing = b2,
-			Loading = b3
-		}
+	new = function(playing: boolean, reversing: boolean, loading: boolean)
+		return { Playing = playing, Reversing = reversing, Loading = loading }
 	end
 }

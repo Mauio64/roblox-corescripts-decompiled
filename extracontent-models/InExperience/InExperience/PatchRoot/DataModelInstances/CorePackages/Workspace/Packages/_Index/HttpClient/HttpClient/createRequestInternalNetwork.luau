@@ -1,81 +1,120 @@
 local HttpService = game:GetService("HttpService")
 
 require(script.Parent.types)
+local FFlagHttpClientMrRouterHeaders = require(script.Parent.Flags.FFlagHttpClientMrRouterHeaders)
+local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
+local MrRouterHeaders
 
-local function toLowerKeyedHeaders(p1) -- line: 13
-	if typeof(p1) ~= "table" then
+if FFlagHttpClientMrRouterHeaders then
+	local parent = script:FindFirstAncestor("HttpClient").Parent
+	MrRouterHeaders = require(parent.MrRouterHeaders)
+else
+	MrRouterHeaders = nil
+end
+
+local function toLowerKeyedHeaders(headers)
+	if typeof(headers) ~= "table" then
 		return nil
 	end
 
-	local t1 = {}
+	local result = {}
 
-	for v6, v7 in p1 do
-		t1[tostring(v6):lower()] = tostring(v7)
+	for k, item in headers do
+		result[tostring(k):lower()] = tostring(item)
 	end
 
-	return t1
+	return result
 end
-local function createRequestInternalNetwork() -- line: 24
-	-- upvalues: HttpService (copy), toLowerKeyedHeaders (copy)
-	return {
-		request = function(p2, p3: ((...any) -> ...any)) -- line: 25
-			-- upvalues: HttpService (copy), toLowerKeyedHeaders (copy)
-			local v10 = HttpService:RequestInternal({
-				Url = p2.url,
-				Method = p2.method,
-				Headers = p2.headers,
-				Body = p2.body,
-				OnMessage = p2.onMessage
-			})
-			local u11 = false
 
-			v10:Start(function(b1: boolean, p4) -- line: 42
-				-- upvalues: u11 (ref), p3 (copy), toLowerKeyedHeaders (copy)
-				if u11 then
+local function createRequestInternalNetwork(p)
+	local v
+
+	if FFlagHttpClientRetryExtensions then
+		v = not (p == nil) and p.transportFailuresAsResponses
+	else
+		v = nil
+	end
+
+	return {
+		request = function(data, callback)
+			local headers = data.headers
+
+			if FFlagHttpClientMrRouterHeaders then
+				headers = MrRouterHeaders.injectMrRouterHeaders(data.headers)
+			end
+
+			local v2 = {
+				Url = data.url,
+				Method = data.method,
+				Headers = headers,
+				Body = data.body,
+				OnMessage = data.onMessage,
+				Priority = 0
+			}
+			local priority
+
+			if FFlagHttpClientRetryExtensions then
+				priority = data.priority
+			end
+
+			v2.Priority = priority
+			local internal = HttpService:RequestInternal(v2)
+
+			local flag = false
+
+			internal:Start(function(flag2: boolean, value)
+				if flag then
 					return
 				end
 
-				u11 = true
+				flag = true
 
-				if b1 and typeof(p4) == "table" then
-					local t2 = nil
+				if typeof(value) == "table" and (flag2 or FFlagHttpClientRetryExtensions and v) then
+					local stats
 
-					if typeof(p4.Stats) == "table" then
-						t2 = {}
+					if typeof(value.Stats) == "table" then
+						stats = {}
 
-						for v15, v16 in p4.Stats do
-							if typeof(v15) == "string" and typeof(v16) == "number" then
-								t2[v15] = v16
-							elseif v15 == "WasRequestRetried" and typeof(v16) == "boolean" then
-								t2[v15] = not v16 and 0 or 1
+						for k, stat in value.Stats do
+							if typeof(k) == "string" and typeof(stat) == "number" then
+								stats[k] = stat
+							elseif k == "WasRequestRetried" and typeof(stat) == "boolean" then
+								stats.WasRequestRetried = stat and 1 or 0
 							end
 						end
 					end
 
-					p3(true, {
-						statusCode = tonumber(p4.StatusCode) or 0,
-						responseBody = p4.Body,
-						headers = toLowerKeyedHeaders(p4.Headers),
-						httpError = p4.HttpError,
-						stats = t2
-					})
+					local v3 = {
+						statusCode = tonumber(value.StatusCode) or 0,
+						responseBody = value.Body,
+						headers = toLowerKeyedHeaders(value.Headers),
+						httpError = value.HttpError,
+						stats = stats,
+						wasTransportFailure = 0
+					}
+					local wasTransportFailure
 
-					return
+					if FFlagHttpClientRetryExtensions and v then
+						wasTransportFailure = not flag2
+					end
+
+					v3.wasTransportFailure = wasTransportFailure
+					callback(true, v3)
+				elseif FFlagHttpClientRetryExtensions and v then
+					callback(false, (tostring(value or "RequestInternal failed")))
+				else
+					callback(false, (tostring(value and value.StatusMessage or "RequestInternal failed")))
 				end
-
-				p3(false, (tostring(p4 and p4.StatusMessage or "RequestInternal failed")))
 			end)
 
-			return function() -- line: 72
-				-- upvalues: u11 (ref), v10 (copy)
-				if u11 then
+			return function()
+				if flag then
 					return
 				end
 
-				u11 = true
-				pcall(function() -- line: 77
-					-- upvalues: v10 (copy)
-					v10:Cancel()
+				flag = true
+				pcall(function()
+					internal:Cancel()
 				end)
 			end
 		end

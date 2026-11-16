@@ -1,6 +1,5 @@
-return require(script.Parent.Parent.Parent.Parent.Action)("ScriptProfiler" .. script.Name, function(p1, p2) -- line: 4
-	return {
-		isClient = p1,
-		isFunctionsView = p2
-	}
+local Action = require(script.Parent.Parent.Parent.Parent.Action)
+
+return Action("ScriptProfiler" .. script.Name, function(isClient, isFunctionsView)
+	return { isClient = isClient, isFunctionsView = isFunctionsView }
 end)

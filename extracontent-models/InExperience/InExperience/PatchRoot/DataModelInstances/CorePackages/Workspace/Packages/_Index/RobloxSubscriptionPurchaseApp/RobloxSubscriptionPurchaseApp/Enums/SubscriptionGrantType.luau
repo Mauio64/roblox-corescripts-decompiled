@@ -1,3 +1,1 @@
-return {
-	FaeFreeTrial = "FaeFreeTrial"
-}
+return { FaeFreeTrial = "FaeFreeTrial" }

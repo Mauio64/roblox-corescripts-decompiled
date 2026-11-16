@@ -1,61 +1,59 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local Signals = require(Parent.Signals)
-local InExperienceAppChatModal = require(Parent.AppChat.InExperienceAppChatModal)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+
+local Signals = require(parent.Signals)
+local InExperienceAppChatModal = require(parent.AppChat.InExperienceAppChatModal)
 local GetFriendsTabVisibilityStore = require(script.Parent.Parent.GetFriendsTabVisibilityStore)
+
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
 
-return function() -- line: 41
-	-- upvalues: createSignal (copy), createComputed (copy), GetFriendsTabVisibilityStore (copy), InExperienceAppChatModal (copy)
-	local v7, v8 = createSignal(0)
-	local n1 = 0
-	local u10 = false
-	local v11 = createComputed(function(p1) -- line: 50
-		-- upvalues: GetFriendsTabVisibilityStore (copy), v7 (copy)
-		if not GetFriendsTabVisibilityStore(p1).getIsFriendsTabVisible(p1) then
-			return 0
+return function()
+	local signal, v = createSignal(0)
+
+	local v2 = 0
+	local v3 = false
+
+	local getUnreadCountToDisplay = createComputed(function(p)
+		if GetFriendsTabVisibilityStore(p).getIsFriendsTabVisible(p) then
+			return signal(p)
 		end
 
-		return v7(p1)
+		return 0
 	end)
 
-	local function establishBaseline(n2: number) -- line: 57
-		-- upvalues: u10 (ref), n1 (ref), v8 (copy)
-		u10 = true
-		n1 = n2
-		v8(0)
+	local function establishBaseline(unreadCount: number) -- 1 equivalent call inferred from this helper
+		v3 = true
+		v2 = unreadCount
+		v(0)
 	end
-	local function recordCanonicalCount(n3: number) -- line: 63
-		-- upvalues: u10 (ref), GetFriendsTabVisibilityStore (copy), n1 (ref), v8 (copy), v7 (copy)
-		if u10 and GetFriendsTabVisibilityStore(false).getIsFriendsTabVisible(false) then
-			local v19 = n3 - n1
 
-			if v19 > 0 then
-				v8(v7(false) + v19)
+	local function recordCanonicalCount(p: number)
+		if v3 and GetFriendsTabVisibilityStore(false).getIsFriendsTabVisible(false) then
+			local v4 = p - v2
+
+			if v4 > 0 then
+				v(signal(false) + v4)
 			end
 		end
 
-		n1 = n3
+		v2 = p
+	end
+
+	local function clearDisplayCount()
+		v(0)
 	end
 
 	local default = InExperienceAppChatModal.default
 
 	if default.hasReceivedInitialUnreadCount then
-		local v15 = default.unreadCount or 0
-
-		u10 = true
-		n1 = v15
-		v8(0)
+		establishBaseline(default.unreadCount or 0) -- inferred equivalent call
 	end
 
 	default.initialUnreadCountSignal.Event:Connect(establishBaseline)
 	default.unreadCountSignal.Event:Connect(recordCanonicalCount)
 
 	return {
-		getUnreadCountToDisplay = v11,
-		clearDisplayCount = function() -- line: 75
-			-- upvalues: v8 (copy)
-			v8(0)
-		end
+		getUnreadCountToDisplay = getUnreadCountToDisplay,
+		clearDisplayCount = clearDisplayCount
 	}
 end

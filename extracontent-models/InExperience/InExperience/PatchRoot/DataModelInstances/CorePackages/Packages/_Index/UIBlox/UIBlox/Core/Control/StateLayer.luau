@@ -1,21 +1,24 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local React = require(scriptParentParentParentParent.React)
-local Cryo = require(scriptParentParentParentParent.Cryo)
-local useStyle = require(scriptParentParent.Style.useStyle)
-local useCursor = require(scriptParentParentParent.App.SelectionCursor.useCursor)
-local Interactable = require(scriptParent.Interactable)
-local ControlState = require(scriptParent.Enum.ControlState)
-local t1 = {
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
+
+local React = require(parent4.React)
+local Cryo = require(parent4.Cryo)
+
+local useStyle = require(parent2.Style.useStyle)
+local useCursor = require(parent3.App.SelectionCursor.useCursor)
+local Interactable = require(parent.Interactable)
+local ControlState = require(parent.Enum.ControlState)
+
+local v = {
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.fromScale(0.5, 0.5),
+	size = UDim2.fromScale(1, 1),
 	isDisabled = false,
 	selectable = true,
 	affordance = "Background",
 	stateStyle = "Standard",
-	anchorPoint = Vector2.new(0.5, 0.5),
-	position = UDim2.fromScale(0.5, 0.5),
-	size = UDim2.fromScale(1, 1),
 	outset = {
 		top = UDim.new(0, 0),
 		right = UDim.new(0, 0),
@@ -23,78 +26,101 @@ local t1 = {
 		left = UDim.new(0, 0)
 	}
 }
-local v12 = ControlState.Initialize.rawValue()
-local v13 = React.forwardRef(function(t2: {[any]: any}, p1) -- line: 76
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), v12 (copy), React (copy), useCursor (copy), Interactable (copy)
-	local v16 = Cryo.Dictionary.join(t1, t2)
-	local StateLayer = useStyle().Tokens.Component.StateLayer
-	local Color = StateLayer[v16.stateStyle][v12].Color
-	local v19, v20 = React.useBinding(Color.Color3)
-	local v21, v22 = React.useBinding(Color.Transparency)
-	local v23 = useCursor(v16.cornerRadius)
-	local t3 = {
-		BackgroundTransparency = 1,
-		ref = p1,
-		AnchorPoint = v16.anchorPoint,
-		Position = v16.position,
-		Size = v16.size,
-		LayoutOrder = v16.layoutOrder,
-		ZIndex = v16.zIndex
+
+local rawValue = ControlState.Initialize.rawValue()
+
+local v2 = {
+	[ControlState.Initialize.rawValue()] = "Idle",
+	[ControlState.Default.rawValue()] = "Idle",
+	[ControlState.Pressed.rawValue()] = "Press",
+	[ControlState.Hover.rawValue()] = "Hover",
+	[ControlState.Selected.rawValue()] = "Idle",
+	[ControlState.SelectedPressed.rawValue()] = "Press",
+	[ControlState.Disabled.rawValue()] = "Idle"
+}
+
+local function getStateTokens(tokens, stateStyle: string) -- 1 equivalent call inferred from this helper
+	if stateStyle == "Standard" then
+		return tokens.Color.State
+	elseif stateStyle == "Inverse" then
+		return tokens.Inverse.State
+	elseif stateStyle == "Lighten" then
+		return tokens.DarkMode.State
+	end
+
+	return tokens.LightMode.State
+end
+
+local forwardRef = React.forwardRef(function(p, ref)
+	local joined = Cryo.Dictionary.join(v, p)
+
+	local tokens = useStyle().Tokens
+	local stateTokens = getStateTokens(tokens, joined.stateStyle) -- inferred equivalent call
+	local stateToken = stateTokens[v2[rawValue]]
+	local v3, v4 = React.useBinding(stateToken.Color3)
+	local v5, v6 = React.useBinding(stateToken.Transparency)
+	local selectionImageObject = useCursor(joined.cornerRadius)
+
+	local v7 = {
+		ref = ref,
+		AnchorPoint = joined.anchorPoint,
+		Position = joined.position,
+		Size = joined.size,
+		LayoutOrder = joined.layoutOrder,
+		ZIndex = joined.zIndex,
+		BackgroundTransparency = 1
 	}
-	local t4 = {}
 
-	if v16.cornerRadius ~= nil then
-		t4.UICorner = React.createElement("UICorner", {
-			CornerRadius = v16.cornerRadius
-		})
+	local children = {}
+
+	if joined.cornerRadius ~= nil then
+		children.UICorner = React.createElement("UICorner", { CornerRadius = joined.cornerRadius })
 	end
 
-	if v16.affordance == "Border" then
-		t4.UIStroke = React.createElement("UIStroke", {
-			Thickness = StateLayer.Base.BorderWidth,
-			Color = v19,
-			Transparency = v21
+	if joined.affordance == "Border" then
+		children.UIStroke = React.createElement("UIStroke", {
+			Thickness = tokens.Stroke.Standard,
+			Color = v3,
+			Transparency = v5
 		})
-		t3.BackgroundTransparency = 1
-	elseif v16.affordance == "Background" then
-		t3.BackgroundColor3 = v19
-		t3.BackgroundTransparency = v21
+
+		v7.BackgroundTransparency = 1
+	elseif joined.affordance == "Background" then
+		v7.BackgroundColor3 = v3
+		v7.BackgroundTransparency = v5
 	end
 
-	local outset = v16.outset
-	local uDim2 = UDim2.new(1 + outset.left.Scale + outset.right.Scale, outset.left.Offset + outset.right.Offset, 1 + outset.top.Scale + outset.bottom.Scale, outset.top.Offset + outset.bottom.Offset)
-	local uDim2_2 = UDim2.new(-outset.left.Scale, -outset.left.Offset, -outset.top.Scale, -outset.top.Offset)
-	local v29 = React.useCallback(function(p2, p3) -- line: 122
-		-- upvalues: StateLayer (copy), v16 (copy), v20 (copy), v22 (copy)
-		local Color2 = StateLayer[v16.stateStyle][p3.rawValue()].Color
+	local outset = joined.outset
+	local udim = UDim2.new(
+		1 + outset.left.Scale + outset.right.Scale,
+		outset.left.Offset + outset.right.Offset,
+		1 + outset.top.Scale + outset.bottom.Scale,
+		outset.top.Offset + outset.bottom.Offset
+	)
 
-		v20(Color2.Color3)
-		v22(Color2.Transparency)
+	local udim2 = UDim2.new(-outset.left.Scale, -outset.left.Offset, -outset.top.Scale, -outset.top.Offset)
+	local onStateChanged = React.useCallback(function(p2, p3)
+		local stateToken2 = stateTokens[v2[p3.rawValue()]]
+		v4(stateToken2.Color3)
+		v6(stateToken2.Transparency)
 
-		if v16.onStateChanged then
-			v16.onStateChanged(p2, p3)
+		if joined.onStateChanged then
+			joined.onStateChanged(p2, p3)
 		end
-	end, {
-		StateLayer,
-		v20,
-		v22,
-		v16.stateStyle,
-		v16.onStateChanged
-	})
-
-	t4.Button = React.createElement(Interactable, {
-		Size = uDim2,
-		Position = uDim2_2,
+	end, { stateTokens, v4, v6, joined.onStateChanged })
+	children.Button = React.createElement(Interactable, {
+		Size = udim,
+		Position = udim2,
 		BackgroundTransparency = 1,
-		Selectable = not v16.isDisabled and v16.selectable,
-		SelectionImageObject = v23,
-		[React.Event.Activated] = v16.onActivated,
-		onStateChanged = v29,
-		isDisabled = v16.isDisabled,
-		userInteractionEnabled = not v16.isDisabled
+		Selectable = not joined.isDisabled and joined.selectable,
+		SelectionImageObject = selectionImageObject,
+		[React.Event.Activated] = joined.onActivated,
+		onStateChanged = onStateChanged,
+		isDisabled = joined.isDisabled,
+		userInteractionEnabled = not joined.isDisabled
 	})
 
-	return React.createElement("Frame", t3, t4)
+	return React.createElement("Frame", v7, children)
 end)
 
-return React.memo(v13)
+return React.memo(forwardRef)

@@ -4,168 +4,125 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
-local function ShouldUseDefaultVoice() -- line: 7
-	-- upvalues: SoundService (copy), VoiceChatService (copy)
-	return SoundService.DefaultListenerLocation == Enum.ListenerLocation.Default and (VoiceChatService.UseAudioApi == Enum.AudioApiRollout.Enabled and VoiceChatService.EnableDefaultVoice)
+local function ShouldUseDefaultVoice() -- 3 equivalent calls inferred from this helper
+	return SoundService.DefaultListenerLocation == Enum.ListenerLocation.Default
+		and VoiceChatService.UseAudioApi == Enum.AudioApiRollout.Enabled
+		and VoiceChatService.EnableDefaultVoice
 end
-local function ShouldUseCamera() -- line: 13
-	-- upvalues: SoundService (copy)
+
+local function ShouldUseCamera(): boolean -- 3 equivalent calls inferred from this helper
 	return SoundService.DefaultListenerLocation == Enum.ListenerLocation.Camera
 end
-local function ShouldUseCharacter() -- line: 17
-	-- upvalues: SoundService (copy)
+
+local function ShouldUseCharacter(): boolean -- 3 equivalent calls inferred from this helper
 	return SoundService.DefaultListenerLocation == Enum.ListenerLocation.Character
 end
-local function ShouldSpawnListener() -- line: 21
-	-- upvalues: SoundService (copy), VoiceChatService (copy)
+
+local function ShouldSpawnListener()
 	if SoundService.DefaultListenerLocation == Enum.ListenerLocation.None then
 		return false
 	end
 
-	return SoundService.DefaultListenerLocation == Enum.ListenerLocation.Camera or (SoundService.DefaultListenerLocation == Enum.ListenerLocation.Character or SoundService.DefaultListenerLocation == Enum.ListenerLocation.Default and (VoiceChatService.UseAudioApi == Enum.AudioApiRollout.Enabled and VoiceChatService.EnableDefaultVoice))
+	return ShouldUseCamera() or ShouldUseCharacter() or ShouldUseDefaultVoice() -- inferred equivalent call
 end
-local function WireUp(p1, p2) -- line: 28
-	local Wire = Instance.new("Wire")
 
-	Wire.SourceInstance = p1
-	Wire.TargetInstance = p2
-	Wire.Parent = p1
-
-	return Wire
+local function WireUp(audioListener, targetInstance) -- 2 equivalent calls inferred from this helper
+	local wire = Instance.new("Wire")
+	wire.SourceInstance = audioListener
+	wire.TargetInstance = targetInstance
+	wire.Parent = audioListener
+	return wire
 end
-local function GetMainOut() -- line: 36
-	-- upvalues: SoundService (copy)
-	local AudioDeviceOutput = SoundService:FindFirstChildWhichIsA("AudioDeviceOutput", true)
 
-	if not AudioDeviceOutput then
-		AudioDeviceOutput = Instance.new("AudioDeviceOutput")
-		AudioDeviceOutput.Parent = SoundService
+local function GetMainOut() -- 2 equivalent calls inferred from this helper
+	local v = SoundService:FindFirstChildWhichIsA("AudioDeviceOutput", true)
+
+	if not v then
+		v = Instance.new("AudioDeviceOutput")
+		v.Parent = SoundService
 	end
 
-	return AudioDeviceOutput
+	return v
 end
-local function SpawnCharacterListener(p3) -- line: 46
-	-- upvalues: SpawnCharacterListener (copy), SoundService (copy), RunService (copy)
-	local PrimaryPart = p3.PrimaryPart
 
-	if not PrimaryPart then
-		p3:GetPropertyChangedSignal("PrimaryPart"):Once(function() -- line: 49
-			-- upvalues: SpawnCharacterListener (copy), p3 (copy)
-			SpawnCharacterListener(p3)
+local function SpawnCharacterListener(character)
+	local primaryPart = character.PrimaryPart
+
+	if not primaryPart then
+		character:GetPropertyChangedSignal("PrimaryPart"):Once(function()
+			SpawnCharacterListener(character)
 		end)
-
 		return
 	end
 
-	local Attachment = Instance.new("Attachment")
+	local attachment = Instance.new("Attachment")
+	local function UpdateCFrame() -- 1 equivalent call inferred from this helper
+		local currentCamera = workspace.CurrentCamera
 
-	local function UpdateCFrame() -- line: 56
-		-- upvalues: Attachment (copy)
-		local CurrentCamera = workspace.CurrentCamera
-
-		if not CurrentCamera then
+		if not currentCamera then
 			return
 		end
 
-		local CFrameRotation = CurrentCamera.CFrame.Rotation
-
-		Attachment.WorldAxis = CFrameRotation.XVector
-		Attachment.WorldSecondaryAxis = CFrameRotation.YVector
+		local rotation = currentCamera.CFrame.Rotation
+		attachment.WorldAxis = rotation.XVector
+		attachment.WorldSecondaryAxis = rotation.YVector
 	end
 
-	local CurrentCamera = workspace.CurrentCamera
+	UpdateCFrame() -- inferred equivalent call
+	local audioListener = Instance.new("AudioListener")
+	audioListener.Parent = attachment
+	attachment.Parent = primaryPart
+	WireUp(audioListener, GetMainOut()) -- inferred equivalent call
+	local heartbeatConnection = RunService.Heartbeat:Connect(UpdateCFrame)
 
-	if CurrentCamera then
-		local CFrameRotation = CurrentCamera.CFrame.Rotation
-
-		Attachment.WorldAxis = CFrameRotation.XVector
-		Attachment.WorldSecondaryAxis = CFrameRotation.YVector
-	end
-
-	local AudioListener = Instance.new("AudioListener")
-
-	AudioListener.Parent = Attachment
-	Attachment.Parent = PrimaryPart
-
-	local AudioDeviceOutput = SoundService:FindFirstChildWhichIsA("AudioDeviceOutput", true)
-
-	if not AudioDeviceOutput then
-		AudioDeviceOutput = Instance.new("AudioDeviceOutput")
-		AudioDeviceOutput.Parent = SoundService
-	end
-
-	local Wire = Instance.new("Wire")
-
-	Wire.SourceInstance = AudioListener
-	Wire.TargetInstance = AudioDeviceOutput
-	Wire.Parent = AudioListener
-
-	local connection = RunService.Heartbeat:Connect(UpdateCFrame)
-	local connection2 = nil
-
-	connection2 = Attachment.AncestryChanged:Connect(function() -- line: 76
-		-- upvalues: Attachment (copy), connection (copy), connection2 (ref)
-		if not Attachment:IsDescendantOf(game) then
-			connection:Disconnect()
-			connection2:Disconnect()
+	local ancestryChangedConnection = nil
+	ancestryChangedConnection = attachment.AncestryChanged:Connect(function()
+		if not attachment:IsDescendantOf(game) then
+			heartbeatConnection:Disconnect()
+			ancestryChangedConnection:Disconnect()
 		end
 	end)
 end
 
-local u13 = false
+local flag = false
+local function Initialize()
+	local v
 
-local function Initialize() -- line: 86
-	-- upvalues: SoundService (copy), VoiceChatService (copy), u13 (ref), LocalPlayer (copy), SpawnCharacterListener (copy)
-	if SoundService.DefaultListenerLocation == Enum.ListenerLocation.None or SoundService.DefaultListenerLocation ~= Enum.ListenerLocation.Camera and (SoundService.DefaultListenerLocation ~= Enum.ListenerLocation.Character and (SoundService.DefaultListenerLocation ~= Enum.ListenerLocation.Default or (VoiceChatService.UseAudioApi ~= Enum.AudioApiRollout.Enabled or not VoiceChatService.EnableDefaultVoice))) then
+	if SoundService.DefaultListenerLocation == Enum.ListenerLocation.None then
+		v = false
+	else
+		v = ShouldUseCamera() or ShouldUseCharacter() or ShouldUseDefaultVoice() -- inferred equivalent call
+	end
+
+	if not v or flag then
 		return
 	end
 
-	if u13 then
-		return
-	end
+	if ShouldUseCharacter() then -- inferred equivalent call
+		local character = LocalPlayer.Character
 
-	if SoundService.DefaultListenerLocation == Enum.ListenerLocation.Character then
-		local Character = LocalPlayer.Character
-
-		if Character then
-			SpawnCharacterListener(Character)
+		if character then
+			SpawnCharacterListener(character)
 		end
 
 		LocalPlayer.CharacterAdded:Connect(SpawnCharacterListener)
-	elseif SoundService.DefaultListenerLocation == Enum.ListenerLocation.Camera then
-		local AudioDeviceOutput = SoundService:FindFirstChildWhichIsA("AudioDeviceOutput", true)
-
-		if not AudioDeviceOutput then
-			AudioDeviceOutput = Instance.new("AudioDeviceOutput")
-			AudioDeviceOutput.Parent = SoundService
-		end
-
-		local AudioListener = Instance.new("AudioListener")
-
-		AudioListener.Parent = workspace.CurrentCamera
-
-		local Wire = Instance.new("Wire")
-
-		Wire.SourceInstance = AudioListener
-		Wire.TargetInstance = AudioDeviceOutput
-		Wire.Parent = AudioListener
-	elseif SoundService.DefaultListenerLocation == Enum.ListenerLocation.Default and (VoiceChatService.UseAudioApi == Enum.AudioApiRollout.Enabled and VoiceChatService.EnableDefaultVoice) then
-		local AudioListener = Instance.new("AudioListener")
-
-		AudioListener.Parent = workspace.CurrentCamera
-
-		local Wire = Instance.new("Wire")
-
-		Wire.Parent = AudioListener
-
-		local AudioDeviceOutput = Instance.new("AudioDeviceOutput")
-
-		AudioDeviceOutput.Parent = Wire
-		Wire.SourceInstance = AudioListener
-		Wire.TargetInstance = AudioDeviceOutput
+	elseif ShouldUseCamera() then -- inferred equivalent call
+		local targetInstance = GetMainOut() -- inferred equivalent call
+		local audioListener = Instance.new("AudioListener")
+		audioListener.Parent = workspace.CurrentCamera
+		WireUp(audioListener, targetInstance) -- inferred equivalent call
+	elseif ShouldUseDefaultVoice() then -- inferred equivalent call
+		local audioListener = Instance.new("AudioListener")
+		audioListener.Parent = workspace.CurrentCamera
+		local wire = Instance.new("Wire")
+		wire.Parent = audioListener
+		local audioDeviceOutput = Instance.new("AudioDeviceOutput")
+		audioDeviceOutput.Parent = wire
+		wire.SourceInstance = audioListener
+		wire.TargetInstance = audioDeviceOutput
 	end
 
-	u13 = true
+	flag = true
 end
 
 Initialize()

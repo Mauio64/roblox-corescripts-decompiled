@@ -1,17 +1,17 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
 local dependencies = require(FriendsLanding.dependencies)
-local Context = dependencies.SocialLibraries.Context
-local React = dependencies.React
-local Context2 = require(script.Context)
+local context = dependencies.SocialLibraries.Context
+local react = dependencies.React
+
+local Context = require(script.Context)
 
 return {
-	Context = Context2,
-	Provider = Context2.Provider,
-	Consumer = Context2.Consumer,
-	with = Context.getWith(Context2),
-	connect = Context.getConnect(Context2),
-	useContext = function() -- line: 14
-		-- upvalues: React (copy), Context2 (copy)
-		return (React.useContext(Context2))
+	Context = Context,
+	Provider = Context.Provider,
+	Consumer = Context.Consumer,
+	with = context.getWith(Context),
+	connect = context.getConnect(Context),
+	useContext = function()
+		return (react.useContext(Context))
 	end
 }

@@ -1,10 +1,8 @@
-return function(t1: {[any]: any}?) -- line: 1
-	if t1 then
-		local v2 = t1.title or t1.titleForViewer
+return function(p)
+	local title = p and (p.title or p.titleForViewer)
 
-		if v2 then
-			return (string.gsub(tostring(v2), "\n", ""))
-		end
+	if title then
+		return (string.gsub(tostring(title), "\n", ""))
 	end
 
 	return ""

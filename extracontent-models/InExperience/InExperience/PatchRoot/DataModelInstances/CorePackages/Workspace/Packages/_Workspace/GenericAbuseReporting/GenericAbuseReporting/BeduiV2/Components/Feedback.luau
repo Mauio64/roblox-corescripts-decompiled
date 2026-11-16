@@ -1,131 +1,126 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local Motion = require(GenericAbuseReportingParent.Motion)
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local Foundation = require(parent.Foundation)
+local Motion = require(parent.Motion)
+local React = require(parent.React)
+
 local AlertSeverity = Foundation.Enums.AlertSeverity
 local FeedbackAlert = Foundation.FeedbackAlert
 local View = Foundation.View
+
 local AbuseReportAnalyticsContext = require(GenericAbuseReporting.BeduiV2.Analytics.AbuseReportAnalyticsContext)
-local TelemetryEventType = require(GenericAbuseReporting.BeduiV2.Analytics.analyticsService).TelemetryEventType
+local analyticsService = require(GenericAbuseReporting.BeduiV2.Analytics.analyticsService)
+
+local telemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
-local v12 = Motion.createState({
+
+local FFlagAbuseReportImproveErrorEvents = require(GenericAbuseReporting.Flags.FFlagAbuseReportImproveErrorEvents)
+
+local state = Motion.createState({
 	groupTransparency = 1,
-	sizeY = 0,
-	position = UDim2.new(0, 0, -0.5, 0)
+	position = UDim2.new(0, 0, -0.5, 0),
+	sizeY = 0
 }, {
-	default = Motion.transition(Motion.TransitionPreset.Default, {
-		duration = 0.15
-	})
+	default = Motion.transition(Motion.TransitionPreset.Default, { duration = 0.15 })
 })
-local t1 = {
+
+local v = {
 	error = AlertSeverity.Error,
 	warning = AlertSeverity.Warning,
 	info = AlertSeverity.Info,
 	success = AlertSeverity.Success
 }
 
-local function Feedback(t2: {[any]: any}) -- line: 45
-	-- upvalues: Motion (copy), v12 (copy), React (copy), useAbuseReportAnalytics (copy), t1 (copy), TelemetryEventType (copy), View (copy), FeedbackAlert (copy), AlertSeverity (copy)
-	local v16 = Motion.usePresence()
-	local v17, v18 = Motion.useMotion(v12)
-	local v19 = React.useRef(0)
-	local v20 = React.useRef(v16.isPresent)
+local function Feedback(props)
+	local v2 = Motion.usePresence()
+	local v3, v4 = Motion.useMotion(state)
+	local ref = React.useRef(0)
+	local ref2 = React.useRef(v2.isPresent)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
 
-	React.useEffect(function() -- line: 52
-		-- upvalues: t1 (copy), t2 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if not t1[t2.severity] then
-			sendEvent({
-				sub_event_type = TelemetryEventType.Error,
+	React.useEffect(function()
+		if not v[props.severity] then
+			local v5 = { sub_event_type = telemetryEventType.Error, error_detail = 0 }
+			local error_detail
+
+			if FFlagAbuseReportImproveErrorEvents then
 				error_detail = {
-					error_message = "feedback missing correct severity, received type: " .. tostring(t2.severity)
+					error_message = "feedback missing correct severity",
+					error_metadata = { received_severity = props.severity }
 				}
-			})
+			else
+				error_detail = {
+					error_message = "feedback missing correct severity, received type: " .. tostring(props.severity)
+				}
+			end
+
+			v5.error_detail = error_detail
+			sendEvent(v5)
 		end
-	end, {
-		t2.severity,
-		sendEvent
-	})
-	React.useEffect(function() -- line: 63
-		-- upvalues: v20 (copy), v16 (copy)
-		v20.current = v16.isPresent
-	end, { v16.isPresent })
-	React.useEffect(function() -- line: 67
-		-- upvalues: v16 (copy), v19 (copy), v18 (copy), t2 (copy)
-		if v16.isPresent then
-			if v19.current > 0 then
-				v18({
+	end, { props.severity, sendEvent })
+
+	React.useEffect(function()
+		ref2.current = v2.isPresent
+	end, { v2.isPresent })
+
+	React.useEffect(function()
+		if v2.isPresent then
+			if ref.current > 0 then
+				v4({
 					groupTransparency = 0,
 					position = UDim2.new(0, 0, 0, 1),
-					sizeY = v19.current + 2 + (t2.bottomMargin or 0)
+					sizeY = ref.current + 2 + (props.bottomMargin or 0)
 				})
-
-				return
 			end
 		else
-			v18({
-				groupTransparency = 1,
-				sizeY = 0,
-				position = UDim2.new(0, 0, -0.5, 0)
-			}, {
-				onAnimationComplete = function(p1) -- line: 82
-					-- upvalues: v16 (copy)
-					if p1 == true then
-						v16.onExitComplete()
+			v4({ groupTransparency = 1, position = UDim2.new(0, 0, -0.5, 0), sizeY = 0 }, {
+				onAnimationComplete = function(p)
+					if p == true then
+						v2.onExitComplete()
 					end
 				end
 			})
 		end
-	end, {
-		v16.isPresent,
-		v18,
-		v16.onExitComplete,
-		t2.bottomMargin
-	})
+	end, { v2.isPresent, v4, v2.onExitComplete, props.bottomMargin })
 
-	local v22 = React.useCallback(function(p2) -- line: 91
-		-- upvalues: v19 (copy), v20 (copy), v18 (copy), t2 (copy)
-		local AbsoluteSizeY = p2.AbsoluteSize.Y
+	local v5 = React.useCallback(function(p)
+		local y = p.AbsoluteSize.Y
 
-		if AbsoluteSizeY <= 0 or AbsoluteSizeY == v19.current then
+		if y <= 0 or y == ref.current then
 			return
 		end
 
-		v19.current = AbsoluteSizeY
+		ref.current = y
 
-		if v20.current then
-			v18({
+		if ref2.current then
+			v4({
 				groupTransparency = 0,
 				position = UDim2.new(0, 0, 0, 1),
-				sizeY = AbsoluteSizeY + 2 + (t2.bottomMargin or 0)
+				sizeY = y + 2 + (props.bottomMargin or 0)
 			})
 		end
-	end, {
-		v18,
-		t2.bottomMargin
-	})
-	local maxWidth = t2.maxWidth
+	end, { v4, props.bottomMargin })
 
+	local maxWidth = props.maxWidth
 	return React.createElement(View, {
-		ClipsDescendants = true,
-		Size = v17.sizeY:map(function(n1: number) -- line: 110
-			-- upvalues: maxWidth (copy)
-			if maxWidth ~= nil then
-				return UDim2.new(0, maxWidth, 0, n1)
+		Size = v3.sizeY:map(function(p: number)
+			if maxWidth == nil then
+				return UDim2.new(1, 0, 0, p)
 			end
 
-			return UDim2.new(1, 0, 0, n1)
+			return UDim2.new(0, maxWidth, 0, p)
 		end),
-		LayoutOrder = t2.layoutOrder
+		ClipsDescendants = true,
+		LayoutOrder = props.layoutOrder
 	}, {
 		Content = React.createElement("CanvasGroup", {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
-			GroupTransparency = v17.groupTransparency,
-			Position = v17.position,
-			[React.Change.AbsoluteSize] = v22
+			GroupTransparency = v3.groupTransparency,
+			Position = v3.position,
+			[React.Change.AbsoluteSize] = v5
 		}, {
 			Padding = React.createElement("UIPadding", {
 				PaddingTop = UDim.new(0, 1),
@@ -134,10 +129,10 @@ local function Feedback(t2: {[any]: any}) -- line: 45
 				PaddingRight = UDim.new(0, 1)
 			}),
 			Alert = React.createElement(FeedbackAlert, {
-				severity = t1[t2.severity] or AlertSeverity.Info,
-				title = t2.title,
-				subtitle = t2.subtitle,
-				onClose = t2.onClose
+				severity = v[props.severity] or AlertSeverity.Info,
+				title = props.title,
+				subtitle = props.subtitle,
+				onClose = props.onClose
 			})
 		})
 	})

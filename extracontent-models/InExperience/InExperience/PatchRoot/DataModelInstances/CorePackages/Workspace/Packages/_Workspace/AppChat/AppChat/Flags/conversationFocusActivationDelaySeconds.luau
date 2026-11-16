@@ -1,0 +1,9 @@
+local FFlagAppChatDebounceConversationFocusActivation = require(script.Parent.FFlagAppChatDebounceConversationFocusActivation)
+
+local FIntAppChatConversationFocusActivationDelayMs = require(script.Parent.FIntAppChatConversationFocusActivationDelayMs)
+
+if FFlagAppChatDebounceConversationFocusActivation then
+	return FIntAppChatConversationFocusActivationDelayMs / 1000
+end
+
+return nil

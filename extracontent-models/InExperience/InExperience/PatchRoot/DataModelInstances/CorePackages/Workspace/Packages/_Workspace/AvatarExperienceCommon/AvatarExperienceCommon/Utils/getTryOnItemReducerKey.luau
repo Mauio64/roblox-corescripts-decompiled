@@ -1,5 +1,5 @@
-local function getTryOnItemReducerKey(s1: string, s2: string) -- line: 6
-	return `{ s1 }-{ s2 }`
+local function getTryOnItemReducerKey(p: string, p2: string)
+	return `{p}-{p2}`
 end
 
 return getTryOnItemReducerKey

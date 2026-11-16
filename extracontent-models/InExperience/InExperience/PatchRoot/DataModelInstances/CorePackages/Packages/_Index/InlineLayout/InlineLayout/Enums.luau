@@ -1,3 +1,1 @@
-return {
-	TextSplitBy = require(script.TextSplitBy)
-}
+return { TextSplitBy = require(script.TextSplitBy) }

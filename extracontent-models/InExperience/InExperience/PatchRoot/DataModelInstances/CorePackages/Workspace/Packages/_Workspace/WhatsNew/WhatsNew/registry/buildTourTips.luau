@@ -1,384 +1,288 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
 local Constants = require(WhatsNew.Constants)
-
 require(WhatsNew.Types)
-
 local DeriveResolvedFields = require(script.Parent.DeriveResolvedFields)
 
-local function appendWarning(t1: {[any]: any}?, s1: string, s2: string) -- line: 33
-	if t1 == nil then
+local function appendWarning(list, p: string, p2: string) -- 2 equivalent calls inferred from this helper
+	if list == nil then
 		return
 	end
 
-	table.insert(t1, `{ s1 }:{ s2 }`)
+	table.insert(list, `{p}:{p2}`)
 end
-local function createBuildContext(p1, p2, s3: string, p3, t2: {[any]: any}?) -- line: 40
+
+local function createBuildContext(document, deps, screenScopeId: string, tourType, warnings) -- 1 equivalent call inferred from this helper
 	return {
-		document = p1,
-		deps = p2,
-		screenScopeId = s3,
-		tourType = p3,
-		warnings = t2,
-		constants = p1.constants,
-		scopeTours = p1.scopeTours
+		document = document,
+		deps = deps,
+		screenScopeId = screenScopeId,
+		tourType = tourType,
+		warnings = warnings,
+		constants = document.constants,
+		scopeTours = document.scopeTours
 	}
 end
-local function filterEntriesInSubtree(t3: {[any]: any}, t4: {[any]: any}) -- line: 59
-	-- upvalues: DeriveResolvedFields (copy)
-	local t5 = {}
 
-	for _, v32 in t3 do
-		if DeriveResolvedFields.isEntryInScopeSubtree(v32, t4.screenScopeId, t4.scopeTours) then
-			table.insert(t5, v32)
+local function filterEntriesInSubtree(items, data)
+	local result = {}
+
+	for _, item in items do
+		if DeriveResolvedFields.isEntryInScopeSubtree(item, data.screenScopeId, data.scopeTours) then
+			table.insert(result, item)
 		end
 	end
 
-	return t5
+	return result
 end
-local function groupEntriesByScopeId(t6: {[any]: any}) -- line: 69
-	local t7 = {}
 
-	for _, v36 in t6 do
-		local v37 = t7[v36.scopeId]
+local function groupEntriesByScopeId(items)
+	local result = {}
 
-		if v37 == nil then
-			v37 = {}
-			t7[v36.scopeId] = v37
+	for _, item in items do
+		local v = result[item.scopeId]
+
+		if v == nil then
+			v = {}
+			result[item.scopeId] = v
 		end
 
-		table.insert(v37, v36)
+		table.insert(v, item)
 	end
 
-	return t7
+	return result
 end
-local function collectRelevantScopeIds(s4: string, t8: {[any]: any}, t9: {[any]: any}) -- line: 82
-	local t10 = {
-		[s4] = true
-	}
 
-	local function addAncestorChain(s5: string) -- line: 91
-		-- upvalues: t10 (copy), s4 (copy), t9 (copy)
-		while s5 ~= nil and not t10[s5] do
-			t10[s5] = true
+local function collectRelevantScopeIds(screenScopeId: string, items, scopeTours)
+	local v = { [screenScopeId] = true }
 
-			if s5 == s4 then
-				return
+	local function addAncestorChain(k: string)
+		while k ~= nil and not v[k] do
+			v[k] = true
+
+			if k == screenScopeId then
+				break
 			end
 
-			local v134 = t9[s5]
-
-			s5 = if not v134 then nil else v134.parentScopeId
+			local v2 = scopeTours[k]
+			k = if v2 then v2.parentScopeId else nil
 		end
 	end
 
-	for v43 in t8 do
-		addAncestorChain(v43)
+	for k in items do
+		addAncestorChain(k)
 	end
 
-	local t11 = {}
+	local relevantScopeIds = {}
 
-	for v45 in t10 do
-		table.insert(t11, v45)
+	for k in v do
+		table.insert(relevantScopeIds, k)
 	end
 
-	return t11
+	return relevantScopeIds
 end
-local function buildEmptyScopeTree(t12: {[any]: any}, t13: {[any]: any}) -- line: 118
-	local t14 = {}
 
-	for _, v50 in t12 do
-		local v51 = t13[v50]
+local function buildEmptyScopeTree(items, scopeTours)
+	local emptyScopeTree = {}
 
-		t14[v50] = {
-			id = v50,
-			parentScopeId = if not v51 then nil else v51.parentScopeId,
-			tourTips = {}
-		}
+	for _, item in items do
+		local v = scopeTours[item]
+		local parentScopeId
+
+		if v then
+			parentScopeId = v.parentScopeId
+		end
+
+		emptyScopeTree[item] = { id = item, parentScopeId = parentScopeId, tourTips = {} }
 	end
 
-	return t14
+	return emptyScopeTree
 end
-local function tryConsumeSteps(t15: {[any]: any}, n1: number) -- line: 134
-	if n1 > t15.globalRemaining then
+
+local function tryConsumeSteps(p, p2: number): boolean -- 2 equivalent calls inferred from this helper
+	if p.globalRemaining < p2 then
 		return false
 	end
 
-	t15.globalRemaining = t15.globalRemaining - n1
-
+	p.globalRemaining -= p2
 	return true
 end
-local function markTruncated(t16: {[any]: any}, t17: {[any]: any}?, s6: string) -- line: 142
-	-- upvalues: Constants (copy)
-	if t16.truncated then
+
+local function markTruncated(p, warnings, screenScopeId: string) -- 2 equivalent calls inferred from this helper
+	if p.truncated then
 		return
 	end
 
-	t16.truncated = true
-
-	local TOUR_TIPS_TRUNCATED = Constants.WarningCodes.TOUR_TIPS_TRUNCATED
-
-	if t17 == nil then
-		return
-	end
-
-	table.insert(t17, `{ TOUR_TIPS_TRUNCATED }:{ s6 }`)
+	p.truncated = true
+	appendWarning(warnings, Constants.WarningCodes.TOUR_TIPS_TRUNCATED, screenScopeId) -- inferred equivalent call
 end
-local function getScopePathFromScreen(s7: string, s8: string, t18: {[any]: any}) -- line: 150
-	local t19 = {}
 
-	while s7 ~= nil do
-		table.insert(t19, 1, s7)
+local function getScopePathFromScreen(p: string, screenScopeId: string, scopeTours)
+	local scopePath = {}
 
-		if s7 == s8 then
-			return t19
+	while p ~= nil do
+		table.insert(scopePath, 1, p)
+
+		if p == screenScopeId then
+			break
 		end
 
-		local v62 = t18[s7]
-
-		s7 = if not v62 then nil else v62.parentScopeId
+		local v = scopeTours[p]
+		p = if v then v.parentScopeId else nil
 	end
 
-	return t19
+	return scopePath
 end
-local function entryToTourTip(p4, p5) -- line: 169
+
+local function entryToTourTip(data, data2)
 	return {
+		id = data.id,
+		scopeId = data.scopeId,
+		title = data.title,
+		text = data.text,
+		icon = data.icon,
+		enabled = data.enabled,
+		publishedTime = data.publishedTime,
+		disabledTime = data.disabledTime,
+		expired = data.expired,
+		seen = data.seen,
+		optOutCount = data.optOutCount,
+		adopted = data.adopted,
+		toShow = data.toShow,
+		anchorId = data2.anchorId,
 		stepCount = 1,
-		id = p4.id,
-		scopeId = p4.scopeId,
-		title = p4.title,
-		text = p4.text,
-		icon = p4.icon,
-		enabled = p4.enabled,
-		publishedTime = p4.publishedTime,
-		disableTime = p4.disableTime,
-		expired = p4.expired,
-		seen = p4.seen,
-		optOutCount = p4.optOutCount,
-		adopted = p4.adopted,
-		toShow = p4.toShow,
-		anchorId = p5.anchorId,
-		side = p5.side,
-		align = p5.align
+		side = data2.side,
+		align = data2.align
 	}
 end
-local function buildNestedGatewayTip(p6, p7, p8) -- line: 191
-	local v68 = p6.openActionKey or ""
-	local v69 = p6.closeActionKey or ""
-	local v70 = p6.anchorId or ""
+
+local function buildNestedGatewayTip(scopeTour, scope, labels)
+	local openActionKey = scopeTour.openActionKey or ""
+	local closeActionKey = scopeTour.closeActionKey or ""
+	local anchorId = scopeTour.anchorId or ""
 
 	return {
+		id = `gateway:{scopeTour.id}`,
+		scopeId = scopeTour.parentScopeId or scopeTour.id,
+		title = labels.title,
+		text = labels.text,
 		icon = nil,
 		enabled = true,
 		publishedTime = nil,
-		disableTime = nil,
+		disabledTime = nil,
 		expired = false,
 		seen = nil,
 		optOutCount = 0,
 		adopted = false,
 		toShow = true,
+		anchorId = anchorId,
 		stepCount = 1,
-		id = `gateway:{ p6.id }`,
-		scopeId = p6.parentScopeId or p6.id,
-		title = p8.title,
-		text = p8.text,
-		anchorId = v70,
-		side = p6.side,
-		align = p6.align,
-		gateway = {
-			openActionKey = v68,
-			closeActionKey = v69,
-			scope = p7
-		}
+		side = scopeTour.side,
+		align = scopeTour.align,
+		gateway = { openActionKey = openActionKey, closeActionKey = closeActionKey, scope = scope }
 	}
 end
-local function addPlainTipToScope(s9: string, p9, t20: {[any]: any}, _: {[any]: any}, t22: {[any]: any}, t23: {[any]: any}) -- line: 226
-	-- upvalues: Constants (copy)
-	local v77
 
-	if t22.globalRemaining < 1 then
-		v77 = false
-	else
-		t22.globalRemaining = t22.globalRemaining - 1
-		v77 = true
-	end
-
-	if not v77 then
-		local warnings = t23.warnings
-		local screenScopeId = t23.screenScopeId
-
-		if not t22.truncated then
-			t22.truncated = true
-
-			local TOUR_TIPS_TRUNCATED = Constants.WarningCodes.TOUR_TIPS_TRUNCATED
-
-			if warnings ~= nil then
-				table.insert(warnings, `{ TOUR_TIPS_TRUNCATED }:{ screenScopeId }`)
-			end
-		end
-
-		return false
-	end
-
-	table.insert(t20[s9].tourTips, p9)
-
-	return true
-end
-local function ensureNestedGateway(s10: string, s11: string, t24: {[any]: any}, t25: {[any]: any}, t26: {[any]: any}, t27: {[any]: any}) -- line: 243
-	-- upvalues: Constants (copy), DeriveResolvedFields (copy), buildNestedGatewayTip (copy)
-	if t25[s11] ~= nil then
+local function addPlainTipToScope(scopeId: string, p, emptyScopeTree, _, p2, data): boolean -- 1 equivalent call inferred from this helper
+	if tryConsumeSteps(p2, 1) then -- inferred equivalent call
+		table.insert(emptyScopeTree[scopeId].tourTips, p)
 		return true
 	end
 
-	local v87 = t27.scopeTours[s11]
-
-	if v87 == nil then
-		return false
-	end
-
-	local v88
-
-	if t26.globalRemaining < 1 then
-		v88 = false
-	else
-		t26.globalRemaining = t26.globalRemaining - 1
-		v88 = true
-	end
-
-	if not v88 then
-		local warnings = t27.warnings
-		local screenScopeId = t27.screenScopeId
-
-		if not t26.truncated then
-			t26.truncated = true
-
-			local TOUR_TIPS_TRUNCATED = Constants.WarningCodes.TOUR_TIPS_TRUNCATED
-
-			if warnings ~= nil then
-				table.insert(warnings, `{ TOUR_TIPS_TRUNCATED }:{ screenScopeId }`)
-			end
-		end
-
-		return false
-	end
-
-	local v92 = DeriveResolvedFields.getLabels(v87, t27.tourType)
-
-	if not DeriveResolvedFields.hasLabels(v92) then
-		local warnings = t27.warnings
-		local GATEWAY_COPY_FALLBACK = Constants.WarningCodes.GATEWAY_COPY_FALLBACK
-
-		if warnings ~= nil then
-			table.insert(warnings, `{ GATEWAY_COPY_FALLBACK }:{ s11 }`)
-		end
-	end
-
-	local v95 = t24[s11]
-	local v96 = buildNestedGatewayTip(v87, v95, v92)
-
-	table.insert(t24[s10].tourTips, v96)
-	t25[s11] = {
-		parentScopeId = s10,
-		tip = v96
-	}
-
-	return true
+	markTruncated(p2, data.warnings, data.screenScopeId) -- inferred equivalent call
+	return false
 end
-local function ensureScopeChainForEntry(s12: string, t28: {[any]: any}, t29: {[any]: any}, t30: {[any]: any}, t31: {[any]: any}) -- line: 280
-	-- upvalues: getScopePathFromScreen (copy), ensureNestedGateway (copy)
-	local v102 = getScopePathFromScreen(s12, t31.screenScopeId, t31.scopeTours)
 
-	for i = 1, #v102 - 1 do
-		local v104 = v102[i]
-		local v105 = v102[i + 1]
+local function ensureNestedGateway(parentScopeId: string, p: string, p2, p3, p4, data): boolean
+	if p3[p] ~= nil then
+		return true
+	end
 
-		if not ensureNestedGateway(v104, v105, t28, t29, t30, t31) then
+	local scopeTour = data.scopeTours[p]
+
+	if scopeTour == nil then
+		return false
+	end
+
+	if tryConsumeSteps(p4, 1) then -- inferred equivalent call
+		local labels = DeriveResolvedFields.getLabels(scopeTour, data.tourType)
+
+		if not DeriveResolvedFields.hasLabels(labels) then
+			appendWarning(data.warnings, Constants.WarningCodes.GATEWAY_COPY_FALLBACK, p) -- inferred equivalent call
+		end
+
+		local nestedGatewayTip = buildNestedGatewayTip(scopeTour, p2[p], labels)
+		table.insert(p2[parentScopeId].tourTips, nestedGatewayTip)
+		p3[p] = { parentScopeId = parentScopeId, tip = nestedGatewayTip }
+
+		return true
+	end
+
+	markTruncated(p4, data.warnings, data.screenScopeId) -- inferred equivalent call
+	return false
+end
+
+local function ensureScopeChainForEntry(scopeId: string, emptyScopeTree, p, p2, data): boolean
+	local scopePathFromScreen = getScopePathFromScreen(scopeId, data.screenScopeId, data.scopeTours)
+
+	for i = 1, #scopePathFromScreen - 1 do
+		if not ensureNestedGateway(scopePathFromScreen[i], scopePathFromScreen[i + 1], emptyScopeTree, p, p2, data) then
 			return false
 		end
 	end
 
 	return true
 end
-local function buildScopeTourForScreen(t32: {[any]: any}, t33: {[any]: any}) -- line: 298
-	-- upvalues: filterEntriesInSubtree (copy), groupEntriesByScopeId (copy), collectRelevantScopeIds (copy), buildEmptyScopeTree (copy), DeriveResolvedFields (copy), ensureScopeChainForEntry (copy), entryToTourTip (copy), Constants (copy)
-	local v108 = t32.scopeTours[t32.screenScopeId]
-	local v109 = if not v108 then nil else v108.parentScopeId
-	local maxTourTips = t32.constants.maxTourTips
-	local v111 = filterEntriesInSubtree(t33, t32)
-	local v112 = groupEntriesByScopeId(v111)
-	local v113 = collectRelevantScopeIds(t32.screenScopeId, v112, t32.scopeTours)
-	local v114 = buildEmptyScopeTree(v113, t32.scopeTours)
-	local t34 = {
-		truncated = false,
-		globalRemaining = maxTourTips
-	}
 
-	for _, v117 in v111 do
-		local v118 = DeriveResolvedFields.deriveEntryDisplay(v117, t32.tourType, t32.deps, t32.constants)
+local function buildScopeTourForScreen(data, p)
+	local scopeTour = data.scopeTours[data.screenScopeId]
+	local parentScopeId
 
-		if v118.toShow and ensureScopeChainForEntry(v117.scopeId, v114, {}, t34, t32) then
-			local v119 = entryToTourTip(v118, v117)
-			local scopeId = v117.scopeId
-			local v121
-
-			if t34.globalRemaining < 1 then
-				v121 = false
-			else
-				t34.globalRemaining = t34.globalRemaining - 1
-				v121 = true
-			end
-
-			if not v121 then
-				local warnings = t32.warnings
-				local screenScopeId = t32.screenScopeId
-
-				if not t34.truncated then
-					t34.truncated = true
-
-					local TOUR_TIPS_TRUNCATED = Constants.WarningCodes.TOUR_TIPS_TRUNCATED
-
-					if warnings ~= nil then
-						table.insert(warnings, `{ TOUR_TIPS_TRUNCATED }:{ screenScopeId }`)
-					end
-				end
-			else
-				table.insert(v114[scopeId].tourTips, v119)
-			end
-		end
+	if scopeTour then
+		parentScopeId = scopeTour.parentScopeId
 	end
 
-	local v125 = v114[t32.screenScopeId]
+	local maxTourTips = data.constants.maxTourTips
 
-	if v125 == nil then
+	local v = filterEntriesInSubtree(p, data)
+	local v2 = groupEntriesByScopeId(v)
+	local emptyScopeTree = buildEmptyScopeTree(
+		collectRelevantScopeIds(data.screenScopeId, v2, data.scopeTours),
+		data.scopeTours
+	)
+
+	local v3 = {}
+	local v4 = { globalRemaining = maxTourTips, truncated = false }
+
+	for _, v5 in v do
+		local entryDisplay = DeriveResolvedFields.deriveEntryDisplay(v5, data.tourType, data.deps)
+
+		if not (entryDisplay.toShow and ensureScopeChainForEntry(v5.scopeId, emptyScopeTree, v3, v4, data)) then
+			continue
+		end
+
+		local v6 = entryToTourTip(entryDisplay, v5)
+		addPlainTipToScope(v5.scopeId, v6, emptyScopeTree, nil, v4, data) -- inferred equivalent call
+	end
+
+	local scope = emptyScopeTree[data.screenScopeId]
+
+	if scope == nil then
 		return {
+			scope = { id = data.screenScopeId, parentScopeId = parentScopeId, tourTips = {} },
 			truncated = false,
-			globalTotalSteps = 0,
-			scope = {
-				id = t32.screenScopeId,
-				parentScopeId = v109,
-				tourTips = {}
-			}
+			globalTotalSteps = 0
 		}
 	end
 
 	return {
-		scope = v125,
-		truncated = t34.truncated,
-		globalTotalSteps = DeriveResolvedFields.countScopeSteps(v125)
+		scope = scope,
+		truncated = v4.truncated,
+		globalTotalSteps = DeriveResolvedFields.countScopeSteps(scope)
 	}
 end
-local function buildTourTips(p10, p11, s13: string, p12, t35: {[any]: any}, t36: {[any]: any}?) -- line: 351
-	-- upvalues: buildScopeTourForScreen (copy)
-	local t37 = {
-		document = p10,
-		deps = p11,
-		screenScopeId = s13,
-		tourType = p12,
-		warnings = t36,
-		constants = p10.constants,
-		scopeTours = p10.scopeTours
-	}
 
-	return (buildScopeTourForScreen(t37, t35))
+local function buildTourTips(document, deps, screenScopeId: string, tourType, p, warnings)
+	return buildScopeTourForScreen(createBuildContext(document, deps, screenScopeId, tourType, warnings), p) -- inferred equivalent call
 end
 
 return buildTourTips

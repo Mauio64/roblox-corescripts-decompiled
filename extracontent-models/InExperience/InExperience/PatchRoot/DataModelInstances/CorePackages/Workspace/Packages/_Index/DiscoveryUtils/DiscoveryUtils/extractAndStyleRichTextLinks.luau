@@ -1,15 +1,13 @@
-local function extractAndStyleRichTextLinks(s1: string?) -- line: 9
-	if s1 == nil then
+local function extractAndStyleRichTextLinks(value: string?)
+	if value == nil then
 		return {}, ""
 	end
 
-	local t1 = {}
+	local v = {}
 
-	return t1, (string.gsub(s1, "<a%s+href=\"([^\"]+)\">([^<]*)</a>", function(s2: string, s3: string) -- line: 21
-		-- upvalues: t1 (copy)
-		table.insert(t1, s2)
-
-		return `<u><b>{ s3 }</b></u>`
+	return v, (string.gsub(value, "<a%s+href=\"([^\"]+)\">([^<]*)</a>", function(p: string, p2: string)
+		table.insert(v, p)
+		return `<u><b>{p2}</b></u>`
 	end))
 end
 

@@ -1,96 +1,106 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local Signals = require(AvatarExperienceCommonParent.Signals)
+
+local parent = AvatarExperienceCommon.Parent
+local Signals = require(parent.Signals)
 local Constants = require(AvatarExperienceCommon.Constants)
 local SafeAppStorageService = require(AvatarExperienceCommon.Lib.SafeAppStorageService)
-local v6 = game:DefineFastString("AXTooltipAllowedTooltips", "")
-local v7 = game:DefineFastFlag("AXTooltipUseMemStorage", false)
-local v8 = game:DefineFastInt("AXTooltipMaxNumberOfTimesSeen", 2)
 
-local function deserializeSeenTooltips(s1: string) -- line: 30
-	local t1 = {}
+local defineFastString = game:DefineFastString("AXTooltipAllowedTooltips", "")
 
-	for _, v15 in (s1:split(",")) do
-		t1[v15] = not t1[v15] and 1 or t1[v15] + 1
+local defineFastFlag = game:DefineFastFlag("AXTooltipUseMemStorage", false)
+
+local defineFastInt = game:DefineFastInt("AXTooltipMaxNumberOfTimesSeen", 2)
+
+local function deserializeSeenTooltips(value: string)
+	local parts = value:split(",")
+	local result = {}
+
+	for _, part in parts do
+		result[part] = not result[part] and 1 or result[part] + 1
 	end
 
-	return t1
+	return result
 end
-local function serializeSeenTooltips(t2: {[any]: any}) -- line: 42
-	-- upvalues: v8 (copy)
-	local t3 = {}
 
-	for v18, v19 in t2 do
-		for _ = 1, math.min(v8, v19) do
-			table.insert(t3, v18)
+local function serializeSeenTooltips(items)
+	local v = {}
+
+	for k, item in items do
+		for _ = 1, math.min(defineFastInt, item) do
+			table.insert(v, k)
 		end
 	end
 
-	return table.concat(t3, ",")
+	return table.concat(v, ",")
 end
-local function createAXTooltipStore() -- line: 54
-	-- upvalues: v6 (copy), SafeAppStorageService (copy), Constants (copy), v7 (copy), deserializeSeenTooltips (copy), v8 (copy), serializeSeenTooltips (copy), Signals (copy)
-	local parts = v6:split(",")
-	local v22 = SafeAppStorageService.getItem(Constants.AX_TOOLTIP_STORAGE_KEY, v7)
-	local v23 = deserializeSeenTooltips(v22)
-	local t4 = {}
-	local t5 = {}
 
-	for _, v27 in parts do
-		local v28 = v23[v27] or 0
+local function createAXTooltipStore()
+	local parts = defineFastString:split(",")
 
-		if v28 < v8 then
-			t4[v27] = true
+	local v = deserializeSeenTooltips(SafeAppStorageService.getItem(Constants.AX_TOOLTIP_STORAGE_KEY, defineFastFlag))
+
+	local partSet = {}
+	local v2 = {}
+
+	for _, part in parts do
+		local v3 = v[part] or 0
+
+		if v3 < defineFastInt then
+			partSet[part] = true
 		end
 
-		t5[v27] = v28
+		v2[part] = v3
 	end
 
-	SafeAppStorageService.setItem(Constants.AX_TOOLTIP_STORAGE_KEY, serializeSeenTooltips(t5), v7)
+	SafeAppStorageService.setItem(Constants.AX_TOOLTIP_STORAGE_KEY, serializeSeenTooltips(v2), defineFastFlag)
+
 	SafeAppStorageService.flush()
 
-	local v29, v30 = Signals.createSignal(t4)
-	local v31, v32 = Signals.createSignal(t5)
-	local t6 = {}
+	local signal, v3 = Signals.createSignal(partSet)
+	local signal2, v4 = Signals.createSignal(v2)
 
-	local function getIsTooltipAllowedToBeShownSignal(s2: string) -- line: 87
-		-- upvalues: t6 (copy), Signals (copy), v29 (copy)
-		if t6[s2] == nil then
-			t6[s2] = Signals.createComputed(function(p1) -- line: 89
-				-- upvalues: v29 (copy), s2 (copy)
-				return v29(p1)[s2] == true
+	local v5 = {}
+
+	local function getIsTooltipAllowedToBeShownSignal(p: string)
+		if v5[p] == nil then
+			v5[p] = Signals.createComputed(function(p2): boolean
+				return signal(p2)[p] == true
 			end)
 		end
 
-		return t6[s2]
+		return v5[p]
+	end
+
+	local function dismissTooltip(p: string, flag: boolean?)
+		local clone = table.clone(signal(false))
+
+		if clone[p] ~= true then
+			return
+		end
+
+		clone[p] = false
+		v3(clone)
+
+		local v6 = signal2(false)
+
+		local v7 = v6[p] or 0
+
+		if flag and not (defineFastInt <= v7) then
+			v6[p] = v7 + 1
+		else
+			v6[p] = defineFastInt
+		end
+
+		SafeAppStorageService.setItem(Constants.AX_TOOLTIP_STORAGE_KEY, serializeSeenTooltips(v6), defineFastFlag)
+
+		SafeAppStorageService.flush()
+
+		v4(v6)
 	end
 
 	return {
 		getIsTooltipAllowedToBeShown = getIsTooltipAllowedToBeShownSignal,
-		dismissTooltip = function(s3: string, b1: boolean?) -- line: 97
-			-- upvalues: v29 (copy), v30 (copy), v31 (copy), v8 (copy), SafeAppStorageService (copy), Constants (copy), serializeSeenTooltips (copy), v7 (copy), v32 (copy)
-			local v38 = table.clone(v29(false))
-
-			if v38[s3] ~= true then
-				return
-			end
-
-			v38[s3] = false
-			v30(v38)
-
-			local v39 = v31(false)
-			local v40 = v39[s3] or 0
-
-			if not b1 or v40 >= v8 then
-				v39[s3] = v8
-			else
-				v39[s3] = v40 + 1
-			end
-
-			SafeAppStorageService.setItem(Constants.AX_TOOLTIP_STORAGE_KEY, serializeSeenTooltips(v39), v7)
-			SafeAppStorageService.flush()
-			v32(v39)
-		end
+		dismissTooltip = dismissTooltip
 	}
 end
 

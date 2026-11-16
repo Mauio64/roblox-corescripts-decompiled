@@ -1,17 +1,19 @@
-local function formatExperienceThumbnail(s1: string?, s2: string, b1: boolean?) -- line: 1
-	local n1 = 384
-	local n2 = 216
+local function formatExperienceThumbnail(p: string?, p2: string, flag: boolean?)
+	local v, v2
 
-	if b1 then
-		n1 = 768
-		n2 = 432
+	if flag then
+		v = 768
+		v2 = 432
+	else
+		v = 384
+		v2 = 216
 	end
 
-	if s1 and s1 ~= "0" then
-		return `rbxthumb://type=Asset&id={ s1 }&w={ n1 }&h={ n2 }`
+	if p and p ~= "0" then
+		return `rbxthumb://type=Asset&id={p}&w={v}&h={v2}`
 	end
 
-	return `rbxthumb://type=GameThumbnail&id={ s2 }&w={ n1 }&h={ n2 }`
+	return `rbxthumb://type=GameThumbnail&id={p2}&w={v}&h={v2}`
 end
 
 return formatExperienceThumbnail

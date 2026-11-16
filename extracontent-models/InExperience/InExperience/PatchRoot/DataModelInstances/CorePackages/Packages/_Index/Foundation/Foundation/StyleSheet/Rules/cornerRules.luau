@@ -1,162 +1,153 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local CornerProperty = require(Foundation.Enums.CornerProperty)
 
+local CornerProperty = require(Foundation.Enums.CornerProperty)
 require(script.Parent.Types)
 
-local uDim = UDim.new(0, 0)
-local t1 = {
+local udim = UDim.new(0, 0)
+
+local v = {
 	CornerProperty.TopLeft,
 	CornerProperty.TopRight,
 	CornerProperty.BottomRight,
 	CornerProperty.BottomLeft
 }
-local t2 = {
+
+local v2 = {
 	["top-left"] = CornerProperty.TopLeft,
 	["top-right"] = CornerProperty.TopRight,
 	["bottom-right"] = CornerProperty.BottomRight,
 	["bottom-left"] = CornerProperty.BottomLeft
 }
-local t3 = {
-	top = {
-		CornerProperty.TopLeft,
-		CornerProperty.TopRight
-	},
-	bottom = {
-		CornerProperty.BottomLeft,
-		CornerProperty.BottomRight
-	},
-	left = {
-		CornerProperty.TopLeft,
-		CornerProperty.BottomLeft
-	},
-	right = {
-		CornerProperty.TopRight,
-		CornerProperty.BottomRight
-	}
+
+local v3 = {
+	top = { CornerProperty.TopLeft, CornerProperty.TopRight },
+	bottom = { CornerProperty.BottomLeft, CornerProperty.BottomRight },
+	left = { CornerProperty.TopLeft, CornerProperty.BottomLeft },
+	right = { CornerProperty.TopRight, CornerProperty.BottomRight }
 }
 
-local function cornerProperties(p1, t4: {[any]: any}) -- line: 44
-	local t5 = {}
+local function cornerProperties(p, items)
+	local result = {}
 
-	for _, v14 in t4 do
-		t5[v14] = p1
+	for _, item in items do
+		result[item] = p
 	end
 
-	return t5
+	return result
 end
-local function zeroedBaseline(s1: string) -- line: 54
-	-- upvalues: uDim (copy), t1 (copy)
-	local t6 = {
-		pseudo = "UICorner",
-		priority = 0,
-		tag = s1
-	}
-	local v17 = uDim
-	local t7 = {}
 
-	for _, v20 in t1 do
-		t7[v20] = v17
+local function zeroedBaseline(tag: string)
+	local udims = {}
+
+	local v4 = { tag = tag, pseudo = "UICorner", priority = 0, properties = 0 }
+
+	for _, v5 in v do
+		udims[v5] = udim
 	end
 
-	t6.properties = t7
-
-	return t6
+	v4.properties = udims
+	return v4
 end
-local function cornerRules(p2, p3: ((...any) -> ...any)) -- line: 63
-	-- upvalues: t1 (copy), t3 (copy), uDim (copy), t2 (copy)
-	local t8 = {}
 
-	for _, v25 in p2 do
-		local v26 = p3(v25)
-		local cornerValue = v26.cornerValue
-		local attributes = v26.attributes
-		local t9 = {
+local function cornerRules(items, callback)
+	local result = {}
+
+	for _, item in items do
+		local v4 = callback(item)
+		local cornerValue = v4.cornerValue
+		local attributes = v4.attributes
+
+		local v5 = {
+			tag = `radius-{item.name}`,
 			pseudo = "UICorner",
 			priority = 1,
-			tag = `radius-{ v25.name }`
+			properties = 0,
+			attributes = 0
 		}
-		local t10 = {}
+		local cornerValues = {}
 
-		for _, v32 in t1 do
-			t10[v32] = cornerValue
+		for _, v6 in v do
+			cornerValues[v6] = cornerValue
 		end
 
-		t9.properties = t10
-		t9.attributes = attributes
-		table.insert(t8, t9)
+		v5.properties = cornerValues
+		v5.attributes = attributes
+		table.insert(result, v5)
 
-		for v33, v34 in t3 do
-			local v35 = `radius-{ v33 }-{ v25.name }`
-			local t11 = {
+		for k, v6 in v3 do
+			local formatted = `radius-{k}-{item.name}`
+			local cornerValues2 = {}
+
+			local v7 = {
+				tag = formatted,
 				pseudo = "UICorner",
 				priority = 2,
-				tag = v35
+				properties = 0,
+				attributes = 0,
+				children = 0
 			}
-			local t12 = {}
 
-			for _, v39 in v34 do
-				t12[v39] = cornerValue
+			for _, v8 in v6 do
+				cornerValues2[v8] = cornerValue
 			end
 
-			t11.properties = t12
-			t11.attributes = attributes
+			v7.properties = cornerValues2
+			v7.attributes = attributes
+			local udims = {}
 
-			local t13 = {}
-			local t14 = {
-				pseudo = "UICorner",
-				priority = 0,
-				tag = v35
-			}
-			local v42 = uDim
-			local t15 = {}
+			local v8 = { tag = formatted, pseudo = "UICorner", priority = 0, properties = 0 }
 
-			for _, v45 in t1 do
-				t15[v45] = v42
+			local children = { nil }
+
+			for _, v9 in v do
+				udims[v9] = udim
 			end
 
-			t14.properties = t15
-			t13[1] = t14
-			t11.children = t13
-			table.insert(t8, t11)
+			v8.properties = udims
+			children[1] = v8
+
+			v7.children = children
+			table.insert(result, v7)
 		end
 
-		for v46, v47 in t2 do
-			local v48 = `radius-{ v46 }-{ v25.name }`
-			local t16 = {
+		for k, v6 in v2 do
+			local formatted = `radius-{k}-{item.name}`
+			local cornerValues2 = {}
+
+			local v7 = {
+				tag = formatted,
 				pseudo = "UICorner",
 				priority = 3,
-				tag = v48
+				properties = 0,
+				attributes = 0,
+				children = 0
 			}
-			local t17 = {}
 
-			for _, v52 in { v47 } do
-				t17[v52] = cornerValue
+			for _, v8 in { v6 } do
+				cornerValues2[v8] = cornerValue
 			end
 
-			t16.properties = t17
-			t16.attributes = attributes
+			v7.properties = cornerValues2
+			v7.attributes = attributes
+			local udims = {}
 
-			local t18 = {}
-			local t19 = {
-				pseudo = "UICorner",
-				priority = 0,
-				tag = v48
-			}
-			local v55 = uDim
-			local t20 = {}
+			local v8 = { tag = formatted, pseudo = "UICorner", priority = 0, properties = 0 }
 
-			for _, v58 in t1 do
-				t20[v58] = v55
+			local children = { nil }
+
+			for _, v9 in v do
+				udims[v9] = udim
 			end
 
-			t19.properties = t20
-			t18[1] = t19
-			t16.children = t18
-			table.insert(t8, t16)
+			v8.properties = udims
+			children[1] = v8
+
+			v7.children = children
+			table.insert(result, v7)
 		end
 	end
 
-	return t8
+	return result
 end
 
 return cornerRules

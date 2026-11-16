@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local InlineSurveyPreset = require(Workspace.OnPlatformSurveys.OnPlatformSurveys.Enums.InlineSurveyPreset)
 
-return (require(_Workspace.OnPlatformSurveys.OnPlatformSurveys.Enums.InlineSurveyPreset))
+return InlineSurveyPreset

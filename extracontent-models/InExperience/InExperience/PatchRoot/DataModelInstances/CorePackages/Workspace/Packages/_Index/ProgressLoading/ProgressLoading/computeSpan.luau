@@ -1,12 +1,11 @@
-local function computeSpan(n1: number, n2: number, n3: number, n4: number?, n5: number?) -- line: 1
-	local v7 = n5 or 0
-	local v8 = n1 - n3 * n2 * 2
+local function computeSpan(p: number, p2: number, p3: number, p4: number?, value: number?)
+	local v = p - p3 * p2 * 2
 
-	if n4 then
-		v8 = math.min(v8, n4 * n2)
+	if p4 then
+		v = math.min(v, p4 * p2)
 	end
 
-	return (math.max(v8, v7))
+	return (math.max(v, value or 0))
 end
 
 return computeSpan

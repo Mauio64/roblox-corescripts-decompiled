@@ -1,238 +1,264 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 54
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		id = if t3 ~= nil and t3.id ~= nil then t3.id else "",
-		name = if t3 ~= nil and t3.name ~= nil then t3.name else "",
-		description = if t3 ~= nil and t3.description ~= nil then t3.description else "",
-		image_asset_id = if t3 ~= nil and t3.image_asset_id ~= nil then t3.image_asset_id else 0,
-		price_in_robux = if t3 ~= nil and t3.price_in_robux ~= nil then t3.price_in_robux else 0,
-		pending_receipt_count = if t3 ~= nil and t3.pending_receipt_count ~= nil then t3.pending_receipt_count else 0,
-		status_tooltip = if t3 ~= nil and t3.status_tooltip ~= nil then t3.status_tooltip else ""
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local v2 = {
+		id = (data == nil or data.id == nil) and "" or data.id,
+		name = (data == nil or data.name == nil) and "" or data.name,
+		description = (data == nil or data.description == nil) and "" or data.description,
+		image_asset_id = (data == nil or data.image_asset_id == nil) and 0 or data.image_asset_id,
+		price_in_robux = (data == nil or data.price_in_robux == nil) and 0 or data.price_in_robux,
+		pending_receipt_count = (data == nil or data.pending_receipt_count == nil) and 0 or data.pending_receipt_count,
+		status_tooltip = (data == nil or data.status_tooltip == nil) and "" or data.status_tooltip,
+		base_price_in_robux = (data == nil or data.base_price_in_robux == nil) and 0 or data.base_price_in_robux,
+		is_discounted = data ~= nil and data.is_discounted ~= nil and data.is_discounted
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 68
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.id ~= nil and p1.id ~= "" then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v9, v10, p1.id)
+	if data.id ~= nil and data.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.id)
 	end
 
-	if p1.name ~= nil and p1.name ~= "" then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.name)
+	if data.name ~= nil and data.name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.name)
 	end
 
-	if p1.description ~= nil and p1.description ~= "" then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v13, v14, p1.description)
+	if data.description ~= nil and data.description ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.description)
 	end
 
-	if p1.image_asset_id ~= nil and p1.image_asset_id ~= 0 then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v15, v16, p1.image_asset_id)
+	if data.image_asset_id ~= nil and data.image_asset_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.image_asset_id)
 	end
 
-	if p1.price_in_robux ~= nil and p1.price_in_robux ~= 0 then
-		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v17, v18, p1.price_in_robux)
+	if data.price_in_robux ~= nil and data.price_in_robux ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.price_in_robux)
 	end
 
-	if p1.pending_receipt_count ~= nil and p1.pending_receipt_count ~= 0 then
-		local v19, v20 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v19, v20, p1.pending_receipt_count)
+	if data.pending_receipt_count ~= nil and data.pending_receipt_count ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.pending_receipt_count)
 	end
 
-	if p1.status_tooltip ~= nil and p1.status_tooltip ~= "" then
-		local v21, v22 = proto.writeTag(buf, n1, 7, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v21, v22, p1.status_tooltip)
+	if data.status_tooltip ~= nil and data.status_tooltip ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.status_tooltip)
 	end
 
-	local buf2 = buffer.create(n1)
+	if data.base_price_in_robux ~= nil and data.base_price_in_robux ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.base_price_in_robux)
+	end
 
-	buffer.copy(buf2, 0, buf, 0, n1)
+	if data.is_discounted then
+		local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_discounted and 1 or 0)
+	end
 
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 112
-	-- upvalues: t2 (copy), proto (copy)
-	local v25 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v27, v28
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v27, v28, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v28 == proto.wireTypes.varint then
-			if v27 == 4 then
-				local v29
-
-				v29, n2 = proto.readVarIntI64(p2, n2)
-				v25.image_asset_id = v29
-			elseif v27 == 5 then
-				local v30
-
-				v30, n2 = proto.readVarIntI64(p2, n2)
-				v25.price_in_robux = v30
-			elseif v27 == 6 then
-				local v31
-
-				v31, n2 = proto.readVarIntI32(p2, n2)
-				v25.pending_receipt_count = v31
+		if v4 == proto.wireTypes.varint then
+			if v3 == 4 then
+				local image_asset_id
+				image_asset_id, v2 = proto.readVarIntI64(buf, v2)
+				result.image_asset_id = image_asset_id
+			elseif v3 == 5 then
+				local price_in_robux
+				price_in_robux, v2 = proto.readVarIntI64(buf, v2)
+				result.price_in_robux = price_in_robux
+			elseif v3 == 6 then
+				local pending_receipt_count
+				pending_receipt_count, v2 = proto.readVarIntI32(buf, v2)
+				result.pending_receipt_count = pending_receipt_count
+			elseif v3 == 8 then
+				local base_price_in_robux
+				base_price_in_robux, v2 = proto.readVarIntI64(buf, v2)
+				result.base_price_in_robux = base_price_in_robux
+			elseif v3 == 9 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_discounted = v5 ~= 0
 			else
-				local v32
-
-				v32, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v28 == proto.wireTypes.lengthDelimited then
-			if v27 == 1 then
-				local v33
-
-				v33, n2 = proto.readBuffer(p2, n2)
-				v25.id = buffer.tostring(v33)
-			elseif v27 == 2 then
-				local v34
-
-				v34, n2 = proto.readBuffer(p2, n2)
-				v25.name = buffer.tostring(v34)
-			elseif v27 == 3 then
-				local v35
-
-				v35, n2 = proto.readBuffer(p2, n2)
-				v25.description = buffer.tostring(v35)
-			elseif v27 == 7 then
-				local v36
-
-				v36, n2 = proto.readBuffer(p2, n2)
-				v25.status_tooltip = buffer.tostring(v36)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.name = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.description = buffer.tostring(v5)
+			elseif v3 == 7 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.status_tooltip = buffer.tostring(v5)
 			else
-				local v37, v38 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v38 + v37
+				v2 = v5 + varInt
 			end
-		elseif v28 == proto.wireTypes.i32 then
-			local v39
-
-			v39, n2 = proto.readFixed32(p2, n2)
-		elseif v28 == proto.wireTypes.i64 then
-			local v40
-
-			v40, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v28)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v25
-end
-function t2.jsonEncode(p3) -- line: 185
-	local t4 = {}
-
-	if p3.id ~= nil and p3.id ~= "" then
-		t4.id = p3.id
-	end
-
-	if p3.name ~= nil and p3.name ~= "" then
-		t4.name = p3.name
-	end
-
-	if p3.description ~= nil and p3.description ~= "" then
-		t4.description = p3.description
-	end
-
-	if p3.image_asset_id ~= nil and p3.image_asset_id ~= 0 then
-		t4.imageAssetId = p3.image_asset_id
-	end
-
-	if p3.price_in_robux ~= nil and p3.price_in_robux ~= 0 then
-		t4.priceInRobux = p3.price_in_robux
-	end
-
-	if p3.pending_receipt_count ~= nil and p3.pending_receipt_count ~= 0 then
-		t4.pendingReceiptCount = p3.pending_receipt_count
-	end
-
-	if p3.status_tooltip ~= nil and p3.status_tooltip ~= "" then
-		t4.statusTooltip = p3.status_tooltip
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 219
-	-- upvalues: t2 (copy)
-	local v44 = t2.new()
-
-	if t5.id ~= nil then
-		v44.id = t5.id
-	end
-
-	if t5.name ~= nil then
-		v44.name = t5.name
-	end
-
-	if t5.description ~= nil then
-		v44.description = t5.description
-	end
-
-	if t5.image_asset_id ~= nil then
-		v44.image_asset_id = t5.image_asset_id
-	end
-
-	if t5.imageAssetId ~= nil then
-		v44.image_asset_id = t5.imageAssetId
-	end
-
-	if t5.price_in_robux ~= nil then
-		v44.price_in_robux = t5.price_in_robux
-	end
-
-	if t5.priceInRobux ~= nil then
-		v44.price_in_robux = t5.priceInRobux
-	end
-
-	if t5.pending_receipt_count ~= nil then
-		v44.pending_receipt_count = t5.pending_receipt_count
-	end
-
-	if t5.pendingReceiptCount ~= nil then
-		v44.pending_receipt_count = t5.pendingReceiptCount
-	end
-
-	if t5.status_tooltip ~= nil then
-		v44.status_tooltip = t5.status_tooltip
-	end
-
-	if t5.statusTooltip ~= nil then
-		v44.status_tooltip = t5.statusTooltip
-	end
-
-	return v44
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.id ~= nil and data.id ~= "" then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil and data.name ~= "" then
+		v2.name = data.name
+	end
+
+	if data.description ~= nil and data.description ~= "" then
+		v2.description = data.description
+	end
+
+	if data.image_asset_id ~= nil and data.image_asset_id ~= 0 then
+		v2.imageAssetId = data.image_asset_id
+	end
+
+	if data.price_in_robux ~= nil and data.price_in_robux ~= 0 then
+		v2.priceInRobux = data.price_in_robux
+	end
+
+	if data.pending_receipt_count ~= nil and data.pending_receipt_count ~= 0 then
+		v2.pendingReceiptCount = data.pending_receipt_count
+	end
+
+	if data.status_tooltip ~= nil and data.status_tooltip ~= "" then
+		v2.statusTooltip = data.status_tooltip
+	end
+
+	if data.base_price_in_robux ~= nil and data.base_price_in_robux ~= 0 then
+		v2.basePriceInRobux = data.base_price_in_robux
+	end
+
+	if data.is_discounted then
+		v2.isDiscounted = data.is_discounted
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil then
+		v2.name = data.name
+	end
+
+	if data.description ~= nil then
+		v2.description = data.description
+	end
+
+	if data.image_asset_id ~= nil then
+		v2.image_asset_id = data.image_asset_id
+	end
+
+	if data.imageAssetId ~= nil then
+		v2.image_asset_id = data.imageAssetId
+	end
+
+	if data.price_in_robux ~= nil then
+		v2.price_in_robux = data.price_in_robux
+	end
+
+	if data.priceInRobux ~= nil then
+		v2.price_in_robux = data.priceInRobux
+	end
+
+	if data.pending_receipt_count ~= nil then
+		v2.pending_receipt_count = data.pending_receipt_count
+	end
+
+	if data.pendingReceiptCount ~= nil then
+		v2.pending_receipt_count = data.pendingReceiptCount
+	end
+
+	if data.status_tooltip ~= nil then
+		v2.status_tooltip = data.status_tooltip
+	end
+
+	if data.statusTooltip ~= nil then
+		v2.status_tooltip = data.statusTooltip
+	end
+
+	if data.base_price_in_robux ~= nil then
+		v2.base_price_in_robux = data.base_price_in_robux
+	end
+
+	if data.basePriceInRobux ~= nil then
+		v2.base_price_in_robux = data.basePriceInRobux
+	end
+
+	if data.is_discounted ~= nil then
+		v2.is_discounted = data.is_discounted
+	end
+
+	if data.isDiscounted ~= nil then
+		v2.is_discounted = data.isDiscounted
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "GameDeveloperProductData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.GameDeveloperProductData"
 }
-t1.GameDeveloperProductData = t2
-typeRegistry.default:register(t1.GameDeveloperProductData)
 
-return {
-	GameDeveloperProductData = t1.GameDeveloperProductData
-}
+v.GameDeveloperProductData = class
+
+typeRegistry.default:register(v.GameDeveloperProductData)
+
+return { GameDeveloperProductData = v.GameDeveloperProductData }

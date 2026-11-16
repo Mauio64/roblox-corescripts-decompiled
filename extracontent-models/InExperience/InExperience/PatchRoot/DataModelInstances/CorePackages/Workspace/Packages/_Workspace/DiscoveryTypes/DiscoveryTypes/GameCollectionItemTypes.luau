@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("DiscoveryTypes").Parent
-
-require(Parent.React)
-
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("DiscoveryTypes").Parent
+require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
 
@@ -12,21 +10,13 @@ return {
 		SeeAllTile = "SeeAllTile",
 		EmphasisTile = "EmphasisTile",
 		TwoByOneTile = "TwoByOneTile",
-		Blank = "Blank",
-		OneByTwoTile = if not FFlagLuaAppEnableHomepageOneByTwoTile then nil else "OneByTwoTile"
+		OneByTwoTile = FFlagLuaAppEnableHomepageOneByTwoTile and "OneByTwoTile" or nil,
+		Blank = "Blank"
 	},
-	SpanForItemType = if not FFlagLuaAppEnableNxMRoduxApportioning then nil else {
-		EmphasisTile = {
-			colSpan = 2,
-			rowSpan = 2
-		},
-		TwoByOneTile = {
-			colSpan = 2,
-			rowSpan = 1
-		},
-		OneByTwoTile = if not FFlagLuaAppEnableHomepageOneByTwoTile then nil else {
-			colSpan = 1,
-			rowSpan = 2
-		}
-	}
+	AlignmentType = { RightPin = "RightPin", LeftPin = "LeftPin", Default = "Default" },
+	SpanForItemType = FFlagLuaAppEnableNxMRoduxApportioning and {
+		EmphasisTile = { colSpan = 2, rowSpan = 2 },
+		TwoByOneTile = { colSpan = 2, rowSpan = 1 },
+		OneByTwoTile = FFlagLuaAppEnableHomepageOneByTwoTile and { colSpan = 1, rowSpan = 2 } or nil
+	} or nil
 }

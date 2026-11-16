@@ -2,22 +2,29 @@ local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
 local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
+
 local TextButton = UIBlox.App.Button.TextButton
-local v7 = Roact.PureComponent:extend("ReportActionSelection")
 
-local function v8() -- line: 22
-end
+local extended = Roact.PureComponent:extend("ReportActionSelection")
 
-v7.defaultProps = {
+local function fn() end
+
+extended.defaultProps = {
 	isMuted = true,
 	isBlocked = true,
+	onCancelActivated = fn,
+	onConfirmActivated = fn,
 	ZIndex = 1,
-	uiScale = 1.3,
-	onCancelActivated = v8,
-	onConfirmActivated = v8
+	uiScale = 1.3
 }
-v7.validateProps = t.strictInterface({
+
+extended.validateProps = t.strictInterface({
 	mutedTitleText = t.string,
 	blockedTitleText = t.string,
 	mutedAndBlockedTitleText = t.string,
@@ -34,75 +41,77 @@ v7.validateProps = t.strictInterface({
 	uiScale = t.optional(t.number)
 })
 
-function v7.init(p1) -- line: 50
-	function p1.onCancelActivated() -- line: 51
-		-- upvalues: p1 (copy)
-		p1.props.onCancelActivated()
-	end
-	function p1.onConfirmActivated() -- line: 55
-		-- upvalues: p1 (copy)
-		p1.props.onConfirmActivated()
+function extended:init()
+	function self.onCancelActivated()
+		self.props.onCancelActivated()
 	end
 
-	local mutedAndBlockedTitleText = nil
-	local mutedAndBlockedSubtitleText = nil
-
-	if p1.props.isMuted and p1.props.isBlocked then
-		mutedAndBlockedTitleText = p1.props.mutedAndBlockedTitleText
-		mutedAndBlockedSubtitleText = p1.props.mutedAndBlockedSubtitleText
-	elseif p1.props.isMuted then
-		mutedAndBlockedTitleText = p1.props.mutedTitleText
-		mutedAndBlockedSubtitleText = p1.props.mutedSubtitleText
-	elseif p1.props.isBlocked then
-		mutedAndBlockedTitleText = p1.props.blockedTitleText
-		mutedAndBlockedSubtitleText = p1.props.blockedSubtitleText
+	function self.onConfirmActivated()
+		self.props.onConfirmActivated()
 	end
 
-	p1:setState({
-		titleText = mutedAndBlockedTitleText,
-		subtitleText = mutedAndBlockedSubtitleText
-	})
+	local titleText = nil
+	local subtitleText = nil
+
+	if self.props.isMuted and self.props.isBlocked then
+		titleText = self.props.mutedAndBlockedTitleText
+		subtitleText = self.props.mutedAndBlockedSubtitleText
+	elseif self.props.isMuted then
+		titleText = self.props.mutedTitleText
+		subtitleText = self.props.mutedSubtitleText
+	elseif self.props.isBlocked then
+		titleText = self.props.blockedTitleText
+		subtitleText = self.props.blockedSubtitleText
+	end
+
+	self:setState({ titleText = titleText, subtitleText = subtitleText })
 end
-function v7.render(p2) -- line: 79
-	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), TextButton (copy), UIBlox (copy)
-	return withFoundationOrUIBloxStyle(function(p3) -- line: 80
+
+function extended.render(data)
+	return withFoundationOrUIBloxStyle(function(p)
+		local tokens
+
+		if FoundationFontFaceMigration then
+			tokens = p
+		end
+
 		return {
+			Tokens = tokens,
 			Theme = {
 				SystemPrimaryContent = {
-					Color = p3.Color.ActionSubEmphasis.Foreground.Color3,
-					Transparency = p3.Color.ActionSubEmphasis.Foreground.Transparency
+					Color = p.Color.ActionSubEmphasis.Foreground.Color3,
+					Transparency = p.Color.ActionSubEmphasis.Foreground.Transparency
 				},
 				TextEmphasis = {
-					Color = p3.Color.Content.Emphasis.Color3,
-					Transparency = p3.Color.Content.Emphasis.Transparency
+					Color = p.Color.Content.Emphasis.Color3,
+					Transparency = p.Color.Content.Emphasis.Transparency
 				}
 			},
 			Font = {
 				BaseSize = 1,
 				CaptionHeader = {
-					Font = p3.Typography.CaptionLarge.Font,
-					RelativeSize = p3.Typography.CaptionLarge.FontSize
+					Font = p.Typography.CaptionLarge.Font,
+					RelativeSize = p.Typography.CaptionLarge.FontSize
 				},
 				Header1 = {
-					Font = p3.Typography.HeadingSmall.Font,
-					RelativeSize = p3.Typography.HeadingSmall.FontSize
+					Font = p.Typography.HeadingSmall.Font,
+					RelativeSize = p.Typography.HeadingSmall.FontSize
 				}
 			}
 		}
-	end, function(p4) -- line: 104
-		-- upvalues: Roact (copy), p2 (copy), TextButton (copy), UIBlox (copy)
-		local BaseSize = p4.Font.BaseSize
+	end, function(props)
+		local baseSize = props.Font.BaseSize
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
+		local createElement = Roact.createElement
+		local v = {
 			Size = UDim2.fromScale(1, 1),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
-			ZIndex = p2.props.ZIndex
-		}, {
-			uiScale = Roact.createElement("UIScale", {
-				Scale = p2.props.uiScale
-			}),
+			BackgroundTransparency = 1,
+			ZIndex = data.props.ZIndex
+		}
+		local children = {
+			uiScale = Roact.createElement("UIScale", { Scale = data.props.uiScale }),
 			layout = Roact.createElement("UIListLayout", {
 				VerticalAlignment = Enum.VerticalAlignment.Top,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -110,39 +119,89 @@ function v7.render(p2) -- line: 79
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			title = Roact.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				Text = p2.state.titleText,
-				TextColor3 = p4.Theme.TextEmphasis.Color,
-				TextTransparency = p4.Theme.TextEmphasis.Transparency,
-				TextSize = p4.Font.Header1.RelativeSize * BaseSize,
-				Font = p4.Font.Header1.Font,
-				AutomaticSize = Enum.AutomaticSize.XY
-			}),
-			subtitle = Roact.createElement("TextLabel", {
-				TextWrapped = true,
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				Size = UDim2.fromOffset(612, 0),
-				Text = p2.state.subtitleText,
-				TextColor3 = p4.Theme.TextEmphasis.Color,
-				TextTransparency = p4.Theme.TextEmphasis.Transparency,
-				TextSize = p4.Font.CaptionHeader.RelativeSize * BaseSize,
-				Font = p4.Font.CaptionHeader.Font,
-				AutomaticSize = Enum.AutomaticSize.Y
-			}),
-			spacer = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 3,
-				Size = UDim2.fromOffset(0, 62)
-			}),
-			actions = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 4,
+			title = 0,
+			subtitle = 0,
+			spacer = 0,
+			actions = 0
+		}
+
+		local createElement2 = Roact.createElement
+		local v2 = {
+			Text = data.state.titleText,
+			TextColor3 = props.Theme.TextEmphasis.Color,
+			TextTransparency = props.Theme.TextEmphasis.Transparency,
+			TextSize = props.Font.Header1.RelativeSize * baseSize,
+			Font = 0,
+			FontFace = 0,
+			BackgroundTransparency = 1,
+			AutomaticSize = 0,
+			LayoutOrder = 1
+		}
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = props.Font.Header1.Font
+		end
+
+		v2.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(props.Tokens.Typography.HeadingSmall.Font)
+		end
+
+		v2.FontFace = fontFace
+
+		v2.AutomaticSize = Enum.AutomaticSize.XY
+		children.title = createElement2("TextLabel", v2)
+
+		local createElement3 = Roact.createElement
+		local v3 = {
+			Size = UDim2.fromOffset(612, 0),
+			Text = data.state.subtitleText,
+			TextColor3 = props.Theme.TextEmphasis.Color,
+			TextTransparency = props.Theme.TextEmphasis.Transparency,
+			TextSize = props.Font.CaptionHeader.RelativeSize * baseSize,
+			Font = 0,
+			FontFace = 0,
+			TextWrapped = true,
+			BackgroundTransparency = 1,
+			AutomaticSize = 0,
+			LayoutOrder = 2
+		}
+		local font2
+
+		if not FoundationFontFaceMigration then
+			font2 = props.Font.CaptionHeader.Font
+		end
+
+		v3.Font = font2
+		local fontFace2
+
+		if FoundationFontFaceMigration then
+			fontFace2 = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
+		end
+
+		v3.FontFace = fontFace2
+
+		v3.AutomaticSize = Enum.AutomaticSize.Y
+		children.subtitle = createElement3("TextLabel", v3)
+
+		children.spacer = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(0, 62),
+			LayoutOrder = 3
+		})
+
+		children.actions = Roact.createElement(
+			"Frame",
+			{
 				Size = UDim2.fromOffset(584, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 4
+			},
+			{
 				layout = Roact.createElement("UIListLayout", {
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -151,40 +210,37 @@ function v7.render(p2) -- line: 79
 					SortOrder = Enum.SortOrder.LayoutOrder
 				}),
 				cancelContainer = Roact.createElement("Frame", {
+					BackgroundColor3 = props.Theme.SystemPrimaryContent.Color,
+					BackgroundTransparency = props.Theme.SystemPrimaryContent.Transparency,
 					BorderSizePixel = 0,
-					LayoutOrder = 1,
-					BackgroundColor3 = p4.Theme.SystemPrimaryContent.Color,
-					BackgroundTransparency = p4.Theme.SystemPrimaryContent.Transparency,
-					Size = UDim2.fromOffset(234, 44)
+					Size = UDim2.fromOffset(234, 44),
+					LayoutOrder = 1
 				}, {
-					uiCorner = Roact.createElement("UICorner", {
-						CornerRadius = UDim.new(0, 4)
-					}),
+					uiCorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
 					cancelButton = Roact.createElement(TextButton, {
 						size = UDim2.fromScale(1, 1),
-						text = p2.props.cancelText,
-						onActivated = p2.onCancelActivated
+						text = data.props.cancelText,
+						onActivated = data.onCancelActivated
 					})
 				}),
 				confirmContainer = Roact.createElement("Frame", {
+					BackgroundColor3 = UIBlox.App.Style.Colors.Blue,
 					BackgroundTransparency = 0,
 					BorderSizePixel = 0,
-					LayoutOrder = 2,
-					BackgroundColor3 = UIBlox.App.Style.Colors.Blue,
-					Size = UDim2.fromOffset(234, 44)
+					Size = UDim2.fromOffset(234, 44),
+					LayoutOrder = 2
 				}, {
-					uiCorner = Roact.createElement("UICorner", {
-						CornerRadius = UDim.new(0, 4)
-					}),
+					uiCorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
 					confirmButton = Roact.createElement(TextButton, {
 						size = UDim2.fromScale(1, 1),
-						text = p2.props.confirmText,
-						onActivated = p2.onConfirmActivated
+						text = data.props.confirmText,
+						onActivated = data.onConfirmActivated
 					})
 				})
-			})
-		})
+			}
+		)
+		return createElement("Frame", v, children)
 	end)
 end
 
-return v7
+return extended

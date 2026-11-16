@@ -1,181 +1,227 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local scriptParentParentParentParentParent = scriptParentParentParentParent.Parent
-local Cryo = require(scriptParentParentParentParentParent.Cryo)
-local React = require(scriptParentParentParentParentParent.React)
-local RoactGamepad = require(scriptParentParentParentParentParent.RoactGamepad)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
+local parent5 = parent4.Parent
+
+local Cryo = require(parent5.Cryo)
+local React = require(parent5.React)
+local RoactGamepad = require(parent5.RoactGamepad)
 local Focusable = RoactGamepad.Focusable
-local FitFrame = require(scriptParentParentParentParentParent.FitFrame)
+local FitFrame = require(parent5.FitFrame)
 local FitFrameHorizontal = FitFrame.FitFrameHorizontal
-local IconSize = require(scriptParentParentParent.ImageSet.Enum.IconSize)
-local Images = require(scriptParentParentParent.ImageSet.Images)
-local useStyle = require(scriptParentParentParentParent.Core.Style.useStyle)
-local IconButton = require(scriptParentParentParentParent.App.Button.IconButton)
-local useIsGamepad = require(scriptParentParentParentParent.Utility.useIsGamepad)
-local ScrollingListWithArrowsAndGradient = require(scriptParentParent.HorizontalNav.ScrollingListWithArrowsAndGradient)
-local Pillv2 = require(scriptParent.Pillv2)
 
-local function PillGroup(t1: {[any]: any}) -- line: 60
-	-- upvalues: useIsGamepad (copy), React (copy), useStyle (copy), RoactGamepad (copy), Cryo (copy), IconButton (copy), IconSize (copy), Images (copy), Focusable (copy), Pillv2 (copy), FitFrameHorizontal (copy), FitFrame (copy), ScrollingListWithArrowsAndGradient (copy)
-	local v21 = t1.isRoactGamepadEnabled == nil or t1.isRoactGamepadEnabled
-	local v22 = useIsGamepad() and v21
-	local v23 = React.useRef(nil)
+local IconSize = require(parent3.ImageSet.Enum.IconSize)
+local Images = require(parent3.ImageSet.Images)
 
-	local function scrollToStart() -- line: 66
-		-- upvalues: v23 (copy)
-		local current = v23.current
+local useStyle = require(parent4.Core.Style.useStyle)
+local IconButton = require(parent4.App.Button.IconButton)
+local useIsGamepad = require(parent4.Utility.useIsGamepad)
+local ScrollingListWithArrowsAndGradient = require(parent2.HorizontalNav.ScrollingListWithArrowsAndGradient)
+local Pillv2 = require(parent.Pillv2)
+
+local function PillGroup(props)
+	local v = props.isRoactGamepadEnabled == nil or props.isRoactGamepadEnabled
+	local v2 = useIsGamepad() and v
+
+	local ref = React.useRef(nil)
+
+	local function scrollToStart()
+		local current = ref.current
 
 		if current then
 			current:ScrollToTop()
 		end
 	end
 
-	local v25 = t1.leftPadding or 15
-	local v26 = t1.rightPadding or 15
-	local v27 = t1.selectedPills or {}
-	local Theme = useStyle().Theme
-	local v29 = React.useCallback(function(p1) -- line: 81
-		-- upvalues: v23 (copy)
-		if v23.current then
-			v23.current.CanvasSize = UDim2.new(0, p1.AbsoluteSize.X, 1, 0)
-		end
-	end)
-	local v30 = React.useRef({})
-	local v31 = v21 and RoactGamepad.useRefCache() or v30.current
-	local v32 = React.useCallback(function() -- line: 90
-		-- upvalues: t1 (copy)
-		if t1.onSelectionChanged then
-			t1.onSelectionChanged({})
-		end
-	end)
-	local v33 = React.useMemo(function() -- line: 96
-		-- upvalues: t1 (copy), Cryo (copy), v27 (copy)
-		local t2 = {}
+	local leftPadding = props.leftPadding or 15
+	local rightPadding = props.rightPadding or 15
 
-		for _, v49 in t1.pills do
-			if not Cryo.List.find(v27, v49) then
-				table.insert(t2, v49)
+	local selectedPills = props.selectedPills or {}
+
+	local theme = useStyle().Theme
+
+	local v3 = React.useCallback(function(p)
+		if ref.current then
+			ref.current.CanvasSize = UDim2.new(0, p.AbsoluteSize.X, 1, 0)
+		end
+	end)
+
+	local ref2 = React.useRef({})
+	local v4 = v and RoactGamepad.useRefCache() or ref2.current
+
+	local onActivated2 = React.useCallback(function()
+		if props.onSelectionChanged then
+			props.onSelectionChanged({})
+		end
+	end)
+
+	local v5 = React.useMemo(function()
+		local pills = {}
+
+		for _, pill in props.pills do
+			if not Cryo.List.find(selectedPills, pill) then
+				table.insert(pills, pill)
 			end
 		end
 
-		return Cryo.List.join(v27, t2)
-	end, {
-		t1.pills,
-		v27
-	})
-	local v34 = #v27 > 1
-	local t3 = {
-		ClearButton = v34 and React.createElement(IconButton, {
+		return Cryo.List.join(selectedPills, pills)
+	end, { props.pills, selectedPills })
+
+	local v6 = #selectedPills > 1
+
+	local children = { ClearButton = 0 }
+	local clearButton
+
+	if v6 then
+		clearButton = React.createElement(IconButton, {
 			layoutOrder = 1,
-			key = "0",
 			size = UDim2.fromOffset(24, 24),
 			iconSize = IconSize.Medium,
 			icon = Images["icons/actions/reject"],
-			onActivated = v32,
-			buttonRef = v31[0],
-			NextSelectionRight = v31[1]
+			onActivated = onActivated2,
+			key = "0",
+			buttonRef = v4[0],
+			NextSelectionRight = v4[1]
 		}) or nil
-	}
-	local isLoading = t1.isLoading
-
-	for v37, v38 in v33 do
-		local v39 = v37 <= #v27
-
-		if v39 then
-			isLoading = false
-		end
-
-		if not v21 then
-			v31[v37] = v31[v37] or React.createRef()
-		end
-
-		t3[v37] = React.createElement(if not v21 then Pillv2 else Focusable[Pillv2], {
-			layoutOrder = v37 + 1,
-			key = tostring(v37),
-			text = v38,
-			isSelected = v39,
-			isLoading = t1.isLoading and not v39,
-			onActivated = function() -- line: 124
-				-- upvalues: Cryo (copy), v27 (copy), v38 (copy), v23 (copy), t1 (copy)
-				local v50 = Cryo.List.find(v27, v38) ~= nil
-				local v51 = if not v50 then Cryo.List.join(v27, { v38 }) else Cryo.List.removeValue(v27, v38)
-
-				if not v50 then
-					local current = v23.current
-
-					if current then
-						current:ScrollToTop()
-					end
-				end
-
-				if t1.onSelectionChanged then
-					t1.onSelectionChanged(v51)
-				end
-			end,
-			ref = v31[v37],
-			NextSelectionLeft = if not (v37 > 1) and not v34 then nil else v31[v37 - 1],
-			NextSelectionRight = if not (v37 < #v33) then nil else v31[v37 + 1]
-		})
 	end
 
-	if isLoading and v22 and v21 then
-		t3[1] = React.createElement(Focusable[Pillv2], {
+	children.ClearButton = clearButton
+
+	local v7 = props.isLoading
+
+	for k, text in v5 do
+		local function onActivated()
+			local v8 = Cryo.List.find(selectedPills, text) ~= nil
+			local v9
+
+			if v8 then
+				v9 = Cryo.List.removeValue(selectedPills, text)
+			else
+				local v10 = { text }
+				v9 = Cryo.List.join(selectedPills, v10)
+			end
+
+			local current = not v8 and ref.current
+
+			if current then
+				current:ScrollToTop()
+			end
+
+			if props.onSelectionChanged then
+				props.onSelectionChanged(v9)
+			end
+		end
+
+		local isSelected = k <= #selectedPills
+
+		if isSelected then
+			v7 = false
+		end
+
+		if not v then
+			v4[k] = v4[k] or React.createRef()
+		end
+
+		local createElement = React.createElement
+		local v8
+
+		if v then
+			v8 = Focusable[Pillv2]
+		else
+			v8 = Pillv2
+		end
+
+		local v9 = {
+			layoutOrder = k + 1,
+			key = tostring(k),
+			text = text,
+			isSelected = isSelected,
+			isLoading = props.isLoading and not isSelected,
+			onActivated = onActivated,
+			ref = v4[k],
+			NextSelectionLeft = 0,
+			NextSelectionRight = 0
+		}
+		local nextSelectionLeft
+
+		if k > 1 or v6 then
+			nextSelectionLeft = v4[k - 1]
+		end
+
+		v9.NextSelectionLeft = nextSelectionLeft
+		local nextSelectionRight
+
+		if k < #v5 then
+			nextSelectionRight = v4[k + 1]
+		end
+
+		v9.NextSelectionRight = nextSelectionRight
+		children[k] = createElement(v8, v9)
+	end
+
+	if v7 and v2 and v then
+		children[1] = React.createElement(Focusable[Pillv2], {
 			layoutOrder = 2,
 			key = "1",
-			text = "",
-			ref = v31[1]
+			ref = v4[1],
+			text = ""
 		})
 	end
 
-	local function getScrollingListChildren() -- line: 176
-		-- upvalues: React (copy), FitFrameHorizontal (copy), FitFrame (copy), v26 (copy), v25 (copy), v29 (copy), t3 (copy)
+	local function getScrollingListChildren()
 		return {
 			SubNavFrame = React.createElement(FitFrameHorizontal, {
 				height = UDim.new(1, 0),
 				contentPadding = UDim.new(0, 8),
-				margin = FitFrame.Rect.quad(0, v26, 0, v25),
+				margin = FitFrame.Rect.quad(0, rightPadding, 0, leftPadding),
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				FillDirection = Enum.FillDirection.Horizontal,
 				BackgroundTransparency = 1,
-				[React.Change.AbsoluteSize] = v29
-			}, t3)
+				[React.Change.AbsoluteSize] = v3
+			}, children)
 		}
 	end
 
-	local t4 = {}
+	local buttonRefs = {}
 
-	for i = 1, #v33 do
-		t4[i] = v31[i]
+	for i = 1, #v5 do
+		buttonRefs[i] = v4[i]
 	end
 
-	return React.createElement(not v21 and "Frame" or Focusable.Frame, {
-		BorderSizePixel = 0,
+	local createElement = React.createElement
+	local v8 = not v and "Frame" or Focusable.Frame
+	local v9 = {
 		Size = UDim2.new(1, 0, 0, 52),
-		BackgroundColor3 = Theme.BackgroundDefault.Color,
-		BackgroundTransparency = Theme.BackgroundDefault.Transparency,
-		LayoutOrder = t1.layoutOrder,
-		ref = t1.forwardRef,
-		NextSelectionUp = t1.NextSelectionUp,
-		NextSelectionDown = t1.NextSelectionDown,
-		defaultChild = if not v21 then nil else v31[1]
-	}, {
+		BackgroundColor3 = theme.BackgroundDefault.Color,
+		BackgroundTransparency = theme.BackgroundDefault.Transparency,
+		BorderSizePixel = 0,
+		LayoutOrder = props.layoutOrder,
+		ref = props.forwardRef,
+		NextSelectionUp = props.NextSelectionUp,
+		NextSelectionDown = props.NextSelectionDown,
+		defaultChild = 0
+	}
+	local defaultChild
+
+	if v then
+		defaultChild = v4[1]
+	end
+
+	v9.defaultChild = defaultChild
+	return createElement(v8, v9, {
 		ScrollingList = React.createElement(ScrollingListWithArrowsAndGradient, {
+			getScollingListContent = getScrollingListChildren,
 			listHeight = 52,
+			scrollingFrameRef = ref,
+			buttonRefs = buttonRefs,
 			buttonPadding = 8,
 			padOutsideEdges = false,
-			hideGradient = true,
-			getScollingListContent = getScrollingListChildren,
-			scrollingFrameRef = v23,
-			buttonRefs = t4
+			hideGradient = true
 		})
 	})
 end
 
-return React.forwardRef(function(p2, p3) -- line: 221
-	-- upvalues: React (copy), PillGroup (copy), Cryo (copy)
-	return React.createElement(PillGroup, Cryo.Dictionary.join(p2, {
-		forwardRef = p3
-	}))
+return React.forwardRef(function(p, forwardRef)
+	return React.createElement(PillGroup, Cryo.Dictionary.join(p, { forwardRef = forwardRef }))
 end)

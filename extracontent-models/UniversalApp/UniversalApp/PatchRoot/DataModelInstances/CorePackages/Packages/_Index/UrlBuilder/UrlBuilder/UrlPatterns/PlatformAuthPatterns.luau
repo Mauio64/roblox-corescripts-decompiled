@@ -1,24 +1,19 @@
-return function(p1) -- line: 1
+return function(p)
 	return {
-		account = function(s1: string) -- line: 4
-			-- upvalues: p1 (copy)
-			return p1.fromString("auth:v1/" .. s1 .. "/account")
+		account = function(p2: string)
+			return p.fromString("auth:v1/" .. p2 .. "/account")
 		end,
-		connect = function(s2: string) -- line: 8
-			-- upvalues: p1 (copy)
-			return p1.fromString("auth:v1/" .. s2 .. "/connect")
+		connect = function(p2: string)
+			return p.fromString("auth:v1/" .. p2 .. "/connect")
 		end,
-		disconnect = function(s3: string) -- line: 12
-			-- upvalues: p1 (copy)
-			return p1.fromString("auth:v1/" .. s3 .. "/disconnect")
+		disconnect = function(p2: string)
+			return p.fromString("auth:v1/" .. p2 .. "/disconnect")
 		end,
-		login = function(s4: string) -- line: 16
-			-- upvalues: p1 (copy)
-			return p1.fromString("auth:v1/" .. s4 .. "/login")
+		login = function(p2: string)
+			return p.fromString("auth:v1/" .. p2 .. "/login")
 		end,
-		signup = function(s5: string) -- line: 20
-			-- upvalues: p1 (copy)
-			return p1.fromString("auth:v1/" .. s5 .. "/signup")
+		signup = function(p2: string)
+			return p.fromString("auth:v1/" .. p2 .. "/signup")
 		end
 	}
 end

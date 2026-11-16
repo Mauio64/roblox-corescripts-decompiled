@@ -1,5 +1,1 @@
-return {
-	Current = "Current",
-	Next = "Next",
-	Previous = "Previous"
-}
+return { Current = "Current", Next = "Next", Previous = "Previous" }

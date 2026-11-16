@@ -1,7 +1,12 @@
-local Parent = script:FindFirstAncestor("IntervalPerformanceTracker").Parent
-local ScrollIntervalTracker = require(Parent.ScrollIntervalTracker)
+local parent = script:FindFirstAncestor("IntervalPerformanceTracker").Parent
+
+local ScrollIntervalTracker = require(parent.ScrollIntervalTracker)
 local IntervalPerformanceTracker = require(script.Parent.IntervalPerformanceTracker)
-local t1 = {
+
+local defineFastFlag = game:DefineFastFlag("IntervalPerformanceTrackerPerIntervalSampleRate", false)
+game:DefineFastInt("ScrollIntervalPerformanceTrackerSampleRate", 1000)
+
+local v = {
 	"duration",
 	"averageFPS",
 	"framesCount",
@@ -10,74 +15,76 @@ local t1 = {
 	"frameTimeStdDevMs",
 	"frameTimeDistributionMs",
 	"frameBuckets",
-	"rawFrameTimesMs"
+	"rawFrameTimesMs",
+	"rawScrollPositionSamplesCsv"
 }
 
-local function createScrollIntervalPerformanceTracker(s1: string, p1, p2, t2: {[any]: any}?) -- line: 69
-	-- upvalues: t1 (copy), IntervalPerformanceTracker (copy), ScrollIntervalTracker (copy)
-	local v10 = if not t2 or not t2.metricsToTrack then t1 else t2.metricsToTrack
-	local v11 = not t2 or (t2.countersEnabled == nil or t2.countersEnabled)
-	local v12 = not t2 or (t2.eventStreamEnabled == nil or t2.eventStreamEnabled)
-	local v13 = if not t2 then nil else t2.scrollOptions
-	local v14 = not t2 or (t2.trackScrollType == nil or t2.trackScrollType)
-	local v15 = if not t2 then nil else t2.extraFields
-	local u16 = false
+local function createScrollIntervalPerformanceTracker(p: string, p2, p3, data)
+	local v2
 
-	local function buildExtraFields() -- line: 88
-		-- upvalues: u16 (ref), v14 (copy), v15 (copy)
-		local v20 = not u16 and "cold" or "warm"
-
-		if not v14 then
-			return v15
-		end
-
-		local t3 = {}
-
-		if v15 then
-			for v22, v23 in v15 do
-				t3[v22] = v23
-			end
-		end
-
-		t3.scroll_type = v20
-
-		return t3
+	if data and data.metricsToTrack then
+		v2 = data.metricsToTrack
+	else
+		v2 = v
 	end
-	local function tryStart(_) -- line: 105
-		-- upvalues: IntervalPerformanceTracker (copy), s1 (copy), v10 (copy), v11 (copy), v12 (copy), u16 (ref), v14 (copy), v15 (copy)
-		local v25 = IntervalPerformanceTracker
-		local v26 = s1
-		local v27 = v10
-		local v28 = v11
-		local v29 = v12
-		local v30 = not u16 and "cold" or "warm"
-		local v31
 
-		if not v14 then
-			v31 = v15
-		else
-			v31 = {}
+	local v3 = not data or data.countersEnabled == nil or data.countersEnabled
+	local v4 = not data or data.eventStreamEnabled == nil or data.eventStreamEnabled
+	local scrollOptions
 
-			if v15 then
-				for v32, v33 in v15 do
-					v31[v32] = v33
-				end
-			end
+	if data then
+		scrollOptions = data.scrollOptions
+	end
 
-			v31.scroll_type = v30
+	local v5 = not data or data.trackScrollType == nil or data.trackScrollType
+	local extraFields
+
+	if data then
+		extraFields = data.extraFields
+	else
+		extraFields = nil
+	end
+
+	local v6 = false
+
+	local function buildExtraFields() -- 1 equivalent call inferred from this helper
+		local scroll_type = v6 and "warm" or "cold"
+
+		if not v5 then
+			return extraFields
 		end
 
-		v25:startTracking(v26, nil, v27, v28, v29, v31)
-		u16 = true
+		local extraFields2 = {}
 
+		if extraFields then
+			for k, extraField in extraFields do
+				extraFields2[k] = extraField
+			end
+		end
+
+		extraFields2.scroll_type = scroll_type
+		return extraFields2
+	end
+
+	local function tryStart(_): boolean
+		local extraFields2 = buildExtraFields() -- inferred equivalent call
+		local v7
+
+		if defineFastFlag then
+			v7 = game:GetFastInt("ScrollIntervalPerformanceTrackerSampleRate")
+		end
+
+		IntervalPerformanceTracker:startTracking(p, nil, v2, v3, v4, extraFields2, p2, v7)
+
+		v6 = true
 		return true
 	end
-	local function finish(_) -- line: 118
-		-- upvalues: IntervalPerformanceTracker (copy), s1 (copy)
-		IntervalPerformanceTracker:stopAndLogTracking(s1)
+
+	local function finish(_)
+		IntervalPerformanceTracker:stopAndLogTracking(p)
 	end
 
-	return ScrollIntervalTracker.createScrollIntervalTracker(tryStart, finish, p1, p2, v13)
+	return ScrollIntervalTracker.createScrollIntervalTracker(tryStart, finish, p2, p3, scrollOptions)
 end
 
 return createScrollIntervalPerformanceTracker

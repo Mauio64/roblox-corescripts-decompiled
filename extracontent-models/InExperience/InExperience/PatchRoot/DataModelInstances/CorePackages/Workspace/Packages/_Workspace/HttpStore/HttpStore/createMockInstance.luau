@@ -1,26 +1,23 @@
-local ParentParent = script.Parent.Parent
-local createMockHttpStore = require(ParentParent.InternalHttpStore).createMockHttpStore
+local parent = script.Parent.Parent
+local InternalHttpStore = require(parent.InternalHttpStore)
+local createMockHttpStore = InternalHttpStore.createMockHttpStore
 
-local function createMockInstance() -- line: 67
-	-- upvalues: createMockHttpStore (copy)
-	local v4 = createMockHttpStore()
+local function createMockInstance()
+	local mockHttpStore = createMockHttpStore()
 
 	return {
-		get = function() -- line: 72
-			-- upvalues: v4 (copy)
-			return v4
+		get = function()
+			return mockHttpStore
 		end,
-		_create = function() -- line: 75
-			-- upvalues: v4 (copy)
-			return v4
+		_create = function()
+			return mockHttpStore
 		end,
-		_dispose = function() -- line: 78
-			-- upvalues: v4 (copy)
-			v4.reset()
+		_dispose = function()
+			mockHttpStore.reset()
 		end,
-		setResponse = v4.setResponse,
-		reset = v4.reset,
-		mockStore = v4
+		setResponse = mockHttpStore.setResponse,
+		reset = mockHttpStore.reset,
+		mockStore = mockHttpStore
 	}
 end
 

@@ -1,148 +1,193 @@
 local CorePackages = game:GetService("CorePackages")
 local LocalizationService = game:GetService("LocalizationService")
+local Players = game:GetService("Players")
+
 local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
 local ExpChatShared = require(CorePackages.Workspace.Packages.ExpChatShared)
-local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
 local Promise = require(CorePackages.Packages.Promise)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local ExpChatMessageHelpers = require(script.Parent.ExpChatMessageHelpers)
-local enrichMissingUsernames = require(script.Parent.inExpChatMessagesLoaderUsernameEnrichment).enrichMissingUsernames
+local inExpChatMessagesLoaderUsernameEnrichment = require(script.Parent.inExpChatMessagesLoaderUsernameEnrichment)
+local enrichMissingUsernames = inExpChatMessagesLoaderUsernameEnrichment.enrichMissingUsernames
+
+local ChannelTabDisplayLabel = ExpChatShared.ChannelTabDisplayLabel
 local GetChannelTabsStore = ExpChat.Stores.GetChannelTabsStore
-local FFlagExpChatUseMessagesStore = require(CorePackages.Workspace.Packages.SharedFlags).FFlagExpChatUseMessagesStore
-local v11 = Localization.new(LocalizationService.RobloxLocaleId)
+
+local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
+local FFlagExpChatUseSharedChannelTabDisplayLabel = SharedFlags.FFlagExpChatUseSharedChannelTabDisplayLabel
+
+local v = Localization.new(LocalizationService.RobloxLocaleId)
+
+local function getLocalizedChannelTabLabels()
+	local localizationKeys = ChannelTabDisplayLabel.LocalizationKeys
+	return {
+		yourServer = v:Format(localizationKeys.yourServer),
+		moreServers = v:Format(localizationKeys.moreServers),
+		friends = v:Format(localizationKeys.friends),
+		system = v:Format(localizationKeys.system),
+		team = v:Format(localizationKeys.team)
+	}
+end
 
 return {
 	type = "groupedListItem",
-	fetch = function(_) -- line: 23
-		-- upvalues: ExpChatShared (copy), Promise (copy), FFlagExpChatUseMessagesStore (copy), ExpChatMessageHelpers (copy), v11 (copy), enrichMissingUsernames (copy), GetChannelTabsStore (copy)
+	fetch = function(_)
 		local store = ExpChatShared.context.store
 
 		if not store then
 			return Promise.resolve({})
 		end
 
-		local v14 = store:getState()
-		local v16, v17, v18
+		local state = store:getState()
 
-		if FFlagExpChatUseMessagesStore then
-			local messagesStore = ExpChatShared.context.messagesStore
+		local messagesStore = ExpChatShared.context.messagesStore
 
-			if not messagesStore then
-				return Promise.resolve({})
-			end
-
-			v16 = messagesStore.getByMessageId(false) or {}
-			v17 = messagesStore.getWindowMessagesInOrder(false) or {}
-			v18 = messagesStore.getWindowMessagesInOrderByTabId(false) or {}
-		else
-			local v19 = v14 and v14.Messages
-
-			if not v19 then
-				return Promise.resolve({})
-			end
-
-			v16 = v19.byMessageId or {}
-			v17 = v19.windowMessagesInOrder or {}
-			v18 = v19.windowMessagesInOrderByTabId or {}
+		if not messagesStore then
+			return Promise.resolve({})
 		end
+
+		local v2 = messagesStore.getByMessageId(false) or {}
+		local v3 = messagesStore.getWindowMessagesInOrder(false) or {}
+		local v4 = messagesStore.getWindowMessagesInOrderByTabId(false) or {}
 
 		local translator = ExpChatShared.context.translator
 
-		if not ExpChatMessageHelpers.areChannelTabsEnabled() then
-			local t1 = {}
-			local t2 = {}
+		if ExpChatMessageHelpers.areChannelTabsEnabled() then
+			local allTextChannels = state.TextChannels and state.TextChannels.allTextChannels or {}
 
-			for _, v in ipairs(v17) do
-				local v25 = v16[v]
+			local allChannelTabs = GetChannelTabsStore(false).getChannelTabsState(false).allChannelTabs
+			local v5
 
-				if v25 then
-					if v25.textChannel then
-						table.insert(t1, v)
+			if FFlagExpChatUseSharedChannelTabDisplayLabel then
+				v5 = getLocalizedChannelTabLabels()
+			end
+
+			local v6 = {}
+			local v7 = {}
+
+			for k, v8 in pairs(v4) do
+				local items = ExpChatMessageHelpers.collectItems(v2, v8)
+
+				if not (#items > 0) then
+					continue
+				end
+
+				local label
+
+				if FFlagExpChatUseSharedChannelTabDisplayLabel then
+					local kind
+
+					if FFlagExpChatUseChannelTabsStore then
+						local allChannelTab = allChannelTabs[k]
+
+						if allChannelTab then
+							kind = allChannelTab.type
+						end
 					else
-						table.insert(t2, v)
+						local allChannelTabs2 = state.ChannelTabs and state.ChannelTabs.allChannelTabs
+						local v9 = allChannelTabs2 and allChannelTabs2[k]
+
+						if v9 then
+							kind = v9.Type
+						end
 					end
+
+					if kind then
+						label = ChannelTabDisplayLabel.getDisplayLabel(
+							kind,
+							k,
+							allTextChannels[k],
+							Players.LocalPlayer,
+							v5
+						)
+					else
+						label = k
+					end
+				else
+					label = ExpChatMessageHelpers.localizeString(
+						translator,
+						ExpChatMessageHelpers.formatChannelLabel(k, allTextChannels[k])
+					)
+				end
+
+				table.insert(v6, k)
+				v7[k] = { id = k, label = label, items = items }
+			end
+
+			table.sort(v6, function(a, b): boolean
+				local allChannelTab = allChannelTabs[a]
+				local allChannelTab2 = allChannelTabs[b]
+
+				if allChannelTab and allChannelTab2 then
+					return allChannelTab.tabIndex < allChannelTab2.tabIndex
+				end
+
+				if allChannelTab then
+					return true
+				end
+
+				if allChannelTab2 then
+					return false
+				end
+
+				if a == ExpChatMessageHelpers.CHANNEL_GENERAL then
+					return true
+				end
+
+				return b ~= ExpChatMessageHelpers.CHANNEL_GENERAL and a < b
+			end)
+
+			local v8 = {}
+
+			for _, v9 in ipairs(v6) do
+				table.insert(v8, v7[v9])
+			end
+
+			return enrichMissingUsernames(v8)
+		else
+			local v5 = {}
+			local v6 = {}
+
+			for _, v7 in ipairs(v3) do
+				local v8 = v2[v7]
+
+				if not v8 then
+					continue
+				end
+
+				if v8.textChannel then
+					table.insert(v5, v7)
+				else
+					table.insert(v6, v7)
 				end
 			end
 
-			local t3 = {}
-			local v27 = ExpChatMessageHelpers.collectItems(v16, t1)
+			local v7 = {}
 
-			ExpChatMessageHelpers.annotateWhisperItems(v27, v16, v11:Format("Feature.ReportAbuse.Label.SentPrivately"))
+			local items = ExpChatMessageHelpers.collectItems(v2, v5)
+			ExpChatMessageHelpers.annotateWhisperItems(items, v2, v:Format("Feature.ReportAbuse.Label.SentPrivately"))
 
-			if #v27 > 0 then
-				table.insert(t3, {
+			if #items > 0 then
+				table.insert(v7, {
 					id = ExpChatMessageHelpers.CHANNEL_GENERAL,
-					label = v11:Format("CoreScripts.TextChat.ChannelTabs.Here"),
-					items = v27
+					label = v:Format(not FFlagExpChatUseSharedChannelTabDisplayLabel and "CoreScripts.TextChat.ChannelTabs.Here" or ChannelTabDisplayLabel.LocalizationKeys.yourServer),
+					items = items
 				})
 			end
 
-			local v28 = ExpChatMessageHelpers.collectItems(v16, t2)
+			local items2 = ExpChatMessageHelpers.collectItems(v2, v6)
 
-			if #v28 > 0 then
-				table.insert(t3, {
+			if #items2 > 0 then
+				table.insert(v7, {
 					id = ExpChatMessageHelpers.CHANNEL_GLOBAL,
-					label = v11:Format("CoreScripts.TextChat.ChannelTabs.Global2"),
-					items = v28
+					label = v:Format("CoreScripts.TextChat.ChannelTabs.Global2"),
+					items = items2
 				})
 			end
 
-			return enrichMissingUsernames(t3)
+			return enrichMissingUsernames(v7)
 		end
-
-		local v29 = v14.TextChannels and v14.TextChannels.allTextChannels or {}
-		local allChannelTabs = GetChannelTabsStore(false).getChannelTabsState(false).allChannelTabs
-		local t4 = {}
-		local t5 = {}
-
-		for k, v in pairs(v18) do
-			local v35 = ExpChatMessageHelpers.collectItems(v16, v)
-
-			if #v35 > 0 then
-				local v36 = ExpChatMessageHelpers.formatChannelLabel(k, v29[k])
-
-				table.insert(t5, k)
-				t4[k] = {
-					id = k,
-					label = ExpChatMessageHelpers.localizeString(translator, v36),
-					items = v35
-				}
-			end
-		end
-
-		table.sort(t5, function(p2, p3) -- line: 124
-			-- upvalues: allChannelTabs (copy), ExpChatMessageHelpers (copy)
-			local v42 = allChannelTabs[p2]
-			local v43 = allChannelTabs[p3]
-
-			if v42 and v43 then
-				return v42.tabIndex < v43.tabIndex
-			end
-
-			if v42 then
-				return true
-			end
-
-			if v43 then
-				return false
-			end
-
-			if p2 == ExpChatMessageHelpers.CHANNEL_GENERAL then
-				return true
-			end
-
-			if p3 == ExpChatMessageHelpers.CHANNEL_GENERAL then
-				return false
-			end
-
-			return p2 < p3
-		end)
-
-		local t6 = {}
-
-		for _, v in ipairs(t5) do
-			table.insert(t6, t4[v])
-		end
-
-		return enrichMissingUsernames(t6)
 	end
 }

@@ -1,8 +1,11 @@
 local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local useEventConnection = require(ParentParent.ReactUtils).useEventConnection
-local t1 = {
+
+local parent = script.Parent.Parent
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
+
+local v = {
 	GeoBlocked = "geoBlocked",
 	SettingsDisabled = "settingsOff",
 	SettingsDisabledVpc = "parentalConsent",
@@ -13,7 +16,8 @@ local t1 = {
 	Ineligible = "viewOnly",
 	NoOne = "viewOnly"
 }
-local t2 = {
+
+local v2 = {
 	geoBlocked = {
 		key = "CoreScripts.TextChat.ChatWindow.ChatDisabled.RegionUnavailable",
 		fallback = "You can only view system messages here. Chat is not available in your region."
@@ -35,76 +39,90 @@ local t2 = {
 		fallback = "You can only view system messages here."
 	}
 }
-local t3 = {
+
+local function resolve(state: string) -- 1 equivalent call inferred from this helper
+	local reason = v[state]
+	local v3
+
+	if reason then
+		v3 = v2[reason]
+	end
+
+	local v4 = {
+		canChat = reason == nil,
+		reason = reason,
+		messageKey = 0,
+		messageFallback = 0
+	}
+	local messageKey
+
+	if v3 then
+		messageKey = v3.key
+	end
+
+	v4.messageKey = messageKey
+	local messageFallback
+
+	if v3 then
+		messageFallback = v3.fallback
+	end
+
+	v4.messageFallback = messageFallback
+	return v4
+end
+
+local context = React.createContext({
 	canChat = true,
 	reason = nil,
 	messageKey = nil,
 	messageFallback = nil
-}
-local v8 = React.createContext(t3)
+})
+local ChatAvailabilityContext = {}
+ChatAvailabilityContext.Context = context
 
-return {
-	Context = v8,
-	Provider = function(t4: {[any]: any}) -- line: 84
-		-- upvalues: Players (copy), React (copy), useEventConnection (copy), t1 (copy), t2 (copy), v8 (copy)
-		local v13 = t4.subjectPlayer or Players.LocalPlayer
-		local v14, v15 = React.useState(function() -- line: 87
-			-- upvalues: t4 (copy), v13 (copy)
-			if t4.value ~= nil then
-				return t4.value
-			end
+function ChatAvailabilityContext.Provider(props)
+	local subjectPlayer = props.subjectPlayer or Players.LocalPlayer
 
-			if v13 then
-				return v13.ChatAvailabilityStatus
-			end
+	local state, setState = React.useState(function()
+		if props.value ~= nil then
+			return props.value
+		end
 
-			return "Enabled"
-		end)
+		if subjectPlayer then
+			return subjectPlayer.ChatAvailabilityStatus
+		end
 
-		useEventConnection(if t4.value ~= nil or not v13 then nil else v13:GetPropertyChangedSignal("ChatAvailabilityStatus"), function() -- line: 97
-			-- upvalues: v13 (copy), v15 (copy)
-			if v13 then
-				v15(v13.ChatAvailabilityStatus)
-			end
-		end, {})
-		React.useEffect(function() -- line: 107
-			-- upvalues: t4 (copy), v15 (copy)
-			if t4.value ~= nil then
-				v15(t4.value)
-			end
-		end, { t4.value })
+		return "Enabled"
+	end)
+	local v3
 
-		local v16 = React.useMemo(function() -- line: 114
-			-- upvalues: v14 (copy), t1 (copy), t2 (copy)
-			local v17 = t1[v14]
-			local v18 = if not v17 then nil else t2[v17]
-
-			return {
-				canChat = v17 == nil,
-				reason = v17,
-				messageKey = if not v18 then nil else v18.key,
-				messageFallback = if not v18 then nil else v18.fallback
-			}
-		end, { v14 })
-
-		return React.createElement(v8.Provider, {
-			value = v16
-		}, t4.children)
-	end,
-	resolve = function(s1: string) -- line: 54
-		-- upvalues: t1 (copy), t2 (copy)
-		local v10 = t1[s1]
-		local v11 = if not v10 then nil else t2[v10]
-
-		return {
-			canChat = v10 == nil,
-			reason = v10,
-			messageKey = if not v11 then nil else v11.key,
-			messageFallback = if not v11 then nil else v11.fallback
-		}
-	end,
-	useLocalUserChatAvailability = function() -- line: 123
-		-- upvalues: React (copy), v8 (copy)
-		return React.useContext(v8)
+	if props.value == nil and subjectPlayer then
+		v3 = subjectPlayer:GetPropertyChangedSignal("ChatAvailabilityStatus")
 	end
-}
+
+	useEventConnection(v3, function()
+		if subjectPlayer then
+			setState(subjectPlayer.ChatAvailabilityStatus)
+		end
+	end, {})
+
+	React.useEffect(function()
+		if props.value ~= nil then
+			setState(props.value)
+		end
+	end, { props.value })
+
+	local v4 = React.useMemo(function()
+		return resolve(state) -- inferred equivalent call
+	end, { state })
+
+	return React.createElement(context.Provider, { value = v4 }, props.children)
+end
+
+ChatAvailabilityContext.resolve = resolve
+
+function ChatAvailabilityContext.useLocalUserChatAvailability()
+	return React.useContext(context)
+end
+
+return ChatAvailabilityContext

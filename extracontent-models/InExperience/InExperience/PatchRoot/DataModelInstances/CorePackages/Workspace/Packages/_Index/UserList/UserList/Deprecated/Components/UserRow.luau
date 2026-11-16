@@ -1,31 +1,35 @@
-local Parent = script:FindFirstAncestor("UserList").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local EnumsRadius = Foundation.Enums.Radius
+local parent = script:FindFirstAncestor("UserList").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Radius = Foundation.Enums.Radius
 local Skeleton = Foundation.Skeleton
+
 local Avatar = Foundation.Avatar
 local InputSize = Foundation.Enums.InputSize
 local useTokens = Foundation.Hooks.useTokens
 
-local function UserRow(t1: {[any]: any}) -- line: 26
-	-- upvalues: useTokens (copy), React (copy), Avatar (copy), InputSize (copy), Foundation (copy), Skeleton (copy), EnumsRadius (copy)
-	local v11 = t1.displayName == "" or t1.username == ""
-	local displayName = t1.displayName
-	local v13 = `@{ t1.username }`
-	local num = tonumber(t1.userId)
-	local v15 = useTokens()
+local function UserRow(props)
+	local v = props.displayName == "" or props.username == ""
+	local displayName = props.displayName
+	local formatted = `@{props.username}`
+	local userId = tonumber(props.userId)
 
-	if num == nil then
+	local v2 = useTokens()
+
+	if userId == nil then
 		return nil
 	end
 
-	return React.createElement("TextButton", {
+	local createElement = React.createElement
+	local onActivatedsByActivated = {
 		Size = UDim2.new(1, 0, 0, 48),
 		BackgroundTransparency = 1,
 		Text = "",
 		BorderSizePixel = 0,
-		[React.Event.Activated] = t1.onActivated
-	}, {
+		[React.Event.Activated] = props.onActivated
+	}
+	local v3 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -33,33 +37,53 @@ local function UserRow(t1: {[any]: any}) -- line: 26
 			Padding = UDim.new(0, 12)
 		}),
 		Avatar = React.createElement(Avatar, {
-			LayoutOrder = 1,
-			userId = num,
+			userId = userId,
 			size = InputSize.Large,
-			userPresence = t1.userPresence,
-			backgroundStyle = v15.Color.Shift.Shift_300
+			userPresence = props.userPresence,
+			backgroundStyle = v2.Color.Shift.Shift_300,
+			LayoutOrder = 1
 		}),
-		UserInfo = React.createElement(Foundation.View, {
-			tag = "size-full-0 auto-y col gap-xsmall align-x-left align-y-center",
-			LayoutOrder = 2
-		}, {
-			DisplayName = if v11 then nil else React.createElement(Foundation.Text, {
-				LayoutOrder = 1,
-				tag = "auto-xy text-title-medium content-emphasis text-align-x-left",
-				Text = displayName
-			}),
-			Username = if v11 then nil else React.createElement(Foundation.Text, {
-				LayoutOrder = 2,
-				tag = "auto-xy text-body-medium content-default text-align-x-left",
-				Text = v13
-			}),
-			ShimmerDisplayName = if not v11 then nil else React.createElement(Skeleton, {
-				LayoutOrder = 1,
-				Size = UDim2.new(0.8, 0, 0, v15.Typography.TitleMedium.FontSize + v15.Typography.BodyMedium.FontSize),
-				radius = EnumsRadius.Circle
-			})
+		UserInfo = 0
+	}
+
+	local createElement2 = React.createElement
+	local view = Foundation.View
+	local displayName2
+
+	if not v then
+		displayName2 = React.createElement(Foundation.Text, {
+			LayoutOrder = 1,
+			Text = displayName,
+			tag = "auto-xy text-title-medium content-emphasis text-align-x-left"
 		})
-	})
+	end
+
+	local username
+
+	if not v then
+		username = React.createElement(Foundation.Text, {
+			LayoutOrder = 2,
+			Text = formatted,
+			tag = "auto-xy text-body-medium content-default text-align-x-left"
+		})
+	end
+
+	local shimmerDisplayName
+
+	if v then
+		shimmerDisplayName = React.createElement(Skeleton, {
+			LayoutOrder = 1,
+			Size = UDim2.new(0.8, 0, 0, v2.Typography.TitleMedium.FontSize + v2.Typography.BodyMedium.FontSize),
+			radius = Radius.Circle
+		})
+	end
+
+	v3.UserInfo = createElement2(
+		view,
+		{ tag = "size-full-0 auto-y col gap-xsmall align-x-left align-y-center", LayoutOrder = 2 },
+		{ DisplayName = displayName2, Username = username, ShimmerDisplayName = shimmerDisplayName }
+	)
+	return createElement("TextButton", onActivatedsByActivated, v3)
 end
 
 return UserRow

@@ -1,141 +1,99 @@
-local Parent = script:FindFirstAncestor("DiscoveryHeroUnit").Parent
-local React = require(Parent.React)
-local FFlagLuaAppHeroUnitParallaxUpdates = require(Parent.SharedFlags).FFlagLuaAppHeroUnitParallaxUpdates
+local parent = script:FindFirstAncestor("DiscoveryHeroUnit").Parent
+local React = require(parent.React)
 
-local function getNormalizedCenterPosition(p1, p2) -- line: 10
-	if p2 and p1 then
-		local AbsolutePositionY = p1.AbsolutePosition.Y
-		local AbsoluteWindowSizeY = p1.AbsoluteWindowSize.Y
-		local v11 = p2.AbsolutePosition.Y + p1.CanvasPosition.Y - AbsolutePositionY + p2.AbsoluteSize.Y * 0.5 - p1.CanvasPosition.Y
+local function customEasing(p, p2, p3, p4, p5) -- 2 equivalent calls inferred from this helper
+	return (1 - p) ^ 3 * p2 + 3 * (1 - p) ^ 2 * p * p3 + 3 * (1 - p) * p ^ 2 * p4 + p ^ 3 * p5
+end
 
-		if AbsoluteWindowSizeY == 0 then
-			return nil
+local ParallaxUtils = {}
+
+function ParallaxUtils.useNormalizedVerticalProgress(p, p2)
+	local v, v2 = React.useBinding(-1)
+
+	React.useEffect(function()
+		local v3
+
+		if p and p.current and p2.current then
+			local current = p2.current
+			local current2 = p.current
+
+			local y = current2.AbsolutePosition.Y
+			local y2 = current2.AbsoluteWindowSize.Y
+
+			local function calculateOffset() -- 1 equivalent call inferred from this helper
+				return current.AbsolutePosition.Y + current2.CanvasPosition.Y - y
+			end
+			local v4 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - y
+
+			local function updateBinding() -- 1 equivalent call inferred from this helper
+				if y2 == 0 then
+					return
+				end
+
+				v2((v4 - current2.CanvasPosition.Y) / y2)
+			end
+
+			local function updateWindowParams()
+				y = current2.AbsolutePosition.Y
+				y2 = current2.AbsoluteWindowSize.Y
+				v4 = calculateOffset() -- inferred equivalent call
+				updateBinding() -- inferred equivalent call
+			end
+
+			y = current2.AbsolutePosition.Y
+			y2 = current2.AbsoluteWindowSize.Y
+			v4 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - y
+
+			if y2 ~= 0 then
+				v2((v4 - current2.CanvasPosition.Y) / y2)
+			end
+
+			v3 = {
+				current2:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateWindowParams),
+				current2:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(updateWindowParams),
+				current2:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(updateWindowParams),
+				current2:GetPropertyChangedSignal("CanvasPosition"):Connect(updateBinding)
+			}
+		else
+			v3 = {}
 		end
 
-		return v11 / AbsoluteWindowSizeY
+		return function()
+			for _, connection in v3 do
+				connection:Disconnect()
+			end
+		end
+	end, { p2, p })
+
+	return v
+end
+
+function ParallaxUtils.getYPositionOffsetForMotion(value: number, p: number, p2: number, p3: number)
+	local v = math.clamp(value, -1, 1)
+
+	if v >= 0 then
+		local v2 = customEasing(v, 0, 0.3, 0.6, 1) -- inferred equivalent call
+		return p2 * v2 + p3 * (1 - v2)
 	end
 
-	return nil
+	local v2 = customEasing(-v, 0, 0.3, 0.6, 1) -- inferred equivalent call
+	return p * v2 + p3 * (1 - v2)
 end
-local function getNormalizedTopPosition(p3, p4) -- line: 32
-	if p4 and p3 then
-		local AbsolutePositionY = p3.AbsolutePosition.Y
-		local AbsoluteWindowSizeY = p3.AbsoluteWindowSize.Y
-		local v16 = p4.AbsolutePosition.Y + p3.CanvasPosition.Y - AbsolutePositionY - p3.CanvasPosition.Y
 
-		if AbsoluteWindowSizeY == 0 then
-			return nil
-		end
-
-		return v16 / AbsoluteWindowSizeY
+function ParallaxUtils.getNormalizedTopPosition(data, p)
+	if not (p and data) then
+		return nil
 	end
 
-	return nil
+	local y = data.AbsolutePosition.Y
+	local y2 = data.AbsoluteWindowSize.Y
+	local v = p.AbsolutePosition.Y + data.CanvasPosition.Y - y - data.CanvasPosition.Y
+
+	if y2 == 0 then
+		return nil
+	end
+
+	return v / y2
 end
-local function customEasing(p5, p6, p7, p8, p9) -- line: 123
-	return (1 - p5) ^ 3 * p6 + 3 * (1 - p5) ^ 2 * p5 * p7 + 3 * (1 - p5) * p5 ^ 2 * p8 + p5 ^ 3 * p9
-end
 
-return {
-	useNormalizedVerticalProgress = function(t1: {[any]: any}, t2: {[any]: any}) -- line: 55
-		-- upvalues: React (copy)
-		local v19, v20 = React.useBinding(-1)
-
-		React.useEffect(function() -- line: 62
-			-- upvalues: t1 (copy), t2 (copy), v20 (copy)
-			local t3 = {}
-
-			if t1 and (t1.current and t2.current) then
-				local current = t2.current
-				local current2 = t1.current
-				local AbsolutePositionY = current2.AbsolutePosition.Y
-				local AbsoluteWindowSizeY = current2.AbsoluteWindowSize.Y
-
-				local function calculateOffset() -- line: 72
-					-- upvalues: current (copy), current2 (copy), AbsolutePositionY (ref)
-					return current.AbsolutePosition.Y + current2.CanvasPosition.Y - AbsolutePositionY
-				end
-
-				local u42 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - AbsolutePositionY
-
-				local function updateBinding() -- line: 79
-					-- upvalues: AbsoluteWindowSizeY (ref), u42 (ref), current2 (copy), v20 (copy)
-					if AbsoluteWindowSizeY == 0 then
-						return
-					end
-
-					local v46 = (u42 - current2.CanvasPosition.Y) / AbsoluteWindowSizeY
-
-					v20(v46)
-				end
-				local function updateWindowParams() -- line: 90
-					-- upvalues: AbsolutePositionY (ref), current2 (copy), AbsoluteWindowSizeY (ref), u42 (ref), current (copy), v20 (copy)
-					AbsolutePositionY = current2.AbsolutePosition.Y
-					AbsoluteWindowSizeY = current2.AbsoluteWindowSize.Y
-					u42 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - AbsolutePositionY
-
-					if AbsoluteWindowSizeY == 0 then
-						return
-					end
-
-					local v47 = (u42 - current2.CanvasPosition.Y) / AbsoluteWindowSizeY
-
-					v20(v47)
-				end
-
-				AbsolutePositionY = current2.AbsolutePosition.Y
-				AbsoluteWindowSizeY = current2.AbsoluteWindowSize.Y
-				u42 = current.AbsolutePosition.Y + current2.CanvasPosition.Y - AbsolutePositionY
-
-				if AbsoluteWindowSizeY ~= 0 then
-					local v45 = (u42 - current2.CanvasPosition.Y) / AbsoluteWindowSizeY
-
-					v20(v45)
-				end
-
-				t3 = {
-					current2:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateWindowParams),
-					current2:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(updateWindowParams),
-					current2:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(updateWindowParams),
-					current2:GetPropertyChangedSignal("CanvasPosition"):Connect(updateBinding)
-				}
-			end
-
-			return function() -- line: 106
-				-- upvalues: t3 (ref)
-				for _, v49 in t3 do
-					v49:Disconnect()
-				end
-			end
-		end, {
-			t2,
-			t1
-		})
-
-		return v19
-	end,
-	getYPositionOffsetForMotion = function(n1: number, n2: number, n3: number, n4: number) -- line: 127
-		-- upvalues: FFlagLuaAppHeroUnitParallaxUpdates (copy)
-		if FFlagLuaAppHeroUnitParallaxUpdates then
-			local v30 = math.clamp(n1, -1, 1)
-
-			if v30 >= 0 then
-				local v31 = (1 - v30) ^ 3 * 0 + 3 * (1 - v30) ^ 2 * v30 * 0.3 + 3 * (1 - v30) * v30 ^ 2 * 0.6 + v30 ^ 3 * 1
-
-				return n3 * v31 + n4 * (1 - v31)
-			end
-
-			local v32 = -v30
-			local v33 = (1 - v32) ^ 3 * 0 + 3 * (1 - v32) ^ 2 * v32 * 0.3 + 3 * (1 - v32) * v32 ^ 2 * 0.6 + v32 ^ 3 * 1
-
-			return n2 * v33 + n4 * (1 - v33)
-		end
-
-		local v34 = math.clamp(n1, 0, 1)
-		local v35 = ((1 - v34) ^ 3 * 0.25 + 3 * (1 - v34) ^ 2 * v34 * 0.25 + 3 * (1 - v34) * v34 ^ 2 * 0.5 + v34 ^ 3 * 1 - 0.25) / 0.75
-
-		return n3 * v35 + n2 * (1 - v35)
-	end,
-	getNormalizedCenterPosition = if not FFlagLuaAppHeroUnitParallaxUpdates then getNormalizedCenterPosition else nil,
-	getNormalizedTopPosition = if not FFlagLuaAppHeroUnitParallaxUpdates then nil else getNormalizedTopPosition
-}
+return ParallaxUtils

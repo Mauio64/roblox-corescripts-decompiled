@@ -1,21 +1,18 @@
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
+local parent = SquadsCore.Parent
+
 local useCurrentSquadId = require(SquadsCore.Hooks.useCurrentSquadId)
-local React = require(SquadsCoreParent.React)
-local usePrevious = require(SquadsCoreParent.RoactUtils).Hooks.usePrevious
 
-return function(p1: ((...any) -> ...any)?) -- line: 9
-	-- upvalues: useCurrentSquadId (copy), usePrevious (copy), React (copy)
-	local v7 = useCurrentSquadId() or ""
-	local v8 = usePrevious(v7) or ""
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local usePrevious = RoactUtils.Hooks.usePrevious
 
-	React.useEffect(function() -- line: 12
-		-- upvalues: v7 (copy), v8 (copy), p1 (copy)
-		if v7 ~= v8 and (v8 ~= "" and p1) then
-			p1()
+return function(callback)
+	local v = useCurrentSquadId() or ""
+	local v2 = usePrevious(v) or ""
+	React.useEffect(function()
+		if v ~= v2 and v2 ~= "" and callback then
+			callback()
 		end
-	end, {
-		v7,
-		p1
-	})
+	end, { v, callback })
 end

@@ -1,74 +1,65 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
+local parent = BuildExperience.Parent
+
 local LocalizationService = game:GetService("LocalizationService")
-local Foundation = require(BuildExperienceParent.Foundation)
-local Localization = require(BuildExperienceParent.Localization)
-local React = require(BuildExperienceParent.React)
-local ReactRoblox = require(BuildExperienceParent.ReactRoblox)
-local RobloxAppLocales = require(BuildExperienceParent.RobloxAppLocales)
+
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+
 local FoundationProvider = Foundation.FoundationProvider
 local LocalizationProvider = Localization.LocalizationProvider
 local Device = Foundation.Enums.Device
-local Theme = Foundation.Enums.Theme
-local Localization2 = RobloxAppLocales.Localization
+local ColorMode = Foundation.Enums.ColorMode
+local localization = RobloxAppLocales.Localization
 local useStyleSheet = Foundation.Hooks.useStyleSheet
-local t1 = {
-	Light = Theme.Light,
-	Dark = Theme.Dark
-}
-local t2 = {
-	Console = Device.Console,
-	Desktop = Device.Desktop
-}
 
-local function StyleLinkPortal(t3: {[any]: any}) -- line: 29
-	-- upvalues: useStyleSheet (copy), ReactRoblox (copy), React (copy)
-	local v19 = useStyleSheet()
+local v = { Light = ColorMode.Light, Dark = ColorMode.Dark }
 
-	return ReactRoblox.createPortal(React.createElement("StyleLink", {
-		StyleSheet = v19
-	}), t3.overlay)
+local v2 = { Console = Device.Console, Desktop = Device.Desktop }
+
+local function StyleLinkPortal(p)
+	local styleSheet = useStyleSheet()
+	return ReactRoblox.createPortal(React.createElement("StyleLink", { StyleSheet = styleSheet }), p.overlay)
 end
 
 return {
 	name = BuildExperience.Name,
 	roact = React,
 	reactRoblox = ReactRoblox,
-	mapStory = function(p1) -- line: 39
-		-- upvalues: React (copy), Localization2 (copy), LocalizationService (copy), LocalizationProvider (copy), FoundationProvider (copy), t1 (copy), t2 (copy), StyleLinkPortal (copy)
-		return function(p2) -- line: 40
-			-- upvalues: React (copy), Localization2 (copy), LocalizationService (copy), LocalizationProvider (copy), FoundationProvider (copy), t1 (copy), t2 (copy), p1 (copy), StyleLinkPortal (copy)
-			local v22 = React.useRef(Instance.new("Frame"))
+	mapStory = function(p)
+		return function(props)
+			local ref = React.useRef(Instance.new("Frame"))
 
-			if v22.current.Parent ~= p2.focus then
-				v22.current.Parent = p2.focus
+			if ref.current.Parent ~= props.focus then
+				ref.current.Parent = props.focus
 			end
 
-			React.useLayoutEffect(function() -- line: 46
-				-- upvalues: v22 (copy)
-				v22.current.Size = UDim2.fromScale(1, 1)
-				v22.current.BackgroundTransparency = 1
+			React.useLayoutEffect(function()
+				ref.current.Size = UDim2.fromScale(1, 1)
+				ref.current.BackgroundTransparency = 1
 			end, {})
 
-			local v23 = React.useMemo(function() -- line: 51
-				-- upvalues: Localization2 (copy), LocalizationService (copy)
-				return Localization2.new(LocalizationService.RobloxLocaleId)
+			local localization2 = React.useMemo(function()
+				return localization.new(LocalizationService.RobloxLocaleId)
 			end, {})
 
-			return React.createElement(LocalizationProvider, {
-				localization = v23
-			}, {
-				FoundationProvider = React.createElement(FoundationProvider, {
-					theme = t1[p2.theme],
-					device = t2[p2.platform],
-					preferences = p2.settings,
-					overlayGui = v22.current
-				}, {
-					Story = React.createElement(p1, p2),
-					StyleLink = React.createElement(StyleLinkPortal, {
-						overlay = v22.current
-					})
-				})
+			return React.createElement(LocalizationProvider, { localization = localization2 }, {
+				FoundationProvider = React.createElement(
+					FoundationProvider,
+					{
+						colorMode = v[props.theme],
+						device = v2[props.platform],
+						preferences = props.settings,
+						overlayGui = ref.current
+					},
+					{
+						Story = React.createElement(p, props),
+						StyleLink = React.createElement(StyleLinkPortal, { overlay = ref.current })
+					}
+				)
 			})
 		end
 	end,

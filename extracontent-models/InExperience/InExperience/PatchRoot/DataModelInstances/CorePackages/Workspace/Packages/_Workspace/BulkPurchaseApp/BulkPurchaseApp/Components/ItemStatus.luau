@@ -1,35 +1,45 @@
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
-local BulkPurchaseAppParent = BulkPurchaseApp.Parent
-local React = require(BulkPurchaseAppParent.React)
-local useDesignTokens = require(BulkPurchaseAppParent.Style).useDesignTokens
-local useLocalization = require(BulkPurchaseAppParent.Localization).Hooks.useLocalization
-local StyledTextLabel = require(BulkPurchaseAppParent.UIBlox).App.Text.StyledTextLabel
+local parent = BulkPurchaseApp.Parent
+local React = require(parent.React)
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local UIBlox = require(parent.UIBlox)
+
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local ItemStatusToItemStatusKey = require(BulkPurchaseApp.Enums.ItemStatusToItemStatusKey)
 local ItemStatusKeyToLocalizationKey = require(BulkPurchaseApp.Enums.ItemStatusKeyToLocalizationKey)
 
-local function mapTokens(p1) -- line: 12
+local function mapTokens(p)
 	return {
-		successColor = p1.Color.System.Success,
-		failureColor = p1.Color.System.Alert,
-		fontStyle = p1.Typography.BodySmall
+		successColor = p.Color.System.Success,
+		failureColor = p.Color.System.Alert,
+		fontStyle = p.Typography.BodySmall
 	}
 end
-local function ItemStatus(p2) -- line: 24
-	-- upvalues: useDesignTokens (copy), mapTokens (copy), useLocalization (copy), ItemStatusKeyToLocalizationKey (copy), ItemStatusToItemStatusKey (copy), React (copy), StyledTextLabel (copy)
-	local v13 = useDesignTokens(mapTokens)
-	local v14 = useLocalization(ItemStatusKeyToLocalizationKey)
-	local v15 = if p2.status ~= Enum.MarketplaceItemPurchaseStatus.Success then v13.failureColor else v13.successColor
-	local v16 = v14[ItemStatusToItemStatusKey[p2.status]]
 
+local function ItemStatus(p)
+	local v = useDesignTokens(mapTokens)
+	local v2 = useLocalization(ItemStatusKeyToLocalizationKey)
+	local colorStyle
+
+	if p.status == Enum.MarketplaceItemPurchaseStatus.Success then
+		colorStyle = v.successColor
+	else
+		colorStyle = v.failureColor
+	end
+
+	local text = v2[ItemStatusToItemStatusKey[p.status]]
 	return React.createElement(StyledTextLabel, {
+		fontStyle = v.fontStyle,
+		colorStyle = colorStyle,
+		text = text,
 		textWrapped = true,
-		fontStyle = v13.fontStyle,
-		colorStyle = v15,
-		text = v16,
 		size = UDim2.fromScale(1, 1),
 		textXAlignment = Enum.TextXAlignment.Right,
 		textYAlignment = Enum.TextYAlignment.Top,
-		lineHeight = v13.fontStyle.LineHeight
+		lineHeight = v.fontStyle.LineHeight
 	})
 end
 

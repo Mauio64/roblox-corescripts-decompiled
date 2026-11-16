@@ -1,82 +1,111 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local HttpClient = require(Parent.HttpClient)
-local UrlBuilder = require(Parent.UrlBuilder)
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local parent = DataHydration.Parent
+
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
 local UrlBase = UrlBuilder.UrlBase
 
+local withCsrfRetry = require(DataHydration.withCsrfRetry)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildWithGroups = SharedFlags.FFlagBuildWithGroups
 require(script.Parent.UniverseSearchStoreTypes)
 
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function fetchUniverseSearch(p1, t1: {[any]: any}?) -- line: 18
-	-- upvalues: UrlBase (copy), fetch (copy), UrlBuilder (copy), asPromise (copy)
-	local v10 = t1 or {}
-	local v11 = v10.baseUrl or UrlBase.APIS
-	local t2 = {}
+local function fetchUniverseSearch(data, options)
+	local v = options or {}
+	local baseUrl = v.baseUrl or UrlBase.APIS
 
-	if p1.creatorType ~= nil then
-		t2.CreatorType = p1.creatorType
+	if FFlagBuildWithGroups and data.creators ~= nil then
+		return asPromise((fetch({
+			network = withCsrfRetry(v.network or HttpClient.createRequestInternalNetwork()),
+			method = "POST",
+			url = baseUrl .. "/universes/v1/search",
+			body = {
+				creators = data.creators,
+				surface = data.surface,
+				search = data.search,
+				isArchived = data.isArchived,
+				isPublic = data.isPublic,
+				isShared = data.isShared,
+				isTeamCreateEnabled = data.isTeamCreateEnabled,
+				sortParam = data.sortParam,
+				sortOrder = data.sortOrder,
+				needsAssetOptions = data.needsAssetOptions,
+				limit = data.pageSize,
+				cursor = data.cursor
+			},
+			analyticsKey = "universes-search.multi-creator-search",
+			decode = function(p)
+				return p
+			end
+		})))
 	end
 
-	if p1.creatorTargetId ~= nil then
-		t2.CreatorTargetId = p1.creatorTargetId
+	local v2 = {}
+
+	if data.creatorType ~= nil then
+		v2.CreatorType = data.creatorType
 	end
 
-	if p1.surface ~= nil then
-		t2.Surface = p1.surface
+	if data.creatorTargetId ~= nil then
+		v2.CreatorTargetId = data.creatorTargetId
 	end
 
-	if p1.search ~= nil then
-		t2.Search = p1.search
+	if data.surface ~= nil then
+		v2.Surface = data.surface
 	end
 
-	if p1.isArchived ~= nil then
-		t2.IsArchived = tostring(p1.isArchived)
+	if data.search ~= nil then
+		v2.Search = data.search
 	end
 
-	if p1.isPublic ~= nil then
-		t2.IsPublic = tostring(p1.isPublic)
+	if data.isArchived ~= nil then
+		v2.IsArchived = tostring(data.isArchived)
 	end
 
-	if p1.isShared ~= nil then
-		t2.IsShared = tostring(p1.isShared)
+	if data.isPublic ~= nil then
+		v2.IsPublic = tostring(data.isPublic)
 	end
 
-	if p1.isTeamCreateEnabled ~= nil then
-		t2.IsTeamCreateEnabled = tostring(p1.isTeamCreateEnabled)
+	if data.isShared ~= nil then
+		v2.IsShared = tostring(data.isShared)
 	end
 
-	if p1.sortParam ~= nil then
-		t2.SortParam = p1.sortParam
+	if data.isTeamCreateEnabled ~= nil then
+		v2.IsTeamCreateEnabled = tostring(data.isTeamCreateEnabled)
 	end
 
-	if p1.sortOrder ~= nil then
-		t2.SortOrder = p1.sortOrder
+	if data.sortParam ~= nil then
+		v2.SortParam = data.sortParam
 	end
 
-	if p1.needsAssetOptions ~= nil then
-		t2.NeedsAssetOptions = tostring(p1.needsAssetOptions)
+	if data.sortOrder ~= nil then
+		v2.SortOrder = data.sortOrder
 	end
 
-	if p1.pageIndex ~= nil then
-		t2.PageIndex = p1.pageIndex
+	if data.needsAssetOptions ~= nil then
+		v2.NeedsAssetOptions = tostring(data.needsAssetOptions)
 	end
 
-	if p1.pageSize ~= nil then
-		t2.PageSize = p1.pageSize
+	if data.pageIndex ~= nil then
+		v2.PageIndex = data.pageIndex
 	end
 
-	local v13 = fetch({
+	if data.pageSize ~= nil then
+		v2.PageSize = data.pageSize
+	end
+
+	return asPromise((fetch({
+		network = v.network,
 		method = "GET",
+		url = UrlBuilder.UrlBuilder.addQueryString(baseUrl .. "/universes/v1/search", v2),
 		analyticsKey = "universes-search.search",
-		network = v10.network,
-		url = UrlBuilder.UrlBuilder.addQueryString(v11 .. "/universes/v1/search", t2),
-		decode = function(p2) -- line: 72
-			return p2
+		decode = function(p)
+			return p
 		end
-	})
-
-	return asPromise(v13)
+	})))
 end
 
 return fetchUniverseSearch

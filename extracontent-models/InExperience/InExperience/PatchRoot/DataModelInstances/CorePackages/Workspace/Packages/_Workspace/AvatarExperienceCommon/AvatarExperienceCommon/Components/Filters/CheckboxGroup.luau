@@ -1,106 +1,117 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
-local View = require(Parent.Foundation).View
-local RoactGamepad = require(Parent.RoactGamepad)
-local Focusable = RoactGamepad.Focusable
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 
-require(Parent.Dash)
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local RoactGamepad = require(parent.RoactGamepad)
+local Focusable = RoactGamepad.Focusable
+require(parent.Dash)
 
 local CheckboxButtonItem = require(script.Parent.CheckboxButtonItem)
 
-local function CheckboxGroup(t1: {[any]: any}) -- line: 65
-	-- upvalues: RoactGamepad (copy), React (copy), Focusable (copy), CheckboxButtonItem (copy), View (copy)
-	local v10 = RoactGamepad.useRefCache()
-	local v11, v12 = React.useBinding(0)
-	local v13 = RoactGamepad.useRefCache()
-	local v14 = React.useCallback(function() -- line: 71
-		-- upvalues: t1 (copy), v13 (copy), v12 (copy)
-		local n1 = 0
+local function CheckboxGroup(props)
+	local v = RoactGamepad.useRefCache()
 
-		for _, v25 in t1.items do
-			n1 += v13[v25.id].current or 0
+	local v2, v3 = React.useBinding(0)
+	local v4 = RoactGamepad.useRefCache()
+
+	local v5 = React.useCallback(function()
+		local total = 0
+
+		for _, item in props.items do
+			total += v4[item.id].current or 0
 		end
 
-		v12(n1)
+		v3(total)
 
-		if t1.onHeightChanged then
-			t1.onHeightChanged(n1)
+		if props.onHeightChanged then
+			props.onHeightChanged(total)
 		end
-	end, {
-		t1.items,
-		v13,
-		v12,
-		t1.onHeightChanged
-	})
-	local t2 = {
+	end, { props.items, v4, v3, props.onHeightChanged })
+
+	local children = {
 		layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 1)
 		})
 	}
 
-	for v16, v17 in t1.items do
-		local v18 = false
+	for k, item in props.items do
+		local v6
 
-		if t1.selectedValue then
-			v18 = table.find(t1.selectedValue, v17.id) ~= nil
+		if props.selectedValue then
+			v6 = table.find(props.selectedValue, item.id) ~= nil
+		else
+			v6 = false
 		end
 
-		local v19 = v10["defaultChild-" .. v16]
+		local v7 = v["defaultChild-" .. k]
 
-		t2["checkboxItem" .. v17.id] = React.createElement(Focusable[CheckboxButtonItem], {
-			id = v17.id,
-			text = v17.text,
-			onActivated = t1.onActivated,
-			isSelected = v18,
-			isDisabled = v17.isDisabled,
-			layoutOrder = v16,
-			itemHeight = t1.itemHeight,
-			customView = v17.customView,
-			expandedView = v17.expandedView,
-			expandedViewHeight = v17.expandedViewHeight,
-			useDefaultControlState = t1.useDefaultControlState,
-			hideDivider = t1.hideDividers or v16 == #t1.items,
-			ref = v10[v16],
-			defaultChildRef = v19,
-			defaultChild = v19,
-			restorePreviousChildFocus = v18,
-			NextSelectionUp = if not (v16 > 1) then nil else v10[v16 - 1],
-			NextSelectionDown = if not (v16 < #t1.items) then nil else v10[v16 + 1],
-			onHeightChanged = React.useCallback(function(n2: number) -- line: 116
-				-- upvalues: v13 (copy), v17 (copy), v14 (copy)
-				v13[v17.id].current = n2
-				v14()
-			end, {
-				v17.id,
-				v13,
-				v14
-			})
-		})
+		local v8 = "checkboxItem" .. item.id
+		local createElement = React.createElement
+		local v9 = Focusable[CheckboxButtonItem]
+		local v10 = {
+			id = item.id,
+			text = item.text,
+			onActivated = props.onActivated,
+			isSelected = v6,
+			isDisabled = item.isDisabled,
+			layoutOrder = k,
+			itemHeight = props.itemHeight,
+			customView = item.customView,
+			expandedView = item.expandedView,
+			expandedViewHeight = item.expandedViewHeight,
+			useDefaultControlState = props.useDefaultControlState,
+			hideDivider = props.hideDividers or k == #props.items,
+			ref = v[k],
+			defaultChildRef = v7,
+			defaultChild = v7,
+			restorePreviousChildFocus = v6,
+			NextSelectionUp = 0,
+			NextSelectionDown = 0,
+			onHeightChanged = 0
+		}
+		local nextSelectionUp
+
+		if k > 1 then
+			nextSelectionUp = v[k - 1]
+		end
+
+		v10.NextSelectionUp = nextSelectionUp
+		local nextSelectionDown
+
+		if k < #props.items then
+			nextSelectionDown = v[k + 1]
+		end
+
+		v10.NextSelectionDown = nextSelectionDown
+
+		v10.onHeightChanged = React.useCallback(function(current: number)
+			v4[item.id].current = current
+			v5()
+		end, { item.id, v4, v5 })
+		children[v8] = createElement(v9, v10)
 	end
 
-	local v20 = t1.items and #t1.items > 0
+	local v6 = props.items and #props.items > 0
 
-	return React.createElement(v20 and Focusable[View] or View, {
-		BackgroundTransparency = 1,
-		defaultChild = v20 and v10[1] or nil,
-		Size = v11:map(function(p1) -- line: 127
-			return UDim2.new(1, 0, 0, p1)
+	return React.createElement(v6 and Focusable[View] or View, {
+		defaultChild = v6 and v[1] or nil,
+		Size = v2:map(function(p)
+			return UDim2.new(1, 0, 0, p)
 		end),
-		LayoutOrder = t1.layoutOrder,
-		NextSelectionLeft = t1.NextSelectionLeft,
-		NextSelectionRight = t1.NextSelectionRight,
-		NextSelectionDown = t1.NextSelectionDown,
-		NextSelectionUp = t1.NextSelectionUp,
-		restorePreviousChildFocus = v20 or nil,
-		ref = t1.frameRef
-	}, t2)
+		BackgroundTransparency = 1,
+		LayoutOrder = props.layoutOrder,
+		NextSelectionLeft = props.NextSelectionLeft,
+		NextSelectionRight = props.NextSelectionRight,
+		NextSelectionDown = props.NextSelectionDown,
+		NextSelectionUp = props.NextSelectionUp,
+		restorePreviousChildFocus = v6 or nil,
+		ref = props.frameRef
+	}, children)
 end
 
-return React.forwardRef(function(p2, p3) -- line: 141
-	-- upvalues: React (copy), CheckboxGroup (copy), Cryo (copy)
-	return React.createElement(CheckboxGroup, Cryo.Dictionary.join(p2, {
-		frameRef = p3
-	}))
+return React.forwardRef(function(p, frameRef)
+	return React.createElement(CheckboxGroup, Cryo.Dictionary.join(p, { frameRef = frameRef }))
 end)

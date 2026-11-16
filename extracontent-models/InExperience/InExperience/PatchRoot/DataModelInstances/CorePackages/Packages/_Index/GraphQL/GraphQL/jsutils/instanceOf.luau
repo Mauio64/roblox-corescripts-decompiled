@@ -1,39 +1,34 @@
-local isNillish = require(script.Parent.Parent.luaUtils.isNillish).isNillish
+local isNillish = require(script.Parent.Parent.luaUtils.isNillish)
+local isNillish2 = isNillish.isNillish
 
-local function instanceOf(p1, p2) -- line: 10
-	-- upvalues: isNillish (copy)
-	if isNillish(p1) then
+local function instanceOf(p, p2): boolean
+	if isNillish2(p) or (typeof(p) ~= "table" or typeof(p2) ~= "table") then
 		return false
 	end
 
-	if typeof(p1) ~= "table" or typeof(p2) ~= "table" then
-		return false
-	end
-
-	if p2.new ~= nil and p1.new == p2.new then
+	if p2.new ~= nil and p.new == p2.new then
 		return true
 	end
 
-	local mt = getmetatable(p1)
+	local v = getmetatable(p)
 
-	repeat
-		local v6 = mt
-
-		if typeof(v6) ~= "table" then
-			return false
-		end
-
-		if p2 == v6.__index then
+	while typeof(v) == "table" do
+		if v.__index == p2 then
 			return true
 		end
 
-		mt = getmetatable(v6.__index)
-	until v6 == mt
+		local metatable = getmetatable(v.__index)
+
+		if v == metatable then
+			return false
+		end
+
+		v = metatable
+	end
 
 	return false
 end
 
-return function(p3, p4) -- line: 41
-	-- upvalues: instanceOf (copy)
-	return instanceOf(p3, p4)
+return function(p, p2)
+	return instanceOf(p, p2)
 end

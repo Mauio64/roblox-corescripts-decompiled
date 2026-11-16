@@ -1,44 +1,67 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local useDesignTokens = require(Parent.Style).useDesignTokens
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(parent.React)
 
-local function WidgetLayout(t1: {[any]: any}) -- line: 19
-	-- upvalues: useDesignTokens (copy), React (copy)
-	local v6 = useDesignTokens()
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
+local function WidgetLayout(props)
+	local v = useDesignTokens()
+	local createElement = React.createElement
+	local v2 = {
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		UIPadding = if not t1.padding then nil else React.createElement("UIPadding", {
-			PaddingLeft = t1.padding.left,
-			PaddingRight = t1.padding.right,
-			PaddingTop = t1.padding.top,
-			PaddingBottom = t1.padding.bottom
-		}),
+		BackgroundTransparency = 1,
+		LayoutOrder = props.LayoutOrder,
+		BorderSizePixel = 0
+	}
+	local uiPadding
+
+	if props.padding then
+		uiPadding = React.createElement("UIPadding", {
+			PaddingLeft = props.padding.left,
+			PaddingRight = props.padding.right,
+			PaddingTop = props.padding.top,
+			PaddingBottom = props.padding.bottom
+		})
+	end
+
+	local v3 = {
+		UIPadding = uiPadding,
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v6.Size.Size_300)
+			Padding = UDim.new(0, v.Size.Size_300)
 		}),
-		TopContent = if not t1.headerSlot then nil else React.createElement("Frame", {
+		TopContent = 0,
+		ItemGroup = 0
+	}
+	local topContent
+
+	if props.headerSlot then
+		topContent = React.createElement("Frame", {
 			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
 			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, t1.headerSlot),
-		ItemGroup = if not t1.contentSlot then nil else React.createElement("Frame", {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0
+		}, props.headerSlot)
+	end
+
+	v3.TopContent = topContent
+	local itemGroup
+
+	if props.contentSlot then
+		itemGroup = React.createElement("Frame", {
 			LayoutOrder = 2,
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
 			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, t1.contentSlot)
-	})
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0
+		}, props.contentSlot)
+	end
+
+	v3.ItemGroup = itemGroup
+	return createElement("Frame", v2, v3)
 end
 
 return WidgetLayout

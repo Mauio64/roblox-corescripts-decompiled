@@ -1,34 +1,44 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local IconSize = Foundation.Enums.IconSize
 
-local function Badge(t1: {[any]: any}) -- line: 32
-	-- upvalues: useTokens (copy), React (copy), Foundation (copy), IconSize (copy)
-	local v8 = useTokens()
+local function Badge(props)
+	local v = useTokens()
 
-	return React.createElement(Foundation.View, {
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v2 = {
 		tag = "auto-xy row align-x-center align-y-center bg-surface-300 radius-circle padding-small gap-xsmall",
 		BorderSizePixel = 0,
+		LayoutOrder = props.LayoutOrder,
 		Text = "",
-		LayoutOrder = t1.LayoutOrder,
-		onActivated = t1.onActivated
-	}, {
+		onActivated = props.onActivated
+	}
+	local v3 = {
 		Icon = React.createElement(Foundation.Icon, {
-			LayoutOrder = 1,
-			name = t1.icon,
-			variant = t1.iconVariant,
+			name = props.icon,
+			variant = props.iconVariant,
 			size = IconSize.Medium,
-			style = v8.Color.Content.Default
+			style = v.Color.Content.Default,
+			LayoutOrder = 1
 		}),
-		Text = if not t1.text then nil else React.createElement(Foundation.Text, {
+		Text = 0
+	}
+	local text
+
+	if props.text then
+		text = React.createElement(Foundation.Text, {
 			tag = "text-caption-large content-emphasis text-align-x-left auto-xy text-truncate-none",
-			LayoutOrder = 2,
-			Text = t1.text,
-			textStyle = v8.Color.Content.Default
+			Text = props.text,
+			textStyle = v.Color.Content.Default,
+			LayoutOrder = 2
 		})
-	})
+	end
+
+	v3.Text = text
+	return createElement(view, v2, v3)
 end
 
 return Badge

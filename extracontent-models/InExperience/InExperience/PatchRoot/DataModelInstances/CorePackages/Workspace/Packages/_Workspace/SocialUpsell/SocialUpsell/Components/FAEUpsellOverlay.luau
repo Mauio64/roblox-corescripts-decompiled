@@ -1,9 +1,12 @@
 local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
-local SocialUpsellParent = SocialUpsell.Parent
-local React = require(SocialUpsellParent.React)
-local SharedFlags = require(SocialUpsellParent.SharedFlags)
-local useDispatch = require(SocialUpsellParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local FoundationCloudAssets = require(SocialUpsellParent.FoundationCloudAssets)
+local parent = SocialUpsell.Parent
+
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+local FoundationCloudAssets = require(parent.FoundationCloudAssets)
 local FIntCommsFAELockTimestamp = require(SocialUpsell.Flag.FIntCommsFAELockTimestamp)
 local UpsellOverlay = require(SocialUpsell.Components.UpsellOverlay)
 local createCommonOverlayProps = require(SocialUpsell.Utils.createCommonOverlayProps)
@@ -12,202 +15,225 @@ local UpsellEntrySurfaceType = require(SocialUpsell.Analytics.Enum.UpsellEntrySu
 local SocialUpsellType = require(SocialUpsell.Enum.SocialUpsellType)
 local UpsellComponent = require(SocialUpsell.Analytics.Enum.UpsellComponent)
 local FFlagEnableCountdownBadge = require(SocialUpsell.Flag.FFlagEnableCountdownBadge)
-local FFlagSupportVPC = require(SocialUpsell.Flag.FFlagSupportVPC)
 local Assets = FoundationCloudAssets.Assets
 local preloadAsset = FoundationCloudAssets.preloadAsset
-local AmpUpsell = require(SocialUpsellParent.AmpUpsell)
-local OpenAmpWizardContainer = AmpUpsell.OpenAmpWizardContainer
-local AccessResponseEnum = AmpUpsell.AmpEnums.AccessResponseEnum
-local FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature = SharedFlags.FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature
-local FStringCoreContentAmpNameSpace = SharedFlags.FStringCoreContentAmpNameSpace
 
 preloadAsset("pictograms/chat_security")
+local pictogramschat_security = Assets["pictograms/chat_security"]
+local assetId = pictogramschat_security and pictogramschat_security.assetId or nil
 
-local v23 = Assets["pictograms/chat_security"]
-local v24 = v23 and v23.assetId or nil
 local FFlagAddFriendsPageFAEUpsell = SharedFlags.FFlagAddFriendsPageFAEUpsell
-local FFlagAddFriendsPageUpdateAmpRules = SharedFlags.FFlagAddFriendsPageUpdateAmpRules
-local FFlagMakeVPCFAECheckMoreGeneric = SharedFlags.FFlagMakeVPCFAECheckMoreGeneric
-local u28 = nil
+local assetId2
 
 if FFlagAddFriendsPageFAEUpsell then
 	preloadAsset("pictograms/lock_closed")
-
-	local v29 = Assets["pictograms/lock_closed"]
-
-	u28 = v29 and v29.assetId or nil
+	local pictogramslock_closed = Assets["pictograms/lock_closed"]
+	assetId2 = pictogramslock_closed and pictogramslock_closed.assetId or nil
+else
+	assetId2 = nil
 end
 
 local useSocialUpsellOverlayController = require(SocialUpsell.Hooks.useSocialUpsellOverlayController)
-local useLocalization = require(SocialUpsellParent.Localization).Hooks.useLocalization
-local FFlagEnableAEGIS2CommsFAEUpsell = SharedFlags.FFlagEnableAEGIS2CommsFAEUpsell
-local v33 = game:DefineFastFlag("AEGISPhase2ShowImageOnFAEOverlay", false)
-local v34 = game:DefineFastFlag("ForceAegisPhase2Modal", false)
-local FFlagTFWithActionsCheck = require(SocialUpsellParent.SharedFlags).FFlagTFWithActionsCheck
 
-return function(p1) -- line: 76
-	-- upvalues: useDispatch (copy), useSocialUpsellOverlayController (copy), useLocalization (copy), FFlagAddFriendsPageFAEUpsell (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), FFlagTFWithActionsCheck (copy), React (copy), v34 (copy), UpsellEntrySurfaceType (copy), UpsellComponent (copy), FFlagSupportVPC (copy), FFlagMakeVPCFAECheckMoreGeneric (copy), FFlagAddFriendsPageUpdateAmpRules (copy), SocialUpsellType (copy), OpenAmpWizardContainer (copy), FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature (copy), AccessResponseEnum (copy), FStringCoreContentAmpNameSpace (copy), startFacialAgeEstimation (copy), FFlagEnableCountdownBadge (copy), FIntCommsFAELockTimestamp (copy), UpsellOverlay (copy), createCommonOverlayProps (copy), u28 (ref), v33 (copy), v24 (copy)
-	local v37 = p1 or {}
-	local v38 = useDispatch()
-	local v39 = useSocialUpsellOverlayController(v37.isInExperience)
-	local v40 = useLocalization({
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local FFlagEnableAEGIS2CommsFAEUpsell = SharedFlags.FFlagEnableAEGIS2CommsFAEUpsell
+local defineFastFlag = game:DefineFastFlag("AEGISPhase2ShowImageOnFAEOverlay", false)
+local defineFastFlag2 = game:DefineFastFlag("ForceAegisPhase2Modal", false)
+
+return function(options)
+	local v = options or {}
+	local v2 = useDispatch()
+	local v3 = useSocialUpsellOverlayController(v.isInExperience)
+	local v4 = useLocalization({
 		ToKeepChattingLetsCheckYourAge = "Feature.FAE.Label.ToKeepChattingLetsCheckYourAge",
 		ModalBodyInApp = "Feature.FAE.Label.ModalBodyInApp",
 		LetsCheckYourAgeSoYouCanUseChat = "Feature.FAE.Label.LetsCheckYourAgeSoYouCanUseChat",
 		ModalBodyInAppV3 = "Feature.FAE.Label.ModalBodyInAppV3",
 		YourSafetyMattersLetsCheckYourAge = "Feature.FAE.Label.YourSafetyMattersLetsCheckYourAge",
 		YouNeedAnAgeCheckToUseChatThisMakesChatSafer = "Feature.FAE.Label.YouNeedAnAgeCheckToUseChatThisMakesChatSafer",
+		ChatWithFriends = FFlagAddFriendsPageFAEUpsell and "Feature.FAE.Label.ChatWithFriends" or nil,
+		GetASecureAgeCheckToUnlockChatAndAddTrustedFriends = FFlagAddFriendsPageFAEUpsell and "Feature.FAE.Label.GetASecureAgeCheckToUnlockChatAndAddTrustedFriends" or nil,
+		Unlock = FFlagAddFriendsPageFAEUpsell and "Feature.FAE.Action.Unlock" or nil,
 		Continue = "Feature.FAE.Action.Continue",
+		ThisAllowsYouToChatSafelyItOnlyTakesAMoment = FFlagEnableAEGIS2CommsFAEUpsell and "Feature.FAE.Label.ThisAllowsYouToChatSafelyItOnlyTakesAMoment" or nil,
+		UnlockChat = FFlagEnableAEGIS2CommsFAEUpsell and "Feature.FAE.Action.UnlockChat" or nil,
 		ThisHelpsYouToChatSafelyItOnlyTakesAMoment = "Feature.FAE.Label.ThisHelpsYouToChatSafelyItOnlyTakesAMoment",
-		ChatWithFriends = if not FFlagAddFriendsPageFAEUpsell then nil else "Feature.FAE.Label.ChatWithFriends",
-		GetASecureAgeCheckToUnlockChatAndAddTrustedFriends = if not FFlagAddFriendsPageFAEUpsell then nil else "Feature.FAE.Label.GetASecureAgeCheckToUnlockChatAndAddTrustedFriends",
-		Unlock = if not FFlagAddFriendsPageFAEUpsell then nil else "Feature.FAE.Action.Unlock",
-		ThisAllowsYouToChatSafelyItOnlyTakesAMoment = if not FFlagEnableAEGIS2CommsFAEUpsell then nil else "Feature.FAE.Label.ThisAllowsYouToChatSafelyItOnlyTakesAMoment",
-		UnlockChat = if not FFlagEnableAEGIS2CommsFAEUpsell then nil else "Feature.FAE.Action.UnlockChat",
-		LetsCheckYourAge = if not FFlagTFWithActionsCheck then nil else "Feature.FAE.Label.LetsCheckYourAge",
-		ToAddTrustedFriendDoAgeCheck = if not FFlagTFWithActionsCheck then nil else "Feature.FAE.Label.ModalBodyTFUnlock"
+		LetsCheckYourAge = "Feature.FAE.Label.LetsCheckYourAge",
+		ToAddTrustedFriendDoAgeCheck = "Feature.FAE.Label.ModalBodyTFUnlock"
 	})
-	local v41 = React.useRef(false)
-	local v42, v43 = React.useMemo(function() -- line: 105
-		-- upvalues: FFlagEnableAEGIS2CommsFAEUpsell (copy), v34 (copy), v37 (copy), v40 (copy), UpsellEntrySurfaceType (copy), UpsellComponent (copy), FFlagAddFriendsPageFAEUpsell (copy), FFlagTFWithActionsCheck (copy)
-		if FFlagEnableAEGIS2CommsFAEUpsell and (v34 or v37.isPhase2) then
-			return v40.LetsCheckYourAgeSoYouCanUseChat, v40.ThisHelpsYouToChatSafelyItOnlyTakesAMoment
+
+	local ref = React.useRef(false)
+
+	local useMemo = React.useMemo
+	local function fn()
+		if FFlagEnableAEGIS2CommsFAEUpsell and (defineFastFlag2 or v.isPhase2) then
+			return v4.LetsCheckYourAgeSoYouCanUseChat, v4.ThisHelpsYouToChatSafelyItOnlyTakesAMoment
 		end
 
-		if v37.upsellEntrySurface == UpsellEntrySurfaceType.Homepage and v37.upsellEntryComponent == UpsellComponent.Modal or v37.upsellEntrySurface == UpsellEntrySurfaceType.NotifPush then
-			return v40.YourSafetyMattersLetsCheckYourAge, v40.YouNeedAnAgeCheckToUseChatThisMakesChatSafer
+		if
+			v.upsellEntrySurface == UpsellEntrySurfaceType.Homepage and v.upsellEntryComponent == UpsellComponent.Modal
+			or v.upsellEntrySurface == UpsellEntrySurfaceType.NotifPush
+		then
+			return v4.YourSafetyMattersLetsCheckYourAge, v4.YouNeedAnAgeCheckToUseChatThisMakesChatSafer
 		end
 
-		if FFlagAddFriendsPageFAEUpsell and v37.upsellEntrySurface == UpsellEntrySurfaceType.AddFriendsPage then
-			return v40.ChatWithFriends, v40.GetASecureAgeCheckToUnlockChatAndAddTrustedFriends
+		if FFlagAddFriendsPageFAEUpsell and v.upsellEntrySurface == UpsellEntrySurfaceType.AddFriendsPage then
+			return v4.ChatWithFriends, v4.GetASecureAgeCheckToUnlockChatAndAddTrustedFriends
 		end
 
-		if FFlagTFWithActionsCheck and (v37.upsellEntrySurface == UpsellEntrySurfaceType.TrustedFriends or v37.upsellEntrySurface == UpsellEntrySurfaceType.TrustedFriendsInExperience) then
-			return v40.LetsCheckYourAge, v40.ToAddTrustedFriendDoAgeCheck
+		if
+			v.upsellEntrySurface == UpsellEntrySurfaceType.TrustedFriends
+			or v.upsellEntrySurface == UpsellEntrySurfaceType.TrustedFriendsInExperience
+		then
+			return v4.LetsCheckYourAge, v4.ToAddTrustedFriendDoAgeCheck
 		end
 
-		return v40.LetsCheckYourAgeSoYouCanUseChat, v40.ModalBodyInAppV3
-	end, {
-		if not FFlagEnableAEGIS2CommsFAEUpsell then nil else v37.isPhase2,
-		v37.upsellEntrySurface,
-		v40,
-		if not FFlagAddFriendsPageFAEUpsell then nil else v37.upsellEntryComponent
-	})
-	local v44 = React.useCallback(function() -- line: 144
-		-- upvalues: v39 (copy), v37 (copy), FFlagSupportVPC (copy), FFlagMakeVPCFAECheckMoreGeneric (copy), FFlagAddFriendsPageUpdateAmpRules (copy), SocialUpsellType (copy), v38 (copy), OpenAmpWizardContainer (copy), FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature (copy), AccessResponseEnum (copy), FStringCoreContentAmpNameSpace (copy), UpsellEntrySurfaceType (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), startFacialAgeEstimation (copy)
-		v39.closeSocialOverlay()
+		return v4.LetsCheckYourAgeSoYouCanUseChat, v4.ModalBodyInAppV3
+	end
 
-		if v37.onAccept then
-			v37.onAccept()
-		end
+	local isPhase2
 
-		if not FFlagSupportVPC then
-			if FFlagMakeVPCFAECheckMoreGeneric then
-				if FFlagAddFriendsPageUpdateAmpRules and v37.shouldIncludeVPC then
-					local v48 = v37.entryPointEventCtx or SocialUpsellType.FacialAgeEstimation .. (v37.upsellEntrySurface or "")
+	if FFlagEnableAEGIS2CommsFAEUpsell then
+		isPhase2 = v.isPhase2
+	end
 
-					v38(OpenAmpWizardContainer(FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature, function(p2, _) -- line: 162
-						-- upvalues: AccessResponseEnum (copy), v37 (copy)
-						if p2 == AccessResponseEnum.Granted then
-							if v37.onSuccess then
-								v37.onSuccess()
+	local upsellEntrySurface = v.upsellEntrySurface
+	local v5
 
-								return
-							end
-						elseif v37.onFailure then
-							v37.onFailure()
-						end
-					end, nil, v48, nil, FStringCoreContentAmpNameSpace))
+	if FFlagAddFriendsPageFAEUpsell then
+		v5 = v.upsellEntryComponent
+	end
 
-					return
-				end
-			elseif FFlagAddFriendsPageUpdateAmpRules and v37.upsellEntrySurface == UpsellEntrySurfaceType.AddFriendsPage then
-				local v49 = v37.entryPointEventCtx or SocialUpsellType.FacialAgeEstimation .. UpsellEntrySurfaceType.AddFriendsPage
+	local title, bodyText = useMemo(fn, { isPhase2, upsellEntrySurface, v4, v5 })
 
-				v38(OpenAmpWizardContainer(FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature, function(p4, _) -- line: 193
-					-- upvalues: AccessResponseEnum (copy), v37 (copy)
-					if p4 == AccessResponseEnum.Granted then
-						if v37.onSuccess then
-							v37.onSuccess()
+	local onActivated = React.useCallback(function()
+		v3.closeSocialOverlay()
 
-							return
-						end
-					elseif v37.onFailure then
-						v37.onFailure()
-					end
-				end, nil, v49, nil, FStringCoreContentAmpNameSpace, nil, nil, nil, true))
-
-				return
-			end
+		if v.onAccept then
+			v.onAccept()
 		end
 
 		if game.JobId ~= "" and not FFlagEnableAEGIS2CommsFAEUpsell then
 			return
 		end
 
-		v38(startFacialAgeEstimation(if not FFlagSupportVPC or not v37.shouldIncludeVPC then v37.entryPointEventCtx else v37.entryPointEventCtx or SocialUpsellType.FacialAgeEstimation .. (v37.upsellEntrySurface or ""), v37.onSuccess, v37.onFailure, v37.upsellEntrySurface, if not FFlagEnableAEGIS2CommsFAEUpsell then nil else v37.isInExperience, if not FFlagSupportVPC then nil else v37.shouldIncludeVPC))
-	end, {
-		v38,
-		v39.closeSocialOverlay,
-		v37.upsellEntrySurface,
-		v37.entryPointEventCtx,
-		v37.onAccept,
-		v37.onSuccess,
-		v37.onFailure,
-		v37.isInExperience,
-		if not FFlagSupportVPC and not FFlagMakeVPCFAECheckMoreGeneric then nil else v37.shouldIncludeVPC
-	})
-	local v45 = React.useCallback(function() -- line: 252
-		-- upvalues: v37 (copy)
-		if v37.onDismiss then
-			v37.onDismiss()
+		local entryPointEventCtx
+
+		if v.shouldIncludeVPC then
+			entryPointEventCtx = v.entryPointEventCtx
+				or SocialUpsellType.FacialAgeEstimation .. (v.upsellEntrySurface or "")
+		else
+			entryPointEventCtx = v.entryPointEventCtx
 		end
-	end, { v37.onDismiss })
-	local v46 = React.useMemo(function() -- line: 258
-		-- upvalues: FFlagEnableCountdownBadge (copy), v37 (copy), FIntCommsFAELockTimestamp (copy)
-		if FFlagEnableCountdownBadge and v37.countDownBadgeText then
-			return {
-				text = v37.countDownBadgeText,
-				deadlineUtcTimestamp = FIntCommsFAELockTimestamp
-			}
+
+		local onSuccess = v.onSuccess
+		local onFailure = v.onFailure
+		local upsellEntrySurface2 = v.upsellEntrySurface
+		local v6
+
+		if FFlagEnableAEGIS2CommsFAEUpsell then
+			v6 = v.isInExperience
+		end
+
+		v2(startFacialAgeEstimation(
+			entryPointEventCtx,
+			onSuccess,
+			onFailure,
+			upsellEntrySurface2,
+			v6,
+			v.shouldIncludeVPC
+		))
+	end, {
+		v2,
+		v3.closeSocialOverlay,
+		v.upsellEntrySurface,
+		v.entryPointEventCtx,
+		v.onAccept,
+		v.onSuccess,
+		v.onFailure,
+		v.isInExperience,
+		v.shouldIncludeVPC
+	})
+
+	local onClose = React.useCallback(function()
+		if v.onDismiss then
+			v.onDismiss()
+		end
+	end, { v.onDismiss })
+
+	local countDownBadge = React.useMemo(function()
+		if FFlagEnableCountdownBadge and v.countDownBadgeText then
+			return { text = v.countDownBadgeText, deadlineUtcTimestamp = FIntCommsFAELockTimestamp }
 		end
 
 		return nil
-	end, { v37.countDownBadgeText })
-	local v47 = React.useMemo(function() -- line: 268
-		-- upvalues: FFlagAddFriendsPageFAEUpsell (copy), v37 (copy), UpsellEntrySurfaceType (copy), v40 (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), v34 (copy), v44 (copy)
-		return {
-			text = if not FFlagAddFriendsPageFAEUpsell or v37.upsellEntrySurface ~= UpsellEntrySurfaceType.AddFriendsPage then if not FFlagEnableAEGIS2CommsFAEUpsell or (not v34 and not v37.isPhase2 or v37.isInExperience) then v40.Continue else v40.UnlockChat else v40.Unlock,
-			onActivated = v44
-		}
-	end, {
-		if not FFlagEnableAEGIS2CommsFAEUpsell then nil else v37.isPhase2,
-		v37.isInExperience,
-		v40,
-		v44,
-		if not FFlagAddFriendsPageFAEUpsell then nil else v37.upsellEntrySurface
-	})
+	end, { v.countDownBadgeText })
 
-	React.useEffect(function() -- line: 292
-		-- upvalues: v41 (copy), v37 (copy)
-		if not v41.current and v37.onMounted then
-			v37.onMounted()
+	local useMemo2 = React.useMemo
+	local function fn2()
+		local text
+
+		if FFlagAddFriendsPageFAEUpsell and v.upsellEntrySurface == UpsellEntrySurfaceType.AddFriendsPage then
+			text = v4.Unlock
+		elseif FFlagEnableAEGIS2CommsFAEUpsell and (defineFastFlag2 or v.isPhase2) and not v.isInExperience then
+			text = v4.UnlockChat
+		else
+			text = v4.Continue
 		end
 
-		v41.current = true
-	end, { v37.onMounted })
+		return { text = text, onActivated = onActivated }
+	end
 
-	return React.createElement(UpsellOverlay, createCommonOverlayProps({
-		onClose = v45,
-		countDownBadge = v46,
-		bodyText = v43,
-		title = v42,
-		imageId = if not FFlagAddFriendsPageFAEUpsell or v37.upsellEntrySurface ~= UpsellEntrySurfaceType.AddFriendsPage then if not FFlagEnableAEGIS2CommsFAEUpsell or (not v34 and not v37.isPhase2 or not (not v33 and v37.isInExperience)) then v24 else nil else u28,
-		primaryAction = v47,
-		impressionId = v37.impressionId,
-		upsellEntryComponent = v37.upsellEntryComponent,
-		upsellEntrySurface = v37.upsellEntrySurface,
+	local isPhase2_2
+
+	if FFlagEnableAEGIS2CommsFAEUpsell then
+		isPhase2_2 = v.isPhase2
+	end
+
+	local isInExperience = v.isInExperience
+	local v6
+
+	if FFlagAddFriendsPageFAEUpsell then
+		v6 = v.upsellEntrySurface
+	end
+
+	local primaryAction = useMemo2(fn2, { isPhase2_2, isInExperience, v4, onActivated, v6 })
+
+	React.useEffect(function()
+		if not ref.current and v.onMounted then
+			v.onMounted()
+		end
+
+		ref.current = true
+	end, { v.onMounted })
+
+	local createElement = React.createElement
+	local imageId
+
+	if FFlagAddFriendsPageFAEUpsell and v.upsellEntrySurface == UpsellEntrySurfaceType.AddFriendsPage then
+		imageId = assetId2
+	elseif FFlagEnableAEGIS2CommsFAEUpsell and (defineFastFlag2 or v.isPhase2) then
+		local v7 = not defineFastFlag and v.isInExperience
+
+		if not v7 then
+			imageId = assetId
+		end
+	else
+		imageId = assetId
+	end
+
+	return createElement(UpsellOverlay, createCommonOverlayProps({
+		onClose = onClose,
+		countDownBadge = countDownBadge,
+		bodyText = bodyText,
+		title = title,
+		imageId = imageId,
+		primaryAction = primaryAction,
+		impressionId = v.impressionId,
+		upsellEntryComponent = v.upsellEntryComponent,
+		upsellEntrySurface = v.upsellEntrySurface,
 		upsellPurpose = SocialUpsellType.FacialAgeEstimation,
-		containerRef = v37.containerRef
-	}, v37))
+		containerRef = v.containerRef
+	}, v))
 end

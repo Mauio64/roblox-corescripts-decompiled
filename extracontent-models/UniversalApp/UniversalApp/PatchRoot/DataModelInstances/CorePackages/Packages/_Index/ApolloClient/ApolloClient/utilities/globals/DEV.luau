@@ -1,15 +1,13 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Boolean = require(ParentParent.LuauPolyfill).Boolean
-local default = require(script.Parent.Parent.common.global).default
+local parent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local global = require(script.Parent.Parent.common.global)
+local default = global.default
 
-local function getDEV() -- line: 23
-	-- upvalues: Boolean (copy), default (copy)
-	local _, result = xpcall(function() -- line: 25
-		-- upvalues: Boolean (copy)
+local function getDEV()
+	local _, result = xpcall(function()
 		return Boolean.toJSBoolean(_G.__DEV__)
-	end, function() -- line: 27
-		-- upvalues: default (copy)
+	end, function()
 		default.__DEV__ = true
 
 		return default.__DEV__
@@ -18,16 +16,11 @@ local function getDEV() -- line: 23
 	return result
 end
 
-local _, result = xpcall(function() -- line: 25
-	-- upvalues: Boolean (copy)
+local _, result = xpcall(function()
 	return Boolean.toJSBoolean(_G.__DEV__)
-end, function() -- line: 27
-	-- upvalues: default (copy)
+end, function()
 	default.__DEV__ = true
 
 	return default.__DEV__
 end)
-
-t1.default = result
-
-return t1
+return { default = result }

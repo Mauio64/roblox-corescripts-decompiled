@@ -1,1 +1,3 @@
-return (require(script.AppShortcutBarContainer))
+local AppShortcutBarContainer = require(script.AppShortcutBarContainer)
+
+return AppShortcutBarContainer

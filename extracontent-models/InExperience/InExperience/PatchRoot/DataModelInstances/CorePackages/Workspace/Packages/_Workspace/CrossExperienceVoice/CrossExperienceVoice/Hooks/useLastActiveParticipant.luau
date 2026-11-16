@@ -1,39 +1,37 @@
-local EngineFeature = game:GetEngineFeature("AudioFocusManagement")
+local engineFeature = game:GetEngineFeature("AudioFocusManagement")
 local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
 local dependencies = require(CrossExperienceVoice.dependencies)
-local useSelector = dependencies.RoactUtils.Hooks.RoactRodux.useSelector
-local useIsVoiceFocused = require(CrossExperienceVoice.Hooks.useIsVoiceFocused)
-local GetFFlagEnableCrossExpVoice = dependencies.SharedFlags.GetFFlagEnableCrossExpVoice
 
-return function() -- line: 13
-	-- upvalues: GetFFlagEnableCrossExpVoice (copy), useIsVoiceFocused (copy), useSelector (copy), EngineFeature (copy)
-	if not GetFFlagEnableCrossExpVoice() then
+local useSelector = dependencies.RoactUtils.Hooks.RoactRodux.useSelector
+
+local useIsVoiceFocused = require(CrossExperienceVoice.Hooks.useIsVoiceFocused)
+local getFFlagEnableCrossExpVoice = dependencies.SharedFlags.GetFFlagEnableCrossExpVoice
+
+return function()
+	if not getFFlagEnableCrossExpVoice() then
 		return nil
 	end
 
-	local v7 = useIsVoiceFocused()
-	local v8 = useSelector(function(p1) -- line: 19
-		if p1 and (p1.Squad and p1.Squad.CrossExperienceVoice) then
-			local activeUserIds = p1.Squad.CrossExperienceVoice.Participants.activeUserIds
+	local v = useIsVoiceFocused()
 
-			for i = #activeUserIds, 1, -1 do
-				local v12 = activeUserIds[i]
-				local v13 = p1.Squad.CrossExperienceVoice.Participants.participants[v12]
-
-				if v13 and not v13.isMuted then
-					return v13
-				end
-			end
-
+	local v2 = useSelector(function(p)
+		if not (p and p.Squad and p.Squad.CrossExperienceVoice) then
 			return nil
+		end
+
+		local activeUserIds = p.Squad.CrossExperienceVoice.Participants.activeUserIds
+
+		for i = #activeUserIds, 1, -1 do
+			local activeUserId = activeUserIds[i]
+
+			local participant = p.Squad.CrossExperienceVoice.Participants.participants[activeUserId]
+
+			if participant and not participant.isMuted then
+				return participant
+			end
 		end
 
 		return nil
 	end)
-
-	if EngineFeature and not v7 then
-		return nil
-	end
-
-	return v8
+	return if not (engineFeature and not v) then v2 else nil
 end

@@ -1,168 +1,204 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local DataHydration = require(BuildExperienceParent.DataHydration)
-local CreatorCredit = require(BuildExperienceParent.DataHydration.CreatorCredit)
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local CreatorCreditConfig = require(BuildExperience.CreatorCreditConfig)
+local parent = BuildExperience.Parent
 
+local DataHydration = require(parent.DataHydration)
+local CreatorCredit = require(parent.DataHydration.CreatorCredit)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local CreatorCreditConfig = require(BuildExperience.CreatorCreditConfig)
 require(script.Parent.CreatorCreditPageView)
 require(script.Parent.DailyLimitBottomSheet)
-
 local getHoursUntilReset = require(script.Parent.getHoursUntilReset)
 local useOpenBuyRobuxWebView = require(script.Parent.useOpenBuyRobuxWebView)
 local useRefreshCreatorCreditOnUnhide = require(script.Parent.useRefreshCreatorCreditOnUnhide)
+local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
+local GetBuildCreatorCreditRefreshStore = require(BuildExperience.Stores.GetBuildCreatorCreditRefreshStore)
+
 local DataStatus = DataHydration.DataStatus
 
-local function useCreatorCreditPageViewModel() -- line: 23
-	-- upvalues: CreatorCredit (copy), React (copy), SignalsReact (copy), DataStatus (copy), useOpenBuyRobuxWebView (copy), useRefreshCreatorCreditOnUnhide (copy), getHoursUntilReset (copy), CreatorCreditConfig (copy)
-	local v13 = CreatorCredit.getCreatorCreditStore(false)
-	local v14 = React.useMemo(function() -- line: 26
-		-- upvalues: v13 (copy)
-		return v13.getQuotaSummary()
-	end, { v13 })
-	local v15 = React.useMemo(function() -- line: 29
-		-- upvalues: v13 (copy)
-		return v13.getDailyLimit()
-	end, { v13 })
-	local v16 = SignalsReact.useSignalState(v14.data)
-	local v17 = SignalsReact.useSignalState(v15.data)
-	local v18 = SignalsReact.useSignalState(v15.status)
-	local v19 = v17 or if not v16 then nil else v16.limitSettings
-	local v20 = not v16 and 0 or v16.robuxBalance
-	local v21 = not v16 and 0 or v16.robuxSpentToday
-	local v22 = not not v19 and v19.additionalUsageEnabled
-	local v23 = if not v19 or not v19.dailyLimitSet then nil else v19.dailyLimit
-	local v24 = v19 ~= nil
-	local v25 = v18 == DataStatus.Ready and v17 ~= nil
-	local v26, v27 = React.useState(false)
-	local v28, v29 = React.useState(false)
-	local v30, v31 = React.useState(false)
-	local v32 = React.useRef(0)
-	local v33 = React.useCallback(function() -- line: 48
-		-- upvalues: v32 (copy), v29 (copy), v31 (copy)
-		local v41 = v32
+local function useCreatorCreditPageViewModel()
+	local creatorCreditStore = CreatorCredit.getCreatorCreditStore(false)
 
-		v41.current = v41.current + 1
-		v29(true)
-		v31(false)
+	local v = React.useMemo(function()
+		return creatorCreditStore.getQuotaSummary()
+	end, { creatorCreditStore })
+	local v2 = React.useMemo(function()
+		return creatorCreditStore.getDailyLimit()
+	end, { creatorCreditStore })
+	local v3 = SignalsReact.useSignalState(v.data)
+	local v4 = SignalsReact.useSignalState(v2.data)
+	local v5 = SignalsReact.useSignalState(v2.status)
+	local v6
 
-		return v32.current
+	if v4 then
+		v6 = v4
+	else
+		v6 = if v3 then v3.limitSettings else nil
+	end
+
+	local robuxAvailable = not v3 and 0 or v3.robuxBalance
+	local additionalUsed = not v3 and 0 or v3.robuxSpentToday
+	local additionalEnabled
+
+	if v6 then
+		additionalEnabled = v6.additionalUsageEnabled
+	else
+		additionalEnabled = false
+	end
+
+	local dailyLimit
+
+	if v6 and v6.dailyLimitSet then
+		dailyLimit = v6.dailyLimit
+	end
+
+	local hasLimitConfigured = v6 ~= nil
+	local v7
+
+	if v5 == DataStatus.Ready then
+		v7 = v4 ~= nil
+	else
+		v7 = false
+	end
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
+	local ref = React.useRef(0)
+
+	local v8 = React.useCallback(function()
+		ref.current += 1
+		setState2(true)
+		setState3(false)
+		return ref.current
 	end, {})
-	local v34 = React.useCallback(function(n1: number, b1: boolean) -- line: 54
-		-- upvalues: v32 (copy), v29 (copy), v31 (copy)
-		if n1 ~= v32.current then
+	local v9 = React.useCallback(function(p: number, flag: boolean)
+		if ref.current ~= p then
 			return
 		end
 
-		v29(false)
-		v31(b1)
+		setState2(false)
+		setState3(flag)
 	end, {})
-	local v35 = React.useCallback(function(b2: boolean) -- line: 62
-		-- upvalues: v25 (copy), v28 (copy), v19 (copy), v33 (copy), v13 (copy), v34 (copy)
-		if not v25 or (v28 or v19 == nil) then
+
+	local onToggleAdditional = React.useCallback(function(additionalUsageEnabled: boolean)
+		if not v7 or state2 or v6 == nil then
 			return
 		end
 
-		local v45 = v33()
+		local v10 = v8()
 
-		v13.setDailyLimit({
-			additionalUsageEnabled = b2,
-			dailyLimitSet = v19.dailyLimitSet,
-			dailyLimit = v19.dailyLimit
-		}):andThen(function() -- line: 73
-			-- upvalues: v34 (copy), v45 (copy)
-			v34(v45, false)
-		end):catch(function() -- line: 76
-			-- upvalues: v34 (copy), v45 (copy)
-			v34(v45, true)
+		creatorCreditStore.setDailyLimit({
+			additionalUsageEnabled = additionalUsageEnabled,
+			dailyLimitSet = v6.dailyLimitSet,
+			dailyLimit = v6.dailyLimit
+		}):andThen(function()
+			v9(v10, false)
+		end):catch(function()
+			v9(v10, true)
 		end)
-	end, {
-		v33,
-		v13,
-		v34,
-		v28,
-		v19,
-		v25
-	})
-	local v36 = React.useCallback(function() -- line: 80
-		-- upvalues: v25 (copy), v28 (copy), v31 (copy), v27 (copy)
-		if v25 and not v28 then
-			v31(false)
-			v27(true)
+	end, { v8, creatorCreditStore, v9, state2, v6, v7 })
+	local onOpenLimitSheet = React.useCallback(function()
+		if v7 and not state2 then
+			setState3(false)
+			setState(true)
 		end
-	end, {
-		v28,
-		v25
-	})
-	local v37 = React.useCallback(function(n2: number?) -- line: 86
-		-- upvalues: v25 (copy), v28 (copy), v19 (copy), v33 (copy), v13 (copy), v32 (copy), v34 (copy), v27 (copy)
-		if not v25 or (v28 or v19 == nil) then
+	end, { state2, v7 })
+	local onConfirm = React.useCallback(function(value: number?)
+		if not v7 or state2 or v6 == nil then
 			return
 		end
 
-		local v47 = v33()
+		local v10 = v8()
 
-		v13.setDailyLimit({
-			additionalUsageEnabled = v19.additionalUsageEnabled,
-			dailyLimitSet = n2 ~= nil,
-			dailyLimit = n2 or 0
-		}):andThen(function() -- line: 97
-			-- upvalues: v32 (copy), v47 (copy), v34 (copy), v27 (copy)
-			if v32.current == v47 then
-				v34(v47, false)
-				v27(false)
+		creatorCreditStore.setDailyLimit({
+			additionalUsageEnabled = v6.additionalUsageEnabled,
+			dailyLimitSet = value ~= nil,
+			dailyLimit = value or 0
+		}):andThen(function()
+			if ref.current == v10 then
+				v9(v10, false)
+				setState(false)
 			end
-		end):catch(function() -- line: 103
-			-- upvalues: v34 (copy), v47 (copy)
-			v34(v47, true)
+		end):catch(function()
+			v9(v10, true)
 		end)
-	end, {
-		v33,
-		v13,
-		v34,
-		v28,
-		v19,
-		v25
-	})
-	local v38 = React.useCallback(function() -- line: 107
-		-- upvalues: v27 (copy)
-		v27(false)
+	end, { v8, creatorCreditStore, v9, state2, v6, v7 })
+	local onCancel = React.useCallback(function()
+		setState(false)
 	end, {})
-	local v39 = React.useCallback(function() -- line: 110
-		-- upvalues: v13 (copy)
-		v13.refreshQuotaSummary():catch(function() -- line: 111
-		end)
-	end, { v13 })
-	local v40 = useOpenBuyRobuxWebView(v39)
+	local v10 = React.useCallback(function()
+		if FFlagBuildExperienceModelPicker then
+			GetBuildCreatorCreditRefreshStore(false).refresh()
+		else
+			creatorCreditStore.refreshQuotaSummary():catch(function() end)
+		end
+	end, { creatorCreditStore })
+	local onOpenBuyRobux = useOpenBuyRobuxWebView(v10)
 
-	useRefreshCreatorCreditOnUnhide(v39)
+	if FFlagBuildExperienceModelPicker then
+		React.useEffect(function()
+			return GetBuildCreatorCreditRefreshStore(false).acquire()
+		end, {})
+	else
+		useRefreshCreatorCreditOnUnhide(v10)
+	end
 
+	local pageProps = {
+		dailyPctUsed = not v3 and 0 or v3.freeTrialPctUsed,
+		resetHours = 0,
+		resetPeriod = 0,
+		additionalEnabled = 0,
+		dailyLimit = 0,
+		hasLimitConfigured = 0,
+		additionalUsed = 0,
+		robuxAvailable = 0,
+		settingsDisabled = 0,
+		settingsError = 0,
+		showBuyRobux = 0,
+		onToggleAdditional = 0,
+		onOpenLimitSheet = 0,
+		onOpenBuyRobux = 0
+	}
+	local resetHours
+
+	if v3 then
+		resetHours = getHoursUntilReset(v3.nextResetEligibleTime)
+	end
+
+	pageProps.resetHours = resetHours
+	local resetPeriod
+
+	if v3 then
+		resetPeriod = v3.freeTrialResetPeriod
+	end
+
+	pageProps.resetPeriod = resetPeriod
+	pageProps.additionalEnabled = additionalEnabled
+	pageProps.dailyLimit = dailyLimit
+	pageProps.hasLimitConfigured = hasLimitConfigured
+	pageProps.additionalUsed = additionalUsed
+	pageProps.robuxAvailable = robuxAvailable
+	pageProps.settingsDisabled = not v7 or state2
+	pageProps.settingsError = state3 or v5 == DataStatus.Failed
+	pageProps.showBuyRobux = v3 ~= nil
+		and v3.freeTrialRemaining <= 0
+		and v3.robuxBalance < CreatorCreditConfig.FIntMinimumUsableRobuxBalance
+	pageProps.onToggleAdditional = onToggleAdditional
+	pageProps.onOpenLimitSheet = onOpenLimitSheet
+	pageProps.onOpenBuyRobux = onOpenBuyRobux
 	return {
-		pageProps = {
-			dailyPctUsed = not v16 and 0 or v16.freeTrialPctUsed,
-			resetHours = if not v16 then nil else getHoursUntilReset(v16.nextResetEligibleTime),
-			additionalEnabled = v22,
-			dailyLimit = v23,
-			hasLimitConfigured = v24,
-			additionalUsed = v21,
-			robuxAvailable = v20,
-			settingsDisabled = not v25 or v28,
-			settingsError = v30 or v18 == DataStatus.Failed,
-			showBuyRobux = v16 ~= nil and (v16.freeTrialRemaining <= 0 and v16.robuxBalance < CreatorCreditConfig.FIntMinimumUsableRobuxBalance),
-			onToggleAdditional = v35,
-			onOpenLimitSheet = v36,
-			onOpenBuyRobux = v40
-		},
+		pageProps = pageProps,
 		limitSheetProps = {
-			isOpen = v26,
-			initialValue = v23,
-			initialIsNoLimit = v24 and v23 == nil,
-			additionalUsed = v21,
-			isSaving = v28,
-			saveError = v30,
-			onConfirm = v37,
-			onCancel = v38
+			isOpen = state,
+			initialValue = dailyLimit,
+			initialIsNoLimit = hasLimitConfigured and dailyLimit == nil,
+			additionalUsed = additionalUsed,
+			isSaving = state2,
+			saveError = state3,
+			onConfirm = onConfirm,
+			onCancel = onCancel
 		}
 	}
 end

@@ -1,70 +1,90 @@
-local Parent = script:FindFirstAncestor("SocialToast").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
-local useNavigation = require(Parent.Navigation).useNavigation
-local useNavigationProps = require(Parent.RobloxAppNavigation).useNavigationProps
+local parent = script:FindFirstAncestor("SocialToast").Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+local useNavigationProps = RobloxAppNavigation.useNavigationProps
+
 local Images = UIBlox.App.ImageSet.Images
 local IconSize = UIBlox.App.Constant.IconSize
 local Toast = UIBlox.App.Dialog.Toast
 
-return function() -- line: 17
-	-- upvalues: React (copy), useNavigation (copy), useNavigationProps (copy), Images (copy), IconSize (copy), Toast (copy)
-	local v9 = React.useRef(false)
-	local v10 = useNavigation()
-	local v11 = useNavigationProps(function(_, p2) -- line: 20
+return function()
+	local ref = React.useRef(false)
+	local v = useNavigation()
+	local v2 = useNavigationProps(function(_, data)
 		return {
-			toastContent = p2.toastContent,
-			anchorPoint = p2.anchorPoint,
-			duration = p2.duration,
-			layoutOrder = p2.layoutOrder,
-			position = p2.position,
-			size = p2.size,
-			show = p2.show
+			toastContent = data.toastContent,
+			anchorPoint = data.anchorPoint,
+			duration = data.duration,
+			layoutOrder = data.layoutOrder,
+			position = data.position,
+			size = data.size,
+			show = data.show
 		}
 	end)
-	local v12 = React.useMemo(function() -- line: 32
-		-- upvalues: v11 (copy), Images (copy), IconSize (copy), v9 (copy), v10 (copy)
-		return {
-			toastTitle = v11.toastContent.toastTitle or "",
-			toastSubtitle = v11.toastContent.toastSubtitle,
-			iconColorStyle = v11.toastContent.iconColorStyle,
-			iconImage = if v11.toastContent.shouldHideIcon then nil else v11.toastContent.iconImage or Images["icons/status/alert"],
-			iconSize = if v11.toastContent.shouldHideIcon then nil else v11.toastContent.iconSize or Vector2.new(IconSize.Regular, IconSize.Regular),
-			swipeUpDismiss = v11.toastContent.swipeUpDismiss,
-			onAppeared = function() -- line: 44
-				-- upvalues: v11 (copy), v9 (copy)
-				if v11.toastContent.onAppeared then
-					v11.toastContent.onAppeared()
-				end
 
-				v9.current = false
-			end,
-			onActivated = v11.toastContent.onActivated,
-			onDismissed = function() -- line: 51
-				-- upvalues: v11 (copy), v9 (copy), v10 (copy)
-				if v11.toastContent.onDismissed then
-					v11.toastContent.onDismissed()
-				end
-
-				if not v9.current then
-					v10.goBack()
-				end
-			end
+	local toastContent = React.useMemo(function()
+		local v3 = {
+			toastTitle = v2.toastContent.toastTitle or "",
+			toastSubtitle = v2.toastContent.toastSubtitle,
+			iconColorStyle = v2.toastContent.iconColorStyle,
+			iconImage = 0,
+			iconSize = 0,
+			swipeUpDismiss = 0,
+			onAppeared = 0,
+			onActivated = 0,
+			onDismissed = 0
 		}
-	end, { v11.toastContent })
+		local iconImage
 
-	React.useEffect(function() -- line: 62
-		-- upvalues: v9 (copy)
-		v9.current = true
+		if not v2.toastContent.shouldHideIcon then
+			iconImage = v2.toastContent.iconImage or Images["icons/status/alert"]
+		end
+
+		v3.iconImage = iconImage
+		local iconSize
+
+		if not v2.toastContent.shouldHideIcon then
+			iconSize = v2.toastContent.iconSize or Vector2.new(IconSize.Regular, IconSize.Regular)
+		end
+
+		v3.iconSize = iconSize
+
+		v3.swipeUpDismiss = v2.toastContent.swipeUpDismiss
+		function v3.onAppeared()
+			if v2.toastContent.onAppeared then
+				v2.toastContent.onAppeared()
+			end
+
+			ref.current = false
+		end
+		v3.onActivated = v2.toastContent.onActivated
+		function v3.onDismissed()
+			if v2.toastContent.onDismissed then
+				v2.toastContent.onDismissed()
+			end
+
+			if not ref.current then
+				v.goBack()
+			end
+		end
+
+		return v3
+	end, { v2.toastContent })
+
+	React.useEffect(function()
+		ref.current = true
 	end)
 
 	return React.createElement(Toast, {
-		toastContent = v12,
-		anchorPoint = v11.anchorPoint,
-		duration = v11.duration or 2,
-		layoutOrder = v11.layoutOrder,
-		position = v11.position,
-		size = v11.size,
-		show = v11.show
+		toastContent = toastContent,
+		anchorPoint = v2.anchorPoint,
+		duration = v2.duration or 2,
+		layoutOrder = v2.layoutOrder,
+		position = v2.position,
+		size = v2.size,
+		show = v2.show
 	})
 end

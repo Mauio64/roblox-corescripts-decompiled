@@ -1,66 +1,60 @@
 local UserInputService = game:GetService("UserInputService")
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 
-return function(t1: {[any]: any}) -- line: 19
-	-- upvalues: React (copy), UserInputService (copy)
-	local v5 = React.createRef()
-	local v6, v7 = React.useState(false)
+return function(props)
+	local ref = React.createRef()
+	local state, setState = React.useState(false)
+	React.useEffect(function()
+		if not (props.swipeEnabled and props.swipeCallback) then
+			setState(false)
 
-	React.useEffect(function() -- line: 23
-		-- upvalues: t1 (copy), UserInputService (copy), v5 (copy), v7 (copy), v6 (copy)
-		if t1.swipeEnabled and t1.swipeCallback then
-			local connection = UserInputService.TouchStarted:Connect(function(p1) -- line: 29
-				-- upvalues: v5 (copy), v7 (copy)
-				local v12 = v5 and v5.current
-
-				if not v12 then
-					return
-				end
-
-				local v13 = Vector2.new(p1.Position.X, p1.Position.Y) - v12.AbsolutePosition
-
-				if v13.X >= 0 and v13.Y >= 0 and v13.X <= v12.AbsoluteSize.X and v13.Y <= v12.AbsoluteSize.Y then
-					v7(true)
-				end
-			end)
-			local connection2 = UserInputService.TouchEnded:Connect(function() -- line: 46
-				-- upvalues: v7 (copy)
-				v7(false)
-			end)
-			local v10 = if not v6 then nil else UserInputService.TouchSwipe:Connect(function(p2) -- line: 50
-				-- upvalues: v6 (copy), t1 (copy)
-				if v6 then
-					t1.swipeCallback(p2)
-				end
-			end)
-
-			return function() -- line: 57
-				-- upvalues: connection (copy), connection2 (copy), v10 (copy)
-				connection:Disconnect()
-				connection2:Disconnect()
-
-				if v10 then
-					v10:Disconnect()
-				end
-			end
+			return nil
 		end
 
-		v7(false)
+		local touchStartedConnection = UserInputService.TouchStarted:Connect(function(p)
+			local current = ref and ref.current
 
-		return nil
-	end, {
-		t1.swipeEnabled,
-		t1.swipeCallback,
-		v5,
-		v6
-	})
+			if not current then
+				return
+			end
+
+			local v = Vector2.new(p.Position.X, p.Position.Y) - current.AbsolutePosition
+
+			if v.X >= 0 and v.Y >= 0 and v.X <= current.AbsoluteSize.X and v.Y <= current.AbsoluteSize.Y then
+				setState(true)
+			end
+		end)
+		local touchEndedConnection = UserInputService.TouchEnded:Connect(function()
+			setState(false)
+		end)
+		local touchSwipeConnection
+
+		if state then
+			touchSwipeConnection = UserInputService.TouchSwipe:Connect(function(p)
+				if state then
+					props.swipeCallback(p)
+				end
+			end)
+		else
+			touchSwipeConnection = nil
+		end
+
+		return function()
+			touchStartedConnection:Disconnect()
+			touchEndedConnection:Disconnect()
+
+			if touchSwipeConnection then
+				touchSwipeConnection:Disconnect()
+			end
+		end
+	end, { props.swipeEnabled, props.swipeCallback, ref, state })
 
 	return React.createElement("Frame", {
+		Size = props.Size,
+		AutomaticSize = props.AutomaticSize,
 		BackgroundTransparency = 1,
 		Active = true,
-		Size = t1.Size,
-		AutomaticSize = t1.AutomaticSize,
-		ref = v5
-	}, t1.children)
+		ref = ref
+	}, props.children)
 end

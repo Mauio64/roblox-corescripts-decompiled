@@ -1,15 +1,11 @@
-local Parent = script:FindFirstAncestor("GenericChallenges").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
+local parent = script:FindFirstAncestor("GenericChallenges").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
 
 return {
 	eventName = "accountSecurityChallengeDeviceIntegrityEvent",
-	throttlingPercentage = 10000,
-	description = "Tracks lifecycle events for the Device Integrity GCS challenge",
-	links = "https://roblox.atlassian.net/wiki/spaces/BaS/pages/2184872709/Bypassing+Challenges+for+Xbox+PS+Quest+etc+Requests#Event-Tracking",
 	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
-	lastUpdated = {
-		24,
-		1,
-		22
-	}
+	throttlingPercentage = 10000,
+	lastUpdated = { 24, 1, 22 },
+	description = "Tracks lifecycle events for the Device Integrity GCS challenge",
+	links = "https://roblox.atlassian.net/wiki/spaces/BaS/pages/2184872709/Bypassing+Challenges+for+Xbox+PS+Quest+etc+Requests#Event-Tracking"
 }

@@ -1,10 +1,12 @@
-local Parent = script:FindFirstAncestor("RobloxAppHooks").Parent
-local React = require(Parent.React)
-local RobloxAppEnums = require(Parent.RobloxAppEnums)
+local parent = script:FindFirstAncestor("RobloxAppHooks").Parent
+local React = require(parent.React)
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
 local DeviceType = RobloxAppEnums.DeviceType
 local UiMode = RobloxAppEnums.UiMode
 local useDeviceType = require(script.Parent.useDeviceType)
-local t1 = {
+
+local v = {
 	[DeviceType.Desktop] = UiMode.Unknown,
 	[DeviceType.Tablet] = UiMode.Unknown,
 	[DeviceType.Phone] = UiMode.Unknown,
@@ -12,21 +14,13 @@ local t1 = {
 	[DeviceType.VR] = UiMode.VR
 }
 
-local function useUiModeInfo() -- line: 36
-	-- upvalues: useDeviceType (copy), t1 (copy), UiMode (copy), React (copy)
-	local v9 = useDeviceType()
-	local v10 = t1[v9] or UiMode.Unknown
+local function useUiModeInfo()
+	local deviceType = useDeviceType()
+	local uiMode = v[deviceType] or UiMode.Unknown
 
-	return (React.useMemo(function() -- line: 40
-		-- upvalues: v9 (copy), v10 (copy)
-		return {
-			deviceType = v9,
-			uiMode = v10
-		}
-	end, {
-		v9,
-		v10
-	}))
+	return (React.useMemo(function()
+		return { deviceType = deviceType, uiMode = uiMode }
+	end, { deviceType, uiMode }))
 end
 
 return useUiModeInfo

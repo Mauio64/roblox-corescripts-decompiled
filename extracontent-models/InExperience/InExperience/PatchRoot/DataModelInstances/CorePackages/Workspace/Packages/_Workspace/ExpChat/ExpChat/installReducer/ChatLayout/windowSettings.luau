@@ -1,14 +1,16 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Rodux = require(ExpChatParent.Rodux)
-local Dictionary = require(ExpChatParent.llama).Dictionary
+local parent = ExpChat.Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+
 local Config = require(ExpChat.Config)
+
 local Actions = ExpChat.Actions
 local ConfigurationObjectsLoaded = require(Actions.ConfigurationObjectsLoaded)
 local ChatWindowSettingsChanged = require(Actions.ChatWindowSettingsChanged)
-local t1 = {
-	HeightScale = 1,
-	WidthScale = 1,
+
+local v = {
 	Font = Config.ChatWindowFont,
 	TextColor3 = Config.ChatWindowTextColor3,
 	TextSize = Config.ChatWindowTextSize,
@@ -16,22 +18,20 @@ local t1 = {
 	TextStrokeTransparency = Config.ChatWindowTextStrokeTransparency,
 	BackgroundColor3 = Config.ChatWindowBackgroundColor3,
 	BackgroundTransparency = Config.ChatWindowBackgroundTransparency,
+	HeightScale = 1,
+	WidthScale = 1,
 	SpatialPanelTextSize = Config.ChatWindowSpatialPanelTextSize
 }
 
-return Rodux.createReducer(t1, {
-	[ConfigurationObjectsLoaded.name] = function(p1, p2) -- line: 26
-		-- upvalues: Dictionary (copy)
-		return Dictionary.join(p1, p2.chatWindowSettings)
+return Rodux.createReducer(v, {
+	[ConfigurationObjectsLoaded.name] = function(p, p2)
+		return dictionary.join(p, p2.chatWindowSettings)
 	end,
-	[ChatWindowSettingsChanged.name] = function(p3, p4) -- line: 30
-		-- upvalues: Dictionary (copy)
-		if not p3[p4.property] then
-			return p3
+	[ChatWindowSettingsChanged.name] = function(p, p2)
+		if not p[p2.property] then
+			return p
 		end
 
-		return Dictionary.join(p3, {
-			[p4.property] = p4.value
-		})
+		return dictionary.join(p, { [p2.property] = p2.value })
 	end
 })

@@ -1,43 +1,48 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
 
 require(Foundation.Enums.DialogSize)
 
 local getResponsiveSize = require(script.Parent.getResponsiveSize)
 local useOverlay = require(Foundation.Providers.Overlay.useOverlay)
 local useTokens = require(Foundation.Providers.Style.useTokens)
+
 local DialogContext = require(script.Parent.DialogContext)
 
-local function DialogProvider(t1: {[any]: any}) -- line: 23
-	-- upvalues: useOverlay (copy), useTokens (copy), React (copy), getResponsiveSize (copy), DialogContext (copy)
-	local v10 = useOverlay()
-	local v11 = useTokens()
-	local v12, v13 = React.useState(function() -- line: 27
-		-- upvalues: v10 (copy), getResponsiveSize (copy), t1 (copy), v11 (copy)
-		if v10 then
-			return getResponsiveSize(v10.AbsoluteSize.X, t1.size, v11)
+local function DialogProvider(props)
+	local v = useOverlay()
+	local v2 = useTokens()
+
+	local state, setState = React.useState(function()
+		if v then
+			return getResponsiveSize(v.AbsoluteSize.X, props.size, v2)
 		end
 
-		return t1.responsiveSize or t1.size
+		return props.responsiveSize or props.size
 	end)
-	local v14, v15 = React.useState(t1.hasHeroMedia)
-	local v16 = React.useRef(nil)
-	local v17, v18 = React.useState(nil)
 
-	return React.createElement(DialogContext.Provider, {
-		value = {
-			size = t1.size,
-			responsiveSize = v12,
-			setResponsiveSize = v13,
-			hasHeroMedia = v14,
-			setHasHeroMedia = v15,
-			testId = t1.testId,
-			closeAffordanceRef = v16,
-			contentStartRef = v17,
-			setContentStartRef = v18
+	local state2, setState2 = React.useState(props.hasHeroMedia)
+
+	local ref = React.useRef(nil)
+	local state3, setState3 = React.useState(nil)
+
+	local v3 = React.useMemo(function()
+		return {
+			size = props.size,
+			responsiveSize = state,
+			setResponsiveSize = setState,
+			hasHeroMedia = state2,
+			setHasHeroMedia = setState2,
+			testId = props.testId,
+			closeAffordanceRef = ref,
+			contentStartRef = state3,
+			setContentStartRef = setState3
 		}
-	}, t1.children)
+	end, { props.size, state, state2, props.testId, state3 })
+
+	return React.createElement(DialogContext.Provider, { value = v3 }, props.children)
 end
 
 return DialogProvider

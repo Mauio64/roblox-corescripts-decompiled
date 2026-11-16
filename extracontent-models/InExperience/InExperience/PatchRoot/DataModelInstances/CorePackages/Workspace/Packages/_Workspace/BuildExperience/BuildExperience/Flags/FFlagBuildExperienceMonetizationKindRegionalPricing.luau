@@ -1,0 +1,4 @@
+local FFlagBuildExperienceMonetizationManageKinds = require(script.Parent.FFlagBuildExperienceMonetizationManageKinds)
+
+return game:DefineFastFlag("BuildExperienceMonetizationKindRegionalPricing", false)
+	and FFlagBuildExperienceMonetizationManageKinds

@@ -1,38 +1,54 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local ParentParentParent = ParentParent.Parent
-local OffPlatformFriendRequestsIXP = require(ParentParent.Flags.OffPlatformFriendRequestsIXP)
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+local parent2 = parent.Parent
+
 local useSelector = dependencies.useSelector
+local SignalsReact = require(parent2.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
 local getContactImporterParams = require(script.Parent.getContactImporterParams)
-local useUiModeInfo = require(ParentParentParent.RobloxAppHooks).useUiModeInfo
-local UiMode = require(ParentParentParent.RobloxAppEnums).UiMode
-local FFlagContactImporterIXPCleanup = require(ParentParentParent.SharedFlags).FFlagContactImporterIXPCleanup
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local useUiModeInfo = RobloxAppHooks.useUiModeInfo
+local RobloxAppEnums = require(parent2.RobloxAppEnums)
+local UiMode = RobloxAppEnums.UiMode
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagUseSignalsForIsLocalUserSoothsayer = SharedFlags.FFlagUseSignalsForIsLocalUserSoothsayer
+local getIsLocalUserSoothsayerStore
 
-return function(t1: {[any]: any}) -- line: 13
-	-- upvalues: useSelector (copy), getContactImporterParams (copy), FFlagContactImporterIXPCleanup (copy), OffPlatformFriendRequestsIXP (copy), useUiModeInfo (copy), UiMode (copy)
-	local v11 = useSelector(function(p1) -- line: 14
-		return p1.IsLocalUserSoothsayer
-	end)
-	local v12 = useSelector(getContactImporterParams)
-	local v13 = if not FFlagContactImporterIXPCleanup then OffPlatformFriendRequestsIXP.useOffPlatformFriendRequestsEnabled() else nil
-	local v14 = useUiModeInfo().uiMode ~= UiMode.TenFoot and v11
-	local v15 = if not FFlagContactImporterIXPCleanup then v13 else nil
-	local v16, v17
+if FFlagUseSignalsForIsLocalUserSoothsayer then
+	local IsLocalUserSoothsayerStore = require(parent2.IsLocalUserSoothsayerStore)
+	getIsLocalUserSoothsayerStore = IsLocalUserSoothsayerStore.GetIsLocalUserSoothsayerStore
+else
+	getIsLocalUserSoothsayerStore = nil
+end
 
-	if v14 then
-		v16 = true
-		v17 = true
+return function(p)
+	local v
+
+	if FFlagUseSignalsForIsLocalUserSoothsayer then
+		v = useSignalState(getIsLocalUserSoothsayerStore(false).getIsLocalUserSoothsayer)
 	else
-		v16 = if not FFlagContactImporterIXPCleanup then v15 and t1.policyIsEnabled else t1.policyIsEnabled
-		v17 = v12.shouldShowContactImporterFeature
+		v = useSelector(function(p2)
+			return p2.IsLocalUserSoothsayer
+		end)
 	end
 
-	local v18 = v16 and v17
-	local v19 = v18 and v12.shouldShowContactImporterUpsellModal
+	local v2 = useSelector(getContactImporterParams)
+	local v3, v4
+
+	if useUiModeInfo().uiMode ~= UiMode.TenFoot and v then
+		v3 = true
+		v4 = true
+	else
+		v3 = p.policyIsEnabled
+		v4 = v2.shouldShowContactImporterFeature
+	end
+
+	local v5 = v3 and v4
+	local shouldShowContactImporterUpsellModal = v5 and v2.shouldShowContactImporterUpsellModal
 
 	return {
-		shouldFetchContactImporterData = v16 or false,
-		shouldShowContactImporter = v18 or false,
-		shouldShowContactImporterModal = v19 or false
+		shouldFetchContactImporterData = v3 or false,
+		shouldShowContactImporter = v5 or false,
+		shouldShowContactImporterModal = shouldShowContactImporterUpsellModal or false
 	}
 end

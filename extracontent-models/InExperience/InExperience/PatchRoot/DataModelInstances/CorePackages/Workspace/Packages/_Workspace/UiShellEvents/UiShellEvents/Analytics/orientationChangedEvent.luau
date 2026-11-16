@@ -1,13 +1,19 @@
 local UiShellEvents = script:FindFirstAncestor("UiShellEvents")
-local UiShellEventsParent = UiShellEvents.Parent
+local parent = UiShellEvents.Parent
 local Logger = require(UiShellEvents.Logger)
-local t = require(UiShellEventsParent.t)
+local t = require(parent.t)
+require(parent.RobloxAppEnums)
 
-require(UiShellEventsParent.RobloxAppEnums)
+local defineFastFlag = game:DefineFastFlag("OrientationUseTelemetryService", false)
+local TelemetryService
 
-local v5 = game:DefineFastFlag("OrientationUseTelemetryService", false)
-local v6 = if not v5 then nil else game:GetService("TelemetryService")
-local v7 = t.strictInterface({
+if defineFastFlag then
+	TelemetryService = game:GetService("TelemetryService")
+else
+	TelemetryService = nil
+end
+
+local strictInterface = t.strictInterface({
 	deviceOrientation = t.string,
 	experienceOrientation = t.optional(t.string),
 	page = t.optional(t.string),
@@ -22,40 +28,29 @@ local v7 = t.strictInterface({
 
 game:DefineFastInt("UiShellOrientationChangedThrottleHundredthsPercent", 10000)
 
-local t1 = {
+local v = {
 	eventName = "uiShellOrientationChanged",
-	description = "Fired when device or app orientation changes on mobile.",
-	links = "",
 	backends = { "EventIngest" },
 	throttlingPercentage = game:GetFastInt("UiShellOrientationChangedThrottleHundredthsPercent"),
-	lastUpdated = {
-		2026,
-		5,
-		6
-	}
+	lastUpdated = { 2026, 5, 6 },
+	description = "Fired when device or app orientation changes on mobile.",
+	links = ""
 }
 
-return function(p1, s1: string, t2: {[any]: any}) -- line: 50
-	-- upvalues: v7 (copy), Logger (copy), v5 (copy), v6 (copy), t1 (copy)
-	local v12, v13 = v7(t2)
+return function(object, eventContext: string, customFields)
+	local v2, v3 = strictInterface(customFields)
 
-	if not v12 then
-		Logger:error(v13)
+	if not v2 then
+		Logger:error(v3)
 	end
 
-	if v5 and v6 then
-		v6:LogEvent(t1, {
-			eventContext = s1,
-			customFields = t2,
-			standardizedFields = {
-				"addSessionInfo",
-				"addSessionId",
-				"addOSInfo"
-			}
+	if defineFastFlag and TelemetryService then
+		TelemetryService:LogEvent(v, {
+			eventContext = eventContext,
+			customFields = customFields,
+			standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" }
 		})
-
-		return
+	else
+		object:sendEventDeferred(eventContext, "uiShellOrientationChanged", customFields)
 	end
-
-	p1:sendEventDeferred(s1, "uiShellOrientationChanged", t2)
 end

@@ -1,36 +1,31 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
-
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
 return {
 	categories = { ValidationEnums.UploadCategory.ANIMATION },
-	requiredData = {
-		ValidationEnums.SharedDataMember.rootInstance,
-		ValidationEnums.SharedDataMember.uploadEnum
-	},
-	fflag = getFFlagUGCValidationAnimationPackSupport,
+	requiredData = { ValidationEnums.SharedDataMember.rootInstance, ValidationEnums.SharedDataMember.uploadEnum },
 	expectedFailures = {},
 	prereqTests = { ValidationEnums.ValidationModule.ExpectedRootSchema },
-	run = function(p1, p2) -- line: 20
-		-- upvalues: ErrorSourceStrings (copy)
-		if p2.uploadEnum.assetType ~= Enum.AssetType.IdleAnimation then
+	run = function(object, p)
+		if p.uploadEnum.assetType ~= Enum.AssetType.IdleAnimation then
 			return
 		end
 
-		for _, descendant in p2.rootInstance:GetDescendants() do
-			if descendant:IsA("NumberValue") and descendant.Name == "Weight" then
-				local descendantValue = descendant.Value
+		for _, numberValue in p.rootInstance:GetDescendants() do
+			if not (numberValue:IsA("NumberValue") and numberValue.Name == "Weight") then
+				continue
+			end
 
-				if descendantValue <= 0 then
-					p1:fail(ErrorSourceStrings.Keys.Animation_WeightNotPositive, {
-						animationName = not descendant.Parent and "Unknown" or descendant.Parent:GetFullName(),
-						weight = tostring(descendantValue)
-					})
-				end
+			local value = numberValue.Value
+
+			if value <= 0 then
+				object:fail(ErrorSourceStrings.Keys.Animation_WeightNotPositive, {
+					animationName = not numberValue.Parent and "Unknown" or numberValue.Parent:GetFullName(),
+					weight = tostring(value)
+				})
 			end
 		end
 	end

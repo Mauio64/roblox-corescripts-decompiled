@@ -1,12 +1,12 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local Cryo = require(ProfilePlatformParent.Cryo)
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+
 local UserProfileHeader = require(ProfilePlatform.Components.UserProfileHeader)
 local MeTabUserProfileHeader = require(ProfilePlatform.Components.UserProfileHeader.MeTabUserProfileHeader)
 local About = require(ProfilePlatform.Components.About)
 local ContactDescription = require(ProfilePlatform.Components.ContactDescription)
-local ProfileActionBar = require(ProfilePlatform.Components.ProfileActionBar)
 local CommunityProfileHeader = require(ProfilePlatform.Components.CommunityProfileHeader)
 local CoverPhoto = require(ProfilePlatform.Components.CoverPhoto)
 local CurrentlyWearing = require(ProfilePlatform.Components.CurrentlyWearing)
@@ -16,157 +16,242 @@ local Inventory = require(ProfilePlatform.Components.Inventory)
 local FavoriteExperiences = require(ProfilePlatform.Components.FavoriteExperiences)
 local ContactProfileHeader = require(ProfilePlatform.Components.ContactProfileHeader)
 local Experiences = require(ProfilePlatform.Components.Experiences)
-local ExperiencesWideCarousel = require(ProfilePlatform.Components.ExperiencesWideCarousel)
+local v = require(ProfilePlatform.Components.ExperiencesWideCarousel)
 local SocialLinks = require(ProfilePlatform.Components.SocialLinks)
-local Videos = require(ProfilePlatform.Components.Videos)
 local CommunityLocked = require(ProfilePlatform.Components.CommunityLocked)
 local Events = require(ProfilePlatform.Components.Events)
+local Announcements = require(ProfilePlatform.Components.Announcements)
+local GroupForumsDiscovery = require(ProfilePlatform.Components.GroupForumsDiscovery)
 local ProfileCompletion = require(ProfilePlatform.Components.ProfileCompletion)
 local CurrentlyPlaying = require(ProfilePlatform.Components.CurrentlyPlaying)
 local CTARow = require(ProfilePlatform.Components.CTARow)
 local Moments = require(ProfilePlatform.Components.Moments)
-local Constants = require(ProfilePlatformParent.ProfilePlatform.Common.Constants)
-local Enums = require(ProfilePlatformParent.ProfilePlatform.Common.Enums)
+
+local Constants = require(parent.ProfilePlatform.Common.Constants)
+local Enums = require(parent.ProfilePlatform.Common.Enums)
 local getPeekViewOpenHeightByProfileType = require(ProfilePlatform.Utils.getPeekViewOpenHeightByProfileType)
+
 local FFlagProfilePlatformEnableFavoriteExperiences = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableFavoriteExperiences)
-local FFlagProfilePlatformEnableStore = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableStore
-local FFlagAXEnableProfileTab = require(ProfilePlatformParent.SharedFlags).FFlagAXEnableProfileTab
-local FFlagProfilePlatformEnableInventory = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableInventory
-local FFlagAddSocialLinksToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddSocialLinksToCommunityProfile
-local FFlagAddVideoToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddVideoToCommunityProfile
-local FFlagAddCommunityLockedToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddCommunityLockedToCommunityProfile
-local FFlagExperiencesOnProfile = require(ProfilePlatformParent.SharedFlags).FFlagExperiencesOnProfile
-local FFlagEnableProfileCompletion = require(ProfilePlatformParent.SharedFlags).FFlagEnableProfileCompletion
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableStore = SharedFlags.FFlagProfilePlatformEnableStore
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAXEnableProfileTab = SharedFlags2.FFlagAXEnableProfileTab
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableInventory = SharedFlags3.FFlagProfilePlatformEnableInventory
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagAddSocialLinksToCommunityProfile = SharedFlags4.FFlagAddSocialLinksToCommunityProfile
+
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagAddCommunityLockedToCommunityProfile = SharedFlags5.FFlagAddCommunityLockedToCommunityProfile
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagExperiencesOnProfile = SharedFlags6.FFlagExperiencesOnProfile
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagEnableProfileCompletion = SharedFlags7.FFlagEnableProfileCompletion
 local FFlagProfilePlatformEnableLazyLoadingComponents = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableLazyLoadingComponents)
 local FFlagAddEventsToCommunityProfile = require(ProfilePlatform.Flags.FFlagAddEventsToCommunityProfile)
+local SharedFlags8 = require(parent.SharedFlags)
+local FFlagGroupAnnouncementsSdui = SharedFlags8.FFlagGroupAnnouncementsSdui
+local SharedFlags9 = require(parent.SharedFlags)
+local FFlagGroupForumsDiscoverySdui = SharedFlags9.FFlagGroupForumsDiscoverySdui
 local FFlagProfilePlatformAddCurrentlyPlaying = require(ProfilePlatform.Flags.FFlagProfilePlatformAddCurrentlyPlaying)
 local FFlagAboutBeforeActionClient = require(ProfilePlatform.Flags.FFlagAboutBeforeActionClient)
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
 local FFlagProfilePlatformEnableMoments = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableMoments)
-local v46 = game:DefineFastFlag("FixCTARowOnContactProfile", false)
 
-local function orderWithAboutBeforeActions(t1: {[any]: any}) -- line: 55
-	-- upvalues: FFlagAboutBeforeActionClient (copy), Enums (copy), FFlagProfilePlatformAddCurrentlyPlaying (copy), Cryo (copy)
+local function orderWithAboutBeforeActions(list)
 	if not FFlagAboutBeforeActionClient then
-		return t1
+		return list
 	end
 
-	local v54 = nil
-	local v55 = nil
-	local v56 = nil
+	local v2 = nil
+	local v3 = nil
+	local v4 = nil
 
-	for i, v in ipairs(t1) do
-		if v == Enums.Components.About then
-			v54 = i
-		elseif v == Enums.Components.Actions then
-			v55 = i
-		elseif FFlagProfilePlatformAddCurrentlyPlaying and v == Enums.Components.CurrentlyPlaying then
-			v56 = i
+	for i, item in ipairs(list) do
+		if item == Enums.Components.About then
+			v2 = i
+		elseif item == Enums.Components.Actions then
+			v3 = i
+		elseif FFlagProfilePlatformAddCurrentlyPlaying and item == Enums.Components.CurrentlyPlaying then
+			v4 = i
 		end
 	end
 
-	if v54 == nil or v55 == nil or v54 < v55 then
-		return t1
+	if v2 == nil or v3 == nil or v2 < v3 then
+		return list
 	end
 
-	local v59 = Cryo.List.join({}, t1)
+	local joined = Cryo.List.join({}, list)
 
-	if FFlagProfilePlatformAddCurrentlyPlaying and v56 then
-		local v60 = v59[v54]
-		local v61 = v59[v56]
-		local v62 = v59[v55]
+	if FFlagProfilePlatformAddCurrentlyPlaying and v4 then
+		local v5 = joined[v2]
+		local v6 = joined[v4]
+		local v7 = joined[v3]
+		joined[v4] = v5
+		joined[v3] = v6
+		joined[v2] = v7
+		return joined
+	else
+		local v5 = joined[v3]
+		local v6 = joined[v2]
+		joined[v2] = v5
+		joined[v3] = v6
 
-		v59[v56] = v60
-		v59[v55] = v61
-		v59[v54] = v62
-
-		return v59
+		return joined
 	end
-
-	local v63 = v59[v55]
-	local v64 = v59[v54]
-
-	v59[v54] = v63
-	v59[v55] = v64
-
-	return v59
 end
-local function moveMomentsToTop(t2: {[any]: any}) -- line: 83
-	-- upvalues: Enums (copy), Cryo (copy)
-	local v66 = nil
 
-	for i, v in ipairs(t2) do
-		if v == Enums.Components.Moments then
-			v66 = i
+local function moveMomentsToTop(list)
+	local v2 = nil
 
+	for i, item in ipairs(list) do
+		if item == Enums.Components.Moments then
+			v2 = i
 			break
 		end
 	end
 
-	if v66 == nil then
-		return t2
+	if v2 == nil then
+		return list
 	end
 
-	local v69 = Cryo.List.join({}, t2)
+	local joined = Cryo.List.join({}, list)
+	table.remove(joined, v2)
+	local v3 = 1
 
-	table.remove(v69, v66)
-
-	local n1 = 1
-
-	for i, v in ipairs(v69) do
-		if v == Enums.Components.CurrentlyWearing then
-			n1 = i
-
+	for i, v4 in ipairs(joined) do
+		if v4 == Enums.Components.CurrentlyWearing then
+			v3 = i
 			break
 		end
 	end
 
-	table.insert(v69, n1, Enums.Components.Moments)
-
-	return v69
+	table.insert(joined, v3, Enums.Components.Moments)
+	return joined
 end
 
-local t3 = {
+local v2 = {
 	[Enums.Components.UserProfileHeader] = UserProfileHeader,
 	[Enums.Components.CurrentlyWearing] = CurrentlyWearing,
-	[Enums.Components.Actions] = if not FFlagProfilePlatformCTAsRefactor then ProfileActionBar else CTARow,
-	[Enums.Components.Experiences] = if not FFlagExperiencesOnProfile then Experiences else ExperiencesWideCarousel,
-	[Enums.Components.ViewFullProfile] = ViewFullProfile,
-	[Enums.Components.About] = About.About,
-	[Enums.Components.FavoriteExperiences] = if not FFlagProfilePlatformEnableFavoriteExperiences then nil else FavoriteExperiences,
-	[Enums.Components.Inventory] = if not FFlagProfilePlatformEnableInventory then nil else Inventory,
-	[Enums.Components.Store] = if not FFlagProfilePlatformEnableStore then nil else Store,
-	[Enums.Components.ProfileCompletion] = if not FFlagEnableProfileCompletion then nil else ProfileCompletion,
-	[Enums.Components.CurrentlyPlaying] = if not FFlagProfilePlatformAddCurrentlyPlaying then nil else CurrentlyPlaying,
-	[Enums.Components.Moments] = if not FFlagProfilePlatformEnableMoments then nil else Moments
+	[Enums.Components.Actions] = CTARow
 }
-local t4 = {
+local experiences = Enums.Components.Experiences
+
+if not FFlagExperiencesOnProfile then
+	v = Experiences
+end
+
+v2[experiences] = v
+v2[Enums.Components.ViewFullProfile] = ViewFullProfile
+v2[Enums.Components.About] = About.About
+local favoriteExperiences = Enums.Components.FavoriteExperiences
+
+if not FFlagProfilePlatformEnableFavoriteExperiences then
+	FavoriteExperiences = nil
+end
+
+v2[favoriteExperiences] = FavoriteExperiences
+
+local inventory = Enums.Components.Inventory
+
+if not FFlagProfilePlatformEnableInventory then
+	Inventory = nil
+end
+
+v2[inventory] = Inventory
+local store = Enums.Components.Store
+local v3
+
+if FFlagProfilePlatformEnableStore then
+	v3 = Store
+end
+
+v2[store] = v3
+local profileCompletion = Enums.Components.ProfileCompletion
+
+if not FFlagEnableProfileCompletion then
+	ProfileCompletion = nil
+end
+
+v2[profileCompletion] = ProfileCompletion
+local currentlyPlaying = Enums.Components.CurrentlyPlaying
+
+if not FFlagProfilePlatformAddCurrentlyPlaying then
+	CurrentlyPlaying = nil
+end
+
+v2[currentlyPlaying] = CurrentlyPlaying
+local moments = Enums.Components.Moments
+
+if not FFlagProfilePlatformEnableMoments then
+	Moments = nil
+end
+
+v2[moments] = Moments
+
+local v4 = {
 	[Enums.Components.CoverPhoto] = CoverPhoto,
 	[Enums.Components.CommunityProfileHeader] = CommunityProfileHeader,
 	[Enums.Components.About] = About.About,
-	[Enums.Components.Actions] = if not FFlagProfilePlatformCTAsRefactor then ProfileActionBar else CTARow,
+	[Enums.Components.Actions] = CTARow,
 	[Enums.Components.Experiences] = Experiences,
-	[Enums.Components.Store] = Store,
-	[Enums.Components.SocialLinks] = if not FFlagAddSocialLinksToCommunityProfile then nil else SocialLinks,
-	[Enums.Components.Videos] = if not FFlagAddVideoToCommunityProfile then nil else Videos,
-	[Enums.Components.ViewFullProfile] = ViewFullProfile,
-	[Enums.Components.CommunityLocked] = if not FFlagAddCommunityLockedToCommunityProfile then nil else CommunityLocked,
-	[Enums.Components.Events] = if not FFlagAddEventsToCommunityProfile then nil else Events
+	[Enums.Components.Store] = Store
 }
-local t5 = {
+local socialLinks = Enums.Components.SocialLinks
+
+if not FFlagAddSocialLinksToCommunityProfile then
+	SocialLinks = nil
+end
+
+v4[socialLinks] = SocialLinks
+v4[Enums.Components.ViewFullProfile] = ViewFullProfile
+local communityLocked = Enums.Components.CommunityLocked
+
+if not FFlagAddCommunityLockedToCommunityProfile then
+	CommunityLocked = nil
+end
+
+v4[communityLocked] = CommunityLocked
+local events = Enums.Components.Events
+
+if not FFlagAddEventsToCommunityProfile then
+	Events = nil
+end
+
+v4[events] = Events
+local announcements = Enums.Components.Announcements
+
+if not FFlagGroupAnnouncementsSdui then
+	Announcements = nil
+end
+
+v4[announcements] = Announcements
+local groupForumsDiscovery = Enums.Components.GroupForumsDiscovery
+
+if not FFlagGroupForumsDiscoverySdui then
+	GroupForumsDiscovery = nil
+end
+
+v4[groupForumsDiscovery] = GroupForumsDiscovery
+
+local v5 = {
 	[Enums.Components.ContactProfileHeader] = ContactProfileHeader,
 	[Enums.Components.ContactDescription] = ContactDescription,
-	[Enums.Components.Actions] = if not v46 or not FFlagProfilePlatformCTAsRefactor then ProfileActionBar else CTARow
+	[Enums.Components.Actions] = CTARow
 }
-local v52 = if not FFlagAXEnableProfileTab then nil else Cryo.Dictionary.join(t3, {
-	[Enums.Components.UserProfileHeader] = MeTabUserProfileHeader,
-	[Enums.Components.Actions] = Cryo.None
-})
+local v6
 
-return function(p1, p2, p3, s1: string?, b1: boolean?) -- line: 161
-	-- upvalues: React (copy), Constants (copy), Cryo (copy), getPeekViewOpenHeightByProfileType (copy), Enums (copy), FFlagAXEnableProfileTab (copy), v52 (copy), t3 (copy), t4 (copy), t5 (copy), FFlagAboutBeforeActionClient (copy), orderWithAboutBeforeActions (copy), FFlagProfilePlatformEnableMoments (copy), moveMomentsToTop (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy)
-	local v78 = p2 or {}
-	local t6 = {
+if FFlagAXEnableProfileTab then
+	v6 = Cryo.Dictionary.join(v2, {
+		[Enums.Components.UserProfileHeader] = MeTabUserProfileHeader,
+		[Enums.Components.Actions] = Cryo.None
+	})
+else
+	v6 = nil
+end
+
+return function(p, options, p2, p3: string?, flag: boolean?)
+	local v7 = options or {}
+	local children = {
 		Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -175,47 +260,45 @@ return function(p1, p2, p3, s1: string?, b1: boolean?) -- line: 161
 		})
 	}
 
-	if Cryo.isEmpty(v78) then
-		t6.loadingView = React.createElement("Frame", {
+	if Cryo.isEmpty(v7) then
+		children.loadingView = React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, getPeekViewOpenHeightByProfileType(p2)),
 			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, getPeekViewOpenHeightByProfileType(p3))
+			BorderSizePixel = 0
 		})
 
-		return t6
+		return children
 	end
 
-	local t7 = {}
+	local v8 = {}
 
-	if p3 == Enums.ProfileTypes.User then
-		t7 = if not FFlagAXEnableProfileTab or not b1 then t3 else v52
-	elseif p3 == Enums.ProfileTypes.Community then
-		t7 = t4
-	elseif p3 == Enums.ProfileTypes.Contact then
-		t7 = t5
+	if p2 == Enums.ProfileTypes.User then
+		v8 = if FFlagAXEnableProfileTab and flag then v6 else v2
+	elseif p2 == Enums.ProfileTypes.Community then
+		v8 = v4
+	elseif p2 == Enums.ProfileTypes.Contact then
+		v8 = v5
 	end
 
-	local v81 = if not FFlagAboutBeforeActionClient or p3 ~= Enums.ProfileTypes.User then v78 else orderWithAboutBeforeActions(v78)
-
-	if FFlagProfilePlatformEnableMoments and p3 == Enums.ProfileTypes.User and s1 == Enums.Sources.MomentsFeed then
-		v81 = moveMomentsToTop(v81)
+	if FFlagAboutBeforeActionClient and p2 == Enums.ProfileTypes.User then
+		v7 = orderWithAboutBeforeActions(v7)
 	end
 
-	for v82, v83 in v81 do
-		local v84 = t7[v83]
+	if FFlagProfilePlatformEnableMoments and p2 == Enums.ProfileTypes.User and p3 == Enums.Sources.MomentsFeed then
+		v7 = moveMomentsToTop(v7)
+	end
+
+	for k, v9 in v7 do
+		local v10 = v8[v9]
 
 		if FFlagProfilePlatformEnableLazyLoadingComponents then
-			if v84 ~= nil and p1[v83] ~= nil then
-				t6[v83] = React.createElement(v84, {
-					layoutOrder = v82
-				})
+			if v10 ~= nil and p[v9] ~= nil then
+				children[v9] = React.createElement(v10, { layoutOrder = k })
 			end
-		elseif v84 ~= nil then
-			t6[v83] = React.createElement(v84, {
-				layoutOrder = v82
-			})
+		elseif v10 ~= nil then
+			children[v9] = React.createElement(v10, { layoutOrder = k })
 		end
 	end
 
-	return t6
+	return children
 end

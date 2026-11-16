@@ -1,160 +1,145 @@
-local Parent = script:FindFirstAncestor("Badges").Parent
+local parent = script:FindFirstAncestor("Badges").Parent
+
 local fetchBadgeDetailsPage = require(script.Parent.fetchBadgeDetailsPage)
 local getBadgeDetailsPageKey = require(script.Parent.getBadgeDetailsPageKey)
 local BadgeDetailsSheetState = require(script.Parent.BadgeDetailsSheetState)
-
-require(Parent.Navigation)
-
-local Foundation = require(Parent.Foundation)
+require(parent.Navigation)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local React = require(Parent.React)
-local useNavigation = require(Parent.Navigation).useNavigation
-local useRouteName = require(Parent.Navigation).useRouteName
-local useNavigationFocus = require(Parent.Navigation).useNavigationFocus
-local Responsive = require(Parent.Responsive)
+local React = require(parent.React)
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local Navigation2 = require(parent.Navigation)
+local useRouteName = Navigation2.useRouteName
+local Navigation3 = require(parent.Navigation)
+local useNavigationFocus = Navigation3.useNavigationFocus
+local Responsive = require(parent.Responsive)
 local useBreakpointXOrSmaller = Responsive.useBreakpointXOrSmaller
-local SduiSharedUtilities = require(Parent.SduiSharedUtilities)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
 local SduiPageEntryPoint = SduiSharedUtilities.SduiPageEntryPoint
 local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
-local CompositionTags = require(Parent.AppComposition).CompositionTags
+local AppComposition = require(parent.AppComposition)
+local CompositionTags = AppComposition.CompositionTags
+
 local setIsBadgeDetailsSheetOpen = BadgeDetailsSheetState.setIsBadgeDetailsSheetOpen
-local FFlagSduiPageEntryUseSharedHooks = require(Parent.SharedFlags).FFlagSduiPageEntryUseSharedHooks
-local v20 = game:DefineFastFlag("LuaAppBadgeDetailsLargeSideSheetSize2", false)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiPageEntryUseSharedHooks = SharedFlags.FFlagSduiPageEntryUseSharedHooks
 
-local function getFromPropsOrNavigationParams(t1: {[any]: any}, s1: string) -- line: 41
-	local v25 = t1.navigation and t1.navigation.getParam("extraProps")
-
-	return t1[s1] or v25 and v25[s1]
+local function getFromPropsOrNavigationParams(p, p2: string) -- 2 equivalent calls inferred from this helper
+	local v = p.navigation and p.navigation.getParam("extraProps")
+	return p[p2] or v and v[p2]
 end
-local function BadgeDetailsPage(t2: {[any]: any}) -- line: 57
-	-- upvalues: useTokens (copy), getBadgeDetailsPageKey (copy), React (copy), SduiLoadTimer (copy), useNavigation (copy), useRouteName (copy), useNavigationFocus (copy), useBreakpointXOrSmaller (copy), Responsive (copy), fetchBadgeDetailsPage (copy), setIsBadgeDetailsSheetOpen (copy), SduiFeatureEntryPoint (copy), SduiPageEntryPoint (copy), FFlagSduiPageEntryUseSharedHooks (copy), CompositionTags (copy), Foundation (copy), v20 (copy)
-	local v29 = useTokens()
-	local v30 = t2.navigation and t2.navigation.getParam("extraProps")
-	local v31 = t2.badgeId or v30 and v30.badgeId
-	local v32 = getBadgeDetailsPageKey(v31)
-	local v33 = React.useMemo(function() -- line: 63
-		-- upvalues: t2 (copy), SduiLoadTimer (copy)
-		local v41 = t2
-		local v42 = v41.navigation and v41.navigation.getParam("extraProps")
 
-		return v41.pageTimer or v42 and v42.pageTimer or SduiLoadTimer.createLoadTimer("BadgeDetails")
+local function BadgeDetailsPage(p)
+	local v = useTokens()
+	local v2 = getFromPropsOrNavigationParams(p, "badgeId") -- inferred equivalent call
+	local badgeDetailsPageKey = getBadgeDetailsPageKey(v2)
+
+	local pageTimer = React.useMemo(function()
+		return getFromPropsOrNavigationParams(p, "pageTimer") or SduiLoadTimer.createLoadTimer("BadgeDetails") -- inferred equivalent call
 	end, {})
-	local v34 = useNavigation()
-	local v35 = useRouteName()
-	local v36 = useNavigationFocus()
-	local v37 = useBreakpointXOrSmaller(Responsive.Keys.Small)
-	local v38 = React.useCallback(function() -- line: 72
-		-- upvalues: v35 (copy), v36 (copy), v34 (copy)
-		if v35 == "BadgeDetails" and v36 then
-			v34.goBack()
+
+	local v3 = useNavigation()
+	local v4 = useRouteName()
+	local isOpen = useNavigationFocus()
+	local v5 = useBreakpointXOrSmaller(Responsive.Keys.Small)
+
+	local onClose = React.useCallback(function()
+		if v4 == "BadgeDetails" and isOpen then
+			v3.goBack()
 		end
-	end, {
-		v34,
-		v35,
-		v36
-	})
+	end, { v3, v4, isOpen })
 
-	React.useEffect(function() -- line: 78
-		-- upvalues: v31 (copy), fetchBadgeDetailsPage (copy), v33 (copy)
-		if v31 then
-			fetchBadgeDetailsPage(v31, v33)
+	React.useEffect(function()
+		if v2 then
+			fetchBadgeDetailsPage(v2, pageTimer)
 		end
-	end, {
-		v31,
-		v33
-	})
-	React.useEffect(function() -- line: 84
-		-- upvalues: v37 (copy), v36 (copy), setIsBadgeDetailsSheetOpen (copy)
-		local v43 = not v37 and v36
+	end, { v2, pageTimer })
 
-		setIsBadgeDetailsSheetOpen(v43)
+	React.useEffect(function()
+		setIsBadgeDetailsSheetOpen(not v5 and isOpen)
 
-		return function() -- line: 88
-			-- upvalues: setIsBadgeDetailsSheetOpen (copy)
+		return function()
 			setIsBadgeDetailsSheetOpen(false)
 		end
-	end, {
-		v37,
-		v36
-	})
+	end, { v5, isOpen })
 
-	local v39 = React.useRef(nil)
-	local v40 = React.useCallback(function() -- line: 97
-		-- upvalues: React (copy), SduiFeatureEntryPoint (copy), v32 (copy), v33 (copy)
+	local ref = React.useRef(nil)
+
+	local renderUtilities = React.useCallback(function()
 		return React.createElement(SduiFeatureEntryPoint, {
 			appPage = "BadgeDetails",
+			configKey = badgeDetailsPageKey,
 			identifier = "badge_details_context_menu",
-			shouldDisplayError = false,
-			shouldDisplayLoading = false,
-			configKey = v32,
 			AutomaticSize = Enum.AutomaticSize.XY,
-			pageTimer = v33
+			pageTimer = pageTimer,
+			shouldDisplayError = false,
+			shouldDisplayLoading = false
 		})
-	end, {
-		v32,
-		v33
-	})
+	end, { badgeDetailsPageKey, pageTimer })
 
-	if v31 == nil then
+	if v2 == nil then
 		return nil
 	end
 
-	if v37 then
+	if v5 then
 		return React.createElement(SduiPageEntryPoint, {
 			appPage = "BadgeDetails",
+			configKey = badgeDetailsPageKey,
+			identifier = FFlagSduiPageEntryUseSharedHooks and "badge_details_feed" or badgeDetailsPageKey .. "_badge_details_feed",
+			pageTimer = pageTimer,
+			renderUtilities = renderUtilities,
 			includeNavigationHeaderBar = true,
-			configKey = v32,
-			identifier = if not FFlagSduiPageEntryUseSharedHooks then v32 .. "_" .. "badge_details_feed" else "badge_details_feed",
-			pageTimer = v33,
-			renderUtilities = v40,
 			contentTag = CompositionTags.ContentRegion.Body
 		})
 	end
 
 	return React.createElement(Foundation.Sheet.Root, {
 		snapPoints = { 1 },
-		isOpen = v36,
-		displaySize = if not v20 then nil else Foundation.Enums.DialogSize.Large,
-		onClose = v38
+		isOpen = isOpen,
+		displaySize = Foundation.Enums.DialogSize.Large,
+		onClose = onClose
 	}, {
-		Header = React.createElement(Foundation.Sheet.Header, {
-			hasCloseAffordance = true
-		}, {
-			ContextMenu = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Right,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder
-				}),
-				ContextMenuEntryPoint = React.createElement("Frame", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					BorderSizePixel = 0,
-					AutomaticSize = Enum.AutomaticSize.XY
-				}, {
-					EntryPoint = v40()
-				})
-			})
+		Header = React.createElement(Foundation.Sheet.Header, { hasCloseAffordance = true }, {
+			ContextMenu = React.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, BorderSizePixel = 0 },
+				{
+					UIListLayout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Right,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					ContextMenuEntryPoint = React.createElement(
+						"Frame",
+						{
+							LayoutOrder = 1,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0
+						},
+						{ EntryPoint = renderUtilities() }
+					)
+				}
+			)
 		}),
-		Content = React.createElement(Foundation.Sheet.Content, {
-			scrollingFrameRef = v39
-		}, React.createElement(SduiPageEntryPoint, {
-			appPage = "BadgeDetails",
-			includeNavigationHeaderBar = false,
-			disableRootPadding = true,
-			snackbarPortalLayoutOrder = 2147483647,
-			configKey = v32,
-			identifier = if not FFlagSduiPageEntryUseSharedHooks then v32 .. "_" .. "badge_details_feed" else "badge_details_feed",
-			pageTimer = v33,
-			backgroundStyle = v29.Color.None,
-			scrollingFrameRef = v39
-		}))
+		Content = React.createElement(
+			Foundation.Sheet.Content,
+			{ scrollingFrameRef = ref },
+			React.createElement(SduiPageEntryPoint, {
+				appPage = "BadgeDetails",
+				configKey = badgeDetailsPageKey,
+				identifier = FFlagSduiPageEntryUseSharedHooks and "badge_details_feed" or badgeDetailsPageKey .. "_badge_details_feed",
+				pageTimer = pageTimer,
+				includeNavigationHeaderBar = false,
+				backgroundStyle = v.Color.None,
+				disableRootPadding = true,
+				scrollingFrameRef = ref,
+				snackbarPortalLayoutOrder = 2147483647
+			})
+		)
 	})
 end
 

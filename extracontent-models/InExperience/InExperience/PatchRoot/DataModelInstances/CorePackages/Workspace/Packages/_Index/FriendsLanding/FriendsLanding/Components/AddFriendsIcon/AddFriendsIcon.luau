@@ -1,64 +1,62 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local FriendsLandingParent = FriendsLanding.Parent
-local FFlagConnectionsToFriendsRename = require(FriendsLandingParent.SharedFlags).FFlagConnectionsToFriendsRename
 local dependencies = require(FriendsLanding.dependencies)
-local React = dependencies.React
-local UIBlox = dependencies.UIBlox
+local react = dependencies.React
+local uiBlox = dependencies.UIBlox
 local TextKeys = require(FriendsLanding.Common.TextKeys)
-local IconButton = UIBlox.App.Button.IconButton
-local Images = UIBlox.App.ImageSet.Images
-local Badge = UIBlox.App.Indicator.Badge
-local Tooltip = UIBlox.App.Dialog.Tooltip
-local Dash = dependencies.Dash
-local useState = React.useState
+
+local iconButton = uiBlox.App.Button.IconButton
+local images = uiBlox.App.ImageSet.Images
+local badge = uiBlox.App.Indicator.Badge
+local tooltip = uiBlox.App.Dialog.Tooltip
+
+local dash = dependencies.Dash
+local useState = react.useState
 local useLocalization = dependencies.Hooks.useLocalization
 local getDeepValue = dependencies.SocialLibraries.Dictionary.getDeepValue
-local t1 = {
-	layoutOrder = 0,
-	friendRequestCount = 0,
-	showTooltip = false,
-	onActivated = Dash.noop
-}
 
-return function(t2: {[any]: any}) -- line: 36
-	-- upvalues: Dash (copy), t1 (copy), useState (copy), getDeepValue (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), TextKeys (copy), React (copy), IconButton (copy), Images (copy), Badge (copy), Tooltip (copy)
-	local v18 = Dash.join(t1, t2)
-	local v19, v20 = useState(240)
-	local v21 = useLocalization({
-		tooltipMessage = if not FFlagConnectionsToFriendsRename then TextKeys.NO_CONNECTIONS_TOOLTIP else TextKeys.NO_FRIENDS_TOOLTIP
-	})
+local v = { layoutOrder = 0, friendRequestCount = 0, onActivated = dash.noop, showTooltip = false }
 
-	return React.createElement(IconButton, {
+return function(p)
+	local joined = dash.join(v, p)
+
+	local state, setState = useState(240)
+	local function fn(instance)
+		if instance and instance:FindFirstChild("CallToActionTooltip", true) then
+			setState(getDeepValue(instance, "CallToActionTooltip.TooltipContainer.AbsoluteSize.X") or 240)
+		end
+	end
+	local v2 = useLocalization({ tooltipMessage = TextKeys.NO_FRIENDS_TOOLTIP })
+
+	return react.createElement(iconButton, {
 		size = UDim2.fromOffset(0, 0),
-		icon = Images["icons/actions/friends/friendAdd"],
-		position = v18.position,
+		icon = images["icons/actions/friends/friendAdd"],
+		position = joined.position,
 		anchorPoint = Vector2.new(1, 0.5),
-		layoutOrder = v18.layoutOrder,
-		onActivated = v18.onActivated
+		layoutOrder = joined.layoutOrder,
+		onActivated = joined.onActivated
 	}, {
-		ImagesContainer = React.createElement("Frame", {
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = 1,
-			[React.Change.AbsoluteSize] = function(p1) -- line: 40
-				-- upvalues: v20 (copy), getDeepValue (copy)
-				if p1 and p1:FindFirstChild("CallToActionTooltip", true) then
-					v20(getDeepValue(p1, "CallToActionTooltip.TooltipContainer.AbsoluteSize.X") or 240)
-				end
-			end
-		}, {
-			FriendRequestsBadge = v18.friendRequestCount > 0 and React.createElement(Badge, {
-				position = UDim2.new(0.5, 0, 0.5, 0),
-				anchorPoint = Vector2.new(0, 1),
-				value = v18.friendRequestCount
-			}),
-			CallToActionTooltip = v18.showTooltip and React.createElement(Tooltip, {
-				forceClickTriggerPoint = true,
-				isDirectChild = true,
-				position = UDim2.new(0, 42.5 - v19, 0, 36),
-				triggerPosition = Vector2.new(0, 0),
-				triggerSize = Vector2.new(36, 0),
-				bodyText = v21.tooltipMessage
-			})
-		})
+		ImagesContainer = react.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 1,
+				[react.Change.AbsoluteSize] = fn
+			},
+			{
+				FriendRequestsBadge = joined.friendRequestCount > 0 and react.createElement(badge, {
+					position = UDim2.new(0.5, 0, 0.5, 0),
+					anchorPoint = Vector2.new(0, 1),
+					value = joined.friendRequestCount
+				}),
+				CallToActionTooltip = joined.showTooltip and react.createElement(tooltip, {
+					position = UDim2.new(0, 42.5 - state, 0, 36),
+					triggerPosition = Vector2.new(0, 0),
+					triggerSize = Vector2.new(36, 0),
+					bodyText = v2.tooltipMessage,
+					forceClickTriggerPoint = true,
+					isDirectChild = true
+				})
+			}
+		)
 	})
 end

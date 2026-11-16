@@ -1,0 +1,4 @@
+local index = script.Parent.Parent.Parent.Parent._Index
+local EditProfileImageScreen = require(index.AvatarExperienceProfilePictureEditor.AvatarExperienceProfilePictureEditor.Components.EditProfileImage.EditProfileImageScreen)
+
+return EditProfileImageScreen

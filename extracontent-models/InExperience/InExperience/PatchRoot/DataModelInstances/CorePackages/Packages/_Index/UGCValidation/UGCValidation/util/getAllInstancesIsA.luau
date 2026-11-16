@@ -1,19 +1,17 @@
-return function(p1, s1: string) -- line: 1
-	local ok, _ = pcall(Instance.new, s1)
+return function(folder, className: string)
+	local success, _ = pcall(Instance.new, className)
+	assert(success, `{className} does not exist. Did you make a typo?`)
 
-	assert(ok, `{ s1 } does not exist. Did you make a typo?`)
+	local descendants = folder:GetDescendants()
+	table.insert(descendants, folder)
 
-	local descendants = p1:GetDescendants()
+	local descendants2 = {}
 
-	table.insert(descendants, p1)
-
-	local t1 = {}
-
-	for _, v8 in descendants do
-		if v8:IsA(s1) then
-			table.insert(t1, v8)
+	for _, descendant in descendants do
+		if descendant:IsA(className) then
+			table.insert(descendants2, descendant)
 		end
 	end
 
-	return t1
+	return descendants2
 end

@@ -1,60 +1,54 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
-local React = require(EditProfileParent.React)
-local UIBlox = require(EditProfileParent.UIBlox)
+local parent = EditProfile.Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
-local useScreenSize = require(EditProfileParent.RobloxAppHooks).useScreenSize
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useScreenSize = RobloxAppHooks.useScreenSize
 local TextKeys = require(EditProfile.Common.TextKeys)
-local useLocalization = require(EditProfileParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local FFlagEditProfileFixFocusNavigation = require(EditProfile.Flags.FFlagEditProfileFixFocusNavigation)
 local useDisplayNameText = require(EditProfile.Hooks.useDisplayNameText)
 local FocusNavigatorWrapper = require(EditProfile.Utils.FocusNavigatorWrapper)
 
-local function EditDisplayNameErrorModal(t1: {[any]: any}) -- line: 19
-	-- upvalues: useScreenSize (copy), useDisplayNameText (copy), useLocalization (copy), TextKeys (copy), FFlagEditProfileFixFocusNavigation (copy), FocusNavigatorWrapper (copy), React (copy), InteractiveAlert (copy), ButtonType (copy)
-	local v15 = useScreenSize()
-	local v16 = useDisplayNameText()
-	local v17 = useLocalization({
-		OK = TextKeys.OK
-	})
+local function EditDisplayNameErrorModal(p)
+	local screenSize = useScreenSize()
+	local v = useDisplayNameText()
+	local v2 = useLocalization({ OK = TextKeys.OK })
 
-	local function onClose() -- line: 26
-		-- upvalues: t1 (copy)
-		t1.navigation.goBack()
+	local function onClose()
+		p.navigation.goBack()
 	end
 
 	if FFlagEditProfileFixFocusNavigation then
-		return FocusNavigatorWrapper({
-			onClose = onClose
-		}, { React.createElement(InteractiveAlert, {
-			screenSize = v15,
-			title = v16.displayNameEditMessage,
-			bodyText = v16.displayNameCoolDownMessage,
-			buttonStackInfo = {
-				buttons = {{
-					buttonType = ButtonType.PrimarySystem,
-					props = {
-						onActivated = onClose,
-						text = v17.OK
+		return FocusNavigatorWrapper({ onClose = onClose }, { React.createElement(InteractiveAlert, {
+				screenSize = screenSize,
+				title = v.displayNameEditMessage,
+				bodyText = v.displayNameCoolDownMessage,
+				buttonStackInfo = {
+					buttons = {
+						{
+							buttonType = ButtonType.PrimarySystem,
+							props = { onActivated = onClose, text = v2.OK }
+						}
 					}
-				}}
-			}
-		}) })
+				}
+			}) })
 	end
 
 	return React.createElement(InteractiveAlert, {
-		screenSize = v15,
-		title = v16.displayNameEditMessage,
-		bodyText = v16.displayNameCoolDownMessage,
+		screenSize = screenSize,
+		title = v.displayNameEditMessage,
+		bodyText = v.displayNameCoolDownMessage,
 		buttonStackInfo = {
-			buttons = {{
-				buttonType = ButtonType.PrimarySystem,
-				props = {
-					onActivated = onClose,
-					text = v17.OK
+			buttons = {
+				{
+					buttonType = ButtonType.PrimarySystem,
+					props = { onActivated = onClose, text = v2.OK }
 				}
-			}}
+			}
 		}
 	})
 end

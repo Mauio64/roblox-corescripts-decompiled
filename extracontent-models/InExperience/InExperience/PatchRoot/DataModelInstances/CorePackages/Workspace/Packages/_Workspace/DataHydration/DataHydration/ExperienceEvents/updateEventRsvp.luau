@@ -1,33 +1,32 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
+
 local HttpService = game:GetService("HttpService")
-local HttpRequest = require(DataHydrationParent.HttpRequest)
-local Promise = require(DataHydrationParent.Promise)
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
+local HttpRequest = require(parent.HttpRequest)
+local Promise = require(parent.Promise)
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
+
 local ExperienceEventsUrlBuilder = require(script.Parent.ExperienceEventsUrlBuilder)
 
-local function updateEventRsvp(s1: string, s2: string) -- line: 13
-	-- upvalues: getLocalPlayerUserId (copy), Promise (copy), ExperienceEventsUrlBuilder (copy), HttpRequest (copy), HttpService (copy)
-	local v11 = getLocalPlayerUserId()
+local function updateEventRsvp(p: string, rsvpStatus: string)
+	local localPlayerUserId = getLocalPlayerUserId()
 
-	if not v11 or v11 <= 0 then
+	if not localPlayerUserId or localPlayerUserId <= 0 then
 		return Promise.reject({
 			ClientError = "Missing or invalid local player ID",
 			message = "Cannot RSVP to event: missing or invalid local player ID"
 		})
 	end
 
-	local v12 = ExperienceEventsUrlBuilder.buildRsvpUpdateUrl((tostring(s1)))
+	local rsvpUpdateUrl = ExperienceEventsUrlBuilder.buildRsvpUpdateUrl((tostring(p)))
 
 	return HttpRequest.config({
-		requestFunction = function(s3: string, s4: string, p1) -- line: 25
-			-- upvalues: HttpRequest (copy)
-			return HttpRequest.requestFunctions.RequestInternal(s3, s4, p1)
+		requestFunction = function(p2: string, p3: string, p4)
+			return HttpRequest.requestFunctions.RequestInternal(p2, p3, p4)
 		end
-	})(v12, "POST", {
-		postBody = HttpService:JSONEncode({
-			rsvpStatus = s2
-		})
+	})(rsvpUpdateUrl, "POST", {
+		postBody = HttpService:JSONEncode({ rsvpStatus = rsvpStatus })
 	})
 end
 

@@ -1,11 +1,7 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
+local parent = UserList.Parent
 
+local React = require(parent.React)
 require(UserList.Common.Types)
 
-local t1 = {
-	contacts = {}
-}
-
-return (React.createContext(t1))
+return (React.createContext({ contacts = {} }))

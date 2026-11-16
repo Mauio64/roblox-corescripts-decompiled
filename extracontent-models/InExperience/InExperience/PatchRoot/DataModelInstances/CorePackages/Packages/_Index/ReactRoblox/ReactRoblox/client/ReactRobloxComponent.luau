@@ -1,32 +1,43 @@
-local ParentParent = script.Parent.Parent.Parent
-local Object = require(ParentParent.LuauPolyfill).Object
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+
 local RobloxComponentProps = require(script.Parent.roblox.RobloxComponentProps)
 
 require(script.Parent["ReactRobloxHostTypes.roblox"])
 
 return {
-	setInitialProperties = RobloxComponentProps.setInitialProperties,
-	diffProperties = function(_, _: string, t1: {[any]: any}, t2: {[any]: any}, _) -- line: 32
-		-- upvalues: Object (copy)
-		local v9 = nil
+	["setInitialProperties"] = RobloxComponentProps.setInitialProperties,
+	diffProperties = function(_, _: string, items, items2, _)
+		local result = nil
 
-		for v10, _ in t1 do
-			if t2[v10] == nil then
-				v9 = v9 or table.create(2)
-				table.insert(v9, v10)
-				table.insert(v9, Object.None)
+		for k, _ in items do
+			if items2[k] ~= nil then
+				continue
 			end
+
+			result = result or table.create(2)
+			table.insert(result, k)
+			table.insert(result, Object.None)
 		end
 
-		for v12, v13 in t2 do
-			if v13 ~= if t1 == nil then nil else t1[v12] then
-				v9 = v9 or table.create(2)
-				table.insert(v9, v12)
-				table.insert(v9, v13)
+		for k, item in items2 do
+			local v
+
+			if items ~= nil then
+				v = items[k]
 			end
+
+			if item == v then
+				continue
+			end
+
+			result = result or table.create(2)
+			table.insert(result, k)
+			table.insert(result, item)
 		end
 
-		return v9
+		return result
 	end,
 	updateProperties = RobloxComponentProps.updateProperties,
 	cleanupHostComponent = RobloxComponentProps.cleanupHostComponent

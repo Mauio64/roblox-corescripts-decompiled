@@ -1,8 +1,8 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 
-require(scriptParent.ReactionAnimation)
+require(parent.ReactionAnimation)
 
-local t1 = {
+local v = {
 	crying = {
 		name = "sob",
 		frameCount = 91,
@@ -96,9 +96,8 @@ local t1 = {
 	}
 }
 
-local function getAnimationData(s1: string) -- line: 100
-	-- upvalues: t1 (copy)
-	return t1[s1]
+local function getAnimationData(p: string)
+	return v[p]
 end
 
 return getAnimationData

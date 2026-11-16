@@ -1,9 +1,6 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(s1: string, t1: {[any]: any}, t2: {[any]: any}?) -- line: 16
-	return {
-		lookId = s1,
-		assetIds = t1,
-		bundleIds = t2
-	}
+return Rodux.makeActionCreator(script.Name, function(lookId: string, assetIds, bundleIds)
+	return { lookId = lookId, assetIds = assetIds, bundleIds = bundleIds }
 end)

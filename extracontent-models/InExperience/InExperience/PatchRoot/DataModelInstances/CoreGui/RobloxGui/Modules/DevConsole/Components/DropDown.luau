@@ -1,153 +1,227 @@
 local CorePackages = game:GetService("CorePackages")
-local _ = game:GetService("CoreGui").RobloxGui
+local v = game:GetService("CoreGui")
+v = v.RobloxGui
 local Roact = require(CorePackages.Packages.Roact)
-local v4 = game:DefineFastFlag("DevConsoleDropdownFlipFix", false)
+
+local defineFastFlag = game:DefineFastFlag("DevConsoleDropdownFlipFix", false)
+local defineFastFlag2 = game:DefineFastFlag("DevConsoleDropdownMultiSelect", false)
+
 local Constants = require(script.Parent.Parent.Constants)
 local UtilBar = Constants.Font.UtilBar
-local UtilBar2 = Constants.DefaultFontSize.UtilBar
+local utilBar = Constants.DefaultFontSize.UtilBar
 local DropDownArrowHeight = Constants.GeneralFormatting.DropDownArrowHeight
-local v9 = DropDownArrowHeight / 2
+local halfDropDownArrowHeight = DropDownArrowHeight / 2
 local DownArrow = Constants.Image.DownArrow
-local v11 = Roact.Component:extend("DropDown")
 
-function v11.init(p1) -- line: 18
-	-- upvalues: v4 (copy), Roact (copy)
-	if v4 then
-		p1.guiInset = game:GetService("GuiService"):GetGuiInset()
+local extended = Roact.Component:extend("DropDown")
+
+function extended:init()
+	if defineFastFlag then
+		local GuiService = game:GetService("GuiService")
+		self.guiInset = GuiService:GetGuiInset()
 	end
 
-	function p1.onMainButtonPressed(_, _) -- line: 23
-		-- upvalues: p1 (copy)
-		p1:setState({
-			showDropDown = true
-		})
+	function self.onMainButtonPressed(_, _)
+		self:setState({ showDropDown = true })
 	end
-	function p1.nonDropDownSelection(_, p5) -- line: 29
-		-- upvalues: p1 (copy)
-		if p5.UserInputType == Enum.UserInputType.MouseButton1 or p5.UserInputType == Enum.UserInputType.Touch and p5.UserInputState == Enum.UserInputState.End then
-			p1:setState({
-				showDropDown = false
-			})
+
+	function self.nonDropDownSelection(_, p)
+		if
+			p.UserInputType == Enum.UserInputType.MouseButton1
+			or p.UserInputType == Enum.UserInputType.Touch and p.UserInputState == Enum.UserInputState.End
+		then
+			self:setState({ showDropDown = false })
 		end
 	end
 
-	p1.state = {
-		showDropDown = false
-	}
-	p1.ref = Roact.createRef()
+	self.state = { showDropDown = false }
+
+	self.ref = Roact.createRef()
 end
-function v11.render(p6) -- line: 47
-	-- upvalues: Roact (copy), Constants (copy), UtilBar2 (copy), UtilBar (copy), v4 (copy), DownArrow (copy), DropDownArrowHeight (copy), v9 (copy)
-	local buttonSize = p6.props.buttonSize
-	local dropDownList = p6.props.dropDownList
-	local selectedIndex = p6.props.selectedIndex
-	local onSelection = p6.props.onSelection
-	local layoutOrder = p6.props.layoutOrder
-	local dropDownTargetParent = p6.props.dropDownTargetParent
-	local v20 = p6.ref.current and p6.state.showDropDown
-	local t1 = {}
-	local v22 = nil
-	local uDim2 = nil
-	local n1 = 0
-	local n2 = 0
 
-	if p6.ref.current and v20 then
-		local AbsolutePosition = p6.ref.current.AbsolutePosition
-		local AbsoluteSize = p6.ref.current.AbsoluteSize
+function extended.render(props)
+	local buttonSize = props.props.buttonSize
+	local dropDownList = props.props.dropDownList
+	local selectedIndex = props.props.selectedIndex
 
-		n2 = AbsoluteSize.X
-		t1.UIListLayout = Roact.createElement("UIListLayout", {
+	local onSelection = props.props.onSelection
+	local layoutOrder = props.props.layoutOrder
+
+	local selectedSet = props.props.selectedSet
+	local onToggle = props.props.onToggle
+	local v2 = defineFastFlag2 and onToggle ~= nil
+	local target = props.props.dropDownTargetParent
+
+	local dropDown2 = props.ref.current and props.state.showDropDown
+
+	local children = {}
+
+	local total = 0
+	local v3, udim, udim2
+
+	if props.ref.current and dropDown2 then
+		local absolutePosition = props.ref.current.AbsolutePosition
+		local absoluteSize = props.ref.current.AbsoluteSize
+
+		v3 = absoluteSize.X
+
+		children.UIListLayout = Roact.createElement("UIListLayout", {
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Top
 		})
 
-		for k, v in pairs(dropDownList) do
-			local v30 = k == selectedIndex and Constants.Color.SelectedGray or Constants.Color.UnselectedGray
+		for k, dropDown in pairs(dropDownList) do
+			local v4
 
-			t1[v] = Roact.createElement("TextButton", {
+			if v2 then
+				if selectedSet == nil then
+					v4 = false
+				else
+					v4 = selectedSet[k] == true
+				end
+			else
+				v4 = k == selectedIndex
+			end
+
+			local selectedGray = v4 and Constants.Color.SelectedGray or Constants.Color.UnselectedGray
+
+			children[dropDown] = Roact.createElement("TextButton", {
 				Size = buttonSize,
-				Text = v,
+				Text = dropDown,
 				TextColor3 = Constants.Color.Text,
-				TextSize = UtilBar2,
+				TextSize = utilBar,
 				Font = UtilBar,
 				AutoButtonColor = false,
-				BackgroundColor3 = v30,
+				BackgroundColor3 = selectedGray,
 				BackgroundTransparency = 0,
 				BorderSizePixel = 0,
 				LayoutOrder = k,
-				[Roact.Event.Activated] = function() -- line: 94
-					-- upvalues: onSelection (copy), k (copy), p6 (copy)
+				[Roact.Event.Activated] = function()
+					if v2 then
+						onToggle(k)
+						return
+					end
+
 					onSelection(k)
-					p6:setState({
-						showDropDown = false
-					})
+					props:setState({ showDropDown = false })
 				end
 			})
-			n1 += AbsoluteSize.Y
+
+			total += absoluteSize.Y
 		end
 
-		local v31 = n1 + 24
+		local v4 = total + 24
 
-		if v4 then
-			local CurrentCamera = workspace.CurrentCamera
-			local v33 = (CurrentCamera and CurrentCamera.ViewportSize.Y or 1e999) - p6.guiInset.Y - (AbsolutePosition.Y + AbsoluteSize.Y)
-			local AbsolutePositionY = AbsolutePosition.Y
-			local v35 = v33 < v31 and v33 < AbsolutePositionY
+		if defineFastFlag then
+			local currentCamera = workspace.CurrentCamera
+			local v5 = (currentCamera and currentCamera.ViewportSize.Y or 1e999) - props.guiInset.Y - (absolutePosition.Y + absoluteSize.Y)
+			local y = absolutePosition.Y
+			local v6
 
-			uDim2 = UDim2.new(0, n2 + 24, 0, v31)
-			v22 = if not v35 then UDim2.new(0, AbsolutePosition.X, 0, AbsolutePosition.Y + AbsoluteSize.Y) else UDim2.new(0, AbsolutePosition.X, 0, AbsolutePosition.Y - v31)
+			if v5 < v4 then
+				v6 = v5 < y
+			else
+				v6 = false
+			end
+
+			udim = UDim2.new(0, v3 + 24, 0, v4)
+
+			if v6 then
+				udim2 = UDim2.new(0, absolutePosition.X, 0, absolutePosition.Y - v4)
+			else
+				udim2 = UDim2.new(0, absolutePosition.X, 0, absolutePosition.Y + absoluteSize.Y)
+			end
 		else
-			uDim2 = UDim2.new(0, n2 + 24, 0, n1 + 24)
-			v22 = UDim2.new(0, AbsolutePosition.X, 0, AbsolutePosition.Y + AbsoluteSize.Y)
+			udim = UDim2.new(0, v3 + 24, 0, total + 24)
+			udim2 = UDim2.new(0, absolutePosition.X, 0, absolutePosition.Y + absoluteSize.Y)
 		end
+	else
+		v3 = 0
 	end
 
-	return Roact.createElement("TextButton", {
+	local createElement = Roact.createElement
+	local position
+
+	if defineFastFlag then
+		position = props.props.position or UDim2.new() or nil
+	end
+
+	local text
+
+	if v2 then
+		text = props.props.summaryText or ""
+	else
+		text = dropDownList[selectedIndex]
+	end
+
+	local v4 = {
 		Size = buttonSize,
-		Position = v4 and (p6.props.position or UDim2.new()) or nil,
-		Text = dropDownList[selectedIndex],
+		Position = position,
+		Text = text,
 		TextColor3 = Constants.Color.Text,
-		TextSize = UtilBar2,
+		TextSize = utilBar,
 		Font = UtilBar,
 		AutoButtonColor = false,
 		BackgroundColor3 = Constants.Color.UnselectedGray,
 		BackgroundTransparency = 0,
 		LayoutOrder = layoutOrder,
-		[Roact.Event.Activated] = p6.onMainButtonPressed,
-		[Roact.Ref] = p6.ref
-	}, {
+		[Roact.Event.Activated] = props.onMainButtonPressed,
+		[Roact.Ref] = props.ref
+	}
+	local v5 = {
 		arrow = Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
 			Image = DownArrow,
+			BackgroundTransparency = 1,
 			Size = UDim2.new(0, DropDownArrowHeight, 0, DropDownArrowHeight),
-			Position = UDim2.new(1, -DropDownArrowHeight - v9, 0.5, -v9)
+			Position = UDim2.new(1, -DropDownArrowHeight - halfDropDownArrowHeight, 0.5, -halfDropDownArrowHeight)
 		}),
-		DropDown = v20 and Roact.createElement(Roact.Portal, {
-			target = dropDownTargetParent ~= nil and dropDownTargetParent or game:GetService("CoreGui").DevConsoleMaster
-		}, {
-			InputCatcher = Roact.createElement("Frame", {
-				Size = UDim2.new(1, 0, 1, 0),
-				Position = UDim2.new(0, 0, 0, 0),
-				BackgroundTransparency = 1,
-				[Roact.Event.InputEnded] = p6.nonDropDownSelection
-			}, {
-				OuterFrame = Roact.createElement("ImageButton", {
-					AutoButtonColor = false,
-					BackgroundTransparency = 0,
-					Size = uDim2,
-					Position = v22,
-					BackgroundColor3 = Constants.Color.TextBoxGray
-				}, {
-					innerFrame = Roact.createElement("Frame", {
-						BackgroundTransparency = 1,
-						Position = UDim2.new(0, 12, 0, 12),
-						Size = UDim2.new(0, n2, 0, n1)
-					}, t1)
-				})
-			})
+		DropDown = 0
+	}
+
+	if dropDown2 then
+		local createElement2 = Roact.createElement
+		local portal = Roact.Portal
+
+		if target == nil or not target then
+			local CoreGui = game:GetService("CoreGui")
+			target = CoreGui.DevConsoleMaster
+		end
+
+		dropDown2 = createElement2(portal, { target = target }, {
+			InputCatcher = Roact.createElement(
+				"Frame",
+				{
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(0, 0, 0, 0),
+					BackgroundTransparency = 1,
+					[Roact.Event.InputEnded] = props.nonDropDownSelection
+				},
+				{
+					OuterFrame = Roact.createElement("ImageButton", {
+						Size = udim,
+						AutoButtonColor = false,
+						Position = udim2,
+						BackgroundColor3 = Constants.Color.TextBoxGray,
+						BackgroundTransparency = 0
+					}, {
+						innerFrame = Roact.createElement(
+							"Frame",
+							{
+								Position = UDim2.new(0, 12, 0, 12),
+								Size = UDim2.new(0, v3, 0, total),
+								BackgroundTransparency = 1
+							},
+							children
+						)
+					})
+				}
+			)
 		})
-	})
+	end
+
+	v5.DropDown = dropDown2
+	return createElement("TextButton", v4, v5)
 end
 
-return v11
+return extended

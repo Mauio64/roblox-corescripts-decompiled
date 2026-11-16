@@ -1,101 +1,140 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 local HttpService = game:GetService("HttpService")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local ToastNotification = require(AppChatParent.ToastNotification)
-local default = require(AppChatParent.ToastNotificationsProtocol).ToastNotificationProtocol.default
+
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local ToastNotification = require(parent.ToastNotification)
+local ToastNotificationsProtocol = require(parent.ToastNotificationsProtocol)
+local default = ToastNotificationsProtocol.ToastNotificationProtocol.default
+
 local NotificationGroups = ToastNotification.NotificationGroups
+
 local useIsChatEnabled = require(AppChat.Hooks.useIsChatEnabled)
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local shouldHideFriendsChatToast = require(script.Parent.shouldHideFriendsChatToast)
+
 local LifecycleEvents = ToastNotification.LifecycleEvents
 local NotificationTypeEnum = ToastNotification.ToastNotificationTypeModule.NotificationTypeEnum
 local ShowNotificationSnoozeMenuSignal = ToastNotification.Signals.ShowNotificationSnoozeMenuSignal
 local DismissNotificationSnoozeMenuSignal = ToastNotification.Signals.DismissNotificationSnoozeMenuSignal
-local UniversalAppPolicy = require(AppChatParent.UniversalAppPolicy)
-local GetFFlagAppChatInExpToastSnoozeMenuDismissFix = require(AppChatParent.SharedFlags).GetFFlagAppChatInExpToastSnoozeMenuDismissFix
-local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
-local FFlagExpChatEnableFriendsTab = require(AppChatParent.SharedFlags).FFlagExpChatEnableFriendsTab
-local t1 = {
+
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local GetFFlagAppChatInExpToastSnoozeMenuDismissFix = SharedFlags.GetFFlagAppChatInExpToastSnoozeMenuDismissFix
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
+local FFlagAppChatToastChatTerminologyFixEnabled = SharedFlags.FFlagAppChatToastChatTerminologyFixEnabled
+
+local v = {
 	hideAllChatToasts = false,
 	isAppChatVisible = false,
 	isInExperience = false,
-	navigateToChat = function() -- line: 38
-	end
+	navigateToChat = function() end
 }
 
-return function(t2: {[any]: any}) -- line: 41
-	-- upvalues: Cryo (copy), t1 (copy), useLocalization (copy), FFlagExpChatEnableFriendsTab (copy), GetFFlagIsSquadEnabled (copy), GetFFlagAppChatInExpToastSnoozeMenuDismissFix (copy), UniversalAppPolicy (copy), useIsChatEnabled (copy), React (copy), LifecycleEvents (copy), NotificationTypeEnum (copy), HttpService (copy), default (copy), ShowNotificationSnoozeMenuSignal (copy), NotificationGroups (copy), DismissNotificationSnoozeMenuSignal (copy)
-	local v21 = Cryo.Dictionary.join(t1, t2)
-	local v22 = useLocalization({
+return function(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local snoozeTitle
+
+	if FFlagAppChatToastChatTerminologyFixEnabled and FFlagExpChatEnableFriendsTab then
+		snoozeTitle = UniversalAppPolicy.getAppFeaturePolicies().getCanSeeChatTerminology()
+			and "Feature.Chat.Label.MuteInGameChatToastNotifications"
+			or "Feature.Chat.Label.MuteInGamePartyToastNotifications"
+	else
+		snoozeTitle = FFlagExpChatEnableFriendsTab and "Feature.Chat.Label.MuteInGameChatToastNotifications"
+			or GetFFlagIsSquadEnabled() and "Feature.Chat.Label.SnoozePartyNotifications"
+			or "Feature.Chat.Label.SnoozeChatNotifications"
+	end
+
+	local v2 = useLocalization({
 		snoozeDescription = "Feature.Chat.Description.SnoozeDescription",
-		snoozeTitle = if not FFlagExpChatEnableFriendsTab then not GetFFlagIsSquadEnabled() and "Feature.Chat.Label.SnoozeChatNotifications" or "Feature.Chat.Label.SnoozePartyNotifications" else "Feature.Chat.Label.MuteInGameChatToastNotifications"
+		snoozeTitle = snoozeTitle
 	})
-	local n1 = 0
-	local v24 = if not GetFFlagAppChatInExpToastSnoozeMenuDismissFix() then v21.hideAllChatToasts else v21.isAppChatVisible
-	local v25 = UniversalAppPolicy.getAppFeaturePolicies().getCanSeeChatTab()
-	local v26 = useIsChatEnabled()
-	local u27 = v24 or not v26
-
-	React.useEffect(function() -- line: 62
-		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), HttpService (copy), default (copy), v21 (copy), ShowNotificationSnoozeMenuSignal (copy), v22 (copy), NotificationGroups (copy)
-		local v28 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.ChatNewMessage, function(p1) -- line: 66
-			-- upvalues: HttpService (copy), default (copy), v21 (copy), ShowNotificationSnoozeMenuSignal (copy), v22 (copy), NotificationGroups (copy)
-			if p1 and (p1.userActionType == "click" and p1.notificationData and p1.visualItem and p1.visualItem.eventName == "ChatMessageBody" and p1.visualItem.actionEventParams) then
-				local data = HttpService:JSONDecode(p1.visualItem.actionEventParams)
-
-				default:dismissNotification(p1.notificationData.id)
-				v21.navigateToChat(data.conversationId)
-			end
-
-			if p1 and p1.userActionType == "click" and p1.notificationData and p1.visualItem and p1.visualItem.eventName == "ChatMessageSnoozeSingleMetaAction" then
-				ShowNotificationSnoozeMenuSignal:fire({
-					context = "Toast",
-					description = v22.snoozeDescription,
-					notificationType = NotificationGroups.ChatMessageGroup,
-					title = v22.snoozeTitle
-				})
-			end
-		end)
-
-		return function() -- line: 98
-			-- upvalues: v28 (copy)
-			v28()
-		end
-	end, {
-		v21.navigateToChat,
-		v22
-	})
-	React.useEffect(function() -- line: 103
-		-- upvalues: default (copy), NotificationTypeEnum (copy), u27 (ref), v25 (copy), n1 (ref)
-		local v29 = default:listenToDisplayNotification(function(p2) -- line: 105
-			-- upvalues: NotificationTypeEnum (copy), u27 (ref), v25 (copy), default (copy), n1 (ref)
-			if p2.notificationType == NotificationTypeEnum.ChatNewMessage then
-				if u27 or not v25 then
-					default:dismissNotification(p2.notificationId)
-
-					return
-				end
-
-				n1 += 1
-			end
-		end)
-
-		return function() -- line: 116
-			-- upvalues: v29 (copy)
-			v29:Disconnect()
-		end
-	end, {
-		u27,
-		v25
-	})
+	local v3
 
 	if GetFFlagAppChatInExpToastSnoozeMenuDismissFix() then
-		React.useEffect(function() -- line: 122
-			-- upvalues: v21 (copy), DismissNotificationSnoozeMenuSignal (copy)
-			if not v21.isAppChatVisible and DismissNotificationSnoozeMenuSignal then
+		v3 = joined.isAppChatVisible
+	else
+		v3 = joined.hideAllChatToasts
+	end
+
+	local canSeeChatTab = UniversalAppPolicy.getAppFeaturePolicies().getCanSeeChatTab()
+
+	local v4 = useIsChatEnabled()
+	local v5 = v3 or not v4
+
+	React.useEffect(function()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.UserAction,
+			NotificationTypeEnum.ChatNewMessage,
+			function(data)
+				if
+					data
+					and data.userActionType == "click"
+					and data.notificationData
+					and data.visualItem
+					and data.visualItem.eventName == "ChatMessageBody"
+					and data.visualItem.actionEventParams
+				then
+					local jsonDecode = HttpService:JSONDecode(data.visualItem.actionEventParams)
+					default:dismissNotification(data.notificationData.id)
+					joined.navigateToChat(jsonDecode.conversationId)
+				end
+
+				if
+					data
+					and data.userActionType == "click"
+					and data.notificationData
+					and data.visualItem
+					and data.visualItem.eventName == "ChatMessageSnoozeSingleMetaAction"
+				then
+					ShowNotificationSnoozeMenuSignal:fire({
+						context = "Toast",
+						description = v2.snoozeDescription,
+						notificationType = NotificationGroups.ChatMessageGroup,
+						title = v2.snoozeTitle
+					})
+				end
+			end
+		)
+
+		return function()
+			callback()
+		end
+	end, { joined.navigateToChat, v2 })
+
+	React.useEffect(function()
+		local connection = default:listenToDisplayNotification(function(p2)
+			if p2.notificationType == NotificationTypeEnum.ChatNewMessage then
+				local v6 = FFlagExpChatEnableFriendsTab
+
+				if v6 then
+					if joined.visibleFriendsConversationId == nil then
+						v6 = false
+					else
+						v6 = shouldHideFriendsChatToast(p2, joined.visibleFriendsConversationId)
+					end
+				end
+
+				if v5 or not canSeeChatTab or v6 then
+					default:dismissNotification(p2.notificationId)
+				end
+			end
+		end)
+
+		return function()
+			connection:Disconnect()
+		end
+	end, { v5, canSeeChatTab, joined.visibleFriendsConversationId })
+
+	if GetFFlagAppChatInExpToastSnoozeMenuDismissFix() then
+		React.useEffect(function()
+			if not joined.isAppChatVisible and DismissNotificationSnoozeMenuSignal then
 				DismissNotificationSnoozeMenuSignal:fire()
 			end
-		end, { v21.isAppChatVisible })
+		end, { joined.isAppChatVisible })
 	end
 end

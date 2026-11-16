@@ -1,7 +1,10 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local RODUX_KEY = require(UserList.Common.Constants).RODUX_KEY
+local parent = UserList.Parent
 
-return require(UserListParent.LuaSocialLibrariesDeps).RoduxPresence.config({
+local Constants = require(UserList.Common.Constants)
+local RODUX_KEY = Constants.RODUX_KEY
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+
+return LuaSocialLibrariesDeps.RoduxPresence.config({
 	keyPath = RODUX_KEY .. ".Presence"
 })

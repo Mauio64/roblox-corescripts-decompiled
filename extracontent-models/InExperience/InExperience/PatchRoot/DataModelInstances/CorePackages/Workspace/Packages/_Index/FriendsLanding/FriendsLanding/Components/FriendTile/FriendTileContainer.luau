@@ -1,46 +1,85 @@
-local Parent = script:FindFirstAncestor("FriendsLanding").Parent
-local React = require(Parent.React)
-local UserProfiles = require(Parent.UserProfiles)
-local Dash = require(Parent.Dash)
-local DataHydration = require(Parent.DataHydration)
-local useSignalState = require(Parent.SignalsReact).useSignalState
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("FriendsLanding").Parent
+
+local React = require(parent.React)
+local UserProfiles = require(parent.UserProfiles)
+local Dash = require(parent.Dash)
+local DataHydration = require(parent.DataHydration)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local Signals = require(parent.Signals)
+
 local FriendTile = require(script.Parent.FriendTile)
-local FFlagFriendsPageUserListEnabled = require(Parent.SharedFlags).FFlagFriendsPageUserListEnabled
-local FFlagEnableBlackbirdCheck = require(Parent.SharedFlags).FFlagEnableBlackbirdCheck
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFriendsPageUserListEnabled = SharedFlags.FFlagFriendsPageUserListEnabled
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags2.FFlagEnableBlackbirdCheck
 local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
-local v12 = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
 
-local function FriendTileContainer(p1) -- line: 19
-	-- upvalues: FFlagFriendsPageUserListEnabled (copy), UserProfiles (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), React (copy), Signals (copy), v12 (copy), useSignalState (copy), FriendTile (copy), Dash (copy)
-	local v15 = if not FFlagFriendsPageUserListEnabled then UserProfiles.Hooks.useUserProfilesFetch({
-		userIds = { p1.user.id },
-		query = UserProfiles.Queries.userProfilesFriendsLandingQueryByUserIds
-	}) else nil
-	local v16 = nil
+local v = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
 
-	if FFlagEnableBlackbirdCheck then
-		v16 = useIsRobloxSubscriber(if not p1.user or not p1.user.id then nil else p1.user.id)
+local function FriendTileContainer(p)
+	local v2
+
+	if not FFlagFriendsPageUserListEnabled then
+		v2 = UserProfiles.Hooks.useUserProfilesFetch({
+			userIds = { p.user.id },
+			query = UserProfiles.Queries.userProfilesFriendsLandingQueryByUserIds
+		})
 	end
 
-	local v17 = React.useMemo(function() -- line: 33
-		-- upvalues: Signals (copy), p1 (copy), v12 (copy)
-		return Signals.createComputed(function(p2) -- line: 34
-			-- upvalues: p1 (copy), v12 (copy)
-			if p1.user and (p1.user.id and p1.user.id ~= "") then
-				return (v12.getIsTrustedConnection(p1.user.id).data(p2))
+	local isRobloxSubscriber
+
+	if FFlagEnableBlackbirdCheck then
+		local v3
+
+		if p.user and p.user.id then
+			v3 = p.user.id
+		end
+
+		isRobloxSubscriber = useIsRobloxSubscriber(v3)
+	end
+
+	local useMemo = React.useMemo
+	local function fn()
+		return Signals.createComputed(function(p2)
+			if p.user and p.user.id and p.user.id ~= "" then
+				return (v.getIsTrustedConnection(p.user.id).data(p2))
 			end
 
 			return nil
 		end)
-	end, { if not p1.user then nil else p1.user.id })
-	local v18 = useSignalState(v17)
+	end
 
-	return React.createElement(FriendTile, Dash.join(p1, {
-		userProfile = if not FFlagFriendsPageUserListEnabled then if not v15.data then nil else v15.data.userProfiles[1] else nil,
-		trustedConnection = v18,
-		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v16
-	}))
+	local v3
+
+	if p.user then
+		v3 = p.user.id
+	end
+
+	local trustedConnection = useSignalState((useMemo(fn, { v3 })))
+
+	local createElement = React.createElement
+
+	local join = Dash.join
+	local userProfile
+
+	if not (FFlagFriendsPageUserListEnabled or not v2.data) then
+		userProfile = v2.data.userProfiles[1]
+	end
+
+	if not FFlagEnableBlackbirdCheck then
+		isRobloxSubscriber = nil
+	end
+
+	return createElement(
+		FriendTile,
+		join(p, {
+			userProfile = userProfile,
+			trustedConnection = trustedConnection,
+			isRobloxSubscriber = isRobloxSubscriber
+		})
+	)
 end
 
 return FriendTileContainer

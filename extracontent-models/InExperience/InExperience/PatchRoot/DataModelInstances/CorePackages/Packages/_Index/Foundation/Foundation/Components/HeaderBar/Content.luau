@@ -1,1 +1,3 @@
-return (require(script.HeaderBarContent))
+local HeaderBarContent = require(script.HeaderBarContent)
+
+return HeaderBarContent

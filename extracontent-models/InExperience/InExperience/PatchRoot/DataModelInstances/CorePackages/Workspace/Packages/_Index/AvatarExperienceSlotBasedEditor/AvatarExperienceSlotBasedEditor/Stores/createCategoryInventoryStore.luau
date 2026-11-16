@@ -1,69 +1,162 @@
 local HttpService = game:GetService("HttpService")
 local AvatarExperienceSlotBasedEditor = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor")
-local AvatarExperienceSlotBasedEditorParent = AvatarExperienceSlotBasedEditor.Parent
-local Signals = require(AvatarExperienceSlotBasedEditorParent.Signals)
-local mutedError = require(AvatarExperienceSlotBasedEditorParent.Loggers).mutedError
-local InventoryItemType = require(AvatarExperienceSlotBasedEditor.Enums.InventoryItemType)
+local parent = AvatarExperienceSlotBasedEditor.Parent
 
+local Signals = require(parent.Signals)
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+
+local InventoryItemType = require(AvatarExperienceSlotBasedEditor.Enums.InventoryItemType)
 require(AvatarExperienceSlotBasedEditor.Enums.InventoryItemAvailability)
 require(script.Parent.Parent.Types)
 
-local FFlagAXModeratedItemsFlow = require(AvatarExperienceSlotBasedEditorParent.AvatarExperienceFlags).FFlagAXModeratedItemsFlow
-local FFlagAXInventoryDurablesSupport = require(AvatarExperienceSlotBasedEditorParent.AvatarExperienceFlags).FFlagAXInventoryDurablesSupport
-local FFlagAXEnableModeratedItemsFlowForDurables = require(AvatarExperienceSlotBasedEditorParent.AvatarExperienceFlags).FFlagAXEnableModeratedItemsFlowForDurables
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXInventoryDurablesSupport = AvatarExperienceFlags.FFlagAXInventoryDurablesSupport
+local AvatarExperienceFlags2 = require(parent.AvatarExperienceFlags)
+local FFlagAXBackgroundGeneration = AvatarExperienceFlags2.FFlagAXBackgroundGeneration
+local AvatarExperienceFlags3 = require(parent.AvatarExperienceFlags)
+local FFlagAXRefetchInventoryOnUpdate = AvatarExperienceFlags3.FFlagAXRefetchInventoryOnUpdate
 
-local function createCategoryInventoryStore() -- line: 41
-	-- upvalues: Signals (copy), HttpService (copy), InventoryItemType (copy), mutedError (copy), FFlagAXModeratedItemsFlow (copy), FFlagAXEnableModeratedItemsFlowForDurables (copy), FFlagAXInventoryDurablesSupport (copy)
-	local t1 = nil
-	local v12, v13 = Signals.createSignal(nil)
-	local v14, v15 = Signals.createSignal(false)
-	local v16, v17 = Signals.createSignal(HttpService:GenerateGUID(true))
+local function createCategoryInventoryStore()
+	local categoryInventoryStore = nil
 
-	t1 = {
+	local signal, v = Signals.createSignal(nil)
+	local signal2, v2 = Signals.createSignal(false)
+	local signal3, v3 = Signals.createSignal(HttpService:GenerateGUID(true))
+	local v4
+
+	if FFlagAXRefetchInventoryOnUpdate then
+		v4 = false
+	else
+		v4 = nil
+	end
+
+	categoryInventoryStore = {
+		getItems = signal,
+		getHasReachedLastPage = signal2,
+		getSearchUuid = signal3,
 		nextPageCursor = nil,
-		getItems = v12,
-		getHasReachedLastPage = v14,
-		getSearchUuid = v16,
-		startNewSearch = function() -- line: 50
-			-- upvalues: t1 (ref), v13 (copy), v15 (copy), v17 (copy), HttpService (copy)
-			t1.nextPageCursor = nil
-			v13(nil)
-			v15(false)
-			v17(HttpService:GenerateGUID(true))
+		isRefreshPending = function(): boolean
+			return v4 == true
 		end,
-		addResultsPage = function(p1) -- line: 58
-			-- upvalues: v12 (copy), InventoryItemType (copy), mutedError (copy), FFlagAXModeratedItemsFlow (copy), FFlagAXEnableModeratedItemsFlowForDurables (copy), FFlagAXInventoryDurablesSupport (copy), v13 (copy), t1 (ref), v15 (copy)
-			local v19 = v12(false)
-			local v20 = if not v19 then {} else table.clone(v19)
+		startNewSearch = function()
+			categoryInventoryStore.nextPageCursor = nil
 
-			for _, v22 in p1.avatarInventoryItems do
-				local v23 = if v22.itemCategory.itemType ~= Enum.AvatarItemType.Asset.Value then if v22.itemCategory.itemType ~= Enum.AvatarItemType.Bundle.Value then InventoryItemType.Unknown else InventoryItemType.Outfit else InventoryItemType.Asset
+			if FFlagAXRefetchInventoryOnUpdate then
+				v4 = false
+			end
 
-				if v23 == InventoryItemType.Unknown then
-					mutedError(`Unknown item type received from user inventory endpoint: { v22.itemCategory.itemType }`)
-				else
-					table.insert(v20, {
-						itemId = tostring(v22.itemId),
-						inventoryItemType = v23,
-						availabilityStatus = if not FFlagAXModeratedItemsFlow and not FFlagAXEnableModeratedItemsFlowForDurables then nil else v22.availabilityStatus,
-						expirationTime = if not FFlagAXInventoryDurablesSupport then nil else v22.expirationTime
-					})
+			v(nil)
+			v2(false)
+			v3(HttpService:GenerateGUID(true))
+		end,
+		startRefresh = function()
+			categoryInventoryStore.nextPageCursor = nil
+			v4 = true
+			v2(false)
+			v3(HttpService:GenerateGUID(true))
+		end,
+		removeItems = function(items)
+			local v5 = signal(false)
+
+			if not v5 then
+				return
+			end
+
+			local set = {}
+
+			for _, item in items do
+				set[item] = true
+			end
+
+			local v6 = {}
+
+			for _, v7 in v5 do
+				if not set[v7.itemId] then
+					v6[#v6 + 1] = v7
 				end
 			end
 
-			v13(v20)
+			if #v6 == #v5 then
+				return
+			end
 
-			local nextPageToken = p1.nextPageToken
+			if not (#v6 > 0) then
+				v6 = nil
+			end
 
-			t1.nextPageCursor = nextPageToken
+			v(v6)
+		end,
+		addResultsPage = function(p, p2: string?)
+			if FFlagAXRefetchInventoryOnUpdate and p2 ~= nil and p2 ~= signal3(false) then
+				return
+			end
+
+			local v5 = FFlagAXRefetchInventoryOnUpdate and v4 == true
+
+			if FFlagAXRefetchInventoryOnUpdate then
+				v4 = false
+			end
+
+			local v6
+
+			if not v5 then
+				v6 = signal(false)
+			end
+
+			local v7 = not v6 and {} or table.clone(v6)
+
+			for _, avatarInventoryItem in p.avatarInventoryItems do
+				local inventoryItemType
+
+				if avatarInventoryItem.itemCategory.itemType == Enum.AvatarItemType.Asset.Value then
+					inventoryItemType = InventoryItemType.Asset
+				elseif avatarInventoryItem.itemCategory.itemType == Enum.AvatarItemType.Bundle.Value then
+					inventoryItemType = InventoryItemType.Outfit
+				else
+					inventoryItemType = InventoryItemType.Unknown
+				end
+
+				if inventoryItemType == InventoryItemType.Unknown then
+					mutedError(`Unknown item type received from user inventory endpoint: {avatarInventoryItem.itemCategory.itemType}`)
+				else
+					local v8 = {
+						itemId = tostring(avatarInventoryItem.itemId),
+						inventoryItemType = inventoryItemType,
+						availabilityStatus = avatarInventoryItem.availabilityStatus,
+						expirationTime = 0,
+						isPlusExclusive = 0
+					}
+					local expirationTime
+
+					if FFlagAXInventoryDurablesSupport then
+						expirationTime = avatarInventoryItem.expirationTime
+					end
+
+					v8.expirationTime = expirationTime
+					local isPlusExclusive
+
+					if FFlagAXBackgroundGeneration then
+						isPlusExclusive = avatarInventoryItem.isPlusExclusive
+					end
+
+					v8.isPlusExclusive = isPlusExclusive
+					table.insert(v7, v8)
+				end
+			end
+
+			v(v7)
+
+			local nextPageToken = p.nextPageToken
+			categoryInventoryStore.nextPageCursor = nextPageToken
 
 			if nextPageToken == nil or nextPageToken == "" then
-				v15(true)
+				v2(true)
 			end
 		end
 	}
 
-	return t1
+	return categoryInventoryStore
 end
 
 return createCategoryInventoryStore

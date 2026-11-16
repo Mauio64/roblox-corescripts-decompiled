@@ -1,158 +1,171 @@
 local AppComposition = script:FindFirstAncestor("AppComposition")
-local AppCompositionParent = AppComposition.Parent
+local parent = AppComposition.Parent
 
-require(AppCompositionParent.Foundation)
+require(parent.Foundation)
+local Signals = require(parent.Signals)
 
-local Signals = require(AppCompositionParent.Signals)
 local CompositionConfig = require(AppComposition.CompositionConfig)
 local AppCompositionEnums = require(AppComposition.AppCompositionEnums)
 local CompositionTags = require(AppComposition.CompositionTags)
 local getGlobalViewportBreakpoint = require(AppComposition.getGlobalViewportBreakpoint)
-local FFlagEnableSplitPane = require(AppCompositionParent.SharedFlags).FFlagEnableSplitPane
-local Display = require(AppCompositionParent.Display)
-local v10 = game:DefineFastFlag("LuaAppCompositionFixDetailClip", false)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
+local Display = require(parent.Display)
+
+local defineFastFlag = game:DefineFastFlag("LuaAppScaleDetailWidth", false)
+
+local defineFastFlag2 = game:DefineFastFlag("LuaAppScaleDiscoveryWidth", false)
+
 local Header = CompositionTags.ContentRegion.Header
 local Body = CompositionTags.ContentRegion.Body
 local Detail = CompositionTags.Layout.Detail
 local ClipAtMaxWidth = CompositionTags.Utility.ClipAtMaxWidth
-local v15 = if not FFlagEnableSplitPane then nil else CompositionTags.SupportRegion.Root
-local v16 = if not FFlagEnableSplitPane then nil else CompositionTags.SupportRegion.Collapsed
-local v17 = if not FFlagEnableSplitPane then nil else "CompositionSupportMinSize"
-local v18 = if not FFlagEnableSplitPane then nil else "CompositionSupportMaxSize"
-local v19 = if not FFlagEnableSplitPane then nil else "CompositionSupportCollapsedSize"
-local v20 = if not FFlagEnableSplitPane then nil else CompositionConfig.getRegionOverrides(AppCompositionEnums.RegionName.SupportRegion)
-local t1 = {
-	[`.{ Header }`] = {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.fromScale(0.5, 0)
-	},
-	[`.{ Header }::UIPadding`] = {
+local root
+
+if FFlagEnableSplitPane then
+	root = CompositionTags.SupportRegion.Root
+end
+
+local collapsed
+
+if FFlagEnableSplitPane then
+	collapsed = CompositionTags.SupportRegion.Collapsed
+end
+
+local v = FFlagEnableSplitPane and "CompositionSupportMinSize" or nil
+local v2 = FFlagEnableSplitPane and "CompositionSupportMaxSize" or nil
+local v3
+
+if FFlagEnableSplitPane then
+	v3 = CompositionConfig.getRegionOverrides(AppCompositionEnums.RegionName.SupportRegion)
+end
+
+local v4 = {
+	[`.{Header}`] = { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.fromScale(0.5, 0) },
+	[`.{Header}::UIPadding`] = {
 		PaddingLeft = "$CompositionMargin",
 		PaddingRight = "$CompositionMargin"
 	},
-	[`.{ Header }::UISizeConstraint`] = {
-		MaxSize = "$CompositionMaxWidthDiscovery"
-	},
-	[`.{ Body }`] = {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.fromScale(0.5, 0)
-	},
-	[`.{ Body }::UIPadding`] = {
+	[`.{Header}::UISizeConstraint`] = { MaxSize = "$CompositionMaxWidthDiscovery" },
+	[`.{Body}`] = { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.fromScale(0.5, 0) },
+	[`.{Body}::UIPadding`] = {
 		PaddingLeft = "$CompositionMargin",
 		PaddingRight = "$CompositionMargin"
 	},
-	[`.{ Body }::UISizeConstraint`] = {
-		MaxSize = "$CompositionMaxWidthDiscovery"
-	},
-	[`.{ Detail } >> .{ Header }::UISizeConstraint`] = {
-		MaxSize = "$CompositionMaxWidthDetail"
-	},
-	[`.{ Detail } >> .{ Body }::UISizeConstraint`] = {
-		MaxSize = "$CompositionMaxWidthDetail"
-	},
-	[`.{ Body }::StyleQuery #CompositionAtMaxWidthDiscovery`] = {
+	[`.{Body}::UISizeConstraint`] = { MaxSize = "$CompositionMaxWidthDiscovery" },
+	[`.{Detail} >> .{Header}::UISizeConstraint`] = { MaxSize = "$CompositionMaxWidthDetail" },
+	[`.{Detail} >> .{Body}::UISizeConstraint`] = { MaxSize = "$CompositionMaxWidthDetail" },
+	[`.{Body}::StyleQuery #CompositionAtMaxWidthDiscovery`] = {
 		MinSize = "$CompositionClipThresholdDiscovery"
 	},
-	[`.{ Body }::StyleQuery #CompositionNotAtMaxWidthDiscovery`] = {
+	[`.{Body}::StyleQuery #CompositionNotAtMaxWidthDiscovery`] = {
 		MaxSize = "$CompositionMaxWidthDiscovery"
 	},
-	[`@CompositionAtMaxWidthDiscovery >> .{ ClipAtMaxWidth }`] = {
-		ClipsDescendants = true
-	},
-	[`@CompositionNotAtMaxWidthDiscovery >> .{ ClipAtMaxWidth }`] = if v10 then nil else {
-		ClipsDescendants = false
-	},
-	[`.{ Detail } >> .{ Body }::StyleQuery #CompositionAtMaxWidthDetail`] = {
+	[`@CompositionAtMaxWidthDiscovery >> .{ClipAtMaxWidth}`] = { ClipsDescendants = true },
+	[`.{Detail} >> .{Body}::StyleQuery #CompositionAtMaxWidthDetail`] = {
 		MinSize = "$CompositionClipThresholdDetail"
 	},
-	[`.{ Detail } >> .{ Body }::StyleQuery #CompositionNotAtMaxWidthDetail`] = {
+	[`.{Detail} >> .{Body}::StyleQuery #CompositionNotAtMaxWidthDetail`] = {
 		MaxSize = "$CompositionMaxWidthDetail"
 	},
-	[`@CompositionAtMaxWidthDetail >> .{ ClipAtMaxWidth }`] = {
-		ClipsDescendants = true
-	},
-	[`@CompositionNotAtMaxWidthDetail >> .{ ClipAtMaxWidth }`] = if v10 then nil else {
-		ClipsDescendants = false
-	},
-	[`.{ v15 }`] = if not FFlagEnableSplitPane or (not v20 or not v20.widthScale) then nil else {
-		Size = UDim2.new(v20.widthScale, 0, 1, 0)
-	},
-	[`.{ v15 }::UISizeConstraint`] = if not FFlagEnableSplitPane then nil else {
-		MinSize = "$" .. v17,
-		MaxSize = "$" .. v18
-	},
-	[`.{ v16 }`] = if not FFlagEnableSplitPane then nil else {
-		Size = "$" .. v19
-	}
+	[`@CompositionAtMaxWidthDetail >> .{ClipAtMaxWidth}`] = { ClipsDescendants = true },
+	[`.{root}`] = FFlagEnableSplitPane and v3 and v3.widthScale and {
+		Size = UDim2.new(v3.widthScale, 0, 1, 0)
+	} or nil,
+	[`.{root}::UISizeConstraint`] = FFlagEnableSplitPane and {
+		MinSize = "$" .. v,
+		MaxSize = "$" .. v2
+	} or nil,
+	[`.{collapsed}`] = FFlagEnableSplitPane and { Size = UDim2.new(0, 0, 1, 0) } or nil
 }
 
-local function applyRules(p1, t2: {[any]: any}) -- line: 141
-	-- upvalues: t1 (copy)
-	for v27, v28 in t1 do
-		local StyleRule = Instance.new("StyleRule")
-
-		StyleRule.Selector = v27
-		StyleRule.Name = v27
-		StyleRule:SetProperties(v28)
-		StyleRule.Parent = p1
-		table.insert(t2, StyleRule)
+local function applyRules(parent2, list)
+	for k, v5 in v4 do
+		local styleRule = Instance.new("StyleRule")
+		styleRule.Selector = k
+		styleRule.Name = k
+		styleRule:SetProperties(v5)
+		styleRule.Parent = parent2
+		table.insert(list, styleRule)
 	end
 end
-local function setupReactiveAttributes(p2, p3) -- line: 155
-	-- upvalues: Signals (copy), getGlobalViewportBreakpoint (copy), CompositionConfig (copy), FFlagEnableSplitPane (copy), AppCompositionEnums (copy), Display (copy), v17 (copy), v18 (copy), v19 (copy)
-	local v32 = Signals.createComputed(function(p4) -- line: 156
-		-- upvalues: getGlobalViewportBreakpoint (copy), CompositionConfig (copy), p3 (copy)
-		local v39 = getGlobalViewportBreakpoint(p4)
 
-		return CompositionConfig.getBaseConfig(v39, p3).margin
+local function setupReactiveAttributes(instance, p)
+	local computed = Signals.createComputed(function(p2)
+		local globalViewportBreakpoint = getGlobalViewportBreakpoint(p2)
+		return CompositionConfig.getBaseConfig(globalViewportBreakpoint, p).margin
 	end)
-	local v33 = if not FFlagEnableSplitPane then nil else Signals.createComputed(function(p5) -- line: 162
-		-- upvalues: getGlobalViewportBreakpoint (copy), CompositionConfig (copy), AppCompositionEnums (copy), p3 (copy)
-		local v41 = getGlobalViewportBreakpoint(p5)
+	local v5
 
-		return CompositionConfig.getRegionLayout(AppCompositionEnums.RegionName.SupportRegion, v41, p3)
-	end)
+	if FFlagEnableSplitPane then
+		v5 = Signals.createComputed(function(p2)
+			local globalViewportBreakpoint = getGlobalViewportBreakpoint(p2)
+			return CompositionConfig.getRegionLayout(
+				AppCompositionEnums.RegionName.SupportRegion,
+				globalViewportBreakpoint,
+				p
+			)
+		end)
+	else
+		v5 = nil
+	end
 
-	return Signals.createEffect(function(p6) -- line: 168
-		-- upvalues: v32 (copy), p2 (copy), FFlagEnableSplitPane (copy), v33 (copy), Display (copy), v17 (copy), v18 (copy), v19 (copy)
-		local v43 = v32(p6)
-		local v44 = v43 * 2
+	return Signals.createEffect(function(p2)
+		local v6 = computed(p2)
+		local v7 = v6 * 2
 
-		p2:SetAttribute("CompositionMargin", UDim.new(0, v43))
-		p2:SetAttribute("CompositionMaxWidthDiscovery", Vector2.new(1920 + v44, 1e999))
-		p2:SetAttribute("CompositionClipThresholdDiscovery", Vector2.new(1920 + v44, 0))
-		p2:SetAttribute("CompositionMaxWidthDetail", Vector2.new(848 + v44, 1e999))
-		p2:SetAttribute("CompositionClipThresholdDetail", Vector2.new(848 + v44, 0))
+		instance:SetAttribute("CompositionMargin", UDim.new(0, v6))
+		local v8
+
+		if defineFastFlag2 or defineFastFlag then
+			local displayStore = Display.GetDisplayStore(p2)
+			local v9 = not displayStore.getPlatformScale and 1 or displayStore.getPlatformScale(p2)
+			v8 = not (v9 and v9 > 0) and 1 or v9
+		end
+
+		instance:SetAttribute(
+			"CompositionMaxWidthDiscovery",
+			Vector2.new((not defineFastFlag2 and 1920 or v8 * 1920) + v7, 1e999)
+		)
+
+		instance:SetAttribute(
+			"CompositionClipThresholdDiscovery",
+			Vector2.new((not defineFastFlag2 and 1920 or v8 * 1920) + v7, 0)
+		)
+
+		instance:SetAttribute(
+			"CompositionMaxWidthDetail",
+			Vector2.new((not defineFastFlag and 848 or v8 * 848) + v7, 1e999)
+		)
+
+		instance:SetAttribute(
+			"CompositionClipThresholdDetail",
+			Vector2.new((not defineFastFlag and 848 or v8 * 848) + v7, 0)
+		)
 
 		if FFlagEnableSplitPane then
-			local v45 = v33(p6)
-			local v46 = Display.GetDisplayStore(p6)
-			local v47 = not v46.getPlatformScale and 1 or v46.getPlatformScale(p6)
-
-			if not v47 or v47 == 0 then
-				v47 = 1
-			end
-
-			p2:SetAttribute(v17, Vector2.new((v45.minWidth or 0) * v47, 0))
-			p2:SetAttribute(v18, Vector2.new((v45.maxWidth or 1e999) * v47, 1e999))
-			p2:SetAttribute(v19, UDim2.new(0, v43, 1, 0))
+			local v9 = v5(p2)
+			local displayStore = Display.GetDisplayStore(p2)
+			local v10 = not displayStore.getPlatformScale and 1 or displayStore.getPlatformScale(p2)
+			local v11 = (not v10 or v10 == 0) and 1 or v10
+			instance:SetAttribute(v, Vector2.new((v9.minWidth or 0) * v11, 0))
+			instance:SetAttribute(v2, Vector2.new((v9.maxWidth or 1e999) * v11, 1e999))
 		end
 	end)
 end
-local function setupCompositionStyleRules(p7, p8) -- line: 196
-	-- upvalues: applyRules (copy), setupReactiveAttributes (copy)
-	local t3 = {}
 
-	applyRules(p7, t3)
+local function setupCompositionStyleRules(parent2, p)
+	local v5 = {}
 
-	local v37 = setupReactiveAttributes(p7, p8)
+	applyRules(parent2, v5)
 
-	return function() -- line: 203
-		-- upvalues: v37 (copy), t3 (copy)
-		v37()
+	local v6 = setupReactiveAttributes(parent2, p)
 
-		for _, v49 in t3 do
-			v49:Destroy()
+	return function()
+		v6()
+
+		for _, v7 in v5 do
+			v7:Destroy()
 		end
 	end
 end

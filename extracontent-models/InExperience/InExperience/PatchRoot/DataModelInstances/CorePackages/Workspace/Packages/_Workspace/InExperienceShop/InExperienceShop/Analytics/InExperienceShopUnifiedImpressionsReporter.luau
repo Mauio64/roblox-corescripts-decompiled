@@ -1,28 +1,52 @@
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local AvatarExperienceAnalytics = require(Parent.AvatarExperienceAnalytics)
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
+
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
 local UnifiedEventLogEnums = AvatarExperienceAnalytics.UnifiedEventLogEnums
+
 local sendUnifiedEventLogForInstance = AvatarExperienceAnalytics.sendUnifiedEventLogForInstance
 local FFlagAllowCustomUnifiedEventFilter = AvatarExperienceAnalytics.Flags.FFlagAllowCustomUnifiedEventFilter
-local UnifiedLoggingSurface = require(Parent.AvatarExperienceNavigation).Enums.UnifiedLoggingSurface
-local Constants = require(script.Parent.Constants)
+local UnifiedEventLogConstants = AvatarExperienceAnalytics.UnifiedEventLogConstants
+local sendPassthroughUnifiedEventLogForInstance = AvatarExperienceAnalytics.sendPassthroughUnifiedEventLogForInstance
+local FFlagAXUnifiedEventStrictPayloads = AvatarExperienceAnalytics.Flags.FFlagAXUnifiedEventStrictPayloads
+
 local InExperienceShopUnifiedEventFilter = require(script.Parent.InExperienceShopUnifiedEventFilter)
+local getShopUnifiedLoggingSurface = require(script.Parent.getShopUnifiedLoggingSurface)
 
-local function InExperienceShopUnifiedImpressionsReporter(s1: string) -- line: 14
-	-- upvalues: Constants (copy), UnifiedLoggingSurface (copy), FFlagAllowCustomUnifiedEventFilter (copy), InExperienceShopUnifiedEventFilter (copy), sendUnifiedEventLogForInstance (copy), UnifiedEventLogEnums (copy)
-	return function(t1: {[any]: any}) -- line: 15
-		-- upvalues: s1 (copy), Constants (copy), UnifiedLoggingSurface (copy), FFlagAllowCustomUnifiedEventFilter (copy), InExperienceShopUnifiedEventFilter (copy), sendUnifiedEventLogForInstance (copy), UnifiedEventLogEnums (copy)
-		local visibleInstance = t1.visibleInstance
-		local v13 = if s1 ~= Constants.ShopPageType.Home then if s1 ~= Constants.ShopPageType.Search then UnifiedLoggingSurface.IN_EXPERIENCE_SHOP_DETAILS else UnifiedLoggingSurface.IN_EXPERIENCE_SHOP_SEARCH else UnifiedLoggingSurface.IN_EXPERIENCE_SHOP_HOME
-		local v14 = if not FFlagAllowCustomUnifiedEventFilter then nil else InExperienceShopUnifiedEventFilter.filter
+local function InExperienceShopUnifiedImpressionsReporter(p: string)
+	return function(p2)
+		local visibleInstance = p2.visibleInstance
 
-		sendUnifiedEventLogForInstance(visibleInstance, {
+		local shopUnifiedLoggingSurface = getShopUnifiedLoggingSurface(p)
+		local filter
+
+		if FFlagAllowCustomUnifiedEventFilter then
+			filter = InExperienceShopUnifiedEventFilter.filter
+		end
+
+		if not FFlagAXUnifiedEventStrictPayloads then
+			sendUnifiedEventLogForInstance(
+				visibleInstance,
+				{
+					action = UnifiedEventLogEnums.MarketplaceUnifiedAction.ITEM_IMPRESSION,
+					surface = shopUnifiedLoggingSurface
+				},
+				{ includeScreenSize = true, includeElementSizeAndPosition = true, filter = filter }
+			)
+
+			return
+		end
+
+		local ATTRIBUTE_PREFIX = UnifiedEventLogConstants.ATTRIBUTE_PREFIX
+		local attributes = visibleInstance:GetAttributes()
+
+		sendPassthroughUnifiedEventLogForInstance(visibleInstance, {
 			action = UnifiedEventLogEnums.MarketplaceUnifiedAction.ITEM_IMPRESSION,
-			surface = v13
-		}, {
-			includeScreenSize = true,
-			includeElementSizeAndPosition = true,
-			filter = v14
-		})
+			surface = shopUnifiedLoggingSurface,
+			itemId = attributes[ATTRIBUTE_PREFIX .. UnifiedEventLogConstants.FIELD_ITEM_ID],
+			itemType = attributes[ATTRIBUTE_PREFIX .. UnifiedEventLogConstants.FIELD_ITEM_TYPE],
+			gridPositionRow = attributes[ATTRIBUTE_PREFIX .. UnifiedEventLogConstants.FIELD_GRID_POSITION_ROW],
+			gridPositionColumn = attributes[ATTRIBUTE_PREFIX .. UnifiedEventLogConstants.FIELD_GRID_POSITION_COLUMN]
+		}, { includeScreenSize = true, includeElementSizeAndPosition = true, filter = filter })
 	end
 end
 

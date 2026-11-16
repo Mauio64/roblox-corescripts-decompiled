@@ -1,29 +1,27 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 local PresenceContext = require(script.Parent.PresenceContext)
-local isPresent = require(script.Parent.PresenceUtils).isPresent
+local PresenceUtils = require(script.Parent.PresenceUtils)
+local isPresent = PresenceUtils.isPresent
 
-local function usePresence() -- line: 37
-	-- upvalues: React (copy), PresenceContext (copy), isPresent (copy)
-	local v6 = React.useContext(PresenceContext)
-	local id = v6.id
-	local _ = v6.isPresent
-	local onExitComplete = v6.onExitComplete
-	local passThroughData = v6.passThroughData
-	local v11 = React.useCallback(function() -- line: 49
-		-- upvalues: onExitComplete (copy), id (copy)
+local function usePresence()
+	local v = React.useContext(PresenceContext)
+
+	local id = v.id
+	local _isPresent = v.isPresent
+	local onExitComplete = v.onExitComplete
+	local passThroughData = v.passThroughData
+
+	local onExitComplete2 = React.useCallback(function()
 		if onExitComplete then
 			onExitComplete(id)
 		end
-	end, {
-		onExitComplete,
-		id
-	})
+	end, { onExitComplete, id })
 
 	return {
-		isPresent = isPresent(v6),
+		isPresent = isPresent(v),
 		id = id,
-		onExitComplete = v11,
+		onExitComplete = onExitComplete2,
 		passThroughData = passThroughData
 	}
 end

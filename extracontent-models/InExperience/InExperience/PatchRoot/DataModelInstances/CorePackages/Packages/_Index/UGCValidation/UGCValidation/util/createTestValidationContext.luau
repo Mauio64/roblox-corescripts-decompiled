@@ -1,46 +1,52 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local UGCValidationService = game:GetService("UGCValidationService")
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
 
-return function(p1, t1: {[any]: any}) -- line: 7
-	-- upvalues: UGCValidationService (copy)
-	local t2 = {
+return function(assetTypeEnum, items)
+	local editableMeshes = {}
+	local editableImages = {}
+	local v = {
 		isServer = true,
-		validateMeshPartAccessories = false,
-		assetTypeEnum = p1
+		assetTypeEnum = assetTypeEnum,
+		validateMeshPartAccessories = false
 	}
-	local t3 = {}
-	local t4 = {}
 
-	for _, v9 in t1 do
-		for _, descendant in v9:GetDescendants() do
-			if descendant:IsA("BinaryStringValue") then
-				if descendant.Name == "MeshId" or descendant.Name == "CageMeshId" or descendant.Name == "ReferenceMeshId" then
-					if not t3[descendant.Parent] then
-						t3[descendant.Parent] = {}
-					end
+	for _, folder in items do
+		for _, binaryStringValue in folder:GetDescendants() do
+			if not binaryStringValue:IsA("BinaryStringValue") then
+				continue
+			end
 
-					t3[descendant.Parent][descendant.Name] = {
-						created = true,
-						instance = UGCValidationService:CreateEditableMeshFromBinaryStringRobloxOnly(descendant)
-					}
-				else
-					if not t4[descendant.Parent] then
-						t4[descendant.Parent] = {}
-					end
-
-					t4[descendant.Parent][descendant.Name] = {
-						created = true,
-						instance = UGCValidationService:CreateEditableImageFromBinaryStringRobloxOnly(descendant)
-					}
+			if
+				binaryStringValue.Name == "MeshId"
+				or binaryStringValue.Name == "CageMeshId"
+				or binaryStringValue.Name == "ReferenceMeshId"
+			then
+				if not editableMeshes[binaryStringValue.Parent] then
+					editableMeshes[binaryStringValue.Parent] = {}
 				end
+
+				editableMeshes[binaryStringValue.Parent][binaryStringValue.Name] = {
+					created = true,
+					instance = UGCValidationService:CreateEditableMeshFromBinaryStringRobloxOnly(binaryStringValue)
+				}
+			else
+				if not editableImages[binaryStringValue.Parent] then
+					editableImages[binaryStringValue.Parent] = {}
+				end
+
+				editableImages[binaryStringValue.Parent][binaryStringValue.Name] = {
+					created = true,
+					instance = UGCValidationService:CreateEditableImageFromBinaryStringRobloxOnly(binaryStringValue)
+				}
 			end
 		end
 	end
 
-	t2.editableMeshes = t3
-	t2.editableImages = t4
+	v.editableMeshes = editableMeshes
+	v.editableImages = editableImages
 
-	return t2
+	return v
 end

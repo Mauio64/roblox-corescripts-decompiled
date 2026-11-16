@@ -1,153 +1,148 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
 
-require(ParentParentParent.Signals)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local useFocusGuiObject = require(ParentParentParent.ReactFocusNavigation).useFocusGuiObject
-local FocusNavHelper = require(ParentParent.Common.FocusNavHelper)
+local React = require(parent2.React)
+require(parent2.Signals)
 
-require(ParentParentParent.LeaderboardStore)
+local ReactFocusNavigation = require(parent2.ReactFocusNavigation)
+local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
 
-local Constants = require(ParentParent.Common.Constants)
+local FocusNavHelper = require(parent.Common.FocusNavHelper)
 
-local function usePlayerListFocusNavigation() -- line: 57
-	-- upvalues: useFocusGuiObject (copy), React (copy), FocusNavHelper (copy), Constants (copy), GuiService (copy)
-	local v9 = useFocusGuiObject()
-	local v10 = React.useRef(nil)
-	local v11 = React.useRef(nil)
-	local v12 = React.useRef({})
-	local v13 = React.useCallback(function(p1, p2) -- line: 66
-		-- upvalues: FocusNavHelper (copy), v12 (copy), v9 (copy), v10 (copy)
-		local v24 = FocusNavHelper.getNextPlayerInstance(v12.current, p1, p2)
+require(parent2.LeaderboardStore)
 
-		if v24 then
-			v9(v24.object)
+local Constants = require(parent.Common.Constants)
 
-			return
+local function usePlayerListFocusNavigation()
+	local v = useFocusGuiObject()
+
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+
+	local ref3 = React.useRef({})
+
+	local v2 = React.useCallback(function(p, p2)
+		local nextPlayerInstance = FocusNavHelper.getNextPlayerInstance(ref3.current, p, p2)
+
+		if nextPlayerInstance then
+			v(nextPlayerInstance.object)
+		else
+			v(ref.current)
 		end
-
-		v9(v10.current)
 	end, {})
-	local v14 = React.useCallback(function() -- line: 78
-		-- upvalues: v11 (copy), Constants (copy), v12 (copy), v9 (copy), v10 (copy), FocusNavHelper (copy)
-		if v11.current and v11.current ~= Constants.SELECTED_TITLE_PLAYER_ID then
-			for _, v26 in v12.current do
-				for _, v28 in v26.players do
-					if v28.userId == v11.current then
-						v9(v28.object)
 
+	local getFocus = React.useCallback(function()
+		if ref2.current and ref2.current ~= Constants.SELECTED_TITLE_PLAYER_ID then
+			for _, v3 in ref3.current do
+				for _, player in v3.players do
+					if player.userId == ref2.current then
+						v(player.object)
 						return
 					end
 				end
 			end
 		end
 
-		if v10.current then
-			v9(v10.current)
-
+		if ref.current then
+			v(ref.current)
 			return
 		end
 
-		local v29 = FocusNavHelper.getFirstPlayerInstance(v12.current)
+		local firstPlayerInstance = FocusNavHelper.getFirstPlayerInstance(ref3.current)
 
-		if v29 then
-			v9(v29.object)
+		if firstPlayerInstance then
+			v(firstPlayerInstance.object)
 		end
 	end, {})
-	local v15 = React.useCallback(function(p3) -- line: 104
-		-- upvalues: v12 (copy)
-		return function(n1: number, p4, p5) -- line: 105
-			-- upvalues: v12 (copy), p3 (copy)
-			if not p4 or not v12.current[p3] then
+
+	local v3 = React.useCallback(function(p)
+		return function(userId: number, object, order)
+			if object and ref3.current[p] then
+				ref3.current[p].players[userId] = {
+					userId = userId,
+					object = object,
+					order = order
+				}
+			end
+		end
+	end, {})
+
+	local v4 = React.useCallback(function(p)
+		return function(p2: number)
+			local v4 = ref3.current[p]
+
+			if not v4 then
 				return
 			end
 
-			v12.current[p3].players[n1] = {
-				userId = n1,
-				object = p4,
-				order = p5
-			}
-		end
-	end, {})
-	local v16 = React.useCallback(function(p6) -- line: 118
-		-- upvalues: v12 (copy), GuiService (copy), v13 (copy)
-		return function(n2: number) -- line: 119
-			-- upvalues: v12 (copy), p6 (copy), GuiService (copy), v13 (copy)
-			local v43 = v12.current[p6]
+			local player = v4.players[p2]
 
-			if not v43 then
+			if not player then
 				return
 			end
 
-			local v44 = v43.players[n2]
-
-			if not v44 then
-				return
+			if GuiService.SelectedCoreObject == player.object then
+				v2(player, p)
 			end
 
-			if GuiService.SelectedCoreObject == v44.object then
-				v13(v44, p6)
-			end
-
-			v12.current[p6].players[n2] = nil
+			ref3.current[p].players[p2] = nil
 		end
 	end, {})
-	local v17 = React.useCallback(function(p7, p8) -- line: 138
-		-- upvalues: v15 (copy), v16 (copy), v12 (copy)
-		local t1 = {
-			teamId = p7,
-			order = p8,
+
+	local registerTeamInstance = React.useCallback(function(teamId, order)
+		local v5 = {
+			teamId = teamId,
+			order = order,
 			players = {},
-			registerPlayerInstance = v15(p7),
-			unregisterPlayerInstance = v16(p7)
+			registerPlayerInstance = v3(teamId),
+			unregisterPlayerInstance = v4(teamId)
 		}
 
-		v12.current[p7] = t1
+		ref3.current[teamId] = v5
 
-		return t1
+		return v5
 	end, {})
-	local v18 = React.useCallback(function(p9) -- line: 152
-		-- upvalues: v12 (copy)
-		v12.current[p9] = nil
+
+	local unregisterTeamInstance = React.useCallback(function(p)
+		ref3.current[p] = nil
 	end, {})
-	local v19 = React.useCallback(function(p10) -- line: 156
-		-- upvalues: v10 (copy)
-		v10.current = p10
+
+	local setTitlePlayerInstance = React.useCallback(function(current)
+		ref.current = current
 	end, {})
-	local v20 = React.useCallback(function(n3: number?) -- line: 160
-		-- upvalues: v11 (copy)
-		v11.current = n3
+
+	local setSelectedPlayerId = React.useCallback(function(current: number?)
+		ref2.current = current
 	end, {})
-	local v21 = React.useCallback(function(b1: boolean?) -- line: 164
-		-- upvalues: v9 (copy), v10 (copy), v11 (copy), v12 (copy)
-		if b1 then
-			v9(nil)
+
+	local cleanup = React.useCallback(function(flag: boolean?)
+		if flag then
+			v(nil)
 		end
 
-		v10.current = nil
-		v11.current = nil
-		v12.current = {}
+		ref.current = nil
+		ref2.current = nil
+		ref3.current = {}
 	end, {})
 
-	return React.useMemo(function() -- line: 175
-		-- upvalues: v14 (copy), v17 (copy), v18 (copy), v19 (copy), v20 (copy), v21 (copy)
+	return React.useMemo(function()
 		return {
-			getFocus = v14,
-			registerTeamInstance = v17,
-			unregisterTeamInstance = v18,
-			setTitlePlayerInstance = v19,
-			setSelectedPlayerId = v20,
-			cleanup = v21
+			getFocus = getFocus,
+			registerTeamInstance = registerTeamInstance,
+			unregisterTeamInstance = unregisterTeamInstance,
+			setTitlePlayerInstance = setTitlePlayerInstance,
+			setSelectedPlayerId = setSelectedPlayerId,
+			cleanup = cleanup
 		}
 	end, {
-		v14,
-		v17,
-		v18,
-		v19,
-		v20,
-		v21
+		getFocus,
+		registerTeamInstance,
+		unregisterTeamInstance,
+		setTitlePlayerInstance,
+		setSelectedPlayerId,
+		cleanup
 	})
 end
 

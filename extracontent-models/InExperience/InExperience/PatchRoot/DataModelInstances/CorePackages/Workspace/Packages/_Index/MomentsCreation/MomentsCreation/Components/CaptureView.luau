@@ -1,121 +1,129 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
+local parent = MomentsCreation.Parent
+
 local RunService = game:GetService("RunService")
-local BuilderIcons = require(MomentsCreationParent.BuilderIcons)
-local Foundation = require(MomentsCreationParent.Foundation)
-local React = require(MomentsCreationParent.React)
-local SharedFlags = require(MomentsCreationParent.SharedFlags)
-local Signals = require(MomentsCreationParent.Signals)
+
+local BuilderIcons = require(parent.BuilderIcons)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+
 local Icon = Foundation.Icon
 local View = Foundation.View
-local FFlagLuaAppMomentsInternalVideoUsage = SharedFlags.FFlagLuaAppMomentsInternalVideoUsage
+
 local useTokens = Foundation.Hooks.useTokens
-local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
+
+local MomentsCommon = require(parent.MomentsCommon)
 local getCropSize = MomentsCommon.Utils.getCropSize
 local getFitSize = MomentsCommon.Utils.getFitSize
+
 local Constants = require(MomentsCreation.Constants)
 local getCaptureContent = require(MomentsCreation.Capture.getCaptureContent)
 local getCaptureVideoContent = require(MomentsCreation.Capture.getCaptureVideoContent)
 local useCreationMusicSync = require(MomentsCreation.Hooks.useCreationMusicSync)
-local GetFFlagMomentsScreenshotMusicScrubber = require(MomentsCreation.Flags.GetFFlagMomentsScreenshotMusicScrubber)
-local GetFFlagMomentsCreationGalleryPreviewSwapFix = require(MomentsCreation.Flags.GetFFlagMomentsCreationGalleryPreviewSwapFix)
+local GetFFlagMomentsTTSAudioOverlay = require(MomentsCreation.Flags.GetFFlagMomentsTTSAudioOverlay)
+local getTtsDuckScalar = require(MomentsCreation.Audio.getTtsDuckScalar)
+local fadeVolume = require(MomentsCreation.Audio.fadeVolume)
+require(MomentsCreation.Types.CreationFlowTypes)
 
-local function VideoPreviewSurface(t1: {[any]: any}) -- line: 85
-	-- upvalues: React (copy), Signals (copy), useCreationMusicSync (copy), getCaptureVideoContent (copy), RunService (copy), View (copy), FFlagLuaAppMomentsInternalVideoUsage (copy), getFitSize (copy), getCropSize (copy)
-	local preview = t1.preview
-	local capture = t1.capture
-	local timeLength = t1.timeLength
-	local v28 = React.useRef(nil)
-	local v29, v30 = React.useState(Vector2.new(0, 0))
-	local v31, v32 = React.useState(Vector2.new(0, 0))
-	local v33, v34 = React.useState(preview.playback.getRegion(false))
+local function VideoPreviewSurface(props)
+	local preview = props.preview
+	local capture = props.capture
+	local timeLength = props.timeLength
+	local ref = React.useRef(nil)
 
-	React.useEffect(function() -- line: 97
-		-- upvalues: Signals (copy), v34 (copy), preview (copy)
-		return Signals.createEffect(function(p1) -- line: 98
-			-- upvalues: v34 (copy), preview (copy)
-			v34(preview.playback.getRegion(p1))
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(Vector2.new(0, 0))
+
+	local state3, setState3 = React.useState(preview.playback.getRegion(false))
+	React.useEffect(function()
+		return Signals.createEffect(function(p)
+			setState3(preview.playback.getRegion(p))
 		end)
 	end, { preview })
+	local v
 
-	local v35 = if v33 == nil then timeLength else math.max(0, v33.endTime - v33.startTime)
-	local v36 = useCreationMusicSync(preview, v35)
-	local audio = v36.audio
-	local music = v36.music
-	local userMuted = v36.userMuted
-	local v40 = React.useRef(nil)
+	if state3 == nil then
+		v = timeLength
+	else
+		v = math.max(0, state3.endTime - state3.startTime)
+	end
 
-	React.useEffect(function() -- line: 116
-		-- upvalues: v40 (copy), music (copy), audio (copy)
-		function v40.current() -- line: 117
-			-- upvalues: music (copy), audio (copy)
+	local v2 = useCreationMusicSync(preview, v, props.ttsAudio)
+	local audio = v2.audio
+	local music = v2.music
+	local userMuted = v2.userMuted
+	local isDucking = v2.isDucking
+
+	local ref2 = React.useRef(nil)
+	React.useEffect(function()
+		function ref2.current()
 			if music ~= nil then
 				audio.timeline.seek(0)
 			end
 		end
-	end, {
-		audio.timeline.seek,
-		music
-	})
-	React.useEffect(function() -- line: 126
-		-- upvalues: v28 (copy), music (copy), userMuted (copy)
-		local current = v28.current
+	end, { audio.timeline.seek, music })
 
-		if current ~= nil then
-			current.Volume = music == nil and not userMuted and 1 or 0
+	React.useEffect(function()
+		local current = ref.current
+
+		if current == nil then
+			return
 		end
-	end, {
-		music,
-		userMuted
-	})
-	React.useEffect(function() -- line: 133
-		-- upvalues: v28 (copy), capture (copy), getCaptureVideoContent (copy), preview (copy), timeLength (copy), RunService (copy), v40 (copy)
-		local current = v28.current
+
+		if not GetFFlagMomentsTTSAudioOverlay then
+			current.Volume = music == nil and not userMuted and 1 or 0
+		elseif music == nil and not userMuted then
+			fadeVolume(current, not isDucking and 1 or 1 * getTtsDuckScalar())
+		else
+			fadeVolume(current, 0, true)
+		end
+	end, { music, userMuted, isDucking })
+
+	React.useEffect(function()
+		local current = ref.current
 
 		if current == nil then
 			return
 		end
 
 		if typeof(capture) == "table" then
-			local v53 = getCaptureVideoContent(capture)
+			local captureVideoContent = getCaptureVideoContent(capture)
 
-			if v53 ~= nil then
-				current.Video = v53.Uri
+			if captureVideoContent ~= nil then
+				current.Video = captureVideoContent.Uri
 			end
 		else
-			local ok, result = pcall(Content.fromObject, capture)
+			local success, result = pcall(Content.fromObject, capture)
 
-			if ok and result then
+			if success and result then
 				current.VideoContent = result
 			end
 		end
 
 		current.Looped = true
+
 		preview.setDuration(timeLength)
 		preview.setTimeLength(timeLength)
 		preview.setReadiness("Ready")
 
-		local u56 = false
+		local flag = false
 
 		preview.bindEngine({
-			play = function() -- line: 161
-				-- upvalues: current (copy)
+			play = function()
 				current.Playing = true
 			end,
-			pause = function() -- line: 164
-				-- upvalues: current (copy)
+			pause = function()
 				current.Playing = false
 			end,
-			seek = function(n1: number) -- line: 167
-				-- upvalues: current (copy)
-				current.TimePosition = n1
+			seek = function(timePosition: number)
+				current.TimePosition = timePosition
 			end
 		})
 
-		local t2 = {
-			current.Loaded:Connect(function() -- line: 173
-				-- upvalues: u56 (ref), current (copy), preview (copy)
-				u56 = true
+		local v3 = {
+			current.Loaded:Connect(function()
+				flag = true
 
 				if current.TimeLength > 0 then
 					preview.setDuration(current.TimeLength)
@@ -125,228 +133,212 @@ local function VideoPreviewSurface(t1: {[any]: any}) -- line: 85
 				current.Playing = true
 				preview.setIsPlaying(true)
 			end),
-			current.Played:Connect(function() -- line: 182
-				-- upvalues: u56 (ref), preview (copy)
-				u56 = true
+			current.Played:Connect(function()
+				flag = true
 				preview.setIsPlaying(true)
 			end),
-			current.Paused:Connect(function() -- line: 186
-				-- upvalues: u56 (ref), preview (copy)
-				if u56 then
+			current.Paused:Connect(function()
+				if flag then
 					preview.setIsPlaying(false)
 				end
 			end),
-			RunService.RenderStepped:Connect(function() -- line: 194
-				-- upvalues: preview (copy), current (copy), v40 (copy)
+			RunService.RenderStepped:Connect(function()
 				preview.setPosition(current.TimePosition)
 
-				local v68 = preview.playback.getRegion(false)
+				local region = preview.playback.getRegion(false)
 
-				if v68 == nil then
+				if region == nil then
 					return
 				end
 
-				local currentTimePosition = current.TimePosition
+				local timePosition = current.TimePosition
 
-				if currentTimePosition >= v68.endTime - 0.05 or currentTimePosition < v68.startTime - 0.05 then
-					current.TimePosition = v68.startTime
+				if region.endTime - 0.05 <= timePosition or timePosition < region.startTime - 0.05 then
+					current.TimePosition = region.startTime
 
-					if v40.current ~= nil then
-						v40.current()
+					if ref2.current ~= nil then
+						ref2.current()
 					end
 				end
 			end)
 		}
 
-		return function() -- line: 214
-			-- upvalues: t2 (copy), preview (copy)
-			for _, v71 in t2 do
-				v71:Disconnect()
+		return function()
+			for _, connection in v3 do
+				connection:Disconnect()
 			end
 
 			preview.bindEngine(nil)
 		end
-	end, {
-		preview,
-		capture,
-		timeLength
-	})
+	end, { preview, capture, timeLength })
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+	local v3 = {
+		["AnchorPoint"] = nil,
+		["AnchorPoint"] = nil,
+		["AnchorPoint"] = nil,
+		["AnchorPoint"] = nil,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		InternalVideoUsage = Enum.InternalVideoUsage.WatchPage,
+		Looped = true,
+		Position = UDim2.fromScale(0.5, 0.5)
+	}
+	local size
+
+	if props.scaleType == Enum.ScaleType.Fit then
+		size = getFitSize(state, state2)
+	else
+		size = getCropSize(state, state2)
+	end
+
+	v3.Size = size
+
+	v3.Visible = state2.X > 0 and state2.Y > 0
+	v3.ref = ref
+	v3[React.Change.Resolution] = function(p)
+		setState2(p.Resolution)
+
+		if props.onResolutionChanged ~= nil then
+			props.onResolutionChanged(p.Resolution)
+		end
+	end
+
+	return createElement(View, {
 		tag = "size-full",
 		ClipsDescendants = true,
-		onAbsoluteSizeChanged = function(p2) -- line: 225
-			-- upvalues: v30 (copy)
-			v30(p2.AbsoluteSize)
+		onAbsoluteSizeChanged = function(p)
+			setState(p.AbsoluteSize)
 		end
 	}, {
-		Media = React.createElement("VideoFrame", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 1,
-			InternalVideoUsage = if not FFlagLuaAppMomentsInternalVideoUsage then nil else Enum.InternalVideoUsage.WatchPage,
-			Looped = true,
-			Position = UDim2.fromScale(0.5, 0.5),
-			Size = if t1.scaleType ~= Enum.ScaleType.Fit then getCropSize(v29, v31) else getFitSize(v29, v31),
-			Visible = v31.X > 0 and v31.Y > 0,
-			ref = v28,
-			[React.Change.Resolution] = function(p3) -- line: 242
-				-- upvalues: v32 (copy), t1 (copy)
-				v32(p3.Resolution)
-
-				if t1.onResolutionChanged ~= nil then
-					t1.onResolutionChanged(p3.Resolution)
-				end
-			end
-		}),
-		Overlay = React.createElement(View, {
-			tag = "size-full",
-			ZIndex = 2
-		}, t1.children)
+		Media = createElement2("VideoFrame", v3),
+		Overlay = React.createElement(View, { tag = "size-full", ZIndex = 2 }, props.children)
 	})
 end
-local function ScreenshotPreviewSurface(t3: {[any]: any}) -- line: 268
-	-- upvalues: useCreationMusicSync (copy), Constants (copy), React (copy), GetFFlagMomentsScreenshotMusicScrubber (copy), View (copy), getCaptureContent (copy)
-	local preview = t3.preview
-	local capture = t3.capture
-	local v44 = useCreationMusicSync(preview, Constants.ScreenshotMusicDuration)
-	local music = v44.music
-	local elapsed = v44.audio.timeline.elapsed
 
-	React.useEffect(function() -- line: 281
-		-- upvalues: preview (copy), Constants (copy)
+local function ScreenshotPreviewSurface(props)
+	local preview = props.preview
+	local capture = props.capture
+
+	local v = useCreationMusicSync(preview, Constants.ScreenshotMusicDuration, props.ttsAudio)
+	local music = v.music
+
+	local elapsed = v.audio.timeline.elapsed
+
+	React.useEffect(function()
 		preview.bindEngine(nil)
 		preview.setDuration(Constants.ScreenshotMusicDuration)
 		preview.setTimeLength(Constants.ScreenshotMusicDuration)
 		preview.setPosition(0)
 		preview.setReadiness("Ready")
-	end, {
-		preview,
-		capture
-	})
-	React.useEffect(function() -- line: 293
-		-- upvalues: GetFFlagMomentsScreenshotMusicScrubber (copy), preview (copy), music (copy), elapsed (copy), Constants (copy)
-		if not GetFFlagMomentsScreenshotMusicScrubber() then
-			return
-		end
+	end, { preview, capture })
 
+	React.useEffect(function()
 		preview.setPosition(music == nil and 0 or math.clamp(elapsed, 0, Constants.ScreenshotMusicDuration))
-	end, {
-		preview,
-		music,
-		elapsed
-	})
+	end, { preview, music, elapsed })
 
 	return React.createElement(View, {
 		tag = "size-full",
-		onAbsoluteSizeChanged = t3.onAbsoluteSizeChanged
+		onAbsoluteSizeChanged = props.onAbsoluteSizeChanged
 	}, {
-		Overlay = React.createElement(React.Fragment, {}, t3.children),
+		Overlay = React.createElement(React.Fragment, {}, props.children),
 		Media = React.createElement("ImageLabel", {
 			BackgroundTransparency = 1,
-			ImageContent = getCaptureContent(t3.capture),
-			ScaleType = t3.scaleType,
+			ImageContent = getCaptureContent(props.capture),
+			ScaleType = props.scaleType,
 			Size = UDim2.fromScale(1, 1)
 		})
 	})
 end
 
-return function(t4: {[any]: any}) -- line: 315
-	-- upvalues: useTokens (copy), React (copy), GetFFlagMomentsCreationGalleryPreviewSwapFix (copy), Signals (copy), View (copy), Icon (copy), BuilderIcons (copy), VideoPreviewSurface (copy), ScreenshotPreviewSurface (copy)
-	local v48 = useTokens()
-	local v49, v50 = React.useState(t4.preview.getCapture(false))
+return function(props)
+	local v = useTokens()
 
-	React.useEffect(function() -- line: 321
-		-- upvalues: t4 (copy), GetFFlagMomentsCreationGalleryPreviewSwapFix (copy), Signals (copy), v50 (copy)
-		local preview = t4.preview
-
-		if not GetFFlagMomentsCreationGalleryPreviewSwapFix() then
-			return Signals.createEffect(function(p4) -- line: 325
-				-- upvalues: v50 (copy), preview (copy)
-				v50(preview.getCapture(p4))
-			end)
-		end
+	local state, setState = React.useState(props.preview.getCapture(false))
+	React.useEffect(function()
+		local preview = props.preview
 
 		local thread = nil
-		local u62 = nil
-		local u63 = false
-
-		local function onWindowElapsed() -- line: 339
-			-- upvalues: u63 (ref), u62 (ref), v50 (copy), thread (ref), onWindowElapsed (copy)
-			if u63 then
-				u63 = false
-
-				local v73 = u62
-
-				u62 = nil
-				v50(v73)
-				thread = task.delay(0.2, onWindowElapsed)
+		local v2 = nil
+		local v3 = false
+		local function onWindowElapsed()
+			if not v3 then
+				thread = nil
 
 				return
 			end
 
-			thread = nil
+			v3 = false
+			local v4 = v2
+			v2 = nil
+			setState(v4)
+			thread = task.delay(0.2, onWindowElapsed)
 		end
 
-		local v65 = Signals.createEffect(function(p5) -- line: 351
-			-- upvalues: preview (copy), thread (ref), v50 (copy), onWindowElapsed (copy), u62 (ref), u63 (ref)
-			local v75 = preview.getCapture(p5)
+		local effect = Signals.createEffect(function(p)
+			local capture = preview.getCapture(p)
 
 			if thread == nil then
-				v50(v75)
+				setState(capture)
 				thread = task.delay(0.2, onWindowElapsed)
-
-				return
+			else
+				v2 = capture
+				v3 = true
 			end
-
-			u62 = v75
-			u63 = true
 		end)
 
-		return function() -- line: 362
-			-- upvalues: thread (ref), v65 (copy)
+		return function()
 			if thread ~= nil then
 				task.cancel(thread)
 				thread = nil
 			end
 
-			v65()
+			effect()
 		end
-	end, { t4.preview })
+	end, { props.preview })
 
-	if v49 == nil then
-		return React.createElement(View, {
-			tag = "size-full radius-large bg-shift-200",
-			onAbsoluteSizeChanged = t4.onAbsoluteSizeChanged
-		}, {
-			EmptyState = React.createElement(Icon, {
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				name = BuilderIcons.Icon.Image,
-				Position = UDim2.fromScale(0.5, 0.5),
-				size = v48.Size.Size_1200,
-				style = v48.Color.Shift.Shift_400
-			})
-		})
+	if state == nil then
+		return React.createElement(
+			View,
+			{
+				tag = "size-full radius-large bg-shift-200",
+				onAbsoluteSizeChanged = props.onAbsoluteSizeChanged
+			},
+			{
+				EmptyState = React.createElement(Icon, {
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					name = BuilderIcons.Icon.Image,
+					Position = UDim2.fromScale(0.5, 0.5),
+					size = v.Size.Size_1200,
+					style = v.Color.Shift.Shift_400
+				})
+			}
+		)
 	end
 
-	if v49.CaptureType == Enum.CaptureType.Video then
+	if state.CaptureType == Enum.CaptureType.Video then
 		return React.createElement(View, {
 			tag = "size-full",
-			onAbsoluteSizeChanged = t4.onAbsoluteSizeChanged
+			onAbsoluteSizeChanged = props.onAbsoluteSizeChanged
 		}, {
 			Preview = React.createElement(VideoPreviewSurface, {
-				preview = t4.preview,
-				capture = v49,
-				scaleType = t4.scaleType,
-				timeLength = v49.TimeLength or 0,
-				onResolutionChanged = t4.onResolutionChanged
-			}, t4.children)
+				preview = props.preview,
+				capture = state,
+				scaleType = props.scaleType,
+				timeLength = state.TimeLength or 0,
+				onResolutionChanged = props.onResolutionChanged,
+				ttsAudio = props.ttsAudio
+			}, props.children)
 		})
 	end
 
 	return React.createElement(ScreenshotPreviewSurface, {
-		preview = t4.preview,
-		capture = v49,
-		scaleType = t4.scaleType,
-		onAbsoluteSizeChanged = t4.onAbsoluteSizeChanged
-	}, t4.children)
+		preview = props.preview,
+		capture = state,
+		scaleType = props.scaleType,
+		onAbsoluteSizeChanged = props.onAbsoluteSizeChanged,
+		ttsAudio = props.ttsAudio
+	}, props.children)
 end

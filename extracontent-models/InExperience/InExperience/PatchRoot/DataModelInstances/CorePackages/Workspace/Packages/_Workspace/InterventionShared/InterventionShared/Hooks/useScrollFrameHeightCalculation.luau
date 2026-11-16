@@ -1,25 +1,30 @@
 local InterventionShared = script:FindFirstAncestor("InterventionShared")
-local InterventionSharedParent = InterventionShared.Parent
+local parent = InterventionShared.Parent
+
 local Constants = require(InterventionShared.Utils.Constants)
-local React = require(InterventionSharedParent.React)
-local useLayerCollector = require(InterventionSharedParent.UIBlox).Core.Layout.LayerCollector.useLayerCollector
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
 
-local function useScrollFrameHeightCalculation(t1: {[any]: any}) -- line: 46
-	-- upvalues: useLayerCollector (copy), React (copy), Constants (copy)
-	local absoluteSize = useLayerCollector().absoluteSize
-	local v9, v10 = React.useState(t1.initialInnerContentHeight or 0)
-	local v11 = React.useCallback(function(p1) -- line: 50
-		-- upvalues: v10 (copy)
-		v10(p1.AbsoluteSize.Y)
+local function useScrollFrameHeightCalculation(data)
+	local v = useLayerCollector()
+	local screenSize = data.screenSize or v.absoluteSize
+	local state, setState = React.useState(data.initialInnerContentHeight or 0)
+	local onInnerContentSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize.Y)
 	end, {})
-	local v12 = t1.scrollFrameHeaderFooterHeight or Constants.DIALOG_HEADER_HEIGHT
-	local v13 = math.ceil((math.min(absoluteSize.Y - Constants.UNIBAR_HEIGHT - v12, v9)))
-	local v14 = v13 < v9
+	local scrollFrameHeaderFooterHeight = data.scrollFrameHeaderFooterHeight or Constants.DIALOG_HEADER_HEIGHT
+	local v2 = screenSize.Y - Constants.UNIBAR_HEIGHT - scrollFrameHeaderFooterHeight
 
+	if data.screenSize then
+		v2 = math.max(0, v2)
+	end
+
+	local scrollFrameContainerHeight = math.ceil((math.min(v2, state)))
 	return {
-		onInnerContentSizeChanged = v11,
-		scrollFrameContainerHeight = v13,
-		shouldShowScrollBar = v14
+		onInnerContentSizeChanged = onInnerContentSizeChanged,
+		scrollFrameContainerHeight = scrollFrameContainerHeight,
+		shouldShowScrollBar = scrollFrameContainerHeight < state
 	}
 end
 

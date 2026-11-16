@@ -1,33 +1,33 @@
 local QRCodeDisplay = script:FindFirstAncestor("QRCodeDisplay")
-local QRCodeDisplayParent = QRCodeDisplay.Parent
+local parent = QRCodeDisplay.Parent
 local DisplayQRCode = require(script.Parent.DisplayQRCode)
-local React = require(QRCodeDisplayParent.React)
+local React = require(parent.React)
 local ECLevels = require(QRCodeDisplay.Common.ECLevels)
+local DisplayQRCodeStories = {}
 
-return {
-	SimpleMatrix = function() -- line: 8
-		-- upvalues: React (copy), DisplayQRCode (copy), ECLevels (copy)
-		return React.createElement(DisplayQRCode, {
-			sideLength = 100,
-			toEncode = "https://www.bbc.com/news",
-			ecLevel = ECLevels.EC_LEVEL_1
-		})
-	end,
-	LoadingMatrix = function() -- line: 16
-		-- upvalues: React (copy), DisplayQRCode (copy), ECLevels (copy)
-		return React.createElement(DisplayQRCode, {
-			isLoading = true,
-			sideLength = 200,
-			toEncode = "",
-			ecLevel = ECLevels.EC_LEVEL_1
-		})
-	end,
-	SuperComplexMatrix = function() -- line: 25
-		-- upvalues: React (copy), DisplayQRCode (copy), ECLevels (copy)
-		return React.createElement(DisplayQRCode, {
-			sideLength = 400,
-			toEncode = "https://ro.blox.com/Ebh5?pid=share&is_retargeting=true&af_dp=roblox%3A%2F%2Fnavigation%2Fshare_links%3Fcode%3D6e5de960f12ec44797d1d974c76605ff%26type%3DFriendInvite&af_web_dp=https%3A%2F%2Fwww.roblox.com%2Fshare-links%3Fcode%3D6e5de960f12ec44797d1d974c76605ff%26type%3DFriendInvite",
-			ecLevel = ECLevels.EC_LEVEL_4
-		})
-	end
-}
+function DisplayQRCodeStories.SimpleMatrix()
+	return React.createElement(DisplayQRCode, {
+		ecLevel = ECLevels.EC_LEVEL_1,
+		sideLength = 100,
+		toEncode = "https://www.bbc.com/news"
+	})
+end
+
+function DisplayQRCodeStories.LoadingMatrix()
+	return React.createElement(DisplayQRCode, {
+		ecLevel = ECLevels.EC_LEVEL_1,
+		isLoading = true,
+		sideLength = 200,
+		toEncode = ""
+	})
+end
+
+function DisplayQRCodeStories.SuperComplexMatrix()
+	return React.createElement(DisplayQRCode, {
+		ecLevel = ECLevels.EC_LEVEL_4,
+		sideLength = 400,
+		toEncode = "https://ro.blox.com/Ebh5?pid=share&is_retargeting=true&af_dp=roblox%3A%2F%2Fnavigation%2Fshare_links%3Fcode%3D6e5de960f12ec44797d1d974c76605ff%26type%3DFriendInvite&af_web_dp=https%3A%2F%2Fwww.roblox.com%2Fshare-links%3Fcode%3D6e5de960f12ec44797d1d974c76605ff%26type%3DFriendInvite"
+	})
+end
+
+return DisplayQRCodeStories

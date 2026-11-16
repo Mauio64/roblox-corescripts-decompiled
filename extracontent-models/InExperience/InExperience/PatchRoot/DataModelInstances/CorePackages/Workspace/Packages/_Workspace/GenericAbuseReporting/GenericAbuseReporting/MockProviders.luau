@@ -1,92 +1,83 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local AppFeaturePolicies = require(Parent.UniversalAppPolicy).AppFeaturePolicies
-local React = require(Parent.React)
-local ProviderContainer = require(Parent.RoactUtils).Components.ProviderContainer
-local StyleProviderWithDefaultTheme = require(Parent.Style).StyleProviderWithDefaultTheme
-local LocalizationProvider = require(Parent.Localization).LocalizationProvider
-local RoactAppPolicy = require(Parent.UniversalAppPolicy).RoactAppPolicy
-local RoactNavigation = require(Parent.RoactNavigation)
-local RoactRodux = require(Parent.RoactRodux)
-local Rodux = require(Parent.Rodux)
-local LayerCollectorProvider = require(Parent.UIBlox).Core.Layout.LayerCollector.LayerCollectorProvider
-local t1 = {
-	state = {
-		routeName = "",
-		key = "",
-		params = {}
-	},
-	dispatch = function() -- line: 34
-	end,
-	goBack = function() -- line: 35
-	end,
-	addListener = function() -- line: 36
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local AppFeaturePolicies = UniversalAppPolicy.AppFeaturePolicies
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local ProviderContainer = RoactUtils.Components.ProviderContainer
+local Style = require(parent.Style)
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local UniversalAppPolicy2 = require(parent.UniversalAppPolicy)
+local RoactAppPolicy = UniversalAppPolicy2.RoactAppPolicy
+local RoactNavigation = require(parent.RoactNavigation)
+local RoactRodux = require(parent.RoactRodux)
+local Rodux = require(parent.Rodux)
+local UIBlox = require(parent.UIBlox)
+local LayerCollectorProvider = UIBlox.Core.Layout.LayerCollector.LayerCollectorProvider
+
+local v = {
+	state = { params = {}, routeName = "", key = "" },
+	dispatch = function() end,
+	goBack = function() end,
+	addListener = function()
 		return {
-			remove = function() -- line: 38
-			end
+			remove = function() end
 		}
 	end,
-	isFocused = function() -- line: 41
-	end,
-	setParams = function() -- line: 42
-	end,
-	getParam = function() -- line: 43
-	end,
-	replace = function() -- line: 44
-	end,
-	push = function() -- line: 45
-	end
+	isFocused = function() end,
+	setParams = function() end,
+	getParam = function() end,
+	replace = function() end,
+	push = function() end
 }
 
-local function reducer(p1) -- line: 48
-	return p1
+local function reducer(p)
+	return p
 end
-local function MockProviders(t2: {[any]: any}) -- line: 52
-	-- upvalues: Rodux (copy), reducer (copy), StyleProviderWithDefaultTheme (copy), LocalizationProvider (copy), LayerCollectorProvider (copy), RoactNavigation (copy), t1 (copy), RoactRodux (copy), RoactAppPolicy (copy), AppFeaturePolicies (copy), React (copy), ProviderContainer (copy)
-	local t3 = {}
-	local v18 = Rodux.Store.new(reducer, {}, { Rodux.thunkMiddleware })
 
-	table.insert(t3, {
+local function MockProviders(p)
+	local providers = {}
+
+	local store = Rodux.Store.new(reducer, {}, { Rodux.thunkMiddleware })
+
+	table.insert(providers, {
 		class = StyleProviderWithDefaultTheme,
-		props = {
-			withDarkTheme = true
-		}
+		props = { withDarkTheme = true }
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = LocalizationProvider,
 		props = {
 			localization = {
-				Format = function(_, s1: string) -- line: 70
-					return s1
+				Format = function(_, p2: string)
+					return p2
 				end
 			}
 		}
 	})
-	table.insert(t3, {
-		class = LayerCollectorProvider,
-		props = {}
-	})
-	table.insert(t3, {
+
+	table.insert(providers, { class = LayerCollectorProvider, props = {} })
+
+	table.insert(providers, {
 		class = RoactNavigation.Provider,
-		props = {
-			value = t1
-		}
+		props = { value = v }
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = RoactRodux.StoreProvider,
-		props = {
-			store = v18
-		}
+		props = { store = store }
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = RoactAppPolicy.Provider,
 		props = {
 			policy = { AppFeaturePolicies }
 		}
 	})
 
-	return React.createElement(ProviderContainer, {
-		providers = t3
-	}, t2.children)
+	return React.createElement(ProviderContainer, { providers = providers }, p.children)
 end
 
 return MockProviders

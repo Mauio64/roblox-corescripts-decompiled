@@ -1,0 +1,4 @@
+local FFlagMomentsFixRecommendationImpressionLifecycle = require(script.Parent.FFlagMomentsFixRecommendationImpressionLifecycle)
+
+return game:DefineFastFlag("MomentsFlushDwellBeforeNavigation", false)
+	and FFlagMomentsFixRecommendationImpressionLifecycle

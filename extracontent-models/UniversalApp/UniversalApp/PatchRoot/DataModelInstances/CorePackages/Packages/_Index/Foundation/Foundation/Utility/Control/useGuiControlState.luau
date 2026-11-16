@@ -1,78 +1,155 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local useForwardRef = require(FoundationParent.ReactUtils).useForwardRef
-local ControlState = require(Foundation.Enums.ControlState)
+local parent = Foundation.Parent
 
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useForwardRef = ReactUtils.useForwardRef
+local ControlState = require(Foundation.Enums.ControlState)
 require(Foundation.Enums.ControlStateEvent)
+local Flags = require(Foundation.Utility.Flags)
 require(Foundation.Components.Types)
 
-local t1 = {
+local v = {
 	[Enum.GuiState.Idle] = ControlState.Default,
 	[Enum.GuiState.Hover] = ControlState.Hover,
 	[Enum.GuiState.Press] = ControlState.Pressed,
 	[Enum.GuiState.NonInteractable] = ControlState.Disabled
 }
 
-local function useGuiControlState(p1, p2) -- line: 22
-	-- upvalues: React (copy), ControlState (copy), t1 (copy), useForwardRef (copy)
-	local v10 = React.useRef(false)
-	local v11 = React.useRef(ControlState.Initialize)
-	local v12 = React.useCallback(function(p3) -- line: 26
-		-- upvalues: v11 (copy), v10 (copy), ControlState (copy), p2 (copy)
-		local current = v11.current
+local function useGuiControlState_DEPRECATED(p, callback)
+	local ref = React.useRef(false)
+	local ref2 = React.useRef(ControlState.Initialize)
 
-		if v10.current then
-			if p3 == ControlState.Default or p3 == ControlState.Hover then
-				p3 = ControlState.Selected
-			elseif p3 == ControlState.Pressed then
-				p3 = ControlState.SelectedPressed
+	local v2 = React.useCallback(function(current)
+		local current2 = ref2.current
+
+		if ref.current then
+			if current == ControlState.Default or current == ControlState.Hover then
+				current = ControlState.Selected
+			elseif current == ControlState.Pressed then
+				current = ControlState.SelectedPressed
 			end
 		end
 
-		if current == p3 then
+		if current2 == current then
 			return
 		end
 
-		v11.current = p3
+		ref2.current = current
 
-		if p2 ~= nil then
-			p2(p3)
+		if callback ~= nil then
+			callback(current)
 		end
-	end, { p2 })
-	local v13 = React.useCallback(function(p4) -- line: 48
-		-- upvalues: v12 (copy), t1 (copy), v10 (copy), v11 (copy)
-		local t2 = {}
+	end, { callback })
 
-		if p4 then
-			v12(t1[p4.GuiState])
-			table.insert(t2, p4:GetPropertyChangedSignal("GuiState"):Connect(function() -- line: 55
-				-- upvalues: t1 (copy), p4 (copy), v12 (copy)
-				local v18 = t1[p4.GuiState]
+	return useForwardRef(p, (React.useCallback(function(instance)
+		local connections = {}
 
-				v12(v18)
+		if instance then
+			v2(v[instance.GuiState])
+
+			table.insert(connections, instance:GetPropertyChangedSignal("GuiState"):Connect(function()
+				v2(v[instance.GuiState])
 			end))
-			table.insert(t2, p4.SelectionGained:Connect(function() -- line: 64
-				-- upvalues: v10 (copy), v12 (copy), v11 (copy)
-				v10.current = true
-				v12(v11.current)
+
+			table.insert(connections, instance.SelectionGained:Connect(function()
+				ref.current = true
+				v2(ref2.current)
 			end))
-			table.insert(t2, p4.SelectionLost:Connect(function() -- line: 71
-				-- upvalues: v10 (copy), v12 (copy), v11 (copy)
-				v10.current = false
-				v12(v11.current)
+
+			table.insert(connections, instance.SelectionLost:Connect(function()
+				ref.current = false
+				v2(ref2.current)
 			end))
 		end
 
-		return function() -- line: 78
-			-- upvalues: t2 (copy)
-			for _, v20 in t2 do
-				v20:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, { v12 })
-
-	return useForwardRef(p1, v13)
+	end, { v2 })))
 end
 
-return useGuiControlState
+local function assignRef(callback, current) -- 1 equivalent call inferred from this helper
+	if typeof(callback) == "function" then
+		callback(current)
+	elseif callback ~= nil then
+		callback.current = current
+	end
+end
+
+local function setControlState(current, controlState) -- 4 equivalent calls inferred from this helper
+	if current.isSelected then
+		if controlState == ControlState.Default or controlState == ControlState.Hover then
+			controlState = ControlState.Selected
+		elseif controlState == ControlState.Pressed then
+			controlState = ControlState.SelectedPressed
+		end
+	end
+
+	if current.controlState == controlState then
+		return
+	end
+
+	current.controlState = controlState
+
+	if current.onStateChanged ~= nil then
+		current.onStateChanged(controlState)
+	end
+end
+
+local function useGuiControlState(callback, onStateChanged)
+	local ref = React.useRef(nil)
+
+	if ref.current == nil then
+		ref.current = {
+			isSelected = false,
+			controlState = ControlState.Initialize,
+			onStateChanged = onStateChanged,
+			connections = nil
+		}
+	end
+
+	ref.current.onStateChanged = onStateChanged
+
+	return React.useCallback(function(instance)
+		local current = ref.current
+		assignRef(callback, instance) -- inferred equivalent call
+		local connections = current.connections
+
+		if connections ~= nil then
+			for _, connection in connections do
+				connection:Disconnect()
+			end
+
+			current.connections = nil
+		end
+
+		if instance == nil then
+			return
+		end
+
+		setControlState(current, v[instance.GuiState]) -- inferred equivalent call
+
+		current.connections = {
+			instance:GetPropertyChangedSignal("GuiState"):Connect(function()
+				setControlState(current, v[instance.GuiState]) -- inferred equivalent call
+			end),
+			instance.SelectionGained:Connect(function()
+				current.isSelected = true
+				setControlState(current, current.controlState) -- inferred equivalent call
+			end),
+			instance.SelectionLost:Connect(function()
+				current.isSelected = false
+				setControlState(current, current.controlState) -- inferred equivalent call
+			end)
+		}
+	end, { callback })
+end
+
+if Flags.FoundationLightweightGuiControlState then
+	return useGuiControlState
+end
+
+return useGuiControlState_DEPRECATED

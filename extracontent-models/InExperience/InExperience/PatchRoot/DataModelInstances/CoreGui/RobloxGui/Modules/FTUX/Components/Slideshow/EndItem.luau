@@ -1,38 +1,41 @@
 local CorePackages = game:GetService("CorePackages")
+
 local React = require(CorePackages.Packages.React)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
-local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
-local ParentParent = script.Parent.Parent.Parent
-local FTUXSlideshowData = require(ParentParent.Resources.FTUXSlideshowData)
-local Button = require(ParentParent.Components.Slideshow.Button)
 
-require(ParentParent.Enums.PlatformEnum)
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local withLocalization = Localization.withLocalization
+local parent = script.Parent.Parent.Parent
+local FTUXSlideshowData = require(parent.Resources.FTUXSlideshowData)
+local Button = require(parent.Components.Slideshow.Button)
 
-local function EndItem(t1: {[any]: any}) -- line: 21
-	-- upvalues: useStyle (copy), FTUXSlideshowData (copy), withLocalization (copy), React (copy), Button (copy), UIBlox (copy)
-	local v11 = useStyle()
-	local Theme = v11.Theme
-	local Font = v11.Font
-	local v14 = FTUXSlideshowData[t1.platform]
+require(parent.Enums.PlatformEnum)
 
-	return withLocalization({
-		footerText = "CoreScripts.VRFTUX.Label.Footer"
-	})(function(p1) -- line: 31
-		-- upvalues: t1 (copy), v14 (copy), React (copy), Button (copy), UIBlox (copy), Font (copy), Theme (copy)
-		return t1.currentIndex ~= #v14 and React.createElement(Button, {
-			platform = t1.platform,
-			currentIndex = t1.currentIndex,
-			increaseCurrentIndex = t1.increaseCurrentIndex
-		}) or React.createElement(UIBlox.App.Text.StyledTextLabel, {
-			layoutOrder = 2,
-			text = p1.footerText,
-			fontStyle = Font.CaptionHeader,
-			colorStyle = Theme.TextEmphasis,
-			textXAlignment = Enum.TextXAlignment.Center,
-			textYAlignment = Enum.TextYAlignment.Center,
-			size = UDim2.new(1, 0, 1, 0)
-		})
+local function EndItem(data)
+	local v = useStyle()
+
+	local theme = v.Theme
+	local font = v.Font
+
+	local v2 = FTUXSlideshowData[data.platform]
+
+	return withLocalization({ footerText = "CoreScripts.VRFTUX.Label.Footer" })(function(p)
+		return data.currentIndex ~= #v2
+			and React.createElement(Button, {
+				platform = data.platform,
+				currentIndex = data.currentIndex,
+				increaseCurrentIndex = data.increaseCurrentIndex
+			})
+			or React.createElement(UIBlox.App.Text.StyledTextLabel, {
+				text = p.footerText,
+				fontStyle = font.CaptionHeader,
+				colorStyle = theme.TextEmphasis,
+				textXAlignment = Enum.TextXAlignment.Center,
+				textYAlignment = Enum.TextYAlignment.Center,
+				size = UDim2.new(1, 0, 1, 0),
+				layoutOrder = 2
+			})
 	end)
 end
 

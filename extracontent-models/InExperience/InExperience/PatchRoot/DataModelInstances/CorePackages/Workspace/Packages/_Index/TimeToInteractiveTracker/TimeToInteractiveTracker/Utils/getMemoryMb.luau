@@ -1,20 +1,23 @@
-local Parent = script:FindFirstAncestor("TimeToInteractiveTracker").Parent
-local MemoryTracker = require(Parent.Memory).MemoryTracker
+local parent = script:FindFirstAncestor("TimeToInteractiveTracker").Parent
 
-local function getMemoryMb() -- line: 14
-	-- upvalues: MemoryTracker (copy)
-	local v4 = MemoryTracker()
+local Memory = require(parent.Memory)
+local MemoryTracker = Memory.MemoryTracker
 
-	if not v4 then
+local function getMemoryMb()
+	local memoryTracker = MemoryTracker()
+
+	if not memoryTracker then
 		return {}
 	end
 
-	local v5 = v4.getSnapshot()
+	local snapshot = memoryTracker.getSnapshot()
+	local totalMemoryMB
 
-	return {
-		totalMemoryMB = if not v5.totalMemory then nil else tonumber(v5.totalMemory),
-		luaHeapMB = tonumber(v5.luaHeapMb)
-	}
+	if snapshot.totalMemory then
+		totalMemoryMB = tonumber(snapshot.totalMemory)
+	end
+
+	return { totalMemoryMB = totalMemoryMB, luaHeapMB = tonumber(snapshot.luaHeapMb) }
 end
 
 return getMemoryMb

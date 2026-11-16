@@ -1,72 +1,83 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local Object = require(Parent.LuauPolyfill).Object
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local Cryo = require(parent.Cryo)
 local ChatBubbleEnum = require(script.Parent.ChatBubbleEnum)
-local Foundation = require(Parent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local useCursor = Foundation.Hooks.useCursor
-local t1 = {
+
+local v = {
 	contentWidth = 0,
 	isIncoming = false,
 	isRepliedTo = false,
+	imageColor = Color3.new(0, 0, 0),
 	imageTransparency = 0,
 	padding = 0,
 	hasTail = false,
-	imageColor = Color3.new(0, 0, 0),
-	onAbsoluteSizeChanged = function(_) -- line: 35
-	end,
-	setContentWidth = function(_: number) -- line: 36
-	end,
-	handleEvent = function(_) -- line: 37
-	end,
+	onAbsoluteSizeChanged = function(_) end,
+	setContentWidth = function(_: number) end,
+	handleEvent = function(_) end,
 	containerChildren = {}
 }
 
-function ChatBubble(t2: {[any]: any}) -- line: 49
-	-- upvalues: useCursor (copy), Foundation (copy), Cryo (copy), t1 (copy), ChatBubbleEnum (copy), React (copy), Object (copy)
-	local v13 = useCursor(Foundation.Enums.CursorType.RoundedRect)
-	local v14 = Cryo.Dictionary.union(t1, t2)
-	local uDim = UDim.new(0, v14.padding or t1.padding)
-	local v16 = ChatBubbleEnum.TAIL_WIDTH + (not v14.isRepliedTo and 0 or ChatBubbleEnum.REPLIED_TO_MARKER_WIDTH + ChatBubbleEnum.REPLIED_TO_MARKER_GAP)
-	local v17 = if not v14.isIncoming then UDim2.new(1, -v16, 0, 0) else UDim2.new(0, v16, 0, 0)
-	local BUBBLE = ChatBubbleEnum.BUBBLE
+function ChatBubble(p)
+	local selectionImageObject = useCursor(Foundation.Enums.CursorType.RoundedRect)
+	local union = Cryo.Dictionary.union(v, p)
+	local udim = UDim.new(0, union.padding or v.padding)
 
-	if v14.hasTail then
-		BUBBLE = if not v14.isIncoming then ChatBubbleEnum.SENT_BUBBLE_WITH_TAIL else ChatBubbleEnum.RECEIVED_BUBBLE_WITH_TAIL
+	local v2 = ChatBubbleEnum.TAIL_WIDTH + (not union.isRepliedTo and 0 or ChatBubbleEnum.REPLIED_TO_MARKER_WIDTH + ChatBubbleEnum.REPLIED_TO_MARKER_GAP)
+	local udim2
+
+	if union.isIncoming then
+		udim2 = UDim2.new(0, v2, 0, 0)
+	else
+		udim2 = UDim2.new(1, -v2, 0, 0)
 	end
 
-	local v19 = React.useCallback(function(p3) -- line: 70
-		-- upvalues: v14 (copy)
-		v14.onAbsoluteSizeChanged(p3)
-	end, { v14.onAbsoluteSizeChanged })
-	local v20 = React.useCallback(function(p4) -- line: 74
-		-- upvalues: v14 (copy), uDim (copy)
-		v14.setContentWidth(p4.AbsoluteContentSize.X + uDim.Offset * 2)
-	end, { v14.setContentWidth })
+	local image = ChatBubbleEnum.BUBBLE
+
+	if union.hasTail then
+		if union.isIncoming then
+			image = ChatBubbleEnum.RECEIVED_BUBBLE_WITH_TAIL
+		else
+			image = ChatBubbleEnum.SENT_BUBBLE_WITH_TAIL
+		end
+	end
+
+	local v3 = React.useCallback(function(p2)
+		union.onAbsoluteSizeChanged(p2)
+	end, { union.onAbsoluteSizeChanged })
+
+	local v4 = React.useCallback(function(p2)
+		union.setContentWidth(p2.AbsoluteContentSize.X + udim.Offset * 2)
+	end, { union.setContentWidth })
 
 	return React.createElement("ImageLabel", {
 		AutomaticSize = Enum.AutomaticSize.XY,
-		Size = UDim2.new(0, v14.contentWidth, 0, 0),
-		AnchorPoint = v14.isIncoming and Vector2.new(0, 0) or Vector2.new(1, 0),
+		Size = UDim2.new(0, union.contentWidth, 0, 0),
+		AnchorPoint = union.isIncoming and Vector2.new(0, 0) or Vector2.new(1, 0),
 		BackgroundTransparency = 1,
-		ImageColor3 = v14.imageColor,
-		Image = BUBBLE,
+		ImageColor3 = union.imageColor,
+		Image = image,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = ChatBubbleEnum.SLIDE_CENTER,
-		ImageTransparency = v14.imageTransparency,
-		Position = v17,
-		Selectable = not v14.hasTail,
-		SelectionImageObject = v13,
-		[React.Change.AbsoluteSize] = v19
-	}, Object.assign(table.clone(v14.containerChildren), {
+		ImageTransparency = union.imageTransparency,
+		Position = udim2,
+		Selectable = not union.hasTail,
+		SelectionImageObject = selectionImageObject,
+		[React.Change.AbsoluteSize] = v3
+	}, Object.assign(table.clone(union.containerChildren), {
 		["$margin"] = React.createElement("UIPadding", {
-			PaddingBottom = uDim,
-			PaddingTop = uDim,
-			PaddingRight = uDim,
-			PaddingLeft = uDim
+			PaddingBottom = udim,
+			PaddingTop = udim,
+			PaddingRight = udim,
+			PaddingLeft = udim
 		}),
 		["$layout"] = React.createElement("UIListLayout", {
-			[React.Change.AbsoluteContentSize] = v20
+			[React.Change.AbsoluteContentSize] = v4
 		})
 	}))
 end

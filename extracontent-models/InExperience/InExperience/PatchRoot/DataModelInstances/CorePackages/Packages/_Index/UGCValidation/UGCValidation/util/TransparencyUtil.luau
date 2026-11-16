@@ -1,9 +1,9 @@
 return {
-	transformTriangleToWorld = function(vector3: Vector3, vector3_2: Vector3, vector3_3: Vector3, cFrame: CFrame, vector3_4: Vector3) -- line: 10
-		local v6 = cFrame * (vector3 * vector3_4)
-		local v7 = cFrame * (vector3_2 * vector3_4)
-		local v8 = cFrame * (vector3_3 * vector3_4)
+	transformTriangleToWorld = function(vector3: Vector3, vector3_2: Vector3, vector3_3: Vector3, cframe: CFrame, vector3_4: Vector3)
+		local v = cframe * (vector3 * vector3_4)
+		local v2 = cframe * (vector3_2 * vector3_4)
+		local v3 = cframe * (vector3_3 * vector3_4)
 
-		return v6, v7, v8, (v7 - v6):Cross(v8 - v6).Unit
+		return v, v2, v3, (v2 - v):Cross(v3 - v).Unit
 	end
 }

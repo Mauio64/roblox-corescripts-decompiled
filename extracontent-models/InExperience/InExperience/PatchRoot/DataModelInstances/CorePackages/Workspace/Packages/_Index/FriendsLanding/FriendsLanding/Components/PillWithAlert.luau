@@ -1,1 +1,3 @@
-return (require(script.PillWithAlert))
+local PillWithAlert = require(script.PillWithAlert)
+
+return PillWithAlert

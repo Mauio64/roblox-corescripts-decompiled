@@ -1,18 +1,17 @@
 local prettyPrint = require(script.Parent.prettyPrint)
-local t1 = {
-	outputFunction = print
-}
+local LoggerMiddleware = { outputFunction = print }
 
-function t1.middleware(p1, p2) -- line: 10
-	-- upvalues: t1 (copy), prettyPrint (copy)
-	return function(p3) -- line: 11
-		-- upvalues: p1 (copy), t1 (copy), prettyPrint (copy), p2 (copy)
-		local v6 = p1(p3)
+function LoggerMiddleware.middleware(callback, object)
+	return function(p)
+		local v = callback(p)
 
-		t1.outputFunction(("Action dispatched: %s\nState changed to: %s"):format(prettyPrint(p3), prettyPrint(p2:getState())))
+		LoggerMiddleware.outputFunction(("Action dispatched: %s\nState changed to: %s"):format(
+			prettyPrint(p),
+			prettyPrint(object:getState())
+		))
 
-		return v6
+		return v
 	end
 end
 
-return t1
+return LoggerMiddleware

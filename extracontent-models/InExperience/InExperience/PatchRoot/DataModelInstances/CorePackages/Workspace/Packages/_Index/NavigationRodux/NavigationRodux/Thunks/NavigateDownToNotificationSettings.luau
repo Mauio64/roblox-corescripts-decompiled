@@ -1,22 +1,23 @@
 local NavigationRodux = script:FindFirstAncestor("NavigationRodux")
-local NavigationRoduxParent = NavigationRodux.Parent
-local ArgCheck = require(NavigationRoduxParent.ArgCheck)
-local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
-local RobloxAppEnums = require(NavigationRoduxParent.RobloxAppEnums)
-local UrlBuilder = require(NavigationRoduxParent.UrlBuilder)
-local AppPage = RobloxAppEnums.AppPage
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local parent = NavigationRodux.Parent
 
-return function(p1) -- line: 12
-	-- upvalues: ArgCheck (copy), NavigateDown (copy), AppPage (copy), UrlBuilder2 (copy)
-	ArgCheck.isTypeOrNil(p1, "function", "onClose")
+local ArgCheck = require(parent.ArgCheck)
+local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local UrlBuilder = require(parent.UrlBuilder)
+
+local AppPage = RobloxAppEnums.AppPage
+local urlBuilder = UrlBuilder.UrlBuilder
+
+return function(onClose)
+	ArgCheck.isTypeOrNil(onClose, "function", "onClose")
 
 	return NavigateDown({
 		name = AppPage.SettingsSubPage,
-		detail = UrlBuilder2.static.settings.notifications(),
+		detail = urlBuilder.static.settings.notifications(),
 		extraProps = {
 			titleKey = "Feature.AccountSettings.Heading.Tab.Notifications",
-			onClose = p1
+			onClose = onClose
 		}
 	})
 end

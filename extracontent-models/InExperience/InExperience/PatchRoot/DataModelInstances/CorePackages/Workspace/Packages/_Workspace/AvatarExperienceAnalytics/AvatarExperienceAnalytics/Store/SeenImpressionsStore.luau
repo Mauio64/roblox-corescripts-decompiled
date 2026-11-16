@@ -1,39 +1,35 @@
-local t1 = {}
+local v = {}
 
-local function getOrCreateCategory(s1: string) -- line: 20
-	-- upvalues: t1 (copy)
-	if not t1[s1] then
-		t1[s1] = {}
+local function getOrCreateCategory(p: string) -- 1 equivalent call inferred from this helper
+	if not v[p] then
+		v[p] = {}
 	end
 
-	return t1[s1]
+	return v[p]
 end
 
-return {
-	Category = {
-		WidgetItems = "WidgetItems",
-		UnifiedImpressions = "UnifiedImpressions"
-	},
-	hasSeen = function(s2: string, s3: string) -- line: 27
-		-- upvalues: t1 (copy)
-		local v6 = t1[s2]
-
-		return v6 ~= nil and v6[s3] == true
-	end,
-	markSeen = function(s4: string, s5: string) -- line: 32
-		-- upvalues: t1 (copy)
-		if not t1[s4] then
-			t1[s4] = {}
-		end
-
-		t1[s4][s5] = true
-	end,
-	clearCategory = function(s6: string) -- line: 36
-		-- upvalues: t1 (copy)
-		t1[s6] = nil
-	end,
-	clear = function() -- line: 40
-		-- upvalues: t1 (copy)
-		table.clear(t1)
-	end
+local SeenImpressionsStore = {}
+SeenImpressionsStore.Category = {
+	WidgetItems = "WidgetItems",
+	UnifiedImpressions = "UnifiedImpressions"
 }
+
+function SeenImpressionsStore.hasSeen(p: string, p2: string): boolean
+	local v2 = v[p]
+	return v2 ~= nil and v2[p2] == true
+end
+
+function SeenImpressionsStore.markSeen(p: string, p2: string)
+	local category = getOrCreateCategory(p) -- inferred equivalent call
+	category[p2] = true
+end
+
+function SeenImpressionsStore.clearCategory(p: string)
+	v[p] = nil
+end
+
+function SeenImpressionsStore.clear()
+	table.clear(v)
+end
+
+return SeenImpressionsStore

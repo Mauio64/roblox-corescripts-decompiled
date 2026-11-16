@@ -1,54 +1,58 @@
 local HttpService = game:GetService("HttpService")
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Base64 = require(AuthCommon.Utils.Base64)
-local Promise = require(AuthCommonParent.Promise)
-local Url = require(AuthCommonParent.Http).Url
-local PasskeyConstants = require(AuthCommon.Common.PasskeyConstants)
-local FFlagEmitPasskeyRegistrationSourceOnFinish = require(AuthCommonParent.SharedFlags).FFlagEmitPasskeyRegistrationSourceOnFinish
 
-local function getFinishRegistrationUrl() -- line: 15
-	-- upvalues: Url (copy)
+local parent = AuthCommon.Parent
+local Base64 = require(AuthCommon.Utils.Base64)
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
+local Url = Http.Url
+
+local PasskeyConstants = require(AuthCommon.Common.PasskeyConstants)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEmitPasskeyRegistrationSourceOnFinish = SharedFlags.FFlagEmitPasskeyRegistrationSourceOnFinish
+
+local function getFinishRegistrationUrl() -- 1 equivalent call inferred from this helper
 	return string.format("%sv1/passkey/finish-ar-preauth-registration", Url.AUTH_URL)
 end
-local function finishARPreauthPasskeyRegistration(p1, p2) -- line: 19
-	-- upvalues: Url (copy), Promise (copy), HttpService (copy), PasskeyConstants (copy)
-	return p1(string.format("%sv1/passkey/finish-ar-preauth-registration", Url.AUTH_URL), "POST", {
-		postBody = p2
-	}):andThen(function(p3) -- line: 20
-		-- upvalues: Promise (copy)
-		return Promise.resolve(p3)
-	end, function(p4) -- line: 22
-		-- upvalues: HttpService (copy), Promise (copy), PasskeyConstants (copy)
-		local v27 = if type(p4) ~= "table" then nil else HttpService:JSONEncode(p4)
 
-		return Promise.reject({
-			body = v27,
-			name = PasskeyConstants.BACKEND_CREATION_ERROR_NAME
-		})
+local function finishARPreauthPasskeyRegistration(callback, postBody)
+	return callback(getFinishRegistrationUrl(), "POST", { postBody = postBody }):andThen(function(p) -- inferred equivalent call
+		return Promise.resolve(p)
+	end, function(p)
+		local body
+
+		if type(p) == "table" then
+			body = HttpService:JSONEncode(p)
+		end
+
+		return Promise.reject({ body = body, name = PasskeyConstants.BACKEND_CREATION_ERROR_NAME })
 	end)
 end
-local function attemptFinishARPreauthPasskeyRegistration(p5, p6, p7, p8, p9, p10, p11) -- line: 28
-	-- upvalues: HttpService (copy), Base64 (copy), FFlagEmitPasskeyRegistrationSourceOnFinish (copy), finishARPreauthPasskeyRegistration (copy)
-	local data = HttpService:JSONDecode(p9)
 
-	data.id = Base64.ToUrlSafeBase64(data.id)
-	data.rawId = Base64.ToUrlSafeBase64(data.rawId)
-	data.response.attestationObject = Base64.ToUrlSafeBase64(data.response.attestationObject)
-	data.response.clientDataJSON = Base64.ToUrlSafeBase64(data.response.clientDataJSON)
+local function attemptFinishARPreauthPasskeyRegistration(p, recoverySession, passkeySessionId, userId, json, isPostRecovery, source)
+	local jsonDecode = HttpService:JSONDecode(json)
+	jsonDecode.id = Base64.ToUrlSafeBase64(jsonDecode.id)
+	jsonDecode.rawId = Base64.ToUrlSafeBase64(jsonDecode.rawId)
+	jsonDecode.response.attestationObject = Base64.ToUrlSafeBase64(jsonDecode.response.attestationObject)
+	jsonDecode.response.clientDataJSON = Base64.ToUrlSafeBase64(jsonDecode.response.clientDataJSON)
 
-	local json = HttpService:JSONEncode(data)
-	local t1 = {
-		recoverySession = p6,
-		passkeySessionId = p7,
-		passkeyRegistrationResponse = json,
-		userId = p8,
-		isPostRecovery = p10,
-		source = if not FFlagEmitPasskeyRegistrationSourceOnFinish then nil else p11
+	local v = {
+		recoverySession = recoverySession,
+		passkeySessionId = passkeySessionId,
+		passkeyRegistrationResponse = HttpService:JSONEncode(jsonDecode),
+		userId = userId,
+		isPostRecovery = isPostRecovery,
+		source = 0
 	}
-	local json2 = HttpService:JSONEncode(t1)
 
-	return finishARPreauthPasskeyRegistration(p5, json2)
+	if not FFlagEmitPasskeyRegistrationSourceOnFinish then
+		source = nil
+	end
+
+	v.source = source
+
+	return finishARPreauthPasskeyRegistration(p, HttpService:JSONEncode(v))
 end
 
 return attemptFinishARPreauthPasskeyRegistration

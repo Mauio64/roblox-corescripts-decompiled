@@ -1,30 +1,31 @@
 local VerifiedParentalConsentDialog = script:FindFirstAncestor("VerifiedParentalConsentDialog")
-local VerifiedParentalConsentDialogParent = VerifiedParentalConsentDialog.Parent
-local React = require(VerifiedParentalConsentDialogParent.React)
-local Images = require(VerifiedParentalConsentDialogParent.UIBlox).App.ImageSet.Images
-local useLocalization = require(VerifiedParentalConsentDialogParent.Localization).Hooks.useLocalization
-local AlertPrompt = require(VerifiedParentalConsentDialog.Components.AlertPrompt)
+local parent = VerifiedParentalConsentDialog.Parent
+local React = require(parent.React)
 
+local UIBlox = require(parent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local AlertPrompt = require(VerifiedParentalConsentDialog.Components.AlertPrompt)
 require(VerifiedParentalConsentDialog.VPCModalType)
 
-local function VPCModalPrompt(t1: {[any]: any}) -- line: 22
-	-- upvalues: useLocalization (copy), React (copy), AlertPrompt (copy), Images (copy)
-	local t2 = {
-		EnablePurchase = { not t1.isActionable and "Common.VerifiedParentalConsent.Description.SpendingRestrictionWithoutSettings" or "Common.VerifiedParentalConsent.Description.SpendingRestrictionWithSettings" }
-	}
-	local v10 = useLocalization({
+local function VPCModalPrompt(props)
+	local v = useLocalization({
 		title = "Common.VerifiedParentalConsent.Label.AskParent",
-		message = t2[t1.modalType]
+		message = ({
+			EnablePurchase = { props.isActionable and "Common.VerifiedParentalConsent.Description.SpendingRestrictionWithSettings" or "Common.VerifiedParentalConsent.Description.SpendingRestrictionWithoutSettings" }
+		})[props.modalType]
 	})
 
 	return React.createElement(AlertPrompt, {
-		title = v10.title,
+		title = v.title,
 		titleIcon = Images["icons/graphic/lock_xxlarge"],
-		bodyText = v10.message,
-		onDismiss = t1.onDismiss,
-		isActionable = t1.isActionable,
-		screenSize = t1.screenSize,
-		onAction = t1.onAction
+		bodyText = v.message,
+		onDismiss = props.onDismiss,
+		isActionable = props.isActionable,
+		screenSize = props.screenSize,
+		onAction = props.onAction
 	})
 end
 

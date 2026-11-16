@@ -1,90 +1,141 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
-local GraphQL = require(ParentParent.GraphQL)
+local FilterSchema = {}
+local GraphQL = require(parent.GraphQL)
+
 local GraphQLInputObjectType = GraphQL.GraphQLInputObjectType
 local GraphQLInterfaceType = GraphQL.GraphQLInterfaceType
 local GraphQLObjectType = GraphQL.GraphQLObjectType
-local MapperKind = require(script.Parent.Interfaces).MapperKind
-local mapSchema = require(script.Parent.mapSchema).mapSchema
 
+local Interfaces = require(script.Parent.Interfaces)
+
+local MapperKind = Interfaces.MapperKind
+
+local mapSchema = require(script.Parent.mapSchema)
+local mapSchema2 = mapSchema.mapSchema
 require(script.Parent.types)
 
-local filterRootFields = nil
-local filterElementFields = nil
+local filterRootFields
+local filterElementFields
 
-function t1.filterSchema(t2: {[any]: any}) -- line: 64
-	-- upvalues: mapSchema (copy), MapperKind (copy), filterRootFields (ref), Boolean (copy), filterElementFields (ref), GraphQLObjectType (copy), Object (copy), GraphQLInterfaceType (copy), GraphQLInputObjectType (copy)
-	local schema = t2.schema
-	local v17 = if t2.typeFilter ~= nil then t2.typeFilter else function(...) -- line: 82
+function FilterSchema.filterSchema(data)
+	local schema = data.schema
+
+	local fn = data.typeFilter == nil and function(...): boolean
 		return true
+	end or data.typeFilter
+	local fieldFilter
+
+	if data.fieldFilter == nil then
+		fieldFilter = nil
+	else
+		fieldFilter = data.fieldFilter
 	end
-	local v18 = if t2.fieldFilter ~= nil then t2.fieldFilter else nil
-	local v19 = if t2.rootFieldFilter ~= nil then t2.rootFieldFilter else nil
-	local v20 = if t2.objectFieldFilter ~= nil then t2.objectFieldFilter else nil
-	local v21 = if t2.interfaceFieldFilter ~= nil then t2.interfaceFieldFilter else nil
-	local v22 = if t2.inputObjectFieldFilter ~= nil then t2.inputObjectFieldFilter else nil
-	local v23 = if t2.argumentFilter ~= nil then t2.argumentFilter else nil
 
-	return (mapSchema(schema, {
-		[MapperKind.QUERY] = function(p1) -- line: 100
-			-- upvalues: filterRootFields (ref), v19 (copy), v23 (copy)
-			return filterRootFields(p1, "Query", v19, v23)
+	local rootFieldFilter
+
+	if data.rootFieldFilter == nil then
+		rootFieldFilter = nil
+	else
+		rootFieldFilter = data.rootFieldFilter
+	end
+
+	local objectFieldFilter
+
+	if data.objectFieldFilter == nil then
+		objectFieldFilter = nil
+	else
+		objectFieldFilter = data.objectFieldFilter
+	end
+
+	local interfaceFieldFilter
+
+	if data.interfaceFieldFilter == nil then
+		interfaceFieldFilter = nil
+	else
+		interfaceFieldFilter = data.interfaceFieldFilter
+	end
+
+	local inputObjectFieldFilter
+
+	if data.inputObjectFieldFilter == nil then
+		inputObjectFieldFilter = nil
+	else
+		inputObjectFieldFilter = data.inputObjectFieldFilter
+	end
+
+	local argumentFilter
+
+	if data.argumentFilter == nil then
+		argumentFilter = nil
+	else
+		argumentFilter = data.argumentFilter
+	end
+
+	return (mapSchema2(schema, {
+		[MapperKind.QUERY] = function(p)
+			return filterRootFields(p, "Query", rootFieldFilter, argumentFilter)
 		end,
-		[MapperKind.MUTATION] = function(p2) -- line: 106
-			-- upvalues: filterRootFields (ref), v19 (copy), v23 (copy)
-			return filterRootFields(p2, "Mutation", v19, v23)
+		[MapperKind.MUTATION] = function(p)
+			return filterRootFields(p, "Mutation", rootFieldFilter, argumentFilter)
 		end,
-		[MapperKind.SUBSCRIPTION] = function(p3) -- line: 112
-			-- upvalues: filterRootFields (ref), v19 (copy), v23 (copy)
-			return filterRootFields(p3, "Subscription", v19, v23)
+		[MapperKind.SUBSCRIPTION] = function(p)
+			return filterRootFields(p, "Subscription", rootFieldFilter, argumentFilter)
 		end,
-		[MapperKind.OBJECT_TYPE] = function(p4) -- line: 118
-			-- upvalues: Boolean (copy), v17 (copy), filterElementFields (ref), GraphQLObjectType (copy), v20 (copy), v18 (copy), v23 (copy), Object (copy)
-			if Boolean.toJSBoolean(v17(p4.name, p4)) then
-				return (filterElementFields(GraphQLObjectType, p4, Boolean.toJSBoolean(v20) and v20 or v18, v23))
+		[MapperKind.OBJECT_TYPE] = function(p)
+			if Boolean.toJSBoolean(fn(p.name, p)) then
+				return (filterElementFields(
+					GraphQLObjectType,
+					p,
+					Boolean.toJSBoolean(objectFieldFilter) and objectFieldFilter or fieldFilter,
+					argumentFilter
+				))
 			end
 
 			return Object.None
 		end,
-		[MapperKind.INTERFACE_TYPE] = function(p5) -- line: 134
-			-- upvalues: Boolean (copy), v17 (copy), filterElementFields (ref), GraphQLInterfaceType (copy), v21 (copy), v18 (copy), v23 (copy), Object (copy)
-			if Boolean.toJSBoolean(v17(p5.name, p5)) then
-				return (filterElementFields(GraphQLInterfaceType, p5, Boolean.toJSBoolean(v21) and v21 or v18, v23))
+		[MapperKind.INTERFACE_TYPE] = function(p)
+			if Boolean.toJSBoolean(fn(p.name, p)) then
+				return (filterElementFields(
+					GraphQLInterfaceType,
+					p,
+					Boolean.toJSBoolean(interfaceFieldFilter) and interfaceFieldFilter or fieldFilter,
+					argumentFilter
+				))
 			end
 
 			return Object.None
 		end,
-		[MapperKind.INPUT_OBJECT_TYPE] = function(p6) -- line: 150
-			-- upvalues: Boolean (copy), v17 (copy), filterElementFields (ref), GraphQLInputObjectType (copy), v22 (copy), v18 (copy), Object (copy)
-			if Boolean.toJSBoolean(v17(p6.name, p6)) then
-				return (filterElementFields(GraphQLInputObjectType, p6, Boolean.toJSBoolean(v22) and v22 or v18))
+		[MapperKind.INPUT_OBJECT_TYPE] = function(p)
+			if Boolean.toJSBoolean(fn(p.name, p)) then
+				return (filterElementFields(
+					GraphQLInputObjectType,
+					p,
+					Boolean.toJSBoolean(inputObjectFieldFilter) and inputObjectFieldFilter or fieldFilter
+				))
 			end
 
 			return Object.None
 		end,
-		[MapperKind.UNION_TYPE] = function(p7) -- line: 165
-			-- upvalues: Boolean (copy), v17 (copy), Object (copy)
-			if Boolean.toJSBoolean(v17(p7.name, p7)) then
+		[MapperKind.UNION_TYPE] = function(p)
+			if Boolean.toJSBoolean(fn(p.name, p)) then
 				return nil
 			end
 
 			return Object.None
 		end,
-		[MapperKind.ENUM_TYPE] = function(p8) -- line: 174
-			-- upvalues: Boolean (copy), v17 (copy), Object (copy)
-			if Boolean.toJSBoolean(v17(p8.name, p8)) then
+		[MapperKind.ENUM_TYPE] = function(p)
+			if Boolean.toJSBoolean(fn(p.name, p)) then
 				return nil
 			end
 
 			return Object.None
 		end,
-		[MapperKind.SCALAR_TYPE] = function(p9) -- line: 183
-			-- upvalues: Boolean (copy), v17 (copy), Object (copy)
-			if Boolean.toJSBoolean(v17(p9.name, p9)) then
+		[MapperKind.SCALAR_TYPE] = function(p)
+			if Boolean.toJSBoolean(fn(p.name, p)) then
 				return nil
 			end
 
@@ -92,59 +143,85 @@ function t1.filterSchema(t2: {[any]: any}) -- line: 64
 		end
 	}))
 end
-function filterRootFields(p10, s1: string, p11, p12) -- line: 199
-	-- upvalues: Boolean (copy), GraphQLObjectType (copy)
-	if Boolean.toJSBoolean(Boolean.toJSBoolean(p11) and p11 or p12) then
-		local v28 = p10:toConfig()
 
-		for _, v30 in v28.fields do
-			local v31 = table.unpack(v30)
-			local v32 = v28.fields:get(v31)
+filterRootFields = function(object, p: string, rootFieldFilter, argumentFilter)
+	if not Boolean.toJSBoolean(Boolean.toJSBoolean(rootFieldFilter) and rootFieldFilter or argumentFilter) then
+		return object
+	end
 
-			if p11 and not p11(s1, v31, (v28.fields:get(v31))) then
-				v28.fields:delete(v31)
-			elseif Boolean.toJSBoolean(if not Boolean.toJSBoolean(p12) then p12 else v32.args) then
-				for _, v34 in v32.args do
-					local v35 = table.unpack(v34)
+	local config = object:toConfig()
 
-					if not p12(s1, v31, v35, v32.args:get(v35)) then
-						v32.args:delete(v35)
+	for _, list in config.fields do
+		local v = table.unpack(list)
+		local v2 = config.fields:get(v)
+
+		if rootFieldFilter and not rootFieldFilter(p, v, (config.fields:get(v))) then
+			config.fields:delete(v)
+		else
+			local toJSBoolean = Boolean.toJSBoolean
+			local v3
+
+			if Boolean.toJSBoolean(argumentFilter) then
+				v3 = v2.args
+			else
+				v3 = argumentFilter
+			end
+
+			if toJSBoolean(v3) then
+				for _, list2 in v2.args do
+					local v4 = table.unpack(list2)
+
+					if argumentFilter(p, v, v4, v2.args:get(v4)) then
+						continue
 					end
+
+					v2.args:delete(v4)
 				end
 			end
 		end
-
-		return GraphQLObjectType.new(v28)
 	end
 
-	return p10
+	return GraphQLObjectType.new(config)
 end
-function filterElementFields(p13, p14, p15, p16) -- line: 273
-	-- upvalues: Boolean (copy), Array (copy), Object (copy)
-	if Boolean.toJSBoolean(Boolean.toJSBoolean(p15) and p15 or p16) then
-		local v40 = p14:toConfig()
 
-		for _, v42 in v40.fields do
-			local v43 = table.unpack(v42)
-			local v44 = v40.fields:get(v43)
+filterElementFields = function(p, object, callback, callback2)
+	if not Boolean.toJSBoolean(Boolean.toJSBoolean(callback) and callback or callback2) then
+		return nil
+	end
 
-			if Boolean.toJSBoolean(p15 and not p15(p14.name, v43, v40.fields:get(v43))) then
-				v40.fields:delete(v43)
-			elseif Boolean.toJSBoolean(if not Boolean.toJSBoolean(p16) then p16 else Array.indexOf(Object.keys(v44), "args") ~= -1) then
-				for _, v46 in v44.args do
-					local v47 = table.unpack(v46)
+	local config = object:toConfig()
 
-					if not Boolean.toJSBoolean(p16(p14.name, v43, v47, v44.args:get(v47))) then
-						v44.args:delete(v47)
+	for _, list in config.fields do
+		local v = table.unpack(list)
+		local v2 = config.fields:get(v)
+
+		if Boolean.toJSBoolean(callback and not callback(object.name, v, config.fields:get(v))) then
+			config.fields:delete(v)
+		else
+			local toJSBoolean = Boolean.toJSBoolean
+			local v3
+
+			if Boolean.toJSBoolean(callback2) then
+				v3 = Array.indexOf(Object.keys(v2), "args") ~= -1
+			else
+				v3 = callback2
+			end
+
+			if toJSBoolean(v3) then
+				for _, list2 in v2.args do
+					local v4 = table.unpack(list2)
+
+					if Boolean.toJSBoolean(callback2(object.name, v, v4, v2.args:get(v4))) then
+						continue
 					end
+
+					v2.args:delete(v4)
 				end
 			end
 		end
-
-		return p13.new(v40)
 	end
 
-	return nil
+	return p.new(config)
 end
 
-return t1
+return FilterSchema

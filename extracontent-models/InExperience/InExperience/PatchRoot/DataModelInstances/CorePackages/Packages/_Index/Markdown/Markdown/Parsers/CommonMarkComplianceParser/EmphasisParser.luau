@@ -1,322 +1,282 @@
 local Markdown = script:FindFirstAncestor("Markdown")
-
 require(Markdown.Types)
 
 local Utils = require(script.Parent.Utils)
-local t2 = {
-	collectDelimiterRun = function(t1: {[any]: any}, p1, n1: number) -- line: 19
-		-- upvalues: Utils (copy)
-		local length = p1.length
-		local v8 = n1 + 1
 
-		while v8 <= #t1 do
-			local v9 = Utils.getDelimiterInfo(t1[v8].name)
+local EmphasisParser = {}
 
-			if not v9 or v9.char ~= p1.char then
-				break
-			end
+function EmphasisParser.collectDelimiterRun(list, p, startIdx: number)
+	local length = p.length
+	local v = startIdx + 1
 
-			length += v9.length
-			v8 += 1
+	while v <= #list do
+		local delimiterInfo = Utils.getDelimiterInfo(list[v].name)
+
+		if not delimiterInfo or delimiterInfo.char ~= p.char then
+			break
 		end
 
-		local prevChar = nil
-		local nextChar = nil
-		local v12 = t1[n1]
-
-		if v12 and v12.context then
-			prevChar = v12.context.prevChar
-		end
-
-		local v13 = t1[v8 - 1]
-
-		if v13 and v13.context then
-			nextChar = v13.context.nextChar
-		end
-
-		return {
-			char = p1.char,
-			prevChar = prevChar,
-			nextChar = nextChar,
-			length = length,
-			startIdx = n1,
-			endIdx = v8 - 1
-		}
+		length += delimiterInfo.length
+		v += 1
 	end
-}
 
-function t2.processEmphasisRun(t3: {[any]: any}, n2: number, n3: number) -- line: 61
-	-- upvalues: Utils (copy), t2 (copy)
-	local t4 = {}
-	local t5 = {}
-	local t6 = {}
-	local n4 = 1
-	local g32 = nil
-	local v33 = nil
+	local nextChar = nil
 
-	while n2 <= n3 do
-		local v21 = t3[n2]
-		local v22 = Utils.getDelimiterInfo(v21.name)
+	local item = list[startIdx]
+	local prevChar
 
-		if not v22 then
-			t4[n4] = v21
+	if item and item.context then
+		prevChar = item.context.prevChar
+	end
 
-			if Utils.causesLineBreak(v21) then
-				table.insert(t6, n2)
-			end
+	local item2 = list[v - 1]
 
-			n4 += 1
-			n2 += 1
-		else
-			local v23 = t2.collectDelimiterRun(t3, v22, n2)
-			local v24 = Utils.canOpenEmphasis(v23)
-			local v25 = Utils.canCloseEmphasis(v23)
+	if item2 and item2.context then
+		nextChar = item2.context.nextChar
+	end
 
-			table.insert(t5, {
-				char = v23.char,
-				runLength = v23.length,
-				origRunLength = v23.length,
-				canOpen = v24,
-				canClose = v25,
-				startIdx = n4,
-				tokenStart = v23.startIdx
+	return {
+		char = p.char,
+		prevChar = prevChar,
+		nextChar = nextChar,
+		length = length,
+		startIdx = startIdx,
+		endIdx = v - 1
+	}
+end
+
+function EmphasisParser.processEmphasisRun(list, p: number, p2: number)
+	local startIdx = 1
+	local v = {}
+	local v2 = {}
+
+	local v3 = {}
+
+	while p <= p2 do
+		local item = list[p]
+		local delimiterInfo = Utils.getDelimiterInfo(item.name)
+
+		if delimiterInfo then
+			local delimiterRun = EmphasisParser.collectDelimiterRun(list, delimiterInfo, p)
+
+			local canOpenEmphasis = Utils.canOpenEmphasis(delimiterRun)
+			local canCloseEmphasis = Utils.canCloseEmphasis(delimiterRun)
+
+			table.insert(v, {
+				char = delimiterRun.char,
+				runLength = delimiterRun.length,
+				origRunLength = delimiterRun.length,
+				canOpen = canOpenEmphasis,
+				canClose = canCloseEmphasis,
+				startIdx = startIdx,
+				tokenStart = delimiterRun.startIdx
 			})
-			t4[n4] = {
+
+			v2[startIdx] = {
 				name = "DELIMITER_RUN",
 				text = "",
-				delimiterIndex = #t5,
-				offset = t3[v23.startIdx].offset
+				delimiterIndex = #v,
+				offset = list[delimiterRun.startIdx].offset
 			}
-			n4 += 1
-			n2 = v23.endIdx + 1
+
+			startIdx += 1
+			p = delimiterRun.endIdx + 1
+		else
+			v2[startIdx] = item
+
+			if Utils.causesLineBreak(item) then
+				table.insert(v3, p)
+			end
+
+			startIdx += 1
+			p += 1
 		end
 	end
 
-	local v26 = false
+	local v4 = false
 
-	for i = n3 + 1, #t3 do
-		if Utils.causesLineBreak(t3[i]) then
-			v26 = true
-
+	for i = p2 + 1, #list do
+		if Utils.causesLineBreak(list[i]) then
+			v4 = true
 			break
 		end
 	end
 
-	local t7 = {}
+	local v5 = {}
 
-	for v29, v30 in t5 do
-		if v30.canClose and v30.runLength > 0 then
-			local v31 = #t7
+	for k, with in v do
+		if with.canClose and with.runLength > 0 then
+			local v6 = #v5
 
-			while true do
-				while true do
-					while true do
-						if not (v31 >= 1) then
-							g32 = true
-						end
+			while v6 >= 1 do
+				local with2 = v[v5[v6]]
 
-						if g32 then
-							break
-						end
-
-						v33 = t5[t7[v31]]
-
-						if v33.char == "`" and v30.char ~= "`" and v33.canOpen then
-							g32 = true
-						end
-
-						if g32 then
-							break
-						end
-
-						if v33.char == v30.char and v33.canOpen and v33.runLength > 0 then
-							break
-						end
-
-						v31 -= 1
-					end
-
-					if g32 then
-						break
-					end
-
-					if g32 then
-						break
-					end
-
-					if Utils.canDelimitersMatch(v33, v30) then
-						break
-					end
-
-					v31 -= 1
-				end
-
-				if g32 then
+				if with2.char == "`" and with.char ~= "`" and with2.canOpen then
 					break
 				end
 
-				if g32 then
-					break
+				if with2.char == with.char and with2.canOpen and with2.runLength > 0 then
+					if Utils.canDelimitersMatch(with2, with) then
+						local length = math.min(2, with2.runLength, with.runLength)
+
+						Utils.addDelimiterMatch(with2, {
+							with = with,
+							length = length,
+							isOpener = true
+						})
+
+						Utils.addDelimiterMatch(with, {
+							with = with2,
+							length = length,
+							isOpener = false
+						})
+
+						with2.runLength -= length
+						with.runLength -= length
+
+						for _ = #v5, v6 + 1, -1 do
+							table.remove(v5)
+						end
+
+						if with2.runLength == 0 then
+							table.remove(v5, v6)
+						end
+
+						if with.runLength == 0 then
+							break
+						end
+
+						v6 = #v5
+					else
+						v6 -= 1
+					end
+				else
+					v6 -= 1
 				end
-
-				local v34 = math.min(2, v33.runLength, v30.runLength)
-
-				Utils.addDelimiterMatch(v33, {
-					isOpener = true,
-					with = v30,
-					length = v34
-				})
-				Utils.addDelimiterMatch(v30, {
-					isOpener = false,
-					with = v33,
-					length = v34
-				})
-				v33.runLength = v33.runLength - v34
-				v30.runLength = v30.runLength - v34
-
-				for _ = #t7, v31 + 1, -1 do
-					table.remove(t7)
-				end
-
-				if v33.runLength == 0 then
-					table.remove(t7, v31)
-				end
-
-				if v30.runLength == 0 then
-					break
-				end
-
-				v31 = #t7
 			end
 		end
 
-		g32 = false
-
-		if v30.canOpen and v30.runLength > 0 then
-			table.insert(t7, v29)
+		if with.canOpen and with.runLength > 0 then
+			table.insert(v5, k)
 		end
 	end
 
-	local t8 = {}
+	local result = {}
 
-	for v37, v38 in t4 do
-		if v38.name == "DELIMITER_RUN" then
-			local v39 = t5[v38.delimiterIndex]
+	for k, v6 in v2 do
+		if v6.name == "DELIMITER_RUN" then
+			local v7 = v[v6.delimiterIndex]
 
-			if v39.char == "`" and v39.runLength > 0 and v38.delimiterIndex == #t5 and not v26 and v37 < #t4 then
-				local v40 = false
+			if v7.char == "`" and v7.runLength > 0 and v6.delimiterIndex == #v and not v4 and k < #v2 then
+				local v8 = false
 
-				for i = #t6, 1, -1 do
-					local v42 = t6[i]
+				for i = #v3, 1, -1 do
+					local v9 = v3[i]
 
-					if v42 > v39.tokenStart then
-						v40 = true
-
+					if v7.tokenStart < v9 then
+						v8 = true
 						break
-					end
-
-					if v42 <= v39.tokenStart then
+					elseif v9 <= v7.tokenStart then
 						break
 					end
 				end
 
-				if not v40 then
-					table.insert(t8, {
+				if not v8 then
+					table.insert(result, {
 						name = "EMPHASIS_START",
 						text = "INLINE_CODE",
-						offset = t3[v39.tokenStart].offset
+						offset = list[v7.tokenStart].offset
 					})
-
 					continue
 				end
 			end
 
-			local matches = v39.matches
+			local matches = v7.matches
 
-			if not matches or #matches == 0 then
-				table.insert(t8, {
-					name = "TEXT",
-					text = string.rep(v39.char, v39.origRunLength),
-					offset = v38.offset
-				})
-			elseif matches[1].isOpener then
-				local n5 = 0
+			if matches and #matches ~= 0 then
+				if matches[1].isOpener then
+					local total = 0
 
-				for _, v46 in matches do
-					n5 += v46.length
-				end
+					for _, match in matches do
+						total += match.length
+					end
 
-				local v47 = v39.origRunLength - n5
+					local v8 = v7.origRunLength - total
 
-				if v47 > 0 then
-					table.insert(t8, {
-						name = "TEXT",
-						text = string.rep(v39.char, v47),
-						offset = v38.offset
-					})
-				end
-
-				for _, v49 in matches do
-					local length = v49.length
-
-					while length > 0 do
-						local v51 = math.min(length, 2)
-						local v52 = Utils.getTokenNameFromCharAndLength(v39.char, v51)
-
-						table.insert(t8, {
-							name = "EMPHASIS_START",
-							text = v52,
-							offset = v38.offset
+					if v8 > 0 then
+						table.insert(result, {
+							name = "TEXT",
+							text = string.rep(v7.char, v8),
+							offset = v6.offset
 						})
-						length -= v51
+					end
+
+					for _, match in matches do
+						local length = match.length
+
+						while length > 0 do
+							local v9 = math.min(length, 2)
+							table.insert(result, {
+								name = "EMPHASIS_START",
+								text = Utils.getTokenNameFromCharAndLength(v7.char, v9),
+								offset = v6.offset
+							})
+
+							length -= v9
+						end
+					end
+				else
+					local v8 = {}
+
+					for _, match in matches do
+						local length = match.length
+
+						while length > 0 do
+							local v9 = math.min(length, 2)
+
+							table.insert(v8, {
+								name = "EMPHASIS_END",
+								text = "",
+								offset = v6.offset
+							})
+
+							length -= v9
+						end
+					end
+
+					for i = #v8, 1, -1 do
+						table.insert(result, v8[i])
+					end
+
+					local total = 0
+
+					for _, match in matches do
+						total += match.length
+					end
+
+					local v9 = v7.origRunLength - total
+
+					if v9 > 0 then
+						table.insert(result, {
+							name = "TEXT",
+							text = string.rep(v7.char, v9),
+							offset = v6.offset
+						})
 					end
 				end
 			else
-				local t9 = {}
-
-				for _, v55 in matches do
-					local length = v55.length
-
-					while length > 0 do
-						local v57 = math.min(length, 2)
-
-						table.insert(t9, {
-							name = "EMPHASIS_END",
-							text = "",
-							offset = v38.offset
-						})
-						length -= v57
-					end
-				end
-
-				for i = #t9, 1, -1 do
-					table.insert(t8, t9[i])
-				end
-
-				local n6 = 0
-
-				for _, v61 in matches do
-					n6 += v61.length
-				end
-
-				local v62 = v39.origRunLength - n6
-
-				if v62 > 0 then
-					table.insert(t8, {
-						name = "TEXT",
-						text = string.rep(v39.char, v62),
-						offset = v38.offset
-					})
-				end
+				table.insert(result, {
+					name = "TEXT",
+					text = string.rep(v7.char, v7.origRunLength),
+					offset = v6.offset
+				})
 			end
-
-			continue
+		else
+			table.insert(result, v6)
 		end
-
-		table.insert(t8, v38)
 	end
 
-	return t8
+	return result
 end
 
-return t2
+return EmphasisParser

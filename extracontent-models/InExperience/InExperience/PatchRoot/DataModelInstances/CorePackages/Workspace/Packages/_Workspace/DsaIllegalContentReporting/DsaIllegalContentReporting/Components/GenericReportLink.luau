@@ -1,60 +1,73 @@
-local Parent = script:FindFirstAncestor("DsaIllegalContentReporting").Parent
-local Foundation = require(Parent.Foundation)
-local default = require(Parent.LinkingProtocol).LinkingProtocol.default
-local Localization = require(Parent.Localization)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("DsaIllegalContentReporting").Parent
+
+local Foundation = require(parent.Foundation)
+local LinkingProtocol = require(parent.LinkingProtocol)
+local default = LinkingProtocol.LinkingProtocol.default
+local Localization = require(parent.Localization)
+local React = require(parent.React)
+
 local ControlState = Foundation.Enums.ControlState
 local getIconRichText = Foundation.Utility.getIconRichText
 local IconName = Foundation.Enums.IconName
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useLocalization = Localization.Hooks.useLocalization
 local View = Foundation.View
-local v12 = game:DefineFastString("GenericReportLink", "https://www.roblox.com/illegal-content-reporting")
-local v13 = game:DefineFastFlag("ImproveIllegalContentReportingLinkLook", false)
 
-function GenericReportLink() -- line: 22
-	-- upvalues: v13 (copy), React (copy), useLocalization (copy), getIconRichText (copy), IconName (copy), default (copy), v12 (copy), ControlState (copy), View (copy), FoundationText (copy)
-	local v14 = nil
-	local u15 = nil
+local defineFastString = game:DefineFastString("GenericReportLink", "https://www.roblox.com/illegal-content-reporting")
+local defineFastFlag = game:DefineFastFlag("ImproveIllegalContentReportingLinkLook", false)
 
-	if v13 then
-		local v16
+function GenericReportLink()
+	local state, setState
 
-		v14, v16 = React.useState(false)
-		u15 = v16
+	if defineFastFlag then
+		state, setState = React.useState(false)
+	else
+		setState = nil
 	end
 
-	local v17 = useLocalization({
+	local v = useLocalization({
 		GenericReportLinkText = "Feature.ReportAbuse.Label.GenericReportIllegalContentMessage"
 	})
-	local v18 = nil
+	local text
 
-	if v13 then
-		v18 = `<b>{ v17.GenericReportLinkText }</b> { getIconRichText(IconName.ArrowUpRightFromSquare) }`
+	if defineFastFlag then
+		text = `<b>{v.GenericReportLinkText}</b> {getIconRichText(IconName.ArrowUpRightFromSquare)}`
 	end
 
-	local v19 = React.useCallback(function() -- line: 39
-		-- upvalues: default (copy), v12 (copy)
-		default:openURL(v12)
+	local onActivated = React.useCallback(function()
+		default:openURL(defineFastString)
 	end, {})
-	local v20 = nil
+	local onStateChanged
 
-	if v13 then
-		v20 = React.useCallback(function(p1) -- line: 45
-			-- upvalues: u15 (ref), ControlState (copy)
-			u15(p1 == ControlState.Hover)
+	if defineFastFlag then
+		onStateChanged = React.useCallback(function(p)
+			setState(p == ControlState.Hover)
 		end, {})
 	end
 
-	return React.createElement(View, {
-		tag = "auto-xy col gap-small"
-	}, { React.createElement(FoundationText, {
-		RichText = true,
-		tag = "auto-xy radius-small padding-xsmall text-wrap text-body-small",
-		Text = if not v13 then `<b>{ v17.GenericReportLinkText }</b>` else if not v14 then v18 else `<u>{ v18 }</u>`,
-		onActivated = v19,
-		onStateChanged = if not v13 then nil else v20
-	}) })
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+
+	if defineFastFlag then
+		if state then
+			text = `<u>{text}</u>`
+		end
+	else
+		text = `<b>{v.GenericReportLinkText}</b>`
+	end
+
+	if not defineFastFlag then
+		onStateChanged = nil
+	end
+
+	return createElement(View, { tag = "auto-xy col gap-small" }, { createElement2(Text, {
+			Text = text,
+			RichText = true,
+			onActivated = onActivated,
+			onStateChanged = onStateChanged,
+			tag = "auto-xy radius-small padding-xsmall text-wrap text-body-small"
+		}) })
 end
 
 return React.memo(GenericReportLink)

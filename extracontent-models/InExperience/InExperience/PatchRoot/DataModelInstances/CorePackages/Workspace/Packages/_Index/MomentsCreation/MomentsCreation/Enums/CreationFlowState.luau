@@ -5,5 +5,6 @@ return {
 	TextOverlay = "TextOverlay",
 	Trimming = "Trimming",
 	Description = "Description",
-	StickerOverlay = "StickerOverlay"
+	StickerOverlay = "StickerOverlay",
+	Voice = "Voice"
 }

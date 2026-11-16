@@ -1,38 +1,36 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
-local buildASTSchema = require(ParentParent.GraphQL).buildASTSchema
+local FixSchemaAst = {}
+local GraphQL = require(parent.GraphQL)
+
+local buildASTSchema = GraphQL.buildASTSchema
 
 require(script.Parent.types)
 
-local getDocumentNodeFromSchema = require(script.Parent["print-schema-with-directives"]).getDocumentNodeFromSchema
+local printschemawithdirectives = require(script.Parent["print-schema-with-directives"])
+local getDocumentNodeFromSchema = printschemawithdirectives.getDocumentNodeFromSchema
 
-local function buildFixedSchema(p1, p2) -- line: 24
-	-- upvalues: getDocumentNodeFromSchema (copy), buildASTSchema (copy), Object (copy), Boolean (copy)
-	local v11 = getDocumentNodeFromSchema(p1)
-
-	return buildASTSchema(v11, Object.assign({}, Boolean.toJSBoolean(p2) and p2 or {}))
+local function buildFixedSchema(state, p)
+	return buildASTSchema(getDocumentNodeFromSchema(state), Object.assign({}, Boolean.toJSBoolean(p) and p or {}))
 end
 
-function t1.fixSchemaAst(p3, p4) -- line: 28
-	-- upvalues: Boolean (copy), buildFixedSchema (copy)
-	local v14 = nil
+function FixSchemaAst:fixSchemaAst(p)
+	local v
 
-	if not Boolean.toJSBoolean(p3.astNode) or not Boolean.toJSBoolean(p3.extensionASTNodes) then
-		v14 = buildFixedSchema(p3, p4)
+	if not (Boolean.toJSBoolean(self.astNode) and Boolean.toJSBoolean(self.extensionASTNodes)) then
+		v = buildFixedSchema(self, p)
 	end
 
-	if not Boolean.toJSBoolean(p3.astNode) and v14 and Boolean.toJSBoolean(v14.astNode) then
-		p3.astNode = v14.astNode
+	if not Boolean.toJSBoolean(self.astNode) and v and Boolean.toJSBoolean(v.astNode) then
+		self.astNode = v.astNode
 	end
 
-	if not Boolean.toJSBoolean(p3.extensionASTNodes) and v14 and Boolean.toJSBoolean(v14.astNode) then
-		p3.extensionASTNodes = v14.extensionASTNodes
+	if not Boolean.toJSBoolean(self.extensionASTNodes) and v and Boolean.toJSBoolean(v.astNode) then
+		self.extensionASTNodes = v.extensionASTNodes
 	end
 
-	return p3
+	return self
 end
-
-return t1
+return FixSchemaAst

@@ -1,50 +1,70 @@
 local Players = game:GetService("Players")
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FStringLuaAppPlayButtonAgeCheckAmpFeatureName = SharedFlags.FStringLuaAppPlayButtonAgeCheckAmpFeatureName
 local FStringLuaAppPlayButtonAgeCheckAmpNameSpace = SharedFlags.FStringLuaAppPlayButtonAgeCheckAmpNameSpace
-local Logging = require(CorePackages.Workspace.Packages.AppCommonLib).Logging
-local t1 = {}
+local FFlagPioneerLeaveOnInExpFaeDownAge = SharedFlags.FFlagPioneerLeaveOnInExpFaeDownAge
 
-local function onPromptAgeCheckRequested(p1) -- line: 24
-	-- upvalues: Players (copy), CorePackages (copy), CoreGui (copy), FStringLuaAppPlayButtonAgeCheckAmpFeatureName (copy), Logging (copy), FStringLuaAppPlayButtonAgeCheckAmpNameSpace (copy)
-	local LocalPlayer = Players.LocalPlayer
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Logging = AppCommonLib.Logging
 
-	if p1 ~= LocalPlayer then
+local maybeLeavePioneerOnFaeDownAge = require(CorePackages.Workspace.Packages.PioneerUtils.maybeLeavePioneerOnFaeDownAge)
+
+local function onPromptAgeCheckRequested(p)
+	local localPlayer = Players.LocalPlayer
+
+	if p ~= localPlayer then
 		return
 	end
 
-	local ok, result = pcall(require, CorePackages.Workspace.Packages.AmpUpsell)
+	local success, ampUpsell = pcall(require, CorePackages.Workspace.Packages.AmpUpsell)
 
-	if not ok or not result or not result.InExpAmpWizardController then
+	if not (success and ampUpsell and ampUpsell.InExpAmpWizardController) then
 		return
 	end
 
-	local ok2, result2 = pcall(require, CoreGui.RobloxGui.Modules.ApolloClient)
+	local success2, apolloClient = pcall(require, CoreGui.RobloxGui.Modules.ApolloClient)
 
-	if not ok2 or not result2 then
-		return
+	if success2 and apolloClient then
+		ampUpsell.InExpAmpWizardController.OpenAmpWizardContainerInExp(
+			FStringLuaAppPlayButtonAgeCheckAmpFeatureName,
+			function(p2, p3)
+				local function notifyIfGranted() -- 1 equivalent call inferred from this helper
+					if p2 == "Granted" then
+						local success3, result = pcall(function()
+							localPlayer:NotifyAgeCheckPassed()
+						end)
+
+						if not success3 then
+							Logging.warn("PromptAgeCheckRequested: NotifyAgeCheckPassed failed: " .. tostring(result))
+						end
+					end
+				end
+
+				if FFlagPioneerLeaveOnInExpFaeDownAge then
+					local ampEnums = ampUpsell.AmpEnums
+
+					maybeLeavePioneerOnFaeDownAge(
+						p3 ~= nil and p3[ampEnums.ActionTypeEnum.AgeEstimation] == ampEnums.ActionStatusEnum.Success,
+						notifyIfGranted
+					)
+				else
+					notifyIfGranted() -- inferred equivalent call
+				end
+			end,
+			nil,
+			"PromptAgeCheckRequested",
+			nil,
+			FStringLuaAppPlayButtonAgeCheckAmpNameSpace,
+			apolloClient
+		)
 	end
-
-	result.InExpAmpWizardController.OpenAmpWizardContainerInExp(FStringLuaAppPlayButtonAgeCheckAmpFeatureName, function(p2, _) -- line: 42
-		-- upvalues: LocalPlayer (copy), Logging (copy)
-		if p2 == "Granted" then
-			local ok3, result3 = pcall(function() -- line: 44
-				-- upvalues: LocalPlayer (copy)
-				LocalPlayer:NotifyAgeCheckPassed()
-			end)
-
-			if not ok3 then
-				Logging.warn("PromptAgeCheckRequested: NotifyAgeCheckPassed failed: " .. tostring(result3))
-			end
-		end
-	end, nil, "PromptAgeCheckRequested", nil, FStringLuaAppPlayButtonAgeCheckAmpNameSpace, result2)
 end
 
-function t1.init() -- line: 62
-	-- upvalues: Players (copy), onPromptAgeCheckRequested (copy)
-	Players.PromptAgeCheckRequested:Connect(onPromptAgeCheckRequested)
-end
-
-return t1
+return {
+	init = function()
+		Players.PromptAgeCheckRequested:Connect(onPromptAgeCheckRequested)
+	end
+}

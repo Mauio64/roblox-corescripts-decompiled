@@ -1,172 +1,144 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
+
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
-local uuid = require(ParentParent.utilities.common.makeUniqueId).uuid
-local t1 = {}
-local t6 = nil
-local t2 = {}
-local n1 = 1
 
-local function makeSlotClass() -- line: 62
-	-- upvalues: Array (copy), n1 (ref), uuid (copy), t6 (ref), t2 (copy)
-	local t3 = {}
+local makeUniqueId = require(parent.utilities.common.makeUniqueId)
+local uuid = makeUniqueId.uuid
 
-	t3.__index = t3
+local v = nil
 
-	function t3.new() -- line: 66
-		-- upvalues: t3 (copy), Array (copy), n1 (ref), uuid (copy)
-		local self = setmetatable({}, t3)
+local v2 = {}
 
-		self.id = Array.join({
-			"slot",
-			n1,
-			DateTime.now().UnixTimestampMillis,
-			uuid()
-		}, ":")
-		n1 += 1
+local v3 = 1
+
+local function makeSlotClass()
+	local slotClass = {}
+	slotClass.__index = slotClass
+
+	function slotClass.new()
+		local self = setmetatable({}, slotClass)
+
+		self.id = Array.join({ "slot", v3, DateTime.now().UnixTimestampMillis, uuid() }, ":")
+
+		v3 += 1
 
 		return self
 	end
-	function t3.hasValue(p1) -- line: 84
-		-- upvalues: t6 (ref), t2 (copy)
-		local v18 = t6
 
-		while v18 do
-			if v18.slots[p1.id] then
-				local v19 = v18.slots[p1.id]
+	function slotClass:hasValue(): boolean
+		local v4 = v
 
-				if v19 == t2 then
+		while v4 do
+			if v4.slots[self.id] then
+				local slot = v4.slots[self.id]
+
+				if slot == v2 then
 					break
 				end
 
-				if v18 ~= t6 then
-					t6.slots[p1.id] = v19
+				if v4 ~= v then
+					v.slots[self.id] = slot
 				end
 
 				return true
 			end
 
-			v18 = v18.parent
+			v4 = v4.parent
 		end
 
-		if t6 then
-			t6.slots[p1.id] = t2
+		if v then
+			v.slots[self.id] = v2
 		end
 
 		return false
 	end
-	function t3.getValue(p2) -- line: 120
-		-- upvalues: t6 (ref)
-		if p2:hasValue() then
-			return t6.slots[p2.id]
+
+	function slotClass:getValue()
+		if self:hasValue() then
+			return v.slots[self.id]
 		end
 
 		return nil
 	end
-	function t3.withValue(t4: {[any]: any}, p3, p4: ((...any) -> ...any), p5, p6) -- line: 127
-		-- upvalues: t6 (ref)
-		local t5 = {
-			[t4.id] = p3
-		}
-		local v27 = t6
 
-		t6 = {
-			parent = v27,
-			slots = t5
-		}
+	function slotClass.withValue(p, p2, callback, options, p3)
+		local slots = { [p.id] = p2 }
 
-		local ok, result, v30 = pcall(function() -- line: 144
-			-- upvalues: p4 (copy), p6 (copy), p5 (copy)
-			return p4(p6, table.unpack(p5 or {})), true
+		local parent3 = v
+		v = { parent = parent3, slots = slots }
+
+		local success, result, v4 = pcall(function()
+			return callback(p3, table.unpack(options or {})), true
 		end)
 
-		t6 = v27
+		v = parent3
 
-		if v30 then
+		if v4 then
 			return result
 		end
 
-		if not ok then
+		if not success then
 			error(result)
 		end
 
 		return nil
 	end
-	function t3.bind(p7: ((...any) -> ...any)) -- line: 162
-		-- upvalues: t6 (ref)
-		local v32 = t6
 
-		return function(p8, ...) -- line: 164
-			-- upvalues: t6 (ref), v32 (copy), p7 (copy)
-			local v41 = t6
+	function slotClass.bind(callback)
+		local v4 = v
+		return function(p, ...)
+			local v5 = v
+			v = v4
+			local success, result = pcall(callback, p, table.unpack({ ... }))
+			v = v5
 
-			t6 = v32
-
-			local ok, result = pcall(p7, p8, table.unpack({ ... }))
-
-			t6 = v41
-
-			if not ok then
+			if not success then
 				error(result)
 			end
 
 			return result
 		end
 	end
-	function t3.noContext(p9: ((...any) -> ...any), p10, p11) -- line: 178
-		-- upvalues: t6 (ref)
-		if t6 then
-			local v36 = t6
-			local ok, result, v39 = pcall(function() -- line: 189
-				-- upvalues: t6 (ref), p9 (copy), p11 (copy), p10 (copy)
-				t6 = nil
 
-				return p9(p11, table.unpack(p10 or {})), true
-			end)
-
-			t6 = v36
-
-			if v39 then
-				return result
-			end
-
-			if not ok then
-				error(result)
-			end
-
-			return nil
+	function slotClass.noContext(callback, options, p)
+		if not v then
+			return callback(p, table.unpack(options or {}))
 		end
 
-		return p9(p11, table.unpack(p10 or {}))
+		local v4 = v
+		local success, result, v5 = pcall(function()
+			v = nil
+
+			return callback(p, table.unpack(options or {})), true
+		end)
+
+		v = v4
+
+		if v5 then
+			return result
+		end
+
+		if not success then
+			error(result)
+		end
+
+		return nil
 	end
 
-	return t3
+	return slotClass
 end
 
-local g13 = nil
-local v12 = nil
+local v4 = Boolean.toJSBoolean(Array["@wry/context:Slot"]) and Array["@wry/context:Slot"]
 
-if Boolean.toJSBoolean(Array["@wry/context:Slot"]) then
-	v12 = Array["@wry/context:Slot"]
-
-	if v12 then
-		g13 = true
-	end
-end
-
-if not g13 then
-	local v14 = makeSlotClass()
-
-	pcall(function() -- line: 227
-		-- upvalues: Array (copy), v14 (copy)
-		Array["@wry/context:Slot"] = v14
+if not v4 then
+	v4 = makeSlotClass()
+	pcall(function()
+		Array["@wry/context:Slot"] = v4
 	end)
-	v12 = v14
 end
 
-g13 = false
-t1.Slot = v12
-
-return t1
+return { Slot = v4 }

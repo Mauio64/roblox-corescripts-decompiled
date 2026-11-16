@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.Observable.Observable))
+local Observable = require(Workspace.Observable.Observable)
+
+return Observable

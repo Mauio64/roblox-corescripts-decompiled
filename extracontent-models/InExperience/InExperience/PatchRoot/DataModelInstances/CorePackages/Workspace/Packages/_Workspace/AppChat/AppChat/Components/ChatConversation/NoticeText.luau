@@ -1,9 +1,10 @@
 local TextService = game:GetService("TextService")
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Roact = require(Parent.Roact)
-local v4 = Roact.PureComponent:extend("NoticeText")
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-v4.defaultProps = {
+local Roact = require(parent.Roact)
+
+local extended = Roact.PureComponent:extend("NoticeText")
+extended.defaultProps = {
 	AnchorPoint = Vector2.new(0, 0),
 	Font = Enum.Font.Gotham,
 	HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -16,62 +17,56 @@ v4.defaultProps = {
 	TextWrapped = true,
 	TextXAlignment = Enum.TextXAlignment.Left,
 	TextYAlignment = Enum.TextYAlignment.Top,
-	[Roact.Change.AbsoluteSize] = function() -- line: 22
-	end,
-	margin = {
-		top = 0,
-		left = 0,
-		right = 0,
-		bottom = 0
-	},
+	[Roact.Change.AbsoluteSize] = function() end,
+	margin = { top = 0, left = 0, right = 0, bottom = 0 },
 	maxWidth = 0,
 	width = UDim.new(1, 0)
 }
 
-function v4.render(p1) -- line: 34
-	-- upvalues: TextService (copy), Roact (copy)
-	local v6 = math.max(0, p1.props.maxWidth - (p1.props.margin.left + p1.props.margin.right))
-	local vector2 = Vector2.new(v6, 1e999)
-	local TextSize = TextService:GetTextSize(p1.props.Text, p1.props.TextSize, p1.props.Font, vector2)
+function extended.render(p)
+	local v = math.max(0, p.props.maxWidth - (p.props.margin.left + p.props.margin.right))
+
+	local vector2 = Vector2.new(v, 1e999)
+	local textSize = TextService:GetTextSize(p.props.Text, p.props.TextSize, p.props.Font, vector2)
 
 	return Roact.createElement("Frame", {
-		AnchorPoint = p1.props.AnchorPoint,
+		AnchorPoint = p.props.AnchorPoint,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		LayoutOrder = p1.props.LayoutOrder,
-		Position = p1.props.Position,
-		[Roact.Change.AbsoluteSize] = p1.props[Roact.Change.AbsoluteSize],
+		LayoutOrder = p.props.LayoutOrder,
+		Position = p.props.Position,
+		[Roact.Change.AbsoluteSize] = p.props[Roact.Change.AbsoluteSize],
 		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.new(p1.props.width, UDim.new(0, 0))
+		Size = UDim2.new(p.props.width, UDim.new(0, 0))
 	}, {
 		Layout = Roact.createElement("UIListLayout", {
-			HorizontalAlignment = p1.props.HorizontalAlignment
+			HorizontalAlignment = p.props.HorizontalAlignment
 		}),
 		Padding = Roact.createElement("UIPadding", {
-			PaddingBottom = UDim.new(0, p1.props.margin.bottom),
-			PaddingRight = UDim.new(0, p1.props.margin.right),
-			PaddingLeft = UDim.new(0, p1.props.margin.left),
-			PaddingTop = UDim.new(0, p1.props.margin.top)
+			PaddingBottom = UDim.new(0, p.props.margin.bottom),
+			PaddingRight = UDim.new(0, p.props.margin.right),
+			PaddingLeft = UDim.new(0, p.props.margin.left),
+			PaddingTop = UDim.new(0, p.props.margin.top)
 		}),
 		NoticeText = Roact.createElement("TextLabel", {
+			AutomaticSize = Enum.AutomaticSize.XY,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			Font = p1.props.Font,
-			Text = p1.props.Text,
-			TextColor3 = p1.props.TextColor3,
-			TextSize = p1.props.TextSize,
-			TextTransparency = p1.props.TextTransparency,
-			TextWrapped = p1.props.TextWrapped,
-			TextXAlignment = p1.props.TextXAlignment,
-			TextYAlignment = p1.props.TextYAlignment,
-			Size = UDim2.fromOffset(math.ceil(TextSize.X), (math.ceil(TextSize.Y)))
+			Font = p.props.Font,
+			Text = p.props.Text,
+			TextColor3 = p.props.TextColor3,
+			TextSize = p.props.TextSize,
+			TextTransparency = p.props.TextTransparency,
+			TextWrapped = p.props.TextWrapped,
+			TextXAlignment = p.props.TextXAlignment,
+			TextYAlignment = p.props.TextYAlignment,
+			Size = UDim2.fromOffset(math.ceil(textSize.X), (math.ceil(textSize.Y)))
 		}, {
 			SizeConstraint = Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(v6, 1e999)
+				MaxSize = Vector2.new(v, 1e999)
 			})
 		})
 	})
 end
 
-return v4
+return extended

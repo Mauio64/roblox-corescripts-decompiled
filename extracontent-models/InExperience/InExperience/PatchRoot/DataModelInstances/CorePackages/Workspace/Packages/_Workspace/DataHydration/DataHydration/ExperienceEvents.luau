@@ -1,5 +1,7 @@
+local ExperienceEventTypes = require(script.ExperienceEventTypes)
+
 return {
-	EventStatus = require(script.ExperienceEventTypes).EventStatus,
+	EventStatus = ExperienceEventTypes.EventStatus,
 	createExperienceEventInfoStore = require(script.createExperienceEventInfoStore),
 	getExperienceEventInfoStore = require(script.getExperienceEventInfoStore)
 }

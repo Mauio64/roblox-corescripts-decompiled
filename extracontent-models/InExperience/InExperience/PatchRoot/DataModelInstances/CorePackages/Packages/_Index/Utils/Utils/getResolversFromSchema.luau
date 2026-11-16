@@ -1,9 +1,11 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
-local t1 = {}
-local GraphQL = require(ParentParent.GraphQL)
+
+local GetResolversFromSchema = {}
+local GraphQL = require(parent.GraphQL)
 local GraphQLScalarType = GraphQL.GraphQLScalarType
+
 local isScalarType = GraphQL.isScalarType
 local isEnumType = GraphQL.isEnumType
 local isInterfaceType = GraphQL.isInterfaceType
@@ -15,108 +17,122 @@ require(script.Parent.Interfaces)
 
 local String = LuauPolyfill.String
 
-function t1.getResolversFromSchema(p1, b1: boolean?) -- line: 37
-	-- upvalues: String (copy), Boolean (copy), isScalarType (copy), isSpecifiedScalarType (copy), GraphQLScalarType (copy), isEnumType (copy), isInterfaceType (copy), isUnionType (copy), isObjectType (copy)
-	local t2 = {}
-	local v17 = p1:getTypeMap()
+function GetResolversFromSchema.getResolversFromSchema(object, flag: boolean?)
+	local typeMap = object:getTypeMap()
+	local resolvers = {}
 
-	for _, v19 in v17 do
-		local v20 = v19[1]
+	for _, kind in typeMap do
+		local v = kind[1]
 
-		if not String.startsWith(v20, "__") then
-			local v21 = v17:get(v20)
+		if String.startsWith(v, "__") then
+			continue
+		end
 
-			if Boolean.toJSBoolean(isScalarType(v21)) then
-				if not Boolean.toJSBoolean(isSpecifiedScalarType(v21)) then
-					local v22 = v21:toConfig()
+		local v2 = typeMap:get(v)
 
-					v22.astNode = nil
+		if Boolean.toJSBoolean(isScalarType(v2)) then
+			if not Boolean.toJSBoolean(isSpecifiedScalarType(v2)) then
+				local config = v2:toConfig()
 
-					local serialize = v22.serialize
-					local parseValue = v22.parseValue
-					local parseLiteral = v22.parseLiteral
+				config.astNode = nil
 
-					if serialize then
-						function v22.serialize(...) -- line: 73
-							-- upvalues: serialize (copy), v22 (copy)
-							return serialize(v22, ...)
-						end
+				local serialize = config.serialize
+				local parseValue = config.parseValue
+				local parseLiteral = config.parseLiteral
+
+				if serialize then
+					function config.serialize(...)
+						return serialize(config, ...)
 					end
+				end
 
-					if parseValue then
-						function v22.parseValue(...) -- line: 79
-							-- upvalues: parseValue (copy), v22 (copy)
-							return parseValue(v22, ...)
-						end
+				if parseValue then
+					function config.parseValue(...)
+						return parseValue(config, ...)
 					end
+				end
 
-					if parseLiteral then
-						function v22.parseLiteral(...) -- line: 85
-							-- upvalues: parseLiteral (copy), v22 (copy)
-							return parseLiteral(v22, ...)
-						end
+				if parseLiteral then
+					function config.parseLiteral(...)
+						return parseLiteral(config, ...)
 					end
-
-					t2[tostring(v20)] = GraphQLScalarType.new(v22)
-				end
-			elseif Boolean.toJSBoolean(isEnumType(v21)) then
-				t2[tostring(v20)] = {}
-
-				for _, v27 in (v21:getValues()) do
-					t2[tostring(v20)][tostring(v27.name)] = v27.value
-				end
-			elseif Boolean.toJSBoolean(isInterfaceType(v21)) then
-				if v21.resolveType ~= nil then
-					t2[v20] = {
-						__resolveType = v21.resolveType
-					}
-				end
-			elseif Boolean.toJSBoolean(isUnionType(v21)) then
-				if v21.resolveType ~= nil then
-					t2[v20] = {
-						__resolveType = v21.resolveType
-					}
-				end
-			elseif Boolean.toJSBoolean(isObjectType(v21)) then
-				t2[tostring(v20)] = {}
-
-				if v21.isTypeOf ~= nil then
-					t2[v20].__isTypeOf = v21.isTypeOf
 				end
 
-				local v28 = v21:getFields()
+				resolvers[tostring(v)] = GraphQLScalarType.new(config)
+			end
+		elseif Boolean.toJSBoolean(isEnumType(v2)) then
+			resolvers[tostring(v)] = {}
 
-				for _, v30 in v28 do
-					local v31 = v30[1]
-					local v32 = v28:get(v31)
+			local values = v2:getValues()
 
-					if v32.subscribe ~= nil then
-						t2[tostring(v20)][tostring(v31)] = Boolean.toJSBoolean(t2[tostring(v20)][tostring(v31)]) and t2[tostring(v20)][tostring(v31)] or {}
-						t2[tostring(v20)][tostring(v31)].subscribe = v32.subscribe
-					end
+			for _, value in values do
+				resolvers[tostring(v)][tostring(value.name)] = value.value
+			end
+		elseif Boolean.toJSBoolean(isInterfaceType(v2)) then
+			if v2.resolveType ~= nil then
+				resolvers[v] = { __resolveType = v2.resolveType }
+			end
+		elseif Boolean.toJSBoolean(isUnionType(v2)) then
+			if v2.resolveType ~= nil then
+				resolvers[v] = { __resolveType = v2.resolveType }
+			end
+		elseif Boolean.toJSBoolean(isObjectType(v2)) then
+			resolvers[tostring(v)] = {}
 
-					if v32.resolve == nil or ((if typeof(v32.resolve) ~= "table" then nil else v32.resolve.name)) == "defaultFieldResolver" then
+			if v2.isTypeOf ~= nil then
+				resolvers[v].__isTypeOf = v2.isTypeOf
+			end
+
+			local fields = v2:getFields()
+
+			for _, field in fields do
+				local v3 = field[1]
+
+				local v4 = fields:get(v3)
+
+				if v4.subscribe ~= nil then
+					resolvers[tostring(v)][tostring(v3)] = Boolean.toJSBoolean(resolvers[tostring(v)][tostring(v3)])
+						and resolvers[tostring(v)][tostring(v3)]
+						or {}
+					resolvers[tostring(v)][tostring(v3)].subscribe = v4.subscribe
+				end
+
+				if v4.resolve == nil then
+					continue
+				end
+
+				local v5
+
+				if typeof(v4.resolve) == "table" then
+					v5 = v4.resolve.name
+				end
+
+				if v5 == "defaultFieldResolver" then
+					continue
+				end
+
+				local name
+
+				if typeof(v4.resolve) == "table" then
+					name = v4.resolve.name
+				end
+
+				if name == "defaultMergedResolver" then
+					if not Boolean.toJSBoolean(flag) then
 						continue
 					end
-
-					local v33 = if typeof(v32.resolve) ~= "table" then nil else v32.resolve.name
-
-					if v33 == "defaultMergedResolver" then
-						if not Boolean.toJSBoolean(b1) then
-							continue
-						end
-					elseif v33 == "defaultFieldResolver" then
-						continue
-					end
-
-					t2[tostring(v20)][tostring(v31)] = Boolean.toJSBoolean(t2[tostring(v20)][tostring(v31)]) and t2[tostring(v20)][tostring(v31)] or {}
-					t2[tostring(v20)][tostring(v31)].resolve = v32.resolve
+				elseif name == "defaultFieldResolver" then
+					continue
 				end
+
+				resolvers[tostring(v)][tostring(v3)] = Boolean.toJSBoolean(resolvers[tostring(v)][tostring(v3)])
+					and resolvers[tostring(v)][tostring(v3)]
+					or {}
+				resolvers[tostring(v)][tostring(v3)].resolve = v4.resolve
 			end
 		end
 	end
 
-	return t2
+	return resolvers
 end
-
-return t1
+return GetResolversFromSchema

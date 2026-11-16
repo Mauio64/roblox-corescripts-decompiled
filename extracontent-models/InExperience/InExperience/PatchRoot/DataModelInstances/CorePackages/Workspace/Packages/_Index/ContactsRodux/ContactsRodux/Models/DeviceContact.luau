@@ -1,50 +1,43 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 local getMockName = require(script.Parent.getMockName)
-
 require(script.Parent.Parent.Types.ContactTypes)
+local Dash = require(parent.Dash)
 
-local Dash = require(ParentParent.Dash)
-local t1 = {}
+local DeviceContact = {}
 
-function t1.new(p1) -- line: 9
-	-- upvalues: t1 (copy)
-	t1.__index = t1
+function DeviceContact.new(data)
+	DeviceContact.__index = DeviceContact
 
-	local t2 = {
-		id = p1.id,
-		phoneNumbers = p1.phoneNumbers,
-		contactName = p1.contactName
-	}
+	local v = { id = data.id, phoneNumbers = data.phoneNumbers, contactName = data.contactName }
 
-	setmetatable(t2, t1)
+	setmetatable(v, DeviceContact)
 
-	return t2
+	return v
 end
-function t1.mock(t3: {[any]: any}?) -- line: 23
-	-- upvalues: getMockName (copy), Dash (copy), t1 (copy)
-	local v8 = getMockName()
-	local t4 = {
-		id = v8,
-		contactName = v8,
+
+function DeviceContact.mock(p)
+	local mockName = getMockName()
+	local joined = Dash.join({
+		id = mockName,
+		contactName = mockName,
 		phoneNumbers = { "123456" }
-	}
-	local v10 = Dash.join(t4, t3)
+	}, p)
 
-	return t1.new(v10)
+	return DeviceContact.new(joined)
 end
-function t1.formatFromDevice(t5: {[any]: any}) -- line: 39
-	-- upvalues: t1 (copy)
-	local v12 = t5.firstname or ""
-	local v13 = t5.lastname or ""
 
-	return t1.new({
-		id = t1.generateId(t5),
-		contactName = v12 .. " " .. v13,
-		phoneNumbers = t5.phonenumber
+function DeviceContact.formatFromDevice(data)
+	local firstname = data.firstname or ""
+	local lastname = data.lastname or ""
+	return DeviceContact.new({
+		id = DeviceContact.generateId(data),
+		contactName = firstname .. " " .. lastname,
+		phoneNumbers = data.phonenumber
 	})
 end
-function t1.generateId(t6: {[any]: any}) -- line: 49
-	return (t6.firstname or "") .. (t6.lastname or "") .. tostring(t6.phonenumber[1])
+
+function DeviceContact.generateId(data)
+	return (data.firstname or "") .. (data.lastname or "") .. tostring(data.phonenumber[1])
 end
 
-return t1
+return DeviceContact

@@ -1,12 +1,9 @@
-local Parent = script:FindFirstAncestor("UserProfiles").Parent
-local JestConfigs = require(Parent.Dev.JestConfigs)
+local parent = script:FindFirstAncestor("UserProfiles").Parent
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "UserProfiles",
-	testMatch = {
-		"**/*.test",
-		"!**/Stores/**/*.test"
-	},
+	testMatch = { "**/*.test", "!**/Stores/**/*.test" },
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.LogHandler,
 		JestConfigs.setupFiles.UIBloxInitializer,

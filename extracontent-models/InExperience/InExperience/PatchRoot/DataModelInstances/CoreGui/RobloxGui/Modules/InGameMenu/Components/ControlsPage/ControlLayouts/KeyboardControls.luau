@@ -1,16 +1,20 @@
 local CorePackages = game:GetService("CorePackages")
-local Roact = require(CorePackages.Packages.InGameMenuDependencies).Roact
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Controls = require(ParentParent.Resources.Controls)
+
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+
+local parent = script.Parent.Parent.Parent.Parent
+
+local Controls = require(parent.Resources.Controls)
+
 local ControlLayoutContainer = require(script.Parent.Parent.ControlLayoutContainer)
-local PaddedScrollFrame = require(ParentParent.Components.PaddedScrollFrame)
+local PaddedScrollFrame = require(parent.Components.PaddedScrollFrame)
 local ControlEntry = require(script.Parent.Parent.ControlEntry)
 local ControlEntryHeader = require(script.Parent.Parent.ControlEntryHeader)
 
-local function KeyboardControls(_) -- line: 26
-	-- upvalues: Roact (copy), Controls (copy), ControlEntryHeader (copy), ControlEntry (copy), ControlLayoutContainer (copy), PaddedScrollFrame (copy)
-	local t1 = {
-		ListLayout = Roact.createElement("UIListLayout", {
+local function KeyboardControls(_)
+	local children = {
+		["ListLayout"] = Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
 		Padding = Roact.createElement("UIPadding", {
@@ -22,51 +26,63 @@ local function KeyboardControls(_) -- line: 26
 			MinSize = Vector2.new(150, 0)
 		})
 	}
-	local n1 = 0
-	local n2 = 0
-	local n3 = 1
+	local count = 0
+	local layoutOrder = 1
+	local count2 = 0
 
-	for _, v in ipairs(Controls.keybinds) do
-		local title = v.title
+	for _, keybind in ipairs(Controls.keybinds) do
+		local title = keybind.title
+		count += 1
 
-		n1 += 1
-		t1[title .. "_header"] = Roact.createElement(ControlEntryHeader, {
+		children[title .. "_header"] = Roact.createElement(ControlEntryHeader, {
 			title = title,
-			LayoutOrder = n3
+			LayoutOrder = layoutOrder
 		})
-		n3 += 1
 
-		for i, v2 in ipairs(v.controls) do
-			n2 += 1
-			t1[title .. "_" .. i] = Roact.createElement(ControlEntry, {
-				LayoutOrder = n3,
-				actionDescription = v2.desc,
-				inputs = v2.inputs,
-				isList = v2.list,
-				hasDivider = i ~= #v.controls
+		layoutOrder += 1
+
+		for i, control in ipairs(keybind.controls) do
+			count2 += 1
+			children[title .. "_" .. i] = Roact.createElement(ControlEntry, {
+				LayoutOrder = layoutOrder,
+				actionDescription = control.desc,
+				inputs = control.inputs,
+				isList = control.list,
+				hasDivider = i ~= #keybind.controls
 			})
-			n3 += 1
+
+			layoutOrder += 1
 		end
 	end
 
-	local v20 = n1 * 45 + n2 * 50
+	local v = count * 45 + count2 * 50
 
-	return Roact.createElement(ControlLayoutContainer, {
-		titleText = "CoreScripts.InGameMenu.Controls.KeyboardAndMouseTitle"
-	}, {
-		ScrollContent = Roact.createElement(PaddedScrollFrame, {
-			CanvasSize = UDim2.new(0, 0, 0, v20),
-			ScrollingDirection = Enum.ScrollingDirection.Y,
-			Size = UDim2.new(1, 0, 1, -130)
-		}, {
-			ListContainer = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0),
-				AnchorPoint = Vector2.new(0.5, 0),
-				Position = UDim2.new(0.5, 0, 0, 0)
-			}, t1)
-		})
-	})
+	return Roact.createElement(
+		ControlLayoutContainer,
+		{ titleText = "CoreScripts.InGameMenu.Controls.KeyboardAndMouseTitle" },
+		{
+			ScrollContent = Roact.createElement(
+				PaddedScrollFrame,
+				{
+					CanvasSize = UDim2.new(0, 0, 0, v),
+					ScrollingDirection = Enum.ScrollingDirection.Y,
+					Size = UDim2.new(1, 0, 1, -130)
+				},
+				{
+					ListContainer = Roact.createElement(
+						"Frame",
+						{
+							Size = UDim2.new(1, 0, 1, 0),
+							BackgroundTransparency = 1,
+							AnchorPoint = Vector2.new(0.5, 0),
+							Position = UDim2.new(0.5, 0, 0, 0)
+						},
+						children
+					)
+				}
+			)
+		}
+	)
 end
 
 return KeyboardControls

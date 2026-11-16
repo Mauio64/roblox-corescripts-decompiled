@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("Moments").Parent
+local Signals = require(parent.Signals)
 local createUsersStore = require(script.createUsersStore)
 
-return Signals.createComputed(function(_) -- line: 7
-	-- upvalues: createUsersStore (copy)
+return Signals.createComputed(function(_)
 	return createUsersStore()
 end)

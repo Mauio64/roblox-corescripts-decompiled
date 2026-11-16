@@ -1,60 +1,58 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
-local valueFromASTUntyped = require(ParentParent.GraphQL).valueFromASTUntyped
+
+local GetFieldsWithDirectives = {}
+local GraphQL = require(parent.GraphQL)
+
+local valueFromASTUntyped = GraphQL.valueFromASTUntyped
 
 require(script.Parent.types)
 
-function t1.getFieldsWithDirectives(p1, t2: {[any]: any}?) -- line: 35
-	-- upvalues: Boolean (copy), Array (copy), Object (copy), valueFromASTUntyped (copy)
-	local v10 = if t2 == nil then {} else t2
-	local t3 = {}
-	local t4 = {
-		"ObjectTypeDefinition",
-		"ObjectTypeExtension"
-	}
+function GetFieldsWithDirectives.getFieldsWithDirectives(p, p2)
+	local v = p2 == nil and {} or p2
+	local fields = {}
+	local joined = { "ObjectTypeDefinition", "ObjectTypeExtension" }
 
-	if Boolean.toJSBoolean(v10.includeInputTypes) then
-		t4 = Array.concat({}, t4, {
-			"InputObjectTypeDefinition",
-			"InputObjectTypeExtension"
-		})
+	if Boolean.toJSBoolean(v.includeInputTypes) then
+		joined = Array.concat({}, joined, { "InputObjectTypeDefinition", "InputObjectTypeExtension" })
 	end
 
-	for _, v14 in (Array.filter(p1.definitions, function(p2) -- line: 45
-		-- upvalues: Array (copy), t4 (ref)
-		return Array.includes(t4, p2.kind)
-	end)) do
-		local value = v14.name.value
+	local filtered = Array.filter(p.definitions, function(p3)
+		return Array.includes(joined, p3.kind)
+	end)
 
-		if v14.fields ~= nil then
-			for _, v17 in v14.fields do
-				if Boolean.toJSBoolean(v17.directives) and #v17.directives > 0 then
-					local value2 = v17.name.value
-					local v19 = ("%s.%s"):format(tostring(value), (tostring(value2)))
-					local v20 = Array.map(v17.directives, function(p3) -- line: 70
-						-- upvalues: Array (copy), Boolean (copy), Object (copy), valueFromASTUntyped (copy)
-						return {
-							name = p3.name.value,
-							args = Array.reduce(Boolean.toJSBoolean(p3.arguments) and p3.arguments or {}, function(t5: {[any]: any}, p4) -- line: 77
-								-- upvalues: Object (copy), valueFromASTUntyped (copy)
-								return Object.assign({}, t5, {
-									[p4.name.value] = valueFromASTUntyped(p4.value, nil)
-								})
-							end, {})
-						}
-					end)
+	for _, v2 in filtered do
+		local value = v2.name.value
 
-					t3[tostring(v19)] = v20
-				end
+		if v2.fields == nil then
+			continue
+		end
+
+		for _, field in v2.fields do
+			if not (Boolean.toJSBoolean(field.directives) and #field.directives > 0) then
+				continue
 			end
+
+			local value2 = field.name.value
+			local formatted = ("%s.%s"):format(tostring(value), (tostring(value2)))
+			local mapped = Array.map(field.directives, function(p3)
+				return {
+					name = p3.name.value,
+					args = Array.reduce(Boolean.toJSBoolean(p3.arguments) and p3.arguments or {}, function(p4, p5)
+						return Object.assign({}, p4, {
+							[p5.name.value] = valueFromASTUntyped(p5.value, nil)
+						})
+					end, {})
+				}
+			end)
+
+			fields[tostring(formatted)] = mapped
 		end
 	end
 
-	return t3
+	return fields
 end
-
-return t1
+return GetFieldsWithDirectives

@@ -1,11 +1,12 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local Roact = require(FriendsLanding.dependencies).Roact
+local dependencies = require(FriendsLanding.dependencies)
 
-return function(p1, p2) -- line: 6
-	-- upvalues: Roact (copy)
-	for _, v6 in p2 do
-		p1 = Roact.createElement(v6[1], v6[2], { p1 })
+local roact = dependencies.Roact
+
+return function(p, items)
+	for _, item in items do
+		p = roact.createElement(item[1], item[2], { p })
 	end
 
-	return p1
+	return p
 end

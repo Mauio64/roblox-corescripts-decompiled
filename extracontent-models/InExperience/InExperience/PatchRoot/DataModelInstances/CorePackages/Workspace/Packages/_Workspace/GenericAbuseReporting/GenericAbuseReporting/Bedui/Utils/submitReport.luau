@@ -1,48 +1,40 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 local HttpService = game:GetService("HttpService")
-local Url = require(Parent.Http).Url
-local FFlagAddThumbnailSelectorReport = require(Parent.SharedFlags).FFlagAddThumbnailSelectorReport
 
-return function(p1, p2) -- line: 9
-	-- upvalues: FFlagAddThumbnailSelectorReport (copy), HttpService (copy), Url (copy)
-	if FFlagAddThumbnailSelectorReport and p2 == nil then
-		p2 = {}
-	end
+local Http = require(parent.Http)
+local Url = Http.Url
 
-	local t1 = {
-		tags = {}
-	}
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddThumbnailSelectorReport = SharedFlags.FFlagAddThumbnailSelectorReport
 
-	for v8, v9 in p2 do
-		local v10 = v9
+return function(callback, p)
+	local v = { tags = {} }
 
-		if typeof(v10) ~= "table" then
-			v10 = if not FFlagAddThumbnailSelectorReport then { (tostring(v10)) } else tostring(v10):split(",")
+	for k, v2 in FFlagAddThumbnailSelectorReport and p == nil and {} or p do
+		if typeof(v2) ~= "table" then
+			if FFlagAddThumbnailSelectorReport then
+				v2 = tostring(v2):split(",")
+			else
+				v2 = { (tostring(v2)) }
+			end
 		end
 
-		local t2 = {}
+		local valueList = {}
 
-		for _, v13 in v10 do
-			table.insert(t2, {
-				data = tostring(v13)
-			})
+		for _, v3 in v2 do
+			table.insert(valueList, { data = tostring(v3) })
 		end
 
-		t1.tags[v8] = {
-			valueList = t2
-		}
+		v.tags[k] = { valueList = valueList }
 	end
 
-	local ok, result = pcall(function() -- line: 46
-		-- upvalues: HttpService (copy), t1 (copy)
-		return HttpService:JSONEncode(t1)
+	local success, result = pcall(function()
+		return HttpService:JSONEncode(v)
 	end)
 
-	if not ok then
+	if not success then
 		warn("Failed to encode report data")
 	end
 
-	return p1(Url.APIS_URL .. "abuse-reporting/v2/abuse-report", "POST", {
-		postBody = result
-	})
+	return callback(Url.APIS_URL .. "abuse-reporting/v2/abuse-report", "POST", { postBody = result })
 end

@@ -1,29 +1,32 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
 
-local validateLayeredClothingAccessory = require(ParentParent.validation.validateLayeredClothingAccessory)
-local validateLayeredClothingAccessoryMeshPartAssetFormatMatch = require(ParentParent.validation.validateLayeredClothingAccessoryMeshPartAssetFormatMatch)
+local validateLayeredClothingAccessory = require(parent.validation.validateLayeredClothingAccessory)
 
-local function validateLayeredClothingAccessoryMeshPartAssetFormat(p1, p2) -- line: 9
-	-- upvalues: validateLayeredClothingAccessory (copy), validateLayeredClothingAccessoryMeshPartAssetFormatMatch (copy)
-	assert(p2.instances ~= nil, "instances required in validationContext for validateLayeredClothingAccessoryMeshPartAssetFormat")
+local validateLayeredClothingAccessoryMeshPartAssetFormatMatch = require(parent.validation.validateLayeredClothingAccessoryMeshPartAssetFormatMatch)
+
+local function validateLayeredClothingAccessoryMeshPartAssetFormat(p, p2)
+	assert(
+		p2.instances ~= nil,
+		"instances required in validationContext for validateLayeredClothingAccessoryMeshPartAssetFormat"
+	)
 
 	local instances = p2.instances
-	local v8, v9 = validateLayeredClothingAccessory(p2)
 
-	if not v8 then
-		return false, v9
+	local v, v2 = validateLayeredClothingAccessory(p2)
+
+	if not v then
+		return false, v2
 	end
 
-	local v10 = instances[1]
-	local v11, v12 = validateLayeredClothingAccessoryMeshPartAssetFormatMatch(v10, p1, p2)
+	local v3, v4 = validateLayeredClothingAccessoryMeshPartAssetFormatMatch(instances[1], p, p2)
 
-	if not v11 then
-		return false, v12
+	if v3 then
+		return true
 	end
 
-	return true
+	return false, v4
 end
 
 return validateLayeredClothingAccessoryMeshPartAssetFormat

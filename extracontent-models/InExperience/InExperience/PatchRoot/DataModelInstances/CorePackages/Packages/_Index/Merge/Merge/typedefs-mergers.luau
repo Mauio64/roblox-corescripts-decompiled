@@ -1,60 +1,35 @@
-local ParentParent = script.Parent.Parent
-local Object = require(ParentParent.LuauPolyfill).Object
-local t1 = {}
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local TypedefsMergers = {}
+
 local arguments = require(script.arguments)
-
-Object.assign(t1, arguments)
-
+Object.assign(TypedefsMergers, arguments)
 local directives = require(script.directives)
-
-Object.assign(t1, directives)
-
-local lib = require(script["enum-values"])
-
-Object.assign(t1, lib)
-
+Object.assign(TypedefsMergers, directives)
+local enumvalues = require(script["enum-values"])
+Object.assign(TypedefsMergers, enumvalues)
 local enum = require(script.enum)
-
-Object.assign(t1, enum)
-
+Object.assign(TypedefsMergers, enum)
 local fields = require(script.fields)
-
-Object.assign(t1, fields)
-
-local lib2 = require(script["input-type"])
-
-Object.assign(t1, lib2)
-
+Object.assign(TypedefsMergers, fields)
+local inputtype = require(script["input-type"])
+Object.assign(TypedefsMergers, inputtype)
 local interface = require(script.interface)
-
-Object.assign(t1, interface)
-
-local lib3 = require(script["merge-named-type-array"])
-
-Object.assign(t1, lib3)
-
-local lib4 = require(script["merge-nodes"])
-
-Object.assign(t1, lib4)
-
-local lib5 = require(script["merge-typedefs"])
-
-Object.assign(t1, lib5)
-
+Object.assign(TypedefsMergers, interface)
+local mergenamedtypearray = require(script["merge-named-type-array"])
+Object.assign(TypedefsMergers, mergenamedtypearray)
+local mergenodes = require(script["merge-nodes"])
+Object.assign(TypedefsMergers, mergenodes)
+local mergetypedefs = require(script["merge-typedefs"])
+Object.assign(TypedefsMergers, mergetypedefs)
 local scalar = require(script.scalar)
-
-Object.assign(t1, scalar)
-
-local type = require(script.type)
-
-Object.assign(t1, type)
-
+Object.assign(TypedefsMergers, scalar)
+local kind = require(script.type)
+Object.assign(TypedefsMergers, kind)
 local union = require(script.union)
-
-Object.assign(t1, union)
-
+Object.assign(TypedefsMergers, union)
 local utils = require(script.utils)
+Object.assign(TypedefsMergers, utils)
 
-Object.assign(t1, utils)
-
-return t1
+return TypedefsMergers

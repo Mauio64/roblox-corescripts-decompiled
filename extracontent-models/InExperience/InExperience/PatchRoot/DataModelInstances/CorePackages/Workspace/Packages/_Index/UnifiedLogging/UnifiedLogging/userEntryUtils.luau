@@ -1,17 +1,13 @@
 return {
-	extractFieldsFromUserEntry = function(p1) -- line: 7
-		if not p1 then
-			return {}
+	extractFieldsFromUserEntry = function(p)
+		if p then
+			return {
+				presence = p.presence and p.presence.userPresenceType or "",
+				friendStatus = p.isFriend and "friend" or "notFriend",
+				presenceUniverseId = (not p.presence or not p.presence.universeId or p.presence.universeId == "") and "-1" or p.presence.universeId
+			}
 		end
 
-		local v2 = p1.presence and p1.presence.userPresenceType or ""
-		local v3 = not p1.isFriend and "notFriend" or "friend"
-		local v4 = (not p1.presence or (not p1.presence.universeId or p1.presence.universeId == "")) and "-1" or p1.presence.universeId
-
-		return {
-			presence = v2,
-			friendStatus = v3,
-			presenceUniverseId = v4
-		}
+		return {}
 	end
 }

@@ -1,64 +1,58 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 local CoreGui = game:GetService("CoreGui")
-local React = require(Parent.React)
-local useIsSpatial = require(Parent.Responsive).useIsSpatial
 
-local function getSyncVrOverlayOrNil() -- line: 10
-	-- upvalues: CoreGui (copy)
-	local VRCentralOverlay = CoreGui:FindFirstChild("VRCentralOverlay")
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
 
-	if not VRCentralOverlay then
-		return nil
+local useIsSpatial = Responsive.useIsSpatial
+
+local function getSyncVrOverlayOrNil()
+	local vrCentralOverlay = CoreGui:FindFirstChild("VRCentralOverlay")
+
+	if vrCentralOverlay then
+		return vrCentralOverlay:FindFirstChildWhichIsA("SurfaceGui")
 	end
 
-	return VRCentralOverlay:FindFirstChildWhichIsA("SurfaceGui")
+	return nil
 end
-local function useVrOverlay() -- line: 25
-	-- upvalues: useIsSpatial (copy), React (copy), getSyncVrOverlayOrNil (copy), CoreGui (copy)
-	local v8 = useIsSpatial()
-	local v9, v10 = React.useState(getSyncVrOverlayOrNil)
 
-	React.useEffect(function() -- line: 33
-		-- upvalues: v8 (copy), v9 (copy), CoreGui (copy), v10 (copy)
-		if not v8 then
-			return function() -- line: 35
-			end
+local function useVrOverlay()
+	local v = useIsSpatial()
+	local state, setState = React.useState(getSyncVrOverlayOrNil)
+
+	React.useEffect(function()
+		if not v then
+			return function() end
 		end
 
-		if v9 then
-			return function() -- line: 40
-			end
+		if state then
+			return function() end
 		end
 
-		local thread = task.spawn(function() -- line: 45
-			-- upvalues: CoreGui (copy), v10 (copy)
-			local VRCentralOverlay = CoreGui:WaitForChild("VRCentralOverlay", 5)
+		local thread = task.spawn(function()
+			local vrCentralOverlay = CoreGui:WaitForChild("VRCentralOverlay", 5)
 
-			if not VRCentralOverlay then
+			if not vrCentralOverlay then
 				return
 			end
 
-			local CentralOverlay_SurfaceGui = VRCentralOverlay:WaitForChild("CentralOverlay_SurfaceGui", 5)
+			local centralOverlay_SurfaceGui = vrCentralOverlay:WaitForChild("CentralOverlay_SurfaceGui", 5)
 
-			if CentralOverlay_SurfaceGui then
-				v10(CentralOverlay_SurfaceGui)
+			if centralOverlay_SurfaceGui then
+				setState(centralOverlay_SurfaceGui)
 			end
 		end)
 
-		return function() -- line: 56
-			-- upvalues: thread (copy)
+		return function()
 			task.cancel(thread)
 		end
-	end, {
-		v8,
-		v9
-	})
+	end, { v, state })
 
-	if not v8 then
-		return nil, false
+	if v then
+		return state, true
 	end
 
-	return v9, true
+	return nil, false
 end
 
 return useVrOverlay

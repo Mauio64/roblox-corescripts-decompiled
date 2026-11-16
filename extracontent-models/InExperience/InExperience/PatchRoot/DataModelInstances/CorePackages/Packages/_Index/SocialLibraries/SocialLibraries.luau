@@ -1,11 +1,10 @@
-local scriptParent = script.Parent
-local UIBlox = require(scriptParent.UIBlox)
+local parent = script.Parent
+local UIBlox = require(parent.UIBlox)
 
 return {
-	config = function(p1) -- line: 5
-		-- upvalues: UIBlox (copy)
-		if p1.UIBloxConfig then
-			UIBlox.init(p1.UIBloxConfig)
+	config = function(p)
+		if p.UIBloxConfig then
+			UIBlox.init(p.UIBloxConfig)
 		end
 
 		return {

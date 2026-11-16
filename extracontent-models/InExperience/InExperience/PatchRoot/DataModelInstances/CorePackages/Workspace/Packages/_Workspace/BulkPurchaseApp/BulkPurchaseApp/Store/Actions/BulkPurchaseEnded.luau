@@ -1,5 +1,6 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator("BulkPurchaseEnded", function() -- line: 9
+return Rodux.makeActionCreator("BulkPurchaseEnded", function()
 	return {}
 end)

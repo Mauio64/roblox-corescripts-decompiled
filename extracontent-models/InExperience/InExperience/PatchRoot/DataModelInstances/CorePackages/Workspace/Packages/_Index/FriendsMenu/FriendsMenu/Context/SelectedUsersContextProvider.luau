@@ -1,83 +1,77 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local SelectedUsersContext = require(scriptParent.SelectedUsersContext)
-local React = require(ParentParent.React)
-local Cryo = require(ParentParent.Cryo)
-local UserProfiles = require(ParentParent.UserProfiles)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
 
-return function(t1: {[any]: any}) -- line: 19
-	-- upvalues: UserProfiles (copy), React (copy), Cryo (copy), SelectedUsersContext (copy)
-	local v8 = UserProfiles.Hooks.useUserProfilesFetch({
-		userIds = t1.preselectedUsers or {},
+local SelectedUsersContext = require(parent.SelectedUsersContext)
+
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
+local UserProfiles = require(parent2.UserProfiles)
+
+return function(props)
+	local v = UserProfiles.Hooks.useUserProfilesFetch({
+		userIds = props.preselectedUsers or {},
 		query = UserProfiles.Queries.userProfilesCombinedNameByUserIds
 	})
-	local v9 = React.useCallback(function(p1) -- line: 25
-		-- upvalues: v8 (copy), UserProfiles (copy), t1 (copy)
-		local t2 = {}
-		local s1 = ""
 
-		for _, v in pairs(p1) do
-			if v8.data then
-				s1 = UserProfiles.Selectors.getCombinedNameFromId(v8.data, v)
+	local v2 = React.useCallback(function(items)
+		local displayName = ""
+		local result = {}
+
+		for _, item in pairs(items) do
+			if v.data then
+				displayName = UserProfiles.Selectors.getCombinedNameFromId(v.data, item)
 			end
 
-			t2[v] = {
-				displayName = s1,
-				layoutOrder = #t2 + 1,
-				unremovable = t1.preselectedUsersUnremovable
+			result[item] = {
+				displayName = displayName,
+				layoutOrder = #result + 1,
+				unremovable = props.preselectedUsersUnremovable
 			}
 		end
 
-		return t2
+		return result
 	end, nil)
-	local v10 = React.useRef(not t1.preselectedUsers and 0 or #t1.preselectedUsers)
-	local v11, v12 = React.useState(if not t1.preselectedUsers then {} else v9(t1.preselectedUsers))
-	local v13, v14 = React.useState(not t1.preselectedUsers and 0 or #t1.preselectedUsers)
-	local v15 = React.useCallback(function(p2, p3) -- line: 49
-		-- upvalues: t1 (copy), v13 (copy), v12 (copy), Cryo (copy), v11 (copy), v10 (copy), v14 (copy)
-		if t1.selectionLimit == nil or v13 < t1.selectionLimit then
-			v12(Cryo.Dictionary.join(v11, {
-				[p2] = {
-					displayName = p3,
-					layoutOrder = v10.current
-				}
-			}))
-			v10.current = v10.current + 1
-			v14(v13 + 1)
-		end
-	end, { v11 })
-	local v16 = React.useCallback(function(p4, p5) -- line: 63
-		-- upvalues: v12 (copy), Cryo (copy), v11 (copy), v14 (copy), v13 (copy), t1 (copy)
-		v12(Cryo.Dictionary.join(v11, {
-			[p4] = Cryo.None
-		}))
-		v14(v13 - 1)
 
-		if t1.onRemoveCallback then
-			t1.onRemoveCallback(p4, p5)
+	local ref = React.useRef(props.preselectedUsers and #props.preselectedUsers or 0)
+
+	local state, setState = React.useState(not props.preselectedUsers and {} or v2(props.preselectedUsers))
+
+	local state2, setState2 = React.useState(props.preselectedUsers and #props.preselectedUsers or 0)
+
+	local addFriend = React.useCallback(function(p, displayName)
+		if props.selectionLimit == nil or state2 < props.selectionLimit then
+			setState(Cryo.Dictionary.join(state, {
+				[p] = { displayName = displayName, layoutOrder = ref.current }
+			}))
+
+			ref.current += 1
+			setState2(state2 + 1)
 		end
-	end, { v11 })
-	local v17 = React.useCallback(function(p6) -- line: 71
-		-- upvalues: v11 (copy)
-		return v11[p6] ~= nil
-	end, { v11 })
+	end, { state })
+
+	local removeFriend = React.useCallback(function(p, p2)
+		setState(Cryo.Dictionary.join(state, { [p] = Cryo.None }))
+		setState2(state2 - 1)
+
+		if props.onRemoveCallback then
+			props.onRemoveCallback(p, p2)
+		end
+	end, { state })
+
+	local isFriendSelected = React.useCallback(function(p): boolean
+		return state[p] ~= nil
+	end, { state })
 
 	return React.createElement(SelectedUsersContext.Provider, {
-		value = React.useMemo(function() -- line: 76
-			-- upvalues: v13 (copy), v11 (copy), v15 (copy), v16 (copy), v17 (copy), t1 (copy)
+		value = React.useMemo(function()
 			return {
-				selectedFriendsSize = v13,
-				selectedFriends = v11,
-				addFriend = v15,
-				removeFriend = v16,
-				isFriendSelected = v17,
-				preselectedUsers = t1.preselectedUsers
+				selectedFriendsSize = state2,
+				selectedFriends = state,
+				addFriend = addFriend,
+				removeFriend = removeFriend,
+				isFriendSelected = isFriendSelected,
+				preselectedUsers = props.preselectedUsers
 			}
-		end, {
-			v11,
-			v15,
-			v16,
-			v17
-		})
-	}, t1.children)
+		end, { state, addFriend, removeFriend, isFriendSelected })
+	}, props.children)
 end

@@ -1,195 +1,214 @@
 local CoreGui = game:GetService("CoreGui")
+
 local StatsUtils = require(CoreGui.RobloxGui.Modules.Stats.StatsUtils)
 local BarGraph = require(CoreGui.RobloxGui.Modules.Stats.BarGraph)
-local t1 = {}
 
-t1.__index = t1
+local StatsAnnotatedGraph = {}
+StatsAnnotatedGraph.__index = StatsAnnotatedGraph
 
-function t1.new(p1, p2) -- line: 24
-	-- upvalues: t1 (copy), StatsUtils (copy), BarGraph (copy)
-	local t2 = {}
+function StatsAnnotatedGraph.new(statType, isMaximized)
+	local class = {}
+	setmetatable(class, StatsAnnotatedGraph)
 
-	setmetatable(t2, t1)
-	t2._statType = p1
-	t2._statMaxName = StatsUtils.StatMaxNames[p1]
-	t2._isMaximized = p2
-	t2._values = {}
-	t2._average = 0
-	t2._target = 0
-	t2._axisMax = 0
-	t2._frame = Instance.new("Frame")
-	t2._frame.Name = "PS_AnnotatedGraph"
-	t2._frame.BackgroundTransparency = 1
-	t2._frame.ZIndex = StatsUtils.GraphZIndex
-	t2._topLabel = Instance.new("TextLabel")
-	t2._topLabel.Name = "PS_TopAxisLabel"
-	t2._topLabel.Parent = t2._frame
-	t2._topLabel.TextXAlignment = Enum.TextXAlignment.Left
-	t2._topLabel.TextYAlignment = Enum.TextYAlignment.Top
-	t2._topLabel.FontSize = StatsUtils.PanelGraphFontSize
-	t2._bottomLabel = Instance.new("TextLabel")
-	t2._bottomLabel.Name = "PS_BottomAxisLabel"
-	t2._bottomLabel.Parent = t2._frame
-	t2._bottomLabel.TextXAlignment = Enum.TextXAlignment.Left
-	t2._bottomLabel.TextYAlignment = Enum.TextYAlignment.Bottom
-	t2._bottomLabel.FontSize = StatsUtils.PanelGraphFontSize
-	t2._graph = BarGraph.new(p2)
-	StatsUtils.StyleTextWidget(t2._topLabel)
-	StatsUtils.StyleTextWidget(t2._bottomLabel)
-	t2:_layoutElements()
+	class._statType = statType
+	class._statMaxName = StatsUtils.StatMaxNames[statType]
+	class._isMaximized = isMaximized
 
-	return t2
+	class._values = {}
+
+	class._average = 0
+
+	class._target = 0
+
+	class._axisMax = 0
+
+	class._frame = Instance.new("Frame")
+	class._frame.Name = "PS_AnnotatedGraph"
+	class._frame.BackgroundTransparency = 1
+	class._frame.ZIndex = StatsUtils.GraphZIndex
+
+	class._topLabel = Instance.new("TextLabel")
+	class._topLabel.Name = "PS_TopAxisLabel"
+	class._topLabel.Parent = class._frame
+	class._topLabel.TextXAlignment = Enum.TextXAlignment.Left
+	class._topLabel.TextYAlignment = Enum.TextYAlignment.Top
+	class._topLabel.FontSize = StatsUtils.PanelGraphFontSize
+
+	class._bottomLabel = Instance.new("TextLabel")
+	class._bottomLabel.Name = "PS_BottomAxisLabel"
+	class._bottomLabel.Parent = class._frame
+	class._bottomLabel.TextXAlignment = Enum.TextXAlignment.Left
+	class._bottomLabel.TextYAlignment = Enum.TextYAlignment.Bottom
+	class._bottomLabel.FontSize = StatsUtils.PanelGraphFontSize
+
+	class._graph = BarGraph.new(isMaximized)
+
+	StatsUtils.StyleTextWidget(class._topLabel)
+	StatsUtils.StyleTextWidget(class._bottomLabel)
+
+	class:_layoutElements()
+
+	return class
 end
-function t1.SetZIndex(p3, p4) -- line: 71
-	p3._frame.ZIndex = p4
-	p3._topLabel.ZIndex = p4
-	p3._bottomLabel.ZIndex = p4
-	p3._graph:SetZIndex(p4)
-end
-function t1._layoutElements(p5) -- line: 78
-	local n1
 
-	if p5._isMaximized then
-		n1 = 30
-		p5._topLabel.Visible = true
-		p5._bottomLabel.Visible = true
+function StatsAnnotatedGraph:SetZIndex(zIndex)
+	self._frame.ZIndex = zIndex
+	self._topLabel.ZIndex = zIndex
+	self._bottomLabel.ZIndex = zIndex
+	self._graph:SetZIndex(zIndex)
+end
+
+function StatsAnnotatedGraph:_layoutElements()
+	local v
+
+	if self._isMaximized then
+		self._topLabel.Visible = true
+		self._bottomLabel.Visible = true
+		v = 30
 	else
-		n1 = 0
-		p5._topLabel.Visible = false
-		p5._bottomLabel.Visible = false
+		self._topLabel.Visible = false
+		self._bottomLabel.Visible = false
+		v = 0
 	end
 
-	local uDim2 = UDim2.new(0, 10, 0, 10)
-	local uDim2_2 = UDim2.new(1, -(20 + n1), 1, -20)
-	local uDim2_3 = UDim2.new(1, -(10 + n1), 0, 10)
-	local uDim2_4 = UDim2.new(0, n1, 0.333, -20)
-	local uDim2_5 = UDim2.new(1, -(10 + n1), 0.666, 10)
-	local uDim2_6 = UDim2.new(0, n1, 0.333, -20)
+	local udim = UDim2.new(0, 10, 0, 10)
+	local udim2 = UDim2.new(1, -(20 + v), 1, -20)
 
-	p5._topLabel.Size = uDim2_4
-	p5._topLabel.Position = uDim2_3
-	p5._bottomLabel.Size = uDim2_6
-	p5._bottomLabel.Position = uDim2_5
-	p5._graph:PlaceInParent(p5._frame, uDim2_2, uDim2)
+	local udim3 = UDim2.new(1, -(10 + v), 0, 10)
+	local udim4 = UDim2.new(0, v, 0.333, -20)
+	local udim5 = UDim2.new(1, -(10 + v), 0.666, 10)
+	local udim6 = UDim2.new(0, v, 0.333, -20)
+
+	self._topLabel.Size = udim4
+	self._topLabel.Position = udim3
+	self._bottomLabel.Size = udim6
+	self._bottomLabel.Position = udim5
+
+	self._graph:PlaceInParent(self._frame, udim2, udim)
 end
-function t1.PlaceInParent(p6, p7, p8, p9) -- line: 108
-	p6._frame.Position = p9
-	p6._frame.Size = p8
-	p6._frame.Parent = p7
+
+function StatsAnnotatedGraph:PlaceInParent(parent, size, position)
+	self._frame.Position = position
+	self._frame.Size = size
+	self._frame.Parent = parent
 end
-function t1._getTarget(p10) -- line: 114
-	if p10._performanceStats == nil then
+
+function StatsAnnotatedGraph:_getTarget()
+	if self._performanceStats == nil then
 		return 0
 	end
 
-	local p10_statMaxName = p10._performanceStats:FindFirstChild(p10._statMaxName)
+	local child = self._performanceStats:FindFirstChild(self._statMaxName)
 
-	if p10_statMaxName == nil then
+	if child == nil then
 		return 0
 	end
 
-	return p10_statMaxName:GetValue()
+	return child:GetValue()
 end
-function t1._render(p11) -- line: 128
-	p11._graph:SetAxisMax(p11._axisMax)
-	p11._graph:SetValues(p11._values)
-	p11._graph:SetAverage(p11._average)
-	p11._graph:SetTarget(p11._target)
-	p11._graph:Render()
-	p11._topLabel.Text = string.format("%.2f", p11._axisMax)
-	p11._bottomLabel.Text = string.format("%.2f", 0)
-end
-function t1._calculateAxisMax(p12) -- line: 140
-	local v26 = p12._target * 2
-	local v27 = p12:_recursiveGetOrderOfMagnitude(1, v26)
 
-	p12._axisMax = math.floor(0.5 + v26 / v27) * v27
+function StatsAnnotatedGraph:_render()
+	self._graph:SetAxisMax(self._axisMax)
+	self._graph:SetValues(self._values)
+
+	self._graph:SetAverage(self._average)
+	self._graph:SetTarget(self._target)
+	self._graph:Render()
+
+	self._topLabel.Text = string.format("%.2f", self._axisMax)
+	self._bottomLabel.Text = string.format("%.2f", 0)
 end
-function t1.SetStatsAggregator(p13, p14) -- line: 150
-	if p13._aggregator then
-		p13._aggregator:RemoveListener(p13._listenerId)
-		p13._listenerId = nil
-		p13._aggregator = nil
+
+function StatsAnnotatedGraph:_calculateAxisMax()
+	local v = self._target * 2
+	local recursiveGetOrderOfMagnitude = self:_recursiveGetOrderOfMagnitude(1, v)
+	self._axisMax = math.floor(0.5 + v / recursiveGetOrderOfMagnitude) * recursiveGetOrderOfMagnitude
+end
+
+function StatsAnnotatedGraph:SetStatsAggregator(aggregator)
+	if self._aggregator then
+		self._aggregator:RemoveListener(self._listenerId)
+		self._listenerId = nil
+		self._aggregator = nil
 	end
 
-	p13._aggregator = p14
-	p13:_refreshVisibility()
+	self._aggregator = aggregator
+
+	self:_refreshVisibility()
 end
-function t1._stopListening(p15) -- line: 162
-	if p15._aggregator == nil then
+
+function StatsAnnotatedGraph:_stopListening()
+	if not (self._aggregator ~= nil and self._listenerId ~= nil) then
 		return
 	end
 
-	if p15._listenerId == nil then
-		return
-	end
-
-	p15._aggregator:RemoveListener(p15._listenerId)
-	p15._listenerId = nil
+	self._aggregator:RemoveListener(self._listenerId)
+	self._listenerId = nil
 end
-function t1._startListening(p16) -- line: 175
-	if p16._aggregator == nil then
+
+function StatsAnnotatedGraph:_startListening()
+	if not (self._aggregator ~= nil and self._listenerId == nil) then
 		return
 	end
 
-	if p16._listenerId ~= nil then
-		return
-	end
-
-	p16._listenerId = p16._aggregator:AddListener(function() -- line: 184
-		-- upvalues: p16 (copy)
-		p16:_updateValuesAndRender()
+	self._listenerId = self._aggregator:AddListener(function()
+		self:_updateValuesAndRender()
 	end)
 end
-function t1._shouldBeVisible(p17) -- line: 189
-	-- upvalues: StatsUtils (copy)
+
+function StatsAnnotatedGraph:_shouldBeVisible()
 	if StatsUtils.PerformanceStatsShouldBeVisible() then
-		return p17._frame.Visible
+		return self._frame.Visible
 	end
 
 	return false
 end
-function t1.SetVisible(p18, p19) -- line: 197
-	p18._frame.Visible = p19
-	p18:_refreshVisibility()
+
+function StatsAnnotatedGraph:SetVisible(visible)
+	self._frame.Visible = visible
+	self:_refreshVisibility()
 end
-function t1._refreshVisibility(p20) -- line: 202
-	if p20:_shouldBeVisible() then
-		p20:_startListening()
-		p20:_updateValuesAndRender()
+
+function StatsAnnotatedGraph:_refreshVisibility()
+	if not self:_shouldBeVisible() then
+		self:_stopListening()
 
 		return
 	end
 
-	p20:_stopListening()
+	self:_startListening()
+	self:_updateValuesAndRender()
 end
-function t1.OnPerformanceStatsShouldBeVisibleChanged(p21) -- line: 211
-	p21:_refreshVisibility()
+
+function StatsAnnotatedGraph:OnPerformanceStatsShouldBeVisibleChanged()
+	self:_refreshVisibility()
 end
-function t1._recursiveGetOrderOfMagnitude(p22, p23, p24) -- line: 215
-	if p24 < p23 then
-		return p22:_recursiveGetOrderOfMagnitude(p23 / 10, p24)
+
+function StatsAnnotatedGraph:_recursiveGetOrderOfMagnitude(p, p2)
+	if p2 < p then
+		return self:_recursiveGetOrderOfMagnitude(p / 10, p2)
 	end
 
-	if p24 <= p23 * 10 then
-		return p23
+	if p2 <= p * 10 then
+		return p
 	end
 
-	return p22:_recursiveGetOrderOfMagnitude(p23 * 10, p24)
+	return self:_recursiveGetOrderOfMagnitude(p * 10, p2)
 end
-function t1._updateValuesAndRender(p25) -- line: 227
-	p25._values = {}
-	p25._average = 0
-	p25._target = 0
 
-	if p25._aggregator ~= nil then
-		p25._values = p25._aggregator:GetValues()
-		p25._average = p25._aggregator:GetAverage()
-		p25._target = p25._aggregator:GetTarget()
+function StatsAnnotatedGraph:_updateValuesAndRender()
+	self._values = {}
+	self._average = 0
+	self._target = 0
+
+	if self._aggregator ~= nil then
+		self._values = self._aggregator:GetValues()
+		self._average = self._aggregator:GetAverage()
+		self._target = self._aggregator:GetTarget()
 	end
 
-	p25:_calculateAxisMax()
-	p25:_render()
+	self:_calculateAxisMax()
+	self:_render()
 end
 
-return t1
+return StatsAnnotatedGraph

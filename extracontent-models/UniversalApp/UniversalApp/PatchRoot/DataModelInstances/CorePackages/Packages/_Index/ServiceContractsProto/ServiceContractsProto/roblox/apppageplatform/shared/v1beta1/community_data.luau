@@ -1,190 +1,176 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 47
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		id = if t3 ~= nil and t3.id ~= nil then t3.id else "",
-		name = if t3 ~= nil and t3.name ~= nil then t3.name else "",
-		member_count = if t3 ~= nil and t3.member_count ~= nil then t3.member_count else 0,
-		description = if t3 ~= nil and t3.description ~= nil then t3.description else "",
-		is_verified = t3 ~= nil and (t3.is_verified ~= nil and t3.is_verified)
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local v2 = {
+		id = (data == nil or data.id == nil) and "" or data.id,
+		name = (data == nil or data.name == nil) and "" or data.name,
+		member_count = (data == nil or data.member_count == nil) and 0 or data.member_count,
+		description = (data == nil or data.description == nil) and "" or data.description,
+		is_verified = data ~= nil and data.is_verified ~= nil and data.is_verified
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 57
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.id ~= nil and p1.id ~= "" then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeString(v9, v10, p1.id)
+	if data.id ~= nil and data.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.id)
 	end
 
-	if p1.name ~= nil and p1.name ~= "" then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.name)
+	if data.name ~= nil and data.name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.name)
 	end
 
-	if p1.member_count ~= nil and p1.member_count ~= 0 then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v13, v14, p1.member_count)
+	if data.member_count ~= nil and data.member_count ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.member_count)
 	end
 
-	if p1.description ~= nil and p1.description ~= "" then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v15, v16, p1.description)
+	if data.description ~= nil and data.description ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.description)
 	end
 
-	if p1.is_verified then
-		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v17, v18, not p1.is_verified and 0 or 1)
+	if data.is_verified then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_verified and 1 or 0)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 91
-	-- upvalues: t2 (copy), proto (copy)
-	local v21 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v23, v24
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v23, v24, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v24 == proto.wireTypes.varint then
-			if v23 == 3 then
-				local v25
-
-				v25, n2 = proto.readVarIntI64(p2, n2)
-				v21.member_count = v25
-			elseif v23 == 5 then
-				local v26
-
-				v26, n2 = proto.readVarInt(p2, n2)
-				v21.is_verified = v26 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 3 then
+				local member_count
+				member_count, v2 = proto.readVarIntI64(buf, v2)
+				result.member_count = member_count
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_verified = v5 ~= 0
 			else
-				local v27
-
-				v27, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v24 == proto.wireTypes.lengthDelimited then
-			if v23 == 1 then
-				local v28
-
-				v28, n2 = proto.readBuffer(p2, n2)
-				v21.id = buffer.tostring(v28)
-			elseif v23 == 2 then
-				local v29
-
-				v29, n2 = proto.readBuffer(p2, n2)
-				v21.name = buffer.tostring(v29)
-			elseif v23 == 4 then
-				local v30
-
-				v30, n2 = proto.readBuffer(p2, n2)
-				v21.description = buffer.tostring(v30)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.name = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.description = buffer.tostring(v5)
 			else
-				local v31, v32 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v32 + v31
+				v2 = v5 + varInt
 			end
-		elseif v24 == proto.wireTypes.i32 then
-			local v33
-
-			v33, n2 = proto.readFixed32(p2, n2)
-		elseif v24 == proto.wireTypes.i64 then
-			local v34
-
-			v34, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v24)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v21
-end
-function t2.jsonEncode(p3) -- line: 154
-	local t4 = {}
-
-	if p3.id ~= nil and p3.id ~= "" then
-		t4.id = p3.id
-	end
-
-	if p3.name ~= nil and p3.name ~= "" then
-		t4.name = p3.name
-	end
-
-	if p3.member_count ~= nil and p3.member_count ~= 0 then
-		t4.memberCount = p3.member_count
-	end
-
-	if p3.description ~= nil and p3.description ~= "" then
-		t4.description = p3.description
-	end
-
-	if p3.is_verified then
-		t4.isVerified = p3.is_verified
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 180
-	-- upvalues: t2 (copy)
-	local v38 = t2.new()
-
-	if t5.id ~= nil then
-		v38.id = t5.id
-	end
-
-	if t5.name ~= nil then
-		v38.name = t5.name
-	end
-
-	if t5.member_count ~= nil then
-		v38.member_count = t5.member_count
-	end
-
-	if t5.memberCount ~= nil then
-		v38.member_count = t5.memberCount
-	end
-
-	if t5.description ~= nil then
-		v38.description = t5.description
-	end
-
-	if t5.is_verified ~= nil then
-		v38.is_verified = t5.is_verified
-	end
-
-	if t5.isVerified ~= nil then
-		v38.is_verified = t5.isVerified
-	end
-
-	return v38
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.id ~= nil and data.id ~= "" then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil and data.name ~= "" then
+		v2.name = data.name
+	end
+
+	if data.member_count ~= nil and data.member_count ~= 0 then
+		v2.memberCount = data.member_count
+	end
+
+	if data.description ~= nil and data.description ~= "" then
+		v2.description = data.description
+	end
+
+	if data.is_verified then
+		v2.isVerified = data.is_verified
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.name ~= nil then
+		v2.name = data.name
+	end
+
+	if data.member_count ~= nil then
+		v2.member_count = data.member_count
+	end
+
+	if data.memberCount ~= nil then
+		v2.member_count = data.memberCount
+	end
+
+	if data.description ~= nil then
+		v2.description = data.description
+	end
+
+	if data.is_verified ~= nil then
+		v2.is_verified = data.is_verified
+	end
+
+	if data.isVerified ~= nil then
+		v2.is_verified = data.isVerified
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "CommunityData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.CommunityData"
 }
-t1.CommunityData = t2
-typeRegistry.default:register(t1.CommunityData)
 
-return {
-	CommunityData = t1.CommunityData
-}
+v.CommunityData = class
+
+typeRegistry.default:register(v.CommunityData)
+
+return { CommunityData = v.CommunityData }

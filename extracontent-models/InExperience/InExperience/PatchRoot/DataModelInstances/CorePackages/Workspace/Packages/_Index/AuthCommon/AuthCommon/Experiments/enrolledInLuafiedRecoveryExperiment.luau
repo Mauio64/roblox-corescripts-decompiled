@@ -1,18 +1,19 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local IXPServiceWrapper = require(Parent.IXPServiceWrapper).IXPServiceWrapper
-local AppBtidLayers = require(Parent.ExperimentLayers).AppBtidLayers
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-local function enrolledInLuafiedRecoveryExperiment() -- line: 7
-	-- upvalues: IXPServiceWrapper (copy), AppBtidLayers (copy)
-	local BTIDLayerData = IXPServiceWrapper:GetBTIDLayerData(AppBtidLayers.AccountRecoveryUILayer)
+local IXPServiceWrapper = require(parent.IXPServiceWrapper)
+local ixpServiceWrapper = IXPServiceWrapper.IXPServiceWrapper
+local ExperimentLayers = require(parent.ExperimentLayers)
+local AppBtidLayers = ExperimentLayers.AppBtidLayers
 
-	IXPServiceWrapper:LogBrowserTrackerLayerExposure(AppBtidLayers.AccountRecoveryUILayer)
+local function enrolledInLuafiedRecoveryExperiment()
+	local btidLayerData = ixpServiceWrapper:GetBTIDLayerData(AppBtidLayers.AccountRecoveryUILayer)
+	ixpServiceWrapper:LogBrowserTrackerLayerExposure(AppBtidLayers.AccountRecoveryUILayer)
 
-	if not BTIDLayerData then
-		return false
+	if btidLayerData then
+		return btidLayerData.shouldShowLuafiedRecoveryFlow or false
 	end
 
-	return BTIDLayerData.shouldShowLuafiedRecoveryFlow or false
+	return false
 end
 
 return enrolledInLuafiedRecoveryExperiment

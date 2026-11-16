@@ -1,646 +1,565 @@
-local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
+local parent = script:FindFirstAncestor("Moments").Parent
+
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local Foundation = require(MomentsParent.Foundation)
-local React = require(MomentsParent.React)
-local Signals = require(MomentsParent.Signals)
-local SignalsReact = require(MomentsParent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
 local Constants = require(script.Parent.Constants)
-
 require(script.Parent.Types)
-
 local snapMath = require(script.Parent.snapMath)
 local pagerNavigation = require(script.Parent.pagerNavigation)
-local GetFFlagMomentsDesktopWheelPaging = require(Moments.Flags.GetFFlagMomentsDesktopWheelPaging)
-local GetFFlagMomentsFixNavButtonSnap = require(Moments.Flags.GetFFlagMomentsFixNavButtonSnap)
+
 local usePreferences = Foundation.Hooks.usePreferences
 
-local function usePagerController(t1: {[any]: any}) -- line: 67
-	-- upvalues: React (copy), usePreferences (copy), Signals (copy), RunService (copy), Constants (copy), snapMath (copy), GetFFlagMomentsDesktopWheelPaging (copy), pagerNavigation (copy), GetFFlagMomentsFixNavButtonSnap (copy), UserInputService (copy), SignalsReact (copy)
-	local scrollingFrame = t1.scrollingFrame
-	local store = t1.store
-	local itemHeight = t1.itemHeight
-	local gap = t1.gap
-	local active = t1.active
-	local nativeScrollEnabled = t1.nativeScrollEnabled
-	local v23 = React.useRef(store)
+local function usePagerController(data)
+	local scrollingFrame = data.scrollingFrame
+	local store = data.store
+	local itemHeight = data.itemHeight
+	local gap = data.gap
+	local active = data.active
+	local nativeScrollEnabled = data.nativeScrollEnabled
 
-	v23.current = store
+	local ref = React.useRef(store)
+	ref.current = store
+	local ref2 = React.useRef(itemHeight)
+	ref2.current = itemHeight
 
-	local v24 = React.useRef(itemHeight)
+	local ref3 = React.useRef(itemHeight + gap)
+	ref3.current = itemHeight + gap
+	local ref4 = React.useRef(data.snapSensitivity)
+	ref4.current = data.snapSensitivity
+	local ref5 = React.useRef(data.animationSpeed)
+	ref5.current = data.animationSpeed
+	local ref6 = React.useRef(data.analytics)
+	ref6.current = data.analytics
 
-	v24.current = itemHeight
-
-	local v25 = React.useRef(itemHeight + gap)
-
-	v25.current = itemHeight + gap
-
-	local v26 = React.useRef(t1.snapSensitivity)
-
-	v26.current = t1.snapSensitivity
-
-	local v27 = React.useRef(t1.animationSpeed)
-
-	v27.current = t1.animationSpeed
-
-	local v28 = React.useRef(t1.analytics)
-
-	v28.current = t1.analytics
-
-	local v29 = React.useRef(active)
-
-	v29.current = active
+	local ref7 = React.useRef(active)
+	ref7.current = active
 
 	local reducedMotion = usePreferences().reducedMotion
-	local v31 = React.useRef(reducedMotion)
+	local ref8 = React.useRef(reducedMotion)
+	ref8.current = reducedMotion
 
-	v31.current = reducedMotion
+	local ref9 = React.useRef(nil)
+	local ref10 = React.useRef(false)
+	local ref11 = React.useRef(0)
 
-	local v32 = React.useRef(nil)
-	local v33 = React.useRef(false)
-	local v34 = React.useRef(0)
-	local v35 = React.useRef(0)
-	local v36 = React.useRef(false)
-	local v37 = React.useRef({})
-	local v38 = React.useRef(0)
-	local v39 = React.useRef(0)
-	local v40 = React.useRef(store.getCurrentIndex(false))
-	local v41 = React.useRef(0)
-	local v42 = React.useRef(0)
-	local v43 = React.useRef(false)
-	local v44 = React.useRef(true)
-	local v45 = React.useRef(nil)
-	local v46 = React.useMemo(function() -- line: 135
-		-- upvalues: Signals (copy), v23 (copy)
-		local v61, v62 = Signals.createSignal(v23.current.getCurrentIndex(false))
+	local ref12 = React.useRef(0)
+	local ref13 = React.useRef(false)
 
-		return {
-			get = v61,
-			set = v62
-		}
+	local ref14 = React.useRef({})
+
+	local ref15 = React.useRef(0)
+
+	local ref16 = React.useRef(0)
+
+	local ref17 = React.useRef(store.getCurrentIndex(false))
+	local ref18 = React.useRef(0)
+
+	local ref19 = React.useRef(0)
+	local ref20 = React.useRef(false)
+
+	local ref21 = React.useRef(true)
+
+	local ref22 = React.useRef(nil)
+
+	local v = React.useMemo(function()
+		local signal, set = Signals.createSignal(ref.current.getCurrentIndex(false))
+		return { get = signal, set = set }
 	end, {})
-	local v47 = React.useMemo(function() -- line: 139
-		-- upvalues: Signals (copy)
-		local v63, v64 = Signals.createSignal("Idle")
-
-		return {
-			get = v63,
-			set = v64
-		}
+	local v2 = React.useMemo(function()
+		local signal, set = Signals.createSignal("Idle")
+		return { get = signal, set = set }
 	end, {})
-	local v48 = React.useCallback(function(p1) -- line: 144
-		-- upvalues: v47 (copy), v28 (copy)
-		if p1 == v47.get(false) then
+
+	local v3 = React.useCallback(function(p)
+		if v2.get(false) == p then
 			return
 		end
 
-		v47.set(p1)
-
-		local current = v28.current
+		v2.set(p)
+		local current = ref6.current
 
 		if current and current.onScrollStateChanged then
-			current.onScrollStateChanged(p1)
+			current.onScrollStateChanged(p)
 		end
-	end, { v47 })
-	local v49 = React.useCallback(function(n1: number) -- line: 155
-		-- upvalues: v46 (copy), v28 (copy), v23 (copy)
-		if n1 == v46.get(false) then
+	end, { v2 })
+
+	local v4 = React.useCallback(function(p: number)
+		if v.get(false) == p then
 			return
 		end
 
-		v46.set(n1)
-
-		local current = v28.current
+		v.set(p)
+		local current = ref6.current
 
 		if current and current.onActiveItemChanged then
-			current.onActiveItemChanged(n1, v23.current.getItems(false)[n1])
+			current.onActiveItemChanged(p, ref.current.getItems(false)[p])
 		end
-	end, { v46 })
-	local v50 = React.useCallback(function() -- line: 168
-		-- upvalues: v45 (copy), v23 (copy)
-		local current = v45.current
+	end, { v })
+
+	local v5 = React.useCallback(function()
+		local current = ref22.current
 
 		if current ~= nil then
-			v45.current = nil
-			v23.current.removeItem(current)
+			ref22.current = nil
+			ref.current.removeItem(current)
 		end
 	end, {})
-	local v51 = React.useCallback(function() -- line: 176
-		-- upvalues: v32 (copy), v33 (copy), v50 (copy)
-		if v32.current then
-			v32.current:Disconnect()
-			v32.current = nil
+
+	local v6 = React.useCallback(function()
+		if ref9.current then
+			ref9.current:Disconnect()
+			ref9.current = nil
 		end
 
-		v33.current = false
-		v50()
-	end, { v50 })
-	local v52 = React.useCallback(function(n2: number) -- line: 187
-		-- upvalues: scrollingFrame (copy), v51 (copy), v33 (copy), v48 (copy), v35 (copy), v32 (copy), RunService (copy), v36 (copy), v44 (copy), Constants (copy), snapMath (copy), v34 (copy), v27 (copy)
+		ref10.current = false
+
+		v5()
+	end, { v5 })
+
+	local v7 = React.useCallback(function(current: number)
 		if not scrollingFrame then
 			return
 		end
 
-		v51()
-		v33.current = true
-		v48("Settling")
-		v35.current = scrollingFrame.CanvasPosition.Y
+		v6()
+		ref10.current = true
+		v3("Settling")
+
+		ref12.current = scrollingFrame.CanvasPosition.Y
 		scrollingFrame:ResetScrollVelocity()
-		v32.current = RunService.Heartbeat:Connect(function(dt) -- line: 203
-			-- upvalues: scrollingFrame (copy), v33 (copy), v36 (copy), v44 (copy), v51 (copy), Constants (copy), snapMath (copy), v35 (copy), v34 (copy), n2 (copy), v27 (copy), v48 (copy)
-			local v108 = scrollingFrame
 
-			if not v108 or (not v33.current or v36.current or not v44.current) then
-				v51()
+		ref9.current = RunService.Heartbeat:Connect(function(dt)
+			local v7 = scrollingFrame
 
+			if not v7 or not ref10.current or ref13.current or not ref21.current then
+				v6()
 				return
 			end
 
-			v108:ResetScrollVelocity()
+			v7:ResetScrollVelocity()
 
-			local v109 = math.min(dt, Constants.MAX_SPRING_DELTA)
-			local v110, v111 = snapMath.advanceCriticalDampedSpring(v35.current, v34.current, n2, v109, v27.current)
+			local v8 = math.min(dt, Constants.MAX_SPRING_DELTA)
+			local current2, current3 = snapMath.advanceCriticalDampedSpring(
+				ref12.current,
+				ref11.current,
+				current,
+				v8,
+				ref5.current
+			)
 
-			v34.current = v111
-			v35.current = v110
-			v108.CanvasPosition = Vector2.new(0, v110)
+			ref11.current = current3
+			ref12.current = current2
+			v7.CanvasPosition = Vector2.new(0, current2)
+			local v9
 
-			if math.abs(n2 - v110) < Constants.POSITION_THRESHOLD and math.abs(v34.current) < Constants.VELOCITY_THRESHOLD then
-				v108.CanvasPosition = Vector2.new(0, n2)
-				v35.current = n2
-				v51()
-				v48("Idle")
+			if math.abs(current - current2) < Constants.POSITION_THRESHOLD then
+				v9 = math.abs(ref11.current) < Constants.VELOCITY_THRESHOLD
+			else
+				v9 = false
+			end
+
+			if v9 then
+				v7.CanvasPosition = Vector2.new(0, current)
+				ref12.current = current
+
+				v6()
+				v3("Idle")
 			end
 		end)
-	end, {
-		scrollingFrame,
-		v51,
-		v48
-	})
-	local v53 = React.useCallback(function(n3: number, n4: number) -- line: 244
-		-- upvalues: scrollingFrame (copy), v23 (copy), snapMath (copy), v40 (copy), v24 (copy), v25 (copy), v31 (copy), v51 (copy), v49 (copy), v48 (copy), v34 (copy), v52 (copy)
+	end, { scrollingFrame, v6, v3 })
+
+	local v8 = React.useCallback(function(p: number, current: number, flag: boolean?)
 		if not scrollingFrame then
 			return
 		end
 
-		local current = v23.current
-		local v74 = snapMath.clampIndex(n3, current.getCount(false))
+		local current2 = ref.current
+		local clampIndex = snapMath.clampIndex(p, current2.getCount(false))
+		local currentIndex = current2.getCurrentIndex(false)
+		local current3 = ref6.current
+		local onTargetCommitted
 
-		v40.current = v74
-		current.goToItem(v74)
-
-		if v24.current <= 0 then
-			return
+		if clampIndex == currentIndex or current3 == nil then
+			onTargetCommitted = nil
+		else
+			onTargetCommitted = current3.onTargetCommitted
 		end
 
-		local v75 = snapMath.offsetForIndex(v74, v25.current)
+		local onUserStep
 
-		if v31.current then
-			v51()
-			scrollingFrame.CanvasPosition = Vector2.new(0, v75)
-			v49(v74)
-			v48("Idle")
-
-			return
+		if flag and clampIndex ~= currentIndex and current3 ~= nil then
+			onUserStep = current3.onUserStep
+		else
+			onUserStep = nil
 		end
 
-		v34.current = n4
-		v52(v75)
-	end, {
-		scrollingFrame,
-		v52,
-		v51,
-		v48,
-		v49
-	})
-	local v54 = React.useCallback(function(n5: number) -- line: 276
-		-- upvalues: scrollingFrame (copy), v23 (copy), v24 (copy), v25 (copy), snapMath (copy), v26 (copy), v28 (copy), v53 (copy)
+		local function commitTarget() -- 3 equivalent calls inferred from this helper
+			if onTargetCommitted ~= nil then
+				onTargetCommitted(currentIndex, clampIndex, current2.getItems(false)[clampIndex])
+			end
+
+			if onUserStep ~= nil then
+				onUserStep(currentIndex, clampIndex)
+			end
+
+			current2.goToItem(clampIndex)
+		end
+
+		ref17.current = clampIndex
+
+		if ref2.current <= 0 then
+			commitTarget() -- inferred equivalent call
+		else
+			local offsetForIndex = snapMath.offsetForIndex(clampIndex, ref3.current)
+
+			if ref8.current then
+				commitTarget() -- inferred equivalent call
+				v6()
+				scrollingFrame.CanvasPosition = Vector2.new(0, offsetForIndex)
+
+				v4(clampIndex)
+				v3("Idle")
+			else
+				if onTargetCommitted ~= nil then
+					v3("Settling")
+				end
+
+				commitTarget() -- inferred equivalent call
+				ref11.current = current
+				v7(offsetForIndex)
+			end
+		end
+	end, { scrollingFrame, v7, v6, v3, v4 })
+
+	local v9 = React.useCallback(function(velocity: number)
 		if not scrollingFrame then
 			return
 		end
 
-		local v77 = v23.current.getCount(false)
-		local current = v24.current
+		local count = ref.current.getCount(false)
+		local current = ref2.current
 
-		if v77 <= 0 or current <= 0 then
+		if count <= 0 or current <= 0 then
 			return
 		end
 
-		local CanvasPositionY = scrollingFrame.CanvasPosition.Y
-		local current2 = v25.current
-		local v81 = snapMath.resolveSnapIndex(CanvasPositionY, n5, current2, v77, v26.current)
-		local current3 = v28.current
+		local y = scrollingFrame.CanvasPosition.Y
+		local current2 = ref3.current
+
+		local snapIndex = snapMath.resolveSnapIndex(y, velocity, current2, count, ref4.current)
+
+		local current3 = ref6.current
 
 		if current3 and current3.onSnap then
-			local v83 = snapMath.nearestIndexForOffset(CanvasPositionY, current2, v77)
-
+			local nearestIndexForOffset = snapMath.nearestIndexForOffset(y, current2, count)
 			current3.onSnap({
-				fromIndex = v83,
-				toIndex = v81,
-				velocity = n5
+				fromIndex = nearestIndexForOffset,
+				toIndex = snapIndex,
+				velocity = velocity
 			})
 		end
 
-		v53(v81, -n5)
-	end, {
-		scrollingFrame,
-		v53
-	})
-	local v55 = React.useCallback(function(n6: number) -- line: 304
-		-- upvalues: v53 (copy)
-		v53(n6, 0)
-	end, { v53 })
-	local v56 = React.useCallback(function() -- line: 308
-		-- upvalues: v53 (copy), v23 (copy)
-		v53(v23.current.getCurrentIndex(false) + 1, 0)
-	end, { v53 })
-	local v57 = React.useCallback(function() -- line: 312
-		-- upvalues: v53 (copy), v23 (copy)
-		v53(v23.current.getCurrentIndex(false) - 1, 0)
-	end, { v53 })
-	local v58 = React.useCallback(function(n7: number) -- line: 319
-		-- upvalues: v23 (copy), v45 (copy), snapMath (copy), v24 (copy), scrollingFrame (copy), v31 (copy), v40 (copy), v34 (copy), v52 (copy), v25 (copy)
-		local current = v23.current
+		v8(snapIndex, -velocity, true)
+	end, { scrollingFrame, v8 })
 
-		if v45.current ~= nil then
+	local scrollToIndex = React.useCallback(function(p: number)
+		v8(p, 0)
+	end, { v8 })
+
+	local nextNode = React.useCallback(function()
+		v8(ref.current.getCurrentIndex(false) + 1, 0, true)
+	end, { v8 })
+
+	local previous = React.useCallback(function()
+		v8(ref.current.getCurrentIndex(false) - 1, 0, true)
+	end, { v8 })
+
+	local removeItem = React.useCallback(function(current: number)
+		local current2 = ref.current
+
+		if ref22.current ~= nil then
 			return
 		end
 
-		local v87 = current.getCurrentIndex(false)
-		local v88 = current.getCount(false)
+		local currentIndex = current2.getCurrentIndex(false)
+		local count = current2.getCount(false)
 
-		if n7 ~= v87 then
-			current.removeItem(n7)
-
+		if current ~= currentIndex then
+			current2.removeItem(current)
 			return
 		end
 
-		if v88 <= 1 then
-			current.removeItem(n7)
-
+		if count <= 1 then
+			current2.removeItem(current)
 			return
 		end
 
-		local v89 = snapMath.neighborForRemoval(v87, v88)
-		local current4 = v24.current
+		local neighborForRemoval = snapMath.neighborForRemoval(currentIndex, count)
+		local current3 = ref2.current
 
-		if not scrollingFrame or current4 <= 0 or v31.current then
-			current.removeItem(n7)
-
+		if not scrollingFrame or current3 <= 0 or ref8.current then
+			current2.removeItem(current)
 			return
 		end
 
-		v40.current = v89
-		v34.current = 0
-		v52(snapMath.offsetForIndex(v89, v25.current))
-		v45.current = n7
-	end, {
-		scrollingFrame,
-		v52
-	})
+		ref17.current = neighborForRemoval
+		ref11.current = 0
 
-	React.useEffect(function() -- line: 361
-		-- upvalues: scrollingFrame (copy), v24 (copy), v23 (copy), v49 (copy), snapMath (copy), v25 (copy), v36 (copy), v33 (copy), active (copy), v42 (copy), v43 (copy), v44 (copy), v29 (copy), Constants (copy), GetFFlagMomentsDesktopWheelPaging (copy), v53 (copy)
-		local v91 = scrollingFrame
+		v7(snapMath.offsetForIndex(neighborForRemoval, ref3.current))
+		ref22.current = current
+	end, { scrollingFrame, v7 })
 
-		if not v91 then
+	React.useEffect(function()
+		local v10 = scrollingFrame
+
+		if not v10 then
 			return
 		end
 
-		local connection = v91:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 367
-			-- upvalues: v24 (copy), v23 (copy), v49 (copy), snapMath (copy), v91 (copy), v25 (copy), v36 (copy), v33 (copy), active (copy), v42 (copy), v43 (copy), v44 (copy), v29 (copy), Constants (copy), GetFFlagMomentsDesktopWheelPaging (copy), v53 (copy)
-			if v24.current <= 0 then
+		local canvasPositionChangedConnection = v10:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+			if ref2.current <= 0 then
 				return
 			end
 
-			local v112 = v23.current.getCount(false)
+			local count = ref.current.getCount(false)
+			v4(snapMath.nearestIndexForOffset(v10.CanvasPosition.Y, ref3.current, count))
 
-			v49(snapMath.nearestIndexForOffset(v91.CanvasPosition.Y, v25.current, v112))
-
-			if v36.current or v33.current or not active then
+			if ref13.current or ref10.current or not active then
 				return
 			end
 
-			v42.current = os.clock()
+			ref19.current = os.clock()
 
-			if v43.current then
+			if ref20.current then
 				return
 			end
 
-			v43.current = true
-
-			local function runSettle() -- line: 389
-				-- upvalues: v44 (copy), v36 (copy), v33 (copy), v29 (copy), v43 (copy), v42 (copy), Constants (copy), runSettle (copy), v24 (copy), v25 (copy), v91 (copy), v23 (copy), snapMath (copy), GetFFlagMomentsDesktopWheelPaging (copy), v53 (copy)
-				if not v44.current or (v36.current or v33.current or not v29.current) then
-					v43.current = false
-
+			ref20.current = true
+			local function runSettle()
+				if not ref21.current or ref13.current or ref10.current or not ref7.current then
+					ref20.current = false
 					return
 				end
 
-				if os.clock() - v42.current < Constants.SETTLE_DEBOUNCE_SECONDS then
+				if os.clock() - ref19.current < Constants.SETTLE_DEBOUNCE_SECONDS then
 					task.delay(Constants.SETTLE_DEBOUNCE_SECONDS, runSettle)
-
 					return
 				end
 
-				v43.current = false
+				ref20.current = false
 
-				if v24.current <= 0 then
+				if ref2.current <= 0 then
 					return
 				end
 
-				local current = v25.current
-				local CanvasPositionY = v91.CanvasPosition.Y
-				local v146 = v23.current.getCurrentIndex(false)
-				local v147 = snapMath.resolveSettleIndex(v146, CanvasPositionY, current, v23.current.getCount(false), Constants.WHEEL_PAGE_TURN_FRACTION, if not GetFFlagMomentsDesktopWheelPaging() then nil else 1)
+				local current = ref3.current
+				local y = v10.CanvasPosition.Y
+				local currentIndex = ref.current.getCurrentIndex(false)
+				local settleIndex = snapMath.resolveSettleIndex(
+					currentIndex,
+					y,
+					current,
+					ref.current.getCount(false),
+					Constants.WHEEL_PAGE_TURN_FRACTION,
+					1
+				)
 
-				if v147 ~= v146 or math.abs(CanvasPositionY - snapMath.offsetForIndex(v146, current)) > Constants.POSITION_THRESHOLD then
-					v53(v147, 0)
+				if
+					settleIndex ~= currentIndex
+					or math.abs(y - snapMath.offsetForIndex(currentIndex, current)) > Constants.POSITION_THRESHOLD
+				then
+					v8(settleIndex, 0, true)
 				end
 			end
 
 			task.delay(Constants.SETTLE_DEBOUNCE_SECONDS, runSettle)
 		end)
 
-		return function() -- line: 431
-			-- upvalues: connection (copy), v43 (copy)
-			connection:Disconnect()
-			v43.current = false
+		return function()
+			canvasPositionChangedConnection:Disconnect()
+			ref20.current = false
 		end
-	end, {
-		scrollingFrame,
-		active,
-		v49,
-		v53
-	})
-	React.useEffect(function() -- line: 442
-		-- upvalues: scrollingFrame (copy), active (copy), pagerNavigation (copy), GetFFlagMomentsFixNavButtonSnap (copy), nativeScrollEnabled (copy), v37 (copy), UserInputService (copy), v36 (copy), v38 (copy), v51 (copy), v48 (copy), Constants (copy), v54 (copy), GetFFlagMomentsDesktopWheelPaging (copy), v39 (copy), v53 (copy), v23 (copy), v57 (copy), v56 (copy)
-		local v93 = scrollingFrame
+	end, { scrollingFrame, active, v4, v8 })
 
-		if not v93 or not active then
+	React.useEffect(function()
+		local v10 = scrollingFrame
+
+		if not (v10 and active) then
 			return
 		end
 
-		local function isDragInput(p2) -- line: 448
-			return p2.UserInputType == Enum.UserInputType.Touch or p2.UserInputType == Enum.UserInputType.MouseButton1
+		local function isDragInput(p): boolean
+			return p.UserInputType == Enum.UserInputType.Touch or p.UserInputType == Enum.UserInputType.MouseButton1
 		end
 
-		local v95 = pagerNavigation.shouldTrackDrag(GetFFlagMomentsFixNavButtonSnap(), nativeScrollEnabled)
+		local shouldTrackDrag = pagerNavigation.shouldTrackDrag(true, nativeScrollEnabled)
 
-		v37.current = {}
+		ref14.current = {}
 
-		local function isWithinFrame(p3) -- line: 469
-			-- upvalues: v93 (copy)
-			local p3Position = p3.Position
-			local AbsolutePosition = v93.AbsolutePosition
-			local AbsoluteSize = v93.AbsoluteSize
-
-			return p3Position.X >= AbsolutePosition.X and (p3Position.X <= AbsolutePosition.X + AbsoluteSize.X and (p3Position.Y >= AbsolutePosition.Y and p3Position.Y <= AbsolutePosition.Y + AbsoluteSize.Y))
+		local function isWithinFrame(input): boolean -- 2 equivalent calls inferred from this helper
+			local position = input.Position
+			local absolutePosition = v10.AbsolutePosition
+			local absoluteSize = v10.AbsoluteSize
+			return position.X >= absolutePosition.X
+				and position.X <= absolutePosition.X + absoluteSize.X
+				and position.Y >= absolutePosition.Y
+				and position.Y <= absolutePosition.Y + absoluteSize.Y
 		end
 
-		local connection = UserInputService.InputBegan:Connect(function(input) -- line: 479
-			-- upvalues: v95 (copy), v37 (copy), v93 (copy), v36 (copy), v38 (copy), v51 (copy), v48 (copy)
-			if v95 and ((input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1) and not v37.current[input]) then
-				local inputPosition = input.Position
-				local AbsolutePosition = v93.AbsolutePosition
-				local AbsoluteSize = v93.AbsoluteSize
+		local inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
+			if
+				shouldTrackDrag
+				and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1)
+				and not ref14.current[input]
+				and isWithinFrame(input) -- inferred equivalent call
+			then
+				local v11 = next(ref14.current) == nil
+				ref14.current[input] = true
 
-				if inputPosition.X >= AbsolutePosition.X and (inputPosition.X <= AbsolutePosition.X + AbsoluteSize.X and (inputPosition.Y >= AbsolutePosition.Y and inputPosition.Y <= AbsolutePosition.Y + AbsoluteSize.Y)) then
-					local v123 = next(v37.current) == nil
-
-					v37.current[input] = true
-
-					if v123 then
-						v36.current = true
-						v38.current = v93.CanvasPosition.Y
-						v51()
-						v48("Dragging")
-					end
-
-					return
+				if v11 then
+					ref13.current = true
+					ref15.current = v10.CanvasPosition.Y
+					v6()
+					v3("Dragging")
 				end
 			end
 		end)
-		local connection2 = UserInputService.InputEnded:Connect(function(input) -- line: 498
-			-- upvalues: v37 (copy), v36 (copy), v93 (copy), v38 (copy), Constants (copy), v48 (copy), v54 (copy)
-			if not v37.current[input] then
+
+		local inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
+			if not ref14.current[input] then
 				return
 			end
 
-			v37.current[input] = nil
+			ref14.current[input] = nil
 
-			if next(v37.current) ~= nil then
+			if next(ref14.current) ~= nil then
 				return
 			end
 
-			v36.current = false
+			ref13.current = false
 
-			local Y = v93:GetScrollVelocity().Y
+			local y = v10:GetScrollVelocity().Y
 
-			if not (math.abs(v93.CanvasPosition.Y - v38.current) > Constants.POSITION_THRESHOLD) and math.abs(Y) < Constants.VELOCITY_THRESHOLD then
-				v48("Idle")
-
-				return
+			if
+				math.abs(v10.CanvasPosition.Y - ref15.current) > Constants.POSITION_THRESHOLD
+				or not (math.abs(y) < Constants.VELOCITY_THRESHOLD)
+			then
+				v9(y)
+			else
+				v3("Idle")
 			end
-
-			v54(Y)
 		end)
-		local connection3 = nil
-		local connection4 = nil
-		local connection5 = nil
 
-		if GetFFlagMomentsDesktopWheelPaging() then
-			local function onWheel(n8: number) -- line: 532
-				-- upvalues: pagerNavigation (copy), v39 (copy), Constants (copy), v53 (copy), v23 (copy)
-				local v127, v128 = pagerNavigation.resolveWheelGesture(os.clock(), v39.current, Constants.WHEEL_COOLDOWN_SECONDS)
+		local function onWheel(p: number) -- 2 equivalent calls inferred from this helper
+			local wheelGesture, current = pagerNavigation.resolveWheelGesture(
+				os.clock(),
+				ref16.current,
+				Constants.WHEEL_COOLDOWN_SECONDS
+			)
 
-				v39.current = v128
+			ref16.current = current
 
-				if v127 then
-					v53(v23.current.getCurrentIndex(false) + n8, 0)
-				end
+			if wheelGesture then
+				v8(ref.current.getCurrentIndex(false) + p, 0, true)
 			end
+		end
 
-			if not nativeScrollEnabled then
-				connection3 = UserInputService.InputChanged:Connect(function(input) -- line: 552
-					-- upvalues: v93 (copy), pagerNavigation (copy), v39 (copy), Constants (copy), v53 (copy), v23 (copy)
-					if input.UserInputType == Enum.UserInputType.MouseWheel then
-						local inputPosition = input.Position
-						local AbsolutePosition = v93.AbsolutePosition
-						local AbsoluteSize = v93.AbsoluteSize
+		local inputChangedConnection
 
-						if inputPosition.X >= AbsolutePosition.X and (inputPosition.X <= AbsolutePosition.X + AbsoluteSize.X and (inputPosition.Y >= AbsolutePosition.Y and inputPosition.Y <= AbsolutePosition.Y + AbsoluteSize.Y)) then
-							local PositionZ = input.Position.Z
-
-							if PositionZ > 0 then
-								local v134, v135 = pagerNavigation.resolveWheelGesture(os.clock(), v39.current, Constants.WHEEL_COOLDOWN_SECONDS)
-
-								v39.current = v135
-
-								if v134 then
-									v53(v23.current.getCurrentIndex(false) + -1, 0)
-
-									return
-								end
-							elseif PositionZ < 0 then
-								local v136, v137 = pagerNavigation.resolveWheelGesture(os.clock(), v39.current, Constants.WHEEL_COOLDOWN_SECONDS)
-
-								v39.current = v137
-
-								if v136 then
-									v53(v23.current.getCurrentIndex(false) + 1, 0)
-								end
-							end
-
-							return
-						end
-					end
-				end)
-			end
+		if nativeScrollEnabled then
+			inputChangedConnection = nil
 		else
-			local function onWheel(p4: ((...any) -> ...any)) -- line: 571
-				-- upvalues: v39 (copy), Constants (copy)
-				local elapsed = os.clock()
+			inputChangedConnection = UserInputService.InputChanged:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseWheel and isWithinFrame(input) then -- inferred equivalent call
+					local z = input.Position.Z
 
-				if elapsed - v39.current < Constants.WHEEL_COOLDOWN_SECONDS then
-					return
+					if z > 0 then
+						onWheel(-1) -- inferred equivalent call
+					elseif z < 0 then
+						onWheel(1) -- inferred equivalent call
+					end
 				end
-
-				v39.current = elapsed
-				p4()
-			end
-
-			connection4 = v93.MouseWheelForward:Connect(function() -- line: 580
-				-- upvalues: v57 (copy), v39 (copy), Constants (copy)
-				local v140 = v57
-				local elapsed = os.clock()
-
-				if elapsed - v39.current < Constants.WHEEL_COOLDOWN_SECONDS then
-					return
-				end
-
-				v39.current = elapsed
-				v140()
-			end)
-			connection5 = v93.MouseWheelBackward:Connect(function() -- line: 583
-				-- upvalues: v56 (copy), v39 (copy), Constants (copy)
-				local v142 = v56
-				local elapsed = os.clock()
-
-				if elapsed - v39.current < Constants.WHEEL_COOLDOWN_SECONDS then
-					return
-				end
-
-				v39.current = elapsed
-				v142()
 			end)
 		end
 
-		return function() -- line: 588
-			-- upvalues: connection (copy), connection2 (copy), connection3 (ref), connection4 (ref), connection5 (ref)
-			connection:Disconnect()
-			connection2:Disconnect()
+		return function()
+			inputBeganConnection:Disconnect()
+			inputEndedConnection:Disconnect()
 
-			if connection3 then
-				connection3:Disconnect()
-			end
-
-			if connection4 then
-				connection4:Disconnect()
-			end
-
-			if connection5 then
-				connection5:Disconnect()
+			if inputChangedConnection then
+				inputChangedConnection:Disconnect()
 			end
 		end
 	end, {
 		scrollingFrame,
 		active,
 		nativeScrollEnabled,
-		v51,
-		v48,
-		v54,
-		v53,
-		v56,
-		v57
+		v6,
+		v3,
+		v9,
+		v8,
+		nextNode,
+		previous
 	})
 
-	local v59 = SignalsReact.useSignalState(store.getCount)
-	local v60 = SignalsReact.useSignalState(store.getCurrentIndex)
+	local v10 = SignalsReact.useSignalState(store.getCount)
+	local v11 = SignalsReact.useSignalState(store.getCurrentIndex)
 
-	React.useEffect(function() -- line: 622
-		-- upvalues: scrollingFrame (copy), itemHeight (copy), gap (copy), v41 (copy), snapMath (copy), v60 (copy), v59 (copy), v40 (copy), v51 (copy), v49 (copy), v48 (copy)
-		local v104 = scrollingFrame
-		local v105 = itemHeight + gap
+	React.useEffect(function()
+		local v12 = scrollingFrame
+		local current = itemHeight + gap
 
-		if not v104 or itemHeight <= 0 then
-			v41.current = v105
-
+		if not v12 or itemHeight <= 0 then
+			ref18.current = current
 			return
 		end
 
-		local v106 = snapMath.clampIndex(v60, v59)
+		local clampIndex = snapMath.clampIndex(v11, v10)
 
-		if v105 ~= v41.current or v106 ~= v40.current then
-			v51()
-			v104.CanvasPosition = Vector2.new(0, snapMath.offsetForIndex(v106, v105))
-			v40.current = v106
-			v49(v106)
-			v48("Idle")
+		if current ~= ref18.current or clampIndex ~= ref17.current then
+			v6()
+			v12.CanvasPosition = Vector2.new(0, snapMath.offsetForIndex(clampIndex, current))
+			ref17.current = clampIndex
+
+			v4(clampIndex)
+
+			v3("Idle")
 		end
 
-		v41.current = v105
-	end, {
-		scrollingFrame,
-		v59,
-		v60,
-		itemHeight,
-		gap,
-		v51,
-		v49,
-		v48
-	})
-	React.useEffect(function() -- line: 662
-		-- upvalues: active (copy), v51 (copy), v48 (copy)
+		ref18.current = current
+	end, { scrollingFrame, v10, v11, itemHeight, gap, v6, v4, v3 })
+
+	React.useEffect(function()
 		if not active then
-			v51()
-			v48("Idle")
+			v6()
+			v3("Idle")
 		end
-	end, {
-		active,
-		v51,
-		v48
-	})
-	React.useEffect(function() -- line: 671
-		-- upvalues: v44 (copy), v51 (copy)
-		v44.current = true
+	end, { active, v6, v3 })
 
-		return function() -- line: 673
-			-- upvalues: v44 (copy), v51 (copy)
-			v44.current = false
-			v51()
+	React.useEffect(function()
+		ref21.current = true
+		return function()
+			ref21.current = false
+			v6()
 		end
-	end, { v51 })
+	end, { v6 })
 
-	return React.useMemo(function() -- line: 680
-		-- upvalues: v46 (copy), v47 (copy), v55 (copy), v56 (copy), v57 (copy), v58 (copy)
+	return React.useMemo(function()
 		return {
-			getActiveIndex = v46.get,
-			getScrollState = v47.get,
-			scrollToIndex = v55,
-			next = v56,
-			previous = v57,
-			removeItem = v58
+			getActiveIndex = v.get,
+			getScrollState = v2.get,
+			scrollToIndex = scrollToIndex,
+			next = nextNode,
+			previous = previous,
+			removeItem = removeItem
 		}
-	end, {
-		v46,
-		v47,
-		v55,
-		v56,
-		v57,
-		v58
-	})
+	end, { v, v2, scrollToIndex, nextNode, previous, removeItem })
 end
 
 return usePagerController

@@ -1,65 +1,77 @@
-local ParentParent = script.Parent.Parent
-local instanceof = require(ParentParent.LuauPolyfill).instanceof
-local Headers = require(script.Parent.Headers).Headers
-local Body = require(script.Parent.Body).Body
-local AbortSignal = require(script.Parent.AbortSignal).AbortSignal
-local self = setmetatable({}, {
-	__index = Body
-})
+local parent = script.Parent.Parent
 
-self.__index = self
+local LuauPolyfill = require(parent.LuauPolyfill)
+local instanceof = LuauPolyfill.instanceof
 
-function self.new(p1, t1: {[any]: any}?) -- line: 92
-	-- upvalues: instanceof (copy), self (copy), Body (copy), Headers (copy), AbortSignal (copy)
-	local v9 = t1 or {}
-	local v10 = nil
-	local t2 = nil
+local Headers = require(script.Parent.Headers)
+local headers = Headers.Headers
 
-	if type(p1) == "string" then
-		v10 = p1
-		t2 = {}
-	elseif instanceof(p1, self) then
-		v10 = p1.url
-		t2 = p1
+local Body = require(script.Parent.Body)
+local body = Body.Body
+
+local AbortSignal = require(script.Parent.AbortSignal)
+local abortSignal = AbortSignal.AbortSignal
+
+local object = setmetatable({}, { __index = body })
+object.__index = object
+
+function object.new(value, options)
+	local v = options or {}
+	local url = nil
+	local v2 = nil
+
+	if type(value) == "string" then
+		url = value
+		v2 = {}
+	elseif instanceof(value, object) then
+		url = value.url
+		v2 = value
 	else
 		error("The first argument of Request.new() must be a string or Request object")
 	end
 
-	local v12 = if v9.body or not instanceof(p1, self) then nil else p1.body
-	local v13 = setmetatable(Body.new(v9.body or v12), self)
+	local body2
 
-	v13.method = v9.method or (t2.method or "GET")
-
-	if (v9.body or v12) and (v13.method == "GET" or v13.method == "HEAD") then
-		error(string.format("'body' should not be provided as an option for request method %s", v13.method))
+	if not (v.body or not instanceof(value, object)) then
+		body2 = value.body
 	end
 
-	v13.url = v10
+	local object2 = setmetatable(body.new(v.body or body2), object)
 
-	local v14 = t2.headers or Headers.new()
+	object2.method = v.method or v2.method or "GET"
 
-	v13.headers = if not v9.headers then v14 else Headers.new(v9.headers)
-	v13.cache = v9.cache or (t2.cache or Enum.HttpCachePolicy.None)
-	v13.signal = v9.signal or (t2.signal or AbortSignal.abort("Request Cancelled"))
-	v13.destination = "document"
-	v13.referrer = "client"
-	v13.referrerPolicy = "no-referrer"
-	v13.mode = v9.mode or "cors"
-	v13.credentials = v9.credentials or (t2.credentials or "omit")
-	v13.redirect = v9.redirect or (t2.redirect or "error")
-	v13.integrity = v9.integrity or (t2.integrity or "")
-	v13.keepalive = v9.keepalive or (t2.keepalive or false)
-	v13.isReloadNavigation = false
-	v13.isHistoryNavigation = false
-	v13.duplex = v9.duplex or (t2.duplex or "half")
+	if (v.body or body2) and (object2.method == "GET" or object2.method == "HEAD") then
+		error(string.format("'body' should not be provided as an option for request method %s", object2.method))
+	end
 
-	return v13
+	object2.url = url
+	local headers2 = v2.headers or headers.new()
+
+	if v.headers then
+		headers2 = headers.new(v.headers)
+	end
+
+	object2.headers = headers2
+	object2.cache = v.cache or v2.cache or Enum.HttpCachePolicy.None
+	object2.signal = v.signal or v2.signal or abortSignal.abort("Request Cancelled")
+
+	object2.destination = "document"
+	object2.referrer = "client"
+	object2.referrerPolicy = "no-referrer"
+	object2.mode = v.mode or "cors"
+	object2.credentials = v.credentials or v2.credentials or "omit"
+	object2.redirect = v.redirect or v2.redirect or "error"
+	object2.integrity = v.integrity or v2.integrity or ""
+	object2.keepalive = v.keepalive or v2.keepalive or false
+	object2.isReloadNavigation = false
+	object2.isHistoryNavigation = false
+	object2.duplex = v.duplex or v2.duplex or "half"
+
+	return object2
 end
-function self.clone(p2) -- line: 137
-	-- upvalues: self (copy)
-	return self.new(p2)
+
+function object.clone(p)
+	return object.new(p)
 end
 
-return {
-	Request = self
-}
+return { Request = object }

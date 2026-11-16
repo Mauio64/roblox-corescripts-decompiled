@@ -1,23 +1,24 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local FStringAXBackendDrivenCatalogLayersNames = require(Parent.AvatarExperienceFlags).FStringAXBackendDrivenCatalogLayersNames
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FStringAXBackendDrivenCatalogLayersNames = AvatarExperienceFlags.FStringAXBackendDrivenCatalogLayersNames
 
-return function() -- line: 6
-	-- upvalues: FStringAXBackendDrivenCatalogLayersNames (copy)
-	local v3 = FStringAXBackendDrivenCatalogLayersNames()
+return function()
+	local fStringAXBackendDrivenCatalogLayersNames = FStringAXBackendDrivenCatalogLayersNames()
 
-	if not v3 or v3 == "" then
+	if not fStringAXBackendDrivenCatalogLayersNames or fStringAXBackendDrivenCatalogLayersNames == "" then
 		return nil
 	end
 
-	local t1 = {}
+	local v = string.split(fStringAXBackendDrivenCatalogLayersNames, ",")
+	local v2 = {}
 
-	for _, v6 in (string.split(v3, ",")) do
-		local v7 = string.gsub(v6, "^%s*(.-)%s*$", "%1")
+	for _, v3 in v do
+		local v4 = string.gsub(v3, "^%s*(.-)%s*$", "%1")
 
-		if v7 ~= "" and string.len(v7) <= 200 then
-			table.insert(t1, v7)
+		if v4 ~= "" and string.len(v4) <= 200 then
+			table.insert(v2, v4)
 		end
 	end
 
-	return #t1 > 0 and t1 or nil
+	return #v2 > 0 and v2 or nil
 end

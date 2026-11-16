@@ -1,5 +1,1 @@
-return {
-	Idle = "Idle",
-	Initializing = "Initializing",
-	Active = "Active"
-}
+return { Idle = "Idle", Initializing = "Initializing", Active = "Active" }

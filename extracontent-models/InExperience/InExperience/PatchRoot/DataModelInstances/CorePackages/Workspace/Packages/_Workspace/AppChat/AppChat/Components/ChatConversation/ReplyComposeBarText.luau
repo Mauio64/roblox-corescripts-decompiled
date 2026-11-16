@@ -1,32 +1,29 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
-local Foundation = require(Parent.Foundation)
-local View = Foundation.View
-local FoundationText = Foundation.Text
-local t1 = {
-	layoutOrder = 2,
-	userText = "",
-	contentText = ""
-}
+local parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
 
-function ReplyComposeBarText(t2: {[any]: any}) -- line: 22
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), View (copy), FoundationText (copy)
-	local v9 = Cryo.Dictionary.union(t1, t2)
+local View = Foundation.View
+local Text = Foundation.Text
+
+local v = { layoutOrder = 2, userText = "", contentText = "" }
+
+function ReplyComposeBarText(p)
+	local union = Cryo.Dictionary.union(v, p)
 
 	return React.createElement(View, {
 		tag = "col fill auto-y align-x-left clip",
-		LayoutOrder = v9.layoutOrder
+		LayoutOrder = union.layoutOrder
 	}, {
-		UserReplyingTo = React.createElement(FoundationText, {
+		UserReplyingTo = React.createElement(Text, {
 			tag = "text-caption-medium content-muted text-truncate-end text-align-x-left auto-xy",
-			LayoutOrder = 1,
-			Text = v9.userText
+			Text = union.userText,
+			LayoutOrder = 1
 		}),
-		ContentReplyingTo = React.createElement(FoundationText, {
+		ContentReplyingTo = React.createElement(Text, {
 			tag = "text-body-medium content-emphasis text-truncate-end text-align-x-left auto-xy",
-			LayoutOrder = 2,
-			Text = v9.contentText
+			Text = union.contentText,
+			LayoutOrder = 2
 		})
 	})
 end

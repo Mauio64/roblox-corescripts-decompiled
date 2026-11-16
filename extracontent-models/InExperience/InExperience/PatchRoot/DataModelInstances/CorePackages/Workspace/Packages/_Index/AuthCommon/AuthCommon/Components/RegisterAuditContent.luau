@@ -1,63 +1,63 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local useMemo = require(AuthCommonParent.React).useMemo
-local useCapturedAuditContent = require(AuthCommon.Stores.AuditContentContext.AuditContentContext).useCapturedAuditContent
+local parent = AuthCommon.Parent
+
+local React = require(parent.React)
+
+local useMemo = React.useMemo
+
+local AuditContentContext = require(AuthCommon.Stores.AuditContentContext.AuditContentContext)
+local useCapturedAuditContent = AuditContentContext.useCapturedAuditContent
+
 local GetFFlagEnableAuditSystem = require(AuthCommon.Flags.GetFFlagEnableAuditSystem)
 
-local function parseTranslationKey(s1: string) -- line: 45
-	if not s1 or s1 == "" then
+local function parseTranslationKey(translationKey: string)
+	if not translationKey or translationKey == "" then
 		return "", ""
 	end
 
-	local parts = string.split(s1, ".")
+	local v = string.split(translationKey, ".")
 
-	if #parts >= 3 then
-		local v10 = parts[1] .. "." .. parts[2]
-		local t1 = {}
-
-		for i = 3, #parts do
-			table.insert(t1, parts[i])
-		end
-
-		return v10, (table.concat(t1, "."))
+	if not (#v >= 3) then
+		return "", translationKey
 	end
 
-	return "", s1
+	local v2 = v[1] .. "." .. v[2]
+	local v3 = {}
+
+	for i = 3, #v do
+		table.insert(v3, v[i])
+	end
+
+	return v2, (table.concat(v3, "."))
 end
-local function RegisterAuditContent(t2: {[any]: any}) -- line: 70
-	-- upvalues: GetFFlagEnableAuditSystem (copy), useMemo (copy), parseTranslationKey (copy), useCapturedAuditContent (copy)
+
+local function RegisterAuditContent(data): nil
 	if not GetFFlagEnableAuditSystem() then
 		return nil
 	end
 
-	local translationKey = t2.translationKey
-	local translatedSourceString = t2.translatedSourceString
-	local parameters = t2.parameters
-	local v17 = useMemo(function() -- line: 79
-		-- upvalues: translationKey (copy), translatedSourceString (copy), parseTranslationKey (copy), parameters (copy)
-		if not translationKey or not translatedSourceString then
+	local translationKey = data.translationKey
+	local translatedSourceString = data.translatedSourceString
+	local parameters = data.parameters
+
+	useCapturedAuditContent(translationKey, (useMemo(function()
+		if not (translationKey and translatedSourceString) then
 			return nil
 		end
 
-		local v18, v19 = parseTranslationKey(translationKey)
+		local translationNamespace, translationKey2 = parseTranslationKey(translationKey)
 
-		if v18 == "" then
+		if translationNamespace == "" then
 			return nil
 		end
 
 		return {
-			translationKey = v19,
-			translationNamespace = v18,
+			translationKey = translationKey2,
+			translationNamespace = translationNamespace,
 			translatedSourceString = translatedSourceString,
 			parameters = parameters
 		}
-	end, {
-		translationKey,
-		translatedSourceString,
-		parameters
-	})
-
-	useCapturedAuditContent(translationKey, v17)
+	end, { translationKey, translatedSourceString, parameters })))
 
 	return nil
 end

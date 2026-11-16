@@ -1,1 +1,3 @@
-return (require(script.AccordionItem))
+local AccordionItem = require(script.AccordionItem)
+
+return AccordionItem

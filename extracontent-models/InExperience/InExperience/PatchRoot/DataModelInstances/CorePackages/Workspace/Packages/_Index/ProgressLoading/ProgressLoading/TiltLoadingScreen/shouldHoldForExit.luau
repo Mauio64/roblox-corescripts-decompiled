@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("ProgressLoading").Parent
-local FFlagTiltLoadingScreenEnterExitHold = require(Parent.SharedFlags).FFlagTiltLoadingScreenEnterExitHold
+local parent = script:FindFirstAncestor("ProgressLoading").Parent
 
-local function shouldHoldForExit(b1: boolean, b2: boolean) -- line: 6
-	-- upvalues: FFlagTiltLoadingScreenEnterExitHold (copy)
-	return FFlagTiltLoadingScreenEnterExitHold and (not b1 and not b2)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagTiltLoadingScreenEnterExitHold = SharedFlags.FFlagTiltLoadingScreenEnterExitHold
+
+local function shouldHoldForExit(flag: boolean)
+	return FFlagTiltLoadingScreenEnterExitHold and not flag
 end
 
 return shouldHoldForExit

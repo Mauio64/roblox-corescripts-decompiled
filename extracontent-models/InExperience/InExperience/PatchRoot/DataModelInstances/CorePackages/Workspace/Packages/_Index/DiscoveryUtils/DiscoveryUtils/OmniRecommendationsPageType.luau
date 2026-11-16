@@ -1,25 +1,25 @@
-local Parent = script:FindFirstAncestor("DiscoveryUtils").Parent
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local t1 = {
-	PAGE_TYPE_HOME = "Home"
-}
+local parent = script:FindFirstAncestor("DiscoveryUtils").Parent
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 
-return {
-	toAppPage = function(s1: string) -- line: 9
-		-- upvalues: t1 (copy), AppPage (copy)
-		if s1 == t1.PAGE_TYPE_HOME then
-			return AppPage.Home
-		end
+local omniRecommendationsPageType = { PAGE_TYPE_HOME = "Home" }
+local OmniRecommendationsPageType = {}
 
-		return nil
-	end,
-	fromAppPage = function(s2: string) -- line: 16
-		-- upvalues: AppPage (copy), t1 (copy)
-		if s2 == AppPage.Home then
-			return t1.PAGE_TYPE_HOME
-		end
+function OmniRecommendationsPageType.toAppPage(p: string)
+	if p == omniRecommendationsPageType.PAGE_TYPE_HOME then
+		return AppPage.Home
+	end
 
-		return nil
-	end,
-	OmniRecommendationsPageType = t1
-}
+	return nil
+end
+
+function OmniRecommendationsPageType.fromAppPage(p: string)
+	if p == AppPage.Home then
+		return omniRecommendationsPageType.PAGE_TYPE_HOME
+	end
+
+	return nil
+end
+
+OmniRecommendationsPageType.OmniRecommendationsPageType = omniRecommendationsPageType
+return OmniRecommendationsPageType

@@ -1,59 +1,46 @@
 local TelemetryService = game:GetService("TelemetryService")
-local t1 = {
+
+local standardizedFields = {
 	"addPlaceId",
 	"addUniverseId",
 	"addSessionId",
 	"addOSInfo",
 	"addSessionInfo"
 }
-local t2 = {
-	"addPlaceId",
-	"addUniverseId",
-	"addOSInfo"
-}
-local t3 = {
+local standardizedFields2 = { "addPlaceId", "addUniverseId", "addOSInfo" }
+
+local v = {
 	eventName = "InExperienceClickoutToggled",
-	description = "        This is fired when the in-experience clickout webview is opened or closed.\n\t\thttps://github.rbx.com/Roblox/proto-schemas/pull/9488\n    ",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("InExperienceClickoutToggledTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		26,
-		1,
-		28
-	}
+	lastUpdated = { 26, 1, 28 },
+	description = [[
+        This is fired when the in-experience clickout webview is opened or closed.
+		https://github.rbx.com/Roblox/proto-schemas/pull/9488
+    ]]
 }
-local t4 = {
+
+local v2 = {
 	eventName = "InExperienceClickoutToggledCounter",
-	description = "\t\tCounter for InExperienceClickoutToggled events.\n\t",
 	backends = { "RobloxTelemetryCounter" },
-	lastUpdated = {
-		26,
-		1,
-		28
-	}
+	lastUpdated = { 26, 1, 28 },
+	description = "\t\tCounter for InExperienceClickoutToggled events.\n\t"
 }
 
 return {
-	logWebviewToggled = function(b1: boolean, s1: string, s2: string) -- line: 33
-		-- upvalues: TelemetryService (copy), t3 (copy), t1 (copy), t4 (copy), t2 (copy)
-		local t5 = {
-			is_opened = tostring(b1),
-			flow_id = s1,
-			target_url = s2
-		}
-
-		TelemetryService:LogEvent(t3, {
-			standardizedFields = t1,
-			customFields = t5
-		})
-		TelemetryService:LogCounter(t4, {
-			standardizedFields = t2,
+	logWebviewToggled = function(flag: boolean, flow_id: string, target_url: string)
+		TelemetryService:LogEvent(v, {
+			standardizedFields = standardizedFields,
 			customFields = {
-				is_opened = tostring(b1)
+				is_opened = tostring(flag),
+				flow_id = flow_id,
+				target_url = target_url
 			}
+		})
+
+		TelemetryService:LogCounter(v2, {
+			standardizedFields = standardizedFields2,
+			customFields = { is_opened = tostring(flag) }
 		}, 1)
 	end
 }

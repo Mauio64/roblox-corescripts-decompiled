@@ -1,3 +1,1 @@
-return {
-	CONTENT_HEIGHT = 48
-}
+return { CONTENT_HEIGHT = 48 }

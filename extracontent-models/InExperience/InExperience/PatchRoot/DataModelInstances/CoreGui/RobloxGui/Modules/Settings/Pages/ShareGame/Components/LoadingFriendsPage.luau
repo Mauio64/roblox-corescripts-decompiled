@@ -1,55 +1,53 @@
 local CorePackages = game:GetService("CorePackages")
 
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
+local AppBlox = require(CorePackages.Workspace.Packages.AppBlox)
+local LoadingBar = AppBlox.LoadingBar
 
-local LoadingBar = require(CorePackages.Workspace.Packages.AppBlox).LoadingBar
 local Roact = require(CorePackages.Packages.Roact)
-local v4 = Roact.PureComponent:extend("LoadingFriendsPage")
 
-function v4.render(p1) -- line: 14
-	-- upvalues: Roact (copy), LoadingBar (copy)
-	local propsLayoutOrder = p1.props.LayoutOrder
-	local propsZIndex = p1.props.ZIndex
-	local n1 = 0
+local extended = Roact.PureComponent:extend("LoadingFriendsPage")
 
-	local function incrementLayoutOrder() -- line: 20
-		-- upvalues: n1 (ref)
-		n1 += 1
+function extended.render(p)
+	local layoutOrder = p.props.LayoutOrder
+	local zIndex = p.props.ZIndex
 
-		return n1
+	local count = 0
+	local function incrementLayoutOrder() -- 1 equivalent call inferred from this helper
+		count += 1
+		return count
 	end
 
-	local createElement = Roact.createElement
-	local t1 = {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		LayoutOrder = propsLayoutOrder,
-		ZIndex = propsZIndex
-	}
-	local t2 = {
-		listLayout = Roact.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		})
-	}
-	local createElement2 = Roact.createElement
-	local t3 = {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, 70, 0, 16)
-	}
-
-	n1 += 1
-	t3.LayoutOrder = n1
-	t3.ZIndex = propsZIndex
-	t2.loadingIndicator = createElement2("Frame", t3, {
-		loadingBar = Roact.createElement(LoadingBar, {
-			ZIndex = propsZIndex
-		})
-	})
-
-	return createElement("Frame", t1, t2)
+	return Roact.createElement(
+		"Frame",
+		{
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			LayoutOrder = layoutOrder,
+			ZIndex = zIndex
+		},
+		{
+			listLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			loadingIndicator = Roact.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, 70, 0, 16),
+					LayoutOrder = incrementLayoutOrder(), -- inferred equivalent call
+					ZIndex = zIndex
+				},
+				{
+					loadingBar = Roact.createElement(LoadingBar, { ZIndex = zIndex })
+				}
+			)
+		}
+	)
 end
 
-return v4
+return extended

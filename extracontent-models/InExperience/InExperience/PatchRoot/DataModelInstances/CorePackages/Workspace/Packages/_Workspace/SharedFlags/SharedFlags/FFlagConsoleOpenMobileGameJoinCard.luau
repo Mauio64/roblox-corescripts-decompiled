@@ -1,0 +1,6 @@
+local FFlagEnableMobileGameJoinCard = require(script.Parent.FFlagEnableMobileGameJoinCard)
+local FFlagMobileGameJoinCardGamepadSupport = require(script.Parent.FFlagMobileGameJoinCardGamepadSupport)
+
+return game:DefineFastFlag("ConsoleOpenMobileGameJoinCard", false)
+	and FFlagEnableMobileGameJoinCard
+	and FFlagMobileGameJoinCardGamepadSupport

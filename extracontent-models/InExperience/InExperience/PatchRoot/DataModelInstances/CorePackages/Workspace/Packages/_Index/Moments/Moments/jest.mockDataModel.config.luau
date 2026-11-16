@@ -1,10 +1,11 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "Moments-MockDataModel",
+	testMatch = { "**/Analytics/**/*.test", "**/Upload/postLifecycleSubscription.test" },
 	mockDataModel = true,
-	testMatch = { "**/Analytics/**/*.test" },
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.LogHandler,
 		JestConfigs.setupFiles.UIBloxInitializer,

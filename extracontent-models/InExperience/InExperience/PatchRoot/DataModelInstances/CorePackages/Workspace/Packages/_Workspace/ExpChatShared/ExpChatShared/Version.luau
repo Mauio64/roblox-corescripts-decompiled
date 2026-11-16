@@ -1,4 +1,1 @@
-return {
-	"4.3.2",
-	"lua-apps"
-}
+return { "4.3.2", "lua-apps" }

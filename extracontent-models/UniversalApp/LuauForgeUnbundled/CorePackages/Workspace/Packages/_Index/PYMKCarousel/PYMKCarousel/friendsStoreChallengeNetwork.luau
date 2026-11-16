@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/PYMKCarousel/GenericChallenges").Middleware.ChallengeRequestWrapper(require("@game/CorePackages/Workspace/Packages/_Workspace/PYMKCarousel/DataHydration").Friends.httpRequest)

@@ -2,148 +2,211 @@ local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
 local LocalizationService = game:GetService("LocalizationService")
 local UserInputService = game:GetService("UserInputService")
-
 CoreGui:WaitForChild("RobloxGui")
 
 local ReactUtils = require(CorePackages.Packages.ReactUtils)
 local React = require(CorePackages.Packages.React)
-
 require(CorePackages.Packages.UIBlox)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
-local FFlagEnableConsoleExpControls = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local useEventConnection = ReactUtils.useEventConnection
-local GetTextSize = require(CorePackages.Workspace.Packages.Style).GetTextSize
-local useDesignTokens = require(CorePackages.Workspace.Packages.Style).useDesignTokens
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Chrome = ParentParent.Parent.Chrome
-local v13 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
-local v14 = if not not FFlagEnableConsoleExpControls and not v13 then nil else require(ParentParent.Components.GamepadConnector)
-local useObservableValue = require(Chrome.ChromeShared.Hooks.useObservableValue)
-local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local Style = require(CorePackages.Workspace.Packages.Style)
+local GetTextSize = Style.GetTextSize
+local Style2 = require(CorePackages.Workspace.Packages.Style)
+local useDesignTokens = Style2.useDesignTokens
+local parent = script.Parent.Parent.Parent.Parent
+local chrome = parent.Parent.Chrome
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local enabled = Chrome.Enabled()
+local GamepadConnector
+
+if FFlagEnableConsoleExpControls and not enabled then
+	GamepadConnector = nil
+else
+	GamepadConnector = require(parent.Components.GamepadConnector)
+end
+
+local useObservableValue = require(chrome.ChromeShared.Hooks.useObservableValue)
+
+local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+
 local FFlagLocalizeMenuNavigationToggleDialog = require(CoreGui.RobloxGui.Modules.TopBar.Flags.FFlagLocalizeMenuNavigationToggleDialog)
 
-local function MenuNavigationToggleDialog(t1: {[any]: any}) -- line: 41
-	-- upvalues: useDesignTokens (copy), FFlagLocalizeMenuNavigationToggleDialog (copy), UserInputService (copy), React (copy), LocalizationService (copy), useEventConnection (copy), Localization (copy), GetTextSize (copy), v13 (copy), FFlagEnableConsoleExpControls (copy), useObservableValue (copy), v14 (copy)
-	local v20 = useDesignTokens()
-	local CaptionMedium = v20.Typography.CaptionMedium
-	local Size_400 = v20.Size.Size_400
-	local Size_150 = v20.Size.Size_150
-	local Medium = v20.Radius.Medium
-	local Size_600 = v20.Size.Size_600
-	local OverMedia_0 = v20.Color.OverMedia.OverMedia_0
-	local EmphasisColor3 = v20.Color.Content.Emphasis.Color3
-	local Size_100 = v20.Size.Size_100
-	local v29 = (not FFlagLocalizeMenuNavigationToggleDialog or not game:GetEngineFeature("GetImageForKeyCode")) and "rbxasset://textures/ui/Controls/DesignSystem/ButtonSelect@2x.png" or UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
-	local u34, u35
+local function MenuNavigationToggleDialog(p)
+	local v = useDesignTokens()
+	local captionMedium = v.Typography.CaptionMedium
+	local size_400 = v.Size.Size_400
+	local size_150 = v.Size.Size_150
+	local medium = v.Radius.Medium
+	local size_600 = v.Size.Size_600
+	local overMedia_0 = v.Color.OverMedia.OverMedia_0
+	local color3 = v.Color.Content.Emphasis.Color3
+	local size_100 = v.Size.Size_100
+
+	local image = not (FFlagLocalizeMenuNavigationToggleDialog and game:GetEngineFeature("GetImageForKeyCode"))
+		and "rbxasset://textures/ui/Controls/DesignSystem/ButtonSelect@2x.png"
+		or UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
+	local text, text2
 
 	if FFlagLocalizeMenuNavigationToggleDialog then
-		local v30, v31 = React.useState(LocalizationService.RobloxLocaleId)
-
-		useEventConnection(LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"), function() -- line: 60
-			-- upvalues: v31 (copy), LocalizationService (copy)
-			v31(LocalizationService.RobloxLocaleId)
+		local state, setState = React.useState(LocalizationService.RobloxLocaleId)
+		useEventConnection(LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"), function()
+			setState(LocalizationService.RobloxLocaleId)
 		end)
 
-		local v32, v33 = React.useMemo(function() -- line: 70
-			-- upvalues: Localization (copy), v30 (copy)
-			local v40 = Localization.new(v30)
-			local ok, result = pcall(v40.Format, v40, "CoreScripts.InGameMenu.VirtualCursorHintPreIcon")
-			local ok2, result2 = pcall(v40.Format, v40, "CoreScripts.InGameMenu.VirtualCursorHintPostIcon")
-			local v45 = not ok and "Some experiences require pressing" or result
+		text, text2 = React.useMemo(function()
+			local v2 = Localization.new(state)
 
-			if ok2 then
-				return v45, result2
+			local success, result = pcall(v2.Format, v2, "CoreScripts.InGameMenu.VirtualCursorHintPreIcon")
+
+			local success2, result2 = pcall(v2.Format, v2, "CoreScripts.InGameMenu.VirtualCursorHintPostIcon")
+			local selected = not success and "Some experiences require pressing" or result
+
+			if success2 then
+				return selected, result2
 			end
 
-			return v45, "to toggle menu navigation"
-		end, { v30 })
-
-		u34 = v32
-		u35 = v33
+			return selected, "to toggle menu navigation"
+		end, { state })
 	else
 		local _ = {
 			VirtualCursorHintPreIcon = "Some experiences require pressing ",
 			VirtualCursorHintPostIcon = " to toggle menu navigation"
 		}
-
-		u34 = "Some experiences require pressing "
-		u35 = " to toggle menu navigation"
+		text = "Some experiences require pressing "
+		text2 = " to toggle menu navigation"
 	end
 
-	local v37, v38 = React.useMemo(function() -- line: 94
-		-- upvalues: GetTextSize (copy), u34 (ref), CaptionMedium (copy), u35 (ref)
-		return GetTextSize(u34, CaptionMedium.FontSize, CaptionMedium.Font, Vector2.new(1e999, 1e999)), (GetTextSize(u35, CaptionMedium.FontSize, CaptionMedium.Font, Vector2.new(1e999, 1e999)))
-	end, {
-		CaptionMedium.FontSize,
-		CaptionMedium.Font,
-		u34,
-		u35
-	})
-	local v39 = nil
+	local v2, v3 = React.useMemo(function()
+		return
+			GetTextSize(text, captionMedium.FontSize, captionMedium.Font, Vector2.new(1e999, 1e999)),
+			(GetTextSize(text2, captionMedium.FontSize, captionMedium.Font, Vector2.new(1e999, 1e999)))
+	end, { captionMedium.FontSize, captionMedium.Font, text, text2 })
 
-	if v13 then
-		if FFlagEnableConsoleExpControls then
-			v39 = useObservableValue(v14:getSelectedCoreObject())
-		end
-	else
-		v39 = nil
+	local v4 = nil
+
+	if enabled and FFlagEnableConsoleExpControls then
+		v4 = useObservableValue(GamepadConnector:getSelectedCoreObject())
 	end
 
-	return React.createElement("Frame", {
-		BackgroundColor3 = OverMedia_0.Color3,
-		BackgroundTransparency = OverMedia_0.Transparency,
+	local createElement = React.createElement
+	local v5 = {
+		BackgroundColor3 = overMedia_0.Color3,
+		BackgroundTransparency = overMedia_0.Transparency,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = t1.Position,
-		Visible = not v13 or (not FFlagEnableConsoleExpControls or v39 ~= nil)
-	}, {
-		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, Medium)
-		}),
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Horizontal,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = if not FFlagLocalizeMenuNavigationToggleDialog then nil else UDim.new(0, Size_100)
-		}),
-		LeftText = React.createElement("TextLabel", {
-			TextWrapped = false,
-			BackgroundTransparency = 1,
-			LayoutOrder = 0,
-			Size = UDim2.fromOffset(v37.X, v37.Y),
-			Text = u34,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center,
-			TextColor3 = EmphasisColor3,
-			Font = CaptionMedium.Font,
-			TextSize = CaptionMedium.FontSize
-		}),
-		Icon = React.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 100,
-			Size = UDim2.fromOffset(Size_600, Size_600),
-			Image = v29
-		}),
-		RightText = React.createElement("TextLabel", {
-			TextWrapped = false,
-			BackgroundTransparency = 1,
-			LayoutOrder = 200,
-			Size = UDim2.fromOffset(v38.X, v38.Y),
-			Text = u35,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center,
-			TextColor3 = EmphasisColor3,
-			Font = CaptionMedium.Font,
-			TextSize = CaptionMedium.FontSize
-		}),
-		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, Size_150),
-			PaddingBottom = UDim.new(0, Size_150),
-			PaddingLeft = UDim.new(0, Size_400),
-			PaddingRight = UDim.new(0, Size_400)
-		})
+		Position = p.Position,
+		Visible = not (enabled and FFlagEnableConsoleExpControls) or v4 ~= nil
+	}
+
+	local children = {
+		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, medium) }),
+		Layout = 0,
+		LeftText = 0,
+		Icon = 0,
+		RightText = 0,
+		Padding = 0
+	}
+
+	local createElement2 = React.createElement
+	local v6 = {
+		FillDirection = Enum.FillDirection.Horizontal,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		Padding = 0
+	}
+	local padding
+
+	if FFlagLocalizeMenuNavigationToggleDialog then
+		padding = UDim.new(0, size_100)
+	end
+
+	v6.Padding = padding
+	children.Layout = createElement2("UIListLayout", v6)
+
+	local createElement3 = React.createElement
+	local v7 = {
+		Size = UDim2.fromOffset(v2.X, v2.Y),
+		Text = text,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		TextYAlignment = Enum.TextYAlignment.Center,
+		TextColor3 = color3,
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextWrapped = false,
+		BackgroundTransparency = 1,
+		LayoutOrder = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = captionMedium.Font
+	end
+
+	v7.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(captionMedium.Font)
+	end
+
+	v7.FontFace = fontFace
+	v7.TextSize = captionMedium.FontSize
+	children.LeftText = createElement3("TextLabel", v7)
+
+	children.Icon = React.createElement("ImageLabel", {
+		Size = UDim2.fromOffset(size_600, size_600),
+		BackgroundTransparency = 1,
+		LayoutOrder = 100,
+		Image = image
 	})
+
+	local createElement4 = React.createElement
+	local v8 = {
+		Size = UDim2.fromOffset(v3.X, v3.Y),
+		Text = text2,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		TextYAlignment = Enum.TextYAlignment.Center,
+		TextColor3 = color3,
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextWrapped = false,
+		BackgroundTransparency = 1,
+		LayoutOrder = 200
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = captionMedium.Font
+	end
+
+	v8.Font = font2
+	local fontFace2
+
+	if FoundationFontFaceMigration then
+		fontFace2 = normalizeFontFace(captionMedium.Font)
+	end
+
+	v8.FontFace = fontFace2
+	v8.TextSize = captionMedium.FontSize
+	children.RightText = createElement4("TextLabel", v8)
+
+	children.Padding = React.createElement("UIPadding", {
+		PaddingTop = UDim.new(0, size_150),
+		PaddingBottom = UDim.new(0, size_150),
+		PaddingLeft = UDim.new(0, size_400),
+		PaddingRight = UDim.new(0, size_400)
+	})
+	return createElement("Frame", v5, children)
 end
 
 return MenuNavigationToggleDialog

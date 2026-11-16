@@ -1,146 +1,144 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
-local WhatsNewParent = WhatsNew.Parent
-local Signals = require(WhatsNewParent.Signals)
+local parent = WhatsNew.Parent
 
+local Signals = require(parent.Signals)
 require(WhatsNew.Types)
 
-local function assertValidKey(s1: string) -- line: 39
-	assert(s1 ~= "", "scope action key must be a non-empty string")
+local function assertValidKey(p: string) -- 4 equivalent calls inferred from this helper
+	assert(p ~= "", "scope action key must be a non-empty string")
 end
 
-return {
-	createScopeActions = function(p1) -- line: 43
-		-- upvalues: Signals (copy)
-		local t1 = {
-			_actions = {},
-			_openStateBindings = {},
-			_openStateDisposers = {}
-		}
+local ScopeActions = {}
 
-		if p1 ~= nil then
-			for v8, v9 in p1 do
-				assert(v8 ~= "", "scope action key must be a non-empty string")
-				t1._actions[v8] = v9
-			end
+function ScopeActions.createScopeActions(items)
+	local v = { _actions = {}, _openStateBindings = {}, _openStateDisposers = {} }
+
+	if items ~= nil then
+		for k, item in items do
+			assertValidKey(k) -- inferred equivalent call
+			v._actions[k] = item
 		end
-
-		local t10 = {
-			register = function(_: {[any]: any}, s2: string, p2) -- line: 59
-				-- upvalues: t1 (copy)
-				assert(s2 ~= "", "scope action key must be a non-empty string")
-				assert(t1._actions[s2] == nil, `scope action already registered: { s2 }`)
-				t1._actions[s2] = p2
-			end,
-			has = function(_: {[any]: any}, s3: string) -- line: 65
-				-- upvalues: t1 (copy)
-				return t1._actions[s3] ~= nil
-			end,
-			invoke = function(_: {[any]: any}, s4: string) -- line: 69
-				-- upvalues: t1 (copy)
-				local v26 = t1._actions[s4]
-
-				assert(v26 ~= nil, `unknown scope action key: { s4 }`)
-				v26()
-			end,
-			getRegisteredKeys = function(_: {[any]: any}) -- line: 75
-				-- upvalues: t1 (copy)
-				local t6 = {}
-
-				for v29 in t1._actions do
-					table.insert(t6, v29)
-				end
-
-				table.sort(t6)
-
-				return t6
-			end,
-			toMap = function(_: {[any]: any}) -- line: 84
-				-- upvalues: t1 (copy)
-				return (table.clone(t1._actions))
-			end,
-			bindOpenState = function(_: {[any]: any}, p3) -- line: 89
-				-- upvalues: t1 (copy)
-				assert(p3.openActionKey ~= "", "scope action key must be a non-empty string")
-				assert(p3.closeActionKey ~= "", "scope action key must be a non-empty string")
-				assert(p3.getIsOpen ~= nil, "bindOpenState requires getIsOpen")
-				assert(t1._actions[p3.openActionKey] ~= nil, `bindOpenState openActionKey not registered: { p3.openActionKey }`)
-				assert(t1._actions[p3.closeActionKey] ~= nil, `bindOpenState closeActionKey not registered: { p3.closeActionKey }`)
-
-				for _, v34 in t1._openStateBindings do
-					assert(v34.openActionKey ~= p3.openActionKey, `open state already bound for openActionKey: { p3.openActionKey }`)
-					assert(v34.closeActionKey ~= p3.closeActionKey, `open state already bound for closeActionKey: { p3.closeActionKey }`)
-				end
-
-				table.insert(t1._openStateBindings, p3)
-			end,
-			stopOpenStateWiring = function(_: {[any]: any}) -- line: 116
-				-- upvalues: t1 (copy)
-				for _, v37 in t1._openStateDisposers do
-					v37()
-				end
-
-				table.clear(t1._openStateDisposers)
-			end
-		}
-
-		function t10.startOpenStateWiring(_: {[any]: any}, p4) -- line: 123
-			-- upvalues: t10 (copy), t1 (copy), Signals (copy)
-			t10:stopOpenStateWiring()
-
-			for _, v41 in t1._openStateBindings do
-				local v42 = Signals.createEffect(function(p5) -- line: 128
-					-- upvalues: v41 (copy), p4 (copy)
-					local v45 = v41.getIsOpen(p5)
-
-					p4.getRuntimeStateSignal(p5)
-
-					if v45 then
-						p4.notifyScopeOpened(v41.openActionKey)
-
-						return
-					end
-
-					p4.notifyScopeClosed(v41.closeActionKey)
-				end)
-
-				table.insert(t1._openStateDisposers, v42)
-			end
-		end
-
-		return t10
-	end,
-	collectRegistryActionKeys = function(p6) -- line: 145
-		local t12 = {}
-		local t13 = {}
-
-		local function addKey(s5: string?) -- line: 149
-			-- upvalues: t12 (copy), t13 (copy)
-			if s5 == nil or (s5 == "" or t12[s5]) then
-				return
-			end
-
-			t12[s5] = true
-			table.insert(t13, s5)
-		end
-
-		for _, v16 in p6.scopeTours do
-			local openActionKey = v16.openActionKey
-
-			if openActionKey ~= nil and openActionKey ~= "" and not t12[openActionKey] then
-				t12[openActionKey] = true
-				table.insert(t13, openActionKey)
-			end
-
-			local closeActionKey = v16.closeActionKey
-
-			if closeActionKey ~= nil and closeActionKey ~= "" and not t12[closeActionKey] then
-				t12[closeActionKey] = true
-				table.insert(t13, closeActionKey)
-			end
-		end
-
-		table.sort(t13)
-
-		return t13
 	end
-}
+
+	local scopeActions = {}
+
+	function scopeActions.register(_, p: string, p2)
+		assertValidKey(p) -- inferred equivalent call
+		assert(v._actions[p] == nil, `scope action already registered: {p}`)
+		v._actions[p] = p2
+	end
+
+	function scopeActions.has(_, p: string): boolean
+		return v._actions[p] ~= nil
+	end
+
+	function scopeActions.invoke(_, p: string)
+		local action = v._actions[p]
+		assert(action ~= nil, `unknown scope action key: {p}`)
+		action()
+	end
+
+	function scopeActions.getRegisteredKeys(_)
+		local registeredKeys = {}
+
+		for k in v._actions do
+			table.insert(registeredKeys, k)
+		end
+
+		table.sort(registeredKeys)
+		return registeredKeys
+	end
+
+	function scopeActions.toMap(_)
+		return (table.clone(v._actions))
+	end
+
+	function scopeActions.bindOpenState(_, data)
+		assertValidKey(data.openActionKey) -- inferred equivalent call
+		assertValidKey(data.closeActionKey) -- inferred equivalent call
+		assert(data.getIsOpen ~= nil, "bindOpenState requires getIsOpen")
+		assert(
+			v._actions[data.openActionKey] ~= nil,
+			`bindOpenState openActionKey not registered: {data.openActionKey}`
+		)
+
+		assert(
+			v._actions[data.closeActionKey] ~= nil,
+			`bindOpenState closeActionKey not registered: {data.closeActionKey}`
+		)
+
+		for _, openStateBinding in v._openStateBindings do
+			assert(
+				openStateBinding.openActionKey ~= data.openActionKey,
+				`open state already bound for openActionKey: {data.openActionKey}`
+			)
+
+			assert(
+				openStateBinding.closeActionKey ~= data.closeActionKey,
+				`open state already bound for closeActionKey: {data.closeActionKey}`
+			)
+		end
+
+		table.insert(v._openStateBindings, data)
+	end
+
+	function scopeActions:stopOpenStateWiring()
+		for _, openStateDisposer in v._openStateDisposers do
+			openStateDisposer()
+		end
+
+		table.clear(v._openStateDisposers)
+	end
+
+	function scopeActions.startOpenStateWiring(_, data)
+		scopeActions:stopOpenStateWiring()
+
+		for _, openStateBinding in v._openStateBindings do
+			local effect = Signals.createEffect(function(p)
+				local isOpen = openStateBinding.getIsOpen(p)
+
+				data.getRuntimeStateSignal(p)
+
+				if isOpen then
+					data.notifyScopeOpened(openStateBinding.openActionKey)
+				else
+					data.notifyScopeClosed(openStateBinding.closeActionKey)
+				end
+			end)
+			table.insert(v._openStateDisposers, effect)
+		end
+	end
+
+	return scopeActions
+end
+
+function ScopeActions.collectRegistryActionKeys(p)
+	local set = {}
+	local registryActionKeys = {}
+
+	local function addKey(openActionKey: string?) -- 1 equivalent call inferred from this helper
+		if openActionKey == nil or openActionKey == "" or set[openActionKey] then
+			return
+		end
+
+		set[openActionKey] = true
+		table.insert(registryActionKeys, openActionKey)
+	end
+
+	for _, scopeTour in p.scopeTours do
+		addKey(scopeTour.openActionKey) -- inferred equivalent call
+		local closeActionKey = scopeTour.closeActionKey
+
+		if closeActionKey == nil or closeActionKey == "" or set[closeActionKey] then
+			continue
+		end
+
+		set[closeActionKey] = true
+		table.insert(registryActionKeys, closeActionKey)
+	end
+
+	table.sort(registryActionKeys)
+	return registryActionKeys
+end
+
+return ScopeActions

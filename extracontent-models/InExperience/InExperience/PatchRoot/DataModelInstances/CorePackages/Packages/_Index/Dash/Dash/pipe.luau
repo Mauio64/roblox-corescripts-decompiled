@@ -1,21 +1,19 @@
-local function pipe(p1: ((...any) -> ...any), ...) -- line: 22
-	local v3 = select("#", ...)
+local function pipe(callback, ...)
+	local v = select("#", ...)
 
-	if v3 == 0 then
-		return p1
+	if v == 0 then
+		return callback
 	end
 
-	local t1 = { ... }
+	local v2 = { ... }
+	return function(...)
+		local v3 = { callback(...) }
 
-	return function(...) -- line: 28
-		-- upvalues: p1 (copy), v3 (copy), t1 (copy)
-		local t2 = { p1(...) }
-
-		for i = 1, v3 do
-			t2 = { t1[i](unpack(t2)) }
+		for i = 1, v do
+			v3 = { v2[i](unpack(v3)) }
 		end
 
-		return unpack(t2)
+		return unpack(v3)
 	end
 end
 

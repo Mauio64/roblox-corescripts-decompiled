@@ -1,5 +1,5 @@
-local function useConfiguration(_: string, p1) -- line: 8
-	return p1
+local function useConfiguration(_: string, p)
+	return p
 end
 
 return useConfiguration

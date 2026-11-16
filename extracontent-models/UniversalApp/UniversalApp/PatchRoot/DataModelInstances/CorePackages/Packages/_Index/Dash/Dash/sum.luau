@@ -1,10 +1,9 @@
-local scriptParent = script.Parent
-local reduce = require(scriptParent.reduce)
+local parent = script.Parent
+local reduce = require(parent.reduce)
 
-local function sum(t1: {[any]: any}) -- line: 16
-	-- upvalues: reduce (copy)
-	return reduce(t1, function(n1: number, p1) -- line: 17
-		return n1 + p1
+local function sum(p)
+	return reduce(p, function(p2: number, p3)
+		return p2 + p3
 	end, 0)
 end
 

@@ -1,15 +1,26 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local useNavigation = require(Parent.Navigation).useNavigation
-local React = require(Parent.React)
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
-local AppEventIngestService = require(Parent.RoactServiceTags).AppEventIngestService
-local t = require(Parent.t)
-local mutedError = require(Parent.Loggers).mutedError
-local default = require(Parent.LinkingProtocol).LinkingProtocol.default
-local v12 = t.strictInterface({
+local parent = script:FindFirstAncestor("GameCollections").Parent
+
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local React = require(parent.React)
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppEventIngestService = RoactServiceTags.AppEventIngestService
+local t = require(parent.t)
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+local LinkingProtocol = require(parent.LinkingProtocol)
+local DeepLinkSource = LinkingProtocol.Enums.DeepLinkSource
+local default = LinkingProtocol.LinkingProtocol.default
+
+local strictInterface = t.strictInterface({
 	action = t.string,
 	linkPath = t.string,
 	webViewSupported = t.boolean,
@@ -17,102 +28,77 @@ local v12 = t.strictInterface({
 	durationInSeconds = t.optional(t.number)
 })
 
-local function validateEventSchema(p1) -- line: 28
-	-- upvalues: v12 (copy), mutedError (copy)
-	local v16, v17 = v12(p1)
+local function validateEventSchema(p) -- 1 equivalent call inferred from this helper
+	local v, v2 = strictInterface(p)
 
-	if not v16 then
-		mutedError(v17)
+	if not v then
+		mutedError(v2)
 	end
 end
-local function useNavigateToSortLinkWebView() -- line: 36
-	-- upvalues: useNavigation (copy), useAppPolicy (copy), useRoactService (copy), AppEventIngestService (copy), React (copy), v12 (copy), mutedError (copy), UrlBuilder (copy), default (copy), AppPage (copy)
-	local v18 = useNavigation()
-	local v19 = useAppPolicy(function(p2) -- line: 38
-		return p2.getWebViewSupport()
+
+local function useNavigateToSortLinkWebView()
+	local v = useNavigation()
+	local webViewSupported = useAppPolicy(function(p)
+		return p.getWebViewSupport()
 	end)
-	local v20 = useRoactService(AppEventIngestService)
 
-	return React.useCallback(function(s1: string, s2: string, s3: string, s4: string?, p3: ((...any) -> ...any)?) -- line: 44
-		-- upvalues: v19 (copy), v12 (copy), mutedError (copy), v20 (copy), UrlBuilder (copy), default (copy), v18 (copy), AppPage (copy)
-		local t1 = {
-			action = "click",
-			durationInSeconds = nil,
-			linkPath = s1,
-			gameSetTypeId = s4,
-			webViewSupported = v19
-		}
-		local v28, v29 = v12(t1)
+	local v2 = useRoactService(AppEventIngestService)
 
-		if not v28 then
-			mutedError(v29)
+	return React.useCallback(function(linkPath: string, p: string, title: string, gameSetTypeId: string?, callback)
+		local function fn(action: string, durationInSeconds: number?) -- 3 equivalent calls inferred from this helper
+			local v3 = {
+				linkPath = linkPath,
+				action = action,
+				gameSetTypeId = gameSetTypeId,
+				webViewSupported = webViewSupported,
+				durationInSeconds = durationInSeconds
+			}
+			validateEventSchema(v3) -- inferred equivalent call
+			v2:sendEventDeferred(p, "navigateToSortLink", v3)
 		end
 
-		v20:sendEventDeferred(s2, "navigateToSortLink", t1)
+		fn("click") -- inferred equivalent call
 
-		if v19 then
-			local v30 = UrlBuilder.fromString((if string.find(s1, "/") ~= 1 then s1 else s1:gsub("/", "www:", 1)))()
-			local elapsed = os.clock()
-			local t2 = {
-				action = "open",
-				durationInSeconds = nil,
-				linkPath = s1,
-				gameSetTypeId = s4,
-				webViewSupported = v19
-			}
-			local v33, v34 = v12(t2)
-
-			if not v33 then
-				mutedError(v34)
-			end
-
-			v20:sendEventDeferred(s2, "navigateToSortLink", t2)
-			default:isURLRegistered(v30):andThen(function(p4) -- line: 69
-				-- upvalues: default (copy), v30 (copy), v18 (copy), AppPage (copy), s3 (copy), elapsed (copy), s1 (copy), s4 (copy), v19 (copy), v12 (copy), mutedError (copy), v20 (copy), s2 (copy), p3 (copy)
-				if p4 then
-					default:detectURL(v30)
-
-					return
-				end
-
-				v18.navigate(AppPage.GenericWebPage, {
-					detail = v30,
-					extraProps = {
-						title = s3,
-						onClose = function() -- line: 77
-							-- upvalues: elapsed (copy), s1 (copy), s4 (copy), v19 (copy), v12 (copy), mutedError (copy), v20 (copy), s2 (copy), p3 (copy)
-							local v41 = os.clock() - elapsed
-							local t3 = {
-								action = "close",
-								linkPath = s1,
-								gameSetTypeId = s4,
-								webViewSupported = v19,
-								durationInSeconds = v41
-							}
-							local v43, v44 = v12(t3)
-
-							if not v43 then
-								mutedError(v44)
-							end
-
-							v20:sendEventDeferred(s2, "navigateToSortLink", t3)
-
-							if p3 then
-								p3()
-							end
-						end
-					}
-				})
-			end)
+		if not webViewSupported then
+			warn("WebView is not supported on this platform")
 
 			return
 		end
 
-		warn("WebView is not supported on this platform")
-	end, {
-		v18,
-		v19
-	})
+		local fromString = urlBuilder.fromString
+		local v3
+
+		if string.find(linkPath, "/") == 1 then
+			v3 = linkPath:gsub("/", "www:", 1)
+		else
+			v3 = linkPath
+		end
+
+		local detail = fromString(v3)()
+		local lastTime = os.clock()
+		fn("open") -- inferred equivalent call
+		default:isURLRegistered(detail):andThen(function(p2)
+			if not p2 then
+				v.navigate(AppPage.GenericWebPage, {
+					detail = detail,
+					extraProps = {
+						title = title,
+						onClose = function()
+							fn("close", os.clock() - lastTime) -- inferred equivalent call
+
+							if callback then
+								callback()
+							end
+						end
+					}
+				})
+			elseif default:isInternalDlicEnabled() then
+				default:detectDeeplinkIntent((default:createInternalDlic(detail, DeepLinkSource.LuaInternal)))
+			else
+				default:detectURL(detail)
+			end
+		end)
+	end, { v, webViewSupported })
 end
 
 return useNavigateToSortLinkWebView

@@ -1,3 +1,3 @@
-return function(p1) -- line: 17
-	return type(p1) == "number" and p1 ~= p1
+return function(value): boolean
+	return type(value) == "number" and value ~= value
 end

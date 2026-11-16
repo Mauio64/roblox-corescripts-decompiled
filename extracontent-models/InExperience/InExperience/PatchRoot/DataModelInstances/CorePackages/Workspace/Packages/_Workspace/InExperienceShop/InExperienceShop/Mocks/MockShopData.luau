@@ -1,240 +1,197 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local Promise = require(InExperienceShopParent.Promise)
-local Constants = require(InExperienceShop.Constants)
+local parent = InExperienceShop.Parent
 
+local Promise = require(parent.Promise)
+local Constants = require(InExperienceShop.Constants)
 require(InExperienceShop.Types)
 
-local t1 = {
+local v = {
 	{
-		id = "3520436958",
+		id = "101",
 		name = "product1",
-		thumbnail = "rbxassetid://139209047523431",
+		thumbnail = "rbxassetid://6789",
 		price = 1,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "test",
 		updated = "2026-02-09T22:14:44.486Z",
-		creator = {
-			name = "MockCreator",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator", hasVerifiedBadge = false }
 	},
 	{
-		id = "3533934241",
+		id = "102",
 		name = "product2",
-		thumbnail = "rbxassetid://87392709922646",
+		thumbnail = "rbxassetid://6789",
 		price = 1,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "This is the description",
 		updated = "2026-02-09T22:25:41.802Z",
-		creator = {
-			name = "MockCreator",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator", hasVerifiedBadge = false }
 	},
 	{
-		id = "3539559418",
+		id = "103",
 		name = "Dev2's` <3 Test",
-		thumbnail = "rbxassetid://87631972256697",
+		thumbnail = "rbxassetid://6789",
 		price = 1,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test Description...",
 		updated = "2026-02-18T00:17:01.48Z",
-		creator = {
-			name = "MockCreator2",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator2", hasVerifiedBadge = false }
 	},
 	{
-		id = "3579160491",
+		id = "104",
 		name = "Very Long Product1",
-		thumbnail = "rbxassetid://100887043069019",
+		thumbnail = "rbxassetid://6789",
 		price = 2,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test",
 		updated = "2026-04-21T04:37:16.988Z",
-		creator = {
-			name = "MockCreator",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator", hasVerifiedBadge = false }
 	},
 	{
-		id = "3579160539",
+		id = "105",
 		name = "Prod3",
-		thumbnail = "rbxassetid://81961804970825",
+		thumbnail = "rbxassetid://6789",
 		price = 1,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test Description...",
 		updated = "2026-04-21T04:29:53.708Z",
-		creator = {
-			name = "MockCreator3",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator3", hasVerifiedBadge = false }
 	},
 	{
-		id = "3579160572",
+		id = "106",
 		name = "Prod5",
-		thumbnail = "rbxassetid://114076823404152",
+		thumbnail = "rbxassetid://6789",
 		price = 2,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "",
 		updated = "2026-04-21T04:36:12.611Z",
-		creator = {
-			name = "MockCreator44",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator44", hasVerifiedBadge = false }
 	},
 	{
-		id = "3579166829",
+		id = "107",
 		name = "Prod7",
-		thumbnail = "rbxassetid://126948782997414",
+		thumbnail = "rbxassetid://6789",
 		price = 2,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Really long description that spans more than one line but could span multiple lines.",
 		updated = "2026-04-21T04:36:37.726Z",
-		creator = {
-			name = "MockCreator5",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator5", hasVerifiedBadge = false }
 	},
 	{
-		id = "3579166863",
+		id = "108",
 		name = "Prod8",
-		thumbnail = "rbxassetid://133455066661752",
+		thumbnail = "rbxassetid://6789",
 		price = 2,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test &nbsp; Description with special characters <>#$%^&*()_+-=[]{}|\\:;\"'<>,.?/~`!",
 		updated = "2026-04-21T04:37:03.186Z",
-		creator = {
-			name = "MockCreator",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator", hasVerifiedBadge = false }
 	},
 	{
-		id = "3579166918",
+		id = "109",
 		name = "Prod9",
-		thumbnail = "rbxassetid://104454970093144",
+		thumbnail = "rbxassetid://6789",
 		price = 5,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test Description...",
 		updated = "2026-04-21T04:36:50.442Z",
-		creator = {
-			name = "MockCreator",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator", hasVerifiedBadge = false }
 	},
 	{
-		id = "3579166948",
+		id = "110",
 		name = "Prod11",
-		thumbnail = "rbxassetid://79364533981550",
+		thumbnail = "rbxassetid://6789",
 		price = 100,
 		isOwned = false,
 		itemType = "Product",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test Description...",
 		updated = "2026-04-25T00:01:47.859Z",
-		creator = {
-			name = "MockCreator",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreator", hasVerifiedBadge = false }
 	}
 }
-local t2 = {
+
+local v2 = {
 	{
-		id = "1804642568",
+		id = "201",
 		name = "pass5",
-		thumbnail = "rbxassetid://87272847166128",
+		thumbnail = "rbxassetid://6789",
 		price = 2,
 		isOwned = false,
 		itemType = "GamePass",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test Description...",
 		updated = "2026-04-21T04:39:24.953Z",
-		creator = {
-			name = "KickCodePrep",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreatorK", hasVerifiedBadge = false }
 	},
 	{
-		id = "1804340575",
+		id = "202",
 		name = "pass5",
-		thumbnail = "rbxassetid://109612833123000",
+		thumbnail = "rbxassetid://6789",
 		price = 4,
 		isOwned = false,
 		itemType = "GamePass",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test Description...",
 		updated = "2026-04-21T04:39:59.813Z",
-		creator = {
-			name = "KickCodePrep",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreatorK", hasVerifiedBadge = false }
 	},
 	{
-		id = "1714448958",
+		id = "203",
 		name = "Thanks's` <3",
-		thumbnail = "rbxassetid://77927364622086",
+		thumbnail = "rbxassetid://6789",
 		price = 1,
 		isOwned = false,
 		itemType = "GamePass",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test Description...",
 		updated = "2026-02-18T00:09:23.903Z",
-		creator = {
-			name = "KickCodePrep",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreatorK", hasVerifiedBadge = false }
 	},
 	{
-		id = "1716550603",
+		id = "204",
 		name = "Thanks’s <3 :heart::victory_hand:t2:",
-		thumbnail = "rbxassetid://125786017250029",
+		thumbnail = "rbxassetid://6789",
 		price = 1,
 		isOwned = false,
 		itemType = "GamePass",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "Test",
 		updated = "2026-02-18T00:05:06.047Z",
-		creator = {
-			name = "KickCodePrep",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreatorK", hasVerifiedBadge = false }
 	},
 	{
-		id = "1683715929",
+		id = "205",
 		name = "pass1",
-		thumbnail = "rbxassetid://104071175854790",
+		thumbnail = "rbxassetid://6789",
 		price = 2,
 		isOwned = false,
 		itemType = "GamePass",
-		universeId = "9238531179",
+		universeId = "12345",
 		description = "test",
 		updated = "2026-04-21T04:38:16.87Z",
-		creator = {
-			name = "KickCodePrep",
-			hasVerifiedBadge = false
-		}
+		creator = { name = "MockCreatorK", hasVerifiedBadge = false }
 	}
 }
-local t3 = {
+
+local robuxPackages = {
 	{
 		id = "229",
 		productId = 229,
@@ -301,133 +258,105 @@ local t3 = {
 	}
 }
 
-local function pickRandomItems() -- line: 341
-	-- upvalues: t1 (copy), t2 (copy)
-	local t4 = table.create(#t1 + #t2)
+local function pickRandomItems()
+	local v3 = table.create(#v + #v2)
+	table.move(v, 1, #v, 1, v3)
+	table.move(v2, 1, #v2, #v + 1, v3)
 
-	table.move(t1, 1, #t1, 1, t4)
-	table.move(t2, 1, #t2, #t1 + 1, t4)
-
-	for i = #t4, 2, -1 do
-		local v13 = math.random(1, i)
-		local v14 = t4[v13]
-		local v15 = t4[i]
-
-		t4[i] = v14
-		t4[v13] = v15
+	for i = #v3, 2, -1 do
+		local v4 = math.random(1, i)
+		local v5 = v3[v4]
+		local v6 = v3[i]
+		v3[i] = v5
+		v3[v4] = v6
 	end
 
-	local v16 = math.min(math.random(8, 10), #t4)
-	local t5 = table.create(v16)
+	local v4 = math.min(math.random(8, 10), #v3)
+	local randomItems = table.create(v4)
 
-	for i = 1, v16 do
-		t5[i] = t4[i]
+	for i = 1, v4 do
+		randomItems[i] = v3[i]
 	end
 
-	return t5
+	return randomItems
 end
 
-local t6 = {
-	{
-		name = "Home"
-	},
+local v3 = {
+	{ name = "Home" },
 	{
 		name = "Top picks",
-		items = pickRandomItems()
+		items = pickRandomItems(),
+		categoryType = Constants.TOP_PICKS_CATEGORY_TYPE,
+		stableCategoryId = "Top picks",
+		categoryGroup = "Featured"
 	},
-	{
-		name = "Robux",
-		robuxPackages = t3
-	},
-	{
-		name = "Coins",
-		items = pickRandomItems()
-	},
-	{
-		name = "Boosts",
-		items = pickRandomItems()
-	},
-	{
-		name = "Upgrades",
-		items = pickRandomItems()
-	},
-	{
-		name = "Cosmetics",
-		items = pickRandomItems()
-	},
-	{
-		name = "Gear",
-		items = pickRandomItems()
-	}
+	{ name = "Robux", robuxPackages = robuxPackages, bonusJwt = "mock-bonus-jwt" },
+	{ name = "Coins", items = pickRandomItems() },
+	{ name = "Boosts", items = pickRandomItems() },
+	{ name = "Upgrades", items = pickRandomItems() },
+	{ name = "Cosmetics", items = pickRandomItems() },
+	{ name = "Gear", items = pickRandomItems() }
 }
 
-local function buildShopData() -- line: 374
-	-- upvalues: t6 (copy)
-	local t7 = table.create(#t6)
-	local t8 = {}
+local function buildShopData()
+	local categories = table.create(#v3)
+	local sections = {}
 
-	for i, v in ipairs(t6) do
-		local str = tostring(i)
+	for i, v4 in ipairs(v3) do
+		local id = tostring(i)
+		categories[i] = { id = id, name = v4.name }
 
-		t7[i] = {
-			id = str,
-			name = v.name
-		}
-
-		if v.name ~= "Home" then
-			table.insert(t8, {
-				id = str,
-				name = v.name,
-				items = v.items or {},
-				robuxPackages = v.robuxPackages
+		if v4.name ~= "Home" then
+			table.insert(sections, {
+				id = id,
+				name = v4.name,
+				items = v4.items or {},
+				robuxPackages = v4.robuxPackages,
+				bonusJwt = v4.bonusJwt,
+				categoryType = v4.categoryType,
+				stableCategoryId = v4.stableCategoryId,
+				categoryGroup = v4.categoryGroup
 			})
 		end
 	end
 
-	return {
-		categories = t7,
-		sections = t8
-	}
+	return { categories = categories, sections = sections }
 end
 
-return {
-	MOCK_PRODUCT_ITEMS = t1,
-	MOCK_GAMEPASS_ITEMS = t2,
-	buildShopItems = function() -- line: 402
-		-- upvalues: t6 (copy)
-		local t9 = {}
+local MockShopData = {
+	MOCK_PRODUCT_ITEMS = v,
+	MOCK_GAMEPASS_ITEMS = v2,
+	buildShopItems = function()
+		local categories = {}
 
-		for _, v in ipairs(t6) do
-			if v.name ~= "Home" and v.name ~= "Robux" then
-				local v27 = v.items or {}
-				local t10 = table.create(#v27)
-
-				for i, v2 in ipairs(v27) do
-					t10[i] = {
-						id = i,
-						type = v2.itemType
-					}
-				end
-
-				table.insert(t9, {
-					id = #t9 + 1,
-					name = v.name,
-					items = t10
-				})
+		for _, v4 in ipairs(v3) do
+			if not (v4.name ~= "Home" and v4.name ~= "Robux") then
+				continue
 			end
+
+			local items = v4.items or {}
+			local items2 = table.create(#items)
+
+			for i, item in ipairs(items) do
+				items2[i] = { id = i, type = item.itemType }
+			end
+
+			table.insert(categories, {
+				id = #categories + 1,
+				name = v4.name,
+				items = items2
+			})
 		end
 
-		return {
-			categories = t9
-		}
-	end,
-	getShopData = function(n1: number?) -- line: 439
-		-- upvalues: Promise (copy), buildShopData (copy)
-		local v32 = n1 == nil and 0.5 or n1
-
-		return Promise.delay(v32):andThen(function() -- line: 441
-			-- upvalues: buildShopData (copy)
-			return (buildShopData())
-		end)
+		return { categories = categories }
 	end
 }
+
+function MockShopData.getShopData(p: number?)
+	local v4 = p == nil and 0.5 or p
+	return Promise.delay(v4):andThen(function()
+		return buildShopData()
+	end)
+end
+
+return MockShopData

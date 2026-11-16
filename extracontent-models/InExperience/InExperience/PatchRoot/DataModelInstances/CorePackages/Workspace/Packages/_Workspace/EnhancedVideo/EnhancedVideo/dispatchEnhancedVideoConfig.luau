@@ -1,19 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local scriptParent = script.Parent
 
-require(scriptParent.Types)
+local parent = script.Parent
+require(parent.Types)
 
-local function dispatchEnhancedVideoConfig(p1) -- line: 9
-	-- upvalues: ReplicatedStorage (copy)
-	task.spawn(function() -- line: 10
-		-- upvalues: ReplicatedStorage (copy), p1 (copy)
-		local EnhancedVideoConfig = ReplicatedStorage:WaitForChild("EnhancedVideoConfig", 60)
+local function dispatchEnhancedVideoConfig(p)
+	task.spawn(function()
+		local enhancedVideoConfig = ReplicatedStorage:WaitForChild("EnhancedVideoConfig", 60)
 
-		if not EnhancedVideoConfig or not EnhancedVideoConfig:IsA("BindableEvent") then
-			return
+		if enhancedVideoConfig and enhancedVideoConfig:IsA("BindableEvent") then
+			enhancedVideoConfig:Fire(p)
 		end
-
-		EnhancedVideoConfig:Fire(p1)
 	end)
 end
 

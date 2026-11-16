@@ -1,14 +1,14 @@
 require(script.Parent.ReactInternalTypes)
 
-local getStackByFiberInDevAndProd = require(script.Parent.ReactFiberComponentStack).getStackByFiberInDevAndProd
+local ReactFiberComponentStack = require(script.Parent.ReactFiberComponentStack)
+local getStackByFiberInDevAndProd = ReactFiberComponentStack.getStackByFiberInDevAndProd
 
 return {
-	createCapturedValue = function(p1, p2) -- line: 26
-		-- upvalues: getStackByFiberInDevAndProd (copy)
+	createCapturedValue = function(p, source)
 		return {
-			value = p1,
-			source = p2,
-			stack = getStackByFiberInDevAndProd(p2)
+			value = p,
+			source = source,
+			stack = getStackByFiberInDevAndProd(source)
 		}
 	end
 }

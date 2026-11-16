@@ -1,10 +1,13 @@
-local scriptParent = script.Parent
-local SessionServiceWrapper = require(scriptParent.SessionizationUtil).SessionServiceWrapper
+local parent = script.Parent
+local SessionizationUtil = require(parent.SessionizationUtil)
+local SessionServiceWrapper = SessionizationUtil.SessionServiceWrapper
+
 local SessionType = require(script.SessionType)
-local v4 = require(script.ExperienceMenuSessionManager).new(SessionServiceWrapper)
+local ExperienceMenuSessionManager = require(script.ExperienceMenuSessionManager)
+local experienceMenuSessionManagerInstance = ExperienceMenuSessionManager.new(SessionServiceWrapper)
 
 return {
 	["jest.config"] = script["jest.config"],
 	SessionType = SessionType,
-	ExperienceMenuSessionManagerInstance = v4
+	ExperienceMenuSessionManagerInstance = experienceMenuSessionManagerInstance
 }

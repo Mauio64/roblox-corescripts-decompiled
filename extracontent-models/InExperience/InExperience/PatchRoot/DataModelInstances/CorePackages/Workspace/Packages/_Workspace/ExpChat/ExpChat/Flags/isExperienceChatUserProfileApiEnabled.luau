@@ -3,18 +3,39 @@ local AppStorageService = game:GetService("AppStorageService")
 game:DefineFastInt("ExperienceChatUserProfileApiRollout_v1", 0)
 game:DefineFastFlag("ExperienceChatUserProfileApiEnabledForAll_v1", false)
 
-local FastInt = game:GetFastInt("ExperienceChatUserProfileApiRollout_v1")
-local Item = AppStorageService:GetItem("AppInstallationId")
-local v4 = typeof(Item)
-local v5 = if v4 ~= "number" then if v4 ~= "string" then nil else if not (string.len(Item) <= 0) then tonumber((string.sub(Item, -2))) else nil else Item
-local v6 = if v5 ~= nil then FastInt >= v5 % 100 + 1 else FastInt >= 100
-
-local function v7() -- line: 57
-	-- upvalues: v6 (copy)
-	return v6
+local function fn() -- 1 equivalent call inferred from this helper
+	return game:GetFastInt("ExperienceChatUserProfileApiRollout_v1")
 end
 
-return function() -- line: 72
-	-- upvalues: v7 (copy)
-	return game:GetFastFlag("ExperienceChatUserProfileApiEnabledForAll_v1") or v7()
+local v = fn() -- inferred equivalent call
+local v2 = AppStorageService:GetItem("AppInstallationId")
+
+local typeName = typeof(v2)
+
+if typeName ~= "number" then
+	if typeName == "string" and not (string.len(v2) <= 0) then
+		v2 = tonumber((string.sub(v2, -2)))
+	else
+		v2 = nil
+	end
+end
+
+local v3
+
+if v2 == nil then
+	v3 = v >= 100
+else
+	v3 = v2 % 100 + 1 <= v
+end
+
+local function fn2()
+	return v3
+end
+
+local function fn3() -- 1 equivalent call inferred from this helper
+	return game:GetFastFlag("ExperienceChatUserProfileApiEnabledForAll_v1")
+end
+
+return function()
+	return fn3() or fn2() -- inferred equivalent call
 end

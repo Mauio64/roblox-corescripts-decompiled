@@ -1,30 +1,40 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local parent = GenericAbuseReporting.Parent
 local HttpService = game:GetService("HttpService")
 local LocalizationService = game:GetService("LocalizationService")
-local ArgCheck = require(GenericAbuseReportingParent.ArgCheck)
-local Url = require(GenericAbuseReportingParent.Http).Url
+
+local ArgCheck = require(parent.ArgCheck)
+local Http = require(parent.Http)
+local Url = Http.Url
 
 require(GenericAbuseReporting.Enums.AbuseVector)
 
-local v7 = not require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3 and "&version=2" or "&version=3"
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAbuseReportInExpPlayerListV3 = SharedFlags.FFlagAbuseReportInExpPlayerListV3
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAbuseReportSubmissionTargetV4 = SharedFlags2.FFlagAbuseReportSubmissionTargetV4
 
-return function(p1, p2, t1: {[any]: any}?) -- line: 19
-	-- upvalues: ArgCheck (copy), LocalizationService (copy), HttpService (copy), Url (copy), v7 (copy)
-	ArgCheck.assert(p2, "abuseVector is required")
-	ArgCheck.isType(p2, "string", "fetchConfigWithAttributes expects abuseVector as a string")
+local v = game:DefineFastFlag("AbuseReportSubmissionLegacyChatV5", false)
+	and FFlagAbuseReportSubmissionTargetV4
+	and "&version=5"
+	or FFlagAbuseReportSubmissionTargetV4 and "&version=4"
+	or FFlagAbuseReportInExpPlayerListV3 and "&version=3"
+	or "&version=2"
 
-	local RobloxLocaleId = LocalizationService.RobloxLocaleId
-	local s1 = ""
+return function(callback, p, items)
+	ArgCheck.assert(p, "abuseVector is required")
+	ArgCheck.isType(p, "string", "fetchConfigWithAttributes expects abuseVector as a string")
 
-	if t1 and next(t1) ~= nil then
-		local json = HttpService:JSONEncode(t1)
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
 
-		s1 = `&attributes={ HttpService:UrlEncode(json) }`
-	end
+	local v2 = (not items or next(items) == nil) and ""
+		or `&attributes={HttpService:UrlEncode((HttpService:JSONEncode(items)))}`
 
-	local v14 = HttpService:UrlEncode(p2)
-	local v15 = HttpService:UrlEncode(RobloxLocaleId)
+	local urlEncode = HttpService:UrlEncode(p)
+	local urlEncode2 = HttpService:UrlEncode(robloxLocaleId)
 
-	return p1(`{ Url.APIS_URL }abuse-reporting/v1/dynamic-config?abuseVector={ v14 }&locale={ v15 }&entryPoint=ua{ s1 }{ v7 }`, "GET")
+	return callback(
+		`{Url.APIS_URL}abuse-reporting/v1/dynamic-config?abuseVector={urlEncode}&locale={urlEncode2}&entryPoint=ua{v2}{v}`,
+		"GET"
+	)
 end

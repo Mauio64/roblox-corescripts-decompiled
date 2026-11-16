@@ -1,41 +1,38 @@
-local Parent = script:FindFirstAncestor("ExpChatIntegration").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("ExpChatIntegration").Parent
+
+local Signals = require(parent.Signals)
 
 require(script.Parent.ChatPlatformTypes)
-
 local createDefaultChatPlatformValue = require(script.Parent.createDefaultChatPlatformValue)
 
-local function createMockChatPlatformValue(t1: {[any]: any}?) -- line: 29
-	-- upvalues: createDefaultChatPlatformValue (copy), Signals (copy)
-	local v6 = t1 or {}
-	local v7 = createDefaultChatPlatformValue()
-	local getChatInputBarSettings = v7.getChatInputBarSettings
+local function createMockChatPlatformValue(options)
+	local v = options or {}
+	local defaultChatPlatformValue = createDefaultChatPlatformValue()
 
-	if v6.chatInputBarSettings ~= nil then
-		getChatInputBarSettings = Signals.createSignal(v6.chatInputBarSettings)
+	local getChatInputBarSettings = defaultChatPlatformValue.getChatInputBarSettings
+
+	if v.chatInputBarSettings ~= nil then
+		getChatInputBarSettings = Signals.createSignal(v.chatInputBarSettings)
 	end
 
-	local getInterpolators = v7.getInterpolators
+	local getInterpolators = defaultChatPlatformValue.getInterpolators
 
-	if v6.interpolators ~= nil then
-		getInterpolators = Signals.createSignal(v6.interpolators)
+	if v.interpolators ~= nil then
+		getInterpolators = Signals.createSignal(v.interpolators)
 	end
 
-	local getTransparencyStore = v7.getTransparencyStore
-	local transparencyStore = v6.transparencyStore
+	local getTransparencyStore = defaultChatPlatformValue.getTransparencyStore
+	local transparencyStore = v.transparencyStore
 
-	if transparencyStore ~= nil then
-		function getTransparencyStore(_: boolean) -- line: 46
-			-- upvalues: transparencyStore (copy)
-			return transparencyStore
-		end
-	end
+	local fn = transparencyStore ~= nil and function(_: boolean)
+		return transparencyStore
+	end or getTransparencyStore
 
 	return {
 		getChatInputBarSettings = getChatInputBarSettings,
-		chatWindowSettings = v6.chatWindowSettings or v7.chatWindowSettings,
+		chatWindowSettings = v.chatWindowSettings or defaultChatPlatformValue.chatWindowSettings,
 		getInterpolators = getInterpolators,
-		getTransparencyStore = getTransparencyStore
+		getTransparencyStore = fn
 	}
 end
 

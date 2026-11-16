@@ -1,10 +1,10 @@
-local function has(p1, p2) -- line: 2
-	local v4 = type(p1)
+local function has(p, p2): boolean
+	local typeName = type(p)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
 	assert(p2 ~= nil, "expected second argument to be anything but nil, got nil")
 
-	return p1[p2] == true
+	return p[p2] == true
 end
 
 return has

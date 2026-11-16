@@ -1,5 +1,9 @@
-local scriptParent = script.Parent
-local FFlagLuaAppHomeThumbnailPrefetch = require(scriptParent.SharedFlags).FFlagLuaAppHomeThumbnailPrefetch
+local parent = script.Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppHomeThumbnailPrefetch = SharedFlags.FFlagLuaAppHomeThumbnailPrefetch
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagMigrateGameInfoToStore = SharedFlags2.FFlagMigrateGameInfoToStore
+
 local OpenCentralOverlayForPlacesList = require(script.OpenCentralOverlayForPlacesList)
 local GameTileConstants = require(script.GameTileConstants)
 local GameTileTypes = require(script.GameTileTypes)
@@ -9,6 +13,7 @@ local ExperienceFooter = require(script.Footer.ExperienceFooter)
 local GameStats = require(script.Footer.GameStats)
 local usePlayerCountText = require(script.Footer.usePlayerCountText)
 local getGameTileLayoutData = require(script.getGameTileLayoutData)
+local getLayoutDataVideo = require(script.getLayoutDataVideo)
 local getGameTileCollectionItemSize = require(script.getGameTileCollectionItemSize)
 local getTileBadgeByPositionConfigFromEntry = require(script.getTileBadgeByPositionConfigFromEntry)
 local getValidTileBadges = require(script.Overlays.getValidTileBadges)
@@ -25,13 +30,29 @@ local HoverTileCoordinator = require(script.HoverTileCoordinator)
 local GameTileExperimentation = require(script.GameTileExperimentation)
 local useIsVideoEligible = require(script.Video.useIsVideoEligible)
 local useVideoAnalytics = require(script.Video.Analytics.useVideoAnalytics)
+local TileVideoBlockingConfig = require(script.Video.TileVideoBlockingConfig)
 local formatExperienceIcon = require(script.formatExperienceIcon)
 local formatExperienceRating = require(script.formatExperienceRating)
 local formatExperienceThumbnail = require(script.formatExperienceThumbnail)
-local v31 = if not FFlagLuaAppHomeThumbnailPrefetch then nil else require(script.resolveGameTileThumbnailUri)
+local resolveGameTileThumbnailUri
+
+if FFlagLuaAppHomeThumbnailPrefetch then
+	resolveGameTileThumbnailUri = require(script.resolveGameTileThumbnailUri)
+end
+
+local resolveWideAssetId
+
+if FFlagMigrateGameInfoToStore then
+	resolveWideAssetId = require(script.resolveWideAssetId)
+end
+
 local useNavigateToGameDetails = require(script.useNavigateToGameDetails)
-local TwoByOneGameTileTelemetry = require(script.TwoByOneGameTileTelemetry)
 local ItemLayoutDataParsingUtils = require(script.ItemLayoutDataParsingUtils)
+local useIsHoveredTile = require(script.useIsHoveredTile)
+local useValidTileBadges = require(script.Overlays.useValidTileBadges)
+local GameTileContextualActions = require(script.GameTileContextualActions)
+local GameTileOverflowMenu = require(script.GameTileOverflowMenu)
+local getAvailableGameTileOverflowMenuItems = require(script.getAvailableGameTileOverflowMenuItems)
 
 return {
 	AppExperienceActionRow = AppExperienceActionRow,
@@ -52,26 +73,34 @@ return {
 	OpenSponsoredTooltip = OpenSponsoredTooltip,
 	usePlayerCountText = usePlayerCountText,
 	getGameTileLayoutData = getGameTileLayoutData,
+	getLayoutDataVideo = getLayoutDataVideo,
 	getGameTileCollectionItemSize = getGameTileCollectionItemSize,
 	UserIconList = UserIconList,
 	WideGameTileViewConfig = WideGameTileViewConfig,
 	getValidTileBadges = getValidTileBadges,
 	useIsVideoEligible = useIsVideoEligible,
 	useVideoAnalytics = useVideoAnalytics,
+	TileVideoBlockingConfig = TileVideoBlockingConfig,
 	formatExperienceIcon = formatExperienceIcon,
 	formatExperienceRating = formatExperienceRating,
 	formatExperienceThumbnail = formatExperienceThumbnail,
-	resolveGameTileThumbnailUri = v31,
+	resolveGameTileThumbnailUri = resolveGameTileThumbnailUri,
+	resolveWideAssetId = resolveWideAssetId,
 	useNavigateToGameDetails = useNavigateToGameDetails,
 	NotInterestedUserSignalTelemetryEventConfigs = require(script.NotInterestedUserSignalTelemetryEventConfigs),
+	activateGameNotInterested = require(script.activateGameNotInterested),
+	undoGameNotInterested = require(script.undoGameNotInterested),
 	getGameTileHiddenStore = require(script.HiddenGameTile.getGameTileHiddenStore),
 	HiddenTileContent = require(script.HiddenGameTile.HiddenTileContent),
 	EmphasisGameTile = require(script.EmphasisGameTile),
-	TwoByOneGameTile = require(script.TwoByOneGameTile),
-	TwoByOneGameTileTelemetry = TwoByOneGameTileTelemetry,
-	OneByTwoTile = require(script.OneByTwoTile),
 	getTileBadgeByPositionConfigFromEntry = getTileBadgeByPositionConfigFromEntry,
 	ItemLayoutDataParsingUtils = ItemLayoutDataParsingUtils,
+	useIsHoveredTile = useIsHoveredTile,
+	useValidTileBadges = useValidTileBadges,
+	GameTileContextualActions = GameTileContextualActions,
+	GameTileOverflowMenu = GameTileOverflowMenu,
+	getAvailableGameTileOverflowMenuItems = getAvailableGameTileOverflowMenuItems,
+	useGameTileOverflowMenuFocusNavigation = require(script.useGameTileOverflowMenuFocusNavigation),
 	ZoomAnimatedFrame = require(script.ZoomAnimatedFrame),
 	["jest.config"] = script["jest.config"]
 }

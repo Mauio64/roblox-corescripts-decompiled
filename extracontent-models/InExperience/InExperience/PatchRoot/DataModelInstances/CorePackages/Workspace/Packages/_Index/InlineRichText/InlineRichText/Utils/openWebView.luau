@@ -1,36 +1,37 @@
-local Parent = script:FindFirstAncestor("InlineRichText").Parent
+local parent = script:FindFirstAncestor("InlineRichText").Parent
+
 local WebViewService = game:GetService("WebViewService")
 local BrowserService = game:GetService("BrowserService")
 local HttpService = game:GetService("HttpService")
-local GetFFlagEnableUnifiedWebViews = require(Parent.SharedFlags).GetFFlagEnableUnifiedWebViews
 
-local function openWebView(s1: string) -- line: 10
-	-- upvalues: GetFFlagEnableUnifiedWebViews (copy), WebViewService (copy), BrowserService (copy), HttpService (copy)
-	if GetFFlagEnableUnifiedWebViews() then
-		local u8 = nil
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnableUnifiedWebViews = SharedFlags.GetFFlagEnableUnifiedWebViews
 
-		u8 = WebViewService.OnWindowClosed:Connect(function() -- line: 14
-			-- upvalues: WebViewService (copy), u8 (ref)
-			WebViewService:CloseWindow()
-
-			if u8 then
-				u8:Disconnect()
-				u8 = nil
-			end
-		end)
-		WebViewService:OpenWindow(s1, "", true)
+local function openWebView(url: string)
+	if not GetFFlagEnableUnifiedWebViews() then
+		BrowserService:SendCommand(HttpService:JSONEncode({
+			command = "open",
+			url = url,
+			title = "",
+			visible = true,
+			isGenericWebview = true,
+			enableOverlayReplacement = true
+		}))
 
 		return
 	end
 
-	BrowserService:SendCommand(HttpService:JSONEncode({
-		command = "open",
-		title = "",
-		visible = true,
-		isGenericWebview = true,
-		enableOverlayReplacement = true,
-		url = s1
-	}))
+	local onWindowClosedConnection = nil
+
+	onWindowClosedConnection = WebViewService.OnWindowClosed:Connect(function()
+		WebViewService:CloseWindow()
+
+		if onWindowClosedConnection then
+			onWindowClosedConnection:Disconnect()
+			onWindowClosedConnection = nil
+		end
+	end)
+	WebViewService:OpenWindow(url, "", true)
 end
 
 return openWebView

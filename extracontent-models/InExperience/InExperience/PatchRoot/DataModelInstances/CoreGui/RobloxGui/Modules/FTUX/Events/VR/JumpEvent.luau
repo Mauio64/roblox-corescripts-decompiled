@@ -1,58 +1,54 @@
 local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")
-
 require(script.Parent.Parent.EventType)
 
-local t1 = {
-	Name = "FirstPersonToggleEvent"
-}
-local u4 = false
-local u5 = nil
+local JumpEvent = { Name = "FirstPersonToggleEvent" }
 
-local function onJumpInput(p1, p2, _) -- line: 16
-	-- upvalues: u4 (ref)
-	if p1 == "JumpAction" and p2 == Enum.UserInputState.Begin then
-		u4 = true
+local flag = false
+local renderSteppedConnection = nil
+
+local function onJumpInput(p, p2, _)
+	if p == "JumpAction" and p2 == Enum.UserInputState.Begin then
+		flag = true
 	end
 
 	return Enum.ContextActionResult.Pass
 end
 
-function startJumpEventListener() -- line: 26
-	-- upvalues: ContextActionService (copy), onJumpInput (copy)
+function startJumpEventListener()
 	ContextActionService:BindCoreAction("JumpAction", onJumpInput, false, Enum.KeyCode.Space)
 end
-function stopJumpEventListener() -- line: 30
-	-- upvalues: ContextActionService (copy)
+
+function stopJumpEventListener()
 	ContextActionService:UnbindAction("JumpAction")
 end
-function t1.StartEvent(p4) -- line: 34
-	-- upvalues: u4 (ref), u5 (ref), RunService (copy)
+
+function JumpEvent.StartEvent(callback)
 	startJumpEventListener()
 
-	local function onRenderStepped(_) -- line: 39
-		-- upvalues: u4 (ref), p4 (copy), u5 (ref)
-		if u4 then
+	local function onRenderStepped(_)
+		if flag then
 			stopJumpEventListener()
-			p4()
 
-			if u5 then
-				u5:Disconnect()
-				u5 = nil
+			callback()
+
+			if renderSteppedConnection then
+				renderSteppedConnection:Disconnect()
+				renderSteppedConnection = nil
 			end
 		end
 	end
 
-	u5 = RunService.RenderStepped:Connect(onRenderStepped)
+	renderSteppedConnection = RunService.RenderStepped:Connect(onRenderStepped)
 end
-function t1.StopEvent() -- line: 58
-	-- upvalues: u5 (ref)
-	if u5 then
-		u5:Disconnect()
-		u5 = nil
+
+function JumpEvent.StopEvent()
+	if renderSteppedConnection then
+		renderSteppedConnection:Disconnect()
+		renderSteppedConnection = nil
 	end
 
 	stopJumpEventListener()
 end
 
-return t1
+return JumpEvent

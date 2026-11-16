@@ -1,20 +1,22 @@
 local RunService = game:GetService("RunService")
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParent.Core
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local Otter = require(ParentParentParent.Otter)
-local Button = require(Core.ImageSet.ImageSetComponent).Button
-local withStyle = require(Core.Style.withStyle)
-local NavigationDirection = require(script.Parent.NavigationDirection)
-local t1 = {
-	dampingRatio = 1,
-	frequency = 3.5
-}
-local v12 = Roact.PureComponent:extend("ArrowNav")
 
-v12.validateProps = t.intersection(t.strictInterface({
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+local core = parent.Core
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+local Otter = require(parent2.Otter)
+local ImageSetComponent = require(core.ImageSet.ImageSetComponent)
+local Button = ImageSetComponent.Button
+local withStyle = require(core.Style.withStyle)
+local NavigationDirection = require(script.Parent.NavigationDirection)
+
+local v = { dampingRatio = 1, frequency = 3.5 }
+
+local extended = Roact.PureComponent:extend("ArrowNav")
+
+extended.validateProps = t.intersection(t.strictInterface({
 	AnchorPoint = t.optional(t.Vector2),
 	Position = t.optional(t.UDim2),
 	Image = t.table,
@@ -31,226 +33,231 @@ v12.validateProps = t.intersection(t.strictInterface({
 		buttonPadding = t.number,
 		updateCanvasPosition = t.callback
 	}))
-}), function(p1) -- line: 63
-	if p1.defaultUseProps then
-		if p1.defaultUseProps.buttonRefs ~= nil then
-			if p1.defaultUseProps.buttonWidth ~= nil then
-				return false, "Cannot set both buttonWidth and buttonRefs"
-			end
+}), function(p)
+	if not p.defaultUseProps then
+		return true
+	end
 
-			if p1.defaultUseProps.numButtons ~= nil then
-				return false, "Cannot set both numButtons and buttonRefs"
-			end
+	if p.defaultUseProps.buttonRefs ~= nil then
+		if p.defaultUseProps.buttonWidth ~= nil then
+			return false, "Cannot set both buttonWidth and buttonRefs"
 		end
 
-		if p1.defaultUseProps.buttonWidth ~= nil and p1.defaultUseProps.numButtons == nil then
-			return false, "If setting buttonWidth must also set numButtons"
+		if p.defaultUseProps.numButtons ~= nil then
+			return false, "Cannot set both numButtons and buttonRefs"
 		end
+	end
 
-		if p1.defaultUseProps.buttonWidth == nil and p1.defaultUseProps.numButtons ~= nil then
-			return false, "If setting numButtons must also set buttonWidth"
-		end
+	if p.defaultUseProps.buttonWidth ~= nil and p.defaultUseProps.numButtons == nil then
+		return false, "If setting buttonWidth must also set numButtons"
+	end
 
-		if p1.defaultUseProps.buttonRefs == nil and p1.defaultUseProps.buttonWidth == nil and p1.defaultUseProps.numButtons == nil then
-			return false, "Must set either buttonRefs or (buttonWidth and numButtons)"
-		end
+	if p.defaultUseProps.buttonWidth == nil and p.defaultUseProps.numButtons ~= nil then
+		return false, "If setting numButtons must also set buttonWidth"
+	end
+
+	if
+		p.defaultUseProps.buttonRefs == nil
+		and p.defaultUseProps.buttonWidth == nil
+		and p.defaultUseProps.numButtons == nil
+	then
+		return false, "Must set either buttonRefs or (buttonWidth and numButtons)"
 	end
 
 	return true
 end)
-v12.defaultProps = {
-	Visible = true,
+
+extended.defaultProps = {
 	AnchorPoint = Vector2.new(0, 0),
-	Position = UDim2.new(0, 0, 0, 0)
+	Position = UDim2.new(0, 0, 0, 0),
+	Visible = true
 }
 
-function v12.init(p2) -- line: 97
-	p2.holdConn = nil
-	p2.timeOfInputBegan = 0
+function extended:init()
+	self.holdConn = nil
+	self.timeOfInputBegan = 0
 
-	function p2.handleInputBegan(_, p4) -- line: 101
-		-- upvalues: p2 (copy)
-		local navDirection = p2.props.navDirection
+	function self.handleInputBegan(_, p)
+		local navDirection = self.props.navDirection
 
-		if p2.props.onPressHoldInputBegan then
-			p2.props.onPressHoldInputBegan(p4, navDirection)
-
-			return
+		if self.props.onPressHoldInputBegan then
+			self.props.onPressHoldInputBegan(p, navDirection)
+		else
+			self:onPressHoldInputBegan(p, navDirection)
 		end
-
-		p2:onPressHoldInputBegan(p4, navDirection)
 	end
-	function p2.handleInputEnded(_, p6) -- line: 110
-		-- upvalues: p2 (copy)
-		local navDirection = p2.props.navDirection
 
-		if p2.props.onPressHoldInputEnded then
-			p2.props.onPressHoldInputEnded(p6, navDirection)
+	function self.handleInputEnded(_, p)
+		local navDirection = self.props.navDirection
 
-			return
+		if self.props.onPressHoldInputEnded then
+			self.props.onPressHoldInputEnded(p, navDirection)
+		else
+			self:onPressHoldInputEnded(p, navDirection)
 		end
-
-		p2:onPressHoldInputEnded(p6, navDirection)
 	end
 end
-function v12.getGoal(p7, p8) -- line: 120
-	-- upvalues: Otter (copy), t1 (copy)
-	return Otter.spring(p7:getScrollToLocation(p8), t1)
-end
-function v12.didMount(p9) -- line: 124
-	p9:setMotor(0)
-end
-function v12.setMotor(t2: {[any]: any}, n1: number) -- line: 128
-	-- upvalues: Otter (copy)
-	t2.motor = Otter.createSingleMotor(n1)
-	t2.motor:onStep(function(p10) -- line: 130
-		-- upvalues: t2 (copy)
-		t2.props.defaultUseProps.updateCanvasPosition(Vector2.new(p10, 0))
-	end)
-	t2.motor:onComplete(function(p11) -- line: 133
-		-- upvalues: t2 (copy)
-		t2.props.defaultUseProps.updateCanvasPosition(Vector2.new(p11, 0))
-	end)
-end
-function v12.render(p12) -- line: 138
-	-- upvalues: withStyle (copy), Roact (copy), Button (copy)
-	return withStyle(function(p13) -- line: 139
-		-- upvalues: Roact (copy), Button (copy), p12 (copy)
-		local Theme = p13.Theme
 
+function extended:getGoal(p)
+	return Otter.spring(self:getScrollToLocation(p), v)
+end
+
+function extended:didMount()
+	self:setMotor(0)
+end
+
+function extended:setMotor(p: number)
+	self.motor = Otter.createSingleMotor(p)
+	self.motor:onStep(function(p2)
+		self.props.defaultUseProps.updateCanvasPosition(Vector2.new(p2, 0))
+	end)
+	self.motor:onComplete(function(p2)
+		self.props.defaultUseProps.updateCanvasPosition(Vector2.new(p2, 0))
+	end)
+end
+
+function extended.render(data)
+	return withStyle(function(p)
+		local theme = p.Theme
 		return Roact.createElement(Button, {
-			AnchorPoint = p12.props.AnchorPoint,
-			Position = p12.props.Position,
-			Image = p12.props.Image,
-			Visible = p12.props.Visible,
+			AnchorPoint = data.props.AnchorPoint,
+			Position = data.props.Position,
+			Image = data.props.Image,
+			Visible = data.props.Visible,
 			BackgroundTransparency = 1,
-			ImageColor3 = Theme.IconEmphasis.Color,
+			ImageColor3 = theme.IconEmphasis.Color,
 			Size = UDim2.fromOffset(36, 36),
-			[Roact.Event.InputBegan] = p12.handleInputBegan,
-			[Roact.Event.InputEnded] = p12.handleInputEnded
+			[Roact.Event.InputBegan] = data.handleInputBegan,
+			[Roact.Event.InputEnded] = data.handleInputEnded
 		})
 	end)
 end
-function v12.willUnmount(p14) -- line: 155
-	p14:disconnectHoldConn()
 
-	if p14.motor then
-		p14.motor:destroy()
-		p14.motor = nil
+function extended:willUnmount()
+	self:disconnectHoldConn()
+
+	if self.motor then
+		self.motor:destroy()
+		self.motor = nil
 	end
 end
-function v12.getNewCanvasPosition(t3: {[any]: any}, n2: number) -- line: 163
-	return t3.props.defaultUseProps.scrollingFrameRef.current.CanvasPosition + Vector2.new(n2, 0)
+
+function extended:getNewCanvasPosition(p: number)
+	return self.props.defaultUseProps.scrollingFrameRef.current.CanvasPosition + Vector2.new(p, 0)
 end
-function v12.disconnectHoldConn(p15) -- line: 168
-	if p15.holdConn == nil then
+
+function extended:disconnectHoldConn()
+	if self.holdConn == nil then
 		return
 	end
 
-	p15.holdConn:Disconnect()
-	p15.holdConn = nil
+	self.holdConn:Disconnect()
+	self.holdConn = nil
 end
-function v12.onPressHoldInputBegan(p16, p17, p18) -- line: 176
-	-- upvalues: RunService (copy), NavigationDirection (copy)
-	if p17.UserInputState ~= Enum.UserInputState.Begin then
+
+function extended:onPressHoldInputBegan(p, p2)
+	if p.UserInputState ~= Enum.UserInputState.Begin then
 		return
 	end
 
-	p16.timeOfInputBegan = tick()
-	p16:disconnectHoldConn()
-	p16.holdConn = RunService.RenderStepped:connect(function(p19) -- line: 182
-		-- upvalues: p16 (copy), NavigationDirection (copy), p18 (copy)
-		local v70 = tick() - p16.timeOfInputBegan
-		local v71 = NavigationDirection.IsLeft ~= p18 and 1 or -1
-		local v72 = p16:getNewCanvasPosition(v71 * 500 * p19 * v70 ^ 2)
-
-		p16.props.defaultUseProps.updateCanvasPosition(v72)
+	self.timeOfInputBegan = tick()
+	self:disconnectHoldConn()
+	self.holdConn = RunService.RenderStepped:connect(function(p3)
+		local v2 = tick() - self.timeOfInputBegan
+		local newCanvasPosition = self:getNewCanvasPosition((p2 == NavigationDirection.IsLeft and -1 or 1) * 500 * p3 * v2 ^ 2)
+		self.props.defaultUseProps.updateCanvasPosition(newCanvasPosition)
 	end)
 end
-function v12.onPressHoldInputEnded(p20, p21, p22) -- line: 191
-	-- upvalues: Otter (copy)
-	if p21.UserInputState ~= Enum.UserInputState.End then
+
+function extended:onPressHoldInputEnded(p, p2)
+	if p.UserInputState ~= Enum.UserInputState.End then
 		return
 	end
 
-	local current = p20.props.defaultUseProps.scrollingFrameRef.current
+	local current = self.props.defaultUseProps.scrollingFrameRef.current
 
-	if tick() - p20.timeOfInputBegan <= 0.5 then
-		if p20.motor then
-			p20.motor:destroy()
+	if tick() - self.timeOfInputBegan <= 0.5 then
+		if self.motor then
+			self.motor:destroy()
 		end
 
-		p20:setMotor(current.CanvasPosition.X)
-		p20.motor:setGoal(p20:getGoal(p22))
+		self:setMotor(current.CanvasPosition.X)
+		self.motor:setGoal(self:getGoal(p2))
 	else
-		p20.motor:setGoal(Otter.instant(current.CanvasPosition.X))
+		self.motor:setGoal(Otter.instant(current.CanvasPosition.X))
 	end
 
-	p20:disconnectHoldConn()
+	self:disconnectHoldConn()
 end
-function v12.getScrollToLocation(p23, p24) -- line: 209
-	-- upvalues: NavigationDirection (copy)
-	local v34 = p23:getButtonSizes()
 
-	if p24 == NavigationDirection.IsLeft then
-		return p23:getScrollToLeftLocation(v34)
+function extended:getScrollToLocation(p)
+	local buttonSizes = self:getButtonSizes()
+
+	if p == NavigationDirection.IsLeft then
+		return self:getScrollToLeftLocation(buttonSizes)
 	end
 
-	return p23:getScrollToRightLocation(v34)
+	return self:getScrollToRightLocation(buttonSizes)
 end
-function v12.getButtonSizes(p25) -- line: 219
-	local buttonRefs = p25.props.defaultUseProps.buttonRefs
-	local buttonWidth = p25.props.defaultUseProps.buttonWidth
-	local numButtons = p25.props.defaultUseProps.numButtons
+
+function extended:getButtonSizes()
+	local buttonRefs = self.props.defaultUseProps.buttonRefs
+	local buttonWidth = self.props.defaultUseProps.buttonWidth
+	local numButtons = self.props.defaultUseProps.numButtons
 
 	if buttonWidth and numButtons then
 		return table.create(numButtons, buttonWidth)
 	end
 
-	local t4 = {}
+	local result = {}
 
-	for _, v in ipairs(buttonRefs) do
-		table.insert(t4, v.current and v.current.AbsoluteSize.X or 0)
+	for _, buttonRef in ipairs(buttonRefs) do
+		table.insert(result, buttonRef.current and buttonRef.current.AbsoluteSize.X or 0)
 	end
 
-	return t4
+	return result
 end
-function v12.getScrollToLeftLocation(p26, p27) -- line: 236
-	local current = p26.props.defaultUseProps.scrollingFrameRef.current
-	local buttonPadding = p26.props.defaultUseProps.buttonPadding
-	local v46 = current.CanvasPosition.X - current.AbsoluteSize.X * 0.4
-	local n3 = 0
 
-	for _, v in ipairs(p27) do
-		if v46 <= n3 + v + buttonPadding then
-			return n3
+function extended:getScrollToLeftLocation(list)
+	local current = self.props.defaultUseProps.scrollingFrameRef.current
+	local buttonPadding = self.props.defaultUseProps.buttonPadding
+
+	local v2 = current.CanvasPosition.X - current.AbsoluteSize.X * 0.4
+	local scrollToLeftLocation = 0
+
+	for _, item in ipairs(list) do
+		if v2 <= scrollToLeftLocation + item + buttonPadding then
+			return scrollToLeftLocation
 		end
 
-		n3 += v + buttonPadding
+		scrollToLeftLocation += item + buttonPadding
 	end
 
-	return n3
+	return scrollToLeftLocation
 end
-function v12.getScrollToRightLocation(p28, p29) -- line: 253
-	local current = p28.props.defaultUseProps.scrollingFrameRef.current
-	local buttonPadding = p28.props.defaultUseProps.buttonPadding
-	local padOutsideEdges = p28.props.defaultUseProps.padOutsideEdges
-	local v55 = current.CanvasPosition.X + current.AbsoluteSize.X * 0.4
-	local v56 = -current.AbsoluteSize.X
+
+function extended:getScrollToRightLocation(list)
+	local current = self.props.defaultUseProps.scrollingFrameRef.current
+	local buttonPadding = self.props.defaultUseProps.buttonPadding
+	local padOutsideEdges = self.props.defaultUseProps.padOutsideEdges
+
+	local v2 = current.CanvasPosition.X + current.AbsoluteSize.X * 0.4
+
+	local scrollToRightLocation = -current.AbsoluteSize.X
 
 	if padOutsideEdges then
-		v56 += buttonPadding
+		scrollToRightLocation += buttonPadding
 	end
 
-	for _, v in ipairs(p29) do
-		if v55 < v56 then
-			return v56
+	for _, item in ipairs(list) do
+		if v2 < scrollToRightLocation then
+			return scrollToRightLocation
 		end
 
-		v56 += v + buttonPadding
+		scrollToRightLocation += item + buttonPadding
 	end
 
-	return v56
+	return scrollToRightLocation
 end
 
-return v12
+return extended

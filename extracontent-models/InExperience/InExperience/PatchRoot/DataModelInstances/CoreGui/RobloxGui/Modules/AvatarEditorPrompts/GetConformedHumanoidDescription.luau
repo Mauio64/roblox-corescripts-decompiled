@@ -1,89 +1,82 @@
 local AvatarEditorService = game:GetService("AvatarEditorService")
 local CorePackages = game:GetService("CorePackages")
+
 local Promise = require(CorePackages.Packages.Promise)
-local u4 = nil
-local u5 = nil
 
-local function removeDefaultClothing(p1, p2, p3) -- line: 14
-	-- upvalues: AvatarEditorService (copy)
-	local v11 = if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then AvatarEditorService:GetAvatarRules() else AvatarEditorService:GetAvatarRulesAsync()
+local v = nil
+local v2 = nil
 
-	if not v11.DefaultClothingAssetLists then
-		p3("No default clothing in avatar rules")
+local function removeDefaultClothing(instance, callback, callback2)
+	local avatarRulesAsync = AvatarEditorService:GetAvatarRulesAsync()
 
+	if not avatarRulesAsync.DefaultClothingAssetLists then
+		callback2("No default clothing in avatar rules")
 		return
 	end
 
-	local DefaultShirtAssetIds = v11.DefaultClothingAssetLists.DefaultShirtAssetIds
-	local DefaultPantAssetIds = v11.DefaultClothingAssetLists.DefaultPantAssetIds
+	local defaultShirtAssetIds = avatarRulesAsync.DefaultClothingAssetLists.DefaultShirtAssetIds
+	local defaultPantAssetIds = avatarRulesAsync.DefaultClothingAssetLists.DefaultPantAssetIds
 
-	if not DefaultShirtAssetIds or not DefaultPantAssetIds then
-		p3("No default clothing ids in avatar rules")
-
+	if not (defaultShirtAssetIds and defaultPantAssetIds) then
+		callback2("No default clothing ids in avatar rules")
 		return
 	end
 
-	local v14 = nil
+	local v3 = nil
 
-	for _, v in ipairs(DefaultShirtAssetIds) do
-		if v == p1.Shirt then
-			v14 = v14 or p1:Clone()
-			v14.Shirt = 0
+	for _, defaultShirtAssetId in ipairs(defaultShirtAssetIds) do
+		if defaultShirtAssetId ~= instance.Shirt then
+			continue
 		end
+
+		v3 = v3 or instance:Clone()
+		v3.Shirt = 0
 	end
 
-	for _, v in ipairs(DefaultPantAssetIds) do
-		if v == p1.Pants then
-			v14 = v14 or p1:Clone()
-			v14.Pants = 0
+	for _, defaultPantAssetId in ipairs(defaultPantAssetIds) do
+		if defaultPantAssetId ~= instance.Pants then
+			continue
 		end
+
+		v3 = v3 or instance:Clone()
+		v3.Pants = 0
 	end
 
-	p2(v14 or p1)
+	callback(v3 or instance)
 end
-local function GetConformedHumanoidDescription(p4, p5) -- line: 53
-	-- upvalues: u4 (ref), Promise (copy), u5 (ref), removeDefaultClothing (copy), AvatarEditorService (copy)
-	if p4 == u4 then
-		if p5 then
-			return Promise.resolve(u5)
-		end
 
-		return Promise.new(function(resolve, reject) -- line: 58
-			-- upvalues: removeDefaultClothing (copy), u5 (ref)
-			removeDefaultClothing(u5, resolve, reject)
-		end)
-	end
+local function GetConformedHumanoidDescription(p, p2)
+	if p ~= v then
+		return Promise.new(function(callback, callback2)
+			coroutine.wrap(function()
+				local success, result = pcall(function()
+					return AvatarEditorService:ConformToAvatarRulesAsync(p)
+				end)
 
-	return Promise.new(function(resolve, reject) -- line: 64
-		-- upvalues: AvatarEditorService (copy), p4 (copy), u4 (ref), u5 (ref), p5 (copy), removeDefaultClothing (copy)
-		coroutine.wrap(function() -- line: 65
-			-- upvalues: AvatarEditorService (copy), p4 (copy), u4 (ref), u5 (ref), p5 (copy), resolve (copy), removeDefaultClothing (copy), reject (copy)
-			local ok, result = pcall(function() -- line: 66
-				-- upvalues: AvatarEditorService (copy), p4 (copy)
-				if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-					return AvatarEditorService:ConformToAvatarRulesAsync(p4)
-				end
-
-				return AvatarEditorService:ConformToAvatarRules(p4)
-			end)
-
-			if ok then
-				u4 = p4
-				u5 = result
-
-				if p5 then
-					resolve(result)
+				if not success then
+					callback2(result)
 
 					return
 				end
 
-				removeDefaultClothing(result, resolve, reject)
+				v = p
+				v2 = result
 
-				return
-			end
+				if p2 then
+					callback(result)
+				else
+					removeDefaultClothing(result, callback, callback2)
+				end
+			end)()
+		end)
+	end
 
-			reject(result)
-		end)()
+	if p2 then
+		return Promise.resolve(v2)
+	end
+
+	return Promise.new(function(p3, p4)
+		removeDefaultClothing(v2, p3, p4)
 	end)
 end
 

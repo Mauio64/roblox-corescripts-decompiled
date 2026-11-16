@@ -1,83 +1,64 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Http = require(DataHydrationParent.Http)
-local HttpClient = require(DataHydrationParent.HttpClient)
-local withCsrfRetry = require(DataHydration.withCsrfRetry)
+local parent = DataHydration.Parent
 
+local Http = require(parent.Http)
+local HttpClient = require(parent.HttpClient)
+
+local withCsrfRetry = require(DataHydration.withCsrfRetry)
 require(script.Parent.UserSettingsStoreTypes)
 
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
-local FFlagUserSettingsFetchCachedEndpoint = require(script.Parent.FFlagUserSettingsFetchCachedEndpoint)
 
-local function settingsAndOptionsUrl() -- line: 26
-	-- upvalues: FFlagUserSettingsFetchCachedEndpoint (copy), Http (copy)
-	local v12 = not FFlagUserSettingsFetchCachedEndpoint and "user-settings-api/v1/user-settings/settings-and-options" or "user-settings-api/v1/user-settings"
-
-	return `{ Http.Url.APIS_URL }{ v12 }`
+local function settingsAndOptionsUrl() -- 1 equivalent call inferred from this helper
+	return `{Http.Url.APIS_URL}user-settings-api/v1/user-settings`
 end
-local function normalizeCachedUserSettings(p1) -- line: 31
-	if typeof(p1) ~= "table" then
+
+local function normalizeCachedUserSettings(items)
+	if typeof(items) ~= "table" then
 		return {}
 	end
 
-	local t1 = {}
+	local result = {}
 
-	for v15, v16 in p1 do
-		t1[v15] = {
-			currentValue = v16
-		}
+	for k, item in items do
+		result[k] = { currentValue = item }
 	end
 
-	return t1
-end
-local function settingsUpdateUrl() -- line: 42
-	-- upvalues: Http (copy)
-	return `{ Http.Url.APIS_URL }user-settings-api/v1/user-settings`
+	return result
 end
 
-return {
-	fetchSettingsAndOptions = function(t2: {[any]: any}?) -- line: 46
-		-- upvalues: HttpClient (copy), fetch (copy), FFlagUserSettingsFetchCachedEndpoint (copy), Http (copy), normalizeCachedUserSettings (copy), asPromise (copy)
-		local v18 = t2 and t2.network or HttpClient.createRequestInternalNetwork()
-		local v19 = fetch
-		local t3 = {
-			method = "GET",
-			analyticsKey = "user-settings.settings-and-options.get"
-		}
-		local v21 = not FFlagUserSettingsFetchCachedEndpoint and "user-settings-api/v1/user-settings/settings-and-options" or "user-settings-api/v1/user-settings"
+local function settingsUpdateUrl() -- 1 equivalent call inferred from this helper
+	return `{Http.Url.APIS_URL}user-settings-api/v1/user-settings`
+end
 
-		t3.url = `{ Http.Url.APIS_URL }{ v21 }`
-		t3.network = v18
+local UserSettingsRequests = {}
 
-		function t3.decode(p2) -- line: 53
-			-- upvalues: FFlagUserSettingsFetchCachedEndpoint (copy), normalizeCachedUserSettings (copy)
-			if FFlagUserSettingsFetchCachedEndpoint then
-				return (normalizeCachedUserSettings(p2))
-			end
-
-			return p2
+function UserSettingsRequests.fetchSettingsAndOptions(p)
+	local network = p and p.network or HttpClient.createRequestInternalNetwork()
+	return asPromise((fetch({
+		method = "GET",
+		url = settingsAndOptionsUrl(), -- inferred equivalent call
+		analyticsKey = "user-settings.settings-and-options.get",
+		network = network,
+		decode = function(p2)
+			return normalizeCachedUserSettings(p2)
 		end
+	})))
+end
 
-		local v22 = v19(t3)
+function UserSettingsRequests.postUserSettings(body, p)
+	local network = p and p.network or HttpClient.createRequestInternalNetwork()
+	return asPromise((fetch({
+		method = "POST",
+		url = settingsUpdateUrl(), -- inferred equivalent call
+		body = body,
+		analyticsKey = "user-settings.update.post",
+		network = withCsrfRetry(network),
+		decode = function(_)
+			return body
+		end
+	})))
+end
 
-		return asPromise(v22)
-	end,
-	postUserSettings = function(t4: {[any]: any}, t5: {[any]: any}?) -- line: 63
-		-- upvalues: HttpClient (copy), fetch (copy), Http (copy), withCsrfRetry (copy), asPromise (copy)
-		local v25 = t5 and t5.network or HttpClient.createRequestInternalNetwork()
-		local v26 = fetch({
-			method = "POST",
-			analyticsKey = "user-settings.update.post",
-			url = `{ Http.Url.APIS_URL }user-settings-api/v1/user-settings`,
-			body = t4,
-			network = withCsrfRetry(v25),
-			decode = function(_) -- line: 71
-				-- upvalues: t4 (copy)
-				return t4
-			end
-		})
-
-		return asPromise(v26)
-	end
-}
+return UserSettingsRequests

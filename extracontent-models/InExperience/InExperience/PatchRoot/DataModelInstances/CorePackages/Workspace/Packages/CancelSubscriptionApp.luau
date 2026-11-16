@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.CancelSubscriptionApp.CancelSubscriptionApp))
+local CancelSubscriptionApp = require(Workspace.CancelSubscriptionApp.CancelSubscriptionApp)
+
+return CancelSubscriptionApp

@@ -1,5 +1,5 @@
-local function escapeRichFormatting(s1: string) -- line: 2
-	return (s1:gsub("[&<>\"']", {
+local function escapeRichFormatting(value: string)
+	return (value:gsub("[&<>\"']", {
 		["&"] = "&amp;",
 		["<"] = "&lt;",
 		[">"] = "&gt;",

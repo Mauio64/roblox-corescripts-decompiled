@@ -1,7 +1,9 @@
 local Charts = script:FindFirstAncestor("Charts")
-local ChartsParent = Charts.Parent
-local AppPage = require(ChartsParent.RobloxAppEnums).AppPage
-local SduiSharedUtilities = require(ChartsParent.SduiSharedUtilities)
+local parent = Charts.Parent
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local SduiSurfaceLoadTimeTracker = SduiSharedUtilities.SduiSurfaceLoadTimeTracker
 local getSduiClientPageScope = SduiSharedUtilities.getSduiClientPageScope
 local ChartsConstants = require(Charts.ChartsPage.ChartsConstants)
@@ -10,25 +12,24 @@ local ChartsSortDetailConstants = require(Charts.ChartsSortDetailPage.ChartsSort
 local fetchChartsSortDetail = require(Charts.ChartsSortDetailPage.fetchChartsSortDetail)
 local getChartsSortDetailPageKey = require(Charts.ChartsSortDetailPage.getChartsSortDetailPageKey)
 
-local function navigateToChartsSortDetailPage(p1, t1: {[any]: any}) -- line: 14
-	-- upvalues: getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy), getChartsSortDetailPageKey (copy), SduiSurfaceLoadTimeTracker (copy), ChartsSortDetailConstants (copy), fetchChartsSortDetail (copy), AppPage (copy)
-	local v15 = getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections)
-	local v16 = getChartsSortDetailPageKey(t1.sortId, nil, v15)
-	local v17 = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(v16, {
-		eventName = ChartsSortDetailConstants.SurfaceLoadTimeEventName,
-		metadata = {
-			page = "navigate"
+local function navigateToChartsSortDetailPage(p, p2)
+	local v = getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections)
+	local chartsSortDetailPageKey = getChartsSortDetailPageKey(p2.sortId, nil, v)
+	local loadTimerWithSurfaceLoadTime = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(
+		chartsSortDetailPageKey,
+		{
+			eventName = ChartsSortDetailConstants.SurfaceLoadTimeEventName,
+			metadata = { page = "navigate" }
 		}
-	})
+	)
 
-	v17.start("navigate")
-	fetchChartsSortDetail(t1.sortId, v17)
-	p1.navigate(AppPage.GamesList, {
-		detail = t1.sortId,
-		extraProps = {
-			pageContext = t1.pageContext,
-			pageTimer = v17
-		}
+	loadTimerWithSurfaceLoadTime.start("navigate")
+
+	fetchChartsSortDetail(p2.sortId, loadTimerWithSurfaceLoadTime)
+
+	p.navigate(AppPage.GamesList, {
+		detail = p2.sortId,
+		extraProps = { pageContext = p2.pageContext, pageTimer = loadTimerWithSurfaceLoadTime }
 	})
 end
 

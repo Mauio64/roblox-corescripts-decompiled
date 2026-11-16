@@ -1,21 +1,25 @@
 local toRect = require(script.Parent.toRect)
 local returnValue = require(script.Parent.returnValue)
 
-local function insideAbove(p1, p2, p3) -- line: 26
-	-- upvalues: toRect (copy), returnValue (copy)
-	local v7 = toRect(p1)
-	local v8 = toRect(p2)
-	local v9 = -(v7.Max - v8.Max)
+local function insideAbove(p, p2, value)
+	local v = toRect(p)
+	local v2 = toRect(p2)
 
-	if p3 then
-		if typeof(p3) == "number" then
-			p3 = NumberRange.new(p3)
-		end
+	local v3 = -(v.Max - v2.Max)
 
-		return returnValue(p3.Min <= v9.Y and p3.Max >= v9.Y, "Was within range", "Was not within range ( " .. tostring(p3) .. ")")
+	if not value then
+		return returnValue(v3.Y >= 0, "Was not below the element", "Was too far below the element")
 	end
 
-	return returnValue(v9.Y >= 0, "Was not below the element", "Was too far below the element")
+	if typeof(value) == "number" then
+		value = NumberRange.new(value)
+	end
+
+	return returnValue(
+		value.Min <= v3.Y and value.Max >= v3.Y,
+		"Was within range",
+		"Was not within range ( " .. tostring(value) .. ")"
+	)
 end
 
 return insideAbove

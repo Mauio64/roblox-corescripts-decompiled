@@ -1,120 +1,107 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local floatEquals = require(parent.util.floatEquals)
+local getMeshSize = require(parent.util.getMeshSize)
+local getEditableMeshFromContext = require(parent.util.getEditableMeshFromContext)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local floatEquals = require(ParentParent.util.floatEquals)
-local getMeshSize = require(ParentParent.util.getMeshSize)
-local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
-local getFFlagUGCValidateMigrateBodyPartBounds = require(ParentParent.flags.getFFlagUGCValidateMigrateBodyPartBounds)
-local t1 = {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
-	},
-	requiredData = {
-		ValidationEnums.SharedDataMember.rootInstance,
-		ValidationEnums.SharedDataMember.uploadEnum,
-		ValidationEnums.SharedDataMember.consumerConfig
-	},
-	conditionalData = { ValidationEnums.SharedDataMember.renderMeshesData },
-	fflag = getFFlagUGCValidateMigrateBodyPartBounds,
-	expectedFailures = {}
+local MeshSizePropertyCorrect = {}
+
+MeshSizePropertyCorrect.categories = {
+	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
+	ValidationEnums.UploadCategory.DYNAMIC_HEAD
 }
 
-local function vector3Equals(vector3: Vector3, vector3_2: Vector3) -- line: 30
-	-- upvalues: floatEquals (copy)
-	return floatEquals(vector3.X, vector3_2.X, 1E-05) and (floatEquals(vector3.Y, vector3_2.Y, 1E-05) and floatEquals(vector3.Z, vector3_2.Z, 1E-05))
+MeshSizePropertyCorrect.requiredData = {
+	ValidationEnums.SharedDataMember.rootInstance,
+	ValidationEnums.SharedDataMember.uploadEnum,
+	ValidationEnums.SharedDataMember.consumerConfig
+}
+
+MeshSizePropertyCorrect.conditionalData = { ValidationEnums.SharedDataMember.renderMeshesData }
+
+MeshSizePropertyCorrect.expectedFailures = {}
+
+local function vector3Equals(meshSize: Vector3, meshSize2: Vector3) -- 1 equivalent call inferred from this helper
+	return floatEquals(meshSize.X, meshSize2.X, 0.00001)
+		and floatEquals(meshSize.Y, meshSize2.Y, 0.00001)
+		and floatEquals(meshSize.Z, meshSize2.Z, 0.00001)
 end
-local function validateSingleMeshPart(p1, p2, p3) -- line: 35
-	-- upvalues: getEditableMeshFromContext (copy), ErrorSourceStrings (copy), getMeshSize (copy), floatEquals (copy)
-	local t2 = {
+
+local function validateSingleMeshPart(instance, p, object)
+	local v = {
+		fullName = instance:GetFullName(),
 		fieldName = "MeshId",
-		fullName = p1:GetFullName(),
-		contentId = p1.MeshId,
-		context = p1.Name
+		contentId = instance.MeshId,
+		context = instance.Name
 	}
-	local v18, v19 = getEditableMeshFromContext(p1, "MeshId", p2)
 
-	if not v18 then
-		p3:fail(ErrorSourceStrings.Keys.MeshSize_LoadFailed, {
-			meshName = p1.Name
-		}, p1)
+	local editableMeshFromContext, editableMesh = getEditableMeshFromContext(instance, "MeshId", p)
 
+	if not editableMeshFromContext then
+		object:fail(ErrorSourceStrings.Keys.MeshSize_LoadFailed, { meshName = instance.Name }, instance)
 		return
 	end
 
-	t2.editableMesh = v19
+	v.editableMesh = editableMesh
 
-	local v20 = getMeshSize(t2)
-	local MeshSize = p1.MeshSize
+	local meshSize = getMeshSize(v)
 
-	if not floatEquals(MeshSize.X, v20.X, 1E-05) or (not floatEquals(MeshSize.Y, v20.Y, 1E-05) or not floatEquals(MeshSize.Z, v20.Z, 1E-05)) then
-		p3:fail(ErrorSourceStrings.Keys.MeshSize_Mismatch, {
-			meshName = p1.Name
-		}, p1)
+	if not vector3Equals(instance.MeshSize, meshSize) then -- inferred equivalent call
+		object:fail(ErrorSourceStrings.Keys.MeshSize_Mismatch, { meshName = instance.Name }, instance)
 	end
 end
 
-function t1.run(p4, p5) -- line: 58
-	-- upvalues: ValidationEnums (copy), validateSingleMeshPart (copy), Constants (copy)
-	local rootInstance = p5.rootInstance
-	local assetType = p5.uploadEnum.assetType
-	local consumerEnv = p5.consumerConfig.consumerEnv
-	local v27 = consumerEnv == ValidationEnums.ConsumerEnv.Backend
+function MeshSizePropertyCorrect.run(p, data)
+	local rootInstance = data.rootInstance
+	local assetType = data.uploadEnum.assetType
 
-	if consumerEnv == ValidationEnums.ConsumerEnv.IEC then
+	local isServer = data.consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend
+
+	if data.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.IEC then
 		return
 	end
 
-	local t3 = {}
+	local editableMeshes = {}
 
-	if p5.renderMeshesData then
+	if data.renderMeshesData then
 		local descendants = rootInstance:GetDescendants()
-
 		table.insert(descendants, rootInstance)
 
-		for _, v31 in descendants do
-			local v32 = p5.renderMeshesData[v31.Name]
+		for _, descendant in descendants do
+			local v = data.renderMeshesData[descendant.Name]
 
-			if v32 and v32.editable then
-				t3[v31] = {
-					MeshId = {
-						created = false,
-						instance = v32.editable
-					}
+			if v and v.editable then
+				editableMeshes[descendant] = {
+					MeshId = { instance = v.editable, created = false }
 				}
 			end
 		end
 	end
 
-	local t4 = {
-		assetTypeEnum = assetType,
-		isServer = v27,
-		editableMeshes = t3
-	}
+	local v = { assetTypeEnum = assetType, isServer = isServer, editableMeshes = editableMeshes }
 
-	if assetType == Enum.AssetType.DynamicHead then
-		validateSingleMeshPart(rootInstance, t4, p4)
-
+	if Enum.AssetType.DynamicHead == assetType then
+		validateSingleMeshPart(rootInstance, v, p)
 		return
 	end
 
-	local v34 = Constants.ASSET_TYPE_INFO[assetType]
+	local v2 = Constants.ASSET_TYPE_INFO[assetType]
 
-	if not v34 then
+	if not v2 then
 		return
 	end
 
-	for k in pairs(v34.subParts) do
-		local k2 = rootInstance:FindFirstChild(k)
+	for childName in pairs(v2.subParts) do
+		local child = rootInstance:FindFirstChild(childName)
 
-		if k2 then
-			validateSingleMeshPart(k2, t4, p4)
+		if child then
+			validateSingleMeshPart(child, v, p)
 		end
 	end
 end
 
-return t1
+return MeshSizePropertyCorrect

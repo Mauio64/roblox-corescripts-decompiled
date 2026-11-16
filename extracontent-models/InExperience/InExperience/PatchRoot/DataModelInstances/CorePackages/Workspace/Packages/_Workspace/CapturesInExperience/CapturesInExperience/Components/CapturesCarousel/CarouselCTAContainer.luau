@@ -1,154 +1,163 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local SocialStopwatch = require(ParentParentParent.SocialStopwatch)
-local UIBlox = require(ParentParentParent.UIBlox)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local RoactUtils = require(parent2.RoactUtils)
+local SocialStopwatch = require(parent2.SocialStopwatch)
+local UIBlox = require(parent2.UIBlox)
+
 local IconButton = UIBlox.App.Button.IconButton
 local Images = UIBlox.App.ImageSet.Images
 local useStyle = UIBlox.Core.Style.useStyle
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+
+local useAnalytics = require(parent.Analytics.useAnalytics)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useRef = React.useRef
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local CapturesPolicy = require(ParentParent.App.CapturesPolicy)
-local CaptureType = require(ParentParent.Enums.CaptureType)
-local Constants = require(ParentParent.Constants)
-local DeleteWarningModalOpened = require(ParentParent.Actions.DeleteWarningModalOpened)
-local EventNames = require(ParentParent.Analytics.EventNames)
-local ExternalShareSourceType = require(ParentParent.Enums.ExternalShareSourceType)
-local getIsDeleteWarningModalOptedOut = require(ParentParent.Utils.getIsDeleteWarningModalOptedOut)
-local getSaveToStoragePermission = require(ParentParent.Utils.getSaveToStoragePermission)
-local ShareCapture = require(ParentParent.Thunks.ShareCapture)
 
-require(ParentParent.Types)
+local CapturesPolicy = require(parent.App.CapturesPolicy)
+local CaptureType = require(parent.Enums.CaptureType)
+local Constants = require(parent.Constants)
+local DeleteWarningModalOpened = require(parent.Actions.DeleteWarningModalOpened)
+local EventNames = require(parent.Analytics.EventNames)
+local ExternalShareSourceType = require(parent.Enums.ExternalShareSourceType)
+local getIsDeleteWarningModalOptedOut = require(parent.Utils.getIsDeleteWarningModalOptedOut)
+local getSaveToStoragePermission = require(parent.Utils.getSaveToStoragePermission)
+local ShareCapture = require(parent.Thunks.ShareCapture)
+require(parent.Types)
 
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
-local uDim = UDim.new(0.12, 0)
-local uDim2 = UDim2.fromOffset(36, 36)
-local uDim3 = UDim.new(0, 8)
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
 
-return (CapturesPolicy.connect(function(p1) -- line: 214
-	return {
-		enableShareCaptureCTA = p1.enableShareCaptureCTA()
-	}
-end)(function(t1: {[any]: any}) -- line: 48
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useStyle (copy), useRef (copy), useSelector (copy), Constants (copy), React (copy), getSaveToStoragePermission (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy), EventNames (copy), SocialStopwatch (copy), ShareCapture (copy), ExternalShareSourceType (copy), getIsDeleteWarningModalOptedOut (copy), DeleteWarningModalOpened (copy), uDim3 (copy), uDim (copy), IconButton (copy), Images (copy), uDim2 (copy)
-	local v28 = useAnalytics()
-	local v29 = useDispatch()
-	local v30 = useStyle()
-	local v31 = useRef(0)
-	local v32 = useSelector(function(p2) -- line: 55
-		-- upvalues: Constants (copy)
-		local SelectedCaptureIndex = p2[Constants.RoduxKey].Carousel.SelectedCaptureIndex
+local udim = UDim.new(0.12, 0)
+local udim2 = UDim2.fromOffset(36, 36)
+local udim3 = UDim.new(0, 8)
 
-		return p2[Constants.RoduxKey].Captures[SelectedCaptureIndex]
+return (CapturesPolicy.connect(function(p)
+	return { enableShareCaptureCTA = p.enableShareCaptureCTA() }
+end)(function(props)
+	local v = useAnalytics()
+	local v2 = useDispatch()
+	local v3 = useStyle()
+
+	local v4 = useRef(0)
+
+	local v5 = useSelector(function(p)
+		local selectedCaptureIndex = p[Constants.RoduxKey].Carousel.SelectedCaptureIndex
+		return p[Constants.RoduxKey].Captures[selectedCaptureIndex]
 	end)
-	local v33 = React.useCallback(function() -- line: 60
-		-- upvalues: t1 (copy), v31 (copy)
-		if t1.isDisabled then
+
+	local v6 = React.useCallback(function(): boolean
+		if props.isDisabled then
 			return true
 		end
 
-		if DateTime.now().UnixTimestampMillis - v31.current < 500 then
-			return true
-		end
+		return DateTime.now().UnixTimestampMillis - v4.current < 500
+	end, { props.isDisabled })
 
-		return false
-	end, { t1.isDisabled })
-	local v34 = React.useCallback(function() -- line: 74
-		-- upvalues: v31 (copy)
-		v31.current = DateTime.now().UnixTimestampMillis
+	local v7 = React.useCallback(function()
+		v4.current = DateTime.now().UnixTimestampMillis
 	end, {})
-	local v35 = React.useCallback(function() -- line: 79
-		-- upvalues: v33 (copy), getSaveToStoragePermission (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), v32 (copy), t1 (copy), v29 (copy), v34 (copy), CaptureType (copy), v28 (copy), EventNames (copy)
-		if v33() then
+
+	local onActivated = React.useCallback(function()
+		if v6() then
 			return
 		end
 
-		getSaveToStoragePermission(if not FFlagEnableCapturesGalleryRetrievalCoreScript then v32 else { v32 }, t1.openPermissionModal, v29)
-		v34()
+		local v8
 
-		if if not FFlagEnableCapturesGalleryRetrievalCoreScript then v32.type == CaptureType.Video else v32.CaptureType == Enum.CaptureType.Video then
-			v28.fireEvent(EventNames.CapturesCarouselVideoSaveToExternalStorageActivated)
-
-			return
-		end
-
-		v28.fireEvent(EventNames.CapturesCarouselSaveToExternalStorageActivated)
-	end, {
-		v32,
-		v33,
-		v34,
-		t1.openPermissionModal
-	})
-	local v36 = React.useCallback(function() -- line: 101
-		-- upvalues: v33 (copy), v34 (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), v32 (copy), CaptureType (copy), v28 (copy), EventNames (copy), SocialStopwatch (copy), v29 (copy), ShareCapture (copy), ExternalShareSourceType (copy)
-		if v33() then
-			return
-		end
-
-		v34()
-
-		if if not FFlagEnableCapturesGalleryRetrievalCoreScript then v32.type == CaptureType.Video else v32.CaptureType == Enum.CaptureType.Video then
-			v28.fireEvent(EventNames.CapturesCarouselVideoShareActivated)
+		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+			v8 = { v5 }
 		else
-			v28.fireEvent(EventNames.CapturesCarouselShareActivated)
+			v8 = v5
+		end
+
+		getSaveToStoragePermission(v8, props.openPermissionModal, v2)
+
+		v7()
+		local v9
+
+		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+			v9 = v5.CaptureType == Enum.CaptureType.Video
+		else
+			v9 = v5.type == CaptureType.Video
+		end
+
+		if v9 then
+			v.fireEvent(EventNames.CapturesCarouselVideoSaveToExternalStorageActivated)
+		else
+			v.fireEvent(EventNames.CapturesCarouselSaveToExternalStorageActivated)
+		end
+	end, { v5, v6, v7, props.openPermissionModal })
+
+	local onActivated2 = React.useCallback(function()
+		if v6() then
+			return
+		end
+
+		v7()
+		local v8
+
+		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+			v8 = v5.CaptureType == Enum.CaptureType.Video
+		else
+			v8 = v5.type == CaptureType.Video
+		end
+
+		if v8 then
+			v.fireEvent(EventNames.CapturesCarouselVideoShareActivated)
+		else
+			v.fireEvent(EventNames.CapturesCarouselShareActivated)
 		end
 
 		if SocialStopwatch.Stopwatch.get(SocialStopwatch.Events.CaptureShared) == nil then
 			SocialStopwatch.Stopwatch.start(SocialStopwatch.Events.CaptureShared)
 		end
 
-		v29(ShareCapture(v32, ExternalShareSourceType.CapturesCarousel))
-	end, {
-		v32,
-		t1.isDisabled,
-		v33,
-		v34
-	})
-	local v37 = React.useCallback(function() -- line: 125
-		-- upvalues: v33 (copy), v34 (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), v32 (copy), CaptureType (copy), v28 (copy), EventNames (copy), getIsDeleteWarningModalOptedOut (copy), t1 (copy), v29 (copy), DeleteWarningModalOpened (copy)
-		if v33() then
+		v2(ShareCapture(v5, ExternalShareSourceType.CapturesCarousel))
+	end, { v5, props.isDisabled, v6, v7 })
+
+	local onActivated3 = React.useCallback(function()
+		if v6() then
 			return
 		end
 
-		v34()
+		v7()
+		local v8
 
-		if if not FFlagEnableCapturesGalleryRetrievalCoreScript then v32.type == CaptureType.Video else v32.CaptureType == Enum.CaptureType.Video then
-			v28.fireEvent(EventNames.CapturesVideoDeleteActivatedInCarousel)
+		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+			v8 = v5.CaptureType == Enum.CaptureType.Video
 		else
-			v28.fireEvent(EventNames.CapturesDeleteActivatedInCarousel)
+			v8 = v5.type == CaptureType.Video
 		end
 
-		if getIsDeleteWarningModalOptedOut() then
-			assert(t1.deleteItem ~= nil, "props.deleteItem should not be nil")
-			t1.deleteItem()
+		if v8 then
+			v.fireEvent(EventNames.CapturesVideoDeleteActivatedInCarousel)
+		else
+			v.fireEvent(EventNames.CapturesDeleteActivatedInCarousel)
+		end
+
+		if not getIsDeleteWarningModalOptedOut() then
+			v2(DeleteWarningModalOpened())
 
 			return
 		end
 
-		v29(DeleteWarningModalOpened())
-	end, {
-		v32,
-		t1.deleteItem,
-		t1.isDisabled,
-		v33,
-		v34
-	})
+		assert(props.deleteItem ~= nil, "props.deleteItem should not be nil")
+		props.deleteItem()
+	end, { v5, props.deleteItem, props.isDisabled, v6, v7 })
 
-	return React.createElement("Frame", {
-		BorderSizePixel = 0,
+	local createElement = React.createElement
+	local v8 = {
 		AutomaticSize = Enum.AutomaticSize.None,
-		BackgroundColor3 = v30.Theme.BackgroundContrast.Color,
-		BackgroundTransparency = v30.Theme.BackgroundContrast.Transparency,
-		LayoutOrder = t1.LayoutOrder,
-		Size = UDim2.new(1, 0, 0, t1.height),
-		ZIndex = t1.ZIndex
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = uDim3
-		}),
+		BackgroundColor3 = v3.Theme.BackgroundContrast.Color,
+		BackgroundTransparency = v3.Theme.BackgroundContrast.Transparency,
+		BorderSizePixel = 0,
+		LayoutOrder = props.LayoutOrder,
+		Size = UDim2.new(1, 0, 0, props.height),
+		ZIndex = props.ZIndex
+	}
+	local v9 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = udim3 }),
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, 12),
 			PaddingRight = UDim.new(0, 12)
@@ -156,39 +165,42 @@ end)(function(t1: {[any]: any}) -- line: 48
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			Padding = uDim,
+			Padding = udim,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
-		SaveButton = if not FFlagEnableCapturesGalleryRetrievalCoreScript then React.createElement(IconButton, {
-			layoutOrder = 1,
-			showBackground = false,
-			backgroundColor = v30.Theme.BackgroundUIContrast,
-			icon = Images["icons/actions/download_medium"],
-			onActivated = v35,
-			size = uDim2
-		}) else React.createElement(IconButton, {
-			layoutOrder = 1,
-			showBackground = false,
-			backgroundColor = v30.Theme.BackgroundUIContrast,
-			icon = Images["icons/actions/download_medium"],
-			onActivated = v35,
-			size = uDim2
-		}),
-		ShareButton = t1.enableShareCaptureCTA and React.createElement(IconButton, {
-			layoutOrder = 2,
-			showBackground = false,
-			backgroundColor = v30.Theme.BackgroundUIContrast,
-			icon = Images["icons/actions/share"],
-			onActivated = v36,
-			size = uDim2
-		}),
-		DeleteButton = React.createElement(IconButton, {
-			layoutOrder = 4,
-			showBackground = false,
-			icon = Images["icons/actions/edit/delete"],
-			onActivated = v37,
-			size = uDim2
-		})
+		SaveButton = 0,
+		ShareButton = 0,
+		DeleteButton = 0
+	}
+
+	if FFlagEnableCapturesGalleryRetrievalCoreScript then
+	end
+
+	v9.SaveButton = React.createElement(IconButton, {
+		backgroundColor = v3.Theme.BackgroundUIContrast,
+		icon = Images["icons/actions/download_medium"],
+		layoutOrder = 1,
+		onActivated = onActivated,
+		showBackground = false,
+		size = udim2
 	})
+
+	v9.ShareButton = props.enableShareCaptureCTA and React.createElement(IconButton, {
+		backgroundColor = v3.Theme.BackgroundUIContrast,
+		icon = Images["icons/actions/share"],
+		layoutOrder = 2,
+		onActivated = onActivated2,
+		showBackground = false,
+		size = udim2
+	})
+
+	v9.DeleteButton = React.createElement(IconButton, {
+		icon = Images["icons/actions/edit/delete"],
+		layoutOrder = 4,
+		onActivated = onActivated3,
+		showBackground = false,
+		size = udim2
+	})
+	return createElement("Frame", v8, v9)
 end))

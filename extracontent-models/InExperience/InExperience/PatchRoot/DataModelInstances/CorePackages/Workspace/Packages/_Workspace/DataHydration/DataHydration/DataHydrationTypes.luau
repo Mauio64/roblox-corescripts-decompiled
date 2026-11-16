@@ -1,11 +1,6 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-
-require(Parent.Signals)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+require(parent.Signals)
 
 return {
-	DataStatus = {
-		NotReady = "NotReady",
-		Ready = "Ready",
-		Failed = "Failed"
-	}
+	DataStatus = { NotReady = "NotReady", Ready = "Ready", Failed = "Failed" }
 }

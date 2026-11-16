@@ -1,28 +1,28 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local Cryo = require(ParentParentParent.Cryo)
-local Images = require(ParentParent.App.ImageSet.Images)
-local ControlState = require(ParentParent.Core.Control.Enum.ControlState)
-local DropdownMenuList = require(ParentParent.App.Menu.DropdownMenuList)
-local DropdownMenuCell = require(ParentParent.App.Menu.DropdownMenuCell)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local bind = require(ParentParent.Utility.bind)
-local useStyle = require(ParentParent.Core.Style.useStyle)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+local Cryo = require(parent2.Cryo)
+
+local Images = require(parent.App.ImageSet.Images)
+local ControlState = require(parent.Core.Control.Enum.ControlState)
+
+local DropdownMenuList = require(parent.App.Menu.DropdownMenuList)
+local DropdownMenuCell = require(parent.App.Menu.DropdownMenuCell)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+
+local bind = require(parent.Utility.bind)
+local useStyle = require(parent.Core.Style.useStyle)
 local StyleDefaults = require(script.Parent.StyleDefaults)
 
-local function getCellDataKey(p1) -- line: 27
-	if p1.key ~= nil then
-		return p1.key
-	end
-
-	return p1.text
+local function getCellDataKey(p) -- 2 equivalent calls inferred from this helper
+	return if p.key == nil then p.text else p.key
 end
 
-local v15 = Roact.Component:extend("DropdownMenu")
+local extended = Roact.Component:extend("DropdownMenu")
 
-v15.validateProps = t.strictInterface({
+extended.validateProps = t.strictInterface({
 	placeholder = t.string,
 	onChange = t.callback,
 	height = t.optional(t.UDim),
@@ -38,10 +38,10 @@ v15.validateProps = t.strictInterface({
 		text = t.string,
 		key = t.optional(t.string),
 		disabled = t.optional(t.boolean),
-		keyCodeLabel = t.optional(t.union(t.enum(Enum.KeyCode), t.strictInterface({
-			key = t.enum(Enum.KeyCode),
-			axis = t.optional(t.string)
-		}))),
+		keyCodeLabel = t.optional(t.union(
+			t.enum(Enum.KeyCode),
+			t.strictInterface({ key = t.enum(Enum.KeyCode), axis = t.optional(t.string) })
+		)),
 		iconColorOverride = t.optional(t.Color3),
 		textColorOverride = t.optional(t.Color3)
 	})),
@@ -56,7 +56,8 @@ v15.validateProps = t.strictInterface({
 	dropdownMenuListPositionFixed = t.optional(t.boolean),
 	defaultKey = t.optional(t.string)
 })
-v15.defaultProps = {
+
+extended.defaultProps = {
 	showDropShadow = false,
 	fixedListHeight = nil,
 	enableTokenOverride = false,
@@ -64,204 +65,203 @@ v15.defaultProps = {
 	defaultKey = nil
 }
 
-function v15.didUpdate(p2, _, p4) -- line: 129
-	if p2.props.onMenuOpenChange and p2.state.menuOpen ~= p4.menuOpen then
-		p2.props.onMenuOpenChange(p2.state.menuOpen)
+function extended.didUpdate(p, _, p2)
+	if p.props.onMenuOpenChange and p.state.menuOpen ~= p2.menuOpen then
+		p.props.onMenuOpenChange(p.state.menuOpen)
 	end
 end
-function v15.init(p5) -- line: 135
-	-- upvalues: Cryo (copy), bind (copy)
-	p5:setState({
+
+function extended:init()
+	self:setState({
 		menuOpen = false,
-		selectedKey = p5.props.defaultKey,
+		selectedKey = self.props.defaultKey,
 		absoluteSize = Vector2.new(0, 0)
 	})
 
-	function p5.openMenu() -- line: 142
-		-- upvalues: p5 (copy)
-		p5:setState({
-			menuOpen = true
-		})
+	function self.openMenu()
+		self:setState({ menuOpen = true })
 	end
-	function p5.closeMenu() -- line: 148
-		-- upvalues: p5 (copy)
-		p5:setState({
-			menuOpen = false
-		})
-	end
-	function p5.onSelect(p6) -- line: 154
-		-- upvalues: p5 (copy)
-		p5:setState({
-			menuOpen = false,
-			selectedKey = p6
-		})
-		p5.props.onChange(p6)
-	end
-	function p5.mapCellData(p7) -- line: 162
-		-- upvalues: Cryo (copy), bind (copy), p5 (copy)
-		local v46 = if p7.key == nil then p7.text else p7.key
-		local v47 = Cryo.Dictionary.join(p7, {
-			key = Cryo.None
-		})
 
-		v47.onActivated = bind(p5.onSelect, v46)
-		v47.selected = v46 == p5.state.selectedKey
-
-		return v47
+	function self.closeMenu()
+		self:setState({ menuOpen = false })
 	end
-	function p5.onResize(p8) -- line: 172
-		-- upvalues: p5 (copy)
-		p5:setState({
-			absoluteSize = p8.AbsoluteSize
-		})
+
+	function self.onSelect(selectedKey)
+		self:setState({ menuOpen = false, selectedKey = selectedKey })
+
+		self.props.onChange(selectedKey)
+	end
+
+	function self.mapCellData(p)
+		local cellDataKey = getCellDataKey(p) -- inferred equivalent call
+		local joined = Cryo.Dictionary.join(p, { key = Cryo.None })
+
+		joined.onActivated = bind(self.onSelect, cellDataKey)
+		joined.selected = self.state.selectedKey == cellDataKey
+		return joined
+	end
+
+	function self.onResize(p)
+		self:setState({ absoluteSize = p.AbsoluteSize })
 	end
 end
-function v15.getDerivedStateFromProps(p9, p10) -- line: 179
-	-- upvalues: Roact (copy)
-	local v23 = false
 
-	for _, v25 in p9.cellDatas do
-		if ((if v25.key == nil then v25.text else v25.key)) == p10.selectedKey then
-			v23 = true
+function extended.getDerivedStateFromProps(p, p2)
+	local flag = false
 
+	for _, cellData in p.cellDatas do
+		if getCellDataKey(cellData) == p2.selectedKey then -- inferred equivalent call
+			flag = true
 			break
 		end
 	end
 
-	if not v23 then
-		return {
-			selectedKey = Roact.None
-		}
+	if flag then
+		return nil
 	end
 
-	return nil
+	return { selectedKey = Roact.None }
 end
-function v15.render(p11) -- line: 197
-	-- upvalues: Cryo (copy), ControlState (copy), Roact (copy), DropdownMenuCell (copy), Images (copy), DropdownMenuList (copy)
-	local cellDatas = p11.props.cellDatas
-	local v28 = Cryo.List.map(cellDatas, p11.mapCellData)
-	local selectionOrder = p11.props.selectionOrder
-	local v30 = Cryo.List.findWhere(v28, function(p12) -- line: 203
-		return p12.selected
+
+function extended.render(props)
+	local cellDatas = props.props.cellDatas
+	local mapped = Cryo.List.map(cellDatas, props.mapCellData)
+
+	local selectionOrder = props.props.selectionOrder
+
+	local where = Cryo.List.findWhere(mapped, function(p)
+		return p.selected
 	end)
-	local v31 = if v30 == nil then p11.props.placeholder else v28[v30].text
-	local v32 = p11.state.absoluteSize.X > 640
-	local t1, t2
+	local text
 
-	if p11.props.enableTokenOverride then
-		local buttonDefault = p11.props.menuStateColors.buttonDefault
-		local contentDefault = p11.props.menuStateColors.contentDefault
-
-		if p11.props.errorState then
-			buttonDefault = p11.props.menuStateColors.alert
-		end
-
-		t1 = {
-			[ControlState.Default] = buttonDefault
-		}
-		t2 = {
-			[ControlState.Default] = contentDefault
-		}
+	if where == nil then
+		text = props.props.placeholder
 	else
-		local s1 = "SecondaryDefault"
-		local s2 = "SecondaryOnHover"
-
-		if p11.state.menuOpen then
-			s2 = s1
-		end
-
-		if p11.props.errorState then
-			s1 = "Alert"
-			s2 = "Alert"
-		end
-
-		t1 = {
-			[ControlState.Default] = s1,
-			[ControlState.Hover] = s2
-		}
-		t2 = {
-			[ControlState.Default] = "TextEmphasis"
-		}
+		text = mapped[where].text
 	end
 
-	if p11.props.isForcedClosed and p11.state.menuOpen then
-		p11:setState({
-			menuOpen = false
-		})
+	local v = props.state.absoluteSize.X > 640
+	local buttonStateColorMap, contentStateColorMap
+
+	if props.props.enableTokenOverride then
+		local v2 = props.props.menuStateColors.buttonDefault
+		local contentDefault = props.props.menuStateColors.contentDefault
+
+		if props.props.errorState then
+			v2 = props.props.menuStateColors.alert
+		end
+
+		buttonStateColorMap = {}
+		buttonStateColorMap[ControlState.Default] = v2
+
+		contentStateColorMap = {}
+		contentStateColorMap[ControlState.Default] = contentDefault
+	else
+		local v2 = "SecondaryDefault"
+
+		local v3 = not props.state.menuOpen and "SecondaryOnHover" or v2
+
+		if props.props.errorState then
+			v2 = "Alert"
+			v3 = "Alert"
+		end
+
+		buttonStateColorMap = {}
+		buttonStateColorMap[ControlState.Default] = v2
+		buttonStateColorMap[ControlState.Hover] = v3
+
+		contentStateColorMap = {}
+		contentStateColorMap[ControlState.Default] = "TextEmphasis"
 	end
 
-	return Roact.createElement("Frame", {
-		Size = UDim2.new(UDim.new(1, 0), p11.props.height),
+	if props.props.isForcedClosed and props.state.menuOpen then
+		props:setState({ menuOpen = false })
+	end
+
+	local createElement = Roact.createElement
+	local v2 = {
+		Size = UDim2.new(UDim.new(1, 0), props.props.height),
 		BackgroundTransparency = 1,
-		[Roact.Change.AbsoluteSize] = p11.onResize,
-		[Roact.Ref] = p11.props[Roact.Ref]
-	}, {
-		InnerFrame = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1)
-		}, {
-			SpawnButton = Roact.createElement(DropdownMenuCell, {
-				isLoading = false,
-				userInteractionEnabled = true,
-				Size = UDim2.fromScale(1, 1),
-				buttonImage = Images["component_assets/circle_17_stroke_1"],
-				buttonStateColorMap = t1,
-				contentStateColorMap = t2,
-				icon = p11.state.menuOpen and Images["truncate_arrows/actions_truncationCollapse"] or Images["truncate_arrows/actions_truncationExpand"],
-				text = v31,
-				isDisabled = p11.props.isDisabled,
-				isActivated = p11.state.menuOpen,
-				hasContent = v30 ~= nil,
-				onActivated = function() -- line: 276
-					-- upvalues: p11 (copy)
-					if p11.state.menuOpen then
-						p11.closeMenu()
+		[Roact.Change.AbsoluteSize] = props.onResize,
+		[Roact.Ref] = props.props[Roact.Ref]
+	}
 
-						return
-					end
+	local createElement2 = Roact.createElement
+	local v3 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }
 
-					p11.openMenu()
-				end,
-				enableTokenOverride = p11.props.enableTokenOverride,
-				SelectionOrder = selectionOrder
-			}),
-			DropdownMenuList = Roact.createElement(DropdownMenuList, {
-				zIndex = 2,
-				closeBackgroundVisible = false,
-				buttonProps = v28,
-				open = p11.state.menuOpen,
-				openPositionY = UDim.new(0, 12),
-				buttonSize = UDim2.fromScale(1, 1),
-				menuListBackground = p11.props.menuListBackground,
-				screenSize = p11.props.screenSize,
-				showDropShadow = p11.props.showDropShadow,
-				fixedListHeight = p11.props.fixedListHeight,
-				onDismiss = p11.closeMenu,
-				enableTokenOverride = p11.props.enableTokenOverride,
-				selectionOrder = if not selectionOrder then nil else selectionOrder + 1,
-				menuPositionFixed = p11.props.dropdownMenuListPositionFixed
-			}),
-			UISizeConstraint = v32 and Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(300, 1e999)
-			}) or nil
-		}) or nil
+	local v4 = {
+		SpawnButton = Roact.createElement(DropdownMenuCell, {
+			Size = UDim2.fromScale(1, 1),
+			buttonImage = Images["component_assets/circle_17_stroke_1"],
+			buttonStateColorMap = buttonStateColorMap,
+			contentStateColorMap = contentStateColorMap,
+			icon = props.state.menuOpen and Images["truncate_arrows/actions_truncationCollapse"] or Images["truncate_arrows/actions_truncationExpand"],
+			text = text,
+			isDisabled = props.props.isDisabled,
+			isLoading = false,
+			isActivated = props.state.menuOpen,
+			hasContent = where ~= nil,
+			userInteractionEnabled = true,
+			onActivated = function()
+				if props.state.menuOpen then
+					props.closeMenu()
+				else
+					props.openMenu()
+				end
+			end,
+			enableTokenOverride = props.props.enableTokenOverride,
+			SelectionOrder = selectionOrder
+		}),
+		DropdownMenuList = 0,
+		UISizeConstraint = 0
+	}
+
+	local createElement3 = Roact.createElement
+	local v5 = {
+		buttonProps = mapped,
+		zIndex = 2,
+		open = props.state.menuOpen,
+		openPositionY = UDim.new(0, 12),
+		buttonSize = UDim2.fromScale(1, 1),
+		closeBackgroundVisible = false,
+		menuListBackground = props.props.menuListBackground,
+		screenSize = props.props.screenSize,
+		showDropShadow = props.props.showDropShadow,
+		fixedListHeight = props.props.fixedListHeight,
+		onDismiss = props.closeMenu,
+		enableTokenOverride = props.props.enableTokenOverride,
+		selectionOrder = 0,
+		menuPositionFixed = 0
+	}
+	local selectionOrder2
+
+	if selectionOrder then
+		selectionOrder2 = selectionOrder + 1
+	end
+
+	v5.selectionOrder = selectionOrder2
+	v5.menuPositionFixed = props.props.dropdownMenuListPositionFixed
+	v4.DropdownMenuList = createElement3(DropdownMenuList, v5)
+
+	v4.UISizeConstraint = v and Roact.createElement("UISizeConstraint", {
+		MaxSize = Vector2.new(300, 1e999)
+	}) or nil
+	return createElement("Frame", v2, {
+		InnerFrame = createElement2("Frame", v3, v4) or nil
 	})
 end
 
-return Roact.forwardRef(function(p13, p14) -- line: 311
-	-- upvalues: useStyle (copy), StyleDefaults (copy), Cryo (copy), Roact (copy), v15 (copy)
-	if p13.enableTokenOverride then
-		local v41 = useStyle()
-		local v42 = StyleDefaults.getDropdownMenuDefaultTokens(v41)
-		local v43 = Cryo.Dictionary.join(v42.menuStateColors, p13.menuStateColors or {})
+return Roact.forwardRef(function(props, p)
+	if props.enableTokenOverride then
+		local v = useStyle()
+		local dropdownMenuDefaultTokens = StyleDefaults.getDropdownMenuDefaultTokens(v)
 
-		p13 = Cryo.Dictionary.join(p13, {
-			height = p13.height or v42.height,
-			menuStateColors = v43
+		local joined = Cryo.Dictionary.join(dropdownMenuDefaultTokens.menuStateColors, props.menuStateColors or {})
+		props = Cryo.Dictionary.join(props, {
+			height = props.height or dropdownMenuDefaultTokens.height,
+			menuStateColors = joined
 		})
 	end
 
-	return Roact.createElement(v15, Cryo.Dictionary.join(p13, {
-		[Roact.Ref] = p14
-	}))
+	return Roact.createElement(extended, Cryo.Dictionary.join(props, { [Roact.Ref] = p }))
 end)

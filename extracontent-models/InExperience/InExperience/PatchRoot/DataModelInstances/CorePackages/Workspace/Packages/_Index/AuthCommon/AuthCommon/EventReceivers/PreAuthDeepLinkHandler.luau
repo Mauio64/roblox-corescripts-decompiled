@@ -1,91 +1,90 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
+local parent = AuthCommon.Parent
+
 local User = require(AuthCommon.Thunks.User)
-local default = require(AuthCommonParent.LinkingProtocol).LinkingProtocol.default
+
+local LinkingProtocol = require(parent.LinkingProtocol)
+local default = LinkingProtocol.LinkingProtocol.default
+
 local PreAuthDeepLinkMap = require(script.Parent.PreAuthDeepLinkMap)
 
-local function parseQueryParams(s1: string) -- line: 50
-	local t1 = {}
-	local _, stop = string.find(s1, "?")
+local FFlagEnablePreAuthDeepLinkHandler = require(AuthCommon.Flags.FFlagEnablePreAuthDeepLinkHandler)
 
-	if not stop then
-		return t1
+local function parseQueryParams(value: string)
+	local queryParams = {}
+	local _, v = string.find(value, "?")
+
+	if not v then
+		return queryParams
 	end
 
-	local v14 = string.sub(s1, stop + 1)
+	local v2 = string.sub(value, v + 1)
 
-	for match in string.gmatch(v14, "[^&]+") do
-		local v16, v17 = string.match(match, "([^=]+)=?(.*)")
+	for k in string.gmatch(v2, "[^&]+") do
+		local v3, v4 = string.match(k, "([^=]+)=?(.*)")
 
-		if v16 then
-			t1[string.lower(v16)] = v17 or ""
+		if v3 then
+			queryParams[string.lower(v3)] = v4 or ""
 		end
 	end
 
-	return t1
+	return queryParams
 end
-local function matchesPattern(s2: string, s3: string) -- line: 70
-	return string.match(s3, s2) ~= nil
+
+local function matchesPattern(regexPattern: string, value: string): boolean -- 2 equivalent calls inferred from this helper
+	return string.match(value, regexPattern) ~= nil
 end
-local function userIsAuthenticated() -- line: 74
-	-- upvalues: User (copy)
+
+local function userIsAuthenticated(): boolean -- 1 equivalent call inferred from this helper
 	return User.fromLocalStorage().userId ~= -1
 end
-local function registerPatterns() -- line: 117
-	-- upvalues: PreAuthDeepLinkMap (copy), default (copy)
-	for _, v in ipairs(PreAuthDeepLinkMap) do
-		local v35 = v.regexPattern:gsub("%%", "\\")
 
-		default:registerURL(v35)
+local function isPreauthDeeplink(value: string): boolean
+	if not value or value == "" then
+		return false
+	end
+
+	local v = string.lower(value)
+
+	for _, preAuthDeepLink in ipairs(PreAuthDeepLinkMap) do
+		if matchesPattern(preAuthDeepLink.regexPattern, v) then -- inferred equivalent call
+			return true
+		end
+	end
+
+	return false
+end
+
+local function firePreauthDeeplink(value: string, p)
+	if not value or value == "" then
+		return nil
+	end
+
+	local v = string.lower(value)
+	local v2 = userIsAuthenticated() -- inferred equivalent call
+
+	for _, preAuthDeepLink in ipairs(PreAuthDeepLinkMap) do
+		if matchesPattern(preAuthDeepLink.regexPattern, v) then -- inferred equivalent call
+			if preAuthDeepLink.preauthOnly and v2 then
+				return nil
+			end
+
+			local v3 = parseQueryParams(value)
+			return preAuthDeepLink.handler(v3, p)
+		end
+	end
+
+	return nil
+end
+
+local function registerPatterns()
+	for _, preAuthDeepLink in ipairs(PreAuthDeepLinkMap) do
+		default:registerURL((preAuthDeepLink.regexPattern:gsub("%%", "\\")))
 	end
 end
 
-if require(AuthCommon.Flags.FFlagEnablePreAuthDeepLinkHandler) then
+if FFlagEnablePreAuthDeepLinkHandler then
 	registerPatterns()
 end
 
-return {
-	isPreauthDeeplink = function(s4: string) -- line: 78
-		-- upvalues: PreAuthDeepLinkMap (copy)
-		if not s4 or s4 == "" then
-			return false
-		end
-
-		local v21 = string.lower(s4)
-
-		for _, v in ipairs(PreAuthDeepLinkMap) do
-			local regexPattern = v.regexPattern
-
-			if string.match(v21, regexPattern) ~= nil then
-				return true
-			end
-		end
-
-		return false
-	end,
-	firePreauthDeeplink = function(s5: string, t2: {[any]: any}) -- line: 94
-		-- upvalues: User (copy), PreAuthDeepLinkMap (copy), parseQueryParams (copy)
-		if not s5 or s5 == "" then
-			return nil
-		end
-
-		local v27 = string.lower(s5)
-		local v28 = User.fromLocalStorage().userId ~= -1
-
-		for _, v in ipairs(PreAuthDeepLinkMap) do
-			local regexPattern = v.regexPattern
-
-			if string.match(v27, regexPattern) ~= nil then
-				if v.preauthOnly and v28 then
-					return nil
-				end
-
-				local v32 = parseQueryParams(s5)
-
-				return v.handler(v32, t2)
-			end
-		end
-
-		return nil
-	end
-}
+return { isPreauthDeeplink = isPreauthDeeplink, firePreauthDeeplink = firePreauthDeeplink }

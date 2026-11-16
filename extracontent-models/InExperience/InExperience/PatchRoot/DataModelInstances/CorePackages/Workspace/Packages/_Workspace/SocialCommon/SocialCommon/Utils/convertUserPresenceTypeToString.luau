@@ -1,21 +1,17 @@
-local Parent = script:FindFirstAncestor("SocialCommon").Parent
-local PresenceType = require(Parent.LuaSocialLibrariesDeps).RoduxPresence.config({
+local parent = script:FindFirstAncestor("SocialCommon").Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local presenceType = LuaSocialLibrariesDeps.RoduxPresence.config({
 	keyPath = "SocialCommon.Presence"
 }).Enums.PresenceType
 
-return function(p1) -- line: 8
-	-- upvalues: PresenceType (copy)
-	if p1 == PresenceType.Online then
+return function(p): string
+	if p == presenceType.Online then
 		return "Online"
 	end
 
-	if p1 == PresenceType.InStudio then
+	if p == presenceType.InStudio then
 		return "InStudio"
 	end
 
-	if p1 == PresenceType.InGame then
-		return "InGame"
-	end
-
-	return "Offline"
+	return if p == presenceType.InGame then "InGame" else "Offline"
 end

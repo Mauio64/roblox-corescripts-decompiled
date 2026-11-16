@@ -1,8 +1,9 @@
 local Chrome = script:FindFirstAncestor("Chrome")
-local ChromeParent = Chrome.Parent
+local parent = Chrome.Parent
 
-require(ChromeParent.React)
-require(ChromeParent.AppCommonLib)
+require(parent.React)
+require(parent.AppCommonLib)
+
 require(Chrome.Common.Enums)
 
 return nil

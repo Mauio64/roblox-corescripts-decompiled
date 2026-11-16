@@ -1,5 +1,1 @@
-return {
-	Default = "Default",
-	Loading = "Loading",
-	NoMoreNotifications = "NoMoreNotifications"
-}
+return { Default = "Default", Loading = "Loading", NoMoreNotifications = "NoMoreNotifications" }

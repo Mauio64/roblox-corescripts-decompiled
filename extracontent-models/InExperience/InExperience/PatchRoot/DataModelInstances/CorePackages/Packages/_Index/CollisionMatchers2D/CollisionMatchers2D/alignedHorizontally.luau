@@ -1,27 +1,23 @@
 local toRect = require(script.Parent.toRect)
 local returnValue = require(script.Parent.returnValue)
 
-local function alignedHorizontally(p1, p2, p3) -- line: 28
-	-- upvalues: toRect (copy), returnValue (copy)
-	local v7 = toRect(p1)
-	local v8 = toRect(p2)
+local function alignedHorizontally(p, p2, p3)
+	local v = toRect(p)
+	local v2 = toRect(p2)
 
 	if p3 == Enum.HorizontalAlignment.Left then
-		return returnValue(v7.Min.X == v8.Min.X, "", "")
+		return returnValue(v.Min.X == v2.Min.X, "", "")
 	end
 
 	if p3 == Enum.HorizontalAlignment.Center then
-		local v9 = (v7.Min + v7.Max) / 2
-		local v10 = (v8.Min + v8.Max) / 2
-
-		return returnValue(v9.X == v10.X, "", "")
+		local midpoint = (v.Min + v.Max) / 2
+		local midpoint2 = (v2.Min + v2.Max) / 2
+		return returnValue(midpoint.X == midpoint2.X, "", "")
+	elseif p3 == Enum.HorizontalAlignment.Right then
+		return returnValue(v.Max.X == v2.Max.X, "", "")
+	else
+		return returnValue(false, "Invalid horizontal alignment!")
 	end
-
-	if p3 == Enum.HorizontalAlignment.Right then
-		return returnValue(v7.Max.X == v8.Max.X, "", "")
-	end
-
-	return returnValue(false, "Invalid horizontal alignment!")
 end
 
 return alignedHorizontally

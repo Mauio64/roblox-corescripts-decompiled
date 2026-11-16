@@ -1,93 +1,86 @@
 local RunService = game:GetService("RunService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local Roact = require(scriptParentParentParentParent.Roact)
-local t = require(scriptParentParentParentParent.t)
-local Cryo = require(scriptParentParentParentParent.Cryo)
-local Foundation = require(scriptParentParentParentParent.Foundation)
-local EventConnection = require(scriptParentParentParentParent.ReactUtils).EventConnection
-local Interactable = require(scriptParentParent.Control.Interactable)
-local ControlState = require(scriptParentParent.Control.Enum.ControlState)
-local getContentStyle = require(script.Parent.getContentStyle)
-local withStyle = require(scriptParentParentParent.Core.Style.withStyle)
-local ImageSetComponent = require(scriptParentParent.ImageSet.ImageSetComponent)
-local Skeleton = Foundation.Skeleton
-local IconSize = require(scriptParentParentParent.App.ImageSet.Enum.IconSize)
-local getClosestRadius = require(scriptParentParentParent.App.Loading.getClosestRadius)
-local getIconSize = require(scriptParentParentParent.App.ImageSet.getIconSize)
-local GenericTextLabel = require(scriptParentParent.Text.GenericTextLabel.GenericTextLabel)
-local withAnimation = require(scriptParentParentParent.Core.Animation.withAnimation)
-local validateFontInfo = require(scriptParentParent.Style.Validator.validateFontInfo)
-local validateTypographyInfo = require(scriptParentParentParent.Core.Style.Validator.validateTypographyInfo)
-local HoverButtonBackground = require(scriptParentParent.Button.HoverButtonBackground)
-local StandardButtonSize = require(scriptParent.Enum.StandardButtonSize)
-local validateImage = require(scriptParentParent.ImageSet.Validator.validateImage)
-local v27 = Roact.PureComponent:extend("GenericButton")
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-function v27.init(p1) -- line: 46
-	-- upvalues: ControlState (copy), RunService (copy), Roact (copy)
-	p1:setState({
-		targetLoadingProgress = 1,
+local Roact = require(parent4.Roact)
+local t = require(parent4.t)
+local Cryo = require(parent4.Cryo)
+local Foundation = require(parent4.Foundation)
+
+local ReactUtils = require(parent4.ReactUtils)
+local EventConnection = ReactUtils.EventConnection
+
+local Interactable = require(parent2.Control.Interactable)
+
+local ControlState = require(parent2.Control.Enum.ControlState)
+local getContentStyle = require(script.Parent.getContentStyle)
+
+local withStyle = require(parent3.Core.Style.withStyle)
+local ImageSetComponent = require(parent2.ImageSet.ImageSetComponent)
+local Skeleton = Foundation.Skeleton
+local IconSize = require(parent3.App.ImageSet.Enum.IconSize)
+local getClosestRadius = require(parent3.App.Loading.getClosestRadius)
+local getIconSize = require(parent3.App.ImageSet.getIconSize)
+local GenericTextLabel = require(parent2.Text.GenericTextLabel.GenericTextLabel)
+local withAnimation = require(parent3.Core.Animation.withAnimation)
+local validateFontInfo = require(parent2.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(parent3.Core.Style.Validator.validateTypographyInfo)
+local HoverButtonBackground = require(parent2.Button.HoverButtonBackground)
+local StandardButtonSize = require(parent.Enum.StandardButtonSize)
+
+local validateImage = require(parent2.ImageSet.Validator.validateImage)
+
+local extended = Roact.PureComponent:extend("GenericButton")
+
+function extended:init()
+	self:setState({
 		controlState = ControlState.Initialize,
 		absoluteSize = Vector2.new(100, 100),
+		targetLoadingProgress = 1,
 		isButtonUnfocused = RunService:GetRobloxGuiFocused()
 	})
 
-	function p1.onStateChanged(p2, p3) -- line: 54
-		-- upvalues: p1 (copy)
-		p1:setState({
-			controlState = p3
-		})
+	function self.onStateChanged(p, controlState)
+		self:setState({ controlState = controlState })
 
-		if p1.props.onStateChanged then
-			p1.props.onStateChanged(p2, p3)
+		if self.props.onStateChanged then
+			self.props.onStateChanged(p, controlState)
 		end
 	end
-	function p1.onAbsoluteSizeChanged(p4) -- line: 63
-		-- upvalues: p1 (copy), Roact (copy)
-		p1:setState({
-			absoluteSize = p4.AbsoluteSize
-		})
 
-		if p1.props[Roact.Change.AbsoluteSize] then
-			p1.props[Roact.Change.AbsoluteSize](p4)
+	function self.onAbsoluteSizeChanged(p)
+		self:setState({ absoluteSize = p.AbsoluteSize })
+
+		if self.props[Roact.Change.AbsoluteSize] then
+			self.props[Roact.Change.AbsoluteSize](p)
 		end
 	end
-	function p1.onRobloxGuiFocusedChanged(p5) -- line: 72
-		-- upvalues: p1 (copy)
-		if p5 then
-			p1:setState({
-				targetLoadingProgress = 1,
-				isButtonUnfocused = true
-			})
 
-			return
+	function self.onRobloxGuiFocusedChanged(p)
+		if p then
+			self:setState({ targetLoadingProgress = 1, isButtonUnfocused = true })
+		else
+			self:setState({ isButtonUnfocused = false })
 		end
-
-		p1:setState({
-			isButtonUnfocused = false
-		})
 	end
 end
 
-local v28 = t.interface({
-	[ControlState.Default] = t.string
-})
+local buttonStateColorMap2 = t.interface({ [ControlState.Default] = t.string })
 
-v27.validateProps = t.interface({
+extended.validateProps = t.interface({
 	icon = t.optional(validateImage),
 	text = t.optional(t.string),
 	inputIcon = t.optional(validateImage),
 	buttonImage = validateImage,
 	fontStyle = t.optional(t.union(t.string, validateFontInfo, validateTypographyInfo)),
 	delayedInputImage = t.optional(validateImage),
-	buttonStateColorMap = v28,
-	contentStateColorMap = t.optional(v28),
-	textStateColorMap = t.optional(v28),
-	iconStateColorMap = t.optional(v28),
-	inputIconStateColorMap = t.optional(v28),
+	buttonStateColorMap = buttonStateColorMap2,
+	contentStateColorMap = t.optional(buttonStateColorMap2),
+	textStateColorMap = t.optional(buttonStateColorMap2),
+	iconStateColorMap = t.optional(buttonStateColorMap2),
+	inputIconStateColorMap = t.optional(buttonStateColorMap2),
 	isDisabled = t.optional(t.boolean),
 	isLoading = t.optional(t.boolean),
 	isDelayedInput = t.optional(t.boolean),
@@ -112,7 +105,8 @@ v27.validateProps = t.interface({
 	forwardedRef = t.optional(t.union(t.table, t.callback)),
 	feedbackType = t.optional(t.string)
 })
-v27.defaultProps = {
+
+extended.defaultProps = {
 	fontStyle = "Header2",
 	isDisabled = false,
 	isLoading = false,
@@ -122,216 +116,300 @@ v27.defaultProps = {
 	SliceCenter = Rect.new(8, 8, 9, 9)
 }
 
-function v27.didMount(p6) -- line: 198
-	p6:setState({
-		targetLoadingProgress = (p6.state.isButtonUnfocused or not p6.props.enableInputDelayed) and 1 or 0
+function extended.didMount(object)
+	object:setState({
+		targetLoadingProgress = (object.state.isButtonUnfocused or not object.props.enableInputDelayed) and 1 or 0
 	})
 end
-function v27.render(p7) -- line: 206
-	-- upvalues: withAnimation (copy)
-	local isDelayedInput = p7.props.isDelayedInput
-	local delayInputSeconds = p7.props.delayInputSeconds
 
-	if isDelayedInput and not p7.state.isButtonUnfocused then
-		local targetLoadingProgress = p7.state.targetLoadingProgress
+function extended:render()
+	local isDelayedInput = self.props.isDelayedInput
+	local delayInputSeconds = self.props.delayInputSeconds
 
-		return withAnimation({
-			loadingProgress = targetLoadingProgress
-		}, function(p8) -- line: 219
-			-- upvalues: p7 (copy)
-			local v47 = math.clamp(p8.loadingProgress, 0, 1)
-
-			return p7:renderButton(v47)
+	if isDelayedInput and not self.state.isButtonUnfocused then
+		return withAnimation({ loadingProgress = self.state.targetLoadingProgress }, function(p)
+			return self:renderButton((math.clamp(p.loadingProgress, 0, 1)))
 		end, {
-			dampingRatio = 0.8,
-			frequency = 1 / delayInputSeconds
+			frequency = 1 / delayInputSeconds,
+			dampingRatio = 0.8
 		})
 	end
 
-	if p7.state.isButtonUnfocused then
-		return p7:renderButton(1)
+	if self.state.isButtonUnfocused then
+		return self:renderButton(1)
 	end
 
-	return p7:renderButton()
+	return self:renderButton()
 end
-function v27.renderButton(p9, p10) -- line: 239
-	-- upvalues: withStyle (copy), t (copy), v28 (copy), getContentStyle (copy), ControlState (copy), StandardButtonSize (copy), Roact (copy), Skeleton (copy), getClosestRadius (copy), getIconSize (copy), IconSize (copy), ImageSetComponent (copy), GenericTextLabel (copy), Cryo (copy), Interactable (copy), HoverButtonBackground (copy), EventConnection (copy), RunService (copy)
-	return withStyle(function(p11) -- line: 240
-		-- upvalues: t (copy), p9 (copy), v28 (copy), p10 (copy), getContentStyle (copy), ControlState (copy), StandardButtonSize (copy), Roact (copy), Skeleton (copy), getClosestRadius (copy), getIconSize (copy), IconSize (copy), ImageSetComponent (copy), GenericTextLabel (copy), Cryo (copy), Interactable (copy), HoverButtonBackground (copy), EventConnection (copy), RunService (copy)
-		assert(t.table(p11), "Style provider is missing.")
 
-		local controlState = p9.state.controlState
-		local text = p9.props.text
-		local icon = p9.props.icon
-		local inputIcon = p9.props.inputIcon
-		local isLoading = p9.props.isLoading
-		local isDisabled = p9.props.isDisabled
-		local isDelayedInput = p9.props.isDelayedInput
-		local userInteractionEnabled = p9.props.userInteractionEnabled
-		local buttonImage = p9.props.buttonImage
-		local fontStyle = p9.props.fontStyle
-		local delayedInputImage = p9.props.delayedInputImage
-		local buttonStateColorMap = p9.props.buttonStateColorMap
-		local contentStateColorMap = p9.props.contentStateColorMap
-		local v62 = p9.props.textStateColorMap or contentStateColorMap
-		local v63 = p9.props.iconStateColorMap or contentStateColorMap
-		local v64 = p9.props.inputIconStateColorMap or contentStateColorMap
-		local propsSize = p9.props.Size
-		local standardSize = p9.props.standardSize
-		local v67 = p9.props.maxWidth or 640
-		local fitContent = p9.props.fitContent
+function extended:renderButton(p)
+	return withStyle(function(p2)
+		assert(t.table(p2), "Style provider is missing.")
+
+		local controlState = self.state.controlState
+
+		local text = self.props.text
+		local icon = self.props.icon
+		local inputIcon = self.props.inputIcon
+		local isLoading = self.props.isLoading
+		local isDisabled = self.props.isDisabled
+		local v = self.props.isDelayedInput
+
+		local userInteractionEnabled = self.props.userInteractionEnabled
+
+		local buttonImage = self.props.buttonImage
+		local fontStyle = self.props.fontStyle
+		local image = self.props.delayedInputImage
+		local buttonStateColorMap = self.props.buttonStateColorMap
+		local contentStateColorMap = self.props.contentStateColorMap
+		local textStateColorMap = self.props.textStateColorMap or contentStateColorMap
+		local iconStateColorMap = self.props.iconStateColorMap or contentStateColorMap
+		local inputIconStateColorMap = self.props.inputIconStateColorMap or contentStateColorMap
+		local size = self.props.Size
+		local standardSize = self.props.standardSize
+		local maxWidth = self.props.maxWidth or 640
+		local v2 = self.props.fitContent
 
 		if text then
-			assert(v28(v62), "textStateColorMap is missing or invalid.")
+			assert(buttonStateColorMap2(textStateColorMap), "textStateColorMap is missing or invalid.")
 		end
 
 		if icon then
-			assert(v28(v63), "iconStateColorMap is missing or invalid.")
+			assert(buttonStateColorMap2(iconStateColorMap), "iconStateColorMap is missing or invalid.")
 		end
 
 		if inputIcon then
-			assert(v28(v64), "inputIconStateColorMap is missing or invalid.")
+			assert(buttonStateColorMap2(inputIconStateColorMap), "inputIconStateColorMap is missing or invalid.")
 		end
 
-		if isDelayedInput and delayedInputImage == nil then
-			isDelayedInput = false
+		if v and image == nil then
+			v = false
 		end
 
-		if isLoading then
-			isDisabled = true
-		end
+		local isDisabled2 = isLoading and true or isDisabled
 
-		if isDisabled then
-			isDelayedInput = false
+		if isDisabled2 then
+			v = false
 		end
 
 		if type(fontStyle) == "string" then
-			fontStyle = p11.Font[fontStyle]
+			fontStyle = p2.Font[fontStyle]
 		end
 
-		if p10 == 1 then
-			delayedInputImage = buttonImage
+		if p == 1 then
+			image = buttonImage
 		end
 
-		if isDelayedInput and p10 ~= 0 then
+		if v and p ~= 0 then
 			userInteractionEnabled = false
 		end
 
-		local v69 = getContentStyle(buttonStateColorMap, controlState, p11)
-		local v70 = text and getContentStyle(v62, controlState, p11)
-		local v71 = icon and getContentStyle(v63, controlState, p11)
-		local v72 = inputIcon and getContentStyle(v64, controlState, p11)
-		local v73 = controlState == ControlState.Hover and p9.props.isHoverBackgroundEnabled == true
-		local hoverImage = p9.props.hoverImage
-		local n1 = 5
+		local contentStyle = getContentStyle(buttonStateColorMap, controlState, p2)
+		local colorStyle = text and getContentStyle(textStateColorMap, controlState, p2)
+		local v3 = icon and getContentStyle(iconStateColorMap, controlState, p2)
+		local v4 = inputIcon and getContentStyle(inputIconStateColorMap, controlState, p2)
+		local v5
+
+		if controlState == ControlState.Hover then
+			v5 = self.props.isHoverBackgroundEnabled == true
+		else
+			v5 = false
+		end
+
+		local hoverImage = self.props.hoverImage
+
+		local v6 = 5
 
 		if standardSize then
-			local n2 = nil
-			local v77 = nil
+			local v7 = nil
+			local v8 = nil
 
 			if standardSize == StandardButtonSize.Regular then
-				n2 = 48
-				n1 = 12
-				fontStyle = p11.Font.Header2
-				v77 = false
+				fontStyle = p2.Font.Header2
+				v7 = 48
+				v6 = 12
+				v8 = false
 			elseif standardSize == StandardButtonSize.Small then
-				n2 = 36
-				n1 = 8
-				fontStyle = p11.Font.Header2
-				v77 = false
+				fontStyle = p2.Font.Header2
+				v7 = 36
+				v6 = 8
+				v8 = false
 			elseif standardSize == StandardButtonSize.XSmall then
-				n2 = 28
-				n1 = 8
-				fontStyle = p11.Font.CaptionHeader
-				v77 = true
+				fontStyle = p2.Font.CaptionHeader
+				v7 = 28
+				v6 = 8
+				v8 = true
 			end
 
-			if fitContent == nil then
-				fitContent = v77
+			if v2 == nil then
+				v2 = v8
 			end
 
-			local v78 = not fitContent and 1 or 0
-
-			propsSize = UDim2.new(v78, 0, 0, n2)
+			size = UDim2.new(v2 and 0 or 1, 0, 0, v7)
 		end
 
-		local t1
+		local children
 
 		if isLoading then
-			t1 = {
-				isLoadingShimmer = Roact.createElement(Skeleton, {
-					Size = if not standardSize then UDim2.new(1, 0, 1, 0) else UDim2.new(1, n1 * 2, 1, 0),
-					Position = if not standardSize then nil else UDim2.new(0, -n1, 0, 0),
-					radius = getClosestRadius(p11.Tokens.Semantic.Radius, UDim.new(0, 8))
-				})
-			}
-		else
-			local absoluteSizeX = p9.state.absoluteSize.X
+			children = { isLoadingShimmer = 0 }
+			local createElement = Roact.createElement
+			local size2
 
-			if standardSize and fitContent then
-				absoluteSizeX = v67
+			if standardSize then
+				size2 = UDim2.new(1, v6 * 2, 1, 0)
+			else
+				size2 = UDim2.new(1, 0, 1, 0)
 			end
 
-			local v81 = p9.state.absoluteSize.Y - 10
-			local v82 = absoluteSizeX - n1 * 2
+			local position
+
+			if standardSize then
+				position = UDim2.new(0, -v6, 0, 0)
+			end
+
+			children.isLoadingShimmer = createElement(Skeleton, {
+				Size = size2,
+				Position = position,
+				radius = getClosestRadius({
+					None = p2.Tokens.Radius.None,
+					Small = p2.Tokens.Radius.Small,
+					Medium = p2.Tokens.Radius.Medium,
+					Large = p2.Tokens.Size.Size_300,
+					XLarge = p2.Tokens.Radius.Large,
+					Circle = p2.Tokens.Radius.Circle
+				}, UDim.new(0, 8))
+			})
+		else
+			local v7 = self.state.absoluteSize.X
+
+			if standardSize and v2 then
+				v7 = maxWidth
+			end
+
+			local v8 = self.state.absoluteSize.Y - 10
+			local v9 = v7 - v6 * 2
 
 			if icon then
-				v82 -= 5 + getIconSize(IconSize.Medium)
+				v9 -= 5 + getIconSize(IconSize.Medium)
 			end
 
-			local vector2 = Vector2.new(v82, v81)
-			local v84 = p9.props[Roact.Children] or {
-				UIListLayout = Roact.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 5)
-				}),
-				Icon = icon and Roact.createElement(ImageSetComponent.Label, {
-					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					Size = UDim2.new(0, getIconSize(IconSize.Medium), 0, getIconSize(IconSize.Medium)),
-					Image = icon,
-					ImageColor3 = v71.Color,
-					ImageTransparency = v71.Transparency
-				}) or nil,
-				Text = text and Roact.createElement(GenericTextLabel, Cryo.Dictionary.join({
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					Text = text,
-					fontStyle = fontStyle,
-					colorStyle = v70,
-					maxSize = vector2,
-					TextWrapped = not standardSize and nil,
-					TextTruncate = if not standardSize then nil else Enum.TextTruncate.AtEnd,
-					TextXAlignment = if not standardSize or not icon then nil else Enum.TextXAlignment.Left
-				}, p9.props.buttonTextOverride or {})) or nil
-			}
+			local vector2 = Vector2.new(v9, v8)
 
-			t1 = p9.props[Roact.Children]
+			local v10 = self.props[Roact.Children]
 
-			if not t1 then
-				t1 = {
-					ButtonMiddleContent = Roact.createElement("Frame", {
-						BackgroundTransparency = 1,
-						AutomaticSize = if not fitContent then nil else Enum.AutomaticSize.X,
-						Size = if not fitContent then UDim2.fromScale(1, 1) else UDim2.fromScale(0, 1)
-					}, v84),
-					ButtonIcon = inputIcon and Roact.createElement(ImageSetComponent.Label, {
-						BackgroundTransparency = 1,
-						AnchorPoint = Vector2.new(1, 0.5),
-						Position = UDim2.new(1, -4, 0.5, 0),
-						Size = UDim2.new(0, getIconSize(IconSize.Medium), 0, getIconSize(IconSize.Medium)),
-						Image = inputIcon,
-						ImageColor3 = v72.Color,
-						ImageTransparency = v72.Transparency
-					}) or nil
+			if not v10 then
+				v10 = {
+					UIListLayout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 5)
+					}),
+					Icon = 0,
+					Text = 0
 				}
+				local icon2
+
+				if icon then
+					icon2 = Roact.createElement(ImageSetComponent.Label, {
+						Size = UDim2.new(0, getIconSize(IconSize.Medium), 0, getIconSize(IconSize.Medium)),
+						BackgroundTransparency = 1,
+						Image = icon,
+						ImageColor3 = v3.Color,
+						ImageTransparency = v3.Transparency,
+						LayoutOrder = 1
+					}) or nil
+				end
+
+				v10.Icon = icon2
+				local text2
+
+				if text then
+					local createElement = Roact.createElement
+
+					local join = Cryo.Dictionary.join
+					local v11 = {
+						BackgroundTransparency = 1,
+						Text = text,
+						fontStyle = fontStyle,
+						colorStyle = colorStyle,
+						LayoutOrder = 2,
+						maxSize = vector2,
+						TextWrapped = not standardSize and nil,
+						TextTruncate = 0,
+						TextXAlignment = 0
+					}
+					local textTruncate
+
+					if standardSize then
+						textTruncate = Enum.TextTruncate.AtEnd
+					end
+
+					v11.TextTruncate = textTruncate
+					local textXAlignment
+
+					if standardSize and icon then
+						textXAlignment = Enum.TextXAlignment.Left
+					end
+
+					v11.TextXAlignment = textXAlignment
+					text2 = createElement(GenericTextLabel, join(v11, self.props.buttonTextOverride or {})) or nil
+				end
+
+				v10.Text = text2
+			end
+
+			children = self.props[Roact.Children]
+
+			if not children then
+				children = { ButtonMiddleContent = 0, ButtonIcon = 0 }
+				local createElement = Roact.createElement
+				local automaticSize
+
+				if v2 then
+					automaticSize = Enum.AutomaticSize.X
+				end
+
+				local size2
+
+				if v2 then
+					size2 = UDim2.fromScale(0, 1)
+				else
+					size2 = UDim2.fromScale(1, 1)
+				end
+
+				children.ButtonMiddleContent = createElement(
+					"Frame",
+					{ AutomaticSize = automaticSize, Size = size2, BackgroundTransparency = 1 },
+					v10
+				)
+
+				children.ButtonIcon = inputIcon and Roact.createElement(ImageSetComponent.Label, {
+					AnchorPoint = Vector2.new(1, 0.5),
+					Position = UDim2.new(1, -4, 0.5, 0),
+					Size = UDim2.new(0, getIconSize(IconSize.Medium), 0, getIconSize(IconSize.Medium)),
+					BackgroundTransparency = 1,
+					Image = inputIcon,
+					ImageColor3 = v4.Color,
+					ImageTransparency = v4.Transparency
+				}) or nil
 			end
 		end
 
-		return Roact.createElement(Interactable, Cryo.Dictionary.join(p9.props, {
+		local createElement = Roact.createElement
+
+		local join = Cryo.Dictionary.join
+		local props = self.props
+		local v7 = {
+			["forwardedRef"] = nil,
+			["forwardedRef"] = nil,
+			["forwardedRef"] = nil,
+			["forwardedRef"] = nil,
+			["forwardedRef"] = nil,
+			["forwardedRef"] = nil,
+			["forwardedRef"] = nil,
+			["forwardedRef"] = nil,
 			forwardedRef = Cryo.None,
 			icon = Cryo.None,
 			text = Cryo.None,
@@ -356,73 +434,127 @@ function v27.renderButton(p9, p10) -- line: 239
 			fitContent = Cryo.None,
 			buttonTextOverride = Cryo.None,
 			[Roact.Children] = Cryo.None,
-			Size = propsSize,
-			AutomaticSize = if not fitContent then nil else Enum.AutomaticSize.X,
-			[Roact.Ref] = p9.props.forwardedRef,
-			isDisabled = isDisabled,
-			onStateChanged = p9.onStateChanged,
-			userInteractionEnabled = userInteractionEnabled,
-			Image = buttonImage,
-			ScaleType = Enum.ScaleType.Slice,
-			ImageColor3 = v69.Color,
-			ImageTransparency = v69.Transparency,
-			BackgroundTransparency = 1,
-			AutoButtonColor = false,
-			[Roact.Event.Activated] = p9.props.onActivated,
-			[Roact.Change.AbsoluteSize] = p9.onAbsoluteSizeChanged
-		}), {
-			UISizeConstraint = if not standardSize or not v67 then nil else Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(v67, 1e999)
-			}),
-			UIPadding = if not standardSize then nil else Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, n1),
-				PaddingRight = UDim.new(0, n1)
-			}),
-			ButtonContent = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				AutomaticSize = if not fitContent then nil else Enum.AutomaticSize.X,
-				Size = if not fitContent then UDim2.fromScale(1, 1) else UDim2.fromScale(0, 1)
-			}, t1),
-			LoadingImage = isDelayedInput and Roact.createElement(ImageSetComponent.Label, {
-				BackgroundTransparency = 1,
-				ImageTransparency = 0.5,
-				Size = UDim2.new(p10, 0, 1, 0),
+			Size = size
+		}
+		local automaticSize
+
+		if v2 then
+			automaticSize = Enum.AutomaticSize.X
+		end
+
+		v7.AutomaticSize = automaticSize
+		v7[Roact.Ref] = self.props.forwardedRef
+		v7.isDisabled = isDisabled2
+		v7.onStateChanged = self.onStateChanged
+		v7.userInteractionEnabled = userInteractionEnabled
+		v7.Image = buttonImage
+		v7.ScaleType = Enum.ScaleType.Slice
+		v7.ImageColor3 = contentStyle.Color
+		v7.ImageTransparency = contentStyle.Transparency
+		v7.BackgroundTransparency = 1
+		v7.AutoButtonColor = false
+		v7[Roact.Event.Activated] = self.props.onActivated
+		v7[Roact.Change.AbsoluteSize] = self.onAbsoluteSizeChanged
+		local v8 = join(props, v7)
+		local uiSizeConstraint
+
+		if standardSize and maxWidth then
+			uiSizeConstraint = Roact.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(maxWidth, 1e999)
+			})
+		end
+
+		local uiPadding
+
+		if standardSize then
+			uiPadding = Roact.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v6),
+				PaddingRight = UDim.new(0, v6)
+			})
+		end
+
+		local createElement2 = Roact.createElement
+		local automaticSize2
+
+		if v2 then
+			automaticSize2 = Enum.AutomaticSize.X
+		end
+
+		local size2
+
+		if v2 then
+			size2 = UDim2.fromScale(0, 1)
+		else
+			size2 = UDim2.fromScale(1, 1)
+		end
+
+		local children2 = {
+			UISizeConstraint = uiSizeConstraint,
+			UIPadding = uiPadding,
+			ButtonContent = createElement2(
+				"Frame",
+				{ AutomaticSize = automaticSize2, Size = size2, BackgroundTransparency = 1 },
+				children
+			),
+			LoadingImage = v and Roact.createElement(ImageSetComponent.Label, {
+				Size = UDim2.new(p, 0, 1, 0),
 				Position = UDim2.new(1, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(1, 0.5),
-				Image = delayedInputImage,
+				BackgroundTransparency = 1,
+				Image = image,
 				ImageColor3 = Color3.new(0, 0, 0),
+				ImageTransparency = 0.5,
 				ScaleType = Enum.ScaleType.Slice,
-				SliceCenter = p9.props.SliceCenter
+				SliceCenter = self.props.SliceCenter
 			}),
-			HoverBackground = v73 and Roact.createElement(HoverButtonBackground, {
-				sidePadding = if not standardSize then nil else UDim.new(0, n1),
-				image = hoverImage,
-				sliceCenter = p9.props.SliceCenter
-			}) or nil,
-			EventConnection = Roact.createElement(EventConnection, {
-				event = RunService.RobloxGuiFocusedChanged,
-				callback = p9.onRobloxGuiFocusedChanged
-			})
+			HoverBackground = 0,
+			EventConnection = 0
+		}
+		local hoverBackground
+
+		if v5 then
+			local createElement3 = Roact.createElement
+			local sidePadding
+
+			if standardSize then
+				sidePadding = UDim.new(0, v6)
+			end
+
+			hoverBackground = createElement3(HoverButtonBackground, {
+					sidePadding = sidePadding,
+					image = hoverImage,
+					sliceCenter = self.props.SliceCenter
+				})
+				or nil
+		end
+
+		children2.HoverBackground = hoverBackground
+
+		children2.EventConnection = Roact.createElement(EventConnection, {
+			event = RunService.RobloxGuiFocusedChanged,
+			callback = self.onRobloxGuiFocusedChanged
 		})
+		return createElement(Interactable, v8, children2)
 	end)
 end
-function v27.didUpdate(p12, p13, p14) -- line: 515
-	if p12.props.enableInputDelayed ~= p13.enableInputDelayed then
-		p12:setState({
-			targetLoadingProgress = not p12.props.enableInputDelayed and 1 or 0
+
+function extended.didUpdate(object, p, p2)
+	if object.props.enableInputDelayed ~= p.enableInputDelayed then
+		object:setState({
+			targetLoadingProgress = object.props.enableInputDelayed and 0 or 1
 		})
 	end
 
-	if not p12.state.isButtonUnfocused and p14.isButtonUnfocused and p12.state.targetLoadingProgress == 1 and p12.props.enableInputDelayed then
-		p12:setState({
-			targetLoadingProgress = 0
-		})
+	if
+		not object.state.isButtonUnfocused
+		and p2.isButtonUnfocused
+		and object.state.targetLoadingProgress == 1
+		and object.props.enableInputDelayed
+	then
+		object:setState({ targetLoadingProgress = 0 })
 	end
 end
 
-return Roact.forwardRef(function(p15, p16) -- line: 533
-	-- upvalues: Roact (copy), v27 (copy), Cryo (copy)
-	return Roact.createElement(v27, Cryo.Dictionary.join(p15, {
-		forwardedRef = p16
-	}))
+return Roact.forwardRef(function(p, forwardedRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { forwardedRef = forwardedRef }))
 end)

@@ -1,1 +1,3 @@
-return (require(script.FriendAcceptedSnackbar))
+local FriendAcceptedSnackbar = require(script.FriendAcceptedSnackbar)
+
+return FriendAcceptedSnackbar

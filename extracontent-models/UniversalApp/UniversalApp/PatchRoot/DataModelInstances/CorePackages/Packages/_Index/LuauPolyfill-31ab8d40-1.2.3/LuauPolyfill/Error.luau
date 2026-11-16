@@ -1,1 +1,3 @@
-return (require(script["Error.global"]))
+local Errorglobal = require(script["Error.global"])
+
+return Errorglobal

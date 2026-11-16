@@ -1,22 +1,18 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
+local parent = InExperienceShop.Parent
 
 require(InExperienceShop.Types)
 
-local function mapShopItemTypeToUnifiedItemType(p1) -- line: 7
-	-- upvalues: InExperienceShopParent (copy)
-	local MarketplaceUnifiedItemType = require(InExperienceShopParent.AvatarExperienceAnalytics).UnifiedEventLogEnums.MarketplaceUnifiedItemType
+local function mapShopItemTypeToUnifiedItemType(p)
+	local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
+	local marketplaceUnifiedItemType = AvatarExperienceAnalytics.UnifiedEventLogEnums.MarketplaceUnifiedItemType
 
-	if p1 == "GamePass" then
-		return MarketplaceUnifiedItemType.GAME_PASS
-	end
-
-	if p1 == "Product" then
-		return MarketplaceUnifiedItemType.DEVELOPER_PRODUCT
-	end
-
-	if p1 == "Robux" then
-		return MarketplaceUnifiedItemType.ROBUX
+	if p == "GamePass" then
+		return marketplaceUnifiedItemType.GAME_PASS
+	elseif p == "Product" then
+		return marketplaceUnifiedItemType.DEVELOPER_PRODUCT
+	elseif p == "Robux" then
+		return marketplaceUnifiedItemType.ROBUX
 	end
 
 	return nil

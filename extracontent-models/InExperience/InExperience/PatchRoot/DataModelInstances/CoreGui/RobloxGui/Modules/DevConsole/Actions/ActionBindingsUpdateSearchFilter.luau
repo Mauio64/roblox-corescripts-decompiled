@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)("ActionBindingsUpdateSearchFilter", function(p1) -- line: 4
-	return {
-		searchTerm = p1
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action("ActionBindingsUpdateSearchFilter", function(searchTerm)
+	return { searchTerm = searchTerm }
 end)

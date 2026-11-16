@@ -1,95 +1,125 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
-local Foundation = require(CurrencyTransfersParent.Foundation)
+local parent = CurrencyTransfers.Parent
+
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
 local Button = Foundation.Button
 local View = Foundation.View
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Enums = Foundation.Enums
+
 local GetFFlagCurrencyTransferFlowUIImprovementFix = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferFlowUIImprovementFix)
 
-local function TransferAmountOptionChips(t1: {[any]: any}) -- line: 33
-	-- upvalues: React (copy), GetFFlagCurrencyTransferFlowUIImprovementFix (copy), Button (copy), Enums (copy), ButtonVariant (copy), View (copy)
-	local v12 = React.useMemo(function() -- line: 34
-		-- upvalues: GetFFlagCurrencyTransferFlowUIImprovementFix (copy), t1 (copy), React (copy), Button (copy), Enums (copy), ButtonVariant (copy)
-		local t2 = {}
-		local v14 = GetFFlagCurrencyTransferFlowUIImprovementFix()
+local function TransferAmountOptionChips(props)
+	local v = React.useMemo(function()
+		local fFlagCurrencyTransferFlowUIImprovementFix = GetFFlagCurrencyTransferFlowUIImprovementFix()
+		local children = {}
 
-		for i, v in ipairs(t1.chips) do
-			local v17 = t1.selectedAmount == v.amount
+		for i, chip in ipairs(props.chips) do
+			local v = props.selectedAmount == chip.amount
 
-			if v14 then
-				t2[i] = React.createElement("Frame", {
-					BackgroundTransparency = 1,
+			if fFlagCurrencyTransferFlowUIImprovementFix then
+				local createElement = React.createElement
+				local v2 = {
 					AutomaticSize = Enum.AutomaticSize.X,
 					Size = UDim2.new(0, 0, 0, 52),
+					BackgroundTransparency = 1,
 					LayoutOrder = i
-				}, {
-					ChipFrame = React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						AutomaticSize = Enum.AutomaticSize.X,
-						Size = UDim2.new(0, 0, 0, 52)
-					}, {
-						Layout = React.createElement("UIListLayout", {
-							FillDirection = Enum.FillDirection.Vertical,
-							HorizontalAlignment = Enum.HorizontalAlignment.Center,
-							VerticalAlignment = Enum.VerticalAlignment.Center
-						}),
-						ChipButton = React.createElement(Button, {
-							text = v.text,
-							icon = Enums.IconName.Robux,
-							variant = if not v17 then ButtonVariant.Standard else ButtonVariant.Subtle,
-							size = Enums.ChipSize.Medium,
-							onActivated = function() -- line: 77
-							end
-						})
+				}
+
+				local createElement2 = React.createElement
+				local v3 = {
+					AutomaticSize = Enum.AutomaticSize.X,
+					Size = UDim2.new(0, 0, 0, 52),
+					BackgroundTransparency = 1
+				}
+
+				local children2 = {
+					Layout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center
 					}),
+					ChipButton = 0
+				}
+
+				local createElement3 = React.createElement
+				local v4 = {
+					text = chip.text,
+					icon = Enums.IconName.Robux,
+					variant = 0,
+					size = 0,
+					onActivated = 0
+				}
+				local variant
+
+				if v then
+					variant = ButtonVariant.Subtle
+				else
+					variant = ButtonVariant.Standard
+				end
+
+				v4.variant = variant
+				v4.size = Enums.ChipSize.Medium
+				function v4.onActivated() end
+
+				children2.ChipButton = createElement3(Button, v4)
+				children[i] = createElement("Frame", v2, {
+					ChipFrame = createElement2("Frame", v3, children2),
 					TouchTarget = React.createElement("TextButton", {
 						Size = UDim2.new(1, 0, 0, 52),
 						BackgroundTransparency = 1,
 						Text = "",
 						ZIndex = 5,
-						[React.Event.Activated] = function() -- line: 88
-							-- upvalues: t1 (copy), v (copy)
-							t1.onChipSelected(v.amount)
+						[React.Event.Activated] = function()
+							props.onChipSelected(chip.amount)
 						end,
-						[React.Event.InputBegan] = function(_, p2) -- line: 98
-							-- upvalues: t1 (copy), v (copy)
-							if p2.UserInputType == Enum.UserInputType.Touch then
-								t1.onChipSelected(v.amount)
+						[React.Event.InputBegan] = function(_, p)
+							if p.UserInputType == Enum.UserInputType.Touch then
+								props.onChipSelected(chip.amount)
 							end
 						end
 					})
 				})
 			else
-				t2[i] = React.createElement(Button, {
-					text = v.text,
+				local createElement = React.createElement
+				local v2 = {
+					text = chip.text,
 					icon = Enums.IconName.Robux,
-					onActivated = function() -- line: 111
-						-- upvalues: t1 (copy), v (copy)
-						t1.onChipSelected(v.amount)
+					onActivated = function()
+						props.onChipSelected(chip.amount)
 					end,
 					LayoutOrder = i,
-					variant = if not v17 then ButtonVariant.Standard else ButtonVariant.Subtle,
-					size = Enums.ChipSize.Medium
-				})
+					variant = 0,
+					size = 0
+				}
+				local variant
+
+				if v then
+					variant = ButtonVariant.Subtle
+				else
+					variant = ButtonVariant.Standard
+				end
+
+				v2.variant = variant
+				v2.size = Enums.ChipSize.Medium
+				children[i] = createElement(Button, v2)
 			end
 		end
 
-		return t2
-	end, {
-		t1.chips,
-		t1.selectedAmount,
-		t1.onChipSelected
-	})
+		return children
+	end, { props.chips, props.selectedAmount, props.onChipSelected })
 
 	return React.createElement(View, {
 		tag = "row align-x-center align-y-center gap-small auto-xy padding-y-medium",
-		LayoutOrder = t1.layoutOrder or 1
+		LayoutOrder = props.layoutOrder or 1
 	}, {
-		ChipsContainer = React.createElement(View, {
-			tag = "row align-x-center align-y-center gap-small auto-xy"
-		}, table.unpack(v12))
+		ChipsContainer = React.createElement(
+			View,
+			{ tag = "row align-x-center align-y-center gap-small auto-xy" },
+			table.unpack(v)
+		)
 	})
 end
 

@@ -1,34 +1,44 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("GameFilters").Parent
+local Foundation = require(parent.Foundation)
 local IconButton = Foundation.IconButton
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
-local React = require(Parent.React)
-local Responsive = require(Parent.Responsive)
-local FFlagLuaAppChartsFilterOptionTextTag = require(Parent.SharedFlags).FFlagLuaAppChartsFilterOptionTextTag
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppChartsFilterOptionTextTag = SharedFlags.FFlagLuaAppChartsFilterOptionTextTag
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-return function(t1: {[any]: any}) -- line: 19
-	-- upvalues: useTokens (copy), Responsive (copy), React (copy), FFlagLuaAppChartsFilterOptionTextTag (copy), IconButton (copy), IconSize (copy)
-	local v10 = useTokens()
-	local v11 = Responsive.usePreferredInput() == Responsive.Input.Directional
-	local HeadingSmall = v10.Typography.HeadingSmall
-	local Emphasis = v10.Color.Content.Emphasis
+return function(props)
+	local v = useTokens()
+	local v2 = Responsive.usePreferredInput() == Responsive.Input.Directional
 
-	return React.createElement("Frame", {
+	local headingSmall = v.Typography.HeadingSmall
+	local emphasis = v.Color.Content.Emphasis
+
+	local createElement = React.createElement
+	local size
+
+	if not FFlagLuaAppChartsFilterOptionTextTag then
+		size = UDim2.fromScale(1, 0)
+	end
+
+	local v3 = {
 		BackgroundTransparency = 1,
-		Size = if not FFlagLuaAppChartsFilterOptionTextTag then UDim2.fromScale(1, 0) else nil,
+		Size = size,
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.LayoutOrder,
-		[React.Change.AbsoluteSize] = function(p1) -- line: 31
-			-- upvalues: t1 (copy)
-			t1.onHeightChanged(p1.AbsoluteSize.Y)
+		LayoutOrder = props.LayoutOrder,
+		[React.Change.AbsoluteSize] = function(p)
+			props.onHeightChanged(p.AbsoluteSize.Y)
 		end
-	}, {
+	}
+	local v4 = {
 		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v10.Padding.Medium),
-			PaddingBottom = UDim.new(0, v10.Padding.Medium),
-			PaddingLeft = UDim.new(0, v10.Padding.XXLarge),
-			PaddingRight = UDim.new(0, v10.Padding.XXLarge)
+			PaddingTop = UDim.new(0, v.Padding.Medium),
+			PaddingBottom = UDim.new(0, v.Padding.Medium),
+			PaddingLeft = UDim.new(0, v.Padding.XXLarge),
+			PaddingRight = UDim.new(0, v.Padding.XXLarge)
 		}),
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
@@ -36,23 +46,54 @@ return function(t1: {[any]: any}) -- line: 19
 			HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		Title = React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			TextWrapped = true,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			Text = t1.title,
-			Font = HeadingSmall.Font,
-			TextSize = HeadingSmall.FontSize,
-			TextColor3 = Emphasis.Color3,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Center
-		}),
-		CloseButton = if not v11 then React.createElement(IconButton, {
+		Title = 0,
+		CloseButton = 0
+	}
+
+	local createElement2 = React.createElement
+	local v5 = {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		LayoutOrder = 1,
+		Text = props.title,
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextColor3 = 0,
+		TextXAlignment = 0,
+		TextYAlignment = 0,
+		TextWrapped = true
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = headingSmall.Font
+	end
+
+	v5.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(headingSmall.Font)
+	end
+
+	v5.FontFace = fontFace
+	v5.TextSize = headingSmall.FontSize
+	v5.TextColor3 = emphasis.Color3
+	v5.TextXAlignment = Enum.TextXAlignment.Left
+	v5.TextYAlignment = Enum.TextYAlignment.Center
+	v4.Title = createElement2("TextLabel", v5)
+	local closeButton
+
+	if not v2 then
+		closeButton = React.createElement(IconButton, {
 			LayoutOrder = 2,
 			icon = "icons/navigation/close",
 			size = IconSize.Small,
-			onActivated = t1.onCloseButtonActivated
-		}) else nil
-	})
+			onActivated = props.onCloseButtonActivated
+		})
+	end
+
+	v4.CloseButton = closeButton
+	return createElement("Frame", v3, v4)
 end

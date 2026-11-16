@@ -1,19 +1,18 @@
-local ParentParent = script.Parent.Parent
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
+local parent = script.Parent.Parent
+local R15plusUtils = require(parent.util.R15plusUtils)
 
-return function(p1) -- line: 12
-	-- upvalues: R15plusUtils (copy)
+return function(instance)
 	if not R15plusUtils.checkFlagEnabledForAllowHrd() then
-		return p1.CFrame
+		return instance.CFrame
 	end
 
-	local p1CFrame = p1.CFrame
-	local p1Parent = p1.Parent
+	local cframe = instance.CFrame
+	local parent2 = instance.Parent
 
-	while p1Parent and p1Parent:IsA("Attachment") do
-		p1CFrame = p1Parent.CFrame * p1CFrame
-		p1Parent = p1Parent.Parent
+	while parent2 and parent2:IsA("Attachment") do
+		cframe = parent2.CFrame * cframe
+		parent2 = parent2.Parent
 	end
 
-	return p1CFrame
+	return cframe
 end

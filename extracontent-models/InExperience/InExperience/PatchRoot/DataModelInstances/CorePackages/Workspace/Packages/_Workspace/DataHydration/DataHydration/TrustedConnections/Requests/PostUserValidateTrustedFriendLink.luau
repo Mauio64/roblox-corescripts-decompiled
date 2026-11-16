@@ -1,17 +1,20 @@
 local HttpService = game:GetService("HttpService")
+
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Url = require(DataHydrationParent.Http).Url
+local parent = DataHydration.Parent
+
+local Http = require(parent.Http)
+local Url = Http.Url
+
 local TrustedConnections = DataHydration.TrustedConnections
 local myHttpRequest = require(TrustedConnections.Networking.myHttpRequest)
 
-return function(p1, p2) -- line: 11
-	-- upvalues: Url (copy), myHttpRequest (copy), HttpService (copy)
-	local v9 = string.format("%s/users/%s/validate-trusted-friend-link", Url.FRIEND_URL, (tostring(p1)))
-
-	return myHttpRequest(v9, "POST", {
-		postBody = HttpService:JSONEncode({
-			Tokens = p2
-		})
-	})
+return function(p, tokens)
+	return myHttpRequest(
+		string.format("%s/users/%s/validate-trusted-friend-link", Url.FRIEND_URL, (tostring(p))),
+		"POST",
+		{
+			postBody = HttpService:JSONEncode({ Tokens = tokens })
+		}
+	)
 end

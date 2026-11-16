@@ -1,44 +1,38 @@
-local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local GetPlaytestLoadingStore = require(BuildExperience.Stores.GetPlaytestLoadingStore)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function getIsPlaytestLoadingForPlaceId(p1, n1: number?) -- line: 19
-	-- upvalues: GetPlaytestLoadingStore (copy)
-	local v10 = GetPlaytestLoadingStore(p1)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
 
-	if n1 == nil then
+local GetPlaytestLoadingStore = require(parent.BuildExperiencePlaytestLaunch.GetPlaytestLoadingStore)
+
+local function getIsPlaytestLoadingForPlaceId(p, playtestPlaceId: number?)
+	local playtestLoadingStore = GetPlaytestLoadingStore(p)
+
+	if playtestPlaceId == nil then
 		return false
 	end
 
-	return v10.getIsPlaytestLoadingForPlaceId(n1)(p1)
+	return playtestLoadingStore.getIsPlaytestLoadingForPlaceId(playtestPlaceId)(p)
 end
-local function useChatPlaytestFooter(t1: {[any]: any}, s1: string) -- line: 27
-	-- upvalues: React (copy), getIsPlaytestLoadingForPlaceId (copy), SignalsReact (copy)
-	local launchPlaytest = t1.launchPlaytest
-	local v14 = React.useCallback(function(p2) -- line: 29
-		-- upvalues: getIsPlaytestLoadingForPlaceId (copy), t1 (copy)
-		return getIsPlaytestLoadingForPlaceId(p2, t1.playtestPlaceId)
-	end, { t1.playtestPlaceId })
-	local v15 = SignalsReact.useSignalState(v14)
-	local v16 = React.useCallback(function() -- line: 34
-		-- upvalues: launchPlaytest (copy), v15 (copy), s1 (copy)
-		if not launchPlaytest or v15 then
-			return
+
+local function useChatPlaytestFooter(p, p2: string)
+	local launchPlaytest = p.launchPlaytest
+	local v = React.useCallback(function(p3)
+		return getIsPlaytestLoadingForPlaceId(p3, p.playtestPlaceId)
+	end, { p.playtestPlaceId })
+	local isPlaytestLoading = SignalsReact.useSignalState(v)
+
+	local onPlaytest = React.useCallback(function()
+		if launchPlaytest and not isPlaytestLoading then
+			launchPlaytest(p2)
 		end
+	end, { isPlaytestLoading, launchPlaytest, p2 })
 
-		launchPlaytest(s1)
-	end, {
-		v15,
-		launchPlaytest,
-		s1
-	})
+	if p.playtestPlaceId == nil or not launchPlaytest then
+		onPlaytest = nil
+	end
 
-	return {
-		onPlaytest = if t1.playtestPlaceId == nil or not launchPlaytest then nil else v16,
-		isPlaytestLoading = v15
-	}
+	return { onPlaytest = onPlaytest, isPlaytestLoading = isPlaytestLoading }
 end
 
 return useChatPlaytestFooter

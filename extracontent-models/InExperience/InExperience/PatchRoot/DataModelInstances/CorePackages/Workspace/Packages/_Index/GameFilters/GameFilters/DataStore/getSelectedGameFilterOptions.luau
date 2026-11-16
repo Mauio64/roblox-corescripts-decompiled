@@ -1,17 +1,16 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
+local parent = script:FindFirstAncestor("GameFilters").Parent
+require(parent.DiscoveryTypes)
 
-require(Parent.DiscoveryTypes)
+local function getSelectedGameFilterOptions(items)
+	local selectedOptionIdsByFilterType = {}
 
-local function getSelectedGameFilterOptions(t1: {[any]: any}) -- line: 6
-	local t2 = {}
-
-	for _, v6 in t1 do
-		if v6.selectedOptionId ~= v6.defaultOptionId then
-			t2[v6.filterType] = v6.selectedOptionId
+	for _, item in items do
+		if item.selectedOptionId ~= item.defaultOptionId then
+			selectedOptionIdsByFilterType[item.filterType] = item.selectedOptionId
 		end
 	end
 
-	return t2
+	return selectedOptionIdsByFilterType
 end
 
 return getSelectedGameFilterOptions

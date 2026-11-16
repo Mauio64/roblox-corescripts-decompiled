@@ -1,23 +1,18 @@
-local Parent = script:FindFirstAncestor("CancelSubscriptionApp").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("CancelSubscriptionApp").Parent
+local Promise = require(parent.Promise)
 local MarketplaceService = game:GetService("MarketplaceService")
 
-local function getUserSubscriptionDetails(_, p2) -- line: 6
-	-- upvalues: Promise (copy), MarketplaceService (copy)
-	return Promise.new(function(resolve, reject) -- line: 7
-		-- upvalues: MarketplaceService (copy), p2 (copy)
-		local ok, result = pcall(function() -- line: 8
-			-- upvalues: MarketplaceService (copy), p2 (copy)
-			return MarketplaceService:GetUserSubscriptionDetailsInternalAsync(p2)
+local function getUserSubscriptionDetails(_, p)
+	return Promise.new(function(callback, callback2)
+		local success, result = pcall(function()
+			return MarketplaceService:GetUserSubscriptionDetailsInternalAsync(p)
 		end)
 
-		if ok then
-			resolve(result)
-
-			return
+		if success then
+			callback(result)
+		else
+			callback2(result)
 		end
-
-		reject(result)
 	end)
 end
 

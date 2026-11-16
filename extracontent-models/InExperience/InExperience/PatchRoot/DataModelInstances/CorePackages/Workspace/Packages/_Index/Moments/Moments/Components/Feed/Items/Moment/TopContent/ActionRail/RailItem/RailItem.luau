@@ -1,67 +1,95 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
-local ReactUtils = require(MomentsParent.ReactUtils)
-local Foundation = require(MomentsParent.Foundation)
+local parent = Moments.Parent
+
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local Foundation = require(parent.Foundation)
+
 local getColorStyleWithTransparency = require(Moments.Utils.getColorStyleWithTransparency)
+local FFlagMomentsActionRailSpacing = require(Moments.Flags.FFlagMomentsActionRailSpacing)
+
 local Icon = Foundation.Icon
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
 
-local function formatCount(n1: number?) -- line: 31
-	if n1 == nil then
+local function formatCount(p: number?, flag: boolean)
+	if p == nil then
 		return ""
 	end
 
-	if n1 >= 1000000 then
-		return string.format("%.1fM", n1 / 1000000)
+	local v
+
+	if p >= 1000000 then
+		v = string.format("%.1fM", p / 1000000)
+	elseif p >= 1000 then
+		v = string.format("%.1fK", p / 1000)
+	else
+		v = tostring(p)
 	end
 
-	if n1 >= 1000 then
-		return string.format("%.1fK", n1 / 1000)
+	if flag then
+		return `{v}+`
 	end
 
-	return (tostring(n1))
+	return v
 end
-local function RailItem(t1: {[any]: any}) -- line: 43
-	-- upvalues: ReactUtils (copy), useTokens (copy), getColorStyleWithTransparency (copy), React (copy), View (copy), Icon (copy), IconSize (copy), FoundationText (copy), formatCount (copy)
-	local count = t1.count
-	local v17 = ReactUtils.createNextOrder()
-	local v18 = useTokens()
-	local v19 = t1.animationRatio:map(function(n2: number) -- line: 49
-		-- upvalues: getColorStyleWithTransparency (copy), v18 (copy)
-		return getColorStyleWithTransparency(v18.Color.Content.Emphasis, n2)
+
+local function RailItem(props)
+	local count = props.count
+
+	local nextOrder = ReactUtils.createNextOrder()
+	local v = useTokens()
+
+	local mapped = props.animationRatio:map(function(p: number)
+		return getColorStyleWithTransparency(v.Color.Content.Emphasis, p)
 	end)
 
-	return React.createElement(View, {
-		tag = "col align-x-center align-y-center gap-xsmall size-1200-1200 radius-medium",
-		LayoutOrder = t1.LayoutOrder,
-		isDisabled = t1.isDisabled,
-		onActivated = t1.onActivated,
-		ref = t1.nativeRef
-	}, {
-		Slot = if type(t1.slot) ~= "string" then React.createElement(View, {
-			tag = "auto-xy",
-			Active = t1.isDisabled ~= false,
-			LayoutOrder = v17()
-		}, t1.slot) else React.createElement(Icon, {
-			LayoutOrder = v17(),
-			name = t1.slot,
+	local createElement = React.createElement
+	local v2 = {
+		LayoutOrder = props.LayoutOrder,
+		tag = FFlagMomentsActionRailSpacing and "col align-x-center align-y-center gap-small size-1200-1200 auto-xy radius-medium" or "col align-x-center align-y-center gap-xsmall size-1200-1200 radius-medium",
+		isDisabled = props.isDisabled,
+		onActivated = props.onActivated,
+		ref = props.nativeRef,
+		testId = props.testId
+	}
+	local slot
+
+	if type(props.slot) == "string" then
+		slot = React.createElement(Icon, {
+			LayoutOrder = nextOrder(),
+			name = props.slot,
 			size = IconSize.Large,
-			style = v19
-		}),
-		Count = if not count then nil else React.createElement(FoundationText, {
-			tag = "auto-xy text-caption-large text-align-x-center content-emphasis",
-			LayoutOrder = v17(),
-			Text = count:map(formatCount),
-			Visible = count:map(function(n3: number?) -- line: 78
-				return n3 ~= nil
-			end),
-			textStyle = v19
+			style = mapped
 		})
-	})
+	else
+		slot = React.createElement(View, {
+			tag = "auto-xy",
+			Active = props.isDisabled ~= false,
+			LayoutOrder = nextOrder()
+		}, props.slot)
+	end
+
+	local count2
+
+	if count then
+		count2 = React.createElement(Text, {
+			LayoutOrder = nextOrder(),
+			tag = "auto-xy text-caption-large text-align-x-center content-emphasis",
+			Text = count:map(function(p: number?)
+				return formatCount(p, props.countIsCapped == true)
+			end),
+			Visible = count:map(function(p: number?): boolean
+				return p ~= nil
+			end),
+			textStyle = mapped
+		})
+	end
+
+	return createElement(View, v2, { Slot = slot, Count = count2 })
 end
 
 return React.memo(RailItem)

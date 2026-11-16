@@ -1,27 +1,28 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
-local ParentParent = script.Parent.Parent.Parent
-local GlobalConfig = require(ParentParent.GlobalConfig)
-local withLocalization = require(ParentParent.Localization.withLocalization)
-local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
-local v9 = t.strictInterface({
+
+local parent = script.Parent.Parent.Parent
+
+local GlobalConfig = require(parent.GlobalConfig)
+local withLocalization = require(parent.Localization.withLocalization)
+
+local ThemedTextLabel = require(parent.Components.ThemedTextLabel)
+
+local strictInterface = t.strictInterface({
 	Position = t.UDim2,
 	Size = t.UDim2,
 	AnchorPoint = t.Vector2
 })
 
-return function(p1) -- line: 20
-	-- upvalues: GlobalConfig (copy), v9 (copy), withLocalization (copy), Roact (copy), ThemedTextLabel (copy)
+return function(p)
 	if GlobalConfig.propValidation then
-		assert(v9(p1))
+		assert(strictInterface(p))
 	end
 
-	return withLocalization({
-		lockedText = "CoreScripts.InGameMenu.GameSettings.LockedByDeveloper"
-	})(function(p2) -- line: 27
-		-- upvalues: Roact (copy), ThemedTextLabel (copy)
+	return withLocalization({ lockedText = "CoreScripts.InGameMenu.GameSettings.LockedByDeveloper" })(function(p2)
 		return Roact.createElement(ThemedTextLabel, {
 			themeKey = "TextDefault",
 			fontKey = "CaptionBody",

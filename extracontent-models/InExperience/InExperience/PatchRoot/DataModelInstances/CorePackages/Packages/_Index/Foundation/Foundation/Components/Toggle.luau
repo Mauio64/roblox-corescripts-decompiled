@@ -1,1 +1,3 @@
-return (require(script.Toggle))
+local Toggle = require(script.Toggle)
+
+return Toggle

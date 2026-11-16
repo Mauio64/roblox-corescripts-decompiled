@@ -1,5 +1,4 @@
 return {
-	UNMAPPED_ERROR_CODE = "UNMAPPED_ERROR_CODE: [%s]",
 	GetCredentialsErrorCodes = {
 		[0] = "UNKNOWN",
 		[1] = "CANCELLATION_ERROR",
@@ -10,5 +9,11 @@ return {
 		[6] = "NO_CREDENTIALS_FOUND",
 		[7] = "CREDENTIAL_UNSUPPORTED",
 		[11] = "INVALID_STATE_ERROR"
-	}
+	},
+	RegisterCredentialsErrorCodes = {
+		PASSWORD_SAVE_FAILED = "PasswordSaveFailed",
+		PASSWORD_AUTOFILL_DISABLED = "PasswordAutoFillDisabled",
+		INVALID_PARAMETERS = "InvalidParameters"
+	},
+	UNMAPPED_ERROR_CODE = "UNMAPPED_ERROR_CODE: [%s]"
 }

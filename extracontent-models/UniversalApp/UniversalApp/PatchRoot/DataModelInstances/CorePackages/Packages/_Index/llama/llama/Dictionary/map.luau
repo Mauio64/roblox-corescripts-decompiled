@@ -1,21 +1,18 @@
-local function map(p1, p2) -- line: 2
-	local v4 = type(p1)
+local function map(items, callback)
+	local typeName = type(items)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+	local typeName2 = type(callback)
+	assert(typeName2 == "function", "expected a function for second argument, got " .. typeName2)
 
-	local v5 = type(p2)
+	local result = {}
 
-	assert(v5 == "function", "expected a function for second argument, got " .. v5)
-
-	local t1 = {}
-
-	for k, v in pairs(p1) do
-		local v9, v10 = p2(v, k)
-
-		t1[v10 or k] = v9
+	for k, item in pairs(items) do
+		local v, v2 = callback(item, k)
+		result[v2 or k] = v
 	end
 
-	return t1
+	return result
 end
 
 return map

@@ -1,5 +1,5 @@
-local function isErrorReasonContainsEconomicRestrictions(s1: string) -- line: 1
-	return string.find(s1, "EconomicRestrictions") ~= nil
+local function isErrorReasonContainsEconomicRestrictions(value: string): boolean
+	return string.find(value, "EconomicRestrictions") ~= nil
 end
 
 return isErrorReasonContainsEconomicRestrictions

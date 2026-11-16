@@ -1,61 +1,97 @@
-local Parent = script:FindFirstAncestor("GameDetailTelemetry").Parent
-local TimeToInteractiveTracker = require(Parent.TimeToInteractiveTracker).TimeToInteractiveTracker
-local Milestone = TimeToInteractiveTracker.Milestone
+local parent = script:FindFirstAncestor("GameDetailTelemetry").Parent
+
+local TimeToInteractiveTracker = require(parent.TimeToInteractiveTracker)
+local timeToInteractiveTracker = TimeToInteractiveTracker.TimeToInteractiveTracker
+local Milestone = timeToInteractiveTracker.Milestone
+local PageGate = require(parent.PageGate)
+local FFlagEnablePLTPrefetchCallbacks = PageGate.FFlagEnablePLTPrefetchCallbacks
+
 local EDPTTIConstants = require(script.Parent.EDPTTIConstants)
-local v5 = game:DefineFastFlag("EnableEDPTTIManagerColdWarmDetection", false)
+
+local defineFastFlag = game:DefineFastFlag("EnableEDPTTIManagerColdWarmDetection", false)
+
 local EDP_TTI_EVENT_NAME = EDPTTIConstants.EDP_TTI_EVENT_NAME
-local u7 = false
-local u8 = false
+local FIRST_MEDIA_RESOLVED = EDPTTIConstants.EDP_MILESTONE.FIRST_MEDIA_RESOLVED
 
-return {
-	startTracking = function(s1: string) -- line: 18
-		-- upvalues: u7 (ref), u8 (ref), TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy), v5 (copy)
-		u7 = false
-		u8 = false
+local flag = false
+local flag2 = false
+local flag3 = false
+local EDPTTIManager = {}
 
-		local v10 = TimeToInteractiveTracker.getEvents(false)[EDP_TTI_EVENT_NAME]
+function EDPTTIManager.startTracking(page: string)
+	flag = false
+	flag2 = false
+	flag3 = false
 
-		if not v10 or not v10.startTime then
-			TimeToInteractiveTracker.trackStart(EDP_TTI_EVENT_NAME, not not v5 or nil)
-			TimeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, {
-				page = s1
-			})
-		end
-	end,
-	setImplementation = function(s2: string) -- line: 35
-		-- upvalues: TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy)
-		TimeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, {
-			category = s2
-		})
-	end,
-	trackFunctionallyReady = function() -- line: 41
-		-- upvalues: u7 (ref), TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy), Milestone (copy)
-		if u7 then
-			return
-		end
+	local v = timeToInteractiveTracker.getEvents(false)[EDP_TTI_EVENT_NAME]
 
-		u7 = true
+	if not (v and v.startTime) then
+		timeToInteractiveTracker.trackStart(EDP_TTI_EVENT_NAME, defineFastFlag and true or nil)
 
-		if TimeToInteractiveTracker.trackMilestone then
-			TimeToInteractiveTracker.trackMilestone(EDP_TTI_EVENT_NAME, Milestone.FunctionallyReady)
-		end
-	end,
-	trackSurfaceReady = function(t1: {[any]: any}?) -- line: 52
-		-- upvalues: u8 (ref), TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy), Milestone (copy)
-		if u8 then
-			return
-		end
-
-		u8 = true
-
-		if t1 then
-			TimeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, t1)
-		end
-
-		if TimeToInteractiveTracker.trackMilestone then
-			TimeToInteractiveTracker.trackMilestone(EDP_TTI_EVENT_NAME, Milestone.SurfaceReady)
-		end
-
-		TimeToInteractiveTracker.trackEnd(EDP_TTI_EVENT_NAME)
+		timeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, { page = page })
 	end
-}
+end
+
+function EDPTTIManager.restartTracking(page: string)
+	flag = false
+	flag2 = false
+	flag3 = false
+
+	timeToInteractiveTracker.trackStart(EDP_TTI_EVENT_NAME, defineFastFlag and true or nil)
+
+	timeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, { page = page })
+end
+
+function EDPTTIManager.setImplementation(category: string)
+	timeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, { category = category })
+end
+
+function EDPTTIManager.trackFunctionallyReady()
+	if flag then
+		return
+	end
+
+	flag = true
+
+	if timeToInteractiveTracker.trackMilestone then
+		timeToInteractiveTracker.trackMilestone(EDP_TTI_EVENT_NAME, Milestone.FunctionallyReady)
+	end
+
+	if FFlagEnablePLTPrefetchCallbacks then
+		PageGate.signal(PageGate.Page.ExperienceDetail, PageGate.Milestone.FunctionallyReady)
+	end
+end
+
+function EDPTTIManager.trackFirstMediaResolved(id: string)
+	if flag3 then
+		return
+	end
+
+	flag3 = true
+
+	if timeToInteractiveTracker.trackMilestone then
+		timeToInteractiveTracker.trackMilestone(EDP_TTI_EVENT_NAME, FIRST_MEDIA_RESOLVED, {
+			id = id
+		})
+	end
+end
+
+function EDPTTIManager.trackSurfaceReady(p)
+	if flag2 then
+		return
+	end
+
+	flag2 = true
+
+	if p then
+		timeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, p)
+	end
+
+	if timeToInteractiveTracker.trackMilestone then
+		timeToInteractiveTracker.trackMilestone(EDP_TTI_EVENT_NAME, Milestone.SurfaceReady)
+	end
+
+	timeToInteractiveTracker.trackEnd(EDP_TTI_EVENT_NAME)
+end
+
+return EDPTTIManager

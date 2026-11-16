@@ -1,29 +1,29 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
 local Error = LuauPolyfill.Error
-local t1 = {}
-local getOperationAST = require(ParentParent.GraphQL).getOperationAST
+
+local GraphQL = require(parent.GraphQL)
+
+local getOperationAST = GraphQL.getOperationAST
 
 require(script.Parent.Interfaces)
 
-local memoize1 = require(script.Parent.memoize).memoize1
+local memoize = require(script.Parent.memoize)
 
-local function getOperationASTFromDocument(p1, s1: string?) -- line: 26
-	-- upvalues: getOperationAST (copy), Boolean (copy), Error (copy)
-	local v11 = getOperationAST(p1, s1)
+local function getOperationASTFromDocument(document, operationName: string?)
+	local operationAST = getOperationAST(document, operationName)
 
-	if not Boolean.toJSBoolean(v11) then
-		error(Error.new(("Cannot infer operation %s"):format((tostring(Boolean.toJSBoolean(s1) and s1 or "")))))
+	if not Boolean.toJSBoolean(operationAST) then
+		error(Error.new(("Cannot infer operation %s"):format((tostring(Boolean.toJSBoolean(operationName) and operationName or "")))))
 	end
 
-	return v11
+	return operationAST
 end
 
-t1.getOperationASTFromDocument = getOperationASTFromDocument
-t1.getOperationASTFromRequest = memoize1(function(p2) -- line: 43
-	-- upvalues: getOperationASTFromDocument (copy)
-	return (getOperationASTFromDocument(p2.document, p2.operationName))
-end)
-
-return t1
+return {
+	["getOperationASTFromDocument"] = getOperationASTFromDocument,
+	getOperationASTFromRequest = memoize.memoize1(function(p)
+		return getOperationASTFromDocument(p.document, p.operationName)
+	end)
+}

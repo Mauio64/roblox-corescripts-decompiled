@@ -1,44 +1,37 @@
 local TelemetryService = game:GetService("TelemetryService")
+
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
+local parent = BuildExperience.Parent
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
 
 require(BuildExperience.Chat.chatTypes)
 require(script.Parent.FeedbackAction)
 
-local debug = CreatorAgentChat.debug
-local t1 = {
+local Debug = CreatorAgentChat.debug
+
+local v = {
 	eventName = "agentTurnFeedback",
-	description = "Fires when a user reacts to an agent turn (thumbs up, thumbs down, or revert).",
-	backends = {
-		"Points",
-		"EventIngest"
-	},
+	backends = { "Points", "EventIngest" },
 	throttlingPercentage = game:DefineFastInt("AgentTurnFeedbackEventThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		2026,
-		6,
-		12
-	}
+	lastUpdated = { 2026, 7, 30 },
+	description = "Fires when a user interacts with an agent turn (thumbs up, thumbs down, copy, or revert)."
 }
 
-local function sendAgentTurnFeedback(p1, p2) -- line: 24
-	-- upvalues: debug (copy), TelemetryService (copy), t1 (copy)
-	local t2 = {
-		action = p1,
-		universeid = p2.universeId,
-		placeid = p2.placeId,
-		sessionid = p2.sessionId,
-		sequenceId = p2.sequenceId,
-		turnId = p2.turnId
+local function sendAgentTurnFeedback(action, data)
+	local customFields = {
+		action = action,
+		universeid = data.universeId,
+		placeid = data.placeId,
+		sessionid = data.sessionId,
+		sequenceId = data.sequenceId,
+		turnId = data.turnId
 	}
 
-	debug.log("info", "agent_turn_feedback sending event", {
-		customFields = t2
-	})
-	TelemetryService:LogEvent(t1, {
+	Debug.log("info", "agent_turn_feedback sending event", { customFields = customFields })
+
+	TelemetryService:LogEvent(v, {
 		standardizedFields = { "addUserId" },
-		customFields = t2
+		customFields = customFields
 	})
 end
 

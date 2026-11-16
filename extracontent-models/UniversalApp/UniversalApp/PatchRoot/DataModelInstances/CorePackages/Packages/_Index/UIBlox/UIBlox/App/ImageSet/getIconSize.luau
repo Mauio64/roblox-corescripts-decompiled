@@ -1,10 +1,11 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
+local parent = script.Parent
 
-require(ParentParent.App.Style.StyleTypes)
+local parent2 = parent.Parent.Parent
+require(parent2.App.Style.StyleTypes)
 
-local IconSize = require(scriptParent.Enum.IconSize)
-local t1 = {
+local IconSize = require(parent.Enum.IconSize)
+
+local v = {
 	[IconSize.Small] = 16,
 	[IconSize.Medium] = 36,
 	[IconSize.Large] = 48,
@@ -12,33 +13,28 @@ local t1 = {
 	[IconSize.XXLarge] = 192
 }
 
-return function(n1: number, p1) -- line: 17
-	-- upvalues: IconSize (copy), t1 (copy)
-	assert(IconSize.isEnumValue(n1))
+return function(p: number, p2)
+	assert(IconSize.isEnumValue(p))
 
-	if p1 ~= nil and p1.Tokens ~= nil then
-		if n1 == IconSize.Small then
-			return p1.Tokens.Semantic.Icon.Size.Small
-		end
-
-		if n1 == IconSize.Medium then
-			return p1.Tokens.Semantic.Icon.Size.Medium
-		end
-
-		if n1 == IconSize.Large then
-			return p1.Tokens.Semantic.Icon.Size.Large
-		end
-
-		if n1 == IconSize.XLarge then
-			return p1.Tokens.Semantic.Icon.Size.XLarge
-		end
-
-		if n1 == IconSize.XXLarge then
-			return p1.Tokens.Semantic.Icon.Size.XxLarge
-		end
-
-		return nil
+	if p2 == nil or p2.Tokens == nil then
+		return v[p]
 	end
 
-	return t1[n1]
+	if p == IconSize.Small then
+		return p2.Tokens.Size.Size_400
+	end
+
+	if p == IconSize.Medium then
+		return p2.Tokens.Size.Size_900
+	end
+
+	if p == IconSize.Large then
+		return p2.Tokens.Size.Size_1200
+	end
+
+	if p == IconSize.XLarge then
+		return p2.Tokens.Size.Size_2400
+	end
+
+	return if p == IconSize.XXLarge then 192 else nil
 end

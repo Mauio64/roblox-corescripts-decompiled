@@ -1,120 +1,114 @@
 local HttpService = game:GetService("HttpService")
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
-local GenericChallengesParent = GenericChallenges.Parent
-local React = require(GenericChallengesParent.React)
-local useRoactService = require(GenericChallengesParent.RobloxAppHooks).useRoactService
-local AppLogging = require(GenericChallengesParent.RoactServiceTags).AppLogging
-local Foundation = require(GenericChallengesParent.Foundation)
+local parent = GenericChallenges.Parent
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppLogging = RoactServiceTags.AppLogging
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
+
 local DeviceIntegrityChallengeEvent = require(script.Parent.DeviceIntegrityChallengeEvent)
+
 local GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner = require(GenericChallenges.Middleware.Flags.GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner)
+
 local GetFFlagEnableNewDeviceIntegrityFailureHandling = require(GenericChallenges.Middleware.Flags.GetFFlagEnableNewDeviceIntegrityFailureHandling)
 local useEffect = React.useEffect
 local ChallengeEventConstants = require(GenericChallenges.Utils.ChallengeEventConstants)
-local useSelector = require(GenericChallengesParent.RoactUtils).Hooks.RoactRodux.useSelector
-
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 game:DefineFastInt("DeviceIntegrityNativeTimeoutMilliseconds", 450)
 
-function constructAccountServiceParams(s1: string) -- line: 21
-	-- upvalues: HttpService (copy)
-	return HttpService:JSONEncode({
-		requestHash = s1
-	})
+function constructAccountServiceParams(requestHash: string)
+	return HttpService:JSONEncode({ requestHash = requestHash })
 end
 
-local function DeviceIntegrityTokenChallenge(t1: {[any]: any}) -- line: 54
-	-- upvalues: useRoactService (copy), AppLogging (copy), useEffect (copy), HttpService (copy), DeviceIntegrityChallengeEvent (copy), ChallengeEventConstants (copy), GetFFlagEnableNewDeviceIntegrityFailureHandling (copy), useSelector (copy), GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner (copy), React (copy), Loading (copy), IconSize (copy)
-	local v19 = useRoactService(AppLogging)
+local function DeviceIntegrityTokenChallenge(props)
+	local v = useRoactService(AppLogging)
 
-	useEffect(function() -- line: 57
-		-- upvalues: HttpService (copy), t1 (copy), v19 (copy), DeviceIntegrityChallengeEvent (copy), ChallengeEventConstants (copy), GetFFlagEnableNewDeviceIntegrityFailureHandling (copy)
-		local data = HttpService:JSONDecode(t1.challengeMetadata)
-
-		v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+	useEffect(function()
+		local jsonDecode = HttpService:JSONDecode(props.challengeMetadata)
+		v:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
 			context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInitialized,
-			challengeId = t1.challengeId,
-			integrityType = data.integrityType
+			challengeId = props.challengeId,
+			integrityType = jsonDecode.integrityType
 		})
 
-		local accountService = t1.accountService
+		local accountService = props.accountService
 
 		if accountService and accountService:DeviceIntegrityAvailable() then
-			local data2
+			local v2
 
 			if GetFFlagEnableNewDeviceIntegrityFailureHandling() then
-				local DeviceIntegrityTokenYield = accountService:GetDeviceIntegrityTokenYield((HttpService:JSONEncode({
-					requestHash = data.requestHash,
+				local deviceIntegrityTokenYield = accountService:GetDeviceIntegrityTokenYield((HttpService:JSONEncode({
+					requestHash = jsonDecode.requestHash,
 					timeoutMillis = game:GetFastInt("DeviceIntegrityNativeTimeoutMilliseconds")
 				})))
 
-				if DeviceIntegrityTokenYield == nil or DeviceIntegrityTokenYield == "" then
-					v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+				if deviceIntegrityTokenYield == nil or deviceIntegrityTokenYield == "" then
+					v:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
 						context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
-						challengeId = t1.challengeId,
-						integrityType = data.integrityType
+						challengeId = props.challengeId,
+						integrityType = jsonDecode.integrityType
 					})
-					t1.onChallengeCompleted(HttpService:JSONEncode({
+
+					props.onChallengeCompleted(HttpService:JSONEncode({
 						redemptionToken = "",
-						integrityType = data.integrityType
+						integrityType = jsonDecode.integrityType
 					}))
 
 					return
 				end
 
-				data2 = HttpService:JSONDecode(DeviceIntegrityTokenYield)
+				v2 = HttpService:JSONDecode(deviceIntegrityTokenYield)
 			else
-				data2 = HttpService:JSONDecode(accountService:GetDeviceIntegrityTokenYield(constructAccountServiceParams(data.requestHash)))
+				v2 = HttpService:JSONDecode(accountService:GetDeviceIntegrityTokenYield(constructAccountServiceParams(jsonDecode.requestHash)))
 			end
 
-			t1.onChallengeCompleted(HttpService:JSONEncode({
-				redemptionToken = data2.token,
-				integrityType = data.integrityType
+			props.onChallengeCompleted(HttpService:JSONEncode({
+				redemptionToken = v2.token,
+				integrityType = jsonDecode.integrityType
 			}))
-			v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+
+			v:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
 				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeCompleted,
-				challengeId = t1.challengeId,
-				integrityType = data.integrityType,
-				result = data2.result
+				challengeId = props.challengeId,
+				integrityType = jsonDecode.integrityType,
+				result = v2.result
 			})
-
-			return
-		end
-
-		if GetFFlagEnableNewDeviceIntegrityFailureHandling() then
-			v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+		elseif GetFFlagEnableNewDeviceIntegrityFailureHandling() then
+			v:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
 				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
-				challengeId = t1.challengeId,
-				integrityType = data.integrityType
+				challengeId = props.challengeId,
+				integrityType = jsonDecode.integrityType
 			})
-			t1.onChallengeCompleted(HttpService:JSONEncode({
+
+			props.onChallengeCompleted(HttpService:JSONEncode({
 				redemptionToken = "",
-				integrityType = data.integrityType
+				integrityType = jsonDecode.integrityType
 			}))
-
-			return
+		else
+			props.onChallengeFailed()
+			v:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
+				challengeId = props.challengeId,
+				integrityType = jsonDecode.integrityType
+			})
 		end
-
-		t1.onChallengeFailed()
-		v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
-			context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
-			challengeId = t1.challengeId,
-			integrityType = data.integrityType
-		})
 	end, {})
-
-	local v20 = useSelector(function(p1) -- line: 131
-		return {
-			screenSize = p1.ScreenSize
-		}
+	local v2 = useSelector(function(p)
+		return { screenSize = p.ScreenSize }
 	end)
-	local uDim2 = UDim2.fromOffset(v20.screenSize.X, v20.screenSize.Y)
+
+	local udim = UDim2.fromOffset(v2.screenSize.X, v2.screenSize.Y)
 
 	if GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner() then
 		return React.createElement("Frame", {
+			Size = udim,
 			BackgroundTransparency = 1,
-			Active = true,
-			Size = uDim2
+			Active = true
 		}, {
 			Spinner = React.createElement(Loading, {
 				AnchorPoint = Vector2.new(0.5, 0.5),
@@ -124,11 +118,7 @@ local function DeviceIntegrityTokenChallenge(t1: {[any]: any}) -- line: 54
 		})
 	end
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 0.2,
-		Active = true,
-		Size = uDim2
-	}, {
+	return React.createElement("Frame", { Size = udim, BackgroundTransparency = 0.2, Active = true }, {
 		Spinner = React.createElement(Loading, {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),

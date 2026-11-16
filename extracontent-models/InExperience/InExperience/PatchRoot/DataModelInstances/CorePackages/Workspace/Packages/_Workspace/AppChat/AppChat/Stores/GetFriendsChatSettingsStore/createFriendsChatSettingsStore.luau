@@ -1,52 +1,123 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local SharedFlags = require(AppChatParent.SharedFlags)
-local Signals = require(AppChatParent.Signals)
+local parent = AppChat.Parent
+
+local Http = require(parent.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
+local SharedFlags = require(parent.SharedFlags)
+local Signals = require(parent.Signals)
+
 local GetFriendsChatMetadataStore = require(AppChat.Stores.GetFriendsChatMetadataStore)
-local v6 = require(AppChat.Logger):new(script.Name)
+local FFlagAppChatUseSignalsForChatSettings = require(AppChat.Flags.FFlagAppChatUseSignalsForChatSettings)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 
-local function createFriendsChatSettingsStore() -- line: 19
-	-- upvalues: GetFriendsChatMetadataStore (copy), Signals (copy), SharedFlags (copy), v6 (copy)
-	local v8 = GetFriendsChatMetadataStore(false)
-	local v9, v10 = Signals.createSignal(Enum.ChatRestrictionStatus.Unknown)
-	local v11 = Signals.createComputed(function(p1) -- line: 24
-		-- upvalues: v8 (copy), v9 (copy)
-		local v16 = v8.getCachedFriendsChatMetadata(p1).data(p1)
-		local v17 = v9(p1)
+local function createFriendsChatSettingsStore()
+	local friendsChatMetadataStore = GetFriendsChatMetadataStore(false)
 
-		return v16 ~= nil and (v17 ~= Enum.ChatRestrictionStatus.Unknown and (v16.isChatEnabled and v17 == Enum.ChatRestrictionStatus.NotRestricted))
-	end)
-	local v12 = Signals.createComputed(function(p2) -- line: 33
-		-- upvalues: v8 (copy)
-		local v19 = v8.getCachedFriendsChatMetadata(p2).data(p2)
+	local signal, v2 = Signals.createSignal(Enum.ChatRestrictionStatus.Unknown)
 
-		return v19 ~= nil and (v19.isChatEnabled and v19.isGroupChatEnabledByPrivacySetting == "enabled")
-	end)
-	local v13 = Signals.createComputed(function(p3) -- line: 38
-		-- upvalues: v8 (copy)
-		local v21 = v8.getCachedFriendsChatMetadata(p3).data(p3)
+	local signal2, v3 = Signals.createSignal(nil)
+	local signal3, v4 = Signals.createSignal(false)
 
-		if v21 then
-			return v21.isChatUserMessagesEnabled
+	local function setThirdPartyChatRestrictionStatus(p)
+		v2(p)
+
+		if p ~= Enum.ChatRestrictionStatus.Unknown then
+			v3(p)
+		elseif friendsChatMetadataStore.getCachedFriendsChatMetadata(false).data(false) == nil then
+			v3(nil)
 		end
+	end
 
-		return nil
+	local function toggleDebugGroupChatEnabled()
+		v4(not signal3(false))
+	end
+
+	local function clearDebugGroupChatToggle()
+		v4(false)
+	end
+
+	local function reset()
+		v2(Enum.ChatRestrictionStatus.Unknown)
+		v3(nil)
+		v4(false)
+	end
+
+	local getChatEnabled = Signals.createComputed(function(p): boolean
+		local data = friendsChatMetadataStore.getCachedFriendsChatMetadata(p).data(p)
+		local v5 = signal(p)
+		v5 = FFlagAppChatUseSignalsForChatSettings and v5 == Enum.ChatRestrictionStatus.Unknown and signal2(p) or v5
+
+		return data ~= nil
+			and v5 ~= Enum.ChatRestrictionStatus.Unknown
+			and data.isChatEnabled == true
+			and v5 == Enum.ChatRestrictionStatus.NotRestricted
 	end)
-	local v14 = not SharedFlags.FFlagDebugFriendsChat and function() -- line: 55
-	end or Signals.createEffect(function(p4) -- line: 44
-		-- upvalues: v8 (copy), v6 (copy), v11 (copy), v9 (copy), v13 (copy)
-		local v23 = v8.getCachedFriendsChatMetadata(p4).data(p4)
 
-		v6:debug(`Friends Chat eligibility: chatEnabled={ tostring(v11(p4)) }` .. ` (accountChatEnabled={ tostring((if not v23 then nil else v23.isChatEnabled)) },` .. ` privacySetting={ tostring((if not v23 then nil else v23.isChatEnabledByPrivacySetting)) },` .. ` globalRules={ tostring((if not v23 then nil else v23.isChatEnabledByGlobalRules)) },` .. ` thirdPartyStatus={ tostring(v9(p4)) });` .. ` chatUserMessagesEnabled={ tostring(v13(p4)) }`)
+	local getGroupChatEnabled = Signals.createComputed(function(p): boolean
+		local data = friendsChatMetadataStore.getCachedFriendsChatMetadata(p).data(p)
+
+		return (data ~= nil and data.isChatEnabled == true and data.isGroupChatEnabledByPrivacySetting == "enabled") ~= signal3(p)
+	end)
+
+	local getChatUserMessagesEnabled = Signals.createComputed(function(p)
+		local data = friendsChatMetadataStore.getCachedFriendsChatMetadata(p).data(p)
+		return if data then data.isChatUserMessagesEnabled else nil
 	end)
 
 	return {
-		getThirdPartyChatRestrictionStatus = v9,
-		getChatEnabled = v11,
-		getGroupChatEnabled = v12,
-		getChatUserMessagesEnabled = v13,
-		setThirdPartyChatRestrictionStatus = v10,
-		dispose = v14
+		getThirdPartyChatRestrictionStatus = signal,
+		getChatEnabled = getChatEnabled,
+		getGroupChatEnabled = getGroupChatEnabled,
+		getChatUserMessagesEnabled = getChatUserMessagesEnabled,
+		getRetrievalStatus = Signals.createComputed(function(p)
+			if friendsChatMetadataStore.getCachedFriendsChatMetadata(p).data(p) == nil or signal2(p) == nil then
+				return RetrievalStatus.NotStarted
+			end
+
+			return RetrievalStatus.Done
+		end),
+		getPrivacySettingsEnabled = Signals.createComputed(function(p): boolean
+			local data = friendsChatMetadataStore.getCachedFriendsChatMetadata(p).data(p)
+			return data ~= nil and data.isChatEnabledByPrivacySetting == "enabled"
+		end),
+		getGlobalRulesEnabled = Signals.createComputed(function(p): boolean
+			local data = friendsChatMetadataStore.getCachedFriendsChatMetadata(p).data(p)
+			return data ~= nil and data.isChatEnabledByGlobalRules == "enabled"
+		end),
+		getThirdPartyPrivacySettingsEnabled = Signals.createComputed(function(p): boolean
+			return signal(p) == Enum.ChatRestrictionStatus.NotRestricted
+		end),
+		setThirdPartyChatRestrictionStatus = setThirdPartyChatRestrictionStatus,
+		toggleDebugGroupChatEnabled = toggleDebugGroupChatEnabled,
+		clearDebugGroupChatToggle = clearDebugGroupChatToggle,
+		reset = reset,
+		dispose = not SharedFlags.FFlagDebugFriendsChat and function() end or Signals.createEffect(function(p)
+			local data = friendsChatMetadataStore.getCachedFriendsChatMetadata(p).data(p)
+
+			local formatted = `Friends Chat eligibility: chatEnabled={tostring(getChatEnabled(p))}`
+			local v5
+
+			if data then
+				v5 = data.isChatEnabled
+			end
+
+			local formatted2 = ` (accountChatEnabled={tostring(v5)},`
+			local v6
+
+			if data then
+				v6 = data.isChatEnabledByPrivacySetting
+			end
+
+			local formatted3 = ` privacySetting={tostring(v6)},`
+			local v7
+
+			if data then
+				v7 = data.isChatEnabledByGlobalRules
+			end
+
+			v:debug(formatted .. formatted2 .. formatted3 .. ` globalRules={tostring(v7)},` .. ` thirdPartyStatus={tostring(signal(p))});` .. ` chatUserMessagesEnabled={tostring(getChatUserMessagesEnabled(p))}`)
+		end)
 	}
 end
 

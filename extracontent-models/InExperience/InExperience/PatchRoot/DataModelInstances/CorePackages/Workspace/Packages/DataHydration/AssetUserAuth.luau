@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local AssetUserAuth = require(Workspace.DataHydration.DataHydration.AssetUserAuth)
 
-return (require(_Workspace.DataHydration.DataHydration.AssetUserAuth))
+return AssetUserAuth

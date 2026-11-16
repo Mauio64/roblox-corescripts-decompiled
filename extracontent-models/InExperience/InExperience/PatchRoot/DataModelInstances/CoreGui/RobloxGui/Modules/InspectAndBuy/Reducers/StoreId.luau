@@ -1,14 +1,15 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local UpdateStoreId = require(ParentParent.Actions.UpdateStoreId)
-local n1 = 0
+
+local parent = script.Parent.Parent
+local UpdateStoreId = require(parent.Actions.UpdateStoreId)
+
+local count = 0
 
 return Rodux.createReducer("0", {
-	[UpdateStoreId.name] = function(_, _) -- line: 11
-		-- upvalues: n1 (ref)
-		n1 += 1
-
-		return (tostring(n1))
+	[UpdateStoreId.name] = function(_, _)
+		count += 1
+		return (tostring(count))
 	end
 })

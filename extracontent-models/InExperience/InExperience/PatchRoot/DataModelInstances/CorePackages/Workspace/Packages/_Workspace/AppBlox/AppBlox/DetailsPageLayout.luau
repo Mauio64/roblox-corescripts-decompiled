@@ -1,12 +1,7 @@
-local DetailsPageLayoutRoot = require(script.DetailsPageLayoutRoot)
-local DetailsPageLayoutHeader = require(script.DetailsPageLayoutHeader)
-local DetailsPageLayoutContent = require(script.DetailsPageLayoutContent)
-local DetailsPageLayoutActions = require(script.DetailsPageLayoutActions)
-
 return {
-	Root = DetailsPageLayoutRoot,
-	Header = DetailsPageLayoutHeader,
-	Content = DetailsPageLayoutContent,
-	Actions = DetailsPageLayoutActions,
+	Root = require(script.DetailsPageLayoutRoot),
+	Header = require(script.DetailsPageLayoutHeader),
+	Content = require(script.DetailsPageLayoutContent),
+	Actions = require(script.DetailsPageLayoutActions),
 	DetailsPageLayoutContext = require(script.DetailsPageLayoutContext)
 }

@@ -1,8 +1,8 @@
-local Parent = script:FindFirstAncestor("RobloxAppHooks").Parent
-local useProperty = require(Parent.GuiObjectUtils).useProperty
+local parent = script:FindFirstAncestor("RobloxAppHooks").Parent
+local GuiObjectUtils = require(parent.GuiObjectUtils)
+local useProperty = GuiObjectUtils.useProperty
 
-local function useCurrentCamera() -- line: 5
-	-- upvalues: useProperty (copy)
+local function useCurrentCamera()
 	return useProperty(workspace, "CurrentCamera")
 end
 

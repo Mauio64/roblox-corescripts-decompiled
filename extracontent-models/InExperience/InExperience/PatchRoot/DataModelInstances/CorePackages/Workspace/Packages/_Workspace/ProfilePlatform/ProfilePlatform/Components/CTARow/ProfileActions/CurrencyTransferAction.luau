@@ -1,40 +1,40 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local SharedFlags = require(ProfilePlatformParent.SharedFlags)
-local Enums = require(ProfilePlatformParent.CurrencyTransfers).Enums
+local parent = ProfilePlatform.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local CurrencyTransfers = require(parent.CurrencyTransfers)
+local Enums = CurrencyTransfers.Enums
 local TransferDirection = Enums.TransferDirection
 local TransferOrigination = Enums.TransferOrigination
+
 local Enums2 = require(ProfilePlatform.Common.Enums)
-
 require(ProfilePlatform.Components.CTARow.Types)
-
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local ProfileTypes = Enums2.ProfileTypes
+
 local FFlagProfilePlatformEnableCurrencyTransfer = SharedFlags.FFlagProfilePlatformEnableCurrencyTransfer
 
 return {
-	[Enums2.ProfileActions.CurrencyTransfer] = if not FFlagProfilePlatformEnableCurrencyTransfer then nil else function(p1) -- line: 18
-		-- upvalues: Enums2 (copy), ProfileTypes (copy), EventNames (copy), TransferDirection (copy), TransferOrigination (copy)
+	[Enums2.ProfileActions.CurrencyTransfer] = FFlagProfilePlatformEnableCurrencyTransfer and function(data)
 		return {
-			text = p1.localized[Enums2.ProfileActions.CurrencyTransfer],
+			text = data.localized[Enums2.ProfileActions.CurrencyTransfer],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 22
-					-- upvalues: p1 (copy), Enums2 (copy), EventNames (copy), TransferDirection (copy), TransferOrigination (copy)
-					if p1.buttonSurface == Enums2.ButtonSurface.ContextualMenu then
-						p1.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonCurrencyTransfer, {
-							buttonSurface = p1.buttonSurface
+				[ProfileTypes.User] = function()
+					if data.buttonSurface == Enums2.ButtonSurface.ContextualMenu then
+						data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonCurrencyTransfer, {
+							buttonSurface = data.buttonSurface
 						})
 					else
-						p1.analytics.fireAnalyticsEvent(EventNames.CTAButtonCurrencyTransfer, {
-							buttonSurface = p1.buttonSurface
+						data.analytics.fireAnalyticsEvent(EventNames.CTAButtonCurrencyTransfer, {
+							buttonSurface = data.buttonSurface
 						})
 					end
 
-					local v12 = p1.navigateTo and p1.navigateTo.navigateToTransfer
+					local navigateToTransfer = data.navigateTo and data.navigateTo.navigateToTransfer
 
-					if v12 then
-						v12({
-							recipientUserId = p1.profileId,
+					if navigateToTransfer then
+						navigateToTransfer({
+							recipientUserId = data.profileId,
 							direction = TransferDirection.Send,
 							transferOrigination = TransferOrigination.Profile
 						})
@@ -42,5 +42,5 @@ return {
 				end
 			}
 		}
-	end
+	end or nil
 }

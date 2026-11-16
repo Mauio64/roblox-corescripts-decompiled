@@ -1,61 +1,79 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
+local AppChatNetworking = require(parent.AppChatNetworking)
 require(AppChat.installReducer.ChatTimeouts)
-
-local React = require(AppChatParent.React)
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local RoactUtils2 = require(parent.RoactUtils)
+local useDispatch = RoactUtils2.Hooks.RoactRodux.useDispatch
 local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
-local LuauPolyfill = require(AppChatParent.LuauPolyfill)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local clearTimeout = LuauPolyfill.clearTimeout
 local setTimeout = LuauPolyfill.setTimeout
-
 require(AppChat.Models.ConversationChannels)
-
 local CurrentConversationTimeoutEnded = require(AppChat.Conversations.Actions.CurrentConversationTimeoutEnded)
 local getEffectiveChatTimeoutDetails = require(AppChat.Utils.getEffectiveChatTimeoutDetails)
 
-local function useChatTimeoutDetails(t1: {[any]: any}) -- line: 21
-	-- upvalues: useDispatch (copy), useSelector (copy), getDeepValue2 (copy), getEffectiveChatTimeoutDetails (copy), React (copy), setTimeout (copy), CurrentConversationTimeoutEnded (copy), clearTimeout (copy)
-	local conversationId = t1.conversationId
-	local v15 = useDispatch()
-	local v16 = useSelector(function(p1) -- line: 24
-		-- upvalues: getDeepValue2 (copy), conversationId (copy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
+
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
+
+local function useChatTimeoutDetails(p)
+	local conversationId = p.conversationId
+	local v2 = useDispatch()
+	local v3 = useSelector(function(p2)
 		return {
-			userTimeout = getDeepValue2(p1, "ChatAppReducer.ChatTimeouts.userTimeout"),
-			conversationTimeout = getDeepValue2(p1, `ChatAppReducer.ChatTimeouts.byConversationId.{ conversationId }`)
+			userTimeout = getDeepValue2(p2, "ChatAppReducer.ChatTimeouts.userTimeout"),
+			conversationTimeout = getDeepValue2(p2, `ChatAppReducer.ChatTimeouts.byConversationId.{conversationId}`)
 		}
 	end)
-	local v17 = getEffectiveChatTimeoutDetails(v16.userTimeout, v16.conversationTimeout, t1.conversationModerationType, DateTime.now().UnixTimestamp)
 
-	React.useEffect(function() -- line: 38
-		-- upvalues: v17 (copy), setTimeout (copy), v15 (copy), CurrentConversationTimeoutEnded (copy), conversationId (copy), clearTimeout (copy)
-		local u19 = nil
+	local effectiveChatTimeoutDetails = getEffectiveChatTimeoutDetails(
+		v3.userTimeout,
+		v3.conversationTimeout,
+		p.conversationModerationType,
+		DateTime.now().UnixTimestamp
+	)
 
-		if v17.isTimedOut then
-			local UnixTimestamp = DateTime.now().UnixTimestamp
+	React.useEffect(function()
+		local v4 = nil
 
-			u19 = setTimeout(function() -- line: 42
-				-- upvalues: v15 (copy), CurrentConversationTimeoutEnded (copy), conversationId (copy)
-				v15(CurrentConversationTimeoutEnded(conversationId))
-			end, (v17.timeoutEndTimestamp - UnixTimestamp + 1) * 1000)
+		if effectiveChatTimeoutDetails.isTimedOut then
+			local unixTimestamp = DateTime.now().UnixTimestamp
+
+			if
+				not FFlagAppChatReactiveFeatureRestrictions
+				or unixTimestamp < effectiveChatTimeoutDetails.timeoutEndTimestamp
+			then
+				v4 = setTimeout(function()
+					if FFlagAppChatReactiveFeatureRestrictions then
+						v2(AppChatNetworking.rodux.GetChatModerationStatuses.API(conversationId and { conversationId } or nil)):catch(function()
+							v:warning("Failed to refresh expired Party Chat restriction")
+						end)
+					else
+						v2(CurrentConversationTimeoutEnded(conversationId))
+					end
+				end, (effectiveChatTimeoutDetails.timeoutEndTimestamp - unixTimestamp + 1) * 1000)
+			end
 		end
 
-		return function() -- line: 46
-			-- upvalues: u19 (ref), clearTimeout (copy)
-			if u19 then
-				clearTimeout(u19)
+		return function()
+			if v4 then
+				clearTimeout(v4)
 			end
 		end
 	end, {
-		v17.isTimedOut,
-		v17.timeoutEndTimestamp,
+		effectiveChatTimeoutDetails.isTimedOut,
+		effectiveChatTimeoutDetails.timeoutEndTimestamp,
 		conversationId,
-		v15
+		v2
 	})
 
-	return v17
+	return effectiveChatTimeoutDetails
 end
 
 return useChatTimeoutDetails

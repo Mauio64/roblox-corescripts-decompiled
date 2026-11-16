@@ -1,26 +1,36 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
 local ChatBubbleEnum = require(script.Parent.ChatBubbleEnum)
-local Foundation = require(Parent.Foundation)
-local t1 = {
-	isIncoming = false
-}
+local Foundation = require(parent.Foundation)
 
-function RepliedToMarker(t2: {[any]: any}) -- line: 32
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), Foundation (copy), ChatBubbleEnum (copy)
-	local v8 = Cryo.Dictionary.union(t1, t2)
+local v = { isIncoming = false }
 
-	return React.createElement(Foundation.View, {
+function RepliedToMarker(p)
+	local union = Cryo.Dictionary.union(v, p)
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v2 = {
 		tag = "bg-shift-400 self-stretch",
-		BorderSizePixel = 0,
 		Size = UDim2.new(0, ChatBubbleEnum.REPLIED_TO_MARKER_WIDTH, 0, 0),
-		AnchorPoint = if not v8.isIncoming then Vector2.new(1, 0) else Vector2.new(0, 0),
-		LayoutOrder = v8.layoutOrder
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(1, 0)
-		})
+		BorderSizePixel = 0,
+		AnchorPoint = 0,
+		LayoutOrder = 0
+	}
+	local anchorPoint
+
+	if union.isIncoming then
+		anchorPoint = Vector2.new(0, 0)
+	else
+		anchorPoint = Vector2.new(1, 0)
+	end
+
+	v2.AnchorPoint = anchorPoint
+	v2.LayoutOrder = union.layoutOrder
+	return createElement(view, v2, {
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
 	})
 end
 

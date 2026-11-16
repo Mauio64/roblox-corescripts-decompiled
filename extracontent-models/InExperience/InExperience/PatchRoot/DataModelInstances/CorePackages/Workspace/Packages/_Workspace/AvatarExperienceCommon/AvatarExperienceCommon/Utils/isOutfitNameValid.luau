@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local AvatarExperienceFormValidation = require(Parent.AvatarExperienceFormValidation)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local AvatarExperienceFormValidation = require(parent.AvatarExperienceFormValidation)
+
 local FIntAXOutfitNameMaxLength = AvatarExperienceFlags.FIntAXOutfitNameMaxLength
 
 return (AvatarExperienceFormValidation.buildFormValidator({

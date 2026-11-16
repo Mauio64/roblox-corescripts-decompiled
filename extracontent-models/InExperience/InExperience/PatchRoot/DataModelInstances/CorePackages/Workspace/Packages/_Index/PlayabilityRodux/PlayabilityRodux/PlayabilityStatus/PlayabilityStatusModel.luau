@@ -1,61 +1,78 @@
-local Parent = script:FindFirstAncestor("PlayabilityRodux").Parent
-local PlayabilityStatusEnum = require(Parent.DiscoveryTypes).PlayabilityStatusEnum
-local FFlagLuaAppPlayableUxTreatment = require(Parent.SharedFlags).FFlagLuaAppPlayableUxTreatment
-local FFlagLuaAppDemoModePlayButton = require(Parent.SharedFlags).FFlagLuaAppDemoModePlayButton
-local Result = require(Parent.Result)
-local t1 = {
-	new = function() -- line: 48
-		return {}
-	end
-}
+local parent = script:FindFirstAncestor("PlayabilityRodux").Parent
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local PlayabilityStatusEnum = DiscoveryTypes.PlayabilityStatusEnum
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppPlayableUxTreatment = SharedFlags.FFlagLuaAppPlayableUxTreatment
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppPlayButtonPrivatePT = SharedFlags2.FFlagLuaAppPlayButtonPrivatePT
 
-function t1.mock() -- line: 54
-	-- upvalues: t1 (copy), PlayabilityStatusEnum (copy)
-	local v7 = t1.new()
+local Result = require(parent.Result)
 
-	v7.universeId = "149757"
-	v7.isPlayable = true
-	v7.playabilityStatus = PlayabilityStatusEnum.Playable
+local PlayabilityStatusModel = {}
 
-	return v7
+function PlayabilityStatusModel.new()
+	return {}
 end
-function t1.fromJsonData(p1) -- line: 63
-	-- upvalues: Result (copy), t1 (copy), FFlagLuaAppDemoModePlayButton (copy), FFlagLuaAppPlayableUxTreatment (copy)
-	if type(p1.universeId) ~= "number" and type(p1.universeId) ~= "string" then
+
+function PlayabilityStatusModel.mock()
+	local v = PlayabilityStatusModel.new()
+	v.universeId = "149757"
+	v.isPlayable = true
+	v.playabilityStatus = PlayabilityStatusEnum.Playable
+
+	return v
+end
+
+function PlayabilityStatusModel.fromJsonData(data)
+	if type(data.universeId) ~= "number" and type(data.universeId) ~= "string" then
 		return Result.error("PlayabilityStatus.fromJsonData expects universeId to be a number or a string")
 	end
 
-	if type(p1.isPlayable) ~= "boolean" then
+	if type(data.isPlayable) ~= "boolean" then
 		return Result.error("PlayabilityStatus.fromJsonData expects isPlayable to be a boolean")
 	end
 
-	if type(p1.playabilityStatus) ~= "string" then
+	if type(data.playabilityStatus) ~= "string" then
 		return Result.error("PlayabilityStatus.fromJsonData expects playabilityStatus to be a string")
 	end
 
-	local v9 = t1.new()
+	local v = PlayabilityStatusModel.new()
+	v.universeId = tostring(data.universeId)
+	v.isPlayable = data.isPlayable
+	v.playabilityStatus = data.playabilityStatus
+	v.unplayableDisplayText = data.unplayableDisplayText
 
-	v9.universeId = tostring(p1.universeId)
-	v9.isPlayable = p1.isPlayable
-	v9.playabilityStatus = p1.playabilityStatus
-	v9.unplayableDisplayText = p1.unplayableDisplayText
+	if type(data.demoModeAvailable) == "boolean" then
+		v.demoModeAvailable = data.demoModeAvailable
+	end
 
-	if FFlagLuaAppDemoModePlayButton and type(p1.demoModeAvailable) == "boolean" then
-		v9.demoModeAvailable = p1.demoModeAvailable
+	if FFlagLuaAppPlayButtonPrivatePT then
+		local privatePlaytestInfo = data.privatePlaytestInfo
+
+		if type(privatePlaytestInfo) == "table" and type(privatePlaytestInfo.isPlayable) == "boolean" then
+			v.privatePlaytestInfo = {
+				isPlayable = privatePlaytestInfo.isPlayable,
+				playabilityStatus = privatePlaytestInfo.playabilityStatus
+			}
+		end
 	end
 
 	if FFlagLuaAppPlayableUxTreatment then
-		local playableUxTreatment = p1.playableUxTreatment
+		local playableUxTreatment = data.playableUxTreatment
 
-		if playableUxTreatment and type(playableUxTreatment) == "table" and type(playableUxTreatment.treatment) == "string" then
-			v9.playableUxTreatment = {
+		if
+			playableUxTreatment
+			and type(playableUxTreatment) == "table"
+			and type(playableUxTreatment.treatment) == "string"
+		then
+			v.playableUxTreatment = {
 				treatment = playableUxTreatment.treatment,
 				data = playableUxTreatment.data
 			}
 		end
 	end
 
-	return Result.success(v9)
+	return Result.success(v)
 end
 
-return t1
+return PlayabilityStatusModel

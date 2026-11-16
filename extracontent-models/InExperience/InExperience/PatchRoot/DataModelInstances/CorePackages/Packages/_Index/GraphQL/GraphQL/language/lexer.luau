@@ -1,477 +1,583 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local LuauPolyfill = require(scriptParentParentParent.LuauPolyfill)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local LuauPolyfill = require(parent3.LuauPolyfill)
 local Number = LuauPolyfill.Number
 local String = LuauPolyfill.String
 local isNaN = Number.isNaN
 local HttpService = game:GetService("HttpService")
-local syntaxError = require(scriptParentParent.error.syntaxError).syntaxError
 
+local syntaxError = require(parent2.error.syntaxError)
+local syntaxError2 = syntaxError.syntaxError
 require(script.Parent.source)
 
-local tokenKind = require(scriptParent.tokenKind)
-local Token = require(scriptParent.ast).Token
-local TokenKind = tokenKind.TokenKind
-local toUnicodeString = require(scriptParentParent.luaUtils.toUnicodeString)
-local dedentBlockStringValue = require(scriptParent.blockString).dedentBlockStringValue
-local readBlockString = nil
-local readString = nil
-local char2hex = nil
+local tokenKind = require(parent.tokenKind)
 
-local function uniCharCode(p1, p2, p3, p4) -- line: 88
-	-- upvalues: char2hex (ref)
-	local v27 = char2hex(p1)
-	local v28 = char2hex(p2)
-	local v29 = char2hex(p3)
-	local v30 = char2hex(p4)
+local ast = require(parent.ast)
+local token = ast.Token
+local tokenKind2 = tokenKind.TokenKind
 
-	if v27 < 0 or (v28 < 0 or v29 < 0 or v30 < 0) then
+local toUnicodeString = require(parent2.luaUtils.toUnicodeString)
+local blockString = require(parent.blockString)
+local dedentBlockStringValue = blockString.dedentBlockStringValue
+
+local readBlockString
+local readString
+
+local char2hex
+
+local function uniCharCode(p, p2, p3, p4)
+	local v = char2hex(p)
+	local v2 = char2hex(p2)
+	local v3 = char2hex(p3)
+	local v4 = char2hex(p4)
+
+	if v < 0 or v2 < 0 or v3 < 0 or v4 < 0 then
 		return -1
 	end
 
-	return (bit32.bor(bit32.lshift(v27, 12), bit32.lshift(v28, 8), bit32.lshift(v29, 4), v30))
+	return (bit32.bor(bit32.lshift(v, 12), bit32.lshift(v2, 8), bit32.lshift(v3, 4), v4))
 end
 
-function char2hex(p5) -- line: 108
-	if p5 >= 48 and p5 <= 57 then
-		return p5 - 48
+char2hex = function(p)
+	if p >= 48 and p <= 57 then
+		return p - 48
 	end
 
-	if p5 >= 65 and p5 <= 70 then
-		return p5 - 55
+	if p >= 65 and p <= 70 then
+		return p - 55
 	end
 
-	if p5 >= 97 and p5 <= 102 then
-		return p5 - 87
+	if p >= 97 and p <= 102 then
+		return p - 87
 	end
 
 	return -1
 end
 
-local function readName(p6, n1: number, n2: number, n3: number, p7) -- line: 126
-	-- upvalues: String (copy), isNaN (copy), Token (copy), TokenKind (copy)
-	local body = p6.body
-	local v38 = string.len(body)
-	local u39 = n1 + 1
-	local n4 = 0
+local function readName(source, p: number, line: number, p2: number, p3)
+	local body = source.body
+	local v = string.len(body)
+	local v2 = p + 1
+	local v3 = 0
 
-	while u39 ~= v38 + 1 do
-		n4 = String.charCodeAt(body, u39)
+	local function fn(): boolean -- 1 equivalent call inferred from this helper
+		return v2 ~= v + 1
+	end
 
-		if not not isNaN(n4) or not (n4 == 95 or (n4 >= 48 and n4 <= 57 or (n4 >= 65 and n4 <= 90 or n4 >= 97 and n4 <= 122))) then
+	while fn() do -- inferred equivalent call
+		v3 = String.charCodeAt(body, v2)
+
+		if isNaN(v3) then
 			break
 		end
 
-		u39 += 1
+		local v4 = v3 == 95
+
+		if not v4 then
+			if v3 >= 48 then
+				v4 = v3 <= 57
+			else
+				v4 = false
+			end
+
+			if not v4 then
+				if v3 >= 65 then
+					v4 = v3 <= 90
+				else
+					v4 = false
+				end
+
+				if not v4 then
+					if v3 >= 97 then
+						v4 = v3 <= 122
+					else
+						v4 = false
+					end
+				end
+			end
+		end
+
+		if not v4 then
+			break
+		end
+
+		v2 += 1
 	end
 
-	return Token.new(TokenKind.NAME, n1, u39, n2, n3, p7, String.slice(body, n1, u39))
+	return token.new(tokenKind2.NAME, p, v2, line, p2, p3, String.slice(body, p, v2))
 end
-local function readComment(p8, n5: number, n6: number, n7: number, p9) -- line: 179
-	-- upvalues: String (copy), isNaN (copy), Token (copy), TokenKind (copy)
-	local body = p8.body
-	local v47 = n5
+
+local function readComment(source, p: number, line: number, p2: number, p3)
+	local body = source.body
+	local v = p
 
 	repeat
-		v47 += 1
+		v += 1
+		local charCodeAt = String.charCodeAt(body, v)
+	until isNaN(charCodeAt) or not (charCodeAt > 31) and charCodeAt ~= 9
 
-		local v48 = String.charCodeAt(body, v47)
-	until isNaN(v48) or not (v48 > 31) and v48 ~= 9
-
-	return Token.new(TokenKind.COMMENT, n5, v47, n6, n7, p9, String.slice(body, n5 + 1, v47))
+	return token.new(tokenKind2.COMMENT, p, v, line, p2, p3, String.slice(body, p + 1, v))
 end
 
-function printCharCode(n8: number) -- line: 201
-	-- upvalues: isNaN (copy), TokenKind (copy), HttpService (copy), toUnicodeString (copy)
-	if isNaN(n8) then
-		return TokenKind.EOF
+function printCharCode(p: number)
+	if isNaN(p) then
+		return tokenKind2.EOF
 	end
 
-	if n8 < 127 then
-		return HttpService:JSONEncode((string.char(n8)))
+	if p < 127 then
+		return HttpService:JSONEncode((string.char(p)))
 	end
 
-	return toUnicodeString(n8)
+	return toUnicodeString(p)
 end
-function readDigits(p10, n9: number, n10: number) -- line: 220
-	-- upvalues: String (copy), syntaxError (copy)
-	local body = p10.body
 
-	if n10 >= 48 and n10 <= 57 then
-		repeat
-			n9 += 1
+function readDigits(p, count: number, p2: number)
+	local body = p.body
 
-			local v54 = String.charCodeAt(body, n9)
-		until not (v54 >= 48) or not (v54 <= 57)
+	if not (p2 >= 48 and p2 <= 57) then
+		error(syntaxError2(p, count, "Invalid number, expected digit but got: " .. printCharCode(p2) .. "."))
 
-		return n9
+		return
 	end
 
-	error(syntaxError(p10, n9, "Invalid number, expected digit but got: " .. printCharCode(n10) .. "."))
+	repeat
+		count += 1
+		local charCodeAt = String.charCodeAt(body, count)
+	until not (charCodeAt >= 48 and charCodeAt <= 57)
+
+	return count
 end
-function unexpectedCharacterMessage(n11: number) -- line: 245
-	if n11 < 32 and (n11 ~= 9 and n11 ~= 10 and n11 ~= 13) then
-		return "Cannot contain the invalid character " .. printCharCode(n11) .. "."
+
+function unexpectedCharacterMessage(p: number)
+	if p < 32 and p ~= 9 and p ~= 10 and p ~= 13 then
+		return "Cannot contain the invalid character " .. printCharCode(p) .. "."
 	end
 
-	if n11 == 39 then
+	if p == 39 then
 		return "Unexpected single quote character ('), did you mean to use a double quote (\")?"
 	end
 
-	return "Cannot parse the unexpected character " .. printCharCode(n11) .. "."
+	return "Cannot parse the unexpected character " .. printCharCode(p) .. "."
 end
-function isNameStart(n12: number) -- line: 259
-	local v57 = n12 == 95
-	local v58 = n12 >= 65 and n12 <= 90
-	local v59 = n12 >= 97 and n12 <= 122
 
-	return v57 or (v58 or v59)
-end
-function readNumber(p11, n13: number, n14: number, n15: number, n16: number, p12) -- line: 274
-	-- upvalues: String (copy), syntaxError (copy), Token (copy), TokenKind (copy)
-	local body = p11.body
-	local v67 = n13
-	local v68 = false
+function isNameStart(p: number)
+	local v = p == 95
+	local v2
 
-	if n14 == 45 then
-		v67 += 1
-		n14 = String.charCodeAt(body, v67)
+	if p >= 65 then
+		v2 = p <= 90
+	else
+		v2 = false
 	end
 
-	local v69, v70
+	local v3 = p >= 97 and p <= 122
+	return v or v2 or v3
+end
 
-	if n14 == 48 then
-		v69 = v67 + 1
-		v70 = String.charCodeAt(body, v69)
+function readNumber(p, p2: number, p3: number, p4: number, p5: number, p6)
+	local body = p.body
 
-		if v70 >= 48 and v70 <= 57 then
-			error(syntaxError(p11, v69, "Invalid number, unexpected digit after 0: " .. printCharCode(v70) .. "."))
+	local v = false
+	local v2
+
+	if p3 == 45 then
+		v2 = p2 + 1
+		p3 = String.charCodeAt(body, v2)
+	else
+		v2 = p2
+	end
+
+	local v3
+
+	if p3 == 48 then
+		v2 += 1
+		v3 = String.charCodeAt(body, v2)
+
+		if v3 >= 48 and v3 <= 57 then
+			error(syntaxError2(p, v2, "Invalid number, unexpected digit after 0: " .. printCharCode(v3) .. "."))
 		end
 	else
-		v69 = readDigits(p11, v67, n14)
-		v70 = String.charCodeAt(body, v69)
+		v2 = readDigits(p, v2, p3)
+		v3 = String.charCodeAt(body, v2)
 	end
 
-	if v70 == 46 then
-		v68 = true
+	if v3 == 46 then
+		local v4 = v2 + 1
+		local charCodeAt = String.charCodeAt(body, v4)
+		v2 = readDigits(p, v4, charCodeAt)
 
-		local v71 = v69 + 1
-		local v72 = String.charCodeAt(body, v71)
-
-		v69 = readDigits(p11, v71, v72)
-		v70 = String.charCodeAt(body, v69)
+		v3 = String.charCodeAt(body, v2)
+		v = true
 	end
 
-	if v70 == 69 or v70 == 101 then
-		v68 = true
+	if v3 == 69 or v3 == 101 then
+		v = true
 
-		local v73 = v69 + 1
-		local v74 = String.charCodeAt(body, v73)
+		local v4 = v2 + 1
+		local v5 = String.charCodeAt(body, v4)
 
-		if v74 == 43 or v74 == 45 then
-			v73 += 1
-			v74 = String.charCodeAt(body, v73)
+		if v5 == 43 or v5 == 45 then
+			v4 += 1
+			v5 = String.charCodeAt(body, v4)
 		end
 
-		v69 = readDigits(p11, v73, v74)
-		v70 = String.charCodeAt(body, v69)
+		v2 = readDigits(p, v4, v5)
+		v3 = String.charCodeAt(body, v2)
 	end
 
-	if v70 == 46 or isNameStart(v70) then
-		error(syntaxError(p11, v69, "Invalid number, expected digit but got: " .. printCharCode(v70) .. "."))
+	if v3 == 46 or isNameStart(v3) then
+		error(syntaxError2(p, v2, "Invalid number, expected digit but got: " .. printCharCode(v3) .. "."))
 	end
 
-	return Token.new(v68 and TokenKind.FLOAT or TokenKind.INT, n13, v69, n15, n16, p12, String.slice(body, n13, v69))
+	return token.new(v and tokenKind2.FLOAT or tokenKind2.INT, p2, v2, p4, p5, p6, String.slice(body, p2, v2))
 end
 
-local function readToken(t1: {[any]: any}, p13) -- line: 359
-	-- upvalues: String (copy), Token (copy), TokenKind (copy), readComment (copy), readBlockString (ref), readString (ref), readName (copy), syntaxError (copy)
-	local source = t1.source
+local function readToken(state, result)
+	local source = state.source
 	local body = source.body
-	local v79 = utf8.len(body)
+	local v = utf8.len(body)
 
-	assert(v79 ~= nil, "invalid utf8 supplied for token")
+	assert(v ~= nil, "invalid utf8 supplied for token")
 
-	local _end = p13._end
+	local v2 = result._end
 
-	while _end <= v79 do
-		local v81 = String.charCodeAt(body, _end)
-		local line = t1.line
-		local v83 = _end - t1.lineStart
+	while v2 <= v do
+		local charCodeAt = String.charCodeAt(body, v2)
 
-		if v81 == 65279 or v81 == 9 or v81 == 32 or v81 == 44 then
-			_end += 1
+		local line = state.line
+		local v3 = v2 - state.lineStart
 
-			continue
-		end
-
-		if v81 == 10 then
-			_end += 1
-			t1.line = t1.line + 1
-			t1.lineStart = _end - 1
-
-			continue
-		end
-
-		if v81 == 13 then
-			_end = if String.charCodeAt(body, _end + 1) ~= 10 then _end + 1 else _end + 2
-			t1.line = t1.line + 1
-			t1.lineStart = _end - 1
-
-			continue
-		end
-
-		if v81 == 33 then
-			return Token.new(TokenKind.BANG, _end, _end + 1, line, v83, p13)
-		end
-
-		if v81 == 35 then
-			return readComment(source, _end, line, v83, p13)
-		end
-
-		if v81 == 36 then
-			return Token.new(TokenKind.DOLLAR, _end, _end + 1, line, v83, p13)
-		end
-
-		if v81 == 38 then
-			return Token.new(TokenKind.AMP, _end, _end + 1, line, v83, p13)
-		end
-
-		if v81 == 40 then
-			return Token.new(TokenKind.PAREN_L, _end, _end + 1, line, v83, p13)
-		end
-
-		if v81 == 41 then
-			return Token.new(TokenKind.PAREN_R, _end, _end + 1, line, v83, p13)
-		end
-
-		if v81 == 46 then
-			if String.charCodeAt(body, _end + 1) == 46 and String.charCodeAt(body, _end + 2) == 46 then
-				return Token.new(TokenKind.SPREAD, _end, _end + 3, line, v83, p13)
+		if charCodeAt == 65279 or charCodeAt == 9 or charCodeAt == 32 or charCodeAt == 44 then
+			v2 += 1
+		elseif charCodeAt == 10 then
+			v2 += 1
+			state.line += 1
+			state.lineStart = v2 - 1
+		elseif charCodeAt == 13 then
+			if String.charCodeAt(body, v2 + 1) == 10 then
+				v2 += 2
+			else
+				v2 += 1
 			end
+
+			state.line += 1
+			state.lineStart = v2 - 1
 		else
-			if v81 == 58 then
-				return Token.new(TokenKind.COLON, _end, _end + 1, line, v83, p13)
+			if charCodeAt == 33 then
+				return token.new(tokenKind2.BANG, v2, v2 + 1, line, v3, result)
+			elseif charCodeAt == 35 then
+				return readComment(source, v2, line, v3, result)
+			elseif charCodeAt == 36 then
+				return token.new(tokenKind2.DOLLAR, v2, v2 + 1, line, v3, result)
+			elseif charCodeAt == 38 then
+				return token.new(tokenKind2.AMP, v2, v2 + 1, line, v3, result)
+			elseif charCodeAt == 40 then
+				return token.new(tokenKind2.PAREN_L, v2, v2 + 1, line, v3, result)
+			elseif charCodeAt == 41 then
+				return token.new(tokenKind2.PAREN_R, v2, v2 + 1, line, v3, result)
 			end
 
-			if v81 == 61 then
-				return Token.new(TokenKind.EQUALS, _end, _end + 1, line, v83, p13)
-			end
-
-			if v81 == 64 then
-				return Token.new(TokenKind.AT, _end, _end + 1, line, v83, p13)
-			end
-
-			if v81 == 91 then
-				return Token.new(TokenKind.BRACKET_L, _end, _end + 1, line, v83, p13)
-			end
-
-			if v81 == 93 then
-				return Token.new(TokenKind.BRACKET_R, _end, _end + 1, line, v83, p13)
-			end
-
-			if v81 == 123 then
-				return Token.new(TokenKind.BRACE_L, _end, _end + 1, line, v83, p13)
-			end
-
-			if v81 == 124 then
-				return Token.new(TokenKind.PIPE, _end, _end + 1, line, v83, p13)
-			end
-
-			if v81 == 125 then
-				return Token.new(TokenKind.BRACE_R, _end, _end + 1, line, v83, p13)
-			end
-
-			if v81 == 34 then
-				if String.charCodeAt(body, _end + 1) == 34 and String.charCodeAt(body, _end + 2) == 34 then
-					return readBlockString(source, _end, line, v83, p13, t1)
+			if charCodeAt == 46 then
+				if String.charCodeAt(body, v2 + 1) == 46 and String.charCodeAt(body, v2 + 2) == 46 then
+					return token.new(tokenKind2.SPREAD, v2, v2 + 3, line, v3, result)
+				end
+			else
+				if charCodeAt == 58 then
+					return token.new(tokenKind2.COLON, v2, v2 + 1, line, v3, result)
+				elseif charCodeAt == 61 then
+					return token.new(tokenKind2.EQUALS, v2, v2 + 1, line, v3, result)
+				elseif charCodeAt == 64 then
+					return token.new(tokenKind2.AT, v2, v2 + 1, line, v3, result)
+				elseif charCodeAt == 91 then
+					return token.new(tokenKind2.BRACKET_L, v2, v2 + 1, line, v3, result)
+				elseif charCodeAt == 93 then
+					return token.new(tokenKind2.BRACKET_R, v2, v2 + 1, line, v3, result)
+				elseif charCodeAt == 123 then
+					return token.new(tokenKind2.BRACE_L, v2, v2 + 1, line, v3, result)
+				elseif charCodeAt == 124 then
+					return token.new(tokenKind2.PIPE, v2, v2 + 1, line, v3, result)
+				elseif charCodeAt == 125 then
+					return token.new(tokenKind2.BRACE_R, v2, v2 + 1, line, v3, result)
 				end
 
-				return readString(source, _end, line, v83, p13)
+				if charCodeAt == 34 then
+					if String.charCodeAt(body, v2 + 1) == 34 and String.charCodeAt(body, v2 + 2) == 34 then
+						return readBlockString(source, v2, line, v3, result, state)
+					end
+
+					return readString(source, v2, line, v3, result)
+				end
+
+				if
+					charCodeAt == 45
+					or charCodeAt == 48
+					or charCodeAt == 49
+					or charCodeAt == 50
+					or charCodeAt == 51
+					or charCodeAt == 52
+					or charCodeAt == 53
+					or charCodeAt == 54
+					or charCodeAt == 55
+					or charCodeAt == 56
+					or charCodeAt == 57
+				then
+					return readNumber(source, v2, charCodeAt, line, v3, result)
+				end
+
+				if
+					charCodeAt == 65
+					or charCodeAt == 66
+					or charCodeAt == 67
+					or charCodeAt == 68
+					or charCodeAt == 69
+					or charCodeAt == 70
+					or charCodeAt == 71
+					or charCodeAt == 72
+					or charCodeAt == 73
+					or charCodeAt == 74
+					or charCodeAt == 75
+					or charCodeAt == 76
+					or charCodeAt == 77
+					or charCodeAt == 78
+					or charCodeAt == 79
+					or charCodeAt == 80
+					or charCodeAt == 81
+					or charCodeAt == 82
+					or charCodeAt == 83
+					or charCodeAt == 84
+					or charCodeAt == 85
+					or charCodeAt == 86
+					or charCodeAt == 87
+					or charCodeAt == 88
+					or charCodeAt == 89
+					or charCodeAt == 90
+					or charCodeAt == 95
+					or charCodeAt == 97
+					or charCodeAt == 98
+					or charCodeAt == 99
+					or charCodeAt == 100
+					or charCodeAt == 101
+					or charCodeAt == 102
+					or charCodeAt == 103
+					or charCodeAt == 104
+					or charCodeAt == 105
+					or charCodeAt == 106
+					or charCodeAt == 107
+					or charCodeAt == 108
+					or charCodeAt == 109
+					or charCodeAt == 110
+					or charCodeAt == 111
+					or charCodeAt == 112
+					or charCodeAt == 113
+					or charCodeAt == 114
+					or charCodeAt == 115
+					or charCodeAt == 116
+					or charCodeAt == 117
+					or charCodeAt == 118
+					or charCodeAt == 119
+					or charCodeAt == 120
+					or charCodeAt == 121
+					or charCodeAt == 122
+				then
+					return readName(source, v2, line, v3, result)
+				end
 			end
 
-			if v81 == 45 or v81 == 48 or v81 == 49 or v81 == 50 or v81 == 51 or v81 == 52 or v81 == 53 or v81 == 54 or v81 == 55 or v81 == 56 or v81 == 57 then
-				return readNumber(source, _end, v81, line, v83, p13)
-			end
-
-			if v81 == 65 or v81 == 66 or v81 == 67 or v81 == 68 or v81 == 69 or v81 == 70 or v81 == 71 or v81 == 72 or v81 == 73 or v81 == 74 or v81 == 75 or v81 == 76 or v81 == 77 or v81 == 78 or v81 == 79 or v81 == 80 or v81 == 81 or v81 == 82 or v81 == 83 or v81 == 84 or v81 == 85 or v81 == 86 or v81 == 87 or v81 == 88 or v81 == 89 or v81 == 90 or v81 == 95 or v81 == 97 or v81 == 98 or v81 == 99 or v81 == 100 or v81 == 101 or v81 == 102 or v81 == 103 or v81 == 104 or v81 == 105 or v81 == 106 or v81 == 107 or v81 == 108 or v81 == 109 or v81 == 110 or v81 == 111 or v81 == 112 or v81 == 113 or v81 == 114 or v81 == 115 or v81 == 116 or v81 == 117 or v81 == 118 or v81 == 119 or v81 == 120 or v81 == 121 or v81 == 122 then
-				return readName(source, _end, line, v83, p13)
-			end
+			error(syntaxError2(source, v2, unexpectedCharacterMessage(charCodeAt)))
 		end
-
-		error(syntaxError(source, _end, unexpectedCharacterMessage(v81)))
 	end
 
-	local line = t1.line
-	local v85 = _end - t1.lineStart
-
-	return Token.new(TokenKind.EOF, v79 + 1, v79 + 1, line, v85, p13)
+	local line = state.line
+	local v3 = v2 - state.lineStart
+	return token.new(tokenKind2.EOF, v + 1, v + 1, line, v3, result)
 end
 
-local t2 = {}
+local class = {}
+class.__index = class
 
-t2.__index = t2
-
-function t2.new(p14) -- line: 558
-	-- upvalues: Token (copy), TokenKind (copy), t2 (copy)
-	local v87 = Token.new(TokenKind.SOF, 1, 1, 0, 0, nil)
+function class.new(source)
+	local v = token.new(tokenKind2.SOF, 1, 1, 0, 0, nil)
 
 	return (setmetatable({
-		source = p14,
-		lastToken = v87,
-		token = v87,
+		["source"] = source,
+		lastToken = v,
+		token = v,
 		line = 1,
 		lineStart = 0
-	}, t2))
+	}, class))
 end
-function t2.advance(p15) -- line: 571
-	p15.lastToken = p15.token
-	p15.token = p15:lookahead()
 
-	return p15.token
+function class:advance()
+	self.lastToken = self.token
+	self.token = self:lookahead()
+	return self.token
 end
-function t2.lookahead(p16) -- line: 577
-	-- upvalues: TokenKind (copy), readToken (copy)
-	local token = p16.token
 
-	if token.kind ~= TokenKind.EOF then
-		repeat
-			if token.next then
-				token = token.next
-			else
-				local v91 = readToken(p16, token)
+function class:lookahead()
+	local result = self.token
 
-				token.next = v91
-				v91.prev = token
-				token = v91
-			end
-		until token.kind ~= TokenKind.COMMENT
+	if result.kind == tokenKind2.EOF then
+		return result
 	end
 
-	return token
-end
-function readBlockString(p17, p18, p19, p20, p21, p22) -- line: 623
-	-- upvalues: isNaN (copy), String (copy), Token (copy), TokenKind (copy), dedentBlockStringValue (copy), syntaxError (copy)
-	local body = p17.body
-	local v100 = p18 + 3
-	local v101 = v100
-	local s1 = ""
-
-	while v100 <= string.len(body) and not isNaN(String.charCodeAt(body, v100)) do
-		local v103 = String.charCodeAt(body, v100)
-
-		if v103 == 34 and String.charCodeAt(body, v100 + 1) == 34 and String.charCodeAt(body, v100 + 2) == 34 then
-			local v104 = s1 .. String.slice(body, v101, v100)
-
-			return Token.new(TokenKind.BLOCK_STRING, p18, v100 + 3, p19, p20, p21, dedentBlockStringValue(v104))
-		end
-
-		if v103 < 32 and v103 ~= 9 and v103 ~= 10 and v103 ~= 13 then
-			error(syntaxError(p17, v100, "Invalid character within String: " .. printCharCode(v103) .. "."))
-		end
-
-		if v103 == 10 then
-			v100 += 1
-			p22.line = p22.line + 1
-			p22.lineStart = v100 - 1
-		elseif v103 == 13 then
-			v100 = if String.charCodeAt(body, v100 + 1) ~= 10 then v100 + 1 else v100 + 2
-			p22.line = p22.line + 1
-			p22.lineStart = v100 - 1
-		elseif v103 == 92 and String.charCodeAt(body, v100 + 1) == 34 and String.charCodeAt(body, v100 + 2) == 34 and String.charCodeAt(body, v100 + 3) == 34 then
-			s1 ..= String.slice(body, v101, v100) .. "\"\"\""
-			v100 += 4
-			v101 = v100
+	repeat
+		if result.next then
+			result = result.next
 		else
-			v100 += 1
+			local nextNode = readToken(self, result)
+			result.next = nextNode
+			nextNode.prev = result
+			result = nextNode
 		end
-	end
+	until result.kind ~= tokenKind2.COMMENT
 
-	error(syntaxError(p17, v100, "Unterminated string."))
+	return result
 end
-function readString(p23, p24, p25, p26, p27) -- line: 697
-	-- upvalues: String (copy), isNaN (copy), Token (copy), TokenKind (copy), syntaxError (copy), uniCharCode (ref)
-	local body = p23.body
-	local v111 = utf8.len(body)
 
-	assert(v111 ~= nil, "invalid utf8 sequence detected")
+readBlockString = function(source, p, line, p2, p3, state)
+	local body = source.body
+	local v = p + 3
+	local v2 = v
+	local v3 = ""
 
-	local v112 = p24 + 1
-	local v113 = v112
-	local s2 = ""
+	while v <= string.len(body) and not isNaN(String.charCodeAt(body, v)) do
+		local charCodeAt = String.charCodeAt(body, v)
 
-	while v112 <= v111 do
-		local v115 = String.charCodeAt(body, v112)
-
-		if isNaN(v115) then
-			break
+		if charCodeAt == 34 and String.charCodeAt(body, v + 1) == 34 and String.charCodeAt(body, v + 2) == 34 then
+			local v4 = v3 .. String.slice(body, v2, v)
+			return token.new(tokenKind2.BLOCK_STRING, p, v + 3, line, p2, p3, dedentBlockStringValue(v4))
 		end
 
-		if v115 == 34 then
-			local v116 = s2 .. String.slice(body, v113, v112)
-
-			return Token.new(TokenKind.STRING, p24, v112 + 1, p25, p26, p27, v116)
+		if charCodeAt < 32 and charCodeAt ~= 9 and charCodeAt ~= 10 and charCodeAt ~= 13 then
+			error(syntaxError2(source, v, "Invalid character within String: " .. printCharCode(charCodeAt) .. "."))
 		end
 
-		if v115 == 10 or v115 == 13 then
-			break
-		end
-
-		if v115 < 32 and v115 ~= 9 then
-			error(syntaxError(p23, v112, "Invalid character within String: " .. printCharCode(v115) .. "."))
-		end
-
-		v112 += 1
-
-		if v115 == 92 then
-			s2 ..= String.slice(body, v113, v112 - 1)
-
-			local v117 = String.charCodeAt(body, v112)
-
-			if v117 == 34 then
-				s2 ..= "\""
-			elseif v117 == 47 then
-				s2 ..= "/"
-			elseif v117 == 92 then
-				s2 ..= "\\"
-			elseif v117 == 98 then
-				s2 ..= "\b"
-			elseif v117 == 102 then
-				s2 ..= "\f"
-			elseif v117 == 110 then
-				s2 ..= "\n"
-			elseif v117 == 114 then
-				s2 ..= "\r"
-			elseif v117 == 116 then
-				s2 ..= "\t"
-			elseif v117 == 117 then
-				local v118 = uniCharCode(String.charCodeAt(body, v112 + 1), String.charCodeAt(body, v112 + 2), String.charCodeAt(body, v112 + 3), String.charCodeAt(body, v112 + 4))
-
-				if v118 < 0 then
-					local v119 = String.slice(body, v112 + 1, v112 + 5)
-
-					error(syntaxError(p23, v112, "Invalid character escape sequence: \\u" .. v119 .. "."))
-				end
-
-				s2 ..= utf8.char(v118)
-				v112 += 4
+		if charCodeAt == 10 then
+			v += 1
+			state.line += 1
+			state.lineStart = v - 1
+		elseif charCodeAt == 13 then
+			if String.charCodeAt(body, v + 1) == 10 then
+				v += 2
 			else
-				error(syntaxError(p23, v112, "Invalid character escape sequence: \\" .. utf8.char(v117) .. "."))
+				v += 1
 			end
 
-			v112 += 1
-			v113 = v112
+			state.line += 1
+			state.lineStart = v - 1
+		elseif
+			charCodeAt == 92
+			and String.charCodeAt(body, v + 1) == 34
+			and String.charCodeAt(body, v + 2) == 34
+			and String.charCodeAt(body, v + 3) == 34
+		then
+			v3 ..= String.slice(body, v2, v) .. "\"\"\""
+			v += 4
+			v2 = v
+		else
+			v += 1
 		end
 	end
 
-	error(syntaxError(p23, v112, "Unterminated string."))
+	error(syntaxError2(source, v, "Unterminated string."))
+end
+
+readString = function(source, p, line, p2, p3)
+	local body = source.body
+	local v = utf8.len(body)
+	assert(v ~= nil, "invalid utf8 sequence detected")
+	local v2 = p + 1
+	local v3 = v2
+	local v4 = ""
+
+	while v2 <= v do
+		local charCodeAt = String.charCodeAt(body, v2)
+
+		if isNaN(charCodeAt) then
+			break
+		end
+
+		if charCodeAt == 34 then
+			local v5 = v4 .. String.slice(body, v3, v2)
+			return token.new(tokenKind2.STRING, p, v2 + 1, line, p2, p3, v5)
+		end
+
+		if charCodeAt == 10 or charCodeAt == 13 then
+			break
+		end
+
+		if charCodeAt < 32 and charCodeAt ~= 9 then
+			error(syntaxError2(source, v2, "Invalid character within String: " .. printCharCode(charCodeAt) .. "."))
+		end
+
+		v2 += 1
+
+		if charCodeAt ~= 92 then
+			continue
+		end
+
+		v4 ..= String.slice(body, v3, v2 - 1)
+		local charCodeAt2 = String.charCodeAt(body, v2)
+
+		if charCodeAt2 == 34 then
+			v4 ..= "\""
+		elseif charCodeAt2 == 47 then
+			v4 ..= "/"
+		elseif charCodeAt2 == 92 then
+			v4 ..= "\\"
+		elseif charCodeAt2 == 98 then
+			v4 ..= "\8"
+		elseif charCodeAt2 == 102 then
+			v4 ..= "\f"
+		elseif charCodeAt2 == 110 then
+			v4 ..= "\n"
+		elseif charCodeAt2 == 114 then
+			v4 ..= "\r"
+		elseif charCodeAt2 == 116 then
+			v4 ..= "\t"
+		elseif charCodeAt2 == 117 then
+			local v5 = uniCharCode(
+				String.charCodeAt(body, v2 + 1),
+				String.charCodeAt(body, v2 + 2),
+				String.charCodeAt(body, v2 + 3),
+				String.charCodeAt(body, v2 + 4)
+			)
+
+			if v5 < 0 then
+				local slice = String.slice(body, v2 + 1, v2 + 5)
+				error(syntaxError2(source, v2, "Invalid character escape sequence: \\u" .. slice .. "."))
+			end
+
+			v4 ..= utf8.char(v5)
+			v2 += 4
+		else
+			error(syntaxError2(source, v2, "Invalid character escape sequence: \\" .. utf8.char(charCodeAt2) .. "."))
+		end
+
+		v2 += 1
+		v3 = v2
+	end
+
+	error(syntaxError2(source, v2, "Unterminated string."))
 end
 
 return {
-	Lexer = t2,
-	isPunctuatorTokenKind = function(p28) -- line: 600
-		-- upvalues: TokenKind (copy)
-		return p28 == TokenKind.BANG or (p28 == TokenKind.DOLLAR or (p28 == TokenKind.AMP or (p28 == TokenKind.PAREN_L or (p28 == TokenKind.PAREN_R or (p28 == TokenKind.SPREAD or (p28 == TokenKind.COLON or (p28 == TokenKind.EQUALS or (p28 == TokenKind.AT or (p28 == TokenKind.BRACKET_L or (p28 == TokenKind.BRACKET_R or (p28 == TokenKind.BRACE_L or (p28 == TokenKind.PIPE or p28 == TokenKind.BRACE_R))))))))))))
+	Lexer = class,
+	isPunctuatorTokenKind = function(p): boolean
+		return p == tokenKind2.BANG
+			or p == tokenKind2.DOLLAR
+			or p == tokenKind2.AMP
+			or p == tokenKind2.PAREN_L
+			or p == tokenKind2.PAREN_R
+			or p == tokenKind2.SPREAD
+			or p == tokenKind2.COLON
+			or p == tokenKind2.EQUALS
+			or p == tokenKind2.AT
+			or p == tokenKind2.BRACKET_L
+			or p == tokenKind2.BRACKET_R
+			or p == tokenKind2.BRACE_L
+			or p == tokenKind2.PIPE
+			or p == tokenKind2.BRACE_R
 	end
 }

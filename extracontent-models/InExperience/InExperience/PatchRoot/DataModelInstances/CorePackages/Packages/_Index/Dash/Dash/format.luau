@@ -1,58 +1,55 @@
-local scriptParent = script.Parent
-local formatValue = require(scriptParent.formatValue)
-local splitOn = require(scriptParent.splitOn)
-local startsWith = require(scriptParent.startsWith)
+local parent = script.Parent
+local formatValue = require(parent.formatValue)
+local splitOn = require(parent.splitOn)
+local startsWith = require(parent.startsWith)
+
 local concat = table.concat
 local insert = table.insert
 
-local function format(s1: string, ...) -- line: 43
-	-- upvalues: splitOn (copy), insert (copy), startsWith (copy), formatValue (copy), concat (copy)
-	local t1 = { ... }
-	local n1 = 1
-	local v11, v12 = splitOn(s1, "{[^{}]*}")
-	local t2 = {}
+local function format(p: string, ...)
+	local v, v2 = splitOn(p, "{[^{}]*}")
+	local v3 = {}
+	local v4 = { ... }
+	local v5 = 1
 
-	for v14, v15 in v11 do
-		insert(t2, (v15:gsub("{{", "{"):gsub("}}", "}")))
+	for k, v6 in v do
+		insert(v3, (v6:gsub("{{", "{"):gsub("}}", "}")))
+		local v7 = v2[k] and v2[k]:sub(2, -2)
 
-		local v16 = v12[v14] and v12[v14]:sub(2, -2)
+		if not v7 then
+			continue
+		end
 
-		if v16 then
-			local v17 = v15:gmatch("{+$")()
+		local v8 = v6:gmatch("{+$")()
 
-			if not v17 or #v17 % 2 ~= 1 then
-				local v18 = splitOn(v16, ":")
-				local v19 = startsWith(v18[1], "#")
-				local v20 = v19 and v18[1]:sub(2) or v18[1]
-				local num = tonumber(v20)
-				local v22 = v18[2]
-				local s2 = "nil"
+		if v8 and #v8 % 2 == 1 then
+			insert(v3, v7)
+		else
+			local v9 = splitOn(v7, ":")
+			local v10 = startsWith(v9[1], "#")
+			local v11 = v10 and v9[1]:sub(2) or v9[1]
+			local v12 = tonumber(v11)
+			local v13 = v9[2]
+			local v14 = "nil"
 
-				if num then
-					s2 = t1[num]
-				elseif v20:len() > 0 then
-					local v24 = t1[1] and t1[1][v20]
+			if v12 then
+				v14 = v4[v12]
+			elseif v11:len() > 0 then
+				local v15 = v4[1] and v4[1][v11]
 
-					if v24 ~= nil then
-						s2 = v24
-					end
-				else
-					s2 = t1[n1]
-					n1 += 1
+				if v15 ~= nil then
+					v14 = v15
 				end
-
-				if v19 then
-					s2 = #s2
-				end
-
-				insert(t2, formatValue(s2, v22 or ""))
 			else
-				insert(t2, v16)
+				v14 = v4[v5]
+				v5 += 1
 			end
+
+			insert(v3, formatValue(v10 and #v14 or v14, v13 or ""))
 		end
 	end
 
-	return concat(t2, "")
+	return concat(v3, "")
 end
 
 return format

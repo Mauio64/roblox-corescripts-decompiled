@@ -1,8 +1,11 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local enumerate = require(PurchasePromptParent.PurchasePromptDeps).enumerate
+local parent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local enumerate = PurchasePromptDeps.enumerate
+
 local addRawValueMethodToEnum = require(PurchasePrompt.Utils.addRawValueMethodToEnum)
-local t1 = {
+
+local v = {
 	UpsellModalShown = "UpsellModalShown",
 	UpsellModalShownAgain = "UpsellModalShownAgain",
 	UpsellGenericModalShown = "UpsellGenericModalShown",
@@ -13,8 +16,9 @@ local t1 = {
 	Failed = "Failed",
 	Success = "Success"
 }
-local v6 = enumerate(script.Name, t1)
 
-addRawValueMethodToEnum(v6, t1)
+local v2 = enumerate(script.Name, v)
 
-return v6
+addRawValueMethodToEnum(v2, v)
+
+return v2

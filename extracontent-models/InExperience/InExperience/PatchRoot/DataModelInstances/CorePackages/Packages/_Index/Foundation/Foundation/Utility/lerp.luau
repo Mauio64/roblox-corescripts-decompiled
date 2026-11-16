@@ -1,3 +1,3 @@
-return function(n1: number, n2: number, n3: number) -- line: 1
-	return (1 - n3) * n1 + n2 * n3
+return function(p: number, p2: number, p3: number)
+	return (1 - p3) * p + p2 * p3
 end

@@ -1,6 +1,13 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local FFlagEnableBottomNavOnMarketplace = require(Parent.SharedFlags).FFlagEnableBottomNavOnMarketplace
-local FFlagAXEnableProfileTab = require(Parent.SharedFlags).FFlagAXEnableProfileTab
-local FFlagAppIaScopedScrollAway = require(Parent.SharedFlags).FFlagAppIaScopedScrollAway
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
 
-return FFlagAXEnableProfileTab and (FFlagAppIaScopedScrollAway and (FFlagEnableBottomNavOnMarketplace and game:DefineFastFlag("ProfilePlatformMeTabScrollAway", false)))
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBottomNavOnMarketplace = SharedFlags.FFlagEnableBottomNavOnMarketplace
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAXEnableProfileTab = SharedFlags2.FFlagAXEnableProfileTab
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagAppIaScopedScrollAway = SharedFlags3.FFlagAppIaScopedScrollAway
+
+return FFlagAXEnableProfileTab
+	and FFlagAppIaScopedScrollAway
+	and FFlagEnableBottomNavOnMarketplace
+	and game:DefineFastFlag("ProfilePlatformMeTabScrollAway", false)

@@ -1,16 +1,25 @@
 local SocialExperienceJoin = script:FindFirstAncestor("SocialExperienceJoin")
-local SocialExperienceJoinParent = SocialExperienceJoin.Parent
-local Rodux = require(SocialExperienceJoinParent.Rodux)
+local parent = SocialExperienceJoin.Parent
+local Rodux = require(parent.Rodux)
 local myRoduxNetworking = require(SocialExperienceJoin.Networking.myRoduxNetworking)
 local Games = require(SocialExperienceJoin.Rodux.Games)
 local Presence = require(SocialExperienceJoin.Rodux.Presence)
+
 local FFlagSocialExperienceJoinPresenceStoreMigration = require(SocialExperienceJoin.Flags.FFlagSocialExperienceJoinPresenceStoreMigration)
 
-return function() -- line: 17
-	-- upvalues: Rodux (copy), myRoduxNetworking (copy), Games (copy), FFlagSocialExperienceJoinPresenceStoreMigration (copy), Presence (copy)
-	return Rodux.combineReducers({
+return function()
+	local combineReducers = Rodux.combineReducers
+	local v = {
 		NetworkStatus = myRoduxNetworking.installReducer(),
 		Games = Games.installReducer(),
-		Presence = if not FFlagSocialExperienceJoinPresenceStoreMigration then Presence.installReducer() else nil
-	})
+		Presence = 0
+	}
+	local presence
+
+	if not FFlagSocialExperienceJoinPresenceStoreMigration then
+		presence = Presence.installReducer()
+	end
+
+	v.Presence = presence
+	return combineReducers(v)
 end

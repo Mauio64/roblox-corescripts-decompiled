@@ -1,36 +1,24 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-require(Parent.React)
+require(parent.React)
 
-local Motion = require(Parent.Motion)
+local Motion = require(parent.Motion)
 local TransitionPreset = Motion.TransitionPreset
 
-local function useSpinnerMotionStates() -- line: 24
-	-- upvalues: Motion (copy), TransitionPreset (copy)
+local function useSpinnerMotionStates()
 	return {
-		Default = Motion.createState({
-			scale = 0,
-			transparency = 1
-		}, {
-			default = Motion.transition(TransitionPreset.Default, {
-				duration = 0.2
-			}),
+		Default = Motion.createState({ scale = 0, transparency = 1 }, {
+			default = Motion.transition(TransitionPreset.Default, { duration = 0.2 }),
 			transparency = Motion.transition({
-				duration = 0.2,
-				easingStyle = Enum.EasingStyle.Linear
+				easingStyle = Enum.EasingStyle.Linear,
+				duration = 0.2
 			})
 		}),
-		Loading = Motion.createState({
-			scale = 1,
-			transparency = 0
-		}, {
-			default = Motion.transition(TransitionPreset.Default, {
-				duration = 0.2,
-				delay = 0.1
-			}),
+		Loading = Motion.createState({ scale = 1, transparency = 0 }, {
+			default = Motion.transition(TransitionPreset.Default, { duration = 0.2, delay = 0.1 }),
 			transparency = Motion.transition({
-				duration = 0.2,
-				easingStyle = Enum.EasingStyle.Linear
+				easingStyle = Enum.EasingStyle.Linear,
+				duration = 0.2
 			})
 		})
 	}

@@ -1,10 +1,10 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local makeActionCreator = require(Parent.Rodux).makeActionCreator
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+local Rodux = require(parent.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
+local ArgCheck = require(parent.ArgCheck)
 
-return makeActionCreator(script.Name, function(p1) -- line: 7
-	-- upvalues: ArgCheck (copy)
+return makeActionCreator(script.Name, function(p)
 	return {
-		disabled = ArgCheck.isType(p1, "boolean", "disabled")
+		disabled = ArgCheck.isType(p, "boolean", "disabled")
 	}
 end)

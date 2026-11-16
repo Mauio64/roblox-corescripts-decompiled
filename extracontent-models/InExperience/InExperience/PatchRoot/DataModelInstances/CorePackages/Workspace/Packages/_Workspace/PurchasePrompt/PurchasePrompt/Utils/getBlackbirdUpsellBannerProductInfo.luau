@@ -1,34 +1,35 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
 
-require(Parent.RobloxSubscriptionPurchaseApp)
+require(parent.RobloxSubscriptionPurchaseApp)
 
-local function getBlackbirdUpsellBannerProductInfo(p1) -- line: 11
-	if type(p1) ~= "table" or #p1 == 0 then
+local function getBlackbirdUpsellBannerProductInfo(list)
+	if type(list) ~= "table" or #list == 0 then
 		return nil
 	end
 
-	local v4 = p1[1]
-	local v5 = false
+	local item = list[1]
+	local isFreeTrial
 
-	if v4.EligibleOffers and v4.EligibleOffers[1] then
-		v5 = v4.EligibleOffers[1].OfferType == "FreeTrial"
+	if item.EligibleOffers and item.EligibleOffers[1] then
+		isFreeTrial = item.EligibleOffers[1].OfferType == "FreeTrial"
+	else
+		isFreeTrial = false
 	end
 
-	local DiscountPercent = nil
-	local v7 = v4.ProductTypeDetails and (v4.ProductTypeDetails.RobloxSubscriptionProductDetails and v4.ProductTypeDetails.RobloxSubscriptionProductDetails.FeatureConfig)
+	local discountPercent = nil
+	local featureConfig = item.ProductTypeDetails
+		and item.ProductTypeDetails.RobloxSubscriptionProductDetails
+		and item.ProductTypeDetails.RobloxSubscriptionProductDetails.FeatureConfig
 
-	if v7 and v7.VirtualTransactionDiscounts then
-		local v8 = v7.VirtualTransactionDiscounts[1]
+	if featureConfig and featureConfig.VirtualTransactionDiscounts then
+		local virtualTransactionDiscount = featureConfig.VirtualTransactionDiscounts[1]
 
-		if v8 then
-			DiscountPercent = v8.DiscountPercent
+		if virtualTransactionDiscount then
+			discountPercent = virtualTransactionDiscount.DiscountPercent
 		end
 	end
 
-	return {
-		isFreeTrial = v5,
-		initialDiscountPercentage = DiscountPercent
-	}
+	return { isFreeTrial = isFreeTrial, initialDiscountPercentage = discountPercent }
 end
 
 return getBlackbirdUpsellBannerProductInfo

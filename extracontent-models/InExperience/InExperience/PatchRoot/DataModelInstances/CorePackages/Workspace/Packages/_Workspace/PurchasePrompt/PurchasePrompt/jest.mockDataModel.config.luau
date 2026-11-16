@@ -1,14 +1,17 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "PurchasePrompt-MockDataModel",
-	mockDataModel = true,
 	testMatch = {
 		"**/launchRobuxPackagePurchase.test",
 		"**/NativePurchaseFinishedConnector.test",
-		"**/NativePurchaseFinishedConnectorFlagOff.test"
+		"**/NativePurchaseFinishedConnectorFlagOff.test",
+		"**/Network.getPlayerOwns.test",
+		"**/ProductPurchaseContainerGameplayPaused.test"
 	},
+	mockDataModel = true,
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.UIBloxInitializer,
 		JestConfigs.setupFiles.createPromiseRejectionHandler(),

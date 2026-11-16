@@ -1,6 +1,6 @@
-local function findWhere(p1, p2) -- line: 5
-	for i = 1, #p1 do
-		if p2(p1[i], i) then
+local function findWhere(list, callback)
+	for i = 1, #list do
+		if callback(list[i], i) then
 			return i
 		end
 	end

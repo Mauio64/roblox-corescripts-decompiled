@@ -1,97 +1,99 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local React = require(InExperienceShopParent.React)
+local parent = InExperienceShop.Parent
+
+local React = require(parent.React)
+
 local Constants = require(InExperienceShop.Constants)
-
 require(InExperienceShop.Types)
-
 local FFlagShopUseFuzzySearch = require(InExperienceShop.Flags.FFlagShopUseFuzzySearch)
 
 require(script.Parent.SearchResultsView)
-
 local searchMatchers = require(script.Parent.searchMatchers)
-local t1 = {}
 
-local function compositeKey(p1) -- line: 37
-	return p1.id .. "|" .. tostring(p1.itemType)
+local v = {}
+
+local function compositeKey(item) -- 1 equivalent call inferred from this helper
+	return item.id .. "|" .. tostring(item.itemType)
 end
-local function collectUniqueItems(t2: {[any]: any}) -- line: 41
-	local t3 = {}
-	local t4 = {}
 
-	for _, v17 in t2 do
-		for _, v19 in v17.items do
-			local v20 = v19.id .. "|" .. tostring(v19.itemType)
+local function collectUniqueItems(sections)
+	local set = {}
+	local uniqueItems = {}
 
-			if not t3[v20] then
-				t3[v20] = true
-				table.insert(t4, v19)
+	for _, item in sections do
+		for _, item2 in item.items do
+			local v2 = compositeKey(item2) -- inferred equivalent call
+
+			if set[v2] then
+				continue
 			end
+
+			set[v2] = true
+			table.insert(uniqueItems, item2)
 		end
 	end
 
-	return t4
+	return uniqueItems
 end
-local function computeState(s1: string, n1: number) -- line: 58
-	if s1 == "" then
+
+local function computeState(committedQuery: string, p: number): string -- 1 equivalent call inferred from this helper
+	if committedQuery == "" then
 		return "hint"
 	end
 
-	if n1 == 0 then
-		return "empty"
-	end
-
-	return "results"
+	return if p == 0 then "empty" else "results"
 end
-local function useSearchResultsViewModel(t5: {[any]: any}) -- line: 68
-	-- upvalues: React (copy), collectUniqueItems (copy), FFlagShopUseFuzzySearch (copy), searchMatchers (copy), Constants (copy), t1 (copy)
-	local committedQuery = t5.committedQuery
-	local sections = t5.sections
-	local v26 = React.useMemo(function() -- line: 72
-		-- upvalues: committedQuery (copy), collectUniqueItems (copy), sections (copy), FFlagShopUseFuzzySearch (copy), searchMatchers (copy), Constants (copy)
+
+local function useSearchResultsViewModel(data)
+	local committedQuery = data.committedQuery
+	local sections = data.sections
+
+	local v2 = React.useMemo(function()
 		if committedQuery == "" then
 			return {}
 		end
 
-		local v33 = collectUniqueItems(sections)
+		local v2 = collectUniqueItems(sections)
+		local v3
 
-		return ((if not FFlagShopUseFuzzySearch then searchMatchers.substringMatch else searchMatchers.fuzzyMatch))(v33, committedQuery, Constants.MAX_SEARCH_RESULTS)
-	end, {
-		sections,
-		committedQuery
-	})
-	local v27 = math.min(t5.itemsPerRow, Constants.ITEMS_PER_SECTION)
-	local itemsPerRow = t5.itemsPerRow
-	local v29 = React.useMemo(function() -- line: 86
-		-- upvalues: v26 (copy), t1 (copy), v27 (copy)
-		if #v26 == 0 then
-			return t1
+		if FFlagShopUseFuzzySearch then
+			v3 = searchMatchers.fuzzyMatch
+		else
+			v3 = searchMatchers.substringMatch
 		end
 
-		local t6 = {}
+		return v3(v2, committedQuery, Constants.MAX_SEARCH_RESULTS)
+	end, { sections, committedQuery })
 
-		for i = 1, #v26, v27 do
-			local t7 = {}
+	local v3 = math.min(data.itemsPerRow, Constants.ITEMS_PER_SECTION)
+	local itemsPerRow = data.itemsPerRow
 
-			table.move(v26, i, math.min(i + v27 - 1, #v26), 1, t7)
-			table.insert(t6, t7)
+	local rows = React.useMemo(function()
+		if #v2 == 0 then
+			return v
 		end
 
-		return t6
-	end, {
-		v26,
-		v27
-	})
-	local onItemActivated = t5.onItemActivated
-	local v31 = #v29
-	local v32 = if committedQuery ~= "" then v31 ~= 0 and "results" or "empty" else "hint"
+		local result = {}
+
+		for i = 1, #v2, v3 do
+			local v4 = {}
+			table.move(v2, i, math.min(i + v3 - 1, #v2), 1, v4)
+			table.insert(result, v4)
+		end
+
+		return result
+	end, { v2, v3 })
+
+	local onItemActivated = data.onItemActivated
+
+	local state = computeState(committedQuery, #rows) -- inferred equivalent call
 
 	return {
-		rows = v29,
+		rows = rows,
 		columnCount = itemsPerRow,
 		onItemActivated = onItemActivated,
-		LayoutOrder = t5.LayoutOrder,
-		state = v32
+		LayoutOrder = data.LayoutOrder,
+		state = state
 	}
 end
 

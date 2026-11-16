@@ -1,24 +1,25 @@
 local FriendsCarousel = script:FindFirstAncestor("FriendsCarousel")
-local FriendsCarouselParent = FriendsCarousel.Parent
+local parent = FriendsCarousel.Parent
 
-require(FriendsCarouselParent.GraphQLServer)
+require(parent.GraphQLServer)
+
 require(FriendsCarousel.Common.LocalTypes)
 
-return function(p1) -- line: 9
+return function(data)
 	local universeId = nil
 
-	if p1.__typename == "Friend" then
-		local v5 = p1.presence or {}
+	if data.__typename == "Friend" then
+		local presence = data.presence or {}
 
-		if v5.universeId then
-			return (tonumber(v5.universeId))
+		if presence.universeId then
+			return (tonumber(presence.universeId))
 		end
 
 		return nil
 	end
 
-	if p1.isFriendWithUser then
-		universeId = p1.universeId
+	if data.isFriendWithUser then
+		universeId = data.universeId
 	end
 
 	return universeId

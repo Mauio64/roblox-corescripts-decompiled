@@ -1,10 +1,14 @@
 local UserInputService = game:GetService("UserInputService")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local InputType = require(ParentParent.Enums.InputType)
-local React = require(ParentParentParent.React)
-local useEventConnection = require(ParentParentParent.ReactUtils).useEventConnection
-local t1 = {
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local InputType = require(parent.Enums.InputType)
+local React = require(parent2.React)
+
+local ReactUtils = require(parent2.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
+
+local v = {
 	[Enum.UserInputType.Gamepad1] = InputType.Gamepad,
 	[Enum.UserInputType.Gamepad2] = InputType.Gamepad,
 	[Enum.UserInputType.Gamepad3] = InputType.Gamepad,
@@ -23,32 +27,30 @@ local t1 = {
 	[Enum.UserInputType.Touch] = InputType.Touch
 }
 
-local function useInputType(p1) -- line: 47
-	-- upvalues: UserInputService (copy), t1 (copy), React (copy), useEventConnection (copy)
-	local v10 = p1 or UserInputService
+local function useInputType(p)
+	local v2 = p or UserInputService
 
-	local function getLastInputType() -- line: 50
-		-- upvalues: v10 (copy), t1 (copy)
-		return t1[v10:GetLastInputType()]
+	local function getLastInputType() -- 2 equivalent calls inferred from this helper
+		return v[v2:GetLastInputType()]
 	end
 
-	local v12, v13 = React.useState(t1[v10:GetLastInputType()])
-	local v14 = React.useCallback(function(p2) -- line: 58
-		-- upvalues: t1 (copy), v13 (copy)
-		local v16 = t1[p2]
+	local state, setState = React.useState(getLastInputType()) -- inferred equivalent call
 
-		if v16 ~= nil then
-			v13(v16)
+	local v3 = React.useCallback(function(p2)
+		local v3 = v[p2]
+
+		if v3 ~= nil then
+			setState(v3)
 		end
 	end)
 
-	useEventConnection(v10.LastInputTypeChanged, v14)
-	React.useEffect(function() -- line: 69
-		-- upvalues: v13 (copy), v10 (copy), t1 (copy)
-		v13(t1[v10:GetLastInputType()])
+	useEventConnection(v2.LastInputTypeChanged, v3)
+
+	React.useEffect(function()
+		setState(getLastInputType()) -- inferred equivalent call
 	end, {})
 
-	return v12
+	return state
 end
 
 return useInputType

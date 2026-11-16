@@ -1,0 +1,3 @@
+local FFlagAXItemDetailsSduiBodyActions = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXItemDetailsSduiBodyActions")
+
+return game:DefineFastFlag("AXItemDetailsSduiTryOnSimpleView", false) and FFlagAXItemDetailsSduiBodyActions

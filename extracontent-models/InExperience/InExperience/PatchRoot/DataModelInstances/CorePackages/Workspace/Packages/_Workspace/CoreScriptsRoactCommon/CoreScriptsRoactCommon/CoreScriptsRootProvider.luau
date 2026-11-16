@@ -1,71 +1,113 @@
-local ParentParent = script.Parent.Parent
-local LocalizationService = game:GetService("LocalizationService")
-local GuiService = game:GetService("GuiService")
-local u4 = if not game:DefineFastFlag("SwitchCSRootProviderTranslationsPackage", false) then require(ParentParent.RobloxAppLocales).Localization else require(ParentParent.InExperienceLocales).Localization
-local LocalizationProvider = require(ParentParent.Localization).LocalizationProvider
-local DesignTokenProvider = require(ParentParent.Style).DesignTokenProvider
-local Cryo = require(ParentParent.Cryo)
-local React = require(ParentParent.React)
-local Rodux = require(ParentParent.Rodux)
-local RoactRodux = require(ParentParent.RoactRodux)
-local UIBlox = require(ParentParent.UIBlox)
-local Foundation = require(ParentParent.Foundation)
-local SelectionCursorProvider = UIBlox.App.SelectionImage.SelectionCursorProvider
-local RobloxAppEnums = require(ParentParent.RobloxAppEnums)
-local ReactFocusNavigation = require(ParentParent.ReactFocusNavigation)
-local Provider = require(ParentParent.FocusNavigationUtils).FocusNavigableSurfaceRegistry.Provider
-local DeviceType = RobloxAppEnums.DeviceType
-local GamepadDisconnectTokenMapper = require(ParentParent.InputUi).Gamepad.GamepadDisconnectTokenMapper
-local FeedbackManagerInjectionContextProvider = require(ParentParent.InteractionFeedback).FeedbackManagerInjectionContextProvider
-local AppInteractionFeedbackProvider = require(ParentParent.RobloxAppInteractionFeedbackConfig).AppInteractionFeedbackProvider
-local v21 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
-local t1 = {
-	themeName = "dark",
-	fontName = "gotham",
-	deviceType = if not GuiService:IsTenFootInterface() then DeviceType.Desktop else DeviceType.Console
-}
+local parent = script.Parent.Parent
 
-local function CoreScriptsRootProvider(t2: {[any]: any}) -- line: 61
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), RoactRodux (copy), Rodux (copy), UIBlox (copy), DesignTokenProvider (copy), GamepadDisconnectTokenMapper (copy), SelectionCursorProvider (copy), LocalizationProvider (copy), u4 (ref), LocalizationService (copy), ReactFocusNavigation (copy), v21 (copy), Provider (copy), Foundation (copy), DeviceType (copy), AppInteractionFeedbackProvider (copy), FeedbackManagerInjectionContextProvider (copy)
-	local v25 = Cryo.Dictionary.join(t1, t2.styleOverride or {})
-	local v26 = React.createElement(RoactRodux.StoreProvider, {
-		store = Rodux.Store.new(function(p1) -- line: 65
-			return p1
+local LocalizationService = game:GetService("LocalizationService")
+
+local AppCommonLib = require(parent.AppCommonLib)
+local isTenFootInterface = AppCommonLib.isTenFootInterface
+local localization
+
+if game:DefineFastFlag("SwitchCSRootProviderTranslationsPackage", false) then
+	local InExperienceLocales = require(parent.InExperienceLocales)
+	localization = InExperienceLocales.Localization
+else
+	local RobloxAppLocales = require(parent.RobloxAppLocales)
+	localization = RobloxAppLocales.Localization
+end
+
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local Style = require(parent.Style)
+local DesignTokenProvider = Style.DesignTokenProvider
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local Rodux = require(parent.Rodux)
+local RoactRodux = require(parent.RoactRodux)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local SelectionCursorProvider = UIBlox.App.SelectionImage.SelectionCursorProvider
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Provider = FocusNavigationUtils.FocusNavigableSurfaceRegistry.Provider
+local DeviceType = RobloxAppEnums.DeviceType
+local InputUi = require(parent.InputUi)
+local GamepadDisconnectTokenMapper = InputUi.Gamepad.GamepadDisconnectTokenMapper
+local InteractionFeedback = require(parent.InteractionFeedback)
+local FeedbackManagerInjectionContextProvider = InteractionFeedback.FeedbackManagerInjectionContextProvider
+
+local RobloxAppInteractionFeedbackConfig = require(parent.RobloxAppInteractionFeedbackConfig)
+local AppInteractionFeedbackProvider = RobloxAppInteractionFeedbackConfig.AppInteractionFeedbackProvider
+
+local focusNavigationService = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+
+local v = { themeName = "dark", fontName = "gotham", deviceType = 0 }
+local deviceType
+
+if isTenFootInterface() then
+	deviceType = DeviceType.Console
+else
+	deviceType = DeviceType.Desktop
+end
+
+v.deviceType = deviceType
+
+local function CoreScriptsRootProvider(p)
+	local joined = Cryo.Dictionary.join(v, p.styleOverride or {})
+
+	local element = React.createElement(RoactRodux.StoreProvider, {
+		store = Rodux.Store.new(function(p2)
+			return p2
 		end, {}, {})
 	}, {
-		AppStyleProvider = React.createElement(UIBlox.App.Style.AppStyleProvider, {
-			style = v25
-		}, {
+		AppStyleProvider = React.createElement(UIBlox.App.Style.AppStyleProvider, { style = joined }, {
 			DesignTokenProvider = React.createElement(DesignTokenProvider, {
-				tokenMappers = {
-					GamepadDisconnect = GamepadDisconnectTokenMapper
-				}
+				tokenMappers = { GamepadDisconnect = GamepadDisconnectTokenMapper }
 			}, {
 				CursorProvider = React.createElement(SelectionCursorProvider, {}, {
-					LocalizationProvider = React.createElement(LocalizationProvider, {
-						localization = u4.new(LocalizationService.RobloxLocaleId)
-					}, {
-						FocusNavigationProvider = React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
-							value = v21
-						}, {
-							FocusNavigationRegistryProvider = React.createElement(Provider, nil, t2.children)
-						})
-					})
+					LocalizationProvider = React.createElement(
+						LocalizationProvider,
+						{
+							localization = localization.new(LocalizationService.RobloxLocaleId)
+						},
+						{
+							FocusNavigationProvider = React.createElement(
+								ReactFocusNavigation.FocusNavigationContext.Provider,
+								{ value = focusNavigationService },
+								{
+									FocusNavigationRegistryProvider = React.createElement(Provider, nil, p.children)
+								}
+							)
+						}
+					)
 				})
 			})
 		})
 	})
-	local v27 = React.createElement(Foundation.FoundationProvider, {
-		theme = if v25.themeName ~= "dark" then Foundation.Enums.Theme.Light else Foundation.Enums.Theme.Dark,
-		device = if v25.deviceType ~= DeviceType.Console then Foundation.Enums.Device.Desktop else Foundation.Enums.Device.Console
-	}, {
-		tree = v26
+
+	local createElement = React.createElement
+	local foundationProvider = Foundation.FoundationProvider
+	local colorMode
+
+	if joined.themeName == "dark" then
+		colorMode = Foundation.Enums.ColorMode.Dark
+	else
+		colorMode = Foundation.Enums.ColorMode.Light
+	end
+
+	local device
+
+	if joined.deviceType == DeviceType.Console then
+		device = Foundation.Enums.Device.Console
+	else
+		device = Foundation.Enums.Device.Desktop
+	end
+
+	local element2 = createElement(foundationProvider, { colorMode = colorMode, device = device }, {
+		tree = element
 	})
 
 	return (React.createElement(AppInteractionFeedbackProvider, {}, {
-		tree = React.createElement(FeedbackManagerInjectionContextProvider, nil, {
-			tree = v27
-		})
+		tree = React.createElement(FeedbackManagerInjectionContextProvider, nil, { tree = element2 })
 	}))
 end
 

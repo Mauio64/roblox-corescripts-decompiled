@@ -1,13 +1,13 @@
-local function assign(p1, ...) -- line: 1
+local function assign(p, ...)
 	for i = 1, select("#", ...) do
-		local v4 = select(i, ...)
+		local v = select(i, ...)
 
-		for k, v in pairs(v4) do
-			p1[k] = v
+		for k, v2 in pairs(v) do
+			p[k] = v2
 		end
 	end
 
-	return p1
+	return p
 end
 
 return assign

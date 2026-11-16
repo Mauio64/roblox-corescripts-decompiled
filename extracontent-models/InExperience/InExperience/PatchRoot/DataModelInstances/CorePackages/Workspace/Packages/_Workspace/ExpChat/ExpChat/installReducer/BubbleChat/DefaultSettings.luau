@@ -1,4 +1,5 @@
 return {
+	BackgroundColor3 = Color3.fromRGB(250, 250, 250),
 	MaxBubbles = 3,
 	BackgroundTransparency = 0.1,
 	Transparency = 0.1,
@@ -9,20 +10,9 @@ return {
 	AdorneeName = "HumanoidRootPart",
 	MaxDistance = 100,
 	MinimizeDistance = 50,
-	BackgroundColor3 = Color3.fromRGB(250, 250, 250),
 	FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json"),
-	SizeAnimation = {
-		Enabled = true,
-		SpringDampingRatio = 1,
-		SpringFrequency = 2
-	},
-	TransparencyAnimation = {
-		Enabled = true,
-		SpringDampingRatio = 1,
-		SpringFrequency = 2
-	},
-	Voice = {
-		ShowIndicator = true
-	},
+	SizeAnimation = { Enabled = true, SpringDampingRatio = 1, SpringFrequency = 2 },
+	TransparencyAnimation = { Enabled = true, SpringDampingRatio = 1, SpringFrequency = 2 },
+	Voice = { ShowIndicator = true },
 	UserSpecificSettings = {}
 }

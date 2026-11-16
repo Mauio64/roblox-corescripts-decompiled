@@ -1,58 +1,62 @@
 local CorePackages = game:GetService("CorePackages")
-local Requests = require(CorePackages.Workspace.Packages.Http).Requests
+
+local Http = require(CorePackages.Workspace.Packages.Http)
+local Requests = Http.Requests
+
 local Promise = require(CorePackages.Packages.Promise)
-local ApiFetchUsersPresences = require(CorePackages.Workspace.Packages.UserLib).Thunks.ApiFetchUsersPresences
+local UserLib = require(CorePackages.Workspace.Packages.UserLib)
+local ApiFetchUsersPresences = UserLib.Thunks.ApiFetchUsersPresences
 local DEPRECATED_UsersGetFriends = Requests.DEPRECATED_UsersGetFriends
-local FetchUserFriendsStarted = require(CorePackages.Workspace.Packages.LegacyFriendsRodux).Actions.FetchUserFriendsStarted
-local FetchUserFriendsFailed = require(CorePackages.Workspace.Packages.LegacyFriendsRodux).Actions.FetchUserFriendsFailed
-local FetchUserFriendsCompleted = require(CorePackages.Workspace.Packages.LegacyFriendsRodux).Actions.FetchUserFriendsCompleted
-local UserModel = require(CorePackages.Workspace.Packages.UserLib).Models.UserModel
-local UpdateUsers = require(CorePackages.Workspace.Packages.UserLib).Thunks.UpdateUsers
-local GetFFlagInviteListRerank = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagInviteListRerank
+local LegacyFriendsRodux = require(CorePackages.Workspace.Packages.LegacyFriendsRodux)
+local FetchUserFriendsStarted = LegacyFriendsRodux.Actions.FetchUserFriendsStarted
+local LegacyFriendsRodux2 = require(CorePackages.Workspace.Packages.LegacyFriendsRodux)
+local FetchUserFriendsFailed = LegacyFriendsRodux2.Actions.FetchUserFriendsFailed
+local LegacyFriendsRodux3 = require(CorePackages.Workspace.Packages.LegacyFriendsRodux)
+local FetchUserFriendsCompleted = LegacyFriendsRodux3.Actions.FetchUserFriendsCompleted
+local UserLib2 = require(CorePackages.Workspace.Packages.UserLib)
+local UserModel = UserLib2.Models.UserModel
+local UserLib3 = require(CorePackages.Workspace.Packages.UserLib)
+local UpdateUsers = UserLib3.Thunks.UpdateUsers
 
-return function(p1, p2, _, p4) -- line: 16
-	-- upvalues: FetchUserFriendsStarted (copy), DEPRECATED_UsersGetFriends (copy), GetFFlagInviteListRerank (copy), UserModel (copy), UpdateUsers (copy), ApiFetchUsersPresences (copy), FetchUserFriendsCompleted (copy), Promise (copy), FetchUserFriendsFailed (copy)
-	return function(p5) -- line: 17
-		-- upvalues: FetchUserFriendsStarted (copy), p2 (copy), DEPRECATED_UsersGetFriends (copy), p1 (copy), p4 (copy), GetFFlagInviteListRerank (copy), UserModel (copy), UpdateUsers (copy), ApiFetchUsersPresences (copy), FetchUserFriendsCompleted (copy), Promise (copy), FetchUserFriendsFailed (copy)
-		p5:dispatch(FetchUserFriendsStarted(p2))
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagInviteListRerank = SharedFlags.GetFFlagInviteListRerank
 
-		return DEPRECATED_UsersGetFriends(p1, p2, p4):andThen(function(p6) -- line: 21
-			-- upvalues: GetFFlagInviteListRerank (copy), UserModel (copy), p5 (copy), UpdateUsers (copy)
-			local responseBody = p6.responseBody
-			local t1 = {}
-			local t2 = {}
+return function(p, p2, _, p3)
+	return function(object)
+		object:dispatch(FetchUserFriendsStarted(p2))
 
-			for k, v in pairs(responseBody.data) do
-				local str = tostring(v.id)
+		return DEPRECATED_UsersGetFriends(p, p2, p3):andThen(function(p4)
+			local responseBody = p4.responseBody
 
-				v.isFriend = true
+			local ids = {}
+			local v = {}
+
+			for k, v2 in pairs(responseBody.data) do
+				local id = tostring(v2.id)
+				v2.isFriend = true
 
 				if GetFFlagInviteListRerank() then
-					v.friendRank = k
+					v2.friendRank = k
 				end
 
-				local v24 = UserModel.fromDataTable(v)
+				local v3 = UserModel.fromDataTable(v2)
 
-				table.insert(t1, str)
-				t2[v24.id] = v24
+				table.insert(ids, id)
+				v[v3.id] = v3
 			end
 
-			p5:dispatch(UpdateUsers(t2))
+			object:dispatch(UpdateUsers(v))
 
-			return t1
-		end):andThen(function(p7) -- line: 43
-			-- upvalues: p5 (copy), ApiFetchUsersPresences (copy), p1 (copy)
-			return p5:dispatch(ApiFetchUsersPresences(p1, p7))
-		end):andThen(function(p8) -- line: 46
-			-- upvalues: p5 (copy), FetchUserFriendsCompleted (copy), p2 (copy), Promise (copy)
-			p5:dispatch(FetchUserFriendsCompleted(p2))
+			return ids
+		end):andThen(function(p4)
+			return object:dispatch(ApiFetchUsersPresences(p, p4))
+		end):andThen(function(p4)
+			object:dispatch(FetchUserFriendsCompleted(p2))
 
-			return Promise.resolve(p8)
-		end, function(p9) -- line: 50
-			-- upvalues: p5 (copy), FetchUserFriendsFailed (copy), p2 (copy), Promise (copy)
-			p5:dispatch(FetchUserFriendsFailed(p2, p9))
-
-			return Promise.reject(p9)
+			return Promise.resolve(p4)
+		end, function(p4)
+			object:dispatch(FetchUserFriendsFailed(p2, p4))
+			return Promise.reject(p4)
 		end)
 	end
 end

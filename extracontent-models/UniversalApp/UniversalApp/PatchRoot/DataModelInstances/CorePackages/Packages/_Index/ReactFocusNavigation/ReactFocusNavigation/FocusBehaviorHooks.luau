@@ -1,39 +1,33 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.FocusNavigation)
+local FocusBehaviors = require(parent.FocusBehaviors)
+local React = require(parent.React)
 
-require(ParentParent.FocusNavigation)
-
-local FocusBehaviors = require(ParentParent.FocusBehaviors)
-local React = require(ParentParent.React)
 local default = FocusBehaviors.default
 local mostRecent = FocusBehaviors.mostRecent
 local mostRecentOrDefault = FocusBehaviors.mostRecentOrDefault
+
 local useContainerFocusBehavior = require(script.Parent.useContainerFocusBehavior)
+local FocusBehaviorHooks = {}
 
-return {
-	useDefaultFocusBehavior = function(p1) -- line: 15
-		-- upvalues: React (copy), default (copy), useContainerFocusBehavior (copy)
-		local v9, v10 = React.useState(nil)
-		local v11 = React.useMemo(function() -- line: 20
-			-- upvalues: default (copy), v9 (copy)
-			return default(v9)
-		end, { v9 })
+function FocusBehaviorHooks.useDefaultFocusBehavior(p)
+	local state, setState = React.useState(nil)
 
-		return v10, (useContainerFocusBehavior(v11, p1))
-	end,
-	useMostRecentFocusBehavior = function(p2) -- line: 29
-		-- upvalues: React (copy), mostRecent (copy), useContainerFocusBehavior (copy)
-		local v13 = React.useMemo(mostRecent, {})
+	return setState, (useContainerFocusBehavior(React.useMemo(function()
+		return default(state)
+	end, { state }), p))
+end
 
-		return useContainerFocusBehavior(v13, p2)
-	end,
-	useMostRecentOrDefaultFocusBehavior = function(p3) -- line: 35
-		-- upvalues: React (copy), mostRecentOrDefault (copy), useContainerFocusBehavior (copy)
-		local v15, v16 = React.useState(nil)
-		local v17 = React.useMemo(function() -- line: 40
-			-- upvalues: mostRecentOrDefault (copy), v15 (copy)
-			return mostRecentOrDefault(v15)
-		end, { v15 })
+function FocusBehaviorHooks.useMostRecentFocusBehavior(p)
+	return useContainerFocusBehavior(React.useMemo(mostRecent, {}), p)
+end
 
-		return v16, (useContainerFocusBehavior(v17, p3))
-	end
-}
+function FocusBehaviorHooks.useMostRecentOrDefaultFocusBehavior(p)
+	local state, setState = React.useState(nil)
+
+	return setState, (useContainerFocusBehavior(React.useMemo(function()
+		return mostRecentOrDefault(state)
+	end, { state }), p))
+end
+
+return FocusBehaviorHooks

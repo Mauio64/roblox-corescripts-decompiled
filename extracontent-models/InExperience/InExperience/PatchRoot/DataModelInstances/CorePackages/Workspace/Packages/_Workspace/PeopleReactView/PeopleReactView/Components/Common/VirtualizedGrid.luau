@@ -1,106 +1,115 @@
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local React = require(PeopleReactViewParent.React)
-local Signals = require(PeopleReactViewParent.Signals)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
-local View = require(PeopleReactViewParent.Foundation).View
-local PeopleService = require(PeopleReactViewParent.PeopleService)
+local parent = PeopleReactView.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+
+local PeopleService = require(parent.PeopleService)
+
 local VirtualizedItem = require(script.Parent.VirtualizedItem)
 
 require(PeopleReactView.Stores.GetScrollingFrameStore)
-
 local GetVirtualizedGridStore = require(PeopleReactView.Stores.GetVirtualizedGridStore)
-local FFlagFixVirtualizedGridNumItems = PeopleService.getService("Flags").FFlagFixVirtualizedGridNumItems
 
-local function VirtualizedGrid(t1: {[any]: any}) -- line: 38
-	-- upvalues: SignalsReact (copy), GetVirtualizedGridStore (copy), React (copy), Signals (copy), FFlagFixVirtualizedGridNumItems (copy), VirtualizedItem (copy), View (copy)
-	local v13 = SignalsReact.useSignalState(GetVirtualizedGridStore)
-	local v14 = SignalsReact.useSignalState(v13.getNumVirtualizedItems)
-	local v15 = React.useRef(nil)
-	local v16 = React.joinBindings({
-		itemWidth = t1.itemWidth,
-		itemHeight = t1.itemHeight,
-		numColumns = t1.numColumns
+local fFlagFixVirtualizedGridNumItems = PeopleService.getService("Flags").FFlagFixVirtualizedGridNumItems
+
+local function VirtualizedGrid(props)
+	local v = SignalsReact.useSignalState(GetVirtualizedGridStore)
+	local v2 = SignalsReact.useSignalState(v.getNumVirtualizedItems)
+
+	local ref = React.useRef(nil)
+
+	local joinBindings = React.joinBindings({
+		itemWidth = props.itemWidth,
+		itemHeight = props.itemHeight,
+		numColumns = props.numColumns
 	})
-	local v17 = React.useMemo(function() -- line: 51
-		-- upvalues: v16 (copy), t1 (copy)
-		return v16:map(function(t2: {[any]: any}) -- line: 52
-			-- upvalues: t1 (copy)
-			return UDim2.new(1, 0, 0, math.ceil(t1.numItems / t2.numColumns) * (t2.itemHeight + t1.gapSize) - t1.gapSize)
+
+	local size = React.useMemo(function()
+		return joinBindings:map(function(p)
+			return UDim2.new(
+				1,
+				0,
+				0,
+				math.ceil(props.numItems / p.numColumns) * (p.itemHeight + props.gapSize) - props.gapSize
+			)
 		end)
-	end, {
-		t1.numItems,
-		t1.gapSize
-	})
+	end, { props.numItems, props.gapSize })
 
-	React.useEffect(function() -- line: 62
-		-- upvalues: t1 (copy), v15 (copy), v13 (copy), Signals (copy)
-		local u20 = nil
-		local connection = nil
+	React.useEffect(function()
+		local v3, absoluteSizeChangedConnection
 
-		if t1.scrollingFrameStore and v15.current then
-			local function handleCalculateVirtualizedGridLimits() -- line: 68
-				-- upvalues: v13 (copy), t1 (copy)
-				v13.calculateVirtualizedGridLimits(t1.scrollingFrameStore.getCanvasPositionY(), t1.scrollingFrameStore.getAbsoluteSizeY(), t1.itemWidth:getValue(), t1.itemHeight:getValue(), t1.numColumns:getValue(), t1.gapSize)
+		if props.scrollingFrameStore and ref.current then
+			local function handleCalculateVirtualizedGridLimits()
+				v.calculateVirtualizedGridLimits(
+					props.scrollingFrameStore.getCanvasPositionY(),
+					props.scrollingFrameStore.getAbsoluteSizeY(),
+					props.itemWidth:getValue(),
+					props.itemHeight:getValue(),
+					props.numColumns:getValue(),
+					props.gapSize
+				)
 			end
 
-			if t1.onContainerWidthChanged then
-				t1.onContainerWidthChanged(v15.current.AbsoluteSize.X)
+			if props.onContainerWidthChanged then
+				props.onContainerWidthChanged(ref.current.AbsoluteSize.X)
 			end
 
 			handleCalculateVirtualizedGridLimits()
-			u20 = Signals.createEffect(function(p1) -- line: 85
-				-- upvalues: t1 (copy), handleCalculateVirtualizedGridLimits (copy)
-				t1.scrollingFrameStore.getCanvasPositionY(p1)
-				t1.scrollingFrameStore.getAbsoluteSizeY(p1)
+
+			v3 = Signals.createEffect(function(p)
+				props.scrollingFrameStore.getCanvasPositionY(p)
+				props.scrollingFrameStore.getAbsoluteSizeY(p)
 				handleCalculateVirtualizedGridLimits()
 			end)
-			connection = v15.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 93
-				-- upvalues: t1 (copy), v15 (copy), handleCalculateVirtualizedGridLimits (copy)
-				if t1.onContainerWidthChanged then
-					t1.onContainerWidthChanged(v15.current.AbsoluteSize.X)
+
+			absoluteSizeChangedConnection = ref.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				if props.onContainerWidthChanged then
+					props.onContainerWidthChanged(ref.current.AbsoluteSize.X)
 				end
 
 				handleCalculateVirtualizedGridLimits()
 			end)
+		else
+			v3 = nil
+			absoluteSizeChangedConnection = nil
 		end
 
-		return function() -- line: 102
-			-- upvalues: u20 (ref), connection (ref)
-			if u20 then
-				u20()
+		return function()
+			if v3 then
+				v3()
 			end
 
-			if connection then
-				connection:Disconnect()
+			if absoluteSizeChangedConnection then
+				absoluteSizeChangedConnection:Disconnect()
 			end
 		end
-	end, {
-		t1.onContainerWidthChanged,
-		t1.scrollingFrameStore,
-		t1.gapSize
-	})
+	end, { props.onContainerWidthChanged, props.scrollingFrameStore, props.gapSize })
 
-	local t3 = {}
+	local children = {}
 
-	for i = 1, if not FFlagFixVirtualizedGridNumItems then v14 else math.min(v14, t1.numItems) do
-		t3["VirtualizedItem_" .. i] = React.createElement(VirtualizedItem, {
+	if fFlagFixVirtualizedGridNumItems then
+		v2 = math.min(v2, props.numItems)
+	end
+
+	for i = 1, v2 do
+		children["VirtualizedItem_" .. i] = React.createElement(VirtualizedItem, {
 			relativeIndex = i,
-			getMinVirtualizedIndex = v13.getMinVirtualizedIndex,
-			getMaxVirtualizedIndex = v13.getMaxVirtualizedIndex,
-			itemWidth = t1.itemWidth,
-			itemHeight = t1.itemHeight,
-			numColumns = t1.numColumns,
-			gapSize = t1.gapSize,
-			getElement = t1.getElement
+			getMinVirtualizedIndex = v.getMinVirtualizedIndex,
+			getMaxVirtualizedIndex = v.getMaxVirtualizedIndex,
+			itemWidth = props.itemWidth,
+			itemHeight = props.itemHeight,
+			numColumns = props.numColumns,
+			gapSize = props.gapSize,
+			getElement = props.getElement
 		})
 	end
 
-	return React.createElement(View, {
-		Size = v17,
-		LayoutOrder = t1.layoutOrder,
-		ref = v15
-	}, t3)
+	return React.createElement(View, { Size = size, LayoutOrder = props.layoutOrder, ref = ref }, children)
 end
 
 return React.memo(VirtualizedGrid)

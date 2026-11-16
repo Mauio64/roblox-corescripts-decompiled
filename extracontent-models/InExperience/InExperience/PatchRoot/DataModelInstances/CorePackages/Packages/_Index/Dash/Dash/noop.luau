@@ -1,4 +1,3 @@
-local function noop(...) -- line: 9
-end
+local function noop(...) end
 
 return noop

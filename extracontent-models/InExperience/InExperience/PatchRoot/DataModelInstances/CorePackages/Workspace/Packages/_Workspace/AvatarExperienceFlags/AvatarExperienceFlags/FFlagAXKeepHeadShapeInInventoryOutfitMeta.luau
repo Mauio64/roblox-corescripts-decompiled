@@ -1,0 +1,6 @@
+local FFlagParseHeadShapeFromAPIResponse = require(script.Parent.FFlagParseHeadShapeFromAPIResponse)
+local FFlagHeadRefinementFacialAnimationToggle = require(script.Parent.FFlagHeadRefinementFacialAnimationToggle)
+
+return game:DefineFastFlag("AXKeepHeadShapeInInventoryOutfitMeta", false)
+	and FFlagParseHeadShapeFromAPIResponse
+	and FFlagHeadRefinementFacialAnimationToggle

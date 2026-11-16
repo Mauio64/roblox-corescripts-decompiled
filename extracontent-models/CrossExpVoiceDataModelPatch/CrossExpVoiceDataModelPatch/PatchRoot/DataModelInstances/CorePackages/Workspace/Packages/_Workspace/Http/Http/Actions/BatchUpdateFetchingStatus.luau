@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("Http").Parent
+local parent = script:FindFirstAncestor("Http").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(t1: {[any]: any}, b1: boolean?) -- line: 11
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(fetchingStatuses, flag: boolean?)
 	return {
-		fetchingStatuses = t1,
-		shouldImmediatelyDispatch = b1 or false
+		fetchingStatuses = fetchingStatuses,
+		shouldImmediatelyDispatch = flag or false
 	}
 end)

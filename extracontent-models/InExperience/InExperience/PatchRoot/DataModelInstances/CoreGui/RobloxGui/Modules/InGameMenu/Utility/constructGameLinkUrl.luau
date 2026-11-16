@@ -1,9 +1,8 @@
-local ParentParent = script.Parent.Parent
-local Url = require(ParentParent.Network.Url)
+local parent = script.Parent.Parent
+local Url = require(parent.Network.Url)
 
-local function constructGameLinkUrl(n1: number) -- line: 4
-	-- upvalues: Url (copy)
-	return `{ Url.DOMAIN }games/{ n1 }`
+local function constructGameLinkUrl(p: number)
+	return `{Url.DOMAIN}games/{p}`
 end
 
 return constructGameLinkUrl

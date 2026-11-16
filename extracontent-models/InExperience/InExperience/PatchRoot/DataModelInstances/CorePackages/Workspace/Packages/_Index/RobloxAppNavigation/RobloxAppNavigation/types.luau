@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
+local parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
 
-require(Parent.Navigation)
+require(parent.Navigation)
 
 return nil

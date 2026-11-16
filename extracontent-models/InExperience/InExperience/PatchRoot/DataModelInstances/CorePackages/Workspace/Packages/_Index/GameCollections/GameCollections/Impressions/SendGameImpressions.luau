@@ -1,446 +1,551 @@
 local LocalizationService = game:GetService("LocalizationService")
 local GameCollections = script:FindFirstAncestor("GameCollections")
 local AppStorageService = game:GetService("AppStorageService")
-local GameCollectionsParent = GameCollections.Parent
-local ArgCheck = require(GameCollectionsParent.ArgCheck)
-local LoggingProtocol = require(GameCollectionsParent.LoggingProtocol)
-local Cryo = require(GameCollectionsParent.Cryo)
-local getGameTileLayoutData = require(GameCollectionsParent.GameTile).getGameTileLayoutData
-local getValidTileBadges = require(GameCollectionsParent.GameTile).getValidTileBadges
-local getTileBadgeByPositionConfigFromEntry = require(GameCollectionsParent.GameTile).getTileBadgeByPositionConfigFromEntry
-local ItemLayoutDataParsingUtils = require(GameCollectionsParent.GameTile).ItemLayoutDataParsingUtils
-local calculateRowPositionFields = require(GameCollectionsParent.UnifiedLogging).calculateRowPositionFields
-local DiscoveryEventErrorLogger = require(GameCollectionsParent.DiscoveryUtils).DiscoveryEventErrorLogger
-local GameCollectionItemTypes = require(GameCollectionsParent.DiscoveryTypes).GameCollectionItemTypes
+local IXPService = game:GetService("IXPService")
+local parent = GameCollections.Parent
+local ArgCheck = require(parent.ArgCheck)
+local LoggingProtocol = require(parent.LoggingProtocol)
+local Cryo = require(parent.Cryo)
+local GameTile = require(parent.GameTile)
+local getGameTileLayoutData = GameTile.getGameTileLayoutData
+local GameTile2 = require(parent.GameTile)
+local getValidTileBadges = GameTile2.getValidTileBadges
+local GameTile3 = require(parent.GameTile)
+local getTileBadgeByPositionConfigFromEntry = GameTile3.getTileBadgeByPositionConfigFromEntry
+local GameTile4 = require(parent.GameTile)
+local ItemLayoutDataParsingUtils = GameTile4.ItemLayoutDataParsingUtils
+local UnifiedLogging = require(parent.UnifiedLogging)
+local calculateRowPositionFields = UnifiedLogging.calculateRowPositionFields
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local GameCollectionItemTypes = DiscoveryTypes.GameCollectionItemTypes
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local ExperimentLayers = require(parent.ExperimentLayers)
+local AppUserLayers = ExperimentLayers.AppUserLayers
 local gameImpressionsEvent = require(script.Parent.gameImpressionsEvent)
 local reportGameImpressionCounts = require(script.Parent.reportGameImpressionCounts)
 local FeedItemRowDataHitCounter = require(script.Parent.FeedItemRowDataHitCounter)
 local FeedItemRowDataMissingCounter = require(script.Parent.FeedItemRowDataMissingCounter)
-local FFlagLuaAppGameImpressionsMobileAdsId = require(GameCollectionsParent.SharedFlags).FFlagLuaAppGameImpressionsMobileAdsId
-local FFlagTraversalHistoryDiscoveryTelemetry = require(GameCollectionsParent.SharedFlags).FFlagTraversalHistoryDiscoveryTelemetry
-local FFlagLuaAppAddComponentTypeToSearchImpressions = require(GameCollectionsParent.SharedFlags).FFlagLuaAppAddComponentTypeToSearchImpressions
-local FFlagLuaAppAddSubIdToHomeEvents = require(GameCollectionsParent.SharedFlags).FFlagLuaAppAddSubIdToHomeEvents
-local FFlagLuaAppFixSearchImpressions = require(GameCollectionsParent.SharedFlags).FFlagLuaAppFixSearchImpressions
-local FFlagLuaAppGameImpressionsAddUnifiedFields = require(GameCollectionsParent.SharedFlags).FFlagLuaAppGameImpressionsAddUnifiedFields
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppGameImpressionsMobileAdsId = SharedFlags.FFlagLuaAppGameImpressionsMobileAdsId
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagTraversalHistoryDiscoveryTelemetry = SharedFlags2.FFlagTraversalHistoryDiscoveryTelemetry
 
-local function addGameFields(t1: {[any]: any}, t2: {[any]: any}, p1, p2, p3, s1: string?, t3: {[any]: any}?, p4, s2: string?) -- line: 58
-	-- upvalues: FFlagLuaAppFixSearchImpressions (copy), GameCollectionItemTypes (copy), DiscoveryEventErrorLogger (copy), calculateRowPositionFields (copy), ArgCheck (copy), getGameTileLayoutData (copy), getTileBadgeByPositionConfigFromEntry (copy), getValidTileBadges (copy), Cryo (copy), ItemLayoutDataParsingUtils (copy), FFlagLuaAppGameImpressionsAddUnifiedFields (copy)
-	local t4 = {}
-	local t5 = {}
-	local t6 = {}
-	local t7 = {}
-	local t8 = {}
-	local t9 = {}
-	local t10 = {}
-	local t11 = {}
-	local t12 = {}
-	local t13 = {}
-	local t14 = {}
-	local t15 = {}
-	local t16 = {}
-	local t17 = {}
-	local t18 = {}
-	local t19 = {}
-	local t20 = {}
-	local t21 = {}
-	local v54 = false
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppGameImpressionsAddUnifiedFields = SharedFlags3.FFlagLuaAppGameImpressionsAddUnifiedFields
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagSduiFixSearchTelemetry = SharedFlags4.FFlagSduiFixSearchTelemetry
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagLuaAppSponsoredGamePreviewVideo = SharedFlags5.FFlagLuaAppSponsoredGamePreviewVideo
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppHomeMomentVideoFallback = SharedFlags6.FFlagLuaAppHomeMomentVideoFallback
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagLuaAppDiscoveryMomentVideoTelemetry = SharedFlags7.FFlagLuaAppDiscoveryMomentVideoTelemetry
 
-	for _, v in ipairs(t1) do
-		local v57 = t2[v]
+local function logSponsoredGamePreviewVideoExposureIfEligible(list, list2, pageContext: string)
+	for _, item in ipairs(list) do
+		local v = list2[item]
 
-		if v57 ~= nil then
-			if FFlagLuaAppFixSearchImpressions and v57.gameCollectionItemTypeOverride == GameCollectionItemTypes.GameCollectionItemType.Blank then
-				DiscoveryEventErrorLogger.reportError("InvalidGameImpressionCollectionItemType", "An impression for a blank tile was attempted to be logged, which should not happen.", {
-					entryIndex = v,
-					pageContext = s2,
-					emphasisFlag = if not p4 then nil else p4.emphasisFlag,
-					sortPos = if not p4 then nil else p4.sortPos,
-					gameSortId = s1
-				})
+		if v and v.isSponsored and v.sponsoredGamePreviewVideoEligible == true then
+			if pageContext == AppPage.Home then
+				IXPService:LogUserLayerExposure(AppUserLayers.SponsoredGamePreviewVideo)
 			else
-				local v58 = v57.uiIndex or v
-				local v59 = v57.topicContentsIndex or v
+				DiscoveryEventErrorLogger.reportError(
+					"SponsoredGamePreviewVideoEligibleImpressionOutsideHome",
+					"A sponsored GPV-eligible tile was impressed outside Home; exposure was suppressed",
+					{ pageContext = pageContext, entryIndex = item }
+				)
+			end
 
-				table.insert(t4, v57.placeId or 0)
-				table.insert(t5, v)
-				table.insert(t7, v57.universeId or 0)
-				table.insert(t6, v59)
+			break
+		end
+	end
+end
 
-				if v57.isSponsored then
-					v54 = true
-					table.insert(t11, 1)
-					table.insert(t12, v57.adId or 0)
-				else
-					table.insert(t11, 0)
-					table.insert(t12, 0)
+local function addGameFields(list, p, p2, p3, p4, gameSortId: string?, options, p5, pageContext: string?)
+	local v = FFlagLuaAppDiscoveryMomentVideoTelemetry and {} or nil
+	local placeIds = {}
+	local v2 = {}
+
+	local universeIds = {}
+	local topicContentsIndexes = {}
+
+	local v3 = {}
+	local v4 = {}
+
+	local gameCollectionItemTypeOverrides = {}
+	local rowInSorts = {}
+	local v5 = {}
+	local v6 = {}
+	local v7 = {}
+	local v8 = {}
+
+	local set = {}
+	local v9 = {}
+	local v10 = {}
+	local v11 = {}
+
+	local v12 = {}
+	local v13 = {}
+	local flag = false
+
+	for _, item in ipairs(list) do
+		local v14 = p[item]
+
+		if v14 == nil then
+			continue
+		end
+
+		if v14.gameCollectionItemTypeOverride == GameCollectionItemTypes.GameCollectionItemType.Blank then
+			local reportError = DiscoveryEventErrorLogger.reportError
+			local emphasisFlag
+
+			if p5 then
+				emphasisFlag = p5.emphasisFlag
+			end
+
+			local sortPos
+
+			if p5 then
+				sortPos = p5.sortPos
+			end
+
+			reportError(
+				"InvalidGameImpressionCollectionItemType",
+				"An impression for a blank tile was attempted to be logged, which should not happen.",
+				{
+					entryIndex = item,
+					pageContext = pageContext,
+					emphasisFlag = emphasisFlag,
+					sortPos = sortPos,
+					gameSortId = gameSortId
+				}
+			)
+		else
+			local uiIndex = v14.uiIndex or item
+			local topicContentsIndex = v14.topicContentsIndex or item
+
+			table.insert(placeIds, v14.placeId or 0)
+			table.insert(v2, item)
+			table.insert(universeIds, v14.universeId or 0)
+			table.insert(topicContentsIndexes, topicContentsIndex)
+
+			if v14.isSponsored then
+				table.insert(v3, 1)
+				table.insert(v4, v14.adId or 0)
+				flag = true
+			else
+				table.insert(v3, 0)
+				table.insert(v4, 0)
+			end
+
+			table.insert(
+				gameCollectionItemTypeOverrides,
+				v14.gameCollectionItemTypeOverride or GameCollectionItemTypes.GameCollectionItemType.GameTile
+			)
+
+			local v15 = calculateRowPositionFields(uiIndex, p2, p4)
+
+			if p2 and p2 > 0 then
+				table.insert(rowInSorts, v15.rowInSort)
+
+				if p4 then
+					table.insert(v5, v15.rowOnPage)
+					table.insert(v6, v15.positionInRow)
+				end
+			else
+				ArgCheck.assert(p2 ~= 0)
+
+				if p4 then
+					table.insert(v5, p4)
+					table.insert(v6, uiIndex)
+				end
+			end
+
+			local gameTileLayoutData = getGameTileLayoutData(v14, gameSortId)
+
+			local v16 = getTileBadgeByPositionConfigFromEntry(v14) or gameTileLayoutData.tileBadgesByPosition
+
+			local v17 = nil
+
+			if v14.tileBadgeIds then
+				v17 = v14.tileBadgeIds
+			elseif v16 then
+				local validTileBadges = getValidTileBadges(v16)
+				local v18 = {}
+
+				for k, validTileBadge in validTileBadges do
+					local mapped = Cryo.List.map(validTileBadge, function(p6)
+						return p6.analyticsId
+					end)
+
+					if #mapped > 0 then
+						table.insert(v18, k .. "=" .. table.concat(mapped, "+"))
+					end
 				end
 
-				table.insert(t19, v57.gameCollectionItemTypeOverride or GameCollectionItemTypes.GameCollectionItemType.GameTile)
-
-				local v60 = calculateRowPositionFields(v58, p1, p3)
-
-				if p1 and p1 > 0 then
-					table.insert(t13, v60.rowInSort)
-
-					if p3 then
-						table.insert(t14, v60.rowOnPage)
-						table.insert(t15, v60.positionInRow)
-					end
-				else
-					ArgCheck.assert(p1 ~= 0)
-
-					if p3 then
-						table.insert(t14, p3)
-						table.insert(t15, v58)
-					end
+				if #v18 > 0 then
+					v17 = table.concat(v18, "&")
 				end
+			end
 
-				local v61 = getGameTileLayoutData(v57, s1)
-				local v62 = getTileBadgeByPositionConfigFromEntry(v57) or v61.tileBadgesByPosition
-				local tileBadgeIds = nil
+			table.insert(v7, v17 or "0")
 
-				if v57.tileBadgeIds then
-					tileBadgeIds = v57.tileBadgeIds
-				elseif v62 then
-					local t22 = {}
+			if p3 then
+				if v14 and v14.thumbnailAssetId then
+					table.insert(v8, v14.thumbnailAssetId)
+				else
+					local v18
 
-					for v65, v66 in (getValidTileBadges(v62)) do
-						local v67 = Cryo.List.map(v66, function(p5) -- line: 175
-							return p5.analyticsId
-						end)
+					if v14 and v14.primaryWideImageAssetId then
+						v18 = v14.primaryWideImageAssetId
+					else
+						v18 = ItemLayoutDataParsingUtils.getWideImageAssetId(gameTileLayoutData)
+					end
 
-						if #v67 > 0 then
-							table.insert(t22, v65 .. "=" .. table.concat(v67, "+"))
+					if not v18 then
+						if v14 then
+							v18 = v14.primaryWideAssetId or nil
+						else
+							v18 = nil
 						end
 					end
 
-					if #t22 > 0 then
-						tileBadgeIds = table.concat(t22, "&")
-					end
+					table.insert(v8, v18 or "0")
 				end
 
-				table.insert(t16, tileBadgeIds or "0")
+				if v14 and v14.thumbnailListId then
+					table.insert(v10, v14.thumbnailListId)
+				else
+					local v18
 
-				if p2 then
-					if v57 and v57.thumbnailAssetId then
-						table.insert(t8, v57.thumbnailAssetId)
+					if v14 and v14.primaryWideImageListId then
+						v18 = v14.primaryWideImageListId
 					else
-						table.insert(t8, ((if not v57 or not v57.primaryWideImageAssetId then ItemLayoutDataParsingUtils.getWideImageAssetId(v61) else v57.primaryWideImageAssetId)) or (v57 and v57.primaryWideAssetId or nil) or "0")
+						v18 = gameTileLayoutData
+							and gameTileLayoutData.primaryMediaAsset
+							and gameTileLayoutData.primaryMediaAsset.wideImageListId
 					end
 
-					if v57 and v57.thumbnailListId then
-						table.insert(t9, v57.thumbnailListId)
-					else
-						table.insert(t9, ((if not v57 or not v57.primaryWideImageListId then v61 and (v61.primaryMediaAsset and v61.primaryMediaAsset.wideImageListId) else v57.primaryWideImageListId)) or (v57 and v57.primaryWideListId or "0"))
-					end
-
-					if v57 and v57.videoThumbnailAssetId then
-						table.insert(t10, v57.videoThumbnailAssetId)
-					else
-						table.insert(t10, ((if not v57 or not v57.primaryWideVideoAssetId then v61 and (v61.primaryMediaAsset and v61.primaryMediaAsset.wideVideoAssetId) else v57.primaryWideVideoAssetId)) or "0")
-					end
-
-					local analytics = nil
-
-					if v57 and v57.footer and v57.footer.analytics then
-						analytics = v57.footer.analytics
-					elseif v61 and v61.footer and v61.footer.analytics then
-						analytics = v61.footer.analytics
-					end
-
-					if analytics and analytics.textLiteral then
-						table.insert(t17, analytics.textLiteral)
-					else
-						table.insert(t17, "0")
-					end
-
-					if analytics and analytics.locKey then
-						table.insert(t18, analytics.locKey)
-					else
-						table.insert(t18, "0")
-					end
+					table.insert(v10, v18 or v14 and v14.primaryWideListId or "0")
 				end
 
-				local analyticsData = v57.analyticsData
+				if v14 and v14.videoThumbnailAssetId then
+					table.insert(v11, v14.videoThumbnailAssetId)
 
-				if analyticsData then
-					for v70 in analyticsData do
-						t21[v70] = true
+					if FFlagLuaAppDiscoveryMomentVideoTelemetry then
+						table.insert(v, "0")
 					end
+				else
+					local v18
+
+					if FFlagLuaAppHomeMomentVideoFallback then
+						local layoutDataVideo = GameTile4.getLayoutDataVideo(
+							gameTileLayoutData,
+							v14 and v14.primaryWideVideoAssetId
+						)
+						v18 = layoutDataVideo and layoutDataVideo.assetId
+
+						if FFlagLuaAppDiscoveryMomentVideoTelemetry then
+							table.insert(v, layoutDataVideo and layoutDataVideo.isMoment and "1" or "0")
+						end
+					elseif v14 and v14.primaryWideVideoAssetId then
+						v18 = v14.primaryWideVideoAssetId
+					else
+						v18 = gameTileLayoutData
+							and gameTileLayoutData.primaryMediaAsset
+							and gameTileLayoutData.primaryMediaAsset.wideVideoAssetId
+					end
+
+					table.insert(v11, v18 or "0")
 				end
 
-				table.insert(t20, analyticsData or {})
+				local analytics = nil
+
+				if v14 and v14.footer and v14.footer.analytics then
+					analytics = v14.footer.analytics
+				elseif gameTileLayoutData and gameTileLayoutData.footer and gameTileLayoutData.footer.analytics then
+					analytics = gameTileLayoutData.footer.analytics
+				end
+
+				if analytics and analytics.textLiteral then
+					table.insert(v12, analytics.textLiteral)
+				else
+					table.insert(v12, "0")
+				end
+
+				if analytics and analytics.locKey then
+					table.insert(v13, analytics.locKey)
+				else
+					table.insert(v13, "0")
+				end
 			end
+
+			local analyticsData = v14.analyticsData
+
+			if analyticsData then
+				for k in analyticsData do
+					set[k] = true
+				end
+			end
+
+			table.insert(v9, analyticsData or {})
 		end
 	end
 
-	local v71 = #t4
+	local count = #placeIds
+	ArgCheck.assert(count == #v2)
+	ArgCheck.assert(count == #topicContentsIndexes)
+	ArgCheck.assert(count == #universeIds)
+	ArgCheck.assert(count == #v3)
+	ArgCheck.assert(count == #v4)
 
-	ArgCheck.assert(v71 == #t5)
-	ArgCheck.assert(v71 == #t6)
-	ArgCheck.assert(v71 == #t7)
-	ArgCheck.assert(v71 == #t11)
-	ArgCheck.assert(v71 == #t12)
-
-	if #t13 > 0 then
-		ArgCheck.assert(v71 == #t13)
+	if #rowInSorts > 0 then
+		ArgCheck.assert(count == #rowInSorts)
 	end
 
-	if #t14 > 0 then
-		ArgCheck.assert(v71 == #t14)
+	if #v5 > 0 then
+		ArgCheck.assert(count == #v5)
 	end
 
-	if #t15 > 0 then
-		ArgCheck.assert(v71 == #t15)
+	if #v6 > 0 then
+		ArgCheck.assert(count == #v6)
 	end
 
-	local t23 = {
-		rootPlaceIds = table.concat(t4, ","),
-		absPositions = table.concat(t5, ","),
-		topicDataPositions = table.concat(t6, ","),
-		universeIds = table.concat(t7, ",")
+	local v14 = {
+		rootPlaceIds = table.concat(placeIds, ","),
+		absPositions = table.concat(v2, ","),
+		topicDataPositions = table.concat(topicContentsIndexes, ","),
+		universeIds = table.concat(universeIds, ",")
 	}
 
-	if v54 then
-		t23.adFlags = table.concat(t11, ",")
-		t23.adIds = table.concat(t12, ",")
+	if flag then
+		v14.adFlags = table.concat(v3, ",")
+		v14.adIds = table.concat(v4, ",")
 	end
 
 	if FFlagLuaAppGameImpressionsAddUnifiedFields then
-		t23.hasSponsoredContent = v54
+		v14.hasSponsoredContent = flag
 	end
 
-	if #t13 > 0 then
-		t23.rows = table.concat(t13, ",")
+	if #rowInSorts > 0 then
+		v14.rows = table.concat(rowInSorts, ",")
 	end
 
-	if #t14 > 0 then
-		t23.rowsOnPage = table.concat(t14, ",")
+	if #v5 > 0 then
+		v14.rowsOnPage = table.concat(v5, ",")
 	end
 
-	if #t15 > 0 then
-		t23.positionsInRows = table.concat(t15, ",")
+	if #v6 > 0 then
+		v14.positionsInRows = table.concat(v6, ",")
 	end
 
-	if p2 and #t8 > 0 then
-		t23.thumbnailAssetIds = table.concat(t8, ",")
+	if p3 and #v8 > 0 then
+		v14.thumbnailAssetIds = table.concat(v8, ",")
 	end
 
-	if p2 and #t9 > 0 then
-		t23.thumbnailListIds = table.concat(t9, ",")
+	if p3 and #v10 > 0 then
+		v14.thumbnailListIds = table.concat(v10, ",")
 	end
 
-	if p2 and #t10 > 0 then
-		t23.videoThumbnailAssetIds = table.concat(t10, ",")
+	if p3 and #v11 > 0 then
+		v14.videoThumbnailAssetIds = table.concat(v11, ",")
 	end
 
-	if #t16 > 0 then
-		t23.tileBadgeContexts = table.concat(t16, ",")
+	if FFlagLuaAppDiscoveryMomentVideoTelemetry and #v > 0 and not set.videoIsMoment then
+		v14.videoIsMoment_arr = table.concat(v, ",")
 	end
 
-	if t17 and #t17 > 0 then
-		t23.footerTextLiterals = table.concat(t17, ",")
+	if #v7 > 0 then
+		v14.tileBadgeContexts = table.concat(v7, ",")
 	end
 
-	if t18 and #t18 > 0 then
-		t23.footerLocalizationKeys = table.concat(t18, ",")
+	if v12 and #v12 > 0 then
+		v14.footerTextLiterals = table.concat(v12, ",")
 	end
 
-	if #t19 > 0 then
-		t23.tileTypes = table.concat(t19, ",")
+	if v13 and #v13 > 0 then
+		v14.footerLocalizationKeys = table.concat(v13, ",")
 	end
 
-	local t24 = {}
+	if #gameCollectionItemTypeOverrides > 0 then
+		v14.tileTypes = table.concat(gameCollectionItemTypeOverrides, ",")
+	end
 
-	if next(t21) then
-		for v74 in t21 do
-			local t25 = {}
+	local values = {}
 
-			for _, v77 in t20 do
-				table.insert(t25, v77[v74] or "0")
+	if next(set) then
+		for k in set do
+			local v15 = {}
+
+			for _, v16 in v9 do
+				table.insert(v15, v16[k] or "0")
 			end
 
-			t24[`{ v74 }_arr`] = table.concat(t25, ",")
+			values[`{k}_arr`] = table.concat(v15, ",")
 		end
 	end
 
-	local v78 = Cryo.Dictionary.join(t24, t3 or {})
+	local joined = Cryo.Dictionary.join(values, options or {})
 
-	if next(v78) then
-		t23.analyticsData = v78
+	if next(joined) then
+		v14.analyticsData = joined
 	end
 
-	return t23, v71
-end
-local function addMobileAdvertisingIdToEventParams(p6) -- line: 349
-	-- upvalues: AppStorageService (copy)
-	local Item = AppStorageService:GetItem("MobileAdvertisingId")
-
-	if Item and Item ~= "" then
-		p6.mobileAdvertisingId = Item
-	end
+	return v14, count
 end
 
-return {
-	sendFromTopicContents = function(p7, p8, t26: {[any]: any}, p9, s3: string, s4: string, n1: number, n2: number?, n3: number?, s5: string?, n4: number?, b1: boolean?, s6: string?, s7: string?, s8: string?, p10: ((...any) -> ...any)?, s9: string?, t27: {[any]: any}?) -- line: 356
-		-- upvalues: LoggingProtocol (copy), FeedItemRowDataHitCounter (copy), FeedItemRowDataMissingCounter (copy), addGameFields (copy), Cryo (copy), LocalizationService (copy), FFlagLuaAppAddSubIdToHomeEvents (copy), FFlagLuaAppGameImpressionsMobileAdsId (copy), AppStorageService (copy), gameImpressionsEvent (copy), reportGameImpressionCounts (copy)
-		if not p7 or not p8 then
-			if p10 then
-				p10(`Missing analytics service eventIngest: { p7 } appAnalytics: { p8 }`)
-			end
+local function addMobileAdvertisingIdToEventParams(p) -- 4 equivalent calls inferred from this helper
+	local item = AppStorageService:GetItem("MobileAdvertisingId")
 
-			return
-		end
-
-		if not t26 or #t26 == 0 then
-			if p10 then
-				p10(`Missing impressionsToSend or impressionsToSend == 0 { t26 }`)
-			end
-
-			return
-		end
-
-		if not p9 or #p9 == 0 then
-			if p10 then
-				p10(`Missing topicContentsEntries or topicContentsEntries == 0 { p9 }`)
-			end
-
-			return
-		end
-
-		if n2 then
-			LoggingProtocol.default:logRobloxTelemetryCounter(FeedItemRowDataHitCounter)
-		else
-			LoggingProtocol.default:logRobloxTelemetryCounter(FeedItemRowDataMissingCounter)
-		end
-
-		local v99, v100 = addGameFields(t26, p9, n4, b1, n2, s4, t27)
-		local v101 = Cryo.Dictionary.join(v99, {
-			sortPos = n1,
-			gameSetTypeId = s4,
-			gameSetTargetId = n3,
-			pageId = s5,
-			componentType = s6,
-			locale = LocalizationService.RobloxLocaleId,
-			appliedFilters = s7,
-			loadSource = s8,
-			sortSubId = if not FFlagLuaAppAddSubIdToHomeEvents then nil else s9
-		})
-
-		if FFlagLuaAppGameImpressionsMobileAdsId then
-			local Item = AppStorageService:GetItem("MobileAdvertisingId")
-
-			if Item and Item ~= "" then
-				v101.mobileAdvertisingId = Item
-			end
-		end
-
-		gameImpressionsEvent(p7, s3, v101)
-		reportGameImpressionCounts(p8, s3, v100)
-	end,
-	sendFromSearch = function(p11, p12, t28: {[any]: any}, p13, s10: string, p14, p15, p16, b2: boolean?, s11: string?) -- line: 434
-		-- upvalues: addGameFields (copy), FFlagLuaAppFixSearchImpressions (copy), FFlagLuaAppAddComponentTypeToSearchImpressions (copy), Cryo (copy), LocalizationService (copy), FFlagLuaAppGameImpressionsMobileAdsId (copy), AppStorageService (copy), gameImpressionsEvent (copy), reportGameImpressionCounts (copy)
-		if not p11 or not p12 then
-			return
-		end
-
-		if not t28 or #t28 == 0 then
-			return
-		end
-
-		if not p13 or #p13 == 0 then
-			return
-		end
-
-		local v113, v114 = addGameFields(t28, p13, p15, b2, p16, nil, nil, if not FFlagLuaAppFixSearchImpressions then nil else p14, if not FFlagLuaAppFixSearchImpressions then nil else s10)
-		local v115
-
-		if FFlagLuaAppAddComponentTypeToSearchImpressions then
-			v115 = Cryo.Dictionary.join(v113, p14, {
-				locale = LocalizationService.RobloxLocaleId,
-				componentType = s11
-			})
-		else
-			v113.locale = LocalizationService.RobloxLocaleId
-			v115 = Cryo.Dictionary.join(v113, p14)
-		end
-
-		if FFlagLuaAppGameImpressionsMobileAdsId then
-			local Item = AppStorageService:GetItem("MobileAdvertisingId")
-
-			if Item and Item ~= "" then
-				v115.mobileAdvertisingId = Item
-			end
-		end
-
-		gameImpressionsEvent(p11, s10, v115)
-		reportGameImpressionCounts(p12, s10, v114)
-	end,
-	sendFromGameDetails = function(p17, p18, t29: {[any]: any}, p19, p20) -- line: 487
-		-- upvalues: addGameFields (copy), LocalizationService (copy), FFlagLuaAppGameImpressionsMobileAdsId (copy), AppStorageService (copy), gameImpressionsEvent (copy), reportGameImpressionCounts (copy)
-		local v122, v123 = addGameFields(t29, p19)
-
-		v122.locale = LocalizationService.RobloxLocaleId
-		v122.refId = p20
-
-		if FFlagLuaAppGameImpressionsMobileAdsId then
-			local Item = AppStorageService:GetItem("MobileAdvertisingId")
-
-			if Item and Item ~= "" then
-				v122.mobileAdvertisingId = Item
-			end
-		end
-
-		gameImpressionsEvent(p17, "recommended", v122)
-		reportGameImpressionCounts(p18, "recommended", v123)
-	end,
-	sendFromSeeAll = function(p21, p22, t30: {[any]: any}, p23, s12: string, s13: string, n5: number?, s14: string?, s15: string?, b3: boolean?) -- line: 507
-		-- upvalues: addGameFields (copy), Cryo (copy), LocalizationService (copy), FFlagLuaAppGameImpressionsMobileAdsId (copy), AppStorageService (copy), gameImpressionsEvent (copy), reportGameImpressionCounts (copy)
-		if not p21 or not p22 then
-			return
-		end
-
-		if not t30 or #t30 == 0 then
-			return
-		end
-
-		if not p23 or #p23 == 0 then
-			return
-		end
-
-		local v135, v136 = addGameFields(t30, p23, nil, b3)
-		local v137 = Cryo.Dictionary.join(v135, {
-			seeAllFlag = 1,
-			gameSetTypeId = s13,
-			gameSetTargetId = n5,
-			pageId = s14,
-			locale = LocalizationService.RobloxLocaleId,
-			appliedFilters = s15
-		})
-
-		if FFlagLuaAppGameImpressionsMobileAdsId then
-			local Item = AppStorageService:GetItem("MobileAdvertisingId")
-
-			if Item and Item ~= "" then
-				v137.mobileAdvertisingId = Item
-			end
-		end
-
-		gameImpressionsEvent(p21, s12, v137)
-		reportGameImpressionCounts(p22, s12, v136, 1)
-	end,
-	sendFromTraversalHistoryPage = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else function(p24, p25, t31: {[any]: any}, t32: {[any]: any}, n6: number, n7: number) -- line: 555
-		-- upvalues: addGameFields (copy), Cryo (copy), LocalizationService (copy), gameImpressionsEvent (copy), reportGameImpressionCounts (copy)
-		if not p24 or not p25 then
-			return
-		end
-
-		local v145, v146 = addGameFields(t31, t32, n6, false, n7)
-		local v147 = Cryo.Dictionary.join(v145, {
-			locale = LocalizationService.RobloxLocaleId
-		})
-
-		gameImpressionsEvent(p24, "InExpHistoryPage", v147)
-		reportGameImpressionCounts(p25, "InExpHistoryPage", v146)
+	if item and item ~= "" then
+		p.mobileAdvertisingId = item
 	end
-}
+end
+
+local function hasNoEntries(list): boolean -- 3 equivalent calls inferred from this helper
+	if FFlagSduiFixSearchTelemetry then
+		return not list or next(list) == nil
+	end
+
+	return not list or #list == 0
+end
+
+local SendGameImpressions = {}
+
+function SendGameImpressions.sendFromTopicContents(p, p2, list, list2, pageContext: string, gameSetTypeId: string, sortPos: number, p3: number?, gameSetTargetId: number?, pageId: string?, p4: number?, flag: boolean?, componentType: string?, appliedFilters: string?, loadSource: string?, callback, sortSubId: string?, p5)
+	if p and p2 then
+		if list and #list ~= 0 then
+			if hasNoEntries(list2) then -- inferred equivalent call
+				if callback then
+					callback(`Missing topicContentsEntries or topicContentsEntries == 0 {list2}`)
+				end
+			else
+				if FFlagLuaAppSponsoredGamePreviewVideo then
+					logSponsoredGamePreviewVideoExposureIfEligible(list, list2, pageContext)
+				end
+
+				if p3 then
+					LoggingProtocol.default:logRobloxTelemetryCounter(FeedItemRowDataHitCounter)
+				else
+					LoggingProtocol.default:logRobloxTelemetryCounter(FeedItemRowDataMissingCounter)
+				end
+
+				local v, v2 = addGameFields(list, list2, p4, flag, p3, gameSetTypeId, p5)
+
+				local joined = Cryo.Dictionary.join(v, {
+					sortPos = sortPos,
+					gameSetTypeId = gameSetTypeId,
+					gameSetTargetId = gameSetTargetId,
+					pageId = pageId,
+					componentType = componentType,
+					locale = LocalizationService.RobloxLocaleId,
+					appliedFilters = appliedFilters,
+					loadSource = loadSource,
+					sortSubId = sortSubId
+				})
+
+				if FFlagLuaAppGameImpressionsMobileAdsId then
+					addMobileAdvertisingIdToEventParams(joined) -- inferred equivalent call
+				end
+
+				gameImpressionsEvent(p, pageContext, joined)
+				reportGameImpressionCounts(p2, pageContext, v2)
+			end
+		elseif callback then
+			callback(`Missing impressionsToSend or impressionsToSend == 0 {list}`)
+		end
+	elseif callback then
+		callback(`Missing analytics service eventIngest: {p} appAnalytics: {p2}`)
+	end
+end
+
+function SendGameImpressions.sendFromSearch(p, p2, list, list2, pageContext: string, p3, p4, p5, flag: boolean?, componentType: string?)
+	if not (p and p2) or (not list or #list == 0) then
+		return
+	end
+
+	if hasNoEntries(list2) then -- inferred equivalent call
+		return
+	end
+
+	local v, v2 = addGameFields(list, list2, p4, flag, p5, nil, nil, p3, pageContext)
+
+	local joined = Cryo.Dictionary.join(v, p3, {
+		locale = LocalizationService.RobloxLocaleId,
+		componentType = componentType
+	})
+
+	if FFlagLuaAppGameImpressionsMobileAdsId then
+		addMobileAdvertisingIdToEventParams(joined) -- inferred equivalent call
+	end
+
+	gameImpressionsEvent(p, pageContext, joined)
+	reportGameImpressionCounts(p2, pageContext, v2)
+end
+
+function SendGameImpressions.sendFromGameDetails(p, p2, p3, p4, refId)
+	local v, v2 = addGameFields(p3, p4)
+	v.locale = LocalizationService.RobloxLocaleId
+	v.refId = refId
+
+	if FFlagLuaAppGameImpressionsMobileAdsId then
+		addMobileAdvertisingIdToEventParams(v) -- inferred equivalent call
+	end
+
+	gameImpressionsEvent(p, "recommended", v)
+	reportGameImpressionCounts(p2, "recommended", v2)
+end
+
+function SendGameImpressions.sendFromSeeAll(p, p2, list, list2, pageContext: string, gameSetTypeId: string, gameSetTargetId: number?, pageId: string?, appliedFilters: string?, flag: boolean?)
+	if not (p and p2) or (not list or #list == 0) then
+		return
+	end
+
+	if hasNoEntries(list2) then -- inferred equivalent call
+		return
+	end
+
+	if FFlagLuaAppSponsoredGamePreviewVideo then
+		logSponsoredGamePreviewVideoExposureIfEligible(list, list2, pageContext)
+	end
+
+	local v, v2 = addGameFields(list, list2, nil, flag)
+
+	local joined = Cryo.Dictionary.join(v, {
+		gameSetTypeId = gameSetTypeId,
+		gameSetTargetId = gameSetTargetId,
+		pageId = pageId,
+		locale = LocalizationService.RobloxLocaleId,
+		seeAllFlag = 1,
+		appliedFilters = appliedFilters
+	})
+
+	if FFlagLuaAppGameImpressionsMobileAdsId then
+		addMobileAdvertisingIdToEventParams(joined) -- inferred equivalent call
+	end
+
+	gameImpressionsEvent(p, pageContext, joined)
+	reportGameImpressionCounts(p2, pageContext, v2, 1)
+end
+
+SendGameImpressions.sendFromTraversalHistoryPage = FFlagTraversalHistoryDiscoveryTelemetry
+	and function(p, p2, p3, p4, p5: number, p6: number)
+		if not (p and p2) then
+			return
+		end
+
+		local v, v2 = addGameFields(p3, p4, p5, false, p6)
+		gameImpressionsEvent(
+			p,
+			"InExpHistoryPage",
+			(Cryo.Dictionary.join(v, { locale = LocalizationService.RobloxLocaleId }))
+		)
+		reportGameImpressionCounts(p2, "InExpHistoryPage", v2)
+	end
+	or nil
+return SendGameImpressions

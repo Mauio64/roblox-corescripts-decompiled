@@ -1,56 +1,67 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Signals = require(parent.Signals)
+require(script.Parent.Parent.Types.model)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
 
 return {
-	createSessionScalarState = function(s1: string?) -- line: 27
-		-- upvalues: Signals (copy)
-		local v4, v5 = Signals.createSignal(s1)
-		local v6, v7 = Signals.createSignal(false)
-		local v8, v9 = Signals.createSignal(nil)
-		local v10, v11 = Signals.createSignal(false)
-		local v12, v13 = Signals.createSignal(false)
-		local v14, v15 = Signals.createSignal(0)
-		local v16, v17 = Signals.createSignal(nil)
+	createSessionScalarState = function(p: string?)
+		local getModels, setModels, hasObservedModels, setHasObservedModels
+
+		if FFlagBuildExperienceModelPickerData then
+			getModels, setModels = Signals.createSignal(nil)
+			hasObservedModels, setHasObservedModels = Signals.createSignal(false)
+		end
+
+		local signal, setCasSessionId = Signals.createSignal(p)
+		local signal2, setHasLoadedHistory = Signals.createSignal(false)
+		local signal3, setNextHistoryPageToken = Signals.createSignal(nil)
+		local signal4, setHistoryLoadInFlight = Signals.createSignal(false)
+		local signal5, setInitialized = Signals.createSignal(false)
+		local signal6, v = Signals.createSignal(0)
+
+		local signal7, v2 = Signals.createSignal(nil)
+
+		local function setLatestObservedHistorySequenceId(p2: number?) -- 1 equivalent call inferred from this helper
+			v2(p2)
+		end
 
 		return {
-			getCasSessionId = v4,
-			setCasSessionId = v5,
-			getHasLoadedHistory = v6,
-			setHasLoadedHistory = v7,
-			markHistoryLoaded = function() -- line: 62
-				-- upvalues: v7 (copy)
-				v7(true)
+			getModels = getModels,
+			hasObservedModels = hasObservedModels,
+			setHasObservedModels = setHasObservedModels,
+			setModels = setModels,
+			getCasSessionId = signal,
+			setCasSessionId = setCasSessionId,
+			getHasLoadedHistory = signal2,
+			setHasLoadedHistory = setHasLoadedHistory,
+			markHistoryLoaded = function()
+				setHasLoadedHistory(true)
 			end,
-			getNextHistoryPageToken = v8,
-			setNextHistoryPageToken = v9,
-			getHistoryLoadInFlight = v10,
-			setHistoryLoadInFlight = v11,
-			getInitialized = v12,
-			setInitialized = v13,
-			getAssistantTurnSequence = v14,
-			incrementAssistantTurnSequence = function() -- line: 51
-				-- upvalues: v14 (copy), v15 (copy)
-				local v21 = v14(false) + 1
-
-				v15(v21)
-
-				return v21
+			getNextHistoryPageToken = signal3,
+			setNextHistoryPageToken = setNextHistoryPageToken,
+			getHistoryLoadInFlight = signal4,
+			setHistoryLoadInFlight = setHistoryLoadInFlight,
+			getInitialized = signal5,
+			setInitialized = setInitialized,
+			getAssistantTurnSequence = signal6,
+			incrementAssistantTurnSequence = function()
+				local v3 = signal6(false) + 1
+				v(v3)
+				return v3
 			end,
-			getLatestObservedHistorySequenceId = v16,
-			setLatestObservedHistorySequenceId = function(n1: number?) -- line: 37
-				-- upvalues: v17 (copy)
-				v17(n1)
-			end,
-			noteHistorySequenceId = function(n2: number?) -- line: 41
-				-- upvalues: v16 (copy), v17 (copy)
-				if n2 == nil then
+			getLatestObservedHistorySequenceId = signal7,
+			setLatestObservedHistorySequenceId = setLatestObservedHistorySequenceId,
+			noteHistorySequenceId = function(p2: number?)
+				if p2 == nil then
 					return
 				end
 
-				local v20 = v16(false)
+				local v3 = signal7(false)
 
-				if v20 == nil or v20 < n2 then
-					v17(n2)
+				if v3 == nil or v3 < p2 then
+					setLatestObservedHistorySequenceId(p2) -- inferred equivalent call
 				end
 			end
 		}

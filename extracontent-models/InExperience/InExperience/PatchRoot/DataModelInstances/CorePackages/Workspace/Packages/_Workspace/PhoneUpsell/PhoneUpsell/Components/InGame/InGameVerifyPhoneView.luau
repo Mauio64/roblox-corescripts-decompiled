@@ -1,31 +1,35 @@
-local Parent = script:FindFirstAncestor("PhoneUpsell").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("PhoneUpsell").Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local TextField = UIBlox.App.Input.TextField
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
-local GetFFlagAddMorePhoneUpsellEvents = require(Parent.SharedFlags).GetFFlagAddMorePhoneUpsellEvents
 
-local function getButtonStackProps(s1: string, p1: ((...any) -> ...any), b1: boolean, s2: string?, p2: ((...any) -> ...any)?) -- line: 35
-	-- upvalues: ButtonType (copy)
-	local t1 = {{
-		buttonType = ButtonType.Secondary,
-		props = {
-			onActivated = p1,
-			text = s1,
-			isDisabled = b1
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagAddMorePhoneUpsellEvents = SharedFlags.GetFFlagAddMorePhoneUpsellEvents
+
+local function getButtonStackProps(text: string, onActivated, isDisabled: boolean, editPhoneDescriptionKey: string?, onActivated2)
+	local buttons = {
+		{
+			buttonType = ButtonType.Secondary,
+			props = { onActivated = onActivated, text = text, isDisabled = isDisabled }
 		}
-	}}
+	}
 
-	if p2 and (s2 and s2 ~= "") then
-		table.insert(t1, 1, {
+	if onActivated2 and editPhoneDescriptionKey and editPhoneDescriptionKey ~= "" then
+		table.insert(buttons, 1, {
 			buttonType = ButtonType.Secondary,
 			props = {
-				isDisabled = false,
-				onActivated = p2,
-				text = s2
+				onActivated = onActivated2,
+				text = editPhoneDescriptionKey,
+				isDisabled = false
 			}
 		})
 	end
@@ -33,14 +37,14 @@ local function getButtonStackProps(s1: string, p1: ((...any) -> ...any), b1: boo
 	return {
 		buttonHeight = 48,
 		forcedFillDirection = Enum.FillDirection.Horizontal,
-		buttons = t1
+		buttons = buttons
 	}
 end
-local function InGameVerifyPhoneView(t2: {[any]: any}) -- line: 72
-	-- upvalues: useStyle (copy), useLocalization (copy), React (copy), InteractiveAlert (copy), getButtonStackProps (copy), TextField (copy), GetFFlagAddMorePhoneUpsellEvents (copy)
-	local v19 = useStyle()
-	local Tokens = v19.Tokens
-	local t3 = {
+
+local function InGameVerifyPhoneView(props)
+	local v = useStyle()
+	local tokens = v.Tokens
+	local v2 = {
 		titleKey = "Feature.VerificationUpsell.Heading.VerifyYourPhone",
 		verificationCodeKey = "Feature.VerificationUpsell.Heading.VerificationCode",
 		placeholderKey = "Feature.VerificationUpsell.Label.SixDigitCode",
@@ -51,131 +55,225 @@ local function InGameVerifyPhoneView(t2: {[any]: any}) -- line: 72
 		editPhoneDescriptionKey = "Feature.VerificationUpsell.Action.EditPhoneNumber"
 	}
 
-	if t2.extraButtonKey and t2.extraButtonKey ~= "" then
-		t3.extraButtonKey = t2.extraButtonKey
+	if props.extraButtonKey and props.extraButtonKey ~= "" then
+		v2.extraButtonKey = props.extraButtonKey
 	end
 
-	local v22 = useLocalization(t3)
-	local v23, v24 = React.useState(0)
-	local v25 = v23 ~= 0
+	local v3 = useLocalization(v2)
+	local state, setState = React.useState(0)
+	local isDisabled = state ~= 0
 
-	local function getBodyText(s3: string) -- line: 97
-		-- upvalues: t2 (copy)
-		return s3:gsub("{phoneNumber}", "+" .. t2.prefix .. t2.phoneNumber)
+	local function getBodyText(descriptionKey: string) -- 1 equivalent call inferred from this helper
+		return descriptionKey:gsub("{phoneNumber}", "+" .. props.prefix .. props.phoneNumber)
 	end
-	local function handleResendButtonClick() -- line: 101
-		-- upvalues: t2 (copy), v24 (copy)
-		t2.onResendPhoneCode()
-		v24(10)
 
-		local timestamp = tick()
+	local function handleResendButtonClick()
+		props.onResendPhoneCode()
+		setState(10)
+		local lastTime = tick()
+		local function countDown()
+			local v4 = 10 - (tick() - lastTime)
 
-		local function countDown() -- line: 106
-			-- upvalues: timestamp (copy), v24 (copy), countDown (copy)
-			local v34 = 10 - (tick() - timestamp)
-
-			if v34 > 0 then
-				v24((math.ceil(v34)))
+			if v4 > 0 then
+				setState((math.ceil(v4)))
 				task.delay(1, countDown)
+			else
+				setState(0)
+			end
+		end
 
-				return
+		local v4 = 10 - (tick() - lastTime)
+
+		if v4 > 0 then
+			setState((math.ceil(v4)))
+			task.delay(1, countDown)
+		else
+			setState(0)
+		end
+	end
+
+	local v4
+
+	if isDisabled then
+		v4 = v3.buttonDisabledKey .. " (" .. state .. ")"
+	else
+		v4 = v3.buttonKey
+	end
+
+	local err = props.errorMessage and props.errorMessage ~= ""
+
+	local createElement = React.createElement
+	local v5 = {
+		title = v3.titleKey,
+		screenSize = props.screenSize,
+		buttonStackInfo = getButtonStackProps(
+			v4,
+			handleResendButtonClick,
+			isDisabled,
+			v3.editPhoneDescriptionKey,
+			props.onExtraButtonClick
+		),
+		onCloseClicked = props.onClose,
+		position = 0,
+		anchorPoint = 0,
+		middleContent = 0
+	}
+	local position
+
+	if props.isKeyboardShowing then
+		position = UDim2.new(0.5, 0, 1, -props.keyboardHeight) or nil
+	end
+
+	v5.position = position
+	v5.anchorPoint = props.isKeyboardShowing and Vector2.new(0.5, 1) or nil
+	function v5.middleContent()
+		local createElement2 = React.createElement
+		local v6 = {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0)
+		}
+		local v7 = {
+			[1] = nil,
+			nil,
+			ListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				Padding = UDim.new(0, tokens.Size.Size_200)
+			})
+		}
+
+		local createElement3 = React.createElement
+		local v8 = {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = 0
+		}
+
+		local v9 = {
+			ListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				Padding = UDim.new(0, tokens.Size.Size_200)
+			}),
+			TextBox = 0,
+			ErrorText = 0
+		}
+
+		local createElement4 = React.createElement
+		local v10 = {
+			text = props.code,
+			placeholder = "",
+			required = true,
+			onChange = function(text)
+				props.onCodeTextChange({ Text = text })
+			end,
+			LayoutOrder = 1,
+			width = UDim.new(1, 0),
+			error = err,
+			textInputType = 0,
+			onFocusGained = 0
+		}
+		local textInputType
+
+		if props.useOTPInputType then
+			textInputType = Enum.TextInputType.OneTimePassword
+		else
+			textInputType = Enum.TextInputType.Number
+		end
+
+		v10.textInputType = textInputType
+		local onFocusGained
+
+		if GetFFlagAddMorePhoneUpsellEvents() then
+			onFocusGained = props.onCodeInputFocus
+		end
+
+		v10.onFocusGained = onFocusGained
+		v9.TextBox = createElement4(TextField, v10)
+
+		local errorText = err
+
+		if errorText then
+			local createElement5 = React.createElement
+			local v11 = {
+				Text = props.errorMessage,
+				TextTransparency = 0,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				TextColor3 = tokens.Color.System.Alert.Color3,
+				Font = 0,
+				FontFace = 0,
+				TextSize = 0,
+				Size = 0,
+				AutomaticSize = 0,
+				LayoutOrder = 2
+			}
+			local font
+
+			if not FoundationFontFaceMigration then
+				font = v.Font.Body.Font
 			end
 
-			v24(0)
+			v11.Font = font
+			local fontFace
+
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font)
+			end
+
+			v11.FontFace = fontFace
+
+			v11.TextSize = v.Font.BaseSize * v.Font.CaptionSmall.RelativeSize
+			v11.Size = UDim2.new(1, 0, 0, 0)
+			v11.AutomaticSize = Enum.AutomaticSize.Y
+			errorText = createElement5("TextLabel", v11)
 		end
 
-		local v33 = 10 - (tick() - timestamp)
+		v9.ErrorText = errorText
+		v7[1] = (createElement3("Frame", v8, v9))
+		local createElement5 = React.createElement
+		local v11 = {
+			LayoutOrder = 3,
+			BackgroundTransparency = 1,
+			Text = getBodyText(v3.descriptionKey), -- inferred equivalent call
+			TextSize = v.Font.BaseSize * v.Font.CaptionHeader.RelativeSize,
+			TextColor3 = v.Theme.TextDefault.Color,
+			TextTransparency = v.Theme.TextDefault.Transparency,
+			Font = 0,
+			FontFace = 0,
+			TextXAlignment = 0,
+			AutomaticSize = 0,
+			TextWrapped = true,
+			Size = 0
+		}
+		local font
 
-		if v33 > 0 then
-			v24((math.ceil(v33)))
-			task.delay(1, countDown)
-
-			return
+		if not FoundationFontFaceMigration then
+			font = v.Font.Body.Font
 		end
 
-		v24(0)
+		v11.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font)
+		end
+
+		v11.FontFace = fontFace
+
+		v11.TextXAlignment = Enum.TextXAlignment.Left
+		v11.AutomaticSize = Enum.AutomaticSize.Y
+
+		v11.Size = UDim2.new(1, 0, 0, 0)
+		v7.BodyText = createElement5("TextLabel", v11)
+		return createElement2("Frame", v6, v7)
 	end
 
-	local v28 = if not v25 then v22.buttonKey else v22.buttonDisabledKey .. " (" .. v23 .. ")"
-	local v29 = t2.errorMessage and t2.errorMessage ~= ""
-
-	return React.createElement(InteractiveAlert, {
-		title = v22.titleKey,
-		screenSize = t2.screenSize,
-		buttonStackInfo = getButtonStackProps(v28, handleResendButtonClick, v25, v22.editPhoneDescriptionKey, t2.onExtraButtonClick),
-		onCloseClicked = t2.onClose,
-		position = t2.isKeyboardShowing and UDim2.new(0.5, 0, 1, -t2.keyboardHeight) or nil,
-		anchorPoint = t2.isKeyboardShowing and Vector2.new(0.5, 1) or nil,
-		middleContent = function() -- line: 139
-			-- upvalues: React (copy), Tokens (copy), TextField (copy), t2 (copy), v29 (copy), GetFFlagAddMorePhoneUpsellEvents (copy), v19 (copy), v22 (copy)
-			return React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, 0, 0, 0)
-			}, {
-				ListLayout = React.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					Padding = UDim.new(0, Tokens.Size.Size_200)
-				}),
-				React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 0,
-					Size = UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}, {
-					ListLayout = React.createElement("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						HorizontalAlignment = Enum.HorizontalAlignment.Left,
-						Padding = UDim.new(0, Tokens.Size.Size_200)
-					}),
-					TextBox = React.createElement(TextField, {
-						placeholder = "",
-						required = true,
-						LayoutOrder = 1,
-						text = t2.code,
-						onChange = function(p3) -- line: 165
-							-- upvalues: t2 (copy)
-							t2.onCodeTextChange({
-								Text = p3
-							})
-						end,
-						width = UDim.new(1, 0),
-						error = v29,
-						textInputType = if not t2.useOTPInputType then Enum.TextInputType.Number else Enum.TextInputType.OneTimePassword,
-						onFocusGained = if not GetFFlagAddMorePhoneUpsellEvents() then nil else t2.onCodeInputFocus
-					}),
-					ErrorText = v29 and React.createElement("TextLabel", {
-						TextTransparency = 0,
-						TextWrapped = true,
-						BackgroundTransparency = 1,
-						LayoutOrder = 2,
-						Text = t2.errorMessage,
-						TextXAlignment = Enum.TextXAlignment.Left,
-						TextYAlignment = Enum.TextYAlignment.Top,
-						TextColor3 = Tokens.Color.System.Alert.Color3,
-						Font = v19.Font.Body.Font,
-						TextSize = v19.Font.BaseSize * v19.Font.CaptionSmall.RelativeSize,
-						Size = UDim2.new(1, 0, 0, 0),
-						AutomaticSize = Enum.AutomaticSize.Y
-					})
-				}),
-				BodyText = React.createElement("TextLabel", {
-					LayoutOrder = 3,
-					BackgroundTransparency = 1,
-					TextWrapped = true,
-					Text = v22.descriptionKey:gsub("{phoneNumber}", "+" .. t2.prefix .. t2.phoneNumber),
-					TextSize = v19.Font.BaseSize * v19.Font.CaptionHeader.RelativeSize,
-					TextColor3 = v19.Theme.TextDefault.Color,
-					TextTransparency = v19.Theme.TextDefault.Transparency,
-					Font = v19.Font.Body.Font,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(1, 0, 0, 0)
-				})
-			})
-		end
-	})
+	return createElement(InteractiveAlert, v5)
 end
 
 return InGameVerifyPhoneView

@@ -1,6 +1,5 @@
 local GuiService = game:GetService("GuiService")
 
-return function() -- line: 4
-	-- upvalues: GuiService (copy)
+return function()
 	return GuiService:FindFirstChildWhichIsA("ScreenshotHud")
 end

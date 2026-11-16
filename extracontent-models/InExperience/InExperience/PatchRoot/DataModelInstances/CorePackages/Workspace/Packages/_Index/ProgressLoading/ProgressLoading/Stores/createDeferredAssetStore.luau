@@ -1,34 +1,48 @@
 local ProgressLoading = script:FindFirstAncestor("ProgressLoading")
-local ProgressLoadingParent = ProgressLoading.Parent
+local parent = ProgressLoading.Parent
+
 local EngineFeatureEnableDeferredAssetManagerService = require(ProgressLoading.Flags.EngineFeatureEnableDeferredAssetManagerService)
-local v4 = if not EngineFeatureEnableDeferredAssetManagerService then nil else game:GetService("DeferredAssetManagerService")
-local Signals = require(ProgressLoadingParent.Signals)
+local DeferredAssetManagerService
 
-local function createDeferredAssetStore(p1) -- line: 19
-	-- upvalues: v4 (copy), EngineFeatureEnableDeferredAssetManagerService (copy), Signals (copy)
-	local v8 = p1 or v4
+if EngineFeatureEnableDeferredAssetManagerService then
+	DeferredAssetManagerService = game:GetService("DeferredAssetManagerService")
+else
+	DeferredAssetManagerService = nil
+end
 
-	if not EngineFeatureEnableDeferredAssetManagerService and p1 == nil then
+local Signals = require(parent.Signals)
+
+local function createDeferredAssetStore(p)
+	local v = p or DeferredAssetManagerService
+
+	if not EngineFeatureEnableDeferredAssetManagerService and p == nil then
 		return {
-			getDownloadStatus = function() -- line: 23
+			getDownloadStatus = function() end,
+			getPregameLoadingScreenOnly = function(): boolean
+				return false
 			end,
-			cleanUp = function() -- line: 24
-			end
+			cleanUp = function() end
 		}
 	end
 
-	local PrefetchDownloadStatus = v8:GetPrefetchDownloadStatus()
-	local v10, v11 = Signals.createSignal(PrefetchDownloadStatus)
-	local connection = v8.PrefetchDownloadStatusChanged:Connect(function(p2) -- line: 30
-		-- upvalues: v11 (copy)
-		v11(p2)
+	local prefetchDownloadStatus = v:GetPrefetchDownloadStatus()
+	local signal, v2 = Signals.createSignal(prefetchDownloadStatus)
+	local prefetchDownloadStatusChangedConnection = v.PrefetchDownloadStatusChanged:Connect(function(p2)
+		v2(p2)
+	end)
+
+	local signal2, v3 = Signals.createSignal(v.PregameLoadingScreenOnly)
+
+	local pregameLoadingScreenOnlyChangedConnection = v:GetPropertyChangedSignal("PregameLoadingScreenOnly"):Connect(function()
+		v3(v.PregameLoadingScreenOnly)
 	end)
 
 	return {
-		getDownloadStatus = v10,
-		cleanUp = function() -- line: 36
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		getDownloadStatus = signal,
+		getPregameLoadingScreenOnly = signal2,
+		cleanUp = function()
+			prefetchDownloadStatusChangedConnection:Disconnect()
+			pregameLoadingScreenOnlyChangedConnection:Disconnect()
 		end
 	}
 end

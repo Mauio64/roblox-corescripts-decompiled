@@ -1,18 +1,19 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local FFlagEnableBlackbirdCheck = require(Parent.SharedFlags).FFlagEnableBlackbirdCheck
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local function useHasRobloxSubscription() -- line: 9
-	-- upvalues: FFlagEnableBlackbirdCheck (copy), useSelector (copy)
-	if not FFlagEnableBlackbirdCheck then
-		return false
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+
+local function useHasRobloxSubscription()
+	if FFlagEnableBlackbirdCheck then
+		return useSelector(function(p)
+			local user = p.Users[p.LocalUserId]
+			return user and user.hasRobloxSubscription == true and true or false
+		end)
 	end
 
-	return useSelector(function(p1) -- line: 13
-		local v6 = p1.Users[p1.LocalUserId]
-
-		return not not v6 and (v6.hasRobloxSubscription == true or false)
-	end)
+	return false
 end
 
 return useHasRobloxSubscription

@@ -1,3 +1,1 @@
-return {
-	DynamicHead = "DynamicHead"
-}
+return { DynamicHead = "DynamicHead" }

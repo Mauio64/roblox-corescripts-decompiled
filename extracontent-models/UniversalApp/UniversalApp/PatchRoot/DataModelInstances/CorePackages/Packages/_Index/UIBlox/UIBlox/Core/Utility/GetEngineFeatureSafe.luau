@@ -1,10 +1,9 @@
-local function GetEngineFeatureSafe(p1) -- line: 8
-	local ok, result = pcall(function() -- line: 9
-		-- upvalues: p1 (copy)
-		return game:GetEngineFeature(p1)
+local function GetEngineFeatureSafe(p)
+	local success, result = pcall(function()
+		return game:GetEngineFeature(p)
 	end)
 
-	return ok and result
+	return success and result
 end
 
 return GetEngineFeatureSafe

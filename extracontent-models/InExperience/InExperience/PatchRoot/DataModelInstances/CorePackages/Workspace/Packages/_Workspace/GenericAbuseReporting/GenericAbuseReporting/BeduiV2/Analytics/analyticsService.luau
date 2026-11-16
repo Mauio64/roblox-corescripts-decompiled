@@ -1,12 +1,180 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local LocalPlayer = game:GetService("Players").LocalPlayer
+local parent = GenericAbuseReporting.Parent
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local TelemetryService = game:GetService("TelemetryService")
-local Dash = require(GenericAbuseReportingParent.Dash)
-local FFlagAbuseReportClientVersion = require(GenericAbuseReporting.Flags.FFlagAbuseReportClientVersion)
-local FFlagFixAnalyticsForDynamicReportV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagFixAnalyticsForDynamicReportV2
-local t1 = {
+
+local Dash = require(parent.Dash)
+
+local FFlagAbuseReportImproveErrorEvents = require(GenericAbuseReporting.Flags.FFlagAbuseReportImproveErrorEvents)
+
+local v = { "errorMessage", "message", "error" }
+
+local function getBoundedUtf8String(p, p2: number) -- 2 equivalent calls inferred from this helper
+	local v2 = tostring(p)
+
+	if utf8.len(v2) == nil then
+		return nil
+	end
+
+	if #v2 <= p2 then
+		return v2
+	end
+
+	return (string.sub(v2, 1, utf8.offset(v2, 0, p2 + 1) - 1))
+end
+
+local function setBoundedMetadata(boundedUtf8Strings, p: string, p2) -- 10 equivalent calls inferred from this helper
+	if p2 ~= nil then
+		local boundedUtf8String = getBoundedUtf8String(p2, 1000) -- inferred equivalent call
+
+		if boundedUtf8String ~= nil then
+			boundedUtf8Strings[p] = boundedUtf8String
+		end
+	end
+end
+
+local function getFallbackErrorMessage(p)
+	if type(p) ~= "table" then
+		return nil
+	end
+
+	for _, v2 in v do
+		local v3 = p[v2]
+
+		if type(v3) == "string" then
+			return v3
+		end
+	end
+
+	return nil
+end
+
+local function getHeader(items, value: string)
+	if type(items) ~= "table" then
+		return nil
+	end
+
+	local v2 = string.lower(value)
+
+	for k, item in items do
+		if type(k) == "string" and string.lower(k) == v2 then
+			return item
+		end
+	end
+
+	return nil
+end
+
+local function setBoundedNumericHeaderMetadata(boundedUtf8Strings, p: string, headers, p2: string) -- 2 equivalent calls inferred from this helper
+	local v2 = tonumber(getHeader(headers, p2))
+
+	if v2 then
+		setBoundedMetadata(boundedUtf8Strings, p, v2) -- inferred equivalent call
+	end
+end
+
+local function isArray(item): boolean -- 1 equivalent call inferred from this helper
+	local count = 0
+
+	for _ in item do
+		count += 1
+	end
+
+	return count == #item and count > 0
+end
+
+local function flattenForTelemetry(joined)
+	local result = {}
+
+	for k, item in joined do
+		if type(item) == "table" then
+			if isArray(item) then -- inferred equivalent call
+				local v2 = {}
+
+				for _, v3 in item do
+					table.insert(v2, (tostring(v3)))
+				end
+
+				result[k] = "[" .. table.concat(v2, ", ") .. "]"
+			else
+				for k2, v2 in item do
+					result[tostring(k2)] = tostring(v2)
+				end
+			end
+		else
+			result[k] = tostring(item)
+		end
+	end
+
+	return result
+end
+
+local v2 = {
+	eventName = "DynamicAbuseReportEventV2",
+	description = "Event to track dynamic abuse report v2",
+	lastUpdated = { 2026, 9, 10 },
+	backends = { "EventIngest", "Points" },
+	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportV2ThrottleHundredthsPercent", 0),
+	links = "https://github.rbx.com/Roblox/proto-schemas/pull/13201"
+}
+
+local function getCoreScriptVersion()
+	if not game:GetEngineFeature("CoreScriptVersionEnabled") then
+		return nil
+	end
+
+	local success, result = pcall(function()
+		return RunService:GetCoreScriptVersion()
+	end)
+	return if success then result else nil
+end
+
+local result
+
+if game:GetEngineFeature("CoreScriptVersionEnabled") then
+	local success
+	success, result = pcall(function()
+		return RunService:GetCoreScriptVersion()
+	end)
+
+	if not success then
+		result = nil
+	end
+else
+	result = nil
+end
+
+local AnalyticsService = {}
+
+function AnalyticsService.sendAnalyticsEvent(p, p2)
+	local v3 = {
+		user_id = LocalPlayer and LocalPlayer.UserId or nil,
+		client_version = result
+	}
+
+	local customFields = flattenForTelemetry(Dash.join(p, p2, v3))
+
+	if
+		FFlagAbuseReportImproveErrorEvents
+		and p2.sub_event_type == "Error"
+		and p2.error_detail.error_metadata ~= nil
+	then
+		local success, result2 = pcall(HttpService.JSONEncode, HttpService, p2.error_detail.error_metadata)
+
+		if success and type(result2) == "string" then
+			customFields.error_metadata = result2
+		else
+			customFields = Dash.omit(customFields, { "error_metadata" })
+		end
+	end
+
+	TelemetryService:LogEvent(v2, { customFields = customFields, eventContext = p.abuse_vector })
+end
+
+AnalyticsService.TelemetryEventType = {
 	ReportStarted = "OpenDialog",
 	ReportAbandoned = "EarlyClose",
 	ReportCompleted = "Close",
@@ -31,138 +199,100 @@ local t1 = {
 	SceneCaptureResult = "SceneCaptureResult",
 	ConfigLoaded = "ConfigLoaded"
 }
-local t2 = {
-	Footer = "footer",
-	NextAction = "next_action"
-}
-local t3 = {
-	Flow = "flow",
-	SceneSelection = "sceneSelection"
-}
 
-local function isArray(t4: {[any]: any}) -- line: 107
-	local n1 = 0
+AnalyticsService.LinkOpenedSource = { Footer = "footer", NextAction = "next_action" }
 
-	for _ in t4 do
-		n1 += 1
+AnalyticsService.SubmitSource = { Flow = "flow", SceneSelection = "sceneSelection" }
+
+function AnalyticsService.formatErrorDetailForAnalytics(p: string, value, p2)
+	local v3
+
+	if type(value) == "string" then
+		v3 = value
 	end
 
-	return n1 == #t4 and n1 > 0
-end
-local function flattenForTelemetry(t5: {[any]: any}) -- line: 120
-	local t6 = {}
+	local error_metadata = {}
 
-	for v25, v26 in t5 do
-		if type(v26) == "table" then
-			local n2 = 0
+	if type(value) == "table" then
+		setBoundedMetadata(error_metadata, "status_code", value.StatusCode) -- inferred equivalent call
+		setBoundedMetadata(error_metadata, "http_error", value.HttpError) -- inferred equivalent call
+		setBoundedMetadata(error_metadata, "is_cached", value.IsCached) -- inferred equivalent call
+		setBoundedMetadata(error_metadata, "is_prefetch", value.IsPrefetch) -- inferred equivalent call
 
-			for _ in v26 do
-				n2 += 1
+		if value.isJSONValid == false then
+			error_metadata.reason = "invalid_json"
+		end
+
+		local stats = value.Stats
+
+		if type(stats) == "table" then
+			local roundTripTime = tonumber(stats.RoundTripTime)
+
+			if roundTripTime then
+				setBoundedMetadata(error_metadata, "round_trip_milliseconds", roundTripTime * 1000) -- inferred equivalent call
 			end
 
-			if n2 == #v26 and n2 > 0 then
-				local t7 = {}
+			setBoundedMetadata(error_metadata, "was_request_retried", stats.WasRequestRetried) -- inferred equivalent call
+		end
 
-				for _, v31 in v26 do
-					table.insert(t7, (tostring(v31)))
+		setBoundedNumericHeaderMetadata(error_metadata, "retry_after_seconds", value.Headers, "Retry-After") -- inferred equivalent call
+
+		setBoundedNumericHeaderMetadata( -- inferred equivalent call
+			error_metadata,
+			"upstream_service_time_milliseconds",
+			value.Headers,
+			"x-envoy-upstream-service-time"
+		)
+
+		if next(error_metadata) == nil then
+			if type(value) == "table" then
+				local flag = true
+
+				for _, v4 in v do
+					v3 = value[v4]
+
+					if type(v3) == "string" then
+						flag = false
+						break
+					end
 				end
 
-				t6[v25] = "[" .. table.concat(t7, ", ") .. "]"
+				if flag then
+					v3 = nil
+				end
 			else
-				for v32, v33 in v26 do
-					t6[tostring(v32)] = tostring(v33)
-				end
+				v3 = nil
 			end
-		else
-			t6[v25] = tostring(v26)
+
+			error_metadata.reason = "unknown"
+		end
+
+		if type(value.Body) == "string" then
+			setBoundedMetadata(error_metadata, "body_size_bytes", #value.Body) -- inferred equivalent call
+		end
+
+		if p2 and p2.includeResponseBody and value.Body ~= nil then
+			local v4
+
+			if type(value.Body) == "string" then
+				v4 = value.Body
+			else
+				v4 = Dash.pretty(value.Body, { depth = 10 })
+			end
+
+			setBoundedMetadata(error_metadata, "response_body", v4) -- inferred equivalent call
 		end
 	end
 
-	return t6
-end
-
-local t8 = {
-	eventName = "DynamicAbuseReportEventV2",
-	description = "Event to track dynamic abuse report v2",
-	links = "https://github.rbx.com/Roblox/proto-schemas/pull/8782",
-	lastUpdated = {
-		2026,
-		5,
-		20
-	},
-	backends = {
-		"EventIngest",
-		"Points"
-	},
-	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportV2ThrottleHundredthsPercent", 0)
-}
-
-local function getCoreScriptVersion() -- line: 162
-	-- upvalues: RunService (copy)
-	if not game:GetEngineFeature("CoreScriptVersionEnabled") then
-		return nil
+	if next(error_metadata) == nil then
+		error_metadata.reason = "unknown"
 	end
 
-	local ok, result = pcall(function() -- line: 167
-		-- upvalues: RunService (copy)
-		return RunService:GetCoreScriptVersion()
-	end)
-
-	if ok then
-		return result
-	end
-
-	return nil
+	setBoundedMetadata(error_metadata, "runtime_message", v3) -- inferred equivalent call
+	return {
+		error_message = getBoundedUtf8String(p, 1000) or "Unknown error", -- inferred equivalent call
+		error_metadata = error_metadata
+	}
 end
 
-local v16
-
-if FFlagAbuseReportClientVersion then
-	if not game:GetEngineFeature("CoreScriptVersionEnabled") then
-		v16 = nil
-	else
-		local ok, result = pcall(function() -- line: 167
-			-- upvalues: RunService (copy)
-			return RunService:GetCoreScriptVersion()
-		end)
-
-		v16 = if not ok then nil else result
-	end
-else
-	v16 = nil
-end
-
-local v19 = v16
-
-return {
-	sendAnalyticsEvent = function(t9: {[any]: any}, t10: {[any]: any}) -- line: 176
-		-- upvalues: LocalPlayer (copy), FFlagAbuseReportClientVersion (copy), v19 (copy), FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), TelemetryService (copy), t8 (copy), flattenForTelemetry (copy)
-		local t11 = {
-			user_id = LocalPlayer and LocalPlayer.UserId or nil
-		}
-
-		if FFlagAbuseReportClientVersion then
-			t11.client_version = v19
-		end
-
-		if FFlagFixAnalyticsForDynamicReportV2 then
-			local v39 = Dash.join(t9, t10, t11)
-
-			TelemetryService:LogEvent(t8, {
-				customFields = flattenForTelemetry(v39),
-				eventContext = t9.abuse_vector
-			})
-
-			return
-		end
-
-		TelemetryService:LogEvent(Dash.join(t8, {
-			eventContext = t9.abuse_vector
-		}), {
-			customFields = Dash.join(t9, t10, t11)
-		})
-	end,
-	TelemetryEventType = t1,
-	LinkOpenedSource = t2,
-	SubmitSource = t3
-}
+return AnalyticsService

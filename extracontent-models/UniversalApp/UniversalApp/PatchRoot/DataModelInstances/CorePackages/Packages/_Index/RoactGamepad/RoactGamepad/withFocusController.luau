@@ -1,23 +1,24 @@
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
+local parent = script.Parent.Parent
+local Roact = require(parent.Roact)
+
 local FocusContext = require(script.Parent.FocusContext)
 
-local function FocusControllerConsumer(p1) -- line: 9
-	-- upvalues: Roact (copy), FocusContext (copy)
+local function FocusControllerConsumer(p)
 	return Roact.createElement(FocusContext.Consumer, {
-		render = function(p2) -- line: 11
-			-- upvalues: p1 (copy)
-			local v9 = if not p2 then nil else p2.focusNode.focusController
+		render = function(p2)
+			local v
 
-			return p1.render(v9)
+			if p2 then
+				v = p2.focusNode.focusController
+			end
+
+			return p.render(v)
 		end
 	})
 end
-local function withFocusController(p3) -- line: 24
-	-- upvalues: Roact (copy), FocusControllerConsumer (copy)
-	return Roact.createElement(FocusControllerConsumer, {
-		render = p3
-	})
+
+local function withFocusController(render)
+	return Roact.createElement(FocusControllerConsumer, { render = render })
 end
 
 return withFocusController

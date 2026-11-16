@@ -1,20 +1,14 @@
 require(script.Parent.types)
 
-local EngineFeature = game:GetEngineFeature("ExpChatLocalUserCountEnabled")
-local v2 = game:DefineFastFlag("ExpChatEnableVirtualLocalOnlineCommand", false)
+local engineFeature = game:GetEngineFeature("ExpChatLocalUserCountEnabled")
+local defineFastFlag = game:DefineFastFlag("ExpChatEnableVirtualLocalOnlineCommand", false)
 
 return {
 	name = script.Name,
-	alias = {
-		"/help",
-		"/?"
-	},
-	clientRun = function() -- line: 9
-		-- upvalues: EngineFeature (copy), v2 (copy)
-		if EngineFeature and v2 then
+	alias = { "/help", "/?" },
+	clientRun = function()
+		if engineFeature and defineFastFlag then
 			return {
-				metadata = "Roblox.Help.Info",
-				args = nil,
 				key = {
 					"CoreScripts.TextChat.Help.FirstLine",
 					"CoreScripts.TextChat.Clear.Help.Description",
@@ -23,13 +17,13 @@ return {
 					"InGame.UnknownNamespace.GameChat_ChatCommandsTeller_TeamCommand",
 					"InGame.UnknownNamespace.GameChat_ChatCommandsTeller_UnMuteCommand",
 					"InGame.UnknownNamespace.GameChat_ChatCommandsTeller_WhisperCommand"
-				}
+				},
+				metadata = "Roblox.Help.Info",
+				args = nil
 			}
 		end
 
 		return {
-			metadata = "Roblox.Help.Info",
-			args = nil,
 			key = {
 				"CoreScripts.TextChat.Help.FirstLine",
 				"InGame.UnknownNamespace.GameChat_ChatCommandsTeller_WhisperCommand",
@@ -37,7 +31,9 @@ return {
 				"InGame.UnknownNamespace.GameChat_ChatCommandsTeller_MuteCommand",
 				"InGame.UnknownNamespace.GameChat_ChatCommandsTeller_UnMuteCommand",
 				"CoreScripts.TextChat.Clear.Help.Description"
-			}
+			},
+			metadata = "Roblox.Help.Info",
+			args = nil
 		}
 	end
 }

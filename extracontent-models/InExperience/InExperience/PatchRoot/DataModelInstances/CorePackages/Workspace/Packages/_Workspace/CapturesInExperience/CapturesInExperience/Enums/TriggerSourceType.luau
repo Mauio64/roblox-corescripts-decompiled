@@ -1,5 +1,1 @@
-return {
-	PromptedSave = "PromptedSave",
-	PromptedShare = "PromptedShare",
-	UserSave = "UserSave"
-}
+return { PromptedSave = "PromptedSave", PromptedShare = "PromptedShare", UserSave = "UserSave" }

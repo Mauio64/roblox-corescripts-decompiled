@@ -1,0 +1,4 @@
+local fFlagBuildExperienceChatResourceAttachments = require("@game/CorePackages/Workspace/Packages/_Workspace/BuildExperience/SharedFlags").FFlagBuildExperienceChatResourceAttachments
+
+return game:DefineFastFlag("BuildExperienceDeveloperProductContext", false)
+	and fFlagBuildExperienceChatResourceAttachments

@@ -1,25 +1,22 @@
 local GameFilters = script:FindFirstAncestor("GameFilters")
-local SetGameFilters = require(GameFilters.DataStore.SetGameFilters)
-local GameFiltersParent = GameFilters.Parent
-local Cryo = require(GameFiltersParent.Cryo)
 
-require(GameFiltersParent.DiscoveryTypes)
+local SetGameFilters = require(GameFilters.DataStore.SetGameFilters)
+
+local parent = GameFilters.Parent
+local Cryo = require(parent.Cryo)
+require(parent.DiscoveryTypes)
 
 return {
 	key = "GameFiltersKey",
-	reducer = function(p1, p2) -- line: 11
-		-- upvalues: SetGameFilters (copy), Cryo (copy)
-		local v7 = p1 or {}
+	reducer = function(options, data)
+		local v = options or {}
 
-		if p2.type == SetGameFilters.name then
-			v7 = Cryo.Dictionary.join(v7, {
-				[p2.groupId] = {
-					allFilters = p2.filters,
-					updatedTimestamp = p2.updatedTimestamp
-				}
-			})
+		if data.type ~= SetGameFilters.name then
+			return v
 		end
 
-		return v7
+		return (Cryo.Dictionary.join(v, {
+			[data.groupId] = { allFilters = data.filters, updatedTimestamp = data.updatedTimestamp }
+		}))
 	end
 }

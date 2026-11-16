@@ -1,329 +1,575 @@
 local Markdown = script:FindFirstAncestor("Markdown")
-
 require(Markdown.Types)
 
 local Constants = require(script.Parent.Parent.Constants)
-local LISTS = Constants.LISTS
+local lists = Constants.LISTS
 local STYLED_TEXT = Constants.STYLED_TEXT
-local DIVIDERS = Constants.DIVIDERS
+local dividers = Constants.DIVIDERS
+
 local NodeType = require(Markdown.Enums.NodeType)
 local getNodeType = require(script.Parent.Parent.getNodeType)
 local isNodeBlock = require(script.Parent.Parent.isNodeBlock)
-local insert = table.insert
-local t1 = {}
+local MarkdownCore = require(Markdown.Parent.MarkdownCore)
+local Flags = MarkdownCore.Flags
 
-local function createTextNode(p1, p2) -- line: 23
-	-- upvalues: getNodeType (copy)
+local insert = table.insert
+
+local v = {
+	area = true,
+	base = true,
+	br = true,
+	col = true,
+	embed = true,
+	hr = true,
+	img = true,
+	input = true,
+	link = true,
+	meta = true,
+	source = true,
+	track = true,
+	wbr = true
+}
+
+local v2 = { Button = true }
+
+local v3 = {}
+
+local function createTextNode(item, p)
 	return {
 		name = "TEXT",
-		text = p1.text,
+		text = item.text,
 		children = {},
-		offset = p1.offset,
-		type = getNodeType("TEXT", p2)
+		offset = item.offset,
+		type = getNodeType("TEXT", p)
 	}
 end
 
-function t1.buildTree(t2: {[any]: any}, p3) -- line: 34
-	-- upvalues: NodeType (copy), getNodeType (copy), insert (copy), t1 (copy), STYLED_TEXT (copy), createTextNode (copy), LISTS (copy), isNodeBlock (copy), DIVIDERS (copy)
-	local t3 = {
-		name = "ROOT",
-		offset = 1,
-		children = {},
-		type = NodeType.Root
-	}
-	local t4 = { t3 }
-	local n1 = 1
+local function createHorizontalRuleNode(item, p, p2)
+	local v4
 
-	while n1 <= #t2 do
-		local v19 = t2[n1]
-		local v20 = t4[#t4]
+	if p.type == NodeType.Root then
+		v4 = true
+	elseif p.type == NodeType.Block then
+		v4 = p.name ~= "TABLE_ROW"
+	else
+		v4 = false
+	end
 
-		if v19.name == "CODE_BLOCK" and v19.capture then
-			local v21 = string.gsub(v19.capture[2], "^%s*(.-)%s*$", "%1")
+	local name = v4 and "DIVIDER" or "BREAK"
+	return { name = name, children = {}, offset = item.offset, type = getNodeType(name, p2) }
+end
 
-			insert(v20.children, {
+local function isLineStartAfter(item, flag: boolean)
+	if item.isBlock then
+		return true
+	end
+
+	if item.name ~= "TEXT" then
+		return false
+	end
+
+	local v4 = string.match(item.text, "\n([^\n]*)$")
+
+	if v4 then
+		return string.find(v4, "^[ \t]*$") ~= nil
+	end
+
+	return flag and string.find(item.text, "^[ \t]*$") ~= nil
+end
+
+local function isWellFormedOpenTag(text: string): boolean
+	local v4 = string.match(text, "^<%a[%w%-]*(.-)>$")
+
+	while v4 and string.find(v4, "%S") do
+		local v5 = string.match(v4, "^%s+[%a_:][%w_%.:%-]*(.*)$")
+
+		if not v5 then
+			return false
+		end
+
+		v4 = string.match(v5, "^%s*=%s*\"[^\"]*\"(.*)$")
+			or string.match(v5, "^%s*=%s*'[^']*'(.*)$")
+			or string.match(v5, "^%s*=%s*[^%s\"'=<>`]+(.*)$")
+			or v5
+	end
+
+	return v4 ~= nil
+end
+
+local function mayCloseLaterInStream(token, startsLine: boolean, p) -- 1 equivalent call inferred from this helper
+	local v4 = token.capture[1]
+
+	local v5 = not v2[v4]
+
+	if v5 then
+		if p.inlineTags[v4] == true or startsLine then
+			return isWellFormedOpenTag(token.text)
+		end
+
+		return startsLine
+	end
+
+	return v5
+end
+
+local function findUnpairedTags(items, p)
+	local unpairedTags = {}
+	local v4 = {}
+
+	local function closeOpenTagsFrom(p2: number) -- 4 equivalent calls inferred from this helper
+		for i = #v4, p2, -1 do
+			unpairedTags[v4[i].token] = true
+			v4[i] = nil
+		end
+	end
+
+	local v5 = true
+	local v6 = false
+	local v7 = 1
+
+	for _, item in items do
+		local lineStartAfter = isLineStartAfter(item, v5)
+		local startsLine
+
+		if item.isBlock then
+			if v6 then
+				startsLine = v5
+				v5 = lineStartAfter
+				closeOpenTagsFrom(v7) -- inferred equivalent call
+			else
+				startsLine = v5
+				v5 = lineStartAfter
+			end
+
+			for k, v8 in v4 do
+				if p.inlineTags[v8.tag] then
+					closeOpenTagsFrom(k) -- inferred equivalent call
+					break
+				end
+			end
+
+			v6 = item.name == "TABLE_ROW"
+
+			if v6 then
+				v7 = #v4 + 1
+			else
+				v7 = 1
+			end
+		elseif v6 and item.name == "TABLE_DIVIDER" then
+			startsLine = v5
+			v5 = lineStartAfter
+			closeOpenTagsFrom(v7) -- inferred equivalent call
+		else
+			startsLine = v5
+			v5 = lineStartAfter
+		end
+
+		if not item.capture then
+			continue
+		end
+
+		local tag = item.capture[1]
+
+		if item.name == "OPEN" and not v[tag] then
+			insert(v4, { token = item, tag = tag, startsLine = startsLine })
+		elseif item.name == "CLOSE" then
+			local v8 = nil
+
+			for i = #v4, v7, -1 do
+				if v4[i].tag == tag then
+					v8 = i
+					break
+				end
+			end
+
+			if v8 then
+				closeOpenTagsFrom(v8 + 1) -- inferred equivalent call
+				v4[v8] = nil
+			else
+				unpairedTags[item] = true
+			end
+		end
+	end
+
+	for _, v8 in v4 do
+		if p.isStreaming and mayCloseLaterInStream(v8.token, v8.startsLine, p) then -- inferred equivalent call
+			continue
+		end
+
+		unpairedTags[v8.token] = true
+	end
+
+	return unpairedTags
+end
+
+function v3.buildTree(list, p)
+	local v4 = not Flags.FFlagMarkdownTagFallbacks and {} or findUnpairedTags(list, p)
+	local tree = { name = "ROOT", children = {}, offset = 1, type = NodeType.Root }
+	local v5 = 1
+	local v6 = { tree }
+
+	while v5 <= #list do
+		local item = list[v5]
+		local v7 = v6[#v6]
+
+		if item.name == "CODE_BLOCK" and item.capture then
+			local text = string.gsub(item.capture[2], "^%s*(.-)%s*$", "%1")
+			insert(v7.children, {
 				name = "CODE_BLOCK",
-				text = v21,
+				text = text,
 				children = {},
-				attributes = {
-					language = v19.capture[1]
-				},
-				offset = v19.offset,
-				type = getNodeType("CODE_BLOCK", p3)
+				attributes = { language = item.capture[1] },
+				offset = item.offset,
+				type = getNodeType("CODE_BLOCK", p)
 			})
-		elseif v19.name == "EMPHASIS_START" then
-			local text = v19.text
-
-			insert(t4, {
+		elseif item.name == "EMPHASIS_START" then
+			insert(v6, {
 				name = "STYLED_TEXT",
-				attributes = {
-					style = text
-				},
+				attributes = { style = item.text },
 				children = {},
-				offset = v19.offset,
-				type = getNodeType("STYLED_TEXT", p3)
+				offset = item.offset,
+				type = getNodeType("STYLED_TEXT", p)
 			})
-		elseif v19.name == "EMPHASIS_END" then
-			t1.closeNode(t4, function(p4) -- line: 76
-				return p4.name == "STYLED_TEXT"
+		elseif item.name == "EMPHASIS_END" then
+			v3.closeNode(v6, function(p2): boolean
+				return p2.name == "STYLED_TEXT"
 			end)
-		elseif STYLED_TEXT[v19.name] then
-			insert(v20.children, (createTextNode(v19, p3)))
-		elseif LISTS[v19.name] and v19.capture then
-			t1.closeNode(t4, function(p5) -- line: 85
-				-- upvalues: isNodeBlock (copy)
-				return isNodeBlock(p5)
+		elseif
+			Flags.FFlagMarkdownTagFallbacks
+			and v4[item]
+			and item.name == "OPEN"
+			and item.capture
+			and v2[item.capture[1]]
+		then
+			local v8 = item.capture[2]
+			insert(v7.children, {
+				name = "TAG",
+				text = item.capture[1],
+				attributes = not v8 and {} or v3.parseXmlAttributes(v8),
+				children = {},
+				offset = item.offset,
+				type = NodeType.Block
+			})
+		elseif STYLED_TEXT[item.name] or Flags.FFlagMarkdownTagFallbacks and v4[item] then
+			insert(v7.children, createTextNode(item, p))
+		elseif lists[item.name] and item.capture then
+			v3.closeNode(v6, function(p2)
+				return isNodeBlock(p2)
 			end)
-			insert(t4, {
+
+			insert(v6, {
 				name = "LIST_ITEM",
 				children = {},
 				attributes = {
-					depth = #v19.capture[1],
-					prefix = v19.capture[2]
+					depth = #item.capture[1],
+					prefix = item.capture[2]
 				},
-				offset = v19.offset,
-				type = getNodeType("LIST_ITEM", p3)
+				offset = item.offset,
+				type = getNodeType("LIST_ITEM", p)
 			})
-		elseif v19.name == "HEADING" and not v19.isBlock then
-			if not t1.closeNode(t4, function(p6) -- line: 101
-				return p6.name == "HEADING"
+		elseif item.name == "HEADING" and not item.isBlock then
+			if not v3.closeNode(v6, function(p2): boolean
+				return p2.name == "HEADING"
 			end) then
-				insert(v20.children, (createTextNode(v19, p3)))
+				insert(v7.children, createTextNode(item, p))
 			end
-		elseif v19.isBlock then
-			t1.closeNode(t4, function(p7) -- line: 110
-				-- upvalues: isNodeBlock (copy)
-				return isNodeBlock(p7)
+		elseif item.isBlock then
+			v3.closeNode(v6, function(p2)
+				return isNodeBlock(p2)
 			end)
+			local v8
 
-			local v23 = if not DIVIDERS[v19.name] then t4 else t4[#t4].children
-			local t5 = {}
-
-			if v19.name == "HEADING" and v19.capture then
-				t5.depth = #v19.capture[1]
+			if dividers[item.name] then
+				v8 = v6[#v6].children
+			else
+				v8 = v6
 			end
 
-			insert(v23, {
-				name = v19.name,
+			local attributes = {}
+
+			if item.name == "HEADING" and item.capture then
+				attributes.depth = #item.capture[1]
+			end
+
+			insert(v8, {
+				name = item.name,
 				children = {},
-				attributes = t5,
-				offset = v19.offset,
-				type = getNodeType(v19.name, p3)
+				attributes = attributes,
+				offset = item.offset,
+				type = getNodeType(item.name, p)
 			})
-		elseif v19.name == "ESCAPE" and v19.capture then
-			insert(v20.children, {
+		elseif item.name == "ESCAPE" and item.capture then
+			insert(v7.children, {
 				name = "TEXT",
-				text = v19.capture[1],
-				offset = v19.offset,
+				text = item.capture[1],
+				offset = item.offset,
 				children = {},
-				type = getNodeType("TEXT", p3)
+				type = getNodeType("TEXT", p)
 			})
-		elseif v19.name == "LINK_START" and v19.capture then
-			insert(t4, {
+		elseif item.name == "LINK_START" and item.capture then
+			insert(v6, {
+				text = item.capture[1],
 				name = "LINK",
-				text = v19.capture[1],
-				attributes = {
-					url = v19.capture[2],
-					title = v19.capture[3]
-				},
+				attributes = { url = item.capture[2], title = item.capture[3] },
 				children = {},
-				offset = v19.offset,
-				type = getNodeType("LINK", p3)
+				offset = item.offset,
+				type = getNodeType("LINK", p)
 			})
-		elseif v19.name == "LINK_END" then
-			t1.closeNode(t4, function(p8) -- line: 153
-				return p8.name == "LINK"
+		elseif item.name == "LINK_END" then
+			v3.closeNode(v6, function(p2): boolean
+				return p2.name == "LINK"
 			end)
-		elseif v19.name == "IMAGE" and v19.capture then
-			insert(v20.children, {
-				name = v19.name,
-				text = v19.capture[1],
-				attributes = {
-					url = v19.capture[2],
-					title = v19.capture[3]
-				},
-				offset = v19.offset,
+		elseif item.name == "IMAGE" and item.capture then
+			insert(v7.children, {
+				name = item.name,
+				text = item.capture[1],
+				attributes = { url = item.capture[2], title = item.capture[3] },
+				offset = item.offset,
 				children = {},
-				type = getNodeType("IMAGE", p3)
+				type = getNodeType("IMAGE", p)
 			})
-		elseif v19.name == "OPEN_CLOSE" and v19.capture then
-			local v25 = v19.capture[1]
-			local v26 = v19.capture[2]
+		elseif item.name == "OPEN_CLOSE" and item.capture then
+			local text = item.capture[1]
+			local v8 = item.capture[2]
 
-			if v19.capture and v25 == "br" then
-				insert(v20.children, {
+			if item.capture and text == "br" then
+				insert(v7.children, {
 					name = "BREAK",
 					children = {},
-					offset = v19.offset,
-					type = getNodeType("BREAK", p3)
+					offset = item.offset,
+					type = getNodeType("BREAK", p)
 				})
+			elseif Flags.FFlagMarkdownTagFallbacks and text == "hr" then
+				insert(v7.children, createHorizontalRuleNode(item, v7, p))
 			else
-				insert(v20.children, {
+				local children = v7.children
+				local v9 = {
 					name = "TAG",
-					text = v25,
-					attributes = if not v26 then {} else t1.parseXmlAttributes(v26),
+					text = text,
+					attributes = not v8 and {} or v3.parseXmlAttributes(v8),
 					children = {},
-					offset = v19.offset,
-					type = if not p3.inlineTags[v25] then NodeType.Block else NodeType.InlineSpan
-				})
-			end
-		elseif v19.name == "OPEN" and v19.capture then
-			local v27 = v19.capture[1]
-			local v28 = v19.capture[2]
+					offset = item.offset,
+					type = 0
+				}
+				local v10
 
-			if v19.capture and v27 == "br" then
-				insert(v20.children, {
-					name = "BREAK",
-					children = {},
-					offset = v19.offset,
-					type = getNodeType("BREAK", p3)
-				})
-			else
-				insert(t4, {
-					name = "TAG",
-					text = v27,
-					attributes = if not v28 then {} else t1.parseXmlAttributes(v28),
-					children = {},
-					offset = v19.offset,
-					type = if not p3.inlineTags[v27] then NodeType.Block else NodeType.InlineSpan
-				})
-			end
-		elseif v19.name == "CLOSE" and v19.capture then
-			local v29 = v19.capture[1]
-
-			assert(t1.closeNode(t4, function(p9) -- line: 213
-				-- upvalues: v29 (copy), v19 (copy)
-				if p9.name == "TAG" then
-					assert(p9.text == v29, `Found <{ p9.text }> at { p9.offset } when trying to close </{ v29 }> at { v19.offset }`)
-
-					return true
+				if p.inlineTags[text] then
+					v10 = NodeType.InlineSpan
+				else
+					v10 = NodeType.Block
 				end
 
-				return false
-			end), `No open tag exists trying to close </{ v29 }> at { v19.offset }`)
-		elseif v20.name == "HEADING" then
-			local v30 = string.find(v19.text, "\n", 1, true)
-
-			if not v30 then
-				insert(v20.children, {
-					name = v19.name,
-					text = v19.text,
-					children = {},
-					offset = v19.offset,
-					type = getNodeType(v19.name, p3)
-				})
-				n1 += 1
-
-				continue
+				v9.type = v10
+				insert(children, v9)
 			end
+		elseif item.name == "OPEN" and item.capture then
+			local text = item.capture[1]
+			local v8 = item.capture[2]
 
-			local v31 = string.sub(v19.text, 1, v30 - 1)
-			local v32 = string.sub(v19.text, v30 + 1)
-
-			if string.find(v32, "%S") == nil then
-				insert(v20.children, {
-					name = v19.name,
-					text = v19.text,
+			if item.capture and text == "br" then
+				insert(v7.children, {
+					name = "BREAK",
 					children = {},
-					offset = v19.offset,
-					type = getNodeType(v19.name, p3)
+					offset = item.offset,
+					type = getNodeType("BREAK", p)
 				})
-				n1 += 1
-
-				continue
-			end
-
-			insert(v20.children, {
-				name = v19.name,
-				text = v31,
-				children = {},
-				offset = v19.offset,
-				type = getNodeType(v19.name, p3)
-			})
-			t1.closeNode(t4, function(p10) -- line: 264
-				return p10.name == "HEADING"
-			end)
-			insert(t4, {
-				name = "PARAGRAPH",
-				children = {{
-					name = "TEXT",
-					text = v32,
+			elseif Flags.FFlagMarkdownTagFallbacks and text == "hr" then
+				insert(v7.children, createHorizontalRuleNode(item, v7, p))
+			elseif Flags.FFlagMarkdownTagFallbacks and v[text] then
+				local children = v7.children
+				local v9 = {
+					name = "TAG",
+					text = text,
+					attributes = not v8 and {} or v3.parseXmlAttributes(v8),
 					children = {},
-					offset = v19.offset + v30 + 1,
-					type = getNodeType("TEXT", p3)
-				}},
-				offset = v19.offset,
-				type = getNodeType("PARAGRAPH", p3)
-			})
+					offset = item.offset,
+					type = 0
+				}
+				local v10
+
+				if p.inlineTags[text] then
+					v10 = NodeType.InlineSpan
+				else
+					v10 = NodeType.Block
+				end
+
+				v9.type = v10
+				insert(children, v9)
+			else
+				local v9 = {
+					name = "TAG",
+					text = text,
+					attributes = not v8 and {} or v3.parseXmlAttributes(v8),
+					children = {},
+					offset = item.offset,
+					type = 0
+				}
+				local v10
+
+				if p.inlineTags[text] then
+					v10 = NodeType.InlineSpan
+				else
+					v10 = NodeType.Block
+				end
+
+				v9.type = v10
+				insert(v6, v9)
+			end
+		elseif Flags.FFlagMarkdownTagFallbacks and item.name == "CLOSE" and item.capture then
+			local v8 = item.capture[1]
+
+			if not v3.closeNode(v6, function(p2): boolean
+				return p2.name == "TAG" and p2.text == v8
+			end) then
+				insert(v7.children, createTextNode(item, p))
+			end
+		elseif item.name == "CLOSE" and item.capture then
+			local v8 = item.capture[1]
+
+			assert(v3.closeNode(v6, function(data): boolean
+				if data.name ~= "TAG" then
+					return false
+				end
+
+				assert(
+					data.text == v8,
+					`Found <{data.text}> at {data.offset} when trying to close </{v8}> at {item.offset}`
+				)
+
+				return true
+			end), `No open tag exists trying to close </{v8}> at {item.offset}`)
+		elseif v7.name == "HEADING" then
+			local v8 = string.find(item.text, "\n", 1, true)
+
+			if v8 then
+				local text = string.sub(item.text, 1, v8 - 1)
+				local text2 = string.sub(item.text, v8 + 1)
+
+				if string.find(text2, "%S") == nil then
+					insert(v7.children, {
+						name = item.name,
+						text = item.text,
+						children = {},
+						offset = item.offset,
+						type = getNodeType(item.name, p)
+					})
+				else
+					insert(v7.children, {
+						name = item.name,
+						text = text,
+						children = {},
+						offset = item.offset,
+						type = getNodeType(item.name, p)
+					})
+
+					v3.closeNode(v6, function(p2): boolean
+						return p2.name == "HEADING"
+					end)
+
+					insert(v6, {
+						name = "PARAGRAPH",
+						children = {
+							{
+								name = "TEXT",
+								text = text2,
+								children = {},
+								offset = item.offset + v8 + 1,
+								type = getNodeType("TEXT", p)
+							}
+						},
+						offset = item.offset,
+						type = getNodeType("PARAGRAPH", p)
+					})
+				end
+			else
+				insert(v7.children, {
+					name = item.name,
+					text = item.text,
+					children = {},
+					offset = item.offset,
+					type = getNodeType(item.name, p)
+				})
+			end
 		else
-			insert(v20.children, {
-				name = v19.name,
-				text = v19.text,
+			insert(v7.children, {
+				name = item.name,
+				text = item.text,
 				children = {},
-				offset = v19.offset,
-				type = getNodeType(v19.name, p3)
+				offset = item.offset,
+				type = getNodeType(item.name, p)
 			})
 		end
 
-		n1 += 1
+		v5 += 1
 	end
 
-	t1.closeNode(t4, function(p11) -- line: 294
-		-- upvalues: isNodeBlock (copy)
-		return isNodeBlock(p11)
-	end)
-	t1.closeNode(t4, function(p12) -- line: 298
-		return p12.name == "ROOT"
+	v3.closeNode(v6, function(p2)
+		return isNodeBlock(p2)
 	end)
 
-	return t3
+	v3.closeNode(v6, function(p2): boolean
+		return p2.name == "ROOT"
+	end)
+
+	return tree
 end
-function t1.closeNode(t6: {[any]: any}, p13) -- line: 305
-	-- upvalues: t1 (copy), insert (copy)
-	local v35 = t1.findLastNodeIndex(t6, p13)
 
-	if v35 then
-		local v36 = t6[v35]
+function v3.closeNode(list, p)
+	local lastNodeIndex = v3.findLastNodeIndex(list, p)
 
-		for i = v35 + 1, #t6 do
-			insert(v36.children, t6[i])
-		end
-
-		for _ = v35 + 1, #t6 do
-			table.remove(t6)
-		end
-
-		local v39 = t6[v35 - 1]
-
-		if v39 then
-			table.remove(t6)
-			insert(v39.children, v36)
-		end
-
-		return v36
+	if not lastNodeIndex then
+		return nil
 	end
 
-	return nil
-end
-function t1.findLastNodeIndex(t7: {[any]: any}, p14) -- line: 332
-	for i = #t7, 1, -1 do
-		local v43 = t7[i]
+	local item = list[lastNodeIndex]
 
-		if if typeof(p14) ~= "string" then p14(v43) else p14 == v43.name then
+	for i = lastNodeIndex + 1, #list do
+		insert(item.children, list[i])
+	end
+
+	for _ = lastNodeIndex + 1, #list do
+		table.remove(list)
+	end
+
+	local item2 = list[lastNodeIndex - 1]
+
+	if item2 then
+		table.remove(list)
+		insert(item2.children, item)
+	end
+
+	return item
+end
+
+function v3.findLastNodeIndex(list, value)
+	for i = #list, 1, -1 do
+		local item = list[i]
+		local v4
+
+		if typeof(value) == "string" then
+			v4 = item.name == value
+		else
+			v4 = value(item)
+		end
+
+		if v4 then
 			return i
 		end
 	end
 
 	return nil
 end
-function t1.parseXmlAttributes(s1: string) -- line: 344
-	local t8 = {}
 
-	for match, v47 in (s1:gmatch("%s*([A-Za-z0-9_-]+)=\"([^\"]+)\"%s*")) do
-		t8[match] = v47
+function v3.parseXmlAttributes(value: string)
+	local v4 = value:gmatch("%s*([A-Za-z0-9_-]+)=\"([^\"]+)\"%s*")
+
+	local xmlAttributes = {}
+
+	for k, v5 in v4 do
+		xmlAttributes[k] = v5
 	end
 
-	return t8
+	return xmlAttributes
 end
 
-return t1.buildTree
+return v3.buildTree

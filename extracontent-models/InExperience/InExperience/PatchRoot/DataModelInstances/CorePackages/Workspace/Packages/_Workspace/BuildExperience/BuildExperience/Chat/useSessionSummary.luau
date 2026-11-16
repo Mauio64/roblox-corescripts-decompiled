@@ -1,33 +1,24 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-require(Parent.DataHydration.CreatorAgentChat)
+require(parent.DataHydration.CreatorAgentChat)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
 
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
 local parseSessionStream = require(script.Parent.parseSessionStream)
 
-local function useSessionSummary(p1) -- line: 24
-	-- upvalues: React (copy), SignalsReact (copy), parseSessionStream (copy)
-	local v7 = React.useCallback(function(p2) -- line: 25
-		-- upvalues: p1 (copy)
-		return p1.getMergedHistory(p2)
-	end, { p1 })
-	local v8 = SignalsReact.useSignalState(v7)
-
-	return React.useMemo(function() -- line: 29
-		-- upvalues: parseSessionStream (copy), v8 (copy), p1 (copy)
-		local v10 = parseSessionStream(v8, {
-			sessionId = p1.getCasSessionId()
-		})
+local function useSessionSummary(p)
+	local v = React.useCallback(function(p2)
+		return p.getMergedHistory(p2)
+	end, { p })
+	local v2 = SignalsReact.useSignalState(v)
+	return React.useMemo(function()
+		local v3 = parseSessionStream(v2, { sessionId = p.getCasSessionId() })
 
 		return {
-			subagentTaskState = v10.subagentTaskState,
-			hasPublishedTurn = v10.includesPublishTool
+			subagentTaskState = v3.subagentTaskState,
+			hasPublishedTurn = v3.includesPublishTool
 		}
-	end, {
-		v8,
-		p1
-	})
+	end, { v2, p })
 end
 
 return useSessionSummary

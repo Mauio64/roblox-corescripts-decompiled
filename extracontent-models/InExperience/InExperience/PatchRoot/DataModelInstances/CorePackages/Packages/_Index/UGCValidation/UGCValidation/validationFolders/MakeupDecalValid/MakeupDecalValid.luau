@@ -1,29 +1,26 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local ConstantsInterface = require(ParentParent.ConstantsInterface)
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local createEditableInstancesForContext = require(ParentParent.util.createEditableInstancesForContext)
-local getFFlagUGCValidateMigrateWrapAndMakeup = require(ParentParent.flags.getFFlagUGCValidateMigrateWrapAndMakeup)
-local getFFlagUGCValidateDecalTextureLimits = require(ParentParent.flags.getFFlagUGCValidateDecalTextureLimits)
-local v10 = game:DefineFastInt("ValidateMakeupZoneIncludeToleranceHundredthsPercent", 100)
-local v11 = game:DefineFastInt("ValidateMakeupZoneExcludeHundredthsPercent", 200)
-local t1 = {
-	Publish = true,
-	Backend = true,
-	Internal = true,
-	InExpServer = true
-}
-local t2 = {
-	InExpServer = true,
-	InExpClient = true
-}
-local t3 = {
-	fflag = getFFlagUGCValidateMigrateWrapAndMakeup,
+local Constants = require(parent.Constants)
+local ConstantsInterface = require(parent.ConstantsInterface)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local createEditableInstancesForContext = require(parent.util.createEditableInstancesForContext)
+
+local getFFlagUGCValidateDecalTextureLimits = require(parent.flags.getFFlagUGCValidateDecalTextureLimits)
+local getFFlagUGCValidationAllowFullVaas = require(parent.flags.getFFlagUGCValidationAllowFullVaas)
+
+local defineFastInt = game:DefineFastInt("ValidateMakeupZoneIncludeToleranceHundredthsPercent", 100)
+
+local defineFastInt2 = game:DefineFastInt("ValidateMakeupZoneExcludeHundredthsPercent", 200)
+
+local v = { Publish = true, Backend = true, Internal = true, InExpServer = true }
+
+local v2 = { InExpServer = true, InExpClient = true }
+
+local MakeupDecalValid = {
 	categories = { ValidationEnums.UploadCategory.MAKEUP },
 	requiredData = {
 		ValidationEnums.SharedDataMember.rootInstance,
@@ -33,188 +30,206 @@ local t3 = {
 	expectedFailures = {}
 }
 
-local function validateTextureSize(p1, p2, s1: string, s2: string, n1: number, b1: boolean) -- line: 52
-	-- upvalues: UGCValidationService (copy), ErrorSourceStrings (copy)
-	local ok, result = pcall(function() -- line: 60
-		-- upvalues: UGCValidationService (copy), p2 (copy)
-		return UGCValidationService:GetEditableImageSize(p2)
+local function validateTextureSize(object, instance, fullName: string, fieldName: string, p: number, flag: boolean)
+	local success, result = pcall(function()
+		return UGCValidationService:GetEditableImageSize(instance)
 	end)
 
-	if not ok then
-		if b1 then
-			p1:forceError(string.format("Failed to load texture data for '%s'. Make sure the texture exists and try again.", s1))
+	if success then
+		if p < result.X or p < result.Y then
+			object:fail(ErrorSourceStrings.Keys.MakeupDecal_TextureTooBig, {
+				sizeX = tostring(result.X),
+				sizeY = tostring(result.Y),
+				fullName = fullName,
+				maxSize = tostring(p),
+				fieldName = fieldName
+			})
+		end
+	else
+		if flag then
+			object:forceError(string.format(
+				"Failed to load texture data for '%s'. Make sure the texture exists and try again.",
+				fullName
+			))
 		end
 
-		p1:fail(ErrorSourceStrings.Keys.MakeupDecal_FailedToLoadTextureData, {
-			fullName = s1
-		})
-
-		return
-	end
-
-	if n1 < result.X or n1 < result.Y then
-		p1:fail(ErrorSourceStrings.Keys.MakeupDecal_TextureTooBig, {
-			sizeX = tostring(result.X),
-			sizeY = tostring(result.Y),
-			fullName = s1,
-			maxSize = tostring(n1),
-			fieldName = s2
-		})
-	end
-end
-local function validateCoverageOutsideIncludeBounds(p3, p4, p5, vector2: Vector2, vector2_2: Vector2, p6, s3: string) -- line: 91
-	-- upvalues: v10 (copy), ErrorSourceStrings (copy)
-	local v34 = (vector2_2.X - vector2.X) * (vector2_2.Y - vector2.Y) * v10 / 10000 * 255
-	local n2 = 0
-	local v36 = p5:ReadPixelsBuffer(Vector2.new(0, 0), p5.Size)
-	local n3 = 0
-	local v38 = p5.Size.Y - 1
-
-	for i = 0, buffer.len(v36) - 1, 4 do
-		if n3 == p5.Size.X then
-			n3 = 0
-			v38 -= 1
-		end
-
-		local v40 = buffer.readu8(v36, i + 3)
-
-		if v40 > 0 and (n3 < vector2.X or v38 < vector2.Y or n3 > vector2_2.X or v38 > vector2_2.Y) then
-			n2 += v40
-		end
-
-		n3 += 1
-	end
-
-	if v34 < n2 then
-		p3:fail(ErrorSourceStrings.Keys.MakeupDecal_UVZoneIncludeViolation, {
-			instanceName = p4.Name,
-			minBound = tostring(p6.MinBound),
-			maxBound = tostring(p6.MaxBound),
-			assetTypeName = s3
+		object:fail(ErrorSourceStrings.Keys.MakeupDecal_FailedToLoadTextureData, {
+			fullName = fullName
 		})
 	end
 end
-local function validateCoverageInsideExcludeBounds(p7, p8, p9, vector2: Vector2, vector2_3: Vector2, p10, s4: string) -- line: 137
-	-- upvalues: v11 (copy), ErrorSourceStrings (copy)
-	local v48 = (vector2_3.X - vector2.X) * (vector2_3.Y - vector2.Y) * v11 / 10000 * 255
-	local n4 = 0
-	local v50 = p9:ReadPixelsBuffer(Vector2.new(0, 0), p9.Size)
-	local n5 = 0
-	local v52 = p9.Size.Y - 1
 
-	for i = 0, buffer.len(v50) - 1, 4 do
-		if n5 == p9.Size.X then
-			n5 = 0
-			v52 -= 1
+local function validateCoverageOutsideIncludeBounds(object, p, object2, vector2: Vector2, vector2_2: Vector2, item, assetTypeName: string)
+	local v3 = (vector2_2.X - vector2.X) * (vector2_2.Y - vector2.Y) * defineFastInt / 10000 * 255
+
+	local pixelsBuffer = object2:ReadPixelsBuffer(Vector2.new(0, 0), object2.Size)
+
+	local v4 = object2.Size.Y - 1
+	local count = 0
+	local total = 0
+
+	for i = 0, buffer.len(pixelsBuffer) - 1, 4 do
+		if count == object2.Size.X then
+			v4 -= 1
+			count = 0
 		end
 
-		local v54 = buffer.readu8(v50, i + 3)
+		local v5 = buffer.readu8(pixelsBuffer, i + 3)
 
-		if v54 > 0 and n5 > vector2.X and v52 > vector2.Y and n5 < vector2_3.X and v52 < vector2_3.Y then
-			n4 += v54
+		if v5 > 0 and (count < vector2.X or v4 < vector2.Y or vector2_2.X < count or vector2_2.Y < v4) then
+			total += v5
 		end
 
-		n5 += 1
+		count += 1
 	end
 
-	if v48 < n4 then
-		p7:fail(ErrorSourceStrings.Keys.MakeupDecal_UVZoneExcludeViolation, {
-			instanceName = p8.Name,
-			minBound = tostring(p10.MinBound),
-			maxBound = tostring(p10.MaxBound),
-			assetTypeName = s4
+	if v3 < total then
+		object:fail(ErrorSourceStrings.Keys.MakeupDecal_UVZoneIncludeViolation, {
+			instanceName = p.Name,
+			minBound = tostring(item.MinBound),
+			maxBound = tostring(item.MaxBound),
+			assetTypeName = assetTypeName
 		})
 	end
 end
-local function validateUVZones(p11, p12, p13, p14, p15, s5: string) -- line: 183
-	-- upvalues: validateCoverageOutsideIncludeBounds (copy), validateCoverageInsideExcludeBounds (copy)
-	local v61 = p14.UVMaxBound - p14.UVMinBound
 
-	for _, v63 in p15 do
-		local v64 = (v63.MinBound - p14.UVMinBound) / v61
-		local v65 = (v63.MaxBound - p14.UVMinBound) / v61
-		local v66 = v64 * p13.Size
-		local v67 = v65 * p13.Size
+local function validateCoverageInsideExcludeBounds(object, p, object2, vector2: Vector2, vector2_2: Vector2, item, assetTypeName: string)
+	local v3 = (vector2_2.X - vector2.X) * (vector2_2.Y - vector2.Y) * defineFastInt2 / 10000 * 255
 
-		if v63.isIncludeBound then
-			validateCoverageOutsideIncludeBounds(p11, p12, p13, v66, v67, v63, s5)
+	local pixelsBuffer = object2:ReadPixelsBuffer(Vector2.new(0, 0), object2.Size)
+
+	local v4 = object2.Size.Y - 1
+	local count = 0
+	local total = 0
+
+	for i = 0, buffer.len(pixelsBuffer) - 1, 4 do
+		if count == object2.Size.X then
+			v4 -= 1
+			count = 0
+		end
+
+		local v5 = buffer.readu8(pixelsBuffer, i + 3)
+
+		if v5 > 0 and vector2.X < count and vector2.Y < v4 and count < vector2_2.X and v4 < vector2_2.Y then
+			total += v5
+		end
+
+		count += 1
+	end
+
+	if v3 < total then
+		object:fail(ErrorSourceStrings.Keys.MakeupDecal_UVZoneExcludeViolation, {
+			instanceName = p.Name,
+			minBound = tostring(item.MinBound),
+			maxBound = tostring(item.MaxBound),
+			assetTypeName = assetTypeName
+		})
+	end
+end
+
+local function validateUVZones(object, rootInstance, p, wrapTextureTransfer, assetUVBound, name: string)
+	local v3 = wrapTextureTransfer.UVMaxBound - wrapTextureTransfer.UVMinBound
+
+	for _, item in assetUVBound do
+		local v4 = (item.MinBound - wrapTextureTransfer.UVMinBound) / v3
+		local v5 = (item.MaxBound - wrapTextureTransfer.UVMinBound) / v3
+
+		local v6 = v4 * p.Size
+		local v7 = v5 * p.Size
+
+		if item.isIncludeBound then
+			validateCoverageOutsideIncludeBounds(object, rootInstance, p, v6, v7, item, name)
 		else
-			validateCoverageInsideExcludeBounds(p11, p12, p13, v66, v67, v63, s5)
+			validateCoverageInsideExcludeBounds(object, rootInstance, p, v6, v7, item, name)
 		end
 	end
 end
 
-function t3.run(p16, p17) -- line: 224
-	-- upvalues: t1 (copy), t2 (copy), Constants (copy), createEditableInstancesForContext (copy), ErrorSourceStrings (copy), getFFlagUGCValidateDecalTextureLimits (copy), ConstantsInterface (copy), validateTextureSize (copy), validateUVZones (copy)
-	local rootInstance = p17.rootInstance
-	local assetType = p17.uploadEnum.assetType
-	local v72 = t1[p17.consumerConfig.source] == true
-	local WrapTextureTransfer = rootInstance:FindFirstChildOfClass("WrapTextureTransfer")
+function MakeupDecalValid.run(object, data)
+	local rootInstance = data.rootInstance
+	local assetType = data.uploadEnum.assetType
+	local consumerConfig = data.consumerConfig
+	local v3
 
-	if WrapTextureTransfer == nil then
+	if getFFlagUGCValidationAllowFullVaas() and consumerConfig.isVaaS then
+		v3 = consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend
+	else
+		v3 = v[consumerConfig.source] == true
+	end
+
+	local wrapTextureTransfer = rootInstance:FindFirstChildOfClass("WrapTextureTransfer")
+
+	if wrapTextureTransfer == nil then
 		error(string.format("WrapTextureTransfer child not found for %s", rootInstance.Name))
 	end
 
-	p16:setReportingInstance(rootInstance)
+	object:setReportingInstance(rootInstance)
 
-	local preloadedEditableImages = p17.consumerConfig.preloadedEditableImages
-	local v75 = t2[p17.consumerConfig.source] == true
-	local Decal = Constants.TEXTURE_CONTENT_ID_FIELDS.Decal
+	local preloadedEditableImages = data.consumerConfig.preloadedEditableImages
 
-	if not Decal then
+	local v4 = v2[consumerConfig.source] == true
+
+	local decal = Constants.TEXTURE_CONTENT_ID_FIELDS.Decal
+
+	if not decal then
 		error("No texture content ID fields defined for Decal class")
 	end
 
-	local v77 = nil
+	local v5 = nil
 
-	for _, v79 in Decal do
-		local v80 = rootInstance[v79 .. "Content"]
+	for _, fieldName in decal do
+		local v6 = rootInstance[fieldName .. "Content"]
 
-		if v80 and v80.Uri ~= nil and v80.Uri ~= "" or v75 and v80 and v80.Object then
-			local v81, v82 = createEditableInstancesForContext.getEditableInstanceInfo(v80, preloadedEditableImages, "EditableImage", v75)
+		if not (v6 and v6.Uri ~= nil and v6.Uri ~= "" or v4 and v6 and v6.Object) then
+			continue
+		end
 
-			if not v81 or not v82 or not v82.instance then
-				if v72 then
-					p16:forceError(string.format("Failed to load %s for Decal %s", v79, rootInstance.Name))
-				end
+		local editableInstanceInfo, v7 = createEditableInstancesForContext.getEditableInstanceInfo(
+			v6,
+			preloadedEditableImages,
+			"EditableImage",
+			v4
+		)
 
-				p16:fail(ErrorSourceStrings.Keys.MakeupDecal_FailedToLoadTexture, {
-					fieldName = v79,
-					instanceName = rootInstance.Name
-				})
-			else
-				local instance = v82.instance
+		if editableInstanceInfo and v7 and v7.instance then
+			local instance = v7.instance
 
-				if v79 == "ColorMap" then
-					v77 = instance
-				end
-
-				local MAX_TEXTURE_SIZE = Constants.MAX_TEXTURE_SIZE
-
-				if getFFlagUGCValidateDecalTextureLimits() and assetType then
-					MAX_TEXTURE_SIZE = ConstantsInterface.getTextureLimit(assetType, rootInstance, v79)
-				end
-
-				local v85 = rootInstance:GetFullName() .. "." .. v79
-
-				validateTextureSize(p16, instance, v85, v79, MAX_TEXTURE_SIZE, v72)
+			if fieldName == "ColorMap" then
+				v5 = instance
 			end
+
+			local v8 = Constants.MAX_TEXTURE_SIZE
+
+			if getFFlagUGCValidateDecalTextureLimits() and assetType then
+				v8 = ConstantsInterface.getTextureLimit(assetType, rootInstance, fieldName)
+			end
+
+			validateTextureSize(object, instance, rootInstance:GetFullName() .. "." .. fieldName, fieldName, v8, v3)
+		else
+			if v3 then
+				object:forceError(string.format("Failed to load %s for Decal %s", fieldName, rootInstance.Name))
+			end
+
+			object:fail(ErrorSourceStrings.Keys.MakeupDecal_FailedToLoadTexture, {
+				fieldName = fieldName,
+				instanceName = rootInstance.Name
+			})
 		end
 	end
 
-	if not v77 then
-		p16:fail(ErrorSourceStrings.Keys.MakeupDecal_NoColorMap, {
+	if not v5 then
+		object:fail(ErrorSourceStrings.Keys.MakeupDecal_NoColorMap, {
 			instanceName = rootInstance.Name
 		})
 
 		return
 	end
 
-	local v86 = Constants.MAKEUP_INFO.AssetUVBounds[assetType]
+	local assetUVBound = Constants.MAKEUP_INFO.AssetUVBounds[assetType]
 
-	if v86 then
-		validateUVZones(p16, rootInstance, v77, WrapTextureTransfer, v86, assetType.Name)
+	if assetUVBound then
+		validateUVZones(object, rootInstance, v5, wrapTextureTransfer, assetUVBound, assetType.Name)
 	end
 end
 
-return t3
+return MakeupDecalValid

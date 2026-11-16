@@ -1,12 +1,13 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ExtraKeysEnum = require(ParentParent.Enums.ExtraKeysEnum)
-local TouchControlsEnum = require(ParentParent.Enums.TouchControlsEnum)
-
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local ExtraKeysEnum = require(parent.Enums.ExtraKeysEnum)
+local TouchControlsEnum = require(parent.Enums.TouchControlsEnum)
 require(script.Parent.ConfigTypes)
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local FFlagHelpPageCCL = require(parent.Flags.FFlagHelpPageCCL)
 
-local FFlagEnableConsoleExpControls = require(ParentParentParent.SharedFlags).FFlagEnableConsoleExpControls
-local t1 = {
+local controlGroups = {
 	CharacterMovement = {
 		layoutOrder = 1,
 		label = "CoreScripts.InGameMenu.Controls.CharacterMovementTitle",
@@ -18,12 +19,12 @@ local t1 = {
 		id = "Accessories"
 	},
 	Misc = {
-		layoutOrder = 3,
+		layoutOrder = FFlagHelpPageCCL and 4 or 3,
 		label = "CoreScripts.InGameMenu.Controls.MiscellaneousTitle",
 		id = "Misc"
 	},
 	CameraMovement = {
-		layoutOrder = 4,
+		layoutOrder = FFlagHelpPageCCL and 3 or 4,
 		label = "CoreScripts.InGameMenu.Controls.CameraMovementTitle",
 		id = "CameraMovement"
 	},
@@ -33,49 +34,50 @@ local t1 = {
 		id = "MenuItems"
 	}
 }
-local t2 = {
+
+local controls = {
 	MoveForward = {
 		label = "CoreScripts.InGameMenu.Controls.MoveForward",
 		keyboardInput = {
-			layoutOrder = 1,
 			input = {
 				{ Enum.KeyCode.W },
 				{ Enum.KeyCode.Up }
 			},
-			group = t1.CharacterMovement
+			group = controlGroups.CharacterMovement,
+			layoutOrder = 1
 		}
 	},
 	MoveBackward = {
 		label = "CoreScripts.InGameMenu.Controls.MoveBackward",
 		keyboardInput = {
-			layoutOrder = 2,
 			input = {
 				{ Enum.KeyCode.S },
 				{ Enum.KeyCode.Down }
 			},
-			group = t1.CharacterMovement
+			group = controlGroups.CharacterMovement,
+			layoutOrder = 2
 		}
 	},
 	MoveLeft = {
 		label = "CoreScripts.InGameMenu.Controls.MoveLeft",
 		keyboardInput = {
-			layoutOrder = 3,
 			input = {
 				{ Enum.KeyCode.A },
 				{ Enum.KeyCode.Left }
 			},
-			group = t1.CharacterMovement
+			group = controlGroups.CharacterMovement,
+			layoutOrder = 3
 		}
 	},
 	MoveRight = {
 		label = "CoreScripts.InGameMenu.Controls.MoveRight",
 		keyboardInput = {
-			layoutOrder = 4,
 			input = {
 				{ Enum.KeyCode.D },
 				{ Enum.KeyCode.Right }
 			},
-			group = t1.CharacterMovement
+			group = controlGroups.CharacterMovement,
+			layoutOrder = 4
 		}
 	},
 	Move = {
@@ -91,9 +93,11 @@ local t2 = {
 	Jump = {
 		label = "CoreScripts.InGameMenu.Controls.Jump",
 		keyboardInput = {
-			layoutOrder = 5,
-			input = {{ Enum.KeyCode.Space }},
-			group = t1.CharacterMovement
+			input = {
+				{ Enum.KeyCode.Space }
+			},
+			group = controlGroups.CharacterMovement,
+			layoutOrder = 5
 		},
 		gamepadInput = {
 			input = { Enum.KeyCode.ButtonA }
@@ -106,9 +110,11 @@ local t2 = {
 	EquipUnequipTool = {
 		label = "CoreScripts.InGameMenu.Controls.EquipUnequipTools",
 		keyboardInput = {
-			layoutOrder = 1,
-			input = {{ ExtraKeysEnum.NumSequence }},
-			group = t1.Accessories
+			input = {
+				{ ExtraKeysEnum.NumSequence }
+			},
+			group = controlGroups.Accessories,
+			layoutOrder = 1
 		},
 		touchInput = {
 			thumbstickInput = { TouchControlsEnum.BottomMid },
@@ -118,17 +124,21 @@ local t2 = {
 	DropTool = {
 		label = "CoreScripts.InGameMenu.Controls.DropTool",
 		keyboardInput = {
-			layoutOrder = 2,
-			input = {{ Enum.KeyCode.Backspace }},
-			group = t1.Accessories
+			input = {
+				{ Enum.KeyCode.Backspace }
+			},
+			group = controlGroups.Accessories,
+			layoutOrder = 2
 		}
 	},
 	UseTool = {
 		label = "CoreScripts.InGameMenu.Controls.UseTool",
 		keyboardInput = {
-			layoutOrder = 3,
-			input = {{ Enum.KeyCode.MouseLeftButton }},
-			group = t1.Accessories
+			input = {
+				{ Enum.KeyCode.MouseLeftButton }
+			},
+			group = controlGroups.Accessories,
+			layoutOrder = 3
 		},
 		gamepadInput = {
 			xboxInput = { Enum.KeyCode.ButtonR2 },
@@ -142,122 +152,115 @@ local t2 = {
 	SwitchTool = {
 		label = "CoreScripts.InGameMenu.Controls.SwitchToolGamepad",
 		gamepadInput = {
-			xboxInput = {
-				Enum.KeyCode.ButtonL1,
-				Enum.KeyCode.ButtonR1
-			},
-			playstationInput = {
-				Enum.KeyCode.ButtonL1,
-				Enum.KeyCode.ButtonR1
-			}
+			xboxInput = { Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1 },
+			playstationInput = { Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1 }
 		}
 	},
 	UISelectionToggle = {
 		label = "CoreScripts.InGameMenu.Controls.GameMenuToggleGamepad",
 		keyboardInput = {
-			layoutOrder = 1,
-			input = {{ Enum.KeyCode.BackSlash }},
-			group = t1.Misc
+			input = {
+				{ Enum.KeyCode.BackSlash }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 1
 		}
 	},
 	Screenshot = {
 		label = "CoreScripts.InGameMenu.Controls.Screenshot",
 		keyboardInput = {
-			layoutOrder = 2,
-			macInput = {{
-				Enum.KeyCode.RightAlt,
-				Enum.KeyCode.One
-			}},
-			winInput = {{
-				Enum.KeyCode.LeftAlt,
-				Enum.KeyCode.One
-			}},
-			group = t1.Misc
+			macInput = {
+				{ Enum.KeyCode.RightAlt, Enum.KeyCode.One }
+			},
+			winInput = {
+				{ Enum.KeyCode.LeftAlt, Enum.KeyCode.One }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 2
 		}
 	},
 	RecordVideo = {
 		label = "CoreScripts.InGameMenu.Controls.RecordVideo",
 		keyboardInput = {
-			layoutOrder = 3,
-			winInput = {{ Enum.KeyCode.F12 }},
-			group = t1.Misc
+			winInput = {
+				{ Enum.KeyCode.F12 }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 3
 		}
 	},
 	DevConsole = {
 		label = "CoreScripts.InGameMenu.Controls.DevConsole",
 		keyboardInput = {
-			layoutOrder = 4,
 			macInput = {
 				{ Enum.KeyCode.F9 },
-				{
-					ExtraKeysEnum.Fn,
-					Enum.KeyCode.F9
-				}
+				{ ExtraKeysEnum.Fn, Enum.KeyCode.F9 }
 			},
-			winInput = {{ Enum.KeyCode.F9 }},
-			group = t1.Misc
+			winInput = {
+				{ Enum.KeyCode.F9 }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 4
 		}
 	},
 	Mouselock = {
 		label = "CoreScripts.InGameMenu.Controls.MouseLock",
 		keyboardInput = {
-			layoutOrder = 5,
-			input = {{ Enum.KeyCode.LeftShift }},
-			group = t1.Misc
+			input = {
+				{ Enum.KeyCode.LeftShift }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 5
 		}
 	},
 	GraphicsLevel = {
 		label = "CoreScripts.InGameMenu.Controls.GraphicsLevel",
 		keyboardInput = {
-			layoutOrder = 6,
 			macInput = {
 				{ Enum.KeyCode.F10 },
-				{
-					ExtraKeysEnum.Fn,
-					Enum.KeyCode.F10
-				}
+				{ ExtraKeysEnum.Fn, Enum.KeyCode.F10 }
 			},
-			winInput = {{ Enum.KeyCode.F10 }},
-			group = t1.Misc
+			winInput = {
+				{ Enum.KeyCode.F10 }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 6
 		}
 	},
 	Fullscreen = {
 		label = "CoreScripts.InGameMenu.Controls.ToggleFullscreen",
 		keyboardInput = {
-			layoutOrder = 7,
-			macInput = {{
-				Enum.KeyCode.LeftControl,
-				Enum.KeyCode.LeftSuper,
-				Enum.KeyCode.F
-			}},
-			winInput = {{ Enum.KeyCode.F11 }},
-			group = t1.Misc
+			macInput = {
+				{ Enum.KeyCode.LeftControl, Enum.KeyCode.LeftSuper, Enum.KeyCode.F }
+			},
+			winInput = {
+				{ Enum.KeyCode.F11 }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 7
 		}
 	},
 	PerfStats = {
 		label = "CoreScripts.InGameMenu.Controls.PerformanceStats",
 		keyboardInput = {
-			layoutOrder = 8,
-			macInput = {{
-				ExtraKeysEnum.Fn,
-				Enum.KeyCode.RightAlt,
-				Enum.KeyCode.LeftSuper,
-				Enum.KeyCode.F7
-			}},
-			winInput = {{
-				Enum.KeyCode.LeftControl,
-				Enum.KeyCode.LeftShift,
-				Enum.KeyCode.F7
-			}},
-			group = t1.Misc
+			macInput = {
+				{ ExtraKeysEnum.Fn, Enum.KeyCode.RightAlt, Enum.KeyCode.LeftSuper, Enum.KeyCode.F7 }
+			},
+			winInput = {
+				{ Enum.KeyCode.LeftControl, Enum.KeyCode.LeftShift, Enum.KeyCode.F7 }
+			},
+			group = controlGroups.Misc,
+			layoutOrder = 8
 		}
 	},
 	Rotate = {
 		label = "CoreScripts.InGameMenu.Controls.RotateCamera",
 		keyboardInput = {
-			layoutOrder = 1,
-			input = {{ Enum.KeyCode.MouseRightButton }},
-			group = t1.CameraMovement
+			input = {
+				{ Enum.KeyCode.MouseRightButton }
+			},
+			group = controlGroups.CameraMovement,
+			layoutOrder = 1
 		}
 	},
 	RotateCamera = {
@@ -274,9 +277,11 @@ local t2 = {
 	ZoomInOut = {
 		label = "CoreScripts.InGameMenu.Controls.ZoomInOutCamera",
 		keyboardInput = {
-			layoutOrder = 2,
-			input = {{ ExtraKeysEnum.MouseWheel }},
-			group = t1.CameraMovement
+			input = {
+				{ ExtraKeysEnum.MouseWheel }
+			},
+			group = controlGroups.CameraMovement,
+			layoutOrder = 2
 		},
 		touchInput = {
 			thumbstickInput = { TouchControlsEnum.TopLeft },
@@ -286,17 +291,21 @@ local t2 = {
 	ZoomIn = {
 		label = "CoreScripts.InGameMenu.Controls.ZoomInCamera",
 		keyboardInput = {
-			layoutOrder = 3,
-			input = {{ Enum.KeyCode.I }},
-			group = t1.CameraMovement
+			input = {
+				{ Enum.KeyCode.I }
+			},
+			group = controlGroups.CameraMovement,
+			layoutOrder = 3
 		}
 	},
 	ZoomOut = {
 		label = "CoreScripts.InGameMenu.Controls.ZoomOutCamera",
 		keyboardInput = {
-			layoutOrder = 4,
-			input = {{ Enum.KeyCode.O }},
-			group = t1.CameraMovement
+			input = {
+				{ Enum.KeyCode.O }
+			},
+			group = controlGroups.CameraMovement,
+			layoutOrder = 4
 		}
 	},
 	CameraZoomGamepad = {
@@ -315,9 +324,11 @@ local t2 = {
 	RobloxMenu = {
 		label = "CoreScripts.InGameMenu.Controls.RobloxMenu",
 		keyboardInput = {
-			layoutOrder = 1,
-			input = {{ Enum.KeyCode.Escape }},
-			group = t1.MenuItems
+			input = {
+				{ Enum.KeyCode.Escape }
+			},
+			group = controlGroups.MenuItems,
+			layoutOrder = 1
 		},
 		gamepadInput = {
 			xboxInput = { Enum.KeyCode.ButtonStart },
@@ -342,25 +353,31 @@ local t2 = {
 	Backpack = {
 		label = "CoreScripts.InGameMenu.Controls.Backpack",
 		keyboardInput = {
-			layoutOrder = 2,
-			input = {{ Enum.KeyCode.Backquote }},
-			group = t1.MenuItems
+			input = {
+				{ Enum.KeyCode.Backquote }
+			},
+			group = controlGroups.MenuItems,
+			layoutOrder = 2
 		}
 	},
 	Playerlist = {
 		label = "CoreScripts.InGameMenu.Controls.Playerlist",
 		keyboardInput = {
-			layoutOrder = 3,
-			input = {{ Enum.KeyCode.Tab }},
-			group = t1.MenuItems
+			input = {
+				{ Enum.KeyCode.Tab }
+			},
+			group = controlGroups.MenuItems,
+			layoutOrder = 3
 		}
 	},
 	Chat = {
 		label = "CoreScripts.InGameMenu.Controls.Chat",
 		keyboardInput = {
-			layoutOrder = 4,
-			input = {{ Enum.KeyCode.Slash }},
-			group = t1.MenuItems
+			input = {
+				{ Enum.KeyCode.Slash }
+			},
+			group = controlGroups.MenuItems,
+			layoutOrder = 4
 		},
 		gamepadInput = {
 			xboxInput = { Enum.KeyCode.ButtonL2 }
@@ -375,10 +392,7 @@ local t2 = {
 }
 
 if not FFlagEnableConsoleExpControls then
-	t2.Chat.gamepadInput = nil
+	controls.Chat.gamepadInput = nil
 end
 
-return {
-	ControlGroups = t1,
-	Controls = t2
-}
+return { ControlGroups = controlGroups, Controls = controls }

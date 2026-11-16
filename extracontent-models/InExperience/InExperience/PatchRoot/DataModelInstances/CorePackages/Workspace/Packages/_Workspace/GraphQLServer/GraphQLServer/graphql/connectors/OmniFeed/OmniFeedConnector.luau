@@ -1,96 +1,97 @@
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local Object = require(Parent.LuauPolyfill).Object
-local Promise = require(Parent.Promise)
-local t1 = {}
-local Fetch = require(Parent.Fetch)
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+
+local Promise = require(parent.Promise)
+local OmniFeedConnector = {}
+local Fetch = require(parent.Fetch)
 local fetch = Fetch.fetch
 local Response = Fetch.Response
-local GraphQLError = require(Parent.GraphQL).GraphQLError
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+
+local GraphQL = require(parent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 local buildOmniRecommendationsRequest = require(script.Parent.buildOmniRecommendationsRequest)
 
 require(script.Parent.Parent.Parent.generatedTypes)
 
-local v12 = UrlBuilder.fromString("apis:discovery-api/omni-recommendation-metadata")
+local v = urlBuilder.fromString("apis:discovery-api/omni-recommendation-metadata")
 
-function t1.findOmniFeedBySessionId(p1, p2) -- line: 52
-	-- upvalues: fetch (copy), buildOmniRecommendationsRequest (copy), Promise (copy), Response (copy), GraphQLError (copy), Object (copy)
-	local v15 = p2 or fetch
-	local v16 = buildOmniRecommendationsRequest(v15)
+function OmniFeedConnector.findOmniFeedBySessionId(data, p)
+	local omniRecommendationsRequest = buildOmniRecommendationsRequest(p or fetch)
 
-	return Promise.new(function(resolve, reject) -- line: 59
-		-- upvalues: v16 (copy), p1 (copy), Response (copy), GraphQLError (copy), Object (copy)
-		local v22 = v16(p1.pageType, p1.sessionId, p1.nextPageToken, p1.supportedTreatmentTypes):catch(function() -- line: 65
-			-- upvalues: Response (copy)
+	return Promise.new(function(callback, callback2): nil
+		local expect = omniRecommendationsRequest(
+			data.pageType,
+			data.sessionId,
+			data.nextPageToken,
+			data.supportedTreatmentTypes
+		):catch(function()
 			return Response.error()
 		end):expect()
 
-		if not v22.ok then
-			reject(GraphQLError.new(string.format("Failed to fetch omni recommendations. Error code: %d", v22.status)))
+		if not expect.ok then
+			callback2(GraphQLError.new(string.format(
+				"Failed to fetch omni recommendations. Error code: %d",
+				expect.status
+			)))
 
 			return nil
 		end
 
-		local v23 = v22:json():catch(function() -- line: 80
+		local expect2 = expect:json():catch(function(): nil
 			return nil
 		end):expect()
 
-		if not v23 then
-			reject(GraphQLError.new("Failed to decode HTTP response as JSON for omni-recommendation fetch"))
+		if not expect2 then
+			callback2(GraphQLError.new("Failed to decode HTTP response as JSON for omni-recommendation fetch"))
 		end
 
-		resolve(Object.assign({
-			omniSessionId = p1.sessionId,
-			pageType = p1.pageType
-		}, v23))
+		callback(Object.assign({ omniSessionId = data.sessionId, pageType = data.pageType }, expect2))
 
 		return nil
 	end)
 end
-function t1.fetchMoreOmniRecommendationMetadata(p3, p4) -- line: 100
-	-- upvalues: fetch (copy), Promise (copy), v12 (copy), HttpService (copy), Response (copy), GraphQLError (copy), Object (copy)
-	local v19 = p4 or fetch
 
-	return Promise.new(function(resolve, reject) -- line: 103
-		-- upvalues: v12 (copy), v19 (copy), HttpService (copy), p3 (copy), Response (copy), GraphQLError (copy), Object (copy)
-		local v26 = v12()
-		local v27 = v19(v26, {
-			method = "POST",
+function OmniFeedConnector.fetchMoreOmniRecommendationMetadata(data, p)
+	local v2 = p or fetch
+	return Promise.new(function(callback, callback2)
+		local expect = v2(v(), {
 			body = HttpService:JSONEncode({
-				sessionId = p3.sessionId,
-				contents = p3.recommendations
+				sessionId = data.sessionId,
+				contents = data.recommendations
 			}),
-			headers = {
-				["Content-Type"] = "application/json",
-				Accept = "application/json"
-			}
-		}):catch(function() -- line: 117
-			-- upvalues: Response (copy)
+			method = "POST",
+			headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
+		}):catch(function()
 			return Response.error()
 		end):expect()
 
-		if not v27.ok then
-			reject(GraphQLError.new(string.format("Failed to fetch additional metadata for topicId: %s", p3.topicId)))
-
+		if not expect.ok then
+			callback2(GraphQLError.new(string.format(
+				"Failed to fetch additional metadata for topicId: %s",
+				data.topicId
+			)))
 			return
 		end
 
-		local v28 = v27:json():catch(function() -- line: 129
+		local expect2 = expect:json():catch(function(): nil
 			return nil
 		end):expect()
 
-		if not v28 then
-			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for topicId: %s", p3.topicId)))
-
-			return
+		if expect2 then
+			callback(Object.assign(expect2, {
+				topicId = data.topicId,
+				recommendations = data.recommendations
+			}))
+		else
+			callback2(GraphQLError.new(string.format(
+				"Failed to decode HTTP response as JSON for topicId: %s",
+				data.topicId
+			)))
 		end
-
-		resolve(Object.assign(v28, {
-			topicId = p3.topicId,
-			recommendations = p3.recommendations
-		}))
 	end)
 end
-
-return t1
+return OmniFeedConnector

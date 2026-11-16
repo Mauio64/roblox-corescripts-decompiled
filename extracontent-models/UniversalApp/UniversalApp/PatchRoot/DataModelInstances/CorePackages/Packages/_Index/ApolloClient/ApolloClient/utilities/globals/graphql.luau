@@ -1,15 +1,12 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent.Parent
-local isType = require(ParentParent.GraphQL).isType
+local parent = script.Parent.Parent.Parent.Parent
 
-function t1.removeTemporaryGlobals() -- line: 26
-	-- upvalues: isType (copy)
-	isType(nil)
+local GraphQL = require(parent.GraphQL)
+local isType = GraphQL.isType
+return {
+	removeTemporaryGlobals = function()
+		isType(nil)
 
-	local function remove() -- line: 33
+		local function remove() end
+		return remove()
 	end
-
-	return remove()
-end
-
-return t1
+}

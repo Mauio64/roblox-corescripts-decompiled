@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("CurrencyTransfers").Parent
+local parent = script:FindFirstAncestor("CurrencyTransfers").Parent
+local React = require(parent.React)
 
-return (require(Parent.React).createContext(nil))
+return (React.createContext(nil))

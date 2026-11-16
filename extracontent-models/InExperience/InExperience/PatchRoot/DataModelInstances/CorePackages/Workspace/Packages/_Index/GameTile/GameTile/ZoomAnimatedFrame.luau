@@ -1,46 +1,46 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local React = require(Parent.React)
-local Otter = require(Parent.Otter)
+local parent = script:FindFirstAncestor("GameTile").Parent
+local React = require(parent.React)
+local Otter = require(parent.Otter)
 
-function ZoomAnimatedFrame(t1: {[any]: any}) -- line: 16
-	-- upvalues: React (copy), Otter (copy)
-	local isZoomEnabled = t1.isZoomEnabled
-	local v6 = React.useRef(nil)
+function ZoomAnimatedFrame(props)
+	local isZoomEnabled = props.isZoomEnabled
 
-	if v6.current == nil then
-		v6.current = Otter.createSingleMotor(0)
+	local ref = React.useRef(nil)
+
+	if ref.current == nil then
+		ref.current = Otter.createSingleMotor(0)
 	end
 
-	assert(v6.current, "zoomMotorRef should always exist; assert only needed for the linter")
+	assert(ref.current, "zoomMotorRef should always exist; assert only needed for the linter")
 
-	local v7, v8 = React.useBinding(0)
+	local v, v2 = React.useBinding(0)
 
-	React.useEffect(function() -- line: 28
-		-- upvalues: v6 (copy), v8 (copy)
-		v6.current:onStep(v8)
+	React.useEffect(function()
+		ref.current:onStep(v2)
 	end, {})
-	React.useEffect(function() -- line: 33
-		-- upvalues: v6 (copy), Otter (copy), isZoomEnabled (copy), t1 (copy)
-		v6.current:setGoal(Otter.spring(not isZoomEnabled and 0 or 1, {
-			frequency = not t1.reducedMotion and 6.5 or 200
+
+	React.useEffect(function()
+		ref.current:setGoal(Otter.spring(isZoomEnabled and 1 or 0, {
+			frequency = props.reducedMotion and 200 or 6.5
 		}))
 	end, { isZoomEnabled })
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Position = v7:map(function(p1) -- line: 41
-			-- upvalues: t1 (copy)
-			local v10 = if not (p1 > 0.9) then p1 else 1
-
-			return UDim2.fromOffset(-t1.expansionOffsetX * v10 / 2, -t1.expansionOffsetTop * v10)
+		Position = v:map(function(p)
+			local v3 = p > 0.9 and 1 or p
+			return UDim2.fromOffset(-props.expansionOffsetX * v3 / 2, -props.expansionOffsetTop * v3)
 		end),
-		Size = v7:map(function(p2) -- line: 48
-			-- upvalues: t1 (copy)
-			local v12 = if not (p2 > 0.9) then p2 else 1
-
-			return UDim2.new(1, t1.expansionOffsetX * v12, 1, t1.expansionOffsetTop * v12 + t1.expansionOffsetBottom * v12)
-		end)
-	}, t1.children)
+		Size = v:map(function(p)
+			local v3 = p > 0.9 and 1 or p
+			return UDim2.new(
+				1,
+				props.expansionOffsetX * v3,
+				1,
+				props.expansionOffsetTop * v3 + props.expansionOffsetBottom * v3
+			)
+		end),
+		BackgroundTransparency = 1
+	}, props.children)
 end
 
 return ZoomAnimatedFrame

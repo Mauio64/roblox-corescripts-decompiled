@@ -1,15 +1,14 @@
-local Parent = script:FindFirstAncestor("RoduxFriends").Parent
-local llama = require(Parent.llama)
+local parent = script:FindFirstAncestor("RoduxFriends").Parent
+local llama = require(parent.llama)
 
-return function(p1, p2) -- line: 5
-	-- upvalues: llama (copy)
-	if not p1 then
+return function(p, p2)
+	if not p then
 		return { p2 }
 	end
 
-	if not llama.List.find(p1, p2) then
-		return llama.List.join(p1, { p2 })
+	if llama.List.find(p, p2) then
+		return p
 	end
 
-	return p1
+	return llama.List.join(p, { p2 })
 end

@@ -1,10 +1,11 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("GameFilters").Parent
 
-local function useTopBarHeightSelector() -- line: 7
-	-- upvalues: useSelector (copy)
-	return useSelector(function(p1) -- line: 8
-		return p1.TopBar.topBarHeight
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+local function useTopBarHeightSelector()
+	return useSelector(function(p)
+		return p.TopBar.topBarHeight
 	end)
 end
 

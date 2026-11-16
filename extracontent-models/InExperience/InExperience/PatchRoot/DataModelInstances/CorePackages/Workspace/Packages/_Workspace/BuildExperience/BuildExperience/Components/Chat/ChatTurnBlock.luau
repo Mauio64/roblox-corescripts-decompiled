@@ -1,347 +1,690 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local Markdown = require(BuildExperienceParent.Markdown)
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local Markdown = require(parent.Markdown)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local useLocalization = Localization.Hooks.useLocalization
+local LocalizationRoactContext = Localization.LocalizationRoactContext
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 
+local ChatPermissionsContext = require(BuildExperience.Chat.ChatPermissionsContext)
+local ChatScrollAnchorContext = require(BuildExperience.Chat.ChatScrollAnchorContext)
+local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+local ChatCardEmphasisPositionProvider = require(script.Parent.ChatCardEmphasis.ChatCardEmphasisPositionProvider)
+local FFlagBuildExperienceChatCardEmphasis = require(BuildExperience.Flags.FFlagBuildExperienceChatCardEmphasis)
 require(BuildExperience.Chat.chatTypes)
+local FFlagBuildExperienceAnswerForm = require(BuildExperience.Flags.FFlagBuildExperienceAnswerForm)
+local AnswersCardContainer
+
+if FFlagBuildExperienceAnswerForm then
+	AnswersCardContainer = require(script.Parent.AnswersCardContainer)
+else
+	AnswersCardContainer = nil
+end
 
 local turnProjection = require(BuildExperience.Chat.turnProjection)
+
+local FFlagBuildExperienceChatAccordionScrollAnchor = require(BuildExperience.Flags.FFlagBuildExperienceChatAccordionScrollAnchor)
+local FFlagBuildExperienceManageDevProduct = require(BuildExperience.Flags.FFlagBuildExperienceManageDevProduct)
+local FFlagBuildAgentAdCampaignCard = require(BuildExperience.Flags.FFlagBuildAgentAdCampaignCard)
+
+local FFlagBuildAgentAdCampaignRefreshEligibility = require(BuildExperience.Flags.FFlagBuildAgentAdCampaignRefreshEligibility)
+local FFlagBuildEventsUpdate1 = require(BuildExperience.Flags.FFlagBuildEventsUpdate1)
+
+local FFlagBuildExperiencePlaytestCardPublishCta = require(BuildExperience.Flags.FFlagBuildExperiencePlaytestCardPublishCta)
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 local reportTurnActivityGap = require(BuildExperience.Telemetry.reportTurnActivityGap)
 local getMarkdownRendererProps = require(BuildExperience.utils.getMarkdownRendererProps)
 local AgentPlanCard = require(BuildExperience.Components.AgentCard.AgentPlanCard)
+local AgentDevProductCard
+
+if FFlagBuildExperienceManageDevProduct then
+	AgentDevProductCard = require(BuildExperience.Components.AgentCard.AgentDevProductCard)
+else
+	AgentDevProductCard = nil
+end
+
 local AnswerStack = require(BuildExperience.Components.AnswerStack.AnswerStack)
 local OptionSelector = require(BuildExperience.Components.AnswerStack.OptionSelector)
 local AgentTurnFeedback = require(script.Parent.AgentTurnFeedback)
 local ChatUserMessage = require(script.Parent.ChatUserMessage)
 local PlaytestCompletedCard = require(script.Parent.PlaytestCompletedCard)
+local useIsPlaceVersionLive
+
+if FFlagBuildExperiencePlaytestCardPublishCta then
+	useIsPlaceVersionLive = require(script.Parent.useIsPlaceVersionLive)
+else
+	useIsPlaceVersionLive = nil
+end
+
+local AdUpsellCard
+
+if FFlagBuildAgentAdCampaignCard then
+	AdUpsellCard = require(BuildExperience.Components.Ads.AdUpsellCard)
+else
+	AdUpsellCard = nil
+end
+
+local AdCampaignIsActiveCard
+
+if FFlagBuildAgentAdCampaignCard then
+	AdCampaignIsActiveCard = require(BuildExperience.Components.Ads.AdCampaignIsActiveCard)
+else
+	AdCampaignIsActiveCard = nil
+end
+
+local useAgentAdCampaignTurnCards
+
+if FFlagBuildAgentAdCampaignCard then
+	useAgentAdCampaignTurnCards = require(script.Parent.useAgentAdCampaignTurnCards)
+else
+	useAgentAdCampaignTurnCards = nil
+end
+
 local TurnActivitySummary = require(script.Parent.TurnActivitySummary)
+
 local Icon = Foundation.Icon
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local IconVariant = Foundation.Enums.IconVariant
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
 local MarkdownViewer = Markdown.Components.MarkdownViewer
-local t1 = {}
-local t2 = {
+
+local v = {}
+local v2 = {
 	onAnswerSelectedByToolCallId = {},
 	onAnswerConfirmedByToolCallId = {},
-	onPlanAcceptedByToolCallId = {}
+	onPlanAcceptedByToolCallId = {},
+	onDevProductApprovedByToolCallId = {},
+	onDevProductRejectedByToolCallId = {}
 }
 
-local function constantSource() -- line: 78
+local function constantSource(): number
 	return 0
 end
-local function useReactiveValue(p1) -- line: 82
-	-- upvalues: React (copy), constantSource (copy), SignalsReact (copy)
-	local v40 = React.useCallback(function(p2) -- line: 83
-		-- upvalues: p1 (copy), constantSource (copy)
-		if typeof(p1) == "function" then
-			return (p1(p2))
+
+local function useReactiveValue(callback)
+	local v3 = React.useCallback(function(callback2)
+		if typeof(callback) == "function" then
+			return (callback(callback2))
 		end
 
-		if typeof(p2) == "function" then
-			p2(constantSource)
+		if typeof(callback2) == "function" then
+			callback2(constantSource)
 		end
 
-		return p1
-	end, { p1 })
+		return callback
+	end, { callback })
 
-	return (SignalsReact.useSignalState(v40))
+	return (SignalsReact.useSignalState(v3))
 end
-local function hasSelectedOptions(p3) -- line: 96
-	if typeof(p3) == "string" then
-		return true
-	end
 
-	if typeof(p3) ~= "table" then
+local function useIsChatReadOnly(): boolean -- 3 equivalent calls inferred from this helper
+	if not FFlagBuildCheckGamePermissions then
 		return false
 	end
 
-	return #p3 > 0
+	local v3 = React.useContext(ChatPermissionsContext)
+	return v3 ~= nil and not v3.canEditOnBuild
 end
-local function AnswerStackSection(t3: {[any]: any}) -- line: 106
-	-- upvalues: LocalizationStrings (copy), React (copy), View (copy), FoundationText (copy), OptionSelector (copy), AnswerStack (copy)
-	local prompt = t3.prompt
-	local question = prompt.question
-	local customResponseText = prompt.customResponseText
-	local v46 = t3.isActive == true
-	local v47 = question.responseType == "multi_select"
-	local v48 = if prompt.isLastQuestion ~= false then LocalizationStrings.ANSWER_STACK_SUBMIT else LocalizationStrings.ANSWER_STACK_NEXT
-	local createElement = React.createElement
-	local v50 = View
-	local t4 = {
-		tag = "col gap-medium size-full-0 auto-y",
-		LayoutOrder = t3.LayoutOrder,
-		testId = `ChatTurnBlock.AnswerStack.{ question.id }`
-	}
-	local t5 = {
-		Question = React.createElement(FoundationText, {
-			LayoutOrder = 1,
-			tag = "size-full-0 auto-y text-title-medium text-wrap text-align-x-left content-emphasis",
-			Text = question.question
-		})
-	}
-	local v53
 
-	if customResponseText ~= nil then
-		v53 = React.createElement(OptionSelector, {
-			LayoutOrder = 2,
-			isSelected = true,
-			title = LocalizationStrings.ANSWER_STACK_CUSTOM_ANSWER,
-			description = customResponseText,
-			testId = `AnswerStack.{ question.id }.CustomAnswer`,
-			onActivated = function() -- line: 133
-			end
-		})
-	elseif #question.options > 0 then
-		local createElement2 = React.createElement
-		local v55 = AnswerStack
-		local t6 = {
-			LayoutOrder = 2,
-			options = question.options,
-			selectedOptionId = prompt.selectedOptionId,
-			selectionMode = not v47 and "single" or "multi",
-			confirmLabel = v48
-		}
-		local selectedOptionId = prompt.selectedOptionId
-
-		t6.isConfirmDisabled = not (typeof(selectedOptionId) == "string" or typeof(selectedOptionId) == "table" and #selectedOptionId > 0)
-		t6.onConfirm = if not v47 or not v46 then nil else t3.onAnswerConfirmed
-		t6.testId = `AnswerStack.{ question.id }`
-
-		function t6.onOptionSelected(p4) -- line: 144
-			-- upvalues: t3 (copy), v47 (copy), v46 (copy), question (copy), prompt (copy)
-			if t3.onAnswerSelected == nil then
-				return
-			end
-
-			if v47 then
-				if v46 then
-					t3.onAnswerSelected(question, p4)
-				end
-
-				return
-			end
-
-			if prompt.selectedOptionId == nil then
-				t3.onAnswerSelected(question, p4)
-			end
-		end
-
-		v53 = createElement2(v55, t6)
-	else
-		v53 = nil
+local function hasSelectedOptions(selectedOptionId): boolean -- 1 equivalent call inferred from this helper
+	if typeof(selectedOptionId) == "string" then
+		return true
 	end
 
-	t5.Answers = v53
-
-	return createElement(v50, t4, t5)
+	return typeof(selectedOptionId) == "table" and #selectedOptionId > 0
 end
-local function PlanProposalSection(t7: {[any]: any}) -- line: 163
-	-- upvalues: React (copy), AgentPlanCard (copy), View (copy), ChatUserMessage (copy)
-	local planProposal = t7.planProposal
-	local v60 = planProposal.isAccepted ~= true and planProposal.feedbackText == nil
-	local v61 = React.createElement(AgentPlanCard, {
+
+local function AnswerStackSection(props)
+	local v3 = useLocalization({
+		customAnswer = LocalizationStrings.ANSWER_STACK_CUSTOM_ANSWER,
+		next = LocalizationStrings.ANSWER_STACK_NEXT,
+		submit = LocalizationStrings.ANSWER_STACK_SUBMIT
+	})
+	local v4 = useIsChatReadOnly() -- inferred equivalent call
+	local prompt = props.prompt
+	local question = prompt.question
+	local customResponseText = prompt.customResponseText
+	local v5
+
+	if props.isActive == true then
+		v5 = not v4
+	else
+		v5 = false
+	end
+
+	local onAnswerSelected
+
+	if v4 then
+		onAnswerSelected = nil
+	else
+		onAnswerSelected = props.onAnswerSelected
+	end
+
+	local v6 = question.responseType == "multi_select"
+	local confirmLabel
+
+	if prompt.isLastQuestion == false then
+		confirmLabel = v3.next
+	else
+		confirmLabel = v3.submit
+	end
+
+	local createElement = React.createElement
+	local v7 = {
+		LayoutOrder = props.LayoutOrder,
+		tag = "col gap-medium size-full-0 auto-y",
+		testId = `ChatTurnBlock.AnswerStack.{question.id}`
+	}
+	local v8 = {
+		Question = React.createElement(Text, {
+			LayoutOrder = 1,
+			Text = question.question,
+			tag = "size-full-0 auto-y text-title-medium text-wrap text-align-x-left content-emphasis"
+		}),
+		Answers = 0
+	}
+	local answers
+
+	if customResponseText == nil then
+		if #question.options > 0 then
+			local createElement2 = React.createElement
+			local v9 = {
+				LayoutOrder = 2,
+				options = question.options,
+				selectedOptionId = prompt.selectedOptionId,
+				selectionMode = v6 and "multi" or "single",
+				confirmLabel = confirmLabel,
+				isConfirmDisabled = not hasSelectedOptions(prompt.selectedOptionId), -- inferred equivalent call
+				onConfirm = 0,
+				testId = 0,
+				onOptionSelected = 0
+			}
+			local onConfirm
+
+			if v6 and v5 then
+				onConfirm = props.onAnswerConfirmed
+			end
+
+			v9.onConfirm = onConfirm
+			v9.testId = `AnswerStack.{question.id}`
+			function v9.onOptionSelected(p)
+				if onAnswerSelected == nil then
+					return
+				end
+
+				if v6 then
+					if v5 then
+						onAnswerSelected(question, p)
+					end
+				elseif prompt.selectedOptionId == nil then
+					onAnswerSelected(question, p)
+				end
+			end
+
+			answers = createElement2(AnswerStack, v9)
+		end
+	else
+		answers = React.createElement(OptionSelector, {
+			LayoutOrder = 2,
+			title = v3.customAnswer,
+			description = customResponseText,
+			isSelected = true,
+			testId = `AnswerStack.{question.id}.CustomAnswer`,
+			onActivated = function() end
+		})
+	end
+
+	v8.Answers = answers
+	return createElement(View, v7, v8)
+end
+
+local function PlanProposalSection(props)
+	local v3 = useIsChatReadOnly() -- inferred equivalent call
+	local planProposal = props.planProposal
+	local v4
+
+	if planProposal.isAccepted == true then
+		v4 = false
+	else
+		v4 = planProposal.feedbackText == nil
+	end
+
+	local element = React.createElement(AgentPlanCard, {
 		layoutOrder = 1,
-		testId = "ChatTurnBlock.PlanProposal",
 		title = planProposal.title,
 		textContent = planProposal.textContent,
 		summary = planProposal.summary,
-		onBuild = t7.onPlanAccepted or function() -- line: 171
-		end,
-		isBuildDisabled = not v60
+		onBuild = props.onPlanAccepted or function() end,
+		isBuildDisabled = not v4 or v3,
+		testId = "ChatTurnBlock.PlanProposal"
 	})
 
 	if planProposal.feedbackText == nil then
-		return React.createElement(View, {
-			tag = "col gap-medium size-full-0 auto-y",
-			LayoutOrder = t7.LayoutOrder
-		}, {
-			Plan = v61
-		})
+		return React.createElement(
+			View,
+			{ LayoutOrder = props.LayoutOrder, tag = "col gap-medium size-full-0 auto-y" },
+			{ Plan = element }
+		)
 	end
 
 	return React.createElement(View, {
-		tag = "col gap-medium size-full-0 auto-y",
-		LayoutOrder = t7.LayoutOrder
+		LayoutOrder = props.LayoutOrder,
+		tag = "col gap-medium size-full-0 auto-y"
 	}, {
-		Plan = v61,
+		Plan = element,
 		Feedback = React.createElement(ChatUserMessage, {
 			LayoutOrder = 2,
-			message = {
-				kind = "user_message",
-				text = planProposal.feedbackText
-			}
+			message = { kind = "user_message", text = planProposal.feedbackText }
 		})
 	})
 end
-local function AgentMessageSegment(t8: {[any]: any}) -- line: 200
-	-- upvalues: useReactiveValue (copy), Foundation (copy), React (copy), getMarkdownRendererProps (copy), View (copy), Icon (copy), IconName (copy), IconVariant (copy), IconSize (copy), FoundationText (copy), MarkdownViewer (copy)
-	local v63 = useReactiveValue(t8.segment.text)
-	local v64 = Foundation.Hooks.useTokens()
-	local v65 = React.useMemo(function() -- line: 203
-		-- upvalues: getMarkdownRendererProps (copy), v64 (copy), t8 (copy)
-		return getMarkdownRendererProps(v64, t8.markdownTextStyle)
-	end, {
-		v64,
-		t8.markdownTextStyle
+
+local function AgentMessageSegment(props)
+	local v3 = useReactiveValue(props.segment.text)
+
+	local v4 = useLocalization({
+		assistantResponseFailed = LocalizationStrings.CHAT_ASSISTANT_RESPONSE_FAILED,
+		assistantStopped = LocalizationStrings.CHAT_ASSISTANT_STOPPED
 	})
 
-	if v63 == "" then
+	local v5 = React.useContext(LocalizationRoactContext)
+
+	if v3 == LocalizationStrings.CHAT_ASSISTANT_RESPONSE_FAILED then
+		v3 = v4.assistantResponseFailed
+	elseif v3 == LocalizationStrings.CHAT_ASSISTANT_STOPPED then
+		v3 = v4.assistantStopped
+	end
+
+	if props.segment.errorCode ~= nil then
+		v3 = v5:Format(LocalizationStrings.CHAT_ERROR_CODE_TEXT, {
+			ERROR_CODE = props.segment.errorCode,
+			ERROR_TEXT = v3
+		})
+	end
+
+	local v6 = Foundation.Hooks.useTokens()
+	local markdownRendererProps = React.useMemo(function()
+		return getMarkdownRendererProps(v6, props.markdownTextStyle)
+	end, { v6, props.markdownTextStyle })
+
+	if v3 == "" then
 		return nil
 	end
 
-	if t8.segment.isError then
-		return React.createElement(View, {
-			tag = "row align-y-center gap-xsmall size-full-0 auto-y",
-			testId = "ChatTurnBlock.ErrorMessage",
-			LayoutOrder = t8.LayoutOrder
-		}, {
-			Icon = React.createElement(Icon, {
-				LayoutOrder = 1,
-				testId = "ChatTurnBlock.ErrorMessage.Icon",
-				name = IconName.CircleX,
-				variant = IconVariant.Filled,
-				size = IconSize.Small,
-				style = v64.Color.System.Alert
-			}),
-			Text = React.createElement(FoundationText, {
-				LayoutOrder = 2,
-				tag = "fill text-body-medium text-wrap text-align-x-left content-emphasis",
-				Text = v63
-			})
-		})
+	if props.segment.isError then
+		return React.createElement(
+			View,
+			{
+				LayoutOrder = props.LayoutOrder,
+				tag = "row align-y-center gap-xsmall size-full-0 auto-y",
+				testId = "ChatTurnBlock.ErrorMessage"
+			},
+			{
+				Icon = React.createElement(Icon, {
+					LayoutOrder = 1,
+					name = IconName.CircleX,
+					variant = IconVariant.Filled,
+					size = IconSize.Small,
+					style = v6.Color.System.Alert,
+					testId = "ChatTurnBlock.ErrorMessage.Icon"
+				}),
+				Text = React.createElement(Text, {
+					LayoutOrder = 2,
+					Text = v3,
+					tag = "fill text-body-medium text-wrap text-align-x-left content-emphasis"
+				})
+			}
+		)
 	end
 
 	return React.createElement(MarkdownViewer, {
-		Markdown = v63,
+		Markdown = v3,
 		WrapperProps = {
-			tag = "size-full-0 auto-y text-body-medium content-emphasis",
-			LayoutOrder = t8.LayoutOrder
+			LayoutOrder = props.LayoutOrder,
+			tag = "size-full-0 auto-y text-body-medium content-emphasis"
 		},
-		MarkdownRendererProps = v65
+		MarkdownRendererProps = markdownRendererProps
 	})
 end
-local function renderClientToolSegment(p5, n1: number, p6) -- line: 245
-	-- upvalues: React (copy), AnswerStackSection (copy), PlanProposalSection (copy)
-	if p5.answerStackPrompt ~= nil then
-		return React.createElement(AnswerStackSection, {
-			LayoutOrder = n1,
-			prompt = p5.answerStackPrompt,
-			isActive = p5.isActive,
-			onAnswerSelected = if not p5.isActive then nil else p6.onAnswerSelectedByToolCallId[p5.toolCallId],
-			onAnswerConfirmed = if not p5.isActive then nil else p6.onAnswerConfirmedByToolCallId[p5.toolCallId]
-		})
+
+local function PlaytestCardSection(props)
+	local v3
+
+	if props.onPublish ~= nil then
+		v3 = props.placeId
 	end
 
-	if p5.planProposal ~= nil then
-		return React.createElement(PlanProposalSection, {
-			LayoutOrder = n1,
-			planProposal = p5.planProposal,
-			onPlanAccepted = if not p5.isActive then nil else p6.onPlanAcceptedByToolCallId[p5.toolCallId]
-		})
-	end
-
-	return nil
+	local v4 = useIsPlaceVersionLive(v3, props.publishedVersionNumber)
+	return React.createElement(PlaytestCompletedCard, {
+		LayoutOrder = props.LayoutOrder,
+		onPlaytest = props.onPlaytest,
+		onPublish = props.onPublish,
+		isPublishDisabled = v4 or props.isPublishDisabled == true,
+		isPlaytestDisabled = props.isPlaytestDisabled,
+		isLoading = props.isLoading
+	})
 end
-local function renderWorkSegment(p7, n2: number, p8, p9, p10) -- line: 275
-	-- upvalues: React (copy), AgentMessageSegment (copy), TurnActivitySummary (copy), renderClientToolSegment (copy)
-	if p7.kind == "agent_message" then
-		return React.createElement(AgentMessageSegment, {
-			LayoutOrder = n2,
-			segment = p7,
-			markdownTextStyle = p8
-		})
-	end
 
-	if p7.kind == "activity_summary" then
-		return React.createElement(TurnActivitySummary, {
-			LayoutOrder = n2,
-			segment = p7,
-			clockBinding = p9
-		})
-	end
+local function DevProductProposalSection(props)
+	local isReadOnly = useIsChatReadOnly() -- inferred equivalent call
+	local devProductProposal = props.devProductProposal
+	local v3
 
-	if p7.kind == "client_tool" then
-		return renderClientToolSegment(p7, n2, p10)
-	end
-
-	return nil
-end
-local function TurnWorkSegment(t9: {[any]: any}) -- line: 301
-	-- upvalues: useReactiveValue (copy), React (copy), Foundation (copy), renderWorkSegment (copy), View (copy), StateLayerAffordance (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy)
-	local v75 = useReactiveValue(t9.segment.label)
-	local v76 = useReactiveValue(t9.segment.segments)
-	local v77, v78 = React.useState(false)
-	local v79 = Foundation.Hooks.useTokens()
-	local isDone = t9.isDone
-	local v81 = not t9.isDone or v77
-	local v82 = React.useCallback(function() -- line: 309
-		-- upvalues: v78 (copy)
-		v78(function(b1: boolean) -- line: 310
-			return not b1
-		end)
-	end, {})
-	local t10 = {}
-
-	if v81 then
-		local n3 = 1
-
-		for _, v86 in v76 do
-			local v87 = renderWorkSegment(v86, n3, t9.markdownTextStyle, t9.clockBinding, t9.localToolActions)
-
-			if v87 ~= nil then
-				t10[v86.key] = v87
-				n3 += 1
-			end
-		end
+	if devProductProposal.isApproved == true then
+		v3 = false
+	else
+		v3 = devProductProposal.isRejected ~= true
 	end
 
 	return React.createElement(View, {
-		tag = "col gap-medium size-full-0 auto-y",
-		testId = "ChatTurnBlock.TurnWork",
-		LayoutOrder = t9.LayoutOrder
+		LayoutOrder = props.LayoutOrder,
+		tag = "col gap-medium size-full-0 auto-y"
 	}, {
-		Summary = if not isDone then nil else React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "row align-y-center gap-xsmall size-full-0 auto-y padding-y-xxsmall",
-			testId = "ChatTurnBlock.TurnWork.Summary",
-			onActivated = v82,
-			stateLayer = {
-				affordance = StateLayerAffordance.None
+		DevProduct = React.createElement(AgentDevProductCard, {
+			layoutOrder = 1,
+			action = devProductProposal.action,
+			name = devProductProposal.name,
+			description = devProductProposal.description,
+			priceInRobux = devProductProposal.priceInRobux,
+			productId = devProductProposal.productId,
+			imageAssetId = devProductProposal.imageAssetId,
+			productType = devProductProposal.productType,
+			itemKind = devProductProposal.itemKind,
+			itemId = devProductProposal.itemId,
+			cancelRenewals = devProductProposal.cancelRenewals,
+			onApprove = props.onApprove or function() end,
+			onReject = props.onReject or function() end,
+			isActionDisabled = not v3,
+			isReadOnly = isReadOnly,
+			isPending = devProductProposal.isPending,
+			hasError = devProductProposal.hasError,
+			errorCause = devProductProposal.errorCause,
+			canRetry = devProductProposal.canRetry,
+			testId = "ChatTurnBlock.DevProductProposal"
+		})
+	})
+end
+
+local function renderClientToolSegment(props, layoutOrder: number, props2)
+	if FFlagBuildExperienceAnswerForm and props.answeredPrompts ~= nil then
+		return React.createElement(AnswersCardContainer, {
+			LayoutOrder = layoutOrder,
+			prompts = props.answeredPrompts
+		})
+	end
+
+	if FFlagBuildExperienceAnswerForm and props.answerStackPrompt ~= nil then
+		return nil
+	end
+
+	if props.answerStackPrompt == nil then
+		if props.planProposal == nil then
+			if not FFlagBuildExperienceManageDevProduct or props.devProductProposal == nil then
+				return nil
+			end
+
+			local createElement = React.createElement
+			local v3 = {
+				LayoutOrder = layoutOrder,
+				devProductProposal = props.devProductProposal,
+				onApprove = 0,
+				onReject = 0
 			}
-		}, {
-			Chevron = React.createElement(Icon, {
+			local onApprove
+
+			if props.isActive then
+				onApprove = props2.onDevProductApprovedByToolCallId[props.toolCallId]
+			end
+
+			v3.onApprove = onApprove
+			local onReject
+
+			if props.isActive then
+				onReject = props2.onDevProductRejectedByToolCallId[props.toolCallId]
+			end
+
+			v3.onReject = onReject
+			return createElement(DevProductProposalSection, v3)
+		else
+			local createElement = React.createElement
+			local v3 = {
+				LayoutOrder = layoutOrder,
+				planProposal = props.planProposal,
+				onPlanAccepted = 0
+			}
+			local onPlanAccepted
+
+			if props.isActive then
+				onPlanAccepted = props2.onPlanAcceptedByToolCallId[props.toolCallId]
+			end
+
+			v3.onPlanAccepted = onPlanAccepted
+			return createElement(PlanProposalSection, v3)
+		end
+	else
+		local createElement = React.createElement
+		local v3 = {
+			LayoutOrder = layoutOrder,
+			prompt = props.answerStackPrompt,
+			isActive = props.isActive,
+			onAnswerSelected = 0,
+			onAnswerConfirmed = 0
+		}
+		local onAnswerSelected
+
+		if props.isActive then
+			onAnswerSelected = props2.onAnswerSelectedByToolCallId[props.toolCallId]
+		end
+
+		v3.onAnswerSelected = onAnswerSelected
+		local onAnswerConfirmed
+
+		if props.isActive then
+			onAnswerConfirmed = props2.onAnswerConfirmedByToolCallId[props.toolCallId]
+		end
+
+		v3.onAnswerConfirmed = onAnswerConfirmed
+		return createElement(AnswerStackSection, v3)
+	end
+end
+
+local function renderWorkSegment(segment, layoutOrder: number, markdownTextStyle, clockBinding, localToolActions)
+	if segment.kind == "agent_message" then
+		return React.createElement(AgentMessageSegment, {
+			LayoutOrder = layoutOrder,
+			segment = segment,
+			markdownTextStyle = markdownTextStyle
+		})
+	end
+
+	if segment.kind == "activity_summary" then
+		return React.createElement(TurnActivitySummary, {
+			LayoutOrder = layoutOrder,
+			segment = segment,
+			clockBinding = clockBinding
+		})
+	end
+
+	if segment.kind == "client_tool" then
+		return renderClientToolSegment(segment, layoutOrder, localToolActions)
+	end
+
+	return nil
+end
+
+local function TurnWorkSegment(props)
+	local text = useReactiveValue(props.segment.label or "")
+	local workedDurationSeconds = props.segment.workedDurationSeconds
+	local seconds
+
+	if workedDurationSeconds ~= nil then
+		seconds = math.max(0, (math.floor(workedDurationSeconds + 0.5)))
+	end
+
+	local actionCount = props.segment.actionCount or 0
+	local summary
+
+	if seconds == nil or not (seconds < 60) then
+		if seconds == nil then
+			if actionCount == 1 then
+				summary = LocalizationStrings.CHAT_ONE_TASK_COMPLETED
+			else
+				summary = actionCount > 1 and {
+					LocalizationStrings.CHAT_TASKS_COMPLETED,
+					NUM_COMPLETED_TASKS = actionCount
+				} or nil
+			end
+		else
+			summary = {
+				LocalizationStrings.CHAT_WORKED_MINUTES_SECONDS,
+				MINUTES = math.floor(seconds / 60),
+				REM_SECONDS = seconds % 60
+			}
+		end
+	else
+		summary = {
+			LocalizationStrings.CHAT_WORKED_SECONDS,
+			SECONDS = seconds
+		}
+	end
+
+	local v3 = useLocalization({
+		summary = summary,
+		turnActivity = LocalizationStrings.CHAT_TURN_ACTIVITY
+	})
+
+	if seconds == nil and not (actionCount > 0) then
+		if text == LocalizationStrings.CHAT_TURN_ACTIVITY then
+			text = v3.turnActivity
+		end
+	else
+		text = v3.summary
+	end
+
+	local v4 = useReactiveValue(props.segment.segments)
+	local state, setState = React.useState(false)
+	local ref, v5
+
+	if FFlagBuildExperienceChatAccordionScrollAnchor then
+		ref = React.useRef(nil)
+		v5 = React.useContext(ChatScrollAnchorContext)
+	else
+		v5 = nil
+		ref = nil
+	end
+
+	local v6 = Foundation.Hooks.useTokens()
+	local isDone = props.isDone
+	local v7 = not props.isDone or state
+
+	local onActivated = React.useCallback(function()
+		if FFlagBuildExperienceChatAccordionScrollAnchor and v5 ~= nil and ref ~= nil then
+			v5(ref.current)
+		end
+
+		setState(function(flag: boolean): boolean
+			return not flag
+		end)
+	end, { v5 })
+
+	local v8 = {}
+
+	if v7 then
+		local childOrder = 1
+
+		for _, v9 in v4 do
+			local v10 = renderWorkSegment(
+				v9,
+				childOrder,
+				props.markdownTextStyle,
+				props.clockBinding,
+				props.localToolActions
+			)
+
+			if v10 == nil then
+				continue
+			end
+
+			if FFlagBuildExperienceChatCardEmphasis then
+				v10 = React.createElement(ChatCardEmphasisPositionProvider, {
+					childOrder = childOrder
+				}, v10)
+			end
+
+			v8[v9.key] = v10
+			childOrder += 1
+		end
+	end
+
+	local createElement = React.createElement
+	local v9 = {
+		LayoutOrder = props.LayoutOrder,
+		tag = "col gap-medium size-full-0 auto-y",
+		testId = "ChatTurnBlock.TurnWork"
+	}
+	local summary2
+
+	if isDone then
+		local createElement2 = React.createElement
+		local v10 = {
+			LayoutOrder = 1,
+			ref = ref,
+			onActivated = onActivated,
+			stateLayer = { affordance = StateLayerAffordance.None },
+			tag = "row align-y-center gap-xsmall size-full-0 auto-y padding-y-xxsmall",
+			testId = "ChatTurnBlock.TurnWork.Summary"
+		}
+
+		local createElement3 = React.createElement
+		local name
+
+		if state then
+			name = IconName.ChevronLargeDown
+		else
+			name = IconName.ChevronLargeRight
+		end
+
+		summary2 = createElement2(View, v10, {
+			Chevron = createElement3(Icon, {
 				LayoutOrder = 1,
-				name = if not v77 then IconName.ChevronLargeRight else IconName.ChevronLargeDown,
+				name = name,
 				size = IconSize.XSmall,
-				style = v79.Color.Content.Muted
+				style = v6.Color.Content.Muted
 			}),
-			Label = React.createElement(FoundationText, {
+			Label = React.createElement(Text, {
 				LayoutOrder = 2,
-				tag = "fill text-body-medium text-wrap text-align-x-left content-muted",
-				Text = v75
+				Text = text,
+				tag = "fill text-body-medium text-wrap text-align-x-left content-muted"
 			})
-		}),
-		Work = if not v81 then nil else React.createElement(View, {
-			testId = "ChatTurnBlock.TurnWork.Content",
-			LayoutOrder = not isDone and 1 or 2,
+		})
+	end
+
+	local work
+
+	if v7 then
+		work = React.createElement(View, {
+			LayoutOrder = isDone and 2 or 1,
 			tag = {
 				["col gap-xlarge size-full-0 auto-y padding-left-large"] = isDone,
 				["col gap-xlarge size-full-0 auto-y"] = not isDone
-			}
-		}, t10)
-	})
+			},
+			testId = "ChatTurnBlock.TurnWork.Content"
+		}, v8)
+	end
+
+	return createElement(View, v9, { Summary = summary2, Work = work })
 end
-local function ChatTurnBlock(t11: {[any]: any}) -- line: 372
-	-- upvalues: React (copy), turnProjection (copy), reportTurnActivityGap (copy), useReactiveValue (copy), t1 (copy), t2 (copy), Foundation (copy), sendBuildExperienceEvent (copy), renderWorkSegment (copy), TurnWorkSegment (copy), PlaytestCompletedCard (copy), View (copy), AgentTurnFeedback (copy)
-	local turn = t11.turn
+
+local function ChatTurnBlock(props)
+	local turn = props.turn
 	local turnState = turn.turnState
 	local turnKey = turn.turnKey
 	local startSequenceId = turn.startSequenceId
@@ -351,8 +694,9 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 372
 	local universeId = turn.universeId
 	local sessionId = turn.sessionId
 	local isDone = turn.isDone
-	local v99 = React.useMemo(function() -- line: 386
-		-- upvalues: turnState (copy), turnProjection (copy), turnKey (copy), universeId (copy), sessionId (copy), startSequenceId (copy), endSequenceId (copy), optimisticLocalTools (copy), setupErrorText (copy)
+	local isLatestPublishTurn = turn.isLatestPublishTurn
+
+	local segments = React.useMemo(function()
 		if turnState ~= nil then
 			return turnProjection.projectActiveTurnSegments(turnState, {
 				turnKey = turnKey,
@@ -360,19 +704,16 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 372
 				sessionId = sessionId,
 				startSequenceId = startSequenceId,
 				endSequenceId = endSequenceId,
-				optimisticLocalTools = optimisticLocalTools
+				optimisticLocalTools = optimisticLocalTools,
+				showPlaytestCta = isLatestPublishTurn
 			})
 		end
 
-		if setupErrorText ~= nil then
-			return turnProjection.projectSetupErrorSegments(setupErrorText, {
-				turnKey = turnKey
-			})
+		if setupErrorText == nil then
+			return turnProjection.projectLoadingTurnSegments({ turnKey = turnKey })
 		end
 
-		return turnProjection.projectLoadingTurnSegments({
-			turnKey = turnKey
-		})
+		return turnProjection.projectSetupErrorSegments(setupErrorText, { turnKey = turnKey })
 	end, {
 		turnState,
 		turnKey,
@@ -381,136 +722,266 @@ local function ChatTurnBlock(t11: {[any]: any}) -- line: 372
 		optimisticLocalTools,
 		setupErrorText,
 		universeId,
-		sessionId
+		sessionId,
+		isLatestPublishTurn
 	})
-	local v100 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 415
-		-- upvalues: isDone (copy), v100 (copy), reportTurnActivityGap (copy), universeId (copy)
+	local ref = React.useRef(nil)
+
+	React.useEffect(function()
 		if isDone then
-			v100.current = nil
-
+			ref.current = nil
 			return
 		end
 
-		local elapsed = os.clock()
-		local v115 = v100.current == nil
-		local v116 = v100.current == nil and 0 or (elapsed - v100.current) * 1000
+		local now = os.clock()
+		local v3 = ref.current == nil
+		local v4 = ref.current == nil and 0 or (now - ref.current) * 1000
+		reportTurnActivityGap.log(v4, v3, universeId)
+		ref.current = now
+	end, { isDone, segments, universeId })
 
-		reportTurnActivityGap.log(v116, v115, universeId)
-		v100.current = elapsed
-	end, {
-		isDone,
-		v99,
-		universeId
+	local turnFeedbackIds = useReactiveValue(turn.turnFeedbackIds or v)
+
+	local v3 = not FFlagBuildAgentAdCampaignCard and {} or useAgentAdCampaignTurnCards({
+		segments = segments,
+		sessionId = sessionId,
+		universeId = universeId,
+		isPageVisible = props.isPageVisible,
+		scrollingFrameRef = props.scrollingFrameRef,
+		getCardState = props.getAgentAdCampaignCardState,
+		isCreateDisabled = props.isAgentAdCampaignCreateDisabled,
+		onOfferSelected = props.onAgentAdCampaignOfferSelected
 	})
+	local localToolActions = props.localToolActions or v2
+	local emphasis = Foundation.Hooks.useTokens().Color.Content.Emphasis
+	local messageText
 
-	local v101 = useReactiveValue(turn.turnFeedbackIds or t1)
-	local v102 = t11.localToolActions or t2
-	local Emphasis = Foundation.Hooks.useTokens().Color.Content.Emphasis
-	local onPlaytest = t11.onPlaytest
-	local v105 = React.useCallback(function() -- line: 434
-		-- upvalues: sendBuildExperienceEvent (copy), v101 (copy), onPlaytest (copy)
-		sendBuildExperienceEvent("PLAYTEST_CLICK", {
-			universeId = v101.universeId,
-			placeId = v101.placeId,
-			conversationId = v101.sessionId,
-			messageId = v101.sequenceId
-		})
+	if turnState ~= nil then
+		messageText = turnProjection.getFinalAssistantMessageText(turnState)
+	end
+
+	local v4
+
+	if FFlagBuildCheckGamePermissions then
+		v4 = React.useContext(ChatPermissionsContext)
+	end
+
+	local isPlaytestDisabled
+
+	if v4 == nil then
+		isPlaytestDisabled = false
+	else
+		isPlaytestDisabled = not v4.canEdit
+	end
+
+	local isPublishDisabled
+
+	if v4 == nil then
+		isPublishDisabled = false
+	else
+		isPublishDisabled = not v4.canPublish
+	end
+
+	local onPlaytest = props.onPlaytest
+	local onPlaytest2 = React.useCallback(function()
+		sendBuildExperienceEvent(
+			"PLAYTEST_CLICK",
+			{
+				universeId = turnFeedbackIds.universeId,
+				placeId = turnFeedbackIds.placeId,
+				conversationId = turnFeedbackIds.sessionId,
+				messageId = turnFeedbackIds.sequenceId
+			},
+			FFlagBuildEventsUpdate1 and { context = "chat_widget" } or nil
+		)
 
 		if onPlaytest ~= nil then
 			onPlaytest()
 		end
-	end, {
-		onPlaytest,
-		v101
-	})
-	local v106 = React.useRef(false)
+	end, { onPlaytest, turnFeedbackIds })
 
-	React.useEffect(function() -- line: 447
-		-- upvalues: v106 (copy), onPlaytest (copy), v99 (copy), sendBuildExperienceEvent (copy), v101 (copy)
-		if v106.current or onPlaytest == nil then
+	local ref2 = React.useRef(false)
+	React.useEffect(function()
+		if ref2.current or onPlaytest == nil then
 			return
 		end
 
-		local v117 = false
+		local v5 = false
 
-		for _, v119 in v99 do
-			if v119.kind == "playtest_cta" then
-				v117 = true
-
+		for _, v6 in segments do
+			if v6.kind == "playtest_cta" then
+				v5 = true
 				break
 			end
 		end
 
-		if not v117 then
+		if not v5 then
 			return
 		end
 
-		v106.current = true
+		ref2.current = true
 		sendBuildExperienceEvent("PLAYTEST_IMPRESSION", {
-			universeId = v101.universeId,
-			placeId = v101.placeId,
-			conversationId = v101.sessionId,
-			messageId = v101.sequenceId
+			universeId = turnFeedbackIds.universeId,
+			placeId = turnFeedbackIds.placeId,
+			conversationId = turnFeedbackIds.sessionId,
+			messageId = turnFeedbackIds.sequenceId
 		})
-	end, {
-		v99,
-		onPlaytest,
-		v101
-	})
+	end, { segments, onPlaytest, turnFeedbackIds })
+	local v5 = 1
+	local v6 = {}
 
-	local t12 = {}
-	local n4 = 1
+	for _, segment in segments do
+		local v7 = nil
 
-	for _, v110 in v99 do
-		local v111 = nil
-
-		if v110.kind == "agent_message" or v110.kind == "activity_summary" or v110.kind == "client_tool" then
-			v111 = renderWorkSegment(v110, n4, Emphasis, t11.clockBinding, v102)
-		elseif v110.kind == "turn_work" then
-			v111 = React.createElement(TurnWorkSegment, {
-				LayoutOrder = n4,
-				segment = v110,
+		if segment.kind == "agent_message" or segment.kind == "activity_summary" or segment.kind == "client_tool" then
+			v7 = renderWorkSegment(segment, v5, emphasis, props.clockBinding, localToolActions)
+		elseif segment.kind == "turn_work" then
+			v7 = React.createElement(TurnWorkSegment, {
+				LayoutOrder = v5,
+				segment = segment,
 				isDone = isDone,
-				markdownTextStyle = Emphasis,
-				clockBinding = t11.clockBinding,
-				localToolActions = v102
+				markdownTextStyle = emphasis,
+				clockBinding = props.clockBinding,
+				localToolActions = localToolActions
 			})
-		elseif v110.kind == "playtest_cta" and onPlaytest ~= nil then
-			v111 = React.createElement(PlaytestCompletedCard, {
-				LayoutOrder = n4,
-				onPlaytest = v105,
-				isLoading = t11.isPlaytestLoading
-			})
+		elseif segment.kind == "playtest_cta" and onPlaytest ~= nil then
+			if FFlagBuildExperiencePlaytestCardPublishCta then
+				v7 = React.createElement(PlaytestCardSection, {
+					LayoutOrder = v5,
+					onPlaytest = onPlaytest2,
+					onPublish = props.onPublish,
+					isLoading = props.isPlaytestLoading,
+					isPlaytestDisabled = isPlaytestDisabled,
+					isPublishDisabled = isPublishDisabled,
+					placeId = turnFeedbackIds.placeId,
+					publishedVersionNumber = turnFeedbackIds.publishedVersionNumber
+				})
+			else
+				v7 = React.createElement(PlaytestCompletedCard, {
+					LayoutOrder = v5,
+					onPlaytest = onPlaytest2,
+					isLoading = props.isPlaytestLoading,
+					isPlaytestDisabled = isPlaytestDisabled
+				})
+			end
+		elseif segment.kind == "agent_ad_campaign_card" and FFlagBuildAgentAdCampaignCard then
+			local v8 = v3[segment.toolCallId]
+			local state = v8.state
+			local v9
+
+			if not (FFlagBuildAgentAdCampaignRefreshEligibility and state ~= nil and state.campaignId == nil) then
+				v9 = state
+			end
+
+			if v9 == nil then
+				if segment.offers ~= nil and not v8.isPending then
+					local createElement = React.createElement
+					local v10 = {
+						LayoutOrder = v5,
+						freePromotionsRemaining = segment.availableCreditsSnapshot,
+						isCreatePending = 0,
+						eligibilityError = 0,
+						fundingType = 0,
+						containerRef = 0,
+						isCreateDisabled = 0,
+						onCreate = 0
+					}
+					local isCreatePending
+
+					if FFlagBuildAgentAdCampaignRefreshEligibility and state ~= nil then
+						isCreatePending = state.eligibilityStatus == "loading"
+					end
+
+					v10.isCreatePending = isCreatePending
+					local eligibilityError
+
+					if
+						FFlagBuildAgentAdCampaignRefreshEligibility
+						and state ~= nil
+						and state.eligibilityStatus ~= "loading"
+					then
+						eligibilityError = state.eligibilityStatus
+					end
+
+					v10.eligibilityError = eligibilityError
+
+					v10.fundingType = v8.fundingType
+					v10.containerRef = v8.cardRef
+					v10.isCreateDisabled = v8.isCreateDisabled
+					v10.onCreate = v8.onCreate
+					v7 = createElement(AdUpsellCard, v10)
+				end
+			else
+				v7 = React.createElement(AdCampaignIsActiveCard, {
+					LayoutOrder = v5,
+					variant = v9.variant,
+					campaignStartDate = v9.campaignStartDate,
+					campaignEndDate = v9.campaignEndDate,
+					isDisabled = props.onAgentAdCampaignActive == nil,
+					onActivated = function()
+						if props.onAgentAdCampaignActive ~= nil then
+							props.onAgentAdCampaignActive()
+						end
+					end
+				})
+			end
 		end
 
-		if v111 ~= nil then
-			t12[v110.key] = v111
-			n4 += 1
+		if v7 == nil then
+			continue
 		end
+
+		if FFlagBuildExperienceChatCardEmphasis then
+			v7 = React.createElement(ChatCardEmphasisPositionProvider, {
+				messageOrder = props.LayoutOrder or 0,
+				segmentOrder = v5
+			}, v7)
+		end
+
+		v6[segment.key] = v7
+		v5 += 1
 	end
 
-	return React.createElement(View, {
-		tag = "row gap-small size-full-0 auto-y",
-		LayoutOrder = t11.LayoutOrder
-	}, {
-		Message = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "col gap-xsmall size-full-0 auto-y",
-			testId = "ChatTurnBlock.Message"
-		}, {
-			Content = React.createElement(View, {
+	local createElement = React.createElement
+	local v7 = { LayoutOrder = props.LayoutOrder, tag = "row gap-small size-full-0 auto-y" }
+
+	local createElement2 = React.createElement
+
+	local v8 = {
+		Content = React.createElement(
+			View,
+			{
 				LayoutOrder = 1,
 				tag = "col gap-xlarge size-full-0 auto-y",
 				testId = "ChatTurnBlock.Message.Content"
-			}, t12),
-			Feedback = if not isDone then nil else React.createElement(AgentTurnFeedback, {
-				LayoutOrder = 2,
-				testId = "ChatTurnBlock.UserFeedback",
-				turnFeedbackIds = v101
-			})
+			},
+			v6
+		),
+		Feedback = 0
+	}
+	local feedback
+
+	if isDone then
+		feedback = React.createElement(AgentTurnFeedback, {
+			LayoutOrder = 2,
+			messageText = messageText,
+			turnFeedbackIds = turnFeedbackIds,
+			testId = "ChatTurnBlock.UserFeedback"
 		})
+	end
+
+	v8.Feedback = feedback
+	return createElement(View, v7, {
+		Message = createElement2(
+			View,
+			{
+				LayoutOrder = 1,
+				tag = "col gap-xsmall size-full-0 auto-y",
+				testId = "ChatTurnBlock.Message"
+			},
+			v8
+		)
 	})
 end
 

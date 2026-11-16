@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.AvatarExperienceTimedOptions.AvatarExperienceTimedOptions))
+local AvatarExperienceTimedOptions = require(Workspace.AvatarExperienceTimedOptions.AvatarExperienceTimedOptions)
+
+return AvatarExperienceTimedOptions

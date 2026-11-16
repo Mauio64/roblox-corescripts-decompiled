@@ -1,113 +1,137 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Generic.ProductDetailsContainer)
+local React = require(parent2.React)
+
+require(parent.Generic.ProductDetailsContainer)
 require(script.Parent.aggregateCartPricingForMultiItem)
 require(script.Parent.cartPricingResponseLineItem)
-
 local deriveCartPricingView = require(script.Parent.deriveCartPricingView)
-local UnifiedPurchaseModalTypeEnum = require(ParentParent.Enums.UnifiedPurchaseModalTypeEnum)
 
-require(ParentParent.ProductPurchase.PricingTypes)
+local UnifiedPurchaseModalTypeEnum = require(parent.Enums.UnifiedPurchaseModalTypeEnum)
 
-local FFlagPurchasePromptFetchCartPricing = require(ParentParent.Parent.SharedFlags).FFlagPurchasePromptFetchCartPricing
+require(parent.ProductPurchase.PricingTypes)
 
-local function useCartPricing(t1: {[any]: any}) -- line: 43
-	-- upvalues: React (copy), FFlagPurchasePromptFetchCartPricing (copy), deriveCartPricingView (copy), UnifiedPurchaseModalTypeEnum (copy)
-	local v9 = React.useMemo(function() -- line: 46
-		-- upvalues: FFlagPurchasePromptFetchCartPricing (copy), deriveCartPricingView (copy), t1 (copy)
-		if not FFlagPurchasePromptFetchCartPricing then
-			return nil
+local function useCartPricing(data)
+	local v = React.useMemo(function()
+		return deriveCartPricingView(data.cartPricingResponse)
+	end, { data.cartPricingResponse })
+
+	local cartPricingOffers = v == nil and {} or v.offers
+
+	local cartAggregate = v ~= nil and v.hasSavings and {
+		subtotalRobux = v.originalPrice,
+		totalRobux = v.priceAfterDiscount,
+		savingsRobux = v.originalPrice - v.priceAfterDiscount,
+		itemCount = v.itemCount
+	} or nil
+	local priceWithoutOffersDiscounts
+
+	if v ~= nil then
+		priceWithoutOffersDiscounts = v.priceWithoutOffersDiscounts
+	end
+
+	local priceAfterDiscount
+
+	if v ~= nil then
+		priceAfterDiscount = v.priceAfterDiscount
+	end
+
+	local shouldHideLookProductDetails = data.purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem
+	local showCartOfferUi = cartAggregate ~= nil or #cartPricingOffers > 0
+
+	local v2 = React.useMemo(function()
+		if showCartOfferUi and cartAggregate ~= nil and v ~= nil then
+			return {
+				basePriceInRobux = cartAggregate.subtotalRobux,
+				priceInRobux = cartAggregate.totalRobux,
+				discounts = v.discounts
+			}
 		end
 
-		return deriveCartPricingView(t1.cartPricingResponse)
-	end, { t1.cartPricingResponse })
-	local v10 = if v9 == nil then {} else v9.offers
-	local v11 = if v9 == nil or not v9.hasSavings then nil else {
-		subtotalRobux = v9.originalPrice,
-		totalRobux = v9.priceAfterDiscount,
-		savingsRobux = v9.originalPrice - v9.priceAfterDiscount,
-		itemCount = v9.itemCount
-	}
-	local v12 = FFlagPurchasePromptFetchCartPricing and t1.purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem
-	local v13 = v11 ~= nil or #v10 > 0
-	local v14 = React.useMemo(function() -- line: 75
-		-- upvalues: v13 (copy), v11 (copy), v9 (copy)
-		if not v13 or (v11 == nil or v9 == nil) then
-			return nil
+		return nil
+	end, { showCartOfferUi, cartAggregate, v })
+
+	local mergedProductForDetails = React.useMemo(function()
+		if showCartOfferUi and cartAggregate ~= nil then
+			return {
+				model = data.product.model,
+				itemIcon = data.product.itemIcon,
+				itemName = data.product.itemName,
+				itemRobuxCost = cartAggregate.totalRobux,
+				itemPrice = v2 or data.product.itemPrice,
+				itemDisplayPrice = data.product.itemDisplayPrice,
+				badgeType = data.product.badgeType
+			}
 		end
 
-		return {
-			basePriceInRobux = v11.subtotalRobux,
-			priceInRobux = v11.totalRobux,
-			discounts = v9.discounts
-		}
-	end, {
-		v13,
-		v11,
-		v9
-	})
-	local v15 = React.useMemo(function() -- line: 86
-		-- upvalues: v13 (copy), v11 (copy), t1 (copy), v14 (copy)
-		if not v13 or v11 == nil then
-			return t1.product
-		end
+		return data.product
+	end, { data.product, showCartOfferUi, cartAggregate, v2 })
 
-		return {
-			model = t1.product.model,
-			itemIcon = t1.product.itemIcon,
-			itemName = t1.product.itemName,
-			itemRobuxCost = v11.totalRobux,
-			itemPrice = v14 or t1.product.itemPrice,
-			itemDisplayPrice = t1.product.itemDisplayPrice,
-			badgeType = t1.product.badgeType
-		}
-	end, {
-		t1.product,
-		v13,
-		v11,
-		v14
-	})
-	local itemPrice = v15.itemPrice
-	local v17 = if not itemPrice then v15.itemRobuxCost else itemPrice.priceInRobux
-	local v18 = if not v13 then t1.product.itemPrice else v14 or t1.product.itemPrice
-	local v19 = if not v13 or v9 == nil then nil else v9.savingsSummary
-	local v20 = React.useCallback(function(s1: string) -- line: 112
-		-- upvalues: t1 (copy), v10 (copy)
-		local onCartOfferAppliedChanged = t1.onCartOfferAppliedChanged
+	local itemPrice = mergedProductForDetails.itemPrice
+	local mergedProductPriceInRobux
 
-		if onCartOfferAppliedChanged == nil then
-			return
-		end
+	if itemPrice then
+		mergedProductPriceInRobux = itemPrice.priceInRobux
+	else
+		mergedProductPriceInRobux = mergedProductForDetails.itemRobuxCost
+	end
 
-		local t2 = {}
-		local v24 = true
+	local displayItemPriceForMultiItem
 
-		for _, v26 in v10 do
-			if not if s1 ~= v26.offerId then v26.selected else not v26.selected then
-				table.insert(t2, v26.offerId)
-				v24 = false
-			end
-		end
+	if showCartOfferUi then
+		displayItemPriceForMultiItem = v2 or data.product.itemPrice
+	else
+		displayItemPriceForMultiItem = data.product.itemPrice
+	end
 
-		onCartOfferAppliedChanged(v24, t2)
-	end, {
-		v10,
-		t1.onCartOfferAppliedChanged
-	})
+	local cartPricingSavingsSummary
+
+	if showCartOfferUi and v ~= nil then
+		cartPricingSavingsSummary = v.savingsSummary
+	end
 
 	return {
-		cartAggregate = v11,
-		shouldHideLookProductDetails = v12,
-		cartPricingOffers = v10,
-		showCartOfferUi = v13,
-		mergedProductForDetails = v15,
+		cartAggregate = cartAggregate,
+		priceWithoutOffersDiscounts = priceWithoutOffersDiscounts,
+		priceAfterOffersDiscounts = priceAfterDiscount,
+		shouldHideLookProductDetails = shouldHideLookProductDetails,
+		cartPricingOffers = cartPricingOffers,
+		showCartOfferUi = showCartOfferUi,
+		mergedProductForDetails = mergedProductForDetails,
 		mergedProductItemPrice = itemPrice,
-		mergedProductPriceInRobux = v17,
-		displayItemPriceForMultiItem = v18,
-		cartPricingSavingsSummary = v19,
-		toggleCartPricingOffer = v20
+		mergedProductPriceInRobux = mergedProductPriceInRobux,
+		displayItemPriceForMultiItem = displayItemPriceForMultiItem,
+		cartPricingSavingsSummary = cartPricingSavingsSummary,
+		toggleCartPricingOffer = React.useCallback(function(p: string)
+			local onCartOfferAppliedChanged = data.onCartOfferAppliedChanged
+
+			if onCartOfferAppliedChanged == nil then
+				return
+			end
+
+			local offerIds = {}
+			local v3 = true
+
+			for _, v4 in cartPricingOffers do
+				local v5
+
+				if v4.offerId == p then
+					v5 = not v4.selected
+				else
+					v5 = v4.selected
+				end
+
+				if v5 then
+					continue
+				end
+
+				table.insert(offerIds, v4.offerId)
+				v3 = false
+			end
+
+			onCartOfferAppliedChanged(v3, offerIds)
+		end, { cartPricingOffers, data.onCartOfferAppliedChanged })
 	}
 end
 

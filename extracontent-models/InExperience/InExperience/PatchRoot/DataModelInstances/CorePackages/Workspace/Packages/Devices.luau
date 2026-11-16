@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.Devices.Devices))
+local Devices = require(Workspace.Devices.Devices)
+
+return Devices

@@ -1,29 +1,28 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent
 
-local pcallDeferred = require(ParentParent.util.pcallDeferred)
+require(parent.util.Types)
+local pcallDeferred = require(parent.util.pcallDeferred)
 
-local function getVerts(p1, p2) -- line: 12
-	-- upvalues: pcallDeferred (copy), UGCValidationService (copy)
+local function getVerts(p, p2)
 	local isServer = p2.isServer
-	local v8, v9 = pcallDeferred(function() -- line: 18
-		-- upvalues: UGCValidationService (copy), p1 (copy)
-		return UGCValidationService:GetEditableMeshVerts(p1.editableMesh)
+
+	local v, v2 = pcallDeferred(function()
+		return UGCValidationService:GetEditableMeshVerts(p.editableMesh)
 	end, p2)
 
-	if not v8 then
-		local v10 = "Failed to read mesh: " .. p1.fullName
-
-		if isServer then
-			error(v10)
-		end
-
-		return false, { v10 }
+	if v then
+		return true, nil, v2
 	end
 
-	return true, nil, v9
+	local v3 = "Failed to read mesh: " .. p.fullName
+
+	if isServer then
+		error(v3)
+	end
+
+	return false, { v3 }
 end
 
 return getVerts

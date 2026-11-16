@@ -1,32 +1,20 @@
-local scriptParent = script.Parent
-local None = require(scriptParent.None)
+local parent = script.Parent
+local None = require(parent.None)
+require(parent.Types)
+local forEach = require(parent.forEach)
+local function joinDeep(p, p2)
+	local clone = table.clone(p)
 
-require(scriptParent.Types)
-
-local forEach = require(scriptParent.forEach)
-
-local function joinDeep(t1: {[any]: any}, t2: {[any]: any}) -- line: 21
-	-- upvalues: forEach (copy), joinDeep (copy), None (copy)
-	local v7 = table.clone(t1)
-
-	forEach(t2, function(p1, p2) -- line: 24
-		-- upvalues: t1 (copy), v7 (copy), joinDeep (copy), None (copy)
-		if typeof(t1[p2]) == "table" and typeof(p1) == "table" then
-			v7[p2] = joinDeep(t1[p2], p1)
-
-			return
+	forEach(p2, function(p3, p4)
+		if typeof(p[p4]) == "table" and typeof(p3) == "table" then
+			clone[p4] = joinDeep(p[p4], p3)
+		elseif p3 == None then
+			clone[p4] = nil
+		else
+			clone[p4] = p3
 		end
-
-		if p1 == None then
-			v7[p2] = nil
-
-			return
-		end
-
-		v7[p2] = p1
 	end)
-
-	return v7
+	return clone
 end
 
 return joinDeep

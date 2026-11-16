@@ -1,12 +1,13 @@
 local CorePackages = game:GetService("CorePackages")
+
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
+
 local GetPlaytestModeStore = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon.GetPlaytestModeStore)
 
-local function useIsPlaytestMode() -- line: 7
-	-- upvalues: GetPlaytestModeStore (copy), SignalsReact (copy)
-	local v5 = GetPlaytestModeStore(false)
+local function useIsPlaytestMode()
+	local playtestModeStore = GetPlaytestModeStore(false)
 
-	return SignalsReact.useSignalState(v5.getIsPlaytestMode)
+	return SignalsReact.useSignalState(playtestModeStore.getIsPlaytestMode)
 end
 
 return useIsPlaytestMode

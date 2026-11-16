@@ -1,45 +1,35 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local FFlagLuaAppIedpSendPoints = require(Parent.SharedFlags).FFlagLuaAppIedpSendPoints
-local v6 = game:DefineFastInt("InExperienceDetailsPromptOpenedHundredthsPercent", 0)
-local v7 = t.strictInterface({
-	targetUniverseId = t.string
-})
-local t1 = {
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppIedpSendPoints = SharedFlags.FFlagLuaAppIedpSendPoints
+
+local defineFastInt = game:DefineFastInt("InExperienceDetailsPromptOpenedHundredthsPercent", 0)
+
+local strictInterface = t.strictInterface({ targetUniverseId = t.string })
+
+local v = {
 	eventName = "inExperienceDetailsPromptOpened",
-	description = "Fires when the in-experience details prompt is opened",
-	backends = if not FFlagLuaAppIedpSendPoints then { "EventIngest" } else {
-		"EventIngest",
-		"Points"
-	},
-	throttlingPercentage = v6,
-	lastUpdated = if not FFlagLuaAppIedpSendPoints then {
-		25,
-		11,
-		11
-	} else {
-		25,
-		11,
-		19
-	}
+	backends = FFlagLuaAppIedpSendPoints and { "EventIngest", "Points" } or { "EventIngest" },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = FFlagLuaAppIedpSendPoints and { 25, 11, 19 } or { 25, 11, 11 },
+	description = "Fires when the in-experience details prompt is opened"
 }
 
-local function fireInExperienceDetailsPromptOpenedEvent(p1) -- line: 24
-	-- upvalues: v7 (copy), DiscoveryEventErrorLogger (copy), TelemetryService (copy), t1 (copy)
-	local v11, v12 = v7(p1)
+local function fireInExperienceDetailsPromptOpenedEvent(customFields)
+	local v2, v3 = strictInterface(customFields)
 
-	if not v11 then
-		DiscoveryEventErrorLogger.reportError("InExperienceDetailsPromptOpenedInvalidInterface", v12)
+	if not v2 then
+		DiscoveryEventErrorLogger.reportError("InExperienceDetailsPromptOpenedInvalidInterface", v3)
 	end
 
-	TelemetryService:LogEvent(t1, {
-		standardizedFields = {
-			"addUniverseId",
-			"addOSInfo"
-		},
-		customFields = p1
+	TelemetryService:LogEvent(v, {
+		standardizedFields = { "addUniverseId", "addOSInfo" },
+		customFields = customFields
 	})
 end
 

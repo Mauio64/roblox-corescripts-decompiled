@@ -1,11 +1,12 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local CentralOverlayType = require(Parent.RobloxAppEnums).CentralOverlayType
-local SetCentralOverlay = require(Parent.CentralOverlay).Actions.SetCentralOverlay
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-return function() -- line: 7
-	-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
-	return function(p1) -- line: 8
-		-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
-		p1:dispatch(SetCentralOverlay(CentralOverlayType.LoginPasswordResetPrompt, {}))
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local CentralOverlayType = RobloxAppEnums.CentralOverlayType
+local CentralOverlay = require(parent.CentralOverlay)
+local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
+
+return function()
+	return function(object)
+		object:dispatch(SetCentralOverlay(CentralOverlayType.LoginPasswordResetPrompt, {}))
 	end
 end

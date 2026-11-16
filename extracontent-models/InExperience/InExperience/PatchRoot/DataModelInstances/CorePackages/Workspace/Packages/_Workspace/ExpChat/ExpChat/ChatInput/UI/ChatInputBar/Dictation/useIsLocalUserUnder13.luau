@@ -1,14 +1,9 @@
 local Players = game:GetService("Players")
 
-local function useIsLocalUserUnder13() -- line: 15
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
+local function useIsLocalUserUnder13(): boolean
+	local localPlayer = Players.LocalPlayer
 
-	if LocalPlayer == nil then
-		return false
-	end
-
-	return LocalPlayer:GetUnder13() == true
+	return localPlayer ~= nil and localPlayer:GetUnder13() == true
 end
 
 return useIsLocalUserUnder13

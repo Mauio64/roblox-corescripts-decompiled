@@ -1,41 +1,33 @@
-local ParentParent = script.Parent.Parent.Parent
-
-require(ParentParent.util.Types)
-
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local parent = script.Parent.Parent.Parent
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 local UGCValidationService = game:GetService("UGCValidationService")
-local v5 = game:DefineFastInt("UGCValidationMinimumHeadSizePercentAcrossFacs", 95)
-local v6 = game:DefineFastInt("UGCValidationMaximumHeadSizePercentAcrossFacs", 120)
+local defineFastInt = game:DefineFastInt("UGCValidationMinimumHeadSizePercentAcrossFacs", 95)
+local defineFastInt2 = game:DefineFastInt("UGCValidationMaximumHeadSizePercentAcrossFacs", 120)
 
 return {
-	fflag = require(ParentParent.flags.getEngineFeatureEngineUGCValidateMinMaxMeshSizeAcrossAllFacs),
+	["fflag"] = require(parent.flags.getEngineFeatureEngineUGCValidateMinMaxMeshSizeAcrossAllFacs),
 	categories = { ValidationEnums.UploadCategory.DYNAMIC_HEAD },
 	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
-	expectedFailures = {
-		"Asset_EF_HeadWithExpandingFacs",
-		"Asset_EF_HeadWithShrinkingFacs"
-	},
-	run = function(p1, p2) -- line: 16
-		-- upvalues: UGCValidationService (copy), v5 (copy), ErrorSourceStrings (copy), v6 (copy)
-		local Head = p2.renderMeshesData.Head
-		local v10, v11 = unpack(UGCValidationService:GetMinAndMaxMeshSizeAcrossAllFacs(Head.editable))
-		local v12 = 100 * v10 / Head.originalSize
-		local v13 = math.floor((math.min(v12.X, v12.Y, v12.Z)))
+	expectedFailures = { "Asset_EF_HeadWithExpandingFacs", "Asset_EF_HeadWithShrinkingFacs" },
+	run = function(object, p)
+		local head = p.renderMeshesData.Head
 
-		if v13 < v5 then
-			p1:fail(ErrorSourceStrings.Keys.FacsShrinksHead, {
-				modPercent = v13
-			})
+		local v, v2 = unpack(UGCValidationService:GetMinAndMaxMeshSizeAcrossAllFacs(head.editable))
+
+		local v3 = 100 * v / head.originalSize
+		local modPercent = math.floor((math.min(v3.X, v3.Y, v3.Z)))
+
+		if modPercent < defineFastInt then
+			object:fail(ErrorSourceStrings.Keys.FacsShrinksHead, { modPercent = modPercent })
 		end
 
-		local v14 = 100 * v11 / Head.originalSize
-		local v15 = math.ceil((math.max(v14.X, v14.Y, v14.Z)))
+		local v4 = 100 * v2 / head.originalSize
+		local modPercent2 = math.ceil((math.max(v4.X, v4.Y, v4.Z)))
 
-		if v15 > v6 then
-			p1:fail(ErrorSourceStrings.Keys.FacsExpandsHead, {
-				modPercent = v15
-			})
+		if defineFastInt2 < modPercent2 then
+			object:fail(ErrorSourceStrings.Keys.FacsExpandsHead, { modPercent = modPercent2 })
 		end
 	end
 }

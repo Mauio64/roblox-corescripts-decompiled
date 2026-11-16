@@ -1,20 +1,20 @@
-local Parent = script:FindFirstAncestor("ApolloLocalState").Parent
-local Array = require(Parent.LuauPolyfill).Array
+local parent = script:FindFirstAncestor("ApolloLocalState").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-local function mergeArrays(_, p2, p3) -- line: 6
-	-- upvalues: Array (copy)
-	local v7 = p2 or {}
-	local v8 = p3 or {}
+local function mergeArrays(_, options, options2)
+	local v = options or {}
+	local selected = options2 or {}
 
-	if #v8 == 0 then
-		return v7
+	if #selected == 0 then
+		return v
 	end
 
-	if #v7 == 0 then
-		return v8
+	if #v == 0 then
+		return selected
 	end
 
-	return Array.concat(table.clone(v7), v8)
+	return Array.concat(table.clone(v), selected)
 end
 
 return mergeArrays

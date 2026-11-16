@@ -1,5 +1,1 @@
-return {
-	Off = "Off",
-	AllItems = "AllItems",
-	SlotItems = "SlotItems"
-}
+return { Off = "Off", AllItems = "AllItems", SlotItems = "SlotItems" }

@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
 
-return require(ParentParent.LuaSocialLibrariesDeps).SocialLibraries.config({})
+return LuaSocialLibrariesDeps.SocialLibraries.config({})

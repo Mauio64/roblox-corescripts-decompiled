@@ -1,1 +1,3 @@
-return require(script.Parent.buildApiSiteUrl)("chat")
+local buildApiSiteUrl = require(script.Parent.buildApiSiteUrl)
+
+return buildApiSiteUrl("chat")

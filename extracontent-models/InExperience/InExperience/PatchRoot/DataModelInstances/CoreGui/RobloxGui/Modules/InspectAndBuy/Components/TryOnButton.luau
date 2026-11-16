@@ -3,134 +3,149 @@ local ContextActionService = game:GetService("ContextActionService")
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
-local ParentParent = script.Parent.Parent
-local Colors = require(ParentParent.Colors)
-local Constants = require(ParentParent.Constants)
-local SetTryingOnInfo = require(ParentParent.Actions.SetTryingOnInfo)
-local TryOnItem = require(ParentParent.Thunks.TryOnItem)
-local getSelectionImageObjectRounded = require(ParentParent.getSelectionImageObjectRounded)
-local TryOn = require(script.Parent.Common.ControllerShortcutKeycodes).TryOn
-local v14 = Roact.PureComponent:extend("TryOnButton")
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
+local parent = script.Parent.Parent
+local Colors = require(parent.Colors)
+local Constants = require(parent.Constants)
+local SetTryingOnInfo = require(parent.Actions.SetTryingOnInfo)
+local TryOnItem = require(parent.Thunks.TryOnItem)
+local getSelectionImageObjectRounded = require(parent.getSelectionImageObjectRounded)
 
-function v14.init(p1) -- line: 22
-	-- upvalues: getSelectionImageObjectRounded (copy), ContextActionService (copy), TryOn (copy)
-	p1.selectedImage = getSelectionImageObjectRounded()
-	ContextActionService:BindCoreAction("TryOnGamepadShortcut", function(_, p3, _) -- line: 25
-		-- upvalues: p1 (copy)
-		if p3 == Enum.UserInputState.End then
-			p1:activateButton()
+local ControllerShortcutKeycodes = require(script.Parent.Common.ControllerShortcutKeycodes)
+local TryOn = ControllerShortcutKeycodes.TryOn
 
-			return Enum.ContextActionResult.Sink
+local extended = Roact.PureComponent:extend("TryOnButton")
+
+function extended:init()
+	self.selectedImage = getSelectionImageObjectRounded()
+
+	ContextActionService:BindCoreAction("TryOnGamepadShortcut", function(_, p, _)
+		if p ~= Enum.UserInputState.End then
+			return Enum.ContextActionResult.Pass
 		end
 
-		return Enum.ContextActionResult.Pass
+		self:activateButton()
+		return Enum.ContextActionResult.Sink
 	end, false, TryOn)
 end
-function v14.activateButton(p5) -- line: 34
-	-- upvalues: Constants (copy)
-	if not p5.props.showTryOn then
+
+function extended:activateButton()
+	if not self.props.showTryOn then
 		return
 	end
 
-	local assetInfo = p5.props.assetInfo
-	local tryOnItem = p5.props.tryOnItem
-	local takeOffItem = p5.props.takeOffItem
-	local tryingOn = p5.props.tryingOnInfo.tryingOn
-	local partOfBundleAndOffsale = p5.props.partOfBundleAndOffsale
-	local bundleId = p5.props.bundleId
+	local assetInfo = self.props.assetInfo
+	local tryOnItem = self.props.tryOnItem
+	local takeOffItem = self.props.takeOffItem
+	local tryingOn = self.props.tryingOnInfo.tryingOn
+	local partOfBundleAndOffsale = self.props.partOfBundleAndOffsale
+	local bundleId = self.props.bundleId
 
-	if not assetInfo or (not p5.props.localPlayerModel or (Constants.LayeredAssetTypes[assetInfo.assetTypeId] == nil or p5.props.localPlayerModel.Humanoid.RigType ~= Enum.HumanoidRigType.R6)) then
+	local v = assetInfo and self.props.localPlayerModel
+
+	if v then
+		if Constants.LayeredAssetTypes[assetInfo.assetTypeId] == nil then
+			v = false
+		else
+			v = self.props.localPlayerModel.Humanoid.RigType == Enum.HumanoidRigType.R6
+		end
+	end
+
+	if not v then
 		if tryingOn then
 			takeOffItem()
-
-			return
+		else
+			tryOnItem(true, assetInfo.assetId, assetInfo.assetTypeId, partOfBundleAndOffsale, bundleId)
 		end
-
-		tryOnItem(true, assetInfo.assetId, assetInfo.assetTypeId, partOfBundleAndOffsale, bundleId)
 	end
 end
-function v14.willUnmount(_) -- line: 61
-	-- upvalues: ContextActionService (copy)
+
+function extended.willUnmount(_)
 	ContextActionService:UnbindCoreAction("TryOnGamepadShortcut")
 end
-function v14.render(p7) -- line: 65
-	-- upvalues: Constants (copy), Roact (copy), Colors (copy), RobloxTranslator (copy), AppFonts (copy)
-	local tryingOn = p7.props.tryingOnInfo.tryingOn
-	local showTryOn = p7.props.showTryOn
-	local locale = p7.props.locale
-	local assetInfo = p7.props.assetInfo
-	local tryOnButtonRef = p7.props.tryOnButtonRef
-	local v30 = not tryingOn and "InGame.InspectMenu.Action.TryOn" or "InGame.InspectMenu.Action.TakeOff"
-	local v31 = assetInfo and (p7.props.localPlayerModel and (Constants.LayeredAssetTypes[assetInfo.assetTypeId] ~= nil and p7.props.localPlayerModel.Humanoid.RigType == Enum.HumanoidRigType.R6))
+
+function extended:render()
+	local tryingOn = self.props.tryingOnInfo.tryingOn
+	local showTryOn = self.props.showTryOn
+	local locale = self.props.locale
+	local assetInfo = self.props.assetInfo
+	local tryOnButtonRef = self.props.tryOnButtonRef
+
+	local v = assetInfo and self.props.localPlayerModel
+
+	if v then
+		if Constants.LayeredAssetTypes[assetInfo.assetTypeId] == nil then
+			v = false
+		else
+			v = self.props.localPlayerModel.Humanoid.RigType == Enum.HumanoidRigType.R6
+		end
+	end
 
 	return Roact.createElement("ImageLabel", {
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Image = "rbxasset://textures/ui/InspectMenu/Button_outline.png",
 		AnchorPoint = Vector2.new(0.5, 0),
+		BackgroundTransparency = 1,
 		Size = UDim2.new(0.5, -32, 0, 44),
 		Visible = showTryOn,
-		ImageTransparency = not v31 and 0 or 0.5,
+		LayoutOrder = 2,
+		Image = "rbxasset://textures/ui/InspectMenu/Button_outline.png",
+		ImageTransparency = v and 0.5 or 0,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(5, 5, 120, 20)
 	}, {
 		SelectionGainedImage = Roact.createElement("ImageLabel", {
 			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
 			Visible = false,
 			Image = "rbxasset://textures/ui/InspectMenu/Button_white.png",
-			Size = UDim2.new(1, 0, 1, 0),
 			ImageColor3 = Colors.Pumice
 		}),
 		TryOnTextKey = Roact.createElement("TextButton", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
-			Text = RobloxTranslator:FormatByKeyForLocale(v30, locale),
+			Text = RobloxTranslator:FormatByKeyForLocale(
+				tryingOn and "InGame.InspectMenu.Action.TakeOff" or "InGame.InspectMenu.Action.TryOn",
+				locale
+			),
 			Font = AppFonts.default:getDefault(),
 			TextSize = 16,
 			TextColor3 = Colors.White,
-			TextTransparency = not v31 and 0 or 0.5,
-			SelectionImageObject = p7.selectedImage,
+			TextTransparency = v and 0.5 or 0,
+			SelectionImageObject = self.selectedImage,
 			ZIndex = 2,
-			[Roact.Event.SelectionGained] = function(p8) -- line: 114
-				-- upvalues: Colors (copy)
-				p8.Parent.SelectionGainedImage.Visible = true
-				p8.TextColor3 = Colors.Carbon
+			[Roact.Event.SelectionGained] = function(p)
+				p.Parent.SelectionGainedImage.Visible = true
+				p.TextColor3 = Colors.Carbon
 			end,
-			[Roact.Event.SelectionLost] = function(p9) -- line: 118
-				-- upvalues: Colors (copy)
-				p9.Parent.SelectionGainedImage.Visible = false
-				p9.TextColor3 = Colors.White
+			[Roact.Event.SelectionLost] = function(p)
+				p.Parent.SelectionGainedImage.Visible = false
+				p.TextColor3 = Colors.White
 			end,
 			[Roact.Ref] = tryOnButtonRef,
-			[Roact.Event.Activated] = function() -- line: 123
-				-- upvalues: p7 (copy)
-				p7:activateButton()
+			[Roact.Event.Activated] = function()
+				self:activateButton()
 			end
 		})
 	})
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p10, _) -- line: 130
-	local assetId = p10.detailsInformation.assetId
+return RoactRodux.UNSTABLE_connect2(function(data, _)
+	local assetId = data.detailsInformation.assetId
 
 	return {
-		locale = p10.locale,
-		view = p10.view,
-		assetInfo = p10.assets[assetId],
-		bundleInfo = p10.bundles,
-		tryingOnInfo = p10.tryingOnInfo
+		locale = data.locale,
+		view = data.view,
+		assetInfo = data.assets[assetId],
+		bundleInfo = data.bundles,
+		tryingOnInfo = data.tryingOnInfo
 	}
-end, function(p12) -- line: 140
-	-- upvalues: TryOnItem (copy), SetTryingOnInfo (copy)
+end, function(callback)
 	return {
-		tryOnItem = function(p13, p14, p15, p16, p17) -- line: 142
-			-- upvalues: p12 (copy), TryOnItem (copy)
-			p12(TryOnItem(p13, p14, p15, p16, p17))
+		tryOnItem = function(p, p2, p3, p4, p5)
+			callback(TryOnItem(p, p2, p3, p4, p5))
 		end,
-		takeOffItem = function() -- line: 145
-			-- upvalues: p12 (copy), SetTryingOnInfo (copy)
-			p12(SetTryingOnInfo(false, nil, nil))
+		takeOffItem = function()
+			callback(SetTryingOnInfo(false, nil, nil))
 		end
 	}
-end)(v14)
+end)(extended)

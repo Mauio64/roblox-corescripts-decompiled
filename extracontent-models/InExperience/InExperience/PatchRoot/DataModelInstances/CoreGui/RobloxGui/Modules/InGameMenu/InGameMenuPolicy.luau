@@ -1,63 +1,49 @@
 local CorePackages = game:GetService("CorePackages")
-local PolicyProvider = require(CorePackages.Packages.InGameMenuDependencies).PolicyProvider
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local PolicyProvider = InGameMenuDependencies.PolicyProvider
 local SharedFlags = CorePackages.Workspace.Packages.SharedFlags
-local GetFFlagUseVoiceExitBetaLanguage = require(SharedFlags).GetFFlagUseVoiceExitBetaLanguage
-local GetFFlagGateEducationalPopupVisibilityViaGUAC = require(SharedFlags).GetFFlagGateEducationalPopupVisibilityViaGUAC
-local v6 = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
-local v7 = PolicyProvider.withGetPolicyImplementation(v6)
-local GetFIntEducationalPopupDisplayMaxCount = require(script.Parent.Parent.Flags.GetFIntEducationalPopupDisplayMaxCount)
-local isSubjectToDesktopPolicies = require(CorePackages.Workspace.Packages.SharedFlags).isSubjectToDesktopPolicies
+local module = require(SharedFlags)
+local getFFlagGateEducationalPopupVisibilityViaGUAC = module.GetFFlagGateEducationalPopupVisibilityViaGUAC
 
-function v7.Mapper(p1) -- line: 16
-	-- upvalues: isSubjectToDesktopPolicies (copy), GetFFlagGateEducationalPopupVisibilityViaGUAC (copy), GetFIntEducationalPopupDisplayMaxCount (copy), GetFFlagUseVoiceExitBetaLanguage (copy)
+local memStorageService = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+local v = PolicyProvider.withGetPolicyImplementation(memStorageService)
+
+local GetFIntEducationalPopupDisplayMaxCount = require(script.Parent.Parent.Flags.GetFIntEducationalPopupDisplayMaxCount)
+
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local isSubjectToDesktopPolicies = SharedFlags2.isSubjectToDesktopPolicies
+
+function v.Mapper(data)
 	return {
-		enableInGameHomeIcon = function() -- line: 18
-			-- upvalues: isSubjectToDesktopPolicies (copy)
+		enableInGameHomeIcon = function()
 			return isSubjectToDesktopPolicies()
 		end,
-		enableEducationalPopup = function() -- line: 22
-			-- upvalues: isSubjectToDesktopPolicies (copy), GetFFlagGateEducationalPopupVisibilityViaGUAC (copy), p1 (copy)
-			local EngineFeature = game:GetEngineFeature("NativeCloseIntercept")
+		enableEducationalPopup = function()
+			local engineFeature = game:GetEngineFeature("NativeCloseIntercept")
 
-			if isSubjectToDesktopPolicies() and EngineFeature then
-				if GetFFlagGateEducationalPopupVisibilityViaGUAC() then
-					if p1.InExperienceCanViewEducationalPopup == nil then
-						return true
-					end
+			if not (isSubjectToDesktopPolicies() and engineFeature) then
+				return false
+			end
 
-					return p1.InExperienceCanViewEducationalPopup
-				end
-
+			if not getFFlagGateEducationalPopupVisibilityViaGUAC() then
 				return true
 			end
 
-			return false
+			return data.InExperienceCanViewEducationalPopup == nil or data.InExperienceCanViewEducationalPopup
 		end,
-		educationalPopupMaxDisplayCount = function() -- line: 35
-			-- upvalues: isSubjectToDesktopPolicies (copy), GetFIntEducationalPopupDisplayMaxCount (copy)
+		educationalPopupMaxDisplayCount = function()
 			return isSubjectToDesktopPolicies() and GetFIntEducationalPopupDisplayMaxCount() or 0
 		end,
-		getGameInfoShowChatFeatures = function() -- line: 39
-			-- upvalues: GetFFlagUseVoiceExitBetaLanguage (copy), p1 (copy)
-			if GetFFlagUseVoiceExitBetaLanguage() then
-				return p1.GameInfoShowChatFeatures or false
-			end
-
+		getGameInfoShowChatFeatures = function(): boolean
 			return false
 		end,
-		enableFullscreenTitleBar = function() -- line: 46
-			-- upvalues: p1 (copy)
-			return p1.FullscreenTitleBarEnabled or false
+		enableFullscreenTitleBar = function()
+			return data.FullscreenTitleBarEnabled or false
 		end,
-		getDisplayCheckboxInVoiceConsent = function() -- line: 50
-			-- upvalues: p1 (copy)
-			if p1.DisplayCheckboxInVoiceConsent == nil then
-				return true
-			end
-
-			return p1.DisplayCheckboxInVoiceConsent
+		getDisplayCheckboxInVoiceConsent = function()
+			return data.DisplayCheckboxInVoiceConsent == nil or data.DisplayCheckboxInVoiceConsent
 		end
 	}
 end
 
-return v7
+return v

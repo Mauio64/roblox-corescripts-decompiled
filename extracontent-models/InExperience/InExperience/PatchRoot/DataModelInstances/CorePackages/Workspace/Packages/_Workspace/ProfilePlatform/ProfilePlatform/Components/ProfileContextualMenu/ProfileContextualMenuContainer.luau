@@ -1,11 +1,14 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Navigation = require(ProfilePlatformParent.Navigation)
-local InputHandlers = require(ProfilePlatformParent.InputHandlers)
-local FocusNavigationUtils = require(ProfilePlatformParent.FocusNavigationUtils)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+
+local Navigation = require(parent.Navigation)
+local InputHandlers = require(parent.InputHandlers)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+
 local ProfileContextualMenu = require(script.Parent.ProfileContextualMenu)
-local useScreenSize = require(ProfilePlatformParent.RobloxAppHooks).useScreenSize
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useScreenSize = RobloxAppHooks.useScreenSize
 local useProfileActions = require(ProfilePlatform.Hooks.useProfileActions)
 local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
 local useNavigation = Navigation.useNavigation
@@ -15,128 +18,141 @@ local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNa
 local useAppFocusRoot = FocusNavigationUtils.useAppFocusRoot
 local Constants = require(ProfilePlatform.Common.Constants)
 local Enums = require(ProfilePlatform.Common.Enums)
-local FFlagProfilePlatformAddTC = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformAddTC
-local FFlagProfileContextualMenuDisableFix = require(ProfilePlatformParent.SharedFlags).FFlagProfileContextualMenuDisableFix
-local FFlagProfileFixMenuNavigation = require(ProfilePlatformParent.SharedFlags).FFlagProfileFixMenuNavigation
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformAddTC = SharedFlags.FFlagProfilePlatformAddTC
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfileContextualMenuDisableFix = SharedFlags2.FFlagProfileContextualMenuDisableFix
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagProfileFixMenuNavigation = SharedFlags3.FFlagProfileFixMenuNavigation
 
-local function ProfileContextualMenuContainer(_) -- line: 24
-	-- upvalues: useScreenSize (copy), useNavigation (copy), Constants (copy), useProfileJsonComponent (copy), Enums (copy), useProfileActions (copy), React (copy), FFlagProfileFixMenuNavigation (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FFlagProfileContextualMenuDisableFix (copy), FFlagProfilePlatformAddTC (copy), ProfileContextualMenu (copy), FocusNavigableSurfaceWrapper (copy)
-	local v23 = useScreenSize()
-	local v24 = useNavigation()
-	local v25 = v24.getParam(Constants.Navigation.ON_CLOSE)
-	local v26 = v24.getParam(Constants.Navigation.GET_ROOT_ELEMENT_REF)
-	local v27 = v24.getParam(Constants.Navigation.ON_DISMISS_REF)
-	local v28 = v26()
-	local v29 = if not v28 then Vector2.new(0, 0) else v28.AbsolutePosition
-	local v30 = useProfileJsonComponent(Enums.Components.Actions) or {}
-	local v31 = useProfileActions(Enums.ButtonSurface.ContextualMenu)
-	local contextual = v30.contextual
-	local v33, v34 = React.useState(true)
-	local v35 = React.useCallback(function() -- line: 42
-		-- upvalues: v34 (copy), v24 (copy), v25 (copy)
-		v34(false)
-		v24.pop()
-		v25()
-	end, {
-		v24,
-		v25
-	})
-	local v36 = if not FFlagProfileFixMenuNavigation then nil else useAppFocusRoot({
-		isAutoFocusRoot = true,
-		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ContextualMenu,
-		customEventHandlers = {
-			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function() -- line: 54
-					-- upvalues: v35 (copy)
-					v35()
-				end)
-			}
-		},
-		isFocusable = v33
-	})
+local function ProfileContextualMenuContainer(_)
+	local screenSize = useScreenSize()
+	local v = useNavigation()
 
-	React.useEffect(function() -- line: 64
-		-- upvalues: v27 (copy), v35 (copy)
-		if not v27 then
+	local param = v.getParam(Constants.Navigation.ON_CLOSE)
+	local param2 = v.getParam(Constants.Navigation.GET_ROOT_ELEMENT_REF)
+	local param3 = v.getParam(Constants.Navigation.ON_DISMISS_REF)
+
+	local current = param2()
+	local rootElementPosition
+
+	if current then
+		rootElementPosition = current.AbsolutePosition
+	else
+		rootElementPosition = Vector2.new(0, 0)
+	end
+
+	local v2 = useProfileJsonComponent(Enums.Components.Actions) or {}
+
+	local v3 = useProfileActions(Enums.ButtonSurface.ContextualMenu)
+	local contextual = v2.contextual
+
+	local state, setState = React.useState(true)
+
+	local v4 = React.useCallback(function()
+		setState(false)
+		v.pop()
+		param()
+	end, { v, param })
+	local menuRef
+
+	if FFlagProfileFixMenuNavigation then
+		menuRef = useAppFocusRoot({
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ContextualMenu,
+			customEventHandlers = {
+				[FocusNavigationEventNameEnum.NavigateBack] = {
+					handler = InputHandlers.onRelease(function()
+						v4()
+					end)
+				}
+			},
+			isAutoFocusRoot = true,
+			isFocusable = state
+		})
+	end
+
+	React.useEffect(function()
+		if not param3 then
 			return
 		end
 
-		v27.current = v35
-
-		return function() -- line: 69
-			-- upvalues: v27 (copy)
-			v27.current = nil
+		param3.current = v4
+		return function()
+			param3.current = nil
 		end
-	end, { v35 })
+	end, { v4 })
 
-	local v37 = React.useMemo(function() -- line: 74
-		-- upvalues: contextual (copy), v31 (copy), FFlagProfileContextualMenuDisableFix (copy), FFlagProfilePlatformAddTC (copy), v35 (copy)
+	local buttonProps = React.useMemo(function()
 		if not contextual then
 			return {}
 		end
 
-		local t1 = {}
+		local result = {}
 
-		for _, v40 in contextual do
-			local v41 = v31[v40]
+		for _, v5 in contextual do
+			local v6 = v3[v5]
 
-			if v41 then
-				table.insert(t1, {
-					text = v41.text,
-					disabled = if not FFlagProfileContextualMenuDisableFix then if not FFlagProfilePlatformAddTC then nil else v41.isDisabled else nil,
-					isDisabled = if not FFlagProfileContextualMenuDisableFix then nil else v41.isDisabled,
-					onActivated = function() -- line: 90
-						-- upvalues: v35 (copy), v41 (copy)
-						v35()
-						v41.onActivated()
-					end
-				})
+			if not v6 then
+				continue
 			end
+
+			local v7 = { text = v6.text, disabled = 0, isDisabled = 0, onActivated = 0 }
+			local disabled
+
+			if not (FFlagProfileContextualMenuDisableFix or not FFlagProfilePlatformAddTC) then
+				disabled = v6.isDisabled
+			end
+
+			v7.disabled = disabled
+			local isDisabled
+
+			if FFlagProfileContextualMenuDisableFix then
+				isDisabled = v6.isDisabled
+			end
+
+			v7.isDisabled = isDisabled
+			function v7.onActivated()
+				v4()
+				v6.onActivated()
+			end
+
+			table.insert(result, v7)
 		end
 
-		return t1
-	end, {
-		contextual,
-		v35,
-		v31
-	})
+		return result
+	end, { contextual, v4, v3 })
 
 	if FFlagProfileFixMenuNavigation then
 		return React.createElement(ProfileContextualMenu, {
-			buttonProps = v37,
-			screenSize = v23,
-			onDismiss = v35,
-			rootElementPosition = v29,
-			rootElementRef = {
-				current = v28
-			},
-			isOpen = v33,
-			menuRef = v36
+			buttonProps = buttonProps,
+			screenSize = screenSize,
+			onDismiss = v4,
+			rootElementPosition = rootElementPosition,
+			rootElementRef = { current = current },
+			isOpen = state,
+			menuRef = menuRef
 		})
 	end
 
 	return (React.createElement(FocusNavigableSurfaceWrapper, {
-		isIsolated = true,
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+		isIsolated = true,
 		customEventHandlers = {
 			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(p2) -- line: 116
-					-- upvalues: v35 (copy)
-					v35()
-					p2:cancel()
+				handler = InputHandlers.onRelease(function(object)
+					v4()
+					object:cancel()
 				end)
 			}
 		}
 	}, { React.createElement(ProfileContextualMenu, {
-		buttonProps = v37,
-		screenSize = v23,
-		onDismiss = v35,
-		rootElementPosition = v29,
-		rootElementRef = {
-			current = v28
-		},
-		isOpen = v33
-	}) }))
+			buttonProps = buttonProps,
+			screenSize = screenSize,
+			onDismiss = v4,
+			rootElementPosition = rootElementPosition,
+			rootElementRef = { current = current },
+			isOpen = state
+		}) }))
 end
 
 return ProfileContextualMenuContainer

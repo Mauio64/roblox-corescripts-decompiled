@@ -1,15 +1,11 @@
 require(script.Parent.types)
 
-local function instant(p1) -- line: 5
+local function instant(startingValue)
 	return {
-		step = function() -- line: 7
-			-- upvalues: p1 (copy)
-			return {
-				complete = true,
-				value = p1
-			}
+		step = function()
+			return { value = startingValue, complete = true }
 		end,
-		startingValue = p1
+		startingValue = startingValue
 	}
 end
 

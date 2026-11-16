@@ -1,176 +1,183 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
+
 local SummaryHeaderNames = Constants.NetworkFormatting.SummaryHeaderNames
 local SummaryCellWidths = Constants.NetworkFormatting.SummaryCellWidths
 local HeaderFrameHeight = Constants.NetworkFormatting.HeaderFrameHeight
 local EntryFrameHeight = Constants.NetworkFormatting.EntryFrameHeight
+
 local LineWidth = Constants.GeneralFormatting.LineWidth
 local LineColor = Constants.GeneralFormatting.LineColor
 local CellPadding = Constants.NetworkFormatting.CellPadding
-local ColorText = Constants.Color.Text
+local Text = Constants.Color.Text
+
 local CellLabel = require(script.Parent.Parent.Parent.Components.CellLabel)
 local HeaderButton = require(script.Parent.Parent.Parent.Components.HeaderButton)
-local n1 = 0
+local total = 0
 
-for _, v in pairs(SummaryCellWidths) do
-	n1 += v
+for _, summaryCellWidth in pairs(SummaryCellWidths) do
+	total += summaryCellWidth
 end
 
-local v17 = -n1
-local t1 = {}
-local t2 = {}
-local t3 = {}
+local v = -total
+local udims = {}
+local udims2 = {}
+local udims3 = {}
 
-table.insert(t1, UDim2.new(0, CellPadding, 0, 0))
-table.insert(t2, UDim2.new(1, -n1 - CellPadding, 0, HeaderFrameHeight))
-table.insert(t3, UDim2.new(1, -n1 - CellPadding, 0, EntryFrameHeight))
+table.insert(udims, UDim2.new(0, CellPadding, 0, 0))
+table.insert(udims2, UDim2.new(1, -total - CellPadding, 0, HeaderFrameHeight))
+table.insert(udims3, UDim2.new(1, -total - CellPadding, 0, EntryFrameHeight))
 
-for _, v in ipairs(SummaryCellWidths) do
-	table.insert(t1, UDim2.new(1, v17 + CellPadding, 0, 0))
-	table.insert(t2, UDim2.new(0, v - CellPadding, 0, HeaderFrameHeight))
-	table.insert(t3, UDim2.new(0, v - CellPadding, 0, EntryFrameHeight))
-	v17 += v
+for _, summaryCellWidth in ipairs(SummaryCellWidths) do
+	table.insert(udims, UDim2.new(1, v + CellPadding, 0, 0))
+	table.insert(udims2, UDim2.new(0, summaryCellWidth - CellPadding, 0, HeaderFrameHeight))
+	table.insert(udims3, UDim2.new(0, summaryCellWidth - CellPadding, 0, EntryFrameHeight))
+	v += summaryCellWidth
 end
 
-local t4 = {}
+local udims4 = {}
 
-for i, v in ipairs(t1) do
-	t4[i] = UDim2.new(v.X.Scale, v.X.Offset - CellPadding, v.Y.Scale, v.Y.Offset)
+for i, v2 in ipairs(udims) do
+	udims4[i] = UDim2.new(v2.X.Scale, v2.X.Offset - CellPadding, v2.Y.Scale, v2.Y.Offset)
 end
 
-local v26 = Roact.Component:extend("NetworkSummary")
+local extended = Roact.Component:extend("NetworkSummary")
 
-function v26.render(p1) -- line: 50
-	-- upvalues: Roact (copy), LineWidth (copy), LineColor (copy), t4 (copy), HeaderFrameHeight (copy), SummaryHeaderNames (copy), HeaderButton (copy), t2 (copy), t1 (copy), CellLabel (copy), EntryFrameHeight (copy), ColorText (copy)
-	local width = p1.props.width
-	local v29 = p1.props.httpSummaryTable or {}
-	local layoutOrder = p1.props.layoutOrder
-	local t5 = {
-		UIListLayout = Roact.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Top,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		})
-	}
-	local t6 = {
-		UpperHorizontalLine = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, LineWidth),
-			BackgroundColor3 = LineColor
-		}),
-		LowerHorizontalLine = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, LineWidth),
-			Position = UDim2.new(0, 0, 1, 0),
-			BackgroundColor3 = LineColor
-		})
-	}
+function extended.render(p)
+	local width = p.props.width
+	local httpSummaryTable = p.props.httpSummaryTable or {}
+	local layoutOrder = p.props.layoutOrder
 
-	for i = 2, #t4 do
-		t6[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
+	local children = {}
+	children.UIListLayout = Roact.createElement("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
+
+	local children2 = {}
+	children2.UpperHorizontalLine = Roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		BackgroundColor3 = LineColor,
+		BorderSizePixel = 0
+	})
+
+	children2.LowerHorizontalLine = Roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 1, 0),
+		BackgroundColor3 = LineColor,
+		BorderSizePixel = 0
+	})
+
+	for i = 2, #udims4 do
+		children2[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
 			Size = UDim2.new(0, LineWidth, 0, HeaderFrameHeight),
-			Position = t4[i],
-			BackgroundColor3 = LineColor
+			Position = udims4[i],
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		})
 	end
 
-	for i, v in ipairs(SummaryHeaderNames) do
-		t6[v] = Roact.createElement(HeaderButton, {
-			text = v,
-			size = t2[i],
-			pos = t1[i]
+	for i, summaryHeaderName in ipairs(SummaryHeaderNames) do
+		children2[summaryHeaderName] = Roact.createElement(HeaderButton, {
+			text = summaryHeaderName,
+			size = udims2[i],
+			pos = udims[i]
 		})
 	end
 
-	t5.Header = Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = 1,
-		Size = UDim2.new(0, width, 0, HeaderFrameHeight)
-	}, t6)
+	children.Header = Roact.createElement(
+		"Frame",
+		{
+			Size = UDim2.new(0, width, 0, HeaderFrameHeight),
+			BackgroundTransparency = 1,
+			LayoutOrder = 1
+		},
+		children2
+	)
+	local v2 = 0
 
-	local n2 = 0
+	for _, v3 in pairs(httpSummaryTable) do
+		v2 += 1
 
-	for _, v in pairs(v29) do
-		n2 += 1
-
-		local t7 = {
-			RequestType = Roact.createElement(CellLabel, {
-				text = v.RequestType,
-				size = t2[1],
-				pos = t1[1]
+		local children3 = {
+			["RequestType"] = Roact.createElement(CellLabel, {
+				text = v3.RequestType,
+				size = udims2[1],
+				pos = udims[1]
 			}),
 			RequestCount = Roact.createElement(CellLabel, {
-				text = v.RequestCount,
-				size = t2[2],
-				pos = t1[2]
+				text = v3.RequestCount,
+				size = udims2[2],
+				pos = udims[2]
 			}),
 			FailedCount = Roact.createElement(CellLabel, {
-				text = v.FailedCount,
-				size = t2[3],
-				pos = t1[3]
+				text = v3.FailedCount,
+				size = udims2[3],
+				pos = udims[3]
 			}),
 			AverageTime = Roact.createElement(CellLabel, {
-				text = string.format("%.3f", v.AverageTime),
-				size = t2[4],
-				pos = t1[4]
+				text = string.format("%.3f", v3.AverageTime),
+				size = udims2[4],
+				pos = udims[4]
 			}),
 			MinTime = Roact.createElement(CellLabel, {
-				text = string.format("%.3f", v.MinTime),
-				size = t2[5],
-				pos = t1[5]
+				text = string.format("%.3f", v3.MinTime),
+				size = udims2[5],
+				pos = udims[5]
 			}),
 			MaxTime = Roact.createElement(CellLabel, {
-				text = string.format("%.3f", v.MaxTime),
-				size = t2[6],
-				pos = t1[6]
+				text = string.format("%.3f", v3.MaxTime),
+				size = udims2[6],
+				pos = udims[6]
 			}),
 			LowerHorizontalLine = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 0, LineWidth),
 				Position = UDim2.new(0, 0, 1, 0),
-				BackgroundColor3 = LineColor
+				BackgroundColor3 = LineColor,
+				BorderSizePixel = 0
 			})
 		}
 
-		for i = 2, #t4 do
-			t7[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
+		for i = 2, #udims4 do
+			children3[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
 				Size = UDim2.new(0, LineWidth, 1, 0),
-				Position = t4[i],
-				BackgroundColor3 = LineColor
+				Position = udims4[i],
+				BackgroundColor3 = LineColor,
+				BorderSizePixel = 0
 			})
 		end
 
-		t5[v.RequestType] = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
+		children[v3.RequestType] = Roact.createElement("Frame", {
 			Size = UDim2.new(0, width, 0, EntryFrameHeight),
-			LayoutOrder = n2 + 1
-		}, t7)
+			BackgroundTransparency = 1,
+			LayoutOrder = v2 + 1
+		}, children3)
 	end
 
-	if n2 == 0 then
-		t5.Padding = Roact.createElement("TextLabel", {
+	if v2 == 0 then
+		children.Padding = Roact.createElement("TextLabel", {
+			Size = UDim2.new(0, width, 0, EntryFrameHeight),
 			Text = "No Summary Data Found",
+			TextColor3 = Text,
 			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(0, width, 0, EntryFrameHeight),
-			TextColor3 = ColorText
+			LayoutOrder = 2
 		})
-		n2 = 1
+		v2 = 1
 	end
 
-	local v41 = n2 * EntryFrameHeight + HeaderFrameHeight
+	local v3 = v2 * EntryFrameHeight + HeaderFrameHeight
 
 	return Roact.createElement("ScrollingFrame", {
+		Size = UDim2.new(1, 0, 0, v3),
 		ScrollingEnabled = false,
 		ScrollBarThickness = 0,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, v41),
 		LayoutOrder = layoutOrder
-	}, t5)
+	}, children)
 end
 
-return v26
+return extended

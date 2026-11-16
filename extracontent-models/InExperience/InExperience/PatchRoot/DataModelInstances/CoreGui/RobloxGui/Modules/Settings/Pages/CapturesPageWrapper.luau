@@ -1,86 +1,88 @@
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
-local Modules = CoreGui:WaitForChild("RobloxGui").Modules
+
+local modules = CoreGui:WaitForChild("RobloxGui").Modules
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local SettingsPageFactory = require(Modules.Settings.SettingsPageFactory)
-local v6 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
+local SettingsPageFactory = require(modules.Settings.SettingsPageFactory)
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local enabled = Chrome.Enabled()
 local BuilderIcons = require(CorePackages.Packages.BuilderIcons)
 local uiblox = BuilderIcons.Migration.uiblox
 local Foundation = require(CorePackages.Packages.Foundation)
-local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+
 local GetFFlagFixIGMTabTransitions = require(script.Parent.Parent.Flags.GetFFlagFixIGMTabTransitions)
 local FFlagIGMChangeCapturesToGallery = require(script.Parent.Parent.Flags.FFlagIGMChangeCapturesToGallery)
 local FFlagIGMChangeGalleryHeaderIcon = require(script.Parent.Parent.Flags.FFlagIGMChangeGalleryHeaderIcon)
-local FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet
-local v15 = SettingsPageFactory:CreateNewPage()
+local isSideSheetEnabled = require(CorePackages.Workspace.Packages.InExperienceSideSheetUtils.isSideSheetEnabled)
 
-v15.TabHeader.Name = "CapturesTab"
+local newPage = SettingsPageFactory:CreateNewPage()
 
-local v16 = if not FFlagIGMChangeGalleryHeaderIcon then if not v6 then uiblox["icons/controls/screenshot"] else uiblox["icons/controls/cameraOff"] else {
-	name = "image",
-	variant = Foundation.Enums.IconVariant.Regular
-}
+newPage.TabHeader.Name = "CapturesTab"
+local v
 
-v15.TabHeader.TabLabel.Icon.Text = v16.name
-v15.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v16.variant]
-v15.TabHeader.TabLabel.Title.AutoLocalize = false
+if FFlagIGMChangeGalleryHeaderIcon then
+	v = { name = "image", variant = Foundation.Enums.IconVariant.Regular }
+elseif enabled then
+	v = uiblox["icons/controls/cameraOff"]
+else
+	v = uiblox["icons/controls/screenshot"]
+end
+
+newPage.TabHeader.TabLabel.Icon.Text = v.name
+newPage.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v.variant]
+
+newPage.TabHeader.TabLabel.Title.AutoLocalize = false
 
 if FFlagIGMChangeCapturesToGallery then
-	v15.TabHeader.TabLabel.Title.Text = RobloxTranslator:FormatByKey("Feature.Captures.Title.Gallery")
+	newPage.TabHeader.TabLabel.Title.Text = RobloxTranslator:FormatByKey("Feature.Captures.Title.Gallery")
 else
-	v15.TabHeader.TabLabel.Title.Text = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Captures")
+	newPage.TabHeader.TabLabel.Title.Text = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Captures")
 end
 
-v15.PageListLayout.Parent = nil
-v15.ShouldShowBottomBar = not FFlagEnableSideSheet
-v15.ShouldShowHubBar = true
-v15.Page.Name = "Captures"
-v15.Page.Size = UDim2.fromScale(1, 0)
+newPage.PageListLayout.Parent = nil
+newPage.ShouldShowBottomBar = not isSideSheetEnabled
+newPage.ShouldShowHubBar = true
 
-local UIPadding = v15.Page:FindFirstChildWhichIsA("UIPadding")
+newPage.Page.Name = "Captures"
+newPage.Page.Size = UDim2.fromScale(1, 0)
 
-if UIPadding then
-	UIPadding:Destroy()
+local uiPadding = newPage.Page:FindFirstChildWhichIsA("UIPadding")
+
+if uiPadding then
+	uiPadding:Destroy()
 end
 
-function v15.ConnectHubToApp(_, p2, p3, p4) -- line: 66
-	-- upvalues: v15 (copy), GetFFlagFixIGMTabTransitions (copy)
-	v15:SetHub(p2)
+function newPage.ConnectHubToApp(_, p, instance, p2)
+	newPage:SetHub(p)
 
-	local u22 = p3.AbsoluteSize.Y - 20
-
-	v15.Page.Size = UDim2.new(1, 0, 0, u22)
-	p3:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 71
-		-- upvalues: u22 (ref), p3 (copy), v15 (copy)
-		u22 = p3.AbsoluteSize.Y - 20
-		v15.Page.Size = UDim2.new(1, 0, 0, u22)
+	local v2 = instance.AbsoluteSize.Y - 20
+	newPage.Page.Size = UDim2.new(1, 0, 0, v2)
+	instance:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+		v2 = instance.AbsoluteSize.Y - 20
+		newPage.Page.Size = UDim2.new(1, 0, 0, v2)
 	end)
 
-	local Display = v15.Display
-
-	function v15.Display(_, ...) -- line: 77
-		-- upvalues: p4 (copy), Display (copy), v15 (copy)
-		p4.openMenu()
-		Display(v15, ...)
+	local display = newPage.Display
+	function newPage.Display(_, ...)
+		p2.openMenu()
+		display(newPage, ...)
 	end
 
-	v15.Hidden.Event:Connect(function() -- line: 82
-		-- upvalues: GetFFlagFixIGMTabTransitions (copy), p4 (copy)
+	newPage.Hidden.Event:Connect(function()
 		if not GetFFlagFixIGMTabTransitions() then
-			p4.closeMenu()
+			p2.closeMenu()
 		end
 	end)
 
-	local Hide = v15.Hide
-
-	function v15.Hide(_, ...) -- line: 91
-		-- upvalues: GetFFlagFixIGMTabTransitions (copy), p4 (copy), Hide (copy), v15 (copy)
+	local hide = newPage.Hide
+	function newPage.Hide(_, ...)
 		if GetFFlagFixIGMTabTransitions() then
-			p4.closeMenu()
+			p2.closeMenu()
 		end
 
-		Hide(v15, ...)
+		hide(newPage, ...)
 	end
 end
 
-return v15
+return newPage

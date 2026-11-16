@@ -1,46 +1,45 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local React = require(Parent.React)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Foundation = require(parent.Foundation)
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local ButtonSize = Foundation.Enums.ButtonSize
 local FlyoutAnalytics = require(script.Parent.Parent.Analytics.FlyoutAnalytics)
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
-local AppEventIngestService = require(Parent.RoactServiceTags).AppEventIngestService
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppEventIngestService = RoactServiceTags.AppEventIngestService
 local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
-local FFlagCTAChangeMorePageFlyoutButtonText = require(Parent.SharedFlags).FFlagCTAChangeMorePageFlyoutButtonText
 
-local function FlyoutReportLogs(t1: {[any]: any}) -- line: 22
-	-- upvalues: useRoactService (copy), AppEventIngestService (copy), React (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), useLocalization (copy), FFlagCTAChangeMorePageFlyoutButtonText (copy), Foundation (copy), ButtonVariant (copy), ButtonSize (copy)
-	local v14 = useRoactService(AppEventIngestService)
-	local v15 = React.useCallback(function() -- line: 24
-		-- upvalues: t1 (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), v14 (copy)
-		t1.closeDrawer()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagCTAChangeMorePageFlyoutButtonText = SharedFlags.FFlagCTAChangeMorePageFlyoutButtonText
 
-		if t1.openReportLogConfirmation then
-			t1.openReportLogConfirmation()
+local function FlyoutReportLogs(props)
+	local v = useRoactService(AppEventIngestService)
+	local onActivated = React.useCallback(function()
+		props.closeDrawer()
+
+		if props.openReportLogConfirmation then
+			props.openReportLogConfirmation()
 		end
 
-		local ReportLogs = FlyoutContentSettings.ItemType.ReportLogs
-
-		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v14, ReportLogs)
-	end, {
-		t1.openReportLogConfirmation,
-		t1.closeDrawer,
-		v14
-	})
-	local v16 = useLocalization({
-		text = not FFlagCTAChangeMorePageFlyoutButtonText and "CommonUI.Features.Label.ReportLogs" or "CommonUI.Features.Label.ReportLogsSentenceCase"
+		local reportLogs = FlyoutContentSettings.ItemType.ReportLogs
+		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v, reportLogs)
+	end, { props.openReportLogConfirmation, props.closeDrawer, v })
+	local v2 = useLocalization({
+		text = FFlagCTAChangeMorePageFlyoutButtonText and "CommonUI.Features.Label.ReportLogsSentenceCase" or "CommonUI.Features.Label.ReportLogs"
 	})
 
 	return React.createElement(Foundation.Button, {
-		isDisabled = false,
-		text = v16.text,
+		testId = "--core-ui-flyout-button-report-logs",
+		text = v2.text,
 		variant = ButtonVariant.Standard,
-		LayoutOrder = t1.layoutOrder,
+		LayoutOrder = props.layoutOrder,
+		isDisabled = false,
 		size = ButtonSize.Large,
 		width = UDim.new(1, 0),
-		onActivated = v15
+		onActivated = onActivated
 	})
 end
 

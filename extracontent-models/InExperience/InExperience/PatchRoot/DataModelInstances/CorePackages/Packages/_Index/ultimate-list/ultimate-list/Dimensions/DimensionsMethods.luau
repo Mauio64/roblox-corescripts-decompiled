@@ -1,235 +1,215 @@
-local ancestor = script:FindFirstAncestor("ultimate-list")
-local DataSourceMethods = require(ancestor.DataSources.DataSourceMethods)
+local ultimatelist = script:FindFirstAncestor("ultimate-list")
 
-require(ancestor.DataSources)
+local DataSourceMethods = require(ultimatelist.DataSources.DataSourceMethods)
+require(ultimatelist.DataSources)
 require(script.Parent)
+local exhaustiveMatch = require(ultimatelist.Util.exhaustiveMatch)
 
-local exhaustiveMatch = require(ancestor.Util.exhaustiveMatch)
-local t1 = {}
+local DimensionsMethods = {}
 
-function t1.getCanvasSize(p1, p2, vector2: Vector2, s1: string) -- line: 11
-	-- upvalues: DataSourceMethods (copy), t1 (copy), exhaustiveMatch (copy)
-	local v13 = DataSourceMethods.back(p2)
+function DimensionsMethods.getCanvasSize(p, p2, vector2: Vector2, p3: string)
+	local back = DataSourceMethods.back(p2)
 
-	if v13 == nil then
+	if back == nil then
 		return UDim2.new()
 	end
 
-	local v14 = t1.getUDimRect(p1, v13, DataSourceMethods.length(p2), vector2, s1)
+	local udimRect = DimensionsMethods.getUDimRect(p, back, DataSourceMethods.length(p2), vector2, p3)
 
-	if s1 == "x" then
-		return (UDim2.fromOffset(v14.position.X.Offset + v14.size.X.Offset, 0))
+	if p3 == "x" then
+		return (UDim2.fromOffset(udimRect.position.X.Offset + udimRect.size.X.Offset, 0))
+	elseif p3 == "y" then
+		return (UDim2.fromOffset(0, udimRect.position.Y.Offset + udimRect.size.Y.Offset))
 	end
 
-	if s1 == "y" then
-		return (UDim2.fromOffset(0, v14.position.Y.Offset + v14.size.Y.Offset))
-	end
-
-	return (exhaustiveMatch(s1))
+	return (exhaustiveMatch(p3))
 end
 
-local function getUDimSizeForConsistentSize(n1: number, s2: string) -- line: 30
-	-- upvalues: exhaustiveMatch (copy)
-	if s2 == "x" then
-		return UDim2.new(0, n1, 1, 0)
+local function getUDimSizeForConsistentSize(size: number, p: string) -- 2 equivalent calls inferred from this helper
+	if p == "x" then
+		return UDim2.new(0, size, 1, 0)
+	elseif p == "y" then
+		return UDim2.new(1, 0, 0, size)
 	end
 
-	if s2 == "y" then
-		return UDim2.new(1, 0, 0, n1)
-	end
-
-	return exhaustiveMatch(s2)
-end
-local function getPositionForConsistentSize(n2: number, n3: number, s3: string) -- line: 40
-	-- upvalues: exhaustiveMatch (copy)
-	if s3 == "x" then
-		return UDim2.fromOffset(n2 * (n3 - 1), 0)
-	end
-
-	if s3 == "y" then
-		return UDim2.fromOffset(0, n2 * (n3 - 1))
-	end
-
-	return exhaustiveMatch(s3)
-end
-local function getPositionForConsistentUDim2(uDim2: UDim2, n4: number, vector2: Vector2, s4: string) -- line: 50
-	-- upvalues: t1 (copy), exhaustiveMatch (copy)
-	local v24 = t1.getAmountPerNonDominantInGrid(uDim2, vector2, s4)
-
-	if s4 == "x" then
-		return UDim2.new(0, (math.ceil(n4 / v24) - 1) * uDim2.X.Offset, uDim2.Y.Scale * ((n4 - 1) % v24), uDim2.Y.Offset * ((n4 - 1) % v24))
-	end
-
-	if s4 == "y" then
-		return UDim2.new(uDim2.X.Scale * ((n4 - 1) % v24), uDim2.X.Offset * ((n4 - 1) % v24), 0, (math.ceil(n4 / v24) - 1) * uDim2.Y.Offset)
-	end
-
-	return exhaustiveMatch(s4)
+	return exhaustiveMatch(p)
 end
 
-function t1.getAmountPerNonDominantInGrid(uDim2: UDim2, vector2: Vector2, s5: string) -- line: 79
-	-- upvalues: exhaustiveMatch (copy)
-	if s5 == "x" then
-		return vector2.Y // (uDim2.Y.Offset + uDim2.Y.Scale * vector2.Y)
+local function getPositionForConsistentSize(p: number, p2: number, p3: string) -- 2 equivalent calls inferred from this helper
+	if p3 == "x" then
+		return UDim2.fromOffset(p * (p2 - 1), 0)
+	elseif p3 == "y" then
+		return UDim2.fromOffset(0, p * (p2 - 1))
 	end
 
-	if s5 == "y" then
-		return vector2.X // (uDim2.X.Offset + uDim2.X.Scale * vector2.X)
-	end
-
-	return exhaustiveMatch(s5)
+	return exhaustiveMatch(p3)
 end
-function t1.getDominantAxis(vector2: Vector2, s6: string) -- line: 93
-	-- upvalues: exhaustiveMatch (copy)
-	if s6 == "x" then
+
+local function getPositionForConsistentUDim2(udim: UDim2, p: number, vector2: Vector2, p2: string)
+	local amountPerNonDominantInGrid = DimensionsMethods.getAmountPerNonDominantInGrid(udim, vector2, p2)
+
+	if p2 == "x" then
+		return UDim2.new(
+			0,
+			(math.ceil(p / amountPerNonDominantInGrid) - 1) * udim.X.Offset,
+			udim.Y.Scale * ((p - 1) % amountPerNonDominantInGrid),
+			udim.Y.Offset * ((p - 1) % amountPerNonDominantInGrid)
+		)
+	elseif p2 == "y" then
+		return UDim2.new(
+			udim.X.Scale * ((p - 1) % amountPerNonDominantInGrid),
+			udim.X.Offset * ((p - 1) % amountPerNonDominantInGrid),
+			0,
+			(math.ceil(p / amountPerNonDominantInGrid) - 1) * udim.Y.Offset
+		)
+	end
+
+	return exhaustiveMatch(p2)
+end
+
+function DimensionsMethods.getAmountPerNonDominantInGrid(udim: UDim2, vector2: Vector2, p: string)
+	if p == "x" then
+		return vector2.Y // (udim.Y.Offset + udim.Y.Scale * vector2.Y)
+	elseif p == "y" then
+		return vector2.X // (udim.X.Offset + udim.X.Scale * vector2.X)
+	end
+
+	return exhaustiveMatch(p)
+end
+
+function DimensionsMethods.getDominantAxis(vector2: Vector2, p: string)
+	if p == "x" then
 		return vector2.X
-	end
-
-	if s6 == "y" then
+	elseif p == "y" then
 		return vector2.Y
 	end
 
-	return exhaustiveMatch(s6)
+	return exhaustiveMatch(p)
 end
-function t1.getUDimRect(p3, p4, n5: number, vector2: Vector2, s7: string) -- line: 103
-	-- upvalues: exhaustiveMatch (copy), getPositionForConsistentUDim2 (copy)
-	if p3.type == "consistentSize" then
-		local t2 = {}
-		local size = p3.size
 
-		t2.size = if s7 ~= "x" then if s7 ~= "y" then exhaustiveMatch(s7) else UDim2.new(1, 0, 0, size) else UDim2.new(0, size, 1, 0)
-
-		local size2 = p3.size
-
-		t2.position = if s7 ~= "x" then if s7 ~= "y" then exhaustiveMatch(s7) else UDim2.fromOffset(0, size2 * (n5 - 1)) else UDim2.fromOffset(size2 * (n5 - 1), 0)
-
-		return t2
-	end
-
-	if p3.type == "consistentUDim2" then
+function DimensionsMethods.getUDimRect(data, p, p2: number, vector2: Vector2, p3: string)
+	if data.type == "consistentSize" then
 		return {
-			size = p3.udim2,
-			position = getPositionForConsistentUDim2(p3.udim2, n5, vector2, s7)
+			size = getUDimSizeForConsistentSize(data.size, p3), -- inferred equivalent call
+			position = getPositionForConsistentSize(data.size, p2, p3) -- inferred equivalent call
 		}
 	end
 
-	if p3.type == "getter" then
-		return p3.callback(p4, n5)
+	if data.type == "consistentUDim2" then
+		return {
+			size = data.udim2,
+			position = getPositionForConsistentUDim2(data.udim2, p2, vector2, p3)
+		}
 	end
 
-	if p3.type == "spaced" then
-		if p3.inner.type == "consistentSize" then
-			local t3 = {}
-			local size = p3.inner.size
-
-			t3.size = if s7 ~= "x" then if s7 ~= "y" then exhaustiveMatch(s7) else UDim2.new(1, 0, 0, size) else UDim2.new(0, size, 1, 0)
-
-			local v40 = p3.inner.size + p3.spacing
-
-			t3.position = if s7 ~= "x" then if s7 ~= "y" then exhaustiveMatch(s7) else UDim2.fromOffset(0, v40 * (n5 - 1)) else UDim2.fromOffset(v40 * (n5 - 1), 0)
-
-			return t3
-		end
-
-		if p3.inner.type == "consistentUDim2" then
-			return {
-				size = p3.inner.udim2,
-				position = getPositionForConsistentUDim2(p3.inner.udim2 + UDim2.fromOffset(s7 ~= "x" and 0 or p3.spacing, s7 ~= "y" and 0 or p3.spacing), n5, vector2, s7)
-			}
-		end
-
-		if p3.inner.type == "getter" or p3.inner.type == "spaced" then
-			error("Unsupported spaced dimensions")
-
-			return
-		end
-
-		return exhaustiveMatch(p3.inner.type)
+	if data.type == "getter" then
+		return data.callback(p, p2)
 	end
 
-	return exhaustiveMatch(p3.type)
+	if data.type ~= "spaced" then
+		return exhaustiveMatch(data.type)
+	end
+
+	if data.inner.type == "consistentSize" then
+		return {
+			size = getUDimSizeForConsistentSize(data.inner.size, p3), -- inferred equivalent call
+			position = getPositionForConsistentSize(data.inner.size + data.spacing, p2, p3) -- inferred equivalent call
+		}
+	end
+
+	if data.inner.type == "consistentUDim2" then
+		return {
+			size = data.inner.udim2,
+			position = getPositionForConsistentUDim2(
+				data.inner.udim2 + UDim2.fromOffset(p3 ~= "x" and 0 or data.spacing, p3 ~= "y" and 0 or data.spacing),
+				p2,
+				vector2,
+				p3
+			)
+		}
+	end
+
+	if data.inner.type ~= "getter" and data.inner.type ~= "spaced" then
+		return exhaustiveMatch(data.inner.type)
+	end
+
+	error("Unsupported spaced dimensions")
 end
 
-local function getElementsDisplayedForUDim2(uDim2: UDim2, vector2: Vector2, s8: string) -- line: 152
-	-- upvalues: t1 (copy), exhaustiveMatch (copy)
-	local v44 = t1.getAmountPerNonDominantInGrid(uDim2, vector2, s8)
+local function getElementsDisplayedForUDim2(udim: UDim2, vector2: Vector2, p: string)
+	local amountPerNonDominantInGrid = DimensionsMethods.getAmountPerNonDominantInGrid(udim, vector2, p)
 
-	if s8 == "x" then
-		return v44 * (vector2.X // uDim2.Y.Offset + 2)
+	if p == "x" then
+		return amountPerNonDominantInGrid * (vector2.X // udim.Y.Offset + 2)
+	elseif p == "y" then
+		return amountPerNonDominantInGrid * (vector2.Y // udim.X.Offset + 2)
 	end
 
-	if s8 == "y" then
-		return v44 * (vector2.Y // uDim2.X.Offset + 2)
-	end
-
-	return exhaustiveMatch(s8)
+	return exhaustiveMatch(p)
 end
 
-function t1.elementsDisplayedHint(p5, vector2: Vector2, s9: string) -- line: 165
-	-- upvalues: t1 (copy), getElementsDisplayedForUDim2 (copy), exhaustiveMatch (copy)
-	if p5.type == "consistentSize" then
-		return t1.getDominantAxis(vector2, s9) // p5.size + 2
+function DimensionsMethods.elementsDisplayedHint(data, vector2: Vector2, p: string)
+	if data.type == "consistentSize" then
+		return DimensionsMethods.getDominantAxis(vector2, p) // data.size + 2
 	end
 
-	if p5.type == "consistentUDim2" then
-		return getElementsDisplayedForUDim2(p5.udim2, vector2, s9)
+	if data.type == "consistentUDim2" then
+		return getElementsDisplayedForUDim2(data.udim2, vector2, p)
 	end
 
-	if p5.type == "getter" then
+	if data.type == "getter" then
 		return nil
 	end
 
-	if p5.type == "spaced" then
-		if p5.inner.type == "consistentSize" then
-			return t1.getDominantAxis(vector2, s9) // (p5.inner.size + p5.spacing) + 2
-		end
-
-		if p5.inner.type == "consistentUDim2" then
-			return getElementsDisplayedForUDim2(p5.inner.udim2 + UDim2.fromOffset(s9 ~= "x" and 0 or p5.spacing, s9 ~= "y" and 0 or p5.spacing), vector2, s9)
-		end
-
-		if p5.inner.type == "spaced" or p5.inner.type == "getter" then
-			error("Unsupported spaced dimensions")
-
-			return
-		end
-
-		return exhaustiveMatch(p5.inner.type)
+	if data.type ~= "spaced" then
+		return exhaustiveMatch(data.type)
 	end
 
-	return exhaustiveMatch(p5.type)
+	if data.inner.type == "consistentSize" then
+		return DimensionsMethods.getDominantAxis(vector2, p) // (data.inner.size + data.spacing) + 2
+	end
+
+	if data.inner.type == "consistentUDim2" then
+		return getElementsDisplayedForUDim2(
+			data.inner.udim2 + UDim2.fromOffset(p ~= "x" and 0 or data.spacing, p ~= "y" and 0 or data.spacing),
+			vector2,
+			p
+		)
+	end
+
+	if data.inner.type ~= "spaced" and data.inner.type ~= "getter" then
+		return exhaustiveMatch(data.inner.type)
+	end
+
+	error("Unsupported spaced dimensions")
 end
-function t1.equals(p6, p7) -- line: 203
-	-- upvalues: exhaustiveMatch (copy)
-	if p6.type ~= p7.type then
+
+function DimensionsMethods.equals(data, data2)
+	if data.type ~= data2.type then
 		return false
 	end
 
-	if p6.type == "getter" then
-		assert(p7.type == "getter", "Luau")
-
-		return p6.callback == p7.callback
+	if data.type == "getter" then
+		assert(data2.type == "getter", "Luau")
+		return data.callback == data2.callback
 	end
 
-	if p6.type == "consistentSize" then
-		assert(p7.type == "consistentSize", "Luau")
-
-		return p6.size == p7.size
+	if data.type == "consistentSize" then
+		assert(data2.type == "consistentSize", "Luau")
+		return data.size == data2.size
 	end
 
-	if p6.type == "consistentUDim2" then
-		assert(p7.type == "consistentUDim2", "Luau")
-
-		return p6.udim2 == p7.udim2
+	if data.type == "consistentUDim2" then
+		assert(data2.type == "consistentUDim2", "Luau")
+		return data.udim2 == data2.udim2
 	end
 
-	if p6.type == "spaced" then
-		assert(p7.type == "spaced", "Luau")
-
-		return p6.spacing == p7.spacing
+	if data.type ~= "spaced" then
+		return exhaustiveMatch(data.type)
 	end
 
-	return exhaustiveMatch(p6.type)
+	assert(data2.type == "spaced", "Luau")
+	return data.spacing == data2.spacing
 end
 
-return t1
+return DimensionsMethods

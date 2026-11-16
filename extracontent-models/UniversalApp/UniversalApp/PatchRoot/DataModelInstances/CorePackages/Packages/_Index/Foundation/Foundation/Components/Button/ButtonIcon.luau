@@ -1,87 +1,129 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+local parent = Foundation.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
 local uiblox = BuilderIcons.Migration.uiblox
-local React = require(FoundationParent.React)
+
+local React = require(parent.React)
 
 require(Foundation.Enums.ButtonVariant)
+
 require(Foundation.Enums.InputSize)
 
 local Image = require(Foundation.Components.Image)
 local Text = require(Foundation.Components.Text)
+
 local getIconScale = require(Foundation.Utility.getIconScale)
+
 local iconMigrationUtils = require(Foundation.Utility.iconMigrationUtils)
 local isMigrated = iconMigrationUtils.isMigrated
 local isBuilderOrMigratedIcon = iconMigrationUtils.isBuilderOrMigratedIcon
+
 local useButtonVariants = require(script.Parent.useButtonVariants)
 local useTextSizeOffset = require(Foundation.Providers.Style.useTextSizeOffset)
 local useTokens = require(Foundation.Providers.Style.useTokens)
-local usePresentationContext = require(Foundation.Providers.Style.PresentationContext).usePresentationContext
+local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
+local usePresentationContext = PresentationContext.usePresentationContext
 
-local function ButtonIcon(t1: {[any]: any}) -- line: 38
-	-- upvalues: useTokens (copy), useTextSizeOffset (copy), getIconScale (copy), usePresentationContext (copy), useButtonVariants (copy), isBuilderOrMigratedIcon (copy), React (copy), Text (copy), isMigrated (copy), uiblox (copy), BuilderIcons (copy), Image (copy)
-	local disabledTransparencyBinding = t1.disabledTransparencyBinding
-	local textTransparencyBinding = t1.textTransparencyBinding
-	local v20 = useTokens()
-	local v21 = useTextSizeOffset()
-	local v22, v23 = getIconScale(t1.icon, t1.size)
-	local v24 = usePresentationContext()
-	local v25 = useButtonVariants(v20, t1.size, t1.variant, if not v24 then nil else v24.colorNamespace)
+local function ButtonIcon(props)
+	local disabledTransparencyBinding = props.disabledTransparencyBinding
+	local textTransparencyBinding = props.textTransparencyBinding
 
-	if not t1.icon then
+	local v = useTokens()
+	local v2 = useTextSizeOffset()
+	local iconScale, scale = getIconScale(props.icon, props.size)
+	local v3 = usePresentationContext()
+
+	local size = props.size
+	local variant = props.variant
+	local v4
+
+	if v3 then
+		v4 = v3.colorNamespace
+	end
+
+	local v5 = useButtonVariants(v, size, variant, v4)
+
+	if not props.icon then
 		return nil
 	end
 
-	if isBuilderOrMigratedIcon(t1.icon) then
-		return React.createElement(Text, {
-			tag = "position-center-center anchor-center-center",
-			Text = if not isMigrated(t1.icon) then t1.icon else uiblox[t1.icon].name,
-			fontStyle = {
-				Font = BuilderIcons.Font[if not isMigrated(t1.icon) then BuilderIcons.IconVariant.Regular else uiblox[t1.icon].variant],
-				FontSize = v25.icon.size.Y.Offset
-			},
-			Size = v25.icon.size,
-			textStyle = React.joinBindings({
-				disabledTransparencyBinding,
-				textTransparencyBinding
-			}):map(function(p1) -- line: 71
-				-- upvalues: v25 (copy)
-				local v27 = p1[1]
-				local v28 = p1[2]
+	if isBuilderOrMigratedIcon(props.icon) then
+		local createElement = React.createElement
+		local text
 
+		if isMigrated(props.icon) then
+			text = uiblox[props.icon].name
+		else
+			text = props.icon
+		end
+
+		local font = BuilderIcons.Font
+		local v6
+
+		if isMigrated(props.icon) then
+			v6 = uiblox[props.icon].variant
+		else
+			v6 = BuilderIcons.IconVariant.Regular
+		end
+
+		local v7 = {
+			Text = text,
+			fontStyle = { Font = font[v6], FontSize = v5.icon.size.Y.Offset },
+			tag = "position-center-center anchor-center-center",
+			Size = v5.icon.size,
+			textStyle = React.joinBindings({ disabledTransparencyBinding, textTransparencyBinding }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
 				return {
-					Color3 = v25.content.style.Color3,
-					Transparency = v28 + v27
+					Color3 = v5.content.style.Color3,
+					Transparency = item2 + item
 				}
 			end),
-			testId = `{ t1.testId }--icon`
-		}, {
-			UITextSizeConstraint = if not (v21 > 0) then nil else React.createElement("UITextSizeConstraint", {
-				MaxTextSize = v25.icon.size.Y.Offset
+			testId = `{props.testId}--icon`
+		}
+		local uiTextSizeConstraint
+
+		if v2 > 0 then
+			uiTextSizeConstraint = React.createElement("UITextSizeConstraint", {
+				MaxTextSize = v5.icon.size.Y.Offset
 			})
-		})
-	end
+		end
 
-	return React.createElement(Image, {
-		tag = "position-center-center anchor-center-center",
-		Image = t1.icon,
-		Size = if not v22 then v25.icon.size else UDim2.fromOffset(v22.X, v22.Y),
-		imageStyle = React.joinBindings({
-			disabledTransparencyBinding,
-			textTransparencyBinding
-		}):map(function(p2) -- line: 97
-			-- upvalues: v25 (copy)
-			local v30 = p2[1]
-			local v31 = p2[2]
+		return createElement(Text, v7, { UITextSizeConstraint = uiTextSizeConstraint })
+	else
+		local createElement = React.createElement
+		local v6 = {
+			tag = "position-center-center anchor-center-center",
+			Image = props.icon,
+			Size = 0,
+			imageStyle = 0,
+			scale = 0,
+			testId = 0
+		}
+		local size2
 
+		if iconScale then
+			size2 = UDim2.fromOffset(iconScale.X, iconScale.Y)
+		else
+			size2 = v5.icon.size
+		end
+
+		v6.Size = size2
+
+		v6.imageStyle = React.joinBindings({ disabledTransparencyBinding, textTransparencyBinding }):map(function(list)
+			local item = list[1]
+			local item2 = list[2]
 			return {
-				Color3 = v25.content.style.Color3,
-				Transparency = v31 + v30
+				Color3 = v5.content.style.Color3,
+				Transparency = item2 + item
 			}
-		end),
-		scale = v23,
-		testId = `{ t1.testId }--icon`
-	})
+		end)
+
+		v6.scale = scale
+		v6.testId = `{props.testId}--icon`
+		return createElement(Image, v6)
+	end
 end
 
 return ButtonIcon

@@ -1,39 +1,40 @@
-local function deduplicateBodyColor3s(t1: {[any]: any}) -- line: 5
-	local t2 = {}
-	local t3 = {}
+local function deduplicateBodyColor3s(items)
+	local set = {}
+	local result = {}
 
-	for _, v7 in t1 do
-		local str = tostring(v7)
+	for _, item in items do
+		local v = tostring(item)
 
-		if not t3[str] then
-			table.insert(t2, v7)
-			t3[str] = true
+		if set[v] then
+			continue
 		end
+
+		table.insert(result, item)
+		set[v] = true
 	end
 
-	return t2
+	return result
 end
-local function generateColorSequence(t4: {[any]: any}) -- line: 23
-	-- upvalues: deduplicateBodyColor3s (copy)
-	local v10 = deduplicateBodyColor3s(t4)
-	local v11 = #v10
 
-	if v11 == 1 then
-		local v12 = v10[1]
+local function generateColorSequence(p)
+	local v = deduplicateBodyColor3s(p)
+	local count = #v
 
-		return ColorSequence.new(v12, v12)
+	if count == 1 then
+		local v2 = v[1]
+		return ColorSequence.new(v2, v2)
 	end
 
-	local t5 = {}
-	local v14 = 1 / (v11 - 1 + 1.6)
+	local v2 = 1 / (count - 1 + 1.6)
+	local colorSequenceKeypoints = {}
 
-	for v15, v16 in v10 do
-		local v17 = if v15 ~= 1 then if v15 ~= v11 then (v15 - 1 + 0.8) * v14 else 1 else 0
+	for k, v3 in v do
+		local v4 = k == 1 and 0 or k == count and 1 or (k - 1 + 0.8) * v2
 
-		table.insert(t5, ColorSequenceKeypoint.new(v17, v16))
+		table.insert(colorSequenceKeypoints, ColorSequenceKeypoint.new(v4, v3))
 	end
 
-	return ColorSequence.new(t5)
+	return ColorSequence.new(colorSequenceKeypoints)
 end
 
 return generateColorSequence

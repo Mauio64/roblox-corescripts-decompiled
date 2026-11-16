@@ -1,16 +1,17 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local AvatarScreenProperties = require(Parent.AvatarExperienceNavigation).AvatarRoute.AvatarScreenProperties
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
 
-local function getUnifiedLoggingSurfaceForAppPage(s1: string?) -- line: 21
-	-- upvalues: AvatarScreenProperties (copy)
-	if typeof(s1) ~= "string" or s1 == "" then
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local AvatarScreenProperties = AvatarExperienceNavigation.AvatarRoute.AvatarScreenProperties
+
+local function getUnifiedLoggingSurfaceForAppPage(value: string?)
+	if typeof(value) ~= "string" or value == "" then
 		return nil
 	end
 
-	local v5 = AvatarScreenProperties[s1]
+	local avatarScreenProperty = AvatarScreenProperties[value]
 
-	if v5 and v5.analyticsData then
-		return v5.analyticsData.unifiedLoggingSurface
+	if avatarScreenProperty and avatarScreenProperty.analyticsData then
+		return avatarScreenProperty.analyticsData.unifiedLoggingSurface
 	end
 
 	return nil

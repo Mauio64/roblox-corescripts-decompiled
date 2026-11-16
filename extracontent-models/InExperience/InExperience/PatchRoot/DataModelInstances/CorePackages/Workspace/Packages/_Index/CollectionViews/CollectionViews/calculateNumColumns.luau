@@ -1,18 +1,16 @@
-local Parent = script:FindFirstAncestor("CollectionViews").Parent
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("CollectionViews").Parent
+local ArgCheck = require(parent.ArgCheck)
 
-local function calculateNumColumns(n1: number, n2: number, n3: number, n4: number, n5: number, b1: boolean?) -- line: 9
-	-- upvalues: ArgCheck (copy)
-	ArgCheck.assert(n1 >= 1)
-	ArgCheck.assert(n2 >= 0)
+local function calculateNumColumns(p: number, p2: number, p3: number, p4: number, p5: number, flag: boolean?)
+	ArgCheck.assert(p >= 1)
+	ArgCheck.assert(p2 >= 0)
+	local v = math.floor((p5 + p2) / (p + p2))
 
-	local v10 = math.floor((n5 + n2) / (n1 + n2))
-
-	if b1 then
-		v10 = math.floor(v10 * 0.5) * 2
+	if flag then
+		v = math.floor(v * 0.5) * 2
 	end
 
-	return (math.min(n4, (math.max(n3, v10))))
+	return (math.min(p4, (math.max(p3, v))))
 end
 
 return calculateNumColumns

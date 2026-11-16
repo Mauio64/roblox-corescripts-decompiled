@@ -1,22 +1,22 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
+
 local getGameInfoStore = require(DataHydration.Game.GameInfo.getGameInfoStore)
-local FFlagLuaAppDataHydrationUpdateItem = require(DataHydrationParent.SharedFlags).FFlagLuaAppDataHydrationUpdateItem
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDataHydrationUpdateItem = SharedFlags.FFlagLuaAppDataHydrationUpdateItem
 
 return {
-	syncExperienceGenreToGameInfo = function(n1: number, s1: string?, s2: string?) -- line: 8
-		-- upvalues: FFlagLuaAppDataHydrationUpdateItem (copy), getGameInfoStore (copy)
+	syncExperienceGenreToGameInfo = function(p: number, genreL: string?, genreL2: string?)
 		if not FFlagLuaAppDataHydrationUpdateItem then
 			return
 		end
 
-		if not s1 and not s2 then
-			return
+		if genreL or genreL2 then
+			getGameInfoStore(false).updateGameInfo(tostring(p), {
+				genreL1 = genreL,
+				genreL2 = genreL2
+			})
 		end
-
-		getGameInfoStore(false).updateGameInfo(tostring(n1), {
-			genreL1 = s1,
-			genreL2 = s2
-		})
 	end
 }

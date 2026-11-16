@@ -1,33 +1,67 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local React = require(Parent.React)
-local FFlagAppChatSanitizeConversationTitleRichText = require(Parent.SharedFlags).FFlagAppChatSanitizeConversationTitleRichText
-local UserTile = require(Parent.UserTile).UserTile
-local LayoutMode = require(Parent.UserTile).LayoutMode
-local escapeRichText = require(Parent.ChatUIPrimitives).Utils.escapeRichText
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+
+local React = require(parent.React)
+local UserTile = require(parent.UserTile)
+local userTile = UserTile.UserTile
+local UserTile2 = require(parent.UserTile)
+local LayoutMode = UserTile2.LayoutMode
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+local escapeRichText = ChatUIPrimitives.Utils.escapeRichText
+
 local getFacePileParticipantIds = require(script.Parent.getFacePileParticipantIds)
 local useFacePilePresence = require(script.Parent.useFacePilePresence)
 
-local function FriendsChatFacePile(t1: {[any]: any}) -- line: 35
-	-- upvalues: getFacePileParticipantIds (copy), useFacePilePresence (copy), React (copy), UserTile (copy), LayoutMode (copy), FFlagAppChatSanitizeConversationTitleRichText (copy), escapeRichText (copy)
-	local v11 = t1.participantUserIds ~= nil and #t1.participantUserIds > 0
-	local v12 = getFacePileParticipantIds(t1.participantUserIds or {}, t1.localUserId)
-	local v13 = useFacePilePresence(v12)
+local function FriendsChatFacePile(props)
+	local v
 
-	if not v11 then
+	if props.participantUserIds == nil then
+		v = false
+	else
+		v = #props.participantUserIds > 0
+	end
+
+	local facePileParticipantIds = getFacePileParticipantIds(props.participantUserIds or {}, props.localUserId)
+	local userPresenceType = useFacePilePresence(facePileParticipantIds)
+
+	if not v then
 		return nil
 	end
 
-	return React.createElement(UserTile, {
-		userId = tostring(v12[1]),
-		facePileSecondUserId = if not v12[2] then nil else tostring(v12[2]),
-		layoutMode = LayoutMode.wide,
-		title = if not FFlagAppChatSanitizeConversationTitleRichText or not t1.titleText then t1.titleText else escapeRichText(t1.titleText),
-		titleStyle = t1.titleStyle,
-		userPresenceType = v13,
-		onActivated = t1.onActivated,
-		selectable = t1.selectable,
-		customTextTruncation = Enum.TextTruncate.SplitWord
-	})
+	local createElement = React.createElement
+	local v2 = {
+		userId = tostring(facePileParticipantIds[1]),
+		facePileSecondUserId = 0,
+		layoutMode = 0,
+		title = 0,
+		titleStyle = 0,
+		userPresenceType = 0,
+		onActivated = 0,
+		selectable = 0,
+		customTextTruncation = 0
+	}
+	local facePileSecondUserId
+
+	if facePileParticipantIds[2] then
+		facePileSecondUserId = tostring(facePileParticipantIds[2])
+	end
+
+	v2.facePileSecondUserId = facePileSecondUserId
+	v2.layoutMode = LayoutMode.wide
+	local title
+
+	if props.titleText then
+		title = escapeRichText(props.titleText)
+	else
+		title = props.titleText
+	end
+
+	v2.title = title
+	v2.titleStyle = props.titleStyle
+	v2.userPresenceType = userPresenceType
+	v2.onActivated = props.onActivated
+	v2.selectable = props.selectable
+	v2.customTextTruncation = Enum.TextTruncate.SplitWord
+	return createElement(userTile, v2)
 end
 
 return FriendsChatFacePile

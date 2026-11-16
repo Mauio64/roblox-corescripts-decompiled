@@ -1,114 +1,88 @@
-local Parent = script:FindFirstAncestor("HttpClient").Parent
-local Promise = require(Parent.Promise)
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("HttpClient").Parent
+
+local Promise = require(parent.Promise)
+local Signals = require(parent.Signals)
 
 require(script.Parent.types)
+local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
 
-local t1 = {}
+local v = {}
 
-local function asPromise(p1) -- line: 15
-	-- upvalues: Promise (copy), t1 (copy), Signals (copy)
-	local t2 = {}
+local function asPromise(p)
+	local v2 = {}
+	return Promise.new(function(callback, callback2, callback3)
+		local flag = false
+		local flag2 = false
 
-	return Promise.new(function(resolve, reject, onCancel) -- line: 17
-		-- upvalues: t1 (copy), t2 (copy), p1 (copy), Signals (copy)
-		local u11 = false
-		local u12 = false
-
-		local function cleanupEffect() -- line: 21
-			-- upvalues: u12 (ref), t1 (copy), t2 (copy)
-			if u12 then
+		local function cleanupEffect() -- 2 equivalent calls inferred from this helper
+			if flag2 then
 				return
 			end
 
-			u12 = true
+			flag2 = true
+			local v3 = v[v2]
+			v[v2] = nil
 
-			local v17 = t1[t2]
+			if v3 ~= nil then
+				v3()
+			end
 
-			t1[t2] = nil
-
-			if v17 ~= nil then
-				v17()
+			if FFlagHttpClientRetryExtensions then
+				p.dispose()
 			end
 		end
-		local function settle(p2) -- line: 33
-			-- upvalues: u11 (ref), u12 (ref), t1 (copy), t2 (copy), resolve (copy), reject (copy)
-			if u11 then
+
+		local function settle(data)
+			if flag then
 				return
 			end
 
-			u11 = true
+			flag = true
+			cleanupEffect() -- inferred equivalent call
 
-			if not u12 then
-				u12 = true
-
-				local v19 = t1[t2]
-
-				t1[t2] = nil
-
-				if v19 ~= nil then
-					v19()
-				end
+			if data.status == "succeeded" then
+				callback(data.result)
+			elseif FFlagHttpClientRetryExtensions then
+				callback2({
+					responseCode = data.errorCode,
+					errorMessage = data.error,
+					response = data.response
+				})
+			else
+				callback2({ responseCode = data.errorCode, errorMessage = data.error })
 			end
-
-			if p2.status == "succeeded" then
-				resolve(p2.result)
-
-				return
-			end
-
-			reject({
-				responseCode = p2.errorCode,
-				errorMessage = p2.error
-			})
 		end
 
-		local v15 = p1.state(false)
+		local state = p.state(false)
 
-		if v15.status ~= "pending" then
-			settle(v15)
-
+		if state.status ~= "pending" then
+			settle(state)
 			return
 		end
 
-		local v16 = Signals.createEffect(function(p3) -- line: 54
-			-- upvalues: p1 (copy), settle (copy)
-			local v21 = p1.state(p3)
+		local effect = Signals.createEffect(function(p2)
+			local state2 = p.state(p2)
 
-			if v21.status == "pending" then
+			if state2.status == "pending" then
 				return
 			end
 
-			settle(v21)
+			settle(state2)
 		end)
 
-		if u12 then
-			v16()
+		if flag2 then
+			effect()
 		else
-			t1[t2] = v16
+			v[v2] = effect
 		end
 
-		onCancel(function() -- line: 67
-			-- upvalues: u11 (ref), u12 (ref), t1 (copy), t2 (copy)
-			if u11 then
+		callback3(function()
+			if flag then
 				return
 			end
 
-			u11 = true
-
-			if u12 then
-				return
-			end
-
-			u12 = true
-
-			local v22 = t1[t2]
-
-			t1[t2] = nil
-
-			if v22 ~= nil then
-				v22()
-			end
+			flag = true
+			cleanupEffect() -- inferred equivalent call
 		end)
 	end)
 end

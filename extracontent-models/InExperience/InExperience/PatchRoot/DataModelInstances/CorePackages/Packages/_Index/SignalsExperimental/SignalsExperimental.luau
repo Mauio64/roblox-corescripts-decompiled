@@ -1,4 +1,5 @@
 local SignalsScheduler = require(script.Parent.SignalsScheduler)
+
 local createProxy = require(script.createProxy)
 
 return {

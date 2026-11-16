@@ -1,36 +1,46 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local CreatorAgentChat = require(Parent.DataHydration.CreatorAgentChat)
-local UniverseConfiguration = require(Parent.DataHydration.UniverseConfiguration)
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
+
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local LocalUserIdStore = require(parent.LocalUserIdStore)
+local localUserIdStore = LocalUserIdStore.LocalUserIdStore
+local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
+
 local useSessionSummary = require(script.Parent.useSessionSummary)
+local PublishStatus = {}
 
-return {
-	isPublishLatest = function(b1: boolean, b2: boolean) -- line: 25
-		return b1 or b2
-	end,
-	usePublishStatus = function(t1: {[any]: any}) -- line: 29
-		-- upvalues: React (copy), UniverseConfiguration (copy), SignalsReact (copy), CreatorAgentChat (copy), useSessionSummary (copy)
-		local v10 = React.useMemo(function() -- line: 30
-			-- upvalues: UniverseConfiguration (copy), t1 (copy)
-			return UniverseConfiguration.getUniverseConfigurationStore().getAndFetchSummary(t1.universeId)
-		end, { t1.universeId })
-		local v11 = SignalsReact.useSignalState(v10.data)
-		local v12 = React.useMemo(function() -- line: 34
-			-- upvalues: CreatorAgentChat (copy), t1 (copy)
-			return CreatorAgentChat.getCreatorAgentChatStore().getSessionForProject(t1.universeId, t1.placeId, t1.sessionId)
-		end, {
-			t1.universeId,
-			t1.placeId,
-			t1.sessionId
-		})
-		local hasPublishedTurn = useSessionSummary(v12).hasPublishedTurn
-		local v14 = v11 ~= nil and v11.isActive
+function PublishStatus.isPublishLatest(flag: boolean, flag2: boolean)
+	return flag or flag2
+end
 
-		return {
-			hasPublishedTurn = hasPublishedTurn,
-			hasPublishedVersion = v14,
-			isPublishLatest = v14 or hasPublishedTurn
-		}
+function PublishStatus.usePublishStatus(data)
+	local v = React.useMemo(function()
+		return UniverseConfiguration.getUniverseConfigurationStore().getAndFetchSummary(data.universeId)
+	end, { data.universeId })
+	local v2 = SignalsReact.useSignalState(v.data)
+	local v3
+
+	if FFlagBuildExperienceModelPicker then
+		v3 = SignalsReact.useSignalState(localUserIdStore.getCurrentUserId)
 	end
-}
+
+	local hasPublishedTurn = useSessionSummary((React.useMemo(function()
+		return CreatorAgentChat.getCreatorAgentChatStore().getSessionForProject(
+			data.universeId,
+			data.placeId,
+			data.sessionId
+		)
+	end, { data.universeId, data.placeId, data.sessionId, v3 }))).hasPublishedTurn
+	local hasPublishedVersion = not (v2 == nil) and v2.isActive
+
+	return {
+		hasPublishedTurn = hasPublishedTurn,
+		hasPublishedVersion = hasPublishedVersion,
+		isPublishLatest = hasPublishedVersion or hasPublishedTurn
+	}
+end
+
+return PublishStatus

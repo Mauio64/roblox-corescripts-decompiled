@@ -1,125 +1,124 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
 require(script.Parent["ReactRobloxHostTypes.roblox"])
 
-local ReactGlobals = require(ParentParent.ReactGlobals)
+local ReactGlobals = require(parent.ReactGlobals)
+require(parent.ReactReconciler)
 
-require(ParentParent.ReactReconciler)
-require(ParentParent.Shared)
-require(ParentParent.ReactReconciler)
+require(parent.Shared)
+
+require(parent.ReactReconciler)
 
 local ReactRobloxComponentTree = require(script.Parent.ReactRobloxComponentTree)
+
 local markContainerAsRoot = ReactRobloxComponentTree.markContainerAsRoot
 local unmarkContainerAsRoot = ReactRobloxComponentTree.unmarkContainerAsRoot
-local lib = require(script.Parent.Parent["ReactReconciler.roblox"])
-local createContainer = lib.createContainer
-local updateContainer = lib.updateContainer
-local invariant = require(ParentParent.Shared).invariant
-local enableEagerRootListeners = require(ParentParent.Shared).ReactFeatureFlags.enableEagerRootListeners
-local flushSync = lib.flushSync
-local flushPassiveEffects = lib.flushPassiveEffects
-local BlockingRoot = lib.ReactRootTags.BlockingRoot
-local ConcurrentRoot = lib.ReactRootTags.ConcurrentRoot
-local LegacyRoot = lib.ReactRootTags.LegacyRoot
-local u16 = nil
-local t1 = {}
 
-t1.__index = t1
+local ReactReconcilerroblox = require(script.Parent.Parent["ReactReconciler.roblox"])
+local createContainer = ReactReconcilerroblox.createContainer
+local updateContainer = ReactReconcilerroblox.updateContainer
 
-function t1.new(p1, p2) -- line: 66
-	-- upvalues: t1 (copy), u16 (ref), ConcurrentRoot (copy)
-	local self = setmetatable({}, t1)
+local Shared = require(parent.Shared)
+local invariant = Shared.invariant
 
-	self._internalRoot = u16(p1, ConcurrentRoot, p2)
+local Shared2 = require(parent.Shared)
+local enableEagerRootListeners = Shared2.ReactFeatureFlags.enableEagerRootListeners
 
-	return self
-end
+local flushSync = ReactReconcilerroblox.flushSync
+local flushPassiveEffects = ReactReconcilerroblox.flushPassiveEffects
 
-local function createBlockingRoot(p3, p4, p5) -- line: 73
-	-- upvalues: t1 (copy), u16 (ref)
-	local self = setmetatable({}, t1)
+local BlockingRoot = ReactReconcilerroblox.ReactRootTags.BlockingRoot
+local ConcurrentRoot = ReactReconcilerroblox.ReactRootTags.ConcurrentRoot
+local LegacyRoot = ReactReconcilerroblox.ReactRootTags.LegacyRoot
 
-	self._internalRoot = u16(p3, p4, p5)
+local fn
+
+local class = {}
+class.__index = class
+
+function class.new(p, p2)
+	local self = setmetatable({}, class)
+	self._internalRoot = fn(p, ConcurrentRoot, p2)
 
 	return self
 end
 
-function t1.render(p6, p7) -- line: 85
-	-- upvalues: updateContainer (copy)
-	local _internalRoot = p6._internalRoot
+local function createBlockingRoot(p, p2, p3) -- 2 equivalent calls inferred from this helper
+	local self = setmetatable({}, class)
+	self._internalRoot = fn(p, p2, p3)
 
-	updateContainer(p7, _internalRoot, nil)
+	return self
 end
-function t1.unmount(p8) -- line: 113
-	-- upvalues: flushSync (copy), updateContainer (copy), unmarkContainerAsRoot (copy), flushPassiveEffects (copy)
-	local _internalRoot = p8._internalRoot
-	local containerInfo = _internalRoot.containerInfo
 
-	flushSync(function() -- line: 126
-		-- upvalues: updateContainer (copy), _internalRoot (copy), unmarkContainerAsRoot (copy), containerInfo (copy)
-		updateContainer(nil, _internalRoot, nil, function() -- line: 127
-			-- upvalues: unmarkContainerAsRoot (copy), containerInfo (copy)
+function class:render(p)
+	updateContainer(p, self._internalRoot, nil)
+end
+
+function class:unmount()
+	local internalRoot = self._internalRoot
+	local containerInfo = internalRoot.containerInfo
+
+	flushSync(function()
+		updateContainer(nil, internalRoot, nil, function()
 			unmarkContainerAsRoot(containerInfo)
 		end)
 	end)
+
 	flushPassiveEffects()
 end
-function u16(p9, p10, p11) -- line: 141
-	-- upvalues: createContainer (copy), markContainerAsRoot (copy), enableEagerRootListeners (copy)
-	local v36 = p11 ~= nil and p11.hydrate == true
-	local v37 = if p11 == nil then nil else p11.hydrationOptions
-	local v38 = p11 ~= nil and (p11.hydrationOptions ~= nil and p11.hydrationOptions.mutableSources) or nil
-	local v39 = createContainer(p9, p10, v36, v37)
 
-	markContainerAsRoot(v39.current, p9)
+fn = function(p, p2, p3)
+	local v
 
-	if not enableEagerRootListeners then
+	if p3 == nil then
+		v = false
+	else
+		v = p3.hydrate == true
 	end
 
-	if not v38 then
+	local hydrationOptions
+
+	if p3 ~= nil then
+		hydrationOptions = p3.hydrationOptions
 	end
 
-	return v39
+	local mutableSources
+
+	if not (p3 == nil or p3.hydrationOptions == nil) then
+		mutableSources = p3.hydrationOptions.mutableSources or nil
+	end
+
+	local container = createContainer(p, p2, v, hydrationOptions)
+	markContainerAsRoot(container.current, p)
+
+	return container
 end
 
-local t2 = {
-	isValidContainer = function(p12) -- line: 189
-		return typeof(p12) == "Instance"
+local function isValidContainer(instance): boolean -- 2 equivalent calls inferred from this helper
+	return typeof(instance) == "Instance"
+end
+
+local ReactRobloxRoot = {
+	["isValidContainer"] = isValidContainer,
+	createRoot = function(instance, p)
+		invariant(isValidContainer(instance), "createRoot(...): Target container is not a Roblox Instance.") -- inferred equivalent call
+
+		warnIfReactDOMContainerInDEV(instance)
+		return class.new(instance, p)
 	end,
-	createRoot = function(p13, p14) -- line: 212
-		-- upvalues: invariant (copy), t1 (copy)
-		invariant(typeof(p13) == "Instance", "createRoot(...): Target container is not a Roblox Instance.")
-		warnIfReactDOMContainerInDEV(p13)
+	createBlockingRoot = function(instance, p)
+		invariant(isValidContainer(instance), "createRoot(...): Target container is not a Roblox Instance.") -- inferred equivalent call
 
-		return t1.new(p13, p14)
+		warnIfReactDOMContainerInDEV(instance)
+		return createBlockingRoot(instance, BlockingRoot, p) -- inferred equivalent call
 	end,
-	createBlockingRoot = function(p15, p16) -- line: 222
-		-- upvalues: invariant (copy), BlockingRoot (copy), t1 (copy), u16 (ref)
-		invariant(typeof(p15) == "Instance", "createRoot(...): Target container is not a Roblox Instance.")
-		warnIfReactDOMContainerInDEV(p15)
-
-		local v45 = BlockingRoot
-		local self = setmetatable({}, t1)
-
-		self._internalRoot = u16(p15, v45, p16)
-
-		return self
-	end,
-	createLegacyRoot = function(p17, p18) -- line: 235
-		-- upvalues: LegacyRoot (copy), t1 (copy), u16 (ref)
-		local v49 = LegacyRoot
-		local self = setmetatable({}, t1)
-
-		self._internalRoot = u16(p17, v49, p18)
-
-		return self
+	createLegacyRoot = function(p, p2)
+		return createBlockingRoot(p, LegacyRoot, p2) -- inferred equivalent call
 	end
 }
 
-function warnIfReactDOMContainerInDEV(_) -- line: 239
-	-- upvalues: ReactGlobals (copy)
-	if not ReactGlobals.__DEV__ then
-	end
+function warnIfReactDOMContainerInDEV(_)
+	local ___DEV__ = ReactGlobals.__DEV__
 end
 
-return t2
+return ReactRobloxRoot

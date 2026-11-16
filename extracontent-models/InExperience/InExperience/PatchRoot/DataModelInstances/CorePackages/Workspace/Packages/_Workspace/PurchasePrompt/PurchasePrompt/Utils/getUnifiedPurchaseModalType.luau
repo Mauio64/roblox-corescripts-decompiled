@@ -1,28 +1,31 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local SharedFlags = require(PurchasePromptParent.SharedFlags)
-local UnifiedPurchaseModalTypeEnum = require(PurchasePromptParent.IAPExperience).Enums.UnifiedPurchaseModalTypeEnum
+local parent = PurchasePrompt.Parent
+local SharedFlags = require(parent.SharedFlags)
+local IAPExperience = require(parent.IAPExperience)
+local UnifiedPurchaseModalTypeEnum = IAPExperience.Enums.UnifiedPurchaseModalTypeEnum
 local isMultiItemPurchase = require(PurchasePrompt.Utils.isMultiItemPurchase)
 local RequestType = require(PurchasePrompt.Enums.RequestType)
-local FFlagEnableUnifiedPurchaseFlowForDevSubs = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs
-local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
 
-local function getUnifiedPurchaseModalType(p1) -- line: 14
-	-- upvalues: RequestType (copy), UnifiedPurchaseModalTypeEnum (copy), FFlagAXMISWithBlackbird (copy), isMultiItemPurchase (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy)
-	if p1 == RequestType.Experience then
+local SharedFlags2 = require(PurchasePrompt.Parent.SharedFlags)
+local FFlagEnableUnifiedPurchaseFlowForDevSubs = SharedFlags2.FFlagEnableUnifiedPurchaseFlowForDevSubs
+local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags.FFlagLuaAppsEnablePromptVIPServerPurchase
+
+local function getUnifiedPurchaseModalType(p)
+	if p == RequestType.Experience then
 		return UnifiedPurchaseModalTypeEnum.Experience
 	end
 
-	if FFlagAXMISWithBlackbird and p1 == RequestType.RobuxUpsell then
+	if FFlagAXMISWithBlackbird and p == RequestType.RobuxUpsell or isMultiItemPurchase(p) then
 		return UnifiedPurchaseModalTypeEnum.MultiItem
 	end
 
-	if isMultiItemPurchase(p1) then
-		return UnifiedPurchaseModalTypeEnum.MultiItem
-	end
-
-	if FFlagEnableUnifiedPurchaseFlowForDevSubs and p1 == RequestType.DeveloperSubscription then
+	if FFlagEnableUnifiedPurchaseFlowForDevSubs and p == RequestType.DeveloperSubscription then
 		return UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	end
+
+	if FFlagLuaAppsEnablePromptVIPServerPurchase and p == RequestType.VIPServer then
+		return UnifiedPurchaseModalTypeEnum.VIPServer
 	end
 
 	return UnifiedPurchaseModalTypeEnum.SingleItem

@@ -1,128 +1,119 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 47
-	-- upvalues: t2 (copy)
+local class = {}
+class.__index = class
+
+function class.new(p)
 	return (setmetatable({
-		following_count_by_type = if t3 ~= nil and t3.following_count_by_type ~= nil then t3.following_count_by_type else 0,
-		following_limit_by_type = if t3 ~= nil and t3.following_limit_by_type ~= nil then t3.following_limit_by_type else 0
-	}, t2))
+		following_count_by_type = (p == nil or p.following_count_by_type == nil) and 0 or p.following_count_by_type,
+		following_limit_by_type = (p == nil or p.following_limit_by_type == nil) and 0 or p.following_limit_by_type
+	}, class))
 end
-function t2.encode(p1) -- line: 60
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.following_count_by_type ~= nil and p1.following_count_by_type ~= 0 then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class.encode(p)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v9, v10, p1.following_count_by_type)
+	if p.following_count_by_type ~= nil and p.following_count_by_type ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.following_count_by_type)
 	end
 
-	if p1.following_limit_by_type ~= nil and p1.following_limit_by_type ~= 0 then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v11, v12, p1.following_limit_by_type)
+	if p.following_limit_by_type ~= nil and p.following_limit_by_type ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.following_limit_by_type)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 79
-	-- upvalues: t2 (copy), proto (copy)
-	local v15 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v17, v18
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v17, v18, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v18 == proto.wireTypes.varint then
-			if v17 == 1 then
-				local v19
-
-				v19, n2 = proto.readVarIntI32(p2, n2)
-				v15.following_count_by_type = v19
-			elseif v17 == 2 then
-				local v20
-
-				v20, n2 = proto.readVarIntI32(p2, n2)
-				v15.following_limit_by_type = v20
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local following_count_by_type
+				following_count_by_type, v2 = proto.readVarIntI32(buf, v2)
+				result.following_count_by_type = following_count_by_type
+			elseif v3 == 2 then
+				local following_limit_by_type
+				following_limit_by_type, v2 = proto.readVarIntI32(buf, v2)
+				result.following_limit_by_type = following_limit_by_type
 			else
-				local v21
-
-				v21, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v18 == proto.wireTypes.lengthDelimited then
-			local v22, v23 = proto.readVarInt(p2, n2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			local varInt, v5 = proto.readVarInt(buf, v2)
 
-			n2 = v23 + v22
-		elseif v18 == proto.wireTypes.i32 then
-			local v24
-
-			v24, n2 = proto.readFixed32(p2, n2)
-		elseif v18 == proto.wireTypes.i64 then
-			local v25
-
-			v25, n2 = proto.readFixed64(p2, n2)
+			v2 = v5 + varInt
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v18)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v15
-end
-function t2.jsonEncode(p3) -- line: 127
-	local t4 = {}
-
-	if p3.following_count_by_type ~= nil and p3.following_count_by_type ~= 0 then
-		t4.followingCountByType = p3.following_count_by_type
-	end
-
-	if p3.following_limit_by_type ~= nil and p3.following_limit_by_type ~= 0 then
-		t4.followingLimitByType = p3.following_limit_by_type
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 141
-	-- upvalues: t2 (copy)
-	local v29 = t2.new()
-
-	if t5.following_count_by_type ~= nil then
-		v29.following_count_by_type = t5.following_count_by_type
-	end
-
-	if t5.followingCountByType ~= nil then
-		v29.following_count_by_type = t5.followingCountByType
-	end
-
-	if t5.following_limit_by_type ~= nil then
-		v29.following_limit_by_type = t5.following_limit_by_type
-	end
-
-	if t5.followingLimitByType ~= nil then
-		v29.following_limit_by_type = t5.followingLimitByType
-	end
-
-	return v29
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(p)
+	local v2 = {}
+
+	if p.following_count_by_type ~= nil and p.following_count_by_type ~= 0 then
+		v2.followingCountByType = p.following_count_by_type
+	end
+
+	if p.following_limit_by_type ~= nil and p.following_limit_by_type ~= 0 then
+		v2.followingLimitByType = p.following_limit_by_type
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.following_count_by_type ~= nil then
+		v2.following_count_by_type = data.following_count_by_type
+	end
+
+	if data.followingCountByType ~= nil then
+		v2.following_count_by_type = data.followingCountByType
+	end
+
+	if data.following_limit_by_type ~= nil then
+		v2.following_limit_by_type = data.following_limit_by_type
+	end
+
+	if data.followingLimitByType ~= nil then
+		v2.following_limit_by_type = data.followingLimitByType
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "UniverseUserFollowLimitData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseUserFollowLimitData"
 }
-t1.UniverseUserFollowLimitData = t2
-typeRegistry.default:register(t1.UniverseUserFollowLimitData)
 
-return {
-	UniverseUserFollowLimitData = t1.UniverseUserFollowLimitData
-}
+v.UniverseUserFollowLimitData = class
+
+typeRegistry.default:register(v.UniverseUserFollowLimitData)
+
+return { UniverseUserFollowLimitData = v.UniverseUserFollowLimitData }

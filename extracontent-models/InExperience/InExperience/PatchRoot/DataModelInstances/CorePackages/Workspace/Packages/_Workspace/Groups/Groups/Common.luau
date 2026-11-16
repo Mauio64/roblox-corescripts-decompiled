@@ -1,6 +1,3 @@
-local _script = script
+local script = script
 
-return {
-	TextKeys = require(_script.TextKeys),
-	Types = require(_script.Types)
-}
+return { TextKeys = require(script.TextKeys), Types = require(script.Types) }

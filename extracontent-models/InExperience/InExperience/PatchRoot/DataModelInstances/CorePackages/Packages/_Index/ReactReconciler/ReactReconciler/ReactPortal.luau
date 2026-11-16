@@ -1,21 +1,22 @@
-local ParentParent = script.Parent.Parent
-local REACT_PORTAL_TYPE = require(ParentParent.Shared).ReactSymbols.REACT_PORTAL_TYPE
+local parent = script.Parent.Parent
 
-require(ParentParent.Shared)
+local Shared = require(parent.Shared)
+local REACT_PORTAL_TYPE = Shared.ReactSymbols.REACT_PORTAL_TYPE
+
+require(parent.Shared)
 
 return {
-	createPortal = function(p1, p2, p3, s1: string?) -- line: 19
-		-- upvalues: REACT_PORTAL_TYPE (copy)
-		if s1 ~= nil then
-			s1 = tostring(s1)
+	createPortal = function(children, containerInfo, implementation, p: string?)
+		if p ~= nil then
+			p = tostring(p)
 		end
 
 		return {
 			["$$typeof"] = REACT_PORTAL_TYPE,
-			key = s1,
-			children = p1,
-			containerInfo = p2,
-			implementation = p3
+			key = p,
+			children = children,
+			containerInfo = containerInfo,
+			implementation = implementation
 		}
 	end
 }

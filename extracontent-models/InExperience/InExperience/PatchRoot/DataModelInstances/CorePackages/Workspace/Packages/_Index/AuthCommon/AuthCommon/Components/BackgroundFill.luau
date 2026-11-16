@@ -1,20 +1,20 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Foundation = require(Parent.Foundation)
-local Roact = require(Parent.Roact)
-local v4 = Roact.PureComponent:extend("BackgroundFill")
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+local Foundation = require(parent.Foundation)
+local Roact = require(parent.Roact)
 
-function v4.render(p1) -- line: 8
-	-- upvalues: Roact (copy), Foundation (copy)
-	local propsImage = p1.props.Image
+local extended = Roact.PureComponent:extend("BackgroundFill")
+
+function extended.render(p)
+	local image = p.props.Image
 
 	return Roact.createElement(Foundation.Image, {
-		BorderSizePixel = 0,
-		Image = propsImage,
+		Image = image,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
+		BorderSizePixel = 0,
 		ScaleType = Enum.ScaleType.Crop
 	})
 end
 
-return v4
+return extended

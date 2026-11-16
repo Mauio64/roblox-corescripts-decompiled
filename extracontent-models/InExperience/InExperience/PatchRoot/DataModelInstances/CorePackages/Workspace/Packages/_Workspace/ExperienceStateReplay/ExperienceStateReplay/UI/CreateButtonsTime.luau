@@ -1,84 +1,81 @@
-local scriptParent = script.Parent
-local ButtonAssets = require(scriptParent.ButtonAssets)
-local SecondsToTimeStr = require(scriptParent.SecondsToTimeStr)
-local t1 = {
-	regularColor = Color3.fromRGB(255, 255, 255),
+local parent = script.Parent
+local ButtonAssets = require(parent.ButtonAssets)
+local SecondsToTimeStr = require(parent.SecondsToTimeStr)
+
+local CreateButtonsTime = {
+	["regularColor"] = Color3.fromRGB(255, 255, 255),
 	hoverColor = Color3.fromRGB(200, 200, 200),
 	clickColor = Color3.fromRGB(150, 150, 150)
 }
 
-function t1.createButtonsTime(p1) -- line: 12
-	-- upvalues: t1 (copy), ButtonAssets (copy), SecondsToTimeStr (copy)
-	function p1.createControlBarButton(s1: string, b1: boolean) -- line: 14
-		-- upvalues: p1 (copy), t1 (copy)
-		local ImageButton = Instance.new("ImageButton")
+function CreateButtonsTime:createButtonsTime()
+	function self.createControlBarButton(image: string, flag: boolean)
+		local controlBarButton = Instance.new("ImageButton")
+		controlBarButton.Name = "ControlBarButton"
+		controlBarButton.Parent = self.ButtonsTimeControlBar
+		controlBarButton.BackgroundTransparency = 1
+		controlBarButton.Image = image
+		controlBarButton.ImageColor3 = CreateButtonsTime.regularColor
+		controlBarButton.AnchorPoint = Vector2.new(0, 0.5)
+		controlBarButton.Size = UDim2.new(0.1, 0, 0.9, 0)
+		controlBarButton.SizeConstraint = Enum.SizeConstraint.RelativeXY
 
-		ImageButton.Name = "ControlBarButton"
-		ImageButton.Parent = p1.ButtonsTimeControlBar
-		ImageButton.BackgroundTransparency = 1
-		ImageButton.Image = s1
-		ImageButton.ImageColor3 = t1.regularColor
-		ImageButton.AnchorPoint = Vector2.new(0, 0.5)
-		ImageButton.Size = UDim2.new(0.1, 0, 0.9, 0)
-		ImageButton.SizeConstraint = Enum.SizeConstraint.RelativeXY
-		ImageButton:SetAttribute("useHoverColor", true)
-		ImageButton.MouseEnter:Connect(function() -- line: 26
-			-- upvalues: ImageButton (copy), t1 (copy)
-			if ImageButton:GetAttribute("useHoverColor") then
-				ImageButton.ImageColor3 = t1.hoverColor
+		controlBarButton:SetAttribute("useHoverColor", true)
+		controlBarButton.MouseEnter:Connect(function()
+			if controlBarButton:GetAttribute("useHoverColor") then
+				controlBarButton.ImageColor3 = CreateButtonsTime.hoverColor
 			end
 		end)
-		ImageButton.MouseLeave:Connect(function() -- line: 31
-			-- upvalues: ImageButton (copy), t1 (copy)
-			if ImageButton:GetAttribute("useHoverColor") then
-				ImageButton.ImageColor3 = t1.regularColor
+		controlBarButton.MouseLeave:Connect(function()
+			if controlBarButton:GetAttribute("useHoverColor") then
+				controlBarButton.ImageColor3 = CreateButtonsTime.regularColor
 			end
 		end)
-		ImageButton.MouseButton1Down:Connect(function() -- line: 36
-			-- upvalues: ImageButton (copy), t1 (copy)
-			ImageButton.ImageColor3 = t1.clickColor
+		controlBarButton.MouseButton1Down:Connect(function()
+			controlBarButton.ImageColor3 = CreateButtonsTime.clickColor
 		end)
 
-		if b1 then
-			ImageButton.MouseButton1Up:Connect(function() -- line: 40
-				-- upvalues: ImageButton (copy), t1 (copy)
-				ImageButton.ImageColor3 = t1.hoverColor
+		if flag then
+			controlBarButton.MouseButton1Up:Connect(function()
+				controlBarButton.ImageColor3 = CreateButtonsTime.hoverColor
 			end)
 		end
 
-		local UISizeConstraint = Instance.new("UISizeConstraint")
+		local uiSizeConstraint = Instance.new("UISizeConstraint")
+		uiSizeConstraint.MaxSize = Vector2.new(self.maxControlBarHeight * 0.9, self.maxControlBarHeight * 0.9)
 
-		UISizeConstraint.MaxSize = Vector2.new(p1.maxControlBarHeight * 0.9, p1.maxControlBarHeight * 0.9)
-		UISizeConstraint.Parent = ImageButton
+		uiSizeConstraint.Parent = controlBarButton
 
-		return ImageButton
+		return controlBarButton
 	end
 
-	p1.PlayButton = p1.createControlBarButton(ButtonAssets.PlayButton, true)
-	p1.PlayButton.LayoutOrder = 2
-	p1.StopButton = p1.createControlBarButton(ButtonAssets.StopButton, false)
-	p1.StopButton.LayoutOrder = 3
-	p1.ReverseButton = p1.createControlBarButton(ButtonAssets.ReverseButton, false)
-	p1.ReverseButton.LayoutOrder = 4
-	p1.CurrentTimeLabel = Instance.new("TextLabel")
-	p1.CurrentTimeLabel.Name = "CurrentTimeLabel"
-	p1.CurrentTimeLabel.Font = Enum.Font.SourceSans
-	p1.CurrentTimeLabel.TextXAlignment = Enum.TextXAlignment.Left
-	p1.CurrentTimeLabel.TextYAlignment = Enum.TextYAlignment.Center
-	p1.CurrentTimeLabel.AnchorPoint = Vector2.new(0, 0.5)
-	p1.CurrentTimeLabel.Size = UDim2.new(0.4, 0, 1.3, 0)
-	p1.CurrentTimeLabel.SizeConstraint = Enum.SizeConstraint.RelativeXY
-	p1.CurrentTimeLabel.BackgroundTransparency = 1
-	p1.CurrentTimeLabel.Text = SecondsToTimeStr.convertSecondsToTimeStr(0)
-	p1.CurrentTimeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	p1.CurrentTimeLabel.TextScaled = true
-	p1.CurrentTimeLabel.LayoutOrder = 5
-	p1.CurrentTimeLabel.Parent = p1.ButtonsTimeControlBar
+	self.PlayButton = self.createControlBarButton(ButtonAssets.PlayButton, true)
+	self.PlayButton.LayoutOrder = 2
 
-	local UIPadding = Instance.new("UIPadding")
+	self.StopButton = self.createControlBarButton(ButtonAssets.StopButton, false)
+	self.StopButton.LayoutOrder = 3
 
-	UIPadding.PaddingBottom = UDim.new(0.05, 0)
-	UIPadding.Parent = p1.CurrentTimeLabel
+	self.ReverseButton = self.createControlBarButton(ButtonAssets.ReverseButton, false)
+	self.ReverseButton.LayoutOrder = 4
+
+	self.CurrentTimeLabel = Instance.new("TextLabel")
+	self.CurrentTimeLabel.Name = "CurrentTimeLabel"
+	self.CurrentTimeLabel.Font = Enum.Font.SourceSans
+	self.CurrentTimeLabel.TextXAlignment = Enum.TextXAlignment.Left
+	self.CurrentTimeLabel.TextYAlignment = Enum.TextYAlignment.Center
+	self.CurrentTimeLabel.AnchorPoint = Vector2.new(0, 0.5)
+	self.CurrentTimeLabel.Size = UDim2.new(0.4, 0, 1.3, 0)
+	self.CurrentTimeLabel.SizeConstraint = Enum.SizeConstraint.RelativeXY
+	self.CurrentTimeLabel.BackgroundTransparency = 1
+	self.CurrentTimeLabel.Text = SecondsToTimeStr.convertSecondsToTimeStr(0)
+	self.CurrentTimeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	self.CurrentTimeLabel.TextScaled = true
+	self.CurrentTimeLabel.LayoutOrder = 5
+	self.CurrentTimeLabel.Parent = self.ButtonsTimeControlBar
+
+	local uiPadding = Instance.new("UIPadding")
+	uiPadding.PaddingBottom = UDim.new(0.05, 0)
+	uiPadding.Parent = self.CurrentTimeLabel
 end
 
-return t1
+return CreateButtonsTime

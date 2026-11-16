@@ -1,242 +1,172 @@
 game:GetService("Players")
-
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local VoiceChatService = game:GetService("VoiceChatService")
 local SoundService = game:GetService("SoundService")
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local AvatarChatService = game:GetService("AvatarChatService")
-local GetFFlagAvatarChatServiceEnabled = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagAvatarChatServiceEnabled
-local v8 = game:DefineFastFlag("DebugLogVoiceDefault", false)
-local EngineFeature = game:GetEngineFeature("AudioInstanceAddedApiEnabled")
-local FFlagExpChatDictation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagExpChatDictation
 
-local function log(...) -- line: 17
-	-- upvalues: v8 (copy)
-	if v8 then
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagAvatarChatServiceEnabled = SharedFlags.GetFFlagAvatarChatServiceEnabled
+
+local defineFastFlag = game:DefineFastFlag("DebugLogVoiceDefault", false)
+
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagUseAudioDeviceInputAddedSignal = SharedFlags2.FFlagUseAudioDeviceInputAddedSignal
+local engineFeature = game:GetEngineFeature("AudioInstanceAddedApiEnabled")
+
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagExpChatDictation = SharedFlags3.FFlagExpChatDictation
+
+local function log(...)
+	if defineFastFlag then
 		print("[VoiceDefault]", ...)
 	end
 end
 
-local t1 = {}
+local v = {}
 
 for i = 7, 80, 2 do
-	t1[i] = (i - 7 - 73) ^ 2 / 5329
+	v[i] = (i - 7 - 73) ^ 2 / 5329
 end
 
-t1[80] = 0
+v[80] = 0
 
 if GetFFlagAvatarChatServiceEnabled() then
-	local ok, result = pcall(AvatarChatService.GetServerFeaturesAsync, AvatarChatService)
+	local success, serverFeaturesAsync = pcall(AvatarChatService.GetServerFeaturesAsync, AvatarChatService)
 
-	if not ok then
+	if not success then
 		log("Failed to get GetServerFeaturesAsync, returning early")
-
 		return
 	end
 
-	local v16 = AvatarChatService:IsEnabled(result, Enum.AvatarChatServiceFeature.UniverseAudio)
-	local v17 = AvatarChatService:IsEnabled(result, Enum.AvatarChatServiceFeature.PlaceAudio)
+	local isEnabled = AvatarChatService:IsEnabled(serverFeaturesAsync, Enum.AvatarChatServiceFeature.UniverseAudio)
+	local isEnabled2 = AvatarChatService:IsEnabled(serverFeaturesAsync, Enum.AvatarChatServiceFeature.PlaceAudio)
 
-	if not v16 or not v17 then
+	if not (isEnabled and isEnabled2) then
 		log("Universe or place not voice enabled, returning early")
-
 		return
 	end
 end
 
-local t2 = {}
-local t3 = {}
-local t4 = {}
+local v2 = {}
+local v3 = {}
+local connections = {}
 
-local function upsertDeviceList(t5: {[any]: any}?, p1) -- line: 58
-	if t5 == nil then
-		return {
-			[p1] = true
-		}
+local function upsertDeviceList(p, p2)
+	if p ~= nil then
+		p[p2] = true
+		return p
 	end
 
-	t5[p1] = true
-
-	return t5
+	local set = {}
+	set[p2] = true
+	return set
 end
-local function addEmitterToHead(p2) -- line: 69
-	-- upvalues: log (copy), VoiceChatService (copy), t1 (copy)
-	local AudioEmitter = Instance.new("AudioEmitter")
 
-	AudioEmitter.Parent = p2
-	AudioEmitter:AddTag("RbxDefaultVoiceEmitter")
-	log("Adding emitter", AudioEmitter, " to ", p2)
+local function addEmitterToHead(parent)
+	local audioEmitter = Instance.new("AudioEmitter")
+	audioEmitter.Parent = parent
+	audioEmitter:AddTag("RbxDefaultVoiceEmitter")
+	log("Adding emitter", audioEmitter, " to ", parent)
 
 	if VoiceChatService.DefaultDistanceAttenuation == Enum.VoiceChatDistanceAttenuationType.Legacy then
-		AudioEmitter:SetDistanceAttenuation(t1)
+		audioEmitter:SetDistanceAttenuation(v)
 	end
 
-	return AudioEmitter
+	return audioEmitter
 end
-local function hookupDeviceInputToEmitter(p3, p4) -- line: 83
-	-- upvalues: addEmitterToHead (copy), log (copy)
-	local v40 = addEmitterToHead(p3)
 
-	log("Hooking input device to emitter", p3, p4, v40)
-
-	local Wire = Instance.new("Wire")
-
-	Wire.Parent = v40
-	Wire.SourceInstance = p4
-	Wire.TargetInstance = v40
+local function hookupDeviceInputToEmitter(character, audioDeviceInput) -- 2 equivalent calls inferred from this helper
+	local v4 = addEmitterToHead(character)
+	log("Hooking input device to emitter", character, audioDeviceInput, v4)
+	local wire = Instance.new("Wire")
+	wire.Parent = v4
+	wire.SourceInstance = audioDeviceInput
+	wire.TargetInstance = v4
 end
-local function untrackDeviceForPlayer(p5, p6) -- line: 95
-	-- upvalues: t2 (copy), t3 (copy), log (copy)
-	if p6 then
-		local v44 = t2[p6]
 
-		if v44 then
-			v44[p5] = nil
-		end
+local function untrackDeviceForPlayer(instance, p) -- 2 equivalent calls inferred from this helper
+	local v4 = p and v2[p]
+
+	if v4 then
+		v4[instance] = nil
 	end
 
-	local v45 = t3[p5]
+	local v5 = v3[instance]
 
-	if not v45 then
+	if not v5 then
 		log("Attempting to remove connections from untracked AudioDeviceInput")
-
 		return
 	end
 
-	v45.onPlayerChanged:Disconnect()
-	t3[p5] = nil
+	v5.onPlayerChanged:Disconnect()
+	v3[instance] = nil
 end
-local function isIgnoredAudioInput(p7) -- line: 116
-	-- upvalues: CoreGui (copy)
-	return p7:IsDescendantOf(CoreGui)
+
+local function isIgnoredAudioInput(instance) -- 3 equivalent calls inferred from this helper
+	return instance:IsDescendantOf(CoreGui)
 end
-local function trackDevice(p8) -- line: 120
-	-- upvalues: FFlagExpChatDictation (copy), CoreGui (copy), t2 (copy), t3 (copy), log (copy), trackDevice (copy)
-	if FFlagExpChatDictation and p8:IsDescendantOf(CoreGui) then
+
+local function trackDevice(instance)
+	if FFlagExpChatDictation and isIgnoredAudioInput(instance) then -- inferred equivalent call
 		return
 	end
 
-	local Player = p8.Player
+	local player = instance.Player
 
-	if Player then
-		local v49 = t2
-		local v50 = t2[Player]
+	if player then
+		local v4 = v2[player]
 
-		if v50 == nil then
-			v50 = {
-				[p8] = true
-			}
-		else
-			v50[p8] = true
+		if v4 == nil then
+			v4 = {}
 		end
 
-		v49[Player] = v50
+		v4[instance] = true
+
+		v2[player] = v4
 	end
 
-	local t6 = {}
-	local u52 = Player
-
-	t6.onPlayerChanged = p8:GetPropertyChangedSignal("Player"):Connect(function() -- line: 132
-		-- upvalues: p8 (copy), u52 (ref), t2 (copy), t3 (copy), log (copy), trackDevice (copy)
-		local v70 = p8
-		local v71 = u52
-
-		if v71 then
-			local v72 = t2[v71]
-
-			if v72 then
-				v72[v70] = nil
-			end
-		end
-
-		local v73 = t3[v70]
-
-		if not v73 then
-			log("Attempting to remove connections from untracked AudioDeviceInput")
-		else
-			v73.onPlayerChanged:Disconnect()
-			t3[v70] = nil
-		end
-
-		u52 = p8.Player
-		trackDevice(p8)
-	end)
-	t3[p8] = t6
-	p8.Destroying:Connect(function() -- line: 139
-		-- upvalues: p8 (copy), t2 (copy), t3 (copy), log (copy)
-		local v74 = p8
-		local Player2 = p8.Player
-
-		if Player2 then
-			local v76 = t2[Player2]
-
-			if v76 then
-				v76[v74] = nil
-			end
-		end
-
-		local v77 = t3[v74]
-
-		if not v77 then
-			log("Attempting to remove connections from untracked AudioDeviceInput")
-
-			return
-		end
-
-		v77.onPlayerChanged:Disconnect()
-		t3[v74] = nil
+	local v4 = player
+	v3[instance] = {
+		onPlayerChanged = instance:GetPropertyChangedSignal("Player"):Connect(function()
+			untrackDeviceForPlayer(instance, v4) -- inferred equivalent call
+			v4 = instance.Player
+			trackDevice(instance)
+		end)
+	}
+	instance.Destroying:Connect(function()
+		untrackDeviceForPlayer(instance, instance.Player) -- inferred equivalent call
 	end)
 end
-local function createAudioDevice(p9) -- line: 144
-	-- upvalues: VoiceChatService (copy), log (copy), trackDevice (copy), addEmitterToHead (copy), t4 (copy)
-	local ok, result = pcall(function() -- line: 145
-		-- upvalues: VoiceChatService (copy), p9 (copy)
-		return VoiceChatService:IsVoiceEnabledForUserIdAsync(p9.UserId)
+
+local function createAudioDevice(player)
+	local success, result = pcall(function()
+		return VoiceChatService:IsVoiceEnabledForUserIdAsync(player.UserId)
 	end)
 
-	if not ok then
+	if not success then
 		log("Error getting voice enabled status: \"", result, "\"")
 	end
 
-	if not ok or not result then
+	if not (success and result) then
 		return
 	end
 
-	local AudioDeviceInput = Instance.new("AudioDeviceInput")
+	local audioDeviceInput = Instance.new("AudioDeviceInput")
+	audioDeviceInput.Player = player
+	audioDeviceInput.Parent = player
+	audioDeviceInput.Active = false
+	trackDevice(audioDeviceInput)
 
-	AudioDeviceInput.Player = p9
-	AudioDeviceInput.Parent = p9
-	AudioDeviceInput.Active = false
-	trackDevice(AudioDeviceInput)
-
-	if p9.Character then
-		local Character = p9.Character
-		local v58 = addEmitterToHead(Character)
-
-		log("Hooking input device to emitter", Character, AudioDeviceInput, v58)
-
-		local Wire = Instance.new("Wire")
-
-		Wire.Parent = v58
-		Wire.SourceInstance = AudioDeviceInput
-		Wire.TargetInstance = v58
+	if player.Character then
+		hookupDeviceInputToEmitter(player.Character, audioDeviceInput) -- inferred equivalent call
 	end
 
-	t4[p9] = p9.CharacterAdded:Connect(function(character) -- line: 164
-		-- upvalues: AudioDeviceInput (copy), addEmitterToHead (copy), log (copy)
-		local v79 = AudioDeviceInput
-		local v80 = addEmitterToHead(character)
-
-		log("Hooking input device to emitter", character, v79, v80)
-
-		local Wire = Instance.new("Wire")
-
-		Wire.Parent = v80
-		Wire.SourceInstance = v79
-		Wire.TargetInstance = v80
+	connections[player] = player.CharacterAdded:Connect(function(character)
+		hookupDeviceInputToEmitter(character, audioDeviceInput) -- inferred equivalent call
 	end)
-	log("Creating device for ", p9.Name)
+	log("Creating device for ", player.Name)
 end
 
 if VoiceChatService.UseNewAudioApi then
@@ -244,81 +174,80 @@ if VoiceChatService.UseNewAudioApi then
 
 	if VoiceChatService.EnableDefaultVoice then
 		local Players = game:GetService("Players")
-
 		Players.PlayerAdded:Connect(createAudioDevice)
-		Players.PlayerRemoving:Connect(function(player) -- line: 175
-			-- upvalues: t2 (copy), t4 (copy), log (copy)
-			local v61 = t2[player]
-			local v62 = t4[player]
+		Players.PlayerRemoving:Connect(function(player)
+			local v4 = v2[player]
+			local connection = connections[player]
+			log(player.Name, "removed. Deleting instance", v4)
 
-			log(player.Name, "removed. Deleting instance", v61)
-
-			if v61 then
-				t2[player] = nil
+			if v4 then
+				v2[player] = nil
 			end
 
-			if v62 then
-				v62:Disconnect()
+			if connection then
+				connection:Disconnect()
 			end
 		end)
 
-		for _, player in Players:GetPlayers() do
-			createAudioDevice(player)
+		for _, v4 in Players:GetPlayers() do
+			createAudioDevice(v4)
 		end
 	end
 
-	local RemoteEvent = Instance.new("RemoteEvent")
+	local setUserActive = Instance.new("RemoteEvent")
+	setUserActive.Name = "SetUserActive"
+	setUserActive.Parent = RobloxReplicatedStorage
 
-	RemoteEvent.Name = "SetUserActive"
-	RemoteEvent.Parent = RobloxReplicatedStorage
+	local function onAudioDeviceInputAdded(audioDeviceInput) -- 2 equivalent calls inferred from this helper
+		if FFlagExpChatDictation and isIgnoredAudioInput(audioDeviceInput) then -- inferred equivalent call
+			return
+		end
 
-	if EngineFeature then
-		SoundService.AudioInstanceAdded:Connect(function(p10) -- line: 197
-			-- upvalues: FFlagExpChatDictation (copy), CoreGui (copy), trackDevice (copy)
-			if p10:IsA("AudioDeviceInput") then
-				if FFlagExpChatDictation and p10:IsDescendantOf(CoreGui) then
-					return
-				end
+		audioDeviceInput.Active = false
+		trackDevice(audioDeviceInput)
+	end
 
-				p10.Active = false
-				trackDevice(p10)
+	if FFlagUseAudioDeviceInputAddedSignal then
+		SoundService.AudioDeviceInputAdded:Connect(onAudioDeviceInputAdded)
+	elseif engineFeature then
+		SoundService.AudioInstanceAdded:Connect(function(audioDeviceInput)
+			if audioDeviceInput:IsA("AudioDeviceInput") then
+				onAudioDeviceInputAdded(audioDeviceInput) -- inferred equivalent call
 			end
 		end)
 	else
-		game.DescendantAdded:Connect(function(descendant) -- line: 208
-			-- upvalues: FFlagExpChatDictation (copy), CoreGui (copy), trackDevice (copy)
-			if descendant:IsA("AudioDeviceInput") then
-				if FFlagExpChatDictation and descendant:IsDescendantOf(CoreGui) then
-					return
-				end
-
-				descendant.Active = false
-				trackDevice(descendant)
+		game.DescendantAdded:Connect(function(audioDeviceInput)
+			if audioDeviceInput:IsA("AudioDeviceInput") then
+				onAudioDeviceInputAdded(audioDeviceInput) -- inferred equivalent call
 			end
 		end)
 	end
 
-	for _, v33 in SoundService:GetAudioInstances() do
-		if v33:IsA("AudioDeviceInput") and (not FFlagExpChatDictation or not v33:IsDescendantOf(CoreGui)) then
-			v33.Active = false
-			trackDevice(v33)
+	for _, audioDeviceInput in SoundService:GetAudioInstances() do
+		if
+			not audioDeviceInput:IsA("AudioDeviceInput")
+			or FFlagExpChatDictation and isIgnoredAudioInput(audioDeviceInput) -- inferred equivalent call
+		then
+			continue
 		end
+
+		audioDeviceInput.Active = false
+		trackDevice(audioDeviceInput)
 	end
 
-	RemoteEvent.OnServerEvent:Connect(function(player, p11) -- line: 231
-		-- upvalues: t2 (copy), log (copy)
-		local v67 = t2[player]
+	setUserActive.OnServerEvent:Connect(function(p, active)
+		local v4 = v2[p]
 
-		if v67 then
-			log("Setting", player, "to", p11)
-
-			for v68, _ in v67 do
-				v68.Active = p11
-			end
+		if not v4 then
+			log("Attempting to set Active property for user", p, "without saved AudioDeviceInput")
 
 			return
 		end
 
-		log("Attempting to set Active property for user", player, "without saved AudioDeviceInput")
+		log("Setting", p, "to", active)
+
+		for k, _ in v4 do
+			k.Active = active
+		end
 	end)
 end

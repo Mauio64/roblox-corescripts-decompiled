@@ -1,186 +1,189 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local SocialCommon = require(ProfilePlatformParent.SocialCommon)
-local Cryo = require(ProfilePlatformParent.Cryo)
+local parent = ProfilePlatform.Parent
+local SocialCommon = require(parent.SocialCommon)
+local Cryo = require(parent.Cryo)
 
 require(ProfilePlatform.Types.Component)
-
 local Enums = require(ProfilePlatform.Common.Enums)
 local buildUserActionsComponent = require(ProfilePlatform.Hooks.buildUserActionsComponent)
 local getSupportedActionsForProfileType = require(ProfilePlatform.Hooks.getSupportedActionsForProfileType)
+
 local FFlagProfilePlatformEnableFavoriteExperiences = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableFavoriteExperiences)
-local FFlagProfilePlatformEnableInventory = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableInventory
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableInventory = SharedFlags.FFlagProfilePlatformEnableInventory
+
 local FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService)
-local FFlagProfilePlatformEnableStore = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableStore
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableStore = SharedFlags2.FFlagProfilePlatformEnableStore
 local FFlagProfilePlatformEnableVR = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableVR)
-local FFlagExperiencesOnProfile = require(ProfilePlatformParent.SharedFlags).FFlagExperiencesOnProfile
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagExperiencesOnProfile = SharedFlags3.FFlagExperiencesOnProfile
 local FFlagProfilePlatformAddCurrentlyPlaying = require(ProfilePlatform.Flags.FFlagProfilePlatformAddCurrentlyPlaying)
 local FFlagProfilePlatformEnableMoments = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableMoments)
-local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
-local FFlagEnableProfileCompletion = require(ProfilePlatformParent.SharedFlags).FFlagEnableProfileCompletion
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableCurrencyTransfer = SharedFlags4.FFlagProfilePlatformEnableCurrencyTransfer
+local FFlagProfilePlatformEnableTradeItems = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableTradeItems)
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagEnableProfileCompletion = SharedFlags5.FFlagEnableProfileCompletion
+
 local FFlagProfilePlatformRefreshActionsRespectPolicies = require(ProfilePlatform.Flags.FFlagProfilePlatformRefreshActionsRespectPolicies)
-local t1 = {
+local FFlagProfilePlatformGracefulVisibility = require(ProfilePlatform.Flags.FFlagProfilePlatformGracefulVisibility)
+
+local v = {
 	[SocialCommon.Enums.ContextualInfoTypes.MutualFriends] = Enums.ContextualTypes.MutualFriends,
 	[SocialCommon.Enums.ContextualInfoTypes.Frequents] = Enums.ContextualTypes.PlayedTogether
 }
 
-return function(p1, t2: {[any]: any}?) -- line: 33
-	-- upvalues: FFlagProfilePlatformEnableVR (copy), FFlagProfilePlatformRefreshActionsRespectPolicies (copy), buildUserActionsComponent (copy), FFlagProfilePlatformCTAsRefactor (copy), getSupportedActionsForProfileType (copy), Enums (copy), Cryo (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), SocialCommon (copy), FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService (copy), t1 (copy), FFlagProfilePlatformEnableFavoriteExperiences (copy), FFlagProfilePlatformEnableInventory (copy), FFlagProfilePlatformEnableStore (copy), FFlagExperiencesOnProfile (copy), FFlagEnableProfileCompletion (copy), FFlagProfilePlatformAddCurrentlyPlaying (copy), FFlagProfilePlatformEnableMoments (copy)
-	local t3
+return function(p, data)
+	local v2
 
 	if FFlagProfilePlatformEnableVR then
-		local v23
+		local v3
 
 		if FFlagProfilePlatformRefreshActionsRespectPolicies then
-			v23 = buildUserActionsComponent(p1, t2)
+			v3 = buildUserActionsComponent(p, data)
 		else
-			local v24 = if not FFlagProfilePlatformCTAsRefactor then Cryo.Dictionary.values(Enums.ProfileActions) else getSupportedActionsForProfileType(Enums.ProfileTypes.User)
-			local v25 = Cryo.List.filter(v24, function(p2) -- line: 54
-				-- upvalues: Enums (copy), t2 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy)
+			local supportedActionsForProfileType = getSupportedActionsForProfileType(Enums.ProfileTypes.User)
+			local filtered = Cryo.List.filter(supportedActionsForProfileType, function(p2): boolean
 				if p2 == Enums.ProfileActions.QrCode then
-					if t2 and t2.isProfileQrCodeEnabled then
+					if data and data.isProfileQrCodeEnabled then
 						return true
 					end
-
-					return false
-				end
-
-				if p2 == Enums.ProfileActions.EditProfile then
-					if t2 and t2.areWebViewsSupported then
+				elseif p2 == Enums.ProfileActions.EditProfile then
+					if data and data.areWebViewsSupported then
 						return true
 					end
-
-					return false
-				end
-
-				if FFlagProfilePlatformEnableCurrencyTransfer and p2 == Enums.ProfileActions.CurrencyTransfer then
-					if t2 and t2.canRenderTransferInProfile then
+				elseif FFlagProfilePlatformEnableCurrencyTransfer and p2 == Enums.ProfileActions.CurrencyTransfer then
+					if data and data.canRenderTransferInProfile then
 						return true
 					end
-
-					return false
-				end
-
-				if p2 == Enums.ProfileActions.Chat then
-					if t2 and t2.canSeeChatTab ~= false then
+				elseif FFlagProfilePlatformEnableTradeItems and p2 == Enums.ProfileActions.TradeItems then
+					if data and data.areWebViewsSupported then
 						return true
 					end
-
-					return false
+				elseif p2 ~= Enums.ProfileActions.Chat or data and data.canSeeChatTab ~= false then
+					return true
 				end
 
-				return true
+				return false
 			end)
 
-			v23 = {
+			v3 = {
 				component = Enums.Components.Actions,
-				context = if p1 ~= SocialCommon.Enums.ContextualInfoTypes.OffNetworkFriendRequest then nil else Enums.ContextualTypes.OffNetworkFriendRequest,
-				supportedActions = v25,
-				excludeContextualActions = FFlagProfilePlatformCTAsRefactor and (not not t2 and not not t2.isSelfView) or nil,
-				isActionsV2Supported = not not FFlagProfilePlatformCTAsRefactor or nil
+				context = 0,
+				supportedActions = 0,
+				excludeContextualActions = 0,
+				isActionsV2Supported = true
 			}
+			local context
+
+			if p == SocialCommon.Enums.ContextualInfoTypes.OffNetworkFriendRequest then
+				context = Enums.ContextualTypes.OffNetworkFriendRequest
+			end
+
+			v3.context = context
+
+			v3.supportedActions = filtered
+			v3.excludeContextualActions = data and data.isSelfView and true or nil
 		end
 
-		t3 = {
-			{
-				component = Enums.Components.UserProfileHeader,
-				context = if not FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService then if p1 ~= SocialCommon.Enums.ContextualInfoTypes.MutualFriends then nil else Enums.ContextualTypes.MutualFriends else t1[p1]
-			},
-			{
-				component = Enums.Components.SocialLinks
-			},
-			{
-				component = Enums.Components.About
-			},
-			{
-				component = Enums.Components.CurrentlyWearing
-			},
-			v23
-		}
-		table.insert(t3, {
-			component = Enums.Components.ProfileBackground
-		})
+		v2 = { nil, nil, nil, nil, nil }
+		local v4 = { component = Enums.Components.UserProfileHeader, context = 0 }
+		local context
 
-		if t2 and t2.areWebViewsSupported then
-			table.insert(t3, {
-				component = Enums.Components.ViewFullProfile
-			})
+		if FFlagProfilePlatformEnableSendPlayedTogetherContextToProfilePlatformService then
+			context = v[p]
+		elseif p == SocialCommon.Enums.ContextualInfoTypes.MutualFriends then
+			context = Enums.ContextualTypes.MutualFriends
+		end
+
+		v4.context = context
+
+		v2[1], v2[2], v2[3], v2[4], v2[5] = v4, { component = Enums.Components.SocialLinks }, { component = Enums.Components.About }, { component = Enums.Components.CurrentlyWearing }, v3
+
+		table.insert(v2, { component = Enums.Components.ProfileBackground })
+
+		if data and data.areWebViewsSupported then
+			table.insert(v2, { component = Enums.Components.ViewFullProfile })
 		end
 	else
-		local v27 = if not FFlagProfilePlatformRefreshActionsRespectPolicies then {
-			component = Enums.Components.Actions,
-			context = if p1 ~= SocialCommon.Enums.ContextualInfoTypes.OffNetworkFriendRequest then nil else Enums.ContextualTypes.OffNetworkFriendRequest,
-			supportedActions = if not FFlagProfilePlatformCTAsRefactor then nil else getSupportedActionsForProfileType(Enums.ProfileTypes.User),
-			excludeContextualActions = FFlagProfilePlatformCTAsRefactor and (not not t2 and not not t2.isSelfView) or nil,
-			isActionsV2Supported = not not FFlagProfilePlatformCTAsRefactor or nil
-		} else buildUserActionsComponent(p1, t2)
+		local v3
 
-		t3 = {
-			{
-				component = Enums.Components.UserProfileHeader,
-				context = if p1 ~= SocialCommon.Enums.ContextualInfoTypes.MutualFriends then nil else Enums.ContextualTypes.MutualFriends
-			},
-			{
-				component = Enums.Components.SocialLinks
-			},
-			{
-				component = Enums.Components.About
-			},
-			{
-				component = Enums.Components.CurrentlyWearing
-			},
-			{
-				component = Enums.Components.ViewFullProfile
-			},
-			v27
-		}
-		table.insert(t3, {
-			component = Enums.Components.ProfileBackground
-		})
+		if FFlagProfilePlatformRefreshActionsRespectPolicies then
+			v3 = buildUserActionsComponent(p, data)
+		else
+			v3 = {
+				component = Enums.Components.Actions,
+				context = 0,
+				supportedActions = 0,
+				excludeContextualActions = 0,
+				isActionsV2Supported = true
+			}
+			local context
+
+			if p == SocialCommon.Enums.ContextualInfoTypes.OffNetworkFriendRequest then
+				context = Enums.ContextualTypes.OffNetworkFriendRequest
+			end
+
+			v3.context = context
+
+			v3.supportedActions = getSupportedActionsForProfileType(Enums.ProfileTypes.User)
+			v3.excludeContextualActions = data and data.isSelfView and true or nil
+		end
+
+		v2 = { nil, nil, nil, nil, nil, nil }
+		local v4 = { component = Enums.Components.UserProfileHeader, context = 0 }
+		local context
+
+		if p == SocialCommon.Enums.ContextualInfoTypes.MutualFriends then
+			context = Enums.ContextualTypes.MutualFriends
+		end
+
+		v4.context = context
+
+		v2[1], v2[2], v2[3], v2[4], v2[5], v2[6] = v4, { component = Enums.Components.SocialLinks }, { component = Enums.Components.About }, { component = Enums.Components.CurrentlyWearing }, { component = Enums.Components.ViewFullProfile }, v3
+
+		table.insert(v2, { component = Enums.Components.ProfileBackground })
 	end
 
-	if FFlagProfilePlatformEnableFavoriteExperiences and (not FFlagProfilePlatformEnableVR or t2 and t2.areWebViewsSupported) then
-		table.insert(t3, {
-			component = Enums.Components.FavoriteExperiences
-		})
+	if
+		FFlagProfilePlatformEnableFavoriteExperiences
+		and (not FFlagProfilePlatformEnableVR or data and data.areWebViewsSupported)
+	then
+		table.insert(v2, { component = Enums.Components.FavoriteExperiences })
 	end
 
-	if FFlagProfilePlatformEnableInventory and (not FFlagProfilePlatformEnableVR or t2 and t2.areWebViewsSupported) then
-		table.insert(t3, {
-			component = Enums.Components.Inventory
-		})
+	if
+		FFlagProfilePlatformEnableInventory
+		and (not FFlagProfilePlatformEnableVR or data and data.areWebViewsSupported)
+	then
+		table.insert(v2, { component = Enums.Components.Inventory })
 	end
 
-	if FFlagProfilePlatformEnableStore and (not FFlagProfilePlatformEnableVR or t2 and t2.areWebViewsSupported) then
-		table.insert(t3, {
-			component = Enums.Components.Store
-		})
+	if FFlagProfilePlatformEnableStore and (not FFlagProfilePlatformEnableVR or data and data.areWebViewsSupported) then
+		table.insert(v2, { component = Enums.Components.Store })
 	end
 
 	if FFlagExperiencesOnProfile then
-		table.insert(t3, {
-			component = Enums.Components.Experiences
-		})
+		table.insert(v2, { component = Enums.Components.Experiences })
 	end
 
 	if FFlagEnableProfileCompletion then
-		table.insert(t3, {
-			component = Enums.Components.ProfileCompletion
-		})
+		table.insert(v2, { component = Enums.Components.ProfileCompletion })
 	end
 
 	if FFlagProfilePlatformAddCurrentlyPlaying then
-		table.insert(t3, {
-			component = Enums.Components.CurrentlyPlaying
-		})
+		table.insert(v2, { component = Enums.Components.CurrentlyPlaying })
+	end
+
+	if FFlagProfilePlatformGracefulVisibility then
+		table.insert(v2, { component = Enums.Components.Friends })
 	end
 
 	if FFlagProfilePlatformEnableMoments then
-		table.insert(t3, {
-			component = Enums.Components.Moments
-		})
+		table.insert(v2, { component = Enums.Components.Moments })
 	end
 
-	return t3
+	return v2
 end

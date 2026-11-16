@@ -1,12 +1,10 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "ProfileInsights",
-	testMatch = {
-		"**/*.test",
-		"!**/data-hydration/**/*.test"
-	},
+	testMatch = { "**/*.test", "!**/data-hydration/**/*.test" },
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.LogHandler,
 		JestConfigs.setupFiles.UIBloxInitializer,

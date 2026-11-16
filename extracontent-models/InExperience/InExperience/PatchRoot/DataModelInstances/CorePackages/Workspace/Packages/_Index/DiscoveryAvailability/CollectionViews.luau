@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.CollectionViews.CollectionViews))
+local CollectionViews = require(index.CollectionViews.CollectionViews)
+
+return CollectionViews

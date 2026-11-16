@@ -1,55 +1,56 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local useEventConnection = require(ParentParent.ReactUtils).useEventConnection
+local parent = script.Parent.Parent
+
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
+
 local findLocalTextSource = require(script.Parent.findLocalTextSource)
 
 return {
-	useCanSendToChannel = function(p1, s1: string?) -- line: 8
-		-- upvalues: React (copy), findLocalTextSource (copy), useEventConnection (copy)
-		local v7, v8 = React.useState(function() -- line: 9
-			-- upvalues: findLocalTextSource (copy), p1 (copy), s1 (copy)
-			return findLocalTextSource(p1, s1)
+	useCanSendToChannel = function(instance, p: string?)
+		local state, setState = React.useState(function()
+			return findLocalTextSource(instance, p)
 		end)
-		local v9 = React.useCallback(function() -- line: 13
-			-- upvalues: v8 (copy), findLocalTextSource (copy), p1 (copy), s1 (copy)
-			v8(findLocalTextSource(p1, s1))
-		end, {
-			p1,
-			s1
-		})
 
-		React.useEffect(v9, { v9 })
-		useEventConnection(if not p1 then nil else p1.ChildAdded, v9, { v9 })
-		useEventConnection(if not p1 then nil else p1.ChildRemoved, v9, { v9 })
+		local v = React.useCallback(function()
+			setState(findLocalTextSource(instance, p))
+		end, { instance, p })
 
-		local function evaluateCanSend() -- line: 23
-			-- upvalues: p1 (copy), s1 (copy), v7 (copy)
-			if p1 == nil or s1 == nil then
-				return true
-			end
+		React.useEffect(v, { v })
+		local v2
 
-			return v7 ~= nil and v7.CanSend
+		if instance then
+			v2 = instance.ChildAdded
 		end
 
-		local v11, v12 = React.useState(evaluateCanSend)
+		useEventConnection(v2, v, { v })
+		local v3
 
-		React.useEffect(function() -- line: 32
-			-- upvalues: v12 (copy), p1 (copy), s1 (copy), v7 (copy)
-			v12(p1 == nil or (s1 == nil or v7 ~= nil and v7.CanSend))
-		end, {
-			p1,
-			s1,
-			v7
-		})
-		useEventConnection(if not v7 then nil else v7:GetPropertyChangedSignal("CanSend"), function() -- line: 36
-			-- upvalues: v12 (copy), p1 (copy), s1 (copy), v7 (copy)
-			v12(p1 == nil or (s1 == nil or v7 ~= nil and v7.CanSend))
-		end, {
-			p1,
-			s1,
-			v7
-		})
+		if instance then
+			v3 = instance.ChildRemoved
+		end
 
-		return v11
+		useEventConnection(v3, v, { v })
+
+		local function evaluateCanSend() -- 2 equivalent calls inferred from this helper
+			return instance == nil or p == nil or state ~= nil and state.CanSend
+		end
+
+		local state2, setState2 = React.useState(evaluateCanSend)
+
+		React.useEffect(function()
+			setState2(evaluateCanSend()) -- inferred equivalent call
+		end, { instance, p, state })
+		local v4
+
+		if state then
+			v4 = state:GetPropertyChangedSignal("CanSend")
+		end
+
+		useEventConnection(v4, function()
+			setState2(evaluateCanSend()) -- inferred equivalent call
+		end, { instance, p, state })
+
+		return state2
 	end
 }

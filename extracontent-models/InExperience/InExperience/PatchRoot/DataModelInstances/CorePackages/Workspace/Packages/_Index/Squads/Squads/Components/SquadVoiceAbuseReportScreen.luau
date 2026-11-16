@@ -1,1 +1,3 @@
-return (require(script.SquadVoiceAbuseReportScreen))
+local SquadVoiceAbuseReportScreen = require(script.SquadVoiceAbuseReportScreen)
+
+return SquadVoiceAbuseReportScreen

@@ -1,26 +1,33 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
 local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
 local User = require(AuthCommon.Thunks.User)
+local parent = AuthCommon.Parent
+local Cryo = require(parent.Cryo)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFixPreviousAccountsListEntries = SharedFlags.FFlagFixPreviousAccountsListEntries
 
-return function() -- line: 5
-	-- upvalues: User (copy), AppStorageUtilities (copy)
-	local v4 = User.fromLocalStorage()
+return function()
+	local v = User.fromLocalStorage()
 
-	if v4 == nil or v4.userId == -1 then
+	if v == nil or v.userId == -1 or (v.username == nil or v.username == "") then
 		return
 	end
 
-	if v4.username == nil or v4.username == "" then
-		return
-	end
-
-	local v5 = AppStorageUtilities.getPreviousAccountsList()
-
-	v5[tostring(v4.userId)] = {
-		username = v4.username,
-		displayName = (not v4.displayName or v4.displayName == "nil") and "" or v4.displayName,
+	local previousAccountsList = AppStorageUtilities.getPreviousAccountsList()
+	local userId = tostring(v.userId)
+	local v2 = {
+		username = v.username,
+		displayName = (not v.displayName or v.displayName == "nil") and "" or v.displayName,
 		timestamp = os.time()
 	}
-	AppStorageUtilities.setPreviousAccountsList(v5)
+
+	if FFlagFixPreviousAccountsListEntries then
+		v2.userId = userId
+		previousAccountsList[userId] = Cryo.Dictionary.join(previousAccountsList[userId] or {}, v2)
+	else
+		previousAccountsList[userId] = v2
+	end
+
+	AppStorageUtilities.setPreviousAccountsList(previousAccountsList)
 	AppStorageUtilities.flush()
 end

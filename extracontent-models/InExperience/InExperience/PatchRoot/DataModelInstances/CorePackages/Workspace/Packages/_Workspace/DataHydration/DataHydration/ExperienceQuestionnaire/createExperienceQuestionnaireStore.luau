@@ -1,118 +1,101 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
 
-require(DataHydrationParent.HttpClient)
+require(parent.HttpClient)
 
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
-
 local createSingleEntityResolver = require(DataHydration.createSingleEntityResolver)
-local fetchExperienceQuestionnaire = require(script.Parent.fetchExperienceQuestionnaire)
 
+local fetchExperienceQuestionnaire = require(script.Parent.fetchExperienceQuestionnaire)
 require(script.Parent.ExperienceQuestionnaireStoreTypes)
 
-local function createExperienceQuestionnaireStore(t1: {[any]: any}?) -- line: 23
-	-- upvalues: createSingleEntityResolver (copy), fetchExperienceQuestionnaire (copy), createDataCache (copy), createDataResolver (copy)
-	local v9 = t1 or {}
-	local t2 = {
-		network = v9.network,
-		baseUrl = v9.baseUrl
-	}
-	local v11 = createSingleEntityResolver(function(n1: number) -- line: 27
-		-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-		return fetchExperienceQuestionnaire.fetchEligibility(n1, t2)
+local function createExperienceQuestionnaireStore(options)
+	local v = options or {}
+	local v2 = { network = v.network, baseUrl = v.baseUrl }
+
+	local singleEntityResolver = createSingleEntityResolver(function(p: number)
+		return fetchExperienceQuestionnaire.fetchEligibility(p, v2)
 	end)
-	local v12 = createSingleEntityResolver(function(n2: number) -- line: 30
-		-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-		return fetchExperienceQuestionnaire.fetchMetadataStatus(n2, t2)
+
+	local singleEntityResolver2 = createSingleEntityResolver(function(p: number)
+		return fetchExperienceQuestionnaire.fetchMetadataStatus(p, v2)
 	end)
-	local v13 = createSingleEntityResolver(function(n3: number) -- line: 33
-		-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-		return fetchExperienceQuestionnaire.fetchActiveResponse(n3, t2)
+
+	local singleEntityResolver3 = createSingleEntityResolver(function(p: number)
+		return fetchExperienceQuestionnaire.fetchActiveResponse(p, v2)
 	end)
-	local v14 = createSingleEntityResolver(function(n4: number) -- line: 36
-		-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-		return fetchExperienceQuestionnaire.fetchLatestQuestionnaire(n4, t2)
+
+	local singleEntityResolver4 = createSingleEntityResolver(function(p: number)
+		return fetchExperienceQuestionnaire.fetchLatestQuestionnaire(p, v2)
 	end)
-	local v15 = createSingleEntityResolver(function(n5: number) -- line: 39
-		-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-		return fetchExperienceQuestionnaire.fetchLatestSubmission(n5, t2)
+
+	local singleEntityResolver5 = createSingleEntityResolver(function(p: number)
+		return fetchExperienceQuestionnaire.fetchLatestSubmission(p, v2)
 	end)
-	local v16 = createDataCache()
-	local v17 = createDataResolver({
+
+	local dataResolver = createDataResolver({
+		cache = createDataCache(),
 		supportsMultiGet = false,
-		cache = v16,
-		fetchFn = function(s1: string, _) -- line: 49
-			-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-			return fetchExperienceQuestionnaire.fetchQuestionnaireById(s1, t2)
+		fetchFn = function(p: string, _)
+			return fetchExperienceQuestionnaire.fetchQuestionnaireById(p, v2)
 		end
 	})
 
 	return {
-		getEligibility = v11.get,
-		fetchEligibility = v11.fetch,
-		getAndFetchEligibility = v11.getAndFetch,
-		getMetadataStatus = v12.get,
-		fetchMetadataStatus = v12.fetch,
-		getAndFetchMetadataStatus = v12.getAndFetch,
-		getActiveResponse = v13.get,
-		fetchActiveResponse = v13.fetch,
-		getAndFetchActiveResponse = v13.getAndFetch,
-		getLatestQuestionnaire = v14.get,
-		fetchLatestQuestionnaire = v14.fetch,
-		getAndFetchLatestQuestionnaire = v14.getAndFetch,
-		getQuestionnaireById = function(p2) -- line: 104
-			-- upvalues: v17 (copy)
-			return v17.getCachedItem(p2)
+		getEligibility = singleEntityResolver.get,
+		fetchEligibility = singleEntityResolver.fetch,
+		getAndFetchEligibility = singleEntityResolver.getAndFetch,
+		getMetadataStatus = singleEntityResolver2.get,
+		fetchMetadataStatus = singleEntityResolver2.fetch,
+		getAndFetchMetadataStatus = singleEntityResolver2.getAndFetch,
+		getActiveResponse = singleEntityResolver3.get,
+		fetchActiveResponse = singleEntityResolver3.fetch,
+		getAndFetchActiveResponse = singleEntityResolver3.getAndFetch,
+		getLatestQuestionnaire = singleEntityResolver4.get,
+		fetchLatestQuestionnaire = singleEntityResolver4.fetch,
+		getAndFetchLatestQuestionnaire = singleEntityResolver4.getAndFetch,
+		getQuestionnaireById = function(p)
+			return dataResolver.getCachedItem(p)
 		end,
-		fetchQuestionnaireById = function(p3) -- line: 107
-			-- upvalues: v17 (copy)
-			return v17.fetchItem(p3)
+		fetchQuestionnaireById = function(p)
+			return dataResolver.fetchItem(p)
 		end,
-		getAndFetchQuestionnaireById = function(p4) -- line: 110
-			-- upvalues: v17 (copy)
-			return v17.getAndFetchItem(p4)
+		getAndFetchQuestionnaireById = function(p)
+			return dataResolver.getAndFetchItem(p)
 		end,
-		getLatestSubmission = v15.get,
-		fetchLatestSubmission = v15.fetch,
-		getAndFetchLatestSubmission = v15.getAndFetch,
-		saveSubmission = function(n6: number, p5) -- line: 57
-			-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy), v13 (copy), v15 (copy)
-			return fetchExperienceQuestionnaire.saveSubmission(n6, p5, t2):andThen(function(p6) -- line: 61
-				-- upvalues: v13 (copy), n6 (copy), v15 (copy)
-				v13.fetch(n6)
-				v15.fetch(n6)
-
-				return p6
+		getLatestSubmission = singleEntityResolver5.get,
+		fetchLatestSubmission = singleEntityResolver5.fetch,
+		getAndFetchLatestSubmission = singleEntityResolver5.getAndFetch,
+		saveSubmission = function(p: number, p2)
+			return fetchExperienceQuestionnaire.saveSubmission(p, p2, v2):andThen(function(p3)
+				singleEntityResolver3.fetch(p)
+				singleEntityResolver5.fetch(p)
+				return p3
 			end)
 		end,
-		validateResponses = function(p7) -- line: 119
-			-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-			return fetchExperienceQuestionnaire.validateResponses(p7, t2)
+		validateResponses = function(p)
+			return fetchExperienceQuestionnaire.validateResponses(p, v2)
 		end,
-		previewSubmission = function(p8) -- line: 122
-			-- upvalues: fetchExperienceQuestionnaire (copy), t2 (copy)
-			return fetchExperienceQuestionnaire.previewSubmission(p8, t2)
+		previewSubmission = function(p)
+			return fetchExperienceQuestionnaire.previewSubmission(p, v2)
 		end,
-		clear = function() -- line: 69
-			-- upvalues: v11 (copy), v12 (copy), v13 (copy), v14 (copy), v17 (copy), v15 (copy)
-			v11.clear()
-			v12.clear()
-			v13.clear()
-			v14.clear()
-			v17.clear()
-			v15.clear()
+		clear = function()
+			singleEntityResolver.clear()
+			singleEntityResolver2.clear()
+			singleEntityResolver3.clear()
+			singleEntityResolver4.clear()
+			dataResolver.clear()
+			singleEntityResolver5.clear()
 		end,
-		dispose = function() -- line: 78
-			-- upvalues: v11 (copy), v12 (copy), v13 (copy), v14 (copy), v17 (copy), v15 (copy)
-			v11.dispose()
-			v12.dispose()
-			v13.dispose()
-			v14.dispose()
-			v17.dispose()
-			v15.dispose()
+		dispose = function()
+			singleEntityResolver.dispose()
+			singleEntityResolver2.dispose()
+			singleEntityResolver3.dispose()
+			singleEntityResolver4.dispose()
+			dataResolver.dispose()
+			singleEntityResolver5.dispose()
 		end
 	}
 end

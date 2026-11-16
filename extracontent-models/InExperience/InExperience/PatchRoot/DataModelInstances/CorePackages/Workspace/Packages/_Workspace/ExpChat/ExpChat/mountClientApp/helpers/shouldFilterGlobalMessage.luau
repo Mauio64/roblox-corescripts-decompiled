@@ -1,16 +1,13 @@
-return function(p1, p2, n1: number?) -- line: 3
-	local TextSource = p1.TextSource
+return function(p, data, p2: number?)
+	local textSource = p.TextSource
 
-	if not TextSource then
+	if not textSource or p2 and textSource.UserId == p2 then
 		return false
 	end
 
-	if n1 and n1 == TextSource.UserId then
-		return false
-	end
-
-	local v5 = string.lower(TextSource.Username or "")
-	local v6 = string.lower(TextSource.DisplayName or "")
-
-	return v5 ~= "" and p2.isUsernameMuted(v5) or (v6 ~= "" and p2.isDisplayNameMuted(v6) or p2.isUserIdMuted(TextSource.UserId))
+	local username = string.lower(textSource.Username or "")
+	local displayName = string.lower(textSource.DisplayName or "")
+	return username ~= "" and data.isUsernameMuted(username)
+		or displayName ~= "" and data.isDisplayNameMuted(displayName)
+		or data.isUserIdMuted(textSource.UserId)
 end

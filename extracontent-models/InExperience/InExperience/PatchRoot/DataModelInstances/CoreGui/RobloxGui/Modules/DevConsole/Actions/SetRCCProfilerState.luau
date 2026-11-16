@@ -1,6 +1,8 @@
-return require(script.Parent.Parent.Action)(script.Name, function(p1, p2) -- line: 4
+local Action = require(script.Parent.Parent.Action)
+
+return Action(script.Name, function(waitingForRecording, value)
 	return {
-		waitingForRecording = p1,
-		lastFileOutputLocation = p2 or ""
+		waitingForRecording = waitingForRecording,
+		lastFileOutputLocation = value or ""
 	}
 end)

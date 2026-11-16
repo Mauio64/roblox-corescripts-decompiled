@@ -1,11 +1,9 @@
-local function isWirable(p1) -- line: 1
-	return (pcall(function() -- line: 2
-		-- upvalues: p1 (copy)
-		local v3 = p1
-
-		v3:GetInputPins()
-		v3:GetOutputPins()
-		v3:GetConnectedWires("Foo")
+local function isWirable(p)
+	return (pcall(function()
+		local v = p
+		v:GetInputPins()
+		v:GetOutputPins()
+		v:GetConnectedWires("Foo")
 	end))
 end
 

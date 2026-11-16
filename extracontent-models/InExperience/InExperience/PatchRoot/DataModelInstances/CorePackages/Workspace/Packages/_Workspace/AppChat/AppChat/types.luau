@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-require(Parent.AppChatNetworking)
-require(Parent.LuauPolyfill)
-require(Parent.SocialCommon)
-require(Parent.React)
+require(parent.AppChatNetworking)
+require(parent.LuauPolyfill)
+require(parent.React)
 
 return {}

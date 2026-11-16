@@ -1,454 +1,715 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local GameDetail = require(BuildExperienceParent.GameDetail)
-local Navigation = require(BuildExperienceParent.Navigation)
-local React = require(BuildExperienceParent.React)
-local SharedFlags = require(BuildExperienceParent.SharedFlags)
-local Signals = require(BuildExperienceParent.Signals)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local useOpenWebView = require(BuildExperienceParent.WebViewUtils).useOpenWebView
-local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
-local ExperienceGuidelines = require(BuildExperienceParent.DataHydration.ExperienceGuidelines)
-local PlaceVersionHistory = require(BuildExperienceParent.DataHydration.PlaceVersionHistory)
-local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
-local UniverseActivation = require(BuildExperienceParent.DataHydration.UniverseActivation)
+local parent = BuildExperience.Parent
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Foundation = require(parent.Foundation)
+local GameDetail = require(parent.GameDetail)
+local Navigation = require(parent.Navigation)
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
+local SharedFlags = require(parent.SharedFlags)
+local SignalsReact = require(parent.SignalsReact)
+local WebViewUtils = require(parent.WebViewUtils)
+local useOpenWebView = WebViewUtils.useOpenWebView
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local ExperienceGuidelines = require(parent.DataHydration.ExperienceGuidelines)
+local PlaceVersionHistory = require(parent.DataHydration.PlaceVersionHistory)
+local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration)
+local UniverseActivation = require(parent.DataHydration.UniverseActivation)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+local FFlagBuildPostPublishShareDismissible = require(BuildExperience.Flags.FFlagBuildPostPublishShareDismissible)
+
+local FIntBuildPostPublishSnackbarAutoDismissSeconds = require(BuildExperience.Flags.FIntBuildPostPublishSnackbarAutoDismissSeconds)
 local FriendsOnlyShareDialog = require(BuildExperience.Components.ShareAudience.FriendsOnlyShareDialog)
-local PrivateShareTooltip = require(BuildExperience.Components.ShareAudience.PrivateShareTooltip)
 local ContentMaturityUtils = require(BuildExperience.utils.ContentMaturityUtils)
 local GameConfigurationActions = require(BuildExperience.utils.GameConfigurationActions)
 local GameConfigurationLabels = require(BuildExperience.utils.GameConfigurationLabels)
+local getGameDetailsNavigation = require(BuildExperience.utils.getGameDetailsNavigation)
 local refreshPublishEligibility = require(BuildExperience.utils.refreshPublishEligibility)
+local useClosableFocusRoot = require(BuildExperience.utils.useClosableFocusRoot)
 local GetVersionInformationStore = require(BuildExperience.Stores.GetVersionInformationStore)
+local useGamePermissions = require(BuildExperience.useGamePermissions)
+local FFlagBuildCheckGamePermissions = require(BuildExperience.Flags.FFlagBuildCheckGamePermissions)
+
 local Button = Foundation.Button
+local Popover = Foundation.Popover
 local Snackbar = Foundation.Snackbar
 local View = Foundation.View
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
+local PopoverAlign = Foundation.Enums.PopoverAlign
+local PopoverSide = Foundation.Enums.PopoverSide
 local PrivacyType = UniverseConfiguration.PrivacyType
+
 local FFlagEnableShareSheet = SharedFlags.FFlagEnableShareSheet
-local FFlagEnableProvisionalRating = require(BuildExperience.Flags.FFlagEnableProvisionalRating)
-local FFlagBuildRehydrateOnPublish = require(BuildExperience.Flags.FFlagBuildRehydrateOnPublish)
-local useStore = require(BuildExperienceParent.RoactUtils).Hooks.RoactRodux.useStore
+local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
+local FFlagBuildPublishNavigationSheet = require(BuildExperience.Flags.FFlagBuildPublishNavigationSheet)
+local FFlagBuildAdUpsell = require(BuildExperience.Flags.FFlagBuildAdUpsell)
+local FFlagBuildExperiencePlaytestCardPublishCta = require(BuildExperience.Flags.FFlagBuildExperiencePlaytestCardPublishCta)
+local GetAdUpsellEventStore
+
+if FFlagBuildAdUpsell then
+	GetAdUpsellEventStore = require(BuildExperience.Stores.GetAdUpsellEventStore)
+else
+	GetAdUpsellEventStore = nil
+end
+
+local RoactUtils = require(parent.RoactUtils)
+local useStore = RoactUtils.Hooks.RoactRodux.useStore
 local getRootNavigation = Navigation.getRootNavigation
 local useNavigation = Navigation.useNavigation
 local OpenGameDetails = GameDetail.OpenGameDetails
-local debug = CreatorAgentChat.debug
+
+local Debug = CreatorAgentChat.debug
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
 local sharePublishedExperience = require(BuildExperience.utils.sharePublishedExperience)
 local sharePublishedExperience2 = sharePublishedExperience.sharePublishedExperience
 local useSharePublishedExperience = sharePublishedExperience.useSharePublishedExperience
-local t1 = {}
+local ShareSheet = require(parent.ShareSheet)
+local UniversalShareSheet = ShareSheet.UniversalShareSheet
 
-local function isPublishedVersion(p1) -- line: 66
-	if typeof(p1) ~= "table" then
+local v = {}
+
+local function isPublishedVersion(p): boolean -- 3 equivalent calls inferred from this helper
+	if typeof(p) ~= "table" then
 		return false
 	end
 
-	return p1.status == "success" and (typeof(p1.version) == "string" and p1.version ~= "")
+	return p.status == "success" and typeof(p.version) == "string" and p.version ~= ""
 end
-local function buildPublicAudiences(t2: {[any]: any}?) -- line: 73
-	-- upvalues: UniverseActivation (copy)
-	local t3 = {}
 
-	for _, v53 in t2 or {} do
-		if v53 ~= UniverseActivation.Audience.Public and v53 ~= UniverseActivation.Audience.Friends then
-			table.insert(t3, v53)
+local function buildPublicAudiences(options)
+	local publicAudiences = {}
+
+	for _, v2 in options or {} do
+		if v2 ~= UniverseActivation.Audience.Public and v2 ~= UniverseActivation.Audience.Friends then
+			table.insert(publicAudiences, v2)
 		end
 	end
 
-	table.insert(t3, UniverseActivation.Audience.Public)
-
-	return t3
+	table.insert(publicAudiences, UniverseActivation.Audience.Public)
+	return publicAudiences
 end
-local function getGameDetailsNavigation(p2) -- line: 85
-	if typeof(p2.clearAppScreens) == "function" then
-		return p2
-	end
 
-	local v55 = table.clone(p2)
+local function PreviewButton(props)
+	local preview = useLocalization({ preview = LocalizationStrings.GAME_CONFIGURATION_PREVIEW }).preview
+	local v2 = useStore()
+	local v3 = useNavigation()
 
-	function v55.clearAppScreens(t4: {[any]: any}) -- line: 91
-		-- upvalues: p2 (copy)
-		p2.dispatch({
-			type = "ClearAppScreensAction",
-			routeNames = t4
-		})
-	end
-
-	return v55
-end
-local function PreviewButton(t5: {[any]: any}) -- line: 107
-	-- upvalues: useStore (copy), useNavigation (copy), React (copy), getRootNavigation (copy), OpenGameDetails (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v57 = useStore()
-	local v58 = useNavigation()
-	local v59 = React.useCallback(function() -- line: 114
-		-- upvalues: getRootNavigation (copy), v58 (copy), OpenGameDetails (copy), t5 (copy), v57 (copy)
-		local v92 = getRootNavigation(v58)
-		local v93 = OpenGameDetails
-		local str = tostring(t5.target.universeId)
-		local v95
-
-		if typeof(v92.clearAppScreens) == "function" then
-			v95 = v92
-		else
-			v95 = table.clone(v92)
-
-			function v95.clearAppScreens(t6: {[any]: any}) -- line: 91
-				-- upvalues: v92 (copy)
-				v92.dispatch({
-					type = "ClearAppScreensAction",
-					routeNames = t6
-				})
-			end
-		end
-
-		v93(str, v95, {
+	local onPreview = props.onPreview
+	local onActivated = React.useCallback(function()
+		local rootNavigation = getRootNavigation(v3)
+		OpenGameDetails(tostring(props.target.universeId), getGameDetailsNavigation(rootNavigation), {
 			source = "BuildExperiencePublish"
-		})(v57)
-	end, {
-		v58,
-		t5.target.universeId,
-		v57
-	})
+		})(v2)
+
+		if onPreview then
+			onPreview()
+		end
+	end, { v3, props.target.universeId, v2, onPreview })
 
 	return React.createElement(Button, {
-		LayoutOrder = 2,
-		text = LocalizationStrings.GAME_CONFIGURATION_PREVIEW,
+		text = preview,
 		size = InputSize.Medium,
 		variant = ButtonVariant.Standard,
 		fillBehavior = FillBehavior.Fill,
-		onActivated = v59,
+		onActivated = onActivated,
 		width = UDim.new(1, 0),
-		testId = `{ t5.actionsTestId }-preview`
+		LayoutOrder = 2,
+		testId = `{props.actionsTestId}-preview`
 	})
 end
-local function PublishFooter(t7: {[any]: any}) -- line: 133
-	-- upvalues: useSharePublishedExperience (copy), SignalsReact (copy), PlaceVersionHistory (copy), React (copy), Signals (copy), UniverseConfiguration (copy), FFlagEnableProvisionalRating (copy), GameConfigurationLabels (copy), UniverseActivation (copy), ContentMaturityUtils (copy), useOpenWebView (copy), LocalizationStrings (copy), FFlagEnableShareSheet (copy), sharePublishedExperience2 (copy), PrivacyType (copy), GameConfigurationActions (copy), refreshPublishEligibility (copy), GetVersionInformationStore (copy), sendBuildExperienceEvent (copy), buildPublicAudiences (copy), FFlagBuildRehydrateOnPublish (copy), ExperienceGuidelines (copy), t1 (copy), debug (copy), View (copy), PrivateShareTooltip (copy), Snackbar (copy), Button (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy), PreviewButton (copy), FriendsOnlyShareDialog (copy)
-	local v61 = useSharePublishedExperience(t7.target.universeId)
-	local v62 = SignalsReact.useSignalState(PlaceVersionHistory.getPlaceVersionHistoryStore)
-	local v63 = React.useMemo(function() -- line: 136
-		-- upvalues: t7 (copy), Signals (copy), v62 (copy)
-		if t7.target.placeId == nil then
-			return (Signals.createSignal(nil))
-		end
 
-		return v62.getAndFetchHistory(t7.target.placeId).data
-	end, {
-		v62,
-		t7.target.placeId
+local function PublishFooter(props)
+	local v2 = useLocalization({
+		accountTooNewError = LocalizationStrings.GAME_CONFIGURATION_PUBLISH_ACCOUNT_TOO_NEW_ERROR,
+		creatorHub = LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB,
+		linkCopied = LocalizationStrings.GAME_CONFIGURATION_LINK_COPIED,
+		publish = LocalizationStrings.GAME_CONFIGURATION_PUBLISH,
+		publishAudienceError = LocalizationStrings.GAME_CONFIGURATION_PUBLISH_AUDIENCE_ERROR,
+		publishError = LocalizationStrings.GAME_CONFIGURATION_PUBLISH_ERROR,
+		publishSuccess = LocalizationStrings.GAME_CONFIGURATION_PUBLISH_SUCCESS,
+		share = LocalizationStrings.GAME_CONFIGURATION_SHARE,
+		updateRating = LocalizationStrings.GAME_CONFIGURATION_UPDATE_RATING
 	})
-	local v64 = SignalsReact.useSignalState(v63)
-	local v65 = if not v64 then nil else v64.placeVersions[1]
-	local v66 = SignalsReact.useSignalState(UniverseConfiguration.getUniverseConfigurationStore)
-	local v67 = SignalsReact.useSignalState(v66.getAndFetchConfiguration(t7.target.universeId).data)
-	local v68 = React.useMemo(function() -- line: 149
-		-- upvalues: FFlagEnableProvisionalRating (copy), Signals (copy), v66 (copy), t7 (copy)
-		if not FFlagEnableProvisionalRating then
-			return (Signals.createSignal(nil))
-		end
 
-		return v66.getAndFetchSummary(t7.target.universeId).data
-	end, {
-		v66,
-		t7.target.universeId
-	})
-	local v69 = SignalsReact.useSignalState(v68)
-	local v70 = GameConfigurationLabels.getAudience(v67)
-	local v71 = false
-	local u72 = nil
+	local accountTooNewError = v2.accountTooNewError
+	local creatorHub = v2.creatorHub
+	local linkCopied = v2.linkCopied
+	local text = v2.publish
+	local publishAudienceError = v2.publishAudienceError
+	local publishError = v2.publishError
+	local publishSuccess = v2.publishSuccess
+	local share = v2.share
+	local updateRating = v2.updateRating
+	local v3 = useSharePublishedExperience(props.target.universeId)
+	local v4 = SignalsReact.useSignalState(PlaceVersionHistory.getPlaceVersionHistoryStore)
+	local v5 = SignalsReact.useSignalState(UniverseConfiguration.getUniverseConfigurationStore)
 
-	if FFlagEnableProvisionalRating then
-		local v73 = SignalsReact.useSignalState(UniverseActivation.getUniverseActivationStore)
+	local v6 = SignalsReact.useSignalState(v5.getAndFetchConfiguration(props.target.universeId).data)
+	local v7 = React.useMemo(function()
+		return v5.getAndFetchSummary(props.target.universeId).data
+	end, { v5, props.target.universeId })
+	local v8 = SignalsReact.useSignalState(v7)
+	local audience = GameConfigurationLabels.getAudience(v6)
 
-		u72 = v73
+	local v9 = SignalsReact.useSignalState(UniverseActivation.getUniverseActivationStore)
+	local v10 = v9
+	local v11 = React.useMemo(function()
+		return v9.getAndFetchEligibility(props.target.universeId)
+	end, { v9, props.target.universeId })
+	local v12 = SignalsReact.useSignalState(v11.data)
+	local v13 = React.useMemo(function()
+		return ContentMaturityUtils.isSealBroken(props.target.universeId)
+			and ContentMaturityUtils.isContentUnrated(props.target.universeId)
+	end, { v12, props.target.universeId })
+	local v14 = useOpenWebView()
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState("")
+	local state3, setState3 = React.useState(nil)
+	local v15
 
-		local v74 = React.useMemo(function() -- line: 163
-			-- upvalues: v73 (copy), t7 (copy)
-			return v73.getAndFetchEligibility(t7.target.universeId)
-		end, {
-			v73,
-			t7.target.universeId
-		})
-		local v75 = SignalsReact.useSignalState(v74.data)
-
-		v71 = React.useMemo(function() -- line: 167
-			-- upvalues: ContentMaturityUtils (copy), t7 (copy)
-			return ContentMaturityUtils.isSealBroken(t7.target.universeId) and ContentMaturityUtils.isContentUnrated(t7.target.universeId)
-		end, {
-			v75,
-			t7.target.universeId
-		})
+	if state2 == publishSuccess and props.target.placeId ~= nil and audience ~= nil then
+		v15 = audience ~= PrivacyType.Private
+	else
+		v15 = false
 	end
 
-	local v76 = useOpenWebView()
-	local v77, v78 = React.useState(false)
-	local v79, v80 = React.useState("")
-	local v81, v82 = React.useState(nil)
-	local v83 = v79 == LocalizationStrings.GAME_CONFIGURATION_PUBLISH_SUCCESS and (t7.target.placeId ~= nil and v70 ~= nil)
-	local v84 = React.useCallback(function() -- line: 180
-		-- upvalues: v80 (copy), v82 (copy)
-		v80("")
-		v82(nil)
+	local onClose = React.useCallback(function()
+		setState2("")
+		setState3(nil)
 	end, {})
-	local v85 = React.useCallback(function() -- line: 185
-		-- upvalues: t7 (copy), v82 (copy), FFlagEnableShareSheet (copy), v61 (copy), sharePublishedExperience2 (copy), v80 (copy), LocalizationStrings (copy)
-		if t7.target.placeId == nil then
+
+	if FFlagBuildPostPublishShareDismissible then
+		React.useEffect(function()
+			if state2 == "" then
+				return nil
+			end
+
+			local thread = task.delay(FIntBuildPostPublishSnackbarAutoDismissSeconds, setState2, "")
+			return function()
+				task.cancel(thread)
+			end
+		end, { state2 })
+	end
+
+	local onShare = React.useCallback(function()
+		if props.target.placeId == nil then
 			return
 		end
 
-		v82(nil)
+		setState3(nil)
 
 		if FFlagEnableShareSheet then
-			v61(t7.target.placeId)
+			local placeId = props.target.placeId
+			local v16
 
-			return
+			if FFlagShareSheetFriendsSort then
+				v16 = UniversalShareSheet.RecipientSource.OneToOneFriends
+			end
+
+			v3(placeId, v16)
+		else
+			local v16 = sharePublishedExperience2(props.target.placeId)
+
+			if v16 ~= nil and v16.copiedToClipboard and linkCopied ~= nil then
+				setState2(linkCopied)
+			end
+		end
+	end, { linkCopied, props.target.placeId, v3 })
+
+	local onActivated = React.useCallback(function()
+		if FFlagBuildPostPublishShareDismissible then
+			setState2("")
 		end
 
-		if sharePublishedExperience2(t7.target.placeId).copiedToClipboard then
-			v80(LocalizationStrings.GAME_CONFIGURATION_LINK_COPIED)
+		if audience == PrivacyType.FriendsOnly then
+			setState3("friends")
+		elseif audience == PrivacyType.Public then
+			onShare()
 		end
-	end, {
-		t7.target.placeId,
-		v61
-	})
-	local v86 = React.useCallback(function() -- line: 202
-		-- upvalues: v70 (copy), PrivacyType (copy), v82 (copy), v81 (copy), v85 (copy)
-		if v70 == PrivacyType.Private then
-			v82(v81 ~= "private" and "private" or nil)
+	end, { audience, onShare })
 
-			return
-		end
-
-		if v70 == PrivacyType.FriendsOnly then
-			v82("friends")
-
-			return
-		end
-
-		if v70 == PrivacyType.Public then
-			v85()
-		end
-	end, {
-		v70,
-		v81,
-		v85
-	})
-	local v87 = React.useCallback(function() -- line: 220
-		-- upvalues: v82 (copy)
-		v82(nil)
+	local onCancel = React.useCallback(function()
+		setState3(nil)
 	end, {})
-	local v88 = React.useCallback(function() -- line: 224
-		-- upvalues: v76 (copy), GameConfigurationActions (copy), t7 (copy), LocalizationStrings (copy), refreshPublishEligibility (copy)
-		v76(GameConfigurationActions.getExperienceQuestionnaireUrl(t7.target.universeId), LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB, function() -- line: 228
-			-- upvalues: refreshPublishEligibility (copy), t7 (copy)
-			refreshPublishEligibility(t7.target.universeId)
+
+	local onActivated2 = React.useCallback(function()
+		v14(GameConfigurationActions.getExperienceQuestionnaireUrl(props.target.universeId), creatorHub, function()
+			refreshPublishEligibility(props.target.universeId)
 		end)
-	end, {
-		v76,
-		t7.target.universeId
-	})
-	local v89 = React.useCallback(function() -- line: 235
-		-- upvalues: v77 (copy), t7 (copy), GetVersionInformationStore (copy), v65 (copy), sendBuildExperienceEvent (copy), v78 (copy), v84 (copy), v69 (copy), FFlagEnableProvisionalRating (copy), GameConfigurationActions (copy), buildPublicAudiences (copy), FFlagBuildRehydrateOnPublish (copy), u72 (ref), ContentMaturityUtils (copy), ExperienceGuidelines (copy), t1 (copy), debug (copy), v66 (copy), v62 (copy), v80 (copy), LocalizationStrings (copy)
-		if v77 then
+	end, { creatorHub, v14, props.target.universeId })
+
+	local useCallback = React.useCallback
+	local function fn()
+		if state then
 			return
 		end
 
-		local placeId = t7.target.placeId
+		local placeId = props.target.placeId
 
 		if placeId == nil then
 			return
 		end
 
-		local v97 = GetVersionInformationStore().getDraft()
-		local u98 = nil
-		local u99 = nil
+		local title = nil
+		local description = nil
+		local function selectVersionNotes(p)
+			local draft = GetVersionInformationStore().getDraft()
+			local v16
 
-		if v97 ~= nil and placeId == v97.placeId then
-			u98 = if v97.title ~= "" then v97.title else nil
-			u99 = if v97.description ~= "" then v97.description else nil
-		elseif v65 ~= nil then
-			u98 = v65.title
-			u99 = v65.description
+			if p ~= nil then
+				v16 = p.placeVersions[1]
+			end
+
+			if draft == nil or draft.placeId ~= placeId then
+				if v16 ~= nil then
+					title = v16.title
+					description = v16.description
+				end
+			else
+				local v17
+
+				if draft.title ~= "" then
+					v17 = draft.title
+				end
+
+				title = v17
+				local v18
+
+				if draft.description ~= "" then
+					v18 = draft.description
+				end
+
+				description = v18
+			end
 		end
 
 		sendBuildExperienceEvent("PUBLISH_CLICK", {
-			universeId = t7.target.universeId,
+			universeId = props.target.universeId,
 			placeId = placeId,
-			conversationId = t7.target.sessionId
+			conversationId = props.target.sessionId
 		})
-		v78(true)
-		v84()
 
-		local s1 = "save_and_publish"
-
-		local function publish(p3) -- line: 264
-			-- upvalues: s1 (ref), v69 (copy), FFlagEnableProvisionalRating (copy), GameConfigurationActions (copy), t7 (copy), placeId (copy), u98 (ref), u99 (ref), buildPublicAudiences (copy)
-			s1 = "save_and_publish"
-
-			local v105 = p3 or v69
-
-			if FFlagEnableProvisionalRating then
-				return (GameConfigurationActions.publishExperience({
-					universeId = t7.target.universeId,
-					placeId = placeId,
-					title = u98,
-					description = u99,
-					isActive = v105 ~= nil and v105.isActive == true,
-					audiences = buildPublicAudiences(if not v105 then nil else v105.audiences)
-				}))
-			end
-
-			return (GameConfigurationActions.saveAndPublishPlace({
-				placeId = placeId,
-				title = u98,
-				description = u99
-			}))
-		end
-
-		local v102
-
-		if FFlagEnableProvisionalRating and FFlagBuildRehydrateOnPublish and u72 ~= nil then
-			s1 = "refresh_eligibility"
-			v102 = u72.refreshEligibility(t7.target.universeId):andThen(function() -- line: 285
-				-- upvalues: ContentMaturityUtils (copy), t7 (copy), ExperienceGuidelines (copy), t1 (copy), debug (copy), s1 (ref), v66 (copy), publish (copy)
-				if ContentMaturityUtils.isSealBroken(t7.target.universeId) and ContentMaturityUtils.isContentUnrated(t7.target.universeId) then
-					return ExperienceGuidelines.getExperienceGuidelinesStore().refreshDetailedGuidelines(t7.target.universeId):andThen(function() -- line: 292
-						-- upvalues: t1 (copy)
-						return t1
-					end, function(p4) -- line: 294
-						-- upvalues: debug (copy), t7 (copy), t1 (copy)
-						debug.log("warn", "build_experience content maturity refresh failed", {
-							errorMessage = tostring(p4),
-							universeId = t7.target.universeId
-						})
-
-						return t1
-					end)
-				end
-
-				s1 = "refresh_summary"
-
-				return v66.refreshSummary(t7.target.universeId):andThen(function(p5) -- line: 309
-					-- upvalues: publish (copy)
-					return (publish(p5))
-				end)
-			end)
-		else
-			v102 = publish()
-		end
-
-		v102:andThen(function(p6) -- line: 317
-			-- upvalues: t1 (copy), GetVersionInformationStore (copy), placeId (copy), v62 (copy), v80 (copy), LocalizationStrings (copy)
-			if p6 == t1 then
+		setState(true)
+		onClose()
+		local v16 = "save_and_publish"
+		local v17 = false
+		local function recordSuccessfulPublish(p) -- 1 equivalent call inferred from this helper
+			if not isPublishedVersion(p) then -- inferred equivalent call
 				return
 			end
 
-			if typeof(p6) ~= "table" or (p6.status ~= "success" or (typeof(p6.version) ~= "string" or p6.version == "")) then
+			GetAdUpsellEventStore(false).reportMenuPublish(
+				props.target.universeId,
+				props.target.sessionId,
+				p.version,
+				v17
+			)
+		end
+		local function publish(p)
+			v16 = "save_and_publish"
+			local v18 = p or v8
+
+			if FFlagBuildAdUpsell then
+				v17 = true
+			end
+
+			local publishExperience = GameConfigurationActions.publishExperience
+			local v19 = {
+				universeId = props.target.universeId,
+				placeId = placeId,
+				title = title,
+				description = description,
+				isActive = v18 ~= nil and v18.isActive == true,
+				audiences = 0
+			}
+			local v20
+
+			if v18 then
+				v20 = v18.audiences
+			end
+
+			v19.audiences = buildPublicAudiences(v20)
+			return publishExperience(v19)
+		end
+
+		local function startPublish() -- 1 equivalent call inferred from this helper
+			if v10 == nil then
+				return publish()
+			end
+
+			v16 = "refresh_eligibility"
+			return v10.refreshEligibility(props.target.universeId):andThen(function()
+				if
+					ContentMaturityUtils.isSealBroken(props.target.universeId)
+					and ContentMaturityUtils.isContentUnrated(props.target.universeId)
+				then
+					return ExperienceGuidelines.getExperienceGuidelinesStore().refreshDetailedGuidelines(props.target.universeId):andThen(
+						function()
+							return v
+						end,
+						function(p)
+							Debug.log("warn", "build_experience content maturity refresh failed", {
+								errorMessage = tostring(p),
+								universeId = props.target.universeId
+							})
+
+							return v
+						end
+					)
+				end
+
+				v16 = "refresh_summary"
+
+				return v5.refreshSummary(props.target.universeId):andThen(function(p)
+					return publish(p)
+				end)
+			end)
+		end
+
+		local draft = GetVersionInformationStore().getDraft()
+		local v18
+
+		if draft == nil or draft.placeId ~= placeId then
+			v18 = v4.fetchPageHistory(placeId):andThen(selectVersionNotes, function()
+				local draft2 = GetVersionInformationStore().getDraft()
+
+				if draft2 == nil or draft2.placeId ~= placeId then
+					return
+				end
+
+				local v19
+
+				if draft2.title ~= "" then
+					v19 = draft2.title
+				end
+
+				title = v19
+				local v20
+
+				if draft2.description ~= "" then
+					v20 = draft2.description
+				end
+
+				description = v20
+			end):andThen(startPublish)
+		else
+			local draft2 = GetVersionInformationStore().getDraft()
+
+			if draft2 ~= nil and draft2.placeId == placeId then
+				title = if draft2.title ~= "" then draft2.title else nil
+
+				if draft2.description == "" then
+					description = nil
+				else
+					description = draft2.description
+				end
+			end
+
+			v18 = startPublish() -- inferred equivalent call
+		end
+
+		v18:andThen(function(p)
+			if p == v then
+				return
+			end
+
+			if not isPublishedVersion(p) then -- inferred equivalent call
 				error({
-					errorMessage = "save_and_publish expected status=success and a non-empty version; " .. `got status={ tostring(p6.status) }, version={ tostring(p6.version) }`
+					errorMessage = "save_and_publish expected status=success and a non-empty version; " .. `got status={tostring(p.status)}, version={tostring(p.version)}`
 				})
+			end
+
+			if FFlagBuildAdUpsell then
+				recordSuccessfulPublish(p) -- inferred equivalent call
 			end
 
 			GetVersionInformationStore().clearDraft(placeId)
-			v62.fetchHistory(placeId)
-			v80(LocalizationStrings.GAME_CONFIGURATION_PUBLISH_SUCCESS)
-		end):catch(function(p7) -- line: 331
-			-- upvalues: FFlagBuildRehydrateOnPublish (copy), GameConfigurationActions (copy), GetVersionInformationStore (copy), placeId (copy), v62 (copy), debug (copy), s1 (ref), t7 (copy), v80 (copy), LocalizationStrings (copy)
-			local v108 = typeof(p7) == "table"
-			local v109 = FFlagBuildRehydrateOnPublish and (v108 and p7.stage == GameConfigurationActions.PublishFailureStage.SetAudience)
-			local v110 = v109
+			v4.fetchHistory(placeId)
 
-			if v110 then
-				local publishResult = p7.publishResult
-
-				v110 = typeof(publishResult) == "table" and (publishResult.status == "success" and (typeof(publishResult.version) == "string" and publishResult.version ~= ""))
+			if FFlagBuildExperiencePlaytestCardPublishCta then
+				v4.fetchLiveVersion(placeId)
 			end
 
-			if v110 then
+			setState2(publishSuccess)
+		end):catch(function(data)
+			local v19 = typeof(data) == "table"
+
+			local v20 = v19 and data.stage == GameConfigurationActions.PublishFailureStage.SetAudience
+			local v21
+
+			if v20 then
+				v21 = isPublishedVersion(data.publishResult) -- inferred equivalent call
+			else
+				v21 = v20
+			end
+
+			local v22 = v19 and data.responseCode == 16
+			local v23
+
+			if v21 then
+				v23 = publishAudienceError
+			else
+				v23 = publishError
+			end
+
+			if v22 then
+				v23 = accountTooNewError
+			end
+
+			if v21 then
 				GetVersionInformationStore().clearDraft(placeId)
-				v62.fetchHistory(placeId)
+				v4.fetchHistory(placeId)
+
+				if FFlagBuildExperiencePlaytestCardPublishCta then
+					v4.fetchLiveVersion(placeId)
+				end
 			end
 
-			debug.log("warn", "build_experience publish failed", {
-				errorMessage = if not v108 or p7.errorMessage == nil then tostring(p7) else tostring(p7.errorMessage),
-				placeId = placeId,
-				responseCode = if not v108 then nil else p7.responseCode,
-				stage = if not v109 then s1 else GameConfigurationActions.PublishFailureStage.SetAudience,
-				universeId = t7.target.universeId
-			})
-			v80(if not v110 then LocalizationStrings.GAME_CONFIGURATION_PUBLISH_ERROR else LocalizationStrings.GAME_CONFIGURATION_PUBLISH_AUDIENCE_ERROR)
-		end):finally(function() -- line: 360
-			-- upvalues: v78 (copy)
-			v78(false)
-		end)
-	end, {
-		v84,
-		v77,
-		v62,
-		t7.target.placeId,
-		t7.target.sessionId,
-		t7.target.universeId,
-		v65,
-		u72,
-		v66,
-		v69
-	})
-	local v90 = `{ t7.testId }.actions`
+			local log = Debug.log
+			local errorMessage
 
-	return React.createElement(View, {
-		LayoutOrder = 3,
-		tag = "col gap-small size-full-0 auto-y bg-surface-0"
-	}, {
-		PublishSnackbarWrapper = if v79 == "" then nil else React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "row align-x-center size-full-0 auto-y padding-x-large"
-		}, {
-			PublishSnackbar = React.createElement(PrivateShareTooltip, {
-				LayoutOrder = 1,
-				isOpen = v81 == "private" and v70 == PrivacyType.Private
-			}, {
-				Snackbar = React.createElement(Snackbar, {
-					LayoutOrder = 1,
-					title = v79,
-					action = if not v83 then nil else {
-						text = LocalizationStrings.GAME_CONFIGURATION_SHARE,
-						onActivated = v86
-					},
-					onClose = if not v83 then v84 else nil,
-					testId = `{ t7.testId }.publish-snackbar`
-				})
-			})
-		}),
-		Actions = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = "row gap-small size-full-0 auto-y padding-y-medium",
-			testId = v90
-		}, {
-			Publish = FFlagEnableProvisionalRating and React.createElement(Button, {
-				LayoutOrder = 1,
-				text = if not v71 then LocalizationStrings.GAME_CONFIGURATION_PUBLISH else LocalizationStrings.GAME_CONFIGURATION_UPDATE_RATING,
-				size = InputSize.Medium,
-				variant = ButtonVariant.Emphasis,
-				fillBehavior = FillBehavior.Fill,
-				isDisabled = t7.target.placeId == nil,
-				isLoading = v77,
-				onActivated = if not v71 then v89 else v88,
-				width = UDim.new(1, 0),
-				testId = `{ v90 }-publish`
-			}),
-			Preview = if t7.showPreviewButton ~= false then React.createElement(PreviewButton, {
-				target = t7.target,
-				actionsTestId = v90
-			}) else nil
-		}),
-		FriendsOnlyShareDialog = if v81 ~= "friends" or v70 ~= PrivacyType.FriendsOnly then nil else React.createElement(FriendsOnlyShareDialog, {
-			onCancel = v87,
-			onShare = v85
-		})
+			if v19 and data.errorMessage ~= nil then
+				errorMessage = tostring(data.errorMessage)
+			else
+				errorMessage = tostring(data)
+			end
+
+			local v24 = {
+				errorMessage = errorMessage,
+				placeId = placeId,
+				responseCode = 0,
+				stage = 0,
+				universeId = 0
+			}
+			local responseCode
+
+			if v19 then
+				responseCode = data.responseCode
+			end
+
+			v24.responseCode = responseCode
+			local stage
+
+			if v20 then
+				stage = GameConfigurationActions.PublishFailureStage.SetAudience
+			else
+				stage = v16
+			end
+
+			v24.stage = stage
+
+			v24.universeId = props.target.universeId
+			log("warn", "build_experience publish failed", v24)
+
+			setState2(v23)
+		end):finally(function()
+			setState(false)
+		end)
+	end
+
+	local v16
+
+	if FFlagBuildAdUpsell then
+		v16 = audience
+	end
+
+	local v17 = useCallback(fn, {
+		v16,
+		onClose,
+		state,
+		v4,
+		props.target.placeId,
+		props.target.sessionId,
+		props.target.universeId,
+		v10,
+		v5,
+		v8,
+		accountTooNewError,
+		publishAudienceError,
+		publishError,
+		publishSuccess
 	})
+
+	local formatted = `{props.testId}.actions`
+	local v18
+
+	if FFlagBuildCheckGamePermissions then
+		v18 = useGamePermissions({
+			universeId = props.target.universeId,
+			isNewGame = props.target.isNewGameTarget
+		})
+	end
+
+	local v19 = not FFlagBuildCheckGamePermissions or v18.canPublish
+	local ref
+
+	if FFlagBuildPostPublishShareDismissible then
+		ref = React.useRef(nil)
+	end
+
+	local v20
+
+	if FFlagBuildPostPublishShareDismissible then
+		v20 = Foundation.Hooks.useTokens()
+	end
+
+	local ref2
+
+	if FFlagBuildPostPublishShareDismissible then
+		ref2 = useClosableFocusRoot({
+			surfaceIdentifier = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum.PopUp,
+			isOpen = state2 ~= "",
+			onClose = onClose
+		})
+	end
+
+	local v21
+
+	if FFlagBuildPostPublishShareDismissible then
+		v21 = Responsive.usePreferredInput() == Responsive.Input.Directional
+	end
+
+	local createElement = React.createElement
+
+	if not FFlagBuildPostPublishShareDismissible then
+		ref2 = nil
+	end
+
+	local v22 = {
+		LayoutOrder = 1,
+		ref = ref2,
+		title = state2,
+		action = v15 and { text = share, onActivated = onActivated } or nil,
+		onClose = 0,
+		testId = 0
+	}
+	local onClose2
+
+	if FFlagBuildPostPublishShareDismissible then
+		if not v21 then
+			onClose2 = onClose
+		end
+	elseif not v15 then
+		onClose2 = onClose
+	end
+
+	v22.onClose = onClose2
+
+	v22.testId = `{props.testId}.publish-snackbar`
+	local element = createElement(Snackbar, v22)
+
+	local createElement2 = React.createElement
+	local publishSnackbar
+
+	if FFlagBuildPostPublishShareDismissible then
+		publishSnackbar = React.createElement(Popover.Root, {
+			isOpen = state2 ~= "",
+			testId = `{props.testId}.publish-snackbar-popover`
+		}, {
+			Anchor = React.createElement(Popover.Anchor, { anchorRef = ref }),
+			Content = React.createElement(Popover.Content, {
+				align = PopoverAlign.Center,
+				backgroundStyle = v20.Color.None,
+				hasArrow = false,
+				selectionGroup = false,
+				side = PopoverSide.Top
+			}, { Snackbar = element })
+		})
+	end
+
+	local publishSnackbarWrapper
+
+	if not (FFlagBuildPostPublishShareDismissible or state2 == "") then
+		publishSnackbarWrapper = React.createElement(
+			View,
+			{ LayoutOrder = 1, tag = "row align-x-center size-full-0 auto-y padding-x-large" },
+			{ PublishSnackbar = element }
+		)
+	end
+
+	local createElement3 = React.createElement
+
+	if not FFlagBuildPostPublishShareDismissible then
+		ref = nil
+	end
+
+	local createElement4 = React.createElement
+
+	if v13 then
+		text = updateRating
+	end
+
+	local v23 = {
+		text = text,
+		size = InputSize.Medium,
+		variant = ButtonVariant.Emphasis,
+		fillBehavior = FillBehavior.Fill,
+		isDisabled = props.target.placeId == nil or not v19,
+		isLoading = state,
+		onActivated = 0,
+		width = 0,
+		LayoutOrder = 1,
+		testId = 0
+	}
+
+	if not v13 then
+		onActivated2 = v17
+	end
+
+	v23.onActivated = onActivated2
+	v23.width = UDim.new(1, 0)
+
+	v23.testId = `{formatted}-publish`
+	local v24 = { Publish = createElement4(Button, v23), Preview = 0 }
+	local preview
+
+	if props.showPreviewButton ~= false then
+		preview = React.createElement(PreviewButton, {
+			target = props.target,
+			actionsTestId = formatted,
+			onPreview = props.onPreview
+		})
+	end
+
+	v24.Preview = preview
+	local v25 = {
+		PublishSnackbar = publishSnackbar,
+		PublishSnackbarWrapper = publishSnackbarWrapper,
+		Actions = createElement3(
+			View,
+			{
+				LayoutOrder = 2,
+				ref = ref,
+				tag = "row gap-small size-full-0 auto-y padding-y-medium",
+				testId = formatted
+			},
+			v24
+		),
+		FriendsOnlyShareDialog = 0
+	}
+	local friendsOnlyShareDialog
+
+	if state3 == "friends" and audience == PrivacyType.FriendsOnly then
+		friendsOnlyShareDialog = React.createElement(FriendsOnlyShareDialog, {
+			onCancel = onCancel,
+			onShare = onShare
+		})
+	end
+
+	v25.FriendsOnlyShareDialog = friendsOnlyShareDialog
+	return createElement2(View, {
+		LayoutOrder = 3,
+		tag = {
+			["col gap-small size-full-0 auto-y"] = true,
+			["bg-surface-0"] = not FFlagBuildPublishNavigationSheet
+		}
+	}, v25)
 end
 
 return PublishFooter

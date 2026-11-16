@@ -1,15 +1,8 @@
 local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
-
 require(script.Parent.Parent.networkingFriendsTypes)
 
-return function(p1) -- line: 5
-	-- upvalues: FRIENDS_URL (copy)
-	return p1.roduxNetworking.POST({
-		Name = "AcceptFriendRequestFromUserId"
-	}, function(p2, p3) -- line: 8
-		-- upvalues: FRIENDS_URL (copy)
-		return p2(FRIENDS_URL, {
-			currentUserId = p3.currentUserId
-		}):path("v1"):path("users"):id(p3.targetUserId):path("accept-friend-request"):body({})
+return function(p)
+	return p.roduxNetworking.POST({ Name = "AcceptFriendRequestFromUserId" }, function(callback, p2)
+		return callback(FRIENDS_URL, { currentUserId = p2.currentUserId }):path("v1"):path("users"):id(p2.targetUserId):path("accept-friend-request"):body({})
 	end)
 end

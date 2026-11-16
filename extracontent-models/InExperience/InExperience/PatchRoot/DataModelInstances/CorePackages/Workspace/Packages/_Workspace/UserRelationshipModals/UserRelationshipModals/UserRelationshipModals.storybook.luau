@@ -1,7 +1,8 @@
 local UserRelationshipModals = script:FindFirstAncestor("UserRelationshipModals")
-local UserRelationshipModalsParent = UserRelationshipModals.Parent
-local React = require(UserRelationshipModalsParent.React)
-local ReactRoblox = require(UserRelationshipModalsParent.ReactRoblox)
+local parent = UserRelationshipModals.Parent
+
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
 
 return {
 	name = "UserRelationshipModals",

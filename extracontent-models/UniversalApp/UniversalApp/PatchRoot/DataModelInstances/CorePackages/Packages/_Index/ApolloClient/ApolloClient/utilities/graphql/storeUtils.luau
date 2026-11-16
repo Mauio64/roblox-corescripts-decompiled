@@ -1,320 +1,281 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
+
 local HttpService = game:GetService("HttpService")
-local t1 = {}
-local u8 = nil
+
+local StoreUtils = {}
+
+local getStoreKeyName = nil
 local stringify = nil
-local isField = nil
+local isField
 
 require(script.Parent.types)
-require(ParentParentParent.GraphQL)
+require(parent2.GraphQL)
 
-local InvariantError = require(ParentParent.jsutils.invariant).InvariantError
-local isNonNullObject = require(script.Parent.Parent.common.objects).isNonNullObject
+local invariant = require(parent.jsutils.invariant)
+local invariantError = invariant.InvariantError
+local objects = require(script.Parent.Parent.common.objects)
+local isNonNullObject = objects.isNonNullObject
 local fragments = require(script.Parent.fragments)
-local objectKeysForEach = require(ParentParent.luaUtils.objectKeysForEach)
+local objectKeysForEach = require(parent.luaUtils.objectKeysForEach)
+
 local getFragmentFromSelection = fragments.getFragmentFromSelection
 
-function t1.makeReference(s1: string) -- line: 59
-	return {
-		__ref = tostring(s1)
-	}
-end
-function t1.isReference(p1) -- line: 64
-	return type(p1) == "table" and type(p1.__ref) == "string"
-end
-function t1.isDocumentNode(p2) -- line: 74
-	-- upvalues: isNonNullObject (copy), Array (copy)
-	return isNonNullObject(p2) and (p2.kind == "Document" and Array.isArray(p2.definitions))
+function StoreUtils.makeReference(p: string)
+	return { __ref = tostring(p) }
 end
 
-local function isStringValue(p3) -- line: 81
-	return p3.kind == "StringValue"
+function StoreUtils:isReference(): boolean
+	return type(self) == "table" and type(self.__ref) == "string"
 end
-local function isBooleanValue(p4) -- line: 85
-	return p4.kind == "BooleanValue"
-end
-local function isIntValue(p5) -- line: 89
-	return p5.kind == "IntValue"
-end
-local function isFloatValue(p6) -- line: 93
-	return p6.kind == "FloatValue"
-end
-local function isVariable(p7) -- line: 97
-	return p7.kind == "Variable"
-end
-local function isObjectValue(p8) -- line: 101
-	return p8.kind == "ObjectValue"
-end
-local function isListValue(p9) -- line: 105
-	return p9.kind == "ListValue"
-end
-local function isEnumValue(p10) -- line: 109
-	return p10.kind == "EnumValue"
-end
-local function isNullValue(p11) -- line: 113
-	return p11.kind == "NullValue"
-end
-local function valueToObjectRepresentation(p12, p13, p14, p15) -- line: 117
-	-- upvalues: Array (copy), valueToObjectRepresentation (copy), InvariantError (copy)
-	if p14.kind == "IntValue" or p14.kind == "FloatValue" then
-		p12[p13.value] = tonumber(p14.value)
 
-		return
+function StoreUtils.isDocumentNode(p)
+	local v = isNonNullObject(p)
+
+	if v then
+		if p.kind == "Document" then
+			return (Array.isArray(p.definitions))
+		end
+
+		return false
 	end
 
-	if p14.kind == "BooleanValue" or p14.kind == "StringValue" then
-		p12[p13.value] = p14.value
+	return v
+end
 
-		return
-	end
+local function isStringValue(p): boolean -- 1 equivalent call inferred from this helper
+	return p.kind == "StringValue"
+end
 
-	if p14.kind == "ObjectValue" then
-		local t2 = {}
+local function isBooleanValue(p): boolean -- 1 equivalent call inferred from this helper
+	return p.kind == "BooleanValue"
+end
 
-		Array.map(p14.fields, function(p16) -- line: 125
-			-- upvalues: valueToObjectRepresentation (copy), t2 (copy), p15 (copy)
-			valueToObjectRepresentation(t2, p16.name, p16.value, p15)
+local function isIntValue(p): boolean -- 1 equivalent call inferred from this helper
+	return p.kind == "IntValue"
+end
 
+local function isFloatValue(p): boolean -- 1 equivalent call inferred from this helper
+	return p.kind == "FloatValue"
+end
+
+local function isVariable(data): boolean -- 1 equivalent call inferred from this helper
+	return data.kind == "Variable"
+end
+
+local function isObjectValue(data): boolean -- 1 equivalent call inferred from this helper
+	return data.kind == "ObjectValue"
+end
+
+local function isListValue(data): boolean -- 1 equivalent call inferred from this helper
+	return data.kind == "ListValue"
+end
+
+local function isEnumValue(data): boolean -- 1 equivalent call inferred from this helper
+	return data.kind == "EnumValue"
+end
+
+local function isNullValue(data): boolean -- 1 equivalent call inferred from this helper
+	return data.kind == "NullValue"
+end
+
+local function valueToObjectRepresentation(p, name, value, options)
+	if isIntValue(value) or isFloatValue(value) then -- inferred equivalent call
+		p[name.value] = tonumber(value.value)
+	elseif isBooleanValue(value) or isStringValue(value) then -- inferred equivalent call
+		p[name.value] = value.value
+	elseif isObjectValue(value) then -- inferred equivalent call
+		local v = {}
+		Array.map(value.fields, function(p2): nil
+			valueToObjectRepresentation(v, p2.name, p2.value, options)
 			return nil
 		end)
-		p12[p13.value] = t2
 
-		return
-	end
+		p[name.value] = v
+	elseif isVariable(value) then -- inferred equivalent call
+		local v = (options or {})[value.name.value]
 
-	if p14.kind == "Variable" then
-		local v45 = (p15 or {})[p14.name.value]
-
-		p12[p13.value] = v45
-
-		return
-	end
-
-	if p14.kind == "ListValue" then
-		p12[p13.value] = Array.map(p14.values, function(p17) -- line: 136
-			-- upvalues: valueToObjectRepresentation (copy), p13 (copy), p15 (copy)
-			local t3 = {}
-
-			valueToObjectRepresentation(t3, p13, p17, p15)
-
-			return t3[p13.value]
+		p[name.value] = v
+	elseif isListValue(value) then -- inferred equivalent call
+		p[name.value] = Array.map(value.values, function(p2)
+			local v = {}
+			valueToObjectRepresentation(v, name, p2, options)
+			return v[name.value]
 		end)
-
-		return
+	elseif isEnumValue(value) then -- inferred equivalent call
+		p[name.value] = value.value
+	elseif isNullValue(value) then -- inferred equivalent call
+		p[name.value] = nil
+	else
+		error(invariantError.new(tostring(("The inline argument \"%s\" of kind \"%s\""):format(name.value, value.kind)) .. "is not supported. Use variables instead of inline arguments to overcome this limitation."))
 	end
-
-	if p14.kind == "EnumValue" then
-		p12[p13.value] = p14.value
-
-		return
-	end
-
-	if p14.kind == "NullValue" then
-		p12[p13.value] = nil
-
-		return
-	end
-
-	error(InvariantError.new(tostring(("The inline argument \"%s\" of kind \"%s\""):format(p13.value, p14.kind)) .. "is not supported. Use variables instead of inline arguments to " .. "overcome this limitation."))
 end
+StoreUtils.valueToObjectRepresentation = valueToObjectRepresentation
 
-t1.valueToObjectRepresentation = valueToObjectRepresentation
+function StoreUtils.storeKeyNameFromField(data, p)
+	local v
 
-function t1.storeKeyNameFromField(p18, p19) -- line: 158
-	-- upvalues: Array (copy), valueToObjectRepresentation (copy), u8 (ref)
-	local t4 = nil
+	if data.directives then
+		v = {}
+		Array.forEach(data.directives, function(p2)
+			v[p2.name.value] = {}
 
-	if p18.directives then
-		t4 = {}
-		Array.forEach(p18.directives, function(p20) -- line: 162
-			-- upvalues: t4 (ref), Array (copy), valueToObjectRepresentation (copy), p19 (copy)
-			t4[p20.name.value] = {}
-
-			if p20.arguments then
-				Array.forEach(p20.arguments, function(p21) -- line: 166
-					-- upvalues: valueToObjectRepresentation (copy), t4 (ref), p20 (copy), p19 (copy)
-					local name = p21.name
-					local value = p21.value
-
-					valueToObjectRepresentation(t4[p20.name.value], name, value, p19)
+			if p2.arguments then
+				Array.forEach(p2.arguments, function(p3)
+					local name = p3.name
+					local value = p3.value
+					valueToObjectRepresentation(v[p2.name.value], name, value, p)
 				end)
 			end
 		end)
+	else
+		v = nil
 	end
 
-	local t5 = nil
+	local v2
 
-	if p18.arguments and #p18.arguments > 0 then
-		t5 = {}
-		Array.forEach(p18.arguments, function(p22) -- line: 177
-			-- upvalues: valueToObjectRepresentation (copy), t5 (ref), p19 (copy)
-			local name = p22.name
-			local value = p22.value
-
-			valueToObjectRepresentation(t5, name, value, p19)
+	if data.arguments and #data.arguments > 0 then
+		v2 = {}
+		Array.forEach(data.arguments, function(p2)
+			local name = p2.name
+			local value = p2.value
+			valueToObjectRepresentation(v2, name, value, p)
 		end)
+	else
+		v2 = nil
 	end
 
-	return u8(p18.name.value, t5, t4)
+	return getStoreKeyName(data.name.value, v2, v)
 end
 
-local t6 = {
-	"connection",
-	"include",
-	"skip",
-	"client",
-	"rest",
-	"export"
-}
+local v = { "connection", "include", "skip", "client", "rest", "export" }
 
-u8 = Object.assign(setmetatable({}, {
-	__call = function(_, s2: string, t7: {[any]: any}?, p24) -- line: 201
-		-- upvalues: Array (copy), stringify (ref), objectKeysForEach (copy), t6 (copy)
-		if t7 and (p24 and p24.connection and p24.connection.key) then
-			if p24.connection.filter and #p24.connection.filter > 0 then
-				local v54 = if not p24.connection.filter then {} else p24.connection.filter
-
-				Array.sort(v54, nil)
-
-				local t8 = {}
-
-				Array.forEach(v54, function(p25) -- line: 227
-					-- upvalues: t8 (copy), t7 (copy)
-					t8[p25] = t7[p25]
-				end)
-
-				return ("%s(%s)"):format(p24.connection.key, stringify(t8))
+getStoreKeyName = Object.assign(setmetatable({}, {
+	__call = function(_, p: string, p2, p3)
+		if p2 and p3 and p3.connection and p3.connection.key then
+			if not (p3.connection.filter and #p3.connection.filter > 0) then
+				return p3.connection.key
 			end
 
-			return p24.connection.key
+			local v2 = not p3.connection.filter and {} or p3.connection.filter
+
+			Array.sort(v2, nil)
+
+			local v3 = {}
+			Array.forEach(v2, function(p4)
+				v3[p4] = p2[p4]
+			end)
+
+			return ("%s(%s)"):format(p3.connection.key, stringify(v3))
 		end
 
-		local u56 = s2
-
-		if t7 then
-			u56 ..= ("(%s)"):format((stringify(t7)))
+		if p2 then
+			p ..= ("(%s)"):format((stringify(p2)))
 		end
 
-		if p24 then
-			objectKeysForEach(p24, function(p26) -- line: 254
-				-- upvalues: Array (copy), t6 (copy), p24 (copy), u56 (ref), stringify (ref)
-				if Array.indexOf(t6, p26) ~= -1 then
+		if p3 then
+			objectKeysForEach(p3, function(p4)
+				if Array.indexOf(v, p4) ~= -1 then
 					return
 				end
 
-				if p24[p26] and next(p24[p26]) ~= nil then
-					u56 ..= ("@%s(%s)"):format(p26, stringify(p24[p26]))
-
-					return
+				if p3[p4] and next(p3[p4]) ~= nil then
+					p ..= ("@%s(%s)"):format(p4, stringify(p3[p4]))
+				else
+					p ..= ("@%s"):format(p4)
 				end
-
-				u56 ..= ("@%s"):format(p26)
 			end)
 		end
 
-		return u56
+		return p
 	end
 }), {
-	setStringify = function(_, p28) -- line: 273
-		-- upvalues: stringify (ref)
-		local v59 = stringify
-
-		stringify = p28
-
-		return v59
+	setStringify = function(_, p)
+		local v2 = stringify
+		stringify = p
+		return v2
 	end
 })
-t1.getStoreKeyName = u8
 
-function stringify(p29) -- line: 284
-	-- upvalues: isNonNullObject (copy), HttpService (copy), Array (copy), Object (copy), stringify (ref)
-	if not isNonNullObject(p29) then
-		return HttpService:JSONEncode(p29)
+StoreUtils.getStoreKeyName = getStoreKeyName
+
+stringify = function(p)
+	if not isNonNullObject(p) then
+		return HttpService:JSONEncode(p)
 	end
 
-	local v61 = Array.map(Array.sort(Object.keys(p29), nil), function(p30) -- line: 295
-		-- upvalues: stringify (ref), p29 (copy)
-		return {
-			p30,
-			stringify(p29[p30])
-		}
+	local mapped = Array.map(Array.sort(Object.keys(p), nil), function(p2)
+		return { p2, stringify(p[p2]) }
 	end)
 
-	if Array.isArray(p29) then
-		return ("[%s]"):format(Array.join(Array.map(v61, function(p31) -- line: 301
-			return p31[2]
+	if Array.isArray(p) then
+		return ("[%s]"):format(Array.join(Array.map(mapped, function(list)
+			return list[2]
 		end), ","))
 	end
 
-	return ("{%s}"):format(Array.join(Array.map(v61, function(p32) -- line: 308
-		return ("\"%s\":%s"):format(p32[1], p32[2])
+	return ("{%s}"):format(Array.join(Array.map(mapped, function(list)
+		return ("\"%s\":%s"):format(list[1], list[2])
 	end), ","))
 end
-function t1.argumentsObjectFromField(p33, t9: {[any]: any}) -- line: 329
-	-- upvalues: Array (copy), valueToObjectRepresentation (copy)
-	if p33.arguments and #p33.arguments > 0 then
-		local t10 = {}
 
-		Array.forEach(p33.arguments, function(p34) -- line: 334
-			-- upvalues: valueToObjectRepresentation (copy), t10 (copy), t9 (copy)
-			local name = p34.name
-			local value = p34.value
-
-			valueToObjectRepresentation(t10, name, value, t9)
+function StoreUtils.argumentsObjectFromField(p, p2)
+	if p.arguments and #p.arguments > 0 then
+		local v2 = {}
+		Array.forEach(p.arguments, function(p3)
+			valueToObjectRepresentation(v2, p3.name, p3.value, p2)
 		end)
-
-		return t10
+		return v2
 	end
 
 	return nil
 end
-function t1.resultKeyNameFromField(p35) -- line: 344
-	if p35.alias then
-		return p35.alias.value
+
+local function resultKeyNameFromField(selection) -- 1 equivalent call inferred from this helper
+	if selection.alias then
+		return selection.alias.value
 	end
 
-	return p35.name.value
+	return selection.name.value
 end
 
-local function getTypenameFromResult(t11: {[any]: any}, p36, p37) -- line: 355
-	-- upvalues: isField (ref), getTypenameFromResult (copy), getFragmentFromSelection (copy)
-	if typeof(t11.__typename) == "string" then
-		return t11.__typename
+StoreUtils.resultKeyNameFromField = resultKeyNameFromField
+local function getTypenameFromResult(p, selectionSet, p2)
+	if typeof(p.__typename) == "string" then
+		return p.__typename
 	end
 
-	for _, v in ipairs(p36.selections) do
-		if not isField(v) then
-			local v71 = getTypenameFromResult(t11, getFragmentFromSelection(v, p37).selectionSet, p37)
-
-			if typeof(v71) ~= "string" then
-				continue
+	for _, selection in ipairs(selectionSet.selections) do
+		if isField(selection) then
+			if selection.name.value == "__typename" then
+				return p[resultKeyNameFromField(selection)] -- inferred equivalent call
 			end
+		else
+			local v2 = getTypenameFromResult(p, getFragmentFromSelection(selection, p2).selectionSet, p2)
 
-			return v71
-		end
-
-		if v.name.value == "__typename" then
-			return t11[if not v.alias then v.name.value else v.alias.value]
+			if typeof(v2) == "string" then
+				return v2
+			end
 		end
 	end
 
 	return nil
 end
 
-t1.getTypenameFromResult = getTypenameFromResult
+StoreUtils.getTypenameFromResult = getTypenameFromResult
 
-function isField(p38) -- line: 385
-	return p38.kind == "Field"
+isField = function(selection): boolean
+	return selection.kind == "Field"
 end
 
-t1.isField = isField
+StoreUtils.isField = isField
 
-function t1.isInlineFragment(p39) -- line: 390
-	return p39.kind == "InlineFragment"
+function StoreUtils.isInlineFragment(p): boolean
+	return p.kind == "InlineFragment"
 end
 
-return t1
+return StoreUtils

@@ -1,350 +1,333 @@
 local AmpUpsell = script:FindFirstAncestor("AmpUpsell")
-local AmpUpsellParent = AmpUpsell.Parent
+local parent = AmpUpsell.Parent
+
 local Players = game:GetService("Players")
-local AppLinking = require(AmpUpsellParent.RoactServiceTags).AppLinking
-local React = require(AmpUpsellParent.React)
-local Promise = require(AmpUpsellParent.Promise)
-local IDVApiProvider = require(AmpUpsellParent.IdentityVerification).IDVApiProvider
-local usePollIDVStatus = require(AmpUpsellParent.IdentityVerification).usePollIDVStatus
-local Foundation = require(AmpUpsellParent.Foundation)
+
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppLinking = RoactServiceTags.AppLinking
+local React = require(parent.React)
+local Promise = require(parent.Promise)
+
+local IdentityVerification = require(parent.IdentityVerification)
+local IDVApiProvider = IdentityVerification.IDVApiProvider
+local IdentityVerification2 = require(parent.IdentityVerification)
+local usePollIDVStatus = IdentityVerification2.usePollIDVStatus
+
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
-local useNavigation = require(AmpUpsellParent.Navigation).useNavigation
-local useDispatch = require(AmpUpsellParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useAppPolicy = require(AmpUpsellParent.UniversalAppPolicy).useAppPolicy
-local NavigateDown = require(AmpUpsellParent.NavigationRodux).Thunks.NavigateDown
-local AppPage = require(AmpUpsellParent.RobloxAppEnums).AppPage
+
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 local UrlUtils = require(AmpUpsell.Common.UrlUtils)
-local FFlagSignalsNavP3Dispatch = require(AmpUpsellParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v19 = if not FFlagSignalsNavP3Dispatch then nil else require(AmpUpsellParent.RobloxAppNavigation).NavigationCommands
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
 local FacialAgeEstimationServiceWrapper = require(script.Parent.FacialAgeEstimationServiceWrapper)
 local FAEDirectLinkUpsell = require(script.Parent.FAEDirectLinkUpsell)
 local FAEWithQRCodeUpsell = require(script.Parent.FAEWithQRCodeUpsell)
 local FAEFailedModal = require(script.Parent.FAEFailedModal)
 local FAELoadingModal = require(script.Parent.FAELoadingModal)
-local AuthAnalytics = require(AmpUpsellParent.AuthAnalytics)
+
+local AuthAnalytics = require(parent.AuthAnalytics)
 local authMsgShown = AuthAnalytics.Events.authMsgShown
 local authModalShown = AuthAnalytics.Events.authModalShown
 local authFormInteraction = AuthAnalytics.Events.authFormInteraction
-local useRoactService = require(AmpUpsellParent.RobloxAppHooks).useRoactService
-local RoactNetworking = require(AmpUpsellParent.RoactServiceTags).RoactNetworking
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags2 = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags2.RoactNetworking
+
 local GetFFlagEnableRoactNetworkingForChallengeInteception = require(AmpUpsell.Flags.GetFFlagEnableRoactNetworkingForChallengeInteception)
 local GetFFlagShowFAELoadingModal = require(AmpUpsell.Flags.GetFFlagShowFAELoadingModal)
-local v33 = game:DefineFastFlag("EnableFAECancellationAnalytics", false)
-local v34 = game:DefineFastFlag("EnableValidateFAEVerificationLink", false)
-local GetFFlagMoveAmpUpsellOffNavigateDown = require(AmpUpsellParent.SharedFlags).GetFFlagMoveAmpUpsellOffNavigateDown
+local defineFastFlag = game:DefineFastFlag("EnableFAECancellationAnalytics", false)
+local defineFastFlag2 = game:DefineFastFlag("EnableValidateFAEVerificationLink", false)
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagMoveAmpUpsellOffNavigateDown = SharedFlags2.GetFFlagMoveAmpUpsellOffNavigateDown
 local GetFFlagEnableWebAmpWizardForFAEHandoff = require(AmpUpsell.Flags.GetFFlagEnableWebAmpWizardForFAEHandoff)
 local GetFFlagEnableFAEQRCodeHandoff = require(AmpUpsell.Flags.GetFFlagEnableFAEQRCodeHandoff)
-local logEventOnceIfEnabled = require(AmpUpsell.Common.LoggingUtils).logEventOnceIfEnabled
-local v39 = game:DefineFastInt("FAEWithCallbackPollDelay", 2)
-local v40 = game:DefineFastInt("FAEWithCallbackPollMaxRetries", 5)
-local v41 = game:DefineFastInt("FAEBackgroundOnlyPollDelay", 15)
-local v42 = game:DefineFastInt("FAEBackgroundOnlyPollMaxRetries", 40)
-local v43 = game:DefineFastInt("FAEWithWebViewCallbackPollDelay", 2)
-local v44 = game:DefineFastInt("FAEWithWebViewCallbackPollMaxRetries", 15)
+local LoggingUtils = require(AmpUpsell.Common.LoggingUtils)
+local logEventOnceIfEnabled = LoggingUtils.logEventOnceIfEnabled
 
-local function FAEUpsellContainer() -- line: 76
-	-- upvalues: useNavigation (copy), useDispatch (copy), useRoactService (copy), RoactNetworking (copy), useAppPolicy (copy), AppLinking (copy), GetFFlagEnableFAEQRCodeHandoff (copy), React (copy), authModalShown (copy), authFormInteraction (copy), authMsgShown (copy), GetFFlagMoveAmpUpsellOffNavigateDown (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v19 (copy), NavigateDown (copy), FacialAgeEstimationServiceWrapper (copy), v39 (copy), v40 (copy), v41 (copy), v42 (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v43 (copy), v44 (copy), usePollIDVStatus (copy), Players (copy), Promise (copy), UrlUtils (copy), v34 (copy), GetFFlagEnableRoactNetworkingForChallengeInteception (copy), logEventOnceIfEnabled (copy), IDVApiProvider (copy), v33 (copy), FAEFailedModal (copy), FAEWithQRCodeUpsell (copy), FAEDirectLinkUpsell (copy), GetFFlagShowFAELoadingModal (copy), FAELoadingModal (copy), Loading (copy), IconSize (copy)
-	local v46 = useNavigation()
-	local v47 = useDispatch()
-	local v48 = useRoactService(RoactNetworking)
-	local v49 = useAppPolicy(function(p1) -- line: 81
-		return p1.getHasWebViewSupportForFAE()
+local defineFastInt = game:DefineFastInt("FAEWithCallbackPollDelay", 2)
+local defineFastInt2 = game:DefineFastInt("FAEWithCallbackPollMaxRetries", 5)
+
+local defineFastInt3 = game:DefineFastInt("FAEBackgroundOnlyPollDelay", 15)
+local defineFastInt4 = game:DefineFastInt("FAEBackgroundOnlyPollMaxRetries", 40)
+
+local defineFastInt5 = game:DefineFastInt("FAEWithWebViewCallbackPollDelay", 2)
+local defineFastInt6 = game:DefineFastInt("FAEWithWebViewCallbackPollMaxRetries", 15)
+
+local function FAEUpsellContainer()
+	local v = useNavigation()
+	local v2 = useDispatch()
+	local v3 = useRoactService(RoactNetworking)
+
+	local v4 = useAppPolicy(function(p)
+		return p.getHasWebViewSupportForFAE()
 	end)
-	local v50 = v46.getParam("extraProps")
-	local entryPointEventCtx = v50.entryPointEventCtx
-	local metadata = v50.metadata
-	local skipFacialAgeEstimationWebLinkModal = v50.skipFacialAgeEstimationWebLinkModal
-	local v54 = useRoactService(AppLinking)
-	local onSuccess = v50.onSuccess
-	local onCancel = v50.onCancel
-	local onFailure = v50.onFailure
-	local onRetry = v50.onRetry
-	local v59 = v49 and GetFFlagEnableFAEQRCodeHandoff()
-	local v60, v61 = React.useState(false)
-	local v62, v63 = React.useState(nil)
-	local v64, v65 = React.useState(nil)
-	local v66, v67 = React.useState(false)
-	local v68, v69 = React.useState(false)
-	local v70 = metadata and metadata.sessionId or ""
-	local v71, v72 = React.useState(v70)
-	local v73 = React.useCallback(function(p2) -- line: 108
-		-- upvalues: authModalShown (copy), entryPointEventCtx (copy), v61 (copy)
-		authModalShown(entryPointEventCtx, p2, "faeFailed")
-		v61(true)
+
+	local param = v.getParam("extraProps")
+	local entryPointEventCtx = param.entryPointEventCtx
+	local metadata = param.metadata
+	local skipFacialAgeEstimationWebLinkModal = param.skipFacialAgeEstimationWebLinkModal
+
+	local v5 = useRoactService(AppLinking)
+
+	local onSuccess = param.onSuccess
+	local onCancel = param.onCancel
+	local onFailure = param.onFailure
+	local onRetry = param.onRetry
+
+	local v6 = v4 and GetFFlagEnableFAEQRCodeHandoff()
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(nil)
+	local state3, setState3 = React.useState(nil)
+	local state4, setState4 = React.useState(false)
+	local state5, setState5 = React.useState(false)
+
+	local sessionId = metadata and metadata.sessionId or ""
+	local state6, setState6 = React.useState(sessionId)
+
+	local v7 = React.useCallback(function(p)
+		authModalShown(entryPointEventCtx, p, "faeFailed")
+		setState(true)
 	end, { entryPointEventCtx })
-	local v74 = React.useCallback(function(p3) -- line: 113
-		-- upvalues: authFormInteraction (copy), entryPointEventCtx (copy), onCancel (copy)
-		authFormInteraction(entryPointEventCtx, p3, "faeCancelled")
+
+	local v8 = React.useCallback(function(p)
+		authFormInteraction(entryPointEventCtx, p, "faeCancelled")
 		onCancel()
-	end, {
-		onCancel,
-		entryPointEventCtx
-	})
-	local v75 = React.useCallback(function(p4) -- line: 118
-		-- upvalues: authMsgShown (copy), entryPointEventCtx (copy), onSuccess (copy)
-		authMsgShown(entryPointEventCtx, p4, "faeSuccess")
+	end, { onCancel, entryPointEventCtx })
+
+	local v9 = React.useCallback(function(p)
+		authMsgShown(entryPointEventCtx, p, "faeSuccess")
 		onSuccess()
-	end, {
-		onSuccess,
-		entryPointEventCtx
-	})
-	local v76 = React.useCallback(function(p5, p6) -- line: 123
-		-- upvalues: GetFFlagMoveAmpUpsellOffNavigateDown (copy), v46 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v19 (copy), v47 (copy), NavigateDown (copy)
+	end, { onSuccess, entryPointEventCtx })
+
+	local useCallback = React.useCallback
+	local function fn(detail, callback)
 		if GetFFlagMoveAmpUpsellOffNavigateDown() then
-			v46.push(AppPage.GenericWebPage, {
-				detail = p5,
+			v.push(AppPage.GenericWebPage, {
+				detail = detail,
 				extraProps = {
 					title = "",
-					onClose = function() -- line: 129
-						-- upvalues: p6 (copy)
-						p6()
+					onClose = function()
+						callback()
 					end
 				}
 			})
-
 			return
 		end
 
-		local t1 = {
+		local v10 = {
 			name = AppPage.GenericWebPage,
-			detail = p5,
+			detail = detail,
 			extraProps = {
 				title = "",
-				onClose = function() -- line: 140
-					-- upvalues: p6 (copy)
-					p6()
+				onClose = function()
+					callback()
 				end
 			}
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v19.down(v19.fromLegacyPage(t1))
-
-			return
-		end
-
-		v47(NavigateDown(t1))
-	end, { GetFFlagMoveAmpUpsellOffNavigateDown() and v46 or v47 })
-	local v77 = React.useMemo(function() -- line: 153
-		-- upvalues: FacialAgeEstimationServiceWrapper (copy), v39 (copy), v40 (copy), v59 (copy), v41 (copy), v42 (copy), v49 (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v43 (copy), v44 (copy)
-		if FacialAgeEstimationServiceWrapper.isAvailable() then
-			return {
-				delay = v39,
-				retries = v40
-			}
-		end
-
-		if v59 then
-			return {
-				delay = v41,
-				retries = v42
-			}
-		end
-
-		if v49 and not GetFFlagEnableWebAmpWizardForFAEHandoff() then
-			return {
-				delay = v43,
-				retries = v44
-			}
-		end
-
-		return {
-			delay = v41,
-			retries = v42
-		}
-	end, {
-		v49,
-		v59
-	})
-	local v78, v79 = usePollIDVStatus({
-		delay = v77.delay,
-		retries = v77.retries
-	})
-	local v80 = React.useCallback(function(p7, p8) -- line: 179
-		-- upvalues: FacialAgeEstimationServiceWrapper (copy), authModalShown (copy), entryPointEventCtx (copy), v67 (copy), v59 (copy), Players (copy), v65 (copy), Promise (copy), GetFFlagEnableWebAmpWizardForFAEHandoff (copy), v63 (copy), UrlUtils (copy), v34 (copy), v49 (copy), v76 (copy), skipFacialAgeEstimationWebLinkModal (copy), v54 (copy)
-		local sessionIdentifier = p7.sessionIdentifier
-		local verificationLink = p7.verificationLink
-		local sessionToken = p7.sessionToken
-
-		if FacialAgeEstimationServiceWrapper.isAvailable() then
-			authModalShown(entryPointEventCtx, p8, "nativeFae")
-			v67(true)
-
-			return FacialAgeEstimationServiceWrapper.startFlow(sessionIdentifier, sessionToken)
-		end
-
-		if v59 then
-			v67(false)
-			authModalShown(entryPointEventCtx, p8, "faeQRCodeHandoff")
-
-			local str = tostring(Players.LocalPlayer and Players.LocalPlayer.UserId or 0)
-			local v94 = "roblox%3A%2F%2Fnavigation%2Famp_wizard%3Ffeature_name=TriggerFacialAgeEstimationRecourse%26namespace=account_identity%252FAgeCheck%26entry_point=" .. entryPointEventCtx .. "%26user_id=" .. str
-
-			v65("https://ro.blox.com/Ebh5" .. "?pid=QR_code&c=fae_onelink" .. "&is_retargeting=false" .. "&af_dp=" .. v94 .. "&deep_link_value=" .. v94)
-
-			return Promise.resolve(sessionIdentifier)
-		end
-
-		if GetFFlagEnableWebAmpWizardForFAEHandoff() then
-			authModalShown(entryPointEventCtx, p8, "webHandoffFAE")
-			v67(false)
-			v63(UrlUtils.buildAmpWizardUrl("TriggerAgeVerifyRecourse", "social%2FUpsells", entryPointEventCtx, "my%2Faccount"))
-
-			return Promise.resolve(sessionIdentifier)
-		end
-
-		if v34 and (not verificationLink or verificationLink == "") then
-			return Promise.reject("Invalid verification link")
-		end
-
-		authModalShown(entryPointEventCtx, p8, "noNativeFae")
-		v67(false)
-
-		if v49 then
-			return Promise.new(function(resolve) -- line: 232
-				-- upvalues: sessionIdentifier (copy), v76 (copy), verificationLink (copy)
-				v76(verificationLink, function() -- line: 233
-					-- upvalues: resolve (copy), sessionIdentifier (copy)
-					resolve(sessionIdentifier)
-				end)
-			end)
-		end
-
-		if skipFacialAgeEstimationWebLinkModal then
-			v54:openURL(verificationLink)
+			navigationCommands.down(navigationCommands.fromLegacyPage(v10))
 		else
-			v63(verificationLink)
+			v2(NavigateDown(v10))
+		end
+	end
+
+	local v10
+
+	if GetFFlagMoveAmpUpsellOffNavigateDown() then
+		v10 = v or v2
+	else
+		v10 = v2
+	end
+
+	local v11 = useCallback(fn, { v10 })
+
+	local v12 = React.useMemo(function()
+		if FacialAgeEstimationServiceWrapper.isAvailable() then
+			return { delay = defineFastInt, retries = defineFastInt2 }
 		end
 
-		return Promise.resolve(sessionIdentifier)
-	end, {
-		entryPointEventCtx,
-		v49,
-		v76,
-		v67,
-		skipFacialAgeEstimationWebLinkModal,
-		v54,
-		v59
-	})
+		if v6 then
+			return { delay = defineFastInt3, retries = defineFastInt4 }
+		end
 
-	React.useEffect(function() -- line: 260
-		-- upvalues: v70 (copy), GetFFlagEnableRoactNetworkingForChallengeInteception (copy), logEventOnceIfEnabled (copy), IDVApiProvider (copy), v48 (copy), v72 (copy), v80 (copy), v69 (copy), v78 (copy), v75 (copy), v33 (copy), v74 (copy), v73 (copy), v79 (copy)
-		local u95 = v70
+		if v4 and not GetFFlagEnableWebAmpWizardForFAEHandoff() then
+			return { delay = defineFastInt5, retries = defineFastInt6 }
+		end
 
-		if GetFFlagEnableRoactNetworkingForChallengeInteception() then
-			logEventOnceIfEnabled("start_verification_init")
-			IDVApiProvider.startVerificationWithWrappedNetworking(v48, {
-				ageEstimation = true
-			}):andThen(function(p9) -- line: 265
-				-- upvalues: u95 (ref), v72 (copy), logEventOnceIfEnabled (copy)
-				u95 = `{ u95 }_{ p9.sessionIdentifier }`
-				v72(u95)
-				logEventOnceIfEnabled("start_verification_end")
+		return { delay = defineFastInt3, retries = defineFastInt4 }
+	end, { v4, v6 })
 
-				return p9
-			end):andThen(function(p10) -- line: 271
-				-- upvalues: logEventOnceIfEnabled (copy), v80 (copy), u95 (ref)
-				logEventOnceIfEnabled("persona_flow_init")
+	local v13, v14 = usePollIDVStatus({ delay = v12.delay, retries = v12.retries })
 
-				return v80(p10, u95)
-			end):andThen(function(p11) -- line: 275
-				-- upvalues: logEventOnceIfEnabled (copy), v69 (copy), v78 (copy)
-				logEventOnceIfEnabled("persona_flow_end")
-				v69(true)
-				logEventOnceIfEnabled("status_polling_init")
+	local v15 = React.useCallback(function(data, p)
+		local sessionIdentifier = data.sessionIdentifier
+		local verificationLink = data.verificationLink
+		local sessionToken = data.sessionToken
 
-				return v78(p11)
-			end):andThen(function() -- line: 281
-				-- upvalues: logEventOnceIfEnabled (copy), v75 (copy), u95 (ref)
-				logEventOnceIfEnabled("status_polling_end")
+		if FacialAgeEstimationServiceWrapper.isAvailable() then
+			authModalShown(entryPointEventCtx, p, "nativeFae")
+			setState4(true)
+			return FacialAgeEstimationServiceWrapper.startFlow(sessionIdentifier, sessionToken)
+		elseif v6 then
+			setState4(false)
+			authModalShown(entryPointEventCtx, p, "faeQRCodeHandoff")
+			local v15 = "roblox%3A%2F%2Fnavigation%2Famp_wizard%3Ffeature_name=TriggerFacialAgeEstimationRecourse%26namespace=account_identity%252FAgeCheck%26entry_point=" .. entryPointEventCtx .. "%26user_id=" .. tostring(Players.LocalPlayer and Players.LocalPlayer.UserId or 0)
+			setState3("https://ro.blox.com/Ebh5" .. "?pid=QR_code&c=fae_onelink" .. "&is_retargeting=false" .. "&af_dp=" .. v15 .. "&deep_link_value=" .. v15)
 
-				return v75(u95)
-			end):catch(function(p12) -- line: 285
-				-- upvalues: logEventOnceIfEnabled (copy), v33 (copy), v74 (copy), u95 (ref), v73 (copy)
-				logEventOnceIfEnabled("status_polling_end")
+			return Promise.resolve(sessionIdentifier)
+		else
+			if GetFFlagEnableWebAmpWizardForFAEHandoff() then
+				authModalShown(entryPointEventCtx, p, "webHandoffFAE")
+				setState4(false)
 
-				if v33 and (p12 and p12.resultType == Enum.FacialAgeEstimationResultType.Cancel) then
-					v74(u95)
-
-					return
+				setState2(UrlUtils.buildAmpWizardUrl(
+					"TriggerAgeVerifyRecourse",
+					"social%2FUpsells",
+					entryPointEventCtx,
+					"my%2Faccount"
+				))
+			else
+				if defineFastFlag2 and (not verificationLink or verificationLink == "") then
+					return Promise.reject("Invalid verification link")
 				end
 
-				v73(u95)
+				authModalShown(entryPointEventCtx, p, "noNativeFae")
+				setState4(false)
+
+				if v4 then
+					return Promise.new(function(callback)
+						v11(verificationLink, function()
+							callback(sessionIdentifier)
+						end)
+					end)
+				end
+
+				if skipFacialAgeEstimationWebLinkModal then
+					v5:openURL(verificationLink)
+				else
+					setState2(verificationLink)
+				end
+			end
+
+			return Promise.resolve(sessionIdentifier)
+		end
+	end, { entryPointEventCtx, v4, v11, setState4, skipFacialAgeEstimationWebLinkModal, v5, v6 })
+
+	React.useEffect(function()
+		local v16 = sessionId
+
+		if not GetFFlagEnableRoactNetworkingForChallengeInteception() then
+			IDVApiProvider.startVerification({ ageEstimation = true }):andThen(function(p)
+				v16 = `{v16}_{p.sessionIdentifier}`
+				setState6(v16)
+				return p
+			end):andThen(function(p)
+				return v15(p, v16)
+			end):andThen(function(p)
+				setState5(true)
+				return v13(p)
+			end):andThen(function()
+				return v9(v16)
+			end):catch(function(p)
+				if defineFastFlag and p and p.resultType == Enum.FacialAgeEstimationResultType.Cancel then
+					v8(v16)
+				else
+					v7(v16)
+				end
 			end)
 
-			return function() -- line: 298
-				-- upvalues: v79 (copy)
-				v79()
+			return function()
+				v14()
 			end
 		end
 
-		IDVApiProvider.startVerification({
-			ageEstimation = true
-		}):andThen(function(p13) -- line: 303
-			-- upvalues: u95 (ref), v72 (copy)
-			u95 = `{ u95 }_{ p13.sessionIdentifier }`
-			v72(u95)
+		logEventOnceIfEnabled("start_verification_init")
+		IDVApiProvider.startVerificationWithWrappedNetworking(v3, { ageEstimation = true }):andThen(function(p)
+			v16 = `{v16}_{p.sessionIdentifier}`
+			setState6(v16)
+			logEventOnceIfEnabled("start_verification_end")
+			return p
+		end):andThen(function(p)
+			logEventOnceIfEnabled("persona_flow_init")
+			return v15(p, v16)
+		end):andThen(function(p)
+			logEventOnceIfEnabled("persona_flow_end")
+			setState5(true)
+			logEventOnceIfEnabled("status_polling_init")
+			return v13(p)
+		end):andThen(function()
+			logEventOnceIfEnabled("status_polling_end")
+			return v9(v16)
+		end):catch(function(p)
+			logEventOnceIfEnabled("status_polling_end")
 
-			return p13
-		end):andThen(function(p14) -- line: 308
-			-- upvalues: v80 (copy), u95 (ref)
-			return v80(p14, u95)
-		end):andThen(function(p15) -- line: 311
-			-- upvalues: v69 (copy), v78 (copy)
-			v69(true)
-
-			return v78(p15)
-		end):andThen(function() -- line: 315
-			-- upvalues: v75 (copy), u95 (ref)
-			return v75(u95)
-		end):catch(function(p16) -- line: 318
-			-- upvalues: v33 (copy), v74 (copy), u95 (ref), v73 (copy)
-			if v33 and (p16 and p16.resultType == Enum.FacialAgeEstimationResultType.Cancel) then
-				v74(u95)
-
-				return
+			if defineFastFlag and p and p.resultType == Enum.FacialAgeEstimationResultType.Cancel then
+				v8(v16)
+			else
+				v7(v16)
 			end
-
-			v73(u95)
 		end)
 
-		return function() -- line: 330
-			-- upvalues: v79 (copy)
-			v79()
+		return function()
+			v14()
 		end
 	end, {})
 
-	if v60 then
+	if state then
 		return React.createElement(FAEFailedModal, {
-			sessionId = v71,
+			sessionId = state6,
 			entryPointEventCtx = entryPointEventCtx,
 			onClose = onFailure,
 			onRetry = onRetry
 		})
 	end
 
-	if v64 then
+	if state3 then
 		return React.createElement(FAEWithQRCodeUpsell, {
-			appsFlyerLink = v64,
-			sessionId = v71,
+			appsFlyerLink = state3,
+			sessionId = state6,
 			entryPointEventCtx = entryPointEventCtx,
 			onCancel = onCancel
 		})
 	end
 
-	if v62 then
+	if state2 then
 		return React.createElement(FAEDirectLinkUpsell, {
-			sessionId = v71,
+			sessionId = state6,
 			entryPointEventCtx = entryPointEventCtx,
-			webLink = v62,
+			webLink = state2,
 			onCancel = onCancel
 		})
 	end
 
-	if GetFFlagShowFAELoadingModal() and v68 and not v66 then
+	if GetFFlagShowFAELoadingModal() and state5 and not state4 then
 		return React.createElement(FAELoadingModal, {
-			sessionId = v71,
+			sessionId = state6,
 			entryPointEventCtx = entryPointEventCtx,
 			onCancel = onCancel
 		})

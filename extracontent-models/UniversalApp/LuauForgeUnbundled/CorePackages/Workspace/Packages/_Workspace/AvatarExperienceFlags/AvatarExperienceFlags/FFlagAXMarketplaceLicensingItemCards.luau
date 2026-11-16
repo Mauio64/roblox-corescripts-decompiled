@@ -1,0 +1,4 @@
+local FFlagAXMarketplaceLicensing = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXMarketplaceLicensing")
+local FFlagAXMarketplaceItemCardIndicatorStack = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXMarketplaceItemCardIndicatorStack")
+
+return game:DefineFastFlag("AXMarketplaceLicensingItemCards2", false) and FFlagAXMarketplaceLicensing and FFlagAXMarketplaceItemCardIndicatorStack

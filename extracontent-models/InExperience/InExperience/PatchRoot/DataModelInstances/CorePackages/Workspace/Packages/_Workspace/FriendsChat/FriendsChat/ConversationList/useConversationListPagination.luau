@@ -1,85 +1,57 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local React = require(Parent.React)
-local ExpChatShared = require(Parent.ExpChatShared)
-local fetchConversationListPageToSignals = require(script.Parent.ExpChatConversationListAdapter).fetchConversationListPageToSignals
-local v5 = ExpChatShared.Logger:new(script.Name)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
 
-local function useConversationListPagination(b1: boolean, t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), fetchConversationListPageToSignals (copy), v5 (copy)
-	local v9 = React.useCallback(function() -- line: 24
-		-- upvalues: b1 (copy), t1 (copy), fetchConversationListPageToSignals (copy), v5 (copy)
-		if not b1 or t1.isFetchingConversations == true then
+local React = require(parent.React)
+
+local ExpChatShared = require(parent.ExpChatShared)
+
+local ExpChatConversationListAdapter = require(script.Parent.ExpChatConversationListAdapter)
+local fetchConversationListPageToSignals = ExpChatConversationListAdapter.fetchConversationListPageToSignals
+
+local v = ExpChatShared.Logger:new(script.Name)
+
+local function useConversationListPagination(flag: boolean, data)
+	local retryInitialFetch = React.useCallback(function()
+		if not flag or data.isFetchingConversations == true then
 			return
 		end
 
-		fetchConversationListPageToSignals():catch(function(p1) -- line: 29
-			-- upvalues: v5 (copy)
-			v5:warning(`Failed to retry FriendsChat conversation list fetch: { tostring(p1) }`)
+		fetchConversationListPageToSignals():catch(function(p)
+			v:warning(`Failed to retry FriendsChat conversation list fetch: {tostring(p)}`)
 		end)
-	end, {
-		b1,
-		t1.isFetchingConversations
-	})
-	local v10 = React.useCallback(function() -- line: 40
-		-- upvalues: b1 (copy), t1 (copy), fetchConversationListPageToSignals (copy), v5 (copy)
-		if not b1 then
+	end, { flag, data.isFetchingConversations })
+
+	local loadNext = React.useCallback(function()
+		if not flag or (data.isFetchingConversations == true or data.isExhausted == true) then
 			return
 		end
 
-		if t1.isFetchingConversations == true or t1.isExhausted == true then
-			return
-		end
-
-		local nextCursor = t1.nextCursor
+		local nextCursor = data.nextCursor
 
 		if nextCursor == nil or nextCursor == "" then
 			return
 		end
 
-		fetchConversationListPageToSignals({
-			cursor = nextCursor
-		}):catch(function(p2) -- line: 54
-			-- upvalues: v5 (copy)
-			v5:warning(`Failed to fetch next FriendsChat conversation list page: { tostring(p2) }`)
+		fetchConversationListPageToSignals({ cursor = nextCursor }):catch(function(p)
+			v:warning(`Failed to fetch next FriendsChat conversation list page: {tostring(p)}`)
 		end)
-	end, {
-		b1,
-		t1.isFetchingConversations,
-		t1.isExhausted,
-		t1.nextCursor
-	})
+	end, { flag, data.isFetchingConversations, data.isExhausted, data.nextCursor })
 
-	React.useEffect(function() -- line: 67
-		-- upvalues: b1 (copy), t1 (copy), fetchConversationListPageToSignals (copy), v5 (copy)
-		if not b1 then
+	React.useEffect(function(): nil
+		if
+			not flag
+			or data.isFetchingConversations == true
+			or (data.hasFetchedInitialPage == true or data.error ~= nil)
+		then
 			return nil
 		end
 
-		if t1.isFetchingConversations == true then
-			return nil
-		end
-
-		if t1.hasFetchedInitialPage == true or t1.error ~= nil then
-			return nil
-		end
-
-		fetchConversationListPageToSignals():catch(function(p3) -- line: 78
-			-- upvalues: v5 (copy)
-			v5:warning(`Failed to fetch initial FriendsChat conversation list page: { tostring(p3) }`)
+		fetchConversationListPageToSignals():catch(function(p)
+			v:warning(`Failed to fetch initial FriendsChat conversation list page: {tostring(p)}`)
 		end)
-
 		return nil
-	end, {
-		b1,
-		t1.error,
-		t1.hasFetchedInitialPage,
-		t1.isFetchingConversations
-	})
+	end, { flag, data.error, data.hasFetchedInitialPage, data.isFetchingConversations })
 
-	return {
-		loadNext = v10,
-		retryInitialFetch = v9
-	}
+	return { loadNext = loadNext, retryInitialFetch = retryInitialFetch }
 end
 
 return useConversationListPagination

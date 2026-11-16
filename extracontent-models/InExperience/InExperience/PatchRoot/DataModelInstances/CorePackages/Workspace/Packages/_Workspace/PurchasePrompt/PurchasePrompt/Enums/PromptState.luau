@@ -1,6 +1,7 @@
-return (require(script.Parent.createEnum)("PromptState", {
+local createEnum = require(script.Parent.createEnum)
+
+return (createEnum("PromptState", {
 	"None",
-	"PremiumUpsell",
 	"RobuxUpsell",
 	"LargeRobuxUpsell",
 	"PromptPurchase",

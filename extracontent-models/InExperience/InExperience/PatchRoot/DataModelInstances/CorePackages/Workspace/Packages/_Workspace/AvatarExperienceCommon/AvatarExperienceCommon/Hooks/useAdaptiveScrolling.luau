@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local React = require(parent.React)
 local AdaptiveScrollingContext = require(script.Parent.AdaptiveScrollingContext)
 
-local function useAdaptiveScrolling() -- line: 15
-	-- upvalues: React (copy), AdaptiveScrollingContext (copy)
+local function useAdaptiveScrolling()
 	return React.useContext(AdaptiveScrollingContext)
 end
 

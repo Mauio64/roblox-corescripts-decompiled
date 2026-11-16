@@ -1,13 +1,32 @@
-local function formatNumberWithShortUnits(n1: number) -- line: 30
-	local v3 = math.abs(n1)
-	local v4 = if not (v3 >= 1000000000) then if not (v3 >= 1000000) then if not (v3 >= 1000) then tostring(n1) else if not (v3 >= 100000) then ("%.1fK"):format(n1 / 1000) else ("%.0fK"):format((math.floor(n1 / 1000))) else if not (v3 >= 100000000) then ("%.1fM"):format(n1 / 1000000) else ("%.0fM"):format((math.floor(n1 / 1000000))) else ("%.0fB"):format((math.floor(n1 / 1000000000)))
-	local v5, v6 = v4:match("(%d+)%.0(%w+)")
+local function formatNumberWithShortUnits(p: number)
+	local v = math.abs(p)
+	local v2
 
-	if v5 and v6 then
-		v4 = v5 .. v6
+	if v >= 1000000000 then
+		v2 = ("%.0fB"):format((math.floor(p / 1000000000)))
+	elseif v >= 1000000 then
+		if v >= 100000000 then
+			v2 = ("%.0fM"):format((math.floor(p / 1000000)))
+		else
+			v2 = ("%.1fM"):format(p / 1000000)
+		end
+	elseif v >= 1000 then
+		if v >= 100000 then
+			v2 = ("%.0fK"):format((math.floor(p / 1000)))
+		else
+			v2 = ("%.1fK"):format(p / 1000)
+		end
+	else
+		v2 = tostring(p)
 	end
 
-	return v4
+	local match, v3 = v2:match("(%d+)%.0(%w+)")
+
+	if match and v3 then
+		return match .. v3
+	end
+
+	return v2
 end
 
 return formatNumberWithShortUnits

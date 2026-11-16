@@ -1,18 +1,18 @@
-local t1 = {
+local MockableProxyServices = {
 	["jest.config"] = script["jest.config"],
 	game = game,
-	waitProxy = function(p1) -- line: 4
-		wait(p1)
+	waitProxy = function(p)
+		wait(p)
 	end,
-	settingsProxy = function() -- line: 7
+	settingsProxy = function()
 		return settings()
 	end
 }
 
-setmetatable(t1, {
-	__index = function(_, p3) -- line: 13
-		return game:GetService(p3)
+setmetatable(MockableProxyServices, {
+	__index = function(_, serviceName)
+		return game:GetService(serviceName)
 	end
 })
 
-return t1
+return MockableProxyServices

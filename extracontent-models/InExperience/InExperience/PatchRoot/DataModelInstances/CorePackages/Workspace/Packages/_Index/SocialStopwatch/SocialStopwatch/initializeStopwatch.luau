@@ -1,51 +1,80 @@
 local SocialStopwatch = script:FindFirstAncestor("SocialStopwatch")
-local SocialStopwatchParent = SocialStopwatch.Parent
+local parent = SocialStopwatch.Parent
 local HttpService = game:GetService("HttpService")
-local Timers = require(SocialStopwatchParent.SocialLuaAnalytics).Analytics.Timing.Timers
 
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Timers = SocialLuaAnalytics.Analytics.Timing.Timers
 require(SocialStopwatch.Events)
-
 local EventModes = require(SocialStopwatch.EventModes)
 local EventRegister = require(SocialStopwatch.EventRegister)
-local LoggingProtocol = require(SocialStopwatchParent.LoggingProtocol)
+local LoggingProtocol = require(parent.LoggingProtocol)
 local StopwatchTelemetryConfig = require(SocialStopwatch.StopwatchTelemetryConfig)
-
 require(script.Parent.Types)
 
-return function() -- line: 21
-	-- upvalues: Timers (copy), LoggingProtocol (copy), EventRegister (copy), StopwatchTelemetryConfig (copy), EventModes (copy), HttpService (copy)
-	local t1 = {}
-	local v10 = Timers()
+return function()
+	local v = {}
+	local timers = Timers()
 	local default = LoggingProtocol.default
-	local s1 = "Get"
-	local s2 = "Stop"
 
-	local function v14(p1) -- line: 35
-		-- upvalues: EventRegister (copy), t1 (ref), default (copy), StopwatchTelemetryConfig (copy), s2 (copy), EventModes (copy), v10 (copy)
-		local v22 = EventRegister[p1]
+	local v2 = "Get"
 
-		if not v22 then
-			error("Event not registered: " .. p1)
+	local function fn(p) -- 3 equivalent calls inferred from this helper
+		local v3 = EventRegister[p]
+
+		if not v3 then
+			error("Event not registered: " .. p)
 		end
 
-		local v23 = t1[p1]
+		return v3
+	end
 
-		if not v23 then
+	local function fn2(p)
+		local v3 = fn(p) -- inferred equivalent call
+		local id = v[p]
+
+		if not id then
 			default:logRobloxTelemetryEvent(StopwatchTelemetryConfig, { default.StandardizedFields.addOsInfo }, {
-				count = 1,
-				eventName = `FailedOn{ s2 }{ p1 }`
+				eventName = `FailedOn{v2}{p}`,
+				count = 1
 			})
 
-			if v22.mode == EventModes.Strict then
-				error(`Cannot { s2 } an event that has not been started: { p1 }`)
+			if v3.mode == EventModes.Strict then
+				error(`Cannot {v2} an event that has not been started: {p}`)
 			end
 		end
 
-		if v23 and v10.getStartTimestamp(v23) then
+		if id and timers.getStartTimestamp(id) then
 			return {
-				startTime = v10.getStartTimestamp(v23),
-				id = v23,
-				timeElapsed = v10.getTime(v23)
+				startTime = timers.getStartTimestamp(id),
+				id = id,
+				timeElapsed = timers.getTime(id)
+			}
+		end
+
+		return nil
+	end
+
+	local v3 = "Stop"
+	local function fn3(p)
+		local v4 = fn(p) -- inferred equivalent call
+		local id = v[p]
+
+		if not id then
+			default:logRobloxTelemetryEvent(StopwatchTelemetryConfig, { default.StandardizedFields.addOsInfo }, {
+				eventName = `FailedOn{v3}{p}`,
+				count = 1
+			})
+
+			if v4.mode == EventModes.Strict then
+				error(`Cannot {v3} an event that has not been started: {p}`)
+			end
+		end
+
+		if id and timers.getStartTimestamp(id) then
+			return {
+				startTime = timers.getStartTimestamp(id),
+				id = id,
+				timeElapsed = timers.getTime(id)
 			}
 		end
 
@@ -53,76 +82,33 @@ return function() -- line: 21
 	end
 
 	return {
-		start = function(p2, p3) -- line: 65
-			-- upvalues: EventRegister (copy), v10 (copy), HttpService (copy), t1 (ref), default (copy), StopwatchTelemetryConfig (copy), EventModes (copy)
-			local v26 = EventRegister[p2]
+		start = function(p, p2)
+			local v4 = fn(p) -- inferred equivalent call
+			local id = timers.start(HttpService:GenerateGUID(false), p2)
 
-			if not v26 then
-				error("Event not registered: " .. p2)
-			end
-
-			local v27 = v10.start(HttpService:GenerateGUID(false), p3)
-
-			if t1[p2] then
+			if v[p] then
 				default:logRobloxTelemetryEvent(StopwatchTelemetryConfig, { default.StandardizedFields.addOsInfo }, {
-					count = 1,
-					eventName = `FailedOnStart{ p2 }`
+					eventName = `FailedOnStart{p}`,
+					count = 1
 				})
 
-				if v26.mode == EventModes.Strict then
-					error("Cannot start event twice: " .. p2)
+				if v4.mode == EventModes.Strict then
+					error("Cannot start event twice: " .. p)
 				end
 			end
 
-			t1[p2] = v27
+			v[p] = id
 
-			return {
-				startTime = v10.getStartTimestamp(v27),
-				id = v27
-			}
+			return { startTime = timers.getStartTimestamp(id), id = id }
 		end,
-		get = function(p4) -- line: 35
-			-- upvalues: EventRegister (copy), t1 (ref), default (copy), StopwatchTelemetryConfig (copy), s1 (copy), EventModes (copy), v10 (copy)
-			local v19 = EventRegister[p4]
-
-			if not v19 then
-				error("Event not registered: " .. p4)
-			end
-
-			local v20 = t1[p4]
-
-			if not v20 then
-				default:logRobloxTelemetryEvent(StopwatchTelemetryConfig, { default.StandardizedFields.addOsInfo }, {
-					count = 1,
-					eventName = `FailedOn{ s1 }{ p4 }`
-				})
-
-				if v19.mode == EventModes.Strict then
-					error(`Cannot { s1 } an event that has not been started: { p4 }`)
-				end
-			end
-
-			if v20 and v10.getStartTimestamp(v20) then
-				return {
-					startTime = v10.getStartTimestamp(v20),
-					id = v20,
-					timeElapsed = v10.getTime(v20)
-				}
-			end
-
-			return nil
+		get = fn2,
+		stop = function(p)
+			local v4 = fn3(p)
+			v[p] = nil
+			return v4
 		end,
-		stop = function(p5) -- line: 90
-			-- upvalues: v14 (copy), t1 (ref)
-			local v29 = v14(p5)
-
-			t1[p5] = nil
-
-			return v29
-		end,
-		_unsafeClearEventLog = function() -- line: 95
-			-- upvalues: t1 (ref)
-			t1 = {}
+		_unsafeClearEventLog = function()
+			v = {}
 		end
 	}
 end

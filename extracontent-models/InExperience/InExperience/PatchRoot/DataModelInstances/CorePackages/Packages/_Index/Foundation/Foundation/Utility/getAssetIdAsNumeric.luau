@@ -1,15 +1,9 @@
-local function getAssetIdAsNumeric(p1) -- line: 3
-	if typeof(p1) == "number" then
-		return p1
+local function getAssetIdAsNumeric(value)
+	if typeof(value) == "number" then
+		return value
 	end
 
-	local num = tonumber(p1:match("(%d+)$"))
-
-	if num then
-		return num
-	end
-
-	return -1
+	return tonumber(value:match("(%d+)$")) or -1
 end
 
 return getAssetIdAsNumeric

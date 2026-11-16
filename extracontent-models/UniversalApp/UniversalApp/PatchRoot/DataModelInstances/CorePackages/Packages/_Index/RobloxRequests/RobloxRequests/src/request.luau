@@ -1,214 +1,207 @@
-local ParentParent = script.Parent.Parent
-local lib = ParentParent.lib
-local src = ParentParent.src
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local lib = parent.lib
+local src = parent.src
+local parent2 = parent.Parent
+
 local HttpService = game:GetService("HttpService")
+
 local url = require(lib.url)
-local Promise = require(ParentParentParent.Promise)
+local Promise = require(parent2.Promise)
+
 local json = require(src.json)
 local response = require(src.response)
 local cookies = require(src.cookies)
 local ratelimit = require(src.ratelimit)
 local util = require(src.util)
+
 local cache = require(src.cache)
-local t1 = {}
 
-t1.__index = t1
+local Request = {}
+Request.__index = Request
+function Request.new(value, input_url, options)
+	local self = setmetatable({}, Request)
 
-function t1.new(p1, p2, p3) -- line: 26
-	-- upvalues: t1 (copy), url (copy), ratelimit (copy), cookies (copy)
-	local self = setmetatable({}, t1)
-	local v19 = p3 or {}
-	local v20 = url.parse(p2)
-	local v21 = v19.headers or {}
+	options = options or {}
 
-	self.method = p1:upper()
-	self.url = v20
-	self.input_url = p2
-	self.headers = v21
+	local parsed = url.parse(input_url)
+	local headers = options.headers or {}
+
+	self.method = value:upper()
+	self.url = parsed
+	self.input_url = input_url
+	self.headers = headers
 	self.query = {}
 	self.data = nil
-	self._ratelimits = { ratelimit.get("http", 250, 30) }
-	self.ignore_ratelimit = v19.ignore_ratelimit or false
 
-	if v19.data then
-		self:set_data(v19.data)
+	self._ratelimits = { ratelimit.get("http", 250, 30) }
+
+	self.ignore_ratelimit = options.ignore_ratelimit or false
+
+	if options.data then
+		self:set_data(options.data)
 	end
 
-	self:set_query(v19.query or {})
+	self:set_query(options.query or {})
 
-	local v22 = v19.cookies or {}
+	local cookies2 = options.cookies or {}
 
-	if not v22.__cookiejar then
-		local v23 = cookies.new()
+	if not cookies2.__cookiejar then
+		local v = cookies.new()
 
-		if v22 then
-			for k, v in pairs(v22) do
-				v23:insert(k, v)
+		if cookies2 then
+			for k, v2 in pairs(cookies2) do
+				v:insert(k, v2)
 			end
 		end
 
-		v22 = v23
+		cookies2 = v
 	end
 
-	self.cookies = v22
-	self.headers.Cookie = v22:string(p2)
+	self.cookies = cookies2
+	self.headers.Cookie = cookies2:string(input_url)
+
 	self._callback = nil
-	self._log = v19.log == nil or v19.log
+
+	self._log = options.log == nil or options.log
 
 	return self
 end
-function t1.set_headers(p4, p5) -- line: 87
-	for k, v in pairs(p5) do
-		p4.headers[k] = v
+
+function Request.set_headers(p, items)
+	for k, item in pairs(items) do
+		p.headers[k] = item
 	end
 
-	return p4
+	return p
 end
 
-t1.update_headers = util.deprecate(t1.set_headers, "0.5", "update_headers")
+Request.update_headers = util.deprecate(Request.set_headers, "0.5", "update_headers")
 
-function t1.set_query(p6, p7) -- line: 98
-	for k, v in pairs(p7) do
-		p6.query[k] = v
+function Request:set_query(items)
+	for k, item in pairs(items) do
+		self.query[k] = item
 	end
 
-	p6.url:setQuery(p6.query)
+	self.url:setQuery(self.query)
 
-	return p6
+	return self
 end
 
-t1.update_query = util.deprecate(t1.set_headers, "0.5", "update_query")
+Request.update_query = util.deprecate(Request.set_headers, "0.5", "update_query")
 
-function t1.set_data(p8, p9) -- line: 111
-	-- upvalues: json (copy)
-	if type(p9) == "table" then
-		if p9.__FormData then
-			p8.headers["Content-Type"] = p9.content_type
-			p9 = p9:build()
+function Request:set_data(object)
+	if type(object) == "table" then
+		if object.__FormData then
+			self.headers["Content-Type"] = object.content_type
+			object = object:build()
 		else
-			p9 = json.enc(p9)
-			p8.headers["Content-Type"] = "application/json"
+			object = json.enc(object)
+			self.headers["Content-Type"] = "application/json"
 		end
 	end
 
-	p8.data = p9
+	self.data = object
 
-	return p8
+	return self
 end
-function t1._ratelimit(p10) -- line: 129
-	for _, v in ipairs(p10._ratelimits) do
-		if not v:request() then
+
+function Request:_ratelimit(): boolean
+	for _, ratelimit2 in ipairs(self._ratelimits) do
+		if not ratelimit2:request() then
 			return false
 		end
 	end
 
 	return true
 end
-function t1._send(p11) -- line: 141
-	-- upvalues: cache (copy), response (copy), HttpService (copy)
-	local t2 = {
-		Url = p11.url:build(),
-		Method = p11.method,
-		Headers = p11.headers
-	}
 
-	if p11.data ~= nil then
-		t2.Body = p11.data
+function Request:_send()
+	local v = { ["Url"] = self.url:build(), Method = self.method, Headers = self.headers }
+
+	if self.data ~= nil then
+		v.Body = self.data
 	end
 
-	local v41 = t2.Url:sub(-1, -1) == "/" and t2.Url:sub(1, -2) or t2.Url
-	local v42 = ("Request_%s_%s_%s"):format(p11.method, v41, t2.Body or "")
+	local v2 = v.Url:sub(-1, -1) == "/" and v.Url:sub(1, -2) or v.Url
 
-	if p11.method:upper() == "GET" and cache.is_cached(t2.Url, v42) then
-		local timestamp = tick()
-		local v44, v45 = cache.get_cached(t2.Url, v42)
+	local formatted = ("Request_%s_%s_%s"):format(self.method, v2, v.Body or "")
 
-		if timestamp - v44.timestamp <= cache.get_expire(t2.Url) then
-			local v46 = response.new(p11, v44, tick() - timestamp)
+	if self.method:upper() == "GET" and cache.is_cached(v.Url, formatted) then
+		local lastTime = tick()
+		local get_cached, v3 = cache.get_cached(v.Url, formatted)
 
-			v46.from_cache = true
-			print("[http]", v45:upper(), "CACHE |", v46.method, v46.url)
+		if lastTime - get_cached.timestamp <= cache.get_expire(v.Url) then
+			local v4 = response.new(self, get_cached, tick() - lastTime)
+			v4.from_cache = true
 
-			return v46
+			print("[http]", v3:upper(), "CACHE |", v4.method, v4.url)
+			return v4
 		end
 	end
 
-	local n1 = 0
-	local v48 = false
-	local v49 = nil
-	local v50 = nil
+	local count = 0
+	local v3 = false
+	local v4 = nil
+	local v5 = nil
 
-	while n1 < 5 do
-		if p11.ignore_ratelimit or p11:_ratelimit() then
-			local timestamp = tick()
+	while count < 5 do
+		if self.ignore_ratelimit or self:_ratelimit() then
+			local lastTime = tick()
 
-			v50 = HttpService:RequestAsync(t2)
-			v49 = response.new(p11, v50, tick() - timestamp)
-			p11.timestamp = timestamp
-			v48 = true
-
+			v5 = HttpService:RequestAsync(v)
+			v4 = response.new(self, v5, tick() - lastTime)
+			self.timestamp = lastTime
+			v3 = true
 			break
 		end
 
 		warn("[http] Rate limit exceeded. Retrying in 5 seconds")
-		n1 += 1
+
+		count += 1
 		wait(5)
 	end
 
-	if not v48 then
+	if not v3 then
 		error("[http] Rate limit still exceeded after 5 attempts")
 	end
 
-	if p11._log then
-		local v52 = tostring(math.floor(p11._ratelimits[#p11._ratelimits]:consumption() * 1000) * 0.1) .. "%"
+	if self._log then
+		local v6 = tostring(math.floor(self._ratelimits[#self._ratelimits]:consumption() * 1000) * 0.1) .. "%"
 
-		print("[http]", v49.code, v49.message, "|", v49.method, v49.url, "(", v52, "ratelimit )")
+		print("[http]", v4.code, v4.message, "|", v4.method, v4.url, "(", v6, "ratelimit )")
 	end
 
-	if p11._callback then
-		p11._callback(v49)
+	if self._callback then
+		self._callback(v4)
 	end
 
-	if p11.method:upper() == "GET" and v49.ok and cache.should_cache(t2.Url) then
-		cache.update_cache(t2.Url, v42, v50)
+	if self.method:upper() == "GET" and v4.ok and cache.should_cache(v.Url) then
+		cache.update_cache(v.Url, formatted, v5)
 	end
 
-	return v49
+	return v4
 end
-function t1.send(p12, p13) -- line: 212
-	-- upvalues: Promise (copy)
-	if p13 then
-		return Promise.new(function(resolve, reject) -- line: 218
-			-- upvalues: p12 (copy)
-			local ok, result = pcall(p12._send, p12)
 
-			if ok and result.ok then
-				resolve(result)
+function Request:send(p)
+	if p then
+		return Promise.new(function(callback, callback2)
+			local success, result = pcall(self._send, self)
 
-				return
+			if success and result.ok then
+				callback(result)
+			elseif success then
+				callback2({ request_sent = true, response = result })
+			else
+				callback2({ request_sent = false, error = result })
 			end
-
-			if ok then
-				reject({
-					request_sent = true,
-					response = result
-				})
-
-				return
-			end
-
-			reject({
-				request_sent = false,
-				error = result
-			})
 		end)
 	end
 
-	return p12:_send()
-end
-function t1.promise(p14) -- line: 238
-	return p14:send(true)
+	return self:_send()
 end
 
-return t1
+function Request:promise()
+	return self:send(true)
+end
+
+return Request

@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
+local parent = script:FindFirstAncestor("Moments").Parent
 
-require(Parent.React)
-require(Parent.Signals)
+require(parent.React)
+require(parent.Signals)
+
 require(script.Parent.createPagerStore)
 
 return {}

@@ -1,17 +1,10 @@
 local SettingsService = require(script.SettingsService)
-
 require(script.Types)
-
-local SettingEnum = require(script.SettingEnum)
-local ValueChangedSignal = require(script.ValueChangedSignal)
-local AvailabilitySignal = require(script.AvailabilitySignal)
-local VisibilitySignal = require(script.VisibilitySignal)
-
 return {
-	SettingEnum = SettingEnum,
+	SettingEnum = require(script.SettingEnum),
 	SettingsService = SettingsService,
-	ValueChangedSignal = ValueChangedSignal,
-	AvailabilitySignal = AvailabilitySignal,
-	VisibilitySignal = VisibilitySignal,
+	ValueChangedSignal = require(script.ValueChangedSignal),
+	AvailabilitySignal = require(script.AvailabilitySignal),
+	VisibilitySignal = require(script.VisibilitySignal),
 	["jest.config"] = script["jest.config"]
 }

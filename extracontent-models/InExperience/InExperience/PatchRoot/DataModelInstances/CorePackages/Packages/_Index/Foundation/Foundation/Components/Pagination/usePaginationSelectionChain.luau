@@ -1,69 +1,66 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local useRefCache = require(FoundationParent.ReactUtils).useRefCache
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useRefCache = ReactUtils.useRefCache
 
 require(Foundation.Components.Types)
 
-local function usePaginationSelectionChain(t1: {[any]: any}, p1, p2: ((...any) -> ...any)?) -- line: 22
-	-- upvalues: useRefCache (copy), React (copy)
-	local v9 = useRefCache()
-	local v10 = t1[1]
-	local v11 = React.useCallback(function(s1: string) -- line: 30
-		-- upvalues: v9 (copy), v10 (copy), p2 (copy)
-		local v14 = v9[s1]
+local function usePaginationSelectionChain(list, p, callback)
+	local v = useRefCache()
+	local item = list[1]
 
-		if s1 ~= v10 or p2 == nil then
-			return v14
+	local getSlotRef = React.useCallback(function(p2: string)
+		local v2 = v[p2]
+
+		if item == p2 and callback ~= nil then
+			return function(current)
+				v2.current = current
+				callback(current)
+			end
 		end
 
-		return function(p3) -- line: 36
-			-- upvalues: v14 (copy), p2 (copy)
-			v14.current = p3
-			p2(p3)
-		end
-	end, {
-		v10,
-		p2,
-		v9
-	})
-	local v12 = React.useCallback(function(s2: string) -- line: 42
-		-- upvalues: t1 (copy), v9 (copy), p1 (copy)
-		local v16 = table.find(t1, s2)
+		return v2
+	end, { item, callback, v })
 
-		if v16 == nil then
-			return {
-				Selectable = false,
-				ref = v9[s2]
-			}
+	local getSlotBindings = React.useCallback(function(p2: string)
+		local index = table.find(list, p2)
+
+		if index == nil then
+			return { ref = v[p2], Selectable = false }
 		end
 
-		return {
+		local v2 = {
+			ref = v[p2],
 			Selectable = true,
-			ref = v9[s2],
-			NextSelectionLeft = if not (v16 > 1) then nil else v9[t1[v16 - 1]],
-			NextSelectionRight = if not (v16 < #t1) then nil else v9[t1[v16 + 1]],
-			NextSelectionUp = p1 and p1.NextSelectionUp,
-			NextSelectionDown = p1 and p1.NextSelectionDown
+			NextSelectionLeft = 0,
+			NextSelectionRight = 0,
+			NextSelectionUp = 0,
+			NextSelectionDown = 0
 		}
-	end, {
-		t1,
-		v9,
-		p1
-	})
+		local nextSelectionLeft
 
-	return React.useMemo(function() -- line: 61
-		-- upvalues: v10 (copy), v12 (copy), v11 (copy)
-		return {
-			firstSlotId = v10,
-			getSlotBindings = v12,
-			getSlotRef = v11
-		}
-	end, {
-		v10,
-		v12,
-		v11
-	})
+		if index > 1 then
+			nextSelectionLeft = v[list[index - 1]]
+		end
+
+		v2.NextSelectionLeft = nextSelectionLeft
+		local nextSelectionRight
+
+		if index < #list then
+			nextSelectionRight = v[list[index + 1]]
+		end
+
+		v2.NextSelectionRight = nextSelectionRight
+		v2.NextSelectionUp = p and p.NextSelectionUp
+		v2.NextSelectionDown = p and p.NextSelectionDown
+		return v2
+	end, { list, v, p })
+
+	return React.useMemo(function()
+		return { firstSlotId = item, getSlotBindings = getSlotBindings, getSlotRef = getSlotRef }
+	end, { item, getSlotBindings, getSlotRef })
 end
 
 return usePaginationSelectionChain

@@ -1,18 +1,23 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local Cryo = require(ParentParentParent.Cryo)
-local RoactGamepad = require(ParentParentParent.RoactGamepad)
-local t = require(ParentParentParent.t)
-local Button = require(scriptParent.Button)
-local ButtonType = require(scriptParent.Enum.ButtonType)
-local GetTextSize = require(ParentParent.Core.Text.GetTextSize)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local FitFrameOnAxis = require(ParentParentParent.FitFrame).FitFrameOnAxis
-local v13 = Roact.PureComponent:extend("ButtonStack")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
 
-v13.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local Cryo = require(parent3.Cryo)
+local RoactGamepad = require(parent3.RoactGamepad)
+local t = require(parent3.t)
+
+local Button = require(parent.Button)
+local ButtonType = require(parent.Enum.ButtonType)
+local GetTextSize = require(parent2.Core.Text.GetTextSize)
+local withStyle = require(parent2.Core.Style.withStyle)
+
+local FitFrame = require(parent3.FitFrame)
+local FitFrameOnAxis = FitFrame.FitFrameOnAxis
+
+local extended = Roact.PureComponent:extend("ButtonStack")
+
+extended.validateProps = t.strictInterface({
 	buttons = t.array(t.strictInterface({
 		buttonType = t.optional(ButtonType.isEnumValue),
 		props = Button.validateProps,
@@ -31,119 +36,209 @@ v13.validateProps = t.strictInterface({
 	frameRef = t.optional(t.table),
 	isRoactGamepadEnabled = t.optional(t.boolean)
 })
-v13.defaultProps = {
+
+extended.defaultProps = {
 	buttonHeight = 36,
 	marginBetween = 12,
 	minHorizontalButtonPadding = 8,
 	isRoactGamepadEnabled = true
 }
 
-function v13.init(p1) -- line: 71
-	-- upvalues: RoactGamepad (copy)
-	p1.buttonRefs = RoactGamepad.createRefCache()
-	p1.state = {
-		frameWidth = 0
-	}
+function extended:init()
+	self.buttonRefs = RoactGamepad.createRefCache()
 
-	function p1.updateFrameSize(p2) -- line: 78
-		-- upvalues: p1 (copy)
-		local AbsoluteSizeX = p2.AbsoluteSize.X
+	self.state = { frameWidth = 0 }
 
-		if AbsoluteSizeX ~= p1.state.frameWidth then
-			p1:setState({
-				frameWidth = AbsoluteSizeX
-			})
+	function self.updateFrameSize(p)
+		local x = p.AbsoluteSize.X
+
+		if x ~= self.state.frameWidth then
+			self:setState({ frameWidth = x })
 		end
 	end
 end
-function v13.render(p3) -- line: 88
-	-- upvalues: withStyle (copy), GetTextSize (copy), ButtonType (copy), Cryo (copy), Roact (copy), Button (copy), RoactGamepad (copy), FitFrameOnAxis (copy)
-	return withStyle(function(p4) -- line: 89
-		-- upvalues: p3 (copy), GetTextSize (copy), ButtonType (copy), Cryo (copy), Roact (copy), Button (copy), RoactGamepad (copy), FitFrameOnAxis (copy)
-		local p4Font = p4.Font
-		local v23 = p4Font.Body.RelativeSize * p4Font.BaseSize
-		local isRoactGamepadEnabled = p3.props.isRoactGamepadEnabled
-		local buttons = p3.props.buttons
-		local v26 = #buttons > 1 and p3.props.marginBetween or 0
-		local v27 = p3.state.frameWidth / #buttons - v26 * (#buttons - 1) / #buttons
-		local v28 = false
-		local v29 = nil
-		local forcedFillDirection
 
-		if p3.props.forcedFillDirection then
-			v28 = p3.props.forcedFillDirection == Enum.FillDirection.Vertical
-			forcedFillDirection = p3.props.forcedFillDirection
+function extended.render(data)
+	return withStyle(function(p)
+		local font = p.Font
+		local v = font.Body.RelativeSize * font.BaseSize
+
+		local isRoactGamepadEnabled = data.props.isRoactGamepadEnabled
+
+		local buttons = data.props.buttons
+		local marginBetween = #buttons > 1 and data.props.marginBetween or 0
+		local v2 = data.state.frameWidth / #buttons - marginBetween * (#buttons - 1) / #buttons
+
+		local v3 = false
+
+		local v4 = nil
+		local fillDirection
+
+		if data.props.forcedFillDirection then
+			v3 = data.props.forcedFillDirection == Enum.FillDirection.Vertical
+			fillDirection = data.props.forcedFillDirection
 		else
-			for _, v in ipairs(buttons) do
-				if GetTextSize(v.props.text or "", v23, p4Font.Body.Font, Vector2.new(p3.state.frameWidth, p3.props.buttonHeight), not not v.props.buttonTextOverride and v.props.buttonTextOverride.RichText).X > v27 - 2 * p3.props.minHorizontalButtonPadding then
-					v28 = true
+			for _, button in ipairs(buttons) do
+				local text = button.props.text or ""
 
+				local font2 = font.Body.Font
+				local vector2 = Vector2.new(data.state.frameWidth, data.props.buttonHeight)
+				local v5
+
+				if button.props.buttonTextOverride then
+					v5 = button.props.buttonTextOverride.RichText
+				else
+					v5 = false
+				end
+
+				if GetTextSize(text, v, font2, vector2, v5).X > v2 - 2 * data.props.minHorizontalButtonPadding then
+					v3 = true
 					break
 				end
 			end
 
-			forcedFillDirection = v28 and Enum.FillDirection.Vertical or Enum.FillDirection.Horizontal
+			fillDirection = v3 and Enum.FillDirection.Vertical or Enum.FillDirection.Horizontal
 		end
 
-		local v33 = v28 and UDim2.new(1, 0, 0, p3.props.buttonHeight) or UDim2.new(0, v27, 0, p3.props.buttonHeight)
-		local t1 = {}
+		local udim = v3 and UDim2.new(1, 0, 0, data.props.buttonHeight) or UDim2.new(0, v2, 0, data.props.buttonHeight)
 
-		for i, v in ipairs(buttons) do
-			local t2 = {
+		local children = {}
+
+		for i, button in ipairs(buttons) do
+			local v5 = {
 				key = tostring(i),
-				layoutOrder = v28 and #buttons - i or i,
-				size = v33,
-				buttonType = v.buttonType or ButtonType.Secondary,
-				isRoactGamepadEnabled = isRoactGamepadEnabled
+				layoutOrder = 0,
+				size = 0,
+				buttonType = 0,
+				isRoactGamepadEnabled = 0
 			}
-			local v38 = Cryo.Dictionary.join(t2, v.props)
+			local layoutOrder
 
-			if v.isDefaultChild then
-				v29 = i
+			if v3 then
+				layoutOrder = #buttons - i or i
+			else
+				layoutOrder = i
 			end
 
-			if not p3.props.disableGamepadRefs and isRoactGamepadEnabled then
-				local v39 = if not p3.props.disableRoactGamepadButtonSelection then {
-					[Roact.Ref] = p3.buttonRefs[i],
-					NextSelectionUp = v28 and (i > 1 and p3.buttonRefs[i - 1]) or nil,
-					NextSelectionDown = v28 and (i < #buttons and p3.buttonRefs[i + 1]) or nil,
-					NextSelectionLeft = not v28 and (i > 1 and p3.buttonRefs[i - 1]) or nil,
-					NextSelectionRight = not v28 and (i < #buttons and p3.buttonRefs[i + 1]) or nil
-				} else {
-					[Roact.Ref] = p3.buttonRefs[i]
-				}
+			v5.layoutOrder = layoutOrder
+			v5.size = udim
+			v5.buttonType = button.buttonType or ButtonType.Secondary
+			v5.isRoactGamepadEnabled = isRoactGamepadEnabled
 
-				v38 = Cryo.Dictionary.join(v38, v39)
+			local joined = Cryo.Dictionary.join(v5, button.props)
+
+			if button.isDefaultChild then
+				v4 = i
 			end
 
-			table.insert(t1, Roact.createElement(Button, v38))
+			if not data.props.disableGamepadRefs and isRoactGamepadEnabled then
+				local v6
+
+				if data.props.disableRoactGamepadButtonSelection then
+					v6 = {}
+					v6[Roact.Ref] = data.buttonRefs[i]
+				else
+					v6 = {}
+					v6[Roact.Ref] = data.buttonRefs[i]
+					local nextSelectionUp
+
+					if v3 and i > 1 then
+						nextSelectionUp = data.buttonRefs[i - 1] or nil
+					end
+
+					v6.NextSelectionUp = nextSelectionUp
+					local nextSelectionDown
+
+					if v3 and i < #buttons then
+						nextSelectionDown = data.buttonRefs[i + 1] or nil
+					end
+
+					v6.NextSelectionDown = nextSelectionDown
+					local nextSelectionLeft
+
+					if not (v3 or not (i > 1)) then
+						nextSelectionLeft = data.buttonRefs[i - 1] or nil
+					end
+
+					v6.NextSelectionLeft = nextSelectionLeft
+					local nextSelectionRight
+
+					if not (v3 or not (i < #buttons)) then
+						nextSelectionRight = data.buttonRefs[i + 1] or nil
+					end
+
+					v6.NextSelectionRight = nextSelectionRight
+				end
+
+				joined = Cryo.Dictionary.join(joined, v6)
+			end
+
+			table.insert(children, Roact.createElement(Button, joined))
 		end
 
-		return Roact.createElement(if not isRoactGamepadEnabled then FitFrameOnAxis else RoactGamepad.Focusable[FitFrameOnAxis], {
+		local createElement = Roact.createElement
+		local v5
+
+		if isRoactGamepadEnabled then
+			v5 = RoactGamepad.Focusable[FitFrameOnAxis]
+		else
+			v5 = FitFrameOnAxis
+		end
+
+		local v6 = {
+			["BackgroundTransparency"] = nil,
 			BackgroundTransparency = 1,
-			contentPadding = UDim.new(0, v26),
-			FillDirection = forcedFillDirection,
+			contentPadding = UDim.new(0, marginBetween),
+			FillDirection = fillDirection,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			LayoutOrder = 3,
-			minimumSize = UDim2.new(1, 0, 0, p3.props.buttonHeight),
-			[Roact.Ref] = p3.props.frameRef,
-			[Roact.Change.AbsoluteSize] = p3.updateFrameSize,
-			NextSelectionLeft = if not isRoactGamepadEnabled then nil else p3.props.NextSelectionLeft,
-			NextSelectionRight = if not isRoactGamepadEnabled then nil else p3.props.NextSelectionRight,
-			NextSelectionUp = if not isRoactGamepadEnabled then nil else p3.props.NextSelectionUp,
-			NextSelectionDown = if not isRoactGamepadEnabled then nil else p3.props.NextSelectionDown,
-			defaultChild = if not isRoactGamepadEnabled then nil else v29 and p3.buttonRefs[v29] or nil
-		}, t1)
+			minimumSize = UDim2.new(1, 0, 0, data.props.buttonHeight),
+			[Roact.Ref] = data.props.frameRef,
+			[Roact.Change.AbsoluteSize] = data.updateFrameSize
+		}
+		local nextSelectionLeft
+
+		if isRoactGamepadEnabled then
+			nextSelectionLeft = data.props.NextSelectionLeft
+		end
+
+		v6.NextSelectionLeft = nextSelectionLeft
+		local nextSelectionRight
+
+		if isRoactGamepadEnabled then
+			nextSelectionRight = data.props.NextSelectionRight
+		end
+
+		v6.NextSelectionRight = nextSelectionRight
+		local nextSelectionUp
+
+		if isRoactGamepadEnabled then
+			nextSelectionUp = data.props.NextSelectionUp
+		end
+
+		v6.NextSelectionUp = nextSelectionUp
+		local nextSelectionDown
+
+		if isRoactGamepadEnabled then
+			nextSelectionDown = data.props.NextSelectionDown
+		end
+
+		v6.NextSelectionDown = nextSelectionDown
+		local defaultChild
+
+		if isRoactGamepadEnabled then
+			defaultChild = v4 and data.buttonRefs[v4] or nil
+		end
+
+		v6.defaultChild = defaultChild
+		return createElement(v5, v6, children)
 	end)
 end
 
-local v14 = Roact.forwardRef(function(p5, p6) -- line: 190
-	-- upvalues: Roact (copy), v13 (copy), Cryo (copy)
-	return Roact.createElement(v13, Cryo.Dictionary.join(p5, {
-		frameRef = p6
-	}))
+local forwardRef = Roact.forwardRef(function(p, frameRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { frameRef = frameRef }))
 end)
 
-v14.validateProps = v13.validateProps
+forwardRef.validateProps = extended.validateProps
 
-return v14
+return forwardRef

@@ -1,16 +1,13 @@
-local t1 = {}
-local findAvatarHeadshotById = require(script.Parent.Parent.connectors.PlayerConnector).findAvatarHeadshotById
-
+local PlayerConnector = require(script.Parent.Parent.connectors.PlayerConnector)
+local findAvatarHeadshotById = PlayerConnector.findAvatarHeadshotById
 require(script.Parent.Parent.generatedTypes)
-t1.default = {
-	Player = {
-		avatarHeadshot = function(p1, _, p3, _) -- line: 9
-			-- upvalues: findAvatarHeadshotById (copy)
-			local fetchImpl = p3.fetchImpl
-
-			return findAvatarHeadshotById(p1.id, fetchImpl)
-		end
+return {
+	default = {
+		Player = {
+			avatarHeadshot = function(p, _, p2, _)
+				local fetchImpl = p2.fetchImpl
+				return findAvatarHeadshotById(p.id, fetchImpl)
+			end
+		}
 	}
 }
-
-return t1

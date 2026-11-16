@@ -1,1 +1,3 @@
-return require(script.Parent.LocalizationContext).Consumer
+local LocalizationContext = require(script.Parent.LocalizationContext)
+
+return LocalizationContext.Consumer

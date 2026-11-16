@@ -1,37 +1,47 @@
-local Parent = script:FindFirstAncestor("ExpChatIntegration").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
+local parent = script:FindFirstAncestor("ExpChatIntegration").Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
 
 require(script.Parent.ChatPlatformContext)
-
 local useChatPlatform = require(script.Parent.useChatPlatform)
-local FFlagExpChatAddressFrame0Flash = require(Parent.ChatUIPrimitives).Flags.FFlagExpChatAddressFrame0Flash
 
-local function useInterpolatedClientSettings(p1) -- line: 14
-	-- upvalues: useChatPlatform (copy), SignalsReact (copy), React (copy), FFlagExpChatAddressFrame0Flash (copy)
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+local FFlagExpChatAddressFrame0Flash = ChatUIPrimitives.Flags.FFlagExpChatAddressFrame0Flash
+
+local function useInterpolatedClientSettings(p)
 	local getInterpolators = useChatPlatform().getInterpolators
-	local v9 = SignalsReact.useSignalState(getInterpolators)
-	local getBackgroundColor = v9.getBackgroundColor
-	local getBackgroundTransparency = v9.getBackgroundTransparency
-	local v12, v13 = React.useState({
-		BackgroundColor3 = if not FFlagExpChatAddressFrame0Flash then nil else getBackgroundColor(p1),
-		BackgroundColor = if FFlagExpChatAddressFrame0Flash then nil else getBackgroundColor(p1),
-		BackgroundTransparency = getBackgroundTransparency(p1)
+	local v = SignalsReact.useSignalState(getInterpolators)
+	local getBackgroundColor = v.getBackgroundColor
+	local getBackgroundTransparency = v.getBackgroundTransparency
+
+	local useState = React.useState
+	local backgroundColor
+
+	if FFlagExpChatAddressFrame0Flash then
+		backgroundColor = getBackgroundColor(p)
+	end
+
+	local backgroundColor2
+
+	if not FFlagExpChatAddressFrame0Flash then
+		backgroundColor2 = getBackgroundColor(p)
+	end
+
+	local state, setState = useState({
+		BackgroundColor3 = backgroundColor,
+		BackgroundColor = backgroundColor2,
+		BackgroundTransparency = getBackgroundTransparency(p)
 	})
 
-	React.useEffect(function() -- line: 26
-		-- upvalues: v13 (copy), getBackgroundColor (copy), p1 (copy), getBackgroundTransparency (copy)
-		v13({
-			BackgroundColor3 = getBackgroundColor(p1),
-			BackgroundTransparency = getBackgroundTransparency(p1)
+	React.useEffect(function()
+		setState({
+			BackgroundColor3 = getBackgroundColor(p),
+			BackgroundTransparency = getBackgroundTransparency(p)
 		})
-	end, {
-		p1,
-		getBackgroundColor,
-		getBackgroundTransparency
-	})
+	end, { p, getBackgroundColor, getBackgroundTransparency })
 
-	return v12
+	return state
 end
 
 return useInterpolatedClientSettings

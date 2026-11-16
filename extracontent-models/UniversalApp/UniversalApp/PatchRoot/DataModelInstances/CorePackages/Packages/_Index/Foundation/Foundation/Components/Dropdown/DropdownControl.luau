@@ -1,116 +1,192 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Components = Foundation.Components
-
 require(Components.BaseMenu)
-
 local View = require(Components.View)
+
 local Constants = require(Foundation.Constants)
 local Icon = require(Components.Icon)
 local InputField = require(Components.InputField)
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
 local Text = require(Components.Text)
-
 require(Foundation.Components.Types)
 
-local Flags = require(Foundation.Utility.Flags)
 local blendTransparencies = require(Foundation.Utility.blendTransparencies)
 local getInputTextSize = require(Foundation.Utility.getInputTextSize)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local useDropdownVariants = require(script.Parent.useDropdownVariants)
+
 local ControlState = require(Foundation.Enums.ControlState)
 
 require(Foundation.Enums.CursorType)
+
 require(Foundation.Enums.InputSize)
 
 local InputVariant = require(Foundation.Enums.InputVariant)
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+
+local BuilderIcons = require(parent.BuilderIcons)
 local ChevronLargeUp = BuilderIcons.Icon.ChevronLargeUp
 local ChevronLargeDown = BuilderIcons.Icon.ChevronLargeDown
-local t1 = {
+
+local v = {
+	variant = InputVariant.Standard,
 	isMenuOpen = false,
 	placeholder = "",
-	variant = if not Flags.FoundationDropdownVariant then nil else InputVariant.Standard,
-	Selectable = not not Flags.FoundationDropdownSelectionProps or nil
+	Selectable = true
 }
 
-local function DropdownControl(p1, p2) -- line: 66
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), ControlState (copy), Flags (copy), InputVariant (copy), useDropdownVariants (copy), InputField (copy), withCommonProps (copy), getInputTextSize (copy), View (copy), StateLayerAffordance (copy), blendTransparencies (copy), Constants (copy), Text (copy), Icon (copy), ChevronLargeUp (copy), ChevronLargeDown (copy)
-	local v27 = withDefaults(p1, t1)
-	local v28 = useTokens()
-	local v29, v30 = React.useState(ControlState.Initialize)
-	local v31 = v27.item == nil
+local function DropdownControl(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local state, setState = React.useState(ControlState.Initialize)
+	local v4 = v2.item == nil
+	local v5 = useDropdownVariants(
+		v3,
+		v2.size,
+		v2.variant,
+		state,
+		v4,
+		v2.hasError or false,
+		v2.isMenuOpen,
+		state == ControlState.Hover
+	)
 
-	if Flags.FoundationDropdownVariant and v27.variant == nil then
-		v27.variant = InputVariant.Standard
-	end
-
-	local v32 = useDropdownVariants(v28, v27.size, if not Flags.FoundationDropdownVariant then nil else v27.variant, v29, v31, v27.hasError or false, if not Flags.FoundationDropdownVariant then nil else v27.isMenuOpen, if not Flags.FoundationDropdownVariant then nil else v29 == ControlState.Hover)
-	local v33 = React.useMemo(function() -- line: 86
-		-- upvalues: v28 (copy)
+	local cursor = React.useMemo(function()
 		return {
-			radius = UDim.new(0, v28.Radius.Small),
-			offset = v28.Size.Size_200,
-			borderWidth = v28.Stroke.Thicker
+			radius = UDim.new(0, v3.Radius.Small),
+			offset = v3.Size.Size_200,
+			borderWidth = v3.Stroke.Thicker
 		}
-	end, { v28 })
+	end, { v3 })
 
-	return React.createElement(InputField, withCommonProps(v27, {
-		size = getInputTextSize(v27.size),
-		hasError = v27.hasError,
-		isDisabled = v27.isDisabled,
-		label = v27.label,
-		hint = v27.hint,
-		ref = p2,
-		width = v27.width,
-		input = function(_) -- line: 104
-			-- upvalues: React (copy), View (copy), v30 (copy), v27 (copy), Flags (copy), v33 (copy), StateLayerAffordance (copy), v32 (copy), blendTransparencies (copy), Constants (copy), Text (copy), Icon (copy), ChevronLargeUp (copy), ChevronLargeDown (copy), v28 (copy)
-			return React.createElement(View, {
-				onStateChanged = v30,
-				isDisabled = v27.isDisabled,
-				onActivated = v27.onActivated,
+	return React.createElement(InputField, withCommonProps(v2, {
+		size = getInputTextSize(v2.size),
+		hasError = v2.hasError,
+		isDisabled = v2.isDisabled,
+		label = v2.label,
+		hint = v2.hint,
+		ref = ref,
+		width = v2.width,
+		input = function(_)
+			local createElement = React.createElement
+			local v6 = {
+				onStateChanged = setState,
+				isDisabled = v2.isDisabled,
+				onActivated = v2.onActivated,
 				selection = {
-					Selectable = if not Flags.FoundationDropdownSelectionProps then not v27.isDisabled else not v27.isDisabled and v27.Selectable,
-					NextSelectionUp = if not Flags.FoundationDropdownSelectionProps then nil else v27.NextSelectionUp,
-					NextSelectionDown = if not Flags.FoundationDropdownSelectionProps then nil else v27.NextSelectionDown,
-					NextSelectionLeft = if not Flags.FoundationDropdownSelectionProps then nil else v27.NextSelectionLeft,
-					NextSelectionRight = if not Flags.FoundationDropdownSelectionProps then nil else v27.NextSelectionRight
+					Selectable = not v2.isDisabled and v2.Selectable,
+					NextSelectionUp = v2.NextSelectionUp,
+					NextSelectionDown = v2.NextSelectionDown,
+					NextSelectionLeft = v2.NextSelectionLeft,
+					NextSelectionRight = v2.NextSelectionRight
 				},
-				cursor = v33,
-				stateLayer = {
-					affordance = StateLayerAffordance.None
-				},
-				backgroundStyle = if not Flags.FoundationDropdownVariant or not v32.container.bgStyle then nil else {
-					Color3 = v32.container.bgStyle.Color3,
-					Transparency = if not v27.isDisabled then v32.container.bgStyle.Transparency else blendTransparencies(v32.container.bgStyle.Transparency, Constants.DISABLED_TRANSPARENCY)
-				},
-				stroke = if not Flags.FoundationDropdownVariant or not v32.container.strokeStyle then nil else {
-					Color = v32.container.strokeStyle.Color3,
-					Transparency = if not v27.isDisabled then v32.container.strokeStyle.Transparency else blendTransparencies(v32.container.strokeStyle.Transparency, Constants.DISABLED_TRANSPARENCY),
-					Thickness = v32.container.strokeThickness,
-					BorderStrokePosition = Enum.BorderStrokePosition.Inner
-				},
-				tag = v32.container.tag,
-				ref = v27.inputRef,
-				testId = `{ v27.testId }--control`
-			}, {
-				Text = React.createElement(Text, {
-					LayoutOrder = 1,
-					Text = if not v27.item then v27.placeholder else v27.item.text,
-					tag = v32.text.tag
-				}),
-				Arrow = React.createElement(Icon, {
-					LayoutOrder = 2,
-					name = if not v27.isMenuOpen then ChevronLargeDown else ChevronLargeUp,
-					size = v32.arrow.size,
-					style = if not v27.isDisabled then nil else v28.Color.Content.Muted,
-					tag = v32.text.tag,
-					testId = `{ v27.testId }--arrow`
-				})
-			})
+				cursor = cursor,
+				stateLayer = { affordance = StateLayerAffordance.None },
+				backgroundStyle = 0,
+				stroke = 0,
+				tag = 0,
+				ref = 0,
+				testId = 0
+			}
+			local backgroundStyle
+
+			if v5.container.bgStyle then
+				backgroundStyle = { Color3 = v5.container.bgStyle.Color3, Transparency = 0 }
+				local transparency
+
+				if v2.isDisabled then
+					transparency = blendTransparencies(
+						v5.container.bgStyle.Transparency,
+						Constants.DISABLED_TRANSPARENCY
+					)
+				else
+					transparency = v5.container.bgStyle.Transparency
+				end
+
+				backgroundStyle.Transparency = transparency
+			end
+
+			v6.backgroundStyle = backgroundStyle
+			local stroke
+
+			if v5.container.strokeStyle then
+				stroke = {
+					Color = v5.container.strokeStyle.Color3,
+					Transparency = 0,
+					Thickness = 0,
+					BorderStrokePosition = 0
+				}
+				local transparency
+
+				if v2.isDisabled then
+					transparency = blendTransparencies(
+						v5.container.strokeStyle.Transparency,
+						Constants.DISABLED_TRANSPARENCY
+					)
+				else
+					transparency = v5.container.strokeStyle.Transparency
+				end
+
+				stroke.Transparency = transparency
+
+				stroke.Thickness = v5.container.strokeThickness
+				stroke.BorderStrokePosition = Enum.BorderStrokePosition.Inner
+			end
+
+			v6.stroke = stroke
+
+			v6.tag = v5.container.tag
+			v6.ref = v2.inputRef
+			v6.testId = `{v2.testId}--control`
+
+			local createElement2 = React.createElement
+			local text
+
+			if v2.item then
+				text = v2.item.text
+			else
+				text = v2.placeholder
+			end
+
+			local children = {
+				Text = createElement2(Text, { LayoutOrder = 1, Text = text, tag = v5.text.tag }),
+				Arrow = 0
+			}
+
+			local createElement3 = React.createElement
+			local name
+
+			if v2.isMenuOpen then
+				name = ChevronLargeUp
+			else
+				name = ChevronLargeDown
+			end
+
+			local v7 = {
+				LayoutOrder = 2,
+				name = name,
+				size = v5.arrow.size,
+				style = 0,
+				tag = 0,
+				testId = 0
+			}
+			local style
+
+			if v2.isDisabled then
+				style = v3.Color.Content.Muted
+			end
+
+			v7.style = style
+			v7.tag = v5.text.tag
+			v7.testId = `{v2.testId}--arrow`
+			children.Arrow = createElement3(Icon, v7)
+			return createElement(View, v6, children)
 		end
 	}))
 end

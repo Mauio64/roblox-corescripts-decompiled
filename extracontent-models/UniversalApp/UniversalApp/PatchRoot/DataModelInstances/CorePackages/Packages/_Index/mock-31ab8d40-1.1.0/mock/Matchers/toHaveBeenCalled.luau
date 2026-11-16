@@ -1,37 +1,57 @@
-local ParentParent = script.Parent.Parent
-local MagicMock = require(ParentParent.MagicMock)
-local Spy = require(ParentParent.Spy)
-local getCalls = require(ParentParent.getCalls)
+local parent = script.Parent.Parent
+local MagicMock = require(parent.MagicMock)
+local Spy = require(parent.Spy)
+local getCalls = require(parent.getCalls)
 
-return function(p1, p2) -- line: 6
-	-- upvalues: MagicMock (copy), Spy (copy), getCalls (copy)
-	if not MagicMock.is(p1) and not Spy.is(p1) then
+return function(p, value)
+	if not (MagicMock.is(p) or Spy.is(p)) then
 		return {
 			pass = false,
-			message = string.format("expect(mock) must be a MagicMock or Spy when .toHaveBeenCalled is used. Given %s instead", (tostring(p1)))
+			message = string.format(
+				"expect(mock) must be a MagicMock or Spy when .toHaveBeenCalled is used. Given %s instead",
+				(tostring(p))
+			)
 		}
 	end
 
-	local v7 = #getCalls(p1)
-	local v8, v9
+	local count = #getCalls(p)
+	local pass, message
 
-	if p2 then
-		if not (type(p2) == "number" and (p2 > 0 and p2 % 1 == 0)) then
+	if value then
+		local v
+
+		if type(value) == "number" and value > 0 then
+			v = value % 1 == 0
+		else
+			v = false
+		end
+
+		if not v then
 			return {
 				pass = false,
-				message = string.format("expectedTimesCalled must be a positive integer. Given %s instead.", (tostring(p2)))
+				message = string.format(
+					"expectedTimesCalled must be a positive integer. Given %s instead.",
+					(tostring(value))
+				)
 			}
 		end
 
-		v8 = p2 == v7
-		v9 = v8 and string.format("Expected %s to not have been called exactly %d times.", tostring(p1), p2) or string.format("Expected %s to have been called %d times. Was called %d times instead.", tostring(p1), p2, v7)
-	else
-		v8 = v7 > 0
-		v9 = v8 and string.format("Expected %s to never have been called. Was called %d times instead.", tostring(p1), v7) or string.format("Expected %s to have been called at least once.", (tostring(p1)))
+		pass = value == count
+		message = pass and string.format("Expected %s to not have been called exactly %d times.", tostring(p), value)
+			or string.format(
+				"Expected %s to have been called %d times. Was called %d times instead.",
+				tostring(p),
+				value,
+				count
+			)
+
+		return { pass = pass, message = message }
 	end
 
-	return {
-		pass = v8,
-		message = v9
-	}
+	pass = count > 0
+	message = pass
+		and string.format("Expected %s to never have been called. Was called %d times instead.", tostring(p), count)
+		or string.format("Expected %s to have been called at least once.", (tostring(p)))
+
+	return { pass = pass, message = message }
 end

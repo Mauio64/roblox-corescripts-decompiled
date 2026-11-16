@@ -1,4 +1,1 @@
-return {
-	APP = "in-app",
-	EXPERIENCE = "in-experience"
-}
+return { APP = "in-app", EXPERIENCE = "in-experience" }

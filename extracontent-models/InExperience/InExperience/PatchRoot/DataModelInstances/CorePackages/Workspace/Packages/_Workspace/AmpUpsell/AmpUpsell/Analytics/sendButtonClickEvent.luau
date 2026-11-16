@@ -1,8 +1,3 @@
-return function(p1, s1: string, s2: string, s3: string) -- line: 1
-	local t1 = {
-		origin = s2,
-		btn = s3
-	}
-
-	p1.sendEventDeferred(s1, "buttonClick", t1)
+return function(p, p2: string, origin: string, btn: string)
+	p.sendEventDeferred(p2, "buttonClick", { origin = origin, btn = btn })
 end

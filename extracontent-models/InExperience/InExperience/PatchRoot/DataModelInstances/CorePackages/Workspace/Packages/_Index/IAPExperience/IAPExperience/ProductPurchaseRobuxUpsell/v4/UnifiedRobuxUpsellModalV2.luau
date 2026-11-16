@@ -1,171 +1,280 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local SharedFlags = require(ParentParentParent.SharedFlags)
-local Foundation = require(ParentParentParent.Foundation)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local SharedFlags = require(parent2.SharedFlags)
+
+local Foundation = require(parent2.Foundation)
 local View = Foundation.View
-local FoundationText = Foundation.Text
-local FoundationImage = Foundation.Image
+local Text = Foundation.Text
 local Checkbox = Foundation.Checkbox
 local ButtonVariant = Foundation.Enums.ButtonVariant
+local ButtonGroup = Foundation.ButtonGroup
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
-local EnumsOrientation = Foundation.Enums.Orientation
+local Orientation = Foundation.Enums.Orientation
 local Enums = Foundation.Enums
 local getIconRichText = Foundation.Utility.getIconRichText
+
 local LocalizationService = game:GetService("LocalizationService")
-local Localization = require(ParentParentParent.AppLocales).Localization
-local Localization2 = require(ParentParentParent.Localization)
+local AppLocales = require(parent2.AppLocales)
+local Localization = AppLocales.Localization
+local Localization2 = require(parent2.Localization)
 local LocalizationProvider = Localization2.LocalizationProvider
 local useLocalization = Localization2.Hooks.useLocalization
-local UnifiedProductDetails = require(ParentParent.Generic.UnifiedProductDetails)
-local YellowBadge = require(ParentParent.Generic.YellowBadge)
-local GrayBadge = require(ParentParent.Generic.GrayBadge)
-local PriceSummary = require(ParentParent.Generic.PriceSummary)
-local ProductDetailsContainer = require(ParentParent.Generic.ProductDetailsContainer)
-local CartPricingLoading = require(ParentParent.ProductPurchase.v4.CartPricingLoading)
-local buildCartPricingOfferCheckboxes = require(ParentParent.ProductPurchase.v4.buildCartPricingOfferCheckboxes)
-local useCartPricing = require(ParentParent.ProductPurchase.v4.useCartPricing)
-local useFocusNavigationRefs = require(ParentParent.Generic.Hooks.useFocusNavigationRefs)
-local UnifiedPurchaseModalTypeEnum = require(ParentParent.Enums.UnifiedPurchaseModalTypeEnum)
 
-require(ParentParent.ProductPurchase.v4.cartPricingResponseLineItem)
+local UnifiedProductDetails = require(parent.Generic.UnifiedProductDetails)
+local YellowBadge = require(parent.Generic.YellowBadge)
+local GrayBadge = require(parent.Generic.GrayBadge)
+local PriceSummary = require(parent.Generic.PriceSummary)
+local ProductDetailsContainer = require(parent.Generic.ProductDetailsContainer)
+local CartPricingLoading = require(parent.ProductPurchase.v4.CartPricingLoading)
+local buildCartPricingOfferCheckboxes = require(parent.ProductPurchase.v4.buildCartPricingOfferCheckboxes)
+local useCartPricing = require(parent.ProductPurchase.v4.useCartPricing)
 
-local formatNumber = require(ParentParent.Utility.formatNumber)
-local getUpsellBadgeInfo = require(ParentParent.Utility.getUpsellBadgeInfo)
+local useFocusNavigationRefs = require(parent.Generic.Hooks.useFocusNavigationRefs)
+
+local UnifiedPurchaseModalTypeEnum = require(parent.Enums.UnifiedPurchaseModalTypeEnum)
+
+require(parent.ProductPurchase.v4.cartPricingResponseLineItem)
+
+local formatNumber = require(parent.Utility.formatNumber)
+local getUpsellBadgeInfo = require(parent.Utility.getUpsellBadgeInfo)
+
 local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
-local FFlagUnifiedPurchaseFlowMarketplaceUIImprovements = require(ParentParent.Parent.SharedFlags).FFlagUnifiedPurchaseFlowMarketplaceUIImprovements
-local v35 = game:DefineFastInt("CompactUpsellModalBreakpoint", 400)
-local FFlagEnableUnifiedPurchaseFlowForDevSubs = require(ParentParent.Parent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs
-local FFlagPurchasePromptFetchCartPricing = SharedFlags.FFlagPurchasePromptFetchCartPricing
-local FFlagShouldApplyDevSubsUpsellFix = require(ParentParent.Flags.FFlagShouldApplyDevSubsUpsellFix)
-local FFlagShouldFixDevSubsFlashingTitle = require(ParentParent.Flags.FFlagShouldFixDevSubsFlashingTitle)
-local GetFFlagIAPExperienceEnableMultiDisplayUpsell = require(ParentParent.Flags.GetFFlagIAPExperienceEnableMultiDisplayUpsell)
-local GetFFlagIAPExperienceUseUpsellBadgeHelper = require(ParentParent.Flags.GetFFlagIAPExperienceUseUpsellBadgeHelper)
 
-require(ParentParent.Api.PaymentsGateway.GetUpsellSuggestionsTypes)
+local FFlagEnableRobuxUpsellPlusButtonExperiment = require(parent.Flags.FFlagEnableRobuxUpsellPlusButtonExperiment)
 
-local BadgeType = require(ParentParent.Enums.BadgeType)
+local SharedFlags2 = require(parent.Parent.SharedFlags)
+local FFlagUnifiedPurchaseFlowMarketplaceUIImprovements = SharedFlags2.FFlagUnifiedPurchaseFlowMarketplaceUIImprovements
+local defineFastInt = game:DefineFastInt("CompactUpsellModalBreakpoint", 400)
 
-require(ParentParent.Enums.VirtualItemBadgeType)
-require(ParentParent.ProductPurchase.v3.UnifiedProductPurchaseModalTypes)
+local SharedFlags3 = require(parent.Parent.SharedFlags)
+local FFlagEnableUnifiedPurchaseFlowForDevSubs = SharedFlags3.FFlagEnableUnifiedPurchaseFlowForDevSubs
+local FFlagShouldFixDevSubsFlashingTitle = require(parent.Flags.FFlagShouldFixDevSubsFlashingTitle)
 
-local function UpsellProductDetailsLegacyImpl(t1: {[any]: any}, t2: {[any]: any}) -- line: 94
-	-- upvalues: BadgeType (copy), React (copy), View (copy), FoundationText (copy), formatNumber (copy), LocalizationService (copy), YellowBadge (copy)
-	local v50 = if t1.badgeType ~= BadgeType.Popular then if t1.badgeType ~= BadgeType.LastPurchased then nil else t2.LastPurchased else t2.Popular
-	local v51 = if t1.badgeType ~= BadgeType.Popular then nil else "icons/menu/fire_fill"
-	local s1 = "size-full-1400 radius-medium padding-x-large row"
-	local v53 = if not t1.selected then s1 .. " bg-surface-300 stroke-emphasis stroke-standard" else s1 .. " bg-surface-200 stroke-system-contrast stroke-thick"
-	local v54 = not t1.isCompact and "auto-xy text-title-large content-emphasis text-align-x-left" or "auto-xy text-title-small content-emphasis text-align-x-left"
-	local v55 = not t1.isCompact and "auto-xy text-title-large content-muted text-align-x-left" or "auto-xy text-title-small content-muted text-align-x-left"
-	local v56 = not t1.isCompact and "auto-xy text-title-large content-emphasis text-align-x-right" or "auto-xy text-title-small content-emphasis text-align-x-right"
+local GetFFlagIAPExperienceEnableMultiDisplayUpsell = require(parent.Flags.GetFFlagIAPExperienceEnableMultiDisplayUpsell)
 
-	return React.createElement(View, {
-		LayoutOrder = t1.layoutOrder,
-		onActivated = t1.onSelected,
-		tag = v53,
-		Size = if not t1.isCompact then nil else UDim2.new(1, 0, 0, 40)
-	}, {
-		LeftSide = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "row gap-small align-y-center align-x-start",
-			Size = UDim2.new(0.5, 0, 1, 0)
-		}, {
-			RobuxAmount = React.createElement(FoundationText, {
-				LayoutOrder = 1,
-				Text = utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, t1.product.robuxAmount),
-				tag = v54
-			}),
-			RobuxAmountBonus = t1.product.robuxAmountBeforeBonus and React.createElement(FoundationText, {
-				LayoutOrder = 2,
-				RichText = true,
-				Text = "<s>" .. utf8.char(57346) .. formatNumber(LocalizationService.RobloxLocaleId, t1.product.robuxAmountBeforeBonus) .. "</s>",
-				tag = v55
-			})
-		}),
-		RightSide = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = "row align-y-center align-x-right gap-large",
-			Size = UDim2.new(0.5, 0, 1, 0)
-		}, {
-			Badge = if not v50 then nil else React.createElement(YellowBadge, {
-				LayoutOrder = 1,
-				Text = v50,
-				Icon = v51
-			}),
-			RobuxPrice = React.createElement(FoundationText, {
-				LayoutOrder = 2,
-				Text = t1.product.price or "",
-				tag = v56
-			})
-		})
-	})
-end
-local function UpsellProductDetailsMultiDisplayImpl(t3: {[any]: any}, t4: {[any]: any}) -- line: 167
-	-- upvalues: GetFFlagIAPExperienceUseUpsellBadgeHelper (copy), getUpsellBadgeInfo (copy), BadgeType (copy), Enums (copy), React (copy), View (copy), FoundationText (copy), getIconRichText (copy), formatNumber (copy), LocalizationService (copy), GrayBadge (copy)
-	local text, icon
+local GetFFlagIAPExperienceUseUpsellBadgeHelper = require(parent.Flags.GetFFlagIAPExperienceUseUpsellBadgeHelper)
 
-	if GetFFlagIAPExperienceUseUpsellBadgeHelper() then
-		local v59 = getUpsellBadgeInfo(t3.badgeType, t4)
+require(parent.Api.PaymentsGateway.GetUpsellSuggestionsTypes)
+local BadgeType = require(parent.Enums.BadgeType)
+require(parent.Enums.VirtualItemBadgeType)
+require(parent.ProductPurchase.v3.UnifiedProductPurchaseModalTypes)
 
-		text = v59.text
-		icon = v59.icon
-	else
-		text = if t3.badgeType ~= BadgeType.Popular then if t3.badgeType ~= BadgeType.LastPurchased then if t3.badgeType ~= BadgeType.ForYou then if t3.badgeType ~= BadgeType.BetterValue then nil else t4.BetterValue else t4.ForYouItem else t4.LastPurchased else t4.Popular
-		icon = if t3.badgeType ~= BadgeType.Popular then if t3.badgeType ~= BadgeType.ForYou then if t3.badgeType ~= BadgeType.BetterValue then nil else Enums.IconName.Tag else Enums.IconName.CircleStar else Enums.IconName.Flame
+local function UpsellProductDetailsLegacyImpl(props, p)
+	local text
+
+	if props.badgeType == BadgeType.Popular then
+		text = p.Popular
+	elseif props.badgeType == BadgeType.LastPurchased then
+		text = p.LastPurchased
 	end
 
-	local s2 = "size-full-1400 radius-medium padding-x-large row"
-	local v63 = if not t3.selected then s2 .. " bg-surface-300 stroke-emphasis stroke-standard" else s2 .. " bg-surface-200 stroke-system-contrast stroke-thick"
-	local v64 = not t3.isCompact and "auto-xy text-title-large content-emphasis text-align-x-left" or "auto-xy text-title-small content-emphasis text-align-x-left"
-	local v65 = not t3.isCompact and "auto-xy text-title-large content-muted text-align-x-left" or "auto-xy text-title-small content-muted text-align-x-left"
-	local v66 = not t3.isCompact and "auto-xy text-title-large content-emphasis text-align-x-right" or "auto-xy text-title-small content-emphasis text-align-x-right"
+	local icon = props.badgeType == BadgeType.Popular and "icons/menu/fire_fill" or nil
 
-	return React.createElement(View, {
-		LayoutOrder = t3.layoutOrder,
-		onActivated = t3.onSelected,
-		tag = v63,
-		Size = if not t3.isCompact then nil else UDim2.new(1, 0, 0, 40)
-	}, {
-		LeftSide = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "row gap-small align-y-center align-x-start",
-			Size = UDim2.new(0.5, 0, 1, 0)
-		}, {
-			RobuxAmount = React.createElement(FoundationText, {
+	local v = "size-full-1400 radius-medium padding-x-large row"
+	local tag
+
+	if props.selected then
+		tag = v .. " bg-surface-200 stroke-system-contrast stroke-thick"
+	else
+		tag = v .. " bg-surface-300 stroke-emphasis stroke-standard"
+	end
+
+	local tag2 = props.isCompact and "auto-xy text-title-small content-emphasis text-align-x-left"
+		or "auto-xy text-title-large content-emphasis text-align-x-left"
+
+	local tag3 = props.isCompact and "auto-xy text-title-small content-muted text-align-x-left"
+		or "auto-xy text-title-large content-muted text-align-x-left"
+
+	local tag4 = props.isCompact and "auto-xy text-title-small content-emphasis text-align-x-right"
+		or "auto-xy text-title-large content-emphasis text-align-x-right"
+
+	local createElement = React.createElement
+	local v2 = {
+		LayoutOrder = props.layoutOrder,
+		onActivated = props.onSelected,
+		tag = tag,
+		Size = 0
+	}
+	local size
+
+	if props.isCompact then
+		size = UDim2.new(1, 0, 0, 40)
+	end
+
+	v2.Size = size
+	local v3 = {
+		LeftSide = React.createElement(
+			View,
+			{
 				LayoutOrder = 1,
-				RichText = true,
-				Text = getIconRichText(Enums.IconName.Robux) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, t3.product.robuxAmount),
-				tag = v64
-			}),
-			RobuxAmountBonus = t3.product.robuxAmountBeforeBonus and React.createElement(FoundationText, {
-				LayoutOrder = 2,
-				RichText = true,
-				Text = "<s>" .. getIconRichText(Enums.IconName.Robux) .. formatNumber(LocalizationService.RobloxLocaleId, t3.product.robuxAmountBeforeBonus) .. "</s>",
-				tag = v65
-			}),
-			Badge = if not text then nil else React.createElement(GrayBadge, {
-				LayoutOrder = 3,
-				Text = text,
-				iconName = icon
-			})
-		}),
-		RightSide = React.createElement(View, {
+				tag = "row gap-small align-y-center align-x-start",
+				Size = UDim2.new(0.5, 0, 1, 0)
+			},
+			{
+				RobuxAmount = React.createElement(Text, {
+					LayoutOrder = 1,
+					Text = utf8.char(57346) .. " " .. formatNumber(
+						LocalizationService.RobloxLocaleId,
+						props.product.robuxAmount
+					),
+					tag = tag2
+				}),
+				RobuxAmountBonus = props.product.robuxAmountBeforeBonus and React.createElement(Text, {
+					LayoutOrder = 2,
+					RichText = true,
+					Text = "<s>" .. utf8.char(57346) .. formatNumber(
+						LocalizationService.RobloxLocaleId,
+						props.product.robuxAmountBeforeBonus
+					) .. "</s>",
+					tag = tag3
+				})
+			}
+		),
+		RightSide = 0
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		LayoutOrder = 2,
+		tag = "row align-y-center align-x-right gap-large",
+		Size = UDim2.new(0.5, 0, 1, 0)
+	}
+	local badge
+
+	if text then
+		badge = React.createElement(YellowBadge, { LayoutOrder = 1, Text = text, Icon = icon })
+	end
+
+	v3.RightSide = createElement2(View, v4, {
+		Badge = badge,
+		RobuxPrice = React.createElement(Text, {
 			LayoutOrder = 2,
-			tag = "row align-y-center align-x-right gap-large",
-			Size = UDim2.new(0.5, 0, 1, 0)
-		}, {
-			RobuxPrice = React.createElement(FoundationText, {
-				LayoutOrder = 2,
-				Text = t3.product.price or "",
-				tag = v66
-			})
+			Text = props.product.price or "",
+			tag = tag4
 		})
 	})
+	return createElement(View, v2, v3)
 end
-local function UpsellProductDetails(t5: {[any]: any}) -- line: 258
-	-- upvalues: useLocalization (copy), GetFFlagIAPExperienceEnableMultiDisplayUpsell (copy), UpsellProductDetailsMultiDisplayImpl (copy), UpsellProductDetailsLegacyImpl (copy)
-	local v68 = useLocalization({
+
+local function UpsellProductDetailsMultiDisplayImpl(props, props2)
+	local text, iconName
+
+	if GetFFlagIAPExperienceUseUpsellBadgeHelper() then
+		local upsellBadgeInfo = getUpsellBadgeInfo(props.badgeType, props2)
+		text = upsellBadgeInfo.text
+		iconName = upsellBadgeInfo.icon
+	else
+		if props.badgeType == BadgeType.Popular then
+			text = props2.Popular
+		elseif props.badgeType == BadgeType.LastPurchased then
+			text = props2.LastPurchased
+		elseif props.badgeType == BadgeType.ForYou then
+			text = props2.ForYouItem
+		elseif props.badgeType == BadgeType.BetterValue then
+			text = props2.BetterValue
+		end
+
+		if props.badgeType == BadgeType.Popular then
+			iconName = Enums.IconName.Flame
+		elseif props.badgeType == BadgeType.ForYou then
+			iconName = Enums.IconName.CircleStar
+		elseif props.badgeType == BadgeType.BetterValue then
+			iconName = Enums.IconName.Tag
+		end
+	end
+
+	local v = "size-full-1400 radius-medium padding-x-large row"
+	local tag
+
+	if props.selected then
+		tag = v .. " bg-surface-200 stroke-system-contrast stroke-thick"
+	else
+		tag = v .. " bg-surface-300 stroke-emphasis stroke-standard"
+	end
+
+	local tag2 = props.isCompact and "auto-xy text-title-small content-emphasis text-align-x-left"
+		or "auto-xy text-title-large content-emphasis text-align-x-left"
+
+	local tag3 = props.isCompact and "auto-xy text-title-small content-muted text-align-x-left"
+		or "auto-xy text-title-large content-muted text-align-x-left"
+
+	local tag4 = props.isCompact and "auto-xy text-title-small content-emphasis text-align-x-right"
+		or "auto-xy text-title-large content-emphasis text-align-x-right"
+
+	local createElement = React.createElement
+	local v2 = {
+		LayoutOrder = props.layoutOrder,
+		onActivated = props.onSelected,
+		tag = tag,
+		Size = 0
+	}
+	local size
+
+	if props.isCompact then
+		size = UDim2.new(1, 0, 0, 40)
+	end
+
+	v2.Size = size
+
+	local createElement2 = React.createElement
+	local v3 = {
+		LayoutOrder = 1,
+		tag = "row gap-small align-y-center align-x-start",
+		Size = UDim2.new(0.5, 0, 1, 0)
+	}
+	local v4 = {
+		RobuxAmount = React.createElement(Text, {
+			LayoutOrder = 1,
+			RichText = true,
+			Text = getIconRichText(Enums.IconName.Robux) .. " " .. formatNumber(
+				LocalizationService.RobloxLocaleId,
+				props.product.robuxAmount
+			),
+			tag = tag2
+		}),
+		RobuxAmountBonus = props.product.robuxAmountBeforeBonus and React.createElement(Text, {
+			LayoutOrder = 2,
+			RichText = true,
+			Text = "<s>" .. getIconRichText(Enums.IconName.Robux) .. formatNumber(
+				LocalizationService.RobloxLocaleId,
+				props.product.robuxAmountBeforeBonus
+			) .. "</s>",
+			tag = tag3
+		}),
+		Badge = 0
+	}
+	local badge
+
+	if text then
+		badge = React.createElement(GrayBadge, { LayoutOrder = 3, Text = text, iconName = iconName })
+	end
+
+	v4.Badge = badge
+	return createElement(View, v2, {
+		LeftSide = createElement2(View, v3, v4),
+		RightSide = React.createElement(
+			View,
+			{
+				LayoutOrder = 2,
+				tag = "row align-y-center align-x-right gap-large",
+				Size = UDim2.new(0.5, 0, 1, 0)
+			},
+			{
+				RobuxPrice = React.createElement(Text, {
+					LayoutOrder = 2,
+					Text = props.product.price or "",
+					tag = tag4
+				})
+			}
+		)
+	})
+end
+
+local function UpsellProductDetails(p)
+	local v = useLocalization({
 		Popular = "IAPExperience.RobuxUpsell.Text.PopularItem",
 		LastPurchased = "IAPExperience.RobuxUpsell.Text.LastPurchased",
 		ForYouItem = "IAPExperience.RobuxUpsell.Text.ForYou",
@@ -174,398 +283,445 @@ local function UpsellProductDetails(t5: {[any]: any}) -- line: 258
 	})
 
 	if GetFFlagIAPExperienceEnableMultiDisplayUpsell() then
-		return UpsellProductDetailsMultiDisplayImpl(t5, v68)
+		return UpsellProductDetailsMultiDisplayImpl(p, v)
 	end
 
-	return UpsellProductDetailsLegacyImpl(t5, v68)
+	return UpsellProductDetailsLegacyImpl(p, v)
 end
-local function UnifiedRobuxUpsellModalV2(t6: {[any]: any}) -- line: 307
-	-- upvalues: FFlagPurchasePromptFetchCartPricing (copy), useCartPricing (copy), React (copy), useLocalization (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy), FFlagAXMISWithBlackbird (copy), FFlagUnifiedPurchaseFlowMarketplaceUIImprovements (copy), UnifiedPurchaseModalTypeEnum (copy), v35 (copy), FFlagShouldFixDevSubsFlashingTitle (copy), useFocusNavigationRefs (copy), buildCartPricingOfferCheckboxes (copy), Checkbox (copy), View (copy), FFlagShouldApplyDevSubsUpsellFix (copy), FoundationImage (copy), FoundationText (copy), ProductDetailsContainer (copy), Dialog (copy), DialogSize (copy), PriceSummary (copy), UnifiedProductDetails (copy), CartPricingLoading (copy), GetFFlagIAPExperienceEnableMultiDisplayUpsell (copy), UpsellProductDetails (copy), EnumsOrientation (copy), ButtonVariant (copy)
-	local u70 = nil
-	local u71 = nil
-	local u72 = nil
-	local v73 = nil
-	local v74 = nil
 
-	if FFlagPurchasePromptFetchCartPricing then
-		u70 = useCartPricing({
-			product = t6.product,
-			purchaseModalType = t6.purchaseModalType,
-			cartPricingResponse = t6.cartPricingResponse,
-			onCartOfferAppliedChanged = t6.onCartOfferAppliedChanged
-		})
+local function UnifiedRobuxUpsellModalV2(props)
+	local robloxPlusDiscountPercentage
 
-		local v75, v76 = React.useState(t6.postPurchaseActions or {})
-
-		u71 = v75
-		u72 = v76
-		v73 = React.useCallback(function() -- line: 327
-			-- upvalues: u71 (ref), t6 (copy)
-			if u71 and t6.setPostPurchaseActions then
-				t6.setPostPurchaseActions(u71)
-			end
-
-			t6.buttons.buyItemActivated()
-		end, {
-			t6.buttons.buyItemActivated,
-			t6.setPostPurchaseActions,
-			u71
-		})
-		v74 = React.useMemo(function() -- line: 335
-			-- upvalues: u70 (ref), t6 (copy)
-			if u70.showCartOfferUi then
-				return u70.mergedProductForDetails
-			end
-
-			return t6.product
-		end, {
-			t6.product,
-			u70.showCartOfferUi,
-			u70.mergedProductForDetails
-		})
+	if FFlagEnableRobuxUpsellPlusButtonExperiment and type(props.robloxPlusDiscountPercentage) == "number" then
+		robloxPlusDiscountPercentage = props.robloxPlusDiscountPercentage
 	end
 
-	local v77 = useLocalization({
+	local onRobloxPlusButtonActivated
+
+	if robloxPlusDiscountPercentage ~= nil then
+		onRobloxPlusButtonActivated = props.onRobloxPlusButtonActivated
+	end
+
+	local cartPricing = useCartPricing({
+		product = props.product,
+		purchaseModalType = props.purchaseModalType,
+		cartPricingResponse = props.cartPricingResponse,
+		onCartOfferAppliedChanged = props.onCartOfferAppliedChanged
+	})
+
+	local state, setState = React.useState(props.postPurchaseActions or {})
+
+	local onActivated = React.useCallback(function()
+		if state and props.setPostPurchaseActions then
+			props.setPostPurchaseActions(state)
+		end
+
+		props.buttons.buyItemActivated()
+	end, { props.buttons.buyItemActivated, props.setPostPurchaseActions, state })
+
+	local product = React.useMemo(function()
+		if cartPricing.showCartOfferUi then
+			return cartPricing.mergedProductForDetails
+		end
+
+		return props.product
+	end, { props.product, cartPricing.showCartOfferUi, cartPricing.mergedProductForDetails })
+
+	local v = useLocalization({
 		Buy = "IAPExperience.PurchasePrompt.Action.Buy",
+		GetTenPercentOff = robloxPlusDiscountPercentage ~= nil and {
+			"IAPExperience.RobuxUpsell.Action.GetPercentOff",
+			discountPercentage = robloxPlusDiscountPercentage
+		} or nil,
+		Subscribe = FFlagEnableUnifiedPurchaseFlowForDevSubs and "Feature.Subscription.Action.Subscribe" or nil,
 		DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment",
 		DisclosureTermsURL = "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL",
 		TermsOfUse = "IAPExperience.RobuxUpsell.Text.TermsOfUse",
 		BuyRobuxAndExperience = "IAPExperience.PurchasePrompt.BuyRobuxAndExperience",
 		BuyRobuxAndItem = "IAPExperience.PurchasePrompt.Title.BuyRobuxAndItem",
 		BuyRobuxAndItems = "IAPExperience.PurchasePrompt.Title.BuyRobuxAndItems",
-		Subscribe = if not FFlagEnableUnifiedPurchaseFlowForDevSubs then nil else "Feature.Subscription.Action.Subscribe",
-		BuyRobuxOnly = if not FFlagAXMISWithBlackbird then nil else "IAPExperience.PurchasePrompt.Title.BuyRobuxOnly",
-		BuyRobuxAndAvatar = if not FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then nil else "IAPExperience.PurchasePrompt.Header.BuyRobuxAndAvatar",
-		BuyRobuxAndSubscription = if not FFlagEnableUnifiedPurchaseFlowForDevSubs then nil else "IAPExperience.PurchasePrompt.BuyRobuxAndSubscription",
-		PerMonth = if not FFlagEnableUnifiedPurchaseFlowForDevSubs then nil else "Feature.Subscription.Text.PerMonth"
+		BuyRobuxOnly = FFlagAXMISWithBlackbird and "IAPExperience.PurchasePrompt.Title.BuyRobuxOnly" or nil,
+		BuyRobuxAndAvatar = FFlagUnifiedPurchaseFlowMarketplaceUIImprovements and "IAPExperience.PurchasePrompt.Header.BuyRobuxAndAvatar" or nil,
+		BuyRobuxAndSubscription = FFlagEnableUnifiedPurchaseFlowForDevSubs and "IAPExperience.PurchasePrompt.BuyRobuxAndSubscription" or nil,
+		PerMonth = FFlagEnableUnifiedPurchaseFlowForDevSubs and "Feature.Subscription.Text.PerMonth" or nil
 	})
-	local u78 = if not FFlagEnableUnifiedPurchaseFlowForDevSubs or t6.purchaseModalType ~= UnifiedPurchaseModalTypeEnum.DeveloperSubscription then t6.screenSize.Y < v35 else t6.screenSize.Y > 0 and t6.screenSize.Y < v35
-	local v79, v80 = React.useState(v77.BuyRobuxAndItem)
+	local isCompact
 
-	React.useEffect(function() -- line: 374
-		-- upvalues: t6 (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy), UnifiedPurchaseModalTypeEnum (copy), v77 (copy), FFlagShouldFixDevSubsFlashingTitle (copy), v80 (copy), FFlagAXMISWithBlackbird (copy), FFlagUnifiedPurchaseFlowMarketplaceUIImprovements (copy)
-		local purchaseModalType = t6.purchaseModalType
+	if
+		FFlagEnableUnifiedPurchaseFlowForDevSubs
+		and props.purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	then
+		if props.screenSize.Y > 0 then
+			isCompact = props.screenSize.Y < defineFastInt
+		else
+			isCompact = false
+		end
+	else
+		isCompact = props.screenSize.Y < defineFastInt
+	end
 
-		if FFlagEnableUnifiedPurchaseFlowForDevSubs and purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription then
-			local BuyRobuxAndItem = v77.BuyRobuxAndItem
+	local state2, setState2 = React.useState(v.BuyRobuxAndItem)
+	local useEffect = React.useEffect
+	local function fn()
+		local purchaseModalType = props.purchaseModalType
 
-			if FFlagShouldFixDevSubsFlashingTitle and v77.BuyRobuxAndSubscription and v77.BuyRobuxAndSubscription ~= "" then
-				BuyRobuxAndItem = v77.BuyRobuxAndSubscription
+		if
+			FFlagEnableUnifiedPurchaseFlowForDevSubs
+			and purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+		then
+			local v2 = v.BuyRobuxAndItem
+
+			if FFlagShouldFixDevSubsFlashingTitle and v.BuyRobuxAndSubscription and v.BuyRobuxAndSubscription ~= "" then
+				v2 = v.BuyRobuxAndSubscription
 			end
 
-			v80(BuyRobuxAndItem)
-
-			return
-		end
-
-		if purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem then
+			setState2(v2)
+		elseif purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem then
 			if FFlagAXMISWithBlackbird then
-				if FFlagUnifiedPurchaseFlowMarketplaceUIImprovements and t6.product.itemName ~= "RobuxUpsell" then
-					v80(v77.BuyRobuxAndAvatar)
-
-					return
+				if FFlagUnifiedPurchaseFlowMarketplaceUIImprovements and props.product.itemName ~= "RobuxUpsell" then
+					setState2(v.BuyRobuxAndAvatar)
+				else
+					setState2(v.BuyRobuxOnly)
 				end
-
-				v80(v77.BuyRobuxOnly)
-
-				return
+			elseif FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then
+				setState2(v.BuyRobuxAndAvatar)
+			else
+				setState2(v.BuyRobuxAndItems)
 			end
-
-			if FFlagUnifiedPurchaseFlowMarketplaceUIImprovements then
-				v80(v77.BuyRobuxAndAvatar)
-
-				return
-			end
-
-			v80(v77.BuyRobuxAndItems)
-
-			return
+		elseif purchaseModalType == UnifiedPurchaseModalTypeEnum.Experience then
+			setState2(v.BuyRobuxAndExperience)
+		else
+			setState2(v.BuyRobuxAndItem)
 		end
+	end
 
-		if purchaseModalType == UnifiedPurchaseModalTypeEnum.Experience then
-			v80(v77.BuyRobuxAndExperience)
+	local purchaseModalType = props.purchaseModalType
+	local buyRobuxAndAvatar = v.BuyRobuxAndAvatar
+	local buyRobuxAndExperience = v.BuyRobuxAndExperience
+	local buyRobuxAndItem = v.BuyRobuxAndItem
+	local buyRobuxAndItems = v.BuyRobuxAndItems
+	local buyRobuxAndSubscription = v.BuyRobuxAndSubscription
+	local itemName
 
-			return
-		end
+	if FFlagAXMISWithBlackbird then
+		itemName = props.product.itemName
+	end
 
-		v80(v77.BuyRobuxAndItem)
-	end, {
-		t6.purchaseModalType,
-		v77.BuyRobuxAndAvatar,
-		v77.BuyRobuxAndExperience,
-		v77.BuyRobuxAndItem,
-		v77.BuyRobuxAndItems,
-		v77.BuyRobuxAndSubscription,
-		if not FFlagAXMISWithBlackbird then nil else t6.product.itemName,
-		if not FFlagAXMISWithBlackbird then nil else v77.BuyRobuxOnly
+	local v2
+
+	if FFlagAXMISWithBlackbird then
+		v2 = v.BuyRobuxOnly
+	end
+
+	useEffect(fn, {
+		purchaseModalType,
+		buyRobuxAndAvatar,
+		buyRobuxAndExperience,
+		buyRobuxAndItem,
+		buyRobuxAndItems,
+		buyRobuxAndSubscription,
+		itemName,
+		v2
 	})
 
-	local v81, v82 = useFocusNavigationRefs(t6.buttons.cancelPurchaseActivated, t6.onBuyItemButtonMounted)
+	local ref, ref2 = useFocusNavigationRefs(props.buttons.cancelPurchaseActivated, props.onBuyItemButtonMounted)
 
-	React.useEffect(function() -- line: 429
-	end, { t6.upsellSuggestions })
+	React.useEffect(function() end, { props.upsellSuggestions })
 
-	local parts = string.split(v77.DisclosureTermsURL, " {termsofuse} ")
-	local TermsOfUse = v77.TermsOfUse
+	local v3 = string.split(v.DisclosureTermsURL, " {termsofuse} ")
+	local text = v.TermsOfUse
 
-	if t6.termsOfUseActivated then
-		TermsOfUse = "<u>" .. TermsOfUse .. "</u>"
+	if props.termsOfUseActivated then
+		text = "<u>" .. text .. "</u>"
 	end
 
-	local v85 = FFlagEnableUnifiedPurchaseFlowForDevSubs and t6.purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
-	local v86 = if not v85 then nil else v77.PerMonth
-	local v87 = if not v85 then v77.Buy else v77.Subscribe
-	local u88 = nil
-	local t7 = {}
+	local v4 = FFlagEnableUnifiedPurchaseFlowForDevSubs
+		and props.purchaseModalType == UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	local perMonth
 
-	if FFlagPurchasePromptFetchCartPricing then
-		u88 = t6.buttons.buyItemDisabled == true or t6.isCartPricingLoading == true
-		t7 = buildCartPricingOfferCheckboxes({
-			cartPricing = u70,
-			isDisabled = u88
-		})
+	if v4 then
+		perMonth = v.PerMonth
 	end
 
-	local n1 = 0
+	local text2 = if v4 then v.Subscribe else v.Buy
 
-	if FFlagPurchasePromptFetchCartPricing then
-		n1 = not u70.showCartOfferUi and 0 or #u70.cartPricingOffers
-	end
+	local isDisabled = props.buttons.buyItemDisabled == true or props.isCartPricingLoading == true
 
-	local v91 = nil
+	local cartPricingOfferCheckboxes = buildCartPricingOfferCheckboxes({
+		cartPricing = cartPricing,
+		isDisabled = isDisabled
+	})
 
-	if FFlagPurchasePromptFetchCartPricing then
-		local v92 = React.useMemo(function() -- line: 469
-			-- upvalues: u71 (ref), React (copy), Checkbox (copy), n1 (ref), u88 (ref), u72 (ref)
-			local t8 = {}
+	local v5 = {
+		text = text2,
+		variant = ButtonVariant.Emphasis,
+		onActivated = onActivated,
+		isDisabled = isDisabled,
+		ref = ref2,
+		inputDelay = props.buttons.buyItemEnableInputDelayed and not isDisabled and 2.5 or 0
+	}
 
-			for v102, v103 in u71 do
-				t8[v103.actionKey] = React.createElement(Checkbox, {
-					size = "XSmall",
-					LayoutOrder = n1 + v102,
-					label = v103.label,
-					isChecked = v103.isActionSelected,
-					isDisabled = u88,
-					onActivated = function() -- line: 478
-						-- upvalues: u72 (ref), v102 (copy), v103 (copy)
-						u72(function(p1) -- line: 479
-							-- upvalues: v102 (copy), v103 (copy)
-							local v109 = table.clone(p1)
+	local v6 = cartPricing.showCartOfferUi and #cartPricing.cartPricingOffers or 0
 
-							v109[v102] = {
-								label = v103.label,
-								isActionSelected = not v103.isActionSelected,
-								actionKey = v103.actionKey
-							}
+	local v7 = React.useMemo(function()
+		local children = {}
 
-							return v109
-						end)
-					end
-				})
-			end
+		for k, v7 in state do
+			children[v7.actionKey] = React.createElement(Checkbox, {
+				LayoutOrder = v6 + k,
+				size = "XSmall",
+				label = v7.label,
+				isChecked = v7.isActionSelected,
+				isDisabled = isDisabled,
+				onActivated = function()
+					setState(function(p)
+						local clone = table.clone(p)
+						clone[k] = {
+							label = v7.label,
+							isActionSelected = not v7.isActionSelected,
+							actionKey = v7.actionKey
+						}
 
-			return t8
-		end, {
-			u71,
-			u88,
-			n1
-		})
-		local v93 = table.clone(t7)
-
-		for k, v in pairs(v92) do
-			v93[k] = v
-		end
-
-		v91 = if not next(v93) then nil else React.createElement(View, {
-			tag = "col gap-medium size-full-0 auto-y",
-			LayoutOrder = 3
-		}, v93)
-	end
-
-	local v96 = if not v85 or not FFlagShouldApplyDevSubsUpsellFix then React.createElement(ProductDetailsContainer, {
-		purchaseModalType = t6.purchaseModalType,
-		product = if not FFlagPurchasePromptFetchCartPricing then t6.product else v74,
-		isCompact = u78,
-		model = if not FFlagPurchasePromptFetchCartPricing then t6.product.model else v74.model,
-		priceSuffix = v86,
-		hideProductDetails = if not FFlagPurchasePromptFetchCartPricing then nil else t6.purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem,
-		hideDiscountSummary = if not FFlagPurchasePromptFetchCartPricing then nil else t6.isCartPricingLoading,
-		savingsSummary = if not FFlagPurchasePromptFetchCartPricing then nil else u70.cartPricingSavingsSummary
-	}) else React.createElement(View, {
-		LayoutOrder = 1,
-		tag = "row align-y-center gap-medium size-full-0 auto-y"
-	}, {
-		ItemIcon = React.createElement(FoundationImage, {
-			LayoutOrder = 1,
-			Size = UDim2.fromOffset(72, 72),
-			ScaleType = Enum.ScaleType.Fit,
-			Image = if not FFlagPurchasePromptFetchCartPricing then t6.product.itemIcon else v74.itemIcon
-		}),
-		ItemInfo = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = "col gap-xxsmall auto-y",
-			Size = UDim2.new(1, -84, 0, 0)
-		}, {
-			ItemName = React.createElement(FoundationText, {
-				LayoutOrder = 1,
-				tag = "auto-y text-title-medium text-wrap text-align-x-left content-emphasis",
-				Size = UDim2.new(1, 0, 0, 0),
-				Text = if not FFlagPurchasePromptFetchCartPricing then t6.product.itemName or "" else v74.itemName or ""
-			}),
-			ItemPrice = React.createElement(FoundationText, {
-				LayoutOrder = 2,
-				tag = "auto-y text-title-medium text-align-x-left content-emphasis",
-				RichText = true,
-				Size = UDim2.new(1, 0, 0, 0),
-				Text = utf8.char(57346) .. " " .. tostring((if not FFlagPurchasePromptFetchCartPricing then t6.product.itemRobuxCost or 0 else v74.itemRobuxCost or 0)) .. (v86 or "")
+						return clone
+					end)
+				end
 			})
-		})
+		end
+
+		return children
+	end, { state, isDisabled, v6 })
+
+	local clone = table.clone(cartPricingOfferCheckboxes)
+	local actions = { v5 }
+
+	for k, v8 in pairs(v7) do
+		clone[k] = v8
+	end
+
+	local postPurchaseActions
+
+	if next(clone) then
+		postPurchaseActions = React.createElement(
+			View,
+			{ tag = "col gap-medium size-full-0 auto-y", LayoutOrder = 3 },
+			clone
+		)
+	end
+
+	local savingsSummary = cartPricing.cartPricingSavingsSummary
+
+	if props.product.itemPrice and props.product.itemPrice.savingsSummaryOverride then
+		savingsSummary = props.product.itemPrice.savingsSummaryOverride
+	end
+
+	local productDetailsContainer = React.createElement(ProductDetailsContainer, {
+		purchaseModalType = props.purchaseModalType,
+		product = product,
+		isCompact = isCompact,
+		model = product.model,
+		priceSuffix = perMonth,
+		hideProductDetails = props.purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem,
+		hideDiscountSummary = props.isCartPricingLoading,
+		savingsSummary = savingsSummary
 	})
 
-	return React.createElement(Dialog.Root, {
-		disablePortal = false,
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v8 = {
 		size = DialogSize.Medium,
-		onClose = t6.buttons.cancelPurchaseActivated,
-		ref = v81
-	}, {
-		DialogTitle = React.createElement(Dialog.Title, {
-			text = v79
-		}),
-		DialogContent = React.createElement(Dialog.Content, nil, {
-			ContentView = React.createElement(View, {
-				tag = {
-					["col align-x-center align-y-top gap-medium size-full-0 auto-y"] = FFlagPurchasePromptFetchCartPricing,
-					["col gap-medium auto-y size-full-0 align-x-center align-y-start"] = not FFlagPurchasePromptFetchCartPricing
-				}
-			}, {
-				ProductDetailsContainer = v96 or React.createElement(View, {
-					LayoutOrder = 1,
-					tag = {
-						["col align-x-center align-y-center gap-medium size-full-0"] = FFlagPurchasePromptFetchCartPricing,
-						["col gap-medium size-full-0 align-x-center align-y-center"] = not FFlagPurchasePromptFetchCartPricing
-					}
-				}, {
-					ProductDetails = if t6.purchaseModalType ~= UnifiedPurchaseModalTypeEnum.MultiItem then React.createElement(UnifiedProductDetails, {
-						isPortrait = false,
-						isCompact = u78,
-						itemIcon = if not FFlagPurchasePromptFetchCartPricing then t6.product.itemIcon else v74.itemIcon,
-						itemName = if not FFlagPurchasePromptFetchCartPricing then t6.product.itemName else v74.itemName,
-						itemRobuxCost = if not FFlagPurchasePromptFetchCartPricing then t6.product.itemRobuxCost else v74.itemRobuxCost,
-						itemPrice = if not FFlagPurchasePromptFetchCartPricing then nil else v74.itemPrice,
-						model = if not FFlagPurchasePromptFetchCartPricing then t6.product.model else v74.model,
-						priceSuffix = v86
-					}) else React.createElement(PriceSummary, {
-						amount = if not FFlagPurchasePromptFetchCartPricing then t6.product.itemRobuxCost else v74.itemRobuxCost,
-						itemPrice = if not FFlagPurchasePromptFetchCartPricing then nil else v74.itemPrice
-					})
-				}),
-				CartPricingLoading = if not FFlagPurchasePromptFetchCartPricing then nil else React.createElement(CartPricingLoading, {
-					isLoading = t6.isCartPricingLoading
-				}),
-				PostPurchaseActions = if not FFlagPurchasePromptFetchCartPricing then nil else v91,
-				UpsellSuggestions = React.createElement(View, {
-					LayoutOrder = not FFlagPurchasePromptFetchCartPricing and 2 or 3,
-					tag = {
-						["col align-x-center align-y-center gap-medium size-full-0 auto-y padding-x-xsmall padding-bottom-xxlarge padding-top-small"] = FFlagPurchasePromptFetchCartPricing,
-						["col gap-medium auto-y size-full-0 align-x-center align-y-center padding-x-xsmall padding-y-small padding-bottom-xxlarge"] = not FFlagPurchasePromptFetchCartPricing
-					}
-				}, if not GetFFlagIAPExperienceEnableMultiDisplayUpsell() then {
-					UpsellPackage1 = React.createElement(UpsellProductDetails, {
-						layoutOrder = 1,
-						product = t6.upsellSuggestions[1],
-						selected = t6.selectedUpsellIndex == 1,
-						isCompact = u78,
-						onSelected = function() -- line: 656
-							-- upvalues: t6 (copy)
-							t6.onUpsellSuggestionsSelected(1)
-						end
-					}),
-					UpsellPackage2 = if not (#t6.upsellSuggestions > 1) then nil else React.createElement(UpsellProductDetails, {
-						layoutOrder = 2,
-						product = t6.upsellSuggestions[2],
-						selected = t6.selectedUpsellIndex == 2,
-						isCompact = u78,
-						onSelected = function() -- line: 666
-							-- upvalues: t6 (copy)
-							t6.onUpsellSuggestionsSelected(2)
-						end,
-						badgeType = t6.upsellSuggestions[2].badgeType
-					})
-				} else (function() -- line: 633
-					-- upvalues: t6 (copy), React (copy), UpsellProductDetails (copy), u78 (ref)
-					local t9 = {}
+		onClose = props.buttons.cancelPurchaseActivated,
+		ref = ref,
+		disablePortal = false
+	}
 
-					for i, v in ipairs(t6.upsellSuggestions) do
-						t9["UpsellPackage" .. tostring(i)] = React.createElement(UpsellProductDetails, {
-							layoutOrder = i,
-							product = v,
-							selected = i == t6.selectedUpsellIndex,
-							isCompact = u78,
-							onSelected = function() -- line: 642
-								-- upvalues: i (copy), t6 (copy)
-								local v107 = i
+	local children = {
+		DialogTitle = React.createElement(Dialog.Title, { text = state2 }),
+		DialogContent = 0,
+		DialogActions = 0,
+		DisclosureTerms = 0
+	}
 
-								t6.onUpsellSuggestionsSelected(v107)
-							end,
-							badgeType = v.badgeType
-						})
-					end
+	local createElement2 = React.createElement
+	local content = Dialog.Content
+	local v9 = { ContentView = 0 }
+	local createElement3 = React.createElement
 
-					return t9
-				end)())
+	if not productDetailsContainer then
+		local createElement4 = React.createElement
+		local productDetails
+
+		if props.purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem then
+			productDetails = React.createElement(PriceSummary, {
+				amount = product.itemRobuxCost,
+				itemPrice = product.itemPrice
 			})
+		else
+			productDetails = React.createElement(UnifiedProductDetails, {
+				isPortrait = false,
+				isCompact = isCompact,
+				itemIcon = product.itemIcon,
+				itemName = product.itemName,
+				itemRobuxCost = product.itemRobuxCost,
+				itemPrice = product.itemPrice,
+				model = product.model,
+				priceSuffix = perMonth
+			})
+		end
+
+		productDetailsContainer = createElement4(
+			View,
+			{ tag = "col align-x-center align-y-center gap-medium size-full-0", LayoutOrder = 1 },
+			{ ProductDetails = productDetails }
+		)
+	end
+
+	local children2 = {
+		ProductDetailsContainer = productDetailsContainer,
+		CartPricingLoading = React.createElement(CartPricingLoading, {
+			isLoading = props.isCartPricingLoading
 		}),
-		DialogActions = React.createElement(Dialog.Actions, {
+		PostPurchaseActions = postPurchaseActions,
+		UpsellSuggestions = 0
+	}
+
+	local createElement4 = React.createElement
+	local children3
+
+	local function fn2(i: number) -- 3 equivalent calls inferred from this helper
+		props.onUpsellSuggestionsSelected(i)
+	end
+
+	if GetFFlagIAPExperienceEnableMultiDisplayUpsell() then
+		children3 = {}
+
+		for i, upsellSuggestion in ipairs(props.upsellSuggestions) do
+			children3["UpsellPackage" .. tostring(i)] = React.createElement(UpsellProductDetails, {
+				layoutOrder = i,
+				product = upsellSuggestion,
+				selected = props.selectedUpsellIndex == i,
+				isCompact = isCompact,
+				onSelected = function()
+					fn2(i) -- inferred equivalent call
+				end,
+				badgeType = upsellSuggestion.badgeType
+			})
+		end
+	else
+		children3 = {
+			UpsellPackage1 = React.createElement(UpsellProductDetails, {
+				layoutOrder = 1,
+				product = props.upsellSuggestions[1],
+				selected = props.selectedUpsellIndex == 1,
+				isCompact = isCompact,
+				onSelected = function()
+					fn2(1) -- inferred equivalent call
+				end
+			}),
+			UpsellPackage2 = 0
+		}
+		local upsellPackage
+
+		if #props.upsellSuggestions > 1 then
+			upsellPackage = React.createElement(UpsellProductDetails, {
+				layoutOrder = 2,
+				product = props.upsellSuggestions[2],
+				selected = props.selectedUpsellIndex == 2,
+				isCompact = isCompact,
+				onSelected = function()
+					fn2(2) -- inferred equivalent call
+				end,
+				badgeType = props.upsellSuggestions[2].badgeType
+			})
+		end
+
+		children3.UpsellPackage2 = upsellPackage
+	end
+
+	children2.UpsellSuggestions = createElement4(
+		View,
+		{
+			LayoutOrder = 3,
+			tag = "col align-x-center align-y-center gap-medium size-full-0 auto-y padding-x-xsmall padding-bottom-xxlarge padding-top-small"
+		},
+		children3
+	)
+	v9.ContentView = createElement3(
+		View,
+		{ tag = "col align-x-center align-y-top gap-medium size-full-0 auto-y" },
+		children2
+	)
+	children.DialogContent = createElement2(content, nil, v9)
+	local dialogActions
+
+	if onRobloxPlusButtonActivated then
+		dialogActions = React.createElement(ButtonGroup, {
 			LayoutOrder = 4,
-			orientation = EnumsOrientation.Horizontal,
-			actions = {{
-				text = v87,
-				variant = ButtonVariant.Emphasis,
-				onActivated = if not FFlagPurchasePromptFetchCartPricing then t6.buttons.buyItemActivated else v73,
-				isDisabled = if not FFlagPurchasePromptFetchCartPricing then t6.buttons.buyItemDisabled else u88,
-				ref = v82,
-				inputDelay = if not FFlagPurchasePromptFetchCartPricing then (not t6.buttons.buyItemEnableInputDelayed or t6.buttons.buyItemDisabled) and 0 or 2.5 else (not t6.buttons.buyItemEnableInputDelayed or u88) and 0 or 2.5
-			}}
-		}),
-		DisclosureTerms = React.createElement(View, {
-			LayoutOrder = 5,
-			tag = {
-				["row wrap align-x-center align-y-center gap-xxsmall size-full-0 auto-y"] = FFlagPurchasePromptFetchCartPricing,
-				["row wrap auto-y align-y-center align-x-center size-full-0 gap-xxsmall"] = not FFlagPurchasePromptFetchCartPricing
+			orientation = Orientation.Vertical,
+			buttons = {
+				v5,
+				{
+					text = v.GetTenPercentOff,
+					variant = ButtonVariant.Standard,
+					onActivated = onRobloxPlusButtonActivated,
+					isDisabled = v5.isDisabled,
+					icon = Enums.IconName.RobloxPlus
+				}
 			}
-		}, {
-			DisclosurePayment = React.createElement(FoundationText, {
+		})
+	else
+		dialogActions = React.createElement(Dialog.Actions, {
+			LayoutOrder = 4,
+			orientation = Orientation.Horizontal,
+			actions = actions
+		})
+	end
+
+	children.DialogActions = dialogActions
+
+	children.DisclosureTerms = React.createElement(
+		View,
+		{
+			LayoutOrder = 5,
+			tag = "row wrap align-x-center align-y-center gap-xxsmall size-full-0 auto-y"
+		},
+		{
+			DisclosurePayment = React.createElement(Text, {
 				LayoutOrder = 1,
-				tag = "auto-xy text-body content-default text-align-x-left content-muted text-caption-small",
-				Text = v77.DisclosurePayment
+				Text = v.DisclosurePayment,
+				tag = "auto-xy text-body content-default text-align-x-left content-muted text-caption-small"
 			}),
-			BeforeText = React.createElement(FoundationText, {
+			BeforeText = React.createElement(Text, {
 				LayoutOrder = 2,
-				tag = "auto-xy text-body content-default text-align-x-left content-muted text-caption-small",
-				Text = parts[1]
+				Text = v3[1],
+				tag = "auto-xy text-body content-default text-align-x-left content-muted text-caption-small"
 			}),
-			TextLink = React.createElement(FoundationText, {
+			TextLink = React.createElement(Text, {
 				LayoutOrder = 3,
 				RichText = true,
+				Text = text,
 				tag = "auto-xy text-body content-default text-align-x-left content-muted text-caption-small",
-				Text = TermsOfUse,
-				onActivated = t6.termsOfUseActivated
+				onActivated = props.termsOfUseActivated
 			}),
-			AfterText = React.createElement(FoundationText, {
+			AfterText = React.createElement(Text, {
 				LayoutOrder = 4,
-				tag = "auto-xy text-body content-default text-align-x-left content-muted text-caption-small",
-				Text = parts[2]
+				Text = v3[2],
+				tag = "auto-xy text-body content-default text-align-x-left content-muted text-caption-small"
 			})
-		})
-	})
+		}
+	)
+	return createElement(root, v8, children)
 end
-local function UnifiedRobuxUpsellModalV2Container(t10: {[any]: any}) -- line: 732
-	-- upvalues: React (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), UnifiedRobuxUpsellModalV2 (copy)
-	return React.createElement(LocalizationProvider, {
-		localization = Localization.new(LocalizationService.RobloxLocaleId)
-	}, {
-		UnifiedRobuxUpsellModalV2 = React.createElement(UnifiedRobuxUpsellModalV2, t10)
-	})
+
+local function UnifiedRobuxUpsellModalV2Container(p)
+	return React.createElement(
+		LocalizationProvider,
+		{
+			localization = Localization.new(LocalizationService.RobloxLocaleId)
+		},
+		{
+			UnifiedRobuxUpsellModalV2 = React.createElement(UnifiedRobuxUpsellModalV2, p)
+		}
+	)
 end
 
 return UnifiedRobuxUpsellModalV2Container

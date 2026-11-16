@@ -1,7 +1,9 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-local function isBuilderIcon(s1: string?) -- line: 6
-	return s1 ~= nil and (s1 ~= "" and s1:find("[^%l%d%-]") == nil)
+local Dash = require(parent.Dash)
+
+local function isBuilderIcon(value: string?): boolean
+	return value ~= nil and value ~= "" and value:find("[^%l%d%-]") == nil
 end
 
-return require(Parent.Dash).memoize(isBuilderIcon)
+return Dash.memoize(isBuilderIcon)

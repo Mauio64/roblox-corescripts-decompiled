@@ -2,9 +2,7 @@ local Array = require(script.Array)
 local AssertionError = require(script.AssertionError)
 local Error = require(script.Error)
 local Object = require(script.Object)
-
 require(script.Promise)
-
 local Set = require(script.Set)
 local Symbol = require(script.Symbol)
 local Timers = require(script.Timers)
@@ -12,7 +10,6 @@ local WeakMap = require(script.WeakMap)
 local Map = require(script.Map)
 local coerceToMap = require(script.Map.coerceToMap)
 local coerceToTable = require(script.Map.coerceToTable)
-
 require(script.types)
 
 return {

@@ -1,10 +1,9 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+require(parent.SocialCommon)
 
-require(ProfilePlatformParent.SocialCommon)
 require(ProfilePlatform.Types.Component)
-
 local Enums = require(ProfilePlatform.Common.Enums)
 local getAvailableUserComponents = require(ProfilePlatform.Hooks.getAvailableUserComponents)
 local getAvailableCommunityComponents = require(ProfilePlatform.Hooks.getAvailableCommunityComponents)
@@ -15,37 +14,55 @@ local useAreWebViewsSupported = require(ProfilePlatform.Hooks.useAreWebViewsSupp
 local useIsProfileQrCodeEnabled = require(ProfilePlatform.Hooks.useIsProfileQrCodeEnabled)
 local useCanRenderTransferOnProfile = require(ProfilePlatform.Hooks.useCanRenderTransferOnProfile)
 local useCanSeeChatTab = require(ProfilePlatform.Hooks.useCanSeeChatTab)
-local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 local FFlagProfilePlatformEnableVR = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableVR)
-local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
 
-return function() -- line: 23
-	-- upvalues: useProfileWrapperContext (copy), getDeepValue (copy), useAreWebViewsSupported (copy), useIsProfileQrCodeEnabled (copy), useCanRenderTransferOnProfile (copy), useCanSeeChatTab (copy), FFlagProfilePlatformCTAsRefactor (copy), useLocalUserId (copy), React (copy), Enums (copy), getAvailableUserComponents (copy), FFlagProfilePlatformEnableVR (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), getAvailableCommunityComponents (copy), getAvailableContactComponents (copy)
-	local v18 = useProfileWrapperContext()
-	local profileType = v18.profileType
-	local v20 = getDeepValue(v18, "sourceInfo.contextualInfoType")
-	local v21 = useAreWebViewsSupported()
-	local v22 = useIsProfileQrCodeEnabled()
-	local v23 = useCanRenderTransferOnProfile()
-	local v24 = useCanSeeChatTab()
-	local v25 = if not FFlagProfilePlatformCTAsRefactor then nil else useLocalUserId()
-	local v26 = not not FFlagProfilePlatformCTAsRefactor and tostring(v18.profileId) == tostring(v25)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableCurrencyTransfer = SharedFlags.FFlagProfilePlatformEnableCurrencyTransfer
 
-	return (React.useMemo(function() -- line: 38
-		-- upvalues: profileType (copy), Enums (copy), getAvailableUserComponents (copy), v20 (copy), FFlagProfilePlatformEnableVR (copy), v21 (copy), v22 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), v23 (copy), v24 (copy), FFlagProfilePlatformCTAsRefactor (copy), v26 (copy), getAvailableCommunityComponents (copy), getAvailableContactComponents (copy)
+return function()
+	local v = useProfileWrapperContext()
+	local profileType = v.profileType
+
+	local deepValue = getDeepValue(v, "sourceInfo.contextualInfoType")
+	local areWebViewsSupported = useAreWebViewsSupported()
+	local isProfileQrCodeEnabled = useIsProfileQrCodeEnabled()
+	local v2 = useCanRenderTransferOnProfile()
+	local canSeeChatTab = useCanSeeChatTab()
+	local v3 = useLocalUserId()
+	local isSelfView = tostring(v.profileId) == tostring(v3)
+
+	local useMemo = React.useMemo
+	local function fn()
 		if profileType == Enums.ProfileTypes.User then
-			return getAvailableUserComponents(v20, if not FFlagProfilePlatformEnableVR then {
-				canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v23,
-				canSeeChatTab = v24,
-				isSelfView = if not FFlagProfilePlatformCTAsRefactor then nil else v26
-			} else {
-				areWebViewsSupported = v21,
-				isProfileQrCodeEnabled = v22,
-				canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v23,
-				canSeeChatTab = v24,
-				isSelfView = if not FFlagProfilePlatformCTAsRefactor then nil else v26
-			})
+			local v4
+
+			if FFlagProfilePlatformEnableVR then
+				v4 = {
+					areWebViewsSupported = areWebViewsSupported,
+					isProfileQrCodeEnabled = isProfileQrCodeEnabled,
+					canRenderTransferInProfile = 0,
+					canSeeChatTab = 0,
+					isSelfView = 0
+				}
+			else
+				v4 = { canRenderTransferInProfile = 0, canSeeChatTab = 0, isSelfView = 0 }
+			end
+
+			local canRenderTransferInProfile
+
+			if FFlagProfilePlatformEnableCurrencyTransfer then
+				canRenderTransferInProfile = v2
+			else
+				canRenderTransferInProfile = false
+			end
+
+			v4.canRenderTransferInProfile = canRenderTransferInProfile
+
+			v4.canSeeChatTab = canSeeChatTab
+			v4.isSelfView = isSelfView
+			return getAvailableUserComponents(deepValue, v4)
 		end
 
 		if profileType == Enums.ProfileTypes.Community then
@@ -57,19 +74,29 @@ return function() -- line: 23
 		end
 
 		return {}
-	end, if not FFlagProfilePlatformEnableVR then {
-		profileType,
-		v20,
-		v21,
-		v22,
-		if not FFlagProfilePlatformCTAsRefactor then nil else v26,
-		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v23,
-		v24
-	} else {
-		profileType,
-		v20,
-		if not FFlagProfilePlatformCTAsRefactor then nil else v26,
-		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v23,
-		v24
-	}))
+	end
+
+	local v4
+
+	if FFlagProfilePlatformEnableVR then
+		v4 = { nil, nil, nil, nil, nil }
+		local v5
+
+		if FFlagProfilePlatformEnableCurrencyTransfer then
+			v5 = v2
+		end
+
+		v4[1], v4[2], v4[3], v4[4], v4[5] = profileType, deepValue, isSelfView, v5, canSeeChatTab
+	else
+		v4 = { nil, nil, nil, nil, nil, nil, nil }
+		local v5
+
+		if FFlagProfilePlatformEnableCurrencyTransfer then
+			v5 = v2
+		end
+
+		v4[1], v4[2], v4[3], v4[4], v4[5], v4[6], v4[7] = profileType, deepValue, areWebViewsSupported, isProfileQrCodeEnabled, isSelfView, v5, canSeeChatTab
+	end
+
+	return (useMemo(fn, v4))
 end

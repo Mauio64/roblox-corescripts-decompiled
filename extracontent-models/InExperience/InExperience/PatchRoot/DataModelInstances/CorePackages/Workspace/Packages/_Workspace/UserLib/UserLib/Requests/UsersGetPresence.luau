@@ -1,24 +1,23 @@
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("UserLib").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("UserLib").Parent
 
-return function(p1, p2) -- line: 9
-	-- upvalues: HttpService (copy), Url (copy)
-	local t1 = {}
+local Http = require(parent.Http)
+local Url = Http.Url
 
-	for _, v in pairs(p2) do
-		local num = tonumber(v)
+return function(callback, items)
+	local userIds = {}
 
-		if num then
-			table.insert(t1, num)
+	for _, item in pairs(items) do
+		local v = tonumber(item)
+
+		if v then
+			table.insert(userIds, v)
 		end
 	end
 
-	local json = HttpService:JSONEncode({
-		userIds = t1
-	})
+	local jsonEncode = HttpService:JSONEncode({ userIds = userIds })
 
-	return p1(string.format("%s/presence/users", Url.PRESENCE_URL), "POST", {
-		postBody = json
+	return callback(string.format("%s/presence/users", Url.PRESENCE_URL), "POST", {
+		postBody = jsonEncode
 	})
 end

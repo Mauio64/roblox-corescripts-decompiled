@@ -1,7 +1,4 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
 
-return require(FriendsLanding.dependencies).enumerate(script.Name, {
-	Home = "Home",
-	More = "More",
-	SocialTab = "SocialTab"
-})
+return dependencies.enumerate(script.Name, { Home = "Home", More = "More", SocialTab = "SocialTab" })

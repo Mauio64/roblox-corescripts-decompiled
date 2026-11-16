@@ -1,5 +1,1 @@
-return {
-	Filters = "Filters",
-	Games = "Games",
-	Songs = "Songs"
-}
+return { Filters = "Filters", Games = "Games", Songs = "Songs" }

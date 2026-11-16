@@ -1,50 +1,59 @@
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
-local useDesignTokens = require(Parent.Style).useDesignTokens
-local NumberLocalization = require(Parent.Localization).NumberLocalization
-local UIBlox = require(Parent.UIBlox)
+
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local Localization = require(parent.Localization)
+local NumberLocalization = Localization.NumberLocalization
+local UIBlox = require(parent.UIBlox)
+
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Images = UIBlox.App.ImageSet.Images
 
-local function PriceIcon(t1: {[any]: any}) -- line: 19
-	-- upvalues: React (copy), ImageSetLabel (copy), Images (copy)
+local function PriceIcon(props)
 	return React.createElement(ImageSetLabel, {
+		Size = props.Size,
+		Image = Images["icons/common/robux_small"],
+		ImageColor3 = props.color,
 		ImageTransparency = 0,
 		BackgroundTransparency = 1,
-		Size = t1.Size,
-		Image = Images["icons/common/robux_small"],
-		ImageColor3 = t1.color,
-		LayoutOrder = t1.LayoutOrder
+		LayoutOrder = props.LayoutOrder
 	})
 end
-local function Price_DEPRECATED(t2: {[any]: any}) -- line: 36
-	-- upvalues: useDesignTokens (copy), React (copy), PriceIcon (copy), StyledTextLabel (copy), NumberLocalization (copy), LocalizationService (copy)
-	local v14 = useDesignTokens()
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, React.createElement("UIListLayout", {
-		SortOrder = Enum.SortOrder.LayoutOrder,
-		HorizontalAlignment = Enum.HorizontalAlignment.Right,
-		VerticalAlignment = Enum.VerticalAlignment.Center,
-		FillDirection = Enum.FillDirection.Horizontal,
-		Padding = UDim.new(0, v14.Size.Size_100)
-	}), React.createElement(PriceIcon, {
-		LayoutOrder = 1,
-		Size = UDim2.fromOffset(t2.fontStyle.FontSize, t2.fontStyle.FontSize),
-		color = t2.colorStyle.Color3
-	}), React.createElement(StyledTextLabel, {
-		layoutOrder = 2,
-		fontStyle = t2.fontStyle,
-		colorStyle = t2.colorStyle,
-		text = NumberLocalization.localize(t2.amount, LocalizationService.RobloxLocaleId),
-		textXAlignment = Enum.TextXAlignment.Right
-	}))
+local function Price_DEPRECATED(props)
+	local v = useDesignTokens()
+
+	return React.createElement(
+		"Frame",
+		{
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0
+		},
+		React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			FillDirection = Enum.FillDirection.Horizontal,
+			Padding = UDim.new(0, v.Size.Size_100)
+		}),
+		React.createElement(PriceIcon, {
+			Size = UDim2.fromOffset(props.fontStyle.FontSize, props.fontStyle.FontSize),
+			color = props.colorStyle.Color3,
+			LayoutOrder = 1
+		}),
+		React.createElement(StyledTextLabel, {
+			fontStyle = props.fontStyle,
+			colorStyle = props.colorStyle,
+			text = NumberLocalization.localize(props.amount, LocalizationService.RobloxLocaleId),
+			textXAlignment = Enum.TextXAlignment.Right,
+			layoutOrder = 2
+		})
+	)
 end
 
 return Price_DEPRECATED

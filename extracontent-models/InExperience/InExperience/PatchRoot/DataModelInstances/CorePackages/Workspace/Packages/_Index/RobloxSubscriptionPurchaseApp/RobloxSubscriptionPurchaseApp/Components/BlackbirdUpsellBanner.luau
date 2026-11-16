@@ -1,91 +1,152 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
-local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
-local React = require(RobloxSubscriptionPurchaseAppParent.React)
-local Foundation = require(RobloxSubscriptionPurchaseAppParent.Foundation)
+local parent = RobloxSubscriptionPurchaseApp.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 local IconName = Foundation.Enums.IconName
 local useTokens = Foundation.Hooks.useTokens
-local useLocalization = require(RobloxSubscriptionPurchaseAppParent.Localization).Hooks.useLocalization
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local FFlagSupportNewBadgeRobloxPlus = require(RobloxSubscriptionPurchaseApp.Flags.FFlagSupportNewBadgeRobloxPlus)
 local useRobloxPlusUpsellBannerNewBadgeInteraction = require(RobloxSubscriptionPurchaseApp.Hooks.useRobloxPlusUpsellBannerNewBadgeInteraction)
 local RobloxPlusUpsellBannerCTA = require(script.Parent.RobloxPlusUpsellBannerCTA)
-local v15 = game:DefineFastFlag("BoldBlackbirdUpsellBannerStroke", false)
+local FFlagRobloxPlusUpsellBannerUseTryItForFree = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusUpsellBannerUseTryItForFree)
+local defineFastFlag = game:DefineFastFlag("BoldBlackbirdUpsellBannerStroke", false)
 
-local function BlackbirdUpsellBanner(t1: {[any]: any}) -- line: 35
-	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), FFlagSupportNewBadgeRobloxPlus (copy), useRobloxPlusUpsellBannerNewBadgeInteraction (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy), RobloxPlusUpsellBannerCTA (copy), v15 (copy)
-	local v18 = useTokens()
-	local v19 = useLocalization({
-		getFreeTrialText = "Feature.RobloxSubscription.Label.FreeTrialText",
-		subscribe = "Feature.RobloxSubscription.Action.Subscribe",
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags.FFlagLuaAppsEnablePromptVIPServerPurchase
+
+local function BlackbirdUpsellBanner(props)
+	local v = useTokens()
+
+	local v2 = useLocalization({
 		bannerText = {
 			"Feature.RobloxSubscription.Label.BlackbirdUpsellBanner",
-			discountPercentage = t1.productInfo.initialDiscountPercentage or 10
-		}
+			discountPercentage = props.productInfo.initialDiscountPercentage or 10
+		},
+		getFreeTrialText = FFlagRobloxPlusUpsellBannerUseTryItForFree and "Feature.RobloxSubscription.Action.TryItForFree" or "Feature.RobloxSubscription.Label.FreeTrialText",
+		subscribe = "Feature.RobloxSubscription.Action.Subscribe"
 	})
-	local v20 = React.useCallback(function() -- line: 47
-		-- upvalues: t1 (copy), v19 (copy)
-		if t1.productInfo.isFreeTrial then
-			return v19.getFreeTrialText
+
+	local v3 = React.useCallback(function()
+		if props.productInfo.isFreeTrial then
+			return v2.getFreeTrialText
 		end
 
-		return v19.subscribe
-	end, {
-		t1.productInfo.isFreeTrial,
-		v19.getFreeTrialText,
-		v19.subscribe
-	})
-	local v21 = nil
+		return v2.subscribe
+	end, { props.productInfo.isFreeTrial, v2.getFreeTrialText, v2.subscribe })
+	local v4
 
 	if FFlagSupportNewBadgeRobloxPlus then
-		v21 = useRobloxPlusUpsellBannerNewBadgeInteraction(t1.onActivated)
+		v4 = useRobloxPlusUpsellBannerNewBadgeInteraction(props.onActivated)
 	end
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local onActivated
+
+	if FFlagSupportNewBadgeRobloxPlus then
+		onActivated = v4.onActivated
+	else
+		onActivated = props.onActivated
+	end
+
+	local v5 = {
 		tag = "size-full-0 auto-y padding-medium",
-		onActivated = if not FFlagSupportNewBadgeRobloxPlus then t1.onActivated else v21.onActivated,
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		ContentContainer = React.createElement(View, {
-			tag = "row align-y-center gap-small size-full-0 auto-y"
-		}, {
-			BlackbirdIcon = React.createElement(Icon, {
-				LayoutOrder = 1,
-				style = v18.Color.Content.Emphasis,
-				name = IconName.RobloxPlus,
-				size = IconSize.Medium
-			}),
-			BannerText = React.createElement(FoundationText, {
-				TextWrapped = true,
-				tag = "text-body-small text-align-x-left content-emphasis",
-				LayoutOrder = 2,
-				Size = UDim2.new(0.7, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Text = v19.bannerText
-			})
+		onActivated = onActivated,
+		LayoutOrder = props.LayoutOrder
+	}
+
+	local createElement2 = React.createElement
+
+	local v6 = {
+		BlackbirdIcon = React.createElement(Icon, {
+			style = v.Color.Content.Emphasis,
+			name = IconName.RobloxPlus,
+			size = IconSize.Medium,
+			LayoutOrder = 1
 		}),
-		SubscribeText = if FFlagSupportNewBadgeRobloxPlus then nil else React.createElement(FoundationText, {
-			tag = "auto-xy text-body-small content-default",
-			RichText = true,
+		BannerText = 0
+	}
+
+	local createElement3 = React.createElement
+	local v7 = {
+		Size = UDim2.new(0.7, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextWrapped = true,
+		tag = "text-body-small text-align-x-left content-emphasis",
+		Text = 0,
+		LayoutOrder = 2
+	}
+	local text
+
+	if FFlagLuaAppsEnablePromptVIPServerPurchase and props.bannerText then
+		text = props.bannerText
+	else
+		text = v2.bannerText
+	end
+
+	v7.Text = text
+	v6.BannerText = createElement3(Text, v7)
+	local children = {
+		ContentContainer = createElement2(View, {
+			tag = "row align-y-center gap-small size-full-0 auto-y"
+		}, v6),
+		SubscribeText = 0,
+		SubscribeCTA = 0,
+		UIStroke = 0,
+		UICorner = 0
+	}
+	local subscribeText
+
+	if not FFlagSupportNewBadgeRobloxPlus then
+		subscribeText = React.createElement(Text, {
 			AnchorPoint = Vector2.new(1, 0.5),
 			Position = UDim2.new(1, 0, 0.5, 0),
-			Text = "<u>" .. v20() .. "</u>"
-		}),
-		SubscribeCTA = if not FFlagSupportNewBadgeRobloxPlus then nil else React.createElement(RobloxPlusUpsellBannerCTA, {
-			productInfo = t1.productInfo,
-			shouldShowNewBadge = v21.shouldShowNewBadge
-		}),
-		UIStroke = React.createElement("UIStroke", {
-			Color = v18.Color.Stroke.Default.Color3,
-			Transparency = v18.Color.Stroke.Default.Transparency,
-			Thickness = if not v15 then v18.Stroke.Standard else v18.Stroke.Thick
-		}),
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, v18.Radius.Medium)
+			tag = "auto-xy text-body-small content-default",
+			Text = "<u>" .. v3() .. "</u>",
+			RichText = true
 		})
+	end
+
+	children.SubscribeText = subscribeText
+	local subscribeCTA
+
+	if FFlagSupportNewBadgeRobloxPlus then
+		subscribeCTA = React.createElement(RobloxPlusUpsellBannerCTA, {
+			productInfo = props.productInfo,
+			shouldShowNewBadge = v4.shouldShowNewBadge
+		})
+	end
+
+	children.SubscribeCTA = subscribeCTA
+
+	local createElement4 = React.createElement
+	local v8 = {
+		Color = v.Color.Stroke.Default.Color3,
+		Transparency = v.Color.Stroke.Default.Transparency,
+		Thickness = 0
+	}
+	local thickness
+
+	if defineFastFlag then
+		thickness = v.Stroke.Thick
+	else
+		thickness = v.Stroke.Standard
+	end
+
+	v8.Thickness = thickness
+	children.UIStroke = createElement4("UIStroke", v8)
+
+	children.UICorner = React.createElement("UICorner", {
+		CornerRadius = UDim.new(0, v.Radius.Medium)
 	})
+	return createElement(View, v5, children)
 end
 
 return BlackbirdUpsellBanner

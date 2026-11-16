@@ -1,65 +1,77 @@
 local CoreGui = game:GetService("CoreGui")
 local LocalizationService = game:GetService("LocalizationService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local React = require(scriptParentParent.React)
-local ReactRoblox = require(scriptParentParent.ReactRoblox)
-local Foundation = require(scriptParentParent.Foundation)
+
+local parent = script.Parent
+local parent2 = parent.Parent
+local React = require(parent2.React)
+local ReactRoblox = require(parent2.ReactRoblox)
+local Foundation = require(parent2.Foundation)
 local FoundationProvider = Foundation.FoundationProvider
 local Enums = Foundation.Enums
-local AdLabel = require(scriptParent.interactivity.AdLabel)
-local Localization = require(scriptParentParent.InExperienceLocales).Localization
-local LocalizationProvider = require(scriptParentParent.Localization).LocalizationProvider
-local v14 = game:DefineFastFlag("LuaAppIsEnhancedVideoUniverse", false)
-local FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline = require(scriptParent.FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline)
-local v16 = game:DefineFastFlag("LuaAppEnableEnhancedVideoExperienceGroupIdCheck", false)
-local v17 = if not v16 then nil else 427968160
-local EnhancedVideoStore = require(scriptParent.EnhancedVideoStore)
-local v19 = if not FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then nil else require(scriptParent.dispatchEnhancedVideoConfig)
-local v20 = require(scriptParentParent.Http).NetworkLayers.requestInternalWrapper(nil)
 
-local function starterScript() -- line: 38
-	-- upvalues: v16 (copy), v17 (copy), v14 (copy), Localization (copy), LocalizationService (copy), FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline (copy), EnhancedVideoStore (copy), v20 (copy), v19 (copy), ReplicatedStorage (copy), CoreGui (copy), ReactRoblox (copy), React (copy), LocalizationProvider (copy), FoundationProvider (copy), Enums (copy), AdLabel (copy)
-	if v16 then
-		if game.CreatorType ~= Enum.CreatorType.Group or game.CreatorId ~= v17 then
+local AdLabel = require(parent.interactivity.AdLabel)
+
+local InExperienceLocales = require(parent2.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+local Localization2 = require(parent2.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+
+local defineFastFlag = game:DefineFastFlag("LuaAppIsEnhancedVideoUniverse", false)
+
+local FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline = require(parent.FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline)
+
+local defineFastFlag2 = game:DefineFastFlag("LuaAppEnableEnhancedVideoExperienceGroupIdCheck", false)
+local v = defineFastFlag2 and 427968160 or nil
+local EnhancedVideoStore = require(parent.EnhancedVideoStore)
+local dispatchEnhancedVideoConfig
+
+if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
+	dispatchEnhancedVideoConfig = require(parent.dispatchEnhancedVideoConfig)
+else
+	dispatchEnhancedVideoConfig = nil
+end
+
+local Http = require(parent2.Http)
+local internalWrapper = Http.NetworkLayers.requestInternalWrapper(nil)
+local function starterScript()
+	if defineFastFlag2 then
+		if game.CreatorType ~= Enum.CreatorType.Group or game.CreatorId ~= v then
 			return
 		end
-	elseif not v14 then
+	elseif not defineFastFlag then
 		return
 	end
 
-	local v22 = Localization.new(LocalizationService.RobloxLocaleId)
+	local localization = Localization.new(LocalizationService.RobloxLocaleId)
 
 	if FFlagLuaAppEnableEnhancedVideoExperienceAssetAndTimeline then
-		EnhancedVideoStore(false).fetchInitialData(v20, game.GameId):andThen(function(p1) -- line: 53
-			-- upvalues: v19 (copy)
-			if p1 then
-				v19(p1)
+		EnhancedVideoStore(false).fetchInitialData(internalWrapper, game.GameId):andThen(function(p)
+			if p then
+				dispatchEnhancedVideoConfig(p)
 			end
 		end)
 	else
-		EnhancedVideoStore(false).fetchInitialData(v20, game.GameId)
+		EnhancedVideoStore(false).fetchInitialData(internalWrapper, game.GameId)
 	end
 
-	local AdDisclosurePauseEvent = ReplicatedStorage:WaitForChild("AdDisclosurePauseEvent")
-	local Folder = Instance.new("Folder")
+	local adDisclosurePauseEvent = ReplicatedStorage:WaitForChild("AdDisclosurePauseEvent")
 
-	Folder.Name = "EnhancedVideoInteractivityControls"
-	Folder.Parent = CoreGui
-	ReactRoblox.createRoot(Folder):render(React.createElement("ScreenGui", {
+	local enhancedVideoInteractivityControls = Instance.new("Folder")
+	enhancedVideoInteractivityControls.Name = "EnhancedVideoInteractivityControls"
+	enhancedVideoInteractivityControls.Parent = CoreGui
+	ReactRoblox.createRoot(enhancedVideoInteractivityControls):render(React.createElement("ScreenGui", {
 		DisplayOrder = -5
 	}, {
 		LocalizationProvider = React.createElement(LocalizationProvider, {
-			localization = v22
+			localization = localization
 		}, {
 			FoundationProvider = React.createElement(FoundationProvider, {
-				theme = Enums.Theme.Dark
+				colorMode = Enums.ColorMode.Dark
 			}, {
 				AdLabel = React.createElement(AdLabel, {
-					sendPauseEvent = function() -- line: 79
-						-- upvalues: AdDisclosurePauseEvent (copy)
-						AdDisclosurePauseEvent:Fire()
+					sendPauseEvent = function()
+						adDisclosurePauseEvent:Fire()
 					end
 				})
 			})

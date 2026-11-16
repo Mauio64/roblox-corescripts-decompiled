@@ -1,13 +1,13 @@
-local function getMakeupDescriptionsFromHumanoidDescription(p1) -- line: 5
-	local t1 = {}
+local function getMakeupDescriptionsFromHumanoidDescription(instance)
+	local makeupDescriptions = {}
 
-	for _, child in p1:GetChildren() do
-		if child:IsA("MakeupDescription") then
-			table.insert(t1, child)
+	for _, makeupDescription in instance:GetChildren() do
+		if makeupDescription:IsA("MakeupDescription") then
+			table.insert(makeupDescriptions, makeupDescription)
 		end
 	end
 
-	return t1
+	return makeupDescriptions
 end
 
 return getMakeupDescriptionsFromHumanoidDescription

@@ -1,71 +1,100 @@
 local ChromeShared = script:FindFirstAncestor("ChromeShared")
+
 local CorePackages = game:GetService("CorePackages")
-local Signal = require(CorePackages.Workspace.Packages.AppCommonLib).Signal
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
 require(CorePackages.Workspace.Packages.Chrome)
 
 local ViewportUtil = require(ChromeShared.Service.ViewportUtil)
 local Constants = require(ChromeShared.Unibar.Constants)
-local FFlagChromeWindowSignalConstraintsToggle = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeWindowSignalConstraintsToggle
 
-local function getConstrainedWindowSize(n1: number, n2: number, b1: boolean?) -- line: 18
-	-- upvalues: ViewportUtil (copy), FFlagChromeWindowSignalConstraintsToggle (copy), Constants (copy)
-	local v12 = ViewportUtil.mobileDevice:get()
-	local v13 = ViewportUtil.screenSize:get()
-	local v14 = v13.Y > v13.X
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagChromeWindowSignalConstraintsToggle = SharedFlags.FFlagChromeWindowSignalConstraintsToggle
 
-	if v12 and (not FFlagChromeWindowSignalConstraintsToggle or not b1) then
-		if v14 then
-			n2 = math.min(n2, Constants.MAX_HEIGHT_PORTRAIT)
-			n1 = math.min(n1, Constants.MAX_WIDTH_PORTRAIT)
-		elseif not v14 then
-			n2 = math.min(n2, Constants.MAX_HEIGHT_LANDSCAPE)
-			n1 = math.min(n1, Constants.MAX_WIDTH_LANDSCAPE)
+local function getConstrainedWindowSize(p: number, p2: number, flag: boolean?)
+	local v = ViewportUtil.mobileDevice:get()
+	local v2 = ViewportUtil.screenSize:get()
+	local v3 = v2.Y > v2.X
+
+	if v and not (FFlagChromeWindowSignalConstraintsToggle and flag) then
+		if v3 then
+			p2 = math.min(p2, Constants.MAX_HEIGHT_PORTRAIT)
+			p = math.min(p, Constants.MAX_WIDTH_PORTRAIT)
+		elseif not v3 then
+			p2 = math.min(p2, Constants.MAX_HEIGHT_LANDSCAPE)
+			p = math.min(p, Constants.MAX_WIDTH_LANDSCAPE)
 		end
 	end
 
-	return UDim2.new(0, n1, 0, n2)
+	return UDim2.new(0, p, 0, p2)
 end
 
-local t1 = {}
+local WindowSizeSignal = {}
+WindowSizeSignal.__index = WindowSizeSignal
 
-t1.__index = t1
+function WindowSizeSignal.new(p: number?, p2: number?, flag: boolean?, flag2: boolean?)
+	local state
 
-function t1.new(n3: number?, n4: number?, b2: boolean?, b3: boolean?) -- line: 43
-	-- upvalues: FFlagChromeWindowSignalConstraintsToggle (copy), getConstrainedWindowSize (copy), Constants (copy), Signal (copy), t1 (copy)
-	return (setmetatable({
-		_state = if not FFlagChromeWindowSignalConstraintsToggle then getConstrainedWindowSize(n3 or Constants.DEFAULT_WIDTH, n4 or Constants.DEFAULT_HEIGHT) else getConstrainedWindowSize(n3 or Constants.DEFAULT_WIDTH, n4 or Constants.DEFAULT_HEIGHT, b3 or false),
-		_isLarge = b2 or false,
-		_ignoreConstraints = if not FFlagChromeWindowSignalConstraintsToggle then nil else b3 or false,
-		_changeSignal = Signal.new()
-	}, t1))
+	if FFlagChromeWindowSignalConstraintsToggle then
+		state = getConstrainedWindowSize(p or Constants.DEFAULT_WIDTH, p2 or Constants.DEFAULT_HEIGHT, flag2 or false)
+	else
+		state = getConstrainedWindowSize(p or Constants.DEFAULT_WIDTH, p2 or Constants.DEFAULT_HEIGHT)
+	end
+
+	local v = {
+		_state = state,
+		_isLarge = flag or false,
+		_ignoreConstraints = nil,
+		_changeSignal = 0
+	}
+	local ignoreConstraints
+
+	if FFlagChromeWindowSignalConstraintsToggle then
+		ignoreConstraints = flag2 or false
+	end
+
+	v._ignoreConstraints = ignoreConstraints
+	v._changeSignal = Signal.new()
+
+	return (setmetatable(v, WindowSizeSignal))
 end
-function t1.connect(p1, p2) -- line: 67
-	return p1._changeSignal:connect(p2)
-end
-function t1.requestSize(t2: {[any]: any}, n5: number, n6: number) -- line: 72
-	-- upvalues: FFlagChromeWindowSignalConstraintsToggle (copy), getConstrainedWindowSize (copy)
-	local v24 = if not FFlagChromeWindowSignalConstraintsToggle then getConstrainedWindowSize(n5, n6) else getConstrainedWindowSize(n5, n6, t2._ignoreConstraints)
 
-	if v24 ~= t2._state then
-		t2._state = v24
-		t2._changeSignal:fire(v24)
+function WindowSizeSignal:connect(p)
+	return self._changeSignal:connect(p)
+end
+
+function WindowSizeSignal:requestSize(p: number, p2: number)
+	local state
+
+	if FFlagChromeWindowSignalConstraintsToggle then
+		state = getConstrainedWindowSize(p, p2, self._ignoreConstraints)
+	else
+		state = getConstrainedWindowSize(p, p2)
+	end
+
+	if self._state ~= state then
+		self._state = state
+		self._changeSignal:fire(state)
 	end
 end
-function t1.toggleIsLarge(p3) -- line: 83
-	local v26 = not p3._isLarge
 
-	p3._isLarge = v26
-	p3._changeSignal:fire(v26)
-end
-function t1.get(p4) -- line: 89
-	return p4._state
-end
-function t1.getIsLarge(p5) -- line: 93
-	return p5._isLarge
-end
-function t1.updateConstraints(p6) -- line: 98
-	p6:requestSize(p6._state.Width.Offset, p6._state.Height.Offset)
+function WindowSizeSignal:toggleIsLarge()
+	local isLarge = not self._isLarge
+	self._isLarge = isLarge
+	self._changeSignal:fire(isLarge)
 end
 
-return t1
+function WindowSizeSignal:get()
+	return self._state
+end
+
+function WindowSizeSignal:getIsLarge()
+	return self._isLarge
+end
+
+function WindowSizeSignal:updateConstraints()
+	self:requestSize(self._state.Width.Offset, self._state.Height.Offset)
+end
+
+return WindowSizeSignal

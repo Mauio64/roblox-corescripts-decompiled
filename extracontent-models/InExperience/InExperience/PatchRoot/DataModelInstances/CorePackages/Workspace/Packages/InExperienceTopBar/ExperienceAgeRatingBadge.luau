@@ -1,0 +1,4 @@
+local Workspace = script.Parent.Parent._Workspace
+local ExperienceAgeRatingBadgeContainer = require(Workspace.InExperienceTopBar.InExperienceTopBar.Components.ExperienceAgeRatingBadge.ExperienceAgeRatingBadgeContainer)
+
+return ExperienceAgeRatingBadgeContainer

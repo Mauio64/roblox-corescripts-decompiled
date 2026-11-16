@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-return function(p1) -- line: 6
-	-- upvalues: UrlBuilder (copy)
-	return p1(UrlBuilder.fromString("auth:v1/session/refresh")(), "POST", {
-		postBody = ""
-	})
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+
+return function(callback)
+	return callback(urlBuilder.fromString("auth:v1/session/refresh")(), "POST", { postBody = "" })
 end

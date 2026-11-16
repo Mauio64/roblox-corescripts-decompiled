@@ -1,94 +1,97 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local Cryo = require(VirtualEvents.Parent.Cryo)
 local React = require(VirtualEvents.Parent.React)
-local t1 = {
-	numItemsShown = 1e999,
-	itemPadding = UDim.new(0, 12)
-}
 
-local function EventsGridLayout(t2: {[any]: any}) -- line: 19
-	-- upvalues: Cryo (copy), t1 (copy), React (copy)
-	local v7 = Cryo.Dictionary.join(t1, t2)
-	local v8 = React.useMemo(function() -- line: 22
-		-- upvalues: v7 (copy), React (copy)
-		local t3 = {}
+local v = { itemPadding = UDim.new(0, 12), numItemsShown = 1e999 }
 
-		for i = 1, v7.numItemsShown do
-			local v12 = v7.items[i]
+local function EventsGridLayout(p)
+	local joined = Cryo.Dictionary.join(v, p)
 
-			t3[i] = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = i,
-				Size = UDim2.fromScale(1, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				Content = v12
-			})
+	local v2 = React.useMemo(function()
+		local children = {}
+
+		for i = 1, joined.numItemsShown do
+			local item = joined.items[i]
+
+			children[i] = React.createElement(
+				"Frame",
+				{
+					LayoutOrder = i,
+					Size = UDim2.fromScale(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1
+				},
+				{ Content = item }
+			)
 		end
 
-		return t3
-	end, {
-		v7.items,
-		v7.numItemsShown
-	})
-	local v9 = React.useMemo(function() -- line: 39
-		-- upvalues: v8 (copy), React (copy), v7 (copy)
-		local t4 = {}
+		return children
+	end, { joined.items, joined.numItemsShown })
 
-		for i = 1, #v8, 2 do
-			local v15 = v8[i]
-			local v16 = v8[i + 1]
-			local v17 = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				LayoutOrder = i
-			}, {
-				Layout = React.createElement("UIListLayout", {
-					Padding = v7.itemPadding,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left
-				}),
-				CellFrame1 = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					Size = UDim2.new(0.5, -v7.itemPadding.Offset / 2, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}, {
-					Item = React.createElement(React.Fragment, nil, v15)
-				}),
-				CellFrame2 = v16 and React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					Size = UDim2.new(0.5, -v7.itemPadding.Offset / 2, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}, {
-					Item = React.createElement(React.Fragment, nil, v16)
-				})
-			})
+	local v3 = React.useMemo(function()
+		local elements = {}
 
-			t4["Row" .. math.ceil(i / 2)] = v17
+		for i = 1, #v2, 2 do
+			local v3 = v2[i]
+			local v4 = v2[i + 1]
+
+			local element = React.createElement(
+				"Frame",
+				{
+					Size = UDim2.fromScale(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					LayoutOrder = i
+				},
+				{
+					Layout = React.createElement("UIListLayout", {
+						Padding = joined.itemPadding,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Left
+					}),
+					CellFrame1 = React.createElement("Frame", {
+						Size = UDim2.new(0.5, -joined.itemPadding.Offset / 2, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y,
+						BackgroundTransparency = 1,
+						LayoutOrder = 1
+					}, {
+						Item = React.createElement(React.Fragment, nil, v3)
+					}),
+					CellFrame2 = v4 and React.createElement("Frame", {
+						Size = UDim2.new(0.5, -joined.itemPadding.Offset / 2, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y,
+						BackgroundTransparency = 1,
+						LayoutOrder = 2
+					}, {
+						Item = React.createElement(React.Fragment, nil, v4)
+					})
+				}
+			)
+
+			elements["Row" .. math.ceil(i / 2)] = element
 		end
 
-		return t4
-	end, {
-		v7.items,
-		v8
-	})
+		return elements
+	end, { joined.items, v2 })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, {
-		Layout = React.createElement("UIListLayout", {
-			Padding = v7.itemPadding,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Vertical
-		}),
-		Rows = React.createElement(React.Fragment, nil, v9)
-	})
+	return React.createElement(
+		"Frame",
+		{
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1
+		},
+		{
+			Layout = React.createElement("UIListLayout", {
+				Padding = joined.itemPadding,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical
+			}),
+			Rows = React.createElement(React.Fragment, nil, v3)
+		}
+	)
 end
 
 return EventsGridLayout

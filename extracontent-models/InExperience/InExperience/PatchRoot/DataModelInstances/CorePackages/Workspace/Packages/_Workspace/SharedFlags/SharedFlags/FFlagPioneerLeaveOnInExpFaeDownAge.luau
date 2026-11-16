@@ -1,0 +1,2 @@
+return game:DefineFastFlag("PioneerLeaveOnInExpFaeDownAge2", false)
+	and game:GetEngineFeature("ExperienceLeaveReasonEnabled")

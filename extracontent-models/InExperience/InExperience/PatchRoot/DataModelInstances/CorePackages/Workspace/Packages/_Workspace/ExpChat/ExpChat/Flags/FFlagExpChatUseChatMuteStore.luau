@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-
-return require(Parent.SharedFlags).FFlagExpChatUseChatMuteStore
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local SharedFlags = require(parent.SharedFlags)
+return SharedFlags.FFlagExpChatUseChatMuteStore

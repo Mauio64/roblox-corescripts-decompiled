@@ -1,12 +1,10 @@
-local function toRect(p1) -- line: 11
-	local v3 = typeof(p1)
+local function toRect(p)
+	local typeName = typeof(p)
 
-	if v3 == "Rect" then
-		return p1
-	end
-
-	if v3 == "Instance" then
-		return Rect.new(p1.AbsolutePosition, p1.AbsolutePosition + p1.AbsoluteSize)
+	if typeName == "Rect" then
+		return p
+	elseif typeName == "Instance" then
+		return Rect.new(p.AbsolutePosition, p.AbsolutePosition + p.AbsoluteSize)
 	end
 end
 

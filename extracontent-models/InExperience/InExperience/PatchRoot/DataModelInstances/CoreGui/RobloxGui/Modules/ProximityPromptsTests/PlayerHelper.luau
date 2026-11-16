@@ -1,158 +1,145 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local GuiService = game:GetService("GuiService")
-local t1 = {
-	initStarted = false,
-	TestModel = nil,
-	hrp = nil,
-	humanoid = nil,
-	player = nil
-}
 
-function t1.Init() -- line: 15
-	-- upvalues: t1 (copy), Players (copy), RunService (copy)
-	if t1.initStarted then
+local PlayerHelper = {}
+PlayerHelper.initStarted = false
+PlayerHelper.TestModel = nil
+PlayerHelper.hrp = nil
+PlayerHelper.humanoid = nil
+PlayerHelper.player = nil
+
+function PlayerHelper.Init()
+	if PlayerHelper.initStarted then
 		return
 	end
 
-	t1.initStarted = true
+	PlayerHelper.initStarted = true
 
-	local v5 = t1.WaitForExpression(function() -- line: 23
-		-- upvalues: Players (copy)
+	local player = PlayerHelper.WaitForExpression(function()
 		return Players.LocalPlayer
 	end, 10, "Players.LocalPlayer not found")
 
-	t1.player = v5
+	PlayerHelper.player = player
 
-	if v5.Character == nil and RunService:IsServer() then
-		if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-			v5:LoadCharacterAsync()
-		else
-			v5:LoadCharacter()
-		end
+	if player.Character == nil and RunService:IsServer() then
+		player:LoadCharacterAsync()
 	end
 
-	t1.WaitForExpression(function() -- line: 37
-		-- upvalues: v5 (copy)
-		return v5.Character
+	PlayerHelper.WaitForExpression(function()
+		return player.Character
 	end, 10, "LocalPlayer.Character not found")
-	t1.hrp = v5.Character:WaitForChild("HumanoidRootPart")
-	t1.humanoid = v5.Character:WaitForChild("Humanoid")
 
-	if t1.TestModel == nil then
-		t1.TestModel = Instance.new("Model")
-		t1.TestModel.Name = "_TestContainer"
-		t1.TestModel.Parent = workspace
+	PlayerHelper.hrp = player.Character:WaitForChild("HumanoidRootPart")
+	PlayerHelper.humanoid = player.Character:WaitForChild("Humanoid")
+
+	if PlayerHelper.TestModel == nil then
+		PlayerHelper.TestModel = Instance.new("Model")
+		PlayerHelper.TestModel.Name = "_TestContainer"
+		PlayerHelper.TestModel.Parent = workspace
 	end
 
-	t1.PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+	PlayerHelper.PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 end
-function t1.AddInstance(p1) -- line: 54
-	-- upvalues: t1 (copy)
-	local v7 = Instance.new(p1)
 
-	v7.Parent = t1.TestModel
+function PlayerHelper.AddInstance(className)
+	local instance = Instance.new(className)
+	instance.Parent = PlayerHelper.TestModel
+	return instance
+end
 
-	return v7
+function PlayerHelper.CleanUpAfterTest()
+	PlayerHelper.TestModel:ClearAllChildren()
 end
-function t1.CleanUpAfterTest() -- line: 61
-	-- upvalues: t1 (copy)
-	t1.TestModel:ClearAllChildren()
-end
-function t1.SetCameraFOV(p2) -- line: 65
-	workspace.CurrentCamera.FieldOfView = p2
-end
-function t1.IsPartOnscreen(p3) -- line: 69
-	local _, v11 = workspace.CurrentCamera:WorldToViewportPoint(p3.Position)
 
-	return v11
+function PlayerHelper.SetCameraFOV(fieldOfView)
+	workspace.CurrentCamera.FieldOfView = fieldOfView
 end
-function t1.GetPartViewportPixelPosition(p4) -- line: 75
-	local v13, _ = workspace.CurrentCamera:WorldToViewportPoint(p4.Position)
 
-	return Vector2.new(v13.x, v13.y)
+function PlayerHelper.IsPartOnscreen(p)
+	local _, v = workspace.CurrentCamera:WorldToViewportPoint(p.Position)
+	return v
 end
-function t1.MovePlayerToPosition(p5) -- line: 82
-	-- upvalues: t1 (copy)
-	if t1.hrp ~= nil then
-		local v16 = CFrame.new() + p5 + Vector3.new(0, 1 + t1.humanoid.HipHeight, 0)
 
-		t1.hrp.CFrame = v16
+function PlayerHelper.GetPartViewportPixelPosition(p)
+	local worldToViewportPoint, _ = workspace.CurrentCamera:WorldToViewportPoint(p.Position)
+	return Vector2.new(worldToViewportPoint.x, worldToViewportPoint.y)
+end
+
+function PlayerHelper.MovePlayerToPosition(p)
+	if PlayerHelper.hrp ~= nil then
+		local cframe = CFrame.new() + p + Vector3.new(0, 1 + PlayerHelper.humanoid.HipHeight, 0)
+		PlayerHelper.hrp.CFrame = cframe
 	end
 end
-function t1.SetPlayerCamera(p6, p7) -- line: 91
-	-- upvalues: t1 (copy)
-	local Head = t1.player.Character:WaitForChild("Head", 10)
-	local v20 = CFrame.new(Vector3.new(), p6) + Head.Position - p7 * p6.Unit
-	local CurrentCamera = workspace.CurrentCamera
 
-	CurrentCamera.CameraType = Enum.CameraType.Scriptable
-	CurrentCamera.CFrame = v20
+function PlayerHelper.SetPlayerCamera(p, p2)
+	local head = PlayerHelper.player.Character:WaitForChild("Head", 10)
+	local cframe = CFrame.new(Vector3.new(), p) + head.Position - p2 * p.Unit
+
+	local currentCamera = workspace.CurrentCamera
+	currentCamera.CameraType = Enum.CameraType.Scriptable
+	currentCamera.CFrame = cframe
 end
-function t1.WaitNFrames(p8) -- line: 102
-	-- upvalues: RunService (copy)
-	for _ = 1, p8 do
+
+function PlayerHelper.WaitNFrames(p)
+	for _ = 1, p do
 		RunService.RenderStepped:Wait()
 	end
 end
-function t1.WaitWallTime(p9) -- line: 111
-	-- upvalues: t1 (copy)
-	local timestamp = tick()
 
-	if p9 > 2 then
+function PlayerHelper.WaitWallTime(p)
+	local lastTime = tick()
+
+	if p > 2 then
 		warn("Requested wait time too long, waiting 2s")
-		p9 = 2
+		p = 2
 	end
 
-	while not (p9 < tick() - timestamp) do
-		t1.WaitNFrames(1)
-	end
-end
-function t1.WaitGameTime(p10) -- line: 129
-	-- upvalues: RunService (copy)
-	local time, _ = RunService.Stepped:Wait()
-	local v29 = time
-
-	while p10 > v29 - time do
-		local dt
-
-		v29, dt = RunService.Stepped:Wait()
+	while not (p < tick() - lastTime) do
+		PlayerHelper.WaitNFrames(1)
 	end
 end
-function t1.WaitForExpression(p11, p12, p13) -- line: 138
-	-- upvalues: t1 (copy)
-	local timestamp = tick()
-	local v35 = p11()
 
-	while not v35 and p12 > tick() - timestamp do
-		t1.WaitNFrames(1)
-		v35 = p11()
+function PlayerHelper.WaitGameTime(p)
+	local v, _ = RunService.Stepped:Wait()
+	local v2 = v
+
+	while v2 - v < p do
+		local v3
+		v2, v3 = RunService.Stepped:Wait()
 	end
-
-	if not v35 then
-		error(p13)
-	end
-
-	return v35
 end
-function t1.GetCornersOfBillboardGui(p14) -- line: 156
-	-- upvalues: t1 (copy), GuiService (copy)
-	local v37 = t1.GetPartViewportPixelPosition(p14.Adornee)
-	local vector2 = Vector2.new(p14.SizeOffset.x * p14.AbsoluteSize.x, p14.SizeOffset.y * p14.AbsoluteSize.y)
-	local v39 = v37 - GuiService:GetGuiInset() + vector2
-	local AbsoluteSize = p14.AbsoluteSize
-	local v41 = v39 - AbsoluteSize / 2 + Vector2.new(1, 1)
-	local v42 = v39 + Vector2.new(AbsoluteSize.x / 2 - 1, -AbsoluteSize.y / 2 + 1)
-	local v43 = v39 + Vector2.new(AbsoluteSize.x / 2 - 1, AbsoluteSize.y / 2 - 1)
-	local v44 = v39 + Vector2.new(-AbsoluteSize.x / 2 + 1, AbsoluteSize.y / 2 - 1)
+
+function PlayerHelper.WaitForExpression(callback, p, message)
+	local lastTime = tick()
+	local v = callback()
+
+	while not v and tick() - lastTime < p do
+		PlayerHelper.WaitNFrames(1)
+		v = callback()
+	end
+
+	if not v then
+		error(message)
+	end
+
+	return v
+end
+
+function PlayerHelper.GetCornersOfBillboardGui(data)
+	local partViewportPixelPosition = PlayerHelper.GetPartViewportPixelPosition(data.Adornee)
+	local vector2 = Vector2.new(data.SizeOffset.x * data.AbsoluteSize.x, data.SizeOffset.y * data.AbsoluteSize.y)
+	local center = partViewportPixelPosition - GuiService:GetGuiInset() + vector2
+	local absoluteSize = data.AbsoluteSize
 
 	return {
-		center = v39,
-		topLeft = v41,
-		topRight = v42,
-		bottomRight = v43,
-		bottomLeft = v44
+		center = center,
+		topLeft = center - absoluteSize / 2 + Vector2.new(1, 1),
+		topRight = center + Vector2.new(absoluteSize.x / 2 - 1, -absoluteSize.y / 2 + 1),
+		bottomRight = center + Vector2.new(absoluteSize.x / 2 - 1, absoluteSize.y / 2 - 1),
+		bottomLeft = center + Vector2.new(-absoluteSize.x / 2 + 1, absoluteSize.y / 2 - 1)
 	}
 end
 
-return t1
+return PlayerHelper

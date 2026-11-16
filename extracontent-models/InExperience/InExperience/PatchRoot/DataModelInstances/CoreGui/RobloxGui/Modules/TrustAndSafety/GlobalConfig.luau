@@ -1,5 +1,1 @@
-return {
-	propValidation = false,
-	elementTracing = false,
-	logStore = false
-}
+return { propValidation = false, elementTracing = false, logStore = false }

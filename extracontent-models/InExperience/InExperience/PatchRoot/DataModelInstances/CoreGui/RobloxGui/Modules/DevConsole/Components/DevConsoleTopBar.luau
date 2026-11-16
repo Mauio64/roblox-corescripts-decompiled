@@ -1,155 +1,157 @@
 local CorePackages = game:GetService("CorePackages")
-local _ = game:GetService("CoreGui").RobloxGui
+local v = game:GetService("CoreGui")
+v = v.RobloxGui
 local TextService = game:GetService("TextService")
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local Constants = require(script.Parent.Parent.Constants)
 local FrameHeight = Constants.TopBarFormatting.FrameHeight
-local v8 = 0.5 * FrameHeight
-local v9 = (FrameHeight - v8) / 2
+local v2 = 0.5 * FrameHeight
+local v3 = (FrameHeight - v2) / 2
+
 local UserInputService = game:GetService("UserInputService")
-local TextSize = TextService:GetTextSize("Developer Console", Constants.DefaultFontSize.TopBar, Constants.Font.TopBar, Vector2.new(0, 0))
+
+local textSize = TextService:GetTextSize(
+	"Developer Console",
+	Constants.DefaultFontSize.TopBar,
+	Constants.Font.TopBar,
+	Vector2.new(0, 0)
+)
+
 local LiveUpdateElement = require(script.Parent.Parent.Components.LiveUpdateElement)
 local SetDevConsolePosition = require(script.Parent.Parent.Actions.SetDevConsolePosition)
-local v14 = Roact.Component:extend("DevConsoleTopBar")
 
-function v14.init(p1) -- line: 24
-	-- upvalues: UserInputService (copy), Roact (copy)
-	p1.inputChangedConnection = nil
-	p1.inputChangedDisconnectRetries = 0
+local extended = Roact.Component:extend("DevConsoleTopBar")
 
-	function p1.inputBegan(_, p3) -- line: 29
-		-- upvalues: p1 (copy), UserInputService (copy)
-		if p1.props.isMinimized then
+function extended:init()
+	self.inputChangedConnection = nil
+
+	self.inputChangedDisconnectRetries = 0
+
+	function self.inputBegan(_, p)
+		if self.props.isMinimized then
 			return
 		end
 
-		if p3.UserInputType == Enum.UserInputType.MouseButton1 then
-			local AbsolutePosition = p1.ref.current.AbsolutePosition
-			local vector3 = Vector3.new(AbsolutePosition.X, AbsolutePosition.Y, 0)
+		if p.UserInputType == Enum.UserInputType.MouseButton1 then
+			local absolutePosition = self.ref.current.AbsolutePosition
+			local vector3 = Vector3.new(absolutePosition.X, absolutePosition.Y, 0)
 
-			if p1.inputChangedConnection then
-				p1.inputChangedConnection:Disconnect()
-				p1.inputChangedConnection = nil
+			if self.inputChangedConnection then
+				self.inputChangedConnection:Disconnect()
+				self.inputChangedConnection = nil
 			end
 
-			p1.inputChangedConnection = UserInputService.InputChanged:Connect(function(input) -- line: 44
-				-- upvalues: p1 (copy)
-				p1.inputChanged(nil, input)
+			self.inputChangedConnection = UserInputService.InputChanged:Connect(function(input)
+				self.inputChanged(nil, input)
 			end)
-			p1:setState({
-				moving = true,
-				startPos = vector3,
-				startOffset = p3.Position
-			})
-			p1.inputChangedDisconnectRetries = 1
+
+			self:setState({ startPos = vector3, startOffset = p.Position, moving = true })
+
+			self.inputChangedDisconnectRetries = 1
 		end
 	end
-	function p1.inputChanged(_, p5) -- line: 58
-		-- upvalues: p1 (copy)
-		if p1.state.moving then
-			if p5.UserInputType == Enum.UserInputType.MouseMovement then
-				local v36 = p1.state.startPos - p1.state.startOffset + p5.Position
-				local uDim2 = UDim2.new(0, v36.X, 0, v36.Y)
-
-				p1.props.dispatchSetDevConsolePosition(uDim2)
-
-				return
+	function self.inputChanged(_, p)
+		if self.state.moving then
+			if p.UserInputType == Enum.UserInputType.MouseMovement then
+				local v4 = self.state.startPos - self.state.startOffset + p.Position
+				local udim = UDim2.new(0, v4.X, 0, v4.Y)
+				self.props.dispatchSetDevConsolePosition(udim)
 			end
-		elseif p1.inputChangedConnection then
-			if p1.inputChangedDisconnectRetries > 0 then
-				p1.inputChangedDisconnectRetries = p1.inputChangedDisconnectRetries - 1
-
-				return
+		elseif self.inputChangedConnection then
+			if self.inputChangedDisconnectRetries > 0 then
+				self.inputChangedDisconnectRetries -= 1
+			else
+				self.inputChangedConnection:Disconnect()
+				self.inputChangedConnection = nil
 			end
-
-			p1.inputChangedConnection:Disconnect()
-			p1.inputChangedConnection = nil
 		end
 	end
-	function p1.inputEnded(_, p7) -- line: 75
-		-- upvalues: p1 (copy)
-		if p7.UserInputType == Enum.UserInputType.MouseButton1 and p7.UserInputState == Enum.UserInputState.End then
-			if p1.inputChangedConnection then
-				p1.inputChangedConnection:Disconnect()
-				p1.inputChangedConnection = nil
+	function self.inputEnded(_, p)
+		if p.UserInputType == Enum.UserInputType.MouseButton1 and p.UserInputState == Enum.UserInputState.End then
+			if self.inputChangedConnection then
+				self.inputChangedConnection:Disconnect()
+				self.inputChangedConnection = nil
 			end
 
-			p1:setState({
-				moving = false
-			})
+			self:setState({ moving = false })
 		end
 	end
 
-	p1.ref = Roact.createRef()
+	self.ref = Roact.createRef()
 end
-function v14.render(p8) -- line: 95
-	-- upvalues: Roact (copy), Constants (copy), TextSize (copy), FrameHeight (copy), LiveUpdateElement (copy), v8 (copy), v9 (copy)
-	local isMinimized = p8.props.isMinimized
-	local formFactor = p8.props.formFactor
-	local onMinimizeClicked = p8.props.onMinimizeClicked
-	local onMaximizeClicked = p8.props.onMaximizeClicked
-	local onCloseClicked = p8.props.onCloseClicked
-	local _ = p8.state.moving
-	local t1 = {
-		WindowTitle = Roact.createElement("TextLabel", {
-			Text = "Developer Console",
-			BackgroundTransparency = 1,
-			TextSize = Constants.DefaultFontSize.TopBar,
-			TextColor3 = Color3.new(1, 1, 1),
-			Font = Constants.Font.TopBar,
-			Size = UDim2.new(0, TextSize.X, 0, FrameHeight),
-			Position = UDim2.new(0, 4, 0, 0),
-			BackgroundColor3 = Constants.Color.BaseGray,
-			TextXAlignment = Enum.TextXAlignment.Left
-		})
-	}
-	local v25 = TextSize.X + 8
-	local uDim2 = UDim2.new(0, v25, 0, 0)
-	local uDim2_2 = UDim2.new(1, -2 * v25, 0, FrameHeight)
+
+function extended.render(props)
+	local isMinimized = props.props.isMinimized
+	local formFactor = props.props.formFactor
+
+	local onMinimizeClicked = props.props.onMinimizeClicked
+	local onMaximizeClicked = props.props.onMaximizeClicked
+	local onCloseClicked = props.props.onCloseClicked
+
+	local _moving = props.state.moving
+
+	local children = {}
+
+	children.WindowTitle = Roact.createElement("TextLabel", {
+		Text = "Developer Console",
+		TextSize = Constants.DefaultFontSize.TopBar,
+		TextColor3 = Color3.new(1, 1, 1),
+		Font = Constants.Font.TopBar,
+		Size = UDim2.new(0, textSize.X, 0, FrameHeight),
+		Position = UDim2.new(0, 4, 0, 0),
+		BackgroundColor3 = Constants.Color.BaseGray,
+		BackgroundTransparency = 1,
+		TextXAlignment = Enum.TextXAlignment.Left
+	})
+
+	local v4 = textSize.X + 8
+	local udim = UDim2.new(0, v4, 0, 0)
+	local udim2 = UDim2.new(1, -2 * v4, 0, FrameHeight)
 
 	if isMinimized then
-		uDim2 = UDim2.new(0, 0, 1, 0)
-		uDim2_2 = UDim2.new(1, 0, 1, 0)
-	elseif p8.ref.current then
-		uDim2_2 = UDim2.new(0, p8.ref.current.AbsoluteSize.X - 2 * TextSize.X, 0, FrameHeight)
+		udim = UDim2.new(0, 0, 1, 0)
+		udim2 = UDim2.new(1, 0, 1, 0)
+	elseif props.ref.current then
+		udim2 = UDim2.new(0, props.ref.current.AbsoluteSize.X - 2 * textSize.X, 0, FrameHeight)
 	end
 
-	local topBarLiveUpdate = p8.props.topBarLiveUpdate
+	local topBarLiveUpdate = props.props.topBarLiveUpdate
 
-	t1.LiveStatsModule = Roact.createElement(LiveUpdateElement, {
+	children.LiveStatsModule = Roact.createElement(LiveUpdateElement, {
 		topBarLiveUpdate = topBarLiveUpdate,
-		size = uDim2_2,
-		position = uDim2
+		size = udim2,
+		position = udim
 	})
 
 	if formFactor == Constants.FormFactor.Large then
-		if not isMinimized then
-			t1.MinButton = Roact.createElement("ImageButton", {
-				Size = UDim2.new(0, v8, 0, v8),
-				Position = UDim2.new(1, -2 * FrameHeight + v9, 0, v9),
-				BorderColor3 = Color3.new(1, 0, 0),
-				BackgroundColor3 = Constants.Color.BaseGray,
-				BackgroundTransparency = 1,
-				Image = Constants.Image.Minimize,
-				[Roact.Event.Activated] = onMinimizeClicked
-			})
-		else
-			t1.MaxButton = Roact.createElement("ImageButton", {
-				Size = UDim2.new(0, v8, 0, v8),
-				Position = UDim2.new(1, -2 * FrameHeight + v9, 0, v9),
+		if isMinimized then
+			children.MaxButton = Roact.createElement("ImageButton", {
+				Size = UDim2.new(0, v2, 0, v2),
+				Position = UDim2.new(1, -2 * FrameHeight + v3, 0, v3),
 				BorderColor3 = Color3.new(0, 0, 1),
 				BackgroundColor3 = Constants.Color.BaseGray,
 				BackgroundTransparency = 1,
 				Image = Constants.Image.Maximize,
 				[Roact.Event.Activated] = onMaximizeClicked
 			})
+		else
+			children.MinButton = Roact.createElement("ImageButton", {
+				Size = UDim2.new(0, v2, 0, v2),
+				Position = UDim2.new(1, -2 * FrameHeight + v3, 0, v3),
+				BorderColor3 = Color3.new(1, 0, 0),
+				BackgroundColor3 = Constants.Color.BaseGray,
+				BackgroundTransparency = 1,
+				Image = Constants.Image.Minimize,
+				[Roact.Event.Activated] = onMinimizeClicked
+			})
 		end
 	end
 
-	t1.CloseButton = Roact.createElement("ImageButton", {
-		Size = UDim2.new(0, v8, 0, v8),
-		Position = UDim2.new(1, -FrameHeight + v9, 0, v9),
+	children.CloseButton = Roact.createElement("ImageButton", {
+		Size = UDim2.new(0, v2, 0, v2),
+		Position = UDim2.new(1, -FrameHeight + v3, 0, v3),
 		BorderColor3 = Color3.new(0, 1, 0),
 		BackgroundColor3 = Constants.Color.BaseGray,
 		BackgroundTransparency = 1,
@@ -164,20 +166,18 @@ function v14.render(p8) -- line: 95
 		BackgroundTransparency = 0.5,
 		AutoButtonColor = false,
 		LayoutOrder = 1,
-		[Roact.Ref] = p8.ref,
-		[Roact.Event.InputBegan] = p8.inputBegan,
-		[Roact.Event.InputEnded] = p8.inputEnded
-	}, t1)
+		[Roact.Ref] = props.ref,
+		[Roact.Event.InputBegan] = props.inputBegan,
+		[Roact.Event.InputEnded] = props.inputEnded
+	}, children)
 end
 
-local function mapDispatchToProps(p9) -- line: 191
-	-- upvalues: SetDevConsolePosition (copy)
+local function mapDispatchToProps(callback)
 	return {
-		dispatchSetDevConsolePosition = function(p10) -- line: 193
-			-- upvalues: p9 (copy), SetDevConsolePosition (copy)
-			p9(SetDevConsolePosition(p10))
+		dispatchSetDevConsolePosition = function(p)
+			callback(SetDevConsolePosition(p))
 		end
 	}
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(v14)
+return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(extended)

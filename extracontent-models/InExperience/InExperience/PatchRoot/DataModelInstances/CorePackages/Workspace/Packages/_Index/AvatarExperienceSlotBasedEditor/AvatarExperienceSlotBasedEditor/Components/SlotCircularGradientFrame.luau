@@ -1,18 +1,18 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local ColorGradientCircle = require(Parent.AXCommon).Components.ColorGradientCircle
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+local AXCommon = require(parent.AXCommon)
+local ColorGradientCircle = AXCommon.Components.ColorGradientCircle
+local React = require(parent.React)
 
-local function SlotCircularGradientFrame(t1: {[any]: any}) -- line: 18
-	-- upvalues: React (copy), ColorGradientCircle (copy)
+local function SlotCircularGradientFrame(props)
 	return React.createElement(ColorGradientCircle, {
 		hasBorder = true,
-		Colors = t1.Colors,
+		Colors = props.Colors,
 		Size = UDim2.fromScale(0.4, 0.4),
 		Position = UDim2.fromScale(0.5, 0.5),
-		Rotation = t1.Rotation,
+		Rotation = props.Rotation,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Transparency = t1.Transparency,
-		Offset = t1.Offset
+		Transparency = props.Transparency,
+		Offset = props.Offset
 	})
 end
 

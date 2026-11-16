@@ -1,13 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local SharedFlags = require(AppChatParent.SharedFlags)
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local AppChatNetworking = require(parent.AppChatNetworking)
+local SharedFlags = require(parent.SharedFlags)
+
 local buildConversationMessageFromApi = require(AppChat.Stores.Ingestion.buildConversationMessageFromApi)
 local ingestBatch = require(AppChat.Stores.Ingestion.ingestBatch)
 local IngestOperation = require(AppChat.Stores.Ingestion.IngestOperation)
+
 local Conversations = require(AppChat.Conversations)
-local NetworkingChat = require(AppChat.Http.NetworkingChat)
 local ReceivedMessages = Conversations.Actions.ReceivedMessages
 local SendingMessage = Conversations.Actions.SendingMessage
 local SentMessage = Conversations.Actions.SentMessage
@@ -17,307 +19,313 @@ local RemovedConversation = require(AppChat.Conversations.Actions.RemovedConvers
 local ReloadedMessagesForConversations = require(AppChat.Conversations.Actions.ReloadedMessagesForConversations)
 
 require(AppChat.MessageData.Types)
-
 local Enums = require(AppChat.MessageData.Enums)
-local MessageModel = require(AppChat.Models.MessageModel)
 local MessageStatus = Enums.MessageStatus
 local MessageType = Enums.MessageType
 local MessageVisibility = Enums.MessageVisibility
 local GetFFlagEnableSocialCards = SharedFlags.GetFFlagEnableSocialCards
+
 local GetConversationMessageViewModelStore = require(AppChat.Stores.GetConversationMessageViewModelStore)
+
+local FFlagAppChatIncrementalPaginationProjection = require(AppChat.Flags.FFlagAppChatIncrementalPaginationProjection)
 local FFlagAppChatSignalsMessageStore = require(AppChat.Flags.FFlagAppChatSignalsMessageStore)
 
-local function determineStatus(b1: boolean?, b2: boolean?, b3: boolean?, s1: string?) -- line: 64
-	-- upvalues: MessageStatus (copy), MessageVisibility (copy)
-	if b1 then
+local function determineStatus(isSending: boolean?, failed: boolean?, moderated: boolean?, visibility: string?) -- 1 equivalent call inferred from this helper
+	if isSending then
 		return MessageStatus.Pending
 	end
 
-	if b2 then
+	if failed then
 		return MessageStatus.Failed
 	end
 
-	if b3 then
+	if moderated then
 		return MessageStatus.Moderated
 	end
 
-	if s1 == MessageVisibility.Hidden then
+	if visibility == MessageVisibility.Hidden then
 		return MessageStatus.Hidden
 	end
 
 	return MessageStatus.Default
 end
-local function extractLegacyTimestamp(p1) -- line: 83
-	if p1 == nil or typeof(p1) ~= "table" then
+
+local function extractLegacyTimestamp(sent)
+	if sent == nil or typeof(sent) ~= "table" then
 		return nil
 	end
 
-	if p1.ToIsoDate then
-		return p1:ToIsoDate()
+	if sent.ToIsoDate then
+		return sent:ToIsoDate()
 	end
 
-	local UnixTimestamp = nil
+	local unixTimestamp = nil
 
-	if p1.GetUnixTimestamp then
-		UnixTimestamp = p1:GetUnixTimestamp()
-	elseif p1.UnixTimestamp then
-		UnixTimestamp = p1.UnixTimestamp
+	if sent.GetUnixTimestamp then
+		unixTimestamp = sent:GetUnixTimestamp()
+	elseif sent.UnixTimestamp then
+		unixTimestamp = sent.UnixTimestamp
 	end
 
-	if UnixTimestamp and UnixTimestamp > 0 then
-		local ok, result = pcall(DateTime.fromUnixTimestamp, UnixTimestamp)
+	if unixTimestamp and unixTimestamp > 0 then
+		local success, result = pcall(DateTime.fromUnixTimestamp, unixTimestamp)
 
-		if ok and result then
+		if success and result then
 			return result:ToIsoDate()
 		end
 	end
 
 	return nil
 end
-local function messagesFromWebResponse(s2: string, t1: {[any]: any}?) -- line: 105
-	-- upvalues: MessageModel (copy)
-	if t1 == nil then
-		return {}
-	end
 
-	local id = nil
-	local t2 = {}
+local function buildFromLegacy(data, conversationId: string)
+	local replies_to
 
-	for i = #t1, 1, -1 do
-		local v60 = t1[i]
-		local v61 = MessageModel.fromWeb(v60, s2, id)
-
-		if v61 ~= nil then
-			v61.isPreviewable = v60.is_previewable
-			v61.isBadgeable = v60.is_badgeable
-			id = v61.id
-			table.insert(t2, 1, v61)
-		end
-	end
-
-	return t2
-end
-local function buildFromLegacy(p2, s3: string) -- line: 127
-	-- upvalues: extractLegacyTimestamp (copy), MessageType (copy), GetFFlagEnableSocialCards (copy), MessageStatus (copy), MessageVisibility (copy)
-	local t3 = nil
-
-	if p2.repliesTo and p2.repliesTo.id then
-		t3 = {
-			id = p2.repliesTo.id,
-			content = p2.repliesTo.content,
-			sender_user_id = if not p2.repliesTo.senderTargetId then nil else tonumber(p2.repliesTo.senderTargetId),
-			created_at = extractLegacyTimestamp(p2.repliesTo.sent),
-			type = if p2.repliesTo.messageType ~= "System" then MessageType.User else MessageType.System
+	if data.repliesTo and data.repliesTo.id then
+		replies_to = {
+			id = data.repliesTo.id,
+			content = data.repliesTo.content,
+			sender_user_id = 0,
+			created_at = 0,
+			type = 0
 		}
+		local sender_user_id
+
+		if data.repliesTo.senderTargetId then
+			sender_user_id = tonumber(data.repliesTo.senderTargetId)
+		end
+
+		replies_to.sender_user_id = sender_user_id
+		replies_to.created_at = extractLegacyTimestamp(data.repliesTo.sent)
+		local v
+
+		if data.repliesTo.messageType == "System" then
+			v = MessageType.System
+		else
+			v = MessageType.User
+		end
+
+		replies_to.type = v
 	end
 
-	local t4 = {
-		id = p2.id or p2.messageId,
-		type = if p2.messageType ~= "System" then MessageType.User else MessageType.System,
-		content = p2.content,
-		created_at = extractLegacyTimestamp(p2.sent),
-		sender_user_id = if not p2.senderTargetId then nil else tonumber(p2.senderTargetId),
-		moderation_type = p2.moderationType,
-		visibility = p2.visibility,
-		preview_content = p2.previewContent,
-		content_to_display = p2.contentToDisplay or p2.content,
-		replies_to = t3,
-		cards = if not GetFFlagEnableSocialCards() then nil else p2.cards,
-		filtered_for_receivers = p2.filteredForReceivers,
-		conversationId = s3
+	local v = {
+		id = data.id or data.messageId,
+		type = 0,
+		content = 0,
+		created_at = 0,
+		sender_user_id = 0,
+		moderation_type = 0,
+		visibility = 0,
+		preview_content = 0,
+		content_to_display = 0,
+		replies_to = 0,
+		cards = 0,
+		filtered_for_receivers = 0,
+		is_previewable = 0,
+		conversationId = 0,
+		status = 0,
+		stableKey = 0
 	}
-	local isSending = p2.isSending
-	local failed = p2.failed
-	local moderated = p2.moderated
-	local visibility = p2.visibility
+	local v2
 
-	t4.status = if not isSending then if not failed then if not moderated then if visibility ~= MessageVisibility.Hidden then MessageStatus.Default else MessageStatus.Hidden else MessageStatus.Moderated else MessageStatus.Failed else MessageStatus.Pending
-	t4.stableKey = p2.stableKey or (p2.stable_key or (p2.id or p2.messageId))
-
-	return t4
-end
-local function clearConversationStores(t5: {[any]: any}, s4: string) -- line: 159
-	for _, v73 in (t5.conversationMessageListStore.getOrderedIds(s4)) do
-		t5.conversationMessageStore.removeMessage(v73)
+	if data.messageType == "System" then
+		v2 = MessageType.System
+	else
+		v2 = MessageType.User
 	end
 
-	t5.conversationMessageViewModelStore.evictConversation(s4)
-	t5.conversationMessageListStore.clearConversation(s4)
+	v.type = v2
+	v.content = data.content
+	v.created_at = extractLegacyTimestamp(data.sent)
+	local sender_user_id
+
+	if data.senderTargetId then
+		sender_user_id = tonumber(data.senderTargetId)
+	end
+
+	v.sender_user_id = sender_user_id
+	v.moderation_type = data.moderationType
+	v.visibility = data.visibility
+	v.preview_content = data.previewContent
+	v.content_to_display = data.contentToDisplay or data.content
+	v.replies_to = replies_to
+	local cards
+
+	if GetFFlagEnableSocialCards() then
+		cards = data.cards
+	end
+
+	v.cards = cards
+	v.filtered_for_receivers = data.filteredForReceivers
+	v.is_previewable = data.isPreviewable
+
+	v.conversationId = conversationId
+	v.status = determineStatus(data.isSending, data.failed, data.moderated, data.visibility) -- inferred equivalent call
+	v.stableKey = data.stableKey or data.stable_key or data.id or data.messageId
+	return v
 end
-local function handleReceivedMessages(p3, _: {[any]: any}) -- line: 170
-	-- upvalues: Cryo (copy), buildFromLegacy (copy), ingestBatch (copy), IngestOperation (copy)
-	local conversationId = p3.conversationId
-	local messages = p3.messages
+
+local function clearConversationStores(data, conversationId: string)
+	local orderedIds = data.conversationMessageListStore.getOrderedIds(conversationId)
+
+	for _, orderedId in orderedIds do
+		data.conversationMessageStore.removeMessage(orderedId)
+	end
+
+	data.conversationMessageViewModelStore.evictConversation(conversationId)
+	data.conversationMessageListStore.clearConversation(conversationId)
+end
+
+local function handleReceivedMessages(p, _)
+	local conversationId = p.conversationId
+	local messages = p.messages
 
 	if messages and conversationId then
-		local v78 = Cryo.List.filterMap(messages, function(p4) -- line: 174
-			-- upvalues: buildFromLegacy (copy), conversationId (copy)
-			if p4 and p4.id then
-				return (buildFromLegacy(p4, conversationId))
+		ingestBatch(conversationId, Cryo.List.filterMap(messages, function(p2)
+			if p2 and p2.id then
+				return buildFromLegacy(p2, conversationId)
 			end
 
 			return nil
-		end)
-
-		ingestBatch(conversationId, v78, IngestOperation.Prepend)
+		end), IngestOperation.Prepend)
 	end
 end
-local function handleSendingMessage(p5, _: {[any]: any}) -- line: 181
-	-- upvalues: buildFromLegacy (copy), MessageStatus (copy), ingestBatch (copy), IngestOperation (copy)
-	local conversationId = p5.conversationId
-	local message = p5.message
 
-	if message and (message.id and conversationId) then
-		local v83 = buildFromLegacy(message, conversationId)
+local function handleSendingMessage(p, _)
+	local conversationId = p.conversationId
+	local message = p.message
 
-		v83.status = MessageStatus.Pending
-		ingestBatch(conversationId, { v83 }, IngestOperation.Prepend)
+	if message and message.id and conversationId then
+		local v = buildFromLegacy(message, conversationId)
+		v.status = MessageStatus.Pending
+		ingestBatch(conversationId, { v }, IngestOperation.Prepend)
 	end
 end
-local function handleSentMessage(p6, t8: {[any]: any}) -- line: 191
-	local conversationId = p6.conversationId
-	local messageId = p6.messageId
+
+local function handleSentMessage(p, p2)
+	local conversationId = p.conversationId
+	local messageId = p.messageId
 
 	if conversationId and messageId then
-		t8.conversationMessageListStore.removeMessage(conversationId, messageId)
-		t8.conversationMessageStore.removeMessage(messageId)
+		p2.conversationMessageListStore.removeMessage(conversationId, messageId)
+		p2.conversationMessageStore.removeMessage(messageId)
 	end
 end
-local function handleMessageModerated(p7, t9: {[any]: any}) -- line: 200
-	-- upvalues: MessageStatus (copy)
-	local messageId = p7.messageId
+
+local function handleMessageModerated(p, p2)
+	local messageId = p.messageId
 
 	if messageId then
-		t9.conversationMessageStore.updateMessage(messageId, {
-			status = MessageStatus.Moderated
-		})
+		p2.conversationMessageStore.updateMessage(messageId, { status = MessageStatus.Moderated })
+
+		if FFlagAppChatIncrementalPaginationProjection and p.conversationId then
+			p2.conversationMessageListStore.publishMessageUpdates(p.conversationId, { messageId })
+		end
 	end
 end
-local function handleMessageFailedToSend(p8, t10: {[any]: any}) -- line: 207
-	-- upvalues: MessageStatus (copy)
-	local messageId = p8.messageId
+
+local function handleMessageFailedToSend(p, p2)
+	local messageId = p.messageId
 
 	if messageId then
-		t10.conversationMessageStore.updateMessage(messageId, {
-			status = MessageStatus.Failed
-		})
+		p2.conversationMessageStore.updateMessage(messageId, { status = MessageStatus.Failed })
+
+		if FFlagAppChatIncrementalPaginationProjection and p.conversationId then
+			p2.conversationMessageListStore.publishMessageUpdates(p.conversationId, { messageId })
+		end
 	end
 end
-local function handleGetOlderMessagesSucceeded(p9, _: {[any]: any}) -- line: 214
-	-- upvalues: Cryo (copy), buildConversationMessageFromApi (copy), ingestBatch (copy), IngestOperation (copy)
-	local v96 = p9.queryArgs and p9.queryArgs.conversation_id
-	local responseBody = p9.responseBody
 
-	if v96 and (responseBody and responseBody.messages) then
-		local v98 = Cryo.List.filterMap(responseBody.messages, function(p10) -- line: 218
-			-- upvalues: buildConversationMessageFromApi (copy), v96 (copy)
-			if p10 and p10.id then
-				return (buildConversationMessageFromApi(p10, v96))
+local function handleGetOlderMessagesSucceeded(p, _)
+	local conversation_id = p.queryArgs and p.queryArgs.conversation_id
+	local responseBody = p.responseBody
+
+	if conversation_id and responseBody and responseBody.messages then
+		local filterMap = Cryo.List.filterMap(responseBody.messages, function(p2)
+			if p2 and p2.id then
+				return (buildConversationMessageFromApi(p2, conversation_id))
 			end
 
 			return nil
 		end)
+
 		local next_cursor = responseBody.next_cursor
+		local appendAndAdvanceCursor = IngestOperation.AppendAndAdvanceCursor
 
-		ingestBatch(v96, v98, IngestOperation.AppendAndAdvanceCursor, if next_cursor ~= "" then next_cursor else nil)
+		if next_cursor == "" then
+			next_cursor = nil
+		end
+
+		ingestBatch(conversation_id, filterMap, appendAndAdvanceCursor, next_cursor)
 	end
 end
-local function handleGetNewerMessagesSucceeded(p11, _: {[any]: any}) -- line: 226
-	-- upvalues: Cryo (copy), buildConversationMessageFromApi (copy), ingestBatch (copy), IngestOperation (copy)
-	local v102 = p11.queryArgs and p11.queryArgs.conversation_id
-	local responseBody = p11.responseBody
 
-	if v102 and (responseBody and responseBody.messages) then
-		local v104 = Cryo.List.filterMap(responseBody.messages, function(p12) -- line: 230
-			-- upvalues: buildConversationMessageFromApi (copy), v102 (copy)
-			if p12 and p12.id then
-				return (buildConversationMessageFromApi(p12, v102))
+local function handleGetNewerMessagesSucceeded(p, _)
+	local conversation_id = p.queryArgs and p.queryArgs.conversation_id
+	local responseBody = p.responseBody
+
+	if conversation_id and responseBody and responseBody.messages then
+		ingestBatch(conversation_id, Cryo.List.filterMap(responseBody.messages, function(p2)
+			if p2 and p2.id then
+				return (buildConversationMessageFromApi(p2, conversation_id))
 			end
 
 			return nil
-		end)
-
-		ingestBatch(v102, v104, IngestOperation.Prepend)
+		end), IngestOperation.Prepend)
 	end
 end
-local function handleGetLatestMessagesSucceeded(p13, _: {[any]: any}) -- line: 237
-	-- upvalues: messagesFromWebResponse (copy), Cryo (copy), buildFromLegacy (copy), ingestBatch (copy), IngestOperation (copy)
-	local responseBody = p13.responseBody
 
-	if responseBody == nil then
+local function ingestConversationsFromResponse(responseBody, _)
+	if not (responseBody and responseBody.conversations) then
 		return
 	end
 
-	for _, v in ipairs(responseBody) do
-		local str = tostring(v.conversationId)
-		local v111 = messagesFromWebResponse(str, v.chatMessages)
-		local v112 = Cryo.List.filterMap(v111, function(p14) -- line: 246
-			-- upvalues: buildFromLegacy (copy), str (copy)
-			if p14 and p14.id then
-				return (buildFromLegacy(p14, str))
-			end
+	for _, conversation in responseBody.conversations do
+		local id = conversation.id
 
-			return nil
-		end)
-
-		ingestBatch(str, v112, IngestOperation.Prepend)
-	end
-end
-local function ingestConversationsFromResponse(p15, _: {[any]: any}) -- line: 253
-	-- upvalues: Cryo (copy), buildConversationMessageFromApi (copy), ingestBatch (copy), IngestOperation (copy)
-	if not p15 or not p15.conversations then
-		return
-	end
-
-	for _, v116 in p15.conversations do
-		local id = v116.id
-
-		if id and v116.messages then
-			local v118 = Cryo.List.filterMap(v116.messages, function(p16) -- line: 260
-				-- upvalues: buildConversationMessageFromApi (copy), id (copy)
-				if p16 and p16.id then
-					return (buildConversationMessageFromApi(p16, id))
+		if id and conversation.messages then
+			ingestBatch(id, Cryo.List.filterMap(conversation.messages, function(p)
+				if p and p.id then
+					return (buildConversationMessageFromApi(p, id))
 				end
 
 				return nil
-			end)
-
-			ingestBatch(id, v118, IngestOperation.Prepend)
+			end), IngestOperation.Prepend)
 		end
 	end
 end
-local function handleGetUserConversationsSucceeded(p17, t15: {[any]: any}) -- line: 268
-	-- upvalues: ingestConversationsFromResponse (copy)
-	ingestConversationsFromResponse(p17.responseBody, t15)
+
+local function handleGetUserConversationsSucceeded(p, p2)
+	ingestConversationsFromResponse(p.responseBody, p2)
 end
-local function handleGetConversationDetailsSucceeded(p18, t16: {[any]: any}) -- line: 272
-	-- upvalues: ingestConversationsFromResponse (copy)
-	ingestConversationsFromResponse(p18.responseBody, t16)
+
+local function handleGetConversationDetailsSucceeded(p, p2)
+	ingestConversationsFromResponse(p.responseBody, p2)
 end
-local function handleMultiGetConversationDetailsSucceeded(p19, t17: {[any]: any}) -- line: 276
-	-- upvalues: ingestConversationsFromResponse (copy)
-	ingestConversationsFromResponse(p19.responseBody, t17)
+
+local function handleMultiGetConversationDetailsSucceeded(p, p2)
+	ingestConversationsFromResponse(p.responseBody, p2)
 end
-local function handleRemovedConversation(p20, t18: {[any]: any}) -- line: 280
-	-- upvalues: clearConversationStores (copy)
-	local conversationId = p20.conversationId
+
+local function handleRemovedConversation(p, p2)
+	local conversationId = p.conversationId
 
 	if conversationId then
-		clearConversationStores(t18, conversationId)
+		clearConversationStores(p2, conversationId)
 	end
 end
-local function handleReloadedMessagesForConversations(p21, t19: {[any]: any}) -- line: 287
-	-- upvalues: clearConversationStores (copy)
-	local conversationIds = p21.conversationIds
+
+local function handleReloadedMessagesForConversations(p, p2)
+	local conversationIds = p.conversationIds
 
 	if conversationIds then
-		for _, v132 in conversationIds do
-			clearConversationStores(t19, v132)
+		for _, conversationId in conversationIds do
+			clearConversationStores(p2, conversationId)
 		end
 	end
 end
 
-local t20 = {
+local v = {
 	[ReceivedMessages.name] = handleReceivedMessages,
 	[SendingMessage.name] = handleSendingMessage,
 	[SentMessage.name] = handleSentMessage,
@@ -325,7 +333,6 @@ local t20 = {
 	[MessageFailedToSend.name] = handleMessageFailedToSend,
 	[AppChatNetworking.rodux.GetOlderMessages.Succeeded.name] = handleGetOlderMessagesSucceeded,
 	[AppChatNetworking.rodux.GetNewerMessages.Succeeded.name] = handleGetNewerMessagesSucceeded,
-	[NetworkingChat.GetLatestMessages.Succeeded.name] = handleGetLatestMessagesSucceeded,
 	[AppChatNetworking.rodux.GetUserConversations.Succeeded.name] = handleGetUserConversationsSucceeded,
 	[AppChatNetworking.rodux.GetConversationDetails.Succeeded.name] = handleGetConversationDetailsSucceeded,
 	[AppChatNetworking.rodux.MultiGetConversationDetails.Succeeded.name] = handleMultiGetConversationDetailsSucceeded,
@@ -333,29 +340,26 @@ local t20 = {
 	[ReloadedMessagesForConversations.name] = handleReloadedMessagesForConversations
 }
 
-local function SignalsMessageIngestionMiddleware(p22, _) -- line: 312
-	-- upvalues: FFlagAppChatSignalsMessageStore (copy), t20 (copy), GetConversationMessageViewModelStore (copy)
-	return function(p24) -- line: 313
-		-- upvalues: p22 (copy), FFlagAppChatSignalsMessageStore (copy), t20 (copy), GetConversationMessageViewModelStore (copy)
-		local v141 = p22(p24)
+local function SignalsMessageIngestionMiddleware(callback, _)
+	return function(p)
+		local v2 = callback(p)
 
 		if not FFlagAppChatSignalsMessageStore then
-			return v141
+			return v2
 		end
 
-		local v142 = t20[p24.type]
+		local v3 = v[p.type]
 
-		if v142 then
-			local v143 = GetConversationMessageViewModelStore(false)
-
-			v142(p24, {
-				conversationMessageStore = v143.conversationMessageStore,
-				conversationMessageListStore = v143.conversationMessageListStore,
-				conversationMessageViewModelStore = v143
+		if v3 then
+			local conversationMessageViewModelStore = GetConversationMessageViewModelStore(false)
+			v3(p, {
+				conversationMessageStore = conversationMessageViewModelStore.conversationMessageStore,
+				conversationMessageListStore = conversationMessageViewModelStore.conversationMessageListStore,
+				conversationMessageViewModelStore = conversationMessageViewModelStore
 			})
 		end
 
-		return v141
+		return v2
 	end
 end
 

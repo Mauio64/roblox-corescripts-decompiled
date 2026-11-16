@@ -1,15 +1,19 @@
 local LocalizationService = game:GetService("LocalizationService")
-local ParentParent = script.Parent.Parent
-local Localization = require(ParentParent.InExperienceLocales).Localization
-local v4 = Localization.new(LocalizationService.RobloxLocaleId)
 
-return {
-	FormatByKey = function(_, p2, p3) -- line: 14
-		-- upvalues: v4 (copy)
-		return v4:Format(p2, p3)
-	end,
-	FormatByKeyForLocale = function(_, p5, p6, p7) -- line: 18
-		-- upvalues: Localization (copy)
-		return Localization.new(p6):Format(p5, p7)
-	end
-}
+local parent = script.Parent.Parent
+
+local InExperienceLocales = require(parent.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+
+local v = Localization.new(LocalizationService.RobloxLocaleId)
+local RobloxTranslator = {}
+
+function RobloxTranslator.FormatByKey(_, p, p2)
+	return v:Format(p, p2)
+end
+
+function RobloxTranslator.FormatByKeyForLocale(_, p, p2, p3)
+	return Localization.new(p2):Format(p, p3)
+end
+
+return RobloxTranslator

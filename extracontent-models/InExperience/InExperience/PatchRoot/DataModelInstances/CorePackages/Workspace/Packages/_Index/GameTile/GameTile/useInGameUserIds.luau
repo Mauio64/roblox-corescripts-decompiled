@@ -1,27 +1,22 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GameTile").Parent
+local React = require(parent.React)
 
-local function useInGameUserIds(s1: string, t1: {[any]: any}) -- line: 5
-	-- upvalues: React (copy)
-	return React.useMemo(function() -- line: 6
-		-- upvalues: s1 (copy), t1 (copy)
-		if not s1 or not t1 then
+local function useInGameUserIds(p: string, items)
+	return React.useMemo(function()
+		if not (p and items) then
 			return {}
 		end
 
-		local t2 = {}
+		local result = {}
 
-		for v7, _ in t1 do
-			if v7 ~= s1 then
-				table.insert(t2, v7)
+		for k, _ in items do
+			if k ~= p then
+				table.insert(result, k)
 			end
 		end
 
-		return t2
-	end, {
-		s1,
-		t1
-	})
+		return result
+	end, { p, items })
 end
 
 return useInGameUserIds

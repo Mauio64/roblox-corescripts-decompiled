@@ -1,26 +1,20 @@
-local ParentParent = script.Parent.Parent
-local NaN = require(ParentParent.Number).NaN
+local parent = script.Parent.Parent
+local Number = require(parent.Number)
 
-return function(s1: string, n1: number) -- line: 10
-	-- upvalues: NaN (copy)
-	if typeof(n1) ~= "number" then
-		n1 = 1
-	end
+local NaN = Number.NaN
 
-	local v5, v6 = utf8.len(s1)
+return function(p: string, value: number)
+	local v = typeof(value) ~= "number" and 1 or value
 
-	assert(v5 ~= nil, ("string `%s` has an invalid byte at position %s"):format(s1, (tostring(v6))))
+	local v2, v3 = utf8.len(p)
+	assert(v2 ~= nil, ("string `%s` has an invalid byte at position %s"):format(p, (tostring(v3))))
 
-	if v5 < n1 or n1 < 1 then
+	if v2 < v or v < 1 then
 		return NaN
 	end
 
-	local v7 = utf8.offset(s1, n1)
-	local v8 = utf8.codepoint(s1, v7, v7)
+	local v4 = utf8.offset(p, v)
+	local v5 = utf8.codepoint(p, v4, v4)
 
-	if v8 == nil then
-		return NaN
-	end
-
-	return v8
+	return if v5 == nil then NaN else v5
 end

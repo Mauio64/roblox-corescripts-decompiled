@@ -1,207 +1,297 @@
 local GameCollections = script:FindFirstAncestor("GameCollections")
-local GameCollectionsParent = GameCollections.Parent
-local GameCollectionItemTypes = require(GameCollectionsParent.DiscoveryTypes).GameCollectionItemTypes
+local parent = GameCollections.Parent
+
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local GameCollectionItemTypes = DiscoveryTypes.GameCollectionItemTypes
+
 local calculateGridLayout = require(GameCollections.calculateGridLayout)
 local renderEmphasisTile = require(GameCollections.renderEmphasisTile)
-local renderTwoByOneTile = require(GameCollections.renderTwoByOneTile)
-local renderOneByTwoTile = require(GameCollections.renderOneByTwoTile)
+local SponsoredTiles = require(parent.SponsoredTiles)
+local renderTwoByOneTile = SponsoredTiles.renderTwoByOneTile
+local renderOneByTwoTile = SponsoredTiles.renderOneByTwoTile
 local renderBlankTile = require(GameCollections.renderBlankTile)
-local Cryo = require(GameCollectionsParent.Cryo)
-
-require(GameCollectionsParent.React)
-
+local Cryo = require(parent.Cryo)
+require(parent.React)
 local GridLayoutTelemetry = require(GameCollections.GridLayoutTelemetry)
-local DiscoveryEventErrorLogger = require(GameCollectionsParent.DiscoveryUtils).DiscoveryEventErrorLogger
-local ApportioningDiagnosticTelemetry = require(GameCollectionsParent.DiscoveryUtils).ApportioningDiagnosticTelemetry
-local SharedFlags = require(GameCollectionsParent.SharedFlags)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+local DiscoveryUtils2 = require(parent.DiscoveryUtils)
+local ApportioningDiagnosticTelemetry = DiscoveryUtils2.ApportioningDiagnosticTelemetry
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppFixTotalColsBound = SharedFlags.FFlagLuaAppFixTotalColsBound
 local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
 local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
 local FFlagLuaAppEnableNxMApportioningExtraLogging = SharedFlags.FFlagLuaAppEnableNxMApportioningExtraLogging
-local t1 = {
+
+local v = {
 	[GameCollectionItemTypes.GameCollectionItemType.EmphasisTile] = renderEmphasisTile,
 	[GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile] = renderTwoByOneTile,
 	[GameCollectionItemTypes.GameCollectionItemType.Blank] = renderBlankTile
 }
 
 if FFlagLuaAppEnableHomepageOneByTwoTile then
-	t1[GameCollectionItemTypes.GameCollectionItemType.OneByTwoTile] = renderOneByTwoTile
+	v[GameCollectionItemTypes.GameCollectionItemType.OneByTwoTile] = renderOneByTwoTile
 end
 
-local v19 = if not FFlagLuaAppEnableNxMRoduxApportioning then nil else GameCollectionItemTypes.SpanForItemType
+local spanForItemType
+
+if FFlagLuaAppEnableNxMRoduxApportioning then
+	spanForItemType = GameCollectionItemTypes.SpanForItemType
+else
+	spanForItemType = nil
+end
 
 return {
-	BuildCollectionEntries = function(t2: {[any]: any}, n1: number, t3: {[any]: any}?, t4: {[any]: any}?, b1: boolean?, s1: string, n2: number?, s2: string?, t5: {[any]: any}?) -- line: 48
-		-- upvalues: FFlagLuaAppEnableNxMRoduxApportioning (copy), t1 (copy), v19 (copy), FFlagLuaAppEnableNxMApportioningExtraLogging (copy), ApportioningDiagnosticTelemetry (copy), calculateGridLayout (copy), FFlagLuaAppFixTotalColsBound (copy), GridLayoutTelemetry (copy), DiscoveryEventErrorLogger (copy), GameCollectionItemTypes (copy), renderBlankTile (copy), Cryo (copy)
-		local t6 = {}
+	BuildCollectionEntries = function(list, itemsPerRow: number, items, componentTypes, flag: boolean?, pageContext: string, sortIndex: number?, topicId: string?, list2)
+		local collectionEntries = {}
 
 		if FFlagLuaAppEnableNxMRoduxApportioning then
-			t4 = {}
-			t3 = {}
+			componentTypes = {}
+			items = {}
 
-			for v30, v31 in t2 do
-				if v31 and v31.componentType then
-					if t1[v31.componentType] then
-						t4[v30] = v31.componentType
-					end
+			for k, item in list do
+				if not (item and item.componentType) then
+					continue
+				end
 
-					local v32 = v19[v31.componentType]
+				if v[item.componentType] then
+					componentTypes[k] = item.componentType
+				end
 
-					if v32 then
-						t3[v30] = {
-							colSpan = v32.colSpan,
-							rowSpan = v32.rowSpan,
-							alignmentType = v31.alignmentType,
-							minRowPadding = tonumber(v31.minRowPadding) or 0
-						}
-					end
+				local v2 = spanForItemType[item.componentType]
+
+				if v2 then
+					items[k] = {
+						colSpan = v2.colSpan,
+						rowSpan = v2.rowSpan,
+						alignmentType = item.alignmentType,
+						minRowPadding = tonumber(item.minRowPadding) or 0
+					}
 				end
 			end
 		end
 
 		local totalCols = nil
-		local v34
+		local totalRows
 
-		if FFlagLuaAppEnableNxMRoduxApportioning and t5 then
-			v34 = #t5
+		if FFlagLuaAppEnableNxMRoduxApportioning and list2 then
+			totalRows = #list2
 		else
-			if FFlagLuaAppEnableNxMApportioningExtraLogging and t3 then
-				local n3 = 0
-				local n4 = 0
-				local n5 = 0
+			if FFlagLuaAppEnableNxMApportioningExtraLogging and items then
+				local count = 0
+				local spanOverrideMaxKey = 0
+				local count2 = 0
 
-				for v38, _ in t3 do
-					n3 += 1
+				for k, _ in items do
+					count += 1
 
-					if n5 < v38 then
-						n5 = v38
+					if spanOverrideMaxKey < k then
+						spanOverrideMaxKey = k
 					end
 
-					if v38 > #t2 then
-						n4 += 1
+					if #list < k then
+						count2 += 1
 					end
 				end
 
-				if n4 > 0 then
+				if count2 > 0 then
 					ApportioningDiagnosticTelemetry.log("LegacySpanOverridesMismatch", {
-						entriesCount = #t2,
-						itemsPerRow = n1,
-						spanOverrideCount = n3,
-						spanOverrideOutOfRangeCount = n4,
-						spanOverrideMaxKey = n5,
-						pageContext = s1,
-						sortIndex = n2,
-						topicId = s2,
+						entriesCount = #list,
+						itemsPerRow = itemsPerRow,
+						spanOverrideCount = count,
+						spanOverrideOutOfRangeCount = count2,
+						spanOverrideMaxKey = spanOverrideMaxKey,
+						pageContext = pageContext,
+						sortIndex = sortIndex,
+						topicId = topicId,
 						nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
 					})
 				end
 			end
 
-			local v40 = calculateGridLayout(#t2, n1, t3)
-
-			t5 = v40.layout
-			v34 = v40.totalRows
-			totalCols = v40.totalCols
+			local v2 = calculateGridLayout(#list, itemsPerRow, items)
+			list2 = v2.layout
+			totalRows = v2.totalRows
+			totalCols = v2.totalCols
 		end
 
-		local t7 = {}
-		local v42 = if not FFlagLuaAppEnableNxMApportioningExtraLogging then nil else {
-			realTileCount = 0,
-			blankStaleCount = 0,
-			blankShadowOrEmptyCount = 0
-		}
+		local v2 = FFlagLuaAppEnableNxMApportioningExtraLogging
+			and { realTileCount = 0, blankStaleCount = 0, blankShadowOrEmptyCount = 0 }
+			or nil
+		local set = {}
 
-		for i = 1, v34 do
-			for j = 1, if not FFlagLuaAppEnableNxMRoduxApportioning and not FFlagLuaAppFixTotalColsBound then totalCols else n1 do
-				local v45 = t5[i] and t5[i][j]
+		for i = 1, totalRows do
+			local v3
 
-				if v45 and v45 > 0 then
-					local v46 = t4 and t4[v45] or nil
-					local v47 = if not FFlagLuaAppEnableNxMRoduxApportioning then nil else t2[v45]
+			if FFlagLuaAppEnableNxMRoduxApportioning or FFlagLuaAppFixTotalColsBound then
+				v3 = itemsPerRow
+			else
+				v3 = totalCols
+			end
 
-					if v46 then
-						t7[v45] = true
+			for j = 1, v3 do
+				local entryIndex = list2[i] and list2[i][j]
+
+				if entryIndex and entryIndex > 0 then
+					local gameCollectionItemTypeOverride
+
+					if componentTypes then
+						gameCollectionItemTypeOverride = componentTypes[entryIndex] or nil
+					end
+
+					local v4
+
+					if FFlagLuaAppEnableNxMRoduxApportioning then
+						v4 = list[entryIndex]
+					end
+
+					if gameCollectionItemTypeOverride then
+						set[entryIndex] = true
 
 						if FFlagLuaAppEnableNxMRoduxApportioning then
-							local v48 = #t6 + 1
-
-							GridLayoutTelemetry.logTilePlaced(v47 and v47.adId, v47 and v47.universeId, v46, s1, n1, v34, v45, v48, n2, s2, nil)
+							local v5 = #collectionEntries + 1
+							GridLayoutTelemetry.logTilePlaced(
+								v4 and v4.adId,
+								v4 and v4.universeId,
+								gameCollectionItemTypeOverride,
+								pageContext,
+								itemsPerRow,
+								totalRows,
+								entryIndex,
+								v5,
+								sortIndex,
+								topicId,
+								nil
+							)
 						else
-							local v49 = t2[v45]
-							local v50 = #t6 + 1
+							local item = list[entryIndex]
 
-							GridLayoutTelemetry.logTilePlaced(v49 and v49.adId, v49 and v49.universeId, v46, s1, n1, v34, v45, v50, n2, s2, if not FFlagLuaAppFixTotalColsBound then nil else totalCols)
+							local v5 = #collectionEntries + 1
+							local logTilePlaced = GridLayoutTelemetry.logTilePlaced
+							local adId = item and item.adId
+							local universeId = item and item.universeId
+							local v6
+
+							if FFlagLuaAppFixTotalColsBound then
+								v6 = totalCols
+							end
+
+							logTilePlaced(
+								adId,
+								universeId,
+								gameCollectionItemTypeOverride,
+								pageContext,
+								itemsPerRow,
+								totalRows,
+								entryIndex,
+								v5,
+								sortIndex,
+								topicId,
+								v6
+							)
 						end
 					end
 
-					if FFlagLuaAppEnableNxMRoduxApportioning and not v47 then
-						DiscoveryEventErrorLogger.reportError("GameCollectionItemBuilder_StaleLayoutEntry", "layout entryIndex points past end of entries", {
-							entryIndex = v45,
-							entriesCount = #t2,
-							pageContext = s1,
-							sortIndex = n2,
-							topicId = s2
-						})
-						table.insert(t6, {
+					if FFlagLuaAppEnableNxMRoduxApportioning and not v4 then
+						DiscoveryEventErrorLogger.reportError(
+							"GameCollectionItemBuilder_StaleLayoutEntry",
+							"layout entryIndex points past end of entries",
+							{
+								entryIndex = entryIndex,
+								entriesCount = #list,
+								pageContext = pageContext,
+								sortIndex = sortIndex,
+								topicId = topicId
+							}
+						)
+
+						table.insert(collectionEntries, {
 							gameCollectionItemTypeOverride = GameCollectionItemTypes.GameCollectionItemType.Blank,
 							customRenderFunction = renderBlankTile
 						})
 
-						if FFlagLuaAppEnableNxMApportioningExtraLogging and v42 then
-							v42.blankStaleCount = v42.blankStaleCount + 1
+						if FFlagLuaAppEnableNxMApportioningExtraLogging and v2 then
+							v2.blankStaleCount += 1
 						end
 					else
-						table.insert(t6, Cryo.Dictionary.join(if not FFlagLuaAppEnableNxMRoduxApportioning then t2[v45] else v47, {
-							spanOverride = t3 and t3[v45] or nil,
-							gameCollectionItemTypeOverride = v46,
-							tileType = v46 or GameCollectionItemTypes.GameCollectionItemType.GameTile,
-							showDescription = v46 == GameCollectionItemTypes.GameCollectionItemType.EmphasisTile and b1 or nil,
-							customRenderFunction = v46 and t1[v46] or nil
-						}))
+						local join = Cryo.Dictionary.join
 
-						if FFlagLuaAppEnableNxMApportioningExtraLogging and v42 then
-							v42.realTileCount = v42.realTileCount + 1
+						if not FFlagLuaAppEnableNxMRoduxApportioning then
+							v4 = list[entryIndex]
+						end
+
+						local spanOverride
+
+						if items then
+							spanOverride = items[entryIndex] or nil
+						end
+
+						local v5 = {
+							spanOverride = spanOverride,
+							gameCollectionItemTypeOverride = gameCollectionItemTypeOverride,
+							tileType = gameCollectionItemTypeOverride or GameCollectionItemTypes.GameCollectionItemType.GameTile,
+							showDescription = gameCollectionItemTypeOverride == GameCollectionItemTypes.GameCollectionItemType.EmphasisTile and flag or nil,
+							customRenderFunction = gameCollectionItemTypeOverride and v[gameCollectionItemTypeOverride] or nil
+						}
+						table.insert(collectionEntries, join(v4, v5))
+
+						if FFlagLuaAppEnableNxMApportioningExtraLogging and v2 then
+							v2.realTileCount += 1
 						end
 					end
 				else
-					table.insert(t6, {
+					table.insert(collectionEntries, {
 						gameCollectionItemTypeOverride = GameCollectionItemTypes.GameCollectionItemType.Blank,
 						customRenderFunction = renderBlankTile
 					})
 
-					if FFlagLuaAppEnableNxMApportioningExtraLogging and v42 then
-						v42.blankShadowOrEmptyCount = v42.blankShadowOrEmptyCount + 1
+					if FFlagLuaAppEnableNxMApportioningExtraLogging and v2 then
+						v2.blankShadowOrEmptyCount += 1
 					end
 				end
 			end
 		end
 
-		if FFlagLuaAppEnableNxMApportioningExtraLogging and v42 then
+		if FFlagLuaAppEnableNxMApportioningExtraLogging and v2 then
 			ApportioningDiagnosticTelemetry.log("DerivedEntriesComposed", {
-				realTileCount = v42.realTileCount,
-				blankStaleCount = v42.blankStaleCount,
-				blankShadowOrEmptyCount = v42.blankShadowOrEmptyCount,
-				entriesCount = #t2,
-				totalRows = v34,
+				realTileCount = v2.realTileCount,
+				blankStaleCount = v2.blankStaleCount,
+				blankShadowOrEmptyCount = v2.blankShadowOrEmptyCount,
+				entriesCount = #list,
+				totalRows = totalRows,
 				totalCols = totalCols,
-				itemsPerRow = n1,
-				pageContext = s1,
-				sortIndex = n2,
-				topicId = s2,
+				itemsPerRow = itemsPerRow,
+				pageContext = pageContext,
+				sortIndex = sortIndex,
+				topicId = topicId,
 				nxmApportioningFlagValue = FFlagLuaAppEnableNxMRoduxApportioning
 			})
 		end
 
-		if t4 then
-			for v51, v52 in t4 do
-				if not t7[v51] then
-					local v53 = t2[v51]
-
-					GridLayoutTelemetry.logTileSkipped(v53 and v53.adId, v53 and v53.universeId, v52, s1, n1, v34, v51, n2, s2)
-				end
-			end
+		if not componentTypes then
+			return collectionEntries
 		end
 
-		return t6
+		for k, item in componentTypes do
+			if set[k] then
+				continue
+			end
+
+			local item2 = list[k]
+			GridLayoutTelemetry.logTileSkipped(
+				item2 and item2.adId,
+				item2 and item2.universeId,
+				item,
+				pageContext,
+				itemsPerRow,
+				totalRows,
+				k,
+				sortIndex,
+				topicId
+			)
+		end
+
+		return collectionEntries
 	end
 }

@@ -1,25 +1,18 @@
 return {
 	VideoBlockingTelemetryConfig = {
 		eventName = "EdpVideoPreviewBlockingStatus",
+		backends = { "Points", "EventIngest" },
+		lastUpdated = { 26, 3, 25 },
 		description = "Telemetry about whether or not the video is blocked by manufacturer/device/max memory",
-		backends = {
-			"Points",
-			"EventIngest"
-		},
-		lastUpdated = {
-			26,
-			3,
-			25
-		},
 		throttlingPercentage = game:DefineFastInt("VideoBlockingTelemetryThrottleHundredthsPercent", 10000)
 	},
-	isInPipeDenyList = function(s1: string?, s2: string?) -- line: 15
-		if not s1 or (not s2 or s2 == "") then
+	isInPipeDenyList = function(value: string?, value2: string?): boolean
+		if not value or not value2 or value2 == "" then
 			return false
 		end
 
-		for match in s2:gmatch("([^|]+)") do
-			if typeof(match) == "string" and string.lower(match) == string.lower(s1) then
+		for k in value2:gmatch("([^|]+)") do
+			if typeof(k) == "string" and string.lower(k) == string.lower(value) then
 				return true
 			end
 		end

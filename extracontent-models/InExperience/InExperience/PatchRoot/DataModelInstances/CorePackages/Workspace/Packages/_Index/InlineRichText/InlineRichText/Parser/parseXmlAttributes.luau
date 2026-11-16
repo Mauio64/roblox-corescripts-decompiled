@@ -1,17 +1,18 @@
-local function parseXmlAttributes(s1: string) -- line: 1
-	local v3 = s1:gmatch("%s*([A-Za-z0-9_-]+)=\"([^\"]*)\"%s*")
-	local v4 = s1:gmatch("%s*([A-Za-z0-9_-]+)='([^']*)'%s*")
-	local t1 = {}
+local function parseXmlAttributes(value: string)
+	local v = value:gmatch("%s*([A-Za-z0-9_-]+)=\"([^\"]*)\"%s*")
+	local v2 = value:gmatch("%s*([A-Za-z0-9_-]+)='([^']*)'%s*")
 
-	for v6, v7 in v3 do
-		t1[v6] = v7 or ""
+	local xmlAttributes = {}
+
+	for k, v3 in v do
+		xmlAttributes[k] = v3 or ""
 	end
 
-	for v8, v9 in v4 do
-		t1[v8] = v9 or ""
+	for k, v3 in v2 do
+		xmlAttributes[k] = v3 or ""
 	end
 
-	return t1
+	return xmlAttributes
 end
 
 return parseXmlAttributes

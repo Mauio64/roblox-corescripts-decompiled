@@ -1,15 +1,19 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local FitFrameOnAxis = require(ParentParentParent.FitFrame).FitFrameOnAxis
-local isCallable = require(ParentParent.Utility.isCallable)
-local CarouselHeader = require(scriptParent.CarouselHeader)
-local HorizontalCarousel = require(scriptParent.HorizontalCarousel)
-local v10 = Roact.PureComponent:extend("FreeFlowCarousel")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent
+local parent3 = parent2.Parent
 
-v10.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local FitFrame = require(parent3.FitFrame)
+local FitFrameOnAxis = FitFrame.FitFrameOnAxis
+local isCallable = require(parent2.Utility.isCallable)
+
+local CarouselHeader = require(parent.CarouselHeader)
+local HorizontalCarousel = require(parent.HorizontalCarousel)
+
+local extended = Roact.PureComponent:extend("FreeFlowCarousel")
+
+extended.validateProps = t.strictInterface({
 	identifier = t.optional(t.callback),
 	headerText = t.optional(t.string),
 	onSeeAll = t.optional(t.callback),
@@ -32,44 +36,44 @@ v10.validateProps = t.strictInterface({
 		onViewableItemsChanged = isCallable
 	})))
 })
-v10.defaultProps = {
+
+extended.defaultProps = {
 	headerText = "",
 	innerPadding = 12,
 	itemPadding = 12,
 	carouselMargin = 24
 }
 
-function v10.render(p1) -- line: 77
-	-- upvalues: Roact (copy), FitFrameOnAxis (copy), CarouselHeader (copy), HorizontalCarousel (copy)
-	local innerPadding = p1.props.innerPadding
-	local carouselMargin = p1.props.carouselMargin
+function extended.render(p)
+	local innerPadding = p.props.innerPadding
+	local carouselMargin = p.props.carouselMargin
 
 	return Roact.createElement(FitFrameOnAxis, {
-		BackgroundTransparency = 1,
 		axis = FitFrameOnAxis.Axis.Vertical,
 		minimumSize = UDim2.fromScale(1, 0),
-		LayoutOrder = p1.props.layoutOrder,
-		contentPadding = UDim.new(0, innerPadding)
+		LayoutOrder = p.props.layoutOrder,
+		contentPadding = UDim.new(0, innerPadding),
+		BackgroundTransparency = 1
 	}, {
 		CarouselHeader = Roact.createElement(CarouselHeader, {
-			layoutOrder = 1,
-			headerText = p1.props.headerText,
-			onSeeAll = p1.props.onSeeAll,
-			carouselMargin = carouselMargin
+			headerText = p.props.headerText,
+			onSeeAll = p.props.onSeeAll,
+			carouselMargin = carouselMargin,
+			layoutOrder = 1
 		}),
 		Carousel = Roact.createElement(HorizontalCarousel, {
-			layoutOrder = 2,
-			identifier = p1.props.identifier,
-			itemList = p1.props.itemList,
-			renderItem = p1.props.renderItem,
-			itemSize = p1.props.itemSize,
+			identifier = p.props.identifier,
+			itemList = p.props.itemList,
+			renderItem = p.props.renderItem,
+			itemSize = p.props.itemSize,
 			itemPadding = innerPadding,
 			carouselMargin = carouselMargin,
-			loadNext = p1.props.loadNext,
-			maxNumOfItemsVisible = p1.props.maxNumOfItemsVisible,
-			viewabilityConfigCallbackPairs = p1.props.viewabilityConfigCallbackPairs
+			layoutOrder = 2,
+			loadNext = p.props.loadNext,
+			maxNumOfItemsVisible = p.props.maxNumOfItemsVisible,
+			viewabilityConfigCallbackPairs = p.props.viewabilityConfigCallbackPairs
 		})
 	})
 end
 
-return v10
+return extended

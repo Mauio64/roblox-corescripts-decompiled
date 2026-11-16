@@ -1,8 +1,11 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local SharedFlags = require(Parent.SharedFlags)
-local t = require(Parent.t)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local t = require(parent.t)
+
 local FFlagAddThumbnailSelectorReport = SharedFlags.FFlagAddThumbnailSelectorReport
-local t1 = {
+
+local v = {
 	componentType = t.literal("dropdown"),
 	isOptional = t.boolean,
 	formDataKey = t.string,
@@ -16,56 +19,61 @@ local t1 = {
 		}))
 	})
 }
-local t2 = {
+
+local v2 = {
 	componentType = t.literal("freeComment"),
 	isOptional = t.boolean,
 	formDataKey = t.string,
 	requirementMessage = t.string,
-	freeComment = t.interface({
-		prompt = t.string,
-		placeholder = t.string
-	})
+	freeComment = t.interface({ prompt = t.string, placeholder = t.string })
 }
-local t3 = {
+
+local v3 = {
 	componentType = t.literal("paragraph"),
 	isOptional = t.boolean,
 	formDataKey = t.optional(t.string),
 	paragraph = t.interface({
 		text = t.string,
-		links = t.optional(t.map(t.string, t.interface({
-			label = t.string,
-			linkButtonLabel = t.string,
-			url = t.string
-		})))
+		links = t.optional(t.map(
+			t.string,
+			t.interface({ label = t.string, linkButtonLabel = t.string, url = t.string })
+		))
 	})
 }
-local t4 = {
+
+local v4 = {
 	componentType = t.literal("selector"),
 	isOptional = t.boolean,
 	formDataKey = t.string,
 	requirementMessage = t.string,
-	selector = t.interface({
-		prompt = t.string
-	})
+	selector = t.interface({ prompt = t.string })
 }
-local t5 = {
+
+local v5 = {
 	componentType = t.literal("link"),
 	isOptional = t.boolean,
 	formDataKey = t.optional(t.string),
-	link = t.interface({
-		label = t.string,
-		linkButtonLabel = t.string,
-		url = t.string
-	})
+	link = t.interface({ label = t.string, linkButtonLabel = t.string, url = t.string })
 }
-local t6 = {
+
+local v6 = {
 	type = t.literal("configurableComponentList"),
-	configurableComponentList = t.interface({
-		components = if not FFlagAddThumbnailSelectorReport then t.array(t.union(t.interface(t1), t.interface(t2), t.interface(t3), t.interface(t5))) else t.array(t.union(t.interface(t1), t.interface(t2), t.interface(t3), t.interface(t4), t.interface(t5)))
-	})
+	configurableComponentList = 0
 }
-local v11 = t.union(t.interface(t6))
-local t7 = {
+local interface = t.interface
+local components
+
+if FFlagAddThumbnailSelectorReport then
+	components = t.array(t.union(t.interface(v), t.interface(v2), t.interface(v3), t.interface(v4), t.interface(v5)))
+else
+	components = t.array(t.union(t.interface(v), t.interface(v2), t.interface(v3), t.interface(v5)))
+end
+
+v6.configurableComponentList = interface({ components = components })
+
+local union = t.union(t.interface(v6))
+
+local v7 = {
 	title = t.string,
 	subtitle = t.string,
 	actionInfo = t.interface({
@@ -76,36 +84,24 @@ local t7 = {
 	stepId = t.number,
 	internalStepName = t.string,
 	isCompletionStep = t.optional(t.boolean),
-	innerContentConfig = t.optional(v11),
-	footerContentConfig = t.optional(v11)
-}
-local t8 = {
-	rootStepId = t.number,
-	nodes = t.array(t.interface(t7))
+	innerContentConfig = t.optional(union),
+	footerContentConfig = t.optional(union)
 }
 
 return {
-	AbuseReportBeduiContextStatus = {
-		Loading = "Loading",
-		Success = "Success",
-		Error = "Error"
-	},
-	BeduiDataTypeInterface = t8,
+	AbuseReportBeduiContextStatus = { Loading = "Loading", Success = "Success", Error = "Error" },
+	BeduiDataTypeInterface = { rootStepId = t.number, nodes = t.array(t.interface(v7)) },
 	ComponentType = {
 		Dropdown = "dropdown",
 		FreeComment = "freeComment",
 		Paragraph = "paragraph",
-		WebViewLink = "link",
-		Selector = if not FFlagAddThumbnailSelectorReport then nil else "selector"
+		Selector = FFlagAddThumbnailSelectorReport and "selector" or nil,
+		WebViewLink = "link"
 	},
 	ContentConfigType = {
 		InnerContentConfig = "innerContentConfig",
 		FooterContentConfig = "footerContentConfig"
 	},
-	InnerContentConfigType = {
-		ConfigurableComponentList = "configurableComponentList"
-	},
-	NotificationType = {
-		OpenCustomWebView = 20
-	}
+	InnerContentConfigType = { ConfigurableComponentList = "configurableComponentList" },
+	NotificationType = { OpenCustomWebView = 20 }
 }

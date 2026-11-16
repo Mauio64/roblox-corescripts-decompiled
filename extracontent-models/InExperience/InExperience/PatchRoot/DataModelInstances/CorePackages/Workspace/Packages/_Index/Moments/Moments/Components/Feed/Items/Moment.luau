@@ -1,105 +1,228 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
+local parent = Moments.Parent
+
+local React = require(parent.React)
 
 require(Moments.Components.Feed.FeedTypes)
-
 local MomentItem = require(script.MomentItem)
 local MomentItemSkeleton = require(script.MomentItemSkeleton)
 
 require(script.createMomentStore)
 
-local MomentsCommon = require(MomentsParent.MomentsCommon)
-
-require(MomentsParent.MomentsTypes)
+local MomentsCommon = require(parent.MomentsCommon)
+local MomentsTypes = require(parent.MomentsTypes)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
+local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
+local FFlagMomentsHideOfficialContentLabel = SharedFlags.FFlagMomentsHideOfficialContentLabel
+local FStringMomentsOfficialContentCreatorId = require(Moments.Flags.FStringMomentsOfficialContentCreatorId)
 
 local GetMomentsPreferencesStore = require(Moments.Stores.GetMomentsPreferencesStore)
-local GetFFlagMomentsPartnerContentLabel = require(Moments.Flags.GetFFlagMomentsPartnerContentLabel)
+local GetFFlagMomentsRenderPostAssets = require(parent.MomentsCommon.GetFFlagMomentsRenderPostAssets)
+local FFlagMomentsAvatarLookTryOn = SharedFlags.FFlagMomentsAvatarLookTryOn
 local makeRecommendationAttribution = require(Moments.Analytics.makeRecommendationAttribution)
+local FFlagMomentsRecommendationContentType = require(Moments.Flags.FFlagMomentsRecommendationContentType)
 local toMediaItem = require(Moments.Components.Feed.Media.toMediaItem)
+local Comments = require(Moments.Components.Comments)
+
 local MomentMediaView = MomentsCommon.Media.MomentMediaView
 
-local function momentAttribution(p1) -- line: 47
-	-- upvalues: makeRecommendationAttribution (copy)
-	if p1 == nil then
+local v = tonumber(FStringMomentsOfficialContentCreatorId)
+
+local function momentAttribution(moment)
+	if moment == nil then
 		return nil
 	end
 
-	return makeRecommendationAttribution(p1.recommendationMetadata)
+	local recommendationMetadata = moment.recommendationMetadata
+
+	if not FFlagMomentsRecommendationContentType then
+		moment = nil
+	end
+
+	return makeRecommendationAttribution(recommendationMetadata, moment)
+end
+
+local function createMediaSurface(moment)
+	local v2 = toMediaItem({ kind = "moment", moment = moment })
+
+	if v2 == nil then
+		return nil
+	end
+
+	return React.createElement(MomentMediaView, {
+		momentId = v2.momentId,
+		posterContent = v2.posterContent,
+		showLoadingSkeleton = v2.captureType == Enum.CaptureType.Video,
+		suppressTapToToggle = true,
+		getScaleType = GetMomentsPreferencesStore(false).getMediaScaleType
+	})
 end
 
 return {
 	{
 		kind = "moment",
-		getKey = function(p2) -- line: 59
-			local moment = p2.moment
+		getKey = function(p)
+			local moment = p.moment
 			local recommendationMetadata = moment.recommendationMetadata
 
-			if recommendationMetadata and (recommendationMetadata.feedItemId and recommendationMetadata.feedItemId ~= "") then
+			if
+				recommendationMetadata
+				and recommendationMetadata.feedItemId
+				and recommendationMetadata.feedItemId ~= ""
+			then
 				return recommendationMetadata.feedItemId
 			end
 
 			return moment.momentId
 		end,
-		getAttribution = function(p3) -- line: 75
-			-- upvalues: momentAttribution (copy)
-			return momentAttribution(p3.moment)
+		getAttribution = function(p)
+			return momentAttribution(p.moment)
 		end,
-		render = function(p4, _: number) -- line: 79
-			-- upvalues: toMediaItem (copy), React (copy), MomentMediaView (copy), GetMomentsPreferencesStore (copy), GetFFlagMomentsPartnerContentLabel (copy), MomentItem (copy)
-			local moment = p4.moment
+		render = function(p, _: number)
+			local moment = p.moment
 
 			if moment == nil then
 				return nil
 			end
 
-			local v21 = nil
-			local v22 = toMediaItem(p4)
+			local mediaSurface = nil
 
-			if v22 ~= nil then
-				v21 = React.createElement(MomentMediaView, {
-					suppressTapToToggle = true,
-					momentId = v22.momentId,
-					posterContent = v22.posterContent,
-					showLoadingSkeleton = v22.captureType == Enum.CaptureType.Video,
-					getScaleType = GetMomentsPreferencesStore(false).getMediaScaleType
-				})
+			if not GetFFlagMomentsRenderPostAssets() then
+				local v2 = toMediaItem(p)
+
+				if v2 ~= nil then
+					mediaSurface = React.createElement(MomentMediaView, {
+						momentId = v2.momentId,
+						posterContent = v2.posterContent,
+						showLoadingSkeleton = v2.captureType == Enum.CaptureType.Video,
+						suppressTapToToggle = true,
+						getScaleType = GetMomentsPreferencesStore(false).getMediaScaleType
+					})
+				end
 			end
 
 			local recommendationMetadata = moment.recommendationMetadata
-			local v24 = GetFFlagMomentsPartnerContentLabel() and moment.metadata.partnerUploadType == "influencer"
-			local t1 = {
+			local v2
+
+			if moment ~= nil then
+				local recommendationMetadata2 = moment.recommendationMetadata
+				local v3
+
+				if FFlagMomentsRecommendationContentType then
+					v3 = moment
+				end
+
+				v2 = makeRecommendationAttribution(recommendationMetadata2, v3)
+			end
+
+			local isSponsored = moment.metadata.partnerUploadType == "influencer"
+			local v3 = {
 				kind = "experience",
-				creatorIsVerified = nil,
-				commentCount = nil,
 				momentId = moment.momentId,
 				creatorId = moment.creatorId,
 				placeId = moment.metadata.placeId or 0,
 				universeId = moment.metadata.universeId or 0,
-				isSponsored = v24,
-				description = moment.metadata.description,
-				isModerated = moment.isModerated == true,
-				feedItemId = if recommendationMetadata == nil then nil else recommendationMetadata.feedItemId,
-				feedSessionId = if recommendationMetadata == nil then nil else recommendationMetadata.tracingId
+				outfitId = 0,
+				isSponsored = 0,
+				isOfficialContent = 0,
+				description = 0,
+				isModerated = 0,
+				isPending = 0,
+				commentCount = 0,
+				feedItemId = 0,
+				feedSessionId = 0,
+				contentType = 0
 			}
+			local outfitId
 
-			return React.createElement(MomentItem, {
-				data = t1,
-				mediaSurface = v21,
+			if FFlagMomentsAvatarLookTryOn then
+				outfitId = moment.metadata.outfitId
+			end
+
+			v3.outfitId = outfitId
+			v3.isSponsored = isSponsored
+			local isOfficialContent
+
+			if FFlagMomentsHideOfficialContentLabel then
+				if v == nil then
+					isOfficialContent = false
+				else
+					isOfficialContent = moment.creatorId == v
+				end
+			end
+
+			v3.isOfficialContent = isOfficialContent
+
+			v3.description = moment.metadata.description
+			v3.isModerated = moment.isModerated == true
+			v3.isPending = FFlagMomentsOptimisticProfilePending
+				and moment.status == MomentsTypes.Enums.MomentStatus.Pending
+			local commentCount
+
+			if SharedFlags.FFlagMomentsComments then
+				commentCount = Comments.getSeededCommentCount(moment.comments)
+			end
+
+			v3.commentCount = commentCount
+			local feedItemId
+
+			if recommendationMetadata ~= nil then
+				feedItemId = recommendationMetadata.feedItemId
+			end
+
+			v3.feedItemId = feedItemId
+			local feedSessionId
+
+			if recommendationMetadata ~= nil then
+				feedSessionId = recommendationMetadata.tracingId
+			end
+
+			v3.feedSessionId = feedSessionId
+			local contentType
+
+			if FFlagMomentsRecommendationContentType and v2 ~= nil then
+				contentType = v2.contentType
+			end
+
+			v3.contentType = contentType
+
+			local createElement = React.createElement
+			local renderMediaSurface
+
+			if GetFFlagMomentsRenderPostAssets() then
+				renderMediaSurface = createMediaSurface
+			end
+
+			local element = createElement(MomentItem, {
+				data = v3,
+				mediaSurface = mediaSurface,
+				renderMediaSurface = renderMediaSurface,
 				moment = moment
+			})
+
+			if not FFlagMomentsServeEDPVideos or moment.entityType ~= "edpVideo" then
+				return element
+			end
+
+			local EdpVideoEligibilityContainer = require(script.EdpVideoEligibility.EdpVideoEligibilityContainer)
+			return React.createElement(EdpVideoEligibilityContainer, {
+				momentId = moment.momentId,
+				universeId = moment.metadata.universeId,
+				content = element,
+				loadingContent = React.createElement(MomentItemSkeleton)
 			})
 		end
 	},
 	{
 		kind = "skeleton",
-		getKey = function(_) -- line: 149
+		getKey = function(_): string
 			return "__feed_skeleton__"
 		end,
-		getAttribution = function(_) -- line: 154
+		getAttribution = function(_): nil
 			return nil
 		end,
-		render = function(_, _: number) -- line: 158
-			-- upvalues: React (copy), MomentItemSkeleton (copy)
+		render = function(_, _: number)
 			return React.createElement(MomentItemSkeleton)
 		end
 	}

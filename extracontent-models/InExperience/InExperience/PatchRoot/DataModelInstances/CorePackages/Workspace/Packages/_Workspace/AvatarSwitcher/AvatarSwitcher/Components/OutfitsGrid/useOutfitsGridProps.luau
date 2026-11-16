@@ -1,33 +1,34 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
-local SignalsReact = require(AvatarSwitcherParent.SignalsReact)
-local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
+local parent = AvatarSwitcher.Parent
 
+local SignalsReact = require(parent.SignalsReact)
+
+local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
 require(AvatarSwitcher.types)
 
 local ExperienceAvatarSupportType = require(AvatarSwitcher.Enums.ExperienceAvatarSupportType)
-local v6 = game:DefineFastInt("AvatarSwitcherShimmerTiles", 12)
 
-local function useOutfitsGridProps() -- line: 19
-	-- upvalues: SignalsReact (copy), getAvatarSwitcherStore (copy), ExperienceAvatarSupportType (copy), v6 (copy)
-	local v8 = SignalsReact.useSignalState(getAvatarSwitcherStore)
-	local v9 = SignalsReact.useSignalState(v8.getOutfits)
-	local v10 = SignalsReact.useSignalState(v8.getLastPageReached)
-	local v11 = SignalsReact.useSignalState(v8.getExperienceAvatarSupportType) == ExperienceAvatarSupportType.NoSupport
+local defineFastInt = game:DefineFastInt("AvatarSwitcherShimmerTiles", 12)
 
-	if #v9 == 0 and not v10 then
-		v9 = {}
+local function useOutfitsGridProps()
+	local v = SignalsReact.useSignalState(getAvatarSwitcherStore)
+	local outfits = SignalsReact.useSignalState(v.getOutfits)
+	local lastPageReached = SignalsReact.useSignalState(v.getLastPageReached)
+	local disabled = SignalsReact.useSignalState(v.getExperienceAvatarSupportType) == ExperienceAvatarSupportType.NoSupport
 
-		for _ = 1, v6 do
-			table.insert(v9, {})
+	if #outfits == 0 and not lastPageReached then
+		outfits = {}
+
+		for _ = 1, defineFastInt do
+			table.insert(outfits, {})
 		end
 	end
 
 	return {
-		outfits = v9,
-		lastPageReached = v10,
-		fetchNextOutfitsPage = v8.fetchNextOutfitsPage,
-		disabled = v11
+		outfits = outfits,
+		lastPageReached = lastPageReached,
+		fetchNextOutfitsPage = v.fetchNextOutfitsPage,
+		disabled = disabled
 	}
 end
 

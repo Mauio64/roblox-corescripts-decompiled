@@ -1,35 +1,37 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local ContextualSlider = require(scriptParent.ContextualSlider)
-local SystemSlider = require(scriptParent.SystemSlider)
-local describe = require(ParentParentParent.Dev.JestGlobals).describe
-local benchmarks = require(ParentParent.Utility.benchmarks)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+
+local React = require(parent3.React)
+local ContextualSlider = require(parent.ContextualSlider)
+local SystemSlider = require(parent.SystemSlider)
+
+local JestGlobals = require(parent3.Dev.JestGlobals)
+local describe = JestGlobals.describe
+
+local benchmarks = require(parent2.Utility.benchmarks)
 local mountComponentTimes = benchmarks.mountComponentTimes
 local scrollComponentTimes = benchmarks.scrollComponentTimes
-local v11 = React.createElement(ContextualSlider, {
+
+local element = React.createElement(ContextualSlider, {
 	min = 0,
 	max = 100,
 	value = 0,
-	onValueChanged = function() -- line: 21
-	end
-})
-local v12 = React.createElement(SystemSlider, {
-	min = 0,
-	max = 100,
-	value = 0,
-	onValueChanged = function() -- line: 27
-	end
+	onValueChanged = function() end
 })
 
-describe("ContextualSlider", function() -- line: 30
-	-- upvalues: mountComponentTimes (copy), v11 (copy), scrollComponentTimes (copy)
-	mountComponentTimes(v11, 100, "ContextualSlider")
-	scrollComponentTimes(v11, 100, "ContextualSlider")
+local element2 = React.createElement(SystemSlider, {
+	min = 0,
+	max = 100,
+	value = 0,
+	onValueChanged = function() end
+})
+
+describe("ContextualSlider", function()
+	mountComponentTimes(element, 100, "ContextualSlider")
+	scrollComponentTimes(element, 100, "ContextualSlider")
 end)
-describe("SystemSlider", function() -- line: 34
-	-- upvalues: mountComponentTimes (copy), v12 (copy), scrollComponentTimes (copy)
-	mountComponentTimes(v12, 100, "SystemSlider")
-	scrollComponentTimes(v12, 100, "SystemSlider")
+describe("SystemSlider", function()
+	mountComponentTimes(element2, 100, "SystemSlider")
+	scrollComponentTimes(element2, 100, "SystemSlider")
 end)

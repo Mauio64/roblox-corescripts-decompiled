@@ -1,5 +1,5 @@
 return {
 	displayName = "VoiceChatCore",
-	mockDataModel = true,
-	testMatch = { "**/*.test" }
+	testMatch = { "**/*.test" },
+	mockDataModel = true
 }

@@ -1,11 +1,12 @@
 local AvatarEditorService = game:GetService("AvatarEditorService")
-local ParentParent = script.Parent.Parent
-local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
-local PromptType = require(ParentParent.PromptType)
 
-return function(p1) -- line: 8
-	-- upvalues: PromptType (copy), AvatarEditorService (copy), CloseOpenPrompt (copy)
-	local promptType = p1:getState().promptInfo.promptType
+local parent = script.Parent.Parent
+local CloseOpenPrompt = require(parent.Actions.CloseOpenPrompt)
+
+local PromptType = require(parent.PromptType)
+
+return function(object)
+	local promptType = object:getState().promptInfo.promptType
 
 	if promptType == PromptType.AllowInventoryReadAccess then
 		AvatarEditorService:SetAllowInventoryReadAccess(false)
@@ -29,5 +30,5 @@ return function(p1) -- line: 8
 		error("CloseOpenPrompt for unhandled prompt type " .. tostring(promptType))
 	end
 
-	p1:dispatch(CloseOpenPrompt())
+	object:dispatch(CloseOpenPrompt())
 end

@@ -1,40 +1,52 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Foundation = require(ParentParentParent.Foundation)
-local Localization = require(ParentParentParent.Localization)
-local React = require(ParentParentParent.React)
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
-local UIBlox = require(ParentParentParent.UIBlox)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Foundation = require(parent2.Foundation)
+local Localization = require(parent2.Localization)
+local React = require(parent2.React)
+local RoactUtils = require(parent2.RoactUtils)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local UIBlox = require(parent2.UIBlox)
+
 local View = Foundation.View
+
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+
+local useAnalytics = require(parent.Analytics.useAnalytics)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useLocalization = Localization.Hooks.useLocalization
-local usePinInputStateWhileOpen = require(ParentParent.Hooks.usePinInputStateWhileOpen)
+local usePinInputStateWhileOpen = require(parent.Hooks.usePinInputStateWhileOpen)
 local useScreenSize = RobloxAppHooks.useScreenSize
-local CapturePromptItem = require(ParentParent.Components.CaptureService.CapturePromptItem)
-local EventNames = require(ParentParent.Analytics.EventNames)
-local ShareCapturePromptFinished = require(ParentParent.Thunks.ShareCapturePromptFinished)
 
-require(ParentParent.Types)
+local CapturePromptItem = require(parent.Components.CaptureService.CapturePromptItem)
+local EventNames = require(parent.Analytics.EventNames)
+local ShareCapturePromptFinished = require(parent.Thunks.ShareCapturePromptFinished)
+require(parent.Types)
 
-local FFlagCapturePermissionsPromptFreeMouse = require(ParentParent.Flags.FFlagCapturePermissionsPromptFreeMouse)
+local FFlagCapturePermissionsPromptFreeMouse = require(parent.Flags.FFlagCapturePermissionsPromptFreeMouse)
 
-return function(t1: {[any]: any}) -- line: 40
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useScreenSize (copy), React (copy), useLocalization (copy), usePinInputStateWhileOpen (copy), FFlagCapturePermissionsPromptFreeMouse (copy), EventNames (copy), ShareCapturePromptFinished (copy), ButtonType (copy), View (copy), CapturePromptItem (copy), InteractiveAlert (copy)
-	local v22 = useAnalytics()
-	local v23 = useDispatch()
-	local v24 = useScreenSize()
-	local v25, v26 = React.useState(Vector2.new(0, 0))
-	local v27, v28 = React.useState(Vector2.new(0, 0))
-	local v29, v30 = React.useState(Vector2.new(0, 0))
-	local content = t1.promptData.content
-	local isU13LocalSavePrompt = t1.promptData.isU13LocalSavePrompt
-	local v33 = t1.enableInputDelayed == nil or t1.enableInputDelayed
-	local v34 = typeof(content) == "Content" and (content.Object ~= nil and content.Object:IsA("VideoCapture"))
-	local v35 = useLocalization({
+return function(props)
+	local v = useAnalytics()
+	local v2 = useDispatch()
+	local screenSize = useScreenSize()
+
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(Vector2.new(0, 0))
+	local state3, setState3 = React.useState(Vector2.new(0, 0))
+
+	local content = props.promptData.content
+	local isU13LocalSavePrompt = props.promptData.isU13LocalSavePrompt
+	local v3 = props.enableInputDelayed == nil or props.enableInputDelayed
+	local v4
+
+	if typeof(content) == "Content" and content.Object ~= nil then
+		v4 = content.Object:IsA("VideoCapture")
+	else
+		v4 = false
+	end
+
+	local v5 = useLocalization({
 		no = "Feature.Captures.Action.NoThanks",
 		saveBodyText = "Feature.Captures.Body.SaveCapturesPrompt",
 		saveTitle = "Feature.Captures.Title.SaveCapturesPrompt",
@@ -43,143 +55,126 @@ return function(t1: {[any]: any}) -- line: 40
 		shareTitle = "Feature.Captures.Title.ShareCapturePrompt",
 		shareYes = "Feature.Captures.Action.Share"
 	})
-	local v36 = if not isU13LocalSavePrompt then v35.shareBodyText else v35.saveBodyText
-	local v37 = if not isU13LocalSavePrompt then v35.shareTitle else v35.saveTitle
-	local v38 = if not isU13LocalSavePrompt then v35.shareYes else v35.saveYes
+	local bodyText
+
+	if isU13LocalSavePrompt then
+		bodyText = v5.saveBodyText
+	else
+		bodyText = v5.shareBodyText
+	end
+
+	local title
+
+	if isU13LocalSavePrompt then
+		title = v5.saveTitle
+	else
+		title = v5.shareTitle
+	end
+
+	local text
+
+	if isU13LocalSavePrompt then
+		text = v5.saveYes
+	else
+		text = v5.shareYes
+	end
 
 	usePinInputStateWhileOpen(FFlagCapturePermissionsPromptFreeMouse)
-	React.useEffect(function() -- line: 71
-		-- upvalues: isU13LocalSavePrompt (copy), v22 (copy), EventNames (copy), v34 (copy)
-		if not isU13LocalSavePrompt then
-			v22.fireEvent(EventNames.ShareCapturePromptViewed)
 
-			if v34 then
-				v22.fireEvent(EventNames.ShareCapturePromptVideoPrompted)
+	React.useEffect(function()
+		if not isU13LocalSavePrompt then
+			v.fireEvent(EventNames.ShareCapturePromptViewed)
+
+			if v4 then
+				v.fireEvent(EventNames.ShareCapturePromptVideoPrompted)
 			end
 		end
-	end, {
-		v22.fireEvent,
-		isU13LocalSavePrompt,
-		v34
-	})
+	end, { v.fireEvent, isU13LocalSavePrompt, v4 })
 
-	local v39 = React.useCallback(function(p1) -- line: 80
-		-- upvalues: v26 (copy)
-		v26(p1.AbsoluteSize)
-	end, { v26 })
-	local v40 = React.useCallback(function(p2) -- line: 84
-		-- upvalues: v28 (copy)
-		v28(p2.AbsoluteSize)
-	end, { v28 })
-	local v41 = React.useCallback(function() -- line: 89
-		-- upvalues: isU13LocalSavePrompt (copy), v22 (copy), EventNames (copy), v34 (copy), v23 (copy), ShareCapturePromptFinished (copy), t1 (copy)
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize)
+	end, { setState })
+
+	local onAbsoluteSizeChanged2 = React.useCallback(function(p)
+		setState2(p.AbsoluteSize)
+	end, { setState2 })
+
+	local onActivated = React.useCallback(function()
 		if not isU13LocalSavePrompt then
-			v22.fireEvent(EventNames.ShareCapturePromptAccepted)
+			v.fireEvent(EventNames.ShareCapturePromptAccepted)
 
-			if v34 then
-				v22.fireEvent(EventNames.ShareCapturePromptVideoAccepted)
+			if v4 then
+				v.fireEvent(EventNames.ShareCapturePromptVideoAccepted)
 			end
 		end
 
-		v23(ShareCapturePromptFinished(t1.promptId, t1.promptData, true))
-	end, {
-		v22.fireEvent,
-		v23,
-		isU13LocalSavePrompt,
-		v34,
-		t1.promptData,
-		t1.promptId
-	})
-	local v42 = React.useCallback(function() -- line: 103
-		-- upvalues: isU13LocalSavePrompt (copy), v22 (copy), EventNames (copy), v34 (copy), v23 (copy), ShareCapturePromptFinished (copy), t1 (copy)
-		if not isU13LocalSavePrompt then
-			v22.fireEvent(EventNames.ShareCapturePromptRejected)
+		v2(ShareCapturePromptFinished(props.promptId, props.promptData, true))
+	end, { v.fireEvent, v2, isU13LocalSavePrompt, v4, props.promptData, props.promptId })
 
-			if v34 then
-				v22.fireEvent(EventNames.ShareCapturePromptVideoRejected)
+	local onActivated2 = React.useCallback(function()
+		if not isU13LocalSavePrompt then
+			v.fireEvent(EventNames.ShareCapturePromptRejected)
+
+			if v4 then
+				v.fireEvent(EventNames.ShareCapturePromptVideoRejected)
 			end
 		end
 
-		v23(ShareCapturePromptFinished(t1.promptId, t1.promptData, false))
-	end, {
-		v22.fireEvent,
-		v23,
-		isU13LocalSavePrompt,
-		v34,
-		t1.promptData,
-		t1.promptId
-	})
-	local v43 = React.useCallback(function(p3) -- line: 116
-		-- upvalues: v30 (copy)
-		v30(p3.Resolution)
-	end, { v30 })
-	local v44 = React.useMemo(function() -- line: 120
-		-- upvalues: v42 (copy), v35 (copy), ButtonType (copy), v33 (copy), v41 (copy), v38 (copy)
+		v2(ShareCapturePromptFinished(props.promptId, props.promptData, false))
+	end, { v.fireEvent, v2, isU13LocalSavePrompt, v4, props.promptData, props.promptId })
+
+	local v6 = React.useCallback(function(p)
+		setState3(p.Resolution)
+	end, { setState3 })
+
+	local buttonStackInfo = React.useMemo(function()
 		return {
 			buttons = {
 				{
-					isDefaultChild = true,
-					props = {
-						onActivated = v42,
-						text = v35.no
-					}
+					props = { onActivated = onActivated2, text = v5.no },
+					isDefaultChild = true
 				},
 				{
-					isDefaultChild = false,
 					buttonType = ButtonType.PrimarySystem,
 					props = {
 						delayInputSeconds = 2,
-						enableInputDelayed = v33,
-						isDelayedInput = v33,
-						onActivated = v41,
-						text = v38
-					}
+						enableInputDelayed = v3,
+						isDelayedInput = v3,
+						onActivated = onActivated,
+						text = text
+					},
+					isDefaultChild = false
 				}
 			}
 		}
-	end, {
-		v33,
-		v35,
-		v41,
-		v42,
-		v38
-	})
-	local v45 = React.useCallback(function() -- line: 146
-		-- upvalues: v25 (copy), v27 (copy), v24 (copy), React (copy), View (copy), v40 (copy), CapturePromptItem (copy), content (copy)
-		local v49 = v25.Y - v27.Y
-		local v50 = v24.Y - 80 - v49
+	end, { v3, v5, onActivated, onActivated2, text })
+
+	local middleContent = React.useCallback(function()
+		local v7 = state.Y - state2.Y
+		local v8 = screenSize.Y - 80 - v7
 
 		return React.createElement(View, {
 			Size = UDim2.new(1, 0, 0, 200),
-			sizeConstraint = {
-				MaxSize = Vector2.new(1e999, v50)
-			},
-			onAbsoluteSizeChanged = v40
+			sizeConstraint = { MaxSize = Vector2.new(1e999, v8) },
+			onAbsoluteSizeChanged = onAbsoluteSizeChanged2
 		}, {
 			CapturePromptItem = React.createElement(CapturePromptItem, {
+				content = content,
 				isSelected = true,
 				showCheckbox = false,
-				content = content,
-				updateSelected = function() -- line: 161
-				end
+				updateSelected = function() end
 			})
 		})
-	end, {
-		v25,
-		content,
-		v27,
-		v43,
-		v29
-	})
+	end, { state, content, state2, v6, state3 })
 
 	return React.createElement(InteractiveAlert, {
+		bodyText = bodyText,
+		buttonStackInfo = buttonStackInfo,
 		isMiddleContentFocusable = false,
-		bodyText = v36,
-		buttonStackInfo = v44,
-		middleContent = v45,
-		onAbsoluteSizeChanged = v39,
+		middleContent = middleContent,
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
 		position = UDim2.fromScale(0.5, 0.5),
-		screenSize = v24,
-		title = v37
+		screenSize = screenSize,
+		title = title
 	})
 end

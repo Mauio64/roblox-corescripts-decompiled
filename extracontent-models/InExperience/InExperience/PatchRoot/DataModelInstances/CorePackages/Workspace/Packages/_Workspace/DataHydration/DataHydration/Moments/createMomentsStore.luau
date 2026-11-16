@@ -1,20 +1,15 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local HttpClient = require(Parent.HttpClient)
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
+local HttpClient = require(parent.HttpClient)
 require(script.Parent.MomentsStoreTypes)
-
 local fetchMomentsByIds = require(script.Parent.Requests.fetchMomentsByIds)
-local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
 
-local function createMomentsStore(p1) -- line: 15
-	-- upvalues: HttpClient (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), fetchMomentsByIds (copy)
-	local v8 = p1 or {}
+local function createMomentsStore(options)
+	local v = options or {}
 
 	return {
-		getMomentsByIds = function(t1: {[any]: any}, s1: string?) -- line: 18
-			-- upvalues: HttpClient (copy), FFlagMomentsPassFeedItemIdToBackendApis (copy), fetchMomentsByIds (copy), v8 (copy)
-			return HttpClient.asPromise(if not FFlagMomentsPassFeedItemIdToBackendApis then fetchMomentsByIds(t1, v8.network) else fetchMomentsByIds(t1, v8.network, s1))
+		getMomentsByIds = function(p, p2: string?)
+			return HttpClient.asPromise(fetchMomentsByIds(p, v.network, p2))
 		end
 	}
 end

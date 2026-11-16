@@ -1,5 +1,6 @@
-local Parent = script:FindFirstAncestor("UserRelationshipModals").Parent
-local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local parent = script:FindFirstAncestor("UserRelationshipModals").Parent
+
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
 local SupportedTelemetryBackends = SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends
 local EventTypes = SocialLuaAnalytics.Analytics.Enums.EventTypes
 local Contexts = SocialLuaAnalytics.Analytics.Enums.Contexts
@@ -7,24 +8,17 @@ local EventNames = require(script.Parent.EventNames)
 
 return {
 	defaults = {
-		links = "",
-		throttlingThousandths = game:DefineFastInt("UserRelationshipModalsAnalyticsThrottlingThousandths", 10000)
+		throttlingThousandths = game:DefineFastInt("UserRelationshipModalsAnalyticsThrottlingThousandths", 10000),
+		links = ""
 	},
 	[EventNames.ModalSeen] = {
 		description = "Userrelationshipsmodal was opened",
-		lastUpdated = {
-			26,
-			4,
-			16
-		},
+		lastUpdated = { 26, 4, 16 },
 		backendsList = {
-			{
-				type = SupportedTelemetryBackends.RobloxTelemetryCounter
-			},
+			{ type = SupportedTelemetryBackends.RobloxTelemetryCounter },
 			{
 				type = SupportedTelemetryBackends.EventIngest,
-				overrideName = function() -- line: 24
-					-- upvalues: EventTypes (copy)
+				overrideName = function()
 					return EventTypes.UserSeen
 				end,
 				staticCustomFields = {
@@ -36,24 +30,17 @@ return {
 	},
 	[EventNames.ModalClosed] = {
 		description = "User-relationship-modal was closed without changing the user relationship",
-		lastUpdated = {
-			26,
-			4,
-			16
-		},
+		lastUpdated = { 26, 4, 16 },
 		backendsList = {
-			{
-				type = SupportedTelemetryBackends.RobloxTelemetryCounter
-			},
+			{ type = SupportedTelemetryBackends.RobloxTelemetryCounter },
 			{
 				type = SupportedTelemetryBackends.EventIngest,
-				overrideName = function() -- line: 43
-					-- upvalues: EventTypes (copy)
+				overrideName = function()
 					return EventTypes.ButtonClick
 				end,
 				staticCustomFields = {
-					btn = "Close",
 					eventContext = Contexts.UserRelationshipModals,
+					btn = "Close",
 					placeId = game.PlaceId
 				}
 			}
@@ -61,24 +48,17 @@ return {
 	},
 	[EventNames.CreateActionPressed] = {
 		description = "User pressed on the create action button on a user-relationship-modal",
-		lastUpdated = {
-			26,
-			4,
-			16
-		},
+		lastUpdated = { 26, 4, 16 },
 		backendsList = {
-			{
-				type = SupportedTelemetryBackends.RobloxTelemetryCounter
-			},
+			{ type = SupportedTelemetryBackends.RobloxTelemetryCounter },
 			{
 				type = SupportedTelemetryBackends.EventIngest,
-				overrideName = function() -- line: 63
-					-- upvalues: EventTypes (copy)
+				overrideName = function()
 					return EventTypes.ButtonClick
 				end,
 				staticCustomFields = {
-					btn = "Create",
 					eventContext = Contexts.UserRelationshipModals,
+					btn = "Create",
 					placeId = game.PlaceId
 				}
 			}

@@ -1,47 +1,47 @@
 local LocalizationService = game:GetService("LocalizationService")
+
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local getDeepValue = require(AppChat.Utils.getDeepValue)
-local SharedFlags = require(AppChatParent.SharedFlags)
-local Url = require(AppChatParent.Http).Url
-local Localization = require(AppChatParent.RobloxAppLocales).Localization
+local SharedFlags = require(parent.SharedFlags)
+local Http = require(parent.Http)
+local Url = Http.Url
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
+
 local EnumMessageTypes = require(AppChat.Components.ChatConversation.EnumMessageTypes)
 local MessageModel = require(AppChat.Models.MessageModel)
+
 local GetFFlagEnableSocialCards = SharedFlags.GetFFlagEnableSocialCards
 
-local function getMessageContent(p1) -- line: 18
-	-- upvalues: MessageModel (copy), Localization (copy), LocalizationService (copy), EnumMessageTypes (copy), Url (copy), GetFFlagEnableSocialCards (copy)
-	if p1.previewContent then
-		return p1.previewContent
+local function getMessageContent(data)
+	if data.previewContent then
+		return data.previewContent
 	end
 
-	if p1.visibility == MessageModel.VisibilityTypes.Hidden then
+	if data.visibility == MessageModel.VisibilityTypes.Hidden then
 		return Localization.new(LocalizationService.RobloxLocaleId):Format("Feature.Chat.Label.MessageNotAvailable")
 	end
 
-	if p1.messageType == EnumMessageTypes.Link then
-		return Url.WWW_URL .. "games/" .. p1.gameLink.universeId
+	if data.messageType == EnumMessageTypes.Link then
+		return Url.WWW_URL .. "games/" .. data.gameLink.universeId
 	end
 
-	if GetFFlagEnableSocialCards() and p1.messageType == EnumMessageTypes.System and p1.cards then
-		return p1.cards[1] and p1.cards[1].alt_text
+	if GetFFlagEnableSocialCards() and data.messageType == EnumMessageTypes.System and data.cards then
+		return data.cards[1] and data.cards[1].alt_text
 	end
 
-	return (tostring(p1.content))
+	return (tostring(data.content))
 end
 
-return function(p2) -- line: 48
-	-- upvalues: getDeepValue (copy), getMessageContent (copy)
-	local v14 = getDeepValue(p2, "messages.values")
-	local previewMessageId = p2.previewMessageId
+return function(p)
+	local deepValue = getDeepValue(p, "messages.values")
+	local previewMessageId = p.previewMessageId
 
-	if previewMessageId and (v14 and v14[previewMessageId]) then
-		return getMessageContent(v14[previewMessageId])
+	if previewMessageId and deepValue and deepValue[previewMessageId] then
+		return getMessageContent(deepValue[previewMessageId])
 	end
 
-	if p2.previewContent then
-		return p2.previewContent
-	end
-
-	return nil
+	return if p.previewContent then p.previewContent else nil
 end

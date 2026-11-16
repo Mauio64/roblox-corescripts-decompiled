@@ -1,37 +1,35 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Foundation = require(AppChatParent.Foundation)
-local SignalsReact = require(AppChatParent.SignalsReact)
-local BuilderIcons = require(AppChatParent.BuilderIcons)
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local SignalsReact = require(parent.SignalsReact)
+local BuilderIcons = require(parent.BuilderIcons)
+
 local GetSelectedUsersStore = require(AppChat.Stores.GetSelectedUsersStore)
 
-local function FriendCountLabel() -- line: 13
-	-- upvalues: GetSelectedUsersStore (copy), SignalsReact (copy), Foundation (copy), React (copy), BuilderIcons (copy)
-	local v9 = GetSelectedUsersStore(false)
-	local v10 = SignalsReact.useSignalBinding(v9.getSelectedUserIdsCount())
-	local v11 = SignalsReact.useSignalBinding(v9.getMaxSize())
-	local v12 = Foundation.Hooks.useTokens()
+local function FriendCountLabel()
+	local selectedUsersStore = GetSelectedUsersStore(false)
+	local v = SignalsReact.useSignalBinding(selectedUsersStore.getSelectedUserIdsCount())
+	local v2 = SignalsReact.useSignalBinding(selectedUsersStore.getMaxSize())
 
+	local v3 = Foundation.Hooks.useTokens()
 	return React.createElement(Foundation.View, {
 		tag = "col auto-xy padding-y-small gap-small align-x-center"
 	}, {
 		React.createElement(Foundation.Icon, {
-			LayoutOrder = 1,
-			style = v12.Color.Content.Emphasis,
+			style = v3.Color.Content.Emphasis,
 			name = BuilderIcons.Migration.uiblox["icons/actions/friend_sort/add_friends"].name,
 			variant = Foundation.Enums.IconVariant.Filled,
-			size = Foundation.Enums.IconSize.Large
+			size = Foundation.Enums.IconSize.Large,
+			LayoutOrder = 1
 		}),
 		Label = React.createElement(Foundation.Text, {
 			tag = "auto-xy text-truncate-end text-caption-large content-emphasis",
-			LayoutOrder = 2,
-			Text = React.joinBindings({
-				v10,
-				v11
-			}):map(function(p1) -- line: 32
-				return `{ p1[1] }/{ p1[2] }`
-			end)
+			Text = React.joinBindings({ v, v2 }):map(function(list)
+				return `{list[1]}/{list[2]}`
+			end),
+			LayoutOrder = 2
 		})
 	})
 end

@@ -1,10 +1,9 @@
-local function isPresetMessage(t1: {[any]: any}?) -- line: 5
-	if t1 == nil then
+local function isPresetMessage(p): boolean
+	if p == nil then
 		return false
 	end
 
-	local presetId = t1.presetId
-
+	local presetId = p.presetId
 	return presetId ~= nil and presetId ~= ""
 end
 

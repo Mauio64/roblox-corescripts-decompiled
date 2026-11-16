@@ -1,79 +1,78 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
 require(AppChat.types)
-
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local memo = React.memo
 local useAnalytics = require(AppChat.Analytics.useAnalytics)
 local useCallback = React.useCallback
-local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMount
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
-local useScreenSize = require(AppChatParent.RobloxAppHooks).useScreenSize
+local RoactUtils = require(parent.RoactUtils)
+local useEffectOnMount = RoactUtils.Hooks.useEffectOnMount
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useScreenSize = RobloxAppHooks.useScreenSize
+
 local EventNames = require(AppChat.Analytics.EventNames)
-local UIBlox = require(AppChatParent.UIBlox)
+
+local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
+
 local PartialModal = require(script.Parent.PartialModal)
-local t1 = {
+
+local v = {
 	conversationId = "",
+	onDismissed = function() end,
 	titleKey = "Feature.Chat.Heading.ExpressiveChat",
 	bodyKey = "Feature.Chat.Description.ExpressiveChatLearnMore",
-	cancelAlertKey = "CommonUI.Features.Action.Close",
-	onDismissed = function() -- line: 33
-	end
+	cancelAlertKey = "CommonUI.Features.Action.Close"
 }
 
-local function LearnMorePartialModalContainer(t2: {[any]: any}) -- line: 40
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useScreenSize (copy), useLayerCollector (copy), useAnalytics (copy), useEffectOnMount (copy), EventNames (copy), useCallback (copy), useLocalization (copy), React (copy), PartialModal (copy)
-	local v19 = Cryo.Dictionary.union(t1, t2)
-	local v20 = useStyle()
-	local v21 = useScreenSize()
-	local v22 = useLayerCollector()
+local function LearnMorePartialModalContainer(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local style = useStyle()
+	local screenSize = useScreenSize()
+	local v2 = useLayerCollector()
 
-	if v22 and v22.absoluteSize then
-		v21 = v22.absoluteSize
+	if v2 and v2.absoluteSize then
+		screenSize = v2.absoluteSize
 	end
 
-	local v23 = useAnalytics()
+	local v3 = useAnalytics()
 
-	useEffectOnMount(function() -- line: 50
-		-- upvalues: v23 (copy), EventNames (copy), v19 (copy)
-		if v23 then
-			v23.fireAnalyticsEvent(EventNames.ConversationLearnMoreDialogRendered, {
-				conversationId = v19.conversationId
+	useEffectOnMount(function()
+		if v3 then
+			v3.fireAnalyticsEvent(EventNames.ConversationLearnMoreDialogRendered, {
+				conversationId = union.conversationId
 			})
 		end
 	end)
 
-	local v24 = useCallback(function() -- line: 58
-		-- upvalues: v23 (copy), EventNames (copy), v19 (copy)
-		if v23 then
-			v23.fireAnalyticsEvent(EventNames.ConversationLearnMoreDialogDismissed, {
-				conversationId = v19.conversationId
+	local onDismissed = useCallback(function()
+		if v3 then
+			v3.fireAnalyticsEvent(EventNames.ConversationLearnMoreDialogDismissed, {
+				conversationId = union.conversationId
 			})
 		end
 
-		v19.onDismissed()
-	end, {
-		v23,
-		v19.conversationId,
-		v19.onDismissed
-	})
-	local v25 = useLocalization({
-		titleText = v19.titleKey,
-		bodyText = v19.bodyKey,
-		cancelAlertText = v19.cancelAlertKey
+		union.onDismissed()
+	end, { v3, union.conversationId, union.onDismissed })
+
+	local v4 = useLocalization({
+		titleText = union.titleKey,
+		bodyText = union.bodyKey,
+		cancelAlertText = union.cancelAlertKey
 	})
 
 	return React.createElement(PartialModal, {
-		titleText = v25.titleText,
-		bodyText = v25.bodyText,
-		cancelAlertText = v25.cancelAlertText,
-		screenSize = v21,
-		onDismissed = v24,
-		style = v20
+		titleText = v4.titleText,
+		bodyText = v4.bodyText,
+		cancelAlertText = v4.cancelAlertText,
+		screenSize = screenSize,
+		onDismissed = onDismissed,
+		style = style
 	})
 end
 

@@ -1,48 +1,63 @@
-local Parent = script:FindFirstAncestor("SocialExperiments").Parent
-local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
-local SharedFlags = require(Parent.SharedFlags)
-local v4 = game:DefineFastString("FStringLuckyRecommendationExpLayer", "Party.Coordination.ExperienceJoin3")
-local v5 = game:DefineFastString("LuckyRecommendationEnableVariant", "enableLuckyRecommendation")
+local parent = script:FindFirstAncestor("SocialExperiments").Parent
+
+local ExperimentCacheManager = require(parent.ExperimentCacheManager)
+local experimentCacheManager = ExperimentCacheManager.ExperimentCacheManager
+local SharedFlags = require(parent.SharedFlags)
+
+local defineFastString = game:DefineFastString(
+	"FStringLuckyRecommendationExpLayer",
+	"Party.Coordination.ExperienceJoin3"
+)
+
+local defineFastString2 = game:DefineFastString("LuckyRecommendationEnableVariant", "enableLuckyRecommendation")
+
 local FFlagForceEnableLuckyRecommendation = SharedFlags.FFlagForceEnableLuckyRecommendation
 local FFlagEnableLuckyRecommendationExperimentation = SharedFlags.FFlagEnableLuckyRecommendationExperimentation
 
-local function getIsUserInTreatment(s1: string) -- line: 15
-	-- upvalues: ExperimentCacheManager (copy), v4 (copy)
-	local v10 = ExperimentCacheManager.default:getLayerVariables(v4)
+local function getIsUserInTreatment(p: string)
+	local layerVariables = experimentCacheManager.default:getLayerVariables(defineFastString)
 
-	if v10 and v10[s1] ~= nil then
-		return v10[s1]
+	if layerVariables and layerVariables[p] ~= nil then
+		return layerVariables[p]
 	end
 
 	return false
 end
 
-return {
-	getLuckyRecommendationEnabled = function() -- line: 25
-		-- upvalues: FFlagForceEnableLuckyRecommendation (copy), FFlagEnableLuckyRecommendationExperimentation (copy), v5 (copy), ExperimentCacheManager (copy), v4 (copy)
-		local v11 = FFlagForceEnableLuckyRecommendation
+local LuckyRecommendationExperimentation = {}
 
-		if not v11 then
-			v11 = FFlagEnableLuckyRecommendationExperimentation
+function LuckyRecommendationExperimentation.getLuckyRecommendationEnabled()
+	local v = FFlagForceEnableLuckyRecommendation
 
-			if v11 then
-				local v12 = v5
-				local v13 = ExperimentCacheManager.default:getLayerVariables(v4)
-
-				if v13 and v13[v12] ~= nil then
-					return v13[v12]
-				end
-
-				v11 = false
-			end
-		end
-
-		return v11
-	end,
-	logExposure = function() -- line: 30
-		-- upvalues: FFlagForceEnableLuckyRecommendation (copy), FFlagEnableLuckyRecommendationExperimentation (copy), ExperimentCacheManager (copy), v4 (copy)
-		if not FFlagForceEnableLuckyRecommendation and (FFlagEnableLuckyRecommendationExperimentation and ExperimentCacheManager.default:getLayerVariables(v4) ~= nil) then
-			ExperimentCacheManager.default:logLayerExposure(v4)
-		end
+	if v then
+		return v
 	end
-}
+
+	v = FFlagEnableLuckyRecommendationExperimentation
+
+	if not v then
+		return v
+	end
+
+	local v2 = defineFastString2
+	local layerVariables = experimentCacheManager.default:getLayerVariables(defineFastString)
+
+	if layerVariables and layerVariables[v2] ~= nil then
+		return layerVariables[v2]
+	end
+
+	v = false
+	return false
+end
+
+function LuckyRecommendationExperimentation.logExposure()
+	if
+		not FFlagForceEnableLuckyRecommendation
+		and FFlagEnableLuckyRecommendationExperimentation
+		and experimentCacheManager.default:getLayerVariables(defineFastString) ~= nil
+	then
+		experimentCacheManager.default:logLayerExposure(defineFastString)
+	end
+end
+
+return LuckyRecommendationExperimentation

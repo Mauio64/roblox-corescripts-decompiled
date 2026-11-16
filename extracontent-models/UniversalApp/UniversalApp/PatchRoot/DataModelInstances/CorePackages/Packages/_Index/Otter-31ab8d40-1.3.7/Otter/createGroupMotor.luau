@@ -1,156 +1,157 @@
-local ParentParent = script.Parent.Parent
-local Object = require(ParentParent.Collections).Object
-local createSignal = require(ParentParent.Signal).createSignal
+local parent = script.Parent.Parent
+
+local Collections = require(parent.Collections)
+local Object = Collections.Object
+local Signal = require(parent.Signal)
+local createSignal = Signal.createSignal
+
 local AnimationStepSignal = require(script.Parent.AnimationStepSignal)
 
 require(script.Parent.types)
 
-local t1 = {}
+local class = {}
+class.__index = class
 
-t1.__index = t1
+local function createGroupMotor(items)
+	local states = {}
 
-local function createGroupMotor(t2: {[any]: any}) -- line: 53
-	-- upvalues: createSignal (copy), t1 (copy)
-	local t3 = {}
-
-	for k, v in pairs(t2) do
-		t3[k] = {
-			complete = true,
-			value = v
-		}
+	for k, item in pairs(items) do
+		states[k] = { value = item, complete = true }
 	end
 
-	local v11, v12 = createSignal()
-	local v13, v14 = createSignal()
-	local t4 = {
-		__allComplete = true,
-		__running = false,
+	local signal, fireOnComplete = createSignal()
+	local signal2, fireOnStep = createSignal()
+
+	local groupMotor = {
 		__goals = {},
-		__states = t3,
-		__onComplete = v11,
-		__fireOnComplete = v12,
-		__onStep = v13,
-		__fireOnStep = v14
+		__states = states,
+		__allComplete = true,
+		__onComplete = signal,
+		__fireOnComplete = fireOnComplete,
+		__onStep = signal2,
+		__fireOnStep = fireOnStep,
+		__running = false
 	}
 
-	setmetatable(t4, t1)
+	setmetatable(groupMotor, class)
 
-	return t4
+	return groupMotor
 end
 
-function t1.start(t5: {[any]: any}, b1: boolean) -- line: 82
-	-- upvalues: AnimationStepSignal (copy)
-	if t5.__running then
+function class:start(flag: boolean)
+	if self.__running then
 		return
 	end
 
-	t5.__connection = AnimationStepSignal:Connect(function(p1) -- line: 87
-		-- upvalues: t5 (copy)
-		t5:step(p1)
+	self.__connection = AnimationStepSignal:Connect(function(p)
+		self:step(p)
 	end)
-	t5.__running = true
 
-	if b1 then
-		t5:step(0)
+	self.__running = true
+
+	if flag then
+		self:step(0)
 	end
 end
-function t1.stop(p2) -- line: 98
-	if p2.__connection ~= nil then
-		p2.__connection:Disconnect()
-		p2.__running = false
+
+function class:stop()
+	if self.__connection ~= nil then
+		self.__connection:Disconnect()
+		self.__running = false
 	end
 end
-function t1.step(t6: {[any]: any}, n1: number) -- line: 105
-	if t6.__allComplete then
+
+function class:step(p: number)
+	if self.__allComplete then
 		return
 	end
 
-	local v21 = true
-	local t7 = {}
+	local v = {}
+	local allComplete = true
 
-	for k, v in pairs(t6.__states) do
-		local v25 = v
+	for k, __state in pairs(self.__states) do
+		if not __state.complete then
+			local __goal = self.__goals[k]
 
-		if not v25.complete then
-			local v26 = t6.__goals[k]
-
-			if v26 ~= nil then
-				local v27 = v26.step(v25, n1)
-
-				if v27 ~= nil then
-					v25 = v27
-					t6.__states[k] = v27
-				end
+			if __goal == nil then
+				__state.complete = true
 			else
-				v25.complete = true
+				local v2 = __goal.step(__state, p)
+
+				if v2 ~= nil then
+					self.__states[k] = v2
+					__state = v2
+				end
 			end
 
-			if not v25.complete then
-				v21 = false
+			if not __state.complete then
+				allComplete = false
 			end
 		end
 
-		t7[k] = v25.value
+		v[k] = __state.value
 	end
 
-	local __allComplete = t6.__allComplete
+	local __allComplete = self.__allComplete
+	self.__allComplete = allComplete
 
-	t6.__allComplete = v21
-	t6.__fireOnStep(t7)
+	self.__fireOnStep(v)
 
-	if t6.__allComplete and not __allComplete and t6.__running then
-		t6:stop()
-		t6.__fireOnComplete(t7)
+	if self.__allComplete and not __allComplete and self.__running then
+		self:stop()
+		self.__fireOnComplete(v)
 	end
 end
-function t1.setGoal(t8: {[any]: any}, t9: {[any]: any}) -- line: 150
-	-- upvalues: Object (copy)
-	t8.__goals = Object.assign({}, t8.__goals, t9)
 
-	local v31 = false
+function class:setGoal(items)
+	self.__goals = Object.assign({}, self.__goals, items)
 
-	for k, v in pairs(t9) do
-		local v34 = t8.__states[k]
+	local v = {}
+	local v2 = false
 
-		if v.startingValue then
-			v31 = true
-			v34.value = v.startingValue
+	for k, item in pairs(items) do
+		local __state = self.__states[k]
 
-			if v34.initialValue then
-				v34.initialValue = v.startingValue
+		if item.startingValue then
+			v2 = true
+			__state.value = item.startingValue
+
+			if __state.initialValue then
+				__state.initialValue = item.startingValue
 			end
-		end;
+		end
 
-		({})[k] = v34.value
+		v[k] = __state.value
 
-		if v34 == nil then
+		if __state == nil then
 			error(("Cannot set goal for the value %s because it doesn't exist"):format((tostring(k))), 2)
 		end
 
-		v34.complete = false
+		__state.complete = false
 	end
 
-	t8.__allComplete = false
-	t8:start(v31)
+	self.__allComplete = false
+	self:start(v2)
 end
-function t1.onStep(p3, p4) -- line: 177
-	local v37 = p3.__onStep:subscribe(p4)
 
-	return function() -- line: 180
-		-- upvalues: v37 (copy)
-		v37:unsubscribe()
+function class:onStep(p)
+	local v = self.__onStep:subscribe(p)
+
+	return function()
+		v:unsubscribe()
 	end
 end
-function t1.onComplete(p5, p6) -- line: 185
-	local v40 = p5.__onComplete:subscribe(p6)
 
-	return function() -- line: 188
-		-- upvalues: v40 (copy)
-		v40:unsubscribe()
+function class:onComplete(p)
+	local v = self.__onComplete:subscribe(p)
+
+	return function()
+		v:unsubscribe()
 	end
 end
-function t1.destroy(p7) -- line: 193
-	p7:stop()
+
+function class:destroy()
+	self:stop()
 end
 
 return createGroupMotor

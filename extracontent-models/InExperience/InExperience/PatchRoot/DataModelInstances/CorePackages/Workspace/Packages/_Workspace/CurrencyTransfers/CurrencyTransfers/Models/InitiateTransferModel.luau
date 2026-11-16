@@ -1,73 +1,65 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-
+local parent = CurrencyTransfers.Parent
 require(CurrencyTransfers.types)
+local t = require(parent.t)
+local FFlagShowRemainingTransfersForNonPlus = require(CurrencyTransfers.Flags.FFlagShowRemainingTransfersForNonPlus)
+local TransferBenefitSource = require(CurrencyTransfers.Enums.TransferBenefitSource)
 
-local t = require(CurrencyTransfersParent.t)
-local t1 = {}
+local InitiateTransferModel = {}
 
-function t1.new(p1) -- line: 24
-	-- upvalues: t1 (copy)
-	assert(t1.isValid(p1))
-	t1.__index = t1
-	setmetatable(p1, t1)
+function InitiateTransferModel.new(p)
+	assert(InitiateTransferModel.isValid(p))
 
-	return p1
+	InitiateTransferModel.__index = InitiateTransferModel
+
+	setmetatable(p, InitiateTransferModel)
+
+	return p
 end
-function t1.mock(p2) -- line: 36
-	-- upvalues: t1 (copy)
-	local v7 = p2 or {}
-	local v8 = v7.robuxTransfer or {}
-	local v9 = v8.sender or {
-		targetDisplayName = "MockSender",
-		targetId = 0,
-		targetName = "mock",
-		type = 1
-	}
-	local v10 = v8.recipient or {
-		targetDisplayName = "MockRecipient",
-		targetId = 0,
-		targetName = "mock",
-		type = 1
-	}
-	local v11 = v7.userRelationshipDetail or {
-		mutualFriendsCount = 0,
-		userAccountSinceYear = 0,
-		areFriends = false
-	}
 
-	return (t1.new({
-		transferRequestId = v7.transferRequestId or "RXT-1234567890",
+function InitiateTransferModel.mock(options)
+	local v = options or {}
+	local robuxTransfer = v.robuxTransfer or {}
+	local sender = robuxTransfer.sender
+		or { targetDisplayName = "MockSender", targetId = 0, targetName = "mock", type = 1 }
+
+	local recipient = robuxTransfer.recipient
+		or { targetDisplayName = "MockRecipient", targetId = 0, targetName = "mock", type = 1 }
+
+	local userRelationshipDetail = v.userRelationshipDetail
+		or { mutualFriendsCount = 0, userAccountSinceYear = 0, areFriends = false }
+
+	return (InitiateTransferModel.new({
+		transferRequestId = v.transferRequestId or "RXT-1234567890",
 		robuxTransfer = {
-			transferId = v8.transferId or 1234567890,
-			sender = v9,
-			recipient = v10
+			transferId = robuxTransfer.transferId or 1234567890,
+			sender = sender,
+			recipient = recipient
 		},
-		userRelationshipDetail = v11,
-		senderRobuxBalance = v7.senderRobuxBalance or 0
+		userRelationshipDetail = userRelationshipDetail,
+		senderRobuxBalance = v.senderRobuxBalance or 0
 	}))
 end
-function t1.format(p3) -- line: 73
-	-- upvalues: t1 (copy)
-	local robuxTransfer = p3.robuxTransfer
-	local sender = robuxTransfer.sender
-	local v15 = if not sender then {
-		targetDisplayName = "",
-		targetId = 0,
-		targetName = "",
-		type = 0
-	} else {
-		targetDisplayName = sender.targetDisplayName,
-		targetId = sender.targetId,
-		targetName = sender.targetName,
-		type = sender.type
-	}
 
-	return (t1.new({
-		transferRequestId = p3.transferRequestId,
+function InitiateTransferModel.format(data)
+	local robuxTransfer = data.robuxTransfer
+	local sender = robuxTransfer.sender
+
+	local sender2 = sender
+		and {
+			targetDisplayName = sender.targetDisplayName,
+			targetId = sender.targetId,
+			targetName = sender.targetName,
+			type = sender.type
+		}
+		or { targetDisplayName = "", targetId = 0, targetName = "", type = 0 }
+
+	local new = InitiateTransferModel.new
+	local v = {
+		transferRequestId = data.transferRequestId,
 		robuxTransfer = {
 			transferId = robuxTransfer.transferId,
-			sender = v15,
+			sender = sender2,
 			recipient = {
 				targetDisplayName = robuxTransfer.recipient.targetDisplayName,
 				targetId = robuxTransfer.recipient.targetId,
@@ -75,20 +67,37 @@ function t1.format(p3) -- line: 73
 				type = robuxTransfer.recipient.type
 			}
 		},
-		senderRobuxBalance = p3.senderRobuxBalance,
-		minimumTransferAmount = p3.minimumTransferAmount,
-		maximumTransferAmount = p3.maximumTransferAmount,
+		senderRobuxBalance = data.senderRobuxBalance,
+		minimumTransferAmount = data.minimumTransferAmount,
+		maximumTransferAmount = data.maximumTransferAmount,
 		userRelationshipDetail = {
-			friendSinceYear = p3.userRelationshipDetail.friendSinceYear,
-			friendSinceDate = p3.userRelationshipDetail.friendSinceDate,
-			mutualFriendsCount = p3.userRelationshipDetail.mutualFriendsCount,
-			userAccountSinceYear = p3.userRelationshipDetail.userAccountSinceYear,
-			areFriends = p3.userRelationshipDetail.areFriends
-		}
-	}))
+			friendSinceYear = data.userRelationshipDetail.friendSinceYear,
+			friendSinceDate = data.userRelationshipDetail.friendSinceDate,
+			mutualFriendsCount = data.userRelationshipDetail.mutualFriendsCount,
+			userAccountSinceYear = data.userRelationshipDetail.userAccountSinceYear,
+			areFriends = data.userRelationshipDetail.areFriends
+		},
+		transferBenefitSource = 0,
+		numFreeTransfersRemaining = 0
+	}
+	local transferBenefitSource
+
+	if FFlagShowRemainingTransfersForNonPlus then
+		transferBenefitSource = TransferBenefitSource.fromValue(data.benefitSource)
+	end
+
+	v.transferBenefitSource = transferBenefitSource
+	local numFreeTransfersRemaining
+
+	if FFlagShowRemainingTransfersForNonPlus and type(data.numFreeTransfersRemaining) == "number" then
+		numFreeTransfersRemaining = data.numFreeTransfersRemaining
+	end
+
+	v.numFreeTransfersRemaining = numFreeTransfersRemaining
+	return (new(v))
 end
 
-t1.isValid = t.strictInterface({
+InitiateTransferModel.isValid = t.strictInterface({
 	transferRequestId = t.string,
 	robuxTransfer = t.strictInterface({
 		transferId = t.number,
@@ -118,7 +127,9 @@ t1.isValid = t.strictInterface({
 	}),
 	senderRobuxBalance = t.number,
 	minimumTransferAmount = t.optional(t.number),
-	maximumTransferAmount = t.optional(t.number)
+	maximumTransferAmount = t.optional(t.number),
+	transferBenefitSource = t.optional(t.string),
+	numFreeTransfersRemaining = t.optional(t.number)
 })
 
-return t1
+return InitiateTransferModel

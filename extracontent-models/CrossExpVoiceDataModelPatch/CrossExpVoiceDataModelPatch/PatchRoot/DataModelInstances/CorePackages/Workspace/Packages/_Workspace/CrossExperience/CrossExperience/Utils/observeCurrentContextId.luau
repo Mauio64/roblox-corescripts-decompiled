@@ -1,40 +1,31 @@
-local u1 = nil
-local u2 = false
+local v = nil
+local v2 = false
 
-return function(p1: ((...any) -> ...any)) -- line: 16
-	-- upvalues: u2 (ref), u1 (ref)
-	if not u2 then
-		local ok, result = pcall(function() -- line: 5
+return function(callback)
+	if not v2 then
+		local success, result = pcall(function()
 			return game:GetService("AudioFocusService")
 		end)
-
-		if ok and result then
-			u1 = result
-		end
-
-		u2 = true
+		v = success and result or v
+		v2 = true
 	end
 
-	local v8 = u1
+	local v3 = v
 
-	if v8 then
-		local FocusedContextId = v8:GetFocusedContextId()
+	if v3 then
+		local v4 = v3:GetFocusedContextId()
+		callback(v4)
+		local function fn()
+			local focusedContextId = v3:GetFocusedContextId()
 
-		p1(FocusedContextId)
-
-		local function v10() -- line: 21
-			-- upvalues: v8 (copy), FocusedContextId (ref), p1 (copy)
-			local FocusedContextId2 = v8:GetFocusedContextId()
-
-			if FocusedContextId2 ~= FocusedContextId then
-				FocusedContextId = FocusedContextId2
-				p1(FocusedContextId)
+			if v4 ~= focusedContextId then
+				v4 = focusedContextId
+				callback(v4)
 			end
 		end
-
-		v8.OnContextRegistered:Connect(v10)
-		v8.OnContextUnregistered:Connect(v10)
-		v8.OnDeafenVoiceAudio:Connect(v10)
-		v8.OnUndeafenVoiceAudio:Connect(v10)
+		v3.OnContextRegistered:Connect(fn)
+		v3.OnContextUnregistered:Connect(fn)
+		v3.OnDeafenVoiceAudio:Connect(fn)
+		v3.OnUndeafenVoiceAudio:Connect(fn)
 	end
 end

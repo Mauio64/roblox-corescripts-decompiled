@@ -1,30 +1,27 @@
-local _script = script
-local _scriptParent = _script.Parent
-local llama = require(_scriptParent.llama)
-local RoduxNetworking = require(_scriptParent.RoduxNetworking)
-local AliasNetworking = require(_scriptParent.AliasNetworking)
-local AliasesReducer = require(_script.Reducers.AliasesReducer)
-local Actions = require(_script.Actions)
-local Selectors = require(_script.Selectors)
+local script = script
+local parent = script.Parent
+local llama = require(parent.llama)
+local RoduxNetworking = require(parent.RoduxNetworking)
+local AliasNetworking = require(parent.AliasNetworking)
 
-require(_script.RoduxAliasesTypes)
+local AliasesReducer = require(script.Reducers.AliasesReducer)
+local Actions = require(script.Actions)
+local Selectors = require(script.Selectors)
+
+require(script.RoduxAliasesTypes)
 
 return {
-	config = function(p1) -- line: 16
-		-- upvalues: llama (copy), AliasNetworking (copy), RoduxNetworking (copy), AliasesReducer (copy), Actions (copy), Selectors (copy)
-		local u10 = llama.Dictionary.join(p1, {
-			aliasNetworking = AliasNetworking.config({
-				roduxNetworking = RoduxNetworking.mock()
-			})
+	config = function(p)
+		local joined = llama.Dictionary.join(p, {
+			aliasNetworking = AliasNetworking.config({ roduxNetworking = RoduxNetworking.mock() })
 		})
 
 		return {
-			installReducer = function() -- line: 24
-				-- upvalues: AliasesReducer (copy), u10 (ref)
-				return AliasesReducer(u10)
+			installReducer = function()
+				return AliasesReducer(joined)
 			end,
 			Actions = Actions,
-			Selectors = Selectors(u10)
+			Selectors = Selectors(joined)
 		}
 	end
 }

@@ -1,93 +1,84 @@
-local Parent = script:FindFirstAncestor("ProfileCtaService").Parent
-local ProfileCTAStore = require(Parent.DataHydration).Profile.ProfileCTAStore
+local parent = script:FindFirstAncestor("ProfileCtaService").Parent
+
+local DataHydration = require(parent.DataHydration)
+local ProfileCTAStore = DataHydration.Profile.ProfileCTAStore
+
 local createProfileCTAEventListener = require(script.Parent.createProfileCTAEventListener)
 
-local function createProfileCTAService() -- line: 20
-	-- upvalues: ProfileCTAStore (copy), createProfileCTAEventListener (copy)
-	local n1 = 0
-	local t1 = {}
-	local v7 = ProfileCTAStore.get()
+local function createProfileCTAService()
+	local v = 0
+	local v2 = {}
+	local v3 = ProfileCTAStore.get()
 
-	local function refetchCTA(s1: string) -- line: 25
-		-- upvalues: v7 (copy)
-		v7.getCTA(s1, true)
+	local function refetchCTA(p: string) -- 1 equivalent call inferred from this helper
+		v3.getCTA(p, true)
 	end
-	local function handleCTAUpdate(s2: string) -- line: 29
-		-- upvalues: n1 (ref), v7 (copy), t1 (copy)
-		if n1 > 0 then
-			v7.getCTA(s2, true)
 
-			return
+	local function handleCTAUpdate(p: string)
+		if v > 0 then
+			refetchCTA(p) -- inferred equivalent call
+		else
+			v2[p] = true
 		end
-
-		t1[s2] = true
 	end
 
 	createProfileCTAEventListener(handleCTAUpdate)
 
-	local function enableRealTimeUpdates() -- line: 39
-		-- upvalues: n1 (ref)
-		n1 += 1
+	local function enableRealTimeUpdates() -- 1 equivalent call inferred from this helper
+		v += 1
 	end
-	local function disableRealTimeUpdates() -- line: 43
-		-- upvalues: n1 (ref)
-		n1 -= 1
 
-		if n1 < 0 then
-			error("ProfileCTAService: disableRealTimeUpdates called more times than enableRealTimeUpdates. consumerConnectionCount: " .. tostring(n1))
+	local function disableRealTimeUpdates() -- 1 equivalent call inferred from this helper
+		v -= 1
+
+		if v < 0 then
+			error("ProfileCTAService: disableRealTimeUpdates called more times than enableRealTimeUpdates. consumerConnectionCount: " .. tostring(v))
 		end
 	end
 
 	return {
-		connectRealTimeUpdates = function() -- line: 54
-			-- upvalues: n1 (ref)
-			n1 += 1
-
-			local u14 = false
+		connectRealTimeUpdates = function()
+			enableRealTimeUpdates() -- inferred equivalent call
+			local flag = false
 
 			return {
-				Disconnect = function() -- line: 60
-					-- upvalues: u14 (ref), n1 (ref)
-					if u14 then
+				Disconnect = function()
+					if flag then
 						return
 					end
 
-					u14 = true
-					n1 -= 1
-
-					if n1 < 0 then
-						error("ProfileCTAService: disableRealTimeUpdates called more times than enableRealTimeUpdates. consumerConnectionCount: " .. tostring(n1))
-					end
+					flag = true
+					disableRealTimeUpdates() -- inferred equivalent call
 				end
 			}
 		end,
-		getProfileCTA = function(s3: string) -- line: 70
-			-- upvalues: t1 (copy), v7 (copy)
-			local v16 = false
+		getProfileCTA = function(p: string)
+			local v4
 
-			if t1[s3] then
-				v16 = true
-				t1[s3] = nil
+			if v2[p] then
+				v2[p] = nil
+				v4 = true
+			else
+				v4 = false
 			end
 
-			return v7.getCTA(s3, v16)
+			return v3.getCTA(p, v4)
 		end,
-		getProfileCTAs = function(t2: {[any]: any}) -- line: 79
-			-- upvalues: t1 (copy), v7 (copy)
-			local t3 = {}
+		getProfileCTAs = function(list)
+			local v4 = {}
 
-			for _, v in ipairs(t2) do
-				if t1[v] then
-					t3[v] = true
-					t1[v] = nil
+			for _, item in ipairs(list) do
+				if v2[item] then
+					v4[item] = true
+					v2[item] = nil
 				else
-					t3[v] = false
+					v4[item] = false
 				end
 			end
 
-			return v7.getBatchCTAs(t2, t3)
+			return v3.getBatchCTAs(list, v4)
 		end
 	}
 end
 
-return (createProfileCTAService())
+return createProfileCTAService()

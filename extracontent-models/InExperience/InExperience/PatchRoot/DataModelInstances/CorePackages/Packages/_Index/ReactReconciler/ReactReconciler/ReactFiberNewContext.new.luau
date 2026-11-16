@@ -1,295 +1,313 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Number = LuauPolyfill.Number
 local Error = LuauPolyfill.Error
-local console = require(ParentParent.Shared).console
 
-require(ParentParent.Shared)
+local Shared = require(parent.Shared)
+local console = Shared.console
+
+local Shared2 = require(parent.Shared)
+local enableAllocationTrims = Shared2.ReactFeatureFlags.enableAllocationTrims
+
+require(parent.Shared)
+
 require(script.Parent.ReactInternalTypes)
 
-local lib = require(script.Parent["ReactFiberStack.new"])
+local ReactFiberStacknew = require(script.Parent["ReactFiberStack.new"])
+
 local ReactFiberLane = require(script.Parent.ReactFiberLane)
-local lib2 = require(script.Parent["ReactUpdateQueue.new"])
-local isPrimaryRenderer = require(script.Parent.ReactFiberHostConfig).isPrimaryRenderer
-local createCursor = lib.createCursor
-local push = lib.push
-local pop = lib.pop
-local MAX_SIGNED_31_BIT_INT = require(script.Parent.MaxInts).MAX_SIGNED_31_BIT_INT
+
+local ReactUpdateQueuenew = require(script.Parent["ReactUpdateQueue.new"])
+
+local ReactFiberHostConfig = require(script.Parent.ReactFiberHostConfig)
+local isPrimaryRenderer = ReactFiberHostConfig.isPrimaryRenderer
+local createCursor = ReactFiberStacknew.createCursor
+local push = ReactFiberStacknew.push
+local pop = ReactFiberStacknew.pop
+local MaxInts = require(script.Parent.MaxInts)
+local MAX_SIGNED_31_BIT_INT = MaxInts.MAX_SIGNED_31_BIT_INT
 local ReactWorkTags = require(script.Parent.ReactWorkTags)
 local ContextProvider = ReactWorkTags.ContextProvider
 local ClassComponent = ReactWorkTags.ClassComponent
+
 local NoLanes = ReactFiberLane.NoLanes
 local NoTimestamp = ReactFiberLane.NoTimestamp
 local isSubsetOfLanes = ReactFiberLane.isSubsetOfLanes
 local includesSomeLane = ReactFiberLane.includesSomeLane
 local mergeLanes = ReactFiberLane.mergeLanes
 local pickArbitraryLane = ReactFiberLane.pickArbitraryLane
-local objectIs = require(ParentParent.Shared).objectIs
-local createUpdate = lib2.createUpdate
-local ForceUpdate = lib2.ForceUpdate
-local t1 = {}
-local v28 = createCursor(nil)
-local t2 = nil
 
-if ReactGlobals.__DEV__ then
-	t2 = {}
-end
+local Shared3 = require(parent.Shared)
+local objectIs = Shared3.objectIs
+local createUpdate = ReactUpdateQueuenew.createUpdate
+local ForceUpdate = ReactUpdateQueuenew.ForceUpdate
 
-local u30 = nil
-local u31 = nil
-local u32 = nil
-local u33 = false
+local New = {}
 
-function t1.resetContextDependencies() -- line: 74
-	-- upvalues: u30 (ref), u31 (ref), u32 (ref), ReactGlobals (copy), u33 (ref)
-	u30 = nil
-	u31 = nil
-	u32 = nil
+local cursor = createCursor(nil)
+
+local currentRenderer = ReactGlobals.__DEV__ and {} or nil
+
+local v = nil
+local v2 = nil
+local v3 = nil
+
+local v4 = false
+
+function New.resetContextDependencies()
+	v = nil
+	v2 = nil
+	v3 = nil
 
 	if ReactGlobals.__DEV__ then
-		u33 = false
+		v4 = false
 	end
 end
-function t1.enterDisallowedContextReadInDEV() -- line: 85
-	-- upvalues: ReactGlobals (copy), u33 (ref)
+
+function New.enterDisallowedContextReadInDEV()
 	if ReactGlobals.__DEV__ then
-		u33 = true
+		v4 = true
 	end
 end
-function t1.exitDisallowedContextReadInDEV() -- line: 91
-	-- upvalues: ReactGlobals (copy), u33 (ref)
+
+function New.exitDisallowedContextReadInDEV()
 	if ReactGlobals.__DEV__ then
-		u33 = false
+		v4 = false
 	end
 end
-function t1.pushProvider(p1, p2) -- line: 97
-	-- upvalues: isPrimaryRenderer (copy), push (copy), v28 (copy), ReactGlobals (copy), t2 (ref), console (copy)
-	local _context = p1.type._context
+
+function New.pushProvider(p, currentValue)
+	local context = p.type._context
 
 	if isPrimaryRenderer then
-		push(v28, _context._currentValue, p1)
-		_context._currentValue = p2
+		push(cursor, context._currentValue, p)
+
+		context._currentValue = currentValue
 
 		if ReactGlobals.__DEV__ then
-			if _context._currentRenderer ~= nil and _context._currentRenderer ~= t2 then
+			if context._currentRenderer ~= nil and context._currentRenderer ~= currentRenderer then
 				console.error("Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported.")
 			end
 
-			_context._currentRenderer = t2
-
-			return
+			context._currentRenderer = currentRenderer
 		end
 	else
-		push(v28, _context._currentValue2, p1)
-		_context._currentValue2 = p2
+		push(cursor, context._currentValue2, p)
+
+		context._currentValue2 = currentValue
 
 		if ReactGlobals.__DEV__ then
-			if _context._currentRenderer2 ~= nil and _context._currentRenderer2 ~= t2 then
+			if context._currentRenderer2 ~= nil and context._currentRenderer2 ~= currentRenderer then
 				console.error("Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported.")
 			end
 
-			_context._currentRenderer2 = t2
+			context._currentRenderer2 = currentRenderer
 		end
 	end
 end
-function t1.popProvider(p3) -- line: 135
-	-- upvalues: v28 (copy), pop (copy), isPrimaryRenderer (copy)
-	local current = v28.current
 
-	pop(v28, p3)
+function New.popProvider(p)
+	local current = cursor.current
 
-	local _context = p3.type._context
+	pop(cursor, p)
+
+	local context = p.type._context
 
 	if isPrimaryRenderer then
-		_context._currentValue = current
-
-		return
+		context._currentValue = current
+	else
+		context._currentValue2 = current
 	end
-
-	_context._currentValue2 = current
 end
-function t1.calculateChangedBits(p4, p5, p6) -- line: 148
-	-- upvalues: objectIs (copy), MAX_SIGNED_31_BIT_INT (copy)
-	if objectIs(p6, p5) then
+
+function New:calculateChangedBits(p, p2)
+	if objectIs(p2, p) then
 		return 0
 	end
 
-	local v43 = MAX_SIGNED_31_BIT_INT
+	local v5 = MAX_SIGNED_31_BIT_INT
 
-	if typeof(p4._calculateChangedBits) == "function" then
-		v43 = p4._calculateChangedBits(p6, p5)
+	if typeof(self._calculateChangedBits) == "function" then
+		v5 = self._calculateChangedBits(p2, p)
 	end
 
-	return (math.floor(v43))
+	return (math.floor(v5))
 end
-function t1.scheduleWorkOnParentPath(p7, p8) -- line: 179
-	-- upvalues: isSubsetOfLanes (copy), mergeLanes (copy)
-	while p7 ~= nil do
-		local alternate = p7.alternate
 
-		if not isSubsetOfLanes(p7.childLanes, p8) then
-			p7.childLanes = mergeLanes(p7.childLanes, p8)
+function New.scheduleWorkOnParentPath(state, p)
+	while state ~= nil do
+		local alternate = state.alternate
+
+		if isSubsetOfLanes(state.childLanes, p) then
+			if alternate == nil or isSubsetOfLanes(alternate.childLanes, p) then
+				break
+			end
+
+			alternate.childLanes = mergeLanes(alternate.childLanes, p)
+		else
+			state.childLanes = mergeLanes(state.childLanes, p)
 
 			if alternate ~= nil then
-				alternate.childLanes = mergeLanes(alternate.childLanes, p8)
+				alternate.childLanes = mergeLanes(alternate.childLanes, p)
 			end
-		else
-			if alternate == nil or isSubsetOfLanes(alternate.childLanes, p8) then
-				return
-			end
-
-			alternate.childLanes = mergeLanes(alternate.childLanes, p8)
 		end
 
-		p7 = p7.return_
+		state = state.return_
 	end
 end
-function t1.propagateContextChange(p9, p10, n1: number, p11) -- line: 202
-	-- upvalues: ClassComponent (copy), createUpdate (copy), NoTimestamp (copy), pickArbitraryLane (copy), ForceUpdate (copy), t1 (copy), ContextProvider (copy)
-	local child = p9.child
 
-	if child ~= nil then
-		child.return_ = p9
+function New.propagateContextChange(return_, p, p2: number, p3)
+	local return_2 = return_.child
+
+	if return_2 ~= nil then
+		return_2.return_ = return_
 	end
 
-	while child ~= nil do
-		local dependencies = child.dependencies
-		local child2
+	while return_2 ~= nil do
+		local dependencies = return_2.dependencies
+		local v5
 
-		if dependencies ~= nil then
-			child2 = child.child
+		if dependencies == nil then
+			if return_2.tag == ContextProvider then
+				if return_2.type ~= return_.type then
+					v5 = return_2.child
+				end
+			else
+				v5 = return_2.child
+			end
+		else
+			v5 = return_2.child
 
-			local firstContext = dependencies.firstContext
+			local v6 = dependencies.firstContext
 
-			while firstContext ~= nil do
-				if p10 == firstContext.context and bit32.band(firstContext.observedBits, n1) ~= 0 then
-					if child.tag == ClassComponent then
-						local v55 = createUpdate(NoTimestamp, pickArbitraryLane(p11))
+			while v6 ~= nil do
+				if v6.context == p and bit32.band(v6.observedBits, p2) ~= 0 then
+					if return_2.tag == ClassComponent then
+						local update = createUpdate(NoTimestamp, pickArbitraryLane(p3))
+						update.tag = ForceUpdate
 
-						v55.tag = ForceUpdate
-
-						local updateQueue = child.updateQueue
+						local updateQueue = return_2.updateQueue
 
 						if updateQueue ~= nil then
-							local shared = updateQueue.shared
-							local pending = shared.pending
+							local Shared4 = updateQueue.shared
+							local pending = Shared4.pending
 
 							if pending == nil then
-								v55.next = v55
+								update.next = update
 							else
-								v55.next = pending.next
-								pending.next = v55
+								update.next = pending.next
+								pending.next = update
 							end
 
-							shared.pending = v55
+							Shared4.pending = update
 						end
 					end
 
-					child.lanes = bit32.bor(child.lanes, p11)
-
-					local alternate = child.alternate
+					return_2.lanes = bit32.bor(return_2.lanes, p3)
+					local alternate = return_2.alternate
 
 					if alternate ~= nil then
-						alternate.lanes = bit32.bor(alternate.lanes, p11)
+						alternate.lanes = bit32.bor(alternate.lanes, p3)
 					end
 
-					t1.scheduleWorkOnParentPath(child.return_, p11)
-					dependencies.lanes = bit32.bor(dependencies.lanes, p11)
+					New.scheduleWorkOnParentPath(return_2.return_, p3)
 
+					dependencies.lanes = bit32.bor(dependencies.lanes, p3)
 					break
 				end
 
-				firstContext = firstContext.next
-			end
-		else
-			child2 = if child.tag ~= ContextProvider then child.child else if child.type ~= p9.type then child.child else nil
-		end
-
-		if child2 ~= nil then
-			child2.return_ = child
-		else
-			child2 = child
-
-			while child2 ~= nil do
-				if child2 == p9 then
-					child2 = nil
-
-					break
-				end
-
-				local sibling = child2.sibling
-
-				if sibling ~= nil then
-					sibling.return_ = child2.return_
-					child2 = sibling
-
-					break
-				end
-
-				child2 = child2.return_
+				v6 = v6.next
 			end
 		end
 
-		child = child2
+		if v5 == nil then
+			v5 = return_2
+
+			while v5 ~= nil do
+				if v5 == return_ then
+					v5 = nil
+					break
+				end
+
+				local sibling = v5.sibling
+
+				if sibling == nil then
+					v5 = v5.return_
+				else
+					sibling.return_ = v5.return_
+					v5 = sibling
+					break
+				end
+			end
+		else
+			v5.return_ = return_2
+		end
+
+		return_2 = v5
 	end
 end
-function t1.prepareToReadContext(p12, p13, p14: ((...any) -> ...any)) -- line: 341
-	-- upvalues: u30 (ref), u31 (ref), u32 (ref), includesSomeLane (copy)
-	u30 = p12
-	u31 = nil
-	u32 = nil
 
-	local dependencies = p12.dependencies
+function New.prepareToReadContext(p, p2, callback)
+	v = p
+	v2 = nil
+	v3 = nil
+
+	local dependencies = p.dependencies
 
 	if dependencies ~= nil and dependencies.firstContext ~= nil then
-		if includesSomeLane(dependencies.lanes, p13) then
-			p14()
+		if includesSomeLane(dependencies.lanes, p2) then
+			callback()
 		end
 
 		dependencies.firstContext = nil
 	end
 end
-function t1.readContext(p15, p16) -- line: 364
-	-- upvalues: ReactGlobals (copy), u33 (ref), console (copy), u32 (ref), Number (copy), u31 (ref), u30 (ref), Error (copy), NoLanes (copy), isPrimaryRenderer (copy)
-	if ReactGlobals.__DEV__ and u33 then
+
+function New:readContext(observedBits)
+	if ReactGlobals.__DEV__ and v4 then
 		console.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().")
 	end
 
-	if p15 ~= u32 and p16 ~= false and p16 ~= 0 then
-		if typeof(p16) ~= "number" or p16 == Number.MAX_SAFE_INTEGER then
-			u32 = p15
-			p16 = Number.MAX_SAFE_INTEGER
+	if v3 ~= self and observedBits ~= false and observedBits ~= 0 then
+		if typeof(observedBits) ~= "number" or observedBits == Number.MAX_SAFE_INTEGER then
+			v3 = self
+			observedBits = Number.MAX_SAFE_INTEGER
 		end
 
-		local t3 = {
-			next = nil,
-			context = p15,
-			observedBits = p16
-		}
+		local v5 = enableAllocationTrims and { context = self, observedBits = observedBits }
+			or { context = self, observedBits = observedBits, next = nil }
 
-		if u31 == nil then
-			if u30 == nil then
+		if v2 == nil then
+			if v == nil then
 				error(Error.new("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo()."))
 			end
 
-			u31 = t3
-			u30.dependencies = {
-				responders = nil,
-				lanes = NoLanes,
-				firstContext = t3
-			}
+			v2 = v5
+
+			if enableAllocationTrims then
+				local dependencies = v.dependencies
+
+				if dependencies == nil then
+					v.dependencies = { lanes = NoLanes, firstContext = v5 }
+				else
+					dependencies.lanes = NoLanes
+					dependencies.firstContext = v5
+				end
+			else
+				v.dependencies = { lanes = NoLanes, firstContext = v5, responders = nil }
+			end
 		else
-			u31.next = t3
-			u31 = t3
+			v2.next = v5
+			v2 = v5
 		end
 	end
 
 	if isPrimaryRenderer then
-		return p15._currentValue
+		return self._currentValue
 	end
 
-	return p15._currentValue2
+	return self._currentValue2
 end
 
-return t1
+return New

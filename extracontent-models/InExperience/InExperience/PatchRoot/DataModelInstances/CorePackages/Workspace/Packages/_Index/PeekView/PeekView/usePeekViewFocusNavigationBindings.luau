@@ -1,40 +1,31 @@
-local Parent = script:FindFirstAncestor("PeekView").Parent
+local parent = script:FindFirstAncestor("PeekView").Parent
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local React = require(Parent.React)
+local React = require(parent.React)
 
-local function usePeekViewFocusNavigationBindings(p1) -- line: 7
-	-- upvalues: React (copy), RunService (copy), UserInputService (copy)
-	React.useEffect(function() -- line: 8
-		-- upvalues: RunService (copy), p1 (copy), UserInputService (copy)
-		local u7 = nil
-		local connection = RunService.Heartbeat:Connect(function(dt) -- line: 10
-			-- upvalues: u7 (ref), p1 (copy)
-			if u7 and u7.KeyCode == Enum.KeyCode.Thumbstick2 then
-				p1(u7, dt)
+local function usePeekViewFocusNavigationBindings(callback)
+	React.useEffect(function()
+		local v = nil
+		local heartbeatConnection = RunService.Heartbeat:Connect(function(dt)
+			if v and v.KeyCode == Enum.KeyCode.Thumbstick2 then
+				callback(v, dt)
 			end
 		end)
-		local connection2 = UserInputService.InputChanged:Connect(function(input, _) -- line: 15
-			-- upvalues: u7 (ref)
+		local inputChangedConnection = UserInputService.InputChanged:Connect(function(input, _)
 			if input.KeyCode == Enum.KeyCode.Thumbstick2 then
 				if input.UserInputState == Enum.UserInputState.Change then
-					u7 = input
-
-					return
-				end
-
-				if input.UserInputState == Enum.UserInputState.End then
-					u7 = nil
+					v = input
+				elseif input.UserInputState == Enum.UserInputState.End then
+					v = nil
 				end
 			end
 		end)
 
-		return function() -- line: 25
-			-- upvalues: connection (copy), connection2 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+		return function()
+			heartbeatConnection:Disconnect()
+			inputChangedConnection:Disconnect()
 		end
-	end, { p1 })
+	end, { callback })
 end
 
 return usePeekViewFocusNavigationBindings

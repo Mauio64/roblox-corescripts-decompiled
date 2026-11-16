@@ -1,15 +1,14 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local React = require(parent.React)
+
 local LocalizationKeysContext = require(GenericAbuseReporting.LocalizationKeys.LocalizationKeysContext)
 local DefaultLocalizationKeys = require(GenericAbuseReporting.LocalizationKeys.DefaultLocalizationKeys)
 
-local function LocalizationKeysProvider(t1: {[any]: any}) -- line: 25
-	-- upvalues: React (copy), DefaultLocalizationKeys (copy), LocalizationKeysContext (copy)
-	local v8 = React.useMemo(function() -- line: 26
-		-- upvalues: t1 (copy), DefaultLocalizationKeys (copy)
-		local localizationKeys = t1.localizationKeys
-
+local function LocalizationKeysProvider(p)
+	local v = React.useMemo(function()
+		local localizationKeys = p.localizationKeys
 		return {
 			formTitle = localizationKeys and localizationKeys.formTitle or DefaultLocalizationKeys.formTitle,
 			formSubmit = localizationKeys and localizationKeys.formSubmit or DefaultLocalizationKeys.formSubmit,
@@ -20,11 +19,9 @@ local function LocalizationKeysProvider(t1: {[any]: any}) -- line: 25
 			failedDescription = localizationKeys and localizationKeys.failedDescription or DefaultLocalizationKeys.failedDescription,
 			failedClose = localizationKeys and localizationKeys.failedClose or DefaultLocalizationKeys.failedClose
 		}
-	end, { t1.localizationKeys })
+	end, { p.localizationKeys })
 
-	return React.createElement(LocalizationKeysContext.Provider, {
-		value = v8
-	}, t1.children)
+	return React.createElement(LocalizationKeysContext.Provider, { value = v }, p.children)
 end
 
 return LocalizationKeysProvider

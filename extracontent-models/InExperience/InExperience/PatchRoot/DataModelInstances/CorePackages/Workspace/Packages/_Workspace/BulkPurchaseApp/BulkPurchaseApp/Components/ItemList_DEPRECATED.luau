@@ -1,36 +1,39 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
-local useDesignTokens = require(Parent.Style).useDesignTokens
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
+
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+
 local Item = require(script.Parent.Item)
 
-local function ItemList_DEPRECATED(t1: {[any]: any}) -- line: 21
-	-- upvalues: useDesignTokens (copy), React (copy), Item (copy)
-	local v7 = useDesignTokens()
-	local t2 = {
+local function ItemList_DEPRECATED(p)
+	local v = useDesignTokens()
+
+	local children = {
 		Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Bottom,
-			Padding = UDim.new(0, v7.Size.Size_300)
+			Padding = UDim.new(0, v.Size.Size_300)
 		})
 	}
 
-	for v9, v10 in t1.items do
-		t2[v10.id] = React.createElement(Item, {
-			name = v10.name,
-			image = v10.image,
-			endSlot = v10.endSlot,
-			LayoutOrder = v9
+	for k, item in p.items do
+		children[item.id] = React.createElement(Item, {
+			name = item.name,
+			image = item.image,
+			endSlot = item.endSlot,
+			LayoutOrder = k
 		})
 	end
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		LayoutOrder = t1.LayoutOrder,
+		LayoutOrder = p.LayoutOrder,
 		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, t2)
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0
+	}, children)
 end
 
 return ItemList_DEPRECATED

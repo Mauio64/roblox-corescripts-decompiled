@@ -1,62 +1,85 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local React = require(ParentParentParentParent.React)
-local ContextStack = require(ParentParentParentParent.ReactUtils).ContextStack
-local Cursor = require(ParentParent.Cursor)
-local Overlay = require(ParentParent.Overlay)
-local PanelsProvider = require(ParentParent.StudioPanels.PanelsProvider)
-local PluginProvider = require(ParentParent.Plugin.PluginProvider)
-local PreferencesProvider = require(ParentParent.Preferences.PreferencesProvider)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-require(ParentParent.Responsive.ResponsiveContext)
+local React = require(parent3.React)
+local ReactUtils = require(parent3.ReactUtils)
+local ContextStack = ReactUtils.ContextStack
+local Flags = require(parent2.Utility.Flags)
 
-local ResponsiveProvider = require(ParentParent.Responsive.ResponsiveProvider)
-local StyleProvider = require(ParentParent.Style.StyleProvider)
+local Cursor = require(parent.Cursor)
+local Overlay = require(parent.Overlay)
+local PanelsProvider = require(parent.StudioPanels.PanelsProvider)
+local PluginProvider = require(parent.Plugin.PluginProvider)
+local PreferencesProvider = require(parent.Preferences.PreferencesProvider)
+require(parent.Responsive.ResponsiveContext)
+local ResponsiveProvider = require(parent.Responsive.ResponsiveProvider)
+local StyleProvider = require(parent.Style.StyleProvider)
+require(parent2.Components.Types)
+local WidgetsProvider = require(parent.StudioWidgets.WidgetsProvider)
+local ElevationProvider = require(parent.Elevation.ElevationProvider)
+local elevationProvider = ElevationProvider.ElevationProvider
+local isPluginElevated = require(parent.Plugin.isPluginElevated)
 
-require(ParentParentParent.Components.Types)
+local frozen = table.freeze({})
 
-local WidgetsProvider = require(ParentParent.StudioWidgets.WidgetsProvider)
-local ElevationProvider = require(ParentParent.Elevation.ElevationProvider).ElevationProvider
-local isPluginElevated = require(ParentParent.Plugin.isPluginElevated)
+local function FoundationProvider(props)
+	local v
 
-local function FoundationProvider(p1) -- line: 34
-	-- upvalues: React (copy), PluginProvider (copy), ElevationProvider (copy), PreferencesProvider (copy), StyleProvider (copy), ResponsiveProvider (copy), Overlay (copy), Cursor (copy), isPluginElevated (copy), WidgetsProvider (copy), PanelsProvider (copy), ContextStack (copy)
-	local v18 = if not p1.preferences then {} else p1.preferences
-	local v19 = if not p1.responsiveConfig then {} else p1.responsiveConfig
-	local t1 = {
-		React.createElement(PluginProvider, {
-			plugin = p1.plugin
-		}),
-		React.createElement(ElevationProvider, nil),
-		React.createElement(PreferencesProvider, v18),
-		React.createElement(StyleProvider, {
-			colorMode = p1.colorMode,
-			theme = p1.theme,
-			device = p1.device,
-			derives = p1.derives,
-			scale = v18.scale,
-			tokenOverrides = p1.tokenOverrides
-		}),
-		React.createElement(ResponsiveProvider, {
-			config = v19
-		}),
-		React.createElement(Overlay, if typeof(p1.overlayGui) ~= "table" then {
-			gui = p1.overlayGui
-		} else {
-			DisplayOrder = p1.overlayGui.DisplayOrder
-		}),
+	if props.preferences then
+		v = props.preferences
+	else
+		v = not Flags.FoundationProviderStableEmptyTable and {} or frozen
+	end
+
+	local config
+
+	if props.responsiveConfig then
+		config = props.responsiveConfig
+	else
+		config = not Flags.FoundationProviderStableEmptyTable and {} or frozen
+	end
+
+	local element = React.createElement(PluginProvider, { plugin = props.plugin })
+
+	local element2 = React.createElement(elevationProvider, nil)
+	local element3 = React.createElement(PreferencesProvider, v)
+	local element4 = React.createElement(StyleProvider, {
+		themeName = props.themeName,
+		colorMode = props.colorMode,
+		theme = props.theme,
+		device = props.device,
+		derives = props.derives,
+		scale = v.scale,
+		tokenOverrides = props.tokenOverrides
+	})
+
+	local element5 = React.createElement(ResponsiveProvider, { config = config })
+	local createElement = React.createElement
+	local v2
+
+	if typeof(props.overlayGui) == "table" then
+		v2 = { DisplayOrder = props.overlayGui.DisplayOrder }
+	else
+		v2 = { gui = props.overlayGui }
+	end
+
+	local providers = {
+		element,
+		element2,
+		element3,
+		element4,
+		element5,
+		createElement(Overlay, v2),
 		React.createElement(Cursor)
 	}
 
-	if p1.plugin and isPluginElevated(p1.plugin) then
-		table.insert(t1, React.createElement(WidgetsProvider, {}))
-		table.insert(t1, React.createElement(PanelsProvider, {}))
+	if props.plugin and isPluginElevated(props.plugin) then
+		table.insert(providers, React.createElement(WidgetsProvider, {}))
+		table.insert(providers, React.createElement(PanelsProvider, {}))
 	end
 
-	return React.createElement(ContextStack, {
-		providers = t1
-	}, p1.children)
+	return React.createElement(ContextStack, { providers = providers }, props.children)
 end
 
 return FoundationProvider

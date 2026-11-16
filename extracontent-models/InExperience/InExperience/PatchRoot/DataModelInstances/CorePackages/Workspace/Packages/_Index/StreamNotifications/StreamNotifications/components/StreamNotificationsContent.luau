@@ -1,437 +1,600 @@
 local StreamNotifications = script:FindFirstAncestor("StreamNotifications")
 local components = StreamNotifications.components
-local StreamNotificationsParent = StreamNotifications.Parent
+
+local parent = StreamNotifications.Parent
 local constants = require(StreamNotifications.constants)
-local Cryo = require(StreamNotificationsParent.Cryo)
-local EventIngest = require(StreamNotificationsParent.Analytics).AnalyticsReporters.EventIngest
+local Cryo = require(parent.Cryo)
+local Analytics = require(parent.Analytics)
+local EventIngest = Analytics.AnalyticsReporters.EventIngest
 local EventIngestService = game:GetService("EventIngestService")
-local v8 = EventIngest.new(EventIngestService)
+local v = EventIngest.new(EventIngestService)
 local SessionService = game:GetService("SessionService")
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
 local ThirdPartyUserService = game:GetService("ThirdPartyUserService")
+
 local EmptyNotifications = require(components.EmptyNotifications)
 local MetaActionsMenu = require(components.MetaActionsMenu)
 local StreamNotificationAnimationWrapper = require(components.StreamNotificationAnimationWrapper)
 local StreamNotificationBundleWrapper = require(components.StreamNotificationBundleWrapper)
-local React = require(StreamNotificationsParent.React)
-local NotificationsCommon = require(StreamNotificationsParent.NotificationsCommon)
+local StreamNotificationsContentPage = require(components.StreamNotificationsContentPage)
+local fetchStreamNotificationsContentPage = require(StreamNotifications.ContentPage.fetchStreamNotificationsContentPage)
+local usePushPermissionClientAttributes = require(StreamNotifications.ContentPage.usePushPermissionClientAttributes)
+local StreamPromptsBannerSlot = require(StreamNotifications.StreamPromptsBannerSlot)
+
+local React = require(parent.React)
+local NotificationsCommon = require(parent.NotificationsCommon)
 local JoinExperience = NotificationsCommon.JoinExperience
-local type = NotificationsCommon.type
+local kind = NotificationsCommon.type
 local NotificationHelper = NotificationsCommon.NotificationHelper
+
 local EnumStreamNotificationsDisplayState = require(StreamNotifications.EnumStreamNotificationsDisplayState)
 local EnumStreamNotificationsLoadingMoreState = require(StreamNotifications.EnumStreamNotificationsLoadingMoreState)
-local HttpRequest = require(StreamNotificationsParent.HttpRequest)
-local FFlagLuaAppDefaultHttpRetry = require(StreamNotificationsParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
-local v26 = HttpRequest.config({
-	requestFunction = HttpRequest.requestFunctions.HttpRbxApi,
-	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("StreamNotificationsContentHttpRetryCount", 4)
-})
-local useDispatch = require(StreamNotificationsParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local UIBlox = require(StreamNotificationsParent.UIBlox)
-local Foundation = require(StreamNotificationsParent.Foundation)
+
+local HttpRequest = require(parent.HttpRequest)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
+local config = HttpRequest.config
+local v2 = { requestFunction = HttpRequest.requestFunctions.HttpRbxApi, maxRetryCount = 0 }
+local maxRetryCount
+
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("StreamNotificationsContentHttpRetryCount", 4)
+end
+
+v2.maxRetryCount = maxRetryCount
+local v3 = config(v2)
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
+
 local useStyle = UIBlox.Core.Style.useStyle
+
 local useClientTriggerEventHandler = require(StreamNotifications.eventHandler.useClientTriggerEventHandler)
+
 local getStreamNotifications = require(StreamNotifications.utils.getStreamNotifications)
 local clearUnreadNotifications = require(StreamNotifications.utils.clearUnreadNotifications)
 local postNotificationsApi = require(StreamNotifications.utils.postNotificationsApi)
 local postReportNotification = require(StreamNotifications.utils.postReportNotification)
 local reportEvent = require(StreamNotifications.utils.reportEvent)
 local sortNotifications = require(StreamNotifications.utils.sortNotifications)
-local EventStream = require(StreamNotifications.analytics.analyticsService).EventStream
-local analyticsConstants = require(StreamNotifications.analytics.analyticsConstants)
-local CloseCentralOverlay = require(StreamNotificationsParent.CentralOverlay).Thunks.CloseCentralOverlay
-local AbuseVector = require(StreamNotificationsParent.GenericAbuseReporting.AbuseVector)
-local OpenDynamicAbuseReport = require(StreamNotificationsParent.GenericAbuseReporting.OpenDynamicAbuseReport)
-local v45 = game:DefineFastFlag("LuaAppNewStreamNotificationsLogFix", false)
-local SharedFlags = require(StreamNotificationsParent.SharedFlags)
-local GetFStringPCGDKFilteredNotificationTypes = SharedFlags.GetFStringPCGDKFilteredNotificationTypes
-local FFlagStreamNotificationsStandardizeClickEvents = SharedFlags.FFlagStreamNotificationsStandardizeClickEvents
-local FFlagStreamNotificationImpressionLogging = SharedFlags.FFlagStreamNotificationImpressionLogging
-local FrameBoundsImpressionsTracker = require(StreamNotificationsParent.Impressions).FrameBoundsImpressionsTracker
 
-local function GetIsFriendCommunicationRestricted() -- line: 76
-	-- upvalues: ThirdPartyUserService (copy)
-	return ThirdPartyUserService and (ThirdPartyUserService:IsChatRestrictionSupported() and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted)
+local analyticsService = require(StreamNotifications.analytics.analyticsService)
+local eventStream = analyticsService.EventStream
+local analyticsConstants = require(StreamNotifications.analytics.analyticsConstants)
+
+local CentralOverlay = require(parent.CentralOverlay)
+local CloseCentralOverlay = CentralOverlay.Thunks.CloseCentralOverlay
+local AbuseVector = require(parent.GenericAbuseReporting.AbuseVector)
+local OpenDynamicAbuseReport = require(parent.GenericAbuseReporting.OpenDynamicAbuseReport)
+
+local defineFastFlag = game:DefineFastFlag("LuaAppNewStreamNotificationsLogFix", false)
+local defineFastFlag2 = game:DefineFastFlag("StreamNotificationFixInitialPageFill", false)
+local FFlagStreamNotificationsSduiContentPage = require(StreamNotifications.Flags.FFlagStreamNotificationsSduiContentPage)
+
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFStringPCGDKFilteredNotificationTypes = SharedFlags2.GetFStringPCGDKFilteredNotificationTypes
+local FFlagStreamNotificationsStandardizeClickEvents = SharedFlags2.FFlagStreamNotificationsStandardizeClickEvents
+
+local FFlagStreamNotificationImpressionLogging = SharedFlags2.FFlagStreamNotificationImpressionLogging
+local FFlagNotificationStreamPromptsHandlerEnabled = SharedFlags2.FFlagNotificationStreamPromptsHandlerEnabled
+local Impressions = require(parent.Impressions)
+local FrameBoundsImpressionsTracker = Impressions.FrameBoundsImpressionsTracker
+
+local function GetIsFriendCommunicationRestricted()
+	return ThirdPartyUserService
+		and ThirdPartyUserService:IsChatRestrictionSupported()
+		and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted
 end
 
 local StreamNotificationDropdownExperimentation = require(StreamNotifications.StreamNotificationDropdownExperimentation)
 
-local function createImpressionSignal() -- line: 112
-	local BindableEvent = Instance.new("BindableEvent")
-
+local function createImpressionSignal()
+	local bindableEvent = Instance.new("BindableEvent")
 	return {
-		connect = function(_, p2) -- line: 115
-			-- upvalues: BindableEvent (copy)
-			return BindableEvent.Event:Connect(p2)
+		connect = function(_, onEvent)
+			return bindableEvent.Event:Connect(onEvent)
 		end,
-		fire = function() -- line: 118
-			-- upvalues: BindableEvent (copy)
-			BindableEvent:Fire()
+		fire = function()
+			bindableEvent:Fire()
 		end,
-		destroy = function() -- line: 121
-			-- upvalues: BindableEvent (copy)
-			BindableEvent:Destroy()
+		destroy = function()
+			bindableEvent:Destroy()
 		end
 	}
 end
 
-return function(t1: {[any]: any}) -- line: 127
-	-- upvalues: useStyle (copy), StreamNotificationDropdownExperimentation (copy), useDispatch (copy), useClientTriggerEventHandler (copy), React (copy), EnumStreamNotificationsDisplayState (copy), EnumStreamNotificationsLoadingMoreState (copy), FFlagStreamNotificationImpressionLogging (copy), createImpressionSignal (copy), UserInputService (copy), constants (copy), getStreamNotifications (copy), v26 (copy), sortNotifications (copy), GetFStringPCGDKFilteredNotificationTypes (copy), ThirdPartyUserService (copy), Cryo (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), FFlagStreamNotificationsStandardizeClickEvents (copy), clearUnreadNotifications (copy), postReportNotification (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy), v45 (copy), type (copy), JoinExperience (copy), SessionService (copy), reportEvent (copy), v8 (copy), postNotificationsApi (copy), NotificationsCommon (copy), MetaActionsMenu (copy), Loading (copy), IconSize (copy), StreamNotificationBundleWrapper (copy), StreamNotificationAnimationWrapper (copy), EmptyNotifications (copy), GuiService (copy), FrameBoundsImpressionsTracker (copy)
-	local v56 = useStyle()
-	local v57 = StreamNotificationDropdownExperimentation.getDropdownEnabled()
-	local v58 = useDispatch()
-	local v59 = useClientTriggerEventHandler()
-	local v60, v61 = React.useState({})
-	local v62, v63 = React.useState(nil)
-	local v64, v65 = React.useState(EnumStreamNotificationsDisplayState.Initializing)
-	local u66 = nil
-	local u67 = nil
-	local u68 = nil
-	local v69 = t1.showOverlay or function(_: boolean) -- line: 148
+return function(props)
+	local v4 = useStyle()
+	local dropdownEnabled = StreamNotificationDropdownExperimentation.getDropdownEnabled()
+	local v5 = useDispatch()
+	local v6 = useClientTriggerEventHandler()
+
+	local state, setState = React.useState({})
+
+	local state2, setState2 = React.useState(nil)
+
+	local state3, setState3 = React.useState(EnumStreamNotificationsDisplayState.Initializing)
+
+	local fn
+
+	local fn2
+
+	local fn3
+
+	local showOverlay = props.showOverlay or function(_: boolean) end
+
+	local ref = React.useRef(EnumStreamNotificationsLoadingMoreState.Loading)
+	local state4, setState4 = React.useState(EnumStreamNotificationsLoadingMoreState.Loading)
+	local ref2 = React.useRef(0)
+
+	local ref3 = React.useRef({})
+	local ref4 = React.useRef(0)
+	local ref5 = React.useRef(nil)
+	local useRef = React.useRef
+	local v7
+
+	if FFlagStreamNotificationImpressionLogging then
+		v7 = createImpressionSignal()
 	end
-	local v70 = React.useRef(EnumStreamNotificationsLoadingMoreState.Loading)
-	local v71, v72 = React.useState(EnumStreamNotificationsLoadingMoreState.Loading)
-	local v73 = React.useRef(0)
-	local v74 = React.useRef(nil)
-	local v75 = React.useRef(if not FFlagStreamNotificationImpressionLogging then nil else createImpressionSignal())
-	local v76 = not UserInputService.StatusBarSize and 0 or UserInputService.StatusBarSize.Y
-	local v77 = constants.Modal.HeaderHeight + v76
-	local v78 = React.useMemo(function() -- line: 164
-		-- upvalues: FFlagStreamNotificationImpressionLogging (copy), v60 (copy)
+
+	local v8 = useRef(v7)
+
+	local v9 = not UserInputService.StatusBarSize and 0 or UserInputService.StatusBarSize.Y
+	local v10 = constants.Modal.HeaderHeight + v9
+
+	local v11 = React.useMemo(function()
 		if not FFlagStreamNotificationImpressionLogging then
-			return {
-				byNotificationId = {},
-				byIndex = {}
+			return { byNotificationId = {}, byIndex = {} }
+		end
+
+		local byIndex = {}
+		local byNotificationId = {}
+
+		local v11 = {}
+
+		for i, notification in ipairs(state) do
+			if notification.notificationSourceType ~= "Sendr" then
+				continue
+			end
+
+			local bundleKey = notification.content.bundleKey
+			local bundlePosition
+
+			if bundleKey and bundleKey ~= "" then
+				bundlePosition = (v11[bundleKey] or 0) + 1
+				v11[bundleKey] = bundlePosition
+			end
+
+			local v12 = {
+				impressionIndex = i,
+				bundlePosition = bundlePosition,
+				notification = notification
 			}
-		end
 
-		local t2 = {}
-		local t3 = {}
-		local t4 = {}
+			byIndex[i] = v12
 
-		for i, v in ipairs(v60) do
-			if v.notificationSourceType == "Sendr" then
-				local bundleKey = v.content.bundleKey
-				local v99 = nil
-
-				if bundleKey and bundleKey ~= "" then
-					v99 = (t4[bundleKey] or 0) + 1
-					t4[bundleKey] = v99
-				end
-
-				local t5 = {
-					impressionIndex = i,
-					bundlePosition = v99,
-					notification = v
-				}
-
-				t3[i] = t5
-
-				if v.id then
-					t2[v.id] = t5
-				end
+			if notification.id then
+				byNotificationId[notification.id] = v12
 			end
 		end
 
-		return {
-			byNotificationId = t2,
-			byIndex = t3
-		}
-	end, { v60 })
+		return { byNotificationId = byNotificationId, byIndex = byIndex }
+	end, { state })
+	local clientAttributes
 
-	React.useEffect(function() -- line: 201
-		-- upvalues: u66 (ref)
-		u66()
+	if FFlagStreamNotificationsSduiContentPage or FFlagNotificationStreamPromptsHandlerEnabled then
+		clientAttributes = usePushPermissionClientAttributes()
+	else
+		clientAttributes = nil
+	end
+
+	React.useEffect(function()
+		fn()
 	end, {})
-	React.useEffect(function() -- line: 205
-		-- upvalues: FFlagStreamNotificationImpressionLogging (copy), v75 (copy)
-		if not FFlagStreamNotificationImpressionLogging then
+
+	React.useEffect(function()
+		if not FFlagStreamNotificationsSduiContentPage or clientAttributes == nil then
 			return
 		end
 
-		return function() -- line: 209
-			-- upvalues: v75 (copy)
-			if v75.current then
-				v75.current:destroy()
+		fetchStreamNotificationsContentPage(clientAttributes)
+	end, { clientAttributes })
+
+	React.useEffect(function()
+		if FFlagStreamNotificationImpressionLogging then
+			return function()
+				if v8.current then
+					v8.current:destroy()
+				end
 			end
 		end
 	end, {})
 
-	function u66() -- line: 221
-		-- upvalues: v70 (copy), EnumStreamNotificationsLoadingMoreState (copy), v72 (copy), getStreamNotifications (copy), v26 (copy), constants (copy), v73 (copy), sortNotifications (copy), GetFStringPCGDKFilteredNotificationTypes (copy), ThirdPartyUserService (copy), v61 (copy), Cryo (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), FFlagStreamNotificationsStandardizeClickEvents (copy), v65 (copy), EnumStreamNotificationsDisplayState (copy), clearUnreadNotifications (copy), v60 (copy), u66 (ref)
-		if v70.current == EnumStreamNotificationsLoadingMoreState.NoMoreNotifications then
+	local function fn4(current: string) -- 3 equivalent calls inferred from this helper
+		ref.current = current
+		setState4(current)
+	end
+
+	fn = function()
+		if ref.current == EnumStreamNotificationsLoadingMoreState.NoMoreNotifications then
 			return
 		end
 
-		local Loading2 = EnumStreamNotificationsLoadingMoreState.Loading
+		fn4(EnumStreamNotificationsLoadingMoreState.Loading) -- inferred equivalent call
+		getStreamNotifications(v3, constants.DefaultMaxRows, ref2.current):andThen(function(p)
+			local v12 = sortNotifications(p)
+			local fStringPCGDKFilteredNotificationTypes = GetFStringPCGDKFilteredNotificationTypes()
+			local v13 = {}
 
-		v70.current = Loading2
-		v72(Loading2)
-		getStreamNotifications(v26, constants.DefaultMaxRows, v73.current):andThen(function(p3) -- line: 229
-			-- upvalues: sortNotifications (copy), GetFStringPCGDKFilteredNotificationTypes (copy), ThirdPartyUserService (copy), v61 (copy), Cryo (copy), EnumStreamNotificationsLoadingMoreState (copy), v70 (copy), v72 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), constants (copy), FFlagStreamNotificationsStandardizeClickEvents (copy), v65 (copy), EnumStreamNotificationsDisplayState (copy), clearUnreadNotifications (copy), v26 (copy), v73 (copy), v60 (copy), u66 (ref)
-			local v144 = sortNotifications(p3)
-			local v145 = GetFStringPCGDKFilteredNotificationTypes()
-			local t6 = {}
-
-			for _, v in ipairs(v144) do
-				if not v145[v.content.notificationType] or (not ThirdPartyUserService or (not ThirdPartyUserService:IsChatRestrictionSupported() or ThirdPartyUserService.FriendCommunicationRestrictionStatus == Enum.ChatRestrictionStatus.NotRestricted)) then
-					table.insert(t6, v)
+			for _, v14 in ipairs(v12) do
+				if not (not fStringPCGDKFilteredNotificationTypes[v14.content.notificationType] or not ThirdPartyUserService or not ThirdPartyUserService:IsChatRestrictionSupported() or ThirdPartyUserService.FriendCommunicationRestrictionStatus == Enum.ChatRestrictionStatus.NotRestricted) then
+					continue
 				end
+
+				table.insert(v13, v14)
 			end
 
-			local u149 = t6
+			if v13 and #v13 > 0 then
+				if defineFastFlag2 then
+					for _, v14 in ipairs(v13) do
+						if v14.notificationSourceType ~= "Sendr" then
+							continue
+						end
 
-			if u149 and #u149 > 0 then
-				v61(function(p4) -- line: 251
-					-- upvalues: Cryo (copy), u149 (ref)
-					return (Cryo.List.join(p4, u149))
+						local v15 = v14.content.bundleKey
+
+						if not v15 or v15 == "" then
+							v15 = v14.id
+						end
+
+						if not v15 or ref3.current[v15] then
+							continue
+						end
+
+						ref3.current[v15] = true
+						ref4.current += 1
+					end
+				end
+
+				setState(function(p2)
+					return (Cryo.List.join(p2, v13))
 				end)
 
-				local Default = EnumStreamNotificationsLoadingMoreState.Default
+				fn4(EnumStreamNotificationsLoadingMoreState.Default) -- inferred equivalent call
 
-				v70.current = Default
-				v72(Default)
+				for _, v14 in ipairs(v13) do
+					local fireEvent = NotificationHelper.fireEvent
 
-				for _, v in ipairs(u149) do
-					NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.fetched, analyticsConstants.EventNames.notificationRetrieved, Cryo.Dictionary.join(v.content.clientEventsPayload or {}, {
+					local fetched = analyticsConstants.Context.fetched
+					local notificationRetrieved = analyticsConstants.EventNames.notificationRetrieved
+					local join = Cryo.Dictionary.join
+					local clientEventsPayload = v14.content.clientEventsPayload or {}
+					local v15 = {
 						sendrVersion = constants.SENDRVersion,
-						notificationType = v.content.notificationType or nil,
-						notificationId = v.id or nil,
-						notificationState = if not FFlagStreamNotificationsStandardizeClickEvents then nil else v.content.currentState or nil
-					}))
+						notificationType = v14.content.notificationType or nil,
+						notificationId = v14.id or nil,
+						notificationState = 0
+					}
+					local notificationState
+
+					if FFlagStreamNotificationsStandardizeClickEvents then
+						notificationState = v14.content.currentState or nil
+					end
+
+					v15.notificationState = notificationState
+					fireEvent(eventStream, fetched, notificationRetrieved, join(clientEventsPayload, v15))
 				end
 			else
-				local NoMoreNotifications = EnumStreamNotificationsLoadingMoreState.NoMoreNotifications
-
-				v70.current = NoMoreNotifications
-				v72(NoMoreNotifications)
+				fn4(EnumStreamNotificationsLoadingMoreState.NoMoreNotifications) -- inferred equivalent call
 			end
 
-			v65(EnumStreamNotificationsDisplayState.Default)
-			clearUnreadNotifications(v26)
-			v73.current = (tonumber(v73.current) or 0) + constants.DefaultMaxRows
+			setState3(EnumStreamNotificationsDisplayState.Default)
+			clearUnreadNotifications(v3)
+			ref2.current = (tonumber(ref2.current) or 0) + constants.DefaultMaxRows
 
-			if v60 and #v60 < constants.DefaultMaxRows then
-				u66()
+			if defineFastFlag2 then
+				if ref4.current < constants.DefaultMaxRows then
+					fn()
+				end
+			elseif state and #state < constants.DefaultMaxRows then
+				fn()
 			end
-		end):catch(function(_) -- line: 284
-			-- upvalues: v65 (copy), EnumStreamNotificationsDisplayState (copy)
-			v65(EnumStreamNotificationsDisplayState.ErrorRetrieving)
+		end):catch(function(_)
+			setState3(EnumStreamNotificationsDisplayState.ErrorRetrieving)
 		end)
 	end
 
-	local function v79(s1: string, p6) -- line: 289
-		-- upvalues: v57 (copy), t1 (copy), postReportNotification (copy), v26 (copy), u67 (ref), v65 (copy), EnumStreamNotificationsDisplayState (copy), v58 (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy)
-		if v57 then
-			t1.displayStream(false)
+	local function fn5(nextState: string, p)
+		if dropdownEnabled then
+			props.displayStream(false)
 		end
 
-		v58(OpenDynamicAbuseReport({
+		local function onSubmit()
+			postReportNotification(v3, p.id):andThen(function(_) end):catch(function(_) end)
+
+			fn2(nextState, p)
+
+			if not dropdownEnabled then
+				props.setDisplayScreenGuiEnabled(true)
+			end
+
+			setState3(EnumStreamNotificationsDisplayState.Default)
+		end
+
+		local function fn6() -- 1 equivalent call inferred from this helper
+			if dropdownEnabled then
+				props.displayStream(true)
+			else
+				props.setDisplayScreenGuiEnabled(true)
+			end
+
+			setState3(EnumStreamNotificationsDisplayState.Default)
+		end
+		v5(OpenDynamicAbuseReport({
 			abuseVector = AbuseVector.Notifications,
-			targetId = p6.id,
-			onSubmit = function() -- line: 301
-				-- upvalues: postReportNotification (copy), v26 (copy), p6 (copy), u67 (ref), s1 (copy), v57 (copy), t1 (copy), v65 (copy), EnumStreamNotificationsDisplayState (copy)
-				postReportNotification(v26, p6.id):andThen(function(_) -- line: 303
-				end):catch(function(_) -- line: 304
-				end)
-				u67(s1, p6)
-
-				if not v57 then
-					t1.setDisplayScreenGuiEnabled(true)
-				end
-
-				v65(EnumStreamNotificationsDisplayState.Default)
-			end,
-			onClose = function() -- line: 327
-				-- upvalues: v58 (copy), CloseCentralOverlay (copy), v57 (copy), t1 (copy), v65 (copy), EnumStreamNotificationsDisplayState (copy)
-				v58(CloseCentralOverlay())
-
-				if v57 then
-					t1.displayStream(true)
-				else
-					t1.setDisplayScreenGuiEnabled(true)
-				end
-
-				v65(EnumStreamNotificationsDisplayState.Default)
+			targetId = p.id,
+			onSubmit = onSubmit,
+			onClose = function()
+				v5(CloseCentralOverlay())
+				fn6() -- inferred equivalent call
 			end
 		}))
 	end
 
-	local v80 = React.useCallback(function(s2: string) -- line: 349
-		-- upvalues: v60 (copy), Cryo (copy), v61 (copy)
-		if v60 and s2 then
-			local v108 = Cryo.List.filter(v60, function(p9) -- line: 351
-				-- upvalues: s2 (copy)
-				return p9.id ~= s2 and p9.dismiss ~= true
-			end)
-
-			v61(v108)
+	local finishDismissNotification = React.useCallback(function(p: string)
+		if state and p then
+			setState((Cryo.List.filter(state, function(p2): boolean
+				return p2.id ~= p and p2.dismiss ~= true
+			end)))
 		end
 	end)
-	local v81 = React.useCallback(function(t7: {[any]: any}) -- line: 360
-		-- upvalues: FFlagStreamNotificationImpressionLogging (copy), v78 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), Cryo (copy), constants (copy), FFlagStreamNotificationsStandardizeClickEvents (copy)
+
+	local sendImpressions = React.useCallback(function(list)
 		if not FFlagStreamNotificationImpressionLogging then
 			return
 		end
 
-		for _, v in ipairs(t7) do
-			local v112 = v78.byIndex[v]
-			local v113 = if not v112 then nil else v112.notification
+		for _, item in ipairs(list) do
+			local v12 = v11.byIndex[item]
+			local notification
 
-			if v113 then
-				NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.impression, analyticsConstants.EventNames.notificationImpression, Cryo.Dictionary.join(v113.content.clientEventsPayload or {}, {
-					sendrVersion = constants.SENDRVersion,
-					notificationType = v113.content.notificationType or nil,
-					notificationId = v113.id or nil,
-					notificationState = if not FFlagStreamNotificationsStandardizeClickEvents then nil else v113.content.currentState or nil,
-					bundlePosition = v112.bundlePosition or nil,
-					bundleKey = v113.content.bundleKey or nil
-				}))
+			if v12 then
+				notification = v12.notification
 			end
-		end
-	end, { v78 })
-	local v82 = React.useCallback(function(p10, p11) -- line: 390
-		-- upvalues: v62 (copy), v63 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), Cryo (copy), FFlagStreamNotificationsStandardizeClickEvents (copy), v45 (copy), constants (copy), type (copy), JoinExperience (copy), t1 (copy), SessionService (copy), reportEvent (copy), v8 (copy), postNotificationsApi (copy), v26 (copy), u67 (ref), u68 (ref), v65 (copy), EnumStreamNotificationsDisplayState (copy), v79 (copy), v60 (copy), v61 (copy), v59 (copy)
-		local v116 = p11 or v62
 
-		v63(v116)
-		NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, p10.eventName or "", Cryo.Dictionary.join(p10.clientEventsPayload or {}, {
-			notifType = if not FFlagStreamNotificationsStandardizeClickEvents then if not v45 then nil else v116 and (v116.content and v116.content.notificationType) else nil,
-			notifId = if not FFlagStreamNotificationsStandardizeClickEvents then if not v45 then nil else v116 and v116.id else nil,
-			notificationType = if not FFlagStreamNotificationsStandardizeClickEvents then nil else v116 and (v116.content and v116.content.notificationType),
-			notificationId = if not FFlagStreamNotificationsStandardizeClickEvents then nil else v116 and v116.id,
-			notificationState = if not FFlagStreamNotificationsStandardizeClickEvents then nil else v116 and (v116.content and v116.content.currentState),
-			visualItemType = p10.visualItemType or nil,
-			visualItemName = p10.visualItemName or nil,
+			if not notification then
+				continue
+			end
+
+			local fireEvent = NotificationHelper.fireEvent
+
+			local impression = analyticsConstants.Context.impression
+			local notificationImpression = analyticsConstants.EventNames.notificationImpression
+			local join = Cryo.Dictionary.join
+			local clientEventsPayload = notification.content.clientEventsPayload or {}
+			local v13 = {
+				sendrVersion = constants.SENDRVersion,
+				notificationType = notification.content.notificationType or nil,
+				notificationId = notification.id or nil,
+				notificationState = 0,
+				bundlePosition = 0,
+				bundleKey = 0
+			}
+			local notificationState
+
+			if FFlagStreamNotificationsStandardizeClickEvents then
+				notificationState = notification.content.currentState or nil
+			end
+
+			v13.notificationState = notificationState
+
+			v13.bundlePosition = v12.bundlePosition or nil
+			v13.bundleKey = notification.content.bundleKey or nil
+			fireEvent(eventStream, impression, notificationImpression, join(clientEventsPayload, v13))
+		end
+	end, { v11 })
+
+	local function fn6(id: string?) -- 1 equivalent call inferred from this helper
+		fn3()
+
+		if state and id then
+			setState((Cryo.List.map(state, function(p)
+				if p.id == id then
+					p.dismiss = true
+				end
+
+				return p
+			end)))
+		end
+	end
+
+	local handleActions = React.useCallback(function(data, p)
+		local v12 = p or state2
+		setState2(v12)
+		local fireEvent = NotificationHelper.fireEvent
+
+		local click = analyticsConstants.Context.click
+		local eventName = data.eventName or ""
+		local join = Cryo.Dictionary.join
+		local clientEventsPayload = data.clientEventsPayload or {}
+		local notifType
+
+		if not (FFlagStreamNotificationsStandardizeClickEvents or not defineFastFlag) then
+			notifType = v12 and v12.content and v12.content.notificationType
+		end
+
+		local notifId
+
+		if not (FFlagStreamNotificationsStandardizeClickEvents or not defineFastFlag) then
+			notifId = v12 and v12.id
+		end
+
+		local notificationType
+
+		if FFlagStreamNotificationsStandardizeClickEvents then
+			notificationType = v12 and v12.content and v12.content.notificationType
+		end
+
+		local notificationId
+
+		if FFlagStreamNotificationsStandardizeClickEvents then
+			notificationId = v12 and v12.id
+		end
+
+		local notificationState
+
+		if FFlagStreamNotificationsStandardizeClickEvents then
+			notificationState = v12 and v12.content and v12.content.currentState
+		end
+
+		fireEvent(eventStream, click, eventName, join(clientEventsPayload, {
+			notifType = notifType,
+			notifId = notifId,
+			notificationType = notificationType,
+			notificationId = notificationId,
+			notificationState = notificationState,
+			visualItemType = data.visualItemType or nil,
+			visualItemName = data.visualItemName or nil,
 			sendrVersion = constants.SENDRVersion
 		}))
 
-		if p10.actions and (#p10.actions > 0 and v116) then
-			for _, v in ipairs(p10.actions) do
-				if v.actionType then
-					if v.actionType == type.ActionTypeEnum.Deeplink then
-						if JoinExperience(v.path, false) then
-							t1.displayStream(false)
-							SessionService:SetSession(constants.StreamSessionStructuralIdentifier.Level1, constants.StreamSessionStructuralIdentifier.StreamNotification, constants.StreamSessionStructuralIdentifier.StreamNotification)
-							SessionService:SetMetadata(constants.StreamSessionStructuralIdentifier.StreamNotification, constants.StreamSessionStructuralIdentifier.DeleteOnGameLeave, "True")
-							reportEvent(v8, {
-								action_type = v.actionType,
-								delivery_channel = constants.DeliveryChannel,
-								notification_type = v116.notificationSourceType,
-								notification_id = v116.id
-							})
-						end
-					elseif v.actionType == type.ActionTypeEnum.NotificationApi then
-						local v119 = v116 and v116.id or nil
-						local v120 = v.path or nil
+		if data.actions and #data.actions > 0 and v12 then
+			for _, action in ipairs(data.actions) do
+				if not action.actionType then
+					continue
+				end
 
-						postNotificationsApi(v26, v119, v120):andThen(function(_) -- line: 463
-							-- upvalues: v (copy), u67 (ref), v116 (copy)
-							if v.nextState ~= nil and v.nextState ~= "" then
-								u67(v.nextState, v116)
-							end
-						end):catch(function(_) -- line: 468
-						end)
-						u68()
-					elseif v.actionType == type.ActionTypeEnum.Report then
-						v65(EnumStreamNotificationsDisplayState.AbuseReport)
-						v79(v.nextState, v116)
-					elseif v.actionType == type.ActionTypeEnum.Dismiss then
-						local id = v116.id
+				if action.actionType == kind.ActionTypeEnum.Deeplink then
+					if JoinExperience(action.path, false) then
+						props.displayStream(false)
+						SessionService:SetSession(
+							constants.StreamSessionStructuralIdentifier.Level1,
+							constants.StreamSessionStructuralIdentifier.StreamNotification,
+							constants.StreamSessionStructuralIdentifier.StreamNotification
+						)
 
-						u68()
+						SessionService:SetMetadata(
+							constants.StreamSessionStructuralIdentifier.StreamNotification,
+							constants.StreamSessionStructuralIdentifier.DeleteOnGameLeave,
+							"True"
+						)
 
-						if v60 and id then
-							local v122 = Cryo.List.map(v60, function(p14) -- line: 338
-								-- upvalues: id (copy)
-								if p14.id == id then
-									p14.dismiss = true
-								end
-
-								return p14
-							end)
-
-							v61(v122)
-						end
-					elseif v.actionType == type.ActionTypeEnum.ClientTrigger then
-						if v.path == "TrustedContactsDoubleOptInModal" then
-							t1.displayStream(false)
-						end
-
-						v59(v.path, {
-							clientEventsPayload = v116.content.clientEventsPayload,
-							callback = function() -- line: 489
-								-- upvalues: u67 (ref), v (copy), v116 (copy)
-								u67(v.nextState, v116)
-							end
+						reportEvent(v, {
+							action_type = action.actionType,
+							delivery_channel = constants.DeliveryChannel,
+							notification_type = v12.notificationSourceType,
+							notification_id = v12.id
 						})
 					end
+				elseif action.actionType == kind.ActionTypeEnum.NotificationApi then
+					local v13
+
+					if v12 then
+						v13 = v12.id or nil
+					end
+
+					postNotificationsApi(v3, v13, action.path or nil):andThen(function(_)
+						if action.nextState ~= nil and action.nextState ~= "" then
+							fn2(action.nextState, v12)
+						end
+					end):catch(function(_) end)
+					fn3()
+				elseif action.actionType == kind.ActionTypeEnum.Report then
+					setState3(EnumStreamNotificationsDisplayState.AbuseReport)
+					fn5(action.nextState, v12)
+				elseif action.actionType == kind.ActionTypeEnum.Dismiss then
+					fn6(v12.id) -- inferred equivalent call
+				elseif action.actionType == kind.ActionTypeEnum.ClientTrigger then
+					if action.path == "TrustedContactsDoubleOptInModal" then
+						props.displayStream(false)
+					end
+
+					v6(action.path, {
+						clientEventsPayload = v12.content.clientEventsPayload,
+						callback = function()
+							fn2(action.nextState, v12)
+						end
+					})
 				end
 			end
 		end
 	end)
 
-	local function v83(p15) -- line: 500
-		-- upvalues: v63 (copy), v65 (copy), EnumStreamNotificationsDisplayState (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), NotificationsCommon (copy), constants (copy), FFlagStreamNotificationsStandardizeClickEvents (copy)
-		v63(p15)
-		v65(EnumStreamNotificationsDisplayState.MetaActions)
-		NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, analyticsConstants.EventNames.openMetaActions, {
+	local function fn7(p)
+		setState2(p)
+		setState3(EnumStreamNotificationsDisplayState.MetaActions)
+		local fireEvent = NotificationHelper.fireEvent
+
+		local click = analyticsConstants.Context.click
+		local openMetaActions = analyticsConstants.EventNames.openMetaActions
+		local v12 = {
 			visualItemType = NotificationsCommon.type.VisualItemTypeEnum.MetaAction,
 			sendrVersion = constants.SENDRVersion,
-			notificationState = if not FFlagStreamNotificationsStandardizeClickEvents then nil else p15 and (not not p15.content and p15.content.currentState) or nil
-		})
-	end
+			notificationState = 0
+		}
+		local notificationState
 
-	function u68() -- line: 522
-		-- upvalues: v69 (copy), v63 (copy), v64 (copy), EnumStreamNotificationsDisplayState (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), NotificationsCommon (copy), constants (copy), v65 (copy)
-		v69(true)
-		v63(nil)
-
-		if v64 == EnumStreamNotificationsDisplayState.MetaActions then
-			NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, analyticsConstants.EventNames.closeMetaActions, {
-				visualItemType = NotificationsCommon.type.VisualItemTypeEnum.MetaAction,
-				sendrVersion = constants.SENDRVersion
-			})
+		if FFlagStreamNotificationsStandardizeClickEvents then
+			notificationState = p and p.content and p.content.currentState or nil
 		end
 
-		v65(EnumStreamNotificationsDisplayState.Default)
+		v12.notificationState = notificationState
+		fireEvent(eventStream, click, openMetaActions, v12)
 	end
-	function u67(s3: string, p16) -- line: 539
-		-- upvalues: v60 (copy), v61 (copy)
-		local t8 = {}
 
-		if v60 and p16 then
-			for _, v in ipairs(v60) do
-				if v.id == p16.id then
-					v.content.currentState = s3
+	fn3 = function()
+		showOverlay(true)
+		setState2(nil)
+
+		if state3 == EnumStreamNotificationsDisplayState.MetaActions then
+			NotificationHelper.fireEvent(
+				eventStream,
+				analyticsConstants.Context.click,
+				analyticsConstants.EventNames.closeMetaActions,
+				{
+					visualItemType = NotificationsCommon.type.VisualItemTypeEnum.MetaAction,
+					sendrVersion = constants.SENDRVersion
+				}
+			)
+		end
+
+		setState3(EnumStreamNotificationsDisplayState.Default)
+	end
+
+	fn2 = function(currentState: string, p)
+		local v12 = {}
+
+		if state and p then
+			for _, v13 in ipairs(state) do
+				if v13.id == p.id then
+					v13.content.currentState = currentState
 				end
 
-				table.insert(t8, v)
+				table.insert(v12, v13)
 			end
 		end
 
-		v61(t8)
+		setState(v12)
 	end
 
-	local v84 = React.useMemo(function() -- line: 555
-		-- upvalues: React (copy), MetaActionsMenu (copy), v64 (copy), v62 (copy), t1 (copy), v82 (copy), u68 (ref)
+	local v12 = React.useMemo(function()
 		return React.createElement(MetaActionsMenu, {
-			displayState = v64,
-			activeNotification = v62,
-			isSmallScreen = t1.isSmallScreen,
-			handleActions = v82,
-			closeNotificationDisplay = u68
+			displayState = state3,
+			activeNotification = state2,
+			isSmallScreen = props.isSmallScreen,
+			handleActions = handleActions,
+			closeNotificationDisplay = fn3
 		})
-	end, {
-		v64,
-		v62
-	})
-	local v85 = React.useMemo(function() -- line: 565
-		-- upvalues: v64 (copy), EnumStreamNotificationsDisplayState (copy), React (copy), Loading (copy), IconSize (copy), v60 (copy), v57 (copy), constants (copy), StreamNotificationBundleWrapper (copy), v80 (copy), v82 (copy), v83 (copy), FFlagStreamNotificationImpressionLogging (copy), v78 (copy), StreamNotificationAnimationWrapper (copy), v70 (copy), EnumStreamNotificationsLoadingMoreState (copy), v77 (copy), EmptyNotifications (copy)
-		if v64 == EnumStreamNotificationsDisplayState.Initializing then
+	end, { state3, state2 })
+
+	local notifications = React.useMemo(function()
+		if state3 == EnumStreamNotificationsDisplayState.Initializing then
 			return React.createElement(Loading, {
 				size = IconSize.Large,
 				Position = UDim2.fromScale(0.5, 0.5),
@@ -439,215 +602,378 @@ return function(t1: {[any]: any}) -- line: 127
 			})
 		end
 
-		if v60 and #v60 > 0 then
-			local t9 = {
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					Padding = if not v57 then nil else UDim.new(0, constants.Dropdown.CardGap)
-				})
+		if state and #state > 0 then
+			local children = {}
+			local createElement = React.createElement
+			local v13 = {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = 0
 			}
+			local padding
 
-			if v57 then
-				t9.UIPadding = React.createElement("UIPadding", {
+			if dropdownEnabled then
+				padding = UDim.new(0, constants.Dropdown.CardGap)
+			end
+
+			v13.Padding = padding
+			children.UIListLayout = createElement("UIListLayout", v13)
+
+			if dropdownEnabled then
+				children.UIPadding = React.createElement("UIPadding", {
 					PaddingRight = UDim.new(0, constants.Dropdown.ScrollBarThickness)
 				})
 			end
 
-			local v130 = false
-			local t10 = {}
-
-			for _, v in ipairs(v60) do
-				if v.notificationSourceType == "Sendr" then
-					v130 = true
-
-					local bundleKey = v.content.bundleKey
-
-					if bundleKey and bundleKey ~= "" then
-						if t10[bundleKey] then
-							table.insert(t10[bundleKey], v)
-						else
-							t10[bundleKey] = { v }
-						end
-					end
-				end
-			end
-
-			for i, v in ipairs(v60) do
-				if v.notificationSourceType == "Sendr" then
-					local bundleKey = v.content.bundleKey
-
-					if bundleKey and bundleKey ~= "" and #t10[bundleKey] > 1 then
-						if not t9[bundleKey] then
-							t9[bundleKey] = React.createElement(StreamNotificationBundleWrapper, {
-								layoutOrder = i,
-								notifications = t10[bundleKey],
-								finishDismissNotification = v80,
-								handleActions = v82,
-								openMetaActions = v83,
-								impressionsTag = if not FFlagStreamNotificationImpressionLogging then nil else "StreamNotificationImpression",
-								impressionMetadataByNotificationId = if not FFlagStreamNotificationImpressionLogging then nil else v78.byNotificationId
-							}, {})
-						end
-					else
-						local v138 = if not FFlagStreamNotificationImpressionLogging then nil else v78.byNotificationId[v.id]
-
-						t9[v.id] = React.createElement(StreamNotificationAnimationWrapper, {
-							collapsed = false,
-							layoutOrder = i,
-							notification = v,
-							finishDismissNotification = v80,
-							handleActions = v82,
-							openMetaActions = v83,
-							impressionsTag = if not FFlagStreamNotificationImpressionLogging then nil else "StreamNotificationImpression",
-							impressionIndex = if not FFlagStreamNotificationImpressionLogging then nil else v138 and v138.impressionIndex or nil
-						}, {})
-					end
-				end
-			end
-
-			if v70.current == EnumStreamNotificationsLoadingMoreState.Loading then
-				t9.LoadingMore = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 1e999,
-					Size = UDim2.new(1, 0, 0, constants.LoadingMoreNotifications.Size)
-				}, {
-					LoadingMoreSpinner = React.createElement(Loading, {
-						size = IconSize.Small,
-						Position = UDim2.fromScale(0.5, 0.5),
-						AnchorPoint = Vector2.new(0.5, 0.5)
-					})
+			if FFlagStreamNotificationsSduiContentPage then
+				children.SduiContentPage = React.createElement(StreamNotificationsContentPage, {
+					LayoutOrder = 0
 				})
 			end
 
-			if v130 then
-				return React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					Size = if not v57 then UDim2.new(1, 0, 0, -v77) else UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}, t9)
+			local v14 = {}
+			local flag = false
+
+			for _, v15 in ipairs(state) do
+				if v15.notificationSourceType ~= "Sendr" then
+					continue
+				end
+
+				flag = true
+
+				local bundleKey = v15.content.bundleKey
+
+				if not (bundleKey and bundleKey ~= "") then
+					continue
+				end
+
+				if v14[bundleKey] then
+					table.insert(v14[bundleKey], v15)
+				else
+					v14[bundleKey] = { v15 }
+				end
+			end
+
+			for i, notification in ipairs(state) do
+				if notification.notificationSourceType ~= "Sendr" then
+					continue
+				end
+
+				local bundleKey = notification.content.bundleKey
+
+				if bundleKey and bundleKey ~= "" and #v14[bundleKey] > 1 then
+					if not children[bundleKey] then
+						local createElement2 = React.createElement
+						local v15 = {
+							layoutOrder = i,
+							notifications = v14[bundleKey],
+							finishDismissNotification = finishDismissNotification,
+							handleActions = handleActions,
+							openMetaActions = fn7,
+							impressionsTag = FFlagStreamNotificationImpressionLogging and "StreamNotificationImpression" or nil,
+							impressionMetadataByNotificationId = 0
+						}
+						local impressionMetadataByNotificationId
+
+						if FFlagStreamNotificationImpressionLogging then
+							impressionMetadataByNotificationId = v11.byNotificationId
+						end
+
+						v15.impressionMetadataByNotificationId = impressionMetadataByNotificationId
+						children[bundleKey] = createElement2(StreamNotificationBundleWrapper, v15, {})
+					end
+				else
+					local v15
+
+					if FFlagStreamNotificationImpressionLogging then
+						v15 = v11.byNotificationId[notification.id]
+					end
+
+					local id = notification.id
+					local createElement2 = React.createElement
+					local v16 = {
+						layoutOrder = i,
+						notification = notification,
+						finishDismissNotification = finishDismissNotification,
+						handleActions = handleActions,
+						openMetaActions = fn7,
+						collapsed = false,
+						impressionsTag = FFlagStreamNotificationImpressionLogging and "StreamNotificationImpression" or nil,
+						impressionIndex = 0
+					}
+					local impressionIndex
+
+					if FFlagStreamNotificationImpressionLogging then
+						impressionIndex = v15 and v15.impressionIndex or nil
+					end
+
+					v16.impressionIndex = impressionIndex
+					children[id] = createElement2(StreamNotificationAnimationWrapper, v16, {})
+				end
+			end
+
+			if ref.current == EnumStreamNotificationsLoadingMoreState.Loading then
+				children.LoadingMore = React.createElement(
+					"Frame",
+					{
+						Size = UDim2.new(1, 0, 0, constants.LoadingMoreNotifications.Size),
+						BackgroundTransparency = 1,
+						LayoutOrder = 1e999
+					},
+					{
+						LoadingMoreSpinner = React.createElement(Loading, {
+							size = IconSize.Small,
+							Position = UDim2.fromScale(0.5, 0.5),
+							AnchorPoint = Vector2.new(0.5, 0.5)
+						})
+					}
+				)
+			end
+
+			if flag then
+				local createElement2 = React.createElement
+				local size
+
+				if dropdownEnabled then
+					size = UDim2.new(1, 0, 0, 0)
+				else
+					size = UDim2.new(1, 0, 0, -v10)
+				end
+
+				return createElement2(
+					"Frame",
+					{
+						Size = size,
+						AutomaticSize = Enum.AutomaticSize.Y,
+						BackgroundTransparency = 1
+					},
+					children
+				)
 			end
 		end
 
+		if FFlagStreamNotificationsSduiContentPage then
+			return React.createElement("Frame", {
+				Size = UDim2.fromScale(1, 1),
+				BackgroundTransparency = 1
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center
+				}),
+				SduiContentPage = React.createElement(StreamNotificationsContentPage, {
+					LayoutOrder = 1
+				}),
+				EmptyState = React.createElement(
+					"Frame",
+					{ Size = UDim2.fromScale(1, 0), BackgroundTransparency = 1, LayoutOrder = 2 },
+					{
+						UIFlexItem = React.createElement("UIFlexItem", {
+							FlexMode = Enum.UIFlexMode.Fill
+						}),
+						EmptyNotifications = React.createElement(EmptyNotifications)
+					}
+				)
+			})
+		end
+
 		return React.createElement(EmptyNotifications)
-	end, {
-		v60,
-		v64,
-		v71,
-		v57,
-		v78
-	})
+	end, { state, state3, state4, dropdownEnabled, v11 })
 
-	local function v86(p17) -- line: 706
-		-- upvalues: v64 (copy), EnumStreamNotificationsDisplayState (copy), FFlagStreamNotificationImpressionLogging (copy), v75 (copy), constants (copy), v70 (copy), EnumStreamNotificationsLoadingMoreState (copy), u66 (ref)
-		local AbsoluteCanvasSizeY = p17.AbsoluteCanvasSize.Y
-		local AbsoluteWindowSizeY = p17.AbsoluteWindowSize.Y
-		local CanvasPositionY = p17.CanvasPosition.Y
+	local function fn8(data)
+		local y = data.AbsoluteCanvasSize.Y
+		local y2 = data.AbsoluteWindowSize.Y
+		local y3 = data.CanvasPosition.Y
 
-		if AbsoluteWindowSizeY == 0 or (AbsoluteCanvasSizeY == 0 or v64 ~= EnumStreamNotificationsDisplayState.Default) then
+		if y2 == 0 or y == 0 or state3 ~= EnumStreamNotificationsDisplayState.Default then
 			return
 		end
 
-		if FFlagStreamNotificationImpressionLogging and v75.current then
-			v75.current:fire()
+		if FFlagStreamNotificationImpressionLogging and v8.current then
+			v8.current:fire()
 		end
 
-		if CanvasPositionY >= AbsoluteCanvasSizeY - AbsoluteWindowSizeY - constants.LoadingMoreNotifications.TriggerDistance and v70.current == EnumStreamNotificationsLoadingMoreState.Default then
-			u66()
+		if
+			y - y2 - constants.LoadingMoreNotifications.TriggerDistance <= y3
+			and ref.current == EnumStreamNotificationsLoadingMoreState.Default
+		then
+			fn()
 		end
 	end
 
-	local v87 = not UserInputService.BottomBarSize and 0 or UserInputService.BottomBarSize.Y
-	local v88 = not GuiService:GetSafeZoneOffsets() and 0 or GuiService:GetSafeZoneOffsets().bottom
-	local v89 = not t1.isSmallScreen and 0 or math.max(v87, v88)
+	if FFlagNotificationStreamPromptsHandlerEnabled then
+		local createElement = React.createElement
+		local v13 = {
+			Size = UDim2.fromScale(1, 1),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1
+		}
 
-	if v57 then
+		local children = {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			}),
+			PromptsBanner = 0,
+			Content = 0
+		}
+
+		local createElement2 = React.createElement
+		local v14 = {
+			LayoutOrder = 0,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1
+		}
+
+		local createElement3 = React.createElement
+		local v15 = StreamPromptsBannerSlot.get()
+		local v16 = { clientAttributes = clientAttributes, bottomPadding = 0 }
+		local bottomPadding
+
+		if dropdownEnabled then
+			bottomPadding = constants.Dropdown.CardGap
+		else
+			bottomPadding = constants.DefaultPadding
+		end
+
+		v16.bottomPadding = bottomPadding
+		children.PromptsBanner = createElement2("Frame", v14, { Banner = createElement3(v15, v16) })
+
+		children.Content = React.createElement(
+			"Frame",
+			{
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1
+			},
+			{
+				UIFlexItem = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill }),
+				Notifications = notifications
+			}
+		)
+		notifications = createElement("Frame", v13, children)
+	end
+
+	local v13 = not UserInputService.BottomBarSize and 0 or UserInputService.BottomBarSize.Y
+	local v14 = not GuiService:GetSafeZoneOffsets() and 0 or GuiService:GetSafeZoneOffsets().bottom
+	local v15 = not props.isSmallScreen and 0 or math.max(v13, v14)
+
+	if dropdownEnabled then
 		return React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
 			LayoutOrder = 2,
-			ClipsDescendants = true,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
+			ClipsDescendants = true
 		}, {
 			MetaActionsOpen = React.createElement("TextButton", {
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Visible = v64 == EnumStreamNotificationsDisplayState.MetaActions,
-				BackgroundTransparency = v56.Theme.Overlay.Transparency,
-				BackgroundColor3 = v56.Theme.Overlay.Color,
+				Visible = state3 == EnumStreamNotificationsDisplayState.MetaActions,
+				BackgroundTransparency = v4.Theme.Overlay.Transparency,
+				BackgroundColor3 = v4.Theme.Overlay.Color,
 				Text = "",
 				AutoButtonColor = false,
 				ZIndex = 2,
-				[React.Event.Activated] = u68,
+				[React.Event.Activated] = fn3,
 				BorderSizePixel = 0,
 				Selectable = false
-			}, { v84 }),
+			}, { v12 }),
 			NotificationsList = React.createElement("ScrollingFrame", {
-				Size = UDim2.new(1, 0, 0, (t1.dropdownHeight or constants.Dropdown.MaxHeight) - constants.Dropdown.HeaderMinHeight - constants.Dropdown.HeaderBodyGap),
+				Size = UDim2.new(
+					1,
+					0,
+					0,
+					(props.dropdownHeight or constants.Dropdown.MaxHeight) - constants.Dropdown.HeaderMinHeight - constants.Dropdown.HeaderBodyGap
+				),
 				CanvasSize = UDim2.new(1, 0, 0, 0),
 				BackgroundTransparency = 1,
 				ScrollBarThickness = constants.Dropdown.ScrollBarThickness,
 				BorderSizePixel = 0,
 				VerticalScrollBarInset = Enum.ScrollBarInset.None,
 				VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right,
-				ScrollBarImageColor3 = v56.Theme.UIEmphasis.Color,
+				ScrollBarImageColor3 = v4.Theme.UIEmphasis.Color,
 				AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				ElasticBehavior = Enum.ElasticBehavior.Always,
-				ScrollingEnabled = v64 == EnumStreamNotificationsDisplayState.Default,
+				ScrollingEnabled = state3 == EnumStreamNotificationsDisplayState.Default,
 				ScrollingDirection = Enum.ScrollingDirection.Y,
-				[React.Change.CanvasPosition] = v86,
+				[React.Change.CanvasPosition] = fn8,
 				Selectable = false
-			}, v85)
+			}, notifications)
 		})
-	end
-
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		Position = UDim2.new(0.5, 0, 0, 0),
-		AnchorPoint = Vector2.new(0.5, 0)
-	}, {
-		MetaActionsOpen = React.createElement("TextButton", {
+	else
+		local createElement = React.createElement
+		local v16 = {
 			Size = UDim2.new(1, 0, 1, 0),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Visible = v64 == EnumStreamNotificationsDisplayState.MetaActions,
-			BackgroundTransparency = v56.Theme.Overlay.Transparency,
-			BackgroundColor3 = v56.Theme.Overlay.Color,
-			Text = "",
-			AutoButtonColor = false,
-			ZIndex = 2,
-			[React.Event.Activated] = u68,
-			BorderSizePixel = 0,
-			Selectable = false
-		}, { v84 }),
-		NotificationsList = React.createElement("ScrollingFrame", {
-			ref = if not FFlagStreamNotificationImpressionLogging then nil else v74,
-			Size = UDim2.new(1, 0, 1, -(v77 + constants.DefaultPadding + v89)),
-			CanvasSize = UDim2.new(1, 0, 1, -(v77 + constants.DefaultPadding + v89)),
+			Position = UDim2.new(0.5, 0, 0, 0),
+			AnchorPoint = Vector2.new(0.5, 0),
+			BackgroundTransparency = 1
+		}
+
+		local children = {
+			MetaActionsOpen = React.createElement("TextButton", {
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Visible = state3 == EnumStreamNotificationsDisplayState.MetaActions,
+				BackgroundTransparency = v4.Theme.Overlay.Transparency,
+				BackgroundColor3 = v4.Theme.Overlay.Color,
+				Text = "",
+				AutoButtonColor = false,
+				ZIndex = 2,
+				[React.Event.Activated] = fn3,
+				BorderSizePixel = 0,
+				Selectable = false
+			}, { v12 }),
+			NotificationsList = 0,
+			ImpressionTracker = 0
+		}
+
+		local createElement2 = React.createElement
+		local ref6
+
+		if FFlagStreamNotificationImpressionLogging then
+			ref6 = ref5
+		end
+
+		children.NotificationsList = createElement2("ScrollingFrame", {
+			ref = ref6,
+			Size = UDim2.new(1, 0, 1, -(v10 + constants.DefaultPadding + v15)),
+			CanvasSize = UDim2.new(1, 0, 1, -(v10 + constants.DefaultPadding + v15)),
 			BackgroundTransparency = 1,
-			Position = UDim2.new(0, 0, 0, v77),
+			Position = UDim2.new(0, 0, 0, v10),
 			AnchorPoint = Vector2.new(0, 0),
 			ScrollBarThickness = 4,
 			BorderSizePixel = 0,
 			VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
 			VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right,
-			ScrollBarImageColor3 = v56.Theme.UIEmphasis.Color,
+			ScrollBarImageColor3 = v4.Theme.UIEmphasis.Color,
 			AutomaticCanvasSize = Enum.AutomaticSize.XY,
 			ElasticBehavior = Enum.ElasticBehavior.Always,
-			ScrollingEnabled = v64 == EnumStreamNotificationsDisplayState.Default,
+			ScrollingEnabled = state3 == EnumStreamNotificationsDisplayState.Default,
 			ScrollingDirection = Enum.ScrollingDirection.Y,
-			[React.Change.CanvasPosition] = v86,
+			[React.Change.CanvasPosition] = fn8,
 			Selectable = false
-		}, v85),
-		ImpressionTracker = if not FFlagStreamNotificationImpressionLogging then nil else React.createElement(FrameBoundsImpressionsTracker, {
-			pageContext = nil,
-			impressionsTag = "StreamNotificationImpression",
-			parentRef = v74,
-			scrollViewPositionChangedSignal = v75.current,
-			sendImpressions = v81
-		})
-	})
+		}, notifications)
+		local impressionTracker
+
+		if FFlagStreamNotificationImpressionLogging then
+			impressionTracker = React.createElement(FrameBoundsImpressionsTracker, {
+				parentRef = ref5,
+				pageContext = nil,
+				impressionsTag = "StreamNotificationImpression",
+				scrollViewPositionChangedSignal = v8.current,
+				sendImpressions = sendImpressions
+			})
+		end
+
+		children.ImpressionTracker = impressionTracker
+		return createElement("Frame", v16, children)
+	end
 end

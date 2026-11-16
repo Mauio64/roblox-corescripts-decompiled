@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Roact = require(Parent.Roact)
-local t = require(Parent.t)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+
+local UIBlox = require(parent.UIBlox)
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local ControlState = UIBlox.Core.Control.Enum.ControlState
@@ -12,14 +13,18 @@ local Interactable = UIBlox.Core.Control.Interactable
 local LoadableImage = UIBlox.App.Loading.LoadableImage
 local getIconSize = UIBlox.App.ImageSet.getIconSize
 local withStyle = UIBlox.Core.Style.withStyle
-local HoverButtonBackground = require(script.Parent.HoverButtonBackground)
-local v16 = getIconSize(IconSize.Large)
-local uDim2 = UDim2.fromScale(0.4, 0.512)
-local uDim2_2 = UDim2.fromOffset(64, 48)
-local uDim2_3 = UDim2.fromScale(0.25, 0.33)
-local v20 = Roact.Component:extend("ThumbnailButton")
 
-v20.validateProps = t.strictInterface({
+local HoverButtonBackground = require(script.Parent.HoverButtonBackground)
+
+local iconSize = getIconSize(IconSize.Large)
+
+local udim = UDim2.fromScale(0.4, 0.512)
+local udim2 = UDim2.fromOffset(64, 48)
+local udim3 = UDim2.fromScale(0.25, 0.33)
+
+local extended = Roact.Component:extend("ThumbnailButton")
+
+extended.validateProps = t.strictInterface({
 	layoutOrder = t.optional(t.number),
 	size = t.optional(t.UDim2),
 	anchorPoint = t.optional(t.Vector2),
@@ -33,137 +38,163 @@ v20.validateProps = t.strictInterface({
 	onActivated = t.optional(t.callback),
 	onPlayActivated = t.optional(t.callback)
 })
-v20.defaultProps = {
+
+extended.defaultProps = {
+	size = UDim2.fromScale(1, 1),
 	imageId = "",
 	isVideo = false,
 	isSelected = false,
-	userInteractionEnabled = true,
-	size = UDim2.fromScale(1, 1)
+	userInteractionEnabled = true
 }
 
-function v20.init(p1) -- line: 57
-	-- upvalues: ControlState (copy)
-	p1:setState({
-		controlState = ControlState.Initialize
-	})
+function extended:init()
+	self:setState({ controlState = ControlState.Initialize })
 
-	function p1.onStateChanged(_, p3) -- line: 62
-		-- upvalues: p1 (copy)
-		p1:setState({
-			controlState = p3
-		})
+	function self.onStateChanged(_, controlState)
+		self:setState({ controlState = controlState })
 	end
-	function p1.onActivated() -- line: 68
-		-- upvalues: p1 (copy)
-		if p1.props.onActivated then
-			p1.props.onActivated(p1.props.itemKey)
+
+	function self.onActivated()
+		if self.props.onActivated then
+			self.props.onActivated(self.props.itemKey)
 		end
 	end
-	function p1.onPlayActivated() -- line: 74
-		-- upvalues: p1 (copy)
-		if p1.props.onPlayActivated then
-			p1.props.onPlayActivated(p1.props.itemKey)
+
+	function self.onPlayActivated()
+		if self.props.onPlayActivated then
+			self.props.onPlayActivated(self.props.itemKey)
 		end
 	end
 end
-function v20.renderButton(p4) -- line: 81
-	-- upvalues: uDim2 (copy), uDim2_2 (copy), withStyle (copy), ControlState (copy), Roact (copy), Interactable (copy), LoadableImage (copy), Button (copy), ButtonType (copy), Images (copy), ImageSetLabel (copy), uDim2_3 (copy), HoverButtonBackground (copy)
-	local useScaledPlayButton = p4.props.useScaledPlayButton
-	local u24 = if not useScaledPlayButton then uDim2_2 else uDim2
 
-	return withStyle(function(p5) -- line: 90
-		-- upvalues: p4 (copy), ControlState (copy), Roact (copy), Interactable (copy), LoadableImage (copy), Button (copy), ButtonType (copy), u24 (ref), useScaledPlayButton (copy), Images (copy), ImageSetLabel (copy), uDim2_3 (copy), HoverButtonBackground (copy)
-		local layoutOrder = p4.props.layoutOrder
-		local anchorPoint = p4.props.anchorPoint
-		local position = p4.props.position
-		local size = p4.props.size
-		local isSelected = p4.props.isSelected
-		local imageId = p4.props.imageId
-		local isVideo = p4.props.isVideo
-		local userInteractionEnabled = p4.props.userInteractionEnabled
-		local v38 = p4.state.controlState == ControlState.Hover
-		local v39 = isSelected and p5.Theme.BackgroundDefault or p5.Theme.BackgroundUIDefault
+function extended:renderButton()
+	local useScaledPlayButton = self.props.useScaledPlayButton
+	local size2
 
-		return Roact.createElement(Interactable, {
+	if useScaledPlayButton then
+		size2 = udim
+	else
+		size2 = udim2
+	end
+
+	return withStyle(function(p)
+		local layoutOrder = self.props.layoutOrder
+		local anchorPoint = self.props.anchorPoint
+		local position = self.props.position
+		local size = self.props.size
+		local isSelected = self.props.isSelected
+		local imageId = self.props.imageId
+		local isVideo = self.props.isVideo
+		local userInteractionEnabled = self.props.userInteractionEnabled
+
+		local v = self.state.controlState == ControlState.Hover
+		local backgroundDefault = isSelected and p.Theme.BackgroundDefault or p.Theme.BackgroundUIDefault
+
+		local createElement = Roact.createElement
+		local onActivatedsByActivated = {
 			LayoutOrder = layoutOrder,
 			Size = size,
 			AnchorPoint = anchorPoint,
 			Position = position,
 			AutoButtonColor = false,
-			BackgroundColor3 = v39.Color,
-			BackgroundTransparency = v39.Transparency,
-			onStateChanged = p4.onStateChanged,
+			BackgroundColor3 = backgroundDefault.Color,
+			BackgroundTransparency = backgroundDefault.Transparency,
+			onStateChanged = self.onStateChanged,
 			userInteractionEnabled = userInteractionEnabled,
-			[Roact.Event.Activated] = p4.onActivated
-		}, {
-			Corner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 8)
-			}),
+			[Roact.Event.Activated] = self.onActivated
+		}
+		local v2 = {
+			Corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 			Tile = Roact.createElement(LoadableImage, {
-				useShimmerAnimationWhileLoading = true,
-				ZIndex = -1,
 				Size = UDim2.fromScale(1, 1),
 				cornerRadius = UDim.new(0, 8),
-				Image = imageId
+				Image = imageId,
+				useShimmerAnimationWhileLoading = true,
+				ZIndex = -1
 			}),
-			PlayButton = if not isVideo then nil else Roact.createElement(Button, {
+			PlayButton = 0,
+			PlayIcon = 0,
+			HoverBackground = 0
+		}
+		local playButton
+
+		if isVideo then
+			local createElement2 = Roact.createElement
+			local v3 = {
 				buttonType = ButtonType.PrimaryContextual,
-				size = u24,
+				size = size2,
 				anchorPoint = Vector2.new(0.5, 0.5),
 				position = UDim2.fromScale(0.5, 0.5),
-				icon = if not useScaledPlayButton then Images["icons/common/play"] else nil,
-				onActivated = p4.onPlayActivated
-			}),
-			PlayIcon = if not isVideo or not useScaledPlayButton then nil else Roact.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
-				ZIndex = 2,
-				Size = uDim2_3,
+				icon = 0,
+				onActivated = 0
+			}
+			local icon
+
+			if not useScaledPlayButton then
+				icon = Images["icons/common/play"]
+			end
+
+			v3.icon = icon
+			v3.onActivated = self.onPlayActivated
+			playButton = createElement2(Button, v3)
+		end
+
+		v2.PlayButton = playButton
+		local playIcon
+
+		if isVideo and useScaledPlayButton then
+			playIcon = Roact.createElement(ImageSetLabel, {
+				Size = udim3,
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
-				Image = Images["icons/common/play"]
-			}),
-			HoverBackground = v38 and Roact.createElement(HoverButtonBackground) or nil
-		})
+				Image = Images["icons/common/play"],
+				BackgroundTransparency = 1,
+				ZIndex = 2
+			})
+		end
+
+		v2.PlayIcon = playIcon
+
+		v2.HoverBackground = v and Roact.createElement(HoverButtonBackground) or nil
+		return createElement(Interactable, onActivatedsByActivated, v2)
 	end)
 end
-function v20.renderEmptyState(p6) -- line: 151
-	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), v16 (copy), Images (copy)
-	return withStyle(function(p7) -- line: 152
-		-- upvalues: p6 (copy), Roact (copy), ImageSetLabel (copy), v16 (copy), Images (copy)
-		local layoutOrder = p6.props.layoutOrder
-		local anchorPoint = p6.props.anchorPoint
-		local position = p6.props.position
-		local size = p6.props.size
+
+function extended:renderEmptyState()
+	return withStyle(function(p)
+		local layoutOrder = self.props.layoutOrder
+		local anchorPoint = self.props.anchorPoint
+		local position = self.props.position
+		local size = self.props.size
 
 		return Roact.createElement("Frame", {
 			LayoutOrder = layoutOrder,
 			Size = size,
 			AnchorPoint = anchorPoint,
 			Position = position,
-			BackgroundColor3 = p7.Theme.BackgroundUIDefault.Color,
-			BackgroundTransparency = p7.Theme.BackgroundUIDefault.Transparency
+			BackgroundColor3 = p.Theme.BackgroundUIDefault.Color,
+			BackgroundTransparency = p.Theme.BackgroundUIDefault.Transparency
 		}, {
-			Corner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 8)
-			}),
+			Corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 			Icon = Roact.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(v16, v16),
+				Size = UDim2.fromOffset(iconSize, iconSize),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
 				Image = Images["icons/imageUnavailable"],
-				ImageColor3 = p7.Theme.UIDefault.Color,
-				ImageTransparency = p7.Theme.UIDefault.Transparency
+				ImageColor3 = p.Theme.UIDefault.Color,
+				ImageTransparency = p.Theme.UIDefault.Transparency,
+				BackgroundTransparency = 1
 			})
 		})
 	end)
 end
-function v20.render(p8) -- line: 182
-	if p8.props.imageId == "" then
-		return p8:renderEmptyState()
+
+function extended:render()
+	if self.props.imageId == "" then
+		return self:renderEmptyState()
 	end
 
-	return p8:renderButton()
+	return self:renderButton()
 end
 
-return v20
+return extended

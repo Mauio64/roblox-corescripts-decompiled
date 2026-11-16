@@ -1,3 +1,1 @@
-return {
-	HOMEPAGE_PROMPTS_CONFIG_KEY = "HomepagePrompts"
-}
+return { HOMEPAGE_PROMPTS_CONFIG_KEY = "HomepagePrompts" }

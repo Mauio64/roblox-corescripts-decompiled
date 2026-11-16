@@ -1,18 +1,17 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent.Parent
+local React = require(parent.React)
 local SceneView = require(script.Parent.Parent.SceneView)
 
-local function SwitchView(p1) -- line: 8
-	-- upvalues: React (copy), SceneView (copy)
-	local state = p1.navigation.state
+local function SwitchView(props)
+	local state = props.navigation.state
 	local key = state.routes[state.index].key
-	local v8 = p1.descriptors[key]
-	local v9 = v8.getComponent()
+	local descriptor = props.descriptors[key]
+	local component = descriptor.getComponent()
 
 	return React.createElement(SceneView, {
-		component = v9,
-		navigation = v8.navigation,
-		screenProps = p1.screenProps
+		component = component,
+		navigation = descriptor.navigation,
+		screenProps = props.screenProps
 	})
 end
 

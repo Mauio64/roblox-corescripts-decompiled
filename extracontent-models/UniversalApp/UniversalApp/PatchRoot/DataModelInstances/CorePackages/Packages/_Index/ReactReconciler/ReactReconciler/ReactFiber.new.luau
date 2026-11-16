@@ -1,25 +1,37 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Object = LuauPolyfill.Object
 local Array = LuauPolyfill.Array
 local inspect = LuauPolyfill.util.inspect
-local __DEV__ = ReactGlobals.__DEV__
-local console = require(ParentParent.Shared).console
 
-require(ParentParent.Shared)
+local __DEV__ = ReactGlobals.__DEV__
+
+local Shared = require(parent.Shared)
+local console = Shared.console
+
+require(parent.Shared)
+
 require(script.Parent.ReactInternalTypes)
 
 local ReactRootTags = require(script.Parent.ReactRootTags)
+
 local ReactWorkTags = require(script.Parent.ReactWorkTags)
+
 local ReactTypeOfMode = require(script.Parent.ReactTypeOfMode)
+
 local ReactFiberLane = require(script.Parent.ReactFiberLane)
 
 require(script.Parent.ReactFiberHostConfig)
+
 require(script.Parent.ReactFiberOffscreenComponent)
 
-local invariant = require(ParentParent.Shared).invariant
-local enableProfilerTimer = require(ParentParent.Shared).ReactFeatureFlags.enableProfilerTimer
+local Shared2 = require(parent.Shared)
+local invariant = Shared2.invariant
+local Shared3 = require(parent.Shared)
+local ReactFeatureFlags = Shared3.ReactFeatureFlags
+local enableProfilerTimer = ReactFeatureFlags.enableProfilerTimer
+
 local ReactFiberFlags = require(script.Parent.ReactFiberFlags)
 local NoFlags = ReactFiberFlags.NoFlags
 local Placement = ReactFiberFlags.Placement
@@ -34,7 +46,7 @@ local HostText = ReactWorkTags.HostText
 local HostPortal = ReactWorkTags.HostPortal
 local ForwardRef = ReactWorkTags.ForwardRef
 local Fragment = ReactWorkTags.Fragment
-local ReactWorkTagsMode = ReactWorkTags.Mode
+local Mode = ReactWorkTags.Mode
 local ContextProvider = ReactWorkTags.ContextProvider
 local ContextConsumer = ReactWorkTags.ContextConsumer
 local Profiler = ReactWorkTags.Profiler
@@ -49,12 +61,17 @@ local FundamentalComponent = ReactWorkTags.FundamentalComponent
 local ScopeComponent = ReactWorkTags.ScopeComponent
 local OffscreenComponent = ReactWorkTags.OffscreenComponent
 local LegacyHiddenComponent = ReactWorkTags.LegacyHiddenComponent
-local getComponentName = require(ParentParent.Shared).getComponentName
-local isDevToolsPresent = require(script.Parent["ReactFiberDevToolsHook.new"]).isDevToolsPresent
-local lib = require(script.Parent["ReactFiberHotReloading.new"])
-local resolveClassForHotReloading = lib.resolveClassForHotReloading
-local resolveFunctionForHotReloading = lib.resolveFunctionForHotReloading
-local resolveForwardRefForHotReloading = lib.resolveForwardRefForHotReloading
+local Shared4 = require(parent.Shared)
+local getComponentName = Shared4.getComponentName
+
+local ReactFiberDevToolsHooknew = require(script.Parent["ReactFiberDevToolsHook.new"])
+local isDevToolsPresent = ReactFiberDevToolsHooknew.isDevToolsPresent
+local ReactFiberHotReloadingnew = require(script.Parent["ReactFiberHotReloading.new"])
+local resolveClassForHotReloading = ReactFiberHotReloadingnew.resolveClassForHotReloading
+
+local resolveFunctionForHotReloading = ReactFiberHotReloadingnew.resolveFunctionForHotReloading
+
+local resolveForwardRefForHotReloading = ReactFiberHotReloadingnew.resolveForwardRefForHotReloading
 local NoLanes = ReactFiberLane.NoLanes
 local NoMode = ReactTypeOfMode.NoMode
 local ConcurrentMode = ReactTypeOfMode.ConcurrentMode
@@ -62,7 +79,8 @@ local DebugTracingMode = ReactTypeOfMode.DebugTracingMode
 local ProfileMode = ReactTypeOfMode.ProfileMode
 local StrictMode = ReactTypeOfMode.StrictMode
 local BlockingMode = ReactTypeOfMode.BlockingMode
-local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local Shared5 = require(parent.Shared)
+local ReactSymbols = Shared5.ReactSymbols
 local REACT_FORWARD_REF_TYPE = ReactSymbols.REACT_FORWARD_REF_TYPE
 local REACT_FRAGMENT_TYPE = ReactSymbols.REACT_FRAGMENT_TYPE
 local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
@@ -75,480 +93,611 @@ local REACT_SUSPENSE_TYPE = ReactSymbols.REACT_SUSPENSE_TYPE
 local REACT_SUSPENSE_LIST_TYPE = ReactSymbols.REACT_SUSPENSE_LIST_TYPE
 local REACT_MEMO_TYPE = ReactSymbols.REACT_MEMO_TYPE
 local REACT_LAZY_TYPE = ReactSymbols.REACT_LAZY_TYPE
+
 local REACT_OFFSCREEN_TYPE = ReactSymbols.REACT_OFFSCREEN_TYPE
 local REACT_LEGACY_HIDDEN_TYPE = ReactSymbols.REACT_LEGACY_HIDDEN_TYPE
-local createFiberFromProfiler = nil
-local createFiberFromFragment = nil
-local createFiberFromSuspense = nil
-local createFiberFromOffscreen = nil
-local createFiberFromLegacyHidden = nil
-local n1 = 1
 
-local function createFiber(p1, p2, p3, p4, p5, p6, p7, p8) -- line: 167
-	-- upvalues: NoFlags (copy), NoLanes (copy), enableProfilerTimer (copy), __DEV__ (copy), n1 (ref)
-	local t1 = {
+local createFiberFromProfiler
+local createFiberFromFragment
+local createFiberFromSuspense
+local createFiberFromOffscreen
+local createFiberFromLegacyHidden
+
+local debugID = 1
+
+local function createFiber(tag, pendingProps, p, mode, elementType, p2, stateNode, p3)
+	local fiber = {
+		tag = tag,
+		key = p,
+		elementType = elementType,
+		type = p2,
+		stateNode = stateNode,
 		index = 1,
-		tag = p1,
-		key = p3,
-		elementType = p5,
-		type = p6,
-		stateNode = p7,
-		pendingProps = p2,
-		mode = p4,
+		pendingProps = pendingProps,
+		mode = mode,
 		flags = NoFlags,
 		subtreeFlags = NoFlags,
-		lanes = p8 or NoLanes,
+		lanes = p3 or NoLanes,
 		childLanes = NoLanes
 	}
 
 	if enableProfilerTimer then
-		t1.actualDuration = 0
-		t1.actualStartTime = -1
-		t1.selfBaseDuration = 0
-		t1.treeBaseDuration = 0
+		fiber.actualDuration = 0
+		fiber.actualStartTime = -1
+		fiber.selfBaseDuration = 0
+		fiber.treeBaseDuration = 0
 	end
 
-	if __DEV__ then
-		t1._debugID = n1
-		n1 += 1
-		t1._debugSource = nil
-		t1._debugOwner = nil
-		t1._debugNeedsRemount = false
-		t1._debugHookTypes = nil
+	if not __DEV__ then
+		return fiber
 	end
 
-	return t1
+	fiber._debugID = debugID
+	debugID += 1
+	fiber._debugSource = nil
+	fiber._debugOwner = nil
+	fiber._debugNeedsRemount = false
+	fiber._debugHookTypes = nil
+
+	return fiber
 end
 
-function _shouldConstruct(p9) -- line: 267
-	return type(p9) ~= "function" and not not p9.isReactComponent
+function _shouldConstruct(callback)
+	return type(callback) ~= "function" and (callback.isReactComponent and true or false)
 end
 
-local function createFiberFromTypeAndProps(p10, s1: string?, p11, p12, p13, p14) -- line: 505
-	-- upvalues: IndeterminateComponent (copy), __DEV__ (copy), resolveFunctionForHotReloading (copy), ClassComponent (copy), resolveClassForHotReloading (copy), HostComponent (copy), REACT_FRAGMENT_TYPE (copy), createFiberFromFragment (ref), REACT_DEBUG_TRACING_MODE_TYPE (copy), ReactWorkTagsMode (copy), DebugTracingMode (copy), REACT_STRICT_MODE_TYPE (copy), StrictMode (copy), REACT_PROFILER_TYPE (copy), createFiberFromProfiler (ref), REACT_SUSPENSE_TYPE (copy), createFiberFromSuspense (ref), REACT_OFFSCREEN_TYPE (copy), createFiberFromOffscreen (ref), REACT_LEGACY_HIDDEN_TYPE (copy), createFiberFromLegacyHidden (ref), REACT_PROVIDER_TYPE (copy), ContextProvider (copy), REACT_CONTEXT_TYPE (copy), ContextConsumer (copy), REACT_FORWARD_REF_TYPE (copy), ForwardRef (copy), resolveForwardRefForHotReloading (copy), REACT_MEMO_TYPE (copy), MemoComponent (copy), REACT_LAZY_TYPE (copy), LazyComponent (copy), Object (copy), inspect (copy), getComponentName (copy), Array (copy), REACT_ELEMENT_TYPE (copy), invariant (copy), createFiber (copy)
-	local v111 = IndeterminateComponent
-	local v112 = p10
-	local v113 = type(p10)
+local function createFiberFromTypeAndProps(kind, key: string?, props, debugOwner, p, p2)
+	local v = IndeterminateComponent
 
-	if v113 == "function" then
+	local v2 = type(kind)
+	local v3
+
+	if v2 == "function" then
 		if __DEV__ then
-			v112 = resolveFunctionForHotReloading(v112)
-		end
-	elseif v113 == "table" and p10.isReactComponent then
-		v111 = ClassComponent
-
-		if __DEV__ then
-			v112 = resolveClassForHotReloading(v112)
-		end
-	elseif v113 == "string" then
-		v111 = HostComponent
-	else
-		if p10 == REACT_FRAGMENT_TYPE then
-			return createFiberFromFragment(p11.children, p13, p14, s1)
-		end
-
-		if p10 == REACT_DEBUG_TRACING_MODE_TYPE then
-			v111 = ReactWorkTagsMode
-			p13 = bit32.bor(p13, DebugTracingMode)
-		elseif p10 == REACT_STRICT_MODE_TYPE then
-			v111 = ReactWorkTagsMode
-			p13 = bit32.bor(p13, StrictMode)
+			v3 = resolveFunctionForHotReloading(kind)
 		else
-			if p10 == REACT_PROFILER_TYPE then
-				return createFiberFromProfiler(p11, p13, p14, s1)
+			v3 = kind
+		end
+	elseif v2 == "table" and kind.isReactComponent then
+		v = ClassComponent
+
+		if __DEV__ then
+			v3 = resolveClassForHotReloading(kind)
+		else
+			v3 = kind
+		end
+	elseif v2 == "string" then
+		v = HostComponent
+		v3 = kind
+	else
+		if kind == REACT_FRAGMENT_TYPE then
+			return createFiberFromFragment(props.children, p, p2, key)
+		end
+
+		if kind == REACT_DEBUG_TRACING_MODE_TYPE then
+			v = Mode
+			p = bit32.bor(p, DebugTracingMode)
+			v3 = kind
+		elseif kind == REACT_STRICT_MODE_TYPE then
+			v = Mode
+			p = bit32.bor(p, StrictMode)
+			v3 = kind
+		else
+			if kind == REACT_PROFILER_TYPE then
+				return createFiberFromProfiler(props, p, p2, key)
 			end
 
-			if p10 == REACT_SUSPENSE_TYPE then
-				return createFiberFromSuspense(p11, p13, p14, s1)
+			if kind == REACT_SUSPENSE_TYPE then
+				return createFiberFromSuspense(props, p, p2, key)
 			end
 
-			if p10 == REACT_OFFSCREEN_TYPE then
-				return createFiberFromOffscreen(p11, p13, p14, s1)
+			if kind == REACT_OFFSCREEN_TYPE then
+				return createFiberFromOffscreen(props, p, p2, key)
 			end
 
-			if p10 == REACT_LEGACY_HIDDEN_TYPE then
-				return createFiberFromLegacyHidden(p11, p13, p14, s1)
+			if kind == REACT_LEGACY_HIDDEN_TYPE then
+				return createFiberFromLegacyHidden(props, p, p2, key)
 			end
 
-			local v114 = false
-			local v115 = nil
+			local v4 = false
+			local Typeof
 
-			if v113 == "table" then
-				v115 = p10["$$typeof"]
+			if v2 == "table" then
+				Typeof = kind["$$typeof"]
 
-				if v115 == REACT_PROVIDER_TYPE then
-					v111 = ContextProvider
-					v114 = true
-				elseif v115 == REACT_CONTEXT_TYPE then
-					v111 = ContextConsumer
-					v114 = true
-				elseif v115 == REACT_FORWARD_REF_TYPE then
-					v111 = ForwardRef
+				if Typeof == REACT_PROVIDER_TYPE then
+					v = ContextProvider
+					v3 = kind
+					v4 = true
+				elseif Typeof == REACT_CONTEXT_TYPE then
+					v = ContextConsumer
+					v3 = kind
+					v4 = true
+				elseif Typeof == REACT_FORWARD_REF_TYPE then
+					v = ForwardRef
 
 					if __DEV__ then
-						v112 = resolveForwardRefForHotReloading(v112)
+						v3 = resolveForwardRefForHotReloading(kind)
+					else
+						v3 = kind
 					end
 
-					v114 = true
-				elseif v115 == REACT_MEMO_TYPE then
-					v111 = MemoComponent
-					v114 = true
-				elseif v115 == REACT_LAZY_TYPE then
-					v111 = LazyComponent
-					v112 = nil
-					v114 = true
+					v4 = true
+				elseif Typeof == REACT_MEMO_TYPE then
+					v = MemoComponent
+					v3 = kind
+					v4 = true
+				elseif Typeof == REACT_LAZY_TYPE then
+					v = LazyComponent
+					v4 = true
+				else
+					v3 = kind
 				end
+			else
+				v3 = kind
 			end
 
-			if not v114 then
-				local s2 = ""
+			if not v4 then
+				local v5 = ""
 
 				if __DEV__ then
-					if p10 == nil or v113 == "table" and #Object.keys(p10) == 0 then
-						s2 ..= " You likely forgot to export your component from the file " .. "it's defined in, or you might have mixed up default and " .. "named imports."
-					elseif p10 ~= nil and v113 == "table" then
-						s2 ..= "\n" .. inspect(p10)
+					if kind == nil or v2 == "table" and #Object.keys(kind) == 0 then
+						v5 ..= " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports."
+					elseif kind ~= nil and v2 == "table" then
+						v5 ..= "\n" .. inspect(kind)
 					end
 
-					local v117 = nil
+					local v6
 
-					if p12 then
-						v117 = getComponentName(p12.type)
+					if debugOwner then
+						v6 = getComponentName(debugOwner.type)
 					end
 
-					if v117 ~= nil and v117 ~= "" then
-						s2 ..= "\n\nCheck the render method of `" .. v117 .. "`."
-					elseif p12 then
-						s2 ..= "\n" .. inspect(p12)
+					if v6 == nil or v6 == "" then
+						if debugOwner then
+							v5 ..= "\n" .. inspect(debugOwner)
+						end
+					else
+						v5 ..= "\n\nCheck the render method of `" .. v6 .. "`."
 					end
 				end
 
-				if p10 == nil then
-					v113 = "nil"
-				elseif Array.isArray(p10) then
-					v113 = "array"
-				elseif v113 == "table" and v115 == REACT_ELEMENT_TYPE then
-					v113 = string.format("<%s />", getComponentName(p10.type) or "Unknown")
-					s2 = " Did you accidentally export a JSX literal or Element instead of a component?"
+				if kind == nil then
+					v2 = "nil"
+				elseif Array.isArray(kind) then
+					v2 = "array"
+				elseif v2 == "table" and Typeof == REACT_ELEMENT_TYPE then
+					v2 = string.format("<%s />", getComponentName(kind.type) or "Unknown")
+					v5 = " Did you accidentally export a JSX literal or Element instead of a component?"
 				end
 
-				invariant(false, "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", v113, s2)
+				invariant(
+					false,
+					"Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s",
+					v2,
+					v5
+				)
 			end
 		end
 	end
 
-	local v118 = createFiber(v111, p11, s1, p13, p10, v112, nil, p14)
+	local fiber = createFiber(v, props, key, p, kind, v3, nil, p2)
 
 	if __DEV__ then
-		v118._debugOwner = p12
+		fiber._debugOwner = debugOwner
 	end
 
-	return v118
+	return fiber
 end
 
-function createFiberFromFragment(p15, p16, p17, s3: string?) -- line: 687
-	-- upvalues: createFiber (copy), Fragment (copy)
-	return (createFiber(Fragment, p15, s3, p16, nil, nil, nil, p17))
+createFiberFromFragment = function(children, mode, p, p2: string?)
+	return createFiber(Fragment, children, p2, mode, nil, nil, nil, p)
 end
 
-local function createFiberFromScope(p18, p19, p20, p21, s4: string?) -- line: 725
-	-- upvalues: createFiber (copy), ScopeComponent (copy)
-	return (createFiber(ScopeComponent, p19, s4, p20, p18, p18, nil, p21))
+local function createFiberFromScope(elementType, pendingProps, mode, p, p2: string?)
+	return createFiber(ScopeComponent, pendingProps, p2, mode, elementType, elementType, nil, p)
 end
 
-function createFiberFromProfiler(p22, p23, p24, s5: string?) -- line: 742
-	-- upvalues: __DEV__ (copy), console (copy), createFiber (copy), Profiler (copy), ProfileMode (copy), REACT_PROFILER_TYPE (copy), enableProfilerTimer (copy)
-	if __DEV__ and typeof(p22.id) ~= "string" then
+createFiberFromProfiler = function(pendingProps, p, p2, p3: string?)
+	if __DEV__ and typeof(pendingProps.id) ~= "string" then
 		console.error("Profiler must specify an \"id\" as a prop")
 	end
 
-	return (createFiber(Profiler, p22, s5, bit32.bor(p23, ProfileMode), REACT_PROFILER_TYPE, REACT_PROFILER_TYPE, if not enableProfilerTimer then nil else {
-		effectDuration = 0,
-		passiveEffectDuration = 0
-	}, p24))
-end
-function createFiberFromSuspense(p25, p26, p27, s6: string?) -- line: 786
-	-- upvalues: createFiber (copy), SuspenseComponent (copy), REACT_SUSPENSE_TYPE (copy)
-	return (createFiber(SuspenseComponent, p25, s6, p26, REACT_SUSPENSE_TYPE, REACT_SUSPENSE_TYPE, nil, p27))
-end
-function createFiberFromOffscreen(p28, p29, p30, s7: string?) -- line: 844
-	-- upvalues: createFiber (copy), OffscreenComponent (copy), REACT_OFFSCREEN_TYPE (copy), __DEV__ (copy)
-	return (createFiber(OffscreenComponent, p28, s7, p29, REACT_OFFSCREEN_TYPE, if not __DEV__ then nil else REACT_OFFSCREEN_TYPE, nil, p30))
-end
-function createFiberFromLegacyHidden(p31, p32, p33, s8: string?) -- line: 873
-	-- upvalues: createFiber (copy), LegacyHiddenComponent (copy), REACT_LEGACY_HIDDEN_TYPE (copy), __DEV__ (copy)
-	return (createFiber(LegacyHiddenComponent, p31, s8, p32, REACT_LEGACY_HIDDEN_TYPE, if not __DEV__ then nil else REACT_LEGACY_HIDDEN_TYPE, nil, p33))
+	return createFiber(
+		Profiler,
+		pendingProps,
+		p3,
+		bit32.bor(p, ProfileMode),
+		REACT_PROFILER_TYPE,
+		REACT_PROFILER_TYPE,
+		enableProfilerTimer and { effectDuration = 0, passiveEffectDuration = 0 } or nil,
+		p2
+	)
 end
 
-return {
-	isSimpleFunctionComponent = function(p34) -- line: 274
-		return type(p34) == "function"
-	end,
-	resolveLazyComponentTag = function(p35) -- line: 282
-		-- upvalues: FunctionComponent (copy), ClassComponent (copy), REACT_FORWARD_REF_TYPE (copy), ForwardRef (copy), REACT_MEMO_TYPE (copy), MemoComponent (copy), IndeterminateComponent (copy)
-		local v93 = typeof(p35)
+createFiberFromSuspense = function(pendingProps, mode, p, p2: string?)
+	return createFiber(SuspenseComponent, pendingProps, p2, mode, REACT_SUSPENSE_TYPE, REACT_SUSPENSE_TYPE, nil, p)
+end
 
-		if v93 == "function" then
-			return FunctionComponent
-		end
+createFiberFromOffscreen = function(pendingProps, mode, p, p2: string?)
+	local v
 
-		if v93 == "table" then
-			if p35.isReactComponent then
-				return ClassComponent
-			end
+	if __DEV__ then
+		v = REACT_OFFSCREEN_TYPE
+	end
 
-			local v94 = p35["$$typeof"]
+	return createFiber(OffscreenComponent, pendingProps, p2, mode, REACT_OFFSCREEN_TYPE, v, nil, p)
+end
 
-			if v94 == REACT_FORWARD_REF_TYPE then
-				return ForwardRef
-			end
+createFiberFromLegacyHidden = function(pendingProps, mode, p, p2: string?)
+	local v
 
-			if v94 == REACT_MEMO_TYPE then
-				return MemoComponent
-			end
-		end
+	if __DEV__ then
+		v = REACT_LEGACY_HIDDEN_TYPE
+	end
 
+	return createFiber(LegacyHiddenComponent, pendingProps, p2, mode, REACT_LEGACY_HIDDEN_TYPE, v, nil, p)
+end
+
+local New = {}
+
+function New.isSimpleFunctionComponent(callback): boolean
+	return type(callback) == "function"
+end
+
+function New.resolveLazyComponentTag(p)
+	local typeName = typeof(p)
+
+	if typeName == "function" then
+		return FunctionComponent
+	end
+
+	if typeName ~= "table" then
 		return IndeterminateComponent
-	end,
-	createWorkInProgress = function(p36, p37) -- line: 305
-		-- upvalues: createFiber (copy), __DEV__ (copy), NoFlags (copy), enableProfilerTimer (copy), StaticMask (copy), IndeterminateComponent (copy), FunctionComponent (copy), SimpleMemoComponent (copy), resolveFunctionForHotReloading (copy), ClassComponent (copy), resolveClassForHotReloading (copy), ForwardRef (copy), resolveForwardRefForHotReloading (copy)
-		local alternate = p36.alternate
+	end
 
-		if alternate == nil then
-			alternate = createFiber(p36.tag, p37, p36.key, p36.mode, p36.elementType, p36.type, p36.stateNode)
+	if p.isReactComponent then
+		return ClassComponent
+	end
 
-			if __DEV__ then
-				alternate._debugID = p36._debugID
-				alternate._debugSource = p36._debugSource
-				alternate._debugOwner = p36._debugOwner
-				alternate._debugHookTypes = p36._debugHookTypes
-			end
+	local Typeof = p["$$typeof"]
 
-			alternate.alternate = p36
-			p36.alternate = alternate
-		else
-			alternate.pendingProps = p37
-			alternate.type = p36.type
-			alternate.flags = NoFlags
-			alternate.subtreeFlags = NoFlags
-			alternate.deletions = nil
+	if Typeof == REACT_FORWARD_REF_TYPE then
+		return ForwardRef
+	end
 
-			if enableProfilerTimer then
-				alternate.actualDuration = 0
-				alternate.actualStartTime = -1
-			end
+	if Typeof == REACT_MEMO_TYPE then
+		return MemoComponent
+	end
+
+	return IndeterminateComponent
+end
+
+function New.createWorkInProgress(alternate, pendingProps)
+	local workInProgress = alternate.alternate
+
+	if workInProgress == nil then
+		workInProgress = createFiber(
+			alternate.tag,
+			pendingProps,
+			alternate.key,
+			alternate.mode,
+			alternate.elementType,
+			alternate.type,
+			alternate.stateNode
+		)
+
+		if __DEV__ then
+			workInProgress._debugID = alternate._debugID
+			workInProgress._debugSource = alternate._debugSource
+			workInProgress._debugOwner = alternate._debugOwner
+			workInProgress._debugHookTypes = alternate._debugHookTypes
 		end
 
-		alternate.flags = bit32.band(p36.flags, StaticMask)
-		alternate.childLanes = p36.childLanes
-		alternate.lanes = p36.lanes
-		alternate.child = p36.child
-		alternate.memoizedProps = p36.memoizedProps
-		alternate.memoizedState = p36.memoizedState
-		alternate.updateQueue = p36.updateQueue
+		workInProgress.alternate = alternate
+		alternate.alternate = workInProgress
+	else
+		workInProgress.pendingProps = pendingProps
 
-		local dependencies = p36.dependencies
+		workInProgress.type = alternate.type
+
+		if ReactFeatureFlags.enableWorkLoopTrims then
+			workInProgress.subtreeFlags = NoFlags
+
+			if workInProgress.deletions ~= nil then
+				workInProgress.deletions = nil
+			end
+		else
+			workInProgress.flags = NoFlags
+
+			workInProgress.subtreeFlags = NoFlags
+			workInProgress.deletions = nil
+		end
+
+		if enableProfilerTimer then
+			workInProgress.actualDuration = 0
+			workInProgress.actualStartTime = -1
+		end
+	end
+
+	workInProgress.flags = bit32.band(alternate.flags, StaticMask)
+	workInProgress.childLanes = alternate.childLanes
+	workInProgress.lanes = alternate.lanes
+
+	if ReactFeatureFlags.enableWorkLoopTrims then
+		if alternate.child ~= nil or workInProgress.child ~= nil then
+			workInProgress.child = alternate.child
+		end
+
+		workInProgress.memoizedProps = alternate.memoizedProps
+
+		if alternate.memoizedState ~= nil or workInProgress.memoizedState ~= nil then
+			workInProgress.memoizedState = alternate.memoizedState
+		end
+
+		if alternate.updateQueue ~= nil or workInProgress.updateQueue ~= nil then
+			workInProgress.updateQueue = alternate.updateQueue
+		end
+
+		local dependencies = alternate.dependencies
 
 		if dependencies == nil then
-			alternate.dependencies = nil
+			if workInProgress.dependencies ~= nil then
+				workInProgress.dependencies = nil
+			end
 		else
-			alternate.dependencies = {
+			workInProgress.dependencies = {
 				lanes = dependencies.lanes,
 				firstContext = dependencies.firstContext
 			}
 		end
 
-		alternate.sibling = p36.sibling
-		alternate.index = p36.index
-		alternate.ref = p36.ref
-
-		if enableProfilerTimer then
-			alternate.selfBaseDuration = p36.selfBaseDuration
-			alternate.treeBaseDuration = p36.treeBaseDuration
+		if alternate.sibling ~= nil or workInProgress.sibling ~= nil then
+			workInProgress.sibling = alternate.sibling
 		end
 
-		if __DEV__ then
-			alternate._debugNeedsRemount = p36._debugNeedsRemount
+		workInProgress.index = alternate.index
 
-			if alternate.tag == IndeterminateComponent or alternate.tag == FunctionComponent or alternate.tag == SimpleMemoComponent then
-				alternate.type = resolveFunctionForHotReloading(p36.type)
-
-				return alternate
-			end
-
-			if alternate.tag == ClassComponent then
-				alternate.type = resolveClassForHotReloading(p36.type)
-
-				return alternate
-			end
-
-			if alternate.tag == ForwardRef then
-				alternate.type = resolveForwardRefForHotReloading(p36.type)
-			end
+		if alternate.ref ~= nil or workInProgress.ref ~= nil then
+			workInProgress.ref = alternate.ref
 		end
+	else
+		workInProgress.child = alternate.child
+		workInProgress.memoizedProps = alternate.memoizedProps
+		workInProgress.memoizedState = alternate.memoizedState
+		workInProgress.updateQueue = alternate.updateQueue
 
-		return alternate
-	end,
-	resetWorkInProgress = function(p38, p39) -- line: 409
-		-- upvalues: StaticMask (copy), Placement (copy), NoLanes (copy), NoFlags (copy), enableProfilerTimer (copy)
-		p38.flags = bit32.band(p38.flags, (bit32.bor(StaticMask, Placement)))
+		local dependencies = alternate.dependencies
 
-		local alternate = p38.alternate
-
-		if alternate == nil then
-			p38.childLanes = NoLanes
-			p38.lanes = p39
-			p38.child = nil
-			p38.subtreeFlags = NoFlags
-			p38.memoizedProps = nil
-			p38.memoizedState = nil
-			p38.updateQueue = nil
-			p38.dependencies = nil
-			p38.stateNode = nil
-
-			if enableProfilerTimer then
-				p38.selfBaseDuration = 0
-				p38.treeBaseDuration = 0
-
-				return p38
-			end
+		if dependencies == nil then
+			workInProgress.dependencies = nil
 		else
-			p38.childLanes = alternate.childLanes
-			p38.lanes = alternate.lanes
-			p38.child = alternate.child
-			p38.subtreeFlags = alternate.subtreeFlags
-			p38.deletions = nil
-			p38.memoizedProps = alternate.memoizedProps
-			p38.memoizedState = alternate.memoizedState
-			p38.updateQueue = alternate.updateQueue
-			p38.type = alternate.type
-
-			local dependencies = alternate.dependencies
-
-			if dependencies == nil then
-				p38.dependencies = nil
-			else
-				p38.dependencies = {
-					lanes = dependencies.lanes,
-					firstContext = dependencies.firstContext
-				}
-			end
-
-			if enableProfilerTimer then
-				p38.selfBaseDuration = alternate.selfBaseDuration
-				p38.treeBaseDuration = alternate.treeBaseDuration
-			end
+			workInProgress.dependencies = {
+				lanes = dependencies.lanes,
+				firstContext = dependencies.firstContext
+			}
 		end
 
-		return p38
-	end,
-	createHostRootFiber = function(p40) -- line: 484
-		-- upvalues: ConcurrentRoot (copy), ConcurrentMode (copy), BlockingMode (copy), StrictMode (copy), BlockingRoot (copy), NoMode (copy), enableProfilerTimer (copy), isDevToolsPresent (copy), ProfileMode (copy), createFiber (copy), HostRoot (copy)
-		local v104 = if p40 ~= ConcurrentRoot then if p40 ~= BlockingRoot then NoMode else bit32.bor(BlockingMode, StrictMode) else bit32.bor(ConcurrentMode, BlockingMode, StrictMode)
+		workInProgress.sibling = alternate.sibling
+		workInProgress.index = alternate.index
+		workInProgress.ref = alternate.ref
+	end
 
-		if enableProfilerTimer and isDevToolsPresent() then
-			v104 = bit32.bor(v104, ProfileMode)
-		end
+	if enableProfilerTimer then
+		workInProgress.selfBaseDuration = alternate.selfBaseDuration
+		workInProgress.treeBaseDuration = alternate.treeBaseDuration
+	end
 
-		return (createFiber(HostRoot, nil, nil, v104))
-	end,
-	createFiberFromTypeAndProps = createFiberFromTypeAndProps,
-	createFiberFromElement = function(p41, p42, p43) -- line: 659
-		-- upvalues: __DEV__ (copy), createFiberFromTypeAndProps (copy)
-		local _owner = nil
+	if not __DEV__ then
+		return workInProgress
+	end
 
-		if __DEV__ then
-			_owner = p41._owner
-		end
+	workInProgress._debugNeedsRemount = alternate._debugNeedsRemount
 
-		local type2 = p41.type
-		local key = p41.key
-		local props = p41.props
-		local v126 = createFiberFromTypeAndProps(type2, key, props, _owner, p42, p43)
+	if
+		workInProgress.tag == IndeterminateComponent
+		or workInProgress.tag == FunctionComponent
+		or workInProgress.tag == SimpleMemoComponent
+	then
+		workInProgress.type = resolveFunctionForHotReloading(alternate.type)
+		return workInProgress
+	end
 
-		if __DEV__ then
-			v126._debugSource = p41._source
-			v126._debugOwner = p41._owner
-		end
+	if workInProgress.tag == ClassComponent then
+		workInProgress.type = resolveClassForHotReloading(alternate.type)
+		return workInProgress
+	elseif workInProgress.tag == ForwardRef then
+		workInProgress.type = resolveForwardRefForHotReloading(alternate.type)
+	end
 
-		return v126
-	end,
-	createFiberFromFragment = createFiberFromFragment,
-	createFiberFromFundamental = function(p44, p45, p46, p47, s9: string?) -- line: 700
-		-- upvalues: createFiber (copy), FundamentalComponent (copy)
-		return (createFiber(FundamentalComponent, p45, s9, p46, p44, p44, nil, p47))
-	end,
-	createFiberFromSuspense = createFiberFromSuspense,
-	createFiberFromSuspenseList = function(p48, p49, p50, s10: string?) -- line: 815
-		-- upvalues: createFiber (copy), SuspenseListComponent (copy), REACT_SUSPENSE_LIST_TYPE (copy), __DEV__ (copy)
-		return (createFiber(SuspenseListComponent, p48, s10, p49, REACT_SUSPENSE_LIST_TYPE, if not __DEV__ then nil else REACT_SUSPENSE_LIST_TYPE, nil, p50))
-	end,
-	createFiberFromOffscreen = createFiberFromOffscreen,
-	createFiberFromLegacyHidden = createFiberFromLegacyHidden,
-	createFiberFromText = function(s11: string, p51, p52) -- line: 902
-		-- upvalues: createFiber (copy), HostText (copy)
-		return (createFiber(HostText, s11, nil, p51, nil, nil, nil, p52))
-	end,
-	createFiberFromHostInstanceForDeletion = function() -- line: 910
-		-- upvalues: createFiber (copy), HostComponent (copy), NoMode (copy)
-		return (createFiber(HostComponent, nil, nil, NoMode, "DELETED", "DELETED"))
-	end,
-	createFiberFromDehydratedFragment = function(p53) -- line: 920
-		-- upvalues: createFiber (copy), DehydratedFragment (copy), NoMode (copy)
-		return (createFiber(DehydratedFragment, nil, nil, NoMode, nil, nil, p53))
-	end,
-	createFiberFromPortal = function(p54, p55, p56) -- line: 929
-		-- upvalues: createFiber (copy), HostPortal (copy)
-		local v168 = if p54.children == nil then {} else p54.children
+	return workInProgress
+end
 
-		return (createFiber(HostPortal, v168, p54.key, p55, nil, nil, {
-			pendingChildren = nil,
-			containerInfo = p54.containerInfo,
-			implementation = p54.implementation
-		}, p56))
-	end,
-	assignFiberPropertiesInDEV = function(p57, p58) -- line: 953
-		-- upvalues: createFiber (copy), IndeterminateComponent (copy), NoMode (copy), enableProfilerTimer (copy)
-		if p57 == nil then
-			p57 = createFiber(IndeterminateComponent, nil, nil, NoMode)
-		end
+function New.resetWorkInProgress(state, lanes)
+	state.flags = bit32.band(state.flags, (bit32.bor(StaticMask, Placement)))
 
-		p57.tag = p58.tag
-		p57.key = p58.key
-		p57.elementType = p58.elementType
-		p57.type = p58.type
-		p57.stateNode = p58.stateNode
-		p57.return_ = p58.return_
-		p57.child = p58.child
-		p57.sibling = p58.sibling
-		p57.index = p58.index
-		p57.ref = p58.ref
-		p57.pendingProps = p58.pendingProps
-		p57.memoizedProps = p58.memoizedProps
-		p57.updateQueue = p58.updateQueue
-		p57.memoizedState = p58.memoizedState
-		p57.dependencies = p58.dependencies
-		p57.mode = p58.mode
-		p57.flags = p58.flags
-		p57.subtreeFlags = p58.subtreeFlags
-		p57.deletions = p58.deletions
-		p57.lanes = p58.lanes
-		p57.childLanes = p58.childLanes
-		p57.alternate = p58.alternate
+	local alternate = state.alternate
+
+	if alternate == nil then
+		state.childLanes = NoLanes
+		state.lanes = lanes
+
+		state.child = nil
+		state.subtreeFlags = NoFlags
+		state.memoizedProps = nil
+		state.memoizedState = nil
+		state.updateQueue = nil
+
+		state.dependencies = nil
+
+		state.stateNode = nil
 
 		if enableProfilerTimer then
-			p57.actualDuration = p58.actualDuration
-			p57.actualStartTime = p58.actualStartTime
-			p57.selfBaseDuration = p58.selfBaseDuration
-			p57.treeBaseDuration = p58.treeBaseDuration
+			state.selfBaseDuration = 0
+			state.treeBaseDuration = 0
+			return state
+		end
+	else
+		state.childLanes = alternate.childLanes
+		state.lanes = alternate.lanes
+
+		state.child = alternate.child
+		state.subtreeFlags = alternate.subtreeFlags
+		state.deletions = nil
+		state.memoizedProps = alternate.memoizedProps
+		state.memoizedState = alternate.memoizedState
+		state.updateQueue = alternate.updateQueue
+
+		state.type = alternate.type
+
+		local dependencies = alternate.dependencies
+
+		if dependencies == nil then
+			state.dependencies = nil
+		else
+			state.dependencies = {
+				lanes = dependencies.lanes,
+				firstContext = dependencies.firstContext
+			}
 		end
 
-		p57._debugID = p58._debugID
-		p57._debugSource = p58._debugSource
-		p57._debugOwner = p58._debugOwner
-		p57._debugNeedsRemount = p58._debugNeedsRemount
-		p57._debugHookTypes = p58._debugHookTypes
-
-		return p57
+		if enableProfilerTimer then
+			state.selfBaseDuration = alternate.selfBaseDuration
+			state.treeBaseDuration = alternate.treeBaseDuration
+		end
 	end
-}
+
+	return state
+end
+
+function New.createHostRootFiber(p)
+	local v
+
+	if p == ConcurrentRoot then
+		v = bit32.bor(ConcurrentMode, BlockingMode, StrictMode)
+	elseif p == BlockingRoot then
+		v = bit32.bor(BlockingMode, StrictMode)
+	else
+		v = NoMode
+	end
+
+	if enableProfilerTimer and isDevToolsPresent() then
+		v = bit32.bor(v, ProfileMode)
+	end
+
+	return createFiber(HostRoot, nil, nil, v)
+end
+
+New.createFiberFromTypeAndProps = createFiberFromTypeAndProps
+
+function New.createFiberFromElement(data, p, p2)
+	local v
+
+	if __DEV__ then
+		v = data._owner
+	end
+
+	local fiberFromTypeAndProps = createFiberFromTypeAndProps(data.type, data.key, data.props, v, p, p2)
+
+	if __DEV__ then
+		fiberFromTypeAndProps._debugSource = data._source
+		fiberFromTypeAndProps._debugOwner = data._owner
+	end
+
+	return fiberFromTypeAndProps
+end
+
+New.createFiberFromFragment = createFiberFromFragment
+
+function New.createFiberFromFundamental(elementType, pendingProps, mode, p, p2: string?)
+	return createFiber(FundamentalComponent, pendingProps, p2, mode, elementType, elementType, nil, p)
+end
+
+New.createFiberFromSuspense = createFiberFromSuspense
+
+function New.createFiberFromSuspenseList(pendingProps, mode, p, p2: string?)
+	local v
+
+	if __DEV__ then
+		v = REACT_SUSPENSE_LIST_TYPE
+	end
+
+	return createFiber(SuspenseListComponent, pendingProps, p2, mode, REACT_SUSPENSE_LIST_TYPE, v, nil, p)
+end
+
+New.createFiberFromOffscreen = createFiberFromOffscreen
+New.createFiberFromLegacyHidden = createFiberFromLegacyHidden
+
+function New.createFiberFromText(pendingProps: string, mode, p)
+	return createFiber(HostText, pendingProps, nil, mode, nil, nil, nil, p)
+end
+
+function New.createFiberFromHostInstanceForDeletion()
+	return createFiber(HostComponent, nil, nil, NoMode, "DELETED", "DELETED")
+end
+
+function New.createFiberFromDehydratedFragment(p)
+	return createFiber(DehydratedFragment, nil, nil, NoMode, nil, nil, p)
+end
+
+function New.createFiberFromPortal(data, mode, p)
+	return createFiber(
+		HostPortal,
+		data.children == nil and {} or data.children,
+		data.key,
+		mode,
+		nil,
+		nil,
+		{
+			containerInfo = data.containerInfo,
+			pendingChildren = nil,
+			implementation = data.implementation
+		},
+		p
+	)
+end
+
+function New.assignFiberPropertiesInDEV(p, data)
+	if p == nil then
+		p = createFiber(IndeterminateComponent, nil, nil, NoMode)
+	end
+
+	p.tag = data.tag
+	p.key = data.key
+	p.elementType = data.elementType
+	p.type = data.type
+	p.stateNode = data.stateNode
+	p.return_ = data.return_
+	p.child = data.child
+	p.sibling = data.sibling
+	p.index = data.index
+	p.ref = data.ref
+	p.pendingProps = data.pendingProps
+	p.memoizedProps = data.memoizedProps
+	p.updateQueue = data.updateQueue
+	p.memoizedState = data.memoizedState
+	p.dependencies = data.dependencies
+	p.mode = data.mode
+	p.flags = data.flags
+	p.subtreeFlags = data.subtreeFlags
+	p.deletions = data.deletions
+	p.lanes = data.lanes
+	p.childLanes = data.childLanes
+	p.alternate = data.alternate
+
+	if enableProfilerTimer then
+		p.actualDuration = data.actualDuration
+		p.actualStartTime = data.actualStartTime
+		p.selfBaseDuration = data.selfBaseDuration
+		p.treeBaseDuration = data.treeBaseDuration
+	end
+
+	p._debugID = data._debugID
+	p._debugSource = data._debugSource
+	p._debugOwner = data._debugOwner
+	p._debugNeedsRemount = data._debugNeedsRemount
+	p._debugHookTypes = data._debugHookTypes
+	return p
+end
+
+return New

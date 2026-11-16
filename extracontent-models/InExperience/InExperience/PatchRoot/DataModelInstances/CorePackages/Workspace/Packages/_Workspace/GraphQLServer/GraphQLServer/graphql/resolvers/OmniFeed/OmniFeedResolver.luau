@@ -1,118 +1,144 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local Array = require(Parent.LuauPolyfill).Array
-local t1 = {}
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+
 local OmniFeedConnector = require(script.Parent.Parent.Parent.connectors.OmniFeed.OmniFeedConnector)
+
 local findOmniFeedBySessionId = OmniFeedConnector.findOmniFeedBySessionId
 local fetchMoreOmniRecommendationMetadata = OmniFeedConnector.fetchMoreOmniRecommendationMetadata
 
 require(script.Parent.Parent.Parent.generatedTypes)
-t1.default = {
-	OmniFeedItem = {
-		experiences = function(t2: {[any]: any}) -- line: 35
-			if not t2.metadata or (not t2.metadata.Game or not t2.recommendations) then
-				return nil
-			end
-
-			local Game = t2.metadata.Game
-			local t3 = {}
-
-			for _, v11 in t2.recommendations do
-				if v11.contentId then
-					local v12 = Game[tostring(v11.contentId)]
-					local contentMetadata = v11.contentMetadata
-					local v14 = if not contentMetadata or not contentMetadata.EncryptedAdTrackingData then nil else contentMetadata.EncryptedAdTrackingData
-
-					if v12 and v12.universeId then
-						table.insert(t3, {
-							placeId = if not v12.rootPlaceId then nil else tostring(v12.rootPlaceId),
-							name = v12.name,
-							universeId = tostring(v12.universeId),
-							totalUpVotes = v12.totalUpVotes,
-							totalDownVotes = v12.totalDownVotes,
-							playerCount = v12.playerCount,
-							under9 = not not v12.under9 and v12.under9,
-							under13 = not not v12.under13 and v12.under13,
-							adId = v14 or "",
-							isSponsored = v14 ~= nil and v14 ~= ""
-						})
-					end
+return {
+	default = {
+		OmniFeedItem = {
+			experiences = function(p)
+				if not (p.metadata and p.metadata.Game and p.recommendations) then
+					return nil
 				end
-			end
 
-			return t3
-		end
-	},
-	OmniFeedMetadata = {
-		GameJSON = function(p1) -- line: 73
-			return p1.Game
-		end,
-		CatalogAssetJSON = function(p2) -- line: 76
-			return p2.CatalogAsset
-		end,
-		CatalogBundleJSON = function(p3) -- line: 79
-			return p3.CatalogBundle
-		end,
-		RecommendedFriendJSON = function(p4) -- line: 82
-			return p4.RecommendedFriend
-		end
-	},
-	OmniFeed = {
-		metadata = function(p5) -- line: 87
-			return p5.contentMetadata
-		end,
-		sortsExpirationTime = function(p6) -- line: 90
-			if not p6.sortsRefreshInterval then
+				local Game = p.metadata.Game
+				local result = {}
+
+				for _, recommendation in p.recommendations do
+					if not recommendation.contentId then
+						continue
+					end
+
+					local v = Game[tostring(recommendation.contentId)]
+					local contentMetadata = recommendation.contentMetadata
+					local encryptedAdTrackingData
+
+					if contentMetadata and contentMetadata.EncryptedAdTrackingData then
+						encryptedAdTrackingData = contentMetadata.EncryptedAdTrackingData
+					end
+
+					if not (v and v.universeId) then
+						continue
+					end
+
+					local placeId
+
+					if v.rootPlaceId then
+						placeId = tostring(v.rootPlaceId)
+					end
+
+					local v2 = {
+						placeId = placeId,
+						name = v.name,
+						universeId = tostring(v.universeId),
+						totalUpVotes = v.totalUpVotes,
+						totalDownVotes = v.totalDownVotes,
+						playerCount = v.playerCount,
+						under9 = 0,
+						under13 = 0,
+						adId = 0,
+						isSponsored = 0
+					}
+					local under = if v.under9 then v.under9 else false
+					v2.under9 = under
+					local under2
+
+					if v.under13 then
+						under2 = v.under13
+					else
+						under2 = false
+					end
+
+					v2.under13 = under2
+					v2.adId = encryptedAdTrackingData or ""
+					v2.isSponsored = encryptedAdTrackingData ~= nil and encryptedAdTrackingData ~= ""
+					table.insert(result, v2)
+				end
+
+				return result
+			end
+		},
+		OmniFeedMetadata = {
+			GameJSON = function(p)
+				return p.Game
+			end,
+			CatalogAssetJSON = function(p)
+				return p.CatalogAsset
+			end,
+			CatalogBundleJSON = function(p)
+				return p.CatalogBundle
+			end,
+			RecommendedFriendJSON = function(p)
+				return p.RecommendedFriend
+			end
+		},
+		OmniFeed = {
+			metadata = function(p)
+				return p.contentMetadata
+			end,
+			sortsExpirationTime = function(p)
+				if p.sortsRefreshInterval then
+					return math.floor((tick())) + p.sortsRefreshInterval
+				end
+
+				return nil
+			end,
+			recommendationsId = function(p)
+				return p.requestId
+			end,
+			globalLayoutData = function(p)
+				return p.globalLayoutData
+			end,
+			sorts = function(p)
+				if p.sorts then
+					return (Array.map(p.sorts, function(data)
+						return {
+							topic = data.topic,
+							topicId = data.topicId,
+							treatmentType = data.treatmentType,
+							recommendations = data.recommendationList,
+							metadata = p.contentMetadata
+						}
+					end))
+				end
+
 				return nil
 			end
-
-			return math.floor((tick())) + p6.sortsRefreshInterval
-		end,
-		recommendationsId = function(p7) -- line: 96
-			return p7.requestId
-		end,
-		globalLayoutData = function(p8) -- line: 99
-			return p8.globalLayoutData
-		end,
-		sorts = function(p9) -- line: 102
-			-- upvalues: Array (copy)
-			if not p9.sorts then
-				return nil
-			end
-
-			return (Array.map(p9.sorts, function(p10) -- line: 107
-				-- upvalues: p9 (copy)
+		},
+		OmniFeedItemWithMetadata = {
+			metadata = function(p)
+				return p.contentMetadata
+			end,
+			sort = function(data)
 				return {
-					topic = p10.topic,
-					topicId = p10.topicId,
-					treatmentType = p10.treatmentType,
-					recommendations = p10.recommendationList,
-					metadata = p9.contentMetadata
+					topicId = data.topicId,
+					metadata = data.contentMetadata,
+					recommendations = data.recommendations
 				}
-			end))
-		end
-	},
-	OmniFeedItemWithMetadata = {
-		metadata = function(p11) -- line: 121
-			return p11.contentMetadata
-		end,
-		sort = function(p12) -- line: 124
-			return {
-				topicId = p12.topicId,
-				metadata = p12.contentMetadata,
-				recommendations = p12.recommendations
-			}
-		end
-	},
-	Query = {
-		omniFeed = function(_, p14, p15) -- line: 135
-			-- upvalues: findOmniFeedBySessionId (copy)
-			return findOmniFeedBySessionId(p14, p15.fetchImpl)
-		end,
-		refreshOmniFeedItem = function(_, p17, p18) -- line: 138
-			-- upvalues: fetchMoreOmniRecommendationMetadata (copy)
-			return fetchMoreOmniRecommendationMetadata(p17, p18.fetchImpl)
-		end
+			end
+		},
+		Query = {
+			omniFeed = function(_, p, p2)
+				return findOmniFeedBySessionId(p, p2.fetchImpl)
+			end,
+			refreshOmniFeedItem = function(_, p, p2)
+				return fetchMoreOmniRecommendationMetadata(p, p2.fetchImpl)
+			end
+		}
 	}
 }
-
-return t1

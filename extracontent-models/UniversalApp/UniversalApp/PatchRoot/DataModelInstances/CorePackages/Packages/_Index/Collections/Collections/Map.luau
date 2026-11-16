@@ -1,13 +1,9 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.ES7Types)
-
-local Map = require(script.Map)
-local coerceToMap = require(script.coerceToMap)
-local coerceToTable = require(script.coerceToTable)
+require(parent.ES7Types)
 
 return {
-	Map = Map,
-	coerceToMap = coerceToMap,
-	coerceToTable = coerceToTable
+	Map = require(script.Map),
+	coerceToMap = require(script.coerceToMap),
+	coerceToTable = require(script.coerceToTable)
 }

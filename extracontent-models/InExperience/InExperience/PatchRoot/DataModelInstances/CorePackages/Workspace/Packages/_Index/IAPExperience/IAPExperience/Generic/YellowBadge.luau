@@ -1,35 +1,41 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
-local FoundationText = Foundation.Text
+local parent = script.Parent.Parent.Parent
+
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local View = Foundation.View
-local FoundationImage = Foundation.Image
+local Image = Foundation.Image
 local useTokens = Foundation.Hooks.useTokens
 
-return function(t1: {[any]: any}) -- line: 19
-	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationImage (copy), FoundationText (copy)
-	local Emphasis = useTokens().LightMode.Content.Emphasis
-	local color3 = Color3.fromRGB(239, 215, 140)
+return function(props)
+	local emphasis = useTokens().LightMode.Content.Emphasis
+	local color = Color3.fromRGB(239, 215, 140)
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v = {
+		LayoutOrder = props.LayoutOrder,
 		tag = "radius-circle padding-small row gap-xsmall align-y-center align-x-center auto-xy",
-		LayoutOrder = t1.LayoutOrder,
-		backgroundStyle = {
-			Transparency = 0,
-			Color3 = color3
-		}
-	}, {
-		Icon = if not t1.Icon then nil else React.createElement(FoundationImage, {
+		backgroundStyle = { Color3 = color, Transparency = 0 }
+	}
+	local icon
+
+	if props.Icon then
+		icon = React.createElement(Image, {
 			LayoutOrder = 1,
-			tag = "size-300",
-			Image = t1.Icon,
-			imageStyle = Emphasis
-		}),
-		Text = React.createElement(FoundationText, {
+			Image = props.Icon,
+			imageStyle = emphasis,
+			tag = "size-300"
+		})
+	end
+
+	return createElement(View, v, {
+		Icon = icon,
+		Text = React.createElement(Text, {
 			LayoutOrder = 2,
-			tag = "text-caption-small content-emphasis text-align-x-center auto-xy",
-			Text = t1.Text,
-			textStyle = Emphasis
+			Text = props.Text,
+			textStyle = emphasis,
+			tag = "text-caption-small content-emphasis text-align-x-center auto-xy"
 		})
 	})
 end

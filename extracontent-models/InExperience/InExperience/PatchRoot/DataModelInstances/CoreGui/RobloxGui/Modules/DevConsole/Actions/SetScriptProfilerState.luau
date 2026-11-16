@@ -1,10 +1,15 @@
-return require(script.Parent.Parent.Action)(script.Name, function(p1, p2, p3, p4, p5, p6) -- line: 6
-	return {
-		isClientView = p1,
-		usePercentages = p2,
-		clientSessionState = p3,
-		serverSessionState = p4,
-		isExporting = p5,
-		isShowingMobileSettings = p6
-	}
-end)
+local Action = require(script.Parent.Parent.Action)
+
+return Action(
+	script.Name,
+	function(isClientView, usePercentages, clientSessionState, serverSessionState, isExporting, isShowingMobileSettings)
+		return {
+			isClientView = isClientView,
+			usePercentages = usePercentages,
+			clientSessionState = clientSessionState,
+			serverSessionState = serverSessionState,
+			isExporting = isExporting,
+			isShowingMobileSettings = isShowingMobileSettings
+		}
+	end
+)

@@ -1,10 +1,10 @@
 local MomentsCreationFlow = script:FindFirstAncestor("MomentsCreationFlow")
-local MomentsCreationFlowParent = MomentsCreationFlow.Parent
-local Cryo = require(MomentsCreationFlowParent.Cryo)
+local parent = MomentsCreationFlow.Parent
 
-require(MomentsCreationFlowParent.MomentsCommon)
+local Cryo = require(parent.Cryo)
+require(parent.MomentsCommon)
+local Rodux = require(parent.Rodux)
 
-local Rodux = require(MomentsCreationFlowParent.Rodux)
 local ClearEdits = require(MomentsCreationFlow.Actions.ClearEdits)
 local CreationFlowState = require(MomentsCreationFlow.Enums.CreationFlowState)
 local CreationFlowStateUpdated = require(MomentsCreationFlow.Actions.CreationFlowStateUpdated)
@@ -14,70 +14,50 @@ local MusicSearchRetrieved = require(MomentsCreationFlow.Actions.MusicSearchRetr
 local SelectedCaptureUpdated = require(MomentsCreationFlow.Actions.SelectedCaptureUpdated)
 local TextOverlayEditsUpdated = require(MomentsCreationFlow.Actions.TextOverlayEditsUpdated)
 local TrimEditUpdated = require(MomentsCreationFlow.Actions.TrimEditUpdated)
-local t1 = {
+
+local v = {
 	active = false,
 	capture = nil,
+	currentState = CreationFlowState.Gallery,
 	description = "",
+	musicList = {},
 	musicEdit = nil,
 	textOverlayEdits = nil,
-	trimEdit = nil,
-	currentState = CreationFlowState.Gallery,
-	musicList = {}
+	trimEdit = nil
 }
 
-return Rodux.createReducer(t1, {
-	[CreationFlowStateUpdated.name] = function(t2: {[any]: any}, p1) -- line: 45
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t2, {
-			currentState = p1.currentState
-		})
+return Rodux.createReducer(v, {
+	[CreationFlowStateUpdated.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, { currentState = p2.currentState })
 	end,
-	[MusicSearchRetrieved.name] = function(t3: {[any]: any}, p2) -- line: 51
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t3, {
-			musicList = p2.musics
-		})
+	[MusicSearchRetrieved.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, { musicList = p2.musics })
 	end,
-	[SelectedCaptureUpdated.name] = function(t4: {[any]: any}, p3) -- line: 57
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t4, {
-			capture = p3.capture
-		})
+	[SelectedCaptureUpdated.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, { capture = p2.capture })
 	end,
-	[TextOverlayEditsUpdated.name] = function(t5: {[any]: any}, p4) -- line: 63
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t5, {
-			textOverlayEdits = p4.textOverlayEdits
-		})
+	[TextOverlayEditsUpdated.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, { textOverlayEdits = p2.textOverlayEdits })
 	end,
-	[TrimEditUpdated.name] = function(t6: {[any]: any}, p5) -- line: 69
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t6, {
-			trimEdit = p5.trimEdit
-		})
+	[TrimEditUpdated.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, { trimEdit = p2.trimEdit })
 	end,
-	[MusicEditUpdated.name] = function(t7: {[any]: any}, p6) -- line: 75
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t7, {
-			musicEdit = p6.musicEdit
-		})
+	[MusicEditUpdated.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, { musicEdit = p2.musicEdit })
 	end,
-	[DescriptionUpdated.name] = function(t8: {[any]: any}, p7) -- line: 81
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t8, {
-			description = p7.description
-		})
+	[DescriptionUpdated.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, { description = p2.description })
 	end,
-	[ClearEdits.name] = function(_: {[any]: any}, p8) -- line: 87
+	[ClearEdits.name] = function(_, p)
 		return {
 			active = true,
 			capture = nil,
+			currentState = p.newState,
 			description = "",
+			musicList = {},
 			musicEdit = nil,
 			textOverlayEdits = nil,
-			trimEdit = nil,
-			currentState = p8.newState,
-			musicList = {}
+			trimEdit = nil
 		}
 	end
 })

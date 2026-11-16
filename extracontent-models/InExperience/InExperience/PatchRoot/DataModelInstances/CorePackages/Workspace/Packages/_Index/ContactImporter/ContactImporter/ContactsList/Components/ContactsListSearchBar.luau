@@ -1,1 +1,3 @@
-return (require(script.ContactsListSearchBar))
+local ContactsListSearchBar = require(script.ContactsListSearchBar)
+
+return ContactsListSearchBar

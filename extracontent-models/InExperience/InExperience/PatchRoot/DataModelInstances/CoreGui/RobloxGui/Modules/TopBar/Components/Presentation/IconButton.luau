@@ -1,42 +1,52 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
-
 game:GetService("GuiService")
 
 local Signals = require(CorePackages.Packages.Signals)
 local Display = require(CorePackages.Workspace.Packages.Display)
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagAddUILessMode = SharedFlags.FFlagAddUILessMode
 local FIntAddUILessModeVariant = SharedFlags.FIntAddUILessModeVariant
+
 local Roact = require(CorePackages.Packages.Roact)
 local React = require(CorePackages.Packages.React)
+
 local t = require(CorePackages.Packages.t)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Cryo = require(CorePackages.Packages.Cryo)
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local withStyle = UIBlox.Core.Style.withStyle
 local Interactable = UIBlox.Core.Control.Interactable
 local ControlState = UIBlox.Core.Control.Enum.ControlState
 local Images = UIBlox.App.ImageSet.Images
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
-local _ = UIBlox.App.SelectionImage.CursorKind
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local ReactOtter = require(CorePackages.Packages.ReactOtter)
+
 local Foundation = require(CorePackages.Packages.Foundation)
 local withCursor = Foundation.Hooks.withCursor
 local SkinToneCircle = Foundation.Enums.CursorType.SkinToneCircle
-local _ = script.Parent.Parent.Parent
+
+local parent = script.Parent.Parent.Parent
+
 local FlashingDot = require(script.Parent.FlashingDot)
 local FlashingDotV2 = require(script.Parent.FlashingDotV2)
 local GetFFlagFlashingDotUseAsyncInit = require(CoreGui.RobloxGui.Modules.Flags.GetFFlagFlashingDotUseAsyncInit)
-local v29 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local enabled = Chrome.Enabled()
 local isNewTiltIconEnabled = require(CoreGui.RobloxGui.Modules.isNewTiltIconEnabled)
 local Constants = require(script.Parent.Parent.Parent.Constants)
-local v32 = Roact.PureComponent:extend("IconButton")
-local v33 = Images["component_assets/circle_17"]
 
-v32.validateProps = t.strictInterface({
-	icon = t.union(t.string, t.table),
+local extended = Roact.PureComponent:extend("IconButton")
+
+local component_assetscircle_17 = Images["component_assets/circle_17"]
+
+local strictInterface = t.strictInterface
+local v = {
+	["icon"] = t.union(t.string, t.table),
 	iconSize = t.union(t.number, t.UDim2, t.table),
 	enableFlashingDot = t.optional(t.boolean),
 	useIconScaleAnimation = t.optional(t.boolean),
@@ -46,182 +56,276 @@ v32.validateProps = t.strictInterface({
 	backgroundTransparency = t.optional(t.number),
 	backgroundColor3 = t.optional(t.Color3),
 	backgroundCornerRadius = t.optional(t.UDim),
-	forwardRef = t.optional(t.any),
-	onSelectionChanged = if not v29 or not FFlagEnableConsoleExpControls then nil else t.optional(t.callback),
-	nextSelectionRightRef = if not v29 or not FFlagEnableConsoleExpControls then nil else t.optional(t.any),
-	modal = if not FFlagAddUILessMode or FIntAddUILessModeVariant ~= 2 then nil else t.optional(t.boolean),
-	[Roact.Change.AbsoluteSize] = t.optional(t.callback),
-	[Roact.Change.AbsolutePosition] = t.optional(t.callback)
-})
+	forwardRef = t.optional(t.any)
+}
+local onSelectionChanged
 
-function AnimatedScaleIcon(p1) -- line: 65
-	-- upvalues: ReactOtter (copy), React (copy), Roact (copy), ImageSetLabel (copy)
-	local v35, v36 = ReactOtter.useAnimatedBinding(p1.iconSize)
+if enabled and FFlagEnableConsoleExpControls then
+	onSelectionChanged = t.optional(t.callback)
+end
 
-	React.useEffect(function() -- line: 68
-		-- upvalues: v36 (copy), ReactOtter (copy), p1 (copy)
-		v36(ReactOtter.spring(p1.iconSize, {
+v.onSelectionChanged = onSelectionChanged
+local nextSelectionRightRef
+
+if enabled and FFlagEnableConsoleExpControls then
+	nextSelectionRightRef = t.optional(t.any)
+end
+
+v.nextSelectionRightRef = nextSelectionRightRef
+local modal
+
+if FFlagAddUILessMode and FIntAddUILessModeVariant == 2 then
+	modal = t.optional(t.boolean)
+end
+
+v.modal = modal
+v[Roact.Change.AbsoluteSize] = t.optional(t.callback)
+v[Roact.Change.AbsolutePosition] = t.optional(t.callback)
+extended.validateProps = strictInterface(v)
+
+function AnimatedScaleIcon(props)
+	local v2, v3 = ReactOtter.useAnimatedBinding(props.iconSize)
+
+	React.useEffect(function()
+		v3(ReactOtter.spring(props.iconSize, {
 			dampingRatio = 1,
-			frequency = 2.857142857142857
+			frequency = 20 / 7
 		}))
 
-		return function() -- line: 73
-		end
-	end, { p1.iconSize })
+		return function() end
+	end, { props.iconSize })
 
 	return Roact.createElement(ImageSetLabel, {
-		BackgroundTransparency = 1,
-		ZIndex = 1,
-		Size = v35:map(function(p2) -- line: 77
-			return UDim2.fromOffset(p2, p2)
+		Size = v2:map(function(p)
+			return UDim2.fromOffset(p, p)
 		end),
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Image = p1.icon,
-		ImageColor3 = p1.style.Theme.IconEmphasis.Color,
-		ImageTransparency = p1.style.Theme.IconEmphasis.Transparency
+		BackgroundTransparency = 1,
+		Image = props.icon,
+		ImageColor3 = props.style.Theme.IconEmphasis.Color,
+		ImageTransparency = props.style.Theme.IconEmphasis.Transparency,
+		ZIndex = 1
 	})
 end
-function v32.init(p3) -- line: 90
-	-- upvalues: ControlState (copy), Signals (copy), Display (copy)
-	p3:setState({
-		controlState = ControlState.Default
-	})
 
-	function p3.controlStateUpdated(p4, p5) -- line: 95
-		-- upvalues: p3 (copy), ControlState (copy)
-		if p3.props.onHover and p5 == ControlState.Hover then
-			p3.props.onHover()
-		elseif p3.props.onHoverEnd and p4 == ControlState.Hover and p5 ~= ControlState.Hover then
-			p3.props.onHoverEnd()
+function extended:init()
+	self:setState({ controlState = ControlState.Default })
+
+	function self.controlStateUpdated(p, controlState)
+		if self.props.onHover and controlState == ControlState.Hover then
+			self.props.onHover()
+		elseif self.props.onHoverEnd and p == ControlState.Hover and controlState ~= ControlState.Hover then
+			self.props.onHoverEnd()
 		end
 
-		p3:setState({
-			controlState = p5
-		})
+		self:setState({ controlState = controlState })
 	end
-
-	p3.disposeUiScaleEffect = Signals.createEffect(function(p6) -- line: 109
-		-- upvalues: Display (copy), p3 (copy)
-		local v50 = Display.GetDisplayStore(p6)
-
-		p3:setState({
-			UiScale = v50.getUIScale(p6)
+	self.disposeUiScaleEffect = Signals.createEffect(function(p)
+		self:setState({
+			UiScale = Display.GetDisplayStore(p).getUIScale(p)
 		})
 	end)
 end
-function v32.render(p7) -- line: 117
-	-- upvalues: v29 (copy), withCursor (copy), withSelectionCursorProvider (copy)
-	if v29 then
-		return withCursor(function(p8) -- line: 119
-			-- upvalues: p7 (copy)
-			return p7:renderWithCursor(p8)
+
+function extended:render()
+	if enabled then
+		return withCursor(function(p)
+			return self:renderWithCursor(p)
 		end)
 	end
 
-	return withSelectionCursorProvider(function(p9) -- line: 123
-		-- upvalues: p7 (copy)
-		return p7:renderWithCursor(p9)
+	return withSelectionCursorProvider(function(p)
+		return self:renderWithCursor(p)
 	end)
 end
-function v32.renderWithCursor(p10, p11) -- line: 129
-	-- upvalues: isNewTiltIconEnabled (copy), Constants (copy), withStyle (copy), ControlState (copy), Roact (copy), Interactable (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), SkinToneCircle (copy), v29 (copy), FFlagEnableConsoleExpControls (copy), ImageSetLabel (copy), GetFFlagFlashingDotUseAsyncInit (copy), FlashingDotV2 (copy), FlashingDot (copy), v33 (copy)
-	local v41 = not isNewTiltIconEnabled() and p10.props.backgroundColor3
-	local v42 = Constants.TopBarButtonHeight * p10.state.UiScale
 
-	return withStyle(function(p12) -- line: 132
-		-- upvalues: p10 (copy), ControlState (copy), Roact (copy), Interactable (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), isNewTiltIconEnabled (copy), v42 (copy), p11 (copy), SkinToneCircle (copy), v29 (copy), FFlagEnableConsoleExpControls (copy), v41 (copy), ImageSetLabel (copy), GetFFlagFlashingDotUseAsyncInit (copy), FlashingDotV2 (copy), FlashingDot (copy), v33 (copy)
-		local t1 = {
-			Transparency = 1,
-			Color = Color3.new(1, 1, 1)
-		}
+function extended:renderWithCursor(p)
+	local backgroundColor3 = not isNewTiltIconEnabled() and self.props.backgroundColor3
+	local v2 = Constants.TopBarButtonHeight * self.state.UiScale
+	return withStyle(function(style)
+		local v3 = { Color = Color3.new(1, 1, 1), Transparency = 1 }
 
-		if p10.state.controlState == ControlState.Pressed then
-			t1 = p12.Theme.BackgroundOnPress
-		elseif p10.state.controlState == ControlState.Hover then
-			t1 = p12.Theme.BackgroundOnHover
+		if self.state.controlState == ControlState.Pressed then
+			v3 = style.Theme.BackgroundOnPress
+		elseif self.state.controlState == ControlState.Hover then
+			v3 = style.Theme.BackgroundOnHover
 		end
 
-		return Roact.createElement(Interactable, {
-			onStateChanged = p10.controlStateUpdated,
-			ZIndex = 1,
-			Modal = if not FFlagAddUILessMode or FIntAddUILessModeVariant ~= 2 then nil else p10.props.modal,
-			BackgroundTransparency = not isNewTiltIconEnabled() and 1 or p12.Theme.BackgroundUIContrast.Transparency * p12.Settings.PreferredTransparency,
-			Position = UDim2.fromScale(0, not isNewTiltIconEnabled() and 1 or 0.5),
-			AnchorPoint = Vector2.new(0, not isNewTiltIconEnabled() and 1 or 0.5),
-			Size = UDim2.fromOffset(v42, v42),
-			Image = if isNewTiltIconEnabled() then nil else "rbxasset://textures/ui/TopBar/iconBase.png",
-			BackgroundColor3 = p12.Theme.BackgroundUIContrast.Color,
-			SelectionImageObject = if not isNewTiltIconEnabled() then nil else p11.getCursor(SkinToneCircle),
-			NextSelectionRight = if not v29 or not FFlagEnableConsoleExpControls then nil else p10.props.nextSelectionRightRef,
-			[Roact.Event.Activated] = p10.props.onActivated,
-			[Roact.Event.SelectionChanged] = if not v29 or not FFlagEnableConsoleExpControls then nil else p10.props.onSelectionChanged,
-			[Roact.Ref] = p10.props.forwardRef
-		}, {
+		local createElement = Roact.createElement
+		local v4 = {}
+		v4.onStateChanged = self.controlStateUpdated
+		v4.ZIndex = 1
+		local modal2
+
+		if FFlagAddUILessMode and FIntAddUILessModeVariant == 2 then
+			modal2 = self.props.modal
+		end
+
+		v4.Modal = modal2
+		v4.BackgroundTransparency = not isNewTiltIconEnabled() and 1
+			or style.Theme.BackgroundUIContrast.Transparency * style.Settings.PreferredTransparency
+
+		v4.Position = UDim2.fromScale(0, isNewTiltIconEnabled() and 0.5 or 1)
+		v4.AnchorPoint = Vector2.new(0, isNewTiltIconEnabled() and 0.5 or 1)
+		v4.Size = UDim2.fromOffset(v2, v2)
+		v4.Image = not isNewTiltIconEnabled() and "rbxasset://textures/ui/TopBar/iconBase.png" or nil
+		v4.BackgroundColor3 = style.Theme.BackgroundUIContrast.Color
+		local selectionImageObject
+
+		if isNewTiltIconEnabled() then
+			selectionImageObject = p.getCursor(SkinToneCircle)
+		end
+
+		v4.SelectionImageObject = selectionImageObject
+		local nextSelectionRight
+
+		if enabled and FFlagEnableConsoleExpControls then
+			nextSelectionRight = self.props.nextSelectionRightRef
+		end
+
+		v4.NextSelectionRight = nextSelectionRight
+		v4[Roact.Event.Activated] = self.props.onActivated
+		local selectionChanged = Roact.Event.SelectionChanged
+		local v5
+
+		if enabled and FFlagEnableConsoleExpControls then
+			v5 = self.props.onSelectionChanged
+		end
+
+		v4[selectionChanged] = v5
+		v4[Roact.Ref] = self.props.forwardRef
+		local v6 = {
 			UICorner = isNewTiltIconEnabled() and Roact.createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
 			}) or nil,
-			BackgroundFrame = if not v41 then nil else Roact.createElement("Frame", {
+			BackgroundFrame = 0,
+			Icon = 0,
+			ScalingIcon = 0,
+			FlashingDot = 0,
+			StateOverlayRound = 0,
+			StateOverlay = 0
+		}
+		local backgroundFrame
+
+		if backgroundColor3 then
+			local createElement2 = Roact.createElement
+			local v7 = {
+				Size = self.props.iconSize,
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5),
 				BorderSizePixel = 0,
-				ZIndex = 0,
-				Size = p10.props.iconSize,
-				Position = UDim2.fromScale(0.5, 0.5),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				BackgroundTransparency = p10.props.backgroundTransparency,
-				BackgroundColor3 = p10.props.backgroundColor3
-			}, {
-				UICorner = if not p10.props.backgroundCornerRadius then nil else Roact.createElement("UICorner", {
-					CornerRadius = p10.props.backgroundCornerRadius
+				BackgroundTransparency = self.props.backgroundTransparency,
+				BackgroundColor3 = self.props.backgroundColor3,
+				ZIndex = 0
+			}
+			local uiCorner
+
+			if self.props.backgroundCornerRadius then
+				uiCorner = Roact.createElement("UICorner", {
+					CornerRadius = self.props.backgroundCornerRadius
 				})
-			}),
-			Icon = not p10.props.useIconScaleAnimation and Roact.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
-				ZIndex = 1,
-				Size = if typeof(p10.props.iconSize) == "number" then UDim2.fromOffset(p10.props.iconSize, p10.props.iconSize) else p10.props.iconSize,
+			end
+
+			backgroundFrame = createElement2("Frame", v7, { UICorner = uiCorner })
+		end
+
+		v6.BackgroundFrame = backgroundFrame
+
+		local icon = not self.props.useIconScaleAnimation
+
+		if icon then
+			local createElement2 = Roact.createElement
+			local size
+
+			if typeof(self.props.iconSize) == "number" then
+				size = UDim2.fromOffset(self.props.iconSize, self.props.iconSize)
+			else
+				size = self.props.iconSize
+			end
+
+			icon = createElement2(ImageSetLabel, {
+				Size = size,
 				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Image = p10.props.icon,
-				ImageColor3 = p12.Theme.IconEmphasis.Color,
-				ImageTransparency = p12.Theme.IconEmphasis.Transparency
-			}),
-			ScalingIcon = p10.props.useIconScaleAnimation and Roact.createElement(AnimatedScaleIcon, {
-				icon = p10.props.icon,
-				iconSize = p10.props.iconSize,
-				style = p12
-			}),
-			FlashingDot = if not p10.props.enableFlashingDot then nil else Roact.createElement(if not GetFFlagFlashingDotUseAsyncInit() then FlashingDot else FlashingDotV2),
-			StateOverlayRound = isNewTiltIconEnabled() and Roact.createElement("Frame", {
-				ZIndex = 2,
-				BackgroundTransparency = t1.Transparency,
-				BackgroundColor3 = t1.Color,
-				Size = UDim2.fromScale(1, 1)
-			}, {
-				UICorner = isNewTiltIconEnabled() and Roact.createElement("UICorner", {
-					CornerRadius = UDim.new(1, 0)
-				}) or nil
-			}) or nil,
-			StateOverlay = not isNewTiltIconEnabled() and Roact.createElement(ImageSetLabel, {
 				BackgroundTransparency = 1,
-				ZIndex = 2,
-				Image = v33,
+				Image = self.props.icon,
+				ImageColor3 = style.Theme.IconEmphasis.Color,
+				ImageTransparency = style.Theme.IconEmphasis.Transparency,
+				ZIndex = 1
+			})
+		end
+
+		v6.Icon = icon
+
+		v6.ScalingIcon = self.props.useIconScaleAnimation
+			and Roact.createElement(AnimatedScaleIcon, {
+				icon = self.props.icon,
+				iconSize = self.props.iconSize,
+				style = style
+			})
+		local flashingDot
+
+		if self.props.enableFlashingDot then
+			local createElement2 = Roact.createElement
+			local v7
+
+			if GetFFlagFlashingDotUseAsyncInit() then
+				v7 = FlashingDotV2
+			else
+				v7 = FlashingDot
+			end
+
+			flashingDot = createElement2(v7)
+		end
+
+		v6.FlashingDot = flashingDot
+		local stateOverlayRound
+
+		if isNewTiltIconEnabled() then
+			stateOverlayRound = Roact.createElement(
+					"Frame",
+					{
+						BackgroundTransparency = v3.Transparency,
+						BackgroundColor3 = v3.Color,
+						Size = UDim2.fromScale(1, 1),
+						ZIndex = 2
+					},
+					{
+						UICorner = isNewTiltIconEnabled() and Roact.createElement("UICorner", {
+							CornerRadius = UDim.new(1, 0)
+						}) or nil
+					}
+				)
+				or nil
+		end
+
+		v6.StateOverlayRound = stateOverlayRound
+		local stateOverlay
+
+		if not isNewTiltIconEnabled() then
+			stateOverlay = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = component_assetscircle_17,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(8, 8, 8, 8),
-				ImageColor3 = t1.Color,
-				ImageTransparency = t1.Transparency,
-				Size = UDim2.fromScale(1, 1)
+				ImageColor3 = v3.Color,
+				ImageTransparency = v3.Transparency,
+				Size = UDim2.fromScale(1, 1),
+				ZIndex = 2
 			}) or nil
-		})
+		end
+
+		v6.StateOverlay = stateOverlay
+		return createElement(Interactable, v4, v6)
 	end)
 end
-function v32.willUnmount(p13) -- line: 236
-	if p13.disposeUiScaleEffect then
-		p13.disposeUiScaleEffect()
+
+function extended.willUnmount(p)
+	if p.disposeUiScaleEffect then
+		p.disposeUiScaleEffect()
 	end
 end
-
-return Roact.forwardRef(function(p14, p15) -- line: 241
-	-- upvalues: Roact (copy), v32 (copy), Cryo (copy)
-	return Roact.createElement(v32, Cryo.Dictionary.join(p14, {
-		forwardRef = p15
-	}))
+return Roact.forwardRef(function(p, forwardRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { forwardRef = forwardRef }))
 end)

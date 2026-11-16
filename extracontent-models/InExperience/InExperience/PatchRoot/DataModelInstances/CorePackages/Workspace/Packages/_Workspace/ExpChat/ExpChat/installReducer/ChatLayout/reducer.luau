@@ -1,11 +1,9 @@
-local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Rodux = require(ExpChatParent.Rodux)
-local getFFlagExpChatEnableChannelTabsUI = require(ExpChat.Flags.getFFlagExpChatEnableChannelTabsUI)
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
 
 return Rodux.combineReducers({
 	Alignment = require(script.Parent.alignment),
 	ChatWindowSettings = require(script.Parent.windowSettings),
 	ChatInputBarSettings = require(script.Parent.inputBarSettings),
-	ChannelTabsSettings = getFFlagExpChatEnableChannelTabsUI() and require(script.Parent.channelTabsSettings) or nil
+	ChannelTabsSettings = require(script.Parent.channelTabsSettings)
 })

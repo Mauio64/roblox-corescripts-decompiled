@@ -1,138 +1,207 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local View = require(UserListParent.Foundation).View
-local FlatList = require(UserListParent.VirtualizedList).FlatList
+local parent = UserList.Parent
 
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local VirtualizedList = require(parent.VirtualizedList)
+local FlatList = VirtualizedList.FlatList
 require(UserList.Common.Types)
-
 local Enums = require(UserList.Common.Enums)
+
 local useEntities = require(UserList.Hooks.useEntities)
 local useEntitySelectionHandler = require(UserList.Hooks.useEntitySelectionHandler)
 local useRenderEntity = require(UserList.Hooks.useRenderEntity)
-local FFlagUserListCtaIntegrationEnabled = require(UserListParent.SharedFlags).FFlagUserListCtaIntegrationEnabled
-local v11 = if not FFlagUserListCtaIntegrationEnabled then nil else require(UserList.Cta)
-local t1 = {
-	BackgroundTransparency = 1,
-	ScrollBarThickness = 0,
-	BorderSizePixel = 0
-}
-local t2 = {
-	BackgroundTransparency = 1
-}
 
-local function keyExtractor(p1, _) -- line: 58
-	return p1
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUserListComposeRenderRowWithCta = SharedFlags2.FFlagUserListComposeRenderRowWithCta
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagUserListSurfaceExtensions = SharedFlags3.FFlagUserListSurfaceExtensions
+local FFlagUserListRowSelectionOriginSource = require(UserList.Flags.FFlagUserListRowSelectionOriginSource)
+local FFlagUserListDisableVirtualizationConfig = require(UserList.Flags.FFlagUserListDisableVirtualizationConfig)
+local Cta
+
+if FFlagUserListCtaIntegrationEnabled then
+	Cta = require(UserList.Cta)
+else
+	Cta = nil
 end
-local function VerticalUserList(t3: {[any]: any}) -- line: 62
-	-- upvalues: useEntities (copy), useEntitySelectionHandler (copy), React (copy), useRenderEntity (copy), Enums (copy), View (copy), FlatList (copy), keyExtractor (copy), t1 (copy), t2 (copy)
-	local v20 = useEntities(t3.entities)
-	local v21 = useEntitySelectionHandler(t3.onRowSelected)
-	local v22 = React.useMemo(function() -- line: 67
-		-- upvalues: t3 (copy)
-		if t3.initialRowCount and t3.initialRowCount < #t3.entities then
-			local t4 = {}
 
-			for i = 1, t3.initialRowCount do
-				table.insert(t4, t3.entities[i])
-			end
+local v = { BackgroundTransparency = 1, ScrollBarThickness = 0, BorderSizePixel = 0 }
 
-			return t4
+local joined = Cryo.Dictionary.join(v, { Selectable = false })
+
+local contentContainerStyle = { BackgroundTransparency = 1 }
+
+local function keyExtractor(p, _)
+	return p
+end
+
+local function VerticalUserList(props)
+	local v2 = useEntities(props.entities)
+
+	local onRowSelected = props.onRowSelected
+	local v3
+
+	if FFlagUserListRowSelectionOriginSource then
+		v3 = props.rowSelectionConfig
+	end
+
+	local onActivated = useEntitySelectionHandler(onRowSelected, v3)
+
+	local v4 = React.useMemo(function()
+		if not (props.initialRowCount and props.initialRowCount < #props.entities) then
+			return props.entities
 		end
 
-		return t3.entities
-	end, {
-		t3.entities,
-		t3.initialRowCount
-	})
-	local v23 = React.useMemo(function() -- line: 79
-		-- upvalues: v22 (copy)
-		local t5 = {}
+		local result = {}
 
-		for _, v31 in v22 do
-			table.insert(t5, v31.id)
+		for i = 1, props.initialRowCount do
+			table.insert(result, props.entities[i])
 		end
 
-		return t5
-	end, { v22 })
-	local v24 = useRenderEntity({
-		entitiesMap = v20.entitiesMap,
-		onActivated = v21,
-		renderRow = t3.renderRow,
-		configs = t3.configs,
-		layoutMode = Enums.LayoutMode.Vertical
-	})
-	local v25 = React.useCallback(function(p3) -- line: 96
-		-- upvalues: v24 (copy)
-		return v24(p3.item, p3.index)
-	end, { v24 })
+		return result
+	end, { props.entities, props.initialRowCount })
 
-	if #t3.entities == 0 then
+	local v5 = React.useMemo(function()
+		local ids = {}
+
+		for _, v5 in v4 do
+			table.insert(ids, v5.id)
+		end
+
+		return ids
+	end, { v4 })
+
+	local v6 = {
+		entitiesMap = v2.entitiesMap,
+		onActivated = onActivated,
+		renderRow = props.renderRow,
+		configs = props.configs,
+		layoutMode = Enums.LayoutMode.Vertical,
+		firstRowRef = 0
+	}
+	local firstRowRef
+
+	if FFlagUserListSurfaceExtensions then
+		firstRowRef = props.firstRowRef
+	end
+
+	v6.firstRowRef = firstRowRef
+	local v7 = useRenderEntity(v6)
+
+	local renderItem = React.useCallback(function(p)
+		return v7(p.item, p.index)
+	end, { v7 })
+
+	if #props.entities == 0 then
 		return nil
 	end
 
-	if t3.isScrollEnabled then
-		return React.createElement(View, {
-			tag = "size-full-0 fill",
-			LayoutOrder = t3.layoutOrder
-		}, {
-			List = React.createElement(FlatList, {
-				windowSize = 3,
-				initialNumToRender = 10,
-				onEndReachedThreshold = 2,
-				data = v23,
-				renderItem = v25,
-				keyExtractor = keyExtractor,
-				style = t1,
-				contentContainerStyle = t2,
-				ListHeaderComponent = t3.ListHeaderComponent,
-				ListFooterComponent = t3.ListFooterComponent
-			})
-		})
+	if not props.isScrollEnabled then
+		return React.createElement(
+			View,
+			{ tag = "size-full-0 auto-y col gap-xxsmall", LayoutOrder = props.layoutOrder },
+			{
+				EntityRows = React.createElement(React.Fragment, {}, unpack(React.useMemo(function()
+					local children = {}
+
+					for i, v8 in ipairs(v5) do
+						children[i] = React.createElement(
+							View,
+							{ key = v8, tag = "size-full-0 auto-y", LayoutOrder = i },
+							{ Content = v7(v8, i) }
+						)
+					end
+
+					return children
+				end, { v5, v7 })))
+			}
+		)
 	end
 
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y col gap-xxsmall",
-		LayoutOrder = t3.layoutOrder
-	}, {
-		EntityRows = React.createElement(React.Fragment, {}, unpack(React.useMemo(function() -- line: 133
-			-- upvalues: v23 (copy), React (copy), View (copy), v24 (copy)
-			local t6 = {}
+	local createElement = React.createElement
+	local v8 = { tag = "size-full-0 fill", LayoutOrder = props.layoutOrder }
 
-			for i, v in ipairs(v23) do
-				t6[i] = React.createElement(View, {
-					tag = "size-full-0 auto-y",
-					key = v,
-					LayoutOrder = i
-				}, {
-					Content = v24(v, i)
-				})
-			end
+	local createElement2 = React.createElement
+	local v9 = {
+		data = v5,
+		renderItem = renderItem,
+		keyExtractor = keyExtractor,
+		windowSize = 3,
+		initialNumToRender = 10,
+		onEndReachedThreshold = 2,
+		disableVirtualization = FFlagUserListDisableVirtualizationConfig and props.configs and props.configs.disableVirtualization and true or nil,
+		onEndReached = 0,
+		style = 0,
+		contentContainerStyle = 0,
+		ListHeaderComponent = 0,
+		ListFooterComponent = 0
+	}
+	local onEndReached
 
-			return t6
-		end, {
-			v23,
-			v24
-		})))
-	})
+	if FFlagUserListSurfaceExtensions then
+		onEndReached = props.onEndReached
+	end
+
+	v9.onEndReached = onEndReached
+	local style
+
+	if FFlagUserListSurfaceExtensions and props.configs and props.configs.disableRowActivation then
+		style = joined
+	else
+		style = v
+	end
+
+	v9.style = style
+
+	v9.contentContainerStyle = contentContainerStyle
+	v9.ListHeaderComponent = props.ListHeaderComponent
+	v9.ListFooterComponent = props.ListFooterComponent
+	return createElement(View, v8, { List = createElement2(FlatList, v9) })
 end
-local function VerticalUserListWithCta(t7: {[any]: any}) -- line: 151
-	-- upvalues: v11 (copy), React (copy), VerticalUserList (copy)
-	if v11 ~= nil and (t7.ctaConfig ~= nil and t7.renderRow == nil) then
-		return React.createElement(v11.CtaRenderRowBridge, {
-			ctaConfig = t7.ctaConfig,
-			render = function(p4) -- line: 157
-				-- upvalues: t7 (copy), React (copy), VerticalUserList (copy)
-				local v37 = table.clone(t7)
 
-				v37.renderRow = p4
+local function VerticalUserListWithCta(p)
+	local v2
 
-				return React.createElement(VerticalUserList, v37)
-			end
-		})
+	if Cta == nil or p.ctaConfig == nil then
+		v2 = false
+	else
+		v2 = p.renderRow == nil
 	end
 
-	return React.createElement(VerticalUserList, t7)
+	if FFlagUserListComposeRenderRowWithCta then
+		if Cta == nil then
+			v2 = false
+		else
+			v2 = p.ctaConfig ~= nil
+		end
+	end
+
+	if not v2 then
+		return React.createElement(VerticalUserList, p)
+	end
+
+	local createElement = React.createElement
+	local ctaRenderRowBridge = Cta.CtaRenderRowBridge
+	local v3 = { ctaConfig = p.ctaConfig, renderRow = 0, render = 0 }
+	local renderRow2
+
+	if FFlagUserListComposeRenderRowWithCta then
+		renderRow2 = p.renderRow
+	end
+
+	v3.renderRow = renderRow2
+	function v3.render(renderRow)
+		local clone = table.clone(p)
+		clone.renderRow = renderRow
+		return React.createElement(VerticalUserList, clone)
+	end
+
+	return createElement(ctaRenderRowBridge, v3)
 end
 
 if FFlagUserListCtaIntegrationEnabled then

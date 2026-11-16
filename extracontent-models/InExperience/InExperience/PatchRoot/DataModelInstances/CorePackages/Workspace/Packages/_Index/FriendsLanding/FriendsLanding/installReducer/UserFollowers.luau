@@ -1,17 +1,18 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
 local dependencies = require(FriendsLanding.dependencies)
-local Rodux = dependencies.Rodux
-local FriendsNetworking = dependencies.FriendsNetworking
 
-return Rodux.createReducer({}, {
-	[FriendsNetworking.GetUserFollowers.Succeeded.name] = function(_, p2) -- line: 10
-		local t1 = {}
-		local data = p2.responseBody.data
+local rodux = dependencies.Rodux
+local friendsNetworking = dependencies.FriendsNetworking
+
+return rodux.createReducer({}, {
+	[friendsNetworking.GetUserFollowers.Succeeded.name] = function(_, p)
+		local data = p.responseBody.data
+		local idSet = {}
 
 		for _, v in ipairs(data) do
-			t1[tostring(v.id)] = true
+			idSet[tostring(v.id)] = true
 		end
 
-		return t1
+		return idSet
 	end
 })

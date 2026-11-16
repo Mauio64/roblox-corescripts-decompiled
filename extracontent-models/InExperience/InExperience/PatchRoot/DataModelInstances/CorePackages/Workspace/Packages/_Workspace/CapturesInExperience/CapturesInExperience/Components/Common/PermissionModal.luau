@@ -1,75 +1,76 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Localization = require(ParentParentParent.Localization)
-local default = require(ParentParentParent.PermissionsProtocol).PermissionsProtocol.default
-local React = require(ParentParentParent.React)
-local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
-local UIBlox = require(ParentParentParent.UIBlox)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Localization = require(parent2.Localization)
+local PermissionsProtocol = require(parent2.PermissionsProtocol)
+local default = PermissionsProtocol.PermissionsProtocol.default
+local React = require(parent2.React)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local UIBlox = require(parent2.UIBlox)
+
 local useCallback = React.useCallback
 local useLocalization = Localization.Hooks.useLocalization
 local useScreenSize = RobloxAppHooks.useScreenSize
 local useStyle = UIBlox.Core.Style.useStyle
-local EventNames = require(ParentParent.Analytics.EventNames)
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+
+local EventNames = require(parent.Analytics.EventNames)
+local useAnalytics = require(parent.Analytics.useAnalytics)
+
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 
-return function(t1: {[any]: any}) -- line: 27
-	-- upvalues: useScreenSize (copy), useStyle (copy), useAnalytics (copy), useLocalization (copy), useCallback (copy), default (copy), EventNames (copy), React (copy), InteractiveAlert (copy), ButtonType (copy)
-	local v17 = useScreenSize()
-	local v18 = useStyle()
-	local v19 = useAnalytics()
-	local v20 = useLocalization({
+return function(props)
+	local screenSize = useScreenSize()
+	local v = useStyle()
+
+	local v2 = useAnalytics()
+
+	local v3 = useLocalization({
 		alertBody = "Feature.Captures.Description.AllowPhotoAccessInfo",
 		alertTitle = "Feature.Captures.Title.AllowPhotoAccessInfo",
 		accessDeniedCTA = "Feature.Captures.Action.AllowPhotoAccessDeclined",
 		accessAllowedCTA = "Feature.Captures.Action.AllowPhotoAccessAccepted"
 	})
-	local Theme = v18.Theme
-	local v22 = useCallback(function() -- line: 42
-		-- upvalues: default (copy), v19 (copy), EventNames (copy), t1 (copy)
+
+	local theme = v.Theme
+
+	local onActivated = useCallback(function()
 		default:requestPermissions({ default.Permissions.WRITE_MEDIA_STORAGE })
-		v19.fireEvent(EventNames.CapturesSavePermissionModalAllowPressed)
-		t1.closeModal()
-	end, { t1.closeModal })
-	local v23 = useCallback(function() -- line: 48
-		-- upvalues: v19 (copy), EventNames (copy), t1 (copy)
-		v19.fireEvent(EventNames.CapturesSavePermissionModalCancelPressed)
-		t1.closeModal()
-	end, { t1.closeModal })
+		v2.fireEvent(EventNames.CapturesSavePermissionModalAllowPressed)
+		props.closeModal()
+	end, { props.closeModal })
+
+	local onActivated2 = useCallback(function()
+		v2.fireEvent(EventNames.CapturesSavePermissionModalCancelPressed)
+		props.closeModal()
+	end, { props.closeModal })
 
 	return React.createElement("Frame", {
 		Active = true,
-		BackgroundColor3 = Theme.Overlay.Color,
-		BackgroundTransparency = Theme.Overlay.Transparency,
+		BackgroundColor3 = theme.Overlay.Color,
+		BackgroundTransparency = theme.Overlay.Transparency,
 		Size = UDim2.new(1, 0, 1, 0),
-		Visible = t1.visible,
-		ZIndex = t1.zIndex
+		Visible = props.visible,
+		ZIndex = props.zIndex
 	}, {
 		Alert = React.createElement(InteractiveAlert, {
-			isMiddleContentFocusable = false,
-			bodyText = v20.alertBody,
+			bodyText = v3.alertBody,
 			buttonStackInfo = {
 				buttons = {
 					{
 						buttonType = ButtonType.Secondary,
-						props = {
-							onActivated = v23,
-							text = v20.accessDeniedCTA
-						}
+						props = { onActivated = onActivated2, text = v3.accessDeniedCTA }
 					},
 					{
 						buttonType = ButtonType.PrimarySystem,
-						props = {
-							onActivated = v22,
-							text = v20.accessAllowedCTA
-						}
+						props = { onActivated = onActivated, text = v3.accessAllowedCTA }
 					}
 				}
 			},
+			isMiddleContentFocusable = false,
 			position = UDim2.fromScale(0.5, 0.5),
-			screenSize = v17,
-			title = v20.alertTitle
+			screenSize = screenSize,
+			title = v3.alertTitle
 		})
 	})
 end

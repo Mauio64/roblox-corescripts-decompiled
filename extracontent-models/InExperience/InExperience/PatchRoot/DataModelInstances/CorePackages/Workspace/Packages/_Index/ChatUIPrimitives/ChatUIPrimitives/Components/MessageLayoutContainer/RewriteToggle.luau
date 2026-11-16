@@ -1,46 +1,48 @@
 local ChatUIPrimitives = script:FindFirstAncestor("ChatUIPrimitives")
-local ChatUIPrimitivesParent = ChatUIPrimitives.Parent
-local React = require(ChatUIPrimitivesParent.React)
-local Foundation = require(ChatUIPrimitivesParent.Foundation)
+local parent = ChatUIPrimitives.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 
 require(ChatUIPrimitives.Types)
 
-local function RewriteToggle(t1: {[any]: any}) -- line: 18
-	-- upvalues: Foundation (copy), React (copy)
-	local v7 = Foundation.Hooks.useTokens()
-	local v8 = if not t1.showOriginal then Foundation.Enums.IconName.ChevronLargeDown else Foundation.Enums.IconName.ChevronLargeUp
-	local v9 = t1.messageBinding:map(function(p1) -- line: 27
-		return p1 ~= nil and p1.wasRewritten == true
+local function RewriteToggle(props)
+	local v = Foundation.Hooks.useTokens()
+	local icon
+
+	if props.showOriginal then
+		icon = Foundation.Enums.IconName.ChevronLargeUp
+	else
+		icon = Foundation.Enums.IconName.ChevronLargeDown
+	end
+
+	local mapped = props.messageBinding:map(function(p): boolean
+		return p ~= nil and p.wasRewritten == true
 	end)
-	local v10 = t1.messageBinding:map(function(p2) -- line: 31
-		if not p2 or not p2.originalText then
-			return ""
+
+	local mapped2 = props.messageBinding:map(function(p)
+		if p and p.originalText then
+			return `<s>{p.originalText}</s>`
 		end
 
-		return `<s>{ p2.originalText }</s>`
+		return ""
 	end)
-	local v11 = t1.messageBinding:map(function(p3) -- line: 38
-		-- upvalues: t1 (copy)
-		return p3 ~= nil and (p3.wasRewritten == true and t1.showOriginal)
+
+	local mapped3 = props.messageBinding:map(function(p)
+		return p ~= nil and p.wasRewritten == true and props.showOriginal
 	end)
 
 	return React.createElement(Foundation.View, {
 		tag = "col gap-xsmall auto-y",
 		Size = UDim2.new(1, 0, 0, 0),
-		backgroundStyle = {
-			Transparency = 1,
-			Color3 = Color3.new(0, 0, 0)
-		},
-		LayoutOrder = t1.LayoutOrder
+		backgroundStyle = { Color3 = Color3.new(0, 0, 0), Transparency = 1 },
+		LayoutOrder = props.LayoutOrder
 	}, {
 		toggleRow = React.createElement(Foundation.View, {
 			tag = "row align-y-center gap-xsmall auto-xy",
-			LayoutOrder = 1,
-			backgroundStyle = {
-				Transparency = 1,
-				Color3 = Color3.new(0, 0, 0)
-			},
-			Visible = v9
+			backgroundStyle = { Color3 = Color3.new(0, 0, 0), Transparency = 1 },
+			Visible = mapped,
+			LayoutOrder = 1
 		}, {
 			label = React.createElement(Foundation.Text, {
 				tag = "auto-xy text-caption-small text-align-x-left content-muted",
@@ -48,37 +50,34 @@ local function RewriteToggle(t1: {[any]: any}) -- line: 18
 				LayoutOrder = 1
 			}),
 			caret = React.createElement(Foundation.IconButton, {
-				isCircular = true,
-				LayoutOrder = 2,
-				icon = v8,
+				icon = icon,
 				variant = Foundation.Enums.ButtonVariant.Utility,
 				size = Foundation.Enums.InputSize.XSmall,
-				onActivated = t1.onToggle
+				isCircular = true,
+				onActivated = props.onToggle,
+				LayoutOrder = 2
 			})
 		}),
 		dropdown = React.createElement(Foundation.View, {
 			tag = "col gap-xxsmall size-full-0 auto-y padding-small radius-medium",
-			LayoutOrder = 2,
-			backgroundStyle = {
-				Transparency = 0.7,
-				Color3 = v7.Color.Common.Scrim.Color3
-			},
-			Visible = v11
+			backgroundStyle = { Color3 = v.Color.Common.Scrim.Color3, Transparency = 0.7 },
+			Visible = mapped3,
+			LayoutOrder = 2
 		}, {
 			original = React.createElement(Foundation.Text, {
 				tag = "text-caption-medium text-wrap text-align-x-left content-muted",
+				Text = mapped2,
 				RichText = true,
-				LayoutOrder = 1,
-				Text = v10,
 				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 1
 			}),
 			explanation = React.createElement(Foundation.Text, {
 				tag = "text-caption-medium text-wrap text-align-x-left content-muted",
 				Text = "Roblox rephrases messages that break safety rules.",
-				LayoutOrder = 2,
 				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 2
 			})
 		})
 	})

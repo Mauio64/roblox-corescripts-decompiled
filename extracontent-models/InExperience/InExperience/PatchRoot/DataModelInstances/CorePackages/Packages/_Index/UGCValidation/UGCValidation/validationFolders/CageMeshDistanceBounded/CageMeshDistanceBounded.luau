@@ -1,16 +1,15 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCageGeometry = require(ParentParent.flags.getFFlagUGCValidateMigrateCageGeometry)
-local getFIntUGCValidateCageMeshDistanceThreshold = require(ParentParent.flags.getFIntUGCValidateCageMeshDistanceThreshold)
-local getFFlagUGCValidationEyebrowEyelashSupport = require(ParentParent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+
+local getFIntUGCValidateCageMeshDistanceThreshold = require(parent.flags.getFIntUGCValidateCageMeshDistanceThreshold)
+local getFFlagUGCValidationEyebrowEyelashSupport = require(parent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
 
 return {
-	fflag = getFFlagUGCValidateMigrateCageGeometry,
 	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING },
 	requiredData = {
 		ValidationEnums.SharedDataMember.renderMeshesData,
@@ -18,41 +17,47 @@ return {
 		ValidationEnums.SharedDataMember.outerCagesData
 	},
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 24
-		-- upvalues: getFFlagUGCValidationEyebrowEyelashSupport (copy), UGCValidationService (copy), getFIntUGCValidateCageMeshDistanceThreshold (copy), ErrorSourceStrings (copy)
+	run = function(object, data)
 		if getFFlagUGCValidationEyebrowEyelashSupport() then
-			local assetType = p2.uploadEnum.assetType
+			local assetType = data.uploadEnum.assetType
 
 			if assetType == Enum.AssetType.EyebrowAccessory or assetType == Enum.AssetType.EyelashAccessory then
 				return
 			end
 		end
 
-		local Handle = p2.renderMeshesData.Handle
+		local handle = data.renderMeshesData.Handle
 
-		if Handle == nil then
+		if handle == nil then
 			return
 		end
 
-		local Handle2 = p2.innerCagesData.Handle
-		local Handle3 = p2.outerCagesData.Handle
+		local handle2 = data.innerCagesData.Handle
+		local handle3 = data.outerCagesData.Handle
 
-		if Handle2 == nil or Handle3 == nil then
+		if handle2 == nil or handle3 == nil then
 			return
 		end
 
-		local v14 = UGCValidationService:CalculateAverageEditableCageMeshDistance(Handle2.editable, Handle3.editable, Handle.editable, Handle2.origin, Handle3.origin)
+		local averageEditableCageMeshDistance = UGCValidationService:CalculateAverageEditableCageMeshDistance(
+			handle2.editable,
+			handle3.editable,
+			handle.editable,
+			handle2.origin,
+			handle3.origin
+		)
 
-		if getFIntUGCValidateCageMeshDistanceThreshold() < v14 * 100 or v14 < 0 then
-			if v14 < 0 then
-				p1:fail(ErrorSourceStrings.Keys.CageMeshDistanceBounded_MeshOutsideCage, {})
-
-				return
+		if
+			getFIntUGCValidateCageMeshDistanceThreshold() < averageEditableCageMeshDistance * 100
+			or averageEditableCageMeshDistance < 0
+		then
+			if averageEditableCageMeshDistance < 0 then
+				object:fail(ErrorSourceStrings.Keys.CageMeshDistanceBounded_MeshOutsideCage, {})
+			else
+				object:fail(ErrorSourceStrings.Keys.CageMeshDistanceBounded_DistanceTooHigh, {
+					distance = string.format("%.2f", averageEditableCageMeshDistance)
+				})
 			end
-
-			p1:fail(ErrorSourceStrings.Keys.CageMeshDistanceBounded_DistanceTooHigh, {
-				distance = string.format("%.2f", v14)
-			})
 		end
 	end
 }

@@ -1,101 +1,118 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local v3 = require(AppChat.Logger):new("AppChatPerf")
-local IntervalPerformanceTracker = require(AppChatParent.IntervalPerformanceTracker).IntervalPerformanceTracker
+local parent = AppChat.Parent
+
+local Logger = require(AppChat.Logger)
+local v = Logger:new("AppChatPerf")
+local IntervalPerformanceTracker = require(parent.IntervalPerformanceTracker)
+local intervalPerformanceTracker = IntervalPerformanceTracker.IntervalPerformanceTracker
+
+local AppChatPerfEvent = require(AppChat.Telemetry.AppChatPerfEvent)
 local AppChatPerfEventInfo = require(AppChat.Telemetry.AppChatPerfEventInfo)
 local AppChatTTITracker = require(AppChat.Telemetry.AppChatTTITracker)
-local t1 = {
+
+local v2 = { "duration", "averageFPS", "longestFrameTime" }
+local v3 = {
 	"duration",
 	"averageFPS",
-	"longestFrameTime"
+	"framesCount",
+	"longestFrameTime",
+	"frameTimeAvgMs",
+	"frameTimeStdDevMs",
+	"frameTimeDistributionMs",
+	"frameBuckets",
+	"rawFrameTimesMs",
+	"rawScrollPositionSamplesCsv"
 }
-local t2 = {}
 
-local function canStartInterval(p1) -- line: 40
-	-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy)
-	local v12 = AppChatPerfEventInfo.getParentTTI(p1)
-	local v13 = AppChatPerfEventInfo.getTTIPage(v12)
+local v4 = {}
 
-	if not AppChatTTITracker.isInteractive(v12) then
-		return false, v13 .. "_not_interactive"
+local function canStartInterval(p)
+	local parentTTI = AppChatPerfEventInfo.getParentTTI(p)
+	local ttiPage = AppChatPerfEventInfo.getTTIPage(parentTTI)
+
+	if not AppChatTTITracker.isInteractive(parentTTI) then
+		return false, ttiPage .. "_not_interactive"
 	end
 
-	local v14 = AppChatTTITracker.getInteractiveTimestamp(v12)
+	local interactiveTimestamp = AppChatTTITracker.getInteractiveTimestamp(parentTTI)
 
-	if v14 and os.clock() - v14 < 0.5 then
-		return false, v13 .. "_interactive_settling_delay"
+	if interactiveTimestamp and os.clock() - interactiveTimestamp < 0.5 then
+		return false, ttiPage .. "_interactive_settling_delay"
 	end
 
 	return true, nil
 end
 
-local t3 = {
-	start = function(p2, _) -- line: 66
-		-- upvalues: AppChatPerfEventInfo (copy), canStartInterval (copy), v3 (copy), IntervalPerformanceTracker (copy), t1 (copy), t2 (copy)
-		local v17 = AppChatPerfEventInfo.getIntervalName(p2)
-		local v18, v19 = canStartInterval(p2)
+local function getMetricsToTrack(p) -- 1 equivalent call inferred from this helper
+	if p == AppChatPerfEvent.ScrollConversationList or p == AppChatPerfEvent.ScrollMessageList then
+		return v3
+	end
 
-		if not v18 then
-			v3:debug("Perf start ignored: {} (reason={})", p2, v19 or "unknown")
+	return v2
+end
 
+local AppChatIntervalTracker = {
+	start = function(p, _, p2): boolean
+		local intervalName = AppChatPerfEventInfo.getIntervalName(p)
+
+		local v5, v6 = canStartInterval(p)
+
+		if not v5 then
+			v:debug("Perf start ignored: {} (reason={})", p, v6 or "unknown")
 			return false
 		end
 
-		v3:debug("Interval Start: {}", v17)
-		IntervalPerformanceTracker:startTracking(v17, nil, t1, true, true)
-		t2[p2] = true
+		v:debug("Interval Start: {}", intervalName)
+		intervalPerformanceTracker:startTracking(intervalName, nil, getMetricsToTrack(p), true, true, nil, p2) -- inferred equivalent call
 
+		v4[p] = true
 		return true
 	end,
-	finish = function(p4) -- line: 87
-		-- upvalues: AppChatPerfEventInfo (copy), t2 (copy), v3 (copy), IntervalPerformanceTracker (copy)
-		local v21 = AppChatPerfEventInfo.getIntervalName(p4)
+	finish = function(p): boolean
+		local intervalName = AppChatPerfEventInfo.getIntervalName(p)
 
-		if not t2[p4] then
+		if not v4[p] then
 			return false
 		end
 
-		v3:debug("Interval Stop: {}", v21)
-		IntervalPerformanceTracker:stopAndLogTracking(v21)
-		t2[p4] = false
-
+		v:debug("Interval Stop: {}", intervalName)
+		intervalPerformanceTracker:stopAndLogTracking(intervalName)
+		v4[p] = false
 		return true
 	end,
-	cancel = function(p5) -- line: 98
-		-- upvalues: AppChatPerfEventInfo (copy), t2 (copy), v3 (copy), IntervalPerformanceTracker (copy)
-		local v23 = AppChatPerfEventInfo.getIntervalName(p5)
+	cancel = function(p): boolean
+		local intervalName = AppChatPerfEventInfo.getIntervalName(p)
 
-		if not t2[p5] then
+		if not v4[p] then
 			return false
 		end
 
-		v3:debug("Interval Cancel: {}", v23)
-		IntervalPerformanceTracker:cancelTracking(v23)
-		t2[p5] = false
-
+		v:debug("Interval Cancel: {}", intervalName)
+		intervalPerformanceTracker:cancelTracking(intervalName)
+		v4[p] = false
 		return true
 	end,
-	isActive = function(p6) -- line: 109
-		-- upvalues: t2 (copy)
-		return t2[p6] == true
+	isActive = function(p): boolean
+		return v4[p] == true
 	end,
-	cancelIntervalsForTTI = function(p7, s1: string) -- line: 115
-		-- upvalues: AppChatPerfEventInfo (copy), t2 (copy), v3 (copy), IntervalPerformanceTracker (copy)
-		for _, v28 in (AppChatPerfEventInfo.getIntervalsForTTI(p7)) do
-			if t2[v28] then
-				local v29 = AppChatPerfEventInfo.getIntervalName(v28)
+	cancelIntervalsForTTI = function(p, p2: string)
+		local intervalsForTTI = AppChatPerfEventInfo.getIntervalsForTTI(p)
 
-				v3:debug("Canceling interval ({}): {}", s1, v29)
-				IntervalPerformanceTracker:cancelTracking(v29)
-				t2[v28] = false
+		for _, v5 in intervalsForTTI do
+			if not v4[v5] then
+				continue
 			end
+
+			local intervalName = AppChatPerfEventInfo.getIntervalName(v5)
+			v:debug("Canceling interval ({}): {}", p2, intervalName)
+			intervalPerformanceTracker:cancelTracking(intervalName)
+			v4[v5] = false
 		end
 	end
 }
 
-AppChatTTITracker.setOnConversationSwitch(function(p8) -- line: 128
-	-- upvalues: t3 (copy)
-	t3.cancelIntervalsForTTI(p8, "conversation_switch")
+AppChatTTITracker.setOnConversationSwitch(function(p)
+	AppChatIntervalTracker.cancelIntervalsForTTI(p, "conversation_switch")
 end)
 
-return t3
+return AppChatIntervalTracker

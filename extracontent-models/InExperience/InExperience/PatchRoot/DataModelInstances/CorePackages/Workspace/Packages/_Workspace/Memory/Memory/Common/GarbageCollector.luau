@@ -1,12 +1,12 @@
-local t1 = {}
-
-function trigger() -- line: 3
+local GarbageCollector = {}
+function trigger()
 	return collectgarbage("collect")
 end
-function t1.collect() -- line: 8
+
+function GarbageCollector.collect()
 	pcall(trigger)
 	pcall(trigger)
 	task.wait()
 end
 
-return t1
+return GarbageCollector

@@ -1,377 +1,403 @@
-local t1 = {}
-local ClientChatModules = game:GetService("Chat"):WaitForChild("ClientChatModules")
-local scriptParent = script.Parent
-local ChannelsTab = require(scriptParent:WaitForChild("ChannelsTab"))
-local MessageSender = require(scriptParent:WaitForChild("MessageSender"))
+local ChannelsBar = {}
+
+local Chat = game:GetService("Chat")
+local ClientChatModules = Chat:WaitForChild("ClientChatModules")
+local parent = script.Parent
+local ChannelsTab = require(parent:WaitForChild("ChannelsTab"))
+local MessageSender = require(parent:WaitForChild("MessageSender"))
 local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
-local CurveUtil = require(scriptParent:WaitForChild("CurveUtil"))
-local t2 = {}
+local CurveUtil = require(parent:WaitForChild("CurveUtil"))
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.CreateGuiObjects(p1, p2) -- line: 24
-	-- upvalues: ChatSettings (copy), MessageSender (copy)
-	local Frame = Instance.new("Frame")
+function class:CreateGuiObjects(parent2)
+	local frame = Instance.new("Frame")
+	frame.Selectable = false
+	frame.Size = UDim2.new(1, 0, 1, 0)
+	frame.BackgroundTransparency = 1
+	frame.Parent = parent2
 
-	Frame.Selectable = false
-	Frame.Size = UDim2.new(1, 0, 1, 0)
-	Frame.BackgroundTransparency = 1
-	Frame.Parent = p2
+	local scrollingBase = Instance.new("Frame")
+	scrollingBase.Selectable = false
+	scrollingBase.Name = "ScrollingBase"
+	scrollingBase.BackgroundTransparency = 1
+	scrollingBase.ClipsDescendants = true
+	scrollingBase.Size = UDim2.new(1, 0, 1, 0)
+	scrollingBase.Position = UDim2.new(0, 0, 0, 0)
+	scrollingBase.Parent = frame
 
-	local Frame2 = Instance.new("Frame")
+	local scrollerSizer = Instance.new("Frame")
+	scrollerSizer.Selectable = false
+	scrollerSizer.Name = "ScrollerSizer"
+	scrollerSizer.BackgroundTransparency = 1
+	scrollerSizer.Size = UDim2.new(1, 0, 1, 0)
+	scrollerSizer.Position = UDim2.new(0, 0, 0, 0)
+	scrollerSizer.Parent = scrollingBase
 
-	Frame2.Selectable = false
-	Frame2.Name = "ScrollingBase"
-	Frame2.BackgroundTransparency = 1
-	Frame2.ClipsDescendants = true
-	Frame2.Size = UDim2.new(1, 0, 1, 0)
-	Frame2.Position = UDim2.new(0, 0, 0, 0)
-	Frame2.Parent = Frame
+	local scrollerFrame = Instance.new("Frame")
+	scrollerFrame.Selectable = false
+	scrollerFrame.Name = "ScrollerFrame"
+	scrollerFrame.BackgroundTransparency = 1
+	scrollerFrame.Size = UDim2.new(1, 0, 1, 0)
+	scrollerFrame.Position = UDim2.new(0, 0, 0, 0)
+	scrollerFrame.Parent = scrollerSizer
 
-	local Frame3 = Instance.new("Frame")
+	local frame2 = Instance.new("Frame")
+	frame2.Selectable = false
+	frame2.Size = UDim2.new(1, 0, 1, 0)
+	frame2.Position = UDim2.new(0, 0, 0, 0)
+	frame2.ClipsDescendants = true
+	frame2.BackgroundTransparency = 1
+	frame2.Parent = frame
 
-	Frame3.Selectable = false
-	Frame3.Name = "ScrollerSizer"
-	Frame3.BackgroundTransparency = 1
-	Frame3.Size = UDim2.new(1, 0, 1, 0)
-	Frame3.Position = UDim2.new(0, 0, 0, 0)
-	Frame3.Parent = Frame2
+	local leaveConfirmationFrame = Instance.new("Frame")
+	leaveConfirmationFrame.Selectable = false
+	leaveConfirmationFrame.Name = "LeaveConfirmationFrame"
+	leaveConfirmationFrame.Size = UDim2.new(1, 0, 1, 0)
+	leaveConfirmationFrame.Position = UDim2.new(0, 0, 1, 0)
+	leaveConfirmationFrame.BackgroundTransparency = 0.6
+	leaveConfirmationFrame.BorderSizePixel = 0
+	leaveConfirmationFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+	leaveConfirmationFrame.Parent = frame2
 
-	local Frame4 = Instance.new("Frame")
+	local textButton = Instance.new("TextButton")
+	textButton.Selectable = false
+	textButton.Size = UDim2.new(1, 0, 1, 0)
+	textButton.BackgroundTransparency = 1
+	textButton.Text = ""
+	textButton.Parent = leaveConfirmationFrame
 
-	Frame4.Selectable = false
-	Frame4.Name = "ScrollerFrame"
-	Frame4.BackgroundTransparency = 1
-	Frame4.Size = UDim2.new(1, 0, 1, 0)
-	Frame4.Position = UDim2.new(0, 0, 0, 0)
-	Frame4.Parent = Frame3
+	local textButton2 = Instance.new("TextButton")
+	textButton2.Selectable = false
+	textButton2.Size = UDim2.new(0.25, 0, 1, 0)
+	textButton2.BackgroundTransparency = 1
+	textButton2.Font = ChatSettings.DefaultFont
+	textButton2.TextSize = 18
+	textButton2.TextStrokeTransparency = 0.75
+	textButton2.Position = UDim2.new(0, 0, 0, 0)
+	textButton2.TextColor3 = Color3.new(0, 1, 0)
+	textButton2.Text = "Confirm"
+	textButton2.Parent = leaveConfirmationFrame
 
-	local Frame5 = Instance.new("Frame")
-
-	Frame5.Selectable = false
-	Frame5.Size = UDim2.new(1, 0, 1, 0)
-	Frame5.Position = UDim2.new(0, 0, 0, 0)
-	Frame5.ClipsDescendants = true
-	Frame5.BackgroundTransparency = 1
-	Frame5.Parent = Frame
-
-	local Frame6 = Instance.new("Frame")
-
-	Frame6.Selectable = false
-	Frame6.Name = "LeaveConfirmationFrame"
-	Frame6.Size = UDim2.new(1, 0, 1, 0)
-	Frame6.Position = UDim2.new(0, 0, 1, 0)
-	Frame6.BackgroundTransparency = 0.6
-	Frame6.BorderSizePixel = 0
-	Frame6.BackgroundColor3 = Color3.new(0, 0, 0)
-	Frame6.Parent = Frame5
-
-	local TextButton = Instance.new("TextButton")
-
-	TextButton.Selectable = false
-	TextButton.Size = UDim2.new(1, 0, 1, 0)
-	TextButton.BackgroundTransparency = 1
-	TextButton.Text = ""
-	TextButton.Parent = Frame6
-
-	local TextButton2 = Instance.new("TextButton")
-
-	TextButton2.Selectable = false
-	TextButton2.Size = UDim2.new(0.25, 0, 1, 0)
-	TextButton2.BackgroundTransparency = 1
-	TextButton2.Font = ChatSettings.DefaultFont
-	TextButton2.TextSize = 18
-	TextButton2.TextStrokeTransparency = 0.75
-	TextButton2.Position = UDim2.new(0, 0, 0, 0)
-	TextButton2.TextColor3 = Color3.new(0, 1, 0)
-	TextButton2.Text = "Confirm"
-	TextButton2.Parent = Frame6
-
-	local clone = TextButton2:Clone()
-
-	clone.Parent = Frame6
+	local clone = textButton2:Clone()
+	clone.Parent = leaveConfirmationFrame
 	clone.Position = UDim2.new(0.75, 0, 0, 0)
 	clone.TextColor3 = Color3.new(1, 0, 0)
 	clone.Text = "Cancel"
 
-	local TextLabel = Instance.new("TextLabel")
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Selectable = false
+	textLabel.Size = UDim2.new(0.5, 0, 1, 0)
+	textLabel.Position = UDim2.new(0.25, 0, 0, 0)
+	textLabel.BackgroundTransparency = 1
+	textLabel.TextColor3 = Color3.new(1, 1, 1)
+	textLabel.TextStrokeTransparency = 0.75
+	textLabel.Text = "Leave channel <XX>?"
+	textLabel.Font = ChatSettings.DefaultFont
+	textLabel.TextSize = 18
+	textLabel.Parent = leaveConfirmationFrame
 
-	TextLabel.Selectable = false
-	TextLabel.Size = UDim2.new(0.5, 0, 1, 0)
-	TextLabel.Position = UDim2.new(0.25, 0, 0, 0)
-	TextLabel.BackgroundTransparency = 1
-	TextLabel.TextColor3 = Color3.new(1, 1, 1)
-	TextLabel.TextStrokeTransparency = 0.75
-	TextLabel.Text = "Leave channel <XX>?"
-	TextLabel.Font = ChatSettings.DefaultFont
-	TextLabel.TextSize = 18
-	TextLabel.Parent = Frame6
+	local leaveTarget = Instance.new("StringValue")
+	leaveTarget.Name = "LeaveTarget"
+	leaveTarget.Parent = leaveConfirmationFrame
 
-	local StringValue = Instance.new("StringValue")
-
-	StringValue.Name = "LeaveTarget"
-	StringValue.Parent = Frame6
-
-	local Frame6Position = Frame6.Position
-
-	TextButton2.MouseButton1Click:connect(function() -- line: 116
-		-- upvalues: MessageSender (copy), StringValue (copy), Frame6 (copy), Frame6Position (copy)
-		MessageSender:SendMessage(string.format("/leave %s", StringValue.Value), nil)
-		Frame6:TweenPosition(Frame6Position, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+	local position = leaveConfirmationFrame.Position
+	textButton2.MouseButton1Click:connect(function()
+		MessageSender:SendMessage(string.format("/leave %s", leaveTarget.Value), nil)
+		leaveConfirmationFrame:TweenPosition(position, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
 	end)
-	clone.MouseButton1Click:connect(function() -- line: 120
-		-- upvalues: Frame6 (copy), Frame6Position (copy)
-		Frame6:TweenPosition(Frame6Position, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+	clone.MouseButton1Click:connect(function()
+		leaveConfirmationFrame:TweenPosition(position, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
 	end)
 
-	local ImageButton = Instance.new("ImageButton", Frame)
+	local pageLeftButton = Instance.new("ImageButton", frame)
+	pageLeftButton.Selectable = ChatSettings.GamepadNavigationEnabled
+	pageLeftButton.Name = "PageLeftButton"
+	pageLeftButton.SizeConstraint = Enum.SizeConstraint.RelativeYY
+	pageLeftButton.Size = UDim2.new(0.7, 0, 0.7, 0)
+	pageLeftButton.BackgroundTransparency = 1
+	pageLeftButton.Position = UDim2.new(0, 4, 0.15000000000000002, 0)
+	pageLeftButton.Visible = false
+	pageLeftButton.Image = "rbxassetid://471630199"
+	local arrowLabel = Instance.new("ImageLabel", pageLeftButton)
+	arrowLabel.Name = "ArrowLabel"
+	arrowLabel.BackgroundTransparency = 1
+	arrowLabel.Size = UDim2.new(0.4, 0, 0.4, 0)
+	arrowLabel.Image = "rbxassetid://471630112"
 
-	ImageButton.Selectable = ChatSettings.GamepadNavigationEnabled
-	ImageButton.Name = "PageLeftButton"
-	ImageButton.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	ImageButton.Size = UDim2.new(0.7, 0, 0.7, 0)
-	ImageButton.BackgroundTransparency = 1
-	ImageButton.Position = UDim2.new(0, 4, 0.15000000000000002, 0)
-	ImageButton.Visible = false
-	ImageButton.Image = "rbxassetid://471630199"
+	local positionalHelper = Instance.new("Frame", frame)
+	positionalHelper.Selectable = false
+	positionalHelper.BackgroundTransparency = 1
+	positionalHelper.Name = "PositionalHelper"
+	positionalHelper.Size = pageLeftButton.Size
+	positionalHelper.SizeConstraint = pageLeftButton.SizeConstraint
+	positionalHelper.Position = UDim2.new(1, 0, 0.15000000000000002, 0)
 
-	local ImageLabel = Instance.new("ImageLabel", ImageButton)
+	local pageRightButton = pageLeftButton:Clone()
+	pageRightButton.Parent = positionalHelper
+	pageRightButton.Name = "PageRightButton"
+	pageRightButton.Size = UDim2.new(1, 0, 1, 0)
+	pageRightButton.SizeConstraint = Enum.SizeConstraint.RelativeXY
+	pageRightButton.Position = UDim2.new(-1, -4, 0, 0)
 
-	ImageLabel.Name = "ArrowLabel"
-	ImageLabel.BackgroundTransparency = 1
-	ImageLabel.Size = UDim2.new(0.4, 0, 0.4, 0)
-	ImageLabel.Image = "rbxassetid://471630112"
+	local udim = UDim2.new(0.05, 0, 0, 0)
 
-	local Frame7 = Instance.new("Frame", Frame)
+	pageRightButton.ArrowLabel.Position = UDim2.new(0.3, 0, 0.3, 0) + udim
+	pageLeftButton.ArrowLabel.Position = UDim2.new(0.3, 0, 0.3, 0) - udim
+	pageLeftButton.ArrowLabel.Rotation = 180
 
-	Frame7.Selectable = false
-	Frame7.BackgroundTransparency = 1
-	Frame7.Name = "PositionalHelper"
-	Frame7.Size = ImageButton.Size
-	Frame7.SizeConstraint = ImageButton.SizeConstraint
-	Frame7.Position = UDim2.new(1, 0, 0.15000000000000002, 0)
+	self.GuiObject = frame
 
-	local clone2 = ImageButton:Clone()
+	self.GuiObjects.BaseFrame = frame
+	self.GuiObjects.ScrollerSizer = scrollerSizer
+	self.GuiObjects.ScrollerFrame = scrollerFrame
+	self.GuiObjects.PageLeftButton = pageLeftButton
+	self.GuiObjects.PageRightButton = pageRightButton
+	self.GuiObjects.LeaveConfirmationFrame = leaveConfirmationFrame
+	self.GuiObjects.LeaveConfirmationNotice = textLabel
 
-	clone2.Parent = Frame7
-	clone2.Name = "PageRightButton"
-	clone2.Size = UDim2.new(1, 0, 1, 0)
-	clone2.SizeConstraint = Enum.SizeConstraint.RelativeXY
-	clone2.Position = UDim2.new(-1, -4, 0, 0)
+	self.GuiObjects.PageLeftButtonArrow = pageLeftButton.ArrowLabel
+	self.GuiObjects.PageRightButtonArrow = pageRightButton.ArrowLabel
+	self:AnimGuiObjects()
 
-	local uDim2 = UDim2.new(0.05, 0, 0, 0)
-
-	clone2.ArrowLabel.Position = UDim2.new(0.3, 0, 0.3, 0) + uDim2
-	ImageButton.ArrowLabel.Position = UDim2.new(0.3, 0, 0.3, 0) - uDim2
-	ImageButton.ArrowLabel.Rotation = 180
-	p1.GuiObject = Frame
-	p1.GuiObjects.BaseFrame = Frame
-	p1.GuiObjects.ScrollerSizer = Frame3
-	p1.GuiObjects.ScrollerFrame = Frame4
-	p1.GuiObjects.PageLeftButton = ImageButton
-	p1.GuiObjects.PageRightButton = clone2
-	p1.GuiObjects.LeaveConfirmationFrame = Frame6
-	p1.GuiObjects.LeaveConfirmationNotice = TextLabel
-	p1.GuiObjects.PageLeftButtonArrow = ImageButton.ArrowLabel
-	p1.GuiObjects.PageRightButtonArrow = clone2.ArrowLabel
-	p1:AnimGuiObjects()
-	ImageButton.MouseButton1Click:connect(function() -- line: 188
-		-- upvalues: p1 (copy)
-		p1:ScrollChannelsFrame(-1)
+	pageLeftButton.MouseButton1Click:connect(function()
+		self:ScrollChannelsFrame(-1)
 	end)
-	clone2.MouseButton1Click:connect(function() -- line: 189
-		-- upvalues: p1 (copy)
-		p1:ScrollChannelsFrame(1)
+	pageRightButton.MouseButton1Click:connect(function()
+		self:ScrollChannelsFrame(1)
 	end)
-	p1:ScrollChannelsFrame(0)
+
+	self:ScrollChannelsFrame(0)
 end
-function t2.UpdateMessagePostedInChannel(p3, p4) -- line: 195
-	local ChannelTab = p3:GetChannelTab(p4)
 
-	if ChannelTab then
-		ChannelTab:UpdateMessagePostedInChannel()
+function class:UpdateMessagePostedInChannel(p)
+	local channelTab = self:GetChannelTab(p)
 
-		return
+	if channelTab then
+		channelTab:UpdateMessagePostedInChannel()
+	else
+		warn("ChannelsTab '" .. p .. "' does not exist!")
+	end
+end
+
+function class:AddChannelTab(value)
+	if self:GetChannelTab(value) then
+		error("Channel tab '" .. value .. "'already exists!")
 	end
 
-	warn("ChannelsTab '" .. p4 .. "' does not exist!")
-end
-function t2.AddChannelTab(p5, p6) -- line: 204
-	-- upvalues: ChannelsTab (copy), ChatSettings (copy)
-	if p5:GetChannelTab(p6) then
-		error("Channel tab '" .. p6 .. "'already exists!")
-	end
+	local v = ChannelsTab.new(value)
+	v.GuiObject.Parent = self.GuiObjects.ScrollerFrame
+	self.ChannelTabs[value:lower()] = v
 
-	local v33 = ChannelsTab.new(p6)
-
-	v33.GuiObject.Parent = p5.GuiObjects.ScrollerFrame
-	p5.ChannelTabs[p6:lower()] = v33
-	p5.NumTabs = p5.NumTabs + 1
-	p5:OrganizeChannelTabs()
+	self.NumTabs += 1
+	self:OrganizeChannelTabs()
 
 	if ChatSettings.RightClickToLeaveChannelEnabled then
-		v33.NameTag.MouseButton2Click:connect(function() -- line: 217
-			-- upvalues: p5 (copy), v33 (copy)
-			p5.LeaveConfirmationNotice.Text = string.format("Leave channel %s?", v33.ChannelName)
-			p5.LeaveConfirmationFrame.LeaveTarget.Value = v33.ChannelName
-			p5.LeaveConfirmationFrame:TweenPosition(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.2, true)
+		v.NameTag.MouseButton2Click:connect(function()
+			self.LeaveConfirmationNotice.Text = string.format("Leave channel %s?", v.ChannelName)
+			self.LeaveConfirmationFrame.LeaveTarget.Value = v.ChannelName
+			self.LeaveConfirmationFrame:TweenPosition(
+				UDim2.new(0, 0, 0, 0),
+				Enum.EasingDirection.In,
+				Enum.EasingStyle.Quad,
+				0.2,
+				true
+			)
 		end)
 	end
 
-	return v33
+	return v
 end
-function t2.RemoveChannelTab(p7, p8) -- line: 227
-	if not p7:GetChannelTab(p8) then
-		error("Channel tab '" .. p8 .. "'does not exist!")
+
+function class:RemoveChannelTab(value)
+	if not self:GetChannelTab(value) then
+		error("Channel tab '" .. value .. "'does not exist!")
 	end
 
-	local v36 = p8:lower()
+	local lower = value:lower()
+	self.ChannelTabs[lower]:Destroy()
+	self.ChannelTabs[lower] = nil
 
-	p7.ChannelTabs[v36]:Destroy()
-	p7.ChannelTabs[v36] = nil
-	p7.NumTabs = p7.NumTabs - 1
-	p7:OrganizeChannelTabs()
+	self.NumTabs -= 1
+	self:OrganizeChannelTabs()
 end
-function t2.GetChannelTab(p9, p10) -- line: 240
-	return p9.ChannelTabs[p10:lower()]
+
+function class:GetChannelTab(value)
+	return self.ChannelTabs[value:lower()]
 end
-function t2.OrganizeChannelTabs(p11) -- line: 244
-	-- upvalues: ChatSettings (copy)
-	local t3 = {}
 
-	table.insert(t3, p11:GetChannelTab(ChatSettings.GeneralChannelName))
-	table.insert(t3, p11:GetChannelTab("System"))
+function class:OrganizeChannelTabs()
+	local channelTabs = {}
 
-	for _, v in pairs(p11.ChannelTabs) do
-		if v.ChannelName ~= ChatSettings.GeneralChannelName and v.ChannelName ~= "System" then
-			table.insert(t3, v)
+	table.insert(channelTabs, self:GetChannelTab(ChatSettings.GeneralChannelName))
+	table.insert(channelTabs, self:GetChannelTab("System"))
+
+	for _, channelTab in pairs(self.ChannelTabs) do
+		if channelTab.ChannelName ~= ChatSettings.GeneralChannelName and channelTab.ChannelName ~= "System" then
+			table.insert(channelTabs, channelTab)
 		end
 	end
 
-	for k, v in pairs(t3) do
+	for k, v in pairs(channelTabs) do
 		v.GuiObject.Position = UDim2.new(k - 1, 0, 0, 0)
 	end
 
-	p11.GuiObjects.ScrollerSizer.Size = UDim2.new(1 / math.max(1, (math.min(ChatSettings.ChannelsBarFullTabSize, p11.NumTabs))), 0, 1, 0)
-	p11:ScrollChannelsFrame(0)
+	self.GuiObjects.ScrollerSizer.Size = UDim2.new(
+		1 / math.max(1, (math.min(ChatSettings.ChannelsBarFullTabSize, self.NumTabs))),
+		0,
+		1,
+		0
+	)
+
+	self:ScrollChannelsFrame(0)
 end
-function t2.ResizeChannelTabText(p12, p13) -- line: 266
-	for _, v in pairs(p12.ChannelTabs) do
-		v:SetTextSize(p13)
+
+function class:ResizeChannelTabText(p)
+	for _, channelTab in pairs(self.ChannelTabs) do
+		channelTab:SetTextSize(p)
 	end
 end
-function t2.ScrollChannelsFrame(p14, p15) -- line: 272
-	-- upvalues: ChatSettings (copy)
-	if p14.ScrollChannelsFrameLock then
+
+function class:ScrollChannelsFrame(p)
+	if self.ScrollChannelsFrameLock then
 		return
 	end
 
-	p14.ScrollChannelsFrameLock = true
+	self.ScrollChannelsFrameLock = true
 
-	local ChannelsBarFullTabSize = ChatSettings.ChannelsBarFullTabSize
-	local v52 = p14.CurPageNum + p15
+	local channelsBarFullTabSize = ChatSettings.ChannelsBarFullTabSize
 
-	if v52 < 0 then
-		v52 = 0
-	elseif v52 > 0 and v52 + ChannelsBarFullTabSize > p14.NumTabs then
-		v52 = p14.NumTabs - ChannelsBarFullTabSize
+	local curPageNum = self.CurPageNum + p
+
+	if curPageNum < 0 then
+		curPageNum = 0
+	elseif curPageNum > 0 and curPageNum + channelsBarFullTabSize > self.NumTabs then
+		curPageNum = self.NumTabs - channelsBarFullTabSize
 	end
 
-	p14.CurPageNum = v52
+	self.CurPageNum = curPageNum
 
-	local uDim2 = UDim2.new(-p14.CurPageNum, 0, 0, 0)
+	local udim = UDim2.new(-self.CurPageNum, 0, 0, 0)
 
-	p14.GuiObjects.PageLeftButton.Visible = p14.CurPageNum > 0
-	p14.GuiObjects.PageRightButton.Visible = p14.CurPageNum + ChannelsBarFullTabSize < p14.NumTabs
+	self.GuiObjects.PageLeftButton.Visible = self.CurPageNum > 0
+	self.GuiObjects.PageRightButton.Visible = self.CurPageNum + channelsBarFullTabSize < self.NumTabs
 
-	if p15 == 0 then
-		p14.ScrollChannelsFrameLock = false
-
+	if p == 0 then
+		self.ScrollChannelsFrameLock = false
 		return
 	end
 
-	local function UnlockFunc() -- line: 298
-		-- upvalues: p14 (copy)
-		p14.ScrollChannelsFrameLock = false
+	local function UnlockFunc()
+		self.ScrollChannelsFrameLock = false
 	end
 
-	p14:WaitUntilParentedCorrectly()
-	p14.GuiObjects.ScrollerFrame:TweenPosition(uDim2, Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.15, true, UnlockFunc)
+	self:WaitUntilParentedCorrectly()
+
+	self.GuiObjects.ScrollerFrame:TweenPosition(
+		udim,
+		Enum.EasingDirection.InOut,
+		Enum.EasingStyle.Quad,
+		0.15,
+		true,
+		UnlockFunc
+	)
 end
-function t2.FadeOutBackground(p16, p17) -- line: 307
-	-- upvalues: CurveUtil (copy)
-	for _, v in pairs(p16.ChannelTabs) do
-		v:FadeOutBackground(p17)
+
+function class:FadeOutBackground(p)
+	for _, channelTab in pairs(self.ChannelTabs) do
+		channelTab:FadeOutBackground(p)
 	end
 
-	p16.AnimParams.Background_TargetTransparency = 1
-	p16.AnimParams.Background_NormalizedExptValue = CurveUtil:NormalizedDefaultExptValueInSeconds(p17)
+	self.AnimParams.Background_TargetTransparency = 1
+	self.AnimParams.Background_NormalizedExptValue = CurveUtil:NormalizedDefaultExptValueInSeconds(p)
 end
-function t2.FadeInBackground(p18, p19) -- line: 316
-	-- upvalues: CurveUtil (copy)
-	for _, v in pairs(p18.ChannelTabs) do
-		v:FadeInBackground(p19)
+
+function class:FadeInBackground(p)
+	for _, channelTab in pairs(self.ChannelTabs) do
+		channelTab:FadeInBackground(p)
 	end
 
-	p18.AnimParams.Background_TargetTransparency = 0.6
-	p18.AnimParams.Background_NormalizedExptValue = CurveUtil:NormalizedDefaultExptValueInSeconds(p19)
+	self.AnimParams.Background_TargetTransparency = 0.6
+	self.AnimParams.Background_NormalizedExptValue = CurveUtil:NormalizedDefaultExptValueInSeconds(p)
 end
-function t2.FadeOutText(p20, p21) -- line: 325
-	for _, v in pairs(p20.ChannelTabs) do
-		v:FadeOutText(p21)
+
+function class:FadeOutText(p)
+	for _, channelTab in pairs(self.ChannelTabs) do
+		channelTab:FadeOutText(p)
 	end
 end
-function t2.FadeInText(p22, p23) -- line: 331
-	for _, v in pairs(p22.ChannelTabs) do
-		v:FadeInText(p23)
+
+function class:FadeInText(p)
+	for _, channelTab in pairs(self.ChannelTabs) do
+		channelTab:FadeInText(p)
 	end
 end
-function t2.AnimGuiObjects(p24) -- line: 337
-	p24.GuiObjects.PageLeftButton.ImageTransparency = p24.AnimParams.Background_CurrentTransparency
-	p24.GuiObjects.PageRightButton.ImageTransparency = p24.AnimParams.Background_CurrentTransparency
-	p24.GuiObjects.PageLeftButtonArrow.ImageTransparency = p24.AnimParams.Background_CurrentTransparency
-	p24.GuiObjects.PageRightButtonArrow.ImageTransparency = p24.AnimParams.Background_CurrentTransparency
+
+function class:AnimGuiObjects()
+	self.GuiObjects.PageLeftButton.ImageTransparency = self.AnimParams.Background_CurrentTransparency
+	self.GuiObjects.PageRightButton.ImageTransparency = self.AnimParams.Background_CurrentTransparency
+	self.GuiObjects.PageLeftButtonArrow.ImageTransparency = self.AnimParams.Background_CurrentTransparency
+	self.GuiObjects.PageRightButtonArrow.ImageTransparency = self.AnimParams.Background_CurrentTransparency
 end
-function t2.InitializeAnimParams(p25) -- line: 344
-	-- upvalues: CurveUtil (copy)
-	p25.AnimParams.Background_TargetTransparency = 0.6
-	p25.AnimParams.Background_CurrentTransparency = 0.6
-	p25.AnimParams.Background_NormalizedExptValue = CurveUtil:NormalizedDefaultExptValueInSeconds(0)
+
+function class:InitializeAnimParams()
+	self.AnimParams.Background_TargetTransparency = 0.6
+	self.AnimParams.Background_CurrentTransparency = 0.6
+	self.AnimParams.Background_NormalizedExptValue = CurveUtil:NormalizedDefaultExptValueInSeconds(0)
 end
-function t2.Update(p26, p27) -- line: 350
-	-- upvalues: CurveUtil (copy)
-	for _, v in pairs(p26.ChannelTabs) do
-		v:Update(p27)
+
+function class:Update(p)
+	for _, channelTab in pairs(self.ChannelTabs) do
+		channelTab:Update(p)
 	end
 
-	p26.AnimParams.Background_CurrentTransparency = CurveUtil:Expt(p26.AnimParams.Background_CurrentTransparency, p26.AnimParams.Background_TargetTransparency, p26.AnimParams.Background_NormalizedExptValue, p27)
-	p26:AnimGuiObjects()
+	self.AnimParams.Background_CurrentTransparency = CurveUtil:Expt(
+		self.AnimParams.Background_CurrentTransparency,
+		self.AnimParams.Background_TargetTransparency,
+		self.AnimParams.Background_NormalizedExptValue,
+		p
+	)
+
+	self:AnimGuiObjects()
 end
-function t2.WaitUntilParentedCorrectly(p28) -- line: 366
-	while not p28.GuiObject:IsDescendantOf(game:GetService("Players").LocalPlayer) do
-		p28.GuiObject.AncestryChanged:wait()
+
+function class:WaitUntilParentedCorrectly()
+	while true do
+		local guiObject = self.GuiObject
+		local Players = game:GetService("Players")
+
+		if guiObject:IsDescendantOf(Players.LocalPlayer) then
+			break
+		end
+
+		self.GuiObject.AncestryChanged:wait()
 	end
 end
-function t1.new() -- line: 375
-	-- upvalues: t2 (copy), ChatSettings (copy)
-	local self = setmetatable({}, t2)
 
-	self.GuiObject = nil
-	self.GuiObjects = {}
-	self.ChannelTabs = {}
-	self.NumTabs = 0
-	self.CurPageNum = 0
-	self.ScrollChannelsFrameLock = false
-	self.AnimParams = {}
-	self:InitializeAnimParams()
-	ChatSettings.SettingsChanged:connect(function(p29, p30) -- line: 391
-		-- upvalues: self (copy)
-		if p29 == "ChatChannelsTabTextSize" then
-			self:ResizeChannelTabText(p30)
+function ChannelsBar.new()
+	local object = setmetatable({}, class)
+
+	object.GuiObject = nil
+	object.GuiObjects = {}
+
+	object.ChannelTabs = {}
+	object.NumTabs = 0
+	object.CurPageNum = 0
+
+	object.ScrollChannelsFrameLock = false
+
+	object.AnimParams = {}
+
+	object:InitializeAnimParams()
+
+	ChatSettings.SettingsChanged:connect(function(p, p2)
+		if p == "ChatChannelsTabTextSize" then
+			object:ResizeChannelTabText(p2)
 		end
 	end)
 
-	return self
+	return object
 end
 
-return t1
+return ChannelsBar

@@ -1,18 +1,15 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local Object = require(Parent.LuauPolyfill).Object
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
-local function addMockResolvers(p1, p2) -- line: 6
-	-- upvalues: Object (copy)
-	local v6 = Object.assign({}, p1, p2)
-	local v7 = Object.assign({}, p1.Query or {}, p2.Query or {})
-	local v8 = Object.assign({}, p1.Mutation or {}, p2.Mutation or {})
+local function addMockResolvers(p, p2)
+	local v = Object.assign({}, p, p2)
+	local query = Object.assign({}, p.Query or {}, p2.Query or {})
+	local mutation = Object.assign({}, p.Mutation or {}, p2.Mutation or {})
 
-	Object.assign(v6, {
-		Query = v7,
-		Mutation = v8
-	})
+	Object.assign(v, { Query = query, Mutation = mutation })
 
-	return v6
+	return v
 end
 
 return addMockResolvers

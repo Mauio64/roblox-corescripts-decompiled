@@ -1,3 +1,3 @@
-local FFlagMomentsEmojiSetsApi = require(script.Parent.FFlagMomentsEmojiSetsApi)
+local parent = script:FindFirstAncestor("Moments").Parent
 
-return game:DefineFastFlag("MomentsReactToFeedItemV2", false) and FFlagMomentsEmojiSetsApi
+return require(parent.DataHydration.MomentsFFlagMomentsReactToFeedItemV2)

@@ -1,48 +1,54 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+local React = require(parent.React)
+
 local Frame = require(AppChat.Components.Common.Frame)
 local AvatarThumbnail = require(script.Parent.AvatarThumbnail)
 local CircleMask = require(script.Parent.CircleMask)
-local ImageSetLabel = require(AppChatParent.UIBlox).Core.ImageSet.ImageSetLabel
 
-local function AvatarOneToOne(t1: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), ImageSetLabel (copy), CircleMask (copy), Frame (copy), AvatarThumbnail (copy)
-	local v10 = if not t1.showNewPresenceImage then React.createElement("ImageLabel", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, t1.presenceIndicatorSize, 0, t1.presenceIndicatorSize),
-		Image = t1.presenceImage
-	}) else React.createElement(ImageSetLabel, {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromOffset(t1.presenceIndicatorSize, t1.presenceIndicatorSize),
-		Image = t1.presenceImage,
-		ImageColor3 = t1.presenceImageColor3,
-		ImageTransparency = t1.presenceImageTransparency
-	})
+local UIBlox = require(parent.UIBlox)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+
+local function AvatarOneToOne(props)
+	local presenceIndicator
+
+	if props.showNewPresenceImage then
+		presenceIndicator = React.createElement(ImageSetLabel, {
+			Size = UDim2.fromOffset(props.presenceIndicatorSize, props.presenceIndicatorSize),
+			BackgroundTransparency = 1,
+			Image = props.presenceImage,
+			ImageColor3 = props.presenceImageColor3,
+			ImageTransparency = props.presenceImageTransparency
+		})
+	else
+		presenceIndicator = React.createElement("ImageLabel", {
+			Size = UDim2.new(0, props.presenceIndicatorSize, 0, props.presenceIndicatorSize),
+			BackgroundTransparency = 1,
+			Image = props.presenceImage
+		})
+	end
 
 	return React.createElement(CircleMask, {
-		circleColor3 = t1.circleColor3,
-		circleTransparency = t1.circleTransparency,
-		circleInteriorBackgroundColor3 = t1.circleInteriorBackgroundColor3,
-		circleInteriorBackgroundTransparency = t1.circleInteriorBackgroundTransparency,
-		circleDividerColor3 = t1.circleDividerColor3,
-		circleDividerTransparency = t1.circleDividerTransparency,
-		overlaySize = t1.overlaySize,
+		circleColor3 = props.circleColor3,
+		circleTransparency = props.circleTransparency,
+		circleInteriorBackgroundColor3 = props.circleInteriorBackgroundColor3,
+		circleInteriorBackgroundTransparency = props.circleInteriorBackgroundTransparency,
+		circleDividerColor3 = props.circleDividerColor3,
+		circleDividerTransparency = props.circleDividerTransparency,
+		overlaySize = props.overlaySize,
 		renderAboveMask = React.createElement(Frame, {}, {
 			layout = React.createElement("UIListLayout", {
 				HorizontalAlignment = Enum.HorizontalAlignment.Right,
 				VerticalAlignment = Enum.VerticalAlignment.Bottom
 			}),
-			presenceIndicator = v10
+			presenceIndicator = presenceIndicator
 		}),
-		onActivated = t1.onActivated,
-		selectable = t1.selectable
+		onActivated = props.onActivated,
+		selectable = props.selectable
 	}, {
-		uiCorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(1, 0)
-		}),
+		uiCorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
 		avatar = React.createElement(AvatarThumbnail, {
-			thumbnail = t1.thumbnail,
+			thumbnail = props.thumbnail,
 			cornerRadius = UDim.new(1, 0)
 		})
 	})

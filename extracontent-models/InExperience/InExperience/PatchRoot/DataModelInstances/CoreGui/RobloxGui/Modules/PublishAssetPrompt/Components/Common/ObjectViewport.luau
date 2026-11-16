@@ -1,262 +1,320 @@
 local CorePackages = game:GetService("CorePackages")
 local RunService = game:GetService("RunService")
+
 local Roact = require(CorePackages.Packages.Roact)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
-local Skeleton = require(CorePackages.Packages.Foundation).Skeleton
+local Foundation = require(CorePackages.Packages.Foundation)
+local Progress = Foundation.Progress
+local Skeleton = Foundation.Skeleton
+local Text = Foundation.Text
+local View = Foundation.View
+local ProgressShape = Foundation.Enums.ProgressShape
+local ProgressSize = Foundation.Enums.ProgressSize
+
 local withStyle = UIBlox.Style.withStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local t = require(CorePackages.Packages.t)
 local Images = UIBlox.App.ImageSet.Images
 local Constants = require(script.Parent.Parent.Parent.Constants)
-local CharacterUtility = require(CorePackages.Packages.Thumbnailing).CharacterUtility
-local CameraUtility = require(CorePackages.Packages.Thumbnailing).CameraUtility
-local CFrameUtility = require(CorePackages.Packages.Thumbnailing).CFrameUtility
-local EmoteUtility = require(CorePackages.Packages.Thumbnailing).EmoteUtility
+local MakeupPreviewUtils = require(script.Parent.Parent.Parent.MakeupPreviewUtils)
+local FFlagIECPublishValidationLoadingUI = require(script.Parent.Parent.Parent.Flags.FFlagIECPublishValidationLoadingUI)
+local Thumbnailing = require(CorePackages.Packages.Thumbnailing)
+local CharacterUtility = Thumbnailing.CharacterUtility
+local Thumbnailing2 = require(CorePackages.Packages.Thumbnailing)
+local CameraUtility = Thumbnailing2.CameraUtility
+local Thumbnailing3 = require(CorePackages.Packages.Thumbnailing)
+local CFrameUtility = Thumbnailing3.CFrameUtility
+local Thumbnailing4 = require(CorePackages.Packages.Thumbnailing)
+local EmoteUtility = Thumbnailing4.EmoteUtility
+
 local IconButton = UIBlox.App.Button.IconButton
 local IconSize = UIBlox.App.ImageSet.Enum.IconSize
-local v17 = Images["icons/actions/previewExpand"]
-local v18 = Images["component_assets/dropshadow_25"]
-local uDim2 = UDim2.new(0.4, 50, 0.15, 10)
-local uDim2_2 = UDim2.new(0.5, 0, 1, 0)
-local v21 = Roact.PureComponent:extend("ObjectViewport")
+local iconsactionspreviewExpand = Images["icons/actions/previewExpand"]
+local component_assetsdropshadow_25 = Images["component_assets/dropshadow_25"]
 
-v21.validateProps = t.strictInterface({
+local udim = UDim2.new(0.4, 50, 0.15, 10)
+local udim2 = UDim2.new(0.5, 0, 1, 0)
+
+local extended = Roact.PureComponent:extend("ObjectViewport")
+
+local function getReviewingCreationText() -- 1 equivalent call inferred from this helper
+	local success, result = pcall(
+		RobloxTranslator.FormatByKey,
+		RobloxTranslator,
+		"CoreScripts.PublishCommon.ReviewingCreation"
+	)
+	return if success then result else "Reviewing your creation..."
+end
+
+extended.validateProps = t.strictInterface({
 	model = t.optional(t.instanceOf("Model")),
 	fieldOfView = t.optional(t.number),
 	isLoading = t.optional(t.boolean),
 	useFullBodyCameraSettings = t.optional(t.boolean),
 	openPreviewView = t.optional(t.callback),
 	LayoutOrder = t.optional(t.number),
-	isHumanoidModel = t.optional(t.boolean)
+	isHumanoidModel = t.optional(t.boolean),
+	isMakeupPreview = t.optional(t.boolean)
 })
 
-function v21.createCamera(p1) -- line: 48
-	local Camera = Instance.new("Camera")
+function extended:createCamera()
+	local camera = Instance.new("Camera")
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.Parent = self.worldModelRef:getValue()
+	camera.HeadLocked = true
+	camera.VRTiltAndRollEnabled = true
 
-	Camera.CameraType = Enum.CameraType.Scriptable
-	Camera.Parent = p1.worldModelRef:getValue()
-	Camera.HeadLocked = true
-	Camera.VRTiltAndRollEnabled = true
-
-	return Camera
-end
-function v21.init(p2) -- line: 58
-	-- upvalues: Roact (copy)
-	p2.worldModelRef = Roact.createRef()
-
-	local v26, v27 = Roact.createBinding(nil)
-
-	p2.camera = v26
-	p2.updateCamera = v27
-	p2.isMounted = false
+	return camera
 end
 
-local function getCameraDistance(p3, p4) -- line: 64
-	local p4X = p4.X
-	local p4Y = p4.Y
-	local p4Z = p4.Z
-	local v33 = math.max(p4X, p4Y, p4Z)
-	local v34 = 1 / math.tan(math.rad(p3) / 2)
-
-	return v33 / 2 * v34 + p4Z / 2
+function extended:init()
+	self.worldModelRef = Roact.createRef()
+	local binding, updateCamera = Roact.createBinding(nil)
+	self.camera = binding
+	self.updateCamera = updateCamera
+	self.isMounted = false
 end
 
-function v21.setupViewportForAsset(p5) -- line: 72
-	if not p5.props.model then
+local function getCameraDistance(p, data) -- 1 equivalent call inferred from this helper
+	local x = data.X
+	local y = data.Y
+	local z = data.Z
+	local v = math.max(x, y, z)
+	local v2 = 1 / math.tan(math.rad(p) / 2)
+	return v / 2 * v2 + z / 2
+end
+
+function extended:setupViewportForAsset()
+	if not self.props.model then
 		return
 	end
 
-	local clone = p5.props.model:Clone()
-
-	clone.Parent = p5.worldModelRef:getValue()
-
-	local ModelCFrame, ExtentsSize
+	local clone = self.props.model:Clone()
+	clone.Parent = self.worldModelRef:getValue()
+	local v, v2
 
 	if clone:IsA("Model") then
-		clone:MoveTo((Vector3.new(0, 0, 0)))
-		ModelCFrame = clone:GetModelCFrame()
-		ExtentsSize = clone:GetExtentsSize()
-	else
-		local MeshPart = clone:FindFirstChildWhichIsA("MeshPart", true)
+		clone:MoveTo(Vector3.new(0, 0, 0))
+		local v3, v4
 
-		if not MeshPart then
+		if self.props.isMakeupPreview then
+			v3, v4 = MakeupPreviewUtils.getHeadPreviewCameraData(clone)
+		end
+
+		v = v3 or clone:GetModelCFrame()
+		v2 = v4 or clone:GetExtentsSize()
+	else
+		local meshPart = clone:FindFirstChildWhichIsA("MeshPart", true)
+
+		if not meshPart then
 			return
 		end
 
-		MeshPart.CFrame = CFrame.new(0, 0, 0)
-		ModelCFrame = MeshPart.CFrame
-		ExtentsSize = MeshPart.Size
+		meshPart.CFrame = CFrame.new(0, 0, 0)
+		v = meshPart.CFrame
+		v2 = meshPart.Size
 	end
 
-	local lookVector = ModelCFrame.lookVector
-	local v41 = p5:createCamera()
-	local v42 = not p5.props.fieldOfView and 30 or p5.props.fieldOfView
-	local ExtentsSizeX = ExtentsSize.X
-	local ExtentsSizeY = ExtentsSize.Y
-	local ExtentsSizeZ = ExtentsSize.Z
-	local v46 = math.max(ExtentsSizeX, ExtentsSizeY, ExtentsSizeZ)
-	local v47 = 1 / math.tan(math.rad(v42) / 2)
-	local v48 = v46 / 2 * v47 + ExtentsSizeZ / 2
+	local lookVector = v.lookVector
+
+	local camera = self:createCamera()
+
+	local fieldOfView = not self.props.fieldOfView and 30 or self.props.fieldOfView
+	local cameraDistance = getCameraDistance(fieldOfView, v2) -- inferred equivalent call
 	local vector2 = Vector2.new(5, 20)
-	local v50 = math.rad(vector2.X)
-	local v51 = math.rad(vector2.Y)
-	local v52 = CFrame.fromAxisAngle(Vector3.new(1, 0, 0), v50):VectorToWorldSpace(lookVector)
-	local v53 = CFrame.fromAxisAngle(Vector3.new(0, 1, 0), v51):VectorToWorldSpace(v52)
-	local v54 = ModelCFrame.Position + v53 * v48
 
-	v41.CFrame = CFrame.new(v54, ModelCFrame.Position)
-	v41.FieldOfView = v42
-	p5.updateCamera(v41)
+	local x = math.rad(vector2.X)
+	local y = math.rad(vector2.Y)
+
+	local vectorToWorldSpace = CFrame.fromAxisAngle(Vector3.new(1, 0, 0), x):VectorToWorldSpace(lookVector)
+	local vectorToWorldSpace2 = CFrame.fromAxisAngle(Vector3.new(0, 1, 0), y):VectorToWorldSpace(vectorToWorldSpace)
+
+	local v3 = v.Position + vectorToWorldSpace2 * cameraDistance
+	camera.CFrame = CFrame.new(v3, v.Position)
+	camera.FieldOfView = fieldOfView
+
+	self.updateCamera(camera)
 end
-function v21.setupViewport(p6) -- line: 130
-	-- upvalues: EmoteUtility (copy), RunService (copy), CFrameUtility (copy), CharacterUtility (copy), CameraUtility (copy)
-	local clone = p6.props.model:Clone()
 
+function extended:setupViewport()
+	local clone = self.props.model:Clone()
 	assert(clone.PrimaryPart, "The Model should have a PrimaryPart for setting up Camera")
-	clone.Parent = p6.worldModelRef:getValue()
-	clone:MoveTo((Vector3.new(0, 0, 0)))
+	clone.Parent = self.worldModelRef:getValue()
+	clone:MoveTo(Vector3.new(0, 0, 0))
 
-	local useFullBodyCameraSettings = p6.props.useFullBodyCameraSettings
+	local useFullBodyCameraSettings = self.props.useFullBodyCameraSettings
 
 	if useFullBodyCameraSettings then
 		EmoteUtility.SetPlayerCharacterPoseWithMoodFallback(clone)
+
 		RunService.PostSimulation:Wait()
 
-		if not p6.isMounted then
+		if not self.isMounted then
 			return
 		end
 	end
 
-	local v58 = p6:createCamera()
-	local v60
+	local camera = self:createCamera()
+	local targetCFrame2
 
 	if useFullBodyCameraSettings then
-		local v59 = CFrameUtility.CalculateTargetCFrame(clone.Head.CFrame)
-
-		v60 = v59 - v59.Position + clone.PrimaryPart.CFrame.Position
+		local targetCFrame = CFrameUtility.CalculateTargetCFrame(clone.Head.CFrame)
+		targetCFrame2 = targetCFrame - targetCFrame.Position + clone.PrimaryPart.CFrame.Position
 	else
-		v60 = clone.PrimaryPart.CFrame
+		targetCFrame2 = clone.PrimaryPart.CFrame
 	end
 
-	local v61, v62 = CharacterUtility.CalculateModelExtents(clone, v60)
-	local t1 = {
-		extentScale = 1,
-		optFieldOfView = not p6.props.fieldOfView and 30 or p6.props.fieldOfView,
-		targetCFrame = v60,
-		minExtent = v61,
-		maxExtent = v62
+	local modelExtents, maxExtent = CharacterUtility.CalculateModelExtents(clone, targetCFrame2)
+	local v = {
+		optFieldOfView = not self.props.fieldOfView and 30 or self.props.fieldOfView,
+		targetCFrame = targetCFrame2,
+		minExtent = modelExtents,
+		maxExtent = maxExtent,
+		extentScale = 1
 	}
 
 	if useFullBodyCameraSettings then
-		t1.optCameraXRot = CameraUtility.XRotForFullBody
-		t1.optCameraDistanceScale = CameraUtility.DistanceScaleForFullBody
-		t1.extentScale = CameraUtility.DefaultBodyMarginScale
+		v.optCameraXRot = CameraUtility.XRotForFullBody
+		v.optCameraDistanceScale = CameraUtility.DistanceScaleForFullBody
+		v.extentScale = CameraUtility.DefaultBodyMarginScale
 	else
-		t1.optCameraYRot = 25
+		v.optCameraYRot = 25
 	end
 
-	CameraUtility.SetupCamera(v58, t1)
-	p6.updateCamera(v58)
+	CameraUtility.SetupCamera(camera, v)
+	self.updateCamera(camera)
 end
-function v21.didMount(p7) -- line: 174
-	p7.isMounted = true
-	task.spawn(function() -- line: 176
-		-- upvalues: p7 (copy)
-		if not p7.props.isLoading then
-			if p7.props.isHumanoidModel then
-				p7:setupViewport()
 
-				return
+function extended:didMount()
+	self.isMounted = true
+	task.spawn(function()
+		if not self.props.isLoading then
+			if self.props.isHumanoidModel then
+				self:setupViewport()
+			else
+				self:setupViewportForAsset()
 			end
-
-			p7:setupViewportForAsset()
 		end
 	end)
 end
-function v21.didUpdate(p8, p9) -- line: 187
-	if p9.isLoading and not p8.props.isLoading then
-		task.spawn(function() -- line: 190
-			-- upvalues: p8 (copy)
-			if p8.props.isHumanoidModel then
-				p8:setupViewport()
 
-				return
+function extended:didUpdate(p)
+	if p.isLoading and not self.props.isLoading then
+		task.spawn(function()
+			if self.props.isHumanoidModel then
+				self:setupViewport()
+			else
+				self:setupViewportForAsset()
 			end
-
-			p8:setupViewportForAsset()
 		end)
 	end
 end
-function v21.render(p10) -- line: 200
-	-- upvalues: withStyle (copy), Roact (copy), Constants (copy), IconButton (copy), v17 (copy), IconSize (copy), ImageSetLabel (copy), uDim2_2 (copy), v18 (copy), uDim2 (copy), Skeleton (copy)
-	return withStyle(function(p11) -- line: 201
-		-- upvalues: p10 (copy), Roact (copy), Constants (copy), IconButton (copy), v17 (copy), IconSize (copy), ImageSetLabel (copy), uDim2_2 (copy), v18 (copy), uDim2 (copy), Skeleton (copy)
-		local Theme = p11.Theme
 
-		if not p10.props.isLoading then
-			return Roact.createElement("Frame", {
-				BackgroundTransparency = 0,
-				BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-				Size = UDim2.new(1, Constants.PromptSidePadding * 2, 0, 240),
-				Position = UDim2.fromScale(0.5, 0.5),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				LayoutOrder = p10.props.LayoutOrder
-			}, {
-				ViewportFrame = Roact.createElement("ViewportFrame", {
-					BackgroundTransparency = 1,
-					Size = UDim2.fromScale(1, 1),
+function extended.render(data)
+	return withStyle(function(p)
+		local theme = p.Theme
+
+		if data.props.isLoading then
+			if not FFlagIECPublishValidationLoadingUI then
+				return (Roact.createElement(Skeleton, {
+					Size = UDim2.new(1, Constants.PromptSidePadding * 2, 0, 240),
 					Position = UDim2.fromScale(0.5, 0.5),
 					AnchorPoint = Vector2.new(0.5, 0.5),
-					LightColor = Constants.ViewportLightColor,
-					Ambient = Constants.ViewportLightAmbient,
-					LightDirection = Constants.ViewportLightDirection,
-					CurrentCamera = p10.camera
-				}, {
-					WorldModel = Roact.createElement("WorldModel", {
-						[Roact.Ref] = p10.worldModelRef
-					})
-				}),
-				ExpandPreviewButton = p10.props.openPreviewView and Roact.createElement(IconButton, {
-					position = UDim2.new(1, -Constants.PromptSidePadding, 1, 0),
-					anchorPoint = Vector2.new(1, 1),
-					icon = v17,
-					iconSize = IconSize.Medium,
-					onActivated = p10.props.openPreviewView
-				}),
-				Gradient = Roact.createElement("UIGradient", {
-					Rotation = 90,
-					Color = ColorSequence.new({
-						ColorSequenceKeypoint.new(0, Theme.BackgroundMuted.Color),
-						ColorSequenceKeypoint.new(1, Theme.BackgroundMuted.Color)
-					}),
-					Transparency = NumberSequence.new({
-						NumberSequenceKeypoint.new(0, 1),
-						NumberSequenceKeypoint.new(0.7, 0.75),
-						NumberSequenceKeypoint.new(1, 1)
-					})
-				}),
-				DropShadow = Roact.createElement(ImageSetLabel, {
+					LayoutOrder = data.props.LayoutOrder
+				}))
+			end
+
+			return (Roact.createElement(
+				"CanvasGroup",
+				{
 					BackgroundTransparency = 1,
-					ImageTransparency = 0.5,
-					ZIndex = 0,
-					Position = uDim2_2,
-					AnchorPoint = Vector2.new(0.5, 1),
-					Image = v18,
-					Size = uDim2
-				})
-			})
+					Size = UDim2.new(1, 0, 0, 240),
+					LayoutOrder = data.props.LayoutOrder
+				},
+				{
+					Content = Roact.createElement(
+						View,
+						{ tag = "col align-x-center align-y-center gap-medium size-full" },
+						{
+							ProgressCircle = Roact.createElement(Progress, {
+								shape = ProgressShape.Circle,
+								size = ProgressSize.Large
+							}),
+							Status = Roact.createElement(
+								View,
+								{
+									tag = "row align-x-center align-y-center size-0-800 auto-x radius-circle clip bg-action-utility",
+									testId = "reviewing-creation-status"
+								},
+								{
+									Text = Roact.createElement(Text, {
+										Text = getReviewingCreationText(), -- inferred equivalent call
+										tag = "shrink size-0-full auto-x padding-x-medium text-label-medium text-truncate-end content-action-utility"
+									})
+								}
+							)
+						}
+					)
+				}
+			))
 		end
 
-		return (Roact.createElement(Skeleton, {
+		return Roact.createElement("Frame", {
+			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+			BackgroundTransparency = 0,
 			Size = UDim2.new(1, Constants.PromptSidePadding * 2, 0, 240),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			LayoutOrder = p10.props.LayoutOrder
-		}))
+			LayoutOrder = data.props.LayoutOrder
+		}, {
+			ViewportFrame = Roact.createElement("ViewportFrame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1),
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				LightColor = Constants.ViewportLightColor,
+				Ambient = Constants.ViewportLightAmbient,
+				LightDirection = Constants.ViewportLightDirection,
+				CurrentCamera = data.camera
+			}, {
+				WorldModel = Roact.createElement("WorldModel", { [Roact.Ref] = data.worldModelRef })
+			}),
+			ExpandPreviewButton = data.props.openPreviewView and Roact.createElement(IconButton, {
+				position = UDim2.new(1, -Constants.PromptSidePadding, 1, 0),
+				anchorPoint = Vector2.new(1, 1),
+				icon = iconsactionspreviewExpand,
+				iconSize = IconSize.Medium,
+				onActivated = data.props.openPreviewView
+			}),
+			Gradient = Roact.createElement("UIGradient", {
+				Rotation = 90,
+				Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, theme.BackgroundMuted.Color),
+					ColorSequenceKeypoint.new(1, theme.BackgroundMuted.Color)
+				}),
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 1),
+					NumberSequenceKeypoint.new(0.7, 0.75),
+					NumberSequenceKeypoint.new(1, 1)
+				})
+			}),
+			DropShadow = Roact.createElement(ImageSetLabel, {
+				Position = udim2,
+				AnchorPoint = Vector2.new(0.5, 1),
+				Image = component_assetsdropshadow_25,
+				BackgroundTransparency = 1,
+				ImageTransparency = 0.5,
+				Size = udim,
+				ZIndex = 0
+			})
+		})
 	end)
 end
-function v21.willUnmount(p12) -- line: 267
-	p12.isMounted = false
+
+function extended:willUnmount()
+	self.isMounted = false
 end
 
-return v21
+return extended

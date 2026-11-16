@@ -1,12 +1,19 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local ParentParent = script.Parent.Parent
-local Assets = require(ParentParent.Resources.Assets)
-local GlobalConfig = require(ParentParent.GlobalConfig)
-local v9 = t.strictInterface({
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
+
+local parent = script.Parent.Parent
+
+local Assets = require(parent.Resources.Assets)
+
+local GlobalConfig = require(parent.GlobalConfig)
+
+local v = t.strictInterface({
 	Size = t.optional(t.UDim2),
 	AnchorPoint = t.optional(t.UDim2),
 	CanvasSize = t.optional(t.UDim2),
@@ -14,38 +21,36 @@ local v9 = t.strictInterface({
 	[Roact.Children] = t.optional(t.table)
 })
 
-local function PaddedScrollFrame(p1) -- line: 23
-	-- upvalues: GlobalConfig (copy), v9 (copy), withFoundationOrUIBloxStyle (copy), Roact (copy), Assets (copy)
+local function PaddedScrollFrame(props)
 	if GlobalConfig.propValidation then
-		assert(v9(p1))
+		assert(v(props))
 	end
 
-	return withFoundationOrUIBloxStyle(function(p2) -- line: 27
+	return withFoundationOrUIBloxStyle(function(p)
 		return {
 			Theme = {
 				UIEmphasis = {
-					Color = p2.Color.Shift.Shift_400.Color3,
-					Transparency = p2.Color.Shift.Shift_400.Transparency
+					Color = p.Color.Shift.Shift_400.Color3,
+					Transparency = p.Color.Shift.Shift_400.Transparency
 				}
 			}
 		}
-	end, function(p3) -- line: 33
-		-- upvalues: Roact (copy), Assets (copy), p1 (copy)
+	end, function(p)
 		return Roact.createElement("ScrollingFrame", {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			ClipsDescendants = false,
-			ScrollBarThickness = 12,
-			ScrollBarImageColor3 = p3.Theme.UIEmphasis.Color,
-			ScrollBarImageTransparency = p3.Theme.UIEmphasis.Transparency,
+			ScrollBarImageColor3 = p.Theme.UIEmphasis.Color,
+			ScrollBarImageTransparency = p.Theme.UIEmphasis.Transparency,
 			BottomImage = Assets.Images.ScrollBottom,
 			MidImage = Assets.Images.ScrollMid,
 			TopImage = Assets.Images.ScrollTop,
-			Size = p1.Size,
-			AnchorPoint = p1.AnchorPoint,
-			CanvasSize = p1.CanvasSize,
-			Position = p1.Position
-		}, p1[Roact.Children])
+			ClipsDescendants = false,
+			ScrollBarThickness = 12,
+			Size = props.Size,
+			AnchorPoint = props.AnchorPoint,
+			CanvasSize = props.CanvasSize,
+			Position = props.Position
+		}, props[Roact.Children])
 	end)
 end
 

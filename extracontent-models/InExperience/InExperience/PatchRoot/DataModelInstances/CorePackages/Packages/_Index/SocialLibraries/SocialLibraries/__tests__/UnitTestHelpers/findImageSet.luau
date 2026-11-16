@@ -1,13 +1,13 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-local UIBlox = require(SocialLibraries.dependencies).UIBlox
+local dependencies = require(SocialLibraries.dependencies)
+local uiBlox = dependencies.UIBlox
 
-return function(p1) -- line: 5
-	-- upvalues: UIBlox (copy)
-	local v4 = UIBlox.App.ImageSet.Images[p1]
+return function(p)
+	local image = uiBlox.App.ImageSet.Images[p]
 
 	return {
-		Image = v4.Image,
-		ImageRectSize = v4.ImageRectSize,
-		ImageRectOffset = v4.ImageRectOffset
+		Image = image.Image,
+		ImageRectSize = image.ImageRectSize,
+		ImageRectOffset = image.ImageRectOffset
 	}
 end

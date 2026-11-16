@@ -1,19 +1,21 @@
-local ParentParent = script.Parent.Parent
-local APIUtil = require(ParentParent.util.APIUtil)
+local parent = script.Parent.Parent
+
+local APIUtil = require(parent.util.APIUtil)
+
 local HttpService = game:GetService("HttpService")
-local v4 = APIUtil.getBaseDomain()
-local v5 = string.format("https://apis.%s", v4) .. "assets/rcc/v1/assets/%s"
 
-local function getAssetCreationDetailsRCC(s1: string) -- line: 15
-	-- upvalues: v5 (copy), APIUtil (copy), HttpService (copy)
-	local v8 = string.format(v5, s1)
-	local v9, v10 = APIUtil.requestAndRetryGet(v8)
+local baseDomain = APIUtil.getBaseDomain()
+local v = string.format("https://apis.%s", baseDomain) .. "assets/rcc/v1/assets/%s"
 
-	if v9 then
-		return true, HttpService:JSONDecode(v10)
+local function getAssetCreationDetailsRCC(p: string)
+	local v2 = string.format(v, p)
+	local requestAndRetryGet, v3 = APIUtil.requestAndRetryGet(v2)
+
+	if requestAndRetryGet then
+		return true, HttpService:JSONDecode(v3)
 	end
 
-	return false, v10
+	return false, v3
 end
 
 return getAssetCreationDetailsRCC

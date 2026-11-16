@@ -1,95 +1,84 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Signals = require(AppChatParent.Signals)
-local SignalsReact = require(AppChatParent.SignalsReact)
-local createCurrentTimeSignal = require(AppChatParent.SignalsUtils).createCurrentTimeSignal
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local SignalsUtils = require(parent.SignalsUtils)
+local createCurrentTimeSignal = SignalsUtils.createCurrentTimeSignal
+
 local GetChatModerationStatusDataHydration = require(AppChat.Stores.GetChatModerationStatusDataHydration)
-
 require(AppChat.Stores.GetConversationStore)
-
 local getConversationSendEligibilityStatus = require(AppChat.Utils.getConversationSendEligibilityStatus)
 
-local function areResultsEqual(t1: {[any]: any}, t2: {[any]: any}) -- line: 29
-	if t1.isLoading ~= t2.isLoading or #t1.eligibleConversations ~= #t2.eligibleConversations then
+local function areResultsEqual(p, p2): boolean
+	if p.isLoading ~= p2.isLoading or #p.eligibleConversations ~= #p2.eligibleConversations then
 		return false
 	end
 
-	for v13, v14 in t1.eligibleConversations do
-		if v14 ~= t2.eligibleConversations[v13] then
+	for k, eligibleConversation in p.eligibleConversations do
+		if eligibleConversation ~= p2.eligibleConversations[k] then
 			return false
 		end
 	end
 
 	return true
 end
-local function useExternalChatConversationEligibility(t3: {[any]: any}) -- line: 43
-	-- upvalues: GetChatModerationStatusDataHydration (copy), React (copy), createCurrentTimeSignal (copy), Signals (copy), getConversationSendEligibilityStatus (copy), areResultsEqual (copy), SignalsReact (copy)
-	local v16 = GetChatModerationStatusDataHydration()
-	local v17 = React.useMemo(function() -- line: 45
-		-- upvalues: createCurrentTimeSignal (copy)
+
+local function useExternalChatConversationEligibility(data)
+	local timeoutStore = GetChatModerationStatusDataHydration()
+	local v = React.useMemo(function()
 		return createCurrentTimeSignal(1)
 	end, {})
-	local v18 = React.useMemo(function() -- line: 50
-		-- upvalues: Signals (copy), t3 (copy), v17 (copy), getConversationSendEligibilityStatus (copy), v16 (copy), areResultsEqual (copy)
-		return Signals.createComputed(function(p1) -- line: 51
-			-- upvalues: t3 (copy), v17 (copy), getConversationSendEligibilityStatus (copy), v16 (copy)
-			local t4 = {}
 
-			if not t3.isActive then
-				return {
-					isLoading = true,
-					eligibleConversations = t4
-				}
+	local v2 = React.useMemo(function()
+		return Signals.createComputed(function(scope)
+			local conversations = {}
+
+			if not data.isActive then
+				return { eligibleConversations = conversations, isLoading = true }
 			end
 
-			local v21 = v17(p1)
+			local currentTimestamp = v(scope)
 
-			for _, v23 in t3.conversations do
-				local v24 = getConversationSendEligibilityStatus({
+			for _, conversation in data.conversations do
+				local conversationSendEligibilityStatus = getConversationSendEligibilityStatus({
 					allowConversationStatusLoading = false,
+					conversation = conversation,
+					currentTimestamp = currentTimestamp,
 					isAvailable = true,
-					conversation = v23,
-					currentTimestamp = v21,
-					isGroupChatEnabled = t3.isGroupChatEnabled,
-					scope = p1,
-					timeoutStore = v16
+					isGroupChatEnabled = data.isGroupChatEnabled,
+					scope = scope,
+					timeoutStore = timeoutStore
 				})
 
-				if v24 == "loading" then
-					return {
-						isLoading = true,
-						eligibleConversations = {}
-					}
+				if conversationSendEligibilityStatus == "loading" then
+					return { eligibleConversations = {}, isLoading = true }
 				end
 
-				if v24 == "eligible" then
-					table.insert(t4, v23)
+				if conversationSendEligibilityStatus ~= "eligible" then
+					continue
+				end
 
-					if #t4 >= t3.maxConversationCount then
-						return {
-							isLoading = false,
-							eligibleConversations = t4
-						}
-					end
+				table.insert(conversations, conversation)
+
+				if #conversations >= data.maxConversationCount then
+					break
 				end
 			end
 
-			return {
-				isLoading = false,
-				eligibleConversations = t4
-			}
+			return { eligibleConversations = conversations, isLoading = false }
 		end, areResultsEqual)
 	end, {
-		v17,
-		t3.conversations,
-		t3.isActive,
-		t3.isGroupChatEnabled,
-		t3.maxConversationCount,
-		v16
+		v,
+		data.conversations,
+		data.isActive,
+		data.isGroupChatEnabled,
+		data.maxConversationCount,
+		timeoutStore
 	})
 
-	return SignalsReact.useSignalState(v18)
+	return SignalsReact.useSignalState(v2)
 end
 
 return useExternalChatConversationEligibility

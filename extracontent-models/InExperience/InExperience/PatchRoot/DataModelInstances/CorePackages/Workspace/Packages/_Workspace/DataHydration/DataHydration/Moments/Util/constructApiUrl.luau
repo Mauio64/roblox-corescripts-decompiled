@@ -1,69 +1,62 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Http = require(DataHydrationParent.Http)
+local parent = DataHydration.Parent
 
-require(DataHydrationParent.HttpClient)
-
+local Http = require(parent.Http)
+require(parent.HttpClient)
 local FStringArgusApiUrlBase = require(DataHydration.Moments.FStringArgusApiUrlBase)
 
-local function normalizeBaseUrl(s1: string) -- line: 14
-	if s1:sub(#s1) == "/" then
-		return s1:sub(1, #s1 - 1)
+local function normalizeBaseUrl(value: string) -- 2 equivalent calls inferred from this helper
+	if value:sub(#value) == "/" then
+		return value:sub(1, #value - 1)
 	end
 
-	return s1
+	return value
 end
-local function normalizePath(s2: string) -- line: 22
-	if s2:sub(1, 1) == "/" then
-		return s2
+
+local function normalizePath(value: string) -- 1 equivalent call inferred from this helper
+	if value:sub(1, 1) == "/" then
+		return value
 	end
 
-	return `/{ s2 }`
+	return `/{value}`
 end
-local function getFStringApiUrlBase() -- line: 30
-	-- upvalues: FStringArgusApiUrlBase (copy)
-	local v11 = FStringArgusApiUrlBase()
 
-	if v11 == "" then
+local function getFStringApiUrlBase() -- 1 equivalent call inferred from this helper
+	local fStringArgusApiUrlBase = FStringArgusApiUrlBase()
+
+	if fStringArgusApiUrlBase == "" then
 		return nil
 	end
 
-	local v12 = if v11:sub(#v11) ~= "/" then v11 else v11:sub(1, #v11 - 1)
+	fStringArgusApiUrlBase = normalizeBaseUrl(fStringArgusApiUrlBase) -- inferred equivalent call
 
-	if v12:match("^https?://") == nil then
+	if fStringArgusApiUrlBase:match("^https?://") == nil then
 		return nil
 	end
 
-	return v12
+	return fStringArgusApiUrlBase
 end
-local function constructApiUrl(s3: string) -- line: 44
-	-- upvalues: FStringArgusApiUrlBase (copy), Http (copy)
-	assert(type(s3) == "string", "path must be a string")
 
-	local LocalPlayer = game:GetService("Players").LocalPlayer
-	local v15 = FStringArgusApiUrlBase()
-	local v16
+local function constructApiUrl(value: string)
+	assert(type(value) == "string", "path must be a string")
+	local Players = game:GetService("Players")
+	local localPlayer = Players.LocalPlayer
+	local fStringApiUrlBase = getFStringApiUrlBase() -- inferred equivalent call
 
-	if v15 == "" then
-		v16 = nil
-	else
-		local v17 = if v15:sub(#v15) ~= "/" then v15 else v15:sub(1, #v15 - 1)
-
-		v16 = if v17:match("^https?://") ~= nil then v17 else nil
+	if fStringApiUrlBase == nil then
+		fStringApiUrlBase = Http.Url.APIS_URL
 	end
 
-	local v18 = if v16 == nil then Http.Url.APIS_URL else v16
-	local v19 = if v18:sub(#v18) ~= "/" then v18 else v18:sub(1, #v18 - 1)
-	local v20 = v19 == "https://apis.roblox.com"
-	local v21 = `{ v19 }{ (if s3:sub(1, 1) ~= "/" then `/{ s3 }` else s3) }`
+	fStringApiUrlBase = normalizeBaseUrl(fStringApiUrlBase) -- inferred equivalent call
+	local v = fStringApiUrlBase == "https://apis.roblox.com"
+	value = normalizePath(value) -- inferred equivalent call
+	local formatted = `{fStringApiUrlBase}{value}`
 
-	if not v20 and LocalPlayer ~= nil then
-		return v21, {
-			["robloxctx-authenticated-userid"] = tostring(LocalPlayer.UserId)
-		}
+	if v or localPlayer == nil then
+		return formatted, nil
 	end
 
-	return v21, nil
+	return formatted, { ["robloxctx-authenticated-userid"] = tostring(localPlayer.UserId) }
 end
 
 return constructApiUrl

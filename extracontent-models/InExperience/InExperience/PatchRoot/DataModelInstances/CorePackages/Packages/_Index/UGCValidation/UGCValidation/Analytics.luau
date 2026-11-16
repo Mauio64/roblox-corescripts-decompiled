@@ -1,343 +1,278 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 
-require(scriptParent.util.Types)
+require(parent.util.Types)
 
 local RunService = game:GetService("RunService")
 local UGCValidationService = game:GetService("UGCValidationService")
-local v4 = if not RunService:IsStudio() then nil else game:GetService("StudioService")
-local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local getEngineFeatureEngineUGCValidationReportScriptTime = require(scriptParent.flags.getEngineFeatureEngineUGCValidationReportScriptTime)
-local getEngineFeatureEngineUGCValidationIECTelemetry = require(scriptParent.flags.getEngineFeatureEngineUGCValidationIECTelemetry)
-local getEngineFeatureEngineUGCValidateRigidNonSkinned = require(scriptParent.flags.getEngineFeatureEngineUGCValidateRigidNonSkinned)
-local getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds = require(scriptParent.flags.getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds)
-local getEngineFeatureEngineUGCValidatePropertiesSensible = require(scriptParent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
-local getFFlagUGCValidateHSRMeshIds = require(scriptParent.flags.getFFlagUGCValidateHSRMeshIds)
-local getFFlagUGCValidationEyebrowEyelashSupport = require(scriptParent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
-local getFFlagUGCValidateCurveAnimRotationSpeed = require(scriptParent.flags.getFFlagUGCValidateCurveAnimRotationSpeed)
-local getFFlagUGCValidateTexturePack = require(scriptParent.flags.getFFlagUGCValidateTexturePack)
+local StudioService
 
-local function joinTables(...) -- line: 30
-	local t1 = {}
+if RunService:IsStudio() then
+	StudioService = game:GetService("StudioService")
+else
+	StudioService = nil
+end
+
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+
+local getEngineFeatureEngineUGCValidationReportScriptTime = require(parent.flags.getEngineFeatureEngineUGCValidationReportScriptTime)
+
+local getEngineFeatureEngineUGCValidationIECTelemetry = require(parent.flags.getEngineFeatureEngineUGCValidationIECTelemetry)
+
+local getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds = require(parent.flags.getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds)
+
+local getEngineFeatureEngineUGCValidatePropertiesSensible = require(parent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
+
+local getFFlagUGCValidationEyebrowEyelashSupport = require(parent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
+local getFFlagUGCValidateTexturePack = require(parent.flags.getFFlagUGCValidateTexturePack)
+
+local function joinTables(...)
+	local result = {}
 
 	for i = 1, select("#", ...) do
-		for v19, v20 in select(i, ...) do
-			t1[v19] = v20
+		for k, v in (select)(i, ...) do
+			result[k] = v
 		end
 	end
 
-	return t1
+	return result
 end
 
-local t2 = {
-	ErrorType = {
-		resetPhysicsData_FailedToLoadMesh = "resetPhysicsData_FailedToLoadMesh",
-		validateAccurateBoundingBox = "validateAccurateBoundingBox",
-		validateAssetBounds_AssetSizeTooBig = "validateAssetBounds_AssetSizeTooBig",
-		validateAssetBounds_AssetSizeTooSmall = "validateAssetBounds_AssetSizeTooSmall",
-		validateAssetBounds_InconsistentAvatarPartScaleType = "validateAssetBounds_InconsistentAvatarPartScaleType",
-		validateScaleType_InvalidAvatarPartScaleType = "validateScaleType_InvalidAvatarPartScaleType",
-		validateAssetCreator_DependencyNotOwnedByCreator = "validateAssetCreator_DependencyNotOwnedByCreator",
-		validateAssetCreator_FailedToLoad = "validateAssetCreator_FailedToLoad",
-		validateAssetCreator_TooManyDependencies = "validateAssetCreator_TooManyDependencies",
-		validateAssetTransparency_AssetTransparencyThresholds = "validateAssetTransparency_AssetTransparencyThresholds",
-		validateAttributes = "validateAttributes",
-		validateBodyPartChildAttachmentBounds_InvalidAttachmentPosition = "validateBodyPartChildAttachmentBounds_InvalidAttachmentPosition",
-		validateBodyPartCollisionFidelity = "validateBodyPartCollisionFidelity",
-		validateBodyPartMeshBounds_FailedToLoadMesh = "validateBodyPartMeshBounds_FailedToLoadMesh",
-		validateCageUVs_TestExecutedSuccessfully = "validateCageUVs_TestExecutedSuccessfully",
-		validateCageUVs_TestPassed = "validateCageUVs_TestPassed",
-		validateCageUVTriangleArea_FailedToLoadMesh = "validateCageUVTriangleArea_FailedToLoadMesh",
-		validateCageUVTriangleArea_ZeroAreaTriangle = "validateCageUVTriangleArea_ZeroAreaTriangle",
-		validateCageUVValues_FailedToLoadMesh = "validateCageUVValues_FailedToLoadMesh",
-		validateCageUVValues_UnexpectedUVValue = "validateCageUVValues_UnexpectedUVValue",
-		validateCanLoad = "validateCanLoad",
-		validateDependencies_IsNotApproved = "validateDependencies_IsNotApproved",
-		validateDependencies_IsRestrictedUserId = "validateDependencies_IsRestrictedUserId",
-		validateDependencies_IsReviewing = "validateDependencies_IsReviewing",
-		validateDependencies_ParseFailure = "validateDependencies_ParseFailure",
-		validateDescendantMeshMetrics_FailedToCalculateTriangles = "validateDescendantMeshMetrics_FailedToCalculateTriangles",
-		validateDescendantMeshMetrics_FailedToLoadMesh = "validateDescendantMeshMetrics_FailedToLoadMesh",
-		validateDescendantMeshMetrics_HasSkinnedMeshMismatch = "validateDescendantMeshMetrics_HasSkinnedMeshMismatch",
-		validateDescendantMeshMetrics_NoSkinningInfo = "validateDescendantMeshMetrics_NoSkinningInfo",
-		validateDescendantMeshMetrics_TooFarFromOrigin = "validateDescendantMeshMetrics_TooFarFromOrigin",
-		validateDescendantMeshMetrics_TooManyTriangles = "validateDescendantMeshMetrics_TooManyTriangles",
-		validateDynamicHeadMeshPartFormat_FailedToLoadMesh = "validateDynamicHeadMeshPartFormat_FailedToLoadMesh",
-		validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMesh = "validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMesh",
-		validateFullBody_IncorrectAssetTypeSet = "validateFullBody_IncorrectAssetTypeSet",
-		validateFullBody_InstancesMissing = "validateFullBody_InstancesMissing",
-		validateFullBody_MeshIdsMissing = "validateFullBody_MeshIdsMissing",
-		validateHSR_HSRDataNotReady = "validateHSR_HSRDataNotReady",
-		validateHSR_NoWrapLayer = "validateHSR_NoWrapLayer",
-		validateInstanceTree = "validateInstanceTree",
-		validateInstanceTree_InvalidDescendants = "validateInstanceTree_InvalidDescendants",
-		validateLayeredClothingAccessory_AssetTypeNotAllowedAsLayeredClothing = "validateLayeredClothingAccessory_AssetTypeNotAllowedAsLayeredClothing",
-		validateLayeredClothingAccessory_FailedToLoadMesh = "validateLayeredClothingAccessory_FailedToLoadMesh",
-		validateLayeredClothingAccessory_NoInnerCageId = "validateLayeredClothingAccessory_NoInnerCageId",
-		validateLayeredClothingAccessory_NoMeshId = "validateLayeredClothingAccessory_NoMeshId",
-		validateLayeredClothingAccessory_NoOuterCageId = "validateLayeredClothingAccessory_NoOuterCageId",
-		validateLayeredClothingAccessory_NoWrapLayer = "validateLayeredClothingAccessory_NoWrapLayer",
-		validateLayeredClothingAccessoryMeshPartAssetFormatMatch_MeshIdMismatch = "validateLayeredClothingAccessoryMeshPartAssetFormatMatch_MeshIdMismatch",
-		validateLayeredClothingAccessoryMeshPartAssetFormatMatch_TextureIdMismatch = "validateLayeredClothingAccessoryMeshPartAssetFormatMatch_TextureIdMismatch",
-		validateLegacyAccessory_AssetTypeNotAllowedAsRigidAccessory = "validateLegacyAccessory_AssetTypeNotAllowedAsRigidAccessory",
-		validateLegacyAccessoryMeshPartAssetFormatMatch_MeshIdMismatch = "validateLegacyAccessoryMeshPartAssetFormatMatch_MeshIdMismatch",
-		validateLegacyAccessoryMeshPartAssetFormatMatch_TextureIdMismatch = "validateLegacyAccessoryMeshPartAssetFormatMatch_TextureIdMismatch",
-		validateLimbsAndTorso_FolderInfoMismatch = "validateLimbsAndTorso_FolderInfoMismatch",
-		validateLimbsAndTorso_R6FolderHasChildren = "validateLimbsAndTorso_R6FolderHasChildren",
-		validateLimbsAndTorso_TopLevelFolders = "validateLimbsAndTorso_TopLevelFolders",
-		validateMaterials = "validateMaterials",
-		validateMeshBounds_FailedToExecute = "validateMeshBounds_FailedToExecute",
-		validateMeshBounds_FailedToLoadMesh = "validateMeshBounds_FailedToLoadMesh",
-		validateMeshBounds_TooLarge = "validateMeshBounds_TooLarge",
-		validateMeshComparison = "validateMeshComparison",
-		validateMeshPartAccessory_DoubleSided = "validateMeshPartAccessory_DoubleSided",
-		validateMeshPartAccessory_FailedToLoadMesh = "validateMeshPartAccessory_FailedToLoadMesh",
-		validateMeshPartAccessory_NoMeshId = "validateMeshPartAccessory_NoMeshId",
-		validateMeshPartBodyPart_ValidateWithSchema = "validateMeshPartBodyPart_ValidateWithSchema",
-		validateMeshTriangleArea_FailedToLoadMesh = "validateMeshTriangleArea_FailedToLoadMesh",
-		validateMeshTriangleArea_NoArea = "validateMeshTriangleArea_NoArea",
-		validateMeshTriangles_FailedToExecute = "validateMeshTriangles_FailedToExecute",
-		validateMeshTriangles_FailedToLoadMesh = "validateMeshTriangles_FailedToLoadMesh",
-		validateMeshTriangles_TooManyTriangles = "validateMeshTriangles_TooManyTriangles",
-		validateMeshVertexColors_FailedToLoadMesh = "validateMeshVertexColors_FailedToLoadMesh",
-		validateMeshVertexColors_NonNeutralVertexColors = "validateMeshVertexColors_NonNeutralVertexColors",
-		validateModeration_AssetsHaveNotPassedModeration = "validateModeration_AssetsHaveNotPassedModeration",
-		validateModeration_CouldNotFetchModerationDetails = "validateModeration_CouldNotFetchModerationDetails",
-		validateModeration_FailedToParse = "validateModeration_FailedToParse",
-		validateModeration_ValidateUser = "validateModeration_ValidateUser",
-		validatePackage_FailedToParse = "validatePackage_FailedToParse",
-		validateProperties_PropertyDoesNotExist = "validateProperties_PropertyDoesNotExist",
-		validateProperties_PropertyMismatch = "validateProperties_PropertyMismatch",
-		validateSingleInstance_MultipleInstances = "validateSingleInstance_MultipleInstances",
-		validateSingleInstance_ZeroInstances = "validateSingleInstance_ZeroInstances",
-		validateSurfaceAppearances_InvalidAlphaMode = "validateSurfaceAppearances_InvalidAlphaMode",
-		validateSurfaceAppearances_MeshPartHasTexture = "validateSurfaceAppearances_MeshPartHasTexture",
-		validateSurfaceAppearances_MissingSurfaceAppearance = "validateSurfaceAppearances_MissingSurfaceAppearance",
-		validateTags = "validateTags",
-		validateTextureSize_FailedToExecute = "validateTextureSize_FailedToExecute",
-		validateTextureSize_FailedToLoadTexture = "validateTextureSize_FailedToLoadTexture",
-		validateTextureSize_InvalidTextureId = "validateTextureSize_InvalidTextureId",
-		validateTextureSize_TextureTooBig = "validateTextureSize_TextureTooBig",
-		validateTextureTransparency_InvalidTextureId = "validateTextureTransparency_InvalidTextureId",
-		validateTextureTransparency_TransparentTexture = "validateTextureTransparency_TransparentTexture",
-		validateThumbnailConfiguration_InvalidTarget = "validateThumbnailConfiguration_InvalidTarget",
-		validateThumbnailConfiguration_OutsideView = "validateThumbnailConfiguration_OutsideView",
-		validateVertexDensity_FailedToExecute = "validateVertexDensity_FailedToExecute",
-		validateVertexDensity_MaxDensityExceeded = "validateVertexDensity_MaxDensityExceeded",
-		validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMeshControls = "validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMeshControls",
-		validateRenderMeshInsideOuterCageMesh_FailedToExecute = "validateRenderMeshInsideOuterCageMesh_FailedToExecute",
-		validateRenderMeshInsideOuterCageMesh_MaxOutsideCageMeshExceeded = "validateRenderMeshInsideOuterCageMesh_MaxOutsideCageMeshExceeded",
-		validateLayeredClothingAccessory_CageOriginOutOfBounds = "validateLayeredClothingAccessory_CageOriginOutOfBounds",
-		validateBodyPart_CageOriginOutOfBounds = "validateBodyPart_CageOriginOutOfBounds",
-		validateTotalSurfaceArea_FailedToExecute = "validateTotalSurfaceArea_FailedToExecute",
-		validateTotalSurfaceArea_maxTotalSurfaceAreaExceeded = "validateTotalSurfaceArea_maxTotalSurfaceAreaExceeded",
-		validateCoplanarIntersection_FailedToExecute = "validateCoplanarIntersection_FailedToExecute",
-		validateCoplanarIntersection_CoplanarIntersection = "validateCoplanarIntersection_CoplanarIntersection",
-		validateExcludedModifiedCageUVs_FailedToExecute = "validateExcludedModifiedCageUVs_FailedToExecute",
-		validateExcludedModifiedCageUVs_UnexpectedUVValue = "validateExcludedModifiedCageUVs_UnexpectedUVValue",
-		validateMainModifiedCageUVs_FailedToExecute = "validateMainModifiedCageUVs_FailedToExecute",
-		validateMainModifiedCageUVs_TooFewModifiedUVsFound = "validateMainModifiedCageUVs_TooFewModifiedUVsFound",
-		validateRenderMeshInsideModifiedOuterCageArea_FailedToExecute = "validateRenderMeshInsideModifiedOuterCageArea_FailedToExecute",
-		validateRenderMeshInsideModifiedOuterCageArea_RenderMeshNotPositionedCorrectly = "validateRenderMeshInsideModifiedOuterCageArea_RenderMeshNotPositionedCorrectly",
-		validateBodyPartCage_FailedToExecute = "validateBodyPartCage_FailedToExecute",
-		validateBodyPartCage_VertsAreTooFarInFrontOfRenderMesh = "validateBodyPartCage_VertsAreTooFarInFrontOfRenderMesh",
-		validateCurveAnimation_IncorrectNumericalData = "validateCurveAnimation_IncorrectNumericalData",
-		validateCurveAnimation_PositionalMovement = "validateCurveAnimation_PositionalMovement",
-		validateVerticesSimilarity_FailedToExecute = "validateVerticesSimilarity_FailedToExecute",
-		validateVerticesSimilarity_MaxSimilarityExceeded = "validateVerticesSimilarity_MaxSimilarityExceeded",
-		validateCagingRelevancy_FailedToExecute = "validateCagingRelevancy_FailedToExecute",
-		validateCagingRelevancy_IrrelevantCaging = "validateCagingRelevancy_IrrelevantCaging",
-		validateCageMeshDistance_FailedToExecute = "validateCageMeshDistance_FailedToExecute",
-		validateCageMeshDistance_OuterCageToMeshDistance = "validateCageMeshDistance_OuterCageToMeshDistance",
-		validateCageUVDuplicate_FailedToExecute = "validateCageUVDuplicate_FailedToExecute",
-		validateCageUVDuplicate_UnexpectedUVValue = "validateCageUVDuplicate_UnexpectedUVValue",
-		validatePartSizeWithinRenderSizeLimits_SizeExceeded = "validatePartSizeWithinRenderSizeLimits_SizeExceeded",
-		validateLayeredClothingAccessory_HandleIsScaled = "validateLayeredClothingAccessory_HandleIsScaled",
-		resetPhysicsData_LargeMass = "resetPhysicsData_LargeMass",
-		validateBodyAttPosRelativeToParent_PartAboveParent = "validateBodyAttPosRelativeToParent_PartAboveParent",
-		validateBodyAttPosRelativeToParent_ParentBelowPart = "validateBodyAttPosRelativeToParent_ParentBelowPart",
-		validateBodyBlockingTests_ZeroMeshSize = "validateBodyBlockingTests_ZeroMeshSize",
-		validateFullBody_ZeroMeshSize = "validateFullBody_ZeroMeshSize",
-		validateMeshBounds_Shifted = "validateMeshBounds_Shifted",
-		validateBodyPartChildAttachmentOrientations_RotatedRig = "validateBodyPartChildAttachmentOrientations_RotatedRig",
-		validateBodyPartChildAttachmentOrientations_RotatedGrip = "validateBodyPartChildAttachmentOrientations_RotatedGrip",
-		validateBodyPartChildAttachmentOrientations_RotatedBasic = "validateBodyPartChildAttachmentOrientations_RotatedBasic",
-		validateDeformedLayeredClothingInRenderBounds_FailedToExecute = "validateDeformedLayeredClothingInRenderBounds_FailedToExecute",
-		validateDeformedLayeredClothingInRenderBounds_ClothingOutOfBounds = "validateDeformedLayeredClothingInRenderBounds_ClothingOutOfBounds",
-		validateEmoteAnimation_FailedToDownloadCurveAnimation = "validateEmoteAnimation_FailedToDownloadCurveAnimation",
-		validateCurveAnimation_AnimationHierarchyIsIncorrect = "validateCurveAnimation_AnimationHierarchyIsIncorrect",
-		validateCurveAnimation_AnimationContainsNoJointManipulation = "validateCurveAnimation_AnimationContainsNoJointManipulation",
-		validateCurveAnimation_UnacceptableLength = "validateCurveAnimation_UnacceptableLength",
-		validateCurveAnimation_UnacceptableSizeBounds = "validateCurveAnimation_UnacceptableSizeBounds",
-		validateCurveAnimation_UnacceptableFrameDelta = "validateCurveAnimation_UnacceptableFrameDelta"
-	}
+local Analytics = {}
+
+Analytics.ErrorType = {
+	resetPhysicsData_FailedToLoadMesh = "resetPhysicsData_FailedToLoadMesh",
+	validateAccurateBoundingBox = "validateAccurateBoundingBox",
+	validateScaleType_InvalidAvatarPartScaleType = "validateScaleType_InvalidAvatarPartScaleType",
+	validateAssetCreator_DependencyNotOwnedByCreator = "validateAssetCreator_DependencyNotOwnedByCreator",
+	validateAssetCreator_FailedToLoad = "validateAssetCreator_FailedToLoad",
+	validateAssetCreator_TooManyDependencies = "validateAssetCreator_TooManyDependencies",
+	validateAssetTransparency_AssetTransparencyThresholds = "validateAssetTransparency_AssetTransparencyThresholds",
+	validateBodyPartCollisionFidelity = "validateBodyPartCollisionFidelity",
+	validateCanLoad = "validateCanLoad",
+	validateDependencies_IsNotApproved = "validateDependencies_IsNotApproved",
+	validateDependencies_IsRestrictedUserId = "validateDependencies_IsRestrictedUserId",
+	validateDependencies_IsReviewing = "validateDependencies_IsReviewing",
+	validateDependencies_ParseFailure = "validateDependencies_ParseFailure",
+	validateDescendantMeshMetrics_FailedToLoadMesh = "validateDescendantMeshMetrics_FailedToLoadMesh",
+	validateDescendantMeshMetrics_HasSkinnedMeshMismatch = "validateDescendantMeshMetrics_HasSkinnedMeshMismatch",
+	validateDescendantMeshMetrics_NoSkinningInfo = "validateDescendantMeshMetrics_NoSkinningInfo",
+	validateDescendantMeshMetrics_TooFarFromOrigin = "validateDescendantMeshMetrics_TooFarFromOrigin",
+	validateDynamicHeadMeshPartFormat_FailedToLoadMesh = "validateDynamicHeadMeshPartFormat_FailedToLoadMesh",
+	validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMesh = "validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMesh",
+	validateFullBody_IncorrectAssetTypeSet = "validateFullBody_IncorrectAssetTypeSet",
+	validateFullBody_InstancesMissing = "validateFullBody_InstancesMissing",
+	validateFullBody_MeshIdsMissing = "validateFullBody_MeshIdsMissing",
+	validateHSR_NoWrapLayer = "validateHSR_NoWrapLayer",
+	validateInstanceTree = "validateInstanceTree",
+	validateInstanceTree_InvalidDescendants = "validateInstanceTree_InvalidDescendants",
+	validateLayeredClothingAccessory_AssetTypeNotAllowedAsLayeredClothing = "validateLayeredClothingAccessory_AssetTypeNotAllowedAsLayeredClothing",
+	validateLayeredClothingAccessory_FailedToLoadMesh = "validateLayeredClothingAccessory_FailedToLoadMesh",
+	validateLayeredClothingAccessory_NoInnerCageId = "validateLayeredClothingAccessory_NoInnerCageId",
+	validateLayeredClothingAccessory_NoMeshId = "validateLayeredClothingAccessory_NoMeshId",
+	validateLayeredClothingAccessory_NoOuterCageId = "validateLayeredClothingAccessory_NoOuterCageId",
+	validateLayeredClothingAccessory_NoWrapLayer = "validateLayeredClothingAccessory_NoWrapLayer",
+	validateLayeredClothingAccessoryMeshPartAssetFormatMatch_MeshIdMismatch = "validateLayeredClothingAccessoryMeshPartAssetFormatMatch_MeshIdMismatch",
+	validateLayeredClothingAccessoryMeshPartAssetFormatMatch_TextureIdMismatch = "validateLayeredClothingAccessoryMeshPartAssetFormatMatch_TextureIdMismatch",
+	validateLegacyAccessory_AssetTypeNotAllowedAsRigidAccessory = "validateLegacyAccessory_AssetTypeNotAllowedAsRigidAccessory",
+	validateLegacyAccessoryMeshPartAssetFormatMatch_MeshIdMismatch = "validateLegacyAccessoryMeshPartAssetFormatMatch_MeshIdMismatch",
+	validateLegacyAccessoryMeshPartAssetFormatMatch_TextureIdMismatch = "validateLegacyAccessoryMeshPartAssetFormatMatch_TextureIdMismatch",
+	validateLimbsAndTorso_FolderInfoMismatch = "validateLimbsAndTorso_FolderInfoMismatch",
+	validateLimbsAndTorso_R6FolderHasChildren = "validateLimbsAndTorso_R6FolderHasChildren",
+	validateLimbsAndTorso_TopLevelFolders = "validateLimbsAndTorso_TopLevelFolders",
+	validateMeshBounds_FailedToExecute = "validateMeshBounds_FailedToExecute",
+	validateMeshBounds_FailedToLoadMesh = "validateMeshBounds_FailedToLoadMesh",
+	validateMeshBounds_TooLarge = "validateMeshBounds_TooLarge",
+	validateMeshPartAccessory_DoubleSided = "validateMeshPartAccessory_DoubleSided",
+	validateMeshPartAccessory_FailedToLoadMesh = "validateMeshPartAccessory_FailedToLoadMesh",
+	validateMeshPartAccessory_NoMeshId = "validateMeshPartAccessory_NoMeshId",
+	validateMeshPartBodyPart_ValidateWithSchema = "validateMeshPartBodyPart_ValidateWithSchema",
+	validateMeshTriangles_FailedToExecute = "validateMeshTriangles_FailedToExecute",
+	validateMeshTriangles_FailedToLoadMesh = "validateMeshTriangles_FailedToLoadMesh",
+	validateMeshTriangles_TooManyTriangles = "validateMeshTriangles_TooManyTriangles",
+	validateMeshVertexColors_FailedToLoadMesh = "validateMeshVertexColors_FailedToLoadMesh",
+	validateMeshVertexColors_NonNeutralVertexColors = "validateMeshVertexColors_NonNeutralVertexColors",
+	validatePackage_FailedToParse = "validatePackage_FailedToParse",
+	validateSingleInstance_MultipleInstances = "validateSingleInstance_MultipleInstances",
+	validateSingleInstance_ZeroInstances = "validateSingleInstance_ZeroInstances",
+	validateSurfaceAppearances_InvalidAlphaMode = "validateSurfaceAppearances_InvalidAlphaMode",
+	validateTags = "validateTags",
+	validateThumbnailConfiguration_InvalidTarget = "validateThumbnailConfiguration_InvalidTarget",
+	validateThumbnailConfiguration_OutsideView = "validateThumbnailConfiguration_OutsideView",
+	validateVertexDensity_FailedToExecute = "validateVertexDensity_FailedToExecute",
+	validateVertexDensity_MaxDensityExceeded = "validateVertexDensity_MaxDensityExceeded",
+	validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMeshControls = "validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMeshControls",
+	validateRenderMeshInsideOuterCageMesh_FailedToExecute = "validateRenderMeshInsideOuterCageMesh_FailedToExecute",
+	validateRenderMeshInsideOuterCageMesh_MaxOutsideCageMeshExceeded = "validateRenderMeshInsideOuterCageMesh_MaxOutsideCageMeshExceeded",
+	validateLayeredClothingAccessory_CageOriginOutOfBounds = "validateLayeredClothingAccessory_CageOriginOutOfBounds",
+	validateBodyPart_CageOriginOutOfBounds = "validateBodyPart_CageOriginOutOfBounds",
+	validateTotalSurfaceArea_FailedToExecute = "validateTotalSurfaceArea_FailedToExecute",
+	validateTotalSurfaceArea_maxTotalSurfaceAreaExceeded = "validateTotalSurfaceArea_maxTotalSurfaceAreaExceeded",
+	validateCoplanarIntersection_FailedToExecute = "validateCoplanarIntersection_FailedToExecute",
+	validateCoplanarIntersection_CoplanarIntersection = "validateCoplanarIntersection_CoplanarIntersection",
+	validateExcludedModifiedCageUVs_FailedToExecute = "validateExcludedModifiedCageUVs_FailedToExecute",
+	validateExcludedModifiedCageUVs_UnexpectedUVValue = "validateExcludedModifiedCageUVs_UnexpectedUVValue",
+	validateMainModifiedCageUVs_FailedToExecute = "validateMainModifiedCageUVs_FailedToExecute",
+	validateMainModifiedCageUVs_TooFewModifiedUVsFound = "validateMainModifiedCageUVs_TooFewModifiedUVsFound",
+	validateRenderMeshInsideModifiedOuterCageArea_FailedToExecute = "validateRenderMeshInsideModifiedOuterCageArea_FailedToExecute",
+	validateRenderMeshInsideModifiedOuterCageArea_RenderMeshNotPositionedCorrectly = "validateRenderMeshInsideModifiedOuterCageArea_RenderMeshNotPositionedCorrectly",
+	validateCagingRelevancy_FailedToExecute = "validateCagingRelevancy_FailedToExecute",
+	validateCagingRelevancy_IrrelevantCaging = "validateCagingRelevancy_IrrelevantCaging",
+	validateCageMeshDistance_FailedToExecute = "validateCageMeshDistance_FailedToExecute",
+	validateCageMeshDistance_OuterCageToMeshDistance = "validateCageMeshDistance_OuterCageToMeshDistance",
+	validatePartSizeWithinRenderSizeLimits_SizeExceeded = "validatePartSizeWithinRenderSizeLimits_SizeExceeded",
+	validateLayeredClothingAccessory_HandleIsScaled = "validateLayeredClothingAccessory_HandleIsScaled",
+	resetPhysicsData_LargeMass = "resetPhysicsData_LargeMass",
+	validateBodyAttPosRelativeToParent_PartAboveParent = "validateBodyAttPosRelativeToParent_PartAboveParent",
+	validateBodyAttPosRelativeToParent_ParentBelowPart = "validateBodyAttPosRelativeToParent_ParentBelowPart",
+	validateBodyBlockingTests_ZeroMeshSize = "validateBodyBlockingTests_ZeroMeshSize",
+	validateFullBody_ZeroMeshSize = "validateFullBody_ZeroMeshSize",
+	validateMeshBounds_Shifted = "validateMeshBounds_Shifted",
+	validateDeformedLayeredClothingInRenderBounds_FailedToExecute = "validateDeformedLayeredClothingInRenderBounds_FailedToExecute",
+	validateDeformedLayeredClothingInRenderBounds_ClothingOutOfBounds = "validateDeformedLayeredClothingInRenderBounds_ClothingOutOfBounds"
 }
 
 if getFFlagUGCValidateTexturePack() then
-	t2.ErrorType.validateTexturePack_InvalidTexturePackURL = "validateTexturePack_InvalidTexturePackURL"
-	t2.ErrorType.validateTexturePack_FailedToDownloadTexturePack = "validateTexturePack_FailedToDownloadTexturePack"
-	t2.ErrorType.validateTexturePack_TexturePackMismatch = "validateTexturePack_TexturePackMismatch"
+	Analytics.ErrorType.validateTexturePack_InvalidTexturePackURL = "validateTexturePack_InvalidTexturePackURL"
+	Analytics.ErrorType.validateTexturePack_FailedToDownloadTexturePack = "validateTexturePack_FailedToDownloadTexturePack"
+
+	Analytics.ErrorType.validateTexturePack_TexturePackMismatch = "validateTexturePack_TexturePackMismatch"
 end
 
-t2.ErrorType.validateLegsSeparation_InvalidAttachmentPosition = "validateLegsSeparation_InvalidAttachmentPosition"
-t2.ErrorType.validateLegsSeparation_LegsOverlap = "validateLegsSeparation_LegsOverlap"
+Analytics.ErrorType.validateMeshSizeProperty_FailedToLoadMesh = "validateMeshSizeProperty_FailedToLoadMesh"
+Analytics.ErrorType.validateMeshSizeProperty_Mismatch = "validateMeshSizeProperty_Mismatch"
 
-if getEngineFeatureEngineUGCValidateRigidNonSkinned() then
-	t2.ErrorType.validateRigidMeshSkinning_FailedToDownload = "validateRigidMeshSkinning_FailedToDownload"
-	t2.ErrorType.validateRigidMeshSkinning_BonesFoundInMesh = "validateRigidMeshSkinning_BonesFoundInMesh"
-end
+Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning = "validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning"
 
-if getFFlagUGCValidateCurveAnimRotationSpeed() then
-	t2.ErrorType.validateCurveAnimation_UnacceptableFrameRotationDelta = "validateCurveAnimation_UnacceptableFrameRotationDelta"
-end
+Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_BodyIsSkinnedToFakeJoints = "validateBodyPartVertsSkinnedToR15_BodyIsSkinnedToFakeJoints"
 
-t2.ErrorType.validateCurveAnimation_IncorrectAnimationRigData = "validateCurveAnimation_IncorrectAnimationRigData"
-t2.ErrorType.validateMeshSizeProperty_FailedToLoadMesh = "validateMeshSizeProperty_FailedToLoadMesh"
-t2.ErrorType.validateMeshSizeProperty_Mismatch = "validateMeshSizeProperty_Mismatch"
-t2.ErrorType.validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning = "validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning"
-t2.ErrorType.validateBodyPartVertsSkinnedToR15_BodyIsSkinnedToFakeJoints = "validateBodyPartVertsSkinnedToR15_BodyIsSkinnedToFakeJoints"
-t2.ErrorType.validateSkinningTransfer_FailedToExecute = "validateSkinningTransfer_FailedToExecute"
-t2.ErrorType.validateSkinningTransfer_BodyPartsWithSpecialJoints = "validateSkinningTransfer_BodyPartsWithSpecialJoints"
-t2.ErrorType.validateSkinningTransfer_SkinningTransferOverride = "validateSkinningTransfer_SkinningTransferOverride"
-t2.ErrorType.validateSkinningTransfer_Weights = "validateSkinningTransfer_Weights"
+Analytics.ErrorType.validateSkinningTransfer_FailedToExecute = "validateSkinningTransfer_FailedToExecute"
+Analytics.ErrorType.validateSkinningTransfer_BodyPartsWithSpecialJoints = "validateSkinningTransfer_BodyPartsWithSpecialJoints"
+
+Analytics.ErrorType.validateSkinningTransfer_SkinningTransferOverride = "validateSkinningTransfer_SkinningTransferOverride"
+
+Analytics.ErrorType.validateSkinningTransfer_Weights = "validateSkinningTransfer_Weights"
 
 if getFFlagUGCValidationEyebrowEyelashSupport() then
-	t2.ErrorType.validateSkinningTransfer_RequiredAssetTypes = "validateSkinningTransfer_RequiredAssetTypes"
+	Analytics.ErrorType.validateSkinningTransfer_RequiredAssetTypes = "validateSkinningTransfer_RequiredAssetTypes"
 end
 
 if getEngineFeatureEngineUGCValidatePropertiesSensible() then
-	t2.ErrorType.validatePropertiesSensible_IncorrectPropertiesFound = "validatePropertiesSensible_IncorrectPropertiesFound"
+	Analytics.ErrorType.validatePropertiesSensible_IncorrectPropertiesFound = "validatePropertiesSensible_IncorrectPropertiesFound"
 end
 
-t2.ErrorType.validateHSR_FileDataInvalid = "validateHSR_FileDataInvalid"
+Analytics.ErrorType.validateHSR_FileDataInvalid = "validateHSR_FileDataInvalid"
 
-if getFFlagUGCValidateHSRMeshIds() then
-	t2.ErrorType.validataHSR_HSRMeshIdsMismatch = "validataHSR_HSRMeshIdsMismatch"
-end
-
-t2.ErrorType.validateMakeupDecal_FailedToLoadTexture = "validateMakeupDecal_FailedToLoadTexture"
-t2.ErrorType.validateMakeupDecal_NoColorMap = "validateMakeupDecal_NoColorMap"
-t2.ErrorType.validateMakeupDecal_UVZoneError = "validateMakeupDecal_UVZoneError"
-t2.ErrorType.validateWrapTextureTransfer_FailedToLoadCage = "validateWrapTextureTransfer_FailedToLoadCage"
-t2.ErrorType.validateWrapTextureTransfer_NoCage = "validateWrapTextureTransfer_NoCage"
-t2.ErrorType.validateWrapTextureTransfer_FailedToLoadUV = "validateWrapTextureTransfer_FailedToLoadUV"
-t2.ErrorType.validateWrapTextureTransfer_InvalidUV = "validateWrapTextureTransfer_InvalidUV"
-t2.ErrorType.validateWrapTextureTransfer_InvalidMinBound = "validateWrapTextureTransfer_InvalidMinBound"
-t2.ErrorType.validateWrapTextureTransfer_InvalidMaxBound = "validateWrapTextureTransfer_InvalidMaxBound"
+Analytics.ErrorType.validataHSR_HSRMeshIdsMismatch = "validataHSR_HSRMeshIdsMismatch"
 
 if getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds() then
-	t2.ErrorType.validateFACSJointTransformsWithinBounds_Error = "validateFACSJointTransformsWithinBounds_Error"
-	t2.ErrorType.validateFACSJointTransformsWithinBounds_OOB = "validateFACSJointTransformsWithinBounds_OOB"
+	Analytics.ErrorType.validateFACSJointTransformsWithinBounds_Error = "validateFACSJointTransformsWithinBounds_Error"
+	Analytics.ErrorType.validateFACSJointTransformsWithinBounds_OOB = "validateFACSJointTransformsWithinBounds_OOB"
 end
 
-setmetatable(t2.ErrorType, {
-	__index = function(_, p2) -- line: 254
-		return `UNREGISTERED_{ p2 }`
+setmetatable(Analytics.ErrorType, {
+	__index = function(_, p)
+		return `UNREGISTERED_{p}`
 	end
 })
-t2.metadata = {}
 
-function t2.setMetadata(t3: {[any]: any}) -- line: 261
-	-- upvalues: t2 (copy)
-	local t4 = {}
+Analytics.metadata = {}
 
-	for v25, v26 in t3 do
-		t4[v25] = tostring(v26)
+function Analytics.setMetadata(items)
+	local metadata = {}
+
+	for k, item in items do
+		metadata[k] = tostring(item)
 	end
 
-	t2.metadata = t4
+	Analytics.metadata = metadata
 end
-function t2.shouldReportIECTelemetry(p3) -- line: 269
-	-- upvalues: getEngineFeatureEngineUGCValidationIECTelemetry (copy), RunService (copy)
+
+function Analytics.shouldReportIECTelemetry(p): boolean
 	if not getEngineFeatureEngineUGCValidationIECTelemetry() then
 		return false
 	end
 
-	if not p3 then
-		return false
-	end
-
-	if RunService:IsStudio() or not p3.allowEditableInstances or not p3.isServer then
-		return false
-	end
-
-	return true
+	return not not p and not (RunService:IsStudio() or not (p.allowEditableInstances and p.isServer))
 end
-function t2.reportCounter(p4, p5, p6) -- line: 285
-	-- upvalues: t2 (copy), UGCValidationService (copy)
-	if t2.shouldReportIECTelemetry(p6) then
-		UGCValidationService:ReportUGCValidationCounter(p4, p5)
+
+function Analytics.reportCounter(p, p2, p3)
+	if Analytics.shouldReportIECTelemetry(p3) then
+		UGCValidationService:ReportUGCValidationCounter(p, p2)
 	end
 end
-function t2.reportFailure(s1: string, t5: {[any]: any}?, p7) -- line: 291
-	-- upvalues: RunService (copy), joinTables (copy), t2 (copy), RbxAnalyticsService (copy), v4 (copy), UGCValidationService (copy)
-	local v34 = not RunService:IsStudio() and "rcc" or "studio"
-	local v35 = joinTables(t2.metadata, t5 or {}, {
-		errorType = s1,
-		studioSid = RbxAnalyticsService:GetSessionId(),
-		clientId = RbxAnalyticsService:GetClientId(),
-		placeId = game.PlaceId,
-		userId = not v4 and 0 or v4:GetUserId()
-	})
 
-	RbxAnalyticsService:SendEventDeferred(v34, "ugcValidation", "failure", v35)
+function Analytics.reportFailure(errorType: string, options, p)
+	RbxAnalyticsService:SendEventDeferred(
+		RunService:IsStudio() and "studio" or "rcc",
+		"ugcValidation",
+		"failure",
+		joinTables(Analytics.metadata, options or {}, {
+			errorType = errorType,
+			studioSid = RbxAnalyticsService:GetSessionId(),
+			clientId = RbxAnalyticsService:GetClientId(),
+			placeId = game.PlaceId,
+			userId = not StudioService and 0 or StudioService:GetUserId()
+		})
+	)
 
-	if t2.shouldReportIECTelemetry(p7) then
-		UGCValidationService:ReportUGCValidationFailureTelemetry(s1)
+	if Analytics.shouldReportIECTelemetry(p) then
+		UGCValidationService:ReportUGCValidationFailureTelemetry(errorType)
 	end
 end
-function t2.reportThumbnailing(n1: number, t6: {[any]: any}?) -- line: 311
-	-- upvalues: RunService (copy), joinTables (copy), t2 (copy), RbxAnalyticsService (copy), v4 (copy)
-	local v38 = not RunService:IsStudio() and "rcc" or "studio"
-	local v39 = joinTables(t2.metadata, t6 or {}, {
-		time = n1,
-		studioSid = RbxAnalyticsService:GetSessionId(),
-		clientId = RbxAnalyticsService:GetClientId(),
-		placeId = game.PlaceId,
-		userId = not v4 and 0 or v4:GetUserId()
-	})
 
-	RbxAnalyticsService:SendEventDeferred(v38, "ugcValidation", "thumbnailing", v39)
+function Analytics.reportThumbnailing(time: number, options)
+	RbxAnalyticsService:SendEventDeferred(
+		RunService:IsStudio() and "studio" or "rcc",
+		"ugcValidation",
+		"thumbnailing",
+		joinTables(Analytics.metadata, options or {}, {
+			time = time,
+			studioSid = RbxAnalyticsService:GetSessionId(),
+			clientId = RbxAnalyticsService:GetClientId(),
+			placeId = game.PlaceId,
+			userId = not StudioService and 0 or StudioService:GetUserId()
+		})
+	)
 end
-function t2.recordScriptTime(s2: string, n2: number, p8) -- line: 323
-	-- upvalues: getEngineFeatureEngineUGCValidationReportScriptTime (copy)
+
+function Analytics.recordScriptTime(p: string, p2: number, p3)
 	if not getEngineFeatureEngineUGCValidationReportScriptTime() then
 		return
 	end
 
-	if not p8.scriptTimes then
-		p8.scriptTimes = {}
+	if not p3.scriptTimes then
+		p3.scriptTimes = {}
 	end
 
-	local scriptTimes = p8.scriptTimes
+	local scriptTimes = p3.scriptTimes
 
-	if not scriptTimes[s2] then
-		scriptTimes[s2] = 0
+	if not scriptTimes[p] then
+		scriptTimes[p] = 0
 	end
 
-	local v44 = tick() - n2
-
-	scriptTimes[s2] = scriptTimes[s2] + v44
+	local v = tick() - p2
+	scriptTimes[p] += v
 end
-function t2.reportScriptTimes(p9) -- line: 341
-	-- upvalues: getEngineFeatureEngineUGCValidationReportScriptTime (copy), RunService (copy), t2 (copy), UGCValidationService (copy)
+
+function Analytics.reportScriptTimes(data)
 	if not getEngineFeatureEngineUGCValidationReportScriptTime() then
 		return
 	end
 
-	if p9.isServer and not RunService:IsStudio() and p9.scriptTimes then
-		assert(t2.metadata, "Metadata is never nil")
+	if data.isServer and not RunService:IsStudio() and data.scriptTimes then
+		assert(Analytics.metadata, "Metadata is never nil")
+		local entrypoint = Analytics.metadata.entrypoint
 
-		local entrypoint = t2.metadata.entrypoint
-		local s3 = "FullBody"
+		local v = "FullBody"
 
-		if p9.assetTypeEnum then
-			s3 = p9.assetTypeEnum.Name
+		if data.assetTypeEnum then
+			v = data.assetTypeEnum.Name
 		elseif entrypoint and type(entrypoint) == "string" and #entrypoint > 0 then
-			s3 = entrypoint
+			v = entrypoint
 		end
 
-		UGCValidationService:ReportUGCValidationTelemetry(s3, p9.scriptTimes)
+		UGCValidationService:ReportUGCValidationTelemetry(v, data.scriptTimes)
 	end
 end
 
-return t2
+return Analytics

@@ -1,6 +1,3 @@
-local Parent = script:FindFirstAncestor("EditProfile").Parent
-local FFlagConnectionsToFriendsRename = require(Parent.SharedFlags).FFlagConnectionsToFriendsRename
-
 return {
 	About = "CommonUI.Features.Label.About",
 	AboutModalCaption = "Feature.Profile.Description.AboutModalCaption",
@@ -17,7 +14,7 @@ return {
 	EditDisplayName = "Feature.Profile.Heading.EditDisplayName",
 	AgedUpDisplayName = "Feature.Profile.Heading.AgedUpDisplayName",
 	AgedUpDisplayNameCaption = "Feature.Profile.Label.AgedUpDisplayNameCaption",
-	AgedUpDisplayNameConnectionsCaption = not FFlagConnectionsToFriendsRename and "Feature.Profile.Label.AgedUpDisplayNameConnectionsCaption" or "Feature.Profile.Label.AgedUpDisplayNameFriendsCaption",
+	AgedUpDisplayNameConnectionsCaption = "Feature.Profile.Label.AgedUpDisplayNameFriendsCaption",
 	AgedUpDisplayNameError = "Feature.Profile.Label.AgedUpDisplayNameFailed",
 	AgedUpDisplayNameMixedCharactersError = "Feature.DisplayName.ErrorMessage.NameMoreThanOneCharacterKind",
 	AgedUpDisplayNameModalCaption = "Feature.Profile.Label.AgedUpDisplayNameModalCaption",
@@ -41,6 +38,7 @@ return {
 	AgedUpNameNotAvailableError = "Feature.DisplayName.ErrorMessage.AgedUpNameNotAvailable",
 	InsufficientFunds = "Feature.Profile.Heading.InsufficientFunds",
 	InsufficientFundsMessage = "Feature.Profile.Description.UsernameInsufficientFunds",
+	New = "Feature.Catalog.Label.New",
 	OK = "CommonUI.Messages.Action.OK",
 	PinLocked = "Feature.Groups.Message.PinLocked",
 	EditBackground = "Feature.Profile.Label.EditBackground",
@@ -63,6 +61,7 @@ return {
 	FriendsAndFollowingDropDown = "Feature.AccountSettings.Label.DropDown.FollowingV2",
 	VisibleTo = "Feature.AccountSettings.Label.SocialLinksVisibility",
 	Title = "Feature.Friends.Action.EditProfile",
+	ProfileFrame = "Feature.Profile.Heading.ProfileFrame",
 	TooManyAttemptsTryAgainLater = "Feature.VerificationUpsell.Response.TooManyAttemptsTryAgainLater",
 	Username = "Feature.Profile.Heading.Username",
 	UsernameDescription = "Feature.Profile.Label.UsernameDescription",

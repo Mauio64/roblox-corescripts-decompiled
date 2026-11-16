@@ -1,47 +1,50 @@
 local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
-local ParentParent = script.Parent.Parent.Parent
-local Controls = require(ParentParent.Resources.Controls)
-local SetControlLayout = require(ParentParent.Actions.SetControlLayout)
-local v9 = Roact.PureComponent:extend("ControlLayoutSetter")
 
-function v9.init(p1) -- line: 16
-	-- upvalues: Controls (copy), UserInputService (copy)
-	local v11 = Controls.inputToControlTypeMap[UserInputService:GetLastInputType()]
+local parent = script.Parent.Parent.Parent
 
-	if v11 then
-		p1.props.dispatchSetControlLayout(v11)
+local Controls = require(parent.Resources.Controls)
+
+local SetControlLayout = require(parent.Actions.SetControlLayout)
+
+local extended = Roact.PureComponent:extend("ControlLayoutSetter")
+
+function extended.init(p)
+	local inputToControlType = Controls.inputToControlTypeMap[UserInputService:GetLastInputType()]
+
+	if inputToControlType then
+		p.props.dispatchSetControlLayout(inputToControlType)
 	end
 end
-function v9.render(_) -- line: 23
+
+function extended.render(_): nil
 	return nil
 end
-function v9.didMount(p3) -- line: 27
-	-- upvalues: UserInputService (copy), Controls (copy)
-	p3.inputChangedConnection = UserInputService.LastInputTypeChanged:Connect(function(p4) -- line: 28
-		-- upvalues: Controls (copy), p3 (copy)
-		local v17 = Controls.inputToControlTypeMap[p4]
 
-		if v17 then
-			p3.props.dispatchSetControlLayout(v17)
+function extended:didMount()
+	self.inputChangedConnection = UserInputService.LastInputTypeChanged:Connect(function(p)
+		local inputToControlType = Controls.inputToControlTypeMap[p]
+
+		if inputToControlType then
+			self.props.dispatchSetControlLayout(inputToControlType)
 		end
 	end)
 end
-function v9.willUnmount(p5) -- line: 39
-	if p5.inputChangedConnection then
-		p5.inputChangedConnection:Disconnect()
+
+function extended.willUnmount(p)
+	if p.inputChangedConnection then
+		p.inputChangedConnection:Disconnect()
 	end
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p6) -- line: 45
-	-- upvalues: SetControlLayout (copy)
+return RoactRodux.UNSTABLE_connect2(nil, function(callback)
 	return {
-		dispatchSetControlLayout = function(p7) -- line: 47
-			-- upvalues: p6 (copy), SetControlLayout (copy)
-			p6(SetControlLayout(p7))
+		dispatchSetControlLayout = function(p)
+			callback(SetControlLayout(p))
 		end
 	}
-end)(v9)
+end)(extended)

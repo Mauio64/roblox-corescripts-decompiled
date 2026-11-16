@@ -1,87 +1,71 @@
 local AvatarExperienceUIKit = script:FindFirstAncestor("AvatarExperienceUIKit")
-local AvatarExperienceUIKitParent = AvatarExperienceUIKit.Parent
-local React = require(AvatarExperienceUIKitParent.React)
-local Badge = require(AvatarExperienceUIKitParent.Foundation).Badge
-local useLocalization = require(AvatarExperienceUIKitParent.Localization).Hooks.useLocalization
+local parent = AvatarExperienceUIKit.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Badge = Foundation.Badge
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local useRemainingTime = require(AvatarExperienceUIKit.Utils.useRemainingTime)
 
-local function getTimerText(p1, t1: {[any]: any}) -- line: 23
-	local unit = p1.unit
-	local v12 = p1.value ~= 1
+local function getTimerText(p, data) -- 1 equivalent call inferred from this helper
+	local unit = p.unit
+	local v = p.value ~= 1
 
 	if unit == "days" then
-		if v12 then
-			return t1.dayPlural
+		return if v then data.dayPlural else data.daySingular
+	elseif unit == "hours" then
+		return if v then data.hourPlural else data.hourSingular
+	elseif unit == "minutes" then
+		if v then
+			return data.minutePlural
 		end
 
-		return t1.daySingular
+		return data.minuteSingular
+	elseif v then
+		return data.secondPlural
+	else
+		return data.secondSingular
 	end
-
-	if unit == "hours" then
-		if v12 then
-			return t1.hourPlural
-		end
-
-		return t1.hourSingular
-	end
-
-	if unit == "minutes" then
-		if v12 then
-			return t1.minutePlural
-		end
-
-		return t1.minuteSingular
-	end
-
-	if v12 then
-		return t1.secondPlural
-	end
-
-	return t1.secondSingular
 end
-local function TimerBadge(t2: {[any]: any}) -- line: 38
-	-- upvalues: useRemainingTime (copy), useLocalization (copy), React (copy), Badge (copy)
-	local v14 = useRemainingTime(t2.endTime)
-	local v15 = not v14 and 0 or v14.value
-	local v16 = useLocalization({
+
+local function TimerBadge(props)
+	local v = useRemainingTime(props.endTime)
+
+	local number = not v and 0 or v.value
+
+	local v2 = useLocalization({
 		daySingular = "Feature.Catalog.Label.Timer.Day.Singular",
-		hourSingular = "Feature.Catalog.Label.Timer.Hour.Singular",
-		minuteSingular = "Feature.Catalog.Label.Timer.Minute.Singular",
-		secondSingular = "Feature.Catalog.Label.Timer.Second.Singular",
 		dayPlural = {
 			"Feature.Catalog.Label.Timer.Day.Plural",
-			number = v15
+			number = number
 		},
+		hourSingular = "Feature.Catalog.Label.Timer.Hour.Singular",
 		hourPlural = {
 			"Feature.Catalog.Label.Timer.Hour.Plural",
-			number = v15
+			number = number
 		},
+		minuteSingular = "Feature.Catalog.Label.Timer.Minute.Singular",
 		minutePlural = {
 			"Feature.Catalog.Label.Timer.Minute.Plural",
-			number = v15
+			number = number
 		},
+		secondSingular = "Feature.Catalog.Label.Timer.Second.Singular",
 		secondPlural = {
 			"Feature.Catalog.Label.Timer.Second.Plural",
-			number = v15
+			number = number
 		}
 	})
 
-	if not v14 or v14.value < 0 then
+	if not v or v.value < 0 then
 		return nil
 	end
 
-	local createElement = React.createElement
-	local v18 = Badge
-	local t3 = {
-		LayoutOrder = t2.LayoutOrder
-	}
-	local unit = v14.unit
-	local v21 = v14.value ~= 1
-
-	t3.text = if unit ~= "days" then if unit ~= "hours" then if unit ~= "minutes" then if not v21 then v16.secondSingular else v16.secondPlural else if not v21 then v16.minuteSingular else v16.minutePlural else if not v21 then v16.hourSingular else v16.hourPlural else if not v21 then v16.daySingular else v16.dayPlural
-	t3.variant = t2.badgeVariant
-
-	return createElement(v18, t3)
+	return React.createElement(Badge, {
+		LayoutOrder = props.LayoutOrder,
+		text = getTimerText(v, v2), -- inferred equivalent call
+		variant = props.badgeVariant
+	})
 end
 
 return TimerBadge

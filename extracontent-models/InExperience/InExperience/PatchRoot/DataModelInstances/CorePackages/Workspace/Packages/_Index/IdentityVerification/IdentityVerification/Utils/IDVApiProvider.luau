@@ -1,160 +1,164 @@
-local Parent = script:FindFirstAncestor("IdentityVerification").Parent
+local IdentityVerification = script:FindFirstAncestor("IdentityVerification")
+local parent = IdentityVerification.Parent
+
 local HttpService = game:GetService("HttpService")
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
-local UrlBase = require(Parent.UrlBuilder).UrlBase
-local Fetch = require(Parent.Fetch)
-local Promise = require(Parent.Promise)
+
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local UrlBuilder2 = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder2.UrlBase
+local Fetch = require(parent.Fetch)
+local Promise = require(parent.Promise)
 local fetch = Fetch.fetch
 local Response = Fetch.Response
-local Cryo = require(Parent.Cryo)
-local v10 = UrlBuilder.new({
-	path = "age-verification-service/v1/persona-id-verification/verified-status",
+
+local Cryo = require(parent.Cryo)
+
+local UniversalFeatureRestrictions = require(parent.UniversalFeatureRestrictions)
+local showFeatureRestriction = UniversalFeatureRestrictions.showFeatureRestriction
+local AbuseVector = UniversalFeatureRestrictions.AbuseVector
+
+local buildAgeVerificationFeatureRestrictionOverrides = require(IdentityVerification.Utils.buildAgeVerificationFeatureRestrictionOverrides)
+
+local FFlagEnableFeatureRestrictionOnAgeVerificationAttempt = require(IdentityVerification.Flags.FFlagEnableFeatureRestrictionOnAgeVerificationAttempt)
+
+local v = urlBuilder.new({
 	base = UrlBase.APIS,
-	query = {
-		token = "{token}"
-	}
-})
-local v11 = UrlBuilder.new({
-	path = "age-verification-service/v1/persona-id-verification/start-verification",
-	base = UrlBase.APIS
-})
-local v12 = UrlBuilder.new({
-	path = "age-verification-service/v1/persona-id-verification/start-liveness-verification",
-	base = UrlBase.APIS
+	path = "age-verification-service/v1/persona-id-verification/verified-status",
+	query = { token = "{token}" }
 })
 
-local function startVerification(t1: {[any]: any}?, s1: string?) -- line: 113
-	-- upvalues: fetch (copy), Promise (copy), v11 (copy), HttpService (copy), Cryo (copy), Response (copy)
-	local v20 = fetch
+local v2 = urlBuilder.new({
+	base = UrlBase.APIS,
+	path = "age-verification-service/v1/persona-id-verification/start-verification"
+})
 
-	return Promise.new(function(resolve, reject) -- line: 115
-		-- upvalues: s1 (copy), v11 (copy), v20 (copy), HttpService (copy), Cryo (copy), t1 (copy), Response (copy)
-		local v33 = s1 or v11()
-		local v34 = v20(v33, {
+local v3 = urlBuilder.new({
+	base = UrlBase.APIS,
+	path = "age-verification-service/v1/persona-id-verification/start-liveness-verification"
+})()
+
+local function getHttpStatusFromWrappedNetworkingError(data) -- 1 equivalent call inferred from this helper
+	if type(data) == "table" then
+		return data.StatusCode or data.responseCode or data.status or data.statusCode
+	end
+
+	return nil
+end
+
+local function maybeShowAgeVerificationFeatureRestriction(p: number?) -- 2 equivalent calls inferred from this helper
+	if not FFlagEnableFeatureRestrictionOnAgeVerificationAttempt or p ~= 403 then
+		return
+	end
+
+	showFeatureRestriction(AbuseVector.AgeVerification, buildAgeVerificationFeatureRestrictionOverrides())
+end
+
+local function startVerification(options, p: string?)
+	local v4 = p or v2()
+	local v5 = v4 ~= v3
+	local fetch2 = fetch
+	return Promise.new(function(callback, callback2)
+		local expect = fetch2(v4, {
 			method = "POST",
-			body = HttpService:JSONEncode(Cryo.Dictionary.join({
-				generatedLink = true
-			}, t1 or {})),
-			headers = {
-				["Content-Type"] = "application/json",
-				Accept = "application/json"
-			}
-		}):catch(function() -- line: 125
-			-- upvalues: Response (copy)
+			body = HttpService:JSONEncode(Cryo.Dictionary.join({ generatedLink = true }, options or {})),
+			headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
+		}):catch(function()
 			return Response.error()
 		end):expect()
 
-		if not v34.ok then
-			reject(string.format("Got start-verification HTTP Response: %d", v34.status))
-
-			return
-		end
-
-		local v35 = v34:json():catch(function() -- line: 137
-			return nil
-		end):expect()
-
-		if not v35 then
-			reject("Failed to decode HTTP response as JSON for IDV Verification")
-
-			return
-		end
-
-		resolve({
-			emailSent = v35.emailSent,
-			sessionIdentifier = v35.sessionIdentifier,
-			daysUntilNextVerification = v35.daysUntilNextVerification,
-			verificationLink = v35.verificationLink,
-			sessionToken = v35.sessionToken
-		})
-	end)
-end
-
-return {
-	startVerification = startVerification,
-	startVerificationWithWrappedNetworking = function(p1, t2: {[any]: any}?) -- line: 77
-		-- upvalues: Promise (copy), v11 (copy), Cryo (copy), HttpService (copy)
-		return Promise.new(function(resolve, reject) -- line: 78
-			-- upvalues: v11 (copy), Cryo (copy), t2 (copy), p1 (copy), HttpService (copy)
-			local v29 = v11()
-			local v30 = Cryo.Dictionary.join({
-				generatedLink = true
-			}, t2 or {})
-
-			p1(v29, "POST", {
-				postBody = HttpService:JSONEncode(v30)
-			}):catch(function(_) -- line: 86
-				-- upvalues: reject (copy)
-				reject("Got error on start-verificatin")
-			end):andThen(function(p3) -- line: 90
-				-- upvalues: reject (copy), resolve (copy)
-				if not p3 or not p3[1] then
-					reject("Got start-verification HTTP with no valid response")
-
-					return
-				end
-
-				local v38 = p3[1]
-
-				if not v38 then
-					reject("Failed to decode HTTP response as JSON for IDV Verification")
-
-					return
-				end
-
-				resolve({
-					emailSent = v38.emailSent,
-					sessionIdentifier = v38.sessionIdentifier,
-					daysUntilNextVerification = v38.daysUntilNextVerification,
-					verificationLink = v38.verificationLink,
-					sessionToken = v38.sessionToken
-				})
-			end)
-		end)
-	end,
-	startLivenessVerification = function(t3: {[any]: any}?) -- line: 158
-		-- upvalues: startVerification (copy), v12 (copy)
-		return startVerification(t3, v12())
-	end,
-	getVerifiedStatus = function(p4) -- line: 34
-		-- upvalues: fetch (copy), Promise (copy), v10 (copy), Response (copy)
-		local v15 = fetch
-
-		return Promise.new(function(resolve, reject) -- line: 36
-			-- upvalues: v10 (copy), p4 (copy), v15 (copy), Response (copy)
-			local v24 = v10({
-				token = p4
-			})
-			local v25 = v15(v24, {
-				method = "GET"
-			}):catch(function() -- line: 39
-				-- upvalues: Response (copy)
-				return Response.error()
-			end):expect()
-
-			if not v25.ok then
-				reject(string.format("Got verified-status verification HTTP Response: %d", v25.status))
-
-				return
-			end
-
-			local v26 = v25:json():catch(function() -- line: 53
+		if expect.ok then
+			local expect2 = expect:json():catch(function(): nil
 				return nil
 			end):expect()
 
-			if not v26 then
-				reject("Failed to decode HTTP response as JSON for get IDV Verification status")
+			if expect2 then
+				callback({
+					emailSent = expect2.emailSent,
+					sessionIdentifier = expect2.sessionIdentifier,
+					daysUntilNextVerification = expect2.daysUntilNextVerification,
+					verificationLink = expect2.verificationLink,
+					sessionToken = expect2.sessionToken
+				})
+			else
+				callback2("Failed to decode HTTP response as JSON for IDV Verification")
+			end
+		else
+			if v5 then
+				maybeShowAgeVerificationFeatureRestriction(expect.status) -- inferred equivalent call
+			end
 
+			callback2(string.format("Got start-verification HTTP Response: %d", expect.status))
+		end
+	end)
+end
+
+local IDVApiProvider = {}
+IDVApiProvider.startVerification = startVerification
+
+function IDVApiProvider.startVerificationWithWrappedNetworking(callback, options)
+	return Promise.new(function(callback2, callback3)
+		callback(v2(), "POST", {
+			postBody = HttpService:JSONEncode((Cryo.Dictionary.join({ generatedLink = true }, options or {})))
+		}):catch(function(data)
+			maybeShowAgeVerificationFeatureRestriction(getHttpStatusFromWrappedNetworkingError(data)) -- inferred equivalent call
+			callback3("Got error on start-verificatin")
+		end):andThen(function(list)
+			if not (list and list[1]) then
+				callback3("Got start-verification HTTP with no valid response")
 				return
 			end
 
-			resolve({
-				isPending = v26.isPending,
-				sessionStatus = v26.sessionStatus,
-				sessionErrorCode = v26.sessionErrorCode,
-				isVerified = v26.isVerified,
-				ageEstimationNextStep = v26.ageEstimationNextStep
-			})
+			local item = list[1]
+
+			if item then
+				callback2({
+					emailSent = item.emailSent,
+					sessionIdentifier = item.sessionIdentifier,
+					daysUntilNextVerification = item.daysUntilNextVerification,
+					verificationLink = item.verificationLink,
+					sessionToken = item.sessionToken
+				})
+			else
+				callback3("Failed to decode HTTP response as JSON for IDV Verification")
+			end
 		end)
-	end
-}
+	end)
+end
+
+function IDVApiProvider.startLivenessVerification(p)
+	return startVerification(p, v3)
+end
+
+function IDVApiProvider.getVerifiedStatus(token)
+	local fetch2 = fetch
+	return Promise.new(function(callback, callback2)
+		local expect = fetch2(v({ token = token }), { method = "GET" }):catch(function()
+			return Response.error()
+		end):expect()
+
+		if not expect.ok then
+			callback2(string.format("Got verified-status verification HTTP Response: %d", expect.status))
+
+			return
+		end
+
+		local expect2 = expect:json():catch(function(): nil
+			return nil
+		end):expect()
+
+		if expect2 then
+			callback({
+				isPending = expect2.isPending,
+				sessionStatus = expect2.sessionStatus,
+				sessionErrorCode = expect2.sessionErrorCode,
+				isVerified = expect2.isVerified,
+				ageEstimationNextStep = expect2.ageEstimationNextStep
+			})
+		else
+			callback2("Failed to decode HTTP response as JSON for get IDV Verification status")
+		end
+	end)
+end
+
+return IDVApiProvider

@@ -1,20 +1,18 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local React = require(scriptParentParentParent.React)
-local NotificationCardContext = require(scriptParent.NotificationCardContext)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local React = require(parent3.React)
+local NotificationCardContext = require(parent.NotificationCardContext)
+require(parent2.type)
 
-require(scriptParentParent.type)
+local function useNotificationCardState(p)
+	local v = React.useContext(NotificationCardContext)
 
-local function useNotificationCardState(p1) -- line: 8
-	-- upvalues: React (copy), NotificationCardContext (copy)
-	local v8 = React.useContext(NotificationCardContext)
-
-	if p1 then
-		return v8.state and (not not v8.state.visualItems and v8.state.visualItems[p1]) or {}
+	if p then
+		return v.state and v.state.visualItems and v.state.visualItems[p] or {}
 	end
 
-	return v8.state
+	return v.state
 end
 
 return useNotificationCardState

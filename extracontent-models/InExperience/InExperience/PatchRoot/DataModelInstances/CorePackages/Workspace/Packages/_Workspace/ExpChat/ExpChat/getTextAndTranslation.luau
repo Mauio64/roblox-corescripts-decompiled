@@ -1,23 +1,38 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
+local parent = ExpChat.Parent
 local isWhiteSpaceOnly = require(ExpChat.isWhiteSpaceOnly)
-local getFFlagExpChatProtectedChatInternalAPIs = require(ExpChatParent.SharedFlags).getFFlagExpChatProtectedChatInternalAPIs
+local SharedFlags = require(parent.SharedFlags)
+local getFFlagExpChatProtectedChatInternalAPIs = SharedFlags.getFFlagExpChatProtectedChatInternalAPIs
 
-return function(p1) -- line: 7
-	-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy), isWhiteSpaceOnly (copy)
-	local s1 = ""
-	local s2 = ""
-	local v8 = if not p1 then nil else if not getFFlagExpChatProtectedChatInternalAPIs() then p1.Text else p1.TextInternal
+return function(data)
+	local v = ""
+	local v2 = ""
+	local v3
 
-	if v8 and not isWhiteSpaceOnly(v8) then
-		s1 = v8
-		s2 = if not getFFlagExpChatProtectedChatInternalAPIs() then p1.Translation else p1.TranslationInternal
+	if data then
+		if getFFlagExpChatProtectedChatInternalAPIs() then
+			v3 = data.TextInternal
+		else
+			v3 = data.Text
+		end
 	end
 
-	if not not p1 and p1.WasRewritten and p1.RewrittenText and not isWhiteSpaceOnly(p1.RewrittenText) then
-		s1 = p1.RewrittenText
-		s2 = p1.RewrittenTranslation
+	if v3 and not isWhiteSpaceOnly(v3) then
+		if getFFlagExpChatProtectedChatInternalAPIs() then
+			v2 = data.TranslationInternal
+		else
+			v2 = data.Translation
+		end
+
+		v = v3
 	end
 
-	return s1, s2
+	local v4 = if data then data.WasRewritten else false
+
+	if v4 and data.RewrittenText and not isWhiteSpaceOnly(data.RewrittenText) then
+		v = data.RewrittenText
+		v2 = data.RewrittenTranslation
+	end
+
+	return v, v2
 end

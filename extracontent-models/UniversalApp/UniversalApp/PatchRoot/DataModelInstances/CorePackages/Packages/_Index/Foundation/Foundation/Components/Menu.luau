@@ -1,1 +1,3 @@
-return (require(script.Menu))
+local Menu = require(script.Menu)
+
+return Menu

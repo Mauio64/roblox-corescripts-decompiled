@@ -1,1 +1,3 @@
-return (require(script.Divider))
+local Divider = require(script.Divider)
+
+return Divider

@@ -1,36 +1,36 @@
-local function serializeTable(p1, p2, p3, p4) -- line: 3
-	-- upvalues: serializeTable (copy)
-	local v6 = p3 or false
-	local v7 = p4 or 0
-	local v8 = string.rep(" ", v7)
+local function serializeTable(item, k, p, count)
+	local v = p or false
+	local v2 = count or 0
 
-	if p2 then
-		v8 ..= p2 .. " = "
+	local v3 = string.rep(" ", v2)
+
+	if k then
+		v3 ..= k .. " = "
 	end
 
-	if type(p1) == "table" then
-		local v9 = v8 .. "{" .. (v6 and "" or "\n")
+	if type(item) == "table" then
+		local v4 = v3 .. "{" .. (v and "" or "\n")
 
-		for k, v in pairs(p1) do
-			v9 ..= serializeTable(v, k, v6, v7 + 1) .. "," .. (v6 and "" or "\n")
+		for k2, item2 in pairs(item) do
+			v4 ..= serializeTable(item2, k2, v, v2 + 1) .. "," .. (v and "" or "\n")
 		end
 
-		return v9 .. string.rep(" ", v7) .. "}"
+		return v4 .. string.rep(" ", v2) .. "}"
 	end
 
-	if type(p1) == "number" then
-		return v8 .. tostring(p1)
+	if type(item) == "number" then
+		return v3 .. tostring(item)
 	end
 
-	if type(p1) == "string" then
-		return v8 .. string.format("%q", p1)
+	if type(item) == "string" then
+		return v3 .. string.format("%q", item)
 	end
 
-	if type(p1) == "boolean" then
-		return v8 .. (not p1 and "false" or "true")
+	if type(item) == "boolean" then
+		return v3 .. (item and "true" or "false")
 	end
 
-	return v8 .. "\"[inserializeable datatype:" .. type(p1) .. "]\""
+	return v3 .. "\"[inserializeable datatype:" .. type(item) .. "]\""
 end
 
 return serializeTable

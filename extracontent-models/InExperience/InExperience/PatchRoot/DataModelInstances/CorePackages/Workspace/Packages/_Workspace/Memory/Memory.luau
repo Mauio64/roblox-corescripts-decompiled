@@ -7,14 +7,11 @@ return {
 	["jest.config"] = script["jest.config"],
 	MemoryTracker = MemoryTracker,
 	MemoryScope = MemoryScope,
-	start = function(b1: boolean?, s1: string?, p1) -- line: 6
-		-- upvalues: MemoryTracker (copy), FFlagEnableMemoryShell (copy), MemoryShell (copy)
-		if b1 then
-			local v8 = MemoryTracker(s1, p1)
+	start = function(self: boolean?, p: string?, p2)
+		local v = self and MemoryTracker(p, p2)
 
-			if v8 then
-				v8:start()
-			end
+		if v then
+			v:start()
 		end
 
 		if FFlagEnableMemoryShell then

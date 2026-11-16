@@ -1,182 +1,287 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local BuilderIcons = require(MomentsParent.BuilderIcons)
-local Foundation = require(MomentsParent.Foundation)
-local MomentsCommon = require(MomentsParent.MomentsCommon)
-local React = require(MomentsParent.React)
-local HeaderBar = require(MomentsParent.UIBlox).App.Bar.HeaderBar
+local parent = Moments.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local Chip = Foundation.Chip
 local Coachmark = Foundation.Coachmark
 local IconButton = Foundation.IconButton
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
+local ChipSize = Foundation.Enums.ChipSize
+local ChipVariant = Foundation.Enums.ChipVariant
 local InputSize = Foundation.Enums.InputSize
+
 local PlusLarge = BuilderIcons.Icon.PlusLarge
 local ChevronLargeLeft = BuilderIcons.Icon.ChevronLargeLeft
-local GradientBackdrop = MomentsCommon.Components.GradientBackdrop
-local FlyoutLeftHeader = require(MomentsParent.FlyoutSidePanel).Components.FlyoutLeftHeader
-local FlyoutSidePanelIXP = require(MomentsParent.SharedExperimentDefinition).FlyoutSidePanelIXP
-local NavigationMenu = require(Moments.Components.NavigationMenu)
-local Constants = require(Moments.Constants)
 
-local function renderAction(s1: string, p1, p2: ((...any) -> ...any), n1: number?) -- line: 60
-	-- upvalues: React (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy)
+local GradientBackdrop = MomentsCommon.Components.GradientBackdrop
+local FlyoutSidePanel = require(parent.FlyoutSidePanel)
+local FlyoutLeftHeader = FlyoutSidePanel.Components.FlyoutLeftHeader
+local SharedExperimentDefinition = require(parent.SharedExperimentDefinition)
+local FlyoutSidePanelIXP = SharedExperimentDefinition.FlyoutSidePanelIXP
+local NavigationMenu = require(Moments.Components.NavigationMenu)
+
+local Constants = require(Moments.Constants)
+local FFlagMomentsFtuxTooltipCreateCopy = require(Moments.Flags.FFlagMomentsFtuxTooltipCreateCopy)
+local FFlagMomentsFixFeedForDeviceSafeInsets = require(Moments.Flags.FFlagMomentsFixFeedForDeviceSafeInsets)
+local Display = require(parent.Display)
+local shouldUseDeviceSafeInsets = Display.shouldUseDeviceSafeInsets
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsCreationFeatureGate = SharedFlags.FFlagMomentsCreationFeatureGate
+
+local function renderFeedTypeChips(feedTypeChips)
+	local children = {}
+
+	for k, item in feedTypeChips do
+		children[`Chip_{item.id}`] = React.createElement(Chip, {
+			LayoutOrder = k,
+			text = item.text,
+			isChecked = item.isChecked,
+			onActivated = item.onActivated,
+			size = ChipSize.Medium,
+			variant = ChipVariant.Standard,
+			testId = `--moments-header--feed-chip--{item.id}`
+		})
+	end
+
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = 2,
+			tag = "row align-y-center gap-small auto-xy",
+			testId = "--moments-header--feed-chips"
+		},
+		children
+	)
+end
+
+local function renderAction(p: string, icon, onActivated, layoutOrder: number?)
 	return React.createElement(IconButton, {
-		isCircular = true,
-		Selectable = true,
-		LayoutOrder = n1,
-		icon = p1,
-		onActivated = p2,
+		LayoutOrder = layoutOrder,
+		icon = icon,
+		onActivated = onActivated,
 		variant = ButtonVariant.Utility,
 		size = InputSize.Medium,
-		testId = `--moments-header--actions--{ s1 }`
+		isCircular = true,
+		Selectable = true,
+		testId = `--moments-header--actions--{p}`
 	})
 end
-local function MomentsHeaderView(t1: {[any]: any}) -- line: 73
-	-- upvalues: renderAction (copy), ChevronLargeLeft (copy), FlyoutSidePanelIXP (copy), React (copy), FlyoutLeftHeader (copy), View (copy), FoundationText (copy), PlusLarge (copy), IconButton (copy), ButtonVariant (copy), InputSize (copy), Foundation (copy), Coachmark (copy), NavigationMenu (copy), HeaderBar (copy), GradientBackdrop (copy), Constants (copy)
-	local v28 = nil
-	local v29 = nil
 
-	if t1.variant == "back" then
-		function v28() -- line: 78
-			-- upvalues: renderAction (copy), ChevronLargeLeft (copy), t1 (copy)
-			return renderAction("back", ChevronLargeLeft, t1.onBack, 1)
+local function MomentsHeaderView(props)
+	local fn
+	local fn2
+	local feedTypeChips = nil
+
+	if props.variant == "back" then
+		fn = function()
+			return renderAction("back", ChevronLargeLeft, props.onBack, 1)
 		end
-	elseif t1.variant == "base" then
-		local v30 = FlyoutSidePanelIXP.isFlyoutSidePanelEnabled()
-		local v31 = t1.showInteractiveButtons and (t1.showHamburger and v30)
 
-		function v28() -- line: 87
-			-- upvalues: v31 (copy), React (copy), FlyoutLeftHeader (copy), t1 (copy), v30 (copy), FlyoutSidePanelIXP (copy), View (copy), FoundationText (copy)
-			if v31 then
+		if props.showInteractiveButtons and props.showNavigationMenu then
+			local children = {}
+
+			if props.showCreateButton then
+				local onCreateMomentButtonPressed = props.onCreateMomentButtonPressed
+				children.CreateMomentButton = React.createElement(IconButton, {
+					LayoutOrder = 1,
+					icon = PlusLarge,
+					onActivated = onCreateMomentButtonPressed,
+					variant = ButtonVariant.Utility,
+					size = InputSize.Medium,
+					isCircular = true,
+					Selectable = true,
+					testId = "--moments-header--actions--create"
+				})
+			end
+
+			children.NavigationMenu = React.createElement(NavigationMenu, {
+				layoutOrder = 2,
+				buttonTestId = "--moments-header--actions--more",
+				buttonVariant = ButtonVariant.Utility,
+				onNavigateToTrending = props.onNavigateToTrending,
+				onNavigateToMyMoments = props.onNavigateToMyMoments
+			})
+
+			fn2 = function()
+				return React.createElement(View, { tag = "row align-y-center gap-xsmall auto-xy" }, children)
+			end
+		elseif props.showInteractiveButtons and props.showCreateButton then
+			fn2 = function()
+				return renderAction("create", PlusLarge, props.onCreateMomentButtonPressed, 1)
+			end
+		end
+	elseif props.variant == "base" then
+		if props.feedTypeChips ~= nil then
+			feedTypeChips = renderFeedTypeChips(props.feedTypeChips)
+		end
+
+		local flyoutSidePanelEnabled = FlyoutSidePanelIXP.isFlyoutSidePanelEnabled()
+		local v = props.showInteractiveButtons and props.showHamburger and flyoutSidePanelEnabled
+
+		fn = function()
+			if v then
 				return React.createElement(FlyoutLeftHeader, {
+					titleText = props.title,
 					isRobloxLogoEnabled = false,
-					titleText = t1.title,
-					isFlyoutEntrypointEnabled = v30,
+					isFlyoutEntrypointEnabled = flyoutSidePanelEnabled,
 					isAlternateEntryPointEnabled = FlyoutSidePanelIXP.isAlternateEntryPointEnabled()
 				})
 			end
 
-			return React.createElement(View, {
-				tag = "row align-x-left align-y-center auto-xy"
-			}, {
-				Title = React.createElement(FoundationText, {
-					tag = "auto-xy text-heading-large",
-					Text = t1.title,
-					textStyle = t1.titleTextStyle
+			return React.createElement(View, { tag = "row align-x-left align-y-center auto-xy" }, {
+				Title = React.createElement(Text, {
+					Text = props.title,
+					textStyle = props.titleTextStyle,
+					tag = "auto-xy text-heading-large"
 				})
 			})
 		end
 
-		if t1.showInteractiveButtons then
-			local v32 = PlusLarge
-			local onCreateMomentButtonPressed = t1.onCreateMomentButtonPressed
-			local v34 = React.createElement(IconButton, {
-				LayoutOrder = 1,
-				isCircular = true,
-				Selectable = true,
-				testId = "--moments-header--actions--create",
-				icon = v32,
-				onActivated = onCreateMomentButtonPressed,
-				variant = ButtonVariant.Utility,
-				size = InputSize.Medium
-			})
-			local u36
+		if props.showInteractiveButtons then
+			local createMomentButton
 
-			if t1.showFtuxTooltip then
-				local t2 = {
+			if props.showCreateButton or not FFlagMomentsCreationFeatureGate then
+				local onCreateMomentButtonPressed = props.onCreateMomentButtonPressed
+				local element = React.createElement(IconButton, {
 					LayoutOrder = 1,
-					title = "Share Your First Moment",
-					text = "Tap + to share a moment from your captures",
-					isOpen = t1.showFtuxTooltip,
-					onClose = t1.onFtuxTooltipClosed,
-					side = Foundation.Enums.PopoverSide.Bottom,
-					align = Foundation.Enums.PopoverAlign.End
-				}
-
-				u36 = React.createElement(Coachmark, t2, v34)
-			else
-				u36 = React.createElement(View, {
-					LayoutOrder = 1,
-					tag = "auto-xy"
-				}, {
-					Action = v34
+					icon = PlusLarge,
+					onActivated = onCreateMomentButtonPressed,
+					variant = ButtonVariant.Utility,
+					size = InputSize.Medium,
+					isCircular = true,
+					Selectable = true,
+					testId = "--moments-header--actions--create"
 				})
+
+				if props.showFtuxTooltip then
+					local v2 = {
+						LayoutOrder = 1,
+						isOpen = props.showFtuxTooltip,
+						onClose = props.onFtuxTooltipClosed,
+						side = Foundation.Enums.PopoverSide.Bottom,
+						title = not FFlagMomentsFtuxTooltipCreateCopy and "Share Your First Moment" or props.ftuxTooltipTitle,
+						text = not FFlagMomentsFtuxTooltipCreateCopy and "Tap + to share a moment from your captures" or props.ftuxTooltipText,
+						align = Foundation.Enums.PopoverAlign.End
+					}
+
+					createMomentButton = React.createElement(Coachmark, v2, element)
+				else
+					createMomentButton = React.createElement(View, {
+						LayoutOrder = 1,
+						tag = "auto-xy"
+					}, {
+						Action = element
+					})
+				end
+			else
+				createMomentButton = nil
 			end
 
-			function v29() -- line: 139
-				-- upvalues: React (copy), View (copy), u36 (ref), NavigationMenu (copy), ButtonVariant (copy), t1 (copy)
-				return React.createElement(View, {
-					tag = "row align-y-center gap-xsmall auto-xy"
-				}, {
-					CreateMomentButton = u36,
+			fn2 = function()
+				return React.createElement(View, { tag = "row align-y-center gap-xsmall auto-xy" }, {
+					CreateMomentButton = createMomentButton,
 					NavigationMenu = React.createElement(NavigationMenu, {
 						layoutOrder = 2,
 						buttonTestId = "--moments-header--actions--more",
 						buttonVariant = ButtonVariant.Utility,
-						onNavigateToTrending = t1.onNavigateToTrending,
-						onNavigateToMyMoments = t1.onNavigateToMyMoments
+						onNavigateToTrending = props.onNavigateToTrending,
+						onNavigateToMyMoments = props.onNavigateToMyMoments
 					})
 				})
 			end
 		end
-	elseif t1.variant == "close" then
-		function v29() -- line: 155
-			-- upvalues: renderAction (copy), t1 (copy)
-			return renderAction("close", "icons/navigation/close_small", t1.onClose, 1)
+	elseif props.variant == "close" then
+		fn2 = function()
+			return renderAction("close", "icons/navigation/close_small", props.onClose, 1)
 		end
 	end
 
-	local t3 = {
-		HeaderContent = React.createElement(View, {
-			tag = "size-full-0 auto-y",
-			testId = "--moments-header-content",
-			ZIndex = 2
-		}, {
-			SafeAreaContent = React.createElement(View, {
-				tag = "size-full-0 auto-y",
-				testId = "--moments-header-safe-area",
-				padding = t1.headerPadding
-			}, {
-				HeaderBarContainer = React.createElement(View, {
-					tag = "size-full-0 auto-y",
-					testId = "--moments-header",
-					Size = UDim2.new(1, 0, 0, t1.headerHeight)
+	local v = {
+		HeaderContent = React.createElement(
+			View,
+			{ tag = "size-full-0 auto-y", testId = "--moments-header-content", ZIndex = 2 },
+			{
+				SafeAreaContent = React.createElement(View, {
+					padding = props.headerPadding,
+					tag = {
+						["size-full-0 auto-y"] = true,
+						col = feedTypeChips ~= nil
+					},
+					testId = "--moments-header-safe-area"
 				}, {
-					HeaderBar = React.createElement(HeaderBar, {
-						isTitleCentered = false,
-						isOnMedia = false,
-						backgroundTransparency = 1,
-						zIndex = 2,
-						barHeight = t1.headerHeight,
-						paddingLeft = UDim.new(0, 0),
-						paddingRight = UDim.new(0, 0),
-						renderLeft = v28,
-						renderRight = v29
-					})
+					FeedTypeChips = feedTypeChips,
+					HeaderBarContainer = React.createElement(
+						View,
+						{
+							LayoutOrder = 1,
+							tag = "size-full-0 auto-y",
+							Size = UDim2.new(1, 0, 0, props.headerHeight),
+							testId = "--moments-header"
+						},
+						{
+							HeaderBar = React.createElement(HeaderBar, {
+								barHeight = props.headerHeight,
+								isTitleCentered = false,
+								isOnMedia = false,
+								backgroundTransparency = 1,
+								paddingLeft = UDim.new(0, 0),
+								paddingRight = UDim.new(0, 0),
+								renderLeft = fn,
+								renderRight = fn2,
+								zIndex = 2
+							})
+						}
+					)
 				})
-			})
-		})
+			}
+		)
 	}
 
-	if t1.showTopScrim then
-		t3.GradientScrim = React.createElement(GradientBackdrop, {
+	if props.showTopScrim then
+		local createElement = React.createElement
+		local v2 = {
+			color3 = Color3.new(0, 0, 0),
 			startingTransparency = 0.4,
 			endingTransparency = 1,
 			rotation = 90,
-			zIndex = 1,
-			color3 = Color3.new(0, 0, 0),
-			position = UDim2.fromScale(0, 0),
-			size = UDim2.new(1, 0, 0, t1.scrimHeight)
-		})
+			position = 0,
+			size = 0,
+			zIndex = 1
+		}
+		local position
+
+		if FFlagMomentsFixFeedForDeviceSafeInsets and shouldUseDeviceSafeInsets then
+			position = UDim2.fromOffset(0, props.scrimTopOffset or 0)
+		else
+			position = UDim2.fromScale(0, 0)
+		end
+
+		v2.position = position
+
+		v2.size = UDim2.new(1, 0, 0, props.scrimHeight)
+		v.GradientScrim = createElement(GradientBackdrop, v2)
 	end
 
-	return React.createElement(View, {
-		tag = "size-full-0",
-		testId = "--moments-header-root",
-		LayoutOrder = t1.layoutOrder,
-		ZIndex = Constants.DisplayOrder.FeedTopBar
-	}, t3)
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = props.layoutOrder,
+			tag = "size-full-0",
+			testId = "--moments-header-root",
+			ZIndex = Constants.DisplayOrder.FeedTopBar
+		},
+		v
+	)
 end
 
 return MomentsHeaderView

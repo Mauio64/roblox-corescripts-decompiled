@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.PlatformLeaderboardsClient.PlatformLeaderboardsClient))
+local PlatformLeaderboardsClient = require(Workspace.PlatformLeaderboardsClient.PlatformLeaderboardsClient)
+
+return PlatformLeaderboardsClient

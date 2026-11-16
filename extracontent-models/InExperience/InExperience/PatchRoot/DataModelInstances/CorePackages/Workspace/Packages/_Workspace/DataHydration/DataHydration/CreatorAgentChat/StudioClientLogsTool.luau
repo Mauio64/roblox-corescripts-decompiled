@@ -1,179 +1,161 @@
 local HttpService = game:GetService("HttpService")
-
 require(script.Parent.types)
 
-local t1 = {
+local function valueLooksLikeToolName(value): boolean -- 8 equivalent calls inferred from this helper
+	return typeof(value) == "string" and string.lower(value) == "ask_for_logs"
+end
+
+local function decodePersistedToolResultText(p: string)
+	local success, result = pcall(HttpService.JSONDecode, HttpService, p)
+
+	if not success or typeof(result) ~= "table" then
+		return nil
+	end
+
+	return if typeof(result.text) == "string" then result.text else nil
+end
+
+local function getPersistedToolResultText(toolCall)
+	if toolCall.content == nil then
+		return nil
+	end
+
+	local texts = {}
+
+	for _, v in toolCall.content do
+		if not (v.type == "content" and v.content ~= nil) then
+			continue
+		end
+
+		local content = v.content
+
+		if not (content.type == "text" and typeof(content.text) == "string") then
+			continue
+		end
+
+		local text = content.text
+		local success, result = pcall(HttpService.JSONDecode, HttpService, text)
+		local text2
+
+		if success and typeof(result) == "table" and typeof(result.text) == "string" then
+			text2 = result.text
+		end
+
+		if text2 ~= nil and text2 ~= "" then
+			table.insert(texts, text2)
+		end
+	end
+
+	if #texts > 0 then
+		return (table.concat(texts))
+	end
+
+	return nil
+end
+
+local StudioClientLogsTool = {}
+StudioClientLogsTool.TOOL_NAME = "ask_for_logs"
+StudioClientLogsTool.LOCAL_TOOL_DEFINITION = {
 	name = "ask_for_logs",
 	inputSchema = {
 		type = "object",
 		properties = {
-			reason = {
-				type = "string"
-			}
+			reason = { type = "string" }
 		}
 	}
 }
+StudioClientLogsTool.NOT_IN_GAME_MESSAGE = "The user is not in the game."
+StudioClientLogsTool.STALE_LOGS_MESSAGE = "The available logs are from an older saved version. Playtest the latest version first."
 
-local function valueLooksLikeToolName(p1) -- line: 34
-	return typeof(p1) == "string" and string.lower(p1) == "ask_for_logs"
-end
-local function decodePersistedToolResultText(s1: string) -- line: 55
-	-- upvalues: HttpService (copy)
-	local ok, result = pcall(HttpService.JSONDecode, HttpService, s1)
-
-	if not ok or typeof(result) ~= "table" then
-		return nil
-	end
-
-	if typeof(result.text) == "string" then
-		return result.text
-	end
-
-	return nil
-end
-local function getPersistedToolResultText(p2) -- line: 65
-	-- upvalues: HttpService (copy)
-	if p2.content == nil then
-		return nil
-	end
-
-	local t2 = {}
-
-	for _, v20 in p2.content do
-		if v20.type == "content" and v20.content ~= nil then
-			local content = v20.content
-
-			if content.type == "text" and typeof(content.text) == "string" then
-				local text = content.text
-				local ok, result = pcall(HttpService.JSONDecode, HttpService, text)
-				local v25 = if not not ok and typeof(result) == "table" then if typeof(result.text) ~= "string" then nil else result.text else nil
-
-				if v25 ~= nil and v25 ~= "" then
-					table.insert(t2, v25)
-				end
-			end
-		end
-	end
-
-	if #t2 > 0 then
-		return (table.concat(t2))
-	end
-
-	return nil
-end
-
-return {
-	TOOL_NAME = "ask_for_logs",
-	NOT_IN_GAME_MESSAGE = "The user is not in the game.",
-	LOCAL_TOOL_DEFINITION = t1,
-	toolCallLooksLikeClientLogsRequest = function(p3) -- line: 38
-		local kind = p3.kind
-
-		if typeof(kind) ~= "string" or string.lower(kind) ~= "ask_for_logs" then
-			local title = p3.title
-
-			if not (typeof(title) == "string" and string.lower(title) == "ask_for_logs") then
-				local rawInput = p3.rawInput
-
-				if typeof(rawInput) == "table" then
-					local name = rawInput.name
-					local v12 = typeof(name) == "string" and string.lower(name) == "ask_for_logs"
-
-					if not v12 then
-						local toolName = rawInput.toolName
-
-						v12 = typeof(toolName) == "string" and string.lower(toolName) == "ask_for_logs"
-					end
-
-					return v12
-				end
-
-				return false
-			end
-		end
-
+function StudioClientLogsTool.toolCallLooksLikeClientLogsRequest(data)
+	if valueLooksLikeToolName(data.kind) then -- inferred equivalent call
 		return true
-	end,
-	findClientLogsRequestInTurnState = function(p4, t3: {[any]: any}?) -- line: 88
-		-- upvalues: getPersistedToolResultText (copy)
-		local t4 = {}
-		local g34 = nil
-		local v38 = nil
-
-		for v29 in p4.toolCalls do
-			table.insert(t4, v29)
-		end
-
-		table.sort(t4)
-
-		for _, v31 in t4 do
-			if t3 and t3[v31] then
-				continue
-			end
-
-			local v32 = p4.toolCalls[v31]
-
-			if getPersistedToolResultText(v32) == nil then
-				local kind = v32.kind
-
-				repeat
-					if not g34 and (typeof(kind) ~= "string" or string.lower(kind) ~= "ask_for_logs") then
-						local title = v32.title
-
-						if typeof(title) == "string" and string.lower(title) == "ask_for_logs" then
-							g34 = true
-						end
-
-						if not g34 then
-							local rawInput = v32.rawInput
-
-							if typeof(rawInput) == "table" then
-								local name = rawInput.name
-
-								v38 = typeof(name) == "string" and string.lower(name) == "ask_for_logs"
-
-								if not v38 then
-									local toolName = rawInput.toolName
-
-									v38 = typeof(toolName) == "string" and string.lower(toolName) == "ask_for_logs"
-								end
-							else
-								v38 = false
-							end
-						end
-					else
-						g34 = false
-						v38 = true
-					end
-				until not g34
-
-				if not v38 then
-					continue
-				end
-
-				return v31, v32.rawInput, v32.turnId, v32.referenceId
-			end
-		end
-
-		return nil, nil, nil, nil
-	end,
-	formatLogsContent = function(t5: {[any]: any}, t6: {[any]: any}) -- line: 114
-		-- upvalues: HttpService (copy)
-		return {
-			text = HttpService:JSONEncode({
-				status = "ok",
-				clientLogs = t5,
-				serverLogs = t6
-			})
-		}
-	end,
-	formatNotInGameContent = function() -- line: 124
-		-- upvalues: HttpService (copy)
-		return {
-			text = HttpService:JSONEncode({
-				status = "not_in_game",
-				message = "The user is not in the game."
-			})
-		}
 	end
-}
+
+	if valueLooksLikeToolName(data.title) then -- inferred equivalent call
+		return true
+	end
+
+	local rawInput = data.rawInput
+
+	if typeof(rawInput) ~= "table" then
+		return false
+	end
+
+	return valueLooksLikeToolName(rawInput.name) or valueLooksLikeToolName(rawInput.toolName) -- inferred equivalent call
+end
+
+function StudioClientLogsTool.findClientLogsRequestInTurnState(p, p2)
+	local v = {}
+
+	for k in p.toolCalls do
+		table.insert(v, k)
+	end
+
+	table.sort(v)
+
+	for _, v2 in v do
+		if p2 and p2[v2] then
+			continue
+		end
+
+		local toolCall = p.toolCalls[v2]
+
+		if not (toolCall.status ~= "completed" and toolCall.status ~= "failed" and toolCall.status ~= "cancelled" and getPersistedToolResultText(toolCall) == nil) then
+			continue
+		end
+
+		local v3 = valueLooksLikeToolName(toolCall.kind) -- inferred equivalent call
+		local v4
+
+		if v3 then
+			v4 = true
+		elseif valueLooksLikeToolName(toolCall.title) then -- inferred equivalent call
+			v4 = true
+		else
+			local rawInput = toolCall.rawInput
+
+			if typeof(rawInput) == "table" then
+				v4 = valueLooksLikeToolName(rawInput.name) or valueLooksLikeToolName(rawInput.toolName) -- inferred equivalent call
+			else
+				v4 = false
+			end
+		end
+
+		if v4 then
+			return v2, toolCall.rawInput, toolCall.turnId, toolCall.referenceId
+		end
+	end
+
+	return nil, nil, nil, nil
+end
+
+function StudioClientLogsTool.formatLogsContent(clientLogs, serverLogs)
+	return {
+		text = HttpService:JSONEncode({
+			status = "ok",
+			clientLogs = clientLogs,
+			serverLogs = serverLogs
+		})
+	}
+end
+
+function StudioClientLogsTool.formatNotInGameContent()
+	return {
+		text = HttpService:JSONEncode({
+			status = "not_in_game",
+			message = "The user is not in the game."
+		})
+	}
+end
+
+function StudioClientLogsTool.formatStaleLogsContent()
+	return {
+		text = HttpService:JSONEncode({
+			status = "stale",
+			message = "The available logs are from an older saved version. Playtest the latest version first."
+		})
+	}
+end
+
+return StudioClientLogsTool

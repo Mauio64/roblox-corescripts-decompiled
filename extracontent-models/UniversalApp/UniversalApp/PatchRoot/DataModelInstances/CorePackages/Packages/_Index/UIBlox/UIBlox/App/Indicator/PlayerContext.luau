@@ -1,37 +1,37 @@
 local App = script:FindFirstAncestor("App")
-local AppParent = App.Parent
-local Core = AppParent.Core
-local AppParentParent = AppParent.Parent
-local t = require(AppParentParent.t)
-local Roact = require(AppParentParent.Roact)
-local ControlState = require(Core.Control.Enum.ControlState)
-local GenericTextLabel = require(Core.Text.GenericTextLabel.GenericTextLabel)
-local withStyle = require(Core.Style.withStyle)
-local getContentStyle = require(Core.Button.getContentStyle)
-local getIconSize = require(App.ImageSet.getIconSize)
-local ImageSetComponent = require(AppParent.Core.ImageSet.ImageSetComponent)
-local IconSize = require(App.ImageSet.Enum.IconSize)
-local validateFontInfo = require(AppParent.Core.Style.Validator.validateFontInfo)
-local validateTypographyInfo = require(AppParent.Core.Style.Validator.validateTypographyInfo)
-local validateColorInfo = require(AppParent.Core.Style.Validator.validateColorInfo)
-local v17 = Roact.PureComponent:extend("PlayerContext")
-local t1 = {
-	[ControlState.Default] = "TextDefault"
-}
-local t2 = {
-	[ControlState.Default] = "IconOnHover",
-	[ControlState.Hover] = "IconDefault"
-}
+local parent = App.Parent
+local core = parent.Core
+local parent2 = parent.Parent
 
-local function doesNotUseScale(p1) -- line: 33
-	if p1.X.Scale ~= 0 or p1.Y.Scale ~= 0 then
-		return false, "Only Offset values are allowed"
+local t = require(parent2.t)
+local Roact = require(parent2.Roact)
+
+local ControlState = require(core.Control.Enum.ControlState)
+local GenericTextLabel = require(core.Text.GenericTextLabel.GenericTextLabel)
+local withStyle = require(core.Style.withStyle)
+local getContentStyle = require(core.Button.getContentStyle)
+local getIconSize = require(App.ImageSet.getIconSize)
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
+local IconSize = require(App.ImageSet.Enum.IconSize)
+local validateFontInfo = require(parent.Core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(parent.Core.Style.Validator.validateTypographyInfo)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+
+local extended = Roact.PureComponent:extend("PlayerContext")
+
+local v = { [ControlState.Default] = "TextDefault" }
+
+local v2 = { [ControlState.Default] = "IconOnHover", [ControlState.Hover] = "IconDefault" }
+
+local function doesNotUseScale(p)
+	if p.X.Scale == 0 and p.Y.Scale == 0 then
+		return true
 	end
 
-	return true
+	return false, "Only Offset values are allowed"
 end
 
-v17.validateProps = t.strictInterface({
+extended.validateProps = t.strictInterface({
 	text = t.optional(t.string),
 	icon = t.optional(t.union(t.string, t.table)),
 	iconSize = t.optional(t.intersection(t.UDim2, doesNotUseScale)),
@@ -48,62 +48,74 @@ v17.validateProps = t.strictInterface({
 	horizontalAlignment = t.optional(t.EnumItem),
 	textXAlignment = t.optional(t.EnumItem)
 })
-v17.defaultProps = {
+
+extended.defaultProps = {
 	text = "",
 	icon = nil,
 	Selectable = true,
+	iconSize = UDim2.fromOffset(getIconSize(IconSize.Small), getIconSize(IconSize.Small)),
 	textHeight = 28,
 	iconPadding = 4,
 	iconTextSpacing = 4,
 	layoutOrder = 1,
-	iconSize = UDim2.fromOffset(getIconSize(IconSize.Small), getIconSize(IconSize.Small)),
 	horizontalAlignment = Enum.HorizontalAlignment.Left,
 	textXAlignment = Enum.TextXAlignment.Left
 }
 
-function v17.init(p2) -- line: 87
-	p2.state = {}
+function extended:init()
+	self.state = {}
 end
-function v17.render(p3) -- line: 91
-	-- upvalues: withStyle (copy), getContentStyle (copy), t2 (copy), t1 (copy), Roact (copy), ImageSetComponent (copy), GenericTextLabel (copy)
-	local controlState = p3.state.controlState
-	local text = p3.props.text
-	local icon = p3.props.icon
-	local iconSize = p3.props.iconSize
-	local horizontalAlignment = p3.props.horizontalAlignment
-	local onActivated = p3.props.onActivated
 
-	return withStyle(function(p4) -- line: 101
-		-- upvalues: getContentStyle (copy), t2 (copy), controlState (copy), t1 (copy), onActivated (copy), p3 (copy), iconSize (copy), Roact (copy), horizontalAlignment (copy), icon (copy), ImageSetComponent (copy), text (copy), GenericTextLabel (copy)
-		local v31 = getContentStyle(t2, controlState, p4)
-		local v32 = getContentStyle(t1, controlState, p4)
-		local v33 = onActivated and v31 or v32
-		local iconTransparency = p3.props.iconTransparency
+function extended.render(p)
+	local controlState = p.state.controlState
+	local text = p.props.text
+	local icon = p.props.icon
+	local iconSize = p.props.iconSize
+	local horizontalAlignment = p.props.horizontalAlignment
 
-		if not p3.props.iconTransparency then
-			iconTransparency = if not p3.props.iconColor then v33.Transparency else 0
+	local onActivated = p.props.onActivated
+
+	return withStyle(function(p2)
+		local contentStyle = getContentStyle(v2, controlState, p2)
+		local contentStyle2 = getContentStyle(v, controlState, p2)
+		local v3 = onActivated and contentStyle or contentStyle2
+		local imageTransparency = p.props.iconTransparency
+
+		if not p.props.iconTransparency then
+			imageTransparency = p.props.iconColor and 0 or v3.Transparency
 		end
 
-		local iconColor = p3.props.iconColor
+		local imageColor = p.props.iconColor
 
-		if not p3.props.iconColor then
-			iconColor = v33.Color
+		if not p.props.iconColor then
+			imageColor = v3.Color
 		end
 
-		local textHeight = p3.props.textHeight
-		local v37 = p3.props.textColorStyle or if not onActivated then v32 else v31
-		local iconPadding = p3.props.iconPadding
-		local iconTextSpacing = p3.props.iconTextSpacing
-		local v40 = iconSize.X.Offset + iconPadding * 2
-		local v41 = iconSize.Y.Offset + iconPadding * 2
-		local v42 = p3.props.fontStyle or p4.Font.CaptionHeader
+		local textHeight = p.props.textHeight
 
+		local colorStyle = p.props.textColorStyle
+
+		if not colorStyle then
+			if onActivated then
+				colorStyle = contentStyle
+			else
+				colorStyle = contentStyle2
+			end
+		end
+
+		local iconPadding = p.props.iconPadding
+		local iconTextSpacing = p.props.iconTextSpacing
+
+		local v4 = iconSize.X.Offset + iconPadding * 2
+		local v5 = iconSize.Y.Offset + iconPadding * 2
+
+		local fontStyle = p.props.fontStyle or p2.Font.CaptionHeader
 		return Roact.createElement("ImageButton", {
 			Size = UDim2.new(1, 0, 0, textHeight),
 			BackgroundTransparency = 1,
-			Selectable = p3.props.Selectable,
-			Active = not not onActivated,
-			LayoutOrder = p3.props.layoutOrder,
+			Selectable = p.props.Selectable,
+			Active = onActivated and true or false,
+			LayoutOrder = p.props.layoutOrder,
 			[Roact.Event.Activated] = onActivated
 		}, {
 			UIListLayout = Roact.createElement("UIListLayout", {
@@ -113,36 +125,37 @@ function v17.render(p3) -- line: 91
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, iconTextSpacing)
 			}),
-			IconFrame = icon and Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(v40, v41)
-			}, {
-				layout = Roact.createElement("UIListLayout", {
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center
-				}),
-				icon = Roact.createElement(ImageSetComponent.Label, {
-					BackgroundTransparency = 1,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Size = iconSize,
-					Image = icon,
-					ImageColor3 = iconColor,
-					ImageTransparency = iconTransparency
-				})
-			}),
+			IconFrame = icon and Roact.createElement(
+				"Frame",
+				{ Size = UDim2.fromOffset(v4, v5), BackgroundTransparency = 1 },
+				{
+					layout = Roact.createElement("UIListLayout", {
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center
+					}),
+					icon = Roact.createElement(ImageSetComponent.Label, {
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Size = iconSize,
+						BackgroundTransparency = 1,
+						Image = icon,
+						ImageColor3 = imageColor,
+						ImageTransparency = imageTransparency
+					})
+				}
+			),
 			Text = text and Roact.createElement(GenericTextLabel, {
-				TextWrapped = true,
-				LayoutOrder = 2,
 				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, not icon and 0 or -(v40 + iconTextSpacing), 0, 0),
+				Size = UDim2.new(1, not icon and 0 or -(v4 + iconTextSpacing), 0, 0),
 				Text = text,
-				TextXAlignment = p3.props.textXAlignment,
-				fontStyle = v42,
-				colorStyle = v37,
+				TextWrapped = true,
+				TextXAlignment = p.props.textXAlignment,
+				fontStyle = fontStyle,
+				colorStyle = colorStyle,
+				LayoutOrder = 2,
 				TextTruncate = Enum.TextTruncate.AtEnd
 			})
 		})
 	end)
 end
 
-return v17
+return extended

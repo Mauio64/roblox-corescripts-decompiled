@@ -7,36 +7,117 @@ local SharedFlags = require(script.Parent.SharedFlags)
 local FFlagMoveInExperienceModeToEditProfile = SharedFlags.FFlagMoveInExperienceModeToEditProfile
 local FFlagAddIEMProfilePage = SharedFlags.FFlagAddIEMProfilePage
 local FFlagTCUpdateProfileCTAButton = SharedFlags.FFlagTCUpdateProfileCTAButton
+local FFlagEnableRecentActivityInspectAndBuy = SharedFlags.FFlagEnableRecentActivityInspectAndBuy
 local FFlagProfilePlatformEnableMoments = require(script.Flags.FFlagProfilePlatformEnableMoments)
 
-return {
-	["jest.config"] = script["jest.config"],
-	RoduxKey = require(script.Common.Constants).RODUX_KEY,
-	installReducer = require(script.Rodux.installReducer),
-	EnableCommunityProfilePageIXP = require(script.Flags.EnableCommunityProfilePageIXP),
-	EventNames = require(script.Analytics.EventNames),
-	LoadingStagesExtension = require(script.Analytics.LoadingStagesExtension),
-	initializeProfileAnalytics = require(script.Analytics.initializeProfileAnalytics),
-	ProfilePlatformNavigator = require(script.Navigation.ProfilePlatformNavigatorWithProviders),
-	ProfileWrapperContext = ProfileWrapperContext,
-	ProfileTypes = Enums.ProfileTypes,
-	Components = Enums.Components,
-	CurrentlyWearing = if not FFlagAddIEMProfilePage then nil else require(script.Components.CurrentlyWearing),
-	UserLists = require(script.Components.UserProfileHeader.SocialChipCountsRow.UserLists),
-	AvatarHeadshotComponent = if not FFlagAddIEMProfilePage then nil else require(script.Components.UserProfileHeader.AvatarHeadshotComponent),
-	SocialChipCountsRow = if not FFlagAddIEMProfilePage then nil else require(script.Components.UserProfileHeader.SocialChipCountsRow).SocialChipCountsRowContainer,
-	AboutDetailsSheet = require(script.Components.AboutDetailsSheet),
-	MomentsFeedPage = if not FFlagProfilePlatformEnableMoments then nil else require(script.Components.Moments.MomentsFeedPage),
-	useDynamicSizeMargin = if not FFlagAddIEMProfilePage then nil else require(script.Hooks.useDynamicSizeMargin),
-	useProfileJsonComponent = if not FFlagAddIEMProfilePage then nil else require(script.Hooks.useProfileJsonComponent),
-	Screens = Enums.Screens,
-	Sources = Enums.Sources,
-	DisabledReasons = Enums.DisabledReasons,
-	ProfileActions = Enums.ProfileActions,
-	getProfilePlatform = if not FFlagMoveInExperienceModeToEditProfile and not FFlagAddIEMProfilePage then nil else getProfilePlatform,
-	refreshProfilePlatformActionInfo = if not FFlagTCUpdateProfileCTAButton then nil else refreshProfilePlatformActionInfo,
-	ProfilePlatformTypes = if not FFlagMoveInExperienceModeToEditProfile then nil else Types,
-	FFlagProfilePlatformEnableEditAppearanceMenu = require(script.Flags.FFlagProfilePlatformEnableEditAppearanceMenu),
-	FFlagProfilePlatformEditBackgroundMenuItem = require(script.Flags.FFlagProfilePlatformEditBackgroundMenuItem),
-	FFlagProfilePlatformEnableMoments = require(script.Flags.FFlagProfilePlatformEnableMoments)
+local ProfilePlatform = {
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = script["jest.config"]
 }
+local Constants = require(script.Common.Constants)
+ProfilePlatform.RoduxKey = Constants.RODUX_KEY
+ProfilePlatform.installReducer = require(script.Rodux.installReducer)
+ProfilePlatform.EnableCommunityProfilePageIXP = require(script.Flags.EnableCommunityProfilePageIXP)
+ProfilePlatform.EventNames = require(script.Analytics.EventNames)
+ProfilePlatform.LoadingStagesExtension = require(script.Analytics.LoadingStagesExtension)
+ProfilePlatform.initializeProfileAnalytics = require(script.Analytics.initializeProfileAnalytics)
+ProfilePlatform.ProfilePlatformNavigator = require(script.Navigation.ProfilePlatformNavigatorWithProviders)
+ProfilePlatform.ProfileWrapperContext = ProfileWrapperContext
+ProfilePlatform.ProfileTypes = Enums.ProfileTypes
+ProfilePlatform.Components = Enums.Components
+local currentlyWearing
+
+if FFlagAddIEMProfilePage then
+	currentlyWearing = require(script.Components.CurrentlyWearing)
+end
+
+ProfilePlatform.CurrentlyWearing = currentlyWearing
+ProfilePlatform.UserLists = require(script.Components.UserProfileHeader.SocialChipCountsRow.UserLists)
+local avatarHeadshotComponent
+
+if FFlagAddIEMProfilePage then
+	avatarHeadshotComponent = require(script.Components.UserProfileHeader.AvatarHeadshotComponent)
+end
+
+ProfilePlatform.AvatarHeadshotComponent = avatarHeadshotComponent
+local socialChipCountsRowContainer
+
+if FFlagAddIEMProfilePage then
+	local SocialChipCountsRow = require(script.Components.UserProfileHeader.SocialChipCountsRow)
+	socialChipCountsRowContainer = SocialChipCountsRow.SocialChipCountsRowContainer
+end
+
+ProfilePlatform.SocialChipCountsRow = socialChipCountsRowContainer
+
+ProfilePlatform.AboutDetailsSheet = require(script.Components.AboutDetailsSheet)
+local recentActivityInspectAndBuy
+
+if FFlagEnableRecentActivityInspectAndBuy then
+	recentActivityInspectAndBuy = require(script.Components.RecentActivityInspectAndBuy.RecentActivityInspectAndBuyContainer)
+end
+
+ProfilePlatform.RecentActivityInspectAndBuy = recentActivityInspectAndBuy
+local momentsFeedPage
+
+if FFlagProfilePlatformEnableMoments then
+	momentsFeedPage = require(script.Components.Moments.MomentsFeedPage)
+end
+
+ProfilePlatform.MomentsFeedPage = momentsFeedPage
+local useDynamicSizeMargin
+
+if FFlagAddIEMProfilePage then
+	useDynamicSizeMargin = require(script.Hooks.useDynamicSizeMargin)
+end
+
+ProfilePlatform.useDynamicSizeMargin = useDynamicSizeMargin
+local useProfileJsonComponent
+
+if FFlagAddIEMProfilePage then
+	useProfileJsonComponent = require(script.Hooks.useProfileJsonComponent)
+end
+
+ProfilePlatform.useProfileJsonComponent = useProfileJsonComponent
+
+ProfilePlatform.Screens = Enums.Screens
+ProfilePlatform.Sources = Enums.Sources
+ProfilePlatform.DisabledReasons = Enums.DisabledReasons
+ProfilePlatform.ProfileActions = Enums.ProfileActions
+
+if not (FFlagMoveInExperienceModeToEditProfile or FFlagAddIEMProfilePage) then
+	getProfilePlatform = nil
+end
+
+ProfilePlatform.getProfilePlatform = getProfilePlatform
+
+if not FFlagTCUpdateProfileCTAButton then
+	refreshProfilePlatformActionInfo = nil
+end
+
+ProfilePlatform.refreshProfilePlatformActionInfo = refreshProfilePlatformActionInfo
+
+if not FFlagMoveInExperienceModeToEditProfile then
+	Types = nil
+end
+
+ProfilePlatform.ProfilePlatformTypes = Types
+ProfilePlatform.FFlagProfilePlatformEnableEditAppearanceMenu = require(script.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
+ProfilePlatform.FFlagProfilePlatformEditBackgroundMenuItem = require(script.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
+ProfilePlatform.FFlagProfilePlatformEnableMoments = require(script.Flags.FFlagProfilePlatformEnableMoments)
+ProfilePlatform.FFlagProfilePlatformGracefulVisibility = require(script.Flags.FFlagProfilePlatformGracefulVisibility)
+return ProfilePlatform

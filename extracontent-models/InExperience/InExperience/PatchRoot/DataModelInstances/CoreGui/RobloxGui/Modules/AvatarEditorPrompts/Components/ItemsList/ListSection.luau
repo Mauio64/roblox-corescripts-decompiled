@@ -1,13 +1,18 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Cryo = require(CorePackages.Packages.Cryo)
 local Roact = require(CorePackages.Packages.Roact)
 local RoactGamepad = require(CorePackages.Packages.RoactGamepad)
 local t = require(CorePackages.Packages.t)
-local RoactFitComponents = require(CorePackages.Packages.AvatarExperienceDeps).RoactFitComponents
-local ListEntry = require(script.Parent.ListEntry)
-local v8 = Roact.PureComponent:extend("ListSection")
+local AvatarExperienceDeps = require(CorePackages.Packages.AvatarExperienceDeps)
 
-v8.validateProps = t.strictInterface({
+local RoactFitComponents = AvatarExperienceDeps.RoactFitComponents
+
+local ListEntry = require(script.Parent.ListEntry)
+
+local extended = Roact.PureComponent:extend("ListSection")
+
+extended.validateProps = t.strictInterface({
 	headerText = t.string,
 	items = t.array(t.string),
 	layoutOrder = t.integer,
@@ -20,61 +25,80 @@ v8.validateProps = t.strictInterface({
 	forwardRef = t.table
 })
 
-function v8.init(p1) -- line: 29
-	-- upvalues: RoactGamepad (copy)
-	p1.listRefCache = RoactGamepad.createRefCache()
+function extended:init()
+	self.listRefCache = RoactGamepad.createRefCache()
 end
-function v8.render(p2) -- line: 33
-	-- upvalues: Roact (copy), RoactGamepad (copy), ListEntry (copy), RoactFitComponents (copy)
-	local t1 = {
-		[0] = Roact.createElement(RoactGamepad.Focusable[ListEntry], {
-			text = p2.props.headerText,
-			hasBullet = false,
-			layoutOrder = 0,
-			positionChangedCallback = p2.props.isFirstSection and p2.firstEntryPositionChanged or nil,
-			NextSelectionDown = #p2.props.items > 0 and p2.listRefCache[1] or nil,
-			[Roact.Ref] = p2.listRefCache[0]
-		})
-	}
 
-	for i, v in ipairs(p2.props.items) do
-		local lastEntryPositionChanged = nil
+function extended.render(props)
+	local children = {}
 
-		if p2.props.isLastSection and i == #p2.props.items then
-			lastEntryPositionChanged = p2.lastEntryPositionChanged
+	local createElement = Roact.createElement
+	local v = RoactGamepad.Focusable[ListEntry]
+	local v2 = {}
+	v2.text = props.props.headerText
+	v2.hasBullet = false
+	v2.layoutOrder = 0
+	local positionChangedCallback
+
+	if props.props.isFirstSection then
+		positionChangedCallback = props.firstEntryPositionChanged or nil
+	end
+
+	v2.positionChangedCallback = positionChangedCallback
+	local nextSelectionDown
+
+	if #props.props.items > 0 then
+		nextSelectionDown = props.listRefCache[1] or nil
+	end
+
+	v2.NextSelectionDown = nextSelectionDown
+	v2[Roact.Ref] = props.listRefCache[0]
+	children[0] = createElement(v, v2)
+
+	for i, item in ipairs(props.props.items) do
+		local lastEntryPositionChanged
+
+		if props.props.isLastSection and i == #props.props.items then
+			lastEntryPositionChanged = props.lastEntryPositionChanged
 		end
 
-		t1[i] = Roact.createElement(RoactGamepad.Focusable[ListEntry], {
-			text = v,
+		local createElement2 = Roact.createElement
+		local v3 = RoactGamepad.Focusable[ListEntry]
+		local v4 = {
+			["text"] = item,
 			hasBullet = true,
 			layoutOrder = i,
 			positionChangedCallback = lastEntryPositionChanged,
-			NextSelectionUp = p2.listRefCache[i - 1],
-			NextSelectionDown = i ~= #p2.props.items and p2.listRefCache[i + 1] or nil,
-			[Roact.Ref] = p2.listRefCache[i]
-		})
+			NextSelectionUp = props.listRefCache[i - 1]
+		}
+		local nextSelectionDown2
+
+		if i ~= #props.props.items then
+			nextSelectionDown2 = props.listRefCache[i + 1] or nil
+		end
+
+		v4.NextSelectionDown = nextSelectionDown2
+		v4[Roact.Ref] = props.listRefCache[i]
+		children[i] = createElement2(v3, v4)
 	end
 
-	local forwardRef = p2.props.forwardRef
+	local forwardRef = props.props.forwardRef
 
 	return Roact.createElement(RoactGamepad.Focusable[RoactFitComponents.FitFrameVertical], {
 		width = UDim.new(1, 0),
 		FillDirection = Enum.FillDirection.Vertical,
 		VerticalAlignment = Enum.VerticalAlignment.Top,
 		BackgroundTransparency = 1,
-		LayoutOrder = p2.props.layoutOrder,
-		defaultChild = p2.listRefCache[0],
-		NextSelectionLeft = p2.props.NextSelectionLeft,
-		NextSelectionRight = p2.props.NextSelectionRight,
-		NextSelectionUp = p2.props.NextSelectionUp,
-		NextSelectionDown = p2.props.NextSelectionDown,
+		LayoutOrder = props.props.layoutOrder,
+		defaultChild = props.listRefCache[0],
+		NextSelectionLeft = props.props.NextSelectionLeft,
+		NextSelectionRight = props.props.NextSelectionRight,
+		NextSelectionUp = props.props.NextSelectionUp,
+		NextSelectionDown = props.props.NextSelectionDown,
 		[Roact.Ref] = forwardRef
-	}, t1)
+	}, children)
 end
 
-return Roact.forwardRef(function(p3, p4) -- line: 84
-	-- upvalues: Roact (copy), v8 (copy), Cryo (copy)
-	return Roact.createElement(v8, Cryo.Dictionary.join(p3, {
-		forwardRef = p4
-	}))
+return Roact.forwardRef(function(p, forwardRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { forwardRef = forwardRef }))
 end)

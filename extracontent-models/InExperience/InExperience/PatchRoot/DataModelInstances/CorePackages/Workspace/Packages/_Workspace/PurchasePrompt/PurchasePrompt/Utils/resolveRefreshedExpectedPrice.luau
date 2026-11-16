@@ -1,32 +1,31 @@
-local function resolveRefreshedExpectedPrice(p1, p2, s1: string?, n1: number?) -- line: 1
+local function resolveRefreshedExpectedPrice(data, p, p2: string?, p3: number?)
 	local price = nil
 
-	if s1 and s1 ~= "" then
-		if p2 ~= nil and p2.data ~= nil then
-			for _, v in ipairs(p2.data) do
-				if s1 == v.collectibleItemInstanceId then
+	if p2 and p2 ~= "" then
+		if p ~= nil and p.data ~= nil then
+			for _, v in ipairs(p.data) do
+				if v.collectibleItemInstanceId == p2 then
 					price = v.price
-
 					break
 				end
 			end
 		end
 
-		if price == nil and p1 ~= nil then
-			return p1.lowestResalePrice
+		if price == nil and data ~= nil then
+			return data.lowestResalePrice
 		end
-	elseif n1 and n1 ~= 0 then
-		if p1 ~= nil and p1.timedOptions then
-			for _, v in ipairs(p1.timedOptions) do
-				if n1 == v.days then
-					return v.price
-				end
-			end
-
+	elseif p3 and p3 ~= 0 then
+		if data == nil or not data.timedOptions then
 			return price
 		end
-	elseif p1 ~= nil then
-		price = p1.price
+
+		for _, timedOption in ipairs(data.timedOptions) do
+			if timedOption.days == p3 then
+				return timedOption.price
+			end
+		end
+	elseif data ~= nil then
+		price = data.price
 	end
 
 	return price

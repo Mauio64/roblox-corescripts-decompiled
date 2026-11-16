@@ -1,28 +1,36 @@
 local App = script:FindFirstAncestor("App")
-local AppParent = App.Parent
-local Core = AppParent.Core
-local AppParentParent = AppParent.Parent
-local t = require(AppParentParent.t)
-local Roact = require(AppParentParent.Roact)
-local Cryo = require(AppParentParent.Cryo)
-local Interactable = require(Core.Control.Interactable)
-local ControlState = require(Core.Control.Enum.ControlState)
-local getContentStyle = require(Core.Button.getContentStyle)
-local getIconSize = require(App.ImageSet.getIconSize)
-local bindingValidator = require(Core.Utility.bindingValidator)
-local validateImage = require(Core.ImageSet.Validator.validateImage)
-local validateColorInfo = require(Core.Style.Validator.validateColorInfo)
-local withStyle = require(Core.Style.withStyle)
-local HoverButtonBackground = require(Core.Button.HoverButtonBackground)
-local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
-local IconSize = require(App.ImageSet.Enum.IconSize)
-local Focusable = require(AppParentParent.RoactGamepad).Focusable
-local isCallable = require(AppParent.Utility.isCallable)
-local useCursor = require(AppParent.App.SelectionCursor.useCursor)
-local uDim = UDim.new(0, 8)
-local v23 = Roact.PureComponent:extend("IconButton")
+local parent = App.Parent
+local core = parent.Core
+local parent2 = parent.Parent
 
-v23.validateProps = t.strictInterface({
+local t = require(parent2.t)
+local Roact = require(parent2.Roact)
+local Cryo = require(parent2.Cryo)
+
+local Interactable = require(core.Control.Interactable)
+
+local ControlState = require(core.Control.Enum.ControlState)
+local getContentStyle = require(core.Button.getContentStyle)
+local getIconSize = require(App.ImageSet.getIconSize)
+local bindingValidator = require(core.Utility.bindingValidator)
+local validateImage = require(core.ImageSet.Validator.validateImage)
+local validateColorInfo = require(core.Style.Validator.validateColorInfo)
+
+local withStyle = require(core.Style.withStyle)
+local HoverButtonBackground = require(core.Button.HoverButtonBackground)
+local ImageSetComponent = require(core.ImageSet.ImageSetComponent)
+local IconSize = require(App.ImageSet.Enum.IconSize)
+
+local RoactGamepad = require(parent2.RoactGamepad)
+local Focusable = RoactGamepad.Focusable
+local isCallable = require(parent.Utility.isCallable)
+local useCursor = require(parent.App.SelectionCursor.useCursor)
+
+local udim = UDim.new(0, 8)
+
+local extended = Roact.PureComponent:extend("IconButton")
+
+extended.validateProps = t.strictInterface({
 	onStateChanged = t.optional(isCallable),
 	isDisabled = t.optional(t.boolean),
 	colorStyleDefault = t.optional(t.string),
@@ -55,10 +63,14 @@ v23.validateProps = t.strictInterface({
 	[Roact.Change.AbsoluteSize] = t.optional(t.callback),
 	isRoactGamepadEnabled = t.optional(t.boolean)
 })
-v23.defaultProps = {
+
+extended.defaultProps = {
+	anchorPoint = Vector2.new(0, 0),
 	layoutOrder = 0,
+	position = UDim2.new(0, 0, 0, 0),
 	size = nil,
 	icon = "",
+	iconSize = IconSize.Medium,
 	colorStyleDefault = "IconEmphasis",
 	colorStyleHover = "IconEmphasis",
 	iconColor3 = nil,
@@ -69,30 +81,21 @@ v23.defaultProps = {
 	isDisabled = false,
 	userInteractionEnabled = true,
 	debugControlState = nil,
-	isRoactGamepadEnabled = true,
-	anchorPoint = Vector2.new(0, 0),
-	position = UDim2.new(0, 0, 0, 0),
-	iconSize = IconSize.Medium
+	isRoactGamepadEnabled = true
 }
 
-function v23.init(p1) -- line: 133
-	-- upvalues: ControlState (copy), IconSize (copy)
-	p1:setState({
-		controlState = ControlState.Initialize
-	})
+function extended:init()
+	self:setState({ controlState = ControlState.Initialize })
 
-	function p1.onStateChanged(p2, p3) -- line: 138
-		-- upvalues: p1 (copy)
-		p1:setState({
-			controlState = p3
-		})
+	function self.onStateChanged(p, controlState)
+		self:setState({ controlState = controlState })
 
-		if p1.props.onStateChanged then
-			p1.props.onStateChanged(p2, p3)
+		if self.props.onStateChanged then
+			self.props.onStateChanged(p, controlState)
 		end
 	end
 
-	local t1 = {
+	local v = {
 		[IconSize.Small] = 1,
 		[IconSize.Medium] = 2,
 		[IconSize.Large] = 3,
@@ -100,100 +103,124 @@ function v23.init(p1) -- line: 133
 		[IconSize.XXLarge] = 5
 	}
 
-	function p1.getSize(p4) -- line: 154
-		-- upvalues: p1 (copy), t1 (copy)
-		if p1.props.size then
-			return p1.props.size
+	function self.getSize(p)
+		if self.props.size then
+			return self.props.size
 		end
 
-		local v46 = p4 + 4 * t1[p1.props.iconSize]
-
-		return UDim2.fromOffset(v46, v46)
+		local v2 = p + 4 * v[self.props.iconSize]
+		return UDim2.fromOffset(v2, v2)
 	end
 end
-function v23.render(p5) -- line: 165
-	-- upvalues: withStyle (copy)
-	return withStyle(function(p6) -- line: 166
-		-- upvalues: p5 (copy)
-		return p5:renderWithProviders(p6, nil, nil)
+
+function extended:render()
+	return withStyle(function(p)
+		return self:renderWithProviders(p, nil, nil)
 	end)
 end
-function v23.renderWithProviders(p7, p8, _, _) -- line: 171
-	-- upvalues: getIconSize (copy), ControlState (copy), getContentStyle (copy), Roact (copy), Focusable (copy), Interactable (copy), ImageSetComponent (copy), HoverButtonBackground (copy), uDim (copy)
-	local v33 = getIconSize(p7.props.iconSize, p8)
-	local v34 = p7.getSize(v33)
-	local showBackground = p7.props.showBackground
-	local v36 = p7.props.debugControlState or p7.state.controlState
-	local t2 = {
-		[ControlState.Default] = p7.props.colorStyleDefault,
-		[ControlState.Hover] = p7.props.colorStyleHover
-	}
-	local v38 = getContentStyle(t2, v36, p8)
-	local v39 = if p7.props.backgroundColor ~= nil then p7.props.backgroundColor else p8.Theme.UIMuted
 
-	return Roact.createElement(if not p7.props.isRoactGamepadEnabled then Interactable else Focusable[Interactable], {
-		AnchorPoint = p7.props.anchorPoint,
-		LayoutOrder = p7.props.layoutOrder,
-		Position = p7.props.position,
-		Size = v34,
-		isDisabled = p7.props.isDisabled,
-		onStateChanged = p7.onStateChanged,
-		userInteractionEnabled = p7.props.userInteractionEnabled,
+function extended:renderWithProviders(p, _, _)
+	local iconSize = getIconSize(self.props.iconSize, p)
+	local size = self.getSize(iconSize)
+	local showBackground = self.props.showBackground
+	local debugControlState = self.props.debugControlState or self.state.controlState
+
+	local contentStyle = getContentStyle(
+		{
+			[ControlState.Default] = self.props.colorStyleDefault,
+			[ControlState.Hover] = self.props.colorStyleHover
+		},
+		debugControlState,
+		p
+	)
+	local v
+
+	if self.props.backgroundColor == nil then
+		v = p.Theme.UIMuted
+	else
+		v = self.props.backgroundColor
+	end
+
+	local createElement = Roact.createElement
+	local v2
+
+	if self.props.isRoactGamepadEnabled then
+		v2 = Focusable[Interactable]
+	else
+		v2 = Interactable
+	end
+
+	local v3 = {
+		AnchorPoint = self.props.anchorPoint,
+		LayoutOrder = self.props.layoutOrder,
+		Position = self.props.position,
+		Size = size,
+		isDisabled = self.props.isDisabled,
+		onStateChanged = self.onStateChanged,
+		userInteractionEnabled = self.props.userInteractionEnabled,
 		BackgroundTransparency = 1,
 		AutoButtonColor = false,
-		[Roact.Change.AbsoluteSize] = p7.props[Roact.Change.AbsoluteSize],
-		[Roact.Change.AbsolutePosition] = p7.props.onAbsolutePositionChanged,
-		[Roact.Event.Activated] = p7.props.onActivated,
-		[Roact.Ref] = p7.props.buttonRef,
-		NextSelectionLeft = p7.props.NextSelectionLeft,
-		NextSelectionRight = p7.props.NextSelectionRight,
-		NextSelectionUp = p7.props.NextSelectionUp,
-		NextSelectionDown = p7.props.NextSelectionDown,
-		inputBindings = if not p7.props.isRoactGamepadEnabled then nil else p7.props.inputBindings,
-		SelectionImageObject = p7.props.cursor
-	}, {
+		[Roact.Change.AbsoluteSize] = self.props[Roact.Change.AbsoluteSize],
+		[Roact.Change.AbsolutePosition] = self.props.onAbsolutePositionChanged,
+		[Roact.Event.Activated] = self.props.onActivated,
+		[Roact.Ref] = self.props.buttonRef,
+		NextSelectionLeft = self.props.NextSelectionLeft,
+		NextSelectionRight = self.props.NextSelectionRight,
+		NextSelectionUp = self.props.NextSelectionUp,
+		NextSelectionDown = self.props.NextSelectionDown
+	}
+	local inputBindings
+
+	if self.props.isRoactGamepadEnabled then
+		inputBindings = self.props.inputBindings
+	end
+
+	v3.inputBindings = inputBindings
+	v3.SelectionImageObject = self.props.cursor
+	local v4 = {
 		sizeConstraint = Roact.createElement("UISizeConstraint", {
-			MinSize = Vector2.new(v33, v33)
+			MinSize = Vector2.new(iconSize, iconSize)
 		}),
 		imageLabel = Roact.createElement(ImageSetComponent.Label, {
-			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
-			Size = UDim2.fromOffset(v33, v33),
-			Image = p7.props.icon,
-			ImageColor3 = p7.props.iconColor3 or v38.Color,
-			ImageTransparency = p7.props.iconTransparency or v38.Transparency
-		}, p7.props[Roact.Children]),
-		hoverBackground = v36 == ControlState.Hover and Roact.createElement(HoverButtonBackground) or nil,
-		background = showBackground and Roact.createElement("Frame", {
-			ZIndex = 0,
+			Size = UDim2.fromOffset(iconSize, iconSize),
+			BackgroundTransparency = 1,
+			Image = self.props.icon,
+			ImageColor3 = self.props.iconColor3 or contentStyle.Color,
+			ImageTransparency = self.props.iconTransparency or contentStyle.Transparency
+		}, self.props[Roact.Children]),
+		hoverBackground = debugControlState == ControlState.Hover and Roact.createElement(HoverButtonBackground) or nil,
+		background = 0
+	}
+	local background
+
+	if showBackground then
+		background = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = v39.Color,
-			BackgroundTransparency = p7.props.backgroundTransparency or v39.Transparency
+			BackgroundColor3 = v.Color,
+			BackgroundTransparency = self.props.backgroundTransparency or v.Transparency,
+			ZIndex = 0
 		}, {
-			corner = Roact.createElement("UICorner", {
-				CornerRadius = uDim
-			})
+			corner = Roact.createElement("UICorner", { CornerRadius = udim })
 		}) or nil
-	})
+	end
+
+	v4.background = background
+	return createElement(v2, v3, v4)
 end
 
-local function IconButtonFunctionalWrapper(p11) -- line: 239
-	-- upvalues: useCursor (copy), uDim (copy), Roact (copy), v23 (copy), Cryo (copy)
-	local v41 = useCursor(uDim)
-
-	return Roact.createElement(v23, Cryo.Dictionary.join(p11, {
-		cursor = v41
-	}))
+local function IconButtonFunctionalWrapper(p)
+	local cursor = useCursor(udim)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { cursor = cursor }))
 end
 
-local v25 = Roact.PureComponent:extend("IconButtonOuterWrapper")
+local extended2 = Roact.PureComponent:extend("IconButtonOuterWrapper")
 
-v25.validateProps = v23.validateProps
+extended2.validateProps = extended.validateProps
 
-function v25.render(p12) -- line: 253
-	-- upvalues: Roact (copy), IconButtonFunctionalWrapper (copy)
-	return Roact.createElement(IconButtonFunctionalWrapper, p12.props)
+function extended2.render(p)
+	return Roact.createElement(IconButtonFunctionalWrapper, p.props)
 end
 
-return v25
+return extended2

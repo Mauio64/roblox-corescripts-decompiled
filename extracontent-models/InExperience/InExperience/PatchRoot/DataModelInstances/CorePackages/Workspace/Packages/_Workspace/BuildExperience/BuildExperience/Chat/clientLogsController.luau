@@ -1,101 +1,152 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local CreatorAgentChat = require(Parent.DataHydration.CreatorAgentChat)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+
 local chatConstants = require(script.Parent.chatConstants)
 local clientLogsCollector = require(script.Parent.clientLogsCollector)
 local toolControllerUtils = require(script.Parent.toolControllerUtils)
+
 local StudioClientLogsTool = CreatorAgentChat.StudioClientLogsTool
-local debug = CreatorAgentChat.debug
+local Debug = CreatorAgentChat.debug
 local awaitRequestState = toolControllerUtils.awaitRequestState
 
-local function getClientLogsReason(p1) -- line: 33
-	if typeof(p1) ~= "table" then
+local function getClientLogsReason(p)
+	if typeof(p) ~= "table" then
 		return nil
 	end
 
-	if typeof(p1.reason) == "string" and p1.reason ~= "" then
-		return p1.reason
+	if typeof(p.reason) == "string" and p.reason ~= "" then
+		return p.reason
 	end
 
 	return nil
 end
-local function createClientLogsController(p2, t1: {[any]: any}) -- line: 40
-	-- upvalues: debug (copy), clientLogsCollector (copy), awaitRequestState (copy), chatConstants (copy), StudioClientLogsTool (copy)
-	local function submitClientLogsResult(t2: {[any]: any}) -- line: 44
-		-- upvalues: debug (copy), clientLogsCollector (copy), p2 (copy), awaitRequestState (copy), chatConstants (copy)
-		debug.log("info", "ask_for_logs tool_result collecting", {
-			sessionId = t2.sessionId,
-			toolCallId = t2.toolCallId,
-			turnId = t2.turnId,
-			referenceId = t2.referenceId,
-			reason = t2.reason
+
+local function fetchLatestSavedVersion(placeId: number?)
+	if placeId == nil then
+		return nil
+	end
+
+	local PlaceVersionHistory = require(parent.DataHydration.PlaceVersionHistory)
+	local v, v2 = PlaceVersionHistory.getPlaceVersionHistoryStore().fetchPageHistory(placeId):await()
+
+	if not v or typeof(v2) ~= "table" or typeof(v2.placeVersions) ~= "table" then
+		return nil
+	end
+
+	local placeVersion = v2.placeVersions[1]
+
+	if typeof(placeVersion) == "table" then
+		return (tonumber(placeVersion.version))
+	end
+
+	return nil
+end
+
+local function createClientLogsController(data, p, callback)
+	local function canHandleClientLogs() -- 2 equivalent calls inferred from this helper
+		return callback == nil or callback()
+	end
+
+	local function submitClientLogsResult(data2)
+		Debug.log("info", "ask_for_logs tool_result collecting", {
+			sessionId = data2.sessionId,
+			toolCallId = data2.toolCallId,
+			turnId = data2.turnId,
+			referenceId = data2.referenceId,
+			reason = data2.reason
 		})
 
-		local elapsed = os.clock()
-		local v17 = clientLogsCollector.collectToolResultContent()
-		local v18 = math.floor((os.clock() - elapsed) * 1000 + 0.5)
-		local v19 = p2.submitActiveToolResult(v17, false, t2.turnId, t2.referenceId)
+		local lastTime = os.clock()
 
-		if v19 == nil then
-			debug.log("warn", "ask_for_logs tool_result submit aborted (no active session)", {
-				toolCallId = t2.toolCallId,
-				collectDurationMs = v18
+		local minimumPlaceVersion = fetchLatestSavedVersion(data.placeId)
+
+		if not canHandleClientLogs() then -- inferred equivalent call
+			p[data2.toolCallId] = nil
+			return
+		end
+
+		local toolResultContent = clientLogsCollector.collectToolResultContent({
+			universeId = data.universeId,
+			placeId = data.placeId,
+			minimumPlaceVersion = minimumPlaceVersion
+		})
+
+		local collectDurationMs = math.floor((os.clock() - lastTime) * 1000 + 0.5)
+
+		local submitActiveToolResult = data.submitActiveToolResult(
+			toolResultContent,
+			false,
+			data2.turnId,
+			data2.referenceId
+		)
+
+		if submitActiveToolResult == nil then
+			Debug.log("warn", "ask_for_logs tool_result submit aborted (no active session)", {
+				toolCallId = data2.toolCallId,
+				collectDurationMs = collectDurationMs
 			})
 
 			return
 		end
 
-		local elapsed2 = os.clock()
-		local v21 = awaitRequestState(v19.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
-		local v22 = math.floor((os.clock() - elapsed2) * 1000 + 0.5)
+		local lastTime2 = os.clock()
+		local v = awaitRequestState(submitActiveToolResult.state, os.clock() + chatConstants.CAS_RPC_TIMEOUT_SECONDS)
+		local submitDurationMs = math.floor((os.clock() - lastTime2) * 1000 + 0.5)
 
-		if v21.status ~= "succeeded" then
-			debug.log("warn", "ask_for_logs tool_result submit failed", {
-				sessionId = t2.sessionId,
-				toolCallId = t2.toolCallId,
-				turnId = t2.turnId,
-				referenceId = t2.referenceId,
-				collectDurationMs = v18,
-				submitDurationMs = v22,
-				state = debug.formatRequestState(v21)
+		if v.status == "succeeded" then
+			Debug.log("info", "ask_for_logs tool_result submitted", {
+				sessionId = data2.sessionId,
+				toolCallId = data2.toolCallId,
+				turnId = data2.turnId,
+				referenceId = data2.referenceId,
+				collectDurationMs = collectDurationMs,
+				submitDurationMs = submitDurationMs
 			})
-
-			return
+		else
+			Debug.log("warn", "ask_for_logs tool_result submit failed", {
+				sessionId = data2.sessionId,
+				toolCallId = data2.toolCallId,
+				turnId = data2.turnId,
+				referenceId = data2.referenceId,
+				collectDurationMs = collectDurationMs,
+				submitDurationMs = submitDurationMs,
+				state = Debug.formatRequestState(v)
+			})
 		end
-
-		debug.log("info", "ask_for_logs tool_result submitted", {
-			sessionId = t2.sessionId,
-			toolCallId = t2.toolCallId,
-			turnId = t2.turnId,
-			referenceId = t2.referenceId,
-			collectDurationMs = v18,
-			submitDurationMs = v22
-		})
 	end
 
 	return {
-		syncClientLogsRequest = function(p3) -- line: 92
-			-- upvalues: StudioClientLogsTool (copy), t1 (copy), submitClientLogsResult (copy)
-			local v24, v25, v26, v27 = StudioClientLogsTool.findClientLogsRequestInTurnState(p3, t1)
-
-			if v24 == nil then
+		syncClientLogsRequest = function(p2): boolean
+			if not canHandleClientLogs() then -- inferred equivalent call
 				return false
 			end
 
-			t1[v24] = true
+			local clientLogsRequestInTurnState, v, turnId, referenceId = StudioClientLogsTool.findClientLogsRequestInTurnState(p2, p)
 
-			local t3 = {
-				sessionId = p3.sessionId,
-				toolCallId = v24,
-				turnId = v26,
-				referenceId = v27,
-				reason = if typeof(v25) == "table" then if typeof(v25.reason) ~= "string" or v25.reason == "" then nil else v25.reason else nil
+			if clientLogsRequestInTurnState == nil then
+				return false
+			end
+
+			p[clientLogsRequestInTurnState] = true
+			local v2 = {
+				sessionId = p2.sessionId,
+				toolCallId = clientLogsRequestInTurnState,
+				turnId = turnId,
+				referenceId = referenceId,
+				reason = 0
 			}
+			local reason
 
-			task.spawn(function() -- line: 107
-				-- upvalues: submitClientLogsResult (copy), t3 (copy)
-				submitClientLogsResult(t3)
+			if typeof(v) == "table" and typeof(v.reason) == "string" and v.reason ~= "" then
+				reason = v.reason
+			end
+
+			v2.reason = reason
+
+			task.spawn(function()
+				submitClientLogsResult(v2)
 			end)
-
 			return true
 		end
 	}

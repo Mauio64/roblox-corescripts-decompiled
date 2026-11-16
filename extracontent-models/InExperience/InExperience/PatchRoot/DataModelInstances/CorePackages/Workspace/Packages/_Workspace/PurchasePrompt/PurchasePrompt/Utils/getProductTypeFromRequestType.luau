@@ -1,21 +1,24 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local _ = PurchasePrompt.Parent
+local parent = PurchasePrompt.Parent
+
 local RequestType = require(PurchasePrompt.Enums.RequestType)
-local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
-local t1 = {
-	[RequestType.Asset] = ProductTypeEnum.Asset,
-	[RequestType.Bundle] = ProductTypeEnum.Bundle,
-	[RequestType.GamePass] = ProductTypeEnum.Gamepass,
-	[RequestType.Product] = ProductTypeEnum.Product,
-	[RequestType.AvatarCreationFee] = ProductTypeEnum.AvatarCreationFee,
-	[RequestType.Experience] = ProductTypeEnum.Experience,
-	[RequestType.Look] = ProductTypeEnum.Look,
-	[RequestType.DeveloperSubscription] = ProductTypeEnum.DeveloperSubscription
+local types = require(PurchasePrompt.types)
+local productTypeEnum = types.ProductTypeEnum
+
+local v = {
+	[RequestType.Asset] = productTypeEnum.Asset,
+	[RequestType.Bundle] = productTypeEnum.Bundle,
+	[RequestType.GamePass] = productTypeEnum.Gamepass,
+	[RequestType.Product] = productTypeEnum.Product,
+	[RequestType.AvatarCreationFee] = productTypeEnum.AvatarCreationFee,
+	[RequestType.Experience] = productTypeEnum.Experience,
+	[RequestType.Look] = productTypeEnum.Look,
+	[RequestType.DeveloperSubscription] = productTypeEnum.DeveloperSubscription,
+	[RequestType.VIPServer] = productTypeEnum.VIPServer
 }
 
-function getProductTypeFromRequestType(p1) -- line: 21
-	-- upvalues: t1 (copy), ProductTypeEnum (copy)
-	return t1[p1] or ProductTypeEnum.Unknown
+function getProductTypeFromRequestType(p)
+	return v[p] or productTypeEnum.Unknown
 end
 
 return getProductTypeFromRequestType

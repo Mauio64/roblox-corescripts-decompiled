@@ -1,11 +1,15 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local Foundation = require(ProfilePlatformParent.Foundation)
+local parent = ProfilePlatform.Parent
+
+local Foundation = require(parent.Foundation)
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
-local SocialCountEnableKeys = require(ProfilePlatform.Common.Enums).SocialCountEnableKeys
+local Enums = require(ProfilePlatform.Common.Enums)
+
+local SocialCountEnableKeys = Enums.SocialCountEnableKeys
 local AvatarGroupType = Foundation.Enums.AvatarGroupType
-local FFlagConnectionsToFriendsRename = require(ProfilePlatformParent.SharedFlags).FFlagConnectionsToFriendsRename
-local FFlagEnableSocialTabsPage = require(ProfilePlatformParent.SharedFlags).FFlagEnableSocialTabsPage
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableSocialTabsPage = SharedFlags.FFlagEnableSocialTabsPage
 
 return {
 	RowConfig = {
@@ -14,25 +18,16 @@ return {
 			textKey = TextKeys.MutualsText,
 			singleTextKey = TextKeys.MutualText,
 			enabledKey = SocialCountEnableKeys.IsMutualFriendsCountEnabled,
-			getIsDisabled = function(_: boolean, _: boolean, b3: boolean) -- line: 30
-				if not b3 then
-					return true
-				end
-
-				return false
+			getIsDisabled = function(_: boolean, _: boolean, flag: boolean): boolean
+				return not flag
 			end,
-			getLeading = function(t1: {[any]: any}) -- line: 36
-				-- upvalues: AvatarGroupType (copy)
-				local t2 = { table.unpack(t1.mutualFriendIds, 1, (math.min(2, #t1.mutualFriendIds))) }
+			getLeading = function(p)
+				local avatars = { table.unpack(p.mutualFriendIds, 1, (math.min(2, #p.mutualFriendIds))) }
 
-				if t2 and #t2 > 0 then
+				if avatars and #avatars > 0 then
 					return {
 						type = "AvatarGroup",
-						props = {
-							max = 2,
-							avatars = t2,
-							type = AvatarGroupType.Stacked
-						}
+						props = { avatars = avatars, type = AvatarGroupType.Stacked, max = 2 }
 					}
 				end
 
@@ -41,24 +36,11 @@ return {
 		},
 		friendsCount = {
 			layoutOrder = 2,
-			textKey = if not FFlagConnectionsToFriendsRename then TextKeys.Connections else TextKeys.Friends,
-			singleTextKey = if not FFlagConnectionsToFriendsRename then TextKeys.Connection else TextKeys.Friend,
+			textKey = TextKeys.Friends,
+			singleTextKey = TextKeys.Friend,
 			enabledKey = SocialCountEnableKeys.IsFriendsCountEnabled,
-			getIsDisabled = function(b4: boolean, b5: boolean, b6: boolean) -- line: 57
-				-- upvalues: FFlagEnableSocialTabsPage (copy)
-				if not b6 then
-					return true
-				end
-
-				if FFlagEnableSocialTabsPage then
-					return false
-				end
-
-				if b5 then
-					return false
-				end
-
-				return not b4
+			getIsDisabled = function(flag: boolean, flag2: boolean, flag3: boolean): boolean
+				return not flag3 or not FFlagEnableSocialTabsPage and not flag2 and not flag
 			end
 		},
 		followersCount = {
@@ -66,12 +48,8 @@ return {
 			textKey = TextKeys.Followers,
 			singleTextKey = TextKeys.Follower,
 			enabledKey = SocialCountEnableKeys.IsFollowersCountEnabled,
-			getIsDisabled = function(b7: boolean, _: boolean, b9: boolean) -- line: 76
-				if not b9 then
-					return true
-				end
-
-				return not b7
+			getIsDisabled = function(flag: boolean, _: boolean, flag2: boolean): boolean
+				return not flag2 or not flag
 			end
 		},
 		followingsCount = {
@@ -79,12 +57,8 @@ return {
 			textKey = TextKeys.Following,
 			singleTextKey = TextKeys.Following,
 			enabledKey = SocialCountEnableKeys.IsFollowingsCountEnabled,
-			getIsDisabled = function(b10: boolean, _: boolean, b12: boolean) -- line: 88
-				if not b12 then
-					return true
-				end
-
-				return not b10
+			getIsDisabled = function(flag: boolean, _: boolean, flag2: boolean): boolean
+				return not flag2 or not flag
 			end
 		}
 	}

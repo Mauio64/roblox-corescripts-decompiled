@@ -1,5 +1,1 @@
-return {
-	UniversalApp = "UniversalApp",
-	InExperience = "InExperience",
-	Unknown = "Unknown"
-}
+return { UniversalApp = "UniversalApp", InExperience = "InExperience", Unknown = "Unknown" }

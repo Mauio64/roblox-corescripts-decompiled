@@ -1,11 +1,11 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local React = require(scriptParentParent.React)
-local HelpPageContainer = require(scriptParent.Components.HelpPageContainer)
-local KeybindContextProvider = require(scriptParent.Context.KeybindContextProvider)
+local parent = script.Parent
+local parent2 = parent.Parent
 
-local function _createPageView() -- line: 10
-	-- upvalues: React (copy), KeybindContextProvider (copy), HelpPageContainer (copy)
+local React = require(parent2.React)
+local HelpPageContainer = require(parent.Components.HelpPageContainer)
+local KeybindContextProvider = require(parent.Context.KeybindContextProvider)
+
+local function _createPageView()
 	return React.createElement(KeybindContextProvider, nil, {
 		HelpPageContainer = React.createElement(HelpPageContainer)
 	})

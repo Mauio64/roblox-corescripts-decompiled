@@ -1,11 +1,16 @@
-return function(p1, p2) -- line: 1
-	if p2 < #p1 then
+local AppChat = script:FindFirstAncestor("AppChat")
+
+local isOverLength = require(AppChat.Utils.isOverLength)
+local FFlagAppChatUseGraphemeMessageLength = require(AppChat.Flags.FFlagAppChatUseGraphemeMessageLength)
+
+return function(value, p): boolean
+	if FFlagAppChatUseGraphemeMessageLength then
+		if isOverLength(value, p, 300) then
+			return false
+		end
+	elseif p < #value then
 		return false
 	end
 
-	if p1:match("^%s*$") then
-		return false
-	end
-
-	return true
+	return not value:match("^%s*$")
 end

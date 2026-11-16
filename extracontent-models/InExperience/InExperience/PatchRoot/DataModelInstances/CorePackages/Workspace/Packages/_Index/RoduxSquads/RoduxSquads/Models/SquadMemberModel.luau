@@ -1,35 +1,35 @@
-local Parent = script:FindFirstAncestor("RoduxSquads").Parent
-local t = require(Parent.t)
-local t1 = {}
+local parent = script:FindFirstAncestor("RoduxSquads").Parent
 
-function t1.new(p1) -- line: 8
-	-- upvalues: t1 (copy)
-	assert(t1.isValid(p1))
-	t1.__index = t1
-	setmetatable(p1, t1)
+local t = require(parent.t)
 
-	return p1
+local SquadMemberModel = {}
+
+function SquadMemberModel.new(p)
+	assert(SquadMemberModel.isValid(p))
+
+	SquadMemberModel.__index = SquadMemberModel
+
+	setmetatable(p, SquadMemberModel)
+
+	return p
 end
-function t1.mock(p2) -- line: 20
-	-- upvalues: t1 (copy)
-	local v6 = p2 or {}
 
-	return (t1.new({
-		userId = v6.userId or 1234,
-		partyVoiceEligible = v6.partyVoiceEligible or false
-	}))
-end
-function t1.format(p3) -- line: 31
-	-- upvalues: t1 (copy)
-	return (t1.new({
-		userId = p3.userId,
-		partyVoiceEligible = p3.partyVoiceEligible
+function SquadMemberModel.mock(options)
+	local v = options or {}
+
+	return (SquadMemberModel.new({
+		userId = v.userId or 1234,
+		partyVoiceEligible = v.partyVoiceEligible or false
 	}))
 end
 
-t1.isValid = t.interface({
+function SquadMemberModel.format(p)
+	return (SquadMemberModel.new({ userId = p.userId, partyVoiceEligible = p.partyVoiceEligible }))
+end
+
+SquadMemberModel.isValid = t.interface({
 	userId = t.number,
 	partyVoiceEligible = t.optional(t.boolean)
 })
 
-return t1
+return SquadMemberModel

@@ -2,10 +2,10 @@ local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
 
 require(InExperienceShop.Types)
 
-local function findSection(t1: {[any]: any}, s1: string) -- line: 13
-	for _, v6 in t1 do
-		if s1 == v6.id then
-			return v6
+local function findSection(items, p: string)
+	for _, item in items do
+		if item.id == p then
+			return item
 		end
 	end
 

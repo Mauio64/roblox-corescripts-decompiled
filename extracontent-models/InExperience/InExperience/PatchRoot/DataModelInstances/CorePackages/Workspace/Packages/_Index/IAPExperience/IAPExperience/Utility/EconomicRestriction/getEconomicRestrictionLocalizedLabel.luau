@@ -1,53 +1,50 @@
 local IAPExperience = script:FindFirstAncestor("IAPExperience")
 local EconomicRestrictionsViolationType = require(IAPExperience.Enums.EconomicRestrictionsViolationType)
+
 local logger = require(IAPExperience.Utility.logger)
 
-return function(t1: {[any]: any}, p1) -- line: 9
-	-- upvalues: EconomicRestrictionsViolationType (copy), logger (copy)
-	if p1 == EconomicRestrictionsViolationType.Chargeback then
-		return t1.chargebackViolationLabel
+return function(data, violationType)
+	if violationType == EconomicRestrictionsViolationType.Chargeback then
+		return data.chargebackViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.AbuseOfAffiliateSystem then
-		return t1.fraudAbuseOfAffiliateSystemViolationLabel
+	if violationType == EconomicRestrictionsViolationType.AbuseOfAffiliateSystem then
+		return data.fraudAbuseOfAffiliateSystemViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.AttemptedUnauthorizedPaymentMethodUse then
-		return t1.fraudAttemptedUnauthorizedPaymentMethodUseViolationLabel
+	if violationType == EconomicRestrictionsViolationType.AttemptedUnauthorizedPaymentMethodUse then
+		return data.fraudAttemptedUnauthorizedPaymentMethodUseViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.PaymentAuthorizationAttempt then
-		return t1.fraudPaymentAbuseViolationLabel
+	if violationType == EconomicRestrictionsViolationType.PaymentAuthorizationAttempt then
+		return data.fraudPaymentAbuseViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.RepeatedRefundRequests then
-		return t1.fraudRepeatedRefundRequestsViolationLabel
+	if violationType == EconomicRestrictionsViolationType.RepeatedRefundRequests then
+		return data.fraudRepeatedRefundRequestsViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.SuspiciousAccountPatterns then
-		return t1.fraudSuspiciousAccountPatternsViolationLabel
+	if violationType == EconomicRestrictionsViolationType.SuspiciousAccountPatterns then
+		return data.fraudSuspiciousAccountPatternsViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.SuspiciousRefundRequests then
-		return t1.fraudSuspiciousRefundRequestsViolationLabel
+	if violationType == EconomicRestrictionsViolationType.SuspiciousRefundRequests then
+		return data.fraudSuspiciousRefundRequestsViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.UnauthorizedPurchase then
-		return t1.fraudUnauthorizedPurchaseViolationLabel
+	if violationType == EconomicRestrictionsViolationType.UnauthorizedPurchase then
+		return data.fraudUnauthorizedPurchaseViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.UseOfUnauthorizedOffPlatformTransactions then
-		return t1.fraudUseOfUnauthorizedOffPlatformTransactionsViolationLabel
+	if violationType == EconomicRestrictionsViolationType.UseOfUnauthorizedOffPlatformTransactions then
+		return data.fraudUseOfUnauthorizedOffPlatformTransactionsViolationLabel
 	end
 
-	if p1 == EconomicRestrictionsViolationType.VirtualEconomyAbuse then
-		return t1.fraudVirtualEconomyAbuseViolationLabel
+	if violationType == EconomicRestrictionsViolationType.VirtualEconomyAbuse then
+		return data.fraudVirtualEconomyAbuseViolationLabel
 	end
 
-	logger.error({
-		message = "Invalid violation type",
-		violationType = p1
-	})
+	logger.error({ message = "Invalid violation type", violationType = violationType })
 
 	return ""
 end

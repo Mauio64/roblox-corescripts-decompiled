@@ -1,744 +1,636 @@
 local HttpService = game:GetService("HttpService")
+
 local AcpProtocol = require(script.Parent.Acp.AcpProtocol)
-
 require(script.Parent.types)
-
+local parent = script:FindFirstAncestor("DataHydration").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
 local createCreatorAgentChatStore = require(script.Parent.createCreatorAgentChatStore)
 
-local function isoNow() -- line: 74
+local function isoNow() -- 6 equivalent calls inferred from this helper
 	return DateTime.now():ToIsoDate()
 end
-local function jsonError(p1, n1: number, s1: string, n2: number) -- line: 78
-	-- upvalues: HttpService (copy)
+
+local function jsonError(id, code: number, message: string, statusCode: number)
 	return {
-		statusCode = n2,
+		statusCode = statusCode,
 		responseBody = HttpService:JSONEncode({
 			jsonrpc = "2.0",
-			id = p1,
-			error = {
-				code = n1,
-				message = s1
-			}
+			id = id,
+			error = { code = code, message = message }
 		})
 	}
 end
-local function jsonOk(p2, p3) -- line: 89
-	-- upvalues: HttpService (copy)
+
+local function jsonOk(id, p)
 	return {
 		statusCode = 200,
-		responseBody = HttpService:JSONEncode({
-			jsonrpc = "2.0",
-			id = p2,
-			result = p3
-		})
+		responseBody = HttpService:JSONEncode({ jsonrpc = "2.0", id = id, result = p })
 	}
 end
-local function streamWords(s2: string) -- line: 96
-	local t1 = {}
-	local v18 = true
 
-	for match in s2:gmatch("%S+") do
-		if v18 then
-			table.insert(t1, match)
-			v18 = false
+local function streamWords(value: string)
+	local flag = true
+	local result = {}
+
+	for k in value:gmatch("%S+") do
+		if flag then
+			table.insert(result, k)
+			flag = false
 		else
-			table.insert(t1, " " .. match)
+			table.insert(result, " " .. k)
 		end
 	end
 
-	return t1
+	return result
 end
-local function httpStatusForCode(n3: number) -- line: 111
-	-- upvalues: AcpProtocol (copy)
-	if n3 == AcpProtocol.ErrorCodes.NotFound then
+
+local function httpStatusForCode(code: number): number
+	if code == AcpProtocol.ErrorCodes.NotFound then
 		return 404
 	end
 
-	if n3 == AcpProtocol.ErrorCodes.Gone then
+	if code == AcpProtocol.ErrorCodes.Gone then
 		return 410
 	end
 
-	if n3 == AcpProtocol.ErrorCodes.Conflict then
+	if code == AcpProtocol.ErrorCodes.Conflict then
 		return 409
 	end
 
-	if n3 == AcpProtocol.ErrorCodes.UpstreamUnavailable then
+	if code == AcpProtocol.ErrorCodes.UpstreamUnavailable then
 		return 502
 	end
 
-	if n3 == AcpProtocol.ErrorCodes.Unauthorized then
+	if code == AcpProtocol.ErrorCodes.Unauthorized then
 		return 401
 	end
 
-	if n3 == AcpProtocol.ErrorCodes.Forbidden then
+	if code == AcpProtocol.ErrorCodes.Forbidden then
 		return 403
 	end
 
-	if n3 == AcpProtocol.ErrorCodes.InternalError then
+	if code == AcpProtocol.ErrorCodes.InternalError then
 		return 500
 	end
 
 	return 400
 end
-local function createMockStore(t2: {[any]: any}?) -- line: 130
-	-- upvalues: AcpProtocol (copy), streamWords (copy), jsonError (copy), httpStatusForCode (copy), jsonOk (copy), HttpService (copy), createCreatorAgentChatStore (copy)
-	local v22 = t2 or {}
-	local v23 = v22.chunkDelay or 0.04
-	local t3 = {}
-	local n4 = 0
 
-	if v22.initialSessions then
-		for _, v27 in v22.initialSessions do
-			n4 += 1
+local function createMockStore(options)
+	local v = options or {}
+	local chunkDelay = v.chunkDelay or 0.04
 
-			local v28 = v27.sessionId or ("mock_seed_%08d"):format(n4)
-			local v29 = DateTime.now():ToIsoDate()
+	local v2 = {}
+	local count = 0
 
-			t3[v28] = {
-				closedUtc = nil,
-				sessionId = v28,
-				title = v27.title,
-				createdUtc = v29,
-				updatedUtc = v29
+	if v.initialSessions then
+		for _, initialSession in v.initialSessions do
+			count += 1
+			local sessionId = initialSession.sessionId or ("mock_seed_%08d"):format(count)
+			local v3 = isoNow() -- inferred equivalent call
+			v2[sessionId] = {
+				sessionId = sessionId,
+				title = initialSession.title,
+				createdUtc = v3,
+				updatedUtc = v3,
+				closedUtc = nil
 			}
 		end
 	end
 
-	local function newSessionId() -- line: 152
-		-- upvalues: n4 (ref)
-		n4 += 1
-
-		return ("mock_%08d"):format(n4)
+	local function newSessionId() -- 1 equivalent call inferred from this helper
+		count += 1
+		return ("mock_%08d"):format(count)
 	end
 
-	local u31 = nil
+	local mockStore = nil
 
-	local function emitNotification(s3: string, p4, n5: number) -- line: 159
-		-- upvalues: u31 (ref), AcpProtocol (copy)
-		u31.ingestFrame({
+	local function emitNotification(sessionId: string, update, count2: number)
+		mockStore.ingestFrame({
 			kind = "notification",
 			notification = {
 				method = AcpProtocol.Notifications.SessionUpdate,
-				params = {
-					sessionId = s3,
-					update = p4
-				}
+				params = { sessionId = sessionId, update = update }
 			}
-		}, {
-			sequenceNumber = n5
-		})
+		}, { sequenceNumber = count2 })
 	end
-	local function emitResponse(p5, t4: {[any]: any}) -- line: 171
-		-- upvalues: u31 (ref)
-		u31.ingestFrame({
-			kind = "response",
-			response = {
-				jsonrpc = "2.0",
-				id = p5,
-				result = t4.result,
-				error = t4.error
-			}
-		})
-	end
-	local function defaultResponder(t5: {[any]: any}) -- line: 183
-		-- upvalues: streamWords (copy), v23 (copy)
-		local v49 = ("Sure! I'll work on \"%s\" for you."):format(t5.promptText:sub(1, 60))
 
-		for _, v51 in streamWords(v49) do
-			t5.emitText(v51)
-			t5.sleep(v23)
+	local function emitResponse(id, p)
+		mockStore.ingestFrame({
+			kind = "response",
+			response = { jsonrpc = "2.0", id = id, result = p.result, error = p.error }
+		})
+	end
+
+	local function defaultResponder(data)
+		for _, v3 in streamWords(("Sure! I'll work on \"%s\" for you."):format(data.promptText:sub(1, 60))) do
+			data.emitText(v3)
+			data.sleep(chunkDelay)
 		end
 
-		t5.finish("end_turn")
+		data.finish("end_turn")
 	end
-	local function stringResponder(s4: string) -- line: 192
-		-- upvalues: streamWords (copy), v23 (copy)
-		return function(p6) -- line: 193
-			-- upvalues: streamWords (copy), s4 (copy), v23 (copy)
-			for _, v114 in streamWords(s4) do
-				p6.emitText(v114)
-				p6.sleep(v23)
+
+	local function stringResponder(respond: string) -- 2 equivalent calls inferred from this helper
+		return function(data)
+			for _, v3 in streamWords(respond) do
+				data.emitText(v3)
+				data.sleep(chunkDelay)
 			end
 
-			p6.finish("end_turn")
+			data.finish("end_turn")
 		end
 	end
-	local function pickResponder() -- line: 202
-		-- upvalues: v22 (copy), defaultResponder (copy), streamWords (copy), v23 (copy)
-		local respond = v22.respond
+
+	local function pickResponder()
+		local respond = v.respond
 
 		if respond == nil then
 			return defaultResponder
 		end
 
 		if typeof(respond) == "string" then
-			return function(p7) -- line: 193
-				-- upvalues: streamWords (copy), respond (copy), v23 (copy)
-				for _, v117 in streamWords(respond) do
-					p7.emitText(v117)
-					p7.sleep(v23)
-				end
-
-				p7.finish("end_turn")
-			end
+			return stringResponder(respond) -- inferred equivalent call
 		end
 
 		return respond
 	end
-	local function runResponder(p8, s5: string, t6: {[any]: any}) -- line: 212
-		-- upvalues: v22 (copy), emitNotification (copy), emitResponse (copy), t3 (copy), defaultResponder (copy), streamWords (copy), v23 (copy), AcpProtocol (copy)
-		local str = tostring(p8)
-		local v58 = `{ str }:user`
-		local v59 = `{ str }:assistant`
-		local s6 = ""
 
-		for _, v62 in t6 do
-			if v62.type == "text" and typeof(v62.text) == "string" then
-				s6 = if s6 ~= "" then s6 .. "\n" .. v62.text else v62.text
+	local function runResponder(id, sessionId: string, prompt)
+		local v3 = tostring(id)
+		local formatted = `{v3}:user`
+		local formatted2 = `{v3}:assistant`
+		local promptText = ""
+
+		for _, item in prompt do
+			if not (item.type == "text" and typeof(item.text) == "string") then
+				continue
+			end
+
+			if promptText == "" then
+				promptText = item.text
+			else
+				promptText ..= "\n" .. item.text
 			end
 		end
 
-		local n6 = 0
-
-		local function emitSessionUpdate(p9) -- line: 224
-			-- upvalues: v22 (copy), n6 (ref), emitNotification (copy), s5 (copy)
-			if v22.onSessionUpdate then
-				v22.onSessionUpdate(p9, n6)
+		local count2 = 0
+		local function emitSessionUpdate(update) -- 7 equivalent calls inferred from this helper
+			if v.onSessionUpdate then
+				v.onSessionUpdate(update, count2)
 			end
 
-			emitNotification(s5, p9, n6)
-			n6 += 1
+			emitNotification(sessionId, update, count2)
+			count2 += 1
 		end
 
-		local u65 = false
-
-		local function finishTurn(p10) -- line: 233
-			-- upvalues: u65 (ref), v22 (copy), n6 (ref), emitNotification (copy), s5 (copy)
-			if u65 then
+		local flag = false
+		local function finishTurn(value) -- 2 equivalent calls inferred from this helper
+			if flag then
 				return
 			end
 
-			u65 = true
-
-			local t7 = {
+			flag = true
+			emitSessionUpdate({ -- inferred equivalent call
 				sessionUpdate = "state_change",
 				state = "idle",
-				stop_reason = p10 or "end_turn"
-			}
-
-			if v22.onSessionUpdate then
-				v22.onSessionUpdate(t7, n6)
-			end
-
-			emitNotification(s5, t7, n6)
-			n6 += 1
-		end
-		local function failTurn(n7: number, s7: string) -- line: 245
-			-- upvalues: u65 (ref), emitResponse (copy), p8 (copy)
-			if u65 then
-				return
-			end
-
-			u65 = true
-			emitResponse(p8, {
-				error = {
-					code = n7,
-					message = s7
-				}
+				stop_reason = value or "end_turn"
 			})
 		end
 
-		local t8 = {
-			sessionUpdate = "user_message",
-			messageId = v58,
-			content = t6
-		}
-
-		if v22.onSessionUpdate then
-			v22.onSessionUpdate(t8, n6)
-		end
-
-		emitNotification(s5, t8, n6)
-		n6 += 1
-
-		local t9 = {
-			sessionUpdate = "state_change",
-			state = "running"
-		}
-
-		if v22.onSessionUpdate then
-			v22.onSessionUpdate(t9, n6)
-		end
-
-		emitNotification(s5, t9, n6)
-		n6 += 1
-
-		local t15 = {
-			sessionId = s5,
-			promptText = s6,
-			promptBlocks = t6,
-			sleep = task.wait,
-			emitText = function(p11) -- line: 268
-				-- upvalues: v59 (copy), v22 (copy), n6 (ref), emitNotification (copy), s5 (copy)
-				local t10 = {
-					sessionUpdate = "agent_message_chunk",
-					messageId = v59,
-					content = {
-						type = "text",
-						text = p11
-					}
-				}
-
-				if v22.onSessionUpdate then
-					v22.onSessionUpdate(t10, n6)
-				end
-
-				emitNotification(s5, t10, n6)
-				n6 += 1
-			end,
-			emitToolCall = function(p12) -- line: 275
-				-- upvalues: v22 (copy), n6 (ref), emitNotification (copy), s5 (copy)
-				local t11 = {
-					sessionUpdate = "tool_call_update",
-					toolCallId = p12.toolCallId,
-					title = p12.title,
-					kind = p12.kind,
-					status = p12.status,
-					rawInput = p12.rawInput
-				}
-
-				if v22.onSessionUpdate then
-					v22.onSessionUpdate(t11, n6)
-				end
-
-				emitNotification(s5, t11, n6)
-				n6 += 1
-			end,
-			updateToolCall = function(p13, p14) -- line: 285
-				-- upvalues: v22 (copy), n6 (ref), emitNotification (copy), s5 (copy)
-				local t12 = {
-					sessionUpdate = "tool_call_update",
-					toolCallId = p13,
-					status = p14.status,
-					rawOutput = p14.rawOutput,
-					content = p14.content
-				}
-
-				if v22.onSessionUpdate then
-					v22.onSessionUpdate(t12, n6)
-				end
-
-				emitNotification(s5, t12, n6)
-				n6 += 1
-			end,
-			setTitle = function(p15) -- line: 294
-				-- upvalues: t3 (copy), s5 (copy), v22 (copy), n6 (ref), emitNotification (copy)
-				local v131 = t3[s5]
-
-				if v131 then
-					v131.title = p15
-					v131.updatedUtc = DateTime.now():ToIsoDate()
-				end
-
-				local t13 = {
-					sessionUpdate = "session_info_update",
-					title = p15
-				}
-
-				if v22.onSessionUpdate then
-					v22.onSessionUpdate(t13, n6)
-				end
-
-				emitNotification(s5, t13, n6)
-				n6 += 1
-			end,
-			finish = function(p16) -- line: 302
-				-- upvalues: u65 (ref), v22 (copy), n6 (ref), emitNotification (copy), s5 (copy)
-				if u65 then
-					return
-				end
-
-				u65 = true
-
-				local t14 = {
-					sessionUpdate = "state_change",
-					state = "idle",
-					stop_reason = p16 or "end_turn"
-				}
-
-				if v22.onSessionUpdate then
-					v22.onSessionUpdate(t14, n6)
-				end
-
-				emitNotification(s5, t14, n6)
-				n6 += 1
-			end,
-			fail = function(p17, p18) -- line: 305
-				-- upvalues: failTurn (copy)
-				failTurn(p17, p18)
-			end
-		}
-
-		task.spawn(function() -- line: 310
-			-- upvalues: v22 (copy), defaultResponder (copy), streamWords (copy), v23 (copy), t15 (copy), failTurn (copy), AcpProtocol (copy), u65 (ref), n6 (ref), emitNotification (copy), s5 (copy)
-			local function callResponder() -- line: 312
-				-- upvalues: v22 (copy), defaultResponder (copy), streamWords (copy), v23 (copy), t15 (copy)
-				local respond = v22.respond;
-
-				((if respond ~= nil then (if typeof(respond) ~= "string" then respond else function(p19) -- line: 193
-					-- upvalues: streamWords (copy), respond (copy), v23 (copy)
-					for _, v148 in streamWords(respond) do
-						p19.emitText(v148)
-						p19.sleep(v23)
-					end
-
-					p19.finish("end_turn")
-				end) else defaultResponder))(t15)
-
-				return nil
-			end
-
-			local ok, result = pcall(callResponder)
-
-			if not ok then
-				failTurn(AcpProtocol.ErrorCodes.InternalError, "Mock responder errored: " .. tostring(result))
-
+		local function failTurn(code: number, message: string)
+			if flag then
 				return
 			end
 
-			if not u65 then
-				if u65 then
-					return
+			flag = true
+			emitResponse(id, {
+				error = { code = code, message = message }
+			})
+		end
+
+		emitSessionUpdate({ -- inferred equivalent call
+			sessionUpdate = "user_message",
+			messageId = formatted,
+			content = prompt
+		})
+
+		emitSessionUpdate({ sessionUpdate = "state_change", state = "running" }) -- inferred equivalent call
+
+		local v4 = {
+			sessionId = sessionId,
+			promptText = promptText,
+			promptBlocks = prompt,
+			sleep = task.wait,
+			emitText = function(text)
+				emitSessionUpdate({ -- inferred equivalent call
+					sessionUpdate = "agent_message_chunk",
+					messageId = formatted2,
+					content = { type = "text", text = text }
+				})
+			end,
+			emitToolCall = function(data)
+				emitSessionUpdate({ -- inferred equivalent call
+					sessionUpdate = "tool_call_update",
+					toolCallId = data.toolCallId,
+					title = data.title,
+					kind = data.kind,
+					status = data.status,
+					rawInput = data.rawInput
+				})
+			end,
+			updateToolCall = function(toolCallId, data)
+				emitSessionUpdate({ -- inferred equivalent call
+					sessionUpdate = "tool_call_update",
+					toolCallId = toolCallId,
+					status = data.status,
+					rawOutput = data.rawOutput,
+					content = data.content
+				})
+			end,
+			setTitle = function(title)
+				local v4 = v2[sessionId]
+
+				if v4 then
+					v4.title = title
+					v4.updatedUtc = isoNow() -- inferred equivalent call
 				end
 
-				u65 = true
+				emitSessionUpdate({ sessionUpdate = "session_info_update", title = title }) -- inferred equivalent call
+			end,
+			finish = function(value)
+				finishTurn(value) -- inferred equivalent call
+			end,
+			fail = function(code, message)
+				failTurn(code, message)
+			end
+		}
 
-				local t16 = {
-					sessionUpdate = "state_change",
-					state = "idle",
-					stop_reason = "end_turn"
-				}
+		task.spawn(function()
+			local function callResponder(): nil
+				local respond = v.respond
+				local v5
 
-				if v22.onSessionUpdate then
-					v22.onSessionUpdate(t16, n6)
+				if respond == nil then
+					v5 = defaultResponder
+				else
+					v5 = typeof(respond) == "string" and stringResponder(respond) or respond -- inferred equivalent call
 				end
 
-				emitNotification(s5, t16, n6)
-				n6 += 1
+				v5(v4)
+				return nil
+			end
+
+			local success, result = pcall(callResponder)
+
+			if not success then
+				failTurn(AcpProtocol.ErrorCodes.InternalError, "Mock responder errored: " .. tostring(result))
+			elseif not flag then
+				finishTurn() -- inferred equivalent call
 			end
 		end)
 	end
-	local function findSession(s8: string) -- line: 325
-		-- upvalues: t3 (copy), AcpProtocol (copy)
-		local v72 = t3[s8]
 
-		if v72 == nil or v72.closedUtc ~= nil then
-			return nil, {
-				message = "session not found",
-				code = AcpProtocol.ErrorCodes.NotFound
+	local function findSession(p: string)
+		local v3 = v2[p]
+
+		if v3 == nil or v3.closedUtc ~= nil then
+			return nil, { code = AcpProtocol.ErrorCodes.NotFound, message = "session not found" }
+		end
+
+		return v3, nil
+	end
+
+	local function sessionListEntry(data)
+		local v3 = { sessionId = data.sessionId, title = data.title, updatedAt = data.updatedUtc }
+
+		if data.project ~= nil then
+			v3._meta = {
+				_roblox = { universeId = data.project.universeId }
 			}
 		end
 
-		return v72, nil
-	end
-	local function sessionListEntry(t17: {[any]: any}) -- line: 333
-		local t18 = {
-			sessionId = t17.sessionId,
-			title = t17.title,
-			updatedAt = t17.updatedUtc
-		}
-
-		if t17.project ~= nil then
-			t18._meta = {
-				_roblox = {
-					universeId = t17.project.universeId
-				}
-			}
-		end
-
-		return t18
+		return v3
 	end
 
-	local t23 = {
-		[AcpProtocol.Methods.Initialize] = function() -- line: 352
-			-- upvalues: AcpProtocol (copy)
+	local v3 = {
+		[AcpProtocol.Methods.Initialize] = function()
 			return {
 				protocolVersion = AcpProtocol.ProtocolVersion,
 				capabilities = {
 					session = {
 						load = {},
-						prompt = {
-							image = true,
-							audio = false,
-							embeddedContext = true
-						},
-						mcp = {
-							http = {}
-						}
+						prompt = { image = true, audio = false, embeddedContext = true },
+						mcp = { http = {} }
 					},
 					_meta = {
-						_roblox = {
-							localToolExecution = true
-						}
+						_roblox = { localToolExecution = true }
 					}
 				},
-				agentInfo = {
-					name = "mock-my-stats-service",
-					version = "0.0.1-mock"
-				}
+				agentInfo = { name = "mock-my-stats-service", version = "0.0.1-mock" }
 			}, nil
 		end,
-		[AcpProtocol.Methods.SessionNew] = function(p20) -- line: 367
-			-- upvalues: AcpProtocol (copy), n4 (ref), t3 (copy)
-			local v76 = AcpProtocol.extractSessionNewProject(p20)
+		[AcpProtocol.Methods.SessionNew] = function(p)
+			local sessionNewProject = AcpProtocol.extractSessionNewProject(p)
 
-			if v76 == nil then
-				return nil, {
-					message = "_meta._roblox universeId/placeId is required on session/new",
-					code = AcpProtocol.ErrorCodes.InvalidParams
-				}
+			if sessionNewProject == nil then
+				return
+					nil,
+					{
+						code = AcpProtocol.ErrorCodes.InvalidParams,
+						message = "_meta._roblox universeId/placeId is required on session/new"
+					}
 			end
 
-			n4 += 1
-
-			local v77 = ("mock_%08d"):format(n4)
-			local v78 = DateTime.now():ToIsoDate()
-
-			t3[v77] = {
+			local sessionId = newSessionId() -- inferred equivalent call
+			local v3 = isoNow() -- inferred equivalent call
+			v2[sessionId] = {
+				sessionId = sessionId,
 				title = nil,
+				createdUtc = v3,
+				updatedUtc = v3,
 				closedUtc = nil,
-				sessionId = v77,
-				createdUtc = v78,
-				updatedUtc = v78,
-				project = v76
+				project = sessionNewProject
 			}
 
-			return {
-				sessionId = v77
-			}, nil
-		end,
-		[AcpProtocol.Methods.SessionList] = function(_) -- line: 388
-			-- upvalues: t3 (copy), sessionListEntry (copy)
-			local t19 = {}
+			if FFlagBuildExperienceModelPickerData and v.models ~= nil then
+				return {
+					sessionId = sessionId,
+					_meta = {
+						_roblox = { models = v.models }
+					}
+				}, nil
+			end
 
-			for _, v82 in t3 do
-				if v82.closedUtc == nil then
-					table.insert(t19, (sessionListEntry(v82)))
+			return { sessionId = sessionId }, nil
+		end,
+		[AcpProtocol.Methods.SessionList] = function(_)
+			local sessions = {}
+
+			for _, v3 in v2 do
+				if v3.closedUtc == nil then
+					table.insert(sessions, sessionListEntry(v3))
 				end
 			end
 
-			table.sort(t19, function(p22, p23) -- line: 395
-				return (p22.updatedAt or "") > (p23.updatedAt or "")
+			table.sort(sessions, function(a, b): boolean
+				return (a.updatedAt or "") > (b.updatedAt or "")
 			end)
 
-			return {
-				sessions = t19
-			}, nil
+			return { sessions = sessions }, nil
 		end,
-		[AcpProtocol.Methods.SessionFindByUniverse] = function(p24) -- line: 400
-			-- upvalues: AcpProtocol (copy), t3 (copy), sessionListEntry (copy)
-			if typeof(p24.universeId) ~= "number" or p24.universeId == 0 then
+		[AcpProtocol.Methods.SessionFindByUniverse] = function(p)
+			if typeof(p.universeId) ~= "number" or p.universeId == 0 then
 				return nil, {
-					message = "universeId is required",
-					code = AcpProtocol.ErrorCodes.InvalidParams
+					code = AcpProtocol.ErrorCodes.InvalidParams,
+					message = "universeId is required"
 				}
 			end
 
-			local t20 = {}
+			local sessions = {}
 
-			for _, v86 in t3 do
-				if v86.closedUtc == nil and v86.project ~= nil and v86.project.universeId == p24.universeId then
-					table.insert(t20, (sessionListEntry(v86)))
+			for _, v3 in v2 do
+				if v3.closedUtc == nil and v3.project ~= nil and v3.project.universeId == p.universeId then
+					table.insert(sessions, sessionListEntry(v3))
 				end
 			end
 
-			table.sort(t20, function(p25, p26) -- line: 418
-				return (p25.updatedAt or "") > (p26.updatedAt or "")
+			table.sort(sessions, function(a, b): boolean
+				return (a.updatedAt or "") > (b.updatedAt or "")
 			end)
 
-			return {
-				sessions = t20
-			}, nil
+			return { sessions = sessions }, nil
 		end,
-		[AcpProtocol.Methods.SessionLoad] = function(p27) -- line: 423
-			-- upvalues: t3 (copy), AcpProtocol (copy)
-			local v88 = t3[p27.sessionId]
-			local t21
+		[AcpProtocol.Methods.SessionLoad] = function(p)
+			local v3 = v2[p.sessionId]
+			local v4
 
-			if v88 == nil or v88.closedUtc ~= nil then
-				v88 = nil
-				t21 = {
-					message = "session not found",
-					code = AcpProtocol.ErrorCodes.NotFound
-				}
-			else
-				t21 = nil
+			if v3 == nil or v3.closedUtc ~= nil then
+				v4 = { code = AcpProtocol.ErrorCodes.NotFound, message = "session not found" }
+				v3 = nil
 			end
 
-			if t21 then
-				return nil, t21
+			if v4 then
+				return nil, v4
+			end
+
+			local models
+
+			if FFlagBuildExperienceModelPickerData then
+				models = v.models
+			end
+
+			local universeId
+
+			if v3.project ~= nil then
+				universeId = v3.project.universeId
 			end
 
 			return {
 				_meta = {
-					_roblox = {
-						universeId = if v88.project == nil then nil else v88.project.universeId
-					}
+					_roblox = { models = models, universeId = universeId }
 				}
 			}, nil
 		end,
-		[AcpProtocol.Methods.SessionReadTasks] = function(p28) -- line: 439
-			-- upvalues: t3 (copy), AcpProtocol (copy)
-			local v91 = t3[p28.sessionId]
-			local v92 = if v91 ~= nil and v91.closedUtc == nil then nil else {
-				message = "session not found",
-				code = AcpProtocol.ErrorCodes.NotFound
-			}
+		[AcpProtocol.Methods.SessionReadTasks] = function(p)
+			local v3 = v2[p.sessionId]
+			local v4 = (v3 == nil or v3.closedUtc ~= nil)
+				and { code = AcpProtocol.ErrorCodes.NotFound, message = "session not found" }
+				or nil
 
-			if v92 then
-				return nil, v92
+			if v4 then
+				return nil, v4
 			end
 
-			return {
-				tasks = {}
-			}, nil
+			return { tasks = {} }, nil
 		end,
-		[AcpProtocol.Methods.SessionCancel] = function(p29) -- line: 446
-			-- upvalues: t3 (copy), AcpProtocol (copy)
-			local v94 = t3[p29.sessionId]
-			local v95 = if v94 ~= nil and v94.closedUtc == nil then nil else {
-				message = "session not found",
-				code = AcpProtocol.ErrorCodes.NotFound
-			}
+		[AcpProtocol.Methods.SessionCancel] = function(p)
+			local v3 = v2[p.sessionId]
+			local v4 = (v3 == nil or v3.closedUtc ~= nil)
+				and { code = AcpProtocol.ErrorCodes.NotFound, message = "session not found" }
+				or nil
 
-			if v95 then
-				return nil, v95
+			if v4 then
+				return nil, v4
 			end
 
 			return {}, nil
 		end,
-		[AcpProtocol.Methods.SessionDelete] = function(p30) -- line: 454
-			-- upvalues: t3 (copy), AcpProtocol (copy)
-			local v97 = t3[p30.sessionId]
+		[AcpProtocol.Methods.SessionDelete] = function(p)
+			local v3 = v2[p.sessionId]
 
-			if v97 == nil then
+			if v3 == nil then
 				return nil, {
-					message = "session not found",
-					code = AcpProtocol.ErrorCodes.NotFound
+					code = AcpProtocol.ErrorCodes.NotFound,
+					message = "session not found"
 				}
 			end
 
-			v97.closedUtc = DateTime.now():ToIsoDate()
-
+			v3.closedUtc = isoNow() -- inferred equivalent call
 			return {}, nil
 		end,
-		[AcpProtocol.Methods.SessionUpdateInfo] = function(p31) -- line: 462
-			-- upvalues: t3 (copy), AcpProtocol (copy)
-			local v99 = t3[p31.sessionId]
-			local t22
+		[AcpProtocol.Methods.SessionUpdateInfo] = function(p)
+			local v3 = v2[p.sessionId]
+			local v4
 
-			if v99 == nil or v99.closedUtc ~= nil then
-				v99 = nil
-				t22 = {
-					message = "session not found",
-					code = AcpProtocol.ErrorCodes.NotFound
-				}
-			else
-				t22 = nil
+			if v3 == nil or v3.closedUtc ~= nil then
+				v4 = { code = AcpProtocol.ErrorCodes.NotFound, message = "session not found" }
+				v3 = nil
 			end
 
-			if t22 then
-				return nil, t22
+			if v4 then
+				return nil, v4
 			end
 
-			if p31.title ~= nil then
-				v99.title = p31.title
-				v99.updatedUtc = DateTime.now():ToIsoDate()
+			if p.title ~= nil then
+				v3.title = p.title
+				v3.updatedUtc = isoNow() -- inferred equivalent call
 			end
 
 			return {}, nil
 		end,
-		[AcpProtocol.Methods.SessionSaveAndPublish] = function(_) -- line: 474
-			return {
-				status = "success",
-				version = "1"
-			}, nil
+		[AcpProtocol.Methods.SessionSaveAndPublish] = function(_)
+			return { status = "success", version = "1" }, nil
+		end,
+		[AcpProtocol.Methods.AdCampaignEligibility] = function(p)
+			if typeof(p.universeId) == "number" and not (p.universeId <= 0) then
+				return {
+					schemaVersion = 2,
+					userEligible = true,
+					universeEligible = true,
+					freeCreditsRemaining = 1,
+					cardType = "promote_free",
+					ineligibleReasons = {},
+					offer = { displayAmountRobux = 0, durationDays = 3 },
+					offers = {
+						{
+							campaignOption = "feedback",
+							fundingType = "free",
+							durationDays = 3,
+							priceRobux = 500
+						},
+						{
+							campaignOption = "plays",
+							fundingType = "paid",
+							durationDays = 7,
+							priceRobux = 2000
+						}
+					}
+				}, nil
+			end
+
+			return nil, {
+				code = AcpProtocol.ErrorCodes.InvalidParams,
+				message = "universeId is required"
+			}
+		end,
+		[AcpProtocol.Methods.AdCampaignCheckFunds] = function(p)
+			if p.campaignOption == "feedback" or p.campaignOption == "plays" then
+				return { canFund = true, fundingSource = "robux" }, nil
+			end
+
+			return nil, {
+				code = AcpProtocol.ErrorCodes.InvalidParams,
+				message = "campaignOption is required"
+			}
+		end,
+		[AcpProtocol.Methods.AdCampaignCreate] = function(data)
+			if typeof(data.universeId) ~= "number" or data.universeId <= 0 then
+				return nil, {
+					code = AcpProtocol.ErrorCodes.InvalidParams,
+					message = "universeId is required"
+				}
+			end
+
+			if typeof(data.idempotencyKey) == "string" and data.idempotencyKey ~= "" then
+				return {
+					campaignId = "mock_campaign_0001",
+					status = "in_review",
+					toolCallId = data.toolCallId
+				}, nil
+			end
+
+			return nil, {
+				code = AcpProtocol.ErrorCodes.InvalidParams,
+				message = "idempotencyKey is required"
+			}
 		end
 	}
 
-	local function dispatch(t24: {[any]: any}) -- line: 479
-		-- upvalues: AcpProtocol (copy), t3 (copy), jsonError (copy), httpStatusForCode (copy), runResponder (copy), jsonOk (copy), t23 (copy)
-		if t24.method == AcpProtocol.Methods.SessionPrompt then
-			local v103 = t3[t24.params.sessionId]
-			local t25
+	local function dispatch(data)
+		if data.method == AcpProtocol.Methods.SessionPrompt then
+			local v4 = v2[data.params.sessionId]
+			local v5
 
-			if v103 == nil or v103.closedUtc ~= nil then
-				v103 = nil
-				t25 = {
-					message = "session not found",
-					code = AcpProtocol.ErrorCodes.NotFound
-				}
-			else
-				t25 = nil
+			if v4 == nil or v4.closedUtc ~= nil then
+				v5 = { code = AcpProtocol.ErrorCodes.NotFound, message = "session not found" }
+				v4 = nil
 			end
 
-			if t25 then
-				return (jsonError(t24.id, t25.code, t25.message, (httpStatusForCode(t25.code))))
+			if v5 then
+				return jsonError(data.id, v5.code, v5.message, httpStatusForCode(v5.code))
 			end
 
-			v103.updatedUtc = DateTime.now():ToIsoDate()
-			runResponder(t24.id, t24.params.sessionId, t24.params.prompt or {})
+			v4.updatedUtc = isoNow() -- inferred equivalent call
+			runResponder(data.id, data.params.sessionId, data.params.prompt or {})
 
-			return (jsonOk(t24.id, {}))
+			if FFlagBuildExperienceModelPickerData then
+				return { statusCode = 202, responseBody = "" }
+			end
+
+			return jsonOk(data.id, {})
+		else
+			local v4 = v3[data.method]
+
+			if v4 == nil then
+				return jsonError(
+					data.id,
+					AcpProtocol.ErrorCodes.MethodNotFound,
+					"Method not found: " .. data.method,
+					404
+				)
+			end
+
+			local success, result, v5 = pcall(v4, data.params or {})
+
+			if not success then
+				return jsonError(data.id, AcpProtocol.ErrorCodes.InternalError, tostring(result), 500)
+			end
+
+			if v5 then
+				return jsonError(data.id, v5.code, v5.message, httpStatusForCode(v5.code))
+			end
+
+			return jsonOk(data.id, result)
 		end
-
-		local v105 = t23[t24.method]
-
-		if v105 == nil then
-			return (jsonError(t24.id, AcpProtocol.ErrorCodes.MethodNotFound, "Method not found: " .. t24.method, 404))
-		end
-
-		local ok, result, v108 = pcall(v105, t24.params or {})
-
-		if not ok then
-			return (jsonError(t24.id, AcpProtocol.ErrorCodes.InternalError, tostring(result), 500))
-		end
-
-		if v108 then
-			return (jsonError(t24.id, v108.code, v108.message, (httpStatusForCode(v108.code))))
-		end
-
-		return (jsonOk(t24.id, result))
 	end
 
-	local t26 = {
-		request = function(p33, p34) -- line: 508
-			-- upvalues: HttpService (copy), dispatch (copy)
-			local data = HttpService:JSONDecode(p33.body or "{}")
+	mockStore = createCreatorAgentChatStore({
+		network = {
+			request = function(p, callback)
+				local jsonDecode = HttpService:JSONDecode(p.body or "{}")
 
-			if typeof(data) == "table" and (typeof(data.result) == "table" and data.result.tool_name == "ask_tool") then
-				p34(true, {
-					statusCode = 200,
-					responseBody = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{}}"
-				})
-
-				return function() -- line: 516
+				if
+					typeof(jsonDecode) == "table"
+					and typeof(jsonDecode.result) == "table"
+					and jsonDecode.result.tool_name == "ask_tool"
+				then
+					callback(true, {
+						statusCode = 200,
+						responseBody = "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{}}"
+					})
+					return function() end
 				end
+
+				callback(true, dispatch(jsonDecode))
+				return function() end
 			end
-
-			p34(true, (dispatch(data)))
-
-			return function() -- line: 519
-			end
-		end
-	}
-
-	u31 = createCreatorAgentChatStore({
-		baseUrl = "mock://my-stats/v2",
-		network = t26
+		},
+		baseUrl = "mock://my-stats/v2"
 	})
 
-	return u31
+	return mockStore
 end
 
 return createMockStore

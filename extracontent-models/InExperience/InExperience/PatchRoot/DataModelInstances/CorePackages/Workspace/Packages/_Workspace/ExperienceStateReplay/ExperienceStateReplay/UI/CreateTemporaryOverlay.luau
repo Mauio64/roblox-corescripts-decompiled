@@ -1,51 +1,51 @@
-local t1 = {}
-local u2 = nil
+local CreateTemporaryOverlay = {}
 
-function t1.hideOverlay() -- line: 12
-	-- upvalues: u2 (ref)
-	if u2 then
-		u2:Destroy()
-		u2 = nil
+local v = nil
+
+function CreateTemporaryOverlay.hideOverlay()
+	if v then
+		v:Destroy()
+		v = nil
 	end
 end
-function t1.showOverlay(p1, p2, p3) -- line: 25
-	-- upvalues: t1 (copy), u2 (ref)
-	t1.hideOverlay()
 
-	local Frame = Instance.new("Frame")
+function CreateTemporaryOverlay.showOverlay(text, duration, parent)
+	CreateTemporaryOverlay.hideOverlay()
 
-	Frame.Name = "TextOverlay"
-	Frame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-	Frame.BackgroundTransparency = 0.5
-	Frame.Size = UDim2.new(0.7, 0, 0.1, 0)
-	Frame.Position = UDim2.new(0.5, 0, 0.8, 0)
-	Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-	Frame.ZIndex = 100
+	local textOverlay = Instance.new("Frame")
+	textOverlay.Name = "TextOverlay"
+	textOverlay.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+	textOverlay.BackgroundTransparency = 0.5
+	textOverlay.Size = UDim2.new(0.7, 0, 0.1, 0)
+	textOverlay.Position = UDim2.new(0.5, 0, 0.8, 0)
+	textOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
+	textOverlay.ZIndex = 100
 
-	local TextLabel = Instance.new("TextLabel")
+	local overlayLabel = Instance.new("TextLabel")
+	overlayLabel.Name = "OverlayLabel"
+	overlayLabel.Text = text
+	overlayLabel.TextColor3 = Color3.new(1, 1, 1)
+	overlayLabel.TextScaled = true
+	overlayLabel.TextWrapped = true
+	overlayLabel.BackgroundTransparency = 1
+	overlayLabel.Size = UDim2.new(0.8, 0, 0.8, 0)
+	overlayLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	overlayLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	overlayLabel.Font = Enum.Font.SourceSans
+	overlayLabel.Parent = textOverlay
+	overlayLabel.ZIndex = 200
 
-	TextLabel.Name = "OverlayLabel"
-	TextLabel.Text = p1
-	TextLabel.TextColor3 = Color3.new(1, 1, 1)
-	TextLabel.TextScaled = true
-	TextLabel.TextWrapped = true
-	TextLabel.BackgroundTransparency = 1
-	TextLabel.Size = UDim2.new(0.8, 0, 0.8, 0)
-	TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-	TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-	TextLabel.Font = Enum.Font.SourceSans
-	TextLabel.Parent = Frame
-	TextLabel.ZIndex = 200
-	Frame.Parent = p3
-	u2 = Frame
-	task.spawn(function() -- line: 66
-		-- upvalues: p2 (copy), u2 (ref), Frame (copy), t1 (copy)
-		task.wait(p2)
+	textOverlay.Parent = parent
 
-		if u2 == Frame then
-			t1.hideOverlay()
+	v = textOverlay
+
+	task.spawn(function()
+		task.wait(duration)
+
+		if v == textOverlay then
+			CreateTemporaryOverlay.hideOverlay()
 		end
 	end)
 end
 
-return t1
+return CreateTemporaryOverlay

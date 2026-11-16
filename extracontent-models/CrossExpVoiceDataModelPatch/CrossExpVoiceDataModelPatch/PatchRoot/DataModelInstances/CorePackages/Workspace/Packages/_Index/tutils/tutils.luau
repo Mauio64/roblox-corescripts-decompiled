@@ -1,3 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
+local tutils = require(CorePackages.Packages.tutils)
 
-return (require(CorePackages.Packages.tutils))
+return tutils

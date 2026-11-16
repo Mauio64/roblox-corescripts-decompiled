@@ -1,23 +1,27 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
-local NotificationModalsManager = require(InlineRichTextParent.NotificationModalsManager)
-local React = require(InlineRichTextParent.React)
-local useLocalization = require(InlineRichTextParent.Localization).Hooks.useLocalization
+local parent = InlineRichText.Parent
+
+local NotificationModalsManager = require(parent.NotificationModalsManager)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
 require(InlineRichText.Types)
 
-return function(t1: {[any]: any}) -- line: 14
-	-- upvalues: useLocalization (copy), React (copy), NotificationModalsManager (copy)
-	local v7 = useLocalization({
-		errorToastText = "CommonUI.Messages.Response.SomethingWentWrong"
-	})
-	local v8 = if not t1.errorToastTextOverride or t1.errorToastTextOverride == "" then v7.errorToastText else t1.errorToastTextOverride
+return function(p)
+	local v = useLocalization({ errorToastText = "CommonUI.Messages.Response.SomethingWentWrong" })
+	local toastTitle
 
-	return React.useCallback(function() -- line: 22
-		-- upvalues: NotificationModalsManager (copy), v8 (copy)
+	if p.errorToastTextOverride and p.errorToastTextOverride ~= "" then
+		toastTitle = p.errorToastTextOverride
+	else
+		toastTitle = v.errorToastText
+	end
+
+	return React.useCallback(function()
 		NotificationModalsManager.SetUIBloxToast({
-			toastTitle = v8,
+			toastTitle = toastTitle,
 			sequenceNumber = DateTime.now().UnixTimestamp
 		})
-	end, { v8 })
+	end, { toastTitle })
 end

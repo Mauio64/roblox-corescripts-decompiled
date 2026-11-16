@@ -1,12 +1,13 @@
-local ParentParent = script.Parent.Parent
-local Spy = require(ParentParent.Spy)
+local parent = script.Parent.Parent
+local Spy = require(parent.Spy)
 
-return function(p1) -- line: 4
-	-- upvalues: Spy (copy)
-	local v4 = Spy.is(p1)
-
+return function(p)
+	local pass = Spy.is(p)
 	return {
-		pass = v4,
-		message = if not v4 then string.format("Expected object to be a Spy. Got %q instead.", (tostring(p1))) else "Expected object to be anything but a Spy."
+		pass = pass,
+		message = pass and "Expected object to be anything but a Spy." or string.format(
+			"Expected object to be a Spy. Got %q instead.",
+			(tostring(p))
+		)
 	}
 end

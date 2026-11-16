@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local GetFriendsChatIconUnreadStore = require(Workspace.FriendsChat.FriendsChat.Stores.GetFriendsChatIconUnreadStore)
 
-return (require(_Workspace.FriendsChat.FriendsChat.Stores.GetFriendsChatIconUnreadStore))
+return GetFriendsChatIconUnreadStore

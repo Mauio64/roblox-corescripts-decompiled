@@ -1,23 +1,22 @@
 local CoreGui = game:GetService("CoreGui")
-local Parent = script:FindFirstAncestor("AppStartup").Parent
-local React = require(Parent.React)
-local ReactRoblox = require(Parent.ReactRoblox)
+local parent = script:FindFirstAncestor("AppStartup").Parent
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
 local useStartupMessageProps = require(script.Parent.useStartupMessageProps)
 local StartupMessage = require(script.Parent.StartupMessage)
 
-local function StartupMessageContainer() -- line: 9
-	-- upvalues: useStartupMessageProps (copy), ReactRoblox (copy), React (copy), StartupMessage (copy), CoreGui (copy)
-	local v8 = useStartupMessageProps()
+local function StartupMessageContainer()
+	local v = useStartupMessageProps()
 
 	return ReactRoblox.createPortal({ React.createElement("ScreenGui", {
-		Enabled = true,
-		IgnoreGuiInset = true,
-		AutoLocalize = false,
-		DisplayOrder = 100,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, {
-		StartupMessage = v8.displayStartupMessage and React.createElement(StartupMessage, v8)
-	}) }, CoreGui)
+			Enabled = true,
+			IgnoreGuiInset = true,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			AutoLocalize = false,
+			DisplayOrder = 100
+		}, {
+			StartupMessage = v.displayStartupMessage and React.createElement(StartupMessage, v)
+		}) }, CoreGui)
 end
 
 return React.memo(StartupMessageContainer)

@@ -1,84 +1,81 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local FriendsLandingParent = FriendsLanding.Parent
+local parent = FriendsLanding.Parent
+
 local dependencies = require(FriendsLanding.dependencies)
-local Roact = dependencies.Roact
-local UIBlox = dependencies.UIBlox
+local roact = dependencies.Roact
+local uiBlox = dependencies.UIBlox
 local withLocalization = dependencies.withLocalization
-local Button = UIBlox.App.Button.Button
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local Cryo = require(FriendsLandingParent.Cryo)
-local useDesignTokens = require(FriendsLandingParent.Style).useDesignTokens
-local v11 = Roact.PureComponent:extend("ShowMoreButton")
+local button = uiBlox.App.Button.Button
+local buttonType = uiBlox.App.Button.Enum.ButtonType
 
-local function v12() -- line: 18
-end
+local Cryo = require(parent.Cryo)
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
 
-v11.defaultProps = {
-	layoutOrder = 1,
-	buttonHeight = 48,
-	onSizeChange = v12,
-	onActivated = v12
-}
-v11.MAX_WIDTH = 640
+local extended = roact.PureComponent:extend("ShowMoreButton")
 
-function v11.init(p1) -- line: 30
-	-- upvalues: v11 (copy)
-	p1.state = {
-		width = 100
-	}
-	p1.localization = {
-		showMore = "Feature.Friends.Action.ShowMore"
-	}
+local function fn() end
 
-	function p1.onChangeSize(p2) -- line: 39
-		-- upvalues: p1 (copy), v11 (copy)
-		local v19 = p1.props.maxWidth or v11.MAX_WIDTH
+extended.defaultProps = { layoutOrder = 1, onSizeChange = fn, onActivated = fn, buttonHeight = 48 }
 
-		p1:setState({
-			width = math.min(v19, p2.AbsoluteSize.X)
+extended.MAX_WIDTH = 640
+
+function extended:init()
+	self.state = { width = 100 }
+
+	self.localization = { showMore = "Feature.Friends.Action.ShowMore" }
+
+	function self.onChangeSize(p)
+		self:setState({
+			width = math.min(self.props.maxWidth or extended.MAX_WIDTH, p.AbsoluteSize.X)
 		})
-		p1.props.onSizeChange(p2)
+
+		self.props.onSizeChange(p)
 	end
 end
-function v11.render(p3) -- line: 49
-	-- upvalues: withLocalization (copy), Roact (copy), Button (copy), ButtonType (copy)
-	return withLocalization(p3.localization)(function(p4) -- line: 50
-		-- upvalues: p3 (copy), Roact (copy), Button (copy), ButtonType (copy)
-		local buttonHeight = p3.props.buttonHeight
-		local uDim2 = UDim2.new(0, p3.state.width, 0, buttonHeight)
 
-		return Roact.createFragment({
-			showMoreContainer = Roact.createElement("Frame", {
+function extended.render(data)
+	return withLocalization(data.localization)(function(p)
+		local buttonHeight = data.props.buttonHeight
+		local udim = UDim2.new(0, data.state.width, 0, buttonHeight)
+
+		return roact.createFragment({
+			showMoreContainer = roact.createElement("Frame", {
 				BackgroundTransparency = 1,
-				LayoutOrder = p3.props.layoutOrder,
+				LayoutOrder = data.props.layoutOrder,
 				Size = UDim2.new(1, 0, 0, buttonHeight + 48),
-				[Roact.Change.AbsoluteSize] = p3.onChangeSize
+				[roact.Change.AbsoluteSize] = data.onChangeSize
 			}, {
-				layout = Roact.createElement("UIListLayout", {
+				layout = roact.createElement("UIListLayout", {
 					FillDirection = Enum.FillDirection.Vertical,
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					VerticalAlignment = Enum.VerticalAlignment.Center
 				}),
-				showMore = Roact.createElement(Button, {
-					buttonType = ButtonType.Secondary,
-					onActivated = p3.props.onActivated,
-					size = uDim2,
-					text = p4.showMore
+				showMore = roact.createElement(button, {
+					buttonType = buttonType.Secondary,
+					onActivated = data.props.onActivated,
+					size = udim,
+					text = p.showMore
 				})
 			})
 		})
 	end)
 end
 
-local function ShowMoreButtonWrapper(p5) -- line: 78
-	-- upvalues: useDesignTokens (copy), Roact (copy), v11 (copy), Cryo (copy)
-	local v17 = useDesignTokens()
+local function ShowMoreButtonWrapper(p)
+	local v = useDesignTokens()
 
-	return Roact.createElement(v11, Cryo.Dictionary.join({
-		maxWidth = v17.LuaApps.FriendsLanding.ShowMore.ButtonWidth,
-		buttonHeight = v17.LuaApps.FriendsLanding.ShowMore.ButtonHeight
-	}, p5))
+	return roact.createElement(
+		extended,
+		Cryo.Dictionary.join(
+			{
+				maxWidth = v.LuaApps.FriendsLanding.ShowMore.ButtonWidth,
+				buttonHeight = v.LuaApps.FriendsLanding.ShowMore.ButtonHeight
+			},
+			p
+		)
+	)
 end
 
 return ShowMoreButtonWrapper

@@ -1,74 +1,95 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Constants = require(Foundation.Constants)
+local Flags = require(Foundation.Utility.Flags)
 local PopoverSide = require(Foundation.Enums.PopoverSide)
 local Radius = require(Foundation.Enums.Radius)
 local useTokens = require(Foundation.Providers.Style.useTokens)
-local SHADOW_SIZE = Constants.SHADOW_SIZE
+local v
 
-local function useArrowPosition(p1, p2, p3, n1: number, n2: number, p4) -- line: 16
-	-- upvalues: useTokens (copy), React (copy), Radius (copy), PopoverSide (copy), SHADOW_SIZE (copy)
-	local v16 = useTokens()
-	local v17 = React.useMemo(function() -- line: 25
-		-- upvalues: p3 (copy), Radius (copy), v16 (copy)
-		if p3 == Radius.XSmall then
-			return v16.Size.Size_50
+if Flags.FoundationPopoverPluginOverlayMeasurement and Flags.FoundationPluginShadowSize then
+	v = Constants.PLUGIN_SHADOW_SIZE
+else
+	v = Constants.SHADOW_SIZE
+end
+
+local function useArrowPosition(object, p, p2, p3: number, p4: number, instance)
+	local v2 = useTokens()
+	local v3 = React.useMemo(function()
+		if p2 == Radius.XSmall then
+			return v2.Size.Size_50
 		end
 
-		if p3 == Radius.Small then
-			return v16.Size.Size_100
+		if p2 == Radius.Small then
+			return v2.Size.Size_100
 		end
 
-		if p3 == Radius.Medium then
-			return v16.Size.Size_200
+		if p2 == Radius.Medium then
+			return v2.Size.Size_200
 		end
 
-		if p3 == Radius.Large then
-			return v16.Size.Size_300
+		return if p2 == Radius.Large then v2.Size.Size_300 else 0
+	end, { p2, v2 })
+
+	return object:map(function(udim: UDim2)
+		local offset = udim.X.Offset
+		local offset2 = udim.Y.Offset
+
+		local v4 = v3
+
+		if p2 == Radius.Circle then
+			v4 = math.min(offset, offset2) / 2
 		end
 
-		return 0
-	end, {
-		p3,
-		v16
-	})
+		local v5 = v4 + p4
+		local v6 = p == PopoverSide.Top or p == PopoverSide.Bottom
+		local offset3 = if v6 then offset else offset2
+		local v7
 
-	return p1:map(function(uDim2: UDim2) -- line: 39
-		-- upvalues: v17 (copy), p3 (copy), Radius (copy), n2 (copy), p2 (copy), PopoverSide (copy), p4 (copy), n1 (copy), SHADOW_SIZE (copy)
-		local XOffset = uDim2.X.Offset
-		local YOffset = uDim2.Y.Offset
-		local v21 = v17
+		if instance and typeof(instance) == "Instance" then
+			local absoluteSize = instance.AbsoluteSize
+			local v8 = if v6 then absoluteSize.X else absoluteSize.Y
+			local v9
 
-		if p3 == Radius.Circle then
-			v21 = math.min(XOffset, YOffset) / 2
-		end
+			if p3 == 0 then
+				v9 = 0
+			elseif p3 == 0.5 then
+				v9 = (offset3 - v8) / 2
+			else
+				v9 = offset3 - v8
+			end
 
-		local v22 = v21 + n2
-		local v23 = p2 == PopoverSide.Top or p2 == PopoverSide.Bottom
-		local v24 = if not v23 then YOffset else XOffset
-		local v30
+			local v10 = math.max(0, v9)
+			local v11 = math.min(offset3, v9 + v8)
 
-		if p4 and typeof(p4) == "Instance" then
-			local AbsoluteSize = p4.AbsoluteSize
-			local v26 = if not v23 then AbsoluteSize.Y else AbsoluteSize.X
-			local v27 = if n1 ~= 0 then if n1 ~= 0.5 then v24 - v26 else (v24 - v26) / 2 else 0
-			local v28 = math.max(0, v27)
-			local v29 = math.min(v24, v27 + v26)
-
-			v30 = if not (v28 <= v29) then if not (v24 < v27) then n2 else v24 - n2 else (v28 + v29) / 2
+			if v10 <= v11 then
+				v7 = (v10 + v11) / 2
+			elseif offset3 < v9 then
+				v7 = offset3 - p4
+			else
+				v7 = p4
+			end
 		else
-			v30 = v24 * n1
+			v7 = offset3 * p3
 		end
 
-		local v31 = v24 - v22
-		local v32 = if not (v22 <= v31) then v24 / 2 else math.clamp(v30, v22, v31)
+		local v8 = offset3 - v5
+		local v9
 
-		if v23 then
-			return UDim2.fromOffset(SHADOW_SIZE + v32, SHADOW_SIZE + (p2 ~= PopoverSide.Top and 0 or YOffset))
+		if v5 <= v8 then
+			v9 = math.clamp(v7, v5, v8)
+		else
+			v9 = offset3 / 2
 		end
 
-		return UDim2.fromOffset(SHADOW_SIZE + (p2 ~= PopoverSide.Left and 0 or XOffset), SHADOW_SIZE + v32)
+		if v6 then
+			return UDim2.fromOffset(v + v9, v + (p ~= PopoverSide.Top and 0 or offset2))
+		end
+
+		return UDim2.fromOffset(v + (p ~= PopoverSide.Left and 0 or offset), v + v9)
 	end)
 end
 

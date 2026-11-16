@@ -1,18 +1,18 @@
-local function replaceIndex(p1, p2, p3) -- line: 5
-	local t1 = {}
-	local v6 = #p1
+local function replaceIndex(list, p, p2)
+	local count = #list
 
-	assert(p2 <= v6, "index must be less or equal than the list length")
+	assert(p <= count, "index must be less or equal than the list length")
+	local result = {}
 
-	for i = 1, v6 do
-		if i == p2 then
-			t1[i] = p3
+	for i = 1, count do
+		if i == p then
+			result[i] = p2
 		else
-			t1[i] = p1[i]
+			result[i] = list[i]
 		end
 	end
 
-	return t1
+	return result
 end
 
 return replaceIndex

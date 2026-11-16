@@ -1,13 +1,17 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local t = require(ParentParent.t)
-local Object = require(ParentParent.LuauPolyfill).Object
-local ResponsiveLayoutContext = require(scriptParent.ResponsiveLayoutContext)
-local ResponsiveLayoutConfigReader = require(scriptParent.ResponsiveLayoutConfigReader)
-local v8 = Roact.PureComponent:extend("ResponsiveCell")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent.Parent
 
-v8.validateProps = t.interface({
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Object = LuauPolyfill.Object
+
+local ResponsiveLayoutContext = require(parent.ResponsiveLayoutContext)
+local ResponsiveLayoutConfigReader = require(parent.ResponsiveLayoutConfigReader)
+
+local extended = Roact.PureComponent:extend("ResponsiveCell")
+
+extended.validateProps = t.interface({
 	layoutOrder = t.optional(t.integer),
 	zIndex = t.optional(t.integer),
 	colspan = t.optional(t.union(t.integer, t.table)),
@@ -17,143 +21,125 @@ v8.validateProps = t.interface({
 	gridCellRef = t.optional(t.union(t.table, t.callback))
 })
 
-local function findProp(p1, p2, p3) -- line: 35
-	if p3 == nil then
-		p3 = "default"
+local function findProp(props, p, p2)
+	local v = p2 == nil and "default" or p2
+
+	if props[p .. "_" .. v] ~= nil then
+		return props[p .. "_" .. v]
 	end
 
-	if p1[p2 .. "_" .. p3] ~= nil then
-		return p1[p2 .. "_" .. p3]
+	if props[p] == nil then
+		return nil
 	end
 
-	if p1[p2] ~= nil then
-		if type(p1[p2]) == "table" then
-			if p1[p2][p3] ~= nil then
-				return p1[p2][p3]
-			end
-
-			return p1[p2].default
-		end
-
-		return p1[p2]
+	if type(props[p]) ~= "table" then
+		return props[p]
 	end
 
-	return nil
+	if props[p][v] == nil then
+		return props[p].default
+	end
+
+	return props[p][v]
 end
 
-function v8.getColspan(p4, p5) -- line: 56
-	-- upvalues: findProp (copy)
-	local v16 = findProp(p4.props, "colspan", p5)
-
-	if v16 ~= nil then
-		return v16
-	end
-
-	return 1
-end
-function v8.getRowspan(p6, p7) -- line: 61
-	-- upvalues: findProp (copy)
-	local v19 = findProp(p6.props, "rowspan", p7)
-
-	if v19 ~= nil then
-		return v19
-	end
-
-	return 1
-end
-function v8.getOrder(p8, p9) -- line: 66
-	-- upvalues: findProp (copy)
-	if p8.props.layoutOrder then
-		return p8.props.layoutOrder
-	end
-
-	return (findProp(p8.props, "order", p9))
+function extended:getColspan(p)
+	local prop = findProp(self.props, "colspan", p)
+	return if prop == nil then 1 else prop
 end
 
-local function round(p10, p11) -- line: 75
-	local v24 = math.floor(p10)
-
-	p11.subPixelOffset = p11.subPixelOffset + (p10 - v24)
-
-	local v25 = math.floor(p11.subPixelOffset + 0.5)
-
-	p11.subPixelOffset = p11.subPixelOffset - v25
-
-	return v24 + v25
+function extended:getRowspan(p)
+	local prop = findProp(self.props, "rowspan", p)
+	return if prop == nil then 1 else prop
 end
 
-function v8.getSize(_, p13, p14, p15) -- line: 84
-	-- upvalues: ResponsiveLayoutConfigReader (copy)
-	local v30 = ResponsiveLayoutConfigReader.getValue(p15, "gutter") or 0
-
-	if p15.multiLine then
-		local v31 = ResponsiveLayoutConfigReader.getValue(p15, "verticalGutter") or v30
-
-		return UDim2.new(p13, (p13 - 1) * v30, p14, (p14 - 1) * v31)
+function extended:getOrder(p)
+	if self.props.layoutOrder then
+		return self.props.layoutOrder
 	end
 
-	local v32 = ResponsiveLayoutConfigReader.getValue(p15, "columns") or 1
-
-	if p15.scrollable then
-		v32 *= math.max(p15.pages, 1)
-	end
-
-	local new = UDim2.new
-	local v34 = p13 / v32
-	local v35 = (p13 / v32 - 1) * v30
-	local v36 = math.floor(v35)
-
-	p15.subPixelOffset = p15.subPixelOffset + (v35 - v36)
-
-	local v37 = math.floor(p15.subPixelOffset + 0.5)
-
-	p15.subPixelOffset = p15.subPixelOffset - v37
-
-	return new(v34, v36 + v37, 1, 0)
+	return findProp(self.props, "order", p)
 end
-function v8.render(p16) -- line: 103
-	-- upvalues: Roact (copy), ResponsiveLayoutContext (copy)
+
+local function round(p, data) -- 1 equivalent call inferred from this helper
+	local v = math.floor(p)
+	data.subPixelOffset += p - v
+	local v2 = math.floor(data.subPixelOffset + 0.5)
+	data.subPixelOffset -= v2
+	return v + v2
+end
+
+function extended:getSize(p, p2, data)
+	local v = ResponsiveLayoutConfigReader.getValue(data, "gutter") or 0
+
+	if data.multiLine then
+		local v2 = ResponsiveLayoutConfigReader.getValue(data, "verticalGutter") or v
+
+		return UDim2.new(p, (p - 1) * v, p2, (p2 - 1) * v2)
+	end
+
+	local v2 = ResponsiveLayoutConfigReader.getValue(data, "columns") or 1
+
+	if data.scrollable then
+		v2 *= math.max(data.pages, 1)
+	end
+
+	return UDim2.new(p / v2, round((p / v2 - 1) * v, data), 1, 0) -- inferred equivalent call
+end
+
+function extended:render()
 	return Roact.createElement(ResponsiveLayoutContext.Consumer, {
-		render = function(p17) -- line: 105
-			-- upvalues: p16 (copy), Roact (copy)
-			local v42 = p16:getColspan(p17.breakpoint)
-			local v43 = not p17.multiLine and 1 or p16:getRowspan(p17.breakpoint)
+		render = function(props)
+			local colspan = self:getColspan(props.breakpoint)
+			local v = not props.multiLine and 1 or self:getRowspan(props.breakpoint)
 
-			if v42 > 0 and v43 > 0 then
-				local v44 = p16:getOrder(p17.breakpoint)
-				local v45 = not v44 and "ResponsiveCell" or string.format("ResponsiveCell%02d", v44)
-				local v46 = p17.multiLine and (v42 > 1 or v43 > 1)
-				local v47 = Roact.createElement("Frame", {
-					Name = if not v46 then v45 else nil,
-					Size = p16:getSize(v42, v43, p17),
-					AutomaticSize = if not p17.relativeHeight then Enum.AutomaticSize.Y else Enum.AutomaticSize.None,
-					BackgroundTransparency = 1,
-					LayoutOrder = v44,
-					ZIndex = p16.props.zIndex,
-					[Roact.Ref] = p16.props.gridCellRef
-				}, p16.props[Roact.Children])
-
-				if v46 then
-					return Roact.createElement("Frame", {
-						BackgroundTransparency = 1,
-						Name = v45,
-						LayoutOrder = v44
-					}, {
-						ResponsiveCellInner = v47
-					})
-				end
-
-				return v47
+			if not (colspan > 0 and v > 0) then
+				return nil
 			end
 
-			return nil
+			local order = self:getOrder(props.breakpoint)
+			local name = not order and "ResponsiveCell" or string.format("ResponsiveCell%02d", order)
+			local v2 = props.multiLine and (colspan > 1 or v > 1)
+			local createElement = Roact.createElement
+			local name2
+
+			if not v2 then
+				name2 = name
+			end
+
+			local gridCellRefsByRef = {}
+			gridCellRefsByRef.Name = name2
+			gridCellRefsByRef.Size = self:getSize(colspan, v, props)
+			local automaticSize
+
+			if props.relativeHeight then
+				automaticSize = Enum.AutomaticSize.None
+			else
+				automaticSize = Enum.AutomaticSize.Y
+			end
+
+			gridCellRefsByRef.AutomaticSize = automaticSize
+			gridCellRefsByRef.BackgroundTransparency = 1
+			gridCellRefsByRef.LayoutOrder = order
+			gridCellRefsByRef.ZIndex = self.props.zIndex
+			gridCellRefsByRef[Roact.Ref] = self.props.gridCellRef
+			local element = createElement("Frame", gridCellRefsByRef, self.props[Roact.Children])
+
+			if v2 then
+				return Roact.createElement("Frame", {
+					Name = name,
+					BackgroundTransparency = 1,
+					LayoutOrder = order
+				}, {
+					ResponsiveCellInner = element
+				})
+			end
+
+			return element
 		end
 	})
 end
 
-return Roact.forwardRef(function(p18, p19) -- line: 141
-	-- upvalues: Roact (copy), v8 (copy), Object (copy)
-	return Roact.createElement(v8, Object.assign({}, p18, {
-		gridCellRef = p19
-	}))
+return Roact.forwardRef(function(p, gridCellRef)
+	return Roact.createElement(extended, Object.assign({}, p, { gridCellRef = gridCellRef }))
 end)

@@ -1,61 +1,62 @@
-local Parent = script:FindFirstAncestor("Components").Parent
-local ParentParent = Parent.Parent
-local React = require(ParentParent.React)
-local Dash = require(ParentParent.Dash)
-local InlineElementType = require(Parent.Utils.InlineElementType)
+local parent = script:FindFirstAncestor("Components").Parent
+local parent2 = parent.Parent
 
-require(Parent.Components.InlineLayout.InlineLayoutElements.RenderableInlineElement)
+local React = require(parent2.React)
+local Dash = require(parent2.Dash)
 
-local HardBreakElement = require(Parent.Components.InlineLayout.InlineLayoutElements.HardBreakElement)
-local isInlineElement = require(Parent.Utils.isInlineElement)
-local t1 = {}
+local InlineElementType = require(parent.Utils.InlineElementType)
+require(parent.Components.InlineLayout.InlineLayoutElements.RenderableInlineElement)
+local HardBreakElement = require(parent.Components.InlineLayout.InlineLayoutElements.HardBreakElement)
+local isInlineElement = require(parent.Utils.isInlineElement)
+local renderInMeasuredFrame = require(parent.Utils.renderInMeasuredFrame)
 
-t1.__index = t1
-t1.__type = InlineElementType
+local InlineSpanElement = {}
+InlineSpanElement.__index = InlineSpanElement
+InlineSpanElement.__type = InlineElementType
 
-local function getSplitPoint(t2: {[any]: any}, n1: number) -- line: 20
-	local n2 = 0
+local function getSplitPoint(elements, p: number)
+	local total = 0
 
-	for v14, v15 in t2 do
-		local v16 = v15:getWidth()
+	for k, item in elements do
+		local width = item:getWidth()
 
-		if n1 < n2 + v16 then
-			return v14, n1 - n2
+		if p < total + width then
+			return k, p - total
 		end
 
-		n2 += v16
+		total += width
 	end
 
 	return -1, -1
 end
-local function handleSplitTrailingElement(p1, p2, p3, n3: number, b1: boolean, b2: boolean?) -- line: 32
-	if not b1 then
-		if p3.canForceSplit and b2 then
-			local v23, v24 = p3:split(n3, true)
 
-			return v23, v24
-		end
+local function handleSplitTrailingElement(p, p2, value, p3: number, flag: boolean, flag2: boolean?)
+	local v = nil
 
-		return p1, p2
+	if flag then
+		return v, value
 	end
 
-	return nil, p3
+	if value.canForceSplit and flag2 then
+		local parts, v2 = value:split(p3, true)
+		return parts, v2
+	end
+
+	return p, p2
 end
 
-function t1.new(p4: ((...any) -> ...any), p5, t3: {[any]: any}, n4: number?) -- line: 56
-	-- upvalues: t1 (copy), isInlineElement (copy), HardBreakElement (copy)
-	local self = setmetatable({}, t1)
-
-	self.WrapperElement = p4
-	self.wrapperElementProps = p5
+function InlineSpanElement.new(wrapperElement, wrapperElementProps, items, value: number?)
+	local self = setmetatable({}, InlineSpanElement)
+	self.WrapperElement = wrapperElement
+	self.wrapperElementProps = wrapperElementProps
 	self.Elements = {}
-	self.startingIndex = n4 or 1
+	self.startingIndex = value or 1
 
-	for _, v31 in t3 do
-		if not isInlineElement(v31) or v31 == HardBreakElement then
-			warn("InlineSpanElement: invalid element provided. Only non inline elements, excluding HardBreakElement, are allowed.")
+	for _, item in items do
+		if isInlineElement(item) and item ~= HardBreakElement then
+			table.insert(self.Elements, item)
 		else
-			table.insert(self.Elements, v31)
+			warn("InlineSpanElement: invalid element provided. Only non inline elements, excluding HardBreakElement, are allowed.")
 		end
 	end
 
@@ -64,86 +65,107 @@ function t1.new(p4: ((...any) -> ...any), p5, t3: {[any]: any}, n4: number?) -- 
 	end
 
 	self.canForceSplit = #self.Elements > 0 and self.Elements[#self.Elements].canForceSplit
-
 	return self
 end
-function t1.getWidth(p6) -- line: 85
-	-- upvalues: Dash (copy)
-	return Dash.sum(Dash.map(p6.Elements, function(p7) -- line: 86
-		return p7:getWidth()
+
+function InlineSpanElement:getWidth()
+	return Dash.sum(Dash.map(self.Elements, function(object)
+		return object:getWidth()
 	end))
 end
-function t1._splitChildAtIndex(t4: {[any]: any}, n5: number, n6: number) -- line: 91
-	local v36, v37 = t4.Elements[n5]:split(n6, false)
 
-	return v36, v37, n6 >= v36:getWidth()
+function InlineSpanElement:_splitChildAtIndex(p: number, p2: number)
+	local parts, v = self.Elements[p]:split(p2, false)
+
+	return parts, v, parts:getWidth() <= p2
 end
-function t1.split(t5: {[any]: any}, n7: number, b3: boolean?) -- line: 101
-	-- upvalues: getSplitPoint (copy), t1 (copy)
-	local t6 = {}
-	local t7 = {}
-	local v43, v44 = getSplitPoint(t5.Elements, n7)
 
-	if v43 == -1 then
-		return t5, nil
+function InlineSpanElement:split(p: number, flag: boolean?)
+	local v = {}
+	local v2 = {}
+
+	local splitPoint, v3 = getSplitPoint(self.Elements, p)
+
+	if splitPoint == -1 then
+		return self, nil
 	end
 
-	local v45 = v43 + 1
-	local v46, v47, v48 = t5:_splitChildAtIndex(v43, v44)
+	local v4 = splitPoint + 1
 
-	if not v48 then
-		local v49 = t5.Elements[v43]
-		local parts = nil
+	local v5, v6, v7 = self:_splitChildAtIndex(splitPoint, v3)
 
-		if not (v43 > 1) then
-			if v49.canForceSplit and b3 then
-				parts, v47 = v49:split(v44, true)
-			else
-				parts = v46
-			end
+	if not v7 then
+		local element = self.Elements[splitPoint]
+
+		if splitPoint > 1 then
+			v6 = element
+			v5 = nil
+		elseif element.canForceSplit and flag then
+			v5, v6 = element:split(v3, true)
+		end
+	end
+
+	if splitPoint > 1 then
+		table.move(self.Elements, 1, splitPoint - 1, 1, v)
+	end
+
+	if v5 then
+		table.insert(v, v5)
+
+		v4 -= 1
+	end
+
+	if v6 then
+		table.insert(v2, v6)
+	end
+
+	if splitPoint < #self.Elements then
+		table.move(self.Elements, splitPoint + 1, #self.Elements, #v2 + 1, v2)
+	end
+
+	local v8 = InlineSpanElement.new(self.WrapperElement, self.wrapperElementProps, v, self.startingIndex)
+
+	if #v2 > 0 then
+		return v8, (InlineSpanElement.new(self.WrapperElement, self.wrapperElementProps, v2, v4))
+	end
+
+	return v8, nil
+end
+
+function InlineSpanElement:trimStart()
+	for k, element in self.Elements do
+		local v
+
+		if element.trimStart then
+			v = element:trimStart()
 		else
-			v47 = v49
+			v = element
 		end
 
-		v46 = parts
+		if v == element and k == 1 then
+			return self
+		end
+
+		if v ~= nil then
+			local v2 = { v }
+			table.move(self.Elements, k + 1, #self.Elements, 2, v2)
+			return InlineSpanElement.new(self.WrapperElement, self.wrapperElementProps, v2, self.startingIndex + k - 1)
+		end
 	end
 
-	if v43 > 1 then
-		table.move(t5.Elements, 1, v43 - 1, 1, t6)
-	end
-
-	if v46 then
-		table.insert(t6, v46)
-		v45 -= 1
-	end
-
-	if v47 then
-		table.insert(t7, v47)
-	end
-
-	if v43 < #t5.Elements then
-		table.move(t5.Elements, v43 + 1, #t5.Elements, #t7 + 1, t7)
-	end
-
-	local v51 = t1.new(t5.WrapperElement, t5.wrapperElementProps, t6, t5.startingIndex)
-
-	if #t7 > 0 then
-		return v51, (t1.new(t5.WrapperElement, t5.wrapperElementProps, t7, v45))
-	end
-
-	return v51, nil
+	return nil
 end
-function t1.render(t8: {[any]: any}, p8, n8: number) -- line: 147
-	-- upvalues: Dash (copy), React (copy)
-	local v55 = Dash.map(t8.Elements, function(p9, p10) -- line: 148
-		-- upvalues: p8 (copy), t8 (copy)
-		return p9:render(`{ p8 }-{ t8.startingIndex + p10 - 1 }`, p10)
+
+function InlineSpanElement:render(id, layoutOrder: number)
+	local mapped = Dash.map(self.Elements, function(object, p)
+		return renderInMeasuredFrame(object:render(`{id}-{self.startingIndex + p - 1}`, p), object:getWidth(), p)
 	end)
 
-	return React.createElement(t8.WrapperElement, Dash.join(t8.wrapperElementProps, {
-		id = p8,
-		LayoutOrder = n8
-	}), v55)
+	return React.createElement(
+		self.WrapperElement,
+		Dash.join(self.wrapperElementProps, { id = id, LayoutOrder = layoutOrder }),
+		mapped
+	)
 end
 
-return t1
+return InlineSpanElement

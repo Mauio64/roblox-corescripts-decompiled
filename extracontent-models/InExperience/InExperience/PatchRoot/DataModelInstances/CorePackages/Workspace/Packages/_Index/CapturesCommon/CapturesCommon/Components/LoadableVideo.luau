@@ -1,105 +1,128 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local ContentProvider = game:GetService("ContentProvider")
-local Foundation = require(ParentParentParent.Foundation)
-local React = require(ParentParentParent.React)
+
+local Foundation = require(parent2.Foundation)
+local React = require(parent2.React)
+
 local Skeleton = Foundation.Skeleton
 local View = Foundation.View
-local getCropSize = require(ParentParent.Utils.getCropSize)
-local getFitSize = require(ParentParent.Utils.getFitSize)
-local LoadingState = require(ParentParent.Enums.LoadingState)
-local FFlagUseRbxStorageInCapturesCommon = require(ParentParent.Flags.FFlagUseRbxStorageInCapturesCommon)
 
-return function(t1: {[any]: any}) -- line: 36
-	-- upvalues: React (copy), LoadingState (copy), ContentProvider (copy), View (copy), getFitSize (copy), getCropSize (copy), FFlagUseRbxStorageInCapturesCommon (copy), Skeleton (copy)
-	local v13, v14 = React.useState(Vector2.new(0, 0))
-	local v15, v16 = React.useState(LoadingState.Loading)
-	local v17, v18 = React.useState(Vector2.new(0, 0))
+local getCropSize = require(parent.Utils.getCropSize)
+local getFitSize = require(parent.Utils.getFitSize)
+local LoadingState = require(parent.Enums.LoadingState)
 
-	React.useEffect(function() -- line: 41
-		-- upvalues: t1 (copy), ContentProvider (copy), v16 (copy), LoadingState (copy)
-		if t1.Video == nil or t1.Video == "" then
+local FFlagUseRbxStorageInCapturesCommon = require(parent.Flags.FFlagUseRbxStorageInCapturesCommon)
+
+return function(props)
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(LoadingState.Loading)
+	local state3, setState3 = React.useState(Vector2.new(0, 0))
+
+	React.useEffect(function()
+		if props.Video == nil or props.Video == "" then
 			return
 		end
 
-		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(t1.Video):Connect(function(p1) -- line: 47
-			-- upvalues: v16 (copy), LoadingState (copy)
-			if p1 == Enum.AssetFetchStatus.Failure then
-				v16(LoadingState.Failed)
+		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(props.Video):Connect(function(p)
+			if p == Enum.AssetFetchStatus.Failure then
+				setState2(LoadingState.Failed)
 			end
 		end)
 
-		return function() -- line: 53
-			-- upvalues: connection (copy), v16 (copy), LoadingState (copy)
+		return function()
 			connection:Disconnect()
-			v16(LoadingState.Loading)
+			setState2(LoadingState.Loading)
 		end
-	end, { t1.Video })
+	end, { props.Video })
 
-	local v19 = React.useCallback(function(p2) -- line: 59
-		-- upvalues: v14 (copy)
-		v14(p2.AbsoluteSize)
-	end, { v14 })
-	local v20 = React.useCallback(function(p3) -- line: 63
-		-- upvalues: v18 (copy), t1 (copy)
-		local Resolution = p3.Resolution
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize)
+	end, { setState })
 
-		v18(Resolution)
+	local v = React.useCallback(function(p)
+		local resolution = p.Resolution
+		setState3(resolution)
 
-		if t1.onResolutionChanged then
-			t1.onResolutionChanged(Resolution)
+		if props.onResolutionChanged then
+			props.onResolutionChanged(resolution)
 		end
-	end, {
-		t1.onResolutionChanged,
-		v18
-	})
-	local v21 = React.useCallback(function(p4) -- line: 72
-		-- upvalues: v15 (copy), LoadingState (copy), v16 (copy), t1 (copy)
-		if v15 == LoadingState.Loading then
-			v16(LoadingState.Finished)
+	end, { props.onResolutionChanged, setState3 })
+
+	local v2 = React.useCallback(function(p)
+		if state2 == LoadingState.Loading then
+			setState2(LoadingState.Finished)
 		end
 
-		t1.onLoaded(p4)
-	end, {
-		v15,
-		t1.onLoaded
-	})
+		props.onLoaded(p)
+	end, { state2, props.onLoaded })
 
-	if v15 == LoadingState.Failed then
-		return t1.renderOnFailed()
+	if state2 == LoadingState.Failed then
+		return props.renderOnFailed()
 	end
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v3 = {
+		AnchorPoint = props.AnchorPoint,
+		BackgroundTransparency = props.BackgroundTransparency,
 		ClipsDescendants = true,
 		isDisabled = true,
-		AnchorPoint = t1.AnchorPoint,
-		BackgroundTransparency = t1.BackgroundTransparency,
-		onAbsoluteSizeChanged = v19,
-		Position = t1.Position,
-		Size = t1.Size,
-		ZIndex = t1.ZIndex
-	}, {
-		VideoFrame = React.createElement("VideoFrame", {
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 1,
-			Looped = t1.Looped == nil or t1.Looped,
-			Playing = t1.Playing,
-			Position = UDim2.fromScale(0.5, 0.5),
-			ref = t1.videoRef,
-			Size = if t1.scaleType ~= Enum.ScaleType.Fit then if t1.scaleType ~= Enum.ScaleType.Crop then UDim2.fromScale(1, 1) else getCropSize(v13, v17) else getFitSize(v13, v17),
-			Video = t1.Video,
-			VideoContent = if not FFlagUseRbxStorageInCapturesCommon then nil else t1.VideoContent,
-			Visible = v17.X > 0 and v17.Y > 0,
-			[React.Change.Resolution] = v20,
-			[React.Event.Loaded] = v21
-		}, {
-			Corner = if not t1.cornerRadius then nil else React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, t1.cornerRadius)
-			})
-		}),
-		Shimmer = if v15 == LoadingState.Finished then nil else React.createElement(Skeleton, {
-			ZIndex = 2,
-			Size = UDim2.fromScale(1, 1)
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+		Position = props.Position,
+		Size = props.Size,
+		ZIndex = props.ZIndex
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {}
+	v4.AnchorPoint = Vector2.new(0.5, 0.5)
+	v4.BackgroundTransparency = 1
+	v4.Looped = props.Looped == nil or props.Looped
+	v4.Playing = props.Playing
+	v4.Position = UDim2.fromScale(0.5, 0.5)
+	v4.ref = props.videoRef
+	local size
+
+	if props.scaleType == Enum.ScaleType.Fit then
+		size = getFitSize(state, state3)
+	elseif props.scaleType == Enum.ScaleType.Crop then
+		size = getCropSize(state, state3)
+	else
+		size = UDim2.fromScale(1, 1)
+	end
+
+	v4.Size = size
+
+	v4.Video = props.Video
+	local videoContent
+
+	if FFlagUseRbxStorageInCapturesCommon then
+		videoContent = props.VideoContent
+	end
+
+	v4.VideoContent = videoContent
+	v4.Visible = state3.X > 0 and state3.Y > 0
+	v4[React.Change.Resolution] = v
+	v4[React.Event.Loaded] = v2
+	local corner
+
+	if props.cornerRadius then
+		corner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, props.cornerRadius)
 		})
-	})
+	end
+
+	local v5 = {
+		VideoFrame = createElement2("VideoFrame", v4, { Corner = corner }),
+		Shimmer = 0
+	}
+	local shimmer
+
+	if state2 ~= LoadingState.Finished then
+		shimmer = React.createElement(Skeleton, { Size = UDim2.fromScale(1, 1), ZIndex = 2 })
+	end
+
+	v5.Shimmer = shimmer
+	return createElement(View, v3, v5)
 end

@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local React = require(parent.React)
+
 local CreatorCreditBalanceChipView = require(script.Parent.CreatorCreditBalanceChipView)
 local useCreatorCreditBalanceChipViewModel = require(script.Parent.useCreatorCreditBalanceChipViewModel)
 
-local function CreatorCreditBalanceChipContainer() -- line: 9
-	-- upvalues: useCreatorCreditBalanceChipViewModel (copy), React (copy), CreatorCreditBalanceChipView (copy)
-	local v6 = useCreatorCreditBalanceChipViewModel()
-
-	return React.createElement(CreatorCreditBalanceChipView, v6)
+local function CreatorCreditBalanceChipContainer()
+	local v = useCreatorCreditBalanceChipViewModel()
+	return React.createElement(CreatorCreditBalanceChipView, v)
 end
 
 return CreatorCreditBalanceChipContainer

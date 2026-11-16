@@ -1,81 +1,132 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Roact = require(AuthCommonParent.Roact)
-local Immutable = require(AuthCommonParent.AppCommonLib).Immutable
-local Text = require(AuthCommonParent.AppCommonLib).Text
+local parent = AuthCommon.Parent
+
+local Roact = require(parent.Roact)
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
+local AppCommonLib2 = require(parent.AppCommonLib)
+local Text = AppCommonLib2.Text
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local FitChildren = require(AuthCommon.Components.FitChildren)
-local v7 = Roact.PureComponent:extend("FitTextLabel")
 
-v7.defaultProps = {
-	maxWidth = nil,
-	fitAxis = FitChildren.FitAxis.Height
-}
+local extended = Roact.PureComponent:extend("FitTextLabel")
 
-function v7.init(p1) -- line: 17
-	-- upvalues: FitChildren (copy), Text (copy)
-	function p1.onRef(p2) -- line: 18
-		-- upvalues: p1 (copy)
-		p1.ref = p2
+extended.defaultProps = { fitAxis = FitChildren.FitAxis.Height, maxWidth = nil }
+
+function extended:init()
+	function self.onRef(ref)
+		self.ref = ref
 	end
-	function p1.resize(p3) -- line: 22
-		-- upvalues: p1 (copy), FitChildren (copy), Text (copy)
-		local fitAxis = p1.props.fitAxis
-		local maxWidth = p1.props.maxWidth
+
+	function self.resize(data)
+		local fitAxis = self.props.fitAxis
+		local maxWidth = self.props.maxWidth
 
 		if fitAxis == FitChildren.FitAxis.Width or fitAxis == FitChildren.FitAxis.Both then
-			local uDim = UDim.new(0, Text.GetTextWidth(p3.Text, p3.Font, p3.TextSize))
-			local uDim2
+			local v
 
-			if maxWidth ~= nil and maxWidth < uDim.Offset then
-				uDim = UDim.new(0, maxWidth)
-				uDim2 = UDim.new(0, Text.GetTextHeight(p3.Text, p3.Font, p3.TextSize, uDim.Offset))
+			if FoundationFontFaceMigration then
+				v = GetTextSize(data.Text, data.TextSize, data.FontFace, Vector2.new(10000, 10000)).X
 			else
-				uDim2 = fitAxis == FitChildren.FitAxis.Both and UDim.new(0, p3.TextSize) or p3.Size.Height
+				v = Text.GetTextWidth(data.Text, data.Font, data.TextSize)
 			end
 
-			p1:setState({
-				width = uDim,
-				height = uDim2
-			})
+			local udim = UDim.new(0, v)
+			local udim2
 
-			return
+			if maxWidth == nil or not (maxWidth < udim.Offset) then
+				udim2 = fitAxis == FitChildren.FitAxis.Both and UDim.new(0, data.TextSize) or data.Size.Height
+			else
+				udim = UDim.new(0, maxWidth)
+				local v2
+
+				if FoundationFontFaceMigration then
+					v2 = GetTextSize(data.Text, data.TextSize, data.FontFace, Vector2.new(udim.Offset, 10000)).Y
+				else
+					v2 = Text.GetTextHeight(data.Text, data.Font, data.TextSize, udim.Offset)
+				end
+
+				udim2 = UDim.new(0, v2)
+			end
+
+			self:setState({ width = udim, height = udim2 })
+		else
+			local v
+
+			if FoundationFontFaceMigration then
+				v = GetTextSize(data.Text, data.TextSize, data.FontFace, Vector2.new(data.AbsoluteSize.X, 10000)).Y
+			else
+				v = Text.GetTextHeight(data.Text, data.Font, data.TextSize, data.AbsoluteSize.X)
+			end
+
+			local udim = UDim.new(0, v)
+
+			self:setState({ width = data.Size.Width, height = udim })
 		end
-
-		local uDim = UDim.new(0, Text.GetTextHeight(p3.Text, p3.Font, p3.TextSize, p3.AbsoluteSize.X))
-
-		p1:setState({
-			width = p3.Size.Width,
-			height = uDim
-		})
 	end
 
-	p1:setState({
-		width = nil,
-		height = nil
-	})
+	self:setState({ width = nil, height = nil })
 end
-function v7.render(p4) -- line: 62
-	-- upvalues: FitChildren (copy), Immutable (copy), Roact (copy)
-	local v10 = p4.props.fitAxis or FitChildren.FitAxis.Height
-	local v11 = Immutable.RemoveFromDictionary(p4.props, "fitAxis", "maxWidth")
-	local width = p4.state.width
-	local height = p4.state.height
+
+function extended.render(props)
+	local fitAxis = props.props.fitAxis or FitChildren.FitAxis.Height
+	local v
+
+	if FoundationFontFaceMigration then
+		v = Immutable.RemoveFromDictionary(props.props, "fitAxis", "maxWidth", "Font", "FontFace")
+	else
+		v = Immutable.RemoveFromDictionary(props.props, "fitAxis", "maxWidth")
+	end
+
+	local width = props.state.width
+	local height = props.state.height
 
 	if width and height then
-		v11 = Immutable.JoinDictionaries(v11, {
-			Size = UDim2.new(width, height)
-		})
+		v = Immutable.JoinDictionaries(v, { Size = UDim2.new(width, height) })
 	end
 
-	return Roact.createElement("TextLabel", Immutable.JoinDictionaries(v11, {
-		[Roact.Ref] = p4.onRef,
-		[Roact.Change.Text] = p4.resize,
-		[Roact.Change.TextSize] = p4.resize,
-		[Roact.Change.AbsoluteSize] = v10 == FitChildren.FitAxis.Height and p4.resize or nil
+	if FoundationFontFaceMigration then
+		local createElement = Roact.createElement
+
+		local joinDictionaries = Immutable.JoinDictionaries
+		local fontFace
+
+		if props.props.FontFace or props.props.Font then
+			fontFace = normalizeFontFace(props.props.FontFace or props.props.Font)
+		end
+
+		local v2 = {
+			[Roact.Ref] = props.onRef,
+			[Roact.Change.Text] = props.resize,
+			[Roact.Change.TextSize] = props.resize
+		}
+		local absoluteSize = Roact.Change.AbsoluteSize
+		local v3
+
+		if fitAxis == FitChildren.FitAxis.Height then
+			v3 = props.resize or nil
+		end
+
+		v2[absoluteSize] = v3
+		v2[Roact.Change.FontFace] = props.resize
+		return createElement("TextLabel", joinDictionaries(v, { FontFace = fontFace }, v2))
+	end
+
+	return Roact.createElement("TextLabel", Immutable.JoinDictionaries(v, {
+		[Roact.Ref] = props.onRef,
+		[Roact.Change.Text] = props.resize,
+		[Roact.Change.TextSize] = props.resize,
+		[Roact.Change.AbsoluteSize] = fitAxis == FitChildren.FitAxis.Height and props.resize or nil
 	}))
 end
-function v7.didMount(p5) -- line: 85
-	p5.resize(p5.ref)
+
+function extended.didMount(p)
+	p.resize(p.ref)
 end
 
-return v7
+return extended

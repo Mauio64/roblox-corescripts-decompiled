@@ -1,4 +1,1 @@
-return {
-	EvenlyDistributed = "EvenlyDistributed",
-	Left = "Left"
-}
+return { EvenlyDistributed = "EvenlyDistributed", Left = "Left" }

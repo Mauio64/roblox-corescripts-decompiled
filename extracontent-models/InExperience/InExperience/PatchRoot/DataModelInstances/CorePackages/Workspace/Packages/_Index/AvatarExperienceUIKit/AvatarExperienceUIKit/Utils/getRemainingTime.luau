@@ -1,58 +1,54 @@
-local function convertSecondsToTimeFrames(n1: number) -- line: 33
-	if n1 >= 86400 then
+local function convertSecondsToTimeFrames(secondsRemaining: number)
+	if secondsRemaining >= 86400 then
 		return {
+			value = math.floor(secondsRemaining / 86400),
 			unit = "days",
-			value = math.floor(n1 / 86400),
-			secondsRemaining = n1
+			secondsRemaining = secondsRemaining
 		}
 	end
 
-	if n1 >= 3600 then
+	if secondsRemaining >= 3600 then
 		return {
+			value = math.floor(secondsRemaining / 3600),
 			unit = "hours",
-			value = math.floor(n1 / 3600),
-			secondsRemaining = n1
+			secondsRemaining = secondsRemaining
 		}
 	end
 
-	if n1 >= 60 then
+	if secondsRemaining >= 60 then
 		return {
+			value = math.floor(secondsRemaining / 60),
 			unit = "minutes",
-			value = math.floor(n1 / 60),
-			secondsRemaining = n1
+			secondsRemaining = secondsRemaining
 		}
 	end
 
 	return {
+		value = math.floor(secondsRemaining),
 		unit = "seconds",
-		value = math.floor(n1),
-		secondsRemaining = n1
+		secondsRemaining = secondsRemaining
 	}
 end
-local function getRemainingTime(s1: string?, p1) -- line: 61
-	-- upvalues: convertSecondsToTimeFrames (copy)
-	if not s1 then
+
+local function getRemainingTime(p: string?, p2)
+	if not p then
 		return nil
 	end
 
-	local dateTime = DateTime.fromIsoDate(s1)
+	local dateTime = DateTime.fromIsoDate(p)
 
 	if not dateTime then
 		return nil
 	end
 
-	local v7 = p1 or DateTime.now()
-	local v8 = dateTime.UnixTimestamp - v7.UnixTimestamp
+	local v = p2 or DateTime.now()
+	local secondsRemaining = dateTime.UnixTimestamp - v.UnixTimestamp
 
-	if v8 <= 0 then
-		return {
-			value = -1,
-			unit = "seconds",
-			secondsRemaining = v8
-		}
+	if secondsRemaining <= 0 then
+		return { value = -1, unit = "seconds", secondsRemaining = secondsRemaining }
 	end
 
-	return (convertSecondsToTimeFrames(v8))
+	return convertSecondsToTimeFrames(secondsRemaining)
 end
 
 return getRemainingTime

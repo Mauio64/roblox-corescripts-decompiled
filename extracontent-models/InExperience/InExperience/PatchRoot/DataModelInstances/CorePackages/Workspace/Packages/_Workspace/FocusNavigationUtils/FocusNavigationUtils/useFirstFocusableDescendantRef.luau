@@ -1,85 +1,55 @@
-local Parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
+local React = require(parent.React)
 local getFirstFocusableDescendant = require(script.Parent.getFirstFocusableDescendant)
 
-local function safeDisconnect(p1) -- line: 6
-	if p1 then
-		p1:Disconnect()
+local function safeDisconnect(connection) -- 5 equivalent calls inferred from this helper
+	if connection then
+		connection:Disconnect()
 	end
 end
-local function useFirstFocusableDescendantRef(p2) -- line: 23
-	-- upvalues: React (copy), getFirstFocusableDescendant (copy)
-	local v8 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 26
-		-- upvalues: getFirstFocusableDescendant (copy), v8 (copy), p2 (copy)
-		local connection = nil
-		local connection2 = nil
-		local connection3 = nil
+local function useFirstFocusableDescendantRef(instance)
+	local ref = React.useRef(nil)
 
-		local function updateFirstFocusable(p3) -- line: 31
-			-- upvalues: connection (ref), connection3 (ref), getFirstFocusableDescendant (copy), updateFirstFocusable (copy), v8 (copy)
-			local v14 = connection
+	React.useEffect(function()
+		local selectableChangedConnection = nil
+		local descendantAddedConnection = nil
+		local ancestryChangedConnection = nil
+		local function updateFirstFocusable(instance2)
+			safeDisconnect(selectableChangedConnection) -- inferred equivalent call
+			safeDisconnect(ancestryChangedConnection) -- inferred equivalent call
+			local firstFocusableDescendant = getFirstFocusableDescendant(instance2)
 
-			if v14 then
-				v14:Disconnect()
-			end
-
-			local v15 = connection3
-
-			if v15 then
-				v15:Disconnect()
-			end
-
-			local v16 = getFirstFocusableDescendant(p3)
-
-			if v16 then
-				connection = v16:GetPropertyChangedSignal("Selectable"):Connect(function() -- line: 38
-					-- upvalues: updateFirstFocusable (copy), p3 (copy)
-					updateFirstFocusable(p3)
+			if firstFocusableDescendant then
+				selectableChangedConnection = firstFocusableDescendant:GetPropertyChangedSignal("Selectable"):Connect(function()
+					updateFirstFocusable(instance2)
 				end)
-				connection3 = v16.AncestryChanged:Connect(function() -- line: 42
-					-- upvalues: updateFirstFocusable (copy), p3 (copy)
-					updateFirstFocusable(p3)
+
+				ancestryChangedConnection = firstFocusableDescendant.AncestryChanged:Connect(function()
+					updateFirstFocusable(instance2)
 				end)
 			end
 
-			v8.current = v16
+			ref.current = firstFocusableDescendant
 		end
 
-		if p2 then
-			updateFirstFocusable(p2)
-			connection2 = p2.DescendantAdded:Connect(function() -- line: 51
-				-- upvalues: updateFirstFocusable (copy), p2 (copy)
-				updateFirstFocusable(p2)
+		if instance then
+			updateFirstFocusable(instance)
+			descendantAddedConnection = instance.DescendantAdded:Connect(function()
+				updateFirstFocusable(instance)
 			end)
 		else
-			v8.current = nil
+			ref.current = nil
 		end
 
-		return function() -- line: 58
-			-- upvalues: connection (ref), connection2 (ref), connection3 (ref)
-			local v17 = connection
-
-			if v17 then
-				v17:Disconnect()
-			end
-
-			local v18 = connection2
-
-			if v18 then
-				v18:Disconnect()
-			end
-
-			local v19 = connection3
-
-			if v19 then
-				v19:Disconnect()
-			end
+		return function()
+			safeDisconnect(selectableChangedConnection) -- inferred equivalent call
+			safeDisconnect(descendantAddedConnection) -- inferred equivalent call
+			safeDisconnect(ancestryChangedConnection) -- inferred equivalent call
 		end
-	end, { p2 })
+	end, { instance })
 
-	return v8
+	return ref
 end
 
 return useFirstFocusableDescendantRef

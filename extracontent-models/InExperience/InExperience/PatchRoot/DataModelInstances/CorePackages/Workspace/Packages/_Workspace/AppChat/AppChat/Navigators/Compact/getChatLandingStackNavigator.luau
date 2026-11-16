@@ -1,25 +1,33 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local RoactNavigation = require(AppChatParent.RoactNavigation)
+local parent = AppChat.Parent
+
+local RoactNavigation = require(parent.RoactNavigation)
 local chatLandingStackNavigatorScreens = require(script.Parent.chatLandingStackNavigatorScreens)
+
 local FFlagAppChatDisableAbsorbInputSelectable = require(AppChat.Flags.FFlagAppChatDisableAbsorbInputSelectable)
 
-local function instantTransitionConfig() -- line: 10
+local function instantTransitionConfig()
 	return {
-		transitionSpec = {
-			frequency = 1000000,
-			dampingRatio = 1
-		}
+		transitionSpec = { frequency = 1000000, dampingRatio = 1 }
 	}
 end
-local function getChatLandingStackNavigator(p1) -- line: 19
-	-- upvalues: RoactNavigation (copy), chatLandingStackNavigatorScreens (copy), FFlagAppChatDisableAbsorbInputSelectable (copy), instantTransitionConfig (copy)
-	return RoactNavigation.createRobloxStackNavigator(chatLandingStackNavigatorScreens, {
-		defaultNavigationOptions = if not FFlagAppChatDisableAbsorbInputSelectable then nil else {
+
+local function getChatLandingStackNavigator(p)
+	local createRobloxStackNavigator = RoactNavigation.createRobloxStackNavigator
+	local v = {
+		defaultNavigationOptions = FFlagAppChatDisableAbsorbInputSelectable and {
 			absorbInputSelectable = false
-		},
-		transitionConfig = if not p1 then nil else instantTransitionConfig
-	})
+		} or nil,
+		transitionConfig = 0
+	}
+	local transitionConfig
+
+	if p then
+		transitionConfig = instantTransitionConfig
+	end
+
+	v.transitionConfig = transitionConfig
+	return createRobloxStackNavigator(chatLandingStackNavigatorScreens, v)
 end
 
 return getChatLandingStackNavigator

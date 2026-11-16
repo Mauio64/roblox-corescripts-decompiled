@@ -1,17 +1,16 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
 local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
 
-local function parseDevProductPurchaseError(p1) -- line: 6
-	-- upvalues: PurchaseError (copy)
-	if PurchaseError.isMember(p1) then
-		return p1
+local function parseDevProductPurchaseError(p)
+	if PurchaseError.isMember(p) then
+		return p
 	end
 
-	if type(p1) == "table" and p1.errorCode == "PendingProductsLimitExceeded" then
+	if type(p) == "table" and p.errorCode == "PendingProductsLimitExceeded" then
 		return PurchaseError.PendingProductsLimitExceeded
 	end
 
-	return p1
+	return p
 end
 
 return parseDevProductPurchaseError

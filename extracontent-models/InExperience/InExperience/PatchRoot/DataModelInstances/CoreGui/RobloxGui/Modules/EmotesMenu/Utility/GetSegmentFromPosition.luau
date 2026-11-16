@@ -1,26 +1,26 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
 
-local function GetSegmentIndexFromPosition(p1) -- line: 6
-	-- upvalues: Constants (copy)
-	local v5 = math.deg((math.atan2(p1.X, p1.Y)))
+local Constants = require(parent.Constants)
 
-	if v5 < 0 then
-		v5 += 360
+local function GetSegmentIndexFromPosition(p)
+	local v = math.deg((math.atan2(p.X, p.Y)))
+
+	if v < 0 then
+		v += 360
 	end
 
-	local v6 = 360 / Constants.EmotesPerPage
-	local v7 = math.ceil(math.ceil(math.fmod(v5 + math.ceil(v6 / 2), 360) / v6) + (Constants.SegmentsStartRotation + 90) / v6)
+	local v2 = 360 / Constants.EmotesPerPage
+	local v3 = math.ceil(math.ceil(math.fmod(v + math.ceil(v2 / 2), 360) / v2) + (Constants.SegmentsStartRotation + 90) / v2)
 
-	if v7 > Constants.EmotesPerPage then
-		return v7 - Constants.EmotesPerPage
+	if Constants.EmotesPerPage < v3 then
+		return v3 - Constants.EmotesPerPage
 	end
 
-	if v7 < 1 then
-		v7 += Constants.EmotesPerPage
+	if v3 < 1 then
+		return v3 + Constants.EmotesPerPage
 	end
 
-	return v7
+	return v3
 end
 
 return GetSegmentIndexFromPosition

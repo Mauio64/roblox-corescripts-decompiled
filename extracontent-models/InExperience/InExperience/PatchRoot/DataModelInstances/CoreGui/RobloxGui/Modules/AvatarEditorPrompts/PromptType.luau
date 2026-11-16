@@ -1,6 +1,7 @@
 local CorePackages = game:GetService("CorePackages")
+local enumerate = require(CorePackages.Packages.enumerate)
 
-return require(CorePackages.Packages.enumerate)("PromptType", {
+return enumerate("PromptType", {
 	"AllowInventoryReadAccess",
 	"SaveAvatar",
 	"CreateOutfit",

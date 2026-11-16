@@ -1,28 +1,38 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Rodux = require(AppChatParent.Rodux)
+local parent = AppChat.Parent
+local Rodux = require(parent.Rodux)
 
-require(AppChatParent.SocialCommon)
+local SocialCommon = require(parent.SocialCommon)
 
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local FFlagAppChatTTIStaleGuard = require(AppChat.Flags.FFlagAppChatTTIStaleGuard)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSharedChatEntryPointAction = SharedFlags.FFlagSharedChatEntryPointAction
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
-local u6 = false
 
-return Rodux.makeActionCreator(script.Name, function(p1) -- line: 16
-	-- upvalues: FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), u6 (ref)
+if FFlagSharedChatEntryPointAction then
+	return SocialCommon.Actions.EnteredChatFromEntryPoint
+end
+
+local v = false
+
+return Rodux.makeActionCreator(script.Name, function(entryPoint)
 	if FFlagAppChatPerfTracking then
-		if p1 == nil then
+		if entryPoint == nil then
 			AppChatPerfTracker.cancel(AppChatPerfTracker.Events.ChatLandingTTI, {})
+
+			if FFlagAppChatTTIStaleGuard then
+				AppChatPerfTracker.cancel(AppChatPerfTracker.Events.ChatConversationTTI, {})
+			end
 		else
 			AppChatPerfTracker.start(AppChatPerfTracker.Events.ChatLandingTTI, {
-				entryPoint = p1,
-				coldStart = not u6
+				entryPoint = entryPoint,
+				coldStart = not v
 			})
-			u6 = true
+
+			v = true
 		end
 	end
 
-	return {
-		entryPoint = p1
-	}
+	return { entryPoint = entryPoint }
 end)

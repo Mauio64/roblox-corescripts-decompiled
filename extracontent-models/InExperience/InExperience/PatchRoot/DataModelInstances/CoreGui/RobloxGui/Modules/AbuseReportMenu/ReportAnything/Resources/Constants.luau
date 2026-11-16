@@ -1,15 +1,7 @@
 return {
 	EnableCategoryListing = true,
-	InputType = {
-		MouseAndKeyboard = "MouseAndKeyboard",
-		Touch = "Touch",
-		Gamepad = "Gamepad"
-	},
-	ReportType = {
-		Any = "Any",
-		Place = "Place",
-		Player = "Player"
-	},
+	InputType = { MouseAndKeyboard = "MouseAndKeyboard", Touch = "Touch", Gamepad = "Gamepad" },
+	ReportType = { Any = "Any", Place = "Place", Player = "Player" },
 	Category = {
 		None = "",
 		Voice = "Voice",
@@ -37,13 +29,7 @@ return {
 		ReportFlowAdvance = "ingame_menu_report_advance_to_form"
 	},
 	Session = {
-		StructuralIdentifier = {
-			Level1 = "level1",
-			AbuseReport = "AbuseReport"
-		},
-		Metadata = {
-			EntryPoint = "entryPoint",
-			DeleteOnGameLeave = "_deleteOnGameLeave"
-		}
+		StructuralIdentifier = { Level1 = "level1", AbuseReport = "AbuseReport" },
+		Metadata = { EntryPoint = "entryPoint", DeleteOnGameLeave = "_deleteOnGameLeave" }
 	}
 }

@@ -1,65 +1,66 @@
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local Modules = CoreGui.RobloxGui.Modules
-local IXPServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper
+local IxpServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper)
+local IXPServiceWrapper = IxpServiceWrapper.IXPServiceWrapper
+
 local GetFStringInExperienceNotificationsLayer = require(Modules.Flags.GetFStringInExperienceNotificationsLayer)
+
 local GetFFlagEnableNewInviteMenuIXP = require(Modules.Flags.GetFFlagEnableNewInviteMenuIXP)
-local GetFFlagInviteListRerank = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagInviteListRerank
-local t1 = {}
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagInviteListRerank = SharedFlags.GetFFlagInviteListRerank
 
-t1.__index = t1
+local NewInviteMenuExperimentManager = {}
+NewInviteMenuExperimentManager.__index = NewInviteMenuExperimentManager
 
-function t1.new(p1) -- line: 20
-	-- upvalues: IXPServiceWrapper (copy), GetFFlagInviteListRerank (copy), t1 (copy)
-	local t2 = {
+function NewInviteMenuExperimentManager.new(p)
+	local v = {
+		_ixpServiceWrapper = p or IXPServiceWrapper,
 		_styleEnabled = false,
 		_customizationEnabled = false,
 		_newSendEndpointEnabled = false,
-		_ixpServiceWrapper = p1 or IXPServiceWrapper,
-		_inviteListSortOrder = if not GetFFlagInviteListRerank() then nil else 0
+		_inviteListSortOrder = GetFFlagInviteListRerank() and 0 or nil
 	}
 
-	setmetatable(t2, t1)
+	setmetatable(v, NewInviteMenuExperimentManager)
+	return v
+end
 
-	return t2
+function NewInviteMenuExperimentManager:getStyleEnabled()
+	return self._styleEnabled
 end
-function t1.getStyleEnabled(p2) -- line: 32
-	return p2._styleEnabled
+
+function NewInviteMenuExperimentManager:getCustomizationEnabled()
+	return self._customizationEnabled
 end
-function t1.getCustomizationEnabled(p3) -- line: 36
-	return p3._customizationEnabled
-end
-function t1.getNewSendEndpointEnabled(p4) -- line: 40
-	return p4._newSendEndpointEnabled
+
+function NewInviteMenuExperimentManager:getNewSendEndpointEnabled()
+	return self._newSendEndpointEnabled
 end
 
 if GetFFlagInviteListRerank() then
-	function t1.getInviteListSortOrder(p5) -- line: 45
-		return p5._inviteListSortOrder
+	function NewInviteMenuExperimentManager:getInviteListSortOrder()
+		return self._inviteListSortOrder
 	end
 end
 
-function t1.initialize(p6) -- line: 50
-	-- upvalues: GetFFlagEnableNewInviteMenuIXP (copy), GetFStringInExperienceNotificationsLayer (copy), GetFFlagInviteListRerank (copy)
+function NewInviteMenuExperimentManager:initialize()
 	if not GetFFlagEnableNewInviteMenuIXP() then
 		return
 	end
 
-	task.spawn(function() -- line: 55
-		-- upvalues: p6 (copy), GetFStringInExperienceNotificationsLayer (copy), GetFFlagInviteListRerank (copy)
-		p6._ixpServiceWrapper:WaitForInitialization()
+	task.spawn(function()
+		self._ixpServiceWrapper:WaitForInitialization()
+		local layerData = self._ixpServiceWrapper:GetLayerData(GetFStringInExperienceNotificationsLayer())
 
-		local LayerData = p6._ixpServiceWrapper:GetLayerData(GetFStringInExperienceNotificationsLayer())
-
-		if LayerData then
-			p6._styleEnabled = LayerData.NewInviteMenuStyleEnabled or false
-			p6._customizationEnabled = LayerData.NewInviteMenuCustomizationEnabled or false
-			p6._newSendEndpointEnabled = LayerData.NewInviteMenuEndpointEnabled or false
-			p6._inviteListSortOrder = if not GetFFlagInviteListRerank() then nil else LayerData.invite_list_sort_order or 0
+		if layerData then
+			self._styleEnabled = layerData.NewInviteMenuStyleEnabled or false
+			self._customizationEnabled = layerData.NewInviteMenuCustomizationEnabled or false
+			self._newSendEndpointEnabled = layerData.NewInviteMenuEndpointEnabled or false
+			self._inviteListSortOrder = GetFFlagInviteListRerank() and (layerData.invite_list_sort_order or 0) or nil
 		end
 	end)
 end
 
-t1.default = t1.new()
-
-return t1
+NewInviteMenuExperimentManager.default = NewInviteMenuExperimentManager.new()
+return NewInviteMenuExperimentManager

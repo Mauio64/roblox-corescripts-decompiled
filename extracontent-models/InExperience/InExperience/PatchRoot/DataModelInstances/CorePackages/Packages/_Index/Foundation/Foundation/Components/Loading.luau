@@ -1,1 +1,3 @@
-return (require(script.Loading))
+local Loading = require(script.Loading)
+
+return Loading

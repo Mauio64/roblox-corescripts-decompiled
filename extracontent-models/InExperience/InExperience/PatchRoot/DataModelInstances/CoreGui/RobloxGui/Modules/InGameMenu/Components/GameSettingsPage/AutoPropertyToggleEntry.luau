@@ -1,15 +1,20 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
-local ParentParent = script.Parent.Parent.Parent
-local ExternalEventConnection = require(ParentParent.Utility.ExternalEventConnection)
-local ToggleEntry = require(script.Parent.ToggleEntry)
-local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
-local Constants = require(ParentParent.Resources.Constants)
-local v10 = Roact.PureComponent:extend("AutoPropertyToggleEntry")
 
-v10.validateProps = t.strictInterface({
+local parent = script.Parent.Parent.Parent
+
+local ExternalEventConnection = require(parent.Utility.ExternalEventConnection)
+
+local ToggleEntry = require(script.Parent.ToggleEntry)
+
+local SendAnalytics = require(parent.Utility.SendAnalytics)
+local Constants = require(parent.Resources.Constants)
+
+local extended = Roact.PureComponent:extend("AutoPropertyToggleEntry")
+extended.validateProps = t.strictInterface({
 	instance = t.Instance,
 	valueKey = t.string,
 	lockedToOff = t.optional(t.boolean),
@@ -20,7 +25,8 @@ v10.validateProps = t.strictInterface({
 	subtextEnabled = t.optional(t.boolean),
 	subtextKey = t.optional(t.string)
 })
-v10.defaultProps = {
+
+extended.defaultProps = {
 	onValue = true,
 	offValue = false,
 	lockedToOff = false,
@@ -28,57 +34,53 @@ v10.defaultProps = {
 	subtextKey = ""
 }
 
-function v10.init(p1, p2) -- line: 37
-	-- upvalues: SendAnalytics (copy), Constants (copy)
-	local v13 = p2.instance[p2.valueKey]
+function extended:init(data)
+	local v = data.instance[data.valueKey]
+	self.changeEvent = data.instance:GetPropertyChangedSignal(data.valueKey)
 
-	p1.changeEvent = p2.instance:GetPropertyChangedSignal(p2.valueKey)
-	p1:setState({
-		checked = not p2.lockedToOff and v13 == p2.onValue
+	self:setState({
+		checked = not data.lockedToOff and v == data.onValue
 	})
 
-	function p1.onExternalChange() -- line: 45
-		-- upvalues: p2 (copy), p1 (copy)
-		local v16 = p2.instance[p2.valueKey]
-
-		p1:setState({
-			checked = v16 == p2.onValue
+	function self.onExternalChange()
+		self:setState({
+			checked = data.instance[data.valueKey] == data.onValue
 		})
 	end
-	function p1.onToggled() -- line: 52
-		-- upvalues: p1 (copy), p2 (copy), SendAnalytics (copy), Constants (copy)
-		if p1.props.lockedToOff then
+
+	function self.onToggled()
+		if self.props.lockedToOff then
 			return
 		end
 
-		if p2.instance[p2.valueKey] == p2.onValue then
-			p2.instance[p2.valueKey] = p2.offValue
+		if data.instance[data.valueKey] == data.onValue then
+			data.instance[data.valueKey] = data.offValue
 		else
-			p2.instance[p2.valueKey] = p2.onValue
+			data.instance[data.valueKey] = data.onValue
 		end
 
 		SendAnalytics(Constants.AnalyticsSettingsChangeName, nil, {}, true)
 	end
 end
-function v10.render(p3) -- line: 69
-	-- upvalues: Roact (copy), ToggleEntry (copy), ExternalEventConnection (copy)
-	local props = p3.props
+
+function extended.render(props)
+	local props2 = props.props
 
 	return Roact.createFragment({
 		Toggle = Roact.createElement(ToggleEntry, {
-			checked = p3.state.checked,
-			lockedToOff = props.lockedToOff,
-			labelKey = props.labelKey,
-			LayoutOrder = props.LayoutOrder,
-			onToggled = p3.onToggled,
-			subtextEnabled = props.subtextEnabled,
-			subtextKey = props.subtextKey
+			checked = props.state.checked,
+			lockedToOff = props2.lockedToOff,
+			labelKey = props2.labelKey,
+			LayoutOrder = props2.LayoutOrder,
+			onToggled = props.onToggled,
+			subtextEnabled = props2.subtextEnabled,
+			subtextKey = props2.subtextKey
 		}),
 		Listener = Roact.createElement(ExternalEventConnection, {
-			event = p3.changeEvent,
-			callback = p3.onExternalChange
+			event = props.changeEvent,
+			callback = props.onExternalChange
 		})
 	})
 end
 
-return v10
+return extended

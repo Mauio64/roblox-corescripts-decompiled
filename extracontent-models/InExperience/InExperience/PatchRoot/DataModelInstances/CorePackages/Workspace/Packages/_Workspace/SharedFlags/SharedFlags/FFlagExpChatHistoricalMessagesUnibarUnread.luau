@@ -1,0 +1,2 @@
+return game:DefineFastFlag("ExpChatHistoricalMessagesUnibarUnread", false)
+	and require(script.Parent.FFlagExpChatRenderHistoricalMessages)

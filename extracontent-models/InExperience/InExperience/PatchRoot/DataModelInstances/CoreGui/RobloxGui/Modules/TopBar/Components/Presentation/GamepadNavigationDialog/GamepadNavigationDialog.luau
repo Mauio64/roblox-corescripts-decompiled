@@ -1,223 +1,349 @@
 local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
-
 game:GetService("LocalizationService")
-
 local ContextActionService = game:GetService("ContextActionService")
+
 local React = require(CorePackages.Packages.React)
 local UIBlox = require(CorePackages.Packages.UIBlox)
-local useDesignTokens = require(CorePackages.Workspace.Packages.Style).useDesignTokens
-local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local Style = require(CorePackages.Workspace.Packages.Style)
+local useDesignTokens = Style.useDesignTokens
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local TopBar = script:FindFirstAncestor("TopBar")
-local default = require(TopBar.Analytics).default
+local Analytics = require(TopBar.Analytics)
+local default = Analytics.default
 
 require(TopBar.TokenMappers.MenuNavigationPromptTokenMapper)
 
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local t1 = {
+
+local v = {
 	ButtonSelect = "CoreScripts.InGameMenu.Label.ViewButton",
 	ButtonTouchpad = "CoreScripts.InGameMenu.Label.TouchpadButton",
 	ButtonShare = "CoreScripts.InGameMenu.Label.ShareButton"
 }
 
-local function HeaderArea() -- line: 42
-	-- upvalues: useDesignTokens (copy), useLocalization (copy), React (copy)
-	local MenuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
-	local Typography = MenuNavigationPrompt.Typography
-	local MenuNavigationPromptColor = MenuNavigationPrompt.Color
-	local Space = MenuNavigationPrompt.Space
-	local v21 = useLocalization({
+local function HeaderArea()
+	local menuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
+	local typography = menuNavigationPrompt.Typography
+	local color = menuNavigationPrompt.Color
+	local space = menuNavigationPrompt.Space
+
+	local v2 = useLocalization({
 		HeaderText = "CoreScripts.InGameMenu.EducationalPopup.UINavigation.Title"
 	})
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v3 = {
+		AutomaticSize = Enum.AutomaticSize.XY,
 		LayoutOrder = 0,
+		BackgroundTransparency = 1
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		Text = v2.HeaderText,
 		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY
-	}, {
-		Header = React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			Text = v21.HeaderText,
-			Font = Typography.header.Font,
-			TextSize = Typography.header.FontSize,
-			TextColor3 = MenuNavigationPromptColor.textColor.Color3,
-			Size = UDim2.fromOffset(0, 0),
-			AutomaticSize = Enum.AutomaticSize.XY,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center
-		}),
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextColor3 = 0,
+		Size = 0,
+		AutomaticSize = 0,
+		TextXAlignment = 0,
+		TextYAlignment = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = typography.header.Font
+	end
+
+	v4.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(typography.header.Font)
+	end
+
+	v4.FontFace = fontFace
+	v4.TextSize = typography.header.FontSize
+	v4.TextColor3 = color.textColor.Color3
+	v4.Size = UDim2.fromOffset(0, 0)
+	v4.AutomaticSize = Enum.AutomaticSize.XY
+	v4.TextXAlignment = Enum.TextXAlignment.Center
+	v4.TextYAlignment = Enum.TextYAlignment.Center
+	return createElement("Frame", v3, {
+		Header = createElement2("TextLabel", v4),
 		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, Space.titlePadding),
-			PaddingBottom = UDim.new(0, Space.titlePadding),
-			PaddingLeft = UDim.new(0, Space.bodyPadding),
-			PaddingRight = UDim.new(0, Space.bodyPadding)
+			PaddingTop = UDim.new(0, space.titlePadding),
+			PaddingBottom = UDim.new(0, space.titlePadding),
+			PaddingLeft = UDim.new(0, space.bodyPadding),
+			PaddingRight = UDim.new(0, space.bodyPadding)
 		})
 	})
 end
-local function GamepadImageArea() -- line: 78
-	-- upvalues: useDesignTokens (copy), UserInputService (copy), t1 (copy), useLocalization (copy), React (copy)
-	local MenuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
-	local Typography = MenuNavigationPrompt.Typography
-	local MenuNavigationPromptColor = MenuNavigationPrompt.Color
-	local MenuNavigationPromptSize = MenuNavigationPrompt.Size
-	local Space = MenuNavigationPrompt.Space
-	local v27 = t1[UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonSelect)] or "CoreScripts.InGameMenu.Label.ViewButton"
-	local v28 = useLocalization({
-		ButtonLabelText = v27
-	})
-	local ImageForKeyCode = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
 
-	return React.createElement("Frame", {
+local function GamepadImageArea()
+	local menuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
+	local typography = menuNavigationPrompt.Typography
+	local color = menuNavigationPrompt.Color
+	local size = menuNavigationPrompt.Size
+	local space = menuNavigationPrompt.Space
+
+	local v2 = useLocalization({
+		ButtonLabelText = v[UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonSelect)] or "CoreScripts.InGameMenu.Label.ViewButton"
+	})
+
+	local imageForKeyCode = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
+
+	local createElement = React.createElement
+	local v3 = {
 		BackgroundTransparency = 1,
 		LayoutOrder = 0,
 		AutomaticSize = Enum.AutomaticSize.XY
-	}, {
+	}
+	local children = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, Space.iconPadding)
+			Padding = UDim.new(0, space.iconPadding)
 		}),
-		ButtonLabelGroup = React.createElement("Frame", {
-			BackgroundTransparency = 1,
+		ButtonLabelGroup = 0,
+		ControllerImage = 0
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		LayoutOrder = 0
+	}
+
+	local v5 = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(0, space.iconPadding)
+		}),
+		Icon = React.createElement("ImageLabel", {
 			LayoutOrder = 0,
-			AutomaticSize = Enum.AutomaticSize.XY
-		}, {
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				Padding = UDim.new(0, Space.iconPadding)
-			}),
-			Icon = React.createElement("ImageLabel", {
-				LayoutOrder = 0,
-				BackgroundTransparency = 1,
-				Image = ImageForKeyCode,
-				Size = UDim2.fromOffset(MenuNavigationPromptSize.iconSize, MenuNavigationPromptSize.iconSize)
-			}),
-			ControllerButtonLabel = React.createElement("TextLabel", {
-				LayoutOrder = 100,
-				BackgroundTransparency = 1,
-				Text = v28.ButtonLabelText,
-				Font = Typography.label.Font,
-				TextSize = Typography.label.FontSize,
-				TextColor3 = MenuNavigationPromptColor.textColor.Color3,
-				Size = UDim2.fromOffset(0, 0),
-				AutomaticSize = Enum.AutomaticSize.XY,
-				TextXAlignment = Enum.TextXAlignment.Center,
-				TextYAlignment = Enum.TextYAlignment.Center
-			})
-		}),
-		ControllerImage = React.createElement("ImageLabel", {
-			Image = "rbxasset://textures/ui/Gamepad/ControllerSelect.png",
-			LayoutOrder = 100,
 			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1)
-		}, {
+			Image = imageForKeyCode,
+			Size = UDim2.fromOffset(size.iconSize, size.iconSize)
+		}),
+		ControllerButtonLabel = 0
+	}
+
+	local createElement3 = React.createElement
+	local v6 = {
+		Text = v2.ButtonLabelText,
+		LayoutOrder = 100,
+		BackgroundTransparency = 1,
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextColor3 = 0,
+		Size = 0,
+		AutomaticSize = 0,
+		TextXAlignment = 0,
+		TextYAlignment = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = typography.label.Font
+	end
+
+	v6.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(typography.label.Font)
+	end
+
+	v6.FontFace = fontFace
+	v6.TextSize = typography.label.FontSize
+	v6.TextColor3 = color.textColor.Color3
+	v6.Size = UDim2.fromOffset(0, 0)
+	v6.AutomaticSize = Enum.AutomaticSize.XY
+	v6.TextXAlignment = Enum.TextXAlignment.Center
+	v6.TextYAlignment = Enum.TextYAlignment.Center
+	v5.ControllerButtonLabel = createElement3("TextLabel", v6)
+	children.ButtonLabelGroup = createElement2("Frame", v4, v5)
+
+	children.ControllerImage = React.createElement(
+		"ImageLabel",
+		{
+			Image = "rbxasset://textures/ui/Gamepad/ControllerSelect.png",
+			Size = UDim2.fromScale(1, 1),
+			LayoutOrder = 100,
+			BackgroundTransparency = 1
+		},
+		{
 			UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
-				AspectRatio = MenuNavigationPromptSize.imageWidth / MenuNavigationPromptSize.imageHeight
+				AspectRatio = size.imageWidth / size.imageHeight
 			}),
 			UISizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(MenuNavigationPromptSize.imageWidth, MenuNavigationPromptSize.imageHeight),
-				MinSize = Vector2.new(MenuNavigationPromptSize.imageWidth * 0.5, MenuNavigationPromptSize.imageHeight * 0.5)
+				MaxSize = Vector2.new(size.imageWidth, size.imageHeight),
+				MinSize = Vector2.new(size.imageWidth * 0.5, size.imageHeight * 0.5)
 			})
-		})
-	})
+		}
+	)
+	return createElement("Frame", v3, children)
 end
-local function Body(t2: {[any]: any}) -- line: 154
-	-- upvalues: useDesignTokens (copy), UserInputService (copy), t1 (copy), useLocalization (copy), React (copy), GamepadImageArea (copy), Button (copy), ButtonType (copy)
-	local MenuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
-	local Typography = MenuNavigationPrompt.Typography
-	local MenuNavigationPromptColor = MenuNavigationPrompt.Color
-	local MenuNavigationPromptSize = MenuNavigationPrompt.Size
-	local Space = MenuNavigationPrompt.Space
-	local _ = t1[UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonSelect)] or "CoreScripts.InGameMenu.Label.ViewButton"
-	local v37 = useLocalization({
+
+local function Body(p)
+	local menuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
+	local typography = menuNavigationPrompt.Typography
+	local color = menuNavigationPrompt.Color
+	local size = menuNavigationPrompt.Size
+	local space = menuNavigationPrompt.Space
+
+	local _ = v[UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonSelect)]
+		or "CoreScripts.InGameMenu.Label.ViewButton"
+
+	local v2 = useLocalization({
 		OkText = "CoreScripts.InGameMenu.Ok",
 		Description = "CoreScripts.InGameMenu.EducationalPopup.UINavigation.Description"
 	})
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v3 = {
 		LayoutOrder = 200,
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY
-	}, {
+		AutomaticSize = Enum.AutomaticSize.XY,
+		BackgroundTransparency = 1
+	}
+
+	local children = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, Space.bodyPadding)
+			Padding = UDim.new(0, space.bodyPadding)
 		}),
 		Padding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, Space.bodyPadding),
-			PaddingRight = UDim.new(0, Space.bodyPadding),
-			PaddingTop = UDim.new(0, Space.bodyPadding),
-			PaddingBottom = UDim.new(0, Space.bodyPadding)
+			PaddingLeft = UDim.new(0, space.bodyPadding),
+			PaddingRight = UDim.new(0, space.bodyPadding),
+			PaddingTop = UDim.new(0, space.bodyPadding),
+			PaddingBottom = UDim.new(0, space.bodyPadding)
 		}),
 		GamepadImageArea = React.createElement(GamepadImageArea),
-		ImageDescription = React.createElement("TextLabel", {
-			LayoutOrder = 100,
-			BackgroundTransparency = 1,
-			TextWrapped = true,
-			Text = v37.Description,
-			Font = Typography.caption.Font,
-			TextSize = Typography.caption.FontSize,
-			TextColor3 = MenuNavigationPromptColor.textColor.Color3,
-			LineHeight = Typography.caption.LineHeight,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Center
-		}),
-		ConfirmationButton = React.createElement(Button, {
-			layoutOrder = 200,
-			buttonType = ButtonType.PrimarySystem,
-			size = UDim2.new(1, 0, 0, MenuNavigationPromptSize.buttonHeight),
-			text = v37.OkText,
-			onActivated = t2.onDismissed,
-			icon = if not t2.selectButtonDismissesGamepadNavigationDialog then nil else UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
-		})
-	})
+		ImageDescription = 0,
+		ConfirmationButton = 0
+	}
+	local createElement2 = React.createElement
+	local v4 = {
+		Text = v2.Description,
+		LayoutOrder = 100,
+		BackgroundTransparency = 1,
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextColor3 = 0,
+		TextWrapped = true,
+		LineHeight = 0,
+		Size = 0,
+		AutomaticSize = 0,
+		TextXAlignment = 0,
+		TextYAlignment = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = typography.caption.Font
+	end
+
+	v4.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(typography.caption.Font)
+	end
+
+	v4.FontFace = fontFace
+	v4.TextSize = typography.caption.FontSize
+	v4.TextColor3 = color.textColor.Color3
+
+	v4.LineHeight = typography.caption.LineHeight
+	v4.Size = UDim2.new(1, 0, 0, 0)
+	v4.AutomaticSize = Enum.AutomaticSize.Y
+	v4.TextXAlignment = Enum.TextXAlignment.Left
+	v4.TextYAlignment = Enum.TextYAlignment.Center
+	children.ImageDescription = createElement2("TextLabel", v4)
+
+	local createElement3 = React.createElement
+	local v5 = {
+		buttonType = ButtonType.PrimarySystem,
+		layoutOrder = 200,
+		size = UDim2.new(1, 0, 0, size.buttonHeight),
+		text = v2.OkText,
+		onActivated = p.onDismissed,
+		icon = 0
+	}
+	local icon
+
+	if p.selectButtonDismissesGamepadNavigationDialog then
+		icon = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonSelect)
+	end
+
+	v5.icon = icon
+	children.ConfirmationButton = createElement3(Button, v5)
+	return createElement("Frame", v3, children)
 end
-local function GamepadNavigationDialog(t3: {[any]: any}) -- line: 216
-	-- upvalues: useDesignTokens (copy), React (copy), default (copy), ContextActionService (copy), HeaderArea (copy), Body (copy)
-	local MenuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
-	local MenuNavigationPromptColor = MenuNavigationPrompt.Color
-	local MenuNavigationPromptSize = MenuNavigationPrompt.Size
-	local Space = MenuNavigationPrompt.Space
-	local MenuNavigationPromptRadius = MenuNavigationPrompt.Radius
 
-	React.useEffect(function() -- line: 224
-		-- upvalues: default (copy), ContextActionService (copy), t3 (copy)
+local function GamepadNavigationDialog(p)
+	local menuNavigationPrompt = useDesignTokens().LuaApps.MenuNavigationPrompt
+	local color = menuNavigationPrompt.Color
+	local size = menuNavigationPrompt.Size
+	local space = menuNavigationPrompt.Space
+	local radius = menuNavigationPrompt.Radius
+
+	React.useEffect(function()
 		default:onShowGamepadNavigationDialog()
-		ContextActionService:BindCoreAction("ConfirmBindComponentMapperTokenModule", function(_, p2, _) -- line: 228
-			-- upvalues: t3 (copy)
-			if p2 == Enum.UserInputState.End then
-				t3.onDismissed()
-			end
-		end, false, if not t3.selectButtonDismissesGamepadNavigationDialog then Enum.KeyCode.ButtonA else Enum.KeyCode.ButtonSelect)
 
-		return function() -- line: 239
-			-- upvalues: default (copy), ContextActionService (copy)
+		local function fn(_, p2, _)
+			if p2 == Enum.UserInputState.End then
+				p.onDismissed()
+			end
+		end
+
+		local v2
+
+		if p.selectButtonDismissesGamepadNavigationDialog then
+			v2 = Enum.KeyCode.ButtonSelect
+		else
+			v2 = Enum.KeyCode.ButtonA
+		end
+
+		ContextActionService:BindCoreAction("ConfirmBindComponentMapperTokenModule", fn, false, v2)
+
+		return function()
 			default:onDismissGamepadNavigationDialog()
 			ContextActionService:UnbindCoreAction("ConfirmBindComponentMapperTokenModule")
 		end
 	end)
 
 	return React.createElement("Frame", {
-		BackgroundColor3 = MenuNavigationPromptColor.backgroundUiColor.Color3,
-		BackgroundTransparency = MenuNavigationPromptColor.backgroundUiColor.Transparency,
+		BackgroundColor3 = color.backgroundUiColor.Color3,
+		BackgroundTransparency = color.backgroundUiColor.Transparency,
 		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.fromScale(MenuNavigationPromptSize.promptWidth / MenuNavigationPromptSize.displayWidth, 0),
+		Size = UDim2.fromScale(size.promptWidth / size.displayWidth, 0),
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	}, {
 		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, MenuNavigationPromptRadius.cornerRadius)
+			CornerRadius = UDim.new(0, radius.cornerRadius)
 		}),
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
@@ -228,15 +354,15 @@ local function GamepadNavigationDialog(t3: {[any]: any}) -- line: 216
 		HeaderArea = React.createElement(HeaderArea),
 		Separator = React.createElement("Frame", {
 			LayoutOrder = 100,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, -2 * Space.bodyPadding, 0, 1),
-			BackgroundColor3 = MenuNavigationPromptColor.separatorColor.Color3,
-			BackgroundTransparency = MenuNavigationPromptColor.separatorColor.Transparency
+			Size = UDim2.new(1, -2 * space.bodyPadding, 0, 1),
+			BackgroundColor3 = color.separatorColor.Color3,
+			BackgroundTransparency = color.separatorColor.Transparency,
+			BorderSizePixel = 0
 		}),
-		Body = React.createElement(Body, t3),
+		Body = React.createElement(Body, p),
 		UISizeConstraint = React.createElement("UISizeConstraint", {
 			MaxSize = Vector2.new(1e999, 1e999),
-			MinSize = Vector2.new(MenuNavigationPromptSize.imageWidth + 2 * Space.bodyPadding, 1)
+			MinSize = Vector2.new(size.imageWidth + 2 * space.bodyPadding, 1)
 		})
 	})
 end

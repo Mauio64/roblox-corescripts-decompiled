@@ -1,12 +1,18 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
-require(ParentParent.Shared)
+require(parent.Shared)
+
 require(script.Parent.ReactWorkTags)
+
 require(script.Parent.ReactTypeOfMode)
+
 require(script.Parent.ReactFiberFlags)
+
 require(script.Parent.ReactRootTags)
-require(ParentParent.Shared)
-require(ParentParent.Scheduler)
+
+require(parent.Shared)
+
+require(parent.Scheduler)
 
 return {}

@@ -1,154 +1,177 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.util.Types)
+local calculateMinMax = require(parent.util.calculateMinMax)
+local getExpectedPartSize = require(parent.util.getExpectedPartSize)
+local ConstantsInterface = require(parent.ConstantsInterface)
+local getPartNamesInHierarchyOrder = require(parent.util.getPartNamesInHierarchyOrder)
+local R15plusUtils = require(parent.util.R15plusUtils)
+local getAttachmentCFrameInPartSpace = require(parent.util.getAttachmentCFrameInPartSpace)
+local AssetTraversalUtils = {}
 
-require(ParentParent.util.Types)
+function AssetTraversalUtils.calculateBounds(p, instance, cframe: CFrame, state, p2)
+	if p2 then
+		local expectedPartSize = getExpectedPartSize(instance, p2)
+		local minMeshCorner, maxMeshCorner = calculateMinMax(
+			state.minMeshCorner,
+			state.maxMeshCorner,
+			cframe:PointToWorldSpace(-(expectedPartSize / 2)),
+			cframe:PointToWorldSpace(-(expectedPartSize / 2))
+		)
+		state.minMeshCorner = minMeshCorner
+		state.maxMeshCorner = maxMeshCorner
 
-local calculateMinMax = require(ParentParent.util.calculateMinMax)
-local getExpectedPartSize = require(ParentParent.util.getExpectedPartSize)
-local ConstantsInterface = require(ParentParent.ConstantsInterface)
-local getPartNamesInHierarchyOrder = require(ParentParent.util.getPartNamesInHierarchyOrder)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local getAttachmentCFrameInPartSpace = require(ParentParent.util.getAttachmentCFrameInPartSpace)
-local t1 = {
-	calculateBounds = function(p1, p2, cFrame: CFrame, p3, p4) -- line: 25
-		-- upvalues: getExpectedPartSize (copy), calculateMinMax (copy), ConstantsInterface (copy), R15plusUtils (copy), getAttachmentCFrameInPartSpace (copy)
-		if p4 then
-			local v16 = getExpectedPartSize(p2, p4)
-			local v17, v18 = calculateMinMax(p3.minMeshCorner, p3.maxMeshCorner, cFrame:PointToWorldSpace(-(v16 / 2)), cFrame:PointToWorldSpace(-(v16 / 2)))
-
-			p3.minMeshCorner = v17
-			p3.maxMeshCorner = v18
-
-			local v19, v20 = calculateMinMax(p3.minMeshCorner, p3.maxMeshCorner, cFrame:PointToWorldSpace(v16 / 2), cFrame:PointToWorldSpace(v16 / 2))
-
-			p3.minMeshCorner = v19
-			p3.maxMeshCorner = v20
-		else
-			local v21, v22 = calculateMinMax(p3.minMeshCorner, p3.maxMeshCorner, cFrame:PointToWorldSpace(-(p2.Size / 2)), cFrame:PointToWorldSpace(-(p2.Size / 2)))
-
-			p3.minMeshCorner = v21
-			p3.maxMeshCorner = v22
-
-			local v23, v24 = calculateMinMax(p3.minMeshCorner, p3.maxMeshCorner, cFrame:PointToWorldSpace(p2.Size / 2), cFrame:PointToWorldSpace(p2.Size / 2))
-
-			p3.minMeshCorner = v23
-			p3.maxMeshCorner = v24
-		end
-
-		for _, v26 in ConstantsInterface.getAttachments(p1, p2.Name) do
-			local v27 = p2:FindFirstChild(v26, R15plusUtils.checkFlagEnabledForAllowHrd())
-
-			assert(v27)
-
-			if string.match(v27.Name, "RigAttachment$") ~= nil then
-				local v28 = cFrame * getAttachmentCFrameInPartSpace(v27)
-				local v29, v30 = calculateMinMax(p3.minRigAttachment, p3.maxRigAttachment, v28.Position, v28.Position)
-
-				p3.minRigAttachment = v29
-				p3.maxRigAttachment = v30
-			end
-		end
-
-		local v31, v32 = calculateMinMax(p3.minOverall, p3.maxOverall, p3.minMeshCorner, p3.maxMeshCorner)
-
-		p3.minOverall = v31
-		p3.maxOverall = v32
-
-		local v33, v34 = calculateMinMax(p3.minOverall, p3.maxOverall, p3.minRigAttachment, p3.maxRigAttachment)
-
-		p3.minOverall = v33
-		p3.maxOverall = v34
-	end
-}
-
-function t1.traverseHierarchy(p5, p6, p7, s1: string?, cFrame: CFrame, s2: string, p8, p9, p10) -- line: 98
-	-- upvalues: ConstantsInterface (copy), R15plusUtils (copy), getAttachmentCFrameInPartSpace (copy), t1 (copy)
-	local v44 = p6 and p7
-
-	assert(p5 ~= nil ~= (v44 ~= nil))
-
-	local v45 = if not p5 then p6:FindFirstChild(s2) else p5[s2]
-
-	assert(v45)
-
-	local v50
-
-	if s1 then
-		local v46 = if not p5 then p6:FindFirstChild(s1) else p5[s1]
-
-		assert(v46)
-
-		local v47 = ConstantsInterface.getRigAttachmentToParent(p7, s2)
-		local v48 = v46:FindFirstChild(v47, R15plusUtils.checkFlagEnabledForAllowHrd())
-
-		assert(v48)
-
-		local v49 = v45:FindFirstChild(v47, R15plusUtils.checkFlagEnabledForAllowHrd())
-
-		assert(v49)
-		v50 = cFrame * getAttachmentCFrameInPartSpace(v48) * getAttachmentCFrameInPartSpace(v49):Inverse()
+		local minMeshCorner2, maxMeshCorner2 = calculateMinMax(
+			state.minMeshCorner,
+			state.maxMeshCorner,
+			cframe:PointToWorldSpace(expectedPartSize / 2),
+			cframe:PointToWorldSpace(expectedPartSize / 2)
+		)
+		state.minMeshCorner = minMeshCorner2
+		state.maxMeshCorner = maxMeshCorner2
 	else
-		v50 = CFrame.new()
+		local minMeshCorner, maxMeshCorner = calculateMinMax(
+			state.minMeshCorner,
+			state.maxMeshCorner,
+			cframe:PointToWorldSpace(-(instance.Size / 2)),
+			cframe:PointToWorldSpace(-(instance.Size / 2))
+		)
+		state.minMeshCorner = minMeshCorner
+		state.maxMeshCorner = maxMeshCorner
+
+		local minMeshCorner2, maxMeshCorner2 = calculateMinMax(
+			state.minMeshCorner,
+			state.maxMeshCorner,
+			cframe:PointToWorldSpace(instance.Size / 2),
+			cframe:PointToWorldSpace(instance.Size / 2)
+		)
+		state.minMeshCorner = minMeshCorner2
+		state.maxMeshCorner = maxMeshCorner2
 	end
 
-	t1.calculateBounds(p7, v45, v50, p9, p10)
+	for _, childName in ConstantsInterface.getAttachments(p, instance.Name) do
+		local child = instance:FindFirstChild(childName, R15plusUtils.checkFlagEnabledForAllowHrd())
+		assert(child)
 
-	if p8.children then
-		for v51, v52 in p8.children do
-			t1.traverseHierarchy(p5, p6, p7, s2, v50, v51, v52, p9, p10)
+		if string.match(child.Name, "RigAttachment$") == nil then
+			continue
+		end
+
+		local v = cframe * getAttachmentCFrameInPartSpace(child)
+		local minRigAttachment, maxRigAttachment = calculateMinMax(
+			state.minRigAttachment,
+			state.maxRigAttachment,
+			v.Position,
+			v.Position
+		)
+		state.minRigAttachment = minRigAttachment
+		state.maxRigAttachment = maxRigAttachment
+	end
+
+	local minOverall, maxOverall = calculateMinMax(
+		state.minOverall,
+		state.maxOverall,
+		state.minMeshCorner,
+		state.maxMeshCorner
+	)
+	state.minOverall = minOverall
+	state.maxOverall = maxOverall
+
+	local minOverall2, maxOverall2 = calculateMinMax(
+		state.minOverall,
+		state.maxOverall,
+		state.minRigAttachment,
+		state.maxRigAttachment
+	)
+	state.minOverall = minOverall2
+	state.maxOverall = maxOverall2
+end
+
+function AssetTraversalUtils.traverseHierarchy(p, instance, p2, childName: string?, cframe: CFrame, childName2: string, p3, p4, p5)
+	assert((p ~= nil) ~= ((instance and p2) ~= nil))
+	local v
+
+	if p then
+		v = p[childName2]
+	else
+		v = instance:FindFirstChild(childName2)
+	end
+
+	assert(v)
+	local v2
+
+	if childName then
+		local v3
+
+		if p then
+			v3 = p[childName]
+		else
+			v3 = instance:FindFirstChild(childName)
+		end
+
+		assert(v3)
+
+		local rigAttachmentToParent = ConstantsInterface.getRigAttachmentToParent(p2, childName2)
+
+		local child = v3:FindFirstChild(rigAttachmentToParent, R15plusUtils.checkFlagEnabledForAllowHrd())
+		assert(child)
+
+		local child2 = v:FindFirstChild(rigAttachmentToParent, R15plusUtils.checkFlagEnabledForAllowHrd())
+		assert(child2)
+
+		v2 = cframe * getAttachmentCFrameInPartSpace(child) * getAttachmentCFrameInPartSpace(child2):Inverse()
+	else
+		v2 = CFrame.new()
+	end
+
+	AssetTraversalUtils.calculateBounds(p2, v, v2, p4, p5)
+
+	if p3.children then
+		for k, child in p3.children do
+			AssetTraversalUtils.traverseHierarchy(p, instance, p2, childName2, v2, k, child, p4, p5)
 		end
 	end
 end
 
-local t2 = nil
-
-local function initRigParentToChild() -- line: 163
-	-- upvalues: t2 (ref), getPartNamesInHierarchyOrder (copy)
-	if t2 then
+local v = nil
+local function initRigParentToChild()
+	if v then
 		return
 	end
 
-	t2 = {}
+	v = {}
 
-	for _, v54 in {
+	for _, v2 in {
 		Enum.AssetType.LeftArm,
 		Enum.AssetType.RightArm,
 		Enum.AssetType.LeftLeg,
 		Enum.AssetType.RightLeg
 	} do
-		local v55 = getPartNamesInHierarchyOrder(v54)
+		local partNamesInHierarchyOrder = getPartNamesInHierarchyOrder(v2)
+		v[v2] = {}
 
-		t2[v54] = {}
-
-		for i = 1, #v55 - 1 do
-			t2[v54][v55[i]] = v55[i + 1]
+		for i = 1, #partNamesInHierarchyOrder - 1 do
+			v[v2][partNamesInHierarchyOrder[i]] = partNamesInHierarchyOrder[i + 1]
 		end
 	end
 end
 
-function t1.getAssetRigChild(p11, s3: string) -- line: 179
-	-- upvalues: initRigParentToChild (copy), t2 (ref)
+function AssetTraversalUtils.getAssetRigChild(p, p2: string)
 	initRigParentToChild()
 
-	return assert(t2[p11], "Invalid asset type")[s3]
+	return assert(v[p], "Invalid asset type")[p2]
 end
 
-t1.assetHierarchy = {
-	[Enum.AssetType.DynamicHead] = {
-		root = "Head"
-	},
+AssetTraversalUtils.assetHierarchy = {
+	[Enum.AssetType.DynamicHead] = { root = "Head" },
 	[Enum.AssetType.Torso] = {
 		root = "LowerTorso",
-		children = {
-			UpperTorso = {}
-		}
+		children = { UpperTorso = {} }
 	},
 	[Enum.AssetType.LeftArm] = {
 		root = "LeftUpperArm",
 		children = {
 			LeftLowerArm = {
-				children = {
-					LeftHand = {}
-				}
+				children = { LeftHand = {} }
 			}
 		}
 	},
@@ -156,9 +179,7 @@ t1.assetHierarchy = {
 		root = "RightUpperArm",
 		children = {
 			RightLowerArm = {
-				children = {
-					RightHand = {}
-				}
+				children = { RightHand = {} }
 			}
 		}
 	},
@@ -166,9 +187,7 @@ t1.assetHierarchy = {
 		root = "LeftUpperLeg",
 		children = {
 			LeftLowerLeg = {
-				children = {
-					LeftFoot = {}
-				}
+				children = { LeftFoot = {} }
 			}
 		}
 	},
@@ -176,12 +195,10 @@ t1.assetHierarchy = {
 		root = "RightUpperLeg",
 		children = {
 			RightLowerLeg = {
-				children = {
-					RightFoot = {}
-				}
+				children = { RightFoot = {} }
 			}
 		}
 	}
 }
 
-return t1
+return AssetTraversalUtils

@@ -1,32 +1,28 @@
 require(script.Parent.Parent.language.ast)
 
-local Kind = require(script.Parent.Parent.language.kinds).Kind
+local kinds = require(script.Parent.Parent.language.kinds)
+local kind = kinds.Kind
 
 return {
-	getOperationAST = function(p1, s1: string?) -- line: 21
-		-- upvalues: Kind (copy)
-		local v4 = nil
+	getOperationAST = function(p, p2: string?)
+		local v = nil
 
-		for _, v in pairs(p1.definitions) do
-			if v.kind ~= Kind.OPERATION_DEFINITION then
+		for _, definition in pairs(p.definitions) do
+			if definition.kind ~= kind.OPERATION_DEFINITION then
 				continue
 			end
 
-			if s1 ~= nil then
-				if not v.name or s1 ~= v.name.value then
-					continue
+			if p2 == nil then
+				if v then
+					return nil
 				end
 
-				return v
+				v = definition
+			elseif definition.name and definition.name.value == p2 then
+				return definition
 			end
-
-			if v4 then
-				return nil
-			end
-
-			v4 = v
 		end
 
-		return v4
+		return v
 	end
 }

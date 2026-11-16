@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-
-require(Parent.AppCommonLib)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+require(parent.AppCommonLib)
 
 return nil

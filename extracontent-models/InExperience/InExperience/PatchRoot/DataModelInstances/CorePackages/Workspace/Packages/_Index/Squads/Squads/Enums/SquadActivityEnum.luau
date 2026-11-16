@@ -1,4 +1,1 @@
-return {
-	Join = "Join",
-	Leave = "Leave"
-}
+return { Join = "Join", Leave = "Leave" }

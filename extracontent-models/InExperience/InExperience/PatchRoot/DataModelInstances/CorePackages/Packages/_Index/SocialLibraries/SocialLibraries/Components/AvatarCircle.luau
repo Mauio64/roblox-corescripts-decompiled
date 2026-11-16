@@ -1,232 +1,244 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
 local dependencies = require(SocialLibraries.dependencies)
-local Roact = dependencies.Roact
-local ImageSetLabel = dependencies.UIBlox.Core.ImageSet.ImageSetLabel
-local v5 = Roact.PureComponent:extend("AvatarCircle")
 
-v5.PresetSize = {
-	Size36x36 = "Size36x36",
-	Size48x48 = "Size48x48"
+local roact = dependencies.Roact
+local imageSetLabel = dependencies.UIBlox.Core.ImageSet.ImageSetLabel
+
+local extended = roact.PureComponent:extend("AvatarCircle")
+
+extended.PresetSize = { Size36x36 = "Size36x36", Size48x48 = "Size48x48" }
+
+local v = {
+	[extended.PresetSize.Size36x36] = "rbxasset://textures/ui/LuaChat/graphic/gr-profile-border-36x36.png",
+	[extended.PresetSize.Size48x48] = "rbxasset://textures/ui/LuaChat/graphic/gr-profile-border-48x48.png"
 }
 
-local t1 = {
-	[v5.PresetSize.Size36x36] = "rbxasset://textures/ui/LuaChat/graphic/gr-profile-border-36x36.png",
-	[v5.PresetSize.Size48x48] = "rbxasset://textures/ui/LuaChat/graphic/gr-profile-border-48x48.png"
-}
-
-v5.defaultProps = {
-	onActivated = nil,
-	circleTransparency = 0,
-	circleInteriorBackgroundTransparency = 0,
-	circleDividerTransparency = 0,
-	presenceImage = nil,
-	presenceIndicatorSize = 14,
+extended.defaultProps = {
 	thumbnails = {},
+	onActivated = nil,
 	circleColor3 = Color3.new(0.9, 0.9, 0.9),
+	circleTransparency = 0,
 	circleInteriorBackgroundColor3 = Color3.new(0.8, 0.8, 0.8),
+	circleInteriorBackgroundTransparency = 0,
 	circleDividerColor3 = Color3.new(0.7, 0.7, 0.7),
-	overlaySize = v5.PresetSize.Size48x48
+	circleDividerTransparency = 0,
+	overlaySize = extended.PresetSize.Size48x48,
+	presenceImage = nil,
+	presenceIndicatorSize = 14
 }
 
-local function createAlignedContainerElement(p1) -- line: 43
-	-- upvalues: Roact (copy)
+local function createAlignedContainerElement(horizontalAlignment)
 	return {
-		layout = Roact.createElement("UIListLayout", {
+		layout = roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			HorizontalAlignment = p1,
+			HorizontalAlignment = horizontalAlignment,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		})
 	}
 end
 
-function v5.generateThumbnails(p2, p3) -- line: 54
-	-- upvalues: Roact (copy), ImageSetLabel (copy), createAlignedContainerElement (copy)
-	local v11 = #p3
-	local v12 = v11 / 2
-	local v13 = v11 % 2 == 0 and v12 or math.floor(v12)
-	local v14 = v11 - v13
-	local v15 = nil
+function extended:generateThumbnails(list)
+	local count = #list
+	local halfCount = count / 2
+	local v2 = count % 2 == 0 and halfCount or math.floor(halfCount)
+	local v3 = count - v2
+	local presenceIndicator
 
-	if v11 == 1 then
-		v15 = if not p2.props.showNewPresenceImage then Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(0, p2.props.presenceIndicatorSize, 0, p2.props.presenceIndicatorSize),
-			Image = p2.props.presenceImage
-		}) else Roact.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(0, p2.props.presenceIndicatorSize, 0, p2.props.presenceIndicatorSize),
-			Image = p2.props.presenceImage,
-			ImageColor3 = p2.props.presenceImageColor3,
-			ImageTransparency = p2.props.presenceImageTransparency
-		})
-	end
-
-	local v16 = createAlignedContainerElement(Enum.HorizontalAlignment.Right)
-	local v17 = createAlignedContainerElement(Enum.HorizontalAlignment.Left)
-	local v18 = createAlignedContainerElement(Enum.HorizontalAlignment.Center)
-
-	for i, v in ipairs(p3) do
-		local n1 = 0
-		local v22 = nil
-		local uDim2, v24
-
-		if v11 == 1 then
-			uDim2 = UDim2.new(1, 0, 1, 0)
-			v24 = v18
-		elseif i <= v13 then
-			uDim2 = UDim2.new(1 / v13, 0, 1 / v13, 0)
-			v24 = v16
-
-			if v11 == 3 then
-				n1 = 0.125
-			elseif v11 == 2 then
-				n1 = 0.125
-			end
-
-			v22 = Roact.createElement("Frame", {
+	if count == 1 then
+		if self.props.showNewPresenceImage then
+			presenceIndicator = roact.createElement(imageSetLabel, {
+				Size = UDim2.new(0, self.props.presenceIndicatorSize, 0, self.props.presenceIndicatorSize),
 				BackgroundTransparency = 1,
-				ZIndex = 2,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				border = Roact.createElement("Frame", {
-					BorderSizePixel = 0,
-					Size = UDim2.new(1, 0, 0, 2),
-					Position = UDim2.new(0, 0, 1, -1),
-					BackgroundColor3 = p2.props.circleDividerColor3,
-					BackgroundTransparency = p2.props.circleDividerTransparency
-				}),
-				borderVertical = Roact.createElement("Frame", {
-					BorderSizePixel = 0,
-					Size = UDim2.new(0, 2, 1, 0),
-					Position = UDim2.new(0, -1, 0, 0),
-					BackgroundColor3 = p2.props.circleDividerColor3,
-					BackgroundTransparency = p2.props.circleDividerTransparency
-				})
+				Image = self.props.presenceImage,
+				ImageColor3 = self.props.presenceImageColor3,
+				ImageTransparency = self.props.presenceImageTransparency
 			})
 		else
-			uDim2 = UDim2.new(1 / v14, 0, 1 / v14, 0)
-			v24 = v17
-
-			if v11 == 2 then
-				n1 = -0.125
-			end
-
-			v22 = Roact.createElement("Frame", {
+			presenceIndicator = roact.createElement("ImageLabel", {
+				Size = UDim2.new(0, self.props.presenceIndicatorSize, 0, self.props.presenceIndicatorSize),
 				BackgroundTransparency = 1,
-				ZIndex = 2,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				border = Roact.createElement("Frame", {
-					BorderSizePixel = 0,
-					Size = UDim2.new(1, 0, 0, 2),
-					Position = UDim2.new(0, 0, 0, -1),
-					BackgroundColor3 = p2.props.circleDividerColor3,
-					BackgroundTransparency = p2.props.circleDividerTransparency
-				}),
-				borderVertical = Roact.createElement("Frame", {
-					BorderSizePixel = 0,
-					Size = UDim2.new(0, 2, 1, 0),
-					Position = UDim2.new(0, -1, 0, 0),
-					BackgroundColor3 = p2.props.circleDividerColor3,
-					BackgroundTransparency = p2.props.circleDividerTransparency
-				})
+				Image = self.props.presenceImage
 			})
 		end
+	end
 
-		v24["thumbnail-" .. tostring(i + 1)] = Roact.createElement("Frame", {
+	local alignedContainerElement = createAlignedContainerElement(Enum.HorizontalAlignment.Right)
+	local alignedContainerElement2 = createAlignedContainerElement(Enum.HorizontalAlignment.Left)
+	local alignedContainerElement3 = createAlignedContainerElement(Enum.HorizontalAlignment.Center)
+
+	for i, item in ipairs(list) do
+		local v4 = 0
+
+		local borderObject = nil
+		local udim, children
+
+		if count == 1 then
+			udim = UDim2.new(1, 0, 1, 0)
+			children = alignedContainerElement3
+		elseif i <= v2 then
+			udim = UDim2.new(1 / v2, 0, 1 / v2, 0)
+
+			v4 = count == 3 and 0.125 or count == 2 and 0.125 or v4
+
+			borderObject = roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 2 },
+				{
+					border = roact.createElement("Frame", {
+						Size = UDim2.new(1, 0, 0, 2),
+						Position = UDim2.new(0, 0, 1, -1),
+						BorderSizePixel = 0,
+						BackgroundColor3 = self.props.circleDividerColor3,
+						BackgroundTransparency = self.props.circleDividerTransparency
+					}),
+					borderVertical = roact.createElement("Frame", {
+						Size = UDim2.new(0, 2, 1, 0),
+						Position = UDim2.new(0, -1, 0, 0),
+						BorderSizePixel = 0,
+						BackgroundColor3 = self.props.circleDividerColor3,
+						BackgroundTransparency = self.props.circleDividerTransparency
+					})
+				}
+			)
+			children = alignedContainerElement
+		else
+			udim = UDim2.new(1 / v3, 0, 1 / v3, 0)
+
+			v4 = count == 2 and -0.125 or v4
+
+			borderObject = roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = 2 },
+				{
+					border = roact.createElement("Frame", {
+						Size = UDim2.new(1, 0, 0, 2),
+						Position = UDim2.new(0, 0, 0, -1),
+						BorderSizePixel = 0,
+						BackgroundColor3 = self.props.circleDividerColor3,
+						BackgroundTransparency = self.props.circleDividerTransparency
+					}),
+					borderVertical = roact.createElement("Frame", {
+						Size = UDim2.new(0, 2, 1, 0),
+						Position = UDim2.new(0, -1, 0, 0),
+						BorderSizePixel = 0,
+						BackgroundColor3 = self.props.circleDividerColor3,
+						BackgroundTransparency = self.props.circleDividerTransparency
+					})
+				}
+			)
+			children = alignedContainerElement2
+		end
+
+		children["thumbnail-" .. tostring(i + 1)] = roact.createElement("Frame", {
 			BackgroundTransparency = 1,
+			Size = udim,
 			ClipsDescendants = true,
-			Size = uDim2,
-			LayoutOrder = #v24 + 1
+			LayoutOrder = #children + 1
 		}, {
-			headshotContainer = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0),
-				Position = UDim2.new(n1, 0, 0, 0)
-			}, {
-				headshot = Roact.createElement("ImageLabel", {
-					BackgroundTransparency = 1,
+			headshotContainer = roact.createElement(
+				"Frame",
+				{
 					Size = UDim2.new(1, 0, 1, 0),
-					Image = v
-				})
-			}),
-			borderObject = v22
+					Position = UDim2.new(v4, 0, 0, 0),
+					BackgroundTransparency = 1
+				},
+				{
+					headshot = roact.createElement("ImageLabel", {
+						Size = UDim2.new(1, 0, 1, 0),
+						BackgroundTransparency = 1,
+						Image = item
+					})
+				}
+			),
+			borderObject = borderObject
 		})
 	end
 
 	return {
-		rightElements = v17,
-		leftElements = v16,
-		centerElements = v18,
-		presenceIndicator = v15
+		rightElements = alignedContainerElement2,
+		leftElements = alignedContainerElement,
+		centerElements = alignedContainerElement3,
+		presenceIndicator = presenceIndicator
 	}
 end
-function v5.render(p4) -- line: 195
-	-- upvalues: t1 (copy), Roact (copy)
-	local thumbnails = p4.props.thumbnails
-	local v27 = t1[p4.props.overlaySize]
-	local v28 = p4:generateThumbnails(thumbnails)
 
-	return Roact.createElement("ImageButton", {
+function extended:render()
+	local thumbnails = self.props.thumbnails
+	local image = v[self.props.overlaySize]
+
+	local thumbnails2 = self:generateThumbnails(thumbnails)
+
+	return roact.createElement("ImageButton", {
 		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = p4.props.circleInteriorBackgroundColor3,
-		BackgroundTransparency = p4.props.circleInteriorBackgroundTransparency,
+		BackgroundColor3 = self.props.circleInteriorBackgroundColor3,
+		BackgroundTransparency = self.props.circleInteriorBackgroundTransparency,
 		BorderSizePixel = 0,
 		Image = "",
 		AutoButtonColor = false,
 		ClipsDescendants = true,
-		[Roact.Event.Activated] = p4.props.onActivated
+		[roact.Event.Activated] = self.props.onActivated
 	}, {
-		imageMask = Roact.createElement("ImageLabel", {
+		imageMask = roact.createElement("ImageLabel", {
+			Image = image,
+			ImageColor3 = self.props.circleColor3,
+			ImageTransparency = self.props.circleTransparency,
+			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Image = v27,
-			ImageColor3 = p4.props.circleColor3,
-			ImageTransparency = p4.props.circleTransparency,
-			Size = UDim2.new(1, 0, 1, 0)
+			BorderSizePixel = 0
 		}, {
-			presenceFrame = Roact.createElement("Frame", {
+			presenceFrame = roact.createElement("Frame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 1, 0)
 			}, {
-				layout = Roact.createElement("UIListLayout", {
+				layout = roact.createElement("UIListLayout", {
 					HorizontalAlignment = Enum.HorizontalAlignment.Right,
 					VerticalAlignment = Enum.VerticalAlignment.Bottom
 				}),
-				presenceIndicator = v28.presenceIndicator
+				presenceIndicator = thumbnails2.presenceIndicator
 			})
 		}),
-		center = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
+		center = roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1
 		}, {
-			elementContainer = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, v28.centerElements)
+			elementContainer = roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 },
+				thumbnails2.centerElements
+			)
 		}),
-		left = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -1, 1, 0),
-			Position = UDim2.new(-0.5, 0, 0, 0)
-		}, {
-			elementContainer = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, v28.leftElements)
-		}),
-		right = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -1, 1, 0),
-			Position = UDim2.new(0.5, -2, 0, 0)
-		}, {
-			elementContainer = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, v28.rightElements)
-		})
+		left = roact.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, -1, 1, 0),
+				Position = UDim2.new(-0.5, 0, 0, 0),
+				BackgroundTransparency = 1
+			},
+			{
+				elementContainer = roact.createElement(
+					"Frame",
+					{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 },
+					thumbnails2.leftElements
+				)
+			}
+		),
+		right = roact.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, -1, 1, 0),
+				Position = UDim2.new(0.5, -2, 0, 0),
+				BackgroundTransparency = 1
+			},
+			{
+				elementContainer = roact.createElement(
+					"Frame",
+					{ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 },
+					thumbnails2.rightElements
+				)
+			}
+		)
 	})
 end
 
-return v5
+return extended

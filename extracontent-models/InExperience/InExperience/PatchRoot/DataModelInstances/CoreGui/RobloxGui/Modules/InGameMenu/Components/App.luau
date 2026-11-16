@@ -1,9 +1,12 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
-local ParentParent = script.Parent.Parent
-local InGameMenuPolicy = require(ParentParent.InGameMenuPolicy)
+
+local parent = script.Parent.Parent
+local InGameMenuPolicy = require(parent.InGameMenuPolicy)
+
 local ViewportOverlay = require(script.Parent.ViewportOverlay)
 local SideNavigation = require(script.Parent.SideNavigation)
 local LeaveGameDialog = require(script.Parent.LeaveGameDialog)
@@ -16,23 +19,24 @@ local Connection = require(script.Parent.Connection)
 local EducationalPopup = require(script.Parent.EducationalPopup)
 local MenuIconTooltip = require(script.Parent.MenuIconTooltip)
 local FullscreenTitleBar = require(script.Parent.FullscreenTitleBar)
-local Flags = ParentParent.Flags
-local FFlagLuaMenuPerfImprovements = require(Flags.FFlagLuaMenuPerfImprovements)
-local Constants = require(ParentParent.Resources.Constants)
 
-local function App(p1) -- line: 32
-	-- upvalues: Roact (copy), FullscreenTitleBar (copy), Constants (copy), FFlagLuaMenuPerfImprovements (copy), ViewportOverlay (copy), SideNavigation (copy), LeaveGameDialog (copy), PageContainer (copy), RespawnDialog (copy), ReportDialog (copy), ReportSentDialog (copy), ControlLayoutSetter (copy), Connection (copy), EducationalPopup (copy), MenuIconTooltip (copy)
-	local v26 = nil
+local flags = parent.Flags
+local FFlagLuaMenuPerfImprovements = require(flags.FFlagLuaMenuPerfImprovements)
 
-	if p1.enableFullscreenTitleBar then
-		v26 = Roact.createElement(FullscreenTitleBar, {
+local Constants = require(parent.Resources.Constants)
+
+local function App(props)
+	local fullscreenTitleBar
+
+	if props.enableFullscreenTitleBar then
+		fullscreenTitleBar = Roact.createElement(FullscreenTitleBar, {
 			displayOrder = Constants.DisplayOrder.FullscreenTitleBar
 		})
 	end
 
 	if FFlagLuaMenuPerfImprovements then
 		return Roact.createFragment({
-			Content = p1.isMenuOpen and Roact.createFragment({
+			Content = props.isMenuOpen and Roact.createFragment({
 				Overlay = Roact.createElement(ViewportOverlay),
 				SideNavigation = Roact.createElement(SideNavigation),
 				LeaveGameDialog = Roact.createElement(LeaveGameDialog),
@@ -43,9 +47,9 @@ local function App(p1) -- line: 32
 				ControlLayoutSetter = Roact.createElement(ControlLayoutSetter)
 			}) or nil,
 			Connection = Roact.createElement(Connection),
-			EducationalPopup = p1.isEducationalPopupEnabled and Roact.createElement(EducationalPopup) or nil,
-			MenuIconTooltip = p1.isEducationalPopupEnabled and Roact.createElement(MenuIconTooltip) or nil,
-			FullscreenTitleBar = v26
+			EducationalPopup = props.isEducationalPopupEnabled and Roact.createElement(EducationalPopup) or nil,
+			MenuIconTooltip = props.isEducationalPopupEnabled and Roact.createElement(MenuIconTooltip) or nil,
+			FullscreenTitleBar = fullscreenTitleBar
 		})
 	end
 
@@ -59,23 +63,21 @@ local function App(p1) -- line: 32
 		ReportSentDialog = Roact.createElement(ReportSentDialog),
 		ControlLayoutSetter = Roact.createElement(ControlLayoutSetter),
 		Connection = Roact.createElement(Connection),
-		EducationalPopup = p1.isEducationalPopupEnabled and Roact.createElement(EducationalPopup) or nil,
-		MenuIconTooltip = p1.isEducationalPopupEnabled and Roact.createElement(MenuIconTooltip) or nil,
-		FullscreenTitleBar = v26
+		EducationalPopup = props.isEducationalPopupEnabled and Roact.createElement(EducationalPopup) or nil,
+		MenuIconTooltip = props.isEducationalPopupEnabled and Roact.createElement(MenuIconTooltip) or nil,
+		FullscreenTitleBar = fullscreenTitleBar
 	})
 end
 
-local v23 = InGameMenuPolicy.connect(function(p2, _) -- line: 75
+local v = InGameMenuPolicy.connect(function(p, _)
 	return {
-		enableFullscreenTitleBar = p2.enableFullscreenTitleBar(),
-		isEducationalPopupEnabled = p2.enableEducationalPopup()
+		enableFullscreenTitleBar = p.enableFullscreenTitleBar(),
+		isEducationalPopupEnabled = p.enableEducationalPopup()
 	}
 end)(App)
 
-local function mapStateToProps(p4, _) -- line: 82
-	return {
-		isMenuOpen = p4.isMenuOpen
-	}
+local function mapStateToProps(p, _)
+	return { isMenuOpen = p.isMenuOpen }
 end
 
-return RoactRodux.connect(mapStateToProps, nil)(v23)
+return RoactRodux.connect(mapStateToProps, nil)(v)

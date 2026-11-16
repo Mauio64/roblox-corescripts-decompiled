@@ -1,50 +1,41 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local HttpService = game:GetService("HttpService")
-local Http = require(DataHydrationParent.Http)
-local HttpClient = require(DataHydrationParent.HttpClient)
-local MomentsTypes = require(DataHydrationParent.MomentsTypes)
-local SharedFlags = require(DataHydrationParent.SharedFlags)
+local parent = DataHydration.Parent
 
+local HttpService = game:GetService("HttpService")
+
+local Http = require(parent.Http)
+local HttpClient = require(parent.HttpClient)
+local MomentsTypes = require(parent.MomentsTypes)
 require(DataHydration.Moments.MomentsStoreTypes)
 
-local v8 = Http.Url.APIS_URL .. "deeplinks/v2/get-or-create-static"
-local FFlagMomentsPassFeedItemIdToBackendApis = SharedFlags.FFlagMomentsPassFeedItemIdToBackendApis
+local url = Http.Url.APIS_URL .. "deeplinks/v2/get-or-create-static"
+
 local ShareLinkTargetIdType = MomentsTypes.Enums.ShareLinkTargetIdType
 
-local function decodeShareLink(t1: {[any]: any}) -- line: 33
-	if t1.link and type(t1.link) == "string" then
-		return t1.link
-	end
-
-	return nil
+local function decodeShareLink(p)
+	return if p.link and type(p.link) == "string" then p.link else nil
 end
-local function fetchShareLink(t2: {[any]: any}, p1) -- line: 41
-	-- upvalues: FFlagMomentsPassFeedItemIdToBackendApis (copy), ShareLinkTargetIdType (copy), HttpClient (copy), v8 (copy), HttpService (copy), decodeShareLink (copy)
-	local momentId = t2.momentId
-	local t3 = {
-		momentId = t2.momentId
-	}
 
-	if FFlagMomentsPassFeedItemIdToBackendApis then
-		momentId = t2.feedItemId
-		assert(momentId ~= nil and momentId ~= "", "feedItemId is required to create a Moments share link")
-		t3.targetIdType = ShareLinkTargetIdType.FeedItemId
-	end
+local function fetchShareLink(data, network)
+	local v = { momentId = data.momentId }
+	local feedItemId = data.feedItemId
+	local v2 = feedItemId ~= nil and feedItemId ~= ""
+	assert(v2, "feedItemId is required to create a Moments share link")
 
+	v.targetIdType = ShareLinkTargetIdType.FeedItemId
 	return HttpClient.fetch({
 		method = "POST",
-		analyticsKey = "moments.get-or-create-static-share-link",
-		url = v8,
+		url = url,
 		body = {
 			linkType = 6,
+			targetId = feedItemId,
+			linkPreviewTitle = data.title,
+			linkPreviewDescription = data.description or "",
 			linkPreviewAssetId = 0,
-			targetId = momentId,
-			linkPreviewTitle = t2.title,
-			linkPreviewDescription = t2.description or "",
-			customData = HttpService:JSONEncode(t3)
+			customData = HttpService:JSONEncode(v)
 		},
-		network = p1,
+		analyticsKey = "moments.get-or-create-static-share-link",
+		network = network,
 		decode = decodeShareLink
 	})
 end

@@ -1,3 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
+local GraphQL = require(CorePackages.Packages.GraphQL)
 
-return (require(CorePackages.Packages.GraphQL))
+return GraphQL

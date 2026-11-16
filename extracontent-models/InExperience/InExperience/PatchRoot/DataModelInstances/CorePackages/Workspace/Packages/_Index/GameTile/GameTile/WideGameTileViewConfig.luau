@@ -1,27 +1,28 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
+local parent = script:FindFirstAncestor("GameTile").Parent
+require(parent.UIBlox)
 
-require(Parent.UIBlox)
+local function getMetadataHeight(p) -- 1 equivalent call inferred from this helper
+	return p.Size.Size_500
+end
 
-return {
-	getTileHeight = function(p1, n1: number) -- line: 18
-		local v9 = n1 * 0.5625
-		local Size_500 = p1.Size.Size_500
-		local Size_200 = p1.Size.Size_200
-		local Size_100 = p1.Size.Size_100
+local function getFooterHeight(p) -- 1 equivalent call inferred from this helper
+	local size_500 = p.Size.Size_500
+	local size_200 = p.Size.Size_200
+	local size_100 = p.Size.Size_100
+	return size_500 + getMetadataHeight(p) + size_200 + size_100 -- inferred equivalent call
+end
 
-		return v9 + (Size_500 + p1.Size.Size_500 + Size_200 + Size_100)
-	end,
-	getFooterHeight = function(p2) -- line: 11
-		local Size_500 = p2.Size.Size_500
-		local Size_200 = p2.Size.Size_200
-		local Size_100 = p2.Size.Size_100
+local WideGameTileViewConfig = {}
 
-		return Size_500 + p2.Size.Size_500 + Size_200 + Size_100
-	end,
-	getMetadataHeight = function(p3) -- line: 7
-		return p3.Size.Size_500
-	end,
-	getPlayButtonHeight = function(p4) -- line: 22
-		return p4.Size.Size_900
-	end
-}
+function WideGameTileViewConfig.getTileHeight(p, p2: number)
+	return p2 * 0.5625 + getFooterHeight(p) -- inferred equivalent call
+end
+
+WideGameTileViewConfig.getFooterHeight = getFooterHeight
+WideGameTileViewConfig.getMetadataHeight = getMetadataHeight
+
+function WideGameTileViewConfig.getPlayButtonHeight(p)
+	return p.Size.Size_900
+end
+
+return WideGameTileViewConfig

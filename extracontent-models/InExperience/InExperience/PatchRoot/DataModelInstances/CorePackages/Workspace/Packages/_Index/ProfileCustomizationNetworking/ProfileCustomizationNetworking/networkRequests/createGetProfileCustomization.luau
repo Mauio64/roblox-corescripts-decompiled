@@ -1,16 +1,12 @@
-local ParentParent = script.Parent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
+local API_URL = require(parent.API_URL)
 
-return function(t1: {[any]: any}) -- line: 15
-	-- upvalues: API_URL (copy)
-	return t1.roduxNetworking.POST({
-		Name = "GetProfileCustomization"
-	}, function(p1, t2: {[any]: any}) -- line: 18
-		-- upvalues: API_URL (copy)
-		local t3 = {
-			profileEntities = { t2.profileEntity }
+return function(p)
+	return p.roduxNetworking.POST("GetProfileCustomization", function(callback, p2)
+		local v = {
+			profileEntities = { p2.profileEntity }
 		}
 
-		return p1(API_URL):path("profile-platform-api"):path("v1"):path("profiles"):path("customization"):path("get"):body(t3)
+		return callback(API_URL):path("profile-platform-api"):path("v1"):path("profiles"):path("customization"):path("get"):body(v)
 	end)
 end

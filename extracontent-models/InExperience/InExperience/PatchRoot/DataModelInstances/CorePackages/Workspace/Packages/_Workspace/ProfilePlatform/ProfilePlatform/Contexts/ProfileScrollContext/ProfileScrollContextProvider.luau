@@ -1,47 +1,79 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local useTopBarHeight = require(ProfilePlatformParent.RobloxAppHooks).useTopBarHeight
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useTopBarHeight = RobloxAppHooks.useTopBarHeight
+
 local Enums = require(ProfilePlatform.Common.Enums)
 local useProfileFormFactor = require(ProfilePlatform.Hooks.useProfileFormFactor)
+local FFlagFixCommunityProfileWideCoverLayout = require(ProfilePlatform.Flags.FFlagFixCommunityProfileWideCoverLayout)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfileInspectAvatarSlideIn = SharedFlags.FFlagProfileInspectAvatarSlideIn
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagProfileInspectAvatarShopChip = SharedFlags2.FFlagProfileInspectAvatarShopChip
+
 local ProfileScrollContext = require(script.Parent.ProfileScrollContext)
 
-return function(t1: {[any]: any}) -- line: 14
-	-- upvalues: useProfileFormFactor (copy), React (copy), Enums (copy), useTopBarHeight (copy), ProfileScrollContext (copy)
-	local v9 = useProfileFormFactor()
-	local v10, v11 = React.useState(v9.formFactor ~= Enums.ProfileFormFactor.PeekView and 1 or 0)
-	local v12, v13 = React.useState(0)
-	local v14 = useTopBarHeight()
-	local v15 = React.useMemo(function() -- line: 22
-		-- upvalues: v9 (copy), v14 (copy), Enums (copy), v12 (copy)
-		local v17 = if not v9.isFullView then v14 else 0
+return function(p)
+	local v = useProfileFormFactor()
 
-		if v9.formFactor == Enums.ProfileFormFactor.PeekView and not v9.isFullView then
-			v17 += 25
+	local state, setState = React.useState(v.formFactor == Enums.ProfileFormFactor.PeekView and 0 or 1)
+	local setState2, v2
+
+	if FFlagProfileInspectAvatarSlideIn or FFlagProfileInspectAvatarShopChip then
+		local state2
+		state2, setState2 = React.useState(false)
+
+		v2 = v.formFactor ~= Enums.ProfileFormFactor.PeekView or (v.isFullView or state2)
+	else
+		v2 = nil
+		setState2 = nil
+	end
+
+	local state2, setState3 = React.useState(0)
+	local v3 = useTopBarHeight()
+
+	local scrollY = React.useMemo(function()
+		local v4
+
+		if FFlagFixCommunityProfileWideCoverLayout then
+			v4 = (v.isFullView or v.formFactor == Enums.ProfileFormFactor.Wide) and 0 or v3
+		else
+			v4 = v.isFullView and 0 or v3
 		end
 
-		return (math.max(v17 - v12, 0))
-	end, {
-		v14,
-		v12,
-		v9
-	})
-	local v16 = React.useMemo(function() -- line: 34
-		-- upvalues: v15 (copy), v13 (copy), v10 (copy), v11 (copy)
-		return {
-			scrollY = v15,
-			setAbsoluteYPosition = v13,
-			peekViewOpenPercent = v10,
-			setPeekViewOpenPercent = v11
-		}
-	end, {
-		v15,
-		v13,
-		v10,
-		v11
-	})
+		if v.formFactor == Enums.ProfileFormFactor.PeekView and not v.isFullView then
+			v4 += 25
+		end
 
-	return React.createElement(ProfileScrollContext.Provider, {
-		value = v16
-	}, t1.children)
+		return (math.max(v4 - state2, 0))
+	end, { v3, state2, v })
+
+	local v4 = React.useMemo(function()
+		local v4 = {
+			scrollY = scrollY,
+			setAbsoluteYPosition = setState3,
+			peekViewOpenPercent = state,
+			setPeekViewOpenPercent = setState,
+			isPeekViewFullyOpen = nil,
+			setIsPeekViewFullyOpen = nil
+		}
+		local isPeekViewFullyOpen
+
+		if FFlagProfileInspectAvatarSlideIn or FFlagProfileInspectAvatarShopChip then
+			isPeekViewFullyOpen = v2
+		end
+
+		v4.isPeekViewFullyOpen = isPeekViewFullyOpen
+		local setIsPeekViewFullyOpen
+
+		if FFlagProfileInspectAvatarSlideIn or FFlagProfileInspectAvatarShopChip then
+			setIsPeekViewFullyOpen = setState2
+		end
+
+		v4.setIsPeekViewFullyOpen = setIsPeekViewFullyOpen
+		return v4
+	end, { scrollY, setState3, state, setState, v2, setState2 })
+
+	return React.createElement(ProfileScrollContext.Provider, { value = v4 }, p.children)
 end

@@ -1,48 +1,58 @@
 game:DefineFastFlag("LuaAppEnableCompactDataModelPayload", false)
 game:DefineFastFlag("LuaAppEnableWebViewStateTrackerInDataModelStreaming", false)
 
-local v1 = game:DefineFastFlag("LuaAppDisableDataModelStreamingInStudio", false)
+local defineFastFlag = game:DefineFastFlag("LuaAppDisableDataModelStreamingInStudio", false)
+
 local RunService = game:GetService("RunService")
-local ParentParent = script.Parent.Parent
-local SharedFlags = require(ParentParent.SharedFlags)
+
+local parent = script.Parent.Parent
+local SharedFlags = require(parent.SharedFlags)
+
 local FFlagLuaAppEnableInExperienceDataModelStreamStarter = SharedFlags.FFlagLuaAppEnableInExperienceDataModelStreamStarter
 local FFlagEnableWebViewStateTracker = SharedFlags.FFlagEnableWebViewStateTracker
-local v7 = require(ParentParent.Loggers).Logger:new("DataModelStreaming")
+local Loggers = require(parent.Loggers)
+local v = Loggers.Logger:new("DataModelStreaming")
 local HttpService = game:GetService("HttpService")
 local getDataModelStreamAllowedHosts = require(script.Parent.getDataModelStreamAllowedHosts)
 local getDataModelRoot = require(script.Parent.getDataModelRoot)
 local compactDataModelPayload = require(script.Parent.compactDataModelPayload)
-local WebViewStateTracker = require(ParentParent.WebViewUtils).WebViewStateTracker
-local v13 = getDataModelStreamAllowedHosts()
-local n1 = 0
-local u15 = nil
-local WebSocketService = nil
-local ok, _ = pcall(function() -- line: 30
-	-- upvalues: WebSocketService (ref)
-	WebSocketService = game:GetService("WebSocketService")
+local WebViewUtils = require(parent.WebViewUtils)
+local WebViewStateTracker = WebViewUtils.WebViewStateTracker
+
+local dataModelStreamAllowedHosts = getDataModelStreamAllowedHosts()
+local count = 0
+local v2 = nil
+
+local v3 = nil
+local success, _ = pcall(function()
+	local WebSocketService = game:GetService("WebSocketService")
+	v3 = WebSocketService
 end)
 
-if not ok then
-	return function(_: string?) -- line: 35
-		-- upvalues: v7 (copy)
-		v7:error("WebSocketService is not available...")
+if not success then
+	return function(_: string?)
+		v:error("WebSocketService is not available...")
 	end
 end
 
-local function splitIntoChunks(p1, p2) -- line: 40
-	local t1 = {}
+local function splitIntoChunks(result, p)
+	local result2 = {}
 
-	for i = 1, #p1, p2 do
-		table.insert(t1, (string.sub(p1, i, i + p2 - 1)))
+	for i = 1, #result, p do
+		table.insert(result2, (string.sub(result, i, i + p - 1)))
 	end
 
-	return t1
+	return result2
 end
-local function streamDataModel(p3, p4, p5) -- line: 48
-	-- upvalues: WebViewStateTracker (copy), FFlagEnableWebViewStateTracker (copy), HttpService (copy), compactDataModelPayload (copy), getDataModelRoot (copy), v7 (copy), splitIntoChunks (copy)
-	local ok2, result = pcall(function() -- line: 49
-		-- upvalues: WebViewStateTracker (copy), FFlagEnableWebViewStateTracker (copy), HttpService (copy), compactDataModelPayload (copy), getDataModelRoot (copy), p5 (copy)
-		if WebViewStateTracker and (FFlagEnableWebViewStateTracker and game:GetFastFlag("LuaAppEnableWebViewStateTrackerInDataModelStreaming") and WebViewStateTracker.isOpen()) then
+
+local function streamDataModel(object, p, properties)
+	local success2, result = pcall(function()
+		if
+			WebViewStateTracker
+			and FFlagEnableWebViewStateTracker
+			and game:GetFastFlag("LuaAppEnableWebViewStateTrackerInDataModelStreaming")
+			and WebViewStateTracker.isOpen()
+		then
 			return HttpService:JSONEncode({
 				type = "webview",
 				webViewMetadata = WebViewStateTracker.getWebViewMetadata()
@@ -50,134 +60,111 @@ local function streamDataModel(p3, p4, p5) -- line: 48
 		end
 
 		if game:GetFastFlag("LuaAppEnableCompactDataModelPayload") then
-			return HttpService:JSONEncode(compactDataModelPayload(getDataModelRoot(p5)))
+			return HttpService:JSONEncode(compactDataModelPayload(getDataModelRoot(properties)))
 		end
 
-		return HttpService:JSONEncode(getDataModelRoot(p5))
+		return HttpService:JSONEncode(getDataModelRoot(properties))
 	end)
 
-	if not ok2 then
-		v7:error(`Error encoding data model: { result }`)
-
+	if not success2 then
+		v:error(`Error encoding data model: {result}`)
 		return
 	end
 
-	v7:info(`Streaming data model, total size: { #result }`)
+	v:info(`Streaming data model, total size: {#result}`)
 
-	local v35 = splitIntoChunks(result, 262144)
-	local v36 = #v35
+	local v4 = splitIntoChunks(result, 262144)
+	local v5 = #v4
 
-	for i, v in ipairs(v35) do
-		p3:Send(`DM_STREAM_CHUNK:{ p4 }:{ v36 }:{ i }:{ v }`)
+	for i, v6 in ipairs(v4) do
+		object:Send(`DM_STREAM_CHUNK:{p}:{v5}:{i}:{v6}`)
 	end
 end
-local function getHostToTry() -- line: 83
-	-- upvalues: u15 (ref), n1 (ref), v13 (copy)
-	if u15 then
-		return u15
+
+local function getHostToTry() -- 1 equivalent call inferred from this helper
+	if v2 then
+		return v2
 	end
 
-	n1 += 1
+	count += 1
 
-	if n1 > #v13 then
+	if count > #dataModelStreamAllowedHosts then
 		return nil
 	end
 
-	return v13[n1]
+	return dataModelStreamAllowedHosts[count]
 end
-local function startDataModelStreamWsClient(s2: string?) -- line: 96
-	-- upvalues: u15 (ref), n1 (ref), v13 (copy), WebSocketService (ref), v7 (copy), startDataModelStreamWsClient (copy), HttpService (copy), streamDataModel (copy)
-	local v40
 
-	if u15 then
-		v40 = u15
-	else
-		n1 += 1
-		v40 = if not (n1 > #v13) then v13[n1] else nil
-	end
+local function startDataModelStreamWsClient(p: string?)
+	local hostToTry = getHostToTry() -- inferred equivalent call
 
-	local v41 = v40
-
-	if not v41 then
+	if not hostToTry then
 		return
 	end
 
-	local u42 = v41
+	local v4 = hostToTry
 
-	if s2 then
-		u42 ..= "/?source=" .. s2
+	if p then
+		v4 ..= "/?source=" .. p
 	end
 
-	local ok3, result = pcall(function() -- line: 109
-		-- upvalues: WebSocketService (ref), u42 (ref)
-		return WebSocketService:CreateClient(u42)
+	local success2, result = pcall(function()
+		return v3:CreateClient(v4)
 	end)
 
-	if not ok3 or not result then
-		v7:error("Failed to create WebSocket client")
-
+	if not (success2 and result) then
+		v:error("Failed to create WebSocket client")
 		return
 	end
 
-	local u45 = result
-
-	u45.Closed:Connect(function() -- line: 118
-		-- upvalues: startDataModelStreamWsClient (copy), s2 (copy)
-		startDataModelStreamWsClient(s2)
+	result.Closed:Connect(function()
+		startDataModelStreamWsClient(p)
 	end)
-	u45.MessageReceived:Connect(function(p6) -- line: 122
-		-- upvalues: u15 (ref), v41 (copy), HttpService (copy), streamDataModel (copy), u45 (ref)
-		u15 = v41
 
-		if p6:match("%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x") then
-			print("[" .. "DataModelStreaming" .. "] uuid[" .. p6 .. "]")
+	result.MessageReceived:Connect(function(json)
+		v2 = hostToTry
+
+		if json:match("%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x") then
+			print("[" .. "DataModelStreaming" .. "] uuid[" .. json .. "]")
 		end
 
-		local ok4, result2 = pcall(function() -- line: 133
-			-- upvalues: HttpService (copy), p6 (copy)
-			return HttpService:JSONDecode(p6)
+		local success3, result2 = pcall(function()
+			return HttpService:JSONDecode(json)
 		end)
 
-		if ok4 and result2.type == "data_model" then
-			local guid = HttpService:GenerateGUID(false)
+		if success3 and result2.type == "data_model" then
+			local v5 = HttpService:GenerateGUID(false)
 
 			if result2.request_id then
-				guid = result2.request_id
+				v5 = result2.request_id
 			end
 
-			streamDataModel(u45, guid, result2.properties)
+			streamDataModel(result, v5, result2.properties)
 		end
 	end)
 end
-local function initDataModelStreamWsClientWithVPNGate(s3: string?) -- line: 147
-	-- upvalues: WebSocketService (ref), startDataModelStreamWsClient (copy)
-	local ok5, result = pcall(function() -- line: 148
-		-- upvalues: WebSocketService (ref)
-		return WebSocketService:CreateClient("ws://10.110.101.222:5052")
+
+local function initDataModelStreamWsClientWithVPNGate(p: string?)
+	local success2, result = pcall(function()
+		return v3:CreateClient("ws://10.110.101.222:5052")
 	end)
 
-	if not ok5 or not result then
-		return
-	end
-
-	result.MessageReceived:Connect(function(_) -- line: 155
-		-- upvalues: result (copy), startDataModelStreamWsClient (copy), s3 (copy)
-		pcall(function() -- line: 156
-			-- upvalues: result (copy)
-			result:Close()
+	if success2 and result then
+		result.MessageReceived:Connect(function(_)
+			pcall(function()
+				result:Close()
+			end)
+			startDataModelStreamWsClient(p)
 		end)
-		startDataModelStreamWsClient(s3)
-	end)
+	end
 end
-local function initDataModelStreamWsClient(s4: string?) -- line: 163
-	-- upvalues: FFlagLuaAppEnableInExperienceDataModelStreamStarter (copy), v1 (copy), RunService (copy), initDataModelStreamWsClientWithVPNGate (copy)
-	local v50 = if not FFlagLuaAppEnableInExperienceDataModelStreamStarter then nil else s4 or "ua"
 
-	if v1 and RunService:IsStudio() then
+local function initDataModelStreamWsClient(value: string?)
+	if defineFastFlag and RunService:IsStudio() then
 		return
 	end
 
-	initDataModelStreamWsClientWithVPNGate(v50)
+	initDataModelStreamWsClientWithVPNGate(FFlagLuaAppEnableInExperienceDataModelStreamStarter and (value or "ua") or nil)
 end
 
 return initDataModelStreamWsClient

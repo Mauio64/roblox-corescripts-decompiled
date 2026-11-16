@@ -1,53 +1,53 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local EventNames = require(script.Parent.EventNames)
-local SocialLuaAnalytics = require(ParentParentParent.SocialLuaAnalytics)
+local SocialLuaAnalytics = require(parent2.SocialLuaAnalytics)
+
 local Enums = SocialLuaAnalytics.Analytics.Enums
 local Contexts = Enums.Contexts
 local EventTypes = Enums.EventTypes
 local BtnValues = require(script.Parent.BtnValues)
-local Constants = require(ParentParent.Common.Constants)
+local Constants = require(parent.Common.Constants)
+
 local formatFriendStatus = require(script.Parent.formatFriendStatus)
 local getUniverseIdFromUser = require(script.Parent.getUniverseIdFromUser)
 local formatRecommendationContextType = SocialLuaAnalytics.Analytics.Formatters.formatRecommendationContextType
 local formatPresence = SocialLuaAnalytics.Analytics.Formatters.formatPresence
-local getFIntShowFriendRecommendationsLimit = require(ParentParent.Flags.getFIntShowFriendRecommendationsLimit)
 
-local function v15(p1) -- line: 20
-	return p1
+local getFIntShowFriendRecommendationsLimit = require(parent.Flags.getFIntShowFriendRecommendationsLimit)
+
+local function fn(p)
+	return p
 end
 
 return {
 	[EventNames.CarouselLoadedWithUsers] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.FriendsCarouselLoaded,
-		additionalInfo = {
-			source = Constants.HomepageFriendsCarouselSourceName
-		},
+		additionalInfo = { source = Constants.HomepageFriendsCarouselSourceName },
 		formatRulesForAdditionalInfo = {
-			friendCount = v15,
-			recommendationCount = v15,
+			friendCount = fn,
+			recommendationCount = fn,
 			recommendationLimit = getFIntShowFriendRecommendationsLimit,
-			refreshCount = v15,
-			experimentLayerStatus = v15,
-			fetchedRecommendations = v15,
-			recommendationSessionId = v15
+			refreshCount = fn,
+			experimentLayerStatus = fn,
+			fetchedRecommendations = fn,
+			recommendationSessionId = fn
 		}
 	},
 	[EventNames.UserSeen] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.UserSeen,
-		additionalInfo = {
-			source = Constants.HomepageFriendsCarouselSourceName
-		},
+		additionalInfo = { source = Constants.HomepageFriendsCarouselSourceName },
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v15,
+			absolutePosition = fn,
 			recommendationContextType = formatRecommendationContextType,
 			friendStatus = formatFriendStatus,
-			isRecommendation = v15,
+			isRecommendation = fn,
 			presence = formatPresence,
-			recommendationRank = v15,
-			userId = v15,
+			recommendationRank = fn,
+			userId = fn,
 			universeId = getUniverseIdFromUser
 		}
 	},
@@ -59,12 +59,12 @@ return {
 			source = Constants.HomepageFriendsCarouselSourceName
 		},
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v15,
+			absolutePosition = fn,
 			recommendationContextType = formatRecommendationContextType,
-			friendId = v15,
+			friendId = fn,
 			friendStatus = formatFriendStatus,
-			isRecommendation = v15,
-			recommendationRank = v15,
+			isRecommendation = fn,
+			recommendationRank = fn,
 			universeId = getUniverseIdFromUser,
 			presence = formatPresence
 		}
@@ -77,10 +77,10 @@ return {
 			source = Constants.HomepageFriendsCarouselSourceName
 		},
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v15,
+			absolutePosition = fn,
 			recommendationContextType = formatRecommendationContextType,
-			recommendationRank = v15,
-			requestedId = v15
+			recommendationRank = fn,
+			requestedId = fn
 		}
 	},
 	[EventNames.RevokeFriendRequest] = {
@@ -91,10 +91,10 @@ return {
 			source = Constants.HomepageFriendsCarouselSourceName
 		},
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v15,
+			absolutePosition = fn,
 			recommendationContextType = formatRecommendationContextType,
-			recommendationRank = v15,
-			requestedId = v15
+			recommendationRank = fn,
+			requestedId = fn
 		}
 	},
 	[EventNames.ViewAllFriends] = {
@@ -105,91 +105,81 @@ return {
 			source = Constants.HomepageFriendsCarouselSourceName
 		},
 		formatRulesForAdditionalInfo = {
-			friendCount = v15,
+			friendCount = fn,
 			recommendationLimit = getFIntShowFriendRecommendationsLimit,
-			recommendationCount = v15
+			recommendationCount = fn
 		}
 	},
 	[EventNames.ViewAddFriends] = {
 		context = Contexts.AddFriends,
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
-			absolutePosition = 1,
 			btn = BtnValues.AddFriendsButton,
+			absolutePosition = 1,
 			source = Constants.HomepageFriendsCarouselSourceName
 		},
 		formatRulesForAdditionalInfo = {
-			friendCount = v15,
+			friendCount = fn,
 			recommendationLimit = getFIntShowFriendRecommendationsLimit,
-			recommendationCount = v15,
-			requestCount = v15,
-			showContactImporterModal = v15
+			recommendationCount = fn,
+			requestCount = fn,
+			showContactImporterModal = fn
 		}
 	},
 	[EventNames.CarouselLoadingTime] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.CarouselLoadingTime,
-		additionalInfo = {
-			source = Constants.HomepageFriendsCarouselSourceName
-		},
+		additionalInfo = { source = Constants.HomepageFriendsCarouselSourceName },
 		formatRulesForAdditionalInfo = {
-			carouselFetchingStatus = v15,
-			friendsFetchingStatus = v15,
-			recommendationFetchingStatus = v15,
-			loadingTime = v15,
-			reachedThreshold = v15,
-			loadingThreshold = v15,
-			experimentLayerStatus = v15,
-			isLegacyCarousel = v15
+			carouselFetchingStatus = fn,
+			friendsFetchingStatus = fn,
+			recommendationFetchingStatus = fn,
+			loadingTime = fn,
+			reachedThreshold = fn,
+			loadingThreshold = fn,
+			experimentLayerStatus = fn,
+			isLegacyCarousel = fn
 		}
 	},
 	[EventNames.ContactImporterOnAddFriends] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.ContactImporterOnAddFriends,
-		additionalInfo = {
-			isLegacyAddFriends = false
-		}
+		additionalInfo = { isLegacyAddFriends = false }
 	},
 	[EventNames.PaginatedFriendsCarouselLoadingTime] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.LoadingTime,
 		formatRulesForAdditionalInfo = {
-			status = v15,
-			loadingTime = v15,
-			loadingThreshold = v15,
-			nextPage = v15,
-			fetch = v15
+			status = fn,
+			loadingTime = fn,
+			loadingThreshold = fn,
+			nextPage = fn,
+			fetch = fn
 		},
-		additionalInfo = {
-			source = Constants.HomepageFriendsCarouselSourceName
-		}
+		additionalInfo = { source = Constants.HomepageFriendsCarouselSourceName }
 	},
 	[EventNames.FriendsEndpointLoadingTime] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.LoadingTime,
 		formatRulesForAdditionalInfo = {
-			status = v15,
-			loadingTime = v15,
-			loadingThreshold = v15,
-			nextPage = v15,
-			fetch = v15
+			status = fn,
+			loadingTime = fn,
+			loadingThreshold = fn,
+			nextPage = fn,
+			fetch = fn
 		},
-		additionalInfo = {
-			source = Constants.HomepageFriendsCarouselSourceName
-		}
+		additionalInfo = { source = Constants.HomepageFriendsCarouselSourceName }
 	},
 	[EventNames.FriendsCarouselUILoadingTime] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.LoadingTime,
 		formatRulesForAdditionalInfo = {
-			status = v15,
-			fetch = v15,
-			loadingTime = v15,
-			loadingThreshold = v15,
-			nextPage = v15
+			status = fn,
+			fetch = fn,
+			loadingTime = fn,
+			loadingThreshold = fn,
+			nextPage = fn
 		},
-		additionalInfo = {
-			source = Constants.HomepageFriendsCarouselSourceName
-		}
+		additionalInfo = { source = Constants.HomepageFriendsCarouselSourceName }
 	}
 }

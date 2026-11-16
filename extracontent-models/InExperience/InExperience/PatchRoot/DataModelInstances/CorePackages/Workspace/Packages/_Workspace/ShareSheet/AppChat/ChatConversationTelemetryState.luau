@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local ChatConversationTelemetryState = require(Workspace.AppChat.AppChat.Contexts.TelemetryState.ChatConversationTelemetryState)
 
-return (require(_Workspace.AppChat.AppChat.Contexts.TelemetryState.ChatConversationTelemetryState))
+return ChatConversationTelemetryState

@@ -5,272 +5,359 @@ local Players = game:GetService("Players")
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local React = require(CorePackages.Packages.React)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local Modules = CoreGui.RobloxGui.Modules
 local renderWithCoreScriptsStyleProvider = require(Modules.Common.renderWithCoreScriptsStyleProvider)
 local ShareGame = Modules.Settings.Pages.ShareGame
-local COLORS = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Constants.COLORS
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local colors = CoreScriptsCommon.Constants.COLORS
 local Constants = require(ShareGame.Constants)
-local GameInviteEvents = require(CorePackages.Workspace.Packages.GameInvite).GameInviteEvents
+local GameInvite = require(CorePackages.Workspace.Packages.GameInvite)
+local GameInviteEvents = GameInvite.GameInviteEvents
 local InviteStatus = Constants.InviteStatus
-local v15 = require(ShareGame.getTranslator)()
+local getTranslator = require(ShareGame.getTranslator)
+local translator = getTranslator()
+
 local httpRequest = require(Modules.Common.httpRequest)
+
 local InviteUserIdToPlaceId = require(ShareGame.Thunks.InviteUserIdToPlaceId)
-local RetrievalStatus = require(CorePackages.Workspace.Packages.Http).Enum.RetrievalStatus
+local Http = require(CorePackages.Workspace.Packages.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
 local InviteUserIdToPlaceIdCustomized = require(ShareGame.Thunks.InviteUserIdToPlaceIdCustomized)
 local ThrottleFunctionCall = require(ShareGame.ThrottleFunctionCall)
+
 local SingleUserThumbnail = require(ShareGame.Components.SingleUserThumbnail)
+
+local Signals = require(CorePackages.Packages.Signals)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local UserProfiles = require(CorePackages.Workspace.Packages.UserProfiles)
+local UserProfileStore = UserProfiles.Stores.UserProfileStore
+
+local LoadingModal = require(ShareGame.Components.LoadingModal)
+
 local GetFFlagAbuseReportAnalyticsHasLaunchData = require(Modules.Settings.Flags.GetFFlagAbuseReportAnalyticsHasLaunchData)
 local GetFFlagEnableNewInviteSendEndpoint = require(Modules.Flags.GetFFlagEnableNewInviteSendEndpoint)
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagFixPromptGameInviteUIMissingDisplayName = SharedFlags.FFlagFixPromptGameInviteUIMissingDisplayName
 local GetFFlagThrottleInviteSendEndpoint = require(Modules.Flags.GetFFlagThrottleInviteSendEndpoint)
 local GetFIntThrottleInviteSendEndpointDelay = require(Modules.Flags.GetFIntThrottleInviteSendEndpointDelay)
 local GetFFlagSingleUserInvitePageKeybind = require(Modules.Settings.Flags.GetFFlagSingleUserInvitePageKeybind)
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+
 local useStyle = UIBlox.Core.Style.useStyle
-local color3 = Color3.fromRGB(41, 41, 41)
 
-local function v33(p1) -- line: 52
-	-- upvalues: useStyle (copy), React (copy), Constants (copy), GameInviteEvents (copy), InviteStatus (copy), GetFFlagAbuseReportAnalyticsHasLaunchData (copy), Players (copy), GetFFlagSingleUserInvitePageKeybind (copy), ContextActionService (copy), GetFFlagThrottleInviteSendEndpoint (copy), ThrottleFunctionCall (copy), GetFIntThrottleInviteSendEndpointDelay (copy), RetrievalStatus (copy), color3 (copy), StyledTextLabel (copy), v15 (copy), COLORS (copy), SingleUserThumbnail (copy), Button (copy), ButtonType (copy)
-	local v35 = p1.friends[tostring(p1.inviteUserId)]
-	local v36 = v35 and p1.invites[v35.id]
-	local v37 = useStyle()
-	local v38, v39 = React.useState(false)
+local color = Color3.fromRGB(41, 41, 41)
 
-	React.useEffect(function() -- line: 59
-		-- upvalues: p1 (copy), Constants (copy), GameInviteEvents (copy)
-		if p1.promptMessage and p1.analytics then
-			p1.analytics:sendEvent(Constants.Triggers.DeveloperSingle, GameInviteEvents.CustomTextShown)
+local function fn(props)
+	local friend = props.friends[tostring(props.inviteUserId)]
+	local v = friend and props.invites[friend.id]
+
+	local v2 = useStyle()
+	local state, setState = React.useState(false)
+	local v3
+
+	if FFlagFixPromptGameInviteUIMissingDisplayName then
+		v3 = React.useMemo(function()
+			return UserProfileStore.get().fetchNamesByUserIds({ (tostring(props.inviteUserId)) })
+		end, { props.inviteUserId })
+	else
+		v3 = nil
+	end
+
+	local v4
+
+	if FFlagFixPromptGameInviteUIMissingDisplayName then
+		v4 = React.useMemo(function()
+			return Signals.createComputed(function(p)
+				local v5 = v3(p)
+				local v6 = v5 and v5.data and v5.data[1]
+				local names = v6 and v6.names
+				local name
+
+				if names then
+					name = names.getCombinedName(p)
+
+					if name == "" then
+						name = names.getUsername(p)
+					end
+				else
+					name = ""
+				end
+
+				return {
+					name = name,
+					isFetching = v5 == nil or v5.status == "fetching"
+				}
+			end)
+		end, { v3 })
+	end
+
+	local v5
+
+	if FFlagFixPromptGameInviteUIMissingDisplayName then
+		v5 = SignalsReact.useSignalState(v4)
+	end
+
+	React.useEffect(function()
+		if props.promptMessage and props.analytics then
+			props.analytics:sendEvent(Constants.Triggers.DeveloperSingle, GameInviteEvents.CustomTextShown)
 		end
 	end, {})
 
-	local v40 = React.useCallback(function() -- line: 66
-		-- upvalues: p1 (copy)
-		p1.closePage()
+	local v6 = React.useCallback(function()
+		props.closePage()
 
-		if p1.onAfterClosePage then
-			p1.onAfterClosePage()
+		if props.onAfterClosePage then
+			props.onAfterClosePage()
 		end
-	end, {
-		p1.closePage,
-		p1.onAfterClosePage
-	})
-	local v41 = React.useCallback(function() -- line: 78
-		-- upvalues: p1 (copy), Constants (copy), GameInviteEvents (copy), v40 (copy)
-		p1.analytics:sendEvent(Constants.Triggers.DeveloperSingle, GameInviteEvents.CancelInvite)
-		v40()
-	end, { v40 })
-	local u42 = React.useCallback(function() -- line: 86
-		-- upvalues: v39 (copy), p1 (copy), v36 (copy), InviteStatus (copy), Constants (copy), GameInviteEvents (copy), v35 (copy), GetFFlagAbuseReportAnalyticsHasLaunchData (copy), Players (copy), v40 (copy)
-		v39(true)
+	end, { props.closePage, props.onAfterClosePage })
 
-		local inviteUser = p1.inviteUser
-		local analytics = p1.analytics
+	local onActivated = React.useCallback(function()
+		props.analytics:sendEvent(Constants.Triggers.DeveloperSingle, GameInviteEvents.CancelInvite)
+		v6()
+	end, { v6 })
 
-		if v36 and v36 ~= InviteStatus.Failed then
+	local onActivated2 = React.useCallback(function()
+		setState(true)
+		local inviteUser = props.inviteUser
+		local analytics = props.analytics
+
+		if v and v ~= InviteStatus.Failed then
 			return
 		end
 
-		local v50 = p1.launchData ~= nil and p1.launchData ~= ""
+		local isLaunchDataProvided
 
-		analytics:sendEvent(Constants.Triggers.DeveloperSingle, GameInviteEvents.SendInvite, {
-			recipient = v35.id,
-			isLaunchDataProvided = if not GetFFlagAbuseReportAnalyticsHasLaunchData() then nil else v50
-		})
-		inviteUser(tostring(v35.id), analytics, p1.inviteMessageId, p1.launchData):andThen(function(p2) -- line: 102
-			-- upvalues: v39 (copy), v35 (copy), Players (copy), analytics (copy), v40 (copy)
-			v39(false)
+		if props.launchData == nil then
+			isLaunchDataProvided = false
+		else
+			isLaunchDataProvided = props.launchData ~= ""
+		end
 
-			if not p2 then
+		local developerSingle = Constants.Triggers.DeveloperSingle
+		local sendInvite = GameInviteEvents.SendInvite
+		local v7 = { recipient = friend.id, isLaunchDataProvided = 0 }
+
+		if not GetFFlagAbuseReportAnalyticsHasLaunchData() then
+			isLaunchDataProvided = nil
+		end
+
+		v7.isLaunchDataProvided = isLaunchDataProvided
+		analytics:sendEvent(developerSingle, sendInvite, v7)
+
+		local function fn2(p)
+			setState(false)
+
+			if not p then
 				return
 			end
 
-			local t1 = { v35.id }
+			local v8 = { friend.id }
 
-			if Players.LocalPlayer and p2.conversationId then
-				local LocalPlayer = Players.LocalPlayer
-
-				analytics:onActivatedInviteSent(LocalPlayer.UserId, p2.conversationId, t1)
+			if Players.LocalPlayer and p.conversationId then
+				analytics:onActivatedInviteSent(Players.LocalPlayer.UserId, p.conversationId, v8)
 			end
 
-			v40()
-		end, v40)
+			v6()
+		end
+
+		inviteUser(tostring(friend.id), analytics, props.inviteMessageId, props.launchData):andThen(fn2, v6)
 	end, {
-		p1.inviteUser,
-		p1.inviteMessageId,
-		p1.launchData,
-		p1.analytics,
-		v39,
-		v36,
-		v35,
-		v40
+		props.inviteUser,
+		props.inviteMessageId,
+		props.launchData,
+		props.analytics,
+		setState,
+		v,
+		friend,
+		v6
 	})
 
 	if GetFFlagSingleUserInvitePageKeybind() then
-		React.useEffect(function() -- line: 136
-			-- upvalues: p1 (copy), ContextActionService (copy), u42 (ref), v41 (copy)
-			if p1.isVisible then
-				ContextActionService:BindCoreAction("ProductPurchaseConfirmButtonBind", function(_, p4, _) -- line: 138
-					-- upvalues: u42 (ref)
-					if p4 == Enum.UserInputState.Begin then
-						u42()
-					end
-				end, false, Enum.KeyCode.ButtonA)
-				ContextActionService:BindCoreAction("ProductPurchaseCancelButtonBind", function(_, p7, _) -- line: 143
-					-- upvalues: v41 (copy)
-					if p7 == Enum.UserInputState.Begin then
-						v41()
-					end
-				end, false, Enum.KeyCode.ButtonB)
-
-				return function() -- line: 148
-					-- upvalues: ContextActionService (copy)
-					ContextActionService:UnbindCoreAction("ProductPurchaseConfirmButtonBind")
-					ContextActionService:UnbindCoreAction("ProductPurchaseCancelButtonBind")
-				end
+		React.useEffect(function()
+			if not props.isVisible then
+				return nil
 			end
 
-			return nil
-		end, {
-			p1.isVisible,
-			u42,
-			v41
-		})
+			ContextActionService:BindCoreAction("ProductPurchaseConfirmButtonBind", function(_, p, _)
+				if p == Enum.UserInputState.Begin then
+					onActivated2()
+				end
+			end, false, Enum.KeyCode.ButtonA)
+			ContextActionService:BindCoreAction("ProductPurchaseCancelButtonBind", function(_, p, _)
+				if p == Enum.UserInputState.Begin then
+					onActivated()
+				end
+			end, false, Enum.KeyCode.ButtonB)
+			return function()
+				ContextActionService:UnbindCoreAction("ProductPurchaseConfirmButtonBind")
+				ContextActionService:UnbindCoreAction("ProductPurchaseCancelButtonBind")
+			end
+		end, { props.isVisible, onActivated2, onActivated })
 	end
 
 	if GetFFlagThrottleInviteSendEndpoint() then
-		u42 = React.useCallback(ThrottleFunctionCall(GetFIntThrottleInviteSendEndpointDelay(), u42), { u42 })
+		onActivated2 = React.useCallback(ThrottleFunctionCall(GetFIntThrottleInviteSendEndpointDelay(), onActivated2), {
+			onActivated2
+		})
 	end
 
-	if not v35 then
-		if p1.friendsRetrievalStatus == RetrievalStatus.Done or p1.friendsRetrievalStatus == RetrievalStatus.Failed then
-			v40()
+	if friend then
+		if FFlagFixPromptGameInviteUIMissingDisplayName and v5.name == "" and v5.isFetching then
+			return React.createElement(LoadingModal)
 		end
 
-		return
-	end
+		local displayName
 
-	local v43 = v36 and v36 ~= InviteStatus.Failed
-	local v44 = not v43 and "Feature.SettingsHub.Action.InviteFriend" or "Feature.SettingsHub.Label.Invited"
+		if FFlagFixPromptGameInviteUIMissingDisplayName then
+			if v5.name == "" then
+				displayName = friend.displayName or ""
+			else
+				displayName = v5.name
+			end
+		else
+			displayName = friend.displayName
+		end
 
-	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		BackgroundTransparency = 0.1,
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = UDim2.new(0.5, 0, 0.5, 0),
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		BackgroundColor3 = color3
-	}, {
-		SizeConstraint = React.createElement("UISizeConstraint", {
-			MaxSize = Vector2.new(442, 1e999),
-			MinSize = Vector2.new(0, 0)
-		}),
-		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, 8)
-		}),
-		Padding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, 24),
-			PaddingRight = UDim.new(0, 24),
-			PaddingBottom = UDim.new(0, 24)
-		}),
-		Header = React.createElement(StyledTextLabel, {
-			fontStyle = v37.Font.Header1,
-			colorStyle = v37.Theme.TextEmphasis,
-			text = v15:FormatByKey("Feature.SettingsHub.Heading.InviteUser", {
-				DisplayName = v35.displayName
-			}),
-			size = UDim2.new(1, 0, 0, 48),
-			textXAlignment = Enum.TextXAlignment.Center
-		}),
-		Divider = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			Position = UDim2.new(0, 0, 0, 48),
-			Size = UDim2.new(1, 0, 0, 1),
-			BackgroundColor3 = COLORS.GRAPHITE
-		}),
-		Wrapper = React.createElement("Frame", {
-			BackgroundTransparency = 1,
+		local isDisabled = v and v ~= InviteStatus.Failed
+
+		return React.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Position = UDim2.new(0, 0, 0, 56)
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BorderSizePixel = 0,
+			BackgroundColor3 = color,
+			BackgroundTransparency = 0.1
 		}, {
-			ListLayout = React.createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				Padding = UDim.new(0, 24)
+			SizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(442, 1e999),
+				MinSize = Vector2.new(0, 0)
 			}),
-			Thumbnail = React.createElement(SingleUserThumbnail, {
-				layoutOrder = 1,
-				square = true,
-				backgroundTransparency = 1,
-				user = v35,
-				size = UDim2.new(0, 95, 0, 95)
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
+			Padding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, 24),
+				PaddingRight = UDim.new(0, 24),
+				PaddingBottom = UDim.new(0, 24)
 			}),
-			TextBody = React.createElement(StyledTextLabel, {
-				layoutOrder = 2,
-				fontStyle = v37.Font.Header2,
-				colorStyle = v37.Theme.TextEmphasis,
-				text = p1.promptMessage or v15:FormatByKey("Feature.SettingsHub.Label.DefaultInviteMessage", {
-					DisplayName = v35.displayName
+			Header = React.createElement(StyledTextLabel, {
+				fontStyle = v2.Font.Header1,
+				colorStyle = v2.Theme.TextEmphasis,
+				text = translator:FormatByKey("Feature.SettingsHub.Heading.InviteUser", {
+					DisplayName = displayName
 				}),
-				textXAlignment = Enum.TextXAlignment.Center,
-				automaticSize = Enum.AutomaticSize.Y,
-				size = UDim2.new(1, 0, 0, 0)
+				size = UDim2.new(1, 0, 0, 48),
+				textXAlignment = Enum.TextXAlignment.Center
 			}),
-			ButtonWrapper = React.createElement("Frame", {
-				LayoutOrder = 3,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, 48)
-			}, {
-				CancelButton = React.createElement(Button, {
-					buttonType = ButtonType.Secondary,
-					size = UDim2.new(0.5, -12, 1, 0),
-					text = v15:FormatByKey("Feature.SettingsHub.Action.Cancel"),
-					onActivated = v41,
-					isDisabled = v38
-				}),
-				InviteButton = React.createElement(Button, {
-					buttonType = ButtonType.PrimarySystem,
-					size = UDim2.new(0.5, -12, 1, 0),
-					position = UDim2.new(0.5, 12, 0, 0),
-					text = v15:FormatByKey(v44),
-					onActivated = u42,
-					isLoading = v38,
-					isDisabled = v43
-				})
-			})
+			Divider = React.createElement("Frame", {
+				Position = UDim2.new(0, 0, 0, 48),
+				Size = UDim2.new(1, 0, 0, 1),
+				BorderSizePixel = 0,
+				BackgroundColor3 = colors.GRAPHITE
+			}),
+			Wrapper = React.createElement(
+				"Frame",
+				{
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Position = UDim2.new(0, 0, 0, 56),
+					BackgroundTransparency = 1
+				},
+				{
+					ListLayout = React.createElement("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						Padding = UDim.new(0, 24)
+					}),
+					Thumbnail = React.createElement(SingleUserThumbnail, {
+						user = friend,
+						size = UDim2.new(0, 95, 0, 95),
+						layoutOrder = 1,
+						square = true,
+						backgroundTransparency = 1
+					}),
+					TextBody = React.createElement(StyledTextLabel, {
+						fontStyle = v2.Font.Header2,
+						colorStyle = v2.Theme.TextEmphasis,
+						text = props.promptMessage or translator:FormatByKey(
+							"Feature.SettingsHub.Label.DefaultInviteMessage",
+							{ DisplayName = displayName }
+						),
+						textXAlignment = Enum.TextXAlignment.Center,
+						automaticSize = Enum.AutomaticSize.Y,
+						size = UDim2.new(1, 0, 0, 0),
+						layoutOrder = 2
+					}),
+					ButtonWrapper = React.createElement(
+						"Frame",
+						{
+							Size = UDim2.new(1, 0, 0, 48),
+							LayoutOrder = 3,
+							BackgroundTransparency = 1
+						},
+						{
+							CancelButton = React.createElement(Button, {
+								buttonType = ButtonType.Secondary,
+								size = UDim2.new(0.5, -12, 1, 0),
+								text = translator:FormatByKey("Feature.SettingsHub.Action.Cancel"),
+								onActivated = onActivated,
+								isDisabled = state
+							}),
+							InviteButton = React.createElement(Button, {
+								buttonType = ButtonType.PrimarySystem,
+								size = UDim2.new(0.5, -12, 1, 0),
+								position = UDim2.new(0.5, 12, 0, 0),
+								text = translator:FormatByKey(isDisabled and "Feature.SettingsHub.Label.Invited" or "Feature.SettingsHub.Action.InviteFriend"),
+								onActivated = onActivated2,
+								isLoading = state,
+								isDisabled = isDisabled
+							})
+						}
+					)
+				}
+			)
 		})
-	})
+	elseif
+		props.friendsRetrievalStatus == RetrievalStatus.Done
+		or props.friendsRetrievalStatus == RetrievalStatus.Failed
+	then
+		v6()
+	end
 end
 
-return RoactRodux.connect(function(p9) -- line: 280
-	-- upvalues: Players (copy)
+return RoactRodux.connect(function(data)
 	return {
-		friends = p9.Users,
-		friendsRetrievalStatus = Players.LocalPlayer and p9.Friends.retrievalStatus[tostring(Players.LocalPlayer.UserId)],
-		invites = p9.Invites
+		friends = data.Users,
+		friendsRetrievalStatus = Players.LocalPlayer and data.Friends.retrievalStatus[tostring(Players.LocalPlayer.UserId)],
+		invites = data.Invites
 	}
-end, function(p10: ((...any) -> ...any)) -- line: 287
-	-- upvalues: httpRequest (copy), HttpRbxApiService (copy), GetFFlagEnableNewInviteSendEndpoint (copy), InviteUserIdToPlaceIdCustomized (copy), Constants (copy), InviteUserIdToPlaceId (copy)
+end, function(callback)
 	return {
-		inviteUser = function(s1: string, p11, s2: string?, s3: string?) -- line: 289
-			-- upvalues: httpRequest (copy), HttpRbxApiService (copy), GetFFlagEnableNewInviteSendEndpoint (copy), p10 (copy), InviteUserIdToPlaceIdCustomized (copy), Constants (copy), InviteUserIdToPlaceId (copy)
-			local v55 = httpRequest(HttpRbxApiService)
-			local str = tostring(game.PlaceId)
+		inviteUser = function(p: string, p2, p3: string?, p4: string?)
+			local v = httpRequest(HttpRbxApiService)
+			local placeId = tostring(game.PlaceId)
 
 			if GetFFlagEnableNewInviteSendEndpoint() then
-				return p10(InviteUserIdToPlaceIdCustomized(v55, s1, str, p11, Constants.Triggers.DeveloperSingle, s2, s3))
+				return callback(InviteUserIdToPlaceIdCustomized(
+					v,
+					p,
+					placeId,
+					p2,
+					Constants.Triggers.DeveloperSingle,
+					p3,
+					p4
+				))
 			end
 
-			return p10(InviteUserIdToPlaceId(v55, s1, str))
+			return callback(InviteUserIdToPlaceId(v, p, placeId))
 		end
 	}
-end)(function(p12) -- line: 310
-	-- upvalues: renderWithCoreScriptsStyleProvider (copy), React (copy), v33 (copy)
-	return renderWithCoreScriptsStyleProvider({
-		SingleUserInvite = React.createElement(v33, p12)
-	})
+end)(function(p)
+	return renderWithCoreScriptsStyleProvider({ SingleUserInvite = React.createElement(fn, p) })
 end)

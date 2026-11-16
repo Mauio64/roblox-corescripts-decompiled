@@ -1,130 +1,175 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local formatNumber = require(ParentParent.Utility.formatNumber)
-local logger = require(ParentParent.Utility.logger)
-local React = require(ParentParentParent.React)
-local UIBlox = require(ParentParentParent.UIBlox)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local formatNumber = require(parent.Utility.formatNumber)
+local logger = require(parent.Utility.logger)
+
+local React = require(parent2.React)
+
+local UIBlox = require(parent2.UIBlox)
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local Foundation = require(ParentParentParent.Foundation)
-local useTokens = Foundation.Hooks.useTokens
-local FoundationText = Foundation.Text
-local View = Foundation.View
-local VirtualItemBadgeType = require(ParentParent.Enums.VirtualItemBadgeType)
-local ModelViewport = require(ParentParent.Generic.ModelViewport)
-local YellowBadge = require(ParentParent.Generic.YellowBadge)
-local LocalizationService = game:GetService("LocalizationService")
-local useLocalization = require(ParentParentParent.Localization).Hooks.useLocalization
-local default = require(ParentParentParent.LoggingProtocol).default
-local VirtualItemBadgeShownCounter = require(ParentParent.Generic.Events.VirtualItemBadgeCounter).VirtualItemBadgeShownCounter
-local v20 = Images["icons/status/imageunavailable"]
 
-local function withMaxLength(s1: string) -- line: 41
-	if #s1 > 50 then
-		return s1:sub(1, 50) .. "..."
+local Foundation = require(parent2.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local Text = Foundation.Text
+local View = Foundation.View
+
+local VirtualItemBadgeType = require(parent.Enums.VirtualItemBadgeType)
+
+local ModelViewport = require(parent.Generic.ModelViewport)
+local YellowBadge = require(parent.Generic.YellowBadge)
+
+local LocalizationService = game:GetService("LocalizationService")
+local Localization = require(parent2.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local LoggingProtocol = require(parent2.LoggingProtocol)
+local default = LoggingProtocol.default
+local VirtualItemBadgeCounter = require(parent.Generic.Events.VirtualItemBadgeCounter)
+local VirtualItemBadgeShownCounter = VirtualItemBadgeCounter.VirtualItemBadgeShownCounter
+
+local iconsstatusimageunavailable = Images["icons/status/imageunavailable"]
+
+local function withMaxLength(itemName: string) -- 1 equivalent call inferred from this helper
+	if #itemName > 50 then
+		return itemName:sub(1, 50) .. "..."
 	end
 
-	return s1
+	return itemName
 end
 
-return function(t1: {[any]: any}) -- line: 57
-	-- upvalues: useLocalization (copy), useTokens (copy), React (copy), ModelViewport (copy), ImageSetLabel (copy), v20 (copy), VirtualItemBadgeType (copy), YellowBadge (copy), logger (copy), default (copy), VirtualItemBadgeShownCounter (copy), View (copy), FoundationText (copy), formatNumber (copy), LocalizationService (copy)
-	local v24 = useLocalization({
-		Popular = "IAPExperience.RobuxUpsell.Text.PopularItem"
-	})
-	local v25 = useTokens()
-	local v26 = not t1.isPortrait and 80 or 128
-	local v27, v28 = React.useState(0)
+return function(props)
+	local v = useLocalization({ Popular = "IAPExperience.RobuxUpsell.Text.PopularItem" })
 
-	local function updateComponentWidth(p1) -- line: 66
-		-- upvalues: v26 (copy), v27 (copy), v28 (copy)
-		if not p1 then
+	local v2 = useTokens()
+	local v3 = props.isPortrait and 128 or 80
+
+	local state, setState = React.useState(0)
+	local function updateComponentWidth(p)
+		if not p then
 			return
 		end
 
-		local v45 = p1.AbsoluteSize.X - v26 - 6
+		local v4 = p.AbsoluteSize.X - v3 - 6
 
-		if v45 ~= v27 then
-			v28(v45)
+		if v4 ~= state then
+			setState(v4)
 		end
 	end
 
-	local v30 = if t1.model == nil then React.createElement(ImageSetLabel, {
-		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 5, 0, 5),
-		Size = UDim2.new(0, v26, 0, v26),
-		ScaleType = Enum.ScaleType.Stretch,
-		Image = if not t1.itemIcon then v20 else t1.itemIcon,
-		ImageColor3 = if not t1.itemIcon then v25.Color.Content.Default.Color3 else nil,
-		ImageTransparency = if not t1.itemIcon then v25.Color.Content.Default.Transparency else nil
-	}) else React.createElement(ModelViewport, {
-		model = t1.model,
-		Position = UDim2.fromOffset(5, 5),
-		Size = UDim2.fromOffset(v26, v26)
-	})
-	local v31 = if not t1.badgeType or t1.badgeType ~= VirtualItemBadgeType.Popular then nil else React.createElement(YellowBadge, {
-		LayoutOrder = 2,
-		Icon = "icons/menu/fire_fill",
-		Text = v24.Popular
-	})
+	local itemIcon
 
-	React.useEffect(function() -- line: 102
-		-- upvalues: v31 (copy), logger (copy), t1 (copy), default (copy), VirtualItemBadgeShownCounter (copy)
-		if not v31 then
+	if props.model == nil then
+		local createElement = React.createElement
+		local v4 = {
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, 5, 0, 5),
+			Size = UDim2.new(0, v3, 0, v3),
+			ScaleType = Enum.ScaleType.Stretch,
+			Image = 0,
+			ImageColor3 = 0,
+			ImageTransparency = 0
+		}
+		local image
+
+		if props.itemIcon then
+			image = props.itemIcon
+		else
+			image = iconsstatusimageunavailable
+		end
+
+		v4.Image = image
+		local imageColor
+
+		if not props.itemIcon then
+			imageColor = v2.Color.Content.Default.Color3
+		end
+
+		v4.ImageColor3 = imageColor
+		local imageTransparency
+
+		if not props.itemIcon then
+			imageTransparency = v2.Color.Content.Default.Transparency
+		end
+
+		v4.ImageTransparency = imageTransparency
+		itemIcon = createElement(ImageSetLabel, v4)
+	else
+		itemIcon = React.createElement(ModelViewport, {
+			model = props.model,
+			Position = UDim2.fromOffset(5, 5),
+			Size = UDim2.fromOffset(v3, v3)
+		})
+	end
+
+	local itemBadge
+
+	if props.badgeType and props.badgeType == VirtualItemBadgeType.Popular then
+		itemBadge = React.createElement(YellowBadge, {
+			LayoutOrder = 2,
+			Text = v.Popular,
+			Icon = "icons/menu/fire_fill"
+		})
+	else
+		itemBadge = nil
+	end
+
+	React.useEffect(function()
+		if not itemBadge then
 			return
 		end
 
-		logger.debug({
-			message = "Virtual Item Badge Shown",
-			badgeType = t1.badgeType
-		})
+		logger.debug({ message = "Virtual Item Badge Shown", badgeType = props.badgeType })
+
 		default:logRobloxTelemetryCounter(VirtualItemBadgeShownCounter, 1, {
-			badgeType = t1.badgeType
+			badgeType = props.badgeType
 		})
 	end, {})
 
 	local createElement = React.createElement
-	local v33 = View
-	local t2 = {
-		tag = "auto-y row gap-small align-y-center align-x-left",
-		LayoutOrder = t1.layoutOrder,
-		Size = UDim2.new(1, 0, 0, 0)
+	local v4 = {
+		LayoutOrder = props.layoutOrder,
+		Size = UDim2.new(1, 0, 0, 0),
+		tag = "auto-y row gap-small align-y-center align-x-left"
 	}
-	local t3 = {
-		ItemIcon = v30
-	}
+
 	local createElement2 = React.createElement
-	local v37 = View
-	local t4 = {
+	local v5 = {
 		LayoutOrder = 2,
-		tag = "col auto-y gap-small",
 		onAbsoluteSizeChanged = updateComponentWidth,
-		Size = UDim2.new(1, 0, 0, 0)
+		Size = UDim2.new(1, 0, 0, 0),
+		tag = "col auto-y gap-small"
 	}
-	local t5 = {}
-	local createElement3 = React.createElement
-	local v41 = FoundationText
-	local t6 = {
-		LayoutOrder = 1,
-		tag = "auto-y text-align-x-left text-wrap text-title-medium content-emphasis",
-		Size = UDim2.new(0, v27, 0, 0)
-	}
-	local itemName = t1.itemName
 
-	t6.Text = if not (#itemName > 50) then itemName else itemName:sub(1, 50) .. "..."
-	t5.ItemName = createElement3(v41, t6)
-	t5.ItemDetails = React.createElement(View, {
-		LayoutOrder = 2,
-		tag = not t1.isPortrait and "auto-xy row gap-small align-y-center" or "auto-xy col gap-small align-y-center"
-	}, {
-		ItemCost = if not t1.itemRobuxCost then nil else React.createElement(FoundationText, {
+	local children = {
+		ItemName = React.createElement(Text, {
 			LayoutOrder = 1,
-			tag = "auto-xy text-align-x-left text-wrap text-title-medium content-emphasis",
-			Text = utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, t1.itemRobuxCost)
+			Size = UDim2.new(0, state, 0, 0),
+			Text = withMaxLength(props.itemName), -- inferred equivalent call
+			tag = "auto-y text-align-x-left text-wrap text-title-medium content-emphasis"
 		}),
-		ItemBadge = v31
-	})
-	t3.ItemDetailsFrame = createElement2(v37, t4, t5)
+		ItemDetails = 0
+	}
 
-	return createElement(v33, t2, t3)
+	local createElement3 = React.createElement
+	local v6 = {
+		LayoutOrder = 2,
+		tag = props.isPortrait and "auto-xy col gap-small align-y-center" or "auto-xy row gap-small align-y-center"
+	}
+	local itemCost
+
+	if props.itemRobuxCost then
+		itemCost = React.createElement(Text, {
+			LayoutOrder = 1,
+			Text = utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, props.itemRobuxCost),
+			tag = "auto-xy text-align-x-left text-wrap text-title-medium content-emphasis"
+		})
+	end
+
+	children.ItemDetails = createElement3(View, v6, { ItemCost = itemCost, ItemBadge = itemBadge })
+	return createElement(View, v4, {
+		ItemIcon = itemIcon,
+		ItemDetailsFrame = createElement2(View, v5, children)
+	})
 end

@@ -1,55 +1,99 @@
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
-local React = require(Parent.React)
-local Responsive = require(Parent.Responsive)
-local UIBlox = require(Parent.UIBlox)
-local useFocusedTextBox = require(Parent.FocusNavigationUtils).useFocusedTextBox
+
+local appShortcutBar = script:FindFirstAncestor("AppShortcutBar")
+local parent = appShortcutBar.Parent
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
+local UIBlox = require(parent.UIBlox)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local useFocusedTextBox = FocusNavigationUtils.useFocusedTextBox
 local ShortcutBar = UIBlox.App.Navigation.ShortcutBar
-local v8 = game:DefineFastFlag("ShortcutBarMinSize", false)
-local v9 = game:DefineFastFlag("DisableAppShortcutBarAndroidTV", false)
+local defineFastFlag = game:DefineFastFlag("DisableAppShortcutBarAndroidTV", false)
 
-function AppShortcutBar(t1: {[any]: any}) -- line: 23
-	-- upvalues: useFocusedTextBox (copy), Responsive (copy), React (copy), UserInputService (copy), v9 (copy), v8 (copy), ShortcutBar (copy)
-	local v11 = if not t1.Position then UDim2.fromScale(0.5, 0) else t1.Position
-	local v12 = if not t1.AnchorPoint then Vector2.new(0.5, 0) else t1.AnchorPoint
-	local v13 = useFocusedTextBox()
-	local v14 = Responsive.useLastInput()
-	local v15, v16 = React.useState(v14 ~= Responsive.Input.Directional or UserInputService:GamepadSupports(UserInputService:GetLastInputType(), Enum.KeyCode.Thumbstick1))
+local Flags = require(appShortcutBar.Flags)
+local FFlagEnableStickyShortcutBarOnAllPlatformsIxpEnabled = Flags.FFlagEnableStickyShortcutBarOnAllPlatformsIxpEnabled
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUnifyShortcutBarUnifiedIXPExposure = SharedFlags.FFlagUnifyShortcutBarUnifiedIXPExposure
+local useStickyShortcutBarExposureLogging = require(appShortcutBar.Hooks.useStickyShortcutBarExposureLogging)
 
-	if v9 then
-		React.useEffect(function() -- line: 34
-			-- upvalues: UserInputService (copy), v16 (copy), v14 (copy), Responsive (copy)
-			local connection = UserInputService.LastInputTypeChanged:Connect(function() -- line: 35
-				-- upvalues: v16 (copy), v14 (copy), Responsive (copy), UserInputService (copy)
-				v16(v14 ~= Responsive.Input.Directional or UserInputService:GamepadSupports(UserInputService:GetLastInputType(), Enum.KeyCode.Thumbstick1))
+function AppShortcutBar(props)
+	local position
+
+	if props.Position then
+		position = props.Position
+	else
+		position = UDim2.fromScale(0.5, 0)
+	end
+
+	local anchorPoint
+
+	if props.AnchorPoint then
+		anchorPoint = props.AnchorPoint
+	else
+		anchorPoint = Vector2.new(0.5, 0)
+	end
+
+	local v = useFocusedTextBox()
+	local v2 = Responsive.useLastInput()
+	local state, setState = React.useState(v2 ~= Responsive.Input.Directional or UserInputService:GamepadSupports(
+		UserInputService:GetLastInputType(),
+		Enum.KeyCode.Thumbstick1
+	))
+
+	if defineFastFlag then
+		React.useEffect(function()
+			local lastInputTypeChangedConnection = UserInputService.LastInputTypeChanged:Connect(function()
+				setState(v2 ~= Responsive.Input.Directional or UserInputService:GamepadSupports(
+					UserInputService:GetLastInputType(),
+					Enum.KeyCode.Thumbstick1
+				))
 			end)
-
-			return function() -- line: 44
-				-- upvalues: connection (copy)
-				connection:Disconnect()
+			return function()
+				lastInputTypeChangedConnection:Disconnect()
 			end
-		end, { v14 })
+		end, { v2 })
 	end
 
-	local v17 = #t1.items > 0 and (not v13 and (not v9 or v15))
+	local v3
 
-	if v8 then
-		local v18 = Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
-		local v19 = Responsive.useBreakpointYOrSmaller(Responsive.Keys.XSmall)
-		local v20 = not v18 and not v19
-
-		v17 = v17 and v20
+	if #props.items > 0 then
+		v3 = not v and (not defineFastFlag or state)
+	else
+		v3 = false
 	end
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Position = UDim2.fromScale(0, 0),
-		Size = if not v8 or not t1.Size then UDim2.fromScale(1, 1) else t1.Size
-	}, if not v17 then nil else React.createElement(ShortcutBar, {
-		items = t1.items,
-		position = v11,
-		anchorPoint = v12
-	}))
+	local v4 = not Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
+	local v5 = not Responsive.useBreakpointYOrSmaller(Responsive.Keys.XSmall)
+
+	local v6 = v3 and v4 and v5
+
+	if FFlagEnableStickyShortcutBarOnAllPlatformsIxpEnabled and not FFlagUnifyShortcutBarUnifiedIXPExposure then
+		useStickyShortcutBarExposureLogging(v6)
+	end
+
+	local createElement = React.createElement
+
+	local v7 = { Position = UDim2.fromScale(0, 0), Size = 0, BackgroundTransparency = 1 }
+	local size
+
+	if props.Size then
+		size = props.Size
+	else
+		size = UDim2.fromScale(1, 1)
+	end
+
+	v7.Size = size
+	local v8
+
+	if v6 then
+		v8 = React.createElement(ShortcutBar, {
+			items = props.items,
+			position = position,
+			anchorPoint = anchorPoint
+		})
+	end
+
+	return createElement("Frame", v7, v8)
 end
 
 return AppShortcutBar

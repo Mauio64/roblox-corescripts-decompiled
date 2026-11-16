@@ -1,4 +1,1 @@
-return {
-	Right = "Right",
-	Left = "Left"
-}
+return { Right = "Right", Left = "Left" }

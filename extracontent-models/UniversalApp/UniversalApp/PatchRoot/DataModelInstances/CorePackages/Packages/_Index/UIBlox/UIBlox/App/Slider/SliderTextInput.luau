@@ -1,15 +1,23 @@
 local UserInputService = game:GetService("UserInputService")
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local t = require(ParentParent.t)
-local EventConnection = require(ParentParent.ReactUtils).EventConnection
-local ImageSetComponent = require(ParentParent.UIBlox.Core.ImageSet.ImageSetComponent)
-local Images = require(ParentParent.UIBlox.App.ImageSet.Images)
-local withStyle = require(ParentParent.UIBlox.Core.Style.withStyle)
-local divideTransparency = require(ParentParent.UIBlox.Utility.divideTransparency)
-local v10 = Roact.PureComponent:extend("SliderTextInput")
 
-v10.validateProps = t.strictInterface({
+local parent = script.Parent.Parent.Parent.Parent
+
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+
+local ReactUtils = require(parent.ReactUtils)
+local EventConnection = ReactUtils.EventConnection
+
+local ImageSetComponent = require(parent.UIBlox.Core.ImageSet.ImageSetComponent)
+local Images = require(parent.UIBlox.App.ImageSet.Images)
+local withStyle = require(parent.UIBlox.Core.Style.withStyle)
+
+local divideTransparency = require(parent.UIBlox.Utility.divideTransparency)
+
+local extended = Roact.PureComponent:extend("SliderTextInput")
+extended.validateProps = t.strictInterface({
 	position = t.optional(t.union(t.UDim2, t.table)),
 	anchorPoint = t.optional(t.Vector2),
 	value = t.number,
@@ -20,109 +28,106 @@ v10.validateProps = t.strictInterface({
 	onValueChanged = t.callback,
 	layoutOrder = t.optional(t.integer)
 })
-v10.defaultProps = {
-	disabled = false
-}
 
-function v10.init(p1) -- line: 37
-	-- upvalues: Roact (copy)
-	p1.textBoxRef = Roact.createRef()
+extended.defaultProps = { disabled = false }
+
+function extended:init()
+	self.textBoxRef = Roact.createRef()
 end
-function v10.render(p2) -- line: 41
-	-- upvalues: withStyle (copy), divideTransparency (copy), Roact (copy), ImageSetComponent (copy), Images (copy), EventConnection (copy), UserInputService (copy)
-	return withStyle(function(p3) -- line: 42
-		-- upvalues: p2 (copy), divideTransparency (copy), Roact (copy), ImageSetComponent (copy), Images (copy), EventConnection (copy), UserInputService (copy)
-		local v15 = not p2.props.disabled and 1 or 2
-		local v16 = divideTransparency(p3.Theme.TextDefault.Transparency, v15)
-		local v17 = divideTransparency(p3.Theme.Divider.Transparency, v15)
-		local v18 = divideTransparency(p3.Theme.BackgroundUIContrast.Transparency, v15)
+
+function extended.render(p)
+	return withStyle(function(p2)
+		local v = p.props.disabled and 2 or 1
+		local textTransparency = divideTransparency(p2.Theme.TextDefault.Transparency, v)
+
+		local imageTransparency = divideTransparency(p2.Theme.Divider.Transparency, v)
+
+		local imageTransparency2 = divideTransparency(p2.Theme.BackgroundUIContrast.Transparency, v)
 
 		return Roact.createElement(ImageSetComponent.Label, {
 			BackgroundTransparency = 1,
 			Image = Images["component_assets/circle_16"],
-			ImageColor3 = p3.Theme.BackgroundUIContrast.Color,
-			ImageTransparency = v18,
-			Position = p2.props.position,
-			AnchorPoint = p2.props.anchorPoint,
+			ImageColor3 = p2.Theme.BackgroundUIContrast.Color,
+			ImageTransparency = imageTransparency2,
+			Position = p.props.position,
+			AnchorPoint = p.props.anchorPoint,
 			ScaleType = Enum.ScaleType.Slice,
 			Size = UDim2.fromOffset(56, 36),
 			SliceCenter = Rect.new(8, 8, 8, 8),
-			LayoutOrder = p2.props.layoutOrder
+			LayoutOrder = p.props.layoutOrder
 		}, {
 			Border = Roact.createElement(ImageSetComponent.Label, {
 				BackgroundTransparency = 1,
 				Image = Images["component_assets/circle_17_stroke_1"],
-				ImageColor3 = p3.Theme.Divider.Color,
-				ImageTransparency = v17,
+				ImageColor3 = p2.Theme.Divider.Color,
+				ImageTransparency = imageTransparency,
 				ScaleType = Enum.ScaleType.Slice,
 				Size = UDim2.fromScale(1, 1),
 				SliceCenter = Rect.new(8, 8, 8, 8)
 			}),
 			TextBox = Roact.createElement("TextBox", {
-				[Roact.Ref] = p2.textBoxRef,
+				[Roact.Ref] = p.textBoxRef,
 				BackgroundTransparency = 1,
 				ClearTextOnFocus = false,
-				Font = p3.Font.Body.Font,
-				TextSize = p3.Font.Body.RelativeSize * p3.Font.BaseSize,
-				TextColor3 = p3.Theme.TextDefault.Color,
-				TextTransparency = v16,
+				FontFace = normalizeFontFace(p2.Font.Body.Font),
+				TextSize = p2.Font.Body.RelativeSize * p2.Font.BaseSize,
+				TextColor3 = p2.Theme.TextDefault.Color,
+				TextTransparency = textTransparency,
 				Size = UDim2.fromScale(1, 1),
-				Text = tostring(p2.props.value),
+				Text = tostring(p.props.value),
 				TextScaled = true,
-				TextEditable = not p2.props.disabled,
+				TextEditable = not p.props.disabled,
 				ZIndex = 2,
-				[Roact.Event.Focused] = p2.props.disabled and function(p4) -- line: 86
-					p4:ReleaseFocus()
+				[Roact.Event.Focused] = p.props.disabled and function(object)
+					object:ReleaseFocus()
 				end or nil,
-				[Roact.Event.FocusLost] = function(p5, _) -- line: 89
-					-- upvalues: p2 (copy)
-					local num = tonumber(p5.Text)
+				[Roact.Event.FocusLost] = function(p3, _)
+					local text = tonumber(p3.Text)
 
-					if num == nil then
-						p5.Text = tostring(p2.props.value)
-
+					if text == nil then
+						p3.Text = tostring(p.props.value)
 						return
 					end
 
-					local v23 = math.clamp(math.floor(num / p2.props.stepInterval + 0.5) * p2.props.stepInterval, p2.props.min, p2.props.max)
+					local v2 = math.clamp(
+						math.floor(text / p.props.stepInterval + 0.5) * p.props.stepInterval,
+						p.props.min,
+						p.props.max
+					)
 
-					p2.props.onValueChanged(v23)
+					p.props.onValueChanged(v2)
 				end
 			}, {
 				TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
-					MinTextSize = p3.Font.Body.RelativeMinSize * p3.Font.BaseSize,
-					MaxTextSize = p3.Font.Body.RelativeSize * p3.Font.BaseSize
+					MinTextSize = p2.Font.Body.RelativeMinSize * p2.Font.BaseSize,
+					MaxTextSize = p2.Font.Body.RelativeSize * p2.Font.BaseSize
 				})
 			}),
-			UserInputConnection = not p2.props.disabled and Roact.createElement(EventConnection, {
+			UserInputConnection = not p.props.disabled and Roact.createElement(EventConnection, {
 				event = UserInputService.InputBegan,
-				callback = function(p7, _) -- line: 113
-					-- upvalues: UserInputService (copy), p2 (copy)
-					if p7.UserInputType ~= Enum.UserInputType.Keyboard then
+				callback = function(p3, _)
+					if not (p3.UserInputType == Enum.UserInputType.Keyboard and UserInputService:GetFocusedTextBox() == p.textBoxRef.current) then
 						return
 					end
 
-					if UserInputService:GetFocusedTextBox() ~= p2.textBoxRef.current then
-						return
+					local v2 = p3.KeyCode == Enum.KeyCode.Up and 1 or p3.KeyCode == Enum.KeyCode.Down and -1 or 0
+
+					if
+						UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+						or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
+					then
+						v2 *= 10
 					end
 
-					local n1 = 0
+					if v2 ~= 0 then
+						local v3 = math.clamp(
+							math.floor((p.props.value + p.props.stepInterval * v2) / p.props.stepInterval + 0.5) * p.props.stepInterval,
+							p.props.min,
+							p.props.max
+						)
 
-					if p7.KeyCode == Enum.KeyCode.Up then
-						n1 = 1
-					elseif p7.KeyCode == Enum.KeyCode.Down then
-						n1 = -1
-					end
-
-					if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then
-						n1 *= 10
-					end
-
-					if n1 ~= 0 then
-						local v27 = math.clamp(math.floor((p2.props.value + p2.props.stepInterval * n1) / p2.props.stepInterval + 0.5) * p2.props.stepInterval, p2.props.min, p2.props.max)
-
-						if v27 ~= p2.props.value then
-							p2.props.onValueChanged(v27)
+						if v3 ~= p.props.value then
+							p.props.onValueChanged(v3)
 						end
 					end
 				end
@@ -130,11 +135,11 @@ function v10.render(p2) -- line: 41
 		})
 	end)
 end
-function v10.didMount(p9) -- line: 154
-	pcall(function() -- line: 157
-		-- upvalues: p9 (copy)
-		p9.textBoxRef.current.TextInputType = Enum.TextInputType.Number
+
+function extended.didMount(p)
+	pcall(function()
+		p.textBoxRef.current.TextInputType = Enum.TextInputType.Number
 	end)
 end
 
-return v10
+return extended

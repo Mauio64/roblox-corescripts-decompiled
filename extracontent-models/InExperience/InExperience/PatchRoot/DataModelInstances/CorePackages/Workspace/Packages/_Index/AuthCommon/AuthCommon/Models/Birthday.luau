@@ -1,74 +1,75 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local DateTime = require(Parent.Time).DateTime
-local t1 = {}
-local t2 = {}
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-t1[t2] = true
+local ArgCheck = require(parent.ArgCheck)
+local Time = require(parent.Time)
+local DateTime = Time.DateTime
 
-function t1.new(p1) -- line: 20
-	-- upvalues: ArgCheck (copy), t1 (copy)
-	local t3 = {
-		Month = 1,
-		Day = 1,
-		Year = 1970
-	}
+local Birthday = {}
+local v = {}
+Birthday[v] = true
 
-	if p1 then
-		t3.Month = p1.Month or t3.Month
-		t3.Day = p1.Day or t3.Day
-		t3.Year = p1.Year or t3.Year
-		ArgCheck.isNonNegativeNumber(t3.Month, "month in Birthday constructor")
-		ArgCheck.isNonNegativeNumber(t3.Day, "day in Birthday constructor")
-		ArgCheck.isNonNegativeNumber(t3.Year, "year in Birthday constructor")
+function Birthday.new(data)
+	local v2 = { Month = 1, Day = 1, Year = 1970 }
+
+	if data then
+		v2.Month = data.Month or v2.Month
+		v2.Day = data.Day or v2.Day
+		v2.Year = data.Year or v2.Year
+
+		ArgCheck.isNonNegativeNumber(v2.Month, "month in Birthday constructor")
+		ArgCheck.isNonNegativeNumber(v2.Day, "day in Birthday constructor")
+		ArgCheck.isNonNegativeNumber(v2.Year, "year in Birthday constructor")
 	end
 
-	setmetatable(t3, t1)
-
-	return t3
+	setmetatable(v2, Birthday)
+	return v2
 end
-function t1.IsUnder13(p2) -- line: 41
-	-- upvalues: t1 (copy), DateTime (copy)
-	local v9 = t1.new(DateTime.now():GetValues())
 
-	if v9.Year - 13 < p2.Year then
+function Birthday.IsUnder13(data): boolean
+	local v2 = Birthday.new(DateTime.now():GetValues())
+
+	if v2.Year - 13 < data.Year then
 		return true
 	end
 
-	if v9.Year - 13 > p2.Year then
+	if v2.Year - 13 > data.Year then
 		return false
 	end
 
-	return v9.Month < p2.Month or v9.Month == p2.Month and v9.Day < p2.Day
-end
-function t1.GetAgeInYears(p3, p4) -- line: 52
-	-- upvalues: DateTime (copy), t1 (copy)
-	local v12 = p4 or DateTime.now():GetValues()
-	local v13 = t1.new(v12)
-
-	if v13.Month < p3.Month or v13.Month == p3.Month and v13.Day < p3.Day then
-		return v13.Year - p3.Year - 1
-	end
-
-	return v13.Year - p3.Year
-end
-function t1.FormatForEndpoint(p5) -- line: 63
-	return p5.Year .. "-" .. p5.Month .. "-" .. p5.Day .. "T12:00:00.000Z"
-end
-function t1.ToString(p6, p7) -- line: 67
-	local v17 = p7 or " "
-
-	return p6.Month .. v17 .. p6.Day .. v17 .. p6.Year
-end
-function t1.is(p8) -- line: 73
-	-- upvalues: t2 (copy)
-	if type(p8) ~= "table" then
+	if v2.Month < data.Month then
+		return true
+	elseif v2.Month == data.Month then
+		return v2.Day < data.Day
+	else
 		return false
 	end
-
-	return p8[t2] == true
 end
 
-t1.__index = t1
+function Birthday.GetAgeInYears(data, p)
+	local v2 = p or DateTime.now():GetValues()
+	local v3 = Birthday.new(v2)
 
-return t1
+	if v3.Month < data.Month or v3.Month == data.Month and v3.Day < data.Day then
+		return v3.Year - data.Year - 1
+	end
+
+	return v3.Year - data.Year
+end
+
+function Birthday.FormatForEndpoint(data)
+	return data.Year .. "-" .. data.Month .. "-" .. data.Day .. "T12:00:00.000Z"
+end
+
+function Birthday.ToString(data, value)
+	value = value or " "
+
+	return data.Month .. value .. data.Day .. value .. data.Year
+end
+
+function Birthday.is(p): boolean
+	return type(p) == "table" and p[v] == true
+end
+
+Birthday.__index = Birthday
+
+return Birthday

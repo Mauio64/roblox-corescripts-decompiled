@@ -1,318 +1,330 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Array = require(ParentParentParent.LuauPolyfill).Array
-local React = require(ParentParentParent.React)
-local Events = require(ParentParent.Events)
-local v6 = React.Component:extend("NavigationEventManager")
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-function v6.didMount(p1) -- line: 13
-	-- upvalues: Events (copy)
-	local navigation = p1.props.navigation
+local React = require(parent2.React)
+local Events = require(parent.Events)
 
-	p1._actionSubscription = navigation.addListener(Events.Action, function(...) -- line: 16
-		-- upvalues: p1 (copy)
-		return p1:_handleAction(...)
+local extended = React.Component:extend("NavigationEventManager")
+
+function extended:didMount()
+	local navigation = self.props.navigation
+
+	self._actionSubscription = navigation.addListener(Events.Action, function(...)
+		return self:_handleAction(...)
 	end)
-	p1._willFocusSubscription = navigation.addListener(Events.WillFocus, function(...) -- line: 20
-		-- upvalues: p1 (copy)
-		return p1:_handleWillFocus(...)
+
+	self._willFocusSubscription = navigation.addListener(Events.WillFocus, function(...)
+		return self:_handleWillFocus(...)
 	end)
-	p1._willBlurSubscription = navigation.addListener(Events.WillBlur, function(...) -- line: 24
-		-- upvalues: p1 (copy)
-		return p1:_handleWillBlur(...)
+
+	self._willBlurSubscription = navigation.addListener(Events.WillBlur, function(...)
+		return self:_handleWillBlur(...)
 	end)
-	p1._didFocusSubscription = navigation.addListener(Events.DidFocus, function(...) -- line: 28
-		-- upvalues: p1 (copy)
-		return p1:_handleDidFocus(...)
+
+	self._didFocusSubscription = navigation.addListener(Events.DidFocus, function(...)
+		return self:_handleDidFocus(...)
 	end)
-	p1._didBlurSubscription = navigation.addListener(Events.DidBlur, function(...) -- line: 32
-		-- upvalues: p1 (copy)
-		return p1:_handleDidBlur(...)
+
+	self._didBlurSubscription = navigation.addListener(Events.DidBlur, function(...)
+		return self:_handleDidBlur(...)
 	end)
-	p1._refocusSubscription = navigation.addListener(Events.Refocus, function(...) -- line: 36
-		-- upvalues: p1 (copy)
-		return p1:_handleRefocus(...)
+
+	self._refocusSubscription = navigation.addListener(Events.Refocus, function(...)
+		return self:_handleRefocus(...)
 	end)
 end
-function v6.willUnmount(p2) -- line: 41
-	if p2._actionSubscription then
-		p2._actionSubscription.remove()
+
+function extended:willUnmount()
+	if self._actionSubscription then
+		self._actionSubscription.remove()
 	end
 
-	if p2._willFocusSubscription then
-		p2._willFocusSubscription.remove()
+	if self._willFocusSubscription then
+		self._willFocusSubscription.remove()
 	end
 
-	if p2._willBlurSubscription then
-		p2._willBlurSubscription.remove()
+	if self._willBlurSubscription then
+		self._willBlurSubscription.remove()
 	end
 
-	if p2._didFocusSubscription then
-		p2._didFocusSubscription.remove()
+	if self._didFocusSubscription then
+		self._didFocusSubscription.remove()
 	end
 
-	if p2._didBlurSubscription then
-		p2._didBlurSubscription.remove()
+	if self._didBlurSubscription then
+		self._didBlurSubscription.remove()
 	end
 
-	if p2._refocusSubscription then
-		p2._refocusSubscription.remove()
+	if self._refocusSubscription then
+		self._refocusSubscription.remove()
 	end
 end
-function v6._handleAction(p3, p4) -- line: 62
-	-- upvalues: Events (copy)
-	local state = p4.state
-	local lastState = p4.lastState
-	local action = p4.action
-	local type2 = p4.type
-	local context = p4.context
-	local navigation = p3.props.navigation
-	local onEvent = p3.props.onEvent
+
+function extended:_handleAction(data)
+	local state = data.state
+	local lastState = data.lastState
+	local action = data.action
+	local kind = data.type
+	local context = data.context
+
+	local navigation = self.props.navigation
+	local onEvent = self.props.onEvent
 
 	if not navigation.isFocused() then
 		return
 	end
 
-	local v19 = nil
+	local lastState2
 
 	if lastState and lastState.routes then
-		v19 = lastState.routes[lastState.index]
+		lastState2 = lastState.routes[lastState.index]
 	end
 
-	local v20 = state.routes[state.index]
-	local t1 = {
-		context = ("%s:%s_%s"):format(v20.key, tostring(action.type), context or "Root"),
-		state = v20,
-		lastState = v19,
+	local route = state.routes[state.index]
+
+	local v = {
+		context = ("%s:%s_%s"):format(route.key, tostring(action.type), context or "Root"),
+		state = route,
+		lastState = lastState2,
 		action = action,
-		type = type2
+		type = kind
 	}
 
-	if (v19 and v19.key) ~= v20.key then
-		p3:_emitWillFocus(v20.key, t1)
+	if (lastState2 and lastState2.key) ~= route.key then
+		self:_emitWillFocus(route.key, v)
 
-		if v19 and v19.key then
-			p3:_emitWillBlur(v19.key, t1)
+		if lastState2 and lastState2.key then
+			self:_emitWillBlur(lastState2.key, v)
 		end
 	end
 
 	if lastState and lastState.isTransitioning ~= state.isTransitioning and state.isTransitioning == false then
-		if p3._lastWillBlurKey then
-			p3:_emitDidBlur(p3._lastWillBlurKey, t1)
+		if self._lastWillBlurKey then
+			self:_emitDidBlur(self._lastWillBlurKey, v)
 		end
 
-		if p3._lastWillFocusKey then
-			p3:_emitDidFocus(p3._lastWillFocusKey, t1)
+		if self._lastWillFocusKey then
+			self:_emitDidFocus(self._lastWillFocusKey, v)
 		end
 	end
 
-	onEvent(v20.key, Events.Action, t1)
+	onEvent(route.key, Events.Action, v)
 end
-function v6._handleWillFocus(p5, p6) -- line: 113
-	-- upvalues: Array (copy)
-	local lastState = p6.lastState
-	local action = p6.action
-	local context = p6.context
-	local type3 = p6.type
-	local navigation = p5.props.navigation
-	local v29 = navigation.state.routes[navigation.state.index]
-	local v30 = nil
+
+function extended:_handleWillFocus(data)
+	local lastState = data.lastState
+	local action = data.action
+	local context = data.context
+	local kind = data.type
+
+	local navigation = self.props.navigation
+	local route = navigation.state.routes[navigation.state.index]
+
+	local lastState2 = nil
 
 	if lastState and lastState.routes then
-		local v31 = not lastState and -1 or Array.findIndex(lastState.routes, function(p7) -- line: 125
-			-- upvalues: v29 (copy)
-			return p7.key == v29.key
+		local v = not lastState and -1 or Array.findIndex(lastState.routes, function(p): boolean
+			return p.key == route.key
 		end)
 
-		if v31 > 0 then
-			v30 = lastState.routes[v31]
+		if v > 0 then
+			lastState2 = lastState.routes[v]
 		end
 	end
 
-	p5:_emitWillFocus(v29.key, {
-		context = ("%s:%s_%s"):format(v29.key, tostring(action.type), context or "Root"),
-		state = v29,
-		lastState = v30,
+	self:_emitWillFocus(route.key, {
+		context = ("%s:%s_%s"):format(route.key, tostring(action.type), context or "Root"),
+		state = route,
+		lastState = lastState2,
 		action = action,
-		type = type3
+		type = kind
 	})
 end
-function v6._handleWillBlur(p8, p9) -- line: 143
-	-- upvalues: Array (copy)
-	local lastState = p9.lastState
-	local action = p9.action
-	local context = p9.context
-	local type4 = p9.type
-	local navigation = p8.props.navigation
-	local v39 = navigation.state.routes[navigation.state.index]
-	local v40 = nil
+
+function extended:_handleWillBlur(data)
+	local lastState = data.lastState
+	local action = data.action
+	local context = data.context
+	local kind = data.type
+
+	local navigation = self.props.navigation
+	local route = navigation.state.routes[navigation.state.index]
+
+	local lastState2 = nil
 
 	if lastState and lastState.routes then
-		local v41 = not lastState and -1 or Array.findIndex(lastState.routes, function(p10) -- line: 155
-			-- upvalues: v39 (copy)
-			return p10.key == v39.key
+		local v = not lastState and -1 or Array.findIndex(lastState.routes, function(p): boolean
+			return p.key == route.key
 		end)
 
-		if v41 > 0 then
-			v40 = lastState.routes[v41]
+		if v > 0 then
+			lastState2 = lastState.routes[v]
 		end
 	end
 
-	p8:_emitWillBlur(v39.key, {
-		context = ("%s:%s_%s"):format(v39.key, tostring(action.type), context or "Root"),
-		state = v39,
-		lastState = v40,
+	self:_emitWillBlur(route.key, {
+		context = ("%s:%s_%s"):format(route.key, tostring(action.type), context or "Root"),
+		state = route,
+		lastState = lastState2,
 		action = action,
-		type = type4
+		type = kind
 	})
 end
-function v6._handleDidFocus(p11, p12) -- line: 173
-	-- upvalues: Array (copy)
-	local lastState = p12.lastState
-	local action = p12.action
-	local context = p12.context
-	local type5 = p12.type
-	local navigation = p11.props.navigation
 
-	if p11._lastWillFocusKey then
-		local v49 = Array.findIndex(navigation.state.routes, function(p13) -- line: 182
-			-- upvalues: p11 (copy)
-			return p13.key == p11._lastWillFocusKey
+function extended:_handleDidFocus(data)
+	local lastState = data.lastState
+	local action = data.action
+	local context = data.context
+	local kind = data.type
+
+	local navigation = self.props.navigation
+
+	if self._lastWillFocusKey then
+		local index = Array.findIndex(navigation.state.routes, function(p): boolean
+			return p.key == self._lastWillFocusKey
 		end)
 
-		if v49 > 0 then
-			local v50 = navigation.state.routes[v49]
-			local v51 = nil
+		if index > 0 then
+			local route = navigation.state.routes[index]
+
+			local lastState2 = nil
 
 			if lastState and lastState.routes then
-				local v52 = not lastState and -1 or Array.findIndex(lastState.routes, function(p14) -- line: 192
-					-- upvalues: v50 (copy)
-					return p14.key == v50.key
+				local v = not lastState and -1 or Array.findIndex(lastState.routes, function(p): boolean
+					return p.key == route.key
 				end)
 
-				if v52 > 0 then
-					v51 = lastState.routes[v52]
+				if v > 0 then
+					lastState2 = lastState.routes[v]
 				end
 			end
 
-			p11:_emitDidFocus(v50.key, {
-				context = ("%s:%s_%s"):format(v50.key, tostring(action.type), context or "Root"),
-				state = v50,
-				lastState = v51,
+			self:_emitDidFocus(route.key, {
+				context = ("%s:%s_%s"):format(route.key, tostring(action.type), context or "Root"),
+				state = route,
+				lastState = lastState2,
 				action = action,
-				type = type5
+				type = kind
 			})
 		end
 	end
 end
-function v6._handleDidBlur(p15, p16) -- line: 212
-	-- upvalues: Array (copy)
-	local lastState = p16.lastState
-	local action = p16.action
-	local context = p16.context
-	local type6 = p16.type
-	local navigation = p15.props.navigation
 
-	if p15._lastWillBlurKey then
-		local v60 = Array.findIndex(navigation.state.routes, function(p17) -- line: 221
-			-- upvalues: p15 (copy)
-			return p17.key == p15._lastWillBlurKey
+function extended:_handleDidBlur(data)
+	local lastState = data.lastState
+	local action = data.action
+	local context = data.context
+	local kind = data.type
+
+	local navigation = self.props.navigation
+
+	if self._lastWillBlurKey then
+		local index = Array.findIndex(navigation.state.routes, function(p): boolean
+			return p.key == self._lastWillBlurKey
 		end)
 
-		if v60 > 0 then
-			local v61 = navigation.state.routes[v60]
-			local v62 = nil
+		if index > 0 then
+			local route = navigation.state.routes[index]
+
+			local lastState2 = nil
 
 			if lastState and lastState.routes then
-				local v63 = not lastState and -1 or Array.findIndex(lastState.routes, function(p18) -- line: 231
-					-- upvalues: v61 (copy)
-					return p18.key == v61.key
+				local v = not lastState and -1 or Array.findIndex(lastState.routes, function(p): boolean
+					return p.key == route.key
 				end)
 
-				if v63 > 0 then
-					v62 = lastState.routes[v63]
+				if v > 0 then
+					lastState2 = lastState.routes[v]
 				end
 			end
 
-			p15:_emitDidBlur(v61.key, {
-				context = ("%s:%s_%s"):format(v61.key, tostring(action.type), context or "Root"),
-				state = v61,
-				lastState = v62,
+			self:_emitDidBlur(route.key, {
+				context = ("%s:%s_%s"):format(route.key, tostring(action.type), context or "Root"),
+				state = route,
+				lastState = lastState2,
 				action = action,
-				type = type6
+				type = kind
 			})
 		end
 	end
 end
-function v6._handleRefocus(p19) -- line: 251
-	-- upvalues: Events (copy)
-	local onEvent = p19.props.onEvent
-	local navigation = p19.props.navigation
 
+function extended:_handleRefocus()
+	local onEvent = self.props.onEvent
+	local navigation = self.props.navigation
 	onEvent(navigation.state.routes[navigation.state.index].key, Events.Refocus)
 end
-function v6._emitWillFocus(p20, p21, p22) -- line: 259
-	-- upvalues: Events (copy)
-	if p21 == p20._lastWillBlurKey then
-		p20._lastWillBlurKey = nil
+
+function extended:_emitWillFocus(lastWillFocusKey, p)
+	if self._lastWillBlurKey == lastWillFocusKey then
+		self._lastWillBlurKey = nil
 	end
 
-	if p21 == p20._lastWillFocusKey then
+	if self._lastWillFocusKey == lastWillFocusKey then
 		return
 	end
 
-	p20._lastDidFocusKey = nil
-	p20._lastWillFocusKey = p21
+	self._lastDidFocusKey = nil
+	self._lastWillFocusKey = lastWillFocusKey
 
-	local navigation = p20.props.navigation
+	local navigation = self.props.navigation
+	self.props.onEvent(lastWillFocusKey, Events.WillFocus, p)
 
-	p20.props.onEvent(p21, Events.WillFocus, p22)
-
-	if type(navigation.state.isTransitioning) ~= "boolean" or navigation.state.isTransitioning ~= true and not navigation._dangerouslyGetParent() then
-		p20:_emitDidFocus(p21, p22)
+	if
+		type(navigation.state.isTransitioning) ~= "boolean"
+		or navigation.state.isTransitioning ~= true and not navigation._dangerouslyGetParent()
+	then
+		self:_emitDidFocus(lastWillFocusKey, p)
 	end
 end
-function v6._emitWillBlur(p23, p24, p25) -- line: 284
-	-- upvalues: Events (copy)
-	if p24 == p23._lastWillFocusKey then
-		p23._lastWillFocusKey = nil
+
+function extended:_emitWillBlur(lastWillBlurKey, p)
+	if self._lastWillFocusKey == lastWillBlurKey then
+		self._lastWillFocusKey = nil
 	end
 
-	if p24 == p23._lastWillBlurKey then
+	if self._lastWillBlurKey == lastWillBlurKey then
 		return
 	end
 
-	p23._lastDidBlurKey = nil
-	p23._lastWillBlurKey = p24
+	self._lastDidBlurKey = nil
+	self._lastWillBlurKey = lastWillBlurKey
 
-	local navigation = p23.props.navigation
+	local navigation = self.props.navigation
+	self.props.onEvent(lastWillBlurKey, Events.WillBlur, p)
 
-	p23.props.onEvent(p24, Events.WillBlur, p25)
-
-	if type(navigation.state.isTransitioning) ~= "boolean" or navigation.state.isTransitioning ~= true and not navigation._dangerouslyGetParent() then
-		p23:_emitDidBlur(p24, p25)
+	if
+		type(navigation.state.isTransitioning) ~= "boolean"
+		or navigation.state.isTransitioning ~= true and not navigation._dangerouslyGetParent()
+	then
+		self:_emitDidBlur(lastWillBlurKey, p)
 	end
 end
-function v6._emitDidFocus(p26, p27, p28) -- line: 309
-	-- upvalues: Events (copy)
-	if p27 ~= p26._lastWillFocusKey or p27 == p26._lastDidFocusKey then
+
+function extended:_emitDidFocus(lastDidFocusKey, p)
+	if self._lastWillFocusKey ~= lastDidFocusKey or self._lastDidFocusKey == lastDidFocusKey then
 		return
 	end
 
-	p26._lastDidFocusKey = p27
-	p26.props.onEvent(p27, Events.DidFocus, p28)
+	self._lastDidFocusKey = lastDidFocusKey
+
+	self.props.onEvent(lastDidFocusKey, Events.DidFocus, p)
 end
-function v6._emitDidBlur(p29, p30, p31) -- line: 321
-	-- upvalues: Events (copy)
-	if p30 ~= p29._lastWillBlurKey or p30 == p29._lastDidBlurKey then
+
+function extended:_emitDidBlur(lastDidBlurKey, p)
+	if self._lastWillBlurKey ~= lastDidBlurKey or self._lastDidBlurKey == lastDidBlurKey then
 		return
 	end
 
-	p29._lastDidBlurKey = p30
-	p29.props.onEvent(p30, Events.DidBlur, p31)
+	self._lastDidBlurKey = lastDidBlurKey
+
+	self.props.onEvent(lastDidBlurKey, Events.DidBlur, p)
 end
-function v6.render(_) -- line: 333
+
+function extended.render(_): nil
 	return nil
 end
 
-return v6
+return extended

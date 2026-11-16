@@ -1,568 +1,628 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local useOpenWebView = require(BuildExperienceParent.WebViewUtils).useOpenWebView
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local WebViewUtils = require(parent.WebViewUtils)
+local useOpenWebView = WebViewUtils.useOpenWebView
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
-local CreatorAgentChat = require(BuildExperienceParent.DataHydration.CreatorAgentChat)
-local ExperienceQuestionnaire = require(BuildExperienceParent.DataHydration.ExperienceQuestionnaire)
-local UniverseActivation = require(BuildExperienceParent.DataHydration.UniverseActivation)
-local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
+
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local ExperienceQuestionnaire = require(parent.DataHydration.ExperienceQuestionnaire)
+local UniverseActivation = require(parent.DataHydration.UniverseActivation)
+local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration)
 local ContentMaturityUtils = require(BuildExperience.utils.ContentMaturityUtils)
 local GameConfigurationActions = require(BuildExperience.utils.GameConfigurationActions)
-local GameConfigurationLabels = require(BuildExperience.utils.GameConfigurationLabels)
+local formatError = require(BuildExperience.utils.formatError)
 local refreshPublishEligibility = require(BuildExperience.utils.refreshPublishEligibility)
-local FFlagBuildRehydrateOnPublish = require(BuildExperience.Flags.FFlagBuildRehydrateOnPublish)
-local debug = CreatorAgentChat.debug
+local refreshAdCampaignEligibility = require(BuildExperience.utils.refreshAdCampaignEligibility)
+local FFlagEnableBuildAdPromotion = require(BuildExperience.Flags.FFlagEnableBuildAdPromotion)
+
+local Debug = CreatorAgentChat.debug
+
 local Icon = Foundation.Icon
 local List = Foundation.List
 local Popover = Foundation.Popover
 local RadioGroup = Foundation.RadioGroup
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local InputSize = Foundation.Enums.InputSize
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local useScaledValue = Foundation.Hooks.useScaledValue
 local useTokens = Foundation.Hooks.useTokens
-local v32 = game:DefineFastInt("BuildExperienceAudienceTooltipMaxWidth", 220)
 
-local function getSelectedAudience(t1: {[any]: any}?) -- line: 56
-	-- upvalues: UniverseActivation (copy)
-	if t1 == nil then
+local PrivacyType = UniverseConfiguration.PrivacyType
+
+local v = {
+	[PrivacyType.Private] = "Private",
+	[PrivacyType.FriendsOnly] = "Friends",
+	[PrivacyType.Public] = "Public"
+}
+
+local defineFastInt = game:DefineFastInt("BuildExperienceAudienceTooltipMaxWidth", 220)
+
+local function getSelectedAudience(audiences) -- 1 equivalent call inferred from this helper
+	if audiences == nil then
 		return nil
 	end
 
-	if t1 then
-		for _, v53 in t1 do
-			if v53 == UniverseActivation.Audience.Public then
-				return "Public"
-			end
-		end
-
-		for _, v55 in t1 do
-			if v55 == UniverseActivation.Audience.Friends then
-				return "Friends"
-			end
-		end
-	end
-
-	return "Private"
+	return v[UniverseConfiguration.getPrivacyTypeForAudiences(audiences)]
 end
-local function isVisibilityAudience(p1) -- line: 78
-	-- upvalues: UniverseActivation (copy)
-	return p1 == UniverseActivation.Audience.Public or p1 == UniverseActivation.Audience.Friends
-end
-local function getAudiencesForValue(s1: string, t2: {[any]: any}) -- line: 82
-	-- upvalues: UniverseActivation (copy)
-	local t3 = {}
 
-	for _, v61 in t2 do
-		if v61 ~= UniverseActivation.Audience.Public and v61 ~= UniverseActivation.Audience.Friends then
-			table.insert(t3, v61)
+local function isVisibilityAudience(p): boolean
+	return p == UniverseActivation.Audience.Public or p == UniverseActivation.Audience.Friends
+end
+
+local function getAudiencesForValue(p: string, audiences)
+	local audiencesForValue = {}
+
+	for _, item in audiences do
+		if item ~= UniverseActivation.Audience.Public and item ~= UniverseActivation.Audience.Friends then
+			table.insert(audiencesForValue, item)
 		end
 	end
 
-	if s1 == "Public" then
-		table.insert(t3, UniverseActivation.Audience.Public)
-
-		return t3
+	if p == "Public" then
+		table.insert(audiencesForValue, UniverseActivation.Audience.Public)
+		return audiencesForValue
 	end
 
-	if s1 == "Friends" then
-		table.insert(t3, UniverseActivation.Audience.Friends)
+	if p == "Friends" then
+		table.insert(audiencesForValue, UniverseActivation.Audience.Friends)
 	end
 
-	return t3
+	return audiencesForValue
 end
-local function AudienceRow(t4: {[any]: any}) -- line: 112
-	-- upvalues: React (copy), Icon (copy), IconName (copy), IconSize (copy), View (copy), List (copy), RadioGroup (copy), InputSize (copy)
-	local v63 = React.useCallback(function() -- line: 113
-		-- upvalues: t4 (copy)
-		t4.onActivated(t4.value)
-	end, {
-		t4.onActivated,
-		t4.value
-	})
-	local v64 = if not t4.isLocked then nil else React.createElement(Icon, {
-		LayoutOrder = 1,
-		tag = "auto-xy content-default",
-		name = IconName.LockClosed,
-		ref = t4.lockIconRef,
-		size = IconSize.Small
-	})
 
-	return React.createElement(View, {
+local function AudienceRow(props)
+	local onActivated = React.useCallback(function()
+		props.onActivated(props.value)
+	end, { props.onActivated, props.value })
+	local formatted = `{props.testId}-row-{string.lower(props.value)}`
+	local lock
+
+	if props.isLocked then
+		lock = React.createElement(Icon, {
+			LayoutOrder = 1,
+			name = IconName.LockClosed,
+			ref = props.lockIconRef,
+			size = IconSize.Small,
+			tag = "auto-xy content-default"
+		})
+	end
+
+	local createElement = React.createElement
+	local v2 = {
+		LayoutOrder = props.LayoutOrder,
+		onActivated = 0,
 		tag = "size-full-0 auto-y radius-medium",
-		LayoutOrder = t4.LayoutOrder,
-		onActivated = v63
-	}, {
+		testId = 0
+	}
+
+	if props.isDisabled then
+		onActivated = nil
+	end
+
+	v2.onActivated = onActivated
+
+	v2.testId = `{formatted}-button`
+	return createElement(View, v2, {
 		ListItem = React.createElement(List.Item, {
-			LayoutOrder = t4.LayoutOrder,
-			title = t4.title,
-			trailing = React.createElement(View, {
-				tag = "row align-y-center gap-medium auto-xy"
-			}, {
-				Lock = v64,
+			LayoutOrder = props.LayoutOrder,
+			title = props.title,
+			trailing = React.createElement(View, { tag = "row align-y-center gap-medium auto-xy" }, {
+				Lock = lock,
 				Radio = React.createElement(RadioGroup.Item, {
 					LayoutOrder = 2,
+					isDisabled = props.isDisabled or props.isLocked,
 					label = "",
-					isDisabled = t4.isLocked,
 					size = InputSize.Medium,
-					testId = `{ t4.testId }-row-{ string.lower(t4.value) }-radio`,
-					value = t4.value
+					testId = `{formatted}-radio`,
+					value = props.value
 				})
 			}),
-			testId = `{ t4.testId }-row-{ string.lower(t4.value) }`
+			testId = formatted
 		})
 	})
 end
-local function getSelectedAudienceFromState(s2: string?, b1: boolean, p2) -- line: 176
-	-- upvalues: getSelectedAudience (copy)
-	if s2 ~= nil then
-		return s2
+
+local function getSelectedAudienceFromState(selectedAudience: string?, flag: boolean, p) -- 1 equivalent call inferred from this helper
+	if selectedAudience ~= nil then
+		return selectedAudience
 	end
 
-	if b1 then
-		return (getSelectedAudience(p2.audiences))
+	if not flag then
+		return nil
 	end
 
-	return nil
+	return getSelectedAudience(p.audiences) -- inferred equivalent call
 end
-local function getIsNonPrivateLocked(p3, b2: boolean, b3: boolean) -- line: 188
-	return b2 and (p3.eligibility == "Required" or b3)
-end
-local function getUniverseActivationStore(p4) -- line: 196
-	-- upvalues: UniverseActivation (copy)
-	return UniverseActivation.getUniverseActivationStore(p4)
-end
-local function getQuestionnaireStore(p5) -- line: 200
-	-- upvalues: ExperienceQuestionnaire (copy)
-	return ExperienceQuestionnaire.getExperienceQuestionnaireStore(p5)
-end
-local function getUniverseConfigurationStore(p6) -- line: 204
-	-- upvalues: UniverseConfiguration (copy)
-	return UniverseConfiguration.getUniverseConfigurationStore(p6)
-end
-local function useAudienceStores() -- line: 208
-	-- upvalues: SignalsReact (copy), getUniverseActivationStore (copy), getQuestionnaireStore (copy), getUniverseConfigurationStore (copy)
-	local v74 = SignalsReact.useSignalState(getUniverseActivationStore)
-	local v75 = SignalsReact.useSignalState(getQuestionnaireStore)
-	local v76 = SignalsReact.useSignalState(getUniverseConfigurationStore)
 
+local function getUniverseActivationStore(p)
+	return UniverseActivation.getUniverseActivationStore(p)
+end
+
+local function getQuestionnaireStore(p)
+	return ExperienceQuestionnaire.getExperienceQuestionnaireStore(p)
+end
+
+local function getUniverseConfigurationStore(p)
+	return UniverseConfiguration.getUniverseConfigurationStore(p)
+end
+
+local function useAudienceStores()
 	return {
-		universeActivationStore = v74,
-		questionnaireStore = v75,
-		universeConfigurationStore = v76
+		universeActivationStore = SignalsReact.useSignalState(getUniverseActivationStore),
+		questionnaireStore = SignalsReact.useSignalState(getQuestionnaireStore),
+		universeConfigurationStore = SignalsReact.useSignalState(getUniverseConfigurationStore)
 	}
 end
-local function useAudienceData(n1: number, p7, p8, p9, s3: string?) -- line: 220
-	-- upvalues: React (copy), FFlagBuildRehydrateOnPublish (copy), debug (copy), SignalsReact (copy), ContentMaturityUtils (copy), getSelectedAudience (copy)
-	local v82 = React.useMemo(function() -- line: 227
-		-- upvalues: p9 (copy), n1 (copy)
-		return p9.getAndFetchConfiguration(n1)
-	end, {
-		n1,
-		p9
-	})
-	local v83, v84 = React.useState(FFlagBuildRehydrateOnPublish)
 
-	if FFlagBuildRehydrateOnPublish then
-		React.useEffect(function() -- line: 234
-			-- upvalues: v84 (copy), p9 (copy), n1 (copy), debug (copy)
-			local u136 = true
+local function useAudienceData(universeId: number, universeActivationStore, universeConfigurationStore, state: string?)
+	local v2 = React.useMemo(function()
+		return universeConfigurationStore.getAndFetchConfiguration(universeId)
+	end, { universeId, universeConfigurationStore })
+	local state2, setState = React.useState(true)
 
-			v84(true)
-			p9.refreshConfiguration(n1):catch(function(p10) -- line: 239
-				-- upvalues: debug (copy), n1 (copy)
-				debug.log("warn", "AudienceConfigurationContent configuration refresh failed", {
-					errorMessage = tostring(p10),
-					universeId = n1
-				})
-			end):finally(function() -- line: 245
-				-- upvalues: u136 (ref), v84 (copy)
-				if u136 then
-					v84(false)
-				end
-			end)
+	React.useEffect(function()
+		local flag = true
+		setState(true)
 
-			return function() -- line: 251
-				-- upvalues: u136 (ref)
-				u136 = false
+		universeConfigurationStore.refreshConfiguration(universeId):catch(function(p)
+			Debug.log("warn", "AudienceConfigurationContent configuration refresh failed", {
+				errorMessage = formatError(p),
+				universeId = universeId
+			})
+		end):finally(function()
+			if flag then
+				setState(false)
 			end
-		end, {
-			p9,
-			n1
-		})
-	end
+		end)
 
-	local v85 = React.useMemo(function() -- line: 256
-		-- upvalues: p7 (copy), n1 (copy)
-		return p7.getAndFetchEligibility(n1)
-	end, {
-		p7,
-		n1
-	})
-	local v86 = React.useMemo(function() -- line: 259
-		-- upvalues: p7 (copy), n1 (copy)
-		return p7.getAndFetchLatestSubmission(n1)
-	end, {
-		p7,
-		n1
-	})
-	local v87 = SignalsReact.useSignalState(v82.data)
-	local v88 = SignalsReact.useSignalState(v82.status)
-	local v89 = SignalsReact.useSignalState(v85.data)
-	local v90 = SignalsReact.useSignalState(v85.status)
-	local v91 = SignalsReact.useSignalState(v86.data)
-	local v92 = SignalsReact.useSignalState(v86.status)
-	local v93 = v88 == "Ready" and v87 ~= nil
-	local v94 = v90 == "Ready" and v89 ~= nil
-	local v95 = v92 == "Ready" and v91 ~= nil
-	local v96 = v92 == "Failed"
-	local v97 = v94 and (v95 or v96)
-	local v102
-
-	if FFlagBuildRehydrateOnPublish then
-		local v98 = React.useMemo(function() -- line: 279
-			-- upvalues: p8 (copy), n1 (copy)
-			return p8.getAndFetchEligibility(n1)
-		end, {
-			p8,
-			n1
-		})
-		local v99 = SignalsReact.useSignalState(v98.data)
-		local v100 = SignalsReact.useSignalState(v98.status)
-		local v101 = v94 and (v89.eligibility == "Required" or v96)
-
-		v102 = React.useMemo(function() -- line: 291
-			-- upvalues: ContentMaturityUtils (copy), n1 (copy), v101 (copy)
-			if not ContentMaturityUtils.isSealBroken(n1) then
-				return false
-			end
-
-			return ContentMaturityUtils.isContentUnrated(n1) or v101
-		end, {
-			v99,
-			v101,
-			n1
-		})
-
-		local v103 = v100 == "Ready" or v100 == "Failed"
-		local v104 = (v90 == "Ready" or v90 == "Failed") and (v92 == "Ready" or v92 == "Failed")
-
-		v97 = v103 and v104
-	else
-		v102 = v94 and (v89.eligibility == "Required" or v96)
-	end
-
-	return {
-		configurationData = v87,
-		isAudiencesReady = v93,
-		isConfigurationRefreshPending = v83,
-		isEligibilityResolved = v97,
-		isNonPrivateLocked = v102,
-		selectedAudience = if s3 == nil then if not v93 then nil else getSelectedAudience(v87.audiences) else s3
-	}
-end
-local function useQuestionnaireHandler(n2: number, p11) -- line: 320
-	-- upvalues: useOpenWebView (copy), React (copy), FFlagBuildRehydrateOnPublish (copy), refreshPublishEligibility (copy), GameConfigurationActions (copy), LocalizationStrings (copy)
-	local v107 = useOpenWebView()
-	local v108 = React.useCallback(function() -- line: 323
-		-- upvalues: FFlagBuildRehydrateOnPublish (copy), refreshPublishEligibility (copy), n2 (copy), p11 (copy)
-		if FFlagBuildRehydrateOnPublish then
-			refreshPublishEligibility(n2)
-
-			return
+		return function()
+			flag = false
 		end
+	end, { universeConfigurationStore, universeId })
 
-		p11.fetchEligibility(n2)
-		p11.fetchLatestSubmission(n2)
-	end, {
-		p11,
-		n2
-	})
+	local configurationData = SignalsReact.useSignalState(v2.data)
+	local isAudiencesReady
 
-	return React.useCallback(function() -- line: 334
-		-- upvalues: v107 (copy), GameConfigurationActions (copy), n2 (copy), LocalizationStrings (copy), v108 (copy)
-		v107(GameConfigurationActions.getExperienceQuestionnaireUrl(n2), LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB, v108)
-	end, {
-		v107,
-		v108,
-		n2
-	})
+	if SignalsReact.useSignalState(v2.status) == "Ready" then
+		isAudiencesReady = configurationData ~= nil
+	else
+		isAudiencesReady = false
+	end
+
+	local v3 = React.useMemo(function()
+		return universeActivationStore.getAndFetchEligibility(universeId)
+	end, { universeActivationStore, universeId })
+	local v4 = SignalsReact.useSignalState(v3.status)
+	local isEligibilityResolved = v4 == "Ready" or v4 == "Failed"
+
+	local contentUnrated = ContentMaturityUtils.isContentUnrated(universeId)
+	local sealBroken = ContentMaturityUtils.isSealBroken(universeId)
+	local lockReason = contentUnrated and (sealBroken and "RatingRequired" or "PublishRequired") or nil
+	local v5 = {
+		configurationData = configurationData,
+		isAudiencesReady = isAudiencesReady,
+		isConfigurationRefreshPending = state2,
+		isEligibilityResolved = isEligibilityResolved,
+		isNonPrivateLocked = lockReason ~= nil,
+		lockReason = lockReason,
+		selectedAudience = 0
+	}
+	state = getSelectedAudienceFromState(state, isAudiencesReady, configurationData) -- inferred equivalent call
+	v5.selectedAudience = state
+	return v5
 end
-local function useAudienceController(n3: number) -- line: 343
-	-- upvalues: useAudienceStores (copy), React (copy), useAudienceData (copy), useQuestionnaireHandler (copy), getAudiencesForValue (copy), FFlagBuildRehydrateOnPublish (copy), GameConfigurationActions (copy), GameConfigurationLabels (copy), debug (copy)
-	local v110 = useAudienceStores()
-	local v111, v112 = React.useState(nil)
-	local v113, v114 = React.useState(false)
-	local v115, v116 = React.useState(nil)
-	local v117 = useAudienceData(n3, v110.questionnaireStore, v110.universeActivationStore, v110.universeConfigurationStore, v111)
-	local v118 = useQuestionnaireHandler(n3, v110.questionnaireStore)
-	local configurationData = v117.configurationData
-	local isAudiencesReady = v117.isAudiencesReady
-	local isConfigurationRefreshPending = v117.isConfigurationRefreshPending
-	local isEligibilityResolved = v117.isEligibilityResolved
-	local isNonPrivateLocked = v117.isNonPrivateLocked
 
+local function useQuestionnaireHandler(p: number, questionnaireStore)
+	local creatorHub = useLocalization({
+		creatorHub = LocalizationStrings.GAME_CONFIGURATION_CREATOR_HUB
+	}).creatorHub
+	local v2 = useOpenWebView()
+
+	local v3 = React.useCallback(function()
+		refreshPublishEligibility(p)
+	end, { questionnaireStore, p })
+
+	return React.useCallback(function()
+		v2(GameConfigurationActions.getExperienceQuestionnaireUrl(p), creatorHub, v3)
+	end, { creatorHub, v2, v3, p })
+end
+
+local function cancelEligibilityRecheck(p) -- 2 equivalent calls inferred from this helper
+	local current = p.current
+	p.current = nil
+
+	if current ~= nil then
+		current:cancel()
+	end
+end
+
+local function useAudienceController(universeId: number)
+	local v2 = useAudienceStores()
+	local state, setState = React.useState(nil)
+	local state2, setState2 = React.useState(false)
+
+	local ref = React.useRef(nil)
+	local v3 = ref
+	React.useEffect(function()
+		return function()
+			cancelEligibilityRecheck(ref) -- inferred equivalent call
+		end
+	end, { ref, universeId })
+
+	local state3, setState3 = React.useState(nil)
+	local onTooltipPressedOutside = React.useCallback(function()
+		setState3(nil)
+	end, {})
+
+	local v4 = useAudienceData(universeId, v2.universeActivationStore, v2.universeConfigurationStore, state)
+	local handleQuestionnaire = useQuestionnaireHandler(universeId, v2.questionnaireStore)
+
+	local configurationData = v4.configurationData
+	local isAudiencesReady = v4.isAudiencesReady
+	local isConfigurationRefreshPending = v4.isConfigurationRefreshPending
+	local isEligibilityResolved = v4.isEligibilityResolved
+	local isNonPrivateLocked = v4.isNonPrivateLocked
+	local v5 = not isAudiencesReady or state2 or isConfigurationRefreshPending
 	return {
-		handleAudienceActivated = React.useCallback(function(s4: string) -- line: 364
-			-- upvalues: isNonPrivateLocked (copy), v116 (copy), isAudiencesReady (copy), isEligibilityResolved (copy), v113 (copy), isConfigurationRefreshPending (copy), getAudiencesForValue (copy), configurationData (copy), v112 (copy), v114 (copy), v110 (copy), n3 (copy), FFlagBuildRehydrateOnPublish (copy), GameConfigurationActions (copy), GameConfigurationLabels (copy), debug (copy)
-			if isNonPrivateLocked and s4 ~= "Private" then
-				v116(function(p12) -- line: 366
-					-- upvalues: s4 (copy)
-					if p12 == s4 then
-						return nil
-					end
-
-					return s4
+		handleAudienceActivated = React.useCallback(function(p: string)
+			local function showLockedTooltip() -- 2 equivalent calls inferred from this helper
+				setState3(function(p2)
+					return if p2 ~= p then p else nil
 				end)
-
-				return
 			end
 
-			if not isAudiencesReady or not isEligibilityResolved or v113 or isConfigurationRefreshPending then
-				return
-			end
-
-			local v138 = getAudiencesForValue(s4, configurationData.audiences)
-
-			v116(nil)
-			v112(s4)
-			v114(true)
-			v110.universeActivationStore.setAudiences(n3, v138):andThen(function(p13) -- line: 392
-				-- upvalues: FFlagBuildRehydrateOnPublish (copy), GameConfigurationActions (copy), n3 (copy), v110 (copy), GameConfigurationLabels (copy), v138 (copy), debug (copy), v112 (copy), v114 (copy)
-				if FFlagBuildRehydrateOnPublish then
-					GameConfigurationActions.updateCachedAudience(n3, p13.audiences)
-				else
-					v110.universeConfigurationStore.updateSummary(n3, {
-						privacyType = GameConfigurationLabels.getAudience({
-							audiences = v138
-						}),
-						audiences = v138
-					})
+			local function applyAudienceChange()
+				if v5 then
+					return
 				end
 
-				v110.universeActivationStore.activate(n3):andThen(function() -- line: 403
-					-- upvalues: FFlagBuildRehydrateOnPublish (copy), v110 (copy), n3 (copy)
-					if not FFlagBuildRehydrateOnPublish then
-						v110.universeConfigurationStore.fetchConfiguration(n3)
-					end
-				end):catch(function(p14) -- line: 408
-					-- upvalues: debug (copy), n3 (copy), v112 (copy)
-					debug.log("warn", "AudienceConfigurationContent activate after audience update failed", {
-						errorMessage = tostring(p14),
-						universeId = n3
+				local audiencesForValue = getAudiencesForValue(p, configurationData.audiences)
+
+				setState3(nil)
+				setState(p)
+				setState2(true)
+
+				v2.universeActivationStore.setAudiences(universeId, audiencesForValue):andThen(function(p2)
+					GameConfigurationActions.updateCachedAudience(universeId, p2.audiences)
+					v2.universeActivationStore.activate(universeId):andThen(function()
+						if FFlagEnableBuildAdPromotion then
+							refreshAdCampaignEligibility(universeId)
+						end
+					end):catch(function(p3)
+						Debug.log("warn", "AudienceConfigurationContent activate after audience update failed", {
+							errorMessage = formatError(p3),
+							universeId = universeId
+						})
+
+						setState(nil)
+					end):finally(function()
+						setState2(false)
+					end)
+				end):catch(function(p2)
+					Debug.log("warn", "AudienceConfigurationContent set audiences failed", {
+						errorMessage = formatError(p2),
+						universeId = universeId
 					})
-					v112(nil)
-				end):finally(function() -- line: 419
-					-- upvalues: v114 (copy)
-					v114(false)
+
+					setState(nil)
+					setState2(false)
 				end)
-			end):catch(function(p15) -- line: 423
-				-- upvalues: debug (copy), n3 (copy), v112 (copy), v114 (copy)
-				debug.log("warn", "AudienceConfigurationContent set audiences failed", {
-					errorMessage = tostring(p15),
-					universeId = n3
-				})
-				v112(nil)
-				v114(false)
+			end
+
+			local v6 = isNonPrivateLocked and p ~= "Private"
+
+			if v6 then
+				showLockedTooltip() -- inferred equivalent call
+			end
+
+			if v5 then
+				return
+			end
+
+			if not v6 then
+				setState2(true)
+			end
+
+			local v7 = v3
+			cancelEligibilityRecheck(v7) -- inferred equivalent call
+
+			if p == "Private" then
+				applyAudienceChange()
+				return
+			end
+
+			if not v6 then
+				setState(p)
+			end
+
+			local current = v2.universeActivationStore.refreshEligibility(universeId)
+			v7.current = current
+
+			current:catch(function(p2)
+				if v7.current == current then
+					Debug.log("warn", "AudienceConfigurationContent eligibility recheck failed", {
+						errorMessage = formatError(p2),
+						universeId = universeId
+					})
+				end
+			end):finally(function()
+				if v7.current ~= current then
+					return
+				end
+
+				v7.current = nil
+
+				if not ContentMaturityUtils.isContentUnrated(universeId) then
+					applyAudienceChange()
+				elseif not v6 then
+					setState(nil)
+					setState2(false)
+					showLockedTooltip() -- inferred equivalent call
+				end
 			end)
 		end, {
 			configurationData,
-			isAudiencesReady,
-			isConfigurationRefreshPending,
+			v3,
+			v5,
 			isEligibilityResolved,
-			v113,
 			isNonPrivateLocked,
-			v110.universeActivationStore,
-			v110.universeConfigurationStore,
-			n3
+			v2.universeActivationStore,
+			v2.universeConfigurationStore,
+			universeId
 		}),
-		handleQuestionnaire = v118,
-		isNonPrivateLocked = v117.isNonPrivateLocked,
-		selectedAudience = v117.selectedAudience,
-		tooltipTarget = v115
+		handleQuestionnaire = handleQuestionnaire,
+		isMutationPending = state2,
+		isNonPrivateLocked = v4.isNonPrivateLocked,
+		lockReason = v4.lockReason,
+		onTooltipPressedOutside = onTooltipPressedOutside,
+		selectedAudience = v4.selectedAudience,
+		tooltipTarget = state3
 	}
 end
-local function AudienceHeader() -- line: 454
-	-- upvalues: React (copy), View (copy), FoundationText (copy), LocalizationStrings (copy)
-	return React.createElement(View, {
-		LayoutOrder = 1,
-		tag = "col gap-xsmall size-full-0 auto-y"
-	}, {
-		Title = React.createElement(FoundationText, {
+
+local function AudienceHeader()
+	local v2 = useLocalization({
+		body = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_BODY,
+		title = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PAGE_TITLE
+	})
+
+	local body = v2.body
+	local title = v2.title
+
+	return React.createElement(View, { LayoutOrder = 1, tag = "col gap-xsmall size-full-0 auto-y" }, {
+		Title = React.createElement(Text, {
 			LayoutOrder = 1,
-			tag = "size-full-0 auto-y text-title-large text-align-x-left content-default",
-			Text = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PAGE_TITLE
+			Text = title,
+			tag = "size-full-0 auto-y text-title-large text-align-x-left content-default"
 		}),
-		Body = React.createElement(FoundationText, {
+		Body = React.createElement(Text, {
 			LayoutOrder = 2,
-			tag = "size-full-0 auto-y text-body-small text-wrap text-align-x-left content-default",
-			Text = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_BODY
+			Text = body,
+			tag = "size-full-0 auto-y text-body-small text-wrap text-align-x-left content-default"
 		})
 	})
 end
-local function AudienceList(t5: {[any]: any}) -- line: 481
-	-- upvalues: React (copy), RadioGroup (copy), List (copy), InputSize (copy), AudienceRow (copy), LocalizationStrings (copy)
-	local v125 = React.useCallback(function(s5: string) -- line: 482
-		-- upvalues: t5 (copy)
-		t5.onAudienceActivated(s5)
-	end, { t5.onAudienceActivated })
+
+local function AudienceList(props)
+	local v2 = useLocalization({
+		friends = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_FRIENDS,
+		private = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PRIVATE,
+		public = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLIC
+	})
+
+	local friends = v2.friends
+	local private = v2.private
+	local public = v2.public
+	local onValueChanged = React.useCallback(function(p: string)
+		props.onAudienceActivated(p)
+	end, { props.onAudienceActivated })
 
 	return React.createElement(RadioGroup.Root, {
 		LayoutOrder = 2,
+		onValueChanged = onValueChanged,
 		Selectable = false,
 		tag = "size-full-0 auto-y",
-		onValueChanged = v125,
-		value = t5.selectedAudience == nil and "" or t5.selectedAudience
+		value = props.selectedAudience == nil and "" or props.selectedAudience
 	}, {
 		List = React.createElement(List.Root, {
+			hasDivider = { hasDivider = true, isInset = false },
 			isContained = true,
-			hasDivider = {
-				hasDivider = true,
-				isInset = false
-			},
 			size = InputSize.Medium,
-			testId = `{ t5.testId }-list`
+			testId = `{props.testId}-list`
 		}, {
 			Private = React.createElement(AudienceRow, {
 				LayoutOrder = 1,
+				isDisabled = props.isDisabled,
 				isLocked = false,
 				lockIconRef = nil,
-				value = "Private",
-				onActivated = t5.onAudienceActivated,
-				testId = t5.testId,
-				title = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PRIVATE
+				onActivated = props.onAudienceActivated,
+				testId = props.testId,
+				title = private,
+				value = "Private"
 			}),
 			Friends = React.createElement(AudienceRow, {
 				LayoutOrder = 2,
-				value = "Friends",
-				isLocked = t5.isNonPrivateLocked,
-				lockIconRef = t5.friendsLockIconRef,
-				onActivated = t5.onAudienceActivated,
-				testId = t5.testId,
-				title = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_FRIENDS
+				isDisabled = props.isDisabled,
+				isLocked = props.isNonPrivateLocked,
+				lockIconRef = props.friendsLockIconRef,
+				onActivated = props.onAudienceActivated,
+				testId = props.testId,
+				title = friends,
+				value = "Friends"
 			}),
 			Public = React.createElement(AudienceRow, {
 				LayoutOrder = 3,
-				value = "Public",
-				isLocked = t5.isNonPrivateLocked,
-				lockIconRef = t5.publicLockIconRef,
-				onActivated = t5.onAudienceActivated,
-				testId = t5.testId,
-				title = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLIC
+				isDisabled = props.isDisabled,
+				isLocked = props.isNonPrivateLocked,
+				lockIconRef = props.publicLockIconRef,
+				onActivated = props.onAudienceActivated,
+				testId = props.testId,
+				title = public,
+				value = "Public"
 			})
 		})
 	})
 end
-local function EligibilityTooltip(t6: {[any]: any}) -- line: 539
-	-- upvalues: useTokens (copy), useScaledValue (copy), v32 (copy), React (copy), Popover (copy), PopoverAlign (copy), EnumsRadius (copy), PopoverSide (copy), View (copy), FoundationText (copy), LocalizationStrings (copy)
-	local v127 = useTokens()
-	local v128 = useScaledValue(v32)
+
+local function EligibilityTooltip(props)
+	local v2 = useLocalization({
+		notEligible = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE,
+		notEligibleDescription = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE_DESCRIPTION,
+		publishRequired = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLISH_REQUIRED,
+		publishRequiredDescription = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_PUBLISH_REQUIRED_DESCRIPTION
+	})
+
+	local notEligible = v2.notEligible
+	local text = v2.notEligibleDescription
+	local text2 = v2.publishRequired
+	local publishRequiredDescription = v2.publishRequiredDescription
+	local v3 = useTokens()
+	local v4 = useScaledValue(defineFastInt)
+	local v5 = props.lockReason == "PublishRequired"
+
+	if not v5 then
+		text2 = notEligible
+	end
+
+	if v5 then
+		text = publishRequiredDescription
+	end
+
+	local testId
+
+	if v5 then
+		testId = `{props.testId}-eligibility-tooltip--publish`
+	else
+		testId = `{props.testId}-eligibility-tooltip--not-eligible`
+	end
 
 	return React.createElement(Popover.Root, {
-		isOpen = t6.isOpen,
-		testId = `{ t6.testId }-eligibility-tooltip`
+		isOpen = props.isOpen,
+		testId = `{props.testId}-eligibility-tooltip`
 	}, {
-		Anchor = React.createElement(Popover.Anchor, {
-			anchorRef = t6.anchorRef
-		}),
+		Anchor = React.createElement(Popover.Anchor, { anchorRef = props.anchorRef }),
 		Content = React.createElement(Popover.Content, {
-			hasArrow = true,
-			selectionGroup = false,
 			align = PopoverAlign.Center,
-			backgroundStyle = v127.Color.System.Contrast,
-			radius = EnumsRadius.Small,
+			backgroundStyle = v3.Color.System.Contrast,
+			hasArrow = true,
+			onPressedOutside = props.onPressedOutside,
+			radius = Radius.Small,
+			selectionGroup = false,
 			side = PopoverSide.Left
 		}, {
 			Layout = React.createElement(View, {
 				tag = "col gap-xsmall auto-xy padding-x-small padding-y-small",
-				sizeConstraint = {
-					MaxSize = Vector2.new(v128, 1e999)
-				}
+				sizeConstraint = { MaxSize = Vector2.new(v4, 1e999) },
+				testId = testId
 			}, {
-				Title = React.createElement(FoundationText, {
+				Title = React.createElement(Text, {
 					LayoutOrder = 1,
+					Text = text2,
 					tag = "auto-xy text-title-small text-wrap text-align-x-left content-inverse-emphasis",
-					Text = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE,
-					testId = `{ t6.testId }-eligibility-tooltip--header`
+					testId = `{props.testId}-eligibility-tooltip--header`
 				}),
-				Text = React.createElement(FoundationText, {
+				Text = React.createElement(Text, {
 					LayoutOrder = 2,
+					Text = text,
 					tag = "auto-xy text-body-small text-wrap text-align-x-left content-inverse-default",
-					Text = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_NOT_ELIGIBLE_DESCRIPTION,
-					testId = `{ t6.testId }-eligibility-tooltip--text`
+					testId = `{props.testId}-eligibility-tooltip--text`
 				})
 			})
 		})
 	})
 end
-local function EligibilityBanner(t7: {[any]: any}) -- line: 586
-	-- upvalues: React (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy), LocalizationStrings (copy)
+
+local function EligibilityBanner(p)
+	local banner = useLocalization({
+		banner = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_BANNER
+	}).banner
+
 	return React.createElement(View, {
 		LayoutOrder = 3,
-		tag = "row align-y-center gap-small size-full-0 auto-y padding-medium radius-medium bg-shift-200",
-		onActivated = t7.onActivated,
+		onActivated = p.onActivated,
 		stateLayer = {},
-		testId = `{ t7.testId }-eligibility-banner`
+		tag = "row align-y-center gap-small size-full-0 auto-y padding-medium radius-medium bg-shift-200",
+		testId = `{p.testId}-eligibility-banner`
 	}, {
 		Lock = React.createElement(Icon, {
 			LayoutOrder = 1,
-			tag = "auto-xy content-emphasis",
 			name = IconName.LockClosed,
-			size = IconSize.Small
+			size = IconSize.Small,
+			tag = "auto-xy content-emphasis"
 		}),
-		Text = React.createElement(FoundationText, {
+		Text = React.createElement(Text, {
 			LayoutOrder = 2,
-			tag = "fill auto-y text-body-small text-align-x-left text-truncate-end content-emphasis",
-			Text = LocalizationStrings.GAME_CONFIGURATION_AUDIENCE_BANNER
+			Text = banner,
+			tag = "fill auto-y text-body-small text-align-x-left text-truncate-end content-emphasis"
 		}),
 		ExternalLink = React.createElement(Icon, {
 			LayoutOrder = 3,
-			tag = "auto-xy content-emphasis",
 			name = IconName.ArrowUpRightFromSquare,
-			size = IconSize.Small
+			size = IconSize.Small,
+			tag = "auto-xy content-emphasis"
 		})
 	})
 end
-local function AudienceConfigurationContent(t8: {[any]: any}) -- line: 614
-	-- upvalues: useAudienceController (copy), React (copy), View (copy), AudienceHeader (copy), AudienceList (copy), EligibilityTooltip (copy), EligibilityBanner (copy)
-	local v131 = t8.testId or "audience-configuration-content"
-	local v132 = useAudienceController(t8.universeId)
-	local v133 = React.useRef(nil)
-	local v134 = React.useRef(nil)
-	local v135 = if v132.tooltipTarget ~= "Public" then v133 else v134
 
-	return React.createElement(View, {
+local function AudienceConfigurationContent(props)
+	local testId = props.testId or "audience-configuration-content"
+	local v2 = useAudienceController(props.universeId)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local anchorRef = if v2.tooltipTarget == "Public" then ref2 else ref
+
+	local v3 = v2.isNonPrivateLocked and v2.lockReason == "RatingRequired"
+
+	local createElement = React.createElement
+	local v4 = {
+		LayoutOrder = props.layoutOrder,
 		tag = "col gap-medium size-full-0 auto-y padding-y-large",
-		LayoutOrder = t8.layoutOrder,
-		testId = v131
-	}, {
+		testId = testId
+	}
+
+	local v5 = {
 		Header = React.createElement(AudienceHeader),
 		List = React.createElement(AudienceList, {
-			friendsLockIconRef = v133,
-			isNonPrivateLocked = v132.isNonPrivateLocked,
-			onAudienceActivated = v132.handleAudienceActivated,
-			publicLockIconRef = v134,
-			selectedAudience = v132.selectedAudience,
-			testId = v131
+			friendsLockIconRef = ref,
+			isDisabled = v2.isMutationPending,
+			isNonPrivateLocked = v2.isNonPrivateLocked,
+			onAudienceActivated = v2.handleAudienceActivated,
+			publicLockIconRef = ref2,
+			selectedAudience = v2.selectedAudience,
+			testId = testId
 		}),
 		Tooltip = React.createElement(EligibilityTooltip, {
-			anchorRef = v135,
-			isOpen = v132.tooltipTarget ~= nil,
-			testId = v131
+			anchorRef = anchorRef,
+			isOpen = v2.tooltipTarget ~= nil,
+			lockReason = v2.lockReason,
+			onPressedOutside = v2.onTooltipPressedOutside,
+			testId = testId
 		}),
-		ContextBanner = if not v132.isNonPrivateLocked then nil else React.createElement(EligibilityBanner, {
-			onActivated = v132.handleQuestionnaire,
-			testId = v131
+		ContextBanner = 0
+	}
+	local contextBanner
+
+	if v3 then
+		contextBanner = React.createElement(EligibilityBanner, {
+			onActivated = v2.handleQuestionnaire,
+			testId = testId
 		})
-	})
+	end
+
+	v5.ContextBanner = contextBanner
+	return createElement(View, v4, v5)
 end
 
 return AudienceConfigurationContent

@@ -1,15 +1,15 @@
 local Platform = require(script.Parent.Platform)
 local Icon = require(script.Parent.Parent.Icon)
 
-local function merge(t1: {[any]: any}, t2: {[any]: any}) -- line: 4
-	for v14, v15 in t2 do
-		t1[v14] = v15
+local function merge(p, items) -- 2 equivalent calls inferred from this helper
+	for k, item in items do
+		p[k] = item
 	end
 
-	return t1
+	return p
 end
 
-local t3 = {
+local defaults = {
 	ButtonA = Icon.PsX,
 	ButtonB = Icon.PsCircle,
 	ButtonX = Icon.PsSquare,
@@ -27,29 +27,18 @@ local t3 = {
 	DPadLeft = Icon.PsDpadLeft,
 	DPadRight = Icon.PsDpadRight
 }
-local t4 = {}
-local PS4 = Platform.PS4
 
-for v7, v8 in {
-	ButtonStart = Icon.Ps4Options,
-	ButtonSelect = Icon.Ps4Share
-} do
-	t3[v7] = v8
-end
+local KeycodeMappings = {
+	[Platform.PS4] = merge(defaults, { ButtonStart = Icon.Ps4Options, ButtonSelect = Icon.Ps4Share }) -- inferred equivalent call
+}
 
-t4[PS4] = t3
-
-local PS5 = Platform.PS5
-
-for v10, v11 in {
+local ps5 = Platform.PS5
+KeycodeMappings[ps5] = merge(defaults, { -- inferred equivalent call
 	ButtonStart = Icon.Ps5Options,
 	ButtonSelect = Icon.Ps5Share
-} do
-	t3[v10] = v11
-end
+})
 
-t4[PS5] = t3
-t4[Platform.Xbox] = {
+KeycodeMappings[Platform.Xbox] = {
 	ButtonA = Icon.XboxA,
 	ButtonB = Icon.XboxB,
 	ButtonX = Icon.XboxX,
@@ -69,7 +58,8 @@ t4[Platform.Xbox] = {
 	DPadLeft = Icon.XboxDpadLeft,
 	DPadRight = Icon.XboxDpadRight
 }
-t4[Platform.Default] = {
+
+KeycodeMappings[Platform.Default] = {
 	LeftAlt = Icon.KeyAlt,
 	RightAlt = Icon.KeyAlt,
 	Down = Icon.KeyArrowDown,
@@ -89,7 +79,14 @@ t4[Platform.Default] = {
 	LeftShift = Icon.KeyShift,
 	RightShift = Icon.KeyShift,
 	Space = Icon.KeySpace,
-	Tab = Icon.KeyTab
+	Tab = Icon.KeyTab,
+	Thumbstick1Down = Icon.GenericStickLDown,
+	Thumbstick1Left = Icon.GenericStickLLeft,
+	Thumbstick1Right = Icon.GenericStickLRight,
+	Thumbstick1Up = Icon.GenericStickLUp,
+	Thumbstick2Down = Icon.GenericStickRDown,
+	Thumbstick2Left = Icon.GenericStickRLeft,
+	Thumbstick2Right = Icon.GenericStickRRight,
+	Thumbstick2Up = Icon.GenericStickRUp
 }
-
-return t4
+return KeycodeMappings

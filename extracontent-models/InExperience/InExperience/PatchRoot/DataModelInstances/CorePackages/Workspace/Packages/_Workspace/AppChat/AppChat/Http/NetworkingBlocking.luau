@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local UserBlockingNetworking = require(Parent.UserBlockingNetworking)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local UserBlockingNetworking = require(parent.UserBlockingNetworking)
+
 local RoduxNetworking = require(script.Parent.RoduxNetworking)
 
-return UserBlockingNetworking.config({
-	roduxNetworking = RoduxNetworking
-})
+return UserBlockingNetworking.config({ roduxNetworking = RoduxNetworking })

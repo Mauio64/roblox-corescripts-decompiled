@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("FoundationImages").Parent
-local SafeFlags = require(Parent.SafeFlags)
+local parent = script:FindFirstAncestor("FoundationImages").Parent
+local SafeFlags = require(parent.SafeFlags)
 
 return {
-	FixBlurryImages = SafeFlags.createGetFFlag("FixBlurryImages")(),
 	FoundationImagesWhitelistedIconAssets = SafeFlags.createGetFString("FoundationImagesWhitelistedIconAssets", "")()
 }

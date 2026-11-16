@@ -1,5 +1,1 @@
-return {
-	Deleted = "Deleted",
-	Public = "Public",
-	FailedToLoad = "FailedToLoad"
-}
+return { Deleted = "Deleted", Public = "Public", FailedToLoad = "FailedToLoad" }

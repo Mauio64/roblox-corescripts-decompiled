@@ -1,64 +1,62 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local SignalsReact = require(ProfilePlatformParent.SignalsReact)
-local SduiSharedUtilities = require(ProfilePlatformParent.SduiSharedUtilities)
+local parent = ProfilePlatform.Parent
 
-require(ProfilePlatformParent.SduiCoreSystem)
-
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+require(parent.SduiCoreSystem)
 local Enums = require(ProfilePlatform.Common.Enums)
-local createProfileCompletionPromptsConfig = require(ProfilePlatformParent.ProfilePlatformCommon).Utils.createProfileCompletionPromptsConfig
-local ServerTriggeredModals = require(ProfilePlatformParent.ServerTriggeredModals)
-local v9 = game:DefineFastFlag("ProfileCompletionResolveLatestSduiEntry", false)
+
+local ProfilePlatformCommon = require(parent.ProfilePlatformCommon)
+local createProfileCompletionPromptsConfig = ProfilePlatformCommon.Utils.createProfileCompletionPromptsConfig
+
+local ServerTriggeredModals = require(parent.ServerTriggeredModals)
+
 local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
 local fetchPrompts = ServerTriggeredModals.fetchPrompts
 
-local function useProfileCompletionData() -- line: 29
-	-- upvalues: React (copy), createProfileCompletionPromptsConfig (copy), fetchPrompts (copy), v9 (copy), getSduiApiStore (copy), Enums (copy), SignalsReact (copy)
-	local v13 = React.useMemo(function() -- line: 30
-		-- upvalues: createProfileCompletionPromptsConfig (copy)
+local function useProfileCompletionData()
+	local v = React.useMemo(function()
 		return createProfileCompletionPromptsConfig()
 	end, {})
 
-	React.useEffect(function() -- line: 34
-		-- upvalues: fetchPrompts (copy), v13 (copy)
-		fetchPrompts(v13, true)
-	end, { v13 })
+	React.useEffect(function()
+		fetchPrompts(v, true)
+	end, { v })
 
-	local v14 = React.useCallback(function() -- line: 38
-		-- upvalues: fetchPrompts (copy), createProfileCompletionPromptsConfig (copy)
+	local v2 = React.useCallback(function()
 		fetchPrompts(createProfileCompletionPromptsConfig(), true)
 	end, {})
-	local v15 = React.useCallback(function(p1) -- line: 42
-		-- upvalues: v9 (copy), getSduiApiStore (copy), Enums (copy)
-		if v9 then
-			local v17 = getSduiApiStore().getData(Enums.Components.ProfileCompletion).data(p1)
 
-			if not v17 then
-				return nil
-			end
+	local v3 = React.useCallback(function(p)
+		local data = getSduiApiStore().getData(Enums.Components.ProfileCompletion).data(p)
 
-			local config = nil
-			local n1 = 0
-
-			for _, v21 in v17 do
-				if v21 and v21.config then
-					local v22 = v21.dataUpdatedTimestamp or 0
-
-					if not config or n1 < v22 then
-						config = v21.config
-						n1 = v22
-					end
-				end
-			end
-
-			return config
+		if not data then
+			return nil
 		end
 
-		return (getSduiApiStore().getRootConfig(Enums.Components.ProfileCompletion, p1))
+		local config = nil
+		local v3 = 0
+
+		for _, v4 in data do
+			if not (v4 and v4.config) then
+				continue
+			end
+
+			local dataUpdatedTimestamp = v4.dataUpdatedTimestamp or 0
+
+			if not (not config or v3 < dataUpdatedTimestamp) then
+				continue
+			end
+
+			config = v4.config
+			v3 = dataUpdatedTimestamp
+		end
+
+		return config
 	end, {})
 
-	return SignalsReact.useSignalState(v15), v14
+	return SignalsReact.useSignalState(v3), v2
 end
 
 return useProfileCompletionData

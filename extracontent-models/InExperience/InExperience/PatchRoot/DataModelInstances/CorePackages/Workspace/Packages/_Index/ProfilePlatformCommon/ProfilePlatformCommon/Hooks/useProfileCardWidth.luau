@@ -1,32 +1,41 @@
-local Parent = script:FindFirstAncestor("ProfilePlatformCommon").Parent
-local InputUi = require(Parent.InputUi)
-local RobloxAppHooks = require(Parent.RobloxAppHooks)
-local RoactUtils = require(Parent.RoactUtils)
+local parent = script:FindFirstAncestor("ProfilePlatformCommon").Parent
+
+local InputUi = require(parent.InputUi)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local RoactUtils = require(parent.RoactUtils)
 local useScreenSize = RobloxAppHooks.useScreenSize
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local getSafeAreaSize = InputUi.getSafeAreaSize
-local useNavBarSize = require(Parent.AppNavBar).useNavBarSize
-local GetDisplayStore = require(Parent.Display).GetDisplayStore
-local FFlagProfilePlatformNewProfileHeader = require(Parent.SharedFlags).FFlagProfilePlatformNewProfileHeader
-local v11 = game:DefineFastFlag("FixIsWideModeCheck", false)
+local AppNavBar = require(parent.AppNavBar)
+local useNavBarSize = AppNavBar.useNavBarSize
+local Display = require(parent.Display)
+local GetDisplayStore = Display.GetDisplayStore
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformNewProfileHeader = SharedFlags.FFlagProfilePlatformNewProfileHeader
 
-return function() -- line: 19
-	-- upvalues: useScreenSize (copy), useSelector (copy), getSafeAreaSize (copy), v11 (copy), GetDisplayStore (copy), useNavBarSize (copy), FFlagProfilePlatformNewProfileHeader (copy)
-	local v12 = useScreenSize()
-	local v13 = useSelector(function(p1) -- line: 21
-		return p1.GlobalGuiInset
-	end)
-	local v14 = getSafeAreaSize(v12, v13)
-	local v15 = if not v11 then GetDisplayStore(false).getDisplaySize(false) ~= Enum.DisplaySize.Small else v14.X.Offset > v14.Y.Offset
-	local v16 = useNavBarSize()
+local defineFastFlag = game:DefineFastFlag("FixIsWideModeCheck", false)
 
-	if FFlagProfilePlatformNewProfileHeader then
-		if v15 then
-			return (math.max(456, (math.floor((v14.X.Offset - v16) / 3))))
-		end
+return function()
+	local safeAreaSize = getSafeAreaSize(useScreenSize(), (useSelector(function(p)
+		return p.GlobalGuiInset
+	end)))
+	local v
 
-		return (math.min(v14.X.Offset, 640))
+	if defineFastFlag then
+		v = safeAreaSize.X.Offset > safeAreaSize.Y.Offset
+	else
+		v = GetDisplayStore(false).getDisplaySize(false) ~= Enum.DisplaySize.Small
 	end
 
-	return (math.min(v14.X.Offset, 640))
+	local v2 = useNavBarSize()
+
+	if not FFlagProfilePlatformNewProfileHeader then
+		return (math.min(safeAreaSize.X.Offset, 640))
+	end
+
+	if v then
+		return (math.max(456, (math.floor((safeAreaSize.X.Offset - v2) / 3))))
+	end
+
+	return (math.min(safeAreaSize.X.Offset, 640))
 end

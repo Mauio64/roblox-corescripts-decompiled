@@ -1,37 +1,56 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local Roact = require(scriptParentParentParent.Roact)
-local t = require(scriptParentParentParent.t)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+
 local LocalizationService = game:GetService("LocalizationService")
-local Localization = require(scriptParentParentParent.AppLocales).Localization
-local LocalizationProvider = require(scriptParentParentParent.Localization).LocalizationProvider
-local withLocalization = require(scriptParentParentParent.Localization).withLocalization
-local RoactFitComponents = require(scriptParentParentParent.RoactFitComponents)
+local AppLocales = require(parent3.AppLocales)
+local Localization = AppLocales.Localization
+local Localization2 = require(parent3.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+local Localization3 = require(parent3.Localization)
+local withLocalization = Localization3.withLocalization
+
+local RoactFitComponents = require(parent3.RoactFitComponents)
 local FitFrameVertical = RoactFitComponents.FitFrameVertical
 local FitTextLabel = RoactFitComponents.FitTextLabel
-local UIBlox = require(scriptParentParentParent.UIBlox)
+
+local UIBlox = require(parent3.UIBlox)
+local Foundation = require(parent3.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local IconSize = UIBlox.App.Constant.IconSize
 local withStyle = UIBlox.Core.Style.withStyle
-local Colors = require(scriptParentParentParent.Style).Colors
-local FFlagLowCogsBannerInfoIcon = require(scriptParentParent.Flags.FFlagLowCogsBannerInfoIcon)
-local InfoIconWithTooltip = require(scriptParentParent.Generic.InfoIconWithTooltip)
-local SharedFlags = require(scriptParentParentParent.SharedFlags)
-local MultiTextLocalizer = require(scriptParentParent.Locale.MultiTextLocalizer)
-local ProductDetails = require(scriptParent.ProductDetails)
-local v26 = Images["icons/common/robux"]
-local v27 = Roact.Component:extend(script.Name)
-local getEnableFixRobuxUpsellPriceCrash = require(scriptParentParent.Flags.getEnableFixRobuxUpsellPriceCrash)
-local FFlagIntroduceMetricsLegacyUpsell = require(scriptParentParent.Flags.FFlagIntroduceMetricsLegacyUpsell)
-local default = require(scriptParentParentParent.LoggingProtocol).default
-local LegacyUpsellCounter = require(scriptParentParent.Generic.Events.LegacyUpsellCounter)
-local logger = require(scriptParentParent.Utility.logger)
 
-v27.validateProps = t.strictInterface({
+local Style = require(parent3.Style)
+local Colors = Style.Colors
+
+local FFlagLowCogsBannerInfoIcon = require(parent2.Flags.FFlagLowCogsBannerInfoIcon)
+local InfoIconWithTooltip = require(parent2.Generic.InfoIconWithTooltip)
+
+local SharedFlags = require(parent3.SharedFlags)
+
+local MultiTextLocalizer = require(parent2.Locale.MultiTextLocalizer)
+
+local ProductDetails = require(parent.ProductDetails)
+
+local iconscommonrobux = Images["icons/common/robux"]
+
+local extended = Roact.Component:extend(script.Name)
+
+local FFlagIntroduceMetricsLegacyUpsell = require(parent2.Flags.FFlagIntroduceMetricsLegacyUpsell)
+local LoggingProtocol = require(parent3.LoggingProtocol)
+local default = LoggingProtocol.default
+local LegacyUpsellCounter = require(parent2.Generic.Events.LegacyUpsellCounter)
+local logger = require(parent2.Utility.logger)
+
+extended.validateProps = t.strictInterface({
 	anchorPoint = t.optional(t.Vector2),
 	position = t.optional(t.UDim2),
 	screenSize = t.Vector2,
@@ -53,122 +72,94 @@ v27.validateProps = t.strictInterface({
 	isLuobu = t.optional(t.boolean),
 	isVng = t.optional(t.boolean)
 })
-v27.defaultProps = {
+
+extended.defaultProps = {
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.new(0.5, 0, 0.5, 0),
 	isLoading = false,
 	isDisabled = false,
 	isDelayedInput = false,
 	enableInputDelayed = false,
-	isLuobu = false,
-	anchorPoint = Vector2.new(0.5, 0.5),
-	position = UDim2.new(0.5, 0, 0.5, 0)
+	isLuobu = false
 }
 
-function v27.init(p1) -- line: 91
-	-- upvalues: Roact (copy)
-	p1.contentRef = Roact.createRef()
-	p1.footerRef = Roact.createRef()
-	p1.state = {
-		contentSize = Vector2.new(0, 0),
-		footerSize = Vector2.new(0, 0)
-	}
+function extended:init()
+	self.contentRef = Roact.createRef()
+	self.footerRef = Roact.createRef()
+	self.state = { contentSize = Vector2.new(0, 0), footerSize = Vector2.new(0, 0) }
 
-	function p1.changeContentSize(p2) -- line: 99
-		-- upvalues: p1 (copy)
-		if p1.state.contentSize ~= p2.AbsoluteSize then
-			p1:setState({
-				contentSize = p2.AbsoluteSize
-			})
+	function self.changeContentSize(p)
+		if self.state.contentSize ~= p.AbsoluteSize then
+			self:setState({ contentSize = p.AbsoluteSize })
 		end
 	end
-	function p1.changeFooterSize(p3) -- line: 107
-		-- upvalues: p1 (copy)
-		if p1.state.footerSize ~= p3.AbsoluteSize then
-			p1:setState({
-				footerSize = p3.AbsoluteSize
-			})
+
+	function self.changeFooterSize(p)
+		if self.state.footerSize ~= p.AbsoluteSize then
+			self:setState({ footerSize = p.AbsoluteSize })
 		end
 	end
 end
-function v27.didMount(_) -- line: 116
-	-- upvalues: FFlagIntroduceMetricsLegacyUpsell (copy), logger (copy), default (copy), LegacyUpsellCounter (copy)
+
+function extended.didMount(_)
 	if FFlagIntroduceMetricsLegacyUpsell then
-		logger.debug({
-			message = "Legacy Upsell Modal Shown"
-		})
+		logger.debug({ message = "Legacy Upsell Modal Shown" })
+
 		default:logRobloxTelemetryCounter(LegacyUpsellCounter.LegacyUpsellShownCounter, 1, {})
 	end
 end
-function v27.render(p5) -- line: 125
-	-- upvalues: SharedFlags (copy), Roact (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), MultiTextLocalizer (copy)
-	local v36 = not p5.props.isLuobu and "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestion" or "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestionWithWarning"
-	local v37 = not p5.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTerms" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTerms"
+
+function extended:render()
+	local v = self.props.isLuobu and "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestionWithWarning"
+		or "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestion"
+
+	local v2 = self.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTerms"
+		or "IAPExperience.RobuxUpsell.Text.DisclosureTerms"
 
 	if SharedFlags.FFlagLowCogsBannerExperiment then
-		return Roact.createElement(LocalizationProvider, {
-			localization = Localization.new(LocalizationService.RobloxLocaleId)
-		}, {
-			Alert = p5:renderNewAlert()
-		})
+		return Roact.createElement(
+			LocalizationProvider,
+			{
+				localization = Localization.new(LocalizationService.RobloxLocaleId)
+			},
+			{ Alert = self:renderNewAlert() }
+		)
 	end
 
 	return Roact.createElement(MultiTextLocalizer, {
 		keys = {
-			InsufficientFundsTitle = {
-				key = "IAPExperience.RobuxUpsell.Title.InsufficientFunds"
-			},
-			BuyRobuxQuestion = {
-				key = v36
-			},
-			DisclosurePayment = {
-				key = "IAPExperience.RobuxUpsell.Text.DisclosurePayment"
-			},
-			DisclosureTerms = {
-				key = v37
-			},
-			RemainingBalance = {
-				key = "IAPExperience.RobuxUpsell.Text.RemainingBalance"
-			},
-			BuyRobuxButton = {
-				key = "IAPExperience.RobuxUpsell.Action.BuyRobux"
-			},
-			ButtonCancel = {
-				key = "IAPExperience.RobuxUpsell.Action.Cancel"
-			},
-			LoadingText = {
-				key = "IAPExperience.RobuxUpsell.Text.Loading"
-			}
+			InsufficientFundsTitle = { key = "IAPExperience.RobuxUpsell.Title.InsufficientFunds" },
+			BuyRobuxQuestion = { key = v },
+			DisclosurePayment = { key = "IAPExperience.RobuxUpsell.Text.DisclosurePayment" },
+			DisclosureTerms = { key = v2 },
+			RemainingBalance = { key = "IAPExperience.RobuxUpsell.Text.RemainingBalance" },
+			BuyRobuxButton = { key = "IAPExperience.RobuxUpsell.Action.BuyRobux" },
+			ButtonCancel = { key = "IAPExperience.RobuxUpsell.Action.Cancel" },
+			LoadingText = { key = "IAPExperience.RobuxUpsell.Text.Loading" }
 		},
-		render = function(p6) -- line: 170
-			-- upvalues: p5 (copy)
-			return p5:renderAlert(p6)
+		render = function(p)
+			return self:renderAlert(p)
 		end
 	})
 end
-function v27.renderAlert(p7, p8) -- line: 176
-	-- upvalues: withStyle (copy), getEnableFixRobuxUpsellPriceCrash (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), ProductDetails (copy), FitTextLabel (copy), ImageSetLabel (copy), v26 (copy), ButtonType (copy), IconSize (copy)
-	return withStyle(function(p9) -- line: 177
-		-- upvalues: getEnableFixRobuxUpsellPriceCrash (copy), p7 (copy), Roact (copy), InteractiveAlert (copy), p8 (copy), FitFrameVertical (copy), ProductDetails (copy), FitTextLabel (copy), ImageSetLabel (copy), v26 (copy), ButtonType (copy), IconSize (copy)
-		local Theme = p9.Theme
-		local p9Font = p9.Font
-		local u58
 
-		if getEnableFixRobuxUpsellPriceCrash() then
-			local v55 = p7.props.balanceAmount or 0
-			local v56 = p7.props.robuxPurchaseAmount or 0
-			local v57 = p7.props.itemRobuxCost or 0
+function extended:renderAlert(data)
+	return withStyle(function(p)
+		local theme = p.Theme
+		local font = p.Font
 
-			u58 = v55 + v56 - v57
-		else
-			u58 = p7.props.balanceAmount + p7.props.robuxPurchaseAmount - p7.props.itemRobuxCost
-		end
+		local balanceAmount = self.props.balanceAmount or 0
+		local robuxPurchaseAmount = self.props.robuxPurchaseAmount or 0
+		local itemRobuxCost = self.props.itemRobuxCost or 0
+
+		local text = balanceAmount + robuxPurchaseAmount - itemRobuxCost
 
 		return Roact.createElement(InteractiveAlert, {
-			screenSize = p7.props.screenSize,
-			position = p7.props.position,
-			anchorPoint = p7.props.anchorPoint,
-			title = p8.InsufficientFundsTitle,
-			middleContent = function() -- line: 198
-				-- upvalues: Roact (copy), FitFrameVertical (copy), p7 (copy), ProductDetails (copy), Theme (copy), FitTextLabel (copy), p9Font (copy), p8 (copy), ImageSetLabel (copy), v26 (copy)
+			screenSize = self.props.screenSize,
+			position = self.props.position,
+			anchorPoint = self.props.anchorPoint,
+			title = data.InsufficientFundsTitle,
+			middleContent = function()
 				return Roact.createElement(FitFrameVertical, {
 					BackgroundTransparency = 1,
 					width = UDim.new(1, 0),
@@ -176,21 +167,21 @@ function v27.renderAlert(p7, p8) -- line: 176
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					contentPadding = UDim.new(0, 15),
-					[Roact.Ref] = p7.contentRef,
-					[Roact.Change.AbsoluteSize] = p7.changeContentSize
+					[Roact.Ref] = self.contentRef,
+					[Roact.Change.AbsoluteSize] = self.changeContentSize
 				}, {
 					ItemDetails = Roact.createElement(ProductDetails, {
 						layoutOrder = 1,
-						model = p7.props.model,
-						itemIcon = p7.props.itemIcon,
-						itemName = p7.props.itemName,
-						itemRobuxCost = p7.props.itemRobuxCost
+						model = self.props.model,
+						itemIcon = self.props.itemIcon,
+						itemName = self.props.itemName,
+						itemRobuxCost = self.props.itemRobuxCost
 					}),
 					Underline = Roact.createElement("Frame", {
 						LayoutOrder = 2,
 						BorderSizePixel = 0,
-						BackgroundColor3 = Theme.Divider.Color,
-						BackgroundTransparency = Theme.Divider.Transparency,
+						BackgroundColor3 = theme.Divider.Color,
+						BackgroundTransparency = theme.Divider.Transparency,
 						Size = UDim2.new(1, 0, 0, 1)
 					}),
 					ConfirmationFrame = Roact.createElement(FitFrameVertical, {
@@ -205,13 +196,13 @@ function v27.renderAlert(p7, p8) -- line: 176
 						WouldYouLikeText = Roact.createElement(FitTextLabel, {
 							LayoutOrder = 1,
 							BackgroundTransparency = 1,
-							TextWrapped = true,
 							width = FitTextLabel.Width.FitToText,
-							maximumWidth = p7.state.contentSize.X * 0.8,
-							Font = p9Font.Body.Font,
-							Text = p8.BuyRobuxQuestion,
-							TextSize = p9Font.BaseSize * p9Font.Body.RelativeSize,
-							TextColor3 = Theme.TextDefault.Color
+							TextWrapped = true,
+							maximumWidth = self.state.contentSize.X * 0.8,
+							Font = font.Body.Font,
+							Text = data.BuyRobuxQuestion,
+							TextSize = font.BaseSize * font.Body.RelativeSize,
+							TextColor3 = theme.TextDefault.Color
 						}),
 						RobuxIcon = Roact.createElement(ImageSetLabel, {
 							LayoutOrder = 2,
@@ -219,18 +210,18 @@ function v27.renderAlert(p7, p8) -- line: 176
 							Position = UDim2.new(0, 5, 0, 5),
 							Size = UDim2.new(0, 24, 0, 24),
 							ScaleType = Enum.ScaleType.Stretch,
-							Image = v26,
-							ImageColor3 = Theme.IconEmphasis.Color,
-							ImageTransparency = Theme.IconEmphasis.Transparency
+							Image = iconscommonrobux,
+							ImageColor3 = theme.IconEmphasis.Color,
+							ImageTransparency = theme.IconEmphasis.Transparency
 						}),
 						RemainingRobux = Roact.createElement(FitTextLabel, {
 							LayoutOrder = 3,
 							BackgroundTransparency = 1,
 							width = FitTextLabel.Width.FitToText,
-							Font = p9Font.Body.Font,
-							Text = tostring(p7.props.robuxPurchaseAmount),
-							TextSize = p9Font.BaseSize * p9Font.Body.RelativeSize,
-							TextColor3 = Theme.TextEmphasis.Color
+							Font = font.Body.Font,
+							Text = tostring(self.props.robuxPurchaseAmount),
+							TextSize = font.BaseSize * font.Body.RelativeSize,
+							TextColor3 = theme.TextEmphasis.Color
 						})
 					}),
 					DisclosureFrame = Roact.createElement(FitFrameVertical, {
@@ -245,21 +236,21 @@ function v27.renderAlert(p7, p8) -- line: 176
 						DisclosurePayment = Roact.createElement(FitTextLabel, {
 							LayoutOrder = 1,
 							BackgroundTransparency = 1,
-							TextWrapped = true,
 							width = FitTextLabel.Width.FitToText,
-							Font = p9Font.Footer.Font,
-							Text = p8.DisclosurePayment,
-							TextSize = p9Font.BaseSize * p9Font.Footer.RelativeSize,
-							TextColor3 = Theme.TextDefault.Color
+							Font = font.Footer.Font,
+							Text = data.DisclosurePayment,
+							TextSize = font.BaseSize * font.Footer.RelativeSize,
+							TextColor3 = theme.TextDefault.Color,
+							TextWrapped = true
 						}),
 						DisclosureTerms = Roact.createElement(FitTextLabel, {
 							LayoutOrder = 2,
 							BackgroundTransparency = 1,
 							width = FitTextLabel.Width.FitToText,
-							Font = p9Font.Footer.Font,
-							Text = p8.DisclosureTerms,
-							TextSize = p9Font.BaseSize * p9Font.Footer.RelativeSize,
-							TextColor3 = Theme.TextDefault.Color
+							Font = font.Footer.Font,
+							Text = data.DisclosureTerms,
+							TextSize = font.BaseSize * font.Footer.RelativeSize,
+							TextColor3 = theme.TextDefault.Color
 						})
 					})
 				})
@@ -268,33 +259,31 @@ function v27.renderAlert(p7, p8) -- line: 176
 				buttons = {
 					{
 						props = {
-							isDisabled = p7.props.isDisabled,
-							onActivated = p7.props.cancelPurchaseActivated,
-							text = p8.ButtonCancel,
-							inputIcon = p7.props.cancelControllerIcon
+							isDisabled = self.props.isDisabled,
+							onActivated = self.props.cancelPurchaseActivated,
+							text = data.ButtonCancel,
+							inputIcon = self.props.cancelControllerIcon
 						}
 					},
 					{
 						buttonType = ButtonType.PrimarySystem,
 						props = {
+							isLoading = self.props.isLoading,
+							isDisabled = self.props.isDisabled,
+							isDelayedInput = self.props.isDelayedInput,
+							enableInputDelayed = self.props.enableInputDelayed,
 							delayInputSeconds = 3,
-							isLoading = p7.props.isLoading,
-							isDisabled = p7.props.isDisabled,
-							isDelayedInput = p7.props.isDelayedInput,
-							enableInputDelayed = p7.props.enableInputDelayed,
-							onActivated = p7.props.buyItemActivated,
-							text = p8.BuyRobuxButton,
-							inputIcon = p7.props.buyItemControllerIcon
+							onActivated = self.props.buyItemActivated,
+							text = data.BuyRobuxButton,
+							inputIcon = self.props.buyItemControllerIcon
 						}
 					}
 				}
 			},
-			footerContent = function() -- line: 329
-				-- upvalues: p8 (copy), Roact (copy), FitFrameVertical (copy), p7 (copy), FitTextLabel (copy), p9Font (copy), Theme (copy), ImageSetLabel (copy), IconSize (copy), v26 (copy), u58 (ref)
-				local parts = string.split(p8.RemainingBalance, " {robux} ")
-				local v61 = parts[1]
-				local v62 = parts[2]
-
+			footerContent = function()
+				local v = string.split(data.RemainingBalance, " {robux} ")
+				local text2 = v[1]
+				local text3 = v[2]
 				return Roact.createElement(FitFrameVertical, {
 					BackgroundTransparency = 1,
 					width = UDim.new(1, 0),
@@ -302,17 +291,17 @@ function v27.renderAlert(p7, p8) -- line: 176
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 					contentPadding = UDim.new(0, 1),
-					[Roact.Ref] = p7.footerRef,
-					[Roact.Change.AbsoluteSize] = p7.changeFooterSize
+					[Roact.Ref] = self.footerRef,
+					[Roact.Change.AbsoluteSize] = self.changeFooterSize
 				}, {
 					RemainingBalanceBefore = Roact.createElement(FitTextLabel, {
 						LayoutOrder = 1,
 						BackgroundTransparency = 1,
 						width = FitTextLabel.Width.FitToText,
-						Font = p9Font.Footer.Font,
-						Text = v61,
-						TextSize = p9Font.BaseSize * p9Font.Footer.RelativeSize,
-						TextColor3 = Theme.TextDefault.Color
+						Font = font.Footer.Font,
+						Text = text2,
+						TextSize = font.BaseSize * font.Footer.RelativeSize,
+						TextColor3 = theme.TextDefault.Color
 					}),
 					RobuxIcon = Roact.createElement(ImageSetLabel, {
 						LayoutOrder = 2,
@@ -320,77 +309,72 @@ function v27.renderAlert(p7, p8) -- line: 176
 						Position = UDim2.new(0, 5, 0, 5),
 						Size = UDim2.new(0, IconSize.Small, 0, IconSize.Small),
 						ScaleType = Enum.ScaleType.Stretch,
-						Image = v26,
-						ImageColor3 = Theme.IconEmphasis.Color,
-						ImageTransparency = Theme.IconEmphasis.Transparency
+						Image = iconscommonrobux,
+						ImageColor3 = theme.IconEmphasis.Color,
+						ImageTransparency = theme.IconEmphasis.Transparency
 					}),
 					RemainingRobux = Roact.createElement(FitTextLabel, {
 						LayoutOrder = 3,
 						BackgroundTransparency = 1,
 						width = FitTextLabel.Width.FitToText,
-						Font = p9Font.Footer.Font,
-						Text = u58,
-						TextSize = p9Font.BaseSize * p9Font.Footer.RelativeSize,
-						TextColor3 = Theme.TextDefault.Color
+						Font = font.Footer.Font,
+						Text = text,
+						TextSize = font.BaseSize * font.Footer.RelativeSize,
+						TextColor3 = theme.TextDefault.Color
 					}),
 					RemainingBalanceAfter = Roact.createElement(FitTextLabel, {
 						LayoutOrder = 4,
 						BackgroundTransparency = 1,
 						width = FitTextLabel.Width.FitToText,
-						Font = p9Font.Footer.Font,
-						Text = v62,
-						TextSize = p9Font.BaseSize * p9Font.Footer.RelativeSize,
-						TextColor3 = Theme.TextDefault.Color
+						Font = font.Footer.Font,
+						Text = text3,
+						TextSize = font.BaseSize * font.Footer.RelativeSize,
+						TextColor3 = theme.TextDefault.Color
 					})
 				})
 			end
 		})
 	end)
 end
-function v27.renderNewAlert(p10) -- line: 401
-	-- upvalues: withLocalization (copy), withStyle (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), ProductDetails (copy), FitTextLabel (copy), ButtonType (copy)
-	local v41 = not p10.props.isLuobu and "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestion" or "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestionWithWarning"
-	local v42 = not p10.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTerms" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTerms"
 
+function extended:renderNewAlert()
 	return withLocalization({
 		InsufficientFundsTitle = "IAPExperience.RobuxUpsell.Title.InsufficientFunds",
+		BuyRobuxQuestion = self.props.isLuobu and "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestionWithWarning" or "IAPExperience.RobuxUpsell.Text.BuyRobuxQuestion",
 		DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment",
+		DisclosureTerms = self.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTerms" or "IAPExperience.RobuxUpsell.Text.DisclosureTerms",
 		RemainingBalance = "IAPExperience.RobuxUpsell.Text.RemainingBalance",
 		BuyRobuxButton = "IAPExperience.RobuxUpsell.Action.BuyRobux",
 		ButtonCancel = "IAPExperience.RobuxUpsell.Action.Cancel",
 		LoadingText = "IAPExperience.RobuxUpsell.Text.Loading",
 		NeedMoreRobux = "IAPExperience.RobuxUpsell.Text.NeedMoreRobux",
 		BonusBannerV1 = "IAPExperience.RobuxUpsell.Text.BonusBannerV1",
-		BonusBannerInfo = "IAPExperience.RobuxUpsell.Text.BonusBannerInfo",
-		BuyRobuxQuestion = v41,
-		DisclosureTerms = v42
-	})(function(t1: {[any]: any}) -- line: 419
-		-- upvalues: withStyle (copy), p10 (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), ProductDetails (copy), FitTextLabel (copy), ButtonType (copy)
-		return withStyle(function(p11) -- line: 420
-			-- upvalues: t1 (copy), p10 (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), ProductDetails (copy), FitTextLabel (copy), ButtonType (copy)
-			local Theme = p11.Theme
-			local p11Font = p11.Font
-			local u66 = t1.BuyRobuxQuestion .. " " .. utf8.char(57346) .. tostring(p10.props.robuxPurchaseAmount)
-			local s1 = ""
+		BonusBannerInfo = "IAPExperience.RobuxUpsell.Text.BonusBannerInfo"
+	})(function(data)
+		return withStyle(function(p)
+			local theme = p.Theme
+			local font = p.Font
 
-			if p10.props.robuxPurchaseAmountBeforeBonus ~= nil then
-				local v68 = (utf8.char(57346) .. "<s>" .. tostring(p10.props.robuxPurchaseAmountBeforeBonus) .. "</s>") .. " " .. utf8.char(57346) .. tostring(p10.props.robuxPurchaseAmount)
+			local text = data.BuyRobuxQuestion .. " " .. utf8.char(57346) .. tostring(self.props.robuxPurchaseAmount)
+			local v
 
-				u66 = t1.BuyRobuxQuestion .. " " .. v68
+			if self.props.robuxPurchaseAmountBeforeBonus == nil then
+				v = ""
+			else
+				local v2 = (utf8.char(57346) .. "<s>" .. tostring(self.props.robuxPurchaseAmountBeforeBonus) .. "</s>") .. " " .. utf8.char(57346) .. tostring(self.props.robuxPurchaseAmount)
+				text = data.BuyRobuxQuestion .. " " .. v2
 
-				local v69 = p10.props.robuxPurchaseAmount - p10.props.robuxPurchaseAmountBeforeBonus
-				local v70 = utf8.char(57346) .. tostring(v69)
-
-				s1 = t1.BonusBannerV1:gsub("{robux}", v70)
+				local v3 = self.props.robuxPurchaseAmount - self.props.robuxPurchaseAmountBeforeBonus
+				local v4 = utf8.char(57346) .. tostring(v3)
+				v = data.BonusBannerV1:gsub("{robux}", v4)
 			end
 
 			return Roact.createElement(InteractiveAlert, {
-				screenSize = p10.props.screenSize,
-				position = p10.props.position,
-				anchorPoint = p10.props.anchorPoint,
-				title = t1.NeedMoreRobux,
-				middleContent = function() -- line: 450
-					-- upvalues: Roact (copy), FitFrameVertical (copy), p10 (copy), ProductDetails (copy), Theme (copy), FitTextLabel (copy), p11Font (copy), u66 (ref), t1 (copy)
+				screenSize = self.props.screenSize,
+				position = self.props.position,
+				anchorPoint = self.props.anchorPoint,
+				title = data.NeedMoreRobux,
+				middleContent = function()
 					return Roact.createElement(FitFrameVertical, {
 						BackgroundTransparency = 1,
 						width = UDim.new(1, 0),
@@ -398,21 +382,21 @@ function v27.renderNewAlert(p10) -- line: 401
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
 						VerticalAlignment = Enum.VerticalAlignment.Center,
 						contentPadding = UDim.new(0, 15),
-						[Roact.Ref] = p10.contentRef,
-						[Roact.Change.AbsoluteSize] = p10.changeContentSize
+						[Roact.Ref] = self.contentRef,
+						[Roact.Change.AbsoluteSize] = self.changeContentSize
 					}, {
 						ItemDetails = Roact.createElement(ProductDetails, {
 							layoutOrder = 1,
-							model = p10.props.model,
-							itemIcon = p10.props.itemIcon,
-							itemName = p10.props.itemName,
-							itemRobuxCost = p10.props.itemRobuxCost
+							model = self.props.model,
+							itemIcon = self.props.itemIcon,
+							itemName = self.props.itemName,
+							itemRobuxCost = self.props.itemRobuxCost
 						}),
 						Underline = Roact.createElement("Frame", {
 							LayoutOrder = 2,
 							BorderSizePixel = 0,
-							BackgroundColor3 = Theme.Divider.Color,
-							BackgroundTransparency = Theme.Divider.Transparency,
+							BackgroundColor3 = theme.Divider.Color,
+							BackgroundTransparency = theme.Divider.Transparency,
 							Size = UDim2.new(1, 0, 0, 1)
 						}),
 						ConfirmationFrame = Roact.createElement(FitFrameVertical, {
@@ -427,14 +411,14 @@ function v27.renderNewAlert(p10) -- line: 401
 							WouldYouLikeText = Roact.createElement(FitTextLabel, {
 								LayoutOrder = 1,
 								BackgroundTransparency = 1,
-								TextWrapped = true,
-								RichText = true,
 								width = FitTextLabel.Width.FitToText,
-								maximumWidth = p10.state.contentSize.X * 0.8,
-								Font = p11Font.Body.Font,
-								Text = u66,
-								TextSize = p11Font.BaseSize * p11Font.Body.RelativeSize,
-								TextColor3 = Theme.TextDefault.Color
+								TextWrapped = true,
+								maximumWidth = self.state.contentSize.X * 0.8,
+								RichText = true,
+								Font = font.Body.Font,
+								Text = text,
+								TextSize = font.BaseSize * font.Body.RelativeSize,
+								TextColor3 = theme.TextDefault.Color
 							})
 						}),
 						DisclosureFrame = Roact.createElement(FitFrameVertical, {
@@ -449,21 +433,21 @@ function v27.renderNewAlert(p10) -- line: 401
 							DisclosurePayment = Roact.createElement(FitTextLabel, {
 								LayoutOrder = 1,
 								BackgroundTransparency = 1,
-								TextWrapped = true,
 								width = FitTextLabel.Width.FitToText,
-								Font = p11Font.Footer.Font,
-								Text = t1.DisclosurePayment,
-								TextSize = p11Font.BaseSize * p11Font.Footer.RelativeSize,
-								TextColor3 = Theme.TextDefault.Color
+								Font = font.Footer.Font,
+								Text = data.DisclosurePayment,
+								TextSize = font.BaseSize * font.Footer.RelativeSize,
+								TextColor3 = theme.TextDefault.Color,
+								TextWrapped = true
 							}),
 							DisclosureTerms = Roact.createElement(FitTextLabel, {
 								LayoutOrder = 2,
 								BackgroundTransparency = 1,
 								width = FitTextLabel.Width.FitToText,
-								Font = p11Font.Footer.Font,
-								Text = t1.DisclosureTerms,
-								TextSize = p11Font.BaseSize * p11Font.Footer.RelativeSize,
-								TextColor3 = Theme.TextDefault.Color
+								Font = font.Footer.Font,
+								Text = data.DisclosureTerms,
+								TextSize = font.BaseSize * font.Footer.RelativeSize,
+								TextColor3 = theme.TextDefault.Color
 							})
 						})
 					})
@@ -472,100 +456,127 @@ function v27.renderNewAlert(p10) -- line: 401
 					buttons = {
 						{
 							props = {
-								isDisabled = p10.props.isDisabled,
-								onActivated = p10.props.cancelPurchaseActivated,
-								text = t1.ButtonCancel,
-								inputIcon = p10.props.cancelControllerIcon
+								isDisabled = self.props.isDisabled,
+								onActivated = self.props.cancelPurchaseActivated,
+								text = data.ButtonCancel,
+								inputIcon = self.props.cancelControllerIcon
 							}
 						},
 						{
 							buttonType = ButtonType.PrimarySystem,
 							props = {
+								isLoading = self.props.isLoading,
+								isDisabled = self.props.isDisabled,
+								isDelayedInput = self.props.isDelayedInput,
+								enableInputDelayed = self.props.enableInputDelayed,
 								delayInputSeconds = 3,
-								isLoading = p10.props.isLoading,
-								isDisabled = p10.props.isDisabled,
-								isDelayedInput = p10.props.isDelayedInput,
-								enableInputDelayed = p10.props.enableInputDelayed,
-								onActivated = p10.props.buyItemActivated,
-								text = t1.BuyRobuxButton,
-								inputIcon = p10.props.buyItemControllerIcon
+								onActivated = self.props.buyItemActivated,
+								text = data.BuyRobuxButton,
+								inputIcon = self.props.buyItemControllerIcon
 							}
 						}
 					}
 				},
-				footerContent = function() -- line: 560
-					-- upvalues: p10 (copy), p11 (copy), s1 (ref), t1 (copy)
-					return p10:renderFooterExperiment(p11, s1, t1.BonusBannerInfo)
+				footerContent = function()
+					return self:renderFooterExperiment(p, v, data.BonusBannerInfo)
 				end
 			})
 		end)
 	end)
 end
-function v27.renderFooterExperiment(p12, p13, p14, p15) -- line: 568
-	-- upvalues: Colors (copy), Roact (copy), FitFrameVertical (copy), FFlagLowCogsBannerInfoIcon (copy), InfoIconWithTooltip (copy)
-	local p13Font = p13.Font
-	local Flint = Colors.Flint
 
-	if p14 == "" then
+function extended:renderFooterExperiment(p, text, text2)
+	local font = p.Font
+	local flint = Colors.Flint
+
+	if text == "" then
 		return nil
 	end
 
-	return Roact.createElement(FitFrameVertical, {
+	local createElement = Roact.createElement
+	local v = {
 		BackgroundTransparency = 1,
 		width = UDim.new(1, 0),
-		margin = {
-			top = 0,
-			bottom = -24,
-			left = -24,
-			right = -24
-		},
-		[Roact.Ref] = p12.footerRef,
-		[Roact.Change.AbsoluteSize] = p12.changeFooterSize
-	}, {
-		Banner = Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Image = "rbxasset://textures/ui/BottomRoundedRect8px.png",
-			ImageColor3 = Color3.fromRGB(239, 215, 140),
-			Size = UDim2.new(1, 0, 0, 40),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(8, 0, 24, 16)
-		}, {
-			BannerContent = Roact.createElement(FitFrameVertical, {
-				LayoutOrder = 2,
-				BackgroundTransparency = 1,
-				width = UDim.new(1, 0),
-				margin = {
-					top = 12,
-					bottom = 0,
-					left = 0,
-					right = 0
-				},
-				FillDirection = Enum.FillDirection.Horizontal,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}, {
-				BonusBefore = Roact.createElement("TextLabel", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					RichText = true,
-					TextWrap = true,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Font = p13Font.Footer.Font,
-					Text = p14,
-					TextSize = p13Font.BaseSize * p13Font.Footer.RelativeSize,
-					TextColor3 = Flint
-				}),
-				InfoIcon = if not FFlagLowCogsBannerInfoIcon then nil else InfoIconWithTooltip({
-					layoutOrder = 2,
-					text = p15,
-					color = Flint,
-					eventActivated = p12.bonusBannerInfoIconStateChange
-				})
-			})
+		margin = { top = 0, bottom = -24, left = -24, right = -24 },
+		[Roact.Ref] = self.footerRef,
+		[Roact.Change.AbsoluteSize] = self.changeFooterSize
+	}
+
+	local createElement2 = Roact.createElement
+	local v2 = {
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Image = "rbxasset://textures/ui/BottomRoundedRect8px.png",
+		ImageColor3 = Color3.fromRGB(239, 215, 140),
+		Size = UDim2.new(1, 0, 0, 40),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(8, 0, 24, 16)
+	}
+
+	local createElement3 = Roact.createElement
+	local v3 = {
+		LayoutOrder = 2,
+		BackgroundTransparency = 1,
+		width = UDim.new(1, 0),
+		margin = { top = 12, bottom = 0, left = 0, right = 0 },
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center
+	}
+
+	local createElement4 = Roact.createElement
+	local v4 = {
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		RichText = true,
+		Font = 0,
+		FontFace = 0,
+		Text = 0,
+		TextSize = 0,
+		TextColor3 = 0,
+		TextWrap = true
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Footer.Font
+	end
+
+	v4.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font)
+	end
+
+	v4.FontFace = fontFace
+
+	v4.Text = text
+	v4.TextSize = font.BaseSize * font.Footer.RelativeSize
+	v4.TextColor3 = flint
+	local v5 = {
+		BonusBefore = createElement4("TextLabel", v4),
+		InfoIcon = 0
+	}
+	local infoIcon
+
+	if FFlagLowCogsBannerInfoIcon then
+		infoIcon = InfoIconWithTooltip({
+			text = text2,
+			layoutOrder = 2,
+			color = flint,
+			eventActivated = self.bonusBannerInfoIconStateChange
+		})
+	end
+
+	v5.InfoIcon = infoIcon
+	return createElement(FitFrameVertical, v, {
+		Banner = createElement2("ImageLabel", v2, {
+			BannerContent = createElement3(FitFrameVertical, v3, v5)
 		})
 	})
 end
 
-return v27
+return extended

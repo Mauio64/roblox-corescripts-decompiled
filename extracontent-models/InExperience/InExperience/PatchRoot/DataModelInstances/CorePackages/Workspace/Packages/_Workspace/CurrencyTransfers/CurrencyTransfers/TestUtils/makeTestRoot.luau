@@ -1,25 +1,23 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
+local parent = CurrencyTransfers.Parent
 local LocalizationService = game:GetService("LocalizationService")
-local React = require(CurrencyTransfersParent.React)
+
+local React = require(parent.React)
 local TransferContext = require(CurrencyTransfers.Contexts.TransferContext)
-local Foundation = require(CurrencyTransfersParent.Foundation)
+local Foundation = require(parent.Foundation)
 local FoundationProvider = Foundation.FoundationProvider
-local Localization = require(CurrencyTransfersParent.AppLocales).Localization
-local LocalizationProvider = require(CurrencyTransfersParent.Localization).LocalizationProvider
+local AppLocales = require(parent.AppLocales)
+local Localization = AppLocales.Localization
+local Localization2 = require(parent.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
 
-return function(t1: {[any]: any}) -- line: 16
-	-- upvalues: Localization (copy), LocalizationService (copy), React (copy), LocalizationProvider (copy), FoundationProvider (copy), Foundation (copy), TransferContext (copy)
-	local v11 = Localization.new(LocalizationService.RobloxLocaleId)
-
-	return function(p1) -- line: 18
-		-- upvalues: React (copy), LocalizationProvider (copy), v11 (copy), FoundationProvider (copy), Foundation (copy), TransferContext (copy), t1 (copy)
-		return React.createElement(LocalizationProvider, {
-			localization = v11
-		}, { React.createElement(FoundationProvider, {
-			theme = Foundation.Enums.Theme.Dark
-		}, { React.createElement(TransferContext.Provider, {
-			value = t1.transferStore
-		}, p1.children) }) })
+return function(p)
+	local localization = Localization.new(LocalizationService.RobloxLocaleId)
+	return function(p2)
+		return React.createElement(LocalizationProvider, { localization = localization }, {
+			React.createElement(FoundationProvider, { colorMode = Foundation.Enums.ColorMode.Dark }, {
+				React.createElement(TransferContext.Provider, { value = p.transferStore }, p2.children)
+			})
+		})
 	end
 end

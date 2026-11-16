@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("AppComposition").Parent
-
-require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AppComposition").Parent
+require(parent.Foundation)
 
 return {}

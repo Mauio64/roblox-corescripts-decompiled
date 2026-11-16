@@ -1,11 +1,12 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+local React = require(parent.React)
+
 local Telemetry = AppChat.Telemetry
 local createReactTelemetryLayer = require(Telemetry.createReactTelemetryLayer)
 local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
 
-return createReactTelemetryLayer(React.createContext(function() -- line: 21
+return createReactTelemetryLayer(React.createContext(function()
 	return {}
 end), {
 	context = "platformChat",

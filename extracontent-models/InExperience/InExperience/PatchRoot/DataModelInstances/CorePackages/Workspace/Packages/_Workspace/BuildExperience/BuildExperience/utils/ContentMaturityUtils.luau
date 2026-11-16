@@ -1,22 +1,21 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local UniverseActivation = require(Parent.DataHydration.UniverseActivation)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function getEligibility(n1: number) -- line: 5
-	-- upvalues: UniverseActivation (copy)
-	return UniverseActivation.getUniverseActivationStore().getAndFetchEligibility(n1).data()
+local UniverseActivation = require(parent.DataHydration.UniverseActivation)
+
+local function getEligibility(p: number) -- 2 equivalent calls inferred from this helper
+	return UniverseActivation.getUniverseActivationStore().getAndFetchEligibility(p).data()
 end
 
-return {
-	isSealBroken = function(n2: number) -- line: 9
-		-- upvalues: UniverseActivation (copy)
-		local v6 = UniverseActivation.getUniverseActivationStore().getAndFetchEligibility(n2).data()
+local ContentMaturityUtils = {}
 
-		return v6 ~= nil and v6.provisionalRatingAllowed ~= true
-	end,
-	isContentUnrated = function(n3: number) -- line: 14
-		-- upvalues: UniverseActivation (copy)
-		local v8 = UniverseActivation.getUniverseActivationStore().getAndFetchEligibility(n3).data()
+function ContentMaturityUtils.isSealBroken(p: number): boolean
+	local eligibility = getEligibility(p) -- inferred equivalent call
+	return eligibility ~= nil and eligibility.provisionalRatingAllowed ~= true
+end
 
-		return v8 ~= nil and v8.maturityRated ~= true
-	end
-}
+function ContentMaturityUtils.isContentUnrated(p: number): boolean
+	local eligibility = getEligibility(p) -- inferred equivalent call
+	return eligibility ~= nil and eligibility.maturityRated ~= true
+end
+
+return ContentMaturityUtils

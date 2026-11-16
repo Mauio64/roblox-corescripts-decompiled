@@ -1,932 +1,900 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 223
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		capabilities = if t3 ~= nil and t3.capabilities ~= nil then t3.capabilities else nil,
-		categories = if t3 ~= nil and t3.categories ~= nil then t3.categories else {},
-		comment = if t3 ~= nil and t3.comment ~= nil then t3.comment else nil,
-		metadata = if t3 ~= nil and t3.metadata ~= nil then t3.metadata else nil
-	}, t2))
-end
-function t2.encode(p1) -- line: 234
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
+require(script.Parent.custom_options)
 
-	if p1.capabilities ~= nil then
-		local v14 = p1.capabilities:encode()
-		local v15, v16 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+local class = {}
+class.__index = class
 
-		buf, n1 = proto.writeBuffer(v15, v16, v14, buffer.len(v14))
+function class.new(data)
+	local capabilities
+
+	if not (data == nil or data.capabilities == nil) then
+		capabilities = data.capabilities
 	end
 
-	if p1.categories ~= nil and #p1.categories > 0 then
-		for _, v18 in p1.categories do
-			local v19 = v18:encode()
-			local v20, v21 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+	local v2 = {
+		capabilities = capabilities,
+		categories = (data == nil or data.categories == nil) and {} or data.categories,
+		comment = 0,
+		metadata = 0
+	}
+	local comment
 
-			buf, n1 = proto.writeBuffer(v20, v21, v19, buffer.len(v19))
+	if not (data == nil or data.comment == nil) then
+		comment = data.comment
+	end
+
+	v2.comment = comment
+	local metadata
+
+	if not (data == nil or data.metadata == nil) then
+		metadata = data.metadata
+	end
+
+	v2.metadata = metadata
+	return (setmetatable(v2, class))
+end
+
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
+
+	if self.capabilities ~= nil then
+		local encoded = self.capabilities:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
+	end
+
+	if self.categories ~= nil and #self.categories > 0 then
+		for _, category in self.categories do
+			local encoded = category:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	if p1.comment ~= nil then
-		local v22 = p1.comment:encode()
-		local v23, v24 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v23, v24, v22, buffer.len(v22))
+	if self.comment ~= nil then
+		local encoded = self.comment:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	if p1.metadata ~= nil then
-		local v25 = p1.metadata:encode()
-		local v26, v27 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v26, v27, v25, buffer.len(v25))
+	if self.metadata ~= nil then
+		local encoded = self.metadata:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 269
-	-- upvalues: t2 (copy), proto (copy), t1 (copy)
-	local v30 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v32, v33
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v32, v33, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v33 == proto.wireTypes.varint then
-			local v34
-
-			v34, n2 = proto.readVarInt(p2, n2)
-		elseif v33 == proto.wireTypes.lengthDelimited then
-			if v32 == 1 then
-				local v35
-
-				v35, n2 = proto.readBuffer(p2, n2)
-				v30.capabilities = t1.UniverseUserVoteFeedbackMetadataData_Capabilities.decode(v35)
-			elseif v32 == 2 then
-				local v36
-
-				v36, n2 = proto.readBuffer(p2, n2)
-				table.insert(v30.categories, t1.UniverseUserVoteFeedbackMetadataData_Category.decode(v36))
-			elseif v32 == 3 then
-				local v37
-
-				v37, n2 = proto.readBuffer(p2, n2)
-				v30.comment = t1.UniverseUserVoteFeedbackMetadataData_Comment.decode(v37)
-			elseif v32 == 4 then
-				local v38
-
-				v38, n2 = proto.readBuffer(p2, n2)
-				v30.metadata = t1.UniverseUserVoteFeedbackMetadataData_Metadata.decode(v38)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.capabilities = v.UniverseUserVoteFeedbackMetadataData_Capabilities.decode(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.categories, v.UniverseUserVoteFeedbackMetadataData_Category.decode(v5))
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.comment = v.UniverseUserVoteFeedbackMetadataData_Comment.decode(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.metadata = v.UniverseUserVoteFeedbackMetadataData_Metadata.decode(v5)
 			else
-				local v39, v40 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v40 + v39
+				v2 = v5 + varInt
 			end
-		elseif v33 == proto.wireTypes.i32 then
-			local v41
-
-			v41, n2 = proto.readFixed32(p2, n2)
-		elseif v33 == proto.wireTypes.i64 then
-			local v42
-
-			v42, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v33)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v30
+	return result
 end
-function t2.jsonEncode(p3) -- line: 327
-	local t4 = {}
 
-	if p3.capabilities ~= nil then
-		t4.capabilities = p3.capabilities:jsonEncode()
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.capabilities ~= nil then
+		v2.capabilities = self.capabilities:jsonEncode()
 	end
 
-	if p3.categories ~= nil and #p3.categories > 0 then
-		local t5 = {}
+	if self.categories ~= nil and #self.categories > 0 then
+		local categories = {}
 
-		for _, v47 in p3.categories do
-			table.insert(t5, v47:jsonEncode())
+		for _, category in self.categories do
+			table.insert(categories, category:jsonEncode())
 		end
 
-		t4.categories = t5
+		v2.categories = categories
 	end
 
-	if p3.comment ~= nil then
-		t4.comment = p3.comment:jsonEncode()
+	if self.comment ~= nil then
+		v2.comment = self.comment:jsonEncode()
 	end
 
-	if p3.metadata ~= nil then
-		t4.metadata = p3.metadata:jsonEncode()
+	if self.metadata ~= nil then
+		v2.metadata = self.metadata:jsonEncode()
 	end
 
-	return t4
+	return v2
 end
-function t2.jsonDecode(t6: {[any]: any}) -- line: 353
-	-- upvalues: t2 (copy), t1 (copy)
-	local v49 = t2.new()
 
-	if t6.capabilities ~= nil then
-		v49.capabilities = t1.UniverseUserVoteFeedbackMetadataData_Capabilities.jsonDecode(t6.capabilities)
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.capabilities ~= nil then
+		v2.capabilities = v.UniverseUserVoteFeedbackMetadataData_Capabilities.jsonDecode(data.capabilities)
 	end
 
-	if t6.categories ~= nil then
-		local t7 = {}
+	if data.categories ~= nil then
+		local categories = {}
 
-		for _, v52 in t6.categories do
-			table.insert(t7, t1.UniverseUserVoteFeedbackMetadataData_Category.jsonDecode(v52))
+		for _, category in data.categories do
+			table.insert(categories, v.UniverseUserVoteFeedbackMetadataData_Category.jsonDecode(category))
 		end
 
-		v49.categories = t7
+		v2.categories = categories
 	end
 
-	if t6.comment ~= nil then
-		v49.comment = t1.UniverseUserVoteFeedbackMetadataData_Comment.jsonDecode(t6.comment)
+	if data.comment ~= nil then
+		v2.comment = v.UniverseUserVoteFeedbackMetadataData_Comment.jsonDecode(data.comment)
 	end
 
-	if t6.metadata ~= nil then
-		v49.metadata = t1.UniverseUserVoteFeedbackMetadataData_Metadata.jsonDecode(t6.metadata)
+	if data.metadata ~= nil then
+		v2.metadata = v.UniverseUserVoteFeedbackMetadataData_Metadata.jsonDecode(data.metadata)
 	end
 
-	return v49
+	return v2
 end
 
-t2.descriptor = {
+class.descriptor = {
 	name = "UniverseUserVoteFeedbackMetadataData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseUserVoteFeedbackMetadataData"
 }
-t1.UniverseUserVoteFeedbackMetadataData = t2
-typeRegistry.default:register(t1.UniverseUserVoteFeedbackMetadataData)
 
-local t8 = {}
+v.UniverseUserVoteFeedbackMetadataData = class
 
-t8.__index = t8
+typeRegistry.default:register(v.UniverseUserVoteFeedbackMetadataData)
 
-function t8.new(t9: {[any]: any}?) -- line: 398
-	-- upvalues: t8 (copy)
-	return (setmetatable({
-		can_submit_review = t9 ~= nil and (t9.can_submit_review ~= nil and t9.can_submit_review),
-		can_submit_comment = t9 ~= nil and (t9.can_submit_comment ~= nil and t9.can_submit_comment),
-		can_submit_category_options = if t9 ~= nil and t9.can_submit_category_options ~= nil then t9.can_submit_category_options else nil
-	}, t8))
+local class2 = {}
+class2.__index = class2
+
+function class2.new(data)
+	local v2 = {
+		can_submit_review = data ~= nil and data.can_submit_review ~= nil and data.can_submit_review,
+		can_submit_comment = data ~= nil and data.can_submit_comment ~= nil and data.can_submit_comment,
+		can_submit_category_options = 0
+	}
+	local can_submit_category_options
+
+	if not (data == nil or data.can_submit_category_options == nil) then
+		can_submit_category_options = data.can_submit_category_options
+	end
+
+	v2.can_submit_category_options = can_submit_category_options
+	return (setmetatable(v2, class2))
 end
-function t8.encode(p4) -- line: 417
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n3 = 0
 
-	if p4.can_submit_review then
-		local v57, v58 = proto.writeTag(buf, n3, 1, proto.wireTypes.varint)
+function class2:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n3 = proto.writeVarInt(v57, v58, not p4.can_submit_review and 0 or 1)
+	if self.can_submit_review then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.can_submit_review and 1 or 0)
 	end
 
-	if p4.can_submit_comment then
-		local v59, v60 = proto.writeTag(buf, n3, 2, proto.wireTypes.varint)
-
-		buf, n3 = proto.writeVarInt(v59, v60, not p4.can_submit_comment and 0 or 1)
+	if self.can_submit_comment then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.can_submit_comment and 1 or 0)
 	end
 
-	if p4.can_submit_category_options ~= nil then
-		local v61, v62 = proto.writeTag(buf, n3, 3, proto.wireTypes.varint)
-
-		buf, n3 = proto.writeVarInt(v61, v62, not p4.can_submit_category_options and 0 or 1)
+	if self.can_submit_category_options ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.can_submit_category_options and 1 or 0)
 	end
 
-	local buf3 = buffer.create(n3)
-
-	buffer.copy(buf3, 0, buf, 0, n3)
-
-	return buf3
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t8.decode(p5: buffer) -- line: 443
-	-- upvalues: t8 (copy), proto (copy)
-	local v65 = t8.new()
-	local n4 = 0
 
-	while n4 < buffer.len(p5) do
-		local v67, v68
+function class2.decode(buf: buffer)
+	local result = class2.new()
+	local v2 = 0
 
-		v67, v68, n4 = proto.readTag(p5, n4)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v68 == proto.wireTypes.varint then
-			if v67 == 1 then
-				local v69
-
-				v69, n4 = proto.readVarInt(p5, n4)
-				v65.can_submit_review = v69 ~= 0
-			elseif v67 == 2 then
-				local v70
-
-				v70, n4 = proto.readVarInt(p5, n4)
-				v65.can_submit_comment = v70 ~= 0
-			elseif v67 == 3 then
-				local v71
-
-				v71, n4 = proto.readVarInt(p5, n4)
-				v65.can_submit_category_options = v71 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.can_submit_review = v5 ~= 0
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.can_submit_comment = v5 ~= 0
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.can_submit_category_options = v5 ~= 0
 			else
-				local v72
-
-				v72, n4 = proto.readVarInt(p5, n4)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v68 == proto.wireTypes.lengthDelimited then
-			local v73, v74 = proto.readVarInt(p5, n4)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			local varInt, v5 = proto.readVarInt(buf, v2)
 
-			n4 = v74 + v73
-		elseif v68 == proto.wireTypes.i32 then
-			local v75
-
-			v75, n4 = proto.readFixed32(p5, n4)
-		elseif v68 == proto.wireTypes.i64 then
-			local v76
-
-			v76, n4 = proto.readFixed64(p5, n4)
+			v2 = v5 + varInt
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v68)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v65
-end
-function t8.jsonEncode(p6) -- line: 498
-	local t10 = {}
-
-	if p6.can_submit_review then
-		t10.canSubmitReview = p6.can_submit_review
-	end
-
-	if p6.can_submit_comment then
-		t10.canSubmitComment = p6.can_submit_comment
-	end
-
-	if p6.can_submit_category_options ~= nil then
-		t10.canSubmitCategoryOptions = p6.can_submit_category_options
-	end
-
-	return t10
-end
-function t8.jsonDecode(t11: {[any]: any}) -- line: 518
-	-- upvalues: t8 (copy)
-	local v80 = t8.new()
-
-	if t11.can_submit_review ~= nil then
-		v80.can_submit_review = t11.can_submit_review
-	end
-
-	if t11.canSubmitReview ~= nil then
-		v80.can_submit_review = t11.canSubmitReview
-	end
-
-	if t11.can_submit_comment ~= nil then
-		v80.can_submit_comment = t11.can_submit_comment
-	end
-
-	if t11.canSubmitComment ~= nil then
-		v80.can_submit_comment = t11.canSubmitComment
-	end
-
-	if t11.can_submit_category_options ~= nil then
-		v80.can_submit_category_options = t11.can_submit_category_options
-	end
-
-	if t11.canSubmitCategoryOptions ~= nil then
-		v80.can_submit_category_options = t11.canSubmitCategoryOptions
-	end
-
-	return v80
+	return result
 end
 
-t8.descriptor = {
+function class2:jsonEncode()
+	local v2 = {}
+
+	if self.can_submit_review then
+		v2.canSubmitReview = self.can_submit_review
+	end
+
+	if self.can_submit_comment then
+		v2.canSubmitComment = self.can_submit_comment
+	end
+
+	if self.can_submit_category_options ~= nil then
+		v2.canSubmitCategoryOptions = self.can_submit_category_options
+	end
+
+	return v2
+end
+
+function class2.jsonDecode(data)
+	local v2 = class2.new()
+
+	if data.can_submit_review ~= nil then
+		v2.can_submit_review = data.can_submit_review
+	end
+
+	if data.canSubmitReview ~= nil then
+		v2.can_submit_review = data.canSubmitReview
+	end
+
+	if data.can_submit_comment ~= nil then
+		v2.can_submit_comment = data.can_submit_comment
+	end
+
+	if data.canSubmitComment ~= nil then
+		v2.can_submit_comment = data.canSubmitComment
+	end
+
+	if data.can_submit_category_options ~= nil then
+		v2.can_submit_category_options = data.can_submit_category_options
+	end
+
+	if data.canSubmitCategoryOptions ~= nil then
+		v2.can_submit_category_options = data.canSubmitCategoryOptions
+	end
+
+	return v2
+end
+
+class2.descriptor = {
 	name = "UniverseUserVoteFeedbackMetadataData_Capabilities",
 	fullName = "roblox.apppageplatform.shared.v1beta1.Capabilities"
 }
-t1.UniverseUserVoteFeedbackMetadataData_Capabilities = t8
-typeRegistry.default:register(t1.UniverseUserVoteFeedbackMetadataData_Capabilities)
 
-local t12 = {}
+v.UniverseUserVoteFeedbackMetadataData_Capabilities = class2
 
-t12.__index = t12
+typeRegistry.default:register(v.UniverseUserVoteFeedbackMetadataData_Capabilities)
 
-function t12.new(t13: {[any]: any}?) -- line: 565
-	-- upvalues: t12 (copy)
-	return (setmetatable({
-		type = if t13 ~= nil and t13.type ~= nil then t13.type else "",
-		label = if t13 ~= nil and t13.label ~= nil then t13.label else "",
-		allows_multiple_selections = t13 ~= nil and (t13.allows_multiple_selections ~= nil and t13.allows_multiple_selections),
-		options = if t13 ~= nil and t13.options ~= nil then t13.options else {}
-	}, t12))
+local class3 = {}
+class3.__index = class3
+
+function class3.new(data)
+	local v2 = {
+		type = (data == nil or data.type == nil) and "" or data.type,
+		label = (data == nil or data.label == nil) and "" or data.label,
+		allows_multiple_selections = data ~= nil and data.allows_multiple_selections ~= nil and data.allows_multiple_selections,
+		options = (data == nil or data.options == nil) and {} or data.options
+	}
+	return (setmetatable(v2, class3))
 end
-function t12.encode(p7) -- line: 578
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n5 = 0
 
-	if p7.type ~= nil and p7.type ~= "" then
-		local v85, v86 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+function class3:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n5 = proto.writeString(v85, v86, p7.type)
+	if self.type ~= nil and self.type ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.type)
 	end
 
-	if p7.label ~= nil and p7.label ~= "" then
-		local v87, v88 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n5 = proto.writeString(v87, v88, p7.label)
+	if self.label ~= nil and self.label ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.label)
 	end
 
-	if p7.allows_multiple_selections then
-		local v89, v90 = proto.writeTag(buf, n5, 3, proto.wireTypes.varint)
-
-		buf, n5 = proto.writeVarInt(v89, v90, not p7.allows_multiple_selections and 0 or 1)
+	if self.allows_multiple_selections then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.allows_multiple_selections and 1 or 0)
 	end
 
-	if p7.options ~= nil and #p7.options > 0 then
-		for _, v92 in p7.options do
-			local v93 = v92:encode()
-			local v94, v95 = proto.writeTag(buf, n5, 4, proto.wireTypes.lengthDelimited)
-
-			buf, n5 = proto.writeBuffer(v94, v95, v93, buffer.len(v93))
+	if self.options ~= nil and #self.options > 0 then
+		for _, option in self.options do
+			local encoded = option:encode()
+			local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 		end
 	end
 
-	local buf4 = buffer.create(n5)
-
-	buffer.copy(buf4, 0, buf, 0, n5)
-
-	return buf4
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t12.decode(p8: buffer) -- line: 612
-	-- upvalues: t12 (copy), proto (copy), t1 (copy)
-	local v98 = t12.new()
-	local n6 = 0
 
-	while n6 < buffer.len(p8) do
-		local v100, v101
+function class3.decode(buf: buffer)
+	local result = class3.new()
+	local v2 = 0
 
-		v100, v101, n6 = proto.readTag(p8, n6)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v101 == proto.wireTypes.varint then
-			if v100 == 3 then
-				local v102
-
-				v102, n6 = proto.readVarInt(p8, n6)
-				v98.allows_multiple_selections = v102 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 3 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.allows_multiple_selections = v5 ~= 0
 			else
-				local v103
-
-				v103, n6 = proto.readVarInt(p8, n6)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v101 == proto.wireTypes.lengthDelimited then
-			if v100 == 1 then
-				local v104
-
-				v104, n6 = proto.readBuffer(p8, n6)
-				v98.type = buffer.tostring(v104)
-			elseif v100 == 2 then
-				local v105
-
-				v105, n6 = proto.readBuffer(p8, n6)
-				v98.label = buffer.tostring(v105)
-			elseif v100 == 4 then
-				local v106
-
-				v106, n6 = proto.readBuffer(p8, n6)
-				table.insert(v98.options, t1.UniverseUserVoteFeedbackMetadataData_Category_Option.decode(v106))
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.type = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.label = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.options, v.UniverseUserVoteFeedbackMetadataData_Category_Option.decode(v5))
 			else
-				local v107, v108 = proto.readVarInt(p8, n6)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n6 = v108 + v107
+				v2 = v5 + varInt
 			end
-		elseif v101 == proto.wireTypes.i32 then
-			local v109
-
-			v109, n6 = proto.readFixed32(p8, n6)
-		elseif v101 == proto.wireTypes.i64 then
-			local v110
-
-			v110, n6 = proto.readFixed64(p8, n6)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v101)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v98
-end
-function t12.jsonEncode(p9) -- line: 675
-	local t14 = {}
-
-	if p9.type ~= nil and p9.type ~= "" then
-		t14.type = p9.type
-	end
-
-	if p9.label ~= nil and p9.label ~= "" then
-		t14.label = p9.label
-	end
-
-	if p9.allows_multiple_selections then
-		t14.allowsMultipleSelections = p9.allows_multiple_selections
-	end
-
-	if p9.options ~= nil and #p9.options > 0 then
-		local t15 = {}
-
-		for _, v115 in p9.options do
-			table.insert(t15, v115:jsonEncode())
-		end
-
-		t14.options = t15
-	end
-
-	return t14
-end
-function t12.jsonDecode(t16: {[any]: any}) -- line: 703
-	-- upvalues: t12 (copy), t1 (copy)
-	local v117 = t12.new()
-
-	if t16.type ~= nil then
-		v117.type = t16.type
-	end
-
-	if t16.label ~= nil then
-		v117.label = t16.label
-	end
-
-	if t16.allows_multiple_selections ~= nil then
-		v117.allows_multiple_selections = t16.allows_multiple_selections
-	end
-
-	if t16.allowsMultipleSelections ~= nil then
-		v117.allows_multiple_selections = t16.allowsMultipleSelections
-	end
-
-	if t16.options ~= nil then
-		local t17 = {}
-
-		for _, v120 in t16.options do
-			table.insert(t17, t1.UniverseUserVoteFeedbackMetadataData_Category_Option.jsonDecode(v120))
-		end
-
-		v117.options = t17
-	end
-
-	return v117
+	return result
 end
 
-t12.descriptor = {
+function class3:jsonEncode()
+	local v2 = {}
+
+	if self.type ~= nil and self.type ~= "" then
+		v2.type = self.type
+	end
+
+	if self.label ~= nil and self.label ~= "" then
+		v2.label = self.label
+	end
+
+	if self.allows_multiple_selections then
+		v2.allowsMultipleSelections = self.allows_multiple_selections
+	end
+
+	if self.options == nil or not (#self.options > 0) then
+		return v2
+	end
+
+	local options = {}
+
+	for _, option in self.options do
+		table.insert(options, option:jsonEncode())
+	end
+
+	v2.options = options
+
+	return v2
+end
+
+function class3.jsonDecode(data)
+	local v2 = class3.new()
+
+	if data.type ~= nil then
+		v2.type = data.type
+	end
+
+	if data.label ~= nil then
+		v2.label = data.label
+	end
+
+	if data.allows_multiple_selections ~= nil then
+		v2.allows_multiple_selections = data.allows_multiple_selections
+	end
+
+	if data.allowsMultipleSelections ~= nil then
+		v2.allows_multiple_selections = data.allowsMultipleSelections
+	end
+
+	if data.options == nil then
+		return v2
+	end
+
+	local options = {}
+
+	for _, option in data.options do
+		table.insert(options, v.UniverseUserVoteFeedbackMetadataData_Category_Option.jsonDecode(option))
+	end
+
+	v2.options = options
+
+	return v2
+end
+
+class3.descriptor = {
 	name = "UniverseUserVoteFeedbackMetadataData_Category",
 	fullName = "roblox.apppageplatform.shared.v1beta1.Category"
 }
-t1.UniverseUserVoteFeedbackMetadataData_Category = t12
-typeRegistry.default:register(t1.UniverseUserVoteFeedbackMetadataData_Category)
 
-local t18 = {}
+v.UniverseUserVoteFeedbackMetadataData_Category = class3
 
-t18.__index = t18
+typeRegistry.default:register(v.UniverseUserVoteFeedbackMetadataData_Category)
 
-function t18.new(t19: {[any]: any}?) -- line: 751
-	-- upvalues: t18 (copy)
+local class4 = {}
+class4.__index = class4
+
+function class4.new(p)
 	return (setmetatable({
-		id = if t19 ~= nil and t19.id ~= nil then t19.id else "",
-		label = if t19 ~= nil and t19.label ~= nil then t19.label else ""
-	}, t18))
+		id = (p == nil or p.id == nil) and "" or p.id,
+		label = (p == nil or p.label == nil) and "" or p.label
+	}, class4))
 end
-function t18.encode(p10) -- line: 763
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n7 = 0
 
-	if p10.id ~= nil and p10.id ~= "" then
-		local v125, v126 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+function class4:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n7 = proto.writeString(v125, v126, p10.id)
+	if self.id ~= nil and self.id ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.id)
 	end
 
-	if p10.label ~= nil and p10.label ~= "" then
-		local v127, v128 = proto.writeTag(buf, n7, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n7 = proto.writeString(v127, v128, p10.label)
+	if self.label ~= nil and self.label ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.label)
 	end
 
-	local buf5 = buffer.create(n7)
-
-	buffer.copy(buf5, 0, buf, 0, n7)
-
-	return buf5
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t18.decode(p11: buffer) -- line: 784
-	-- upvalues: t18 (copy), proto (copy)
-	local v131 = t18.new()
-	local n8 = 0
 
-	while n8 < buffer.len(p11) do
-		local v133, v134
+function class4.decode(buf: buffer)
+	local result = class4.new()
+	local v2 = 0
 
-		v133, v134, n8 = proto.readTag(p11, n8)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v134 == proto.wireTypes.varint then
-			local v135
-
-			v135, n8 = proto.readVarInt(p11, n8)
-		elseif v134 == proto.wireTypes.lengthDelimited then
-			if v133 == 1 then
-				local v136
-
-				v136, n8 = proto.readBuffer(p11, n8)
-				v131.id = buffer.tostring(v136)
-			elseif v133 == 2 then
-				local v137
-
-				v137, n8 = proto.readBuffer(p11, n8)
-				v131.label = buffer.tostring(v137)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.id = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.label = buffer.tostring(v5)
 			else
-				local v138, v139 = proto.readVarInt(p11, n8)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n8 = v139 + v138
+				v2 = v5 + varInt
 			end
-		elseif v134 == proto.wireTypes.i32 then
-			local v140
-
-			v140, n8 = proto.readFixed32(p11, n8)
-		elseif v134 == proto.wireTypes.i64 then
-			local v141
-
-			v141, n8 = proto.readFixed64(p11, n8)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v134)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v131
-end
-function t18.jsonEncode(p12) -- line: 834
-	local t20 = {}
-
-	if p12.id ~= nil and p12.id ~= "" then
-		t20.id = p12.id
-	end
-
-	if p12.label ~= nil and p12.label ~= "" then
-		t20.label = p12.label
-	end
-
-	return t20
-end
-function t18.jsonDecode(t21: {[any]: any}) -- line: 850
-	-- upvalues: t18 (copy)
-	local v145 = t18.new()
-
-	if t21.id ~= nil then
-		v145.id = t21.id
-	end
-
-	if t21.label ~= nil then
-		v145.label = t21.label
-	end
-
-	return v145
+	return result
 end
 
-t18.descriptor = {
+function class4:jsonEncode()
+	local v2 = {}
+
+	if self.id ~= nil and self.id ~= "" then
+		v2.id = self.id
+	end
+
+	if self.label ~= nil and self.label ~= "" then
+		v2.label = self.label
+	end
+
+	return v2
+end
+
+function class4.jsonDecode(p)
+	local v2 = class4.new()
+
+	if p.id ~= nil then
+		v2.id = p.id
+	end
+
+	if p.label ~= nil then
+		v2.label = p.label
+	end
+
+	return v2
+end
+
+class4.descriptor = {
 	name = "UniverseUserVoteFeedbackMetadataData_Category_Option",
 	fullName = "roblox.apppageplatform.shared.v1beta1.Option"
 }
-t1.UniverseUserVoteFeedbackMetadataData_Category_Option = t18
-typeRegistry.default:register(t1.UniverseUserVoteFeedbackMetadataData_Category_Option)
 
-local t22 = {}
+v.UniverseUserVoteFeedbackMetadataData_Category_Option = class4
 
-t22.__index = t22
+typeRegistry.default:register(v.UniverseUserVoteFeedbackMetadataData_Category_Option)
 
-function t22.new(t23: {[any]: any}?) -- line: 881
-	-- upvalues: t22 (copy)
+local class5 = {}
+class5.__index = class5
+
+function class5.new(data)
 	return (setmetatable({
-		label = if t23 ~= nil and t23.label ~= nil then t23.label else "",
-		placeholder_text = if t23 ~= nil and t23.placeholder_text ~= nil then t23.placeholder_text else "",
-		minimum_length = if t23 ~= nil and t23.minimum_length ~= nil then t23.minimum_length else 0,
-		maximum_length = if t23 ~= nil and t23.maximum_length ~= nil then t23.maximum_length else 0
-	}, t22))
+		label = (data == nil or data.label == nil) and "" or data.label,
+		placeholder_text = (data == nil or data.placeholder_text == nil) and "" or data.placeholder_text,
+		minimum_length = (data == nil or data.minimum_length == nil) and 0 or data.minimum_length,
+		maximum_length = (data == nil or data.maximum_length == nil) and 0 or data.maximum_length
+	}, class5))
 end
-function t22.encode(p13) -- line: 892
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n9 = 0
 
-	if p13.label ~= nil and p13.label ~= "" then
-		local v150, v151 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
+function class5:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n9 = proto.writeString(v150, v151, p13.label)
+	if self.label ~= nil and self.label ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.label)
 	end
 
-	if p13.placeholder_text ~= nil and p13.placeholder_text ~= "" then
-		local v152, v153 = proto.writeTag(buf, n9, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n9 = proto.writeString(v152, v153, p13.placeholder_text)
+	if self.placeholder_text ~= nil and self.placeholder_text ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.placeholder_text)
 	end
 
-	if p13.minimum_length ~= nil and p13.minimum_length ~= 0 then
-		local v154, v155 = proto.writeTag(buf, n9, 3, proto.wireTypes.varint)
-
-		buf, n9 = proto.writeVarInt(v154, v155, p13.minimum_length)
+	if self.minimum_length ~= nil and self.minimum_length ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.minimum_length)
 	end
 
-	if p13.maximum_length ~= nil and p13.maximum_length ~= 0 then
-		local v156, v157 = proto.writeTag(buf, n9, 4, proto.wireTypes.varint)
-
-		buf, n9 = proto.writeVarInt(v156, v157, p13.maximum_length)
+	if self.maximum_length ~= nil and self.maximum_length ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.maximum_length)
 	end
 
-	local buf6 = buffer.create(n9)
-
-	buffer.copy(buf6, 0, buf, 0, n9)
-
-	return buf6
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t22.decode(p14: buffer) -- line: 923
-	-- upvalues: t22 (copy), proto (copy)
-	local v160 = t22.new()
-	local n10 = 0
 
-	while n10 < buffer.len(p14) do
-		local v162, v163
+function class5.decode(buf: buffer)
+	local result = class5.new()
+	local v2 = 0
 
-		v162, v163, n10 = proto.readTag(p14, n10)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v163 == proto.wireTypes.varint then
-			if v162 == 3 then
-				local v164
-
-				v164, n10 = proto.readVarIntI32(p14, n10)
-				v160.minimum_length = v164
-			elseif v162 == 4 then
-				local v165
-
-				v165, n10 = proto.readVarIntI32(p14, n10)
-				v160.maximum_length = v165
+		if v4 == proto.wireTypes.varint then
+			if v3 == 3 then
+				local minimum_length
+				minimum_length, v2 = proto.readVarIntI32(buf, v2)
+				result.minimum_length = minimum_length
+			elseif v3 == 4 then
+				local maximum_length
+				maximum_length, v2 = proto.readVarIntI32(buf, v2)
+				result.maximum_length = maximum_length
 			else
-				local v166
-
-				v166, n10 = proto.readVarInt(p14, n10)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v163 == proto.wireTypes.lengthDelimited then
-			if v162 == 1 then
-				local v167
-
-				v167, n10 = proto.readBuffer(p14, n10)
-				v160.label = buffer.tostring(v167)
-			elseif v162 == 2 then
-				local v168
-
-				v168, n10 = proto.readBuffer(p14, n10)
-				v160.placeholder_text = buffer.tostring(v168)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.label = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.placeholder_text = buffer.tostring(v5)
 			else
-				local v169, v170 = proto.readVarInt(p14, n10)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n10 = v170 + v169
+				v2 = v5 + varInt
 			end
-		elseif v163 == proto.wireTypes.i32 then
-			local v171
-
-			v171, n10 = proto.readFixed32(p14, n10)
-		elseif v163 == proto.wireTypes.i64 then
-			local v172
-
-			v172, n10 = proto.readFixed64(p14, n10)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v163)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v160
-end
-function t22.jsonEncode(p15) -- line: 983
-	local t24 = {}
-
-	if p15.label ~= nil and p15.label ~= "" then
-		t24.label = p15.label
-	end
-
-	if p15.placeholder_text ~= nil and p15.placeholder_text ~= "" then
-		t24.placeholderText = p15.placeholder_text
-	end
-
-	if p15.minimum_length ~= nil and p15.minimum_length ~= 0 then
-		t24.minimumLength = p15.minimum_length
-	end
-
-	if p15.maximum_length ~= nil and p15.maximum_length ~= 0 then
-		t24.maximumLength = p15.maximum_length
-	end
-
-	return t24
-end
-function t22.jsonDecode(t25: {[any]: any}) -- line: 1007
-	-- upvalues: t22 (copy)
-	local v176 = t22.new()
-
-	if t25.label ~= nil then
-		v176.label = t25.label
-	end
-
-	if t25.placeholder_text ~= nil then
-		v176.placeholder_text = t25.placeholder_text
-	end
-
-	if t25.placeholderText ~= nil then
-		v176.placeholder_text = t25.placeholderText
-	end
-
-	if t25.minimum_length ~= nil then
-		v176.minimum_length = t25.minimum_length
-	end
-
-	if t25.minimumLength ~= nil then
-		v176.minimum_length = t25.minimumLength
-	end
-
-	if t25.maximum_length ~= nil then
-		v176.maximum_length = t25.maximum_length
-	end
-
-	if t25.maximumLength ~= nil then
-		v176.maximum_length = t25.maximumLength
-	end
-
-	return v176
+	return result
 end
 
-t22.descriptor = {
+function class5:jsonEncode()
+	local v2 = {}
+
+	if self.label ~= nil and self.label ~= "" then
+		v2.label = self.label
+	end
+
+	if self.placeholder_text ~= nil and self.placeholder_text ~= "" then
+		v2.placeholderText = self.placeholder_text
+	end
+
+	if self.minimum_length ~= nil and self.minimum_length ~= 0 then
+		v2.minimumLength = self.minimum_length
+	end
+
+	if self.maximum_length ~= nil and self.maximum_length ~= 0 then
+		v2.maximumLength = self.maximum_length
+	end
+
+	return v2
+end
+
+function class5.jsonDecode(data)
+	local v2 = class5.new()
+
+	if data.label ~= nil then
+		v2.label = data.label
+	end
+
+	if data.placeholder_text ~= nil then
+		v2.placeholder_text = data.placeholder_text
+	end
+
+	if data.placeholderText ~= nil then
+		v2.placeholder_text = data.placeholderText
+	end
+
+	if data.minimum_length ~= nil then
+		v2.minimum_length = data.minimum_length
+	end
+
+	if data.minimumLength ~= nil then
+		v2.minimum_length = data.minimumLength
+	end
+
+	if data.maximum_length ~= nil then
+		v2.maximum_length = data.maximum_length
+	end
+
+	if data.maximumLength ~= nil then
+		v2.maximum_length = data.maximumLength
+	end
+
+	return v2
+end
+
+class5.descriptor = {
 	name = "UniverseUserVoteFeedbackMetadataData_Comment",
 	fullName = "roblox.apppageplatform.shared.v1beta1.Comment"
 }
-t1.UniverseUserVoteFeedbackMetadataData_Comment = t22
-typeRegistry.default:register(t1.UniverseUserVoteFeedbackMetadataData_Comment)
 
-local t26 = {}
+v.UniverseUserVoteFeedbackMetadataData_Comment = class5
 
-t26.__index = t26
+typeRegistry.default:register(v.UniverseUserVoteFeedbackMetadataData_Comment)
 
-function t26.new(t27: {[any]: any}?) -- line: 1057
-	-- upvalues: t26 (copy)
+local class6 = {}
+class6.__index = class6
+
+function class6.new(data)
 	return (setmetatable({
-		disclaimer_label = if t27 ~= nil and t27.disclaimer_label ~= nil then t27.disclaimer_label else "",
-		submit_button_label = if t27 ~= nil and t27.submit_button_label ~= nil then t27.submit_button_label else "",
-		form_title_label = if t27 ~= nil and t27.form_title_label ~= nil then t27.form_title_label else ""
-	}, t26))
+		disclaimer_label = (data == nil or data.disclaimer_label == nil) and "" or data.disclaimer_label,
+		submit_button_label = (data == nil or data.submit_button_label == nil) and "" or data.submit_button_label,
+		form_title_label = (data == nil or data.form_title_label == nil) and "" or data.form_title_label
+	}, class6))
 end
-function t26.encode(p16) -- line: 1069
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n11 = 0
 
-	if p16.disclaimer_label ~= nil and p16.disclaimer_label ~= "" then
-		local v181, v182 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
+function class6:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n11 = proto.writeString(v181, v182, p16.disclaimer_label)
+	if self.disclaimer_label ~= nil and self.disclaimer_label ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.disclaimer_label)
 	end
 
-	if p16.submit_button_label ~= nil and p16.submit_button_label ~= "" then
-		local v183, v184 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n11 = proto.writeString(v183, v184, p16.submit_button_label)
+	if self.submit_button_label ~= nil and self.submit_button_label ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.submit_button_label)
 	end
 
-	if p16.form_title_label ~= nil and p16.form_title_label ~= "" then
-		local v185, v186 = proto.writeTag(buf, n11, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n11 = proto.writeString(v185, v186, p16.form_title_label)
+	if self.form_title_label ~= nil and self.form_title_label ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.form_title_label)
 	end
 
-	local buf7 = buffer.create(n11)
-
-	buffer.copy(buf7, 0, buf, 0, n11)
-
-	return buf7
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t26.decode(p17: buffer) -- line: 1095
-	-- upvalues: t26 (copy), proto (copy)
-	local v189 = t26.new()
-	local n12 = 0
 
-	while n12 < buffer.len(p17) do
-		local v191, v192
+function class6.decode(buf: buffer)
+	local result = class6.new()
+	local v2 = 0
 
-		v191, v192, n12 = proto.readTag(p17, n12)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v192 == proto.wireTypes.varint then
-			local v193
-
-			v193, n12 = proto.readVarInt(p17, n12)
-		elseif v192 == proto.wireTypes.lengthDelimited then
-			if v191 == 1 then
-				local v194
-
-				v194, n12 = proto.readBuffer(p17, n12)
-				v189.disclaimer_label = buffer.tostring(v194)
-			elseif v191 == 2 then
-				local v195
-
-				v195, n12 = proto.readBuffer(p17, n12)
-				v189.submit_button_label = buffer.tostring(v195)
-			elseif v191 == 3 then
-				local v196
-
-				v196, n12 = proto.readBuffer(p17, n12)
-				v189.form_title_label = buffer.tostring(v196)
+		if v4 == proto.wireTypes.varint then
+			local _
+			_, v2 = proto.readVarInt(buf, v2)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.disclaimer_label = buffer.tostring(v5)
+			elseif v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.submit_button_label = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.form_title_label = buffer.tostring(v5)
 			else
-				local v197, v198 = proto.readVarInt(p17, n12)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n12 = v198 + v197
+				v2 = v5 + varInt
 			end
-		elseif v192 == proto.wireTypes.i32 then
-			local v199
-
-			v199, n12 = proto.readFixed32(p17, n12)
-		elseif v192 == proto.wireTypes.i64 then
-			local v200
-
-			v200, n12 = proto.readFixed64(p17, n12)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v192)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v189
-end
-function t26.jsonEncode(p18) -- line: 1150
-	local t28 = {}
-
-	if p18.disclaimer_label ~= nil and p18.disclaimer_label ~= "" then
-		t28.disclaimerLabel = p18.disclaimer_label
-	end
-
-	if p18.submit_button_label ~= nil and p18.submit_button_label ~= "" then
-		t28.submitButtonLabel = p18.submit_button_label
-	end
-
-	if p18.form_title_label ~= nil and p18.form_title_label ~= "" then
-		t28.formTitleLabel = p18.form_title_label
-	end
-
-	return t28
-end
-function t26.jsonDecode(t29: {[any]: any}) -- line: 1170
-	-- upvalues: t26 (copy)
-	local v204 = t26.new()
-
-	if t29.disclaimer_label ~= nil then
-		v204.disclaimer_label = t29.disclaimer_label
-	end
-
-	if t29.disclaimerLabel ~= nil then
-		v204.disclaimer_label = t29.disclaimerLabel
-	end
-
-	if t29.submit_button_label ~= nil then
-		v204.submit_button_label = t29.submit_button_label
-	end
-
-	if t29.submitButtonLabel ~= nil then
-		v204.submit_button_label = t29.submitButtonLabel
-	end
-
-	if t29.form_title_label ~= nil then
-		v204.form_title_label = t29.form_title_label
-	end
-
-	if t29.formTitleLabel ~= nil then
-		v204.form_title_label = t29.formTitleLabel
-	end
-
-	return v204
+	return result
 end
 
-t26.descriptor = {
+function class6:jsonEncode()
+	local v2 = {}
+
+	if self.disclaimer_label ~= nil and self.disclaimer_label ~= "" then
+		v2.disclaimerLabel = self.disclaimer_label
+	end
+
+	if self.submit_button_label ~= nil and self.submit_button_label ~= "" then
+		v2.submitButtonLabel = self.submit_button_label
+	end
+
+	if self.form_title_label ~= nil and self.form_title_label ~= "" then
+		v2.formTitleLabel = self.form_title_label
+	end
+
+	return v2
+end
+
+function class6.jsonDecode(data)
+	local v2 = class6.new()
+
+	if data.disclaimer_label ~= nil then
+		v2.disclaimer_label = data.disclaimer_label
+	end
+
+	if data.disclaimerLabel ~= nil then
+		v2.disclaimer_label = data.disclaimerLabel
+	end
+
+	if data.submit_button_label ~= nil then
+		v2.submit_button_label = data.submit_button_label
+	end
+
+	if data.submitButtonLabel ~= nil then
+		v2.submit_button_label = data.submitButtonLabel
+	end
+
+	if data.form_title_label ~= nil then
+		v2.form_title_label = data.form_title_label
+	end
+
+	if data.formTitleLabel ~= nil then
+		v2.form_title_label = data.formTitleLabel
+	end
+
+	return v2
+end
+
+class6.descriptor = {
 	name = "UniverseUserVoteFeedbackMetadataData_Metadata",
 	fullName = "roblox.apppageplatform.shared.v1beta1.Metadata"
 }
-t1.UniverseUserVoteFeedbackMetadataData_Metadata = t26
-typeRegistry.default:register(t1.UniverseUserVoteFeedbackMetadataData_Metadata)
+
+v.UniverseUserVoteFeedbackMetadataData_Metadata = class6
+
+typeRegistry.default:register(v.UniverseUserVoteFeedbackMetadataData_Metadata)
 
 return {
-	UniverseUserVoteFeedbackMetadataData = t1.UniverseUserVoteFeedbackMetadataData,
-	UniverseUserVoteFeedbackMetadataData_Capabilities = t1.UniverseUserVoteFeedbackMetadataData_Capabilities,
-	UniverseUserVoteFeedbackMetadataData_Category = t1.UniverseUserVoteFeedbackMetadataData_Category,
-	UniverseUserVoteFeedbackMetadataData_Category_Option = t1.UniverseUserVoteFeedbackMetadataData_Category_Option,
-	UniverseUserVoteFeedbackMetadataData_Comment = t1.UniverseUserVoteFeedbackMetadataData_Comment,
-	UniverseUserVoteFeedbackMetadataData_Metadata = t1.UniverseUserVoteFeedbackMetadataData_Metadata
+	UniverseUserVoteFeedbackMetadataData = v.UniverseUserVoteFeedbackMetadataData,
+	UniverseUserVoteFeedbackMetadataData_Capabilities = v.UniverseUserVoteFeedbackMetadataData_Capabilities,
+	UniverseUserVoteFeedbackMetadataData_Category = v.UniverseUserVoteFeedbackMetadataData_Category,
+	UniverseUserVoteFeedbackMetadataData_Category_Option = v.UniverseUserVoteFeedbackMetadataData_Category_Option,
+	UniverseUserVoteFeedbackMetadataData_Comment = v.UniverseUserVoteFeedbackMetadataData_Comment,
+	UniverseUserVoteFeedbackMetadataData_Metadata = v.UniverseUserVoteFeedbackMetadataData_Metadata
 }

@@ -1,8 +1,6 @@
-local PeopleReactView = require(script.PeopleReactView)
-local Constants = require(script.Constants)
-
 return {
-	PeopleReactView = PeopleReactView,
-	Constants = Constants,
+	PeopleReactView = require(script.PeopleReactView),
+	Constants = require(script.Constants),
+	SideSheetFocusContext = require(script.SideSheetFocusContext),
 	["jest.config"] = script["jest.config"]
 }

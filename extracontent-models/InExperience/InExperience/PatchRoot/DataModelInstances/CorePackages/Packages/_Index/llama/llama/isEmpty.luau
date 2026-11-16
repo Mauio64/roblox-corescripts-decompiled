@@ -1,5 +1,5 @@
-local function isEmpty(p1) -- line: 2
-	return next(p1) == nil
+local function isEmpty(items): boolean
+	return next(items) == nil
 end
 
 return isEmpty

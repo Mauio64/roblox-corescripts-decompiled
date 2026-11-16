@@ -1,7 +1,4 @@
-local createPause = require(script.createPause)
-local createPersistAndUpdateState = require(script.createPersistAndUpdateState)
-
 return {
-	createPause = createPause,
-	createPersistAndUpdateState = createPersistAndUpdateState
+	createPause = require(script.createPause),
+	createPersistAndUpdateState = require(script.createPersistAndUpdateState)
 }

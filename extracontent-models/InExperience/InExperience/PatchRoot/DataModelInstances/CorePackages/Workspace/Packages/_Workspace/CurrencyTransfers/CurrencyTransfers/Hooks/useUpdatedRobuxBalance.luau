@@ -1,59 +1,49 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
-local SignalsReact = require(CurrencyTransfersParent.SignalsReact)
-local Promise = require(CurrencyTransfersParent.Promise)
-local getBalanceRequest = require(CurrencyTransfers.NetworkRequests.getBalanceRequest)
+local parent = CurrencyTransfers.Parent
 
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Promise = require(parent.Promise)
+
+local getBalanceRequest = require(CurrencyTransfers.NetworkRequests.getBalanceRequest)
 require(CurrencyTransfers.Hooks.useTransferStore)
 
-local function useUpdatedRobuxBalance(p1) -- line: 19
-	-- upvalues: React (copy), getBalanceRequest (copy), Promise (copy), SignalsReact (copy)
-	local setRobuxBalanceAmount = p1.setRobuxBalanceAmount
-	local setBalanceReceivedFromApi = p1.setBalanceReceivedFromApi
+local function useUpdatedRobuxBalance(data)
+	local setRobuxBalanceAmount = data.setRobuxBalanceAmount
+	local setBalanceReceivedFromApi = data.setBalanceReceivedFromApi
 
-	React.useEffect(function() -- line: 27
-		-- upvalues: getBalanceRequest (copy), p1 (copy), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), Promise (copy)
-		local u11 = false
+	React.useEffect(function()
+		local flag = false
 
-		getBalanceRequest(nil, p1.getNetworkImpl()):andThen(function(p2) -- line: 31
-			-- upvalues: u11 (ref), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), Promise (copy), getBalanceRequest (copy), p1 (copy)
-			if u11 then
+		getBalanceRequest(nil, data.getNetworkImpl()):andThen(function(p)
+			if flag then
 				return
 			end
 
-			setRobuxBalanceAmount(p2)
+			setRobuxBalanceAmount(p)
 			setBalanceReceivedFromApi(true)
-			Promise.delay(0.5):andThen(function() -- line: 39
-				-- upvalues: u11 (ref), getBalanceRequest (copy), p1 (copy), setRobuxBalanceAmount (copy)
-				if u11 then
+
+			Promise.delay(0.5):andThen(function()
+				if flag then
 					return
 				end
 
-				return getBalanceRequest(nil, p1.getNetworkImpl()):andThen(function(p3) -- line: 44
-					-- upvalues: u11 (ref), setRobuxBalanceAmount (copy)
-					if u11 then
+				return getBalanceRequest(nil, data.getNetworkImpl()):andThen(function(p2)
+					if flag then
 						return
 					end
 
-					setRobuxBalanceAmount(p3)
-				end):catch(function() -- line: 50
-				end)
-			end):catch(function() -- line: 52
-			end)
-		end):catch(function() -- line: 54
-		end)
+					setRobuxBalanceAmount(p2)
+				end):catch(function() end)
+			end):catch(function() end)
+		end):catch(function() end)
 
-		return function() -- line: 56
-			-- upvalues: u11 (ref)
-			u11 = true
+		return function()
+			flag = true
 		end
-	end, {
-		setRobuxBalanceAmount,
-		setBalanceReceivedFromApi
-	})
+	end, { setRobuxBalanceAmount, setBalanceReceivedFromApi })
 
-	return SignalsReact.useSignalState(p1.getRobuxBalanceAmount) or 0
+	return SignalsReact.useSignalState(data.getRobuxBalanceAmount) or 0
 end
 
 return useUpdatedRobuxBalance

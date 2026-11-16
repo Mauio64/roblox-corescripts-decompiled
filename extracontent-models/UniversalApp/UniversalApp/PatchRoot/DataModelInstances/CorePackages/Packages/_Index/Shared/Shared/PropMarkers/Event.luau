@@ -1,24 +1,23 @@
-local lib = require(script.Parent.Parent["Type.roblox"])
-local t1 = {}
-local t2 = {
-	__tostring = function(p1) -- line: 35
-		return string.format("RoactHostEvent(%s)", p1.name)
+local Typeroblox = require(script.Parent.Parent["Type.roblox"])
+
+local Event = {}
+
+local v = {
+	__tostring = function(p)
+		return string.format("RoactHostEvent(%s)", p.name)
 	end
 }
 
-setmetatable(t1, {
-	__index = function(_, p3) -- line: 41
-		-- upvalues: lib (copy), t2 (copy), t1 (copy)
-		local t3 = {
-			[lib] = lib.HostEvent,
-			name = p3
-		}
+setmetatable(Event, {
+	__index = function(_, name)
+		local v2 = { [Typeroblox] = Typeroblox.HostEvent, name = name }
 
-		setmetatable(t3, t2)
-		t1[p3] = t3
+		setmetatable(v2, v)
 
-		return t3
+		Event[name] = v2
+
+		return v2
 	end
 })
 
-return t1
+return Event

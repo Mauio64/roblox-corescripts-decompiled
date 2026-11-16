@@ -1,16 +1,16 @@
-local ParentParent = script.Parent.Parent
-local UpdateSelectedCaptures = require(ParentParent.Actions.UpdateSelectedCaptures)
-local getUpdatedSelectedCapturesArray = require(ParentParent.Utils.getUpdatedSelectedCapturesArray)
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
 
-require(ParentParent.Types)
+local UpdateSelectedCaptures = require(parent.Actions.UpdateSelectedCaptures)
+local getUpdatedSelectedCapturesArray = require(parent.Utils.getUpdatedSelectedCapturesArray)
 
-return function(p1) -- line: 9
-	-- upvalues: Constants (copy), UpdateSelectedCaptures (copy), getUpdatedSelectedCapturesArray (copy)
-	return function(p2) -- line: 10
-		-- upvalues: Constants (copy), UpdateSelectedCaptures (copy), getUpdatedSelectedCapturesArray (copy), p1 (copy)
-		local SelectedCaptures = p2:getState()[Constants.RoduxKey].CaptureManager.SelectedCaptures
+local Constants = require(parent.Constants)
+require(parent.Types)
 
-		p2:dispatch(UpdateSelectedCaptures(getUpdatedSelectedCapturesArray(SelectedCaptures, p1)))
+return function(p)
+	return function(object)
+		object:dispatch(UpdateSelectedCaptures(getUpdatedSelectedCapturesArray(
+			object:getState()[Constants.RoduxKey].CaptureManager.SelectedCaptures,
+			p
+		)))
 	end
 end

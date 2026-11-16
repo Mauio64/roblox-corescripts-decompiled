@@ -1,8 +1,10 @@
-local scriptParent = script.Parent
-local t1 = {}
+local parent = script.Parent
+local Images = require(parent.Images)
 
-for v3, v4 in (require(scriptParent.Images)) do
-	t1[v4] = v3
+local ImagesInverse = {}
+
+for k, image in Images do
+	ImagesInverse[image] = k
 end
 
-return t1
+return ImagesInverse

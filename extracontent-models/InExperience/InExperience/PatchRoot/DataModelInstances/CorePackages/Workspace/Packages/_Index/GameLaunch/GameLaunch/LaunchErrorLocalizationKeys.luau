@@ -1,10 +1,15 @@
-local Parent = script:FindFirstAncestor("GameLaunch").Parent
-local RetrievalStatus = require(Parent.Http).Enum.RetrievalStatus
-local PlayabilityStatusEnum = require(Parent.DiscoveryTypes).PlayabilityStatusEnum
-local FFlagLuaAppBlockedUnplayableError = require(Parent.SharedFlags).FFlagLuaAppBlockedUnplayableError
-local FFlagLuaAppDemoModePlayButton = require(Parent.SharedFlags).FFlagLuaAppDemoModePlayButton
-local t1 = {}
-local t2 = {
+local parent = script:FindFirstAncestor("GameLaunch").Parent
+local Http = require(parent.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local PlayabilityStatusEnum = DiscoveryTypes.PlayabilityStatusEnum
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppBlockedUnplayableError = SharedFlags.FFlagLuaAppBlockedUnplayableError
+
+local LaunchErrorLocalizationKeys = {}
+
+local v = {
 	[RetrievalStatus.Failed] = "Feature.GamePage.QuickLaunch.LaunchError.RequestFailed",
 	[PlayabilityStatusEnum.GuestProhibited] = "Feature.GamePage.QuickLaunch.LaunchError.GuestProhibited",
 	[PlayabilityStatusEnum.GameUnapproved] = "Feature.ExperienceDetails.UnplayableError.GameUnapproved",
@@ -26,20 +31,17 @@ local t2 = {
 	[PlayabilityStatusEnum.ContextualPlayabilityAgeGated] = "Feature.ExperienceDetails.UnplayableError.ContextualPlayabilityAgeGated",
 	[PlayabilityStatusEnum.ContextualPlayabilityUnrated] = "Feature.ExperienceDetails.UnplayableError.ContextualPlayabilityUnrated",
 	[PlayabilityStatusEnum.ContextualPlayabilityAgeGatedByDescriptor] = "Feature.ExperienceDetails.UnplayableError.ContextualPlayabilityAgeGatedByDescriptor",
-	[PlayabilityStatusEnum.FiatPurchaseDeviceRestricted] = not FFlagLuaAppDemoModePlayButton and "Feature.ExperienceDetails.UnplayableError.DeviceRestrictedDefault" or "Feature.ExperienceDetails.UnplayableError.FiatPurchaseDeviceRestricted",
-	[PlayabilityStatusEnum.ContextualPlayabilityExperienceBlockedParentalControls] = if not FFlagLuaAppBlockedUnplayableError then nil else "Feature.ExperienceDetails.UnplayableError.ContextualPlayabilityExperienceBlockedParentalControls",
+	[PlayabilityStatusEnum.FiatPurchaseDeviceRestricted] = "Feature.ExperienceDetails.UnplayableError.FiatPurchaseDeviceRestricted",
+	[PlayabilityStatusEnum.ContextualPlayabilityExperienceBlockedParentalControls] = FFlagLuaAppBlockedUnplayableError and "Feature.ExperienceDetails.UnplayableError.ContextualPlayabilityExperienceBlockedParentalControls" or nil,
 	Default = "Feature.ExperienceDetails.UnplayableError.UnplayableOther"
 }
 
-setmetatable(t1, {
-	__newindex = function(_, _, _) -- line: 45
-	end,
-	__index = function(_, p5) -- line: 46
-		-- upvalues: t2 (copy)
-		assert(p5 ~= nil, "LaunchErrorLocalizationKeys needs a key")
-
-		return t2[p5] or t2.Default
+setmetatable(LaunchErrorLocalizationKeys, {
+	__newindex = function(_, _, _) end,
+	__index = function(_, p)
+		assert(p ~= nil, "LaunchErrorLocalizationKeys needs a key")
+		return v[p] or v.Default
 	end
 })
 
-return t1
+return LaunchErrorLocalizationKeys

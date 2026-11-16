@@ -1,179 +1,285 @@
 local Players = game:GetService("Players")
+
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
+
 local createDataCache = require(DataHydration.createDataCache)
 local DataHydrationTypes = require(DataHydration.DataHydrationTypes)
-local Signals = require(DataHydrationParent.Signals)
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
-local v8 = createDataCache()
-local t1 = {}
-local u10 = getLocalPlayerUserId()
+local Signals = require(parent.Signals)
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
+local DataHydrationUtils2 = require(DataHydration.DataHydrationUtils)
+local observeLocalPlayerUserId = DataHydrationUtils2.observeLocalPlayerUserId
 
-Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 68
-	-- upvalues: getLocalPlayerUserId (copy), u10 (ref), t1 (copy)
-	local v16 = getLocalPlayerUserId()
+local defineFastInt = game:DefineFastInt("UserProfileNamesRetryCount", 3)
 
-	if v16 ~= u10 then
-		u10 = v16
-		table.clear(t1)
+local dataCache = createDataCache()
+
+local v = {}
+
+local v2 = getLocalPlayerUserId()
+Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function()
+	local localPlayerUserId = getLocalPlayerUserId()
+
+	if localPlayerUserId ~= v2 then
+		v2 = localPlayerUserId
+		table.clear(v)
 	end
 end)
 
-local UserProfileStore = nil
+local namesStatusCache = nil
+local v3 = {}
+local v4 = {}
 
-local function getUserProfileStore() -- line: 77
-	-- upvalues: UserProfileStore (ref), DataHydrationParent (copy)
-	if not UserProfileStore then
-		UserProfileStore = require(DataHydrationParent.UserProfiles).Stores.UserProfileStore
+local count = 0
+
+local function getNamesStatusCache()
+	if namesStatusCache == nil then
+		local dataCache2 = createDataCache(nil, nil, { observeLocalUser = false })
+		namesStatusCache = dataCache2
+		observeLocalPlayerUserId(function()
+			count += 1
+			table.clear(v3)
+			table.clear(v4)
+			dataCache2.clear()
+		end)
 	end
 
-	return UserProfileStore
+	return namesStatusCache
 end
-local function getProfileModel(s1: string) -- line: 84
-	-- upvalues: UserProfileStore (ref), DataHydrationParent (copy)
-	if not UserProfileStore then
-		UserProfileStore = require(DataHydrationParent.UserProfiles).Stores.UserProfileStore
+
+local userProfileStore = nil
+local function getUserProfileStore() -- 4 equivalent calls inferred from this helper
+	if not userProfileStore then
+		local Stores = require(parent.UserProfiles.Stores)
+		userProfileStore = Stores.UserProfileStore
 	end
 
-	return (UserProfileStore.get().getProfileByUserId(s1))
+	return userProfileStore
 end
-local function getStatusAndFetch(s2: string) -- line: 88
-	-- upvalues: v8 (copy), UserProfileStore (ref), DataHydrationParent (copy)
-	local v19, v20 = v8.getItem(s2)
 
-	if v20 then
-		if not UserProfileStore then
-			UserProfileStore = require(DataHydrationParent.UserProfiles).Stores.UserProfileStore
-		end
+local function getProfileModel(p: string) -- 3 equivalent calls inferred from this helper
+	return (getUserProfileStore().get().getProfileByUserId(p)) -- inferred equivalent call
+end
 
-		UserProfileStore.get().fetchNamesByUserIds({ s2 }, function(p1) -- line: 91
-			-- upvalues: v8 (copy), s2 (copy)
-			if p1.status == "success" then
-				v8.replaceItem(s2, true)
+local function getStatusAndFetch(p: string)
+	local item, v5 = dataCache.getItem(p)
 
-				return
-			end
-
-			if p1.status == "failed" then
-				v8.markItemsAsFailed({ s2 })
+	if v5 then
+		getUserProfileStore().get().fetchNamesByUserIds({ p }, function(p2) -- inferred equivalent call
+			if p2.status == "success" then
+				dataCache.replaceItem(p, true)
+			elseif p2.status == "failed" then
+				dataCache.markItemsAsFailed({ p })
 			end
 		end)
 	end
 
-	return v19, v20
+	return item, v5
 end
-local function resolveUserProfileField(t2: {[any]: any}, s3: string, p2) -- line: 102
-	if s3 == "userId" then
-		return (tonumber(t2.userId))
+
+local function resolveUserProfileField(profileModel, p: string, p2)
+	if p == "userId" then
+		return (tonumber(profileModel.userId))
+	elseif p == "username" then
+		return profileModel.names.getUsername(p2)
+	elseif p == "displayName" then
+		return profileModel.names.getDisplayName(p2)
 	end
 
-	if s3 == "username" then
-		return t2.names.getUsername(p2)
-	end
-
-	if s3 == "displayName" then
-		return t2.names.getDisplayName(p2)
-	end
-
-	if s3 == "isVerified" then
-		if t2.getIsVerified ~= nil then
-			return (t2.getIsVerified(p2))
-		end
-
+	if not (p == "isVerified" and profileModel.getIsVerified ~= nil) then
 		return nil
 	end
 
-	return nil
+	return (profileModel.getIsVerified(p2))
 end
 
-return {
-	resolveField = function(_: string, t3: {[any]: any}, s5: string, p3, _: boolean?) -- line: 115
-		-- upvalues: getStatusAndFetch (copy), DataHydrationTypes (copy), UserProfileStore (ref), DataHydrationParent (copy), resolveUserProfileField (copy)
-		if #t3 < 2 then
-			return nil, nil
-		end
-
-		local str = tostring(s5)
-		local v30 = getStatusAndFetch(str).status(p3)
-
-		if v30 ~= DataHydrationTypes.DataStatus.Ready then
-			return nil, v30
-		end
-
-		if not UserProfileStore then
-			UserProfileStore = require(DataHydrationParent.UserProfiles).Stores.UserProfileStore
-		end
-
-		local v31 = UserProfileStore.get().getProfileByUserId(str)
-
-		if not v31 then
-			return nil, v30
-		end
-
-		local v32 = t3[2]
-
-		return resolveUserProfileField(v31, v32, p3), v30
-	end,
-	updateFromHydration = function(t4: {[any]: any}) -- line: 182
-		-- upvalues: UserProfileStore (ref), DataHydrationParent (copy), v8 (copy)
-		if not UserProfileStore then
-			UserProfileStore = require(DataHydrationParent.UserProfiles).Stores.UserProfileStore
-		end
-
-		UserProfileStore.get().updateFromHydration(t4)
-
-		local t5 = {}
-
-		for v40, v41 in t4 do
-			t5[if v41.userId == nil then v40 else tostring(v41.userId)] = true
-		end
-
-		v8.replaceItems(t5)
-	end,
-	getAndFetchUserInfo = function(p4) -- line: 147
-		-- upvalues: t1 (copy), Signals (copy), getStatusAndFetch (copy), DataHydrationTypes (copy), UserProfileStore (ref), DataHydrationParent (copy)
-		local str = tostring(p4)
-		local v35 = t1[str]
-
-		if v35 ~= nil then
-			return v35
-		end
-
-		local v36 = Signals.createComputed(function(p5) -- line: 154
-			-- upvalues: getStatusAndFetch (copy), str (copy)
-			return getStatusAndFetch(str).status(p5)
-		end)
-		local t6 = {
-			info = Signals.createComputed(function(p6) -- line: 159
-				-- upvalues: v36 (copy), DataHydrationTypes (copy), str (copy), UserProfileStore (ref), DataHydrationParent (copy)
-				if v36(p6) ~= DataHydrationTypes.DataStatus.Ready then
-					return nil
-				end
-
-				local v45 = str
-
-				if not UserProfileStore then
-					UserProfileStore = require(DataHydrationParent.UserProfiles).Stores.UserProfileStore
-				end
-
-				local v46 = UserProfileStore.get().getProfileByUserId(v45)
-
-				if v46 == nil then
-					return nil
-				end
-
-				return {
-					userId = tonumber(str),
-					displayName = v46.names.getDisplayName(p6),
-					username = v46.names.getUsername(p6),
-					hasVerifiedBadge = v46.getIsVerified ~= nil and v46.getIsVerified(p6)
-				}
-			end),
-			status = v36
-		}
-
-		t1[str] = t6
-
-		return t6
+local function fetchNamesWithRetries(p: string, p2: number, count2: number)
+	if count2 ~= count then
+		return
 	end
-}
+
+	v4[p] = true
+	getUserProfileStore().get().fetchNamesByUserIds({ p }, function(p3) -- inferred equivalent call
+		if count2 ~= count then
+			return
+		end
+
+		if p3.status == "success" then
+			v4[p] = nil
+			getNamesStatusCache().replaceItem(p, true)
+		elseif p3.status == "failed" then
+			if p2 < defineFastInt then
+				task.delay(2 ^ p2 + math.random(), fetchNamesWithRetries, p, p2 + 1, count2)
+				return
+			end
+
+			v4[p] = nil
+			getNamesStatusCache().markItemsAsFailed({ p })
+		end
+	end)
+end
+
+local function getAndFetchUserNames(item)
+	local v5 = tostring(item)
+	local v6 = v3[v5]
+
+	if v6 ~= nil then
+		return v6
+	end
+
+	local status = Signals.createComputed(function(p)
+		local item2, v7 = getNamesStatusCache().getItem(v5)
+
+		if v7 and not v4[v5] then
+			fetchNamesWithRetries(v5, 0, count)
+		end
+
+		return item2.status(p)
+	end)
+
+	local v7 = {
+		names = Signals.createComputed(function(p)
+			if status(p) ~= DataHydrationTypes.DataStatus.Ready then
+				return nil
+			end
+
+			local profileModel = getProfileModel(v5) -- inferred equivalent call
+
+			if profileModel == nil then
+				return nil
+			end
+
+			return {
+				combinedName = profileModel.names.getCombinedName(p),
+				username = profileModel.names.getUsername(p)
+			}
+		end),
+		status = status
+	}
+	v3[v5] = v7
+	return v7
+end
+
+local function nonEmpty(p: string?) -- 2 equivalent calls inferred from this helper
+	return if p ~= "" then p else nil
+end
+
+local UserProfileDataHydration = {}
+
+function UserProfileDataHydration.resolveField(_: string, list, p: string, p2, _: boolean?)
+	if #list < 2 then
+		return nil, nil
+	end
+
+	local v5 = tostring(p)
+	local status = getStatusAndFetch(v5).status(p2)
+
+	if status ~= DataHydrationTypes.DataStatus.Ready then
+		return nil, status
+	end
+
+	local profileModel = getProfileModel(v5) -- inferred equivalent call
+
+	if profileModel then
+		return resolveUserProfileField(profileModel, list[2], p2), status
+	end
+
+	return nil, status
+end
+
+function UserProfileDataHydration.updateFromHydration(items)
+	getUserProfileStore().get().updateFromHydration(items) -- inferred equivalent call
+
+	local userIdSet = {}
+
+	for userId, item in items do
+		if item.userId ~= nil then
+			userId = tostring(item.userId)
+		end
+
+		userIdSet[userId] = true
+	end
+
+	dataCache.replaceItems(userIdSet)
+end
+
+function UserProfileDataHydration.getAndFetchUserInfo(p)
+	local v5 = tostring(p)
+	local v6 = v[v5]
+
+	if v6 ~= nil then
+		return v6
+	end
+
+	local status = Signals.createComputed(function(p2)
+		return getStatusAndFetch(v5).status(p2)
+	end)
+
+	local v7 = {
+		info = Signals.createComputed(function(p2)
+			if status(p2) ~= DataHydrationTypes.DataStatus.Ready then
+				return nil
+			end
+
+			local profileModel = getProfileModel(v5) -- inferred equivalent call
+
+			if profileModel == nil then
+				return nil
+			end
+
+			return {
+				userId = tonumber(v5),
+				displayName = profileModel.names.getDisplayName(p2),
+				username = profileModel.names.getUsername(p2),
+				hasVerifiedBadge = profileModel.getIsVerified ~= nil and profileModel.getIsVerified(p2)
+			}
+		end),
+		status = status
+	}
+	v[v5] = v7
+	return v7
+end
+
+UserProfileDataHydration.getAndFetchUserNames = getAndFetchUserNames
+
+function UserProfileDataHydration.getAndFetchUserNamesByUserIds(items)
+	local v5 = {}
+
+	for _, item in items do
+		if tonumber(item) ~= nil then
+			v5[item] = getAndFetchUserNames(item)
+		end
+	end
+
+	return Signals.createComputed(function(p)
+		local status2 = DataHydrationTypes.DataStatus.Ready
+		local namesByUserId = {}
+
+		for k, v6 in v5 do
+			local status = v6.status(p)
+
+			if status == DataHydrationTypes.DataStatus.NotReady then
+				status2 = DataHydrationTypes.DataStatus.NotReady
+			elseif
+				status == DataHydrationTypes.DataStatus.Failed
+				and status2 == DataHydrationTypes.DataStatus.Ready
+			then
+				status2 = DataHydrationTypes.DataStatus.Failed
+			end
+
+			local names = v6.names(p)
+
+			if names then
+				namesByUserId[k] = {
+					combinedName = nonEmpty(names.combinedName), -- inferred equivalent call
+					username = nonEmpty(names.username) -- inferred equivalent call
+				}
+			end
+		end
+
+		return { status = status2, namesByUserId = namesByUserId }
+	end)
+end
+
+return UserProfileDataHydration

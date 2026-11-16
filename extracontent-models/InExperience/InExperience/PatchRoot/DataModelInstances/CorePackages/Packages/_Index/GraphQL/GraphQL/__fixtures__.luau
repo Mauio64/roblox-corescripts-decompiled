@@ -1,3 +1,1 @@
-return {
-	kitchenSinkQuery = require(script.kitchenSink)
-}
+return { kitchenSinkQuery = require(script.kitchenSink) }

@@ -1,6 +1,6 @@
-local function exitCreationFlow(p1: ((...any) -> ...any)?) -- line: 16
-	if p1 then
-		p1()
+local function exitCreationFlow(callback)
+	if callback then
+		callback()
 	end
 end
 

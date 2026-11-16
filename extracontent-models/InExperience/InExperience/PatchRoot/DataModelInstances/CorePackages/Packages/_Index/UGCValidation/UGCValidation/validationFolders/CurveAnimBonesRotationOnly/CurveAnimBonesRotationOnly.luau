@@ -1,65 +1,49 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local CurveAnimBoneHierarchyUtils = require(parent.util.CurveAnimBoneHierarchyUtils)
+local CurveAnimTranslationUtils = require(parent.util.CurveAnimTranslationUtils)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local CurveAnimBoneHierarchyUtils = require(ParentParent.util.CurveAnimBoneHierarchyUtils)
-local getFFlagUGCValidateEmotesBonesAllowed = require(ParentParent.flags.getFFlagUGCValidateEmotesBonesAllowed)
-local getFFlagUGCValidateAnimBonesSupport = require(ParentParent.flags.getFFlagUGCValidateAnimBonesSupport)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
-}
+local getFFlagUGCValidateAnimTranslationThreshold = require(parent.flags.getFFlagUGCValidateAnimTranslationThreshold)
 
-if getFFlagUGCValidateAnimBonesSupport() and getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+local defineFastInt = game:DefineFastInt("UGCValidateBoneTranslationMaxDistanceHundredths", 100)
 
-t1.requiredData = { ValidationEnums.SharedDataMember.curveAnimations }
-t1.conditionalData = { ValidationEnums.SharedDataMember.curveAnimBoneData }
+return {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = { ValidationEnums.SharedDataMember.curveAnimations },
+	conditionalData = { ValidationEnums.SharedDataMember.curveAnimBoneData },
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
+	run = function(object, p)
+		local v = defineFastInt / 100
 
-function t1.fflag() -- line: 22
-	-- upvalues: getFFlagUGCValidateEmotesBonesAllowed (copy), getFFlagUGCValidateAnimBonesSupport (copy)
-	return getFFlagUGCValidateEmotesBonesAllowed() or getFFlagUGCValidateAnimBonesSupport()
-end
+		for _, folder in p.curveAnimations do
+			for _, folder2 in folder:GetDescendants() do
+				if not (folder2:IsA("Folder") and CurveAnimBoneHierarchyUtils.isBoneFolderName(folder2.Name)) then
+					continue
+				end
 
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
+				if getFFlagUGCValidateAnimTranslationThreshold() then
+					local translationExceedsThreshold, v2 = CurveAnimTranslationUtils.translationExceedsThreshold(
+						folder2,
+						v
+					)
 
-local function bonePositionHasKeyframes(p1) -- line: 28
-	local Position = p1:FindFirstChild("Position")
-
-	if not Position or not Position:IsA("Vector3Curve") then
-		return false
-	end
-
-	for _, v13 in {
-		"X",
-		"Y",
-		"Z"
-	} do
-		local v14 = Position:FindFirstChild(v13)
-
-		if v14 and v14:IsA("FloatCurve") and #v14:GetKeys() > 0 then
-			return true
-		end
-	end
-
-	return false
-end
-
-function t1.run(p2, p3) -- line: 42
-	-- upvalues: CurveAnimBoneHierarchyUtils (copy), bonePositionHasKeyframes (copy), ErrorSourceStrings (copy)
-	for _, v18 in p3.curveAnimations do
-		for _, descendant in v18:GetDescendants() do
-			if descendant:IsA("Folder") and CurveAnimBoneHierarchyUtils.isBoneFolderName(descendant.Name) and bonePositionHasKeyframes(descendant) then
-				p2:fail(ErrorSourceStrings.Keys.CurveAnim_BonePositionNotAllowed, {
-					boneName = descendant.Name
-				})
+					if translationExceedsThreshold then
+						object:fail(ErrorSourceStrings.Keys.CurveAnim_BoneTranslationExceedsThreshold, {
+							boneName = folder2.Name,
+							distance = string.format("%.3f", v2),
+							maxDistance = string.format("%.3f", v)
+						})
+					end
+				elseif CurveAnimTranslationUtils.positionHasKeyframes(folder2) then
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_BonePositionNotAllowed, {
+						boneName = folder2.Name
+					})
+				end
 			end
 		end
 	end
-end
-
-return t1
+}

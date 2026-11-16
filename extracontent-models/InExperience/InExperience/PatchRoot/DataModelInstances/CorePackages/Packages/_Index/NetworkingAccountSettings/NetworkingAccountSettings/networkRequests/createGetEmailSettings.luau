@@ -1,15 +1,10 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.Types.networkRequestsTypes)
 
-require(ParentParent.Types.networkRequestsTypes)
+local ACCOUNT_SETTINGS_URL = require(parent.ACCOUNT_SETTINGS_URL)
 
-local ACCOUNT_SETTINGS_URL = require(ParentParent.ACCOUNT_SETTINGS_URL)
-
-return function(p1) -- line: 6
-	-- upvalues: ACCOUNT_SETTINGS_URL (copy)
-	return p1.roduxNetworking.GET({
-		Name = "GetEmailSettings"
-	}, function(p2) -- line: 9
-		-- upvalues: ACCOUNT_SETTINGS_URL (copy)
-		return p2(ACCOUNT_SETTINGS_URL):path("v1"):path("email")
+return function(p)
+	return p.roduxNetworking.GET({ Name = "GetEmailSettings" }, function(callback)
+		return callback(ACCOUNT_SETTINGS_URL):path("v1"):path("email")
 	end)
 end

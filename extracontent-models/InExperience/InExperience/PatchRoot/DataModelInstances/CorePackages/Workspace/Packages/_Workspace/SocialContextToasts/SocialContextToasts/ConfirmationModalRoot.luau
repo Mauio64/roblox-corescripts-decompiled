@@ -1,17 +1,19 @@
-local Parent = script:FindFirstAncestor("SocialContextToasts").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local React = require(Parent.React)
-local DeeplinkConfirmationModal = require(Parent.NotificationsCommon).DeeplinkConfirmationModal
+local parent = script:FindFirstAncestor("SocialContextToasts").Parent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local React = require(parent.React)
 
-local function ConfirmationModalRoot() -- line: 10
-	-- upvalues: useSelector (copy), React (copy), DeeplinkConfirmationModal (copy)
-	local v6 = useSelector(function(p1) -- line: 11
-		return p1.ConfirmationModal
+local NotificationsCommon = require(parent.NotificationsCommon)
+local DeeplinkConfirmationModal = NotificationsCommon.DeeplinkConfirmationModal
+
+local function ConfirmationModalRoot()
+	local v = useSelector(function(p)
+		return p.ConfirmationModal
 	end)
 
 	return {
-		DeeplinkConfirmationModal = v6 and v6.isOpen and React.createElement(DeeplinkConfirmationModal, {
-			closeCallback = v6.closeCallback
+		DeeplinkConfirmationModal = v and v.isOpen and React.createElement(DeeplinkConfirmationModal, {
+			closeCallback = v.closeCallback
 		})
 	}
 end

@@ -1,3 +1,3 @@
-return function(s1: string) -- line: 1
-	return s1 ~= nil and (s1 ~= "" and tonumber(s1) > 0)
+return function(p: string): boolean
+	return p ~= nil and p ~= "" and tonumber(p) > 0
 end

@@ -1,10 +1,12 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
 local FFlagExpChatScrollbarInset = require(ExpChat.Flags.FFlagExpChatScrollbarInset)
-local v3 = game:DefineFastInt("ExpChatVisibleARButtonPadding", 42)
-local v4 = game:DefineFastInt("ExpChatVisibleARButtonPaddingInset", 34)
+
+local defineFastInt = game:DefineFastInt("ExpChatVisibleARButtonPadding", 42)
+
+local defineFastInt2 = game:DefineFastInt("ExpChatVisibleARButtonPaddingInset", 34)
 
 if FFlagExpChatScrollbarInset then
-	return v4
+	return defineFastInt2
 end
 
-return v3
+return defineFastInt

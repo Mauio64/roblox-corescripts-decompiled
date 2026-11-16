@@ -1,240 +1,420 @@
 local CollectionViews = script:FindFirstAncestor("CollectionViews")
-local CollectionViewsParent = CollectionViews.Parent
-local React = require(CollectionViewsParent.React)
-local Cryo = require(CollectionViewsParent.Cryo)
-local UIBlox = require(CollectionViewsParent.UIBlox)
+local parent = CollectionViews.Parent
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local UIBlox = require(parent.UIBlox)
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
-local useDesignTokens = require(CollectionViewsParent.Style).useDesignTokens
-local IconWithTooltip = require(CollectionViewsParent.AppBlox).IconWithTooltip
-local Responsive = require(CollectionViewsParent.Responsive)
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local Foundation2 = require(parent.Foundation)
+local normalizeFontFace = Foundation2.Utility.normalizeFontFace
+local AppBlox = require(parent.AppBlox)
+local IconWithTooltip = AppBlox.IconWithTooltip
+local Responsive = require(parent.Responsive)
 local usePreferredInput = Responsive.usePreferredInput
 local checkAndFormatPossibleLink = require(CollectionViews.checkAndFormatPossibleLink)
-
 require(CollectionViews.SeeAllButtonType_Legacy)
 
-local SharedFlags = require(CollectionViewsParent.SharedFlags)
-local FFlagLuaAppHideCarouselSubtitleChevron = SharedFlags.FFlagLuaAppHideCarouselSubtitleChevron
+local SharedFlags = require(parent.SharedFlags)
 local FFlagLuaAppSortHeaderAnchorTag = SharedFlags.FFlagLuaAppSortHeaderAnchorTag
-local v17 = Images["icons/actions/truncationCollapse_small"]
-local v18 = Images["icons/actions/cycleRight"]
-local t1 = {
-	tooltipSupportsVR = true,
-	tooltipSupportsTenFootUi = true,
+local FFlagSduiComponentsUseFoundationTokens = SharedFlags.FFlagSduiComponentsUseFoundationTokens
+local Foundation3 = require(parent.Foundation)
+local FoundationFontFaceMigration = Foundation3.Utility.Flags.FoundationFontFaceMigration
+
+local iconsactionstruncationCollapse_small = Images["icons/actions/truncationCollapse_small"]
+local iconsactionscycleRight = Images["icons/actions/cycleRight"]
+
+local v = {
 	AutomaticSize = Enum.AutomaticSize.Y,
-	Size = UDim2.new(1, 0, 0, 0)
+	Size = UDim2.new(1, 0, 0, 0),
+	tooltipSupportsVR = true,
+	tooltipSupportsTenFootUi = true
 }
 
-local function HeaderButton(t2: {[any]: any}) -- line: 88
-	-- upvalues: useDesignTokens (copy), React (copy), ImageSetLabel (copy)
-	local v23 = useDesignTokens()
-	local Size_400 = v23.Size.Size_400
-	local Emphasis = v23.Color.Content.Emphasis
-	local image = t2.image
+local function HeaderButton(props)
+	local v2
 
-	return React.createElement(ImageSetLabel, {
-		BackgroundTransparency = 1,
-		Size = t2.Size or UDim2.new(0, Size_400, 0, Size_400),
-		Image = image,
-		ImageColor3 = Emphasis.Color3,
-		ImageTransparency = Emphasis.Transparency,
-		LayoutOrder = t2.LayoutOrder,
-		Rotation = t2.Rotation,
-		AnchorPoint = t2.AnchorPoint,
-		Position = t2.Position
-	})
-end
-local function CollectionHeader(t3: {[any]: any}) -- line: 115
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), usePreferredInput (copy), useDesignTokens (copy), Responsive (copy), checkAndFormatPossibleLink (copy), FFlagLuaAppHideCarouselSubtitleChevron (copy), FFlagLuaAppSortHeaderAnchorTag (copy), HeaderButton (copy), v18 (copy), v17 (copy), IconWithTooltip (copy), TooltipOrientation (copy)
-	local v28 = Cryo.Dictionary.join(t1, t3)
-	local v29, v30 = React.useBinding(0)
-	local v31 = React.useCallback(function(p1) -- line: 119
-		-- upvalues: v30 (copy)
-		v30(p1.AbsoluteSize.X)
-	end, {})
-	local v32 = usePreferredInput()
-	local v33 = useDesignTokens()
-	local v34 = v28.titleTypography or v33.Typography.HeadingSmall
-	local v35 = v28.titleColor or v33.Color.Content.Emphasis
-	local v36 = v28.subtitleTypography or v33.Typography.BodySmall
-	local v37 = v28.subtitleTypography and v28.subtitleTypography.FontSize or 17.64 * v33.Stroke.Standard
-	local v38 = v28.subtitleColor or v33.Color.Content.Default
-	local Size_50 = v33.Size.Size_50
-	local Size_300 = v33.Size.Size_300
-	local v41 = not not (not v28.hideButton and v32 ~= Responsive.Input.Directional) and not not v28.onActivate
-	local Size_700 = v33.Size.Size_700
-	local Size_100 = v33.Size.Size_100
-	local Size_500 = v33.Size.Size_500
-	local v45 = v28.tooltipInfoText ~= nil
-	local v46 = not v41 and 0 or Size_500
-	local v47 = not v45 and 0 or Size_700 + Size_300
-	local v48 = not v45 and 0 or v47
-	local v49 = v28.subtitle ~= nil and v28.subtitle ~= ""
-	local v50, v51 = checkAndFormatPossibleLink(v28.subtitle)
-	local v52 = if not v28.onActivateSubtitle then v28.onActivate else v28.onActivateSubtitle
-
-	if v28.onActivateSubtitle then
-		v50 = true
+	if FFlagSduiComponentsUseFoundationTokens then
+		v2 = useTokens()
+	else
+		v2 = useDesignTokens()
 	end
 
-	local v53 = if not FFlagLuaAppHideCarouselSubtitleChevron then nil else v50 and (not v28.hideSubtitleChevron and not v41)
-	local Size_250 = v33.Size.Size_250
-	local v55 = not (if not FFlagLuaAppHideCarouselSubtitleChevron then v50 else v53) and 0 or Size_250
-	local v56 = v50 and v52 ~= nil
+	local size_400 = v2.Size.Size_400
+	local emphasis = v2.Color.Content.Emphasis
+	local image = props.image
+	return React.createElement(ImageSetLabel, {
+		Size = props.Size or UDim2.new(0, size_400, 0, size_400),
+		BackgroundTransparency = 1,
+		Image = image,
+		ImageColor3 = emphasis.Color3,
+		ImageTransparency = emphasis.Transparency,
+		LayoutOrder = props.LayoutOrder,
+		Rotation = props.Rotation,
+		AnchorPoint = props.AnchorPoint,
+		Position = props.Position
+	})
+end
 
-	return React.createElement("Frame", {
-		Position = v28.Position,
-		AutomaticSize = v28.AutomaticSize,
-		Size = v28.Size,
+local function CollectionHeader(p)
+	local joined = Cryo.Dictionary.join(v, p)
+
+	local v2, v3 = React.useBinding(0)
+	local v4 = React.useCallback(function(p2)
+		v3(p2.AbsoluteSize.X)
+	end, {})
+
+	local v5 = usePreferredInput()
+	local v6
+
+	if FFlagSduiComponentsUseFoundationTokens then
+		v6 = useTokens()
+	else
+		v6 = useDesignTokens()
+	end
+
+	local titleTypography = joined.titleTypography or v6.Typography.HeadingSmall
+	local titleColor = joined.titleColor or v6.Color.Content.Emphasis
+
+	local subtitleTypography = joined.subtitleTypography or v6.Typography.BodySmall
+
+	local fontSize = joined.subtitleTypography and joined.subtitleTypography.FontSize or 17.64 * v6.Stroke.Standard
+	local subtitleColor = joined.subtitleColor or v6.Color.Content.Default
+
+	local size_50 = v6.Size.Size_50
+
+	local size_300 = v6.Size.Size_300
+
+	local v7 = not joined.hideButton and v5 ~= Responsive.Input.Directional and joined.onActivate and true or false
+
+	local size_700 = v6.Size.Size_700
+
+	local size_100 = v6.Size.Size_100
+
+	local size_500 = v6.Size.Size_500
+
+	local v8 = joined.tooltipInfoText ~= nil
+	local v9 = not v7 and 0 or size_500
+	local v10 = not v8 and 0 or size_700 + size_300
+	local v11
+
+	if joined.subtitle == nil then
+		v11 = false
+	else
+		v11 = joined.subtitle ~= ""
+	end
+
+	local v12, text = checkAndFormatPossibleLink(joined.subtitle)
+	local v13
+
+	if joined.onActivateSubtitle then
+		v13 = joined.onActivateSubtitle
+	else
+		v13 = joined.onActivate
+	end
+
+	local richText = joined.onActivateSubtitle and true or v12
+
+	local v14 = richText and not (joined.hideSubtitleChevron or v7)
+	local size_250 = v6.Size.Size_250
+	local v15 = not v14 and 0 or size_250
+	local v16 = richText and v13 ~= nil
+	local createElement = React.createElement
+	local v17 = {
+		["Position"] = nil,
+		["Position"] = nil,
+		Position = joined.Position,
+		AutomaticSize = joined.AutomaticSize,
+		Size = joined.Size,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		LayoutOrder = v28.LayoutOrder,
-		ZIndex = v28.ZIndex,
-		[React.Tag] = if not FFlagLuaAppSortHeaderAnchorTag then nil else v28.headerTag,
-		[React.Change.AbsoluteSize] = v31
-	}, {
-		LeftContentFrame = React.createElement(not v41 and "Frame" or "TextButton", {
-			Text = if not v41 then nil else "",
-			Size = UDim2.new(1, -v48, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = joined.LayoutOrder,
+		ZIndex = joined.ZIndex
+	}
+	local tag = React.Tag
+	local v18
+
+	if FFlagLuaAppSortHeaderAnchorTag then
+		v18 = joined.headerTag
+	end
+
+	v17[tag] = v18
+	v17[React.Change.AbsoluteSize] = v4
+
+	local createElement2 = React.createElement
+	local v19 = {}
+	v19.Text = v7 and "" or nil
+	v19.Size = UDim2.new(1, -(not v8 and 0 or v10), 0, 0)
+	v19.AutomaticSize = Enum.AutomaticSize.Y
+	v19.BackgroundTransparency = 1
+	v19.AnchorPoint = joined.AnchorPoint
+	v19.BorderSizePixel = 0
+	v19.AutoButtonColor = not v7 and nil
+	local activated = React.Event.Activated
+	local v20
+
+	if v7 then
+		v20 = joined.onActivate
+	end
+
+	v19[activated] = v20
+	v19.Active = v7
+	v19.Selectable = v7
+	local v21 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			Padding = UDim.new(0, size_50),
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		TitleContainer = 0,
+		SubtitleFrame = 0
+	}
+
+	local createElement3 = React.createElement
+	local v22 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.new(1, 0, 0, 0),
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0
+	}
+
+	local v24 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Horizontal,
+			Padding = UDim.new(0, size_100),
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		Title = 0,
+		SeeAllButton = 0
+	}
+	local title
+
+	if typeof(joined.title) == "string" then
+		local createElement4 = React.createElement
+		local v23 = {
 			BackgroundTransparency = 1,
-			AnchorPoint = v28.AnchorPoint,
-			BorderSizePixel = 0,
-			AutoButtonColor = not v41 and nil,
-			[React.Event.Activated] = if not v41 then nil else v28.onActivate,
-			Active = v41,
-			Selectable = v41
-		}, {
+			Text = joined.title,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Size = UDim2.new(0, 0, 0, 0),
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			TextTransparency = 0,
+			TextColor3 = 0,
+			TextWrapped = false,
+			TextTruncate = 0,
+			TextXAlignment = 0,
+			LayoutOrder = 1
+		}
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = titleTypography.Font
+		end
+
+		v23.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(titleTypography.Font)
+		end
+
+		v23.FontFace = fontFace
+		v23.TextSize = titleTypography.FontSize
+		v23.TextTransparency = titleColor.Transparency
+		v23.TextColor3 = titleColor.Color3
+
+		v23.TextTruncate = Enum.TextTruncate.SplitWord
+		v23.TextXAlignment = Enum.TextXAlignment.Left
+		title = createElement4("TextLabel", v23, {
+			UISizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = v2:map(function(p2: number)
+					local v25 = p2 - v9 - v10
+
+					if v25 > 0 then
+						return Vector2.new(v25, 1e999)
+					end
+
+					return nil
+				end)
+			})
+		})
+	elseif typeof(joined.title) == "function" then
+		title = joined.title()
+	end
+
+	v24.Title = title
+
+	v24.SeeAllButton = v7
+		and React.createElement(HeaderButton, {
+			LayoutOrder = 2,
+			Size = UDim2.fromOffset(size_500, size_500),
+			image = iconsactionscycleRight
+		})
+		or nil
+	v21.TitleContainer = createElement3("Frame", v22, v24)
+	local subtitleFrame
+
+	if v11 then
+		local createElement4 = React.createElement
+		local v23 = {}
+		v23.LayoutOrder = 2
+		v23.Text = v16 and "" or nil
+		v23.Size = UDim2.new(1, 0, 0, 0)
+		v23.AutomaticSize = Enum.AutomaticSize.Y
+		v23.BackgroundTransparency = 1
+		v23.BorderSizePixel = 0
+		v23.AutoButtonColor = not v16 and nil
+		local activated2 = React.Event.Activated
+
+		if not v16 then
+			v13 = nil
+		end
+
+		v23[activated2] = v13
+		v23.Active = v16
+		v23.Selectable = v16
+		local v25 = {
 			UIListLayout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				FillDirection = Enum.FillDirection.Vertical,
-				Padding = UDim.new(0, Size_50),
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, v6.Size.Size_50),
 				HorizontalAlignment = Enum.HorizontalAlignment.Left,
 				VerticalAlignment = Enum.VerticalAlignment.Center
 			}),
-			TitleContainer = React.createElement("Frame", {
-				LayoutOrder = 1,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, 0, 0, 0)
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					Padding = UDim.new(0, Size_100),
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}),
-				Title = if typeof(v28.title) ~= "string" then if typeof(v28.title) ~= "function" then nil else v28.title() else React.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					TextWrapped = false,
-					LayoutOrder = 1,
-					Text = v28.title,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Size = UDim2.new(0, 0, 0, 0),
-					Font = v34.Font,
-					TextSize = v34.FontSize,
-					TextTransparency = v35.Transparency,
-					TextColor3 = v35.Color3,
-					TextTruncate = Enum.TextTruncate.SplitWord,
-					TextXAlignment = Enum.TextXAlignment.Left
-				}, {
-					UISizeConstraint = React.createElement("UISizeConstraint", {
-						MaxSize = v29:map(function(n1: number) -- line: 245
-							-- upvalues: v46 (copy), v47 (copy)
-							local v59 = n1 - v46 - v47
+			Subtitle = 0,
+			SubtitleLinkArrow = 0
+		}
 
-							if v59 > 0 then
-								return Vector2.new(v59, 1e999)
-							end
+		local createElement5 = React.createElement
+		local v26 = {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Text = text,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Size = UDim2.new(0, 0, 0, 0),
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			TextTransparency = 0,
+			TextColor3 = 0,
+			TextWrapped = false,
+			TextTruncate = 0,
+			TextXAlignment = 0,
+			RichText = 0
+		}
+		local font
 
-							return nil
-						end)
-					})
-				}),
-				SeeAllButton = v41 and React.createElement(HeaderButton, {
+		if not FoundationFontFaceMigration then
+			font = subtitleTypography.Font
+		end
+
+		v26.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(subtitleTypography.Font)
+		end
+
+		v26.FontFace = fontFace
+
+		v26.TextSize = fontSize
+		v26.TextTransparency = titleColor.Transparency
+		v26.TextColor3 = subtitleColor.Color3
+
+		v26.TextTruncate = Enum.TextTruncate.SplitWord
+		v26.TextXAlignment = Enum.TextXAlignment.Left
+		v26.RichText = richText
+		v25.Subtitle = createElement5("TextLabel", v26, {
+			UISizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = v2:map(function(p2: number)
+					local v27 = p2 - v15
+
+					if v27 > 0 then
+						return Vector2.new(v27, 1e999)
+					end
+
+					return nil
+				end)
+			})
+		})
+
+		v25.SubtitleLinkArrow = v14
+			and React.createElement(
+				"Frame",
+				{
 					LayoutOrder = 2,
-					Size = UDim2.fromOffset(Size_500, Size_500),
-					image = v18
-				}) or nil
-			}),
-			SubtitleFrame = v49 and React.createElement(not v56 and "Frame" or "TextButton", {
-				LayoutOrder = 2,
-				Text = if not v56 then nil else "",
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				AutoButtonColor = not v56 and nil,
-				[React.Event.Activated] = if not v56 then nil else v52,
-				Active = v56,
-				Selectable = v56
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					Padding = UDim.new(0, v33.Size.Size_50),
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}),
-				Subtitle = React.createElement("TextLabel", {
-					LayoutOrder = 1,
+					Size = UDim2.fromOffset(v15, v15),
 					BackgroundTransparency = 1,
-					TextWrapped = false,
-					Text = v51,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Size = UDim2.new(0, 0, 0, 0),
-					Font = v36.Font,
-					TextSize = v37,
-					TextTransparency = v35.Transparency,
-					TextColor3 = v38.Color3,
-					TextTruncate = Enum.TextTruncate.SplitWord,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					RichText = v50
-				}, {
-					UISizeConstraint = React.createElement("UISizeConstraint", {
-						MaxSize = v29:map(function(n2: number) -- line: 299
-							-- upvalues: v55 (copy)
-							local v61 = n2 - v55
-
-							if v61 > 0 then
-								return Vector2.new(v61, 1e999)
-							end
-
-							return nil
-						end)
-					})
-				}),
-				SubtitleLinkArrow = ((if not FFlagLuaAppHideCarouselSubtitleChevron then v50 and not v41 else v53)) and React.createElement("Frame", {
-					LayoutOrder = 2,
-					BackgroundTransparency = 1,
-					ClipsDescendants = true,
-					Size = UDim2.fromOffset(v55, v55)
-				}, {
+					ClipsDescendants = true
+				},
+				{
 					Icon = React.createElement(HeaderButton, {
+						image = iconsactionstruncationCollapse_small,
+						Size = UDim2.new(1, v6.Size.Size_50, 1, v6.Size.Size_50),
 						Rotation = 90,
-						image = v17,
-						Size = UDim2.new(1, v33.Size.Size_50, 1, v33.Size.Size_50),
 						Position = UDim2.fromScale(0.5, 0.5),
 						AnchorPoint = Vector2.new(0.5, 0.5)
 					})
-				}) or nil
-			}) or nil
-		}),
-		IconWithTooltip = v45 and React.createElement(IconWithTooltip, {
-			triggerPointName = "IconWithTooltip",
+				}
+			)
+			or nil
+		subtitleFrame = createElement4(v16 and "TextButton" or "Frame", v23, v25) or nil
+	end
+
+	v21.SubtitleFrame = subtitleFrame
+	local v23 = {
+		LeftContentFrame = createElement2(v7 and "TextButton" or "Frame", v19, v21),
+		IconWithTooltip = 0
+	}
+	local iconWithTooltip
+
+	if v8 then
+		local createElement4 = React.createElement
+		local v25 = {
 			tooltipOrientation = TooltipOrientation.Bottom,
-			hoverText = v28.tooltipInfoText,
-			onActivateTooltip = v28.onActivateInfoIcon,
-			supportVR = v28.tooltipSupportsVR,
-			supportTenFootUi = v28.tooltipSupportsTenFootUi,
-			size = UDim2.new(0, Size_700, 0, Size_700),
-			position = if not v49 then UDim2.new(1, 0, 0.5, 0) else UDim2.new(1, 0, 0, 0),
-			anchorPoint = if not v49 then Vector2.new(1, 0.5) else Vector2.new(1, 0)
-		}) or nil
-	})
+			hoverText = joined.tooltipInfoText,
+			triggerPointName = "IconWithTooltip",
+			onActivateTooltip = joined.onActivateInfoIcon,
+			supportVR = joined.tooltipSupportsVR,
+			supportTenFootUi = joined.tooltipSupportsTenFootUi,
+			size = UDim2.new(0, size_700, 0, size_700),
+			position = 0,
+			anchorPoint = 0
+		}
+		local position
+
+		if v11 then
+			position = UDim2.new(1, 0, 0, 0)
+		else
+			position = UDim2.new(1, 0, 0.5, 0)
+		end
+
+		v25.position = position
+		local anchorPoint
+
+		if v11 then
+			anchorPoint = Vector2.new(1, 0)
+		else
+			anchorPoint = Vector2.new(1, 0.5)
+		end
+
+		v25.anchorPoint = anchorPoint
+		iconWithTooltip = createElement4(IconWithTooltip, v25) or nil
+	end
+
+	v23.IconWithTooltip = iconWithTooltip
+	return createElement("Frame", v17, v23)
 end
 
 return React.memo(CollectionHeader)

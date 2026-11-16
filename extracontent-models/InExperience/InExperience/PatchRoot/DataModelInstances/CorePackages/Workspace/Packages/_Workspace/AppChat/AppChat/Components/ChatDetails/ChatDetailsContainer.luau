@@ -1,44 +1,64 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local UIBlox = require(AppChatParent.UIBlox)
-local Promise = require(AppChatParent.Promise)
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Promise = require(parent.Promise)
 local getDeepValue = require(AppChat.Utils.getDeepValue)
-local UserProfiles = require(AppChatParent.UserProfiles)
+local UserProfiles = require(parent.UserProfiles)
+
 local useCallback = React.useCallback
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffect = React.useEffect
-local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMount
+local RoactUtils2 = require(parent.RoactUtils)
+local useEffectOnMount = RoactUtils2.Hooks.useEffectOnMount
 local useIsGroupChatEnabled = require(AppChat.Hooks.useIsGroupChatEnabled)
 local useState = React.useState
 local useStyle = UIBlox.Core.Style.useStyle
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local RoactUtils3 = require(parent.RoactUtils)
+local useSelector = RoactUtils3.Hooks.RoactRodux.useSelector
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local Conversation = require(AppChat.Models.Conversation)
 local ConversationChannels = require(AppChat.Models.ConversationChannels)
 local useUserProfilesFetch = UserProfiles.Hooks.useUserProfilesFetch
 local userProfilesCombinedNameAndUsernameByUserIds = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
 local useIsUserPending = require(AppChat.Hooks.useIsUserPending)
 local LuaAppNavigationContext = require(AppChat.LuaAppNavigationContext)
-local useNavigation = require(AppChatParent.Navigation).useNavigation
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
 local useIsChatEnabled = require(AppChat.Hooks.useIsChatEnabled)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+local useChatPlacementContext = ChatPlacementContext.useChatPlacementContext
+local isPlacementInExperience = ChatPlacementContext.isPlacementInExperience
+
 local getConversationTitle = require(AppChat.Conversations.getConversationTitle)
+
 local selectChatUserEntryModelList = require(script.Parent.Selectors.selectChatUserEntryModelList)
 local ParticipantDialogContainer = require(script.Parent.ParticipantDialog.ParticipantDialogContainer)
+
 local ChatDetailsPage = require(script.Parent.ChatDetailsPage)
 local GenericDialogType = require(script.Parent.Dialogs.GenericDialogType)
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local ChatDetailsTelemetryLayer = require(AppChat.Telemetry.Layers.ChatDetailsTelemetryLayer)
 local ChatDetailsTelemetryEvents = require(AppChat.Components.ChatDetails.ChatDetailsTelemetryEvents)
 local ChatConversationTelemetryState = require(AppChat.Contexts.TelemetryState.ChatConversationTelemetryState)
 local ChatDetailsTelemetryState = require(AppChat.Contexts.TelemetryState.ChatDetailsTelemetryState)
-local FFlagConnectionsToFriendsRename = require(AppChatParent.SharedFlags).FFlagConnectionsToFriendsRename
-local FFlagAppChatAlwaysDisplayUserCardsInChatDetails = require(AppChat.Flags.FFlagAppChatAlwaysDisplayUserCardsInChatDetails)
-local getFFlagAppChatParticipantDialogFoundationMenu = require(AppChat.Flags.getFFlagAppChatParticipantDialogFoundationMenu)
-local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
-local t1 = {
+local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
+local FFlagAppChatUseUserProfileHydration = require(AppChat.Flags.FFlagAppChatUseUserProfileHydration)
+local useProfileNames = require(AppChat.Hooks.useProfileNames)
+local getCombinedNameFromProfileNames = require(AppChat.Users.getCombinedNameFromProfileNames)
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
+
+local v = {
 	topBarHeight = 0,
 	wideMode = false,
 	participants = nil,
@@ -46,389 +66,361 @@ local t1 = {
 	isGroupOwner = nil,
 	conversationId = nil,
 	conversation = nil,
-	navigateBack = function() -- line: 62
-	end,
-	navigateToEditChatMembers = function() -- line: 63
-	end,
-	navigateToDialog = function() -- line: 64
-	end,
-	navigateToToast = function() -- line: 65
-	end,
-	navigateToConversation = function() -- line: 66
-	end,
-	navigateToChatLanding = function() -- line: 67
-	end
+	navigateBack = function() end,
+	navigateToEditChatMembers = function() end,
+	navigateToDialog = function() end,
+	navigateToToast = function() end,
+	navigateToConversation = function() end,
+	navigateToChatLanding = function() end
 }
 
-return function(p1) -- line: 70
-	-- upvalues: Cryo (copy), t1 (copy), getFFlagAppChatParticipantDialogFoundationMenu (copy), useStyle (copy), useLocalization (copy), GetFFlagIsSquadEnabled (copy), FFlagConnectionsToFriendsRename (copy), React (copy), LuaAppNavigationContext (copy), useDispatch (copy), useState (copy), useNavigation (copy), useIsGroupChatEnabled (copy), useIsChatEnabled (copy), useEffect (copy), useSelector (copy), getDeepValue (copy), Conversation (copy), AppChatNetworking (copy), useUserProfilesFetch (copy), userProfilesCombinedNameAndUsernameByUserIds (copy), useTelemetry (copy), ChatDetailsTelemetryLayer (copy), FFlagAppChatAlwaysDisplayUserCardsInChatDetails (copy), selectChatUserEntryModelList (copy), getConversationTitle (copy), useIsUserPending (copy), ConversationChannels (copy), Promise (copy), GenericDialogType (copy), ChatDetailsTelemetryEvents (copy), useCallback (copy), ChatConversationTelemetryState (copy), ChatDetailsTelemetryState (copy), useEffectOnMount (copy), ChatDetailsPage (copy), ParticipantDialogContainer (copy)
-	local v43 = Cryo.Dictionary.join(t1, p1 or {})
-	local v44 = getFFlagAppChatParticipantDialogFoundationMenu()
-	local v45 = useStyle()
-	local v46 = useLocalization({
+local function getParticipantProfiles(p, participants)
+	local participantProfiles = {}
+
+	for k, item in participants do
+		local combinedNameFromProfileNames = getCombinedNameFromProfileNames(p, item)
+
+		if combinedNameFromProfileNames then
+			participantProfiles[k] = {
+				names = { combinedName = combinedNameFromProfileNames }
+			}
+		end
+	end
+
+	return participantProfiles
+end
+
+return function(options)
+	local joined = Cryo.Dictionary.join(v, options or {})
+	local style = useStyle()
+	local v2 = useLocalization({
+		pageHeaderText = GetFFlagIsSquadEnabled() and "Feature.Chat.Label.Details" or "Feature.Chat.Label.ChatDetails",
 		generalText = "Feature.Chat.Label.General",
 		titleNotSetText = "Feature.Chat.Label.NotSet",
 		membersText = "Feature.Chat.Label.Members",
+		addFriendsText = "Feature.Chat.Label.AddFriends",
 		leaveGroupText = "Feature.Chat.Heading.LeaveGroup",
+		chatGroupText = GetFFlagIsSquadEnabled() and "Feature.Chat.Label.GroupName" or "Feature.Chat.Label.ChatGroupName",
 		onlinePresenceText = "Common.Presence.Label.Online",
 		offlinePresenceText = "Common.Presence.Label.Offline",
+		tooManyPeopleText = {
+			GetFFlagIsSquadEnabled() and "Feature.Chat.Message.AddFriendsPartyLimit" or "Feature.Chat.Message.AddFriendsLimit",
+			friendNum = 5,
+			connectionsNum = 5
+		},
 		networkErrorToastText = "Feature.Toast.NetworkingError.SomethingIsWrong",
 		conversationTypeHeaderText = "Feature.Chat.Label.ExpandedChatFeatures",
 		enabledText = "Feature.Chat.Label.Available",
 		disabledText = "Feature.Chat.Label.Unavailable",
 		createUnfilteredChatText = "Feature.Chat.Label.CreateUnfilteredChat",
-		createUnfilteredChatSubtitleText = "Feature.Chat.Description.CreateUnfilteredChatCell",
-		pageHeaderText = not GetFFlagIsSquadEnabled() and "Feature.Chat.Label.ChatDetails" or "Feature.Chat.Label.Details",
-		addFriendsText = not FFlagConnectionsToFriendsRename and "Feature.Chat.Label.AddConnections" or "Feature.Chat.Label.AddFriends",
-		chatGroupText = not GetFFlagIsSquadEnabled() and "Feature.Chat.Label.ChatGroupName" or "Feature.Chat.Label.GroupName",
-		tooManyPeopleText = {
-			if not GetFFlagIsSquadEnabled() then not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.AddConnectionsLimit" or "Feature.Chat.Message.AddFriendsLimit" else not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.AddConnectionsPartyLimit" or "Feature.Chat.Message.AddFriendsPartyLimit",
-			friendNum = 5,
-			connectionsNum = 5
-		}
+		createUnfilteredChatSubtitleText = "Feature.Chat.Description.CreateUnfilteredChatCell"
 	})
-	local v47 = React.useContext(LuaAppNavigationContext)
-	local v48 = useDispatch()
-	local v49, v50 = useState(false)
-	local u51 = nil
-	local u52 = nil
-	local v53 = nil
-	local u54 = nil
 
-	if v44 then
-		local v55, v56 = useState(nil)
-
-		u51 = v55
-		u52 = v56
-
-		local v57
-
-		v53, v57 = useState(nil)
-		u54 = v57
-	end
-
-	local v58 = useNavigation()
-	local v59 = useIsGroupChatEnabled()
-	local v60 = useIsChatEnabled()
-
-	useEffect(function() -- line: 123
-		-- upvalues: v60 (copy), v43 (copy)
-		if not v60 then
-			v43.navigateToChatLanding()
+	local v3 = React.useContext(LuaAppNavigationContext)
+	local v4 = useDispatch()
+	local state, setState = useState(false)
+	local state2, setState2 = useState(nil)
+	local state3, setState3 = useState(nil)
+	local v5 = useNavigation()
+	local shouldShowAddFriends = useIsGroupChatEnabled()
+	local v6 = useIsChatEnabled()
+	useEffect(function()
+		if not v6 then
+			joined.navigateToChatLanding()
 		end
-	end, {
-		v60,
-		v43.navigateToChatLanding
-	})
+	end, { v6, joined.navigateToChatLanding })
 
-	local v61 = useSelector(function(p2) -- line: 129
-		-- upvalues: getDeepValue (copy), v43 (copy), Conversation (copy)
-		return getDeepValue(p2, `ChatAppReducer.Conversations.{ v43.conversationId or "" }`) or Conversation.empty()
+	local conversation = useSelector(function(p)
+		return getDeepValue(p, `ChatAppReducer.Conversations.{joined.conversationId or ""}`) or Conversation.empty()
 	end)
-	local v62 = useSelector(function(p3) -- line: 133
-		-- upvalues: getDeepValue (copy), v43 (copy)
-		return getDeepValue(p3, `ChatAppReducer.ParticipantMetadata.{ v43.conversationId or "" }`)
-	end)
-	local v63 = v61 and v61.source
 
-	useEffect(function() -- line: 138
-		-- upvalues: v63 (copy), v48 (copy), AppChatNetworking (copy), v43 (copy)
-		if v63 ~= "channels" then
+	local v7 = useSelector(function(p)
+		return getDeepValue(p, `ChatAppReducer.ParticipantMetadata.{joined.conversationId or ""}`)
+	end)
+
+	local source = conversation and conversation.source
+
+	useEffect(function()
+		if source ~= "channels" then
 			return
 		end
 
-		v48(AppChatNetworking.rodux.GetConversationsParticipantsMetadata.API({ v43.conversationId })):catch(function() -- line: 144
+		v4(AppChatNetworking.rodux.GetConversationsParticipantsMetadata.API({ joined.conversationId })):catch(function()
 			warn("Error in ChatDetailsContainer -> GetConversationsParticipantsMetadata")
 		end)
-	end, {
-		v43.conversationId,
-		v43.participants,
-		v63
-	})
+	end, { joined.conversationId, joined.participants, source })
 
-	local v64 = useUserProfilesFetch({
-		userIds = v61.participants,
-		query = userProfilesCombinedNameAndUsernameByUserIds
-	})
-	local v65 = useTelemetry(ChatDetailsTelemetryLayer.Context)
-	local v66 = nil
-	local u67 = nil
-	local u68 = nil
-	local v69 = nil
-	local v70 = nil
-	local u71 = nil
-	local v72 = nil
+	local v8 = nil
+	local v9 = nil
 
-	if v61 then
-		v66 = useSelector(function(p4) -- line: 163
-			-- upvalues: FFlagAppChatAlwaysDisplayUserCardsInChatDetails (copy), selectChatUserEntryModelList (copy), v61 (copy), v64 (copy)
-			if FFlagAppChatAlwaysDisplayUserCardsInChatDetails then
-				return selectChatUserEntryModelList(p4, v61.participants, if not v64 or not v64.data then nil else v64.data.userProfiles)
+	if FFlagAppChatUseUserProfileHydration then
+		v9 = useProfileNames(conversation.participants)
+	else
+		v8 = useUserProfilesFetch({
+			userIds = conversation.participants,
+			query = userProfilesCombinedNameAndUsernameByUserIds
+		})
+	end
+
+	local v10 = useTelemetry(ChatDetailsTelemetryLayer.Context)
+	local values, isGroupConversation, isGroupOwner, conversationTitle, v11, shouldHideGroupChatFunctionality, flag
+
+	if conversation then
+		values = useSelector(function(p)
+			local participants = conversation.participants
+			local v12
+
+			if FFlagAppChatUseUserProfileHydration then
+				v12 = getParticipantProfiles(v9, conversation.participants)
+			elseif v8 and v8.data then
+				v12 = v8.data.userProfiles
 			end
 
-			if v64.data then
-				return selectChatUserEntryModelList(p4, v61.participants, v64.data.userProfiles)
+			return selectChatUserEntryModelList(p, participants, v12)
+		end)
+
+		isGroupConversation = conversation.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
+		isGroupOwner = useSelector(function(p)
+			return isGroupConversation and conversation.initiator == p.LocalUserId
+		end)
+
+		conversationTitle = getConversationTitle(conversation)
+
+		if v7 then
+			for k, v12 in values do
+				values[k] = Cryo.Dictionary.join(v12, { metadata = v7[k] })
 			end
+		end
 
-			return {}
-		end)
-		u68 = v61.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
-		u67 = useSelector(function(p5) -- line: 183
-			-- upvalues: u68 (ref), v61 (copy)
-			return u68 and v61.initiator == p5.LocalUserId
-		end)
-		v69 = getConversationTitle(v61)
+		v11 = useIsUserPending(conversation)
+		shouldHideGroupChatFunctionality = isGroupConversation and v11
 
-		if v62 then
-			for v73, v74 in v66 do
-				v66[v73] = Cryo.Dictionary.join(v74, {
-					metadata = v62[v73]
+		if shouldHideGroupChatFunctionality then
+			shouldShowAddFriends = false
+		end
+
+		if conversation.moderationType == ConversationChannels.ModerationType.TrustedComms then
+			flag = true
+		else
+			flag = false
+		end
+	else
+		isGroupOwner = nil
+		isGroupConversation = nil
+	end
+
+	local v12 = values and #values or 0
+	local conversationTypeText
+
+	if flag then
+		conversationTypeText = v2.enabledText
+	else
+		conversationTypeText = v2.disabledText
+	end
+
+	if conversation.isDefaultTitle then
+		conversationTitle = v2.titleNotSetText
+	end
+
+	local function onGroupNameEntryCellActivated()
+		joined.navigateToDialog(GenericDialogType.EditChatGroupNameDialog, {
+			conversationId = joined.conversationId
+		})
+	end
+	local function onLeaveGroupCellActivated()
+		local isRooted
+
+		if getFFlagAppChatEnableRootedNavigation() and v5 then
+			isRooted = v5.getParam("isRooted", false)
+		else
+			isRooted = false
+		end
+
+		joined.navigateToDialog(GenericDialogType.LeaveGroupDialog, {
+			conversationId = joined.conversationId,
+			isRooted = isRooted
+		})
+
+		v10.emit(ChatDetailsTelemetryEvents.ChatDetailsLeaveGroupBtnClicked, {})
+	end
+	local onConversationTypeIconActivated = useCallback(function()
+		if v5 then
+			v3.navigateToUnfilteredThreadsLearnMore(v5.navigate)
+		else
+			v3.navigateToUnfilteredThreadsLearnMore()
+		end
+	end, { v3, v5 })
+	local onCreateUnfilteredChatCellActivated = useCallback(function()
+		v10.emit(ChatDetailsTelemetryEvents.ChatDetailsCreateUnfilteredChatCellClicked, {})
+		setState(true)
+		v4(AppChatNetworking.rodux.DuplicateConversation.API(joined.conversationId, "trusted_comms")):andThen(function(p)
+			local responseBody = p.responseBody
+
+			local id = responseBody
+				and responseBody.conversations
+				and responseBody.conversations[1]
+				and responseBody.conversations[1].id
+
+			if id then
+				joined.navigateToConversation(id)
+			else
+				joined.navigateToToast({
+					toastProps = {
+						toastContent = { toastTitle = v2.networkErrorToastText }
+					}
 				})
 			end
-		end
-
-		u71 = useIsUserPending(v61)
-		v70 = u68 and u71
-
-		if v70 then
-			v59 = false
-		end
-
-		v72 = v61.moderationType == ConversationChannels.ModerationType.TrustedComms
-	end
-
-	local v75 = v66 and #v66 or 0
-	local v76 = if not v72 then v46.disabledText else v46.enabledText
-
-	if v61.isDefaultTitle then
-		v69 = v46.titleNotSetText
-	end
-
-	local v77 = useCallback(function() -- line: 232
-		-- upvalues: v58 (copy), v47 (copy)
-		if v58 then
-			v47.navigateToUnfilteredThreadsLearnMore(v58.navigate)
-
-			return
-		end
-
-		v47.navigateToUnfilteredThreadsLearnMore()
-	end, {
-		v47,
-		v58
-	})
-	local v78 = useCallback(function() -- line: 240
-		-- upvalues: v65 (copy), ChatDetailsTelemetryEvents (copy), v50 (copy), v48 (copy), AppChatNetworking (copy), v43 (copy), v46 (copy)
-		v65.emit(ChatDetailsTelemetryEvents.ChatDetailsCreateUnfilteredChatCellClicked, {})
-		v50(true)
-		v48(AppChatNetworking.rodux.DuplicateConversation.API(v43.conversationId, "trusted_comms")):andThen(function(p6) -- line: 244
-			-- upvalues: v43 (copy), v46 (copy)
-			local responseBody = p6.responseBody
-			local v101 = responseBody and (responseBody.conversations and (responseBody.conversations[1] and responseBody.conversations[1].id))
-
-			if v101 then
-				v43.navigateToConversation(v101)
-
-				return
-			end
-
-			v43.navigateToToast({
+		end):catch(function()
+			joined.navigateToToast({
 				toastProps = {
-					toastContent = {
-						toastTitle = v46.networkErrorToastText
-					}
+					toastContent = { toastTitle = v2.networkErrorToastText }
 				}
 			})
-		end):catch(function() -- line: 262
-			-- upvalues: v43 (copy), v46 (copy)
-			v43.navigateToToast({
-				toastProps = {
-					toastContent = {
-						toastTitle = v46.networkErrorToastText
-					}
-				}
-			})
-		end):finally(function() -- line: 271
-			-- upvalues: v50 (copy)
-			v50(false)
+		end):finally(function()
+			setState(false)
 		end)
 	end, {
-		v48,
-		v50,
-		v43.navigateToToast,
-		v43.navigateToConversation,
-		v43.conversationId,
-		v75,
-		u67,
-		v65
+		v4,
+		setState,
+		joined.navigateToToast,
+		joined.navigateToConversation,
+		joined.conversationId,
+		v12,
+		isGroupOwner,
+		v10
 	})
 
-	local function v79(p7) -- line: 314
-		-- upvalues: v43 (copy)
-		v43.navigateToToast({
+	local function onDismiss() -- 1 equivalent call inferred from this helper
+		setState2(nil)
+		setState3(nil)
+	end
+
+	local function fn(toastTitle)
+		joined.navigateToToast({
 			toastProps = {
-				toastContent = {
-					toastTitle = p7
-				}
+				toastContent = { toastTitle = toastTitle }
 			}
 		})
 	end
-	local function v80(p8) -- line: 324
-		-- upvalues: v61 (copy), Promise (copy), v43 (copy), v79 (copy), v65 (copy), ChatDetailsTelemetryEvents (copy)
-		local v96 = v61
 
-		Promise.new(function(resolve, reject) -- line: 211
-			-- upvalues: v96 (copy)
-			if #v96.participants > 5 then
-				reject()
-
-				return
+	local function fn2(tooManyPeopleText)
+		local v13 = conversation
+		Promise.new(function(callback, callback2)
+			if #v13.participants > 5 then
+				callback2()
+			else
+				callback()
 			end
-
-			resolve()
-		end):andThen(function() -- line: 325
-			-- upvalues: v43 (copy), v61 (copy)
-			v43.navigateToEditChatMembers(v61)
-		end, function() -- line: 328
-			-- upvalues: v79 (copy), p8 (copy)
-			v79(p8)
+		end):andThen(function()
+			joined.navigateToEditChatMembers(conversation)
+		end, function()
+			fn(tooManyPeopleText)
 		end)
-		v65.emit(ChatDetailsTelemetryEvents.ChatDetailsAddFriendsBtnClicked, {})
+		v10.emit(ChatDetailsTelemetryEvents.ChatDetailsAddFriendsBtnClicked, {})
 	end
 
-	local v81 = v61 and v61.moderationType or Cryo.None
-	local v82 = v61 and v61.userPendingStatus or Cryo.None
-	local v83 = ChatConversationTelemetryState.useMergeState()
-
-	useEffect(function() -- line: 338
-		-- upvalues: v83 (copy), v43 (copy), v81 (copy), v82 (copy)
-		v83({
-			conversationId = v43.conversationId,
-			moderationType = v81,
-			userPendingStatus = v82
-		})
-	end, {
-		v43.conversationId,
-		v81,
-		v82
-	})
-
-	local v84 = ChatDetailsTelemetryState.useMergeState()
-
-	useEffect(function() -- line: 346
-		-- upvalues: v84 (copy), v61 (copy), u67 (ref)
-		v84({
-			participantsCount = #v61.participants,
-			isGroupOwner = u67
-		})
-	end, {
-		#v61.participants,
-		u67
-	})
-	useEffectOnMount(function() -- line: 353
-		-- upvalues: v65 (copy), ChatDetailsTelemetryEvents (copy), u68 (ref)
-		v65.emit(ChatDetailsTelemetryEvents.ScreenRendered, {
-			isGroupConversation = u68
-		})
+	local v13 = useAppPolicy(function(p)
+		return p.getWebViewSupport()
 	end)
 
-	local v85 = Cryo.Dictionary.join({
-		shouldShowCreateUnfilteredChat = false,
-		LayoutOrder = 2,
-		navigateBack = v43.navigateBack,
-		onGroupNameEntryCellActivated = function() -- line: 221
-			-- upvalues: v43 (copy), GenericDialogType (copy)
-			v43.navigateToDialog(GenericDialogType.EditChatGroupNameDialog, {
-				conversationId = v43.conversationId
-			})
-		end,
-		onLeaveGroupCellActivated = function() -- line: 226
-			-- upvalues: v43 (copy), GenericDialogType (copy), v65 (copy), ChatDetailsTelemetryEvents (copy)
-			v43.navigateToDialog(GenericDialogType.LeaveGroupDialog, {
-				conversationId = v43.conversationId
-			})
-			v65.emit(ChatDetailsTelemetryEvents.ChatDetailsLeaveGroupBtnClicked, {})
-		end,
-		onParticipantCellActivated = function(p9, p10) -- line: 294
-			-- upvalues: v44 (copy), u52 (ref), u54 (ref), u51 (ref), v43 (copy), GenericDialogType (copy), u71 (ref), u68 (ref), u67 (ref)
-			local str = tostring(p9)
+	local placementInExperience = isPlacementInExperience(useChatPlacementContext().chatPlacement)
 
-			if v44 and u52 and u54 then
-				if str == u51 then
-					if u52 and u54 then
-						u52(nil)
-						u54(nil)
+	local moderationType = conversation and conversation.moderationType or Cryo.None
+	local userPendingStatus = conversation and conversation.userPendingStatus or Cryo.None
+	local v14 = ChatConversationTelemetryState.useMergeState()
+	useEffect(function()
+		v14({
+			conversationId = joined.conversationId,
+			moderationType = moderationType,
+			userPendingStatus = userPendingStatus
+		})
+	end, { joined.conversationId, moderationType, userPendingStatus })
+	local v15 = ChatDetailsTelemetryState.useMergeState()
+	useEffect(function()
+		v15({
+			participantsCount = #conversation.participants,
+			isGroupOwner = isGroupOwner
+		})
+	end, { #conversation.participants, isGroupOwner })
 
-						return
-					end
-				else
-					u52(str)
-					u54(p10)
-				end
+	useEffectOnMount(function()
+		v10.emit(ChatDetailsTelemetryEvents.ScreenRendered, {
+			isGroupConversation = isGroupConversation
+		})
+	end)
+	local joined2 = Cryo.Dictionary.join({
+		navigateBack = joined.navigateBack,
+		onGroupNameEntryCellActivated = onGroupNameEntryCellActivated,
+		onLeaveGroupCellActivated = onLeaveGroupCellActivated,
+		onParticipantCellActivated = function(p, p2)
+			local v16 = tostring(p)
 
-				return
+			if state2 == v16 then
+				onDismiss() -- inferred equivalent call
+			else
+				setState2(v16)
+				setState3(p2)
 			end
-
-			v43.navigateToDialog(GenericDialogType.ParticipantDialog, {
-				conversationId = v43.conversationId,
-				participantId = str,
-				showRemoveUserButton = not u71 and (u68 and u67)
-			})
 		end,
-		onAddFriendsCellActivated = function() -- line: 364
-			-- upvalues: v80 (copy), v46 (copy)
-			return v80(v46.tooManyPeopleText)
+		onAddFriendsCellActivated = function()
+			return fn2(v2.tooManyPeopleText)
 		end,
-		onConversationTypeIconActivated = v77,
-		onCreateUnfilteredChatCellActivated = v78,
-		conversationTitle = v69,
-		conversation = v61,
-		conversationId = v43.conversationId,
-		participants = v66,
-		isGroupConversation = u68,
-		wideMode = v43.wideMode,
-		shouldHideGroupChatFunctionality = v70,
-		shouldShowAddFriends = v59,
-		conversationTypeText = v76,
-		isCreateUnfilteredChatLoading = v49,
-		topBarHeight = v43.topBarHeight,
-		style = v45
-	}, v46)
+		onConversationTypeIconActivated = onConversationTypeIconActivated,
+		onCreateUnfilteredChatCellActivated = onCreateUnfilteredChatCellActivated,
+		conversationTitle = conversationTitle,
+		conversation = conversation,
+		conversationId = joined.conversationId,
+		participants = values,
+		isGroupConversation = isGroupConversation,
+		wideMode = joined.wideMode,
+		shouldHideGroupChatFunctionality = shouldHideGroupChatFunctionality,
+		shouldShowAddFriends = shouldShowAddFriends,
+		shouldShowCreateUnfilteredChat = false,
+		shouldShowConversationTypeInfo = v13 or placementInExperience,
+		conversationTypeText = conversationTypeText,
+		isCreateUnfilteredChatLoading = state,
+		topBarHeight = joined.topBarHeight,
+		LayoutOrder = 2,
+		style = style
+	}, v2)
 
-	if v44 then
-		v85.activeParticipantId = u51
-	end
+	joined2.activeParticipantId = state2
 
-	return React.createElement("ImageButton", {
+	local createElement = React.createElement
+	local v16 = {
+		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundTransparency = 1,
 		Active = true,
 		AutoButtonColor = false,
-		Selectable = false,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
+		Selectable = false
+	}
+
+	local v17 = {
 		ChatDetailsPage = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0)
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1
 		}, {
 			UIListLayout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			Content = React.createElement(ChatDetailsPage, v85)
+			Content = React.createElement(ChatDetailsPage, joined2)
 		}),
-		ParticipantDialog = if not v44 or u51 == nil then nil else React.createElement(ParticipantDialogContainer, {
-			anchorRef = v53,
-			conversationId = v43.conversationId,
-			isWideMode = v43.wideMode,
-			navigateToDialog = v43.navigateToDialog,
-			onDismiss = function() -- line: 287
-				-- upvalues: u52 (ref), u54 (ref)
-				if u52 and u54 then
-					u52(nil)
-					u54(nil)
-				end
-			end,
-			participantId = u51,
-			showRemoveUserButton = not u71 and (u68 and u67)
+		ParticipantDialog = 0
+	}
+	local participantDialog
+
+	if state2 ~= nil then
+		participantDialog = React.createElement(ParticipantDialogContainer, {
+			anchorRef = state3,
+			conversationId = joined.conversationId,
+			isWideMode = joined.wideMode,
+			navigateToDialog = joined.navigateToDialog,
+			onDismiss = onDismiss,
+			participantId = state2,
+			showRemoveUserButton = not v11 and isGroupConversation and isGroupOwner
 		})
-	})
+	end
+
+	v17.ParticipantDialog = participantDialog
+	return createElement("ImageButton", v16, v17)
 end

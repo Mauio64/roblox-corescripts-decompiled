@@ -1,60 +1,77 @@
 local AvatarExperienceUIKit = script:FindFirstAncestor("AvatarExperienceUIKit")
-local AvatarExperienceUIKitParent = AvatarExperienceUIKit.Parent
-local React = require(AvatarExperienceUIKitParent.React)
-local Foundation = require(AvatarExperienceUIKitParent.Foundation)
+local parent = AvatarExperienceUIKit.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
-local UIBlox = require(AvatarExperienceUIKitParent.UIBlox)
+local UIBlox = require(parent.UIBlox)
 local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
-local FFlagAXMigrateAXToGlobalAutofocus = require(AvatarExperienceUIKitParent.SharedFlags).FFlagAXMigrateAXToGlobalAutofocus
-
 require(AvatarExperienceUIKit.BackgroundLayers.BackgroundLayers)
-
 local ItemCardBackgroundsWrapper = require(script.Parent.ItemCardBackgroundsWrapper)
-local AvatarExperienceFlags = require(AvatarExperienceUIKitParent.AvatarExperienceFlags)
-local FFlagAXMISEnableMultiShopping = AvatarExperienceFlags.FFlagAXMISEnableMultiShopping
-local FFlagAXSelectedBorderWrapsBackground = AvatarExperienceFlags.FFlagAXSelectedBorderWrapsBackground
 
-return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 32
-	-- upvalues: FFlagAXMigrateAXToGlobalAutofocus (copy), useSelectionCursor (copy), CursorKind (copy), useTokens (copy), React (copy), FFlagAXMISEnableMultiShopping (copy), ItemCardBackgroundsWrapper (copy), FFlagAXSelectedBorderWrapsBackground (copy), View (copy)
-	local v17 = if not FFlagAXMigrateAXToGlobalAutofocus then nil else useSelectionCursor(CursorKind.RoundedRect)
-	local v18 = useTokens()
+return (React.forwardRef(function(props, ref)
+	local selectionImageObject = useSelectionCursor(CursorKind.RoundedRect)
+	local v = useTokens()
+	local createElement = React.createElement
 
-	return React.createElement("TextButton", {
-		Selectable = if not FFlagAXMISEnableMultiShopping then nil else t1.Selectable,
-		SelectionImageObject = v17,
-		Text = "",
-		AutoButtonColor = false,
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		[React.Event.Activated] = if not t1.isDisabled then t1.onActivated else nil,
-		ref = p1,
-		Size = t1.Size,
-		AutomaticSize = t1.AutomaticSize,
-		LayoutOrder = t1.LayoutOrder,
-		SelectionGroup = true,
-		[React.Tag] = t1.tag
-	}, if t1.backgroundLayers == nil or not (#t1.backgroundLayers > 0) then {
-		ItemCardListLayout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = UDim.new(0, v18.Gap.Small)
-		}),
-		ItemCardHeaderSlot = t1.headerSlot,
-		ItemCardFooterSlot = t1.footerSlot
-	} else {
-		BackgroundsWrapper = React.createElement(ItemCardBackgroundsWrapper, {
-			backgroundLayers = t1.backgroundLayers,
-			imageScaleType = t1.imageScaleType,
-			headerSlot = t1.headerSlot,
-			footerSlot = t1.footerSlot
-		}),
-		SelectedBorder = if not FFlagAXSelectedBorderWrapsBackground or not t1.showSelectionBorderWithBackground then nil else React.createElement(View, {
-			tag = "size-full stroke-standard stroke-system-contrast radius-medium",
-			testId = "card-selection-stroke",
-			ZIndex = 2
-		})
-	})
+	local v2 = {}
+	v2.Selectable = props.Selectable
+	v2.SelectionImageObject = selectionImageObject
+	v2.Text = ""
+	v2.AutoButtonColor = false
+	v2.BackgroundTransparency = 1
+	v2.BorderSizePixel = 0
+	local activated = React.Event.Activated
+	local v3
+
+	if not props.isDisabled then
+		v3 = props.onActivated
+	end
+
+	v2[activated] = v3
+	v2.ref = ref
+	v2.Size = props.Size
+	v2.AutomaticSize = props.AutomaticSize
+	v2.LayoutOrder = props.LayoutOrder
+	v2.SelectionGroup = true
+	v2[React.Change.AbsoluteSize] = props.onAbsoluteSizeChanged
+	v2[React.Tag] = props.tag
+	local v4
+
+	if props.backgroundLayers == nil or not (#props.backgroundLayers > 0) then
+		v4 = {
+			ItemCardListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				Padding = UDim.new(0, v.Gap.Small)
+			}),
+			ItemCardHeaderSlot = props.headerSlot,
+			ItemCardFooterSlot = props.footerSlot
+		}
+	else
+		v4 = {
+			BackgroundsWrapper = React.createElement(ItemCardBackgroundsWrapper, {
+				backgroundLayers = props.backgroundLayers,
+				imageScaleType = props.imageScaleType,
+				headerSlot = props.headerSlot,
+				footerSlot = props.footerSlot
+			}),
+			SelectedBorder = 0
+		}
+		local selectedBorder
+
+		if props.showSelectionBorderWithBackground then
+			selectedBorder = React.createElement(View, {
+				tag = "size-full stroke-standard stroke-system-contrast radius-medium",
+				testId = "card-selection-stroke",
+				ZIndex = 2
+			})
+		end
+
+		v4.SelectedBorder = selectedBorder
+	end
+
+	return createElement("TextButton", v2, v4)
 end))

@@ -1,59 +1,103 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
-local Localization = require(MomentsParent.Localization)
+local parent = Moments.Parent
 
-require(MomentsParent.MomentsTypes)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+require(parent.MomentsTypes)
 
 local FeedContext = require(Moments.Components.Feed.FeedContext)
 local SignalActionType = require(Moments.Enums.SignalActionType)
 local MomentContext = require(Moments.Components.Feed.Items.Moment.MomentContext)
 local makeRecommendationAttribution = require(Moments.Analytics.makeRecommendationAttribution)
+local FFlagMomentsRecommendationContentType = require(Moments.Flags.FFlagMomentsRecommendationContentType)
+
 local shareMoment = require(script.Parent.shareMoment)
+
 local useLocalization = Localization.Hooks.useLocalization
-local t1 = {
+
+local v = {
 	shareLinkTitle = "Feature.Moments.Label.ShareLinkTitle",
 	linkCopied = "Feature.Moments.Label.LinkCopied",
 	linkCopyFailed = "Feature.Moments.Label.LinkCopyFailed"
 }
 
-local function useShareMoment(p1) -- line: 32
-	-- upvalues: MomentContext (copy), React (copy), FeedContext (copy), useLocalization (copy), t1 (copy), makeRecommendationAttribution (copy), SignalActionType (copy), shareMoment (copy)
-	local momentId = MomentContext.useMoment().momentId
-	local v15 = React.useContext(FeedContext.FeedContext)
-	local v16 = useLocalization(t1)
+local function useShareMoment(p)
+	local v2 = MomentContext.useMoment()
+	local momentId = v2.momentId
+	local v3 = React.useContext(FeedContext.FeedContext)
+
+	local v4 = useLocalization(v)
+
+	local useCallback = React.useCallback
+	local function fn()
+		local recommendationMetadata
+
+		if p then
+			recommendationMetadata = p.recommendationMetadata
+		end
+
+		local v5
+
+		if FFlagMomentsRecommendationContentType then
+			v5 = v2.store.getData(false).contentType
+		end
+
+		local recommendationAttribution = makeRecommendationAttribution(recommendationMetadata, nil, v5)
+
+		local fn2 = nil
+
+		fn2 = recommendationAttribution and v3 and function(p2)
+			return v3.logAction(SignalActionType.Share, recommendationAttribution, p2)
+		end or fn2
+
+		local v6 = {
+			momentId = momentId,
+			feedItemId = 0,
+			feedSessionId = 0,
+			description = 0,
+			logAction = 0,
+			strings = 0
+		}
+		local feedItemId
+
+		if p and p.recommendationMetadata then
+			feedItemId = p.recommendationMetadata.feedItemId
+		end
+
+		v6.feedItemId = feedItemId
+		local feedSessionId
+
+		if p and p.recommendationMetadata then
+			feedSessionId = p.recommendationMetadata.tracingId
+		end
+
+		v6.feedSessionId = feedSessionId
+		local description
+
+		if p and p.metadata then
+			description = p.metadata.description
+		end
+
+		v6.description = description
+		v6.logAction = fn2
+		v6.strings = {
+			linkPreviewTitle = v4.shareLinkTitle,
+			linkCopied = v4.linkCopied,
+			linkCopyFailed = v4.linkCopyFailed
+		}
+		shareMoment(v6)
+	end
+
+	local v5
+
+	if FFlagMomentsRecommendationContentType then
+		v5 = v2.store
+	else
+		v5 = false
+	end
 
 	return {
-		onShareActivated = React.useCallback(function() -- line: 40
-			-- upvalues: makeRecommendationAttribution (copy), p1 (copy), v15 (copy), SignalActionType (copy), shareMoment (copy), momentId (copy), v16 (copy)
-			local v17 = makeRecommendationAttribution(if not p1 then nil else p1.recommendationMetadata)
-			local v18 = nil
-
-			if v17 and v15 then
-				function v18(t2: {[any]: any}) -- line: 49
-					-- upvalues: v15 (copy), SignalActionType (copy), v17 (copy)
-					return v15.logAction(SignalActionType.Share, v17, t2)
-				end
-			end
-
-			shareMoment({
-				momentId = momentId,
-				feedItemId = if not p1 or not p1.recommendationMetadata then nil else p1.recommendationMetadata.feedItemId,
-				feedSessionId = if not p1 or not p1.recommendationMetadata then nil else p1.recommendationMetadata.tracingId,
-				description = if not p1 or not p1.metadata then nil else p1.metadata.description,
-				logAction = v18,
-				strings = {
-					linkPreviewTitle = v16.shareLinkTitle,
-					linkCopied = v16.linkCopied,
-					linkCopyFailed = v16.linkCopyFailed
-				}
-			})
-		end, {
-			momentId,
-			p1,
-			v15,
-			v16
-		})
+		onShareActivated = useCallback(fn, { momentId, p, v3, v4, v5 })
 	}
 end
 

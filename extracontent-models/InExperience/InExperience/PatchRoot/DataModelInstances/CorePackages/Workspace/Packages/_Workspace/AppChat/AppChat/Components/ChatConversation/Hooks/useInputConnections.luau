@@ -1,63 +1,49 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-local function useInputConnections(t1: {[any]: any}) -- line: 13
-	-- upvalues: React (copy)
-	local v5 = React.useRef(false)
-	local v6 = React.useRef(nil)
-	local v7 = React.useRef(nil)
-	local v8 = React.useCallback(function() -- line: 18
-		-- upvalues: v6 (copy), v7 (copy), v5 (copy)
-		if v6.current then
-			v6.current:Disconnect()
-			v6.current = nil
+local React = require(parent.React)
+
+local function useInputConnections(data)
+	local ref = React.useRef(false)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+
+	local disconnectInputConnection = React.useCallback(function()
+		if ref2.current then
+			ref2.current:Disconnect()
+			ref2.current = nil
 		end
 
-		if v7.current then
-			v7.current:Disconnect()
-			v7.current = nil
+		if ref3.current then
+			ref3.current:Disconnect()
+			ref3.current = nil
 		end
 
-		v5.current = false
+		ref.current = false
 	end, {})
-	local v9 = React.useCallback(function(p1) -- line: 32
-		-- upvalues: v5 (copy), v6 (copy), t1 (copy), v7 (copy), v8 (copy)
-		if p1 and not v5.current then
-			v6.current = t1.userInputService.InputBegan:Connect(t1.onInputBegan)
-			v7.current = t1.userInputService.InputEnded:Connect(t1.onInputEnded)
-			v5.current = true
 
-			return
-		end
+	local focusChanged = React.useCallback(function(p)
+		if p and not ref.current then
+			ref2.current = data.userInputService.InputBegan:Connect(data.onInputBegan)
+			ref3.current = data.userInputService.InputEnded:Connect(data.onInputEnded)
+			ref.current = true
+		elseif not p and ref.current then
+			disconnectInputConnection()
 
-		if not p1 and v5.current then
-			v8()
-
-			if t1.onFocusLost then
-				t1.onFocusLost()
+			if data.onFocusLost then
+				data.onFocusLost()
 			end
 		end
-	end, {
-		t1.onInputBegan,
-		t1.onInputEnded,
-		v8,
-		t1.onFocusLost
-	})
+	end, { data.onInputBegan, data.onInputEnded, disconnectInputConnection, data.onFocusLost })
 
-	React.useEffect(function() -- line: 53
-		-- upvalues: v5 (copy), v8 (copy)
-		return function() -- line: 54
-			-- upvalues: v5 (copy), v8 (copy)
-			if v5.current then
-				v8()
+	React.useEffect(function()
+		return function()
+			if ref.current then
+				disconnectInputConnection()
 			end
 		end
-	end, { v8 })
+	end, { disconnectInputConnection })
 
-	return {
-		focusChanged = v9,
-		disconnectInputConnection = v8
-	}
+	return { focusChanged = focusChanged, disconnectInputConnection = disconnectInputConnection }
 end
 
 return useInputConnections

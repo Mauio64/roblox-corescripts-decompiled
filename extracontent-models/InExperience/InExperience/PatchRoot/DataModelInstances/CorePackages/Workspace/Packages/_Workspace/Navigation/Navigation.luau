@@ -1,7 +1,9 @@
 require(script.types)
 
 local ViewState = require(script.ViewState)
+
 local createSignalsNavigationObject = require(script.createSignalsNavigationObject)
+
 local createProjectedNavigationObject = require(script.createProjectedNavigationObject)
 
 return {

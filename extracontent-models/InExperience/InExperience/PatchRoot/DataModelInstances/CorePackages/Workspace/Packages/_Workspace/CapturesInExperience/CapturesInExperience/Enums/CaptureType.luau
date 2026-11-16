@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-return require(ParentParent.CapturesCommon).Enums.CaptureType
+local CapturesCommon = require(parent.CapturesCommon)
+return CapturesCommon.Enums.CaptureType

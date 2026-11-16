@@ -1,4 +1,7 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceFlags").Parent
-local FFlagUnifiedPurchaseOptimizeTTIMarketplace = require(Parent.SharedFlags).FFlagUnifiedPurchaseOptimizeTTIMarketplace
+local parent = script:FindFirstAncestor("AvatarExperienceFlags").Parent
 
-return game:DefineFastFlag("UnifiedPurchaseOptimizeTTIMarketplaceIntegration", false) and FFlagUnifiedPurchaseOptimizeTTIMarketplace
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUnifiedPurchaseOptimizeTTIMarketplace = SharedFlags.FFlagUnifiedPurchaseOptimizeTTIMarketplace
+
+return game:DefineFastFlag("UnifiedPurchaseOptimizeTTIMarketplaceIntegration", false)
+	and FFlagUnifiedPurchaseOptimizeTTIMarketplace

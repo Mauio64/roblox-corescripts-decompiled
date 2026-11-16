@@ -1,7 +1,6 @@
-local ParentParent = script.Parent.Parent
-local CloseResultModal = require(ParentParent.Actions.CloseResultModal)
+local parent = script.Parent.Parent
+local CloseResultModal = require(parent.Actions.CloseResultModal)
 
-return function(p1) -- line: 4
-	-- upvalues: CloseResultModal (copy)
-	p1:dispatch(CloseResultModal())
+return function(object)
+	object:dispatch(CloseResultModal())
 end

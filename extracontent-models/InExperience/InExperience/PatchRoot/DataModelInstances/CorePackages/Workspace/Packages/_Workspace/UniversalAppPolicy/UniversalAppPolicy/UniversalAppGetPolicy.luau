@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local PolicyProvider = require(parent.PolicyProvider)
 
-return (require(ParentParent.PolicyProvider).GetPolicyImplementations.MemStorageService("app-policy"))
+return (PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy"))

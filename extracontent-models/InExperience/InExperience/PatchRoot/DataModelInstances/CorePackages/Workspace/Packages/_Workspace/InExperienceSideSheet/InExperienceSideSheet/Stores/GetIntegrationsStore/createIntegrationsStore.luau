@@ -1,25 +1,32 @@
-local Parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
+local parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
 
-require(Parent.Chrome)
+require(parent.Chrome)
+local Signals = require(parent.Signals)
 
-local Signals = require(Parent.Signals)
+local function createIntegrationsStore()
+	local signal, setUnibarIntegrations = Signals.createSignal({})
+	local signal2, setAboveFoldIntegrations = Signals.createSignal({})
+	local signal3, setBelowFoldIntegrations = Signals.createSignal({})
 
-local function createIntegrationsStore() -- line: 21
-	-- upvalues: Signals (copy)
-	local v4, v5 = Signals.createSignal({})
-	local v6, v7 = Signals.createSignal({})
-	local v8, v9 = Signals.createSignal({})
-	local v10, v11 = Signals.createSignal({})
+	local signal4, setSessionActionIntegrations = Signals.createSignal({})
+
+	local signal5, setScrollableContentTopWidgetIntegrations = Signals.createSignal({})
+
+	local signal6, setScrollableContentBottomWidgetIntegrations = Signals.createSignal({})
 
 	return {
-		getUnibarIntegrations = v4,
-		setUnibarIntegrations = v5,
-		getToggleIntegrations = v6,
-		setToggleIntegrations = v7,
-		getPageIntegrations = v8,
-		setPageIntegrations = v9,
-		getSessionActionIntegrations = v10,
-		setSessionActionIntegrations = v11
+		getUnibarIntegrations = signal,
+		setUnibarIntegrations = setUnibarIntegrations,
+		getAboveFoldIntegrations = signal2,
+		setAboveFoldIntegrations = setAboveFoldIntegrations,
+		getBelowFoldIntegrations = signal3,
+		setBelowFoldIntegrations = setBelowFoldIntegrations,
+		getSessionActionIntegrations = signal4,
+		setSessionActionIntegrations = setSessionActionIntegrations,
+		getScrollableContentTopWidgetIntegrations = signal5,
+		setScrollableContentTopWidgetIntegrations = setScrollableContentTopWidgetIntegrations,
+		getScrollableContentBottomWidgetIntegrations = signal6,
+		setScrollableContentBottomWidgetIntegrations = setScrollableContentBottomWidgetIntegrations
 	}
 end
 

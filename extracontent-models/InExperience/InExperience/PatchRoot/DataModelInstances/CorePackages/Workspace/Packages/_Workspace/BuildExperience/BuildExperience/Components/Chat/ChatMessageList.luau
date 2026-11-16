@@ -1,39 +1,90 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
+local parent = BuildExperience.Parent
 
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
+local chatConstants = require(BuildExperience.Chat.chatConstants)
 require(BuildExperience.Chat.chatTypes)
+local FFlagBuildAgentAdCampaignCard = require(BuildExperience.Flags.FFlagBuildAgentAdCampaignCard)
 
 local View = Foundation.View
+
+local ChatHistoryLoadingState = require(script.Parent.ChatHistoryLoadingState)
 local ChatMessageItem = require(script.Parent.ChatMessageItem)
 
-local function ChatMessageList(t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), View (copy), ChatMessageItem (copy)
-	local t2 = {}
+local function ChatMessageList(props)
+	local children = {}
 
-	if #t1.messages == 0 and t1.emptyState ~= nil then
-		t2.EmptyState = React.createElement(View, {
-			LayoutOrder = 0,
-			tag = "col align-x-center align-y-center padding-large",
-			Size = UDim2.fromScale(1, 1)
-		}, t1.emptyState)
+	if #props.messages == 0 then
+		local v = props.emptyState
 
-		return t2
+		if props.isHistoryLoading then
+			v = React.createElement(ChatHistoryLoadingState)
+		end
+
+		if v ~= nil then
+			children.EmptyState = React.createElement(
+				View,
+				{
+					LayoutOrder = 0,
+					Size = UDim2.fromScale(1, 1),
+					tag = "col align-x-center align-y-center padding-large"
+				},
+				v
+			)
+		end
+
+		return children
 	end
 
-	for v10, v11 in t1.messages do
-		t2[v11.id or `Message{ v10 }`] = React.createElement(ChatMessageItem, {
-			message = v11,
-			LayoutOrder = v10,
-			clockBinding = t1.clockBinding,
-			localToolActions = t1.localToolActions,
-			onPlaytest = t1.onPlaytest,
-			isPlaytestLoading = t1.isPlaytestLoading
-		})
+	for k, message in props.messages do
+		local id = message.id or `Message{k}`
+		local createElement = React.createElement
+		local v = {
+			message = message,
+			LayoutOrder = k * chatConstants.MESSAGE_LAYOUT_ORDER_STRIDE,
+			clockBinding = props.clockBinding,
+			localToolActions = props.localToolActions,
+			onPlaytest = props.onPlaytest,
+			onPublish = props.onPublish,
+			isPlaytestLoading = props.isPlaytestLoading,
+			onAgentAdCampaignOfferSelected = 0,
+			isPageVisible = 0,
+			scrollingFrameRef = 0,
+			isAgentAdCampaignCreateDisabled = 0,
+			getAgentAdCampaignCardState = 0,
+			onAgentAdCampaignActive = 0
+		}
+		local onAgentAdCampaignOfferSelected
+
+		if FFlagBuildAgentAdCampaignCard then
+			onAgentAdCampaignOfferSelected = props.onAgentAdCampaignOfferSelected
+		end
+
+		v.onAgentAdCampaignOfferSelected = onAgentAdCampaignOfferSelected
+
+		v.isPageVisible = props.isPageVisible
+		v.scrollingFrameRef = props.scrollingFrameRef
+		v.isAgentAdCampaignCreateDisabled = props.isAgentAdCampaignCreateDisabled
+		local getAgentAdCampaignCardState
+
+		if FFlagBuildAgentAdCampaignCard then
+			getAgentAdCampaignCardState = props.getAgentAdCampaignCardState
+		end
+
+		v.getAgentAdCampaignCardState = getAgentAdCampaignCardState
+		local onAgentAdCampaignActive
+
+		if FFlagBuildAgentAdCampaignCard then
+			onAgentAdCampaignActive = props.onAgentAdCampaignActive
+		end
+
+		v.onAgentAdCampaignActive = onAgentAdCampaignActive
+		children[id] = createElement(ChatMessageItem, v)
 	end
 
-	return t2
+	return children
 end
 
 return ChatMessageList

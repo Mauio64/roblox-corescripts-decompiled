@@ -1,41 +1,74 @@
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
 
-require(InExperienceSideSheetParent.Chrome)
+local parent = InExperienceSideSheet.Parent
+require(parent.Chrome)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
 
-local Foundation = require(InExperienceSideSheetParent.Foundation)
-local React = require(InExperienceSideSheetParent.React)
-
-require(InExperienceSideSheetParent.Signals)
-
-local SignalsReact = require(InExperienceSideSheetParent.SignalsReact)
 local View = Foundation.View
+
 local VerticalItem = require(InExperienceSideSheet.Components.VerticalItem)
-local FFlagSideSheetFocusNav = require(InExperienceSideSheetParent.SharedFlags).FFlagSideSheetFocusNav
+local getDidSideSheetOpenWithPeoplePage = require(InExperienceSideSheet.Utils.getDidSideSheetOpenWithPeoplePage)
+local shouldShowInviteFriendsInSideSheet = require(InExperienceSideSheet.Utils.shouldShowInviteFriendsInSideSheet)
 
-local function VerticalList(t1: {[any]: any}) -- line: 25
-	-- upvalues: SignalsReact (copy), React (copy), VerticalItem (copy), FFlagSideSheetFocusNav (copy), View (copy)
-	local integrationsGetter = t1.integrationsGetter
-	local t2 = {}
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddInviteFriendsIntegration = SharedFlags.FFlagAddInviteFriendsIntegration
+local FFlagHidePeoplePageInviteFriends = SharedFlags.FFlagHidePeoplePageInviteFriends
+local FFlagSideSheetFocusNav = SharedFlags.FFlagSideSheetFocusNav
+local Flags = require(InExperienceSideSheet.Flags)
+local FFlagSideSheetOpenPeoplePage = Flags.FFlagSideSheetOpenPeoplePage
 
-	for v13, v14 in (SignalsReact.useSignalState(integrationsGetter)) do
-		t2[v14.id] = React.createElement(VerticalItem, {
-			label = v14.integration.label,
-			layoutOrder = v13,
-			onActivated = v14.activated,
-			icon = v14.component,
-			disableGamepadDirections = if not FFlagSideSheetFocusNav then nil else {
-				right = true,
-				left = true
-			},
-			firstIntegrationToFocusCallback = if not FFlagSideSheetFocusNav or v13 ~= 1 then nil else t1.firstIntegrationToFocusCallback
-		})
+local function VerticalList(props)
+	local integrationsGetter = props.integrationsGetter
+	local v = SignalsReact.useSignalState(integrationsGetter)
+	local v2
+
+	if FFlagSideSheetOpenPeoplePage then
+		v2 = SignalsReact.useSignalState(getDidSideSheetOpenWithPeoplePage)
+	else
+		v2 = false
 	end
 
-	return React.createElement(View, {
-		tag = "col size-full-0 auto-y padding-y-xsmall padding-right-xlarge",
-		LayoutOrder = t1.layoutOrder
-	}, t2)
+	local v3 = not (FFlagHidePeoplePageInviteFriends and FFlagAddInviteFriendsIntegration)
+	local count = 0
+	local children = {}
+
+	for _, v4 in v do
+		if not shouldShowInviteFriendsInSideSheet(v4.id, v2, v3) then
+			continue
+		end
+
+		count += 1
+		local id = v4.id
+		local createElement = React.createElement
+		local v5 = {
+			label = v4.integration.label,
+			layoutOrder = count,
+			onActivated = v4.activated,
+			icon = v4.component,
+			disableGamepadDirections = FFlagSideSheetFocusNav and {
+				right = not props.allowRightFocusEscape,
+				left = true
+			} or nil,
+			firstIntegrationToFocusCallback = 0
+		}
+		local firstIntegrationToFocusCallback
+
+		if FFlagSideSheetFocusNav and count == 1 then
+			firstIntegrationToFocusCallback = props.firstIntegrationToFocusCallback
+		end
+
+		v5.firstIntegrationToFocusCallback = firstIntegrationToFocusCallback
+		children[id] = createElement(VerticalItem, v5)
+	end
+
+	return React.createElement(
+		View,
+		{ tag = "col gap-small size-full-0 auto-y", LayoutOrder = props.layoutOrder },
+		children
+	)
 end
 
 return React.memo(VerticalList)

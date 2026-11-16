@@ -11,8 +11,6 @@ return {
 	},
 	PlatformChatConversation = {
 		Namespace = "PlatformChatConversationMessage",
-		Types = {
-			ConversationSuggestionsGenerated = "ConversationSuggestionsGenerated"
-		}
+		Types = { ConversationSuggestionsGenerated = "ConversationSuggestionsGenerated" }
 	}
 }

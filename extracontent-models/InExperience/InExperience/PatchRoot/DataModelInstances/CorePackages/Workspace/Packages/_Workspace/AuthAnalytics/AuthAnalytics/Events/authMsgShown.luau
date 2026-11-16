@@ -1,21 +1,24 @@
-local ParentParent = script.Parent.Parent
-local checkAndSendEvent = require(ParentParent.Utils.checkAndSendEvent)
+local parent = script.Parent.Parent
+local checkAndSendEvent = require(parent.Utils.checkAndSendEvent)
 
-return function(s1: string, s2: string, s3: string, s4: string?) -- line: 4
-	-- upvalues: checkAndSendEvent (copy)
-	local t1 = {}
+return function(p: string, state: string, field: string, errorCode: string?, associatedText: string?)
+	local v = {}
 
-	if s2 then
-		t1.state = s2
+	if state then
+		v.state = state
 	end
 
-	if s3 then
-		t1.field = s3
+	if field then
+		v.field = field
 	end
 
-	if s4 then
-		t1.errorCode = s4
+	if errorCode then
+		v.errorCode = errorCode
 	end
 
-	checkAndSendEvent(s1, "authMsgShown", t1)
+	if associatedText then
+		v.associatedText = associatedText
+	end
+
+	checkAndSendEvent(p, "authMsgShown", v)
 end

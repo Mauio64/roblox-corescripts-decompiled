@@ -1,10 +1,10 @@
 local CorePackages = game:GetService("CorePackages")
-local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
-
+local Rodux = require(CorePackages.Packages.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
 require(CorePackages.Workspace.Packages.AvatarExperienceInspectAndBuy)
 
-return makeActionCreator(script.Name, function(p1) -- line: 12
+return makeActionCreator(script.Name, function(options)
 	return {
-		result = p1 or {}
+		result = options or {}
 	}
 end)

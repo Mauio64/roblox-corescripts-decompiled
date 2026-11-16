@@ -1,18 +1,19 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local Dictionary = require(Parent.llama).Dictionary
-local n1 = 0
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
 
-local function createMockMessage(p1) -- line: 7
-	-- upvalues: n1 (ref), Dictionary (copy)
-	n1 += 1
+local count = 0
 
-	return Dictionary.join({
+local function createMockMessage(p)
+	count += 1
+
+	return dictionary.join({
 		name = "Foo",
+		id = tostring(count),
 		userId = "1",
 		text = "Hello, World!",
-		id = tostring(n1),
-		timestamp = n1
-	}, p1)
+		timestamp = count
+	}, p)
 end
 
 return createMockMessage

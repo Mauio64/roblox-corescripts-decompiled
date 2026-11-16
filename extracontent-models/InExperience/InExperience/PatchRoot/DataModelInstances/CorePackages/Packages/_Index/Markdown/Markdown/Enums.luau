@@ -1,3 +1,1 @@
-return {
-	NodeType = require(script.NodeType)
-}
+return { NodeType = require(script.NodeType) }

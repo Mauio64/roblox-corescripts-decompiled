@@ -1,45 +1,35 @@
 local createPageTracker = require(script.Parent.createPageTracker)
 
-local function getTracker(t1: {[any]: any}, s1: string) -- line: 10
-	-- upvalues: createPageTracker (copy)
-	if t1.trackers[s1] == nil then
-		local v8 = createPageTracker()
-
-		t1.trackers[s1] = v8
+local function getTracker(p, p2: string)
+	if p.trackers[p2] == nil then
+		local pageTracker = createPageTracker()
+		p.trackers[p2] = pageTracker
 	end
 
-	return t1.trackers[s1]
+	return p.trackers[p2]
 end
-local function removeTracker(t2: {[any]: any}, s2: string) -- line: 18
-	local v11 = t2.trackers[s2]
 
-	if v11 then
-		v11:stop()
-		t2.trackers[s2] = nil
+local function removeTracker(p, p2: string)
+	local tracker = p.trackers[p2]
+
+	if tracker then
+		tracker:stop()
+		p.trackers[p2] = nil
 	end
 end
-local function createFactory() -- line: 27
-	-- upvalues: getTracker (copy), removeTracker (copy)
-	return {
-		trackers = {},
-		getTracker = getTracker,
-		removeTracker = removeTracker
-	}
+
+local function createFactory() -- 1 equivalent call inferred from this helper
+	return { trackers = {}, getTracker = getTracker, removeTracker = removeTracker }
 end
 
-local t3 = nil
+local instance = nil
 
 return {
-	getInstance = function() -- line: 39
-		-- upvalues: t3 (ref), getTracker (copy), removeTracker (copy)
-		if not t3 then
-			t3 = {
-				trackers = {},
-				getTracker = getTracker,
-				removeTracker = removeTracker
-			}
+	getInstance = function()
+		if not instance then
+			instance = createFactory() -- inferred equivalent call
 		end
 
-		return t3
+		return instance
 	end
 }

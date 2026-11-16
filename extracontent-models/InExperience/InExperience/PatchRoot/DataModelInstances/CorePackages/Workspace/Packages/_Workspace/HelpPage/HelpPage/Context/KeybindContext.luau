@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Configs.ConfigTypes)
+local React = require(parent2.React)
+require(parent.Configs.ConfigTypes)
 
 return React.createContext({})

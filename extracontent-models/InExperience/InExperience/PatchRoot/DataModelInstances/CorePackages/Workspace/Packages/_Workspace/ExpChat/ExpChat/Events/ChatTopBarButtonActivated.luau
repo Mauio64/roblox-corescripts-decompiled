@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.ChatTopBarButtonActivated)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local ChatTopBarButtonActivated = require(actions.ChatTopBarButtonActivated)
+
+return event(ChatTopBarButtonActivated)

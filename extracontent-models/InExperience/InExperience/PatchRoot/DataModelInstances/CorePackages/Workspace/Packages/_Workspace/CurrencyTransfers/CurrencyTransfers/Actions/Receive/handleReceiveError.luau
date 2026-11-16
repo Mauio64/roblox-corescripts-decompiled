@@ -1,15 +1,11 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-
 require(CurrencyTransfers.Stores.createTransferStore)
-
 local PromptState = require(CurrencyTransfers.Enums.PromptState)
-
 require(CurrencyTransfers.Models.ErrorTransferModel)
 
-local function handleReceiveError(p1, p2) -- line: 10
-	-- upvalues: PromptState (copy)
-	local setPromptState = p1.setPromptState
-	local setErrorTransferModel = p1.setErrorTransferModel
+local function handleReceiveError(p, p2)
+	local setPromptState = p.setPromptState
+	local setErrorTransferModel = p.setErrorTransferModel
 
 	if p2 then
 		setErrorTransferModel(p2)

@@ -1,7 +1,4 @@
-local ClearSuggestedCallees = require(script.ClearSuggestedCallees)
-local UpdateCall = require(script.UpdateCall)
-
 return {
-	ClearSuggestedCallees = ClearSuggestedCallees,
-	UpdateCall = UpdateCall
+	ClearSuggestedCallees = require(script.ClearSuggestedCallees),
+	UpdateCall = require(script.UpdateCall)
 }

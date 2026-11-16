@@ -1,8 +1,8 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
 
-require(scriptParent.SettingEnum)
-require(scriptParentParent.AppCommonLib)
-require(scriptParentParent.Signals)
+require(parent.SettingEnum)
+require(parent2.AppCommonLib)
+require(parent2.Signals)
 
 return nil

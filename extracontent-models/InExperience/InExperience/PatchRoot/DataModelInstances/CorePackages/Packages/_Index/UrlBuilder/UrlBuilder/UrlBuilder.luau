@@ -1,10 +1,12 @@
-local ParentParent = script.Parent.Parent
-local Cryo = require(ParentParent.Cryo)
-local StringUtilities = require(ParentParent.StringUtilities)
+local parent = script.Parent.Parent
+
+local Cryo = require(parent.Cryo)
+local StringUtilities = require(parent.StringUtilities)
 local StringTrim = StringUtilities.StringTrim
 local StringSplit = StringUtilities.StringSplit
 local encodeURIComponent = require(script.Parent.encodeURIComponent)
 local UrlBase = require(script.Parent.UrlBase)
+
 local GameUrlPatterns = require(script.Parent.UrlPatterns.GameUrlPatterns)
 local UserUrlPatterns = require(script.Parent.UrlPatterns.UserUrlPatterns)
 local StaticUrlPatterns = require(script.Parent.UrlPatterns.StaticUrlPatterns)
@@ -15,237 +17,230 @@ local UserModerationPatterns = require(script.Parent.UrlPatterns.UserModerationP
 local AccountInformationPatterns = require(script.Parent.UrlPatterns.AccountInformationPatterns)
 local VirtualEventsUrlPatterns = require(script.Parent.UrlPatterns.VirtualEventsUrlPatterns)
 local PlatformAuthPatterns = require(script.Parent.UrlPatterns.PlatformAuthPatterns)
-local t1 = {}
 
-local function splitAndTrim(p1, p2, p3) -- line: 28
-	-- upvalues: StringSplit (copy), Cryo (copy), StringTrim (copy)
-	local v33 = StringSplit(p1, p2, p3)
-	local v34 = Cryo.List.map(v33, function(p4) -- line: 30
-		-- upvalues: StringTrim (copy)
+local UrlBuilder = {}
+
+local function splitAndTrim(p, p2, p3)
+	local stringSplit = StringSplit(p, p2, p3)
+	local mapped = Cryo.List.map(stringSplit, function(p4)
 		return StringTrim(p4)
 	end)
 
-	return (Cryo.List.filter(v34, function(p5) -- line: 33
-		return #p5 > 0
+	return (Cryo.List.filter(mapped, function(list): boolean
+		return #list > 0
 	end))
 end
-local function validateValueType(p6) -- line: 44
-	local v36 = type(p6)
 
-	if v36 == "string" then
+local function validateValueType(list): boolean
+	local typeName = type(list)
+
+	if typeName == "string" then
+		return true
+	elseif typeName == "number" then
 		return true
 	end
 
-	if v36 == "number" then
-		return true
+	if typeName ~= "table" then
+		return false
 	end
 
-	if v36 == "table" then
-		for _, v in ipairs(p6) do
-			local v39 = type(v)
+	for _, item in ipairs(list) do
+		local typeName2 = type(item)
 
-			if v39 ~= "string" and v39 ~= "number" then
-				return false
-			end
-		end
-
-		return true
-	end
-
-	return false
-end
-local function assertPlaceholder(p7) -- line: 64
-	if string.sub(p7, 1, 1) == "{" then
-		assert(string.sub(p7, -1, -1) == "}", "invalid pattern: placeholder items should end with `}`")
-	end
-end
-local function assertElementIsValid(p8, p9) -- line: 71
-	-- upvalues: validateValueType (copy)
-	assert(type(p8) == "table", "invalid pattern: elements should all be tables")
-
-	if p9 then
-		assert(type(p8.name) == "string", "invalid pattern: element name should be a string")
-		assert(#p8.name > 0, "invalid pattern: element name should not be empty")
-	end
-
-	assert(type(p8.value) == "string" or type(p8.value) == "number", "invalid pattern: element value should be a string or number")
-
-	if type(p8.value) == "string" then
-		local value = p8.value
-
-		if string.sub(value, 1, 1) == "{" then
-			assert(string.sub(value, -1, -1) == "}", "invalid pattern: placeholder items should end with `}`")
+		if typeName2 ~= "string" and typeName2 ~= "number" then
+			return false
 		end
 	end
 
-	if p8.optional ~= nil then
-		assert(type(p8.optional) == "boolean", "invalid pattern: element optional should be a boolean")
-	end
+	return true
+end
 
-	if p8.default ~= nil then
-		assert(validateValueType(p8.default), "invalid pattern: element default should be a string, number, or a table of strings and numbers only")
-	end
-
-	if p8.collect ~= nil then
-		assert(p8.collect == "multi" or p8.collect == "csv", "invalid pattern: element optional should be one of `multi`, `csv`")
+local function assertPlaceholder(value) -- 1 equivalent call inferred from this helper
+	if string.sub(value, 1, 1) == "{" then
+		assert(string.sub(value, -1, -1) == "}", "invalid pattern: placeholder items should end with `}`")
 	end
 end
-local function assertPatternIsValid(p10) -- line: 102
-	-- upvalues: assertElementIsValid (copy)
-	assert(type(p10.base) == "string", "invalid pattern: base should be a string")
-	assert(#p10.base > 0, "invalid pattern: base should not be empty")
-	assert(type(p10.path) == "table", "invalid pattern: path should be a table")
 
-	for _, v in ipairs(p10.path) do
+local function assertElementIsValid(data, p)
+	assert(type(data) == "table", "invalid pattern: elements should all be tables")
+
+	if p then
+		assert(type(data.name) == "string", "invalid pattern: element name should be a string")
+		assert(#data.name > 0, "invalid pattern: element name should not be empty")
+	end
+
+	assert(
+		type(data.value) == "string" or type(data.value) == "number",
+		"invalid pattern: element value should be a string or number"
+	)
+
+	if type(data.value) == "string" then
+		assertPlaceholder(data.value) -- inferred equivalent call
+	end
+
+	if data.optional ~= nil then
+		assert(type(data.optional) == "boolean", "invalid pattern: element optional should be a boolean")
+	end
+
+	if data.default ~= nil then
+		assert(
+			validateValueType(data.default),
+			"invalid pattern: element default should be a string, number, or a table of strings and numbers only"
+		)
+	end
+
+	if data.collect ~= nil then
+		assert(
+			data.collect == "multi" or data.collect == "csv",
+			"invalid pattern: element optional should be one of `multi`, `csv`"
+		)
+	end
+end
+
+local function assertPatternIsValid(data)
+	assert(type(data.base) == "string", "invalid pattern: base should be a string")
+	assert(#data.base > 0, "invalid pattern: base should not be empty")
+	assert(type(data.path) == "table", "invalid pattern: path should be a table")
+
+	for _, v in ipairs(data.path) do
 		assertElementIsValid(v, false)
 	end
 
-	if p10.query ~= nil then
-		assert(type(p10.query) == "table", "invalid pattern: query should be a table")
+	if data.query ~= nil then
+		assert(type(data.query) == "table", "invalid pattern: query should be a table")
 	end
 
-	if type(p10.query) == "table" then
-		for _, v in ipairs(p10.query) do
+	if type(data.query) == "table" then
+		for _, v in ipairs(data.query) do
 			assertElementIsValid(v, true)
 		end
 	end
 
-	if p10.hash ~= nil then
-		assert(type(p10.hash) == "table", "invalid pattern: hash should be a table")
+	if data.hash ~= nil then
+		assert(type(data.hash) == "table", "invalid pattern: hash should be a table")
 	end
 end
-local function buildElementsFromString(p11, p12) -- line: 127
-	-- upvalues: splitAndTrim (copy), Cryo (copy), StringTrim (copy), StringSplit (copy)
-	local v51 = not p12 and "/" or "&"
-	local v52 = splitAndTrim(p11, v51)
 
-	return (Cryo.List.map(v52, function(p13) -- line: 130
-		-- upvalues: StringTrim (copy), p12 (copy), StringSplit (copy)
-		local v102 = nil
-		local v103 = StringTrim(p13)
-		local v104 = nil
-		local v105 = nil
-		local s1 = nil
+local function buildElementsFromString(p, p2)
+	local v = splitAndTrim(p, p2 and "&" or "/")
+	return (Cryo.List.map(v, function(p3)
+		local stringTrim = StringTrim(p3)
+		local optional = nil
+		local default = nil
+		local name, collect
 
-		if p12 then
-			local v107 = StringSplit(v103, "=", 2)
+		if p2 then
+			local stringSplit = StringSplit(stringTrim, "=", 2)
+			name = StringTrim(stringSplit[1])
+			stringTrim = stringSplit[2]
 
-			v102 = StringTrim(v107[1])
-			v103 = v107[2]
+			if string.sub(name, 1, 1) == "{" then
+				local v2 = StringSplit(StringTrim(name, "{}"), "|", 2)[1]
 
-			if string.sub(v102, 1, 1) == "{" then
-				local v108 = StringTrim(v102, "{}")
-				local v109 = StringSplit(v108, "|", 2)[1]
-
-				if v103 == nil then
-					v103 = v107[1]
+				if stringTrim == nil then
+					stringTrim = stringSplit[1]
 				end
 
-				v102 = StringTrim(v109)
+				name = StringTrim(v2)
 			end
 
-			s1 = "multi"
+			collect = "multi"
 		end
 
-		if v103 ~= nil and string.find(v103, "^{.*}$") then
-			local v110 = StringTrim(v103, "{}")
-			local v111 = StringSplit(v110, "|", 2)
-			local v112 = StringTrim(v111[1])
+		if stringTrim ~= nil and string.find(stringTrim, "^{.*}$") then
+			local stringSplit = StringSplit(StringTrim(stringTrim, "{}"), "|", 2)
+			local stringTrim2 = StringTrim(stringSplit[1])
 
-			if #v111 > 1 then
-				v104 = true
+			if #stringSplit > 1 then
+				optional = true
 
-				if #v111[2] > 1 then
-					v105 = v111[2]
+				if #stringSplit[2] > 1 then
+					default = stringSplit[2]
 				end
 			end
 
-			v103 = "{" .. v112 .. "}"
+			stringTrim = "{" .. stringTrim2 .. "}"
 		end
 
 		return {
-			name = v102,
-			value = v103,
-			optional = v104,
-			default = v105,
-			collect = s1
+			name = name,
+			value = stringTrim,
+			optional = optional,
+			default = default,
+			collect = collect
 		}
 	end))
 end
-local function buildQueryStringFromTable(p14) -- line: 173
-	local t2 = {}
 
-	for k, v in pairs(p14) do
-		table.insert(t2, k .. "=" .. v)
+local function buildQueryStringFromTable(items)
+	local v = {}
+
+	for k, item in pairs(items) do
+		table.insert(v, k .. "=" .. item)
 	end
 
-	return table.concat(t2, "&")
+	return table.concat(v, "&")
 end
-local function simplifyPattern(p15) -- line: 182
-	-- upvalues: UrlBase (copy), splitAndTrim (copy), Cryo (copy), StringTrim (copy), StringSplit (copy), buildQueryStringFromTable (copy)
-	local base = p15.base
-	local path = p15.path
-	local query = p15.query
-	local hash = p15.hash
+
+local function simplifyPattern(data)
+	local base = data.base
+	local path = data.path
+	local query = data.query
+	local hash = data.hash
 
 	if base ~= nil and UrlBase[string.upper(base)] ~= nil then
 		base = UrlBase[string.upper(base)]
 	end
 
 	if type(path) == "string" then
-		local v62 = splitAndTrim(path, "/")
-		local v63 = false
+		local v = splitAndTrim(path, "/")
+		local flag
+		flag = false
+		path = Cryo.List.map(v, function(p)
+			local stringTrim = StringTrim(p)
+			local optional = nil
+			local default = nil
+			local name, collect
 
-		path = Cryo.List.map(v62, function(p16) -- line: 130
-			-- upvalues: StringTrim (copy), v63 (copy), StringSplit (copy)
-			local v114 = nil
-			local v115 = StringTrim(p16)
-			local v116 = nil
-			local v117 = nil
-			local s2 = nil
+			if flag then
+				local stringSplit = StringSplit(stringTrim, "=", 2)
+				name = StringTrim(stringSplit[1])
+				stringTrim = stringSplit[2]
 
-			if v63 then
-				local v119 = StringSplit(v115, "=", 2)
+				if string.sub(name, 1, 1) == "{" then
+					local v2 = StringSplit(StringTrim(name, "{}"), "|", 2)[1]
 
-				v114 = StringTrim(v119[1])
-				v115 = v119[2]
-
-				if string.sub(v114, 1, 1) == "{" then
-					local v120 = StringTrim(v114, "{}")
-					local v121 = StringSplit(v120, "|", 2)[1]
-
-					if v115 == nil then
-						v115 = v119[1]
+					if stringTrim == nil then
+						stringTrim = stringSplit[1]
 					end
 
-					v114 = StringTrim(v121)
+					name = StringTrim(v2)
 				end
 
-				s2 = "multi"
+				collect = "multi"
 			end
 
-			if v115 ~= nil and string.find(v115, "^{.*}$") then
-				local v122 = StringTrim(v115, "{}")
-				local v123 = StringSplit(v122, "|", 2)
-				local v124 = StringTrim(v123[1])
+			if stringTrim ~= nil and string.find(stringTrim, "^{.*}$") then
+				local stringSplit = StringSplit(StringTrim(stringTrim, "{}"), "|", 2)
+				local stringTrim2 = StringTrim(stringSplit[1])
 
-				if #v123 > 1 then
-					v116 = true
+				if #stringSplit > 1 then
+					optional = true
 
-					if #v123[2] > 1 then
-						v117 = v123[2]
+					if #stringSplit[2] > 1 then
+						default = stringSplit[2]
 					end
 				end
 
-				v115 = "{" .. v124 .. "}"
+				stringTrim = "{" .. stringTrim2 .. "}"
 			end
 
 			return {
-				name = v114,
-				value = v115,
-				optional = v116,
-				default = v117,
-				collect = s2
+				name = name,
+				value = stringTrim,
+				optional = optional,
+				default = default,
+				collect = collect
 			}
 		end)
 	end
@@ -255,309 +250,268 @@ local function simplifyPattern(p15) -- line: 182
 	end
 
 	if type(query) == "string" then
-		local v64 = splitAndTrim(query, "&")
-		local v65 = true
+		local v = splitAndTrim(query, "&")
+		local flag
+		flag = true
+		query = Cryo.List.map(v, function(p)
+			local stringTrim = StringTrim(p)
+			local optional = nil
+			local default = nil
+			local name, collect
 
-		query = Cryo.List.map(v64, function(p17) -- line: 130
-			-- upvalues: StringTrim (copy), v65 (copy), StringSplit (copy)
-			local v126 = nil
-			local v127 = StringTrim(p17)
-			local v128 = nil
-			local v129 = nil
-			local s3 = nil
+			if flag then
+				local stringSplit = StringSplit(stringTrim, "=", 2)
+				name = StringTrim(stringSplit[1])
+				stringTrim = stringSplit[2]
 
-			if v65 then
-				local v131 = StringSplit(v127, "=", 2)
+				if string.sub(name, 1, 1) == "{" then
+					local v2 = StringSplit(StringTrim(name, "{}"), "|", 2)[1]
 
-				v126 = StringTrim(v131[1])
-				v127 = v131[2]
-
-				if string.sub(v126, 1, 1) == "{" then
-					local v132 = StringTrim(v126, "{}")
-					local v133 = StringSplit(v132, "|", 2)[1]
-
-					if v127 == nil then
-						v127 = v131[1]
+					if stringTrim == nil then
+						stringTrim = stringSplit[1]
 					end
 
-					v126 = StringTrim(v133)
+					name = StringTrim(v2)
 				end
 
-				s3 = "multi"
+				collect = "multi"
 			end
 
-			if v127 ~= nil and string.find(v127, "^{.*}$") then
-				local v134 = StringTrim(v127, "{}")
-				local v135 = StringSplit(v134, "|", 2)
-				local v136 = StringTrim(v135[1])
+			if stringTrim ~= nil and string.find(stringTrim, "^{.*}$") then
+				local stringSplit = StringSplit(StringTrim(stringTrim, "{}"), "|", 2)
+				local stringTrim2 = StringTrim(stringSplit[1])
 
-				if #v135 > 1 then
-					v128 = true
+				if #stringSplit > 1 then
+					optional = true
 
-					if #v135[2] > 1 then
-						v129 = v135[2]
+					if #stringSplit[2] > 1 then
+						default = stringSplit[2]
 					end
 				end
 
-				v127 = "{" .. v136 .. "}"
+				stringTrim = "{" .. stringTrim2 .. "}"
 			end
 
 			return {
-				name = v126,
-				value = v127,
-				optional = v128,
-				default = v129,
-				collect = s3
+				name = name,
+				value = stringTrim,
+				optional = optional,
+				default = default,
+				collect = collect
 			}
 		end)
 	end
 
 	if type(hash) == "string" then
-		local v66 = splitAndTrim(hash, "/")
-		local v67 = false
+		local v = splitAndTrim(hash, "/")
+		local flag
+		flag = false
+		hash = Cryo.List.map(v, function(p)
+			local stringTrim = StringTrim(p)
+			local optional = nil
+			local default = nil
+			local name, collect
 
-		hash = Cryo.List.map(v66, function(p18) -- line: 130
-			-- upvalues: StringTrim (copy), v67 (copy), StringSplit (copy)
-			local v138 = nil
-			local v139 = StringTrim(p18)
-			local v140 = nil
-			local v141 = nil
-			local s4 = nil
+			if flag then
+				local stringSplit = StringSplit(stringTrim, "=", 2)
+				name = StringTrim(stringSplit[1])
+				stringTrim = stringSplit[2]
 
-			if v67 then
-				local v143 = StringSplit(v139, "=", 2)
+				if string.sub(name, 1, 1) == "{" then
+					local v2 = StringSplit(StringTrim(name, "{}"), "|", 2)[1]
 
-				v138 = StringTrim(v143[1])
-				v139 = v143[2]
-
-				if string.sub(v138, 1, 1) == "{" then
-					local v144 = StringTrim(v138, "{}")
-					local v145 = StringSplit(v144, "|", 2)[1]
-
-					if v139 == nil then
-						v139 = v143[1]
+					if stringTrim == nil then
+						stringTrim = stringSplit[1]
 					end
 
-					v138 = StringTrim(v145)
+					name = StringTrim(v2)
 				end
 
-				s4 = "multi"
+				collect = "multi"
 			end
 
-			if v139 ~= nil and string.find(v139, "^{.*}$") then
-				local v146 = StringTrim(v139, "{}")
-				local v147 = StringSplit(v146, "|", 2)
-				local v148 = StringTrim(v147[1])
+			if stringTrim ~= nil and string.find(stringTrim, "^{.*}$") then
+				local stringSplit = StringSplit(StringTrim(stringTrim, "{}"), "|", 2)
+				local stringTrim2 = StringTrim(stringSplit[1])
 
-				if #v147 > 1 then
-					v140 = true
+				if #stringSplit > 1 then
+					optional = true
 
-					if #v147[2] > 1 then
-						v141 = v147[2]
+					if #stringSplit[2] > 1 then
+						default = stringSplit[2]
 					end
 				end
 
-				v139 = "{" .. v148 .. "}"
+				stringTrim = "{" .. stringTrim2 .. "}"
 			end
 
 			return {
-				name = v138,
-				value = v139,
-				optional = v140,
-				default = v141,
-				collect = s4
+				name = name,
+				value = stringTrim,
+				optional = optional,
+				default = default,
+				collect = collect
 			}
 		end)
 	end
 
-	return {
-		base = base,
-		path = path,
-		query = query,
-		hash = hash
-	}
+	return { base = base, path = path, query = query, hash = hash }
 end
-local function concatValues(p19, p20) -- line: 214
-	-- upvalues: Cryo (copy), splitAndTrim (copy)
-	local v70 = Cryo.List.filter(p19, function(p21) -- line: 216
-		-- upvalues: p20 (copy), splitAndTrim (copy)
-		if p20 then
-			return #splitAndTrim(p21, "=") > 1
+
+local function concatValues(mapped, p)
+	local filtered = Cryo.List.filter(mapped, function(list): boolean
+		if p then
+			return #splitAndTrim(list, "=") > 1
 		end
 
-		return #p21 > 0
+		return #list > 0
 	end)
-	local v71 = not p20 and "/" or "&"
 
-	return table.concat(v70, v71)
+	return table.concat(filtered, p and "&" or "/")
 end
-local function resolveElement(p22, p23, p24) -- line: 227
-	-- upvalues: validateValueType (copy), Cryo (copy), encodeURIComponent (copy), concatValues (copy)
-	if p23 == nil then
-		p23 = {}
-	end
 
-	local v75
+local function resolveElement(data, p, p2)
+	local v = p == nil and {} or p
+	local v2
 
-	if type(p22.value) == "string" and string.sub(p22.value, 1, 1) == "{" then
-		v75 = p23[string.sub(p22.value, 2, -2)]
+	if type(data.value) == "string" and string.sub(data.value, 1, 1) == "{" then
+		local v3 = v[string.sub(data.value, 2, -2)]
 
-		if v75 == nil then
-			v75 = p22.default
+		if v3 == nil then
+			v3 = data.default
 		end
 
-		if not p22.optional then
-			assert(v75 ~= nil, "UrlBuilder: missing parameter: `" .. p22.value .. "`")
+		if not data.optional then
+			assert(v3 ~= nil, "UrlBuilder: missing parameter: `" .. data.value .. "`")
 		end
 
-		if v75 == nil then
-			v75 = {}
-		end
+		v2 = v3 == nil and {} or v3
 
-		assert(validateValueType(v75), "UrlBuilder: invalid parameter: `" .. p22.value .. "`, " .. "should be a string, number, or a table of strings and numbers only")
+		assert(
+			validateValueType(v2),
+			"UrlBuilder: invalid parameter: `" .. data.value .. "`, should be a string, number, or a table of strings and numbers only"
+		)
 	else
-		v75 = p22.value
+		v2 = data.value
 	end
 
-	if type(v75) ~= "table" then
-		v75 = { v75 }
-	end
+	local v3 = type(v2) ~= "table" and { v2 } or v2
 
-	local v76 = Cryo.List.map(v75, function(p25) -- line: 257
-		-- upvalues: encodeURIComponent (copy)
-		return encodeURIComponent((tostring(p25)))
+	local mapped = Cryo.List.map(v3, function(p3)
+		return encodeURIComponent((tostring(p3)))
 	end)
 
-	if p24 then
-		if p22.collect == "csv" then
-			v76 = { table.concat(v76, "%2C") }
-		end
+	if p2 then
+		local v4 = data.collect == "csv" and { table.concat(mapped, "%2C") } or mapped
 
-		v76 = Cryo.List.map(v76, function(p26) -- line: 265
-			-- upvalues: encodeURIComponent (copy), p22 (copy)
-			return encodeURIComponent(p22.name) .. "=" .. p26
+		mapped = Cryo.List.map(v4, function(p3)
+			return encodeURIComponent(data.name) .. "=" .. p3
 		end)
 	end
 
-	return concatValues(v76, p24)
-end
-local function resolveElementList(p27, p28, p29) -- line: 272
-	-- upvalues: Cryo (copy), resolveElement (copy), concatValues (copy)
-	local v80 = Cryo.List.map(p27 or {}, function(p30) -- line: 273
-		-- upvalues: resolveElement (copy), p28 (copy), p29 (copy)
-		return resolveElement(p30, p28, p29)
-	end)
-
-	return concatValues(v80, p29)
+	return concatValues(mapped, p2)
 end
 
-function t1.new(p31) -- line: 308
-	-- upvalues: simplifyPattern (copy), assertPatternIsValid (copy), StringTrim (copy), resolveElementList (copy)
-	local u82 = simplifyPattern(p31)
+local function resolveElementList(options, p, p2)
+	return concatValues(Cryo.List.map(options or {}, function(p3)
+		return resolveElement(p3, p, p2)
+	end), p2)
+end
 
-	assertPatternIsValid(u82)
+function UrlBuilder.new(p)
+	local v = simplifyPattern(p)
+	assertPatternIsValid(v)
+	return function(p2, p3)
+		local stringTrim = StringTrim(v.base, "/", { right = true })
+		local elementList = resolveElementList(v.path, p2, false)
 
-	return function(p32, p33) -- line: 311
-		-- upvalues: StringTrim (copy), u82 (ref), resolveElementList (copy)
-		local v155 = StringTrim(u82.base, "/", {
-			right = true
-		})
-		local v156 = resolveElementList(u82.path, p32, false)
-
-		if #v156 > 0 then
-			v155 ..= "/" .. v156
+		if #elementList > 0 then
+			stringTrim ..= "/" .. elementList
 		end
 
-		if string.match(v155, "[^/]/[^/]") == nil then
-			v155 ..= "/"
+		if string.match(stringTrim, "[^/]/[^/]") == nil then
+			stringTrim ..= "/"
 		end
 
-		local v157 = resolveElementList(u82.query, p32, true)
+		local elementList2 = resolveElementList(v.query, p2, true)
 
-		if #v157 > 0 then
-			v155 ..= "?" .. v157
+		if #elementList2 > 0 then
+			stringTrim ..= "?" .. elementList2
 		end
 
-		local v158 = resolveElementList(u82.hash, p32, false)
+		local elementList3 = resolveElementList(v.hash, p2, false)
 
-		if #v158 > 0 then
-			v155 ..= "#" .. v158
+		if #elementList3 > 0 then
+			stringTrim ..= "#" .. elementList3
 		end
 
-		if p33 then
-			if v155 ~= p33 then
-				warn("UrlBuilder: unexpected output for pattern:")
-				warn("UrlBuilder: expected `" .. p33 .. "`")
-				warn("UrlBuilder: actual `" .. v155 .. "`")
-			end
-
-			return p33
+		if not p3 then
+			return stringTrim
 		end
 
-		return v155
+		if stringTrim ~= p3 then
+			warn("UrlBuilder: unexpected output for pattern:")
+			warn("UrlBuilder: expected `" .. p3 .. "`")
+			warn("UrlBuilder: actual `" .. stringTrim .. "`")
+		end
+
+		return p3
 	end
 end
-function t1.fromString(p34) -- line: 347
-	-- upvalues: StringSplit (copy), t1 (copy), StringTrim (copy)
-	local v84 = StringSplit(p34, ":", 2)
 
-	if #v84 < 2 then
-		v84 = {
-			"",
-			v84[1]
-		}
+function UrlBuilder.fromString(p)
+	local stringSplit = StringSplit(p, ":", 2)
+	local v = #stringSplit < 2 and { "", stringSplit[1] } or stringSplit
+
+	local v2 = v[1]
+	local stringSplit2 = StringSplit(v[2], "%#", 2)
+	local v3 = stringSplit2[2] or ""
+	local stringSplit3 = StringSplit(stringSplit2[1], "%?", 2)
+	local v4 = stringSplit3[1] or ""
+	local v5 = stringSplit3[2] or ""
+
+	if string.sub(v4, 1, 2) == "//" then
+		local stringSplit4 = StringSplit(string.sub(v4, 3), "/", 2)
+		v2 ..= "://" .. stringSplit4[1]
+		v4 = stringSplit4[2] or "/"
 	end
 
-	local v85 = v84[1]
-	local v86 = StringSplit(v84[2], "%#", 2)
-	local v87 = v86[2] or ""
-	local v88 = StringSplit(v86[1], "%?", 2)
-	local v89 = v88[1] or ""
-	local v90 = v88[2] or ""
-
-	if string.sub(v89, 1, 2) == "//" then
-		local v91 = StringSplit(string.sub(v89, 3), "/", 2)
-
-		v85 ..= "://" .. v91[1]
-		v89 = v91[2] or "/"
-	end
-
-	return t1.new({
-		base = StringTrim(v85),
-		path = StringTrim(v89),
-		query = StringTrim(v90),
-		hash = StringTrim(v87)
+	return UrlBuilder.new({
+		base = StringTrim(v2),
+		path = StringTrim(v4),
+		query = StringTrim(v5),
+		hash = StringTrim(v3)
 	})
 end
-function t1.addQueryString(p35, p36) -- line: 376
-	-- upvalues: StringTrim (copy), Cryo (copy), t1 (copy)
-	local v94 = StringTrim(p35)
-	local v95 = string.find(v94, "%?")
 
-	if v95 == nil then
-		v94 ..= "?"
-	elseif v95 < #v94 then
-		v94 ..= "&"
+function UrlBuilder.addQueryString(p, p2)
+	local stringTrim = StringTrim(p)
+	local v = string.find(stringTrim, "%?")
+
+	if v == nil then
+		stringTrim ..= "?"
+	elseif v < #stringTrim then
+		stringTrim ..= "&"
 	end
 
-	local v96 = Cryo.Dictionary.keys(p36)
-	local v97 = Cryo.List.map(v96, function(p37) -- line: 385
-		return "{" .. p37 .. "}"
+	local keys = Cryo.Dictionary.keys(p2)
+	local mapped = Cryo.List.map(keys, function(p3)
+		return "{" .. p3 .. "}"
 	end)
-	local v98 = v94 .. table.concat(v97, "&")
 
-	return t1.fromString(v98)(p36)
+	local v2 = stringTrim .. table.concat(mapped, "&")
+	return UrlBuilder.fromString(v2)(p2)
 end
 
-t1.game = GameUrlPatterns(t1)
-t1.user = UserUrlPatterns(t1)
-t1.catalog = CatalogUrlPatterns(t1)
-t1.static = StaticUrlPatterns(t1)
-t1.usermoderation = UserModerationPatterns(t1)
-t1.accountinformation = AccountInformationPatterns(t1)
-t1.sharelinks = ShareLinksUrlPatterns(t1)
-t1.economy = EconomyUrlPatterns(t1)
-t1.virtualevents = VirtualEventsUrlPatterns(t1)
-t1.PlatformAuth = PlatformAuthPatterns(t1)
+UrlBuilder.game = GameUrlPatterns(UrlBuilder)
+UrlBuilder.user = UserUrlPatterns(UrlBuilder)
+UrlBuilder.catalog = CatalogUrlPatterns(UrlBuilder)
+UrlBuilder.static = StaticUrlPatterns(UrlBuilder)
+UrlBuilder.usermoderation = UserModerationPatterns(UrlBuilder)
+UrlBuilder.accountinformation = AccountInformationPatterns(UrlBuilder)
+UrlBuilder.sharelinks = ShareLinksUrlPatterns(UrlBuilder)
+UrlBuilder.economy = EconomyUrlPatterns(UrlBuilder)
+UrlBuilder.virtualevents = VirtualEventsUrlPatterns(UrlBuilder)
+UrlBuilder.PlatformAuth = PlatformAuthPatterns(UrlBuilder)
 
-return t1
+return UrlBuilder

@@ -1,1 +1,3 @@
-return (require(script.DisplayQRCode))
+local DisplayQRCode = require(script.DisplayQRCode)
+
+return DisplayQRCode

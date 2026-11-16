@@ -1,118 +1,104 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
 
 require(InGameAssetReporting.InGameAssetReportUI.Resources.Types)
+local Constants = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants)
 
-local AnalyticsActions = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants).AnalyticsActions
+local AnalyticsActions = Constants.AnalyticsActions
 
-local function analyticsReducer(p1, p2) -- line: 8
-	-- upvalues: AnalyticsActions (copy)
-	local v6 = table.clone(p1)
-	local type = p2.type
+local function analyticsReducer(p, data)
+	local clone = table.clone(p)
+	local kind = data.type
 
-	if type == AnalyticsActions.SetPlaceId then
-		v6.place_id = p2.place_id
-
-		return v6
+	if kind == AnalyticsActions.SetPlaceId then
+		clone.place_id = data.place_id
+		return clone
 	end
 
-	if type == AnalyticsActions.AccumulateForTimeSpent then
-		v6.accumulated_time_ms = p2.accumulated_time_ms
-
-		return v6
+	if kind == AnalyticsActions.AccumulateForTimeSpent then
+		clone.accumulated_time_ms = data.accumulated_time_ms
+		return clone
 	end
 
-	if type == AnalyticsActions.SetReasonSelection then
-		v6.reason_selection = p2.reason_selection
-
-		return v6
+	if kind == AnalyticsActions.SetReasonSelection then
+		clone.reason_selection = data.reason_selection
+		return clone
 	end
 
-	if type == AnalyticsActions.SetSurfaceSelection then
-		v6.surface_selection = p2.surface_selection
-
-		return v6
+	if kind == AnalyticsActions.SetSurfaceSelection then
+		clone.surface_selection = data.surface_selection
+		return clone
 	end
 
-	if type == AnalyticsActions.SetPrefilledSurfaceSelection then
-		v6.prefilled_surface_selection = p2.prefilled_surface_selection
-
-		return v6
+	if kind == AnalyticsActions.SetPrefilledSurfaceSelection then
+		clone.prefilled_surface_selection = data.prefilled_surface_selection
+		return clone
 	end
 
-	if type == AnalyticsActions.SetCommentAdded then
-		v6.comment_added = p2.comment_added
-
-		return v6
+	if kind == AnalyticsActions.SetCommentAdded then
+		clone.comment_added = data.comment_added
+		return clone
 	end
 
-	if type == AnalyticsActions.IncrementNextCount then
-		v6.next_count = v6.next_count + 1
-
-		return v6
+	if kind == AnalyticsActions.IncrementNextCount then
+		clone.next_count += 1
+		return clone
 	end
 
-	if type == AnalyticsActions.IncremementAnnotationCount then
-		v6.annotation_place_count = v6.annotation_place_count + 1
-
-		return v6
+	if kind == AnalyticsActions.IncremementAnnotationCount then
+		clone.annotation_place_count += 1
+		return clone
 	end
 
-	if type == AnalyticsActions.IncremementAnnotationUndoCount then
-		v6.annotation_undo_count = v6.annotation_undo_count + 1
-
-		return v6
+	if kind == AnalyticsActions.IncremementAnnotationUndoCount then
+		clone.annotation_undo_count += 1
+		return clone
 	end
 
-	if type == AnalyticsActions.IncremementAnnotationRedoCount then
-		v6.annotation_redo_count = v6.annotation_redo_count + 1
-
-		return v6
+	if kind == AnalyticsActions.IncremementAnnotationRedoCount then
+		clone.annotation_redo_count += 1
+		return clone
 	end
 
-	if type == AnalyticsActions.SetExtractionResults then
-		local results = p2.results
+	if kind == AnalyticsActions.SetExtractionResults then
+		local results = data.results
 
-		v6.annotation_final_count = p2.final_annotation_count
-		v6.avatar_final_count = results.stats.playersCount
-		v6.image_asset_count = #results.extractedAssets.Image
-		v6.mesh_asset_count = #results.extractedAssets.Mesh
-		v6.model_asset_count = #results.extractedAssets.Model
-		v6.package_asset_count = #results.extractedAssets.Package
-		v6.final_raycast_target_count = results.stats.raycastTargetCount
-		v6.final_raycast_completed_count = results.stats.raycastCompletedCount
-		v6.final_raycast_resumption_count = results.stats.raycastResumptionCount
-		v6.final_raycast_computation_time_us = math.ceil(results.stats.raycastComputeTime * 1000000)
-		v6.hit_count_map_size = results.stats.hitCountMapSize
-		v6.top_level_objects_size = results.stats.topLevelObjectsSize
-		v6.instances_traversed_count = results.stats.instancesTraversed
-		v6.traversal_task_list_size = results.stats.traversalTaskListSize
-		v6.traversal_tasks_completed_count = results.stats.traversalTasksCompleted
-		v6.extraction_resumption_count = results.stats.resumptionCount
-		v6.extraction_computation_time_us = math.ceil(results.stats.computeTime * 1000000)
-		v6.extraction_wall_time_us = math.ceil(results.stats.wallTime * 1000000)
-
-		return v6
+		clone.annotation_final_count = data.final_annotation_count
+		clone.avatar_final_count = results.stats.playersCount
+		clone.image_asset_count = #results.extractedAssets.Image
+		clone.mesh_asset_count = #results.extractedAssets.Mesh
+		clone.model_asset_count = #results.extractedAssets.Model
+		clone.package_asset_count = #results.extractedAssets.Package
+		clone.final_raycast_target_count = results.stats.raycastTargetCount
+		clone.final_raycast_completed_count = results.stats.raycastCompletedCount
+		clone.final_raycast_resumption_count = results.stats.raycastResumptionCount
+		clone.final_raycast_computation_time_us = math.ceil(results.stats.raycastComputeTime * 1000000)
+		clone.hit_count_map_size = results.stats.hitCountMapSize
+		clone.top_level_objects_size = results.stats.topLevelObjectsSize
+		clone.instances_traversed_count = results.stats.instancesTraversed
+		clone.traversal_task_list_size = results.stats.traversalTaskListSize
+		clone.traversal_tasks_completed_count = results.stats.traversalTasksCompleted
+		clone.extraction_resumption_count = results.stats.resumptionCount
+		clone.extraction_computation_time_us = math.ceil(results.stats.computeTime * 1000000)
+		clone.extraction_wall_time_us = math.ceil(results.stats.wallTime * 1000000)
+		return clone
 	end
 
-	if type == AnalyticsActions.SetViewportInformation then
-		v6.viewport_size_x = p2.viewport_size_x
-		v6.viewport_size_y = p2.viewport_size_y
-		v6.is_portrait_mode = p2.is_portrait_mode
+	if kind == AnalyticsActions.SetViewportInformation then
+		clone.viewport_size_x = data.viewport_size_x
+		clone.viewport_size_y = data.viewport_size_y
+		clone.is_portrait_mode = data.is_portrait_mode
+	else
+		if kind == AnalyticsActions.SetDidUserResize then
+			clone.did_user_resize = data.did_user_resize
+			return clone
+		end
 
-		return v6
+		if kind == AnalyticsActions.SetVariant then
+			clone.variant = data.variant
+		end
 	end
 
-	if type == AnalyticsActions.SetDidUserResize then
-		v6.did_user_resize = p2.did_user_resize
-
-		return v6
-	end
-
-	if type == AnalyticsActions.SetVariant then
-		v6.variant = p2.variant
-	end
-
-	return v6
+	return clone
 end
 
 return analyticsReducer

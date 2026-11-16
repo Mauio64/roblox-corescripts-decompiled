@@ -1,54 +1,57 @@
-local Parent = script:FindFirstAncestor("ExperimentLayers").Parent
-local Dash = require(Parent.Dash)
+local parent = script:FindFirstAncestor("ExperimentLayers").Parent
+local Dash = require(parent.Dash)
 local AppUserLayers = require(script.Parent.AppUserLayers)
-local v4 = game:DefineFastString("IxpNewLayersForRegistration", "")
 
-local function findNextKey(t1: {[any]: any}, s1: string) -- line: 21
-	if not t1[s1] then
-		t1[s1] = true
+local defineFastString = game:DefineFastString("IxpNewLayersForRegistration", "")
 
-		return s1
+local function findNextKey(set, p: string)
+	if not set[p] then
+		set[p] = true
+		return p
 	end
 
 	for i = 2, 100 do
-		local v10 = s1 .. "_" .. i
+		local v = p .. "_" .. i
 
-		if not t1[v10] then
-			t1[v10] = true
-
-			return v10
+		if not set[v] then
+			set[v] = true
+			return v
 		end
 	end
 
-	error("Exceeded max index for next key search: " .. s1)
+	error("Exceeded max index for next key search: " .. p)
 end
-local function getAllAppUserLayers(s2: string?) -- line: 37
-	-- upvalues: v4 (copy), AppUserLayers (copy), Dash (copy), findNextKey (copy)
-	local v12 = s2 or v4
 
-	if #v12 == 0 then
+local function getAllAppUserLayers(p: string?)
+	local v = p or defineFastString
+
+	if #v == 0 then
 		return AppUserLayers
 	end
 
-	local v13 = Dash.copy(AppUserLayers)
-	local t2 = {}
-	local t3 = {}
+	local copy = Dash.copy(AppUserLayers)
 
-	for v16, v17 in v13 do
-		t2[v16] = true
-		t3[v17] = true
+	local set = {}
+	local set2 = {}
+
+	for k, v2 in copy do
+		set[k] = true
+		set2[v2] = true
 	end
 
-	local parts = string.split(v12, ",")
+	local v2 = string.split(v, ",")
+	local mapped = Dash.map(v2, Dash.trim)
 
-	for _, v20 in (Dash.map(parts, Dash.trim)) do
-		if not t3[v20] then
-			t3[v20] = true
-			v13[findNextKey(t2, v20)] = v20
+	for _, v3 in mapped do
+		if set2[v3] then
+			continue
 		end
+
+		set2[v3] = true
+		copy[findNextKey(set, v3)] = v3
 	end
 
-	return v13
+	return copy
 end
 
 return getAllAppUserLayers

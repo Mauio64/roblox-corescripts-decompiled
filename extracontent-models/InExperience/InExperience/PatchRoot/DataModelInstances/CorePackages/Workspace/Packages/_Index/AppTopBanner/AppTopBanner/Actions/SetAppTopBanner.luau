@@ -1,11 +1,15 @@
-local Parent = script:FindFirstAncestor("AppTopBanner").Parent
+local parent = script:FindFirstAncestor("AppTopBanner").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2, p3, p4, p5) -- line: 7
-	return {
-		expanded = p1,
-		appTopBannerType = p2,
-		appTopBannerContentProps = p3,
-		onAppTopBannerClick = p4,
-		appTopBannerContentHeight = p5
-	}
-end)
+return Rodux.makeActionCreator(
+	script.Name,
+	function(expanded, appTopBannerType, appTopBannerContentProps, onAppTopBannerClick, appTopBannerContentHeight)
+		return {
+			expanded = expanded,
+			appTopBannerType = appTopBannerType,
+			appTopBannerContentProps = appTopBannerContentProps,
+			onAppTopBannerClick = onAppTopBannerClick,
+			appTopBannerContentHeight = appTopBannerContentHeight
+		}
+	end
+)

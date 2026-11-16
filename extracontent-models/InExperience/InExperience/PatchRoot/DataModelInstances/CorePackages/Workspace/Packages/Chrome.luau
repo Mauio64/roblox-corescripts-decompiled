@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.Chrome.Chrome))
+local Chrome = require(Workspace.Chrome.Chrome)
+
+return Chrome

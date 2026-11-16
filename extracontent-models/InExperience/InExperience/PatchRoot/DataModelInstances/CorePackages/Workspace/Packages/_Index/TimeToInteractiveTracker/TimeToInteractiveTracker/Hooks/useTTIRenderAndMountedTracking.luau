@@ -1,24 +1,21 @@
 local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
-local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
-local React = require(TimeToInteractiveTrackerParent.React)
+local parent = TimeToInteractiveTracker.Parent
+local React = require(parent.React)
 local constants = require(TimeToInteractiveTracker.Milestones.constants)
 
 require(TimeToInteractiveTracker.Milestones.types)
 
-local function createUseTTIRenderAndMountedTracking(p1: ((...any) -> ...any)) -- line: 25
-	-- upvalues: React (copy), constants (copy)
-	return function(s1: string) -- line: 26
-		-- upvalues: React (copy), p1 (copy), constants (copy)
-		local v8 = React.useRef(false)
+local function createUseTTIRenderAndMountedTracking(callback)
+	return function(p: string)
+		local ref = React.useRef(false)
 
-		if not v8.current then
-			v8.current = true
-			p1(s1, constants.RenderStarted)
+		if not ref.current then
+			ref.current = true
+			callback(p, constants.RenderStarted)
 		end
 
-		React.useEffect(function() -- line: 34
-			-- upvalues: p1 (copy), s1 (copy), constants (copy)
-			p1(s1, constants.SurfaceMounted)
+		React.useEffect(function()
+			callback(p, constants.SurfaceMounted)
 		end, {})
 	end
 end

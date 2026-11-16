@@ -1,28 +1,35 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local NavigateIntoChat = require(AppChat.Actions.NavigateIntoChat)
-local NavigateToRoute = require(AppChatParent.NavigationRodux).Thunks.NavigateToRoute
-local AppPage = require(AppChatParent.RobloxAppEnums).AppPage
-local EnumScreens = require(AppChat.EnumScreens)
-local FFlagSignalsNavP3Dispatch = require(AppChatParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v8 = if not FFlagSignalsNavP3Dispatch then nil else require(AppChatParent.RobloxAppNavigation).NavigationCommands
-local t1 = {{
-	name = AppPage.Chat
-}}
+local parent = AppChat.Parent
 
-return function(t2: {[any]: any}, b1: boolean) -- line: 23
-	-- upvalues: FFlagSignalsNavP3Dispatch (copy), v8 (copy), t1 (copy), NavigateToRoute (copy), NavigateIntoChat (copy), EnumScreens (copy)
-	return function(p1) -- line: 24
-		-- upvalues: FFlagSignalsNavP3Dispatch (copy), v8 (copy), t1 (copy), b1 (copy), NavigateToRoute (copy), NavigateIntoChat (copy), EnumScreens (copy), t2 (copy)
+local NavigateIntoChat = require(AppChat.Actions.NavigateIntoChat)
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateToRoute = NavigationRodux.Thunks.NavigateToRoute
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local EnumScreens = require(AppChat.EnumScreens)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local v = {
+	{ name = AppPage.Chat }
+}
+
+return function(params, flag: boolean)
+	return function(object)
 		if FFlagSignalsNavP3Dispatch then
-			v8.to(v8.fromLegacyPage(t1[#t1]), b1)
+			navigationCommands.to(navigationCommands.fromLegacyPage(v[#v]), flag)
 		else
-			p1:dispatch(NavigateToRoute(t1, b1))
+			object:dispatch(NavigateToRoute(v, flag))
 		end
 
-		p1:dispatch(NavigateIntoChat({
-			screen = EnumScreens.SquadLobby,
-			params = t2
-		}))
+		object:dispatch(NavigateIntoChat({ screen = EnumScreens.SquadLobby, params = params }))
 	end
 end

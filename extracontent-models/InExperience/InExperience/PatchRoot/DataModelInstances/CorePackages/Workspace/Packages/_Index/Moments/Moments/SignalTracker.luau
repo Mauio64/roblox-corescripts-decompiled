@@ -1,3 +1,1 @@
-return {
-	createSignalTracker = require(script.SignalTracker)
-}
+return { createSignalTracker = require(script.SignalTracker) }

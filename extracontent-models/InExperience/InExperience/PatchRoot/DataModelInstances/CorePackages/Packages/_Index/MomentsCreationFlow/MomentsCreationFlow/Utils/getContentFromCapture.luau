@@ -1,5 +1,5 @@
-local function getContentFromCapture(p1) -- line: 2
-	return Content.fromObject(p1)
+local function getContentFromCapture(p)
+	return Content.fromObject(p)
 end
 
 return getContentFromCapture

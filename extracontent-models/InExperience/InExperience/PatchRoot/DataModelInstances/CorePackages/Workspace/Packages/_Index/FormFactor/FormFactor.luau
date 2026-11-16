@@ -1,13 +1,6 @@
 local FormFactor = require(script.FormFactor)
-local FormFactorReducer = require(script.FormFactorReducer)
-local SetFormFactor = require(script.SetFormFactor)
-
 return {
-	FormFactorReducer = FormFactorReducer,
-	Enums = {
-		FormFactor = FormFactor
-	},
-	Actions = {
-		SetFormFactor = SetFormFactor
-	}
+	FormFactorReducer = require(script.FormFactorReducer),
+	Enums = { FormFactor = FormFactor },
+	Actions = { SetFormFactor = require(script.SetFormFactor) }
 }

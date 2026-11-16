@@ -1,18 +1,29 @@
 local GameTile = script:FindFirstAncestor("GameTile")
-local GameTileParent = GameTile.Parent
-local GameInfosReducer = require(GameTileParent.GameInfosRodux).GameInfosReducer
-local useSelector = require(GameTileParent.RoactUtils).Hooks.RoactRodux.useSelector
+
+local parent = GameTile.Parent
+local GameInfosRodux = require(parent.GameInfosRodux)
+local GameInfosReducer = GameInfosRodux.GameInfosReducer
+
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
 local getGameTileLayoutData = require(GameTile.getGameTileLayoutData)
+local getLayoutDataVideo = require(GameTile.getLayoutDataVideo)
 
-local function useHasVideoThumbnailSelector(s1: string, s2: string?) -- line: 10
-	-- upvalues: useSelector (copy), GameInfosReducer (copy), getGameTileLayoutData (copy)
-	local v9 = useSelector(function(p1) -- line: 11
-		-- upvalues: GameInfosReducer (copy), s1 (copy)
-		return p1.Personalization[GameInfosReducer.key][s1]
-	end)
-	local v10 = getGameTileLayoutData(v9, s2)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppHomeMomentVideoFallback = SharedFlags.FFlagLuaAppHomeMomentVideoFallback
 
-	return (v10 and (v10.primaryMediaAsset and v10.primaryMediaAsset.wideVideoAssetId)) ~= nil
+local function useHasVideoThumbnailSelector(p: string, p2: string?): boolean
+	local gameTileLayoutData = getGameTileLayoutData(useSelector(function(p3)
+		return p3.Personalization[GameInfosReducer.key][p]
+	end), p2)
+
+	if not FFlagLuaAppHomeMomentVideoFallback then
+		return (gameTileLayoutData and gameTileLayoutData.primaryMediaAsset and gameTileLayoutData.primaryMediaAsset.wideVideoAssetId) ~= nil
+	end
+
+	local layoutDataVideo = getLayoutDataVideo(gameTileLayoutData)
+	return layoutDataVideo ~= nil and layoutDataVideo.assetId ~= nil
 end
 
 return useHasVideoThumbnailSelector

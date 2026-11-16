@@ -1,8 +1,11 @@
 local CorePackages = game:GetService("CorePackages")
-local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
 
-if require(ParentParent.Flags.FFlagTopBarDeprecateChatRodux) then
+local Rodux = require(CorePackages.Packages.Rodux)
+
+local parent = script.Parent.Parent
+local FFlagTopBarDeprecateChatRodux = require(parent.Flags.FFlagTopBarDeprecateChatRodux)
+
+if FFlagTopBarDeprecateChatRodux then
 	return nil
 end
 
@@ -11,71 +14,65 @@ local UpdateChatMessages = require(Actions.UpdateChatMessages)
 local UpdateUnreadMessagesBadge = require(Actions.UpdateUnreadMessagesBadge)
 local UpdateChatVisible = require(Actions.UpdateChatVisible)
 local SetCanChat = require(Actions.SetCanChat)
-local t1 = {
+
+return (Rodux.createReducer({
 	canChat = false,
 	visible = true,
 	lastReadMessages = 0,
 	unreadMessages = 0
-}
-
-return (Rodux.createReducer(t1, {
-	[UpdateUnreadMessagesBadge.name] = function(p1, p2) -- line: 28
-		if p1.visible then
-			return {
-				visible = true,
-				lastReadMessages = 0,
-				unreadMessages = 0,
-				canChat = p1.canChat
-			}
+}, {
+	[UpdateUnreadMessagesBadge.name] = function(p, p2)
+		if p.visible then
+			return { canChat = p.canChat, visible = true, lastReadMessages = 0, unreadMessages = 0 }
 		end
 
 		return {
+			canChat = p.canChat,
 			visible = false,
 			lastReadMessages = 0,
-			canChat = p1.canChat,
 			unreadMessages = p2.messages
 		}
 	end,
-	[UpdateChatMessages.name] = function(p3, p4) -- line: 46
-		if p3.visible then
+	[UpdateChatMessages.name] = function(data, p)
+		if data.visible then
 			return {
+				canChat = data.canChat,
 				visible = true,
-				unreadMessages = 0,
-				canChat = p3.canChat,
-				lastReadMessages = p4.messages
+				lastReadMessages = p.messages,
+				unreadMessages = 0
 			}
 		end
 
 		return {
+			canChat = data.canChat,
 			visible = false,
-			canChat = p3.canChat,
-			lastReadMessages = p3.lastReadMessages,
-			unreadMessages = p4.messages - p3.lastReadMessages
+			lastReadMessages = data.lastReadMessages,
+			unreadMessages = p.messages - data.lastReadMessages
 		}
 	end,
-	[UpdateChatVisible.name] = function(p5, p6) -- line: 64
-		if p6.visible then
+	[UpdateChatVisible.name] = function(data, p)
+		if p.visible then
 			return {
+				canChat = data.canChat,
 				visible = true,
-				unreadMessages = 0,
-				canChat = p5.canChat,
-				lastReadMessages = p5.lastReadMessages + p5.unreadMessages
+				lastReadMessages = data.lastReadMessages + data.unreadMessages,
+				unreadMessages = 0
 			}
 		end
 
 		return {
+			canChat = data.canChat,
 			visible = false,
-			canChat = p5.canChat,
-			lastReadMessages = p5.lastReadMessages,
-			unreadMessages = p5.unreadMessages
+			lastReadMessages = data.lastReadMessages,
+			unreadMessages = data.unreadMessages
 		}
 	end,
-	[SetCanChat.name] = function(p7, p8) -- line: 82
+	[SetCanChat.name] = function(data, p)
 		return {
-			canChat = p8.canChat,
-			visible = p7.visible,
-			lastReadMessages = p7.lastReadMessages,
-			unreadMessages = p7.unreadMessages
+			canChat = p.canChat,
+			visible = data.visible,
+			lastReadMessages = data.lastReadMessages,
+			unreadMessages = data.unreadMessages
 		}
 	end
 }))

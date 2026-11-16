@@ -1,1 +1,3 @@
-return (require(script.View))
+local View = require(script.View)
+
+return View

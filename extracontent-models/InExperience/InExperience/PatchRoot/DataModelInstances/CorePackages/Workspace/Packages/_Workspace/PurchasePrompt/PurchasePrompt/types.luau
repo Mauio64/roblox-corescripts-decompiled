@@ -1,11 +1,6 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
+require(parent.IAPExperience)
+local PurchasePromptLite = require(parent.PurchasePromptLite)
+require(parent.LuauPolyfill)
 
-require(Parent.IAPExperience)
-
-local PurchasePromptLite = require(Parent.PurchasePromptLite)
-
-require(Parent.LuauPolyfill)
-
-return {
-	ProductTypeEnum = PurchasePromptLite.Enums.ProductKind
-}
+return { ProductTypeEnum = PurchasePromptLite.Enums.ProductKind }

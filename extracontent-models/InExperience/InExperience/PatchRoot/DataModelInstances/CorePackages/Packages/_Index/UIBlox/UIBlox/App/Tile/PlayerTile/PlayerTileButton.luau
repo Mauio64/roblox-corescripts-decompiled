@@ -1,15 +1,18 @@
 local App = script:FindFirstAncestor("App")
-local AppParent = App.Parent
-local Core = AppParent.Core
-local AppParentParent = AppParent.Parent
-local t = require(AppParentParent.t)
-local Roact = require(AppParentParent.Roact)
+local parent = App.Parent
+local core = parent.Core
+local parent2 = parent.Parent
+
+local t = require(parent2.t)
+local Roact = require(parent2.Roact)
+
 local Button = require(App.Button.Button)
 local ButtonType = require(App.Button.Enum.ButtonType)
-local ControlState = require(Core.Control.Enum.ControlState)
-local v10 = Roact.PureComponent:extend("PlayerTileButton")
+local ControlState = require(core.Control.Enum.ControlState)
 
-v10.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("PlayerTileButton")
+
+extended.validateProps = t.strictInterface({
 	buttonHeight = t.optional(t.number),
 	buttonWidth = t.optional(t.number),
 	outerButtonPadding = t.optional(t.number),
@@ -22,51 +25,46 @@ v10.validateProps = t.strictInterface({
 	mouseLeave = t.optional(t.callback),
 	isRoactGamepadEnabled = t.optional(t.boolean)
 })
-v10.defaultProps = {
+
+extended.defaultProps = {
 	isSecondary = false,
 	isDisabled = false,
 	buttonHeight = 36,
 	outerButtonPadding = 10,
-	isRoactGamepadEnabled = true,
-	tileSize = UDim2.new(0, 150, 0, 150)
+	tileSize = UDim2.new(0, 150, 0, 150),
+	isRoactGamepadEnabled = true
 }
 
-function v10.render(p1) -- line: 42
-	-- upvalues: ButtonType (copy), Roact (copy), Button (copy), ControlState (copy)
-	local isSecondary = p1.props.isSecondary
-	local onActivated = p1.props.onActivated
-	local isDisabled = p1.props.isDisabled
-	local icon = p1.props.icon
-	local buttonHeight = p1.props.buttonHeight
-	local outerButtonPadding = p1.props.outerButtonPadding
-	local v18 = p1.props.tileSize.X.Offset / 2 - outerButtonPadding * 1.5
-	local uDim2 = UDim2.new(0, v18, 0, buttonHeight)
-	local v20 = isSecondary and ButtonType.Secondary or ButtonType.PrimarySystem
+function extended.render(p)
+	local isSecondary = p.props.isSecondary
+	local onActivated = p.props.onActivated
+	local isDisabled = p.props.isDisabled
+	local icon = p.props.icon
+	local buttonHeight = p.props.buttonHeight
+	local outerButtonPadding = p.props.outerButtonPadding
+	local v = p.props.tileSize.X.Offset / 2 - outerButtonPadding * 1.5
+	local udim = UDim2.new(0, v, 0, buttonHeight)
+
+	local secondary = isSecondary and ButtonType.Secondary or ButtonType.PrimarySystem
 
 	return Roact.createElement(Button, {
-		buttonType = v20,
+		buttonType = secondary,
 		automaticSize = Enum.AutomaticSize.XY,
 		position = UDim2.new(1, 0, 1, 0),
-		size = uDim2,
+		size = udim,
 		anchorPoint = Vector2.new(1, 1),
-		onActivated = onActivated or function() -- line: 62
-		end,
+		onActivated = onActivated or function() end,
 		isDisabled = isDisabled,
 		icon = icon,
-		isRoactGamepadEnabled = p1.props.isRoactGamepadEnabled,
-		onStateChanged = function(p2, p3) -- line: 66
-			-- upvalues: ControlState (copy), p1 (copy)
+		isRoactGamepadEnabled = p.props.isRoactGamepadEnabled,
+		onStateChanged = function(p2, p3)
 			if p2 == ControlState.Hover then
-				p1.props.mouseEnter()
-
-				return
-			end
-
-			if p3 == ControlState.Hover then
-				p1.props.mouseLeave()
+				p.props.mouseEnter()
+			elseif p3 == ControlState.Hover then
+				p.props.mouseLeave()
 			end
 		end
 	})
 end
 
-return v10
+return extended

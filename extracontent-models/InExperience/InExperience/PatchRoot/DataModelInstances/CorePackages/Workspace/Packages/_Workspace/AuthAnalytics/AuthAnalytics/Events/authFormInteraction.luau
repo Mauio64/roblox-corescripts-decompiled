@@ -1,25 +1,28 @@
-local ParentParent = script.Parent.Parent
-local checkAndSendEvent = require(ParentParent.Utils.checkAndSendEvent)
+local parent = script.Parent.Parent
+local checkAndSendEvent = require(parent.Utils.checkAndSendEvent)
 
-return function(s1: string, s2: string?, s3: string?, s4: string?, p1) -- line: 4
-	-- upvalues: checkAndSendEvent (copy)
-	local t1 = {}
+return function(p: string, field: string?, state: string?, origin: string?, p2, associatedText: string?)
+	local v = {}
 
-	if s2 then
-		t1.field = s2
+	if field then
+		v.field = field
 	end
 
-	if s3 then
-		t1.state = s3
+	if state then
+		v.state = state
 	end
 
-	if s4 then
-		t1.origin = s4
+	if origin then
+		v.origin = origin
 	end
 
-	if p1 ~= nil then
-		t1.entered = tostring(p1)
+	if p2 ~= nil then
+		v.entered = tostring(p2)
 	end
 
-	checkAndSendEvent(s1, "authFormInteraction", t1)
+	if associatedText then
+		v.associatedText = associatedText
+	end
+
+	checkAndSendEvent(p, "authFormInteraction", v)
 end

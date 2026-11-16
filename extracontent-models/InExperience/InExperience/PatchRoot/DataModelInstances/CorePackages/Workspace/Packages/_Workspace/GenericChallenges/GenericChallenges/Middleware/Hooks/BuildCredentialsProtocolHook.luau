@@ -1,57 +1,63 @@
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
 local HttpService = game:GetService("HttpService")
-local GenericChallengesParent = GenericChallenges.Parent
-local default = require(GenericChallengesParent.CredentialsProtocol).CredentialsProtocol.default
-local JavascriptHybrid = require(GenericChallenges.Types.JavascriptHybrid)
 
+local parent = GenericChallenges.Parent
+local CredentialsProtocol = require(parent.CredentialsProtocol)
+local default = CredentialsProtocol.CredentialsProtocol.default
+local JavascriptHybrid = require(GenericChallenges.Types.JavascriptHybrid)
 require(GenericChallenges.Middleware.BuildHybridCallback)
 
-local GetFFlagLuaAppEnableCredentialsProtocol = require(GenericChallengesParent.CredentialsProtocol).Flags.GetFFlagLuaAppEnableCredentialsProtocol
-local GetFIntLuaAppCredentialsProtocolAvailableTimeout = require(GenericChallengesParent.CredentialsProtocol).Flags.GetFIntLuaAppCredentialsProtocolAvailableTimeout
-local GetFIntLuaAppCredentialsProtocolTimeout = require(GenericChallengesParent.CredentialsProtocol).Flags.GetFIntLuaAppCredentialsProtocolTimeout
-local v9 = game:DefineFastFlag("EnableGetCredentialsInCredentialsProtocolHook", false)
+local CredentialsProtocol2 = require(parent.CredentialsProtocol)
+local GetFFlagLuaAppEnableCredentialsProtocol = CredentialsProtocol2.Flags.GetFFlagLuaAppEnableCredentialsProtocol
+
+local CredentialsProtocol3 = require(parent.CredentialsProtocol)
+local GetFIntLuaAppCredentialsProtocolAvailableTimeout = CredentialsProtocol3.Flags.GetFIntLuaAppCredentialsProtocolAvailableTimeout
+
+local CredentialsProtocol4 = require(parent.CredentialsProtocol)
+local GetFIntLuaAppCredentialsProtocolTimeout = CredentialsProtocol4.Flags.GetFIntLuaAppCredentialsProtocolTimeout
+
+local defineFastFlag = game:DefineFastFlag("EnableGetCredentialsInCredentialsProtocolHook", false)
 local ExecuteJavaScriptInWebView = require(GenericChallenges.Utils.ExecuteJavaScriptInWebView)
 
-return function(t1: {[any]: any}?) -- line: 19
-	-- upvalues: default (copy), ExecuteJavaScriptInWebView (copy), GetFFlagLuaAppEnableCredentialsProtocol (copy), JavascriptHybrid (copy), GetFIntLuaAppCredentialsProtocolAvailableTimeout (copy), v9 (copy), GetFIntLuaAppCredentialsProtocolTimeout (copy), HttpService (copy)
-	local u12 = default
-	local u13 = ExecuteJavaScriptInWebView
-	local u14 = GetFFlagLuaAppEnableCredentialsProtocol()
+return function(data)
+	local v = default
+	local v2 = ExecuteJavaScriptInWebView
+	local fFlagLuaAppEnableCredentialsProtocol = GetFFlagLuaAppEnableCredentialsProtocol()
 
-	if t1 ~= nil and t1.defaultExecuteJavaScriptInWebView ~= nil then
-		u13 = t1.defaultExecuteJavaScriptInWebView
+	if data ~= nil and data.defaultExecuteJavaScriptInWebView ~= nil then
+		v2 = data.defaultExecuteJavaScriptInWebView
 	end
 
-	if t1 ~= nil and t1.defaultCredentialsProtocol ~= nil then
-		u12 = t1.defaultCredentialsProtocol
+	if data ~= nil and data.defaultCredentialsProtocol ~= nil then
+		v = data.defaultCredentialsProtocol
 	end
 
-	if t1 ~= nil and t1.defaultCredentialsProtocolEnabled ~= nil then
-		u14 = t1.defaultCredentialsProtocolEnabled
+	if data ~= nil and data.defaultCredentialsProtocolEnabled ~= nil then
+		fFlagLuaAppEnableCredentialsProtocol = data.defaultCredentialsProtocolEnabled
 	end
 
-	return function(p1) -- line: 36
-		-- upvalues: u14 (ref), JavascriptHybrid (copy), u12 (ref), default (copy), GetFIntLuaAppCredentialsProtocolAvailableTimeout (copy), u13 (ref), v9 (copy), GetFIntLuaAppCredentialsProtocolTimeout (copy), HttpService (copy)
-		if u14 then
-			if p1.feature == JavascriptHybrid.Feature.CredentialsProtocolAvailable then
-				u12:isAvailable(default.CredentialsTypes.FIDO2, GetFIntLuaAppCredentialsProtocolAvailableTimeout()):andThen(function(p2) -- line: 44
-					-- upvalues: u13 (ref), p1 (copy)
-					local v17 = p2.isAvailable or false
+	return function(p): boolean
+		if not fFlagLuaAppEnableCredentialsProtocol then
+			return false
+		end
 
-					u13.Execute(p1.data.callId, (tostring(v17)))
-				end):catch(function() -- line: 48
-					-- upvalues: u13 (ref), p1 (copy)
-					u13.Execute(p1.data.callId, "false")
-				end)
-			elseif v9 and p1.feature == JavascriptHybrid.Feature.GetCredentials then
-				u12:getCredentials(default.CredentialsTypes.FIDO2, p1.data.authenticationOptionsJSON, GetFIntLuaAppCredentialsProtocolTimeout()):andThen(function(p3) -- line: 61
-					-- upvalues: u13 (ref), p1 (copy), HttpService (copy)
-					u13.Execute(p1.data.callId, not p3 and "" or HttpService:JSONEncode(p3))
-				end):catch(function() -- line: 67
-					-- upvalues: u13 (ref), p1 (copy)
-					u13.Execute(p1.data.callId, "")
-				end)
-			end
+		if p.feature == JavascriptHybrid.Feature.CredentialsProtocolAvailable then
+			v:isAvailable(default.CredentialsTypes.FIDO2, GetFIntLuaAppCredentialsProtocolAvailableTimeout()):andThen(function(p2)
+				local isAvailable = p2.isAvailable or false
+				v2.Execute(p.data.callId, (tostring(isAvailable)))
+			end):catch(function()
+				v2.Execute(p.data.callId, "false")
+			end)
+		elseif defineFastFlag and p.feature == JavascriptHybrid.Feature.GetCredentials then
+			v:getCredentials(
+				default.CredentialsTypes.FIDO2,
+				p.data.authenticationOptionsJSON,
+				GetFIntLuaAppCredentialsProtocolTimeout()
+			):andThen(function(p2)
+				v2.Execute(p.data.callId, not p2 and "" or HttpService:JSONEncode(p2))
+			end):catch(function()
+				v2.Execute(p.data.callId, "")
+			end)
 		end
 
 		return false

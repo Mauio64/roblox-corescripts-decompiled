@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("PhoneUpsell").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("PhoneUpsell").Parent
+local Cryo = require(parent.Cryo)
 
-local function mergeProps(p1, p2) -- line: 9
-	-- upvalues: Cryo (copy)
-	return Cryo.Dictionary.join(p1, p2)
+local function mergeProps(p, p2)
+	return Cryo.Dictionary.join(p, p2)
 end
 
 return mergeProps

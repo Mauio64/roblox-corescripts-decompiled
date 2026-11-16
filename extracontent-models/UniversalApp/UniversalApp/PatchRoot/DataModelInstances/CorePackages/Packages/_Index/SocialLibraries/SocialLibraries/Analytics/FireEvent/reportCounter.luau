@@ -1,10 +1,9 @@
 require(script.Parent.Types)
 
-return function(t1: {[any]: any}) -- line: 4
-	return function(p1) -- line: 5
-		-- upvalues: t1 (copy)
-		t1:reportCounter(p1.name, p1.count or 1)
+return function(object)
+	return function(p)
+		object:reportCounter(p.name, p.count or 1)
 
-		return p1
+		return p
 	end
 end

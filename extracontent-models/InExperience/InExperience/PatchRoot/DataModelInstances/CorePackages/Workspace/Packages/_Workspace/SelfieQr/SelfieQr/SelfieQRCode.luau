@@ -1,87 +1,139 @@
 local AvatarCreationService = game:GetService("AvatarCreationService")
-local Parent = script:FindFirstAncestor("SelfieQr").Parent
-local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
-local Foundation = require(Parent.Foundation)
-local Http = require(Parent.Http)
-local Localization = require(Parent.Localization)
-local Promise = require(Parent.Promise)
-local QRCodeDisplay = require(Parent.QRCodeDisplay)
-local React = require(Parent.React)
-local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
-local Responsive = require(Parent.Responsive)
-local RoactNetworking = require(Parent.RoactServiceTags).RoactNetworking
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
+
+local parent = script:FindFirstAncestor("SelfieQr").Parent
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Foundation = require(parent.Foundation)
+local Http = require(parent.Http)
+local Localization = require(parent.Localization)
+local Promise = require(parent.Promise)
+local QRCodeDisplay = require(parent.QRCodeDisplay)
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local Responsive = require(parent.Responsive)
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
 local DisplayQRCode = QRCodeDisplay.DisplayQRCode
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
-local FoundationImage = Foundation.Image
+local Image = Foundation.Image
 local Icon = Foundation.Icon
 local Url = Http.Url
 local useLocalization = Localization.Hooks.useLocalization
 local useTokens = Foundation.Hooks.useTokens
-local v23 = game:DefineFastFlag("AdoptStyleTokens", false)
-local v24 = game:DefineFastFlag("AllowQrEnlargeUniversally", false)
-local v25 = game:DefineFastFlag("ConsoleCloseAffordanceFix", false)
-local v26 = game:DefineFastFlag("EnableTimeoutUI", false)
-local v27 = game:DefineFastInt("SelfieQrTimeoutSeconds", 120)
-local v28 = game:DefineFastString("DebugAvatarGenerationStaticApiKey", "NOT_SET")
-local t1 = {
+
+local defineFastFlag = game:DefineFastFlag("AdoptStyleTokens", false)
+local defineFastFlag2 = game:DefineFastFlag("AllowQrEnlargeUniversally", false)
+local defineFastFlag3 = game:DefineFastFlag("ConsoleCloseAffordanceFix", false)
+local defineFastFlag4 = game:DefineFastFlag("EnableTimeoutUI", false)
+local defineFastInt = game:DefineFastInt("SelfieQrTimeoutSeconds", 120)
+
+local defineFastString = game:DefineFastString("DebugAvatarGenerationStaticApiKey", "NOT_SET")
+
+local navigateBacksByButtonB = {
 	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack
 }
 
-local function SelfieQRCodeView(t2: {[any]: any}) -- line: 60
-	-- upvalues: useTokens (copy), React (copy), v26 (copy), v23 (copy), DisplayQRCode (copy), QRCodeDisplay (copy), FoundationImage (copy)
-	local v33 = useTokens()
+local function SelfieQRCodeView(props)
+	local v = useTokens()
 
-	return React.createElement("Frame", {
-		ClipsDescendants = true,
-		Size = t2.outerSize,
+	local createElement = React.createElement
+	local v2 = {
+		Size = props.outerSize,
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		BackgroundColor3 = if not v26 or not t2.errorOccurred then if not v23 then Color3.fromRGB(255, 255, 255) else v33.Color.Extended.White.White_0.Color3 else v33.Color.Extended.Gray.Gray_1000.Color3
-	}, {
-		QRContainer = if not not v26 and t2.errorOccurred then nil else React.createElement("Frame", {
-			Size = UDim2.fromOffset(t2.sideLength, t2.sideLength),
+		BackgroundColor3 = 0,
+		ClipsDescendants = true
+	}
+	local backgroundColor
+
+	if defineFastFlag4 and props.errorOccurred then
+		backgroundColor = v.Color.Extended.Gray.Gray_1000.Color3
+	elseif defineFastFlag then
+		backgroundColor = v.Color.Extended.White.White_0.Color3
+	else
+		backgroundColor = Color3.fromRGB(255, 255, 255)
+	end
+
+	v2.BackgroundColor3 = backgroundColor
+	local qrContainer
+
+	if not (defineFastFlag4 and props.errorOccurred) then
+		qrContainer = React.createElement("Frame", {
+			Size = UDim2.fromOffset(props.sideLength, props.sideLength),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = not v23 and 1 or v33.Color.None.Transparency
+			BackgroundTransparency = not defineFastFlag and 1 or v.Color.None.Transparency
 		}, {
 			DisplayQRCode = React.createElement(DisplayQRCode, {
-				toEncode = t2.url,
+				toEncode = props.url,
 				ecLevel = QRCodeDisplay.ECLevels.EC_LEVEL_4,
-				sideLength = t2.sideLength
+				sideLength = props.sideLength
 			})
-		}),
-		LogoContainer = if not not v26 and t2.errorOccurred then nil else React.createElement("Frame", {
-			ZIndex = 10,
-			ClipsDescendants = true,
+		})
+	end
+
+	local logoContainer
+
+	if not (defineFastFlag4 and props.errorOccurred) then
+		local createElement2 = React.createElement
+		local v3 = {
 			Size = UDim2.new(0.3, 0, 0.3, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundColor3 = if not v23 then Color3.fromRGB(0, 0, 0) else v33.Color.Extended.Black.Black_0.Color3
-		}, {
-			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0.125, 0)
-			}),
+			BackgroundColor3 = 0,
+			ZIndex = 10,
+			ClipsDescendants = true
+		}
+		local backgroundColor2
+
+		if defineFastFlag then
+			backgroundColor2 = v.Color.Extended.Black.Black_0.Color3
+		else
+			backgroundColor2 = Color3.fromRGB(0, 0, 0)
+		end
+
+		v3.BackgroundColor3 = backgroundColor2
+
+		local v4 = {
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0.125, 0) }),
 			Stroke = React.createElement("UIStroke", {
+				Color = v.Color.Extended.White.White_0.Color3,
 				Thickness = 1,
-				Color = v33.Color.Extended.White.White_0.Color3,
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 				LineJoinMode = Enum.LineJoinMode.Round
 			}),
-			Icon = React.createElement(FoundationImage, {
-				ZIndex = 11,
-				Size = if not v23 then UDim2.new(0.75, 0, 0.75, 0) else UDim2.fromScale(1, 1),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				BackgroundTransparency = not v23 and 1 or nil,
-				Image = not v23 and "icons/logo/block" or "rbxasset://textures/ui/LuaApp/ExternalSite/roblox@3x.png"
-			})
-		}),
-		Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0.065, 0)
-		}),
+			Icon = 0
+		}
+
+		local createElement3 = React.createElement
+		local size
+
+		if defineFastFlag then
+			size = UDim2.fromScale(1, 1)
+		else
+			size = UDim2.new(0.75, 0, 0.75, 0)
+		end
+
+		v4.Icon = createElement3(Image, {
+			Size = size,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			BackgroundTransparency = not defineFastFlag and 1 or nil,
+			Image = defineFastFlag and "rbxasset://textures/ui/LuaApp/ExternalSite/roblox@3x.png" or "icons/logo/block",
+			ZIndex = 11
+		})
+		logoContainer = createElement2("Frame", v3, v4)
+	end
+
+	return createElement("Frame", v2, {
+		QRContainer = qrContainer,
+		LogoContainer = logoContainer,
+		Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0.065, 0) }),
 		Constraint = React.createElement("UIAspectRatioConstraint", {
 			AspectRatio = 1,
 			AspectType = Enum.AspectType.FitWithinMaxSize,
@@ -89,33 +141,30 @@ local function SelfieQRCodeView(t2: {[any]: any}) -- line: 60
 		})
 	})
 end
-local function getJobStatus(p1, p2) -- line: 133
-	-- upvalues: v28 (copy), Promise (copy)
-	return p1(p2, "GET", {
-		headers = {
-			["X-Static-Api-Key"] = v28
-		}
-	}):andThen(function(p3) -- line: 135
-		-- upvalues: Promise (copy)
-		local responseBody = p3.responseBody
 
-		if not responseBody then
-			return Promise.reject("Invalid response from getJobStatus")
+local function getJobStatus(callback, p)
+	return callback(p, "GET", {
+		headers = { ["X-Static-Api-Key"] = defineFastString }
+	}):andThen(function(p2)
+		local responseBody = p2.responseBody
+
+		if responseBody then
+			return responseBody
 		end
 
-		return responseBody
+		return Promise.reject("Invalid response from getJobStatus")
 	end)
 end
 
-return function(t3: {[any]: any}) -- line: 146
-	-- upvalues: React (copy), Responsive (copy), useRoactService (copy), RoactNetworking (copy), useTokens (copy), useLocalization (copy), v27 (copy), v26 (copy), AvatarCreationService (copy), getJobStatus (copy), Url (copy), DialogSize (copy), v25 (copy), ReactFocusNavigation (copy), t1 (copy), FocusNavigationEventNameEnum (copy), v23 (copy), v24 (copy), SelfieQRCodeView (copy), Dialog (copy), Icon (copy), Foundation (copy)
-	local v37, v38 = React.useState(false)
-	local v39 = Responsive.usePreferredInput() == Responsive.Input.Directional
-	local v40, v41 = React.useState(false)
-	local v42, v43 = React.useState(false)
-	local v44 = useRoactService(RoactNetworking)
-	local v45 = useTokens()
-	local v46 = useLocalization({
+return function(props)
+	local state, setState = React.useState(false)
+	local v = Responsive.usePreferredInput() == Responsive.Input.Directional
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
+	local v2 = useRoactService(RoactNetworking)
+	local v3 = useTokens()
+
+	local v4 = useLocalization({
 		title = {
 			"AvatarGeneration.SelfieConsent.QRTitle",
 			fontStart = "<font weight=\"heavy\" size=\"24\">",
@@ -138,81 +187,51 @@ return function(t3: {[any]: any}) -- line: 146
 		}
 	})
 
-	local function handleError() -- line: 178
-		-- upvalues: v43 (copy), v38 (copy), v41 (copy)
-		v43(true)
-		v38(false)
-		v41(false)
+	local function handleError() -- 3 equivalent calls inferred from this helper
+		setState3(true)
+		setState(false)
+		setState2(false)
 	end
 
-	React.useEffect(function() -- line: 185
-		-- upvalues: v27 (copy), v26 (copy), v43 (copy), v38 (copy), v41 (copy), t3 (copy), AvatarCreationService (copy), getJobStatus (copy), v44 (copy), Url (copy)
+	React.useEffect(function()
 		local thread = nil
-		local thread2 = task.delay(v27, function() -- line: 187
-			-- upvalues: v26 (copy), v43 (copy), v38 (copy), v41 (copy), t3 (copy), AvatarCreationService (copy)
-			if v26 then
-				v43(true)
-				v38(false)
-				v41(false)
-
-				return
+		local thread2 = task.delay(defineFastInt, function()
+			if defineFastFlag4 then
+				handleError() -- inferred equivalent call
+			else
+				props.displaySelfieQRCode(false)
+				AvatarCreationService:HandleSelfieQRResult(false, "job not completed within time limit")
 			end
-
-			t3.displaySelfieQRCode(false)
-			AvatarCreationService:HandleSelfieQRResult(false, "job not completed within time limit")
 		end)
-
-		local function poll(p4) -- line: 196
-			-- upvalues: getJobStatus (copy), v44 (copy), t3 (copy), AvatarCreationService (copy), v26 (copy), v43 (copy), v38 (copy), v41 (copy), thread (ref), poll (copy)
-			getJobStatus(v44, p4):andThen(function(p5) -- line: 198
-				-- upvalues: t3 (copy), AvatarCreationService (copy), v26 (copy), v43 (copy), v38 (copy), v41 (copy), thread (ref), poll (copy), p4 (copy)
-				if p5.status == "done" then
-					local v62 = p5.fileIds and p5.fileIds[1]
-
-					t3.displaySelfieQRCode(false)
-					AvatarCreationService:HandleSelfieQRResult(true, v62)
-
-					return
-				end
-
-				if p5.status == "cancelled" or p5.status == "error" then
-					if v26 then
-						v43(true)
-						v38(false)
-						v41(false)
-
-						return
-					end
-
-					t3.displaySelfieQRCode(false)
+		local function poll(p)
+			getJobStatus(v2, p):andThen(function(p2)
+				if p2.status == "done" then
+					local v5 = p2.fileIds and p2.fileIds[1]
+					props.displaySelfieQRCode(false)
+					AvatarCreationService:HandleSelfieQRResult(true, v5)
+				elseif p2.status ~= "cancelled" and p2.status ~= "error" then
+					thread = task.delay(1, function()
+						poll(p)
+					end)
+				elseif defineFastFlag4 then
+					handleError() -- inferred equivalent call
+				else
+					props.displaySelfieQRCode(false)
 					AvatarCreationService:HandleSelfieQRResult(false, "job polling failed")
-
-					return
 				end
-
-				thread = task.delay(1, function() -- line: 211
-					-- upvalues: poll (copy), p4 (copy)
-					poll(p4)
-				end)
-			end):catch(function(_) -- line: 216
-				-- upvalues: v26 (copy), v43 (copy), v38 (copy), v41 (copy), t3 (copy), AvatarCreationService (copy)
-				if v26 then
-					v43(true)
-					v38(false)
-					v41(false)
-
-					return
+			end):catch(function(_)
+				if defineFastFlag4 then
+					handleError() -- inferred equivalent call
+				else
+					props.displaySelfieQRCode(false)
+					AvatarCreationService:HandleSelfieQRResult(false, "job polling failed")
 				end
-
-				t3.displaySelfieQRCode(false)
-				AvatarCreationService:HandleSelfieQRResult(false, "job polling failed")
 			end)
 		end
 
-		poll((string.format("%sml-runtime-gateway/v0.2/jobs/%s", Url.APIS_URL, t3.jobId)))
+		poll((string.format("%sml-runtime-gateway/v0.2/jobs/%s", Url.APIS_URL, props.jobId)))
 
-		return function() -- line: 229
-			-- upvalues: thread (ref), thread2 (copy)
+		return function()
 			if thread then
 				task.cancel(thread)
 			end
@@ -223,253 +242,452 @@ return function(t3: {[any]: any}) -- line: 146
 		end
 	end, {})
 
-	local t4 = {
-		ZIndex = 2,
-		size = DialogSize.Medium
-	}
+	local v5 = { size = DialogSize.Medium, ZIndex = 2 }
 
-	if not v39 then
-		function t4.onClose(_) -- line: 245
-			-- upvalues: t3 (copy), v26 (copy), AvatarCreationService (copy)
-			t3.displaySelfieQRCode(false)
+	if not v then
+		function v5.onClose(_)
+			props.displaySelfieQRCode(false)
 
-			if v26 then
-				AvatarCreationService:HandleSelfieQRResult(false, "QR code closed before job completed or session expired")
-
-				return
-			end
-
-			AvatarCreationService:HandleSelfieQRResult(false, "QR code closed before job completed")
-		end
-	end
-
-	local v49 = if not v25 then nil else ReactFocusNavigation.useEventMap(t1)
-	local v50 = React.useCallback(function(p8) -- line: 259
-		-- upvalues: v37 (copy), v38 (copy), t3 (copy), v26 (copy), AvatarCreationService (copy)
-		local eventData = p8.eventData
-
-		if eventData and eventData.UserInputState == Enum.UserInputState.End then
-			p8:cancel()
-
-			if v37 then
-				v38(false)
-
-				return
-			end
-
-			t3.displaySelfieQRCode(false)
-
-			if v26 then
-				AvatarCreationService:HandleSelfieQRResult(false, "QR code closed before job completed or session expired")
-
-				return
-			end
-
-			AvatarCreationService:HandleSelfieQRResult(false, "QR code closed before job completed")
-		end
-	end, {
-		v37,
-		t3.displaySelfieQRCode
-	})
-	local v51 = if not v25 then nil else ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.NavigateBack, v50, nil, v49)
-
-	if v37 then
-		return React.createElement("Frame", {
-			ZIndex = 7,
-			ref = if not v25 then nil else v51,
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundColor3 = if not v23 then Color3.fromRGB(0, 0, 0) else v45.Color.Extended.Black.Black_60.Color3,
-			BackgroundTransparency = not v23 and 0.4 or v45.Color.Extended.Black.Black_60.Transparency
-		}, {
-			InvisibleCloseButton = React.createElement("TextButton", {
-				Size = UDim2.new(1, 0, 1, 0),
-				BackgroundTransparency = not v23 and 1 or v45.Color.ActionUtility.Background.Transparency,
-				Text = "",
-				ZIndex = if v25 then nil else 5,
-				[React.Event.Activated] = if not (not not v24 and not v39) and v25 then nil else function() -- line: 311
-					-- upvalues: v38 (copy)
-					v38(false)
-				end
-			}),
-			QRCodeArea = React.createElement(SelfieQRCodeView, {
-				sideLength = 500,
-				url = t3.url,
-				outerSize = UDim2.fromOffset(600, 600),
-				errorOccurred = if not v26 then nil else v42
-			})
-		})
-	end
-
-	return React.createElement("Frame", {
-		ZIndex = 0,
-		ref = if not v25 then nil else v51,
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = if not v23 then Color3.fromRGB(0, 0, 0) else v45.Color.Extended.Black.Black_0.Color3,
-		BackgroundTransparency = not v23 and 1 or v45.Color.None.Transparency
-	}, {
-		InvisibleCloseButton = if v25 then nil else React.createElement("TextButton", {
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = not v23 and 1 or v45.Color.ActionUtility.Background.Transparency,
-			Text = "",
-			ZIndex = 1,
-			[React.Event.Activated] = function() -- line: 344
-				-- upvalues: t3 (copy), AvatarCreationService (copy)
-				t3.displaySelfieQRCode(false)
+			if defineFastFlag4 then
+				AvatarCreationService:HandleSelfieQRResult(
+					false,
+					"QR code closed before job completed or session expired"
+				)
+			else
 				AvatarCreationService:HandleSelfieQRResult(false, "QR code closed before job completed")
 			end
-		}),
-		Dialog = React.createElement(Dialog.Root, t4, {
-			DialogContent = React.createElement(Dialog.Content, nil, {
-				Layout = React.createElement("UIListLayout", {
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		end
+	end
+
+	local v6
+
+	if defineFastFlag3 then
+		v6 = ReactFocusNavigation.useEventMap(navigateBacksByButtonB)
+	end
+
+	local v7 = React.useCallback(function(object)
+		local eventData = object.eventData
+
+		if eventData and eventData.UserInputState == Enum.UserInputState.End then
+			object:cancel()
+
+			if state then
+				setState(false)
+				return
+			end
+
+			props.displaySelfieQRCode(false)
+
+			if defineFastFlag4 then
+				AvatarCreationService:HandleSelfieQRResult(
+					false,
+					"QR code closed before job completed or session expired"
+				)
+			else
+				AvatarCreationService:HandleSelfieQRResult(false, "QR code closed before job completed")
+			end
+		end
+	end, { state, props.displaySelfieQRCode })
+	local ref
+
+	if defineFastFlag3 then
+		ref = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.NavigateBack, v7, nil, v6)
+	end
+
+	if state then
+		local createElement = React.createElement
+
+		if not defineFastFlag3 then
+			ref = nil
+		end
+
+		local v8 = {
+			ref = ref,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundColor3 = 0,
+			BackgroundTransparency = 0,
+			ZIndex = 7
+		}
+		local backgroundColor
+
+		if defineFastFlag then
+			backgroundColor = v3.Color.Extended.Black.Black_60.Color3
+		else
+			backgroundColor = Color3.fromRGB(0, 0, 0)
+		end
+
+		v8.BackgroundColor3 = backgroundColor
+
+		v8.BackgroundTransparency = not defineFastFlag and 0.4 or v3.Color.Extended.Black.Black_60.Transparency
+
+		local children = {
+			InvisibleCloseButton = React.createElement("TextButton", {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = not defineFastFlag and 1 or v3.Color.ActionUtility.Background.Transparency,
+				Text = "",
+				ZIndex = not defineFastFlag3 and 5 or nil,
+				[React.Event.Activated] = defineFastFlag2 and not v and function()
+					setState(false)
+				end or not defineFastFlag3 and function()
+					setState(false)
+				end or nil
+			}),
+			QRCodeArea = 0
+		}
+
+		local createElement2 = React.createElement
+		local v9 = {
+			url = props.url,
+			sideLength = 500,
+			outerSize = UDim2.fromOffset(600, 600),
+			errorOccurred = 0
+		}
+
+		if not defineFastFlag4 then
+			state3 = nil
+		end
+
+		v9.errorOccurred = state3
+		children.QRCodeArea = createElement2(SelfieQRCodeView, v9)
+		return createElement("Frame", v8, children)
+	else
+		local createElement = React.createElement
+
+		if not defineFastFlag3 then
+			ref = nil
+		end
+
+		local v8 = {
+			ref = ref,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundColor3 = 0,
+			BackgroundTransparency = 0,
+			ZIndex = 0
+		}
+		local backgroundColor
+
+		if defineFastFlag then
+			backgroundColor = v3.Color.Extended.Black.Black_0.Color3
+		else
+			backgroundColor = Color3.fromRGB(0, 0, 0)
+		end
+
+		v8.BackgroundColor3 = backgroundColor
+
+		v8.BackgroundTransparency = not defineFastFlag and 1 or v3.Color.None.Transparency
+		local invisibleCloseButton
+
+		if not defineFastFlag3 then
+			invisibleCloseButton = React.createElement("TextButton", {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = not defineFastFlag and 1 or v3.Color.ActionUtility.Background.Transparency,
+				Text = "",
+				ZIndex = 1,
+				[React.Event.Activated] = function()
+					props.displaySelfieQRCode(false)
+					AvatarCreationService:HandleSelfieQRResult(false, "QR code closed before job completed")
+				end
+			})
+		end
+
+		local createElement2 = React.createElement
+		local root = Dialog.Root
+		local createElement3 = React.createElement
+		local content = Dialog.Content
+		local createElement4 = React.createElement
+		local v9 = {
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = 0
+		}
+		local padding
+
+		if defineFastFlag then
+			padding = UDim.new(0, v3.Padding.Small)
+		else
+			padding = UDim.new(0, 10)
+		end
+
+		v9.Padding = padding
+		local children = {
+			Layout = createElement4("UIListLayout", v9),
+			TopSpacer = 0,
+			HoverFrame = 0,
+			BottomSpacer = 0,
+			TextContainerWrapper = 0
+		}
+
+		local createElement5 = React.createElement
+		local size
+
+		if defineFastFlag then
+			size = UDim2.fromOffset(0, 56)
+		else
+			size = UDim2.new(0, 0, 0, 50)
+		end
+
+		children.TopSpacer = createElement5("Frame", {
+			Size = size,
+			BackgroundTransparency = not defineFastFlag and 1 or v3.Color.None.Transparency,
+			LayoutOrder = 0
+		})
+
+		local createElement6 = React.createElement
+		local v10 = {
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			LayoutOrder = 1
+		}
+
+		local v11 = {
+			Layout = React.createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			InteractiveArea = 0
+		}
+
+		local createElement7 = React.createElement
+		local v12 = {
+			Text = "",
+			Size = UDim2.new(0.65, 0, 0, 0),
+			BackgroundTransparency = not defineFastFlag and 1 or v3.Color.ActionUtility.Background.Transparency,
+			AutoButtonColor = false,
+			[React.Event.MouseEnter] = function()
+				if defineFastFlag4 and state3 then
+					return
+				end
+
+				if defineFastFlag2 or v then
+					setState2(true)
+				end
+			end,
+			[React.Event.MouseLeave] = function()
+				setState2(false)
+			end,
+			[React.Event.Activated] = function()
+				if defineFastFlag4 and state3 then
+					return
+				end
+
+				if defineFastFlag2 or v then
+					setState(true)
+
+					if defineFastFlag4 then
+						setState2(false)
+					end
+				end
+			end
+		}
+		local children2 = {
+			Constraint = React.createElement("UIAspectRatioConstraint", {
+				AspectRatio = 1,
+				AspectType = Enum.AspectType.ScaleWithParentSize,
+				DominantAxis = Enum.DominantAxis.Width
+			}),
+			BorderFrame = 0,
+			QRCodeArea = 0
+		}
+
+		local createElement8 = React.createElement
+		local v13 = {
+			Size = UDim2.new(0.98, 0, 0.98, 0),
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = v3.Color.ActionEmphasis.Border.Transparency
+		}
+
+		local createElement9 = React.createElement
+		local color
+
+		if defineFastFlag then
+			color = v3.Color.Extended.White.White_0.Color3
+		else
+			color = Color3.fromRGB(255, 255, 255)
+		end
+
+		children2.BorderFrame = createElement8("Frame", v13, {
+			Stroke = createElement9("UIStroke", {
+				Color = color,
+				Thickness = 3,
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+				LineJoinMode = Enum.LineJoinMode.Round,
+				Transparency = not defineFastFlag and (state2 and 0 or 1) or state2 and v3.Color.ActionEmphasis.Foreground.Transparency or v3.Color.ActionEmphasis.Border.Transparency
+			}),
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0.075, 0) })
+		})
+
+		local createElement10 = React.createElement
+		local v14 = {
+			url = props.url,
+			sideLength = 225,
+			outerSize = UDim2.new(0.95, 0, 0.95, 0),
+			errorOccurred = 0
+		}
+		local errorOccurred
+
+		if defineFastFlag4 then
+			errorOccurred = state3
+		end
+
+		v14.errorOccurred = errorOccurred
+		children2.QRCodeArea = createElement10(SelfieQRCodeView, v14)
+		v11.InteractiveArea = createElement7("TextButton", v12, children2)
+		children.HoverFrame = createElement6("Frame", v10, v11)
+
+		local createElement11 = React.createElement
+		local size2
+
+		if defineFastFlag then
+			size2 = UDim2.fromOffset(0, v3.Gap.XXLarge)
+		else
+			size2 = UDim2.new(0, 0, 0, 30)
+		end
+
+		children.BottomSpacer = createElement11("Frame", {
+			Size = size2,
+			BackgroundTransparency = not defineFastFlag and 1 or v3.Color.None.Transparency,
+			LayoutOrder = 2
+		})
+
+		local createElement12 = React.createElement
+		local v15 = {
+			Size = UDim2.new(1, 0, 0, v3.Size.Size_2000),
+			BackgroundTransparency = v3.Color.None.Transparency,
+			LayoutOrder = 3
+		}
+		local layout
+
+		if not defineFastFlag4 then
+			layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			})
+		end
+
+		local textAndIconContainer
+
+		if defineFastFlag4 then
+			local createElement13 = React.createElement
+			local v16 = {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = v3.Color.None.Transparency
+			}
+
+			local createElement14 = React.createElement
+			local fillDirection
+
+			if state3 then
+				fillDirection = Enum.FillDirection.Horizontal
+			else
+				fillDirection = Enum.FillDirection.Vertical
+			end
+
+			local children3 = {
+				Layout = createElement14("UIListLayout", {
+					FillDirection = fillDirection,
 					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = if not v23 then UDim.new(0, 10) else UDim.new(0, v45.Padding.Small)
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Top,
+					Padding = UDim.new(0, v3.Gap.Medium)
 				}),
-				TopSpacer = React.createElement("Frame", {
-					LayoutOrder = 0,
-					Size = if not v23 then UDim2.new(0, 0, 0, 50) else UDim2.fromOffset(0, 56),
-					BackgroundTransparency = not v23 and 1 or v45.Color.None.Transparency
-				}),
-				HoverFrame = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					Size = UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y
-				}, {
-					Layout = React.createElement("UIListLayout", {
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						VerticalAlignment = Enum.VerticalAlignment.Center
-					}),
-					InteractiveArea = React.createElement("TextButton", {
-						Text = "",
-						Size = UDim2.new(0.65, 0, 0, 0),
-						BackgroundTransparency = not v23 and 1 or v45.Color.ActionUtility.Background.Transparency,
-						AutoButtonColor = false,
-						[React.Event.MouseEnter] = function() -- line: 386
-							-- upvalues: v26 (copy), v42 (copy), v24 (copy), v39 (copy), v41 (copy)
-							if v26 and v42 then
-								return
-							end
+				WarningIcon = 0,
+				TextContent = 0
+			}
+			local warningIcon
 
-							if v24 or v39 then
-								v41(true)
-							end
-						end,
-						[React.Event.MouseLeave] = function() -- line: 394
-							-- upvalues: v41 (copy)
-							v41(false)
-						end,
-						[React.Event.Activated] = function() -- line: 397
-							-- upvalues: v26 (copy), v42 (copy), v24 (copy), v39 (copy), v38 (copy), v41 (copy)
-							if v26 and v42 then
-								return
-							end
-
-							if v24 or v39 then
-								v38(true)
-
-								if v26 then
-									v41(false)
-								end
-							end
-						end
-					}, {
-						Constraint = React.createElement("UIAspectRatioConstraint", {
-							AspectRatio = 1,
-							AspectType = Enum.AspectType.ScaleWithParentSize,
-							DominantAxis = Enum.DominantAxis.Width
-						}),
-						BorderFrame = React.createElement("Frame", {
-							Size = UDim2.new(0.98, 0, 0.98, 0),
-							Position = UDim2.fromScale(0.5, 0.5),
-							AnchorPoint = Vector2.new(0.5, 0.5),
-							BackgroundTransparency = v45.Color.ActionEmphasis.Border.Transparency
-						}, {
-							Stroke = React.createElement("UIStroke", {
-								Thickness = 3,
-								Color = if not v23 then Color3.fromRGB(255, 255, 255) else v45.Color.Extended.White.White_0.Color3,
-								ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-								LineJoinMode = Enum.LineJoinMode.Round,
-								Transparency = if not v23 then not v40 and 1 or 0 else v40 and v45.Color.ActionEmphasis.Foreground.Transparency or v45.Color.ActionEmphasis.Border.Transparency
-							}),
-							Corner = React.createElement("UICorner", {
-								CornerRadius = UDim.new(0.075, 0)
-							})
-						}),
-						QRCodeArea = React.createElement(SelfieQRCodeView, {
-							sideLength = 225,
-							url = t3.url,
-							outerSize = UDim2.new(0.95, 0, 0.95, 0),
-							errorOccurred = if not v26 then nil else v42
-						})
-					})
-				}),
-				BottomSpacer = React.createElement("Frame", {
-					LayoutOrder = 2,
-					Size = if not v23 then UDim2.new(0, 0, 0, 30) else UDim2.fromOffset(0, v45.Gap.XXLarge),
-					BackgroundTransparency = not v23 and 1 or v45.Color.None.Transparency
-				}),
-				TextContainerWrapper = React.createElement("Frame", {
-					LayoutOrder = 3,
-					Size = UDim2.new(1, 0, 0, v45.Size.Size_2000),
-					BackgroundTransparency = v45.Color.None.Transparency
-				}, {
-					Layout = if v26 then nil else React.createElement("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center
-					}),
-					TextAndIconContainer = if not v26 then nil else React.createElement("Frame", {
-						Size = UDim2.new(1, 0, 1, 0),
-						BackgroundTransparency = v45.Color.None.Transparency
-					}, {
-						Layout = React.createElement("UIListLayout", {
-							FillDirection = if not v42 then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal,
-							SortOrder = Enum.SortOrder.LayoutOrder,
-							HorizontalAlignment = Enum.HorizontalAlignment.Left,
-							VerticalAlignment = Enum.VerticalAlignment.Top,
-							Padding = UDim.new(0, v45.Gap.Medium)
-						}),
-						WarningIcon = if not v42 then nil else React.createElement(Icon, {
-							LayoutOrder = 1,
-							name = Foundation.Enums.IconName.TriangleExclamation,
-							size = v45.Size.Size_700,
-							BackgroundTransparency = v45.Color.None.Transparency
-						}),
-						TextContent = React.createElement("Frame", {
-							LayoutOrder = 2,
-							Size = if not v42 then UDim2.fromScale(1, 0) else UDim2.new(1, -48, 0, 0),
-							AutomaticSize = Enum.AutomaticSize.Y,
-							BackgroundTransparency = v45.Color.None.Transparency
-						}, {
-							Layout = React.createElement("UIListLayout", {
-								SortOrder = Enum.SortOrder.LayoutOrder,
-								HorizontalAlignment = Enum.HorizontalAlignment.Left,
-								Padding = UDim.new(0, v45.Gap.Small)
-							}),
-							TitleText = React.createElement(Dialog.Text, {
-								LayoutOrder = 3,
-								Text = if not v42 then v46.title else v46.errorTitle,
-								TextXAlignment = if not v42 then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left,
-								Font = Enum.Font.SourceSansBold
-							}),
-							DialogText = React.createElement(Dialog.Text, {
-								LayoutOrder = 4,
-								Text = not v42 and "" or v46.errorBody,
-								TextXAlignment = Enum.TextXAlignment.Left
-							})
-						})
-					}),
-					TitleText = if v26 then nil else React.createElement(Dialog.Text, {
-						LayoutOrder = 3,
-						Text = v46.title,
-						Font = Enum.Font.SourceSansBold
-					}),
-					DialogText = if v26 then nil else React.createElement(Dialog.Text, {
-						LayoutOrder = 4,
-						Text = v46.body
-					})
+			if state3 then
+				warningIcon = React.createElement(Icon, {
+					name = Foundation.Enums.IconName.TriangleExclamation,
+					size = v3.Size.Size_700,
+					BackgroundTransparency = v3.Color.None.Transparency,
+					LayoutOrder = 1
 				})
+			end
+
+			children3.WarningIcon = warningIcon
+
+			local createElement15 = React.createElement
+			local size3
+
+			if state3 then
+				size3 = UDim2.new(1, -48, 0, 0)
+			else
+				size3 = UDim2.fromScale(1, 0)
+			end
+
+			local v17 = {
+				Size = size3,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = v3.Color.None.Transparency,
+				LayoutOrder = 2
+			}
+
+			local children4 = {
+				Layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					Padding = UDim.new(0, v3.Gap.Small)
+				}),
+				TitleText = 0,
+				DialogText = 0
+			}
+
+			local createElement16 = React.createElement
+			local text = Dialog.Text
+			local text2 = if state3 then v4.errorTitle else v4.title
+			local textXAlignment
+
+			if state3 then
+				textXAlignment = Enum.TextXAlignment.Left
+			else
+				textXAlignment = Enum.TextXAlignment.Center
+			end
+
+			children4.TitleText = createElement16(text, {
+				Text = text2,
+				LayoutOrder = 3,
+				TextXAlignment = textXAlignment,
+				Font = Enum.Font.SourceSansBold
+			})
+
+			children4.DialogText = React.createElement(Dialog.Text, {
+				Text = not state3 and "" or v4.errorBody,
+				LayoutOrder = 4,
+				TextXAlignment = Enum.TextXAlignment.Left
+			})
+			children3.TextContent = createElement15("Frame", v17, children4)
+			textAndIconContainer = createElement13("Frame", v16, children3)
+		end
+
+		local titleText
+
+		if not defineFastFlag4 then
+			titleText = React.createElement(Dialog.Text, {
+				Text = v4.title,
+				LayoutOrder = 3,
+				Font = Enum.Font.SourceSansBold
+			})
+		end
+
+		local dialogText
+
+		if not defineFastFlag4 then
+			dialogText = React.createElement(Dialog.Text, { Text = v4.body, LayoutOrder = 4 })
+		end
+
+		children.TextContainerWrapper = createElement12("Frame", v15, {
+			Layout = layout,
+			TextAndIconContainer = textAndIconContainer,
+			TitleText = titleText,
+			DialogText = dialogText
+		})
+		return createElement("Frame", v8, {
+			InvisibleCloseButton = invisibleCloseButton,
+			Dialog = createElement2(root, v5, {
+				DialogContent = createElement3(content, nil, children)
 			})
 		})
-	})
+	end
 end

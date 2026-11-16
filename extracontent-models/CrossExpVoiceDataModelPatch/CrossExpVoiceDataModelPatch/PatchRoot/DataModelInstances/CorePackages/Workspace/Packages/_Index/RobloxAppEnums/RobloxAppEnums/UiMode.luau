@@ -1,5 +1,1 @@
-return {
-	TenFoot = "TenFoot",
-	VR = "VR",
-	Unknown = "Unknown"
-}
+return { TenFoot = "TenFoot", VR = "VR", Unknown = "Unknown" }

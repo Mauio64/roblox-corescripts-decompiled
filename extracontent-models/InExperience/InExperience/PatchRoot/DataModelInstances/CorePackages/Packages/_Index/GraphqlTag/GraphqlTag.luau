@@ -1,1 +1,3 @@
-return (require(script.gqlTag))
+local gqlTag = require(script.gqlTag)
+
+return gqlTag

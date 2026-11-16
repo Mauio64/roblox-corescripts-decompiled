@@ -1,1 +1,3 @@
-return (require(script.AppStickyShortcutBar))
+local AppStickyShortcutBar = require(script.AppStickyShortcutBar)
+
+return AppStickyShortcutBar

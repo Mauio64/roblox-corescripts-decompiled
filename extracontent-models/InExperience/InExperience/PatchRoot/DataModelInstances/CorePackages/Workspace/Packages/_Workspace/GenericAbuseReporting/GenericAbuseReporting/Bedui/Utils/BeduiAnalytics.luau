@@ -1,63 +1,51 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local LocalPlayer = game:GetService("Players").LocalPlayer
+local parent = GenericAbuseReporting.Parent
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 local TelemetryService = game:GetService("TelemetryService")
-local ArgCheck = require(GenericAbuseReportingParent.ArgCheck)
-local Dash = require(GenericAbuseReportingParent.Dash)
-local AbuseEntrypoint = require(GenericAbuseReporting.Enums.AbuseEntrypoint)
 
+local ArgCheck = require(parent.ArgCheck)
+local Dash = require(parent.Dash)
+
+local AbuseEntrypoint = require(GenericAbuseReporting.Enums.AbuseEntrypoint)
 require(GenericAbuseReporting.Enums.AbuseVector)
 
-local t1 = {
-	Abandoned = "EVENT_ABANDONED",
-	Error = "EVENT_ERROR",
-	Rendered = "EVENT_RENDERED",
-	Submitted = "EVENT_SUBMITTED"
-}
-local t2 = {
+local v = {
 	eventName = "DynamicAbuseReportEvent",
 	description = "Event to track dynamic abuse report",
-	links = "https://github.rbx.com/Roblox/proto-schemas/pull/6068",
-	lastUpdated = {
-		2024,
-		6,
-		18
-	},
-	backends = {
-		"EventIngest",
-		"Points"
-	},
-	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportThrottleHundredthsPercent", 0)
+	lastUpdated = { 2024, 6, 18 },
+	backends = { "EventIngest", "Points" },
+	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportThrottleHundredthsPercent", 0),
+	links = "https://github.rbx.com/Roblox/proto-schemas/pull/6068"
 }
 
-local function buildCustomFields(t3: {[any]: any}) -- line: 60
-	-- upvalues: Dash (copy), LocalPlayer (copy), AbuseEntrypoint (copy)
-	local v12 = nil
+local function buildCustomFields(data)
+	local meta
 
-	if t3.meta then
-		v12 = Dash.pretty(t3.meta, {
-			depth = 10,
-			multiline = false
-		})
+	if data.meta then
+		meta = Dash.pretty(data.meta, { depth = 10, multiline = false })
 	end
 
 	return {
-		abuse_vector = t3.context.abuseVector,
+		abuse_vector = data.context.abuseVector,
 		user_id = not LocalPlayer and 0 or LocalPlayer.UserId,
-		event_type = t3.eventType,
+		event_type = data.eventType,
 		entry_point = AbuseEntrypoint.APP,
-		meta = v12
+		meta = meta
 	}
 end
 
 return {
-	sendAnalyticsEvent = function(t4: {[any]: any}) -- line: 76
-		-- upvalues: ArgCheck (copy), TelemetryService (copy), t2 (copy), buildCustomFields (copy)
-		ArgCheck.assert(t4.context, "customFields must be provided")
-		ArgCheck.assert(t4.context.abuseVector, "customFields.abuse_vector must be provided")
-		TelemetryService:LogEvent(t2, {
-			customFields = buildCustomFields(t4)
-		})
+	sendAnalyticsEvent = function(p)
+		ArgCheck.assert(p.context, "customFields must be provided")
+		ArgCheck.assert(p.context.abuseVector, "customFields.abuse_vector must be provided")
+
+		TelemetryService:LogEvent(v, { customFields = buildCustomFields(p) })
 	end,
-	TelemetryEventType = t1
+	TelemetryEventType = {
+		Abandoned = "EVENT_ABANDONED",
+		Error = "EVENT_ERROR",
+		Rendered = "EVENT_RENDERED",
+		Submitted = "EVENT_SUBMITTED"
+	}
 }

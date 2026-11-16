@@ -1,21 +1,15 @@
 local AvatarExperienceAnalytics = script:FindFirstAncestor("AvatarExperienceAnalytics")
-local AvatarExperienceAnalyticsParent = AvatarExperienceAnalytics.Parent
+local parent = AvatarExperienceAnalytics.Parent
 
-require(AvatarExperienceAnalyticsParent.AvatarExperienceCommon)
-
+require(parent.AvatarExperienceModel)
 local UnifiedEventLogEnums = require(AvatarExperienceAnalytics.UnifiedEventLogEnums)
 
-local function getMarketplaceUnifiedItemType(p1) -- line: 13
-	-- upvalues: UnifiedEventLogEnums (copy)
-	if p1 == "Look" then
+local function getMarketplaceUnifiedItemType(p)
+	if p == "Look" then
 		return UnifiedEventLogEnums.MarketplaceUnifiedItemType.LOOK
-	end
-
-	if p1 == "Asset" then
+	elseif p == "Asset" then
 		return UnifiedEventLogEnums.MarketplaceUnifiedItemType.ASSET
-	end
-
-	if p1 == "Bundle" then
+	elseif p == "Bundle" then
 		return UnifiedEventLogEnums.MarketplaceUnifiedItemType.BUNDLE
 	end
 

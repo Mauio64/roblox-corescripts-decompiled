@@ -1,14 +1,12 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
 
-require(ParentParent.App.Style.StyleTypes)
+require(parent2.App.Style.StyleTypes)
+local StyleContext = require(parent.StyleContext)
+local React = require(parent3.React)
 
-local StyleContext = require(scriptParent.StyleContext)
-local React = require(ParentParentParent.React)
-
-local function useStyle() -- line: 15
-	-- upvalues: React (copy), StyleContext (copy)
+local function useStyle()
 	return React.useContext(StyleContext).style
 end
 

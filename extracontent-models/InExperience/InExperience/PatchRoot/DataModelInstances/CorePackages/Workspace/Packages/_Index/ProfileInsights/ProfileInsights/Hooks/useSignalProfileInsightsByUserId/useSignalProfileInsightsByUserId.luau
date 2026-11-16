@@ -1,29 +1,45 @@
 local ProfileInsights = script:FindFirstAncestor("ProfileInsights")
-local ProfileInsightsParent = ProfileInsights.Parent
+local parent = ProfileInsights.Parent
+
 local ProfileInsightsStore = require(ProfileInsights["data-hydration"].ProfileInsightsStore)
-local SignalsReact = require(ProfileInsightsParent.SignalsReact)
-local React = require(ProfileInsightsParent.React)
-local FFlagAddFriendsPageTrustedFriendRequestSection = require(ProfileInsightsParent.SharedFlags).FFlagAddFriendsPageTrustedFriendRequestSection
 
-local function useSignalProfileInsightsByUserId(t1: {[any]: any}) -- line: 18
-	-- upvalues: ProfileInsightsStore (copy), FFlagAddFriendsPageTrustedFriendRequestSection (copy), SignalsReact (copy), React (copy)
-	local v9 = ProfileInsightsStore(false).getProfileInsightsByUserId({
-		userIds = { t1.userId },
-		rankingStrategy = t1.rankingStrategy,
-		skipFetch = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else t1.skipFetch
-	})
-	local v10 = SignalsReact.useSignalState(v9(false).data.getProfileInsights)
+local SignalsReact = require(parent.SignalsReact)
+local React = require(parent.React)
 
-	return React.useMemo(function() -- line: 26
-		-- upvalues: v10 (copy), t1 (copy)
-		for _, v12 in v10 do
-			if v12.targetUserId == t1.userId then
-				return v12
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddFriendsPageTrustedFriendRequestSection = SharedFlags.FFlagAddFriendsPageTrustedFriendRequestSection
+
+local function useSignalProfileInsightsByUserId(data)
+	local v = React.useMemo(function()
+		local getProfileInsightsByUserId = ProfileInsightsStore(false).getProfileInsightsByUserId
+		local v = {
+			userIds = { data.userId },
+			rankingStrategy = data.rankingStrategy,
+			skipFetch = 0,
+			forceFetch = 0
+		}
+		local skipFetch
+
+		if FFlagAddFriendsPageTrustedFriendRequestSection then
+			skipFetch = data.skipFetch
+		end
+
+		v.skipFetch = skipFetch
+		v.forceFetch = data.forceFetch
+		return getProfileInsightsByUserId(v)
+	end, { data.userId, data.rankingStrategy, data.skipFetch, data.forceFetch })
+
+	local v2 = SignalsReact.useSignalState(v(false).data.getProfileInsights)
+
+	return React.useMemo(function()
+		for _, v3 in v2 do
+			if v3.targetUserId == data.userId then
+				return v3
 			end
 		end
 
 		return {}
-	end, { v10 }), v9(false).status == "fetching"
+	end, { v2 }), v(false).status == "fetching"
 end
 
 return useSignalProfileInsightsByUserId

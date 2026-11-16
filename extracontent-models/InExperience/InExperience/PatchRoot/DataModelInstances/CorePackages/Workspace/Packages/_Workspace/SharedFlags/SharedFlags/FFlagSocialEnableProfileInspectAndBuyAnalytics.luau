@@ -1,1 +1,2 @@
-return game:DefineFastFlag("SocialEnableProfileInspectAndBuyAnalytics", false) and require(script.Parent.FFlagSocialEnableProfileInspectAndBuy)
+return game:DefineFastFlag("SocialEnableProfileInspectAndBuyAnalytics", false)
+	and require(script.Parent.FFlagSocialEnableProfileInspectAndBuy)

@@ -1,132 +1,152 @@
-local Parent = script:FindFirstAncestor("Impressions").Parent
-local React = require(Parent.React)
-local Signal = require(Parent.AppCommonLib).Signal
+local parent = script:FindFirstAncestor("Impressions").Parent
+local React = require(parent.React)
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 local ImpressionsDetector = require(script.Parent.ImpressionsDetector)
 local ImpressionDetectorWithoutNavigation = require(script.Parent.ImpressionDetectorWithoutNavigation)
 local ImpressionsVisualizer = require(script.Parent.ImpressionsVisualizer)
-local SharedFlags = require(Parent.SharedFlags)
-local v8 = game:DefineFastFlag("LuaAppFixImpressionsHookDependencies", false)
+local SharedFlags = require(parent.SharedFlags)
+
+local defineFastFlag = game:DefineFastFlag("LuaAppFixImpressionsHookDependencies", false)
+
 local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
-local v10 = game:DefineFastFlag("LuaAppFireRequestImpressionsOnTagChange", false)
 
-return function(t1: {[any]: any}) -- line: 36
-	-- upvalues: React (copy), Signal (copy), ImpressionsVisualizer (copy), v10 (copy), v8 (copy), ImpressionsDetector (copy), ImpressionDetectorWithoutNavigation (copy), FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions (copy)
-	local v12 = React.useRef({})
-	local v13 = React.useRef(Signal.new())
-	local u14 = React.useRef(nil)
+return function(props)
+	local ref = React.useRef({})
+	local ref2 = React.useRef(Signal.new())
 
-	if u14.current == nil then
-		u14.current = ImpressionsVisualizer.new(t1.impressionsTag)
+	local ref3 = React.useRef(nil)
+
+	if ref3.current == nil then
+		ref3.current = ImpressionsVisualizer.new(props.impressionsTag)
 	end
 
-	assert(u14.current, "impressionsVisualizer should always be truthy; check needed for lint")
+	assert(ref3.current, "impressionsVisualizer should always be truthy; check needed for lint")
+	local state, setState = React.useState({})
+	local state2, setState2 = React.useState(props.dataUpdatedTimestamp)
 
-	local v15, v16 = React.useState({})
-	local v17, v18 = React.useState(t1.dataUpdatedTimestamp)
-	local v19 = React.useRef(t1.impressionsTag)
-	local viewPortBounds = t1.viewPortBounds
+	local ref4 = React.useRef(props.impressionsTag)
+	local viewPortBounds = props.viewPortBounds
 
-	React.useEffect(function() -- line: 51
-		-- upvalues: v19 (copy), t1 (copy), v18 (copy), v12 (copy), u14 (ref), v10 (copy), v13 (copy)
-		if v19.current ~= t1.impressionsTag then
-			v19.current = t1.impressionsTag
-			v18(t1.dataUpdatedTimestamp)
-			v12.current = {}
-			u14.current:onClearAllImpressions()
-			u14.current:setImpressionsTag(t1.impressionsTag)
-
-			if v10 then
-				v13.current:fire()
-			end
+	local useEffect = React.useEffect
+	local function fn()
+		if ref4.current ~= props.impressionsTag then
+			ref4.current = props.impressionsTag
+			setState2(props.dataUpdatedTimestamp)
+			ref.current = {}
+			ref3.current:onClearAllImpressions()
+			ref3.current:setImpressionsTag(props.impressionsTag)
+			ref2.current:fire()
 		end
-	end, {
-		t1.impressionsTag,
-		if not v8 then nil else t1.dataUpdatedTimestamp
-	})
-	React.useEffect(function() -- line: 67
-		-- upvalues: v13 (copy), t1 (copy)
-		v13.current:fire()
+	end
+	local impressionsTag = props.impressionsTag
+	local v
 
-		local u24 = nil
+	if defineFastFlag then
+		v = props.dataUpdatedTimestamp
+	end
 
-		if t1.scrollViewPositionChangedSignal then
-			u24 = t1.scrollViewPositionChangedSignal:connect(function() -- line: 71
-				-- upvalues: v13 (copy)
-				v13.current:fire()
+	useEffect(fn, { impressionsTag, v })
+
+	React.useEffect(function()
+		ref2.current:fire()
+		local scrollViewPositionChangedSignalConnection
+
+		if props.scrollViewPositionChangedSignal then
+			scrollViewPositionChangedSignalConnection = props.scrollViewPositionChangedSignal:connect(function()
+				ref2.current:fire()
 			end)
+		else
+			scrollViewPositionChangedSignalConnection = nil
 		end
 
-		return function() -- line: 76
-			-- upvalues: u24 (ref)
-			if u24 ~= nil then
-				u24:disconnect()
+		return function()
+			if scrollViewPositionChangedSignalConnection ~= nil then
+				scrollViewPositionChangedSignalConnection:disconnect()
 			end
 		end
-	end, { t1.scrollViewPositionChangedSignal })
-	React.useEffect(function() -- line: 84
-		-- upvalues: t1 (copy), v13 (copy), v17 (copy), v18 (copy), v12 (copy), u14 (ref)
-		if t1.pageContext and t1.routeName == t1.pageContext then
-			v13.current:fire()
+	end, { props.scrollViewPositionChangedSignal })
 
-			if t1.dataUpdatedTimestamp ~= v17 then
-				v18(t1.dataUpdatedTimestamp)
-				v12.current = {}
-				u14.current:onClearAllImpressions()
+	React.useEffect(function()
+		if props.pageContext and props.routeName == props.pageContext then
+			ref2.current:fire()
+
+			if props.dataUpdatedTimestamp ~= state2 then
+				setState2(props.dataUpdatedTimestamp)
+				ref.current = {}
+				ref3.current:onClearAllImpressions()
 			end
 		end
-	end, {
-		t1.routeName,
-		t1.pageContext,
-		t1.dataUpdatedTimestamp,
-		v17,
-		viewPortBounds
-	})
-	React.useEffect(function() -- line: 107
-		-- upvalues: v15 (copy), t1 (copy), u14 (ref), v16 (copy)
-		if v15 ~= nil and #v15 > 0 then
-			t1.sendImpressions(v15)
-			u14.current:onSendImpressions(v15)
-			v16({})
+	end, { props.routeName, props.pageContext, props.dataUpdatedTimestamp, state2, viewPortBounds })
+
+	local useEffect2 = React.useEffect
+	local function fn2()
+		if state ~= nil and #state > 0 then
+			props.sendImpressions(state)
+			ref3.current:onSendImpressions(state)
+			setState({})
 		end
-	end, {
-		v15,
-		if not v8 then nil else t1.sendImpressions
-	})
-	React.useEffect(function() -- line: 118
-		-- upvalues: u14 (ref)
-		return function() -- line: 119
-			-- upvalues: u14 (ref)
-			u14.current:destroy()
+	end
+
+	local v2
+
+	if defineFastFlag then
+		v2 = props.sendImpressions
+	end
+
+	useEffect2(fn2, { state, v2 })
+
+	React.useEffect(function()
+		return function()
+			ref3.current:destroy()
 		end
 	end, {})
 
-	local v21 = React.useCallback(function(p1) -- line: 124
-		-- upvalues: v12 (copy)
-		if v12.current[p1] ~= nil then
+	local filterImpressionFunc = React.useCallback(function(p): boolean
+		if ref.current[p] ~= nil then
 			return false
 		end
 
-		v12.current[p1] = true
-
+		ref.current[p] = true
 		return true
 	end, {})
-	local v22 = React.useCallback(function(p2) -- line: 133
-		-- upvalues: v16 (copy)
-		if not p2 or #p2 == 0 then
+
+	local onImpressionsDetected = React.useCallback(function(list)
+		if not list or #list == 0 then
 			return
 		end
 
-		v16(p2)
+		setState(list)
 	end, {})
-	local v23 = if not t1.pageContext then ImpressionDetectorWithoutNavigation else ImpressionsDetector
+	local v3
 
-	return React.createElement(v23, {
-		parentRef = t1.parentRef,
+	if props.pageContext then
+		v3 = ImpressionsDetector
+	else
+		v3 = ImpressionDetectorWithoutNavigation
+	end
+
+	local createElement = React.createElement
+	local v4 = {
+		parentRef = props.parentRef,
 		viewPortBounds = viewPortBounds,
-		viewPortFillBounds = if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then nil else t1.viewPortFillBounds,
-		onRequestImpressionsSignal = v13.current,
-		filterImpressionFunc = v21,
-		onImpressionsDetected = v22,
-		impressionsTag = t1.impressionsTag
-	})
+		viewPortFillBounds = 0,
+		onRequestImpressionsSignal = 0,
+		filterImpressionFunc = 0,
+		onImpressionsDetected = 0,
+		impressionsTag = 0
+	}
+	local viewPortFillBounds
+
+	if FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then
+		viewPortFillBounds = props.viewPortFillBounds
+	end
+
+	v4.viewPortFillBounds = viewPortFillBounds
+
+	v4.onRequestImpressionsSignal = ref2.current
+	v4.filterImpressionFunc = filterImpressionFunc
+	v4.onImpressionsDetected = onImpressionsDetected
+	v4.impressionsTag = props.impressionsTag
+	return createElement(v3, v4)
 end

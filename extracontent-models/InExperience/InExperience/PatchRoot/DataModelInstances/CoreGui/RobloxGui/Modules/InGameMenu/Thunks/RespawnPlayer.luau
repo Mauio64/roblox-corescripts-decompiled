@@ -1,35 +1,36 @@
 local AvatarEditorService = game:GetService("AvatarEditorService")
 local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
-local CloseMenu = require(ParentParent.Thunks.CloseMenu)
-local SetRespawning = require(ParentParent.Actions.SetRespawning)
-local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
-local Constants = require(ParentParent.Resources.Constants)
 
-return function(p1) -- line: 12
-	-- upvalues: AvatarEditorService (copy), Players (copy), SetRespawning (copy), CloseMenu (copy), SendAnalytics (copy), Constants (copy)
-	local v9 = p1:getState()
+local parent = script.Parent.Parent
 
-	if v9.respawn.enabled then
+local CloseMenu = require(parent.Thunks.CloseMenu)
+local SetRespawning = require(parent.Actions.SetRespawning)
+local SendAnalytics = require(parent.Utility.SendAnalytics)
+local Constants = require(parent.Resources.Constants)
+
+return function(object)
+	local state = object:getState()
+
+	if state.respawn.enabled then
 		AvatarEditorService:BustAvatarFetchCache()
 
-		if v9.respawn.customCallback then
-			v9.respawn.customCallback:Fire()
+		if state.respawn.customCallback then
+			state.respawn.customCallback:Fire()
 		else
-			local Character = Players.LocalPlayer.Character
+			local character = Players.LocalPlayer.Character
 
-			if Character ~= nil then
-				local Humanoid = Character:FindFirstChild("Humanoid")
+			if character ~= nil then
+				local humanoid = character:FindFirstChild("Humanoid")
 
-				if Humanoid ~= nil and Humanoid:IsA("Humanoid") then
-					Humanoid.Health = 0
+				if humanoid ~= nil and humanoid:IsA("Humanoid") then
+					humanoid.Health = 0
 				end
 			end
 		end
 	end
 
-	p1:dispatch(SetRespawning(false))
-	p1:dispatch(CloseMenu)
+	object:dispatch(SetRespawning(false))
+	object:dispatch(CloseMenu)
 	SendAnalytics(Constants.AnalyticsInGameMenuName, Constants.AnalyticsRespawnCharacterName, {
 		confirmed = Constants.AnalyticsConfirmedName
 	})

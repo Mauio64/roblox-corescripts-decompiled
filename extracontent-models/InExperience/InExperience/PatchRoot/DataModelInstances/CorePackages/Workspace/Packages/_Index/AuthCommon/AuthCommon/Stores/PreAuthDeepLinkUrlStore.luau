@@ -1,12 +1,12 @@
-local u1 = nil
+local url = nil
+local PreAuthDeepLinkUrlStore = {}
 
-return {
-	getUrl = function() -- line: 4
-		-- upvalues: u1 (ref)
-		return u1
-	end,
-	setUrl = function(s1: string?) -- line: 8
-		-- upvalues: u1 (ref)
-		u1 = s1
-	end
-}
+function PreAuthDeepLinkUrlStore.getUrl()
+	return url
+end
+
+function PreAuthDeepLinkUrlStore.setUrl(p: string?)
+	url = p
+end
+
+return PreAuthDeepLinkUrlStore

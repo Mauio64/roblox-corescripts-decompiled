@@ -1,55 +1,61 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
 local UIBlox = InGameMenuDependencies.UIBlox
-local ParentParent = script.Parent.Parent
-local Assets = require(ParentParent.Resources.Assets)
-local GlobalConfig = require(ParentParent.GlobalConfig)
+
+local parent = script.Parent.Parent
+
+local Assets = require(parent.Resources.Assets)
+
+local GlobalConfig = require(parent.GlobalConfig)
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local Image = require(CorePackages.Packages.Foundation).Image
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local t1 = {
+
+local Foundation = require(CorePackages.Packages.Foundation)
+local Image = Foundation.Image
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+
+local v = {
 	[Enum.UserInputType.MouseButton1] = Assets.Images.Mouse1Press,
 	[Enum.UserInputType.MouseButton2] = Assets.Images.Mouse2Press,
 	[Enum.UserInputType.MouseWheel] = Assets.Images.MouseWheelScroll
 }
-local v13 = t.strictInterface({
+
+local strictInterface = t.strictInterface({
 	input = t.enum(Enum.UserInputType),
 	AnchorPoint = t.optional(t.Vector2),
 	Position = t.optional(t.UDim2),
 	LayoutOrder = t.optional(t.integer)
 })
 
-local function PointerLabel(p1) -- line: 34
-	-- upvalues: GlobalConfig (copy), v13 (copy), t1 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Image (copy), ImageSetLabel (copy)
+local function PointerLabel(props)
 	if GlobalConfig.propValidation then
-		assert(v13(p1))
+		assert(strictInterface(props))
 	end
 
-	local v16 = t1[p1.input]
+	local image = v[props.input]
 
 	if FFlagCoreUiMigrateUIBloxToFoundation then
 		return Roact.createElement(Image, {
-			Image = v16.Image,
-			imageRect = {
-				offset = v16.ImageRectOffset,
-				size = v16.ImageRectSize
-			},
+			Image = image.Image,
+			imageRect = { offset = image.ImageRectOffset, size = image.ImageRectSize },
 			Size = UDim2.new(0, 36, 0, 36),
-			Position = p1.Position,
-			AnchorPoint = p1.AnchorPoint,
-			LayoutOrder = p1.LayoutOrder
+			Position = props.Position,
+			AnchorPoint = props.AnchorPoint,
+			LayoutOrder = props.LayoutOrder
 		})
 	end
 
 	return Roact.createElement(ImageSetLabel, {
 		BackgroundTransparency = 1,
-		Image = v16,
+		Image = image,
 		Size = UDim2.new(0, 36, 0, 36),
-		Position = p1.Position,
-		AnchorPoint = p1.AnchorPoint,
-		LayoutOrder = p1.LayoutOrder
+		Position = props.Position,
+		AnchorPoint = props.AnchorPoint,
+		LayoutOrder = props.LayoutOrder
 	})
 end
 

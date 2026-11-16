@@ -1,13 +1,25 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local SharedFlags = require(parent.SharedFlags)
+local FFlagJoinabilityCTAContextCopy = SharedFlags.FFlagJoinabilityCTAContextCopy
 
-return function(p1) -- line: 6
-	-- upvalues: useTokens (copy)
-	local v4 = useTokens()
+return function(p)
+	local v = useTokens()
 
-	if p1 == nil or p1.universeId == nil then
+	if p == nil or p.universeId == nil then
 		return 0
 	end
 
-	return v4.Size.Size_1000 + 2 * v4.Padding.Large
+	local v2 = v.Size.Size_1000 + 2 * v.Padding.Large
+
+	if FFlagJoinabilityCTAContextCopy then
+		local joinability = p.joinability
+
+		if joinability == "Joinable" or joinability == "NotJoinable" then
+			return v2 + (v.Typography.BodyMedium.FontSize + v.Gap.XSmall)
+		end
+	end
+
+	return v2
 end

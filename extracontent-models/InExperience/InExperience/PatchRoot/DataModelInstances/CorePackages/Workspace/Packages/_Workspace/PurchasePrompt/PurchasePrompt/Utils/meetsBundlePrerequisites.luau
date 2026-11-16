@@ -1,42 +1,80 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local Players = game:GetService("Players")
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
 
-local function meetsBundlePrerequisites(p1, p2, n1: number?, p3, _: {[any]: any}?) -- line: 10
-	-- upvalues: PurchaseError (copy), Players (copy)
-	local collectibleItemDetail = p1.collectibleItemDetail
-	local v11 = collectibleItemDetail and (collectibleItemDetail.collectibleItemId ~= nil and collectibleItemDetail.collectibleItemId ~= "")
-	local v12 = collectibleItemDetail and (collectibleItemDetail.collectibleItemType ~= nil and collectibleItemDetail.collectibleItemType == "Limited")
+local PurchaseError = require(parent.Enums.PurchaseError)
 
-	if v11 then
-		if not v12 and p3 then
+local function meetsBundlePrerequisites(data, p, p2: number?, p3, _)
+	local collectibleItemDetail = data.collectibleItemDetail
+	local v
+
+	if collectibleItemDetail then
+		if collectibleItemDetail.collectibleItemId == nil then
+			v = false
+		else
+			v = collectibleItemDetail.collectibleItemId ~= ""
+		end
+	else
+		v = collectibleItemDetail
+	end
+
+	local v2
+
+	if collectibleItemDetail then
+		if collectibleItemDetail.collectibleItemType == nil then
+			v2 = false
+		else
+			v2 = collectibleItemDetail.collectibleItemType == "Limited"
+		end
+	else
+		v2 = collectibleItemDetail
+	end
+
+	if v then
+		if not v2 and p3 then
 			return false, PurchaseError.AlreadyOwn
 		end
 	elseif p3 then
 		return false, PurchaseError.AlreadyOwn
 	end
 
-	local v13 = if not v11 then p1.product and p1.product.isForSale else collectibleItemDetail.saleStatus == "OnSale"
-	local v14 = v11 and (collectibleItemDetail.lowestAvailableResaleProductId ~= nil and collectibleItemDetail.lowestAvailableResaleProductId ~= "")
+	local v3
 
-	if not v13 and not v14 then
+	if v then
+		v3 = collectibleItemDetail.saleStatus == "OnSale"
+	else
+		v3 = data.product and data.product.isForSale
+	end
+
+	if v then
+		if collectibleItemDetail.lowestAvailableResaleProductId == nil then
+			v = false
+		else
+			v = collectibleItemDetail.lowestAvailableResaleProductId ~= ""
+		end
+	end
+
+	if not (v3 or v) then
 		return false, PurchaseError.NotForSale
 	end
 
-	if n1 ~= nil and p2.robux ~= nil and n1 > p2.robux then
+	if p2 ~= nil and p.robux ~= nil and p.robux < p2 then
 		return false, PurchaseError.NotEnoughRobux
 	end
 
-	if p1.itemRestrictions ~= nil then
-		for _, v16 in p1.itemRestrictions do
-			if v16 == "ThirteenPlus" then
-				if not Players.LocalPlayer:GetUnder13() then
-					return true, nil
-				end
+	if data.itemRestrictions == nil then
+		return true, nil
+	end
 
-				return false, PurchaseError.Under13
-			end
+	for _, itemRestriction in data.itemRestrictions do
+		if itemRestriction ~= "ThirteenPlus" then
+			continue
 		end
+
+		if Players.LocalPlayer:GetUnder13() then
+			return false, PurchaseError.Under13
+		end
+
+		break
 	end
 
 	return true, nil

@@ -1,17 +1,16 @@
 local copy = require(script.Parent.copy)
 
-local function set(p1, p2, p3) -- line: 4
-	-- upvalues: copy (copy)
-	local v6 = type(p1)
+local function set(p, p2, p3)
+	local typeName = type(p)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v6 == "table", "expected a table for first argument, got " .. v6)
 	assert(p2 ~= nil, "expected second argument to be anything but nil, got nil")
 
-	local v7 = copy(p1)
+	local v = copy(p)
 
-	v7[p2] = p3
+	v[p2] = p3
 
-	return v7
+	return v
 end
 
 return set

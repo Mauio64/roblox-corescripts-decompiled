@@ -1,72 +1,80 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
+
 local Players = game:GetService("Players")
 
 require(CurrencyTransfers.Stores.createTransferStore)
-
 local TransferDirection = require(CurrencyTransfers.Enums.TransferDirection)
 
-local function buildRobuxTransferFlowPayload(p1, s1: string) -- line: 10
-	-- upvalues: Players (copy), TransferDirection (copy)
-	local LocalPlayer = Players.LocalPlayer
-	local v8 = not LocalPlayer and 0 or LocalPlayer.UserId
-	local v9 = p1.getDirection(false)
-	local n1 = 0
-	local n2 = 0
+local function buildRobuxTransferFlowPayload(data, event_name: string)
+	local localPlayer = Players.LocalPlayer
+	local v = not localPlayer and 0 or localPlayer.UserId
 
-	if v9 == TransferDirection.Send then
-		n1 = v8
+	local direction = data.getDirection(false)
+	local sender_user_id = 0
+	local recipient_user_id = 0
 
-		local v12 = p1.getRecipient(false)
+	if direction == TransferDirection.Send then
+		local recipient = data.getRecipient(false)
 
-		n2 = if not v12 then p1.getRecipientUserId(false) else v12.targetId
-	elseif v9 == TransferDirection.Receive then
-		n2 = v8
+		if recipient then
+			recipient_user_id = recipient.targetId
+		else
+			recipient_user_id = data.getRecipientUserId(false)
+		end
 
-		local v13 = p1.getSender(false)
+		sender_user_id = v
+	elseif direction == TransferDirection.Receive then
+		local sender = data.getSender(false)
 
-		n1 = not v13 and 0 or v13.targetId
+		if sender then
+			sender_user_id = sender.targetId
+			recipient_user_id = v
+		else
+			recipient_user_id = v
+			sender_user_id = 0
+		end
 	end
 
-	local v14 = p1.getTransferRequestId(false)
-	local v15 = p1.getSelectedAmount(false)
-	local v16 = p1.getRobuxTransfer(false)
+	local transferRequestId = data.getTransferRequestId(false)
+	local transfer_amount = data.getSelectedAmount(false)
+	local robuxTransfer = data.getRobuxTransfer(false)
 
-	if v15 == nil and v16 then
-		v15 = v16.transferAmount
+	if transfer_amount == nil and robuxTransfer then
+		transfer_amount = robuxTransfer.transferAmount
 	end
 
-	local v17 = nil
-	local GameId = game.GameId
+	local gameId = game.GameId
 
-	if GameId > 0 then
-		v17 = GameId
+	if not (gameId > 0) then
+		gameId = nil
 	end
 
-	local v19 = p1.getTransferOrigination(false)
-	local v20 = not v9 and "" or tostring(v9)
-	local v21 = not v19 and "" or tostring(v19)
-	local t1 = {
-		transfer_request_id = v14 or "",
-		transfer_client_session_id = p1.getTransferClientSessionId(false),
-		event_name = s1,
-		sender_user_id = n1,
-		recipient_user_id = n2,
-		transfer_amount = v15,
-		transfer_prompt_state = tostring(p1.getPromptState(false)),
-		transfer_origination = v21,
-		transfer_direction = v20,
+	local transferOrigination = data.getTransferOrigination(false)
+	local transfer_direction = not direction and "" or tostring(direction)
+	local transfer_origination = not transferOrigination and "" or tostring(transferOrigination)
+
+	local robuxTransferFlowPayload = {
+		transfer_request_id = transferRequestId or "",
+		transfer_client_session_id = data.getTransferClientSessionId(false),
+		event_name = event_name,
+		sender_user_id = sender_user_id,
+		recipient_user_id = recipient_user_id,
+		transfer_amount = transfer_amount,
+		transfer_prompt_state = tostring(data.getPromptState(false)),
+		transfer_origination = transfer_origination,
+		transfer_direction = transfer_direction,
 		ingest_timestamp_milliseconds = DateTime.now().UnixTimestampMillis
 	}
 
-	if v9 == TransferDirection.Send and p1.getBalanceReceivedFromApi(false) then
-		t1.user_balance = p1.getRobuxBalanceAmount(false)
+	if direction == TransferDirection.Send and data.getBalanceReceivedFromApi(false) then
+		robuxTransferFlowPayload.user_balance = data.getRobuxBalanceAmount(false)
 	end
 
-	if v17 ~= nil then
-		t1.universe_id = v17
+	if gameId ~= nil then
+		robuxTransferFlowPayload.universe_id = gameId
 	end
 
-	return t1
+	return robuxTransferFlowPayload
 end
 
 return buildRobuxTransferFlowPayload

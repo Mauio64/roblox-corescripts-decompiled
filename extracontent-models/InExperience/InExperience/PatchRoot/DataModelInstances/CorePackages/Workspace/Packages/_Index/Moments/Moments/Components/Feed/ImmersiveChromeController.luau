@@ -1,17 +1,14 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
+local parent = Moments.Parent
 
-require(MomentsParent.Signals)
-
-local Foundation = require(MomentsParent.Foundation)
-local MomentsCommon = require(MomentsParent.MomentsCommon)
+local React = require(parent.React)
+require(parent.Signals)
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
 
 require(script.Parent.FeedTypes)
-
 local useImmersiveChrome = require(script.Parent.useImmersiveChrome)
 local usePreferredInput = require(Moments.Hooks.usePreferredInput)
-
 require(Moments.Components.VerticalPager)
 
 local MediaPreloadProvider = MomentsCommon.Media.MediaPreloadProvider
@@ -19,62 +16,54 @@ local useFormFactor = MomentsCommon.Hooks.useFormFactor
 local FormFactor = MomentsCommon.Enums.FormFactor
 local usePreferences = Foundation.Hooks.usePreferences
 
-local function ImmersiveChromeController(t1: {[any]: any}) -- line: 50
-	-- upvalues: MediaPreloadProvider (copy), usePreferredInput (copy), useFormFactor (copy), usePreferences (copy), FormFactor (copy), React (copy), useImmersiveChrome (copy)
-	local pager = t1.pager
-	local v15 = MediaPreloadProvider.useMediaControllerProvider()
-	local v16 = usePreferredInput()
-	local v17 = useFormFactor()
+local function ImmersiveChromeController(data): nil
+	local pager = data.pager
+	local v = MediaPreloadProvider.useMediaControllerProvider()
+	local v2 = usePreferredInput()
+	local v3 = useFormFactor()
 	local reducedMotion = usePreferences().reducedMotion
-	local v19 = v16 == Enum.PreferredInput.Touch and v17 == FormFactor.MobilePortrait
-	local v20 = React.useMemo(function() -- line: 64
-		-- upvalues: v15 (copy), pager (copy)
-		return function(p1) -- line: 65
-			-- upvalues: v15 (copy), pager (copy)
-			if v15 == nil then
+	local inputAllowed
+
+	if v2 == Enum.PreferredInput.Touch then
+		inputAllowed = v3 == FormFactor.MobilePortrait
+	else
+		inputAllowed = false
+	end
+
+	local getActiveIsPlaying = React.useMemo(function()
+		return function(p)
+			if v == nil then
 				return true
 			end
 
-			local v23 = pager.getCurrentItem(p1)
+			local currentItem = pager.getCurrentItem(p)
 
-			if v23 == nil or v23.kind ~= "moment" then
+			if currentItem == nil or currentItem.kind ~= "moment" then
 				return true
 			end
 
-			local momentId = v23.moment.momentId
-			local v25 = v15.getControllerMap(p1)[momentId]
-
-			if v25 == nil then
-				return true
-			end
-
-			return v25.getState(p1).isPlaying
+			local momentId = currentItem.moment.momentId
+			local v4 = v.getControllerMap(p)[momentId]
+			return v4 == nil or v4.getState(p).isPlaying
 		end
-	end, {
-		pager,
-		v15
-	})
-	local v21 = React.useMemo(function() -- line: 85
-		-- upvalues: t1 (copy)
-		return function(p2) -- line: 86
-			-- upvalues: t1 (copy)
-			local current = t1.controllerRef.current
+	end, { pager, v })
 
-			if current == nil then
-				return false
-			end
+	local getIsScrolling = React.useMemo(function()
+		return function(p): boolean
+			local current = data.controllerRef.current
 
-			return current.getScrollState(p2) ~= "Idle"
+			return current ~= nil and current.getScrollState(p) ~= "Idle"
 		end
-	end, { t1.controllerRef })
+	end, { data.controllerRef })
 
 	useImmersiveChrome({
 		pager = pager,
-		active = t1.active,
-		getActiveIsPlaying = v20,
-		getIsScrolling = v21,
-		inputAllowed = v19,
-		reducedMotion = reducedMotion
+		active = data.active,
+		getActiveIsPlaying = getActiveIsPlaying,
+		getIsScrolling = getIsScrolling,
+		inputAllowed = inputAllowed,
+		reducedMotion = reducedMotion,
+		coveringOverlay = data.coveringOverlay
 	})
 
 	return nil

@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-require(CorePackages.Workspace.Packages.BulkPurchaseApp).renderBulkPurchaseApp()
+local BulkPurchaseApp = require(CorePackages.Workspace.Packages.BulkPurchaseApp)
+BulkPurchaseApp.renderBulkPurchaseApp()

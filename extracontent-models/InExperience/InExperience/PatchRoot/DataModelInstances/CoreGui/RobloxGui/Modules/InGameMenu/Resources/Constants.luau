@@ -1,14 +1,12 @@
 local CorePackages = game:GetService("CorePackages")
 local t = require(CorePackages.Packages.t)
-local MessageBus = require(CorePackages.Workspace.Packages.MessageBus).MessageBus
+local MessageBus = require(CorePackages.Workspace.Packages.MessageBus)
+local messageBus = MessageBus.MessageBus
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableGameLeftMessage = SharedFlags.FFlagEnableGameLeftMessage
 local FFlagRenameRespawnConfirmationPage = SharedFlags.FFlagRenameRespawnConfirmationPage
-local t1 = {
-	MouseAndKeyboard = "MouseAndKeyboard",
-	Touch = "Touch",
-	Gamepad = "Gamepad"
-}
+
+local inputType = { MouseAndKeyboard = "MouseAndKeyboard", Touch = "Touch", Gamepad = "Gamepad" }
 
 return {
 	InviteStatus = {
@@ -17,7 +15,7 @@ return {
 		Failed = "Failed",
 		Pending = "Pending"
 	},
-	InputType = t1,
+	InputType = inputType,
 	FallbackLocaleId = "UNKNOWN_FALLBACK",
 	defaultPageKey = "InitalPage",
 	advancedSettingsPageKey = "AdvancedGameSettings",
@@ -92,50 +90,32 @@ return {
 	ShieldOpenFadeTime2 = 0.25,
 	ShieldCloseFadeTime2 = 0.15,
 	ShieldExtraFadeTime = 0.05,
-	Zone = {
-		PortalSize = 1,
-		ContentOffset = 2
-	},
+	Zone = { PortalSize = 1, ContentOffset = 2 },
 	InputTypeMap = {
-		[Enum.UserInputType.MouseButton1] = t1.MouseAndKeyboard,
-		[Enum.UserInputType.MouseButton2] = t1.MouseAndKeyboard,
-		[Enum.UserInputType.MouseButton3] = t1.MouseAndKeyboard,
-		[Enum.UserInputType.MouseWheel] = t1.MouseAndKeyboard,
-		[Enum.UserInputType.MouseMovement] = t1.MouseAndKeyboard,
-		[Enum.UserInputType.Keyboard] = t1.MouseAndKeyboard,
-		[Enum.UserInputType.Gamepad1] = t1.Gamepad,
-		[Enum.UserInputType.Gamepad2] = t1.Gamepad,
-		[Enum.UserInputType.Gamepad3] = t1.Gamepad,
-		[Enum.UserInputType.Gamepad4] = t1.Gamepad,
-		[Enum.UserInputType.Gamepad5] = t1.Gamepad,
-		[Enum.UserInputType.Gamepad6] = t1.Gamepad,
-		[Enum.UserInputType.Gamepad7] = t1.Gamepad,
-		[Enum.UserInputType.Gamepad8] = t1.Gamepad,
-		[Enum.UserInputType.Touch] = t1.Touch
+		[Enum.UserInputType.MouseButton1] = inputType.MouseAndKeyboard,
+		[Enum.UserInputType.MouseButton2] = inputType.MouseAndKeyboard,
+		[Enum.UserInputType.MouseButton3] = inputType.MouseAndKeyboard,
+		[Enum.UserInputType.MouseWheel] = inputType.MouseAndKeyboard,
+		[Enum.UserInputType.MouseMovement] = inputType.MouseAndKeyboard,
+		[Enum.UserInputType.Keyboard] = inputType.MouseAndKeyboard,
+		[Enum.UserInputType.Gamepad1] = inputType.Gamepad,
+		[Enum.UserInputType.Gamepad2] = inputType.Gamepad,
+		[Enum.UserInputType.Gamepad3] = inputType.Gamepad,
+		[Enum.UserInputType.Gamepad4] = inputType.Gamepad,
+		[Enum.UserInputType.Gamepad5] = inputType.Gamepad,
+		[Enum.UserInputType.Gamepad6] = inputType.Gamepad,
+		[Enum.UserInputType.Gamepad7] = inputType.Gamepad,
+		[Enum.UserInputType.Gamepad8] = inputType.Gamepad,
+		[Enum.UserInputType.Touch] = inputType.Touch
 	},
-	FramerateCaps = if not game:DefineFastFlag("MoreFramerateOptions", false) then {
-		60,
-		120,
-		144,
-		240
-	} else {
-		60,
-		120,
-		144,
-		160,
-		165,
-		180,
-		200,
-		240
-	},
-	OnAppRatingPromptEventDescriptor = if not FFlagEnableGameLeftMessage then nil else {
-		mid = MessageBus.getMessageId("AppRatingPrompt", "leftGame"),
-		validateParams = t.strictInterface({
-			gameTime = t.number
-		})
-	},
+	FramerateCaps = { 60, 120, 144, 160, 165, 180, 200, 240 },
+	FramerateCapsIOS = { 60, 120 },
+	OnAppRatingPromptEventDescriptor = FFlagEnableGameLeftMessage and {
+		mid = messageBus.getMessageId("AppRatingPrompt", "leftGame"),
+		validateParams = t.strictInterface({ gameTime = t.number })
+	} or nil,
 	OnSurveyEventDescriptor = {
-		mid = MessageBus.getMessageId("Game", "openSurvey"),
+		mid = messageBus.getMessageId("Game", "openSurvey"),
 		validateParams = t.strictInterface({
 			eventType = t.string,
 			userId = t.optional(t.string),
@@ -149,9 +129,9 @@ return {
 	ResumeLocalizedKey = "CoreScripts.InGameMenu.Prompt.ResumeGame",
 	ResetCharacterLocalizedKey = not FFlagRenameRespawnConfirmationPage and "CoreScripts.InGameMenu.Action.ResetCharacter" or nil,
 	ConfirmLeaveGameLocalizedKey = "CoreScripts.InGameMenu.Prompt.ConfirmLeaveGame",
-	ConfirmResetCharacterLocalizedKey = not FFlagRenameRespawnConfirmationPage and "CoreScripts.InGameMenu.Prompt.ConfirmResetCharacter" or "CoreScripts.InGameMenu.Prompt.ConfirmRespawnCharacter",
+	ConfirmResetCharacterLocalizedKey = FFlagRenameRespawnConfirmationPage and "CoreScripts.InGameMenu.Prompt.ConfirmRespawnCharacter" or "CoreScripts.InGameMenu.Prompt.ConfirmResetCharacter",
 	DontLeaveGameLocalizedKey = "CoreScripts.InGameMenu.Action.DontLeaveGame",
-	DontResetCharacterLocalizedKey = not FFlagRenameRespawnConfirmationPage and "CoreScripts.InGameMenu.Action.DontResetCharacter" or "CoreScripts.InGameMenu.Action.DontRespawnCharacter",
+	DontResetCharacterLocalizedKey = FFlagRenameRespawnConfirmationPage and "CoreScripts.InGameMenu.Action.DontRespawnCharacter" or "CoreScripts.InGameMenu.Action.DontResetCharacter",
 	ConnectionLocalizedKey = "CommonUI.Features.Label.Connection",
 	FriendLocalizedKey = "Feature.Friends.Label.Friend",
 	AddConnectionLocalizedKey = "CommonUI.Features.Label.AddConnection",

@@ -1,104 +1,115 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local mutedError = require(AvatarExperienceCommonParent.Loggers).mutedError
-local HUMANOID_DESCRIPTION_SCALE_TO_NAME = require(AvatarExperienceCommon.Constants).HUMANOID_DESCRIPTION_SCALE_TO_NAME
+local parent = AvatarExperienceCommon.Parent
+
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+local Constants = require(AvatarExperienceCommon.Constants)
+local HUMANOID_DESCRIPTION_SCALE_TO_NAME = Constants.HUMANOID_DESCRIPTION_SCALE_TO_NAME
 local setHumanoidDescriptionColorsFromBodyColor3s = require(script.Parent.setHumanoidDescriptionColorsFromBodyColor3s)
 local setMakeupDescriptions = require(script.Parent.setMakeupDescriptions)
 local createHumanoidDescriptionAccessoryInfo = require(script.Parent.createHumanoidDescriptionAccessoryInfo)
 local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
 local isValidAssetTypeForOutfitType = require(AvatarExperienceCommon.Utils.isValidAssetTypeForOutfitType)
-local Constants = require(AvatarExperienceCommon.Constants)
-local AvatarExperienceFlags = require(AvatarExperienceCommonParent.AvatarExperienceFlags)
-local FFlagAXMakeupEquipping = AvatarExperienceFlags.FFlagAXMakeupEquipping
+
+local Constants2 = require(AvatarExperienceCommon.Constants)
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagParseHeadShapeFromAPIResponse = AvatarExperienceFlags.FFlagParseHeadShapeFromAPIResponse
 local FFlagHeadRefinementFacialAnimationToggle = AvatarExperienceFlags.FFlagHeadRefinementFacialAnimationToggle
 
 require(AvatarExperienceCommon.Types.CategoryTypes.CategoryTypes)
 
-return function(p1, p2) -- line: 22
-	-- upvalues: isValidAssetTypeForOutfitType (copy), Constants (copy), createHumanoidDescriptionAccessoryInfo (copy), FFlagParseHeadShapeFromAPIResponse (copy), FFlagHeadRefinementFacialAnimationToggle (copy), FFlagAXMakeupEquipping (copy), isMakeupAssetType (copy), mutedError (copy), setMakeupDescriptions (copy), HUMANOID_DESCRIPTION_SCALE_TO_NAME (copy), setHumanoidDescriptionColorsFromBodyColor3s (copy)
-	local HumanoidDescription = Instance.new("HumanoidDescription")
-	local EquippedAssets = p1.AvatarEditor.Character.EquippedAssets
-	local AvatarScales = p1.AvatarEditor.Character.AvatarScales
+return function(p, p2)
+	local humanoidDescription = Instance.new("HumanoidDescription")
+	local equippedAssets = p.AvatarEditor.Character.EquippedAssets
+	local avatarScales = p.AvatarEditor.Character.AvatarScales
+
 	local staticFacialAnimation = nil
 
-	if EquippedAssets then
-		local t1 = {}
+	if equippedAssets then
+		local v = {}
 
-		for v22, v23 in EquippedAssets do
-			if isValidAssetTypeForOutfitType(v22, p2) then
-				local t2 = {}
-				local v25 = Constants.ASSET_TYPE_TO_ACCESSORY_TYPE[v22]
+		for k, equippedAsset in equippedAssets do
+			if not isValidAssetTypeForOutfitType(k, p2) then
+				continue
+			end
 
-				for v26, v27 in v23 do
-					if v25 then
-						table.insert(t1, createHumanoidDescriptionAccessoryInfo(v22, v26, v27))
-					else
-						table.insert(t2, v26)
-					end
+			local v2 = Constants2.ASSET_TYPE_TO_ACCESSORY_TYPE[k]
+			local v3 = {}
+
+			for k2, v4 in equippedAsset do
+				if v2 then
+					table.insert(v, createHumanoidDescriptionAccessoryInfo(k, k2, v4))
+				else
+					table.insert(v3, k2)
 				end
+			end
 
-				if v25 == nil and #t2 > 0 then
-					local v28 = Constants.ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[v22]
-					local v29 = table.concat(t2, ",")
+			if not (v2 == nil and #v3 > 0) then
+				continue
+			end
 
-					if v28 then
-						if FFlagParseHeadShapeFromAPIResponse and Constants.BODY_PART_NAME_TO_ENUM[v28] then
-							local BodyPartDescription = Instance.new("BodyPartDescription")
+			local v4 = Constants2.ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[k]
+			local joined = table.concat(v3, ",")
 
-							BodyPartDescription.AssetId = t2[1]
-							BodyPartDescription.Parent = HumanoidDescription
-							BodyPartDescription.BodyPart = Constants.BODY_PART_NAME_TO_ENUM[v28]
+			if v4 then
+				if FFlagParseHeadShapeFromAPIResponse and Constants2.BODY_PART_NAME_TO_ENUM[v4] then
+					local bodyPartDescription = Instance.new("BodyPartDescription")
+					bodyPartDescription.AssetId = v3[1]
+					bodyPartDescription.Parent = humanoidDescription
+					bodyPartDescription.BodyPart = Constants2.BODY_PART_NAME_TO_ENUM[v4]
 
-							if v22 == Constants.ASSET_TYPE_NAME_TO_ID_STRING.DynamicHead then
-								local v31 = nil
+					if k == Constants2.ASSET_TYPE_NAME_TO_ID_STRING.DynamicHead then
+						local headShape = nil
 
-								for _, v33 in t2 do
-									local v34 = v23[v33]
+						for _, v5 in v3 do
+							local v6 = equippedAsset[v5]
 
-									if FFlagHeadRefinementFacialAnimationToggle and v34 and v34.staticFacialAnimation ~= nil then
-										staticFacialAnimation = v34.staticFacialAnimation
-									end
-
-									if v34 and v34.headShape then
-										v31 = if v34.headShape ~= "Default" then v34.headShape else nil
-
-										break
-									end
-								end
-
-								if v31 then
-									BodyPartDescription.HeadShape = v31
-								end
+							if FFlagHeadRefinementFacialAnimationToggle and v6 and v6.staticFacialAnimation ~= nil then
+								staticFacialAnimation = v6.staticFacialAnimation
 							end
-						else
-							HumanoidDescription[v28] = v29
+
+							if v6 and v6.headShape then
+								if v6.headShape == "Default" then
+									headShape = nil
+								else
+									headShape = v6.headShape
+								end
+
+								break
+							end
 						end
-					elseif v22 ~= Constants.ASSET_TYPE_NAME_TO_ID_STRING.Gear and (not FFlagAXMakeupEquipping or not isMakeupAssetType(v22)) then
-						mutedError(string.format("assetTypeId: %s not recognized as member of humanoidDescription", (tostring(v22))))
+
+						if headShape then
+							bodyPartDescription.HeadShape = headShape
+						end
 					end
+				else
+					humanoidDescription[v4] = joined
 				end
+			elseif k ~= Constants2.ASSET_TYPE_NAME_TO_ID_STRING.Gear and not isMakeupAssetType(k) then
+				mutedError(string.format(
+					"assetTypeId: %s not recognized as member of humanoidDescription",
+					(tostring(k))
+				))
 			end
 		end
 
-		HumanoidDescription:SetAccessories(t1, true)
-
-		if FFlagAXMakeupEquipping then
-			setMakeupDescriptions(HumanoidDescription, EquippedAssets)
-		end
+		humanoidDescription:SetAccessories(v, true)
+		setMakeupDescriptions(humanoidDescription, equippedAssets)
 
 		if FFlagHeadRefinementFacialAnimationToggle and staticFacialAnimation ~= nil then
-			HumanoidDescription[Constants.STATIC_FACIAL_ANIMATION] = staticFacialAnimation
+			humanoidDescription[Constants2.STATIC_FACIAL_ANIMATION] = staticFacialAnimation
 		end
 	end
 
-	if AvatarScales then
-		for v35, v36 in AvatarScales do
-			HumanoidDescription[HUMANOID_DESCRIPTION_SCALE_TO_NAME[v35]] = v36
+	if avatarScales then
+		for k, avatarScale in avatarScales do
+			humanoidDescription[HUMANOID_DESCRIPTION_SCALE_TO_NAME[k]] = avatarScale
 		end
 	end
 
-	setHumanoidDescriptionColorsFromBodyColor3s(HumanoidDescription, p1.AvatarEditor.Character.BodyColor3s)
+	setHumanoidDescriptionColorsFromBodyColor3s(humanoidDescription, p.AvatarEditor.Character.BodyColor3s)
 
-	return HumanoidDescription
+	return humanoidDescription
 end

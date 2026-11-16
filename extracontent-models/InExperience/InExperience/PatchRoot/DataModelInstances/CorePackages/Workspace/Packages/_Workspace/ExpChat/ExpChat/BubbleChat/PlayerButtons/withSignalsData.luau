@@ -1,27 +1,34 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Signals = require(ExpChatParent.Signals)
-local useSignalState = require(ExpChatParent.SignalsReact).useSignalState
-local React = require(ExpChatParent.React)
-local GetVoiceStore = require(ExpChat.Stores.GetVoiceStore)
+local parent = ExpChat.Parent
 
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
+local React = require(parent.React)
+
+local GetVoiceStore = require(ExpChat.Stores.GetVoiceStore)
 require(ExpChat.Stores.GetVoiceStore.createVoiceStore)
 
-local v7 = GetVoiceStore(false)
-local v8 = Signals.createSignal(nil)
+local voiceStore = GetVoiceStore(false)
 
-local function withSignalsData(p1) -- line: 24
-	-- upvalues: v7 (copy), useSignalState (copy), v8 (copy), React (copy)
-	return function(p2) -- line: 25
-		-- upvalues: v7 (copy), useSignalState (copy), v8 (copy), React (copy), p1 (copy)
+local signal = Signals.createSignal(nil)
+
+local function withSignalsData(p)
+	return function(p2)
 		local userId = p2.userId
-		local v13 = if not userId then nil else v7.getOrCreateVoiceState(userId)
-		local v14 = useSignalState(v13 or v8)
-		local v15 = table.clone(p2)
+		local v
 
-		v15.voiceState = v14
+		if userId then
+			v = voiceStore.getOrCreateVoiceState(userId)
+		end
 
-		return React.createElement(p1, v15)
+		local voiceState = useSignalState(v or signal)
+
+		local clone = table.clone(p2)
+		clone.voiceState = voiceState
+
+		return React.createElement(p, clone)
 	end
 end
 

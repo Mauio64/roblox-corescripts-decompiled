@@ -1,20 +1,28 @@
-local Parent = script:FindFirstAncestor("ProfilePlatformCommon").Parent
-local PromptsEntryPoint = require(Parent.ServerTriggeredModals).PromptsEntryPoint
-local SduiLoadTimer = require(Parent.SduiSharedUtilities).SduiLoadTimer
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local FFlagSduiAllowNoConfigsBuilt = require(Parent.SharedFlags).FFlagSduiAllowNoConfigsBuilt
-local v6 = game:DefineFastFlag("ProfileCompletionUsePlatformSurfaceKey", false)
+local parent = script:FindFirstAncestor("ProfilePlatformCommon").Parent
 
-return function() -- line: 18
-	-- upvalues: SduiLoadTimer (copy), PromptsEntryPoint (copy), v6 (copy), AppPage (copy), FFlagSduiAllowNoConfigsBuilt (copy)
-	local v7 = SduiLoadTimer.createLoadTimer("ProfileCompletion")
+local ServerTriggeredModals = require(parent.ServerTriggeredModals)
+local PromptsEntryPoint = ServerTriggeredModals.PromptsEntryPoint
+
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiAllowNoConfigsBuilt = SharedFlags.FFlagSduiAllowNoConfigsBuilt
+local defineFastFlag = game:DefineFastFlag("ProfileCompletionUsePlatformSurfaceKey", false)
+local defineFastFlag2 = game:DefineFastFlag("ProfileCompletionReplaceOnFetch", false)
+
+return function()
+	local loadTimer = SduiLoadTimer.createLoadTimer("ProfileCompletion")
 
 	return {
+		entryPoint = PromptsEntryPoint.SelfUserProfileOpen,
+		surfaceKey = not defineFastFlag and "ProfileCompletion" or AppPage.ProfilePlatform,
 		configKey = "ProfileCompletion",
 		clearOnEmptyResponse = true,
-		entryPoint = PromptsEntryPoint.SelfUserProfileOpen,
-		surfaceKey = not v6 and "ProfileCompletion" or AppPage.ProfilePlatform,
-		allowNoConfigsBuilt = not not FFlagSduiAllowNoConfigsBuilt or nil,
-		loadTimer = v7
+		replaceOnFetch = defineFastFlag2 and true or nil,
+		allowNoConfigsBuilt = FFlagSduiAllowNoConfigsBuilt and true or nil,
+		loadTimer = loadTimer
 	}
 end

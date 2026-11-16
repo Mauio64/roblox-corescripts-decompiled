@@ -1,5 +1,1 @@
-return {
-	Hidden = "Hidden",
-	Problematic = "Problematic",
-	Resolved = "Resolved"
-}
+return { Hidden = "Hidden", Problematic = "Problematic", Resolved = "Resolved" }

@@ -1,136 +1,179 @@
 local PhoneUpsell = script:FindFirstAncestor("PhoneUpsell")
-local PhoneUpsellParent = PhoneUpsell.Parent
-local React = require(PhoneUpsellParent.React)
-local UIBlox = require(PhoneUpsellParent.UIBlox)
+local parent = PhoneUpsell.Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
-local useLocalization = require(PhoneUpsellParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local useRef = React.useRef
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local Images = UIBlox.App.ImageSet.Images
-local Cryo = require(PhoneUpsellParent.Cryo)
-local PostUserOptIn = require(PhoneUpsellParent.VoiceChat).PostUserOptIn
-local useRoactService = require(PhoneUpsellParent.RobloxAppHooks).useRoactService
-local RoactNetworking = require(PhoneUpsellParent.RoactServiceTags).RoactNetworking
-local FocusNavigationUtils = require(PhoneUpsellParent.FocusNavigationUtils)
+local Cryo = require(parent.Cryo)
+local VoiceChat = require(parent.VoiceChat)
+local PostUserOptIn = VoiceChat.PostUserOptIn
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
-local useDispatch = require(PhoneUpsellParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local ToastRodux = require(PhoneUpsellParent.ToastRodux)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local ToastRodux = require(parent.ToastRodux)
 local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
 local PostUpsellTrialOptIn = require(PhoneUpsell.Http.Requests.PostUpsellTrialOptIn)
-local t1 = {}
 
-local function getButtonStackProps(s1: string, n1: number, p1: ((...any) -> ...any), s2: string, p2: ((...any) -> ...any)) -- line: 32
-	-- upvalues: ButtonType (copy)
-	local t2 = {{
-		buttonType = ButtonType.PrimarySystem,
-		props = {
-			onActivated = p1,
-			text = s1
+local v = {}
+
+local function getButtonStackProps(buttonKey: string, size_1200: number, onActivated, extraButtonKey: string, onActivated2)
+	local buttons = {
+		{
+			buttonType = ButtonType.PrimarySystem,
+			props = { onActivated = onActivated, text = buttonKey }
 		}
-	}}
+	}
 
-	if s2 and s2 ~= "" then
-		table.insert(t2, 1, {
+	if extraButtonKey and extraButtonKey ~= "" then
+		table.insert(buttons, 1, {
 			buttonType = ButtonType.Secondary,
-			props = {
-				onActivated = p2,
-				text = s2
-			}
+			props = { onActivated = onActivated2, text = extraButtonKey }
 		})
 	end
 
-	return {
-		buttonHeight = n1,
-		buttons = t2
-	}
+	return { buttonHeight = size_1200, buttons = buttons }
 end
-local function VoiceTrialUpsell(t3: {[any]: any}) -- line: 64
-	-- upvalues: Cryo (copy), t1 (copy), useDispatch (copy), useRef (copy), useStyle (copy), useLocalization (copy), useRoactService (copy), RoactNetworking (copy), PostUserOptIn (copy), PostUpsellTrialOptIn (copy), SetCurrentToastMessage (copy), ToastRodux (copy), Images (copy), React (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigableSurfaceIdentifierEnum (copy), InteractiveAlert (copy), getButtonStackProps (copy)
-	local v32 = Cryo.Dictionary.union(t1, t3)
-	local t4 = {
+
+local function VoiceTrialUpsell(p)
+	local union = Cryo.Dictionary.union(v, p)
+
+	local v2 = useDispatch()
+	local ref = useRef(nil)
+	local v3 = useStyle()
+	local baseSize = v3.Font.BaseSize
+	local v4 = useLocalization({
 		titleKey = "Feature.VerificationUpsell.Heading.TryVoiceChat",
 		descriptionKey = "Feature.VerificationUpsell.Description.VoiceLegalConsent2",
 		buttonKey = "Feature.VerificationUpsell.Action.TurnOn",
 		extraButtonKey = "Feature.VerificationUpsell.Action.NotNow.2"
-	}
-	local v34 = useDispatch()
-	local v35 = useRef(nil)
-	local v36 = useStyle()
-	local BaseSize = v36.Font.BaseSize
-	local v38 = useLocalization(t4)
-	local v39 = useRoactService(RoactNetworking)
+	})
 
-	local function handleTurnOn() -- line: 81
-		-- upvalues: v32 (copy), PostUserOptIn (copy), v39 (copy), PostUpsellTrialOptIn (copy), v34 (copy), SetCurrentToastMessage (copy), ToastRodux (copy), Images (copy), v36 (copy)
-		v32.onClose()
-		PostUserOptIn(v39, true, false):andThen(function(_) -- line: 84
-			-- upvalues: PostUpsellTrialOptIn (copy), v39 (copy), v32 (copy)
-			return PostUpsellTrialOptIn(v39, v32.upsellCardType)
-		end):andThen(function() -- line: 87
-			-- upvalues: v34 (copy), SetCurrentToastMessage (copy), ToastRodux (copy), Images (copy), v36 (copy), v32 (copy)
-			v34(SetCurrentToastMessage({
+	local v5 = useRoactService(RoactNetworking)
+
+	local function handleTurnOn()
+		union.onClose()
+		PostUserOptIn(v5, true, false):andThen(function(_)
+			return PostUpsellTrialOptIn(v5, union.upsellCardType)
+		end):andThen(function()
+			v2(SetCurrentToastMessage({
 				toastMessage = "Feature.VerificationUpsell.Heading.VoiceChatTurnedOn",
 				isLocalized = false,
-				slideIn = true,
 				toastType = ToastRodux.Enums.ToastType.SuccessConfirmation,
 				toastIcon = Images["icons/status/success_large"],
-				toastIconColorStyle = {
-					Color = v36.Tokens.Color.System.Success.Color3
-				}
+				toastIconColorStyle = { Color = v3.Tokens.Color.System.Success.Color3 },
+				slideIn = true
 			}))
-			v32.onCompletion()
-		end):catch(function() -- line: 100
-			-- upvalues: v34 (copy), SetCurrentToastMessage (copy), ToastRodux (copy), v36 (copy)
-			v34(SetCurrentToastMessage({
+
+			union.onCompletion()
+		end):catch(function()
+			v2(SetCurrentToastMessage({
 				toastMessage = "Feature.VerificationUpsell.Heading.VoiceChatJoinFailed",
 				isLocalized = false,
-				slideIn = true,
 				toastType = ToastRodux.Enums.ToastType.NetworkingError,
-				toastIconColorStyle = {
-					Color = v36.Tokens.Color.System.Alert.Color3
-				}
+				toastIconColorStyle = { Color = v3.Tokens.Color.System.Alert.Color3 },
+				slideIn = true
 			}))
 		end)
 	end
 
-	return React.createElement(FocusNavigableSurfaceWrapper, {
-		isIsolated = true,
+	local createElement = React.createElement
+	local v6 = {
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
-		frameProps = {
-			ref = v35
+		isIsolated = true,
+		frameProps = { ref = ref }
+	}
+
+	local createElement2 = React.createElement
+	local v7 = {
+		title = v4.titleKey,
+		screenSize = 0,
+		buttonStackInfo = 0,
+		onCloseClicked = 0,
+		middleContent = 0
+	}
+	local screenSize
+
+	if ref and ref.current then
+		screenSize = ref.current.AbsoluteSize
+	else
+		screenSize = Vector2.new(500, 500)
+	end
+
+	v7.screenSize = screenSize
+	v7.buttonStackInfo = getButtonStackProps(
+		v4.buttonKey,
+		v3.Tokens.Size.Size_1200,
+		handleTurnOn,
+		v4.extraButtonKey,
+		union.onClose
+	)
+
+	v7.onCloseClicked = union.onClose
+	function v7.middleContent()
+		local createElement3 = React.createElement
+		local v8 = {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0)
 		}
-	}, {
-		Modal = React.createElement(InteractiveAlert, {
-			title = v38.titleKey,
-			screenSize = if not v35 or not v35.current then Vector2.new(500, 500) else v35.current.AbsoluteSize,
-			buttonStackInfo = getButtonStackProps(v38.buttonKey, v36.Tokens.Size.Size_1200, handleTurnOn, v38.extraButtonKey, v32.onClose),
-			onCloseClicked = v32.onClose,
-			middleContent = function() -- line: 132
-				-- upvalues: React (copy), v38 (copy), BaseSize (copy), v36 (copy)
-				return React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(1, 0, 0, 0)
-				}, {
-					BodyText = React.createElement("TextLabel", {
-						LayoutOrder = 0,
-						BackgroundTransparency = 1,
-						TextWrapped = true,
-						RichText = true,
-						Text = v38.descriptionKey,
-						TextSize = BaseSize,
-						TextColor3 = v36.Theme.TextDefault.Color,
-						TextTransparency = v36.Theme.TextDefault.Transparency,
-						Font = v36.Font.Body.Font,
-						TextXAlignment = Enum.TextXAlignment.Left,
-						Size = UDim2.new(1, 0, 0, 0),
-						AutomaticSize = Enum.AutomaticSize.Y
-					})
-				})
-			end
+
+		local createElement4 = React.createElement
+		local v9 = {
+			LayoutOrder = 0,
+			BackgroundTransparency = 1,
+			Text = v4.descriptionKey,
+			TextSize = baseSize,
+			TextColor3 = v3.Theme.TextDefault.Color,
+			TextTransparency = v3.Theme.TextDefault.Transparency,
+			Font = 0,
+			FontFace = 0,
+			TextXAlignment = 0,
+			TextWrapped = true,
+			Size = 0,
+			AutomaticSize = 0,
+			RichText = true
+		}
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = v3.Font.Body.Font
+		end
+
+		v9.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(v3.Tokens.Typography.BodyLarge.Font)
+		end
+
+		v9.FontFace = fontFace
+
+		v9.TextXAlignment = Enum.TextXAlignment.Left
+
+		v9.Size = UDim2.new(1, 0, 0, 0)
+		v9.AutomaticSize = Enum.AutomaticSize.Y
+		return createElement3("Frame", v8, {
+			BodyText = createElement4("TextLabel", v9)
 		})
+	end
+
+	return createElement(FocusNavigableSurfaceWrapper, v6, {
+		Modal = createElement2(InteractiveAlert, v7)
 	})
 end
 

@@ -1,119 +1,130 @@
 local RunService = game:GetService("RunService")
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
-
 game:GetService("VideoCaptureService")
-
 local FaceAnimatorService = game:GetService("FaceAnimatorService")
+
 local Roact = require(CorePackages.Packages.Roact)
-
 require(CorePackages.Packages.UIBlox)
-
 local ReactUtils = require(CorePackages.Packages.ReactUtils)
 local t = require(CorePackages.Packages.t)
-local EventConnection = ReactUtils.EventConnection
-local Modules = CoreGui.RobloxGui.Modules
-local default = require(Modules.VoiceChat.VoiceChatServiceManager).default
-local cameraDevicePermissionGrantedSignal = require(CoreGui.RobloxGui.Modules.Settings.cameraDevicePermissionGrantedSignal)
-local v12 = Roact.PureComponent:extend("FlashingDot")
 
-local function lerpNum(n1: number, n2: number, n3: number) -- line: 29
-	return n1 + (n2 - n1) * n3
+local EventConnection = ReactUtils.EventConnection
+
+local Modules = CoreGui.RobloxGui.Modules
+local VoiceChatServiceManager = require(Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
+
+local cameraDevicePermissionGrantedSignal = require(CoreGui.RobloxGui.Modules.Settings.cameraDevicePermissionGrantedSignal)
+
+local extended = Roact.PureComponent:extend("FlashingDot")
+
+local function lerpNum(p: number, p2: number, p3: number)
+	return p + (p2 - p) * p3
 end
 
-v12.validateProps = t.strictInterface({})
+extended.validateProps = t.strictInterface({})
 
-function v12.init(p1) -- line: 35
-	-- upvalues: Roact (copy), default (copy), FaceAnimatorService (copy), cameraDevicePermissionGrantedSignal (copy)
-	p1:setState({
-		Visible = false,
-		isUsingMic = false
-	})
-	p1.prevTime = 1.5707963267948966
-	p1.prevSinTime = 1
+function extended:init()
+	self:setState({ Visible = false, isUsingMic = false })
 
-	local v18, v19 = Roact.createBinding(0)
+	self.prevTime = 1.5707963267948966
+	self.prevSinTime = 1
+	local binding, updateTransparencyBinding = Roact.createBinding(0)
+	self.transparencyBinding = binding
+	self.updateTransparencyBinding = updateTransparencyBinding
 
-	p1.transparencyBinding = v18
-	p1.updateTransparencyBinding = v19
+	function self.checkNewVisibility()
+		local isUsingMic
 
-	function p1.checkNewVisibility() -- line: 45
-		-- upvalues: default (copy), FaceAnimatorService (copy), p1 (copy)
-		local v24 = default.localMuted ~= nil and not default.localMuted
-		local v25 = FaceAnimatorService:IsStarted() and FaceAnimatorService.VideoAnimationEnabled
-		local v26 = v24 or v25
-
-		if v26 ~= p1.state.Visible then
-			p1:setState({
-				Visible = v26,
-				isUsingMic = v24
-			})
+		if default.localMuted == nil then
+			isUsingMic = false
+		else
+			isUsingMic = not default.localMuted
 		end
-	end
-	function p1.animationConnection(p2) -- line: 61
-		-- upvalues: p1 (copy)
-		local v28 = p1.prevTime + p2
-		local v29 = math.sin(v28 * 3)
-		local v30 = math.abs(p1.prevSinTime)
 
-		p1.updateTransparencyBinding(v30 * -0.5 + 0.5)
-		p1.prevTime = v28
-		p1.prevSinTime = v29
-	end
-	function p1.teardownCameraPermissionGrantedListener() -- line: 71
-		-- upvalues: p1 (copy)
-		if p1.cameraPermissionGrantedListener then
-			p1.cameraPermissionGrantedListener:disconnect()
-			p1.cameraPermissionGrantedListener = nil
+		local videoAnimationEnabled = FaceAnimatorService:IsStarted() and FaceAnimatorService.VideoAnimationEnabled
+		local visible = isUsingMic or videoAnimationEnabled
+
+		if self.state.Visible ~= visible then
+			self:setState({ Visible = visible, isUsingMic = isUsingMic })
 		end
 	end
 
-	p1.cameraPermissionGrantedListener = cameraDevicePermissionGrantedSignal:connect(function() -- line: 79
-		-- upvalues: p1 (copy)
-		p1.checkNewVisibility()
+	function self.animationConnection(p)
+		local prevTime = self.prevTime + p
+		local prevSinTime2 = math.sin(prevTime * 3)
+
+		local prevSinTime = math.abs(self.prevSinTime)
+		self.updateTransparencyBinding(prevSinTime * -0.5 + 0.5)
+		self.prevTime = prevTime
+		self.prevSinTime = prevSinTime2
+	end
+
+	function self.teardownCameraPermissionGrantedListener()
+		if self.cameraPermissionGrantedListener then
+			self.cameraPermissionGrantedListener:disconnect()
+			self.cameraPermissionGrantedListener = nil
+		end
+	end
+
+	self.cameraPermissionGrantedListener = cameraDevicePermissionGrantedSignal:connect(function()
+		self.checkNewVisibility()
 	end)
 end
-function v12.didMount(p3) -- line: 84
-	p3.checkNewVisibility()
+
+function extended.didMount(p)
+	p.checkNewVisibility()
 end
-function v12.willUnmount(p4) -- line: 88
-	if p4.teardownCameraPermissionGrantedListener then
-		p4.teardownCameraPermissionGrantedListener()
+
+function extended.willUnmount(p)
+	if p.teardownCameraPermissionGrantedListener then
+		p.teardownCameraPermissionGrantedListener()
 	end
 end
-function v12.render(p5) -- line: 94
-	-- upvalues: Roact (copy), EventConnection (copy), default (copy), FaceAnimatorService (copy), RunService (copy)
-	local uDim2 = UDim2.fromOffset(4, 4)
 
-	return Roact.createElement("Frame", {
-		ZIndex = 2,
-		BorderSizePixel = 0,
-		BackgroundTransparency = 1,
+function extended.render(props)
+	local udim = UDim2.fromOffset(4, 4)
+
+	local createElement = Roact.createElement
+	local v = {
 		AnchorPoint = Vector2.new(1, 0),
 		Position = UDim2.new(1, -4, 0, 3),
 		Size = UDim2.fromOffset(4, 4),
-		Visible = p5.state.Visible
-	}, {
+		ZIndex = 2,
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		Visible = props.state.Visible
+	}
+	local v2 = {
 		FlashingDot = Roact.createElement("ImageLabel", {
 			BackgroundTransparency = 1,
+			Size = udim,
 			Image = "rbxasset://textures/AnimationEditor/FaceCaptureUI/FlashingDot.png",
-			LayoutOrder = 2,
-			Size = uDim2,
-			ImageTransparency = p5.transparencyBinding
+			ImageTransparency = props.transparencyBinding,
+			LayoutOrder = 2
 		}),
 		MuteChangedEvent = Roact.createElement(EventConnection, {
 			event = default.muteChanged.Event,
-			callback = p5.checkNewVisibility
+			callback = props.checkNewVisibility
 		}),
 		CameraChangedEvent = Roact.createElement(EventConnection, {
 			event = FaceAnimatorService:GetPropertyChangedSignal("VideoAnimationEnabled"),
-			callback = p5.checkNewVisibility
+			callback = props.checkNewVisibility
 		}),
-		AnimationConnection = if not p5.state.Visible then nil else Roact.createElement(EventConnection, {
+		AnimationConnection = 0
+	}
+	local animationConnection
+
+	if props.state.Visible then
+		animationConnection = Roact.createElement(EventConnection, {
 			event = RunService.RenderStepped,
-			callback = p5.animationConnection
+			callback = props.animationConnection
 		})
-	})
+	end
+
+	v2.AnimationConnection = animationConnection
+	return createElement("Frame", v, v2)
 end
 
-return v12
+return extended

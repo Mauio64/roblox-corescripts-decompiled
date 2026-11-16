@@ -1,20 +1,18 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local getFStringUGCLCAllowedAssetTypeIds = require(ParentParent.flags.getFStringUGCLCAllowedAssetTypeIds)
+local parent = script.Parent.Parent
 
-return {
-	isRigidAccessoryAllowed = function(p1) -- line: 9
-		-- upvalues: Constants (copy)
-		local v5 = Constants.ASSET_TYPE_INFO[p1]
+local Constants = require(parent.Constants)
 
-		if v5 == nil then
-			return false
-		end
+local getFStringUGCLCAllowedAssetTypeIds = require(parent.flags.getFStringUGCLCAllowedAssetTypeIds)
+local RigidOrLayeredAllowed = {}
 
-		return v5.rigidAllowed == true
-	end,
-	isLayeredClothingAllowed = function(p2) -- line: 18
-		-- upvalues: getFStringUGCLCAllowedAssetTypeIds (copy)
-		return table.find(string.split(getFStringUGCLCAllowedAssetTypeIds(), ","), (tostring(p2.Value))) ~= nil
-	end
-}
+function RigidOrLayeredAllowed.isRigidAccessoryAllowed(p): boolean
+	local v = Constants.ASSET_TYPE_INFO[p]
+
+	return v ~= nil and v.rigidAllowed == true
+end
+
+function RigidOrLayeredAllowed.isLayeredClothingAllowed(p): boolean
+	return table.find(string.split(getFStringUGCLCAllowedAssetTypeIds(), ","), (tostring(p.Value))) ~= nil
+end
+
+return RigidOrLayeredAllowed

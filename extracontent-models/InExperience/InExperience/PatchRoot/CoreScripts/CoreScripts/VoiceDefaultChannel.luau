@@ -2,95 +2,105 @@ local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local NotificationService = game:GetService("NotificationService")
 local Players = game:GetService("Players")
+
 local RobloxGui = CoreGui.RobloxGui
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
-local default2 = require(CorePackages.Workspace.Packages.CallProtocol).CallProtocol.default
-local Enums = require(CorePackages.Workspace.Packages.CallProtocol).Enums
-local v9 = game:DefineFastFlag("DebugDefaultChannelStartMuted", true)
-local v10 = game:DefineFastFlag("UseNotificationServiceIsConnected", false)
-local v11 = game:DefineFastFlag("DefaultChannelEnableDefaultVoice", true)
-local GetFFlagSeamlessVoiceFTUX = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagSeamlessVoiceFTUX
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
+local CallProtocol = require(CorePackages.Workspace.Packages.CallProtocol)
+local default2 = CallProtocol.CallProtocol.default
+local CallProtocol2 = require(CorePackages.Workspace.Packages.CallProtocol)
+local Enums = CallProtocol2.Enums
+
+local defineFastFlag = game:DefineFastFlag("DebugDefaultChannelStartMuted", true)
+local defineFastFlag2 = game:DefineFastFlag("UseNotificationServiceIsConnected", false)
+local defineFastFlag3 = game:DefineFastFlag("DefaultChannelEnableDefaultVoice", true)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagSeamlessVoiceFTUX = SharedFlags.GetFFlagSeamlessVoiceFTUX
 
 game:GetEngineFeature("VoiceServiceGenerateDefaultChannelAvailable")
+local engineFeature = game:GetEngineFeature("VoiceServiceEnableDefaultVoiceAvailable")
+local engineFeature2 = game:GetEngineFeature("NotificationServiceIsConnectedAvailable")
 
-local EngineFeature = game:GetEngineFeature("VoiceServiceEnableDefaultVoiceAvailable")
-local EngineFeature2 = game:GetEngineFeature("NotificationServiceIsConnectedAvailable")
-local v15 = require(RobloxGui.Modules.VoiceChat.Logger)(script.Name)
-local v16 = require(RobloxGui.Modules.VoiceChat.Analytics).new()
+local Logger = require(RobloxGui.Modules.VoiceChat.Logger)
+local logger = Logger(script.Name)
+local Analytics = require(RobloxGui.Modules.VoiceChat.Analytics)
+local v = Analytics.new()
+
 local VoiceChatService = game:GetService("VoiceChatService")
 
-local function initializeDefaultChannel(p1) -- line: 27
-	-- upvalues: default (copy), v15 (copy), v16 (copy)
-	local v21 = default:getService()
+local function initializeDefaultChannel(p)
+	local service = default:getService()
 
-	if not v21 then
+	if not service then
 		return nil
 	end
 
-	v15:info("Joining default channel")
+	logger:info("Joining default channel")
 
-	local v22 = v21:JoinByGroupIdToken("default", p1)
+	local joinByGroupIdToken = service:JoinByGroupIdToken("default", p)
 
-	if v22 then
-		v16:reportVoiceChatJoinResult(true, "defaultJoinSuccess")
-
-		return v22
+	if joinByGroupIdToken then
+		v:reportVoiceChatJoinResult(true, "defaultJoinSuccess")
+		return joinByGroupIdToken
 	end
 
-	v16:reportVoiceChatJoinResult(false, "defaultJoinFailed", "error")
+	v:reportVoiceChatJoinResult(false, "defaultJoinFailed", "error")
 
-	return v22
+	return joinByGroupIdToken
 end
 
-if EngineFeature2 and v10 then
+if engineFeature2 and defineFastFlag2 then
 	if not NotificationService.IsConnected then
-		v15:debug("NotificationService is not yet connected")
+		logger:debug("NotificationService is not yet connected")
 		NotificationService:GetPropertyChangedSignal("IsConnected"):Wait()
 	end
 
-	v15:debug("NotificationService connected")
+	logger:debug("NotificationService connected")
 end
 
 if not VoiceChatService.UseNewAudioApi then
-	if not Players.LocalPlayer.Character then
-		Players.LocalPlayer.CharacterAdded:Wait()
-		v15:debug("Player character loaded")
+	if Players.LocalPlayer.Character then
+		logger:debug("Player character already loaded")
 	else
-		v15:debug("Player character already loaded")
+		Players.LocalPlayer.CharacterAdded:Wait()
+		logger:debug("Player character loaded")
 	end
 end
 
-if EngineFeature and v11 then
-	local Service = game:FindService("VoiceChatService")
+if engineFeature and defineFastFlag3 then
+	local service = game:FindService("VoiceChatService")
 
-	if not Service then
-		v15:info("VoiceChatService not found. Assuming default values.")
-	elseif not Service.EnableDefaultVoice and not Service.UseNewAudioApi then
-		v15:debug("Default channel is disabled.")
-		v16:reportVoiceChatJoinResult(false, "defaultDisabled")
-
-		return
+	if service then
+		if not (service.EnableDefaultVoice or service.UseNewAudioApi) then
+			logger:debug("Default channel is disabled.")
+			v:reportVoiceChatJoinResult(false, "defaultDisabled")
+			return
+		end
+	else
+		logger:info("VoiceChatService not found. Assuming default values.")
 	end
 end
 
-default2:getCallState():andThen(function(p2) -- line: 74
-	-- upvalues: Enums (copy), v9 (copy), default (copy), initializeDefaultChannel (copy), v15 (copy)
-	local v24 = if p2.status == Enums.CallStatus.Idle.rawValue() or p2.status == Enums.CallStatus.Ringing.rawValue() then v9 else p2.muted
+default2:getCallState():andThen(function(p)
+	local v2
 
-	default:asyncInit():andThen(function() -- line: 81
-		-- upvalues: initializeDefaultChannel (copy), v24 (copy), default (copy)
-		if initializeDefaultChannel(v24) == false then
+	if p.status == Enums.CallStatus.Idle.rawValue() or p.status == Enums.CallStatus.Ringing.rawValue() then
+		v2 = defineFastFlag
+	else
+		v2 = p.muted
+	end
+
+	default:asyncInit():andThen(function()
+		if initializeDefaultChannel(v2) == false then
 			default:InitialJoinFailedPrompt()
 		end
-	end):catch(function() -- line: 87
-		-- upvalues: v15 (copy)
-		v15:info("VoiceChatServiceManager did not initialize")
+	end):catch(function()
+		logger:info("VoiceChatServiceManager did not initialize")
 	end)
 end)
 
 if GetFFlagSeamlessVoiceFTUX() then
-	task.spawn(function() -- line: 96
-		-- upvalues: default (copy)
+	task.spawn(function()
 		default:VoiceChatFirstTimeUX(game:GetService("AppStorageService"))
 	end)
 end

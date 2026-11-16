@@ -1,26 +1,24 @@
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("Localization").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("Localization").Parent
 
-return function() -- line: 12
-	-- upvalues: Signals (copy), LocalizationService (copy)
-	local t1 = {}
-	local v5, v6 = Signals.createSignal(LocalizationService.RobloxLocaleId)
+local Signals = require(parent.Signals)
 
-	t1.robloxLocaleId = LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"):Connect(function() -- line: 16
-		-- upvalues: v6 (copy), LocalizationService (copy)
-		v6(LocalizationService.RobloxLocaleId)
+return function()
+	local v = {}
+
+	local signal, v2 = Signals.createSignal(LocalizationService.RobloxLocaleId)
+	v.robloxLocaleId = LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"):Connect(function()
+		v2(LocalizationService.RobloxLocaleId)
 	end)
 
 	return {
-		getRobloxLocaleId = v5,
-		cleanUp = function() -- line: 23
-			-- upvalues: t1 (ref)
-			for _, v8 in t1 do
-				v8:Disconnect()
+		getRobloxLocaleId = signal,
+		cleanUp = function()
+			for _, connection in v do
+				connection:Disconnect()
 			end
 
-			t1 = {}
+			v = {}
 		end
 	}
 end

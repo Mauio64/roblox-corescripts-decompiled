@@ -1,35 +1,35 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local LocalizationRoactContext = require(ParentParent.Localization).LocalizationRoactContext
-local useLocalization = require(ParentParent.Localization).Hooks.useLocalization
-local NotificationsCommon = script:FindFirstAncestor("NotificationsCommon")
+local parent = script.Parent.Parent.Parent
 
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local LocalizationRoactContext = Localization.LocalizationRoactContext
+local Localization2 = require(parent.Localization)
+local useLocalization = Localization2.Hooks.useLocalization
+local NotificationsCommon = script:FindFirstAncestor("NotificationsCommon")
 require(NotificationsCommon.type)
 
-local RobloxTranslator = require(ParentParent.RobloxTranslator)
+local RobloxTranslator = require(parent.RobloxTranslator)
 
 return {
-	getLocalizedStrings = function(p1) -- line: 13
-		-- upvalues: React (copy), LocalizationRoactContext (copy), useLocalization (copy), RobloxTranslator (copy)
+	getLocalizedStrings = function(items)
 		if React.useContext(LocalizationRoactContext) ~= nil then
-			return useLocalization(p1)
+			return useLocalization(items)
 		end
 
-		local t1 = {}
+		local result = {}
 
-		for k, v in pairs(p1) do
-			local ok, result = pcall(function() -- line: 24
-				-- upvalues: RobloxTranslator (copy), v (copy)
-				return RobloxTranslator:FormatByKey(v)
+		for k, item in pairs(items) do
+			local success, result2 = pcall(function()
+				return RobloxTranslator:FormatByKey(item)
 			end)
 
-			if ok then
-				t1[k] = result
+			if success then
+				result[k] = result2
 			else
-				t1[k] = v
+				result[k] = item
 			end
 		end
 
-		return t1
+		return result
 	end
 }

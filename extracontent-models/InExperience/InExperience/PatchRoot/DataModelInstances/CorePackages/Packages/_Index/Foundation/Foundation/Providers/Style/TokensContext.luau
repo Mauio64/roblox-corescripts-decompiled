@@ -1,6 +1,8 @@
-local scriptParent = script.Parent
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script.Parent
+local parent2 = script:FindFirstAncestor("Foundation").Parent
 
-require(scriptParent.Tokens)
+require(parent.Tokens)
 
-return (require(Parent.React).createContext({}))
+local React = require(parent2.React)
+
+return (React.createContext({}))

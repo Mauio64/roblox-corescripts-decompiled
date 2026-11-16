@@ -1,20 +1,18 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local HttpRequest = require(Parent.HttpRequest)
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
-require(Parent.Http)
+local HttpRequest = require(parent.HttpRequest)
+require(parent.Http)
 
 local UserVoteFeedbackMetdataUrlBuilder = require(script.Parent.UserVoteFeedbackMetdataUrlBuilder)
 
-local function fetchUserVoteFeedbackMetadata(s1: string) -- line: 13
-	-- upvalues: UserVoteFeedbackMetdataUrlBuilder (copy), HttpRequest (copy)
-	local v6 = UserVoteFeedbackMetdataUrlBuilder.buildUserVoteFeedbackMetadataUrl(s1)
+local function fetchUserVoteFeedbackMetadata(p: string)
+	local userVoteFeedbackMetadataUrl = UserVoteFeedbackMetdataUrlBuilder.buildUserVoteFeedbackMetadataUrl(p)
 
 	return HttpRequest.config({
-		requestFunction = function(s2: string, s3: string, p1) -- line: 17
-			-- upvalues: HttpRequest (copy)
-			return HttpRequest.requestFunctions.HttpRbxApi(s2, s3, p1)
+		requestFunction = function(p2: string, p3: string, p4)
+			return HttpRequest.requestFunctions.HttpRbxApi(p2, p3, p4)
 		end
-	})(v6, "GET")
+	})(userVoteFeedbackMetadataUrl, "GET")
 end
 
 return fetchUserVoteFeedbackMetadata

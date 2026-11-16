@@ -30,6 +30,8 @@ return {
 		LoginOtherDevice = "loginOtherDevice",
 		EnterDeviceCode = "enterDeviceCode",
 		GrantAccess = "grantAccess",
+		DenyAccess = "denyAccess",
+		Done = "done",
 		VerifyPhonePrompt = "verifyPhonePrompt",
 		WeChat = "wechat",
 		QQ = "qq",
@@ -48,8 +50,10 @@ return {
 		SetupPasskey = "setupPasskey",
 		Close = "close",
 		SwitchAccounts = "switchAccounts",
+		SwitchPlatformAccount = "switchPlatformAccount",
 		SelectPassword = "selectPassword",
 		SavePassword = "savePassword",
+		Save = "save",
 		IosAuthServiceSavePasswordAttempted = "iosAuthServiceSavePasswordAttempted",
 		IosAuthServiceSavePasswordSuccess = "iosAuthServiceSavePasswordSuccess",
 		IosAuthServiceSavePasswordFailure = "iosAuthServiceSavePasswordFailure",
@@ -57,14 +61,20 @@ return {
 		Next = "next",
 		UsePasskey = "usePasskey",
 		QuickLogin = "quickLogin",
+		QuickLoginBack = "quickLoginBack",
 		Skip = "skip",
 		Back = "back",
+		DismissSheet = "dismissSheet",
 		PrimaryButton = "primaryButton",
 		SecondaryButton = "secondaryButton",
 		PrefilledNext = "prefilledNext",
 		TryAgain = "tryAgain",
 		GoHome = "goHome",
 		RegisterPasskey = "registerPasskey",
+		PlayNow = "playNow",
+		GoogleSso = "googleSso",
+		AppleSso = "appleSso",
+		OtherSignInOptions = "otherSignInOptions",
 		AccountPickerSignInAnotherAccount = "accountPickerSignInAnotherAccount",
 		AccountPickerCreateAccount = "accountPickerCreateAccount",
 		AccountPickerMoreOptions = "accountPickerMoreOptions",
@@ -112,7 +122,13 @@ return {
 		TosCheckbox = "tosCheckbox",
 		BirthdayDropdown = "birthdayDropdown",
 		BirthdayPicker = "birthdayPicker",
-		BirthdayPickerAgeCalculatorShown = "birthdayPickerAgeCalculatorShown"
+		BirthdayPickerAgeCalculatorShown = "birthdayPickerAgeCalculatorShown",
+		LoginV2Modal = "loginV2Modal",
+		LoginV2QuickLoginModal = "loginV2QuickLoginModal",
+		LoginV2OtherSignInOptionsModal = "loginV2OtherSignInOptionsModal",
+		LoginOtherSignInOptionsModal = "loginOtherSignInOptionsModal",
+		MarketingEmailConsent = "marketingEmailConsent",
+		MarketingEmailAutoOptIn = "marketingEmailAutoOptIn"
 	},
 	Context = {
 		AccountPickerLandingScreen = "accountPickerLandingScreen",
@@ -123,7 +139,6 @@ return {
 		LandingScreen = "landingScreen",
 		LandingPageUnmount = "landingPageUnmount",
 		LandingScreenCustomizedInvite = "landingScreenCustomizedInvite",
-		LandingScreenVideo = "landingScreenEligibleForVideo",
 		BirthdayScreen = "birthdayScreen",
 		SignupAvatarScreen = "signupAvatarScreen",
 		UsernameScreen = "usernameScreen",
@@ -136,6 +151,9 @@ return {
 		CrossDeviceKey = "crossDeviceKey",
 		QuickLogin = "quickLogin",
 		ApproveQuickLogin = "approveQuickLogin",
+		QuickLoginSucceeded = "quickLoginSucceeded",
+		QuickLoginFailed = "quickLoginFailed",
+		QuickLoginDenied = "quickLoginDenied",
 		ModalStateViewed = "modalStateViewed",
 		PhoneVerification = "phoneVerification",
 		LuobuLandingPage = "luobuLandingPage",
@@ -149,6 +167,8 @@ return {
 		AccountSwitcher = "accountSwitcher",
 		AccountSwitcherMismatch = "accountSwitcherMismatch",
 		AccountLinking = "accountLinking",
+		AccountUpgrade = "accountUpgrade",
+		AccountUpgradeCloseWarning = "accountUpgradeCloseWarning",
 		PasskeyLogin = "passkeyLogin",
 		PasskeySignup = "passkeySignup",
 		SignupPasskeyCreated = "signupPasskeyCreated",
@@ -162,6 +182,7 @@ return {
 		LoginFormV2Username = "loginFormV2Username",
 		LoginFormV2Auth = "loginFormV2Auth",
 		LoginFormV2EmailOtp = "loginFormV2EmailOtp",
+		LoginFormV2EnterEmail = "loginFormV2EnterEmail",
 		PasskeyLoginV2 = "passkeyLoginV2",
 		CMPasswordPasskeySignup = "cmPasswordPasskeySignup",
 		CMPasswordPasskeyFallback = "cmPasswordPasskeyFallback",
@@ -201,7 +222,8 @@ return {
 		SignupEmailOnAddAuthMethod = "signupEmailOnAddAuthMethod",
 		AddAuthMethodPage = "addAuthMethodPage",
 		PlatformRestrictedPage = "platformRestrictedPage",
-		KISAU14Signup = "kisaU14Signup"
+		KISAU14Signup = "kisaU14Signup",
+		BirthdayComplianceUnblockWait = "birthdayComplianceUnblockWait"
 	},
 	ActionType = {
 		Submit = "submit",
@@ -214,7 +236,12 @@ return {
 		Logout = "logout",
 		LandingScreen = "landingScreen",
 		MoreMenu = "moreMenu",
-		FlyoutSidePanel = "flyoutSidePanel"
+		FlyoutSidePanel = "flyoutSidePanel",
+		LoginV2Fullscreen = "loginV2Fullscreen",
+		LoginV2Modalized = "loginV2Modalized",
+		DesktopSignupDialog = "desktopSignupDialog",
+		AccountUpgradeOAuthDialog = "accountUpgradeOAuthDialog",
+		AccountUpgradeOAuthFullPage = "accountUpgradeOAuthFullPage"
 	},
 	AuthEventName = {
 		AuthButtonShown = "authButtonShown",
@@ -278,10 +305,11 @@ return {
 		Diagnostic401WebviewClosedExpired = "diagnostic401_webviewClosedExpired",
 		Diagnostic401WebviewNeverOpened = "diagnostic401_webviewNeverOpened",
 		SkipVPC = "skipVPC",
-		LaunchParentSignUpOtp = "launchParentSignUpOtp"
+		LaunchParentSignUpOtp = "launchParentSignUpOtp",
+		GatewayUnblocked = "gatewayUnblocked",
+		GatewayRetriesExhausted = "gatewayRetriesExhausted",
+		GatewayProbeFailed = "gatewayProbeFailed",
+		FetchAccessStatusError = "fetchAccessStatusError"
 	},
-	EventTimingKeys = {
-		OsClock = "os_clock",
-		OsTime = "os_time"
-	}
+	EventTimingKeys = { OsClock = "os_clock", OsTime = "os_time" }
 }

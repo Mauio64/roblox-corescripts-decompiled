@@ -1,134 +1,129 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
-
+local parent = InlineRichText.Parent
 require(InlineRichText.Types)
+local Logger = require(InlineRichText.Logger)
+local v = Logger:new(script.Name)
 
-local v3 = require(InlineRichText.Logger):new(script.Name)
-local Cryo = require(InlineRichTextParent.Cryo)
+local Cryo = require(parent.Cryo)
 local NodeConfig = require(InlineRichText.NodeConfig)
 local NodeStack = require(InlineRichText.Parser.NodeStack)
 local NodeType = require(InlineRichText.Enums.NodeType)
 local TokenName = require(InlineRichText.Enums.TokenName)
-local t1 = {
-	[TokenName.Text] = function(p1, p2, _) -- line: 16
-		-- upvalues: NodeType (copy), v3 (copy)
-		local v14 = p1:peek()
 
-		if not v14 or v14.type ~= NodeType.Plaintext then
-			local _, v16 = p1:pushDefault(NodeType.Plaintext)
+local v2 = {
+	[TokenName.Text] = function(object, p, _)
+		local v2 = object:peek()
 
-			if not v16 then
-				v3:error("Failed to push default plaintext node to add text to")
+		if not v2 or v2.type ~= NodeType.Plaintext then
+			local _, v3 = object:pushDefault(NodeType.Plaintext)
 
+			if not v3 then
+				v:error("Failed to push default plaintext node to add text to")
 				return nil
 			end
 		end
 
-		local v17 = p1:peek()
-
-		v17.text = `{ v17.text }{ p2.text }`
+		local v3 = object:peek()
+		v3.text = `{v3.text}{p.text}`
 	end,
-	[TokenName.Break] = function(p4, _, _) -- line: 30
-		-- upvalues: NodeType (copy), v3 (copy), Cryo (copy), NodeConfig (copy)
-		local v21, v22 = p4:push({
+	[TokenName.Break] = function(object, _, _)
+		local v2, v3 = object:push({
+			type = NodeType.InlineCustom,
 			name = "BREAK",
 			text = "",
-			type = NodeType.InlineCustom,
 			children = {},
 			attributes = {}
 		})
-		local _, v24 = p4:findAndClose("BREAK")
 
-		if not v22 or not v24 then
-			v3:error("Failed to push break node")
+		local _, v4 = object:findAndClose("BREAK")
 
+		if not (v3 and v4) then
+			v:error("Failed to push break node")
 			return nil
 		end
 
-		for _, v26 in Cryo.List.reverse(v21) do
-			local v27 = p4:peek()
-			local v28 = v27 and NodeConfig.getByNode(v27)
+		for _, v5 in Cryo.List.reverse(v2) do
+			local v6 = object:peek()
+			local v7 = v6 and NodeConfig.getByNode(v6)
 
-			if not v28 then
-				return
+			if not v7 then
+				break
 			end
 
-			if not v28.children[v26.type] then
+			if not v7.children[v5.type] then
 				continue
 			end
 
-			local _, v30 = p4:push(v26)
+			local _, v8 = object:push(v5)
 
-			if not v30 then
-				v3:error(`Failed to re-open node { v26.name } after break`)
-
+			if not v8 then
+				v:error(`Failed to re-open node {v5.name} after break`)
 				return nil
 			end
 		end
 	end,
-	[TokenName.Open] = function(p7, p8, p9) -- line: 64
-		-- upvalues: v3 (copy)
-		local v34 = p9.TagAliases[p8.text] or p8.text
-		local v35 = p9.TagConfigurations[v34]
+	[TokenName.Open] = function(object, p, p2)
+		local v2 = p2.TagAliases[p.text] or p.text
+		local tagConfiguration = p2.TagConfigurations[v2]
 
-		if not v35 then
-			v3:error(`No configuration open tag name { v34 }`)
-
+		if not tagConfiguration then
+			v:error(`No configuration open tag name {v2}`)
 			return nil
 		end
 
-		local v36 = v35.OverrideName or v34
-		local _, v38 = p7:push({
+		local overrideName = tagConfiguration.OverrideName or v2
+
+		local _, v3 = object:push({
+			type = tagConfiguration.NodeType,
+			name = overrideName,
 			text = "",
-			type = v35.NodeType,
-			name = v36,
 			children = {},
-			attributes = p8.attributes
+			attributes = p.attributes
 		})
 
-		if not v38 then
-			v3:error(`Failed to push open tag { v36 }`)
-
-			return nil
+		if v3 then
+			return
 		end
+
+		v:error(`Failed to push open tag {overrideName}`)
+		return nil
 	end,
-	[TokenName.Close] = function(p10, p11, p12) -- line: 87
-		-- upvalues: v3 (copy)
-		local v42 = p12.TagAliases[p11.text] or p11.text
-		local v43 = p12.TagConfigurations[v42]
+	[TokenName.Close] = function(object, p, p2)
+		local v2 = p2.TagAliases[p.text] or p.text
+		local tagConfiguration = p2.TagConfigurations[v2]
 
-		if not v43 then
-			v3:error(`No configuration close tag name { v42 }`)
-
+		if not tagConfiguration then
+			v:error(`No configuration close tag name {v2}`)
 			return nil
 		end
 
-		local v44 = v43.OverrideName or v42
-		local _, v46 = p10:findAndClose(v44)
+		local overrideName = tagConfiguration.OverrideName or v2
 
-		if not v46 then
-			v3:error(`Failed to find and close tag { v44 }`)
+		local _, v3 = object:findAndClose(overrideName)
 
-			return nil
+		if v3 then
+			return
 		end
+
+		v:error(`Failed to find and close tag {overrideName}`)
+		return nil
 	end
 }
 
-local function buildTree(t2: {[any]: any}, p13) -- line: 106
-	-- upvalues: NodeStack (copy), t1 (copy), v3 (copy)
-	local v49 = NodeStack.new()
+local function buildTree(items, p)
+	local v3 = NodeStack.new()
 
-	for _, v51 in t2 do
-		local v52 = t1[v51.name]
+	for _, item in items do
+		local v4 = v2[item.name]
 
-		if not v52 then
-			v3:error(`No processor for token name { v51.name }`)
+		if v4 then
+			v4(v3, item, p)
 		else
-			v52(v49, v51, p13)
+			v:error(`No processor for token name {item.name}`)
 		end
 	end
 
-	return v49:buildRoot()
+	return v3:buildRoot()
 end
 
 return buildTree

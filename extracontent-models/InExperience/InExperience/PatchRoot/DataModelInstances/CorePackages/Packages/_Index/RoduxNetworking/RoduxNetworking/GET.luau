@@ -1,7 +1,6 @@
-local scriptParent = script.Parent
-local makeRequestApi = require(scriptParent.makeRequestApi)
+local parent = script.Parent
+local makeRequestApi = require(parent.makeRequestApi)
 
-return function(p1) -- line: 4
-	-- upvalues: makeRequestApi (copy)
-	return makeRequestApi(p1, "GET")
+return function(p)
+	return makeRequestApi(p, "GET")
 end

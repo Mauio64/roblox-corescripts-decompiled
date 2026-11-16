@@ -1,28 +1,33 @@
 local CorePackages = game:GetService("CorePackages")
 local ArgCheck = require(CorePackages.Workspace.Packages.ArgCheck)
-local v3 = require(script.Parent.GetImageSetData)((game:GetService("GuiService"):GetResolutionScale()))
-local t1 = {}
 
-for k, v in pairs(v3) do
+local GetImageSetData = require(script.Parent.GetImageSetData)
+
+local GuiService = game:GetService("GuiService")
+
+local imageSetData = GetImageSetData((GuiService:GetResolutionScale()))
+
+local Images = {}
+
+for k, v in pairs(imageSetData) do
 	ArgCheck.isType(v, "table", "value")
+	local v2 = {}
 
-	local t2 = {}
-
-	for k2, v2 in pairs(v) do
+	for k2, v3 in pairs(v) do
 		if k2 == "ImageSet" then
-			t2.Image = string.format("rbxasset://textures/ui/ImageSet/%s.png", v2)
+			v2.Image = string.format("rbxasset://textures/ui/ImageSet/%s.png", v3)
 		else
-			t2[k2] = v2
+			v2[k2] = v3
 		end
 	end
 
-	t1[k] = t2
+	Images[k] = v2
 end
 
-setmetatable(t1, {
-	__index = function(_, p2) -- line: 30
-		error(("%q is not a valid member of Images"):format((tostring(p2))), 2)
+setmetatable(Images, {
+	__index = function(_, p)
+		error(("%q is not a valid member of Images"):format((tostring(p))), 2)
 	end
 })
 
-return t1
+return Images

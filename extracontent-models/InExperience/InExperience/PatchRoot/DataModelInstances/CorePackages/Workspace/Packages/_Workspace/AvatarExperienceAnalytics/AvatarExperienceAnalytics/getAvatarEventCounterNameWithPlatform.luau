@@ -1,40 +1,42 @@
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local isSpatial = require(Parent.AppCommonLib).isSpatial
 
-local function getAvatarEventCounterNameWithPlatform(s1: string) -- line: 8
-	-- upvalues: UserInputService (copy), isSpatial (copy)
-	local Platform = UserInputService:GetPlatform()
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
+
+local function getAvatarEventCounterNameWithPlatform(p: string)
+	local platform = UserInputService:GetPlatform()
 
 	if isSpatial() then
-		return "VR" .. s1
+		return "VR" .. p
 	end
 
-	if Platform == Enum.Platform.Android then
-		return "Android" .. s1
+	if platform == Enum.Platform.Android then
+		return "Android" .. p
 	end
 
-	if Platform == Enum.Platform.IOS then
-		return "IOS" .. s1
+	if platform == Enum.Platform.IOS then
+		return "IOS" .. p
 	end
 
-	if Platform == Enum.Platform.Windows then
-		return "Windows" .. s1
+	if platform == Enum.Platform.Windows then
+		return "Windows" .. p
 	end
 
-	if Platform == Enum.Platform.OSX then
-		return "OSX" .. s1
+	if platform == Enum.Platform.OSX then
+		return "OSX" .. p
 	end
 
-	if Platform == Enum.Platform.PS4 or Platform == Enum.Platform.PS5 then
-		return "PlayStation" .. s1
+	if platform == Enum.Platform.PS4 or platform == Enum.Platform.PS5 then
+		return "PlayStation" .. p
 	end
 
-	if Platform == Enum.Platform.XBoxOne or Platform == Enum.Platform.XBox360 then
-		s1 = "Xbox-" .. s1
+	if platform == Enum.Platform.XBoxOne or platform == Enum.Platform.XBox360 then
+		p = "Xbox-" .. p
 	end
 
-	return s1
+	return p
 end
 
 return getAvatarEventCounterNameWithPlatform

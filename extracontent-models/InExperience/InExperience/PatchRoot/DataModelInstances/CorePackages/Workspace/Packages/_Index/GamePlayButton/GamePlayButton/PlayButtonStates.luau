@@ -1,6 +1,3 @@
-local Parent = script:FindFirstAncestor("GamePlayButton").Parent
-local FFlagLuaAppDemoModePlayButton = require(Parent.SharedFlags).FFlagLuaAppDemoModePlayButton
-
 return {
 	Loading = "Loading",
 	Playable = "Playable",
@@ -10,5 +7,7 @@ return {
 	WaitingForParty = "WaitingForParty",
 	ActionNeeded = "ActionNeeded",
 	FiatPaidAccess = "FiatPaidAccess",
-	DemoMode = if not FFlagLuaAppDemoModePlayButton then nil else "DemoMode"
+	DemoMode = "DemoMode",
+	Playtest = "Playtest",
+	EarlyAccessLocked = "EarlyAccessLocked"
 }

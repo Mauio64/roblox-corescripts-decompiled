@@ -1,26 +1,26 @@
-local ParentParent = script.Parent.Parent
-local isCreatorStoreAssetType = require(ParentParent.Utils.isCreatorStoreAssetType)
+local parent = script.Parent.Parent
+local isCreatorStoreAssetType = require(parent.Utils.isCreatorStoreAssetType)
+require(parent.Promise)
+local GetAssetInfoUtil = {}
 
-require(ParentParent.Promise)
-
-return {
-	isAssetValid = function(p1) -- line: 17
-		-- upvalues: isCreatorStoreAssetType (copy)
-		if isCreatorStoreAssetType(p1.type) and (not p1.id or not p1.type or not p1.typeId or not p1.creator) then
-			return false
-		end
-
-		return true
-	end,
-	fromAsset = function(p2) -- line: 29
-		return {
-			id = p2.id,
-			type = p2.type,
-			typeId = p2.typeId,
-			creator = p2.creator,
-			description = p2.description,
-			isPublicDomainEnabled = p2.isPublicDomainEnabled,
-			name = p2.name
-		}
+function GetAssetInfoUtil.isAssetValid(data): boolean
+	if isCreatorStoreAssetType(data.type) and not (data.id and data.type and data.typeId and data.creator) then
+		return false
 	end
-}
+
+	return true
+end
+
+function GetAssetInfoUtil.fromAsset(data)
+	return {
+		["id"] = data.id,
+		type = data.type,
+		typeId = data.typeId,
+		creator = data.creator,
+		description = data.description,
+		isPublicDomainEnabled = data.isPublicDomainEnabled,
+		name = data.name
+	}
+end
+
+return GetAssetInfoUtil

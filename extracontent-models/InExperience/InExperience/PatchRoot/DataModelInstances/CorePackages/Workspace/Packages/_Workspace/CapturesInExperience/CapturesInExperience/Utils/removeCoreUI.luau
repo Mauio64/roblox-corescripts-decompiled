@@ -1,47 +1,44 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local CoreGui = game:GetService("CoreGui")
-local Constants = require(ParentParent.Constants)
-local v4 = game:DefineFastFlag("CapturesRecursiveCoreUIRemoval", false)
 
-return function() -- line: 8
-	-- upvalues: Constants (copy), v4 (copy), CoreGui (copy)
-	local t1 = {}
+local Constants = require(parent.Constants)
+local defineFastFlag = game:DefineFastFlag("CapturesRecursiveCoreUIRemoval", false)
 
-	local function shouldRemoveUI(p1) -- line: 11
-		-- upvalues: Constants (copy)
-		if not p1:IsA("LayerCollector") then
+return function()
+	local v = {}
+
+	local function shouldRemoveUI(instance): boolean
+		if not instance:IsA("LayerCollector") or instance:IsA("BillboardGui") then
 			return false
 		end
 
-		if p1:IsA("BillboardGui") then
-			return false
+		if instance.Enabled then
+			return instance.Name ~= Constants.OverlayName
 		end
 
-		if not p1.Enabled then
-			return false
-		end
-
-		if p1.Name == Constants.OverlayName then
-			return false
-		end
-
-		return true
+		return false
 	end
 
-	if v4 then
-		local function searchInstance(p2) -- line: 34
-			-- upvalues: Constants (copy), t1 (copy), searchInstance (copy)
-			if not p2:IsA("Folder") and not p2:IsA("CoreGui") then
-				if if p2:IsA("LayerCollector") then not p2:IsA("BillboardGui") and if p2.Enabled then p2.Name ~= Constants.OverlayName else false else false then
-					p2.Enabled = false
-					table.insert(t1, p2)
+	if defineFastFlag then
+		local function searchInstance(CoreGui2)
+			if CoreGui2:IsA("Folder") or CoreGui2:IsA("CoreGui") then
+				for _, child in CoreGui2:GetChildren() do
+					searchInstance(child)
+				end
+			else
+				local v2
+
+				if CoreGui2:IsA("LayerCollector") and not CoreGui2:IsA("BillboardGui") and CoreGui2.Enabled then
+					v2 = CoreGui2.Name ~= Constants.OverlayName
+				else
+					v2 = false
 				end
 
-				return
-			end
-
-			for _, child in p2:GetChildren() do
-				searchInstance(child)
+				if v2 then
+					CoreGui2.Enabled = false
+					table.insert(v, CoreGui2)
+				end
 			end
 		end
 
@@ -50,24 +47,43 @@ return function() -- line: 8
 		for _, child in CoreGui:GetChildren() do
 			if child:IsA("Folder") then
 				for _, child2 in child:GetChildren() do
-					if if child2:IsA("LayerCollector") then not child2:IsA("BillboardGui") and if child2.Enabled then child2.Name ~= Constants.OverlayName else false else false then
-						child2.Enabled = false
-						table.insert(t1, child2)
+					local v2
+
+					if child2:IsA("LayerCollector") and not child2:IsA("BillboardGui") and child2.Enabled then
+						v2 = child2.Name ~= Constants.OverlayName
+					else
+						v2 = false
 					end
+
+					if not v2 then
+						continue
+					end
+
+					child2.Enabled = false
+					table.insert(v, child2)
 				end
 			end
 
-			if if child:IsA("LayerCollector") then not child:IsA("BillboardGui") and if child.Enabled then child.Name ~= Constants.OverlayName else false else false then
-				child.Enabled = false
-				table.insert(t1, child)
+			local v2
+
+			if child:IsA("LayerCollector") and not child:IsA("BillboardGui") and child.Enabled then
+				v2 = child.Name ~= Constants.OverlayName
+			else
+				v2 = false
 			end
+
+			if not v2 then
+				continue
+			end
+
+			child.Enabled = false
+			table.insert(v, child)
 		end
 	end
 
-	local function restoreCoreUI() -- line: 70
-		-- upvalues: t1 (copy)
-		for _, v18 in t1 do
-			v18.Enabled = true
+	local function restoreCoreUI()
+		for _, v2 in v do
+			v2.Enabled = true
 		end
 	end
 

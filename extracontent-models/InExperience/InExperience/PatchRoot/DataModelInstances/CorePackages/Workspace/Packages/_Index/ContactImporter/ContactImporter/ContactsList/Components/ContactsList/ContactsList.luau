@@ -1,524 +1,664 @@
 local ContactImporter = script:FindFirstAncestor("ContactImporter")
-local ContactImporterParent = ContactImporter.Parent
+local parent = ContactImporter.Parent
 local dependencies = require(ContactImporter.dependencies)
-local useAppPolicy = require(ContactImporterParent.UniversalAppPolicy).useAppPolicy
-local useDispatch = require(ContactImporterParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local Roact = dependencies.Roact
-local React = dependencies.React
-local UIBlox = dependencies.UIBlox
+
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+local roact = dependencies.Roact
+local react = dependencies.React
+local uiBlox = dependencies.UIBlox
 local useLocalization = dependencies.useLocalization
 local useStyle = dependencies.useStyle
-local FullPageModal = UIBlox.App.Dialog.Modal.FullPageModal
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
-local HorizontalPageMargin = UIBlox.App.Container.HorizontalPageMargin
-local SectionList = dependencies.SectionList
+
+local fullPageModal = uiBlox.App.Dialog.Modal.FullPageModal
+local buttonType = uiBlox.App.Button.Enum.ButtonType
+
+local styledTextLabel = uiBlox.App.Text.StyledTextLabel
+local horizontalPageMargin = uiBlox.App.Container.HorizontalPageMargin
+local sectionList = dependencies.SectionList
+
 local TextKeys = require(ContactImporter.Common.TextKeys)
 local ContactsListEntry = require(ContactImporter.ContactsList.Components.ContactsListEntry)
 local ContactsListInviteEntry = require(ContactImporter.ContactsList.Components.ContactsListInviteEntry)
 local ContactsEmptyList = require(ContactImporter.ContactsList.Components.ContactsEmptyList)
 local ContactsUploadErrorModal = require(ContactImporter.ContactsList.Components.ContactsUploadErrorModal)
 local ContactsGlimmer = require(ContactImporter.ContactsList.Components.ContactsGlimmer)
-local ContactsSyncWarningMessage = require(ContactImporter.ContactsList.Components.ContactsSyncWarningMessage)
-local EventNames = require(ContactImporter.Analytics).EventNames
 
+local ContactsSyncWarningMessage = require(ContactImporter.ContactsList.Components.ContactsSyncWarningMessage)
+
+local Analytics = require(ContactImporter.Analytics)
+local EventNames = Analytics.EventNames
 require(ContactImporter.Common.LocalTypes)
 
 local ContactsListSearchBar = require(ContactImporter.ContactsList.Components.ContactsListSearchBar)
-local Dash = dependencies.Dash
-local Foundation = require(ContactImporterParent.Foundation)
+local dash = dependencies.Dash
+
+local Foundation = require(parent.Foundation)
 local InputLabel = Foundation.InputLabel
 local InputLabelSize = Foundation.Enums.InputLabelSize
-local AppPage = require(ContactImporterParent.RobloxAppEnums).AppPage
-local NavigateDown = require(ContactImporterParent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(ContactImporterParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v32 = if not FFlagSignalsNavP3Dispatch then nil else require(ContactImporterParent.RobloxAppNavigation).NavigationCommands
-local ContactImportButtonsIXP = require(ContactImporter.Flags.ContactImportButtonsIXP)
-local v34 = game:DefineFastFlag("ContactImportButtonsExperimentEnabled", false)
-local FFlagAddFriendsBannersNewUI_IXP = require(ContactImporterParent.SharedFlags).FFlagAddFriendsBannersNewUI_IXP
-local IXPService = game:GetService("IXPService")
-local uprankContactsWithEmoji = require(ContactImporter.Utils).uprankContactsWithEmoji
-local FFlagContactsListEmojiSorting = require(ContactImporter.Flags.FFlagContactsListEmojiSorting)
-local v39 = game:DefineFastFlag("ContactsListEmojiSortingIxpEnabled", false)
-local v40 = game:DefineFastString("ContactsListEmojiSortingIxpLayer", "Social.ContactListEmojiSorting")
-local FFlagQRCodeCopyUpdates = require(ContactImporterParent.SharedFlags).FFlagQRCodeCopyUpdates
-local FFlagConnectionsToFriendsRename = require(ContactImporterParent.SharedFlags).FFlagConnectionsToFriendsRename
-local FStringCanAccessTrustedContactsAmpFeature = require(ContactImporterParent.SharedFlags).FStringCanAccessTrustedContactsAmpFeature
-local FStringIsUserInTcEligibleCountryAmpFeature = require(ContactImporterParent.SharedFlags).FStringIsUserInTcEligibleCountryAmpFeature
-local FFlagTCPolicyCheckRedirect = require(ContactImporterParent.SharedFlags).FFlagTCPolicyCheckRedirect
-local FStringCanAccessTrustedContactsAmpNameSpace = require(ContactImporterParent.SharedFlags).FStringCanAccessTrustedContactsAmpNameSpace
-local AmpApiProvider = require(ContactImporterParent.AmpUpsell).AmpApiProvider
-local AmpEnums = require(ContactImporterParent.AmpUpsell).AmpEnums
-local UserInputService = dependencies.UserInputService
 
-local function ContactsList(t1: {[any]: any}) -- line: 98
-	-- upvalues: useAppPolicy (copy), useStyle (copy), useDispatch (copy), useLocalization (copy), TextKeys (copy), FFlagQRCodeCopyUpdates (copy), FFlagConnectionsToFriendsRename (copy), v34 (copy), ContactImportButtonsIXP (copy), Dash (copy), EventNames (copy), React (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v32 (copy), NavigateDown (copy), FFlagContactsListEmojiSorting (copy), uprankContactsWithEmoji (copy), v39 (copy), IXPService (copy), v40 (copy), FFlagTCPolicyCheckRedirect (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpFeature (copy), AmpApiProvider (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AmpEnums (copy), Roact (copy), ContactsListEntry (copy), ContactsListInviteEntry (copy), StyledTextLabel (copy), ButtonType (copy), UserInputService (copy), FFlagAddFriendsBannersNewUI_IXP (copy), ContactsSyncWarningMessage (copy), SectionList (copy), ContactsEmptyList (copy), InputLabel (copy), InputLabelSize (copy), ContactsListSearchBar (copy), ContactsGlimmer (copy), ContactsUploadErrorModal (copy), FullPageModal (copy), HorizontalPageMargin (copy)
-	local v52 = useAppPolicy(function(p1) -- line: 99
-		return p1.getWebViewSupport()
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local ContactImportButtonsIXP = require(ContactImporter.Flags.ContactImportButtonsIXP)
+
+local defineFastFlag = game:DefineFastFlag("ContactImportButtonsExperimentEnabled", false)
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAddFriendsBannersNewUI_IXP = SharedFlags2.FFlagAddFriendsBannersNewUI_IXP
+
+local IXPService = game:GetService("IXPService")
+local Utils = require(ContactImporter.Utils)
+local uprankContactsWithEmoji = Utils.uprankContactsWithEmoji
+local FFlagContactsListEmojiSorting = require(ContactImporter.Flags.FFlagContactsListEmojiSorting)
+local defineFastFlag2 = game:DefineFastFlag("ContactsListEmojiSortingIxpEnabled", false)
+
+local defineFastString = game:DefineFastString("ContactsListEmojiSortingIxpLayer", "Social.ContactListEmojiSorting")
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagQRCodeCopyUpdates = SharedFlags3.FFlagQRCodeCopyUpdates
+local SharedFlags4 = require(parent.SharedFlags)
+local FStringCanAccessTrustedContactsAmpFeature = SharedFlags4.FStringCanAccessTrustedContactsAmpFeature
+local SharedFlags5 = require(parent.SharedFlags)
+local FStringIsUserInTcEligibleCountryAmpFeature = SharedFlags5.FStringIsUserInTcEligibleCountryAmpFeature
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagTCPolicyCheckRedirect = SharedFlags6.FFlagTCPolicyCheckRedirect
+local SharedFlags7 = require(parent.SharedFlags)
+local FStringCanAccessTrustedContactsAmpNameSpace = SharedFlags7.FStringCanAccessTrustedContactsAmpNameSpace
+local AmpUpsell = require(parent.AmpUpsell)
+local AmpApiProvider = AmpUpsell.AmpApiProvider
+local AmpUpsell2 = require(parent.AmpUpsell)
+local AmpEnums = AmpUpsell2.AmpEnums
+
+local userInputService = dependencies.UserInputService
+
+local function ContactsList(props)
+	local v = useAppPolicy(function(p)
+		return p.getWebViewSupport()
 	end)
-	local v53 = useStyle()
-	local v54 = useDispatch()
-	local v55 = useLocalization({
-		learnMore = "Feature.Chat.Action.LearnMore",
+
+	local v2 = useStyle()
+	local v3 = useDispatch()
+
+	local v4 = useLocalization({
 		fromContactsText = TextKeys.ON_ROBLOX,
 		inviteToRobloxText = TextKeys.INVITE_TO_ROBLOX,
 		contactsListBlurb = TextKeys.CONTACTS_LIST_DESCRIPTION,
-		contactsListTCEducationBlurb = if not FFlagQRCodeCopyUpdates then nil else TextKeys.ADD_CONTACTS_AS_TRUSTED_CONNECTION_DESCRIPTION,
-		contactsListTFEducationBlurb = if not FFlagConnectionsToFriendsRename then nil else TextKeys.ADD_CONTACTS_AS_TRUSTED_FRIENDS_DESCRIPTION,
+		contactsListTFEducationBlurb = TextKeys.ADD_CONTACTS_AS_TRUSTED_FRIENDS_DESCRIPTION,
 		connectWithFriends = TextKeys.CONTACTS_LIST_TITLE,
 		closeModal = TextKeys.CLOSE_MODAL,
 		goToAddFriends = TextKeys.GO_TO_ADD_FRIENDS,
-		searchContacts = TextKeys.SEARCH_CONTACTS
+		searchContacts = TextKeys.SEARCH_CONTACTS,
+		learnMore = "Feature.Chat.Action.LearnMore"
 	})
-	local v56 = not not v34 and ContactImportButtonsIXP.useIsRemoveCloseButtonExperimentEnabled({
-		isExposureEnabled = true
-	})
+	local v5
 
-	local function v57() -- line: 131
-		-- upvalues: t1 (copy), EventNames (copy)
-		t1.closeModal(EventNames.CloseContactListButton)
+	if defineFastFlag then
+		v5 = ContactImportButtonsIXP.useIsRemoveCloseButtonExperimentEnabled({
+			isExposureEnabled = true
+		})
+	else
+		v5 = false
 	end
 
-	local v58 = React.useCallback(function() -- line: 139
-		-- upvalues: AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v32 (copy), v54 (copy), NavigateDown (copy)
-		local t2 = {
-			detail = "https://en.help.roblox.com/hc/en-us/articles/37725513985812",
+	local function fn(p, filtered, filtered2)
+		local v6 = #filtered ~= 0 and {
+			{ isSectionDivider = true }
+		} or nil
+		dash.append(p, filtered, v6, filtered2)
+	end
+
+	local function onActivated()
+		props.closeModal(EventNames.CloseContactListButton)
+	end
+
+	local function onCloseClicked()
+		props.closeModal(EventNames.CloseContactListCross)
+	end
+
+	local onActivated2 = react.useCallback(function()
+		local v6 = {
 			name = AppPage.GenericWebPage,
-			extraProps = {
-				title = ""
-			}
+			detail = "https://en.help.roblox.com/hc/en-us/articles/37725513985812",
+			extraProps = { title = "" }
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v32.down(v32.fromLegacyPage(t2))
-
-			return
+			navigationCommands.down(navigationCommands.fromLegacyPage(v6))
+		else
+			v3(NavigateDown(v6, nil))
 		end
+	end, { v3 })
 
-		v54(NavigateDown(t2, nil))
-	end, { v54 })
-	local v59, v60 = React.useState("")
-	local v61 = if not FFlagContactsListEmojiSorting then nil else React.useMemo(function() -- line: 171
-		-- upvalues: uprankContactsWithEmoji (copy), t1 (copy)
-		return uprankContactsWithEmoji(t1.matchedContacts)
-	end, { t1.matchedContacts })
-	local v62 = if not FFlagContactsListEmojiSorting then nil else React.useMemo(function() -- line: 176
-		-- upvalues: uprankContactsWithEmoji (copy), t1 (copy)
-		return uprankContactsWithEmoji(t1.deviceContacts)
-	end, { t1.deviceContacts })
-	local v63
+	local state, setState = react.useState("")
+	local v6
 
 	if FFlagContactsListEmojiSorting then
-		v63 = Dash.filter(v61, function(p2) -- line: 157
-			-- upvalues: v59 (copy)
-			if p2.contactName ~= nil then
-				if not p2.contactName:match("^%s*$") then
-					return string.find(string.lower(p2.contactName or ""), string.lower(v59)) ~= nil
-				end
+		v6 = react.useMemo(function()
+			return uprankContactsWithEmoji(props.matchedContacts)
+		end, { props.matchedContacts })
+	end
 
+	local v7
+
+	if FFlagContactsListEmojiSorting then
+		v7 = react.useMemo(function()
+			return uprankContactsWithEmoji(props.deviceContacts)
+		end, { props.deviceContacts })
+	end
+
+	local filtered
+
+	if FFlagContactsListEmojiSorting then
+		filtered = dash.filter(v6, function(p): boolean
+			if p.contactName == nil then
+				return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
+			end
+
+			if p.contactName:match("^%s*$") then
 				return false
 			end
 
-			return string.find(string.lower(p2.contactName or ""), string.lower(v59)) ~= nil
+			return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
 		end)
 	else
-		local matchedContacts = t1.matchedContacts
+		local matchedContacts = props.matchedContacts
+		filtered = dash.filter(matchedContacts, function(p): boolean
+			if p.contactName == nil then
+				return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
+			end
 
-		v63 = Dash.filter(matchedContacts, function(p3) -- line: 157
-			-- upvalues: v59 (copy)
-			if p3.contactName ~= nil then
-				if not p3.contactName:match("^%s*$") then
-					return string.find(string.lower(p3.contactName or ""), string.lower(v59)) ~= nil
-				end
-
+			if p.contactName:match("^%s*$") then
 				return false
 			end
 
-			return string.find(string.lower(p3.contactName or ""), string.lower(v59)) ~= nil
+			return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
 		end)
 	end
 
-	local v65
+	local filtered2
 
 	if FFlagContactsListEmojiSorting then
-		v65 = Dash.filter(v62, function(p4) -- line: 157
-			-- upvalues: v59 (copy)
-			if p4.contactName ~= nil then
-				if not p4.contactName:match("^%s*$") then
-					return string.find(string.lower(p4.contactName or ""), string.lower(v59)) ~= nil
-				end
+		filtered2 = dash.filter(v7, function(p): boolean
+			if p.contactName == nil then
+				return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
+			end
 
+			if p.contactName:match("^%s*$") then
 				return false
 			end
 
-			return string.find(string.lower(p4.contactName or ""), string.lower(v59)) ~= nil
+			return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
 		end)
 	else
-		local deviceContacts = t1.deviceContacts
+		local deviceContacts = props.deviceContacts
+		filtered2 = dash.filter(deviceContacts, function(p): boolean
+			if p.contactName == nil then
+				return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
+			end
 
-		v65 = Dash.filter(deviceContacts, function(p5) -- line: 157
-			-- upvalues: v59 (copy)
-			if p5.contactName ~= nil then
-				if not p5.contactName:match("^%s*$") then
-					return string.find(string.lower(p5.contactName or ""), string.lower(v59)) ~= nil
-				end
-
+			if p.contactName:match("^%s*$") then
 				return false
 			end
 
-			return string.find(string.lower(p5.contactName or ""), string.lower(v59)) ~= nil
+			return string.find(string.lower(p.contactName or ""), string.lower(state)) ~= nil
 		end)
 	end
 
-	if v39 then
-		React.useEffect(function() -- line: 191
-			-- upvalues: IXPService (copy), v40 (copy)
-			IXPService:LogFlagLinkedUserLayerExposure(v40)
+	if defineFastFlag2 then
+		react.useEffect(function()
+			IXPService:LogFlagLinkedUserLayerExposure(defineFastString)
 		end, {})
 	end
 
-	local v67, v68 = React.useState(false)
+	local state2, setState2 = react.useState(false)
 
 	if FFlagQRCodeCopyUpdates then
-		React.useEffect(function() -- line: 199
-			-- upvalues: FFlagTCPolicyCheckRedirect (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpFeature (copy), AmpApiProvider (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AmpEnums (copy), v68 (copy)
-			local v90 = if not FFlagTCPolicyCheckRedirect then FStringCanAccessTrustedContactsAmpFeature else FStringIsUserInTcEligibleCountryAmpFeature
+		react.useEffect(function()
+			local v8
 
-			if AmpApiProvider.upsellFeatureAccess(v90, {}, FStringCanAccessTrustedContactsAmpNameSpace).access == AmpEnums.AccessResponseEnum.Granted then
-				v68(true)
+			if FFlagTCPolicyCheckRedirect then
+				v8 = FStringIsUserInTcEligibleCountryAmpFeature
+			else
+				v8 = FStringCanAccessTrustedContactsAmpFeature
+			end
+
+			if AmpApiProvider.upsellFeatureAccess(v8, {}, FStringCanAccessTrustedContactsAmpNameSpace).access == AmpEnums.AccessResponseEnum.Granted then
+				setState2(true)
 			end
 		end)
 	end
 
-	local t3 = {};
+	local v8 = {}
+	fn(v8, filtered, filtered2)
 
-	(function(p6, p7, p8) -- line: 126
-		-- upvalues: Dash (copy)
-		local v83 = if #p7 == 0 then nil else {{
-			isSectionDivider = true
-		}}
+	local sections = {}
 
-		Dash.append(p6, p7, v83, p8)
-	end)(t3, v63, v65)
-
-	local t4 = {}
-
-	if #v63 > 0 then
-		table.insert(t4, {
-			data = v63,
-			title = v55.fromContactsText,
-			sectionNumber = #t4 + 1
+	if #filtered > 0 then
+		table.insert(sections, {
+			data = filtered,
+			title = v4.fromContactsText,
+			sectionNumber = #sections + 1
 		})
 	end
 
-	if #v65 > 0 then
-		table.insert(t4, {
-			data = v65,
-			title = v55.inviteToRobloxText,
-			sectionNumber = #t4 + 1
+	if #filtered2 > 0 then
+		table.insert(sections, {
+			data = filtered2,
+			title = v4.inviteToRobloxText,
+			sectionNumber = #sections + 1
 		})
 	end
 
-	local StatusBarSizeY = UserInputService.StatusBarSize.Y
-	local v72 = if not FFlagAddFriendsBannersNewUI_IXP then nil else ContactsSyncWarningMessage.useIsVisible()
-	local t5 = {
-		layout = Roact.createElement("UIListLayout", {
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Vertical
-		}),
-		contactsSyncWarning = if not FFlagAddFriendsBannersNewUI_IXP or not v72 then nil else React.createElement(ContactsSyncWarningMessage.Component, {
-			layoutOrder = -1
-		})
-	}
-	local v74 = React.createRef()
-	local v75 = if #t3 == 0 then Roact.createElement(ContactsEmptyList, {
-		layoutOrder = 8,
-		errorTextKey = TextKeys.NO_RESULTS
-	}) else Roact.createElement(SectionList, {
-		initialNumToRender = 15,
-		ref = v74,
-		sections = t4,
-		renderSectionHeader = if not (#v63 > 0) then nil else function(p9) -- line: 272
-			-- upvalues: Roact (copy), StyledTextLabel (copy), v53 (copy)
-			if p9.section then
-				return Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, 0)
-				}, {
-					layout = Roact.createElement("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						FillDirection = Enum.FillDirection.Vertical
-					}),
-					padding = if p9.section.sectionNumber == 1 then nil else Roact.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 1,
-						Size = UDim2.new(1, 0, 0, 24)
-					}),
-					Roact.createElement("Frame", {
-						LayoutOrder = 2,
-						BackgroundTransparency = 1,
-						Size = UDim2.new(1, 0, 0, 24)
-					}, {
-						sectionHeaderTextLabel = Roact.createElement(StyledTextLabel, {
-							fontStyle = v53.Font.Header2,
-							colorStyle = v53.Theme.TextDefault,
-							text = p9.section.title or ""
-						})
-					})
-				})
-			end
+	local function fn2(p)
+		local item = p.item
 
-			return Roact.createElement("Frame", {
+		if item.isSectionDivider then
+			local _ = p.index ~= 1
+			return roact.createElement("Frame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 0, 24)
 			}, {
-				divider = Roact.createElement("Frame", {
-					BorderSizePixel = 0,
+				divider = roact.createElement("Frame", {
 					Size = UDim2.new(1, 0, 0, 1),
 					Position = UDim2.new(0, 0, 0.5, 0),
-					BackgroundColor3 = v53.Theme.Divider.Color,
-					BackgroundTransparency = v53.Theme.Divider.Transparency
+					BorderSizePixel = 0,
+					BackgroundColor3 = v2.Theme.Divider.Color,
+					BackgroundTransparency = v2.Theme.Divider.Transparency
 				})
 			})
-		end,
-		renderItem = function(p10) -- line: 233
-			-- upvalues: Roact (copy), v53 (copy), ContactsListEntry (copy), v55 (copy), t1 (copy), ContactsListInviteEntry (copy)
-			local item = p10.item
-
-			if item.isSectionDivider then
-				local v93 = p10.index ~= 1
-
-				return Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, 24)
-				}, {
-					divider = Roact.createElement("Frame", {
-						BorderSizePixel = 0,
-						Size = UDim2.new(1, 0, 0, 1),
-						Position = UDim2.new(0, 0, not v93 and 0.5 or 0.5, 0),
-						BackgroundColor3 = v53.Theme.Divider.Color,
-						BackgroundTransparency = v53.Theme.Divider.Transparency
-					})
-				})
-			end
-
-			if item.isMatchedContact then
-				return Roact.createElement(ContactsListEntry, {
-					hasDivider = true,
-					contactName = item.contactName,
-					contactId = item.contactId,
-					contextualInfo = v55.fromContactsText,
-					hasSentRequest = item.hasSentRequest,
-					requestFriendship = t1.requestFriendship,
-					openProfilePeekView = t1.openProfilePeekView,
-					headshotThumbnailUrl = item.headshotThumbnailUrl,
-					avatarThumbnailUrl = item.avatarThumbnailUrl
-				})
-			end
-
-			return Roact.createElement(ContactsListInviteEntry, {
+		elseif item.isMatchedContact then
+			return roact.createElement(ContactsListEntry, {
+				contactName = item.contactName,
+				contactId = item.contactId,
+				contextualInfo = v4.fromContactsText,
 				hasDivider = true,
+				hasSentRequest = item.hasSentRequest,
+				requestFriendship = props.requestFriendship,
+				openProfilePeekView = props.openProfilePeekView,
+				headshotThumbnailUrl = item.headshotThumbnailUrl,
+				avatarThumbnailUrl = item.avatarThumbnailUrl
+			})
+		else
+			return roact.createElement(ContactsListInviteEntry, {
 				contactName = item.contactName,
 				deviceContactId = item.deviceContactId,
+				hasDivider = true,
 				phoneNumber = item.phoneNumber,
 				hasSentRequest = item.hasSentRequest
 			})
-		end,
-		CanvasSize = UDim2.new(1, 0, 0, #t3 * 73),
-		contentContainerStyle = {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0
-		},
-		style = {
-			BackgroundTransparency = 1,
-			ScrollBarThickness = 0,
-			LayoutOrder = 8,
-			Size = UDim2.new(1, 0, 1, -80 - (not v56 and 48 or 0) - 36 - 16),
-			ElasticBehavior = Enum.ElasticBehavior.Always
+		end
+	end
+
+	local function fn3(p)
+		if not p.section then
+			return roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 24)
+			}, {
+				divider = roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 0, 1),
+					Position = UDim2.new(0, 0, 0.5, 0),
+					BorderSizePixel = 0,
+					BackgroundColor3 = v2.Theme.Divider.Color,
+					BackgroundTransparency = v2.Theme.Divider.Transparency
+				})
+			})
+		end
+
+		local createElement = roact.createElement
+		local v9 = { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 0) }
+
+		local constructorValue = roact.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical
+		})
+		local v10
+
+		if p.section.sectionNumber ~= 1 then
+			v10 = roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, 24),
+				BackgroundTransparency = 1,
+				LayoutOrder = 1
+			})
+		end
+
+		local constructorValue_2 = v10
+		local v11 = {
+			layout = constructorValue,
+			padding = constructorValue_2,
+			roact.createElement(
+				"Frame",
+				{ LayoutOrder = 2, Size = UDim2.new(1, 0, 0, 24), BackgroundTransparency = 1 },
+				{
+					sectionHeaderTextLabel = roact.createElement(styledTextLabel, {
+						fontStyle = v2.Font.Header2,
+						colorStyle = v2.Theme.TextDefault,
+						text = p.section.title or ""
+					})
+				}
+			)
 		}
-	})
-	local t6 = {
-		layout = Roact.createElement("UIListLayout", {
+		return createElement("Frame", v9, v11)
+	end
+
+	local function fn4(): boolean -- 3 equivalent calls inferred from this helper
+		return #props.matchedContacts + #props.deviceContacts == 0
+	end
+
+	local function fn5(p)
+		if props.isFetching then
+			return {
+				{
+					buttonType = buttonType.PrimarySystem,
+					props = { isLoading = true, onActivated = dash.noop }
+				}
+			}
+		end
+
+		if props.showAddFriendsButton and fn4() then -- inferred equivalent call
+			if v5 then
+				return {
+					{
+						buttonType = buttonType.PrimarySystem,
+						props = {
+							onActivated = props.onAddFriendsActivated,
+							text = p.goToAddFriends
+						}
+					}
+				}
+			end
+
+			return {
+				{
+					buttonType = buttonType.PrimarySystem,
+					props = { onActivated = props.onAddFriendsActivated, text = p.goToAddFriends }
+				},
+				{
+					buttonType = buttonType.Secondary,
+					props = { onActivated = onActivated, text = p.closeModal }
+				}
+			}
+		elseif v5 then
+			return {}
+		else
+			return {
+				{
+					buttonType = buttonType.PrimarySystem,
+					props = { onActivated = onActivated, text = p.closeModal }
+				}
+			}
+		end
+	end
+
+	local y = userInputService.StatusBarSize.Y
+	local v9
+
+	if FFlagAddFriendsBannersNewUI_IXP then
+		v9 = ContactsSyncWarningMessage.useIsVisible()
+	end
+
+	local children = {
+		layout = roact.createElement("UIListLayout", {
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical
 		}),
-		contactsSyncWarning = if not FFlagAddFriendsBannersNewUI_IXP or not v72 then nil else React.createElement(ContactsSyncWarningMessage.Component, {
+		contactsSyncWarning = 0
+	}
+	local contactsSyncWarning
+
+	if FFlagAddFriendsBannersNewUI_IXP and v9 then
+		contactsSyncWarning = react.createElement(ContactsSyncWarningMessage.Component, {
 			layoutOrder = -1
+		})
+	end
+
+	children.contactsSyncWarning = contactsSyncWarning
+
+	local ref = react.createRef()
+
+	local function fn6(p)
+		setState(p)
+	end
+
+	local contactsList
+
+	if #v8 == 0 then
+		contactsList = roact.createElement(ContactsEmptyList, {
+			errorTextKey = TextKeys.NO_RESULTS,
+			layoutOrder = 8
+		})
+	else
+		local createElement = roact.createElement
+
+		if not (#filtered > 0) then
+			fn3 = nil
+		end
+
+		contactsList = createElement(sectionList, {
+			ref = ref,
+			sections = sections,
+			renderSectionHeader = fn3,
+			renderItem = fn2,
+			initialNumToRender = 15,
+			CanvasSize = UDim2.new(1, 0, 0, #v8 * 73),
+			contentContainerStyle = { BackgroundTransparency = 1, BorderSizePixel = 0 },
+			style = {
+				BackgroundTransparency = 1,
+				ScrollBarThickness = 0,
+				LayoutOrder = 8,
+				Size = UDim2.new(1, 0, 1, -80 - (v5 and 0 or 48) - 36 - 16),
+				ElasticBehavior = Enum.ElasticBehavior.Always
+			}
+		})
+	end
+
+	local children2 = {
+		layout = roact.createElement("UIListLayout", {
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical
 		}),
-		spacer1 = if not FFlagAddFriendsBannersNewUI_IXP or not v72 then Roact.createElement("Frame", {
+		contactsSyncWarning = 0,
+		spacer1 = 0,
+		descriptionFrame = 0,
+		spacer2 = 0,
+		searchBarContainer = 0,
+		spacer4 = 0,
+		contactsList = 0
+	}
+	local contactsSyncWarning2
+
+	if FFlagAddFriendsBannersNewUI_IXP and v9 then
+		contactsSyncWarning2 = react.createElement(ContactsSyncWarningMessage.Component, {
+			layoutOrder = -1
+		})
+	end
+
+	children2.contactsSyncWarning = contactsSyncWarning2
+	local spacer
+
+	if not (FFlagAddFriendsBannersNewUI_IXP and v9) then
+		spacer = roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, 24),
 			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, 24)
-		}) else nil,
-		descriptionFrame = if not FFlagAddFriendsBannersNewUI_IXP or not v72 then Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, 80)
-		}, {
-			textLayout = Roact.createElement("UIListLayout", {
-				HorizontalAlignment = if not FFlagQRCodeCopyUpdates or not v67 then Enum.HorizontalAlignment.Center else Enum.HorizontalAlignment.Left,
+			LayoutOrder = 1
+		})
+	end
+
+	children2.spacer1 = spacer
+	local descriptionFrame
+
+	if not (FFlagAddFriendsBannersNewUI_IXP and v9) then
+		local createElement = roact.createElement
+		local v10 = { Size = UDim2.new(1, 0, 0, 80), BackgroundTransparency = 1, LayoutOrder = 2 }
+
+		local createElement2 = roact.createElement
+		local horizontalAlignment
+
+		if FFlagQRCodeCopyUpdates and state2 then
+			horizontalAlignment = Enum.HorizontalAlignment.Left
+		else
+			horizontalAlignment = Enum.HorizontalAlignment.Center
+		end
+
+		local children3 = {
+			textLayout = createElement2("UIListLayout", {
+				HorizontalAlignment = horizontalAlignment,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			descriptionText = Roact.createElement(StyledTextLabel, {
-				lineHeight = 1,
-				layoutOrder = 1,
-				text = if not FFlagQRCodeCopyUpdates or not v67 then v55.contactsListBlurb else if not FFlagConnectionsToFriendsRename then v55.contactsListTCEducationBlurb else v55.contactsListTFEducationBlurb,
-				automaticSize = Enum.AutomaticSize.Y,
-				colorStyle = v53.Theme.TextDefault,
-				fontStyle = v53.Font.Body,
-				size = UDim2.new(1, 0, 0, 0),
-				maxSize = Vector2.new(0, 80),
-				textXAlignment = if not FFlagQRCodeCopyUpdates or not v67 then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left,
-				textYAlignment = Enum.TextYAlignment.Center
-			}),
-			LearnMoreWebLink = v52 and React.createElement(InputLabel, {
-				LayoutOrder = 2,
-				tag = "auto-y size-full-0",
-				RichText = true,
-				Text = `<u>{ v55.learnMore }</u>`,
-				size = InputLabelSize.Large,
-				onActivated = v58
-			})
-		}) else nil,
-		spacer2 = if not FFlagAddFriendsBannersNewUI_IXP or not v72 then Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 3,
-			Size = UDim2.new(1, 0, 0, 24)
-		}) else nil,
-		searchBarContainer = Roact.createElement(ContactsListSearchBar, {
-			height = 36,
-			layoutOrder = 4,
-			textChangeCallback = function(p11) -- line: 393
-				-- upvalues: v60 (copy)
-				v60(p11)
-			end
-		}),
-		spacer4 = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 7,
-			Size = UDim2.new(1, 0, 0, 16)
-		}),
-		contactsList = v75
-	}
+			descriptionText = 0,
+			LearnMoreWebLink = 0
+		}
 
-	if t1.isFetching then
-		for _, v78 in {
-			1,
-			2,
-			3
-		} do
-			t5["glimmer" .. v78] = Roact.createElement(ContactsGlimmer, {
-				layoutOrder = v78
-			})
+		local createElement3 = roact.createElement
+		local text
+
+		if FFlagQRCodeCopyUpdates and state2 then
+			text = v4.contactsListTFEducationBlurb
+		else
+			text = v4.contactsListBlurb
 		end
-	elseif t1.hasUploadError and #t1.matchedContacts + #t1.deviceContacts == 0 then
-		t5.errorModal = Roact.createElement(ContactsUploadErrorModal)
-	elseif #t1.matchedContacts + #t1.deviceContacts == 0 then
-		t5.emptyList = Roact.createElement(ContactsEmptyList)
-	else
-		t5 = t6
+
+		local v11 = {
+			text = text,
+			automaticSize = Enum.AutomaticSize.Y,
+			colorStyle = v2.Theme.TextDefault,
+			fontStyle = v2.Font.Body,
+			lineHeight = 1,
+			size = UDim2.new(1, 0, 0, 0),
+			maxSize = Vector2.new(0, 80),
+			textXAlignment = 0,
+			textYAlignment = 0,
+			layoutOrder = 1
+		}
+		local textXAlignment
+
+		if FFlagQRCodeCopyUpdates and state2 then
+			textXAlignment = Enum.TextXAlignment.Left
+		else
+			textXAlignment = Enum.TextXAlignment.Center
+		end
+
+		v11.textXAlignment = textXAlignment
+
+		v11.textYAlignment = Enum.TextYAlignment.Center
+		children3.descriptionText = createElement3(styledTextLabel, v11)
+
+		children3.LearnMoreWebLink = v and react.createElement(InputLabel, {
+			LayoutOrder = 2,
+			tag = "auto-y size-full-0",
+			RichText = true,
+			Text = `<u>{v4.learnMore}</u>`,
+			size = InputLabelSize.Large,
+			onActivated = onActivated2
+		})
+		descriptionFrame = createElement("Frame", v10, children3)
 	end
 
-	return Roact.createElement(FullPageModal, {
+	children2.descriptionFrame = descriptionFrame
+	local spacer2
+
+	if not (FFlagAddFriendsBannersNewUI_IXP and v9) then
+		spacer2 = roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, 24),
+			BackgroundTransparency = 1,
+			LayoutOrder = 3
+		})
+	end
+
+	children2.spacer2 = spacer2
+
+	children2.searchBarContainer = roact.createElement(ContactsListSearchBar, {
+		height = 36,
+		layoutOrder = 4,
+		textChangeCallback = fn6
+	})
+
+	children2.spacer4 = roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, 16),
+		BackgroundTransparency = 1,
+		LayoutOrder = 7
+	})
+
+	children2.contactsList = contactsList
+
+	if props.isFetching then
+		for _, layoutOrder in { 1, 2, 3 } do
+			children["glimmer" .. layoutOrder] = roact.createElement(ContactsGlimmer, {
+				layoutOrder = layoutOrder
+			})
+		end
+	elseif props.hasUploadError and fn4() then -- inferred equivalent call
+		children.errorModal = roact.createElement(ContactsUploadErrorModal)
+	elseif fn4() then -- inferred equivalent call
+		children.emptyList = roact.createElement(ContactsEmptyList)
+	else
+		children = children2
+	end
+
+	return roact.createElement(fullPageModal, {
+		title = v4.connectWithFriends,
+		screenSize = props.screenSize,
 		marginSize = 0,
-		title = v55.connectWithFriends,
-		screenSize = t1.screenSize,
-		distanceFromTop = StatusBarSizeY,
-		onCloseClicked = function() -- line: 135
-			-- upvalues: t1 (copy), EventNames (copy)
-			t1.closeModal(EventNames.CloseContactListCross)
-		end,
+		distanceFromTop = y,
+		onCloseClicked = onCloseClicked,
 		buttonStackProps = {
-			buttons = (function(p12) -- line: 317
-				-- upvalues: t1 (copy), ButtonType (copy), Dash (copy), v56 (copy), v57 (copy)
-				if t1.isFetching then
-					return {{
-						buttonType = ButtonType.PrimarySystem,
-						props = {
-							isLoading = true,
-							onActivated = Dash.noop
-						}
-					}}
-				end
-
-				if t1.showAddFriendsButton and #t1.matchedContacts + #t1.deviceContacts == 0 then
-					if v56 then
-						return {{
-							buttonType = ButtonType.PrimarySystem,
-							props = {
-								onActivated = t1.onAddFriendsActivated,
-								text = p12.goToAddFriends
-							}
-						}}
-					end
-
-					return {
-						{
-							buttonType = ButtonType.PrimarySystem,
-							props = {
-								onActivated = t1.onAddFriendsActivated,
-								text = p12.goToAddFriends
-							}
-						},
-						{
-							buttonType = ButtonType.Secondary,
-							props = {
-								onActivated = v57,
-								text = p12.closeModal
-							}
-						}
-					}
-				end
-
-				if v56 then
-					return {}
-				end
-
-				return {{
-					buttonType = ButtonType.PrimarySystem,
-					props = {
-						onActivated = v57,
-						text = p12.closeModal
-					}
-				}}
-			end)(v55),
-			buttonHeight = not v56 and 48 or 0,
+			buttons = fn5(v4),
+			buttonHeight = v5 and 0 or 48,
 			forcedFillDirection = Enum.FillDirection.Vertical
 		}
 	}, {
-		hpm = Roact.createElement(HorizontalPageMargin, {
-			backgroundTransparency = 1,
-			size = UDim2.new(1, 0, 1, 0),
-			position = UDim2.new(0, 0, 0, 0)
-		}, {
-			contentFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1)
-			}, t5),
-			gradientFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 0,
-				BorderSizePixel = 0,
-				ZIndex = 2,
-				Position = UDim2.new(0, 0, 1, not v56 and -24 or 0),
-				Size = UDim2.new(1, 0, 0, 24),
-				BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			}, {
-				gradient = Roact.createElement("UIGradient", {
-					Rotation = 270,
-					Color = ColorSequence.new({
-						ColorSequenceKeypoint.new(0, v53.Theme.BackgroundUIDefault.Color),
-						ColorSequenceKeypoint.new(1, v53.Theme.BackgroundUIDefault.Color)
-					}),
-					Transparency = NumberSequence.new({
-						NumberSequenceKeypoint.new(0, 0),
-						NumberSequenceKeypoint.new(1, 1)
+		hpm = roact.createElement(
+			horizontalPageMargin,
+			{
+				size = UDim2.new(1, 0, 1, 0),
+				position = UDim2.new(0, 0, 0, 0),
+				backgroundTransparency = 1
+			},
+			{
+				contentFrame = roact.createElement(
+					"Frame",
+					{ Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 },
+					children
+				),
+				gradientFrame = roact.createElement("Frame", {
+					Position = UDim2.new(0, 0, 1, v5 and 0 or -24),
+					Size = UDim2.new(1, 0, 0, 24),
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					BackgroundTransparency = 0,
+					BorderSizePixel = 0,
+					ZIndex = 2
+				}, {
+					gradient = roact.createElement("UIGradient", {
+						Rotation = 270,
+						Color = ColorSequence.new({
+							ColorSequenceKeypoint.new(0, v2.Theme.BackgroundUIDefault.Color),
+							ColorSequenceKeypoint.new(1, v2.Theme.BackgroundUIDefault.Color)
+						}),
+						Transparency = NumberSequence.new({
+							NumberSequenceKeypoint.new(0, 0),
+							NumberSequenceKeypoint.new(1, 1)
+						})
 					})
 				})
-			})
-		})
+			}
+		)
 	})
 end
 

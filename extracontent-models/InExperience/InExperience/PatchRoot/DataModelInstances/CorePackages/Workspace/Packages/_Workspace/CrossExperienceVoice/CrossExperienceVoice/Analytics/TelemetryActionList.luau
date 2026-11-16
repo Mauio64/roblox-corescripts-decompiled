@@ -1,130 +1,109 @@
-local Parent = script:FindFirstAncestor("CrossExperienceVoice").Parent
-local SupportedTelemetryBackends = require(Parent.SocialLuaAnalytics).Analytics.Enums.SupportedTelemetryBackends
+local parent = script:FindFirstAncestor("CrossExperienceVoice").Parent
+
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local SupportedTelemetryBackends = SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends
+
 local EventNames = require(script.Parent.EventNames)
 
 return {
 	defaults = {
-		links = "",
-		throttlingThousandths = game:DefineFastInt("PartyVoiceTelemetryThrottlingThousandths", 1000)
+		throttlingThousandths = game:DefineFastInt("PartyVoiceTelemetryThrottlingThousandths", 1000),
+		links = ""
 	},
 	[EventNames.PartyVoiceStateChanged] = {
+		lastUpdated = { 24, 12, 8 },
 		description = "Event when a user transitions state during a party voice session",
-		lastUpdated = {
-			24,
-			12,
-			8
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
-			dynamicCustomFields = {
-				status = function(p1) -- line: 21
-					return p1
-				end,
-				previousStatus = function(p2) -- line: 24
-					return p2
-				end,
-				detail = function(p3) -- line: 27
-					return p3
-				end,
-				activeDm = function(p4) -- line: 30
-					return p4
-				end
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+				dynamicCustomFields = {
+					status = function(p)
+						return p
+					end,
+					previousStatus = function(p)
+						return p
+					end,
+					detail = function(p)
+						return p
+					end,
+					activeDm = function(p)
+						return p
+					end
+				}
 			}
-		}}
+		}
 	},
 	[EventNames.PartyVoiceConnectedParticipantsOnJoin] = {
+		lastUpdated = { 24, 11, 30 },
 		description = "Event when a user successfully connects to a party voice channel",
-		lastUpdated = {
-			24,
-			11,
-			30
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
-			dynamicCustomFields = {
-				numberActive = function(p5) -- line: 44
-					return p5
-				end,
-				activeDm = function(p6) -- line: 47
-					return p6
-				end
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+				dynamicCustomFields = {
+					numberActive = function(p)
+						return p
+					end,
+					activeDm = function(p)
+						return p
+					end
+				}
 			}
-		}}
+		}
 	},
 	[EventNames.PartyVoiceJoinFailure] = {
+		lastUpdated = { 25, 3, 12 },
 		description = "Event when a user attempts to connect to party voice and results in failure",
-		lastUpdated = {
-			25,
-			3,
-			12
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
-			dynamicCustomFields = {
-				errorMessage = function(p7) -- line: 61
-					return p7
-				end
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+				dynamicCustomFields = {
+					errorMessage = function(p)
+						return p
+					end
+				}
 			}
-		}}
+		}
 	},
 	[EventNames.PartyVoiceJoinAttempt] = {
+		lastUpdated = { 24, 12, 8 },
 		description = "Event when a user attempts to connect to party voice",
-		lastUpdated = {
-			24,
-			12,
-			8
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
-			dynamicCustomFields = {
-				activeDm = function(p8) -- line: 75
-					return p8
-				end
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+				dynamicCustomFields = {
+					activeDm = function(p)
+						return p
+					end
+				}
 			}
-		}}
+		}
 	},
 	[EventNames.PartyVoiceUnmuteParticipant] = {
+		lastUpdated = { 25, 3, 30 },
 		description = "Event when a user unmutes a participant in party voice",
-		lastUpdated = {
-			25,
-			3,
-			30
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter
-		}}
+		backendsList = {
+			{ type = SupportedTelemetryBackends.RobloxTelemetryCounter }
+		}
 	},
 	[EventNames.PartyVoiceMuteParticipant] = {
+		lastUpdated = { 25, 3, 30 },
 		description = "Event when a user mutes a participant in party voice",
-		lastUpdated = {
-			25,
-			3,
-			30
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter
-		}}
+		backendsList = {
+			{ type = SupportedTelemetryBackends.RobloxTelemetryCounter }
+		}
 	},
 	[EventNames.PartyVoiceBlockParticipant] = {
+		lastUpdated = { 25, 3, 30 },
 		description = "Event when a user blocks a participant in party voice",
-		lastUpdated = {
-			25,
-			3,
-			30
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter
-		}}
+		backendsList = {
+			{ type = SupportedTelemetryBackends.RobloxTelemetryCounter }
+		}
 	},
 	[EventNames.PartyVoiceUnblockParticipant] = {
+		lastUpdated = { 25, 3, 30 },
 		description = "Event when a user unblocks a participant in party voice",
-		lastUpdated = {
-			25,
-			3,
-			30
-		},
-		backendsList = {{
-			type = SupportedTelemetryBackends.RobloxTelemetryCounter
-		}}
+		backendsList = {
+			{ type = SupportedTelemetryBackends.RobloxTelemetryCounter }
+		}
 	}
 }

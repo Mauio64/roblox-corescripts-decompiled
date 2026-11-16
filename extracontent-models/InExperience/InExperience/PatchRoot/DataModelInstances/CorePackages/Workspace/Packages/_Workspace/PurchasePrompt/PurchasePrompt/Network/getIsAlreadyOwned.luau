@@ -1,17 +1,23 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local Players = game:GetService("Players")
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
-local Promise = require(ParentParent.Promise)
-local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = require(ParentParent.Parent.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
 
-local function getIsAlreadyOwned(p1, p2, p3, b1: boolean?) -- line: 11
-	-- upvalues: FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), Promise (copy), Players (copy), PurchaseError (copy)
-	if FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow and b1 then
+local PurchaseError = require(parent.Enums.PurchaseError)
+local Promise = require(parent.Promise)
+
+local types = require(parent.types)
+local productTypeEnum = types.ProductTypeEnum
+local SharedFlags = require(parent.Parent.SharedFlags)
+
+local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = SharedFlags.FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
+
+local vipServerSet = { [productTypeEnum.VIPServer] = true }
+
+local function getIsAlreadyOwned(p, p2, p3, flag: boolean?)
+	if FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow and flag or vipServerSet[p3] then
 		return Promise.resolve(false)
 	end
 
-	return p1.getPlayerOwns(Players.LocalPlayer, p2, p3):catch(function(_) -- line: 15
-		-- upvalues: Promise (copy), PurchaseError (copy)
+	return p.getPlayerOwns(Players.LocalPlayer, p2, p3):catch(function(_)
 		return Promise.reject(PurchaseError.UnknownFailure)
 	end)
 end

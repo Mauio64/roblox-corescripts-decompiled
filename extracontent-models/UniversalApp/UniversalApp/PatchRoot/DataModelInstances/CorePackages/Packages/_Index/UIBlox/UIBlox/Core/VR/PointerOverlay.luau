@@ -1,166 +1,165 @@
 local RunService = game:GetService("RunService")
 local ContextActionService = game:GetService("ContextActionService")
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Roact = require(ParentParent.Roact)
-local EventConnection = require(ParentParent.ReactUtils).EventConnection
-local Object = require(ParentParent.LuauPolyfill).Object
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent
+local React = require(parent2.React)
+local Roact = require(parent2.Roact)
 
-require(scriptParent.Constants)
+local ReactUtils = require(parent2.ReactUtils)
+local EventConnection = ReactUtils.EventConnection
 
-local t1 = {
-	VRService = game:GetService("VRService"),
-	UpdateEvent = RunService.Heartbeat
-}
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Object = LuauPolyfill.Object
+require(parent.Constants)
 
-local function setLaserPointerModeBasedOnUserCFrame(p1, p2) -- line: 45
-	if p2:GetUserCFrameEnabled(Enum.UserCFrame.RightHand) and p2:GetUserCFrameEnabled(Enum.UserCFrame.LeftHand) then
-		p1.current:setMode(p1.current.Mode.DualPointer)
+local v = { VRService = game:GetService("VRService"), UpdateEvent = RunService.Heartbeat }
 
-		return
+local function setLaserPointerModeBasedOnUserCFrame(ref, vrService)
+	if
+		vrService:GetUserCFrameEnabled(Enum.UserCFrame.RightHand)
+		and vrService:GetUserCFrameEnabled(Enum.UserCFrame.LeftHand)
+	then
+		ref.current:setMode(ref.current.Mode.DualPointer)
+	elseif
+		vrService:GetUserCFrameEnabled(Enum.UserCFrame.RightHand)
+		or vrService:GetUserCFrameEnabled(Enum.UserCFrame.LeftHand)
+	then
+		ref.current:setMode(ref.current.Mode.Pointer)
+	else
+		ref.current:setMode(ref.current.Mode.Disabled)
 	end
-
-	if not p2:GetUserCFrameEnabled(Enum.UserCFrame.RightHand) and not p2:GetUserCFrameEnabled(Enum.UserCFrame.LeftHand) then
-		p1.current:setMode(p1.current.Mode.Disabled)
-
-		return
-	end
-
-	p1.current:setMode(p1.current.Mode.Pointer)
 end
-local function PointerOverlay(t2: {[any]: any}) -- line: 61
-	-- upvalues: Object (copy), t1 (copy), React (copy), setLaserPointerModeBasedOnUserCFrame (copy), ContextActionService (copy), Roact (copy), EventConnection (copy)
-	local v15 = Object.assign({}, t1, t2)
-	local LaserPointer = v15.LaserPointer
-	local VRControllerModel = v15.VRControllerModel
-	local VRService = v15.VRService
-	local v19 = React.useRef(nil)
-	local v20 = React.useRef(nil)
-	local v21 = React.useRef(nil)
-	local ok, result = pcall(function() -- line: 74
-		-- upvalues: VRService (copy)
-		return VRService:GetPropertyChangedSignal("VRSessionState")
+
+local function PointerOverlay(p)
+	local v2 = Object.assign({}, v, p)
+
+	local laserPointer = v2.LaserPointer
+	local vrControllerModel = v2.VRControllerModel
+	local vrService = v2.VRService
+
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+
+	local success, result = pcall(function()
+		return vrService:GetPropertyChangedSignal("VRSessionState")
 	end)
-	local v24 = React.useCallback(function() -- line: 78
-		-- upvalues: v19 (copy), LaserPointer (copy), setLaserPointerModeBasedOnUserCFrame (copy), VRService (copy), v20 (copy), VRControllerModel (copy), v21 (copy), ContextActionService (copy)
-		if not v19.current then
-			v19.current = LaserPointer.new()
-			setLaserPointerModeBasedOnUserCFrame(v19, VRService)
-			v19.current:setEnableAmbidexterousPointer(true)
-			v20.current = VRControllerModel.new(Enum.UserCFrame.LeftHand)
-			v21.current = VRControllerModel.new(Enum.UserCFrame.RightHand)
+
+	local callback = React.useCallback(function()
+		if not ref.current then
+			ref.current = laserPointer.new()
+			setLaserPointerModeBasedOnUserCFrame(ref, vrService)
+			ref.current:setEnableAmbidexterousPointer(true)
+			ref2.current = vrControllerModel.new(Enum.UserCFrame.LeftHand)
+			ref3.current = vrControllerModel.new(Enum.UserCFrame.RightHand)
 		end
 
-		v20.current:setEnabled(VRService.VREnabled)
-		v21.current:setEnabled(VRService.VREnabled)
+		ref2.current:setEnabled(vrService.VREnabled)
+		ref3.current:setEnabled(vrService.VREnabled)
 
-		if VRService.VREnabled then
-			ContextActionService:BindActivate(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonA, Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonL2)
+		if vrService.VREnabled then
+			ContextActionService:BindActivate(
+				Enum.UserInputType.Gamepad1,
+				Enum.KeyCode.ButtonA,
+				Enum.KeyCode.ButtonX,
+				Enum.KeyCode.ButtonR2,
+				Enum.KeyCode.ButtonL2
+			)
 		end
-	end, {
-		v20,
-		v21,
-		v19,
-		LaserPointer,
-		VRControllerModel
-	})
-	local u25 = React.useCallback(function() -- line: 101
-		-- upvalues: v20 (copy), v21 (copy), v19 (copy), ContextActionService (copy)
-		if v20.current then
-			v20.current:setEnabled(false)
-		end
+	end, { ref2, ref3, ref, laserPointer, vrControllerModel })
 
-		if v21.current then
-			v21.current:setEnabled(false)
+	local v3 = React.useCallback(function()
+		if ref2.current then
+			ref2.current:setEnabled(false)
 		end
 
-		if v19.current then
-			v19.current:disableComponent()
+		if ref3.current then
+			ref3.current:setEnabled(false)
+		end
+
+		if ref.current then
+			ref.current:disableComponent()
 		end
 
 		ContextActionService:UnbindActivate(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonA)
 		ContextActionService:UnbindActivate(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonR2)
-	end, {
-		v20,
-		v21,
-		v19,
-		LaserPointer,
-		VRControllerModel
-	})
-	local v26 = React.useCallback(function() -- line: 115
-		-- upvalues: VRService (copy), v19 (copy), setLaserPointerModeBasedOnUserCFrame (copy), v20 (copy), v21 (copy)
-		local v28 = not (VRService.VRSessionState == Enum.VRSessionState.Idle or VRService.VRSessionState == Enum.VRSessionState.Visible)
+	end, { ref2, ref3, ref, laserPointer, vrControllerModel })
 
-		if v19.current then
-			if v28 then
-				setLaserPointerModeBasedOnUserCFrame(v19, VRService)
+	local callback2 = React.useCallback(function()
+		local v4 = vrService.VRSessionState ~= Enum.VRSessionState.Idle
+			and vrService.VRSessionState ~= Enum.VRSessionState.Visible
+
+		if ref.current then
+			if v4 then
+				setLaserPointerModeBasedOnUserCFrame(ref, vrService)
 			else
-				v19.current:setMode(v19.current.Mode.Disabled)
+				ref.current:setMode(ref.current.Mode.Disabled)
 			end
 		end
 
-		if v20.current then
-			v20.current:setEnabled(v28)
+		if ref2.current then
+			ref2.current:setEnabled(v4)
 		end
 
-		if v21.current then
-			v21.current:setEnabled(v28)
+		if ref3.current then
+			ref3.current:setEnabled(v4)
 		end
-	end, {
-		v20,
-		v21,
-		v19,
-		LaserPointer,
-		VRControllerModel
-	})
-	local v27 = React.useCallback(function() -- line: 135
-		-- upvalues: setLaserPointerModeBasedOnUserCFrame (copy), v19 (copy), VRService (copy)
-		setLaserPointerModeBasedOnUserCFrame(v19, VRService)
-	end, { v19 })
+	end, { ref2, ref3, ref, laserPointer, vrControllerModel })
 
-	React.useEffect(function() -- line: 140
-		-- upvalues: VRService (copy), v24 (copy), u25 (ref)
-		if VRService.VREnabled then
-			v24()
+	local callback3 = React.useCallback(function()
+		setLaserPointerModeBasedOnUserCFrame(ref, vrService)
+	end, { ref })
+
+	React.useEffect(function()
+		if vrService.VREnabled then
+			callback()
 		end
 
-		return u25
+		return v3
 	end, {})
 
-	return React.createElement(Roact.Portal, {
-		target = workspace
-	}, {
+	local createElement = React.createElement
+	local portal = Roact.Portal
+	local v4 = { target = workspace }
+
+	local v5 = {
 		UserCFrameChangedConnection = React.createElement(EventConnection, {
-			event = v15.UpdateEvent,
-			callback = function() -- line: 152
-				-- upvalues: v19 (copy), v20 (copy), v21 (copy)
-				if v19.current then
-					v19.current:update()
+			event = v2.UpdateEvent,
+			callback = function()
+				if ref.current then
+					ref.current:update()
 				end
 
-				if v20.current then
-					v20.current:update()
+				if ref2.current then
+					ref2.current:update()
 				end
 
-				if v21.current then
-					v21.current:update()
+				if ref3.current then
+					ref3.current:update()
 				end
 			end
 		}),
 		VREnabledConnection = React.createElement(EventConnection, {
-			event = VRService:GetPropertyChangedSignal("VREnabled"),
-			callback = v24
+			event = vrService:GetPropertyChangedSignal("VREnabled"),
+			callback = callback
 		}),
 		VRUserCFrameEnabledConnection = React.createElement(EventConnection, {
-			event = VRService.UserCFrameEnabled,
-			callback = v27
+			event = vrService.UserCFrameEnabled,
+			callback = callback3
 		}),
-		VRSessionStateConnection = if not ok then nil else React.createElement(EventConnection, {
+		VRSessionStateConnection = 0
+	}
+	local vrSessionStateConnection
+
+	if success then
+		vrSessionStateConnection = React.createElement(EventConnection, {
 			event = result,
-			callback = v26
+			callback = callback2
 		})
-	})
+	end
+
+	v5.VRSessionStateConnection = vrSessionStateConnection
+	return createElement(portal, v4, v5)
 end
 
 return PointerOverlay

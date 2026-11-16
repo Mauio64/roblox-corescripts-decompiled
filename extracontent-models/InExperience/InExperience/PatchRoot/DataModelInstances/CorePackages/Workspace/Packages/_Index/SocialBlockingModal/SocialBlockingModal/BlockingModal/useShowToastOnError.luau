@@ -1,8 +1,14 @@
-local Parent = script:FindFirstAncestor("SocialBlockingModal").Parent
-local React = require(Parent.React)
-local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local SetCurrentToastMessage = require(Parent.ToastRodux).Actions.SetCurrentToastMessage
+local parent = script:FindFirstAncestor("SocialBlockingModal").Parent
+
+local React = require(parent.React)
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+
 local _ = {
 	BLOCK_TARGET_ALREADY_BLOCKED_ERROR = 1,
 	USER_BLOCKING_LIMIT_REACHED_API_ERROR = 2,
@@ -10,45 +16,31 @@ local _ = {
 	PARENT_BLOCKED_TARGET_USER_ERROR = 14
 }
 
-local function useShowToastOnError() -- line: 17
-	-- upvalues: useDispatch (copy), useLocalization (copy), React (copy), SetCurrentToastMessage (copy)
-	local v8 = useDispatch()
-	local v9 = useLocalization({
+local function useShowToastOnError()
+	local v = useDispatch()
+	local v2 = useLocalization({
 		somethingIsWrongToast = "Feature.Toast.NetworkingError.SomethingIsWrong",
 		blockLimitReachedToast = "Feature.Profile.Message.BlockError",
 		blocktargetAlreadyBlockedToast = "Feature.Friends.Error.TargetAlreadyBlockedError"
 	})
 
-	return React.useCallback(function(t1: {[any]: any}?) -- line: 25
-		-- upvalues: v8 (copy), SetCurrentToastMessage (copy), v9 (copy)
-		local v11 = t1 and (not not t1.Body and tonumber(t1.Body)) or nil
+	return React.useCallback(function(p)
+		local body = p and p.Body and tonumber(p.Body) or nil
 
-		if v11 == 1 then
-			v8(SetCurrentToastMessage({
-				isLocalized = true,
-				toastMessage = v9.blocktargetAlreadyBlockedToast
+		if body == 1 then
+			v(SetCurrentToastMessage({
+				toastMessage = v2.blocktargetAlreadyBlockedToast,
+				isLocalized = true
 			}))
-
-			return
-		end
-
-		if v11 == 2 then
-			v8(SetCurrentToastMessage({
-				isLocalized = true,
-				toastMessage = v9.blockLimitReachedToast
+		elseif body == 2 then
+			v(SetCurrentToastMessage({
+				toastMessage = v2.blockLimitReachedToast,
+				isLocalized = true
 			}))
-
-			return
+		else
+			v(SetCurrentToastMessage({ toastMessage = v2.somethingIsWrongToast, isLocalized = true }))
 		end
-
-		v8(SetCurrentToastMessage({
-			isLocalized = true,
-			toastMessage = v9.somethingIsWrongToast
-		}))
-	end, {
-		v8,
-		v9
-	})
+	end, { v, v2 })
 end
 
 return useShowToastOnError

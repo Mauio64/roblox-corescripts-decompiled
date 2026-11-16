@@ -1,7 +1,7 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+
 local Boolean = LuauPolyfill.Boolean
 local clearTimeout = LuauPolyfill.clearTimeout
 local Map = LuauPolyfill.Map
@@ -10,281 +10,250 @@ local Set = LuauPolyfill.Set
 local setTimeout = LuauPolyfill.setTimeout
 local WeakMap = LuauPolyfill.WeakMap
 
-require(ParentParentParent.GraphQL)
+require(parent2.GraphQL)
 
-local equal = require(ParentParent.jsutils.equal)
+local equal = require(parent.jsutils.equal)
 
-require(ParentParent.cache)
+require(parent.cache)
+
 require(script.Parent.watchQueryOptions_types)
+
 require(script.Parent.ObservableQuery_types)
+
 require(script.Parent.Parent.link.core)
 
 local utilities = require(script.Parent.Parent.utilities)
+
 local isNonEmptyArray = utilities.isNonEmptyArray
 local graphQLResultHasError = utilities.graphQLResultHasError
 local canUseWeakMap = utilities.canUseWeakMap
 local networkStatus = require(script.Parent.networkStatus)
-local NetworkStatus = networkStatus.NetworkStatus
+local networkStatus2 = networkStatus.NetworkStatus
+
 local isNetworkRequestInFlight = networkStatus.isNetworkRequestInFlight
 
 require(script.Parent.Parent.errors)
 
-local t2 = {
-	FORBID = 0,
-	OVERWRITE = 1,
-	MERGE = 2
-}
+local cacheWriteBehavior = { FORBID = 0, OVERWRITE = 1, MERGE = 2 }
+local QueryInfo = {}
+QueryInfo.CacheWriteBehavior = cacheWriteBehavior
+local v
 
-t1.CacheWriteBehavior = t2
+if canUseWeakMap then
+	v = WeakMap.new()
+else
+	v = Map.new(nil)
+end
 
-local v21 = if not canUseWeakMap then Map.new(nil) else WeakMap.new()
+local function wrapDestructiveCacheMethod(p, p2: string) -- 3 equivalent calls inferred from this helper
+	local v2 = p[p2]
 
-local function wrapDestructiveCacheMethod(p1, s1: string) -- line: 98
-	-- upvalues: v21 (copy)
-	local v28 = p1[s1]
+	if typeof(v2) == "function" then
+		p[p2] = function(...)
+			v:set(p, (v:get(p) + 1) % 1000000000000000)
 
-	if typeof(v28) == "function" then
-		p1[s1] = function(...) -- line: 105
-			-- upvalues: v21 (copy), p1 (copy), v28 (copy)
-			v21:set(p1, (v21:get(p1) + 1) % 1000000000000000)
-
-			return v28(...)
+			return v2(...)
 		end
 	end
 end
-local function cancelNotifyTimeout(t3: {[any]: any}) -- line: 119
-	-- upvalues: Boolean (copy), clearTimeout (copy)
-	if Boolean.toJSBoolean(t3.notifyTimeout) then
-		clearTimeout(t3.notifyTimeout)
-		t3.notifyTimeout = nil
+
+local function cancelNotifyTimeout(p) -- 2 equivalent calls inferred from this helper
+	if Boolean.toJSBoolean(p.notifyTimeout) then
+		clearTimeout(p.notifyTimeout)
+		p.notifyTimeout = nil
 	end
 end
 
-local t4 = {}
+local class = {}
+class.__index = class
 
-t4.__index = t4
-
-function t4.new(p2) -- line: 204
-	-- upvalues: Set (copy), v21 (copy), t4 (copy)
-	local t5 = {
-		listeners = Set.new(),
+function class.new(cache)
+	local v2 = {
+		["listeners"] = Set.new(),
 		document = nil,
 		lastRequestId = 1,
 		subscriptions = Set.new(),
 		stopped = false,
-		cache = p2,
+		cache = cache,
 		dirty = false,
 		observableQuery = nil
 	}
 
-	if not v21:has(p2) then
-		v21:set(p2, 0)
-
-		local evict = p2.evict
-
-		if typeof(evict) == "function" then
-			function p2.evict(...) -- line: 105
-				-- upvalues: v21 (copy), p2 (copy), evict (copy)
-				v21:set(p2, (v21:get(p2) + 1) % 1000000000000000)
-
-				return evict(...)
-			end
-		end
-
-		local modify = p2.modify
-
-		if typeof(modify) == "function" then
-			function p2.modify(...) -- line: 105
-				-- upvalues: v21 (copy), p2 (copy), modify (copy)
-				v21:set(p2, (v21:get(p2) + 1) % 1000000000000000)
-
-				return modify(...)
-			end
-		end
-
-		local reset = p2.reset
-
-		if typeof(reset) == "function" then
-			function p2.reset(...) -- line: 105
-				-- upvalues: v21 (copy), p2 (copy), reset (copy)
-				v21:set(p2, (v21:get(p2) + 1) % 1000000000000000)
-
-				return reset(...)
-			end
-		end
+	if not v:has(cache) then
+		v:set(cache, 0)
+		wrapDestructiveCacheMethod(cache, "evict") -- inferred equivalent call
+		wrapDestructiveCacheMethod(cache, "modify") -- inferred equivalent call
+		wrapDestructiveCacheMethod(cache, "reset") -- inferred equivalent call
 	end
 
-	return (setmetatable(t5, t4))
+	return (setmetatable(v2, class))
 end
-function t4.init(t6: {[any]: any}, t7: {[any]: any}) -- line: 230
-	-- upvalues: Boolean (copy), NetworkStatus (copy), equal (copy), Object (copy)
-	local v37 = Boolean.toJSBoolean(t7.networkStatus) and t7.networkStatus or NetworkStatus.loading
 
-	if Boolean.toJSBoolean(t6.variables) and (t6.networkStatus ~= NetworkStatus.loading and not equal(t6.variables, t7.variables)) then
-		v37 = NetworkStatus.setVariables
+function class:init(data)
+	local networkStatus3 = Boolean.toJSBoolean(data.networkStatus) and data.networkStatus or networkStatus2.loading
+
+	if
+		Boolean.toJSBoolean(self.variables)
+		and self.networkStatus ~= networkStatus2.loading
+		and not equal(self.variables, data.variables)
+	then
+		networkStatus3 = networkStatus2.setVariables
 	end
 
-	if not equal(t7.variables, t6.variables) then
-		t6.lastDiff = nil
+	if not equal(data.variables, self.variables) then
+		self.lastDiff = nil
 	end
 
-	Object.assign(t6, {
-		document = t7.document,
-		variables = t7.variables,
+	Object.assign(self, {
+		document = data.document,
+		variables = data.variables,
 		networkError = Object.None,
-		graphQLErrors = Boolean.toJSBoolean(t6.graphQLErrors) and t6.graphQLErrors or {},
-		networkStatus = v37
+		graphQLErrors = Boolean.toJSBoolean(self.graphQLErrors) and self.graphQLErrors or {},
+		networkStatus = networkStatus3
 	})
 
-	if Boolean.toJSBoolean(t7.observableQuery) then
-		t6:setObservableQuery(t7.observableQuery)
+	if Boolean.toJSBoolean(data.observableQuery) then
+		self:setObservableQuery(data.observableQuery)
 	end
 
-	if Boolean.toJSBoolean(t7.lastRequestId) then
-		t6.lastRequestId = t7.lastRequestId
+	if Boolean.toJSBoolean(data.lastRequestId) then
+		self.lastRequestId = data.lastRequestId
 	end
 
-	return t6
+	return self
 end
-function t4.reset(p3) -- line: 271
-	-- upvalues: Boolean (copy), clearTimeout (copy)
-	if Boolean.toJSBoolean(p3.notifyTimeout) then
-		clearTimeout(p3.notifyTimeout)
-		p3.notifyTimeout = nil
-	end
 
-	p3.lastDiff = nil
-	p3.dirty = false
+function class:reset()
+	cancelNotifyTimeout(self) -- inferred equivalent call
+	self.lastDiff = nil
+	self.dirty = false
 end
-function t4.getDiff(p4, p5) -- line: 277
-	-- upvalues: Boolean (copy), equal (copy)
-	if p5 == nil then
-		p5 = p4.variables
+
+function class:getDiff(variables)
+	if variables == nil then
+		variables = self.variables
 	end
 
-	local v41 = p4:getDiffOptions(p5)
+	local diffOptions = self:getDiffOptions(variables)
 
-	if Boolean.toJSBoolean(p4.lastDiff) and equal(v41, p4.lastDiff.options) then
-		return p4.lastDiff.diff
+	if Boolean.toJSBoolean(self.lastDiff) and equal(diffOptions, self.lastDiff.options) then
+		return self.lastDiff.diff
 	end
 
-	p4.variables = p5
-	p4:updateWatch(p4.variables)
+	self.variables = variables
+	self:updateWatch(self.variables)
 
-	local observableQuery = p4.observableQuery
+	local observableQuery = self.observableQuery
 
 	if Boolean.toJSBoolean(observableQuery) and observableQuery.options.fetchPolicy == "no-cache" then
-		return {
-			complete = false
-		}
+		return { complete = false }
 	end
 
-	local v43 = p4.cache:diff(v41)
-
-	p4:updateLastDiff(v43, v41)
-
-	return v43
+	local diff = self.cache:diff(diffOptions)
+	self:updateLastDiff(diff, diffOptions)
+	return diff
 end
-function t4.updateLastDiff(p6, p7, p8) -- line: 302
-	-- upvalues: Boolean (copy)
-	p6.lastDiff = Boolean.toJSBoolean(p7) and {
-		diff = p7,
-		options = Boolean.toJSBoolean(p8) and p8 or p6:getDiffOptions()
-	} or nil
+
+function class:updateLastDiff(diff, p)
+	self.lastDiff = Boolean.toJSBoolean(diff) and ({
+		diff = diff,
+		options = Boolean.toJSBoolean(p) and p or self:getDiffOptions()
+	} or nil) or nil
 end
-function t4.getDiffOptions(p9, p10) -- line: 311
-	-- upvalues: Boolean (copy)
-	if p10 == nil then
-		p10 = p9.variables
+
+function class:getDiffOptions(variables)
+	if variables == nil then
+		variables = self.variables
 	end
 
-	local observableQuery = p9.observableQuery
+	local observableQuery = self.observableQuery
 
 	return {
+		query = self.document,
+		variables = variables,
 		returnPartialData = true,
 		optimistic = true,
-		query = p9.document,
-		variables = p10,
 		canonizeResults = not Boolean.toJSBoolean(observableQuery) or observableQuery.options.canonizeResults ~= false
 	}
 end
-function t4.setDiff(p11, p12) -- line: 327
-	-- upvalues: Boolean (copy), equal (copy), setTimeout (copy)
-	local v52 = if not Boolean.toJSBoolean(p11.lastDiff) then p11.lastDiff else p11.lastDiff.diff
 
-	p11:updateLastDiff(p12)
+function class:setDiff(p)
+	local v2
 
-	local v53 = if not Boolean.toJSBoolean(v52) then v52 else v52.result
-	local v54 = if not Boolean.toJSBoolean(p12) then p12 else p12.result
+	if Boolean.toJSBoolean(self.lastDiff) then
+		v2 = self.lastDiff.diff
+	else
+		v2 = self.lastDiff
+	end
 
-	if not p11.dirty and not equal(v53, v54) then
-		p11.dirty = true
+	self:updateLastDiff(p)
 
-		if not Boolean.toJSBoolean(p11.notifyTimeout) then
-			p11.notifyTimeout = setTimeout(function() -- line: 352
-				-- upvalues: p11 (copy)
-				return p11:notify()
+	if Boolean.toJSBoolean(v2) then
+		v2 = v2.result
+	end
+
+	if Boolean.toJSBoolean(p) then
+		p = p.result
+	end
+
+	if not (self.dirty or equal(v2, p)) then
+		self.dirty = true
+
+		if not Boolean.toJSBoolean(self.notifyTimeout) then
+			self.notifyTimeout = setTimeout(function()
+				return self:notify()
 			end, 0)
 		end
 	end
 end
-function t4.setObservableQuery(p13, p14) -- line: 359
-	-- upvalues: Boolean (copy)
-	if p14 == p13.observableQuery then
+
+function class:setObservableQuery(observableQuery)
+	if observableQuery == self.observableQuery then
 		return
 	end
 
-	if Boolean.toJSBoolean(p13.oqListener) then
-		p13.listeners:delete(p13.oqListener)
+	if Boolean.toJSBoolean(self.oqListener) then
+		self.listeners:delete(self.oqListener)
 	end
 
-	p13.observableQuery = p14
+	self.observableQuery = observableQuery
 
-	if Boolean.toJSBoolean(p14) and p14 ~= nil then
-		p14.queryInfo = p13
+	if not Boolean.toJSBoolean(observableQuery) or observableQuery == nil then
+		self.oqListener = nil
 
-		function p13.oqListener() -- line: 373
-			-- upvalues: Boolean (copy), p13 (copy), p14 (copy)
-			if Boolean.toJSBoolean(p13:getDiff().fromOptimisticTransaction) then
-				p14.observe(p14)
+		return
+	end
 
-				return
-			end
-
-			p14:reobserve()
+	observableQuery.queryInfo = self
+	function self.oqListener()
+		if Boolean.toJSBoolean(self:getDiff().fromOptimisticTransaction) then
+			observableQuery.observe(observableQuery)
+		else
+			observableQuery:reobserve()
 		end
-
-		p13.listeners:add(p13.oqListener)
-
-		return
 	end
-
-	p13.oqListener = nil
+	self.listeners:add(self.oqListener)
 end
-function t4.notify(p15) -- line: 391
-	-- upvalues: Boolean (copy), clearTimeout (copy)
-	if Boolean.toJSBoolean(p15.notifyTimeout) then
-		clearTimeout(p15.notifyTimeout)
-		p15.notifyTimeout = nil
-	end
 
-	if p15:shouldNotify() then
-		p15.listeners:forEach(function(p16) -- line: 395
-			-- upvalues: p15 (copy)
-			return p16(p15)
+function class:notify()
+	cancelNotifyTimeout(self) -- inferred equivalent call
+
+	if self:shouldNotify() then
+		self.listeners:forEach(function(callback)
+			return callback(self)
 		end)
 	end
 
-	p15.dirty = false
+	self.dirty = false
 end
-function t4.shouldNotify(p17) -- line: 402
-	-- upvalues: Boolean (copy), isNetworkRequestInFlight (copy)
-	if not p17.dirty or not Boolean.toJSBoolean(p17.listeners.size) then
+
+function class:shouldNotify(): boolean
+	if not (self.dirty and Boolean.toJSBoolean(self.listeners.size)) then
 		return false
 	end
 
-	if isNetworkRequestInFlight(p17.networkStatus) and Boolean.toJSBoolean(p17.observableQuery) then
-		local fetchPolicy = p17.observableQuery.options.fetchPolicy
+	if isNetworkRequestInFlight(self.networkStatus) and Boolean.toJSBoolean(self.observableQuery) then
+		local fetchPolicy = self.observableQuery.options.fetchPolicy
 
 		if fetchPolicy ~= "cache-only" and fetchPolicy ~= "cache-and-network" then
 			return false
@@ -293,168 +262,165 @@ function t4.shouldNotify(p17) -- line: 402
 
 	return true
 end
-function t4.stop(p18) -- line: 416
-	-- upvalues: t4 (copy), Boolean (copy)
-	if not p18.stopped then
-		p18.stopped = true
-		p18:reset()
-		p18:cancel()
-		p18.cancel = t4.cancel
-		p18.subscriptions:forEach(function(p19) -- line: 426
-			return p19:unsubscribe()
+
+function class:stop()
+	if not self.stopped then
+		self.stopped = true
+
+		self:reset()
+		self:cancel()
+
+		self.cancel = class.cancel
+
+		self.subscriptions:forEach(function(object)
+			return object:unsubscribe()
 		end)
 
-		local observableQuery = p18.observableQuery
+		local observableQuery = self.observableQuery
 
 		if Boolean.toJSBoolean(observableQuery) then
 			observableQuery:stopPolling()
 		end
 	end
 end
-function t4.cancel(_) -- line: 440
-end
-function t4.updateWatch(p21, p22) -- line: 442
-	-- upvalues: Boolean (copy), Object (copy), equal (copy)
-	if p22 == nil then
-		p22 = p21.variables
+
+function class:cancel() end
+
+function class:updateWatch(p)
+	if p == nil then
+		p = self.variables
 	end
 
-	local observableQuery = p21.observableQuery
+	local observableQuery = self.observableQuery
 
 	if Boolean.toJSBoolean(observableQuery) and observableQuery.options.fetchPolicy == "no-cache" then
 		return
 	end
 
-	local v66 = Object.assign({}, p21:getDiffOptions(p22), {
-		watcher = p21,
-		callback = function(_, p24) -- line: 461
-			-- upvalues: p21 (copy)
-			return p21:setDiff(p24)
+	local lastWatch = Object.assign({}, self:getDiffOptions(p), {
+		watcher = self,
+		callback = function(_, p2)
+			return self:setDiff(p2)
 		end
 	})
-	local v67 = Object.assign({}, v66, {
-		callback = Object.None
-	})
-	local v68 = Object.assign({}, p21.lastWatch, {
-		callback = Object.None
-	})
 
-	if not Boolean.toJSBoolean(p21.lastWatch) or not equal(v67, v68) then
-		p21:cancel()
-		p21.lastWatch = v66
-		p21.cancel = p21.cache:watch(p21.lastWatch)
+	local v2 = Object.assign({}, lastWatch, { callback = Object.None })
+	local v3 = Object.assign({}, self.lastWatch, { callback = Object.None })
+
+	if not (Boolean.toJSBoolean(self.lastWatch) and equal(v2, v3)) then
+		self:cancel()
+		self.lastWatch = lastWatch
+		self.cancel = self.cache:watch(self.lastWatch)
 	end
 end
-function t4.resetLastWrite(p25) -- line: 477
-	p25.lastWrite = nil
-end
-function t4.shouldWrite(t8: {[any]: any}, p26, t9: {[any]: any}) -- line: 481
-	-- upvalues: Boolean (copy), v21 (copy), equal (copy)
-	local lastWrite = t8.lastWrite
 
-	return not (Boolean.toJSBoolean(lastWrite) and (lastWrite.dmCount == v21:get(t8.cache) and (equal(t9, lastWrite.variables) and equal(p26.data, lastWrite.result.data))))
+function class:resetLastWrite()
+	self.lastWrite = nil
 end
 
-local shouldWriteResult = nil
+function class:shouldWrite(p, p2): boolean
+	local lastWrite = self.lastWrite
 
-function t4.markResult(t10: {[any]: any}, p27, t11: {[any]: any}, n1: number) -- line: 507
-	-- upvalues: isNonEmptyArray (copy), t2 (copy), shouldWriteResult (ref), v21 (copy), Boolean (copy)
-	if isNonEmptyArray(p27.errors) then
-		t10.graphQLErrors = p27.errors
+	local v2 = Boolean.toJSBoolean(lastWrite)
+
+	if v2 then
+		if lastWrite.dmCount == v:get(self.cache) then
+			v2 = equal(p2, lastWrite.variables) and equal(p.data, lastWrite.result.data)
+		else
+			v2 = false
+		end
+	end
+
+	return not v2
+end
+
+local shouldWriteResult
+
+function class:markResult(state, data, p: number)
+	if isNonEmptyArray(state.errors) then
+		self.graphQLErrors = state.errors
 	else
-		t10.graphQLErrors = {}
+		self.graphQLErrors = {}
 	end
 
-	t10:reset()
+	self:reset()
 
-	if t11.fetchPolicy == "no-cache" then
-		t10:updateLastDiff({
-			complete = true,
-			result = p27.data
-		}, t10:getDiffOptions(t11.variables))
-
-		return
-	end
-
-	if n1 ~= t2.FORBID then
-		if shouldWriteResult(p27, t11.errorPolicy) then
-			t10.cache:performTransaction(function(p28) -- line: 529
-				-- upvalues: t10 (copy), p27 (copy), t11 (copy), n1 (copy), t2 (copy), v21 (copy), Boolean (copy)
-				if t10:shouldWrite(p27, t11.variables) then
-					p28:writeQuery({
-						query = t10.document,
-						data = p27.data,
-						variables = t11.variables,
-						overwrite = n1 == t2.OVERWRITE
+	if data.fetchPolicy == "no-cache" then
+		self:updateLastDiff({ result = state.data, complete = true }, self:getDiffOptions(data.variables))
+	elseif p ~= cacheWriteBehavior.FORBID then
+		if shouldWriteResult(state, data.errorPolicy) then
+			self.cache:performTransaction(function(object)
+				if self:shouldWrite(state, data.variables) then
+					object:writeQuery({
+						query = self.document,
+						data = state.data,
+						variables = data.variables,
+						overwrite = p == cacheWriteBehavior.OVERWRITE
 					})
-					t10.lastWrite = {
-						result = p27,
-						variables = t11.variables,
-						dmCount = v21:get(t10.cache)
-					}
-				elseif Boolean.toJSBoolean(t10.lastDiff) and Boolean.toJSBoolean(t10.lastDiff.diff.complete) then
-					p27.data = t10.lastDiff.diff.result
 
+					self.lastWrite = {
+						result = state,
+						variables = data.variables,
+						dmCount = v:get(self.cache)
+					}
+				elseif Boolean.toJSBoolean(self.lastDiff) and Boolean.toJSBoolean(self.lastDiff.diff.complete) then
+					state.data = self.lastDiff.diff.result
 					return
 				end
 
-				local v89 = t10:getDiffOptions(t11.variables)
-				local v90 = p28:diff(v89)
+				local diffOptions = self:getDiffOptions(data.variables)
+				local diff = object:diff(diffOptions)
 
-				if not t10.stopped then
-					t10:updateWatch(t11.variables)
+				if not self.stopped then
+					self:updateWatch(data.variables)
 				end
 
-				t10:updateLastDiff(v90, v89)
+				self:updateLastDiff(diff, diffOptions)
 
-				if Boolean.toJSBoolean(v90.complete) then
-					p27.data = v90.result
+				if Boolean.toJSBoolean(diff.complete) then
+					state.data = diff.result
 				end
 			end)
-
-			return
+		else
+			self.lastWrite = nil
 		end
-
-		t10.lastWrite = nil
 	end
 end
-function t4.markReady(p29) -- line: 613
-	-- upvalues: NetworkStatus (copy)
-	p29.networkError = nil
-	p29.networkStatus = NetworkStatus.ready
 
-	return p29.networkStatus
-end
-function t4.markError(p30, p31) -- line: 619
-	-- upvalues: NetworkStatus (copy), Boolean (copy)
-	p30.networkStatus = NetworkStatus.error
-	p30.lastWrite = nil
-	p30:reset()
-
-	if Boolean.toJSBoolean(p31.graphQLErrors) then
-		p30.graphQLErrors = p31.graphQLErrors
-	end
-
-	if Boolean.toJSBoolean(p31.networkError) then
-		p30.networkError = p31.networkError
-	end
-
-	return p31
+function class:markReady()
+	self.networkError = nil
+	self.networkStatus = networkStatus2.ready
+	return self.networkStatus
 end
 
-t1.QueryInfo = t4
+function class:markError(p)
+	self.networkStatus = networkStatus2.error
+	self.lastWrite = nil
 
-function shouldWriteResult(p32, p33) -- line: 637
-	-- upvalues: graphQLResultHasError (copy), Boolean (copy)
-	if p33 == nil then
-		p33 = "none"
+	self:reset()
+
+	if Boolean.toJSBoolean(p.graphQLErrors) then
+		self.graphQLErrors = p.graphQLErrors
 	end
 
-	local v83 = p33 == "ignore" or p33 == "all"
+	if Boolean.toJSBoolean(p.networkError) then
+		self.networkError = p.networkError
+	end
 
-	return not graphQLResultHasError(p32) or (not v83 or not not Boolean.toJSBoolean(p32.data))
+	return p
 end
 
-t1.shouldWriteResult = shouldWriteResult
+QueryInfo.QueryInfo = class
 
-return t1
+shouldWriteResult = function(state, errorPolicy)
+	local v2 = errorPolicy == nil and "none" or errorPolicy
+
+	local v3 = v2 == "ignore" or v2 == "all"
+	local v4 = not graphQLResultHasError(state)
+
+	return not v4 and v3 and Boolean.toJSBoolean(state.data) and true or v4
+end
+
+QueryInfo.shouldWriteResult = shouldWriteResult
+
+return QueryInfo

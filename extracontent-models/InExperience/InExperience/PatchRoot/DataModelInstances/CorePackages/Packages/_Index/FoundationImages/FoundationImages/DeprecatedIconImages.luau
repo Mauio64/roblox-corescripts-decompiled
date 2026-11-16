@@ -1,26 +1,35 @@
-local scriptParent = script.Parent
-local GetDeprecatedIconImageSetData = require(scriptParent.Deprecated.GetDeprecatedIconImageSetData)
-local StaticFallbackImages = require(scriptParent.Deprecated.StaticFallbackImages)
-local v4 = GetDeprecatedIconImageSetData((require(scriptParent.getResolutionScale)()))
-local scriptParentParent = scriptParent.Parent
-local uiblox = require(scriptParentParent.BuilderIcons).Migration.uiblox
-local whitelistedIconAssets = require(scriptParent.whitelistedIconAssets)
-local t1 = {}
+local parent = script.Parent
 
-for v9, v10 in v4 do
-	if uiblox[v9] and whitelistedIconAssets[v9] == nil then
-		local t2 = {}
+local GetDeprecatedIconImageSetData = require(parent.Deprecated.GetDeprecatedIconImageSetData)
+local StaticFallbackImages = require(parent.Deprecated.StaticFallbackImages)
 
-		for v12, v13 in v10 do
-			if v12 == "ImageSet" then
-				t2.Image = StaticFallbackImages[v13]
-			else
-				t2[v12] = v13
-			end
-		end
+local getResolutionScale = require(parent.getResolutionScale)
 
-		t1[v9] = t2
+local deprecatedIconImageSetData = GetDeprecatedIconImageSetData((getResolutionScale()))
+
+local parent2 = parent.Parent
+local BuilderIcons = require(parent2.BuilderIcons)
+local uiblox = BuilderIcons.Migration.uiblox
+local whitelistedIconAssets = require(parent.whitelistedIconAssets)
+
+local DeprecatedIconImages = {}
+
+for k, v in deprecatedIconImageSetData do
+	if not (uiblox[k] and whitelistedIconAssets[k] == nil) then
+		continue
 	end
+
+	local v2 = {}
+
+	for k2, v3 in v do
+		if k2 == "ImageSet" then
+			v2.Image = StaticFallbackImages[v3]
+		else
+			v2[k2] = v3
+		end
+	end
+
+	DeprecatedIconImages[k] = v2
 end
 
-return t1
+return DeprecatedIconImages

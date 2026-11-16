@@ -1,5 +1,1 @@
-return {
-	Limited = "Limited",
-	LimitedUnique = "LimitedUnique",
-	Collectible = "Collectible"
-}
+return { Limited = "Limited", LimitedUnique = "LimitedUnique", Collectible = "Collectible" }

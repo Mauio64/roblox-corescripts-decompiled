@@ -1,12 +1,13 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local Cryo = require(SocialCarouselParent.Cryo)
-local React = require(SocialCarouselParent.React)
-local RoactUtils = require(SocialCarouselParent.RoactUtils)
-local NavigationRodux = require(SocialCarouselParent.NavigationRodux)
-local RobloxAppEnums = require(SocialCarouselParent.RobloxAppEnums)
-local Navigation = require(SocialCarouselParent.Navigation)
-local SocialStopwatch = require(SocialCarouselParent.SocialStopwatch)
+local parent = SocialCarousel.Parent
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local NavigationRodux = require(parent.NavigationRodux)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local Navigation = require(parent.Navigation)
+local SocialStopwatch = require(parent.SocialStopwatch)
+
 local AppPage = RobloxAppEnums.AppPage
 local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
@@ -16,52 +17,48 @@ local useSocialCarouselAnalytics = require(SocialCarousel.Analytics.useSocialCar
 local useSocialCarouselContext = require(SocialCarousel.Contexts.useSocialCarouselContext)
 local Constants = require(SocialCarousel.Common.Constants)
 local useNewFriendRequestsCount = require(SocialCarousel.Hooks.useNewFriendRequestsCount)
-local FFlagCreateConnectionsHub = require(SocialCarouselParent.SharedFlags).FFlagCreateConnectionsHub
-local FFlagSignalsNavP3Dispatch = require(SocialCarouselParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v21 = if not FFlagSignalsNavP3Dispatch then nil else require(SocialCarouselParent.RobloxAppNavigation).NavigationCommands
 
-local function AddFriendsTileContainer(t1: {[any]: any}) -- line: 31
-	-- upvalues: useNavigation (copy), useDispatch (copy), useSocialCarouselAnalytics (copy), useSocialCarouselContext (copy), useNewFriendRequestsCount (copy), React (copy), SocialStopwatch (copy), FFlagCreateConnectionsHub (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v21 (copy), NavigateDown (copy), Constants (copy), AddFriendsTile (copy), Cryo (copy)
-	local v24 = useNavigation()
-	local v25 = useDispatch()
-	local v26 = useSocialCarouselAnalytics()
-	local v27 = useSocialCarouselContext()
-	local v28 = useNewFriendRequestsCount()
-	local v29 = React.useCallback(function() -- line: 37
-		-- upvalues: v26 (copy), t1 (copy), SocialStopwatch (copy), FFlagCreateConnectionsHub (copy), v24 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v21 (copy), v25 (copy), NavigateDown (copy)
-		v26.addFriendsPressed(t1.index)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagCreateConnectionsHub = SharedFlags.FFlagCreateConnectionsHub
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags2.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local function AddFriendsTileContainer(p)
+	local v = useNavigation()
+	local v2 = useDispatch()
+	local v3 = useSocialCarouselAnalytics()
+	local v4 = useSocialCarouselContext()
+	local badge = useNewFriendRequestsCount()
+	local onActivated = React.useCallback(function()
+		v3.addFriendsPressed(p.index)
 		SocialStopwatch.Stopwatch.start(SocialStopwatch.Events.AFPUserTileLoadFromHomeCarousel)
 
 		if FFlagCreateConnectionsHub then
-			v24.navigate(AppPage.CoHubAddConnections)
-
-			return
-		end
-
-		if FFlagSignalsNavP3Dispatch then
-			v21.down(v21.fromLegacyPage({
+			v.navigate(AppPage.CoHubAddConnections)
+		elseif FFlagSignalsNavP3Dispatch then
+			navigationCommands.down(navigationCommands.fromLegacyPage({
 				name = AppPage.AddFriendsPage
 			}))
-
-			return
+		else
+			v2(NavigateDown({ name = AppPage.AddFriendsPage }))
 		end
+	end, { v2, v })
 
-		v25(NavigateDown({
-			name = AppPage.AddFriendsPage
-		}))
-	end, {
-		v25,
-		v24
-	})
-
-	React.useEffect(function() -- line: 49
-		-- upvalues: v27 (copy), Constants (copy)
-		v27.onSuccessfulRender(Constants.ANALYTICS.UI_LOADING_EVENTS.ADD_FRIENDS)
+	React.useEffect(function()
+		v4.onSuccessfulRender(Constants.ANALYTICS.UI_LOADING_EVENTS.ADD_FRIENDS)
 	end, {})
 
-	return React.createElement(AddFriendsTile, Cryo.Dictionary.join(t1, {
-		onActivated = v29,
-		badge = v28
+	return React.createElement(AddFriendsTile, Cryo.Dictionary.join(p, {
+		onActivated = onActivated,
+		badge = badge
 	}))
 end
 

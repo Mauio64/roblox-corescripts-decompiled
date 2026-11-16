@@ -1,23 +1,24 @@
-local Parent = script:FindFirstAncestor("EditProfile").Parent
-local RoactAppExperiment = require(Parent.RoactAppExperiment)
-local v3 = game:DefineFastString("RealNamesInDisplayNamesIXP_v1", "Social.DisplayNameSetting")
-local v4 = game:DefineFastString("RealNamesInDisplayNamesExperimentDefinition", "can_see_real_names")
-local v5 = game:DefineFastFlag("RealNamesInDisplayNamesEnabledForAll", false)
+local parent = script:FindFirstAncestor("EditProfile").Parent
+local RoactAppExperiment = require(parent.RoactAppExperiment)
+
+local defineFastString = game:DefineFastString("RealNamesInDisplayNamesIXP_v1", "Social.DisplayNameSetting")
+
+local defineFastString2 = game:DefineFastString("RealNamesInDisplayNamesExperimentDefinition", "can_see_real_names")
+local defineFastFlag = game:DefineFastFlag("RealNamesInDisplayNamesEnabledForAll", false)
+
 local useUserExperiment = RoactAppExperiment.useUserExperiment
 
-local function v7(p1) -- line: 12
-	-- upvalues: v5 (copy), v3 (copy), v4 (copy)
-	if v5 then
+local function fn(options): boolean
+	if defineFastFlag then
 		return true
 	end
 
-	return ((p1 or {})[v3] or {})[v4] == true
+	return ((options or {})[defineFastString] or {})[defineFastString2] == true
 end
 
 return {
-	isExperimentEnabled = v7,
-	useIsExperimentEnabled = function(t1: {[any]: any}) -- line: 25
-		-- upvalues: useUserExperiment (copy), v3 (copy), v7 (copy)
-		return useUserExperiment({ v3 }, v7, t1.isExposureEnabled)
+	isExperimentEnabled = fn,
+	useIsExperimentEnabled = function(p)
+		return useUserExperiment({ defineFastString }, fn, p.isExposureEnabled)
 	end
 }

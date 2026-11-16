@@ -1,164 +1,162 @@
-local t1 = {}
+local MessageLabelCreator = {}
+
 local Chat = game:GetService("Chat")
 local ClientChatModules = Chat:WaitForChild("ClientChatModules")
 local MessageCreatorModules = ClientChatModules:WaitForChild("MessageCreatorModules")
 local Util = require(MessageCreatorModules:WaitForChild("Util"))
-local scriptParent = script.Parent
-
+local parent = script.Parent
 require(ClientChatModules:WaitForChild("ChatSettings"))
+local ObjectPool = require(parent:WaitForChild("ObjectPool"))
+require(parent:WaitForChild("MessageSender"))
 
-local ObjectPool = require(scriptParent:WaitForChild("ObjectPool"))
+local class = {}
+class.__index = class
 
-require(scriptParent:WaitForChild("MessageSender"))
-
-local t2 = {}
-
-t2.__index = t2
-
-function mergeProps(p1, p2) -- line: 26
-	if not p1 then
+function mergeProps(items, p)
+	if not items then
 		return
 	end
 
-	for k, v in pairs(p1) do
-		p2[k] = v
+	for k, item in pairs(items) do
+		p[k] = item
 	end
 end
-function ReturnToObjectPoolRecursive(p3, p4) -- line: 33
-	local children = p3:GetChildren()
+
+function ReturnToObjectPoolRecursive(instance, object)
+	local children = instance:GetChildren()
 
 	for i = 1, #children do
-		ReturnToObjectPoolRecursive(children[i], p4)
+		ReturnToObjectPoolRecursive(children[i], object)
 	end
 
-	p3.Parent = nil
-	p4:ReturnInstance(p3)
+	instance.Parent = nil
+	object:ReturnInstance(instance)
 end
-function GetMessageCreators() -- line: 42
-	-- upvalues: MessageCreatorModules (copy), Util (copy)
-	local t3 = {}
+
+function GetMessageCreators()
 	local children = MessageCreatorModules:GetChildren()
+	local messageCreators = {}
 
 	for i = 1, #children do
-		if children[i]:IsA("ModuleScript") and children[i].Name ~= "Util" then
-			local lib = require(children[i])
-
-			t3[lib[Util.KEY_MESSAGE_TYPE]] = lib[Util.KEY_CREATOR_FUNCTION]
+		if not (children[i]:IsA("ModuleScript") and children[i].Name ~= "Util") then
+			continue
 		end
+
+		local module = require(children[i])
+		messageCreators[module[Util.KEY_MESSAGE_TYPE]] = module[Util.KEY_CREATOR_FUNCTION]
 	end
 
-	return t3
+	return messageCreators
 end
-function t2.WrapIntoMessageObject(p5, p6, p7) -- line: 56
-	-- upvalues: Util (copy)
-	local v24 = p7[Util.KEY_BASE_FRAME]
-	local v25 = nil
+
+function class:WrapIntoMessageObject(p, p2)
+	local baseFrame = p2[Util.KEY_BASE_FRAME]
+	local baseMessage
 
 	if Util.KEY_BASE_MESSAGE then
-		v25 = p7[Util.KEY_BASE_MESSAGE]
+		baseMessage = p2[Util.KEY_BASE_MESSAGE]
 	end
 
-	local v26 = p7[Util.KEY_UPDATE_TEXT_FUNC]
-	local v27 = p7[Util.KEY_GET_HEIGHT]
-	local v28 = p7[Util.KEY_FADE_IN]
-	local v29 = p7[Util.KEY_FADE_OUT]
-	local v30 = p7[Util.KEY_UPDATE_ANIMATION]
+	local v = p2[Util.KEY_UPDATE_TEXT_FUNC]
+	local getHeightFunction = p2[Util.KEY_GET_HEIGHT]
+	local fadeInFunction = p2[Util.KEY_FADE_IN]
+	local fadeOutFunction = p2[Util.KEY_FADE_OUT]
+	local updateAnimFunction = p2[Util.KEY_UPDATE_ANIMATION]
 
 	return {
-		ID = p6.ID,
-		BaseFrame = v24,
-		BaseMessage = v25,
-		UpdateTextFunction = v26 or function() -- line: 73
+		["ID"] = p.ID,
+		BaseFrame = baseFrame,
+		BaseMessage = baseMessage,
+		UpdateTextFunction = v or function()
 			warn("NO MESSAGE RESIZE FUNCTION")
 		end,
-		GetHeightFunction = v27,
-		FadeInFunction = v28,
-		FadeOutFunction = v29,
-		UpdateAnimFunction = v30,
-		ObjectPool = p5.ObjectPool,
+		GetHeightFunction = getHeightFunction,
+		FadeInFunction = fadeInFunction,
+		FadeOutFunction = fadeOutFunction,
+		UpdateAnimFunction = updateAnimFunction,
+		ObjectPool = self.ObjectPool,
 		Destroyed = false,
-		Destroy = function(p8) -- line: 81
-			ReturnToObjectPoolRecursive(p8.BaseFrame, p8.ObjectPool)
-			p8.Destroyed = true
+		Destroy = function(state)
+			ReturnToObjectPoolRecursive(state.BaseFrame, state.ObjectPool)
+			state.Destroyed = true
 		end
 	}
 end
-function t2.CreateMessageLabel_Chat(p9, p10, p11, p12) -- line: 89
-	-- upvalues: Chat (copy)
-	p10.Channel = p11
 
-	local u35 = nil
-
-	pcall(function() -- line: 92
-		-- upvalues: u35 (ref), Chat (copy), p10 (copy)
-		u35 = Chat:InvokeChatCallback(Enum.ChatCallbackType.OnClientFormattingMessage, p10)
+function class:CreateMessageLabel_Chat(state, channel, p)
+	state.Channel = channel
+	local v = nil
+	pcall(function()
+		v = Chat:InvokeChatCallback(Enum.ChatCallbackType.OnClientFormattingMessage, state)
 	end)
-	p10.ExtraData = p10.ExtraData or {}
-	mergeProps(u35, p10.ExtraData)
+	state.ExtraData = state.ExtraData or {}
+	local mergeProps = mergeProps
+	local v2 = v
+	mergeProps(v2, state.ExtraData)
 
-	local MessageType = p10.MessageType
+	local messageType = state.MessageType
 
-	if p9.MessageCreators[MessageType] then
-		local v37 = p9.MessageCreators[MessageType](p10, p11, p12)
+	if self.MessageCreators[messageType] then
+		local v3 = self.MessageCreators[messageType](state, channel, p)
 
-		if v37 then
-			return p9:WrapIntoMessageObject(p10, v37)
+		if v3 then
+			return self:WrapIntoMessageObject(state, v3)
 		end
-	elseif p9.DefaultCreatorType then
-		local v38 = p9.MessageCreators[p9.DefaultCreatorType](p10, p11, p12)
+	elseif self.DefaultCreatorType then
+		local v3 = self.MessageCreators[self.DefaultCreatorType](state, channel, p)
 
-		if v38 then
-			return p9:WrapIntoMessageObject(p10, v38)
+		if v3 then
+			return self:WrapIntoMessageObject(state, v3)
 		end
 	else
-		error("No message creator available for message type: " .. MessageType)
+		error("No message creator available for message type: " .. messageType)
 	end
 end
-function t2.CreateMessageLabel(p13, p14, p15) -- line: 114
-	-- upvalues: Chat (copy)
-	p14.Channel = p15
 
-	local u42 = nil
-
-	pcall(function() -- line: 118
-		-- upvalues: u42 (ref), Chat (copy), p14 (copy)
-		u42 = Chat:InvokeChatCallback(Enum.ChatCallbackType.OnClientFormattingMessage, p14)
+function class:CreateMessageLabel(state, channel)
+	state.Channel = channel
+	local v = nil
+	pcall(function()
+		v = Chat:InvokeChatCallback(Enum.ChatCallbackType.OnClientFormattingMessage, state)
 	end)
-	p14.ExtraData = p14.ExtraData or {}
-	mergeProps(u42, p14.ExtraData)
+	state.ExtraData = state.ExtraData or {}
+	local mergeProps = mergeProps
+	local v2 = v
+	mergeProps(v2, state.ExtraData)
 
-	local MessageType = p14.MessageType
+	local messageType = state.MessageType
 
-	if p13.MessageCreators[MessageType] then
-		local v44 = p13.MessageCreators[MessageType](p14, p15)
+	if self.MessageCreators[messageType] then
+		local v3 = self.MessageCreators[messageType](state, channel)
 
-		if v44 then
-			return p13:WrapIntoMessageObject(p14, v44)
+		if v3 then
+			return self:WrapIntoMessageObject(state, v3)
 		end
-	elseif p13.DefaultCreatorType then
-		local v45 = p13.MessageCreators[p13.DefaultCreatorType](p14, p15)
+	elseif self.DefaultCreatorType then
+		local v3 = self.MessageCreators[self.DefaultCreatorType](state, channel)
 
-		if v45 then
-			return p13:WrapIntoMessageObject(p14, v45)
+		if v3 then
+			return self:WrapIntoMessageObject(state, v3)
 		end
 	else
-		error("No message creator available for message type: " .. MessageType)
+		error("No message creator available for message type: " .. messageType)
 	end
 end
-function t1.new() -- line: 143
-	-- upvalues: t2 (copy), ObjectPool (copy), Util (copy)
-	local self = setmetatable({}, t2)
+
+function MessageLabelCreator.new()
+	local self = setmetatable({}, class)
 
 	self.ObjectPool = ObjectPool.new(50)
 	self.MessageCreators = GetMessageCreators()
 	self.DefaultCreatorType = Util.DEFAULT_MESSAGE_CREATOR
+
 	Util:RegisterObjectPool(self.ObjectPool)
 
 	return self
 end
-function t1.GetStringTextBounds(_, p17, p18, p19, p20) -- line: 155
-	-- upvalues: Util (copy)
-	return Util:GetStringTextBounds(p17, p18, p19, p20)
+
+function MessageLabelCreator:GetStringTextBounds(p, p2, p3, p4)
+	return Util:GetStringTextBounds(p, p2, p3, p4)
 end
 
-return t1
+return MessageLabelCreator

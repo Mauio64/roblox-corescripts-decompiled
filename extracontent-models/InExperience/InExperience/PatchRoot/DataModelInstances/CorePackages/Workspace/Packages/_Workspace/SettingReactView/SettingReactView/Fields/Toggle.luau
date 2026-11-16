@@ -1,28 +1,23 @@
-local Parent = script:FindFirstAncestor("SettingReactView").Parent
+local parent = script:FindFirstAncestor("SettingReactView").Parent
 
-require(Parent.SettingsService)
+require(parent.SettingsService)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local toggle = Foundation.Toggle
 
-local React = require(Parent.React)
-local Toggle = require(Parent.Foundation).Toggle
-
-return function(p1) -- line: 16
-	-- upvalues: React (copy), Toggle (copy)
-	local v5, v6 = React.useState(p1.onChanged:get())
-
-	p1.onChanged:connect(function(b1: boolean) -- line: 18
-		-- upvalues: v6 (copy)
-		v6(b1)
+return function(p)
+	local state, setState = React.useState(p.onChanged:get())
+	p.onChanged:connect(function(flag: boolean)
+		setState(flag)
 	end)
+	local onActivated = React.useCallback(function()
+		p.onChanged:set(not state)
+	end, { state })
 
-	local v7 = React.useCallback(function() -- line: 21
-		-- upvalues: p1 (copy), v5 (copy)
-		p1.onChanged:set(not v5)
-	end, { v5 })
-
-	return React.createElement(Toggle, {
+	return React.createElement(toggle, {
 		label = "",
 		isDisabled = false,
-		isChecked = v5,
-		onActivated = v7
+		isChecked = state,
+		onActivated = onActivated
 	})
 end

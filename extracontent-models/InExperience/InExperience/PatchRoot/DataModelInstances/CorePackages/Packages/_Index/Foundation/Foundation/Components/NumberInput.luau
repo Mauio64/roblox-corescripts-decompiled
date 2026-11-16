@@ -1,1 +1,3 @@
-return (require(script.NumberInput))
+local NumberInput = require(script.NumberInput)
+
+return NumberInput

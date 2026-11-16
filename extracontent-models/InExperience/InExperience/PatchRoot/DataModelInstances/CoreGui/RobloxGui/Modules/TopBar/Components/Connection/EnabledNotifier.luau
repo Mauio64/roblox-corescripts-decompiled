@@ -1,53 +1,63 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local t = require(CorePackages.Packages.t)
-local ParentParent = script.Parent.Parent.Parent
 
-if require(ParentParent.Flags.FFlagTopBarDeprecateDisplayOptionsRodux) then
+local parent = script.Parent.Parent.Parent
+local FFlagTopBarDeprecateDisplayOptionsRodux = require(parent.Flags.FFlagTopBarDeprecateDisplayOptionsRodux)
+
+if FFlagTopBarDeprecateDisplayOptionsRodux then
 	return nil
 end
 
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local ChatSelector = require(RobloxGui.Modules.ChatSelector)
-local FFlagEnableNewBackpack = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableNewBackpack
-local v10 = if FFlagEnableNewBackpack then nil else require(RobloxGui.Modules.BackpackScript)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableNewBackpack = SharedFlags.FFlagEnableNewBackpack
+local BackpackScript
+
+if FFlagEnableNewBackpack then
+	BackpackScript = nil
+else
+	BackpackScript = require(RobloxGui.Modules.BackpackScript)
+end
+
 local EmotesMenuMaster = require(RobloxGui.Modules.EmotesMenu.EmotesMenuMaster)
 local PlayerListManager = require(RobloxGui.Modules.PlayerList.PlayerListManager)
-local v13 = Roact.PureComponent:extend("CoreGuiCEnabledNotifieronnector")
 
-v13.validateProps = t.strictInterface({
-	topBarEnabled = t.boolean
-})
+local extended = Roact.PureComponent:extend("CoreGuiCEnabledNotifieronnector")
 
-function v13.notifyEnabled(p1) -- line: 29
-	-- upvalues: PlayerListManager (copy), ChatSelector (copy), FFlagEnableNewBackpack (copy), v10 (copy), EmotesMenuMaster (copy)
-	PlayerListManager:SetTopBarEnabled(p1.props.topBarEnabled)
-	ChatSelector:TopbarEnabledChanged(p1.props.topBarEnabled)
+extended.validateProps = t.strictInterface({ topBarEnabled = t.boolean })
 
-	if not FFlagEnableNewBackpack and v10 then
-		v10:TopbarEnabledChanged(p1.props.topBarEnabled)
+function extended:notifyEnabled()
+	PlayerListManager:SetTopBarEnabled(self.props.topBarEnabled)
+	ChatSelector:TopbarEnabledChanged(self.props.topBarEnabled)
+
+	if not FFlagEnableNewBackpack and BackpackScript then
+		BackpackScript:TopbarEnabledChanged(self.props.topBarEnabled)
 	end
 
-	EmotesMenuMaster:setTopBarEnabled(p1.props.topBarEnabled)
+	EmotesMenuMaster:setTopBarEnabled(self.props.topBarEnabled)
 end
-function v13.didMount(p2) -- line: 38
-	p2:notifyEnabled()
+
+function extended:didMount()
+	self:notifyEnabled()
 end
-function v13.render(_) -- line: 42
+
+function extended.render(_): nil
 	return nil
 end
-function v13.didUpdate(p4, p5, _) -- line: 46
-	if p4.props.topBarEnabled ~= p5.topBarEnabled then
-		p4:notifyEnabled()
+
+function extended:didUpdate(p, _)
+	if self.props.topBarEnabled ~= p.topBarEnabled then
+		self:notifyEnabled()
 	end
 end
 
-local function mapStateToProps(p7) -- line: 52
-	return {
-		topBarEnabled = p7.displayOptions.topbarEnabled
-	}
+local function mapStateToProps(p)
+	return { topBarEnabled = p.displayOptions.topbarEnabled }
 end
 
-return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(v13)
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(extended)

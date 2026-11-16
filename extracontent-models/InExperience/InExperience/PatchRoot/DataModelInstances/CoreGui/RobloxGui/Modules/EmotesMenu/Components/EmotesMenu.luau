@@ -4,59 +4,68 @@ local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
+
 local VRService = game:GetService("VRService")
 local CoreGui = game:GetService("CoreGui")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Actions = scriptParentParent.Actions
-local Thunks = scriptParentParent.Thunks
-local HideMenu = require(Actions.HideMenu)
-local SetLayout = require(Actions.SetLayout)
-local ShowError = require(Actions.ShowError)
-local HideError = require(Actions.HideError)
-local OpenMenu = require(Thunks.OpenMenu)
-local EmotesWheel = require(scriptParent.EmotesWheel)
-local ErrorMessage = require(scriptParent.ErrorMessage)
-local Constants = require(scriptParentParent.Constants)
+
+local parent = script.Parent
+local parent2 = parent.Parent
+local actions = parent2.Actions
+local thunks = parent2.Thunks
+
+local HideMenu = require(actions.HideMenu)
+local SetLayout = require(actions.SetLayout)
+local ShowError = require(actions.ShowError)
+local HideError = require(actions.HideError)
+
+local OpenMenu = require(thunks.OpenMenu)
+
+local EmotesWheel = require(parent.EmotesWheel)
+local ErrorMessage = require(parent.ErrorMessage)
+
+local Constants = require(parent2.Constants)
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = nil
-local v26 = Roact.PureComponent:extend("EmotesMenu")
+local playerGui = nil
 
-function v26.init(p1) -- line: 39
-	p1.savedSelectedCoreObject = nil
-	p1.savedSelectedObject = nil
+local extended = Roact.PureComponent:extend("EmotesMenu")
+
+function extended:init()
+	self.savedSelectedCoreObject = nil
+	self.savedSelectedObject = nil
 end
-function v26.displayVisitShopMessage(p2) -- line: 44
-	-- upvalues: RobloxTranslator (copy), Constants (copy)
-	local locale = p2.props.locale
-	local v32 = RobloxTranslator:FormatByKeyForLocale(Constants.LocalizationKeys.VisitShopToGetEmotes, locale)
 
-	p2.props.showError(v32)
-	delay(Constants.ErrorDisplayTimeSeconds, function() -- line: 48
-		-- upvalues: p2 (copy)
-		p2.props.hideError()
+function extended.displayVisitShopMessage(p)
+	local locale = p.props.locale
+	local formatByKeyForLocale = RobloxTranslator:FormatByKeyForLocale(
+		Constants.LocalizationKeys.VisitShopToGetEmotes,
+		locale
+	)
+	p.props.showError(formatByKeyForLocale)
+	delay(Constants.ErrorDisplayTimeSeconds, function()
+		p.props.hideError()
 	end)
 end
-function v26.bindActions(p3) -- line: 53
-	-- upvalues: GuiService (copy), UserInputService (copy), ContextActionService (copy), Constants (copy)
-	local function toggleMenuFunc(_, p5, _) -- line: 54
-		-- upvalues: GuiService (copy), UserInputService (copy), p3 (copy)
-		if GuiService.MenuIsOpen then
+
+function extended:bindActions()
+	local function toggleMenuFunc(_, p, _)
+		if
+			GuiService.MenuIsOpen
+			or (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift))
+		then
 			return Enum.ContextActionResult.Pass
 		end
 
-		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then
-			return Enum.ContextActionResult.Pass
-		end
-
-		if p5 == Enum.UserInputState.Begin then
-			if p3.props.displayOptions.menuVisible then
-				p3.props.hideMenu()
+		if p == Enum.UserInputState.Begin then
+			if self.props.displayOptions.menuVisible then
+				self.props.hideMenu()
 			else
-				p3.props.openMenu()
+				self.props.openMenu()
 			end
 		end
 
@@ -65,194 +74,202 @@ function v26.bindActions(p3) -- line: 53
 
 	ContextActionService:BindAction(Constants.ToggleMenuAction, toggleMenuFunc, false, Constants.EmoteMenuOpenKey)
 end
-function v26.unbindActions(_) -- line: 84
-	-- upvalues: ContextActionService (copy), Constants (copy)
+
+function extended:unbindActions()
 	ContextActionService:UnbindAction(Constants.ToggleMenuAction)
 end
-function v26.saveSelectedObject(p8) -- line: 88
-	-- upvalues: GuiService (copy)
-	p8.savedSelectedCoreObject = GuiService.SelectedCoreObject
+
+function extended:saveSelectedObject()
+	self.savedSelectedCoreObject = GuiService.SelectedCoreObject
 	GuiService.SelectedCoreObject = nil
-	p8.savedSelectedObject = GuiService.SelectedObject
+	self.savedSelectedObject = GuiService.SelectedObject
 	GuiService.SelectedObject = nil
 end
-function v26.resetSelectedObject(p9) -- line: 95
-	-- upvalues: GuiService (copy), CoreGui (copy), PlayerGui (ref), LocalPlayer (copy)
-	if GuiService.SelectedCoreObject == nil and (p9.savedSelectedCoreObject == nil or p9.savedSelectedCoreObject:IsDescendantOf(CoreGui)) then
-		GuiService.SelectedCoreObject = p9.savedSelectedCoreObject
+
+function extended:resetSelectedObject()
+	if
+		GuiService.SelectedCoreObject == nil
+		and (self.savedSelectedCoreObject == nil or self.savedSelectedCoreObject:IsDescendantOf(CoreGui))
+	then
+		GuiService.SelectedCoreObject = self.savedSelectedCoreObject
 	end
 
 	if GuiService.SelectedObject == nil then
-		if PlayerGui == nil then
-			PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+		if playerGui == nil then
+			playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
 		end
 
-		if not not PlayerGui and (p9.savedSelectedObject == nil or p9.savedSelectedObject:IsDescendantOf(PlayerGui)) then
-			GuiService.SelectedObject = p9.savedSelectedObject
+		local v
+
+		if playerGui then
+			v = self.savedSelectedObject == nil or self.savedSelectedObject:IsDescendantOf(playerGui)
+		else
+			v = false
+		end
+
+		if v then
+			GuiService.SelectedObject = self.savedSelectedObject
 		end
 	end
 end
-function v26.viewPortSizeChanged(p10) -- line: 119
-	-- upvalues: Constants (copy), Workspace (copy)
-	if p10.props.layout == Constants.Layout.TenFoot then
+
+function extended:viewPortSizeChanged()
+	if self.props.layout == Constants.Layout.TenFoot then
 		return
 	end
 
-	local CurrentCamera = Workspace.CurrentCamera
+	local currentCamera = Workspace.CurrentCamera
 
-	if not CurrentCamera then
+	if not currentCamera then
 		return
 	end
 
-	local ViewportSize = CurrentCamera.ViewportSize
+	local viewportSize = currentCamera.ViewportSize
 
-	if ViewportSize == Vector2.new(1, 1) then
+	if viewportSize == Vector2.new(1, 1) then
 		return
 	end
 
-	local Large = Constants.Layout.Large
-	local v42 = ViewportSize.X < Constants.SmallScreenMaxSize.X
-	local v43 = ViewportSize.Y < Constants.SmallScreenMaxSize.Y
+	local v = Constants.Layout.Large
 
-	if v42 or v43 then
-		Large = Constants.Layout.Small
+	local v2 = viewportSize.X < Constants.SmallScreenMaxSize.X
+	local v3 = viewportSize.Y < Constants.SmallScreenMaxSize.Y
+
+	if v2 or v3 then
+		v = Constants.Layout.Small
 	end
 
-	p10.props.setLayout(Large)
+	self.props.setLayout(v)
 end
-function v26.currentCameraChanged(p11) -- line: 147
-	-- upvalues: Workspace (copy)
-	if p11.viewportSizeChangedConn then
-		p11.viewportSizeChangedConn:Disconnect()
+
+function extended:currentCameraChanged()
+	if self.viewportSizeChangedConn then
+		self.viewportSizeChangedConn:Disconnect()
 	end
 
-	local CurrentCamera = Workspace.CurrentCamera
+	local currentCamera = Workspace.CurrentCamera
 
-	if CurrentCamera then
-		p11.viewportSizeChangedConn = CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 154
-			-- upvalues: p11 (copy)
-			p11:viewPortSizeChanged()
+	if currentCamera then
+		self.viewportSizeChangedConn = currentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+			self:viewPortSizeChanged()
 		end)
-		p11:viewPortSizeChanged()
+		self:viewPortSizeChanged()
 	end
 end
-function v26.didMount(p12) -- line: 161
-	-- upvalues: Workspace (copy), GuiService (copy), VRService (copy), UserInputService (copy)
-	p12.currentCameraChangedConn = Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() -- line: 162
-		-- upvalues: p12 (copy)
-		p12:currentCameraChanged()
+
+function extended:didMount()
+	self.currentCameraChangedConn = Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+		self:currentCameraChanged()
 	end)
-	p12:currentCameraChanged()
-	p12.menuOpenedConn = GuiService.MenuOpened:Connect(function() -- line: 167
-		-- upvalues: p12 (copy), VRService (copy)
-		if p12.props.displayOptions.menuVisible and not VRService.VREnabled then
-			p12.props.hideMenu()
+	self:currentCameraChanged()
+
+	self.menuOpenedConn = GuiService.MenuOpened:Connect(function()
+		if self.props.displayOptions.menuVisible and not VRService.VREnabled then
+			self.props.hideMenu()
 		end
 	end)
-	p12.inputOutsideMenuConn = UserInputService.InputBegan:Connect(function(input, gameProcessed) -- line: 173
-		-- upvalues: p12 (copy)
-		if gameProcessed then
+
+	self.inputOutsideMenuConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed or not self.props.displayOptions.menuVisible then
 			return
 		end
 
-		if not p12.props.displayOptions.menuVisible then
-			return
-		end
+		local userInputType = input.UserInputType
 
-		local UserInputType = input.UserInputType
-
-		if UserInputType == Enum.UserInputType.MouseButton1 or UserInputType == Enum.UserInputType.Touch then
-			p12.props.hideMenu()
+		if userInputType == Enum.UserInputType.MouseButton1 or userInputType == Enum.UserInputType.Touch then
+			self.props.hideMenu()
 		end
 	end)
-	p12:bindActions()
+
+	self:bindActions()
 end
-function v26.willUnmount(p13) -- line: 193
-	p13.currentCameraChangedConn:Disconnect()
-	p13.viewportSizeChangedConn:Disconnect()
-	p13.menuOpenedConn:Disconnect()
-	p13.inputOutsideMenuConn:Disconnect()
-	p13.currentCameraChangedConn = nil
-	p13.viewportSizeChangedConn = nil
-	p13.menuOpenedConn = nil
-	p13.inputOutsideMenuConn = nil
-	p13:unbindActions()
+
+function extended:willUnmount()
+	self.currentCameraChangedConn:Disconnect()
+	self.viewportSizeChangedConn:Disconnect()
+	self.menuOpenedConn:Disconnect()
+	self.inputOutsideMenuConn:Disconnect()
+
+	self.currentCameraChangedConn = nil
+	self.viewportSizeChangedConn = nil
+	self.menuOpenedConn = nil
+	self.inputOutsideMenuConn = nil
+
+	self:unbindActions()
 end
-function v26.didUpdate(p14, p15, _) -- line: 207
-	if p14.props.displayOptions.menuVisible ~= p15.displayOptions.menuVisible then
-		if p14.props.displayOptions.menuVisible then
-			p14:saveSelectedObject()
 
-			return
+function extended:didUpdate(p, _)
+	if self.props.displayOptions.menuVisible ~= p.displayOptions.menuVisible then
+		if self.props.displayOptions.menuVisible then
+			self:saveSelectedObject()
+		else
+			self:resetSelectedObject()
 		end
-
-		p14:resetSelectedObject()
 	end
 end
-function v26.render(p17) -- line: 217
-	-- upvalues: Constants (copy), Roact (copy), EmotesWheel (copy), ErrorMessage (copy)
-	local v52 = Constants.Layouts[p17.props.layout]
-	local guiInset = p17.props.displayOptions.guiInset
+
+function extended.render(p)
+	local layout = Constants.Layouts[p.props.layout]
+	local guiInset = p.props.displayOptions.guiInset
 
 	return Roact.createElement("Frame", {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		AutoLocalize = false,
 		Position = UDim2.new(0, 0, 0, -guiInset),
 		Size = UDim2.new(1, 0, 1, guiInset),
-		ZIndex = Constants.EmotesMenuZIndex
+		ZIndex = Constants.EmotesMenuZIndex,
+		AutoLocalize = false
 	}, {
-		Main = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = Constants.ScreenAvailable
-		}, {
-			AsspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
-				AspectRatio = 1
-			}),
-			SizeConstraint = Roact.createElement("UISizeConstraint", {
-				MinSize = v52.EmotesWheelMinSize,
-				MaxSize = v52.EmotesWheelMaxSize
-			}),
-			EmotesWheel = Roact.createElement(EmotesWheel)
-		}),
+		Main = Roact.createElement(
+			"Frame",
+			{
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Size = Constants.ScreenAvailable,
+				BackgroundTransparency = 1
+			},
+			{
+				AsspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+					AspectRatio = 1
+				}),
+				SizeConstraint = Roact.createElement("UISizeConstraint", {
+					MinSize = layout.EmotesWheelMinSize,
+					MaxSize = layout.EmotesWheelMaxSize
+				}),
+				EmotesWheel = Roact.createElement(EmotesWheel)
+			}
+		),
 		ErrorMessage = Roact.createElement(ErrorMessage)
 	})
 end
 
-local function mapStateToProps(p18) -- line: 251
+local function mapStateToProps(data)
 	return {
-		displayOptions = p18.displayOptions,
-		emotesInfo = p18.emotesPage.emotesInfo,
-		layout = p18.layout,
-		locale = p18.locale
+		displayOptions = data.displayOptions,
+		emotesInfo = data.emotesPage.emotesInfo,
+		layout = data.layout,
+		locale = data.locale
 	}
 end
-local function mapDispatchToProps(p19) -- line: 260
-	-- upvalues: OpenMenu (copy), HideMenu (copy), SetLayout (copy), ShowError (copy), HideError (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		openMenu = function() -- line: 262
-			-- upvalues: p19 (copy), OpenMenu (copy)
-			return p19(OpenMenu())
+		openMenu = function()
+			return callback(OpenMenu())
 		end,
-		hideMenu = function() -- line: 266
-			-- upvalues: p19 (copy), HideMenu (copy)
-			return p19(HideMenu())
+		hideMenu = function()
+			return callback(HideMenu())
 		end,
-		setLayout = function(p20) -- line: 270
-			-- upvalues: p19 (copy), SetLayout (copy)
-			return p19(SetLayout(p20))
+		setLayout = function(p)
+			return callback(SetLayout(p))
 		end,
-		showError = function(p21) -- line: 274
-			-- upvalues: p19 (copy), ShowError (copy)
-			return p19(ShowError(p21))
+		showError = function(p)
+			return callback(ShowError(p))
 		end,
-		hideError = function() -- line: 278
-			-- upvalues: p19 (copy), HideError (copy)
-			return p19(HideError())
+		hideError = function()
+			return callback(HideError())
 		end
 	}
 end
 
-return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v26)
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(extended)

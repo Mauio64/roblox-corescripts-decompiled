@@ -1,66 +1,68 @@
 local CorePackages = game:GetService("CorePackages")
 local React = require(CorePackages.Packages.React)
 local HttpRequest = require(CorePackages.Packages.HttpRequest)
-local FFlagLuaAppDefaultHttpRetry = require(CorePackages.Workspace.Packages.SharedFlags).FFlagLuaAppDefaultHttpRetry
-local v5 = HttpRequest.config({
-	requestFunction = function(p1, p2, p3) -- line: 7
-		-- upvalues: HttpRequest (copy)
-		return HttpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
+local config = HttpRequest.config
+local v = {
+	requestFunction = function(p, p2, p3)
+		return HttpRequest.requestFunctions.HttpRbxApi(p, p2, p3)
 	end,
-	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("WithReferralRewardTooltipInfoHttpRetryCount", 4)
-})
-local Url = require(CorePackages.Workspace.Packages.Http).Url
-local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+	maxRetryCount = 0
+}
+local maxRetryCount
+
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("WithReferralRewardTooltipInfoHttpRetryCount", 4)
+end
+
+v.maxRetryCount = maxRetryCount
+local v2 = config(v)
+
+local Http = require(CorePackages.Workspace.Packages.Http)
+local Url = Http.Url
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local Cryo = require(CorePackages.Packages.Cryo)
 
-function GetReferralRewardTooltipInfo() -- line: 19
-	-- upvalues: Url (copy), v5 (copy)
-	local v12 = Url:makeQueryString({
-		UniverseId = game.GameId
-	})
-	local v13 = string.format("%sreferral-reward-metadata/v1/get-reward-metadata?%s", Url.APIS_URL, v12)
+function GetReferralRewardTooltipInfo()
+	local queryString = Url:makeQueryString({ UniverseId = game.GameId })
 
-	return v5(v13, "GET")
+	return v2(string.format("%sreferral-reward-metadata/v1/get-reward-metadata?%s", Url.APIS_URL, queryString), "GET")
 end
-function withReferralRewardTooltipInfo(p4) -- line: 27
-	-- upvalues: Cryo (copy), React (copy), useLocalization (copy)
-	return function(p5) -- line: 28
-		-- upvalues: Cryo (copy), React (copy), useLocalization (copy), p4 (copy)
-		local v16 = Cryo.Dictionary.join(p5, {
-			referralRewardTooltipText = ""
-		})
-		local v17, v18 = React.useState("")
 
-		React.useEffect(function() -- line: 33
-			-- upvalues: v18 (copy)
-			GetReferralRewardTooltipInfo():andThen(function(p6) -- line: 34
-				-- upvalues: v18 (copy)
-				if p6 and (p6.responseBody and p6.responseBody.name) then
-					v18(p6.responseBody.name)
-					task.delay(4, function() -- line: 37
-						-- upvalues: v18 (copy)
-						v18("")
+function withReferralRewardTooltipInfo(p)
+	return function(p2)
+		local joined = Cryo.Dictionary.join(p2, { referralRewardTooltipText = "" })
+
+		local state, setState = React.useState("")
+		React.useEffect(function()
+			GetReferralRewardTooltipInfo():andThen(function(p3)
+				if p3 and p3.responseBody and p3.responseBody.name then
+					setState(p3.responseBody.name)
+					task.delay(4, function()
+						setState("")
 					end)
 				end
-			end):catch(function(p7) -- line: 41
-				warn(p7)
+			end):catch(function(p3)
+				warn(p3)
 			end)
 		end, {})
-
-		local v19 = useLocalization({
+		local v3 = useLocalization({
 			referralRewardTooltipText = {
 				"CoreScripts.TopBar.RobloxMenuReferralRewardTooltip",
-				referralRewardName = v17
+				referralRewardName = state
 			}
 		})
 
-		if v17 ~= "" then
-			v16 = Cryo.Dictionary.join(v16, {
-				referralRewardTooltipText = v19.referralRewardTooltipText
+		if state ~= "" then
+			joined = Cryo.Dictionary.join(joined, {
+				referralRewardTooltipText = v3.referralRewardTooltipText
 			})
 		end
 
-		return React.createElement(p4, v16)
+		return React.createElement(p, joined)
 	end
 end
 

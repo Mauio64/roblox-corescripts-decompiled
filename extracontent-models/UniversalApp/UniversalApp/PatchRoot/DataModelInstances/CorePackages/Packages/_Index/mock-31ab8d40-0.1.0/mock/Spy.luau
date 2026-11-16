@@ -1,42 +1,34 @@
 local symbols = require(script.Parent.symbols)
-local t1 = {}
 
-t1.__index = t1
+local Spy = {}
+Spy.__index = Spy
 
-local t2 = {}
+local v = {}
+setmetatable(v, { __mode = "kv" })
 
-setmetatable(t2, {
-	__mode = "kv"
-})
+function Spy.new(callback)
+	local v2 = { [symbols.Calls] = {} }
 
-function t1.new(p1) -- line: 12
-	-- upvalues: symbols (copy), t1 (copy), t2 (copy)
-	local t3 = {
-		[symbols.Calls] = {}
-	}
+	setmetatable(v2, Spy)
 
-	setmetatable(t3, t1)
-
-	local function v6(...) -- line: 18
-		-- upvalues: p1 (copy), t3 (copy), symbols (copy)
-		local t4 = {
+	local function fn(...)
+		local v3 = {
 			args = table.pack(...),
-			result = table.pack(p1(...))
+			result = table.pack(callback(...))
 		}
 
-		table.insert(t3[symbols.Calls], t4)
-
-		return table.unpack(t4.result)
+		table.insert(v2[symbols.Calls], v3)
+		return table.unpack(v3.result)
 	end
 
-	t3.inner = v6
-	t2[v6] = t3
+	v2.inner = fn
+	v[fn] = v2
 
-	return t3, v6
-end
-function t1.lookup(p2) -- line: 33
-	-- upvalues: t2 (copy)
-	return t2[p2]
+	return v2, fn
 end
 
-return t1
+function Spy.lookup(p)
+	return v[p]
+end
+
+return Spy

@@ -1,21 +1,28 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.LuauPolyfill)
 
-require(scriptParent.LuauPolyfill)
+local Headers = require(script.Headers)
+local headers = Headers.Headers
 
-local Headers = require(script.Headers).Headers
-local Request = require(script.Request).Request
-local Response = require(script.Response).Response
-local Body = require(script.Body).Body
+local Request = require(script.Request)
+local request = Request.Request
+
+local Response = require(script.Response)
+local response = Response.Response
+
+local Body = require(script.Body)
+local body = Body.Body
+
 local fetch = require(script.fetch)
-local v7 = fetch(game:GetService("HttpService"))
-local AbortSignal = require(script.AbortSignal).AbortSignal
+local fetch2 = fetch(game:GetService("HttpService"))
 
+local AbortSignal = require(script.AbortSignal)
 return {
-	Headers = Headers,
-	Request = Request,
-	Response = Response,
-	Body = Body,
-	fetch = v7,
+	Headers = headers,
+	Request = request,
+	Response = response,
+	Body = body,
+	fetch = fetch2,
 	buildFetch = fetch,
-	AbortSignal = AbortSignal
+	AbortSignal = AbortSignal.AbortSignal
 }

@@ -1,252 +1,256 @@
-local t1 = {}
-local n1 = 0
-local u3 = nil
-local u4 = nil
-local n2 = -1
-local u6 = nil
-local n3 = -1
-local u8 = false
-local u9 = false
-local u10 = false
-local u11 = false
-local ParentParent = script.Parent.Parent.Parent
-local console = require(ParentParent.Shared).console
-local disabledLog = require(ParentParent.Shared).ConsolePatchingDev.disabledLog
+local Mock = {}
 
-function t1.requestHostCallback(p1: ((...any) -> ...any)) -- line: 28
-	-- upvalues: u3 (ref)
-	u3 = p1
-end
-function t1.cancelHostCallback() -- line: 32
-	-- upvalues: u3 (ref)
-	u3 = nil
-end
-function t1.requestHostTimeout(p2: ((...any) -> ...any), n4: number) -- line: 36
-	-- upvalues: u4 (ref), n2 (ref), n1 (ref)
-	u4 = p2
-	n2 = n1 + n4
-end
-function t1.cancelHostTimeout() -- line: 41
-	-- upvalues: u4 (ref), n2 (ref)
-	u4 = nil
-	n2 = -1
-end
-function t1.shouldYieldToHost() -- line: 46
-	-- upvalues: u6 (ref), n3 (ref), u11 (ref), u10 (ref), u8 (ref)
-	local v18 = u6
+local total = 0
+local v = nil
+local v2 = nil
+local v3 = -1
+local v4 = nil
+local v5 = -1
+local v6 = false
+local flag = false
+local v7 = false
+local v8 = false
+local parent = script.Parent.Parent.Parent
+local Shared = require(parent.Shared)
+local console = Shared.console
+local Shared2 = require(parent.Shared)
+local disabledLog = Shared2.ConsolePatchingDev.disabledLog
 
-	if n3 ~= -1 and (v18 ~= nil and #v18 >= n3) or u11 and u10 then
-		u8 = true
+function Mock.requestHostCallback(callback)
+	v = callback
+end
 
-		return true
+function Mock.cancelHostCallback()
+	v = nil
+end
+
+function Mock.requestHostTimeout(callback, p: number)
+	v2 = callback
+	v3 = total + p
+end
+
+function Mock.cancelHostTimeout()
+	v2 = nil
+	v3 = -1
+end
+
+function Mock.shouldYieldToHost(): boolean
+	local v9 = v4
+
+	if v5 == -1 or v9 == nil then
+		if v8 and v7 then
+			v6 = true
+			return true
+		end
+
+		return false
+	else
+		local v10 = #v9
+
+		if v5 <= v10 then
+			v6 = true
+			return true
+		end
+
+		if v8 and v7 then
+			v6 = true
+			return true
+		end
+
+		return false
 	end
+end
 
-	return false
+function Mock.getCurrentTime()
+	return total
 end
-function t1.getCurrentTime() -- line: 65
-	-- upvalues: n1 (ref)
-	return n1
-end
-function t1.forceFrameRate() -- line: 69
-end
-function t1.reset() -- line: 73
-	-- upvalues: u9 (ref), n1 (ref), u3 (ref), u4 (ref), n2 (ref), u6 (ref), n3 (ref), u8 (ref), u10 (ref)
-	if u9 then
+
+function Mock.forceFrameRate() end
+
+function Mock.reset()
+	if flag then
 		error("Cannot reset while already flushing work.")
 	end
 
-	n1 = 0
-	u3 = nil
-	u4 = nil
-	n2 = -1
-	u6 = nil
-	n3 = -1
-	u8 = false
-	u9 = false
-	u10 = false
+	total = 0
+	v = nil
+	v2 = nil
+	v3 = -1
+	v4 = nil
+	v5 = -1
+	v6 = false
+	flag = false
+	v7 = false
 end
-function t1.unstable_flushNumberOfYields(n5: number) -- line: 90
-	-- upvalues: u9 (ref), u3 (ref), n3 (ref), n1 (ref), u8 (ref)
-	if u9 then
+
+function Mock.unstable_flushNumberOfYields(p: number)
+	if flag then
 		error("Already flushing work.")
 	end
 
-	if u3 ~= nil then
-		local v20 = u3
+	if v ~= nil then
+		local v9 = v
+		v5 = p
+		flag = true
 
-		n3 = n5
-		u9 = true
-
-		local ok, result = pcall(function() -- line: 100
-			-- upvalues: v20 (copy), n1 (ref), u8 (ref), u3 (ref)
-			local v34
+		local success, result = pcall(function()
+			local v10
 
 			repeat
-				v34 = v20(true, n1)
-			until not v34 or u8
+				v10 = v9(true, total)
+			until not v10 or v6
 
-			if not v34 then
-				u3 = nil
+			if not v10 then
+				v = nil
 			end
 		end)
 
-		n3 = -1
-		u8 = false
-		u9 = false
+		v5 = -1
+		v6 = false
+		flag = false
 
-		if not ok then
+		if not success then
 			error(result)
 		end
 	end
 end
-function t1.unstable_flushUntilNextPaint() -- line: 121
-	-- upvalues: u9 (ref), u3 (ref), u11 (ref), u10 (ref), n1 (ref), u8 (ref)
-	if u9 then
+
+function Mock.unstable_flushUntilNextPaint()
+	if flag then
 		error("Already flushing work.")
 	end
 
-	if u3 ~= nil then
-		local v23 = u3
+	if v ~= nil then
+		local v9 = v
+		v8 = true
+		v7 = false
+		flag = true
 
-		u11 = true
-		u10 = false
-		u9 = true
-
-		local ok, result = pcall(function() -- line: 132
-			-- upvalues: v23 (copy), n1 (ref), u8 (ref), u3 (ref)
-			local v35
+		local success, result = pcall(function()
+			local v10
 
 			repeat
-				v35 = v23(true, n1)
-			until not v35 or u8
+				v10 = v9(true, total)
+			until not v10 or v6
 
-			if not v35 then
-				u3 = nil
+			if not v10 then
+				v = nil
 			end
 		end)
 
-		u11 = false
-		u8 = false
-		u9 = false
+		v8 = false
+		v6 = false
+		flag = false
 
-		if not ok then
+		if not success then
 			error(result)
 		end
 	end
 end
-function t1.unstable_flushExpired() -- line: 154
-	-- upvalues: u9 (ref), u3 (ref), n1 (ref)
-	if u9 then
+
+function Mock.unstable_flushExpired()
+	if flag then
 		error("Already flushing work.")
 	end
 
-	if u3 ~= nil then
-		u9 = true
-
-		local ok, result = pcall(function() -- line: 160
-			-- upvalues: u3 (ref), n1 (ref)
-			if not u3(false, n1) then
-				u3 = nil
+	if v ~= nil then
+		flag = true
+		local success, result = pcall(function()
+			if not v(false, total) then
+				v = nil
 			end
 		end)
 
-		u9 = false
+		flag = false
 
-		if not ok then
+		if not success then
 			error(result)
 		end
 	end
 end
-function t1.unstable_flushAllWithoutAsserting() -- line: 178
-	-- upvalues: u9 (ref), u3 (ref), n1 (ref)
-	if u9 then
+
+function Mock.unstable_flushAllWithoutAsserting(): boolean
+	if flag then
 		error("Already flushing work.")
 	end
 
-	if u3 ~= nil then
-		local v28 = u3
-
-		u9 = true
-
-		local ok, result = pcall(function() -- line: 186
-			-- upvalues: v28 (copy), n1 (ref), u3 (ref)
-			local v36
-
-			repeat
-				v36 = v28(true, n1)
-			until not v36
-
-			if not v36 then
-				u3 = nil
-			end
-		end)
-
-		u9 = false
-
-		if not ok then
-			error(result)
-		end
-
-		return true
+	if v == nil then
+		return false
 	end
 
-	return false
+	local v9 = v
+	flag = true
+	local success, result = pcall(function()
+		local v10
+
+		repeat
+			v10 = v9(true, total)
+		until not v10
+
+		if not v10 then
+			v = nil
+		end
+	end)
+
+	flag = false
+
+	if not success then
+		error(result)
+	end
+
+	return true
 end
-function t1.unstable_clearYields() -- line: 209
-	-- upvalues: u6 (ref)
-	if u6 == nil then
+
+function Mock.unstable_clearYields()
+	if v4 == nil then
 		return {}
 	end
 
-	local v31 = u6
-
-	u6 = nil
-
-	return v31
+	local v9 = v4
+	v4 = nil
+	return v9
 end
-function t1.unstable_flushAll() -- line: 218
-	-- upvalues: u6 (ref), t1 (copy)
-	if u6 ~= nil then
+
+function Mock.unstable_flushAll()
+	if v4 ~= nil then
 		error("Log is not empty. Assert on the log of yielded values before flushing additional work.")
 	end
 
-	t1.unstable_flushAllWithoutAsserting()
+	Mock.unstable_flushAllWithoutAsserting()
 
-	if u6 ~= nil then
+	if v4 ~= nil then
 		error("While flushing work, something yielded a value. Use an assertion helper to assert on the log of yielded values, e.g. expect(Scheduler).toFlushAndYield([...])")
 	end
 end
-function t1.unstable_yieldValue(p3) -- line: 235
-	-- upvalues: console (copy), disabledLog (copy), u6 (ref)
+
+function Mock.unstable_yieldValue(p)
 	if console.log == disabledLog then
 		return
 	end
 
-	if u6 == nil then
-		u6 = { p3 }
-
-		return
+	if v4 == nil then
+		v4 = { p }
+	else
+		table.insert(v4, p)
 	end
-
-	table.insert(u6, p3)
 end
-function t1.unstable_advanceTime(n6: number) -- line: 252
-	-- upvalues: console (copy), disabledLog (copy), n1 (ref), u4 (ref), n2 (ref)
+
+function Mock.unstable_advanceTime(p: number)
 	if console.log == disabledLog then
 		return
 	end
 
-	n1 += n6
+	total += p
 
-	if u4 ~= nil and n2 <= n1 then
-		u4(n1)
-		n2 = -1
-		u4 = nil
+	if v2 ~= nil and v3 <= total then
+		v2(total)
+		v3 = -1
+		v2 = nil
 	end
 end
-function t1.requestPaint() -- line: 271
-	-- upvalues: u10 (ref)
-	u10 = true
+
+function Mock.requestPaint()
+	v7 = true
 end
 
-return t1
+return Mock

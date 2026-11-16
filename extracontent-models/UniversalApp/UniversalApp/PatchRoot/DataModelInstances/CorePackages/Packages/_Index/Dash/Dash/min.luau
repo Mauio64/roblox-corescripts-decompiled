@@ -1,47 +1,27 @@
-local scriptParent = script.Parent
-local reduce = require(scriptParent.reduce)
+local parent = script.Parent
+local reduce = require(parent.reduce)
 
-local function v3(p1, p2) -- line: 8
-	return p1 < p2
+local function fn(p, p2): boolean
+	return p < p2
 end
-local function min(t1: {[any]: any}, p3: ((...any) -> ...any)?, p4: ((...any) -> ...any)?) -- line: 48
-	-- upvalues: v3 (copy), reduce (copy)
-	local v10 = p4 or v3
 
-	if p3 then
-		return reduce(t1, function(p5, p6, p7) -- line: 52
-			-- upvalues: p3 (copy), v10 (copy)
-			local v14 = p3(p6, p7)
+local function min(p, callback, callback2)
+	local v = callback2 or fn
 
-			if not p5 then
-				return {
-					value = v14,
-					original = p6
-				}
+	if callback then
+		return reduce(p, function(p2, original, p3)
+			local v2 = callback(original, p3)
+
+			if not p2 or v(v2, p2.value) then
+				return { value = v2, original = original }
 			end
 
-			if v10(v14, p5.value) then
-				return {
-					value = v14,
-					original = p6
-				}
-			end
-
-			return p5
+			return p2
 		end, nil).original
 	end
 
-	return reduce(t1, function(p8, p9) -- line: 62
-		-- upvalues: v10 (copy)
-		if not p8 then
-			return p9
-		end
-
-		if v10(p9, p8) then
-			return p9
-		end
-
-		return p8
+	return reduce(p, function(p2, p3)
+		return if not p2 or v(p3, p2) then p3 else p2
 	end, nil)
 end
 

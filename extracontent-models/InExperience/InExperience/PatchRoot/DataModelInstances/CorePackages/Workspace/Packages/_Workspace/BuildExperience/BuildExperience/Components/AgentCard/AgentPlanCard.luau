@@ -1,131 +1,171 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local Markdown = require(BuildExperienceParent.Markdown)
-local React = require(BuildExperienceParent.React)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local Markdown = require(parent.Markdown)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
 local AgentCard = require(script.Parent.AgentCard)
 local AgentCardActions = require(script.Parent.AgentCardActions)
 local getMarkdownRendererProps = require(BuildExperience.utils.getMarkdownRendererProps)
+local ChatCardPriority = require(BuildExperience.Components.Chat.ChatCardEmphasis.ChatCardPriority)
+local useChatCardEmphasis = require(BuildExperience.Components.Chat.ChatCardEmphasis.useChatCardEmphasis)
+local FFlagBuildExperienceChatCardEmphasis = require(BuildExperience.Flags.FFlagBuildExperienceChatCardEmphasis)
+
 local Button = Foundation.Button
 local Sheet = Foundation.Sheet
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
+
 local MarkdownViewer = Markdown.Components.MarkdownViewer
 
-local function AgentPlanSheet(t1: {[any]: any}) -- line: 42
-	-- upvalues: Foundation (copy), React (copy), getMarkdownRendererProps (copy), Sheet (copy), FoundationText (copy), View (copy), LocalizationStrings (copy), MarkdownViewer (copy)
-	local v21 = Foundation.Hooks.useTokens()
-	local Default = v21.Color.Content.Default
-	local v23 = React.useMemo(function() -- line: 45
-		-- upvalues: getMarkdownRendererProps (copy), v21 (copy), Default (copy)
-		return getMarkdownRendererProps(v21, Default)
-	end, {
-		v21,
-		Default
-	})
+local function AgentPlanSheet(props)
+	local v = useLocalization({ overview = LocalizationStrings.AGENT_PLAN_OVERVIEW })
+
+	local v2 = Foundation.Hooks.useTokens()
+	local default = v2.Color.Content.Default
+	local markdownRendererProps = React.useMemo(function()
+		return getMarkdownRendererProps(v2, default)
+	end, { v2, default })
 
 	return React.createElement(Sheet.Root, {
+		isOpen = props.isOpen,
+		onClose = props.onClose,
+		snapPoints = { 0.5, 1 },
 		defaultSnapPointIndex = 1,
-		isOpen = t1.isOpen,
-		onClose = t1.onClose,
-		snapPoints = {
-			0.5,
-			1
-		},
-		testId = t1.testId
+		testId = props.testId
 	}, {
 		Header = React.createElement(Sheet.Header, nil, {
-			Title = React.createElement(FoundationText, {
+			Title = React.createElement(Text, {
 				LayoutOrder = 1,
-				tag = "size-full-0 auto-y margin-x-small padding-y-small text-heading-small text-wrap text-align-x-left content-emphasis",
-				Text = t1.title
+				Text = props.title,
+				tag = "size-full-0 auto-y margin-x-small padding-y-small text-heading-small text-wrap text-align-x-left content-emphasis"
 			})
 		}),
 		Content = React.createElement(Sheet.Content, nil, {
-			OverviewAndBody = React.createElement(View, {
-				tag = "col gap-xsmall size-full-0 auto-y margin-x-small padding-bottom-large"
-			}, {
-				Overview = React.createElement(FoundationText, {
-					LayoutOrder = 1,
-					tag = "size-full-0 auto-y text-title-medium text-wrap text-align-x-left content-default",
-					Text = LocalizationStrings.AGENT_PLAN_OVERVIEW
-				}),
-				Body = React.createElement(MarkdownViewer, {
-					Markdown = t1.textContent,
-					WrapperProps = {
-						LayoutOrder = 2,
-						tag = "size-full-0 auto-y text-body-medium content-emphasis",
-						testId = `{ t1.testId }-text-content`
-					},
-					MarkdownRendererProps = v23
-				})
-			})
+			OverviewAndBody = React.createElement(
+				View,
+				{ tag = "col gap-xsmall size-full-0 auto-y margin-x-small padding-bottom-large" },
+				{
+					Overview = React.createElement(Text, {
+						LayoutOrder = 1,
+						Text = v.overview,
+						tag = "size-full-0 auto-y text-title-medium text-wrap text-align-x-left content-default"
+					}),
+					Body = React.createElement(MarkdownViewer, {
+						Markdown = props.textContent,
+						WrapperProps = {
+							LayoutOrder = 2,
+							tag = "size-full-0 auto-y text-body-medium content-emphasis",
+							testId = `{props.testId}-text-content`
+						},
+						MarkdownRendererProps = markdownRendererProps
+					})
+				}
+			)
 		})
 	})
 end
-local function AgentPlanCard(t2: {[any]: any}) -- line: 91
-	-- upvalues: React (copy), AgentCard (copy), AgentCardActions (copy), Button (copy), LocalizationStrings (copy), InputSize (copy), ButtonVariant (copy), FillBehavior (copy), AgentPlanSheet (copy)
-	local v25 = t2.testId or "agent-plan-card"
-	local v26, v27 = React.useState(false)
-	local v28 = React.useCallback(function() -- line: 95
-		-- upvalues: t2 (copy)
-		if t2.isBuildDisabled == true then
+
+local function AgentPlanCard(props)
+	local v = useLocalization({
+		build = LocalizationStrings.AGENT_PLAN_BUILD,
+		view = LocalizationStrings.AGENT_PLAN_VIEW
+	})
+
+	local testId = props.testId or "agent-plan-card"
+	local state, setState = React.useState(false)
+	local v2
+
+	if FFlagBuildExperienceChatCardEmphasis then
+		local v3
+
+		if props.isBuildDisabled ~= true then
+			v3 = ChatCardPriority.AgentProposal
+		end
+
+		v2 = useChatCardEmphasis(v3)
+	end
+
+	local onActivated = React.useCallback(function()
+		if props.isBuildDisabled == true then
 			return
 		end
 
-		t2.onBuild()
-	end, {
-		t2.isBuildDisabled,
-		t2.onBuild
-	})
-	local v29 = React.useCallback(function() -- line: 102
-		-- upvalues: v27 (copy)
-		v27(true)
-	end, {})
-	local v30 = React.useCallback(function() -- line: 106
-		-- upvalues: v27 (copy)
-		v27(false)
+		props.onBuild()
+	end, { props.isBuildDisabled, props.onBuild })
+
+	local onActivated2 = React.useCallback(function()
+		setState(true)
 	end, {})
 
-	return React.createElement(React.Fragment, nil, {
-		Card = React.createElement(AgentCard, {
-			title = t2.title,
-			textContent = t2.summary or t2.textContent,
-			layoutOrder = t2.layoutOrder,
-			testId = v25
-		}, {
-			Actions = React.createElement(AgentCardActions, nil, {
-				Build = React.createElement(Button, {
-					LayoutOrder = 1,
-					text = LocalizationStrings.AGENT_PLAN_BUILD,
-					size = InputSize.Small,
-					variant = ButtonVariant.Emphasis,
-					fillBehavior = FillBehavior.Fill,
-					isDisabled = t2.isBuildDisabled == true,
-					onActivated = v28,
-					testId = `{ v25 }-build-button`
-				}),
+	local onClose = React.useCallback(function()
+		setState(false)
+	end, {})
+
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local createElement2 = React.createElement
+	local v3 = {
+		title = props.title,
+		textContent = props.summary or props.textContent,
+		layoutOrder = props.layoutOrder,
+		testId = testId
+	}
+
+	local createElement3 = React.createElement
+	local createElement4 = React.createElement
+	local v4 = {
+		LayoutOrder = 1,
+		text = v.build,
+		size = InputSize.Small,
+		variant = 0,
+		fillBehavior = 0,
+		isDisabled = 0,
+		onActivated = 0,
+		testId = 0
+	}
+	local variant
+
+	if v2 == false then
+		variant = ButtonVariant.SoftEmphasis
+	else
+		variant = ButtonVariant.Emphasis
+	end
+
+	v4.variant = variant
+	v4.fillBehavior = FillBehavior.Fill
+	v4.isDisabled = props.isBuildDisabled == true
+	v4.onActivated = onActivated
+	v4.testId = `{testId}-build-button`
+	return createElement(fragment, nil, {
+		Card = createElement2(AgentCard, v3, {
+			Actions = createElement3(AgentCardActions, nil, {
+				Build = createElement4(Button, v4),
 				View = React.createElement(Button, {
 					LayoutOrder = 2,
-					text = LocalizationStrings.AGENT_PLAN_VIEW,
+					text = v.view,
 					size = InputSize.Small,
 					variant = ButtonVariant.Standard,
 					fillBehavior = FillBehavior.Fill,
-					onActivated = v29,
-					testId = `{ v25 }-view-button`
+					onActivated = onActivated2,
+					testId = `{testId}-view-button`
 				})
 			})
 		}),
 		Sheet = React.createElement(AgentPlanSheet, {
-			title = t2.title,
-			textContent = t2.textContent,
-			isOpen = v26,
-			onClose = v30,
-			testId = `{ v25 }-sheet`
+			title = props.title,
+			textContent = props.textContent,
+			isOpen = state,
+			onClose = onClose,
+			testId = `{testId}-sheet`
 		})
 	})
 end

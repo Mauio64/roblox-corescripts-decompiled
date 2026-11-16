@@ -1,20 +1,15 @@
-local v1 = game:DefineFastFlag("DevConsoleDownArrowIconFix", false)
-local v2 = game:DefineFastFlag("SlimDevConsole2", false)
+local defineFastFlag = game:DefineFastFlag("DevConsoleDownArrowIconFix", false)
+local defineFastFlag2 = game:DefineFastFlag("SlimDevConsole2", false)
 
 return {
 	MainWindowInit = {
-		Transparency = 0.36,
 		Position = UDim2.new(0.5, -486, 0.02, 16),
 		Size = UDim2.new(0, 992, 0.96, -32),
+		Transparency = 0.36,
 		Padding = UDim.new(0, 5),
 		MinSize = Vector2.new(400, 250)
 	},
-	FormFactor = {
-		Large = 0,
-		Middle = 1,
-		Small = 2,
-		Console = 3
-	},
+	FormFactor = { Large = 0, Middle = 1, Small = 2, Console = 3 },
 	Color = {
 		Black = Color3.fromRGB(0, 0, 0),
 		BaseGray = Color3.fromRGB(30, 30, 30),
@@ -55,14 +50,9 @@ return {
 		FilterUnfilled = "rbxasset://textures/DevConsole/Filter-stroke.png",
 		FilterFilled = "rbxasset://textures/DevConsole/Filter-filled.png",
 		RightArrow = "rbxasset://textures/DevConsole/Arrow.png",
-		DownArrow = not v1 and "rbxasset://textures/TerrainTools/button_arrow_down.png" or "rbxasset://textures/DevConsole/ArrowDown.png"
+		DownArrow = defineFastFlag and "rbxasset://textures/DevConsole/ArrowDown.png" or "rbxasset://textures/TerrainTools/button_arrow_down.png"
 	},
-	Padding = {
-		WindowPadding = 8,
-		TabRow = 24,
-		LinePadding = 2,
-		MemoryIndent = 24
-	},
+	Padding = { WindowPadding = 8, TabRow = 24, LinePadding = 2, MemoryIndent = 24 },
 	DefaultFontSize = {
 		TopBar = 18,
 		TabBar = 20,
@@ -81,11 +71,13 @@ return {
 		MainWindowBold = Enum.Font.SourceSansBold,
 		MainWindowHeader = Enum.Font.SourceSansBold,
 		Log = Enum.Font.Code,
-		Search = Enum.Font.Code
+		Search = Enum.Font.Code,
+		Mono = Enum.Font.Code
 	},
 	GeneralFormatting = {
 		NoResultSearchStr = "Did not find results for \"%s.\"",
 		LineWidth = 1,
+		LineColor = Color3.new(1, 1, 1),
 		ArrowWidth = 8,
 		MainRowPadding = 8,
 		LineGraphHeight = 200,
@@ -94,13 +86,9 @@ return {
 		DropDownEntryHeight = 40,
 		DropDownEntryWidth = 375,
 		DropDownArrowHeight = 12,
-		NumberInputTextSize = 14,
-		LineColor = Color3.new(1, 1, 1)
+		NumberInputTextSize = 14
 	},
-	TopBarFormatting = {
-		BarTransparency = 0.64,
-		FrameHeight = 30
-	},
+	TopBarFormatting = { BarTransparency = 0.64, FrameHeight = 30 },
 	TabRowFormatting = {
 		TabDropDownWidth = 144,
 		FrameHeight = 40,
@@ -132,32 +120,17 @@ return {
 		[Enum.MessageType.MessageWarning.Value] = "Warning",
 		[Enum.MessageType.MessageError.Value] = "Error"
 	},
-	MsgTypeNamesOrdered = {
-		"Output",
-		"Information",
-		"Warning",
-		"Error"
-	},
+	MsgTypeNamesOrdered = { "Output", "Information", "Warning", "Error" },
 	MemoryFormatting = {
+		ChartHeaderNames = { "Name", "Value MB" },
 		ValueCellWidth = 0.2,
 		DepthIndent = 24,
 		CellPadding = 24,
 		ValuePadding = 12,
 		HeaderFrameHeight = 20,
-		EntryFrameHeight = 30,
-		ChartHeaderNames = {
-			"Name",
-			"Value MB"
-		}
+		EntryFrameHeight = 30
 	},
 	NetworkFormatting = {
-		CellPadding = 16,
-		SummaryButtonHeight = 30,
-		HeaderFrameHeight = 20,
-		EntryFrameHeight = 30,
-		ResponseWidthRatio = 0.8,
-		ResponseStrHeight = 15,
-		MinFrameWidth = 750,
 		SummaryHeaderNames = {
 			"RequestType",
 			"RequestCount",
@@ -174,107 +147,62 @@ return {
 			"MinTime",
 			"MaxTime"
 		},
-		ChartHeaderNames = {
-			"No.",
-			"Method",
-			"Status",
-			"Time(ms).",
-			"RequestType",
-			"URL"
-		},
-		SummaryCellWidths = {
-			120,
-			120,
-			120,
-			120,
-			120
-		},
-		ChartCellWidths = {
-			72,
-			72,
-			72,
-			84,
-			140
-		}
+		ChartHeaderNames = { "No.", "Method", "Status", "Time(ms).", "RequestType", "URL" },
+		SummaryCellWidths = { 120, 120, 120, 120, 120 },
+		ChartCellWidths = { 72, 72, 72, 84, 140 },
+		CellPadding = 16,
+		SummaryButtonHeight = 30,
+		HeaderFrameHeight = 20,
+		EntryFrameHeight = 30,
+		ResponseWidthRatio = 0.8,
+		ResponseStrHeight = 15,
+		MinFrameWidth = 750
 	},
 	ServerScriptsFormatting = {
+		ChartHeaderNames = { "Name", "Activity (%)", "Rate (/s)" },
+		ChartCellWidths = { 0.6, 0.2, 0.2 },
 		HeaderFrameHeight = 20,
 		EntryFrameHeight = 30,
 		CellPadding = 16,
 		ActivityBoxWidth = 12,
-		ActivityBoxPadding = 14,
-		ChartHeaderNames = {
-			"Name",
-			"Activity (%)",
-			"Rate (/s)"
-		},
-		ChartCellWidths = {
-			0.6,
-			0.2,
-			0.2
-		}
+		ActivityBoxPadding = 14
 	},
 	DataStoresFormatting = {
+		ChartHeaderNames = { "Name", "Value" },
 		ValueCellWidth = 0.2,
 		CellPadding = 16,
 		ExpandArrowPadding = 12,
 		HeaderFrameHeight = 20,
-		EntryFrameHeight = 30,
-		ChartHeaderNames = {
-			"Name",
-			"Value"
-		}
+		EntryFrameHeight = 30
 	},
 	ServerStatsFormatting = {
+		ChartHeaderNames = { "Name", "Value" },
 		ValueCellWidth = 0.2,
 		CellPadding = 14,
 		ExpandArrowPadding = 12,
 		HeaderFrameHeight = 20,
-		EntryFrameHeight = 30,
-		ChartHeaderNames = {
-			"Name",
-			"Value"
-		}
+		EntryFrameHeight = 30
 	},
 	ActionBindingsFormatting = {
+		ChartHeaderNames = { "Name", "Priority", "Security", "Action Name", "Input Types" },
+		ChartCellWidths = { 80, 100, 185 },
 		CellPadding = 16,
 		ExpandArrowPadding = 12,
 		HeaderFrameHeight = 20,
 		EntryFrameHeight = 30,
-		MinFrameWidth = 654,
-		ChartHeaderNames = {
-			"Name",
-			"Priority",
-			"Security",
-			"Action Name",
-			"Input Types"
-		},
-		ChartCellWidths = {
-			80,
-			100,
-			185
-		}
+		MinFrameWidth = 654
 	},
 	ServerJobsFormatting = {
+		ChartHeaderNames = { "Name", "DutyCycle(%)", "Steps Per Sec (/s)", "Step Time (ms)" },
+		ValueCellWidth = { 0.31, 0.23, 0.23, 0.23 },
 		CellPadding = 16,
 		ExpandArrowPadding = 12,
 		HeaderFrameHeight = 20,
 		EntryFrameHeight = 30,
-		MinFrameWidth = 654,
-		ChartHeaderNames = {
-			"Name",
-			"DutyCycle(%)",
-			"Steps Per Sec (/s)",
-			"Step Time (ms)"
-		},
-		ValueCellWidth = {
-			0.31,
-			0.23,
-			0.23,
-			0.23
-		}
+		MinFrameWidth = 654
 	},
 	MicroProfilerFormatting = {
+		ValueCellWidth = { 0.3, 0.7 },
 		ButtonWidth = 200,
 		CellPadding = 16,
 		ButtonTextSize = 20,
@@ -288,22 +216,14 @@ return {
 		TabButtonPad = 5,
 		TextSizePanelTitle = 16,
 		TextSizePanelOptionLabel = 16,
-		RecentDumpPathPadding = 8,
-		ValueCellWidth = {
-			0.3,
-			0.7
-		}
+		RecentDumpPathPadding = 8
 	},
 	ScriptProfilerFormatting = {
+		HeaderNames = { "Name", "Total", "Self" },
 		ValueCellWidth = 0.2,
 		CellPadding = 24,
 		ValuePadding = 12,
-		DepthIndent = 24,
-		HeaderNames = {
-			"Name",
-			"Total",
-			"Self"
-		}
+		DepthIndent = 24
 	},
 	LuauHeapFormatting = {
 		ValueCellWidth = 0.2,
@@ -324,22 +244,14 @@ return {
 		StatEntryFrameHeight = 20
 	},
 	DebugVisualizationsFormatting = {
+		ChartHeaderNames = { "Name", "Toggle", "Draw Type", "Tags" },
+		ChartCellWidths = { defineFastFlag2 and 170 or 60, 80 },
 		CellPadding = 16,
 		ExpandArrowPadding = 12,
 		HeaderFrameHeight = 20,
 		EntryFrameHeight = 30,
 		MinFrameWidth = 654,
-		LearnMoreWidth = 80,
-		ChartHeaderNames = {
-			"Name",
-			"Toggle",
-			"Draw Type",
-			"Tags"
-		},
-		ChartCellWidths = {
-			not v2 and 60 or 170,
-			80
-		}
+		LearnMoreWidth = 80
 	},
 	Graph = {
 		PointWidth = 4,
@@ -351,9 +263,9 @@ return {
 		TextPadding = 10
 	},
 	Tooltip = {
-		MaxWidth = 300,
-		Delay = 0.35,
 		Padding = UDim.new(0, 6),
-		Offset = UDim2.fromOffset(12, 12)
+		Offset = UDim2.fromOffset(12, 12),
+		MaxWidth = 300,
+		Delay = 0.35
 	}
 }

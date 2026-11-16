@@ -1,28 +1,25 @@
-local function makeActionCreator(p1, ...) -- line: 11
-	local t1 = { ... }
-
-	assert(type(p1) == "string", "Bad argument #1 to makeActionCreator, expected string")
+local function makeActionCreator(name, ...)
+	assert(type(name) == "string", "Bad argument #1 to makeActionCreator, expected string")
+	local v = { ... }
 
 	for i = 1, select("#", ...) do
-		assert(typeof(select(i, ...)) == "string", "Bad argument to makeActionCreator, all arguments must be of type string")
+		assert(
+			typeof((select)(i, ...)) == "string",
+			"Bad argument to makeActionCreator, all arguments must be of type string"
+		)
 	end
 
-	return (setmetatable({
-		name = p1
-	}, {
-		__call = function(_, ...) -- line: 26
-			-- upvalues: p1 (copy), t1 (copy)
-			local t2 = {
-				type = p1
-			}
+	return (setmetatable({ name = name }, {
+		__call = function(_, ...)
+			local result = { type = name }
 
-			assert(select("#", ...) == #t1, "Incorrect number of arguments provided to action creator " .. p1)
+			assert(select("#", ...) == #v, "Incorrect number of arguments provided to action creator " .. name)
 
-			for i, v in ipairs(t1) do
-				t2[v] = select(i, ...)
+			for i, v2 in ipairs(v) do
+				result[v2] = select(i, ...)
 			end
 
-			return t2
+			return result
 		end
 	}))
 end

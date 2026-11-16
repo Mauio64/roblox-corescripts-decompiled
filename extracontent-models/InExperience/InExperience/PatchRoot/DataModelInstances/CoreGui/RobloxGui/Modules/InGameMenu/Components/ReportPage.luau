@@ -1,56 +1,45 @@
 local Players = game:GetService("Players")
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local t = InGameMenuDependencies.t
-local ParentParent = script.Parent.Parent
-local PageNavigationWatcher = require(ParentParent.Components.PageNavigationWatcher)
-local Page = require(ParentParent.Components.Page)
+
+local parent = script.Parent.Parent
+
+local PageNavigationWatcher = require(parent.Components.PageNavigationWatcher)
+local Page = require(parent.Components.Page)
 local ReportList = require(script.ReportList)
 
-local function getReportablePlayers() -- line: 14
-	-- upvalues: Players (copy)
-	local t1 = {}
+local function getReportablePlayers()
+	local reportablePlayers = {}
 
-	for _, player in ipairs(Players:GetPlayers()) do
-		if player ~= Players.LocalPlayer then
-			table.insert(t1, player)
+	for _, v in ipairs(Players:GetPlayers()) do
+		if v ~= Players.LocalPlayer then
+			table.insert(reportablePlayers, v)
 		end
 	end
 
-	return t1
+	return reportablePlayers
 end
 
-local v11 = Roact.PureComponent:extend("ReportPage")
+local extended = Roact.PureComponent:extend("ReportPage")
+extended.validateProps = t.strictInterface({ pageTitle = t.string })
 
-v11.validateProps = t.strictInterface({
-	pageTitle = t.string
-})
-
-function v11.init(p1) -- line: 31
-	-- upvalues: getReportablePlayers (copy)
-	p1:setState({
-		players = getReportablePlayers()
-	})
+function extended.init(object)
+	object:setState({ players = getReportablePlayers() })
 end
-function v11.render(p2) -- line: 37
-	-- upvalues: Roact (copy), Page (copy), ReportList (copy), PageNavigationWatcher (copy), getReportablePlayers (copy)
-	return Roact.createElement(Page, {
-		pageTitle = p2.props.pageTitle
-	}, {
-		PlayerList = Roact.createElement(ReportList, {
-			players = p2.state.players
-		}),
+
+function extended.render(object)
+	return Roact.createElement(Page, { pageTitle = object.props.pageTitle }, {
+		PlayerList = Roact.createElement(ReportList, { players = object.state.players }),
 		Watcher = Roact.createElement(PageNavigationWatcher, {
 			desiredPage = "Report",
-			onNavigateTo = function() -- line: 46
-				-- upvalues: p2 (copy), getReportablePlayers (copy)
-				p2:setState({
-					players = getReportablePlayers()
-				})
+			onNavigateTo = function()
+				object:setState({ players = getReportablePlayers() })
 			end
 		})
 	})
 end
 
-return v11
+return extended

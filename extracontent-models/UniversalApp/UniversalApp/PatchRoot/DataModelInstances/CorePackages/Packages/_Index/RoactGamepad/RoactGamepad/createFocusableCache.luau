@@ -1,64 +1,56 @@
 local asFocusable = require(script.Parent.asFocusable)
 
-local function checkHostProperties(p1) -- line: 3
-	assert(Instance.new(p1):IsA("GuiObject"))
+local function checkHostProperties(className)
+	assert(Instance.new(className):IsA("GuiObject"))
 end
-local function isValidFocusable(p2) -- line: 9
-	-- upvalues: checkHostProperties (copy)
-	local v7 = typeof(p2)
 
-	if v7 == "string" then
-		local ok, _ = pcall(checkHostProperties, p2)
+local function isValidFocusable(p)
+	local typeName = typeof(p)
 
-		return ok
+	if typeName ~= "string" then
+		return typeName == "function" or typeName == "table"
 	end
 
-	if v7 == "function" or v7 == "table" then
-		return true
-	end
-
-	return false
+	local success, _ = pcall(checkHostProperties, p)
+	return success
 end
-local function createFocusableCache() -- line: 25
-	-- upvalues: checkHostProperties (copy), asFocusable (copy)
-	local t1 = {}
 
-	setmetatable(t1, {
-		__index = function(_, p4) -- line: 29
-			-- upvalues: checkHostProperties (copy), asFocusable (copy), t1 (copy)
-			local v13 = typeof(p4)
-			local ok
+local function createFocusableCache()
+	local focusableCache = {}
 
-			if v13 == "string" then
+	setmetatable(focusableCache, {
+		__index = function(_, p)
+			local typeName = typeof(p)
+			local success
+
+			if typeName == "string" then
 				local result
-
-				ok, result = pcall(checkHostProperties, p4)
+				success, result = pcall(checkHostProperties, p)
 			else
-				ok = v13 == "function" or v13 == "table"
+				success = typeName == "function" or typeName == "table"
 			end
 
-			if not ok then
-				error("Component " .. tostring(p4) .. " (" .. typeof(p4) .. ") is not a valid focusable component", 2)
+			if not success then
+				error("Component " .. tostring(p) .. " (" .. typeof(p) .. ") is not a valid focusable component", 2)
 			end
 
-			local v16 = asFocusable(p4)
+			local v = asFocusable(p)
+			focusableCache[p] = v
 
-			t1[p4] = v16
-
-			return v16
+			return v
 		end,
-		__tostring = function(p5) -- line: 39
-			local s1 = "{"
+		__tostring = function(items)
+			local v = "{"
 
-			for k, v in pairs(p5) do
-				s1 = ("%s\n\t%s -> %s"):format(s1, tostring(k), (tostring(v)))
+			for k, item in pairs(items) do
+				v = ("%s\n\t%s -> %s"):format(v, tostring(k), (tostring(item)))
 			end
 
-			return s1 .. "\n}"
+			return v .. "\n}"
 		end
 	})
 
-	return t1
+	return focusableCache
 end
 
 return createFocusableCache

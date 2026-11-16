@@ -1,4 +1,1 @@
-return {
-	LeaveButtonClick = "leaveButtonClick",
-	ReportSubmitted = "reportSubmitted"
-}
+return { LeaveButtonClick = "leaveButtonClick", ReportSubmitted = "reportSubmitted" }

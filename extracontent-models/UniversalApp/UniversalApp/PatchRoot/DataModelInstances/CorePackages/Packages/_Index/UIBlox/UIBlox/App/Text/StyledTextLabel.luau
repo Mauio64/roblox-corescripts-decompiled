@@ -1,15 +1,18 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local GenericTextLabel = require(ParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local validateFontInfo = require(ParentParent.Core.Style.Validator.validateFontInfo)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local validateColorToken = require(ParentParent.Core.Style.Validator.validateColorToken)
-local validateTypographyInfo = require(ParentParent.Core.Style.Validator.validateTypographyInfo)
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local v10 = Roact.PureComponent:extend("StyledTextLabel")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-v10.validateProps = t.strictInterface({
+local GenericTextLabel = require(parent.Core.Text.GenericTextLabel.GenericTextLabel)
+local validateFontInfo = require(parent.Core.Style.Validator.validateFontInfo)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+local validateColorToken = require(parent.Core.Style.Validator.validateColorToken)
+local validateTypographyInfo = require(parent.Core.Style.Validator.validateTypographyInfo)
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+
+local extended = Roact.PureComponent:extend("StyledTextLabel")
+
+extended.validateProps = t.strictInterface({
 	text = t.string,
 	fontStyle = t.union(validateFontInfo, validateTypographyInfo),
 	colorStyle = t.union(validateColorInfo, validateColorToken),
@@ -28,38 +31,38 @@ v10.validateProps = t.strictInterface({
 	onAbsoluteSizeChange = t.optional(t.callback),
 	openTypeFeatures = t.optional(t.string)
 })
-v10.defaultProps = {
-	richText = true,
-	fluidSizing = true,
-	lineHeight = 1.4,
-	clipsDescendants = false,
-	openTypeFeatures = nil,
+
+extended.defaultProps = {
 	textXAlignment = Enum.TextXAlignment.Left,
 	textYAlignment = Enum.TextYAlignment.Center,
-	automaticSize = Enum.AutomaticSize.None
+	richText = true,
+	fluidSizing = true,
+	automaticSize = Enum.AutomaticSize.None,
+	lineHeight = 1.4,
+	clipsDescendants = false,
+	openTypeFeatures = nil
 }
 
-function v10.render(p1) -- line: 64
-	-- upvalues: Roact (copy), GenericTextLabel (copy)
+function extended.render(p)
 	return Roact.createElement(GenericTextLabel, {
-		maxSize = p1.props.maxSize,
-		fontStyle = p1.props.fontStyle,
-		colorStyle = p1.props.colorStyle,
-		fluidSizing = p1.props.fluidSizing,
-		Size = p1.props.size,
-		Text = p1.props.text,
-		TextXAlignment = p1.props.textXAlignment,
-		TextYAlignment = p1.props.textYAlignment,
-		TextTruncate = p1.props.textTruncate,
-		TextWrapped = p1.props.textWrapped,
-		LayoutOrder = p1.props.layoutOrder,
-		RichText = p1.props.richText,
-		AutomaticSize = p1.props.automaticSize,
-		LineHeight = p1.props.lineHeight,
-		ClipsDescendants = p1.props.clipsDescendants,
-		openTypeFeatures = p1.props.openTypeFeatures,
-		[Roact.Change.AbsoluteSize] = p1.props.onAbsoluteSizeChange
+		maxSize = p.props.maxSize,
+		fontStyle = p.props.fontStyle,
+		colorStyle = p.props.colorStyle,
+		fluidSizing = p.props.fluidSizing,
+		Size = p.props.size,
+		Text = p.props.text,
+		TextXAlignment = p.props.textXAlignment,
+		TextYAlignment = p.props.textYAlignment,
+		TextTruncate = p.props.textTruncate,
+		TextWrapped = p.props.textWrapped,
+		LayoutOrder = p.props.layoutOrder,
+		RichText = p.props.richText,
+		AutomaticSize = p.props.automaticSize,
+		LineHeight = p.props.lineHeight,
+		ClipsDescendants = p.props.clipsDescendants,
+		openTypeFeatures = p.props.openTypeFeatures,
+		[Roact.Change.AbsoluteSize] = p.props.onAbsoluteSizeChange
 	})
 end
 
-return v10
+return extended

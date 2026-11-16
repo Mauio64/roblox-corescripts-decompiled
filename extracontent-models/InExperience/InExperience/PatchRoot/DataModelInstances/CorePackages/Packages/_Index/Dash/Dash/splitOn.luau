@@ -1,31 +1,29 @@
 local insert = table.insert
 
-local function splitOn(s1: string, s2: string) -- line: 10
-	-- upvalues: insert (copy)
-	local t1 = {}
-	local t2 = {}
-	local n1 = 1
+local function splitOn(value: string, p: string)
+	local result = {}
+	local result2 = {}
+	local v = 1
 
-	if not s2 then
-		for i = 1, #s1 do
-			insert(t1, s1:sub(i, i))
+	if p then
+		local v2, v3 = value:find(p, v)
+
+		while v2 do
+			insert(result2, value:sub(v2, v3))
+			insert(result, value:sub(v, v2 - 1))
+			v = v3 + 1
+			v2, v3 = value:find(p, v)
 		end
 
-		return t1
+		insert(result, value:sub(v))
+		return result, result2
 	end
 
-	local start, stop = s1:find(s2, n1)
-
-	while start do
-		insert(t2, s1:sub(start, stop))
-		insert(t1, s1:sub(n1, start - 1))
-		n1 = stop + 1
-		start, stop = s1:find(s2, n1)
+	for i = 1, #value do
+		insert(result, value:sub(i, i))
 	end
 
-	insert(t1, s1:sub(n1))
-
-	return t1, t2
+	return result
 end
 
 return splitOn

@@ -1,156 +1,263 @@
 local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local React = require(CorePackages.Packages.React)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-
 require(CorePackages.Workspace.Packages.LeaderboardStore)
 
 local GameTranslator = require(RobloxGui.Modules.GameTranslator)
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+
 local useLayoutValues = PlayerList.Common.useLayoutValues
 local useStyle = UIBlox.Core.Style.useStyle
-local FFlagPlayerListFixLeaderstatsStacking = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagPlayerListFixLeaderstatsStacking = SharedFlags.FFlagPlayerListFixLeaderstatsStacking
 local FFlagEnableMobilePlayerListOnConsole = PlayerList.Flags.FFlagEnableMobilePlayerListOnConsole
-local t1 = {
+
+local v = {
 	showDivider = false,
 	showBackground = false,
 	backgroundTransparency = 1,
 	useCustomTextColor = false,
-	headerPaddingLeft = 15,
-	customTextColor = Color3.fromRGB(255, 255, 255)
+	customTextColor = Color3.fromRGB(255, 255, 255),
+	headerPaddingLeft = 15
 }
 
-local function TitleBarView(t2: {[any]: any}) -- line: 56
-	-- upvalues: t1 (copy), useLayoutValues (copy), useStyle (copy), React (copy), RobloxTranslator (copy), FFlagEnableMobilePlayerListOnConsole (copy), FFlagPlayerListFixLeaderstatsStacking (copy), SignalsReact (copy), GameTranslator (copy), CoreGui (copy), CorePackages (copy)
-	local t3 = {}
+local function TitleBarView(items)
+	local v2 = {}
 
-	for k, v in pairs(t1) do
-		t3[k] = t2[k] ~= nil and t2[k] or v
+	for k, v3 in pairs(v) do
+		v3 = items[k] ~= nil and items[k] or v3
+		v2[k] = v3
 	end
 
-	for k, v in pairs(t2) do
-		t3[k] = v
+	for k, item in pairs(items) do
+		v2[k] = item
 	end
 
-	local v22 = useLayoutValues()
-	local v23 = useStyle()
-	local t4 = {
-		layout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Horizontal,
-			VerticalAlignment = Enum.VerticalAlignment.Center
-		})
-	}
-	local entrySizeX = t3.entrySizeX
+	local v3 = useLayoutValues()
+	local v4 = useStyle()
 
-	if t3.isSmallTouchDevice then
-		entrySizeX = v22.PlayerNameSizeXMobile
+	local children = {}
+
+	children.layout = React.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		FillDirection = Enum.FillDirection.Horizontal,
+		VerticalAlignment = Enum.VerticalAlignment.Center
+	})
+
+	local v5 = v2.entrySizeX
+
+	if v2.isSmallTouchDevice then
+		v5 = v3.PlayerNameSizeXMobile
 	end
 
-	local v26 = t3.useCustomTextColor and t3.customTextColor or v23.Theme.TextMuted.Color
-	local v27 = if not t3.useCustomTextColor then v23.Theme.TextMuted.Transparency else 0
+	local customTextColor = v2.useCustomTextColor and v2.customTextColor or v4.Theme.TextMuted.Color
 
-	t4.playersHeader = React.createElement("TextLabel", {
+	local textTransparency = v2.useCustomTextColor and 0 or v4.Theme.TextMuted.Transparency
+
+	local createElement = React.createElement
+	local v6 = {
 		LayoutOrder = 1,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, entrySizeX, 1, 0),
+		Size = UDim2.new(0, v5, 1, 0),
 		Text = RobloxTranslator:FormatByKey("InGame.PlayerList.Players"),
+		BackgroundTransparency = 1,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Center,
-		Font = v23.Font.Footer.Font,
-		TextSize = if not FFlagEnableMobilePlayerListOnConsole then v23.Font.BaseSize * v23.Font.Footer.RelativeSize else v22.TitleBarTextSize,
-		TextTransparency = v27,
-		TextColor3 = v26
-	}, {
+		Font = 0,
+		FontFace = 0,
+		TextSize = 0,
+		TextTransparency = 0,
+		TextColor3 = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = v4.Font.Footer.Font
+	end
+
+	v6.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font)
+	end
+
+	v6.FontFace = fontFace
+	local textSize
+
+	if FFlagEnableMobilePlayerListOnConsole then
+		textSize = v3.TitleBarTextSize
+	else
+		textSize = v4.Font.BaseSize * v4.Font.Footer.RelativeSize
+	end
+
+	v6.TextSize = textSize
+	v6.TextTransparency = textTransparency
+	v6.TextColor3 = customTextColor
+	children.playersHeader = createElement("TextLabel", v6, {
 		Padding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, t3.headerPaddingLeft)
+			PaddingLeft = UDim.new(0, v2.headerPaddingLeft)
 		})
 	})
 
-	local MaxLeaderstats = v22.MaxLeaderstats
+	local maxLeaderstats = v3.MaxLeaderstats
 
 	if FFlagPlayerListFixLeaderstatsStacking then
-		for v29, v30 in (SignalsReact.useSignalState(t3.gameStats.getAllData)) do
-			if not (MaxLeaderstats < v30.order(false)) then
-				local v31 = GameTranslator:TranslateGameText(CoreGui, v29)
+		local v7 = SignalsReact.useSignalState(v2.gameStats.getAllData)
 
-				t4["stat_" .. v29] = React.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					LayoutOrder = v30.order(false) + 1,
-					Size = UDim2.new(0, v22.StatEntrySizeX, 1, 0),
-					Text = v31,
-					TextXAlignment = Enum.TextXAlignment.Center,
-					TextYAlignment = Enum.TextYAlignment.Center,
-					Font = v23.Font.Footer.Font,
-					TextSize = if not FFlagEnableMobilePlayerListOnConsole then v23.Font.BaseSize * v23.Font.Footer.RelativeSize else v22.TitleBarTextSize,
-					TextTransparency = v27,
-					TextColor3 = v26,
-					TextTruncate = Enum.TextTruncate.AtEnd
-				})
+		for k, v8 in v7 do
+			if maxLeaderstats < v8.order(false) then
+				continue
 			end
+
+			local translateGameText = GameTranslator:TranslateGameText(CoreGui, k)
+
+			local v9 = "stat_" .. k
+			local createElement2 = React.createElement
+			local v10 = {
+				LayoutOrder = v8.order(false) + 1,
+				Size = UDim2.new(0, v3.StatEntrySizeX, 1, 0),
+				Text = translateGameText,
+				BackgroundTransparency = 1,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Font = 0,
+				FontFace = 0,
+				TextSize = 0,
+				TextTransparency = 0,
+				TextColor3 = 0,
+				TextTruncate = 0
+			}
+			local font2
+
+			if not FoundationFontFaceMigration then
+				font2 = v4.Font.Footer.Font
+			end
+
+			v10.Font = font2
+			local fontFace2
+
+			if FoundationFontFaceMigration then
+				fontFace2 = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font)
+			end
+
+			v10.FontFace = fontFace2
+			local textSize2
+
+			if FFlagEnableMobilePlayerListOnConsole then
+				textSize2 = v3.TitleBarTextSize
+			else
+				textSize2 = v4.Font.BaseSize * v4.Font.Footer.RelativeSize
+			end
+
+			v10.TextSize = textSize2
+			v10.TextTransparency = textTransparency
+			v10.TextColor3 = customTextColor
+			v10.TextTruncate = Enum.TextTruncate.AtEnd
+			children[v9] = createElement2("TextLabel", v10)
 		end
-	elseif t3.gameStatsCount and t3.gameStatsCount > 0 then
-		t3.gameStats.iterateData(function(p1, p2) -- line: 138
-			-- upvalues: MaxLeaderstats (copy), GameTranslator (copy), CoreGui (copy), t4 (copy), React (copy), v22 (copy), v23 (copy), FFlagEnableMobilePlayerListOnConsole (copy), v27 (copy), v26 (copy)
-			if p2.order(false) > MaxLeaderstats then
+	elseif v2.gameStatsCount and v2.gameStatsCount > 0 then
+		v2.gameStats.iterateData(function(p, p2)
+			if maxLeaderstats < p2.order(false) then
 				return
 			end
 
-			local v36 = GameTranslator:TranslateGameText(CoreGui, p1)
+			local translateGameText = GameTranslator:TranslateGameText(CoreGui, p)
 
-			t4["stat_" .. p1] = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
+			local v7 = "stat_" .. p
+			local createElement2 = React.createElement
+			local v8 = {
 				LayoutOrder = p2.order(false) + 1,
-				Size = UDim2.new(0, v22.StatEntrySizeX, 1, 0),
-				Text = v36,
+				Size = UDim2.new(0, v3.StatEntrySizeX, 1, 0),
+				Text = translateGameText,
+				BackgroundTransparency = 1,
 				TextXAlignment = Enum.TextXAlignment.Center,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				Font = v23.Font.Footer.Font,
-				TextSize = if not FFlagEnableMobilePlayerListOnConsole then v23.Font.BaseSize * v23.Font.Footer.RelativeSize else v22.TitleBarTextSize,
-				TextTransparency = v27,
-				TextColor3 = v26,
-				TextTruncate = Enum.TextTruncate.AtEnd
-			})
+				Font = 0,
+				FontFace = 0,
+				TextSize = 0,
+				TextTransparency = 0,
+				TextColor3 = 0,
+				TextTruncate = 0
+			}
+			local font2
+
+			if not FoundationFontFaceMigration then
+				font2 = v4.Font.Footer.Font
+			end
+
+			v8.Font = font2
+			local fontFace2
+
+			if FoundationFontFaceMigration then
+				fontFace2 = normalizeFontFace(v4.Tokens.Typography.CaptionSmall.Font)
+			end
+
+			v8.FontFace = fontFace2
+			local textSize2
+
+			if FFlagEnableMobilePlayerListOnConsole then
+				textSize2 = v3.TitleBarTextSize
+			else
+				textSize2 = v4.Font.BaseSize * v4.Font.Footer.RelativeSize
+			end
+
+			v8.TextSize = textSize2
+			v8.TextTransparency = textTransparency
+			v8.TextColor3 = customTextColor
+			v8.TextTruncate = Enum.TextTruncate.AtEnd
+			children[v7] = createElement2("TextLabel", v8)
 		end, false)
 	end
 
-	local color3 = Color3.fromRGB(0, 0, 0)
+	local color = Color3.fromRGB(0, 0, 0)
 
-	if t3.showBackground then
-		color3 = if not require(CorePackages.Workspace.Packages.Chrome).Enabled() then v23.Theme.BackgroundContrast.Color else v23.Theme.BackgroundUIContrast.Color
+	if v2.showBackground then
+		local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+
+		if Chrome.Enabled() then
+			color = v4.Theme.BackgroundUIContrast.Color
+		else
+			color = v4.Theme.BackgroundContrast.Color
+		end
 	end
 
-	local t5 = {}
+	local children2 = {}
 
-	if t3.showDivider then
-		t5.Divider = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			Visible = t3.contentsVisible,
+	if v2.showDivider then
+		children2.Divider = React.createElement("Frame", {
+			Visible = v2.contentsVisible,
 			Size = UDim2.new(1, 0, 0, 1),
 			Position = UDim2.new(0, 0, 1, 0),
 			AnchorPoint = Vector2.new(0, 1),
-			BackgroundTransparency = v23.Theme.Divider.Transparency,
-			BackgroundColor3 = v23.Theme.Divider.Color
+			BackgroundTransparency = v4.Theme.Divider.Transparency,
+			BackgroundColor3 = v4.Theme.Divider.Color,
+			BorderSizePixel = 0
 		})
 	end
 
-	t5.ChildrenFrame = React.createElement("Frame", {
+	children2.ChildrenFrame = React.createElement("Frame", {
+		Visible = v2.contentsVisible,
 		BackgroundTransparency = 1,
-		Visible = t3.contentsVisible,
-		Position = t3.showBackground and UDim2.new(0, 0, 0, -2) or UDim2.new(0, 0, 0, 0),
+		Position = v2.showBackground and UDim2.new(0, 0, 0, -2) or UDim2.new(0, 0, 0, 0),
 		Size = UDim2.new(1, 0, 1, 0)
-	}, t4)
+	}, children)
 
 	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		Size = t3.size,
-		LayoutOrder = t3.layoutOrder,
-		BackgroundTransparency = t3.backgroundTransparency,
-		BackgroundColor3 = color3
-	}, t5)
+		Size = v2.size,
+		LayoutOrder = v2.layoutOrder,
+		BackgroundTransparency = v2.backgroundTransparency,
+		BackgroundColor3 = color,
+		BorderSizePixel = 0
+	}, children2)
 end
 
 return React.memo(TitleBarView)

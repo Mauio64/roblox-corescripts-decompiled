@@ -1,36 +1,55 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local mutedError = require(Parent.Loggers).mutedError
-local t = require(Parent.t)
-local FFlagLuaAppChartsFilterOptionTextTag = require(Parent.SharedFlags).FFlagLuaAppChartsFilterOptionTextTag
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("GameFilters").Parent
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+local t = require(parent.t)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppChartsFilterOptionTextTag = SharedFlags.FFlagLuaAppChartsFilterOptionTextTag
+
+local strictInterface = t.strictInterface
+local v = {
 	absPositions = t.string,
 	filterIds = t.string,
 	selectedOptionIds = t.string,
-	selectedOptionContextTags = if not FFlagLuaAppChartsFilterOptionTextTag then nil else t.optional(t.string),
-	gameSetTypeId = t.string,
-	gameSetTargetId = t.optional(t.number),
-	sortPos = t.number
-})
-local t1 = {
-	[AppPage.Games] = v6
+	selectedOptionContextTags = 0,
+	gameSetTypeId = 0,
+	gameSetTargetId = 0,
+	sortPos = 0
 }
+local selectedOptionContextTags
 
-local function filterImpressionsEvent(p1, p2, p3) -- line: 27
-	-- upvalues: t1 (copy), mutedError (copy)
-	local v12 = t1[p2]
+if FFlagLuaAppChartsFilterOptionTextTag then
+	selectedOptionContextTags = t.optional(t.string)
+end
 
-	if v12 then
-		local v13, v14 = v12(p3)
+v.selectedOptionContextTags = selectedOptionContextTags
+v.gameSetTypeId = t.string
+v.gameSetTargetId = t.optional(t.number)
+v.sortPos = t.number
+local v2 = strictInterface(v)
 
-		if not v13 then
-			mutedError(v14)
+local v3 = { [AppPage.Games] = v2 }
+
+local function filterImpressionsEvent(object, p, p2)
+	local v4 = v3[p]
+
+	if v4 then
+		local v5, v6 = v4(p2)
+
+		if not v5 then
+			mutedError(v6)
 		end
 	else
-		mutedError(string.format("Missing interface for eventContext %s to type check filterImpressions event parameters", p2))
+		mutedError(string.format(
+			"Missing interface for eventContext %s to type check filterImpressions event parameters",
+			p
+		))
 	end
 
-	p1:sendEventDeferred(p2, "filterImpressions", p3)
+	object:sendEventDeferred(p, "filterImpressions", p2)
 end
 
 return filterImpressionsEvent

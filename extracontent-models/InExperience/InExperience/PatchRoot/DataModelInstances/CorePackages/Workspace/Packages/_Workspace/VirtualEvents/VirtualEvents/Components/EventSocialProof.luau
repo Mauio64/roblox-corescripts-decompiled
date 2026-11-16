@@ -1,86 +1,90 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local Cryo = require(VirtualEvents.Parent.Cryo)
 local React = require(VirtualEvents.Parent.React)
 local Foundation = require(VirtualEvents.Parent.Foundation)
-local FoundationImage = Foundation.Image
-local useTokens = Foundation.Hooks.useTokens
-local uDim = UDim.new(0, -8)
 
-local function EventSocialProof(t1: {[any]: any}) -- line: 21
-	-- upvalues: useTokens (copy), React (copy), Cryo (copy), uDim (copy), FoundationImage (copy)
-	local v10 = useTokens()
-	local v11 = React.useMemo(function() -- line: 24
-		-- upvalues: t1 (copy), Cryo (copy)
-		if t1.desiredFirstUserId and Cryo.List.find(t1.userIds, t1.desiredFirstUserId) then
-			return t1.desiredFirstUserId
+local Image = Foundation.Image
+
+local useTokens = Foundation.Hooks.useTokens
+
+local udim = UDim.new(0, -8)
+
+local function EventSocialProof(p)
+	local v = useTokens()
+
+	local v2 = React.useMemo(function()
+		if p.desiredFirstUserId and Cryo.List.find(p.userIds, p.desiredFirstUserId) then
+			return p.desiredFirstUserId
 		end
 
-		return t1.userIds[1]
-	end, {
-		t1.userIds,
-		t1.desiredFirstUserId
-	})
-	local v12 = React.useMemo(function() -- line: 35
-		-- upvalues: t1 (copy)
-		return t1.userIds[2] or nil
-	end, { t1.userIds })
+		return p.userIds[1]
+	end, { p.userIds, p.desiredFirstUserId })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY
-	}, {
+	local v3 = React.useMemo(function()
+		return p.userIds[2] or nil
+	end, { p.userIds })
+
+	local createElement = React.createElement
+	local v4 = { BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.XY }
+	local v5 = {
 		Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
-			Padding = uDim
+			Padding = udim
 		}),
-		FirstUser = if not v11 then nil else React.createElement("Frame", {
-			ZIndex = 3,
-			BackgroundColor3 = v10.Inverse.Surface.Surface_300.Color3,
+		FirstUser = 0,
+		SecondUser = 0
+	}
+	local firstUser
+
+	if v2 then
+		firstUser = React.createElement("Frame", {
+			BackgroundColor3 = v.Inverse.Surface.Surface_300.Color3,
 			Size = UDim2.fromOffset(25, 25),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5)
+			Position = UDim2.fromScale(0.5, 0.5),
+			ZIndex = 3
 		}, {
-			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			}),
-			FirstUserFace = React.createElement(FoundationImage, {
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+			FirstUserFace = React.createElement(Image, {
 				ZIndex = 4,
-				tag = "radius-circle",
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
-				Image = ("rbxthumb://type=AvatarHeadShot&id=%s&w=100&h=100"):format(v11),
-				backgroundStyle = {
-					Transparency = 0,
-					Color3 = v10.Color.Shift.Shift_200.Color3
-				},
-				Size = UDim2.fromOffset(20, 20)
-			})
-		}),
-		SecondUser = if not v12 then nil else React.createElement("Frame", {
-			ZIndex = 1,
-			BackgroundColor3 = v10.Inverse.Surface.Surface_300.Color3,
-			Size = UDim2.fromOffset(25, 25),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5)
-		}, {
-			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			}),
-			SecondUserFace = React.createElement(FoundationImage, {
-				ZIndex = 2,
 				tag = "radius-circle",
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Image = ("rbxthumb://type=AvatarHeadShot&id=%s&w=100&h=100"):format(v12),
-				backgroundStyle = {
-					Transparency = 0,
-					Color3 = v10.Color.Shift.Shift_200.Color3
-				},
+				Image = ("rbxthumb://type=AvatarHeadShot&id=%s&w=100&h=100"):format(v2),
+				backgroundStyle = { Color3 = v.Color.Shift.Shift_200.Color3, Transparency = 0 },
 				Size = UDim2.fromOffset(20, 20)
 			})
 		})
-	})
+	end
+
+	v5.FirstUser = firstUser
+	local secondUser
+
+	if v3 then
+		secondUser = React.createElement("Frame", {
+			BackgroundColor3 = v.Inverse.Surface.Surface_300.Color3,
+			Size = UDim2.fromOffset(25, 25),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			ZIndex = 1
+		}, {
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+			SecondUserFace = React.createElement(Image, {
+				ZIndex = 2,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5),
+				tag = "radius-circle",
+				Image = ("rbxthumb://type=AvatarHeadShot&id=%s&w=100&h=100"):format(v3),
+				backgroundStyle = { Color3 = v.Color.Shift.Shift_200.Color3, Transparency = 0 },
+				Size = UDim2.fromOffset(20, 20)
+			})
+		})
+	end
+
+	v5.SecondUser = secondUser
+	return createElement("Frame", v4, v5)
 end
 
 return EventSocialProof

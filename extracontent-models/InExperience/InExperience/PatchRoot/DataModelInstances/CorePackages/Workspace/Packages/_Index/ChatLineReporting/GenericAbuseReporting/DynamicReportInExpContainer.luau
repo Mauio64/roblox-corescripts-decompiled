@@ -1,0 +1,3 @@
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+
+return require(Workspace.GenericAbuseReporting.GenericAbuseReporting.UXFlow.DynamicReportV2InExp.DynamicReportV2InExpContainer)

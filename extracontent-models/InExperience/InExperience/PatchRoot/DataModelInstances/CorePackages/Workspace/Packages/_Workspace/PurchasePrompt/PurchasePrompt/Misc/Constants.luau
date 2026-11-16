@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent
-local strict = require(ParentParent.strict)
+local parent = script.Parent.Parent
+
+local strict = require(parent.strict)
 
 return strict({
 	ABTests = strict({
@@ -17,32 +18,45 @@ return strict({
 		PurchaseResult_RobuxUpdated = 3,
 		PurcahseResult_NoActionNeeded = 4
 	}, "Constants.PlatformPurchaseResult"),
-	PurchaseFailureReason = strict({
-		TwoStepVerificationRequired = "TwoStepVerificationRequired",
-		EconomyDisabled = "EconomyDisabled",
-		PriceChanged = "PriceChanged"
-	}, "Constants.TransactionStatus"),
-	ProductType = strict({
-		CollectibleItem = "Collectible Item",
-		DeveloperProduct = "Developer Product",
-		Asset = "Asset",
-		Bundle = "Bundle"
-	}, "Constants.ProductType"),
-	Currency = strict({
-		Robux = 1
-	}, "Constants.Currency"),
-	TermsOfUse = strict({
-		DMCCAUrl = "https://en.help.roblox.com/hc/en-us/articles/115004647846-Roblox-Terms-of-Use#robux-and-premium-membership"
-	}, "Constants.TermsOfUse"),
+	PurchaseFailureReason = strict(
+		{
+			TwoStepVerificationRequired = "TwoStepVerificationRequired",
+			EconomyDisabled = "EconomyDisabled",
+			PriceChanged = "PriceChanged"
+		},
+		"Constants.TransactionStatus"
+	),
+	ProductType = strict(
+		{
+			CollectibleItem = "Collectible Item",
+			DeveloperProduct = "Developer Product",
+			Asset = "Asset",
+			Bundle = "Bundle"
+		},
+		"Constants.ProductType"
+	),
+	Currency = strict({ Robux = 1 }, "Constants.Currency"),
+	TermsOfUse = strict(
+		{
+			DMCCAUrl = "https://en.help.roblox.com/hc/en-us/articles/115004647846-Roblox-Terms-of-Use#robux-and-premium-membership"
+		},
+		"Constants.TermsOfUse"
+	),
 	PerformanceMetrics = strict({
-		Prefix = strict({
-			UnifiedPurchaseModal = "UnifiedPurchaseModal",
-			PurchaseModal = "PurchaseModal",
-			RobuxUpsellModal = "RobuxUpsellModal"
-		}, "Constants.PerformanceMetrics.Prefix"),
-		IntervalName = strict({
-			ProductPurchaseContainerShown = "ProductPurchaseContainerShown",
-			RobuxUpsellModalShown = "RobuxUpsellModalShown"
-		}, "Constants.PerformanceMetrics.IntervalName")
+		Prefix = strict(
+			{
+				UnifiedPurchaseModal = "UnifiedPurchaseModal",
+				PurchaseModal = "PurchaseModal",
+				RobuxUpsellModal = "RobuxUpsellModal"
+			},
+			"Constants.PerformanceMetrics.Prefix"
+		),
+		IntervalName = strict(
+			{
+				ProductPurchaseContainerShown = "ProductPurchaseContainerShown",
+				RobuxUpsellModalShown = "RobuxUpsellModalShown"
+			},
+			"Constants.PerformanceMetrics.IntervalName"
+		)
 	}, "Constants.PerformanceMetrics")
 }, "Constants")

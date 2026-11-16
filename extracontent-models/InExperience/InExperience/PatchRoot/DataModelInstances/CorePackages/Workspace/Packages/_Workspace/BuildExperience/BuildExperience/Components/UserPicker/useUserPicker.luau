@@ -1,355 +1,282 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local React = require(parent.React)
 
 require(script.Parent.UserPickerTypes)
 
-local v3 = game:DefineFastInt("BuildExperienceUserPickerSearchDebounceMs", 250)
+local defineFastInt = game:DefineFastInt("BuildExperienceUserPickerSearchDebounceMs", 250)
 
-local function trim(s1: string) -- line: 23
-	return (string.gsub(s1, "^%s*(.-)%s*$", "%1"))
+local function trim(state: string) -- 4 equivalent calls inferred from this helper
+	return (string.gsub(state, "^%s*(.-)%s*$", "%1"))
 end
-local function countKeys(t1: {[any]: any}) -- line: 27
-	local n1 = 0
 
-	for _, v12 in t1 do
-		if v12 then
-			n1 += 1
+local function countKeys(items) -- 4 equivalent calls inferred from this helper
+	local count = 0
+
+	for _, item in items do
+		if item then
+			count += 1
 		end
 	end
 
-	return n1
+	return count
 end
-local function appendUniqueIds(t2: {[any]: any}, t3: {[any]: any}) -- line: 39
-	local t4 = {}
 
-	for _, v17 in t2 do
-		t4[v17] = true
+local function appendUniqueIds(items, ids)
+	local set = {}
+
+	for _, item in items do
+		set[item] = true
 	end
 
-	local v18 = table.clone(t2)
+	local clone = table.clone(items)
 
-	for _, v20 in t3 do
-		if not t4[v20] then
-			table.insert(v18, v20)
+	for _, item in ids do
+		if not set[item] then
+			table.insert(clone, item)
 		end
 	end
 
-	return v18
+	return clone
 end
-local function useUserPicker(p1) -- line: 53
-	-- upvalues: React (copy), v3 (copy), appendUniqueIds (copy)
-	local browseIds = p1.browseIds
-	local browseIsLoading = p1.browseIsLoading
-	local loadMoreBrowse = p1.loadMoreBrowse
-	local onSearch = p1.onSearch
-	local onSubmit = p1.onSubmit
-	local selectionLimit = p1.selectionLimit
-	local onSelectionChanged = p1.onSelectionChanged
-	local excludeUserIds = p1.excludeUserIds
-	local v30, v31 = React.useState("")
-	local v32, v33 = React.useState({})
-	local v34, v35 = React.useState(nil)
-	local v36, v37 = React.useState(false)
-	local v38, v39 = React.useState({})
-	local v40, v41 = React.useState("")
-	local v42, v43 = React.useState(false)
-	local v44 = React.useRef(false)
-	local v45 = React.useRef(0)
-	local v46 = React.useRef(false)
-	local v47 = string.gsub(v30, "^%s*(.-)%s*$", "%1") ~= ""
 
-	React.useEffect(function() -- line: 79
-		-- upvalues: v30 (copy), v33 (copy), v35 (copy), v37 (copy), v45 (copy), v3 (copy), onSearch (copy)
-		local v57 = v30
-		local v58 = string.gsub(v57, "^%s*(.-)%s*$", "%1")
+local function useUserPicker(data)
+	local browseIds = data.browseIds
+	local isLoading = data.browseIsLoading
+	local loadMoreBrowse = data.loadMoreBrowse
+	local onSearch = data.onSearch
+	local onSubmit = data.onSubmit
+	local selectionLimit = data.selectionLimit
+	local onSelectionChanged = data.onSelectionChanged
+	local excludeUserIds = data.excludeUserIds
 
-		if v58 == "" then
-			v33({})
-			v35(nil)
-			v37(false)
+	local state, setState = React.useState("")
+	local state2, setState2 = React.useState({})
 
+	local state3, setState3 = React.useState(nil)
+	local state4, setState4 = React.useState(false)
+	local state5, setState5 = React.useState({})
+	local state6, setState6 = React.useState("")
+	local state7, setState7 = React.useState(false)
+
+	local ref = React.useRef(false)
+	local ref2 = React.useRef(0)
+	local ref3 = React.useRef(false)
+	local v = trim(state) ~= "" -- inferred equivalent call
+	React.useEffect(function()
+		local v2 = trim(state) -- inferred equivalent call
+
+		if v2 == "" then
+			setState2({})
+			setState3(nil)
+			setState4(false)
+		else
+			ref2.current += 1
+			local current = ref2.current
+
+			setState2({})
+			setState3(nil)
+			setState4(true)
+			local thread = task.delay(defineFastInt / 1000, function()
+				onSearch(v2):andThen(function(p)
+					if ref2.current == current then
+						setState2(p.ids)
+						setState3(p.nextCursor)
+						setState4(false)
+					end
+				end):catch(function()
+					if ref2.current == current then
+						setState2({})
+						setState3(nil)
+						setState4(false)
+					end
+				end)
+			end)
+
+			return function()
+				pcall(task.cancel, thread)
+			end
+		end
+	end, { state, onSearch })
+
+	local loadMore = React.useCallback(function()
+		if not v then
+			loadMoreBrowse()
 			return
 		end
 
-		local v59 = v45
-
-		v59.current = v59.current + 1
-
-		local current = v45.current
-
-		v33({})
-		v35(nil)
-		v37(true)
-
-		local thread = task.delay(v3 / 1000, function() -- line: 96
-			-- upvalues: onSearch (copy), v58 (copy), v45 (copy), current (copy), v33 (copy), v35 (copy), v37 (copy)
-			onSearch(v58):andThen(function(p2) -- line: 99
-				-- upvalues: v45 (copy), current (copy), v33 (copy), v35 (copy), v37 (copy)
-				if v45.current == current then
-					v33(p2.ids)
-					v35(p2.nextCursor)
-					v37(false)
-				end
-			end):catch(function() -- line: 106
-				-- upvalues: v45 (copy), current (copy), v33 (copy), v35 (copy), v37 (copy)
-				if v45.current == current then
-					v33({})
-					v35(nil)
-					v37(false)
-				end
-			end)
-		end)
-
-		return function() -- line: 117
-			-- upvalues: thread (copy)
-			pcall(task.cancel, thread)
+		if ref.current or state3 == nil then
+			return
 		end
-	end, {
-		v30,
-		onSearch
-	})
 
-	local v48 = React.useCallback(function() -- line: 122
-		-- upvalues: v47 (copy), v44 (copy), v34 (copy), v45 (copy), onSearch (copy), v30 (copy), v33 (copy), appendUniqueIds (copy), v35 (copy), loadMoreBrowse (copy)
-		if v47 then
-			if v44.current or v34 == nil then
+		ref.current = true
+		local current = ref2.current
+		onSearch(trim(state), state3):andThen(function(p) -- inferred equivalent call
+			if ref2.current ~= current then
 				return
 			end
 
-			v44.current = true
-
-			local current = v45.current
-			local v63 = onSearch
-			local v64 = v30
-
-			v63(string.gsub(v64, "^%s*(.-)%s*$", "%1"), v34):andThen(function(p3) -- line: 132
-				-- upvalues: v45 (copy), current (copy), v33 (copy), appendUniqueIds (copy), v35 (copy)
-				if v45.current ~= current then
-					return
-				end
-
-				v33(function(p4) -- line: 137
-					-- upvalues: appendUniqueIds (copy), p3 (copy)
-					return (appendUniqueIds(p4, p3.ids))
-				end)
-				v35(p3.nextCursor)
-			end):finally(function() -- line: 142
-				-- upvalues: v44 (copy)
-				v44.current = false
+			setState2(function(p2)
+				return appendUniqueIds(p2, p.ids)
 			end)
 
-			return
-		end
+			setState3(p.nextCursor)
+		end):finally(function()
+			ref.current = false
+		end)
+	end, { v, state3, state, onSearch, loadMoreBrowse })
 
-		loadMoreBrowse()
-	end, {
-		v47,
-		v34,
-		v30,
-		onSearch,
-		loadMoreBrowse
-	})
-	local v49 = React.useMemo(function() -- line: 154
-		-- upvalues: v47 (copy), v32 (copy), browseIds (copy), excludeUserIds (copy)
-		local v65 = if not v47 then browseIds else v32
+	local userIds = React.useMemo(function()
+		local selected = if v then state2 else browseIds
 
 		if excludeUserIds == nil then
-			return v65
+			return selected
 		end
 
-		local t5 = {}
+		local result = {}
 
-		for _, v68 in v65 do
-			if not excludeUserIds[v68] then
-				table.insert(t5, v68)
+		for _, v2 in selected do
+			if not excludeUserIds[v2] then
+				table.insert(result, v2)
 			end
 		end
 
-		return t5
-	end, {
-		v47,
-		v32,
-		browseIds,
-		excludeUserIds
-	})
-	local n2 = 0
-
-	for _, v52 in v38 do
-		if v52 then
-			n2 += 1
-		end
-	end
-
-	React.useEffect(function() -- line: 173
-		-- upvalues: selectionLimit (copy), v39 (copy)
+		return result
+	end, { v, state2, browseIds, excludeUserIds })
+	local selectedCount = countKeys(state5) -- inferred equivalent call
+	React.useEffect(function()
 		if selectionLimit == nil then
 			return
 		end
 
-		local v69 = selectionLimit
+		local v2 = selectionLimit
+		setState5(function(items)
+			if countKeys(items) <= v2 then -- inferred equivalent call
+				return items
+			end
 
-		v39(function(p5) -- line: 178
-			-- upvalues: v69 (copy)
-			local n3 = 0
+			local count = 0
+			local result = {}
 
-			for _, v89 in p5 do
-				if v89 then
-					n3 += 1
+			for k, item in items do
+				if not (item and count < v2) then
+					continue
 				end
+
+				result[k] = true
+				count += 1
 			end
 
-			if n3 <= v69 then
-				return p5
-			end
-
-			local t6 = {}
-			local n4 = 0
-
-			for v92, v93 in p5 do
-				if v93 and n4 < v69 then
-					t6[v92] = true
-					n4 += 1
-				end
-			end
-
-			return t6
+			return result
 		end)
 	end, { selectionLimit })
-	React.useEffect(function() -- line: 194
-		-- upvalues: v46 (copy), onSelectionChanged (copy), v38 (copy)
-		if not v46.current then
-			v46.current = true
 
-			return
-		end
+	React.useEffect(function()
+		if not ref3.current then
+			ref3.current = true
+		elseif onSelectionChanged ~= nil then
+			local v2 = {}
 
-		if onSelectionChanged ~= nil then
-			local t7 = {}
-
-			for v71, v72 in v38 do
-				if v72 then
-					table.insert(t7, v71)
+			for k, v3 in state5 do
+				if v3 then
+					table.insert(v2, k)
 				end
 			end
 
-			onSelectionChanged(t7)
+			onSelectionChanged(v2)
 		end
-	end, {
-		v38,
-		onSelectionChanged
-	})
+	end, { state5, onSelectionChanged })
 
-	local v53 = React.useCallback(function(n5: number) -- line: 210
-		-- upvalues: v38 (copy)
-		return v38[n5] == true
-	end, { v38 })
-	local v54 = React.useCallback(function(n6: number) -- line: 214
-		-- upvalues: v38 (copy), selectionLimit (copy)
-		if v38[n6] == true then
-			return true
-		end
+	local isSelected = React.useCallback(function(p: number): boolean
+		return state5[p] == true
+	end, { state5 })
 
-		local v75 = true
+	local canSelect = React.useCallback(function(p: number): boolean
+		return state5[p] == true or selectionLimit == nil or countKeys(state5) < selectionLimit -- inferred equivalent call
+	end, { state5, selectionLimit })
 
-		if selectionLimit ~= nil then
-			local n7 = 0
+	local toggleSelected = React.useCallback(function(p: number)
+		setState5(function(p2)
+			local clone = table.clone(p2)
 
-			for _, v78 in v38 do
-				if v78 then
-					n7 += 1
-				end
+			if clone[p] then
+				clone[p] = nil
+				return clone
 			end
 
-			v75 = n7 < selectionLimit
-		end
-
-		return v75
-	end, {
-		v38,
-		selectionLimit
-	})
-	local v55 = React.useCallback(function(n8: number) -- line: 221
-		-- upvalues: v39 (copy), selectionLimit (copy)
-		v39(function(p6) -- line: 222
-			-- upvalues: n8 (copy), selectionLimit (copy)
-			local v95 = table.clone(p6)
-
-			if v95[n8] then
-				v95[n8] = nil
-
-				return v95
+			if selectionLimit ~= nil and not (countKeys(clone) < selectionLimit) then -- inferred equivalent call
+				return p2
 			end
 
-			if selectionLimit ~= nil then
-				local n9 = 0
-
-				for _, v98 in v95 do
-					if v98 then
-						n9 += 1
-					end
-				end
-
-				if not (n9 < selectionLimit) then
-					return p6
-				end
-			end
-
-			v95[n8] = true
-
-			return v95
+			clone[p] = true
+			return clone
 		end)
 	end, { selectionLimit })
-	local v56 = React.useCallback(function() -- line: 235
-		-- upvalues: v42 (copy), v38 (copy), v43 (copy), onSubmit (copy), v40 (copy)
-		if v42 then
+
+	local submit = React.useCallback(function()
+		if state7 then
 			return
 		end
 
-		local t8 = {}
+		local v2 = {}
 
-		for v81, v82 in v38 do
-			if v82 then
-				table.insert(t8, v81)
+		for k, v3 in state5 do
+			if v3 then
+				table.insert(v2, k)
 			end
 		end
 
-		if #t8 == 0 then
+		if #v2 == 0 then
 			return
 		end
 
-		v43(true)
+		setState7(true)
+		local v3
 
-		local v83 = onSubmit
-		local v84 = v40
+		if trim(state6) ~= "" then -- inferred equivalent call
+			v3 = state6
+		end
 
-		v83(t8, (if string.gsub(v84, "^%s*(.-)%s*$", "%1") == "" then nil else v40)):finally(function() -- line: 249
-			-- upvalues: v43 (copy)
-			v43(false)
+		onSubmit(v2, v3):finally(function()
+			setState7(false)
 		end)
-	end, {
-		v42,
-		v38,
-		v40,
-		onSubmit
-	})
+	end, { state7, state5, state6, onSubmit })
 
-	return {
-		searchText = v30,
-		setSearchText = v31,
-		userIds = v49,
-		isLoading = if not v47 then browseIsLoading else v36,
-		loadMore = v48,
-		selectedCount = n2,
-		hasSelection = n2 > 0,
-		selectionLimit = selectionLimit,
-		isSelected = v53,
-		canSelect = v54,
-		toggleSelected = v55,
-		message = v40,
-		setMessage = v41,
-		isSubmitting = v42,
-		submit = v56
+	local v2 = {
+		searchText = state,
+		setSearchText = setState,
+		userIds = userIds,
+		isLoading = nil,
+		loadMore = nil,
+		selectedCount = nil,
+		hasSelection = 0,
+		selectionLimit = 0,
+		isSelected = 0,
+		canSelect = 0,
+		toggleSelected = 0,
+		message = 0,
+		setMessage = 0,
+		isSubmitting = 0,
+		submit = 0
 	}
+
+	if v then
+		isLoading = state4
+	end
+
+	v2.isLoading = isLoading
+	v2.loadMore = loadMore
+	v2.selectedCount = selectedCount
+	v2.hasSelection = selectedCount > 0
+	v2.selectionLimit = selectionLimit
+	v2.isSelected = isSelected
+	v2.canSelect = canSelect
+	v2.toggleSelected = toggleSelected
+	v2.message = state6
+	v2.setMessage = setState6
+	v2.isSubmitting = state7
+	v2.submit = submit
+	return v2
 end
 
 return useUserPicker

@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("MomentsCommon").Parent
-local v2, v3 = require(Parent.Signals).createSignal(false)
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
 
-return {
-	getSuspended = v2,
-	setSuspended = v3
-}
+local Signals = require(parent.Signals)
+
+local signal, setSuspended = Signals.createSignal(false)
+
+return { getSuspended = signal, setSuspended = setSuspended }

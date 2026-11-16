@@ -1,13 +1,21 @@
 local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local ParentParent = script.Parent.Parent.Parent
-local EventConnection = require(ParentParent.Parent.Common.EventConnection)
-local SetInputType = require(ParentParent.Actions.SetInputType)
-local InputType = require(ParentParent.Constants).InputType
-local v9 = Roact.PureComponent:extend("LastInputTypeConnector")
-local t1 = {
+
+local parent = script.Parent.Parent.Parent
+
+local EventConnection = require(parent.Parent.Common.EventConnection)
+
+local SetInputType = require(parent.Actions.SetInputType)
+local Constants = require(parent.Constants)
+
+local InputType = Constants.InputType
+
+local extended = Roact.PureComponent:extend("LastInputTypeConnector")
+
+local v = {
 	[Enum.UserInputType.MouseButton2] = InputType.MouseAndKeyBoard,
 	[Enum.UserInputType.MouseButton3] = InputType.MouseAndKeyBoard,
 	[Enum.UserInputType.MouseWheel] = InputType.MouseAndKeyBoard,
@@ -24,35 +32,31 @@ local t1 = {
 	[Enum.UserInputType.Touch] = InputType.Touch
 }
 
-function v9.didMount(p1) -- line: 38
-	-- upvalues: t1 (copy), UserInputService (copy)
-	local v12 = t1[UserInputService:GetLastInputType()]
+function extended.didMount(p)
+	local v2 = v[UserInputService:GetLastInputType()]
 
-	if v12 then
-		p1.props.setInputType(v12)
+	if v2 then
+		p.props.setInputType(v2)
 	end
 end
-function v9.render(p2) -- line: 45
-	-- upvalues: Roact (copy), EventConnection (copy), UserInputService (copy), t1 (copy)
+
+function extended.render(p)
 	return Roact.createElement(EventConnection, {
 		event = UserInputService.LastInputTypeChanged,
-		callback = function(p3) -- line: 48
-			-- upvalues: t1 (copy), p2 (copy)
-			local v16 = t1[p3]
+		callback = function(p2)
+			local v2 = v[p2]
 
-			if v16 then
-				p2.props.setInputType(v16)
+			if v2 then
+				p.props.setInputType(v2)
 			end
 		end
 	})
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p4) -- line: 57
-	-- upvalues: SetInputType (copy)
+return RoactRodux.UNSTABLE_connect2(nil, function(callback)
 	return {
-		setInputType = function(p5) -- line: 59
-			-- upvalues: p4 (copy), SetInputType (copy)
-			return p4(SetInputType(p5))
+		setInputType = function(p)
+			return callback(SetInputType(p))
 		end
 	}
-end)(v9)
+end)(extended)

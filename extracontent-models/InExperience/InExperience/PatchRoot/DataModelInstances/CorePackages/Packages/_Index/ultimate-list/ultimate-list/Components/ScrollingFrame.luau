@@ -1,133 +1,76 @@
 local RunService = game:GetService("RunService")
-local ancestor = script:FindFirstAncestor("ultimate-list")
+local ultimatelist = script:FindFirstAncestor("ultimate-list")
 
-require(ancestor.DataSources)
-require(ancestor.Dimensions)
+require(ultimatelist.DataSources)
+require(ultimatelist.Dimensions)
+local React = require(ultimatelist.Parent.React)
+local RendererOverlay = require(script.Parent.RendererOverlay)
+require(ultimatelist.Renderers)
+local exhaustiveMatch = require(ultimatelist.Util.exhaustiveMatch)
+local useVirtualizedList = require(script.Parent.useVirtualizedList)
 
-local React = require(ancestor.Parent.React)
-local ReactBindingsRenderer = require(ancestor.Renderers.ReactBindingsRenderer)
-local ReactStateRenderer = require(ancestor.Renderers.ReactStateRenderer)
-
-require(ancestor.Renderers)
-
-local createVirtualizedListController = require(ancestor.createVirtualizedListController)
-local exhaustiveMatch = require(ancestor.Util.exhaustiveMatch)
 local createElement = React.createElement
 
-local function ScrollingFrame(t1: {[any]: any}) -- line: 15
-	-- upvalues: React (copy), createVirtualizedListController (copy), exhaustiveMatch (copy), RunService (copy), createElement (copy), ReactStateRenderer (copy), ReactBindingsRenderer (copy)
-	local v11 = React.useState(function() -- line: 34
-		-- upvalues: createVirtualizedListController (copy), t1 (copy)
-		return createVirtualizedListController(t1.dataSource, t1.dimensions, t1.direction)
-	end)
+local function ScrollingFrame(props)
+	local v = useVirtualizedList(props)
 
-	React.useEffect(function() -- line: 38
-		-- upvalues: v11 (copy)
-		return function() -- line: 39
-			-- upvalues: v11 (copy)
-			return v11.destroy()
+	local v2 = React.useCallback(function(p)
+		v.setWindowSize(p.AbsoluteWindowSize)
+
+		if props.onAbsoluteWindowSizeChanged ~= nil then
+			props.onAbsoluteWindowSizeChanged(p.AbsoluteWindowSize)
 		end
-	end, {})
+	end, { props.direction, props.onAbsoluteWindowSizeChanged })
 
-	local v12, v13 = React.useBinding(v11.getCanvasSize())
-	local v14, v15 = React.useBinding(Vector2.zero)
-	local v16, v17 = React.useBinding(0)
+	local v3 = React.useCallback(function(p)
+		local v3
 
-	React.useEffect(function() -- line: 48
-		-- upvalues: v11 (copy), v13 (copy)
-		return v11.bindToUpdate(function() -- line: 49
-			-- upvalues: v13 (copy), v11 (copy)
-			v13(v11.getCanvasSize())
-		end)
-	end, {})
-
-	local v18 = React.useCallback(function(p1) -- line: 54
-		-- upvalues: v15 (copy), v11 (copy), t1 (copy)
-		v15(p1.AbsoluteWindowSize)
-		v11.setWindowSize(p1.AbsoluteWindowSize)
-
-		if t1.onAbsoluteWindowSizeChanged ~= nil then
-			t1.onAbsoluteWindowSizeChanged(p1.AbsoluteWindowSize)
+		if props.direction == "x" then
+			v3 = p.CanvasPosition.X
+		elseif props.direction == "y" then
+			v3 = p.CanvasPosition.Y
+		else
+			v3 = exhaustiveMatch(props.direction)
 		end
-	end, {
-		t1.direction,
-		t1.onAbsoluteWindowSizeChanged
-	})
-	local v19 = React.useCallback(function(p2) -- line: 63
-		-- upvalues: t1 (copy), exhaustiveMatch (copy), RunService (copy), v11 (copy), v17 (copy)
-		local v25 = if t1.direction ~= "x" then if t1.direction ~= "y" then exhaustiveMatch(t1.direction) else p2.CanvasPosition.Y else p2.CanvasPosition.X
 
-		RunService.Heartbeat:Once(function() -- line: 71
-			-- upvalues: v11 (copy), v25 (copy), v17 (copy), t1 (copy)
-			v11.setScrollAxis(v25)
-			v17(v25)
+		RunService.Heartbeat:Once(function()
+			v.setScrollAxis(v3)
 
-			if t1.onScrollAxisChanged ~= nil then
-				t1.onScrollAxisChanged(v25)
+			if props.onScrollAxisChanged ~= nil then
+				props.onScrollAxisChanged(v3)
 			end
 		end)
-	end, {
-		t1.direction,
-		t1.onScrollAxisChanged
-	})
+	end, { props.direction, props.onScrollAxisChanged })
 
-	React.useEffect(function() -- line: 81
-		-- upvalues: v11 (copy), t1 (copy)
-		v11.setDataSource(t1.dataSource)
-	end, { t1.dataSource })
-	React.useEffect(function() -- line: 85
-		-- upvalues: v11 (copy), t1 (copy)
-		v11.setDimensions(t1.dimensions)
-	end, { t1.dimensions })
-
-	local t2 = {
+	local v4 = {
 		Size = UDim2.fromScale(1, 1),
-		CanvasSize = v12,
-		[React.Change.AbsoluteWindowSize] = v18,
-		[React.Change.CanvasPosition] = v19,
-		[React.Tag] = t1.tag,
-		ref = t1.scrollingFrameRef
+		CanvasSize = v.canvasSizeBinding,
+		[React.Change.AbsoluteWindowSize] = v2,
+		[React.Change.CanvasPosition] = v3,
+		[React.Tag] = props.tag,
+		ref = props.scrollingFrameRef
 	}
 
-	if t1.native ~= nil then
-		for v21, v22 in t1.native do
-			if t2[v21] ~= nil then
-				error(`{ v21 } is already used by UltimateList`)
+	if props.native ~= nil then
+		for k, v5 in props.native do
+			if v4[k] ~= nil then
+				error(`{k} is already used by UltimateList`)
 			end
 
-			t2[v21] = v22
+			v4[k] = v5
 		end
 	end
 
-	return createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1)
-	}, {
-		ScrollingFrame = createElement("ScrollingFrame", t2),
-		RendererOverlay = createElement("Frame", {
-			BackgroundTransparency = 1,
-			ClipsDescendants = true,
-			ZIndex = 2,
-			Size = v14:map(function(vector2: Vector2) -- line: 124
-				return UDim2.fromOffset(vector2.X, vector2.Y)
-			end)
-		}, {
-			Renderer = if t1.renderer.type ~= "byState" then if t1.renderer.type ~= "byBinding" then exhaustiveMatch(t1.renderer.type) else createElement(ReactBindingsRenderer, {
-				virtualizedListController = v11,
-				scrollAxisBinding = v16,
-				dimensions = t1.dimensions,
-				direction = t1.direction,
-				callback = t1.renderer.callback,
-				getKey = t1.getKey
-			}) else createElement(ReactStateRenderer, {
-				virtualizedListController = v11,
-				config = t1.renderer.config,
-				dimensions = t1.dimensions,
-				direction = t1.direction,
-				callback = t1.renderer.callback,
-				getKey = t1.getKey,
-				scrollAxisBinding = v16
-			})
+	return createElement("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) }, {
+		ScrollingFrame = createElement("ScrollingFrame", v4),
+		RendererOverlay = createElement(RendererOverlay, {
+			dimensions = props.dimensions,
+			renderer = props.renderer,
+			getKey = props.getKey,
+			direction = props.direction,
+			virtualizedListController = v.virtualizedListController,
+			windowSizeBinding = v.windowSizeBinding,
+			scrollAxisBinding = v.scrollAxisBinding
 		})
 	})
 end

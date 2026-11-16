@@ -1,5 +1,1 @@
-return {
-	Microphone = "microphone",
-	Camera = "camera",
-	Contacts = "contacts"
-}
+return { Microphone = "microphone", Camera = "camera", Contacts = "contacts" }

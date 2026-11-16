@@ -1,10 +1,11 @@
 local AvatarExperienceRodux = script:FindFirstAncestor("AvatarExperienceRodux")
-local AvatarExperienceRoduxParent = AvatarExperienceRodux.Parent
-local Rodux = require(AvatarExperienceRoduxParent.Rodux)
+local parent = AvatarExperienceRodux.Parent
+local Rodux = require(parent.Rodux)
+
 local PlayingSwimAnimation = require(AvatarExperienceRodux.Actions.PlayingSwimAnimation)
 
 return Rodux.createReducer(false, {
-	[PlayingSwimAnimation.name] = function(_: boolean, p1) -- line: 10
-		return p1.playingSwimAnimation
+	[PlayingSwimAnimation.name] = function(_: boolean, p)
+		return p.playingSwimAnimation
 	end
 })

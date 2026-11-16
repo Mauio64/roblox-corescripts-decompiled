@@ -1,43 +1,29 @@
-local t1 = {}
-
-t1.__index = t1
-
-function t1.new() -- line: 4
-	-- upvalues: t1 (copy)
-	local t2 = {}
-
-	setmetatable(t2, t1)
-
-	return t2
+local AggregatedData = {}
+AggregatedData.__index = AggregatedData
+function AggregatedData.new()
+	local v = {}
+	setmetatable(v, AggregatedData)
+	return v
 end
 
-local function isRbxAssetId(s1: string) -- line: 10
-	return s1:find("rbxassetid://")
+local function isRbxAssetId(value: string) -- 1 equivalent call inferred from this helper
+	return value:find("rbxassetid://")
 end
 
-function t1.addPlay(t3: {[any]: any}, s2: string, n1: number, n2: number) -- line: 14
-	if not s2:find("rbxassetid://") then
+function AggregatedData:addPlay(value: string, playtime: number, loopcount: number)
+	if not isRbxAssetId(value) then -- inferred equivalent call
 		return
 	end
 
-	local v9 = s2:sub(14)
+	local v = value:sub(14)
 
-	if t3[v9] == nil then
-		t3[v9] = {
-			playtime = n1,
-			loopcount = n2
-		}
-
+	if self[v] == nil then
+		self[v] = { playtime = playtime, loopcount = loopcount }
 		return
 	end
 
-	local v10 = t3[v9]
-
-	v10.playtime = v10.playtime + n1
-
-	local v11 = t3[v9]
-
-	v11.loopcount = v11.loopcount + n2
+	self[v].playtime += playtime
+	self[v].loopcount += loopcount
 end
 
-return t1
+return AggregatedData

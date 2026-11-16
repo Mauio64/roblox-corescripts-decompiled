@@ -1,12 +1,12 @@
 require(script.Parent.Parent.Stores.createCategoryInventoryStore)
-
 local createSortAndFiltersStore = require(script.Parent.Parent.Stores.createSortAndFiltersStore)
+require(script.Parent.Parent.Stores.createThumbnailLatencyStore)
 
-local function createAvatarEditorStores() -- line: 19
-	-- upvalues: createSortAndFiltersStore (copy)
+local function createAvatarEditorStores()
 	return {
 		categoryInventoryStores = {},
-		sortAndFiltersStore = createSortAndFiltersStore()
+		sortAndFiltersStore = createSortAndFiltersStore(),
+		thumbnailLatencyStores = {}
 	}
 end
 

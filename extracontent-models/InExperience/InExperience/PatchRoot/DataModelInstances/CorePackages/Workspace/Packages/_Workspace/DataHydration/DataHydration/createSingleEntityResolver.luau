@@ -1,50 +1,52 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
 
-local t1 = {}
-local t2 = {}
+local v = {}
+local v2 = {}
 
-local function createSingleEntityResolver(p1: ((...any) -> ...any), t3: {[any]: any}?) -- line: 44
-	-- upvalues: t1 (copy), t2 (copy), createDataCache (copy), createDataResolver (copy)
-	local v9 = t3 and t3.cache or t1
-	local v10 = t3 and t3.resolver or t2
-	local v11 = createDataCache(v9.ttlSeconds, v9.failedTtlSeconds)
-	local v12 = createDataResolver({
+local function createSingleEntityResolver(callback, p)
+	local cache = p and p.cache or v
+	local resolver = p and p.resolver or v2
+	local dataCache = createDataCache(cache.ttlSeconds, cache.failedTtlSeconds, {
+		ttlSecondsForItem = cache.ttlSecondsForItem
+	})
+
+	local dataResolver = createDataResolver({
+		cache = dataCache,
 		supportsMultiGet = false,
-		cache = v11,
-		fetchFn = function(s1: string, _) -- line: 54
-			-- upvalues: p1 (copy)
-			return p1((tonumber(s1)))
+		fetchFn = function(p2: string, _)
+			return callback((tonumber(p2)))
 		end,
-		queueProcessDelaySec = v10.queueProcessDelaySec,
-		requestTimeoutSec = v10.requestTimeoutSec,
-		logError = v10.logError,
-		onClear = v10.onClear
+		queueProcessDelaySec = resolver.queueProcessDelaySec,
+		requestTimeoutSec = resolver.requestTimeoutSec,
+		replaceItems = resolver.replaceItems,
+		logError = resolver.logError,
+		onClear = resolver.onClear
 	})
 
 	return {
-		cache = v11,
-		get = function(p3) -- line: 65
-			-- upvalues: v12 (copy)
-			return v12.getCachedItem((tostring(p3)))
+		cache = dataCache,
+		get = function(p2)
+			return dataResolver.getCachedItem((tostring(p2)))
 		end,
-		fetch = function(p4) -- line: 68
-			-- upvalues: v12 (copy)
-			return v12.fetchItem((tostring(p4)))
+		fetch = function(p2)
+			return dataResolver.fetchItem((tostring(p2)))
 		end,
-		getAndFetch = function(p5) -- line: 71
-			-- upvalues: v12 (copy)
-			return v12.getAndFetchItem((tostring(p5)))
+		refetch = function(p2)
+			return dataResolver.refetchItem((tostring(p2)))
 		end,
-		update = function(p6, p7) -- line: 74
-			-- upvalues: v11 (copy)
-			v11.updateItem(tostring(p6), p7)
+		getAndFetch = function(p2)
+			return dataResolver.getAndFetchItem((tostring(p2)))
 		end,
-		clear = v12.clear,
-		dispose = v12.dispose
+		update = function(p2, p3)
+			dataCache.updateItem(tostring(p2), p3)
+		end,
+		getAccountResetGeneration = dataResolver.getAccountResetGeneration,
+		clear = dataResolver.clear,
+		dispose = dataResolver.dispose
 	}
 end
 

@@ -1,21 +1,29 @@
 local CorePackages = game:GetService("CorePackages")
+
 local t = require(CorePackages.Packages.t)
+
 local Types = require(script.Parent.Parent.Types)
 local maybeAssert = require(script.Parent.maybeAssert)
-local _ = script.Parent.Parent.Parent.Parent.Flags
 
-local function getSettingsForMessage(p1, p2) -- line: 12
-	-- upvalues: maybeAssert (copy), Types (copy), t (copy)
-	maybeAssert(Types.IChatSettings(p1))
+local Flags = script.Parent.Parent.Parent.Parent.Flags
+
+local function getSettingsForMessage(p, p2)
+	maybeAssert(Types.IChatSettings(p))
 	maybeAssert(t.optional(Types.IMessage)(p2))
 
-	local UserSpecificSettings = p1.UserSpecificSettings
+	local userSpecificSettings = p.UserSpecificSettings
 
-	if not UserSpecificSettings or not p2 then
-		return p1
+	if not (userSpecificSettings and p2) then
+		return p
 	end
 
-	return UserSpecificSettings[p2.userId] or (not p2.adornee or UserSpecificSettings[p2.adornee:GetFullName()]) or p1
+	local v = userSpecificSettings[p2.userId]
+
+	if not v and p2.adornee then
+		v = userSpecificSettings[p2.adornee:GetFullName()]
+	end
+
+	return v or p
 end
 
 return getSettingsForMessage

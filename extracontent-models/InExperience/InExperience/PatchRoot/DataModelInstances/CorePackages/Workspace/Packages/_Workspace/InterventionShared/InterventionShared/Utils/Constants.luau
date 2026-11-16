@@ -1,16 +1,8 @@
 return {
-	InitialUIState = {
-		treatmentType = "none",
-		isShown = false,
-		dispatchTimestamp = 0,
-		detail = {}
-	},
-	UIStateActions = {
-		ToggleNotificationDialog = "ToggleNotificationDialog"
-	},
+	InitialUIState = { treatmentType = "none", isShown = false, detail = {}, dispatchTimestamp = 0 },
+	UIStateActions = { ToggleNotificationDialog = "ToggleNotificationDialog" },
 	EXP_INTERV_SIGNAL_NAMESPACE = "ExperienceIntervention",
 	FEATURE_INTERV_SIGNAL_NAMESPACE = "FeatureIntervention",
-	AVATAR_VIOLATION_SIGNAL_NAMESPACE = "AvatarViolation",
 	ChatNudgeDialogSelectionGroup = "ChatNudgeCustomDialog",
 	TreatmentType = {
 		ChatNudgeToast = "nudgeToast",
@@ -24,22 +16,18 @@ return {
 		PartyChatTimeoutDialog = "partyChatTimeoutDialog",
 		BackendDriven = "BackendDriven",
 		UniversalFeatureRestriction = "universalFeatureRestriction",
-		TemporaryAvatarKickWarning = "temporaryAvatarKickWarning",
+		DictationSafetyReminderToast = "dictationSafetyReminderToast",
 		None = "none"
 	},
 	AbuseVectorType = {
 		ExperienceChat = "experience_chat",
 		PartyChat = "party_chat",
-		RobloxExperienceKick = "roblox_experience_kick"
+		RobloxExperienceKick = "roblox_experience_kick",
+		AgeVerification = "age_verification",
+		Voice = "voice"
 	},
-	NotificationDialogType = {
-		ChatNudge = "nudge",
-		ChatTimeout = "timeout"
-	},
-	NotificationModalType = {
-		Dialog = "dialog",
-		Toast = "toast"
-	},
+	NotificationDialogType = { ChatNudge = "nudge", ChatTimeout = "timeout" },
+	NotificationModalType = { Dialog = "dialog", Toast = "toast" },
 	PunishmentTypeDescription = {
 		ChatTimeout = "Chat Timeout",
 		ChatNudge = "Chat Nudge",
@@ -98,9 +86,6 @@ return {
 		ModeratorNoteLabel = "Feature.NotApproved.Label.ModeratorNote",
 		OkText = "Feature.AppealsPortal.Action.OK",
 		AppealsPortalTitleText = "Feature.AppealsPortal.Label.ReportAndAppeals",
-		AccountStatusTitleText = "Feature.SafetyDashboard.Heading.AccountStatus",
-		AvatarKickWarningTitle = "Notifications.SafetyAvatarModeration.Label.NotificationTypeInExpWarn",
-		AvatarKickWarningDescription = "Notifications.SafetyAvatarModeration.Description.NotificationTypeInExpWarnMsg",
-		Thanks = "CommonUI.Features.Label.Thanks"
+		AccountStatusTitleText = "Feature.SafetyDashboard.Heading.AccountStatus.V2"
 	}
 }

@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.Scheduler.Scheduler))
+local Scheduler = require(index.Scheduler.Scheduler)
+
+return Scheduler

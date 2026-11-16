@@ -1,27 +1,36 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local tutils = require(Parent.tutils)
+local parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local tutils = require(parent.tutils)
 local Players = game:GetService("Players")
-local UserLib = require(Parent.UserLib)
+local UserLib = require(parent.UserLib)
 
-local function selectPlayer(p1) -- line: 13
-	return {
-		playerName = p1.playerName,
-		playerId = p1.playerId
-	}
+local function selectPlayer(p)
+	return { playerName = p.playerName, playerId = p.playerId }
 end
 
-return function() -- line: 26
-	-- upvalues: useSelector (copy), selectPlayer (copy), tutils (copy), Players (copy), UserLib (copy)
-	local v8 = useSelector(selectPlayer, tutils.deepEqual)
-	local v9 = if not v8 then nil else v8.playerName
-	local v10 = if not v8 then nil else tonumber(v8.playerId)
-	local v11 = v10 and Players:GetPlayerByUserId(v10)
-	local v12 = not not v11 and UserLib.Utils.isPlayerVerified(v11)
+return function()
+	local v = useSelector(selectPlayer, tutils.deepEqual)
+	local playerName
 
-	return {
-		playerName = v9,
-		playerId = v10,
-		hasVerifiedBadge = v12
-	}
+	if v then
+		playerName = v.playerName
+	end
+
+	local playerId
+
+	if v then
+		playerId = tonumber(v.playerId)
+	end
+
+	local playerByUserId = playerId and Players:GetPlayerByUserId(playerId)
+	local hasVerifiedBadge
+
+	if playerByUserId then
+		hasVerifiedBadge = UserLib.Utils.isPlayerVerified(playerByUserId)
+	else
+		hasVerifiedBadge = false
+	end
+
+	return { playerName = playerName, playerId = playerId, hasVerifiedBadge = hasVerifiedBadge }
 end

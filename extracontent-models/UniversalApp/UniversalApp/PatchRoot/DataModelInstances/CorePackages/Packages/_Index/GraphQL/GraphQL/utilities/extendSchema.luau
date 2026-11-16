@@ -1,44 +1,59 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Error = LuauPolyfill.Error
 local Map = LuauPolyfill.Map
 local Object = LuauPolyfill.Object
 local coerceToMap = LuauPolyfill.coerceToMap
-local mapValueOrdered = require(ParentParent.luaUtils.mapValueOrdered).mapValueOrdered
 
-require(ParentParent.luaUtils.null)
+local mapValueOrdered = require(parent.luaUtils.mapValueOrdered)
+local mapValueOrdered2 = mapValueOrdered.mapValueOrdered
+require(parent.luaUtils.null)
 
-local jsutils = ParentParent.jsutils
-local keyMap = require(jsutils.keyMap).keyMap
-local inspect = require(jsutils.inspect).inspect
-local devAssert = require(jsutils.devAssert).devAssert
-
+local jsutils = parent.jsutils
+local keyMap = require(jsutils.keyMap)
+local keyMap2 = keyMap.keyMap
+local inspect = require(jsutils.inspect)
+local inspect2 = inspect.inspect
+local devAssert = require(jsutils.devAssert)
+local devAssert2 = devAssert.devAssert
 require(jsutils.ObjMap)
-require(ParentParent.language.ast)
 
-local Kind = require(ParentParent.language.kinds).Kind
-local predicates = require(ParentParent.language.predicates)
+require(parent.language.ast)
+
+local kinds = require(parent.language.kinds)
+local kind = kinds.Kind
+
+local predicates = require(parent.language.predicates)
 local isTypeDefinitionNode = predicates.isTypeDefinitionNode
 local isTypeExtensionNode = predicates.isTypeExtensionNode
-local assertValidSDLExtension = require(ParentParent.validation.validate).assertValidSDLExtension
-local getDirectiveValues = require(ParentParent.execution.values).getDirectiveValues
-local type = ParentParent.type
-local schema = require(type.schema)
+
+local validate = require(parent.validation.validate)
+local assertValidSDLExtension = validate.assertValidSDLExtension
+
+local values = require(parent.execution.values)
+local getDirectiveValues = values.getDirectiveValues
+
+local kind2 = parent.type
+local schema = require(kind2.schema)
+
 local assertSchema = schema.assertSchema
-local GraphQLSchema = schema.GraphQLSchema
-local scalars = require(type.scalars)
+local graphQLSchema = schema.GraphQLSchema
+local scalars = require(kind2.scalars)
 local specifiedScalarTypes = scalars.specifiedScalarTypes
 local isSpecifiedScalarType = scalars.isSpecifiedScalarType
-local introspection = require(type.introspection)
+local introspection = require(kind2.introspection)
 local introspectionTypes = introspection.introspectionTypes
 local isIntrospectionType = introspection.isIntrospectionType
-local directives = require(type.directives)
-local GraphQLDirective = directives.GraphQLDirective
-local GraphQLDeprecatedDirective = directives.GraphQLDeprecatedDirective
-local GraphQLSpecifiedByDirective = directives.GraphQLSpecifiedByDirective
-local definition = require(type.definition)
+local directives = require(kind2.directives)
+
+local graphQLDirective = directives.GraphQLDirective
+local graphQLDeprecatedDirective = directives.GraphQLDeprecatedDirective
+local graphQLSpecifiedByDirective = directives.GraphQLSpecifiedByDirective
+
+local definition = require(kind2.definition)
+
 local isScalarType = definition.isScalarType
 local isObjectType = definition.isObjectType
 local isInterfaceType = definition.isInterfaceType
@@ -47,563 +62,654 @@ local isListType = definition.isListType
 local isNonNullType = definition.isNonNullType
 local isEnumType = definition.isEnumType
 local isInputObjectType = definition.isInputObjectType
-local GraphQLList = definition.GraphQLList
-local GraphQLNonNull = definition.GraphQLNonNull
-local GraphQLScalarType = definition.GraphQLScalarType
-local GraphQLObjectType = definition.GraphQLObjectType
-local GraphQLInterfaceType = definition.GraphQLInterfaceType
-local GraphQLUnionType = definition.GraphQLUnionType
-local GraphQLEnumType = definition.GraphQLEnumType
-local GraphQLInputObjectType = definition.GraphQLInputObjectType
-local valueFromAST = require(script.Parent.valueFromAST).valueFromAST
-local u52 = nil
-local getDeprecationReason = nil
-local getSpecifiedByUrl = nil
+local graphQLList = definition.GraphQLList
+local graphQLNonNull = definition.GraphQLNonNull
+local graphQLScalarType = definition.GraphQLScalarType
 
-function extendSchemaImpl(p1, p2, p3) -- line: 175
-	-- upvalues: Map (copy), Kind (copy), isTypeDefinitionNode (copy), isTypeExtensionNode (copy), Array (copy), isListType (copy), GraphQLList (copy), isNonNullType (copy), GraphQLNonNull (copy), GraphQLDirective (copy), Object (copy), mapValueOrdered (copy), coerceToMap (copy), isIntrospectionType (copy), isSpecifiedScalarType (copy), isScalarType (copy), isObjectType (copy), isInterfaceType (copy), isUnionType (copy), isEnumType (copy), isInputObjectType (copy), inspect (copy), GraphQLInputObjectType (copy), GraphQLEnumType (copy), getSpecifiedByUrl (ref), GraphQLScalarType (copy), GraphQLObjectType (copy), GraphQLInterfaceType (copy), GraphQLUnionType (copy), u52 (ref), Error (copy), getDeprecationReason (ref), valueFromAST (copy)
-	local t1 = {}
-	local v64 = Map.new()
-	local t2 = {}
-	local v66 = nil
-	local t3 = {}
+local graphQLObjectType = definition.GraphQLObjectType
 
-	for _, v in ipairs(p2.definitions) do
-		if v.kind == Kind.SCHEMA_DEFINITION then
-			v66 = v
-		elseif v.kind == Kind.SCHEMA_EXTENSION then
-			table.insert(t3, v)
-		elseif isTypeDefinitionNode(v) then
-			table.insert(t1, v)
-		elseif isTypeExtensionNode(v) then
-			local value = v.name.value
-			local v71 = v64:get(value)
+local graphQLInterfaceType = definition.GraphQLInterfaceType
 
-			v64:set(value, if not v71 then { v } else Array.concat(v71, { v }))
-		elseif v.kind == Kind.DIRECTIVE_DEFINITION then
-			table.insert(t2, v)
+local graphQLUnionType = definition.GraphQLUnionType
+
+local graphQLEnumType = definition.GraphQLEnumType
+
+local graphQLInputObjectType = definition.GraphQLInputObjectType
+
+local valueFromAST = require(script.Parent.valueFromAST)
+local valueFromAST2 = valueFromAST.valueFromAST
+
+local v = nil
+local getDeprecationReason
+local getSpecifiedByUrl
+
+function extendSchemaImpl(data, p, p2)
+	local v2 = Map.new()
+
+	local definitions = {}
+	local definitions2 = {}
+
+	local definitions3 = {}
+	local v3 = nil
+
+	for _, definition2 in ipairs(p.definitions) do
+		if definition2.kind == kind.SCHEMA_DEFINITION then
+			v3 = definition2
+		elseif definition2.kind == kind.SCHEMA_EXTENSION then
+			table.insert(definitions, definition2)
+		elseif isTypeDefinitionNode(definition2) then
+			table.insert(definitions2, definition2)
+		elseif isTypeExtensionNode(definition2) then
+			local value = definition2.name.value
+
+			local v4 = v2:get(value)
+			v2:set(value, not v4 and { definition2 } or Array.concat(v4, { definition2 }))
+		elseif definition2.kind == kind.DIRECTIVE_DEFINITION then
+			table.insert(definitions3, definition2)
 		end
 	end
 
-	if #v64:keys() == 0 and #t1 == 0 and #t2 == 0 and #t3 == 0 and v66 == nil then
-		return p1
+	if #v2:keys() == 0 and #definitions2 == 0 and #definitions3 == 0 and #definitions == 0 and v3 == nil then
+		return data
 	end
 
-	local v72 = Map.new()
-	local replaceNamedType = nil
-	local extendArg = nil
-	local extendField = nil
-	local extendScalarType = nil
-	local extendObjectType = nil
-	local extendInterfaceType = nil
-	local extendUnionType = nil
-	local extendEnumType = nil
-	local extendInputObjectType = nil
-	local buildInputFieldMap = nil
-	local buildEnumValueMap = nil
-	local buildInterfaces = nil
-	local buildUnionTypes = nil
-	local getNamedType = nil
-	local buildArgumentMap = nil
-	local buildFieldMap = nil
+	local v4 = Map.new()
 
-	local function replaceType(p4) -- line: 279
-		-- upvalues: isListType (copy), GraphQLList (copy), replaceType (copy), isNonNullType (copy), GraphQLNonNull (copy), replaceNamedType (ref)
-		if isListType(p4) then
-			return GraphQLList.new(replaceType(p4.ofType))
+	local replaceNamedType
+	local extendArg
+	local extendField
+	local extendScalarType
+	local extendObjectType
+	local extendInterfaceType
+	local extendUnionType
+	local extendEnumType
+	local extendInputObjectType
+	local buildInputFieldMap
+
+	local buildEnumValueMap
+
+	local buildInterfaces
+
+	local buildUnionTypes
+	local getNamedType
+	local buildArgumentMap
+	local buildFieldMap
+	local function replaceType(kind3)
+		if isListType(kind3) then
+			return graphQLList.new(replaceType(kind3.ofType))
 		end
 
-		if isNonNullType(p4) then
-			return GraphQLNonNull.new(replaceType(p4.ofType))
+		if isNonNullType(kind3) then
+			return graphQLNonNull.new(replaceType(kind3.ofType))
 		end
 
-		return replaceNamedType(p4)
+		return replaceNamedType(kind3)
 	end
 
-	function replaceNamedType(p5) -- line: 291
-		-- upvalues: v72 (copy)
-		return v72:get(p5.name)
+	replaceNamedType = function(p3)
+		return v4:get(p3.name)
 	end
 
-	local function replaceDirective(p6) -- line: 299
-		-- upvalues: GraphQLDirective (copy), Object (copy), mapValueOrdered (copy), coerceToMap (copy), extendArg (ref)
-		local v113 = p6:toConfig()
-
-		return GraphQLDirective.new(Object.assign({}, v113, {
-			args = mapValueOrdered(coerceToMap(v113.args), extendArg)
+	local function replaceDirective(object)
+		local config = object:toConfig()
+		return graphQLDirective.new(Object.assign({}, config, {
+			args = mapValueOrdered2(coerceToMap(config.args), extendArg)
 		}))
 	end
-	local function extendNamedType(p7) -- line: 310
-		-- upvalues: isIntrospectionType (copy), isSpecifiedScalarType (copy), isScalarType (copy), extendScalarType (ref), isObjectType (copy), extendObjectType (ref), isInterfaceType (copy), extendInterfaceType (ref), isUnionType (copy), extendUnionType (ref), isEnumType (copy), extendEnumType (ref), isInputObjectType (copy), extendInputObjectType (ref), inspect (copy)
-		if isIntrospectionType(p7) or isSpecifiedScalarType(p7) then
-			return p7
+
+	local function extendNamedType(kind3)
+		if isIntrospectionType(kind3) or isSpecifiedScalarType(kind3) then
+			return kind3
 		end
 
-		if isScalarType(p7) then
-			return extendScalarType(p7)
+		if isScalarType(kind3) then
+			return extendScalarType(kind3)
 		end
 
-		if isObjectType(p7) then
-			return extendObjectType(p7)
+		if isObjectType(kind3) then
+			return extendObjectType(kind3)
 		end
 
-		if isInterfaceType(p7) then
-			return extendInterfaceType(p7)
+		if isInterfaceType(kind3) then
+			return extendInterfaceType(kind3)
 		end
 
-		if isUnionType(p7) then
-			return extendUnionType(p7)
+		if isUnionType(kind3) then
+			return extendUnionType(kind3)
 		end
 
-		if isEnumType(p7) then
-			return extendEnumType(p7)
+		if isEnumType(kind3) then
+			return extendEnumType(kind3)
 		end
 
-		if isInputObjectType(p7) then
-			return extendInputObjectType(p7)
+		if isInputObjectType(kind3) then
+			return extendInputObjectType(kind3)
 		end
 
-		assert(false, "Unexpected type: " .. inspect(p7))
+		assert(false, "Unexpected type: " .. inspect2(kind3))
 	end
 
-	function extendInputObjectType(p8) -- line: 341
-		-- upvalues: v64 (copy), GraphQLInputObjectType (copy), Object (copy), Map (copy), Array (copy), mapValueOrdered (copy), coerceToMap (copy), replaceType (copy), buildInputFieldMap (ref)
-		local v116 = p8:toConfig()
-		local v117 = v64[v116.name] or {}
+	extendInputObjectType = function(object)
+		local config = object:toConfig()
 
-		return GraphQLInputObjectType.new(Object.assign({}, v116, {
-			fields = function() -- line: 347
-				-- upvalues: Map (copy), Array (copy), mapValueOrdered (copy), coerceToMap (copy), v116 (copy), Object (copy), replaceType (copy), buildInputFieldMap (ref), v117 (copy)
-				return Map.new(Array.concat(mapValueOrdered(coerceToMap(v116.fields), function(p9) -- line: 349
-					-- upvalues: Object (copy), replaceType (copy)
-					return Object.assign({}, p9, {
-						type = replaceType(p9.type)
-					})
-				end):entries(), buildInputFieldMap(v117):entries()))
+		local v5 = v2[config.name] or {}
+
+		return graphQLInputObjectType.new(Object.assign({}, config, {
+			fields = function()
+				return Map.new(Array.concat(mapValueOrdered2(coerceToMap(config.fields), function(p3)
+					return Object.assign({}, p3, { type = replaceType(p3.type) })
+				end):entries(), buildInputFieldMap(v5):entries()))
 			end,
-			extensionASTNodes = Array.concat(v116.extensionASTNodes, v117)
+			extensionASTNodes = Array.concat(config.extensionASTNodes, v5)
 		}))
 	end
-	function extendEnumType(p10) -- line: 360
-		-- upvalues: v64 (copy), GraphQLEnumType (copy), Object (copy), Map (copy), Array (copy), buildEnumValueMap (ref)
-		local v119 = p10:toConfig()
-		local v120 = v64:get(p10.name) or {}
 
-		return GraphQLEnumType.new(Object.assign({}, v119, {
-			values = Map.new(Array.concat(v119.values:entries(), buildEnumValueMap(v120):entries())),
-			extensionASTNodes = Array.concat(v119.extensionASTNodes, v120)
+	extendEnumType = function(object)
+		local config = object:toConfig()
+
+		local v5 = v2:get(object.name) or {}
+
+		return graphQLEnumType.new(Object.assign({}, config, {
+			values = Map.new(Array.concat(config.values:entries(), buildEnumValueMap(v5):entries())),
+			extensionASTNodes = Array.concat(config.extensionASTNodes, v5)
 		}))
 	end
-	function extendScalarType(p11) -- line: 378
-		-- upvalues: v64 (copy), getSpecifiedByUrl (ref), GraphQLScalarType (copy), Object (copy), Array (copy)
-		local v122 = p11:toConfig()
-		local v123 = v64:get(v122.name) or {}
-		local specifiedByUrl = v122.specifiedByUrl
 
-		for _, v in ipairs(v123) do
-			specifiedByUrl = getSpecifiedByUrl(v) or specifiedByUrl
+	extendScalarType = function(object)
+		local config = object:toConfig()
+
+		local v5 = v2:get(config.name) or {}
+
+		local specifiedByUrl = config.specifiedByUrl
+
+		for _, v6 in ipairs(v5) do
+			specifiedByUrl = getSpecifiedByUrl(v6) or specifiedByUrl
 		end
 
-		return GraphQLScalarType.new(Object.assign({}, v122, {
+		return graphQLScalarType.new(Object.assign({}, config, {
 			specifiedByUrl = specifiedByUrl,
-			extensionASTNodes = Array.concat(v122.extensionASTNodes, v123)
+			extensionASTNodes = Array.concat(config.extensionASTNodes, v5)
 		}))
 	end
-	function extendObjectType(p12) -- line: 394
-		-- upvalues: v64 (copy), GraphQLObjectType (copy), Object (copy), Array (copy), replaceNamedType (ref), buildInterfaces (ref), Map (copy), mapValueOrdered (copy), coerceToMap (copy), extendField (ref), buildFieldMap (ref)
-		local v128 = p12:toConfig()
-		local v129 = v64:get(v128.name) or {}
 
-		return GraphQLObjectType.new(Object.assign({}, v128, {
-			interfaces = function() -- line: 400
-				-- upvalues: Array (copy), p12 (copy), replaceNamedType (ref), buildInterfaces (ref), v129 (copy)
-				return Array.concat(Array.map(p12:getInterfaces(), replaceNamedType), buildInterfaces(v129))
+	extendObjectType = function(object)
+		local config = object:toConfig()
+
+		local v5 = v2:get(config.name) or {}
+
+		return graphQLObjectType.new(Object.assign({}, config, {
+			interfaces = function()
+				return Array.concat(Array.map(object:getInterfaces(), replaceNamedType), buildInterfaces(v5))
 			end,
-			fields = function() -- line: 407
-				-- upvalues: Map (copy), Array (copy), mapValueOrdered (copy), coerceToMap (copy), v128 (copy), extendField (ref), buildFieldMap (ref), v129 (copy)
-				return Map.new(Array.concat(mapValueOrdered(coerceToMap(v128.fields), extendField):entries(), buildFieldMap(v129):entries()))
+			fields = function()
+				return Map.new(Array.concat(
+					mapValueOrdered2(coerceToMap(config.fields), extendField):entries(),
+					buildFieldMap(v5):entries()
+				))
 			end,
-			extensionASTNodes = Array.concat(v128.extensionASTNodes, v129)
+			extensionASTNodes = Array.concat(config.extensionASTNodes, v5)
 		}))
 	end
-	function extendInterfaceType(p13) -- line: 419
-		-- upvalues: v64 (copy), GraphQLInterfaceType (copy), Object (copy), Array (copy), replaceNamedType (ref), buildInterfaces (ref), Map (copy), mapValueOrdered (copy), coerceToMap (copy), extendField (ref), buildFieldMap (ref)
-		local v131 = p13:toConfig()
-		local v132 = v64:get(v131.name) or {}
 
-		return GraphQLInterfaceType.new(Object.assign({}, v131, {
-			interfaces = function() -- line: 425
-				-- upvalues: Array (copy), p13 (copy), replaceNamedType (ref), buildInterfaces (ref), v132 (copy)
-				return Array.concat(Array.map(p13:getInterfaces(), replaceNamedType), buildInterfaces(v132))
+	extendInterfaceType = function(object)
+		local config = object:toConfig()
+
+		local v5 = v2:get(config.name) or {}
+
+		return graphQLInterfaceType.new(Object.assign({}, config, {
+			interfaces = function()
+				return Array.concat(Array.map(object:getInterfaces(), replaceNamedType), buildInterfaces(v5))
 			end,
-			fields = function() -- line: 432
-				-- upvalues: Map (copy), Array (copy), mapValueOrdered (copy), coerceToMap (copy), v131 (copy), extendField (ref), buildFieldMap (ref), v132 (copy)
-				return Map.new(Array.concat(mapValueOrdered(coerceToMap(v131.fields), extendField):entries(), buildFieldMap(v132):entries()))
+			fields = function()
+				return Map.new(Array.concat(
+					mapValueOrdered2(coerceToMap(config.fields), extendField):entries(),
+					buildFieldMap(v5):entries()
+				))
 			end,
-			extensionASTNodes = Array.concat(v131.extensionASTNodes, v132)
+			extensionASTNodes = Array.concat(config.extensionASTNodes, v5)
 		}))
 	end
-	function extendUnionType(p14) -- line: 444
-		-- upvalues: v64 (copy), GraphQLUnionType (copy), Object (copy), Array (copy), replaceNamedType (ref), buildUnionTypes (ref)
-		local v134 = p14:toConfig()
-		local v135 = v64:get(v134.name) or {}
 
-		return GraphQLUnionType.new(Object.assign({}, v134, {
-			types = function() -- line: 450
-				-- upvalues: Array (copy), p14 (copy), replaceNamedType (ref), buildUnionTypes (ref), v135 (copy)
-				return Array.concat(Array.map(p14:getTypes(), replaceNamedType), buildUnionTypes(v135))
+	extendUnionType = function(object)
+		local config = object:toConfig()
+
+		local v5 = v2:get(config.name) or {}
+
+		return graphQLUnionType.new(Object.assign({}, config, {
+			types = function()
+				return Array.concat(Array.map(object:getTypes(), replaceNamedType), buildUnionTypes(v5))
 			end,
-			extensionASTNodes = Array.concat(v134.extensionASTNodes, v135)
+			extensionASTNodes = Array.concat(config.extensionASTNodes, v5)
 		}))
 	end
-	function extendField(p15) -- line: 461
-		-- upvalues: Object (copy), replaceType (copy), mapValueOrdered (copy), extendArg (ref)
-		return Object.assign({}, p15, {
-			type = replaceType(p15.type),
-			args = if not p15.args then nil else mapValueOrdered(p15.args, extendArg)
-		})
+
+	extendField = function(p3)
+		local assign = Object.assign
+		local v5 = { type = replaceType(p3.type), args = 0 }
+		local args
+
+		if p3.args then
+			args = mapValueOrdered2(p3.args, extendArg)
+		end
+
+		v5.args = args
+		return assign({}, p3, v5)
 	end
-	function extendArg(p16) -- line: 469
-		-- upvalues: Object (copy), replaceType (copy)
-		return Object.assign({}, p16, {
-			type = replaceType(p16.type)
-		})
+
+	extendArg = function(p3)
+		return Object.assign({}, p3, { type = replaceType(p3.type) })
 	end
 
-	local function getOperationTypes(p17) -- line: 473
-		-- upvalues: getNamedType (ref)
-		local t4 = {}
+	local function getOperationTypes(list)
+		local operationTypes = {}
 
-		for _, v in ipairs(p17) do
-			local v142 = v.operationTypes or {}
+		for _, item in ipairs(list) do
+			local operationTypes2 = item.operationTypes or {}
 
-			for _, v2 in ipairs(v142) do
-				t4[v2.operation] = getNamedType(v2.type)
+			for _, operationType in ipairs(operationTypes2) do
+				operationTypes[operationType.operation] = getNamedType(operationType.type)
 			end
 		end
 
-		return t4
+		return operationTypes
 	end
 
-	function getNamedType(p18) -- line: 496
-		-- upvalues: u52 (ref), v72 (copy), Error (copy)
-		local value = p18.name.value
-		local v147 = u52[value] or v72[value]
+	getNamedType = function(p3)
+		local value = p3.name.value
 
-		if v147 == nil then
+		local namedType = v[value] or v4[value]
+
+		if namedType == nil then
 			error(Error.new(("Unknown type: \"%s\"."):format(value)))
 		end
 
-		return v147
+		return namedType
 	end
 
-	local function getWrappedType(p19) -- line: 508
-		-- upvalues: Kind (copy), GraphQLList (copy), getWrappedType (copy), GraphQLNonNull (copy), getNamedType (ref)
-		if p19.kind == Kind.LIST_TYPE then
-			return GraphQLList.new(getWrappedType(p19.type))
+	local function getWrappedType(kind3)
+		if kind3.kind == kind.LIST_TYPE then
+			return graphQLList.new(getWrappedType(kind3.type))
 		end
 
-		if p19.kind == Kind.NON_NULL_TYPE then
-			return GraphQLNonNull.new(getWrappedType(p19.type))
+		if kind3.kind == kind.NON_NULL_TYPE then
+			return graphQLNonNull.new(getWrappedType(kind3.type))
 		end
 
-		return getNamedType(p19)
+		return getNamedType(kind3)
 	end
-	local function buildDirective(p20) -- line: 519
-		-- upvalues: Array (copy), GraphQLDirective (copy), buildArgumentMap (ref)
-		local v150 = Array.map(p20.locations, function(p21) -- line: 520
-			return p21.value
+
+	local function buildDirective(astNode)
+		local mapped = Array.map(astNode.locations, function(p3)
+			return p3.value
 		end)
 
-		return GraphQLDirective.new({
-			name = p20.name.value,
-			description = if not p20.description then nil else p20.description.value,
-			locations = v150,
-			isRepeatable = p20.repeatable,
-			args = buildArgumentMap(p20.arguments),
-			astNode = p20
-		})
-	end
+		local new = graphQLDirective.new
+		local v5 = {
+			name = astNode.name.value,
+			description = 0,
+			locations = 0,
+			isRepeatable = 0,
+			args = 0,
+			astNode = 0
+		}
+		local description
 
-	function buildFieldMap(p22) -- line: 537
-		-- upvalues: Map (copy), getWrappedType (copy), buildArgumentMap (ref), getDeprecationReason (ref)
-		local v152 = Map.new()
-
-		for _, v in ipairs(p22) do
-			local v155 = if not v.fields then {} else v.fields
-
-			for _, v3 in ipairs(v155) do
-				v152:set(v3.name.value, {
-					type = getWrappedType(v3.type),
-					description = if not v3.description then nil else v3.description.value,
-					args = buildArgumentMap(v3.arguments),
-					deprecationReason = getDeprecationReason(v3),
-					astNode = v3
-				})
-			end
+		if astNode.description then
+			description = astNode.description.value
 		end
 
-		return v152
+		v5.description = description
+		v5.locations = mapped
+		v5.isRepeatable = astNode.repeatable
+		v5.args = buildArgumentMap(astNode.arguments)
+		v5.astNode = astNode
+		return new(v5)
 	end
-	function buildArgumentMap(p23) -- line: 565
-		-- upvalues: Map (copy), getWrappedType (copy), valueFromAST (copy), getDeprecationReason (ref)
-		local v159 = p23 or {}
-		local v160 = Map.new()
 
-		for _, v in ipairs(v159) do
-			local v163 = getWrappedType(v.type)
+	buildFieldMap = function(list)
+		local fieldMap = Map.new()
 
-			v160:set(v.name.value, {
-				type = v163,
-				description = if not v.description then nil else v.description.value,
-				defaultValue = valueFromAST(v.defaultValue, v163),
-				deprecationReason = getDeprecationReason(v),
-				astNode = v
-			})
-		end
+		for _, item in ipairs(list) do
+			local v5 = not item.fields and {} or item.fields
 
-		return v160
-	end
-	function buildInputFieldMap(p24) -- line: 589
-		-- upvalues: Map (copy), getWrappedType (copy), valueFromAST (copy), getDeprecationReason (ref)
-		local v165 = Map.new()
+			for _, astNode in ipairs(v5) do
+				local value = astNode.name.value
+				local v6 = {
+					type = getWrappedType(astNode.type),
+					description = 0,
+					args = 0,
+					deprecationReason = 0,
+					astNode = 0
+				}
+				local description
 
-		for _, v in ipairs(p24) do
-			local v168 = if not v.fields then {} else v.fields
-
-			for _, v4 in ipairs(v168) do
-				local v171 = getWrappedType(v4.type)
-
-				v165:set(v4.name.value, {
-					type = v171,
-					description = if not v4.description then nil else v4.description.value,
-					defaultValue = valueFromAST(v4.defaultValue, v171),
-					deprecationReason = getDeprecationReason(v4),
-					astNode = v4
-				})
-			end
-		end
-
-		return v165
-	end
-	function buildEnumValueMap(p25) -- line: 621
-		-- upvalues: Map (copy), getDeprecationReason (ref)
-		local v173 = Map.new()
-
-		for _, v in ipairs(p25) do
-			local v176 = if not v.values then {} else v.values
-
-			for _, v5 in ipairs(v176) do
-				v173:set(v5.name.value, {
-					description = if not v5.description then nil else v5.description.value,
-					deprecationReason = getDeprecationReason(v5),
-					astNode = v5
-				})
-			end
-		end
-
-		return v173
-	end
-	function buildInterfaces(p26) -- line: 644
-		-- upvalues: getNamedType (ref)
-		local t5 = {}
-
-		for _, v in ipairs(p26) do
-			if v.interfaces then
-				for _, v6 in ipairs(v.interfaces) do
-					table.insert(t5, (getNamedType(v6)))
+				if astNode.description then
+					description = astNode.description.value
 				end
+
+				v6.description = description
+				v6.args = buildArgumentMap(astNode.arguments)
+				v6.deprecationReason = getDeprecationReason(astNode)
+				v6.astNode = astNode
+				fieldMap:set(value, v6)
 			end
 		end
 
-		return t5
+		return fieldMap
 	end
-	function buildUnionTypes(p27) -- line: 670
-		-- upvalues: getNamedType (ref)
-		local t6 = {}
 
-		for _, v in ipairs(p27) do
-			if v.types then
-				for _, v7 in ipairs(v.types) do
-					table.insert(t6, (getNamedType(v7)))
+	buildArgumentMap = function(arguments)
+		local argumentMap = Map.new()
+
+		for _, astNode in ipairs(arguments or {}) do
+			local wrappedType = getWrappedType(astNode.type)
+
+			local value = astNode.name.value
+			local description
+
+			if astNode.description then
+				description = astNode.description.value
+			end
+
+			argumentMap:set(value, {
+				type = wrappedType,
+				description = description,
+				defaultValue = valueFromAST2(astNode.defaultValue, wrappedType),
+				deprecationReason = getDeprecationReason(astNode),
+				astNode = astNode
+			})
+		end
+
+		return argumentMap
+	end
+
+	buildInputFieldMap = function(list)
+		local inputFieldMap = Map.new()
+
+		for _, item in ipairs(list) do
+			local v5 = not item.fields and {} or item.fields
+
+			for _, astNode in ipairs(v5) do
+				local wrappedType = getWrappedType(astNode.type)
+
+				local value = astNode.name.value
+				local description
+
+				if astNode.description then
+					description = astNode.description.value
 				end
+
+				inputFieldMap:set(value, {
+					type = wrappedType,
+					description = description,
+					defaultValue = valueFromAST2(astNode.defaultValue, wrappedType),
+					deprecationReason = getDeprecationReason(astNode),
+					astNode = astNode
+				})
 			end
 		end
 
-		return t6
+		return inputFieldMap
 	end
 
-	local function buildType(p28) -- line: 691
-		-- upvalues: v64 (copy), Kind (copy), Array (copy), GraphQLObjectType (copy), buildInterfaces (ref), buildFieldMap (ref), GraphQLInterfaceType (copy), GraphQLEnumType (copy), buildEnumValueMap (ref), GraphQLUnionType (copy), buildUnionTypes (ref), GraphQLScalarType (copy), getSpecifiedByUrl (ref), GraphQLInputObjectType (copy), buildInputFieldMap (ref), inspect (copy)
-		local value = p28.name.value
-		local v193 = v64[value] or {}
-		local kind = p28.kind
+	buildEnumValueMap = function(list)
+		local enumValueMap = Map.new()
 
-		if kind == Kind.OBJECT_TYPE_DEFINITION then
-			local v195 = Array.concat(p28, v193)
+		for _, item in ipairs(list) do
+			local v5 = not item.values and {} or item.values
 
-			return GraphQLObjectType.new({
-				name = value,
-				description = if not p28.description then nil else p28.description.value,
-				interfaces = function() -- line: 704
-					-- upvalues: buildInterfaces (ref), v195 (copy)
-					return buildInterfaces(v195)
-				end,
-				fields = function() -- line: 707
-					-- upvalues: buildFieldMap (ref), v195 (copy)
-					return buildFieldMap(v195)
-				end,
-				astNode = p28,
-				extensionASTNodes = v193
-			})
+			for _, astNode in ipairs(v5) do
+				local value = astNode.name.value
+				local description
+
+				if astNode.description then
+					description = astNode.description.value
+				end
+
+				enumValueMap:set(value, {
+					description = description,
+					deprecationReason = getDeprecationReason(astNode),
+					astNode = astNode
+				})
+			end
 		end
 
-		if kind == Kind.INTERFACE_TYPE_DEFINITION then
-			local v196 = Array.concat(p28, v193)
-
-			return GraphQLInterfaceType.new({
-				name = value,
-				description = if not p28.description then nil else p28.description.value,
-				interfaces = function() -- line: 724
-					-- upvalues: buildInterfaces (ref), v196 (copy)
-					return buildInterfaces(v196)
-				end,
-				fields = function() -- line: 727
-					-- upvalues: buildFieldMap (ref), v196 (copy)
-					return buildFieldMap(v196)
-				end,
-				astNode = p28,
-				extensionASTNodes = v193
-			})
-		end
-
-		if kind == Kind.ENUM_TYPE_DEFINITION then
-			local v197 = Array.concat(p28, v193)
-
-			return GraphQLEnumType.new({
-				name = value,
-				description = if not p28.description then nil else p28.description.value,
-				values = buildEnumValueMap(v197),
-				astNode = p28,
-				extensionASTNodes = v193
-			})
-		end
-
-		if kind == Kind.UNION_TYPE_DEFINITION then
-			local v198 = Array.concat(p28, v193)
-
-			return GraphQLUnionType.new({
-				name = value,
-				description = if not p28.description then nil else p28.description.value,
-				types = function() -- line: 750
-					-- upvalues: buildUnionTypes (ref), v198 (copy)
-					return buildUnionTypes(v198)
-				end,
-				astNode = p28,
-				extensionASTNodes = v193
-			})
-		end
-
-		if kind == Kind.SCALAR_TYPE_DEFINITION then
-			return GraphQLScalarType.new({
-				name = value,
-				description = if not p28.description then nil else p28.description.value,
-				specifiedByUrl = getSpecifiedByUrl(p28),
-				astNode = p28,
-				extensionASTNodes = v193
-			})
-		end
-
-		if kind == Kind.INPUT_OBJECT_TYPE_DEFINITION then
-			local v199 = Array.concat(p28, v193)
-
-			return GraphQLInputObjectType.new({
-				name = value,
-				description = if not p28.description then nil else p28.description.value,
-				fields = function() -- line: 773
-					-- upvalues: buildInputFieldMap (ref), v199 (copy)
-					return buildInputFieldMap(v199)
-				end,
-				astNode = p28,
-				extensionASTNodes = v193
-			})
-		end
-
-		assert(false, "Unexpected type definition node: " .. inspect(p28))
+		return enumValueMap
 	end
 
-	for _, v in ipairs(p1.types) do
-		v72:set(v.name, extendNamedType(v))
+	buildInterfaces = function(list)
+		local interfaces = {}
+
+		for _, item in ipairs(list) do
+			if not item.interfaces then
+				continue
+			end
+
+			for _, interface in ipairs(item.interfaces) do
+				table.insert(interfaces, (getNamedType(interface)))
+			end
+		end
+
+		return interfaces
 	end
 
-	for _, v in ipairs(t1) do
-		local value = v.name.value
+	buildUnionTypes = function(list)
+		local unionTypes = {}
 
-		v72:set(value, u52[value] or buildType(v))
+		for _, item in ipairs(list) do
+			if not item.types then
+				continue
+			end
+
+			for _, kind3 in ipairs(item.types) do
+				table.insert(unionTypes, (getNamedType(kind3)))
+			end
+		end
+
+		return unionTypes
 	end
 
-	local v101 = Object.assign({}, {
-		query = p1.query and replaceNamedType(p1.query),
-		mutation = p1.mutation and replaceNamedType(p1.mutation),
-		subscription = p1.subscription and replaceNamedType(p1.subscription)
-	}, v66 and getOperationTypes({ v66 }) or {}, (getOperationTypes(t3)))
-	local value = nil
+	local function buildType(astNode)
+		local name = astNode.name.value
 
-	if v66 ~= nil and v66.description ~= nil then
-		value = v66.description.value
+		local extensionASTNodes = v2[name] or {}
+		local kind3 = astNode.kind
+
+		if kind3 == kind.OBJECT_TYPE_DEFINITION then
+			local joined = Array.concat(astNode, extensionASTNodes)
+
+			local new = graphQLObjectType.new
+			local description
+
+			if astNode.description then
+				description = astNode.description.value
+			end
+
+			return new({
+				name = name,
+				description = description,
+				interfaces = function()
+					return buildInterfaces(joined)
+				end,
+				fields = function()
+					return buildFieldMap(joined)
+				end,
+				astNode = astNode,
+				extensionASTNodes = extensionASTNodes
+			})
+		elseif kind3 == kind.INTERFACE_TYPE_DEFINITION then
+			local joined = Array.concat(astNode, extensionASTNodes)
+
+			local new = graphQLInterfaceType.new
+			local description
+
+			if astNode.description then
+				description = astNode.description.value
+			end
+
+			return new({
+				name = name,
+				description = description,
+				interfaces = function()
+					return buildInterfaces(joined)
+				end,
+				fields = function()
+					return buildFieldMap(joined)
+				end,
+				astNode = astNode,
+				extensionASTNodes = extensionASTNodes
+			})
+		elseif kind3 == kind.ENUM_TYPE_DEFINITION then
+			local joined = Array.concat(astNode, extensionASTNodes)
+
+			local new = graphQLEnumType.new
+			local description
+
+			if astNode.description then
+				description = astNode.description.value
+			end
+
+			return new({
+				name = name,
+				description = description,
+				values = buildEnumValueMap(joined),
+				astNode = astNode,
+				extensionASTNodes = extensionASTNodes
+			})
+		elseif kind3 == kind.UNION_TYPE_DEFINITION then
+			local joined = Array.concat(astNode, extensionASTNodes)
+
+			local new = graphQLUnionType.new
+			local description
+
+			if astNode.description then
+				description = astNode.description.value
+			end
+
+			return new({
+				name = name,
+				description = description,
+				types = function()
+					return buildUnionTypes(joined)
+				end,
+				astNode = astNode,
+				extensionASTNodes = extensionASTNodes
+			})
+		elseif kind3 == kind.SCALAR_TYPE_DEFINITION then
+			local new = graphQLScalarType.new
+			local description
+
+			if astNode.description then
+				description = astNode.description.value
+			end
+
+			return new({
+				name = name,
+				description = description,
+				specifiedByUrl = getSpecifiedByUrl(astNode),
+				astNode = astNode,
+				extensionASTNodes = extensionASTNodes
+			})
+		else
+			if kind3 ~= kind.INPUT_OBJECT_TYPE_DEFINITION then
+				assert(false, "Unexpected type definition node: " .. inspect2(astNode))
+				return
+			end
+
+			local joined = Array.concat(astNode, extensionASTNodes)
+
+			local new = graphQLInputObjectType.new
+			local description
+
+			if astNode.description then
+				description = astNode.description.value
+			end
+
+			return new({
+				name = name,
+				description = description,
+				fields = function()
+					return buildInputFieldMap(joined)
+				end,
+				astNode = astNode,
+				extensionASTNodes = extensionASTNodes
+			})
+		end
 	end
 
-	local v103 = p3 ~= nil and (p3.assumeValid == nil or p3.assumeValid)
-	local v104 = Object.assign({}, {
-		description = value
-	}, v101, {
-		types = v72:values(),
-		directives = Array.concat(Array.map(p1.directives, replaceDirective), Array.map(t2, buildDirective)),
-		astNode = v66 or p1.astNode,
-		extensionASTNodes = Array.concat(p1.extensionASTNodes, t3),
-		assumeValid = v103
+	for _, kind3 in ipairs(data.types) do
+		v4:set(kind3.name, extendNamedType(kind3))
+	end
+
+	for _, v5 in ipairs(definitions2) do
+		local value = v5.name.value
+
+		v4:set(value, v[value] or buildType(v5))
+	end
+
+	local v5 = Object.assign({}, {
+		query = data.query and replaceNamedType(data.query),
+		mutation = data.mutation and replaceNamedType(data.mutation),
+		subscription = data.subscription and replaceNamedType(data.subscription)
+	}, v3 and getOperationTypes({ v3 }) or {}, getOperationTypes(definitions))
+	local description
+
+	if not (v3 == nil or v3.description == nil) then
+		description = v3.description.value
+	end
+
+	local assumeValid
+
+	if p2 == nil or p2.assumeValid == nil then
+		assumeValid = false
+	else
+		assumeValid = p2.assumeValid
+	end
+
+	local v6 = Object.assign({}, { description = description }, v5, {
+		types = v4:values(),
+		directives = Array.concat(Array.map(data.directives, replaceDirective), Array.map(definitions3, buildDirective)),
+		astNode = v3 or data.astNode,
+		extensionASTNodes = Array.concat(data.extensionASTNodes, definitions),
+		assumeValid = assumeValid
 	})
 
-	v104.extensions = nil
-
-	return v104
+	v6.extensions = nil
+	return v6
 end
 
-u52 = keyMap(Array.concat(specifiedScalarTypes, introspectionTypes), function(p29) -- line: 846
-	return p29.name
+v = keyMap2(Array.concat(specifiedScalarTypes, introspectionTypes), function(p)
+	return p.name
 end)
 
-function getDeprecationReason(p30) -- line: 854
-	-- upvalues: getDirectiveValues (copy), GraphQLDeprecatedDirective (copy)
-	local v107 = getDirectiveValues(GraphQLDeprecatedDirective, p30)
-
-	return v107 and v107.reason
+getDeprecationReason = function(p)
+	local directiveValues = getDirectiveValues(graphQLDeprecatedDirective, p)
+	return directiveValues and directiveValues.reason
 end
-function getSpecifiedByUrl(p31) -- line: 864
-	-- upvalues: getDirectiveValues (copy), GraphQLSpecifiedByDirective (copy)
-	local v109 = getDirectiveValues(GraphQLSpecifiedByDirective, p31)
 
-	return v109 and v109.url
+getSpecifiedByUrl = function(p)
+	local directiveValues = getDirectiveValues(graphQLSpecifiedByDirective, p)
+	return directiveValues and directiveValues.url
 end
 
 return {
-	extendSchema = function(p32, p33, p34) -- line: 152
-		-- upvalues: assertSchema (copy), devAssert (copy), Kind (copy), assertValidSDLExtension (copy), GraphQLSchema (copy)
-		assertSchema(p32)
-		devAssert(p33 ~= nil and p33.kind == Kind.DOCUMENT, "Must provide valid Document AST.")
+	extendSchema = function(object, p, p2)
+		assertSchema(object)
 
-		if (p34 and p34.assumeValid) ~= true and (p34 and p34.assumeValidSDL) ~= true then
-			assertValidSDLExtension(p33, p32)
+		devAssert2(p ~= nil and p.kind == kind.DOCUMENT, "Must provide valid Document AST.")
+
+		if (p2 and p2.assumeValid) ~= true and (p2 and p2.assumeValidSDL) ~= true then
+			assertValidSDLExtension(p, object)
 		end
 
-		local v58 = p32:toConfig()
-		local v59 = extendSchemaImpl(v58, p33, p34)
+		local config = object:toConfig()
+		local v2 = extendSchemaImpl(config, p, p2)
 
-		if v58 == v59 then
-			return p32
+		if config == v2 then
+			return object
 		end
 
-		return (GraphQLSchema.new(v59))
+		return (graphQLSchema.new(v2))
 	end,
 	extendSchemaImpl = extendSchemaImpl
 }

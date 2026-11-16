@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.InlineLayout.InlineLayout))
+local InlineLayout = require(index.InlineLayout.InlineLayout)
+
+return InlineLayout

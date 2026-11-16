@@ -1,5 +1,1 @@
-return {
-	Unknown = "Unknown",
-	Signup = "Signup",
-	UsernameChange = "UsernameChange"
-}
+return { Unknown = "Unknown", Signup = "Signup", UsernameChange = "UsernameChange" }

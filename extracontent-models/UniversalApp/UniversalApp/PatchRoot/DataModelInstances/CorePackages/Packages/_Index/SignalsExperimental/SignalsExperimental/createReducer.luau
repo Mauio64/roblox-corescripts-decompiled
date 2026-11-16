@@ -1,29 +1,30 @@
-local ParentParent = script.Parent.Parent
-local createComputed = require(ParentParent.Signals).createComputed
+local parent = script.Parent.Parent
+local Signals = require(parent.Signals)
+local createComputed = Signals.createComputed
 
-local function createReducer(p1: ((...any) -> ...any), p2) -- line: 8
-	-- upvalues: createComputed (copy)
-	local u6 = false
-	local u7 = nil
+local function createReducer(callback, callback2)
+	local v = false
+	local v2 = nil
 
-	local function ensureInitialized() -- line: 12
-		-- upvalues: u6 (ref), u7 (ref), p2 (copy)
-		if not u6 then
-			u6 = true
-			u7 = if typeof(p2) ~= "function" then p2 else p2()
+	local function ensureInitialized() -- 1 equivalent call inferred from this helper
+		if not v then
+			v = true
+			local v3
+
+			if typeof(callback2) == "function" then
+				v3 = callback2()
+			else
+				v3 = callback2
+			end
+
+			v2 = v3
 		end
 	end
 
-	return createComputed(function(p3) -- line: 19
-		-- upvalues: u6 (ref), u7 (ref), p2 (copy), p1 (copy)
-		if not u6 then
-			u6 = true
-			u7 = if typeof(p2) ~= "function" then p2 else p2()
-		end
-
-		u7 = p1(p3, u7)
-
-		return u7
+	return createComputed(function(p)
+		ensureInitialized() -- inferred equivalent call
+		v2 = callback(p, v2)
+		return v2
 	end)
 end
 

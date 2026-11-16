@@ -1,9 +1,6 @@
-local function forwardErrorToScriptContext(p1, s1: string?) -- line: 11
-	task.spawn(function() -- line: 12
-		-- upvalues: s1 (copy), p1 (copy)
-		local v4 = not s1 and "" or s1
-
-		error(tostring(p1) .. "\n" .. v4, 0)
+local function forwardErrorToScriptContext(p, p2: string?)
+	task.spawn(function()
+		error(tostring(p) .. "\n" .. (not p2 and "" or p2), 0)
 	end)
 end
 

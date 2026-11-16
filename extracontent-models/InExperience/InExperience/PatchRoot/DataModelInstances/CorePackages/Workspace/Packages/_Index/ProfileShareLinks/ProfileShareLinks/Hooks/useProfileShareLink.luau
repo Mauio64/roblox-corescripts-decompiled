@@ -1,13 +1,15 @@
 local ProfileShareLinks = script:FindFirstAncestor("ProfileShareLinks")
-local ProfileShareLinksParent = ProfileShareLinks.Parent
-local default = require(ProfileShareLinksParent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
-local React = require(ProfileShareLinksParent.React)
-local RoactUtils = require(ProfileShareLinksParent.RoactUtils)
+local parent = ProfileShareLinks.Parent
+
+local ExternalContentSharingProtocol = require(parent.ExternalContentSharingProtocol)
+local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffectOnce = RoactUtils.Hooks.useEffectOnce
-local SetCurrentToastMessage = require(ProfileShareLinksParent.ToastRodux).Actions.SetCurrentToastMessage
-
-require(ProfileShareLinksParent.SocialLuaAnalytics)
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+require(parent.SocialLuaAnalytics)
 
 local ProfileSharePolicyEnum = require(ProfileShareLinks.Enums.ProfileSharePolicyEnum)
 local useGetOrGenerateLinkUrl = require(ProfileShareLinks.Hooks.useGetOrGenerateLinkUrl)
@@ -17,53 +19,43 @@ local useAnalytics = require(ProfileShareLinks.Analytics.useAnalytics)
 local EventNames = require(ProfileShareLinks.Analytics.EventNames)
 local TextKeys = require(ProfileShareLinks.Common.TextKeys)
 
-return function(t1: {[any]: any}) -- line: 31
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useProfileSharePolicy (copy), useGetOrGenerateLinkUrl (copy), useShortUrl (copy), useEffectOnce (copy), ProfileSharePolicyEnum (copy), React (copy), EventNames (copy), default (copy), SetCurrentToastMessage (copy), TextKeys (copy)
-	local v17 = t1.enableFetch == nil or t1.enableFetch
-	local v18 = useAnalytics()
-	local v19 = useDispatch()
-	local v20 = useProfileSharePolicy()
-	local v21 = useGetOrGenerateLinkUrl()
-	local v22 = useShortUrl()
-	local v23 = v22 ~= nil
+return function(p)
+	local v = p.enableFetch == nil or p.enableFetch
+	local v2 = useAnalytics()
+	local v3 = useDispatch()
+	local v4 = useProfileSharePolicy()
+	local v5 = useGetOrGenerateLinkUrl()
+	local v6 = useShortUrl()
+	local hasLoaded = v6 ~= nil
+	local v7 = not hasLoaded
 
-	useEffectOnce(v21, not v23 and (v20 ~= ProfileSharePolicyEnum.Disabled and v17))
+	if v7 then
+		v7 = not (v4 == ProfileSharePolicyEnum.Disabled) and v
+	end
 
-	local v24 = React.useCallback(function() -- line: 45
-		-- upvalues: v20 (copy), ProfileSharePolicyEnum (copy), v22 (copy), v18 (copy), EventNames (copy), t1 (copy), default (copy), v19 (copy), SetCurrentToastMessage (copy), TextKeys (copy)
-		if v20 == ProfileSharePolicyEnum.Disabled or v22 == nil then
-			return
-		end
-
-		local str = tostring(DateTime.now().UnixTimestampMillis)
-		local v26 = `{ v22 }&source=ProfileShare&stamp={ str }`
-
-		v18.fireAnalyticsEvent(EventNames.ProfileShareLinkActivated, {
-			context = t1.context,
-			shareType = v20,
-			stamp = str
-		})
-		default:shareUrl({
-			context = t1.context,
-			url = v26
-		})
-
-		if v20 == ProfileSharePolicyEnum.Copy then
-			v19(SetCurrentToastMessage({
-				toastMessage = TextKeys.LinkCopied
-			}))
-		end
-	end, {
-		v20,
-		v22,
-		t1.context,
-		v18,
-		v19
-	})
+	useEffectOnce(v5, v7)
 
 	return {
-		hasLoaded = v23,
-		policy = v20,
-		onActivated = v24
+		hasLoaded = hasLoaded,
+		policy = v4,
+		onActivated = React.useCallback(function()
+			if v4 == ProfileSharePolicyEnum.Disabled or v6 == nil then
+				return
+			end
+
+			local unixTimestampMillis = tostring(DateTime.now().UnixTimestampMillis)
+			local formatted = `{v6}&source=ProfileShare&stamp={unixTimestampMillis}`
+			v2.fireAnalyticsEvent(EventNames.ProfileShareLinkActivated, {
+				context = p.context,
+				shareType = v4,
+				stamp = unixTimestampMillis
+			})
+
+			default:shareUrl({ context = p.context, url = formatted })
+
+			if v4 == ProfileSharePolicyEnum.Copy then
+				v3(SetCurrentToastMessage({ toastMessage = TextKeys.LinkCopied }))
+			end
+		end, { v4, v6, p.context, v2, v3 })
 	}
 end

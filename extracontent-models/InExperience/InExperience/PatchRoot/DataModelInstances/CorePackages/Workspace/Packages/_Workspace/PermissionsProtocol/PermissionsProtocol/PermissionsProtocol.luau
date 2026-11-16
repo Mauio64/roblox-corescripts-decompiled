@@ -1,14 +1,28 @@
-local ParentParent = script.Parent.Parent
-local MessageBus = require(ParentParent.MessageBus).MessageBus
-local Promise = require(ParentParent.Promise)
-local t = require(ParentParent.t)
-local GetFFlagLuaEnableShowUpsellMethod = require(ParentParent.SharedFlags).GetFFlagLuaEnableShowUpsellMethod
-local v6 = game:DefineFastFlag("ScopedSubscribersForPermissionsProtocol2", false)
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local parent = script.Parent.Parent
+local MessageBus = require(parent.MessageBus)
+local messageBus = MessageBus.MessageBus
+local Promise = require(parent.Promise)
+local t = require(parent.t)
+
+local isVersionAtLeast = require(script.Parent.isVersionAtLeast)
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagLuaEnableShowUpsellMethod = SharedFlags.GetFFlagLuaEnableShowUpsellMethod
+
+local defineFastFlag = game:DefineFastFlag("ScopedSubscribersForPermissionsProtocol2", false)
 
 require(script.Parent.PermissionsProtocolTypes)
+
 game:DefineFastFlag("DebugRomarkAudioPermissionsBypass", false)
 
-local t1 = {
+game:DefineFastFlag("EnableAndroidOpenNotificationSettings", false)
+game:DefineFastString("AndroidOpenNotificationSettingsMinVersion", "")
+game:DefineFastFlag("PermissionsProtocolNonStickyResponses", false)
+
+local permissions2 = {
 	CAMERA_ACCESS = "CAMERA_ACCESS",
 	MICROPHONE_ACCESS = "MICROPHONE_ACCESS",
 	LOCAL_NETWORK = "LOCAL_NETWORK",
@@ -16,368 +30,510 @@ local t1 = {
 	WRITE_MEDIA_STORAGE = "WRITE_MEDIA_STORAGE",
 	POST_NOTIFICATIONS = "POST_NOTIFICATIONS"
 }
-local t2 = {
+
+local status = {
 	AUTHORIZED = "AUTHORIZED",
 	DENIED = "DENIED",
 	RESTRICTED = "RESTRICTED",
 	UNSUPPORTED = "UNSUPPORTED"
 }
-local t3 = {
-	SHOW = "SHOW",
-	HIDE = "HIDE",
-	UNSUPPORTED = "UNSUPPORTED"
+
+local upsellStatus = { SHOW = "SHOW", HIDE = "HIDE", UNSUPPORTED = "UNSUPPORTED" }
+
+local openSettingsStatus = {
+	OPENED_NOTIFICATION_SETTINGS = "OPENED_NOTIFICATION_SETTINGS",
+	OPENED_APP_SETTINGS = "OPENED_APP_SETTINGS",
+	FAILED = "FAILED"
 }
-local v10 = t.array(t.valueOf(t1))
-local v11 = t.valueOf(t2)
-local v12 = t.valueOf(t3)
-local t4 = {
-	Permissions = t1,
-	Status = t2,
-	UpsellStatus = t3,
+
+local array = t.array(t.valueOf(permissions2))
+local status2 = t.valueOf(status)
+local upsellStatus2 = t.valueOf(upsellStatus)
+
+local PermissionsProtocol = {
+	Permissions = permissions2,
+	Status = status,
+	UpsellStatus = upsellStatus,
+	OpenSettingsStatus = openSettingsStatus,
 	PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "PermissionsRequest",
-		validateParams = t.strictInterface({
-			permissions = v10
-		})
+		validateParams = t.strictInterface({ permissions = array })
 	},
 	PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "PermissionsRequest",
-		validateParams = t.strictInterface({
-			status = v11,
-			missingPermissions = v10
-		})
+		validateParams = t.strictInterface({ status = status2, missingPermissions = array })
 	},
 	HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "HasPermissions",
-		validateParams = t.strictInterface({
-			permissions = v10
-		})
+		validateParams = t.strictInterface({ permissions = array })
 	},
 	HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "HasPermissions",
-		validateParams = t.strictInterface({
-			status = v11,
-			missingPermissions = v10
-		})
+		validateParams = t.strictInterface({ status = status2, missingPermissions = array })
 	},
 	SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "SupportsPermissions",
-		validateParams = t.strictInterface({
-			includeStatus = t.literal(false)
-		})
+		validateParams = t.strictInterface({ includeStatus = t.literal(false) })
 	},
 	SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "SupportsPermissions",
-		validateParams = t.strictInterface({
-			permissions = v10
-		})
+		validateParams = t.strictInterface({ permissions = array })
 	},
 	SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "ShouldShowPermissionUpsell",
-		validateParams = t.strictInterface({
-			permissions = v10
-		})
+		validateParams = t.strictInterface({ permissions = array })
 	},
 	SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "ShouldShowPermissionUpsell",
 		validateParams = t.strictInterface({
-			hiddenUpsellPermissions = v10,
-			upsellStatus = v12
+			hiddenUpsellPermissions = array,
+			upsellStatus = upsellStatus2
 		})
 	},
 	SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "ShouldShowRequestPermissionRationale",
-		validateParams = t.strictInterface({
-			permissions = v10
-		})
+		validateParams = t.strictInterface({ permissions = array })
 	},
 	SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
 		protocolName = "PermissionsProtocol",
 		methodName = "ShouldShowRequestPermissionRationale",
 		validateParams = t.strictInterface({
-			hiddenUpsellPermissions = v10,
-			upsellStatus = v12
+			hiddenUpsellPermissions = array,
+			upsellStatus = upsellStatus2
 		})
-	}
+	},
+	OPEN_NOTIFICATION_SETTINGS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
+		protocolName = "PermissionsProtocol",
+		methodName = "OpenNotificationSettings",
+		validateParams = t.strictInterface({ permissions = array })
+	},
+	OPEN_NOTIFICATION_SETTINGS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
+		protocolName = "PermissionsProtocol",
+		methodName = "OpenNotificationSettings",
+		validateParams = t.strictInterface({ status = t.valueOf(openSettingsStatus) })
+	},
+	GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = {
+		protocolName = "PermissionsProtocol",
+		methodName = "GetPushNotificationsEnabled",
+		validateParams = t.strictInterface({ permissions = array })
+	},
+	GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = {
+		protocolName = "PermissionsProtocol",
+		methodName = "GetPushNotificationsEnabled",
+		validateParams = t.strictInterface({ enabled = t.boolean })
+	},
+	_getPlatform = function()
+		return UserInputService:GetPlatform()
+	end,
+	_getVersion = function()
+		return RunService:GetRobloxVersion()
+	end,
+	_openNotificationSettingsTimeoutSeconds = 5,
+	_getPushNotificationsEnabledTimeoutSeconds = 1
 }
 
-t4.__index = t4
+PermissionsProtocol.__index = PermissionsProtocol
 
-local function getPermissionRequestTelemetryData(p1) -- line: 145
-	-- upvalues: t4 (copy)
-	local t5 = {}
+local function getPermissionRequestTelemetryData(items)
+	local permissionRequestTelemetryData = {}
 
-	for _, v in pairs(p1) do
-		if v == t4.Permissions.CAMERA_ACCESS then
-			t5.camera_access_requested = ""
+	for _, item in pairs(items) do
+		if item == PermissionsProtocol.Permissions.CAMERA_ACCESS then
+			permissionRequestTelemetryData.camera_access_requested = ""
 		end
 
-		if v == t4.Permissions.MICROPHONE_ACCESS then
-			t5.microphone_access_requested = ""
+		if item == PermissionsProtocol.Permissions.MICROPHONE_ACCESS then
+			permissionRequestTelemetryData.microphone_access_requested = ""
 		end
 
-		if v == t4.Permissions.LOCAL_NETWORK then
-			t5.local_network_requested = ""
+		if item == PermissionsProtocol.Permissions.LOCAL_NETWORK then
+			permissionRequestTelemetryData.local_network_requested = ""
 		end
 
-		if v == t4.Permissions.CONTACTS_ACCESS then
-			t5.contacts_access_requested = ""
+		if item == PermissionsProtocol.Permissions.CONTACTS_ACCESS then
+			permissionRequestTelemetryData.contacts_access_requested = ""
 		end
 	end
 
-	return t5
+	return permissionRequestTelemetryData
 end
-local function createSequencedProtocolMethodCall(t6: {[any]: any}, p2, p3, p4, p5) -- line: 164
-	-- upvalues: Promise (copy), MessageBus (copy)
-	assert(p3.validateParams(p4))
 
-	local v25 = (t6[p2] or Promise.resolve()):finally(function() -- line: 175
-		-- upvalues: Promise (copy), MessageBus (copy), p2 (copy), p3 (copy), p4 (copy), p5 (copy)
-		return Promise.new(function(resolve) -- line: 176
-			-- upvalues: MessageBus (copy), p2 (copy), p3 (copy), p4 (copy), p5 (copy)
-			local v80 = MessageBus.Subscriber.new()
+local function createSequencedProtocolMethodCall(activeCalls, p, p2, p3, p4, flag: boolean?)
+	assert(p2.validateParams(p3))
 
-			v80:subscribeProtocolMethodResponse(p2, function(p6) -- line: 178
-				-- upvalues: v80 (copy), p2 (copy), resolve (copy)
-				v80:unsubscribeToProtocolMethodResponse(p2)
-				resolve(p6)
-			end)
-			MessageBus.publishProtocolMethodRequest(p3, p4, p5)
+	local sequencedProtocolMethodCall = (activeCalls[p] or Promise.resolve()):finally(function()
+		return Promise.new(function(callback)
+			local subscriber = messageBus.Subscriber.new()
+			subscriber:subscribeProtocolMethodResponse(p, function(p5)
+				subscriber:unsubscribeToProtocolMethodResponse(p)
+				callback(p5)
+			end, flag)
+			messageBus.publishProtocolMethodRequest(p2, p3, p4)
 		end)
 	end)
 
-	t6[p2] = v25
-
-	return v25
+	activeCalls[p] = sequencedProtocolMethodCall
+	return sequencedProtocolMethodCall
 end
 
-function t4.new() -- line: 190
-	-- upvalues: v6 (copy), MessageBus (copy), t4 (copy)
-	return (setmetatable({
-		activeCalls = if not v6 then nil else {},
-		subscriber = if not v6 then MessageBus.Subscriber.new() else nil
-	}, t4))
-end
-function t4.hasPermissions(p7, p8) -- line: 208
-	-- upvalues: v6 (copy), createSequencedProtocolMethodCall (copy), getPermissionRequestTelemetryData (copy), Promise (copy), MessageBus (copy)
-	if v6 then
-		local HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p7.HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-		local HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = p7.HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
-
-		return (createSequencedProtocolMethodCall(p7.activeCalls, HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-			permissions = p8
-		}, (getPermissionRequestTelemetryData(p8))))
+local function getResponseSticky(): nil | boolean -- 10 equivalent calls inferred from this helper
+	if game:GetFastFlag("PermissionsProtocolNonStickyResponses") then
+		return false
 	end
 
-	local v30 = Promise.new(function(resolve, _) -- line: 217
-		-- upvalues: p7 (copy)
-		local HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p7.HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-
-		p7.subscriber:subscribeProtocolMethodResponse(HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, function(p10) -- line: 219
-			-- upvalues: p7 (copy), HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR (copy), resolve (copy)
-			p7.subscriber:unsubscribeToProtocolMethodResponse(HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
-			resolve(p10)
-		end)
-	end)
-
-	MessageBus.publishProtocolMethodRequest(p7.HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-		permissions = p8
-	}, (getPermissionRequestTelemetryData(p8)))
-
-	return v30
+	return nil
 end
-function t4.requestPermissions(p11, p12) -- line: 239
-	-- upvalues: t4 (copy), Promise (copy), v6 (copy), createSequencedProtocolMethodCall (copy), getPermissionRequestTelemetryData (copy), MessageBus (copy)
+
+local function getPlatform() -- 3 equivalent calls inferred from this helper
+	local success, result = pcall(PermissionsProtocol._getPlatform)
+	return if success then result else nil
+end
+
+local function isAndroidNotificationSettingsGateOpen() -- 2 equivalent calls inferred from this helper
+	return game:GetFastFlag("EnableAndroidOpenNotificationSettings")
+		and isVersionAtLeast(
+			PermissionsProtocol._getVersion(),
+			game:GetFastString("AndroidOpenNotificationSettingsMinVersion")
+		)
+end
+
+local function callPushNotificationSettingsMethod(p, p2, p3)
+	local permissions = { PermissionsProtocol.Permissions.POST_NOTIFICATIONS }
+	local v = { permissions = permissions }
+
+	local permissionRequestTelemetryData = getPermissionRequestTelemetryData(permissions)
+
+	if defineFastFlag then
+		return createSequencedProtocolMethodCall(p.activeCalls, p3, p2, v, permissionRequestTelemetryData, false)
+	end
+
+	local v2 = Promise.new(function(callback, _)
+		p.subscriber:subscribeProtocolMethodResponse(p3, function(p4)
+			p.subscriber:unsubscribeToProtocolMethodResponse(p3)
+			callback(p4)
+		end, false)
+	end)
+	messageBus.publishProtocolMethodRequest(p2, v, permissionRequestTelemetryData)
+	return v2
+end
+
+function PermissionsProtocol.new()
+	local v = {
+		activeCalls = defineFastFlag and {} or nil,
+		subscriber = 0
+	}
+	local subscriber
+
+	if not defineFastFlag then
+		subscriber = messageBus.Subscriber.new()
+	end
+
+	v.subscriber = subscriber
+	return (setmetatable(v, PermissionsProtocol))
+end
+
+function PermissionsProtocol:hasPermissions(permissions)
+	if defineFastFlag then
+		local HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = self.HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		local HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = self.HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
+		return createSequencedProtocolMethodCall(
+			self.activeCalls,
+			HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+			HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions),
+			getResponseSticky() -- inferred equivalent call
+		)
+	else
+		local v = Promise.new(function(callback, _)
+			local HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = self.HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+			local function fn(p)
+				self.subscriber:unsubscribeToProtocolMethodResponse(HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
+				callback(p)
+			end
+
+			self.subscriber:subscribeProtocolMethodResponse(
+				HAS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+				fn,
+				getResponseSticky() -- inferred equivalent call
+			)
+		end)
+		messageBus.publishProtocolMethodRequest(
+			self.HAS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions)
+		)
+		return v
+	end
+end
+
+function PermissionsProtocol:requestPermissions(permissions)
 	if game:GetFastFlag("DebugRomarkAudioPermissionsBypass") then
-		local t7 = {
-			missingPermissions = {},
-			status = t4.Status.AUTHORIZED
-		}
+		local v = {}
+		v.missingPermissions = {}
+		v.status = PermissionsProtocol.Status.AUTHORIZED
+		return Promise.resolve(v)
+	elseif defineFastFlag then
+		local PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = self.PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		local PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = self.PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
+		return createSequencedProtocolMethodCall(
+			self.activeCalls,
+			PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+			PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions),
+			getResponseSticky() -- inferred equivalent call
+		)
+	else
+		local v = Promise.new(function(callback, _)
+			local PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = self.PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+			local function fn(p)
+				self.subscriber:unsubscribeToProtocolMethodResponse(PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
+				callback(p)
+			end
 
-		return Promise.resolve(t7)
-	end
-
-	if v6 then
-		local PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p11.PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-		local PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = p11.PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
-
-		return (createSequencedProtocolMethodCall(p11.activeCalls, PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-			permissions = p12
-		}, (getPermissionRequestTelemetryData(p12))))
-	end
-
-	local v36 = Promise.new(function(resolve, _) -- line: 256
-		-- upvalues: p11 (copy)
-		local PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p11.PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-
-		p11.subscriber:subscribeProtocolMethodResponse(PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, function(p14) -- line: 258
-			-- upvalues: p11 (copy), PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR (copy), resolve (copy)
-			p11.subscriber:unsubscribeToProtocolMethodResponse(PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
-			resolve(p14)
+			self.subscriber:subscribeProtocolMethodResponse(
+				PERMISSION_REQUEST_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+				fn,
+				getResponseSticky() -- inferred equivalent call
+			)
 		end)
-	end)
-
-	MessageBus.publishProtocolMethodRequest(p11.PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-		permissions = p12
-	}, (getPermissionRequestTelemetryData(p12)))
-
-	return v36
-end
-function t4.getSupportedPermissionsList(p15) -- line: 276
-	-- upvalues: v6 (copy), createSequencedProtocolMethodCall (copy), Promise (copy), MessageBus (copy)
-	if v6 then
-		local SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p15.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-		local SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = p15.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
-
-		return (createSequencedProtocolMethodCall(p15.activeCalls, SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-			includeStatus = false
-		}, {}))
+		messageBus.publishProtocolMethodRequest(
+			self.PERMISSION_REQUEST_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions)
+		)
+		return v
 	end
-
-	local v40 = Promise.new(function(resolve, _) -- line: 285
-		-- upvalues: p15 (copy)
-		local SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p15.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-
-		p15.subscriber:subscribeProtocolMethodResponse(SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, function(p17) -- line: 287
-			-- upvalues: p15 (copy), SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR (copy), resolve (copy)
-			p15.subscriber:unsubscribeToProtocolMethodResponse(SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
-			resolve(p17)
-		end)
-	end)
-
-	MessageBus.publishProtocolMethodRequest(p15.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-		includeStatus = false
-	}, {})
-
-	return v40
 end
-function t4.supportsPermissions(p18, p19) -- line: 306
-	-- upvalues: v10 (copy), Promise (copy)
-	assert(v10(p19))
 
-	return (p18:getSupportedPermissionsList():andThen(function(p20) -- line: 309
-		-- upvalues: p19 (copy), Promise (copy)
-		local v65 = p20 and p20.permissions
+function PermissionsProtocol:getSupportedPermissionsList()
+	if defineFastFlag then
+		local SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = self.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		local SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = self.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
+		return createSequencedProtocolMethodCall(
+			self.activeCalls,
+			SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+			SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ includeStatus = false },
+			{},
+			getResponseSticky() -- inferred equivalent call
+		)
+	else
+		local v = Promise.new(function(callback, _)
+			local SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = self.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+			local function fn(p)
+				self.subscriber:unsubscribeToProtocolMethodResponse(SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
+				callback(p)
+			end
 
-		if v65 then
-			for _, v in pairs(p19) do
-				local v68 = false
+			self.subscriber:subscribeProtocolMethodResponse(
+				SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+				fn,
+				getResponseSticky() -- inferred equivalent call
+			)
+		end)
+		messageBus.publishProtocolMethodRequest(
+			self.SUPPORTS_PERMISSIONS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ includeStatus = false },
+			{}
+		)
+		return v
+	end
+end
 
-				for _, v2 in pairs(v65) do
-					if v == v2 then
-						v68 = true
+function PermissionsProtocol:supportsPermissions(items)
+	assert(array(items))
 
-						break
-					end
-				end
+	return (self:getSupportedPermissionsList():andThen(function(p)
+		local permissions = p and p.permissions
 
-				if not v68 then
-					return Promise.resolve(false)
+		if not permissions then
+			return Promise.reject()
+		end
+
+		for _, item in pairs(items) do
+			local v = false
+
+			for _, permission in pairs(permissions) do
+				if item == permission then
+					v = true
+					break
 				end
 			end
 
-			return Promise.resolve(true)
+			if not v then
+				return Promise.resolve(false)
+			end
 		end
 
-		return Promise.reject()
+		return Promise.resolve(true)
 	end))
 end
-function t4.checkOrRequestPermissions(p21, p22) -- line: 348
-	-- upvalues: v10 (copy), Promise (copy), t4 (copy)
-	assert(v10(p22))
 
-	return p21:supportsPermissions(p22):andThen(function(p23) -- line: 351
-		-- upvalues: Promise (copy), t4 (copy), p21 (copy), p22 (copy)
-		if not p23 then
-			return Promise.resolve(t4.Status.UNSUPPORTED)
+function PermissionsProtocol:checkOrRequestPermissions(p)
+	assert(array(p))
+
+	return self:supportsPermissions(p):andThen(function(p2)
+		if p2 then
+			return (self:hasPermissions(p):andThen(function(p3)
+				if p3.status == PermissionsProtocol.Status.AUTHORIZED then
+					return Promise.resolve(p3.status)
+				end
+
+				return self:requestPermissions(p):andThen(function(p4)
+					return Promise.resolve(p4.status)
+				end)
+			end))
 		end
 
-		return (p21:hasPermissions(p22):andThen(function(p24) -- line: 358
-			-- upvalues: t4 (copy), Promise (copy), p21 (copy), p22 (copy)
-			if p24.status == t4.Status.AUTHORIZED then
-				return Promise.resolve(p24.status)
-			end
-
-			return p21:requestPermissions(p22):andThen(function(p25) -- line: 364
-				-- upvalues: Promise (copy)
-				return Promise.resolve(p25.status)
-			end)
-		end))
-	end, function(_) -- line: 370
-		-- upvalues: Promise (copy), t4 (copy)
-		return Promise.resolve(t4.Status.UNSUPPORTED)
+		return Promise.resolve(PermissionsProtocol.Status.UNSUPPORTED)
+	end, function(_)
+		return Promise.resolve(PermissionsProtocol.Status.UNSUPPORTED)
 	end)
 end
-function t4.shouldShowUpsell(p27, p28) -- line: 385
-	-- upvalues: GetFFlagLuaEnableShowUpsellMethod (copy), Promise (copy), v6 (copy), createSequencedProtocolMethodCall (copy), getPermissionRequestTelemetryData (copy), MessageBus (copy)
+
+function PermissionsProtocol.shouldShowUpsell(data, permissions)
 	if not GetFFlagLuaEnableShowUpsellMethod() then
 		return Promise.resolve({})
 	end
 
-	if v6 then
-		local SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p27.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-		local SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = p27.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
+	if defineFastFlag then
+		local SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = data.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		local SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = data.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
+		return createSequencedProtocolMethodCall(
+			data.activeCalls,
+			SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+			SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions),
+			getResponseSticky() -- inferred equivalent call
+		)
+	else
+		local v = Promise.new(function(callback, _)
+			local SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = data.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+			local function fn(p)
+				data.subscriber:unsubscribeToProtocolMethodResponse(SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
+				callback(p)
+			end
 
-		return (createSequencedProtocolMethodCall(p27.activeCalls, SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-			permissions = p28
-		}, (getPermissionRequestTelemetryData(p28))))
-	end
-
-	local v49 = Promise.new(function(resolve, _) -- line: 398
-		-- upvalues: p27 (copy)
-		local SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p27.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-
-		p27.subscriber:subscribeProtocolMethodResponse(SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, function(p30) -- line: 400
-			-- upvalues: p27 (copy), SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR (copy), resolve (copy)
-			p27.subscriber:unsubscribeToProtocolMethodResponse(SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
-			resolve(p30)
+			data.subscriber:subscribeProtocolMethodResponse(
+				SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+				fn,
+				getResponseSticky() -- inferred equivalent call
+			)
 		end)
-	end)
-
-	MessageBus.publishProtocolMethodRequest(p27.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-		permissions = p28
-	}, (getPermissionRequestTelemetryData(p28)))
-
-	return v49
-end
-function t4.shouldShowRationale(p31, p32) -- line: 421
-	-- upvalues: v6 (copy), createSequencedProtocolMethodCall (copy), getPermissionRequestTelemetryData (copy), Promise (copy), MessageBus (copy)
-	if v6 then
-		local SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p31.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-		local SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = p31.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
-
-		return (createSequencedProtocolMethodCall(p31.activeCalls, SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-			permissions = p32
-		}, (getPermissionRequestTelemetryData(p32))))
+		messageBus.publishProtocolMethodRequest(
+			data.SHOULD_SHOW_PERMISSION_UPSELL_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions)
+		)
+		return v
 	end
-
-	local v54 = Promise.new(function(resolve, _) -- line: 430
-		-- upvalues: p31 (copy)
-		local SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = p31.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
-
-		p31.subscriber:subscribeProtocolMethodResponse(SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR, function(p34) -- line: 432
-			-- upvalues: p31 (copy), SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR (copy), resolve (copy)
-			p31.subscriber:unsubscribeToProtocolMethodResponse(SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
-			resolve(p34)
-		end)
-	end)
-
-	MessageBus.publishProtocolMethodRequest(p31.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR, {
-		permissions = p32
-	}, (getPermissionRequestTelemetryData(p32)))
-
-	return v54
 end
 
-t4.default = t4.new()
+function PermissionsProtocol.shouldShowRationale(data, permissions)
+	if defineFastFlag then
+		local SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = data.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		local SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR = data.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR
+		return createSequencedProtocolMethodCall(
+			data.activeCalls,
+			SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+			SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions),
+			getResponseSticky() -- inferred equivalent call
+		)
+	else
+		local v = Promise.new(function(callback, _)
+			local SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR = data.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+			local function fn(p)
+				data.subscriber:unsubscribeToProtocolMethodResponse(SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR)
+				callback(p)
+			end
 
-return t4
+			data.subscriber:subscribeProtocolMethodResponse(
+				SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR,
+				fn,
+				getResponseSticky() -- inferred equivalent call
+			)
+		end)
+		messageBus.publishProtocolMethodRequest(
+			data.SHOULD_SHOW_PERMISSION_RATIONALE_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			{ permissions = permissions },
+			getPermissionRequestTelemetryData(permissions)
+		)
+		return v
+	end
+end
+
+function PermissionsProtocol.isOpenNotificationSettingsSupported()
+	local platform = getPlatform() -- inferred equivalent call
+
+	if platform == Enum.Platform.IOS then
+		return true
+	end
+
+	if platform == Enum.Platform.Android then
+		return isAndroidNotificationSettingsGateOpen() -- inferred equivalent call
+	end
+
+	return false
+end
+
+function PermissionsProtocol:openNotificationSettings()
+	if not PermissionsProtocol.isOpenNotificationSettingsSupported() then
+		return Promise.resolve({ status = openSettingsStatus.FAILED })
+	end
+
+	if getPlatform() == Enum.Platform.IOS then -- inferred equivalent call
+		return self:requestPermissions({ PermissionsProtocol.Permissions.POST_NOTIFICATIONS }):andThen(function()
+			return { status = openSettingsStatus.OPENED_APP_SETTINGS }
+		end, function()
+			return { status = openSettingsStatus.FAILED }
+		end)
+	end
+
+	return callPushNotificationSettingsMethod(
+		self,
+		self.OPEN_NOTIFICATION_SETTINGS_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+		self.OPEN_NOTIFICATION_SETTINGS_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+	):timeout(PermissionsProtocol._openNotificationSettingsTimeoutSeconds):andThen(
+		function(p)
+			return { status = p.status }
+		end,
+		function()
+			return { status = openSettingsStatus.FAILED }
+		end
+	)
+end
+
+function PermissionsProtocol.getPushNotificationsEnabled(p)
+	if getPlatform() == Enum.Platform.Android and isAndroidNotificationSettingsGateOpen() then -- inferred equivalent call
+		return callPushNotificationSettingsMethod(
+			p,
+			p.GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_REQUEST_DESCRIPTOR,
+			p.GET_PUSH_NOTIFICATIONS_ENABLED_PROTOCOL_METHOD_RESPONSE_DESCRIPTOR
+		):timeout(
+			PermissionsProtocol._getPushNotificationsEnabledTimeoutSeconds,
+			"TIMEOUT"
+		):andThen(function(p2)
+			return { enabled = p2.enabled }
+		end)
+	end
+
+	return Promise.reject("UNSUPPORTED")
+end
+
+PermissionsProtocol.default = PermissionsProtocol.new()
+
+return PermissionsProtocol

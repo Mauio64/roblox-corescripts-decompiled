@@ -1,126 +1,144 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local Icon = Foundation.Icon
 local InputLabel = Foundation.InputLabel
 local View = Foundation.View
 local IconSize = Foundation.Enums.IconSize
 local ControlState = Foundation.Enums.ControlState
 local InputLabelSize = Foundation.Enums.InputLabelSize
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local useTokens = Foundation.Hooks.useTokens
 
-local function createButtons(t1: {[any]: any}, p1, p2: ((...any) -> ...any), p3: ((...any) -> ...any)?, s1: string?) -- line: 30
-	-- upvalues: useTokens (copy), React (copy), ControlState (copy), View (copy), InputLabel (copy), InputLabelSize (copy), Icon (copy), IconSize (copy)
-	local v20 = useTokens()
-	local t2 = {}
-	local v22, v23 = React.useState(s1 or "")
+local function createButtons(items, p, onSelected, setDescription, defaultValue: string?)
+	local v = useTokens()
 
-	for k, v in pairs(t1) do
-		local v26, v27 = React.useState(false)
-		local v28 = React.useCallback(function() -- line: 43
-			-- upvalues: v23 (copy), v (copy), p2 (copy), p3 (copy), p1 (copy), v27 (copy)
-			v23(v.value)
-			p2(v.value, v.text)
+	local state, setState = React.useState(defaultValue or "")
+	local children = {}
 
-			if p3 then
-				p3(p1[v.value])
+	for k, item in pairs(items) do
+		local state2, setState2 = React.useState(false)
+
+		local onActivated = React.useCallback(function()
+			setState(item.value)
+			onSelected(item.value, item.text)
+
+			if setDescription then
+				setDescription(p[item.value])
 			end
 
-			v27(true)
-		end, {
-			p2,
-			p3,
-			v27
-		})
-		local v29 = React.useCallback(function(p4) -- line: 52
-			-- upvalues: ControlState (copy), v27 (copy)
-			if p4 == ControlState.Hover or p4 == ControlState.Pressed then
-				v27(true)
+			setState2(true)
+		end, { onSelected, setDescription, setState2 })
 
-				return
+		local onStateChanged = React.useCallback(function(p2)
+			if p2 == ControlState.Hover or p2 == ControlState.Pressed then
+				setState2(true)
+			else
+				setState2(false)
 			end
+		end, { setState2, onActivated })
 
-			v27(false)
-		end, {
-			v27,
-			v28
-		})
+		local createElement = React.createElement
 
-		table.insert(t2, React.createElement(View, {
-			tag = "auto-xy col gap-xsmall padding-bottom-xsmall"
-		}, {
-			ButtonContainer = React.createElement(View, {
-				tag = "size-full-0 auto-y radius-medium row flex-between",
-				onStateChanged = v29,
-				onActivated = v28
-			}, {
-				UIPadding = React.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, 4),
-					PaddingRight = UDim.new(0, 4),
-					PaddingTop = UDim.new(0, 10),
-					PaddingBottom = UDim.new(0, 10)
-				}),
-				Button = React.createElement(InputLabel, {
-					Text = v.text,
-					textStyle = if not v26 then v20.Color.Content.Default else v20.Color.Content.Emphasis,
-					onActivated = v28,
-					onHover = v27,
-					size = InputLabelSize.Medium
-				}),
-				Icon = if v22 ~= v.value then nil else React.createElement(Icon, {
-					name = "icons/status/success_small",
-					size = IconSize.Small
-				})
+		local createElement2 = React.createElement
+
+		local children3 = {
+			UIPadding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, 4),
+				PaddingRight = UDim.new(0, 4),
+				PaddingTop = UDim.new(0, 10),
+				PaddingBottom = UDim.new(0, 10)
 			}),
+			Button = 0,
+			Icon = 0
+		}
+
+		local createElement3 = React.createElement
+		local v2 = {
+			Text = item.text,
+			textStyle = 0,
+			onActivated = 0,
+			onHover = 0,
+			size = 0
+		}
+		local textStyle
+
+		if state2 then
+			textStyle = v.Color.Content.Emphasis
+		else
+			textStyle = v.Color.Content.Default
+		end
+
+		v2.textStyle = textStyle
+		v2.onActivated = onActivated
+		v2.onHover = setState2
+		v2.size = InputLabelSize.Medium
+		children3.Button = createElement3(InputLabel, v2)
+		local icon
+
+		if item.value == state then
+			icon = React.createElement(Icon, {
+				name = "icons/status/success_small",
+				size = IconSize.Small
+			})
+		end
+
+		children3.Icon = icon
+		local children2 = {
+			ButtonContainer = createElement2(
+				View,
+				{
+					tag = "size-full-0 auto-y radius-medium row flex-between",
+					onStateChanged = onStateChanged,
+					onActivated = onActivated
+				},
+				children3
+			),
 			Divider = React.createElement(View, {
 				tag = "size-full-0 auto-y",
 				stroke = {
 					Thickness = 0.5,
-					Color = v20.Color.Content.Default.Color3,
-					Transparency = next(t1, k) ~= nil and v20.Color.Content.Default.Transparency or 1
+					Color = v.Color.Content.Default.Color3,
+					Transparency = next(items, k) == nil and 1 or v.Color.Content.Default.Transparency or 1
 				}
 			})
-		}))
+		}
+		table.insert(children, createElement(View, {
+			tag = "auto-xy col gap-xsmall padding-bottom-xsmall"
+		}, children2))
 	end
 
-	return t2
+	return children
 end
-local function ButtonList(t3: {[any]: any}) -- line: 112
-	-- upvalues: React (copy), Cryo (copy), useLocalization (copy), createButtons (copy), View (copy)
-	local v31 = React.useMemo(function() -- line: 113
-		-- upvalues: Cryo (copy), t3 (copy)
-		return Cryo.Dictionary.map(t3.options, function(p5) -- line: 114
-			return p5.localizationKey, p5.value
-		end)
-	end)
-	local v32 = React.useMemo(function() -- line: 119
-		-- upvalues: Cryo (copy), t3 (copy)
-		return Cryo.Dictionary.map(t3.options, function(p6) -- line: 120
-			return p6.descriptionLocalizationKey, p6.value
-		end)
-	end)
-	local v33 = useLocalization(v31)
-	local v34 = useLocalization(v32)
-	local v35 = React.useMemo(function() -- line: 128
-		-- upvalues: Cryo (copy), t3 (copy), v33 (copy)
-		return Cryo.List.map(t3.options, function(p7) -- line: 129
-			-- upvalues: v33 (copy)
-			return {
-				text = v33[p7.value] or "",
-				value = p7.value
-			}
-		end)
-	end, {
-		t3.options,
-		v33
-	})
-	local v36 = createButtons(v35, v34, t3.onSelected, t3.setDescription, t3.defaultValue)
 
-	return React.createElement(View, {
-		tag = "size-full col"
-	}, { v36 })
+local function ButtonList(props)
+	local v = React.useMemo(function()
+		return Cryo.Dictionary.map(props.options, function(p)
+			return p.localizationKey, p.value
+		end)
+	end)
+
+	local v2 = React.useMemo(function()
+		return Cryo.Dictionary.map(props.options, function(p)
+			return p.descriptionLocalizationKey, p.value
+		end)
+	end)
+
+	local v3 = useLocalization(v)
+	local v4 = useLocalization(v2)
+
+	local v5 = { createButtons(React.useMemo(function()
+			return Cryo.List.map(props.options, function(p)
+				return {
+					text = v3[p.value] or "",
+					value = p.value
+				}
+			end)
+		end, { props.options, v3 }), v4, props.onSelected, props.setDescription, props.defaultValue) }
+	return React.createElement(View, { tag = "size-full col" }, v5)
 end
 
 return ButtonList

@@ -1,31 +1,32 @@
-local ParentParent = script.Parent.Parent.Parent
-local Object = require(ParentParent.LuauPolyfill).Object
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local SafeFlags = require(parent.SafeFlags)
+local Object = LuauPolyfill.Object
+
+local v = SafeFlags.createGetFFlag("MemoizeVirtualizedListContext")()
+
+local React = require(parent.React)
 local useMemo = React.useMemo
 local useContext = React.useContext
-local t1 = {}
-local v7 = React.createContext(nil)
 
-t1.VirtualizedListContext = v7
+local context = React.createContext(nil)
+local VirtualizedListContext = {}
+VirtualizedListContext.VirtualizedListContext = context
 
 if _G.__DEV__ then
-	v7.displayName = "VirtualizedListContext"
+	context.displayName = "VirtualizedListContext"
 end
 
-function t1.VirtualizedListContextResetter(t2: {[any]: any}) -- line: 96
-	-- upvalues: React (copy), v7 (copy)
-	local children = t2.children
-
-	return React.createElement(v7.Provider, {
-		value = nil
-	}, children)
+function VirtualizedListContext.VirtualizedListContextResetter(p)
+	local children = p.children
+	return React.createElement(context.Provider, { value = nil }, children)
 end
-function t1.VirtualizedListContextProvider(t3: {[any]: any}) -- line: 109
-	-- upvalues: useMemo (copy), React (copy), v7 (copy)
-	local children = t3.children
-	local value = t3.value
-	local v13 = useMemo(function() -- line: 116
-		-- upvalues: value (copy)
+
+function VirtualizedListContext.VirtualizedListContextProvider(p)
+	local children = p.children
+	local value = p.value
+
+	local v2 = useMemo(function()
 		return {
 			cellKey = nil,
 			getScrollMetrics = value.getScrollMetrics,
@@ -54,21 +55,37 @@ function t1.VirtualizedListContextProvider(t3: {[any]: any}) -- line: 109
 		value.debugInfo.parent
 	})
 
-	return React.createElement(v7.Provider, {
-		value = v13
-	}, children)
-end
-function t1.VirtualizedListCellContextProvider(t4: {[any]: any}) -- line: 156
-	-- upvalues: useContext (copy), v7 (copy), React (copy), Object (copy)
-	local cellKey = t4.cellKey
-	local children = t4.children
-	local v17 = useContext(v7)
-
-	return React.createElement(v7.Provider, {
-		value = if v17 ~= nil then Object.assign(table.clone(v17), {
-			cellKey = cellKey
-		}) else nil
-	}, children)
+	return React.createElement(context.Provider, { value = v2 }, children)
 end
 
-return t1
+function VirtualizedListContext.VirtualizedListCellContextProvider(p)
+	local cellKey = p.cellKey
+	local children = p.children
+	local v2 = useContext(context)
+	local v3
+
+	if v then
+		v3 = useMemo(function()
+			if v2 == nil then
+				return nil
+			end
+
+			return (Object.assign(table.clone(v2), { cellKey = cellKey }))
+		end, { v2, cellKey })
+	end
+
+	local createElement = React.createElement
+	local provider = context.Provider
+
+	if not v then
+		if v2 == nil then
+			v3 = nil
+		else
+			v3 = Object.assign(table.clone(v2), { cellKey = cellKey })
+		end
+	end
+
+	return createElement(provider, { value = v3 }, children)
+end
+
+return VirtualizedListContext

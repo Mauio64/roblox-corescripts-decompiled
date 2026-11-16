@@ -1,37 +1,34 @@
 local ScriptContext = game:GetService("ScriptContext")
-local EngineFeature = game:GetEngineFeature("LuaAppCompression")
-local Parent = script:FindFirstAncestor("AppStartup").Parent
-local Signal = require(Parent.AppCommonLib).Signal
-local t1 = {}
+local engineFeature = game:GetEngineFeature("LuaAppCompression")
+local parent = script:FindFirstAncestor("AppStartup").Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
-t1.__index = t1
+local AppStartupSequence = {}
 
-function t1.new() -- line: 22
-	-- upvalues: Signal (copy), t1 (copy)
-	local t2 = {
-		isInteractive = false,
-		changed = Signal.new()
-	}
+AppStartupSequence.__index = AppStartupSequence
 
-	setmetatable(t2, t1)
+function AppStartupSequence.new()
+	local v = { changed = Signal.new(), isInteractive = false }
 
-	return t2
+	setmetatable(v, AppStartupSequence)
+	return v
 end
-function t1.setInteractive(p1) -- line: 31
-	-- upvalues: EngineFeature (copy), ScriptContext (copy)
-	if p1.isInteractive then
+
+function AppStartupSequence:setInteractive()
+	if self.isInteractive then
 		return
 	end
 
-	p1.isInteractive = true
+	self.isInteractive = true
 
-	if EngineFeature then
+	if engineFeature then
 		ScriptContext:CompressLuaApp()
 	end
 
-	p1.changed:fire()
+	self.changed:fire()
 end
 
-t1.default = t1.new()
+AppStartupSequence.default = AppStartupSequence.new()
 
-return t1
+return AppStartupSequence

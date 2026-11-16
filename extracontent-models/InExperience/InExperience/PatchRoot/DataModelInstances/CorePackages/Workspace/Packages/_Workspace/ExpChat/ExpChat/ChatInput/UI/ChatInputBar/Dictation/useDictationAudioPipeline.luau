@@ -1,304 +1,214 @@
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local React = require(Parent.React)
-local v5 = game:DefineFastFlag("EngineAudioSTTIsDictationEnabled", false)
 
-local function destroyIfExists(t1: {[any]: any}) -- line: 43
-	if t1.current then
-		t1.current:Destroy()
-		t1.current = nil
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local parent = ExpChat.Parent
+
+local React = require(parent.React)
+local finishDictationInput = require(script.Parent.finishDictationInput)
+local prepareDictationInput = require(script.Parent.prepareDictationInput)
+local setDictationUsageType = require(script.Parent.setDictationUsageType)
+local FFlagExpChatDictationExplicitFinish = require(ExpChat.Flags.FFlagExpChatDictationExplicitFinish)
+
+local defineFastFlag = game:DefineFastFlag("EngineAudioSTTIsDictationEnabled", false)
+local defineFastFlag2 = game:DefineFastFlag("ExpChatDictationSendUsageType", false)
+local FFlagExpChatDictationStreamingAudio = require(ExpChat.Flags.FFlagExpChatDictationStreamingAudio)
+
+local function destroyIfExists(p) -- 4 equivalent calls inferred from this helper
+	if p.current then
+		p.current:Destroy()
+		p.current = nil
 	end
 end
-local function disconnectIfExists(t2: {[any]: any}) -- line: 50
-	if t2.current then
-		t2.current:Disconnect()
-		t2.current = nil
+
+local function disconnectIfExists(p) -- 3 equivalent calls inferred from this helper
+	if p.current then
+		p.current:Disconnect()
+		p.current = nil
 	end
 end
-local function teardownInstances(t3: {[any]: any}) -- line: 57
-	local textConnection = t3.textConnection
 
-	if textConnection.current then
-		textConnection.current:Disconnect()
-		textConnection.current = nil
-	end
+local function teardownInstances(data) -- 5 equivalent calls inferred from this helper
+	disconnectIfExists(data.textConnection) -- inferred equivalent call
+	disconnectIfExists(data.vadConnection) -- inferred equivalent call
+	destroyIfExists(data.wire) -- inferred equivalent call
+	destroyIfExists(data.audioSTT) -- inferred equivalent call
+	destroyIfExists(data.audioDeviceInput) -- inferred equivalent call
+	destroyIfExists(data.container) -- inferred equivalent call
+end
 
-	local vadConnection = t3.vadConnection
-
-	if vadConnection.current then
-		vadConnection.current:Disconnect()
-		vadConnection.current = nil
-	end
-
-	local wire = t3.wire
-
-	if wire.current then
-		wire.current:Destroy()
-		wire.current = nil
-	end
-
-	local audioSTT = t3.audioSTT
-
-	if audioSTT.current then
-		audioSTT.current:Destroy()
-		audioSTT.current = nil
-	end
-
-	local audioDeviceInput = t3.audioDeviceInput
-
-	if audioDeviceInput.current then
-		audioDeviceInput.current:Destroy()
-		audioDeviceInput.current = nil
-	end
-
-	local container = t3.container
-
-	if container.current then
-		container.current:Destroy()
-		container.current = nil
+local function teardownPending(current)
+	for k, item in current do
+		pcall(task.cancel, item)
+		teardownInstances(k) -- inferred equivalent call
+		current[k] = nil
 	end
 end
-local function useDictationAudioPipeline() -- line: 66
-	-- upvalues: React (copy), Players (copy), CoreGui (copy), v5 (copy)
-	local v19, v20 = React.useState(nil)
-	local v21 = React.useRef(nil)
-	local v22 = React.useRef(nil)
-	local v23 = React.useRef(nil)
-	local v24 = React.useRef(nil)
-	local v25 = React.useRef(nil)
-	local v26 = React.useRef(nil)
-	local v27 = React.useMemo(function() -- line: 76
-		-- upvalues: v21 (copy), v22 (copy), v23 (copy), v24 (copy), v25 (copy), v26 (copy)
+
+local function useDictationAudioPipeline()
+	local state, setState = React.useState(nil)
+
+	local ref = React.useRef({})
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+	local ref4 = React.useRef(nil)
+	local ref5 = React.useRef(nil)
+	local ref6 = React.useRef(nil)
+	local ref7 = React.useRef(nil)
+
+	local v = React.useMemo(function()
 		return {
-			audioDeviceInput = v21,
-			audioSTT = v22,
-			wire = v23,
-			container = v24,
-			textConnection = v25,
-			vadConnection = v26
+			audioDeviceInput = ref2,
+			audioSTT = ref3,
+			wire = ref4,
+			container = ref5,
+			textConnection = ref6,
+			vadConnection = ref7
 		}
 	end, {})
-	local v28 = React.useCallback(function() -- line: 87
-		-- upvalues: v27 (copy), v20 (copy)
-		local v30 = v27
-		local textConnection = v30.textConnection
 
-		if textConnection.current then
-			textConnection.current:Disconnect()
-			textConnection.current = nil
+	local stop = React.useCallback(function(flag: boolean?)
+		teardownInstances(v) -- inferred equivalent call
+
+		if flag then
+			teardownPending(ref.current)
 		end
 
-		local vadConnection = v30.vadConnection
+		setState(nil)
+	end, { v })
 
-		if vadConnection.current then
-			vadConnection.current:Disconnect()
-			vadConnection.current = nil
-		end
+	local drain = React.useCallback(function(duration: number)
+		local v2 = {
+			audioDeviceInput = { current = v.audioDeviceInput.current },
+			audioSTT = { current = v.audioSTT.current },
+			wire = { current = v.wire.current },
+			container = { current = v.container.current },
+			textConnection = { current = v.textConnection.current },
+			vadConnection = { current = v.vadConnection.current }
+		}
 
-		local wire = v30.wire
+		v.audioDeviceInput.current = nil
+		v.audioSTT.current = nil
+		v.wire.current = nil
+		v.container.current = nil
+		v.textConnection.current = nil
+		v.vadConnection.current = nil
+		disconnectIfExists(v2.vadConnection) -- inferred equivalent call
+		ref.current[v2] = task.delay(duration, function()
+			ref.current[v2] = nil
+			teardownInstances(v2) -- inferred equivalent call
+		end)
+		setState(nil)
+	end, { v })
 
-		if wire.current then
-			wire.current:Destroy()
-			wire.current = nil
-		end
+	local start = React.useCallback(function(p, p2)
+		local localPlayer = Players.LocalPlayer
 
-		local audioSTT = v30.audioSTT
-
-		if audioSTT.current then
-			audioSTT.current:Destroy()
-			audioSTT.current = nil
-		end
-
-		local audioDeviceInput = v30.audioDeviceInput
-
-		if audioDeviceInput.current then
-			audioDeviceInput.current:Destroy()
-			audioDeviceInput.current = nil
-		end
-
-		local container = v30.container
-
-		if container.current then
-			container.current:Destroy()
-			container.current = nil
-		end
-
-		v20(nil)
-	end, { v27 })
-	local v29 = React.useCallback(function(t4: {[any]: any}, t5: {[any]: any}?) -- line: 93
-		-- upvalues: Players (copy), v27 (copy), CoreGui (copy), v5 (copy), v20 (copy)
-		local LocalPlayer = Players.LocalPlayer
-
-		if not LocalPlayer then
+		if not localPlayer then
 			error("No local player")
 		end
 
-		local v40 = v27
-		local textConnection = v40.textConnection
+		teardownInstances(v) -- inferred equivalent call
+		local v2
 
-		if textConnection.current then
-			textConnection.current:Disconnect()
-			textConnection.current = nil
+		if p2 == nil then
+			v2 = false
+		else
+			v2 = p2.continuous == true
 		end
 
-		local vadConnection = v40.vadConnection
+		local expChatDictation = Instance.new("Folder")
+		expChatDictation.Name = "ExpChatDictation"
+		expChatDictation.Parent = CoreGui
+		v.container.current = expChatDictation
 
-		if vadConnection.current then
-			vadConnection.current:Disconnect()
-			vadConnection.current = nil
+		local audioDeviceInput = Instance.new("AudioDeviceInput")
+		audioDeviceInput.Player = localPlayer
+		audioDeviceInput.Muted = false
+
+		if FFlagExpChatDictationStreamingAudio and v2 then
+			audioDeviceInput.Streaming = true
 		end
 
-		local wire = v40.wire
+		audioDeviceInput.Parent = expChatDictation
+		audioDeviceInput.Active = true
+		v.audioDeviceInput.current = audioDeviceInput
 
-		if wire.current then
-			wire.current:Destroy()
-			wire.current = nil
+		local audioSpeechToText = Instance.new("AudioSpeechToText")
+
+		if FFlagExpChatDictationStreamingAudio and v2 then
+			audioSpeechToText.Streaming = true
 		end
 
-		local audioSTT = v40.audioSTT
-
-		if audioSTT.current then
-			audioSTT.current:Destroy()
-			audioSTT.current = nil
+		if defineFastFlag then
+			audioSpeechToText.DictationEnabled = true
 		end
 
-		local audioDeviceInput = v40.audioDeviceInput
-
-		if audioDeviceInput.current then
-			audioDeviceInput.current:Destroy()
-			audioDeviceInput.current = nil
+		if defineFastFlag2 then
+			setDictationUsageType(audioSpeechToText, v2)
 		end
 
-		local container = v40.container
-
-		if container.current then
-			container.current:Destroy()
-			container.current = nil
+		if FFlagExpChatDictationExplicitFinish then
+			prepareDictationInput(audioSpeechToText)
 		end
 
-		local v47 = t5 ~= nil and t5.continuous == true
-		local Folder = Instance.new("Folder")
+		audioSpeechToText.Enabled = true
+		audioSpeechToText.Parent = expChatDictation
+		v.audioSTT.current = audioSpeechToText
 
-		Folder.Name = "ExpChatDictation"
-		Folder.Parent = CoreGui
-		v27.container.current = Folder
+		local wire = Instance.new("Wire")
+		wire.SourceInstance = audioDeviceInput
+		wire.TargetInstance = audioSpeechToText
+		wire.Parent = expChatDictation
+		v.wire.current = wire
 
-		local AudioDeviceInput = Instance.new("AudioDeviceInput")
+		v.textConnection.current = audioSpeechToText:GetPropertyChangedSignal("Text"):Connect(function()
+			local text = audioSpeechToText.Text
 
-		AudioDeviceInput.Player = LocalPlayer
-		AudioDeviceInput.Muted = false
-		AudioDeviceInput.Parent = Folder
-		AudioDeviceInput.Active = true
-		v27.audioDeviceInput.current = AudioDeviceInput
-
-		local AudioSpeechToText = Instance.new("AudioSpeechToText")
-
-		if v5 then
-			AudioSpeechToText.DictationEnabled = true
-		end
-
-		AudioSpeechToText.Enabled = true
-		AudioSpeechToText.Parent = Folder
-		v27.audioSTT.current = AudioSpeechToText
-
-		local Wire = Instance.new("Wire")
-
-		Wire.SourceInstance = AudioDeviceInput
-		Wire.TargetInstance = AudioSpeechToText
-		Wire.Parent = Folder
-		v27.wire.current = Wire
-		v27.textConnection.current = AudioSpeechToText:GetPropertyChangedSignal("Text"):Connect(function() -- line: 139
-			-- upvalues: AudioSpeechToText (copy), v47 (copy), t4 (copy)
-			local AudioSpeechToTextText = AudioSpeechToText.Text
-
-			if AudioSpeechToTextText and AudioSpeechToTextText ~= "" then
-				if v47 then
-					AudioSpeechToText.Text = ""
+			if text and text ~= "" then
+				if v2 then
+					audioSpeechToText.Text = ""
 				end
 
-				t4.onTranscription(AudioSpeechToTextText)
+				p.onTranscription(text)
 			end
 		end)
 
-		if t4.onSpeechStarted then
-			local onSpeechStarted = t4.onSpeechStarted
-
-			v27.vadConnection.current = AudioSpeechToText:GetPropertyChangedSignal("VoiceDetected"):Connect(function() -- line: 153
-				-- upvalues: AudioSpeechToText (copy), onSpeechStarted (copy)
-				if AudioSpeechToText.VoiceDetected then
+		if p.onSpeechStarted then
+			local onSpeechStarted = p.onSpeechStarted
+			v.vadConnection.current = audioSpeechToText:GetPropertyChangedSignal("VoiceDetected"):Connect(function()
+				if audioSpeechToText.VoiceDetected then
 					onSpeechStarted()
 				end
 			end)
 		end
 
-		v20(AudioDeviceInput)
+		setState(audioDeviceInput)
+		return audioDeviceInput
+	end, { v })
 
-		return AudioDeviceInput
-	end, { v27 })
-
-	React.useEffect(function() -- line: 166
-		-- upvalues: v27 (copy)
-		return function() -- line: 167
-			-- upvalues: v27 (copy)
-			local v54 = v27
-			local textConnection = v54.textConnection
-
-			if textConnection.current then
-				textConnection.current:Disconnect()
-				textConnection.current = nil
-			end
-
-			local vadConnection = v54.vadConnection
-
-			if vadConnection.current then
-				vadConnection.current:Disconnect()
-				vadConnection.current = nil
-			end
-
-			local wire = v54.wire
-
-			if wire.current then
-				wire.current:Destroy()
-				wire.current = nil
-			end
-
-			local audioSTT = v54.audioSTT
-
-			if audioSTT.current then
-				audioSTT.current:Destroy()
-				audioSTT.current = nil
-			end
-
-			local audioDeviceInput = v54.audioDeviceInput
-
-			if audioDeviceInput.current then
-				audioDeviceInput.current:Destroy()
-				audioDeviceInput.current = nil
-			end
-
-			local container = v54.container
-
-			if container.current then
-				container.current:Destroy()
-				container.current = nil
-			end
+	React.useEffect(function()
+		return function()
+			teardownInstances(v) -- inferred equivalent call
+			teardownPending(ref.current)
 		end
-	end, { v27 })
+	end, { v })
 
-	return React.useMemo(function() -- line: 172
-		-- upvalues: v29 (copy), v28 (copy), v19 (copy), v21 (copy)
+	return React.useMemo(function()
 		return {
-			start = v29,
-			stop = v28,
-			audioDeviceInput = v19,
-			audioDeviceInputRef = v21
+			start = start,
+			finishInput = function()
+				return finishDictationInput(v.audioSTT.current)
+			end,
+			stop = stop,
+			drain = drain,
+			discardPending = function()
+				teardownPending(ref.current)
+			end,
+			audioDeviceInput = state,
+			audioDeviceInputRef = ref2
 		}
-	end, {
-		v29,
-		v28,
-		v19
-	})
+	end, { start, stop, drain, state, v })
 end
 
 return useDictationAudioPipeline

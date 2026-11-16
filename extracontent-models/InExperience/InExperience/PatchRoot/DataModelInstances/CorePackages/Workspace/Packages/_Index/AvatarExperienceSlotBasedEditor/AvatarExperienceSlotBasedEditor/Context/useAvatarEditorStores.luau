@@ -1,18 +1,19 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+local React = require(parent.React)
 local AvatarEditorStores = require(script.Parent.AvatarEditorStores)
 local createAvatarEditorStores = require(script.Parent.Parent.Stores.createAvatarEditorStores)
 
-local function useAvatarEditorStores() -- line: 12
-	-- upvalues: React (copy), AvatarEditorStores (copy), createAvatarEditorStores (copy)
-	local v6 = React.useContext(AvatarEditorStores)
+local function useAvatarEditorStores()
+	local v = React.useContext(AvatarEditorStores)
 
-	if not v6 then
-		warn("useAvatarEditorStores was used without an AvatarEditorStores context provider. Providing a temporary default value instead.")
-		v6 = createAvatarEditorStores()
+	if v then
+		return v
 	end
 
-	return v6
+	warn("useAvatarEditorStores was used without an AvatarEditorStores context provider. Providing a temporary default value instead.")
+
+	return createAvatarEditorStores()
 end
 
 return useAvatarEditorStores

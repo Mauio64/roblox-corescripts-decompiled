@@ -1,32 +1,30 @@
-local t1 = {}
+local MockVRService = {}
+MockVRService.__index = MockVRService
 
-t1.__index = t1
-
-function t1.GetPropertyChangedSignal(p1, p2) -- line: 4
-	if p2 == "VRDeviceAvailable" then
-		return p1._vrDeviceAvailableChanged.Event
+function MockVRService:GetPropertyChangedSignal(p)
+	if p == "VRDeviceAvailable" then
+		return self._vrDeviceAvailableChanged.Event
 	end
 
-	error(("%s is not a valid property name"):format((tostring(p2))))
+	error(("%s is not a valid property name"):format((tostring(p))))
 end
-function t1.toggleHeadsetConnectionState(p3) -- line: 11
-	local v5 = not p3.VRDeviceAvailable
 
-	p3.VRDeviceAvailable = v5
-	p3._vrDeviceAvailableChanged:Fire(v5)
+function MockVRService:toggleHeadsetConnectionState()
+	local vrDeviceAvailable = not self.VRDeviceAvailable
+	self.VRDeviceAvailable = vrDeviceAvailable
+
+	self._vrDeviceAvailableChanged:Fire(vrDeviceAvailable)
 end
-function t1.new() -- line: 18
-	-- upvalues: t1 (copy)
-	local t2 = {
+
+function MockVRService.new()
+	local v = {
 		VRDeviceAvailable = true,
 		_vrDeviceAvailableChanged = Instance.new("BindableEvent")
 	}
 
-	setmetatable(t2, {
-		__index = t1
-	})
+	setmetatable(v, { __index = MockVRService })
 
-	return t2
+	return v
 end
 
-return t1
+return MockVRService

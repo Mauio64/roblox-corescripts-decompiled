@@ -1,93 +1,149 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local SharedFlags = require(ExpChatParent.SharedFlags)
-local getFFlagExpChatEnableChannelTabsUI = require(ExpChat.Flags.getFFlagExpChatEnableChannelTabsUI)
+local parent = ExpChat.Parent
+
+local ExpChatShared = require(parent.ExpChatShared)
+local SharedFlags = require(parent.SharedFlags)
+
 local FFlagExpChatNewInputBar = require(ExpChat.Flags.FFlagExpChatNewInputBar)
+local FFlagExpChatFixInputBarOrphanBorder = require(ExpChat.Flags.FFlagExpChatFixInputBarOrphanBorder)
 local selectSelectedTabName = require(ExpChat.selectSelectedTabName)
+local FriendsChatTabName = require(parent.FriendsChat.FriendsChatTabName)
+
 local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
-local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
 local FFlagExpChatUseChatConfigStore = SharedFlags.FFlagExpChatUseChatConfigStore
-local FFlagExpChatChannelTabRefactor = SharedFlags.FFlagExpChatChannelTabRefactor
+local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
 local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 
-local function getIsChatInputBarVisible(p1) -- line: 18
-	-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), selectSelectedTabName (copy)
-	local isChatInputBarEnabled = p1.ChatVisibility.isChatInputBarEnabled
+local function getIsChatInputBarVisible(data, flag: boolean) -- 2 equivalent calls inferred from this helper
+	local isChatInputBarEnabled = data.ChatVisibility.isChatInputBarEnabled
 
-	if GetFFlagTextChatEnableUniverseChatTabs() and (selectSelectedTabName(p1) == "RBXGlobal" and isChatInputBarEnabled._propertyEnabled ~= nil) then
-		return isChatInputBarEnabled._topBarVisibility and (isChatInputBarEnabled._coreGuiEnabled and not isChatInputBarEnabled._devTextBoxEnabled)
+	if GetFFlagTextChatEnableUniverseChatTabs() and flag and isChatInputBarEnabled._propertyEnabled ~= nil then
+		return isChatInputBarEnabled._topBarVisibility
+			and isChatInputBarEnabled._coreGuiEnabled
+			and not isChatInputBarEnabled._devTextBoxEnabled
 	end
 
 	return isChatInputBarEnabled.value
 end
-local function getSelectedTabType(p2) -- line: 33
-	-- upvalues: FFlagExpChatChannelTabRefactor (copy)
-	if not FFlagExpChatChannelTabRefactor then
+
+local function getSelectedTabType(data) -- 1 equivalent call inferred from this helper
+	local channelTabs = data.ChannelTabs
+
+	if channelTabs == nil or channelTabs.allChannelTabs == nil or channelTabs.selectedTabName == nil then
 		return nil
 	end
 
-	local ChannelTabs = p2.ChannelTabs
-
-	if ChannelTabs == nil or ChannelTabs.allChannelTabs == nil or ChannelTabs.selectedTabName == nil then
-		return nil
-	end
-
-	local v20 = ChannelTabs.allChannelTabs[ChannelTabs.selectedTabName]
-
-	return v20 and v20.Type or nil
+	local allChannelTab = channelTabs.allChannelTabs[channelTabs.selectedTabName]
+	return allChannelTab and allChannelTab.Type or nil
 end
 
-return function(p3, _) -- line: 45
-	-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatEnableFriendsTab (copy), FFlagExpChatUseMessagesStore (copy), selectSelectedTabName (copy), getFFlagExpChatEnableChannelTabsUI (copy), FFlagExpChatUseChatConfigStore (copy), FFlagExpChatChannelTabRefactor (copy), FFlagExpChatPresetChatEnabled (copy), FFlagExpChatNewInputBar (copy)
-	local v23 = false
+return function(data, data2)
+	local channelTabs
 
-	if GetFFlagTextChatEnableUniverseChatTabs() then
-		local ChannelTabs = p3.ChannelTabs
-
-		v23 = ChannelTabs ~= nil and (ChannelTabs.allChannelTabs ~= nil and ChannelTabs.allChannelTabs.RBXGlobal ~= nil)
+	if not FFlagExpChatUseChannelTabsStore then
+		channelTabs = data.ChannelTabs
 	end
 
-	local v25 = false
+	local v
 
-	if FFlagExpChatEnableFriendsTab then
-		local ChannelTabs = p3.ChannelTabs
-
-		v25 = ChannelTabs ~= nil and (ChannelTabs.allChannelTabs ~= nil and ChannelTabs.allChannelTabs.FriendsChat ~= nil)
+	if not (FFlagExpChatUseChannelTabsStore or not GetFFlagTextChatEnableUniverseChatTabs()) then
+		v = selectSelectedTabName(data)
 	end
 
-	local t1 = {
-		canLocalUserChat = if not FFlagExpChatUseMessagesStore then p3.CanLocalUserChat else nil
-	}
-	local isChatInputBarEnabled = p3.ChatVisibility.isChatInputBarEnabled
+	local v2
 
-	t1.isChatInputBarVisible = if not GetFFlagTextChatEnableUniverseChatTabs() or (selectSelectedTabName(p3) ~= "RBXGlobal" or isChatInputBarEnabled._propertyEnabled == nil) then isChatInputBarEnabled.value else isChatInputBarEnabled._topBarVisibility and (isChatInputBarEnabled._coreGuiEnabled and not isChatInputBarEnabled._devTextBoxEnabled)
-	t1.isChatWindowVisible = p3.ChatVisibility.isChatWindowEnabled.value
-	t1.isChannelBarVisible = not not getFFlagExpChatEnableChannelTabsUI() and (p3.ChatVisibility.isChannelBarEnabled.value or (GetFFlagTextChatEnableUniverseChatTabs() and (not not v23 and p3.ChatVisibility.isChatWindowEnabled.value) or v25 and p3.ChatVisibility.isChatWindowEnabled.value))
-	t1.chatTopBarVisibility = p3.ChatVisibility.isChatInputBarEnabled._topBarVisibility and p3.ChatVisibility.isChatWindowEnabled._topBarVisibility
-	t1.chatLayoutAlignment = p3.ChatLayout.Alignment
-	t1.chatWindowSettings = if not FFlagExpChatUseChatConfigStore then p3.ChatLayout.ChatWindowSettings else nil
-	t1.clientSettings = p3.ClientSettings
-
-	local v29
-
-	if not FFlagExpChatChannelTabRefactor then
-		v29 = nil
+	if FFlagExpChatUseChannelTabsStore then
+		v2 = data2.isGlobalTabSelected == true
 	else
-		local ChannelTabs = p3.ChannelTabs
+		v2 = v == "RBXGlobal"
+	end
 
-		if ChannelTabs == nil or ChannelTabs.allChannelTabs == nil or ChannelTabs.selectedTabName == nil then
-			v29 = nil
+	local v3
+
+	if FFlagExpChatUseChannelTabsStore then
+		v3 = data2.hasGlobalChannelTab
+	else
+		v3 = false
+	end
+
+	if not FFlagExpChatUseChannelTabsStore and GetFFlagTextChatEnableUniverseChatTabs() then
+		if channelTabs == nil or channelTabs.allChannelTabs == nil then
+			v3 = false
 		else
-			local v31 = ChannelTabs.allChannelTabs[ChannelTabs.selectedTabName]
-
-			v29 = v31 and v31.Type or nil
+			v3 = channelTabs.allChannelTabs.RBXGlobal ~= nil
 		end
 	end
 
-	t1.selectedTabType = v29
-	t1.targetTextChannel = if not FFlagExpChatPresetChatEnabled and not FFlagExpChatNewInputBar then nil else p3.TextChannels and p3.TextChannels.targetTextChannel
+	local v4
 
-	return t1
+	if FFlagExpChatUseChannelTabsStore then
+		v4 = data2.hasFriendsChannelTab
+	else
+		v4 = false
+	end
+
+	if not FFlagExpChatUseChannelTabsStore and FFlagExpChatEnableFriendsTab then
+		if channelTabs == nil or channelTabs.allChannelTabs == nil then
+			v4 = false
+		else
+			v4 = channelTabs.allChannelTabs[FriendsChatTabName] ~= nil
+		end
+	end
+
+	local selectedTabType
+
+	if FFlagExpChatUseChannelTabsStore then
+		selectedTabType = data2.selectedTabType
+	else
+		selectedTabType = getSelectedTabType(data) -- inferred equivalent call
+	end
+
+	local renderingFriends = FFlagExpChatEnableFriendsTab and selectedTabType == "FriendsChat"
+	local isExperienceChatRendered = not renderingFriends
+	local isChatInputBarVisible
+
+	if FFlagExpChatFixInputBarOrphanBorder then
+		isChatInputBarVisible = getIsChatInputBarVisible(data, v2) and isExperienceChatRendered -- inferred equivalent call
+	else
+		isChatInputBarVisible = getIsChatInputBarVisible(data, v2) -- inferred equivalent call
+	end
+
+	local v5 = {
+		isChatInputBarVisible = isChatInputBarVisible,
+		isChatWindowVisible = data.ChatVisibility.isChatWindowEnabled.value,
+		isChannelBarVisible = data.ChatVisibility.isChannelBarEnabled.value or GetFFlagTextChatEnableUniverseChatTabs() and v3 and data.ChatVisibility.isChatWindowEnabled.value or v4 and data.ChatVisibility.isChatWindowEnabled.value,
+		chatTopBarVisibility = data.ChatVisibility.isChatInputBarEnabled._topBarVisibility and data.ChatVisibility.isChatWindowEnabled._topBarVisibility,
+		chatLayoutAlignment = data.ChatLayout.Alignment,
+		chatWindowSettings = 0,
+		clientSettings = 0,
+		selectedTabType = 0,
+		renderingFriends = 0,
+		isExperienceChatRendered = 0,
+		targetTextChannel = 0
+	}
+	local chatWindowSettings
+
+	if not FFlagExpChatUseChatConfigStore then
+		chatWindowSettings = data.ChatLayout.ChatWindowSettings
+	end
+
+	v5.chatWindowSettings = chatWindowSettings
+	v5.clientSettings = data.ClientSettings
+
+	if FFlagExpChatUseChannelTabsStore then
+		selectedTabType = nil
+	end
+
+	v5.selectedTabType = selectedTabType
+	v5.renderingFriends = renderingFriends
+	v5.isExperienceChatRendered = isExperienceChatRendered
+	local targetTextChannel
+
+	if FFlagExpChatPresetChatEnabled or FFlagExpChatNewInputBar then
+		targetTextChannel = data.TextChannels and data.TextChannels.targetTextChannel
+	end
+
+	v5.targetTextChannel = targetTextChannel
+	return v5
 end

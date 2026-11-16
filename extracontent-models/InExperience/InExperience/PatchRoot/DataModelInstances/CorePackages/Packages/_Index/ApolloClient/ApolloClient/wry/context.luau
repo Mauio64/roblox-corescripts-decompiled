@@ -1,1 +1,3 @@
-return (require(script.context))
+local context = require(script.context)
+
+return context

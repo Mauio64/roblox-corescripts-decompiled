@@ -1,122 +1,248 @@
 local IAPExperience = script:FindFirstAncestor("IAPExperience")
 local decodeLuauUnicodeEscapes = require(IAPExperience.Utility.decodeLuauUnicodeEscapes)
-local DiscountType = require(script.Parent.Parent.PricingTypes).DiscountType
+local FFlagCartPricingSupportGameItemOffer = require(IAPExperience.Flags.FFlagCartPricingSupportGameItemOffer)
 
-local function mapCartPricingDiscountType(p1) -- line: 125
-	-- upvalues: DiscountType (copy)
-	if p1 == "ROBLOX_PLUS" then
+local PricingTypes = require(script.Parent.Parent.PricingTypes)
+
+local DiscountType = PricingTypes.DiscountType
+
+local SharedFlags = require(IAPExperience.Parent.SharedFlags)
+
+local v = { RobloxPlus = "ROBLOX_PLUS", MarketplaceOffer = "MARKETPLACE_OFFER", Offer = "OFFER" }
+
+local function mapCartPricingDiscountType(p)
+	if p == "ROBLOX_PLUS" then
 		return DiscountType.RobloxPlusSubscription
 	end
 
 	return DiscountType.Uncategorized
 end
 
-return {
-	getCartLineSalePriceInRobux = function(t1: {[any]: any}?) -- line: 74
-		if type(t1) ~= "table" then
+local function isOfferDiscountType(p)
+	return p == "MARKETPLACE_OFFER" or FFlagCartPricingSupportGameItemOffer and p == "OFFER"
+end
+
+local function consolidateRobloxPlusDiscounts(items)
+	local v2 = nil
+	local result = {}
+
+	for _, item in items do
+		if item.type == DiscountType.RobloxPlusSubscription then
+			if v2 == nil then
+				table.insert(result, {
+					type = item.type,
+					amountInRobux = item.amountInRobux,
+					percent = item.percent,
+					localizedDiscountAttribution = item.localizedDiscountAttribution
+				})
+
+				v2 = #result
+			else
+				result[v2].amountInRobux += item.amountInRobux
+			end
+		else
+			table.insert(result, item)
+		end
+	end
+
+	return result
+end
+
+local CartPricingResponseLineItem = {
+	getCartLineSalePriceInRobux = function(p)
+		if type(p) ~= "table" then
 			return nil
 		end
 
-		local priceInRobux = t1.priceInRobux
+		local priceInRobux = p.priceInRobux
 
-		if type(priceInRobux) ~= "number" or priceInRobux < 0 then
-			return nil
+		if type(priceInRobux) == "number" and not (priceInRobux < 0) then
+			return priceInRobux
 		end
 
-		return priceInRobux
+		return nil
 	end,
-	getCartLineRegularPriceInRobux = function(t2: {[any]: any}?, n1: number) -- line: 85
-		if type(t2) == "table" then
-			local regularPriceInRobux = t2.regularPriceInRobux
+	getCartLineRegularPriceInRobux = function(p, p2: number)
+		if type(p) == "table" then
+			local regularPriceInRobux = p.regularPriceInRobux
 
-			if type(regularPriceInRobux) == "number" and n1 <= regularPriceInRobux then
+			if type(regularPriceInRobux) == "number" and p2 <= regularPriceInRobux then
 				return regularPriceInRobux
 			end
 		end
 
-		return n1
+		return p2
 	end,
-	extractCartPricingMarketingOffers = function(t3: {[any]: any}?) -- line: 95
-		-- upvalues: decodeLuauUnicodeEscapes (copy)
-		local t4 = {}
+	extractCartPricingMarketingOffers = function(p)
+		local cartPricingMarketingOffers = {}
 
-		if type(t3) ~= "table" then
-			return t4
+		if type(p) ~= "table" then
+			return cartPricingMarketingOffers
 		end
 
-		local availableOffers = t3.availableOffers
+		local availableOffers = p.availableOffers
 
 		if type(availableOffers) ~= "table" then
-			return t4
+			return cartPricingMarketingOffers
 		end
 
-		for _, v14 in availableOffers do
-			if type(v14) == "table" then
-				local offerId = v14.offerId
-				local localizedDescription = v14.localizedDescription
+		for _, availableOffer in availableOffers do
+			if type(availableOffer) ~= "table" then
+				continue
+			end
 
-				if type(offerId) == "string" and offerId ~= "" and type(localizedDescription) == "string" and localizedDescription ~= "" then
-					table.insert(t4, {
-						offerId = offerId,
-						localizedDescription = decodeLuauUnicodeEscapes(localizedDescription),
-						selected = v14.selected == true
-					})
+			local offerId = availableOffer.offerId
+			local localizedDescription = availableOffer.localizedDescription
+
+			if not (type(offerId) == "string" and offerId ~= "" and type(localizedDescription) == "string" and localizedDescription ~= "") then
+				continue
+			end
+
+			local expirationTimeUtc = availableOffer.expirationTimeUtc
+			local v2 = {
+				offerId = offerId,
+				localizedDescription = decodeLuauUnicodeEscapes(localizedDescription),
+				selected = availableOffer.selected == true,
+				expirationTimeUtc = 0
+			}
+
+			if type(expirationTimeUtc) ~= "string" or expirationTimeUtc == "" then
+				expirationTimeUtc = nil
+			end
+
+			v2.expirationTimeUtc = expirationTimeUtc
+			table.insert(cartPricingMarketingOffers, v2)
+		end
+
+		return cartPricingMarketingOffers
+	end,
+	extractDiscountRowsFromLineItems = function(items)
+		local discountRowsFromLineItems = {}
+
+		if type(items) ~= "table" then
+			return discountRowsFromLineItems
+		end
+
+		for _, item in items do
+			if type(item) ~= "table" then
+				continue
+			end
+
+			local discountInformation = item.discountInformation
+
+			if type(discountInformation) ~= "table" then
+				continue
+			end
+
+			local discounts = discountInformation.discounts
+
+			if type(discounts) ~= "table" then
+				continue
+			end
+
+			for _, discount in discounts do
+				if type(discount) ~= "table" then
+					continue
 				end
+
+				local robuxDiscountAmount = discount.robuxDiscountAmount
+				local localizedDiscountAttribution = discount.localizedDiscountAttribution
+
+				if
+					type(robuxDiscountAmount) ~= "number"
+					or robuxDiscountAmount <= 0
+					or type(localizedDiscountAttribution) ~= "string"
+					or localizedDiscountAttribution == ""
+				then
+					continue
+				end
+
+				local v3
+
+				if discount.discountType == v.RobloxPlus then
+					v3 = DiscountType.RobloxPlusSubscription
+				else
+					v3 = DiscountType.Uncategorized
+				end
+
+				local v2 = {
+					type = v3,
+					amountInRobux = robuxDiscountAmount,
+					percent = 0,
+					localizedDiscountAttribution = decodeLuauUnicodeEscapes(localizedDiscountAttribution)
+				}
+				table.insert(discountRowsFromLineItems, v2)
 			end
 		end
 
-		return t4
+		return discountRowsFromLineItems
 	end,
-	extractDiscountRowsFromLineItems = function(t5: {[any]: any}?) -- line: 139
-		-- upvalues: DiscountType (copy), decodeLuauUnicodeEscapes (copy)
-		local t6 = {}
+	consolidateRobloxPlusDiscounts = 0,
+	computePriceWithoutOffersDiscounts = 0,
+	extractCartPricingSavingsSummary = 0
+}
 
-		if type(t5) ~= "table" then
-			return t6
+if not SharedFlags.FFlagPurchasePromptFetchCartPricingForLooks then
+	consolidateRobloxPlusDiscounts = nil
+end
+
+CartPricingResponseLineItem.consolidateRobloxPlusDiscounts = consolidateRobloxPlusDiscounts
+
+function CartPricingResponseLineItem.computePriceWithoutOffersDiscounts(items, total: number)
+	if type(items) ~= "table" then
+		return total
+	end
+
+	for _, item in items do
+		if type(item) ~= "table" then
+			continue
 		end
 
-		for _, v21 in t5 do
-			if type(v21) == "table" then
-				local discountInformation = v21.discountInformation
+		local discountInformation = item.discountInformation
 
-				if type(discountInformation) == "table" then
-					local discounts = discountInformation.discounts
+		if type(discountInformation) ~= "table" then
+			continue
+		end
 
-					if type(discounts) == "table" then
-						for _, v25 in discounts do
-							if type(v25) == "table" then
-								local robuxDiscountAmount = v25.robuxDiscountAmount
-								local localizedDiscountAttribution = v25.localizedDiscountAttribution
+		local discounts = discountInformation.discounts
 
-								if type(robuxDiscountAmount) == "number" and not (robuxDiscountAmount <= 0) and type(localizedDiscountAttribution) == "string" and localizedDiscountAttribution ~= "" then
-									table.insert(t6, {
-										percent = 0,
-										type = if v25.discountType ~= "ROBLOX_PLUS" then DiscountType.Uncategorized else DiscountType.RobloxPlusSubscription,
-										amountInRobux = robuxDiscountAmount,
-										localizedDiscountAttribution = decodeLuauUnicodeEscapes(localizedDiscountAttribution)
-									})
-								end
-							end
-						end
-					end
-				end
+		if type(discounts) ~= "table" then
+			continue
+		end
+
+		for _, discount in discounts do
+			if type(discount) ~= "table" then
+				continue
+			end
+
+			local discountType = discount.discountType
+
+			if not (discountType == v.MarketplaceOffer or FFlagCartPricingSupportGameItemOffer and discountType == v.Offer) then
+				continue
+			end
+
+			local robuxDiscountAmount = discount.robuxDiscountAmount
+
+			if type(robuxDiscountAmount) == "number" and robuxDiscountAmount > 0 then
+				total += robuxDiscountAmount
 			end
 		end
+	end
 
-		return t6
-	end,
-	extractCartPricingSavingsSummary = function(t7: {[any]: any}?) -- line: 184
-		-- upvalues: decodeLuauUnicodeEscapes (copy)
-		if type(t7) ~= "table" then
-			return nil
-		end
+	return total
+end
 
-		local savingsSummary = t7.savingsSummary
+function CartPricingResponseLineItem.extractCartPricingSavingsSummary(p)
+	if type(p) ~= "table" then
+		return nil
+	end
 
-		if type(savingsSummary) ~= "string" or savingsSummary == "" then
-			return nil
-		end
+	local savingsSummary = p.savingsSummary
 
+	if type(savingsSummary) == "string" and savingsSummary ~= "" then
 		return decodeLuauUnicodeEscapes(savingsSummary)
 	end
-}
+
+	return nil
+end
+return CartPricingResponseLineItem

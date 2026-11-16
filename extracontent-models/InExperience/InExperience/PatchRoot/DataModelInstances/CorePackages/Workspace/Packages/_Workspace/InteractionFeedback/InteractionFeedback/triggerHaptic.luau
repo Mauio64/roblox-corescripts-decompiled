@@ -1,35 +1,30 @@
-local Parent = script:FindFirstAncestor("InteractionFeedback").Parent
-local Cryo = require(Parent.Cryo)
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("InteractionFeedback").Parent
+local Cryo = require(parent.Cryo)
 
 require(script.Parent.InteractionFeedbackContext)
-
 local sendHapticAnalytics = require(script.Parent.sendHapticAnalytics)
-local FFlagLuaAppHapticTriggeredTelemetry = SharedFlags.FFlagLuaAppHapticTriggeredTelemetry
-local FFlagLuaAppFixExplicitFeedbackTelemetry = SharedFlags.FFlagLuaAppFixExplicitFeedbackTelemetry
-local t1 = {}
 
-local function triggerHaptic(p1, vector3: Vector3, n1: number, s1: string?, p2, s2: string?, t2: {[any]: any}?) -- line: 16
-	-- upvalues: t1 (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), Cryo (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), sendHapticAnalytics (copy)
-	if not t1[p1] then
-		t1[p1] = Instance.new("HapticEffect")
-		t1[p1].Parent = workspace
-		t1[p1].Type = p1
+local hapticEffects = {}
+
+local function triggerHaptic(p, position: Vector3, radius: number, contextKey: string?, interactionType, p2: string?, options)
+	if not hapticEffects[p] then
+		hapticEffects[p] = Instance.new("HapticEffect")
+		hapticEffects[p].Parent = workspace
+		hapticEffects[p].Type = p
 	end
 
-	t1[p1].Position = vector3
-	t1[p1].Radius = n1
-	t1[p1]:Play()
+	hapticEffects[p].Position = position
+	hapticEffects[p].Radius = radius
+	hapticEffects[p]:Play()
 
-	if FFlagLuaAppHapticTriggeredTelemetry and s2 then
-		local v16 = Cryo.Dictionary.join({
-			hapticType = p1.Name,
-			contextKey = s1,
-			interactionType = p2,
-			ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then s2 else nil
-		}, t2 or {})
-
-		sendHapticAnalytics(v16, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else s2)
+	if p2 then
+		sendHapticAnalytics(
+			Cryo.Dictionary.join(
+				{ hapticType = p.Name, contextKey = contextKey, interactionType = interactionType },
+				options or {}
+			),
+			p2
+		)
 	end
 end
 

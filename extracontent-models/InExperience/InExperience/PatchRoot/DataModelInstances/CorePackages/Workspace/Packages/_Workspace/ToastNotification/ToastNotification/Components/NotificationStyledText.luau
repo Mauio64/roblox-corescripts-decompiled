@@ -1,109 +1,136 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local dependencies = require(parent.dependencies)
 local useStyle = dependencies.UIBlox.Core.Style.useStyle
+require(parent.type)
 
-require(ParentParent.type)
+local react = dependencies.React
+local Foundation = require(parent2.Foundation)
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-local React = dependencies.React
-local t1 = {
-	highlight = function(s1: string) -- line: 44
-		return "<b>" .. s1 .. "</b>"
+local v = {
+	highlight = function(p: string)
+		return "<b>" .. p .. "</b>"
 	end
 }
 
-local function formatString(p1) -- line: 49
-	-- upvalues: t1 (copy)
-	local text = p1.text
-	local styledElements = p1.styledElements
-	local t2 = {
+local function formatString(text)
+	local text2 = text.text
+	local styledElements = text.styledElements
+
+	local v2 = {
+		{ Position = 0, ReferenceCount = 0, Format = "highlight" },
 		{
-			Position = 0,
+			Position = #text.text,
 			ReferenceCount = 0,
 			Format = "highlight"
-		},
-		{
-			ReferenceCount = 0,
-			Format = "highlight",
-			Position = #p1.text
 		}
 	}
 
 	if styledElements then
-		for _, v in pairs(styledElements) do
-			table.insert(t2, {
+		for _, styledElement in pairs(styledElements) do
+			table.insert(v2, {
+				Position = styledElement.offset,
 				ReferenceCount = 1,
-				Position = v.offset,
-				Format = v.styledElementType
+				Format = styledElement.styledElementType
 			})
-			table.insert(t2, {
+
+			table.insert(v2, {
+				Position = styledElement.offset + styledElement.length,
 				ReferenceCount = -1,
-				Position = v.offset + v.length,
-				Format = v.styledElementType
+				Format = styledElement.styledElementType
 			})
 		end
 	end
 
-	table.sort(t2, function(p2, p3) -- line: 84
-		return p2.Position < p3.Position
+	table.sort(v2, function(a, b): boolean
+		return a.Position < b.Position
 	end)
 
-	local t3 = {}
+	local v3 = {}
 
-	for k in pairs(t1) do
-		t3[k] = 0
+	for k in pairs(v) do
+		v3[k] = 0
 	end
 
-	local s2 = ""
+	local v4 = ""
 
-	for i = 1, #t2 - 1 do
-		local v18 = t2[i]
-		local v19 = t2[i + 1]
+	for i = 1, #v2 - 1 do
+		local v5 = v2[i]
+		local v6 = v2[i + 1]
 
-		if v18.Format then
-			local Format = v18.Format
-
-			t3[Format] = t3[Format] + v18.ReferenceCount
+		if v5.Format then
+			local format = v5.Format
+			v3[format] += v5.ReferenceCount
 		end
 
-		if v18.Position ~= v19.Position then
-			local v21 = text:sub(v18.Position + 1, v19.Position)
+		if v5.Position == v6.Position then
+			continue
+		end
 
-			for k, v in pairs(t1) do
-				if t3[k] > 0 then
-					v21 = v(v21)
-				end
+		local v7 = text2:sub(v5.Position + 1, v6.Position)
+
+		for k, v8 in pairs(v) do
+			if v3[k] > 0 then
+				v7 = v8(v7)
 			end
-
-			s2 ..= v21
 		end
+
+		v4 ..= v7
 	end
 
-	return s2
+	return v4
 end
 
-return function(t4: {[any]: any}) -- line: 115
-	-- upvalues: useStyle (copy), formatString (copy), React (copy)
-	local v25 = useStyle()
-	local v26 = not t4.Text and "" or formatString(t4.Text)
+return function(props)
+	local v2 = useStyle()
+	local text = not props.Text and "" or formatString(props.Text)
 
-	return React.createElement("TextLabel", {
+	local createElement = react.createElement
+	local v3 = {
 		RichText = true,
+		Text = text,
 		BackgroundTransparency = 1,
-		TextWrapped = true,
-		Text = v26,
-		TextColor3 = t4.TextColor3 or v25.Theme.TextDefault.Color,
-		TextTransparency = t4.TextTransparency or v25.Theme.TextDefault.Transparency,
-		Font = t4.Font or v25.Font.Body.Font,
-		AutomaticSize = t4.AutomaticSize,
-		Size = t4.Size,
-		TextSize = t4.TextSize,
-		Position = t4.Position,
-		AnchorPoint = t4.AnchorPoint,
-		TextXAlignment = t4.TextXAlignment,
-		TextTruncate = Enum.TextTruncate.AtEnd
-	}, {
-		UISizeConstraint = if not t4.MaxSize then nil else React.createElement("UISizeConstraint", {
-			MaxSize = t4.MaxSize
-		})
-	})
+		TextColor3 = props.TextColor3 or v2.Theme.TextDefault.Color,
+		TextTransparency = props.TextTransparency or v2.Theme.TextDefault.Transparency,
+		Font = 0,
+		FontFace = 0,
+		AutomaticSize = 0,
+		Size = 0,
+		TextSize = 0,
+		Position = 0,
+		AnchorPoint = 0,
+		TextXAlignment = 0,
+		TextTruncate = 0,
+		TextWrapped = true
+	}
+	local font
+
+	if not (FoundationFontFaceMigration and props.FontFace) then
+		font = props.Font or v2.Font.Body.Font
+	end
+
+	v3.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = props.FontFace
+	end
+
+	v3.FontFace = fontFace
+
+	v3.AutomaticSize = props.AutomaticSize
+	v3.Size = props.Size
+	v3.TextSize = props.TextSize
+	v3.Position = props.Position
+	v3.AnchorPoint = props.AnchorPoint
+	v3.TextXAlignment = props.TextXAlignment
+	v3.TextTruncate = Enum.TextTruncate.AtEnd
+	local uiSizeConstraint
+
+	if props.MaxSize then
+		uiSizeConstraint = react.createElement("UISizeConstraint", { MaxSize = props.MaxSize })
+	end
+
+	return createElement("TextLabel", v3, { UISizeConstraint = uiSizeConstraint })
 end

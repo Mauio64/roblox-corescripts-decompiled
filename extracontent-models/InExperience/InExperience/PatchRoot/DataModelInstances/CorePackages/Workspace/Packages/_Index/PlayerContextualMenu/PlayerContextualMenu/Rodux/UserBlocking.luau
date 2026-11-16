@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
+local parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
+local UserBlockingRodux = require(parent.UserBlockingRodux)
 
-return require(Parent.UserBlockingRodux).config({
-	keyPath = "PlayerContextualMenu.UserBlocking"
-})
+return UserBlockingRodux.config({ keyPath = "PlayerContextualMenu.UserBlocking" })

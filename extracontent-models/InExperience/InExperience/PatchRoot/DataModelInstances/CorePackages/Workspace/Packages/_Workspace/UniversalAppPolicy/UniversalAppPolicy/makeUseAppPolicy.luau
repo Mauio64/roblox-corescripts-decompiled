@@ -1,72 +1,115 @@
-local ParentParent = script.Parent.Parent
-local PolicyProvider = require(ParentParent.PolicyProvider)
+local parent = script.Parent.Parent
+local PolicyProvider = require(parent.PolicyProvider)
 local Logger = PolicyProvider.Logger
-local React = require(ParentParent.React)
-local Cryo = require(ParentParent.Cryo)
-
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
 require(script.Parent.PolicyTypes)
 
-local function mergePolicies(p1, t1: {[any]: any}) -- line: 15
-	-- upvalues: Cryo (copy)
-	local t2 = {}
+local defineFastFlag = game:DefineFastFlag("UniversalAppPolicySkipUnchangedPolicy2", false)
 
-	for _, v in ipairs(t1) do
-		t2 = Cryo.Dictionary.join(t2, v(p1))
+local function sameValues(current, p): boolean -- 1 equivalent call inferred from this helper
+	if current.n ~= p.n then
+		return false
 	end
 
-	return t2
+	for i = 1, current.n do
+		if current[i] ~= p[i] then
+			return false
+		end
+	end
+
+	return true
 end
 
-return function(p2) -- line: 25
-	-- upvalues: React (copy), PolicyProvider (copy), mergePolicies (copy), Logger (copy)
-	assert(p2, "expected getPolicyImpl")
+local function mergePolicies(p, presentationPolicy)
+	local joined = {}
 
-	local function useAppPolicy(p3: ((...any) -> ...any)) -- line: 28
-		-- upvalues: React (copy), PolicyProvider (copy), mergePolicies (copy), p2 (copy), Logger (copy)
-		local v15 = React.useContext(PolicyProvider.AppPolicyContext)
+	for _, item in ipairs(presentationPolicy) do
+		joined = Cryo.Dictionary.join(joined, item(p))
+	end
 
-		assert(v15, "Not a descendent of PolicyProvider")
+	return joined
+end
 
-		local function getInitialPolicy() -- line: 32
-			-- upvalues: v15 (copy), mergePolicies (copy), p2 (copy), Logger (copy)
-			if v15.staticExternalPolicy then
-				return (mergePolicies(v15.staticExternalPolicy, v15.presentationPolicy))
+return function(p)
+	assert(p, "expected getPolicyImpl")
+
+	local function useAppPolicy(current)
+		local v = React.useContext(PolicyProvider.AppPolicyContext)
+		assert(v, "Not a descendent of PolicyProvider")
+
+		local function getInitialPolicy()
+			if v.staticExternalPolicy then
+				return mergePolicies(v.staticExternalPolicy, v.presentationPolicy)
 			end
 
-			local v19 = p2.read()
+			local v2 = p.read()
 
-			if v19 then
-				return (mergePolicies(v19, v15.presentationPolicy))
+			if v2 then
+				return mergePolicies(v2, v.presentationPolicy)
 			end
 
 			Logger:trace("No app policy data available")
-
-			return (mergePolicies({}, v15.presentationPolicy))
+			return mergePolicies({}, v.presentationPolicy)
 		end
 
-		local v17, v18 = React.useState(getInitialPolicy)
+		local state, setState = React.useState(getInitialPolicy)
+		local ref, ref2, ref3
 
-		React.useEffect(function() -- line: 50
-			-- upvalues: v15 (copy), p2 (copy), Logger (copy), v18 (copy), mergePolicies (copy)
-			local u20 = nil
+		if defineFastFlag then
+			ref = React.useRef(current)
+			assert(ref, "latestMapPolicies")
+			ref.current = current
+			ref2 = React.useRef(state)
+			ref3 = React.useRef(nil)
+		else
+			ref = nil
+			ref2 = nil
+			ref3 = nil
+		end
 
-			if not v15.staticExternalPolicy then
-				u20 = p2.onPolicyChanged(function(p4) -- line: 53
-					-- upvalues: Logger (copy), v18 (copy), mergePolicies (copy), v15 (copy)
+		React.useEffect(function()
+			local connection
+
+			if v.staticExternalPolicy then
+				connection = nil
+			else
+				connection = p.onPolicyChanged(function(p2)
 					Logger:trace("Received policy update")
-					v18((mergePolicies(p4, v15.presentationPolicy)))
+
+					if not (defineFastFlag and ref and ref2 and ref3) then
+						setState(mergePolicies(p2, v.presentationPolicy))
+
+						return
+					end
+
+					local current3 = mergePolicies(p2, v.presentationPolicy)
+					ref2.current = current3
+					local current2 = ref3.current
+
+					if current2 ~= nil and sameValues(current2, table.pack(ref.current(current3))) then -- inferred equivalent call
+						return
+					end
+
+					setState(current3)
 				end)
 			end
 
-			return function() -- line: 59
-				-- upvalues: u20 (ref)
-				if u20 then
-					u20:Disconnect()
+			return function()
+				if connection then
+					connection:Disconnect()
 				end
 			end
-		end, { v15 })
+		end, { v })
 
-		return p3(v17)
+		if defineFastFlag and ref2 and ref3 then
+			local current2 = table.pack(current(ref2.current))
+			ref3.current = current2
+
+			return (table.unpack)(current2, 1, current2.n)
+		end
+
+		return current(state)
 	end
 
 	return useAppPolicy

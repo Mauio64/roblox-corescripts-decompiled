@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-require(CorePackages.Workspace.Packages.CancelSubscriptionApp).renderCancelSubscriptionApp()
+local CancelSubscriptionApp = require(CorePackages.Workspace.Packages.CancelSubscriptionApp)
+CancelSubscriptionApp.renderCancelSubscriptionApp()

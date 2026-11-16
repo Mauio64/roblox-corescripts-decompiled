@@ -1,11 +1,13 @@
 local CorePackages = game:GetService("CorePackages")
 local React = require(CorePackages.Packages.React)
-local StyleProviderWithDefaultTheme = require(CorePackages.Workspace.Packages.Style).StyleProviderWithDefaultTheme
+local Style = require(CorePackages.Workspace.Packages.Style)
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
 
-return function(p1, p2) -- line: 7
-	-- upvalues: React (copy), StyleProviderWithDefaultTheme (copy)
-	return React.createElement(StyleProviderWithDefaultTheme, {
-		withUiModeSupport = not not p2 and p2.withUiModeSupport,
+return function(p, p2)
+	local createElement = React.createElement
+	local withUiModeSupport = if p2 then p2.withUiModeSupport else false
+	return createElement(StyleProviderWithDefaultTheme, {
+		withUiModeSupport = withUiModeSupport,
 		withDarkTheme = not p2 or p2.withDarkTheme
-	}, p1)
+	}, p)
 end

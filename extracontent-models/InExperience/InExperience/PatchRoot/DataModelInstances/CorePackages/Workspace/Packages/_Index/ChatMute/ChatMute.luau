@@ -1,62 +1,53 @@
 local GetMutedUsersStore = require(script.GetMutedUsersStore)
 
-local function store() -- line: 3
-	-- upvalues: GetMutedUsersStore (copy)
+local function store() -- 12 equivalent calls inferred from this helper
 	return GetMutedUsersStore(false)
 end
 
 return {
-	mutePlayer = function(t1: {[any]: any}) -- line: 16
-		-- upvalues: GetMutedUsersStore (copy)
-		if t1.userId then
-			GetMutedUsersStore(false).muteGlobalUserId(t1.userId)
+	mutePlayer = function(data)
+		if data.userId then
+			store().muteGlobalUserId(data.userId) -- inferred equivalent call
 		end
 
-		if t1.username then
-			GetMutedUsersStore(false).muteGlobalUsername(t1.username)
+		if data.username then
+			store().muteGlobalUsername(data.username) -- inferred equivalent call
 		end
 
-		if t1.displayName then
-			GetMutedUsersStore(false).muteGlobalDisplayName(t1.displayName)
+		if data.displayName then
+			store().muteGlobalDisplayName(data.displayName) -- inferred equivalent call
 		end
 	end,
-	unmutePlayer = function(t2: {[any]: any}) -- line: 28
-		-- upvalues: GetMutedUsersStore (copy)
-		if t2.userId then
-			GetMutedUsersStore(false).unmuteGlobalUserId(t2.userId)
-		end
-
-		if t2.username then
-			GetMutedUsersStore(false).unmuteGlobalUsername(t2.username)
+	unmutePlayer = function(data)
+		if data.userId then
+			store().unmuteGlobalUserId(data.userId) -- inferred equivalent call
 		end
 
-		if t2.displayName then
-			GetMutedUsersStore(false).unmuteGlobalDisplayName(t2.displayName)
+		if data.username then
+			store().unmuteGlobalUsername(data.username) -- inferred equivalent call
+		end
+
+		if data.displayName then
+			store().unmuteGlobalDisplayName(data.displayName) -- inferred equivalent call
 		end
 	end,
-	isUserIdMuted = function(p1) -- line: 41
-		-- upvalues: GetMutedUsersStore (copy)
-		return GetMutedUsersStore(false).isUserIdMuted(p1)
+	isUserIdMuted = function(p)
+		return store().isUserIdMuted(p) -- inferred equivalent call
 	end,
-	isUsernameMuted = function(s1: string) -- line: 44
-		-- upvalues: GetMutedUsersStore (copy)
-		return GetMutedUsersStore(false).isUsernameMuted(s1)
+	isUsernameMuted = function(p: string)
+		return store().isUsernameMuted(p) -- inferred equivalent call
 	end,
-	isDisplayNameMuted = function(s2: string) -- line: 47
-		-- upvalues: GetMutedUsersStore (copy)
-		return GetMutedUsersStore(false).isDisplayNameMuted(s2)
+	isDisplayNameMuted = function(p: string)
+		return store().isDisplayNameMuted(p) -- inferred equivalent call
 	end,
-	getMutedUserIds = function() -- line: 52
-		-- upvalues: GetMutedUsersStore (copy)
-		return GetMutedUsersStore(false).getMutedUserIds
+	getMutedUserIds = function()
+		return store().getMutedUserIds -- inferred equivalent call
 	end,
-	getMutedUsernames = function() -- line: 55
-		-- upvalues: GetMutedUsersStore (copy)
-		return GetMutedUsersStore(false).getMutedUsernames
+	getMutedUsernames = function()
+		return store().getMutedUsernames -- inferred equivalent call
 	end,
-	getMutedDisplayNames = function() -- line: 58
-		-- upvalues: GetMutedUsersStore (copy)
-		return GetMutedUsersStore(false).getMutedDisplayNames
+	getMutedDisplayNames = function()
+		return store().getMutedDisplayNames -- inferred equivalent call
 	end,
 	resolveMuteTarget = require(script.resolveMuteTarget),
 	resolveUnmuteTarget = require(script.resolveUnmuteTarget),

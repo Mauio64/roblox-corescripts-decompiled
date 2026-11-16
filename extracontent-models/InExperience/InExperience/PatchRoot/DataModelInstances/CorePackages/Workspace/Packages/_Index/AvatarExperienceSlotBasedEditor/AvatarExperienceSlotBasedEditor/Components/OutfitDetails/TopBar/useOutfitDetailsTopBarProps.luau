@@ -1,14 +1,15 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local useStatusBarHeight = require(Parent.RobloxAppHooks).useStatusBarHeight
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useStatusBarHeight = RobloxAppHooks.useStatusBarHeight
 
 require(script.Parent.OutfitDetailsTopBar)
 
-local function useOutfitDetailsTopBarProps(t1: {[any]: any}) -- line: 14
-	-- upvalues: useStatusBarHeight (copy)
+local function useOutfitDetailsTopBarProps(p)
 	return {
 		statusBarHeight = useStatusBarHeight(),
-		LayoutOrder = t1.LayoutOrder,
-		onClose = t1.onClose
+		LayoutOrder = p.LayoutOrder,
+		onClose = p.onClose
 	}
 end
 

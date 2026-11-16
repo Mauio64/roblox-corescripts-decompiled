@@ -1,4 +1,1 @@
-return {
-	Send = "send",
-	Receive = "receive"
-}
+return { Send = "send", Receive = "receive" }

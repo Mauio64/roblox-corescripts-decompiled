@@ -1,36 +1,33 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParentParent.LuauPolyfill)
+require(parent2.LuauPolyfill)
 
-local React = require(ParentParentParent.React)
-local getApolloContext = require(script.Parent.ApolloContext).getApolloContext
-local invariant = require(ParentParent.jsutils.invariant).invariant
+local React = require(parent2.React)
 
-require(ParentParent.core.ApolloClient)
+local ApolloContext = require(script.Parent.ApolloContext)
+local getApolloContext = ApolloContext.getApolloContext
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
 
-function ApolloProvider(t1: {[any]: any}) -- line: 29
-	-- upvalues: getApolloContext (copy), React (copy), invariant (copy)
-	local v7 = getApolloContext()
+require(parent.core.ApolloClient)
 
-	return React.createElement(v7.Consumer, nil, function(p1) -- line: 31
-		-- upvalues: t1 (copy), invariant (copy), React (copy), v7 (copy)
-		if p1 == nil then
-			p1 = {}
+function ApolloProvider(p)
+	local apolloContext = getApolloContext()
+	return React.createElement(apolloContext.Consumer, nil, function(p2)
+		local v = p2 == nil and {} or p2
+
+		if p.client and v.client ~= p.client then
+			v.client = p.client
 		end
 
-		if t1.client and p1.client ~= t1.client then
-			p1.client = t1.client
-		end
+		invariant2(
+			v.client,
+			"ApolloProvider was not passed a client instance. Make sure you pass in your client via the \"client\" prop."
+		)
 
-		invariant(p1.client, "ApolloProvider was not passed a client instance. Make sure you pass in your client via the \"client\" prop.")
-
-		return React.createElement(v7.Provider, {
-			value = p1
-		}, t1.children)
+		return React.createElement(apolloContext.Provider, { value = v }, p.children)
 	end)
 end
 
-return {
-	ApolloProvider = ApolloProvider
-}
+return { ApolloProvider = ApolloProvider }

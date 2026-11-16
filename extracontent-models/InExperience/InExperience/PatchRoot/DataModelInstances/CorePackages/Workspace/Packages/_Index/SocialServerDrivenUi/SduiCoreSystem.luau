@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Index.SduiCoreSystem.SduiCoreSystem))
+local SduiCoreSystem = require(Workspace.SduiCoreSystem.SduiCoreSystem)
+
+return SduiCoreSystem

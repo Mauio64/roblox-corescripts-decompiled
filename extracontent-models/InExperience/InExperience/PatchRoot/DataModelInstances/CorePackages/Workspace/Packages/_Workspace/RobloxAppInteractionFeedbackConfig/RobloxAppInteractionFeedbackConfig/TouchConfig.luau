@@ -1,24 +1,19 @@
-local Parent = script:FindFirstAncestor("RobloxAppInteractionFeedbackConfig").Parent
-
-require(Parent.InteractionFeedback)
-
-local Sounds = require(Parent.SoundManager).Sounds
+local parent = script:FindFirstAncestor("RobloxAppInteractionFeedbackConfig").Parent
+require(parent.InteractionFeedback)
+local SoundManager = require(parent.SoundManager)
+local Sounds = SoundManager.Sounds
 
 return {
+	Default = {
+		SecondaryActivated = { Haptic = Enum.HapticEffectType.UIHover }
+	},
 	PlayExperienceButton = {
-		Release = {
-			Sound = Sounds.NotificationHigh.Name
-		}
+		Release = { Sound = Sounds.NotificationHigh.Name }
 	},
 	MakePurchase = {
-		Press = {
-			Sound = Sounds.Purchase.Name,
-			Haptic = Enum.HapticEffectType.UIClick
-		}
+		Press = { Sound = Sounds.Purchase.Name, Haptic = Enum.HapticEffectType.UIClick }
 	},
 	TileLongPress = {
-		Press = {
-			Haptic = Enum.HapticEffectType.UIClick
-		}
+		Press = { Haptic = Enum.HapticEffectType.UIClick }
 	}
 }

@@ -1,7 +1,7 @@
+local makeDefaultReadPolicy = require(script.Parent.utils.makeDefaultReadPolicy)
+
 return {
 	fields = {
-		imageId = {
-			read = require(script.Parent.utils.makeDefaultReadPolicy)("-1")
-		}
+		imageId = { read = makeDefaultReadPolicy("-1") }
 	}
 }

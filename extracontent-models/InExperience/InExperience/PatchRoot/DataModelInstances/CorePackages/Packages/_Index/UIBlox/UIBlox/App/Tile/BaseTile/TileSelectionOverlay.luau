@@ -1,51 +1,61 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local Images = require(ParentParent.App.ImageSet.Images)
-local ImageSetComponent = require(ParentParent.Core.ImageSet.ImageSetComponent)
-local v8 = Roact.PureComponent:extend("TileSelectionOverlay")
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-v8.validateProps = t.strictInterface({
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+local withStyle = require(parent.Core.Style.withStyle)
+
+local Images = require(parent.App.ImageSet.Images)
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
+
+local extended = Roact.PureComponent:extend("TileSelectionOverlay")
+
+extended.validateProps = t.strictInterface({
 	ZIndex = t.optional(t.integer),
 	cornerRadius = t.optional(t.UDim)
 })
-v8.defaultProps = {
-	cornerRadius = UDim.new(0, 0)
-}
 
-function v8.render(p1) -- line: 26
-	-- upvalues: Images (copy), withStyle (copy), Roact (copy), ImageSetComponent (copy)
-	local propsZIndex = p1.props.ZIndex
-	local cornerRadius = p1.props.cornerRadius
-	local v12 = Images["icons/actions/selectOn"]
-	local v13 = v12.ImageRectSize / Images.ImagesResolutionScale
+extended.defaultProps = { cornerRadius = UDim.new(0, 0) }
 
-	return withStyle(function(p2) -- line: 33
-		-- upvalues: Roact (copy), propsZIndex (copy), ImageSetComponent (copy), v12 (copy), v13 (copy), cornerRadius (copy)
-		local Theme = p2.Theme
-		local Tokens = p2.Tokens
+function extended.render(p)
+	local zIndex = p.props.ZIndex
+	local cornerRadius = p.props.cornerRadius
 
-		return Roact.createElement("Frame", {
+	local iconsactionsselectOn = Images["icons/actions/selectOn"]
+	local v = iconsactionsselectOn.ImageRectSize / Images.ImagesResolutionScale
+
+	return withStyle(function(p2)
+		local theme = p2.Theme
+		local tokens = p2.Tokens
+
+		local createElement = Roact.createElement
+		local v2 = {
+			BackgroundColor3 = theme.Overlay.Color,
+			BackgroundTransparency = theme.Overlay.Transparency,
 			BorderSizePixel = 0,
-			BackgroundColor3 = Theme.Overlay.Color,
-			BackgroundTransparency = Theme.Overlay.Transparency,
 			Size = UDim2.new(1, 0, 1, 0),
-			ZIndex = propsZIndex
-		}, {
+			ZIndex = zIndex
+		}
+
+		local v3 = {
 			SelectionImage = Roact.createElement(ImageSetComponent.Label, {
-				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(1, 0),
-				Image = v12,
-				Position = UDim2.new(1, -Tokens.Global.Size_25, 0, Tokens.Global.Size_25),
-				Size = UDim2.new(0, v13.X, 0, v13.Y)
+				BackgroundTransparency = 1,
+				Image = iconsactionsselectOn,
+				Position = UDim2.new(1, -tokens.Size.Size_50, 0, tokens.Size.Size_50),
+				Size = UDim2.new(0, v.X, 0, v.Y)
 			}),
-			UICorner = cornerRadius ~= UDim.new(0, 0) and Roact.createElement("UICorner", {
-				CornerRadius = cornerRadius
-			}) or nil
-		})
+			UICorner = 0
+		}
+		local uiCorner
+
+		if cornerRadius ~= UDim.new(0, 0) then
+			uiCorner = Roact.createElement("UICorner", { CornerRadius = cornerRadius }) or nil
+		end
+
+		v3.UICorner = uiCorner
+		return createElement("Frame", v2, v3)
 	end)
 end
 
-return v8
+return extended

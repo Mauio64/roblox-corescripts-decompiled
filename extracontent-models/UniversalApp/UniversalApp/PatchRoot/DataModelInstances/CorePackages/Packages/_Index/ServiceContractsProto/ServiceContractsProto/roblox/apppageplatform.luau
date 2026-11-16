@@ -1,29 +1,26 @@
 require(script.Parent.Parent.proto)
 
-local v1beta1 = require(script.badges.v1beta1)
-local v1beta1_2 = require(script.charts.v1beta1)
-local v1beta1_3 = require(script.devstore.v1beta1)
-local v1beta1_4 = require(script.experiencedetails.v1beta1)
-local v1beta1_5 = require(script.experienceevents.v1beta1)
-local v1beta1_6 = require(script.home.v1beta1)
-local v1beta1_7 = require(script.marketplacecatalog.v1beta1)
-local v1beta1_8 = require(script.partychat.v1beta1)
-local v1beta1_9 = require(script.prompts.v1beta1)
-local v1beta1_10 = require(script.search.v1beta1)
-local v1beta1_11 = require(script.shared.v1beta1)
-local v1beta1_12 = require(script.spotlightcollection.v1beta1)
-
 return {
-	badges = v1beta1,
-	charts = v1beta1_2,
-	devstore = v1beta1_3,
-	experiencedetails = v1beta1_4,
-	experienceevents = v1beta1_5,
-	home = v1beta1_6,
-	marketplacecatalog = v1beta1_7,
-	partychat = v1beta1_8,
-	prompts = v1beta1_9,
-	search = v1beta1_10,
-	shared = v1beta1_11,
-	spotlightcollection = v1beta1_12
+	badges = require(script.badges.v1beta1),
+	buyrobux = require(script.buyrobux.v1beta1),
+	charts = require(script.charts.v1beta1),
+	communities = require(script.communities.v1beta1),
+	communityprofile = require(script.communityprofile.v1beta1),
+	devstore = require(script.devstore.v1beta1),
+	experiencedetails = require(script.experiencedetails.v1beta1),
+	experienceevents = require(script.experienceevents.v1beta1),
+	experienceleaderboard = require(script.experienceleaderboard.v1beta1),
+	friendrecommendations = require(script.friendrecommendations.v1beta1),
+	groups = require(script.groups.v1beta1),
+	home = require(script.home.v1beta1),
+	marketplacecatalog = require(script.marketplacecatalog.v1beta1),
+	notifications = require(script.notifications.v1beta1),
+	partychat = require(script.partychat.v1beta1),
+	prompts = require(script.prompts.v1beta1),
+	search = require(script.search.v1beta1),
+	settings = require(script.settings.v1beta1),
+	shared = require(script.shared.v1beta1),
+	spotlightcollection = require(script.spotlightcollection.v1beta1),
+	templates = require(script.templates.v1beta1),
+	userlibrary = require(script.userlibrary.v1beta1)
 }

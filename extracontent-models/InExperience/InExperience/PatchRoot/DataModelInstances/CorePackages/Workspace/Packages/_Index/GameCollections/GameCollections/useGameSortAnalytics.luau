@@ -1,264 +1,360 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local React = require(Parent.React)
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local RoactAnalyticsCommonGameEvents = require(Parent.RoactServiceTags).RoactAnalyticsCommonGameEvents
-local AppEventIngestService = require(Parent.RoactServiceTags).AppEventIngestService
-local gamePlayIntent = require(Parent.DiscoveryAnalytics).Events.gamePlayIntent
-local reportGameAttributionError = require(Parent.DiscoveryAnalytics).Events.reportGameAttributionError
-local mutedError = require(Parent.Loggers).mutedError
-local useStore = require(Parent.RoactUtils).Hooks.RoactRodux.useStore
-local GameCollectionItemTypes = require(Parent.DiscoveryTypes).GameCollectionItemTypes
-local GameSortLoadSource = require(Parent.DiscoveryAvailability).GameSortLoadSource
-local feedScroll = require(Parent.ScrollTelemetry).feedScroll
-local calculateRowPositionFields = require(Parent.UnifiedLogging).calculateRowPositionFields
-local Cryo = require(Parent.Cryo)
-local FFlagLuaAppLogGameAttributionError = require(Parent.SharedFlags).FFlagLuaAppLogGameAttributionError
-local FFlagLuaAppGameDetailsAttributionFix = require(Parent.SharedFlags).FFlagLuaAppGameDetailsAttributionFix
-local FFlagLuaAppAddSubIdToHomeEvents = require(Parent.SharedFlags).FFlagLuaAppAddSubIdToHomeEvents
-local FFlagLuaAppDemoModePlayButtonTelemetry = require(Parent.SharedFlags).FFlagLuaAppDemoModePlayButtonTelemetry
-local t1 = {}
+local parent = script:FindFirstAncestor("GameCollections").Parent
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local RoactServiceTags = require(parent.RoactServiceTags)
+local RoactAnalyticsCommonGameEvents = RoactServiceTags.RoactAnalyticsCommonGameEvents
+local RoactServiceTags2 = require(parent.RoactServiceTags)
+local AppEventIngestService = RoactServiceTags2.AppEventIngestService
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local gamePlayIntent = DiscoveryAnalytics.Events.gamePlayIntent
+local DiscoveryAnalytics2 = require(parent.DiscoveryAnalytics)
+local reportGameAttributionError = DiscoveryAnalytics2.Events.reportGameAttributionError
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+local RoactUtils = require(parent.RoactUtils)
+local useStore = RoactUtils.Hooks.RoactRodux.useStore
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local GameCollectionItemTypes = DiscoveryTypes.GameCollectionItemTypes
+local DiscoveryAvailability = require(parent.DiscoveryAvailability)
+local GameSortLoadSource = DiscoveryAvailability.GameSortLoadSource
+local ScrollTelemetry = require(parent.ScrollTelemetry)
+local feedScroll = ScrollTelemetry.feedScroll
+local UnifiedLogging = require(parent.UnifiedLogging)
+local calculateRowPositionFields = UnifiedLogging.calculateRowPositionFields
+local Cryo = require(parent.Cryo)
 
-local function mergeAnalyticsData(t2: {[any]: any}?, t3: {[any]: any}?) -- line: 30
-	-- upvalues: Cryo (copy), t1 (copy)
-	if not t2 and not t3 then
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppLogGameAttributionError = SharedFlags.FFlagLuaAppLogGameAttributionError
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppGameDetailsAttributionFix = SharedFlags2.FFlagLuaAppGameDetailsAttributionFix
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppDemoModePlayButtonTelemetry = SharedFlags3.FFlagLuaAppDemoModePlayButtonTelemetry
+
+local v = {}
+
+local function mergeAnalyticsData(analyticsData, analyticsData2) -- 2 equivalent calls inferred from this helper
+	if not (analyticsData or analyticsData2) then
 		return nil
 	end
 
-	local v29 = Cryo.Dictionary.join(t2 or t1, t3 or t1)
-
-	if next(v29) then
-		return v29
-	end
-
-	return nil
+	local joined = Cryo.Dictionary.join(analyticsData or v, analyticsData2 or v)
+	return if next(joined) then joined else nil
 end
 
-local v22 = if not FFlagLuaAppLogGameAttributionError then nil else {
+local v2 = FFlagLuaAppLogGameAttributionError and {
 	GameDetail = "GameDetail",
 	PlayIntent = "PlayIntent"
-}
+} or nil
 
-local function getGameSetTypeId(p1, b1: boolean, b2: boolean?) -- line: 51
-	if p1 ~= nil then
-		if b1 or b2 then
-			return p1.topicId
-		end
-
-		return p1.gameSetTypeId
+local function getGameSetTypeId(data, flag: boolean, flag2: boolean?) -- 1 equivalent call inferred from this helper
+	if data == nil then
+		return nil
 	end
 
-	return nil
+	return if flag or flag2 then data.topicId else data.gameSetTypeId
 end
-local function getGameSetTargetId(p2, b3: boolean) -- line: 63
-	if not b3 and p2 ~= nil then
-		return p2.gameSetTargetId
+
+local function getGameSetTargetId(data, flag: boolean) -- 1 equivalent call inferred from this helper
+	if flag or data == nil then
+		return nil
 	end
 
-	return nil
+	return data.gameSetTargetId
 end
-local function getAppliedFilters(p3, b4: boolean) -- line: 73
-	if not b4 and p3 then
-		return p3.appliedFilters
+
+local function getAppliedFilters(data, flag: boolean) -- 1 equivalent call inferred from this helper
+	return if not (flag or not data) then data.appliedFilters else nil
+end
+
+local function useGameSortAnalytics(data, flag: boolean, p: number, pageName: string, p2, list, p3: number, p4: number?)
+	local v3 = useStore()
+	local v4 = useRoactService(RoactAnalyticsCommonGameEvents)
+	local v5 = useRoactService(AppEventIngestService)
+
+	local gameSetTypeId = getGameSetTypeId(data, flag, pageName == AppPage.SearchPage) -- inferred equivalent call
+	local gameSetTargetId = getGameSetTargetId(data, flag) -- inferred equivalent call
+	local appliedFilters = getAppliedFilters(data, flag) -- inferred equivalent call
+	local loadSource
+
+	if pageName == AppPage.Home and data and data.topicId then
+		loadSource = GameSortLoadSource.getSortLoadSource(data.topicId)
+	else
+		loadSource = nil
 	end
 
-	return nil
-end
-local function useGameSortAnalytics(p4, b5: boolean, n1: number, s1: string, t4: {[any]: any}?, t5: {[any]: any}?, n2: number, n3: number?) -- line: 86
-	-- upvalues: useStore (copy), useRoactService (copy), RoactAnalyticsCommonGameEvents (copy), AppEventIngestService (copy), AppPage (copy), GameSortLoadSource (copy), FFlagLuaAppAddSubIdToHomeEvents (copy), React (copy), FFlagLuaAppGameDetailsAttributionFix (copy), reportGameAttributionError (copy), v22 (copy), mutedError (copy), calculateRowPositionFields (copy), Cryo (copy), t1 (copy), GameCollectionItemTypes (copy), FFlagLuaAppLogGameAttributionError (copy), gamePlayIntent (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy), feedScroll (copy)
-	local v45 = useStore()
-	local v46 = useRoactService(RoactAnalyticsCommonGameEvents)
-	local v47 = useRoactService(AppEventIngestService)
-	local v48 = s1 == AppPage.SearchPage
-	local v49 = if p4 == nil then nil else if not b5 and not v48 then p4.gameSetTypeId else p4.topicId
-	local v50 = if b5 or p4 == nil then nil else p4.gameSetTargetId
-	local v51 = if b5 or not p4 then nil else p4.appliedFilters
-	local v52 = if s1 ~= AppPage.Home or (not p4 or not p4.topicId) then nil else GameSortLoadSource.getSortLoadSource(p4.topicId)
-	local v53 = if not FFlagLuaAppAddSubIdToHomeEvents or not p4 then nil else p4.sortSubId
-	local v54 = if not p4 then nil else p4.analyticsData
+	local sortSubId
 
-	return React.useCallback(function(n4: number?, s2: string?) -- line: 116
-		-- upvalues: FFlagLuaAppGameDetailsAttributionFix (copy), t5 (copy), reportGameAttributionError (copy), s1 (copy), v22 (copy), v49 (copy), v50 (copy), n1 (copy), mutedError (copy), calculateRowPositionFields (copy), n2 (copy), n3 (copy), v54 (copy), Cryo (copy), t1 (copy), v46 (copy), v51 (copy), v52 (copy), GameCollectionItemTypes (copy), FFlagLuaAppAddSubIdToHomeEvents (copy), v53 (copy)
+	if data then
+		sortSubId = data.sortSubId
+	else
+		sortSubId = nil
+	end
+
+	local analyticsData
+
+	if data then
+		analyticsData = data.analyticsData
+	else
+		analyticsData = nil
+	end
+
+	local v6 = React.useCallback(function(p5: number?, clickedUniverseId: string?)
 		if FFlagLuaAppGameDetailsAttributionFix then
-			local v57 = nil
-			local v58
+			local v6, v7
 
-			if n4 and t5 then
-				v57 = t5[n4]
-				v58 = not v57 or s2 ~= v57.universeId
+			if p5 and list then
+				v6 = list[p5]
+				v7 = not v6 or v6.universeId ~= clickedUniverseId
 			else
-				v58 = true
+				v7 = true
 			end
 
-			if v58 then
-				reportGameAttributionError(s1, {
-					errorType = v22.GameDetail,
-					clickedUniverseId = s2,
-					universeId = if not v57 then nil else v57.universeId,
-					gameSetTypeId = v49,
-					gameSetTargetId = v50,
-					sortIndex = n1,
-					sortEntryIndex = n4 or nil
-				})
+			if v7 then
+				local v8 = {
+					errorType = v2.GameDetail,
+					clickedUniverseId = clickedUniverseId,
+					universeId = 0,
+					gameSetTypeId = 0,
+					gameSetTargetId = 0,
+					sortIndex = 0,
+					sortEntryIndex = 0
+				}
+				local universeId
+
+				if v6 then
+					universeId = v6.universeId
+				end
+
+				v8.universeId = universeId
+				v8.gameSetTypeId = gameSetTypeId
+				v8.gameSetTargetId = gameSetTargetId
+				v8.sortIndex = p
+				v8.sortEntryIndex = p5 or nil
+				reportGameAttributionError(pageName, v8)
 			end
 		end
 
-		if n4 ~= nil and t5 ~= nil then
-			local v59 = t5[n4]
+		if p5 ~= nil and list ~= nil then
+			local item = list[p5]
 
-			if not v59 then
+			if not item then
 				mutedError("reportGameDetailOpened requires a valid entry")
 			end
 
-			local v60 = calculateRowPositionFields(n4, n2, n3)
-			local v61 = v54
-			local analyticsData = v59.analyticsData
-			local v63
+			local v6 = calculateRowPositionFields(p5, p3, p4)
 
-			if not v61 and not analyticsData then
-				v63 = nil
-			else
-				local v64 = Cryo.Dictionary.join(v61 or t1, analyticsData or t1)
+			local joined = mergeAnalyticsData(analyticsData, item.analyticsData) -- inferred equivalent call
 
-				v63 = if not next(v64) then nil else v64
-			end
-
-			v46.reportOpenGameDetailWithId(v59.placeIdOverride or v59.placeId, v49, v50, n1, n4, #t5, v59.isSponsored, v59.adId, v59.universeId, s1, s2, v51, v59.topicContentsIndex or n4, nil, v60.positionInRow, v60.rowInSort, v60.rowOnPage, nil, v52, v59.tileType or GameCollectionItemTypes.GameCollectionItemType.GameTile, if not FFlagLuaAppAddSubIdToHomeEvents then nil else v53, v63)
+			v4.reportOpenGameDetailWithId(
+				item.placeIdOverride or item.placeId,
+				gameSetTypeId,
+				gameSetTargetId,
+				p,
+				p5,
+				#list,
+				item.isSponsored,
+				item.adId,
+				item.universeId,
+				pageName,
+				clickedUniverseId,
+				appliedFilters,
+				item.topicContentsIndex or p5,
+				nil,
+				v6.positionInRow,
+				v6.rowInSort,
+				v6.rowOnPage,
+				nil,
+				loadSource,
+				item.tileType or GameCollectionItemTypes.GameCollectionItemType.GameTile,
+				sortSubId,
+				joined
+			)
 		end
 	end, {
-		v46,
-		n1,
-		s1,
-		v49,
-		v50,
-		t5,
-		n2,
-		n3,
-		v52,
-		if not FFlagLuaAppAddSubIdToHomeEvents then nil else v53,
-		v54
-	}), React.useCallback(function(p5, s3: string?, _: string?, s5: string, n5: number?, s6: string?) -- line: 194
-		-- upvalues: FFlagLuaAppLogGameAttributionError (copy), t5 (copy), reportGameAttributionError (copy), v22 (copy), v49 (copy), v50 (copy), n1 (copy), calculateRowPositionFields (copy), n2 (copy), n3 (copy), v54 (copy), Cryo (copy), t1 (copy), gamePlayIntent (copy), v47 (copy), v51 (copy), s1 (copy), v52 (copy), FFlagLuaAppAddSubIdToHomeEvents (copy), v53 (copy), GameCollectionItemTypes (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy)
+		v4,
+		p,
+		pageName,
+		gameSetTypeId,
+		gameSetTargetId,
+		list,
+		p3,
+		p4,
+		loadSource,
+		sortSubId,
+		analyticsData
+	})
+
+	local useCallback = React.useCallback
+	local function fn(data2, referralSource: string?, _: string?, p5: string, p6: number?, actionType: string?)
 		if FFlagLuaAppLogGameAttributionError then
-			local v71 = nil
-			local v72
+			local v7, v8
 
-			if n5 and t5 then
-				v71 = t5[n5]
-				v72 = not v71 or v71.universeId ~= p5.universeId
+			if p6 and list then
+				v7 = list[p6]
+				v8 = not v7 or v7.universeId ~= data2.universeId
 			else
-				v72 = true
+				v8 = true
 			end
 
-			if v72 then
-				reportGameAttributionError(s5, {
-					errorType = v22.PlayIntent,
-					clickedUniverseId = p5.universeId,
-					universeId = if not v71 then nil else v71.universeId,
-					gameSetTypeId = v49,
-					gameSetTargetId = v50,
-					sortIndex = n1,
-					sortEntryIndex = n5 or nil
-				})
+			if v8 then
+				local v9 = {
+					errorType = v2.PlayIntent,
+					clickedUniverseId = data2.universeId,
+					universeId = 0,
+					gameSetTypeId = 0,
+					gameSetTargetId = 0,
+					sortIndex = 0,
+					sortEntryIndex = 0
+				}
+				local universeId
+
+				if v7 then
+					universeId = v7.universeId
+				end
+
+				v9.universeId = universeId
+				v9.gameSetTypeId = gameSetTypeId
+				v9.gameSetTargetId = gameSetTargetId
+				v9.sortIndex = p
+				v9.sortEntryIndex = p6 or nil
+				reportGameAttributionError(p5, v9)
 			end
 		end
 
-		local v73 = calculateRowPositionFields(n5, n2, n3)
-		local v74 = v54
-		local analyticsData = p5.analyticsData
-		local v76
+		local v7 = calculateRowPositionFields(p6, p3, p4)
 
-		if not v74 and not analyticsData then
-			v76 = nil
-		else
-			local v77 = Cryo.Dictionary.join(v74 or t1, analyticsData or t1)
+		local analyticsData2 = mergeAnalyticsData(analyticsData, data2.analyticsData) -- inferred equivalent call
 
-			v76 = if not next(v77) then nil else v77
+		local v8 = {
+			placeId = data2.placeIdOverride or data2.placeId,
+			rootPlaceId = tonumber(data2.placeId),
+			universeId = data2.universeId,
+			sortIndex = tostring(p),
+			sortEntryIndex = 0,
+			referralSource = 0,
+			gameSetTypeId = 0,
+			gameSetTargetId = 0,
+			appliedFilters = 0,
+			topicDataPosition = 0,
+			nativeAdData = 0,
+			pageName = 0,
+			positionInRow = 0,
+			rowNumber = 0,
+			feedRowNumber = 0,
+			loadSource = 0,
+			launchData = 0,
+			sortSubId = 0,
+			tileType = 0,
+			analyticsData = 0,
+			actionType = 0
+		}
+		local sortEntryIndex
+
+		if p6 then
+			sortEntryIndex = tostring(p6)
 		end
 
-		gamePlayIntent(v47, s5, {
-			placeId = p5.placeIdOverride or p5.placeId,
-			rootPlaceId = tonumber(p5.placeId),
-			universeId = p5.universeId,
-			sortIndex = tostring(n1),
-			sortEntryIndex = if not n5 then nil else tostring(n5),
-			referralSource = s3,
-			gameSetTypeId = v49,
-			gameSetTargetId = v50,
-			appliedFilters = v51,
-			topicDataPosition = p5.topicContentsIndex or n5,
-			nativeAdData = p5.adId,
-			pageName = s1,
-			positionInRow = v73.positionInRow,
-			rowNumber = v73.rowInSort,
-			feedRowNumber = v73.rowOnPage,
-			loadSource = v52,
-			launchData = p5.launchDataOverride,
-			sortSubId = if not FFlagLuaAppAddSubIdToHomeEvents then nil else v53,
-			tileType = p5.tileType or GameCollectionItemTypes.GameCollectionItemType.GameTile,
-			analyticsData = v76,
-			actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else s6
-		})
-	end, {
-		n1,
-		v47,
-		v49,
-		v50,
-		if not FFlagLuaAppLogGameAttributionError then nil else t5,
-		s1,
-		n2,
-		n3,
-		v52,
-		if not FFlagLuaAppAddSubIdToHomeEvents then nil else v53,
-		v54
-	}), React.useCallback(function() -- line: 275
-		-- upvalues: v46 (copy), v49 (copy), v50 (copy), n1 (copy)
-		v46.reportSeeAllWithId(v49, v50, n1)
-	end, {
-		v46,
-		v49,
-		v50,
-		n1
-	}), (React.useCallback(function(n6: number, n7: number, n8: number) -- line: 288
-		-- upvalues: t4 (copy), mutedError (copy), v45 (copy), n1 (copy), v49 (copy), v50 (copy), feedScroll (copy), v47 (copy), s1 (copy)
-		if t4 and t4.current ~= nil then
-			local ScrollingDirection = t4.current.ScrollingDirection
-			local n9 = 0
+		v8.sortEntryIndex = sortEntryIndex
+		v8.referralSource = referralSource
+		v8.gameSetTypeId = gameSetTypeId
+		v8.gameSetTargetId = gameSetTargetId
+		v8.appliedFilters = appliedFilters
+		v8.topicDataPosition = data2.topicContentsIndex or p6
+		v8.nativeAdData = data2.adId
+		v8.pageName = pageName
+		v8.positionInRow = v7.positionInRow
+		v8.rowNumber = v7.rowInSort
+		v8.feedRowNumber = v7.rowOnPage
+		v8.loadSource = loadSource
+		v8.launchData = data2.launchDataOverride
+		v8.sortSubId = sortSubId
+		v8.tileType = data2.tileType or GameCollectionItemTypes.GameCollectionItemType.GameTile
+		v8.analyticsData = analyticsData2
 
-			if ScrollingDirection == Enum.ScrollingDirection.X then
-				n9 = t4.current.AbsoluteSize.X
-			elseif ScrollingDirection == Enum.ScrollingDirection.Y then
-				n9 = t4.current.AbsoluteSize.Y
-			else
-				mutedError(`Direction { ScrollingDirection.Name } is an unsupported option for feedScroll event`)
+		if not FFlagLuaAppDemoModePlayButtonTelemetry then
+			actionType = nil
+		end
+
+		v8.actionType = actionType
+		gamePlayIntent(v5, p5, v8)
+	end
+
+	local v7
+
+	if FFlagLuaAppLogGameAttributionError then
+		v7 = list
+	end
+
+	return v6, useCallback(fn, {
+		p,
+		v5,
+		gameSetTypeId,
+		gameSetTargetId,
+		v7,
+		pageName,
+		p3,
+		p4,
+		loadSource,
+		sortSubId,
+		analyticsData
+	}), React.useCallback(function()
+		v4.reportSeeAllWithId(gameSetTypeId, gameSetTargetId, p)
+	end, { v4, gameSetTypeId, gameSetTargetId, p }), (React.useCallback(
+		function(distance: number, scrollDuration: number, startPos: number)
+			if p2 and p2.current ~= nil then
+				local scrollingDirection = p2.current.ScrollingDirection
+				local scrollAreaSize = 0
+
+				if scrollingDirection == Enum.ScrollingDirection.X then
+					scrollAreaSize = p2.current.AbsoluteSize.X
+				elseif scrollingDirection == Enum.ScrollingDirection.Y then
+					scrollAreaSize = p2.current.AbsoluteSize.Y
+				else
+					mutedError(`Direction {scrollingDirection.Name} is an unsupported option for feedScroll event`)
+				end
+
+				local screenSize = v3:getState().ScreenSize
+				local v8 = {
+					distance = distance,
+					screenSizeX = screenSize.X,
+					screenSizeY = screenSize.Y,
+					scrollAreaSize = scrollAreaSize,
+					scrollDepth = 0,
+					startDepth = 0,
+					startPos = 0,
+					scrollDuration = 0,
+					sortPos = 0,
+					gameSetTypeId = 0,
+					gameSetTargetId = 0
+				}
+				local scrollDepth
+
+				if scrollAreaSize > 0 then
+					scrollDepth = distance / scrollAreaSize
+				end
+
+				v8.scrollDepth = scrollDepth
+				local startDepth
+
+				if scrollAreaSize > 0 then
+					startDepth = startPos / scrollAreaSize
+				end
+
+				v8.startDepth = startDepth
+				v8.startPos = startPos
+				v8.scrollDuration = scrollDuration
+				v8.sortPos = p
+				v8.gameSetTypeId = gameSetTypeId
+				v8.gameSetTargetId = gameSetTargetId
+
+				feedScroll(v5, pageName, scrollingDirection, v8)
 			end
-
-			local ScreenSize = v45:getState().ScreenSize
-			local t6 = {
-				distance = n6,
-				screenSizeX = ScreenSize.X,
-				screenSizeY = ScreenSize.Y,
-				scrollAreaSize = n9,
-				scrollDepth = if not (n9 > 0) then nil else n6 / n9,
-				startDepth = if not (n9 > 0) then nil else n8 / n9,
-				startPos = n8,
-				scrollDuration = n7,
-				sortPos = n1,
-				gameSetTypeId = v49,
-				gameSetTargetId = v50
-			}
-
-			feedScroll(v47, s1, ScrollingDirection, t6)
-		end
-	end, {
-		v47,
-		n1,
-		s1,
-		t4,
-		v49,
-		v50,
-		v45
-	}))
+		end,
+		{ v5, p, pageName, p2, gameSetTypeId, gameSetTargetId, v3 }
+	))
 end
 
 return useGameSortAnalytics

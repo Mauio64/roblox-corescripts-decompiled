@@ -1,17 +1,12 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality = require(ParentParent.flags.getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality)
-local t1 = {
-	InExpServer = true,
-	InExpClient = true
-}
+local v = { InExpServer = true, InExpClient = true }
 
 return {
-	fflag = getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality,
 	categories = {
 		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
@@ -19,37 +14,42 @@ return {
 	},
 	requiredData = {},
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 39
-		-- upvalues: t1 (copy), ErrorSourceStrings (copy)
-		local rootInstance = p2.rootInstance
-		local v9 = t1[p2.consumerConfig.source] == true
-		local descendants = rootInstance:GetDescendants()
+	run = function(object, p)
+		local rootInstance = p.rootInstance
 
+		local v2 = v[p.consumerConfig.source] == true
+
+		local descendants = rootInstance:GetDescendants()
 		table.insert(descendants, rootInstance)
 
-		for _, v12 in descendants do
-			if v12:IsA("MeshPart") then
-				local v13 = v12.TextureID ~= ""
+		for _, part in descendants do
+			if not part:IsA("MeshPart") then
+				continue
+			end
 
-				if v9 and not v13 then
-					local TextureContent = v12.TextureContent
+			local v3 = part.TextureID ~= ""
 
-					v13 = TextureContent.Uri ~= nil and TextureContent.Uri ~= "" or TextureContent.Object ~= nil
+			if v2 and not v3 then
+				local textureContent = part.TextureContent
+				v3 = textureContent.Uri ~= nil and textureContent.Uri ~= "" or textureContent.Object ~= nil
+			end
+
+			local surfaceAppearance = part:FindFirstChildWhichIsA("SurfaceAppearance")
+
+			if v3 then
+				if surfaceAppearance then
+					object:fail(
+						ErrorSourceStrings.Keys.SurfaceAppearance_TextureAndSABothDefined,
+						{ MeshPartFullName = part:GetFullName() },
+						part
+					)
 				end
-
-				local SurfaceAppearance = v12:FindFirstChildWhichIsA("SurfaceAppearance")
-
-				if v13 then
-					if SurfaceAppearance then
-						p1:fail(ErrorSourceStrings.Keys.SurfaceAppearance_TextureAndSABothDefined, {
-							MeshPartFullName = v12:GetFullName()
-						}, v12)
-					end
-				elseif not SurfaceAppearance then
-					p1:fail(ErrorSourceStrings.Keys.SurfaceAppearance_MissingSA, {
-						MeshPartFullName = v12:GetFullName()
-					}, v12)
-				end
+			elseif not surfaceAppearance then
+				object:fail(
+					ErrorSourceStrings.Keys.SurfaceAppearance_MissingSA,
+					{ MeshPartFullName = part:GetFullName() },
+					part
+				)
 			end
 		end
 	end

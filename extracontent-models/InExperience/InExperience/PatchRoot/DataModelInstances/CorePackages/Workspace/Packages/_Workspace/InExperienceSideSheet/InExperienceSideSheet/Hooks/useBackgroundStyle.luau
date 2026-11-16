@@ -1,30 +1,27 @@
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
-local Foundation = require(InExperienceSideSheetParent.Foundation)
-local React = require(InExperienceSideSheetParent.React)
-local SignalsReact = require(InExperienceSideSheetParent.SignalsReact)
+local parent = InExperienceSideSheet.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local GetSideSheetConfigStore = require(InExperienceSideSheet.Stores.GetSideSheetConfigStore)
+
 local useTokens = Foundation.Hooks.useTokens
 
-local function getBackgroundTransparency(p1) -- line: 12
-	-- upvalues: GetSideSheetConfigStore (copy)
-	return GetSideSheetConfigStore(p1).getBackgroundTransparency(p1)
+local function getBackgroundTransparency(p)
+	return GetSideSheetConfigStore(p).getBackgroundTransparency(p)
 end
-local function useBackgroundStyle() -- line: 16
-	-- upvalues: useTokens (copy), SignalsReact (copy), getBackgroundTransparency (copy), React (copy)
-	local v11 = useTokens()
-	local v12 = SignalsReact.useSignalBinding(getBackgroundTransparency)
 
-	return (React.useMemo(function() -- line: 20
-		-- upvalues: v12 (copy), v11 (copy)
-		return v12:map(function(p2) -- line: 21
-			-- upvalues: v11 (copy)
-			return {
-				Color3 = v11.Color.OverMedia.OverMedia_0.Color3,
-				Transparency = p2
-			}
+local function useBackgroundStyle()
+	local v = useTokens()
+	local v2 = SignalsReact.useSignalBinding(getBackgroundTransparency)
+
+	return (React.useMemo(function()
+		return v2:map(function(transparency)
+			return { Color3 = v.Color.OverMedia.OverMedia_0.Color3, Transparency = transparency }
 		end)
-	end, { v11.Color.OverMedia.OverMedia_0.Color3 }))
+	end, { v.Color.OverMedia.OverMedia_0.Color3 }))
 end
 
 return useBackgroundStyle

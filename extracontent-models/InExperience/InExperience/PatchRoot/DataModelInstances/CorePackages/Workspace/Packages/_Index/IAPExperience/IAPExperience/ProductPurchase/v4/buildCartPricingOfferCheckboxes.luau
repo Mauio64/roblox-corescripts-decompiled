@@ -1,35 +1,34 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Checkbox = require(ParentParent.Foundation).Checkbox
+local parent = script.Parent.Parent.Parent.Parent
+
+local React = require(parent.React)
+
+local OfferCheckboxRow = require(script.Parent.OfferCheckboxRow)
 
 require(script.Parent.useCartPricing)
 
-local function buildCartPricingOfferCheckboxes(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy), Checkbox (copy)
-	local cartPricing = t1.cartPricing
-	local t2 = {}
+local function buildCartPricingOfferCheckboxes(p)
+	local cartPricing = p.cartPricing
+	local children = {}
 
 	if not cartPricing.showCartOfferUi then
-		return t2
+		return children
 	end
 
-	for v8, v9 in cartPricing.cartPricingOffers do
-		local offerId = v9.offerId
-
-		t2["CartPricingOffer_" .. offerId] = React.createElement(Checkbox, {
-			size = "XSmall",
-			LayoutOrder = v8,
-			label = v9.localizedDescription,
-			isChecked = v9.selected,
-			isDisabled = t1.isDisabled,
-			onActivated = function() -- line: 33
-				-- upvalues: cartPricing (copy), offerId (copy)
+	for k, cartPricingOffer in cartPricing.cartPricingOffers do
+		local offerId = cartPricingOffer.offerId
+		children["CartPricingOffer_" .. offerId] = React.createElement(OfferCheckboxRow, {
+			LayoutOrder = k,
+			label = cartPricingOffer.localizedDescription,
+			isChecked = cartPricingOffer.selected,
+			isDisabled = p.isDisabled,
+			expirationTimeUtc = cartPricingOffer.expirationTimeUtc,
+			onActivated = function()
 				cartPricing.toggleCartPricingOffer(offerId)
 			end
 		})
 	end
 
-	return t2
+	return children
 end
 
 return buildCartPricingOfferCheckboxes

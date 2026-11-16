@@ -1,5 +1,5 @@
-local function constructGameThumbnailUrl(s1: string, n1: number, n2: number) -- line: 9
-	return `rbxthumb://type=GameThumbnail&id={ s1 }&w={ n1 }&h={ n2 }`
+local function constructGameThumbnailUrl(p: string, p2: number, p3: number)
+	return `rbxthumb://type=GameThumbnail&id={p}&w={p2}&h={p3}`
 end
 
 return constructGameThumbnailUrl

@@ -1,27 +1,23 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
+local parent = AuthCommon.Parent
 local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
-local Cryo = require(AuthCommonParent.Cryo)
+local Cryo = require(parent.Cryo)
 
-local function record2svCompletion(s1: string) -- line: 7
-	-- upvalues: AppStorageUtilities (copy), Cryo (copy)
-	if s1 == nil or s1 == "0" then
+local function record2svCompletion(p: string): boolean
+	if p == nil or p == "0" then
 		return false
 	end
 
-	local v7 = AppStorageUtilities.getPreviousAccountsList()
-	local v8 = v7[s1]
+	local previousAccountsList = AppStorageUtilities.getPreviousAccountsList()
+	local previousAccount = previousAccountsList[p]
 
-	if v8 then
-		v7[s1] = Cryo.Dictionary.join(v8, {
-			signInTimestamp = os.time()
-		})
-		AppStorageUtilities.setPreviousAccountsList(v7)
-
-		return true
+	if not previousAccount then
+		return false
 	end
 
-	return false
+	previousAccountsList[p] = Cryo.Dictionary.join(previousAccount, { signInTimestamp = os.time() })
+	AppStorageUtilities.setPreviousAccountsList(previousAccountsList)
+	return true
 end
 
 return record2svCompletion

@@ -1,69 +1,97 @@
-local Foundation = game:GetService("CorePackages").Packages._Index.Foundation.Foundation
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local Components = Foundation.Components
-local InputField = require(Components.InputField)
+local CorePackages = game:GetService("CorePackages")
+local foundation = CorePackages.Packages._Index.Foundation.Foundation
+local parent = foundation.Parent
 
-require(Foundation.Components.Types)
+local React = require(parent.React)
+
+local components = foundation.Components
+local InputField = require(components.InputField)
+require(foundation.Components.Types)
 
 local ChatInternalTextInput = require(script.Parent.ChatInternalTextInput)
-local useTextInputVariants = require(Components.TextInput.useTextInputVariants)
-local useTokens = require(Foundation.Providers.Style.useTokens)
-local withCommonProps = require(Foundation.Utility.withCommonProps)
-local withDefaults = require(Foundation.Utility.withDefaults)
-local InputSize = require(Foundation.Enums.InputSize)
-local t1 = {
-	maxLines = 5,
-	testId = "--build-experience-chat-text-area",
-	size = InputSize.Large
-}
+local useTextInputVariants = require(components.TextInput.useTextInputVariants)
+local useTokens = require(foundation.Providers.Style.useTokens)
+local withCommonProps = require(foundation.Utility.withCommonProps)
+local withDefaults = require(foundation.Utility.withDefaults)
 
-local function ChatTextArea(p1, p2) -- line: 36
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextInputVariants (copy), React (copy), InputField (copy), withCommonProps (copy), ChatInternalTextInput (copy)
-	local v16 = withDefaults(p1, t1)
-	local v17 = useTokens()
-	local v18 = useTextInputVariants(v17, v16.size, v16.variant)
+local InputSize = require(foundation.Enums.InputSize)
 
-	return React.createElement(InputField, withCommonProps(v16, {
-		width = if not v16.width then nil else v16.width,
-		label = v16.label,
-		hint = v16.hint,
-		hasError = v16.hasError,
-		isDisabled = v16.trailingElement == nil and v16.isDisabled,
-		isRequired = v16.isRequired,
-		input = function(p3) -- line: 51
-			-- upvalues: React (copy), ChatInternalTextInput (copy), v16 (copy), v17 (copy), v18 (copy)
-			return React.createElement(ChatInternalTextInput, {
+local v = { size = InputSize.Large, maxLines = 5, testId = "--build-experience-chat-text-area" }
+
+local function ChatTextArea(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local v4 = useTextInputVariants(v3, v2.size, v2.variant)
+
+	local createElement = React.createElement
+	local width
+
+	if v2.width then
+		width = v2.width
+	end
+
+	return createElement(InputField, withCommonProps(v2, {
+		width = width,
+		label = v2.label,
+		hint = v2.hint,
+		hasError = v2.hasError,
+		isDisabled = v2.leadingElement == nil and v2.trailingElement == nil and v2.isDisabled,
+		isRequired = v2.isRequired,
+		input = function(ref2)
+			local createElement2 = React.createElement
+			local v5 = {
+				size = v2.size,
+				variant = v2.variant,
+				maxLines = v2.maxLines,
 				alwaysMultiLine = true,
 				manualFocusRelease = true,
+				trailingAlignBottom = v2.trailingElement ~= nil,
+				composerDebug = v2.composerDebug,
+				focusBehavior = v2.focusBehavior,
+				onFocus = v2.onFocusGained,
+				onFocusLost = v2.onFocusLost,
+				onReturnPressed = v2.onReturnPressed,
+				onChanged = v2.onChanged,
+				text = v2.text,
+				hasError = v2.hasError,
+				isDisabled = v2.isDisabled,
+				hasClearButton = v2.hasClearButton,
+				placeholder = v2.placeholder,
+				horizontalPadding = 0,
 				textPaddingOnParent = true,
+				leadingElement = 0,
+				trailingElement = 0,
 				LayoutOrder = 2,
-				size = v16.size,
-				variant = v16.variant,
-				maxLines = v16.maxLines,
-				trailingAlignBottom = v16.trailingElement ~= nil,
-				composerDebug = v16.composerDebug,
-				focusBehavior = v16.focusBehavior,
-				onFocus = v16.onFocusGained,
-				onFocusLost = v16.onFocusLost,
-				onReturnPressed = v16.onReturnPressed,
-				onChanged = v16.onChanged,
-				text = v16.text,
-				hasError = v16.hasError,
-				isDisabled = v16.isDisabled,
-				hasClearButton = v16.hasClearButton,
-				placeholder = v16.placeholder,
-				horizontalPadding = {
-					left = UDim.new(0, v17.Padding.Large),
-					right = if not v16.trailingElement then v18.container.horizontalPadding else UDim.new(0, v17.Padding.XSmall)
-				},
-				trailingElement = v16.trailingElement,
-				ref = p3,
-				testId = `{ v16.testId }--input`
-			})
+				ref = 0,
+				testId = 0
+			}
+			local left
+
+			if v2.leadingElement then
+				left = UDim.new(0, v3.Padding.XSmall)
+			else
+				left = UDim.new(0, v3.Padding.Large)
+			end
+
+			local right
+
+			if v2.trailingElement then
+				right = UDim.new(0, v3.Padding.XSmall)
+			else
+				right = v4.container.horizontalPadding
+			end
+
+			v5.horizontalPadding = { left = left, right = right }
+
+			v5.leadingElement = v2.leadingElement
+			v5.trailingElement = v2.trailingElement
+
+			v5.ref = ref2
+			v5.testId = `{v2.testId}--input`
+			return createElement2(ChatInternalTextInput, v5)
 		end,
-		textBoxRef = v16.textBoxRef,
-		ref = p2
+		textBoxRef = v2.textBoxRef,
+		ref = ref
 	}))
 end
 

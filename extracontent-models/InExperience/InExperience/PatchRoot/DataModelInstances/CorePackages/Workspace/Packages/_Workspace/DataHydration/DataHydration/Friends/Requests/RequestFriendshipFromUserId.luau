@@ -1,31 +1,45 @@
 local HttpService = game:GetService("HttpService")
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Url = require(DataHydrationParent.Http).Url
+local parent = DataHydration.Parent
+
+local Http = require(parent.Http)
+local Url = Http.Url
+
 local Friends = DataHydration.Friends
 local myHttpRequest = require(Friends.Networking.myHttpRequest)
 
-return function(p1, s1: string?) -- line: 22
-	-- upvalues: Url (copy), HttpService (copy), myHttpRequest (copy)
-	local v9 = string.format("%s/users/%s/request-friendship", Url.FRIEND_URL, (tostring(p1)))
-	local json = HttpService:JSONEncode({
-		friendshipOriginSourceType = s1
-	})
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableFriendsStoreChallengeInterceptor = SharedFlags.FFlagEnableFriendsStoreChallengeInterceptor
 
-	return myHttpRequest(v9, "POST", {
-		postBody = json
-	}):andThen(function() -- line: 28
+return function(p, friendshipOriginSourceType: string?, p2)
+	return (FFlagEnableFriendsStoreChallengeInterceptor and p2 or myHttpRequest)(
+		string.format("%s/users/%s/request-friendship", Url.FRIEND_URL, (tostring(p))),
+		"POST",
+		{
+			postBody = HttpService:JSONEncode({
+				friendshipOriginSourceType = friendshipOriginSourceType
+			})
+		}
+	):andThen(function(): nil
 		return nil
-	end):catch(function(p2) -- line: 31
-		-- upvalues: HttpService (copy)
-		local v12 = if type(p2) ~= "table" then nil else p2.StatusCode
+	end):catch(function(p3)
+		local statusCode
+
+		if type(p3) == "table" then
+			statusCode = p3.StatusCode
+		end
+
 		local code = nil
-		local v14 = if type(p2) ~= "table" then nil else p2.Body
+		local body
 
-		if type(v14) == "string" then
-			local ok, result = pcall(HttpService.JSONDecode, HttpService, v14)
+		if type(p3) == "table" then
+			body = p3.Body
+		end
 
-			if ok and type(result) == "table" then
+		if type(body) == "string" then
+			local success, result = pcall(HttpService.JSONDecode, HttpService, body)
+
+			if success and type(result) == "table" then
 				local errors = result.errors
 
 				if type(errors) == "table" and errors[1] then
@@ -34,9 +48,6 @@ return function(p1, s1: string?) -- line: 22
 			end
 		end
 
-		error({
-			statusCode = v12,
-			firstErrorCode = code
-		})
+		error({ statusCode = statusCode, firstErrorCode = code })
 	end)
 end

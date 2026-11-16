@@ -1,31 +1,35 @@
-local ParentParent = script.Parent.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local Constants = require(ParentParent.Common.Constants)
-local React = dependencies.React
-local DiscoverabilityModalAnalyticsContext = require(ParentParent.Analytics.DiscoverabilityModalAnalyticsContext)
-local setupFireAnalyticsEvents = require(ParentParent.Analytics.setupFireAnalyticsEvents)
-local AnalyticsService = require(ParentParent.Analytics.AnalyticsService)
+local parent = script.Parent.Parent.Parent
+local dependencies = require(parent.dependencies)
+local Constants = require(parent.Common.Constants)
+local react = dependencies.React
+local DiscoverabilityModalAnalyticsContext = require(parent.Analytics.DiscoverabilityModalAnalyticsContext)
+local setupFireAnalyticsEvents = require(parent.Analytics.setupFireAnalyticsEvents)
+local AnalyticsService = require(parent.Analytics.AnalyticsService)
+
 local useSelector = dependencies.Hooks.useSelector
 
-local function Container(p1) -- line: 11
-	-- upvalues: useSelector (copy), React (copy), DiscoverabilityModalAnalyticsContext (copy), setupFireAnalyticsEvents (copy), AnalyticsService (copy), Constants (copy)
-	return function(p2) -- line: 12
-		-- upvalues: useSelector (copy), React (copy), DiscoverabilityModalAnalyticsContext (copy), setupFireAnalyticsEvents (copy), AnalyticsService (copy), Constants (copy), p1 (copy)
-		local v12 = useSelector(function(p3) -- line: 13
+local function Container(p)
+	return function(p2)
+		local uid = useSelector(function(p3)
 			return p3.LocalUserId
 		end)
 
-		return React.createElement(DiscoverabilityModalAnalyticsContext.Provider, {
-			value = {
-				fireAnalyticsEvent = setupFireAnalyticsEvents({
-					analytics = AnalyticsService,
-					defaultAnalyticsInfo = {
-						uid = v12,
-						entry = if not p2.navigation then p2.entryPoint else p2.navigation.getParam(Constants.ENTRY_POINT)
-					}
-				})
-			}
-		}, { React.createElement(p1, p2) })
+		local createElement = react.createElement
+		local provider = DiscoverabilityModalAnalyticsContext.Provider
+
+		local v = { analytics = AnalyticsService, defaultAnalyticsInfo = 0 }
+		local entry
+
+		if p2.navigation then
+			entry = p2.navigation.getParam(Constants.ENTRY_POINT)
+		else
+			entry = p2.entryPoint
+		end
+
+		v.defaultAnalyticsInfo = { uid = uid, entry = entry }
+		return createElement(provider, {
+			value = { fireAnalyticsEvent = setupFireAnalyticsEvents(v) }
+		}, { react.createElement(p, p2) })
 	end
 end
 

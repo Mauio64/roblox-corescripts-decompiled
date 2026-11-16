@@ -1,13 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local useCursor = require(ParentParent.Foundation).Hooks.useCursor
-
-require(ParentParent.React)
-
+local parent = script.Parent.Parent.Parent.Parent
+local Foundation = require(parent.Foundation)
+local useCursor = Foundation.Hooks.useCursor
+require(parent.React)
 local mapCursorType = require(script.Parent.mapCursorType)
 
-local function useCursorByType(p1) -- line: 8
-	-- upvalues: useCursor (copy), mapCursorType (copy)
-	return useCursor(mapCursorType(p1))
+local function useCursorByType(p)
+	return useCursor(mapCursorType(p))
 end
 
 return useCursorByType

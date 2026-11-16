@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.Navigation.Navigation))
+local Navigation = require(Workspace.Navigation.Navigation)
+
+return Navigation

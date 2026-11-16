@@ -1,8 +1,8 @@
 local renderSystemScrim = require(script.renderSystemScrim)
-local lib = require(script["data-model"])
+local datamodel = require(script["data-model"])
 
 return {
 	renderSystemScrim = renderSystemScrim,
-	SystemScrimSignalStore = lib.SystemScrimSignalStore,
+	SystemScrimSignalStore = datamodel.SystemScrimSignalStore,
 	["jest.config"] = script["jest.config"]
 }

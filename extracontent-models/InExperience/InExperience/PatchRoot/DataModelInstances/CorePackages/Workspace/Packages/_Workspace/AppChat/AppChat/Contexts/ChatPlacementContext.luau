@@ -1,43 +1,45 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local FFlagExpChatEnableFriendsTab = require(Parent.SharedFlags).FFlagExpChatEnableFriendsTab
-local t1 = {
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+
+local enum = {
 	Unknown = "Unknown",
 	ConnectTab = "ConnectTab",
 	ChatTab = "ChatTab",
 	InExperienceDefault = "InExperienceDefault",
 	InExperienceFriendsTab = "InExperienceFriendsTab"
 }
-local v5 = React.createContext({
-	chatPlacement = t1.Unknown
-})
-local Provider = v5.Provider
-local Consumer = v5.Consumer
 
-return {
-	Provider = Provider,
-	Consumer = Consumer,
-	Context = v5,
-	Enum = t1,
-	useChatPlacementContext = function() -- line: 42
-		-- upvalues: React (copy), v5 (copy)
-		return React.useContext(v5)
-	end,
-	withChatPlacementContext = function(p1: ((...any) -> ...any)) -- line: 45
-		-- upvalues: React (copy), Consumer (copy)
-		return React.createElement(Consumer, {
-			render = function(p2) -- line: 47
-				-- upvalues: p1 (copy)
-				return p1(p2)
-			end
-		})
-	end,
-	isPlacementInExperience = function(p3) -- line: 52
-		-- upvalues: FFlagExpChatEnableFriendsTab (copy), t1 (copy)
-		if FFlagExpChatEnableFriendsTab and p3 == t1.InExperienceFriendsTab then
-			return true
+local context = React.createContext({ chatPlacement = enum.Unknown })
+
+local provider = context.Provider
+local consumer = context.Consumer
+local ChatPlacementContext = {}
+ChatPlacementContext.Provider = provider
+ChatPlacementContext.Consumer = consumer
+ChatPlacementContext.Context = context
+ChatPlacementContext.Enum = enum
+
+function ChatPlacementContext.useChatPlacementContext()
+	return React.useContext(context)
+end
+
+function ChatPlacementContext.withChatPlacementContext(callback)
+	return React.createElement(consumer, {
+		render = function(p)
+			return callback(p)
 		end
+	})
+end
 
-		return p3 == t1.InExperienceDefault
+function ChatPlacementContext.isPlacementInExperience(p): boolean
+	if FFlagExpChatEnableFriendsTab and p == enum.InExperienceFriendsTab then
+		return true
 	end
-}
+
+	return p == enum.InExperienceDefault
+end
+
+return ChatPlacementContext

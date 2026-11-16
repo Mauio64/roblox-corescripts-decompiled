@@ -1,13 +1,12 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
+
 local BulkPurchaseError = require(script.Parent.BulkPurchaseError)
 local useBulkPurchaseErrorProps = require(script.Parent.useBulkPurchaseErrorProps)
 
-local function BulkPurchaseErrorContainer() -- line: 8
-	-- upvalues: useBulkPurchaseErrorProps (copy), React (copy), BulkPurchaseError (copy)
-	local v6 = useBulkPurchaseErrorProps()
-
-	return React.createElement(BulkPurchaseError, v6)
+local function BulkPurchaseErrorContainer()
+	local v = useBulkPurchaseErrorProps()
+	return React.createElement(BulkPurchaseError, v)
 end
 
 return BulkPurchaseErrorContainer

@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetPerformanceStatsVisible", function(p1) -- line: 5
-	return {
-		isVisible = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetPerformanceStatsVisible", function(isVisible)
+	return { isVisible = isVisible }
 end)

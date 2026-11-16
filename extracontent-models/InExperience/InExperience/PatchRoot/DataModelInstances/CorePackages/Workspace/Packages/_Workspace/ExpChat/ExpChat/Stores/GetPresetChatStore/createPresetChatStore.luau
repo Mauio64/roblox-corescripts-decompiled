@@ -1,48 +1,59 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local createSignal = require(Parent.Signals).createSignal
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(parent.Signals)
+local createSignal = Signals.createSignal
 
-return function() -- line: 57
-	-- upvalues: createSignal (copy)
-	local v3, v4 = createSignal(false)
-	local v5, v6 = createSignal(true)
-	local v7, v8 = createSignal(false)
-	local v9, v10 = createSignal({})
-	local v11, v12 = createSignal(1)
-	local v13, v14 = createSignal("")
-	local v15, v16 = createSignal("Disabled")
-	local v17, v18 = createSignal(nil)
-	local v19, v20 = createSignal(nil)
-	local v21, v22 = createSignal(0)
-	local v23, v24 = createSignal({})
+return function()
+	local signal, setIsEnabled = createSignal(false)
+	local signal2, setIsLoading = createSignal(true)
+	local signal3, setIsTrayOpen = createSignal(false)
+	local signal4, setCategoryGroups = createSignal({})
+	local signal5, setSelectedGroupIndex = createSignal(1)
+	local signal6, setVersion = createSignal("")
+	local signal7, setAccessLevel = createSignal("Disabled")
+	local signal8, setLayoutModeOverride = createSignal(nil)
+	local signal9, setPresetCooldownEndsAt = createSignal(nil)
+	local signal10, setChatWindowBottomY = createSignal(0)
+	local signal11, setPresetClickCounts = createSignal({})
+	local signal12, setViewedGroupIds = createSignal({})
 
 	return {
-		getIsEnabled = v3,
-		getIsLoading = v5,
-		getIsTrayOpen = v7,
-		getCategoryGroups = v9,
-		getSelectedGroupIndex = v11,
-		getVersion = v13,
-		getAccessLevel = v15,
-		getLayoutModeOverride = v17,
-		getPresetCooldownEndsAt = v19,
-		getChatWindowBottomY = v21,
-		getPresetClickCounts = v23,
-		setIsEnabled = v4,
-		setIsLoading = v6,
-		setIsTrayOpen = v8,
-		setCategoryGroups = v10,
-		setSelectedGroupIndex = v12,
-		setVersion = v14,
-		setAccessLevel = v16,
-		setLayoutModeOverride = v18,
-		setPresetCooldownEndsAt = v20,
-		setChatWindowBottomY = v22,
-		incrementPresetClickCount = function(s1: string) -- line: 70
-			-- upvalues: v23 (copy), v24 (copy)
-			local v26 = table.clone(v23(false))
+		getIsEnabled = signal,
+		getIsLoading = signal2,
+		getIsTrayOpen = signal3,
+		getCategoryGroups = signal4,
+		getSelectedGroupIndex = signal5,
+		getVersion = signal6,
+		getAccessLevel = signal7,
+		getLayoutModeOverride = signal8,
+		getPresetCooldownEndsAt = signal9,
+		getChatWindowBottomY = signal10,
+		getPresetClickCounts = signal11,
+		getViewedGroupIds = signal12,
+		setIsEnabled = setIsEnabled,
+		setIsLoading = setIsLoading,
+		setIsTrayOpen = setIsTrayOpen,
+		setCategoryGroups = setCategoryGroups,
+		setSelectedGroupIndex = setSelectedGroupIndex,
+		setVersion = setVersion,
+		setAccessLevel = setAccessLevel,
+		setLayoutModeOverride = setLayoutModeOverride,
+		setPresetCooldownEndsAt = setPresetCooldownEndsAt,
+		setChatWindowBottomY = setChatWindowBottomY,
+		setPresetClickCounts = setPresetClickCounts,
+		incrementPresetClickCount = function(p: string)
+			local clone = table.clone(signal11(false))
+			clone[p] = not clone[p] and 1 or clone[p] + 1
+			setPresetClickCounts(clone)
+		end,
+		setViewedGroupIds = setViewedGroupIds,
+		markGroupViewed = function(p: string)
+			if signal12(false)[p] then
+				return
+			end
 
-			v26[s1] = not v26[s1] and 1 or v26[s1] + 1
-			v24(v26)
+			local clone = table.clone(signal12(false))
+			clone[p] = true
+			setViewedGroupIds(clone)
 		end
 	}
 end

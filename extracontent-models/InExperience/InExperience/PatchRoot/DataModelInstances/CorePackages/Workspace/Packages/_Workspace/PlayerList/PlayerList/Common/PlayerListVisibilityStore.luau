@@ -1,52 +1,73 @@
-local ParentParent = script.Parent.Parent.Parent
-local Signals = require(ParentParent.Signals)
-local v3, v4 = Signals.createSignal(true)
-local v5, v6 = Signals.createSignal({})
-local v7 = Signals.createComputed(function(p1) -- line: 24
-	-- upvalues: v3 (copy), v5 (copy)
-	return v3(p1) and next(v5(p1)) == nil
+local parent = script.Parent.Parent.Parent
+
+local Signals = require(parent.Signals)
+
+local signal, v = Signals.createSignal(true)
+
+local v2 = false
+
+local function setShouldPersistVisibility(flag: boolean)
+	v2 = flag
+end
+
+local function setVisible(playerListVisible: boolean)
+	v(playerListVisible)
+
+	if v2 then
+		local userSettings = UserSettings()
+		userSettings.GameSettings.PlayerListVisible = playerListVisible
+	end
+end
+
+local signal2, v3 = Signals.createSignal({})
+
+local getEffectiveVisible = Signals.createComputed(function(p)
+	return signal(p) and next(signal2(p)) == nil
 end)
-local u8 = nil
+
+local v4 = nil
+
+local function setTempHide(p: string, flag: boolean?)
+	local v5 = next(signal2(false)) == nil
+	v3(function(p2)
+		local clone = table.clone(p2)
+		clone[p] = flag and true or nil
+		return clone
+	end)
+
+	local v6 = next(signal2(false)) == nil
+
+	if v5 and not v6 then
+		v4 = signal(false)
+	elseif not v5 and v6 and v4 ~= nil then
+		local v7 = v4
+		v4 = nil
+
+		if signal(false) ~= v7 then
+			v(v7)
+		end
+	end
+end
+
+local function setTempHideSnapshot(flag: boolean)
+	if v4 ~= nil then
+		v4 = flag
+	end
+end
+
+local function reset()
+	v2 = false
+	v4 = nil
+	v3({})
+	v(true)
+end
 
 return {
-	getVisible = v3,
-	setVisible = v4,
-	getEffectiveVisible = v7,
-	setTempHide = function(s1: string, b1: boolean?) -- line: 30
-		-- upvalues: v5 (copy), v6 (copy), u8 (ref), v3 (copy), v4 (copy)
-		local v12 = next(v5(false)) == nil
-
-		v6(function(p2) -- line: 32
-			-- upvalues: s1 (copy), b1 (copy)
-			local v16 = table.clone(p2)
-
-			v16[s1] = not not b1 or nil
-
-			return v16
-		end)
-
-		local v13 = next(v5(false)) == nil
-
-		if v12 and not v13 then
-			u8 = v3(false)
-
-			return
-		end
-
-		if not v12 and v13 and u8 ~= nil then
-			local v14 = u8
-
-			u8 = nil
-
-			if v14 ~= v3(false) then
-				v4(v14)
-			end
-		end
-	end,
-	reset = function() -- line: 51
-		-- upvalues: u8 (ref), v6 (copy), v4 (copy)
-		u8 = nil
-		v6({})
-		v4(true)
-	end
+	getVisible = signal,
+	setVisible = setVisible,
+	setShouldPersistVisibility = setShouldPersistVisibility,
+	getEffectiveVisible = getEffectiveVisible,
+	setTempHide = setTempHide,
+	setTempHideSnapshot = setTempHideSnapshot,
+	reset = reset
 }

@@ -1,38 +1,35 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceTimedOptions").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 local Popover = Foundation.Popover
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Enums = Foundation.Enums
 local PopoverSide = Foundation.Enums.PopoverSide
 local PopoverAlign = Foundation.Enums.PopoverAlign
-local FFlagAXFixIaBTimedOptionsPopoverFocus = require(Parent.AvatarExperienceFlags).FFlagAXFixIaBTimedOptionsPopoverFocus
+
 local WearTimeList = require(script.Parent.WearTimeList)
-
 require(script.Parent.useWearTimeSelectedOptionViewModel)
-
 local useWearTimePopoverFocusNavigationBindings = require(script.Parent.useWearTimePopoverFocusNavigationBindings)
 
-local function WearTimeSelectedOptionInListView(p1) -- line: 22
-	-- upvalues: React (copy), useWearTimePopoverFocusNavigationBindings (copy), FFlagAXFixIaBTimedOptionsPopoverFocus (copy), View (copy), FoundationText (copy), Foundation (copy), Enums (copy), Popover (copy), PopoverAlign (copy), PopoverSide (copy), WearTimeList (copy)
-	local tokens = p1.tokens
-	local v16 = React.useCallback(function() -- line: 25
-		-- upvalues: p1 (copy)
-		p1.setIsOpen(false)
-	end, { p1.setIsOpen })
-	local v17 = useWearTimePopoverFocusNavigationBindings(v16, p1.isOpen, if not FFlagAXFixIaBTimedOptionsPopoverFocus then nil else p1.anchorRef)
-	local v18 = React.createElement("TextButton", {
+local function WearTimeSelectedOptionInListView(props)
+	local tokens = props.tokens
+
+	local ref = useWearTimePopoverFocusNavigationBindings(React.useCallback(function()
+		props.setIsOpen(false)
+	end, { props.setIsOpen }), props.isOpen, props.anchorRef)
+
+	local element = React.createElement("TextButton", {
 		Text = "",
 		Size = UDim2.fromScale(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BorderSizePixel = 0,
-		Transparency = p1.tokens.Color.Shift.Shift_200.Transparency,
-		BackgroundColor3 = p1.tokens.Color.Shift.Shift_200.Color3,
-		ref = p1.anchorRef,
-		[React.Event.Activated] = function() -- line: 45
-			-- upvalues: p1 (copy)
-			p1.setIsOpen(not p1.isOpen)
+		Transparency = props.tokens.Color.Shift.Shift_200.Transparency,
+		BackgroundColor3 = props.tokens.Color.Shift.Shift_200.Color3,
+		ref = props.anchorRef,
+		[React.Event.Activated] = function()
+			props.setIsOpen(not props.isOpen)
 		end
 	}, {
 		UICorner = React.createElement("UICorner", {
@@ -53,53 +50,46 @@ local function WearTimeSelectedOptionInListView(p1) -- line: 22
 			tag = "row align-y-center gap-small auto-xy",
 			LayoutOrder = 1
 		}, {
-			Duration = React.createElement(FoundationText, {
+			Duration = React.createElement(Text, {
 				tag = "auto-xy",
-				LayoutOrder = 2,
-				Text = p1.listLabelText,
+				Text = props.listLabelText,
 				textStyle = tokens.Color.Content.Emphasis,
 				fontStyle = {
 					Font = tokens.Typography.TitleSmall.Font,
 					FontSize = tokens.FontSize.FontSize_300
-				}
+				},
+				LayoutOrder = 2
 			}),
 			ChevronIcon = React.createElement(Foundation.Icon, {
-				LayoutOrder = 3,
 				name = Enums.IconName.ChevronLargeDown,
 				variant = Enums.IconVariant.Regular,
-				size = Enums.IconSize.Small
+				size = Enums.IconSize.Small,
+				LayoutOrder = 3
 			})
 		})
 	})
 
-	return React.createElement(View, {
-		tag = "auto-xy"
-	}, {
-		TriggerButton = v18,
-		Popover = React.createElement(Popover.Root, {
-			isOpen = p1.isOpen
-		}, {
-			Anchor = React.createElement(Popover.Anchor, {
-				anchorRef = p1.anchorRef
-			}),
+	return React.createElement(View, { tag = "auto-xy" }, {
+		TriggerButton = element,
+		Popover = React.createElement(Popover.Root, { isOpen = props.isOpen }, {
+			Anchor = React.createElement(Popover.Anchor, { anchorRef = props.anchorRef }),
 			Content = React.createElement(Popover.Content, {
-				hasArrow = false,
 				align = PopoverAlign.Start,
 				side = PopoverSide.Bottom,
-				onPressedOutside = function() -- line: 100
-					-- upvalues: p1 (copy)
-					p1.setIsOpen(false)
+				hasArrow = false,
+				onPressedOutside = function()
+					props.setIsOpen(false)
 				end
 			}, {
 				ContentWrapper = React.createElement(View, {
-					tag = "auto-y",
 					Size = UDim2.new(0, tokens.Size.Size_2900 * 2, 0, 0),
-					ref = v17
+					tag = "auto-y",
+					ref = ref
 				}, {
 					WearTimeList = React.createElement(WearTimeList, {
-						options = p1.updatedOptions,
-						selectedIndex = p1.selectedIndex,
-						onOptionActivated = p1.handleOptionActivated
+						options = props.updatedOptions,
+						selectedIndex = props.selectedIndex,
+						onOptionActivated = props.handleOptionActivated
 					})
 				})
 			})

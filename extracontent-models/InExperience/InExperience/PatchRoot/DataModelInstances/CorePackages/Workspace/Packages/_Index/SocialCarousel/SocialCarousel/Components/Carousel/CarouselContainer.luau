@@ -1,68 +1,71 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local React = require(SocialCarouselParent.React)
-local RobloxAppEnums = require(SocialCarouselParent.RobloxAppEnums)
-local RoactUtils = require(SocialCarouselParent.RoactUtils)
+local parent = SocialCarousel.Parent
+local React = require(parent.React)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local RoactUtils = require(parent.RoactUtils)
+
 local Carousel = require(script.Parent.Carousel)
-local NavigateDown = require(SocialCarouselParent.NavigationRodux).Thunks.NavigateDown
-local Navigation = require(SocialCarouselParent.Navigation)
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local Navigation = require(parent.Navigation)
+
 local useSocialCarouselAnalytics = require(SocialCarousel.Analytics.useSocialCarouselAnalytics)
 local useTilesSeenCollection = require(SocialCarousel.Analytics.useTilesSeenCollection)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local AppPage = RobloxAppEnums.AppPage
 local useNavigation = Navigation.useNavigation
-local FFlagCreateConnectionsHub = require(SocialCarouselParent.SharedFlags).FFlagCreateConnectionsHub
-local FFlagSignalsNavP3Dispatch = require(SocialCarouselParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v16 = if not FFlagSignalsNavP3Dispatch then nil else require(SocialCarouselParent.RobloxAppNavigation).NavigationCommands
+local SharedFlags = require(parent.SharedFlags)
+local FFlagCreateConnectionsHub = SharedFlags.FFlagCreateConnectionsHub
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags2.FFlagSignalsNavP3Dispatch
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagShowRequestsInCarouselForAllUsers = SharedFlags3.FFlagShowRequestsInCarouselForAllUsers
+local navigationCommands
 
-local function CarouselContainer(t1: {[any]: any}) -- line: 26
-	-- upvalues: useSocialCarouselAnalytics (copy), useTilesSeenCollection (copy), useDispatch (copy), useNavigation (copy), React (copy), FFlagCreateConnectionsHub (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v16 (copy), NavigateDown (copy), Carousel (copy)
-	local v19 = useSocialCarouselAnalytics()
-	local v20 = useTilesSeenCollection()
-	local v21 = useDispatch()
-	local v22 = useNavigation()
-	local v23 = React.useRef({
-		startIndex = 1,
-		endIndex = 1
-	})
-	local v24 = React.useCallback(function() -- line: 33
-		-- upvalues: v19 (copy), FFlagCreateConnectionsHub (copy), v22 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v16 (copy), v21 (copy), NavigateDown (copy)
-		v19.friendsHeaderPressed()
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local function CarouselContainer(p)
+	local v = useSocialCarouselAnalytics()
+	local v2 = useTilesSeenCollection()
+	local v3 = useDispatch()
+	local v4 = useNavigation()
+	local ref = React.useRef({ startIndex = 1, endIndex = 1 })
+
+	local onActivateHeader = React.useCallback(function()
+		v.friendsHeaderPressed()
 
 		if FFlagCreateConnectionsHub then
-			v22.navigate(AppPage.CoHubMyConnections)
-
-			return
+			v4.navigate(AppPage.CoHubMyConnections)
+		elseif FFlagSignalsNavP3Dispatch then
+			navigationCommands.down(navigationCommands.fromLegacyPage({ name = AppPage.ViewFriends }))
+		else
+			v3(NavigateDown({ name = AppPage.ViewFriends }))
 		end
+	end, { v3, v4 })
 
-		if FFlagSignalsNavP3Dispatch then
-			v16.down(v16.fromLegacyPage({
-				name = AppPage.ViewFriends
-			}))
+	local onTileContentChanged = React.useCallback(function(p2: string, p3: number, p4)
+		local current = ref.current
 
-			return
+		if current.startIndex <= p3 and p3 <= current.endIndex then
+			v2.addTileToCollection(p2, p3, p4)
 		end
+	end, { v2 })
 
-		v21(NavigateDown({
-			name = AppPage.ViewFriends
-		}))
-	end, {
-		v21,
-		v22
-	})
-	local v25 = React.useCallback(function(s1: string, n1: number, p1) -- line: 44
-		-- upvalues: v23 (copy), v20 (copy)
-		local current = v23.current
+	local createElement = React.createElement
 
-		if n1 >= current.startIndex and n1 <= current.endIndex then
-			v20.addTileToCollection(s1, n1, p1)
-		end
-	end, { v20 })
+	if FFlagShowRequestsInCarouselForAllUsers then
+		onTileContentChanged = nil
+	end
 
-	return React.createElement(Carousel, {
-		onActivateHeader = v24,
-		onTileContentChanged = v25,
-		appCompositionEnabled = t1.appCompositionEnabled
+	return createElement(Carousel, {
+		onActivateHeader = onActivateHeader,
+		onTileContentChanged = onTileContentChanged,
+		appCompositionEnabled = p.appCompositionEnabled
 	})
 end
 

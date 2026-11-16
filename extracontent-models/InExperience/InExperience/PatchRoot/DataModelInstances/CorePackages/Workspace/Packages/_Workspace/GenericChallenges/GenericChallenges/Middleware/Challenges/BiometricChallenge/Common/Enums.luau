@@ -1,5 +1,3 @@
 return {
-	BiometricTypeEnum = {
-		PersonaLiveness = "personaliveness"
-	}
+	BiometricTypeEnum = { PersonaLiveness = "personaliveness" }
 }

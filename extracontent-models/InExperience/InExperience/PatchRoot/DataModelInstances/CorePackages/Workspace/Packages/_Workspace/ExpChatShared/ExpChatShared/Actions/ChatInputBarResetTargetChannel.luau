@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("ExpChatShared").Parent
+local parent = script:FindFirstAncestor("ExpChatShared").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(b1: boolean?) -- line: 10
-	return {
-		isGlobalTabActive = b1
-	}
+return Rodux.makeActionCreator(script.Name, function(isGlobalTabActive: boolean?)
+	return { isGlobalTabActive = isGlobalTabActive }
 end)

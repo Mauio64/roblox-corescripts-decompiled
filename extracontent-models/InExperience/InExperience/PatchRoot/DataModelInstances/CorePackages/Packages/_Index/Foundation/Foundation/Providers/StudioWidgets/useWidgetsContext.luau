@@ -1,19 +1,18 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
+
+local React = require(parent.React)
 
 require(script.Parent.Types)
-
 local WidgetsContext = require(script.Parent.WidgetsContext)
 
-local function useWidgetsContext() -- line: 11
-	-- upvalues: React (copy), WidgetsContext (copy)
-	local v5 = React.useContext(WidgetsContext)
+local function useWidgetsContext()
+	local v = React.useContext(WidgetsContext)
 
-	if v5 == nil then
+	if v == nil then
 		error("useWidgetsContext must be used within a WidgetsProvider")
 	end
 
-	return v5
+	return v
 end
 
 return useWidgetsContext

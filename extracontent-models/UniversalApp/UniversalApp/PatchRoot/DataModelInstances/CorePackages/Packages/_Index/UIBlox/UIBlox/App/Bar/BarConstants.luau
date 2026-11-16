@@ -1,3 +1,1 @@
-return {
-	ControllerBarHintInternalPadding = 8
-}
+return { ControllerBarHintInternalPadding = 8 }

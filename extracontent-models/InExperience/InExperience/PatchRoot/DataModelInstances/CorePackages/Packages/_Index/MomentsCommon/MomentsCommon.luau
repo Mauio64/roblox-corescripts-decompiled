@@ -6,12 +6,19 @@ local LoadingState = require(script.Enums.LoadingState)
 local MomentStatus = require(script.Enums.MomentStatus)
 local MusicThumbnailIconSize = require(script.Enums.MusicThumbnailIconSize)
 local NavigationType = require(script.Enums.NavigationType)
+
 local GradientBackdrop = require(script.Components.GradientBackdrop)
+
 local LoadableVideo = require(script.Components.LoadableVideo)
+
 local MusicThumbnailIcon = require(script.Components.MusicThumbnailIcon)
+
 local ScrollingGridView = require(script.Components.ScrollingGridView)
+
 local TextOverlay = require(script.Components.TextOverlay)
+
 local TextOverlayDisplay = require(script.Components.TextOverlayDisplay)
+
 local Signal = require(script.Utils.Signal)
 
 return {

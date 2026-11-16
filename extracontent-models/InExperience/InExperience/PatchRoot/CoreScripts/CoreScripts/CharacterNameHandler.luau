@@ -1,12 +1,14 @@
 local Players = game:GetService("Players")
 local CorePackages = game:GetService("CorePackages")
-
 game:GetService("CoreGui")
 
-local UserProfileStore = require(CorePackages.Workspace.Packages.UserProfiles).Stores.UserProfileStore
-local FFlagUserProfileStoreQueryRefetch = require(CorePackages.Workspace.Packages.SharedFlags).FFlagUserProfileStoreQueryRefetch
-local v5 = game:DefineFastFlag("FixCharacterNameHandlerNilProfileCrash", false)
-local t1 = {}
+local UserProfiles = require(CorePackages.Workspace.Packages.UserProfiles)
+local UserProfileStore = UserProfiles.Stores.UserProfileStore
+
+local defineFastFlag = game:DefineFastFlag("FixCharacterNameHandlerNilProfileCrash", false)
+
+local v = {}
+
 local _ = {
 	CharacterAdded = "CharacterAdded",
 	CharacterRemoving = "CharacterRemoving",
@@ -14,87 +16,81 @@ local _ = {
 	CharacterHumanoidAdded = "CharacterHumanoidAdded"
 }
 
-local function setName(p1, p2, t2: {[any]: any}) -- line: 29
-	-- upvalues: t1 (copy)
-	local inExperienceCombinedName = t2.names.inExperienceCombinedName
-	local displayName = t2.names.displayName
+local function setName(humanoid, p, p2)
+	local inExperienceCombinedName = p2.names.inExperienceCombinedName
+	local displayName = p2.names.displayName
 
-	if t2.names.displayName == p1.DisplayName then
-		p1.InternalDisplayName = inExperienceCombinedName
-		t1[p2].HumanoidDisplayNameChanged = p1:GetPropertyChangedSignal("DisplayName"):Connect(function() -- line: 36
-			-- upvalues: displayName (copy), p1 (copy)
-			if displayName ~= p1.DisplayName then
-				p1.InternalDisplayName = ""
+	if p2.names.displayName == humanoid.DisplayName then
+		humanoid.InternalDisplayName = inExperienceCombinedName
+		v[p].HumanoidDisplayNameChanged = humanoid:GetPropertyChangedSignal("DisplayName"):Connect(function()
+			if displayName ~= humanoid.DisplayName then
+				humanoid.InternalDisplayName = ""
 			end
 		end)
 	end
 end
-local function checkHumanoid(p3, p4, t3: {[any]: any}) -- line: 44
-	-- upvalues: setName (copy), t1 (copy)
-	local Humanoid = p4:FindFirstChildWhichIsA("Humanoid")
 
-	if Humanoid then
-		setName(Humanoid, p3, t3)
+local function checkHumanoid(player, character, p)
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+
+	if humanoid then
+		setName(humanoid, player, p)
 	end
 
-	t1[p3].CharacterHumanoidAdded = p4.ChildAdded:Connect(function(child) -- line: 49
-		-- upvalues: setName (copy), p3 (copy), t3 (copy)
-		if child:IsA("Humanoid") then
-			setName(child, p3, t3)
+	v[player].CharacterHumanoidAdded = character.ChildAdded:Connect(function(humanoid2)
+		if humanoid2:IsA("Humanoid") then
+			setName(humanoid2, player, p)
 		end
 	end)
 end
-local function setNameOnCharacterAdded(p5, t4: {[any]: any}) -- line: 56
-	-- upvalues: t1 (copy), checkHumanoid (copy)
-	t1[p5] = {}
 
-	if p5.Character then
-		checkHumanoid(p5, p5.Character, t4)
+local function setNameOnCharacterAdded(player, p)
+	v[player] = {}
+
+	if player.Character then
+		checkHumanoid(player, player.Character, p)
 	end
 
-	t1[p5].CharacterAdded = p5.CharacterAdded:Connect(function(character) -- line: 62
-		-- upvalues: checkHumanoid (copy), p5 (copy), t4 (copy)
-		checkHumanoid(p5, character, t4)
+	v[player].CharacterAdded = player.CharacterAdded:Connect(function(character)
+		checkHumanoid(player, character, p)
 	end)
-	t1[p5].CharacterRemoving = p5.CharacterRemoving:Connect(function() -- line: 65
-		-- upvalues: t1 (copy), p5 (copy)
-		local CharacterHumanoidAdded = t1[p5].CharacterHumanoidAdded
-		local HumanoidDisplayNameChanged = t1[p5].HumanoidDisplayNameChanged
+	v[player].CharacterRemoving = player.CharacterRemoving:Connect(function()
+		local characterHumanoidAdded = v[player].CharacterHumanoidAdded
+		local humanoidDisplayNameChanged = v[player].HumanoidDisplayNameChanged
 
-		if CharacterHumanoidAdded then
-			t1[p5].CharacterHumanoidAdded:Disconnect()
+		if characterHumanoidAdded then
+			v[player].CharacterHumanoidAdded:Disconnect()
 		end
 
-		if HumanoidDisplayNameChanged then
-			t1[p5].HumanoidDisplayNameChanged:Disconnect()
+		if humanoidDisplayNameChanged then
+			v[player].HumanoidDisplayNameChanged:Disconnect()
 		end
 	end)
 end
-local function setCurrentPlayersNames() -- line: 77
-	-- upvalues: Players (copy), UserProfileStore (copy), v5 (copy), setNameOnCharacterAdded (copy)
+
+local function setCurrentPlayersNames()
 	local players = Players:GetPlayers()
-	local t5 = {}
-	local t6 = {}
+	local userIds = {}
+	local playersByUserId = {}
 
-	for _, v in pairs(players) do
-		table.insert(t5, (tostring(v.UserId)))
-		t6[tostring(v.UserId)] = v
+	for _, player in pairs(players) do
+		table.insert(userIds, (tostring(player.UserId)))
+		playersByUserId[tostring(player.UserId)] = player
 	end
 
-	UserProfileStore.get().fetchNamesByUserIds(t5, function(p6) -- line: 85
-		-- upvalues: t6 (copy), v5 (copy), setNameOnCharacterAdded (copy)
-		local status = p6.status
-		local data = p6.data
+	UserProfileStore.get().fetchNamesByUserIds(userIds, function(p)
+		local status = p.status
+		local data = p.data
 
 		if status == "success" then
-			for _, v43 in data do
-				local v44 = t6[v43.userId]
+			for _, v2 in data do
+				local v3 = playersByUserId[v2.userId]
 
-				if not v5 or v44 and v43.names ~= nil then
-					setNameOnCharacterAdded(v44, {
+				if not defineFastFlag or v3 and v2.names ~= nil then
+					setNameOnCharacterAdded(v3, {
 						names = {
-							inExperienceCombinedName = v43.names.getInExperienceCombinedName(false),
-							displayName = v43.names.getDisplayName(false)
+							inExperienceCombinedName = v2.names.getInExperienceCombinedName(false),
+							displayName = v2.names.getDisplayName(false)
 						}
 					})
 				end
@@ -102,41 +98,47 @@ local function setCurrentPlayersNames() -- line: 77
 		end
 	end)
 end
-local function onPlayerAdded(p7) -- line: 104
-	-- upvalues: UserProfileStore (copy), v5 (copy), setNameOnCharacterAdded (copy)
-	UserProfileStore.get().fetchNamesByUserIds({ (tostring(p7.UserId)) }, function(p8) -- line: 105
-		-- upvalues: v5 (copy), setNameOnCharacterAdded (copy), p7 (copy)
-		local status = p8.status
-		local data = p8.data
-		local v48 = not v5 or #data > 0 and data[1].names ~= nil
 
-		if status == "success" and v48 then
-			local v49 = data[1]
+local function onPlayerAdded(p)
+	UserProfileStore.get().fetchNamesByUserIds({ (tostring(p.UserId)) }, function(p2)
+		local status = p2.status
+		local data = p2.data
+		local v2
 
-			setNameOnCharacterAdded(p7, {
+		if defineFastFlag then
+			if #data > 0 then
+				v2 = data[1].names ~= nil
+			else
+				v2 = false
+			end
+		else
+			v2 = true
+		end
+
+		if status == "success" and v2 then
+			local v3 = data[1]
+			setNameOnCharacterAdded(p, {
 				names = {
-					inExperienceCombinedName = v49.names.getInExperienceCombinedName(false),
-					displayName = v49.names.getDisplayName(false)
+					inExperienceCombinedName = v3.names.getInExperienceCombinedName(false),
+					displayName = v3.names.getDisplayName(false)
 				}
 			})
 		end
 	end)
 end
-local function onPlayerRemoving(p9) -- line: 122
-	-- upvalues: t1 (copy), FFlagUserProfileStoreQueryRefetch (copy), UserProfileStore (copy)
-	local v32 = t1[p9]
 
-	if t1[p9] then
-		for _, v in pairs(v32) do
-			v:Disconnect()
+local function onPlayerRemoving(p)
+	local v2 = v[p]
+
+	if v[p] then
+		for _, connection in pairs(v2) do
+			connection:Disconnect()
 		end
 
-		t1[p9] = nil
+		v[p] = nil
 	end
 
-	if FFlagUserProfileStoreQueryRefetch then
-		UserProfileStore.get().invalidateCachedNamesForUserIds({ (tostring(p9.UserId)) })
-	end
+	UserProfileStore.get().invalidateCachedNamesForUserIds({ (tostring(p.UserId)) })
 end
 
 setCurrentPlayersNames()

@@ -3,73 +3,73 @@ local CorePackages = game:GetService("CorePackages")
 local Cryo = require(CorePackages.Packages.Cryo)
 local VerifiedBadges = require(CorePackages.Workspace.Packages.VerifiedBadges)
 local UserLib = require(CorePackages.Workspace.Packages.UserLib)
-
 require(AbuseReportMenu.Components.Types)
-
 local Constants = require(AbuseReportMenu.Components.Constants)
-local InExperienceCapabilities = require(CorePackages.Workspace.Packages.InExperienceCapabilities).InExperienceCapabilities
-local FFlagInGameMenuAddChatLineReporting = require(CorePackages.Workspace.Packages.SharedFlags).FFlagInGameMenuAddChatLineReporting
 
-return {
-	componentType = "modalSelector",
-	fieldLabel = "WhichPerson",
-	componentName = "PlayerSelector",
-	getIsVisible = function(_) -- line: 16
-		return true
-	end,
-	getMenuItems = function(p2) -- line: 19
-		-- upvalues: Cryo (copy), UserLib (copy), VerifiedBadges (copy), InExperienceCapabilities (copy)
-		return (Cryo.List.map(p2.playerObjects, function(p3) -- line: 20
-			-- upvalues: UserLib (copy), VerifiedBadges (copy), InExperienceCapabilities (copy)
-			local v24 = not UserLib.Utils.isPlayerVerified(p3) and "" or VerifiedBadges.emoji.verified
+local InExperienceCapabilities = require(CorePackages.Workspace.Packages.InExperienceCapabilities)
+local inExperienceCapabilities = InExperienceCapabilities.InExperienceCapabilities
+local PlayerModalSelectorMenuConfig = {}
+PlayerModalSelectorMenuConfig.componentType = "modalSelector"
 
-			return {
-				label = p3.DisplayName .. v24,
-				subLabel = if not InExperienceCapabilities.canDisplayPeoplesUsernames then nil else "[@" .. p3.Name .. "]",
-				identifier = p3.Name
-			}
-		end))
-	end,
-	getSelectedValue = function(p4) -- line: 34
-		-- upvalues: InExperienceCapabilities (copy)
-		local allegedAbuser = p4.allegedAbuser
+function PlayerModalSelectorMenuConfig.getIsVisible(_): boolean
+	return true
+end
 
-		if allegedAbuser then
-			local DisplayName = allegedAbuser.DisplayName
-			local allegedAbuserName = allegedAbuser.Name
+function PlayerModalSelectorMenuConfig.getMenuItems(p)
+	return (Cryo.List.map(p.playerObjects, function(p2)
+		local v = not UserLib.Utils.isPlayerVerified(p2) and "" or VerifiedBadges.emoji.verified
 
-			return DisplayName .. (not InExperienceCapabilities.canDisplayPeoplesUsernames and "" or "[@" .. allegedAbuserName .. "]")
+		local v2 = {
+			label = p2.DisplayName .. v,
+			subLabel = 0,
+			identifier = 0
+		}
+		local subLabel
+
+		if inExperienceCapabilities.canDisplayPeoplesUsernames then
+			subLabel = "[@" .. p2.Name .. "]"
 		end
 
+		v2.subLabel = subLabel
+
+		v2.identifier = p2.Name
+		return v2
+	end))
+end
+
+function PlayerModalSelectorMenuConfig.getSelectedValue(p)
+	local allegedAbuser = p.allegedAbuser
+
+	if not allegedAbuser then
 		return nil
-	end,
-	onUpdateSelectedOption = function(p5, p6, p7, p8) -- line: 45
-		-- upvalues: Constants (copy), FFlagInGameMenuAddChatLineReporting (copy)
-		if p5.identifier then
-			local identifier = p5.identifier
+	end
 
-			for _, v21 in p6.playerObjects do
-				if identifier == v21.Name then
-					local UserId = v21.UserId
+	local displayName = allegedAbuser.DisplayName
+	local name = allegedAbuser.Name
 
-					p8.analyticsDispatch({
-						type = Constants.AnalyticsActions.IncrementPersonChanged
-					})
-					p7({
-						type = Constants.PlayerMenuActions.UpdateAbuser,
-						abuseId = UserId,
-						abuser = v21
-					})
+	return displayName .. (not inExperienceCapabilities.canDisplayPeoplesUsernames and "" or "[@" .. name .. "]")
+end
 
-					if FFlagInGameMenuAddChatLineReporting then
-						p7({
-							selectedMessage = nil,
-							type = Constants.PlayerMenuActions.UpdatedSelectedChatAndOrderedMessages,
-							orderedMessages = {}
-						})
-					end
-				end
+function PlayerModalSelectorMenuConfig.onUpdateSelectedOption(p, p2, callback, p3)
+	if p.identifier then
+		local identifier = p.identifier
+
+		for _, playerObject in p2.playerObjects do
+			if identifier ~= playerObject.Name then
+				continue
 			end
+
+			local userId = playerObject.UserId
+			p3.analyticsDispatch({ type = Constants.AnalyticsActions.IncrementPersonChanged })
+			callback({
+				type = Constants.PlayerMenuActions.UpdateAbuser,
+				abuseId = userId,
+				abuser = playerObject
+			})
 		end
 	end
-}
+end
+
+PlayerModalSelectorMenuConfig.fieldLabel = "WhichPerson"
+PlayerModalSelectorMenuConfig.componentName = "PlayerSelector"
+return PlayerModalSelectorMenuConfig

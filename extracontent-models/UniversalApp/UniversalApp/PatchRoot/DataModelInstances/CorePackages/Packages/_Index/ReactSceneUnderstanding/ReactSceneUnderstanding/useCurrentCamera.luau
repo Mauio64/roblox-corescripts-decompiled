@@ -1,38 +1,34 @@
 local ReactSceneUnderstanding = script:FindFirstAncestor("ReactSceneUnderstanding")
+
 local React = require(ReactSceneUnderstanding.Parent.React)
+
 local useState = React.useState
 local useCallback = React.useCallback
 local useEffect = React.useEffect
-local Camera = Instance.new("Camera")
 
-local function useCurrentCamera() -- line: 11
-	-- upvalues: useState (copy), useCallback (copy), useEffect (copy), Camera (copy)
-	local v8, v9 = useState(nil)
-	local v10 = useCallback(function() -- line: 14
-		-- upvalues: v8 (copy), v9 (copy)
-		local CurrentCamera = workspace.CurrentCamera
+local camera = Instance.new("Camera")
 
-		if CurrentCamera and CurrentCamera ~= v8 then
-			v9(CurrentCamera)
+local function useCurrentCamera()
+	local state, setState = useState(nil)
+
+	local v = useCallback(function()
+		local currentCamera = workspace.CurrentCamera
+
+		if currentCamera and currentCamera ~= state then
+			setState(currentCamera)
 		end
-	end, { v8 })
+	end, { state })
 
-	useEffect(function() -- line: 21
-		-- upvalues: v10 (copy)
-		local connection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(v10)
+	useEffect(function()
+		local currentCameraChangedConnection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(v)
 
-		return function() -- line: 24
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			currentCameraChangedConnection:Disconnect()
 		end
-	end, { v10 })
-	useEffect(v10, {})
+	end, { v })
 
-	if v8 then
-		return v8
-	end
-
-	return Camera
+	useEffect(v, {})
+	return state or camera
 end
 
 return useCurrentCamera

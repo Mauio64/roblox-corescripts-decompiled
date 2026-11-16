@@ -1,69 +1,176 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local MomentsCommon = require(MomentsParent.MomentsCommon)
+local parent = Moments.Parent
 
-require(MomentsParent.MomentsTypes)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.MomentsTypes)
+local SharedFlags = require(parent.SharedFlags)
+
 require(Moments.Components.Feed)
-
+local Analytics = MomentsCommon.Analytics
 local RecommendationSource = MomentsCommon.Analytics.RecommendationSource
-local MomentsGetMomentsUserStore = require(MomentsParent.DataHydration.MomentsGetMomentsUserStore)
 
-require(MomentsParent.DataHydration.MomentsStoreTypes)
-
+local MomentsGetMomentsUserStore = require(parent.DataHydration.MomentsGetMomentsUserStore)
+local MomentsGetPostAssetStore = require(parent.DataHydration.MomentsGetPostAssetStore)
+require(parent.DataHydration.MomentsStoreTypes)
+local createPendingFeedGetter = require(script.Parent.createPendingFeedGetter)
+local hydrateAvatarMomentFeedItems = require(script.Parent.hydrateAvatarMomentFeedItems)
 local shouldShowMomentInFeed = require(script.Parent.shouldShowMomentInFeed)
+local reportUnavailableFeedItem = require(script.Parent.reportUnavailableFeedItem)
 local GetReactionsStore = require(Moments.Stores.GetReactionsStore)
 local GetShareCountsStore = require(Moments.Stores.GetShareCountsStore)
 local GetDeletedMomentsStore = require(Moments.Stores.GetDeletedMomentsStore)
-local FFlagProfileMomentsOrderingAndReactions = require(MomentsParent.SharedFlags).FFlagProfileMomentsOrderingAndReactions
-local FFlagMomentsRemoveDeletedFromProfile = require(MomentsParent.SharedFlags).FFlagMomentsRemoveDeletedFromProfile
-local GetFFlagMomentsFilterUnavailableFeedItems = require(Moments.Flags.GetFFlagMomentsFilterUnavailableFeedItems)
+local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
+local FFlagMomentsRemoveDeletedFromProfile = SharedFlags.FFlagMomentsRemoveDeletedFromProfile
+local FFlagMomentsComments = SharedFlags.FFlagMomentsComments
+local FFlagProfileRenderAvatarMoments = SharedFlags.FFlagProfileRenderAvatarMoments
+local MomentsGetMomentsCommentsStore
 
-local function createUserMomentsFeedSource(n1: number, t1: {[any]: any}?) -- line: 36
-	-- upvalues: MomentsGetMomentsUserStore (copy), RecommendationSource (copy), FFlagProfileMomentsOrderingAndReactions (copy), GetReactionsStore (copy), GetShareCountsStore (copy), FFlagMomentsRemoveDeletedFromProfile (copy), GetDeletedMomentsStore (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), shouldShowMomentInFeed (copy)
-	local v16 = t1 or {}
-	local v17 = if v16.userStore == nil then MomentsGetMomentsUserStore(false) else v16.userStore
-	local initialIndex = v16.initialIndex
+if FFlagMomentsComments then
+	MomentsGetMomentsCommentsStore = require(parent.DataHydration.MomentsGetMomentsCommentsStore)
+else
+	MomentsGetMomentsCommentsStore = nil
+end
 
-	return {
-		id = `profile:{ n1 }`,
-		recommendationSource = RecommendationSource.Profile,
-		fetchAsync = function(p1) -- line: 45
-			-- upvalues: v17 (copy), n1 (copy), FFlagProfileMomentsOrderingAndReactions (copy), GetReactionsStore (copy), GetShareCountsStore (copy), FFlagMomentsRemoveDeletedFromProfile (copy), GetDeletedMomentsStore (copy), GetFFlagMomentsFilterUnavailableFeedItems (copy), shouldShowMomentInFeed (copy), initialIndex (copy)
-			local t2 = {}
-			local v21 = p1 == nil
+local function createUserMomentsFeedSource(p: number, options)
+	local v = options or {}
+	local v2
 
-			repeat
-				local v22, v23 = v17.getUserMoments(n1, p1):await()
+	if v.userStore == nil then
+		v2 = MomentsGetMomentsUserStore(false)
+	else
+		v2 = v.userStore
+	end
 
-				if not v22 then
-					error(v23)
-				end
+	local v3
 
-				if FFlagProfileMomentsOrderingAndReactions then
-					GetReactionsStore(false).setBatchReactionCounts(v23.reactionsByMomentId or {})
-					GetShareCountsStore(false).setBatchShareCounts(v23.shareInfoByMomentId or {})
-				end
+	if FFlagMomentsComments then
+		v3 = v.commentsStore
 
-				local v24 = if not FFlagMomentsRemoveDeletedFromProfile then nil else GetDeletedMomentsStore(false).getDeletedIds(false)
-
-				for _, v26 in v23.moments do
-					if (v24 == nil or table.find(v24, v26.momentId) == nil) and (not GetFFlagMomentsFilterUnavailableFeedItems() or shouldShowMomentInFeed(v26)) then
-						table.insert(t2, {
-							kind = "moment",
-							moment = v26
-						})
-					end
-				end
-
-				p1 = v23.nextCursor
-			until not v21 or (initialIndex == nil or (not (#t2 < initialIndex) or p1 == nil))
-
-			return {
-				items = t2,
-				nextCursor = p1
-			}
+		if v3 == nil and MomentsGetMomentsCommentsStore ~= nil then
+			v3 = MomentsGetMomentsCommentsStore(false)
 		end
+	else
+		v3 = nil
+	end
+
+	local initialIndex = v.initialIndex
+
+	local userMomentsFeedSource = {
+		id = `profile:{p}`,
+		initialMomentId = 0,
+		getPendingItems = 0,
+		recommendationSource = 0,
+		fetchAsync = 0
 	}
+	local initialMomentId
+
+	if FFlagMomentsOptimisticProfilePending then
+		initialMomentId = v.initialMomentId
+	end
+
+	userMomentsFeedSource.initialMomentId = initialMomentId
+	local getPendingItems
+
+	if FFlagMomentsOptimisticProfilePending then
+		getPendingItems = createPendingFeedGetter(p, v2)
+	end
+
+	userMomentsFeedSource.getPendingItems = getPendingItems
+
+	userMomentsFeedSource.recommendationSource = RecommendationSource.Profile
+
+	function userMomentsFeedSource.fetchAsync(nextCursor)
+		local v4
+
+		if v3 == nil then
+			v4 = nil
+		else
+			v4 = v3.getOwnerGeneration(false)
+		end
+
+		local comments = nil
+		local items = {}
+
+		local flag = nextCursor == nil
+
+		repeat
+			local v5, v6 = v2.getUserMoments(p, nextCursor):await()
+
+			if not v5 then
+				error(v6)
+			end
+
+			if v6.commentsByFeedItemId ~= nil then
+				comments = comments or {}
+
+				for k, comment in v6.commentsByFeedItemId do
+					comments[k] = comment
+				end
+			end
+
+			GetReactionsStore(false).setBatchReactionCounts(v6.reactionsByMomentId or {})
+			GetShareCountsStore(false).setBatchShareCounts(v6.shareInfoByMomentId or {})
+			local v7
+
+			if FFlagMomentsRemoveDeletedFromProfile or FFlagMomentsOptimisticProfilePending then
+				v7 = GetDeletedMomentsStore(false).getDeletedIds(false)
+			end
+
+			for _, moment in v6.moments do
+				Analytics.reportMomentsFeedItemsReceived(RecommendationSource.Profile)
+				local v8
+
+				if v7 == nil then
+					v8 = false
+				else
+					v8 = table.find(v7, moment.momentId) ~= nil
+				end
+
+				local v9 = shouldShowMomentInFeed(moment)
+
+				if v8 or not v9 then
+					if v8 then
+						Analytics.reportMomentsFeedItemFiltered("deleted", RecommendationSource.Profile)
+					else
+						reportUnavailableFeedItem(moment, RecommendationSource.Profile)
+					end
+				else
+					table.insert(items, { kind = "moment", moment = moment })
+				end
+			end
+
+			nextCursor = v6.nextCursor
+			local v8
+
+			if flag then
+				if initialIndex == nil or not (#items < initialIndex) then
+					v8 = false
+				else
+					v8 = nextCursor ~= nil
+				end
+			else
+				v8 = flag
+			end
+		until not v8
+
+		if FFlagProfileRenderAvatarMoments then
+			items = hydrateAvatarMomentFeedItems(items, v.postAssetStore or MomentsGetPostAssetStore(false))
+		end
+
+		local onAccepted
+
+		if FFlagMomentsComments and v3 ~= nil and v4 ~= nil and comments ~= nil then
+			local v5 = v3
+
+			onAccepted = function()
+				v5.upsertMomentComments(comments, v4)
+			end
+		end
+
+		return { items = items, nextCursor = nextCursor, onAccepted = onAccepted }
+	end
+
+	return userMomentsFeedSource
 end
 
 return createUserMomentsFeedSource

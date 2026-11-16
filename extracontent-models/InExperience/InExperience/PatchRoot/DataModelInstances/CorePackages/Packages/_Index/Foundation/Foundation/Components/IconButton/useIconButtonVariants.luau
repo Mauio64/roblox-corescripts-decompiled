@@ -1,4 +1,5 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+
 local InputSize = require(Foundation.Enums.InputSize)
 
 require(Foundation.Enums.ButtonVariant)
@@ -14,50 +15,57 @@ require(Foundation.Providers.Style.Tokens)
 
 local getSharedVariants = require(Foundation.Components.Button.getSharedVariants)
 
-local function v7(p1) -- line: 41
-	-- upvalues: getSharedVariants (copy), InputSize (copy)
-	local v9 = getSharedVariants(p1)
-	local t1 = {
-		[InputSize.XSmall] = {
-			container = {
-				radius = v9.sizes[InputSize.XSmall].container.radius,
-				size = UDim2.fromOffset(v9.sizes[InputSize.XSmall].container.height, v9.sizes[InputSize.XSmall].container.height),
-				padding = UDim.new(0, p1.Size.Size_150)
-			}
-		},
-		[InputSize.Small] = {
-			container = {
-				radius = v9.sizes[InputSize.Small].container.radius,
-				size = UDim2.fromOffset(v9.sizes[InputSize.Small].container.height, v9.sizes[InputSize.Small].container.height),
-				padding = UDim.new(0, p1.Size.Size_200)
-			}
-		},
-		[InputSize.Medium] = {
-			container = {
-				radius = v9.sizes[InputSize.Medium].container.radius,
-				size = UDim2.fromOffset(v9.sizes[InputSize.Medium].container.height, v9.sizes[InputSize.Medium].container.height),
-				padding = UDim.new(0, p1.Size.Size_250)
-			}
-		},
-		[InputSize.Large] = {
-			container = {
-				radius = v9.sizes[InputSize.Large].container.radius,
-				size = UDim2.fromOffset(v9.sizes[InputSize.Large].container.height, v9.sizes[InputSize.Large].container.height),
-				padding = UDim.new(0, p1.Size.Size_300)
-			}
-		}
-	}
-
+local function fn(p)
+	local sharedVariants = getSharedVariants(p)
 	return {
 		common = {},
-		sizes = t1,
-		types = v9.types
+		sizes = {
+			[InputSize.XSmall] = {
+				container = {
+					radius = sharedVariants.sizes[InputSize.XSmall].container.radius,
+					size = UDim2.fromOffset(
+						sharedVariants.sizes[InputSize.XSmall].container.height,
+						sharedVariants.sizes[InputSize.XSmall].container.height
+					),
+					padding = UDim.new(0, p.Size.Size_150)
+				}
+			},
+			[InputSize.Small] = {
+				container = {
+					radius = sharedVariants.sizes[InputSize.Small].container.radius,
+					size = UDim2.fromOffset(
+						sharedVariants.sizes[InputSize.Small].container.height,
+						sharedVariants.sizes[InputSize.Small].container.height
+					),
+					padding = UDim.new(0, p.Size.Size_200)
+				}
+			},
+			[InputSize.Medium] = {
+				container = {
+					radius = sharedVariants.sizes[InputSize.Medium].container.radius,
+					size = UDim2.fromOffset(
+						sharedVariants.sizes[InputSize.Medium].container.height,
+						sharedVariants.sizes[InputSize.Medium].container.height
+					),
+					padding = UDim.new(0, p.Size.Size_250)
+				}
+			},
+			[InputSize.Large] = {
+				container = {
+					radius = sharedVariants.sizes[InputSize.Large].container.radius,
+					size = UDim2.fromOffset(
+						sharedVariants.sizes[InputSize.Large].container.height,
+						sharedVariants.sizes[InputSize.Large].container.height
+					),
+					padding = UDim.new(0, p.Size.Size_300)
+				}
+			}
+		},
+		types = sharedVariants.types
 	}
 end
 
-return function(p2, p3, p4, p5) -- line: 92
-	-- upvalues: VariantsContext (copy), v7 (copy), composeStyleVariant (copy), ColorNamespace (copy)
-	local v15 = VariantsContext.useVariants("IconButton", v7, p2)
-
-	return composeStyleVariant(v15.common, v15.sizes[p3], v15.types[p4][p5 or ColorNamespace.Color])
+return function(p, p2, p3, p4)
+	local v = VariantsContext.useVariants("IconButton", fn, p)
+	return composeStyleVariant(v.common, v.sizes[p2], v.types[p3][p4 or ColorNamespace.Color])
 end

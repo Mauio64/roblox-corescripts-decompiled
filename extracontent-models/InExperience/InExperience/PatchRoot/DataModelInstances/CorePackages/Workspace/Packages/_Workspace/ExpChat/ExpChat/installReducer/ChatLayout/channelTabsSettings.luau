@@ -1,12 +1,16 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Rodux = require(ExpChatParent.Rodux)
-local Dictionary = require(ExpChatParent.llama).Dictionary
+local parent = ExpChat.Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+
 local Config = require(ExpChat.Config)
+
 local Actions = ExpChat.Actions
 local ConfigurationObjectsLoaded = require(Actions.ConfigurationObjectsLoaded)
 local ChannelTabsSettingsChanged = require(Actions.ChannelTabsSettingsChanged)
-local t1 = {
+
+local v = {
 	BackgroundTransparency = Config.ChannelTabsSettings.BackgroundTransparency,
 	BackgroundColor3 = Config.ChannelTabsSettings.BackgroundColor3,
 	HoverBackgroundColor3 = Config.ChannelTabsSettings.HoverBackgroundColor3,
@@ -18,19 +22,15 @@ local t1 = {
 	TextStrokeTransparency = Config.ChannelTabsSettings.TextStrokeTransparency
 }
 
-return Rodux.createReducer(t1, {
-	[ConfigurationObjectsLoaded.name] = function(p1, p2) -- line: 25
-		-- upvalues: Dictionary (copy)
-		return Dictionary.join(p1, p2.channelTabsSettings)
+return Rodux.createReducer(v, {
+	[ConfigurationObjectsLoaded.name] = function(p, p2)
+		return dictionary.join(p, p2.channelTabsSettings)
 	end,
-	[ChannelTabsSettingsChanged.name] = function(p3, p4) -- line: 29
-		-- upvalues: Dictionary (copy)
-		if not p3[p4.property] then
-			return p3
+	[ChannelTabsSettingsChanged.name] = function(p, p2)
+		if not p[p2.property] then
+			return p
 		end
 
-		return Dictionary.join(p3, {
-			[p4.property] = p4.value
-		})
+		return dictionary.join(p, { [p2.property] = p2.value })
 	end
 })

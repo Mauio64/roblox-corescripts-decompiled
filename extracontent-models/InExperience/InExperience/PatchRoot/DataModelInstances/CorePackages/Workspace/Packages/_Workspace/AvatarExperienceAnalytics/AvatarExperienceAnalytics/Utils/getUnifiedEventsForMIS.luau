@@ -1,106 +1,259 @@
 local AvatarExperienceAnalytics = script:FindFirstAncestor("AvatarExperienceAnalytics")
+local parent = AvatarExperienceAnalytics.Parent
+
+require(parent.AvatarExperienceCommon)
+local Cryo = require(parent.Cryo)
+
 local CartIdService = require(AvatarExperienceAnalytics.Lib.CartIdService)
+
 local UnifiedEventLogEnums = require(AvatarExperienceAnalytics.UnifiedEventLogEnums)
+local getMarketplaceUnifiedAssetType = require(AvatarExperienceAnalytics.Utils.getMarketplaceUnifiedAssetType)
+local getMarketplaceUnifiedBundleType = require(AvatarExperienceAnalytics.Utils.getMarketplaceUnifiedBundleType)
+local getWidgetAttributionFields = require(AvatarExperienceAnalytics.Utils.getWidgetAttributionFields)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXUnifiedEventStrictPayloads = AvatarExperienceFlags.FFlagAXUnifiedEventStrictPayloads
 
-return function(p1, p2, p3, p4, p5) -- line: 13
-	-- upvalues: CartIdService (copy), UnifiedEventLogEnums (copy)
-	local n1 = 0
-	local t1 = {}
-	local t2 = {}
-	local n2 = 0
-	local t3 = {}
-	local t4 = {}
-	local t5 = {}
+local function appendMISPrefixToCartId(p: string) -- 3 equivalent calls inferred from this helper
+	return "MIS_" .. p
+end
 
-	for _, v17 in p1 do
-		if p3 and (p3.lookAssetInfos[v17.itemId] or p3.lookBundleInfos[v17.itemId]) then
-			if p3.lookAssetInfos[v17.itemId] then
-				table.insert(t1, v17.itemId)
-				n1 += v17.priceInRobux
-			elseif p3.lookBundleInfos[v17.itemId] then
-				table.insert(t2, v17.itemId)
-				n1 += v17.priceInRobux
+return function(items, items2, data, data2, action, surface: number?, p, p2)
+	local itemIds = {}
+	local total = 0
+	local itemIds2 = {}
+
+	local itemIds3 = {}
+	local total2 = 0
+	local itemIds4 = {}
+
+	local result = {}
+
+	local result2 = {}
+
+	for _, item in items do
+		if data and (data.lookAssetInfos[item.itemId] or data.lookBundleInfos[item.itemId]) then
+			if data.lookAssetInfos[item.itemId] then
+				table.insert(itemIds, item.itemId)
+
+				total += item.priceInRobux
+			elseif data.lookBundleInfos[item.itemId] then
+				table.insert(itemIds2, item.itemId)
+
+				total += item.priceInRobux
 			end
-		elseif p4 and (p4.lookAssetInfos[v17.itemId] or p4.lookBundleInfos[v17.itemId]) then
-			if p4.lookAssetInfos[v17.itemId] then
-				table.insert(t3, v17.itemId)
-				n2 += v17.priceInRobux
-			elseif p4.lookBundleInfos[v17.itemId] then
-				table.insert(t4, v17.itemId)
-				n2 += v17.priceInRobux
+		elseif data2 and (data2.lookAssetInfos[item.itemId] or data2.lookBundleInfos[item.itemId]) then
+			if data2.lookAssetInfos[item.itemId] then
+				table.insert(itemIds3, item.itemId)
+
+				total2 += item.priceInRobux
+			elseif data2.lookBundleInfos[item.itemId] then
+				table.insert(itemIds4, item.itemId)
+
+				total2 += item.priceInRobux
 			end
 		else
-			local v18 = nil
+			local v = nil
 
-			for _, v20 in p2 do
-				if v20.itemId == v17.itemId and v20.itemType == v17.itemType then
-					v18 = v20
-
+			for _, item2 in items2 do
+				if item2.itemId == item.itemId and item2.itemType == item.itemType then
+					v = item2
 					break
 				end
 			end
 
-			table.insert(t5, {
-				cartId = CartIdService.getCartId(),
-				action = p5,
-				itemId = v17.itemId,
-				itemType = if v17.itemType ~= "Asset" then UnifiedEventLogEnums.MarketplaceUnifiedItemType.BUNDLE else UnifiedEventLogEnums.MarketplaceUnifiedItemType.ASSET,
-				assetType = if v17.itemType ~= "Asset" then nil else v17.itemSubType,
-				bundleType = if v17.itemType ~= "Bundle" then nil else v17.itemSubType,
-				widgetId = if not v18.widgetInfo then nil else v18.widgetInfo.widgetId,
-				widgetType = if not v18.widgetInfo then nil else v18.widgetInfo.widgetType,
-				widgetItemPrice = if not v18.widgetInfo then nil else v17.priceInRobux,
-				organicItemPrice = if not v18.widgetInfo then v17.priceInRobux else nil,
-				status = v17.status
-			})
+			local v2 = {
+				cartId = appendMISPrefixToCartId(CartIdService.getCartId()), -- inferred equivalent call
+				action = action,
+				itemId = item.itemId,
+				itemType = 0,
+				surface = 0,
+				assetType = 0,
+				bundleType = 0,
+				widgetId = 0,
+				widgetType = 0,
+				widgetItemPrice = 0,
+				organicItemPrice = 0,
+				status = 0
+			}
+			local itemType
+
+			if item.itemType == "Asset" then
+				itemType = UnifiedEventLogEnums.MarketplaceUnifiedItemType.ASSET
+			else
+				itemType = UnifiedEventLogEnums.MarketplaceUnifiedItemType.BUNDLE
+			end
+
+			v2.itemType = itemType
+			local surface2
+
+			if FFlagAXUnifiedEventStrictPayloads then
+				surface2 = surface
+			end
+
+			v2.surface = surface2
+			local assetType
+
+			if item.itemType == "Asset" then
+				if FFlagAXUnifiedEventStrictPayloads then
+					assetType = getMarketplaceUnifiedAssetType(item.itemSubType)
+				else
+					assetType = item.itemSubType
+				end
+			end
+
+			v2.assetType = assetType
+			local bundleType
+
+			if item.itemType == "Bundle" then
+				if FFlagAXUnifiedEventStrictPayloads then
+					bundleType = getMarketplaceUnifiedBundleType(item.itemSubType)
+				else
+					bundleType = item.itemSubType
+				end
+			end
+
+			v2.bundleType = bundleType
+			local widgetId
+
+			if v.widgetInfo then
+				widgetId = v.widgetInfo.widgetId
+			end
+
+			v2.widgetId = widgetId
+			local widgetType
+
+			if v.widgetInfo then
+				widgetType = v.widgetInfo.widgetType
+			end
+
+			v2.widgetType = widgetType
+			local widgetItemPrice
+
+			if v.widgetInfo then
+				widgetItemPrice = item.priceInRobux
+			end
+
+			v2.widgetItemPrice = widgetItemPrice
+			local organicItemPrice
+
+			if not v.widgetInfo then
+				organicItemPrice = item.priceInRobux
+			end
+
+			v2.organicItemPrice = organicItemPrice
+			v2.status = item.status
+			table.insert(result, v2)
+			local v3
+
+			if FFlagAXUnifiedEventStrictPayloads then
+				v3 = getWidgetAttributionFields(v.widgetInfo)
+			end
+
+			if v3 then
+				local v4 = #result
+				local join = Cryo.Dictionary.join
+				local widgetAssetType
+
+				if item.itemType == "Asset" then
+					widgetAssetType = getMarketplaceUnifiedAssetType(item.itemSubType)
+				end
+
+				local widgetBundleType
+
+				if item.itemType == "Bundle" then
+					widgetBundleType = getMarketplaceUnifiedBundleType(item.itemSubType)
+				end
+
+				result2[v4] = join(v3, {
+					widgetAssetType = widgetAssetType,
+					widgetBundleType = widgetBundleType
+				})
+			end
 		end
 	end
 
-	if #t1 > 0 or #t2 > 0 then
-		local v21 = not (#t1 > 0) and "" or table.concat(t1, ",")
-		local v22 = not (#t2 > 0) and "" or table.concat(t2, ",")
-		local t6 = {
-			cartId = CartIdService.getCartId(),
-			action = p5,
-			itemId = p3.itemId,
-			itemType = UnifiedEventLogEnums.MarketplaceUnifiedItemType.LOOK
+	if #itemIds > 0 or #itemIds2 > 0 then
+		local v = not (#itemIds > 0) and "" or table.concat(itemIds, ",")
+		local v2 = not (#itemIds2 > 0) and "" or table.concat(itemIds2, ",")
+
+		local v3 = {
+			cartId = appendMISPrefixToCartId(CartIdService.getCartId()), -- inferred equivalent call
+			action = action,
+			itemId = data.itemId,
+			itemType = UnifiedEventLogEnums.MarketplaceUnifiedItemType.LOOK,
+			surface = 0
 		}
+		local surface2
 
-		if p3.isOrganicLook then
-			t6.organicAssetIds = v21
-			t6.organicBundleIds = v22
-			t6.organicItemPrice = n1
-		else
-			t6.assetIds = v21
-			t6.bundleIds = v22
-			t6.widgetItemPrice = n1
+		if FFlagAXUnifiedEventStrictPayloads then
+			surface2 = surface
 		end
 
-		table.insert(t5, t6)
-	end
+		v3.surface = surface2
 
-	if #t3 > 0 or #t4 > 0 then
-		local v24 = not (#t3 > 0) and "" or table.concat(t3, ",")
-		local v25 = not (#t4 > 0) and "" or table.concat(t4, ",")
-		local t7 = {
-			cartId = CartIdService.getCartId(),
-			action = p5,
-			itemId = p4.itemId,
-			itemType = UnifiedEventLogEnums.MarketplaceUnifiedItemType.LOOK
-		}
-
-		if p4.isOrganicLook then
-			t7.organicAssetIds = v24
-			t7.organicBundleIds = v25
-			t7.organicItemPrice = n2
+		if data.isOrganicLook then
+			v3.organicAssetIds = v
+			v3.organicBundleIds = v2
+			v3.organicItemPrice = total
 		else
-			t7.assetIds = v24
-			t7.bundleIds = v25
-			t7.widgetItemPrice = n2
+			v3.assetIds = v
+			v3.bundleIds = v2
+			v3.widgetItemPrice = total
 		end
 
-		table.insert(t5, t7)
+		table.insert(result, v3)
+		local v4
+
+		if FFlagAXUnifiedEventStrictPayloads and not data.isOrganicLook then
+			v4 = getWidgetAttributionFields(p)
+		end
+
+		if v4 then
+			result2[#result] = v4
+		end
 	end
 
-	return t5
+	if not (#itemIds3 > 0 or #itemIds4 > 0) then
+		return result, result2
+	end
+
+	local v = not (#itemIds3 > 0) and "" or table.concat(itemIds3, ",")
+	local v2 = not (#itemIds4 > 0) and "" or table.concat(itemIds4, ",")
+
+	local v3 = {
+		cartId = appendMISPrefixToCartId(CartIdService.getCartId()), -- inferred equivalent call
+		action = action,
+		itemId = data2.itemId,
+		itemType = UnifiedEventLogEnums.MarketplaceUnifiedItemType.LOOK,
+		surface = 0
+	}
+
+	if not FFlagAXUnifiedEventStrictPayloads then
+		surface = nil
+	end
+
+	v3.surface = surface
+
+	if data2.isOrganicLook then
+		v3.organicAssetIds = v
+		v3.organicBundleIds = v2
+		v3.organicItemPrice = total2
+	else
+		v3.assetIds = v
+		v3.bundleIds = v2
+		v3.widgetItemPrice = total2
+	end
+
+	table.insert(result, v3)
+	local v4
+
+	if FFlagAXUnifiedEventStrictPayloads and not data2.isOrganicLook then
+		v4 = getWidgetAttributionFields(p2)
+	end
+
+	if v4 then
+		result2[#result] = v4
+	end
+
+	return result, result2
 end

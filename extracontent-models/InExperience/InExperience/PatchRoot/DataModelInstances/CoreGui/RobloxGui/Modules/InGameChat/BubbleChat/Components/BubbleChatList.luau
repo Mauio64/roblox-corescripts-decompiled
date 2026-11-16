@@ -1,4 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Cryo = require(CorePackages.Packages.Cryo)
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
@@ -6,11 +7,12 @@ local t = require(CorePackages.Packages.t)
 local ChatBubble = require(script.Parent.ChatBubble)
 local Types = require(script.Parent.Parent.Types)
 
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 
-local v8 = Roact.Component:extend("BubbleChatList")
+local extended = Roact.Component:extend("BubbleChatList")
 
-v8.validateProps = t.strictInterface({
+extended.validateProps = t.strictInterface({
 	userId = t.string,
 	isVisible = t.optional(t.boolean),
 	theme = t.optional(t.string),
@@ -20,104 +22,97 @@ v8.validateProps = t.strictInterface({
 	insertSize = t.optional(t.Vector2),
 	messageIds = t.array(t.string)
 })
-v8.defaultProps = {
-	theme = "Light"
-}
 
-function v8.getDerivedStateFromProps(p1, p2) -- line: 32
-	-- upvalues: Cryo (copy)
-	local t1 = {}
+extended.defaultProps = { theme = "Light" }
+
+function extended.getDerivedStateFromProps(p, p2)
+	local bubbles = {}
 
 	if p2.bubbles then
-		for _, v in ipairs(p2.bubbles) do
-			if not Cryo.List.find(p1.messageIds, v.messageId) then
-				table.insert(t1, {
-					fadingOut = true,
-					messageId = v.messageId
-				})
+		for _, bubble in ipairs(p2.bubbles) do
+			if not Cryo.List.find(p.messageIds, bubble.messageId) then
+				table.insert(bubbles, { messageId = bubble.messageId, fadingOut = true })
 			end
 		end
 	end
 
-	for _, v in ipairs(p1.messageIds) do
-		table.insert(t1, {
-			fadingOut = false,
-			messageId = v
-		})
+	for _, messageId in ipairs(p.messageIds) do
+		table.insert(bubbles, { messageId = messageId, fadingOut = false })
 	end
 
-	return {
-		bubbles = t1
-	}
+	return { bubbles = bubbles }
 end
-function v8.init(p3, p4) -- line: 60
-	-- upvalues: Cryo (copy)
-	if (not p4.messageIds or #p4.messageIds == 0) and p4.onLastBubbleFadeOut then
-		p4.onLastBubbleFadeOut()
+
+function extended:init(p)
+	if (not p.messageIds or #p.messageIds == 0) and p.onLastBubbleFadeOut then
+		p.onLastBubbleFadeOut()
 	end
 
-	function p3.onBubbleFadeOut(p5) -- line: 67
-		-- upvalues: Cryo (copy), p3 (copy)
-		local v30 = Cryo.List.filter(p3.state.bubbles, function(p6) -- line: 68
-			-- upvalues: p5 (copy)
-			return p6.messageId ~= p5
+	function self.onBubbleFadeOut(p2)
+		local filtered = Cryo.List.filter(self.state.bubbles, function(p3): boolean
+			return p3.messageId ~= p2
 		end)
 
-		if #v30 == 0 and p3.props.onLastBubbleFadeOut then
-			p3.props.onLastBubbleFadeOut()
+		if #filtered == 0 and self.props.onLastBubbleFadeOut then
+			self.props.onLastBubbleFadeOut()
+		else
+			self:setState({ bubbles = filtered })
+		end
+	end
+end
 
-			return
+function extended.render(props)
+	local chatSettings = props.props.chatSettings
+	local children = {
+		["Layout"] = Roact.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Bottom,
+			Padding = UDim.new(0, chatSettings.BubblesSpacing)
+		}),
+		CaretPadding = chatSettings.TailVisible and props.props.showCarat and Roact.createElement("UIPadding", {
+			PaddingBottom = UDim.new(0, 8)
+		})
+	}
+
+	for i, bubble in ipairs(props.state.bubbles) do
+		local isMostRecent = i == #props.state.bubbles
+		local renderFirstInsert
+
+		if isMostRecent then
+			renderFirstInsert = props.props.renderFirstInsert or nil
 		end
 
-		p3:setState({
-			bubbles = v30
-		})
-	end
-end
-function v8.render(p7) -- line: 83
-	-- upvalues: Roact (copy), ChatBubble (copy)
-	local t2 = {}
-	local chatSettings = p7.props.chatSettings
+		local insertSize = props.props.insertSize
 
-	t2.Layout = Roact.createElement("UIListLayout", {
-		SortOrder = Enum.SortOrder.LayoutOrder,
-		HorizontalAlignment = Enum.HorizontalAlignment.Center,
-		VerticalAlignment = Enum.VerticalAlignment.Bottom,
-		Padding = UDim.new(0, chatSettings.BubblesSpacing)
-	})
-	t2.CaretPadding = chatSettings.TailVisible and (p7.props.showCarat and Roact.createElement("UIPadding", {
-		PaddingBottom = UDim.new(0, 8)
-	}))
-
-	for i, v in ipairs(p7.state.bubbles) do
-		local v24 = i == #p7.state.bubbles
-		local v25 = v24 and p7.props.renderFirstInsert or nil
-		local insertSize = p7.props.insertSize
-
-		t2["Bubble" .. v.messageId] = Roact.createElement(ChatBubble, {
-			messageId = v.messageId,
-			isMostRecent = v24,
-			theme = p7.props.theme,
-			fadingOut = v.fadingOut,
-			onFadeOut = p7.onBubbleFadeOut,
+		children["Bubble" .. bubble.messageId] = Roact.createElement(ChatBubble, {
+			messageId = bubble.messageId,
+			isMostRecent = isMostRecent,
+			theme = props.props.theme,
+			fadingOut = bubble.fadingOut,
+			onFadeOut = props.onBubbleFadeOut,
 			chatSettings = chatSettings,
-			renderInsert = v25,
+			renderInsert = renderFirstInsert,
 			insertSize = insertSize,
-			showCarat = p7.props.showCarat
+			showCarat = props.props.showCarat
 		})
 	end
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Visible = p7.props.isVisible,
-		Size = UDim2.fromScale(1, 1)
-	}, t2)
+	return Roact.createElement(
+		"Frame",
+		{
+			Visible = props.props.isVisible,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1
+		},
+		children
+	)
 end
 
-local function mapStateToProps(p8, p9) -- line: 127
+local function mapStateToProps(p, p2)
 	return {
-		messageIds = p8.userMessages[p9.userId] or {}
+		messageIds = p.userMessages[p2.userId] or {}
 	}
 end
 
-return RoactRodux.connect(mapStateToProps)(v8)
+return RoactRodux.connect(mapStateToProps)(extended)

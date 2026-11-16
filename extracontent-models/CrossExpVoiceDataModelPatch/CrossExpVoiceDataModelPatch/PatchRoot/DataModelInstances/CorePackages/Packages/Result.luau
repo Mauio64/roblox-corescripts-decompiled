@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index["lua-result"]["lua-result"]))
+local luaresult = require(index["lua-result"]["lua-result"])
+
+return luaresult

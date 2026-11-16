@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	"ThumbnailCharacterRotation",
 	"ThumbnailHorizontalOffset",
 	"ThumbnailKeyframe",
@@ -8,22 +8,18 @@ local t1 = {
 	"ThumbnailFieldOfView"
 }
 
-local function createEmoteSchema() -- line: 15
-	-- upvalues: t1 (copy)
-	local t2 = {
-		ClassName = "Animation",
-		_children = {}
-	}
+local function createEmoteSchema()
+	local emoteSchema = { ClassName = "Animation", _children = {} }
 
-	for _, v5 in t1 do
-		table.insert(t2._children, {
+	for _, name in v do
+		table.insert(emoteSchema._children, {
+			Name = name,
 			ClassName = "NumberValue",
-			_optional = true,
-			Name = v5
+			_optional = true
 		})
 	end
 
-	return t2
+	return emoteSchema
 end
 
 return createEmoteSchema

@@ -1,10 +1,7 @@
 local CorePackages = game:GetService("CorePackages")
-local scriptParent = script.Parent
+local parent = script.Parent
 local Rodux = require(CorePackages.Packages.Rodux)
-local FavoriteAssets = require(scriptParent.FavoriteAssets)
-local FavoriteBundles = require(scriptParent.FavoriteBundles)
+local FavoriteAssets = require(parent.FavoriteAssets)
+local FavoriteBundles = require(parent.FavoriteBundles)
 
-return Rodux.combineReducers({
-	assets = FavoriteAssets,
-	bundles = FavoriteBundles
-})
+return Rodux.combineReducers({ assets = FavoriteAssets, bundles = FavoriteBundles })

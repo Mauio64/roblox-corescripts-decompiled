@@ -1,39 +1,32 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.LeaderboardStore)
+require(parent.LeaderboardStore)
 
-local function computeStatColumns(p1, n1: number) -- line: 19
-	if not p1 then
+local function computeStatColumns(p, p2: number)
+	if not p then
 		return {}
 	end
 
-	local t1 = {}
-
-	p1.iterateData(function(p2, p3) -- line: 25
-		-- upvalues: t1 (copy)
-		table.insert(t1, {
-			name = p2,
-			order = p3.order(false)
-		})
+	local v = {}
+	p.iterateData(function(name, p3)
+		table.insert(v, { name = name, order = p3.order(false) })
 	end, false)
-	table.sort(t1, function(p4, p5) -- line: 29
-		return p4.order < p5.order
+
+	table.sort(v, function(a, b): boolean
+		return a.order < b.order
 	end)
 
-	local t2 = {}
+	local result = {}
 
-	for i, v in ipairs(t1) do
-		if n1 < i then
-			return t2
+	for i, v2 in ipairs(v) do
+		if p2 < i then
+			break
 		end
 
-		table.insert(t2, {
-			name = v.name,
-			order = v.order
-		})
+		table.insert(result, { name = v2.name, order = v2.order })
 	end
 
-	return t2
+	return result
 end
 
 return computeStatColumns

@@ -1,43 +1,35 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local React = require(Parent.React)
-local useTriggerFeedback = require(Parent.InteractionFeedback).useTriggerFeedback
+local parent = script:FindFirstAncestor("GameCollections").Parent
+local React = require(parent.React)
 
-local function useTriggerGameTileFeedbackCallbacks() -- line: 8
-	-- upvalues: useTriggerFeedback (copy), React (copy)
-	local v5 = useTriggerFeedback()
-	local v6 = React.useRef(nil)
+local InteractionFeedback = require(parent.InteractionFeedback)
+local useTriggerFeedback = InteractionFeedback.useTriggerFeedback
 
-	return React.useCallback(function(p1) -- line: 11
-		-- upvalues: v6 (copy), v5 (copy)
-		local GuiState = p1.GuiState
+local function useTriggerGameTileFeedbackCallbacks()
+	local v = useTriggerFeedback()
+	local ref = React.useRef(nil)
+	return React.useCallback(function(p)
+		local guiState = p.GuiState
 
-		if v6.current == Enum.GuiState.Press then
-			v5("Default", "Release")
+		if ref.current == Enum.GuiState.Press then
+			v("Default", "Release")
 		end
 
-		if GuiState == Enum.GuiState.Hover then
-			v5("Default", "Hover")
+		if guiState == Enum.GuiState.Hover then
+			v("Default", "Hover")
 		end
 
-		if GuiState == Enum.GuiState.Press then
-			v5("Default", "Press")
+		if guiState == Enum.GuiState.Press then
+			v("Default", "Press")
 		end
 
-		v6.current = GuiState
-	end, {
-		v5,
-		v6
-	}), (React.useCallback(function() -- line: 25
-		-- upvalues: v6 (copy), v5 (copy)
-		if v6.current == Enum.GuiState.Press then
-			v5("Default", "Release")
+		ref.current = guiState
+	end, { v, ref }), (React.useCallback(function()
+		if ref.current == Enum.GuiState.Press then
+			v("Default", "Release")
 		end
 
-		v6.current = Enum.GuiState.Idle
-	end, {
-		v5,
-		v6
-	}))
+		ref.current = Enum.GuiState.Idle
+	end, { v, ref }))
 end
 
 return useTriggerGameTileFeedbackCallbacks

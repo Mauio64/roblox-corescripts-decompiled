@@ -1,80 +1,97 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local StyleRule = require(scriptParent.StyleRule)
+local parent2 = Foundation.Parent
+local React = require(parent2.React)
+local StyleRule = require(parent.StyleRule)
+require(parent.Rules.Types)
 
-require(scriptParent.Rules.Types)
+require(Foundation.Enums.ColorMode)
 require(Foundation.Enums.Device)
-
 local Flags = require(Foundation.Utility.Flags)
-
-require(Foundation.Enums.Theme)
-require(scriptParent.getOverrideAttributes)
-
+require(parent.getOverrideAttributes)
 local scaleValue = require(Foundation.Utility.scaleValue)
 
-local function insertRule(t1: {[any]: any}, p1, s1: string) -- line: 23
-	-- upvalues: React (copy), StyleRule (copy)
-	local properties = p1.properties
-	local v15 = "." .. s1
-	local v16 = p1.modifier == nil and "" or ":" .. p1.modifier
-	local v17 = v15 .. v16 .. (p1.pseudo == nil and "" or " ::" .. p1.pseudo)
+local function insertRule(list, props, p: string)
+	local properties = props.properties
 
-	if p1.pseudo ~= nil then
-		v17 ..= ", " .. v15 .. v16 .. " > " .. p1.pseudo
+	local v = "." .. p
+	local v2 = props.modifier == nil and "" or ":" .. props.modifier
+	local selector = v .. v2 .. (props.pseudo == nil and "" or " ::" .. props.pseudo)
+
+	if props.pseudoName ~= nil then
+		selector ..= " #" .. props.pseudoName
 	end
 
-	table.insert(t1, React.createElement(StyleRule, {
-		key = v17,
-		Priority = p1.priority,
-		Selector = v17,
-		properties = properties
-	}))
+	if props.pseudo ~= nil and props.pseudoName == nil then
+		selector ..= ", " .. v .. v2 .. " > " .. props.pseudo
+	end
+
+	table.insert(
+		list,
+		React.createElement(StyleRule, {
+			key = selector,
+			Priority = props.priority,
+			Selector = selector,
+			properties = properties
+		})
+	)
 end
-local function updateRuleAttributes(p2, t2: {[any]: any}?, t3: {[any]: any}, n1: number?, p3) -- line: 46
-	-- upvalues: Flags (copy), scaleValue (copy)
-	local v23 = t2 or {}
-	local v24 = if not Flags.FoundationDisableTokenScaling then n1 or 1 else 1
 
-	for _, v26 in v23 do
-		local v27 = if not p3 then nil else p3[v26.name]
-		local v28 = if v27 == nil then v26.value else v27
-		local v29 = scaleValue(v28, v24)
+local function updateRuleAttributes(instance, attributes, p, value: number?, p2)
+	local v = Flags.FoundationDisableTokenScaling and 1 or value or 1
 
-		if v29 ~= t3[v26.name] then
-			p2:SetAttribute(v26.name, v29)
-			t3[v26.name] = v29
+	for _, v2 in attributes or {} do
+		local v3
+
+		if p2 then
+			v3 = p2[v2.name]
 		end
+
+		if v3 == nil then
+			v3 = v2.value
+		end
+
+		local v4 = scaleValue(v3, v)
+
+		if p[v2.name] == v4 then
+			continue
+		end
+
+		instance:SetAttribute(v2.name, v4)
+		p[v2.name] = v4
 	end
 end
-local function createStyleSheetRules(t4: {[any]: any}, t5: {[any]: any}, p4, t6: {[any]: any}?, n2: number?, p5) -- line: 67
-	-- upvalues: updateRuleAttributes (copy), insertRule (copy)
-	local t7 = {}
 
-	for v37, _ in t5 do
-		local v39 = t4[v37]
+local function createStyleSheetRules(p, items, p2, p3, p4: number?, p5)
+	local styleSheetRules = {}
 
-		if v39 ~= nil then
-			if p4 and t6 then
-				updateRuleAttributes(p4, v39.attributes, t6, n2, p5)
+	for k, _ in items do
+		local v = p[k]
+
+		if v == nil then
+			continue
+		end
+
+		if p2 and p3 then
+			updateRuleAttributes(p2, v.attributes, p3, p4, p5)
+		end
+
+		insertRule(styleSheetRules, v, k)
+
+		if not v.children then
+			continue
+		end
+
+		for _, child in v.children do
+			if p2 and p3 then
+				updateRuleAttributes(p2, child.attributes, p3, p4, p5)
 			end
 
-			insertRule(t7, v39, v37)
-
-			if v39.children then
-				for _, v41 in v39.children do
-					if p4 and t6 then
-						updateRuleAttributes(p4, v41.attributes, t6, n2, p5)
-					end
-
-					insertRule(t7, v41, v41.tag)
-				end
-			end
+			insertRule(styleSheetRules, child, child.tag)
 		end
 	end
 
-	return t7
+	return styleSheetRules
 end
 
 return createStyleSheetRules

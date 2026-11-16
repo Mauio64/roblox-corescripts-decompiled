@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
 
-return require(Parent.SharedFlags).FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell
+local SharedFlags = require(parent.SharedFlags)
+return SharedFlags.FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell

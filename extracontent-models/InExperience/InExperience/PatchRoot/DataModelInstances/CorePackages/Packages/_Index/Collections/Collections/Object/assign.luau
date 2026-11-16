@@ -1,54 +1,55 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local None = require(scriptParent.None)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
 
-require(ParentParent.ES7Types)
+local None = require(parent.None)
+require(parent2.ES7Types)
 
-return function(p1, p2, p3, p4, ...) -- line: 30
-	-- upvalues: None (copy)
-	if p2 ~= nil and typeof(p2) == "table" then
-		for k, v in pairs(p2) do
-			if v == None then
-				p1[k] = nil
+return function(p, items, items2, items3, ...)
+	if items ~= nil and typeof(items) == "table" then
+		for k, item in pairs(items) do
+			if item == None then
+				p[k] = nil
 			else
-				p1[k] = v
+				p[k] = item
 			end
 		end
 	end
 
-	if p3 ~= nil and typeof(p3) == "table" then
-		for k, v in pairs(p3) do
-			if v == None then
-				p1[k] = nil
+	if items2 ~= nil and typeof(items2) == "table" then
+		for k, item in pairs(items2) do
+			if item == None then
+				p[k] = nil
 			else
-				p1[k] = v
+				p[k] = item
 			end
 		end
 	end
 
-	if p4 ~= nil and typeof(p4) == "table" then
-		for k, v in pairs(p4) do
-			if v == None then
-				p1[k] = nil
+	if items3 ~= nil and typeof(items3) == "table" then
+		for k, item in pairs(items3) do
+			if item == None then
+				p[k] = nil
 			else
-				p1[k] = v
+				p[k] = item
 			end
 		end
 	end
 
 	for i = 1, select("#", ...) do
-		local v15 = select(i, ...)
+		local v = select(i, ...)
 
-		if v15 ~= nil and typeof(v15) == "table" then
-			for k, v in pairs(v15) do
-				if v == None then
-					p1[k] = nil
-				else
-					p1[k] = v
-				end
+		if not (v ~= nil and typeof(v) == "table") then
+			continue
+		end
+
+		for k, v2 in pairs(v) do
+			if v2 == None then
+				p[k] = nil
+			else
+				p[k] = v2
 			end
 		end
 	end
 
-	return p1
+	return p
 end

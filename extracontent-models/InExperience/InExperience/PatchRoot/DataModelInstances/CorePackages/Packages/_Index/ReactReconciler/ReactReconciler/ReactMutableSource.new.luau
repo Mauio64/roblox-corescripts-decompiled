@@ -1,92 +1,80 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local console = require(ParentParent.Shared).console
-local t1 = {}
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
 
-require(ParentParent.Shared)
+local Shared = require(parent.Shared)
+local console = Shared.console
+
+local New = {}
+
+require(parent.Shared)
+
 require(script.Parent.ReactInternalTypes)
 
-local isPrimaryRenderer = require(script.Parent.ReactFiberHostConfig).isPrimaryRenderer
-local t2 = {}
-local t3 = nil
+local ReactFiberHostConfig = require(script.Parent.ReactFiberHostConfig)
+local isPrimaryRenderer = ReactFiberHostConfig.isPrimaryRenderer
 
-if ReactGlobals.__DEV__ then
-	t3 = {}
+local v = {}
+
+local v2 = ReactGlobals.__DEV__ and {} or nil
+
+function New.markSourceAsDirty(p)
+	table.insert(v, p)
 end
 
-function t1.markSourceAsDirty(p1) -- line: 39
-	-- upvalues: t2 (copy)
-	table.insert(t2, p1)
-end
-function t1.resetWorkInProgressVersions() -- line: 43
-	-- upvalues: t2 (copy), isPrimaryRenderer (copy)
-	for _, v10 in t2 do
+function New.resetWorkInProgressVersions()
+	for _, v3 in v do
 		if isPrimaryRenderer then
-			v10._workInProgressVersionPrimary = nil
+			v3._workInProgressVersionPrimary = nil
 		else
-			v10._workInProgressVersionSecondary = nil
+			v3._workInProgressVersionSecondary = nil
 		end
 	end
 
-	table.clear(t2)
+	table.clear(v)
 end
-function t1.getWorkInProgressVersion(p2) -- line: 54
-	-- upvalues: isPrimaryRenderer (copy)
+
+function New:getWorkInProgressVersion()
 	if isPrimaryRenderer then
-		return p2._workInProgressVersionPrimary
+		return self._workInProgressVersionPrimary
 	end
 
-	return p2._workInProgressVersionSecondary
+	return self._workInProgressVersionSecondary
 end
-function t1.setWorkInProgressVersion(p3, p4) -- line: 64
-	-- upvalues: isPrimaryRenderer (copy), t2 (copy)
+
+function New:setWorkInProgressVersion(p)
 	if isPrimaryRenderer then
-		p3._workInProgressVersionPrimary = p4
+		self._workInProgressVersionPrimary = p
 	else
-		p3._workInProgressVersionSecondary = p4
+		self._workInProgressVersionSecondary = p
 	end
 
-	table.insert(t2, p3)
+	table.insert(v, self)
 end
-function t1.warnAboutMultipleRenderersDEV(p5) -- line: 76
-	-- upvalues: ReactGlobals (copy), isPrimaryRenderer (copy), t3 (ref), console (copy)
+
+function New:warnAboutMultipleRenderersDEV()
 	if ReactGlobals.__DEV__ then
 		if isPrimaryRenderer then
-			if p5._currentPrimaryRenderer == nil then
-				p5._currentPrimaryRenderer = t3
-
-				return
-			end
-
-			if p5._currentPrimaryRenderer ~= t3 then
-				console.error("Detected multiple renderers concurrently rendering the same mutable source. This is currently unsupported.")
-
-				return
-			end
-		else
-			if p5._currentSecondaryRenderer == nil then
-				p5._currentSecondaryRenderer = t3
-
-				return
-			end
-
-			if p5._currentSecondaryRenderer ~= t3 then
+			if self._currentPrimaryRenderer == nil then
+				self._currentPrimaryRenderer = v2
+			elseif self._currentPrimaryRenderer ~= v2 then
 				console.error("Detected multiple renderers concurrently rendering the same mutable source. This is currently unsupported.")
 			end
+		elseif self._currentSecondaryRenderer == nil then
+			self._currentSecondaryRenderer = v2
+		elseif self._currentSecondaryRenderer ~= v2 then
+			console.error("Detected multiple renderers concurrently rendering the same mutable source. This is currently unsupported.")
 		end
 	end
 end
-function t1.registerMutableSourceForHydration(p6, p7) -- line: 104
-	local v17 = p7._getVersion(p7._source)
 
-	if p6.mutableSourceEagerHydrationData == nil then
-		p6.mutableSourceEagerHydrationData = {
-			p7,
-			v17
-		}
+function New:registerMutableSourceForHydration(p)
+	local version = p._getVersion(p._source)
 
+	if self.mutableSourceEagerHydrationData ~= nil then
 		return
 	end
+
+	self.mutableSourceEagerHydrationData = { p, version }
 end
 
-return t1
+return New

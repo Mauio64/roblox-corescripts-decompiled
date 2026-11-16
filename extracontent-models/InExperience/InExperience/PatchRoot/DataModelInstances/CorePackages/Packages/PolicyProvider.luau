@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.LuaRoactPolicyProvider.LuaRoactPolicyProvider))
+local LuaRoactPolicyProvider = require(index.LuaRoactPolicyProvider.LuaRoactPolicyProvider)
+
+return LuaRoactPolicyProvider

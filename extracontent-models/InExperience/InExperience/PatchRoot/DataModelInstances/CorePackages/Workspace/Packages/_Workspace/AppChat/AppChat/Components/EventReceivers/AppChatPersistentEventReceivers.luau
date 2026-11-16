@@ -1,61 +1,81 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+local React = require(parent.React)
+
 local AppChatAccountSettingsEventReceiver = require(script.Parent.AppChatAccountSettingsEventReceiver)
 local AppChatInterventionEventReceiver = require(script.Parent.AppChatInterventionEventReceiver)
 local AppChatThirdPartySettingsEventReceiver = require(script.Parent.AppChatThirdPartySettingsEventReceiver)
 local AppChatNotificationEventReceiver = require(script.Parent.AppChatNotificationEventReceiver)
 local AppChatRemoveThirdPartyRestriction = require(script.Parent.AppChatRemoveThirdPartyRestriction)
-local FFlagAppChatFriendsTabIxpEnabled = require(AppChat.Flags.FFlagAppChatFriendsTabIxpEnabled)
-local FriendsChatExperimentExposureEventReceiver = nil
 
-local function getFriendsChatExperimentExposureEventReceiver() -- line: 15
-	-- upvalues: FriendsChatExperimentExposureEventReceiver (ref)
-	if FriendsChatExperimentExposureEventReceiver == nil then
-		FriendsChatExperimentExposureEventReceiver = require(script.Parent.FriendsChatExperimentExposureEventReceiver)
+local FFlagAppChatFriendsTabIxpEnabled = require(AppChat.Flags.FFlagAppChatFriendsTabIxpEnabled)
+
+local friendsChatExperimentExposureEventReceiver = nil
+local function getFriendsChatExperimentExposureEventReceiver() -- 1 equivalent call inferred from this helper
+	if friendsChatExperimentExposureEventReceiver == nil then
+		local FriendsChatExperimentExposureEventReceiver = require(script.Parent.FriendsChatExperimentExposureEventReceiver)
+		friendsChatExperimentExposureEventReceiver = FriendsChatExperimentExposureEventReceiver
 	end
 
-	return FriendsChatExperimentExposureEventReceiver
+	return friendsChatExperimentExposureEventReceiver
 end
 
-local FFlagEnableShareSheet = require(AppChatParent.SharedFlags).FFlagEnableShareSheet
-local v13 = if not FFlagEnableShareSheet then nil else require(script.Parent.ExternalChatMessageSenderRegistration)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableShareSheet = SharedFlags.FFlagEnableShareSheet
+local ExternalChatMessageSenderRegistration
+
+if FFlagEnableShareSheet then
+	ExternalChatMessageSenderRegistration = require(script.Parent.ExternalChatMessageSenderRegistration)
+else
+	ExternalChatMessageSenderRegistration = nil
+end
+
 local ThirdPartyUserService = game:GetService("ThirdPartyUserService")
 
-local function AppChatPersistentEventReceivers(t1: {[any]: any}) -- line: 33
-	-- upvalues: React (copy), AppChatAccountSettingsEventReceiver (copy), AppChatInterventionEventReceiver (copy), ThirdPartyUserService (copy), AppChatThirdPartySettingsEventReceiver (copy), AppChatRemoveThirdPartyRestriction (copy), AppChatNotificationEventReceiver (copy), FFlagAppChatFriendsTabIxpEnabled (copy), FriendsChatExperimentExposureEventReceiver (ref), FFlagEnableShareSheet (copy), v13 (copy)
+local function AppChatPersistentEventReceivers(p)
 	local createElement = React.createElement
-	local Fragment = React.Fragment
-	local t2 = {
+	local fragment = React.Fragment
+	local children = {
 		accountSettings = React.createElement(AppChatAccountSettingsEventReceiver, {
-			isInExperience = t1.isInExperience
+			isInExperience = p.isInExperience
 		}),
 		intervention = React.createElement(AppChatInterventionEventReceiver, {}),
-		thirdPartySettings = React.createElement(if ThirdPartyUserService == nil or not ThirdPartyUserService:IsChatRestrictionSupported() then AppChatRemoveThirdPartyRestriction else AppChatThirdPartySettingsEventReceiver),
-		notification = React.createElement(AppChatNotificationEventReceiver, {
-			isInExperience = t1.isInExperience
-		})
+		thirdPartySettings = 0,
+		notification = 0,
+		friendsChatExperimentExposure = 0,
+		externalChatMessageSenderRegistration = 0
 	}
-	local v21
+	local createElement2 = React.createElement
+	local v
 
-	if FFlagAppChatFriendsTabIxpEnabled and t1.isInExperience then
-		local createElement2 = React.createElement
-
-		if FriendsChatExperimentExposureEventReceiver == nil then
-			FriendsChatExperimentExposureEventReceiver = require(script.Parent.FriendsChatExperimentExposureEventReceiver)
-		end
-
-		v21 = createElement2(FriendsChatExperimentExposureEventReceiver)
+	if ThirdPartyUserService == nil or not ThirdPartyUserService:IsChatRestrictionSupported() then
+		v = AppChatRemoveThirdPartyRestriction
 	else
-		v21 = nil
+		v = AppChatThirdPartySettingsEventReceiver
 	end
 
-	t2.friendsChatExperimentExposure = v21
-	t2.externalChatMessageSenderRegistration = if not FFlagEnableShareSheet then nil else React.createElement(v13, {
-		isInExperience = t1.isInExperience
-	})
+	children.thirdPartySettings = createElement2(v)
 
-	return createElement(Fragment, nil, t2)
+	children.notification = React.createElement(AppChatNotificationEventReceiver, {
+		isInExperience = p.isInExperience
+	})
+	local friendsChatExperimentExposure
+
+	if FFlagAppChatFriendsTabIxpEnabled and p.isInExperience then
+		friendsChatExperimentExposure = React.createElement(getFriendsChatExperimentExposureEventReceiver()) -- inferred equivalent call
+	end
+
+	children.friendsChatExperimentExposure = friendsChatExperimentExposure
+	local externalChatMessageSenderRegistration
+
+	if FFlagEnableShareSheet then
+		externalChatMessageSenderRegistration = React.createElement(ExternalChatMessageSenderRegistration, {
+			isInExperience = p.isInExperience
+		})
+	end
+
+	children.externalChatMessageSenderRegistration = externalChatMessageSenderRegistration
+	return createElement(fragment, nil, children)
 end
 
 return AppChatPersistentEventReceivers

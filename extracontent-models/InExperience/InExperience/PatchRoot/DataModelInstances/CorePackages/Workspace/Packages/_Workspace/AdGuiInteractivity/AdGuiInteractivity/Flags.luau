@@ -15,58 +15,75 @@ game:DefineFastFlag("EnableReportAdDropdown5", false)
 game:DefineFastInt("UniversalAppPolicyFailureTelemetryThrottleHundredthsPercent", 10000)
 game:DefineFastFlag("EnableHideReportAdModalDuringScreenshot2", false)
 game:DefineFastInt("AdGuiInteractivityPixelsPerStud", 50)
+local Flags = {}
 
-return {
-	GetFStringAdsVolumeOffImageLua = function() -- line: 20
-		return game:GetFastString("AdsVolumeOffImageLua")
-	end,
-	GetFStringAdsVolumeOnImageLua = function() -- line: 23
-		return game:GetFastString("AdsVolumeOnImageLua")
-	end,
-	GetFStringAdsEnterFullscreenImageLua = function() -- line: 26
-		return game:GetFastString("AdsEnterFullscreenImageLua")
-	end,
-	GetFStringAdsExitFullscreenImageLua = function() -- line: 29
-		return game:GetFastString("AdsExitFullscreenImageLua")
-	end,
-	GetFStringAdsEudsaPromptActiveImageLua = function() -- line: 32
-		return game:GetFastString("AdsEudsaPromptActiveImageLua")
-	end,
-	GetFStringAdsEudsaPromptInactiveImageLua = function() -- line: 35
-		return game:GetFastString("AdsEudsaPromptInactiveImageLua")
-	end,
-	GetFStringAdGuiPlayButtonImageLua = function() -- line: 38
-		return game:GetFastString("AdGuiPlayButtonImageLua")
-	end,
-	GetFStringAdGuiPauseButtonImageLua = function() -- line: 41
-		return game:GetFastString("AdGuiPauseButtonImageLua")
-	end,
-	GetFStringAdGuiCloseButtonImageLua = function() -- line: 44
-		return game:GetFastString("AdGuiCloseButtonImageLua")
-	end,
-	GetFStringAdGuiLivePreviewWatermark = function() -- line: 47
-		return game:GetFastString("AdGuiLivePreviewWatermark")
-	end,
-	GetFStringLivePreviewPlaceId = function() -- line: 50
-		return game:GetFastString("LivePreviewPlaceId")
-	end,
-	GetFFlagUseV2LivePreviewWatermark = function() -- line: 53
-		return game:GetFastFlag("UseV2LivePreviewWatermark")
-	end,
-	GetFStringAdGuiLivePreviewWatermarkV2 = function() -- line: 56
-		return game:GetFastString("AdGuiLivePreviewWatermarkV2")
-	end,
-	GetFFlagEnableReportAdDropdown = function() -- line: 59
-		return game:GetFastFlag("EnableReportAdDropdown5")
-	end,
-	FFlagFixReportAdInfoDuringRotation = game:DefineFastFlag("FixReportAdInfoDuringRotation", false),
-	GetFIntUniversalAppPolicyFailureTelemetryThrottleHundredthsPercent = function() -- line: 63
-		return game:GetFastInt("UniversalAppPolicyFailureTelemetryThrottleHundredthsPercent")
-	end,
-	GetEnableHideReportAdModalDuringScreenshot = function() -- line: 66
-		return game:GetFastFlag("EnableHideReportAdModalDuringScreenshot2")
-	end,
-	GetAdGuiInteractivityPixelsPerStud = function() -- line: 69
-		return game:GetFastInt("AdGuiInteractivityPixelsPerStud")
-	end
-}
+function Flags.GetFStringAdsVolumeOffImageLua()
+	return game:GetFastString("AdsVolumeOffImageLua")
+end
+
+function Flags.GetFStringAdsVolumeOnImageLua()
+	return game:GetFastString("AdsVolumeOnImageLua")
+end
+
+function Flags.GetFStringAdsEnterFullscreenImageLua()
+	return game:GetFastString("AdsEnterFullscreenImageLua")
+end
+
+function Flags.GetFStringAdsExitFullscreenImageLua()
+	return game:GetFastString("AdsExitFullscreenImageLua")
+end
+
+function Flags.GetFStringAdsEudsaPromptActiveImageLua()
+	return game:GetFastString("AdsEudsaPromptActiveImageLua")
+end
+
+function Flags.GetFStringAdsEudsaPromptInactiveImageLua()
+	return game:GetFastString("AdsEudsaPromptInactiveImageLua")
+end
+
+function Flags.GetFStringAdGuiPlayButtonImageLua()
+	return game:GetFastString("AdGuiPlayButtonImageLua")
+end
+
+function Flags.GetFStringAdGuiPauseButtonImageLua()
+	return game:GetFastString("AdGuiPauseButtonImageLua")
+end
+
+function Flags.GetFStringAdGuiCloseButtonImageLua()
+	return game:GetFastString("AdGuiCloseButtonImageLua")
+end
+
+function Flags.GetFStringAdGuiLivePreviewWatermark()
+	return game:GetFastString("AdGuiLivePreviewWatermark")
+end
+
+function Flags.GetFStringLivePreviewPlaceId()
+	return game:GetFastString("LivePreviewPlaceId")
+end
+
+function Flags.GetFFlagUseV2LivePreviewWatermark()
+	return game:GetFastFlag("UseV2LivePreviewWatermark")
+end
+
+function Flags.GetFStringAdGuiLivePreviewWatermarkV2()
+	return game:GetFastString("AdGuiLivePreviewWatermarkV2")
+end
+
+function Flags.GetFFlagEnableReportAdDropdown()
+	return game:GetFastFlag("EnableReportAdDropdown5")
+end
+
+Flags.FFlagFixReportAdInfoDuringRotation = game:DefineFastFlag("FixReportAdInfoDuringRotation", false)
+function Flags.GetFIntUniversalAppPolicyFailureTelemetryThrottleHundredthsPercent()
+	return game:GetFastInt("UniversalAppPolicyFailureTelemetryThrottleHundredthsPercent")
+end
+
+function Flags.GetEnableHideReportAdModalDuringScreenshot()
+	return game:GetFastFlag("EnableHideReportAdModalDuringScreenshot2")
+end
+
+function Flags.GetAdGuiInteractivityPixelsPerStud()
+	return game:GetFastInt("AdGuiInteractivityPixelsPerStud")
+end
+
+return Flags

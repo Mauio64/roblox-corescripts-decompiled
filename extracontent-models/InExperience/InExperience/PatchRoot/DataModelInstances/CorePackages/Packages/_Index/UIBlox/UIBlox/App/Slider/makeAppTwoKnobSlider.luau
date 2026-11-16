@@ -1,34 +1,30 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local Roact = require(scriptParentParentParentParent.Roact)
-local Cryo = require(scriptParentParentParentParent.Cryo)
-local t = require(scriptParentParentParentParent.t)
-local makeAppSlider = require(scriptParent.makeAppSlider)
-local withStyle = require(scriptParentParentParent.Core.Style.withStyle)
-local validateStyle = require(scriptParentParent.Style.Validator.validateStyle)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-local function wrapStyleAndRef(p1) -- line: 15
-	-- upvalues: Roact (copy), withStyle (copy), Cryo (copy)
-	return Roact.forwardRef(function(p2, p3) -- line: 16
-		-- upvalues: withStyle (copy), Cryo (copy), Roact (copy), p1 (copy)
-		return withStyle(function(p4) -- line: 17
-			-- upvalues: Cryo (copy), p2 (copy), p3 (copy), Roact (copy), p1 (copy)
-			local v24 = Cryo.Dictionary.join(p2, {
-				style = p4,
-				forwardedRef = p3
-			})
+local Roact = require(parent4.Roact)
+local Cryo = require(parent4.Cryo)
+local t = require(parent4.t)
 
-			return Roact.createElement(p1, v24)
+local makeAppSlider = require(parent.makeAppSlider)
+local withStyle = require(parent3.Core.Style.withStyle)
+local validateStyle = require(parent2.Style.Validator.validateStyle)
+
+local function wrapStyleAndRef(extended)
+	return Roact.forwardRef(function(p, forwardedRef)
+		return withStyle(function(style)
+			local joined = Cryo.Dictionary.join(p, { style = style, forwardedRef = forwardedRef })
+
+			return Roact.createElement(extended, joined)
 		end)
 	end)
 end
-local function makeAppTwoKnobSlider(p5) -- line: 28
-	-- upvalues: Roact (copy), makeAppSlider (copy), t (copy), validateStyle (copy), wrapStyleAndRef (copy)
-	local v15 = Roact.PureComponent:extend("TwoKnobAppSliderFor" .. p5)
-	local v16 = makeAppSlider(p5, true)
-	local v17 = t.strictInterface({
+
+local function makeAppTwoKnobSlider(p)
+	local extended = Roact.PureComponent:extend("TwoKnobAppSliderFor" .. p)
+	local appSlider = makeAppSlider(p, true)
+	local strictInterface = t.strictInterface({
 		lowerValue = t.number,
 		upperValue = t.number,
 		min = t.number,
@@ -50,26 +46,23 @@ local function makeAppTwoKnobSlider(p5) -- line: 28
 		style = validateStyle
 	})
 
-	local function valueValidator(p6) -- line: 76
-		if p6.lowerValue > p6.upperValue then
+	local function valueValidator(p2)
+		if p2.lowerValue > p2.upperValue then
 			return false, "The upper value must be greater than or equal to the lower"
 		end
 
 		return true
 	end
 
-	v15.validateProps = t.intersection(v17, valueValidator)
-	v15.defaultProps = {
-		stepInterval = 1,
-		width = UDim.new(1, 0)
-	}
+	extended.validateProps = t.intersection(strictInterface, valueValidator)
 
-	function v15.render(p7) -- line: 91
-		-- upvalues: Roact (copy), v16 (copy)
-		return Roact.createElement(v16, p7.props)
+	extended.defaultProps = { stepInterval = 1, width = UDim.new(1, 0) }
+
+	function extended.render(p2)
+		return Roact.createElement(appSlider, p2.props)
 	end
 
-	return wrapStyleAndRef(v15)
+	return wrapStyleAndRef(extended)
 end
 
 return makeAppTwoKnobSlider

@@ -1,14 +1,11 @@
-local Parent = script:FindFirstAncestor("EditProfile").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("EditProfile").Parent
+local React = require(parent.React)
 local EditProfileToast = require(script.Parent.EditProfileToast)
 
-local function EditProfileToastScreen(t1: {[any]: any}) -- line: 10
-	-- upvalues: React (copy), EditProfileToast (copy)
-	local v6 = t1.navigation.getParam("text", "")
+local function EditProfileToastScreen(p)
+	local param = p.navigation.getParam("text", "")
 
-	return React.createElement(EditProfileToast, {
-		text = v6
-	})
+	return React.createElement(EditProfileToast, { text = param })
 end
 
 return EditProfileToastScreen

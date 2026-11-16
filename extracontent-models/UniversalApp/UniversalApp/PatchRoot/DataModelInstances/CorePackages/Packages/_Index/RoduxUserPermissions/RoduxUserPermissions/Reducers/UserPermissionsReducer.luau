@@ -1,30 +1,24 @@
-local ParentParent = script.Parent.Parent
-local Types = ParentParent.Types
-local isPhoneVerified = require(ParentParent.Reducers.isPhoneVerified)
-local userSettings = require(ParentParent.Reducers.userSettings)
-local userSettingsMetadata = require(ParentParent.Reducers.userSettingsMetadata)
+local parent = script.Parent.Parent
+local types = parent.Types
+local isPhoneVerified = require(parent.Reducers.isPhoneVerified)
+local userSettings = require(parent.Reducers.userSettings)
+local userSettingsMetadata = require(parent.Reducers.userSettingsMetadata)
 
-require(Types.ReducerTypes)
+require(types.ReducerTypes)
 
-local t1 = {
-	isPhoneVerified = false,
-	userSettings = {},
-	userSettingsMetadata = {}
-}
+local v = { isPhoneVerified = false, userSettings = {}, userSettingsMetadata = {} }
 
-return function(p1) -- line: 15
-	-- upvalues: t1 (copy), isPhoneVerified (copy), userSettings (copy), userSettingsMetadata (copy)
-	return function(p2, p3) -- line: 16
-		-- upvalues: t1 (copy), isPhoneVerified (copy), p1 (copy), userSettings (copy), userSettingsMetadata (copy)
-		local v10 = p2 or t1
-		local v11 = isPhoneVerified(p1)
-		local v12 = userSettings(p1)
-		local v13 = userSettingsMetadata(p1)
+return function(p)
+	return function(p2, p3)
+		local v2 = p2 or v
+		local phoneVerified = isPhoneVerified(p)
+		local v3 = userSettings(p)
+		local v4 = userSettingsMetadata(p)
 
 		return {
-			isPhoneVerified = v11(v10.isPhoneVerified, p3),
-			userSettings = v12(v10.userSettings, p3),
-			userSettingsMetadata = v13(v10.userSettingsMetadata, p3)
+			isPhoneVerified = phoneVerified(v2.isPhoneVerified, p3),
+			userSettings = v3(v2.userSettings, p3),
+			userSettingsMetadata = v4(v2.userSettingsMetadata, p3)
 		}
 	end
 end

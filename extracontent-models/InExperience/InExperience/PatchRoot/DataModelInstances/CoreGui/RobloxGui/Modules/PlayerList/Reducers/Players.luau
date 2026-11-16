@@ -1,20 +1,19 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Rodux = require(CorePackages.Packages.Rodux)
 local Cryo = require(CorePackages.Packages.Cryo)
+
 local Actions = script.Parent.Parent.Actions
 local AddPlayer = require(Actions.AddPlayer)
 local RemovePlayer = require(Actions.RemovePlayer)
 
 return (Rodux.createReducer({}, {
-	[AddPlayer.name] = function(p1, p2) -- line: 11
-		-- upvalues: Cryo (copy)
-		return Cryo.List.join(p1, { p2.player })
+	[AddPlayer.name] = function(p, p2)
+		return Cryo.List.join(p, { p2.player })
 	end,
-	[RemovePlayer.name] = function(p3, p4) -- line: 15
-		-- upvalues: Cryo (copy)
-		return Cryo.List.filter(p3, function(p5) -- line: 16
-			-- upvalues: p4 (copy)
-			return p5 ~= p4.player
+	[RemovePlayer.name] = function(p, p2)
+		return Cryo.List.filter(p, function(p3): boolean
+			return p3 ~= p2.player
 		end)
 	end
 }))

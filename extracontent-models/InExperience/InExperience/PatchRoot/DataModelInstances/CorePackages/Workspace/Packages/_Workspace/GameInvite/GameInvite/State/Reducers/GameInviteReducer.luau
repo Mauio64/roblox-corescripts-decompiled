@@ -1,21 +1,39 @@
-local Parent = script:FindFirstAncestor("GameInvite").Parent
-local scriptParent = script.Parent
-local UserReducer = require(Parent.UserLib).Reducers.UserReducer
-local Rodux = require(Parent.Rodux)
-local FFlagUseSignalsForGameInvitesStatus = require(Parent.SharedFlags).FFlagUseSignalsForGameInvitesStatus
-local LegacyFriendsRodux = require(Parent.LegacyFriendsRodux)
-local ReducerDependencies = require(Parent.NotificationsCommon).ReducerDependencies
+local parent = script:FindFirstAncestor("GameInvite").Parent
+local parent2 = script.Parent
+local UserLib = require(parent.UserLib)
+local UserReducer = UserLib.Reducers.UserReducer
+local Rodux = require(parent.Rodux)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUseSignalsForGameInvitesStatus = SharedFlags.FFlagUseSignalsForGameInvitesStatus
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagRemoveUnusedFriendCountRoduxSlice = SharedFlags2.FFlagRemoveUnusedFriendCountRoduxSlice
+local LegacyFriendsRodux = require(parent.LegacyFriendsRodux)
+local NotificationsCommon = require(parent.NotificationsCommon)
+local ReducerDependencies = NotificationsCommon.ReducerDependencies
+
 local FriendCount = LegacyFriendsRodux.Reducers.FriendCount
-local Invites = require(scriptParent.Invites)
+
+local Invites = require(parent2.Invites)
+
 local RoduxNetworking = ReducerDependencies.RoduxNetworking
 local ShareLinksRodux = ReducerDependencies.ShareLinksRodux
-local v12 = RoduxNetworking.installReducer()
-local v13 = ShareLinksRodux.installReducer()
+local networkStatus = RoduxNetworking.installReducer()
+local shareLinks = ShareLinksRodux.installReducer()
 
-return Rodux.combineReducers({
+local combineReducers = Rodux.combineReducers
+
+if FFlagRemoveUnusedFriendCountRoduxSlice then
+	FriendCount = nil
+end
+
+if FFlagUseSignalsForGameInvitesStatus then
+	Invites = nil
+end
+
+return combineReducers({
 	FriendCount = FriendCount,
-	GameInvitesStatus = if not FFlagUseSignalsForGameInvitesStatus then Invites else nil,
+	GameInvitesStatus = Invites,
 	Users = UserReducer,
-	ShareLinks = v13,
-	NetworkStatus = v12
+	ShareLinks = shareLinks,
+	NetworkStatus = networkStatus
 })

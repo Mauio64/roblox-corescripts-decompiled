@@ -1,43 +1,37 @@
-local Parent = script:FindFirstAncestor("CollectionViews").Parent
-local React = require(Parent.React)
-local Signal = require(Parent.AppCommonLib).Signal
+local parent = script:FindFirstAncestor("CollectionViews").Parent
+local React = require(parent.React)
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
-local function useCollectionImpressionsSignal(p1) -- line: 18
-	-- upvalues: React (copy), Signal (copy)
-	local v6 = React.useRef(nil)
+local function useCollectionImpressionsSignal(object)
+	local ref = React.useRef(nil)
 
-	if v6.current == nil then
-		v6.current = Signal.new()
+	if ref.current == nil then
+		ref.current = Signal.new()
 	end
 
-	local current = v6.current
+	local current = ref.current
 
-	React.useEffect(function() -- line: 25
-		-- upvalues: current (copy), p1 (copy)
+	React.useEffect(function()
 		current:fire()
+		local connection
 
-		local u8 = nil
-
-		if p1 then
-			u8 = p1:connect(function() -- line: 34
-				-- upvalues: current (copy)
+		if object then
+			connection = object:connect(function()
 				current:fire()
 			end)
+		else
+			connection = nil
 		end
 
-		return function() -- line: 39
-			-- upvalues: u8 (ref)
-			if u8 then
-				u8:disconnect()
+		return function()
+			if connection then
+				connection:disconnect()
 			end
 		end
-	end, {
-		p1,
-		current
-	})
+	end, { object, current })
 
-	return current, (React.useCallback(function() -- line: 46
-		-- upvalues: current (copy)
+	return current, (React.useCallback(function()
 		current:fire()
 	end, { current }))
 end

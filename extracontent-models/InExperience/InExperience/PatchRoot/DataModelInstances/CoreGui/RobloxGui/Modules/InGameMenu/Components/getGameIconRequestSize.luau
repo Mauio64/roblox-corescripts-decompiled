@@ -1,24 +1,18 @@
 local CorePackages = game:GetService("CorePackages")
 local ArgCheck = require(CorePackages.Workspace.Packages.ArgCheck)
-local t1 = {
-	50,
-	128,
-	150,
-	256,
-	512
-}
 
-return function(p1) -- line: 15
-	-- upvalues: ArgCheck (copy), t1 (copy)
-	ArgCheck.isNonNegativeNumber(p1, "Game Icon Size")
+local v = { 50, 128, 150, 256, 512 }
 
-	local v5 = #t1
+return function(p)
+	ArgCheck.isNonNegativeNumber(p, "Game Icon Size")
 
-	for _, v in ipairs(t1) do
-		if p1 <= v then
-			return v
+	local v2 = #v
+
+	for _, v3 in ipairs(v) do
+		if p <= v3 then
+			return v3
 		end
 	end
 
-	return t1[v5]
+	return v[v2]
 end

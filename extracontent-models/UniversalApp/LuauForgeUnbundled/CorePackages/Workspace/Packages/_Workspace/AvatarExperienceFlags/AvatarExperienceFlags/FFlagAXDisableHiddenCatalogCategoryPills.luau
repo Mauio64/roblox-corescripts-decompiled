@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXCategoryPillPositionAnimation") and game:DefineFastFlag("AXDisableHiddenCatalogCategoryPills", false)

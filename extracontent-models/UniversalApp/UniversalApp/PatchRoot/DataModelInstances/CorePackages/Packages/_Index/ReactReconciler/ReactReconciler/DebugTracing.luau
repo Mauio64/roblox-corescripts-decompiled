@@ -1,38 +1,44 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local console = require(ParentParent.Shared).console
-local t1 = {}
-local log = nil
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+
+local Shared = require(parent.Shared)
+local console = Shared.console
+local DebugTracing = {}
+
+local log
 
 require(script.Parent.ReactFiberLane)
 
-local enableDebugTracing = require(ParentParent.Shared).ReactFeatureFlags.enableDebugTracing
-local log2 = nil
-local t2 = {}
-local n1 = 0
+local Shared2 = require(parent.Shared)
+local enableDebugTracing = Shared2.ReactFeatureFlags.enableDebugTracing
 
-function decimalToBinaryString(n2: number) -- line: 40
-	local s1 = ""
+local log2 = nil
+
+local v = {}
+
+local v2 = 0
+
+function decimalToBinaryString(p: number)
+	local v3 = ""
 
 	repeat
-		local fraction
+		local v4
+		p, v4 = math.modf(p / 2)
 
-		n2, fraction = math.modf(n2 / 2)
-		s1 = math.ceil(fraction) .. s1
-	until n2 == 0
+		v3 = math.ceil(v4) .. v3
+	until p == 0
 
-	local v16 = 31 - string.len(s1)
-
-	return string.rep("0", v16) .. s1
+	local v4 = 31 - string.len(v3)
+	return string.rep("0", v4) .. v3
 end
 
-local function formatLanes(p1) -- line: 53
-	return "0b" .. decimalToBinaryString(p1)
+local function formatLanes(p) -- 6 equivalent calls inferred from this helper
+	return "0b" .. decimalToBinaryString(p)
 end
-local function group(...) -- line: 59
-	-- upvalues: t2 (copy), log2 (ref), console (copy), log (ref)
-	for _, v19 in { ... } do
-		table.insert(t2, v19)
+
+local function group(...)
+	for _, v3 in { ... } do
+		table.insert(v, v3)
 	end
 
 	if log2 == nil then
@@ -40,113 +46,107 @@ local function group(...) -- line: 59
 		console.log = log
 	end
 end
-local function groupEnd() -- line: 69
-	-- upvalues: t2 (copy), n1 (ref), console (copy), log2 (ref)
-	table.remove(t2, 1)
 
-	while n1 > #t2 do
+local function groupEnd()
+	table.remove(v, 1)
+
+	while v2 > #v do
 		console.groupEnd()
-		n1 -= 1
+		v2 -= 1
 	end
 
-	if #t2 == 0 then
+	if #v == 0 then
 		console.log = log2
 		log2 = nil
 	end
 end
 
-function log(...) -- line: 81
-	-- upvalues: n1 (ref), t2 (copy), console (copy), log2 (ref)
-	if n1 < #t2 then
-		for i = n1 + 1, #t2 do
-			local v21 = t2[i]
-
-			console.group(v21)
+log = function(...)
+	if v2 < #v then
+		for i = v2 + 1, #v do
+			local v3 = v[i]
+			console.group(v3)
 		end
 
-		n1 = #t2
+		v2 = #v
 	end
 
 	if typeof(log2) == "function" then
 		log2(...)
-
-		return
+	else
+		console.log(...)
 	end
-
-	console.log(...)
 end
-function t1.logCommitStarted(p2) -- line: 99
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), group (copy)
+
+function DebugTracing.logCommitStarted(p)
 	if ReactGlobals.__DEV__ and enableDebugTracing then
-		group(string.format("* commit (%s)", "0b" .. decimalToBinaryString(p2)), "", "", "")
+		group(string.format("* commit (%s)", formatLanes(p)), "", "", "") -- inferred equivalent call
 	end
 end
-function t1.logCommitStopped() -- line: 114
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), groupEnd (copy)
+
+function DebugTracing.logCommitStopped()
 	if ReactGlobals.__DEV__ and enableDebugTracing then
 		groupEnd()
 	end
 end
-function t1.logComponentSuspended(s2: string, p3) -- line: 142
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), log (ref)
+
+function DebugTracing.logComponentSuspended(p: string, object)
 	if ReactGlobals.__DEV__ and enableDebugTracing then
-		log(string.format("* %s suspended", s2))
-		p3:andThen(function() -- line: 156
-			-- upvalues: log (ref), s2 (copy)
-			log(string.format("* %s resolved", s2))
-		end, function() -- line: 165
-			-- upvalues: log (ref), s2 (copy)
-			log(string.format("* %s rejected", s2))
+		log(string.format("* %s suspended", p))
+
+		object:andThen(function()
+			log(string.format("* %s resolved", p))
+		end, function()
+			log(string.format("* %s rejected", p))
 		end)
 	end
 end
-function t1.logLayoutEffectsStarted(p4) -- line: 180
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), group (copy)
+
+function DebugTracing.logLayoutEffectsStarted(p)
 	if ReactGlobals.__DEV__ and enableDebugTracing then
-		group(string.format("* layout effects (%s)", "0b" .. decimalToBinaryString(p4)))
-	end
-end
-function t1.logLayoutEffectsStopped() -- line: 195
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), groupEnd (copy)
-	if ReactGlobals.__DEV__ and enableDebugTracing then
-		groupEnd()
-	end
-end
-function t1.logPassiveEffectsStarted(p5) -- line: 204
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), group (copy)
-	if ReactGlobals.__DEV__ and enableDebugTracing then
-		group(string.format("* passive effects (%s)", "0b" .. decimalToBinaryString(p5)))
-	end
-end
-function t1.logPassiveEffectsStopped() -- line: 219
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), groupEnd (copy)
-	if ReactGlobals.__DEV__ and enableDebugTracing then
-		groupEnd()
-	end
-end
-function t1.logRenderStarted(p6) -- line: 228
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), group (copy)
-	if ReactGlobals.__DEV__ and enableDebugTracing then
-		group(string.format("* render (%s)", "0b" .. decimalToBinaryString(p6)))
-	end
-end
-function t1.logRenderStopped() -- line: 243
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), groupEnd (copy)
-	if ReactGlobals.__DEV__ and enableDebugTracing then
-		groupEnd()
-	end
-end
-function t1.logForceUpdateScheduled(s3: string, p7) -- line: 252
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), log (ref)
-	if ReactGlobals.__DEV__ and enableDebugTracing then
-		log(string.format("* %s forced update (%s)", s3, "0b" .. decimalToBinaryString(p7)))
-	end
-end
-function t1.logStateUpdateScheduled(s4: string, p8, _) -- line: 267
-	-- upvalues: ReactGlobals (copy), enableDebugTracing (copy), log (ref)
-	if ReactGlobals.__DEV__ and enableDebugTracing then
-		log(string.format("* %s updated state (%s)", s4, "0b" .. decimalToBinaryString(p8)))
+		group(string.format("* layout effects (%s)", formatLanes(p))) -- inferred equivalent call
 	end
 end
 
-return t1
+function DebugTracing.logLayoutEffectsStopped()
+	if ReactGlobals.__DEV__ and enableDebugTracing then
+		groupEnd()
+	end
+end
+
+function DebugTracing.logPassiveEffectsStarted(p)
+	if ReactGlobals.__DEV__ and enableDebugTracing then
+		group(string.format("* passive effects (%s)", formatLanes(p))) -- inferred equivalent call
+	end
+end
+
+function DebugTracing.logPassiveEffectsStopped()
+	if ReactGlobals.__DEV__ and enableDebugTracing then
+		groupEnd()
+	end
+end
+
+function DebugTracing.logRenderStarted(p)
+	if ReactGlobals.__DEV__ and enableDebugTracing then
+		group(string.format("* render (%s)", formatLanes(p))) -- inferred equivalent call
+	end
+end
+
+function DebugTracing.logRenderStopped()
+	if ReactGlobals.__DEV__ and enableDebugTracing then
+		groupEnd()
+	end
+end
+
+function DebugTracing.logForceUpdateScheduled(p: string, p2)
+	if ReactGlobals.__DEV__ and enableDebugTracing then
+		log(string.format("* %s forced update (%s)", p, formatLanes(p2))) -- inferred equivalent call
+	end
+end
+
+function DebugTracing.logStateUpdateScheduled(p: string, p2, _)
+	if ReactGlobals.__DEV__ and enableDebugTracing then
+		log(string.format("* %s updated state (%s)", p, formatLanes(p2))) -- inferred equivalent call
+	end
+end
+return DebugTracing

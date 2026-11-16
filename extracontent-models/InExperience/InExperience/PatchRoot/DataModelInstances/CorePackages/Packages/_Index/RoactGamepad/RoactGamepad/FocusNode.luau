@@ -1,225 +1,203 @@
-local ParentParent = script.Parent.Parent
-local Cryo = require(ParentParent.Cryo)
+local parent = script.Parent.Parent
+local Cryo = require(parent.Cryo)
+
 local FocusControllerInternalApi = require(script.Parent.FocusControllerInternalApi)
 local inputBindingsEqual = require(script.Parent.inputBindingsEqual)
 local debugPrint = require(script.Parent.debugPrint)
 local Config = require(script.Parent.Config)
-local t1 = {}
 
-t1.__index = t1
+local FocusNode = {}
+FocusNode.__index = FocusNode
 
-function t1.new(p1, p2) -- line: 17
-	-- upvalues: t1 (copy)
+function FocusNode.new(p, ref)
 	local focusController = nil
 
-	if p1.parentFocusNode ~= nil then
-		focusController = p1.parentFocusNode.focusController
-	elseif p1.focusController ~= nil then
-		focusController = p1.focusController
+	if p.parentFocusNode == nil then
+		if p.focusController == nil then
+			error("Cannot create node without focus manager")
+		else
+			focusController = p.focusController
+		end
 	else
-		error("Cannot create node without focus manager")
+		focusController = p.parentFocusNode.focusController
 	end
 
-	local v11 = setmetatable({
-		lastFocused = nil,
-		focusController = focusController,
-		ref = p2
-	}, t1)
+	local object = setmetatable({ focusController = focusController, ref = ref, lastFocused = nil }, FocusNode)
 
-	v11:updateNavProps(p1)
+	object:updateNavProps(p)
 
-	return v11
+	return object
 end
-function t1.__getFocusControllerInternal(p3) -- line: 40
-	-- upvalues: FocusControllerInternalApi (copy)
-	return p3.focusController[FocusControllerInternalApi]
+
+function FocusNode:__getFocusControllerInternal()
+	return self.focusController[FocusControllerInternalApi]
 end
-function t1.__findDefaultChildNode(p4) -- line: 44
-	local n1 = 1e999
-	local v15 = nil
-	local v16 = p4:__getFocusControllerInternal():getChildren(p4)
-	local v17 = p4.ref:getValue()
-	local g21 = nil
-	local g22 = nil
-	local LayoutOrder = nil
 
-	for k, v in pairs(v16) do
-		local v20 = k:getValue()
+function FocusNode:__findDefaultChildNode()
+	local children = self:__getFocusControllerInternal():getChildren(self)
+	local value = self.ref:getValue()
+	local v = 1e999
+	local v2 = nil
 
-		repeat
-			while g21 or true do
-				if not g21 then
-					if v20 == v17 or v20 == nil then
-						g22 = true
+	for k, child in pairs(children) do
+		local v3 = k:getValue()
+
+		while v3 ~= value and v3 ~= nil do
+			if v3:isA("GuiObject") then
+				local layoutOrder = v3.LayoutOrder
+
+				if layoutOrder ~= 0 then
+					if layoutOrder < v then
+						v2 = child
+						v = layoutOrder
 					end
 
-					if not g22 then
-						if v20:isA("GuiObject") then
-							break
-						end
-					end
-				end
-
-				if g22 then
 					break
 				end
-
-				g21 = false
-				v20 = v20.Parent
 			end
 
-			if g22 then
-				break
-			end
-
-			LayoutOrder = v20.LayoutOrder
-
-			if LayoutOrder == 0 then
-				g21 = true
-			end
-		until not g21
-
-		if not g22 then
-			if LayoutOrder < n1 then
-				n1 = LayoutOrder
-				v15 = v
-			end
+			v3 = v3.Parent
 		end
-
-		g22 = false
 	end
 
-	if v15 ~= nil then
-		return v15
+	if v2 ~= nil then
+		return v2
 	end
 
-	for k, v in pairs(v16) do
+	for k, child in pairs(children) do
 		if k:getValue() ~= nil then
-			return v
+			return child
 		end
 	end
 
 	return nil
 end
-function t1.updateNavProps(p5, p6) -- line: 98
-	-- upvalues: inputBindingsEqual (copy)
-	local v28 = p6.restorePreviousChildFocus ~= nil and p6.restorePreviousChildFocus
-	local inputBindings = p5.inputBindings
 
-	p5.defaultChildRef = p6.defaultChild
-	p5.restorePreviousChildFocus = v28
-	p5.inputBindings = p6.inputBindings or {}
+function FocusNode:updateNavProps(data)
+	local restorePreviousChildFocus
 
-	local v30 = p5:__getFocusControllerInternal()
+	if data.restorePreviousChildFocus == nil then
+		restorePreviousChildFocus = false
+	else
+		restorePreviousChildFocus = data.restorePreviousChildFocus
+	end
 
-	if v30:isNodeFocused(p5) and not inputBindingsEqual(inputBindings, p5.inputBindings) then
-		v30:updateInputBindings()
+	local inputBindings = self.inputBindings
+
+	self.defaultChildRef = data.defaultChild
+	self.restorePreviousChildFocus = restorePreviousChildFocus
+	self.inputBindings = data.inputBindings or {}
+
+	local __getFocusControllerInternal = self:__getFocusControllerInternal()
+
+	if
+		__getFocusControllerInternal:isNodeFocused(self)
+		and not inputBindingsEqual(inputBindings, self.inputBindings)
+	then
+		__getFocusControllerInternal:updateInputBindings()
 	end
 end
-function t1.focus(p7) -- line: 116
-	-- upvalues: Config (copy), Cryo (copy), debugPrint (copy)
+
+function FocusNode:focus()
 	if not Config.Enabled then
 		return
 	end
 
-	local v32 = p7:__getFocusControllerInternal()
+	local __getFocusControllerInternal = self:__getFocusControllerInternal()
 
-	if not v32:isInitialized() then
+	if not __getFocusControllerInternal:isInitialized() then
 		return
 	end
 
-	v32:setInProgressFocus(p7)
+	__getFocusControllerInternal:setInProgressFocus(self)
+	local children = __getFocusControllerInternal:getChildren(self)
 
-	local v33 = v32:getChildren(p7)
-
-	if Cryo.isEmpty(v33) then
-		v32:setSelection(p7.ref:getValue())
-
+	if Cryo.isEmpty(children) then
+		__getFocusControllerInternal:setSelection(self.ref:getValue())
 		return
 	end
 
-	local elapsed = os.clock()
-	local v35 = p7.defaultChildRef ~= nil and (v32.allNodes[p7.defaultChildRef] ~= nil and p7.defaultChildRef:getValue() ~= nil)
-	local v36 = p7.timeout == nil or elapsed < p7.timeout
+	local now = os.clock()
+	local v
 
-	if p7.restorePreviousChildFocus and p7.lastFocused ~= nil and p7.lastFocused:getValue() then
-		debugPrint("[FOCUS] Restore previous focus:", p7.lastFocused)
-		v32:moveFocusTo(p7.lastFocused)
-
-		return
+	if self.defaultChildRef == nil or __getFocusControllerInternal.allNodes[self.defaultChildRef] == nil then
+		v = false
+	else
+		v = self.defaultChildRef:getValue() ~= nil
 	end
 
-	if p7.defaultChildRef and (v36 or v35) then
-		if v35 then
-			debugPrint("[FOCUS] Found valid default child", p7.defaultChildRef, "for", p7.ref)
-			p7.timeout = nil
-			v32:moveFocusTo(p7.defaultChildRef)
+	local v2 = self.timeout == nil or now < self.timeout
 
-			return
-		end
-
-		if p7.timeout == nil then
-			debugPrint("[FOCUS] Default child specified is not valid. Wait for it to be assigned...")
-			p7.timeout = elapsed + 0.5
-		end
-
-		task.delay(0, function() -- line: 155
-			-- upvalues: v32 (copy), p7 (copy)
-			if v32:isInProgressFocus(p7) then
-				p7:focus()
+	if self.restorePreviousChildFocus and self.lastFocused ~= nil and self.lastFocused:getValue() then
+		debugPrint("[FOCUS] Restore previous focus:", self.lastFocused)
+		__getFocusControllerInternal:moveFocusTo(self.lastFocused)
+	elseif self.defaultChildRef and (v2 or v) then
+		if v then
+			debugPrint("[FOCUS] Found valid default child", self.defaultChildRef, "for", self.ref)
+			self.timeout = nil
+			__getFocusControllerInternal:moveFocusTo(self.defaultChildRef)
+		else
+			if self.timeout == nil then
+				debugPrint("[FOCUS] Default child specified is not valid. Wait for it to be assigned...")
+				self.timeout = now + 0.5
 			end
-		end)
 
-		return
-	end
-
-	if p7.timeout ~= nil then
-		debugPrint("[FOCUS] Timeout for default child of", p7.ref)
-		p7.timeout = nil
-	end
-
-	local v37 = p7:__findDefaultChildNode()
-
-	if v37 ~= nil then
-		debugPrint("[FOCUS] No default, use fallback logic to focus", v37.ref)
-		v37:focus()
-
-		return
-	end
-
-	v32:setFocusedLeaf(p7)
-	v32:setInProgressFocus(nil)
-end
-function t1.attachToTree(p8, p9, p10) -- line: 180
-	-- upvalues: Cryo (copy)
-	local v41 = p8:__getFocusControllerInternal()
-
-	v41:registerNode(p9, p8.ref, p8)
-	p8.parent = p9
-	p8.disconnectSelectionListener = v41:subscribeToSelectionChange(function() -- line: 185
-		-- upvalues: v41 (copy), p8 (copy), p10 (copy), Cryo (copy)
-		local v43 = v41:isNodeFocused(p8)
-
-		p10(v43)
-
-		if p8.parent ~= nil and v43 then
-			p8.parent.lastFocused = p8.ref
+			task.delay(0, function()
+				if __getFocusControllerInternal:isInProgressFocus(self) then
+					self:focus()
+				end
+			end)
+		end
+	else
+		if self.timeout ~= nil then
+			debugPrint("[FOCUS] Timeout for default child of", self.ref)
+			self.timeout = nil
 		end
 
-		local v44 = v41:getChildren(p8)
+		local __findDefaultChildNode = self:__findDefaultChildNode()
 
-		if not Cryo.isEmpty(v44) and v43 and v41:getSelection() == p8.ref:getValue() then
-			p8:focus()
+		if __findDefaultChildNode == nil then
+			__getFocusControllerInternal:setFocusedLeaf(self)
+			__getFocusControllerInternal:setInProgressFocus(nil)
+		else
+			debugPrint("[FOCUS] No default, use fallback logic to focus", __findDefaultChildNode.ref)
+			__findDefaultChildNode:focus()
+		end
+	end
+end
+
+function FocusNode:attachToTree(parent2, callback)
+	local __getFocusControllerInternal = self:__getFocusControllerInternal()
+	__getFocusControllerInternal:registerNode(parent2, self.ref, self)
+
+	self.parent = parent2
+	self.disconnectSelectionListener = __getFocusControllerInternal:subscribeToSelectionChange(function()
+		local nodeFocused = __getFocusControllerInternal:isNodeFocused(self)
+		callback(nodeFocused)
+
+		if self.parent ~= nil and nodeFocused then
+			self.parent.lastFocused = self.ref
+		end
+
+		local children = __getFocusControllerInternal:getChildren(self)
+
+		if
+			not Cryo.isEmpty(children)
+			and nodeFocused
+			and __getFocusControllerInternal:getSelection() == self.ref:getValue()
+		then
+			self:focus()
 		end
 	end)
 end
-function t1.detachFromTree(p11) -- line: 209
-	p11:__getFocusControllerInternal():deregisterNode(p11.parent, p11.ref)
 
-	if p11.disconnectSelectionListener ~= nil then
-		p11.disconnectSelectionListener()
-		p11.disconnectSelectionListener = nil
+function FocusNode:detachFromTree()
+	self:__getFocusControllerInternal():deregisterNode(self.parent, self.ref)
+
+	if self.disconnectSelectionListener ~= nil then
+		self.disconnectSelectionListener()
+		self.disconnectSelectionListener = nil
 	end
 end
 
-return t1
+return FocusNode

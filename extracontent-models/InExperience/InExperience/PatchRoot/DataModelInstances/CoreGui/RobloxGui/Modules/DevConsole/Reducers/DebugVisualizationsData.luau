@@ -1,22 +1,25 @@
 local Immutable = require(script.Parent.Parent.Immutable)
+
 local DebugVisualizationsUpdateSearchFilter = require(script.Parent.Parent.Actions.DebugVisualizationsUpdateSearchFilter)
 
-return function(t1: {[any]: any}?, t2: {[any]: any}) -- line: 5
-	-- upvalues: Immutable (copy), DebugVisualizationsUpdateSearchFilter (copy)
-	local v5 = t1 or {
-		debugVisualizationsSearchTerm = "",
-		debugVisualizationsTypeFilters = {}
-	}
-	local v6 = if t2.filterTypes ~= nil then Immutable.JoinDictionaries(v5.debugVisualizationsTypeFilters, t2.filterTypes) else v5.debugVisualizationsTypeFilters
+return function(p, data)
+	local v = p or { debugVisualizationsSearchTerm = "", debugVisualizationsTypeFilters = {} }
+	local debugVisualizationsTypeFilters
 
-	if t2.type == DebugVisualizationsUpdateSearchFilter.name then
-		local t3 = {
-			debugVisualizationsSearchTerm = t2.searchTerm,
-			debugVisualizationsTypeFilters = v6
-		}
-
-		return Immutable.JoinDictionaries(v5, t3)
+	if data.filterTypes == nil then
+		debugVisualizationsTypeFilters = v.debugVisualizationsTypeFilters
+	else
+		debugVisualizationsTypeFilters = Immutable.JoinDictionaries(v.debugVisualizationsTypeFilters, data.filterTypes)
 	end
 
-	return v5
+	if data.type ~= DebugVisualizationsUpdateSearchFilter.name then
+		return v
+	end
+
+	local v2 = {
+		debugVisualizationsSearchTerm = data.searchTerm,
+		debugVisualizationsTypeFilters = debugVisualizationsTypeFilters
+	}
+
+	return Immutable.JoinDictionaries(v, v2)
 end

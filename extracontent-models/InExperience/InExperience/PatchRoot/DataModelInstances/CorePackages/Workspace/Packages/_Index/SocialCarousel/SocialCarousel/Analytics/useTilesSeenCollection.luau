@@ -1,113 +1,193 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local React = require(SocialCarouselParent.React)
+local parent = SocialCarousel.Parent
+local React = require(parent.React)
+local Impressions = require(parent.Impressions)
+local SharedFlags = require(parent.SharedFlags)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+
+local getFriendStatusFromTileType = require(SocialCarousel.Analytics.getFriendStatusFromTileType)
 local useSocialCarouselAnalytics = require(SocialCarousel.Analytics.useSocialCarouselAnalytics)
-local Tile = require(SocialCarousel.Common.Enums).Tile
-local v6 = game:DefineFastInt("UserSeenCollectionBatchTimeMs", 200)
-local _ = {
-	Friend = "Friend",
-	NotFriend = "NotFriend"
-}
+local Enums = require(SocialCarousel.Common.Enums)
+local Tile = Enums.Tile
+local buildUserSeenCollectionPayload = SocialLuaAnalytics.Analytics.buildUserSeenCollectionPayload
+local useBatchedImpressions = Impressions.useBatchedImpressions
+local FIntUserSeenCollectionBatchTimeMs = SharedFlags.FIntUserSeenCollectionBatchTimeMs
+local FFlagLuaAppPYMKSendUserSeenCollection = SharedFlags.FFlagLuaAppPYMKSendUserSeenCollection
+local FFlagLuaAppUserSeenCollectionUnifiedFields = SharedFlags.FFlagLuaAppUserSeenCollectionUnifiedFields
+local FFlagShowRequestsInCarouselForAllUsers = SharedFlags.FFlagShowRequestsInCarouselForAllUsers
 
-local function useTilesSeenCollection() -- line: 42
-	-- upvalues: useSocialCarouselAnalytics (copy), React (copy), Tile (copy), v6 (copy)
-	local v9 = useSocialCarouselAnalytics()
-	local v10 = React.useRef({})
-	local v11 = React.useRef(nil)
-	local v12 = React.useRef({})
-	local v13 = React.useRef({})
-	local v14 = React.useRef(0)
-	local v15 = React.useCallback(function() -- line: 52
-		-- upvalues: v10 (copy), v12 (copy), v9 (copy), v14 (copy), v13 (copy)
-		local current = v10.current
+local function useTilesSeenCollection()
+	local v = useSocialCarouselAnalytics()
 
-		if #current == 0 then
-			return
-		end
+	if FFlagLuaAppPYMKSendUserSeenCollection then
+		local mapItem = React.useCallback(function(userId: string, p: number, data)
+			return {
+				userId = userId,
+				index = p,
+				presence = not (data and data.presence) and "Offline" or data.presence.userPresenceType,
+				friendStatus = getFriendStatusFromTileType(data and data.tileType).Name,
+				recommendationContextType = not (data and data.recommendationContextType) and "None" or data.recommendationContextType,
+				recommendationRank = not (data and data.recommendationRank) and -1 or data.recommendationRank,
+				isRecommendation = data and data.tileType == Tile.Recommendation,
+				universeId = (not data or not data.presence or not data.presence.universeId or data.presence.universeId == "") and -1 or data.presence.universeId
+			}
+		end, {})
 
-		local t1 = {}
-		local t2 = {}
-		local t3 = {}
-		local t4 = {}
-		local t5 = {}
-		local t6 = {}
-		local t7 = {}
-		local t8 = {}
-
-		for _, v27 in current do
-			if v27 and v27.userId and v27.index then
-				v12.current[v27.userId] = true
-				table.insert(t1, (tostring(v27.userId)))
-				table.insert(t2, (tostring(v27.index)))
-				table.insert(t5, v27.friendStatus)
-				table.insert(t7, (tostring(v27.isRecommendation)))
-				table.insert(t3, (tostring(v27.presence)))
-				table.insert(t8, (tostring(v27.universeId)))
-				table.insert(t6, (tostring(v27.recommendationContextType)))
-				table.insert(t4, (tostring(v27.recommendationRank)))
+		local tilesSeenCollection = v.tilesSeenCollection
+		local onFlush = React.useCallback(function(p, p2: number)
+			if not tilesSeenCollection then
+				return
 			end
+
+			tilesSeenCollection(buildUserSeenCollectionPayload(p, p2))
+		end, { tilesSeenCollection })
+
+		local v2 = {
+			batchTimeMs = FIntUserSeenCollectionBatchTimeMs,
+			mapItem = mapItem,
+			onFlush = nil
+		}
+
+		if not tilesSeenCollection then
+			onFlush = nil
 		end
 
-		if v9.tilesSeenCollection then
-			v14.current = v14.current + 1
-			v9.tilesSeenCollection({
-				userIds = table.concat(t1, ","),
-				absolutePositions = table.concat(t2, ","),
-				presences = table.concat(t3, ","),
-				recommendationRanks = table.concat(t4, ","),
-				friendStatuses = table.concat(t5, ","),
-				recommendationContextTypes = table.concat(t6, ","),
-				isRecommendations = table.concat(t7, ","),
-				universeIds = table.concat(t8, ","),
-				tileCount = #t1,
-				sessionEventCount = v14.current
+		v2.onFlush = onFlush
+		local v3 = useBatchedImpressions(v2)
+
+		local addTileToCollection = React.useCallback(function(p: string, p2: number, p3)
+			if
+				FFlagShowRequestsInCarouselForAllUsers
+				and p3
+				and p3.tileType == Tile.FriendRequest
+				and not p3.presence
+			then
+				return
+			end
+
+			v3.addImpression(p, p2, p3)
+		end, { v3.addImpression })
+
+		return React.useMemo(function()
+			return { addTileToCollection = addTileToCollection }
+		end, { addTileToCollection })
+	else
+		local ref = React.useRef({})
+		local ref2 = React.useRef(nil)
+		local ref3 = React.useRef({})
+		local ref4 = React.useRef({})
+		local ref5 = React.useRef(0)
+
+		local v2 = React.useCallback(function()
+			local current = ref.current
+
+			if #current == 0 then
+				return
+			end
+
+			local userIds = {}
+			local indices = {}
+
+			local friendStatuses = {}
+
+			local isRecommendations = {}
+			local presences = {}
+
+			local universeIds = {}
+			local recommendationContextTypes = {}
+			local recommendationRanks = {}
+
+			for _, v2 in current do
+				if not (v2 and v2.userId and v2.index) then
+					continue
+				end
+
+				ref3.current[v2.userId] = true
+
+				table.insert(userIds, (tostring(v2.userId)))
+				table.insert(indices, (tostring(v2.index)))
+				table.insert(friendStatuses, v2.friendStatus)
+				table.insert(isRecommendations, (tostring(v2.isRecommendation)))
+				table.insert(presences, (tostring(v2.presence)))
+				table.insert(universeIds, (tostring(v2.universeId)))
+				table.insert(recommendationContextTypes, (tostring(v2.recommendationContextType)))
+				table.insert(recommendationRanks, (tostring(v2.recommendationRank)))
+			end
+
+			if v.tilesSeenCollection then
+				ref5.current += 1
+				local v2
+
+				if FFlagLuaAppUserSeenCollectionUnifiedFields then
+					v2 = buildUserSeenCollectionPayload(current, ref5.current)
+				else
+					v2 = {
+						userIds = table.concat(userIds, ","),
+						absolutePositions = table.concat(indices, ","),
+						presences = table.concat(presences, ","),
+						recommendationRanks = table.concat(recommendationRanks, ","),
+						friendStatuses = table.concat(friendStatuses, ","),
+						recommendationContextTypes = table.concat(recommendationContextTypes, ","),
+						isRecommendations = table.concat(isRecommendations, ","),
+						universeIds = table.concat(universeIds, ","),
+						tileCount = #userIds,
+						sessionEventCount = ref5.current
+					}
+				end
+
+				v.tilesSeenCollection(v2)
+			end
+
+			ref.current = {}
+			ref4.current = {}
+		end, { v })
+
+		local addTileToCollection = React.useCallback(function(userId: string, p: number, data)
+			if not userId or not p or ref3.current[userId] or ref4.current[userId] then
+				return
+			end
+
+			if
+				FFlagShowRequestsInCarouselForAllUsers
+				and data
+				and data.tileType == Tile.FriendRequest
+				and not data.presence
+			then
+				return
+			end
+
+			ref4.current[userId] = true
+			table.insert(ref.current, {
+				userId = userId,
+				index = p,
+				presence = not (data and data.presence) and "Offline" or data.presence.userPresenceType,
+				friendStatus = getFriendStatusFromTileType(data and data.tileType).Name,
+				recommendationContextType = not (data and data.recommendationContextType) and "None" or data.recommendationContextType,
+				recommendationRank = not (data and data.recommendationRank) and -1 or data.recommendationRank,
+				isRecommendation = data and data.tileType == Tile.Recommendation,
+				universeId = (not data or not data.presence or not data.presence.universeId or data.presence.universeId == "") and -1 or data.presence.universeId
 			})
-		end
 
-		v10.current = {}
-		v13.current = {}
-	end, { v9 })
-	local v16 = React.useCallback(function(s1: string, n1: number, t9: {[any]: any}?) -- line: 108
-		-- upvalues: v12 (copy), v13 (copy), v10 (copy), Tile (copy), v11 (copy), v6 (copy), v15 (copy)
-		if not s1 or (not n1 or v12.current[s1] or v13.current[s1]) then
-			return
-		end
-
-		v13.current[s1] = true
-		table.insert(v10.current, {
-			userId = s1,
-			index = n1,
-			presence = (not t9 or not t9.presence) and "Offline" or t9.presence.userPresenceType,
-			friendStatus = (not t9 or t9.tileType ~= Tile.Friend) and "NotFriend" or "Friend",
-			recommendationContextType = (not t9 or not t9.recommendationContextType) and "None" or t9.recommendationContextType,
-			recommendationRank = (not t9 or not t9.recommendationRank) and -1 or t9.recommendationRank,
-			isRecommendation = t9 and t9.tileType == Tile.Recommendation,
-			universeId = (not t9 or (not t9.presence or (not t9.presence.universeId or t9.presence.universeId == ""))) and -1 or t9.presence.universeId
-		})
-
-		if v11.current then
-			pcall(task.cancel, v11.current)
-		end
-
-		v11.current = task.delay(v6 * 0.001, v15)
-	end, { v15 })
-
-	React.useEffect(function() -- line: 148
-		-- upvalues: v11 (copy), v15 (copy)
-		return function() -- line: 149
-			-- upvalues: v11 (copy), v15 (copy)
-			if v11.current then
-				pcall(task.cancel, v11.current)
+			if ref2.current then
+				pcall(task.cancel, ref2.current)
 			end
 
-			v11.current = nil
-			v15()
-		end
-	end, {})
+			ref2.current = task.delay(FIntUserSeenCollectionBatchTimeMs * 0.001, v2)
+		end, { v2 })
 
-	return {
-		addTileToCollection = v16
-	}
+		React.useEffect(function()
+			return function()
+				if ref2.current then
+					pcall(task.cancel, ref2.current)
+				end
+
+				ref2.current = nil
+				v2()
+			end
+		end, {})
+
+		return { addTileToCollection = addTileToCollection }
+	end
 end
 
 return useTilesSeenCollection

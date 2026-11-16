@@ -1,62 +1,74 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Signals = require(CorePackages.Packages.Signals)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local Display = require(CorePackages.Workspace.Packages.Display)
 local getUIScale = Display.GetDisplayStore(false).getUIScale
-local ParentParent = script.Parent.Parent
-local TenFootInterface = require(ParentParent.TenFootInterface)
-local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
-local ChromeShared = ParentParent.Chrome.ChromeShared
-local isNewTiltIconEnabled = require(ParentParent.isNewTiltIconEnabled)
-local FFlagTopBarRefactor = require(CorePackages.Workspace.Packages.InExperienceTopBar).Flags.FFlagTopBarRefactor
-local FFlagEnableSideSheet = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableSideSheet
-local v13 = if not Enabled() then nil else require(ChromeShared.Utility.GetStyleTokens)()
 
-local function withUIScale(n1: number) -- line: 22
-	-- upvalues: TenFootInterface (copy), Enabled (copy)
-	local v29 = not TenFootInterface:IsEnabled() and 1 or 1.5
+local parent = script.Parent.Parent
+local TenFootInterface = require(parent.TenFootInterface)
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local Enabled = Chrome.Enabled
+local chromeShared = parent.Chrome.ChromeShared
+local isNewTiltIconEnabled = require(parent.isNewTiltIconEnabled)
+local InExperienceTopBar = require(CorePackages.Workspace.Packages.InExperienceTopBar)
+local FFlagTopBarRefactor = InExperienceTopBar.Flags.FFlagTopBarRefactor
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagResponsiveUnitsDeprecateTenFoot = SharedFlags.FFlagResponsiveUnitsDeprecateTenFoot
 
-	if Enabled() then
-		return v29 * n1
-	end
-
-	return n1
-end
-
-local v15 = not Enabled() and 36 or v13.Size.Size_900
-local v16 = v15 - 4
-local v18
+local isSideSheetEnabled = require(CorePackages.Workspace.Packages.InExperienceSideSheetUtils.isSideSheetEnabled)
+local v
 
 if Enabled() then
-	local v17 = not TenFootInterface:IsEnabled() and 1 or 1.5
-
-	v18 = not Enabled() and 58 or v17 * 58
-else
-	v18 = 58
+	local GetStyleTokens = require(chromeShared.Utility.GetStyleTokens)
+	v = GetStyleTokens()
 end
 
-local v19 = v18
-local v20 = not Enabled() and 44 or v13.Size.Size_1100
-
-local function getTopbarHeight() -- line: 32
-	-- upvalues: isNewTiltIconEnabled (copy), v15 (copy), Enabled (copy), v19 (copy)
-	if not isNewTiltIconEnabled() then
-		return v15
+local function withUIScale(p: number)
+	if FFlagResponsiveUnitsDeprecateTenFoot then
+		return p
 	end
+
+	local v2 = TenFootInterface:IsEnabled() and 1.5 or 1
 
 	if Enabled() then
-		return v19
+		return v2 * p
 	end
 
-	return v15
+	return p
 end
 
-local v22 = if isNewTiltIconEnabled() then if not Enabled() then v15 else v19 else v15
-local v23 = if not Enabled() then v16 else v20
-local v24 = not Enabled() and 2 or v13.Padding.XXSmall
-local v25 = not Enabled() and 16 or v13.Gap.Large
-local v26 = not Enabled() and 12 or v13.Padding.Small
-local t1 = {
+local v2 = not Enabled() and 36 or v.Size.Size_900
+local topBarButtonHeight = v2 - 4
+local v3
+
+if Enabled() and not FFlagResponsiveUnitsDeprecateTenFoot then
+	local v4 = TenFootInterface:IsEnabled() and 1.5 or 1
+	v3 = not Enabled() and 58 or v4 * 58
+else
+	v3 = 58
+end
+
+local v4 = not Enabled() and 44 or v.Size.Size_1100
+local function getTopbarHeight() -- 1 equivalent call inferred from this helper
+	if not isNewTiltIconEnabled() then
+		return v2
+	end
+
+	return if Enabled() then v3 else v2
+end
+
+local topbarHeight = getTopbarHeight() -- inferred equivalent call
+
+if Enabled() then
+	topBarButtonHeight = v4
+end
+
+local topBarButtonPadding = not Enabled() and 2 or v.Padding.XXSmall
+local screenSideOffset = not Enabled() and 16 or v.Gap.Large
+local topBarPadding = not Enabled() and 12 or v.Padding.Small
+
+local gamepadInputTypes = {
 	Enum.UserInputType.Gamepad1,
 	Enum.UserInputType.Gamepad2,
 	Enum.UserInputType.Gamepad3,
@@ -67,69 +79,95 @@ local t1 = {
 	Enum.UserInputType.Gamepad8
 }
 
-return {
+local Constants = {
+	ApplyDisplayScale = function(p: number)
+		return getUIScale(false) * p
+	end,
+	useDisplayScaleState = function(p: number)
+		return SignalsReact.useSignalState(Signals.createComputed(function(p2)
+			return p * Display.GetDisplayStore(p2).getUIScale(p2)
+		end))
+	end,
+	TopBarHeight = topbarHeight,
+	TopBarHeightTenFoot = not Enabled() and 72 or nil,
+	TopBarButtonHeight = topBarButtonHeight,
+	TopBarButtonPadding = topBarButtonPadding,
+	TopBarTopMargin = 0,
+	LegacyCloseMenuIconSize = 0,
+	MENU_ICON_SIZE = 0,
 	MenuIconOpenScale = 1.25,
+	UnibarFrame = 0,
 	MenuIconKeepOutAreaId = "roblox-menu-icon",
 	HealthBarKeepOutAreaId = "health-bar",
 	MoreMenuKeepOutAreaId = "more-menu",
 	ChatIconKeepOutAreaId = "chat-icon",
 	BackIconKeepOutAreaId = "back-icon",
-	VoiceBetaBadgeKeepOutAreaId = "badge-voice-beta",
 	TopBarKeepOutAreaId = "roblox-topbar",
+	ScreenSideOffset = 0,
+	ScreenSideOffsetTenFoot = 0,
+	TopBarPadding = 0,
 	InitialHealth = 100,
 	HealthPercentForOverlay = 0.05,
-	ApplyDisplayScale = function(n2: number) -- line: 63
-		-- upvalues: getUIScale (copy)
-		return getUIScale(false) * n2
-	end,
-	useDisplayScaleState = function(n3: number) -- line: 66
-		-- upvalues: SignalsReact (copy), Signals (copy), Display (copy)
-		return SignalsReact.useSignalState(Signals.createComputed(function(p1) -- line: 67
-			-- upvalues: Display (copy), n3 (copy)
-			local getUIScale2 = Display.GetDisplayStore(p1).getUIScale
-
-			return n3 * getUIScale2(p1)
-		end))
-	end,
-	TopBarHeight = v22,
-	TopBarHeightTenFoot = not Enabled() and 72 or nil,
-	TopBarButtonHeight = v23,
-	TopBarButtonPadding = v24,
-	TopBarTopMargin = if not FFlagTopBarRefactor then v22 - v23 - 2 * v24 else v13.Gap.Medium,
-	LegacyCloseMenuIconSize = not isNewTiltIconEnabled() and 30 or v22 - v13.Size.Size_100,
-	MENU_ICON_SIZE = not Enabled() and 24 or v13.Size.Size_600,
-	UnibarFrame = {
-		PaddingTop = not Enabled() and 2 or v13.Padding.XXSmall,
-		PaddingBottom = not Enabled() and 2 or v13.Padding.XXSmall,
-		PaddingLeft = v25 + v26 + (if not FFlagEnableSideSheet then v22 else 0) + (not Enabled() and 2 or v13.Padding.XXSmall),
-		ExtendedSize = v22 - (not Enabled() and 4 or v13.Size.Size_100)
-	},
-	ScreenSideOffset = v25,
-	ScreenSideOffsetTenFoot = not Enabled() and 48 or nil,
-	TopBarPadding = v26,
-	HealthRedColor = Color3.fromRGB(255, 28, 0),
-	HealthYellowColor = Color3.fromRGB(250, 235, 0),
-	HealthGreenColor = Color3.fromRGB(27, 252, 107),
-	InputType = {
-		MouseAndKeyBoard = "MouseAndKeyboard",
-		Touch = "Touch",
-		Gamepad = "Gamepad"
-	},
-	GamepadInputTypes = t1,
-	Analytics = {
-		ShowGamepadNavigationDialog = "show-gamepad-navigation-dialog",
-		DismissGamepadNavigationDialog = "dismiss-gamepad-navigation-dialog",
-		EventNameTopBarButtonActivated = "topbar-button-activated",
-		ChatButtonName = "chat",
-		MoreMenuButtonName = "more-menu",
-		InventoryButtonName = "inventory",
-		LeaderboardButtonName = "leaderboard",
-		EmotesButtonName = "emotes",
-		StatusActive = "active",
-		StatusInactive = "inactive"
-	},
-	LocalizedKeys = {
-		UILessTooltipTitle = "CoreScripts.TopBar.Label.UILessHintTitle",
-		UILessTooltipDescription = "CoreScripts.TopBar.Label.UILessHintDescription"
-	}
+	HealthRedColor = 0,
+	HealthYellowColor = 0,
+	HealthGreenColor = 0,
+	InputType = 0,
+	GamepadInputTypes = 0,
+	Analytics = 0,
+	LocalizedKeys = 0
 }
+local topBarTopMargin
+
+if FFlagTopBarRefactor then
+	topBarTopMargin = v.Gap.Medium
+else
+	topBarTopMargin = topbarHeight - topBarButtonHeight - 2 * topBarButtonPadding
+end
+
+Constants.TopBarTopMargin = topBarTopMargin
+
+Constants.LegacyCloseMenuIconSize = not isNewTiltIconEnabled() and 30 or topbarHeight - v.Size.Size_100
+Constants.MENU_ICON_SIZE = not Enabled() and 24 or v.Size.Size_600
+
+Constants.UnibarFrame = {
+	PaddingTop = not Enabled() and 2 or v.Padding.XXSmall,
+	PaddingBottom = not Enabled() and 2 or v.Padding.XXSmall,
+	PaddingLeft = screenSideOffset + topBarPadding + (isSideSheetEnabled and 0 or topbarHeight) + (not Enabled() and 2 or v.Padding.XXSmall),
+	ExtendedSize = topbarHeight - (not Enabled() and 4 or v.Size.Size_100)
+}
+
+Constants.ScreenSideOffset = screenSideOffset
+Constants.ScreenSideOffsetTenFoot = not Enabled() and 48 or nil
+
+Constants.TopBarPadding = topBarPadding
+
+Constants.HealthRedColor = Color3.fromRGB(255, 28, 0)
+Constants.HealthYellowColor = Color3.fromRGB(250, 235, 0)
+Constants.HealthGreenColor = Color3.fromRGB(27, 252, 107)
+
+Constants.InputType = {
+	MouseAndKeyBoard = "MouseAndKeyboard",
+	Touch = "Touch",
+	Gamepad = "Gamepad"
+}
+
+Constants.GamepadInputTypes = gamepadInputTypes
+
+Constants.Analytics = {
+	ShowGamepadNavigationDialog = "show-gamepad-navigation-dialog",
+	DismissGamepadNavigationDialog = "dismiss-gamepad-navigation-dialog",
+	EventNameTopBarButtonActivated = "topbar-button-activated",
+	ChatButtonName = "chat",
+	MoreMenuButtonName = "more-menu",
+	InventoryButtonName = "inventory",
+	LeaderboardButtonName = "leaderboard",
+	EmotesButtonName = "emotes",
+	StatusActive = "active",
+	StatusInactive = "inactive"
+}
+
+Constants.LocalizedKeys = {
+	UILessTooltipTitle = "CoreScripts.TopBar.Label.UILessHintTitle",
+	UILessTooltipDescription = "CoreScripts.TopBar.Label.UILessHintDescription"
+}
+return Constants

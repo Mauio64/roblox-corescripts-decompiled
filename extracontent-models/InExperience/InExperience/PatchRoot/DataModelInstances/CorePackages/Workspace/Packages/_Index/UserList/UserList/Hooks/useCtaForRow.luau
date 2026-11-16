@@ -1,102 +1,210 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local DataHydration = require(UserListParent.DataHydration)
-local RoactUtils = require(UserListParent.RoactUtils)
+local parent = UserList.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local DataHydration = require(parent.DataHydration)
+local RoactUtils = require(parent.RoactUtils)
 local Enums = require(UserList.Common.Enums)
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local NavigateDown = require(UserListParent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(UserListParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local FFlagUserListCtaAnalyticsEnabled = require(UserListParent.SharedFlags).FFlagUserListCtaAnalyticsEnabled
-local NavigationCommands = require(UserListParent.RobloxAppNavigation).NavigationCommands
-local AppPage = require(UserListParent.RobloxAppEnums).AppPage
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUserListCtaAnalyticsEnabled = SharedFlags2.FFlagUserListCtaAnalyticsEnabled
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagGameJoinCardSourceAttribution = SharedFlags3.FFlagGameJoinCardSourceAttribution
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagUserListSurfaceExtensions = SharedFlags4.FFlagUserListSurfaceExtensions
+local FFlagUserListCanonicalCtaAnalytics = require(UserList.Flags.FFlagUserListCanonicalCtaAnalytics)
+local FFlagUserListViewCtaAnalytics = require(UserList.Flags.FFlagUserListViewCtaAnalytics)
+local FFlagUserListRowViewCta = require(UserList.Flags.FFlagUserListRowViewCta)
+local mapClientActionsToRowCta
+
+if FFlagUserListRowViewCta then
+	mapClientActionsToRowCta = require(UserList.Cta.mapClientActionsToRowCta)
+else
+	mapClientActionsToRowCta = nil
+end
+
+local reportCtaActivated = require(UserList.Analytics.reportCtaActivated)
+local reportViewCta = require(UserList.Analytics.reportViewCta)
+local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+local NavigationCommands = RobloxAppNavigation.NavigationCommands
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
 local DataStatus = DataHydration.DataStatus
 local ButtonTypes = Enums.ButtonTypes
-local mapServerActionsToRowCta = require(UserList.Cta.mapServerActionsToRowCta)
+local ButtonVariant = Foundation.Enums.ButtonVariant
 
+local mapServerActionsToRowCta = require(UserList.Cta.mapServerActionsToRowCta)
 require(UserList.Common.Types)
 
-local t1 = {
-	primaryCta = nil,
-	secondaryCta = nil,
-	isLoading = true
-}
+local v = { primaryCta = nil, secondaryCta = nil, isLoading = true }
 
-local function buildJoinCta(p1, t2: {[any]: any}, p2: ((...any) -> ...any)) -- line: 40
-	local v22 = table.clone(p1)
-
-	v22.onActivated = p2
-	v22.isDisabled = not t2.isInExperience
-	v22.isLoading = t2.isLoading
-
-	return v22
+local function buildJoinCta(primaryCta, p, fn) -- 1 equivalent call inferred from this helper
+	local clone = table.clone(primaryCta)
+	clone.onActivated = fn
+	clone.isDisabled = not p.isInExperience
+	clone.isLoading = p.isLoading
+	return clone
 end
-local function useCtaForRow(p3, s1: string?, p4, s2: string, p5, t3: {[any]: any}?) -- line: 52
-	-- upvalues: useDispatch (copy), React (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), NavigationCommands (copy), NavigateDown (copy), DataStatus (copy), t1 (copy), mapServerActionsToRowCta (copy), ButtonTypes (copy), FFlagUserListCtaAnalyticsEnabled (copy)
-	local v29 = useDispatch()
-	local v30 = React.useCallback(function(s3: string) -- line: 61
-		-- upvalues: AppPage (copy), FFlagSignalsNavP3Dispatch (copy), NavigationCommands (copy), v29 (copy), NavigateDown (copy)
-		local t4 = {
-			name = AppPage.GameJoinCard,
-			userId = s3
+
+local function useCtaForRow(p, p2: string?, p3, p4: string, data, p5, p6: number?)
+	local v2 = useDispatch()
+	local v3 = useLocalUserId()
+
+	local v4 = React.useCallback(function(userId: string, joinSource)
+		local v4 = { name = AppPage.GameJoinCard, userId = userId, joinSource = 0 }
+
+		if not FFlagGameJoinCardSourceAttribution then
+			joinSource = nil
+		end
+
+		v4.joinSource = joinSource
+
+		if FFlagSignalsNavP3Dispatch then
+			NavigationCommands.down(NavigationCommands.fromLegacyPage(v4))
+		else
+			v2(NavigateDown(v4))
+		end
+	end, { v2 })
+
+	local v5 = React.useCallback(function()
+		local v5 = {
+			name = AppPage.ProfilePlatform,
+			detail = p4,
+			extraProps = { profileType = Enums.EntityType.User }
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			NavigationCommands.down(NavigationCommands.fromLegacyPage(t4))
-
-			return
+			NavigationCommands.down(NavigationCommands.fromLegacyPage(v5))
+		else
+			v2(NavigateDown(v5))
 		end
+	end, { v2, p4 })
 
-		v29(NavigateDown(t4))
-	end, { v29 })
+	local useMemo = React.useMemo
+	local function fn()
+		if data and data.showSelfProfileCta and p4 == v3 then
+			local onActivated = v5
 
-	return React.useMemo(function() -- line: 73
-		-- upvalues: s1 (copy), DataStatus (copy), t1 (copy), mapServerActionsToRowCta (copy), p3 (copy), p4 (copy), s2 (copy), p5 (copy), ButtonTypes (copy), t3 (copy), FFlagUserListCtaAnalyticsEnabled (copy), v30 (copy)
-		if s1 == nil or s1 == DataStatus.NotReady then
-			return t1
-		end
+			if FFlagUserListViewCtaAnalytics then
+				local analytics = data.analytics
+				onActivated = function()
+					reportViewCta(analytics)
+					v5()
+				end
+			end
 
-		local v33 = mapServerActionsToRowCta(p3, p4, s2, p5)
-		local primaryCta = v33.primaryCta
+			return {
+				primaryCta = {
+					type = ButtonTypes.View,
+					onActivated = onActivated,
+					variant = ButtonVariant.Standard,
+					minWidth = data.primaryCtaMinWidth,
+					maxWidth = data.primaryCtaMaxWidth
+				},
+				secondaryCta = nil
+			}
+		else
+			if FFlagUserListRowViewCta then
+				local v6 = p4 == v3
+				local v7
 
-		if primaryCta and primaryCta.type == ButtonTypes.Join and t3 then
-			local t5 = {}
-			local v36 = t3
-			local v37 = table.clone(primaryCta)
+				if FFlagUserListCanonicalCtaAnalytics then
+					v7 = p6
+				end
 
-			function v37.onActivated() -- line: 83
-				-- upvalues: FFlagUserListCtaAnalyticsEnabled (copy), p5 (copy), ButtonTypes (copy), s2 (copy), v30 (copy)
+				local v8 = mapClientActionsToRowCta(p3, p4, v6, data, v7)
+
+				if v8 ~= nil then
+					return v8
+				end
+			end
+
+			if p2 == nil or p2 == DataStatus.NotReady then
+				return v
+			end
+
+			local v6
+
+			if FFlagUserListCanonicalCtaAnalytics then
+				v6 = p6
+			end
+
+			local v7 = mapServerActionsToRowCta(p, p3, p4, data, v6)
+
+			local primaryCta = v7.primaryCta
+
+			if not primaryCta or primaryCta.type ~= ButtonTypes.Join or not p5 then
+				return v7
+			end
+
+			local function fn2()
 				if FFlagUserListCtaAnalyticsEnabled then
-					local v38 = if not p5 then nil else p5.onCtaActivated
+					local onCtaActivated
 
-					if v38 ~= nil then
-						v38({
-							buttonType = ButtonTypes.Join,
-							userId = s2
-						})
+					if data then
+						onCtaActivated = data.onCtaActivated
+					end
+
+					if onCtaActivated ~= nil then
+						onCtaActivated({ buttonType = ButtonTypes.Join, userId = p4 })
 					end
 				end
 
-				v30(s2)
+				local analytics
+
+				if data then
+					analytics = data.analytics
+				end
+
+				if FFlagUserListCanonicalCtaAnalytics then
+					reportCtaActivated(analytics, ButtonTypes.Join, p4, p6)
+				end
+
+				if FFlagUserListSurfaceExtensions and data and data.join then
+					data.join.onActivated(p4)
+					return
+				end
+
+				if not FFlagGameJoinCardSourceAttribution then
+					analytics = nil
+				end
+
+				v4(p4, analytics)
 			end
 
-			v37.isDisabled = not v36.isInExperience
-			v37.isLoading = v36.isLoading
-			t5.primaryCta = v37
-			t5.secondaryCta = v33.secondaryCta
-
-			return t5
+			return {
+				primaryCta = buildJoinCta(primaryCta, p5, fn2), -- inferred equivalent call
+				secondaryCta = v7.secondaryCta
+			}
 		end
+	end
 
-		return v33
-	end, {
+	local v6
+
+	if FFlagUserListCanonicalCtaAnalytics then
+		v6 = p6
+	end
+
+	return useMemo(fn, {
+		p,
+		p2,
 		p3,
-		s1,
 		p4,
-		s2,
+		data,
 		p5,
-		t3,
-		v30
+		v4,
+		v3,
+		v5,
+		v6
 	})
 end
 

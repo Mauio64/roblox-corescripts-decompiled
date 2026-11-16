@@ -1,1 +1,3 @@
-return (require(script.FeedbackAlert))
+local FeedbackAlert = require(script.FeedbackAlert)
+
+return FeedbackAlert

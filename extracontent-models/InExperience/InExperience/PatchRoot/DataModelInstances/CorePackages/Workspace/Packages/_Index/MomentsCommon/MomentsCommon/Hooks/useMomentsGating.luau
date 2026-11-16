@@ -1,65 +1,99 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local React = require(MomentsCommonParent.React)
-local useAppPolicy = require(MomentsCommonParent.UniversalAppPolicy).useAppPolicy
-local SharedFlags = require(MomentsCommonParent.SharedFlags)
-local v6 = require(MomentsCommonParent.Loggers).Logger:new("Moments.Gating")
+local parent = MomentsCommon.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local SharedFlags = require(parent.SharedFlags)
+local Loggers = require(parent.Loggers)
+local v = Loggers.Logger:new("Moments.Gating")
+
 local FFlagEnableArgus = SharedFlags.FFlagEnableArgus
-local FFlagEnableArgusFlyoutEntry = SharedFlags.FFlagEnableArgusFlyoutEntry
-local FFlagEnableArgusTab = SharedFlags.FFlagEnableArgusTab
 local FFlagArgoEnableMoments = SharedFlags.FFlagArgoEnableMoments
-local FFlagArgusTabImpliesFlyout = SharedFlags.FFlagArgusTabImpliesFlyout
-local v12 = game:DefineFastFlag("DebugMomentsGating", false)
-local ArgusExperiment = require(MomentsCommon.Flags.ArgusExperiment)
+local FFlagMomentsCreationFeatureGate = SharedFlags.FFlagMomentsCreationFeatureGate
+local defineFastFlag = game:DefineFastFlag("DebugMomentsGating", false)
+local FFlagFlyoutRemoveMomentsForArgoEnabled = SharedFlags.FFlagFlyoutRemoveMomentsForArgoEnabled
 
-local function useMomentsGating() -- line: 49
-	-- upvalues: FFlagEnableArgus (copy), useAppPolicy (copy), ArgusExperiment (copy), React (copy), FFlagArgoEnableMoments (copy), FFlagEnableArgusFlyoutEntry (copy), FFlagArgusTabImpliesFlyout (copy), FFlagEnableArgusTab (copy), v12 (copy), v6 (copy)
-	local v15 = FFlagEnableArgus
-	local v16 = useAppPolicy(function(p1) -- line: 52
-		return p1.getDisplayMomentsMoreTabTile()
-	end)
-	local v17 = v15 and v16
-	local v18 = ArgusExperiment.useExperimentConfig({
-		isExposureEnabled = false
-	})
-	local v19 = React.useMemo(function() -- line: 59
-		-- upvalues: v18 (copy), FFlagArgoEnableMoments (copy), v17 (copy), v15 (copy), v16 (copy), FFlagEnableArgusFlyoutEntry (copy), FFlagArgusTabImpliesFlyout (copy), FFlagEnableArgusTab (copy)
-		local entryType = v18.entryType
-		local v22 = entryType == "tab"
-		local v23 = FFlagArgoEnableMoments and v17
+local GetMomentsCapabilities = require(MomentsCommon.Stores.GetMomentsCapabilities)
+local getIsSupportedOnPlatform
 
+if FFlagFlyoutRemoveMomentsForArgoEnabled then
+	getIsSupportedOnPlatform = require(MomentsCommon.Utils.getIsSupportedOnPlatform)
+else
+	getIsSupportedOnPlatform = nil
+end
+
+local function useMomentsGating()
+	local isMasterEnabled = FFlagEnableArgus
+
+	local momentsCapabilities = GetMomentsCapabilities(false)
+	local isAmpPolicyEnabled = useSignalState(momentsCapabilities.getHasMomentsAccess)
+	local v2 = useSignalState(momentsCapabilities.getIsInfluencerContentEnabled)
+	local v3
+
+	if FFlagMomentsCreationFeatureGate then
+		v3 = useSignalState(momentsCapabilities.getCanCreateMoments)
+	else
+		v3 = nil
+	end
+
+	local isSupportedOnPlatform
+
+	if FFlagFlyoutRemoveMomentsForArgoEnabled then
+		isSupportedOnPlatform = getIsSupportedOnPlatform()
+	else
+		isSupportedOnPlatform = false
+	end
+
+	local v4 = isMasterEnabled and isAmpPolicyEnabled
+
+	local useMemo = React.useMemo
+	local function fn()
 		return {
-			isMasterEnabled = v15,
-			isAmpPolicyEnabled = v16,
-			isMomentsEnabled = v17,
-			isFlyoutEntryEnabled = v23 or v17 and (entryType == "flyout" or (FFlagEnableArgusFlyoutEntry or FFlagArgusTabImpliesFlyout and v22)),
-			isTabEnabled = v23 or v17 and (v22 or FFlagEnableArgusTab),
-			platformIntegrationEnabled = v23 or v17 and v18.platformIntegration,
-			influencerUploadsEnabled = v17 and v18.influencerUploads,
-			experimentConfig = v18
+			isMasterEnabled = isMasterEnabled,
+			isAmpPolicyEnabled = isAmpPolicyEnabled,
+			isMomentsEnabled = v4,
+			isSupportedOnPlatform = isSupportedOnPlatform,
+			isFlyoutEntryEnabled = v4,
+			isTabEnabled = FFlagArgoEnableMoments and v4,
+			isCreationEnabled = v4 and (not FFlagMomentsCreationFeatureGate or v3),
+			platformIntegrationEnabled = v4,
+			influencerUploadsEnabled = v4 and v2
 		}
-	end, {
-		v15,
-		v16,
-		v17,
-		v18
+	end
+
+	local v5 = if FFlagMomentsCreationFeatureGate then v3 else false
+	local v6 = useMemo(fn, {
+		isMasterEnabled,
+		isAmpPolicyEnabled,
+		v4,
+		isSupportedOnPlatform,
+		isAmpPolicyEnabled,
+		v2,
+		v5
 	})
 
-	React.useEffect(function() -- line: 83
-		-- upvalues: v12 (copy), v6 (copy), v19 (copy), FFlagEnableArgusFlyoutEntry (copy), FFlagEnableArgusTab (copy), FFlagArgoEnableMoments (copy)
-		if not v12 then
+	React.useEffect(function()
+		if not defineFastFlag then
 			return
 		end
 
-		v6:debug("Moments.Gating master={} ampPolicy={} moments={} entryType={} platformIntegration={} influencerUploads={} flyout={} tab={} forceFlyout={} forceTab={} forceAll={}", tostring(v19.isMasterEnabled), tostring(v19.isAmpPolicyEnabled), tostring(v19.isMomentsEnabled), tostring(v19.experimentConfig.entryType), tostring(v19.platformIntegrationEnabled), tostring(v19.influencerUploadsEnabled), tostring(v19.isFlyoutEntryEnabled), tostring(v19.isTabEnabled), tostring(FFlagEnableArgusFlyoutEntry), tostring(FFlagEnableArgusTab), (tostring(FFlagArgoEnableMoments)))
-	end, {
-		v12,
-		FFlagEnableArgusFlyoutEntry,
-		FFlagEnableArgusTab,
-		v19
-	})
+		v:debug(
+			"Moments.Gating master={} ampPolicy={} moments={} supportedOnPlatform={} platformIntegration={} influencerUploads={} creation={} flyout={} tab={} forceAll={}",
+			tostring(v6.isMasterEnabled),
+			tostring(v6.isAmpPolicyEnabled),
+			tostring(v6.isMomentsEnabled),
+			tostring(v6.isSupportedOnPlatform),
+			tostring(v6.platformIntegrationEnabled),
+			tostring(v6.influencerUploadsEnabled),
+			tostring(v6.isCreationEnabled),
+			tostring(v6.isFlyoutEntryEnabled),
+			tostring(v6.isTabEnabled),
+			(tostring(FFlagArgoEnableMoments))
+		)
+	end, { defineFastFlag, v6 })
 
-	return v19
+	return v6
 end
 
 return useMomentsGating

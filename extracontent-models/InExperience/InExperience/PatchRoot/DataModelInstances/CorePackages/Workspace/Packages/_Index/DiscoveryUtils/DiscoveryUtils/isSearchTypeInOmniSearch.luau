@@ -1,13 +1,9 @@
-local Parent = script:FindFirstAncestor("DiscoveryUtils").Parent
-local SearchTypes = require(Parent.RobloxAppEnums).SearchTypes
+local parent = script:FindFirstAncestor("DiscoveryUtils").Parent
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local SearchTypes = RobloxAppEnums.SearchTypes
 
-local function isSearchTypeInOmniSearch(p1) -- line: 4
-	-- upvalues: SearchTypes (copy)
-	if p1 == SearchTypes.Games or (p1 == SearchTypes.Players or p1 == SearchTypes.Auto or p1 == SearchTypes.TopResults) then
-		return true
-	end
-
-	return false
+local function isSearchTypeInOmniSearch(p): boolean
+	return p == SearchTypes.Games or p == SearchTypes.Players or p == SearchTypes.Auto or p == SearchTypes.TopResults
 end
 
 return isSearchTypeInOmniSearch

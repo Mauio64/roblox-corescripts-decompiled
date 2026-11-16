@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.WhatsNew.WhatsNew))
+local WhatsNew = require(Workspace.WhatsNew.WhatsNew)
+
+return WhatsNew

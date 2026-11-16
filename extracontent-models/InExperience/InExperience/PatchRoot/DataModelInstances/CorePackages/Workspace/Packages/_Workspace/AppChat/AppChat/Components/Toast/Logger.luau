@@ -1,8 +1,7 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local v2 = require(AppChat.Logger):new("RoactChat.Toast")
+local Logger = require(AppChat.Logger)
 
-v2:setContext({
-	screen = "Toast"
-})
+local v = Logger:new("RoactChat.Toast")
+v:setContext({ screen = "Toast" })
 
-return v2
+return v

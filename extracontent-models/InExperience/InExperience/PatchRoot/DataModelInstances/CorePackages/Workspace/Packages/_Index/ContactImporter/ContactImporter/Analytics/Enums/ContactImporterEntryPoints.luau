@@ -1,7 +1,8 @@
-local ParentParent = script.Parent.Parent.Parent
-local Contexts = require(ParentParent.dependencies).SocialLuaAnalytics.Analytics.Enums.Contexts
+local parent = script.Parent.Parent.Parent
+local dependencies = require(parent.dependencies)
+local contexts = dependencies.SocialLuaAnalytics.Analytics.Enums.Contexts
 
 return {
-	HomePage = `{ Contexts.HomePage }FriendsSort`,
-	AddFriends = Contexts.AddFriends
+	HomePage = `{contexts.HomePage}FriendsSort`,
+	AddFriends = contexts.AddFriends
 }

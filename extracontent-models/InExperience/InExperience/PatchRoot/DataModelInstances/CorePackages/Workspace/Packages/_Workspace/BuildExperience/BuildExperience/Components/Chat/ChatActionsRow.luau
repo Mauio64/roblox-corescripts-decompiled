@@ -1,54 +1,147 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
+local FFlagBuildExperienceConfirmStop = require(BuildExperience.Flags.FFlagBuildExperienceConfirmStop)
+
+local FFlagBuildExperienceGateSendDuringResponse = require(BuildExperience.Flags.FFlagBuildExperienceGateSendDuringResponse)
+local StopAssistantResponseDialog = require(script.Parent.StopAssistantResponseDialog)
+
 local IconButton = Foundation.IconButton
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
 
-local function constantSource() -- line: 29
+local function constantSource(): number
 	return 0
 end
-local function ChatActionsRow(t1: {[any]: any}) -- line: 33
-	-- upvalues: React (copy), constantSource (copy), SignalsReact (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy)
-	local v12 = React.useCallback(function(p1) -- line: 34
-		-- upvalues: t1 (copy), constantSource (copy)
-		if t1.getIsComposerEmpty ~= nil then
-			return t1.getIsComposerEmpty(p1)
+
+local function ChatActionsRow(props)
+	local v = React.useCallback(function(callback)
+		if props.getIsComposerEmpty ~= nil then
+			return props.getIsComposerEmpty(callback)
 		end
 
-		if typeof(p1) == "function" then
-			p1(constantSource)
+		if typeof(callback) == "function" then
+			callback(constantSource)
 		end
 
-		return t1.isComposerEmpty == true
-	end, {
-		t1.getIsComposerEmpty,
-		t1.isComposerEmpty
-	})
-	local v13 = SignalsReact.useSignalState(v12)
-	local v14 = t1.isAssistantResponding and (t1.canStopAssistantResponse ~= false and t1.canSendWhileResponding ~= true)
-	local v15 = not v14 and (v13 or t1.isSendDisabled == true)
+		return props.isComposerEmpty == true
+	end, { props.getIsComposerEmpty, props.isComposerEmpty })
+	local v2 = SignalsReact.useSignalState(v)
+	local v3
 
-	return React.createElement(IconButton, {
-		isCircular = true,
-		LayoutOrder = t1.LayoutOrder,
-		icon = if not v14 then IconName.ArrowWideShortUp else IconName.StopSmall,
-		size = InputSize.Small,
-		variant = if not v14 then if v13 then ButtonVariant.Standard else ButtonVariant.Emphasis else ButtonVariant.Standard,
-		isDisabled = v15,
-		onActivated = function() -- line: 59
-			-- upvalues: v14 (copy), t1 (copy)
-			if v14 then
-				t1.onStop()
+	if props.canStopAssistantResponse == false then
+		v3 = false
+	else
+		v3 = props.canSendWhileResponding ~= true
+	end
 
-				return
+	local v4
+
+	if props.isAssistantResponding then
+		v4 = v3
+	else
+		v4 = FFlagBuildExperienceModelPicker
+
+		if v4 then
+			v4 = props.canStopAssistantResponse == true and v3
+		end
+	end
+
+	local v5 = props.isAssistantResponding ~= true or props.canSendWhileResponding == true
+
+	local v6 = not v4
+		and (FFlagBuildExperienceGateSendDuringResponse and not v5 or v2 and props.hasAttachments ~= true and true or props.isSendDisabled == true)
+	local state, v7, onCancel, onConfirm
+
+	if FFlagBuildExperienceConfirmStop then
+		local setState
+		state, setState = React.useState(false)
+		v7 = setState
+		onCancel = React.useCallback(function()
+			setState(false)
+		end, {})
+		onConfirm = React.useCallback(function()
+			setState(false)
+			props.onStop()
+		end, { props.onStop })
+
+		React.useEffect(function()
+			if not v4 then
+				setState(false)
 			end
+		end, { v4 })
+	else
+		v7 = nil
+		state = false
+	end
 
-			t1.onSend()
+	local createElement = React.createElement
+	local v8 = {
+		LayoutOrder = props.LayoutOrder,
+		icon = 0,
+		size = 0,
+		variant = 0,
+		isCircular = true,
+		isDisabled = 0,
+		onActivated = 0
+	}
+	local icon
+
+	if v4 then
+		icon = IconName.StopSmall
+	else
+		icon = IconName.ArrowWideShortUp
+	end
+
+	v8.icon = icon
+	v8.size = InputSize.Small
+	local variant
+
+	if v4 then
+		variant = ButtonVariant.Standard
+	elseif v2 and props.hasAttachments ~= true then
+		variant = ButtonVariant.Standard
+	else
+		variant = ButtonVariant.Emphasis
+	end
+
+	v8.variant = variant
+
+	v8.isDisabled = v6 or v4 and props.isStopDisabled == true
+	function v8.onActivated()
+		if not v4 then
+			props.onSend()
+		elseif FFlagBuildExperienceConfirmStop then
+			v7(true)
+		else
+			props.onStop()
 		end
-	})
+	end
+
+	local element = createElement(IconButton, v8)
+
+	if not FFlagBuildExperienceConfirmStop then
+		return element
+	end
+
+	local createElement2 = React.createElement
+	local fragment = React.Fragment
+	local stopDialog
+
+	if state and v4 then
+		stopDialog = React.createElement(StopAssistantResponseDialog, {
+			onCancel = onCancel,
+			onConfirm = onConfirm
+		})
+	end
+
+	return createElement2(fragment, nil, { Action = element, StopDialog = stopDialog })
 end
 
 return ChatActionsRow

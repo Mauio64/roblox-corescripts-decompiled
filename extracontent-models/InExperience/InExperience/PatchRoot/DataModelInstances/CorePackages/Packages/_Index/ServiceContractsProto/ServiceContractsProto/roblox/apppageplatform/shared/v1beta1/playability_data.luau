@@ -1,130 +1,122 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 41
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		is_playable = t3 ~= nil and (t3.is_playable ~= nil and t3.is_playable),
-		playability_status = if t3 ~= nil and t3.playability_status ~= nil then t3.playability_status else ""
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(p)
+	local v2 = {
+		is_playable = p ~= nil and p.is_playable ~= nil and p.is_playable,
+		playability_status = (p == nil or p.playability_status == nil) and "" or p.playability_status
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 48
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.is_playable then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class.encode(p)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v9, v10, not p1.is_playable and 0 or 1)
+	if p.is_playable then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, p.is_playable and 1 or 0)
 	end
 
-	if p1.playability_status ~= nil and p1.playability_status ~= "" then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.playability_status)
+	if p.playability_status ~= nil and p.playability_status ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, p.playability_status)
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 67
-	-- upvalues: t2 (copy), proto (copy)
-	local v15 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v17, v18
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v17, v18, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v18 == proto.wireTypes.varint then
-			if v17 == 1 then
-				local v19
-
-				v19, n2 = proto.readVarInt(p2, n2)
-				v15.is_playable = v19 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_playable = v5 ~= 0
 			else
-				local v20
-
-				v20, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v18 == proto.wireTypes.lengthDelimited then
-			if v17 == 2 then
-				local v21
-
-				v21, n2 = proto.readBuffer(p2, n2)
-				v15.playability_status = buffer.tostring(v21)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.playability_status = buffer.tostring(v5)
 			else
-				local v22, v23 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v23 + v22
+				v2 = v5 + varInt
 			end
-		elseif v18 == proto.wireTypes.i32 then
-			local v24
-
-			v24, n2 = proto.readFixed32(p2, n2)
-		elseif v18 == proto.wireTypes.i64 then
-			local v25
-
-			v25, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v18)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v15
-end
-function t2.jsonEncode(p3) -- line: 115
-	local t4 = {}
-
-	if p3.is_playable then
-		t4.isPlayable = p3.is_playable
-	end
-
-	if p3.playability_status ~= nil and p3.playability_status ~= "" then
-		t4.playabilityStatus = p3.playability_status
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 129
-	-- upvalues: t2 (copy)
-	local v29 = t2.new()
-
-	if t5.is_playable ~= nil then
-		v29.is_playable = t5.is_playable
-	end
-
-	if t5.isPlayable ~= nil then
-		v29.is_playable = t5.isPlayable
-	end
-
-	if t5.playability_status ~= nil then
-		v29.playability_status = t5.playability_status
-	end
-
-	if t5.playabilityStatus ~= nil then
-		v29.playability_status = t5.playabilityStatus
-	end
-
-	return v29
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(p)
+	local v2 = {}
+
+	if p.is_playable then
+		v2.isPlayable = p.is_playable
+	end
+
+	if p.playability_status ~= nil and p.playability_status ~= "" then
+		v2.playabilityStatus = p.playability_status
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.is_playable ~= nil then
+		v2.is_playable = data.is_playable
+	end
+
+	if data.isPlayable ~= nil then
+		v2.is_playable = data.isPlayable
+	end
+
+	if data.playability_status ~= nil then
+		v2.playability_status = data.playability_status
+	end
+
+	if data.playabilityStatus ~= nil then
+		v2.playability_status = data.playabilityStatus
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "PlayabilityData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.PlayabilityData"
 }
-t1.PlayabilityData = t2
-typeRegistry.default:register(t1.PlayabilityData)
 
-return {
-	PlayabilityData = t1.PlayabilityData
-}
+v.PlayabilityData = class
+
+typeRegistry.default:register(v.PlayabilityData)
+
+return { PlayabilityData = v.PlayabilityData }

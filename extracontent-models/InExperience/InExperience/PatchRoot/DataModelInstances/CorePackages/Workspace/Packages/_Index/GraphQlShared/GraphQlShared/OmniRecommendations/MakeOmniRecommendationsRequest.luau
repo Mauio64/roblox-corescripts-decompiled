@@ -1,35 +1,40 @@
-local Parent = script:FindFirstAncestor("GraphQlShared").Parent
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("GraphQlShared").Parent
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local Http = require(parent.Http)
+local Url = Http.Url
 local HttpService = game:GetService("HttpService")
-local DiscoveryUtils = require(Parent.DiscoveryUtils)
-local FFlagEnableContextFeaturesForOmniRecommendations = require(Parent.SharedFlags).FFlagEnableContextFeaturesForOmniRecommendations
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableContextFeaturesForOmniRecommendations = SharedFlags.FFlagEnableContextFeaturesForOmniRecommendations
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagHomePYMKUseProfileFrameThumbnail = SharedFlags2.GetFFlagHomePYMKUseProfileFrameThumbnail
 local AddSystemInfoToArgs = DiscoveryUtils.AddSystemInfoToArgs
 local OmniRecommendationsPageType = DiscoveryUtils.OmniRecommendationsPageType
-local v9 = UrlBuilder.new({
-	path = "/discovery-api/omni-recommendation",
-	base = Url.APIS_URL
-})
 
-return function(p1, p2, p3, p4, p5, p6, p7, p8, p9) -- line: 54
-	-- upvalues: OmniRecommendationsPageType (copy), FFlagEnableContextFeaturesForOmniRecommendations (copy), AddSystemInfoToArgs (copy), v9 (copy), HttpService (copy)
-	local t1 = {
-		pageType = OmniRecommendationsPageType.fromAppPage(p2),
-		sessionId = p3,
-		pageToken = p4,
-		supportedTreatmentTypes = p5,
-		requestIntent = p6,
-		topicIds = p7,
-		sduiTreatmentTypes = p8
+local v = urlBuilder.new({ base = Url.APIS_URL, path = "/discovery-api/omni-recommendation" })
+
+return function(callback, p, sessionId, pageToken, supportedTreatmentTypes, requestIntent, topicIds, sduiTreatmentTypes, contextFeatures, includePymkSortProfileFrame)
+	local v2 = {
+		["pageType"] = OmniRecommendationsPageType.fromAppPage(p),
+		sessionId = sessionId,
+		pageToken = pageToken,
+		supportedTreatmentTypes = supportedTreatmentTypes,
+		requestIntent = requestIntent,
+		topicIds = topicIds,
+		sduiTreatmentTypes = sduiTreatmentTypes
 	}
 
-	if FFlagEnableContextFeaturesForOmniRecommendations and p9 then
-		t1.contextFeatures = p9
+	if FFlagEnableContextFeaturesForOmniRecommendations and contextFeatures then
+		v2.contextFeatures = contextFeatures
 	end
 
-	AddSystemInfoToArgs(t1)
+	if GetFFlagHomePYMKUseProfileFrameThumbnail() and includePymkSortProfileFrame then
+		v2.includePymkSortProfileFrame = includePymkSortProfileFrame
+	end
 
-	return p1(v9(), "POST", {
-		postBody = HttpService:JSONEncode(t1)
-	})
+	AddSystemInfoToArgs(v2)
+
+	return callback(v(), "POST", { postBody = HttpService:JSONEncode(v2) })
 end

@@ -1,27 +1,24 @@
 require(script.Parent.Parent.types)
 
-return function(p1) -- line: 7
-	return function(s1: string) -- line: 8
-		-- upvalues: p1 (copy)
-		p1(function(p2) -- line: 9
-			-- upvalues: s1 (copy)
-			local v4 = p2[s1]
+return function(callback)
+	return function(p: string)
+		callback(function(p2)
+			local v = p2[p]
 
-			if v4 == nil then
+			if v == nil then
 				return p2
 			end
 
-			local v5 = table.clone(p2)
-
-			v5[s1] = {
+			local clone = table.clone(p2)
+			clone[p] = {
 				startTime = nil,
 				endTime = nil,
 				deltaMs = nil,
 				sent = nil,
-				metadata = table.clone(v4.metadata)
+				metadata = table.clone(v.metadata)
 			}
 
-			return v5
+			return clone
 		end)
 	end
 end

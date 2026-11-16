@@ -1,32 +1,38 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
+
 local HttpService = game:GetService("HttpService")
-local HttpRequest = require(DataHydrationParent.HttpRequest)
-local Promise = require(DataHydrationParent.Promise)
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
+local HttpRequest = require(parent.HttpRequest)
+local Promise = require(parent.Promise)
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
+
 local FollowingsUrlBuilder = require(script.Parent.FollowingsUrlBuilder)
 
-local function requestUpdateFollowing(s1: string, b1: boolean) -- line: 13
-	-- upvalues: getLocalPlayerUserId (copy), Promise (copy), FollowingsUrlBuilder (copy), HttpRequest (copy), HttpService (copy)
-	local v11 = getLocalPlayerUserId()
+local function requestUpdateFollowing(p: string, flag: boolean)
+	local localPlayerUserId = getLocalPlayerUserId()
 
-	if not v11 or v11 <= 0 then
+	if not localPlayerUserId or localPlayerUserId <= 0 then
 		return Promise.reject({
 			ClientError = "Missing or invalid local player ID",
 			message = "Cannot update following status: missing or invalid local player ID"
 		})
 	end
 
-	local v12 = FollowingsUrlBuilder.buildFollowingUpdateUrl(tostring(v11), s1)
+	local followingUpdateUrl = FollowingsUrlBuilder.buildFollowingUpdateUrl(tostring(localPlayerUserId), p)
 
-	return HttpRequest.config({
-		requestFunction = function(s2: string, s3: string, p1) -- line: 25
-			-- upvalues: HttpRequest (copy)
-			return HttpRequest.requestFunctions.RequestInternal(s2, s3, p1)
+	local config = HttpRequest.config({
+		requestFunction = function(p2: string, p3: string, p4)
+			return HttpRequest.requestFunctions.RequestInternal(p2, p3, p4)
 		end
-	})(v12, not b1 and "DELETE" or "POST", {
-		postBody = if not b1 then nil else HttpService:JSONEncode({})
 	})
+	local postBody
+
+	if flag then
+		postBody = HttpService:JSONEncode({})
+	end
+
+	return config(followingUpdateUrl, flag and "POST" or "DELETE", { postBody = postBody })
 end
 
 return requestUpdateFollowing

@@ -1,370 +1,391 @@
 require(script.Parent.ErrorReport)
+local parent = script:FindFirstAncestor("ErrorReporters").Parent
 
-local _ = script:FindFirstAncestor("ErrorReporters").Parent
-local t1 = {}
+local SentryReporterUtility = {}
 
-local function toUnsignedInt(p1) -- line: 124
-	if p1 == nil then
+local defineFastFlag = game:DefineFastFlag("SentryIncludeRolloutFlagsContext", false)
+
+local defineFastFlag2 = game:DefineFastFlag("SentryIncludeIxpEnrolledExperimentsContext", false)
+
+local function isJsonCompatible(result): boolean -- 1 equivalent call inferred from this helper
+	local typeName = typeof(result)
+
+	if result == nil or typeName == "string" or typeName == "boolean" then
+		return true
+	end
+
+	return typeName == "number" and result == result and result ~= 1e999 and result ~= -1e999
+end
+
+function SentryReporterUtility.safeGet(p, p2: string)
+	local success, result = pcall(function()
+		return p[p2]
+	end)
+
+	if not success then
+		return "unparsable"
+	end
+
+	if isJsonCompatible(result) then -- inferred equivalent call
+		return result
+	end
+
+	return "json_incompatible"
+end
+
+local function toUnsignedInt(safeGet) -- 6 equivalent calls inferred from this helper
+	if safeGet == nil then
 		return nil
 	end
 
-	local num = tonumber(p1)
+	local v = tonumber(safeGet)
 
-	if num == nil then
+	if v == nil then
 		return nil
 	end
 
-	if num < 0 then
+	if v < 0 then
 		return 0
 	end
 
-	return (math.floor(num))
+	return (math.floor(v))
 end
-local function convertErrorStackToSentryFrame(p2) -- line: 184
-	local t2 = {
-		lineno = tonumber(p2.line) or 0
+
+local function convertErrorStackToSentryFrame(data)
+	local v = {
+		lineno = tonumber(data.line) or 0
 	}
 
-	if p2.funcName then
-		t2["function"] = p2.funcName
+	if data.funcName then
+		v["function"] = data.funcName
 	end
 
-	if p2.sourceCode then
-		t2.filename = p2.sourceCode
-		t2.abs_path = p2.sourceCode
+	if data.sourceCode then
+		v.filename = data.sourceCode
+		v.abs_path = data.sourceCode
 	end
 
-	if p2.column then
-		t2.colno = tonumber(p2.column)
+	if data.column then
+		v.colno = tonumber(data.column)
 	end
 
-	if p2.library then
-		t2.module = p2.library
+	if data.library then
+		v.module = data.library
 	end
 
-	if p2.address then
-		t2.instruction_addr = p2.address
+	if data.address then
+		v.instruction_addr = data.address
 	end
 
-	if p2.guessed_frame == false then
-		t2.in_app = true
+	if data.guessed_frame == false then
+		v.in_app = true
 	end
 
-	return t2
+	return v
 end
 
-function t1.parseThreadsToSentry(p3) -- line: 286
-	-- upvalues: convertErrorStackToSentryFrame (copy)
-	if not p3 then
+function SentryReporterUtility.parseThreadsToSentry(items)
+	if not items then
 		return nil
 	end
 
-	local t3 = {}
-	local n1 = 1
+	local id = 1
+	local values = {}
 
-	for k, v in pairs(p3) do
-		local t4 = {
-			id = n1,
-			name = v.name or k
+	for k, item in pairs(items) do
+		local v = {
+			id = id,
+			name = item.name or k
 		}
 
-		if k == "main" or v.name == "main" then
-			t4.main = true
+		if k == "main" or item.name == "main" then
+			v.main = true
 		end
 
-		if v.fault == true then
-			t4.crashed = true
+		if item.fault == true then
+			v.crashed = true
 		end
 
-		if v.stack and #v.stack > 0 then
-			local t5 = {}
+		if item.stack and #item.stack > 0 then
+			local v2 = {}
 
-			for _, v2 in ipairs(v.stack) do
-				table.insert(t5, (convertErrorStackToSentryFrame(v2)))
+			for _, v3 in ipairs(item.stack) do
+				table.insert(v2, convertErrorStackToSentryFrame(v3))
 			end
 
-			local t6 = {}
+			local frames = {}
 
-			for i = #t5, 1, -1 do
-				table.insert(t6, t5[i])
+			for i = #v2, 1, -1 do
+				table.insert(frames, v2[i])
 			end
 
-			t4.stacktrace = {
-				frames = t6
-			}
+			v.stacktrace = { frames = frames }
 		end
 
-		table.insert(t3, t4)
-		n1 += 1
+		table.insert(values, v)
+		id += 1
 	end
 
-	if #t3 == 0 then
+	if #values == 0 then
 		return nil
 	end
 
-	return {
-		values = t3
-	}
+	return { values = values }
 end
 
-local function parseAppContext(p4) -- line: 371
-	local t7 = {}
-	local attributes = p4.attributes
+local function parseAppContext(p)
+	local appContext = {}
+	local attributes = p.attributes
 
-	if attributes.appVersion ~= nil then
-		t7.app_version = attributes.appVersion
+	local safeGet = SentryReporterUtility.safeGet(attributes, "appVersion")
+
+	if safeGet ~= nil then
+		appContext.app_version = safeGet
 	end
 
-	if attributes.AppInstallationId ~= nil then
-		t7.device_app_hash = attributes.AppInstallationId
+	local safeGet2 = SentryReporterUtility.safeGet(attributes, "AppInstallationId")
+
+	if safeGet2 ~= nil then
+		appContext.device_app_hash = safeGet2
 	end
 
-	if attributes.CoreScriptVersion ~= nil then
-		t7.core_script_version = attributes.CoreScriptVersion
+	local safeGet3 = SentryReporterUtility.safeGet(attributes, "CoreScriptVersion")
+
+	if safeGet3 ~= nil then
+		appContext.core_script_version = safeGet3
 	end
 
-	if attributes.RobloxChannel ~= nil then
-		t7.roblox_channel = attributes.RobloxChannel
+	local safeGet4 = SentryReporterUtility.safeGet(attributes, "RobloxChannel")
+
+	if safeGet4 ~= nil then
+		appContext.roblox_channel = safeGet4
 	end
 
-	if attributes.AppRunningTime ~= nil then
-		t7.app_running_time = attributes.AppRunningTime
+	local safeGet5 = SentryReporterUtility.safeGet(attributes, "AppRunningTime")
+
+	if safeGet5 ~= nil then
+		appContext.app_running_time = safeGet5
 	end
 
-	if attributes.UserAgent ~= nil then
-		t7.user_agent = attributes.UserAgent
+	local safeGet6 = SentryReporterUtility.safeGet(attributes, "UserAgent")
+
+	if safeGet6 ~= nil then
+		appContext.user_agent = safeGet6
 	end
 
-	if attributes.BaseUrl ~= nil then
-		t7.base_url = attributes.BaseUrl
+	local safeGet7 = SentryReporterUtility.safeGet(attributes, "BaseUrl")
+
+	if safeGet7 ~= nil then
+		appContext.base_url = safeGet7
 	end
 
-	if attributes.WindowsLaunchType ~= nil then
-		t7.windows_launch_type = attributes.WindowsLaunchType
+	local safeGet8 = SentryReporterUtility.safeGet(attributes, "WindowsLaunchType")
+
+	if safeGet8 ~= nil then
+		appContext.windows_launch_type = safeGet8
 	end
 
-	if attributes.CountryCode ~= nil then
-		t7.country_code = attributes.CountryCode
+	local safeGet9 = SentryReporterUtility.safeGet(attributes, "CountryCode")
+
+	if safeGet9 ~= nil then
+		appContext.country_code = safeGet9
 	end
 
-	return t7
+	if defineFastFlag then
+		local safeGet10 = SentryReporterUtility.safeGet(attributes, "RolloutFlagsInControl")
+
+		if safeGet10 ~= nil then
+			appContext.rollout_flags_in_control = safeGet10
+		end
+
+		local safeGet11 = SentryReporterUtility.safeGet(attributes, "RolloutFlagsInVariant")
+
+		if safeGet11 ~= nil then
+			appContext.rollout_flags_in_variant = safeGet11
+		end
+	end
+
+	if defineFastFlag2 then
+		local safeGet10 = SentryReporterUtility.safeGet(attributes, "IxpEnrolledExperiments")
+
+		if safeGet10 ~= nil then
+			appContext.ixp_enrolled_experiments = safeGet10
+		end
+	end
+
+	return appContext
 end
-local function parseNetworkContext(p5) -- line: 436
-	local t8 = {}
 
-	if p5.attributes.networkType ~= nil then
-		t8.network_type = p5.attributes.networkType
+local function parseNetworkContext(p) -- 1 equivalent call inferred from this helper
+	local networkContext = {}
+
+	local safeGet = SentryReporterUtility.safeGet(p.attributes, "networkType")
+
+	if safeGet ~= nil then
+		networkContext.network_type = safeGet
 	end
 
-	return t8
+	return networkContext
 end
-local function parseOSContext(p6) -- line: 470
-	local t9 = {}
-	local attributes = p6.attributes
 
-	if attributes.baseOs ~= nil then
-		t9.name = attributes.baseOs
+local function parseOSContext(p)
+	local osContext = {}
+	local attributes = p.attributes
+
+	local safeGet = SentryReporterUtility.safeGet(attributes, "baseOs")
+
+	if safeGet ~= nil then
+		osContext.name = safeGet
 	end
 
-	if attributes.systemVersion ~= nil then
-		t9.version = attributes.systemVersion
+	local safeGet2 = SentryReporterUtility.safeGet(attributes, "systemVersion")
+
+	if safeGet2 ~= nil then
+		osContext.version = safeGet2
 	end
 
-	if attributes.systemVersion ~= nil then
-		t9.version = attributes.systemVersion
-	end
-
-	return t9
+	return osContext
 end
-local function parseDeviceContext(p7) -- line: 541
-	local t10 = {}
-	local attributes = p7.attributes
 
-	if attributes.deviceName ~= nil then
-		t10.name = attributes.deviceName
+local function parseDeviceContext(p)
+	local deviceContext = {}
+	local attributes = p.attributes
+
+	local safeGet = SentryReporterUtility.safeGet(attributes, "deviceName")
+
+	if safeGet ~= nil then
+		deviceContext.name = safeGet
 	end
 
-	if attributes.batteryLevel ~= nil then
-		local num = tonumber(attributes.batteryLevel)
+	local safeGet2 = SentryReporterUtility.safeGet(attributes, "batteryLevel")
 
-		if num ~= nil then
-			t10.battery_level = num
-		end
-	end
+	if safeGet2 ~= nil then
+		local battery_level = tonumber(safeGet2)
 
-	if attributes.manufacturer ~= nil then
-		t10.manufacturer = attributes.manufacturer
-	end
-
-	if attributes.maxMemory ~= nil then
-		local maxMemory = attributes.maxMemory
-		local v38
-
-		if maxMemory == nil then
-			v38 = nil
-		else
-			local num = tonumber(maxMemory)
-
-			v38 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
-		end
-
-		if v38 ~= nil then
-			t10.memory_size = v38
+		if battery_level ~= nil then
+			deviceContext.battery_level = battery_level
 		end
 	end
 
-	if attributes.availRAM ~= nil then
-		local availRAM = attributes.availRAM
-		local v41
+	local safeGet3 = SentryReporterUtility.safeGet(attributes, "manufacturer")
 
-		if availRAM == nil then
-			v41 = nil
-		else
-			local num = tonumber(availRAM)
+	if safeGet3 ~= nil then
+		deviceContext.manufacturer = safeGet3
+	end
 
-			v41 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
-		end
+	local safeGet4 = SentryReporterUtility.safeGet(attributes, "maxMemory")
 
-		if v41 ~= nil then
-			t10.free_memory = v41
+	if safeGet4 ~= nil then
+		local memory_size = toUnsignedInt(safeGet4) -- inferred equivalent call
+
+		if memory_size ~= nil then
+			deviceContext.memory_size = memory_size
 		end
 	end
 
-	if attributes.maxResolution ~= nil then
-		t10.screen_resolution = attributes.maxResolution
-	end
+	local safeGet5 = SentryReporterUtility.safeGet(attributes, "availRAM")
 
-	if attributes.thermalStatus ~= nil then
-		t10.thermal_status = attributes.thermalStatus
-	end
+	if safeGet5 ~= nil then
+		local free_memory = toUnsignedInt(safeGet5) -- inferred equivalent call
 
-	if attributes.cpuLogicalCount ~= nil then
-		local cpuLogicalCount = attributes.cpuLogicalCount
-		local v44
-
-		if cpuLogicalCount == nil then
-			v44 = nil
-		else
-			local num = tonumber(cpuLogicalCount)
-
-			v44 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
-		end
-
-		if v44 ~= nil then
-			t10.processor_count = v44
+		if free_memory ~= nil then
+			deviceContext.free_memory = free_memory
 		end
 	end
 
-	if attributes.cpuCoreCount ~= nil then
-		local cpuCoreCount = attributes.cpuCoreCount
-		local v47
+	local safeGet6 = SentryReporterUtility.safeGet(attributes, "maxResolution")
 
-		if cpuCoreCount == nil then
-			v47 = nil
-		else
-			local num = tonumber(cpuCoreCount)
+	if safeGet6 ~= nil then
+		deviceContext.screen_resolution = safeGet6
+	end
 
-			v47 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
-		end
+	local safeGet7 = SentryReporterUtility.safeGet(attributes, "thermalStatus")
 
-		if v47 ~= nil then
-			t10.cpu_core_count = v47
+	if safeGet7 ~= nil then
+		deviceContext.thermal_status = safeGet7
+	end
+
+	local safeGet8 = SentryReporterUtility.safeGet(attributes, "cpuLogicalCount")
+
+	if safeGet8 ~= nil then
+		local processor_count = toUnsignedInt(safeGet8) -- inferred equivalent call
+
+		if processor_count ~= nil then
+			deviceContext.processor_count = processor_count
 		end
 	end
 
-	if attributes.cpuMake ~= nil then
-		t10.cpu_description = attributes.cpuMake
-	end
+	local safeGet9 = SentryReporterUtility.safeGet(attributes, "cpuCoreCount")
 
-	if attributes.cpuPhysCount ~= nil then
-		local cpuPhysCount = attributes.cpuPhysCount
-		local v50
+	if safeGet9 ~= nil then
+		local cpu_core_count = toUnsignedInt(safeGet9) -- inferred equivalent call
 
-		if cpuPhysCount == nil then
-			v50 = nil
-		else
-			local num = tonumber(cpuPhysCount)
-
-			v50 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
-		end
-
-		if v50 ~= nil then
-			t10.cpu_physical_count = v50
+		if cpu_core_count ~= nil then
+			deviceContext.cpu_core_count = cpu_core_count
 		end
 	end
 
-	if attributes.cpuSpeed ~= nil then
-		local cpuSpeed = attributes.cpuSpeed
-		local v53
+	local safeGet10 = SentryReporterUtility.safeGet(attributes, "cpuMake")
 
-		if cpuSpeed == nil then
-			v53 = nil
-		else
-			local num = tonumber(cpuSpeed)
+	if safeGet10 ~= nil then
+		deviceContext.cpu_description = safeGet10
+	end
 
-			v53 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
-		end
+	local safeGet11 = SentryReporterUtility.safeGet(attributes, "cpuPhysCount")
 
-		if v53 ~= nil then
-			t10.cpu_speed = v53
+	if safeGet11 ~= nil then
+		local cpu_physical_count = toUnsignedInt(safeGet11) -- inferred equivalent call
+
+		if cpu_physical_count ~= nil then
+			deviceContext.cpu_physical_count = cpu_physical_count
 		end
 	end
 
-	return t10
+	local safeGet12 = SentryReporterUtility.safeGet(attributes, "cpuSpeed")
+
+	if safeGet12 ~= nil then
+		local cpu_speed = toUnsignedInt(safeGet12) -- inferred equivalent call
+
+		if cpu_speed ~= nil then
+			deviceContext.cpu_speed = cpu_speed
+		end
+	end
+
+	return deviceContext
 end
-local function parseCustomMetadataContexts(p8) -- line: 628
-	local t11 = {}
-	local customMetadata = p8.customMetadata
+
+local function parseCustomMetadataContexts(p)
+	local customMetadataContexts = {}
+	local customMetadata = p.customMetadata
 
 	if type(customMetadata) ~= "table" then
-		return t11
+		return customMetadataContexts
 	end
 
-	for v58, v59 in customMetadata do
-		if type(v59) == "table" and next(v59) ~= nil then
-			t11[v58] = v59
+	for k, v in customMetadata do
+		if not (type(v) == "table" and next(v) ~= nil) then
+			continue
 		end
+
+		customMetadataContexts[k] = v
 	end
 
-	return t11
+	return customMetadataContexts
 end
 
-function t1.parseErrorToContext(p9) -- line: 692
-	-- upvalues: parseAppContext (copy), parseDeviceContext (copy), parseCustomMetadataContexts (copy)
-	local t12 = {
-		app = parseAppContext(p9)
-	}
-	local t13 = {}
+function SentryReporterUtility.parseErrorToContext(p)
+	local errorToContext = {}
 
-	if p9.attributes.networkType ~= nil then
-		t13.network_type = p9.attributes.networkType
+	errorToContext.app = parseAppContext(p)
+	errorToContext.network = parseNetworkContext(p) -- inferred equivalent call
+	errorToContext.os = parseOSContext(p)
+	errorToContext.device = parseDeviceContext(p)
+
+	for k, v in parseCustomMetadataContexts(p) do
+		errorToContext[k] = v
 	end
 
-	t12.network = t13
-
-	local t14 = {}
-	local attributes = p9.attributes
-
-	if attributes.baseOs ~= nil then
-		t14.name = attributes.baseOs
-	end
-
-	if attributes.systemVersion ~= nil then
-		t14.version = attributes.systemVersion
-	end
-
-	if attributes.systemVersion ~= nil then
-		t14.version = attributes.systemVersion
-	end
-
-	t12.os = t14
-	t12.device = parseDeviceContext(p9)
-
-	for v65, v66 in parseCustomMetadataContexts(p9) do
-		t12[v65] = v66
-	end
-
-	return t12
+	return errorToContext
 end
 
-return t1
+return SentryReporterUtility

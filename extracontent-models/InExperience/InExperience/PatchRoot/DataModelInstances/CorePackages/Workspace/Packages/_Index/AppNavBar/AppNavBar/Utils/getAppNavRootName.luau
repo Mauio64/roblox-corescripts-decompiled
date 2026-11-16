@@ -1,15 +1,14 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
 
-require(ParentParent.Navigation)
+require(parent2.Navigation)
 
-local getPageNameFromRoute = require(scriptParent.getPageNameFromRoute)
+local getPageNameFromRoute = require(parent.getPageNameFromRoute)
 
-return function(p1) -- line: 11
-	-- upvalues: getPageNameFromRoute (copy)
-	if not p1 or (not p1.routes or not p1.routes[1]) then
-		return nil
+return function(p)
+	if p and p.routes and p.routes[1] then
+		return getPageNameFromRoute(p.routes[1])
 	end
 
-	return getPageNameFromRoute(p1.routes[1])
+	return nil
 end

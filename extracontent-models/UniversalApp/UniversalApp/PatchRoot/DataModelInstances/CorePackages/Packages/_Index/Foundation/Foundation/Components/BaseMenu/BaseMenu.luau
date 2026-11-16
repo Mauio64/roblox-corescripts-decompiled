@@ -1,187 +1,191 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Flags = require(Foundation.Utility.Flags)
 local View = require(Foundation.Components.View)
 local useScaledValue = require(Foundation.Utility.useScaledValue)
+
 local useBindable = require(Foundation.Utility.useBindable)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
 
 require(Foundation.Enums.ControlState)
-
 local Radius = require(Foundation.Enums.Radius)
 
 require(Foundation.Components.Types)
 
 local InputSize = require(Foundation.Enums.InputSize)
+
 local BaseMenuContext = require(script.Parent.BaseMenuContext)
 local BaseMenuScrollContainer = require(script.Parent.BaseMenuScrollContainer)
 local useSubmenuHover = require(script.Parent.useSubmenuHover)
+
 local DeclarativeBaseMenuContent = require(script.Parent.DeclarativeBaseMenuContent)
-local t1 = {
-	size = InputSize.Medium
-}
-local t2 = {
-	[Radius.Small] = "radius-small",
-	[Radius.Medium] = "radius-medium"
-}
 
-local function BaseMenu(p1, p2) -- line: 69
-	-- upvalues: React (copy), t1 (copy), withDefaults (copy), useBindable (copy), useScaledValue (copy), useSubmenuHover (copy), Flags (copy), DeclarativeBaseMenuContent (copy), t2 (copy), BaseMenuContext (copy), BaseMenuScrollContainer (copy), withCommonProps (copy), View (copy)
-	local v21, v22 = React.useBinding(false)
-	local v23 = table.clone(t1)
+local v = { size = InputSize.Medium }
 
-	v23.Visible = v21
+local v2 = { [Radius.Small] = "radius-small", [Radius.Medium] = "radius-medium" }
 
-	local v24 = withDefaults(p1, v23)
-	local v25 = useBindable(v24.width)
-	local v26 = useBindable(v24.maxHeight)
-	local v27 = useScaledValue(260)
-	local v28 = useScaledValue(320)
-	local v29, v30 = React.useState(false)
-	local v31 = useSubmenuHover()
+local function BaseMenu(p, ref)
+	local visible, v3 = React.useBinding(false)
+	local clone = table.clone(v)
+	clone.Visible = visible
 
-	React.useEffect(function() -- line: 81
-		-- upvalues: v22 (copy)
-		task.delay(0, function() -- line: 82
-			-- upvalues: v22 (copy)
-			v22(true)
+	local v4 = withDefaults(p, clone)
+	local width = useBindable(v4.width)
+	local maxHeight = useBindable(v4.maxHeight)
+	local v5 = useScaledValue(260)
+	local v6 = useScaledValue(320)
+	local state, setState = React.useState(false)
+	local v7 = useSubmenuHover()
+	React.useEffect(function()
+		task.delay(0, function()
+			v3(true)
 		end)
 	end, {})
 
-	local v32 = React.useCallback(function() -- line: 87
-		-- upvalues: v30 (copy)
-		v30(true)
+	local setHasLeading = React.useCallback(function()
+		setState(true)
 	end, {})
-	local v33 = React.useMemo(function() -- line: 92
-		-- upvalues: v25 (copy), Flags (copy), v27 (copy)
-		return v25:map(function(uDim: UDim?) -- line: 93
-			-- upvalues: Flags (copy), v27 (copy)
-			if uDim then
-				return uDim.Offset
+
+	local v8 = React.useMemo(function()
+		return width:map(function(udim: UDim?)
+			if udim then
+				return udim.Offset
 			end
 
 			if Flags.FoundationBaseMenuContentSizing then
 				return 0
 			end
 
-			return v27
+			return v5
 		end)
-	end, {
-		v25,
-		v27
-	})
-	local v34 = React.useMemo(function() -- line: 101
-		-- upvalues: v25 (copy), Flags (copy), v24 (copy), v28 (copy)
-		return v25:map(function(uDim: UDim?) -- line: 102
-			-- upvalues: Flags (copy), v24 (copy), v28 (copy)
+	end, { width, v5 })
+
+	local autoSize = React.useMemo(function()
+		return width:map(function(udim: UDim?)
 			if Flags.FoundationBaseMenuContentSizing then
-				return not uDim or v24.couldGrow == true
+				return not udim or v4.couldGrow == true
 			end
 
-			return not uDim or v24.couldGrow == true and uDim.Offset < v28
+			local v9 = not udim
+
+			if not v9 then
+				if v4.couldGrow == true then
+					return udim.Offset < v6
+				end
+
+				return false
+			end
+
+			return v9
 		end)
-	end, {
-		v25,
-		v28,
-		v24.couldGrow
-	})
-	local v35 = React.useMemo(function() -- line: 110
-		-- upvalues: React (copy), v34 (copy), v33 (copy), Flags (copy), v28 (copy)
-		return {
-			MinSize = React.joinBindings({
-				v34,
-				v33
-			}):map(function(p3) -- line: 112
-				-- upvalues: Flags (copy)
-				local v46 = p3[1]
-				local v47 = p3[2]
+	end, { width, v6, v4.couldGrow })
 
-				if not v46 then
+	local sizeConstraint = React.useMemo(function()
+		local v9 = {
+			MinSize = React.joinBindings({ autoSize, v8 }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+
+				if not item or Flags.FoundationBaseMenuContentSizing and item2 == 0 then
 					return nil
 				end
 
-				if Flags.FoundationBaseMenuContentSizing and v47 == 0 then
-					return nil
-				end
-
-				return (Vector2.new(v47, 0))
+				return (Vector2.new(item2, 0))
 			end),
-			MaxSize = if not Flags.FoundationBaseMenuContentSizing then v34:map(function(p4) -- line: 124
-				-- upvalues: v28 (copy)
-				if p4 then
-					return (Vector2.new(v28, 1e999))
+			MaxSize = 0
+		}
+		local maxSize
+
+		if not Flags.FoundationBaseMenuContentSizing then
+			maxSize = autoSize:map(function(p2)
+				if p2 then
+					return (Vector2.new(v6, 1e999))
 				end
 
 				return nil
-			end) else nil
-		}
-	end, {
-		v34,
-		v33,
-		v28
-	})
-	local v36 = v24.children or (not v24.items or React.createElement(DeclarativeBaseMenuContent, {
-		items = v24.items,
-		size = v24.size
-	}))
-	local v37 = v24.radius == nil and "" or t2[v24.radius]
-	local v38 = React.createElement(BaseMenuContext.Provider, {
-		value = {
-			depth = 1,
-			onActivated = v24.onActivated,
-			onNestedLeafActivated = v24.onNestedLeafActivated,
-			size = v24.size,
-			hasLeading = v29,
-			setHasLeading = v32,
-			hoverOpenPath = v31.openPath,
-			hoverOpenAtDepth = v31.openAtDepth,
-			hoverCloseAtDepth = v31.closeAtDepth,
-			hoverReset = v31.reset,
-			maxHeight = v24.maxHeight
-		}
-	}, v36)
+			end)
+		end
 
-	if v24.maxHeight then
-		return React.createElement(BaseMenuScrollContainer, {
-			maxHeight = v26,
-			autoSize = v34,
-			width = v25,
-			scrollViewProps = withCommonProps(v24, {
-				ref = p2,
-				sizeConstraint = v35,
-				scrollingFrameRef = v24.scrollingFrameRef,
-				tag = `stroke-standard stroke-default { v37 }`
-			})
-		}, v38)
+		v9.MaxSize = maxSize
+		return v9
+	end, { autoSize, v8, v6 })
+
+	local v9 = v4.children
+
+	if not v9 and v4.items then
+		v9 = React.createElement(DeclarativeBaseMenuContent, { items = v4.items, size = v4.size })
 	end
 
-	return React.createElement(View, withCommonProps(v24, {
-		tag = `col stroke-standard stroke-default { v37 }`,
-		AutomaticSize = v34:map(function(p5) -- line: 173
-			if p5 then
+	local v10 = v4.radius == nil and "" or v2[v4.radius]
+
+	local v11 = React.useMemo(function()
+		return {
+			onActivated = v4.onActivated,
+			onNestedLeafActivated = v4.onNestedLeafActivated,
+			size = v4.size,
+			hasLeading = state,
+			setHasLeading = setHasLeading,
+			hoverOpenPath = v7.openPath,
+			hoverOpenAtDepth = v7.openAtDepth,
+			hoverCloseAtDepth = v7.closeAtDepth,
+			hoverReset = v7.reset,
+			depth = 1,
+			maxHeight = v4.maxHeight
+		}
+	end, {
+		v4.onActivated,
+		v4.onNestedLeafActivated,
+		v4.size,
+		state,
+		v7.openPath,
+		v7.openAtDepth,
+		v7.closeAtDepth,
+		v7.reset,
+		v4.maxHeight
+	})
+
+	local element = React.createElement(BaseMenuContext.Provider, { value = v11 }, v9)
+
+	if v4.maxHeight then
+		return React.createElement(BaseMenuScrollContainer, {
+			maxHeight = maxHeight,
+			autoSize = autoSize,
+			width = width,
+			scrollViewProps = withCommonProps(v4, {
+				ref = ref,
+				sizeConstraint = sizeConstraint,
+				scrollingFrameRef = v4.scrollingFrameRef,
+				tag = `stroke-standard stroke-default {v10}`
+			})
+		}, element)
+	end
+
+	return React.createElement(View, withCommonProps(v4, {
+		tag = `col stroke-standard stroke-default {v10}`,
+		AutomaticSize = autoSize:map(function(p2)
+			if p2 then
 				return Enum.AutomaticSize.XY
 			end
 
 			return Enum.AutomaticSize.Y
 		end),
-		Size = React.joinBindings({
-			v34,
-			v25
-		}):map(function(p6) -- line: 176
-			local v41 = p6[1]
-			local v42 = p6[2]
+		Size = React.joinBindings({ autoSize, width }):map(function(list)
+			local item = list[1]
+			local item2 = list[2]
 
-			if v41 then
+			if item then
 				return nil
 			end
 
-			return (UDim2.new(v42, UDim.new()))
+			return (UDim2.new(item2, UDim.new()))
 		end),
-		ref = p2,
-		sizeConstraint = v35
-	}), v38)
+		ref = ref,
+		sizeConstraint = sizeConstraint
+	}), element)
 end
 
 return React.memo(React.forwardRef(BaseMenu))

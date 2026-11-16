@@ -1,11 +1,12 @@
-local Parent = script:FindFirstAncestor("PeekView").Parent
-local t = require(Parent.t)
-local mutedError = require(Parent.Loggers).mutedError
-local v4 = t.strictInterface({
-	page = t.string,
-	dismissMethod = t.string
-})
-local v5 = t.strictInterface({
+local parent = script:FindFirstAncestor("PeekView").Parent
+
+local t = require(parent.t)
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+
+local strictInterface = t.strictInterface({ page = t.string, dismissMethod = t.string })
+
+local strictInterface2 = t.strictInterface({
 	page = t.string,
 	dismissMethod = t.string,
 	locale = t.optional(t.string),
@@ -13,7 +14,8 @@ local v5 = t.strictInterface({
 	source = t.string,
 	index = t.number
 })
-local v6 = t.union(v4, v5)
+
+local union = t.union(strictInterface, strictInterface2)
 
 return {
 	dismissMethodEnum = {
@@ -22,14 +24,13 @@ return {
 		swipe = "swipe",
 		handleTap = "handleTap"
 	},
-	logEvent = function(p1, s1: string, p2) -- line: 31
-		-- upvalues: v6 (copy), mutedError (copy)
-		local v10, v11 = v6(p2)
+	logEvent = function(object, p: string, p2)
+		local v, v2 = union(p2)
 
-		if not v10 then
-			mutedError(v11)
+		if not v then
+			mutedError(v2)
 		end
 
-		p1:sendEventDeferred(s1, "uiPeekViewDismissed", p2)
+		object:sendEventDeferred(p, "uiPeekViewDismissed", p2)
 	end
 }

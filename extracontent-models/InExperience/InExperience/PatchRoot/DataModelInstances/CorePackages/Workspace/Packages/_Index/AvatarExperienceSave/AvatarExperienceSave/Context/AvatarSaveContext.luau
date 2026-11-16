@@ -1,22 +1,24 @@
 local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
-local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
-local React = require(AvatarExperienceSaveParent.React)
-local Signals = require(AvatarExperienceSaveParent.Signals)
+local parent = AvatarExperienceSave.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+
 local SaveStatusEnum = require(AvatarExperienceSave.Enums.SaveStatusEnum)
 
 if game:DefineFastFlag("FFlagAXFixAvatarSaveContext", false) then
 	return (React.createContext({
 		getHistorySignal = Signals.createSignal({}),
 		getCurrentHistoryIndexSignal = Signals.createSignal(0),
-		updateHistoryIndexAndGetCharacterData = function(_: number) -- line: 42
+		updateHistoryIndexAndGetCharacterData = function(_: number): nil
 			return nil
 		end,
 		getLastSuccessfullySavedStateSignal = Signals.createSignal({}),
 		getSaveEligibilityStatusSignal = Signals.createSignal(SaveStatusEnum.AlreadySaved),
-		autoSaveNextNewSaveData = function() -- line: 47
+		autoSaveNextNewSaveData = function(): nil
 			return nil
 		end,
-		trySaveAvatar = function() -- line: 50
+		trySaveAvatar = function(): nil
 			return nil
 		end
 	}))

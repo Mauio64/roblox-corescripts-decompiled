@@ -1,111 +1,100 @@
 local SceneUnderstanding = script:FindFirstAncestor("SceneUnderstanding")
+
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
+
 local safelyAccessProperty = require(SceneUnderstanding.safelyAccessProperty)
 local getOutputWires = require(SceneUnderstanding.wiring.getOutputWires)
-
 require(SceneUnderstanding.wiring.types)
-
 local toWirableInstance = require(SceneUnderstanding.wiring.toWirableInstance)
 
-local function calculateSoundPotentialAudibility(p1) -- line: 13
-	-- upvalues: safelyAccessProperty (copy)
-	if not p1.IsPlaying then
+local function calculateSoundPotentialAudibility(sound) -- 1 equivalent call inferred from this helper
+	if not sound.IsPlaying then
 		return 0
 	end
 
-	local v12 = safelyAccessProperty(p1, "RollOffGain", 0)
-	local v13 = not p1.SoundGroup and 1 or p1.SoundGroup.Volume
+	local v = safelyAccessProperty(sound, "RollOffGain", 0)
 
-	if v12 < 1 then
-		v12 /= 10
+	local v2 = not sound.SoundGroup and 1 or sound.SoundGroup.Volume
+
+	if v < 1 then
+		v /= 10
 	end
 
-	return v13 * p1.Volume * v12
+	return v2 * sound.Volume * v
 end
-local function getOutputsOf(p2) -- line: 41
-	-- upvalues: getOutputWires (copy), toWirableInstance (copy)
-	if typeof(p2) == "Instance" and p2:IsA("AudioEmitter") then
-		return (p2:GetInteractingListeners())
+
+local function getOutputsOf(audioEmitter)
+	if typeof(audioEmitter) == "Instance" and audioEmitter:IsA("AudioEmitter") then
+		return (audioEmitter:GetInteractingListeners())
 	end
 
-	local t1 = {}
+	local result = {}
 
-	for _, v17 in getOutputWires(p2) do
-		local v18 = toWirableInstance(v17.TargetInstance)
+	for _, v in getOutputWires(audioEmitter) do
+		local v2 = toWirableInstance(v.TargetInstance)
 
-		if v18 then
-			table.insert(t1, v18)
+		if v2 then
+			table.insert(result, v2)
 		end
 	end
 
-	return t1
+	return result
 end
-local function getAudibilityMultiplierFor(p3) -- line: 60
-	local n1 = 0
 
-	for _, v22 in p3:GetInteractingListeners() do
-		n1 += v22:GetAudibilityFor(p3)
+local function getAudibilityMultiplierFor(object)
+	local audibilityMultiplierFor = 0
+
+	for _, v in object:GetInteractingListeners() do
+		audibilityMultiplierFor += v:GetAudibilityFor(object)
 	end
 
-	return n1
+	return audibilityMultiplierFor
 end
-local function getAudibilityOf(p4, t2: {[any]: any}?) -- line: 68
-	-- upvalues: getOutputsOf (copy), getAudibilityOf (copy)
-	local v25 = t2 or {}
 
-	if v25[p4] then
+local function getAudibilityOf(sound, options)
+	local v = options or {}
+
+	if v[sound] then
 		return 0
 	end
 
-	v25[p4] = true
+	v[sound] = true
+	local v2 = 1
 
-	local n2 = 1
+	if typeof(sound) == "Instance" then
+		if sound:IsA("AudioPlayer") or sound:IsA("AudioFader") then
+			v2 = sound.Volume
+		elseif sound:IsA("AudioEmitter") then
+			v2 = 0
 
-	if typeof(p4) == "Instance" then
-		if p4:IsA("AudioPlayer") or p4:IsA("AudioFader") then
-			n2 = p4.Volume
-		elseif p4:IsA("AudioEmitter") then
-			n2 = 0
-
-			for _, v28 in p4:GetInteractingListeners() do
-				n2 += v28:GetAudibilityFor(p4)
+			for _, v3 in sound:GetInteractingListeners() do
+				v2 += v3:GetAudibilityFor(sound)
 			end
-		elseif p4:IsA("AudioDeviceOutput") then
+		elseif sound:IsA("AudioDeviceOutput") then
 			return 1
 		end
 	end
 
-	local n3 = 0
+	local total = 0
 
-	for _, v31 in getOutputsOf(p4) do
-		n3 += n2 * getAudibilityOf(v31, v25)
+	for _, v3 in getOutputsOf(sound) do
+		total += v2 * getAudibilityOf(v3, v)
 	end
 
-	return n3
+	return total
 end
-local function calculatePotentialAudibility(p5) -- line: 105
-	-- upvalues: safelyAccessProperty (copy), UserGameSettings (copy), getAudibilityOf (copy)
-	local v33 = safelyAccessProperty(UserGameSettings, "MasterVolume", 0)
-	local n4
 
-	if p5:IsA("Sound") then
-		if not p5.IsPlaying then
-			n4 = 0
-		else
-			local v35 = safelyAccessProperty(p5, "RollOffGain", 0)
-			local v36 = not p5.SoundGroup and 1 or p5.SoundGroup.Volume
+local function calculatePotentialAudibility(sound)
+	local v = safelyAccessProperty(UserGameSettings, "MasterVolume", 0)
+	local v2
 
-			if v35 < 1 then
-				v35 /= 10
-			end
-
-			n4 = v36 * p5.Volume * v35
-		end
+	if sound:IsA("Sound") then
+		v2 = calculateSoundPotentialAudibility(sound) -- inferred equivalent call
 	else
-		n4 = getAudibilityOf(p5)
+		v2 = getAudibilityOf(sound)
 	end
 
-	return v33 * n4
+	return v * v2
 end
 
 return calculatePotentialAudibility

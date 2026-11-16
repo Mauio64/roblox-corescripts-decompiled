@@ -1,76 +1,89 @@
-local Parent = script:FindFirstAncestor("Responsive").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Responsive").Parent
+local React = require(parent.React)
 local Responsive = require(script.Parent.Parent.Responsive)
 local ContainerRef = require(script.Parent.Parent.Context.ContainerRef)
-local v5 = game:DefineFastFlag("LuaAppResponsiveFixHookDeps", false)
 
-function id(p1) -- line: 9
-	return p1
+local defineFastFlag = game:DefineFastFlag("LuaAppResponsiveFixHookDeps", false)
+
+function id(p)
+	return p
 end
-function useResponsiveImpl(p2, p3, s1: string?) -- line: 17
-	-- upvalues: React (copy), ContainerRef (copy), Responsive (copy), v5 (copy)
-	local v10 = if typeof(p2) ~= "function" then id else p2
-	local v11 = React.useContext(ContainerRef)
-	local v12, v13 = React.useState(v10(Responsive.DefaultKey))
-	local v14 = React.useRef("")
-	local v15 = React.useRef({
-		Key = Responsive.DefaultKey
-	})
-	local t1 = nil
 
-	if typeof(p2) == "table" then
-		t1 = {}
+function useResponsiveImpl(value, p, p2: string?)
+	local v
 
-		for _, v18 in p2 do
-			t1[v18] = true
+	if typeof(value) == "function" then
+		v = value
+	else
+		v = id
+	end
+
+	local v2 = React.useContext(ContainerRef)
+	local state, setState = React.useState(v(Responsive.DefaultKey))
+	local ref = React.useRef("")
+	local ref2 = React.useRef({ Key = Responsive.DefaultKey })
+	local set
+
+	if typeof(value) == "table" then
+		set = {}
+
+		for _, item in value do
+			set[item] = true
+		end
+	else
+		set = nil
+	end
+
+	local useEffect = React.useEffect
+	local function fn()
+		if not (v2 and v2.current) then
+			return function() end
+		end
+
+		local v3 = Responsive.bindContainer(v2.current, p)
+		local connection = v3:connect(function()
+			local currentKey = v3:currentKey(p2)
+
+			if set then
+				if set[currentKey] or ref.current and set[ref.current] then
+					ref2.current = v3:currentRule(p2)
+					setState(currentKey)
+				end
+			else
+				ref2.current = v3:currentRule(p2)
+				setState(v(currentKey))
+			end
+
+			ref.current = currentKey
+		end)
+
+		ref2.current = v3:currentRule(p2)
+		local currentKey = v3:currentKey(p2)
+		setState(v(currentKey))
+		ref.current = currentKey
+
+		return function()
+			connection:disconnect()
+			v3:destroy()
 		end
 	end
 
-	React.useEffect(function() -- line: 34
-		-- upvalues: v11 (copy), Responsive (copy), p3 (copy), s1 (copy), t1 (ref), v14 (copy), v15 (copy), v13 (copy), v10 (copy)
-		if v11 and v11.current then
-			local v19 = Responsive.bindContainer(v11.current, p3)
-			local v20 = v19:connect(function() -- line: 37
-				-- upvalues: v19 (copy), s1 (copy), t1 (ref), v14 (copy), v15 (copy), v13 (copy), v10 (copy)
-				local v22 = v19:currentKey(s1)
+	local current = v2 and v2.current or false
+	local v3
 
-				if t1 then
-					if t1[v22] or v14.current and t1[v14.current] then
-						v15.current = v19:currentRule(s1)
-						v13(v22)
-					end
-				else
-					v15.current = v19:currentRule(s1)
-					v13(v10(v22))
-				end
+	if defineFastFlag then
+		v3 = p
+	end
 
-				v14.current = v22
-			end)
+	local v4
 
-			v15.current = v19:currentRule(s1)
+	if defineFastFlag then
+		v4 = p2
+	end
 
-			local v21 = v19:currentKey(s1)
+	useEffect(fn, { v2, current, v3, v4 })
 
-			v13(v10(v21))
-			v14.current = v21
-
-			return function() -- line: 56
-				-- upvalues: v20 (copy), v19 (copy)
-				v20:disconnect()
-				v19:destroy()
-			end
-		end
-
-		return function() -- line: 61
-		end
-	end, {
-		v11,
-		not not v11 and (v11.current or false),
-		if not v5 then nil else p3,
-		if not v5 then nil else s1
-	})
-
-	return v12, v15.current
+	return state, ref2.current
 end
 
 return useResponsiveImpl

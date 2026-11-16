@@ -6,38 +6,53 @@ local Contexts = Enums.Contexts
 local EventTypes = Enums.EventTypes
 local SubPages = Enums.SubPages
 local Pages = Enums.Pages
-
 require(script.Parent.Parent.Analytics.FireEvent.Types)
-
 local isEnum = require(script.Parent.Parent.Utils.isEnum)
 local t = dependencies.t
 local formatKeyValidationError = require(script.Parent.formatKeyValidationError)
 local formatErrorForIncorrectKey = require(script.Parent.formatErrorForIncorrectKey)
-local v13 = t.strictInterface({
+
+local strictInterface = t.strictInterface({
 	context = t.any,
 	eventType = t.any,
 	additionalInfo = t.optional(t.table),
 	formatRulesForAdditionalInfo = t.optional(t.table)
 })
 
-return function(p1, t1: {[any]: any}?) -- line: 23
-	-- upvalues: llama (copy), isEnum (copy), Contexts (copy), formatKeyValidationError (copy), EventTypes (copy), formatErrorForIncorrectKey (copy), v13 (copy), SubPages (copy), Pages (copy)
-	llama.Dictionary.map(p1, function(p2, p3) -- line: 24
-		-- upvalues: isEnum (copy), Contexts (copy), formatKeyValidationError (copy), EventTypes (copy), formatErrorForIncorrectKey (copy), v13 (copy), SubPages (copy), Pages (copy), llama (copy), t1 (copy)
-		local v18 = if not isEnum(p3) then p3 else p3.rawValue()
+return function(p, options): boolean
+	llama.Dictionary.map(p, function(data, p2)
+		if isEnum(p2) then
+			p2 = p2.rawValue()
+		end
 
-		assert(Contexts.isEnumValue(p2.context), formatKeyValidationError("context", "a Context enum", v18))
-		assert(EventTypes.isEnumValue(p2.eventType), formatKeyValidationError("eventType", "an EventType enum", v18))
-		assert(type(p2.additionalInfo) == "table" or p2.additionalInfo == nil, formatKeyValidationError("additionalInfo", "nil or a table", v18))
-		assert(type(p2.formatRulesForAdditionalInfo) == "table" or p2.formatRulesForAdditionalInfo == nil, formatKeyValidationError("formatRulesForAdditionalInfo", "nil or a table", v18))
-		assert(formatErrorForIncorrectKey(v13)(p2, v18))
+		assert(Contexts.isEnumValue(data.context), formatKeyValidationError("context", "a Context enum", p2))
+		assert(EventTypes.isEnumValue(data.eventType), formatKeyValidationError("eventType", "an EventType enum", p2))
 
-		if p2.additionalInfo then
-			assert(p2.additionalInfo.subpage == nil or SubPages.isEnumValue(p2.additionalInfo.subpage), formatKeyValidationError("subpage additional info", "SubPages enum", v18))
-			assert(p2.additionalInfo.page == nil or Pages.isEnumValue(p2.additionalInfo.page), formatKeyValidationError("page additional info", "Pages enum", v18))
-			llama.Dictionary.map(t1 or {}, function(p4, p5) -- line: 53
-				-- upvalues: p2 (copy), v18 (copy)
-				assert(p4(p2.additionalInfo[p5]), p5 .. " key is invalid. Issue with: " .. v18)
+		assert(
+			type(data.additionalInfo) == "table" or data.additionalInfo == nil,
+			formatKeyValidationError("additionalInfo", "nil or a table", p2)
+		)
+
+		assert(
+			type(data.formatRulesForAdditionalInfo) == "table" or data.formatRulesForAdditionalInfo == nil,
+			formatKeyValidationError("formatRulesForAdditionalInfo", "nil or a table", p2)
+		)
+
+		assert(formatErrorForIncorrectKey(strictInterface)(data, p2))
+
+		if data.additionalInfo then
+			assert(
+				data.additionalInfo.subpage == nil or SubPages.isEnumValue(data.additionalInfo.subpage),
+				formatKeyValidationError("subpage additional info", "SubPages enum", p2)
+			)
+
+			assert(
+				data.additionalInfo.page == nil or Pages.isEnumValue(data.additionalInfo.page),
+				formatKeyValidationError("page additional info", "Pages enum", p2)
+			)
+
+			llama.Dictionary.map(options or {}, function(callback, p3)
+				assert(callback(data.additionalInfo[p3]), p3 .. " key is invalid. Issue with: " .. p2)
 			end)
 		end
 	end)

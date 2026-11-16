@@ -1,44 +1,35 @@
-local function unindentTags(s1: string, n1: number?) -- line: 49
-	local v4 = n1 or 2
+local function unindentTags(value: string, value2: number?)
+	local v = value2 or 2
 
-	if not string.find(s1, "<.->") then
-		return s1
+	if not string.find(value, "<.->") then
+		return value
 	end
 
-	local v5 = string.gsub(s1, "\r\n", "\n")
-	local parts = string.split(v5, "\n")
-	local t1 = table.create(#parts)
-	local t2 = {}
+	local v2 = string.gsub(value, "\r\n", "\n")
+	local v3 = string.split(v2, "\n")
+	local v4 = table.create(#v3)
+	local v5 = {}
 
-	for _, v10 in parts do
-		local _, stop = string.find(v10, "^[ \t]*")
-		local v13 = stop or 0
-		local v14 = string.sub(v10, v13 + 1)
+	for _, v6 in v3 do
+		local _, v7 = string.find(v6, "^[ \t]*")
+		local v8 = v7 or 0
+		local v9 = string.sub(v6, v8 + 1)
 
-		if string.find(v14, "^<") then
-			if string.find(v14, "^</") then
-				table.remove(t2)
-				table.insert(t1, v14)
-			elseif string.find(v14, "/>$") then
-				table.insert(t1, v14)
-			else
-				table.insert(t2, v13)
-				table.insert(t1, v14)
+		if string.find(v9, "^<") then
+			if string.find(v9, "^</") then
+				table.remove(v5)
+			elseif not string.find(v9, "/>$") then
+				table.insert(v5, v8)
 			end
+
+			table.insert(v4, v9)
 		else
-			local n2 = 0
-
-			if #t2 > 0 then
-				n2 = t2[#t2] + v4
-			end
-
-			local v16 = math.max(0, v13 - n2)
-
-			table.insert(t1, string.rep(" ", v16) .. v14)
+			local v10 = math.max(0, v8 - (not (#v5 > 0) and 0 or v5[#v5] + v))
+			table.insert(v4, string.rep(" ", v10) .. v9)
 		end
 	end
 
-	return table.concat(t1, "\n")
+	return table.concat(v4, "\n")
 end
 
 return unindentTags

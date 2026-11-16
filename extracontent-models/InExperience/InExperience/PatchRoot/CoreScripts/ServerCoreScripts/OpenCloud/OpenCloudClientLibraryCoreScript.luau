@@ -3,925 +3,861 @@ local HttpService = game:GetService("HttpService")
 local OpenCloudService = game:GetService("OpenCloudService")
 local RunService = game:GetService("RunService")
 
-function InvalidArgumentError(s1: string) -- line: 19
-	-- upvalues: HttpService (copy)
+function InvalidArgumentError(message: string)
 	return {
 		StatusCode = 400,
-		Body = HttpService:JSONEncode({
-			code = "INVALID_ARGUMENT",
-			message = s1
-		})
+		Body = HttpService:JSONEncode({ code = "INVALID_ARGUMENT", message = message })
 	}
 end
-function verifyTable(p1, p2) -- line: 37
-	if p1 == nil then
+
+function verifyTable(p, p2)
+	if not (p ~= nil and typeof(p) ~= "table") then
 		return nil
 	end
 
-	if typeof(p1) ~= "table" then
-		return InvalidArgumentError(`Argument not a table: { p2 }.`)
-	end
-
-	return nil
+	return InvalidArgumentError(`Argument not a table: {p2}.`)
 end
-function verifyNumber(p3, p4) -- line: 49
-	if p3 == nil then
+
+function verifyNumber(value, p)
+	if not (value ~= nil and typeof(value) ~= "number") then
 		return nil
 	end
 
-	if typeof(p3) ~= "number" then
-		return InvalidArgumentError(`Argument not a number: { p4 }.`)
-	end
-
-	return nil
+	return InvalidArgumentError(`Argument not a number: {p}.`)
 end
-function verifyString(p5, p6) -- line: 61
-	if p5 == nil then
+
+function verifyString(value, p)
+	if not (value ~= nil and typeof(value) ~= "string") then
 		return nil
 	end
 
-	if typeof(p5) ~= "string" then
-		return InvalidArgumentError(`Argument not a string: { p6 }.`)
-	end
-
-	return nil
+	return InvalidArgumentError(`Argument not a string: {p}.`)
 end
-function verifyEnum(p7, p8) -- line: 73
-	if p7 == nil then
+
+function verifyEnum(value, p)
+	if value == nil or (typeof(value) == "number" or typeof(value) == "string") then
 		return nil
 	end
 
-	if typeof(p7) ~= "number" and typeof(p7) ~= "string" then
-		return InvalidArgumentError(`Argument not an enum: { p8 }.`)
-	end
-
-	return nil
+	return InvalidArgumentError(`Argument not an enum: {p}.`)
 end
-function getApisUrl() -- line: 85
-	-- upvalues: ContentProvider (copy)
-	local v14 = ContentProvider.BaseUrl:lower()
-	local v15 = string.gsub(v14, "http:", "https:")
 
-	return string.gsub(v15, "www", "apis")
+function getApisUrl()
+	local baseUrl = ContentProvider.BaseUrl:lower()
+	local v = string.gsub(baseUrl, "http:", "https:")
+	return string.gsub(v, "www", "apis")
 end
-function getUrlPrefix(p9) -- line: 91
-	-- upvalues: RunService (copy)
-	if p9 ~= nil and p9["x-api-key"] ~= nil then
+
+function getUrlPrefix(p): string
+	if p ~= nil and p["x-api-key"] ~= nil then
 		return ""
 	end
 
-	if RunService:IsStudio() then
-		return "user"
-	end
-
-	return "rcc"
+	return if RunService:IsStudio() then "user" else "rcc"
 end
-function verifyGetUniverseRequest(p10, p11) -- line: 101
-	if p10 == nil then
+
+function verifyGetUniverseRequest(p, p2)
+	if p == nil then
 		return nil
 	end
 
-	local v19 = verifyTable(p10, p11)
+	local v = verifyTable(p, p2)
 
-	if v19 ~= nil then
-		return v19
+	if v ~= nil then
+		return v
 	end
 
-	if p10.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p11 }.path.`)
+	if p.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p2}.path.`)
 	end
 
-	local v20 = verifyString(p10.path, `{ p11 }.path`)
-
-	if v20 ~= nil then
-		return v20
-	end
-
-	return nil
+	local v2 = verifyString(p.path, `{p2}.path`)
+	return if v2 ~= nil then v2 else nil
 end
-function getUniverseUrl(p12, p13) -- line: 122
-	if p12.path == nil then
+
+function getUniverseUrl(p, p2)
+	if p.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: getUniverseRequest.path.")
 	end
 
-	if string.match(p12.path, "^universes/([^/]+)$") == nil then
+	if string.match(p.path, "^universes/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: getUniverseRequest.path.")
 	end
 
-	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p13), (tostring(p12.path))))
+	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p2), (tostring(p.path))))
 end
-function getUniverse(p14, p15) -- line: 135
-	-- upvalues: OpenCloudService (copy)
-	if p14 == nil then
+
+function getUniverse(p, headers)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v25 = verifyGetUniverseRequest(p14, "getUniverseRequest")
+	local v = verifyGetUniverseRequest(p, "getUniverseRequest")
 
-	if v25 ~= nil then
-		return v25
+	if v ~= nil then
+		return v
 	end
 
-	local v26 = getUniverseUrl(p14, p15)
+	local universeUrl = getUniverseUrl(p, headers)
 
-	if typeof(v26) ~= "string" then
-		return v26
+	if typeof(universeUrl) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = universeUrl,
+			Request_Type = "GET",
+			Headers = headers
+		})
 	end
 
-	return OpenCloudService:HttpRequestAsync({
-		Url = v26,
-		Request_Type = "GET",
-		Headers = p15
-	})
+	return universeUrl
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GetUniverse", getUniverse)
 
-function verifyTranslateTextRequest(p16, p17) -- line: 155
-	if p16 == nil then
+function verifyTranslateTextRequest(data, p)
+	if data == nil then
 		return nil
 	end
 
-	local v29 = verifyTable(p16, p17)
+	local v = verifyTable(data, p)
 
-	if v29 ~= nil then
-		return v29
+	if v ~= nil then
+		return v
 	end
 
-	if p16.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p17 }.path.`)
+	if data.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.path.`)
 	end
 
-	local v30 = verifyString(p16.path, `{ p17 }.path`)
+	local v2 = verifyString(data.path, `{p}.path`)
 
-	if v30 ~= nil then
-		return v30
+	if v2 ~= nil then
+		return v2
 	end
 
-	if p16.text == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p17 }.text.`)
+	if data.text == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.text.`)
 	end
 
-	local v31 = verifyString(p16.text, `{ p17 }.text`)
+	local v3 = verifyString(data.text, `{p}.text`)
 
-	if v31 ~= nil then
-		return v31
+	if v3 ~= nil then
+		return v3
 	end
 
-	local v32 = verifyString(p16.sourceLanguageCode, `{ p17 }.sourceLanguageCode`)
+	local v4 = verifyString(data.sourceLanguageCode, `{p}.sourceLanguageCode`)
 
-	if v32 ~= nil then
-		return v32
+	if v4 ~= nil then
+		return v4
 	end
 
-	for v33, v34 in p16.targetLanguageCodes do
-		local v35 = verifyString(v34, `{ p17 }.targetLanguageCodes[{ v33 }]`)
+	for k, targetLanguageCode in data.targetLanguageCodes do
+		local v5 = verifyString(targetLanguageCode, `{p}.targetLanguageCodes[{k}]`)
 
-		if v35 ~= nil then
-			return v35
+		if v5 ~= nil then
+			return v5
 		end
 	end
 
 	return nil
 end
-function translateTextUrl(p18) -- line: 196
-	if p18.path == nil then
+
+function translateTextUrl(p)
+	if p.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: translateTextRequest.path.")
 	end
 
-	if string.match(p18.path, "^universes/([^/]+)$") == nil then
+	if string.match(p.path, "^universes/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: translateTextRequest.path.")
 	end
 
-	return (string.format("%s%s/cloud/v2/%s:translateText", getApisUrl(), getUrlPrefix(), (tostring(p18.path))))
+	return (string.format("%s%s/cloud/v2/%s:translateText", getApisUrl(), getUrlPrefix(), (tostring(p.path))))
 end
-function translateText(p19) -- line: 209
-	-- upvalues: HttpService (copy), OpenCloudService (copy)
-	if p19 == nil then
+
+function translateText(p)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v38 = verifyTranslateTextRequest(p19, "translateTextRequest")
+	local v = verifyTranslateTextRequest(p, "translateTextRequest")
 
-	if v38 ~= nil then
-		return v38
+	if v ~= nil then
+		return v
 	end
 
-	local v39 = translateTextUrl(p19)
+	local url = translateTextUrl(p)
 
-	if typeof(v39) ~= "string" then
-		return v39
+	if typeof(url) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = url,
+			Request_Type = "POST",
+			Body = HttpService:JSONEncode(p)
+		})
 	end
 
-	local json = HttpService:JSONEncode(p19)
-
-	return OpenCloudService:HttpRequestAsync({
-		Url = v39,
-		Request_Type = "POST",
-		Body = json
-	})
+	return url
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "TranslateText", translateText)
 
-function verifyGenerateSpeechRequest(p20, p21) -- line: 231
-	if p20 == nil then
+function verifyGenerateSpeechRequest(data, p)
+	if data == nil then
 		return nil
 	end
 
-	local v43 = verifyTable(p20, p21)
+	local v = verifyTable(data, p)
 
-	if v43 ~= nil then
-		return v43
+	if v ~= nil then
+		return v
 	end
 
-	if p20.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p21 }.path.`)
+	if data.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.path.`)
 	end
 
-	local v44 = verifyString(p20.path, `{ p21 }.path`)
+	local v2 = verifyString(data.path, `{p}.path`)
 
-	if v44 ~= nil then
-		return v44
+	if v2 ~= nil then
+		return v2
 	end
 
-	if p20.text == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p21 }.text.`)
+	if data.text == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.text.`)
 	end
 
-	local v45 = verifyString(p20.text, `{ p21 }.text`)
+	local v3 = verifyString(data.text, `{p}.text`)
 
-	if v45 ~= nil then
-		return v45
+	if v3 ~= nil then
+		return v3
 	end
 
-	local v46 = verifyGeneratedSpeechStyle(p20.speechStyle, `{ p21 }.speechStyle`)
-
-	if v46 ~= nil then
-		return v46
-	end
-
-	return nil
+	local v4 = verifyGeneratedSpeechStyle(data.speechStyle, `{p}.speechStyle`)
+	return if v4 ~= nil then v4 else nil
 end
-function verifyGeneratedSpeechStyle(p22, p23) -- line: 265
-	if p22 == nil then
+
+function verifyGeneratedSpeechStyle(data, p)
+	if data == nil then
 		return nil
 	end
 
-	local v49 = verifyTable(p22, p23)
+	local v = verifyTable(data, p)
 
-	if v49 ~= nil then
-		return v49
+	if v ~= nil then
+		return v
 	end
 
-	local v50 = verifyString(p22.voiceId, `{ p23 }.voiceId`)
+	local v2 = verifyString(data.voiceId, `{p}.voiceId`)
 
-	if v50 ~= nil then
-		return v50
+	if v2 ~= nil then
+		return v2
 	end
 
-	local v51 = verifyNumber(p22.pitch, `{ p23 }.pitch`)
+	local v3 = verifyNumber(data.pitch, `{p}.pitch`)
 
-	if v51 ~= nil then
-		return v51
+	if v3 ~= nil then
+		return v3
 	end
 
-	local v52 = verifyNumber(p22.speed, `{ p23 }.speed`)
-
-	if v52 ~= nil then
-		return v52
-	end
-
-	return nil
+	local v4 = verifyNumber(data.speed, `{p}.speed`)
+	return if v4 ~= nil then v4 else nil
 end
-function generateSpeechUrl(p24) -- line: 293
-	if p24.path == nil then
+
+function generateSpeechUrl(p)
+	if p.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: generateSpeechRequest.path.")
 	end
 
-	if string.match(p24.path, "^universes/([^/]+)$") == nil then
+	if string.match(p.path, "^universes/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: generateSpeechRequest.path.")
 	end
 
-	return (string.format("%s%s/cloud/v2/%s:generateSpeech", getApisUrl(), getUrlPrefix(), (tostring(p24.path))))
+	return (string.format("%s%s/cloud/v2/%s:generateSpeech", getApisUrl(), getUrlPrefix(), (tostring(p.path))))
 end
-function generateSpeech(p25) -- line: 306
-	-- upvalues: HttpService (copy), OpenCloudService (copy)
-	if p25 == nil then
+
+function generateSpeech(p)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v55 = verifyGenerateSpeechRequest(p25, "generateSpeechRequest")
+	local v = verifyGenerateSpeechRequest(p, "generateSpeechRequest")
 
-	if v55 ~= nil then
-		return v55
+	if v ~= nil then
+		return v
 	end
 
-	local v56 = generateSpeechUrl(p25)
+	local url = generateSpeechUrl(p)
 
-	if typeof(v56) ~= "string" then
-		return v56
+	if typeof(url) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = url,
+			Request_Type = "POST",
+			Body = HttpService:JSONEncode(p)
+		})
 	end
 
-	local json = HttpService:JSONEncode(p25)
-
-	return OpenCloudService:HttpRequestAsync({
-		Url = v56,
-		Request_Type = "POST",
-		Body = json
-	})
+	return url
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GenerateSpeech", generateSpeech)
 
-function verifyGenerateTextRequest(p26, p27) -- line: 328
-	if p26 == nil then
+function verifyGenerateTextRequest(data, p)
+	if data == nil then
 		return nil
 	end
 
-	local v60 = verifyTable(p26, p27)
+	local v = verifyTable(data, p)
 
-	if v60 ~= nil then
-		return v60
+	if v ~= nil then
+		return v
 	end
 
-	if p26.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p27 }.path.`)
+	if data.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.path.`)
 	end
 
-	local v61 = verifyString(p26.path, `{ p27 }.path`)
+	local v2 = verifyString(data.path, `{p}.path`)
 
-	if v61 ~= nil then
-		return v61
+	if v2 ~= nil then
+		return v2
 	end
 
-	local v62 = verifyString(p26.userPrompt, `{ p27 }.userPrompt`)
+	local v3 = verifyString(data.userPrompt, `{p}.userPrompt`)
 
-	if v62 ~= nil then
-		return v62
+	if v3 ~= nil then
+		return v3
 	end
 
-	local v63 = verifyString(p26.systemPrompt, `{ p27 }.systemPrompt`)
+	local v4 = verifyString(data.systemPrompt, `{p}.systemPrompt`)
 
-	if v63 ~= nil then
-		return v63
+	if v4 ~= nil then
+		return v4
 	end
 
-	local v64 = verifyNumber(p26.temperature, `{ p27 }.temperature`)
+	local v5 = verifyNumber(data.temperature, `{p}.temperature`)
 
-	if v64 ~= nil then
-		return v64
+	if v5 ~= nil then
+		return v5
 	end
 
-	local v65 = verifyNumber(p26.topP, `{ p27 }.topP`)
+	local v6 = verifyNumber(data.topP, `{p}.topP`)
 
-	if v65 ~= nil then
-		return v65
+	if v6 ~= nil then
+		return v6
 	end
 
-	local v66 = verifyNumber(p26.maxTokens, `{ p27 }.maxTokens`)
+	local v7 = verifyNumber(data.maxTokens, `{p}.maxTokens`)
 
-	if v66 ~= nil then
-		return v66
+	if v7 ~= nil then
+		return v7
 	end
 
-	local v67 = verifyNumber(p26.seed, `{ p27 }.seed`)
+	local v8 = verifyNumber(data.seed, `{p}.seed`)
 
-	if v67 ~= nil then
-		return v67
+	if v8 ~= nil then
+		return v8
 	end
 
-	local v68 = verifyString(p26.contextToken, `{ p27 }.contextToken`)
+	local v9 = verifyString(data.contextToken, `{p}.contextToken`)
 
-	if v68 ~= nil then
-		return v68
+	if v9 ~= nil then
+		return v9
 	end
 
-	local v69 = verifyString(p26.model, `{ p27 }.model`)
-
-	if v69 ~= nil then
-		return v69
-	end
-
-	return nil
+	local v10 = verifyString(data.model, `{p}.model`)
+	return if v10 ~= nil then v10 else nil
 end
-function generateTextUrl(p28) -- line: 389
-	if p28.path == nil then
+
+function generateTextUrl(p)
+	if p.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: generateTextRequest.path.")
 	end
 
-	if string.match(p28.path, "^universes/([^/]+)$") == nil then
+	if string.match(p.path, "^universes/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: generateTextRequest.path.")
 	end
 
-	return (string.format("%s%s/cloud/v2/%s:generateText", getApisUrl(), getUrlPrefix(), (tostring(p28.path))))
+	return (string.format("%s%s/cloud/v2/%s:generateText", getApisUrl(), getUrlPrefix(), (tostring(p.path))))
 end
-function generateText(p29) -- line: 402
-	-- upvalues: HttpService (copy), OpenCloudService (copy)
-	if p29 == nil then
+
+function generateText(p)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v72 = verifyGenerateTextRequest(p29, "generateTextRequest")
+	local v = verifyGenerateTextRequest(p, "generateTextRequest")
 
-	if v72 ~= nil then
-		return v72
+	if v ~= nil then
+		return v
 	end
 
-	local v73 = generateTextUrl(p29)
+	local url = generateTextUrl(p)
 
-	if typeof(v73) ~= "string" then
-		return v73
+	if typeof(url) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = url,
+			Request_Type = "POST",
+			Body = HttpService:JSONEncode(p)
+		})
 	end
 
-	local json = HttpService:JSONEncode(p29)
-
-	return OpenCloudService:HttpRequestAsync({
-		Url = v73,
-		Request_Type = "POST",
-		Body = json
-	})
+	return url
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GenerateText", generateText)
 
-function verifyGetPlaceRequest(p30, p31) -- line: 424
-	if p30 == nil then
+function verifyGetPlaceRequest(p, p2)
+	if p == nil then
 		return nil
 	end
 
-	local v77 = verifyTable(p30, p31)
+	local v = verifyTable(p, p2)
 
-	if v77 ~= nil then
-		return v77
+	if v ~= nil then
+		return v
 	end
 
-	if p30.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p31 }.path.`)
+	if p.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p2}.path.`)
 	end
 
-	local v78 = verifyString(p30.path, `{ p31 }.path`)
-
-	if v78 ~= nil then
-		return v78
-	end
-
-	return nil
+	local v2 = verifyString(p.path, `{p2}.path`)
+	return if v2 ~= nil then v2 else nil
 end
-function getPlaceUrl(p32, p33) -- line: 445
-	if p32.path == nil then
+
+function getPlaceUrl(p, p2)
+	if p.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: getPlaceRequest.path.")
 	end
 
-	if string.match(p32.path, "^universes/([^/]+)/places/([^/]+)$") == nil then
+	if string.match(p.path, "^universes/([^/]+)/places/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: getPlaceRequest.path.")
 	end
 
-	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p33), (tostring(p32.path))))
+	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p2), (tostring(p.path))))
 end
-function getPlace(p34, p35) -- line: 458
-	-- upvalues: OpenCloudService (copy)
-	if p34 == nil then
+
+function getPlace(p, headers)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v83 = verifyGetPlaceRequest(p34, "getPlaceRequest")
+	local v = verifyGetPlaceRequest(p, "getPlaceRequest")
 
-	if v83 ~= nil then
-		return v83
+	if v ~= nil then
+		return v
 	end
 
-	local v84 = getPlaceUrl(p34, p35)
+	local placeUrl = getPlaceUrl(p, headers)
 
-	if typeof(v84) ~= "string" then
-		return v84
+	if typeof(placeUrl) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = placeUrl,
+			Request_Type = "GET",
+			Headers = headers
+		})
 	end
 
-	return OpenCloudService:HttpRequestAsync({
-		Url = v84,
-		Request_Type = "GET",
-		Headers = p35
-	})
+	return placeUrl
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GetPlace", getPlace)
 
-function verifyGetGroupRequest(p36, p37) -- line: 478
-	if p36 == nil then
+function verifyGetGroupRequest(p, p2)
+	if p == nil then
 		return nil
 	end
 
-	local v87 = verifyTable(p36, p37)
+	local v = verifyTable(p, p2)
 
-	if v87 ~= nil then
-		return v87
+	if v ~= nil then
+		return v
 	end
 
-	if p36.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p37 }.path.`)
+	if p.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p2}.path.`)
 	end
 
-	local v88 = verifyString(p36.path, `{ p37 }.path`)
-
-	if v88 ~= nil then
-		return v88
-	end
-
-	return nil
+	local v2 = verifyString(p.path, `{p2}.path`)
+	return if v2 ~= nil then v2 else nil
 end
-function getGroupUrl(p38, p39) -- line: 499
-	if p38.path == nil then
+
+function getGroupUrl(p, p2)
+	if p.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: getGroupRequest.path.")
 	end
 
-	if string.match(p38.path, "^groups/([^/]+)$") == nil then
+	if string.match(p.path, "^groups/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: getGroupRequest.path.")
 	end
 
-	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p39), (tostring(p38.path))))
+	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p2), (tostring(p.path))))
 end
-function getGroup(p40, p41) -- line: 512
-	-- upvalues: OpenCloudService (copy)
-	if p40 == nil then
+
+function getGroup(p, headers)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v93 = verifyGetGroupRequest(p40, "getGroupRequest")
+	local v = verifyGetGroupRequest(p, "getGroupRequest")
 
-	if v93 ~= nil then
-		return v93
+	if v ~= nil then
+		return v
 	end
 
-	local v94 = getGroupUrl(p40, p41)
+	local groupUrl = getGroupUrl(p, headers)
 
-	if typeof(v94) ~= "string" then
-		return v94
+	if typeof(groupUrl) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = groupUrl,
+			Request_Type = "GET",
+			Headers = headers
+		})
 	end
 
-	return OpenCloudService:HttpRequestAsync({
-		Url = v94,
-		Request_Type = "GET",
-		Headers = p41
-	})
+	return groupUrl
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GetGroup", getGroup)
 
-function verifyListInventoryItemsRequest(p42, p43) -- line: 532
-	if p42 == nil then
+function verifyListInventoryItemsRequest(data, p)
+	if data == nil then
 		return nil
 	end
 
-	local v97 = verifyTable(p42, p43)
+	local v = verifyTable(data, p)
 
-	if v97 ~= nil then
-		return v97
+	if v ~= nil then
+		return v
 	end
 
-	if p42.parent == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p43 }.parent.`)
+	if data.parent == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.parent.`)
 	end
 
-	local v98 = verifyString(p42.parent, `{ p43 }.parent`)
+	local v2 = verifyString(data.parent, `{p}.parent`)
 
-	if v98 ~= nil then
-		return v98
+	if v2 ~= nil then
+		return v2
 	end
 
-	local v99 = verifyNumber(p42.maxPageSize, `{ p43 }.maxPageSize`)
+	local v3 = verifyNumber(data.maxPageSize, `{p}.maxPageSize`)
 
-	if v99 ~= nil then
-		return v99
+	if v3 ~= nil then
+		return v3
 	end
 
-	local v100 = verifyString(p42.pageToken, `{ p43 }.pageToken`)
+	local v4 = verifyString(data.pageToken, `{p}.pageToken`)
 
-	if v100 ~= nil then
-		return v100
+	if v4 ~= nil then
+		return v4
 	end
 
-	local v101 = verifyString(p42.filter, `{ p43 }.filter`)
-
-	if v101 ~= nil then
-		return v101
-	end
-
-	return nil
+	local v5 = verifyString(data.filter, `{p}.filter`)
+	return if v5 ~= nil then v5 else nil
 end
-function listInventoryItemsUrl(p44, p45) -- line: 568
-	if p44.parent == nil then
+
+function listInventoryItemsUrl(data, p)
+	if data.parent == nil then
 		return InvalidArgumentError("URL parameter provided was nil: listInventoryItemsRequest.parent.")
 	end
 
-	if string.match(p44.parent, "^users/([^/]+)$") == nil then
+	if string.match(data.parent, "^users/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: listInventoryItemsRequest.parent.")
 	end
 
-	local v104 = string.format("%s%s/cloud/v2/%s/inventory-items", getApisUrl(), getUrlPrefix(p45), (tostring(p44.parent)))
+	local v = string.format("%s%s/cloud/v2/%s/inventory-items", getApisUrl(), getUrlPrefix(p), (tostring(data.parent)))
 
-	if p44.maxPageSize == nil and p44.pageToken == nil and p44.filter == nil then
-		return v104
+	if data.maxPageSize == nil and data.pageToken == nil and data.filter == nil then
+		return v
 	end
 
-	local t1 = {}
+	local v2 = {}
 
-	if p44.maxPageSize ~= nil then
-		table.insert(t1, string.format("maxPageSize=%s", (tostring(p44.maxPageSize))))
+	if data.maxPageSize ~= nil then
+		table.insert(v2, string.format("maxPageSize=%s", (tostring(data.maxPageSize))))
 	end
 
-	if p44.pageToken ~= nil then
-		table.insert(t1, string.format("pageToken=%s", (tostring(p44.pageToken))))
+	if data.pageToken ~= nil then
+		table.insert(v2, string.format("pageToken=%s", (tostring(data.pageToken))))
 	end
 
-	if p44.filter ~= nil then
-		table.insert(t1, string.format("filter=%s", (tostring(p44.filter))))
+	if data.filter ~= nil then
+		table.insert(v2, string.format("filter=%s", (tostring(data.filter))))
 	end
 
-	return (string.format("%s?%s", v104, table.concat(t1, "&")))
+	return (string.format("%s?%s", v, table.concat(v2, "&")))
 end
-function listInventoryItems(p46, p47) -- line: 598
-	-- upvalues: OpenCloudService (copy)
-	if p46 == nil then
+
+function listInventoryItems(p, headers)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v108 = verifyListInventoryItemsRequest(p46, "listInventoryItemsRequest")
+	local v = verifyListInventoryItemsRequest(p, "listInventoryItemsRequest")
 
-	if v108 ~= nil then
-		return v108
+	if v ~= nil then
+		return v
 	end
 
-	local v109 = listInventoryItemsUrl(p46, p47)
+	local url = listInventoryItemsUrl(p, headers)
 
-	if typeof(v109) ~= "string" then
-		return v109
+	if typeof(url) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = url,
+			Request_Type = "GET",
+			Headers = headers
+		})
 	end
 
-	return OpenCloudService:HttpRequestAsync({
-		Url = v109,
-		Request_Type = "GET",
-		Headers = p47
-	})
+	return url
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "ListInventoryItems", listInventoryItems)
 
-function verifyListGroupMembershipsRequest(p48, p49) -- line: 618
-	if p48 == nil then
+function verifyListGroupMembershipsRequest(data, p)
+	if data == nil then
 		return nil
 	end
 
-	local v112 = verifyTable(p48, p49)
+	local v = verifyTable(data, p)
 
-	if v112 ~= nil then
-		return v112
+	if v ~= nil then
+		return v
 	end
 
-	if p48.parent == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p49 }.parent.`)
+	if data.parent == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.parent.`)
 	end
 
-	local v113 = verifyString(p48.parent, `{ p49 }.parent`)
+	local v2 = verifyString(data.parent, `{p}.parent`)
 
-	if v113 ~= nil then
-		return v113
+	if v2 ~= nil then
+		return v2
 	end
 
-	local v114 = verifyNumber(p48.maxPageSize, `{ p49 }.maxPageSize`)
+	local v3 = verifyNumber(data.maxPageSize, `{p}.maxPageSize`)
 
-	if v114 ~= nil then
-		return v114
+	if v3 ~= nil then
+		return v3
 	end
 
-	local v115 = verifyString(p48.pageToken, `{ p49 }.pageToken`)
+	local v4 = verifyString(data.pageToken, `{p}.pageToken`)
 
-	if v115 ~= nil then
-		return v115
+	if v4 ~= nil then
+		return v4
 	end
 
-	local v116 = verifyString(p48.filter, `{ p49 }.filter`)
-
-	if v116 ~= nil then
-		return v116
-	end
-
-	return nil
+	local v5 = verifyString(data.filter, `{p}.filter`)
+	return if v5 ~= nil then v5 else nil
 end
-function listGroupMembershipsUrl(p50, p51) -- line: 654
-	if p50.parent == nil then
+
+function listGroupMembershipsUrl(data, p)
+	if data.parent == nil then
 		return InvalidArgumentError("URL parameter provided was nil: listGroupMembershipsRequest.parent.")
 	end
 
-	if string.match(p50.parent, "^groups/([^/]+)$") == nil then
+	if string.match(data.parent, "^groups/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: listGroupMembershipsRequest.parent.")
 	end
 
-	local v119 = string.format("%s%s/cloud/v2/%s/memberships", getApisUrl(), getUrlPrefix(p51), (tostring(p50.parent)))
+	local v = string.format("%s%s/cloud/v2/%s/memberships", getApisUrl(), getUrlPrefix(p), (tostring(data.parent)))
 
-	if p50.maxPageSize == nil and p50.pageToken == nil and p50.filter == nil then
-		return v119
+	if data.maxPageSize == nil and data.pageToken == nil and data.filter == nil then
+		return v
 	end
 
-	local t2 = {}
+	local v2 = {}
 
-	if p50.maxPageSize ~= nil then
-		table.insert(t2, string.format("maxPageSize=%s", (tostring(p50.maxPageSize))))
+	if data.maxPageSize ~= nil then
+		table.insert(v2, string.format("maxPageSize=%s", (tostring(data.maxPageSize))))
 	end
 
-	if p50.pageToken ~= nil then
-		table.insert(t2, string.format("pageToken=%s", (tostring(p50.pageToken))))
+	if data.pageToken ~= nil then
+		table.insert(v2, string.format("pageToken=%s", (tostring(data.pageToken))))
 	end
 
-	if p50.filter ~= nil then
-		table.insert(t2, string.format("filter=%s", (tostring(p50.filter))))
+	if data.filter ~= nil then
+		table.insert(v2, string.format("filter=%s", (tostring(data.filter))))
 	end
 
-	return (string.format("%s?%s", v119, table.concat(t2, "&")))
+	return (string.format("%s?%s", v, table.concat(v2, "&")))
 end
-function listGroupMemberships(p52, p53) -- line: 684
-	-- upvalues: OpenCloudService (copy)
-	if p52 == nil then
+
+function listGroupMemberships(p, headers)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v123 = verifyListGroupMembershipsRequest(p52, "listGroupMembershipsRequest")
+	local v = verifyListGroupMembershipsRequest(p, "listGroupMembershipsRequest")
 
-	if v123 ~= nil then
-		return v123
+	if v ~= nil then
+		return v
 	end
 
-	local v124 = listGroupMembershipsUrl(p52, p53)
+	local url = listGroupMembershipsUrl(p, headers)
 
-	if typeof(v124) ~= "string" then
-		return v124
+	if typeof(url) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = url,
+			Request_Type = "GET",
+			Headers = headers
+		})
 	end
 
-	return OpenCloudService:HttpRequestAsync({
-		Url = v124,
-		Request_Type = "GET",
-		Headers = p53
-	})
+	return url
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "ListGroupMemberships", listGroupMemberships)
 
-function verifyGetOperationRequest(p54, p55) -- line: 704
-	if p54 == nil then
+function verifyGetOperationRequest(p, p2)
+	if p == nil then
 		return nil
 	end
 
-	local v127 = verifyTable(p54, p55)
+	local v = verifyTable(p, p2)
 
-	if v127 ~= nil then
-		return v127
+	if v ~= nil then
+		return v
 	end
 
-	if p54.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p55 }.path.`)
+	if p.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p2}.path.`)
 	end
 
-	local v128 = verifyString(p54.path, `{ p55 }.path`)
-
-	if v128 ~= nil then
-		return v128
-	end
-
-	return nil
+	local v2 = verifyString(p.path, `{p2}.path`)
+	return if v2 ~= nil then v2 else nil
 end
-function getOperationUrl(p56, p57) -- line: 725
-	if p56.path == nil then
+
+function getOperationUrl(p, p2)
+	if p.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: getOperationRequest.path.")
 	end
 
-	if string.match(p56.path, "^users/([^/]+)/operations/([^/]+)$") == nil then
+	if string.match(p.path, "^users/([^/]+)/operations/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: getOperationRequest.path.")
 	end
 
-	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p57), (tostring(p56.path))))
+	return (string.format("%s%s/cloud/v2/%s", getApisUrl(), getUrlPrefix(p2), (tostring(p.path))))
 end
-function getOperation(p58, p59) -- line: 738
-	-- upvalues: OpenCloudService (copy)
-	if p58 == nil then
+
+function getOperation(p, headers)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v133 = verifyGetOperationRequest(p58, "getOperationRequest")
+	local v = verifyGetOperationRequest(p, "getOperationRequest")
 
-	if v133 ~= nil then
-		return v133
+	if v ~= nil then
+		return v
 	end
 
-	local v134 = getOperationUrl(p58, p59)
+	local operationUrl = getOperationUrl(p, headers)
 
-	if typeof(v134) ~= "string" then
-		return v134
+	if typeof(operationUrl) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = operationUrl,
+			Request_Type = "GET",
+			Headers = headers
+		})
 	end
 
-	return OpenCloudService:HttpRequestAsync({
-		Url = v134,
-		Request_Type = "GET",
-		Headers = p59
-	})
+	return operationUrl
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GetOperation", getOperation)
 
-function verifyGenerateUserThumbnailRequest(p60, p61) -- line: 758
-	if p60 == nil then
+function verifyGenerateUserThumbnailRequest(data, p)
+	if data == nil then
 		return nil
 	end
 
-	local v137 = verifyTable(p60, p61)
+	local v = verifyTable(data, p)
 
-	if v137 ~= nil then
-		return v137
+	if v ~= nil then
+		return v
 	end
 
-	if p60.path == nil then
-		return InvalidArgumentError(`Required argument was not provided: { p61 }.path.`)
+	if data.path == nil then
+		return InvalidArgumentError(`Required argument was not provided: {p}.path.`)
 	end
 
-	local v138 = verifyString(p60.path, `{ p61 }.path`)
+	local v2 = verifyString(data.path, `{p}.path`)
 
-	if v138 ~= nil then
-		return v138
+	if v2 ~= nil then
+		return v2
 	end
 
-	local v139 = verifyNumber(p60.size, `{ p61 }.size`)
+	local v3 = verifyNumber(data.size, `{p}.size`)
 
-	if v139 ~= nil then
-		return v139
+	if v3 ~= nil then
+		return v3
 	end
 
-	local v140 = verifyEnum(p60.format, `{ p61 }.format`)
+	local v4 = verifyEnum(data.format, `{p}.format`)
 
-	if v140 ~= nil then
-		return v140
+	if v4 ~= nil then
+		return v4
 	end
 
-	local v141 = verifyEnum(p60.shape, `{ p61 }.shape`)
-
-	if v141 ~= nil then
-		return v141
-	end
-
-	return nil
+	local v5 = verifyEnum(data.shape, `{p}.shape`)
+	return if v5 ~= nil then v5 else nil
 end
-function generateUserThumbnailUrl(p62, p63) -- line: 794
-	if p62.path == nil then
+
+function generateUserThumbnailUrl(data, p)
+	if data.path == nil then
 		return InvalidArgumentError("URL parameter provided was nil: generateUserThumbnailRequest.path.")
 	end
 
-	if string.match(p62.path, "^users/([^/]+)$") == nil then
+	if string.match(data.path, "^users/([^/]+)$") == nil then
 		return InvalidArgumentError("URL parameter was not formatted correctly: generateUserThumbnailRequest.path.")
 	end
 
-	local v144 = string.format("%s%s/cloud/v2/%s:generateThumbnail", getApisUrl(), getUrlPrefix(p63), (tostring(p62.path)))
+	local v = string.format("%s%s/cloud/v2/%s:generateThumbnail", getApisUrl(), getUrlPrefix(p), (tostring(data.path)))
 
-	if p62.size == nil and p62.format == nil and p62.shape == nil then
-		return v144
+	if data.size == nil and data.format == nil and data.shape == nil then
+		return v
 	end
 
-	local t3 = {}
+	local v2 = {}
 
-	if p62.size ~= nil then
-		table.insert(t3, string.format("size=%s", (tostring(p62.size))))
+	if data.size ~= nil then
+		table.insert(v2, string.format("size=%s", (tostring(data.size))))
 	end
 
-	if p62.format ~= nil then
-		table.insert(t3, string.format("format=%s", (tostring(p62.format))))
+	if data.format ~= nil then
+		table.insert(v2, string.format("format=%s", (tostring(data.format))))
 	end
 
-	if p62.shape ~= nil then
-		table.insert(t3, string.format("shape=%s", (tostring(p62.shape))))
+	if data.shape ~= nil then
+		table.insert(v2, string.format("shape=%s", (tostring(data.shape))))
 	end
 
-	return (string.format("%s?%s", v144, table.concat(t3, "&")))
+	return (string.format("%s?%s", v, table.concat(v2, "&")))
 end
-function generateUserThumbnail(p64, p65) -- line: 824
-	-- upvalues: OpenCloudService (copy)
-	if p64 == nil then
+
+function generateUserThumbnail(p, headers)
+	if p == nil then
 		return InvalidArgumentError("Request provided was nil.")
 	end
 
-	local v148 = verifyGenerateUserThumbnailRequest(p64, "generateUserThumbnailRequest")
+	local v = verifyGenerateUserThumbnailRequest(p, "generateUserThumbnailRequest")
 
-	if v148 ~= nil then
-		return v148
+	if v ~= nil then
+		return v
 	end
 
-	local v149 = generateUserThumbnailUrl(p64, p65)
+	local url = generateUserThumbnailUrl(p, headers)
 
-	if typeof(v149) ~= "string" then
-		return v149
+	if typeof(url) == "string" then
+		return OpenCloudService:HttpRequestAsync({
+			["Url"] = url,
+			Request_Type = "GET",
+			Headers = headers
+		})
 	end
 
-	return OpenCloudService:HttpRequestAsync({
-		Url = v149,
-		Request_Type = "GET",
-		Headers = p65
-	})
+	return url
 end
 
 OpenCloudService:RegisterOpenCloud("v2", "GenerateUserThumbnail", generateUserThumbnail)
+
 OpenCloudService:RegistrationComplete()

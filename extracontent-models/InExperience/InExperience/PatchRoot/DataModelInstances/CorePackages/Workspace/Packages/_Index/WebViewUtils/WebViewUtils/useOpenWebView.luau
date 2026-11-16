@@ -1,62 +1,83 @@
-local Parent = script:FindFirstAncestor("WebViewUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("WebViewUtils").Parent
+
+local React = require(parent.React)
 local useEffect = React.useEffect
 local useCallback = React.useCallback
 local useRef = React.useRef
-local SharedFlags = require(Parent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local GetFFlagEnableUnifiedWebViews = SharedFlags.GetFFlagEnableUnifiedWebViews
 local FFlagAppNavMyStatsTab = SharedFlags.FFlagAppNavMyStatsTab
+
+local FFlagUseWebViewSessionInOpenWebView = require(script.Parent.Flags.FFlagUseWebViewSessionInOpenWebView)
+local openWebViewSession = require(script.Parent.openWebViewSession)
+
 local BrowserService = game:GetService("BrowserService")
 local HttpService = game:GetService("HttpService")
 local WebViewService = game:GetService("WebViewService")
 
-local function useOpenWebView() -- line: 25
-	-- upvalues: useRef (copy), useCallback (copy), GetFFlagEnableUnifiedWebViews (copy), WebViewService (copy), FFlagAppNavMyStatsTab (copy), BrowserService (copy), HttpService (copy), useEffect (copy)
-	local v13 = useRef(nil)
-	local v14 = useCallback(function() -- line: 28
-		-- upvalues: v13 (copy)
-		if v13.current then
-			v13.current:Disconnect()
-			v13.current = nil
-		end
-	end, { v13 })
-	local v15 = useCallback(function(s1: string, s2: string, p1: ((...any) -> ...any)?) -- line: 35
-		-- upvalues: GetFFlagEnableUnifiedWebViews (copy), v14 (copy), v13 (copy), WebViewService (copy), FFlagAppNavMyStatsTab (copy), BrowserService (copy), HttpService (copy)
-		if GetFFlagEnableUnifiedWebViews() then
-			v14()
-			v13.current = WebViewService.OnWindowClosed:Connect(function() -- line: 41
-				-- upvalues: WebViewService (copy), v14 (copy), FFlagAppNavMyStatsTab (copy), p1 (copy)
-				WebViewService:CloseWindow()
-				v14()
+local function useOpenWebView()
+	local v = useRef(nil)
+	local v2 = useRef(nil)
 
-				if FFlagAppNavMyStatsTab and p1 then
-					p1()
+	local v3 = useCallback(function()
+		if v.current then
+			v.current:Disconnect()
+			v.current = nil
+		end
+
+		if v2.current then
+			v2.current()
+			v2.current = nil
+		end
+	end, { v, v2 })
+
+	local v4 = useCallback(function(url: string, title: string, callback)
+		if FFlagUseWebViewSessionInOpenWebView then
+			v3()
+
+			if not FFlagAppNavMyStatsTab then
+				callback = nil
+			end
+
+			local _, current = openWebViewSession(url, title, callback)
+			v2.current = current
+		else
+			if not GetFFlagEnableUnifiedWebViews() then
+				BrowserService:SendCommand(HttpService:JSONEncode({
+					command = "open",
+					url = url,
+					title = title,
+					visible = true,
+					isGenericWebview = true,
+					enableOverlayReplacement = true
+				}))
+
+				return
+			end
+
+			v3()
+
+			v.current = WebViewService.OnWindowClosed:Connect(function()
+				WebViewService:CloseWindow()
+				v3()
+
+				if FFlagAppNavMyStatsTab and callback then
+					callback()
 				end
 			end)
-			WebViewService:OpenWindow(s1, s2, true)
 
-			return
+			WebViewService:OpenWindow(url, title, true)
 		end
+	end, { v3 })
 
-		BrowserService:SendCommand(HttpService:JSONEncode({
-			command = "open",
-			visible = true,
-			isGenericWebview = true,
-			enableOverlayReplacement = true,
-			url = s1,
-			title = s2
-		}))
-	end, { v14 })
-
-	useEffect(function() -- line: 63
-		-- upvalues: v14 (copy)
-		return function() -- line: 64
-			-- upvalues: v14 (copy)
-			v14()
+	useEffect(function()
+		return function()
+			v3()
 		end
-	end, { v14 })
+	end, { v3 })
 
-	return v15
+	return v4
 end
 
 return useOpenWebView

@@ -1,6 +1,7 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
+local parent = MomentsCreation.Parent
+
+local MomentsCommon = require(parent.MomentsCommon)
 
 require(MomentsCreation.Types.CreationFlowTypes)
 
@@ -9,15 +10,19 @@ local musicTool = require(MomentsCreation.Tools.musicTool)
 local textTool = require(MomentsCreation.Tools.textTool)
 local generateTextTool = require(MomentsCreation.Tools.generateTextTool)
 local stickerTool = require(MomentsCreation.Tools.stickerTool)
-local t1 = {
-	trimTool,
-	musicTool,
-	textTool,
-	generateTextTool
-}
+local voiceTool = require(MomentsCreation.Tools.voiceTool)
 
-if MomentsCommon.Flags.GetFFlagMomentsStickerButton() then
-	table.insert(t1, stickerTool)
+local GetFFlagMomentsStickerButton = MomentsCommon.Flags.GetFFlagMomentsStickerButton
+local GetFFlagMomentsTTSAudioOverlay = require(MomentsCreation.Flags.GetFFlagMomentsTTSAudioOverlay)
+
+local DefaultCreationTools = { trimTool, musicTool, textTool, generateTextTool }
+
+if GetFFlagMomentsStickerButton() then
+	table.insert(DefaultCreationTools, stickerTool)
 end
 
-return t1
+if GetFFlagMomentsTTSAudioOverlay and game:GetEngineFeature("TextToSpeechPlatformPreview") then
+	table.insert(DefaultCreationTools, voiceTool)
+end
+
+return DefaultCreationTools

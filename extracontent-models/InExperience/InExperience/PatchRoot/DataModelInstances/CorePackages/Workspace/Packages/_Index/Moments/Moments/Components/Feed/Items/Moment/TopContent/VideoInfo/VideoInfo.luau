@@ -1,47 +1,84 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
-local Foundation = require(MomentsParent.Foundation)
-local SignalsReact = require(MomentsParent.SignalsReact)
+local parent = Moments.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.MomentsTypes)
+local SignalsReact = require(parent.SignalsReact)
+
 local MomentContext = require(script.Parent.Parent.Parent.MomentContext)
+
+local FFlagMomentsEngagementMetricsFeature = MomentsCommon.Flags.FFlagMomentsEngagementMetricsFeature
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags2.FFlagMomentsRenderAvatarPostsInFeed
 local CreatorAttribution = require(script.Parent.CreatorAttribution)
 local DebugInfo = require(script.Parent.DebugInfo)
 local Description = require(script.Parent.Description)
 local Reactions = require(script.Parent.Reactions)
 local StatusChip = require(script.Parent.StatusChip)
-local useMomentsSession = require(Moments.Stores.GetMomentsStore.MomentsSessionContext).useMomentsSession
+
+local MomentsSessionContext = require(Moments.Stores.GetMomentsStore.MomentsSessionContext)
+local useMomentsSession = MomentsSessionContext.useMomentsSession
+
 local View = Foundation.View
+
+local GetMomentsCapabilities = MomentsCommon.Stores.GetMomentsCapabilities
 local useSignalState = SignalsReact.useSignalState
 
-local function VideoInfo(t1: {[any]: any}) -- line: 38
-	-- upvalues: MomentContext (copy), useSignalState (copy), useMomentsSession (copy), React (copy), DebugInfo (copy), CreatorAttribution (copy), Description (copy), Reactions (copy), StatusChip (copy), View (copy)
-	local v17 = MomentContext.useMoment()
-	local v18 = useSignalState(v17.store.getData).kind == "experience"
-	local v19 = useMomentsSession()
-	local t2 = {}
+local function VideoInfo(p)
+	local kind = useSignalState(MomentContext.useMoment().store.getData).kind
+	local v = kind == "experience" or FFlagMomentsRenderAvatarPostsInFeed and kind == "avatar"
+	local v2
 
-	if not useSignalState(v19.getHideDetails) then
-		t2.DebugInfo = React.createElement(DebugInfo, {
-			LayoutOrder = 0
-		})
-		t2.CreatorAttribution = if not v18 then nil else React.createElement(CreatorAttribution, {
-			LayoutOrder = 1
-		})
-		t2.Description = React.createElement(Description, {
-			LayoutOrder = 2
-		})
-		t2.Reactions = if not v18 then nil else React.createElement(Reactions, {
-			LayoutOrder = 3
-		})
-		t2.StatusChip = React.createElement(StatusChip, {
-			LayoutOrder = 4
-		})
+	if FFlagMomentsServeEDPVideos then
+		if p.moment == nil then
+			v2 = false
+		else
+			v2 = p.moment.entityType == "edpVideo"
+		end
 	end
 
-	return React.createElement(View, {
-		tag = "col align-x-left align-y-bottom grow gap-small auto-y",
-		LayoutOrder = t1.LayoutOrder
-	}, t2)
+	local v3
+
+	if FFlagMomentsEngagementMetricsFeature then
+		v3 = useSignalState(GetMomentsCapabilities(false).getIsEngagementMetricsEnabled)
+	end
+
+	local children = {}
+
+	if not useSignalState(useMomentsSession().getHideDetails) then
+		children.DebugInfo = React.createElement(DebugInfo, { LayoutOrder = 0 })
+		local creatorAttribution
+
+		if v and not (FFlagMomentsServeEDPVideos and v2) then
+			creatorAttribution = React.createElement(CreatorAttribution, { LayoutOrder = 1 })
+		end
+
+		children.CreatorAttribution = creatorAttribution
+
+		children.Description = React.createElement(Description, { LayoutOrder = 2 })
+		local reactions
+
+		if v and (not FFlagMomentsEngagementMetricsFeature or v3) then
+			reactions = React.createElement(Reactions, { LayoutOrder = 3 })
+		end
+
+		children.Reactions = reactions
+
+		children.StatusChip = React.createElement(StatusChip, { LayoutOrder = 4 })
+	end
+
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = p.LayoutOrder,
+			tag = "col align-x-left align-y-bottom grow gap-small auto-y"
+		},
+		children
+	)
 end
 
 return React.memo(VideoInfo)

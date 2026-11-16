@@ -1,1 +1,3 @@
-return (require(script.DialogHeroMedia))
+local DialogHeroMedia = require(script.DialogHeroMedia)
+
+return DialogHeroMedia

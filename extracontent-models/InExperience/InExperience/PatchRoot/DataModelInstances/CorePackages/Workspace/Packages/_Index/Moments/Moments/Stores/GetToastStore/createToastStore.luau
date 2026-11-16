@@ -1,64 +1,59 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local Signals = require(parent.Signals)
+
 local createSignal = Signals.createSignal
 
-local function createToastStore() -- line: 35
-	-- upvalues: createSignal (copy), Signals (copy)
-	local n1 = 0
-	local v6, v7 = createSignal({})
-	local v8 = Signals.createComputed(function(p1) -- line: 69
-		-- upvalues: v6 (copy)
-		local v20 = v6(p1)
+local function createToastStore()
+	local count = 0
+	local signal, v = createSignal({})
 
-		if #v20 == 0 then
-			return nil
+	local function triggerToast(p)
+		count += 1
+		local v2 = { id = count, data = p }
+		local v3 = signal(false)
+
+		if #v3 >= 4 then
+			local v4 = {}
+
+			for i = #v3 - 4 + 2, #v3 do
+				table.insert(v4, v3[i])
+			end
+
+			table.insert(v4, v2)
+			v(v4)
+		else
+			local clone = table.clone(v3)
+			table.insert(clone, v2)
+			v(clone)
 		end
 
-		return v20[#v20].data
-	end)
+		return v2.id
+	end
 
 	return {
-		getToasts = v6,
-		getToast = v8,
-		triggerToast = function(t1: {[any]: any}) -- line: 39
-			-- upvalues: n1 (ref), v6 (copy), v7 (copy)
-			n1 += 1
+		getToasts = signal,
+		getToast = Signals.createComputed(function(p)
+			local v2 = signal(p)
 
-			local t2 = {
-				id = n1,
-				data = t1
-			}
-			local v11 = v6(false)
-
-			if #v11 >= 4 then
-				local t3 = {}
-
-				for i = #v11 - 4 + 2, #v11 do
-					table.insert(t3, v11[i])
-				end
-
-				table.insert(t3, t2)
-				v7(t3)
-
-				return
+			if #v2 == 0 then
+				return nil
 			end
 
-			local v14 = table.clone(v11)
+			return v2[#v2].data
+		end),
+		triggerToast = triggerToast,
+		dismissToast = function(p: number)
+			local v2 = signal(false)
+			local v3 = {}
 
-			table.insert(v14, t2)
-			v7(v14)
-		end,
-		dismissToast = function(n2: number) -- line: 58
-			-- upvalues: v6 (copy), v7 (copy)
-			local t4 = {}
-
-			for _, v18 in (v6(false)) do
-				if n2 ~= v18.id then
-					table.insert(t4, v18)
+			for _, v4 in v2 do
+				if v4.id ~= p then
+					table.insert(v3, v4)
 				end
 			end
 
-			v7(t4)
+			v(v3)
 		end
 	}
 end

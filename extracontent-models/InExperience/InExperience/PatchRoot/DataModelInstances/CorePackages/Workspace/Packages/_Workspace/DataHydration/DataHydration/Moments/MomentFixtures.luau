@@ -1,24 +1,17 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local MomentStatus = require(Parent.MomentsTypes).Enums.MomentStatus
-local t1 = {
-	{
-		placeId = 185655149,
-		universeId = 8357232245
-	},
-	{
-		placeId = 920587237,
-		universeId = 245662005
-	},
-	{
-		placeId = 6516141723,
-		universeId = 2440500276
-	},
-	{
-		placeId = 4924922222,
-		universeId = 1685831367
-	}
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local MomentsTypes = require(parent.MomentsTypes)
+
+local MomentStatus = MomentsTypes.Enums.MomentStatus
+
+local v = {
+	{ placeId = 185655149, universeId = 8357232245 },
+	{ placeId = 920587237, universeId = 245662005 },
+	{ placeId = 6516141723, universeId = 2440500276 },
+	{ placeId = 4924922222, universeId = 1685831367 }
 }
-local t2 = {
+
+local v2 = {
 	9113446962,
 	1062804083,
 	10067664364,
@@ -31,7 +24,8 @@ local t2 = {
 	10790642201,
 	2539415890
 }
-local t3 = {
+
+local v3 = {
 	5608386285,
 	5608368298,
 	5670824523,
@@ -43,22 +37,12 @@ local t3 = {
 	5608304953,
 	5608281849
 }
-local t4 = {
-	8508980527,
-	109251559,
-	78447821,
-	595029580,
-	394647606,
-	68073547,
-	3537138
-}
-local t5 = {
-	1848354536,
-	5410086218,
-	139180277700549,
-	139434270800490
-}
-local t6 = {
+
+local v4 = { 8508980527, 109251559, 78447821, 595029580, 394647606, 68073547, 3537138 }
+
+local v5 = { 1848354536, 5410086218, 139180277700549, 139434270800490 }
+
+local v6 = {
 	"first try, no way",
 	"we actually cooked today",
 	"had to clip this one",
@@ -80,7 +64,8 @@ local t6 = {
 	"trust the process they said",
 	"peak gameplay right here"
 }
-local t7 = {
+
+local v7 = {
 	"rbxasset://textures/ui/Moments/Reactions/thumbs-up-large.png",
 	"rbxasset://textures/ui/Moments/Reactions/heart-large.png",
 	"rbxasset://textures/ui/Moments/Reactions/laugh-joy-large.png",
@@ -89,106 +74,108 @@ local t7 = {
 	"rbxasset://textures/ui/Moments/Reactions/skull-large.png"
 }
 
-local function rngFor(n1: number) -- line: 133
-	return Random.new(n1 * 2654435761 + 2026)
+local function rngFor(p: number) -- 1 equivalent call inferred from this helper
+	return Random.new(p * 2654435761 + 2026)
 end
-local function cycle(t8: {[any]: any}, n2: number) -- line: 137
-	return t8[(n2 - 1) % #t8 + 1]
+
+local function cycle(list, p: number) -- 4 equivalent calls inferred from this helper
+	return list[(p - 1) % #list + 1]
 end
-local function makeMomentFeedItem(n3: number) -- line: 143
-	-- upvalues: t6 (copy), t1 (copy), t2 (copy), t5 (copy), t7 (copy), t4 (copy), t3 (copy), MomentStatus (copy)
-	local random = Random.new(n3 * 2654435761 + 2026)
-	local v18 = random:NextNumber()
-	local v19 = n3 > 1 and v18 < 0.28
-	local v20 = t6[random:NextInteger(1, #t6)]
-	local v21 = t1[random:NextInteger(1, #t1)]
-	local v22 = t2[random:NextInteger(1, #t2)]
-	local v23 = random:NextNumber()
-	local v24 = random:NextInteger(0, 12)
-	local t9
 
-	if #t5 > 0 and (v19 or v23 < 0.45) then
-		t9 = {}
+local function makeMomentFeedItem(p: number)
+	local v8 = rngFor(p) -- inferred equivalent call
+	local number = v8:NextNumber()
+	local v9
 
-		local v26 = t5
-
-		t9.assetId = v26[(n3 - 1) % #v26 + 1]
-		t9.startTime = v24
+	if p > 1 then
+		v9 = number < 0.28
 	else
-		t9 = nil
+		v9 = false
 	end
 
-	local t10 = nil
+	local description = v6[v8:NextInteger(1, #v6)]
 
-	if random:NextNumber() < 0.6 then
-		t10 = {}
+	local v10 = v[v8:NextInteger(1, #v)]
+	local creatorId = v2[v8:NextInteger(1, #v2)]
 
-		local t11 = {
-			rotation = 0,
-			scale = 1,
-			zIndex = 1
-		}
-		local v29 = t7
+	local number2 = v8:NextNumber()
+	local integer = v8:NextInteger(0, 12)
+	local music
 
-		t11.stickerURI = v29[(n3 - 1) % #v29 + 1]
-		t11.position = UDim2.fromScale(random:NextNumber() * 0.6 + 0.2, random:NextNumber() * 0.5 + 0.25)
-		t11.stickerSize = random:NextInteger(50, 200)
-		t10[1] = t11
+	if #v5 > 0 and (v9 or number2 < 0.45) then
+		music = { assetId = 0, startTime = 0 }
+		music.assetId = cycle(v5, p) -- inferred equivalent call
+		music.startTime = integer
 	end
 
-	local v31
+	local stickerOverlays
 
-	if v19 then
-		local v30 = t4
-
-		v31 = v30[(n3 - 1) % #v30 + 1]
-	else
-		local v32 = t3
-
-		v31 = v32[(n3 - 1) % #v32 + 1]
-	end
-
-	local t12 = {
-		isModerated = false,
-		assetId = v31,
-		creatorId = v22,
-		momentId = `mock-moment-{ n3 }`,
-		status = MomentStatus.Public,
-		metadata = {
-			assetTotalDuration = 10,
-			captureType = if not v19 then Enum.CaptureType.Video else Enum.CaptureType.Screenshot,
-			description = v20,
-			placeId = v21.placeId,
-			universeId = v21.universeId,
-			edits = {
-				music = t9,
-				stickerOverlays = t10
+	if v8:NextNumber() < 0.6 then
+		stickerOverlays = {
+			{
+				stickerURI = cycle(v7, p), -- inferred equivalent call
+				position = UDim2.fromScale(v8:NextNumber() * 0.6 + 0.2, v8:NextNumber() * 0.5 + 0.25),
+				stickerSize = v8:NextInteger(50, 200),
+				rotation = 0,
+				scale = 1,
+				zIndex = 1
 			}
-		},
-		recommendationMetadata = {
-			configName = "MaximizeJoins",
-			locationId = "Trending",
-			feedItemId = `mock-item-{ n3 }`,
-			tracingId = `mock-trace-{ n3 }`
 		}
+	end
+
+	local assetId
+
+	if v9 then
+		assetId = cycle(v4, p) -- inferred equivalent call
+	else
+		assetId = cycle(v3, p) -- inferred equivalent call
+	end
+
+	local moment = {
+		assetId = assetId,
+		creatorId = creatorId,
+		isModerated = false,
+		momentId = `mock-moment-{p}`,
+		status = MomentStatus.Public,
+		metadata = 0,
+		recommendationMetadata = 0
+	}
+	local captureType
+
+	if v9 then
+		captureType = Enum.CaptureType.Screenshot
+	else
+		captureType = Enum.CaptureType.Video
+	end
+
+	moment.metadata = {
+		assetTotalDuration = 10,
+		captureType = captureType,
+		description = description,
+		placeId = v10.placeId,
+		universeId = v10.universeId,
+		edits = { music = music, stickerOverlays = stickerOverlays }
 	}
 
-	return {
-		kind = "moment",
-		moment = t12
+	moment.recommendationMetadata = {
+		feedItemId = `mock-item-{p}`,
+		tracingId = `mock-trace-{p}`,
+		configName = "MaximizeJoins",
+		locationId = "Trending"
 	}
+
+	return { kind = "moment", moment = moment }
 end
 
 return {
 	makeMomentFeedItem = makeMomentFeedItem,
-	buildMomentFeedItems = function(n4: number, n5: number) -- line: 245
-		-- upvalues: makeMomentFeedItem (copy)
-		local t13 = {}
+	buildMomentFeedItems = function(p: number, p2: number)
+		local momentFeedItems = {}
 
-		for i = 0, n5 - 1 do
-			table.insert(t13, (makeMomentFeedItem(n4 + i)))
+		for i = 0, p2 - 1 do
+			table.insert(momentFeedItems, makeMomentFeedItem(p + i))
 		end
 
-		return t13
+		return momentFeedItems
 	end
 }

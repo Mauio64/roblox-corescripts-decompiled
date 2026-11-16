@@ -1,12 +1,10 @@
-local Parent = script:FindFirstAncestor("NextDataExpirationTimeRodux").Parent
+local parent = script:FindFirstAncestor("NextDataExpirationTimeRodux").Parent
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(value: string, value2: number, namespace: string?)
+	assert(type(value) == "string", "SetNextDataExpirationTime: key must be a string!")
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(s1: string, n1: number, s2: string?) -- line: 5
-	assert(type(s1) == "string", "SetNextDataExpirationTime: key must be a string!")
-	assert(type(n1) == "number" and n1 > 0, "SetNextDataExpirationTime: nextDataExpirationTime must be a positive number!")
+	local v = type(value2) == "number" and value2 > 0
+	assert(v, "SetNextDataExpirationTime: nextDataExpirationTime must be a positive number!")
 
-	return {
-		key = s1,
-		nextDataExpirationTime = n1,
-		namespace = s2
-	}
+	return { key = value, nextDataExpirationTime = value2, namespace = namespace }
 end)

@@ -1,15 +1,15 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent
-local FFlagTopBarDeprecateCoreGuiRodux = require(ParentParent.Flags.FFlagTopBarDeprecateCoreGuiRodux)
-local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+local parent = script.Parent.Parent
+local FFlagTopBarDeprecateCoreGuiRodux = require(parent.Flags.FFlagTopBarDeprecateCoreGuiRodux)
+
+local Rodux = require(CorePackages.Packages.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
 
 if FFlagTopBarDeprecateCoreGuiRodux then
 	return nil
 end
 
-return (makeActionCreator(script.Name, function(p1, p2) -- line: 11
-	return {
-		coreGuiType = p1,
-		enabled = p2
-	}
+return (makeActionCreator(script.Name, function(coreGuiType, enabled)
+	return { coreGuiType = coreGuiType, enabled = enabled }
 end))

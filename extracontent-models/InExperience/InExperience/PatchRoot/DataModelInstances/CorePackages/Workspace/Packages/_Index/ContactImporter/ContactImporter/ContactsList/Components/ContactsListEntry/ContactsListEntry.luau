@@ -1,188 +1,242 @@
 local ContactImporter = script:FindFirstAncestor("ContactImporter")
-local ContactImporterParent = ContactImporter.Parent
+local parent = ContactImporter.Parent
 local dependencies = require(ContactImporter.dependencies)
 local Constants = require(ContactImporter.Common.Constants)
-local NavigationRodux = require(ContactImporterParent.NavigationRodux)
-local AppPage = require(ContactImporterParent.RobloxAppEnums).AppPage
-local Roact = dependencies.Roact
-local UIBlox = dependencies.UIBlox
-local RoactRodux = dependencies.RoactRodux
-local Button = UIBlox.App.Button.Button
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local Images = UIBlox.App.ImageSet.Images
-local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
-local withStyle = UIBlox.Style.withStyle
-local LoadableImage = UIBlox.App.Loading.LoadableImage
+local NavigationRodux = require(parent.NavigationRodux)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local roact = dependencies.Roact
+local uiBlox = dependencies.UIBlox
+local roactRodux = dependencies.RoactRodux
+
+local button = uiBlox.App.Button.Button
+local buttonType = uiBlox.App.Button.Enum.ButtonType
+local images = uiBlox.App.ImageSet.Images
+local styledTextLabel = uiBlox.App.Text.StyledTextLabel
+local withStyle = uiBlox.Style.withStyle
+local loadableImage = uiBlox.App.Loading.LoadableImage
+
 local getFFlagContactsListEntryUpdatedTruncationFix = require(ContactImporter.Flags.getFFlagContactsListEntryUpdatedTruncationFix)
+
 local NavigateDown = NavigationRodux.Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(ContactImporterParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v19 = if not FFlagSignalsNavP3Dispatch then nil else require(ContactImporterParent.RobloxAppNavigation).NavigationCommands
-local v20 = Roact.PureComponent:extend("ContactsListEntry")
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
 
-v20.defaultProps = {
-	contextualInfo = "",
-	contactName = "",
-	hasDivider = false
-}
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
 
-function v20.init(p1) -- line: 60
-	-- upvalues: AppPage (copy), Constants (copy)
-	p1:setState({
-		clicked = false,
-		contactNameOffset = 0
-	})
+local extended = roact.PureComponent:extend("ContactsListEntry")
 
-	function p1.addButtonSizeChanged(p2) -- line: 66
-		-- upvalues: p1 (copy)
-		p1:setState({
-			contactNameOffset = 0 - (p2.AbsoluteSize.X + 10)
+extended.defaultProps = { contextualInfo = "", contactName = "", hasDivider = false }
+
+function extended:init()
+	self:setState({ clicked = false, contactNameOffset = 0 })
+
+	function self.addButtonSizeChanged(p)
+		self:setState({
+			contactNameOffset = 0 - (p.AbsoluteSize.X + 10)
 		})
 	end
-	function p1.requestContactFriendship() -- line: 72
-		-- upvalues: p1 (copy)
-		local props = p1.props
 
+	function self.requestContactFriendship()
+		local props = self.props
 		props.requestFriendship(props.contactId)
 	end
-	function p1.openProfilePeekView() -- line: 77
-		-- upvalues: p1 (copy), AppPage (copy), Constants (copy)
-		local props = p1.props
 
-		p1.props.navigateToProfile({
+	function self.openProfilePeekView()
+		local props = self.props
+		self.props.navigateToProfile({
 			name = AppPage.ProfilePlatform,
 			detail = props.contactId,
-			extraProps = {
-				profileType = Constants.CONTACT
-			}
+			extraProps = { profileType = Constants.CONTACT }
 		})
 	end
 end
-function v20.render(p3) -- line: 91
-	-- upvalues: withStyle (copy), Roact (copy), LoadableImage (copy), getFFlagContactsListEntryUpdatedTruncationFix (copy), StyledTextLabel (copy), Button (copy), ButtonType (copy), Images (copy)
-	local props = p3.props
-	local v25 = not props.hasSentRequest
 
-	return withStyle(function(p4) -- line: 95
-		-- upvalues: Roact (copy), props (copy), p3 (copy), LoadableImage (copy), getFFlagContactsListEntryUpdatedTruncationFix (copy), StyledTextLabel (copy), v25 (copy), Button (copy), ButtonType (copy), Images (copy)
-		return Roact.createElement("Frame", {
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
+function extended.render(data)
+	local props = data.props
+	local v = not props.hasSentRequest
+
+	return withStyle(function(p)
+		local createElement = roact.createElement
+		local v2 = {
 			Name = props.deviceContactId,
 			Size = UDim2.new(1, 0, 0, 72),
-			LayoutOrder = p3.props.layoutOrder
-		}, {
-			entryContent = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				layout = Roact.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					Padding = UDim.new(0, 1)
-				}),
-				headshotThumbnailContainer = Roact.createElement("Frame", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(0, 64, 0, 64)
-				}, { Roact.createElement("ImageButton", {
-					Size = UDim2.new(1, 0, 1, 0),
-					BackgroundTransparency = 1,
-					[Roact.Event.Activated] = p3.openProfilePeekView
-				}, {
-					headshotThumbnailImage = Roact.createElement(LoadableImage, {
-						BackgroundTransparency = 1,
-						useShimmerAnimationWhileLoading = true,
-						showFailedStateWhenLoadingFailed = true,
-						Size = UDim2.new(0, 64, 0, 64),
-						Image = props.headshotThumbnailUrl,
-						onLoaded = function() -- line: 126
-						end
-					})
-				}) }),
-				headshotPadding = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					Size = UDim2.new(0, 12, 1, 0)
-				}),
-				middleTextGroup = Roact.createElement("TextButton", {
-					Size = UDim2.new(1, -123, 1, 0),
-					Text = "",
-					BackgroundTransparency = 1,
-					[Roact.Event.Activated] = p3.openProfilePeekView,
-					LayoutOrder = 3
-				}, {
-					layout = Roact.createElement("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						VerticalAlignment = Enum.VerticalAlignment.Center
-					}),
-					contactNameLabel = if not getFFlagContactsListEntryUpdatedTruncationFix() then Roact.createElement(StyledTextLabel, {
-						lineHeight = 1,
-						layoutOrder = 1,
-						automaticSize = Enum.AutomaticSize.Y,
-						colorStyle = p4.Theme.TextEmphasis,
-						fontStyle = p4.Font.Header2,
-						text = props.contactName,
-						textXAlignment = Enum.TextXAlignment.Left,
-						textYAlignment = Enum.TextYAlignment.Bottom
-					}) else Roact.createElement(StyledTextLabel, {
-						lineHeight = 1,
-						fluidSizing = false,
-						richText = false,
-						textWrapped = false,
-						layoutOrder = 1,
-						size = UDim2.new(1, p3.state.contactNameOffset, 0, 20),
-						colorStyle = p4.Theme.TextEmphasis,
-						fontStyle = p4.Font.Header2,
-						text = props.contactName,
-						textXAlignment = Enum.TextXAlignment.Left,
-						textYAlignment = Enum.TextYAlignment.Bottom,
-						textTruncate = Enum.TextTruncate.AtEnd
-					})
-				}),
-				requestContactButton = if not v25 then Roact.createElement(Button, {
-					buttonType = ButtonType.Secondary,
-					icon = Images["icons/actions/friends/friendpending"],
-					size = UDim2.fromOffset(44, 36),
-					onActivated = function() -- line: 196
-					end,
-					isDisabled = true,
-					layoutOrder = 4,
-					[Roact.Change.AbsoluteSize] = if not getFFlagContactsListEntryUpdatedTruncationFix() then nil else p3.addButtonSizeChanged
-				}) else Roact.createElement(Button, {
-					buttonType = ButtonType.PrimarySystem,
-					icon = Images["icons/actions/friends/friendAdd"],
-					size = UDim2.fromOffset(44, 36),
-					onActivated = p3.requestContactFriendship,
-					layoutOrder = 4,
-					[Roact.Change.AbsoluteSize] = if not getFFlagContactsListEntryUpdatedTruncationFix() then nil else p3.addButtonSizeChanged
-				})
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = data.props.layoutOrder
+		}
+
+		local createElement2 = roact.createElement
+		local v3 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
+
+		local children = {
+			layout = roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, 1)
 			}),
-			divider = if not props.hasDivider then nil else Roact.createElement("Frame", {
-				BorderSizePixel = 0,
+			headshotThumbnailContainer = roact.createElement(
+				"Frame",
+				{ Size = UDim2.new(0, 64, 0, 64), LayoutOrder = 1, BackgroundTransparency = 1 },
+				{ roact.createElement(
+						"ImageButton",
+						{
+							Size = UDim2.new(1, 0, 1, 0),
+							BackgroundTransparency = 1,
+							[roact.Event.Activated] = data.openProfilePeekView
+						},
+						{
+							headshotThumbnailImage = roact.createElement(loadableImage, {
+								Size = UDim2.new(0, 64, 0, 64),
+								Image = props.headshotThumbnailUrl,
+								onLoaded = function() end,
+								BackgroundTransparency = 1,
+								useShimmerAnimationWhileLoading = true,
+								showFailedStateWhenLoadingFailed = true
+							})
+						}
+					) }
+			),
+			headshotPadding = roact.createElement("Frame", {
+				Size = UDim2.new(0, 12, 1, 0),
+				BackgroundTransparency = 1,
+				LayoutOrder = 2
+			}),
+			middleTextGroup = 0,
+			requestContactButton = 0
+		}
+
+		local createElement3 = roact.createElement
+		local openProfilePeekViewsByActivated = {
+			Size = UDim2.new(1, -123, 1, 0),
+			Text = "",
+			BackgroundTransparency = 1,
+			[roact.Event.Activated] = data.openProfilePeekView,
+			LayoutOrder = 3
+		}
+
+		local v5 = {
+			layout = roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			contactNameLabel = 0
+		}
+		local contactNameLabel
+
+		if getFFlagContactsListEntryUpdatedTruncationFix() then
+			contactNameLabel = roact.createElement(styledTextLabel, {
+				size = UDim2.new(1, data.state.contactNameOffset, 0, 20),
+				colorStyle = p.Theme.TextEmphasis,
+				fontStyle = p.Font.Header2,
+				lineHeight = 1,
+				text = props.contactName,
+				fluidSizing = false,
+				richText = false,
+				textWrapped = false,
+				textXAlignment = Enum.TextXAlignment.Left,
+				textYAlignment = Enum.TextYAlignment.Bottom,
+				textTruncate = Enum.TextTruncate.AtEnd,
+				layoutOrder = 1
+			})
+		else
+			contactNameLabel = roact.createElement(styledTextLabel, {
+				automaticSize = Enum.AutomaticSize.Y,
+				colorStyle = p.Theme.TextEmphasis,
+				fontStyle = p.Font.Header2,
+				lineHeight = 1,
+				text = props.contactName,
+				textXAlignment = Enum.TextXAlignment.Left,
+				textYAlignment = Enum.TextYAlignment.Bottom,
+				layoutOrder = 1
+			})
+		end
+
+		v5.contactNameLabel = contactNameLabel
+		children.middleTextGroup = createElement3("TextButton", openProfilePeekViewsByActivated, v5)
+		local requestContactButton
+
+		if v then
+			local createElement4 = roact.createElement
+			local v4 = {
+				["buttonType"] = buttonType.PrimarySystem,
+				icon = images["icons/actions/friends/friendAdd"],
+				size = UDim2.fromOffset(44, 36),
+				onActivated = data.requestContactFriendship,
+				layoutOrder = 4
+			}
+
+			local absoluteSize = roact.Change.AbsoluteSize
+			local v6
+
+			if getFFlagContactsListEntryUpdatedTruncationFix() then
+				v6 = data.addButtonSizeChanged
+			end
+
+			v4[absoluteSize] = v6
+			requestContactButton = createElement4(button, v4)
+		else
+			local createElement4 = roact.createElement
+			local v4 = {
+				["buttonType"] = buttonType.Secondary,
+				icon = images["icons/actions/friends/friendpending"],
+				size = UDim2.fromOffset(44, 36),
+				onActivated = function() end,
+				isDisabled = true,
+				layoutOrder = 4
+			}
+
+			local absoluteSize = roact.Change.AbsoluteSize
+			local v6
+
+			if getFFlagContactsListEntryUpdatedTruncationFix() then
+				v6 = data.addButtonSizeChanged
+			end
+
+			v4[absoluteSize] = v6
+			requestContactButton = createElement4(button, v4)
+		end
+
+		children.requestContactButton = requestContactButton
+		local v4 = {
+			entryContent = createElement2("Frame", v3, children),
+			divider = 0
+		}
+		local divider
+
+		if props.hasDivider then
+			divider = roact.createElement("Frame", {
 				Size = UDim2.new(1, 0, 0, 1),
 				Position = UDim2.new(0, 0, 1, 0),
-				BackgroundColor3 = p4.Theme.Divider.Color,
-				BackgroundTransparency = p4.Theme.Divider.Transparency
+				BorderSizePixel = 0,
+				BackgroundColor3 = p.Theme.Divider.Color,
+				BackgroundTransparency = p.Theme.Divider.Transparency
 			})
-		})
+		end
+
+		v4.divider = divider
+		return createElement("Frame", v2, v4)
 	end)
 end
 
-local function mapDispatchToProps(p5) -- line: 218
-	-- upvalues: FFlagSignalsNavP3Dispatch (copy), v19 (copy), NavigateDown (copy)
+local function mapDispatchToProps(callback)
 	return {
-		navigateToProfile = function(p6) -- line: 220
-			-- upvalues: FFlagSignalsNavP3Dispatch (copy), v19 (copy), p5 (copy), NavigateDown (copy)
+		navigateToProfile = function(p)
 			if FFlagSignalsNavP3Dispatch then
-				v19.down(v19.fromLegacyPage(p6))
-
-				return
+				navigationCommands.down(navigationCommands.fromLegacyPage(p))
+			else
+				callback(NavigateDown(p))
 			end
-
-			p5(NavigateDown(p6))
 		end
 	}
 end
 
-return RoactRodux.connect(nil, mapDispatchToProps)(v20)
+return roactRodux.connect(nil, mapDispatchToProps)(extended)

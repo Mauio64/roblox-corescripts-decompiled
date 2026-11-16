@@ -1,12 +1,14 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedContactsParent = TrustedContacts.Parent
-local React = require(TrustedContactsParent.React)
-local useLocalization = require(TrustedContactsParent.Localization).Hooks.useLocalization
-local TrustedConnectionStatus = require(TrustedContacts.Enums).TrustedConnectionStatus
+local parent = TrustedContacts.Parent
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-local function useModalTexts(s1: string?) -- line: 14
-	-- upvalues: useLocalization (copy), React (copy), TrustedConnectionStatus (copy)
-	local v8 = useLocalization({
+local Enums = require(TrustedContacts.Enums)
+local TrustedConnectionStatus = Enums.TrustedConnectionStatus
+
+local function useModalTexts(p: string?)
+	local v = useLocalization({
 		addTFHeader = "Feature.Friends.TrustedFriend.Label.AddTrustedFriend",
 		addTFBody = "Feature.Friends.Description.DoMoreWithTrustedFriends",
 		acceptTFHeader = "Feature.Friends.TrustedFriend.AddBack.Header",
@@ -14,28 +16,32 @@ local function useModalTexts(s1: string?) -- line: 14
 		newTFHeader = "Feature.Friends.TrustedFriend.Info.Modal.Header",
 		newTFBody = "Feature.Friends.Description.YouCanDoMoreWithTrustedFriends"
 	})
-	local v9 = React.useMemo(function() -- line: 24
-		-- upvalues: TrustedConnectionStatus (copy), v8 (copy)
+
+	local v2 = React.useMemo(function()
 		return {
 			[TrustedConnectionStatus.Friends] = {
-				header = v8.addTFHeader,
-				description = v8.addTFBody
+				header = v.addTFHeader,
+				description = v.addTFBody
 			},
 			[TrustedConnectionStatus.RequestReceived] = {
-				header = v8.acceptTFHeader,
-				description = v8.acceptTFBody
+				header = v.acceptTFHeader,
+				description = v.acceptTFBody
 			},
 			[TrustedConnectionStatus.TrustedFriends] = {
-				header = v8.newTFHeader,
-				description = v8.newTFBody
+				header = v.newTFHeader,
+				description = v.newTFBody
 			}
 		}
-	end, { v8 })
-	local v10 = if not s1 then nil else v9[s1]
+	end, { v })
+	local v3
+
+	if p then
+		v3 = v2[p]
+	end
 
 	return {
-		header = not v10 and "" or v10.header,
-		description = not v10 and "" or v10.description
+		header = not v3 and "" or v3.header,
+		description = not v3 and "" or v3.description
 	}
 end
 

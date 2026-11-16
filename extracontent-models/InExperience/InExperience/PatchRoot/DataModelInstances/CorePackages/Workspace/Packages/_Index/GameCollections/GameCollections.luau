@@ -1,5 +1,7 @@
-local scriptParent = script.Parent
-local GameCollectionItemTypes = require(scriptParent.DiscoveryTypes).GameCollectionItemTypes
+local parent = script.Parent
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local GameCollectionItemTypes = DiscoveryTypes.GameCollectionItemTypes
+
 local isSeeAllTileEnabled = require(script.isSeeAllTileEnabled)
 local useCountdownSubtitleTextBinding = require(script.useCountdownSubtitleTextBinding)
 local useGetGameTileHeight = require(script.useGetGameTileHeight)
@@ -36,6 +38,8 @@ return {
 	useNavigateToSortLinkWebView = useNavigateToSortLinkWebView,
 	useRenderGameCollectionItem = useRenderGameCollectionItem,
 	["jest.config"] = script["jest.config"],
+	["jest.main.config"] = script["jest.main.config"],
+	["jest.mockDataModel.config"] = script["jest.mockDataModel.config"],
 	GameCollectionLayoutCalculators = GameCollectionLayoutCalculators,
 	GameCollectionNavigationBindings = GameCollectionNavigationBindings,
 	GameSortImpressionsDetector = GameSortImpressionsDetector,

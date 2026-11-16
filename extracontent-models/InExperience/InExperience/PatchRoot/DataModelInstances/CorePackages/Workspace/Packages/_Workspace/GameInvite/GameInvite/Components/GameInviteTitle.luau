@@ -2,123 +2,183 @@ local GameInvite = script:FindFirstAncestor("GameInvite")
 local TextService = game:GetService("TextService")
 local Components = GameInvite.Components
 local Context = GameInvite.Context
-local GameInviteParent = GameInvite.Parent
+local parent = GameInvite.Parent
 local utils = GameInvite.utils
-local FriendsMenu = require(GameInviteParent.FriendsMenu)
-local React = require(GameInviteParent.React)
-local UIBlox = require(GameInviteParent.UIBlox)
-local UniversalAppPolicy = require(GameInviteParent.UniversalAppPolicy)
-local DeviceInfo = require(GameInviteParent.NotificationsCommon).DeviceInfo
-local IsVRAppBuild = require(GameInviteParent.AppCommonLib).IsVRAppBuild
+
+local FriendsMenu = require(parent.FriendsMenu)
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local NotificationsCommon = require(parent.NotificationsCommon)
+local DeviceInfo = NotificationsCommon.DeviceInfo
+local AppCommonLib = require(parent.AppCommonLib)
+local IsVRAppBuild = AppCommonLib.IsVRAppBuild
+
 local FriendsMenuSearch = FriendsMenu.FriendsMenuSearch
 local FriendsListContext = FriendsMenu.FriendsListContext
 local InviteFriendContext = FriendsMenu.InviteFriendContext
+
 local GameInviteAnalyticsManager = require(GameInvite.analytics.GameInviteAnalyticsManager)
 local GameInviteModalManager = require(GameInvite.GameInviteModalManager)
 local ShareGameInviteLink = require(Components.ShareGameInviteLink)
 local isExperienceOlderThanOneWeek = require(utils.isExperienceOlderThanOneWeek)
-
 require(GameInvite.gameInviteModalType)
-
-local LocalizationHelper = require(GameInviteParent.NotificationsCommon).LocalizationHelper
+local NotificationsCommon2 = require(parent.NotificationsCommon)
+local LocalizationHelper = NotificationsCommon2.LocalizationHelper
 local GameInviteConstants = require(GameInvite.GameInviteConstants)
+local shouldShowJoinCta = require(utils.shouldShowJoinCta)
+local FFlagGameInviteInExpJoinCta = require(GameInvite.Flags.FFlagGameInviteInExpJoinCta)
+
 local GameInviteModalLayoutContext = require(Context.GameInviteModalLayoutContext)
 local GameDetailsContext = require(Context.GameDetailsContext)
+
 local useStyle = UIBlox.Core.Style.useStyle
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
 local Images = UIBlox.App.ImageSet.Images
 local getLocalizedStrings = LocalizationHelper.getLocalizedStrings
 local useAppPolicy = UniversalAppPolicy.useAppPolicy
-local SharedFlags = require(GameInviteParent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local GetFFlagEnableGameInviteModalVRSupport = SharedFlags.GetFFlagEnableGameInviteModalVRSupport
-local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
+
 local TitleIconSize = GameInviteConstants.Layout.TitleIconSize
 local SidePadding = GameInviteConstants.Layout.SidePadding
-local v34 = Images["icons/navigation/close"]
-local v35 = Images["icons/menu/search"]
-local t1 = {
+
+local iconsnavigationclose = Images["icons/navigation/close"]
+local iconsmenusearch = Images["icons/menu/search"]
+
+local v = {
 	cancelText = "Feature.SettingsHub.Action.CancelSearch",
-	copyLink = "Feature.SocialShare.Action.CopyLink",
-	inviteFriends = if not FFlagConnectionsToFriendsRename then nil else "CoreScripts.InGameMenu.PageTitle.InviteFriends",
-	inviteConnections = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.InviteConnections" or nil
+	inviteFriends = "CoreScripts.InGameMenu.PageTitle.InviteFriends",
+	joinOrInviteFriends = FFlagGameInviteInExpJoinCta and "CoreScripts.InGameMenu.PageTitle.JoinOrInviteFriends" or nil,
+	copyLink = "Feature.SocialShare.Action.CopyLink"
 }
 
-local function v37(p1, b1: boolean, b2: boolean) -- line: 61
-	-- upvalues: GetFFlagEnableGameInviteModalVRSupport (copy), IsVRAppBuild (copy), isExperienceOlderThanOneWeek (copy)
+local function fn(data, flag: boolean, flag2: boolean)
 	if GetFFlagEnableGameInviteModalVRSupport() then
-		return not IsVRAppBuild() and (b2 and (not b1 and (p1 and (p1.isCoreScript and (p1.serverType == "StandardServer" and isExperienceOlderThanOneWeek(p1.gameDetails))))))
-	end
+		local v2 = not IsVRAppBuild() and flag2 and not flag and data and data.isCoreScript
 
-	return not b1 and (b2 and (p1 and (p1.isCoreScript and (p1.serverType == "StandardServer" and isExperienceOlderThanOneWeek(p1.gameDetails)))))
+		if v2 then
+			if data.serverType == "StandardServer" then
+				return (isExperienceOlderThanOneWeek(data.gameDetails))
+			end
+
+			return false
+		end
+
+		return v2
+	else
+		local v2 = not flag and flag2 and data and data.isCoreScript
+
+		if v2 then
+			if data.serverType == "StandardServer" then
+				return (isExperienceOlderThanOneWeek(data.gameDetails))
+			end
+
+			return false
+		end
+
+		return v2
+	end
 end
 
-return function(t2: {[any]: any}) -- line: 90
-	-- upvalues: useStyle (copy), React (copy), GameInviteModalLayoutContext (copy), GameDetailsContext (copy), FriendsListContext (copy), InviteFriendContext (copy), getLocalizedStrings (copy), t1 (copy), useAppPolicy (copy), DeviceInfo (copy), v37 (copy), TextService (copy), TitleIconSize (copy), GameInviteModalManager (copy), SidePadding (copy), ImageSetButton (copy), v34 (copy), FFlagConnectionsToFriendsRename (copy), v35 (copy), ShareGameInviteLink (copy), FriendsMenuSearch (copy), GameInviteAnalyticsManager (copy)
-	local v42 = useStyle()
-	local v43 = React.useContext(GameInviteModalLayoutContext)
-	local v44 = React.useContext(GameDetailsContext)
-	local v45 = React.useContext(FriendsListContext)
-	local v46 = React.useContext(InviteFriendContext)
-	local v47, v48 = React.useState(false)
-	local v49 = getLocalizedStrings(t1)
-	local searchFriends = v45.searchFriends
-	local v51 = useAppPolicy(function(p2) -- line: 102
-		return p2.getExperienceInviteShareLinkEnabled()
+return function(props)
+	local v2 = useStyle()
+	local v3 = React.useContext(GameInviteModalLayoutContext)
+	local v4 = React.useContext(GameDetailsContext)
+	local v5 = React.useContext(FriendsListContext)
+	local v6 = React.useContext(InviteFriendContext)
+
+	local state, setState = React.useState(false)
+	local localizedStrings = getLocalizedStrings(v)
+	local text
+
+	if FFlagGameInviteInExpJoinCta and shouldShowJoinCta(v4) then
+		text = localizedStrings.joinOrInviteFriends
+	else
+		text = localizedStrings.inviteFriends
+	end
+
+	local searchFriends = v5.searchFriends
+
+	local v7 = useAppPolicy(function(p)
+		return p.getExperienceInviteShareLinkEnabled()
 	end)
-	local v52 = v43.modalMode == "compact"
-	local isFullWidth = v43.isFullWidth
-	local v54 = DeviceInfo.isDesktopDevice()
-	local v55 = DeviceInfo.isConsole()
-	local v56 = v37(v44, v55, v51)
-	local v57 = v54 and not isFullWidth
-	local v58 = v42.Font.BaseSize * v42.Font.Header2.RelativeSize
-	local v59 = v42.Font.BaseSize * v42.Font.Body.RelativeSize
-	local TextSize = TextService:GetTextSize(v49.copyLink, v58, v42.Font.Header2.Font, Vector2.new(300 - TitleIconSize, 1e999))
-	local uDim2 = nil
-	local n1 = 0
 
-	if v56 then
-		if v54 and v57 then
-			local v63 = math.ceil(TextSize.X) + 10
+	local v8 = v3.modalMode == "compact"
+	local isFullWidth = v3.isFullWidth
+	local desktopDevice = DeviceInfo.isDesktopDevice()
+	local v9 = fn(v4, DeviceInfo.isConsole(), v7)
+	local isFullSize = desktopDevice and not isFullWidth
+	local textSize = v2.Font.BaseSize * v2.Font.Header2.RelativeSize
+	local textSize2 = v2.Font.BaseSize * v2.Font.Body.RelativeSize
+	local v10
 
-			uDim2 = UDim2.new(0, v63, 1, 0)
-			n1 += v63
+	if FoundationFontFaceMigration then
+		v10 = GetTextSize(
+			localizedStrings.copyLink,
+			textSize,
+			v2.Tokens.Typography.TitleLarge.Font,
+			Vector2.new(300 - TitleIconSize, 1e999),
+			{ addTemporaryPadding = false }
+		)
+	else
+		v10 = TextService:GetTextSize(
+			localizedStrings.copyLink,
+			textSize,
+			v2.Font.Header2.Font,
+			Vector2.new(300 - TitleIconSize, 1e999)
+		)
+	end
+
+	local total = 0
+	local udim
+
+	if v9 then
+		if desktopDevice and isFullSize then
+			local v11 = math.ceil(v10.X) + 10
+			udim = UDim2.new(0, v11, 1, 0)
+			total += v11
 		else
-			uDim2 = UDim2.new(0, TitleIconSize, 0, TitleIconSize)
-			n1 += TitleIconSize
+			udim = UDim2.new(0, TitleIconSize, 0, TitleIconSize)
+			total += TitleIconSize
 		end
+	else
+		udim = nil
 	end
 
-	if v52 then
-		n1 += TitleIconSize
+	if v8 then
+		total += TitleIconSize
 	end
 
-	if v52 and v56 then
-		n1 += 4
+	if v8 and v9 then
+		total += 4
 	end
 
-	local function v64() -- line: 143
-		-- upvalues: GameInviteModalManager (copy), v46 (copy)
-		GameInviteModalManager:closeModal(v46.getMaxRecipientRowNum())
+	local function fn2()
+		GameInviteModalManager:closeModal(v6.getMaxRecipientRowNum())
 	end
-	local function v65() -- line: 147
-		-- upvalues: v48 (copy)
-		v48(true)
+
+	local function fn3()
+		setState(true)
 	end
-	local function v66() -- line: 151
-		-- upvalues: v48 (copy), searchFriends (copy)
-		v48(false)
+
+	local function fn4() -- 1 equivalent call inferred from this helper
+		setState(false)
 		searchFriends("")
 	end
 
-	if not v52 and v47 then
-		v48(false)
-		searchFriends("")
+	if not v8 and state then
+		fn4() -- inferred equivalent call
 	end
 
-	local v67 = React.useMemo(function() -- line: 162
-		-- upvalues: React (copy), SidePadding (copy), n1 (ref), t2 (copy), ImageSetButton (copy), TitleIconSize (copy), v64 (copy), v34 (copy), v42 (copy), FFlagConnectionsToFriendsRename (copy), v49 (copy), v58 (copy), v52 (copy), v65 (copy), v35 (copy), v56 (copy), ShareGameInviteLink (copy), v54 (copy), v57 (copy), uDim2 (ref)
-		return {
+	local v11 = React.useMemo(function()
+		local children = {
 			UIPadding = React.createElement("UIPadding", {
 				PaddingLeft = UDim.new(0, SidePadding),
 				PaddingRight = UDim.new(0, SidePadding)
@@ -128,80 +188,126 @@ return function(t2: {[any]: any}) -- line: 90
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center
 			}),
-			LeftActionContainer = React.createElement("Frame", {
+			LeftActionContainer = 0,
+			Title = 0,
+			RightActionContainer = 0
+		}
+
+		local createElement = React.createElement
+		local v11 = {
+			Size = UDim2.new(0, total, 1, 0),
+			LayoutOrder = 0,
+			BackgroundTransparency = 1
+		}
+
+		local v12 = {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				Padding = UDim.new(0, 4)
+			}),
+			CloseButton = 0
+		}
+		local closeButton
+
+		if not props.hideCloseButton then
+			closeButton = React.createElement(ImageSetButton, {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, TitleIconSize, 0, TitleIconSize),
+				[React.Event.Activated] = fn2,
+				Image = iconsnavigationclose,
+				ImageColor3 = v2.Theme.IconEmphasis.Color,
+				ImageTransparency = v2.Theme.IconEmphasis.Transparency,
+				BorderSizePixel = 0
+			})
+		end
+
+		v12.CloseButton = closeButton
+		children.LeftActionContainer = createElement("Frame", v11, v12)
+
+		local createElement2 = React.createElement
+		local v13 = {
+			BackgroundTransparency = 1,
+			Text = text,
+			TextSize = textSize,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			TextColor3 = v2.Theme.TextEmphasis.Color,
+			Font = 0,
+			FontFace = 0,
+			Size = 0,
+			LayoutOrder = 1
+		}
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = v2.Font.Header2.Font
+		end
+
+		v13.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(v2.Tokens.Typography.TitleLarge.Font)
+		end
+
+		v13.FontFace = fontFace
+
+		v13.Size = UDim2.new(1, total * 2 * -1, 1, 0)
+		children.Title = createElement2("TextLabel", v13)
+
+		local createElement3 = React.createElement
+		local v14 = {
+			Size = UDim2.new(0, total, 1, 0),
+			LayoutOrder = 2,
+			BackgroundTransparency = 1
+		}
+
+		local v15 = {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right,
+				Padding = UDim.new(0, 4)
+			}),
+			SearchButton = 0,
+			ShareGameInviteLink = 0
+		}
+		local searchButton
+
+		if v8 then
+			searchButton = React.createElement(ImageSetButton, {
 				LayoutOrder = 0,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, n1, 1, 0)
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					Padding = UDim.new(0, 4)
-				}),
-				CloseButton = if t2.hideCloseButton then nil else React.createElement(ImageSetButton, {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(0, TitleIconSize, 0, TitleIconSize),
-					[React.Event.Activated] = v64,
-					Image = v34,
-					ImageColor3 = v42.Theme.IconEmphasis.Color,
-					ImageTransparency = v42.Theme.IconEmphasis.Transparency,
-					BorderSizePixel = 0
-				})
-			}),
-			Title = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				TextWrapped = true,
-				LayoutOrder = 1,
-				Text = if not FFlagConnectionsToFriendsRename then v49.inviteConnections else v49.inviteFriends,
-				TextSize = v58,
-				TextXAlignment = Enum.TextXAlignment.Center,
-				TextColor3 = v42.Theme.TextEmphasis.Color,
-				Font = v42.Font.Header2.Font,
-				Size = UDim2.new(1, n1 * 2 * -1, 1, 0)
-			}),
-			RightActionContainer = React.createElement("Frame", {
-				LayoutOrder = 2,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0, n1, 1, 0)
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = Enum.HorizontalAlignment.Right,
-					Padding = UDim.new(0, 4)
-				}),
-				SearchButton = v52 and React.createElement(ImageSetButton, {
-					LayoutOrder = 0,
-					BackgroundTransparency = 1,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Size = UDim2.new(0, TitleIconSize, 0, TitleIconSize),
-					[React.Event.Activated] = v65,
-					Image = v35,
-					ImageColor3 = v42.Theme.IconEmphasis.Color,
-					ImageTransparency = v42.Theme.IconEmphasis.Transparency,
-					BorderSizePixel = 0
-				}) or nil,
-				ShareGameInviteLink = v56 and React.createElement(ShareGameInviteLink, {
-					layoutOrder = 1,
-					isDesktop = v54,
-					isFullSize = v57,
-					size = uDim2
-				}) or nil
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Size = UDim2.new(0, TitleIconSize, 0, TitleIconSize),
+				[React.Event.Activated] = fn3,
+				Image = iconsmenusearch,
+				ImageColor3 = v2.Theme.IconEmphasis.Color,
+				ImageTransparency = v2.Theme.IconEmphasis.Transparency,
+				BorderSizePixel = 0
+			}) or nil
+		end
+
+		v15.SearchButton = searchButton
+
+		v15.ShareGameInviteLink = v9
+			and React.createElement(ShareGameInviteLink, {
+				layoutOrder = 1,
+				isDesktop = desktopDevice,
+				isFullSize = isFullSize,
+				size = udim
 			})
-		}
-	end, {
-		v47,
-		v57,
-		v52,
-		v56,
-		v54
-	})
-	local v68 = React.useMemo(function() -- line: 243
-		-- upvalues: React (copy), FriendsMenuSearch (copy), GameInviteAnalyticsManager (copy), v59 (copy), v42 (copy), v49 (copy), v66 (copy)
-		return {
+			or nil
+		children.RightActionContainer = createElement3("Frame", v14, v15)
+		return children
+	end, { state, isFullSize, v8, v9, desktopDevice, text })
+
+	local v12 = React.useMemo(function()
+		local v12 = {
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -211,33 +317,54 @@ return function(t2: {[any]: any}) -- line: 90
 			}),
 			SearchBox = React.createElement(FriendsMenuSearch, {
 				layoutOrder = 0,
-				focusElement = true,
 				size = UDim2.new(1, -120, 1, -20),
-				onFocus = function() -- line: 256
-					-- upvalues: GameInviteAnalyticsManager (copy)
+				focusElement = true,
+				onFocus = function()
 					GameInviteAnalyticsManager:onSearchFocused()
 				end
 			}),
-			CancelButton = React.createElement("TextButton", {
-				LayoutOrder = 1,
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.new(1, 0, 0.5, 0),
-				Size = UDim2.new(0, 100, 1, 0),
-				TextSize = v59,
-				TextColor3 = v42.Theme.UIDefault.Color,
-				Text = v49.cancelText,
-				Font = v42.Font.Body.Font,
-				[React.Event.Activated] = v66
-			})
+			CancelButton = 0
 		}
-	end, { v47 })
+
+		local createElement = React.createElement
+		local v13 = {}
+		v13.LayoutOrder = 1
+		v13.BackgroundTransparency = 1
+		v13.AnchorPoint = Vector2.new(1, 0.5)
+		v13.Position = UDim2.new(1, 0, 0.5, 0)
+		v13.Size = UDim2.new(0, 100, 1, 0)
+		v13.TextSize = textSize2
+		v13.TextColor3 = v2.Theme.UIDefault.Color
+		v13.Text = localizedStrings.cancelText
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = v2.Font.Body.Font
+		end
+
+		v13.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(v2.Tokens.Typography.BodyLarge.Font)
+		end
+
+		v13.FontFace = fontFace
+
+		v13[React.Event.Activated] = fn4
+		v12.CancelButton = createElement("TextButton", v13)
+		return v12
+	end, { state })
+
+	if state then
+		v11 = v12
+	end
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0, 1),
-		LayoutOrder = t2.layoutOrder,
+		LayoutOrder = props.layoutOrder,
 		Position = UDim2.new(0, 0, 1, 0),
-		Size = t2.size
-	}, if not v47 then v67 else v68)
+		Size = props.size
+	}, v11)
 end

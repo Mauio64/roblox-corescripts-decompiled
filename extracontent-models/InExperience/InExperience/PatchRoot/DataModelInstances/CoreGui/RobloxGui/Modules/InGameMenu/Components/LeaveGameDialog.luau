@@ -1,27 +1,37 @@
 local RunService = game:GetService("RunService")
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local RoactRodux = InGameMenuDependencies.RoactRodux
 local t = InGameMenuDependencies.t
-local ParentParent = script.Parent.Parent
-local withLocalization = require(ParentParent.Localization.withLocalization)
-local CancelLeavingGame = require(ParentParent.Actions.CancelLeavingGame)
-local GlobalConfig = require(ParentParent.GlobalConfig)
+
+local parent = script.Parent.Parent
+
+local withLocalization = require(parent.Localization.withLocalization)
+
+local CancelLeavingGame = require(parent.Actions.CancelLeavingGame)
+
+local GlobalConfig = require(parent.GlobalConfig)
+
 local ConfirmationDialog = require(script.Parent.ConfirmationDialog)
-local Constants = require(ParentParent.Resources.Constants)
-local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
-local GetDefaultQualityLevel = require(CorePackages.Workspace.Packages.AppCommonLib).GetDefaultQualityLevel
-local v15 = t.strictInterface({
+
+local Constants = require(parent.Resources.Constants)
+
+local SendAnalytics = require(parent.Utility.SendAnalytics)
+
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local GetDefaultQualityLevel = AppCommonLib.GetDefaultQualityLevel
+
+local strictInterface = t.strictInterface({
 	isLeavingGame = t.boolean,
 	onCancel = t.callback,
 	sendAnalytics = t.callback
 })
 
-local function LeaveGameDialog(p1) -- line: 31
-	-- upvalues: GlobalConfig (copy), v15 (copy), withLocalization (copy), Roact (copy), ConfirmationDialog (copy), SendAnalytics (copy), Constants (copy), RunService (copy), GetDefaultQualityLevel (copy)
+local function LeaveGameDialog(p)
 	if GlobalConfig.propValidation then
-		assert(v15(p1))
+		assert(strictInterface(p))
 	end
 
 	return withLocalization({
@@ -29,40 +39,36 @@ local function LeaveGameDialog(p1) -- line: 31
 		confirmText = "CoreScripts.InGameMenu.Leave",
 		titleText = "CoreScripts.InGameMenu.LeaveGameQuestion",
 		cancelText = "CoreScripts.InGameMenu.Cancel"
-	})(function(p2) -- line: 41
-		-- upvalues: Roact (copy), ConfirmationDialog (copy), p1 (copy), SendAnalytics (copy), Constants (copy), RunService (copy), GetDefaultQualityLevel (copy)
+	})(function(props)
 		return Roact.createElement(ConfirmationDialog, {
+			bodyText = props.bodyText,
+			confirmText = props.confirmText,
+			titleText = props.titleText,
+			cancelText = props.cancelText,
 			bindReturnToConfirm = true,
-			blurBackground = true,
-			bodyText = p2.bodyText,
-			confirmText = p2.confirmText,
-			titleText = p2.titleText,
-			cancelText = p2.cancelText,
-			onCancel = p1.onCancel,
-			onConfirm = function() -- line: 51
-				-- upvalues: SendAnalytics (copy), Constants (copy), RunService (copy), GetDefaultQualityLevel (copy)
+			onCancel = p.onCancel,
+			onConfirm = function()
 				SendAnalytics(Constants.AnalyticsInGameMenuName, Constants.AnalyticsLeaveGameName, {
 					confirmed = Constants.AnalyticsConfirmedName
 				})
+
 				RunService.Heartbeat:Wait()
 				game:Shutdown()
-				settings().Rendering.QualityLevel = GetDefaultQualityLevel()
+				local settings = settings()
+				settings.Rendering.QualityLevel = GetDefaultQualityLevel()
 			end,
-			visible = p1.isLeavingGame
+			blurBackground = true,
+			visible = p.isLeavingGame
 		})
 	end)
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p3, _) -- line: 69
+return RoactRodux.UNSTABLE_connect2(function(p, _)
+	return { isLeavingGame = p.leavingGame }
+end, function(callback)
 	return {
-		isLeavingGame = p3.leavingGame
-	}
-end, function(p5) -- line: 73
-	-- upvalues: CancelLeavingGame (copy), SendAnalytics (copy), Constants (copy)
-	return {
-		onCancel = function() -- line: 75
-			-- upvalues: p5 (copy), CancelLeavingGame (copy), SendAnalytics (copy), Constants (copy)
-			p5(CancelLeavingGame())
+		onCancel = function()
+			callback(CancelLeavingGame())
 			SendAnalytics(Constants.AnalyticsInGameMenuName, Constants.AnalyticsLeaveGameName, {
 				confirmed = Constants.AnalyticsCancelledName
 			})

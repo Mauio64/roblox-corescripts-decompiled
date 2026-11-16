@@ -1,0 +1,4 @@
+local FFlagBuildExperienceMonetizationNativeUI = require(script.Parent.FFlagBuildExperienceMonetizationNativeUI)
+
+return game:DefineFastFlag("BuildExperienceMonetizationProductEditing", false)
+	and FFlagBuildExperienceMonetizationNativeUI

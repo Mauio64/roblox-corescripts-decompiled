@@ -1,38 +1,34 @@
 local None = require(script.Parent.Parent.None)
 
-local function join(...) -- line: 12
-	-- upvalues: None (copy)
-	local v3 = select("#", ...)
+local function join(...)
+	local v = select("#", ...)
 
-	if v3 == 0 then
+	if v == 0 then
 		return {}
 	end
 
-	if v3 == 1 then
-		local v4 = table.clone(...)
+	if v == 1 then
+		local clone = table.clone(...)
+		setmetatable(clone, nil)
+		return clone
+	else
+		local clone = table.clone((select)(1, ...))
+		setmetatable(clone, nil)
 
-		setmetatable(v4, nil)
+		for i = 2, v do
+			local v2 = select(i, ...)
 
-		return v4
-	end
-
-	local v5 = table.clone(select(1, ...))
-
-	setmetatable(v5, nil)
-
-	for i = 2, v3 do
-		local v7 = select(i, ...)
-
-		for k, v in pairs(v7) do
-			if v == None then
-				v5[k] = nil
-			else
-				v5[k] = v
+			for k, v3 in pairs(v2) do
+				if v3 == None then
+					clone[k] = nil
+				else
+					clone[k] = v3
+				end
 			end
 		end
-	end
 
-	return v5
+		return clone
+	end
 end
 
 return join

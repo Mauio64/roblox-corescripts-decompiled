@@ -1,11 +1,6 @@
-local Parent = script:FindFirstAncestor("DiscoveryHeroUnit").Parent
-
-require(Parent.Foundation)
+local parent = script:FindFirstAncestor("DiscoveryHeroUnit").Parent
+require(parent.Foundation)
 
 return {
-	HeroNarrowLayout = {
-		Compact = "Compact",
-		Square = "Square",
-		Tall = "Tall"
-	}
+	HeroNarrowLayout = { Compact = "Compact", Square = "Square", Tall = "Tall" }
 }

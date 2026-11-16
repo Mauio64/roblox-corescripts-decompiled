@@ -1,3 +1,4 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
 
-return require(FriendsLanding.dependencies).Logger
+return dependencies.Logger

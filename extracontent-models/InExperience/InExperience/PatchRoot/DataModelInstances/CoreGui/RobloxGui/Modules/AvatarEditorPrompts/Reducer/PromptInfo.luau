@@ -1,12 +1,17 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Rodux = require(CorePackages.Packages.Rodux)
 local Cryo = require(CorePackages.Packages.Cryo)
-local ParentParent = script.Parent.Parent
-local PromptType = require(ParentParent.PromptType)
-local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
-local OpenPrompt = require(ParentParent.Actions.OpenPrompt)
-local CreateOutfitConfirmed = require(ParentParent.Actions.CreateOutfitConfirmed)
-local t1 = {
+
+local parent = script.Parent.Parent
+
+local PromptType = require(parent.PromptType)
+
+local CloseOpenPrompt = require(parent.Actions.CloseOpenPrompt)
+local OpenPrompt = require(parent.Actions.OpenPrompt)
+local CreateOutfitConfirmed = require(parent.Actions.CreateOutfitConfirmed)
+
+return (Rodux.createReducer({
 	promptType = nil,
 	humanoidDescription = nil,
 	rigType = nil,
@@ -16,41 +21,29 @@ local t1 = {
 	isFavorited = nil,
 	queue = {},
 	infoQueue = {}
-}
-
-return (Rodux.createReducer(t1, {
-	[CloseOpenPrompt.name] = function(p1, _) -- line: 32
-		-- upvalues: Cryo (copy)
-		if Cryo.isEmpty(p1.queue) then
-			return {
-				queue = p1.queue,
-				infoQueue = p1.infoQueue
-			}
+}, {
+	[CloseOpenPrompt.name] = function(p, _)
+		if Cryo.isEmpty(p.queue) then
+			return { queue = p.queue, infoQueue = p.infoQueue }
 		end
 
-		return Cryo.Dictionary.join(p1.infoQueue[1], {
-			promptType = p1.queue[1],
-			queue = Cryo.List.removeIndex(p1.queue, 1),
-			infoQueue = Cryo.List.removeIndex(p1.infoQueue, 1)
+		return Cryo.Dictionary.join(p.infoQueue[1], {
+			promptType = p.queue[1],
+			queue = Cryo.List.removeIndex(p.queue, 1),
+			infoQueue = Cryo.List.removeIndex(p.infoQueue, 1)
 		})
 	end,
-	[OpenPrompt.name] = function(p3, p4) -- line: 47
-		-- upvalues: Cryo (copy)
-		if p3.promptType == nil then
-			return Cryo.Dictionary.join(p3, {
-				promptType = p4.promptType
-			}, p4.promptInfo)
+	[OpenPrompt.name] = function(data, p)
+		if data.promptType == nil then
+			return Cryo.Dictionary.join(data, { promptType = p.promptType }, p.promptInfo)
 		end
 
-		return Cryo.Dictionary.join(p3, {
-			queue = Cryo.List.join(p3.queue, { p4.promptType }),
-			infoQueue = Cryo.List.join(p3.infoQueue, { p4.promptInfo })
+		return Cryo.Dictionary.join(data, {
+			queue = Cryo.List.join(data.queue, { p.promptType }),
+			infoQueue = Cryo.List.join(data.infoQueue, { p.promptInfo })
 		})
 	end,
-	[CreateOutfitConfirmed.name] = function(p5, _) -- line: 60
-		-- upvalues: Cryo (copy), PromptType (copy)
-		return Cryo.Dictionary.join(p5, {
-			promptType = PromptType.EnterOutfitName
-		})
+	[CreateOutfitConfirmed.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { promptType = PromptType.EnterOutfitName })
 	end
 }))

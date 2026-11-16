@@ -4,251 +4,162 @@ local UIBlox = require(CorePackages.Packages.UIBlox)
 local GridMetrics = UIBlox.App.Grid.GridMetrics
 local DefaultMetricsGridView = UIBlox.App.Grid.DefaultMetricsGridView
 local Constants = require(script.Parent.Parent.Parent.Parent.Constants)
+
 local AvatarItemCard = require(script.Parent.AvatarItemCard)
 local ItemTile = UIBlox.Tile.ItemTile
+
 local vector2 = Vector2.new(20, 20)
 
-local function createObjectsFolder(t1: {[any]: any}) -- line: 33
-	local Folder = Instance.new("Folder")
+local function createObjectsFolder(items) -- 4 equivalent calls inferred from this helper
+	local r15ArtistIntent = Instance.new("Folder")
+	r15ArtistIntent.Name = "R15ArtistIntent"
 
-	Folder.Name = "R15ArtistIntent"
-
-	for _, v17 in t1 do
-		v17.Parent = Folder
+	for _, item in items do
+		item.Parent = r15ArtistIntent
 	end
 
-	return {
-		[1] = Folder
-	}
+	return { r15ArtistIntent }
 end
-local function getPart(p1, s1: string) -- line: 43
-	return (p1:FindFirstChild(s1))
-end
-local function getItems(p2, _: string) -- line: 47
-	local v22 = nil
-	local v23 = nil
-	local v24 = nil
 
-	for _, child in ipairs(p2:GetChildren()) do
-		if child:IsA("Accessory") then
-			if child.AccessoryType == Enum.AccessoryType.Eyebrow then
-				v23 = child
-			elseif child.AccessoryType == Enum.AccessoryType.Eyelash then
-				v22 = child
-			elseif child.AccessoryType == Enum.AccessoryType.Hair then
-				v24 = child
-			end
+local function getPart(instance, childName: string) -- 15 equivalent calls inferred from this helper
+	return (instance:FindFirstChild(childName))
+end
+
+local function getItems(clone, _: string)
+	local asset = nil
+	local asset2 = nil
+	local asset3 = nil
+
+	for _, accessory in ipairs(clone:GetChildren()) do
+		if not accessory:IsA("Accessory") then
+			continue
+		end
+
+		if accessory.AccessoryType == Enum.AccessoryType.Eyebrow then
+			asset = accessory
+		elseif accessory.AccessoryType == Enum.AccessoryType.Eyelash then
+			asset2 = accessory
+		elseif accessory.AccessoryType == Enum.AccessoryType.Hair then
+			asset3 = accessory
 		end
 	end
 
-	local t2 = {}
-	local t3 = {
-		partName = "Head",
-		asset = p2:FindFirstChild("Head")
-	}
-	local t4 = {
-		partName = "Torso"
-	}
-	local t5 = {
-		p2:FindFirstChild("UpperTorso"),
-		(p2:FindFirstChild("LowerTorso"))
-	}
-	local Folder = Instance.new("Folder")
+	local v = { asset = getPart(clone, "Head"), partName = "Head" } -- inferred equivalent call
 
-	Folder.Name = "R15ArtistIntent"
+	local v2 = { getPart(clone, "UpperTorso"), getPart(clone, "LowerTorso") } -- inferred equivalent call
+	local r15ArtistIntent = Instance.new("Folder")
+	r15ArtistIntent.Name = "R15ArtistIntent"
 
-	for _, v33 in t5 do
-		v33.Parent = Folder
+	local v3 = { asset = 0, partName = "Torso" }
+	local items = { nil, nil, nil, nil, nil, nil }
+
+	for _, v4 in v2 do
+		v4.Parent = r15ArtistIntent
 	end
 
-	t4.asset = {
-		[1] = Folder
-	}
+	v3.asset = { r15ArtistIntent }
 
-	local t6 = {
-		partName = "Left Arm"
-	}
-	local t7 = {
-		p2:FindFirstChild("LeftUpperArm"),
-		p2:FindFirstChild("LeftLowerArm"),
-		(p2:FindFirstChild("LeftHand"))
-	}
-	local Folder2 = Instance.new("Folder")
+	items[1], items[2], items[3], items[4], items[5], items[6] = v, v3, {
+	asset = createObjectsFolder({ getPart(clone, "LeftUpperArm"), getPart(clone, "LeftLowerArm"), getPart(clone, "LeftHand") }),
+	partName = "Left Arm"
+}, {
+	asset = createObjectsFolder({ getPart(clone, "LeftUpperLeg"), getPart(clone, "LeftLowerLeg"), getPart(clone, "LeftFoot") }),
+	partName = "Left Leg"
+}, {
+	asset = createObjectsFolder({ getPart(clone, "RightUpperArm"), getPart(clone, "RightLowerArm"), getPart(clone, "RightHand") }),
+	partName = "Right Arm"
+}, {
+	asset = createObjectsFolder({ getPart(clone, "RightUpperLeg"), getPart(clone, "RightLowerLeg"), getPart(clone, "RightFoot") }),
+	partName = "Right Leg"
+} -- inferred equivalent call
 
-	Folder2.Name = "R15ArtistIntent"
-
-	for _, v38 in t7 do
-		v38.Parent = Folder2
+	if asset then
+		table.insert(items, { asset = asset, partName = "Eyebrows" })
 	end
 
-	t6.asset = {
-		[1] = Folder2
-	}
-
-	local t8 = {
-		partName = "Left Leg"
-	}
-	local t9 = {
-		p2:FindFirstChild("LeftUpperLeg"),
-		p2:FindFirstChild("LeftLowerLeg"),
-		(p2:FindFirstChild("LeftFoot"))
-	}
-	local Folder3 = Instance.new("Folder")
-
-	Folder3.Name = "R15ArtistIntent"
-
-	for _, v43 in t9 do
-		v43.Parent = Folder3
+	if asset2 then
+		table.insert(items, { asset = asset2, partName = "Eyelashes" })
 	end
 
-	t8.asset = {
-		[1] = Folder3
-	}
-
-	local t10 = {
-		partName = "Right Arm"
-	}
-	local t11 = {
-		p2:FindFirstChild("RightUpperArm"),
-		p2:FindFirstChild("RightLowerArm"),
-		(p2:FindFirstChild("RightHand"))
-	}
-	local Folder4 = Instance.new("Folder")
-
-	Folder4.Name = "R15ArtistIntent"
-
-	for _, v48 in t11 do
-		v48.Parent = Folder4
+	if asset3 then
+		table.insert(items, { asset = asset3, partName = "Hair" })
 	end
 
-	t10.asset = {
-		[1] = Folder4
-	}
-
-	local t12 = {
-		partName = "Right Leg"
-	}
-	local t13 = {
-		p2:FindFirstChild("RightUpperLeg"),
-		p2:FindFirstChild("RightLowerLeg"),
-		(p2:FindFirstChild("RightFoot"))
-	}
-	local Folder5 = Instance.new("Folder")
-
-	Folder5.Name = "R15ArtistIntent"
-
-	for _, v53 in t13 do
-		v53.Parent = Folder5
-	end
-
-	t12.asset = {
-		[1] = Folder5
-	}
-	t2[1] = t3
-	t2[2] = t4
-	t2[3] = t6
-	t2[4] = t8
-	t2[5] = t10
-	t2[6] = t12
-
-	if v23 then
-		table.insert(t2, {
-			partName = "Eyebrows",
-			asset = v23
-		})
-	end
-
-	if v22 then
-		table.insert(t2, {
-			partName = "Eyelashes",
-			asset = v22
-		})
-	end
-
-	if v24 then
-		table.insert(t2, {
-			partName = "Hair",
-			asset = v24
-		})
-	end
-
-	return t2
+	return items
 end
-local function AvatarPartGrid(t14: {[any]: any}) -- line: 132
-	-- upvalues: React (copy), getItems (copy), Constants (copy), AvatarItemCard (copy), ItemTile (copy), DefaultMetricsGridView (copy), GridMetrics (copy), vector2 (copy)
-	local v55, v56 = React.useState({})
 
-	React.useEffect(function() -- line: 134
-		-- upvalues: t14 (copy), v56 (copy), getItems (copy)
-		if t14.humanoidModel then
-			local clone = t14.humanoidModel:Clone()
-
-			v56((getItems(clone, t14.name)))
-
+local function AvatarPartGrid(props)
+	local state, setState = React.useState({})
+	React.useEffect(function()
+		if props.humanoidModel then
+			setState(getItems(props.humanoidModel:Clone(), props.name))
 			return
 		end
 
-		local t15 = {}
+		local v = {}
 
 		for i = 1, 6 do
-			t15[i] = {}
+			v[i] = {}
 		end
 
-		v56(t15)
-	end, { t14.humanoidModel })
-	React.useEffect(function() -- line: 150
-		-- upvalues: v55 (copy), v56 (copy)
-		if v55[1] and v55[1].asset then
-			local t16 = {}
+		setState(v)
+	end, { props.humanoidModel })
 
-			for v63, v64 in v55 do
-				t16[v63] = {
-					asset = v64.asset,
-					partName = v64.partName
-				}
+	React.useEffect(function()
+		if state[1] and state[1].asset then
+			local v = {}
+
+			for k, v2 in state do
+				v[k] = { asset = v2.asset, partName = v2.partName }
 			end
 
-			v56(t16)
+			setState(v)
 		end
-	end, { t14.name })
+	end, { props.name })
+	local v
 
-	local v57 = if not (t14.screenSize.Y > t14.screenSize.X) then Constants.ItemCardWidthLandscape else Constants.ItemCardWidthPortrait
-	local v58 = React.useCallback(function(p3) -- line: 168
-		-- upvalues: React (copy), AvatarItemCard (copy), t14 (copy), v57 (copy), ItemTile (copy)
-		if p3.asset then
+	if props.screenSize.Y > props.screenSize.X then
+		v = Constants.ItemCardWidthPortrait
+	else
+		v = Constants.ItemCardWidthLandscape
+	end
+
+	local renderItem = React.useCallback(function(p)
+		if p.asset then
 			return React.createElement(AvatarItemCard, {
-				asset = p3.asset,
-				bodyName = t14.name,
-				partName = p3.partName,
-				viewportSize = v57
+				asset = p.asset,
+				bodyName = props.name,
+				partName = p.partName,
+				viewportSize = v
 			})
 		end
 
 		return React.createElement(ItemTile)
-	end, {
-		v57,
-		t14.name
-	})
+	end, { v, props.name })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t14.LayoutOrder
-	}, {
-		Grid = React.createElement(DefaultMetricsGridView, {
-			getItemHeight = function(n1: number) -- line: 190
-				return n1 * 1.3333333333333333
-			end,
-			getItemMetrics = GridMetrics.makeCustomMetricsGetter({
-				minimumItemsPerRow = 2,
-				minimumItemWidth = v57
-			}),
-			renderItem = v58,
-			itemPadding = vector2,
-			items = v55
-		})
-	})
+	return React.createElement(
+		"Frame",
+		{
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = props.LayoutOrder,
+			BackgroundTransparency = 1
+		},
+		{
+			Grid = React.createElement(DefaultMetricsGridView, {
+				getItemHeight = function(p: number)
+					return p * (4 / 3)
+				end,
+				getItemMetrics = GridMetrics.makeCustomMetricsGetter({
+					minimumItemsPerRow = 2,
+					minimumItemWidth = v
+				}),
+				renderItem = renderItem,
+				itemPadding = vector2,
+				items = state
+			})
+		}
+	)
 end
 
 return AvatarPartGrid

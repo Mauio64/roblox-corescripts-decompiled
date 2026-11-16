@@ -1,41 +1,36 @@
-local Parent = script:FindFirstAncestor("SocialTabsPage").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("SocialTabsPage").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationImage = Foundation.Image
-local FoundationText = Foundation.Text
+local Image = Foundation.Image
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
-local FoundationCloudAssets = require(Parent.FoundationCloudAssets)
+
+local FoundationCloudAssets = require(parent.FoundationCloudAssets)
 local Assets = FoundationCloudAssets.Assets
-
 FoundationCloudAssets.preloadAsset("pictograms/collaborators")
+local pictogramscollaborators = Assets["pictograms/collaborators"] or {}
 
-local v10 = Assets["pictograms/collaborators"] or {}
+local function SocialTabsEmptyState(p)
+	local v = useTokens()
+	local v2 = 180 * v.Config.UI.Scale
+	local v3 = 320 * v.Config.UI.Scale
 
-local function SocialTabsEmptyState(t1: {[any]: any}) -- line: 24
-	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationImage (copy), v10 (copy), FoundationText (copy)
-	local v13 = useTokens()
-	local v14 = 180 * v13.Config.UI.Scale
-	local v15 = 320 * v13.Config.UI.Scale
-
-	return React.createElement(View, {
-		tag = "col align-x-center align-y-center size-full"
-	}, {
-		EmptyContainer = React.createElement(View, {
-			tag = "col align-x-center size-full-0 auto-y"
-		}, {
-			Illustration = React.createElement(FoundationImage, {
+	return React.createElement(View, { tag = "col align-x-center align-y-center size-full" }, {
+		EmptyContainer = React.createElement(View, { tag = "col align-x-center size-full-0 auto-y" }, {
+			Illustration = React.createElement(Image, {
 				LayoutOrder = 1,
-				tag = "position-top-center anchor-top-center",
-				Image = v10.assetId,
-				imageStyle = v13.Color.Content.Emphasis,
+				Image = pictogramscollaborators.assetId,
+				imageStyle = v.Color.Content.Emphasis,
 				ScaleType = Enum.ScaleType.Fit,
-				Size = UDim2.new(0, v15, 0, v14)
+				Size = UDim2.new(0, v3, 0, v2),
+				tag = "position-top-center anchor-top-center"
 			}),
-			EmptyText = React.createElement(FoundationText, {
+			EmptyText = React.createElement(Text, {
 				LayoutOrder = 2,
 				tag = "size-full-0 auto-y text-body-medium",
-				Text = t1.text
+				Text = p.text
 			})
 		})
 	})

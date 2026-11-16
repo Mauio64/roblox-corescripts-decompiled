@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("RemoveGameStat", function(p1) -- line: 4
-	return {
-		statName = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("RemoveGameStat", function(statName)
+	return { statName = statName }
 end)

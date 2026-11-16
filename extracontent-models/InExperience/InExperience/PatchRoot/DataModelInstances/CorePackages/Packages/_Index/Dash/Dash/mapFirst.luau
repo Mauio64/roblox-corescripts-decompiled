@@ -1,9 +1,9 @@
-local function mapFirst(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 12
-	for i, v in ipairs(t1) do
-		local v6 = p1(v, i)
+local function mapFirst(list, callback)
+	for i, item in ipairs(list) do
+		local v = callback(item, i)
 
-		if v6 ~= nil then
-			return v6
+		if v ~= nil then
+			return v
 		end
 	end
 

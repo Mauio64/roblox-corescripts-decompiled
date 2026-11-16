@@ -1,35 +1,67 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local useDesignTokens = require(Parent.Style).useDesignTokens
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(parent.React)
+
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXAddTransparencyToItemCardHeader = AvatarExperienceFlags.FFlagAXAddTransparencyToItemCardHeader
-local FFlagAXCatalogItemCardDarkerBackground = AvatarExperienceFlags.FFlagAXCatalogItemCardDarkerBackground
 
-local function ItemCardHeader(t1: {[any]: any}) -- line: 21
-	-- upvalues: useDesignTokens (copy), FFlagAXCatalogItemCardDarkerBackground (copy), React (copy), FFlagAXAddTransparencyToItemCardHeader (copy)
-	local v9 = useDesignTokens()
-	local uDim = UDim.new(0, v9.Radius.Medium)
-	local v11 = if not FFlagAXCatalogItemCardDarkerBackground then v9.Color.Common.Shimmer else v9.Color.Shift.Shift_100
+local function ItemCardHeader(props)
+	local v = useDesignTokens()
+	local udim = UDim.new(0, v.Radius.Medium)
 
-	return React.createElement("Frame", {
+	local shimmer = v.Color.Common.Shimmer
+
+	local createElement = React.createElement
+	local size
+
+	if props.Size then
+		size = props.Size
+	else
+		size = UDim2.fromScale(1, 1)
+	end
+
+	local v2 = {
+		Size = size,
 		BorderSizePixel = 0,
-		Size = if not t1.Size then UDim2.fromScale(1, 1) else t1.Size,
-		BackgroundColor3 = v11.Color3,
-		BackgroundTransparency = if not FFlagAXAddTransparencyToItemCardHeader then v11.Transparency else t1.BackgroundTransparency or v11.Transparency,
-		LayoutOrder = t1.LayoutOrder,
-		ZIndex = t1.ZIndex
-	}, {
-		CornerRadius = React.createElement("UICorner", {
-			CornerRadius = uDim
-		}),
-		AspectRatio = if t1.Size then nil else React.createElement("UIAspectRatioConstraint", {
-			AspectRatio = t1.aspectRatio or 1,
+		BackgroundColor3 = shimmer.Color3,
+		BackgroundTransparency = 0,
+		LayoutOrder = 0,
+		ZIndex = 0
+	}
+	local backgroundTransparency
+
+	if FFlagAXAddTransparencyToItemCardHeader then
+		backgroundTransparency = props.BackgroundTransparency or shimmer.Transparency
+	else
+		backgroundTransparency = shimmer.Transparency
+	end
+
+	v2.BackgroundTransparency = backgroundTransparency
+
+	v2.LayoutOrder = props.LayoutOrder
+	v2.ZIndex = props.ZIndex
+	local v3 = {
+		CornerRadius = React.createElement("UICorner", { CornerRadius = udim }),
+		AspectRatio = 0,
+		ItemCardHeaderChildren = 0,
+		ItemCardHeaderOverlaySlot = 0
+	}
+	local aspectRatio
+
+	if not props.Size then
+		aspectRatio = React.createElement("UIAspectRatioConstraint", {
+			AspectRatio = props.aspectRatio or 1,
 			AspectType = Enum.AspectType.FitWithinMaxSize,
 			DominantAxis = Enum.DominantAxis.Width
-		}),
-		ItemCardHeaderChildren = React.createElement(React.Fragment, nil, t1.children),
-		ItemCardHeaderOverlaySlot = t1.overlaySlot
-	})
+		})
+	end
+
+	v3.AspectRatio = aspectRatio
+
+	v3.ItemCardHeaderChildren = React.createElement(React.Fragment, nil, props.children)
+	v3.ItemCardHeaderOverlaySlot = props.overlaySlot
+	return createElement("Frame", v2, v3)
 end
 
 if AvatarExperienceFlags.FFlagAXItemCardComponentsMemo then

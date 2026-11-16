@@ -1,1 +1,3 @@
-return (require(script.Chip))
+local Chip = require(script.Chip)
+
+return Chip

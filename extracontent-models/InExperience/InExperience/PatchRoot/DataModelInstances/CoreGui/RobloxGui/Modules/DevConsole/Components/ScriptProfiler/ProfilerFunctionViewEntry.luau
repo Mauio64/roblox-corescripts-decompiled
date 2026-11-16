@@ -1,167 +1,178 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
+
 local ProfilerUtil = require(script.Parent.ProfilerUtil)
-local _ = ProfilerUtil.getDurations
-local _ = ProfilerUtil.getSourceName
-local _ = ProfilerUtil.getLine
+
+local getDurations = ProfilerUtil.getDurations
+local getSourceName = ProfilerUtil.getSourceName
+local getLine = ProfilerUtil.getLine
 local getNativeFlag = ProfilerUtil.getNativeFlag
 local getPluginFlag = ProfilerUtil.getPluginFlag
-local _ = ProfilerUtil.standardizeChildren
+local standardizeChildren = ProfilerUtil.standardizeChildren
+
 local Components = script.Parent.Parent.Parent.Components
 local CellLabel = require(Components.CellLabel)
 local BannerButton = require(Components.BannerButton)
 local Tooltip = require(Components.Tooltip)
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
 local LineWidth = Constants.GeneralFormatting.LineWidth
 local LineColor = Constants.GeneralFormatting.LineColor
+
 local EntryFrameHeight = Constants.GeneralFormatting.EntryFrameHeight
-local _ = Constants.ScriptProfilerFormatting.DepthIndent
+local DepthIndent = Constants.ScriptProfilerFormatting.DepthIndent
 local ValueCellWidth = Constants.ScriptProfilerFormatting.ValueCellWidth
 local CellPadding = Constants.ScriptProfilerFormatting.CellPadding
 local ValuePadding = Constants.ScriptProfilerFormatting.ValuePadding
-local v22 = Roact.PureComponent:extend("ProfilerFunctionViewEntry")
 
-local function BorderedCellLabel(t1: {[any]: any}) -- line: 42
-	-- upvalues: Roact (copy), CellLabel (copy), LineWidth (copy), ValuePadding (copy), LineColor (copy)
+local extended = Roact.PureComponent:extend("ProfilerFunctionViewEntry")
+
+local function BorderedCellLabel(props)
 	return Roact.createFragment({
 		Label = Roact.createElement(CellLabel, {
-			text = t1.text,
-			size = t1.size,
-			pos = t1.pos
+			text = props.text,
+			size = props.size,
+			pos = props.pos
 		}),
 		LeftBorder = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = UDim2.new(UDim.new(0, LineWidth), t1.size.Y),
-			Position = UDim2.fromOffset(-ValuePadding, 0) + t1.pos,
+			Size = UDim2.new(UDim.new(0, LineWidth), props.size.Y),
+			Position = UDim2.fromOffset(-ValuePadding, 0) + props.pos,
 			AnchorPoint = Vector2.new(0, 0),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		})
 	})
 end
 
-function v22.init(p1) -- line: 59
-	p1.state = {
+function extended:init()
+	self.state = {
+		expanded = self.props.depth == 0,
 		showTooltip = false,
-		expanded = p1.props.depth == 0,
 		tooltipPos = UDim2.fromOffset(0, 0)
 	}
 
-	function p1.onButtonPress() -- line: 66
-		-- upvalues: p1 (copy)
-		p1:setState(function(_) -- line: 67
-			-- upvalues: p1 (copy)
+	function self.onButtonPress()
+		self:setState(function(_)
 			return {
-				expanded = not p1.state.expanded
+				expanded = not self.state.expanded
 			}
 		end)
 	end
-	function p1.onMouseEnter(_, p4, p5) -- line: 74
-		-- upvalues: p1 (copy)
-		p1:setState({
-			showTooltip = true,
-			tooltipPos = UDim2.fromOffset(p4, p5)
-		})
+
+	function self.onMouseEnter(_, p, p2)
+		self:setState({ showTooltip = true, tooltipPos = UDim2.fromOffset(p, p2) })
 	end
-	function p1.onMouseMove(_, p7, p8) -- line: 81
-		-- upvalues: p1 (copy)
-		p1:setState({
-			showTooltip = true,
-			tooltipPos = UDim2.fromOffset(p7, p8)
-		})
+
+	function self.onMouseMove(_, p, p2)
+		self:setState({ showTooltip = true, tooltipPos = UDim2.fromOffset(p, p2) })
 	end
-	function p1.onMouseLeave() -- line: 88
-		-- upvalues: p1 (copy)
-		p1:setState({
-			showTooltip = false
-		})
+
+	function self.onMouseLeave()
+		self:setState({ showTooltip = false })
 	end
 end
-function v22.renderValues(_, p10) -- line: 95
-	-- upvalues: ValueCellWidth (copy), ValuePadding (copy), EntryFrameHeight (copy), Roact (copy), BorderedCellLabel (copy)
-	local t2 = {}
-	local uDim2 = UDim2.new(ValueCellWidth, -ValuePadding, 0, EntryFrameHeight)
-	local uDim2_2 = UDim2.new(1 - ValueCellWidth * #p10, ValuePadding, 0, 0)
 
-	for i, v in ipairs(p10) do
-		t2[tostring(i)] = Roact.createElement(BorderedCellLabel, {
-			text = tostring(v),
-			size = uDim2,
-			pos = uDim2_2 + UDim2.fromScale(ValueCellWidth * (i - 1), 0)
+function extended:renderValues(list)
+	local udim = UDim2.new(ValueCellWidth, -ValuePadding, 0, EntryFrameHeight)
+	local udim2 = UDim2.new(1 - ValueCellWidth * #list, ValuePadding, 0, 0)
+	local children = {}
+
+	for i, item in ipairs(list) do
+		children[tostring(i)] = Roact.createElement(BorderedCellLabel, {
+			text = tostring(item),
+			size = udim,
+			pos = udim2 + UDim2.fromScale(ValueCellWidth * (i - 1), 0)
 		})
 	end
 
-	return t2
+	return children
 end
-function v22.render(p11) -- line: 110
-	-- upvalues: EntryFrameHeight (copy), getNativeFlag (copy), getPluginFlag (copy), ProfilerUtil (copy), ValueCellWidth (copy), Roact (copy), Tooltip (copy), BannerButton (copy), CellLabel (copy), CellPadding (copy)
-	local props = p11.props
-	local v35 = props.size or UDim2.new(1, 0, 0, EntryFrameHeight)
-	local v36 = props.layoutOrder or 0
+
+function extended:render()
+	local props = self.props
+
+	local size = props.size or UDim2.new(1, 0, 0, EntryFrameHeight)
+	local layoutOrder = props.layoutOrder or 0
+
 	local percentageRatio = props.percentageRatio
 	local data = props.data
+
 	local functionId = props.functionId
-	local v40 = data.Functions[functionId]
-	local v41 = v40.TotalDuration / p11.props.average - (p11.props.gcOffset or 0)
-	local v42 = getNativeFlag(data, v40)
-	local v43 = getPluginFlag(data, v40)
-	local t3 = { if not percentageRatio then string.format("%.3f", v41 * 1000) else if percentageRatio ~= 0 then string.format("%.3f%%", v41 / percentageRatio) else "N/A" }
+	local v = data.Functions[functionId]
+
+	local v2 = v.TotalDuration / self.props.average - (self.props.gcOffset or 0)
+
+	local nativeFlag = getNativeFlag(data, v)
+	local pluginFlag = getPluginFlag(data, v)
+	local v3
+
+	if percentageRatio then
+		v3 = percentageRatio == 0 and "N/A" or string.format("%.3f%%", v2 / percentageRatio)
+	else
+		v3 = string.format("%.3f", v2 * 1000)
+	end
+
+	local v4 = { v3 }
+
 	local nodeName = props.nodeName
+	local text = (not nodeName or #nodeName == 0) and "<anonymous>" or nodeName
 
-	if not nodeName or #nodeName == 0 then
-		nodeName = "<anonymous>"
+	local text2 = ProfilerUtil.getSourceLocationString(data, v, text)
+
+	if text == "<anonymous>" then
+		text = text2
+		text2 = ""
 	end
 
-	local v46 = ProfilerUtil.getSourceLocationString(data, v40, nodeName)
-
-	if nodeName == "<anonymous>" then
-		nodeName = v46
-		v46 = ""
+	if pluginFlag then
+		text ..= " <plugin>"
 	end
 
-	if v43 then
-		nodeName ..= " <plugin>"
+	if nativeFlag then
+		text ..= " <native>"
 	end
 
-	if v42 then
-		nodeName ..= " <native>"
-	end
+	local udim = UDim.new(1 - ValueCellWidth * #v4, -0)
 
-	local uDim = UDim.new(1 - ValueCellWidth * #t3, -0)
-
-	return Roact.createElement("Frame", {
+	local createElement = Roact.createElement
+	local v5 = {
+		Size = size,
 		BackgroundTransparency = 1,
-		Size = v35,
-		LayoutOrder = v36,
+		LayoutOrder = layoutOrder,
 		AutomaticSize = Enum.AutomaticSize.Y
-	}, {
-		tooltip = if not p11.state.showTooltip then nil else Roact.createElement(Tooltip, {
-			text = v46,
-			pos = p11.state.tooltipPos
-		}),
+	}
+	local tooltip
+
+	if self.state.showTooltip then
+		tooltip = Roact.createElement(Tooltip, { text = text2, pos = self.state.tooltipPos })
+	end
+
+	return createElement("Frame", v5, {
+		tooltip = tooltip,
 		layout = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Right,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
 		button = Roact.createElement(BannerButton, {
-			inset = 0,
-			isExpandable = false,
-			layoutOrder = -1,
 			size = UDim2.new(1, 0, 0, EntryFrameHeight),
-			isExpanded = p11.state.expanded,
-			onButtonPress = p11.onButtonPress,
-			onMouseEnter = p11.onMouseEnter,
-			onMouseLeave = p11.onMouseLeave,
-			onMouseMove = p11.onMouseMove
+			inset = 0,
+			isExpanded = self.state.expanded,
+			isExpandable = false,
+			onButtonPress = self.onButtonPress,
+			onMouseEnter = self.onMouseEnter,
+			onMouseLeave = self.onMouseLeave,
+			onMouseMove = self.onMouseMove,
+			layoutOrder = -1
 		}, {
 			name = Roact.createElement(CellLabel, {
-				text = nodeName,
-				size = UDim2.new(uDim, UDim.new(1, 0)),
+				text = text,
+				size = UDim2.new(udim, UDim.new(1, 0)),
 				pos = UDim2.new(0, CellPadding + 0, 0, 0)
 			}),
-			values = Roact.createFragment(p11:renderValues(t3))
+			values = Roact.createFragment(self:renderValues(v4))
 		})
 	})
 end
 
-return v22
+return extended

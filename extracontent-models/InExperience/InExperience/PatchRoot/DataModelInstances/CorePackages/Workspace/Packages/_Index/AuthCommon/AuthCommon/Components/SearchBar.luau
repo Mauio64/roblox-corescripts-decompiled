@@ -1,87 +1,85 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local AppFonts = require(Parent.Style).AppFonts
-local Roact = require(Parent.Roact)
-local ImageSetLabel = require(Parent.UIBlox).Core.ImageSet.ImageSetLabel
-local GetImageData = require(Parent.RobloxAppAssets).GetImageData
-local v6 = Roact.PureComponent:extend("LoginSearchBar")
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-function v6.init(p1) -- line: 18
-	p1.state = {
-		longText = false
-	}
-	p1.lastInput = 0
+local Style = require(parent.Style)
+local AppFonts = Style.AppFonts
 
-	function p1.searchTextChanged(p2) -- line: 25
-		-- upvalues: p1 (copy)
-		local v17 = p2.TextBounds.X > p2.AbsoluteSize.X
+local Roact = require(parent.Roact)
+local UIBlox = require(parent.UIBlox)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local RobloxAppAssets = require(parent.RobloxAppAssets)
+local GetImageData = RobloxAppAssets.GetImageData
 
-		if v17 ~= p1.state.longText then
-			p2.TextXAlignment = v17 and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left
-			spawn(function() -- line: 29
-				-- upvalues: p1 (copy), v17 (copy)
-				p1:setState({
-					longText = v17
-				})
+local extended = Roact.PureComponent:extend("LoginSearchBar")
+
+function extended:init()
+	self.state = { longText = false }
+
+	self.lastInput = 0
+	function self.searchTextChanged(state)
+		local longText = state.TextBounds.X > state.AbsoluteSize.X
+
+		if longText ~= self.state.longText then
+			state.TextXAlignment = longText and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left
+			spawn(function()
+				self:setState({ longText = longText })
 			end)
 		end
 
-		if p1.props.TextChanged then
-			p1.lastInput = p1.lastInput + 1
-
-			local lastInput = p1.lastInput
-
+		if self.props.TextChanged then
+			self.lastInput += 1
+			local lastInput = self.lastInput
 			wait(0.3)
 
-			if lastInput == p1.lastInput then
-				p1.props.TextChanged(p2)
+			if lastInput == self.lastInput then
+				self.props.TextChanged(state)
 			end
 		end
 	end
 end
-function v6.render(p3) -- line: 47
-	-- upvalues: Roact (copy), ImageSetLabel (copy), GetImageData (copy), AppFonts (copy)
-	local YOffset = p3.props.Size.Y.Offset
-	local IconSize = p3.props.IconSize
-	local propsTextSize = p3.props.TextSize
-	local PlaceholderText = p3.props.PlaceholderText
-	local PlaceholderColor3 = p3.props.PlaceholderColor3
-	local propsText = p3.props.Text
-	local propsTextColor3 = p3.props.TextColor3
+
+function extended.render(props)
+	local offset = props.props.Size.Y.Offset
+	local iconSize = props.props.IconSize
+	local textSize = props.props.TextSize
+	local placeholderText = props.props.PlaceholderText
+	local placeholderColor3 = props.props.PlaceholderColor3
+	local text = props.props.Text
+	local textColor3 = props.props.TextColor3
 
 	return Roact.createElement(ImageSetLabel, {
+		Size = props.props.Size,
+		Position = props.props.Position,
 		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = p3.props.Size,
-		Position = p3.props.Position,
 		Image = GetImageData("LuaApp/buttons/buttonFill") or "LuaApp/buttons/buttonFill",
-		ImageColor3 = p3.props.ImageColor3,
+		ImageColor3 = props.props.ImageColor3,
+		BorderSizePixel = 0,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(8, 8, 9, 9)
 	}, {
 		SearchIcon = Roact.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(0, IconSize, 0, IconSize),
-			Position = UDim2.new(0, YOffset * 0.5, 0, YOffset * 0.5),
+			Size = UDim2.new(0, iconSize, 0, iconSize),
+			Position = UDim2.new(0, offset * 0.5, 0, offset * 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Image = GetImageData("LuaApp/icons/ic-search-new") or "LuaApp/icons/ic-search-new",
-			ImageColor3 = propsTextColor3
+			BackgroundTransparency = 1,
+			ImageColor3 = textColor3
 		}),
 		SearchInput = Roact.createElement("TextBox", {
-			Size = UDim2.new(1, -YOffset - 10, 1, 0),
-			Position = UDim2.new(0, YOffset, 0, 0),
-			TextSize = propsTextSize,
-			TextColor3 = propsTextColor3,
-			PlaceholderText = PlaceholderText,
-			PlaceholderColor3 = PlaceholderColor3,
+			Size = UDim2.new(1, -offset - 10, 1, 0),
+			Position = UDim2.new(0, offset, 0, 0),
+			TextSize = textSize,
+			TextColor3 = textColor3,
+			PlaceholderText = placeholderText,
+			PlaceholderColor3 = placeholderColor3,
 			Font = AppFonts.default:getDefault(),
-			TextXAlignment = p3.state.longText and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left,
+			TextXAlignment = props.state.longText and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left,
 			BackgroundTransparency = 1,
-			Text = propsText,
+			Text = text,
 			ClearTextOnFocus = false,
 			ClipsDescendants = true,
-			[Roact.Change.Text] = p3.searchTextChanged
+			[Roact.Change.Text] = props.searchTextChanged
 		})
 	})
 end
 
-return v6
+return extended

@@ -1,125 +1,131 @@
 local OnPlatformSurveys = script:FindFirstAncestor("OnPlatformSurveys")
-local OnPlatformSurveysParent = OnPlatformSurveys.Parent
-local Dash = require(OnPlatformSurveysParent.Dash)
-local FFlagInlineSurveyBranching = require(OnPlatformSurveysParent.SharedFlags).FFlagInlineSurveyBranching
+local parent = OnPlatformSurveys.Parent
+
+local Dash = require(parent.Dash)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagInlineSurveyBranching = SharedFlags.FFlagInlineSurveyBranching
+
 local inlineSurveyHelpers = require(OnPlatformSurveys.Utils.inlineSurveyHelpers)
 local Phase = require(OnPlatformSurveys.Enums.Phase)
-
 require(OnPlatformSurveys.Types.InlineSurveyTypes)
 
-local t1 = {}
+local answer = {}
 
-local function getInitialState(b1: boolean?) -- line: 51
-	-- upvalues: Phase (copy), t1 (copy)
+local function getInitialState(flag: boolean?)
 	return {
+		phase = Phase.Loading,
+		hasInvite = flag == true,
+		questions = {},
 		index = 1,
+		answersByQuestionId = {},
+		answer = answer,
 		surveyId = nil,
 		idempotencyKey = nil,
-		errorType = nil,
-		phase = Phase.Loading,
-		hasInvite = b1 == true,
-		questions = {},
-		answersByQuestionId = {},
-		answer = t1
+		errorType = nil
 	}
 end
-local function closedState(b2: boolean) -- line: 65
-	-- upvalues: Dash (copy), getInitialState (copy), Phase (copy)
-	return Dash.join(getInitialState(b2), {
-		phase = Phase.Closed
-	})
+
+local function closedState(hasInvite: boolean)
+	return Dash.join(getInitialState(hasInvite), { phase = Phase.Closed })
 end
 
 return {
 	getInitialState = getInitialState,
-	reducer = function(t2: {[any]: any}, t3: {[any]: any}) -- line: 69
-		-- upvalues: getInitialState (copy), closedState (copy), Dash (copy), Phase (copy), inlineSurveyHelpers (copy), FFlagInlineSurveyBranching (copy), t1 (copy)
-		if t3.type == "fetchRequested" then
-			return (getInitialState(t2.hasInvite))
+	reducer = function(data, data2)
+		if data2.type == "fetchRequested" then
+			return getInitialState(data.hasInvite)
 		end
 
-		if t3.type == "questionsReceived" then
-			local response = t3.response
+		if data2.type == "questionsReceived" then
+			local response = data2.response
 
 			if response == nil or response.shouldPromptSurvey ~= true then
-				return closedState(t2.hasInvite)
+				return closedState(data.hasInvite)
 			end
 
 			local questions = response.questions
 
 			if questions == nil or #questions == 0 then
-				return closedState(t2.hasInvite)
+				return closedState(data.hasInvite)
 			end
 
-			return Dash.join(getInitialState(t2.hasInvite), {
-				phase = if not t2.hasInvite then Phase.Started else Phase.Invite,
+			local join = Dash.join
+			local initialState = getInitialState(data.hasInvite)
+			local phase
+
+			if data.hasInvite then
+				phase = Phase.Invite
+			else
+				phase = Phase.Started
+			end
+
+			return join(initialState, {
+				phase = phase,
 				questions = questions,
 				surveyId = response.surveyId
 			})
 		end
 
-		if t3.type == "fetchFailed" then
-			return Dash.join(t2, {
-				errorType = "fetch",
-				phase = Phase.Error
-			})
+		if data2.type == "fetchFailed" then
+			return Dash.join(data, { phase = Phase.Error, errorType = "fetch" })
 		end
 
-		if t3.type == "setAnswer" then
-			return Dash.join(t2, {
-				answer = t3.answer
-			})
+		if data2.type == "setAnswer" then
+			return Dash.join(data, { answer = data2.answer })
 		end
 
-		if t3.type == "next" then
-			local v16 = inlineSurveyHelpers.mergeCurrentAnswerIntoBatch(t2.answersByQuestionId, t2.questions[t2.index], t2.answer)
-			local v17 = if not FFlagInlineSurveyBranching then t2.index + 1 else inlineSurveyHelpers.resolveNextIndex(t2.questions, t2.index, t2.answer) or t2.index + 1
+		if data2.type == "next" then
+			local mergeCurrentAnswerIntoBatch = inlineSurveyHelpers.mergeCurrentAnswerIntoBatch(
+				data.answersByQuestionId,
+				data.questions[data.index],
+				data.answer
+			)
+			local v
 
-			return Dash.join(t2, {
-				index = v17,
-				answersByQuestionId = v16,
-				answer = t1,
+			if FFlagInlineSurveyBranching then
+				v = inlineSurveyHelpers.resolveNextIndex(data.questions, data.index, data.answer) or data.index + 1
+			else
+				v = data.index + 1
+			end
+
+			return Dash.join(data, {
+				index = v,
+				answersByQuestionId = mergeCurrentAnswerIntoBatch,
+				answer = answer,
 				errorType = Dash.None
 			})
 		end
 
-		if t3.type == "submitStarted" then
-			return Dash.join(t2, {
+		if data2.type == "submitStarted" then
+			return Dash.join(data, {
 				phase = Phase.Submitting,
-				answersByQuestionId = inlineSurveyHelpers.mergeCurrentAnswerIntoBatch(t2.answersByQuestionId, t2.questions[t2.index], t2.answer),
-				idempotencyKey = t3.idempotencyKey,
+				answersByQuestionId = inlineSurveyHelpers.mergeCurrentAnswerIntoBatch(
+					data.answersByQuestionId,
+					data.questions[data.index],
+					data.answer
+				),
+				idempotencyKey = data2.idempotencyKey,
 				errorType = Dash.None
 			})
 		end
 
-		if t3.type == "submitSucceeded" then
-			return Dash.join(t2, {
-				phase = Phase.Completed,
-				errorType = Dash.None
-			})
+		if data2.type == "submitSucceeded" then
+			return Dash.join(data, { phase = Phase.Completed, errorType = Dash.None })
 		end
 
-		if t3.type == "submitFailed" then
-			return Dash.join(t2, {
-				errorType = "submit",
-				phase = Phase.Error
-			})
+		if data2.type == "submitFailed" then
+			return Dash.join(data, { phase = Phase.Error, errorType = "submit" })
 		end
 
-		if t3.type == "inviteAccepted" then
-			return Dash.join(t2, {
-				phase = Phase.Started
-			})
+		if data2.type == "inviteAccepted" then
+			return Dash.join(data, { phase = Phase.Started })
 		end
 
-		if t3.type == "inviteDeclined" then
-			return closedState(t2.hasInvite)
+		if not (data2.type ~= "inviteDeclined" and data2.type ~= "dismissed") then
+			return closedState(data.hasInvite)
 		end
 
-		if t3.type == "dismissed" then
-			return closedState(t2.hasInvite)
-		end
-
-		return t2
+		return data
 	end
 }

@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-return require(Parent.React).createContext({
+local React = require(parent.React)
+
+return React.createContext({
+	requestOverlay = function() end,
 	instance = nil,
-	screen = nil,
-	requestOverlay = function() -- line: 7
-	end
+	screen = nil
 })

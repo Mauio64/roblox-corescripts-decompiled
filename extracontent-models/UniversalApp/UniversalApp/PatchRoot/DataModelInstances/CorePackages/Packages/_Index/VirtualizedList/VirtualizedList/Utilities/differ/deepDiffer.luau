@@ -1,69 +1,83 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
-local u5 = nil
 
-local function deepDiffer(p1, p2, p3, t1: {[any]: any}?) -- line: 29
-	-- upvalues: u5 (ref), Boolean (copy), Array (copy), deepDiffer (copy)
-	local v12 = p3 == nil and -1 or p3
-	local v13 = if typeof(v12) ~= "number" then v12 else t1
-	local v14 = typeof(v12) ~= "number" and -1 or v12
+local v = nil
+local function deepDiffer(value, value2, p, p2): boolean
+	local v2 = p == nil and -1 or p
 
-	if v14 == 0 then
+	if typeof(v2) ~= "number" then
+		p2 = v2
+	end
+
+	local v3 = typeof(v2) ~= "number" and -1 or v2
+
+	if v3 == 0 then
 		return true
 	end
 
-	if p1 == p2 then
+	if value == value2 then
 		return false
 	end
 
-	if typeof(p1) == "function" and typeof(p2) == "function" then
-		local v15 = v13 ~= nil and v13.unsafelyIgnoreFunctions ~= nil
-		local v16 = if v13 == nil or not v15 then nil else v13.unsafelyIgnoreFunctions
+	if typeof(value) == "function" and typeof(value2) == "function" then
+		local v4
 
-		if v16 == nil then
-			if u5 ~= nil and Boolean.toJSBoolean(u5.onDifferentFunctionsIgnored) and (not Boolean.toJSBoolean(v13) or not v15) then
-				u5.onDifferentFunctionsIgnored(debug.info(p1, "n"), debug.info(p2, "n"))
-			end
-
-			v16 = true
+		if p2 == nil then
+			v4 = false
+		else
+			v4 = p2.unsafelyIgnoreFunctions ~= nil
 		end
 
-		return not v16
+		local v5
+
+		if not (p2 == nil or not v4) then
+			v5 = p2.unsafelyIgnoreFunctions
+		end
+
+		if v5 == nil then
+			if
+				v ~= nil
+				and Boolean.toJSBoolean(v.onDifferentFunctionsIgnored)
+				and not (Boolean.toJSBoolean(p2) and v4)
+			then
+				v.onDifferentFunctionsIgnored(debug.info(value, "n"), debug.info(value2, "n"))
+			end
+
+			v5 = true
+		end
+
+		return not v5
 	end
 
-	if typeof(p1) ~= "table" or p1 == nil then
-		return p1 ~= p2
+	if typeof(value) ~= "table" or value == nil then
+		return value ~= value2
 	end
 
-	if typeof(p2) ~= "table" or p2 == nil then
+	if typeof(value2) ~= "table" or value2 == nil or Array.isArray(value) ~= Array.isArray(value2) then
 		return true
 	end
 
-	if Array.isArray(p1) ~= Array.isArray(p2) then
-		return true
-	end
-
-	if Array.isArray(p1) then
-		if #p2 ~= #p1 then
+	if Array.isArray(value) then
+		if #value2 ~= #value then
 			return true
 		end
 
-		for i = 1, #p1 do
-			if deepDiffer(p1[i], p2[i], v14 - 1, v13) then
+		for i = 1, #value do
+			if deepDiffer(value[i], value2[i], v3 - 1, p2) then
 				return true
 			end
 		end
 	else
-		for k in pairs(p1) do
-			if deepDiffer(p1[k], p2[k], v14 - 1, v13) then
+		for k in pairs(value) do
+			if deepDiffer(value[k], value2[k], v3 - 1, p2) then
 				return true
 			end
 		end
 
-		for k in pairs(p2) do
-			if p1[k] == nil and p2[k] ~= nil then
+		for k in pairs(value2) do
+			if value[k] == nil and value2[k] ~= nil then
 				return true
 			end
 		end
@@ -73,13 +87,11 @@ local function deepDiffer(p1, p2, p3, t1: {[any]: any}?) -- line: 29
 end
 
 return (setmetatable({
-	unstable_setLogListeners = function(t2: {[any]: any}?) -- line: 22
-		-- upvalues: u5 (ref)
-		u5 = t2
+	unstable_setLogListeners = function(p)
+		v = p
 	end
 }, {
-	__call = function(_, p5, p6, p7, t3: {[any]: any}?) -- line: 110
-		-- upvalues: deepDiffer (copy)
-		return (deepDiffer(p5, p6, p7, t3))
+	__call = function(_, p, p2, p3, p4)
+		return (deepDiffer(p, p2, p3, p4))
 	end
 }))

@@ -1,6 +1,1 @@
-return {
-	Link = "Link",
-	PlainText = "PlainText",
-	System = "System",
-	Custom = "Custom"
-}
+return { Link = "Link", PlainText = "PlainText", System = "System", Custom = "Custom" }

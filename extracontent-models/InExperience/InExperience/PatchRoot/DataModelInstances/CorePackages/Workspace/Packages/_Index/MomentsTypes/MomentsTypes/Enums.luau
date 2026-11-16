@@ -1,11 +1,7 @@
 local MomentStatus = require(script.MomentStatus)
-local MomentGetIdType = require(script.MomentGetIdType)
-local ReactionType = require(script.ReactionType)
-local ShareLinkTargetIdType = require(script.ShareLinkTargetIdType)
-
 return {
-	MomentGetIdType = MomentGetIdType,
+	MomentGetIdType = require(script.MomentGetIdType),
 	MomentStatus = MomentStatus,
-	ReactionType = ReactionType,
-	ShareLinkTargetIdType = ShareLinkTargetIdType
+	ReactionType = require(script.ReactionType),
+	ShareLinkTargetIdType = require(script.ShareLinkTargetIdType)
 }

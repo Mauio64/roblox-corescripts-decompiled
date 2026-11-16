@@ -1,48 +1,116 @@
-local function createSignal() -- line: 36
-	local t1 = {}
-	local t2 = {}
-	local u4 = false
+local function createSignal()
+	local v = {}
+	local v2 = {}
+	local v3 = false
 
-	local function subscribe(p1) -- line: 41
-		-- upvalues: u4 (ref), t1 (copy), t2 (copy)
-		assert(typeof(p1) == "function", "Can only subscribe to signals with a function.")
+	local function subscribe(callback)
+		assert(typeof(callback) == "function", "Can only subscribe to signals with a function.")
 
-		local t3 = {
-			disconnected = false,
-			callback = p1
-		}
+		local v4 = { callback = callback, disconnected = false }
 
-		if u4 and not t1[p1] then
-			t2[p1] = t3
+		if v3 and not v[callback] then
+			v2[callback] = v4
 		end
 
-		t1[p1] = t3
+		v[callback] = v4
 
-		local function disconnect() -- line: 60
-			-- upvalues: t3 (copy), t1 (copy), p1 (copy), t2 (copy)
-			assert(not t3.disconnected, "Listeners can only be disconnected once.")
-			t3.disconnected = true
-			t1[p1] = nil
-			t2[p1] = nil
+		local function disconnect()
+			assert(not v4.disconnected, "Listeners can only be disconnected once.")
+
+			v4.disconnected = true
+			v[callback] = nil
+			v2[callback] = nil
 		end
 
 		return disconnect
 	end
-	local function fire(...) -- line: 74
-		-- upvalues: u4 (ref), t1 (copy), t2 (copy)
-		u4 = true
 
-		for v10, v11 in t1 do
-			if not v11.disconnected and not t2[v10] then
-				v10(...)
+	local function fire(...)
+		v3 = true
+
+		for k, v4 in v do
+			if not (v4.disconnected or v2[k]) then
+				k(...)
 			end
 		end
 
-		u4 = false
-		table.clear(t2)
+		v3 = false
+
+		table.clear(v2)
 	end
 
 	return subscribe, fire
+end
+
+local function fireConnections(items, ...): nil
+	for k, item in items do
+		if not item.disconnected then
+			k(...)
+		end
+	end
+
+	return nil
+end
+
+local function createReentrantSafeSignal()
+	local v = {}
+	local v2 = {}
+	local v3 = 0
+
+	local function subscribe(callback)
+		assert(typeof(callback) == "function", "Can only subscribe to signals with a function.")
+
+		local v4 = { callback = callback, disconnected = false }
+
+		if v3 > 0 and v[callback] == nil then
+			v2[callback] = v4
+		else
+			v[callback] = v4
+		end
+
+		local function disconnect()
+			assert(not v4.disconnected, "Listeners can only be disconnected once.")
+
+			v4.disconnected = true
+
+			if v[callback] == v4 then
+				v[callback] = nil
+			end
+
+			if v2[callback] == v4 then
+				v2[callback] = nil
+			end
+		end
+
+		return disconnect
+	end
+
+	local function fire(...)
+		v3 += 1
+
+		local success, result = pcall(fireConnections, v, ...)
+		v3 -= 1
+
+		if v3 == 0 and next(v2) ~= nil then
+			for k, v4 in v2 do
+				v[k] = v4
+			end
+
+			table.clear(v2)
+		end
+
+		if not success then
+			error(result, 0)
+		end
+	end
+
+	return subscribe, fire
+end
+
+local Shared = require(script.Parent.Parent.Shared)
+
+if Shared.ReactFeatureFlags.enableReentrantSafeSignals then
+	return createReentrantSafeSignal
 end
 
 return createSignal

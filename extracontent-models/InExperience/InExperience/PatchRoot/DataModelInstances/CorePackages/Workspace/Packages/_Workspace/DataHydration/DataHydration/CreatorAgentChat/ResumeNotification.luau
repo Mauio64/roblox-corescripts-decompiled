@@ -1,141 +1,108 @@
 local HttpService = game:GetService("HttpService")
-local AcpProtocol = require(script.Parent.Acp.AcpProtocol)
-local parseFrame = require(script.Parent.Acp.parseFrame)
+local LocalizationService = game:GetService("LocalizationService")
 
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local AcpProtocol = require(script.Parent.Acp.AcpProtocol)
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
+local parseFrame = require(script.Parent.Acp.parseFrame)
 require(script.Parent.types)
 
-local t1 = {
-	studio_ask_user = true,
-	ask_user = true,
-	present_plan = true,
-	propose_plan = true
-}
+local v = { studio_ask_user = true, ask_user = true, present_plan = true, propose_plan = true }
 
-local function extractRawFrame(p1) -- line: 29
-	if typeof(p1) == "string" then
-		return p1
+local function extractRawFrame(value)
+	if typeof(value) == "string" then
+		return value
 	end
 
-	if typeof(p1) ~= "table" then
+	if typeof(value) ~= "table" then
 		return nil
 	end
 
-	for _, v18 in {
-		"frame",
-		"payload",
-		"message",
-		"data",
-		"body"
-	} do
-		local v19 = p1[v18]
+	for _, v2 in { "frame", "payload", "message", "data", "body" } do
+		local v3 = value[v2]
 
-		if typeof(v19) == "string" and v19 ~= "" then
-			return v19
+		if typeof(v3) == "string" and v3 ~= "" then
+			return v3
 		end
 	end
 
 	return nil
 end
-local function normalizeUniverseId(p2) -- line: 45
-	if typeof(p2) == "number" and p2 ~= 0 then
-		return p2
-	end
 
-	if typeof(p2) == "string" and p2 ~= "" then
-		local num = tonumber(p2)
-
-		if num ~= nil and num ~= 0 then
-			return num
-		end
-
-		return nil
-	end
-
-	return nil
-end
-local function getUniverseId(t2: {[any]: any}) -- line: 56
-	local universeId = t2.universeId
-
+local function normalizeUniverseId(universeId) -- 1 equivalent call inferred from this helper
 	if typeof(universeId) == "number" and universeId ~= 0 then
-	elseif typeof(universeId) == "string" and universeId ~= "" then
-		local num = tonumber(universeId)
+		return universeId
+	end
 
-		universeId = if num == nil or num == 0 then nil else num
-	else
-		universeId = nil
+	if typeof(universeId) ~= "string" or universeId == "" then
+		return nil
+	end
+
+	local v2 = tonumber(universeId)
+	return if not (v2 == nil or v2 == 0) then v2 else nil
+end
+
+local function getUniverseId(p)
+	local universeId = p.universeId
+
+	if typeof(universeId) ~= "number" or universeId == 0 then
+		if typeof(universeId) == "string" and universeId ~= "" then
+			universeId = tonumber(universeId)
+
+			if universeId == nil or universeId == 0 then
+				universeId = nil
+			end
+		else
+			universeId = nil
+		end
 	end
 
 	if universeId ~= nil then
 		return universeId
 	end
 
-	local v25 = t2._meta and t2._meta._roblox
+	local roblox = p._meta and p._meta._roblox
 
-	if typeof(v25) == "table" then
-		local universeId2 = v25.universeId
-
-		if typeof(universeId2) == "number" and universeId2 ~= 0 then
-			return universeId2
-		end
-
-		if typeof(universeId2) == "string" and universeId2 ~= "" then
-			local num = tonumber(universeId2)
-
-			if num ~= nil and num ~= 0 then
-				return num
-			end
-
-			return nil
-		end
-
+	if typeof(roblox) ~= "table" then
 		return nil
 	end
 
-	return nil
+	return normalizeUniverseId(roblox.universeId) -- inferred equivalent call
 end
-local function valueLooksLikeLocalTool(p3) -- line: 69
-	-- upvalues: t1 (copy)
-	return typeof(p3) == "string" and t1[string.lower(p3)] == true
+
+local function valueLooksLikeLocalTool(value): boolean -- 8 equivalent calls inferred from this helper
+	return typeof(value) == "string" and v[string.lower(value)] == true
 end
-local function updateLooksLikeLocalTool(p4) -- line: 73
-	-- upvalues: t1 (copy)
-	local kind = p4.kind
 
-	if typeof(kind) ~= "string" or t1[string.lower(kind)] ~= true then
-		local title = p4.title
-
-		if not (typeof(title) == "string" and t1[string.lower(title)] == true) then
-			local rawInput = p4.rawInput
-
-			if typeof(rawInput) == "table" then
-				local name = rawInput.name
-				local v34 = typeof(name) == "string" and t1[string.lower(name)] == true
-
-				if not v34 then
-					local toolName = rawInput.toolName
-
-					v34 = typeof(toolName) == "string" and t1[string.lower(toolName)] == true
-				end
-
-				return v34
-			end
-
-			return false
-		end
+local function updateLooksLikeLocalTool(data)
+	if valueLooksLikeLocalTool(data.kind) then -- inferred equivalent call
+		return true
 	end
 
-	return true
-end
-local function getSessionUpdate(p5) -- line: 86
-	-- upvalues: AcpProtocol (copy)
-	if p5.kind ~= "notification" then
-		return nil, nil, nil
+	if valueLooksLikeLocalTool(data.title) then -- inferred equivalent call
+		return true
 	end
 
-	local notification = p5.notification
+	local rawInput = data.rawInput
+
+	if typeof(rawInput) ~= "table" then
+		return false
+	end
+
+	return valueLooksLikeLocalTool(rawInput.name) or valueLooksLikeLocalTool(rawInput.toolName) -- inferred equivalent call
+end
+
+local function getSessionUpdate(p)
+	if p.kind ~= "notification" then
+		return nil, nil, nil, nil
+	end
+
+	local notification = p.notification
 
 	if notification.method ~= AcpProtocol.Notifications.SessionUpdate then
-		return nil, nil, nil
+		return nil, nil, nil, nil
 	end
 
 	local params = notification.params
@@ -143,345 +110,258 @@ local function getSessionUpdate(p5) -- line: 86
 	local update = params.update
 
 	if typeof(sessionId) ~= "string" or sessionId == "" or typeof(update) ~= "table" then
-		return nil, nil, nil
+		return nil, nil, nil, nil
 	end
 
 	local universeId = params.universeId
 
-	if typeof(universeId) == "number" and universeId ~= 0 then
-	elseif typeof(universeId) == "string" and universeId ~= "" then
-		local num = tonumber(universeId)
+	if typeof(universeId) ~= "number" or universeId == 0 then
+		if typeof(universeId) == "string" and universeId ~= "" then
+			universeId = tonumber(universeId)
 
-		universeId = if num == nil or num == 0 then nil else num
+			if universeId == nil or universeId == 0 then
+				universeId = nil
+			end
+		else
+			universeId = nil
+		end
+	end
+
+	if universeId ~= nil then
+		return update, sessionId, universeId, params.pinForBuild == true
+	end
+
+	local roblox = params._meta and params._meta._roblox
+
+	if typeof(roblox) == "table" then
+		universeId = roblox.universeId
+
+		if typeof(universeId) ~= "number" or universeId == 0 then
+			if typeof(universeId) == "string" and universeId ~= "" then
+				universeId = tonumber(universeId)
+
+				if universeId == nil or universeId == 0 then
+					universeId = nil
+				end
+			else
+				universeId = nil
+			end
+		end
 	else
 		universeId = nil
 	end
 
-	if universeId ~= nil then
-		return update, sessionId, universeId
-	end
-
-	local v43 = params._meta and params._meta._roblox
-
-	if typeof(v43) == "table" then
-		local universeId3 = v43.universeId
-
-		if typeof(universeId3) == "number" and universeId3 ~= 0 then
-			return update, sessionId, universeId3
-		end
-
-		if typeof(universeId3) == "string" and universeId3 ~= "" then
-			local num = tonumber(universeId3)
-
-			if num ~= nil and num ~= 0 then
-				return update, sessionId, num
-			end
-
-			return update, sessionId, nil
-		end
-
-		return update, sessionId, nil
-	end
-
-	return update, sessionId, nil
+	return update, sessionId, universeId, params.pinForBuild == true
 end
-local function classifyFrame(p6) -- line: 106
-	-- upvalues: AcpProtocol (copy), t1 (copy)
-	local g57 = nil
-	local title = nil
-	local v61 = nil
-	local v47, v48, v49
 
-	if p6.kind ~= "notification" then
-		v47 = nil
-		v48 = nil
-		v49 = nil
-	else
-		local notification = p6.notification
+local function classifyFrame(p)
+	local sessionUpdate, sessionId, universeId, v2 = getSessionUpdate(p)
 
-		if notification.method ~= AcpProtocol.Notifications.SessionUpdate then
-			v47 = nil
-			v48 = nil
-			v49 = nil
-		else
-			local params = notification.params
-
-			v48 = params.sessionId
-			v47 = params.update
-
-			if typeof(v48) ~= "string" or v48 == "" or typeof(v47) ~= "table" then
-				v47 = nil
-				v48 = nil
-				v49 = nil
-			else
-				v49 = params.universeId
-
-				if typeof(v49) == "number" and v49 ~= 0 then
-				elseif typeof(v49) == "string" and v49 ~= "" then
-					local num = tonumber(v49)
-
-					v49 = if num == nil or num == 0 then nil else num
-				else
-					v49 = nil
-				end
-
-				if v49 ~= nil then
-				else
-					local v53 = params._meta and params._meta._roblox
-
-					if typeof(v53) == "table" then
-						v49 = v53.universeId
-
-						if typeof(v49) == "number" and v49 ~= 0 then
-						elseif typeof(v49) == "string" and v49 ~= "" then
-							local num = tonumber(v49)
-
-							v49 = if num == nil or num == 0 then nil else num
-						else
-							v49 = nil
-						end
-					else
-						v49 = nil
-					end
-				end
-			end
-		end
-	end
-
-	if v47 == nil or v48 == nil then
+	if sessionUpdate == nil or sessionId == nil or v2 ~= true then
 		return nil
 	end
 
-	if v47.sessionUpdate == "state_change" and v47.state == "idle" then
+	if sessionUpdate.sessionUpdate == "state_change" and sessionUpdate.state == "idle" then
+		return { kind = "turn_end", sessionId = sessionId, universeId = universeId }
+	end
+
+	if sessionUpdate.sessionUpdate ~= "tool_call_update" then
+		return nil
+	end
+
+	local status = sessionUpdate.status
+
+	if not (status ~= "completed" and status ~= "failed" and status ~= "cancelled") then
+		return nil
+	end
+
+	local v3 = valueLooksLikeLocalTool(sessionUpdate.kind) -- inferred equivalent call
+	local v4
+
+	if v3 then
+		v4 = true
+	elseif valueLooksLikeLocalTool(sessionUpdate.title) then -- inferred equivalent call
+		v4 = true
+	else
+		local rawInput = sessionUpdate.rawInput
+
+		if typeof(rawInput) == "table" then
+			v4 = valueLooksLikeLocalTool(rawInput.name) or valueLooksLikeLocalTool(rawInput.toolName) -- inferred equivalent call
+		else
+			v4 = false
+		end
+	end
+
+	if v4 then
+		local toolCallId = sessionUpdate.toolCallId
+
+		if typeof(toolCallId) ~= "string" or toolCallId == "" then
+			toolCallId = nil
+		end
+
 		return {
-			kind = "turn_end",
-			sessionId = v48,
-			universeId = v49
+			kind = "local_tool_call",
+			sessionId = sessionId,
+			universeId = universeId,
+			toolCallId = toolCallId
 		}
 	end
 
-	if v47.sessionUpdate ~= "tool_call_update" then
-		return nil
-	end
-
-	local status = v47.status
-
-	if status == "completed" or status == "failed" then
-		return nil
-	end
-
-	local kind = v47.kind
-
-	repeat
-		if g57 or (typeof(kind) ~= "string" or t1[string.lower(kind)] ~= true) then
-			if not g57 then
-				title = v47.title
-			end
-
-			if g57 or (typeof(title) ~= "string" or t1[string.lower(title)] ~= true) then
-				if not g57 then
-					local rawInput = v47.rawInput
-
-					if typeof(rawInput) == "table" then
-						local name = rawInput.name
-
-						v61 = typeof(name) == "string" and t1[string.lower(name)] == true
-
-						if not v61 then
-							local toolName = rawInput.toolName
-
-							v61 = typeof(toolName) == "string" and t1[string.lower(toolName)] == true
-						end
-					else
-						v61 = false
-					end
-				end
-
-				g57 = false
-
-				if v61 then
-					local toolCallId = v47.toolCallId
-
-					return {
-						kind = "local_tool_call",
-						sessionId = v48,
-						universeId = v49,
-						toolCallId = if typeof(toolCallId) ~= "string" or toolCallId == "" then nil else toolCallId
-					}
-				end
-
-				return nil
-			end
-		end
-
-		v61 = true
-		g57 = true
-	until not g57
+	return nil
 end
-local function getResumeDeepLink(t3: {[any]: any}) -- line: 172
-	-- upvalues: HttpService (copy)
-	local t4 = {}
 
-	if t3.universeId ~= nil then
-		table.insert(t4, `universeid={ HttpService:UrlEncode((tostring(t3.universeId))) }`)
+local function getNotificationId(data) -- 1 equivalent call inferred from this helper
+	if data.kind == "local_tool_call" and data.toolCallId ~= nil then
+		return `CreatorAgentResume-{data.sessionId}-{data.toolCallId}`
 	end
 
-	table.insert(t4, `sessionid={ HttpService:UrlEncode(t3.sessionId) }`)
-
-	return `roblox://navigation/build?{ table.concat(t4, "&") }`
+	return `CreatorAgentResume-{data.sessionId}-{data.kind}`
 end
-local function getToastCopy(t5: {[any]: any}) -- line: 182
-	if t5.kind == "local_tool_call" then
-		return "Assistant needs your input", "Resume your build chat to continue."
+
+local function getResumeDeepLink(data)
+	local v2 = {}
+
+	if data.universeId ~= nil then
+		table.insert(v2, `universeid={HttpService:UrlEncode((tostring(data.universeId)))}`)
 	end
 
-	return "Assistant finished", "Resume your build chat to review the result."
+	table.insert(v2, `sessionid={HttpService:UrlEncode(data.sessionId)}`)
+
+	return `roblox://navigation/build?{table.concat(v2, "&")}`
 end
-local function getActionEventParams(t6: {[any]: any}) -- line: 189
-	-- upvalues: HttpService (copy), getResumeDeepLink (copy)
+
+local function getToastCopy(data)
+	local v2 = data.kind == "local_tool_call"
+	local v3 = Localization.new(LocalizationService.RobloxLocaleId)
+	return {
+		title = v3:Format(v2 and "Feature.Build.Notification.Title.NeedInput" or "Feature.Build.Notification.Title.Finished"),
+		label = v3:Format(v2 and "Feature.Build.Notification.Message.Continue" or "Feature.Build.Notification.Message.Review"),
+		dismiss = v3:Format("Feature.Build.Action.Dismiss"),
+		resume = v3:Format("Feature.Build.Action.Resume")
+	}
+end
+
+local function getActionEventParams(data) -- 1 equivalent call inferred from this helper
 	return HttpService:JSONEncode({
-		sessionId = t6.sessionId,
-		universeId = t6.universeId,
-		kind = t6.kind,
-		deepLink = getResumeDeepLink(t6)
+		sessionId = data.sessionId,
+		universeId = data.universeId,
+		kind = data.kind,
+		deepLink = getResumeDeepLink(data)
 	})
 end
-local function getToastVisualItems(t7: {[any]: any}, s1: string, s2: string, s3: string) -- line: 198
-	local t8 = {}
 
-	if t7.universeId ~= nil then
-		table.insert(t8, {
+local function getToastVisualItems(data, toastCopy, actionEventParams: string)
+	local toastVisualItems = {}
+
+	if data.universeId ~= nil then
+		table.insert(toastVisualItems, {
 			thumbnail = {
+				id = tostring(data.universeId),
 				idType = "gameThumbnail",
-				visualItemType = "thumbnail",
-				id = tostring(t7.universeId)
+				visualItemType = "thumbnail"
 			}
 		})
 	end
 
-	table.insert(t8, {
+	table.insert(toastVisualItems, {
 		textBody = {
+			title = { text = toastCopy.title },
+			label = { text = toastCopy.label },
+			actions = {},
 			eventName = "CreatorAgentResume",
 			visualItemType = "textBody",
-			title = {
-				text = s1
-			},
-			label = {
-				text = s2
-			},
-			actions = {},
-			actionEventParams = s3
+			actionEventParams = actionEventParams
 		}
 	})
-	table.insert(t8, {
+
+	table.insert(toastVisualItems, {
 		button = {
+			label = { text = toastCopy.dismiss },
+			actions = {
+				{ actionType = "dismiss" }
+			},
 			buttonStyle = "Secondary",
 			eventName = "CreatorAgentResumeDismiss",
-			visualItemType = "button",
-			label = {
-				text = "Dismiss"
-			},
-			actions = {{
-				actionType = "dismiss"
-			}}
+			visualItemType = "button"
 		}
 	})
-	table.insert(t8, {
+
+	table.insert(toastVisualItems, {
 		button = {
+			label = { text = toastCopy.resume },
+			actions = {},
 			buttonStyle = "Primary",
 			eventName = "CreatorAgentResume",
 			visualItemType = "button",
-			label = {
-				text = "Resume"
-			},
-			actions = {},
-			actionEventParams = s3
+			actionEventParams = actionEventParams
 		}
 	})
 
-	return t8
+	return toastVisualItems
 end
 
-return {
-	NotificationType = "CreatorAgentResume",
-	ResumeEventName = "CreatorAgentResume",
-	CapRtnNamespace = AcpProtocol.CapRtnNamespace,
-	classifyFrame = classifyFrame,
-	classifyRtnDetail = function(p7) -- line: 136
-		-- upvalues: extractRawFrame (copy), parseFrame (copy), classifyFrame (copy)
-		local v65 = extractRawFrame(p7)
+local ResumeNotification = {}
+ResumeNotification.NotificationType = "CreatorAgentResume"
+ResumeNotification.ResumeEventName = "CreatorAgentResume"
+ResumeNotification.CapRtnNamespace = AcpProtocol.CapRtnNamespace
+ResumeNotification.classifyFrame = classifyFrame
 
-		if v65 == nil then
-			return nil
-		end
+function ResumeNotification.classifyRtnDetail(p)
+	local v2 = extractRawFrame(p)
 
-		local v66 = parseFrame(v65)
+	if v2 == nil then
+		return nil
+	end
 
-		if v66 == nil then
-			return nil
-		end
+	local v3 = parseFrame(v2)
 
-		return (classifyFrame(v66))
-	end,
-	targetMatchesNotification = function(t9: {[any]: any}?, t10: {[any]: any}) -- line: 150
-		if t9 == nil then
-			return false
-		end
+	if v3 == nil then
+		return nil
+	end
 
-		if t9.sessionId ~= nil and t9.sessionId ~= "" and t9.sessionId == t10.sessionId then
-			return true
-		end
+	return classifyFrame(v3)
+end
 
-		return t9.universeId ~= nil and (t10.universeId ~= nil and t9.universeId == t10.universeId)
-	end,
-	getNotificationId = function(t11: {[any]: any}) -- line: 165
-		if t11.kind == "local_tool_call" and t11.toolCallId ~= nil then
-			return `CreatorAgentResume-{ t11.sessionId }-{ t11.toolCallId }`
-		end
+function ResumeNotification.targetMatchesNotification(p, p2): boolean
+	if p == nil then
+		return false
+	end
 
-		return `CreatorAgentResume-{ t11.sessionId }-{ t11.kind }`
-	end,
-	getResumeDeepLink = getResumeDeepLink,
-	buildToastNotification = function(t12: {[any]: any}) -- line: 251
-		-- upvalues: HttpService (copy), getResumeDeepLink (copy), getToastVisualItems (copy)
-		local s4, s5
+	if p.sessionId ~= nil and p.sessionId ~= "" and p.sessionId == p2.sessionId then
+		return true
+	end
 
-		if t12.kind == "local_tool_call" then
-			s4 = "Assistant needs your input"
-			s5 = "Resume your build chat to continue."
-		else
-			s4 = "Assistant finished"
-			s5 = "Resume your build chat to review the result."
-		end
+	return p.universeId ~= nil and p2.universeId ~= nil and p.universeId == p2.universeId
+end
 
-		local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
-		local json = HttpService:JSONEncode({
-			sessionId = t12.sessionId,
-			universeId = t12.universeId,
-			kind = t12.kind,
-			deepLink = getResumeDeepLink(t12)
-		})
+ResumeNotification.getNotificationId = getNotificationId
+ResumeNotification.getResumeDeepLink = getResumeDeepLink
 
-		return {
+function ResumeNotification.buildToastNotification(data)
+	local toastCopy = getToastCopy(data)
+	local unixTimestampMillis = DateTime.now().UnixTimestampMillis
+	local actionEventParams = getActionEventParams(data) -- inferred equivalent call
+	return {
+		notificationType = "CreatorAgentResume",
+		deliverTimestamp = unixTimestampMillis,
+		notificationReceivedTimestampMs = unixTimestampMillis,
+		content = {
+			currentState = "Default",
 			notificationType = "CreatorAgentResume",
-			deliverTimestamp = UnixTimestampMillis,
-			notificationReceivedTimestampMs = UnixTimestampMillis,
-			content = {
-				currentState = "Default",
-				notificationType = "CreatorAgentResume",
-				minVersion = 0,
-				priority = 1,
-				id = if t12.kind ~= "local_tool_call" or t12.toolCallId == nil then `CreatorAgentResume-{ t12.sessionId }-{ t12.kind }` else `CreatorAgentResume-{ t12.sessionId }-{ t12.toolCallId }`,
-				clientEventsPayload = {},
-				states = {
-					Default = {
-						layoutKey = "CreatorAgentResume",
-						name = "Default",
-						timeOnScreenMs = 12000,
-						visualItems = getToastVisualItems(t12, s4, s5, json)
-					}
+			id = getNotificationId(data), -- inferred equivalent call
+			minVersion = 0,
+			priority = 1,
+			clientEventsPayload = {},
+			states = {
+				Default = {
+					layoutKey = "CreatorAgentResume",
+					name = "Default",
+					timeOnScreenMs = 12000,
+					visualItems = getToastVisualItems(data, toastCopy, actionEventParams)
 				}
 			}
 		}
-	end
-}
+	}
+end
+
+return ResumeNotification

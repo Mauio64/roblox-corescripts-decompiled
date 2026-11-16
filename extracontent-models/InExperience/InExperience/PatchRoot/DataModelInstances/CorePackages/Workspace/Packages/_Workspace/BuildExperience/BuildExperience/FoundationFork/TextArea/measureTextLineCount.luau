@@ -1,63 +1,88 @@
 local TextService = game:GetService("TextService")
+
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+local Foundation = require(parent.Foundation)
+local Style = require(parent.Style)
+
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local getVisibleLineCount = require(script.Parent.getVisibleLineCount)
 local chatTextAreaDebug = require(script.Parent.chatTextAreaDebug)
 
-local function measureTextLineCount(t1: {[any]: any}) -- line: 23
-	-- upvalues: getVisibleLineCount (copy), chatTextAreaDebug (copy), TextService (copy)
-	local v6 = getVisibleLineCount(t1.text, t1.maxLines)
-	local n1 = 1
+local function measureTextLineCount(data)
+	local visibleLineCount = getVisibleLineCount(data.text, data.maxLines)
+	local v = 1
 
-	if t1.text ~= "" then
-		for _ in string.gmatch(t1.text, "\n") do
-			n1 += 1
+	if data.text ~= "" then
+		for _ in string.gmatch(data.text, "\n") do
+			v += 1
 		end
 	end
 
-	local v9 = t1.layoutWidth or 0
-	local Y = nil
-	local v11 = nil
-	local v12 = v6
+	local layoutWidth = data.layoutWidth or 0
+	local boundsY = nil
+	local wrappedLineCount = nil
 
-	if t1.text == "" then
-		local t2 = {
+	if data.text == "" then
+		chatTextAreaDebug.log("measure", `empty -> lineCount=1 layoutWidth={layoutWidth}`)
+		return {
 			lineCount = 1,
 			newlineLineCount = 1,
 			wrappedLineCount = nil,
-			boundsY = nil,
-			layoutWidth = v9
+			layoutWidth = layoutWidth,
+			boundsY = nil
 		}
-
-		chatTextAreaDebug.log("measure", `empty -> lineCount=1 layoutWidth={ v9 }`)
-
-		return t2
 	end
 
-	if v9 > 0 then
-		local Y2 = TextService:GetTextSize("M", t1.fontSize, t1.font, Vector2.new(v9, 100000)).Y
+	local lineCount
 
-		Y = TextService:GetTextSize(t1.text, t1.fontSize, t1.font, Vector2.new(v9, 100000)).Y
+	if layoutWidth > 0 then
+		local v2
 
-		if Y > 0 and Y2 > 0 then
-			v11 = math.ceil(Y / Y2)
-
-			local v15 = math.max(n1, v11)
-
-			v12 = math.clamp(v15, 1, t1.maxLines)
-			Y = v15 * t1.singleLineHeight
+		if FoundationFontFaceMigration then
+			v2 = Style.GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
+				addTemporaryPadding = false
+			})
+		else
+			v2 = TextService:GetTextSize("M", data.fontSize, data.font, Vector2.new(layoutWidth, 100000))
 		end
+
+		local y = v2.Y
+		local v3
+
+		if FoundationFontFaceMigration then
+			v3 = Style.GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000), {
+				addTemporaryPadding = false
+			})
+		else
+			v3 = TextService:GetTextSize(data.text, data.fontSize, data.font, Vector2.new(layoutWidth, 100000))
+		end
+
+		boundsY = v3.Y
+
+		if boundsY > 0 and y > 0 then
+			wrappedLineCount = math.ceil(boundsY / y)
+			local v4 = math.max(v, wrappedLineCount)
+
+			lineCount = math.clamp(v4, 1, data.maxLines)
+			boundsY = v4 * data.singleLineHeight
+		else
+			lineCount = visibleLineCount
+		end
+	else
+		lineCount = visibleLineCount
 	end
 
-	local t3 = {
-		lineCount = v12,
-		newlineLineCount = v6,
-		wrappedLineCount = v11,
-		layoutWidth = v9,
-		boundsY = Y
+	chatTextAreaDebug.log(
+		"measure",
+		`lineCount={lineCount} newlines={visibleLineCount} wrapped={wrappedLineCount or "nil"} boundsY={boundsY or "nil"} layoutWidth={layoutWidth} textLen={utf8.len(data.text) or #data.text}`
+	)
+	return {
+		lineCount = lineCount,
+		newlineLineCount = visibleLineCount,
+		wrappedLineCount = wrappedLineCount,
+		layoutWidth = layoutWidth,
+		boundsY = boundsY
 	}
-
-	chatTextAreaDebug.log("measure", `lineCount={ v12 } newlines={ v6 } wrapped={ v11 or "nil" } boundsY={ Y or "nil" } layoutWidth={ v9 } textLen={ utf8.len(t1.text) or #t1.text }`)
-
-	return t3
 end
 
 return measureTextLineCount

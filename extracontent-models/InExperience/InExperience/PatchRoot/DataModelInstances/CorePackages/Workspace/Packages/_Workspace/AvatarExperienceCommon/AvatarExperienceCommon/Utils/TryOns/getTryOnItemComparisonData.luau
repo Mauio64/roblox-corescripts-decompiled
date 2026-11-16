@@ -1,9 +1,11 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local ItemTypeEnum = require(AvatarExperienceCommon.Enums.ItemTypeEnum)
+local AvatarExperienceModel = require(AvatarExperienceCommon.Parent.AvatarExperienceModel)
+
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
 
 require(AvatarExperienceCommon.Types.TryOnItemComparisonData)
 
-local t1 = {
+local v = {
 	[tostring(Enum.AssetType.ShirtAccessory.Value)] = "LCTops",
 	[tostring(Enum.AssetType.TShirtAccessory.Value)] = "LCTops",
 	[tostring(Enum.AssetType.SweaterAccessory.Value)] = "LCTops",
@@ -12,63 +14,45 @@ local t1 = {
 	[tostring(Enum.AssetType.DressSkirtAccessory.Value)] = "LCBottoms"
 }
 
-function getTryOnItemComparisonData(t2: {[any]: any}) -- line: 16
-	-- upvalues: t1 (copy), ItemTypeEnum (copy)
-	local t3 = {}
-	local t4 = {}
-	local v7 = false
-	local v8 = false
+function getTryOnItemComparisonData(data)
+	local set = {}
+	local set2 = {}
+	local isClassicHeadOrFace = false
+	local isDynamicHead = false
 
-	local function addAssetTypeAndLayeredClothingCategory(s1: string) -- line: 26
-		-- upvalues: t3 (copy), t1 (copy), t4 (copy)
-		t3[s1] = true
+	local function addAssetTypeAndLayeredClothingCategory(p: string) -- 2 equivalent calls inferred from this helper
+		set[p] = true
+		local v2 = v[p]
 
-		local v17 = t1[s1]
-
-		if v17 then
-			t4[v17] = true
+		if v2 then
+			set2[v2] = true
 		end
 	end
 
-	if t2.itemType == ItemTypeEnum.Asset then
-		local itemSubType = t2.itemSubType
+	if data.itemType == ItemTypeEnum.Asset then
+		addAssetTypeAndLayeredClothingCategory(data.itemSubType) -- inferred equivalent call
 
-		t3[itemSubType] = true
-
-		local v11 = t1[itemSubType]
-
-		if v11 then
-			t4[v11] = true
+		if
+			data.itemSubType == tostring(Enum.AssetType.Head.Value)
+			or data.itemSubType == tostring(Enum.AssetType.Face.Value)
+		then
+			isClassicHeadOrFace = true
 		end
+	elseif data.itemType == ItemTypeEnum.Bundle and data.bundleInfo then
+		isDynamicHead = data.itemSubType == tostring(Enum.BundleType.DynamicHead.Value) or false
 
-		if t2.itemSubType == tostring(Enum.AssetType.Head.Value) or t2.itemSubType == tostring(Enum.AssetType.Face.Value) then
-			v7 = true
-		end
-	elseif t2.itemType == ItemTypeEnum.Bundle and t2.bundleInfo then
-		if t2.itemSubType == tostring(Enum.BundleType.DynamicHead.Value) then
-			v8 = true
-		end
-
-		for _, v13 in t2.bundleInfo do
-			local assetType = v13.assetType
-
-			t3[assetType] = true
-
-			local v15 = t1[assetType]
-
-			if v15 then
-				t4[v15] = true
-			end
+		for _, v2 in data.bundleInfo do
+			addAssetTypeAndLayeredClothingCategory(v2.assetType) -- inferred equivalent call
 		end
 	end
 
 	return {
-		assetTypes = t3,
-		layeredClothingCategories = t4,
-		isClassicHeadOrFace = v7,
-		isDynamicHead = v8,
-		itemType = t2.itemType,
-		itemSubType = t2.itemSubType
+		assetTypes = set,
+		layeredClothingCategories = set2,
+		isClassicHeadOrFace = isClassicHeadOrFace,
+		isDynamicHead = isDynamicHead,
+		itemType = data.itemType,
+		itemSubType = data.itemSubType
 	}
 end
 

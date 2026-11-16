@@ -1,3 +1,5 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-return require(ParentParent.NavigationSymbol)("CHILD_IS_SCREEN_ROUTER")
+local NavigationSymbol = require(parent.NavigationSymbol)
+
+return NavigationSymbol("CHILD_IS_SCREEN_ROUTER")

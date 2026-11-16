@@ -1,223 +1,337 @@
 local FriendsCommon = script:FindFirstAncestor("FriendsCommon")
-local FriendsCommonParent = FriendsCommon.Parent
-local React = require(FriendsCommonParent.React)
-local Cryo = require(FriendsCommonParent.Cryo)
-local ApolloClient = require(FriendsCommonParent.ApolloClient)
+local parent = FriendsCommon.Parent
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+
+local ApolloClient = require(parent.ApolloClient)
 local useQuery = ApolloClient.useQuery
 local useApolloClient = ApolloClient.useApolloClient
-local queries = require(FriendsCommonParent.ApolloLocalState).queries
-local ApolloFriends = require(FriendsCommonParent.ApolloFriends)
-local ApolloPresence = require(FriendsCommonParent.ApolloPresence)
-local PresenceType = require(FriendsCommonParent.GraphQLServer).types.PresenceType
-local useSignalState = require(FriendsCommonParent.SignalsReact).useSignalState
-local DataHydration = require(FriendsCommonParent.DataHydration)
-local FriendsCommonPresenceUpdateSignal = require(FriendsCommon.Signals).FriendsCommonPresenceUpdateSignal
-local v15 = game:DefineFastInt("FriendsListDefaultPageSize", 12)
-local FFlagFriendSortedByPresenceSignalsImplementation = require(FriendsCommonParent.SharedFlags).FFlagFriendSortedByPresenceSignalsImplementation
+
+local ApolloLocalState = require(parent.ApolloLocalState)
+local queries = ApolloLocalState.queries
+
+local ApolloFriends = require(parent.ApolloFriends)
+local ApolloPresence = require(parent.ApolloPresence)
+
+local GraphQLServer = require(parent.GraphQLServer)
+
+local presenceType = GraphQLServer.types.PresenceType
+
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local DataHydration = require(parent.DataHydration)
+
+local Signals = require(FriendsCommon.Signals)
+local FriendsCommonPresenceUpdateSignal = Signals.FriendsCommonPresenceUpdateSignal
+
+local defineFastInt = game:DefineFastInt("FriendsListDefaultPageSize", 12)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFriendSortedByPresenceSignalsImplementation = SharedFlags.FFlagFriendSortedByPresenceSignalsImplementation
+
 local usePresenceImpressionEvents = require(script.Parent.usePresenceImpressionEvents)
-local v18 = game:DefineFastFlag("UseFriendsListOrderedByIdPresenceImpressionEventsEnabled", false)
-local v19 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else DataHydration.Friends.FriendsStore.get()
 
-local function v20(t1: {[any]: any}, t2: {[any]: any}) -- line: 64
-	-- upvalues: Cryo (copy)
-	local t3 = {}
+local defineFastFlag = game:DefineFastFlag("UseFriendsListOrderedByIdPresenceImpressionEventsEnabled", false)
 
-	for _, v29 in t1 do
-		t3[v29.id] = v29.presence
+local defineFastFlag2 = game:DefineFastFlag("FriendsListStableEmptyOnlineFriends", false)
+
+local v = DataHydration.Friends.FriendsStore.get()
+
+local frozen = table.freeze({})
+
+local function fn(mapped, friends)
+	local presencesById = {}
+
+	for _, item in mapped do
+		presencesById[item.id] = item.presence
 	end
 
-	local v30 = Cryo.List.filter(t2 or {}, function(p1) -- line: 74
-		-- upvalues: t3 (copy)
-		return not t3[p1.id]
+	local filtered = Cryo.List.filter(friends or {}, function(p): boolean
+		return not presencesById[p.id]
 	end)
 
-	return Cryo.List.sort(t1, function(p2, p3) -- line: 81
-		return p2.sortScore > p3.sortScore
-	end), v30
+	return Cryo.List.sort(mapped, function(p, p2): boolean
+		return p.sortScore > p2.sortScore
+	end), filtered
 end
-local function shouldRefetchOnlineFriends(p4, p5, p6) -- line: 90
-	-- upvalues: queries (copy), Cryo (copy), ApolloPresence (copy), PresenceType (copy)
-	local v34 = p4:readQuery({
-		query = queries.onlineFriendsByUserId,
-		variables = p5
-	})
-	local t4 = {}
 
-	for _, v37 in ((if not v34 then {} else v34.onlineFriendsByUserId)) or {} do
-		t4[v37.id] = v37.presence
+local function shouldRefetchOnlineFriends(object, variables, p): boolean
+	local query = object:readQuery({ query = queries.onlineFriendsByUserId, variables = variables })
+
+	local presencesById = {}
+
+	for _, v2 in not query and {} or query.onlineFriendsByUserId or {} do
+		presencesById[v2.id] = v2.presence
 	end
 
-	return #Cryo.List.filter(p6, function(p7) -- line: 103
-		-- upvalues: ApolloPresence (copy), PresenceType (copy), t4 (copy)
-		return ApolloPresence.Formatters.formatNumberToPresenceType(p7.userPresenceType) ~= PresenceType.Offline and not t4[tostring(p7.userId)]
+	return #Cryo.List.filter(p, function(p2): boolean
+		return ApolloPresence.Formatters.formatNumberToPresenceType(p2.userPresenceType) ~= presenceType.Offline
+			and not presencesById[tostring(p2.userId)]
 	end) > 0
 end
-local function bulkUpdateUserPresences(p8, p9) -- line: 111
-	-- upvalues: ApolloPresence (copy)
-	for _, v41 in p9 do
-		ApolloPresence.Mutations.createUserPresenceCache(p8, {
-			id = v41.userId,
-			userPresenceNumber = v41.userPresenceType,
-			lastLocation = v41.lastLocation,
-			lastOnline = v41.lastOnline,
-			gameId = v41.gameId,
-			placeId = v41.placeId,
-			rootPlaceId = v41.rootPlaceId,
-			universeId = v41.universeId
+
+local function bulkUpdateUserPresences(p, items)
+	for _, item in items do
+		ApolloPresence.Mutations.createUserPresenceCache(p, {
+			id = item.userId,
+			userPresenceNumber = item.userPresenceType,
+			lastLocation = item.lastLocation,
+			lastOnline = item.lastOnline,
+			gameId = item.gameId,
+			placeId = item.placeId,
+			rootPlaceId = item.rootPlaceId,
+			universeId = item.universeId
 		})
 	end
 end
-local function useFriendsListOrderedByPresence(t5: {[any]: any}) -- line: 126
-	-- upvalues: FFlagFriendSortedByPresenceSignalsImplementation (copy), useApolloClient (copy), React (copy), v19 (copy), useSignalState (copy), v15 (copy), ApolloFriends (copy), useQuery (copy), queries (copy), Cryo (copy), FriendsCommonPresenceUpdateSignal (copy), bulkUpdateUserPresences (copy), shouldRefetchOnlineFriends (copy), v20 (copy), PresenceType (copy), v18 (copy), usePresenceImpressionEvents (copy), DataHydration (copy)
-	local v43 = if not FFlagFriendSortedByPresenceSignalsImplementation then useApolloClient() else nil
-	local v44 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else React.useMemo(function() -- line: 137
-		-- upvalues: v19 (copy)
-		return v19.GetOnlineFriends()
-	end, {})
-	local v45 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else useSignalState(v44)
-	local v46 = t5.pageSize or v15
-	local v47 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else React.useMemo(function() -- line: 149
-		-- upvalues: v19 (copy)
-		return v19.GetAllFriends()
-	end, {})
-	local v48 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else useSignalState(v47)
-	local v49 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else React.useMemo(function() -- line: 159
-		-- upvalues: v19 (copy)
-		return v19.GetAllFriendsStatus()
-	end, {})
-	local v50 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else useSignalState(v49)
-	local t6 = {
-		userId = t5.userId,
-		sort = ApolloFriends.Enums.Sort.FriendshipScore
-	}
-	local v52 = React.useRef(nil)
-	local v53 = React.useRef(nil)
-	local v54 = if not FFlagFriendSortedByPresenceSignalsImplementation then useQuery(queries.allFriendsByUserId, {
-		errorPolicy = "all",
-		skip = false,
-		notifyOnNetworkStatusChange = true,
-		variables = Cryo.Dictionary.join(t6, {
-			pageCursor = "",
-			pageLimit = v46
+
+local function useFriendsListOrderedByPresence(p)
+	local v2
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v2 = nil
+	else
+		v2 = useApolloClient()
+	end
+
+	local v3
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v3 = React.useMemo(function()
+			return v.GetOnlineFriends()
+		end, {})
+	end
+
+	local v4
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v4 = useSignalState(v3)
+	end
+
+	local pageSize = p.pageSize or defineFastInt
+	local v5
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v5 = React.useMemo(function()
+			return v.GetAllFriends()
+		end, {})
+	end
+
+	local v6
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v6 = useSignalState(v5)
+	end
+
+	local v7
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v7 = React.useMemo(function()
+			return v.GetAllFriendsStatus()
+		end, {})
+	end
+
+	local v8
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v8 = useSignalState(v7)
+	end
+
+	local variables = { userId = p.userId, sort = ApolloFriends.Enums.Sort.FriendshipScore }
+
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local v9
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v9 = nil
+	else
+		v9 = useQuery(queries.allFriendsByUserId, {
+			errorPolicy = "all",
+			skip = false,
+			notifyOnNetworkStatusChange = true,
+			variables = Cryo.Dictionary.join(variables, { pageLimit = pageSize, pageCursor = "" })
 		})
-	}) else nil
-	local v55 = if not FFlagFriendSortedByPresenceSignalsImplementation then useQuery(queries.onlineFriendsByUserId, {
-		skip = false,
-		notifyOnNetworkStatusChange = true,
-		variables = t6
-	}) else nil
-	local v56 = if not FFlagFriendSortedByPresenceSignalsImplementation then if not v54.data then nil else v54.data.allFriendsByUserId.nextCursor else v48 and v48.nextCursor or nil
-	local v57 = if not FFlagFriendSortedByPresenceSignalsImplementation then if not v54.data then nil else v54.data.allFriendsByUserId.friends else v48 and v48.friends or nil
-	local v58 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else v48 and v48.hasMore or nil
-	local v59 = if not FFlagFriendSortedByPresenceSignalsImplementation then v55.data and v55.data.onlineFriendsByUserId or {} else v45 or {}
-	local v60 = React.useCallback(function() -- line: 210
-		-- upvalues: FFlagFriendSortedByPresenceSignalsImplementation (copy), v58 (copy), v56 (copy), v54 (copy), v19 (copy), v46 (copy), v53 (copy), v52 (copy)
+	end
+
+	local v10
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v10 = nil
+	else
+		v10 = useQuery(queries.onlineFriendsByUserId, {
+			skip = false,
+			notifyOnNetworkStatusChange = true,
+			variables = variables
+		})
+	end
+
+	local nextCursor
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		if v6 then
+			nextCursor = v6.nextCursor or nil
+		else
+			nextCursor = nil
+		end
+	elseif v9.data then
+		nextCursor = v9.data.allFriendsByUserId.nextCursor
+	else
+		nextCursor = nil
+	end
+
+	local friends
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		if v6 then
+			friends = v6.friends or nil
+		else
+			friends = nil
+		end
+	elseif v9.data then
+		friends = v9.data.allFriendsByUserId.friends
+	else
+		friends = nil
+	end
+
+	local hasMore
+
+	if FFlagFriendSortedByPresenceSignalsImplementation and v6 then
+		hasMore = v6.hasMore or nil
+	else
+		hasMore = nil
+	end
+
+	local v11
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v11 = v4 or not defineFastFlag2 and {} or frozen
+	else
+		v11 = v10.data and v10.data.onlineFriendsByUserId or {}
+	end
+
+	local useCallback = React.useCallback
+	local function fn2()
 		if FFlagFriendSortedByPresenceSignalsImplementation then
-			if not v58 then
+			if not hasMore then
 				return
 			end
-		elseif not v56 or v56 == "" or v54.loading then
+		elseif not nextCursor or nextCursor == "" or v9.loading then
 			return
 		end
 
 		if FFlagFriendSortedByPresenceSignalsImplementation then
-			v19.FetchMoreFriends()
-
+			v.FetchMoreFriends()
 			return
 		end
 
-		v54:fetchMore({
-			variables = {
-				pageCursor = v56,
-				pageLimit = v46
-			}
-		}):andThen(function(p10) -- line: 233
-			-- upvalues: v53 (copy)
-			v53.current = p10 and p10.errors
+		v9:fetchMore({
+			variables = { pageCursor = nextCursor, pageLimit = pageSize }
+		}):andThen(function(p2)
+			ref2.current = p2 and p2.errors
 		end)
-		v52.current = v56
-	end, {
-		if not FFlagFriendSortedByPresenceSignalsImplementation then v56 else nil,
-		if not FFlagFriendSortedByPresenceSignalsImplementation then v54.loading else nil,
-		if not FFlagFriendSortedByPresenceSignalsImplementation then nil else v58
-	})
+
+		ref.current = nextCursor
+	end
+
+	local v12
 
 	if not FFlagFriendSortedByPresenceSignalsImplementation then
-		React.useEffect(function() -- line: 258
-			-- upvalues: FriendsCommonPresenceUpdateSignal (copy), bulkUpdateUserPresences (copy), v43 (copy), shouldRefetchOnlineFriends (copy), t6 (copy), FFlagFriendSortedByPresenceSignalsImplementation (copy), v19 (copy), v55 (copy)
-			FriendsCommonPresenceUpdateSignal.Event:Connect(function(p11) -- line: 259
-				-- upvalues: bulkUpdateUserPresences (copy), v43 (copy), shouldRefetchOnlineFriends (copy), t6 (copy), FFlagFriendSortedByPresenceSignalsImplementation (copy), v19 (copy), v55 (copy)
-				bulkUpdateUserPresences(v43, p11)
+		v12 = nextCursor
+	end
 
-				if shouldRefetchOnlineFriends(v43, t6, p11) then
+	local loading
+
+	if not FFlagFriendSortedByPresenceSignalsImplementation then
+		loading = v9.loading
+	end
+
+	local v13
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		v13 = hasMore
+	end
+
+	local fetchMoreFriends = useCallback(fn2, { v12, loading, v13 })
+
+	local function fn3()
+		if FFlagFriendSortedByPresenceSignalsImplementation then
+			v.RefetchOnlineFriends()
+			v.RefetchAllFriends()
+		else
+			v10:refetch()
+			v9:refetch()
+			ref.current = nil
+			ref2.current = nil
+		end
+	end
+
+	if not FFlagFriendSortedByPresenceSignalsImplementation then
+		React.useEffect(function()
+			FriendsCommonPresenceUpdateSignal.Event:Connect(function(p2)
+				bulkUpdateUserPresences(v2, p2)
+
+				if shouldRefetchOnlineFriends(v2, variables, p2) then
 					if FFlagFriendSortedByPresenceSignalsImplementation then
-						v19._fetchOnlineFriendsAsync()
-
-						return
+						v._fetchOnlineFriendsAsync()
+					else
+						v10:refetch()
 					end
-
-					v55:refetch()
 				end
 			end)
 
-			return function() -- line: 270
-				-- upvalues: FriendsCommonPresenceUpdateSignal (copy)
+			return function()
 				FriendsCommonPresenceUpdateSignal:Destroy()
 			end
 		end, {})
 	end
 
-	local v61, v62 = React.useMemo(function() -- line: 276
-		-- upvalues: v20 (copy), v59 (copy), Cryo (copy), PresenceType (copy), v57 (copy)
-		local v71 = v20
-		local v72 = v59
-
-		return v71(Cryo.List.map(v72, function(p12) -- line: 51
-			-- upvalues: PresenceType (copy), Cryo (copy)
-			if p12.presence and (p12.presence.userPresenceType == PresenceType.InGame and p12.presence.universeId == "") then
-				local v76 = Cryo.Dictionary.join(p12.presence, {
-					userPresenceType = PresenceType.Online
-				})
-
-				return Cryo.Dictionary.join(p12, {
-					presence = v76
-				})
+	local onlineFriends, offlineFriends = React.useMemo(function()
+		return fn(Cryo.List.map(v11, function(p2)
+			if
+				not p2.presence
+				or p2.presence.userPresenceType ~= presenceType.InGame
+				or p2.presence.universeId ~= ""
+			then
+				return p2
 			end
 
-			return p12
-		end), v57)
-	end, {
-		v59,
-		v57
-	})
+			local joined = Cryo.Dictionary.join(p2.presence, {
+				userPresenceType = presenceType.Online
+			})
+			return Cryo.Dictionary.join(p2, { presence = joined })
+		end), friends)
+	end, { v11, friends })
 
-	if v18 then
-		usePresenceImpressionEvents(v59)
+	if defineFastFlag then
+		usePresenceImpressionEvents(v11)
 	end
 
-	local v63 = not v56 or v56 == ""
-	local v64 = if not FFlagFriendSortedByPresenceSignalsImplementation then v54.loading else v48 == nil and v50 == DataHydration.DataStatus.NotReady
+	local isEndOfList = not nextCursor or nextCursor == ""
+	local isLoading
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		if v6 == nil then
+			isLoading = v8 == DataHydration.DataStatus.NotReady
+		else
+			isLoading = false
+		end
+	else
+		isLoading = v9.loading
+	end
+
+	if FFlagFriendSortedByPresenceSignalsImplementation then
+		isEndOfList = not hasMore
+	end
 
 	return {
-		onlineFriends = v61,
-		offlineFriends = v62,
-		fetchMoreFriends = v60,
-		refreshFriendsData = function() -- line: 245
-			-- upvalues: FFlagFriendSortedByPresenceSignalsImplementation (copy), v19 (copy), v55 (copy), v54 (copy), v52 (copy), v53 (copy)
-			if FFlagFriendSortedByPresenceSignalsImplementation then
-				v19.RefetchOnlineFriends()
-				v19.RefetchAllFriends()
-
-				return
-			end
-
-			v55:refetch()
-			v54:refetch()
-			v52.current = nil
-			v53.current = nil
-		end,
-		isEndOfList = if not FFlagFriendSortedByPresenceSignalsImplementation then v63 else not v58,
-		isLoading = v64
+		onlineFriends = onlineFriends,
+		offlineFriends = offlineFriends,
+		fetchMoreFriends = fetchMoreFriends,
+		refreshFriendsData = fn3,
+		isEndOfList = isEndOfList,
+		isLoading = isLoading
 	}
 end
 

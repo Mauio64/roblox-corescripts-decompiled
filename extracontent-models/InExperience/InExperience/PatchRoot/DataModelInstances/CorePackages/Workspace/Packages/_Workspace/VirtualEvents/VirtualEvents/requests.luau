@@ -1,8 +1,10 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
-local gql = require(VirtualEvents.Parent.ApolloClient).gql
+
+local ApolloClient = require(VirtualEvents.Parent.ApolloClient)
+local gql = ApolloClient.gql
 
 return {
-	GET_VIRTUAL_EVENT = gql(require(script.Parent.GetVirtualEvent)),
+	["GET_VIRTUAL_EVENT"] = gql(require(script.Parent.GetVirtualEvent)),
 	UPDATE_RSVP_STATUS = gql(require(script.Parent.UpdateRsvpStatus)),
 	NEVER_SHOW_NOTIFICATIONS_MODAL_AGAIN = gql(require(script.Parent.NeverShowNotificationModalAgain)),
 	ENABLE_PUSH_NOTIFICATIONS = gql(require(script.Parent.EnablePushNotifications)),

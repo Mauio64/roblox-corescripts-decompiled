@@ -1,27 +1,16 @@
 require(script.MomentsStoreTypes)
-
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-
-require(Parent.MomentsTypes)
-
-local convertApiMomentsToMomentItems = require(script.Util.convertApiMomentsToMomentItems)
-local createMomentsReactionsStore = require(script.createMomentsReactionsStore)
-local createMomentsShareLinkStore = require(script.createMomentsShareLinkStore)
-local createMomentsTrendingStore = require(script.createMomentsTrendingStore)
-local createMomentsUserStore = require(script.createMomentsUserStore)
-local getMomentsReactionsStore = require(script.getMomentsReactionsStore)
-local getMomentsShareLinkStore = require(script.getMomentsShareLinkStore)
-local getMomentsTrendingStore = require(script.getMomentsTrendingStore)
-local getMomentsUserStore = require(script.getMomentsUserStore)
-
+local parent = script:FindFirstAncestor("DataHydration").Parent
+require(parent.MomentsTypes)
 return {
-	convertApiMomentsToMomentItems = convertApiMomentsToMomentItems,
-	createMomentsReactionsStore = createMomentsReactionsStore,
-	createMomentsShareLinkStore = createMomentsShareLinkStore,
-	createMomentsTrendingStore = createMomentsTrendingStore,
-	createMomentsUserStore = createMomentsUserStore,
-	getMomentsReactionsStore = getMomentsReactionsStore,
-	getMomentsShareLinkStore = getMomentsShareLinkStore,
-	getMomentsTrendingStore = getMomentsTrendingStore,
-	getMomentsUserStore = getMomentsUserStore
+	convertApiMomentsToMomentItems = require(script.Util.convertApiMomentsToMomentItems),
+	createMomentsCommentsStore = require(script.createMomentsCommentsStore),
+	createMomentsReactionsStore = require(script.createMomentsReactionsStore),
+	createMomentsShareLinkStore = require(script.createMomentsShareLinkStore),
+	createMomentsTrendingStore = require(script.createMomentsTrendingStore),
+	createMomentsUserStore = require(script.createMomentsUserStore),
+	getMomentsCommentsStore = require(script.getMomentsCommentsStore),
+	getMomentsReactionsStore = require(script.getMomentsReactionsStore),
+	getMomentsShareLinkStore = require(script.getMomentsShareLinkStore),
+	getMomentsTrendingStore = require(script.getMomentsTrendingStore),
+	getMomentsUserStore = require(script.getMomentsUserStore)
 }

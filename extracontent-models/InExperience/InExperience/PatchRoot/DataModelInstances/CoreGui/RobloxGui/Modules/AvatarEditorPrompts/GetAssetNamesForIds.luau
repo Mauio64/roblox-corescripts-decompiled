@@ -1,32 +1,26 @@
 local CorePackages = game:GetService("CorePackages")
 local AvatarEditorService = game:GetService("AvatarEditorService")
+
 local Promise = require(CorePackages.Packages.Promise)
 
-return function(p1) -- line: 6
-	-- upvalues: Promise (copy), AvatarEditorService (copy)
-	return Promise.new(function(resolve, reject) -- line: 7
-		-- upvalues: AvatarEditorService (copy), p1 (copy)
-		local ok, result = pcall(function() -- line: 8
-			-- upvalues: AvatarEditorService (copy), p1 (copy)
-			if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-				return AvatarEditorService:GetBatchItemDetailsAsync(p1, Enum.AvatarItemType.Asset)
-			end
-
-			return AvatarEditorService:GetBatchItemDetails(p1, Enum.AvatarItemType.Asset)
+return function(p)
+	return Promise.new(function(callback, callback2)
+		local success, result = pcall(function()
+			return AvatarEditorService:GetBatchItemDetailsAsync(p, Enum.AvatarItemType.Asset)
 		end)
 
-		if ok then
-			local t1 = {}
-
-			for _, v in ipairs(result) do
-				t1[v.Id] = v.Name
-			end
-
-			resolve(t1)
+		if not success then
+			callback2()
 
 			return
 		end
 
-		reject()
+		local namesById = {}
+
+		for _, v in ipairs(result) do
+			namesById[v.Id] = v.Name
+		end
+
+		callback(namesById)
 	end)
 end

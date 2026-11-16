@@ -2,128 +2,140 @@ local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local TextService = game:GetService("TextService")
+
 local SetActiveTab = require(script.Parent.Parent.Actions.SetActiveTab)
+
 local TabRowButton = require(script.Parent.TabRowButton)
 local DropDown = require(script.Parent.DropDown)
 local FullScreenDropDownButton = require(script.Parent.FullScreenDropDownButton)
+
 local Constants = require(script.Parent.Parent.Constants)
 local TabDropDownWidth = Constants.TabRowFormatting.TabDropDownWidth
 local TabOverlapThreshold = Constants.TabRowFormatting.TabOverlapThreshold
-local v12 = Roact.Component:extend("TabRowContainer")
 
-local function initTabList(p1) -- line: 19
-	-- upvalues: TextService (copy), Constants (copy)
-	local t1 = {}
-	local n1 = 0
-	local n2 = 0
+local extended = Roact.Component:extend("TabRowContainer")
 
-	for k, _ in pairs(p1) do
-		local TextSize = TextService:GetTextSize(k, Constants.DefaultFontSize.TabBar, Constants.Font.TabBar, Vector2.new(0, 0))
+local function initTabList(tabList)
+	local result = {}
+	local total = 0
+	local count = 0
 
-		t1[k] = TextSize.X
-		n1 += TextSize.X
-		n2 += 1
+	for k, _ in pairs(tabList) do
+		local textSize = TextService:GetTextSize(
+			k,
+			Constants.DefaultFontSize.TabBar,
+			Constants.Font.TabBar,
+			Vector2.new(0, 0)
+		)
+		result[k] = textSize.X
+		total += textSize.X
+		count += 1
 	end
 
-	return t1, n1, n2
+	return result, total, count
 end
 
-function v12.init(p2) -- line: 33
-	-- upvalues: initTabList (copy)
-	local tabList = p2.props.tabList
-	local v25, v26, v27 = initTabList(tabList)
+function extended:init()
+	local textWidths, totalTextLength, totalTabCount = initTabList(self.props.tabList)
 
-	p2.state = {
-		currContainerWidth = 0,
-		textWidths = v25,
-		totalTextLength = v26,
-		totalTabCount = v27
+	self.state = {
+		textWidths = textWidths,
+		totalTextLength = totalTextLength,
+		totalTabCount = totalTabCount,
+		currContainerWidth = 0
 	}
 
-	function p2.onTabButtonClicked(p3) -- line: 45
-		-- upvalues: p2 (copy)
-		for k, v in pairs(p2.props.tabList) do
-			if p3 == v.layoutOrder then
-				p2.props.dispatchSetActiveTab(k, v.hasClientServer)
-
-				return
+	function self.onTabButtonClicked(p)
+		for k, tab in pairs(self.props.tabList) do
+			if tab.layoutOrder == p then
+				self.props.dispatchSetActiveTab(k, tab.hasClientServer)
+				break
 			end
 		end
 	end
 end
-function v12.didUpdate(p4, p5, _) -- line: 55
-	-- upvalues: initTabList (copy)
-	if p5.tabList ~= p4.props.tabList then
-		local v31, v32, v33 = initTabList(p4.props.tabList)
 
-		p4:setState({
-			textWidths = v31,
-			totalTextLength = v32,
-			totalTabCount = v33
+function extended.didUpdate(object, p, _)
+	if p.tabList ~= object.props.tabList then
+		local textWidths, totalTextLength, totalTabCount = initTabList(object.props.tabList)
+		object:setState({
+			textWidths = textWidths,
+			totalTextLength = totalTextLength,
+			totalTabCount = totalTabCount
 		})
 	end
 end
-function v12.render(p7) -- line: 66
-	-- upvalues: TabOverlapThreshold (copy), Constants (copy), Roact (copy), FullScreenDropDownButton (copy), TabDropDownWidth (copy), DropDown (copy), TabRowButton (copy)
-	local tabList = p7.props.tabList
-	local currTabIndex = p7.props.currTabIndex
-	local formFactor = p7.props.formFactor
-	local windowWidth = p7.props.windowWidth
-	local frameHeight = p7.props.frameHeight
-	local layoutOrder = p7.props.layoutOrder
-	local textWidths = p7.state.textWidths
-	local totalTextLength = p7.state.totalTextLength
-	local totalTabCount = p7.state.totalTabCount
-	local t2 = {}
-	local v45 = (windowWidth - totalTextLength) / totalTabCount
-	local v46 = v45 % 1 * totalTabCount / 2
-	local v47 = v45 < TabOverlapThreshold and windowWidth > 0
-	local v48 = formFactor == Constants.FormFactor.Small
+
+function extended.render(props)
+	local tabList = props.props.tabList
+	local currTabIndex = props.props.currTabIndex
+	local formFactor = props.props.formFactor
+	local windowWidth = props.props.windowWidth
+	local frameHeight = props.props.frameHeight
+	local layoutOrder = props.props.layoutOrder
+
+	local textWidths = props.state.textWidths
+	local totalTextLength = props.state.totalTextLength
+	local totalTabCount = props.state.totalTabCount
+	local children = {}
+
+	local padding = (windowWidth - totalTextLength) / totalTabCount
+
+	local v = padding % 1 * totalTabCount / 2
+	local v2
+
+	if padding < TabOverlapThreshold then
+		v2 = windowWidth > 0
+	else
+		v2 = false
+	end
+
+	local v3 = formFactor == Constants.FormFactor.Small
 
 	if tabList then
-		if v47 or v48 then
-			local t3 = {}
+		if v2 or v3 then
 			local layoutOrder2 = tabList[currTabIndex].layoutOrder
+			local dropDownList = {}
 
-			for k, v in pairs(tabList) do
-				t3[v.layoutOrder] = k
+			for k, tab in pairs(tabList) do
+				dropDownList[tab.layoutOrder] = k
 			end
 
-			if v48 then
+			if v3 then
 				return Roact.createElement(FullScreenDropDownButton, {
 					buttonSize = UDim2.new(0, TabDropDownWidth, 0, frameHeight),
-					dropDownList = t3,
+					dropDownList = dropDownList,
 					selectedIndex = layoutOrder2,
-					onSelection = p7.onTabButtonClicked,
+					onSelection = props.onTabButtonClicked,
 					layoutOrder = layoutOrder
 				})
 			end
 
-			if v47 then
+			if v2 then
 				return Roact.createElement(DropDown, {
 					buttonSize = UDim2.new(0, TabDropDownWidth, 0, frameHeight),
-					dropDownList = t3,
+					dropDownList = dropDownList,
 					selectedIndex = layoutOrder2,
-					onSelection = p7.onTabButtonClicked
+					onSelection = props.onTabButtonClicked
 				})
 			end
 		else
-			for k, v in pairs(tabList) do
+			for k, tab in pairs(tabList) do
 				if textWidths[k] then
-					t2[k] = Roact.createElement(TabRowButton, {
-						index = v.layoutOrder,
+					children[k] = Roact.createElement(TabRowButton, {
+						index = tab.layoutOrder,
 						name = k,
-						padding = v45,
-						textWidth = v47 and TabDropDownWidth or textWidths[k],
+						padding = padding,
+						textWidth = v2 and TabDropDownWidth or textWidths[k],
 						isSelected = k == currTabIndex,
-						layoutOrder = v.layoutOrder,
-						onTabButtonClicked = p7.onTabButtonClicked
+						layoutOrder = tab.layoutOrder,
+						onTabButtonClicked = props.onTabButtonClicked
 					})
 				end
 			end
 		end
 
-		t2.UIListLayout = Roact.createElement("UIListLayout", {
+		children.UIListLayout = Roact.createElement("UIListLayout", {
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
@@ -131,28 +143,28 @@ function v12.render(p7) -- line: 66
 		})
 	end
 
-	return Roact.createElement("Frame", {
-		Transparency = 1,
-		Size = UDim2.new(1, 0, 0, frameHeight),
-		Position = UDim2.new(0, v46, 0, 0),
-		LayoutOrder = layoutOrder
-	}, t2)
+	return Roact.createElement(
+		"Frame",
+		{
+			Size = UDim2.new(1, 0, 0, frameHeight),
+			Position = UDim2.new(0, v, 0, 0),
+			Transparency = 1,
+			LayoutOrder = layoutOrder
+		},
+		children
+	)
 end
 
-local function mapStateToProps(p8, _) -- line: 146
-	return {
-		tabList = p8.MainView.tabList,
-		currTabIndex = p8.MainView.currTabIndex
-	}
+local function mapStateToProps(p, _)
+	return { tabList = p.MainView.tabList, currTabIndex = p.MainView.currTabIndex }
 end
-local function mapDispatchToProps(p10) -- line: 153
-	-- upvalues: SetActiveTab (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		dispatchSetActiveTab = function(p11, p12) -- line: 155
-			-- upvalues: p10 (copy), SetActiveTab (copy)
-			p10(SetActiveTab(p11, p12))
+		dispatchSetActiveTab = function(p, p2)
+			callback(SetActiveTab(p, p2))
 		end
 	}
 end
 
-return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(v12)
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(extended)

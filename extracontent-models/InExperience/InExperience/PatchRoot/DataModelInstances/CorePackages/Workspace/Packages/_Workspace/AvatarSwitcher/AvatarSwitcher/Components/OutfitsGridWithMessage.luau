@@ -1,16 +1,15 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
-local React = require(AvatarSwitcherParent.React)
-local Foundation = require(AvatarSwitcherParent.Foundation)
+local parent = AvatarSwitcher.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local AvatarsUnsupportedMessage = require(AvatarSwitcher.Components.Messages.AvatarsUnsupportedMessage)
 local PendingAvatarSwitchMessage = require(AvatarSwitcher.Components.Messages.PendingAvatarSwitchMessage)
 local OutfitsGridContainer = require(AvatarSwitcher.Components.OutfitsGrid.OutfitsGridContainer)
 
-local function OutfitsGridWithMessage() -- line: 17
-	-- upvalues: React (copy), Foundation (copy), AvatarsUnsupportedMessage (copy), PendingAvatarSwitchMessage (copy), OutfitsGridContainer (copy)
-	return (React.createElement(Foundation.View, {
-		tag = "size-full-full col gap-large"
-	}, {
+local function OutfitsGridWithMessage()
+	return (React.createElement(Foundation.View, { tag = "size-full-full col gap-large" }, {
 		AvatarsUnsupportedMessage = React.createElement(AvatarsUnsupportedMessage, {
 			LayoutOrder = 1
 		}),

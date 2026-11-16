@@ -1,28 +1,23 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Cryo = require(ParentParentParent.Cryo)
-local Rodux = require(ParentParentParent.Rodux)
-local PromptDismissed = require(ParentParent.Actions.PromptDismissed)
-local PromptTriggered = require(ParentParent.Actions.PromptTriggered)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Types)
+local Cryo = require(parent2.Cryo)
+local Rodux = require(parent2.Rodux)
+
+local PromptDismissed = require(parent.Actions.PromptDismissed)
+local PromptTriggered = require(parent.Actions.PromptTriggered)
+require(parent.Types)
 
 return Rodux.createReducer({}, {
-	[PromptDismissed.name] = function(t1: {[any]: any}, p1) -- line: 16
-		-- upvalues: Cryo (copy)
-		return Cryo.List.filter(t1, function(p2) -- line: 17
-			-- upvalues: p1 (copy)
-			return p2.PromptId ~= p1.promptId
+	[PromptDismissed.name] = function(p, p2)
+		return Cryo.List.filter(p, function(p3): boolean
+			return p3.PromptId ~= p2.promptId
 		end)
 	end,
-	[PromptTriggered.name] = function(t2: {[any]: any}, p3) -- line: 22
-		-- upvalues: Cryo (copy)
-		local t3 = {
-			PromptData = p3.promptData,
-			PromptType = p3.promptType,
-			PromptId = p3.promptId
+	[PromptTriggered.name] = function(p, data)
+		local v = {
+			{ PromptData = data.promptData, PromptType = data.promptType, PromptId = data.promptId }
 		}
-
-		return Cryo.List.join(t2, { t3 })
+		return Cryo.List.join(p, v)
 	end
 })

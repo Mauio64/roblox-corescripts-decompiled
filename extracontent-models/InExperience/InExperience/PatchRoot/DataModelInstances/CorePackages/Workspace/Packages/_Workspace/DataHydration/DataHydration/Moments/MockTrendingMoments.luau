@@ -1,11 +1,12 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
-require(Parent.MomentsTypes)
+require(parent.MomentsTypes)
+local MomentFixtures = require(script.Parent.MomentFixtures)
 
-local t1 = {}
+local MockTrendingMoments = {}
 
-for _, v4 in require(script.Parent.MomentFixtures).buildMomentFeedItems(1, 10) do
-	table.insert(t1, v4.moment)
+for _, v in MomentFixtures.buildMomentFeedItems(1, 10) do
+	table.insert(MockTrendingMoments, v.moment)
 end
 
-return t1
+return MockTrendingMoments

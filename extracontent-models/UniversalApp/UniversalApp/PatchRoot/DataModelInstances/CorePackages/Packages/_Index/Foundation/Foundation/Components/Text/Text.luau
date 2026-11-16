@@ -1,106 +1,178 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactIs = require(FoundationParent.ReactIs)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+
 local Interactable = require(Foundation.Components.Interactable)
+
+local Flags = require(Foundation.Utility.Flags)
 local GuiObjectChildren = require(Foundation.Utility.GuiObjectChildren)
-
 require(Foundation.Components.Types)
-
 local indexBindable = require(Foundation.Utility.indexBindable)
+local normalizeFontFace = require(Foundation.Utility.normalizeFontFace)
 local useDefaultTags = require(Foundation.Utility.useDefaultTags)
 local withDefaults = require(Foundation.Utility.withDefaults)
 local withGuiObjectProps = require(Foundation.Utility.withGuiObjectProps)
+
 local useStyleTags = require(Foundation.Providers.Style.useStyleTags)
+
 local FontScales = require(script.Parent.FontScales)
-local t1 = {
-	AutoLocalize = false,
-	AutoButtonColor = false,
-	BorderSizePixel = 0,
-	isDisabled = false
-}
 
-local function Text(p1, p2) -- line: 50
-	-- upvalues: withDefaults (copy), t1 (copy), useDefaultTags (copy), useStyleTags (copy), React (copy), ReactIs (copy), FontScales (copy), withGuiObjectProps (copy), indexBindable (copy), Interactable (copy), GuiObjectChildren (copy)
-	local v17 = withDefaults(p1, t1)
-	local v18 = v17.onStateChanged ~= nil or (v17.onActivated ~= nil or v17.onSecondaryActivated ~= nil)
-	local v19 = v17.backgroundStyle == nil and "gui-object-defaults text-defaults text-size-defaults text-color-defaults" or "gui-object-defaults text-defaults text-size-defaults text-color-defaults x-default-transparency"
+local v = { AutoLocalize = false, AutoButtonColor = false, BorderSizePixel = 0, isDisabled = false }
 
-	if v17.fontStyle and v17.fontStyle.FontSize then
-		v19 ..= " x-default-text-size"
+local function Text(p, ref)
+	local v2 = withDefaults(p, v)
+
+	local v3 = v2.onStateChanged ~= nil or v2.onActivated ~= nil or v2.onSecondaryActivated ~= nil
+
+	local v4 = v2.backgroundStyle == nil
+		and "gui-object-defaults text-defaults text-size-defaults text-color-defaults"
+		or "gui-object-defaults text-defaults text-size-defaults text-color-defaults x-default-transparency"
+
+	if v2.fontStyle and v2.fontStyle.FontSize then
+		v4 ..= " x-default-text-size"
 	end
 
-	local v20 = useDefaultTags(v17.tag, v19)
-	local v21 = useStyleTags(v20)
-	local v22 = React.useMemo(function() -- line: 63
-		-- upvalues: v17 (copy), ReactIs (copy)
-		local v27 = if v17.fontStyle == nil then nil else v17.fontStyle.Font
+	local v5 = useStyleTags((useDefaultTags(v2.tag, v4)))
 
-		if typeof(v27) == "table" and not ReactIs.isBinding(v27) then
-			return Font.new(v27.Family, v27.Weight, v27.Style)
+	local fontFace = React.useMemo(function()
+		if Flags.FoundationFontFaceMigration then
+			local v6
+
+			if v2.fontStyle ~= nil then
+				v6 = v2.fontStyle.Font
+			end
+
+			return normalizeFontFace(v6)
+		else
+			local font
+
+			if v2.fontStyle ~= nil then
+				font = v2.fontStyle.Font
+			end
+
+			if typeof(font) == "table" and not ReactIs.isBinding(font) then
+				return Font.new(font.Family, font.Weight, font.Style)
+			end
+
+			if typeof(font) == "EnumItem" then
+				return Font.fromEnum(font)
+			end
+
+			return font
 		end
+	end, { v2.fontStyle })
 
-		if typeof(v27) == "EnumItem" then
-			return Font.fromEnum(v27)
-		end
-
-		return v27
-	end, { v17.fontStyle })
-	local v23 = React.useMemo(function() -- line: 77
-		-- upvalues: v17 (copy), v22 (copy), ReactIs (copy), FontScales (copy)
-		if v17.fontStyle == nil or (v17.fontStyle.LineHeight == nil or v17.fontStyle.FontSize == nil or v22 == nil) then
+	local v6 = React.useMemo(function()
+		if v2.fontStyle == nil or v2.fontStyle.LineHeight == nil or v2.fontStyle.FontSize == nil or fontFace == nil then
 			return 0
 		end
 
-		local v28 = FontScales[if not ReactIs.isBinding(v22) then v22.Family else v22:getValue().Family]
+		local v6
 
-		if v28 == nil then
+		if ReactIs.isBinding(fontFace) then
+			v6 = fontFace:getValue().Family
+		else
+			v6 = fontFace.Family
+		end
+
+		local fontScale = FontScales[v6]
+
+		if fontScale == nil then
 			return 0
 		end
 
-		return (v17.fontStyle.FontSize / v28 * (v17.fontStyle.LineHeight * v28) - v17.fontStyle.FontSize) / 2
-	end, {
-		v22,
-		v17.fontStyle
-	})
+		return (v2.fontStyle.FontSize / fontScale * (v2.fontStyle.LineHeight * fontScale) - v2.fontStyle.FontSize) / 2
+	end, { fontFace, v2.fontStyle })
 
-	if v17.padding == nil and v23 ~= 0 then
-		v17.padding = Vector2.new(0, v23)
+	if v2.padding == nil and v6 ~= 0 then
+		v2.padding = Vector2.new(0, v6)
 	end
 
-	local v24 = not v18 and "TextLabel" or "TextButton"
-	local v25 = withGuiObjectProps(v17, {
-		AutoButtonColor = if v24 ~= "TextButton" then nil else v17.AutoButtonColor,
-		FontFace = v22,
-		LineHeight = if v17.fontStyle == nil then nil else v17.fontStyle.LineHeight,
-		RichText = v17.RichText,
-		Text = v17.Text,
-		TextColor3 = if not v17.textStyle then nil else indexBindable(v17.textStyle, "Color3"),
-		TextTransparency = if not v17.textStyle then nil else indexBindable(v17.textStyle, "Transparency"),
-		TextDirection = v17.TextDirection,
-		TextScaled = v17.TextScaled,
-		TextSize = if v17.fontStyle == nil then nil else v17.fontStyle.FontSize,
-		TextTruncate = v17.TextTruncate,
-		TextWrapped = v17.TextWrapped,
-		TextXAlignment = v17.TextXAlignment,
-		TextYAlignment = v17.TextYAlignment,
-		ref = p2,
-		[React.Tag] = v21
-	})
-	local v26 = v24
+	local component = v3 and "TextButton" or "TextLabel"
+	local autoButtonColor
 
-	if v18 then
-		v26 = Interactable
-		v25.component = v24
-		v25.onActivated = v17.onActivated
-		v25.onSecondaryActivated = v17.onSecondaryActivated
-		v25.onStateChanged = v17.onStateChanged
-		v25.stateLayer = v17.stateLayer
-		v25.isDisabled = v17.isDisabled
-		v25.cursor = v17.cursor
+	if component == "TextButton" then
+		autoButtonColor = v2.AutoButtonColor
 	end
 
-	return React.createElement(v26, v25, GuiObjectChildren(v17))
+	local v7 = {
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		["AutoButtonColor"] = nil,
+		AutoButtonColor = autoButtonColor,
+		FontFace = fontFace
+	}
+	local lineHeight
+
+	if v2.fontStyle ~= nil then
+		lineHeight = v2.fontStyle.LineHeight
+	end
+
+	v7.LineHeight = lineHeight
+	v7.OpenTypeFeatures = v2.OpenTypeFeatures
+	v7.RichText = v2.RichText
+	v7.Text = v2.Text
+	local textColor
+
+	if v2.textStyle then
+		textColor = indexBindable(v2.textStyle, "Color3")
+	end
+
+	v7.TextColor3 = textColor
+	local textTransparency
+
+	if v2.textStyle then
+		textTransparency = indexBindable(v2.textStyle, "Transparency")
+	end
+
+	v7.TextTransparency = textTransparency
+	v7.TextDirection = v2.TextDirection
+	v7.TextScaled = v2.TextScaled
+	local textSize
+
+	if v2.fontStyle ~= nil then
+		textSize = v2.fontStyle.FontSize
+	end
+
+	v7.TextSize = textSize
+	v7.TextTruncate = v2.TextTruncate
+	v7.TextWrapped = v2.TextWrapped
+	v7.TextXAlignment = v2.TextXAlignment
+	v7.TextYAlignment = v2.TextYAlignment
+
+	v7.ref = ref
+	v7[React.Tag] = v5
+	local v8 = withGuiObjectProps(v2, v7)
+	local v9
+
+	if v3 then
+		v9 = Interactable
+		v8.component = component
+		v8.onActivated = v2.onActivated
+		v8.onSecondaryActivated = v2.onSecondaryActivated
+		v8.onStateChanged = v2.onStateChanged
+		v8.stateLayer = v2.stateLayer
+		v8.isDisabled = v2.isDisabled
+		v8.cursor = v2.cursor
+	else
+		v9 = component
+	end
+
+	return React.createElement(v9, v8, GuiObjectChildren(v2))
 end
 
 return React.memo(React.forwardRef(Text))

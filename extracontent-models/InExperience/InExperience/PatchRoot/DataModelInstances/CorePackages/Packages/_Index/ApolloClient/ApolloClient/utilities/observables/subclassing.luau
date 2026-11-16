@@ -1,20 +1,19 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent.Parent
+local Subclassing = {}
 
-require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent.Parent
 
-local Observable = require(script.Parent.Observable).Observable
+require(parent.LuauPolyfill)
 
-function t1.fixObservableSubclass(p1) -- line: 30
-	-- upvalues: Observable (copy)
-	local function set(p2) -- line: 32
-		-- upvalues: p1 (copy), Observable (copy)
-		p1[p2] = Observable
+local Observable = require(script.Parent.Observable)
+local observable = Observable.Observable
+
+function Subclassing:fixObservableSubclass()
+	local function set(p) -- 1 equivalent call inferred from this helper
+		self[p] = observable
 	end
 
-	p1["@@species"] = Observable
-
-	return p1
+	set("@@species") -- inferred equivalent call
+	return self
 end
 
-return t1
+return Subclassing

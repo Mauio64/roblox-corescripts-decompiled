@@ -1,141 +1,126 @@
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local CorePackages = game:GetService("CorePackages")
-local GuiService = game:GetService("GuiService")
+
 local Constants = require(script.Parent.Constants)
 local InExperienceSideSheet = require(CorePackages.Workspace.Packages.InExperienceSideSheet)
+
 local isConnectDropdownEnabled = require(Chrome.Integrations.Connect.isConnectDropdownEnabled)
-local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
-local ArgoPartyExperimentation = require(CorePackages.Workspace.Packages.SocialExperiments).ArgoPartyExperimentation
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
+local AppCommonLib2 = require(CorePackages.Workspace.Packages.AppCommonLib)
+local isTenFootInterface = AppCommonLib2.isTenFootInterface
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableInExperienceAvatarSwitcher = SharedFlags.FFlagEnableInExperienceAvatarSwitcher
-local FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet
+local isSideSheetEnabled = require(CorePackages.Workspace.Packages.InExperienceSideSheetUtils.isSideSheetEnabled)
 local FFlagAddInviteFriendsIntegration = SharedFlags.FFlagAddInviteFriendsIntegration
 local FFlagIntegrateTraversalHistoryInSideSheet = SharedFlags.FFlagIntegrateTraversalHistoryInSideSheet
 local FFlagEnableInExperienceShop = SharedFlags.FFlagEnableInExperienceShop
 local FFlagRemoveFriendsChatUnibarEntrypoints = SharedFlags.FFlagRemoveFriendsChatUnibarEntrypoints
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
-local FIntSideSheetVariant = SharedFlags.FIntSideSheetVariant
-local FFlagDebugEnablePioneerUX = SharedFlags.FFlagDebugEnablePioneerUX
-local v20 = if not FFlagIntegrateTraversalHistoryInSideSheet then nil else require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).Traversal
-local v21 = not not v20 and v20.Flags.FFlagAddTraversalHistory
+local FFlagExpChatCanShowFriendsTab = SharedFlags.FFlagExpChatCanShowFriendsTab
+local FFlagShowSwitchServerButton = SharedFlags.FFlagShowSwitchServerButton
+local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
+local isPioneerLaunch = PioneerUtils.isPioneerLaunch
+local FFlagEnableSideSheetRobuxWidget = require(Chrome.Flags.FFlagEnableSideSheetRobuxWidget)
+local traversal
 
-local function reorder(t1: {[any]: any}, s1: string, n1: number) -- line: 34
-	if t1[s1] ~= nil then
-		t1[s1] = n1
+if FFlagIntegrateTraversalHistoryInSideSheet then
+	local CoreScriptsRoactCommon = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon)
+	traversal = CoreScriptsRoactCommon.Traversal
+end
+
+local v
+
+if traversal then
+	v = traversal.Flags.FFlagAddTraversalHistory
+else
+	v = false
+end
+
+local function reorder(p, p2: string, p3: number) -- 8 equivalent calls inferred from this helper
+	if p[p2] ~= nil then
+		p[p2] = p3
 	end
 end
-local function buildMenuOrder() -- line: 41
-	-- upvalues: isConnectDropdownEnabled (copy), FFlagRemoveFriendsChatUnibarEntrypoints (copy), ArgoPartyExperimentation (copy), FFlagExpChatEnableFriendsTab (copy), isSpatial (copy), GuiService (copy), isInExperienceUIVREnabled (copy), v21 (copy), FFlagIntegrateTraversalHistoryInSideSheet (copy), FFlagAddInviteFriendsIntegration (copy), Constants (copy), FFlagEnableInExperienceAvatarSwitcher (copy), FFlagEnableInExperienceShop (copy), InExperienceSideSheet (copy), FFlagEnableSideSheet (copy), FIntSideSheetVariant (copy), FFlagDebugEnablePioneerUX (copy)
-	local v27 = isConnectDropdownEnabled() and not (FFlagRemoveFriendsChatUnibarEntrypoints and (ArgoPartyExperimentation.getIsRenameEnabled() and FFlagExpChatEnableFriendsTab))
-	local v28 = not isSpatial() and not GuiService:IsTenFootInterface()
-	local v29 = not isInExperienceUIVREnabled or not isSpatial()
-	local v30 = v21 and FFlagIntegrateTraversalHistoryInSideSheet
-	local t2 = {
-		invite_friends = if not FFlagAddInviteFriendsIntegration then nil else 10,
+
+local function buildMenuOrder()
+	local v2 = isConnectDropdownEnabled()
+
+	if v2 then
+		v2 = not (FFlagRemoveFriendsChatUnibarEntrypoints and FFlagExpChatCanShowFriendsTab)
+	end
+
+	local v3 = not (isSpatial() or isTenFootInterface())
+	local v4 = not (isInExperienceUIVREnabled and isSpatial())
+
+	local v5 = {
+		RobuxWidget = FFlagEnableSideSheetRobuxWidget and isSideSheetEnabled and 5 or nil,
+		invite_friends = FFlagAddInviteFriendsIntegration and 10 or nil,
 		people = 20,
 		settings = 30,
 		trust_and_safety = 40,
-		connect_dropdown = if not v27 then nil else 50,
-		[Constants.AVATAR_SWITCHER_ID] = if not FFlagEnableInExperienceAvatarSwitcher then nil else 60,
-		[Constants.IN_EXPERIENCE_SHOP_ID] = if not FFlagEnableInExperienceShop then nil else 70,
+		connect_dropdown = v2 and 50 or nil,
+		[Constants.AVATAR_SWITCHER_ID] = FFlagEnableInExperienceAvatarSwitcher and 60 or nil,
+		[Constants.SWITCH_SERVER_ID] = (FFlagShowSwitchServerButton or isPioneerLaunch()) and 65 or nil,
+		[Constants.IN_EXPERIENCE_SHOP_ID] = FFlagEnableInExperienceShop and 70 or nil,
 		leaderboard = 80,
 		emotes = 90,
 		backpack = 100,
-		traversal_history = if not v30 then nil else 110,
+		traversal_history = v and FFlagIntegrateTraversalHistoryInSideSheet and 110 or nil,
 		help = 120,
-		camera_entrypoint = if not v29 then nil else 130,
+		camera_entrypoint = v4 and 130 or nil,
 		gallery = 140,
-		selfie_view = if not v29 then nil else 150,
-		music_entrypoint = if not v28 then nil else 160,
+		selfie_view = v4 and 150 or nil,
+		music_entrypoint = v3 and 160 or nil,
+		AccountUpsell = isPioneerLaunch() and 170 or nil,
 		[InExperienceSideSheet.Enums.ActionBinding.Leave] = 180,
 		[InExperienceSideSheet.Enums.ActionBinding.Respawn] = 190
 	}
 
-	if FFlagEnableSideSheet then
-		if FIntSideSheetVariant == 0 then
-			if t2.settings ~= nil then
-				t2.settings = 103
-			end
+	if isPioneerLaunch() then
+		v5.connect_dropdown = nil
+		v5[Constants.AVATAR_SWITCHER_ID] = nil
+		v5.emotes = nil
+		v5.traversal_history = nil
+		v5.camera_entrypoint = nil
+		v5.gallery = nil
+		reorder(v5, Constants.SWITCH_SERVER_ID, 200) -- inferred equivalent call
+	elseif not isSideSheetEnabled then
+		reorder(v5, "connect_dropdown", 10) -- inferred equivalent call
+		reorder(v5, Constants.IN_EXPERIENCE_SHOP_ID, 20) -- inferred equivalent call
+		reorder(v5, "selfie_view", 30) -- inferred equivalent call
+		reorder(v5, Constants.AVATAR_SWITCHER_ID, 40) -- inferred equivalent call
+		reorder(v5, "music_entrypoint", 50) -- inferred equivalent call
+		reorder(v5, "camera_entrypoint", 60) -- inferred equivalent call
+		reorder(v5, "trust_and_safety", 70) -- inferred equivalent call
+		v5.respawn = 110
 
-			if t2.trust_and_safety ~= nil then
-				t2.trust_and_safety = 106
-			end
-
-			local IN_EXPERIENCE_SHOP_ID = Constants.IN_EXPERIENCE_SHOP_ID
-
-			if t2[IN_EXPERIENCE_SHOP_ID] ~= nil then
-				t2[IN_EXPERIENCE_SHOP_ID] = 143
-			end
-
-			if t2.backpack ~= nil then
-				t2.backpack = 146
-			end
-		end
-
-		if FFlagDebugEnablePioneerUX then
-			t2.connect_dropdown = nil
-			t2.invite_friends = nil
-			t2[Constants.AVATAR_SWITCHER_ID] = nil
-			t2.emotes = nil
-			t2.traversal_history = nil
-		end
-	else
-		if t2.connect_dropdown ~= nil then
-			t2.connect_dropdown = 10
-		end
-
-		local IN_EXPERIENCE_SHOP_ID = Constants.IN_EXPERIENCE_SHOP_ID
-
-		if t2[IN_EXPERIENCE_SHOP_ID] ~= nil then
-			t2[IN_EXPERIENCE_SHOP_ID] = 20
-		end
-
-		if t2.selfie_view ~= nil then
-			t2.selfie_view = 30
-		end
-
-		local AVATAR_SWITCHER_ID = Constants.AVATAR_SWITCHER_ID
-
-		if t2[AVATAR_SWITCHER_ID] ~= nil then
-			t2[AVATAR_SWITCHER_ID] = 40
-		end
-
-		if t2.music_entrypoint ~= nil then
-			t2.music_entrypoint = 50
-		end
-
-		if t2.camera_entrypoint ~= nil then
-			t2.camera_entrypoint = 60
-		end
-
-		if t2.trust_and_safety ~= nil then
-			t2.trust_and_safety = 70
-		end
-
-		t2.respawn = 110
-		t2.invite_friends = nil
-		t2.people = nil
-		t2.settings = nil
-		t2.traversal_history = nil
-		t2.help = nil
-		t2.gallery = nil
-		t2[InExperienceSideSheet.Enums.ActionBinding.Leave] = nil
-		t2[InExperienceSideSheet.Enums.ActionBinding.Respawn] = nil
+		v5.invite_friends = nil
+		v5.people = nil
+		v5.settings = nil
+		v5.traversal_history = nil
+		v5.help = nil
+		v5.gallery = nil
+		v5[InExperienceSideSheet.Enums.ActionBinding.Leave] = nil
+		v5[InExperienceSideSheet.Enums.ActionBinding.Respawn] = nil
+		v5[Constants.SWITCH_SERVER_ID] = nil
 	end
 
-	local t3 = {}
+	local menuOrder = {}
 
-	for v36 in t2 do
-		table.insert(t3, v36)
+	for k in v5 do
+		table.insert(menuOrder, k)
 	end
 
-	table.sort(t3, function(p1, p2) -- line: 118
-		-- upvalues: t2 (copy)
-		return t2[p1] < t2[p2]
+	table.sort(menuOrder, function(a, b): boolean
+		return v5[a] < v5[b]
 	end)
 
-	return t3
+	return menuOrder
 end
 
 return buildMenuOrder

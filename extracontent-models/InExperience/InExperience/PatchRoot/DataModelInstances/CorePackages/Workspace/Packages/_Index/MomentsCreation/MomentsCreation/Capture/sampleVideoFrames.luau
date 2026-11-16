@@ -1,25 +1,33 @@
-local function sampleVideoFrames(p1, n1: number, p2: ((...any) -> ...any)) -- line: 17
-	task.spawn(function() -- line: 18
-		-- upvalues: p1 (copy), n1 (copy), p2 (copy)
-		local ok, result = pcall(function() -- line: 19
-			-- upvalues: p1 (copy), n1 (copy)
-			local v7 = game:GetService("VideoService"):CreateVideoSamplerAsync(p1)
-			local t1 = {}
+local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
 
-			for i = 0, math.floor(n1) - 1 do
-				table.insert(t1, i)
+local GetFFlagMomentsTTSAudioOverlay = require(MomentsCreation.Flags.GetFFlagMomentsTTSAudioOverlay)
+
+local function sampleVideoFrames(p, p2: number, callback, value: number?, p3)
+	task.spawn(function()
+		local success, result = pcall(function()
+			local videoSamplerAsync = (p3 or game:GetService("VideoService")):CreateVideoSamplerAsync(p)
+			local v = value or 0
+			local v2 = {}
+			local v3
+
+			if GetFFlagMomentsTTSAudioOverlay then
+				v3 = math.max(1, (math.floor(p2)))
+			else
+				v3 = math.floor(p2)
 			end
 
-			return v7:GetSamplesAtTimesAsync(t1)
+			for i = 0, v3 - 1 do
+				table.insert(v2, v + i)
+			end
+
+			return videoSamplerAsync:GetSamplesAtTimesAsync(v2)
 		end)
 
-		if ok then
-			p2(result)
-
-			return
+		if success then
+			callback(result)
+		else
+			callback({})
 		end
-
-		p2({})
 	end)
 end
 

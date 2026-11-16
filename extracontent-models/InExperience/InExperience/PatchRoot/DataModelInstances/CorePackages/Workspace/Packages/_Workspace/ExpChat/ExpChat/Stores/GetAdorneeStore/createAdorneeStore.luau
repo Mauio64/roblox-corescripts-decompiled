@@ -1,86 +1,78 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local createSignal = require(Parent.Signals).createSignal
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(parent.Signals)
 
-local function findFirstChildByNameAndClass(p1, s1: string, s2: string) -- line: 20
-	if not p1 then
+local createSignal = Signals.createSignal
+
+local function findFirstChildByNameAndClass(instance, p: string, className: string)
+	if not instance then
 		return nil
 	end
 
-	for _, child in ipairs(p1:GetChildren()) do
-		if s1 == child.Name and child:IsA(s2) then
+	for _, child in ipairs(instance:GetChildren()) do
+		if child.Name == p and child:IsA(className) then
 			return child
 		end
 	end
 
 	return nil
 end
-local function createAdorneeStore() -- line: 32
-	-- upvalues: createSignal (copy), findFirstChildByNameAndClass (copy)
-	local t1 = {}
 
-	local function getKey(p2) -- line: 37
-		return (tostring(p2))
+local function createAdorneeStore()
+	local v = {}
+
+	local function getKey(p) -- 4 equivalent calls inferred from this helper
+		return (tostring(p))
+	end
+
+	local function getAdornee(p) -- 1 equivalent call inferred from this helper
+		local key = getKey(p) -- inferred equivalent call
+
+		if not v[key] then
+			local signal, setter = createSignal(nil)
+			v[key] = { getter = signal, setter = setter }
+		end
+
+		return v[key].getter
 	end
 
 	return {
-		getAdornee = function(p3) -- line: 41
-			-- upvalues: t1 (copy), createSignal (copy)
-			local str = tostring(p3)
+		getAdornee = getAdornee,
+		handleAdorneeAdded = function(p, p2, p3)
+			local key = getKey(p) -- inferred equivalent call
+			local v2 = findFirstChildByNameAndClass(p2, "Head", "BasePart")
 
-			if not t1[str] then
-				local v15, v16 = createSignal(nil)
-
-				t1[str] = {
-					getter = v15,
-					setter = v16
-				}
+			if p3.Health ~= 0 then
+				v2 = p2
 			end
 
-			return t1[str].getter
+			if not v[key] then
+				local _adornee = getAdornee(p) -- inferred equivalent call
+			end
+
+			v[key].setter(v2)
 		end,
-		handleAdorneeAdded = function(p4, p5, p6) -- line: 50
-			-- upvalues: findFirstChildByNameAndClass (copy), t1 (copy), createSignal (copy)
-			local str = tostring(p4)
-			local v21 = findFirstChildByNameAndClass(p5, "Head", "BasePart")
-			local v22 = if p6.Health ~= 0 then p5 else v21
+		handleHumanoidDied = function(p)
+			local key = getKey(p) -- inferred equivalent call
 
-			if not t1[str] then
-				local str2 = tostring(p4)
+			if v[key] then
+				local getter = v[key].getter(false)
+				local v2
 
-				if not t1[str2] then
-					local v24, v25 = createSignal(nil)
-
-					t1[str2] = {
-						getter = v24,
-						setter = v25
-					}
+				if getter then
+					v2 = findFirstChildByNameAndClass(getter, "Head", "BasePart") or getter
 				end
 
-				local _ = t1[str2].getter
-			end
-
-			t1[str].setter(v22)
-		end,
-		handleHumanoidDied = function(p7) -- line: 61
-			-- upvalues: t1 (copy), findFirstChildByNameAndClass (copy)
-			local str = tostring(p7)
-
-			if t1[str] then
-				local v29 = t1[str].getter(false)
-				local v30 = if not v29 then nil else findFirstChildByNameAndClass(v29, "Head", "BasePart") or v29
-
-				t1[str].setter(v30)
+				v[key].setter(v2)
 			end
 		end,
-		handlePlayerRemoved = function(p8) -- line: 77
-			-- upvalues: t1 (copy)
-			local str = tostring(p8)
+		handlePlayerRemoved = function(p)
+			local key = getKey(p) -- inferred equivalent call
 
-			if t1[str] then
-				t1[str].setter(nil)
+			if v[key] then
+				v[key].setter(nil)
 			end
 
-			t1[str] = nil
+			v[key] = nil
 		end
 	}
 end

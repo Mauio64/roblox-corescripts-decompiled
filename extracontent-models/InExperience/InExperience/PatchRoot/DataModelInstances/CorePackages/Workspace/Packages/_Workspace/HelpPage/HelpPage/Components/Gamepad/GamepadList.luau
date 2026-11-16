@@ -1,159 +1,277 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Configs.ConfigTypes)
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+require(parent.Configs.ConfigTypes)
+local Constants = require(parent.Constants)
+require(parent.Components.Common.ActionText)
+local ControlActionRow = require(parent.Components.Common.ControlActionRow)
 
-local Constants = require(ParentParent.Constants)
-local useLocalization = require(ParentParentParent.Localization).Hooks.useLocalization
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Icon = Foundation.Icon
 local Enums = Foundation.Enums
 local useTokens = Foundation.Hooks.useTokens
-local ExtraKeysEnum = require(ParentParent.Enums.ExtraKeysEnum)
-local v13 = React.memo(function(t1: {[any]: any}) -- line: 45
-	-- upvalues: useLocalization (copy), React (copy), FoundationText (copy)
-	local v17 = useLocalization({
-		action = t1.action
-	})
+local ExtraKeysEnum = require(parent.Enums.ExtraKeysEnum)
+local FFlagHelpPageCCL = require(parent.Flags.FFlagHelpPageCCL)
+local useLocalizedLabels = require(parent.Hooks.useLocalizedLabels)
 
-	return React.createElement(FoundationText, {
-		tag = "auto-xy text-align-x-center text-align-y-center text-title-large",
-		Text = v17.action
+local memo = React.memo(function(p)
+	local v = useLocalizedLabels({ action = p.action })
+
+	return React.createElement(Text, {
+		Text = v.action,
+		tag = "auto-xy text-title-large text-align-x-center text-align-y-center"
 	})
 end)
-local v14 = React.memo(function(t2: {[any]: any}) -- line: 56
-	-- upvalues: useTokens (copy), React (copy), ExtraKeysEnum (copy), Constants (copy), View (copy), Icon (copy), Enums (copy)
-	local v19 = useTokens()
-	local v20 = React.useMemo(function() -- line: 60
-		-- upvalues: t2 (copy), ExtraKeysEnum (copy), Constants (copy)
-		local t3 = {}
 
-		for _, v in ipairs(t2.buttons) do
-			if v ~= ExtraKeysEnum.TouchPad then
-				t3[v] = if not t2.isSpatial then if not Constants.HELP_PAGE.GAMEPAD_PLAYSTATION_PLATFORMS[t2.platform] then Constants.HELP_PAGE.GAMEPAD_ICON_MAP_XBOX[v] else if t2.platform ~= Enum.Platform.PS5 or Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[v] == nil then Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION[v] else Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[v] else Constants.HELP_PAGE.GAMEPAD_ICON_MAP_SPATIAL[v]
-			elseif Constants.HELP_PAGE.GAMEPAD_PLAYSTATION_PLATFORMS[t2.platform] then
-				if t2.platform == Enum.Platform.PS5 and Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[v] ~= nil then
-					t3[v] = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[v]
-				else
-					t3[v] = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION[v]
-				end
-			end
-		end
+local memo2 = React.memo(function(props)
+	local v = useTokens()
+	local style = props.isDisabled and {
+		Color3 = v.Color.Content.Default.Color3,
+		Transparency = 0.5
+	} or nil
 
-		return t3
-	end, { t2.buttons })
-	local v21 = React.useMemo(function() -- line: 102
-		-- upvalues: t2 (copy), React (copy), View (copy), v19 (copy), v20 (copy), Constants (copy), Icon (copy), Enums (copy)
-		local t4 = {}
+	local v2 = React.useMemo(function()
+		local result = {}
 
-		if t2.addBlankIcon and t2.layoutOrderReversed then
-			table.insert(t4, React.createElement(View, {
-				BackgroundTransparency = 1,
-				LayoutOrder = -1,
-				key = "BlankIconBefore",
-				Size = UDim2.fromOffset(v19.Size.Size_600, v19.Size.Size_600)
-			}))
-		end
-
-		for v29, v30 in v20 do
-			table.insert(t4, React.createElement(View, {
-				tag = "align-x-center align-y-center auto-xy",
-				LayoutOrder = Constants.HELP_PAGE.GAMEPAD_LAYOUT_ORDER[v29],
-				key = Constants.HELP_PAGE.GAMEPAD_LAYOUT_ORDER[v29]
-			}, {
-				Icon = React.createElement(Icon, {
-					name = v30,
-					size = Enums.IconSize.Large
-				})
-			}))
-		end
-
-		return t4
-	end, {
-		v20,
-		t2.addBlankIcon,
-		t2.layoutOrderReversed
-	})
-
-	return React.createElement(View, {
-		tag = "align-x-center align-y-center auto-xy gap-xsmall row"
-	}, v21)
-end)
-local v15 = React.memo(function(t5: {[any]: any}) -- line: 141
-	-- upvalues: React (copy), Constants (copy), View (copy), v13 (copy), v14 (copy)
-	local v23, v24 = React.useMemo(function() -- line: 142
-		-- upvalues: t5 (copy), Constants (copy), React (copy), View (copy), v13 (copy), v14 (copy)
-		local t6 = {}
-		local t7 = {}
-
-		for v33, v34 in t5.controls do
-			if v34.gamepadInput then
-				local gamepadInput = v34.gamepadInput
-				local input = gamepadInput.input
-
-				if input == nil then
-					input = if not t5.isSpatial then if not Constants.HELP_PAGE.GAMEPAD_PLAYSTATION_PLATFORMS[t5.platform] then gamepadInput.xboxInput else gamepadInput.playstationInput else gamepadInput.spatialGamepadInput
-				end
-
-				if input ~= nil and #input > 0 then
-					local v37 = Constants.HELP_PAGE.GAMEPAD_LAYOUT_ORDER[input[1]]
-
-					if t5.layoutOrderReversed then
-						v37 = -v37
+		for _, button in ipairs(props.buttons) do
+			if button == ExtraKeysEnum.TouchPad then
+				if Constants.HELP_PAGE.GAMEPAD_PLAYSTATION_PLATFORMS[props.platform] then
+					if
+						props.platform == Enum.Platform.PS5
+						and Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[button] ~= nil
+					then
+						result[button] = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[button]
+					else
+						result[button] = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION[button]
 					end
-
-					table.insert(t6, React.createElement(View, {
-						tag = "align-y-center auto-x col size-0-1000",
-						LayoutOrder = v37,
-						key = "Text-" .. v33
-					}, {
-						ActionText = React.createElement(v13, {
-							action = v34.label
-						})
-					}))
-					table.insert(t7, React.createElement(View, {
-						tag = "align-y-center auto-x col size-0-1000",
-						LayoutOrder = v37,
-						key = "Icon-" .. v33
-					}, {
-						IconContainer = React.createElement(v14, {
-							buttons = input,
-							platform = t5.platform,
-							addBlankIcon = t5.addBlankIcon,
-							layoutOrderReversed = t5.layoutOrderReversed,
-							isSpatial = t5.isSpatial
-						})
-					}))
 				end
+			else
+				local v2
+
+				if props.isSpatial then
+					v2 = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_SPATIAL[button]
+				elseif Constants.HELP_PAGE.GAMEPAD_PLAYSTATION_PLATFORMS[props.platform] then
+					if
+						props.platform == Enum.Platform.PS5
+						and Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[button] ~= nil
+					then
+						v2 = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION_5[button]
+					else
+						v2 = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION[button]
+					end
+				else
+					v2 = Constants.HELP_PAGE.GAMEPAD_ICON_MAP_XBOX[button]
+				end
+
+				result[button] = v2
 			end
 		end
 
-		return t6, t7
+		return result
+	end, { props.buttons, props.isSpatial, props.platform })
+
+	local v3 = React.useMemo(function()
+		local children = {}
+
+		if props.addBlankIcon and props.layoutOrderReversed then
+			table.insert(
+				children,
+				React.createElement(View, {
+					Size = UDim2.fromOffset(v.Size.Size_600, v.Size.Size_600),
+					BackgroundTransparency = 1,
+					LayoutOrder = -1,
+					key = "BlankIconBefore"
+				})
+			)
+		end
+
+		for k, name in v2 do
+			table.insert(
+				children,
+				React.createElement(
+					View,
+					{
+						tag = "align-x-center align-y-center auto-xy",
+						LayoutOrder = Constants.HELP_PAGE.GAMEPAD_LAYOUT_ORDER[k],
+						key = Constants.HELP_PAGE.GAMEPAD_LAYOUT_ORDER[k]
+					},
+					{
+						Icon = React.createElement(Icon, {
+							name = name,
+							size = Enums.IconSize.Large,
+							style = style,
+							testId = props.testId
+						})
+					}
+				)
+			)
+		end
+
+		return children
+	end, { v2, props.addBlankIcon, props.layoutOrderReversed, style, props.testId, v.Size.Size_600 })
+
+	local v4 = #props.buttons + (props.addBlankIcon and props.layoutOrderReversed and 1 or 0)
+	local v5 = v.Size.Size_600 * v4 + v.Gap.XSmall * (v4 - 1)
+
+	local createElement = React.createElement
+	local v6 = {
+		tag = {
+			["row align-x-center align-y-center gap-xsmall auto-xy"] = not FFlagHelpPageCCL,
+			["row align-x-right align-y-center gap-xsmall auto-y"] = FFlagHelpPageCCL and not props.layoutOrderReversed,
+			["row align-x-left align-y-center gap-xsmall auto-y"] = FFlagHelpPageCCL and props.layoutOrderReversed
+		},
+		Size = 0,
+		LayoutOrder = 0,
+		testId = 0
+	}
+	local size
+
+	if FFlagHelpPageCCL then
+		size = UDim2.fromOffset(v5, 0)
+	end
+
+	v6.Size = size
+	v6.LayoutOrder = props.LayoutOrder
+	v6.testId = props.testId .. "Container"
+	return createElement(View, v6, v3)
+end)
+
+local memo3 = React.memo(function(props)
+	local v = useTokens()
+	local layoutOrder = props.layoutOrderReversed and 1 or 2
+	local v2 = #props.buttons + (props.addBlankIcon and props.layoutOrderReversed and 1 or 0)
+	local iconWidth = v.Size.Size_600 * v2 + v.Gap.XSmall * (v2 - 1)
+	local isDisabled = true
+
+	for _, actionLabel in ipairs(props.actionLabels) do
+		if not actionLabel.disabled then
+			isDisabled = false
+			break
+		end
+	end
+
+	return React.createElement(ControlActionRow, {
+		actionLabels = props.actionLabels,
+		layoutOrderReversed = props.layoutOrderReversed,
+		layoutOrder = props.layoutOrder,
+		iconWidth = iconWidth,
+		testId = "GamepadActionText-" .. props.testId,
+		icon = React.createElement(memo2, {
+			buttons = props.buttons,
+			platform = props.platform,
+			addBlankIcon = props.addBlankIcon,
+			layoutOrderReversed = props.layoutOrderReversed,
+			isSpatial = props.isSpatial,
+			isDisabled = isDisabled,
+			testId = "GamepadActionIcon-" .. props.testId,
+			LayoutOrder = layoutOrder
+		})
+	})
+end)
+
+local memo4 = React.memo(function(props)
+	local v, v2, v3 = React.useMemo(function()
+		local children = {}
+		local children2 = {}
+		local children3 = {}
+
+		for k, control in props.controls do
+			if not control.gamepadInput then
+				continue
+			end
+
+			local gamepadInput = control.gamepadInput
+			local buttons = gamepadInput.input
+
+			if buttons == nil then
+				if props.isSpatial then
+					buttons = gamepadInput.spatialGamepadInput
+				elseif Constants.HELP_PAGE.GAMEPAD_PLAYSTATION_PLATFORMS[props.platform] then
+					buttons = gamepadInput.playstationInput
+				else
+					buttons = gamepadInput.xboxInput
+				end
+			end
+
+			if not (buttons ~= nil and #buttons > 0) then
+				continue
+			end
+
+			local layoutOrder = Constants.HELP_PAGE.GAMEPAD_LAYOUT_ORDER[buttons[1]]
+
+			if props.layoutOrderReversed then
+				layoutOrder = -layoutOrder
+			end
+
+			if FFlagHelpPageCCL then
+				table.insert(children, React.createElement(memo3, {
+					actionLabels = control.actionLabels or {
+						{ label = control.label }
+					},
+					buttons = buttons,
+					platform = props.platform,
+					layoutOrder = layoutOrder,
+					layoutOrderReversed = props.layoutOrderReversed,
+					addBlankIcon = props.addBlankIcon,
+					isSpatial = props.isSpatial,
+					testId = k,
+					key = "ActionRow-" .. k
+				}))
+			else
+				table.insert(children2, React.createElement(View, {
+					tag = "col align-y-center size-0-1000 auto-x",
+					LayoutOrder = layoutOrder,
+					key = "Text-" .. k
+				}, {
+					ActionText = React.createElement(memo, {
+						action = control.label,
+						testId = "GamepadActionText-" .. k
+					})
+				}))
+
+				table.insert(children3, React.createElement(View, {
+					tag = "col align-y-center size-0-1000 auto-x",
+					LayoutOrder = layoutOrder,
+					key = "Icon-" .. k
+				}, {
+					IconContainer = React.createElement(memo2, {
+						buttons = buttons,
+						platform = props.platform,
+						addBlankIcon = props.addBlankIcon,
+						layoutOrderReversed = props.layoutOrderReversed,
+						isSpatial = props.isSpatial,
+						testId = "GamepadActionIcon-" .. k
+					})
+				}))
+			end
+		end
+
+		return children2, children3, children
 	end, {
-		t5.controls,
-		t5.platform,
-		t5.addBlankIcon,
-		t5.layoutOrderReversed
+		props.controls,
+		props.platform,
+		props.addBlankIcon,
+		props.layoutOrderReversed,
+		props.isSpatial
 	})
 
-	return React.createElement(View, {
-		tag = "row auto-xy gap-small"
-	}, {
+	if FFlagHelpPageCCL then
+		return React.createElement(View, { tag = "col gap-small size-full-0 auto-y" }, v3)
+	end
+
+	return React.createElement(View, { tag = "row gap-small auto-xy" }, {
 		TextCol = React.createElement(View, {
 			tag = {
-				["col auto-xy align-x-right"] = not t5.layoutOrderReversed,
-				["col auto-xy align-x-left"] = t5.layoutOrderReversed
+				["col align-x-right auto-xy"] = not props.layoutOrderReversed,
+				["col align-x-left auto-xy"] = props.layoutOrderReversed
 			},
-			LayoutOrder = not t5.layoutOrderReversed and 1 or 3
-		}, v23),
-		IconCol = React.createElement(View, {
-			tag = "col auto-xy",
-			LayoutOrder = 2
-		}, v24)
+			LayoutOrder = props.layoutOrderReversed and 3 or 1
+		}, v),
+		IconCol = React.createElement(View, { tag = "col auto-xy", LayoutOrder = 2 }, v2)
 	})
 end)
 
-return React.memo(v15)
+return React.memo(memo4)

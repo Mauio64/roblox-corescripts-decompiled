@@ -1,24 +1,26 @@
 local RunService = game:GetService("RunService")
 local CorePackages = game:GetService("CorePackages")
-local v3 = require(CorePackages.Packages.Roact).Component:extend("RenderStep")
+local Roact = require(CorePackages.Packages.Roact)
 
-function v3.render(_) -- line: 23
+local extended = Roact.Component:extend("RenderStep")
+
+function extended.render(_): nil
 	return nil
 end
-function v3.didMount(p2) -- line: 27
-	-- upvalues: RunService (copy)
-	RunService:BindToRenderStep(p2.props.name, p2.props.priority, p2.props.callback)
-end
-function v3.didUpdate(p3, p4) -- line: 31
-	-- upvalues: RunService (copy)
-	if p3.props.callback ~= p4.callback or p3.props.name ~= p4.name then
-		RunService:UnbindFromRenderStep(p4.name)
-		RunService:BindToRenderStep(p3.props.name, p3.props.priority, p3.props.callback)
-	end
-end
-function v3.willUnmount(p5) -- line: 38
-	-- upvalues: RunService (copy)
-	RunService:UnbindFromRenderStep(p5.props.name)
+
+function extended.didMount(p)
+	RunService:BindToRenderStep(p.props.name, p.props.priority, p.props.callback)
 end
 
-return v3
+function extended.didUpdate(p, p2)
+	if p.props.callback ~= p2.callback or p.props.name ~= p2.name then
+		RunService:UnbindFromRenderStep(p2.name)
+		RunService:BindToRenderStep(p.props.name, p.props.priority, p.props.callback)
+	end
+end
+
+function extended.willUnmount(p)
+	RunService:UnbindFromRenderStep(p.props.name)
+end
+
+return extended

@@ -1,28 +1,53 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
-local VerifiedBadges = require(Parent.VerifiedBadges)
-local FFlagAXAddTextXAlignmentProp = require(Parent.AvatarExperienceFlags).FFlagAXAddTextXAlignmentProp
+local VerifiedBadges = require(parent.VerifiedBadges)
 
-local function ItemCardCreatorName(t1: {[any]: any}) -- line: 19
-	-- upvalues: useTokens (copy), React (copy), FoundationText (copy), VerifiedBadges (copy), FFlagAXAddTextXAlignmentProp (copy)
-	local v10 = useTokens()
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXAddTextXAlignmentProp = AvatarExperienceFlags.FFlagAXAddTextXAlignmentProp
+local AvatarExperienceFlags2 = require(parent.AvatarExperienceFlags)
 
-	return React.createElement(FoundationText, {
-		textStyle = v10.Color.Content.Default,
-		fontStyle = v10.Typography.BodyMedium,
-		LayoutOrder = t1.LayoutOrder,
-		Text = if not t1.hasVerifiedBadge then t1.name else `{ t1.name }{ VerifiedBadges.emoji.verified }`,
-		TextXAlignment = if not FFlagAXAddTextXAlignmentProp or not t1.TextXAlignment then Enum.TextXAlignment.Left else t1.TextXAlignment,
-		Size = UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		TextTruncate = Enum.TextTruncate.SplitWord
-	})
+local function ItemCardCreatorName(props)
+	local v = useTokens()
+	local createElement = React.createElement
+	local v2 = {
+		textStyle = v.Color.Content.Default,
+		fontStyle = v.Typography.BodyMedium,
+		LayoutOrder = props.LayoutOrder,
+		Text = 0,
+		TextXAlignment = 0,
+		Size = 0,
+		AutomaticSize = 0,
+		TextTruncate = 0
+	}
+	local text
+
+	if props.hasVerifiedBadge then
+		text = `{props.name}{VerifiedBadges.emoji.verified}`
+	else
+		text = props.name
+	end
+
+	v2.Text = text
+	local textXAlignment
+
+	if FFlagAXAddTextXAlignmentProp and props.TextXAlignment then
+		textXAlignment = props.TextXAlignment
+	else
+		textXAlignment = Enum.TextXAlignment.Left
+	end
+
+	v2.TextXAlignment = textXAlignment
+
+	v2.Size = UDim2.fromScale(1, 0)
+	v2.AutomaticSize = Enum.AutomaticSize.Y
+	v2.TextTruncate = Enum.TextTruncate.SplitWord
+	return createElement(Text, v2)
 end
 
-if require(Parent.AvatarExperienceFlags).FFlagAXItemCardComponentsMemo then
+if AvatarExperienceFlags2.FFlagAXItemCardComponentsMemo then
 	return (React.memo(ItemCardCreatorName))
 end
 

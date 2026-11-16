@@ -1,16 +1,19 @@
-local Parent = script:FindFirstAncestor("PhoneUpsell").Parent
+local parent = script:FindFirstAncestor("PhoneUpsell").Parent
+
 local HttpService = game:GetService("HttpService")
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 
-return function(p1, s1: string, n1: number, b1: boolean, b2: boolean) -- line: 7
-	-- upvalues: HttpService (copy), UrlBuilder (copy)
-	local json = HttpService:JSONEncode({
-		layerName = s1,
-		displayTime = n1,
-		userIgnored = b1
+return function(callback, layerName: string, displayTime: number, userIgnored: boolean, flag: boolean)
+	local jsonEncode = HttpService:JSONEncode({
+		layerName = layerName,
+		displayTime = displayTime,
+		userIgnored = userIgnored
 	})
 
-	return p1(UrlBuilder.fromString("apis:upsellcard/v1/phone-verification/display-time")(), "POST", if not b2 then json else {
-		postBody = json
-	})
+	return callback(
+		urlBuilder.fromString("apis:upsellcard/v1/phone-verification/display-time")(),
+		"POST",
+		flag and { postBody = jsonEncode } or jsonEncode
+	)
 end

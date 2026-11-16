@@ -1,4 +1,5 @@
 return {
+	AccountUpgradeRequest = require(script.AccountUpgradeRequest),
 	GetAuthMetaData = require(script.GetAuthMetaData),
 	GetCountryCodes = require(script.GetCountryCodes),
 	GetGameMedia = require(script.GetGameMedia),
@@ -8,8 +9,10 @@ return {
 	LoginRequests = require(script.LoginRequests),
 	PostGetUserByUsername = require(script.PostGetUserByUsername),
 	PostPasswordValid = require(script.PostPasswordValid),
+	RedeemAuthenticationTicket = require(script.RedeemAuthenticationTicket),
 	LogoutAllLoggedInUsersRequest = require(script.LogoutAllLoggedInUsersRequest),
 	LogoutFromAllSessionsAndReauthenticateRequest = require(script.LogoutFromAllSessionsAndReauthenticateRequest),
+	LogoutRequest = require(script.LogoutRequest),
 	PostUsernameValid = require(script.PostUsernameValid),
 	TwoStepRequests = require(script.TwoStepRequests),
 	AuthPlatformDisconnect = require(script.AuthPlatformDisconnect),

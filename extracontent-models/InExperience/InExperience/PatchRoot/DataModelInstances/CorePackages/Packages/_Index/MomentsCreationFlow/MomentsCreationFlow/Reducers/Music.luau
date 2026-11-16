@@ -1,15 +1,14 @@
 local MomentsCreationFlow = script:FindFirstAncestor("MomentsCreationFlow")
-local MomentsCreationFlowParent = MomentsCreationFlow.Parent
-local Cryo = require(MomentsCreationFlowParent.Cryo)
+local parent = MomentsCreationFlow.Parent
 
-require(MomentsCreationFlowParent.MomentsCommon)
+local Cryo = require(parent.Cryo)
+require(parent.MomentsCommon)
+local Rodux = require(parent.Rodux)
 
-local Rodux = require(MomentsCreationFlowParent.Rodux)
 local CreationFlowMusicInfoRetrieved = require(MomentsCreationFlow.Actions.CreationFlowMusicInfoRetrieved)
 
 return Rodux.createReducer({}, {
-	[CreationFlowMusicInfoRetrieved.name] = function(t1: {[any]: any}, p1) -- line: 19
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.union(t1, p1.musicInfos)
+	[CreationFlowMusicInfoRetrieved.name] = function(p, p2)
+		return Cryo.Dictionary.union(p, p2.musicInfos)
 	end
 })

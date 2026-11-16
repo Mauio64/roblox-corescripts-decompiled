@@ -1,14 +1,17 @@
 local Players = game:GetService("Players")
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local computeNameColor
 
-if require(Parent.ExpChatShared).Flags.GetFFlagTextChatEnableUniverseChatTabs() then
-	computeNameColor = require(Parent.ChatUIPrimitives).Utils.computeNameColor
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local ExpChatShared = require(parent.ExpChatShared)
+local v
+
+if ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs() then
+	local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+	v = ChatUIPrimitives.Utils.computeNameColor
 else
-	local t1 = {
-		Color3.new(0.9921568627450981, 0.1607843137254902, 0.2627450980392157),
-		Color3.new(0.00392156862745098, 0.6352941176470588, 1),
-		Color3.new(0.00784313725490196, 0.7215686274509804, 0.3411764705882353),
+	local v2 = {
+		Color3.new(253 / 255, 41 / 255, 67 / 255),
+		Color3.new(1 / 255, 162 / 255, 1),
+		Color3.new(2 / 255, 184 / 255, 87 / 255),
 		BrickColor.new("Alder").Color,
 		BrickColor.new("Bright orange").Color,
 		BrickColor.new("Bright yellow").Color,
@@ -16,46 +19,44 @@ else
 		BrickColor.new("Brick yellow").Color
 	}
 
-	local function GetNameValue(s1: string) -- line: 24
-		local n1 = 0
+	local function GetNameValue(value: string)
+		local nameValue = 0
 
-		for i = 1, #s1 do
-			local byte = string.byte((string.sub(s1, i, i)))
-			local v11 = #s1 - i + 1
+		for i = 1, #value do
+			local v3 = string.byte((string.sub(value, i, i)))
+			local v4 = #value - i + 1
 
-			if #s1 % 2 == 1 then
-				v11 -= 1
+			if #value % 2 == 1 then
+				v4 -= 1
 			end
 
-			if v11 % 4 >= 2 then
-				byte = -byte
+			if v4 % 4 >= 2 then
+				v3 = -v3
 			end
 
-			n1 += byte
+			nameValue += v3
 		end
 
-		return n1
+		return nameValue
 	end
 
-	function computeNameColor(s2: string) -- line: 42
-		-- upvalues: t1 (copy), GetNameValue (copy)
-		return t1[(GetNameValue(s2) + 0) % #t1 + 1]
+	v = function(p: string)
+		return v2[(GetNameValue(p) + 0) % #v2 + 1]
 	end
 end
 
-local function GetNameColor(n2: number) -- line: 47
-	-- upvalues: Players (copy), computeNameColor (ref)
-	local PlayerByUserId = Players:GetPlayerByUserId(n2)
+local function GetNameColor(p: number)
+	local playerByUserId = Players:GetPlayerByUserId(p)
 
-	if PlayerByUserId then
-		if PlayerByUserId.Team ~= nil then
-			return PlayerByUserId.TeamColor.Color
-		end
-
-		return computeNameColor(PlayerByUserId.Name)
+	if not playerByUserId then
+		return Color3.fromRGB(255, 255, 255)
 	end
 
-	return Color3.fromRGB(255, 255, 255)
+	if playerByUserId.Team == nil then
+		return v(playerByUserId.Name)
+	end
+
+	return playerByUserId.TeamColor.Color
 end
 
 return GetNameColor

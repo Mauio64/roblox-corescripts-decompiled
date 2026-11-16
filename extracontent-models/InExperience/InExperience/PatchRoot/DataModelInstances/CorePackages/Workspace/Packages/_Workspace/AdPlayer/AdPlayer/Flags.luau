@@ -1,18 +1,18 @@
 game:DefineFastString("AdPlayerExitButton", "icons/navigation/close")
 game:DefineFastString("AdDropdownButtonDefault", "rbxassetid://85625850440429")
 game:DefineFastString("AdDropdownButtonOpen", "rbxassetid://85625850440429")
+local Flags = {}
 
-return {
-	GetAdPlayerExitButton = function() -- line: 6
-		return game:GetFastString("AdPlayerExitButton")
-	end,
-	GetAdDropdownButtonDefault = function() -- line: 9
-		return game:GetFastString("AdDropdownButtonDefault")
-	end,
-	GetAdDropdownButtonOpen = function() -- line: 12
-		return game:GetFastString("AdDropdownButtonOpen")
-	end,
-	GetEnableLuaRewardTimerUI = function() -- line: 15
-		return game:GetEngineFeature("EnableLuaRewardTimerUI")
-	end
-}
+function Flags.GetAdPlayerExitButton()
+	return game:GetFastString("AdPlayerExitButton")
+end
+
+function Flags.GetAdDropdownButtonDefault()
+	return game:GetFastString("AdDropdownButtonDefault")
+end
+
+function Flags.GetAdDropdownButtonOpen()
+	return game:GetFastString("AdDropdownButtonOpen")
+end
+
+return Flags

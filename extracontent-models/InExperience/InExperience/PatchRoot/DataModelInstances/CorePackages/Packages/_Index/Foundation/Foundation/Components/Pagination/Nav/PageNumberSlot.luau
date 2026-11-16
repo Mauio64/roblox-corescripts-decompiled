@@ -1,140 +1,172 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useChipVariants = require(Foundation.Components.Chip.useChipVariants)
+
 local ChipSize = require(Foundation.Enums.ChipSize)
+
 local ChipVariant = require(Foundation.Enums.ChipVariant)
 local ColorNamespace = require(Foundation.Enums.ColorNamespace)
 local PaginationSize = require(Foundation.Enums.PaginationSize)
+
 local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
 local useTokens = require(Foundation.Providers.Style.useTokens)
-local withCommonProps = require(Foundation.Utility.withCommonProps)
-local ParentParent = script.Parent.Parent
-local paginationUtils = require(ParentParent.paginationUtils)
 
-local function PageNumberText(t1: {[any]: any}) -- line: 43
-	-- upvalues: React (copy), Text (copy)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+
+local parent2 = script.Parent.Parent
+local paginationUtils = require(parent2.paginationUtils)
+
+local function PageNumberText(props)
 	return React.createElement(Text, {
+		Text = tostring(props.page),
+		textStyle = props.textStyle,
+		tag = props.textTag,
+		padding = props.padding,
 		LayoutOrder = 1,
-		Text = tostring(t1.page),
-		textStyle = t1.textStyle,
-		tag = t1.textTag,
-		padding = t1.padding,
-		testId = `{ t1.testId }--text`
+		testId = `{props.testId}--text`
 	})
 end
 
-local t2 = {
-	[PaginationSize.Small] = "size-0-600",
-	[PaginationSize.Medium] = "size-0-800"
-}
+local v = { colorNamespace = ColorNamespace.Color, isIconSize = true }
 
-local function PageNumberSlot(p1, p2) -- line: 65
-	-- upvalues: useTokens (copy), paginationUtils (copy), PaginationSize (copy), ChipSize (copy), useChipVariants (copy), ChipVariant (copy), t2 (copy), React (copy), View (copy), withCommonProps (copy), PresentationContext (copy), ColorNamespace (copy), PageNumberText (copy)
-	local v22 = useTokens()
-	local v23 = not p1.isChecked
-	local v24 = paginationUtils.needsWidePageSlot(p1.page)
-	local v25 = if p1.slotSize ~= PaginationSize.Small then ChipSize.Medium else ChipSize.Small
-	local v26 = useChipVariants(v22, v25, ChipVariant.Utility, true, false, false)
-	local v27 = useChipVariants(v22, v25, ChipVariant.Utility, false, false, false)
-	local v28 = `row align-x-center align-y-center auto-x radius-circle { t2[p1.slotSize] }`
-	local v29 = React.useCallback(function() -- line: 76
-		-- upvalues: p1 (copy)
-		p1.onPageActivated(p1.page)
-	end, {
-		p1.onPageActivated,
-		p1.page
-	})
-	local t3 = {
-		Selectable = v23 and p1.Selectable ~= false,
-		NextSelectionLeft = p1.NextSelectionLeft,
-		NextSelectionRight = p1.NextSelectionRight,
-		NextSelectionUp = p1.NextSelectionUp,
-		NextSelectionDown = p1.NextSelectionDown
+local v2 = { [PaginationSize.Small] = "size-0-600", [PaginationSize.Medium] = "size-0-800" }
+
+local function PageNumberSlot(props, ref)
+	local v3 = useTokens()
+
+	local v4 = not props.isChecked
+	local needsWidePageSlot = paginationUtils.needsWidePageSlot(props.page)
+	local v5
+
+	if props.slotSize == PaginationSize.Small then
+		v5 = ChipSize.Small
+	else
+		v5 = ChipSize.Medium
+	end
+
+	local v6 = useChipVariants(v3, v5, ChipVariant.Utility, true, false, false)
+	local v7 = useChipVariants(v3, v5, ChipVariant.Utility, false, false, false)
+	local formatted = `row align-x-center align-y-center auto-x radius-circle {v2[props.slotSize]}`
+
+	local onActivated = React.useCallback(function()
+		props.onPageActivated(props.page)
+	end, { props.onPageActivated, props.page })
+
+	local selection = {
+		Selectable = v4 and props.Selectable ~= false,
+		NextSelectionLeft = props.NextSelectionLeft,
+		NextSelectionRight = props.NextSelectionRight,
+		NextSelectionUp = props.NextSelectionUp,
+		NextSelectionDown = props.NextSelectionDown
 	}
 
-	if v24 then
-		if v23 then
-			return React.createElement(View, withCommonProps({
-				LayoutOrder = p1.layoutOrder,
-				testId = p1.testId
-			}, {
-				backgroundStyle = v27.chip.backgroundStyle,
-				padding = v27.chip.padding,
-				cursor = paginationUtils.getSlotCursor(v22),
-				onActivated = v29,
-				ref = p2,
-				selection = t3,
-				tag = v28
-			}), {
-				Label = React.createElement(PresentationContext.Provider, {
-					value = {
-						isIconSize = true,
-						colorNamespace = ColorNamespace.Color
-					}
-				}, {
-					Text = React.createElement(PageNumberText, {
-						page = p1.page,
-						textStyle = v27.text.contentStyle,
-						textTag = v27.text.tag,
-						padding = v27.text.padding,
-						testId = p1.testId
+	if needsWidePageSlot then
+		if v4 then
+			return React.createElement(
+				View,
+				withCommonProps({ LayoutOrder = props.LayoutOrder, testId = props.testId }, {
+					backgroundStyle = v7.chip.backgroundStyle,
+					padding = v7.chip.padding,
+					cursor = paginationUtils.getSlotCursor(v3),
+					onActivated = onActivated,
+					ref = ref,
+					selection = selection,
+					tag = formatted
+				}),
+				{
+					Label = React.createElement(PresentationContext.Provider, { value = v }, {
+						Text = React.createElement(PageNumberText, {
+							page = props.page,
+							textStyle = v7.text.contentStyle,
+							textTag = v7.text.tag,
+							padding = v7.text.padding,
+							testId = props.testId
+						})
 					})
-				})
-			})
+				}
+			)
 		end
 
 		return React.createElement(View, withCommonProps({
-			LayoutOrder = p1.layoutOrder,
-			testId = p1.testId
+			LayoutOrder = props.LayoutOrder,
+			testId = props.testId
 		}, {
-			backgroundStyle = v26.chip.backgroundStyle,
-			padding = v26.chip.padding,
-			ref = p2,
-			selection = {
-				Selectable = false
-			},
-			tag = v28
+			backgroundStyle = v6.chip.backgroundStyle,
+			padding = v6.chip.padding,
+			ref = ref,
+			selection = { Selectable = false },
+			tag = formatted
 		}), {
 			Text = React.createElement(PageNumberText, {
-				page = p1.page,
-				textStyle = v26.text.contentStyle,
-				textTag = v26.text.tag,
-				padding = v26.text.padding,
-				testId = p1.testId
+				page = props.page,
+				textStyle = v6.text.contentStyle,
+				textTag = v6.text.tag,
+				padding = v6.text.padding,
+				testId = props.testId
 			})
 		})
-	end
+	else
+		local createElement = React.createElement
 
-	return React.createElement(View, withCommonProps({
-		LayoutOrder = p1.layoutOrder,
-		testId = p1.testId
-	}, {
-		backgroundStyle = {
-			Transparency = 1,
-			Color3 = v22.Color.Surface.Surface_0.Color3
-		},
-		cursor = if not v23 then nil else paginationUtils.getSlotCursor(v22),
-		onActivated = if not v23 then nil else v29,
-		ref = p2,
-		selection = if not v23 then {
-			Selectable = false
-		} else t3,
-		tag = paginationUtils.getCircularSlotTag(p1.slotSize)
-	}), {
-		Text = React.createElement(PageNumberText, {
+		local v8 = { LayoutOrder = props.LayoutOrder, testId = props.testId }
+		local v9 = {
+			backgroundStyle = { Color3 = v3.Color.Surface.Surface_0.Color3, Transparency = 1 },
+			cursor = 0,
+			onActivated = 0,
+			ref = 0,
+			selection = 0,
+			tag = 0
+		}
+		local cursor
+
+		if v4 then
+			cursor = paginationUtils.getSlotCursor(v3)
+		end
+
+		v9.cursor = cursor
+
+		if not v4 then
+			onActivated = nil
+		end
+
+		v9.onActivated = onActivated
+		v9.ref = ref
+		v9.selection = not v4 and { Selectable = false } or selection
+
+		v9.tag = paginationUtils.getCircularSlotTag(props.slotSize)
+		local v10 = withCommonProps(v8, v9)
+
+		local createElement2 = React.createElement
+		local v11 = {
+			page = props.page,
+			textStyle = 0,
+			textTag = 0,
 			padding = nil,
-			page = p1.page,
-			textStyle = if not p1.isChecked then v22.Color.Content.Default else v26.text.contentStyle,
-			textTag = paginationUtils.getPageLabelTextTag(p1.slotSize),
-			testId = p1.testId
+			testId = 0
+		}
+		local textStyle
+
+		if props.isChecked then
+			textStyle = v6.text.contentStyle
+		else
+			textStyle = v3.Color.Content.Default
+		end
+
+		v11.textStyle = textStyle
+
+		v11.textTag = paginationUtils.getPageLabelTextTag(props.slotSize)
+
+		v11.testId = props.testId
+		return createElement(View, v10, {
+			Text = createElement2(PageNumberText, v11)
 		})
-	})
+	end
 end
 
 return React.memo(React.forwardRef(PageNumberSlot))

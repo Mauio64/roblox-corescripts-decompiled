@@ -1,35 +1,30 @@
-local Parent = script:FindFirstAncestor("RobloxAppHooks").Parent
-local ExperienceService = require(Parent.ExperienceService).ExperienceService
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("RobloxAppHooks").Parent
 
-local function useIsUserInExperience(b1: boolean?) -- line: 10
-	-- upvalues: React (copy), ExperienceService (copy)
-	local v6, v7 = React.useState(b1 or false)
+local ExperienceService = require(parent.ExperienceService)
+local experienceService = ExperienceService.ExperienceService
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 12
-		-- upvalues: ExperienceService (copy), v7 (copy)
-		local t1 = {
-			ExperienceService:RegisterForExperienceJoin(function() -- line: 14
-				-- upvalues: v7 (copy)
-				v7(true)
+local function useIsUserInExperience(flag: boolean?)
+	local state, setState = React.useState(flag or false)
+	React.useEffect(function()
+		local v = {
+			experienceService:RegisterForExperienceJoin(function()
+				setState(true)
 			end),
-			ExperienceService:RegisterForExperienceLeave(function() -- line: 17
-				-- upvalues: v7 (copy)
-				v7(false)
+			experienceService:RegisterForExperienceLeave(function()
+				setState(false)
 			end)
 		}
 
-		return function() -- line: 22
-			-- upvalues: t1 (copy)
-			for _, v10 in t1 do
-				if v10 and v10.Disconnect then
-					v10:Disconnect()
+		return function()
+			for _, connection in v do
+				if connection and connection.Disconnect then
+					connection:Disconnect()
 				end
 			end
 		end
 	end, {})
-
-	return v6
+	return state
 end
 
 return useIsUserInExperience

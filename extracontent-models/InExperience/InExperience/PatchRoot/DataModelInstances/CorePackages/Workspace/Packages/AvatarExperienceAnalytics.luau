@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.AvatarExperienceAnalytics.AvatarExperienceAnalytics))
+local AvatarExperienceAnalytics = require(Workspace.AvatarExperienceAnalytics.AvatarExperienceAnalytics)
+
+return AvatarExperienceAnalytics

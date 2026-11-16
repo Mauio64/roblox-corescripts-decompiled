@@ -1,65 +1,70 @@
-local ParentParent = script.Parent.Parent
-local Array = require(ParentParent.LuauPolyfill).Array
-local t1 = {}
+local parent = script.Parent.Parent
 
-t1.__index = t1
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-function t1.new(p1) -- line: 36
-	-- upvalues: Array (copy), t1 (copy)
-	local t2 = {}
-	local t3
+local class = {}
+class.__index = class
 
-	if Array.isArray(p1) then
-		t3 = {}
+function class.new(options)
+	local v = {}
+	local headerList
 
-		for _, v8 in p1 do
-			t3[v8[1]] = v8[2]
+	if Array.isArray(options) then
+		headerList = {}
+
+		for _, option in options do
+			headerList[option[1]] = option[2]
 		end
 	else
-		t3 = p1 or {}
+		headerList = options or {}
 	end
 
-	t2.headerList = t3
-	t2.guard = "none"
-	setmetatable(t2, t1)
+	v.headerList = headerList
+	v.guard = "none"
 
-	return t2
+	setmetatable(v, class)
+	return v
 end
-function t1.append(t4: {[any]: any}, s1: string, s2: string) -- line: 56
-	if t4.guard == "immutable" then
+
+function class.append(p, p2: string, p3: string)
+	if p.guard == "immutable" then
 		error("TypeError: tried to append header to immutable Headers object")
 	end
 
-	t4.headerList[s1] = s2
+	p.headerList[p2] = p3
 end
-function t1.delete(t5: {[any]: any}, s3: string) -- line: 64
-	if t5.guard == "immutable" then
+
+function class:delete(p: string)
+	if self.guard == "immutable" then
 		error("TypeError: tried to delete key on immutable Headers object")
 	end
 
-	if not t5:has(s3) then
+	if not self:has(p) then
 		return
 	end
 
-	t5.headerList[s3] = nil
+	self.headerList[p] = nil
 end
-function t1.get(t6: {[any]: any}, s4: string) -- line: 76
-	return t6.headerList[s4]
+
+function class.get(p, p2: string)
+	return p.headerList[p2]
 end
-function t1.has(t7: {[any]: any}, s5: string) -- line: 80
-	return t7.headerList[s5] ~= nil
+
+function class:has(p: string): boolean
+	return self.headerList[p] ~= nil
 end
-function t1.set(t8: {[any]: any}, s6: string, s7: string) -- line: 84
-	if t8.guard == "immutable" then
+
+function class.set(p, p2: string, p3: string)
+	if p.guard == "immutable" then
 		error("TypeError: tried to set key on immutable Headers object")
 	end
 
-	t8.headerList[s6] = s7
-end
-function t1.__iter(p2) -- line: 91
-	return next, p2.headerList
+	p.headerList[p2] = p3
 end
 
-return {
-	Headers = t1
-}
+function class.__iter(p)
+	return next, p.headerList
+end
+
+return { Headers = class }

@@ -1,166 +1,173 @@
 local OnPlatformSurveys = script:FindFirstAncestor("OnPlatformSurveys")
-local OnPlatformSurveysParent = OnPlatformSurveys.Parent
-local Foundation = require(OnPlatformSurveysParent.Foundation)
-local React = require(OnPlatformSurveysParent.React)
+local parent = OnPlatformSurveys.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local Skeleton = Foundation.Skeleton
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local FFlagInlineSurveyEnhancements = require(OnPlatformSurveysParent.SharedFlags).FFlagInlineSurveyEnhancements
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagInlineSurveyEnhancements = SharedFlags.FFlagInlineSurveyEnhancements
+
 local inlineSurveyHelpers = require(OnPlatformSurveys.Utils.inlineSurveyHelpers)
 local Phase = require(OnPlatformSurveys.Enums.Phase)
 local questionRenderers = require(OnPlatformSurveys.Components.Questions.questionRenderers)
-
 require(OnPlatformSurveys.Hooks.inlineSurveyReducer)
 require(OnPlatformSurveys.Types.InlineSurveyTypes)
 
-local function LoadingBody(t1: {[any]: any}) -- line: 60
-	-- upvalues: React (copy), View (copy), Skeleton (copy), EnumsRadius (copy)
-	local Size_600 = t1.tokens.Size.Size_600
-
-	return React.createElement(View, {
-		tag = "col gap-medium size-full-0 auto-y"
-	}, {
+local function LoadingBody(p)
+	local size_600 = p.tokens.Size.Size_600
+	return React.createElement(View, { tag = "col gap-medium size-full-0 auto-y" }, {
 		Line1 = React.createElement(Skeleton, {
-			LayoutOrder = 1,
-			radius = EnumsRadius.Medium,
-			Size = UDim2.new(1, 0, 0, Size_600)
+			radius = Radius.Medium,
+			Size = UDim2.new(1, 0, 0, size_600),
+			LayoutOrder = 1
 		}),
 		Line2 = React.createElement(Skeleton, {
-			LayoutOrder = 2,
-			radius = EnumsRadius.Medium,
-			Size = UDim2.new(1, 0, 0, Size_600)
+			radius = Radius.Medium,
+			Size = UDim2.new(1, 0, 0, size_600),
+			LayoutOrder = 2
 		}),
 		Line3 = React.createElement(Skeleton, {
-			LayoutOrder = 3,
-			radius = EnumsRadius.Medium,
-			Size = UDim2.new(0.6, 0, 0, Size_600)
+			radius = Radius.Medium,
+			Size = UDim2.new(0.6, 0, 0, size_600),
+			LayoutOrder = 3
 		})
 	})
 end
-local function QuestionBody(t2: {[any]: any}) -- line: 83
-	-- upvalues: questionRenderers (copy), Phase (copy), React (copy), View (copy), FoundationText (copy)
-	local v19 = t2.state.questions[t2.state.index]
-	local v20 = questionRenderers.renderQuestion({
-		layoutOrder = 2,
-		question = v19,
-		answer = t2.state.answer,
-		onAnswerChanged = t2.onAnswerChanged,
-		isDisabled = t2.state.phase == Phase.Submitting
+
+local function QuestionBody(p)
+	local question = p.state.questions[p.state.index]
+	local question2 = questionRenderers.renderQuestion({
+		question = question,
+		answer = p.state.answer,
+		onAnswerChanged = p.onAnswerChanged,
+		isDisabled = p.state.phase == Phase.Submitting,
+		layoutOrder = 2
 	})
 
-	return React.createElement(View, {
-		tag = "col gap-xlarge size-full-0 auto-y"
-	}, {
-		Title = React.createElement(FoundationText, {
+	return React.createElement(View, { tag = "col gap-xlarge size-full-0 auto-y" }, {
+		Title = React.createElement(Text, {
+			Text = question.title,
 			tag = "size-full-0 auto-y text-body-large text-wrap text-align-x-left content-emphasis",
-			LayoutOrder = 1,
-			Text = v19.title
+			LayoutOrder = 1
 		}),
-		Input = v20
+		Input = question2
 	})
 end
 
 return {
-	getSlots = function(p1, t3: {[any]: any}, p2, t4: {[any]: any}) -- line: 105
-		-- upvalues: Phase (copy), React (copy), FoundationText (copy), ButtonVariant (copy), LoadingBody (copy), QuestionBody (copy), FFlagInlineSurveyEnhancements (copy), inlineSurveyHelpers (copy)
-		if p1.phase == Phase.Invite then
+	getSlots = function(props, props2, tokens, props3)
+		if props.phase == Phase.Invite then
 			return {
-				headerTitle = t3.surveyTitle,
-				body = React.createElement(FoundationText, {
-					tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-default",
-					Text = t3.inviteBody
+				headerTitle = props2.surveyTitle,
+				body = React.createElement(Text, {
+					Text = props2.inviteBody,
+					tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-default"
 				}),
 				primaryAction = {
-					text = t3.inviteAccept,
+					text = props2.inviteAccept,
 					variant = ButtonVariant.Emphasis,
-					onActivated = t4.onAccept
+					onActivated = props3.onAccept
 				}
 			}
 		end
 
-		if p1.phase == Phase.Loading then
+		if props.phase == Phase.Loading then
 			return {
 				headerTitle = nil,
-				primaryAction = nil,
-				body = React.createElement(LoadingBody, {
-					tokens = p2
-				})
+				body = React.createElement(LoadingBody, { tokens = tokens }),
+				primaryAction = nil
 			}
 		end
 
-		if p1.phase == Phase.Error then
+		if props.phase == Phase.Error then
 			return {
 				headerTitle = nil,
-				body = React.createElement(FoundationText, {
-					tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-center content-default",
-					Text = t3.errorText
+				body = React.createElement(Text, {
+					Text = props2.errorText,
+					tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-center content-default"
 				}),
 				primaryAction = {
-					text = t3.retry,
+					text = props2.retry,
 					variant = ButtonVariant.Standard,
-					onActivated = t4.onRetry
+					onActivated = props3.onRetry
 				}
 			}
 		end
 
-		if p1.phase == Phase.Completed then
+		if props.phase == Phase.Completed then
 			return {
+				headerTitle = props2.completedTitle,
 				body = nil,
-				headerTitle = t3.completedTitle,
 				primaryAction = {
-					text = t3.done,
+					text = props2.done,
 					variant = ButtonVariant.Emphasis,
-					onActivated = t4.onDismiss
+					onActivated = props3.onDismiss
 				}
 			}
 		end
 
-		if (p1.phase == Phase.Started or p1.phase == Phase.Submitting) and p1.questions[p1.index] ~= nil then
-			local v25 = p1.phase == Phase.Submitting
-			local v26 = React.createElement(QuestionBody, {
-				state = p1,
-				onAnswerChanged = t4.onAnswerChanged
-			})
+		if props.phase ~= Phase.Started and props.phase ~= Phase.Submitting or props.questions[props.index] == nil then
+			return { headerTitle = nil, body = nil, primaryAction = nil }
+		end
 
-			if FFlagInlineSurveyEnhancements then
-				local v27 = inlineSurveyHelpers.isLastQuestion(p1.questions, p1.index, p1.answer)
-				local v28 = v25 or not inlineSurveyHelpers.canAdvance(p1.questions, p1.index, p1.answersByQuestionId, p1.answer)
+		local isLoading = props.phase == Phase.Submitting
+		local element = React.createElement(QuestionBody, {
+			state = props,
+			onAnswerChanged = props3.onAnswerChanged
+		})
 
-				return {
-					headerTitle = t3.surveyTitle,
-					body = v26,
-					primaryAction = {
-						text = if not v27 then t3.next else t3.send,
-						variant = ButtonVariant.Emphasis,
-						onActivated = t4.onSubmit,
-						isLoading = v25,
-						isDisabled = v28
-					}
-				}
+		if FFlagInlineSurveyEnhancements then
+			local lastQuestion = inlineSurveyHelpers.isLastQuestion(props.questions, props.index, props.answer)
+
+			local isDisabled = isLoading
+				or not inlineSurveyHelpers.canAdvance(
+					props.questions,
+					props.index,
+					props.answersByQuestionId,
+					props.answer
+				)
+			local v = { headerTitle = props2.surveyTitle, body = element, primaryAction = 0 }
+			local text
+
+			if lastQuestion then
+				text = props2.send
+			else
+				text = props2.next
 			end
 
-			local v29 = inlineSurveyHelpers.mergeCurrentAnswerIntoBatch(p1.answersByQuestionId, p1.questions[p1.index], p1.answer)
-			local v30 = v25 or not inlineSurveyHelpers.canSubmitAll(p1.questions, v29)
-
+			v.primaryAction = {
+				text = text,
+				variant = ButtonVariant.Emphasis,
+				onActivated = props3.onSubmit,
+				isLoading = isLoading,
+				isDisabled = isDisabled
+			}
+			return v
+		else
+			local mergeCurrentAnswerIntoBatch = inlineSurveyHelpers.mergeCurrentAnswerIntoBatch(
+				props.answersByQuestionId,
+				props.questions[props.index],
+				props.answer
+			)
+			local isDisabled = isLoading
+				or not inlineSurveyHelpers.canSubmitAll(props.questions, mergeCurrentAnswerIntoBatch)
 			return {
-				headerTitle = t3.surveyTitle,
-				body = v26,
+				headerTitle = props2.surveyTitle,
+				body = element,
 				primaryAction = {
-					text = t3.send,
+					text = props2.send,
 					variant = ButtonVariant.Emphasis,
-					onActivated = t4.onSubmit,
-					isLoading = v25,
-					isDisabled = v30
+					onActivated = props3.onSubmit,
+					isLoading = isLoading,
+					isDisabled = isDisabled
 				}
 			}
 		end
-
-		return {
-			headerTitle = nil,
-			body = nil,
-			primaryAction = nil
-		}
 	end
 }

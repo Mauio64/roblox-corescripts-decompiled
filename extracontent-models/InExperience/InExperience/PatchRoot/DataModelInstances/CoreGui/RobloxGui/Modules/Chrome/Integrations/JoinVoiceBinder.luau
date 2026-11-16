@@ -1,193 +1,191 @@
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local CorePackages = game:GetService("CorePackages")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local React = require(CorePackages.Packages.React)
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local Signals = require(CorePackages.Packages.Signals)
+
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
+
 local CrossExperienceVoice = require(CorePackages.Workspace.Packages.CrossExperienceVoice)
 local CrossExperience = require(CorePackages.Workspace.Packages.CrossExperience)
-local v8 = if not require(CorePackages.Workspace.Packages.Chrome).Enabled() then nil else require(Chrome.ChromeShared.Service)
+
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local Service
+
+if Chrome2.Enabled() then
+	Service = require(Chrome.ChromeShared.Service)
+else
+	Service = nil
+end
+
 local isVoiceFocused = CrossExperience.Utils.isVoiceFocused
 local useIsVoiceFocused = CrossExperienceVoice.Hooks.useIsVoiceFocused
 local useIsVoiceConnecting = CrossExperienceVoice.Hooks.useIsVoiceConnecting
+
 local Constants = require(RobloxGui.Modules.VoiceChat.Constants)
 local VOICE_JOIN_PROGRESS = Constants.VOICE_JOIN_PROGRESS
 local PromptType = require(RobloxGui.Modules.VoiceChatPrompt.PromptType)
-local GetFFlagEnableConnectDisconnectInSettingsAndChrome = require(RobloxGui.Modules.Flags.GetFFlagEnableConnectDisconnectInSettingsAndChrome)
-local GetFFlagIntegratePhoneUpsellJoinVoice = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagIntegratePhoneUpsellJoinVoice
-local GetFFlagEnableVoiceUxUpdates = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableVoiceUxUpdates
-local FFlagVoiceRewarmTelemetry = require(CorePackages.Workspace.Packages.SharedFlags).FFlagVoiceRewarmTelemetry
 
-local function v19() -- line: 43
-	-- upvalues: default (copy), FFlagVoiceRewarmTelemetry (copy)
-	default:reportJoinVoiceUpsellEvent("Shown", if not FFlagVoiceRewarmTelemetry then nil else default.joinVoiceButtonContext)
-end
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagIntegratePhoneUpsellJoinVoice = SharedFlags.GetFFlagIntegratePhoneUpsellJoinVoice
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagVoiceRewarmTelemetry = SharedFlags2.FFlagVoiceRewarmTelemetry
 
-local u20 = false
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagProactiveVoiceRestrictionsUFR = SharedFlags3.FFlagProactiveVoiceRestrictionsUFR
+local FFlagVoiceRewarmGrafanaMetrics = require(RobloxGui.Modules.VoiceChat.Flags.FFlagVoiceRewarmGrafanaMetrics)
 
-local function v21(...) -- line: 33
-	-- upvalues: u20 (ref), v19 (copy)
-	if not u20 then
-		u20 = true
+local function fn()
+	local v
 
-		return v19(...)
+	if FFlagVoiceRewarmTelemetry then
+		v = default.joinVoiceButtonContext
 	end
 
-	return nil
+	default:reportJoinVoiceUpsellEvent("Shown", v)
 end
-local function JoinVoiceBinder() -- line: 50
-	-- upvalues: useIsVoiceFocused (copy), useIsVoiceConnecting (copy), React (copy), v8 (copy), v21 (copy), GetFFlagIntegratePhoneUpsellJoinVoice (copy), default (copy), isVoiceFocused (copy), VOICE_JOIN_PROGRESS (copy), GetFFlagEnableVoiceUxUpdates (copy), Constants (copy), PromptType (copy), GetFFlagEnableConnectDisconnectInSettingsAndChrome (copy)
-	local v25 = useIsVoiceFocused()
-	local v26 = useIsVoiceConnecting()
-	local v27 = React.useMemo(function() -- line: 53
-		-- upvalues: v25 (copy), v26 (copy)
-		return v25 or v26
-	end, {
-		v26,
-		v25
-	})
-	local v28 = React.useMemo(function() -- line: 57
-		-- upvalues: v8 (copy)
-		if v8 then
-			return v8:integrations().join_voice
+
+local function fn2(fn3) -- 1 equivalent call inferred from this helper
+	local flag = false
+	return function(...)
+		if flag then
+			return nil
+		end
+
+		flag = true
+		return fn3(...)
+	end
+end
+
+local v = fn2(fn) -- inferred equivalent call
+
+local function JoinVoiceBinder(): nil
+	local v2 = useIsVoiceFocused()
+	local v3 = useIsVoiceConnecting()
+	local v4 = React.useMemo(function()
+		return v2 or v3
+	end, { v3, v2 })
+
+	local v5 = React.useMemo(function()
+		if Service then
+			return Service:integrations().join_voice
 		end
 
 		return nil
 	end, {})
-	local v29 = React.useCallback(function(n1: number) -- line: 64
-		-- upvalues: v28 (copy), v8 (copy), v25 (copy), v21 (copy)
-		if not v28 or not v8 then
+
+	local v6 = React.useCallback(function(p: number)
+		if not (v5 and Service) then
 			return
 		end
 
-		if not v25 then
-			if n1 == v8.AvailabilitySignal.Available then
-				v21()
-				v28.availability:available()
+		if FFlagProactiveVoiceRestrictionsUFR and default:GetVoiceRestrictionState(false) ~= "normal" then
+			v5.availability:unavailable()
+		elseif not v2 then
+			if p == Service.AvailabilitySignal.Available then
+				v()
 
-				return
-			end
+				if FFlagVoiceRewarmGrafanaMetrics then
+					default:reportVoiceRewarmShown()
+				end
 
-			if n1 == v8.AvailabilitySignal.Unavailable then
-				v28.availability:unavailable()
+				v5.availability:available()
+			elseif p == Service.AvailabilitySignal.Unavailable then
+				v5.availability:unavailable()
 			end
 		end
 	end, {})
-	local v30 = React.useCallback(function() -- line: 79
-		-- upvalues: v8 (copy), GetFFlagIntegratePhoneUpsellJoinVoice (copy), default (copy), v27 (copy), isVoiceFocused (copy), v29 (copy)
-		if not v8 then
+
+	local v7 = React.useCallback(function()
+		if not Service then
 			return
 		end
 
 		if GetFFlagIntegratePhoneUpsellJoinVoice() then
-			task.spawn(function() -- line: 85
-				-- upvalues: default (copy), v27 (copy), isVoiceFocused (copy), v29 (copy), v8 (copy)
-				if default:ShouldShowJoinVoice() and (not v27 and not isVoiceFocused()) then
-					v29(v8.AvailabilitySignal.Available)
+			task.spawn(function()
+				if default:ShouldShowJoinVoice() and not (v4 or isVoiceFocused()) then
+					v6(Service.AvailabilitySignal.Available)
 				end
 			end)
+		elseif default:ShouldShowJoinVoice() and not (v4 or isVoiceFocused()) then
+			v6(Service.AvailabilitySignal.Available)
+		end
+	end, { v5, v4 })
 
+	local v8 = React.useCallback(function(p)
+		if not v5 then
 			return
 		end
 
-		if default:ShouldShowJoinVoice() and not v27 and not isVoiceFocused() then
-			v29(v8.AvailabilitySignal.Available)
-		end
-	end, {
-		v28,
-		v27
-	})
-	local v31 = React.useCallback(function(p1) -- line: 101
-		-- upvalues: v28 (copy), v27 (copy), isVoiceFocused (copy), VOICE_JOIN_PROGRESS (copy), v30 (copy), GetFFlagEnableVoiceUxUpdates (copy), default (copy), Constants (copy), PromptType (copy)
-		if not v28 then
-			return
-		end
-
-		if v27 or isVoiceFocused() then
-			v28.availability:unavailable()
-
-			return
-		end
-
-		if p1 == VOICE_JOIN_PROGRESS.Idle then
-			v30()
-
-			return
-		end
-
-		if not GetFFlagEnableVoiceUxUpdates() and p1 == VOICE_JOIN_PROGRESS.Suspended then
-			v28.availability:available()
-
-			return
-		end
-
-		if p1 == VOICE_JOIN_PROGRESS.Joined then
-			v28.availability:unavailable()
+		if FFlagProactiveVoiceRestrictionsUFR and default:GetVoiceRestrictionState(false) ~= "normal" then
+			v5.availability:unavailable()
+		elseif v4 or isVoiceFocused() then
+			v5.availability:unavailable()
+		elseif p == VOICE_JOIN_PROGRESS.Idle then
+			v7()
+		elseif p == VOICE_JOIN_PROGRESS.Joined then
+			v5.availability:unavailable()
 
 			if default.inExpUpsellEntrypoint == Constants.IN_EXP_UPSELL_ENTRYPOINTS.JOIN_VOICE then
 				default:ToggleMic()
 				default:showPrompt(PromptType.VoiceConsentAcceptedToast)
 			end
 		end
-	end, {
-		v28,
-		v27
-	})
-	local v32 = React.useCallback(function() -- line: 122
-		-- upvalues: v28 (copy)
-		v28.availability:unavailable()
-	end, { v28 })
-	local v33 = React.useCallback(function() -- line: 126
-		-- upvalues: v27 (copy), isVoiceFocused (copy), v28 (copy)
-		if v27 or isVoiceFocused() then
-			v28.availability:unavailable()
+	end, { v5, v4 })
 
-			return
+	local v9 = React.useCallback(function()
+		v5.availability:unavailable()
+	end, { v5 })
+
+	local v10 = React.useCallback(function()
+		local v10
+
+		if FFlagProactiveVoiceRestrictionsUFR and v5 then
+			v10 = Signals.createEffect(function(p)
+				if default:GetVoiceRestrictionState(p) ~= "normal" then
+					v5.availability:unavailable()
+				end
+			end)
+		else
+			v10 = nil
 		end
 
-		v28.availability:available()
-	end, {
-		v28,
-		v27
-	})
-	local v34 = React.useCallback(function() -- line: 134
-		-- upvalues: default (copy), v31 (copy), GetFFlagEnableConnectDisconnectInSettingsAndChrome (copy), v32 (copy), GetFFlagEnableVoiceUxUpdates (copy), v33 (copy)
-		local connection = nil
-		local connection2 = nil
-		local connection3 = default.VoiceJoinProgressChanged.Event:Connect(v31)
+		local eventConnection = default.VoiceJoinProgressChanged.Event:Connect(v8)
+		local eventConnection2 = default.showVoiceUI.Event:Connect(v9)
 
-		if GetFFlagEnableConnectDisconnectInSettingsAndChrome() then
-			connection = default.showVoiceUI.Event:Connect(v32)
-
-			if not GetFFlagEnableVoiceUxUpdates() then
-				connection2 = default.hideVoiceUI.Event:Connect(v33)
-			end
-		end
-
-		return function() -- line: 146
-			-- upvalues: connection3 (copy), connection (ref), connection2 (ref)
-			if connection3 then
-				connection3:Disconnect()
+		return function()
+			if v10 then
+				v10()
 			end
 
-			if connection then
-				connection:Disconnect()
+			if eventConnection then
+				eventConnection:Disconnect()
 			end
 
-			if connection2 then
-				connection2:Disconnect()
+			if eventConnection2 then
+				eventConnection2:Disconnect()
 			end
 		end
 	end, {})
 
-	React.useEffect(function() -- line: 159
-		-- upvalues: v30 (copy), v34 (copy)
-		v30()
-		v34()
+	React.useEffect(function()
+		v7()
+
+		if FFlagProactiveVoiceRestrictionsUFR then
+			return v10()
+		end
+
+		v10()
+		return nil
 	end, {})
-	React.useEffect(function() -- line: 164
-		-- upvalues: v31 (copy), default (copy)
-		v31(default.VoiceJoinProgress)
-	end, { v27 })
+
+	React.useEffect(function()
+		v8(default.VoiceJoinProgress)
+	end, { v4 })
 
 	return nil
 end

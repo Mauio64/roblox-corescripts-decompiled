@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.SettingsService.SettingsService))
+local SettingsService = require(Workspace.SettingsService.SettingsService)
+
+return SettingsService

@@ -1,5 +1,6 @@
+local SceneAnalysisContext = require(script.SceneAnalysisContext)
 return {
-	SceneAnalysisProvider = require(script.SceneAnalysisContext).Provider,
+	SceneAnalysisProvider = SceneAnalysisContext.Provider,
 	useAssetsInView = require(script.useAssetsInView),
 	useAssetsInRange = require(script.useAssetsInRange),
 	useAudibleSounds = require(script.useAudibleSounds)

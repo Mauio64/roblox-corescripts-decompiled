@@ -1,8 +1,17 @@
 local selectTryOnBodyIds = require(script.Parent.selectTryOnBodyIds)
 
-local function selectHasBodyTryOn(p1) -- line: 3
-	-- upvalues: selectTryOnBodyIds (copy)
-	return #selectTryOnBodyIds(p1) > 0 or p1.AvatarExperience.AvatarScene.OutfitTryOn ~= nil and p1.AvatarExperience.AvatarScene.OutfitTryOn.LookId ~= nil
+local function selectHasBodyTryOn(p)
+	local hasBodyTryOn
+
+	if #selectTryOnBodyIds(p) > 0 then
+		hasBodyTryOn = true
+	elseif p.AvatarExperience.AvatarScene.OutfitTryOn == nil then
+		hasBodyTryOn = false
+	else
+		hasBodyTryOn = p.AvatarExperience.AvatarScene.OutfitTryOn.LookId ~= nil
+	end
+
+	return hasBodyTryOn
 end
 
 return selectHasBodyTryOn

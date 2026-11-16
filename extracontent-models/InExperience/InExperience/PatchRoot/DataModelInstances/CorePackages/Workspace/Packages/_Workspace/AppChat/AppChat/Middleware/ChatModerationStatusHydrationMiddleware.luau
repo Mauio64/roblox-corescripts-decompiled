@@ -1,31 +1,40 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local parent = AppChat.Parent
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local UserLib = require(parent.UserLib)
+local ClearUserSpecificData = UserLib.Actions.ClearUserSpecificData
+
 local RemovedConversation = require(AppChat.Conversations.Actions.RemovedConversation)
 local GetChatModerationStatusDataHydration = require(AppChat.Stores.GetChatModerationStatusDataHydration)
 
-local function ChatModerationStatusHydrationMiddleware(p1: ((...any) -> ...any), _) -- line: 11
-	-- upvalues: AppChatNetworking (copy), GetChatModerationStatusDataHydration (copy), RemovedConversation (copy)
-	return function(p3) -- line: 12
-		-- upvalues: p1 (copy), AppChatNetworking (copy), GetChatModerationStatusDataHydration (copy), RemovedConversation (copy)
-		local v10 = p1(p3)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
+local FFlagAppChatUseDataHydrationForChatTimeouts = require(AppChat.Flags.FFlagAppChatUseDataHydrationForChatTimeouts)
 
-		if p3.type == AppChatNetworking.rodux.GetChatModerationStatuses.Succeeded.name then
-			local v11 = if not p3.postBody then {} else p3.postBody.ids or {}
+local function ChatModerationStatusHydrationMiddleware(callback, _)
+	return function(data)
+		local v = callback(data)
 
-			GetChatModerationStatusDataHydration(false).ingestResponse(p3.responseBody, {
-				includeUser = #v11 == 0,
-				conversationIds = v11
+		if data.type == AppChatNetworking.rodux.GetChatModerationStatuses.Succeeded.name then
+			local ids = data.postBody and data.postBody.ids or {}
+			GetChatModerationStatusDataHydration(false).ingestResponse(data.responseBody, {
+				includeUser = FFlagAppChatReactiveFeatureRestrictions or #ids == 0,
+				conversationIds = ids
 			})
-
-			return v10
+			return v
 		end
 
-		if p3.type == RemovedConversation.name and p3.conversationId then
-			GetChatModerationStatusDataHydration(false).setConversationStatusNone(p3.conversationId)
+		if data.type == RemovedConversation.name and data.conversationId then
+			GetChatModerationStatusDataHydration(false).setConversationStatusNone(data.conversationId)
+			return v
 		end
 
-		return v10
+		if FFlagAppChatUseDataHydrationForChatTimeouts and data.type == ClearUserSpecificData.name then
+			GetChatModerationStatusDataHydration(false).clear()
+		end
+
+		return v
 	end
 end
 

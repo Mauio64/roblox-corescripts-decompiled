@@ -1,60 +1,58 @@
 game:DefineFastFlag("LoggingRethrowUsingError", false)
 
-local function GetFFlagLoggingRethrowUsingError() -- line: 8
+local function GetFFlagLoggingRethrowUsingError() -- 1 equivalent call inferred from this helper
 	return game:GetFastFlag("LoggingRethrowUsingError")
 end
 
-local u2 = true
-local t1 = {}
+local v = true
+local v2 = {}
 
-local function createLogInfo() -- line: 15
-	local t2 = {
-		warnings = {}
-	}
+local function createLogInfo()
+	local logInfo = { warnings = {} }
 
-	setmetatable(t2, {
-		__tostring = function(p1) -- line: 21
-			return ("LogInfo\n\tWarnings (%d):\n\t\t%s"):format(#p1.warnings, table.concat(p1.warnings, "\n\t\t"))
+	setmetatable(logInfo, {
+		__tostring = function(p)
+			return ("LogInfo\n\tWarnings (%d):\n\t\t%s"):format(#p.warnings, table.concat(p.warnings, "\n\t\t"))
 		end
 	})
 
-	return t2
+	return logInfo
 end
 
-return {
-	capture = function(p2) -- line: 31
-		-- upvalues: createLogInfo (copy), u2 (ref), t1 (copy)
-		local v7 = createLogInfo()
-		local v8 = u2
+local Logging = {}
 
-		u2 = false
-		t1[v7] = true
+function Logging.capture(callback)
+	local logInfo = createLogInfo()
 
-		local ok, result = pcall(p2)
+	local v3 = v
+	v = false
+	v2[logInfo] = true
 
-		t1[v7] = nil
-		u2 = v8
+	local success, result = pcall(callback)
 
-		if game:GetFastFlag("LoggingRethrowUsingError") then
-			if not ok then
-				error(result)
+	v2[logInfo] = nil
+	v = v3
 
-				return v7
-			end
-		else
-			assert(ok, result)
+	if GetFFlagLoggingRethrowUsingError() then -- inferred equivalent call
+		if not success then
+			error(result)
+			return logInfo
 		end
-
-		return v7
-	end,
-	warn = function(p3) -- line: 54
-		-- upvalues: t1 (copy), u2 (ref)
-		for k in pairs(t1) do
-			table.insert(k.warnings, p3)
-		end
-
-		if u2 then
-			warn(p3)
-		end
+	else
+		assert(success, result)
 	end
-}
+
+	return logInfo
+end
+
+function Logging.warn(p)
+	for k in pairs(v2) do
+		table.insert(k.warnings, p)
+	end
+
+	if v then
+		warn(p)
+	end
+end
+
+return Logging

@@ -1,11 +1,7 @@
 return {
-	stringIndexOf = function(s1: string, s2: string) -- line: 11
-		local start, _ = string.find(s1, s2)
+	stringIndexOf = function(value: string, p: string)
+		local v, _ = string.find(value, p)
 
-		if start == nil then
-			return -1
-		end
-
-		return start
+		return if v == nil then -1 else v
 	end
 }

@@ -1,78 +1,73 @@
 local InlineLayout = script:FindFirstAncestor("InlineLayout")
-local InlineLayoutParent = InlineLayout.Parent
-local React = require(InlineLayoutParent.React)
+local parent = InlineLayout.Parent
+
+local React = require(parent.React)
 local InlineElementType = require(InlineLayout.Utils.InlineElementType)
-local t1 = {}
 
-t1.__index = t1
-t1.__type = InlineElementType
+local class = {}
+class.__index = class
+class.__type = InlineElementType
 
-function t1.new(n1: number, b1: boolean?) -- line: 12
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
-
-	self.width = n1
-	self.canForceSplit = b1
-
+function class.new(width: number, canForceSplit: boolean?)
+	local self = setmetatable({}, class)
+	self.width = width
+	self.canForceSplit = canForceSplit
 	return self
 end
-function t1.getWidth(p1) -- line: 19
-	return p1.width
+
+function class.getWidth(p)
+	return p.width
 end
-function t1.split(t2: {[any]: any}, _: number, _: boolean?) -- line: 23
-	-- upvalues: t1 (copy)
-	return t1.new(t2.width, t2.canForceSplit)
+
+function class.split(p, _: number, _: boolean?)
+	return class.new(p.width, p.canForceSplit)
 end
-function t1.render(t3: {[any]: any}, p2, n3: number) -- line: 28
-	-- upvalues: React (copy)
+
+function class.render(p, p2, layoutOrder: number)
 	return React.createElement("TextLabel", {
-		key = tostring(n3),
-		LayoutOrder = n3,
-		Size = UDim2.new(0, t3.width, 0, 20),
-		Text = `{ p2 }`
+		key = tostring(layoutOrder),
+		LayoutOrder = layoutOrder,
+		Size = UDim2.fromOffset(p.width, 20),
+		Text = `{p2}`
 	})
 end
 
-local t4 = {}
+local class2 = {}
+class2.__index = class2
+class2.__type = InlineElementType
 
-t4.__index = t4
-t4.__type = InlineElementType
-
-function t4.new(n4: number, b3: boolean?) -- line: 42
-	-- upvalues: t4 (copy)
-	local self = setmetatable({}, t4)
-
-	self.width = n4
-	self.canForceSplit = b3
-
+function class2.new(width: number, canForceSplit: boolean?)
+	local self = setmetatable({}, class2)
+	self.width = width
+	self.canForceSplit = canForceSplit
 	return self
 end
-function t4.getWidth(p3) -- line: 49
-	return p3.width
-end
-function t4.split(t5: {[any]: any}, n5: number, b4: boolean?) -- line: 53
-	-- upvalues: t4 (copy)
-	local v24 = math.floor(t5.width / 2)
-	local v25 = t5.width - v24
 
-	if b4 and n5 < v24 then
-		v24 = n5
-		v25 = t5.width - n5
+function class2.getWidth(p)
+	return p.width
+end
+
+function class2.split(p, p2: number, flag: boolean?)
+	local v = math.floor(p.width / 2)
+
+	local v2 = p.width - v
+
+	if flag and p2 < v then
+		v2 = p.width - p2
+	else
+		p2 = v
 	end
 
-	return t4.new(v24, t5.canForceSplit), (t4.new(v25, t5.canForceSplit))
+	return class2.new(p2, p.canForceSplit), (class2.new(v2, p.canForceSplit))
 end
-function t4.render(t6: {[any]: any}, p4, n6: number) -- line: 70
-	-- upvalues: React (copy)
+
+function class2.render(p, p2, layoutOrder: number)
 	return React.createElement("TextLabel", {
-		key = tostring(n6),
-		LayoutOrder = n6,
-		Size = UDim2.new(0, t6.width, 0, 20),
-		Text = `{ p4 }`
+		key = tostring(layoutOrder),
+		LayoutOrder = layoutOrder,
+		Size = UDim2.fromOffset(p.width, 20),
+		Text = `{p2}`
 	})
 end
 
-return {
-	MockInlineElement = t1,
-	SplittableMockInlineElement = t4
-}
+return { MockInlineElement = class, SplittableMockInlineElement = class2 }

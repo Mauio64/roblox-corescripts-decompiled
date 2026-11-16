@@ -1,46 +1,43 @@
-local Parent = script:FindFirstAncestor("VrSpatialUi").Parent
-local VRUtil = require(Parent.VrCommon).VRUtil
-local v3 = game:DefineFastInt("SpatialUIHeadLookDotNoMovementThreshold", 990) / 1000
-local t1 = {}
+local parent = script:FindFirstAncestor("VrSpatialUi").Parent
+local VrCommon = require(parent.VrCommon)
+local VRUtil = VrCommon.VRUtil
 
-t1.__index = t1
+local v = game:DefineFastInt("SpatialUIHeadLookDotNoMovementThreshold", 990) / 1000
 
-function t1.getCurrentStableCameraCFrame(p1) -- line: 18
-	return p1.lastCameraCFrame
+local StableCameraCache = {}
+
+StableCameraCache.__index = StableCameraCache
+
+function StableCameraCache.getCurrentStableCameraCFrame(p)
+	return p.lastCameraCFrame
 end
-function t1.updateAndCheckCameraMoved(p2) -- line: 22
-	-- upvalues: VRUtil (copy), v3 (copy)
-	local v7 = VRUtil.GetUserCFrameWorldSpace(Enum.UserCFrame.Head)
 
-	if not p2.lastUserHeadCFrame then
-		p2.lastUserHeadCFrame = v7
-		p2.lastCameraCFrame = workspace.CurrentCamera.CFrame
+function StableCameraCache:updateAndCheckCameraMoved(): boolean
+	local userCFrameWorldSpace = VRUtil.GetUserCFrameWorldSpace(Enum.UserCFrame.Head)
 
+	if self.lastUserHeadCFrame then
+		local v2 = workspace.CurrentCamera.CameraType == Enum.CameraType.Scriptable
+		local v3 = self.lastUserHeadCFrame.LookVector:Dot(userCFrameWorldSpace.LookVector) < v
+
+		if v2 and not v3 then
+			return false
+		end
+
+		self.lastUserHeadCFrame = userCFrameWorldSpace
+		self.lastCameraCFrame = workspace.CurrentCamera.CFrame
 		return true
 	end
 
-	local v8 = workspace.CurrentCamera.CameraType == Enum.CameraType.Scriptable
-	local v9 = p2.lastUserHeadCFrame.LookVector:Dot(v7.LookVector) < v3
-
-	if not v8 or v9 then
-		p2.lastUserHeadCFrame = v7
-		p2.lastCameraCFrame = workspace.CurrentCamera.CFrame
-
-		return true
-	end
-
-	return false
-end
-function t1.new() -- line: 44
-	-- upvalues: t1 (copy)
-	local t2 = {
-		lastUserHeadCFrame = nil,
-		lastCameraCFrame = nil
-	}
-
-	setmetatable(t2, t1)
-
-	return t2
+	self.lastUserHeadCFrame = userCFrameWorldSpace
+	self.lastCameraCFrame = workspace.CurrentCamera.CFrame
+	return true
 end
 
-return t1
+function StableCameraCache.new()
+	local v2 = { lastUserHeadCFrame = nil, lastCameraCFrame = nil }
+
+	setmetatable(v2, StableCameraCache)
+	return v2
+end
+
+return StableCameraCache

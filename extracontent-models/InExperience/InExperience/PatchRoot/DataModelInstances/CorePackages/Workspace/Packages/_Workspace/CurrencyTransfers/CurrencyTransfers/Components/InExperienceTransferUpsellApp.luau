@@ -1,36 +1,41 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
+local parent = CurrencyTransfers.Parent
+local React = require(parent.React)
+
 local InExperienceRobuxTransferSubscriptionUpsell = require(CurrencyTransfers.Components.InExperienceRobuxTransferSubscriptionUpsell)
+
 local useRobuxTransferSubscriptionUpsellListenerEffect = require(CurrencyTransfers.Hooks.useRobuxTransferSubscriptionUpsellListenerEffect)
 
-local function InExperienceTransferUpsellApp() -- line: 16
-	-- upvalues: React (copy), useRobuxTransferSubscriptionUpsellListenerEffect (copy), InExperienceRobuxTransferSubscriptionUpsell (copy)
-	local v7, v8 = React.useState(false)
-	local v9 = React.useCallback(function() -- line: 19
-		-- upvalues: v8 (copy)
-		v8(true)
-	end, {})
-	local v10 = React.useCallback(function() -- line: 23
-		-- upvalues: v8 (copy)
-		v8(false)
+local function InExperienceTransferUpsellApp()
+	local state, setState = React.useState(false)
+
+	local v = React.useCallback(function()
+		setState(true)
 	end, {})
 
-	useRobuxTransferSubscriptionUpsellListenerEffect(v9)
+	local onClose = React.useCallback(function()
+		setState(false)
+	end, {})
 
-	if not v7 then
-		return nil
+	useRobuxTransferSubscriptionUpsellListenerEffect(v)
+
+	if state then
+		return React.createElement(
+			"ScreenGui",
+			{
+				ScreenInsets = Enum.ScreenInsets.None,
+				ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+				DisplayOrder = 8
+			},
+			{
+				SubscriptionUpsell = React.createElement(InExperienceRobuxTransferSubscriptionUpsell, {
+					onClose = onClose
+				})
+			}
+		)
 	end
 
-	return React.createElement("ScreenGui", {
-		DisplayOrder = 8,
-		ScreenInsets = Enum.ScreenInsets.None,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, {
-		SubscriptionUpsell = React.createElement(InExperienceRobuxTransferSubscriptionUpsell, {
-			onClose = v10
-		})
-	})
+	return nil
 end
 
 return InExperienceTransferUpsellApp

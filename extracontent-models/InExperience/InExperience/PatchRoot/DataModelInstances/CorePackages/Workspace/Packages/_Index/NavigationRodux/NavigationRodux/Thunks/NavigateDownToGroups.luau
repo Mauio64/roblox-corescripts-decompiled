@@ -1,23 +1,24 @@
 local NavigationRodux = script:FindFirstAncestor("NavigationRodux")
-local NavigationRoduxParent = NavigationRodux.Parent
-local GetFFlagUseCommunitiesTranslation = require(NavigationRoduxParent.SharedFlags).GetFFlagUseCommunitiesTranslation
+local parent = NavigationRodux.Parent
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagUseCommunitiesTranslation = SharedFlags.GetFFlagUseCommunitiesTranslation
+
 local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
-local RobloxAppEnums = require(NavigationRoduxParent.RobloxAppEnums)
-local UrlBuilder = require(NavigationRoduxParent.UrlBuilder)
-local t = require(NavigationRoduxParent.t)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local UrlBuilder = require(parent.UrlBuilder)
+local t = require(parent.t)
+
 local AppPage = RobloxAppEnums.AppPage
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local urlBuilder = UrlBuilder.UrlBuilder
 
-return function(p1) -- line: 14
-	-- upvalues: t (copy), NavigateDown (copy), AppPage (copy), UrlBuilder2 (copy), GetFFlagUseCommunitiesTranslation (copy)
-	assert(t.callback(p1) or t.none(p1), "")
-
+return function(onClose)
+	assert(t.callback(onClose) or t.none(onClose), "")
 	return NavigateDown({
 		name = AppPage.GenericWebPage,
-		detail = UrlBuilder2.static.groups(),
+		detail = urlBuilder.static.groups(),
 		extraProps = {
-			titleKey = not GetFFlagUseCommunitiesTranslation() and "CommonUI.Features.Label.sGroups" or "CommonUI.Features.Label.Groups",
-			onClose = p1
+			titleKey = GetFFlagUseCommunitiesTranslation() and "CommonUI.Features.Label.Groups" or "CommonUI.Features.Label.sGroups",
+			onClose = onClose
 		}
 	})
 end

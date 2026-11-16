@@ -1,10 +1,10 @@
-local function parseErrorReasonToEconomicRestriction(s1: string) -- line: 1
-	local parts = string.split(s1, "/")
-	local v4 = #parts
+local function parseErrorReasonToEconomicRestriction(value: string)
+	local v = string.split(value, "/")
 
+	local count = #v
 	return {
-		timeoutMinutes = parts[v4],
-		violationType = parts[v4 - 1]
+		timeoutMinutes = v[count],
+		violationType = v[count - 1]
 	}
 end
 

@@ -1,12 +1,9 @@
-local Parent = script:FindFirstAncestor("GameDetailRodux").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("GameDetailRodux").Parent
 
-return function(p1, p2) -- line: 28
-	-- upvalues: Url (copy)
-	local t1 = {
-		placeIds = p2
-	}
-	local v6 = Url:makeQueryString(t1)
+local Http = require(parent.Http)
+local Url = Http.Url
 
-	return p1(string.format("%s/v1/games/multiget-place-details?%s", Url.GAME_URL, v6), "GET")
+return function(callback, placeIds)
+	local queryString = Url:makeQueryString({ placeIds = placeIds })
+	return callback(string.format("%s/v1/games/multiget-place-details?%s", Url.GAME_URL, queryString), "GET")
 end

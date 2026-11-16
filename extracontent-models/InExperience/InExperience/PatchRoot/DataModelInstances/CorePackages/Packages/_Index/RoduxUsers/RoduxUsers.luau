@@ -1,29 +1,26 @@
 local Reducers = require(script.Reducers)
 local Actions = require(script.Actions)
 local Models = require(script.Models)
-local scriptParent = script.Parent
-local Cryo = require(scriptParent.Cryo)
-local RoduxNetworking = require(scriptParent.RoduxNetworking)
-local FriendsNetworking = require(scriptParent.FriendsNetworking)
-local UsersNetworking = require(scriptParent.UsersNetworking)
+
+local parent = script.Parent
+local Cryo = require(parent.Cryo)
+local RoduxNetworking = require(parent.RoduxNetworking)
+local FriendsNetworking = require(parent.FriendsNetworking)
+local UsersNetworking = require(parent.UsersNetworking)
 local roduxUsersTypes = require(script.roduxUsersTypes)
 
 return {
-	config = function(p1) -- line: 13
-		-- upvalues: Cryo (copy), UsersNetworking (copy), RoduxNetworking (copy), FriendsNetworking (copy), Reducers (copy), Actions (copy), Models (copy), roduxUsersTypes (copy)
-		local u11 = Cryo.Dictionary.join(p1, {
-			usersNetworking = UsersNetworking.config({
-				roduxNetworking = RoduxNetworking.mock()
-			}),
+	config = function(p)
+		local joined = Cryo.Dictionary.join(p, {
+			usersNetworking = UsersNetworking.config({ roduxNetworking = RoduxNetworking.mock() }),
 			friendsNetworking = FriendsNetworking.config({
 				roduxNetworking = RoduxNetworking.mock()
 			})
 		})
 
 		return {
-			installReducer = function() -- line: 24
-				-- upvalues: Reducers (copy), u11 (ref)
-				return Reducers(u11)
+			installReducer = function()
+				return Reducers(joined)
 			end,
 			Actions = Actions,
 			Models = Models,

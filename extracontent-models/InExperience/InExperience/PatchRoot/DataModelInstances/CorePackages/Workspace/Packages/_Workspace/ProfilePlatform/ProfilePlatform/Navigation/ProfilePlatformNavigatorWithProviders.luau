@@ -1,62 +1,81 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local Cryo = require(ProfilePlatformParent.Cryo)
-local React = require(ProfilePlatformParent.React)
-local AppCommonLib = require(ProfilePlatformParent.AppCommonLib)
-local SubPages = require(ProfilePlatformParent.SocialLuaAnalytics).Analytics.Enums.SubPages
+local parent = ProfilePlatform.Parent
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local AppCommonLib = require(parent.AppCommonLib)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local SubPages = SocialLuaAnalytics.Analytics.Enums.SubPages
 local initializeProfileAnalytics = require(ProfilePlatform.Analytics.initializeProfileAnalytics)
 local ProfileAnalyticsContext = require(ProfilePlatform.Contexts.ProfileAnalyticsContext)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 local ProfileScrollContextProvider = require(ProfilePlatform.Contexts.ProfileScrollContext.ProfileScrollContextProvider)
 local HttpService = game:GetService("HttpService")
-local FFlagProfilePlatformEnableImpressions = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableImpressions
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableImpressions = SharedFlags.FFlagProfilePlatformEnableImpressions
+
 local ProfilePlatformNavigator = require(script.Parent.ProfilePlatformNavigator)
 
-local function v14(p1) -- line: 18
-	-- upvalues: FFlagProfilePlatformEnableImpressions (copy), React (copy), useProfileWrapperContext (copy), AppCommonLib (copy), HttpService (copy), initializeProfileAnalytics (copy), SubPages (copy), Cryo (copy), ProfileAnalyticsContext (copy), ProfileScrollContextProvider (copy), ProfilePlatformNavigator (copy)
-	local v17 = if not FFlagProfilePlatformEnableImpressions then React.createRef() else nil
-	local v18 = useProfileWrapperContext()
-	local profileId = v18.profileId
-	local v20 = if not FFlagProfilePlatformEnableImpressions then nil else AppCommonLib.Signal.new()
-	local v21 = React.useMemo(function() -- line: 27
-		-- upvalues: FFlagProfilePlatformEnableImpressions (copy), v17 (copy), HttpService (copy), initializeProfileAnalytics (copy), v18 (copy), profileId (copy), SubPages (copy), Cryo (copy), v20 (copy)
-		if not FFlagProfilePlatformEnableImpressions and v17.current == nil then
-			v17.current = HttpService:GenerateGUID(false)
+local function fn(p)
+	local ref
+
+	if FFlagProfilePlatformEnableImpressions then
+		ref = nil
+	else
+		ref = React.createRef()
+	end
+
+	local v = useProfileWrapperContext()
+	local profileId = v.profileId
+	local signal
+
+	if FFlagProfilePlatformEnableImpressions then
+		signal = AppCommonLib.Signal.new()
+	else
+		signal = nil
+	end
+
+	local v2 = React.useMemo(function()
+		if not FFlagProfilePlatformEnableImpressions and ref.current == nil then
+			ref.current = HttpService:GenerateGUID(false)
 		end
 
-		local v23 = initializeProfileAnalytics()
+		local v2 = initializeProfileAnalytics()
+		local updateInfoForAllEvents = v2.updateInfoForAllEvents
+		local profileSessionId
 
-		v23.updateInfoForAllEvents({
-			profileSessionId = if not FFlagProfilePlatformEnableImpressions then if not v18.sessionIdOverride then v17.current else v18.sessionIdOverride else v18.profileSessionId,
+		if FFlagProfilePlatformEnableImpressions then
+			profileSessionId = v.profileSessionId
+		elseif v.sessionIdOverride then
+			profileSessionId = v.sessionIdOverride
+		else
+			profileSessionId = ref.current
+		end
+
+		updateInfoForAllEvents({
+			profileSessionId = profileSessionId,
 			profileId = profileId,
-			profileType = v18.profileType,
+			profileType = v.profileType,
 			subpage = SubPages.PeekView
 		})
 
 		if FFlagProfilePlatformEnableImpressions then
-			return (Cryo.Dictionary.join(v23, {
-				scrollViewPositionChangedSignal = v20
-			}))
+			return (Cryo.Dictionary.join(v2, { scrollViewPositionChangedSignal = signal }))
 		end
 
-		return v23
-	end, {
-		profileId,
-		v18.sessionIdOverride
+		return v2
+	end, { profileId, v.sessionIdOverride })
+
+	return React.createElement(ProfileAnalyticsContext.Provider, { value = v2 }, {
+		React.createElement(ProfileScrollContextProvider, nil, { React.createElement(ProfilePlatformNavigator, p) })
 	})
-
-	return React.createElement(ProfileAnalyticsContext.Provider, {
-		value = v21
-	}, { React.createElement(ProfileScrollContextProvider, nil, { React.createElement(ProfilePlatformNavigator, p1) }) })
 end
 
-local v15 = React.PureComponent:extend("ProfilePlatformNavigatorWithProviders")
+local extended = React.PureComponent:extend("ProfilePlatformNavigatorWithProviders")
 
-function v15.render(p2) -- line: 61
-	-- upvalues: React (copy), v14 (copy)
-	return React.createElement(v14, p2.props)
+function extended.render(p)
+	return React.createElement(fn, p.props)
 end
 
-v15.router = ProfilePlatformNavigator.router
+extended.router = ProfilePlatformNavigator.router
 
-return v15
+return extended

@@ -1,81 +1,75 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
 local SquareCollectionGridView = require(ProfilePlatform.BaseComponents.CollectionGridViews.SquareCollectionGridView)
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
-local Foundation = require(ProfilePlatformParent.Foundation)
+local Foundation = require(parent.Foundation)
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local View = Foundation.View
 local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
-local t1 = {
-	numColumns = 3
-}
 
-local function getTextSizeAdjustedSquareExperienceTileHeight(n1: number) -- line: 23
-	return function(n2: number) -- line: 24
-		-- upvalues: n1 (copy)
-		return n2 + 80 + n1 * 3
+local overrides = { numColumns = 3 }
+
+local function getTextSizeAdjustedSquareExperienceTileHeight(p: number) -- 1 equivalent call inferred from this helper
+	return function(p2: number)
+		return p2 + 80 + p * 3
 	end
 end
-local function ExperiencesSkeleton(t2: {[any]: any}) -- line: 29
-	-- upvalues: useLocalization (copy), TextKeys (copy), useTextSizeOffset (copy), React (copy), View (copy), Skeleton (copy), EnumsRadius (copy), SquareCollectionGridView (copy), t1 (copy)
-	local v17 = useLocalization({
-		experiences = TextKeys.Experiences
-	})
-	local u18 = useTextSizeOffset()
-	local v19 = React.useMemo(function() -- line: 36
-		-- upvalues: u18 (ref)
-		local v23 = u18
 
-		return function(n3: number) -- line: 24
-			-- upvalues: v23 (copy)
-			return n3 + 80 + v23 * 3
-		end
-	end, { u18 })
-	local v20 = React.useCallback(function(_, n4: number, p2) -- line: 40
-		-- upvalues: React (copy), View (copy), Skeleton (copy), EnumsRadius (copy)
-		return React.createElement(View, {
-			tag = "col gap-small radius-medium",
-			LayoutOrder = n4,
-			Size = p2
-		}, {
-			ThumbnailSkeleton = React.createElement(Skeleton, {
-				LayoutOrder = 1,
-				Size = UDim2.fromScale(1, 0.6),
-				radius = EnumsRadius.Medium
+local function ExperiencesSkeleton(p)
+	local v = useLocalization({ experiences = TextKeys.Experiences })
+
+	local v2 = useTextSizeOffset()
+	local getItemHeight = React.useMemo(function()
+		return getTextSizeAdjustedSquareExperienceTileHeight(v2) -- inferred equivalent call
+	end, { v2 })
+
+	local renderItem = React.useCallback(function(_, layoutOrder: number, size)
+		return
+			React.createElement(View, {
+				tag = "col gap-small radius-medium",
+				LayoutOrder = layoutOrder,
+				Size = size
+			}, {
+				ThumbnailSkeleton = React.createElement(Skeleton, {
+					LayoutOrder = 1,
+					Size = UDim2.fromScale(1, 0.6),
+					radius = Radius.Medium
+				}),
+				NameSkeleton = React.createElement(Skeleton, {
+					LayoutOrder = 2,
+					Size = UDim2.fromScale(0.8, 0.18),
+					radius = Radius.Medium
+				}),
+				ButtonSkeleton = React.createElement(Skeleton, {
+					LayoutOrder = 3,
+					Size = UDim2.fromScale(0.6, 0.08),
+					radius = Radius.Medium
+				})
 			}),
-			NameSkeleton = React.createElement(Skeleton, {
-				LayoutOrder = 2,
-				Size = UDim2.fromScale(0.8, 0.18),
-				radius = EnumsRadius.Medium
-			}),
-			ButtonSkeleton = React.createElement(Skeleton, {
-				LayoutOrder = 3,
-				Size = UDim2.fromScale(0.6, 0.08),
-				radius = EnumsRadius.Medium
-			})
-		}), "Skeleton_" .. n4
+			"Skeleton_" .. layoutOrder
 	end, {})
-	local v21 = React.useMemo(function() -- line: 65
-		-- upvalues: t2 (copy)
-		local t3 = {}
 
-		for i = 1, t2.numSkeletons do
-			table.insert(t3, i)
+	local items = React.useMemo(function()
+		local result = {}
+
+		for i = 1, p.numSkeletons do
+			table.insert(result, i)
 		end
 
-		return t3
-	end, { t2.numSkeletons })
+		return result
+	end, { p.numSkeletons })
 
 	return React.createElement(SquareCollectionGridView, {
-		layoutOrder = t2.layoutOrder,
-		items = v21,
-		renderItem = v20,
-		getItemHeight = v19,
-		title = v17.experiences,
-		overrides = t1
+		layoutOrder = p.layoutOrder,
+		items = items,
+		renderItem = renderItem,
+		getItemHeight = getItemHeight,
+		title = v.experiences,
+		overrides = overrides
 	})
 end
 

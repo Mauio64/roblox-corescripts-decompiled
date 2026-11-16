@@ -1,3 +1,1 @@
-return {
-	LinkCopied = "Feature.Catalog.Toast.LinkCopied"
-}
+return { LinkCopied = "Feature.Catalog.Toast.LinkCopied" }

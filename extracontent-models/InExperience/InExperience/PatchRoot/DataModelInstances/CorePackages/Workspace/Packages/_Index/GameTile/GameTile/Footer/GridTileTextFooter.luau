@@ -1,47 +1,134 @@
 local GameTile = script:FindFirstAncestor("GameTile")
-local GameTileParent = GameTile.Parent
-local React = require(GameTileParent.React)
-local useDesignTokens = require(GameTileParent.Style).useDesignTokens
-local useTokens = require(GameTileParent.Foundation).Hooks.useTokens
-local useTextSizeOffset = require(GameTileParent.UIBlox).Core.Style.useTextSizeOffset
+
+local parent = GameTile.Parent
+local React = require(parent.React)
+
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local UIBlox = require(parent.UIBlox)
+local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
+
 local getGameTileMetadataFont = require(GameTile.Footer.getGameTileMetadataFont)
 
-local function GridTileTextFooter(t1: {[any]: any}) -- line: 47
-	-- upvalues: useDesignTokens (copy), useTextSizeOffset (copy), useTokens (copy), getGameTileMetadataFont (copy), React (copy)
-	local v12 = useDesignTokens()
-	local v13 = useTextSizeOffset()
-	local v14 = useTokens()
-	local v15 = if not t1.isUnifiedGameTile then v12.Size.Size_500 else v14.Size.Size_500
-	local v16 = if not t1.isUnifiedGameTile then v12.Color.Content.Default else v14.Color.Content.Default
-	local v17 = getGameTileMetadataFont(t1.useLargerFont, v12, v14, not not t1.isUnifiedGameTile or nil)
+local function fn(p: number, linesOfText: number?) -- 2 equivalent calls inferred from this helper
+	return p * (linesOfText or 1)
+end
 
-	return React.createElement("Frame", {
+local function GridTileTextFooter(props)
+	local v = useDesignTokens()
+	local v2 = useTextSizeOffset()
+	local v3 = useTokens()
+	local size_500
+
+	if props.isUnifiedGameTile then
+		size_500 = v3.Size.Size_500
+	else
+		size_500 = v.Size.Size_500
+	end
+
+	local default
+
+	if props.isUnifiedGameTile then
+		default = v3.Color.Content.Default
+	else
+		default = v.Color.Content.Default
+	end
+
+	local gameTileMetadataFont = getGameTileMetadataFont(
+		props.useLargerFont,
+		v,
+		v3,
+		props.isUnifiedGameTile and true or nil
+	)
+
+	local createElement = React.createElement
+	local v4 = {
+		LayoutOrder = props.LayoutOrder,
+		Size = UDim2.new(props.shouldSizeToContentWidth and 0 or 1, 0, 0, fn(size_500 + v2, props.linesOfText)), -- inferred equivalent call
+		AutomaticSize = 0,
+		Position = 0,
+		AnchorPoint = 0,
 		ClipsDescendants = false,
+		BackgroundTransparency = 1
+	}
+	local automaticSize
+
+	if props.shouldSizeToContentWidth then
+		automaticSize = Enum.AutomaticSize.X
+	else
+		automaticSize = Enum.AutomaticSize.None
+	end
+
+	v4.AutomaticSize = automaticSize
+	v4.Position = props.Position
+	v4.AnchorPoint = props.AnchorPoint
+
+	local createElement2 = React.createElement
+	local v5 = {
+		Text = props.text,
+		Size = UDim2.new(
+			props.shouldSizeToContentWidth and 0 or 1,
+			0,
+			0,
+			fn(gameTileMetadataFont.FontSize + v2, props.linesOfText) -- inferred equivalent call
+		),
+		AutomaticSize = 0,
+		Position = 0,
+		AnchorPoint = 0,
 		BackgroundTransparency = 1,
-		LayoutOrder = t1.LayoutOrder,
-		Size = UDim2.new(not t1.shouldSizeToContentWidth and 1 or 0, 0, 0, (v15 + v13) * (t1.linesOfText or 1)),
-		AutomaticSize = if not t1.shouldSizeToContentWidth then Enum.AutomaticSize.None else Enum.AutomaticSize.X,
-		Position = t1.Position,
-		AnchorPoint = t1.AnchorPoint
-	}, {
-		Text = React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			Text = t1.text,
-			Size = UDim2.new(not t1.shouldSizeToContentWidth and 1 or 0, 0, 0, (v17.FontSize + v13) * (t1.linesOfText or 1)),
-			AutomaticSize = if not t1.shouldSizeToContentWidth then Enum.AutomaticSize.None else Enum.AutomaticSize.X,
-			Position = UDim2.new(0, 0, 0.5, 0),
-			AnchorPoint = Vector2.new(0, 0.5),
-			TextSize = v17.FontSize,
-			Font = v17.Font,
-			TextTransparency = v16.Transparency,
-			TextColor3 = v16.Color3,
-			TextWrapped = t1.TextWrapped or false,
-			TextTruncate = Enum.TextTruncate.AtEnd,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = t1.TextYAlignment or Enum.TextYAlignment.Center,
-			ClipsDescendants = t1.ClipsDescendants,
-			RichText = t1.RichText
-		})
+		TextSize = 0,
+		Font = 0,
+		FontFace = 0,
+		TextTransparency = 0,
+		TextColor3 = 0,
+		TextWrapped = 0,
+		TextTruncate = 0,
+		TextXAlignment = 0,
+		TextYAlignment = 0,
+		ClipsDescendants = 0,
+		RichText = 0
+	}
+	local automaticSize2
+
+	if props.shouldSizeToContentWidth then
+		automaticSize2 = Enum.AutomaticSize.X
+	else
+		automaticSize2 = Enum.AutomaticSize.None
+	end
+
+	v5.AutomaticSize = automaticSize2
+	v5.Position = UDim2.new(0, 0, 0.5, 0)
+	v5.AnchorPoint = Vector2.new(0, 0.5)
+
+	v5.TextSize = gameTileMetadataFont.FontSize
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = gameTileMetadataFont.Font
+	end
+
+	v5.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(gameTileMetadataFont.Font)
+	end
+
+	v5.FontFace = fontFace
+	v5.TextTransparency = default.Transparency
+	v5.TextColor3 = default.Color3
+	v5.TextWrapped = props.TextWrapped or false
+	v5.TextTruncate = Enum.TextTruncate.AtEnd
+	v5.TextXAlignment = Enum.TextXAlignment.Left
+	v5.TextYAlignment = props.TextYAlignment or Enum.TextYAlignment.Center
+	v5.ClipsDescendants = props.ClipsDescendants
+	v5.RichText = props.RichText
+	return createElement("Frame", v4, {
+		Text = createElement2("TextLabel", v5)
 	})
 end
 

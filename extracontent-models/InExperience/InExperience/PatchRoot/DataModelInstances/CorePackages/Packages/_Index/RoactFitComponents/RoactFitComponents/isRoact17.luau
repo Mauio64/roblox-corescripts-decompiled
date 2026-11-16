@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Roact)
+local parent = script.Parent.Parent
 
-return function() -- line: 7
-	-- upvalues: Roact (copy)
+local Roact = require(parent.Roact)
+
+return function(): boolean
 	return Roact.Ref == "ref"
 end

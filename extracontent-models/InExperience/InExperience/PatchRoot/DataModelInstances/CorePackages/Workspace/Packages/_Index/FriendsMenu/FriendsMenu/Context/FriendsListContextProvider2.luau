@@ -1,200 +1,238 @@
 local Players = game:GetService("Players")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local utils = scriptParentParent.utils
-local FriendsMenuDependencies = require(scriptParentParent.FriendsMenuDependencies)
-local React = require(scriptParentParentParent.React)
-local UserLib = require(scriptParentParentParent.UserLib)
-local RoactUtils = require(scriptParentParentParent.RoactUtils)
-local UserProfiles = require(scriptParentParentParent.UserProfiles)
-local FriendsCommon = require(scriptParentParentParent.FriendsCommon)
-local Cryo = require(scriptParentParentParent.Cryo)
-local GraphQLServer = require(scriptParentParentParent.GraphQLServer)
+
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+
+local utils = parent2.utils
+local FriendsMenuDependencies = require(parent2.FriendsMenuDependencies)
+
+local React = require(parent3.React)
+local UserLib = require(parent3.UserLib)
+local RoactUtils = require(parent3.RoactUtils)
+local UserProfiles = require(parent3.UserProfiles)
+local FriendsCommon = require(parent3.FriendsCommon)
+local Cryo = require(parent3.Cryo)
+local GraphQLServer = require(parent3.GraphQLServer)
+
 local Constants = UserLib.Utils.Constants
 local ThumbnailRequest = UserLib.Utils.ThumbnailRequest
 local PreloadUsersThumbnail = UserLib.Thunks.PreloadUsersThumbnail
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local sortFriendsByCorrectedPresenceAndRank = FriendsMenuDependencies.sortFriendsByCorrectedPresenceAndRank
 local networkImpl = FriendsMenuDependencies.networkImpl
-local PresenceType = GraphQLServer.types.PresenceType
-local GetFriendsSearch = require(scriptParentParent.Requests.GetFriendsSearch)
-local Constants2 = require(scriptParentParent.Constants)
-local SortInvitesByScoreIXP = require(scriptParentParent.Experiments.SortInvitesByScoreIXP)
-local FriendsListContext = require(scriptParent.FriendsListContext)
+local presenceType = GraphQLServer.types.PresenceType
+local GetFriendsSearch = require(parent2.Requests.GetFriendsSearch)
+local Constants2 = require(parent2.Constants)
+local SortInvitesByScoreIXP = require(parent2.Experiments.SortInvitesByScoreIXP)
+
+local FriendsListContext = require(parent.FriendsListContext)
 local useFriendsListOrderedByPresence = FriendsCommon.Hooks.useFriendsListOrderedByPresence
 local generateDummyFriends = require(utils.generateDummyFriends)
-local FFlagFilterOutDeletedAccountsGameInvites = require(scriptParentParent.Flags.FFlagFilterOutDeletedAccountsGameInvites)
-local FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt = require(scriptParentParentParent.SharedFlags).FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt
+
+local FFlagFilterOutDeletedAccountsGameInvites = require(parent2.Flags.FFlagFilterOutDeletedAccountsGameInvites)
+
+local SharedFlags = require(parent3.SharedFlags)
+local FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt = SharedFlags.FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt
+
 local UserModel = UserLib.Models.UserModel
-local t1 = {
-	InviteAvatarThumbnailType = Constants.RbxAvatarThumbnailTypesFromEnum.HeadShot,
+local v = {
+	["InviteAvatarThumbnailType"] = Constants.RbxAvatarThumbnailTypesFromEnum.HeadShot,
 	InviteAvatarThumbnailSize = Constants.RbxThumbnailSizes.Size150x150,
 	InviteAvatarRbxthumbType = Constants.RbxthumbTypes.AvatarHeadShot
 }
 
-t1.ThumbnailRequest = {
-	InviteToGame = { ThumbnailRequest.fromData(t1.InviteAvatarThumbnailType, t1.InviteAvatarThumbnailSize) }
+v.ThumbnailRequest = {
+	InviteToGame = { ThumbnailRequest.fromData(v.InviteAvatarThumbnailType, v.InviteAvatarThumbnailSize) }
 }
 
-return function(t2: {[any]: any}) -- line: 57
-	-- upvalues: SortInvitesByScoreIXP (copy), networkImpl (copy), Players (copy), useDispatch (copy), React (copy), generateDummyFriends (copy), useFriendsListOrderedByPresence (copy), UserProfiles (copy), PreloadUsersThumbnail (copy), t1 (copy), UserModel (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), sortFriendsByCorrectedPresenceAndRank (copy), Cryo (copy), GetFriendsSearch (copy), FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt (copy), FriendsListContext (copy)
-	local v32 = if not SortInvitesByScoreIXP.FFlagEnableSortInvitesByScoreExperiment then nil else SortInvitesByScoreIXP.useSortInvitesByScoreExperiment()
-	local u33 = if not t2.networkImplOverride then networkImpl else t2.networkImplOverride
-	local v34 = not Players.LocalPlayer and "0" or tostring(Players.LocalPlayer.UserId)
-	local v35 = useDispatch()
-	local v36, v37 = React.useState("")
-	local v38, v39 = React.useState(true)
-	local t3 = {}
-	local v41, v42 = React.useState((generateDummyFriends(10)))
-	local v43 = useFriendsListOrderedByPresence({
+return function(props)
+	local v2
+
+	if SortInvitesByScoreIXP.FFlagEnableSortInvitesByScoreExperiment then
+		v2 = SortInvitesByScoreIXP.useSortInvitesByScoreExperiment()
+	else
+		v2 = nil
+	end
+
+	local v3
+
+	if props.networkImplOverride then
+		v3 = props.networkImplOverride
+	else
+		v3 = networkImpl
+	end
+
+	local userId = not Players.LocalPlayer and "0" or tostring(Players.LocalPlayer.UserId)
+	local v4 = useDispatch()
+	local state, setState = React.useState("")
+	local state2, setState2 = React.useState(true)
+	local v5 = {}
+	local state3, setState3 = React.useState((generateDummyFriends(10)))
+
+	local v6 = useFriendsListOrderedByPresence({
+		userId = userId,
 		pageSize = 50,
-		shouldListenToPresenceUpdates = false,
-		userId = v34
+		shouldListenToPresenceUpdates = false
 	})
-	local v44 = UserProfiles.Hooks.useUserProfilesFetch({
+	local v7 = UserProfiles.Hooks.useUserProfilesFetch({
 		userIds = {},
 		query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
 	})
 
-	local function v45(p1, p2) -- line: 87
-		-- upvalues: v35 (copy), PreloadUsersThumbnail (copy), t1 (copy), v44 (copy), t2 (copy), UserModel (copy), v43 (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), v32 (copy), SortInvitesByScoreIXP (copy), sortFriendsByCorrectedPresenceAndRank (copy), v42 (copy), v39 (copy), t3 (ref), Cryo (copy)
-		v35(PreloadUsersThumbnail(p1, t1.ThumbnailRequest.InviteToGame, nil))
-		v44:fetchMore({
-			variables = {
-				userIds = p1
-			}
-		}):andThen(function(p3) -- line: 95
-			-- upvalues: p1 (copy), t2 (copy), UserModel (copy), v43 (copy), PresenceType (copy), FFlagFilterOutDeletedAccountsGameInvites (copy), Constants2 (copy), v32 (copy), SortInvitesByScoreIXP (copy), p2 (copy), sortFriendsByCorrectedPresenceAndRank (copy), v42 (copy), v39 (copy)
-			local t4 = {}
+	local function fn(userIds, p)
+		v4(PreloadUsersThumbnail(userIds, v.ThumbnailRequest.InviteToGame, nil))
 
-			for _, v55 in p1 do
-				if not t2.excludedFriendsSet or not t2.excludedFriendsSet[v55] then
-					local OFFLINE = UserModel.PresenceType.OFFLINE
-					local lastLocation = nil
+		v7:fetchMore({
+			variables = { userIds = userIds }
+		}):andThen(function(p2)
+			local v8 = {}
 
-					for _, v59 in v43.onlineFriends do
-						if v55 == v59.id then
-							if not v59.presence then
-								break
-							end
+			for _, item in userIds do
+				if props.excludedFriendsSet and props.excludedFriendsSet[item] then
+					continue
+				end
 
-							local userPresenceType = v59.presence.userPresenceType
+				local presence = UserModel.PresenceType.OFFLINE
+				local lastLocation = nil
 
-							if userPresenceType == PresenceType.InGame then
-								OFFLINE = UserModel.PresenceType.IN_GAME
-							elseif userPresenceType == PresenceType.Online then
-								OFFLINE = UserModel.PresenceType.ONLINE
-							elseif userPresenceType == PresenceType.InStudio then
-								OFFLINE = UserModel.PresenceType.IN_STUDIO
-							end
-
-							lastLocation = v59.presence.lastLocation
-
+				for _, onlineFriend in v6.onlineFriends do
+					if item == onlineFriend.id then
+						if not onlineFriend.presence then
 							break
 						end
+
+						local userPresenceType = onlineFriend.presence.userPresenceType
+
+						if userPresenceType == presenceType.InGame then
+							presence = UserModel.PresenceType.IN_GAME
+						elseif userPresenceType == presenceType.Online then
+							presence = UserModel.PresenceType.ONLINE
+						elseif userPresenceType == presenceType.InStudio then
+							presence = UserModel.PresenceType.IN_STUDIO
+						end
+
+						lastLocation = onlineFriend.presence.lastLocation
+						break
 					end
+				end
 
-					for _, v62 in p3.data.userProfiles do
-						if (not FFlagFilterOutDeletedAccountsGameInvites or v62.names.username ~= Constants2.NameAccountDeleted) and v55 == v62.id then
-							table.insert(t4, {
-								id = v55,
-								presence = OFFLINE,
-								lastLocation = lastLocation,
-								displayName = v62.names.combinedName,
-								name = v62.names.username,
-								friendRank = if not v32 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else p2 and p2[v55]
-							})
+				for _, userProfile in p2.data.userProfiles do
+					if
+						(not FFlagFilterOutDeletedAccountsGameInvites or userProfile.names.username ~= Constants2.NameAccountDeleted)
+						and userProfile.id == item
+					then
+						local v9 = {
+							id = item,
+							presence = presence,
+							lastLocation = lastLocation,
+							displayName = userProfile.names.combinedName,
+							name = userProfile.names.username,
+							friendRank = 0
+						}
+						local friendRank
 
-							break
+						if v2 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
+							friendRank = p and p[item]
 						end
+
+						v9.friendRank = friendRank
+						table.insert(v8, v9)
+						break
 					end
 				end
 			end
 
-			table.sort(t4, sortFriendsByCorrectedPresenceAndRank)
-			v42(t4)
-			v39(false)
-		end):catch(function(p4) -- line: 146
-			-- upvalues: v39 (copy)
-			print("error", p4)
-			v39(false)
+			table.sort(v8, sortFriendsByCorrectedPresenceAndRank)
+			setState3(v8)
+			setState2(false)
+		end):catch(function(p2)
+			print("error", p2)
+			setState2(false)
 		end)
 
-		if t3 then
-			return (Cryo.List.join(t3, p1))
+		if v5 then
+			return (Cryo.List.join(v5, userIds))
 		end
 
-		return p1
+		return userIds
 	end
 
-	t3 = React.useMemo(function() -- line: 154
-		-- upvalues: v36 (copy), GetFriendsSearch (copy), u33 (ref), v34 (copy), v32 (copy), SortInvitesByScoreIXP (copy), Cryo (copy), v45 (copy), v43 (copy), t3 (ref), FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt (copy), v42 (copy), v39 (copy)
-		if v36 ~= "" then
-			GetFriendsSearch(u33, v34, v36, 20):andThen(function(p5) -- line: 156
-				-- upvalues: v32 (copy), SortInvitesByScoreIXP (copy), Cryo (copy), v45 (copy)
-				local v65 = if not v32 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else {}
-				local v66 = Cryo.List.map(p5.responseBody.PageItems, function(p6, p7) -- line: 161
-					-- upvalues: v32 (copy), SortInvitesByScoreIXP (copy), v65 (copy)
-					if v32 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
-						v65[p6.id] = p7
+	local useMemo = React.useMemo
+	local function fn2()
+		if state == "" then
+			if v6.onlineFriends and v6.offlineFriends then
+				local v8 = (v2 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll) and {} or nil
+
+				local joined = Cryo.List.join(v6.offlineFriends, v6.onlineFriends)
+				local ids = {}
+
+				for k, v9 in joined do
+					if Cryo.List.find(v5, v9.id) ~= nil then
+						continue
 					end
 
-					return (tostring(p6.id))
-				end)
+					table.insert(ids, v9.id)
 
-				return (v45(v66, v65))
-			end):catch(function(p8) -- line: 168
-				print("error", p8)
-			end)
-		elseif v43.onlineFriends and v43.offlineFriends then
-			local t5 = {}
-			local v49 = if not v32 and not SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then nil else {}
-
-			for v50, v51 in (Cryo.List.join(v43.offlineFriends, v43.onlineFriends)) do
-				if Cryo.List.find(t3, v51.id) == nil then
-					table.insert(t5, v51.id)
-
-					if v32 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
-						v49[v51.id] = v50
+					if v2 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
+						v8[v9.id] = k
 					end
 				end
-			end
 
-			if FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt and #t5 == 0 then
-				if v43.isLoading then
+				if not FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt or #ids ~= 0 then
+					return fn(ids, v8)
+				end
+
+				if v6.isLoading then
 					return {}
 				end
 
-				v42({})
-				v39(false)
-
+				setState3({})
+				setState2(false)
 				return {}
 			end
+		else
+			GetFriendsSearch(v3, userId, state, 20):andThen(function(p)
+				local v8 = (v2 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll) and {} or nil
 
-			return (v45(t5, v49))
+				return fn(Cryo.List.map(p.responseBody.PageItems, function(p2, p3)
+					if v2 or SortInvitesByScoreIXP.FFlagSortInvitesByScoreEnabledForAll then
+						v8[p2.id] = p3
+					end
+
+					return (tostring(p2.id))
+				end), v8)
+			end):catch(function(p)
+				print("error", p)
+			end)
 		end
 
 		return {}
-	end, {
-		v43.onlineFriends,
-		v43.offlineFriends,
-		v36,
-		if not FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt then nil else v43.isLoading
-	})
+	end
+
+	local onlineFriends = v6.onlineFriends
+	local offlineFriends = v6.offlineFriends
+	local v8
+
+	if FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt then
+		v8 = v6.isLoading
+	end
+
+	v5 = useMemo(fn2, { onlineFriends, offlineFriends, state, v8 })
 
 	return React.createElement(FriendsListContext.Provider, {
 		value = {
+			friends = state3,
+			hasFriends = not (Cryo.isEmpty(v6.onlineFriends) and Cryo.isEmpty(v6.offlineFriends)),
+			isFetchingFriends = v7.loading or props.isLoadingCustomParams or state2 or FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt and v6.isLoading,
 			isFriendsListFetchFailed = false,
-			friends = v41,
-			hasFriends = not Cryo.isEmpty(v43.onlineFriends) or not Cryo.isEmpty(v43.offlineFriends),
-			isFetchingFriends = v44.loading or (t2.isLoadingCustomParams or (v38 or FFlagGameInviteOpenModalWithoutBlockingOnCanPrompt and v43.isLoading)),
 			friendsNames = {
-				loading = v44 and v44.loading
+				loading = v7 and v7.loading
 			},
-			fetchMoreFriends = v43.fetchMoreFriends,
-			searchFriends = v37,
-			searchFriendsString = v36
+			fetchMoreFriends = v6.fetchMoreFriends,
+			searchFriends = setState,
+			searchFriendsString = state
 		}
-	}, t2.children)
+	}, props.children)
 end

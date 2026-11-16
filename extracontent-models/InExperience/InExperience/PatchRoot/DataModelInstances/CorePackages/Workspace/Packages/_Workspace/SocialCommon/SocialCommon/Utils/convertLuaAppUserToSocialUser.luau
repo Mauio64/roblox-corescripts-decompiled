@@ -1,10 +1,7 @@
-local Parent = script:FindFirstAncestor("SocialCommon").Parent
-local Dash = require(Parent.Dash)
+local parent = script:FindFirstAncestor("SocialCommon").Parent
 
-return function(t1: {[any]: any}) -- line: 13
-	-- upvalues: Dash (copy)
-	return Dash.join(t1, {
-		name = t1.username,
-		gameInstanceId = t1.gameId
-	})
+local Dash = require(parent.Dash)
+
+return function(p)
+	return Dash.join(p, { name = p.username, gameInstanceId = p.gameId })
 end

@@ -1,16 +1,12 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-local React = require(AvatarExperienceInspectAndBuyParent.React)
+local parent = AvatarExperienceInspectAndBuy.Parent
+local React = require(parent.React)
 local useConvertedItemData = require(AvatarExperienceInspectAndBuy.Hooks.useConvertedItemData)
 local useItemStatusLocalization = require(AvatarExperienceInspectAndBuy.Hooks.useItemStatusLocalization)
 local getPriceStatus = require(AvatarExperienceInspectAndBuy.Utils.getPriceStatus)
-
 require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
-
-local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
-
+local Foundation = require(parent.Foundation)
 require(AvatarExperienceInspectAndBuy.Types)
-
 local PriceStatus = require(AvatarExperienceInspectAndBuy.Enums.PriceStatus)
 local itemDetailsUtils = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils)
 local isCollectible = itemDetailsUtils.isCollectible
@@ -18,61 +14,77 @@ local calculatePurchaseStatusForItem = itemDetailsUtils.calculatePurchaseStatusF
 local getPriceInRobux = itemDetailsUtils.getPriceInRobux
 local formatNumber = require(AvatarExperienceInspectAndBuy.Utils.formatNumber)
 
-local function usePurchaseButtonProps(t1: {[any]: any}) -- line: 40
-	-- upvalues: useConvertedItemData (copy), getPriceStatus (copy), useItemStatusLocalization (copy), React (copy), Foundation (copy), PriceStatus (copy), isCollectible (copy), calculatePurchaseStatusForItem (copy), formatNumber (copy), getPriceInRobux (copy)
-	local v16 = useConvertedItemData(t1.selectedItem)
-	local v17 = getPriceStatus(v16)
-	local v18 = useItemStatusLocalization(v16)
-	local v19 = React.useMemo(function() -- line: 46
-		-- upvalues: t1 (copy), Foundation (copy)
+local function usePurchaseButtonProps(data)
+	local v = useConvertedItemData(data.selectedItem)
+	local priceStatus = getPriceStatus(v)
+	local v2 = useItemStatusLocalization(v)
+
+	local purchaseButtonProps = React.useMemo(function()
 		return {
+			purchaseButtonText = data.purchaseButtonText,
+			onPurchase = data.onBulkPurchase,
+			isDisabled = data.isDisabled,
 			showRobuxIcon = false,
-			purchaseButtonText = t1.purchaseButtonText,
-			onPurchase = t1.onBulkPurchase,
-			isDisabled = t1.isDisabled,
 			variant = Foundation.Enums.ButtonVariant.Emphasis
 		}
-	end, { t1 })
-	local v20 = React.useMemo(function() -- line: 57
-		-- upvalues: v17 (copy), PriceStatus (copy), v18 (copy), Foundation (copy), v16 (copy), isCollectible (copy), calculatePurchaseStatusForItem (copy), t1 (copy)
-		local v21 = v17 == PriceStatus.Free or (v17 == PriceStatus.PurchaseFromRoblox or v17 == PriceStatus.PurchaseFromResale)
+	end, { data })
 
-		return {
-			purchaseButtonText = v18[v17],
-			isDisabled = not v21,
-			variant = if v21 then Foundation.Enums.ButtonVariant.Emphasis else Foundation.Enums.ButtonVariant.Standard,
-			onPurchase = function() -- line: 70
-				-- upvalues: v16 (copy), isCollectible (copy), calculatePurchaseStatusForItem (copy), v17 (copy), t1 (copy)
-				if v16 then
-					local v22 = isCollectible(v16)
-					local v23 = calculatePurchaseStatusForItem(v16, v17)
+	local purchaseButtonProps2 = React.useMemo(function()
+		local v3 = priceStatus == PriceStatus.Free
+			or priceStatus == PriceStatus.PurchaseFromRoblox
+			or priceStatus == PriceStatus.PurchaseFromResale
 
-					t1.onPromptPurchase(v16.id, v16.itemType, v23.collectibleItemId, v23.collectibleLowestAvailableResaleProductId, v23.collectibleLowestAvailableResaleItemInstanceId, v23.collectibleLowestResalePrice, v22)
-				end
-			end
+		local v4 = {
+			purchaseButtonText = v2[priceStatus],
+			isDisabled = not v3,
+			variant = 0,
+			onPurchase = 0
 		}
-	end, {
-		t1,
-		v17,
-		v16
-	})
+		local variant
 
-	if t1.selectedItem then
+		if v3 then
+			variant = Foundation.Enums.ButtonVariant.Emphasis
+		else
+			variant = Foundation.Enums.ButtonVariant.Standard
+		end
+
+		v4.variant = variant
+
+		function v4.onPurchase()
+			if v then
+				local collectible = isCollectible(v)
+				local v5 = calculatePurchaseStatusForItem(v, priceStatus)
+				data.onPromptPurchase(
+					v.id,
+					v.itemType,
+					v5.collectibleItemId,
+					v5.collectibleLowestAvailableResaleProductId,
+					v5.collectibleLowestAvailableResaleItemInstanceId,
+					v5.collectibleLowestResalePrice,
+					collectible
+				)
+			end
+		end
+
+		return v4
+	end, { data, priceStatus, v })
+
+	if data.selectedItem then
 		return {
-			purchaseButtonProps = v20,
+			purchaseButtonProps = purchaseButtonProps2,
 			priceLabel = {
-				leftLabel = t1.localizedStrings.total or "",
-				priceInRobux = formatNumber(getPriceInRobux(v16, v17))
+				leftLabel = data.localizedStrings.total or "",
+				priceInRobux = formatNumber(getPriceInRobux(v, priceStatus))
 			},
-			priceStatus = v17
+			priceStatus = priceStatus
 		}
 	end
 
 	return {
-		purchaseButtonProps = v19,
+		purchaseButtonProps = purchaseButtonProps,
 		priceLabel = {
-			leftLabel = t1.localizedStrings.totalItems or "",
-			priceInRobux = t1.formattedTotalPrice
+			leftLabel = data.localizedStrings.totalItems or "",
+			priceInRobux = data.formattedTotalPrice
 		}
 	}
 end

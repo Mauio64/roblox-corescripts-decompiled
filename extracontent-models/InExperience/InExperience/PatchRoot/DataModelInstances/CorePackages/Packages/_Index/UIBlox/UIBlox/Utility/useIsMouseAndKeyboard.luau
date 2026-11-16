@@ -1,10 +1,10 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local InputType = require(scriptParentParent.Enums.InputType)
-local useInputType = require(scriptParent.useInputType)
+local parent = script.Parent
+local parent2 = parent.Parent
 
-local function useIsMouseAndKeyboard() -- line: 11
-	-- upvalues: useInputType (copy), InputType (copy)
+local InputType = require(parent2.Enums.InputType)
+local useInputType = require(parent.useInputType)
+
+local function useIsMouseAndKeyboard(): boolean
 	return useInputType() == InputType.MouseAndKeyboard
 end
 

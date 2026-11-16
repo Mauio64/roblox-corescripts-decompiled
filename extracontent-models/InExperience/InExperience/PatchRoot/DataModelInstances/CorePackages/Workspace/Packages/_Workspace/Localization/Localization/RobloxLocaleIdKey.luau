@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("Localization").Parent
-
-return require(Parent.AppCommonLib).Symbol.named("RobloxLocaleId")
+local parent = script:FindFirstAncestor("Localization").Parent
+local AppCommonLib = require(parent.AppCommonLib)
+return AppCommonLib.Symbol.named("RobloxLocaleId")

@@ -1,33 +1,29 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Signals = require(parent.Signals)
 
 require(script.Parent.PrivatePlaytestersStoreTypes)
 
-local function createPlayersGetterCache() -- line: 26
-	-- upvalues: Signals (copy)
-	local t1 = {}
+local function createPlayersGetterCache()
+	local computedsByCallback = {}
 
 	return {
-		getFor = function(p1) -- line: 29
-			-- upvalues: t1 (copy), Signals (copy)
-			local v6 = t1[p1]
+		getFor = function(callback)
+			local v = computedsByCallback[callback]
 
-			if v6 ~= nil then
-				return v6
+			if v ~= nil then
+				return v
 			end
 
-			local v7 = Signals.createComputed(function(p2) -- line: 34
-				-- upvalues: p1 (copy)
-				return p1(p2) or {}
+			local computed = Signals.createComputed(function(p)
+				return callback(p) or {}
 			end)
 
-			t1[p1] = v7
-
-			return v7
+			computedsByCallback[callback] = computed
+			return computed
 		end,
-		clear = function() -- line: 41
-			-- upvalues: t1 (copy)
-			table.clear(t1)
+		clear = function()
+			table.clear(computedsByCallback)
 		end
 	}
 end

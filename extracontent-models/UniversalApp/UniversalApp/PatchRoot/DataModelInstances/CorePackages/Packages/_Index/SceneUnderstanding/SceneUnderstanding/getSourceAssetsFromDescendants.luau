@@ -1,24 +1,24 @@
 local SceneUnderstanding = script:FindFirstAncestor("SceneUnderstanding")
+
 local isSourceAsset = require(SceneUnderstanding.isSourceAsset)
 local findSourceAssetsFromDescendant = require(SceneUnderstanding.findSourceAssetsFromDescendant)
 
-local function getSourceAssetsFromDescendants(t1: {[any]: any}) -- line: 17
-	-- upvalues: isSourceAsset (copy), findSourceAssetsFromDescendant (copy)
-	local t2 = {}
+local function getSourceAssetsFromDescendants(items)
+	local sourceAssets = {}
 
-	for _, v8 in t1 do
-		if isSourceAsset(v8) then
-			table.insert(t2, v8)
+	for _, item in items do
+		if isSourceAsset(item) then
+			table.insert(sourceAssets, item)
 		end
 
-		for _, v10 in findSourceAssetsFromDescendant(v8) do
-			if not table.find(t2, v10) then
-				table.insert(t2, v10)
+		for _, v in findSourceAssetsFromDescendant(item) do
+			if not table.find(sourceAssets, v) then
+				table.insert(sourceAssets, v)
 			end
 		end
 	end
 
-	return t2
+	return sourceAssets
 end
 
 return getSourceAssetsFromDescendants

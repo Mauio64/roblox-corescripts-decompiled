@@ -1,4 +1,1 @@
-return {
-	CloseMoreMenu = "CloseMoreMenu",
-	OpenMoreMenu = "OpenMoreMenu"
-}
+return { CloseMoreMenu = "CloseMoreMenu", OpenMoreMenu = "OpenMoreMenu" }

@@ -1,205 +1,334 @@
-local Parent = script:FindFirstAncestor("ViewportUtils").Parent
-local Display = require(Parent.Display)
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("ViewportUtils").Parent
+local Display = require(parent.Display)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local SharedFlags = require(parent.SharedFlags)
+
 local intersectBounds = require(script.Parent.intersectBounds)
 local useClipAncestorBounds = require(script.Parent.useClipAncestorBounds)
-local v9 = game:DefineFastFlag("LuaAppFixFrameBoundsImpressions", false)
+
+local defineFastFlag = game:DefineFastFlag("LuaAppFixFrameBoundsImpressions", false)
+
 local FIntLuaAppUpdateImpressionsViewportBoundsPositionThreshold = SharedFlags.FIntLuaAppUpdateImpressionsViewportBoundsPositionThreshold
-local v11 = game:DefineFastFlag("LuaAppThrottleViewportBoundsScreenSize", false)
+local defineFastFlag2 = game:DefineFastFlag("LuaAppThrottleViewportBoundsScreenSize", false)
 local FIntLuaAppViewportBoundsScreenSizeThreshold = SharedFlags.FIntLuaAppViewportBoundsScreenSizeThreshold
+
 local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
 local FFlagLuaAppRespectClipAncestorImpressions = SharedFlags.FFlagLuaAppRespectClipAncestorImpressions
-local v15 = game:DefineFastFlag("LuaAppUseViewportBoundsInsetFix", false)
+local defineFastFlag3 = game:DefineFastFlag("LuaAppUseViewportBoundsInsetFix", false)
+local FFlagUnifyShortcutBarFixImpressions = SharedFlags.FFlagUnifyShortcutBarFixImpressions
 
-local function boundsEqual(t1: {[any]: any}, t2: {[any]: any}) -- line: 34
-	return t1.min == t2.min and t1.max == t2.max
-end
-local function screenSizeBoundsEqual(t3: {[any]: any}, t4: {[any]: any}) -- line: 38
-	-- upvalues: FIntLuaAppViewportBoundsScreenSizeThreshold (copy)
-	local v24 = FIntLuaAppViewportBoundsScreenSizeThreshold
-
-	return v24 > math.abs(t3.max.X - t4.max.X) and (v24 > math.abs(t3.max.Y - t4.max.Y) and (t3.min.X == t4.min.X and t3.min.Y == t4.min.Y))
+local function boundsEqual(p, p2): boolean -- 1 equivalent call inferred from this helper
+	return p.min == p2.min and p.max == p2.max
 end
 
-local t5 = {
-	min = Vector2.zero,
-	max = Vector2.zero
-}
+local function screenSizeBoundsEqual(p, p2): boolean
+	local v = FIntLuaAppViewportBoundsScreenSizeThreshold
+	return math.abs(p.max.X - p2.max.X) < v
+		and math.abs(p.max.Y - p2.max.Y) < v
+		and p.min.X == p2.min.X
+		and p.min.Y == p2.min.Y
+end
 
-local function calculateClampedViewportBounds(vector2: Vector2?, vector2_2: Vector2?, t6: {[any]: any}) -- line: 48
-	-- upvalues: v9 (copy), t5 (copy)
-	local v28 = vector2 or Vector2.zero
-	local v29 = v28 + (vector2_2 or Vector2.zero)
-	local v30 = math.max(t6.min.X, v28.X)
-	local v31 = math.min(t6.max.X, v29.X)
-	local v32 = math.max(t6.min.Y, v28.Y)
-	local v33 = math.min(t6.max.Y, v29.Y)
+local v = { min = Vector2.zero, max = Vector2.zero }
 
-	if v9 and (v31 <= v30 or v33 <= v32) then
-		return t5
+local function calculateClampedViewportBounds(absolutePosition: Vector2?, absoluteSize: Vector2?, p)
+	local v2 = absolutePosition or Vector2.zero
+	local v3 = v2 + (absoluteSize or Vector2.zero)
+
+	local v4 = math.max(p.min.X, v2.X)
+	local v5 = math.min(p.max.X, v3.X)
+	local v6 = math.max(p.min.Y, v2.Y)
+	local v7 = math.min(p.max.Y, v3.Y)
+
+	if defineFastFlag and (v5 <= v4 or v7 <= v6) then
+		return v
 	end
 
-	return {
-		min = Vector2.new(v30, v32),
-		max = Vector2.new(v31, v33)
-	}
+	return { min = Vector2.new(v4, v6), max = Vector2.new(v5, v7) }
 end
 
-return function(t7: {[any]: any}?, b1: boolean?, b2: boolean?) -- line: 69
-	-- upvalues: v11 (copy), React (copy), Signals (copy), Display (copy), v15 (copy), screenSizeBoundsEqual (copy), SignalsReact (copy), FFlagLuaAppRespectClipAncestorImpressions (copy), useClipAncestorBounds (copy), t5 (copy), v9 (copy), intersectBounds (copy), calculateClampedViewportBounds (copy), FIntLuaAppUpdateImpressionsViewportBoundsPositionThreshold (copy), FIntLuaAppViewportBoundsScreenSizeThreshold (copy), FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions (copy)
-	local u38
+return function(p, flag: boolean?, flag2: boolean?, value: number?)
+	local v2 = FFlagUnifyShortcutBarFixImpressions and (value or 0) or nil
+	local v3
 
-	if v11 then
-		local v37 = React.useMemo(function() -- line: 77
-			-- upvalues: Signals (copy), Display (copy), v15 (copy), b1 (copy), screenSizeBoundsEqual (copy)
-			return Signals.createComputed(function(p1) -- line: 78
-				-- upvalues: Display (copy), v15 (copy), b1 (copy)
-				local v58 = Display.GetDisplayStore(p1)
-				local v59 = v58.getViewportSize(p1)
-				local v60 = v58.getTopBarHeight(p1)
-				local v61 = if not v15 then v58.getGuiInset(p1) else nil
+	if defineFastFlag2 then
+		local useMemo = React.useMemo
+		local function fn()
+			return Signals.createComputed(function(p2)
+				local displayStore = Display.GetDisplayStore(p2)
+				local viewportSize = displayStore.getViewportSize(p2)
+				local topBarHeight = displayStore.getTopBarHeight(p2)
+				local v4
 
-				return {
-					min = Vector2.new(0, v60),
-					max = Vector2.new(v59.X, if not v15 and not b1 then v59.Y - v61.bottom else v59.Y)
-				}
+				if not defineFastFlag3 then
+					v4 = displayStore.getGuiInset(p2)
+				end
+
+				local v5 = { min = Vector2.new(0, topBarHeight), max = 0 }
+
+				local x = viewportSize.X
+				local v6
+
+				if defineFastFlag3 or flag then
+					v6 = viewportSize.Y
+				else
+					v6 = viewportSize.Y - v4.bottom
+				end
+
+				local vector2 = Vector2.new(x, v6)
+				local v7
+
+				if FFlagUnifyShortcutBarFixImpressions then
+					v7 = Vector2.new(0, v2)
+				else
+					v7 = Vector2.zero
+				end
+
+				v5.max = vector2 - v7
+				return v5
 			end, screenSizeBoundsEqual)
-		end, { b1 })
+		end
 
-		u38 = SignalsReact.useSignalState(v37)
+		local v4
+
+		if FFlagUnifyShortcutBarFixImpressions then
+			v4 = v2
+		end
+
+		local v5 = useMemo(fn, { flag, v4 })
+
+		v3 = SignalsReact.useSignalState(v5)
 	else
-		local v39 = SignalsReact.useSignalState(function(p2) -- line: 99
-			-- upvalues: Display (copy)
+		local v4 = SignalsReact.useSignalState(function(p2)
 			return Display.GetDisplayStore(p2).getViewportSize(p2)
 		end)
-		local v40 = SignalsReact.useSignalState(function(p3) -- line: 102
-			-- upvalues: Display (copy)
-			return Display.GetDisplayStore(p3).getTopBarHeight(p3)
+
+		local v5 = SignalsReact.useSignalState(function(p2)
+			return Display.GetDisplayStore(p2).getTopBarHeight(p2)
 		end)
-		local v41 = if not v15 then SignalsReact.useSignalState(function(p4) -- line: 107
-			-- upvalues: Display (copy)
-			return Display.GetDisplayStore(p4).getGuiInset(p4)
-		end) else nil
+		local v6
 
-		u38 = React.useMemo(function() -- line: 112
-			-- upvalues: v40 (copy), v39 (copy), v15 (copy), b1 (copy), v41 (copy)
-			return {
-				min = Vector2.new(0, v40),
-				max = Vector2.new(v39.X, if not v15 and not b1 then v39.Y - v41.bottom else v39.Y)
-			}
-		end, {
-			v40,
-			v39,
-			if not v15 then v41 else nil,
-			b1
-		})
-	end
+		if defineFastFlag3 then
+			v6 = nil
+		else
+			v6 = SignalsReact.useSignalState(function(p2)
+				return Display.GetDisplayStore(p2).getGuiInset(p2)
+			end)
+		end
 
-	local v42 = if not FFlagLuaAppRespectClipAncestorImpressions then nil else useClipAncestorBounds(if not b2 then nil else t7)
-	local v43, v44 = React.useState(t5)
-	local v45 = if not v9 then v44 else React.useCallback(function(t8: {[any]: any}) -- line: 139
-		-- upvalues: v44 (copy)
-		v44(function(t9: {[any]: any}) -- line: 140
-			-- upvalues: t8 (copy)
-			local v63 = t8
+		local useMemo = React.useMemo
+		local function fn()
+			local v7 = { min = Vector2.new(0, v5), max = 0 }
 
-			if t9.min == v63.min and t9.max == v63.max then
-				return t9
+			local x = v4.X
+			local v8
+
+			if defineFastFlag3 or flag then
+				v8 = v4.Y
+			else
+				v8 = v4.Y - v6.bottom
 			end
 
-			return t8
-		end)
-	end, {})
+			local vector2 = Vector2.new(x, v8)
+			local v9
 
-	React.useEffect(function() -- line: 150
-		-- upvalues: t7 (copy), v9 (copy), v11 (copy), v45 (copy), FFlagLuaAppRespectClipAncestorImpressions (copy), intersectBounds (copy), u38 (ref), calculateClampedViewportBounds (copy), FIntLuaAppUpdateImpressionsViewportBoundsPositionThreshold (copy), FIntLuaAppViewportBoundsScreenSizeThreshold (copy)
-		local t10 = {}
-		local current = nil
+			if FFlagUnifyShortcutBarFixImpressions then
+				v9 = Vector2.new(0, v2)
+			else
+				v9 = Vector2.zero
+			end
 
-		if t7 then
-			current = t7.current
+			v7.max = vector2 - v9
+			return v7
+		end
+
+		local v7
+
+		if not defineFastFlag3 then
+			v7 = v6
+		end
+
+		local v8
+
+		if FFlagUnifyShortcutBarFixImpressions then
+			v8 = v2
+		end
+
+		v3 = useMemo(fn, { v5, v4, v7, flag, v8 })
+	end
+
+	local v4
+
+	if FFlagLuaAppRespectClipAncestorImpressions then
+		local v5
+
+		if flag2 then
+			v5 = p
+		end
+
+		v4 = useClipAncestorBounds(v5)
+	else
+		v4 = nil
+	end
+
+	local state, setState = React.useState(v)
+	local v5
+
+	if defineFastFlag then
+		v5 = React.useCallback(function(p2)
+			setState(function(p3)
+				if boundsEqual(p3, p2) then -- inferred equivalent call
+					return p3
+				end
+
+				return p2
+			end)
+		end, {})
+	else
+		v5 = setState
+	end
+
+	local useEffect = React.useEffect
+	local function fn()
+		local connections = {}
+		local current
+
+		if p then
+			current = p.current
+		else
+			current = nil
 		end
 
 		if current then
-			local AbsolutePosition = current.AbsolutePosition
-			local AbsoluteSize = current.AbsoluteSize
-			local u55 = if not v9 then nil else AbsolutePosition
-			local u56 = if not v11 then nil else AbsoluteSize
+			local absolutePosition = current.AbsolutePosition
+			local absoluteSize = current.AbsoluteSize
+			local v6
 
-			v45(if not FFlagLuaAppRespectClipAncestorImpressions then calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u38) else intersectBounds({
-				min = AbsolutePosition,
-				max = AbsolutePosition + AbsoluteSize
-			}, u38))
-			table.insert(t10, current:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 182
-				-- upvalues: AbsolutePosition (ref), current (ref), v9 (copy), FIntLuaAppUpdateImpressionsViewportBoundsPositionThreshold (copy), u55 (ref), v45 (copy), FFlagLuaAppRespectClipAncestorImpressions (copy), intersectBounds (copy), AbsoluteSize (ref), u38 (ref), calculateClampedViewportBounds (copy)
-				AbsolutePosition = current.AbsolutePosition
+			if defineFastFlag then
+				v6 = absolutePosition
+			else
+				v6 = nil
+			end
 
-				if v9 then
-					local v64 = FIntLuaAppUpdateImpressionsViewportBoundsPositionThreshold
-					local v65 = AbsolutePosition - u55
+			local v7
 
-					if v64 > math.abs(v65.X) and v64 > math.abs(v65.Y) then
+			if defineFastFlag2 then
+				v7 = absoluteSize
+			else
+				v7 = nil
+			end
+
+			local v8
+
+			if FFlagLuaAppRespectClipAncestorImpressions then
+				v8 = intersectBounds({
+					min = absolutePosition,
+					max = absolutePosition + absoluteSize
+				}, v3)
+			else
+				v8 = calculateClampedViewportBounds(absolutePosition, absoluteSize, v3)
+			end
+
+			v5(v8)
+
+			table.insert(connections, current:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+				absolutePosition = current.AbsolutePosition
+
+				if defineFastFlag then
+					local v9 = FIntLuaAppUpdateImpressionsViewportBoundsPositionThreshold
+					local v10 = absolutePosition - v6
+
+					if math.abs(v10.X) < v9 and math.abs(v10.Y) < v9 then
 						return
 					end
 
-					u55 = AbsolutePosition
+					v6 = absolutePosition
 				end
 
-				v45(if not FFlagLuaAppRespectClipAncestorImpressions then calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u38) else intersectBounds({
-					min = AbsolutePosition,
-					max = AbsolutePosition + AbsoluteSize
-				}, u38))
+				local v9
+
+				if FFlagLuaAppRespectClipAncestorImpressions then
+					v9 = intersectBounds({
+						min = absolutePosition,
+						max = absolutePosition + absoluteSize
+					}, v3)
+				else
+					v9 = calculateClampedViewportBounds(absolutePosition, absoluteSize, v3)
+				end
+
+				v5(v9)
 			end))
-			table.insert(t10, current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 210
-				-- upvalues: AbsoluteSize (ref), current (ref), v11 (copy), FIntLuaAppViewportBoundsScreenSizeThreshold (copy), u56 (ref), v45 (copy), FFlagLuaAppRespectClipAncestorImpressions (copy), intersectBounds (copy), AbsolutePosition (ref), u38 (ref), calculateClampedViewportBounds (copy)
-				AbsoluteSize = current.AbsoluteSize
 
-				if v11 then
-					local v66 = FIntLuaAppViewportBoundsScreenSizeThreshold
-					local v67 = AbsoluteSize - u56
+			table.insert(connections, current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				absoluteSize = current.AbsoluteSize
 
-					if v66 > math.abs(v67.X) and v66 > math.abs(v67.Y) then
+				if defineFastFlag2 then
+					local v9 = FIntLuaAppViewportBoundsScreenSizeThreshold
+					local v10 = absoluteSize - v7
+
+					if math.abs(v10.X) < v9 and math.abs(v10.Y) < v9 then
 						return
 					end
 
-					u56 = AbsoluteSize
+					v7 = absoluteSize
 				end
 
-				v45(if not FFlagLuaAppRespectClipAncestorImpressions then calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u38) else intersectBounds({
-					min = AbsolutePosition,
-					max = AbsolutePosition + AbsoluteSize
-				}, u38))
+				local v9
+
+				if FFlagLuaAppRespectClipAncestorImpressions then
+					v9 = intersectBounds({
+						min = absolutePosition,
+						max = absolutePosition + absoluteSize
+					}, v3)
+				else
+					v9 = calculateClampedViewportBounds(absolutePosition, absoluteSize, v3)
+				end
+
+				v5(v9)
 			end))
 		else
-			v45(u38)
+			v5(v3)
 		end
 
-		return function() -- line: 234
-			-- upvalues: t10 (copy)
-			for _, v69 in t10 do
-				v69:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, {
-		t7,
-		u38,
-		if not FFlagLuaAppRespectClipAncestorImpressions then nil else v45
-	})
+	end
 
-	local v46 = if not FFlagLuaAppRespectClipAncestorImpressions then v43 else React.useMemo(function() -- line: 248
-		-- upvalues: v42 (copy), intersectBounds (copy), v43 (copy)
-		if v42 then
-			return (intersectBounds(v43, v42))
-		end
+	local v6
 
-		return v43
-	end, {
-		v43,
-		v42
-	})
+	if FFlagLuaAppRespectClipAncestorImpressions then
+		v6 = v5
+	end
 
-	return if not FFlagLuaAppRespectClipAncestorImpressions then v43 else v46, if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then nil else u38
+	useEffect(fn, { p, v3, v6 })
+	local v7
+
+	if FFlagLuaAppRespectClipAncestorImpressions then
+		v7 = React.useMemo(function()
+			if v4 then
+				return (intersectBounds(state, v4))
+			end
+
+			return state
+		end, { state, v4 })
+	else
+		v7 = state
+	end
+
+	if not FFlagLuaAppRespectClipAncestorImpressions then
+		v7 = state
+	end
+
+	local v8
+
+	if FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then
+		v8 = v3
+	end
+
+	return v7, v8
 end

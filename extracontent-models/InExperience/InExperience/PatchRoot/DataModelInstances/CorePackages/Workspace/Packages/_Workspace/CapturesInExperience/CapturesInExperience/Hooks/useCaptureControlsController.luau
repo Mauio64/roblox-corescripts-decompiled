@@ -1,442 +1,457 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local CapturesCommon = require(ParentParentParent.CapturesCommon)
-local React = require(ParentParentParent.React)
-local ReactOtter = require(ParentParentParent.ReactOtter)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local CapturesCommon = require(parent2.CapturesCommon)
+local React = require(parent2.React)
+local ReactOtter = require(parent2.ReactOtter)
+
 local useAnimatedBinding = ReactOtter.useAnimatedBinding
 local useCallback = React.useCallback
-local useDeviceInsets = require(ParentParentParent.Responsive).useDeviceInsets
+local Responsive = require(parent2.Responsive)
+local useDeviceInsets = Responsive.useDeviceInsets
 local useEffect = React.useEffect
 local useGuiInset = CapturesCommon.Hooks.useGuiInset
 local useRef = React.useRef
 local useState = React.useState
-local CaptureControlsConfiguration = require(ParentParent.Utils.CaptureControlsConfiguration)
-local SnapDirection = require(ParentParent.Enums.SnapDirection)
-local FFlagCapturesDragEdgeOffsetEnabled = require(ParentParent.Flags.FFlagCapturesDragEdgeOffsetEnabled)
-local EngineFeature = game:GetEngineFeature("UIDragDetectorFixEventPositionEnabled")
-local t1 = {
-	x = 0.5,
-	y = 0.5
-}
-local t2 = {
-	xOffset = -100,
-	yOffset = -100
-}
+
+local CaptureControlsConfiguration = require(parent.Utils.CaptureControlsConfiguration)
+
+local SnapDirection = require(parent.Enums.SnapDirection)
+local engineFeature = game:GetEngineFeature("UIDragDetectorFixEventPositionEnabled")
+
+local v = { x = 0.5, y = 0.5 }
+local v2 = { xOffset = -100, yOffset = -100 }
 local vector2 = Vector2.new(1, 0.5)
 local Right = SnapDirection.Right
-local t3 = {
+
+local v3 = {
 	duration = 0.4,
-	easingStyle = {
-		0.19,
-		1,
-		0.22,
-		1
-	}
+	easingStyle = { 0.19, 1, 0.22, 1 }
 }
 
-local function validateRefs(t4: {[any]: any}) -- line: 33
-	for _, v31 in t4 do
-		if v31.current == nil then
-			return false
-		end
-
-		if v31.current.AbsoluteSize.X <= 0 or v31.current.AbsoluteSize.Y <= 0 then
+local function validateRefs(items): boolean
+	for _, item in items do
+		if item.current == nil or (item.current.AbsoluteSize.X <= 0 or item.current.AbsoluteSize.Y <= 0) then
 			return false
 		end
 	end
 
 	return true
 end
-local function clampItemPosition(vector2_2: Vector2, vector2_3: Vector2, vector2_4: Vector2, vector2_5: Vector2, vector2_6: Vector2) -- line: 47
-	-- upvalues: FFlagCapturesDragEdgeOffsetEnabled (copy)
-	local v37 = vector2_2 - vector2_4
-	local v38 = not FFlagCapturesDragEdgeOffsetEnabled and 0 or 50
-	local v39 = not FFlagCapturesDragEdgeOffsetEnabled and 0 or vector2_6.Y
 
-	if not FFlagCapturesDragEdgeOffsetEnabled and (v37.X + vector2_3.X < vector2_6.X and v37.Y < vector2_6.Y) then
-		v39 = vector2_6.Y
-	elseif not FFlagCapturesDragEdgeOffsetEnabled and v37.Y < vector2_6.Y then
-		v38 = vector2_6.X
+local function clampItemPosition(vector2_2: Vector2, vector2_3: Vector2, vector2_4: Vector2, vector2_5: Vector2, vector2_6: Vector2)
+	local v4 = vector2_2 - vector2_4
+	local y = vector2_6.Y
+
+	local v5 = not (vector2_5.X - 50 > vector2_3.X) and 50 or math.clamp(v4.X, 50, vector2_5.X - vector2_3.X - 50)
+
+	if vector2_5.Y - y > vector2_3.Y then
+		y = math.clamp(v4.Y, y, vector2_5.Y - vector2_3.Y)
 	end
 
-	if vector2_5.X - v38 > vector2_3.X then
-		v38 = math.clamp(v37.X, v38, vector2_5.X - vector2_3.X - (not FFlagCapturesDragEdgeOffsetEnabled and 0 or 50))
-	end
-
-	if vector2_5.Y - v39 > vector2_3.Y then
-		v39 = math.clamp(v37.Y, v39, vector2_5.Y - vector2_3.Y)
-	end
-
-	return Vector2.new(v38, v39)
+	return Vector2.new(v5, y)
 end
-local function getSnapPosition(vector2_7: Vector2, vector2_8: Vector2, vector2_9: Vector2, vector2_10: Vector2, vector2_11: Vector2, vector2_12: Vector2) -- line: 87
-	-- upvalues: clampItemPosition (copy)
-	local v46 = Vector2.new(vector2_10.X * vector2_11.X, vector2_10.Y * vector2_11.Y) - Vector2.new(vector2_7.X * vector2_8.X, vector2_7.Y * vector2_8.Y) + vector2_9
 
-	return (clampItemPosition(v46, vector2_7, vector2_9, vector2_10, vector2_12))
+local function getSnapPosition(vector2_2: Vector2, vector2_3: Vector2, absolutePosition: Vector2, absoluteSize: Vector2, vector2_4: Vector2, current: Vector2)
+	return (clampItemPosition(
+		Vector2.new(absoluteSize.X * vector2_4.X, absoluteSize.Y * vector2_4.Y) - Vector2.new(
+			vector2_2.X * vector2_3.X,
+			vector2_2.Y * vector2_3.Y
+		) + absolutePosition,
+		vector2_2,
+		absolutePosition,
+		absoluteSize,
+		current
+	))
 end
-local function getSnapAnchorPoint(vector2_13: Vector2, vector2_14: Vector2, vector2_15: Vector2, vector2_16: Vector2) -- line: 114
-	local v51 = vector2_13 - vector2_14
-	local t5 = {
-		Vector2.new(0, (math.max(v51.Y, vector2_16.Y))),
-		Vector2.new(vector2_15.X, v51.Y),
-		Vector2.new(math.max(v51.X, vector2_16.X), 0),
-		Vector2.new(v51.X, vector2_15.Y)
+
+local function getSnapAnchorPoint(vector2_2: Vector2, absolutePosition: Vector2, absoluteSize: Vector2, current: Vector2)
+	local v4 = vector2_2 - absolutePosition
+
+	local v5 = {
+		Vector2.new(0, (math.max(v4.Y, current.Y))),
+		Vector2.new(absoluteSize.X, v4.Y),
+		Vector2.new(math.max(v4.X, current.X), 0),
+		Vector2.new(v4.X, absoluteSize.Y)
 	}
 
-	table.sort(t5, function(p1, p2) -- line: 129
-		-- upvalues: v51 (copy)
-		return (p1 - v51).Magnitude < (p2 - v51).Magnitude
+	table.sort(v5, function(a, b): boolean
+		return (a - v4).Magnitude < (b - v4).Magnitude
 	end)
 
-	local v53 = t5[1]
-	local Magnitude = (v53 - v51).Magnitude
-
-	return v53 / vector2_15, Magnitude
+	local v6 = v5[1]
+	local magnitude = (v6 - v4).Magnitude
+	return v6 / absoluteSize, magnitude
 end
-local function getSnapDirectionFromAnchorPoint(vector2_17: Vector2) -- line: 138
-	-- upvalues: SnapDirection (copy)
-	if vector2_17.X == 0 then
+
+local function getSnapDirectionFromAnchorPoint(vector2_2: Vector2) -- 2 equivalent calls inferred from this helper
+	if vector2_2.X == 0 then
 		return SnapDirection.Left
 	end
 
-	if vector2_17.X == 1 then
+	if vector2_2.X == 1 then
 		return SnapDirection.Right
 	end
 
-	if vector2_17.Y == 0 then
+	if vector2_2.Y == 0 then
 		return SnapDirection.Top
 	end
 
 	return SnapDirection.Bottom
 end
-local function getShouldRotate(b1: boolean, vector2_18: Vector2) -- line: 150
-	local v58 = vector2_18.X == 0 or vector2_18.X == 1
-	local v59 = vector2_18.Y == 0 or vector2_18.Y == 1
-	local v60 = false
 
-	if v58 and v59 then
+local function getShouldRotate(flag: boolean, vector2_2: Vector2)
+	local v4 = vector2_2.X == 0 or vector2_2.X == 1
+	local v5 = vector2_2.Y == 0 or vector2_2.Y == 1
+
+	if v4 and v5 then
 		return false
 	end
 
-	if v59 and not b1 then
+	if v5 and not flag then
 		return true
 	end
 
-	if v58 and b1 then
-		v60 = true
+	return v4 and flag and true or false
+end
+
+local function useCaptureControlsController(flag: boolean, current: Vector2)
+	local v4 = useRef(current)
+	local dragContainerRef = useRef(nil)
+	local dragDetectorRef = useRef(nil)
+	local dragItemRef = useRef(nil)
+	local v5 = useRef(false)
+	local screenshotButtonRef = useRef(nil)
+	local v6 = useRef(CaptureControlsConfiguration.getStoredSnapAnchorPoint())
+
+	local state, setState = useState(vector2)
+	local state2, setState2 = useState(false)
+	local state3, setState3 = useState(false)
+	local state4, setState4 = useState(Right)
+
+	local v7 = useGuiInset()
+	local v8 = useDeviceInsets()
+
+	local v9 = useCallback(function()
+		v5.current = false
+	end, {})
+
+	local dragItemAnchorPointBinding, v10 = useAnimatedBinding(v)
+
+	local dragItemPositionBinding, v11 = useAnimatedBinding(v2, v9)
+
+	useEffect(function()
+		if not (flag and validateRefs({ dragItemRef, dragContainerRef })) then
+			return
+		end
+
+		assert(dragItemRef.current ~= nil, "dragItemRef is nil")
+		assert(dragContainerRef.current ~= nil, "dragContainerRef is nil")
+
+		v4.current = current
+
+		local current2 = v6.current
+
+		setState(current2)
+		setState4(getSnapDirectionFromAnchorPoint(current2)) -- inferred equivalent call
+
+		local v12 = dragItemRef.current.AbsoluteSize
+		local v13 = dragItemRef.current.AnchorPoint
+
+		local isItemHorizontal = state3
+		local v14 = current2.X == 0 or current2.X == 1
+		local v15 = current2.Y == 0 or current2.Y == 1
+		local v16
+
+		if v14 and v15 then
+			v16 = false
+		else
+			v16 = v15 and not isItemHorizontal and true or v14 and isItemHorizontal and true or false
+		end
+
+		if v16 then
+			v12 = Vector2.new(v12.Y, v12.X)
+			v13 = Vector2.new(v13.Y, v13.X)
+			v10({ x = ReactOtter.ease(v13.X, v3), y = ReactOtter.ease(v13.Y, v3) })
+
+			setState3(not state3)
+		end
+
+		local snapPosition = getSnapPosition(
+			v12,
+			v13,
+			dragContainerRef.current.AbsolutePosition,
+			dragContainerRef.current.AbsoluteSize,
+			current2,
+			current
+		)
+
+		local vector2_2 = Vector2.new(v12.X * v13.X, v12.Y * v13.Y)
+
+		v11({
+			xOffset = ReactOtter.instant(snapPosition.X + vector2_2.X),
+			yOffset = ReactOtter.instant(snapPosition.Y + vector2_2.Y)
+		})
+	end, { flag, current, v10, v11 })
+
+	local v12 = useCallback(function()
+		if not flag or v5.current or not validateRefs({ dragItemRef, dragContainerRef }) then
+			return
+		end
+
+		assert(dragItemRef.current ~= nil, "dragItemRef is nil")
+		assert(dragContainerRef.current ~= nil, "dragContainerRef is nil")
+
+		local absoluteSize = dragItemRef.current.AbsoluteSize
+		local anchorPoint = dragItemRef.current.AnchorPoint
+
+		local snapPosition = getSnapPosition(
+			absoluteSize,
+			anchorPoint,
+			dragContainerRef.current.AbsolutePosition,
+			dragContainerRef.current.AbsoluteSize,
+			state,
+			current
+		)
+
+		local vector2_2 = Vector2.new(absoluteSize.X * anchorPoint.X, absoluteSize.Y * anchorPoint.Y)
+
+		v11({
+			xOffset = ReactOtter.instant(snapPosition.X + vector2_2.X),
+			yOffset = ReactOtter.instant(snapPosition.Y + vector2_2.Y)
+		})
+	end, { flag, current, state, state2, v11 })
+
+	local function fn(vector2_2: Vector2)
+		if not flag or state2 or not validateRefs({ dragContainerRef, dragItemRef }) then
+			return
+		end
+
+		assert(dragItemRef.current ~= nil, "dragItemRef is nil")
+		assert(dragContainerRef.current ~= nil, "dragContainerRef is nil")
+
+		local v13 = vector2_2 - Vector2.new(v7.left + v8.left, v7.top + v8.top)
+		setState2(true)
+
+		local absoluteSize = dragItemRef.current.AbsoluteSize
+		local absolutePosition = dragItemRef.current.AbsolutePosition
+		local _anchorPoint = dragItemRef.current.AnchorPoint
+
+		local v14 = clampItemPosition(
+			absolutePosition,
+			absoluteSize,
+			dragContainerRef.current.AbsolutePosition,
+			dragContainerRef.current.AbsoluteSize,
+			current
+		)
+		local v15
+
+		if state3 then
+			local v16 = if engineFeature then vector2_2 else v13
+			v15 = (v16.X - absolutePosition.X) / absoluteSize.X
+		else
+			v15 = 0.5
+		end
+
+		local v16
+
+		if state3 then
+			v16 = 0.5
+		else
+			if engineFeature then
+				v13 = vector2_2
+			end
+
+			v16 = (v13.Y - absolutePosition.Y) / absoluteSize.Y
+		end
+
+		local vector2_3 = Vector2.new(v15, v16)
+
+		v10({
+			x = ReactOtter.instant(vector2_3.X),
+			y = ReactOtter.instant(vector2_3.Y)
+		})
+
+		local vector2_4 = Vector2.new(absoluteSize.X * vector2_3.X, absoluteSize.Y * vector2_3.Y)
+
+		v11({
+			xOffset = ReactOtter.instant(v14.X + vector2_4.X),
+			yOffset = ReactOtter.instant(v14.Y + vector2_4.Y)
+		})
 	end
 
-	return v60
-end
-local function useCaptureControlsController(b2: boolean, vector2_19: Vector2) -- line: 166
-	-- upvalues: useRef (copy), CaptureControlsConfiguration (copy), useState (copy), vector2 (copy), Right (copy), useGuiInset (copy), useDeviceInsets (copy), useCallback (copy), useAnimatedBinding (copy), t1 (copy), t2 (copy), useEffect (copy), validateRefs (copy), SnapDirection (copy), ReactOtter (copy), t3 (copy), getSnapPosition (copy), clampItemPosition (copy), EngineFeature (copy), getSnapAnchorPoint (copy)
-	local v63 = useRef(vector2_19)
-	local v64 = useRef(nil)
-	local v65 = useRef(nil)
-	local v66 = useRef(nil)
-	local v67 = useRef(false)
-	local v68 = useRef(nil)
-	local v69 = useRef(CaptureControlsConfiguration.getStoredSnapAnchorPoint())
-	local v70, v71 = useState(vector2)
-	local v72, v73 = useState(false)
-	local v74, v75 = useState(false)
-	local v76, v77 = useState(Right)
-	local v78 = useGuiInset()
-	local v79 = useDeviceInsets()
-	local v80 = useCallback(function() -- line: 183
-		-- upvalues: v67 (copy)
-		v67.current = false
-	end, {})
-	local v81, v82 = useAnimatedBinding(t1)
-	local v83, v84 = useAnimatedBinding(t2, v80)
+	local v13
 
-	useEffect(function() -- line: 194
-		-- upvalues: b2 (copy), validateRefs (copy), v66 (copy), v64 (copy), v63 (copy), vector2_19 (copy), v69 (copy), v71 (copy), v77 (copy), SnapDirection (copy), v74 (copy), v82 (copy), ReactOtter (copy), t3 (copy), v75 (copy), getSnapPosition (copy), v84 (copy)
-		if not b2 or not validateRefs({
-			v66,
-			v64
-		}) then
-			return
-		end
+	if not engineFeature then
+		v13 = v8
+	end
 
-		assert(v66.current ~= nil, "dragItemRef is nil")
-		assert(v64.current ~= nil, "dragContainerRef is nil")
-		v63.current = vector2_19
+	local v14
 
-		local current = v69.current
+	if not engineFeature then
+		v14 = v7
+	end
 
-		v71(current)
-		v77(if current.X ~= 0 then if current.X ~= 1 then if current.Y ~= 0 then SnapDirection.Bottom else SnapDirection.Top else SnapDirection.Right else SnapDirection.Left)
-
-		local AbsoluteSize = v66.current.AbsoluteSize
-		local currentAnchorPoint = v66.current.AnchorPoint
-		local v95 = v74
-		local v96 = current.X == 0 or current.X == 1
-		local v97 = current.Y == 0 or current.Y == 1
-		local v98 = false
-
-		if v96 and v97 then
-			v98 = false
-		elseif v97 and not v95 then
-			v98 = true
-		elseif v96 and v95 then
-			v98 = true
-		end
-
-		if v98 then
-			AbsoluteSize = Vector2.new(AbsoluteSize.Y, AbsoluteSize.X)
-			currentAnchorPoint = Vector2.new(currentAnchorPoint.Y, currentAnchorPoint.X)
-			v82({
-				x = ReactOtter.ease(currentAnchorPoint.X, t3),
-				y = ReactOtter.ease(currentAnchorPoint.Y, t3)
-			})
-			v75(not v74)
-		end
-
-		local v99 = getSnapPosition(AbsoluteSize, currentAnchorPoint, v64.current.AbsolutePosition, v64.current.AbsoluteSize, current, vector2_19)
-		local vector2_20 = Vector2.new(AbsoluteSize.X * currentAnchorPoint.X, AbsoluteSize.Y * currentAnchorPoint.Y)
-
-		v84({
-			xOffset = ReactOtter.instant(v99.X + vector2_20.X),
-			yOffset = ReactOtter.instant(v99.Y + vector2_20.Y)
-		})
-	end, {
-		b2,
-		vector2_19,
-		v82,
-		v84
-	})
-
-	local v85 = useCallback(function() -- line: 250
-		-- upvalues: b2 (copy), v67 (copy), validateRefs (copy), v66 (copy), v64 (copy), getSnapPosition (copy), v70 (copy), vector2_19 (copy), v84 (copy), ReactOtter (copy)
-		if not b2 or (v67.current or not validateRefs({
-			v66,
-			v64
-		})) then
-			return
-		end
-
-		assert(v66.current ~= nil, "dragItemRef is nil")
-		assert(v64.current ~= nil, "dragContainerRef is nil")
-
-		local AbsoluteSize = v66.current.AbsoluteSize
-		local currentAnchorPoint = v66.current.AnchorPoint
-		local v103 = getSnapPosition(AbsoluteSize, currentAnchorPoint, v64.current.AbsolutePosition, v64.current.AbsoluteSize, v70, vector2_19)
-		local vector2_21 = Vector2.new(AbsoluteSize.X * currentAnchorPoint.X, AbsoluteSize.Y * currentAnchorPoint.Y)
-
-		v84({
-			xOffset = ReactOtter.instant(v103.X + vector2_21.X),
-			yOffset = ReactOtter.instant(v103.Y + vector2_21.Y)
-		})
-	end, {
-		b2,
-		vector2_19,
-		v70,
-		v72,
-		v84
-	})
-	local v86 = useCallback(function(vector2_22: Vector2) -- line: 288
-		-- upvalues: b2 (copy), v72 (copy), validateRefs (copy), v64 (copy), v66 (copy), v78 (copy), v79 (copy), v73 (copy), clampItemPosition (copy), vector2_19 (copy), v74 (copy), EngineFeature (copy), v82 (copy), ReactOtter (copy), v84 (copy)
-		if not b2 or (v72 or not validateRefs({
-			v64,
-			v66
-		})) then
-			return
-		end
-
-		assert(v66.current ~= nil, "dragItemRef is nil")
-		assert(v64.current ~= nil, "dragContainerRef is nil")
-
-		local v106 = vector2_22 - Vector2.new(v78.left + v79.left, v78.top + v79.top)
-
-		v73(true)
-
-		local AbsoluteSize = v66.current.AbsoluteSize
-		local AbsolutePosition = v66.current.AbsolutePosition
-		local _ = v66.current.AnchorPoint
-		local v110 = clampItemPosition(AbsolutePosition, AbsoluteSize, v64.current.AbsolutePosition, v64.current.AbsoluteSize, vector2_19)
-		local vector2_23 = Vector2.new(not v74 and 0.5 or (((if not EngineFeature then v106 else vector2_22)).X - AbsolutePosition.X) / AbsoluteSize.X, if not v74 then (((if not EngineFeature then v106 else vector2_22)).Y - AbsolutePosition.Y) / AbsoluteSize.Y else 0.5)
-
-		v82({
-			x = ReactOtter.instant(vector2_23.X),
-			y = ReactOtter.instant(vector2_23.Y)
-		})
-
-		local vector2_24 = Vector2.new(AbsoluteSize.X * vector2_23.X, AbsoluteSize.Y * vector2_23.Y)
-
-		v84({
-			xOffset = ReactOtter.instant(v110.X + vector2_24.X),
-			yOffset = ReactOtter.instant(v110.Y + vector2_24.Y)
-		})
-	end, {
-		b2,
-		vector2_19,
+	local v15 = useCallback(fn, {
+		flag,
+		current,
 		clampItemPosition,
-		if not EngineFeature then v79 else nil,
-		if not EngineFeature then v78 else nil,
-		v72,
-		v74,
-		v84,
-		v82
+		v13,
+		v14,
+		state2,
+		state3,
+		v11,
+		v10
 	})
-	local v87 = useCallback(function(vector2_25: Vector2, b3: boolean) -- line: 354
-		-- upvalues: validateRefs (copy), v66 (copy), v64 (copy), v78 (copy), v79 (copy), getSnapAnchorPoint (copy), EngineFeature (copy), vector2_19 (copy), v74 (copy), v82 (copy), ReactOtter (copy), v75 (copy), getSnapPosition (copy), clampItemPosition (copy), v84 (copy), v67 (copy), t3 (copy), v71 (copy), v77 (copy), SnapDirection (copy), CaptureControlsConfiguration (copy), v69 (copy)
-		if not validateRefs({
-			v66,
-			v64
-		}) then
+
+	local function fn2(vector2_2: Vector2, flag2: boolean)
+		if not validateRefs({ dragItemRef, dragContainerRef }) then
 			return
 		end
 
-		assert(v66.current ~= nil, "dragItemRef is nil")
-		assert(v64.current ~= nil, "dragContainerRef is nil")
+		assert(dragItemRef.current ~= nil, "dragItemRef is nil")
+		assert(dragContainerRef.current ~= nil, "dragContainerRef is nil")
 
-		local v115 = vector2_25 - Vector2.new(v78.left + v79.left, v78.top + v79.top)
-		local AbsolutePosition = v64.current.AbsolutePosition
-		local AbsoluteSize = v64.current.AbsoluteSize
-		local v118, v119 = getSnapAnchorPoint(if not EngineFeature then v115 else vector2_25, AbsolutePosition, AbsoluteSize, vector2_19)
-		local v120 = v119 < 70 or not b3
-		local AbsoluteSize2 = v66.current.AbsoluteSize
-		local currentAnchorPoint = v66.current.AnchorPoint
-		local v123 = v74
-		local v124 = v118.X == 0 or v118.X == 1
-		local v125 = v118.Y == 0 or v118.Y == 1
-		local v126 = false
+		local v16 = vector2_2 - Vector2.new(v7.left + v8.left, v7.top + v8.top)
 
-		if v124 and v125 then
-			v126 = false
-		elseif v125 and not v123 then
-			v126 = true
-		elseif v124 and v123 then
-			v126 = true
+		local absolutePosition = dragContainerRef.current.AbsolutePosition
+		local absoluteSize = dragContainerRef.current.AbsoluteSize
+		local v17 = if engineFeature then vector2_2 else v16
+		local snapAnchorPoint, v18 = getSnapAnchorPoint(v17, absolutePosition, absoluteSize, current)
+
+		local v19 = v18 < 70 or not flag2
+
+		local v20 = dragItemRef.current.AbsoluteSize
+		local v21 = dragItemRef.current.AnchorPoint
+
+		local isItemHorizontal = state3
+		local v22 = snapAnchorPoint.X == 0 or snapAnchorPoint.X == 1
+		local v23 = snapAnchorPoint.Y == 0 or snapAnchorPoint.Y == 1
+		local v24
+
+		if v22 and v23 then
+			v24 = false
+		else
+			v24 = v23 and not isItemHorizontal and true or v22 and isItemHorizontal and true or false
 		end
 
-		if v120 and v126 then
-			AbsoluteSize2 = Vector2.new(AbsoluteSize2.Y, AbsoluteSize2.X)
-			currentAnchorPoint = Vector2.new(currentAnchorPoint.Y, currentAnchorPoint.X)
-			v82({
-				x = ReactOtter.instant(currentAnchorPoint.X),
-				y = ReactOtter.instant(currentAnchorPoint.Y)
-			})
-			v75(not v74)
+		if v19 and v24 then
+			v20 = Vector2.new(v20.Y, v20.X)
+			v21 = Vector2.new(v21.Y, v21.X)
+			v10({ x = ReactOtter.instant(v21.X), y = ReactOtter.instant(v21.Y) })
+
+			setState3(not state3)
 		end
 
-		local vector2_26 = Vector2.new(AbsoluteSize2.X * currentAnchorPoint.X, AbsoluteSize2.Y * currentAnchorPoint.Y)
-		local v128 = if not v120 then clampItemPosition(((if not EngineFeature then v115 else vector2_25)) - vector2_26, AbsoluteSize2, AbsolutePosition, AbsoluteSize, vector2_19) else getSnapPosition(AbsoluteSize2, currentAnchorPoint, AbsolutePosition, AbsoluteSize, v118, vector2_19)
+		local vector2_3 = Vector2.new(v20.X * v21.X, v20.Y * v21.Y)
+		local v25
 
-		if b3 then
-			v84({
-				xOffset = ReactOtter.instant(v128.X + vector2_26.X),
-				yOffset = ReactOtter.instant(v128.Y + vector2_26.Y)
+		if v19 then
+			v25 = getSnapPosition(v20, v21, absolutePosition, absoluteSize, snapAnchorPoint, current)
+		else
+			if engineFeature then
+				v16 = vector2_2
+			end
+
+			v25 = clampItemPosition(v16 - vector2_3, v20, absolutePosition, absoluteSize, current)
+		end
+
+		if flag2 then
+			v11({
+				xOffset = ReactOtter.instant(v25.X + vector2_3.X),
+				yOffset = ReactOtter.instant(v25.Y + vector2_3.Y)
 			})
-
 			return
 		end
 
-		v67.current = true
-		v84({
-			xOffset = ReactOtter.ease(v128.X + vector2_26.X, t3),
-			yOffset = ReactOtter.ease(v128.Y + vector2_26.Y, t3)
+		v5.current = true
+		v11({
+			xOffset = ReactOtter.ease(v25.X + vector2_3.X, v3),
+			yOffset = ReactOtter.ease(v25.Y + vector2_3.Y, v3)
 		})
-		v71(v118)
-		v77(if v118.X ~= 0 then if v118.X ~= 1 then if v118.Y ~= 0 then SnapDirection.Bottom else SnapDirection.Top else SnapDirection.Right else SnapDirection.Left)
-		CaptureControlsConfiguration.setStoredSnapAnchorPoint(v118)
-		v69.current = v118
-	end, {
-		vector2_19,
-		if not EngineFeature then v79 else nil,
-		if not EngineFeature then v78 else nil,
-		v74,
-		v84,
-		v82
-	})
-	local v88 = useCallback(function(vector2_27: Vector2) -- line: 445
-		-- upvalues: b2 (copy), v72 (copy), v87 (copy)
-		if not b2 or not v72 then
+
+		setState(snapAnchorPoint)
+		setState4(getSnapDirectionFromAnchorPoint(snapAnchorPoint)) -- inferred equivalent call
+
+		CaptureControlsConfiguration.setStoredSnapAnchorPoint(snapAnchorPoint)
+		v6.current = snapAnchorPoint
+	end
+
+	local v16
+
+	if not engineFeature then
+		v16 = v8
+	end
+
+	local v17
+
+	if not engineFeature then
+		v17 = v7
+	end
+
+	local v18 = useCallback(fn2, { current, v16, v17, state3, v11, v10 })
+
+	local v19 = useCallback(function(vector2_2: Vector2)
+		if flag and state2 then
+			v18(vector2_2, true)
+		end
+	end, { flag, v18, state2 })
+
+	local v20 = useCallback(function(vector2_2: Vector2)
+		if flag and state2 then
+			v18(vector2_2, false)
+			setState2(false)
+		end
+	end, { flag, v18, state2 })
+
+	useEffect(function()
+		if not flag then
 			return
 		end
 
-		v87(vector2_27, true)
-	end, {
-		b2,
-		v87,
-		v72
-	})
-	local v89 = useCallback(function(vector2_28: Vector2) -- line: 453
-		-- upvalues: b2 (copy), v72 (copy), v87 (copy), v73 (copy)
-		if not b2 or not v72 then
+		if v4.current ~= current then
+			v4.current = current
+			v12()
+		end
+	end, { flag, current, v12 })
+
+	useEffect(function()
+		if not flag then
 			return
 		end
 
-		v87(vector2_28, false)
-		v73(false)
-	end, {
-		b2,
-		v87,
-		v72
-	})
+		local connections = {}
 
-	useEffect(function() -- line: 462
-		-- upvalues: b2 (copy), v63 (copy), vector2_19 (copy), v85 (copy)
-		if not b2 then
-			return
+		if dragDetectorRef.current ~= nil then
+			table.insert(connections, dragDetectorRef.current.DragStart:Connect(v15))
+			table.insert(connections, dragDetectorRef.current.DragContinue:Connect(v19))
+			table.insert(connections, dragDetectorRef.current.DragEnd:Connect(v20))
 		end
 
-		if v63.current ~= vector2_19 then
-			v63.current = vector2_19
-			v85()
-		end
-	end, {
-		b2,
-		vector2_19,
-		v85
-	})
-	useEffect(function() -- line: 473
-		-- upvalues: b2 (copy), v65 (copy), v86 (copy), v88 (copy), v89 (copy), v64 (copy), v85 (copy), v66 (copy)
-		if not b2 then
-			return
+		if dragContainerRef.current ~= nil then
+			table.insert(connections, dragContainerRef.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(v12))
 		end
 
-		local t6 = {}
-
-		if v65.current ~= nil then
-			table.insert(t6, v65.current.DragStart:Connect(v86))
-			table.insert(t6, v65.current.DragContinue:Connect(v88))
-			table.insert(t6, v65.current.DragEnd:Connect(v89))
+		if dragItemRef.current ~= nil then
+			table.insert(connections, dragItemRef.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(v12))
 		end
 
-		if v64.current ~= nil then
-			table.insert(t6, v64.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(v85))
-		end
-
-		if v66.current ~= nil then
-			table.insert(t6, v66.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(v85))
-		end
-
-		return function() -- line: 499
-			-- upvalues: t6 (copy)
-			for _, v133 in t6 do
-				v133:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, {
-		b2,
-		v86,
-		v88,
-		v89,
-		v85
-	})
+	end, { flag, v15, v19, v20, v12 })
 
 	return {
-		dragContainerRef = v64,
-		dragDetectorRef = v65,
-		dragItemAnchorPointBinding = v81,
-		dragItemPositionBinding = v83,
-		dragItemRef = v66,
-		isItemHorizontal = v74,
-		screenshotButtonRef = v68,
-		snapDirection = v76
+		dragContainerRef = dragContainerRef,
+		dragDetectorRef = dragDetectorRef,
+		dragItemAnchorPointBinding = dragItemAnchorPointBinding,
+		dragItemPositionBinding = dragItemPositionBinding,
+		dragItemRef = dragItemRef,
+		isItemHorizontal = state3,
+		screenshotButtonRef = screenshotButtonRef,
+		snapDirection = state4
 	}
 end
 

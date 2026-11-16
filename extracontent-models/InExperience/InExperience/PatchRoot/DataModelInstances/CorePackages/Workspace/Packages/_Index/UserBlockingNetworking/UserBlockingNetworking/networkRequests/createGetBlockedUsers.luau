@@ -1,17 +1,24 @@
-local ParentParent = script.Parent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
+local API_URL = require(parent.API_URL)
 
-return function(t1: {[any]: any}) -- line: 14
-	-- upvalues: API_URL (copy)
-	return t1.roduxNetworking.GET({
-		Name = "GetBlockedUsers"
-	}, function(p1, t2: {[any]: any}?) -- line: 17
-		-- upvalues: API_URL (copy)
-		return p1(API_URL, {
-			currentUserId = t2 and t2.currentUserId or nil
-		}):path("user-blocking-api"):path("v1"):path("users"):path("get-blocked-users"):queryArgs({
-			cursor = t2 and t2.cursor or nil,
-			count = t2 and t2.count or nil
+return function(p)
+	return p.roduxNetworking.GET("GetBlockedUsers", function(callback, data)
+		local currentUserId
+
+		if data then
+			currentUserId = data.currentUserId or nil
+		end
+
+		local path = callback(API_URL, { currentUserId = currentUserId }):path("user-blocking-api"):path("v1"):path("users"):path("get-blocked-users")
+		local cursor
+
+		if data then
+			cursor = data.cursor or nil
+		end
+
+		return path:queryArgs({
+			cursor = cursor,
+			count = data and data.count or nil
 		})
 	end)
 end

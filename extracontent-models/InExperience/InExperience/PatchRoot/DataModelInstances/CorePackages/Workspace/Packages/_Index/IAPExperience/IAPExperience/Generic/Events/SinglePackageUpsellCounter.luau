@@ -1,39 +1,27 @@
-local Parent = script:FindFirstAncestor("IAPExperience").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
+local parent = script:FindFirstAncestor("IAPExperience").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
 
 return {
 	SinglePackageUpsellShownCounter = {
 		eventName = "SinglePackageUpsellShownCounter",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = { 2025, 5, 1 },
 		throttlingPercentage = 100,
 		description = "Counter on all multiple package upsell shown",
-		links = "",
-		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			5,
-			1
-		}
+		links = ""
 	},
 	SinglePackageUpsellModalClosedCounter = {
 		eventName = "SinglePackageUpsellModalClosedCounter",
-		throttlingPercentage = 100,
-		description = "Counter on all single package upsell modal closed",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			5,
-			1
-		}
+		lastUpdated = { 2025, 5, 1 },
+		throttlingPercentage = 100,
+		description = "Counter on all single package upsell modal closed"
 	},
 	SinglePackageUpsellModalBuyClickedCounter = {
 		eventName = "SinglePackageUpsellModalBuyClickedCounter",
-		throttlingPercentage = 100,
-		description = "Counter on all single package upsell modal buy clicked",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			5,
-			1
-		}
+		lastUpdated = { 2025, 5, 1 },
+		throttlingPercentage = 100,
+		description = "Counter on all single package upsell modal buy clicked"
 	}
 }

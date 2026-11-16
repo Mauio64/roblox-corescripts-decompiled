@@ -1,5 +1,5 @@
-local scriptParent = script.Parent
-local FFlagEnableConsoleExpControls = require(scriptParent:WaitForChild("FFlagEnableConsoleExpControls"))
-local v3 = game:DefineFastFlag("ChromeChatGamepadSupportFix", false)
+local parent = script.Parent
+local FFlagEnableConsoleExpControls = require(parent:WaitForChild("FFlagEnableConsoleExpControls"))
+local defineFastFlag = game:DefineFastFlag("ChromeChatGamepadSupportFix", false)
 
-return FFlagEnableConsoleExpControls and v3
+return FFlagEnableConsoleExpControls and defineFastFlag

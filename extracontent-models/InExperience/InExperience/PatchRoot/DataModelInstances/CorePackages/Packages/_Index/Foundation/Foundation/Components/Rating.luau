@@ -1,1 +1,3 @@
-return (require(script.Rating))
+local Rating = require(script.Rating)
+
+return Rating

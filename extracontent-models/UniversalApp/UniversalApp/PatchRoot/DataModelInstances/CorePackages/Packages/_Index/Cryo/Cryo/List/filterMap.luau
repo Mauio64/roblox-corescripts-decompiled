@@ -1,17 +1,19 @@
-local function filterMap(p1, p2) -- line: 7
-	local t1 = {}
-	local n1 = 1
+local function filterMap(list, callback)
+	local result = {}
+	local v = 1
 
-	for i = 1, #p1 do
-		local v7 = p2(p1[i], i)
+	for i = 1, #list do
+		local v2 = callback(list[i], i)
 
-		if v7 ~= nil then
-			t1[n1] = v7
-			n1 += 1
+		if v2 == nil then
+			continue
 		end
+
+		result[v] = v2
+		v += 1
 	end
 
-	return t1
+	return result
 end
 
 return filterMap

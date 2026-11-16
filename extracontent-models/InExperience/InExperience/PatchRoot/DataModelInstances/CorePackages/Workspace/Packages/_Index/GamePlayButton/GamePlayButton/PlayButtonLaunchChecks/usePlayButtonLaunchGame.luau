@@ -1,160 +1,375 @@
 local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
-
 require(GamePlayButton.PlayButtonTypes)
 
-local GamePlayButtonParent = GamePlayButton.Parent
-local React = require(GamePlayButtonParent.React)
-local useRoactService = require(GamePlayButtonParent.RobloxAppHooks).useRoactService
-local RoactServiceTags = require(GamePlayButtonParent.RoactServiceTags)
+local parent = GamePlayButton.Parent
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
 local RoactAnalytics = RoactServiceTags.RoactAnalytics
 local AppEventIngestService = RoactServiceTags.AppEventIngestService
 local AppGame = RoactServiceTags.AppGame
-local RoactUtils = require(GamePlayButtonParent.RoactUtils)
+local RoactUtils = require(parent.RoactUtils)
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local DiscoveryAnalytics = require(GamePlayButtonParent.DiscoveryAnalytics)
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
 local gamePlayIntent = DiscoveryAnalytics.Events.gamePlayIntent
 local joinGamePlayButton = DiscoveryAnalytics.Points.joinGamePlayButton
-local GameVotesRodux = require(GamePlayButtonParent.GameVotesRodux)
+local GameVotesRodux = require(parent.GameVotesRodux)
 local ReasonForNotVoteable = GameVotesRodux.Enums.ReasonForNotVoteable
 local ClearUserGameVotes = GameVotesRodux.UserGameVotes.ClearUserGameVotes
-local IsVRAppBuild = require(GamePlayButtonParent.AppCommonLib).IsVRAppBuild
-local SplashScreenManager = require(GamePlayButtonParent.SplashScreenManager).SplashScreenManager
-local LaunchGame = require(GamePlayButtonParent.GameLaunch).LaunchGame
-local GetFFlagLuaAppEnableVirtualEventPlaceId = require(GamePlayButtonParent.SharedFlags).GetFFlagLuaAppEnableVirtualEventPlaceId
-local FFlagLuaAppEnableStratusStreamingTestOnly = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppEnableStratusStreamingTestOnly
-local NavigateToRoute = require(GamePlayButtonParent.NavigationRodux).Thunks.NavigateToRoute
-local AppPage = require(GamePlayButtonParent.RobloxAppEnums).AppPage
-local FFlagSignalsNavP3Dispatch = require(GamePlayButtonParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v26 = if not FFlagSignalsNavP3Dispatch then nil else require(GamePlayButtonParent.RobloxAppNavigation).NavigationCommands
-local FFlagLuaAppEnablePlayButtonThrottle = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppEnablePlayButtonThrottle
-local FIntLuaAppPlayButtonThrottleTimeSeconds = require(GamePlayButtonParent.SharedFlags).FIntLuaAppPlayButtonThrottleTimeSeconds
-local FFlagLuaAppFixLaunchGameSourceParam = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppFixLaunchGameSourceParam
-local FFlagLuaAppEnableStratusStreamingCheck = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppEnableStratusStreamingCheck
-local FFlagLuaAppDemoModePlayButtonTelemetry = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppDemoModePlayButtonTelemetry
+local AppCommonLib = require(parent.AppCommonLib)
+local IsVRAppBuild = AppCommonLib.IsVRAppBuild
+local SplashScreenManager = require(parent.SplashScreenManager)
+local splashScreenManager = SplashScreenManager.SplashScreenManager
+local GameLaunch = require(parent.GameLaunch)
+local LaunchGame = GameLaunch.LaunchGame
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDeferInExperienceRbxmDownload = SharedFlags.FFlagDeferInExperienceRbxmDownload
+local Dash = require(parent.Dash)
+
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagLuaAppEnableVirtualEventPlaceId = SharedFlags2.GetFFlagLuaAppEnableVirtualEventPlaceId
+
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppEnableStratusStreamingTestOnly = SharedFlags3.FFlagLuaAppEnableStratusStreamingTestOnly
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppStratusPassUniverseId = SharedFlags4.FFlagLuaAppStratusPassUniverseId
+
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateToRoute = NavigationRodux.Thunks.NavigateToRoute
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags5.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppEnablePlayButtonThrottle = SharedFlags6.FFlagLuaAppEnablePlayButtonThrottle
+local SharedFlags7 = require(parent.SharedFlags)
+local FIntLuaAppPlayButtonThrottleTimeSeconds = SharedFlags7.FIntLuaAppPlayButtonThrottleTimeSeconds
+local SharedFlags8 = require(parent.SharedFlags)
+local FFlagLuaAppFixLaunchGameSourceParam = SharedFlags8.FFlagLuaAppFixLaunchGameSourceParam
+local SharedFlags9 = require(parent.SharedFlags)
+local FFlagLuaAppEnableStratusStreamingCheck = SharedFlags9.FFlagLuaAppEnableStratusStreamingCheck
+local SharedFlags10 = require(parent.SharedFlags)
+local FFlagLuaAppDemoModePlayButtonTelemetry = SharedFlags10.FFlagLuaAppDemoModePlayButtonTelemetry
+local SharedFlags11 = require(parent.SharedFlags)
+local FFlagLuaAppCloudClientPlayButtonOffer = SharedFlags11.FFlagLuaAppCloudClientPlayButtonOffer
+
 local VideoService = game:GetService("VideoService")
 
-return function(p1, p2, p3, p4, p5, p6, t1: {[any]: any}?) -- line: 43
-	-- upvalues: useRoactService (copy), RoactAnalytics (copy), AppEventIngestService (copy), AppGame (copy), useSelector (copy), useDispatch (copy), FFlagLuaAppEnablePlayButtonThrottle (copy), React (copy), FIntLuaAppPlayButtonThrottleTimeSeconds (copy), GetFFlagLuaAppEnableVirtualEventPlaceId (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy), gamePlayIntent (copy), joinGamePlayButton (copy), FFlagLuaAppEnableStratusStreamingTestOnly (copy), FFlagLuaAppEnableStratusStreamingCheck (copy), VideoService (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), NavigateToRoute (copy), IsVRAppBuild (copy), SplashScreenManager (copy), FFlagLuaAppFixLaunchGameSourceParam (copy), LaunchGame (copy), ReasonForNotVoteable (copy), ClearUserGameVotes (copy)
-	local v40 = useRoactService(RoactAnalytics)
-	local v41 = useRoactService(AppEventIngestService)
-	local v42 = useRoactService(AppGame)
-	local v43 = useSelector(function(p7) -- line: 56
-		-- upvalues: p1 (copy)
-		return p7.UserGameVotes[p1]
+return function(universeId, p, p2, referralSource, ctx, launchSource, extraParams)
+	local v = useRoactService(RoactAnalytics)
+	local v2 = useRoactService(AppEventIngestService)
+	local v3 = useRoactService(AppGame)
+
+	local v4 = useSelector(function(p3)
+		return p3.UserGameVotes[universeId]
 	end)
-	local v44 = useDispatch()
-	local v45 = if not FFlagLuaAppEnablePlayButtonThrottle then nil else React.useRef(0)
 
-	return (React.useCallback(function(p8: ((...any) -> ...any)?, s1: string?) -- line: 64
-		-- upvalues: FFlagLuaAppEnablePlayButtonThrottle (copy), v45 (copy), FIntLuaAppPlayButtonThrottleTimeSeconds (copy), GetFFlagLuaAppEnableVirtualEventPlaceId (copy), p2 (copy), p3 (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy), gamePlayIntent (copy), v41 (copy), p4 (copy), p1 (copy), t1 (copy), joinGamePlayButton (copy), v40 (copy), p5 (copy), FFlagLuaAppEnableStratusStreamingTestOnly (copy), FFlagLuaAppEnableStratusStreamingCheck (copy), VideoService (copy), AppPage (copy), p6 (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), v44 (copy), NavigateToRoute (copy), IsVRAppBuild (copy), SplashScreenManager (copy), FFlagLuaAppFixLaunchGameSourceParam (copy), LaunchGame (copy), v42 (copy), v43 (copy), ReasonForNotVoteable (copy), ClearUserGameVotes (copy)
+	local v5 = useDispatch()
+	local ref
+
+	if FFlagLuaAppEnablePlayButtonThrottle then
+		ref = React.useRef(0)
+	else
+		ref = nil
+	end
+
+	local useCallback = React.useCallback
+	local function fn(callback, actionType: string?, p3)
 		if FFlagLuaAppEnablePlayButtonThrottle then
-			local timestamp = tick()
+			local now = tick()
 
-			if timestamp - v45.current < FIntLuaAppPlayButtonThrottleTimeSeconds then
+			if now - ref.current < FIntLuaAppPlayButtonThrottleTimeSeconds then
 				return
 			end
 
-			v45.current = timestamp
+			ref.current = now
 		end
 
-		if GetFFlagLuaAppEnableVirtualEventPlaceId() and (not p2 or not p3) or not GetFFlagLuaAppEnableVirtualEventPlaceId() and not p3 then
+		if
+			GetFFlagLuaAppEnableVirtualEventPlaceId() and not (p and p2)
+			or not (GetFFlagLuaAppEnableVirtualEventPlaceId() or p2)
+		then
 			return
 		end
 
-		if p8 ~= nil then
-			if FFlagLuaAppDemoModePlayButtonTelemetry then
-				p8(s1)
+		if callback == nil then
+			local placeId
+
+			if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+				placeId = p
 			else
-				p8()
+				placeId = p2
 			end
+
+			local v6 = {
+				placeId = placeId,
+				rootPlaceId = tonumber(p2),
+				referralSource = referralSource,
+				universeId = universeId,
+				launchData = 0,
+				tileType = 0,
+				nativeAdData = 0,
+				actionType = 0
+			}
+			local launchData
+
+			if extraParams and extraParams.launchData then
+				launchData = extraParams.launchData
+			end
+
+			v6.launchData = launchData
+			local tileType
+
+			if extraParams then
+				tileType = extraParams.tileType
+			end
+
+			v6.tileType = tileType
+			local nativeAdData
+
+			if extraParams then
+				nativeAdData = extraParams.nativeAdData
+			end
+
+			v6.nativeAdData = nativeAdData
+			local actionType2
+
+			if FFlagLuaAppDemoModePlayButtonTelemetry then
+				actionType2 = actionType
+			end
+
+			v6.actionType = actionType2
+			gamePlayIntent(v2, "PlayButton", v6)
+		elseif FFlagLuaAppDemoModePlayButtonTelemetry then
+			callback(actionType)
 		else
-			gamePlayIntent(v41, "PlayButton", {
-				placeId = if not GetFFlagLuaAppEnableVirtualEventPlaceId() then p3 else p2,
-				rootPlaceId = tonumber(p3),
-				referralSource = p4,
-				universeId = p1,
-				launchData = if not t1 or not t1.launchData then nil else t1.launchData,
-				tileType = if not t1 then nil else t1.tileType,
-				nativeAdData = if not t1 then nil else t1.nativeAdData,
-				actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else s1
-			})
+			callback()
 		end
 
-		joinGamePlayButton(v40.InfluxDb, "gamePlayIntent", {
+		local influxDb = v.InfluxDb
+		local v6 = {
 			isUniversalApp = true,
-			referralSource = p4,
-			placeId = if not GetFFlagLuaAppEnableVirtualEventPlaceId() then p3 else p2,
-			ctx = p5,
-			actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else s1
-		})
+			referralSource = referralSource,
+			placeId = 0,
+			ctx = 0,
+			actionType = 0
+		}
+		local placeId
 
-		if FFlagLuaAppEnableStratusStreamingTestOnly then
-			if not FFlagLuaAppEnableStratusStreamingCheck then
-				local t2 = {{
-					name = AppPage.VideoServer,
-					placeId = if not GetFFlagLuaAppEnableVirtualEventPlaceId() then p3 else p2,
-					launchSource = p6,
-					extraParams = t1
-				}}
-
-				if FFlagSignalsNavP3Dispatch then
-					v26.to(v26.fromLegacyPage(t2[#t2]))
-
-					return
-				end
-
-				v44(NavigateToRoute(t2))
-
-				return
-			end
-
-			if VideoService:GameStreamingEnabled() then
-				local t3 = {{
-					name = AppPage.VideoServer,
-					placeId = if not GetFFlagLuaAppEnableVirtualEventPlaceId() then p3 else p2,
-					launchSource = p6,
-					extraParams = t1
-				}}
-
-				if FFlagSignalsNavP3Dispatch then
-					v26.to(v26.fromLegacyPage(t3[#t3]))
-
-					return
-				end
-
-				v44(NavigateToRoute(t3))
-
-				return
-			end
-		end
-
-		if IsVRAppBuild() then
-			SplashScreenManager.initialize(36)
-			wait(0.3)
-		end
-
-		if FFlagLuaAppFixLaunchGameSourceParam then
-			LaunchGame(if not GetFFlagLuaAppEnableVirtualEventPlaceId() then p3 else p2, p4, t1, v42, p6)
+		if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+			placeId = p
 		else
-			LaunchGame(if not GetFFlagLuaAppEnableVirtualEventPlaceId() then p3 else p2, p6, t1, v42)
+			placeId = p2
 		end
 
-		if v43 and v43.reasonForNotVoteable == ReasonForNotVoteable.PlayGame then
-			v44(ClearUserGameVotes(p1))
+		v6.placeId = placeId
+		v6.ctx = ctx
+
+		if not FFlagLuaAppDemoModePlayButtonTelemetry then
+			actionType = nil
 		end
-	end, {
-		v41,
-		v40,
-		v42,
-		v43,
-		p1,
-		if not GetFFlagLuaAppEnableVirtualEventPlaceId() then nil else p2,
-		p3,
-		p4,
-		p5,
-		t1,
-		if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else v44,
-		if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else p6
+
+		v6.actionType = actionType
+		joinGamePlayButton(influxDb, "gamePlayIntent", v6)
+		local cloudClientReservation
+
+		if FFlagLuaAppCloudClientPlayButtonOffer and p3 then
+			cloudClientReservation = p3.cloudClientReservation
+		end
+
+		if cloudClientReservation == nil then
+			if FFlagLuaAppEnableStratusStreamingTestOnly then
+				if FFlagLuaAppEnableStratusStreamingCheck then
+					if VideoService:GameStreamingEnabled() then
+						local v7 = {
+							name = AppPage.VideoServer,
+							placeId = 0,
+							universeId = 0,
+							launchSource = 0,
+							extraParams = 0
+						}
+						local placeId2
+
+						if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+							placeId2 = p
+						else
+							placeId2 = p2
+						end
+
+						v7.placeId = placeId2
+						local universeId2
+
+						if FFlagLuaAppStratusPassUniverseId then
+							universeId2 = universeId
+						end
+
+						v7.universeId = universeId2
+						v7.launchSource = launchSource
+						v7.extraParams = extraParams
+						local v8 = { v7 }
+
+						if FFlagSignalsNavP3Dispatch then
+							navigationCommands.to(navigationCommands.fromLegacyPage(v8[#v8]))
+						else
+							v5(NavigateToRoute(v8))
+						end
+
+						return
+					end
+				else
+					local v7 = {
+						name = AppPage.VideoServer,
+						placeId = 0,
+						universeId = 0,
+						launchSource = 0,
+						extraParams = 0
+					}
+					local placeId2
+
+					if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+						placeId2 = p
+					else
+						placeId2 = p2
+					end
+
+					v7.placeId = placeId2
+					local universeId2
+
+					if FFlagLuaAppStratusPassUniverseId then
+						universeId2 = universeId
+					end
+
+					v7.universeId = universeId2
+					v7.launchSource = launchSource
+					v7.extraParams = extraParams
+					local v8 = { v7 }
+
+					if FFlagSignalsNavP3Dispatch then
+						navigationCommands.to(navigationCommands.fromLegacyPage(v8[#v8]))
+					else
+						v5(NavigateToRoute(v8))
+					end
+
+					return
+				end
+			end
+
+			if IsVRAppBuild() then
+				splashScreenManager.initialize(36)
+				wait(0.3)
+			end
+
+			if FFlagDeferInExperienceRbxmDownload then
+				extraParams = Dash.join(extraParams or {}, { universeId = universeId })
+			end
+
+			if FFlagLuaAppFixLaunchGameSourceParam then
+				local v7
+
+				if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+					v7 = p
+				else
+					v7 = p2
+				end
+
+				LaunchGame(v7, referralSource, extraParams, v3, launchSource)
+			else
+				local v7
+
+				if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+					v7 = p
+				else
+					v7 = p2
+				end
+
+				LaunchGame(v7, launchSource, extraParams, v3)
+			end
+
+			if v4 and v4.reasonForNotVoteable == ReasonForNotVoteable.PlayGame then
+				v5(ClearUserGameVotes(universeId))
+			end
+		else
+			local v7 = {
+				name = AppPage.VideoServer,
+				placeId = 0,
+				universeId = 0,
+				launchSource = 0,
+				extraParams = 0,
+				reservationToken = 0,
+				offerKind = 0
+			}
+			local placeId2
+
+			if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+				placeId2 = p
+			else
+				placeId2 = p2
+			end
+
+			v7.placeId = placeId2
+			local universeId2
+
+			if FFlagLuaAppStratusPassUniverseId then
+				universeId2 = universeId
+			end
+
+			v7.universeId = universeId2
+			v7.launchSource = launchSource
+			v7.extraParams = extraParams
+			v7.reservationToken = cloudClientReservation.reservationToken
+			v7.offerKind = cloudClientReservation.offerKind
+			local v8 = { v7 }
+
+			if FFlagSignalsNavP3Dispatch then
+				navigationCommands.to(navigationCommands.fromLegacyPage(v8[#v8]))
+			else
+				v5(NavigateToRoute(v8))
+			end
+		end
+	end
+
+	local v6
+
+	if GetFFlagLuaAppEnableVirtualEventPlaceId() then
+		v6 = p
+	end
+
+	local v7 = extraParams
+	local v8
+
+	if FFlagLuaAppDemoModePlayButtonTelemetry then
+		v8 = v5
+	end
+
+	local v9
+
+	if FFlagLuaAppDemoModePlayButtonTelemetry then
+		v9 = launchSource
+	end
+
+	return (useCallback(fn, {
+		v2,
+		v,
+		v3,
+		v4,
+		universeId,
+		v6,
+		p2,
+		referralSource,
+		ctx,
+		v7,
+		v8,
+		v9
 	}))
 end

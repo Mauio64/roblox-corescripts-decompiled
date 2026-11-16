@@ -1,34 +1,44 @@
-local ParentParent = script.Parent.Parent
-local SignalsExperimental = require(ParentParent.SignalsExperimental)
+local parent = script.Parent.Parent
+local SignalsExperimental = require(parent.SignalsExperimental)
+local SharedFlags = require(parent.SharedFlags)
+local ActionHandlers = require(script.Parent.ActionHandlers)
 
-local function createSignalsMiddleware(t1: {[any]: any}) -- line: 4
-	-- upvalues: SignalsExperimental (copy)
-	return function(p1, _) -- line: 5
-		-- upvalues: t1 (copy), SignalsExperimental (copy)
-		return function(p3) -- line: 6
-			-- upvalues: t1 (copy), SignalsExperimental (copy), p1 (copy)
-			local v8 = t1[p3.type]
+local FFlagSignalsRegistryOwnedFanout = SharedFlags.FFlagSignalsRegistryOwnedFanout
 
-			if v8 and #v8 > 0 then
-				SignalsExperimental.batch(function() -- line: 10
-					-- upvalues: v8 (copy), p3 (copy), p1 (copy)
-					local v9 = true
+local function createSignalsMiddleware(p)
+	return function(callback, _)
+		return function(p2)
+			if FFlagSignalsRegistryOwnedFanout then
+				local v = nil
+				SignalsExperimental.batch(function()
+					ActionHandlers.handleAction(p, p2)
 
-					for _, v11 in v8 do
-						v9 = v11(p3) and v9
-					end
+					v = callback(p2)
+				end)
+				return v
+			else
+				local v = p[p2.type]
 
-					if not v9 then
-						return p1(p3)
-					end
+				if v and #v > 0 then
+					SignalsExperimental.batch(function()
+						local v2 = true
+
+						for _, v3 in v do
+							v2 = v3(p2) and v2
+						end
+
+						if v2 then
+							return nil
+						end
+
+						return callback(p2)
+					end)
 
 					return nil
-				end)
+				end
 
-				return nil
+				return callback(p2)
 			end
-
-			return p1(p3)
 		end
 	end
 end

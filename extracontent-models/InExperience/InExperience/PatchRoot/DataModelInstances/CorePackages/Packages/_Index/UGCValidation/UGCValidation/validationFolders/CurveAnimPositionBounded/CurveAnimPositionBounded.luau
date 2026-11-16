@@ -1,53 +1,41 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local GetFStringUGCValidateMaxAnimationMovementPerPart = require(ParentParent.flags.GetFStringUGCValidateMaxAnimationMovementPerPart)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
-}
+local GetFStringUGCValidateMaxAnimationMovementPerPart = require(parent.flags.GetFStringUGCValidateMaxAnimationMovementPerPart)
+return {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = {
+		ValidationEnums.SharedDataMember.curveAnimations,
+		ValidationEnums.SharedDataMember.curveAnimComputedFrames
+	},
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
+	run = function(object, p)
+		local v = {}
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+		for _, positionMagnitudeFrame in p.curveAnimComputedFrames.positionMagnitudeFrames do
+			for k, v2 in positionMagnitudeFrame do
+				if k == Constants.NAMED_R15_BODY_PARTS.LowerTorso then
+					continue
+				end
 
-t1.requiredData = {
-	ValidationEnums.SharedDataMember.curveAnimations,
-	ValidationEnums.SharedDataMember.curveAnimComputedFrames
-}
-t1.fflag = getFFlagUGCValidateMigrateCurveAnim
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
+				if not v[k] then
+					v[k] = GetFStringUGCValidateMaxAnimationMovementPerPart.asNumber(k)
+				end
 
-function t1.run(p1, p2) -- line: 27
-	-- upvalues: Constants (copy), GetFStringUGCValidateMaxAnimationMovementPerPart (copy), ErrorSourceStrings (copy)
-	local t2 = {}
+				if v[k] < v2 then
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_PositionSeparation, {
+						bodyPart = k,
+						maxMovement = tostring(v[k])
+					})
 
-	for _, v13 in p2.curveAnimComputedFrames.positionMagnitudeFrames do
-		for v14, v15 in v13 do
-			if v14 == Constants.NAMED_R15_BODY_PARTS.LowerTorso then
-				continue
-			end
-
-			if not t2[v14] then
-				t2[v14] = GetFStringUGCValidateMaxAnimationMovementPerPart.asNumber(v14)
-			end
-
-			if v15 > t2[v14] then
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_PositionSeparation, {
-					bodyPart = v14,
-					maxMovement = tostring(t2[v14])
-				})
-
-				return
+					return
+				end
 			end
 		end
 	end
-end
-
-return t1
+}

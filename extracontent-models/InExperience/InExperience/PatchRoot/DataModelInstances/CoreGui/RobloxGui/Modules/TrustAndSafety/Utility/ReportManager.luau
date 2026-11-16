@@ -7,96 +7,103 @@ local RunService = game:GetService("RunService")
 
 require(CorePackages.Packages.Dash)
 
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 local createVoiceAbuseReportRequest = require(RobloxGui.Modules.VoiceChat.createVoiceAbuseReportRequest)
-local Url = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Url
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Resources.Constants)
-local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
-local SessionUtility = require(ParentParent.Utility.SessionUtility)
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local Url = CoreScriptsCommon.Url
 
-function sendAnalytics(s1: string, n1: number, s2: string, s3: string?) -- line: 36
-	-- upvalues: SendAnalytics (copy), Constants (copy)
-	SendAnalytics(s1, Constants.Analytics.ReportSubmittedName, {
-		reportType = s1,
-		reportedEntityId = tostring(n1),
+local parent = script.Parent.Parent
+local Constants = require(parent.Resources.Constants)
+local SendAnalytics = require(parent.Utility.SendAnalytics)
+local SessionUtility = require(parent.Utility.SessionUtility)
+
+function sendAnalytics(reportType: string, p: number, reason: string, abuseVector: string?)
+	SendAnalytics(reportType, Constants.Analytics.ReportSubmittedName, {
+		reportType = reportType,
+		reportedEntityId = tostring(p),
 		reportSource = Constants.Analytics.ReportSourceInGame,
-		reason = s2,
-		abuseVector = s3
+		reason = reason,
+		abuseVector = abuseVector
 	})
 end
-function getAbuseVectorFromReportCategory(s4: string) -- line: 50
-	-- upvalues: Constants (copy)
-	if s4 == Constants.Category.Voice then
+
+function getAbuseVectorFromReportCategory(p: string): string
+	if p == Constants.Category.Voice then
 		return "voice"
 	end
 
-	if s4 == Constants.Category.Text then
-		return "chat"
-	end
-
-	return "other"
+	return if p == Constants.Category.Text then "chat" else "other"
 end
-function submitUserAbuseReport(t1: {[any]: any}, p1) -- line: 59
-	-- upvalues: Constants (copy), Players (copy), createVoiceAbuseReportRequest (copy), default (copy), Url (copy), HttpRbxApiService (copy), SessionUtility (copy)
-	local v21 = t1.reportCategory == Constants.Category.Voice
-	local LocalPlayer = Players.LocalPlayer
 
-	if LocalPlayer then
-		pcall(function() -- line: 63
-			-- upvalues: t1 (copy), v21 (copy), createVoiceAbuseReportRequest (copy), Players (copy), default (copy), LocalPlayer (copy), Url (copy), HttpRbxApiService (copy), Constants (copy), SessionUtility (copy), p1 (copy)
-			coroutine.wrap(function() -- line: 64
-				-- upvalues: t1 (copy), v21 (copy), createVoiceAbuseReportRequest (copy), Players (copy), default (copy), LocalPlayer (copy), Url (copy), HttpRbxApiService (copy), Constants (copy), SessionUtility (copy), p1 (copy)
-				local v26 = getAbuseVectorFromReportCategory(t1.reportCategory)
+function submitUserAbuseReport(data, callback)
+	local v = data.reportCategory == Constants.Category.Voice
+	local localPlayer = Players.LocalPlayer
 
-				if v21 then
-					local v27 = createVoiceAbuseReportRequest(Players, default, {
-						localUserId = LocalPlayer.UserId,
-						abuserUserId = t1.abusingPlayer.UserId,
-						abuseComment = t1.comment,
-						abuseReason = t1.reason,
-						inExpMenuOpenedUnixMilli = math.floor(t1.beginningTimestamp * 1000),
-						sortedPlayerListUserIds = t1.sortedUserIds,
-						abuseVector = v26
+	if localPlayer then
+		pcall(function()
+			coroutine.wrap(function()
+				local abuseVectorFromReportCategory = getAbuseVectorFromReportCategory(data.reportCategory)
+
+				if v then
+					local voiceAbuseReportRequest = createVoiceAbuseReportRequest(Players, default, {
+						localUserId = localPlayer.UserId,
+						abuserUserId = data.abusingPlayer.UserId,
+						abuseComment = data.comment,
+						abuseReason = data.reason,
+						inExpMenuOpenedUnixMilli = math.floor(data.beginningTimestamp * 1000),
+						sortedPlayerListUserIds = data.sortedUserIds,
+						abuseVector = abuseVectorFromReportCategory
 					})
 
 					if game:GetEngineFeature("AbuseReportV3") then
-						Players:ReportAbuseV3(LocalPlayer, v27)
+						Players:ReportAbuseV3(localPlayer, voiceAbuseReportRequest)
 					else
-						local v28 = Url.APIS_URL .. "/abuse-reporting/v2/abuse-report"
-
-						HttpRbxApiService:PostAsyncFullUrl(v28, v27)
+						HttpRbxApiService:PostAsyncFullUrl(
+							Url.APIS_URL .. "/abuse-reporting/v2/abuse-report",
+							voiceAbuseReportRequest
+						)
 					end
 				else
-					Players:ReportAbuse(t1.abusingPlayer, t1.reason, t1.comment)
+					Players:ReportAbuse(data.abusingPlayer, data.reason, data.comment)
 				end
 
-				sendAnalytics(Constants.Analytics.ReportTypeUser, t1.abusingPlayer.UserId, t1.reason, v26)
+				sendAnalytics(
+					Constants.Analytics.ReportTypeUser,
+					data.abusingPlayer.UserId,
+					data.reason,
+					abuseVectorFromReportCategory
+				)
 				SessionUtility.endAbuseReportSession()
 
-				if p1 then
-					p1()
+				if callback then
+					callback()
 				end
 			end)()
 		end)
 	end
 end
-function submitPlaceAbuseReport(t2: {[any]: any}, p2) -- line: 99
-	-- upvalues: RunService (copy), Players (copy), Constants (copy), SessionUtility (copy)
-	if t2.placeName ~= "" then
-		coroutine.wrap(function() -- line: 101
-			-- upvalues: RunService (copy), t2 (copy), Players (copy), Constants (copy), SessionUtility (copy), p2 (copy)
-			if not RunService:IsStudio() then
-				local v25 = string.format("User Report: \n    %s \nPlace Title: \n    %s \nPlaceId: \n    %s \nPlace Description: \n    %s \n", t2.comment, t2.placeName, tostring(t2.placeId), t2.placeDescription)
 
-				Players:ReportAbuse(nil, t2.reason, v25)
+function submitPlaceAbuseReport(data, callback)
+	if data.placeName ~= "" then
+		coroutine.wrap(function()
+			if not RunService:IsStudio() then
+				local v = string.format(
+					"User Report: \n    %s \nPlace Title: \n    %s \nPlaceId: \n    %s \nPlace Description: \n    %s \n",
+					data.comment,
+					data.placeName,
+					tostring(data.placeId),
+					data.placeDescription
+				)
+
+				Players:ReportAbuse(nil, data.reason, v)
 			end
 
-			sendAnalytics(Constants.Analytics.ReportTypeGame, t2.placeId, t2.reason)
+			sendAnalytics(Constants.Analytics.ReportTypeGame, data.placeId, data.reason)
 			SessionUtility.endAbuseReportSession()
 
-			if p2 then
-				p2()
+			if callback then
+				callback()
 			end
 		end)()
 	end

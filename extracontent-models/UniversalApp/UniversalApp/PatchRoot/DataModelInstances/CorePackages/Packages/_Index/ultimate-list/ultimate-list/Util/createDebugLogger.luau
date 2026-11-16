@@ -1,21 +1,18 @@
-local ancestor = script:FindFirstAncestor("ultimate-list")
-local DebugFlags = require(ancestor.DebugFlags)
+local ultimatelist = script:FindFirstAncestor("ultimate-list")
 
-local function createDebugLogger(s1: string) -- line: 7
-	-- upvalues: DebugFlags (copy)
-	return function(p1, ...) -- line: 8
-		-- upvalues: DebugFlags (copy), s1 (copy)
+local DebugFlags = require(ultimatelist.DebugFlags)
+
+local function createDebugLogger(p: string)
+	return function(formatString, ...)
 		if not DebugFlags.shouldLog then
 			return
 		end
 
-		if typeof(p1) == "string" then
-			print(`[{ s1 }] { string.format(p1, ...) }`)
-
-			return
+		if typeof(formatString) == "string" then
+			print(`[{p}] {string.format(formatString, ...)}`)
+		else
+			print(`[{p}]`, formatString(...))
 		end
-
-		print(`[{ s1 }]`, p1(...))
 	end
 end
 

@@ -1,39 +1,42 @@
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
-local ParentParent = script.Parent.Parent.Parent
-local SetPlayerFriendStatus = require(ParentParent.Actions.SetPlayerFriendStatus)
-local EventConnection = require(script.Parent.EventConnection)
-local v8 = Roact.PureComponent:extend("SocialConnector")
 
-function v8.didMount(p1) -- line: 17
-	p1.mounted = true
+local parent = script.Parent.Parent.Parent
+
+local SetPlayerFriendStatus = require(parent.Actions.SetPlayerFriendStatus)
+
+local EventConnection = require(script.Parent.EventConnection)
+
+local extended = Roact.PureComponent:extend("SocialConnector")
+
+function extended:didMount()
+	self.mounted = true
 end
-function v8.render(p2) -- line: 21
-	-- upvalues: Roact (copy), EventConnection (copy), Players (copy)
+
+function extended.render(p)
 	return Roact.createFragment({
 		FriendStatusChangedConnection = Roact.createElement(EventConnection, {
 			event = Players.LocalPlayer.FriendStatusChanged,
-			callback = function(p3, p4) -- line: 25
-				-- upvalues: p2 (copy)
-				p2.props.setPlayerFriendStatus(p3, p4)
+			callback = function(p2, p3)
+				p.props.setPlayerFriendStatus(p2, p3)
 			end
 		})
 	})
 end
-function v8.willUnmount(p5) -- line: 32
-	p5.mounted = false
+
+function extended:willUnmount()
+	self.mounted = false
 end
 
-local function mapDispatchToProps(p6) -- line: 36
-	-- upvalues: SetPlayerFriendStatus (copy)
+local function mapDispatchToProps(callback)
 	return {
-		setPlayerFriendStatus = function(p7, p8) -- line: 38
-			-- upvalues: p6 (copy), SetPlayerFriendStatus (copy)
-			return p6(SetPlayerFriendStatus(p7, p8))
+		setPlayerFriendStatus = function(p, p2)
+			return callback(SetPlayerFriendStatus(p, p2))
 		end
 	}
 end
 
-return RoactRodux.connect(nil, mapDispatchToProps)(v8)
+return RoactRodux.connect(nil, mapDispatchToProps)(extended)

@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)("SetDevConsoleVisibility", function(p1) -- line: 4
-	return {
-		isVisible = p1
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action("SetDevConsoleVisibility", function(isVisible)
+	return { isVisible = isVisible }
 end)

@@ -1,10 +1,9 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
-local Rodux = require(EditProfileParent.Rodux)
+local parent = EditProfile.Parent
+local Rodux = require(parent.Rodux)
 local ProfileRoduxNetworking = require(EditProfile.Networking.ProfileRoduxNetworking)
 
-return function() -- line: 6
-	-- upvalues: Rodux (copy), ProfileRoduxNetworking (copy)
+return function()
 	return Rodux.combineReducers({
 		NetworkStatus = ProfileRoduxNetworking.installReducer()
 	})

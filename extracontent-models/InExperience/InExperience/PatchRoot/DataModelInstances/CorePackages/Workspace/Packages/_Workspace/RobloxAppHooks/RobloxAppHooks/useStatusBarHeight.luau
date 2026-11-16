@@ -1,15 +1,16 @@
-local Parent = script:FindFirstAncestor("RobloxAppHooks").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("RobloxAppHooks").Parent
 
-return function() -- line: 8
-	-- upvalues: useSelector (copy)
-	return useSelector(function(p1) -- line: 9
-		if not p1.TopBar then
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+return function()
+	return useSelector(function(p)
+		if not p.TopBar then
 			return 0
 		end
 
-		if p1.TopBar.statusBarHeight then
-			return p1.TopBar.statusBarHeight
+		if p.TopBar.statusBarHeight then
+			return p.TopBar.statusBarHeight
 		end
 
 		return 0

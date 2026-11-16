@@ -1,4 +1,1 @@
-return {
-	InContent = "InContent",
-	Modal = "Modal"
-}
+return { InContent = "InContent", Modal = "Modal" }

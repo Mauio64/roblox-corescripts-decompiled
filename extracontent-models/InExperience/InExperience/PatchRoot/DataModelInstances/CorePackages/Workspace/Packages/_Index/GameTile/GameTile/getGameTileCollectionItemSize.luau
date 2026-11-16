@@ -1,19 +1,21 @@
 local GameTile = script:FindFirstAncestor("GameTile")
-local GameTileLayoutType = require(GameTile.GameTileTypes).GameTileLayoutType
-local GameTileParent = GameTile.Parent
-local CollectionItemSize = require(GameTileParent.CollectionViews).CollectionViewTypes.CollectionItemSize
+local GameTileTypes = require(GameTile.GameTileTypes)
+local GameTileLayoutType = GameTileTypes.GameTileLayoutType
 
-local function getGameTileCollectionItemSize(p1) -- line: 12
-	-- upvalues: GameTileLayoutType (copy), CollectionItemSize (copy)
-	if p1 == GameTileLayoutType.Narrow then
+local parent = GameTile.Parent
+local CollectionViews = require(parent.CollectionViews)
+local CollectionItemSize = CollectionViews.CollectionViewTypes.CollectionItemSize
+
+local function getGameTileCollectionItemSize(p)
+	if p == GameTileLayoutType.Narrow then
 		return CollectionItemSize.Small
 	end
 
-	if p1 == GameTileLayoutType.Wide then
+	if p == GameTileLayoutType.Wide then
 		return CollectionItemSize.Medium
 	end
 
-	if p1 == GameTileLayoutType.Event then
+	if p == GameTileLayoutType.Event then
 		return CollectionItemSize.Large
 	end
 

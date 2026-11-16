@@ -1,38 +1,32 @@
 local Markdown = script:FindFirstAncestor("Markdown")
-local MarkdownParent = Markdown.Parent
-local Dash = require(MarkdownParent.Dash)
+local parent = Markdown.Parent
+local Dash = require(parent.Dash)
+
 local BuildTree = require(script.BuildTree)
 local PostProcessTree = require(script.PostProcessTree)
 local Tokenize = require(script.Tokenize)
-
 require(Markdown.Types)
-
 local UnindentTags = require(script.Parent.UnindentTags)
 local IndexTree = require(script.Parent.IndexTree)
 local DefaultParserOptions = require(script.Parent.DefaultParserOptions)
-local t1 = {}
 
-function t1.safeParse(s1: string, p1) -- line: 18
-	-- upvalues: t1 (copy)
-	local ok, result = xpcall(function() -- line: 19
-		-- upvalues: t1 (copy), s1 (copy), p1 (copy)
-		return t1.parse(s1, p1)
-	end, function(err) -- line: 21
-		return `{ err }\n{ debug.traceback() }`
+local WikiMarkdownParser = {}
+
+function WikiMarkdownParser.safeParse(p: string, p2)
+	local success, result = xpcall(function()
+		return WikiMarkdownParser.parse(p, p2)
+	end, function(p3)
+		return `{p3}\n{debug.traceback()}`
 	end)
 
-	return ok, result
-end
-function t1.parse(s2: string, p2) -- line: 27
-	-- upvalues: Dash (copy), DefaultParserOptions (copy), UnindentTags (copy), Tokenize (copy), BuildTree (copy), PostProcessTree (copy), IndexTree (copy)
-	local v17 = Dash.joinDeep(DefaultParserOptions, p2 or {})
-	local v18 = UnindentTags(s2)
-	local v19 = Tokenize(v18)
-	local v20 = BuildTree(v19, v17)
-
-	v20.children = PostProcessTree(v20, v17)
-
-	return IndexTree(v20)
+	return success, result
 end
 
-return t1
+function WikiMarkdownParser.parse(p: string, options)
+	local joinDeep = Dash.joinDeep(DefaultParserOptions, options or {})
+	local tree = BuildTree(Tokenize((UnindentTags(p))), joinDeep)
+	tree.children = PostProcessTree(tree, joinDeep)
+	return IndexTree(tree)
+end
+
+return WikiMarkdownParser

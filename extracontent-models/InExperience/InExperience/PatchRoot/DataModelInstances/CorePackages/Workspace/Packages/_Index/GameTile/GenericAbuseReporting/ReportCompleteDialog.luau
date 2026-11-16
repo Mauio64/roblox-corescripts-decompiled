@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local ReportCompleteDialog = require(Workspace.GenericAbuseReporting.GenericAbuseReporting.Dialogs.ReportCompleteDialog)
 
-return (require(_Workspace.GenericAbuseReporting.GenericAbuseReporting.Dialogs.ReportCompleteDialog))
+return ReportCompleteDialog

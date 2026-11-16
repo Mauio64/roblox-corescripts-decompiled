@@ -1,11 +1,8 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Rodux = require(Parent.Rodux)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-require(Parent.AppChatNetworking)
+local Rodux = require(parent.Rodux)
+require(parent.AppChatNetworking)
 
-return Rodux.makeActionCreator(script.Name, function(s1: string, p1) -- line: 14
-	return {
-		conversationId = s1,
-		moderationType = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(conversationId: string, moderationType)
+	return { conversationId = conversationId, moderationType = moderationType }
 end)

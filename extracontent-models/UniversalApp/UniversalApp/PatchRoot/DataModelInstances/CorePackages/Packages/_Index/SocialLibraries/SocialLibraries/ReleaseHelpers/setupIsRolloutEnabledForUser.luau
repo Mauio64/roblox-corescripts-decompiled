@@ -1,20 +1,15 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
 local throttleUserId = require(script.Parent.throttleUserId)
 
-return function(p1: ((...any) -> ...any)) -- line: 5
-	-- upvalues: dependencies (copy), throttleUserId (copy)
-	return function() -- line: 6
-		-- upvalues: dependencies (copy), throttleUserId (copy), p1 (copy)
-		local LocalPlayer = dependencies.Players.LocalPlayer
+return function(callback)
+	return function()
+		local localPlayer = dependencies.Players.LocalPlayer
 
-		if not LocalPlayer or not LocalPlayer.UserId then
-			return false
+		if localPlayer and localPlayer.UserId then
+			return throttleUserId({ throttle = callback(), userId = localPlayer.UserId })
 		end
 
-		return throttleUserId({
-			throttle = p1(),
-			userId = LocalPlayer.UserId
-		})
+		return false
 	end
 end

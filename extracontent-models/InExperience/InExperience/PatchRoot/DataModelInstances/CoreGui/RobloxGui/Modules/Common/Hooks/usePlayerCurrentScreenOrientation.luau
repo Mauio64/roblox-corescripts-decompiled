@@ -2,32 +2,31 @@ local CorePackages = game:GetService("CorePackages")
 local React = require(CorePackages.Packages.React)
 local usePlayerGui = require(script.Parent.usePlayerGui)
 
-local function usePlayerCurrentScreenOrientation() -- line: 5
-	-- upvalues: usePlayerGui (copy), React (copy)
-	local v5 = usePlayerGui()
-	local v6, v7 = React.useState(nil)
+local function usePlayerCurrentScreenOrientation()
+	local v = usePlayerGui()
+	local state, setState = React.useState(nil)
 
-	React.useEffect(function() -- line: 9
-		-- upvalues: v5 (copy), v7 (copy)
-		local connection = nil
+	React.useEffect(function()
+		local currentScreenOrientationChangedConnection
 
-		if v5 then
-			v7(v5.CurrentScreenOrientation)
-			connection = v5:GetPropertyChangedSignal("CurrentScreenOrientation"):Connect(function() -- line: 15
-				-- upvalues: v7 (copy), v5 (copy)
-				v7(v5.CurrentScreenOrientation)
+		if v then
+			setState(v.CurrentScreenOrientation)
+
+			currentScreenOrientationChangedConnection = v:GetPropertyChangedSignal("CurrentScreenOrientation"):Connect(function()
+				setState(v.CurrentScreenOrientation)
 			end)
+		else
+			currentScreenOrientationChangedConnection = nil
 		end
 
-		return function() -- line: 20
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if currentScreenOrientationChangedConnection then
+				currentScreenOrientationChangedConnection:Disconnect()
 			end
 		end
-	end, { v5 })
+	end, { v })
 
-	return v6
+	return state
 end
 
 return usePlayerCurrentScreenOrientation

@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function() -- line: 6
-	-- upvalues: useSelector (copy)
-	return useSelector(function(p1) -- line: 7
-		return p1.Users
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+return function()
+	return useSelector(function(p)
+		return p.Users
 	end)
 end

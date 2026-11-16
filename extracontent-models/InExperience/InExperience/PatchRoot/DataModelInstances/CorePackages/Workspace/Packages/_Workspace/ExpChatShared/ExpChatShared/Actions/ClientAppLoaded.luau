@@ -1,10 +1,11 @@
-local Parent = script:FindFirstAncestor("ExpChatShared").Parent
+local parent = script:FindFirstAncestor("ExpChatShared").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 13
+return Rodux.makeActionCreator(script.Name, function(data)
 	return {
-		team = p1.team,
-		isChatCoreGuiEnabled = p1.isChatCoreGuiEnabled == nil or p1.isChatCoreGuiEnabled,
-		isTouchEnabled = p1.isTouchEnabled,
-		isGamepadEnabled = p1.isGamepadEnabled
+		team = data.team,
+		isChatCoreGuiEnabled = data.isChatCoreGuiEnabled == nil or data.isChatCoreGuiEnabled,
+		isTouchEnabled = data.isTouchEnabled,
+		isGamepadEnabled = data.isGamepadEnabled
 	}
 end)

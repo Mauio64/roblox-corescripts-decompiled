@@ -1,23 +1,28 @@
-local Parent = script:FindFirstAncestor("GameInvite").Parent
-local HttpRequest = require(Parent.HttpRequest)
-local Url = require(Parent.Http).Url
-local FFlagLuaAppDefaultHttpRetry = require(Parent.SharedFlags).FFlagLuaAppDefaultHttpRetry
-local v5 = HttpRequest.config({
-	requestFunction = HttpRequest.requestFunctions.RequestInternal,
-	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("GetRewardMetadataHttpRetryCount", 4)
-})
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("GameInvite").Parent
+local HttpRequest = require(parent.HttpRequest)
+local Http = require(parent.Http)
+local Url = Http.Url
 
-return function() -- line: 14
-	-- upvalues: Promise (copy), Url (copy), v5 (copy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDefaultHttpRetry = SharedFlags.FFlagLuaAppDefaultHttpRetry
+local config = HttpRequest.config
+local v = { requestFunction = HttpRequest.requestFunctions.RequestInternal, maxRetryCount = 0 }
+local maxRetryCount
+
+if FFlagLuaAppDefaultHttpRetry then
+	maxRetryCount = game:DefineFastInt("GetRewardMetadataHttpRetryCount", 4)
+end
+
+v.maxRetryCount = maxRetryCount
+local v2 = config(v)
+
+local Promise = require(parent.Promise)
+return function()
 	if game.GameId == nil or game.GameId == 0 then
 		return Promise.reject("GameId is nil or 0")
 	end
 
-	local v7 = Url:makeQueryString({
-		UniverseId = game.GameId
-	})
-	local v8 = string.format("%sreferral-reward-metadata/v1/get-reward-metadata?%s", Url.APIS_URL, v7)
+	local queryString = Url:makeQueryString({ UniverseId = game.GameId })
 
-	return v5(v8, "GET")
+	return v2(string.format("%sreferral-reward-metadata/v1/get-reward-metadata?%s", Url.APIS_URL, queryString), "GET")
 end

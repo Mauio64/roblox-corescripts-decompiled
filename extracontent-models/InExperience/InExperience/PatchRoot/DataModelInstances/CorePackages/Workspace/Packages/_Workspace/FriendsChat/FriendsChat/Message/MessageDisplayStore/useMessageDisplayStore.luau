@@ -1,19 +1,14 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
 
-require(Parent.Signals)
+local React = require(parent.React)
+require(parent.Signals)
 
 local createMessageDisplayStore = require(script.Parent.createMessageDisplayStore)
 
-local function useMessageDisplayStore(p1, s1: string?) -- line: 22
-	-- upvalues: React (copy), createMessageDisplayStore (copy)
-	return React.useMemo(function() -- line: 26
-		-- upvalues: createMessageDisplayStore (copy), p1 (copy), s1 (copy)
-		return createMessageDisplayStore(p1, s1)
-	end, {
-		p1,
-		s1
-	})
+local function useMessageDisplayStore(p, p2: string?)
+	return React.useMemo(function()
+		return createMessageDisplayStore(p, p2)
+	end, { p, p2 })
 end
 
 return useMessageDisplayStore

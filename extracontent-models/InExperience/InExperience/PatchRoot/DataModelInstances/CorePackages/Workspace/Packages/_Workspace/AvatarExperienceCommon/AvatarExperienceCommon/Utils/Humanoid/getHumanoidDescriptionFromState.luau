@@ -1,87 +1,92 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local mutedError = require(AvatarExperienceCommonParent.Loggers).mutedError
-local ASSET_TYPE_NAME_TO_ID_STRING = require(AvatarExperienceCommon.Constants).ASSET_TYPE_NAME_TO_ID_STRING
-local ASSET_TYPE_TO_ACCESSORY_TYPE = require(AvatarExperienceCommon.Constants).ASSET_TYPE_TO_ACCESSORY_TYPE
-local ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP = require(AvatarExperienceCommon.Constants).ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP
-local HUMANOID_DESCRIPTION_SCALE_TO_NAME = require(AvatarExperienceCommon.Constants).HUMANOID_DESCRIPTION_SCALE_TO_NAME
+local parent = AvatarExperienceCommon.Parent
+
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+local Constants = require(AvatarExperienceCommon.Constants)
+local ASSET_TYPE_NAME_TO_ID_STRING = Constants.ASSET_TYPE_NAME_TO_ID_STRING
+local Constants2 = require(AvatarExperienceCommon.Constants)
+local ASSET_TYPE_TO_ACCESSORY_TYPE = Constants2.ASSET_TYPE_TO_ACCESSORY_TYPE
+
+local Constants3 = require(AvatarExperienceCommon.Constants)
+local ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP = Constants3.ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP
+local Constants4 = require(AvatarExperienceCommon.Constants)
+local HUMANOID_DESCRIPTION_SCALE_TO_NAME = Constants4.HUMANOID_DESCRIPTION_SCALE_TO_NAME
 local setHumanoidDescriptionColorsFromBodyColor3s = require(script.Parent.setHumanoidDescriptionColorsFromBodyColor3s)
 local createHumanoidDescriptionAccessoryInfo = require(script.Parent.createHumanoidDescriptionAccessoryInfo)
 local setMakeupDescriptions = require(script.Parent.setMakeupDescriptions)
 local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
-local AvatarExperienceFlags = require(AvatarExperienceCommonParent.AvatarExperienceFlags)
-local FFlagAXMakeupEquipping = AvatarExperienceFlags.FFlagAXMakeupEquipping
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXOutfitPageRevamp = AvatarExperienceFlags.FFlagAXOutfitPageRevamp
+
 local getHumanoidDescriptionFromStateForOutfitType = require(AvatarExperienceCommon.Utils.Humanoid.getHumanoidDescriptionFromStateForOutfitType)
 
-return function(p1) -- line: 22
-	-- upvalues: FFlagAXOutfitPageRevamp (copy), getHumanoidDescriptionFromStateForOutfitType (copy), ASSET_TYPE_TO_ACCESSORY_TYPE (copy), createHumanoidDescriptionAccessoryInfo (copy), ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP (copy), ASSET_TYPE_NAME_TO_ID_STRING (copy), FFlagAXMakeupEquipping (copy), isMakeupAssetType (copy), mutedError (copy), setMakeupDescriptions (copy), HUMANOID_DESCRIPTION_SCALE_TO_NAME (copy), setHumanoidDescriptionColorsFromBodyColor3s (copy)
-	local v17
+return function(p)
+	local values
 
 	if FFlagAXOutfitPageRevamp then
-		v17 = getHumanoidDescriptionFromStateForOutfitType(p1, nil)
+		values = getHumanoidDescriptionFromStateForOutfitType(p, nil)
 	else
-		v17 = Instance.new("HumanoidDescription")
+		values = Instance.new("HumanoidDescription")
+		local equippedAssets = p.AvatarEditor.Character.EquippedAssets
+		local avatarScales = p.AvatarEditor.Character.AvatarScales
 
-		local EquippedAssets = p1.AvatarEditor.Character.EquippedAssets
-		local AvatarScales = p1.AvatarEditor.Character.AvatarScales
+		if equippedAssets then
+			local v = {}
 
-		if EquippedAssets then
-			local t1 = {}
+			for k, equippedAsset in equippedAssets do
+				local v2 = ASSET_TYPE_TO_ACCESSORY_TYPE[k]
+				local v3 = {}
 
-			for v21, v22 in EquippedAssets do
-				local t2 = {}
-				local v24 = ASSET_TYPE_TO_ACCESSORY_TYPE[v21]
-
-				for v25, v26 in v22 do
-					if v24 then
-						table.insert(t1, createHumanoidDescriptionAccessoryInfo(v21, v25, v26))
+				for k2, v4 in equippedAsset do
+					if v2 then
+						table.insert(v, createHumanoidDescriptionAccessoryInfo(k, k2, v4))
 					else
-						table.insert(t2, v25)
+						table.insert(v3, k2)
 					end
 				end
 
-				if v24 == nil and #t2 > 0 then
-					local v27 = ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[v21]
-					local v28 = table.concat(t2, ",")
+				if not (v2 == nil and #v3 > 0) then
+					continue
+				end
 
-					if v27 then
-						v17[v27] = v28
-					elseif v21 ~= ASSET_TYPE_NAME_TO_ID_STRING.Gear and (not FFlagAXMakeupEquipping or not isMakeupAssetType(v21)) then
-						mutedError(string.format("assetTypeId: %s not recognized as member of humanoidDescription", (tostring(v21))))
-					end
+				local v4 = ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[k]
+				local joined = table.concat(v3, ",")
+
+				if v4 then
+					values[v4] = joined
+				elseif k ~= ASSET_TYPE_NAME_TO_ID_STRING.Gear and not isMakeupAssetType(k) then
+					mutedError(string.format(
+						"assetTypeId: %s not recognized as member of humanoidDescription",
+						(tostring(k))
+					))
 				end
 			end
 
-			v17:SetAccessories(t1, true)
+			values:SetAccessories(v, true)
+			setMakeupDescriptions(values, equippedAssets)
+		end
 
-			if FFlagAXMakeupEquipping then
-				setMakeupDescriptions(v17, EquippedAssets)
+		if avatarScales then
+			for k, avatarScale in avatarScales do
+				values[HUMANOID_DESCRIPTION_SCALE_TO_NAME[k]] = avatarScale
 			end
 		end
 
-		if AvatarScales then
-			for v29, v30 in AvatarScales do
-				v17[HUMANOID_DESCRIPTION_SCALE_TO_NAME[v29]] = v30
-			end
-		end
-
-		setHumanoidDescriptionColorsFromBodyColor3s(v17, p1.AvatarEditor.Character.BodyColor3s)
+		setHumanoidDescriptionColorsFromBodyColor3s(values, p.AvatarEditor.Character.BodyColor3s)
 	end
 
-	local t3 = {}
-	local t4 = {}
+	local v = {}
+	local v2 = {}
 
-	for _, v34 in p1.AvatarEditor.EquippedEmotes.slotInfo do
-		t3[tostring(v34.assetId)] = { (tonumber(v34.assetId)) }
-		table.insert(t4, {
-			Slot = v34.position,
-			Name = tostring(v34.assetId)
-		})
+	for _, v3 in p.AvatarEditor.EquippedEmotes.slotInfo do
+		v[tostring(v3.assetId)] = { (tonumber(v3.assetId)) }
+		table.insert(v2, { Slot = v3.position, Name = tostring(v3.assetId) })
 	end
 
-	v17:SetEmotes(t3)
-	v17:SetEquippedEmotes(t4)
+	values:SetEmotes(v)
+	values:SetEquippedEmotes(v2)
 
-	return v17
+	return values
 end

@@ -1,37 +1,33 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local React = require(GenericAbuseReportingParent.React)
-local forwardErrorToScriptContext = require(GenericAbuseReporting.BeduiV2.Analytics.forwardErrorToScriptContext)
-local v5 = React.Component:extend("AbuseReportErrorBoundary")
+local parent = GenericAbuseReporting.Parent
 
-function v5.getDerivedStateFromError(_) -- line: 36
-	return {
-		hasError = true
-	}
+local React = require(parent.React)
+
+local forwardErrorToScriptContext = require(GenericAbuseReporting.BeduiV2.Analytics.forwardErrorToScriptContext)
+
+local extended = React.Component:extend("AbuseReportErrorBoundary")
+
+function extended.getDerivedStateFromError(_)
+	return { hasError = true }
 end
-function v5.init(p2) -- line: 40
-	p2.state = {
-		hasError = false
-	}
+
+function extended:init()
+	self.state = { hasError = false }
 end
-function v5.componentDidCatch(t1: {[any]: any}, p3, t2: {[any]: any}) -- line: 44
-	-- upvalues: forwardErrorToScriptContext (copy)
-	local onError = t1.props.onError
+
+function extended.componentDidCatch(p, p2, p3)
+	local onError = p.props.onError
 
 	if onError then
-		onError(p3, t2)
+		onError(p2, p3)
 	end
 
-	forwardErrorToScriptContext(p3, t2 and t2.componentStack or nil)
-end
-function v5.render(p4) -- line: 53
-	local props = p4.props
-
-	if p4.state.hasError then
-		return props.fallback
-	end
-
-	return props.children
+	forwardErrorToScriptContext(p2, p3 and p3.componentStack or nil)
 end
 
-return v5
+function extended.render(p)
+	local props = p.props
+	return if p.state.hasError then props.fallback else props.children
+end
+
+return extended

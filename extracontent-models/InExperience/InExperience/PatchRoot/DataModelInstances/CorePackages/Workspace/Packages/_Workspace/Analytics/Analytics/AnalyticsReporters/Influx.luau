@@ -1,35 +1,33 @@
-local t1 = {}
+local Influx = {}
+Influx.__index = Influx
 
-t1.__index = t1
+function Influx.new(reporter)
+	local typeName = type(reporter)
+	assert(typeName == "table" or typeName == "userdata", "Unexpected value for reportingService")
 
-function t1.new(p1) -- line: 27
-	-- upvalues: t1 (copy)
-	local v3 = type(p1)
+	local v = { _reporter = reporter, _isEnabled = true }
 
-	assert(v3 == "table" or v3 == "userdata", "Unexpected value for reportingService")
+	setmetatable(v, Influx)
 
-	local t2 = {
-		_isEnabled = true,
-		_reporter = p1
-	}
-
-	setmetatable(t2, t1)
-
-	return t2
-end
-function t1.setEnabled(t3: {[any]: any}, b1: boolean) -- line: 40
-	assert(type(b1) == "boolean", "Expected isEnabled to be a boolean")
-	t3._isEnabled = b1
-end
-function t1.reportSeries(t4: {[any]: any}, s1: string, t5: {[any]: any}?, n1: number) -- line: 48
-	local v11 = t5 or {}
-
-	assert(type(s1) == "string", "Expected seriesName to be a string")
-	assert(type(v11) == "table", "Expected additionalArgs to be a table")
-	assert(type(n1) == "number", "Expected throttlingPercent to be a number")
-	assert(n1 >= 0 and n1 <= 10000, "throttlingPercent must be between 0 - 10,000")
-	assert(t4._isEnabled, "This reporting service is disabled")
-	t4._reporter:ReportInfluxSeries(s1, v11, n1)
+	return v
 end
 
-return t1
+function Influx:setEnabled(isEnabled: boolean)
+	assert(type(isEnabled) == "boolean", "Expected isEnabled to be a boolean")
+	self._isEnabled = isEnabled
+end
+
+function Influx:reportSeries(value: string, options, value2: number)
+	local v = options or {}
+
+	assert(type(value) == "string", "Expected seriesName to be a string")
+	assert(type(v) == "table", "Expected additionalArgs to be a table")
+	assert(type(value2) == "number", "Expected throttlingPercent to be a number")
+	local v2 = value2 >= 0 and value2 <= 10000
+	assert(v2, "throttlingPercent must be between 0 - 10,000")
+	assert(self._isEnabled, "This reporting service is disabled")
+
+	self._reporter:ReportInfluxSeries(value, v, value2)
+end
+
+return Influx

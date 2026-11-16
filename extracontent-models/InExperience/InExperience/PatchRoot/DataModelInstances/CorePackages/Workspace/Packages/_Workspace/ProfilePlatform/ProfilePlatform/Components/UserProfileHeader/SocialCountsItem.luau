@@ -1,45 +1,50 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local React = require(Parent.React)
-local Interactable = require(Parent.UIBlox).Core.Control.Interactable
-local Foundation = require(Parent.Foundation)
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local React = require(parent.React)
+
+local UIBlox = require(parent.UIBlox)
+local Interactable = UIBlox.Core.Control.Interactable
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 
-local function NOOP() -- line: 19
-end
-local function SocialCountsItem(t1: {[any]: any}) -- line: 21
-	-- upvalues: useTokens (copy), React (copy), Interactable (copy), NOOP (copy), FoundationText (copy)
-	local v10 = useTokens()
-	local v11 = not t1.isDisabled and t1.count ~= "0"
-	local v12 = v11 and v10.Color.Content.Emphasis or v10.Color.Content.Muted
+local function NOOP() end
 
-	return React.createElement(Interactable, {
-		Size = UDim2.fromScale(0.25, 0),
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		[React.Event.Activated] = if not v11 then NOOP else t1.onActivated,
-		onStateChanged = NOOP,
-		LayoutOrder = t1.layoutOrder,
-		Active = v11
-	}, {
+local function SocialCountsItem(props)
+	local v = useTokens()
+	local active = not props.isDisabled and props.count ~= "0"
+
+	local emphasis = active and v.Color.Content.Emphasis or v.Color.Content.Muted
+
+	local createElement = React.createElement
+	local v2 = {}
+	v2.Size = UDim2.fromScale(0.25, 0)
+	v2.BackgroundTransparency = 1
+	v2.AutomaticSize = Enum.AutomaticSize.Y
+	local activated = React.Event.Activated
+	local v3 = if active then props.onActivated else NOOP
+	v2[activated] = v3
+	v2.onStateChanged = NOOP
+	v2.LayoutOrder = props.layoutOrder
+	v2.Active = active
+	return createElement(Interactable, v2, {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		Count = React.createElement(FoundationText, {
+		Count = React.createElement(Text, {
+			Text = props.count,
 			tag = "text-align-y-bottom auto-xy",
-			LayoutOrder = 1,
-			Text = t1.count,
-			fontStyle = v10.Typography.HeadingSmall,
-			textStyle = v12
+			fontStyle = v.Typography.HeadingSmall,
+			textStyle = emphasis,
+			LayoutOrder = 1
 		}),
-		Text = React.createElement(FoundationText, {
+		Text = React.createElement(Text, {
+			Text = props.text,
 			tag = "text-align-y-top auto-xy",
-			LayoutOrder = 2,
-			Text = t1.text,
-			fontStyle = v10.Typography.CaptionMedium,
-			textStyle = v12
+			fontStyle = v.Typography.CaptionMedium,
+			textStyle = emphasis,
+			LayoutOrder = 2
 		})
 	})
 end

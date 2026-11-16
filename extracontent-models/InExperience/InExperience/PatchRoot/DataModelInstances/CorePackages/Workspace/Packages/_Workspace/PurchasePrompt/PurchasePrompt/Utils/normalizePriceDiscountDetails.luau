@@ -1,86 +1,89 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local DiscountType = require(PurchasePromptParent.IAPExperience).DiscountType
+local parent = PurchasePrompt.Parent
+
+local IAPExperience = require(parent.IAPExperience)
+local DiscountType = IAPExperience.DiscountType
 local FFlagNormalizePriceDiscountAcceptLowercase = require(PurchasePrompt.Flags.FFlagNormalizePriceDiscountAcceptLowercase)
-local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
-local t1 = {
+
+local set = {
 	[DiscountType.BlackbirdSubscription] = true,
 	[DiscountType.RobloxPlusSubscription] = true
 }
 
-local function isValidRawDiscount(p1) -- line: 16
-	-- upvalues: FFlagNormalizePriceDiscountAcceptLowercase (copy)
-	if type(p1) ~= "table" then
+local function isValidRawDiscount(data): boolean
+	if type(data) ~= "table" then
 		return false
 	end
 
 	if FFlagNormalizePriceDiscountAcceptLowercase then
-		local v10 = p1.Type or p1.type
-		local v11 = p1.AmountInRobux or p1.amountInRobux
-		local v12 = p1.Percent or p1.percent
+		local kind = data.Type or data.type
+		local amountInRobux = data.AmountInRobux or data.amountInRobux
+		local percent = data.Percent or data.percent
 
-		if type(v10) ~= "string" or v10 == "" then
-			return false
-		end
-
-		if type(v11) ~= "number" then
-			return false
-		end
-
-		if type(v12) ~= "number" then
+		if type(kind) ~= "string" or kind == "" or type(amountInRobux) ~= "number" or type(percent) ~= "number" then
 			return false
 		end
 	else
-		if type(p1.Type) ~= "string" or p1.Type == "" then
+		if type(data.Type) ~= "string" or data.Type == "" or type(data.AmountInRobux) ~= "number" then
 			return false
 		end
 
-		if type(p1.AmountInRobux) ~= "number" then
-			return false
-		end
-
-		if type(p1.Percent) ~= "number" then
+		if type(data.Percent) ~= "number" then
 			return false
 		end
 	end
 
 	return true
 end
-local function normalizePriceDiscountDetails(t2: {[any]: any}?) -- line: 50
-	-- upvalues: isValidRawDiscount (copy), FFlagNormalizePriceDiscountAcceptLowercase (copy), t1 (copy), DiscountType (copy), FFlagPurchasePromptCartPricingEnabled (copy)
-	if type(t2) ~= "table" or #t2 == 0 then
+
+local function normalizePriceDiscountDetails(list)
+	if type(list) ~= "table" or #list == 0 then
 		return {}
 	end
 
-	local t3 = {}
+	local result = {}
 
-	for _, v in ipairs(t2) do
-		if not isValidRawDiscount(v) then
+	for _, item in ipairs(list) do
+		if not isValidRawDiscount(item) then
 			return {}
 		end
 
 		if FFlagNormalizePriceDiscountAcceptLowercase then
-			local v17 = v.Type or v.type
-			local v18 = v.AmountInRobux or v.amountInRobux
-			local v19 = v.Percent or v.percent
+			local v = item.Type or item.type
+			local amountInRobux = item.AmountInRobux or item.amountInRobux
+			local percent = item.Percent or item.percent
 
-			table.insert(t3, {
-				type = if not t1[v17] then DiscountType.Uncategorized else v17,
-				amountInRobux = v18,
-				percent = v19,
-				localizedDiscountAttribution = if not FFlagPurchasePromptCartPricingEnabled then nil else v.LocalizedDiscountAttribution
-			})
+			if not set[v] then
+				v = DiscountType.Uncategorized
+			end
+
+			local v2 = {
+				type = v,
+				amountInRobux = amountInRobux,
+				percent = percent,
+				localizedDiscountAttribution = item.LocalizedDiscountAttribution
+			}
+			table.insert(result, v2)
 		else
-			table.insert(t3, {
-				type = if not t1[v.Type] then DiscountType.Uncategorized else v.Type,
-				amountInRobux = v.AmountInRobux,
-				percent = v.Percent,
-				localizedDiscountAttribution = if not FFlagPurchasePromptCartPricingEnabled then nil else v.LocalizedDiscountAttribution
-			})
+			local v2
+
+			if set[item.Type] then
+				v2 = item.Type
+			else
+				v2 = DiscountType.Uncategorized
+			end
+
+			local v = {
+				type = v2,
+				amountInRobux = item.AmountInRobux,
+				percent = item.Percent,
+				localizedDiscountAttribution = item.LocalizedDiscountAttribution
+			}
+			table.insert(result, v)
 		end
 	end
 
-	return t3
+	return result
 end
 
 return normalizePriceDiscountDetails

@@ -1,11 +1,11 @@
-local function getConversationIds(t1: {[any]: any}) -- line: 2
-	local t2 = {}
+local function getConversationIds(items)
+	local ids = {}
 
-	for v4, v5 in t1 do
-		t2[v4] = tostring(v5.id)
+	for k, item in items do
+		ids[k] = tostring(item.id)
 	end
 
-	return t2
+	return ids
 end
 
 return getConversationIds

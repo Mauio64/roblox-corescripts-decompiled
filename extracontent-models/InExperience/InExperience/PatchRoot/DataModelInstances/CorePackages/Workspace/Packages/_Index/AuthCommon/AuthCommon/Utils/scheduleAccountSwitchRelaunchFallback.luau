@@ -1,12 +1,12 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Promise = require(Parent.Promise)
-local GetFIntAccountSwitchRelaunchFallbackSeconds = require(Parent.SharedFlags).GetFIntAccountSwitchRelaunchFallbackSeconds
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+local Promise = require(parent.Promise)
+local SharedFlags = require(parent.SharedFlags)
 
-local function scheduleAccountSwitchRelaunchFallback(p1: ((...any) -> ...any), t1: {[any]: any}?) -- line: 28
-	-- upvalues: Promise (copy), GetFIntAccountSwitchRelaunchFallbackSeconds (copy)
-	return ((t1 or {}).delay or Promise.delay)(GetFIntAccountSwitchRelaunchFallbackSeconds()):andThen(function() -- line: 32
-		-- upvalues: p1 (copy)
-		p1()
+local GetFIntAccountSwitchRelaunchFallbackSeconds = SharedFlags.GetFIntAccountSwitchRelaunchFallbackSeconds
+
+local function scheduleAccountSwitchRelaunchFallback(callback, options)
+	return ((options or {}).delay or Promise.delay)(GetFIntAccountSwitchRelaunchFallbackSeconds()):andThen(function()
+		callback()
 	end)
 end
 

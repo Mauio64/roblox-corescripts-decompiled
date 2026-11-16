@@ -1,20 +1,19 @@
 local HttpService = game:GetService("HttpService")
 local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
-local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
-local default = require(AppChatNetworking.url.HttpRequest).default
 
-return function(p1, s1: string, s2: string, s3: string?) -- line: 10
-	-- upvalues: default (copy), HttpService (copy), CHAT_PLATFORM_BASE_URL (copy)
-	local v9 = p1 or default
-	local json = HttpService:JSONEncode({
-		conversation_id = s1,
-		messages = {{
-			content = s2,
-			replies_to = s3
-		}}
+local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
+local HttpRequest = require(AppChatNetworking.url.HttpRequest)
+local default = HttpRequest.default
+
+return function(p, conversation_id: string, content: string, replies_to: string?)
+	local jsonEncode = HttpService:JSONEncode({
+		conversation_id = conversation_id,
+		messages = {
+			{ content = content, replies_to = replies_to }
+		}
 	})
 
-	return v9(`{ CHAT_PLATFORM_BASE_URL }/v1/send-messages`, "POST", {
-		postBody = json
+	return (p or default)(`{CHAT_PLATFORM_BASE_URL}/v1/send-messages`, "POST", {
+		postBody = jsonEncode
 	})
 end

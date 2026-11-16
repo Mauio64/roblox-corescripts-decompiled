@@ -1,52 +1,43 @@
-local Parent = script:FindFirstAncestor("NavigationRodux").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local t1 = {}
-local v4 = require(Parent.AppCommonLib).Symbol.named("RNAdapterThunkTag")
+local parent = script:FindFirstAncestor("NavigationRodux").Parent
 
-function t1.middleware(p1) -- line: 19
-	-- upvalues: ArgCheck (copy), v4 (copy)
-	ArgCheck.isType(p1, "function", "rnDispatcher")
+local ArgCheck = require(parent.ArgCheck)
+local AppCommonLib = require(parent.AppCommonLib)
+local named = AppCommonLib.Symbol.named("RNAdapterThunkTag")
+local RNAdapterThunk = {}
 
-	return function(p2, p3) -- line: 22
-		-- upvalues: v4 (copy), p1 (copy)
-		return function(p4) -- line: 23
-			-- upvalues: v4 (copy), p3 (copy), p1 (copy), p2 (copy)
-			if typeof(p4) == "table" and p4[v4] == true then
-				return p4(p3, p1)
+function RNAdapterThunk.middleware(p)
+	ArgCheck.isType(p, "function", "rnDispatcher")
+
+	return function(callback, p2)
+		return function(callback2)
+			if typeof(callback2) == "table" and callback2[named] == true then
+				return callback2(p2, p)
 			end
 
-			return p2(p4)
+			return callback(callback2)
 		end
 	end
 end
-function t1.new(p5, p6) -- line: 33
-	-- upvalues: ArgCheck (copy), v4 (copy)
-	ArgCheck.isNonEmptyString(p5, "name")
-	ArgCheck.isType(p6, "function", "onInvoke")
 
-	return (setmetatable({
-		[v4] = true,
-		type = p5
-	}, {
-		__call = function(_, ...) -- line: 41
-			-- upvalues: p6 (copy)
-			p6(...)
+function RNAdapterThunk.new(p, callback)
+	ArgCheck.isNonEmptyString(p, "name")
+	ArgCheck.isType(callback, "function", "onInvoke")
+
+	return (setmetatable({ [named] = true, type = p }, {
+		__call = function(_, ...)
+			callback(...)
 		end
 	}))
 end
-function t1.test(p8, p9, p10) -- line: 47
-	-- upvalues: ArgCheck (copy), v4 (copy)
-	ArgCheck.assert(type(p8) == "table" and p8[v4] == true, "'thunk' must be a valid RNAdapterThunk")
 
-	return p8(p9, p10)
-end
-function t1.is(p11) -- line: 56
-	-- upvalues: v4 (copy)
-	if type(p11) == "table" then
-		return p11[v4] == true
-	end
+function RNAdapterThunk.test(callback, p, p2)
+	ArgCheck.assert(type(callback) == "table" and callback[named] == true, "'thunk' must be a valid RNAdapterThunk")
 
-	return false
+	return callback(p, p2)
 end
 
-return t1
+function RNAdapterThunk.is(p): boolean
+	return type(p) == "table" and p[named] == true
+end
+
+return RNAdapterThunk

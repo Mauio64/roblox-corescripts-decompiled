@@ -1,6 +1,7 @@
 local CommercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
-local CommercePurchaseAppParent = CommercePurchaseApp.Parent
-local Rodux = require(CommercePurchaseAppParent.Rodux)
+local parent = CommercePurchaseApp.Parent
+local Rodux = require(parent.Rodux)
+
 local CommercePurchasePromptStateEnum = require(CommercePurchaseApp.Enums.CommercePurchasePromptStateEnum)
 local CommercePurchaseEnded = require(CommercePurchaseApp.Store.Actions.CommercePurchaseEnded)
 local CommercePurchaseFailed = require(CommercePurchaseApp.Store.Actions.CommercePurchaseFailed)
@@ -9,47 +10,32 @@ local CommercePurchaseCheckout = require(CommercePurchaseApp.Store.Actions.Comme
 
 require(CommercePurchaseApp.Store.Types)
 
-local function createInitialState() -- line: 20
-	-- upvalues: CommercePurchasePromptStateEnum (copy)
-	return {
-		promptState = CommercePurchasePromptStateEnum.None
-	}
+local function createInitialState() -- 2 equivalent calls inferred from this helper
+	return { promptState = CommercePurchasePromptStateEnum.None }
 end
 
-return (Rodux.createReducer({
-	promptState = CommercePurchasePromptStateEnum.None
-}, {
-	[CommercePurchaseEnded.name] = function(_, _) -- line: 27
-		-- upvalues: CommercePurchasePromptStateEnum (copy)
-		return {
-			promptState = CommercePurchasePromptStateEnum.None
-		}
+local createReducer = Rodux.createReducer
+local initialState = createInitialState() -- inferred equivalent call
+return (createReducer(initialState, {
+	[CommercePurchaseEnded.name] = function(_, _)
+		return createInitialState() -- inferred equivalent call
 	end,
-	[CommercePurchaseFailed.name] = function(p3, p4) -- line: 30
-		-- upvalues: CommercePurchasePromptStateEnum (copy)
-		local v14 = table.clone(p3)
-
-		v14.errorCode = p4.errorCode
-		v14.promptState = CommercePurchasePromptStateEnum.Error
-
-		return v14
+	[CommercePurchaseFailed.name] = function(p, p2)
+		local clone = table.clone(p)
+		clone.errorCode = p2.errorCode
+		clone.promptState = CommercePurchasePromptStateEnum.Error
+		return clone
 	end,
-	[CommercePurchaseStarted.name] = function(p5, p6) -- line: 36
-		-- upvalues: CommercePurchasePromptStateEnum (copy)
-		local v17 = table.clone(p5)
-
-		v17.promptState = CommercePurchasePromptStateEnum.Started
-		v17.commerceProductId = p6.commerceProductId
-
-		return v17
+	[CommercePurchaseStarted.name] = function(p, p2)
+		local clone = table.clone(p)
+		clone.promptState = CommercePurchasePromptStateEnum.Started
+		clone.commerceProductId = p2.commerceProductId
+		return clone
 	end,
-	[CommercePurchaseCheckout.name] = function(p7, p8) -- line: 42
-		-- upvalues: CommercePurchasePromptStateEnum (copy)
-		local v20 = table.clone(p7)
-
-		v20.promptState = CommercePurchasePromptStateEnum.Checkout
-		v20.checkoutSessionId = p8.checkoutSessionId
-
-		return v20
+	[CommercePurchaseCheckout.name] = function(p, p2)
+		local clone = table.clone(p)
+		clone.promptState = CommercePurchasePromptStateEnum.Checkout
+		clone.checkoutSessionId = p2.checkoutSessionId
+		return clone
 	end
 }))

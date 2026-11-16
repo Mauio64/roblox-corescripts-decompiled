@@ -1,44 +1,45 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-local React = require(AvatarExperienceInspectAndBuyParent.React)
-local useSelector = require(AvatarExperienceInspectAndBuyParent.RoactUtils).Hooks.RoactRodux.useSelector
-local tutils = require(AvatarExperienceInspectAndBuyParent.tutils)
-local useTokens = require(AvatarExperienceInspectAndBuyParent.Foundation).Hooks.useTokens
+local parent = AvatarExperienceInspectAndBuy.Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local tutils = require(parent.tutils)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+
 local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
 
-local function selectView(p1) -- line: 32
-	return p1.view
+local function selectView(p)
+	return p.view
 end
-local function useViewBreakpoints(n1: number) -- line: 44
-	-- upvalues: useTokens (copy), React (copy), ViewType (copy), useSelector (copy), selectView (copy), tutils (copy)
-	local v12 = useTokens()
 
-	return React.useMemo(function() -- line: 46
-		-- upvalues: ViewType (copy), n1 (copy), v12 (copy)
+local function useViewBreakpoints(p: number)
+	local v = useTokens()
+	return React.useMemo(function()
 		return {
 			[ViewType.Wide] = {
-				ContainerSize = UDim2.new(0, 800, 0.9, -n1),
+				ContainerSize = UDim2.new(0, 800, 0.9, -p),
 				ContainerAnchorPoint = Vector2.new(0.5, 0.5),
-				ContainerPosition = UDim2.new(0.5, 0, 0.5, n1 / 2),
-				OverlaySize = UDim2.new(1, 0, 1, n1),
-				OverlayPosition = UDim2.new(0, 0, 0, -n1)
+				ContainerPosition = UDim2.new(0.5, 0, 0.5, p / 2),
+				OverlaySize = UDim2.new(1, 0, 1, p),
+				OverlayPosition = UDim2.new(0, 0, 0, -p)
 			},
 			[ViewType.WideLandscape] = {
-				ContainerSize = UDim2.new(0.95, 0, 1, -n1),
+				ContainerSize = UDim2.new(0.95, 0, 1, -p),
 				ContainerAnchorPoint = Vector2.new(0.5, 0),
-				ContainerPosition = UDim2.new(0.5, 0, 0, n1 + v12.Padding.XSmall),
-				OverlaySize = UDim2.new(1, 0, 1, n1),
-				OverlayPosition = UDim2.new(0, 0, 0, -n1)
+				ContainerPosition = UDim2.new(0.5, 0, 0, p + v.Padding.XSmall),
+				OverlaySize = UDim2.new(1, 0, 1, p),
+				OverlayPosition = UDim2.new(0, 0, 0, -p)
 			},
 			[ViewType.Compact] = {
-				ContainerSize = UDim2.new(1, 0, 1, -n1),
+				ContainerSize = UDim2.new(1, 0, 1, -p),
 				ContainerAnchorPoint = Vector2.new(0, 0),
-				ContainerPosition = UDim2.new(0, 0, 0, n1 + v12.Padding.Small),
-				OverlaySize = UDim2.new(1, 0, 1, n1),
-				OverlayPosition = UDim2.new(0, 0, 0, -n1)
+				ContainerPosition = UDim2.new(0, 0, 0, p + v.Padding.Small),
+				OverlaySize = UDim2.new(1, 0, 1, p),
+				OverlayPosition = UDim2.new(0, 0, 0, -p)
 			}
 		}
-	end, { n1 })[useSelector(selectView, tutils.deepEqual)] or {}
+	end, { p })[useSelector(selectView, tutils.deepEqual)] or {}
 end
 
 return useViewBreakpoints

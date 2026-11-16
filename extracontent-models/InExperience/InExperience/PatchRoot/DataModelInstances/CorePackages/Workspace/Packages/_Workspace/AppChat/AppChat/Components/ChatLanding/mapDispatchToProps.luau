@@ -1,43 +1,29 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local RoactPaginator = require(AppChat.SocialLibraries).RoactPaginator
-local Promise = require(AppChatParent.Promise)
+local parent = AppChat.Parent
+
+local SocialLibraries = require(AppChat.SocialLibraries)
+local RoactPaginator = SocialLibraries.RoactPaginator
+local Promise = require(parent.Promise)
+
 local fetchConversationsByPage = require(AppChat.Conversations.Thunks.fetchConversationsByPage)
-local NetworkingChat = require(AppChat.Http.NetworkingChat)
-local createConversation = require(AppChat.Conversations.Thunks.createConversation)
 
-return function(p1: ((...any) -> ...any)) -- line: 11
-	-- upvalues: RoactPaginator (copy), fetchConversationsByPage (copy), Promise (copy), NetworkingChat (copy), createConversation (copy)
+return function(callback)
 	return {
-		[RoactPaginator.fetchInit] = function() -- line: 13
-			-- upvalues: p1 (copy), fetchConversationsByPage (copy)
-			return p1(fetchConversationsByPage())
+		[RoactPaginator.fetchInit] = function()
+			return callback(fetchConversationsByPage())
 		end,
-		[RoactPaginator.fetchWithCursor] = function(p2) -- line: 17
-			-- upvalues: Promise (copy), p1 (copy), fetchConversationsByPage (copy)
-			return Promise.new(function(resolve) -- line: 18
-				-- upvalues: p1 (copy), fetchConversationsByPage (copy), p2 (copy)
-				coroutine.wrap(function() -- line: 19
-					-- upvalues: p1 (copy), fetchConversationsByPage (copy), p2 (copy), resolve (copy)
-					local v13, v14, v15 = p1(fetchConversationsByPage(p2)):await()
+		[RoactPaginator.fetchWithCursor] = function(p)
+			return Promise.new(function(callback2)
+				coroutine.wrap(function()
+					local v, v2, v3 = callback(fetchConversationsByPage(p)):await()
 
-					if v13 then
-						resolve(v14, v15)
-
-						return
+					if v then
+						callback2(v2, v3)
+					else
+						callback2(nil, p)
 					end
-
-					resolve(nil, p2)
 				end)()
 			end)
-		end,
-		startOneToOneConversation = function(p3) -- line: 30
-			-- upvalues: p1 (copy), NetworkingChat (copy)
-			return p1(NetworkingChat.StartOneToOneConversation.API(p3))
-		end,
-		createOneToOneConversation = function(p4) -- line: 34
-			-- upvalues: p1 (copy), createConversation (copy)
-			return p1(createConversation("one_to_one", { p4 }))
 		end
 	}
 end

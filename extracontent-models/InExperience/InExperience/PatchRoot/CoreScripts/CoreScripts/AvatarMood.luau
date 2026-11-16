@@ -2,18 +2,21 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
 local LocalPlayer = Players.LocalPlayer
-local _ = CoreGui.RobloxGui
+local RobloxGui = CoreGui.RobloxGui
 
-require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local CoreScriptsInitializer = require(CorePackages.Workspace.Packages.CoreScriptsInitializer)
+CoreScriptsInitializer.CoreLogger:new(script.Name)
 
-local u6 = nil
-local u7 = nil
-local Core = Enum.AnimationPriority.Core
-local u9 = nil
-local u10 = true
-local u11 = false
-local t1 = {}
-local t2 = {
+local v = nil
+local track = nil
+local priority = Enum.AnimationPriority.Core
+local v2 = nil
+local v3 = true
+local v4 = false
+
+local v5 = {}
+
+local v6 = {
 	EmoteStopped = "currentEmoteTrackStopped",
 	EmoteKeyframeReached = "emoteKeyframeReached",
 	AnimationInstanceChanged = "animationInstanceChanged",
@@ -32,7 +35,8 @@ local t2 = {
 	AnimationStreamTrackPlayed = "AnimationStreamTrackPlayed",
 	StreamTrackStopped = "StreamTrackStopped"
 }
-local t3 = {
+
+local v7 = {
 	wave = true,
 	point = true,
 	dance = true,
@@ -42,830 +46,486 @@ local t3 = {
 	cheer = true
 }
 
-local function getPlayerHumanoid(p1) -- line: 63
-	if p1.Character then
-		return p1.Character:FindFirstChildOfClass("Humanoid")
+local function getPlayerHumanoid(player) -- 1 equivalent call inferred from this helper
+	if player.Character then
+		return player.Character:FindFirstChildOfClass("Humanoid")
 	end
 
 	return nil
 end
-local function getPlayerAnimator(p2) -- line: 71
-	local v36 = if not p2.Character then nil else p2.Character:FindFirstChildOfClass("Humanoid")
 
-	if v36 then
-		return v36:FindFirstChildOfClass("Animator")
+local function getPlayerAnimator(player) -- 2 equivalent calls inferred from this helper
+	local playerHumanoid = getPlayerHumanoid(player) -- inferred equivalent call
+
+	if playerHumanoid then
+		return playerHumanoid:FindFirstChildOfClass("Animator")
 	end
 
 	return nil
 end
-local function switchPriority(p3) -- line: 80
-	-- upvalues: Core (ref), u7 (ref)
-	Core = p3
 
-	if u7 then
-		u7.Priority = Core
+local function switchPriority(p) -- 6 equivalent calls inferred from this helper
+	priority = p
+
+	if track then
+		track.Priority = priority
 	end
 end
-local function disconnectAndRemoveConnection(p4) -- line: 87
-	-- upvalues: t1 (copy)
-	if t1[p4] ~= nil then
-		t1[p4]:Disconnect()
-		t1[p4] = nil
+
+local function disconnectAndRemoveConnection(p) -- 47 equivalent calls inferred from this helper
+	if v5[p] ~= nil then
+		v5[p]:Disconnect()
+		v5[p] = nil
 	end
 end
-local function resumeMoodAfterEmote() -- line: 94
-	-- upvalues: u9 (ref), u7 (ref), t1 (copy)
-	u9 = nil
 
-	if u7 ~= nil then
-		u7:Play()
+local function resumeMoodAfterEmote()
+	v2 = nil
+
+	if track ~= nil then
+		track:Play()
 	end
 
-	if t1.currentEmoteTrackStopped ~= nil then
-		t1.currentEmoteTrackStopped:Disconnect()
-		t1.currentEmoteTrackStopped = nil
-	end
-
-	if t1.emoteKeyframeReached ~= nil then
-		t1.emoteKeyframeReached:Disconnect()
-		t1.emoteKeyframeReached = nil
-	end
+	disconnectAndRemoveConnection("currentEmoteTrackStopped") -- inferred equivalent call
+	disconnectAndRemoveConnection("emoteKeyframeReached") -- inferred equivalent call
 end
-local function onEmoteTriggered(p5, p6) -- line: 104
-	-- upvalues: u10 (ref), u7 (ref), u9 (ref), u11 (ref), t1 (copy), t2 (copy)
-	if not u10 or u7 == nil then
+
+local function onEmoteTriggered(p, p2)
+	if not v3 or track == nil then
 		return
 	end
 
-	if p5 and p6 then
-		u7:Stop()
-		u9 = p6
-		u11 = true
+	if p and p2 then
+		track:Stop()
+		v2 = p2
+		v4 = true
+		disconnectAndRemoveConnection("currentEmoteTrackStopped") -- inferred equivalent call
+		disconnectAndRemoveConnection("emoteKeyframeReached") -- inferred equivalent call
+		v5.currentEmoteTrackStopped = v2.Stopped:Connect(function()
+			v2 = nil
 
-		if t1.currentEmoteTrackStopped ~= nil then
-			t1.currentEmoteTrackStopped:Disconnect()
-			t1.currentEmoteTrackStopped = nil
-		end
-
-		if t1.emoteKeyframeReached ~= nil then
-			t1.emoteKeyframeReached:Disconnect()
-			t1.emoteKeyframeReached = nil
-		end
-
-		t1.currentEmoteTrackStopped = u9.Stopped:Connect(function() -- line: 116
-			-- upvalues: u9 (ref), u7 (ref), t2 (copy), t1 (copy), u11 (ref)
-			u9 = nil
-
-			if u7 ~= nil then
-				u7:Play()
+			if track ~= nil then
+				track:Play()
 			end
 
-			local EmoteStopped = t2.EmoteStopped
+			disconnectAndRemoveConnection(v6.EmoteStopped) -- inferred equivalent call
+			disconnectAndRemoveConnection(v6.EmoteKeyframeReached) -- inferred equivalent call
 
-			if t1[EmoteStopped] ~= nil then
-				t1[EmoteStopped]:Disconnect()
-				t1[EmoteStopped] = nil
-			end
-
-			local EmoteKeyframeReached = t2.EmoteKeyframeReached
-
-			if t1[EmoteKeyframeReached] ~= nil then
-				t1[EmoteKeyframeReached]:Disconnect()
-				t1[EmoteKeyframeReached] = nil
-			end
-
-			u11 = false
+			v4 = false
 		end)
-		t1.emoteKeyframeReached = u9.KeyframeReached:Connect(function(keyframe) -- line: 122
-			-- upvalues: u9 (ref), u7 (ref), t2 (copy), t1 (copy), u11 (ref)
-			if keyframe == "End" and not u9.Looped then
-				u9 = nil
 
-				if u7 ~= nil then
-					u7:Play()
+		v5.emoteKeyframeReached = v2.KeyframeReached:Connect(function(p3)
+			if p3 == "End" and not v2.Looped then
+				v2 = nil
+
+				if track ~= nil then
+					track:Play()
 				end
 
-				local EmoteStopped = t2.EmoteStopped
+				disconnectAndRemoveConnection(v6.EmoteStopped) -- inferred equivalent call
+				disconnectAndRemoveConnection(v6.EmoteKeyframeReached) -- inferred equivalent call
 
-				if t1[EmoteStopped] ~= nil then
-					t1[EmoteStopped]:Disconnect()
-					t1[EmoteStopped] = nil
-				end
-
-				local EmoteKeyframeReached = t2.EmoteKeyframeReached
-
-				if t1[EmoteKeyframeReached] ~= nil then
-					t1[EmoteKeyframeReached]:Disconnect()
-					t1[EmoteKeyframeReached] = nil
-				end
-
-				u11 = false
+				v4 = false
 			end
 		end)
 	end
 end
-local function checkEmotePlaying(p7) -- line: 131
-	-- upvalues: t3 (copy), t1 (copy), u9 (ref), u11 (ref), u7 (ref), checkEmotePlaying (copy), t2 (copy)
-	local PlayingAnimationTracks = p7:GetPlayingAnimationTracks()
-	local v43 = false
 
-	for _, v in pairs(PlayingAnimationTracks) do
-		if v.IsPlaying and v.Animation.Parent and t3[v.Animation.Parent.Name] then
-			if t1.currentEmoteTrackStopped ~= nil then
-				t1.currentEmoteTrackStopped:Disconnect()
-				t1.currentEmoteTrackStopped = nil
+local function checkEmotePlaying(humanoid)
+	local playingAnimationTracks = humanoid:GetPlayingAnimationTracks()
+	local v8 = false
+
+	for _, playingAnimationTrack in pairs(playingAnimationTracks) do
+		if not (playingAnimationTrack.IsPlaying and playingAnimationTrack.Animation.Parent and v7[playingAnimationTrack.Animation.Parent.Name]) then
+			continue
+		end
+
+		disconnectAndRemoveConnection("currentEmoteTrackStopped") -- inferred equivalent call
+		disconnectAndRemoveConnection("emoteKeyframeReached") -- inferred equivalent call
+		v2 = playingAnimationTrack
+		v4 = false
+		track:Stop()
+
+		v5.currentEmoteTrackStopped = v2.Stopped:Connect(function()
+			wait(0.3)
+
+			if not (checkEmotePlaying(humanoid) or v4) then
+				v2 = nil
+
+				if track ~= nil then
+					track:Play()
+				end
+
+				disconnectAndRemoveConnection(v6.EmoteStopped) -- inferred equivalent call
+				disconnectAndRemoveConnection(v6.EmoteKeyframeReached) -- inferred equivalent call
 			end
+		end)
 
-			if t1.emoteKeyframeReached ~= nil then
-				t1.emoteKeyframeReached:Disconnect()
-				t1.emoteKeyframeReached = nil
-			end
-
-			u9 = v
-			u11 = false
-			u7:Stop()
-			t1.currentEmoteTrackStopped = u9.Stopped:Connect(function() -- line: 150
-				-- upvalues: checkEmotePlaying (copy), p7 (copy), u11 (ref), u9 (ref), u7 (ref), t2 (copy), t1 (copy)
+		v5.emoteKeyframeReached = v2.KeyframeReached:Connect(function(p)
+			if p == "End" then
 				wait(0.3)
 
-				if not checkEmotePlaying(p7) and not u11 then
-					u9 = nil
+				if not (checkEmotePlaying(humanoid) or v4) then
+					v2 = nil
 
-					if u7 ~= nil then
-						u7:Play()
+					if track ~= nil then
+						track:Play()
 					end
 
-					local EmoteStopped = t2.EmoteStopped
-
-					if t1[EmoteStopped] ~= nil then
-						t1[EmoteStopped]:Disconnect()
-						t1[EmoteStopped] = nil
-					end
-
-					local EmoteKeyframeReached = t2.EmoteKeyframeReached
-
-					if t1[EmoteKeyframeReached] ~= nil then
-						t1[EmoteKeyframeReached]:Disconnect()
-						t1[EmoteKeyframeReached] = nil
-					end
+					disconnectAndRemoveConnection(v6.EmoteStopped) -- inferred equivalent call
+					disconnectAndRemoveConnection(v6.EmoteKeyframeReached) -- inferred equivalent call
 				end
-			end)
-			t1.emoteKeyframeReached = u9.KeyframeReached:Connect(function(keyframe) -- line: 159
-				-- upvalues: checkEmotePlaying (copy), p7 (copy), u11 (ref), u9 (ref), u7 (ref), t2 (copy), t1 (copy)
-				if keyframe == "End" then
-					wait(0.3)
-
-					if not checkEmotePlaying(p7) and not u11 then
-						u9 = nil
-
-						if u7 ~= nil then
-							u7:Play()
-						end
-
-						local EmoteStopped = t2.EmoteStopped
-
-						if t1[EmoteStopped] ~= nil then
-							t1[EmoteStopped]:Disconnect()
-							t1[EmoteStopped] = nil
-						end
-
-						local EmoteKeyframeReached = t2.EmoteKeyframeReached
-
-						if t1[EmoteKeyframeReached] ~= nil then
-							t1[EmoteKeyframeReached]:Disconnect()
-							t1[EmoteKeyframeReached] = nil
-						end
-					end
-				end
-			end)
-			v43 = true
-		end
+			end
+		end)
+		v8 = true
 	end
 
-	return v43
+	return v8
 end
 
-LocalPlayer.Chatted:Connect(function(message) -- line: 175
-	-- upvalues: u10 (ref), u7 (ref), LocalPlayer (copy), t3 (copy), checkEmotePlaying (copy)
-	if not u10 or u7 == nil then
+LocalPlayer.Chatted:Connect(function(value)
+	if not v3 or track == nil then
 		return
 	end
 
-	if LocalPlayer.Character then
-		local Humanoid = LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+	local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
 
-		if Humanoid then
-			local s1 = ""
+	if humanoid then
+		local v8 = ""
 
-			if string.sub(message, 1, 3) == "/e " then
-				s1 = string.sub(message, 4)
-			elseif string.sub(message, 1, 7) == "/emote " then
-				s1 = string.sub(message, 8)
-			end
+		if string.sub(value, 1, 3) == "/e " then
+			v8 = string.sub(value, 4)
+		elseif string.sub(value, 1, 7) == "/emote " then
+			v8 = string.sub(value, 8)
+		end
 
-			if t3[s1] then
-				wait(0.3)
-				checkEmotePlaying(Humanoid)
-			end
+		if v7[v8] then
+			wait(0.3)
+			checkEmotePlaying(humanoid)
 		end
 	end
 end)
 
-local function stopAndDestroyCurrentMoodTrack() -- line: 198
-	-- upvalues: u7 (ref)
-	if u7 ~= nil then
-		u7:Stop()
-		u7:Destroy()
-		u7 = nil
+local function stopAndDestroyCurrentMoodTrack() -- 6 equivalent calls inferred from this helper
+	if track ~= nil then
+		track:Stop()
+		track:Destroy()
+		track = nil
 	end
 end
-local function stopAndDestroyCurrentMoodTrackConnections() -- line: 206
-	-- upvalues: u7 (ref), t1 (copy), u6 (ref)
-	if u7 ~= nil then
-		u7:Stop()
-		u7:Destroy()
-		u7 = nil
-	end
 
-	if t1.currentEmoteTrackStopped ~= nil then
-		t1.currentEmoteTrackStopped:Disconnect()
-		t1.currentEmoteTrackStopped = nil
-	end
-
-	if t1.emoteKeyframeReached ~= nil then
-		t1.emoteKeyframeReached:Disconnect()
-		t1.emoteKeyframeReached = nil
-	end
-
-	if t1.animationInstanceChanged ~= nil then
-		t1.animationInstanceChanged:Disconnect()
-		t1.animationInstanceChanged = nil
-	end
-
-	if t1.localEmote ~= nil then
-		t1.localEmote:Disconnect()
-		t1.localEmote = nil
-	end
-
-	u6 = nil
+local function stopAndDestroyCurrentMoodTrackConnections()
+	stopAndDestroyCurrentMoodTrack() -- inferred equivalent call
+	disconnectAndRemoveConnection("currentEmoteTrackStopped") -- inferred equivalent call
+	disconnectAndRemoveConnection("emoteKeyframeReached") -- inferred equivalent call
+	disconnectAndRemoveConnection("animationInstanceChanged") -- inferred equivalent call
+	disconnectAndRemoveConnection("localEmote") -- inferred equivalent call
+	v = nil
 end
-local function updateCharacterMoodOnAnimatorAdded(_, _, p10, p11) -- line: 215
-	-- upvalues: u7 (ref), u6 (ref), Core (ref), u9 (ref), t1 (copy), onEmoteTriggered (copy)
-	u7 = p11:LoadAnimation(u6)
-	u7.Priority = Core
-	task.delay(0.1, function() -- line: 222
-		-- upvalues: u9 (ref), u6 (ref), u7 (ref), p11 (copy), Core (ref), t1 (copy), p10 (copy), onEmoteTriggered (copy)
-		if u9 == nil and u6 then
-			if not u7 then
-				u7 = p11:LoadAnimation(u6)
+
+local function updateCharacterMoodOnAnimatorAdded(_, _, instance, animator) -- 2 equivalent calls inferred from this helper
+	track = animator:LoadAnimation(v)
+	track.Priority = priority
+
+	task.delay(0.1, function()
+		if v2 == nil and v then
+			if not track then
+				track = animator:LoadAnimation(v)
 			end
 
-			if u7 then
-				u7.Priority = Core
-				u7:Play()
+			if track then
+				track.Priority = priority
+				track:Play()
 			end
 		end
 
-		if t1.localEmote ~= nil then
-			t1.localEmote:Disconnect()
-			t1.localEmote = nil
-		end
-
-		t1.localEmote = p10.EmoteTriggered:Connect(onEmoteTriggered)
+		disconnectAndRemoveConnection("localEmote") -- inferred equivalent call
+		v5.localEmote = instance.EmoteTriggered:Connect(onEmoteTriggered)
 	end)
 end
-local function updateCharacterMoodOnHumanoidAdded(p12, p13, p14) -- line: 242
-	-- upvalues: u7 (ref), u6 (ref), Core (ref), u9 (ref), t1 (copy), onEmoteTriggered (copy)
-	local Animator = p14:FindFirstChild("Animator")
 
-	if Animator then
-		u7 = Animator:LoadAnimation(u6)
-		u7.Priority = Core
-		task.delay(0.1, function() -- line: 222
-			-- upvalues: u9 (ref), u6 (ref), u7 (ref), Animator (copy), Core (ref), t1 (copy), p14 (copy), onEmoteTriggered (copy)
-			if u9 == nil and u6 then
-				if not u7 then
-					u7 = Animator:LoadAnimation(u6)
-				end
+local function updateCharacterMoodOnHumanoidAdded(instance, p, humanoid)
+	local animator = humanoid:FindFirstChild("Animator")
 
-				if u7 then
-					u7.Priority = Core
-					u7:Play()
-				end
-			end
-
-			if t1.localEmote ~= nil then
-				t1.localEmote:Disconnect()
-				t1.localEmote = nil
-			end
-
-			t1.localEmote = p14.EmoteTriggered:Connect(onEmoteTriggered)
-		end)
+	if animator then
+		updateCharacterMoodOnAnimatorAdded(nil, nil, humanoid, animator) -- inferred equivalent call
 	end
 
-	if t1.humanoidAnimatorAdded and t1.humanoidAnimatorAdded ~= nil then
-		t1.humanoidAnimatorAdded:Disconnect()
-		t1.humanoidAnimatorAdded = nil
+	if v5.humanoidAnimatorAdded then
+		disconnectAndRemoveConnection("humanoidAnimatorAdded") -- inferred equivalent call
 	end
 
-	t1.humanoidAnimatorAdded = p14.ChildAdded:Connect(function(child) -- line: 252
-		-- upvalues: p12 (copy), p13 (copy), p14 (copy), u7 (ref), u6 (ref), Core (ref), u9 (ref), t1 (copy), onEmoteTriggered (copy)
+	v5.humanoidAnimatorAdded = humanoid.ChildAdded:Connect(function(child)
 		if child.Name == "Animator" then
-			local _ = p12
-			local _ = p13
-			local v100 = p14
-
-			u7 = child:LoadAnimation(u6)
-			u7.Priority = Core
-			task.delay(0.1, function() -- line: 222
-				-- upvalues: u9 (ref), u6 (ref), u7 (ref), child (copy), Core (ref), t1 (copy), v100 (copy), onEmoteTriggered (copy)
-				if u9 == nil and u6 then
-					if not u7 then
-						u7 = child:LoadAnimation(u6)
-					end
-
-					if u7 then
-						u7.Priority = Core
-						u7:Play()
-					end
-				end
-
-				if t1.localEmote ~= nil then
-					t1.localEmote:Disconnect()
-					t1.localEmote = nil
-				end
-
-				t1.localEmote = v100.EmoteTriggered:Connect(onEmoteTriggered)
-			end)
-		end
-	end)
-end
-local function updateCharacterMood(p15, p16) -- line: 259
-	-- upvalues: u10 (ref), t1 (copy), u7 (ref), u6 (ref), updateCharacterMood (copy), updateCharacterMoodOnHumanoidAdded (copy)
-	if p15 == nil or (p16 == nil or not u10) then
-		return
-	end
-
-	if t1.animationInstanceChanged and t1.animationInstanceChanged ~= nil then
-		t1.animationInstanceChanged:Disconnect()
-		t1.animationInstanceChanged = nil
-	end
-
-	if t1.characterHumanoidAdded and t1.characterHumanoidAdded ~= nil then
-		t1.characterHumanoidAdded:Disconnect()
-		t1.characterHumanoidAdded = nil
-	end
-
-	if u7 ~= nil then
-		u7:Stop()
-		u7:Destroy()
-		u7 = nil
-	end
-
-	u6 = p16
-	t1.animationInstanceChanged = u6.Changed:Connect(function(_) -- line: 275
-		-- upvalues: updateCharacterMood (copy), p15 (copy), p16 (copy)
-		updateCharacterMood(p15, p16)
-	end)
-
-	local Humanoid = p15:FindFirstChildWhichIsA("Humanoid")
-
-	if Humanoid then
-		updateCharacterMoodOnHumanoidAdded(p15, p16, Humanoid)
-	end
-
-	t1.characterHumanoidAdded = p15.ChildAdded:Connect(function(child) -- line: 284
-		-- upvalues: updateCharacterMoodOnHumanoidAdded (copy), p15 (copy), p16 (copy), Humanoid (copy)
-		if child:IsA("Humanoid") then
-			updateCharacterMoodOnHumanoidAdded(p15, p16, Humanoid)
+			updateCharacterMoodOnAnimatorAdded(nil, nil, humanoid, child) -- inferred equivalent call
 		end
 	end)
 end
 
-function initAvatarMood(p18) -- line: 291
-	-- upvalues: t1 (copy), u10 (ref), updateCharacterMood (copy), LocalPlayer (copy), u7 (ref), t2 (copy), u6 (ref)
-	local MoodsEnabled = p18:FindFirstChild("MoodsEnabled")
-
-	if t1.animateScriptMoodAdded ~= nil then
-		t1.animateScriptMoodAdded:Disconnect()
-		t1.animateScriptMoodAdded = nil
-	end
-
-	if t1.animateScriptMoodRemoved ~= nil then
-		t1.animateScriptMoodRemoved:Disconnect()
-		t1.animateScriptMoodRemoved = nil
-	end
-
-	if MoodsEnabled then
-		u10 = false
-
+local function updateCharacterMood(character, p)
+	if character == nil or p == nil or not v3 then
 		return
 	end
 
-	local mood = p18:FindFirstChild("mood")
+	if v5.animationInstanceChanged then
+		disconnectAndRemoveConnection("animationInstanceChanged") -- inferred equivalent call
+	end
+
+	if v5.characterHumanoidAdded then
+		disconnectAndRemoveConnection("characterHumanoidAdded") -- inferred equivalent call
+	end
+
+	stopAndDestroyCurrentMoodTrack() -- inferred equivalent call
+	v = p
+	v5.animationInstanceChanged = v.Changed:Connect(function(_)
+		updateCharacterMood(character, p)
+	end)
+
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+
+	if humanoid then
+		updateCharacterMoodOnHumanoidAdded(character, p, humanoid)
+	end
+
+	v5.characterHumanoidAdded = character.ChildAdded:Connect(function(humanoid2)
+		if humanoid2:IsA("Humanoid") then
+			updateCharacterMoodOnHumanoidAdded(character, p, humanoid)
+		end
+	end)
+end
+
+function initAvatarMood(instance)
+	local moodsEnabled = instance:FindFirstChild("MoodsEnabled")
+	disconnectAndRemoveConnection("animateScriptMoodAdded") -- inferred equivalent call
+	disconnectAndRemoveConnection("animateScriptMoodRemoved") -- inferred equivalent call
+
+	if moodsEnabled then
+		v3 = false
+		return
+	end
+
+	local mood = instance:FindFirstChild("mood")
 
 	if mood then
 		if #mood:GetChildren() > 0 then
 			updateCharacterMood(LocalPlayer.Character, mood:FindFirstChildWhichIsA("Animation"))
 		end
 
-		if t1.moodChildAdded ~= nil then
-			t1.moodChildAdded:Disconnect()
-			t1.moodChildAdded = nil
-		end
-
-		t1.moodChildAdded = mood.ChildAdded:Connect(function(child) -- line: 313
-			-- upvalues: updateCharacterMood (copy), LocalPlayer (copy)
-			if child:IsA("Animation") then
-				updateCharacterMood(LocalPlayer.Character, child)
+		disconnectAndRemoveConnection("moodChildAdded") -- inferred equivalent call
+		v5.moodChildAdded = mood.ChildAdded:Connect(function(animation)
+			if animation:IsA("Animation") then
+				updateCharacterMood(LocalPlayer.Character, animation)
 			end
 		end)
 	else
-		if u7 ~= nil then
-			u7:Stop()
-			u7:Destroy()
-			u7 = nil
-		end
-
-		local EmoteStopped = t2.EmoteStopped
-
-		if t1[EmoteStopped] ~= nil then
-			t1[EmoteStopped]:Disconnect()
-			t1[EmoteStopped] = nil
-		end
-
-		local EmoteKeyframeReached = t2.EmoteKeyframeReached
-
-		if t1[EmoteKeyframeReached] ~= nil then
-			t1[EmoteKeyframeReached]:Disconnect()
-			t1[EmoteKeyframeReached] = nil
-		end
-
-		local AnimationInstanceChanged = t2.AnimationInstanceChanged
-
-		if t1[AnimationInstanceChanged] ~= nil then
-			t1[AnimationInstanceChanged]:Disconnect()
-			t1[AnimationInstanceChanged] = nil
-		end
-
-		local EmoteTriggered = t2.EmoteTriggered
-
-		if t1[EmoteTriggered] ~= nil then
-			t1[EmoteTriggered]:Disconnect()
-			t1[EmoteTriggered] = nil
-		end
-
-		u6 = nil
+		stopAndDestroyCurrentMoodTrack() -- inferred equivalent call
+		disconnectAndRemoveConnection(v6.EmoteStopped) -- inferred equivalent call
+		disconnectAndRemoveConnection(v6.EmoteKeyframeReached) -- inferred equivalent call
+		disconnectAndRemoveConnection(v6.AnimationInstanceChanged) -- inferred equivalent call
+		disconnectAndRemoveConnection(v6.EmoteTriggered) -- inferred equivalent call
+		v = nil
 	end
 
-	t1.animateScriptMoodAdded = p18.ChildAdded:Connect(function(child) -- line: 322
-		-- upvalues: updateCharacterMood (copy), LocalPlayer (copy), t1 (copy), u10 (ref)
+	v5.animateScriptMoodAdded = instance.ChildAdded:Connect(function(child)
 		if child.Name == "mood" then
 			if #child:GetChildren() > 0 then
-				local v105 = child:GetChildren()[1]
-
-				updateCharacterMood(LocalPlayer.Character, v105)
+				local v8 = child:GetChildren()[1]
+				updateCharacterMood(LocalPlayer.Character, v8)
 			end
 
-			if t1.moodChildAdded ~= nil then
-				t1.moodChildAdded:Disconnect()
-				t1.moodChildAdded = nil
-			end
-
-			t1.moodChildAdded = child.ChildAdded:Connect(function(child2) -- line: 332
-				-- upvalues: updateCharacterMood (copy), LocalPlayer (copy)
+			disconnectAndRemoveConnection("moodChildAdded") -- inferred equivalent call
+			v5.moodChildAdded = child.ChildAdded:Connect(function(child2)
 				updateCharacterMood(LocalPlayer.Character, child2)
 			end)
-
-			return
-		end
-
-		if child.Name == "MoodsEnabled" then
-			u10 = false
+		elseif child.Name == "MoodsEnabled" then
+			v3 = false
 		end
 	end)
-	t1.animateScriptMoodRemoved = p18.ChildRemoved:Connect(function(child) -- line: 340
-		-- upvalues: p18 (copy), updateCharacterMood (copy), LocalPlayer (copy), u7 (ref), t2 (copy), t1 (copy), u6 (ref)
+
+	v5.animateScriptMoodRemoved = instance.ChildRemoved:Connect(function(child)
 		if child.Name == "mood" then
-			local mood2 = p18:FindFirstChild("mood")
+			local mood2 = instance:FindFirstChild("mood")
 
 			if mood2 then
 				updateCharacterMood(LocalPlayer.Character, mood2:FindFirstChildWhichIsA("Animation"))
-
 				return
 			end
 
-			if u7 ~= nil then
-				u7:Stop()
-				u7:Destroy()
-				u7 = nil
-			end
-
-			local EmoteStopped = t2.EmoteStopped
-
-			if t1[EmoteStopped] ~= nil then
-				t1[EmoteStopped]:Disconnect()
-				t1[EmoteStopped] = nil
-			end
-
-			local EmoteKeyframeReached = t2.EmoteKeyframeReached
-
-			if t1[EmoteKeyframeReached] ~= nil then
-				t1[EmoteKeyframeReached]:Disconnect()
-				t1[EmoteKeyframeReached] = nil
-			end
-
-			local AnimationInstanceChanged = t2.AnimationInstanceChanged
-
-			if t1[AnimationInstanceChanged] ~= nil then
-				t1[AnimationInstanceChanged]:Disconnect()
-				t1[AnimationInstanceChanged] = nil
-			end
-
-			local EmoteTriggered = t2.EmoteTriggered
-
-			if t1[EmoteTriggered] ~= nil then
-				t1[EmoteTriggered]:Disconnect()
-				t1[EmoteTriggered] = nil
-			end
-
-			u6 = nil
+			stopAndDestroyCurrentMoodTrack() -- inferred equivalent call
+			disconnectAndRemoveConnection(v6.EmoteStopped) -- inferred equivalent call
+			disconnectAndRemoveConnection(v6.EmoteKeyframeReached) -- inferred equivalent call
+			disconnectAndRemoveConnection(v6.AnimationInstanceChanged) -- inferred equivalent call
+			disconnectAndRemoveConnection(v6.EmoteTriggered) -- inferred equivalent call
+			v = nil
 		end
 	end)
 end
 
-local function waitForAnimateScript() -- line: 352
-	-- upvalues: LocalPlayer (copy), t1 (copy)
-	local Animate = LocalPlayer.Character:FindFirstChild("Animate")
+local function waitForAnimateScript()
+	local animate = LocalPlayer.Character:FindFirstChild("Animate")
 
-	if Animate then
-		initAvatarMood(Animate)
+	if animate then
+		initAvatarMood(animate)
 	end
 
-	if t1.animateScriptAdded ~= nil then
-		t1.animateScriptAdded:Disconnect()
-		t1.animateScriptAdded = nil
-	end
-
-	t1.animateScriptAdded = LocalPlayer.Character.ChildAdded:Connect(function(child) -- line: 359
+	disconnectAndRemoveConnection("animateScriptAdded") -- inferred equivalent call
+	v5.animateScriptAdded = LocalPlayer.Character.ChildAdded:Connect(function(child)
 		if child.Name == "Animate" then
 			initAvatarMood(child)
 		end
 	end)
 end
-local function onHeadAdded(p19) -- line: 367
-	-- upvalues: waitForAnimateScript (copy), t1 (copy)
-	if p19:FindFirstChildWhichIsA("FaceControls") then
+
+local function onHeadAdded(instance)
+	if instance:FindFirstChildWhichIsA("FaceControls") then
 		waitForAnimateScript()
 	end
 
-	if t1.headChildAdded ~= nil then
-		t1.headChildAdded:Disconnect()
-		t1.headChildAdded = nil
-	end
-
-	t1.headChildAdded = p19.ChildAdded:Connect(function(child) -- line: 374
-		-- upvalues: waitForAnimateScript (copy)
-		if child:IsA("FaceControls") then
+	disconnectAndRemoveConnection("headChildAdded") -- inferred equivalent call
+	v5.headChildAdded = instance.ChildAdded:Connect(function(faceControls)
+		if faceControls:IsA("FaceControls") then
 			waitForAnimateScript()
 		end
 	end)
 end
-local function syncWithStreamTrack(p20) -- line: 381
-	-- upvalues: t1 (copy), Core (ref), u7 (ref)
-	if t1.StreamTrackStopped ~= nil then
-		t1.StreamTrackStopped:Disconnect()
-		t1.StreamTrackStopped = nil
-	end
 
-	Core = Enum.AnimationPriority.Idle
+local function syncWithStreamTrack(p)
+	disconnectAndRemoveConnection("StreamTrackStopped") -- inferred equivalent call
+	switchPriority(Enum.AnimationPriority.Idle) -- inferred equivalent call
 
-	if u7 then
-		u7.Priority = Core
-	end
+	v5.StreamTrackStopped = p.Stopped:Connect(function()
+		disconnectAndRemoveConnection("StreamTrackStopped") -- inferred equivalent call
+		priority = Enum.AnimationPriority.Core
 
-	t1.StreamTrackStopped = p20.Stopped:Connect(function() -- line: 389
-		-- upvalues: t1 (copy), Core (ref), u7 (ref)
-		if t1.StreamTrackStopped ~= nil then
-			t1.StreamTrackStopped:Disconnect()
-			t1.StreamTrackStopped = nil
-		end
-
-		Core = Enum.AnimationPriority.Core
-
-		if u7 then
-			u7.Priority = Core
+		if track then
+			track.Priority = priority
 		end
 	end)
 end
-local function onAnimatorAdded(p21) -- line: 397
-	-- upvalues: t1 (copy), t2 (copy), Core (ref), u7 (ref)
-	if t1.AnimationStreamTrackPlayed ~= nil then
-		t1.AnimationStreamTrackPlayed:Disconnect()
-		t1.AnimationStreamTrackPlayed = nil
-	end
 
-	t1.AnimationStreamTrackPlayed = p21.AnimationStreamTrackPlayed:Connect(function(p22) -- line: 402
-		-- upvalues: t2 (copy), t1 (copy), Core (ref), u7 (ref)
-		local StreamTrackStopped = t2.StreamTrackStopped
+local function onAnimatorAdded(object)
+	disconnectAndRemoveConnection("AnimationStreamTrackPlayed") -- inferred equivalent call
+	v5.AnimationStreamTrackPlayed = object.AnimationStreamTrackPlayed:Connect(function(p)
+		disconnectAndRemoveConnection(v6.StreamTrackStopped) -- inferred equivalent call
 
-		if t1[StreamTrackStopped] ~= nil then
-			t1[StreamTrackStopped]:Disconnect()
-			t1[StreamTrackStopped] = nil
-		end
+		switchPriority(Enum.AnimationPriority.Idle) -- inferred equivalent call
 
-		Core = Enum.AnimationPriority.Idle
+		v5[v6.StreamTrackStopped] = p.Stopped:Connect(function()
+			disconnectAndRemoveConnection("StreamTrackStopped") -- inferred equivalent call
+			priority = Enum.AnimationPriority.Core
 
-		if u7 then
-			u7.Priority = Core
-		end
-
-		t1[t2.StreamTrackStopped] = p22.Stopped:Connect(function() -- line: 389
-			-- upvalues: t1 (copy), Core (ref), u7 (ref)
-			if t1.StreamTrackStopped ~= nil then
-				t1.StreamTrackStopped:Disconnect()
-				t1.StreamTrackStopped = nil
-			end
-
-			Core = Enum.AnimationPriority.Core
-
-			if u7 then
-				u7.Priority = Core
+			if track then
+				track.Priority = priority
 			end
 		end)
 	end)
 
-	local v71 = nil
+	local playingAnimationTracksCoreScript = object:GetPlayingAnimationTracksCoreScript()
+	local v8 = nil
 
-	for _, v73 in (p21:GetPlayingAnimationTracksCoreScript()) do
-		if v73:IsA("AnimationStreamTrack") then
-			v71 = v73
-
+	for _, animationStreamTrack in playingAnimationTracksCoreScript do
+		if animationStreamTrack:IsA("AnimationStreamTrack") then
+			v8 = animationStreamTrack
 			break
 		end
 	end
 
-	if v71 then
-		local StreamTrackStopped = t2.StreamTrackStopped
+	if v8 then
+		disconnectAndRemoveConnection(v6.StreamTrackStopped) -- inferred equivalent call
 
-		if t1[StreamTrackStopped] ~= nil then
-			t1[StreamTrackStopped]:Disconnect()
-			t1[StreamTrackStopped] = nil
-		end
+		switchPriority(Enum.AnimationPriority.Idle) -- inferred equivalent call
 
-		Core = Enum.AnimationPriority.Idle
+		v5[v6.StreamTrackStopped] = v8.Stopped:Connect(function()
+			disconnectAndRemoveConnection("StreamTrackStopped") -- inferred equivalent call
+			priority = Enum.AnimationPriority.Core
 
-		if u7 then
-			u7.Priority = Core
-		end
-
-		t1[t2.StreamTrackStopped] = v71.Stopped:Connect(function() -- line: 389
-			-- upvalues: t1 (copy), Core (ref), u7 (ref)
-			if t1.StreamTrackStopped ~= nil then
-				t1.StreamTrackStopped:Disconnect()
-				t1.StreamTrackStopped = nil
-			end
-
-			Core = Enum.AnimationPriority.Core
-
-			if u7 then
-				u7.Priority = Core
+			if track then
+				track.Priority = priority
 			end
 		end)
-
-		return
-	end
-
-	Core = Enum.AnimationPriority.Core
-
-	if u7 then
-		u7.Priority = Core
+	else
+		switchPriority(Enum.AnimationPriority.Core) -- inferred equivalent call
 	end
 end
-local function onAnimatorRemoving(p23, _) -- line: 424
-	-- upvalues: t1 (copy), Core (ref), u7 (ref), onAnimatorAdded (copy)
-	if t1.AnimationStreamTrackPlayed ~= nil then
-		t1.AnimationStreamTrackPlayed:Disconnect()
-		t1.AnimationStreamTrackPlayed = nil
-	end
 
-	if t1.StreamTrackStopped ~= nil then
-		t1.StreamTrackStopped:Disconnect()
-		t1.StreamTrackStopped = nil
-	end
+local function onAnimatorRemoving(p, _)
+	disconnectAndRemoveConnection("AnimationStreamTrackPlayed") -- inferred equivalent call
+	disconnectAndRemoveConnection("StreamTrackStopped") -- inferred equivalent call
+	switchPriority(Enum.AnimationPriority.Core) -- inferred equivalent call
+	local playerAnimator = getPlayerAnimator(p) -- inferred equivalent call
 
-	Core = Enum.AnimationPriority.Core
-
-	if u7 then
-		u7.Priority = Core
-	end
-
-	local v77 = if not p23.Character then nil else p23.Character:FindFirstChildOfClass("Humanoid")
-	local v78 = if not v77 then nil else v77:FindFirstChildOfClass("Animator")
-
-	if v78 then
-		onAnimatorAdded(v78)
+	if playerAnimator then
+		onAnimatorAdded(playerAnimator)
 	end
 end
-local function onCharacterAdded(p25, p26) -- line: 439
-	-- upvalues: onHeadAdded (copy), t1 (copy), u7 (ref), onAnimatorAdded (copy), t2 (copy), Core (ref)
-	local Head = p26:FindFirstChild("Head")
 
-	if Head then
-		onHeadAdded(Head)
+local function onCharacterAdded(localPlayer, character)
+	local head = character:FindFirstChild("Head")
+
+	if head then
+		onHeadAdded(head)
 	end
 
-	t1.characterChildAdded = p26.ChildAdded:Connect(function(child) -- line: 445
-		-- upvalues: onHeadAdded (copy)
+	v5.characterChildAdded = character.ChildAdded:Connect(function(child)
 		if child.Name == "Head" then
 			onHeadAdded(child)
 		end
 	end)
-	t1.characterChildRemoved = p26.ChildRemoved:Connect(function(child) -- line: 451
-		-- upvalues: u7 (ref), p26 (copy), onHeadAdded (copy)
+
+	v5.characterChildRemoved = character.ChildRemoved:Connect(function(child)
 		if child.Name == "Head" then
-			if u7 ~= nil then
-				u7:Stop()
-				u7:Destroy()
-				u7 = nil
-			end
+			stopAndDestroyCurrentMoodTrack() -- inferred equivalent call
+			local head2 = character:FindFirstChild("Head")
 
-			local Head2 = p26:FindFirstChild("Head")
-
-			if Head2 then
-				onHeadAdded(Head2)
+			if head2 then
+				onHeadAdded(head2)
 			end
 		end
 	end)
-	t1.DescendantAdded = p26.DescendantAdded:Connect(function(descendant) -- line: 461
-		-- upvalues: onAnimatorAdded (copy)
-		if descendant:IsA("Animator") then
-			onAnimatorAdded(descendant)
+
+	v5.DescendantAdded = character.DescendantAdded:Connect(function(animator)
+		if animator:IsA("Animator") then
+			onAnimatorAdded(animator)
 		end
 	end)
+	local animator = character:FindFirstChildWhichIsA("Animator", true)
 
-	local Animator = p26:FindFirstChildWhichIsA("Animator", true)
-
-	if Animator then
-		onAnimatorAdded(Animator)
+	if animator then
+		onAnimatorAdded(animator)
 	end
 
-	t1.DescendantRemoving = p26.DescendantRemoving:Connect(function(descendant) -- line: 471
-		-- upvalues: p25 (copy), t2 (copy), t1 (copy), Core (ref), u7 (ref), onAnimatorAdded (copy)
-		if descendant:IsA("Animator") then
-			local v121 = p25
-			local AnimationStreamTrackPlayed = t2.AnimationStreamTrackPlayed
+	v5.DescendantRemoving = character.DescendantRemoving:Connect(function(animator2)
+		if animator2:IsA("Animator") then
+			disconnectAndRemoveConnection(v6.AnimationStreamTrackPlayed) -- inferred equivalent call
+			disconnectAndRemoveConnection(v6.StreamTrackStopped) -- inferred equivalent call
 
-			if t1[AnimationStreamTrackPlayed] ~= nil then
-				t1[AnimationStreamTrackPlayed]:Disconnect()
-				t1[AnimationStreamTrackPlayed] = nil
-			end
+			switchPriority(Enum.AnimationPriority.Core) -- inferred equivalent call
+			local playerAnimator = getPlayerAnimator(localPlayer) -- inferred equivalent call
 
-			local StreamTrackStopped = t2.StreamTrackStopped
-
-			if t1[StreamTrackStopped] ~= nil then
-				t1[StreamTrackStopped]:Disconnect()
-				t1[StreamTrackStopped] = nil
-			end
-
-			Core = Enum.AnimationPriority.Core
-
-			if u7 then
-				u7.Priority = Core
-			end
-
-			local v124 = if not v121.Character then nil else v121.Character:FindFirstChildOfClass("Humanoid")
-			local v125 = if not v124 then nil else v124:FindFirstChildOfClass("Animator")
-
-			if v125 then
-				onAnimatorAdded(v125)
+			if playerAnimator then
+				onAnimatorAdded(playerAnimator)
 			end
 		end
 	end)
 end
-local function onCharacterRemoving(_) -- line: 478
-	-- upvalues: u7 (ref), t1 (copy)
-	if u7 ~= nil then
-		u7:Stop()
-		u7:Destroy()
-		u7 = nil
-	end
 
-	for _, v in pairs(t1) do
-		if v then
-			v:Disconnect()
+local function onCharacterRemoving(_)
+	stopAndDestroyCurrentMoodTrack() -- inferred equivalent call
+
+	for _, connection in pairs(v5) do
+		if connection then
+			connection:Disconnect()
 		end
 	end
 
-	table.clear(t1)
+	table.clear(v5)
 end
 
 if LocalPlayer.Character then
 	onCharacterAdded(LocalPlayer, LocalPlayer.Character)
 end
 
-LocalPlayer.CharacterAdded:Connect(function(character) -- line: 492
-	-- upvalues: onCharacterAdded (copy), LocalPlayer (copy)
+LocalPlayer.CharacterAdded:Connect(function(character)
 	onCharacterAdded(LocalPlayer, character)
 end)
 LocalPlayer.CharacterRemoving:Connect(onCharacterRemoving)

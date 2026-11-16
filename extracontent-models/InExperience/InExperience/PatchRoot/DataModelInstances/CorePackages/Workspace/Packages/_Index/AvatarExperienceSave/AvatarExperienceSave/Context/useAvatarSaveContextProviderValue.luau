@@ -1,38 +1,45 @@
 local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
-local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
-local React = require(AvatarExperienceSaveParent.React)
-local AvatarExperienceCommon = require(AvatarExperienceSaveParent.AvatarExperienceCommon)
-local Dash = require(AvatarExperienceSaveParent.Dash)
-local Cryo = require(AvatarExperienceSaveParent.Cryo)
-local Signals = require(AvatarExperienceSaveParent.Signals)
-local ToastRodux = require(AvatarExperienceSaveParent.ToastRodux)
-local tutils = require(AvatarExperienceSaveParent.tutils)
-local Navigation = require(AvatarExperienceSaveParent.Navigation)
-local RoactNavigation = require(AvatarExperienceSaveParent.RoactNavigation)
-local AvatarExperienceNavigation = require(AvatarExperienceSaveParent.AvatarExperienceNavigation)
-local AvatarExperienceFlags = require(AvatarExperienceSaveParent.AvatarExperienceFlags)
-local NavigationRodux = require(AvatarExperienceSaveParent.NavigationRodux)
-local RobloxAppEnums = require(AvatarExperienceSaveParent.RobloxAppEnums)
-local Promise = require(AvatarExperienceSaveParent.Promise)
+
+local parent = AvatarExperienceSave.Parent
+
+local React = require(parent.React)
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local Dash = require(parent.Dash)
+local Cryo = require(parent.Cryo)
+local Signals = require(parent.Signals)
+local ToastRodux = require(parent.ToastRodux)
+local tutils = require(parent.tutils)
+local Navigation = require(parent.Navigation)
+local RoactNavigation = require(parent.RoactNavigation)
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local NavigationRodux = require(parent.NavigationRodux)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local Promise = require(parent.Promise)
+
 local useSelectorSignal = AvatarExperienceCommon.Hooks.useSelectorSignal
 local useSignal = AvatarExperienceCommon.Hooks.useSignal
 local useComputedSignal = AvatarExperienceCommon.Hooks.useComputedSignal
-local useDispatch = require(AvatarExperienceSaveParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useNavigation = Navigation.useNavigation
 
 require(script.Parent.AvatarSaveContext)
-
 local SaveStatusEnum = require(AvatarExperienceSave.Enums.SaveStatusEnum)
 local ToastType = ToastRodux.Enums.ToastType
 local Actions = RoactNavigation.Actions
 local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
 local AppPage = RobloxAppEnums.AppPage
 local CustomGetStateForAction = AvatarExperienceNavigation.Enums.CustomGetStateForAction
+
 local saveAvatar = require(AvatarExperienceSave.Requests.saveAvatar)
 local saveProfileConfiguration = require(AvatarExperienceSave.Requests.saveProfileConfiguration)
+
 local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+
 local CharacterHistoryStateChangeButtonActivated = AvatarExperienceCommon.State.Actions.CharacterHistoryStateChangeButtonActivated
 local RegisterCustomGetStateForAction = AvatarExperienceNavigation.Actions.RegisterCustomGetStateForAction
+
 local shouldInsertNewHistoryEntry = require(AvatarExperienceSave.Utils.shouldInsertNewHistoryEntry)
 local shouldReplaceLastHistoryEntry = require(AvatarExperienceSave.Utils.shouldReplaceLastHistoryEntry)
 local getSaveDict = require(AvatarExperienceSave.Utils.getSaveDict)
@@ -43,524 +50,522 @@ local checkCharacterDataHasTryOnItems = require(AvatarExperienceSave.Utils.check
 local selectCharacterData = require(AvatarExperienceSave.Selectors.selectCharacterData)
 local selectHasAvatarData = require(AvatarExperienceSave.Selectors.selectHasAvatarData)
 local NavigateToRoute = NavigationRodux.Thunks.NavigateToRoute
-local FFlagSignalsNavP3Dispatch = require(AvatarExperienceSaveParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v44 = if not FFlagSignalsNavP3Dispatch then nil else require(AvatarExperienceSaveParent.RobloxAppNavigation).NavigationCommands
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
 local buildHumanoidDescription = AvatarExperienceCommon.Utils.buildHumanoidDescription
 local getGearAssetIdFromEquippedAssets = AvatarExperienceCommon.Utils.getGearAssetIdFromEquippedAssets
+
 local getAssetIdToAssetTypeIdFromHumanoidDescription = AvatarExperienceCommon.Utils.getAssetIdToAssetTypeIdFromHumanoidDescription
-local v48 = game:DefineFastInt("FIntAXMinSaveIntervalSeconds", 2)
-local v49 = game:DefineFastInt("AXMaxUndoRedoHistory", 20)
-local v50 = game:DefineFastFlag("AXEnableMaxUndoRedoHistory", false)
+
+local defineFastInt = game:DefineFastInt("FIntAXMinSaveIntervalSeconds", 2)
+local defineFastInt2 = game:DefineFastInt("AXMaxUndoRedoHistory", 20)
 local FFlagAXEnableManualSavingBlockingPrompt = AvatarExperienceFlags.FFlagAXEnableManualSavingBlockingPrompt
 local FFlagAXBackgroundsPersistence = AvatarExperienceFlags.FFlagAXBackgroundsPersistence
-local t1 = {
+local FFlagAXTimeoutAcknowledgementGating = AvatarExperienceFlags.FFlagAXTimeoutAcknowledgementGating
+
+local v = {
 	toastMessage = "Feature.Avatar.Message.SaveThrottled",
 	isLocalized = false,
 	toastType = ToastType.InformationMessage
 }
-local t2 = {
+
+local v2 = {
 	toastMessage = "Feature.Avatar.Message.SaveSuccessWithInvalidAssets",
 	isLocalized = false,
 	toastType = ToastType.SuccessConfirmation
 }
-local t3 = {
+
+local v3 = {
 	toastMessage = "Feature.Avatar.Message.SaveSuccess",
 	isLocalized = false,
 	toastType = ToastType.SuccessConfirmation
 }
-local t4 = {
+
+local v4 = {
 	toastMessage = "Feature.Avatar.Message.SaveFailure",
 	isLocalized = false,
 	toastType = ToastType.InformationMessage
 }
-local t5 = {
-	Home = AppPage.Home,
-	More = AppPage.More,
-	Chat = AppPage.Chat,
-	Games = AppPage.Games
-}
 
-local function buildHumanoidDescriptionForCharacterData(p1) -- line: 98
-	-- upvalues: buildHumanoidDescription (copy)
+local v5 = { Home = AppPage.Home, More = AppPage.More, Chat = AppPage.Chat, Games = AppPage.Games }
+
+local function buildHumanoidDescriptionForCharacterData(p) -- 1 equivalent call inferred from this helper
 	return buildHumanoidDescription({
-		currentAssets = p1.equipped.EquippedAssets,
-		avatarScales = p1.equipped.AvatarScales,
-		bodyColor3s = p1.equipped.BodyColor3s,
-		emotesSlotInfo = p1.equipped.EquippedEmotes.slotInfo
+		currentAssets = p.equipped.EquippedAssets,
+		avatarScales = p.equipped.AvatarScales,
+		bodyColor3s = p.equipped.BodyColor3s,
+		emotesSlotInfo = p.equipped.EquippedEmotes.slotInfo
 	})
 end
-local function useAvatarSaveContextProviderValue() -- line: 109
-	-- upvalues: useDispatch (copy), useNavigation (copy), useSelectorSignal (copy), selectCharacterData (copy), tutils (copy), selectHasAvatarData (copy), useSignal (copy), React (copy), Signals (copy), shouldInsertNewHistoryEntry (copy), Dash (copy), v50 (copy), v49 (copy), shouldReplaceLastHistoryEntry (copy), removeInvalidAssetsFromCharacterData (copy), AvatarExperienceCommon (copy), useComputedSignal (copy), SaveStatusEnum (copy), checkHasChangesToSave (copy), checkCharacterDataHasTryOnItems (copy), getInvalidAssetIdsToAssetTypeIdMap (copy), getAssetIdToAssetTypeIdFromHumanoidDescription (copy), SetCurrentToastMessage (copy), t3 (copy), t2 (copy), CharacterHistoryStateChangeButtonActivated (copy), t1 (copy), t4 (copy), Promise (copy), v48 (copy), buildHumanoidDescription (copy), getSaveDict (copy), FFlagAXBackgroundsPersistence (copy), Cryo (copy), saveProfileConfiguration (copy), getGearAssetIdFromEquippedAssets (copy), saveAvatar (copy), FFlagAXEnableManualSavingBlockingPrompt (copy), FFlagSignalsNavP3Dispatch (copy), v44 (copy), NavigateToRoute (copy), Actions (copy), AvatarScreen (copy), t5 (copy), RegisterCustomGetStateForAction (copy), CustomGetStateForAction (copy)
-	local v61 = useDispatch()
-	local v62 = useNavigation()
-	local v63 = useSelectorSignal(selectCharacterData, tutils.deepEqual)
-	local v64 = useSelectorSignal(selectHasAvatarData)
-	local v65, v66 = useSignal({})
-	local v67, v68 = useSignal(0)
-	local v69, v70 = useSignal(nil)
-	local v71, v72 = useSignal(nil)
-	local v73, v74 = useSignal(0)
-	local v75, v76 = useSignal(false)
 
-	React.useEffect(function() -- line: 131
-		-- upvalues: Signals (copy), v64 (copy), v63 (copy), v65 (copy), tutils (copy), v66 (copy), v68 (copy), v70 (copy), v72 (copy), v74 (copy)
-		return Signals.createEffect(function(p2) -- line: 132
-			-- upvalues: v64 (copy), v63 (copy), v65 (copy), tutils (copy), v66 (copy), v68 (copy), v70 (copy), v72 (copy), v74 (copy)
-			local v119 = v64(p2)
-			local v120 = v63(p2)
-			local v121 = v65(false)
-			local v122 = v120.equipped.BodyPartRangeIds and tutils.fieldCount(v120.equipped.BodyPartRangeIds) > 0
+local function useAvatarSaveContextProviderValue()
+	local v6 = useDispatch()
+	local v7 = useNavigation()
 
-			if v119 and (v122 and #v121 == 0) then
-				v66({ v120 })
-				v68(1)
-				v70(v120)
-				v72(nil)
-				v74(0)
+	local v8 = useSelectorSignal(selectCharacterData, tutils.deepEqual)
+	local v9 = useSelectorSignal(selectHasAvatarData)
+
+	local getHistorySignal, v10 = useSignal({})
+	local getCurrentHistoryIndexSignal, v11 = useSignal(0)
+
+	local getLastSuccessfullySavedStateSignal, v12 = useSignal(nil)
+
+	local v13, v14 = useSignal(nil)
+	local v15, v16 = useSignal(0)
+	local v17, v18 = useSignal(false)
+
+	React.useEffect(function()
+		return Signals.createEffect(function(p)
+			local v19 = v9(p)
+			local v20 = v8(p)
+			local v21 = getHistorySignal(false)
+
+			local v22 = v20.equipped.BodyPartRangeIds and tutils.fieldCount(v20.equipped.BodyPartRangeIds) > 0
+
+			if v19 and v22 and #v21 == 0 then
+				v10({ v20 })
+				v11(1)
+
+				v12(v20)
+				v14(nil)
+				v16(0)
 			end
 		end)
 	end, {})
-	React.useEffect(function() -- line: 155
-		-- upvalues: Signals (copy), v63 (copy), v65 (copy), v67 (copy), shouldInsertNewHistoryEntry (copy), Dash (copy), v50 (copy), v49 (copy), v66 (copy), v68 (copy), shouldReplaceLastHistoryEntry (copy)
-		return Signals.createEffect(function(p3) -- line: 156
-			-- upvalues: v63 (copy), v65 (copy), v67 (copy), shouldInsertNewHistoryEntry (copy), Dash (copy), v50 (copy), v49 (copy), v66 (copy), v68 (copy), shouldReplaceLastHistoryEntry (copy)
-			local v124 = v63(p3)
-			local v125 = v65(false)
-			local v126 = v67(false)
-			local v127 = v125[v126] or v124
 
-			if shouldInsertNewHistoryEntry(v127, v124) and #v125 > 0 then
-				local v128 = Dash.slice(v125, 1, v126)
+	React.useEffect(function()
+		return Signals.createEffect(function(p)
+			local v19 = v8(p)
+			local v20 = getHistorySignal(false)
+			local v21 = getCurrentHistoryIndexSignal(false)
+			local v22 = v20[v21] or v19
 
-				table.insert(v128, v124)
+			if shouldInsertNewHistoryEntry(v22, v19) and #v20 > 0 then
+				local slice = Dash.slice(v20, 1, v21)
+				table.insert(slice, v19)
+				local v23 = v21 + 1
 
-				if v50 then
-					local v129 = v126 + 1
-
-					if #v128 > v49 then
-						table.remove(v128, 1)
-						v129 -= 1
-					end
-
-					v66(v128)
-					v68(v129)
-
-					return
+				if defineFastInt2 < #slice then
+					table.remove(slice, 1)
+					v23 -= 1
 				end
 
-				v66(v128)
-				v68(v126 + 1)
-
-				return
-			end
-
-			if shouldReplaceLastHistoryEntry(v127, v124) and #v125 > 0 then
-				local v130 = Dash.slice(v125)
-
-				v130[v126] = v124
-				v66(v130)
-				v68(v126)
+				v10(slice)
+				v11(v23)
+			elseif shouldReplaceLastHistoryEntry(v22, v19) and #v20 > 0 then
+				local slice = Dash.slice(v20)
+				slice[v21] = v19
+				v10(slice)
+				v11(v21)
 			end
 		end)
 	end, {})
 
-	local v77 = React.useCallback(function(n1: number) -- line: 189
-		-- upvalues: v65 (copy), v68 (copy)
-		local v89 = v65(false)
+	local updateHistoryIndexAndGetCharacterData = React.useCallback(function(p: number)
+		local v19 = getHistorySignal(false)
 
-		if n1 < 1 or n1 > #v89 then
+		if p < 1 or #v19 < p then
 			return nil
 		end
 
-		v68(n1)
+		v11(p)
+		return v19[p]
+	end, { getHistorySignal, v11 })
 
-		return v89[n1]
-	end, {
-		v65,
-		v68
-	})
-	local v78 = React.useCallback(function(t6: {[any]: any}) -- line: 206
-		-- upvalues: v65 (copy), v67 (copy), removeInvalidAssetsFromCharacterData (copy), v66 (copy)
-		local v91 = v65(false)
-		local v92 = v67(false)
-		local v93 = v91[v92]
+	local v19 = React.useCallback(function(p)
+		local v19 = getHistorySignal(false)
+		local v20 = getCurrentHistoryIndexSignal(false)
+		local v21 = v19[v20]
 
-		if not v93 then
+		if not v21 then
 			return nil
 		end
 
-		local v94, v95 = removeInvalidAssetsFromCharacterData(v93, t6)
+		local v22, v23 = removeInvalidAssetsFromCharacterData(v21, p)
 
-		if v95 then
-			v91[v92] = v94
-			v66(v91)
-
-			return v94
+		if not v23 then
+			return nil
 		end
 
-		return nil
-	end, {
-		v65,
-		v66,
-		v68
-	})
-	local v79 = AvatarExperienceCommon.Stores.getTimeoutStatusStore()
-	local v80 = useComputedSignal(function(p4) -- line: 228
-		-- upvalues: v79 (copy), SaveStatusEnum (copy), v65 (copy), v67 (copy), v69 (copy), v71 (copy), checkHasChangesToSave (copy), checkCharacterDataHasTryOnItems (copy)
-		if v79 and v79.getIsTimedOut(p4) then
+		v19[v20] = v22
+		v10(v19)
+		return v22
+	end, { getHistorySignal, v10, v11 })
+
+	local timeoutStatusStore = AvatarExperienceCommon.Stores.getTimeoutStatusStore()
+
+	local getSaveEligibilityStatusSignal = useComputedSignal(function(p)
+		if timeoutStatusStore and timeoutStatusStore.getIsTimedOut(p) then
 			return SaveStatusEnum.TimedOut
 		end
 
-		local v97 = v65(p4)
-		local v98 = v67(p4)
-		local v99 = v69(p4)
-		local v100 = v71(p4)
-		local v101 = v97[v98]
+		local v20 = getHistorySignal(p)
+		local v21 = getCurrentHistoryIndexSignal(p)
+		local v22 = getLastSuccessfullySavedStateSignal(p)
+		local v23 = v13(p)
+		local v24 = v20[v21]
 
-		if not v101 or not v99 then
+		if not (v24 and v22) then
 			return SaveStatusEnum.NoData
 		end
 
-		if v100 then
+		if v23 then
 			return SaveStatusEnum.Saving
 		end
 
-		if v99 and not checkHasChangesToSave(v101, v99) then
+		if v22 and not checkHasChangesToSave(v24, v22) then
 			return SaveStatusEnum.AlreadySaved
 		end
 
-		if checkCharacterDataHasTryOnItems(v101) then
+		if checkCharacterDataHasTryOnItems(v24) then
 			return SaveStatusEnum.HasTryOns
 		end
 
 		return SaveStatusEnum.Eligible
 	end)
-	local v81 = React.useCallback(function(p5, p6, p7, _, p9) -- line: 258
-		-- upvalues: SaveStatusEnum (copy), getInvalidAssetIdsToAssetTypeIdMap (copy), getAssetIdToAssetTypeIdFromHumanoidDescription (copy), v78 (copy), removeInvalidAssetsFromCharacterData (copy), v70 (copy), v72 (copy), v61 (copy), SetCurrentToastMessage (copy), t3 (copy), t2 (copy), CharacterHistoryStateChangeButtonActivated (copy)
-		local Success = SaveStatusEnum.Success
-		local v108 = nil
 
-		if p9.Assets then
-			local v109 = getInvalidAssetIdsToAssetTypeIdMap(getAssetIdToAssetTypeIdFromHumanoidDescription(p5), getAssetIdToAssetTypeIdFromHumanoidDescription(p6))
+	local v20 = React.useCallback(function(p, p2, p3, _, p4)
+		local v20 = SaveStatusEnum.Success
+		local v21
 
-			v108 = v78(v109)
-			p7 = removeInvalidAssetsFromCharacterData(p7, v109)
+		if p4.Assets then
+			local invalidAssetIdsToAssetTypeIdMap = getInvalidAssetIdsToAssetTypeIdMap(
+				getAssetIdToAssetTypeIdFromHumanoidDescription(p),
+				getAssetIdToAssetTypeIdFromHumanoidDescription(p2)
+			)
+
+			v21 = v19(invalidAssetIdsToAssetTypeIdMap)
+
+			p3 = removeInvalidAssetsFromCharacterData(p3, invalidAssetIdsToAssetTypeIdMap)
 		end
 
-		v70(p7)
-		v72(nil)
+		v12(p3)
+		v14(nil)
 
-		if v108 ~= nil then
-			Success = SaveStatusEnum.SuccessWithInvalidAssets
+		if v21 ~= nil then
+			v20 = SaveStatusEnum.SuccessWithInvalidAssets
 		end
 
-		if Success == SaveStatusEnum.Success then
-			v61(SetCurrentToastMessage(t3))
-		elseif Success == SaveStatusEnum.SuccessWithInvalidAssets then
-			v61(SetCurrentToastMessage(t2))
+		if v20 == SaveStatusEnum.Success then
+			v6(SetCurrentToastMessage(v3))
+		elseif v20 == SaveStatusEnum.SuccessWithInvalidAssets then
+			v6(SetCurrentToastMessage(v2))
 		end
 
-		if v108 then
-			v61(CharacterHistoryStateChangeButtonActivated(v108))
+		if v21 then
+			v6(CharacterHistoryStateChangeButtonActivated(v21))
 		end
 
-		return Success
-	end, {
-		v65,
-		v67,
-		v70,
-		v72,
-		v78
-	})
-	local v82 = React.useCallback(function(p10) -- line: 310
-		-- upvalues: v72 (copy), SaveStatusEnum (copy), v61 (copy), SetCurrentToastMessage (copy), t1 (copy), t4 (copy)
-		v72(nil)
+		return v20
+	end, { getHistorySignal, getCurrentHistoryIndexSignal, v12, v14, v19 })
 
-		if p10 == SaveStatusEnum.Throttled then
-			v61(SetCurrentToastMessage(t1))
+	local v21 = React.useCallback(function(p)
+		v14(nil)
 
-			return
+		if p == SaveStatusEnum.Throttled then
+			v6(SetCurrentToastMessage(v))
+		else
+			v6(SetCurrentToastMessage(v4))
 		end
+	end, { v14, v6 })
 
-		v61(SetCurrentToastMessage(t4))
-	end, {
-		v72,
-		v61
-	})
-	local v83 = React.useCallback(function() -- line: 320
-		-- upvalues: Promise (copy), v79 (copy), v82 (copy), SaveStatusEnum (copy), v65 (copy), v67 (copy), v69 (copy), v73 (copy), v48 (copy), v72 (copy), v74 (copy), buildHumanoidDescription (copy), getSaveDict (copy), FFlagAXBackgroundsPersistence (copy), Cryo (copy), saveProfileConfiguration (copy), v76 (copy), v81 (copy), getGearAssetIdFromEquippedAssets (copy), saveAvatar (copy)
-		return Promise.new(function(resolve, reject) -- line: 321
-			-- upvalues: v79 (copy), v82 (copy), SaveStatusEnum (copy), v65 (copy), v67 (copy), v69 (copy), v73 (copy), v48 (copy), v72 (copy), v74 (copy), buildHumanoidDescription (copy), getSaveDict (copy), FFlagAXBackgroundsPersistence (copy), Cryo (copy), saveProfileConfiguration (copy), v76 (copy), v81 (copy), getGearAssetIdFromEquippedAssets (copy), saveAvatar (copy)
-			if v79 and v79.getIsTimedOut(false) then
-				v82(SaveStatusEnum.TimedOut)
-
-				return
-			end
-
-			local v133 = v65(false)
-			local v134 = v67(false)
-			local v135 = v69(false)
-			local v136 = v133[v134]
-
-			if v136 and v135 then
-				local v137 = v73(false)
-
-				if v137 > 0 and os.time() - v137 < v48 then
-					v82(SaveStatusEnum.Throttled)
-
-					return
+	local trySaveAvatar = React.useCallback(function()
+		return Promise.new(function(callback, callback2)
+			if timeoutStatusStore and timeoutStatusStore.getIsTimedOut(false) then
+				if
+					FFlagAXTimeoutAcknowledgementGating
+					and timeoutStatusStore.getStatus(false).requiresAcknowledgement
+				then
+					AvatarExperienceCommon.Utils.showAvatarChangeFeatureRestriction()
+				else
+					v21(SaveStatusEnum.TimedOut)
 				end
+			else
+				local v22 = getHistorySignal(false)
+				local v23 = getCurrentHistoryIndexSignal(false)
+				local v24 = getLastSuccessfullySavedStateSignal(false)
+				local v25 = v22[v23]
 
-				v72(v136)
-				v74(os.time())
+				if v25 and v24 then
+					local v26 = v15(false)
 
-				local v138 = buildHumanoidDescription({
-					currentAssets = v136.equipped.EquippedAssets,
-					avatarScales = v136.equipped.AvatarScales,
-					bodyColor3s = v136.equipped.BodyColor3s,
-					emotesSlotInfo = v136.equipped.EquippedEmotes.slotInfo
-				})
-				local v139 = Enum.HumanoidRigType[v136.equipped.AvatarType]
-				local u140 = getSaveDict(v136, v135)
-				local v141 = if not FFlagAXBackgroundsPersistence then nil else v136.equipped.BackgroundAssetId
-				local v142 = u140.Background == true and v141 ~= nil
-				local v143 = false
-
-				if FFlagAXBackgroundsPersistence then
-					u140 = Cryo.Dictionary.join(u140, {
-						Background = Cryo.None
-					})
-
-					for _, v145 in u140 do
-						if v145 then
-							v143 = true
-
-							break
-						end
-					end
-				end
-
-				if v142 and not v143 then
-					saveProfileConfiguration(v141):andThen(function() -- line: 376
-						-- upvalues: v76 (copy), v81 (copy), v138 (copy), v136 (copy), v135 (copy), u140 (ref), resolve (copy)
-						v76(false)
-						v81(v138, v138, v136, v135, u140)
-						resolve()
-					end):catch(function() -- line: 387
-						-- upvalues: v76 (copy), v82 (copy), SaveStatusEnum (copy), reject (copy)
-						v76(false)
-						v82(SaveStatusEnum.Failure)
-						reject()
-					end)
-
-					return
-				end
-
-				local v146 = if not v142 then nil else saveProfileConfiguration(v141)
-				local v147 = getGearAssetIdFromEquippedAssets(v136.equipped.EquippedAssets)
-
-				saveAvatar(v138, v139, u140, v147):andThen(function(p11) -- line: 401
-					-- upvalues: v76 (copy), v81 (copy), v138 (copy), v135 (copy), u140 (ref), resolve (copy), v146 (copy), v136 (copy), Cryo (copy)
-					v76(false)
-
-					local function finishSuccess(p12) -- line: 404
-						-- upvalues: v81 (copy), v138 (copy), p11 (copy), v135 (copy), u140 (ref), resolve (copy)
-						v81(v138, p11.humanoidDescriptionWithValidAssets, p12, v135, u140)
-						resolve()
-					end
-
-					if v146 then
-						v146:andThen(function() -- line: 418
-							-- upvalues: v136 (copy), v81 (copy), v138 (copy), p11 (copy), v135 (copy), u140 (ref), resolve (copy)
-							local v157 = v136
-
-							v81(v138, p11.humanoidDescriptionWithValidAssets, v157, v135, u140)
-							resolve()
-						end, function() -- line: 420
-							-- upvalues: Cryo (copy), v136 (copy), v135 (copy), v81 (copy), v138 (copy), p11 (copy), u140 (ref), resolve (copy)
-							local v158 = Cryo.Dictionary.join(v136, {
-								equipped = Cryo.Dictionary.join(v136.equipped, {
-									BackgroundAssetId = if v135.equipped.BackgroundAssetId == nil then Cryo.None else v135.equipped.BackgroundAssetId
-								})
-							})
-
-							v81(v138, p11.humanoidDescriptionWithValidAssets, v158, v135, u140)
-							resolve()
-						end)
-
+					if v26 > 0 and os.time() - v26 < defineFastInt then
+						v21(SaveStatusEnum.Throttled)
 						return
 					end
 
-					local v153 = v136
+					v14(v25)
+					v16(os.time())
+					local humanoidDescriptionForCharacterData = buildHumanoidDescriptionForCharacterData(v25) -- inferred equivalent call
+					local v27 = Enum.HumanoidRigType[v25.equipped.AvatarType]
+					local saveDict = getSaveDict(v25, v24)
+					local backgroundAssetId
 
-					v81(v138, p11.humanoidDescriptionWithValidAssets, v153, v135, u140)
-					resolve()
-				end):catch(function(_) -- line: 433
-					-- upvalues: v76 (copy), v79 (copy), v82 (copy), SaveStatusEnum (copy), reject (copy)
-					v76(false)
-
-					if v79 then
-						v79.fetchStatus()
+					if FFlagAXBackgroundsPersistence then
+						backgroundAssetId = v25.equipped.BackgroundAssetId
 					end
 
-					v82(SaveStatusEnum.Failure)
-					reject()
-				end)
+					local v28
+
+					if saveDict.Background == true then
+						v28 = backgroundAssetId ~= nil
+					else
+						v28 = false
+					end
+
+					local v29 = AvatarExperienceFlags.FFlagAXProfileConfigurationMultiFieldApply
+						and { BackgroundAssetId = backgroundAssetId }
+						or backgroundAssetId
+
+					local v30 = false
+
+					if FFlagAXBackgroundsPersistence then
+						saveDict = Cryo.Dictionary.join(saveDict, { Background = Cryo.None })
+
+						for _, save in saveDict do
+							if save then
+								v30 = true
+								break
+							end
+						end
+					end
+
+					if v28 and not v30 then
+						saveProfileConfiguration(v29):andThen(function()
+							v18(false)
+							v20(
+								humanoidDescriptionForCharacterData,
+								humanoidDescriptionForCharacterData,
+								v25,
+								v24,
+								saveDict
+							)
+
+							callback()
+						end):catch(function()
+							v18(false)
+							v21(SaveStatusEnum.Failure)
+							callback2()
+						end)
+						return
+					end
+
+					local v31
+
+					if v28 then
+						v31 = saveProfileConfiguration(v29)
+					else
+						v31 = nil
+					end
+
+					saveAvatar(
+						humanoidDescriptionForCharacterData,
+						v27,
+						saveDict,
+						(getGearAssetIdFromEquippedAssets(v25.equipped.EquippedAssets))
+					):andThen(function(p)
+						v18(false)
+
+						local function finishSuccess(p2) -- 3 equivalent calls inferred from this helper
+							v20(
+								humanoidDescriptionForCharacterData,
+								p.humanoidDescriptionWithValidAssets,
+								p2,
+								v24,
+								saveDict
+							)
+
+							callback()
+						end
+
+						if v31 then
+							v31:andThen(function()
+								finishSuccess(v25) -- inferred equivalent call
+							end, function()
+								local join = Cryo.Dictionary.join
+								local join2 = Cryo.Dictionary.join
+								local equipped = v25.equipped
+								local backgroundAssetId2
+
+								if v24.equipped.BackgroundAssetId == nil then
+									backgroundAssetId2 = Cryo.None
+								else
+									backgroundAssetId2 = v24.equipped.BackgroundAssetId
+								end
+
+								finishSuccess(join(v25, { -- inferred equivalent call
+									equipped = join2(equipped, {
+										BackgroundAssetId = backgroundAssetId2
+									})
+								}))
+							end)
+							return
+						end
+
+						finishSuccess(v25) -- inferred equivalent call
+					end):catch(function(_)
+						v18(false)
+
+						if timeoutStatusStore then
+							timeoutStatusStore.fetchStatus()
+						end
+
+						v21(SaveStatusEnum.Failure)
+						callback2()
+					end)
+				end
 			end
 		end)
 	end, {
-		v79,
-		v65,
-		v67,
-		v70,
-		v72,
-		v74,
-		v78,
-		v82,
-		v76
+		timeoutStatusStore,
+		getHistorySignal,
+		getCurrentHistoryIndexSignal,
+		v12,
+		v14,
+		v16,
+		v19,
+		v21,
+		v18
 	})
 
 	if FFlagAXEnableManualSavingBlockingPrompt then
-		local v84 = React.useCallback(function(s1: string) -- line: 465
-			-- upvalues: v83 (copy), FFlagSignalsNavP3Dispatch (copy), v44 (copy), v61 (copy), NavigateToRoute (copy)
-			return function() -- line: 466
-				-- upvalues: v83 (copy), FFlagSignalsNavP3Dispatch (copy), v44 (copy), s1 (copy), v61 (copy), NavigateToRoute (copy)
-				v83():finally(function() -- line: 467
-					-- upvalues: FFlagSignalsNavP3Dispatch (copy), v44 (copy), s1 (copy), v61 (copy), NavigateToRoute (copy)
+		local v22 = React.useCallback(function(name: string)
+			return function()
+				trySaveAvatar():finally(function()
 					if FFlagSignalsNavP3Dispatch then
-						v44.to(v44.fromLegacyPage({
-							skipSaveBlockingPrompt = true,
-							name = s1
+						navigationCommands.to(navigationCommands.fromLegacyPage({
+							name = name,
+							skipSaveBlockingPrompt = true
 						}))
-
-						return
+					else
+						v6(NavigateToRoute({
+							{ name = name, skipSaveBlockingPrompt = true }
+						}))
 					end
-
-					v61(NavigateToRoute({{
-						skipSaveBlockingPrompt = true,
-						name = s1
-					}}))
 				end)
 			end
-		end, {
-			v83,
-			v61
-		})
-		local v85 = React.useCallback(function(s2: string) -- line: 477
-			-- upvalues: v69 (copy), v61 (copy), CharacterHistoryStateChangeButtonActivated (copy), FFlagSignalsNavP3Dispatch (copy), v44 (copy), NavigateToRoute (copy)
-			return function() -- line: 478
-				-- upvalues: v69 (copy), v61 (copy), CharacterHistoryStateChangeButtonActivated (copy), FFlagSignalsNavP3Dispatch (copy), v44 (copy), s2 (copy), NavigateToRoute (copy)
-				task.spawn(function() -- line: 479
-					-- upvalues: v69 (copy), v61 (copy), CharacterHistoryStateChangeButtonActivated (copy), FFlagSignalsNavP3Dispatch (copy), v44 (copy), s2 (copy), NavigateToRoute (copy)
-					local v155 = v69(false)
+		end, { trySaveAvatar, v6 })
 
-					v61(CharacterHistoryStateChangeButtonActivated(v155))
+		local v23 = React.useCallback(function(name: string)
+			return function()
+				task.spawn(function()
+					v6(CharacterHistoryStateChangeButtonActivated((getLastSuccessfullySavedStateSignal(false))))
+
 					task.wait()
 
 					if FFlagSignalsNavP3Dispatch then
-						v44.to(v44.fromLegacyPage({
-							skipSaveBlockingPrompt = true,
-							name = s2
+						navigationCommands.to(navigationCommands.fromLegacyPage({
+							name = name,
+							skipSaveBlockingPrompt = true
 						}))
-
-						return
+					else
+						v6(NavigateToRoute({
+							{ name = name, skipSaveBlockingPrompt = true }
+						}))
 					end
-
-					v61(NavigateToRoute({{
-						skipSaveBlockingPrompt = true,
-						name = s2
-					}}))
 				end)
 			end
-		end, {
-			v61,
-			v69
-		})
-		local v86 = React.useCallback(function(p14, p15) -- line: 500
-			-- upvalues: Actions (copy), AvatarScreen (copy), t5 (copy), tutils (copy), v80 (copy), SaveStatusEnum (copy), Cryo (copy), v84 (copy), v85 (copy)
-			local routeName = (p14 or {}).routeName
-			local params = (p14 or {}).params
+		end, { v6, getLastSuccessfullySavedStateSignal })
 
-			if p14.type == Actions.Back and (not p14.immediate and p15.routes[#p15.routes] and p15.routes[#p15.routes].routeName == AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt) then
+		local v24 = React.useCallback(function(options, p)
+			local routeName = (options or {}).routeName
+			local params = (options or {}).params
+
+			if
+				options.type == Actions.Back
+				and not options.immediate
+				and p.routes[#p.routes]
+				and p.routes[#p.routes].routeName == AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt
+			then
 				return true, nil
 			end
 
-			if p14.type == Actions.Navigate and t5[routeName] ~= nil and ((params == nil or tutils.fieldCount(params) == 0) and v80(false) == SaveStatusEnum.Eligible) then
-				if p15.routes[#p15.routes] and p15.routes[#p15.routes].routeName == AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt then
-					return true, nil
-				end
+			if
+				options.type ~= Actions.Navigate
+				or v5[routeName] == nil
+				or params ~= nil and tutils.fieldCount(params) ~= 0
+				or getSaveEligibilityStatusSignal(false) ~= SaveStatusEnum.Eligible
+			then
+				return false, nil
+			end
 
-				local v117 = Cryo.List.join(p15.routes, {{
+			if
+				p.routes[#p.routes]
+				and p.routes[#p.routes].routeName == AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt
+			then
+				return true, nil
+			end
+
+			local joined = Cryo.List.join(p.routes, {
+				{
 					key = AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt,
 					routeName = AvatarScreen.SaveAvatarOnLeaveAvatarExperiencePrompt,
 					params = {
-						saveAndContinue = v84(routeName),
-						continueWithoutSave = v85(routeName)
+						saveAndContinue = v22(routeName),
+						continueWithoutSave = v23(routeName)
 					}
-				}})
+				}
+			})
 
-				return true, Cryo.Dictionary.join(p15, {
-					routes = v117,
-					index = #v117
-				})
-			end
+			return true, Cryo.Dictionary.join(p, {
+				routes = joined,
+				index = #joined
+			})
+		end, { getSaveEligibilityStatusSignal, v22, v23 })
 
-			return false, nil
-		end, {
-			v80,
-			v84,
-			v85
-		})
-
-		React.useEffect(function() -- line: 563
-			-- upvalues: v62 (copy), RegisterCustomGetStateForAction (copy), CustomGetStateForAction (copy), v86 (copy)
-			v62.dispatch(RegisterCustomGetStateForAction(CustomGetStateForAction.HandlerId.BlockAXExitOnUnsavedChanges, v86))
-		end, {
-			v62,
-			v86
-		})
+		React.useEffect(function()
+			v7.dispatch(RegisterCustomGetStateForAction(
+				CustomGetStateForAction.HandlerId.BlockAXExitOnUnsavedChanges,
+				v24
+			))
+		end, { v7, v24 })
 	end
 
-	React.useEffect(function() -- line: 576
-		-- upvalues: Signals (copy), v65 (copy), v75 (copy), v80 (copy), SaveStatusEnum (copy), v83 (copy)
-		return Signals.createEffect(function(p16) -- line: 577
-			-- upvalues: v65 (copy), v75 (copy), v80 (copy), SaveStatusEnum (copy), v83 (copy)
-			local v149 = v65(p16)
+	React.useEffect(function()
+		return Signals.createEffect(function(p)
+			local v22 = getHistorySignal(p)
 
-			if v149[#v149] and v75(false) then
-				local v150 = v80(false)
+			if v22[#v22] and v17(false) then
+				local v23 = getSaveEligibilityStatusSignal(false)
 
-				if v150 == SaveStatusEnum.Eligible or v150 == SaveStatusEnum.HasTryOns then
-					v83()
+				if v23 == SaveStatusEnum.Eligible or v23 == SaveStatusEnum.HasTryOns then
+					trySaveAvatar()
 				end
 			end
 		end)
 	end, {})
 
-	local v87 = React.useCallback(function() -- line: 594
-		-- upvalues: v76 (copy)
-		v76(true)
-	end, { v76 })
+	local autoSaveNextNewSaveData = React.useCallback(function()
+		v18(true)
+	end, { v18 })
 
-	return React.useMemo(function() -- line: 599
-		-- upvalues: v65 (copy), v67 (copy), v77 (copy), v69 (copy), v80 (copy), v83 (copy), v87 (copy)
+	return React.useMemo(function()
 		return {
-			getHistorySignal = v65,
-			getCurrentHistoryIndexSignal = v67,
-			updateHistoryIndexAndGetCharacterData = v77,
-			getLastSuccessfullySavedStateSignal = v69,
-			getSaveEligibilityStatusSignal = v80,
-			trySaveAvatar = v83,
-			autoSaveNextNewSaveData = v87
+			getHistorySignal = getHistorySignal,
+			getCurrentHistoryIndexSignal = getCurrentHistoryIndexSignal,
+			updateHistoryIndexAndGetCharacterData = updateHistoryIndexAndGetCharacterData,
+			getLastSuccessfullySavedStateSignal = getLastSuccessfullySavedStateSignal,
+			getSaveEligibilityStatusSignal = getSaveEligibilityStatusSignal,
+			trySaveAvatar = trySaveAvatar,
+			autoSaveNextNewSaveData = autoSaveNextNewSaveData
 		}
 	end, {
-		v65,
-		v67,
-		v77,
-		v69,
-		v80,
-		v83,
-		v87
+		getHistorySignal,
+		getCurrentHistoryIndexSignal,
+		updateHistoryIndexAndGetCharacterData,
+		getLastSuccessfullySavedStateSignal,
+		getSaveEligibilityStatusSignal,
+		trySaveAvatar,
+		autoSaveNextNewSaveData
 	})
 end
 

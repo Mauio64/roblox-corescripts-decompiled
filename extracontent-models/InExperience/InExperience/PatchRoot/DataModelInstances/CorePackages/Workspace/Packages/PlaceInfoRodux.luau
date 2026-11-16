@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.PlaceInfoRodux.PlaceInfoRodux))
+local PlaceInfoRodux = require(Workspace.PlaceInfoRodux.PlaceInfoRodux)
+
+return PlaceInfoRodux

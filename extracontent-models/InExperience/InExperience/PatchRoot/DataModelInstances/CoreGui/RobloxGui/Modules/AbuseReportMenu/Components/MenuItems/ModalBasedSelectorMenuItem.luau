@@ -4,14 +4,13 @@ local React = require(CorePackages.Packages.React)
 local ModalBasedSelector = require(AbuseReportMenu.Components.ModalBasedSelector)
 local ReportMenuItem = require(AbuseReportMenu.Components.MenuItems.ReportMenuItem)
 
-return function(p1) -- line: 15
-	-- upvalues: React (copy), ReportMenuItem (copy), ModalBasedSelector (copy)
+return function(props)
 	return React.createElement(ReportMenuItem, {
-		label = p1.label,
-		layoutOrder = p1.layoutOrder,
-		rightComponent = React.createElement(ModalBasedSelector, p1),
-		menuContainerWidth = p1.menuContainerWidth,
-		isSmallPortraitViewport = p1.isSmallPortraitViewport,
-		placeholderText = p1.placeholderText
+		label = props.label,
+		layoutOrder = props.layoutOrder,
+		rightComponent = React.createElement(ModalBasedSelector, props),
+		menuContainerWidth = props.menuContainerWidth,
+		isSmallPortraitViewport = props.isSmallPortraitViewport,
+		placeholderText = props.placeholderText
 	})
 end

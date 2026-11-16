@@ -1,14 +1,15 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent
-local FFlagTopBarDeprecateMoreMenuRodux = require(ParentParent.Flags.FFlagTopBarDeprecateMoreMenuRodux)
-local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+local parent = script.Parent.Parent
+local FFlagTopBarDeprecateMoreMenuRodux = require(parent.Flags.FFlagTopBarDeprecateMoreMenuRodux)
+
+local Rodux = require(CorePackages.Packages.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
 
 if FFlagTopBarDeprecateMoreMenuRodux then
 	return nil
 end
 
-return (makeActionCreator(script.Name, function(p1) -- line: 11
-	return {
-		open = p1
-	}
+return (makeActionCreator(script.Name, function(open)
+	return { open = open }
 end))

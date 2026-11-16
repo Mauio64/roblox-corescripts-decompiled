@@ -1,366 +1,362 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
+
+local v = {}
+
 local timestamp = require(script.Parent.Parent.Parent.Parent.Parent.google.protobuf.timestamp)
-local t2 = {}
+require(script.Parent.custom_options)
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.new(t3: {[any]: any}?) -- line: 63
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		id = if t3 ~= nil and t3.id ~= nil then t3.id else 0,
-		display_name = if t3 ~= nil and t3.display_name ~= nil then t3.display_name else "",
-		display_icon_image_id = if t3 ~= nil and t3.display_icon_image_id ~= nil then t3.display_icon_image_id else 0,
-		display_description = if t3 ~= nil and t3.display_description ~= nil then t3.display_description else "",
-		total_awarded_count = if t3 ~= nil and t3.total_awarded_count ~= nil then t3.total_awarded_count else 0,
-		past_day_awarded_count = if t3 ~= nil and t3.past_day_awarded_count ~= nil then t3.past_day_awarded_count else 0,
-		rarity = if t3 ~= nil and t3.rarity ~= nil then t3.rarity else "",
-		badge_type_label = if t3 ~= nil and t3.badge_type_label ~= nil then t3.badge_type_label else "",
-		created_time = if t3 ~= nil and t3.created_time ~= nil then t3.created_time else nil,
-		updated_time = if t3 ~= nil and t3.updated_time ~= nil then t3.updated_time else nil,
-		is_earned_by_user = t3 ~= nil and (t3.is_earned_by_user ~= nil and t3.is_earned_by_user),
-		awarded_time = if t3 ~= nil and t3.awarded_time ~= nil then t3.awarded_time else nil
-	}, t2))
+function class.new(data)
+	local v2 = {
+		id = (data == nil or data.id == nil) and 0 or data.id,
+		display_name = (data == nil or data.display_name == nil) and "" or data.display_name,
+		display_icon_image_id = (data == nil or data.display_icon_image_id == nil) and 0 or data.display_icon_image_id,
+		display_description = (data == nil or data.display_description == nil) and "" or data.display_description,
+		total_awarded_count = (data == nil or data.total_awarded_count == nil) and 0 or data.total_awarded_count,
+		past_day_awarded_count = (data == nil or data.past_day_awarded_count == nil) and 0 or data.past_day_awarded_count,
+		rarity = (data == nil or data.rarity == nil) and "" or data.rarity,
+		badge_type_label = (data == nil or data.badge_type_label == nil) and "" or data.badge_type_label,
+		created_time = 0,
+		updated_time = 0,
+		is_earned_by_user = 0,
+		awarded_time = 0
+	}
+	local created_time
+
+	if not (data == nil or data.created_time == nil) then
+		created_time = data.created_time
+	end
+
+	v2.created_time = created_time
+	local updated_time
+
+	if not (data == nil or data.updated_time == nil) then
+		updated_time = data.updated_time
+	end
+
+	v2.updated_time = updated_time
+	v2.is_earned_by_user = data ~= nil and data.is_earned_by_user ~= nil and data.is_earned_by_user
+	local awarded_time
+
+	if not (data == nil or data.awarded_time == nil) then
+		awarded_time = data.awarded_time
+	end
+
+	v2.awarded_time = awarded_time
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 88
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.id ~= nil and p1.id ~= 0 then
-		local v10, v11 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class:encode()
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v10, v11, p1.id)
+	if self.id ~= nil and self.id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.id)
 	end
 
-	if p1.display_name ~= nil and p1.display_name ~= "" then
-		local v12, v13 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v12, v13, p1.display_name)
+	if self.display_name ~= nil and self.display_name ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.display_name)
 	end
 
-	if p1.display_icon_image_id ~= nil and p1.display_icon_image_id ~= 0 then
-		local v14, v15 = proto.writeTag(buf, n1, 3, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v14, v15, p1.display_icon_image_id)
+	if self.display_icon_image_id ~= nil and self.display_icon_image_id ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.display_icon_image_id)
 	end
 
-	if p1.display_description ~= nil and p1.display_description ~= "" then
-		local v16, v17 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v16, v17, p1.display_description)
+	if self.display_description ~= nil and self.display_description ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.display_description)
 	end
 
-	if p1.total_awarded_count ~= nil and p1.total_awarded_count ~= 0 then
-		local v18, v19 = proto.writeTag(buf, n1, 5, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v18, v19, p1.total_awarded_count)
+	if self.total_awarded_count ~= nil and self.total_awarded_count ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.total_awarded_count)
 	end
 
-	if p1.past_day_awarded_count ~= nil and p1.past_day_awarded_count ~= 0 then
-		local v20, v21 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v20, v21, p1.past_day_awarded_count)
+	if self.past_day_awarded_count ~= nil and self.past_day_awarded_count ~= 0 then
+		local v4, v5 = proto.writeTag(v2, v3, 6, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.past_day_awarded_count)
 	end
 
-	if p1.rarity ~= nil and p1.rarity ~= "" then
-		local v22, v23 = proto.writeTag(buf, n1, 7, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v22, v23, p1.rarity)
+	if self.rarity ~= nil and self.rarity ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 7, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.rarity)
 	end
 
-	if p1.badge_type_label ~= nil and p1.badge_type_label ~= "" then
-		local v24, v25 = proto.writeTag(buf, n1, 8, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v24, v25, p1.badge_type_label)
+	if self.badge_type_label ~= nil and self.badge_type_label ~= "" then
+		local v4, v5 = proto.writeTag(v2, v3, 8, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, self.badge_type_label)
 	end
 
-	if p1.created_time ~= nil then
-		local v26 = p1.created_time:encode()
-		local v27, v28 = proto.writeTag(buf, n1, 9, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v27, v28, v26, buffer.len(v26))
+	if self.created_time ~= nil then
+		local encoded = self.created_time:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 9, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	if p1.updated_time ~= nil then
-		local v29 = p1.updated_time:encode()
-		local v30, v31 = proto.writeTag(buf, n1, 10, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v30, v31, v29, buffer.len(v29))
+	if self.updated_time ~= nil then
+		local encoded = self.updated_time:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 10, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	if p1.is_earned_by_user then
-		local v32, v33 = proto.writeTag(buf, n1, 11, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v32, v33, not p1.is_earned_by_user and 0 or 1)
+	if self.is_earned_by_user then
+		local v4, v5 = proto.writeTag(v2, v3, 11, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, self.is_earned_by_user and 1 or 0)
 	end
 
-	if p1.awarded_time ~= nil then
-		local v34 = p1.awarded_time:encode()
-		local v35, v36 = proto.writeTag(buf, n1, 12, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeBuffer(v35, v36, v34, buffer.len(v34))
+	if self.awarded_time ~= nil then
+		local encoded = self.awarded_time:encode()
+		local v4, v5 = proto.writeTag(v2, v3, 12, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeBuffer(v4, v5, encoded, buffer.len(encoded))
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 160
-	-- upvalues: t2 (copy), proto (copy), timestamp (copy)
-	local v39 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v41, v42
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v41, v42, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v42 == proto.wireTypes.varint then
-			if v41 == 1 then
-				local v43
-
-				v43, n2 = proto.readVarIntI64(p2, n2)
-				v39.id = v43
-			elseif v41 == 3 then
-				local v44
-
-				v44, n2 = proto.readVarIntI64(p2, n2)
-				v39.display_icon_image_id = v44
-			elseif v41 == 5 then
-				local v45
-
-				v45, n2 = proto.readVarIntI64(p2, n2)
-				v39.total_awarded_count = v45
-			elseif v41 == 6 then
-				local v46
-
-				v46, n2 = proto.readVarIntI64(p2, n2)
-				v39.past_day_awarded_count = v46
-			elseif v41 == 11 then
-				local v47
-
-				v47, n2 = proto.readVarInt(p2, n2)
-				v39.is_earned_by_user = v47 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local id
+				id, v2 = proto.readVarIntI64(buf, v2)
+				result.id = id
+			elseif v3 == 3 then
+				local display_icon_image_id
+				display_icon_image_id, v2 = proto.readVarIntI64(buf, v2)
+				result.display_icon_image_id = display_icon_image_id
+			elseif v3 == 5 then
+				local total_awarded_count
+				total_awarded_count, v2 = proto.readVarIntI64(buf, v2)
+				result.total_awarded_count = total_awarded_count
+			elseif v3 == 6 then
+				local past_day_awarded_count
+				past_day_awarded_count, v2 = proto.readVarIntI64(buf, v2)
+				result.past_day_awarded_count = past_day_awarded_count
+			elseif v3 == 11 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_earned_by_user = v5 ~= 0
 			else
-				local v48
-
-				v48, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v42 == proto.wireTypes.lengthDelimited then
-			if v41 == 2 then
-				local v49
-
-				v49, n2 = proto.readBuffer(p2, n2)
-				v39.display_name = buffer.tostring(v49)
-			elseif v41 == 4 then
-				local v50
-
-				v50, n2 = proto.readBuffer(p2, n2)
-				v39.display_description = buffer.tostring(v50)
-			elseif v41 == 7 then
-				local v51
-
-				v51, n2 = proto.readBuffer(p2, n2)
-				v39.rarity = buffer.tostring(v51)
-			elseif v41 == 8 then
-				local v52
-
-				v52, n2 = proto.readBuffer(p2, n2)
-				v39.badge_type_label = buffer.tostring(v52)
-			elseif v41 == 9 then
-				local v53
-
-				v53, n2 = proto.readBuffer(p2, n2)
-				v39.created_time = timestamp.Timestamp.decode(v53)
-			elseif v41 == 10 then
-				local v54
-
-				v54, n2 = proto.readBuffer(p2, n2)
-				v39.updated_time = timestamp.Timestamp.decode(v54)
-			elseif v41 == 12 then
-				local v55
-
-				v55, n2 = proto.readBuffer(p2, n2)
-				v39.awarded_time = timestamp.Timestamp.decode(v55)
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_name = buffer.tostring(v5)
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_description = buffer.tostring(v5)
+			elseif v3 == 7 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.rarity = buffer.tostring(v5)
+			elseif v3 == 8 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.badge_type_label = buffer.tostring(v5)
+			elseif v3 == 9 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.created_time = timestamp.Timestamp.decode(v5)
+			elseif v3 == 10 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.updated_time = timestamp.Timestamp.decode(v5)
+			elseif v3 == 12 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.awarded_time = timestamp.Timestamp.decode(v5)
 			else
-				local v56, v57 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v57 + v56
+				v2 = v5 + varInt
 			end
-		elseif v42 == proto.wireTypes.i32 then
-			local v58
-
-			v58, n2 = proto.readFixed32(p2, n2)
-		elseif v42 == proto.wireTypes.i64 then
-			local v59
-
-			v59, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v42)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v39
-end
-function t2.jsonEncode(p3) -- line: 258
-	local t4 = {}
-
-	if p3.id ~= nil and p3.id ~= 0 then
-		t4.id = p3.id
-	end
-
-	if p3.display_name ~= nil and p3.display_name ~= "" then
-		t4.displayName = p3.display_name
-	end
-
-	if p3.display_icon_image_id ~= nil and p3.display_icon_image_id ~= 0 then
-		t4.displayIconImageId = p3.display_icon_image_id
-	end
-
-	if p3.display_description ~= nil and p3.display_description ~= "" then
-		t4.displayDescription = p3.display_description
-	end
-
-	if p3.total_awarded_count ~= nil and p3.total_awarded_count ~= 0 then
-		t4.totalAwardedCount = p3.total_awarded_count
-	end
-
-	if p3.past_day_awarded_count ~= nil and p3.past_day_awarded_count ~= 0 then
-		t4.pastDayAwardedCount = p3.past_day_awarded_count
-	end
-
-	if p3.rarity ~= nil and p3.rarity ~= "" then
-		t4.rarity = p3.rarity
-	end
-
-	if p3.badge_type_label ~= nil and p3.badge_type_label ~= "" then
-		t4.badgeTypeLabel = p3.badge_type_label
-	end
-
-	if p3.created_time ~= nil then
-		t4.createdTime = p3.created_time:jsonEncode()
-	end
-
-	if p3.updated_time ~= nil then
-		t4.updatedTime = p3.updated_time:jsonEncode()
-	end
-
-	if p3.is_earned_by_user then
-		t4.isEarnedByUser = p3.is_earned_by_user
-	end
-
-	if p3.awarded_time ~= nil then
-		t4.awardedTime = p3.awarded_time:jsonEncode()
-	end
-
-	return t4
-end
-function t2.jsonDecode(t5: {[any]: any}) -- line: 312
-	-- upvalues: t2 (copy), timestamp (copy)
-	local v63 = t2.new()
-
-	if t5.id ~= nil then
-		v63.id = t5.id
-	end
-
-	if t5.display_name ~= nil then
-		v63.display_name = t5.display_name
-	end
-
-	if t5.displayName ~= nil then
-		v63.display_name = t5.displayName
-	end
-
-	if t5.display_icon_image_id ~= nil then
-		v63.display_icon_image_id = t5.display_icon_image_id
-	end
-
-	if t5.displayIconImageId ~= nil then
-		v63.display_icon_image_id = t5.displayIconImageId
-	end
-
-	if t5.display_description ~= nil then
-		v63.display_description = t5.display_description
-	end
-
-	if t5.displayDescription ~= nil then
-		v63.display_description = t5.displayDescription
-	end
-
-	if t5.total_awarded_count ~= nil then
-		v63.total_awarded_count = t5.total_awarded_count
-	end
-
-	if t5.totalAwardedCount ~= nil then
-		v63.total_awarded_count = t5.totalAwardedCount
-	end
-
-	if t5.past_day_awarded_count ~= nil then
-		v63.past_day_awarded_count = t5.past_day_awarded_count
-	end
-
-	if t5.pastDayAwardedCount ~= nil then
-		v63.past_day_awarded_count = t5.pastDayAwardedCount
-	end
-
-	if t5.rarity ~= nil then
-		v63.rarity = t5.rarity
-	end
-
-	if t5.badge_type_label ~= nil then
-		v63.badge_type_label = t5.badge_type_label
-	end
-
-	if t5.badgeTypeLabel ~= nil then
-		v63.badge_type_label = t5.badgeTypeLabel
-	end
-
-	if t5.created_time ~= nil then
-		v63.created_time = timestamp.Timestamp.jsonDecode(t5.created_time)
-	end
-
-	if t5.createdTime ~= nil then
-		v63.created_time = timestamp.Timestamp.jsonDecode(t5.createdTime)
-	end
-
-	if t5.updated_time ~= nil then
-		v63.updated_time = timestamp.Timestamp.jsonDecode(t5.updated_time)
-	end
-
-	if t5.updatedTime ~= nil then
-		v63.updated_time = timestamp.Timestamp.jsonDecode(t5.updatedTime)
-	end
-
-	if t5.is_earned_by_user ~= nil then
-		v63.is_earned_by_user = t5.is_earned_by_user
-	end
-
-	if t5.isEarnedByUser ~= nil then
-		v63.is_earned_by_user = t5.isEarnedByUser
-	end
-
-	if t5.awarded_time ~= nil then
-		v63.awarded_time = timestamp.Timestamp.jsonDecode(t5.awarded_time)
-	end
-
-	if t5.awardedTime ~= nil then
-		v63.awarded_time = timestamp.Timestamp.jsonDecode(t5.awardedTime)
-	end
-
-	return v63
+	return result
 end
 
-t2.descriptor = {
+function class:jsonEncode()
+	local v2 = {}
+
+	if self.id ~= nil and self.id ~= 0 then
+		v2.id = self.id
+	end
+
+	if self.display_name ~= nil and self.display_name ~= "" then
+		v2.displayName = self.display_name
+	end
+
+	if self.display_icon_image_id ~= nil and self.display_icon_image_id ~= 0 then
+		v2.displayIconImageId = self.display_icon_image_id
+	end
+
+	if self.display_description ~= nil and self.display_description ~= "" then
+		v2.displayDescription = self.display_description
+	end
+
+	if self.total_awarded_count ~= nil and self.total_awarded_count ~= 0 then
+		v2.totalAwardedCount = self.total_awarded_count
+	end
+
+	if self.past_day_awarded_count ~= nil and self.past_day_awarded_count ~= 0 then
+		v2.pastDayAwardedCount = self.past_day_awarded_count
+	end
+
+	if self.rarity ~= nil and self.rarity ~= "" then
+		v2.rarity = self.rarity
+	end
+
+	if self.badge_type_label ~= nil and self.badge_type_label ~= "" then
+		v2.badgeTypeLabel = self.badge_type_label
+	end
+
+	if self.created_time ~= nil then
+		v2.createdTime = self.created_time:jsonEncode()
+	end
+
+	if self.updated_time ~= nil then
+		v2.updatedTime = self.updated_time:jsonEncode()
+	end
+
+	if self.is_earned_by_user then
+		v2.isEarnedByUser = self.is_earned_by_user
+	end
+
+	if self.awarded_time ~= nil then
+		v2.awardedTime = self.awarded_time:jsonEncode()
+	end
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.id ~= nil then
+		v2.id = data.id
+	end
+
+	if data.display_name ~= nil then
+		v2.display_name = data.display_name
+	end
+
+	if data.displayName ~= nil then
+		v2.display_name = data.displayName
+	end
+
+	if data.display_icon_image_id ~= nil then
+		v2.display_icon_image_id = data.display_icon_image_id
+	end
+
+	if data.displayIconImageId ~= nil then
+		v2.display_icon_image_id = data.displayIconImageId
+	end
+
+	if data.display_description ~= nil then
+		v2.display_description = data.display_description
+	end
+
+	if data.displayDescription ~= nil then
+		v2.display_description = data.displayDescription
+	end
+
+	if data.total_awarded_count ~= nil then
+		v2.total_awarded_count = data.total_awarded_count
+	end
+
+	if data.totalAwardedCount ~= nil then
+		v2.total_awarded_count = data.totalAwardedCount
+	end
+
+	if data.past_day_awarded_count ~= nil then
+		v2.past_day_awarded_count = data.past_day_awarded_count
+	end
+
+	if data.pastDayAwardedCount ~= nil then
+		v2.past_day_awarded_count = data.pastDayAwardedCount
+	end
+
+	if data.rarity ~= nil then
+		v2.rarity = data.rarity
+	end
+
+	if data.badge_type_label ~= nil then
+		v2.badge_type_label = data.badge_type_label
+	end
+
+	if data.badgeTypeLabel ~= nil then
+		v2.badge_type_label = data.badgeTypeLabel
+	end
+
+	if data.created_time ~= nil then
+		v2.created_time = timestamp.Timestamp.jsonDecode(data.created_time)
+	end
+
+	if data.createdTime ~= nil then
+		v2.created_time = timestamp.Timestamp.jsonDecode(data.createdTime)
+	end
+
+	if data.updated_time ~= nil then
+		v2.updated_time = timestamp.Timestamp.jsonDecode(data.updated_time)
+	end
+
+	if data.updatedTime ~= nil then
+		v2.updated_time = timestamp.Timestamp.jsonDecode(data.updatedTime)
+	end
+
+	if data.is_earned_by_user ~= nil then
+		v2.is_earned_by_user = data.is_earned_by_user
+	end
+
+	if data.isEarnedByUser ~= nil then
+		v2.is_earned_by_user = data.isEarnedByUser
+	end
+
+	if data.awarded_time ~= nil then
+		v2.awarded_time = timestamp.Timestamp.jsonDecode(data.awarded_time)
+	end
+
+	if data.awardedTime ~= nil then
+		v2.awarded_time = timestamp.Timestamp.jsonDecode(data.awardedTime)
+	end
+
+	return v2
+end
+
+class.descriptor = {
 	name = "BadgeData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.BadgeData"
 }
-t1.BadgeData = t2
-typeRegistry.default:register(t1.BadgeData)
 
-return {
-	BadgeData = t1.BadgeData
-}
+v.BadgeData = class
+
+typeRegistry.default:register(v.BadgeData)
+
+return { BadgeData = v.BadgeData }

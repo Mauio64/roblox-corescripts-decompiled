@@ -1,151 +1,141 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
 require(AppChat.types)
-
 local Constants = require(AppChat.Constants)
-
 require(AppChat.Models.ConversationChannels)
 
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local Signals = require(AppChatParent.Signals)
-local View = require(AppChatParent.Foundation).View
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+
 local useAppChatIsWideMode = require(AppChat.Hooks.useAppChatIsWideMode)
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
+
 local isUserInConversation = require(script.Parent.Utils.isUserInConversation)
 local searchFilterPredicate = require(script.Parent.Utils.searchFilterPredicate)
 local sortComparator = require(script.Parent.Utils.sortComparator)
+
 local useFetchPaginatedFriendIds = require(script.Parent.useFetchPaginatedFriendIds)
 local SelectChatMembers = require(script.Parent.SelectChatMembers)
-local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
-local FFlagConnectionsToFriendsRename = require(AppChatParent.SharedFlags).FFlagConnectionsToFriendsRename
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
+local FFlagFixPaginatedChatMembersCutoff = require(AppChat.Flags.FFlagFixPaginatedChatMembersCutoff)
+
 local GetSelectedUsersStore = require(AppChat.Stores.GetSelectedUsersStore)
-local t1 = {
+
+local v = {
 	minSelections = 1,
-	canOnlyCreateOneToOneChat = false,
-	isDebugEnabled = false,
 	maxSelections = Constants.MIN_PARTICIPANT_COUNT,
 	maxConversationSize = Constants.MAX_PARTICIPANT_COUNT,
+	canOnlyCreateOneToOneChat = false,
 	filterPredicate = searchFilterPredicate,
 	sortComparator = sortComparator,
-	conversation = {
-		participants = {}
-	},
-	navigateToToast = function(_) -- line: 63
-	end,
-	selectedUsersChanged = function(_, _) -- line: 64
-	end
+	conversation = { participants = {} },
+	navigateToToast = function(_) end,
+	selectedUsersChanged = function(_, _) end,
+	isDebugEnabled = false
 }
 
-function SelectChatMembersContainer(t2: {[any]: any}) -- line: 69
-	-- upvalues: Cryo (copy), t1 (copy), GetSelectedUsersStore (copy), React (copy), Signals (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), GetFFlagIsSquadEnabled (copy), Constants (copy), useFetchPaginatedFriendIds (copy), isUserInConversation (copy), useIsInExperience (copy), useAppChatIsWideMode (copy), View (copy), SelectChatMembers (copy)
-	local v24 = Cryo.Dictionary.union(t1, t2)
-	local v25 = GetSelectedUsersStore(false)
+function SelectChatMembersContainer(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local selectedUsersStore = GetSelectedUsersStore(false)
+	local v2
 
-	React.useEffect(function() -- line: 73
-		-- upvalues: v25 (copy), v24 (copy)
-		v25.setMaxSize(v24.maxSelections)
+	if FFlagFixPaginatedChatMembersCutoff then
+		v2 = useNavigation().getScreenProps("topBarHeight", 0)
+	end
 
-		return function() -- line: 75
-			-- upvalues: v25 (copy)
-			v25.clearStore()
+	React.useEffect(function()
+		selectedUsersStore.setMaxSize(union.maxSelections)
+		return function()
+			selectedUsersStore.clearStore()
 		end
-	end, { v24.maxSelections })
-	React.useEffect(function() -- line: 80
-		-- upvalues: Signals (copy), v25 (copy), Cryo (copy), v24 (copy)
-		local v36 = Signals.createEffect(function(p4) -- line: 81
-			-- upvalues: v25 (copy), Cryo (copy), v24 (copy)
-			local v40 = v25.getSelectedUserIdsArray()(p4)
-			local v41 = Cryo.List.map(v40, function(p5) -- line: 86
-				return {
-					id = p5
-				}
+	end, { union.maxSelections })
+
+	React.useEffect(function()
+		local effect = Signals.createEffect(function(p2)
+			local v3 = selectedUsersStore.getSelectedUserIdsArray()(p2)
+
+			local mapped = Cryo.List.map(v3, function(id)
+				return { id = id }
 			end)
 
-			v24.selectedUsersChanged(v41, v24.minSelections)
+			union.selectedUsersChanged(mapped, union.minSelections)
 		end)
-
-		return function() -- line: 92
-			-- upvalues: v36 (copy)
-			v36()
+		return function()
+			effect()
 		end
-	end, { v24.minSelections })
+	end, { union.minSelections })
 
-	local v26 = useLocalization({
+	local v3 = useLocalization({
+		systemButtonText = union.systemButtonText,
+		pageHeaderText = union.pageHeaderText,
+		searchFriendsText = "Feature.Chat.Label.SearchFriends",
 		networkErrorText = "Feature.Chat.Response.NetworkError",
-		systemButtonText = v24.systemButtonText,
-		pageHeaderText = v24.pageHeaderText,
-		searchFriendsText = not FFlagConnectionsToFriendsRename and "Feature.Chat.Label.SearchConnections" or "Feature.Chat.Label.SearchFriends",
 		tooManyFriendsText = {
-			if not GetFFlagIsSquadEnabled() then not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.AddConnectionsLimit" or "Feature.Chat.Message.AddFriendsLimit" else not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.AddConnectionsPartyLimit" or "Feature.Chat.Message.AddFriendsPartyLimit",
+			GetFFlagIsSquadEnabled() and "Feature.Chat.Message.AddFriendsPartyLimit" or "Feature.Chat.Message.AddFriendsLimit",
 			friendNum = Constants.MAX_PARTICIPANT_COUNT,
 			connectionsNum = Constants.MAX_PARTICIPANT_COUNT
 		},
-		tooManyFriendsTextSingular = if not GetFFlagIsSquadEnabled() then not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.GroupConnectionLimitSingular" or "Feature.Chat.Message.GroupFriendLimitSingular" else not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.AddConnectionsPartyLimitSingular" or "Feature.Chat.Message.AddFriendsPartyLimitSingular"
+		tooManyFriendsTextSingular = GetFFlagIsSquadEnabled() and "Feature.Chat.Message.AddFriendsPartyLimitSingular" or "Feature.Chat.Message.GroupFriendLimitSingular"
 	})
-	local v27 = React.useCallback(function() -- line: 125
-		-- upvalues: v24 (copy), v26 (copy)
-		local v37 = if not v24.canOnlyCreateOneToOneChat then v26.tooManyFriendsText else v26.tooManyFriendsTextSingular
 
-		v24.navigateToToast({
+	local v4 = React.useCallback(function()
+		local toastTitle
+
+		if union.canOnlyCreateOneToOneChat then
+			toastTitle = v3.tooManyFriendsTextSingular
+		else
+			toastTitle = v3.tooManyFriendsText
+		end
+
+		union.navigateToToast({
 			toastProps = {
-				toastContent = {
-					toastTitle = v37
-				}
+				toastContent = { toastTitle = toastTitle }
 			}
 		})
-	end, {
-		v24.canOnlyCreateOneToOneChat,
-		v24.navigateToToast,
-		v26
-	})
-
-	React.useEffect(function() -- line: 131
-		-- upvalues: v25 (copy), v27 (copy)
-		local v38 = v25.onMaxSizeExceeded(v27)
-
-		return function() -- line: 133
-			-- upvalues: v38 (copy)
-			v38()
+	end, { union.canOnlyCreateOneToOneChat, union.navigateToToast, v3 })
+	React.useEffect(function()
+		local v5 = selectedUsersStore.onMaxSizeExceeded(v4)
+		return function()
+			v5()
 		end
-	end, { v27 })
+	end, { v4 })
 
-	local v28, v29, v30 = useFetchPaginatedFriendIds()
-	local v31 = React.useMemo(function() -- line: 140
-		-- upvalues: Cryo (copy), v28 (copy), isUserInConversation (copy), v24 (copy)
-		return Cryo.List.filter(v28, function(p6) -- line: 141
-			-- upvalues: isUserInConversation (copy), v24 (copy)
-			return not isUserInConversation(p6, v24.conversation)
+	local v5, v6, v7 = useFetchPaginatedFriendIds()
+
+	local friendIds = React.useMemo(function()
+		return Cryo.List.filter(v5, function(p2): boolean
+			return not isUserInConversation(p2, union.conversation)
 		end)
-	end, {
-		v28,
-		v24.conversation
-	})
-	local v32 = React.useCallback(function() -- line: 146
-		-- upvalues: v29 (copy), v30 (copy)
-		if v29 and not v30 then
-			v29()
-		end
-	end, {
-		v29,
-		v30
-	})
-	local canOnlyCreateOneToOneChat = v24.canOnlyCreateOneToOneChat
-	local v34 = useIsInExperience()
-	local v35 = useAppChatIsWideMode(v34)
+	end, { v5, union.conversation })
 
+	local fetchMoreFriends = React.useCallback(function()
+		if v6 and not v7 then
+			v6()
+		end
+	end, { v6, v7 })
+
+	local shouldShowSelectChatMembersBar = not union.canOnlyCreateOneToOneChat
+	local v8 = not useAppChatIsWideMode((useIsInExperience()))
 	return React.createElement(View, {
-		Size = UDim2.new(1, 0, 1, v35 and -56 or 0)
+		Size = UDim2.new(1, 0, 1, v8 and 0 or -(not FFlagFixPaginatedChatMembersCutoff and 56 or v2))
 	}, {
 		SelectMembers = React.createElement(SelectChatMembers, {
-			friendIds = v31,
-			fetchMoreFriends = v32,
-			searchFriendsText = v26.searchFriendsText,
-			shouldShowSelectChatMembersBar = not canOnlyCreateOneToOneChat,
-			conversation = v24.conversation,
-			isDebugEnabled = v24.isDebugEnabled
+			friendIds = friendIds,
+			fetchMoreFriends = fetchMoreFriends,
+			searchFriendsText = v3.searchFriendsText,
+			shouldShowSelectChatMembersBar = shouldShowSelectChatMembersBar,
+			conversation = union.conversation,
+			isDebugEnabled = union.isDebugEnabled
 		})
 	})
 end

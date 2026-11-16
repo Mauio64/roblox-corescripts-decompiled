@@ -1,307 +1,337 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
 local setTimeout = LuauPolyfill.setTimeout
-local Promise = require(ParentParentParent.Promise)
 
-require(ParentParentParent.GraphQL)
+local Promise = require(parent2.Promise)
 
-local invariant = require(ParentParent.jsutils.invariant)
+require(parent2.GraphQL)
+
+local invariant = require(parent.jsutils.invariant)
 local invariant2 = invariant.invariant
-local InvariantError = invariant.InvariantError
+local invariantError = invariant.InvariantError
+
 local core = require(script.Parent.Parent.link.core)
-local ApolloLink = core.ApolloLink
+local apolloLink = core.ApolloLink
+
 local execute = core.execute
 
 require(script.Parent.Parent.cache)
 
-local compact = require(script.Parent.Parent.utilities).compact
-local version = require(script.Parent.Parent.version).version
-local HttpLink = require(script.Parent.Parent.link.http).HttpLink
-local QueryManager = require(script.Parent.QueryManager).QueryManager
+local utilities = require(script.Parent.Parent.utilities)
+
+local compact = utilities.compact
+local version = require(script.Parent.Parent.version)
+local version2 = version.version
+
+local http = require(script.Parent.Parent.link.http)
+local httpLink = http.HttpLink
+
+local QueryManager = require(script.Parent.QueryManager)
+local queryManager = QueryManager.QueryManager
 
 require(script.Parent.ObservableQuery_types)
-require(ParentParent.core.types)
+
+require(parent.core.types)
+
 require(script.Parent.watchQueryOptions_types)
+
 require(script.Parent.watchQueryOptions)
 
-local LocalState = require(script.Parent.LocalState).LocalState
+local LocalState = require(script.Parent.LocalState)
+local localState = LocalState.LocalState
 
 require(script.Parent.ApolloClient_types)
 
-local function mergeOptions(p1, p2) -- line: 133
-	-- upvalues: compact (copy), Boolean (copy), Object (copy)
-	return compact(p1, p2, Boolean.toJSBoolean(p2.variables) and {
-		variables = Object.assign({}, p1.variables, p2.variables)
-	} or p2.variables)
+local function mergeOptions(p, p2)
+	return compact(
+		p,
+		p2,
+		Boolean.toJSBoolean(p2.variables) and {
+			variables = Object.assign({}, p.variables, p2.variables)
+		} or p2.variables
+	)
 end
 
-t1.mergeOptions = mergeOptions
+local ApolloClient = {}
+ApolloClient.mergeOptions = mergeOptions
+local class = {}
+class.__index = class
 
-local t2 = {}
+function class.new(data)
+	local object = setmetatable({}, class)
+	object.defaultOptions = {}
+	object.resetStoreCallbacks = {}
+	object.clearStoreCallbacks = {}
 
-t2.__index = t2
+	local uri = data.uri
+	local credentials = data.credentials
+	local headers = data.headers
+	local cache = data.cache
+	local defaultOptions = data.defaultOptions
+	local resolvers = data.resolvers
+	local typeDefs = data.typeDefs
+	local fragmentMatcher = data.fragmentMatcher
+	local name = data.name
+	local version3 = data.version
 
-function t2.new(t3: {[any]: any}) -- line: 189
-	-- upvalues: t2 (copy), Boolean (copy), HttpLink (copy), ApolloLink (copy), InvariantError (copy), setTimeout (copy), version (copy), LocalState (copy), QueryManager (copy)
-	local self = setmetatable({}, t2)
+	local ssrMode = not (data.ssrMode == nil) and data.ssrMode
 
-	self.defaultOptions = {}
-	self.resetStoreCallbacks = {}
-	self.clearStoreCallbacks = {}
+	local v = data.ssrForceFetchDelay == nil and 0 or data.ssrForceFetchDelay
+	local v2
 
-	local uri = t3.uri
-	local credentials = t3.credentials
-	local headers = t3.headers
-	local cache = t3.cache
-	local defaultOptions = t3.defaultOptions
-	local resolvers = t3.resolvers
-	local typeDefs = t3.typeDefs
-	local fragmentMatcher = t3.fragmentMatcher
-	local name = t3.name
-	local version2 = t3.version
-	local v37 = t3.ssrMode ~= nil and t3.ssrMode
-	local v38 = if t3.ssrForceFetchDelay ~= nil then t3.ssrForceFetchDelay else 0
-	local v39 = if t3.connectToDevTools ~= nil then t3.connectToDevTools else typeof(_G) == "table" and (not Boolean.toJSBoolean(_G.__APOLLO_CLIENT__) and _G.__DEV__)
-	local v40 = t3.queryDeduplication == nil or t3.queryDeduplication
-	local v41 = t3.assumeImmutableResults ~= nil and t3.assumeImmutableResults
-	local link = t3.link
+	if data.connectToDevTools == nil then
+		if typeof(_G) == "table" then
+			v2 = not Boolean.toJSBoolean(_G.__APOLLO_CLIENT__) and _G.__DEV__
+		else
+			v2 = false
+		end
+	else
+		v2 = data.connectToDevTools
+	end
+
+	local queryDeduplication = data.queryDeduplication == nil or data.queryDeduplication
+	local assumeImmutableResults
+
+	if data.assumeImmutableResults == nil then
+		assumeImmutableResults = false
+	else
+		assumeImmutableResults = data.assumeImmutableResults
+	end
+
+	local link = data.link
 
 	if not Boolean.toJSBoolean(link) then
-		link = if not Boolean.toJSBoolean(uri) then ApolloLink.empty() else HttpLink.new({
-			uri = uri,
-			credentials = credentials,
-			headers = headers
-		})
+		if Boolean.toJSBoolean(uri) then
+			link = httpLink.new({ uri = uri, credentials = credentials, headers = headers })
+		else
+			link = apolloLink.empty()
+		end
 	end
 
 	if not Boolean.toJSBoolean(cache) then
-		error(InvariantError.new("To initialize Apollo Client, you must specify a 'cache' property in the options object. \nFor more information, please visit: https://go.apollo.dev/c/docs"))
+		error(invariantError.new("To initialize Apollo Client, you must specify a 'cache' property in the options object. \nFor more information, please visit: https://go.apollo.dev/c/docs"))
 	end
 
-	self.link = link
-	self.cache = cache
-	self.disableNetworkFetches = Boolean.toJSBoolean(v37) and v37 or v38 > 0
-	self.queryDeduplication = v40
-	self.defaultOptions = Boolean.toJSBoolean(defaultOptions) and defaultOptions or {}
-	self.typeDefs = typeDefs
+	object.link = link
+	object.cache = cache
+	object.disableNetworkFetches = Boolean.toJSBoolean(ssrMode) and ssrMode or v > 0
+	object.queryDeduplication = queryDeduplication
+	object.defaultOptions = Boolean.toJSBoolean(defaultOptions) and defaultOptions or {}
+	object.typeDefs = typeDefs
 
-	if Boolean.toJSBoolean(v38) then
-		setTimeout(function() -- line: 271
-			-- upvalues: self (copy)
-			self.disableNetworkFetches = false
-
-			return self.disableNetworkFetches
-		end, v38)
+	if Boolean.toJSBoolean(v) then
+		setTimeout(function()
+			object.disableNetworkFetches = false
+			return object.disableNetworkFetches
+		end, v)
 	end
 
-	self.version = version
-	self.localState = LocalState.new({
+	object.version = version2
+
+	object.localState = localState.new({
 		cache = cache,
-		client = self,
+		client = object,
 		resolvers = resolvers,
 		fragmentMatcher = fragmentMatcher
 	})
-	self.queryManager = QueryManager.new({
-		cache = self.cache,
-		link = self.link,
-		queryDeduplication = v40,
-		ssrMode = v37,
-		clientAwareness = {
-			name = name,
-			version = version2
-		},
-		localState = self.localState,
-		assumeImmutableResults = v41,
-		onBroadcast = if not v39 then nil else function() -- line: 425
-		end
+
+	object.queryManager = queryManager.new({
+		cache = object.cache,
+		link = object.link,
+		queryDeduplication = queryDeduplication,
+		ssrMode = ssrMode,
+		clientAwareness = { name = name, version = version3 },
+		localState = object.localState,
+		assumeImmutableResults = assumeImmutableResults,
+		onBroadcast = v2 and function() end or nil
 	})
 
-	return self
+	return object
 end
-function t2.stop(p3) -- line: 438
-	p3.queryManager:stop()
+
+function class:stop()
+	self.queryManager:stop()
 end
-function t2.watchQuery(p4, p5) -- line: 461
-	-- upvalues: Boolean (copy), mergeOptions (copy), Object (copy)
-	if Boolean.toJSBoolean(p4.defaultOptions.watchQuery) then
-		p5 = mergeOptions(p4.defaultOptions.watchQuery, p5)
+
+function class:watchQuery(p)
+	if Boolean.toJSBoolean(self.defaultOptions.watchQuery) then
+		p = mergeOptions(self.defaultOptions.watchQuery, p)
 	end
 
-	if p4.disableNetworkFetches and (p5.fetchPolicy == "network-only" or p5.fetchPolicy == "cache-and-network") then
-		p5 = Object.assign({}, p5, {
-			fetchPolicy = "cache-first"
-		})
+	if self.disableNetworkFetches and (p.fetchPolicy == "network-only" or p.fetchPolicy == "cache-and-network") then
+		p = Object.assign({}, p, { fetchPolicy = "cache-first" })
 	end
 
-	return p4.queryManager:watchQuery(p5)
+	return self.queryManager:watchQuery(p)
 end
-function t2.query(p6, p7) -- line: 486
-	-- upvalues: Boolean (copy), mergeOptions (copy), invariant2 (copy), Object (copy)
-	if Boolean.toJSBoolean(p6.defaultOptions.query) then
-		p7 = mergeOptions(p6.defaultOptions.query, p7)
+
+function class:query(p)
+	if Boolean.toJSBoolean(self.defaultOptions.query) then
+		p = mergeOptions(self.defaultOptions.query, p)
 	end
 
-	invariant2(p7.fetchPolicy ~= "cache-and-network", "The cache-and-network fetchPolicy does not work with client.query, because client.query can only return a single result. Please use client.watchQuery to receive multiple results from the cache and the network, or consider using a different fetchPolicy, such as cache-first or network-only.")
+	invariant2(
+		p.fetchPolicy ~= "cache-and-network",
+		"The cache-and-network fetchPolicy does not work with client.query, because client.query can only return a single result. Please use client.watchQuery to receive multiple results from the cache and the network, or consider using a different fetchPolicy, such as cache-first or network-only."
+	)
 
-	if p6.disableNetworkFetches and p7.fetchPolicy == "network-only" then
-		p7 = Object.assign({}, p7, {
-			fetchPolicy = "cache-first"
-		})
+	if self.disableNetworkFetches and p.fetchPolicy == "network-only" then
+		p = Object.assign({}, p, { fetchPolicy = "cache-first" })
 	end
 
-	return p6.queryManager:query(p7)
+	return self.queryManager:query(p)
 end
-function t2.mutate(p8, p9) -- line: 513
-	-- upvalues: Boolean (copy), mergeOptions (copy)
-	if Boolean.toJSBoolean(p8.defaultOptions.mutate) then
-		p9 = mergeOptions(p8.defaultOptions.mutate, p9)
+
+function class:mutate(p)
+	if Boolean.toJSBoolean(self.defaultOptions.mutate) then
+		p = mergeOptions(self.defaultOptions.mutate, p)
 	end
 
-	return p8.queryManager:mutate(p9)
+	return self.queryManager:mutate(p)
 end
-function t2.subscribe(p10, p11) -- line: 526
-	return p10.queryManager:startGraphQLSubscription(p11)
+
+function class.subscribe(p, p2)
+	return p.queryManager:startGraphQLSubscription(p2)
 end
-function t2.readQuery(t4: {[any]: any}, p12, b1: boolean?) -- line: 539
-	if b1 == nil then
-		b1 = false
+
+function class:readQuery(p, flag: boolean?)
+	if flag == nil then
+		flag = false
 	end
 
-	return t4.cache:readQuery(p12, b1)
+	return self.cache:readQuery(p, flag)
 end
-function t2.readFragment(t5: {[any]: any}, p13, b2: boolean?) -- line: 560
-	if b2 == nil then
-		b2 = false
+
+function class:readFragment(p, flag: boolean?)
+	if flag == nil then
+		flag = false
 	end
 
-	return t5.cache:readFragment(p13, b2)
+	return self.cache:readFragment(p, flag)
 end
-function t2.writeQuery(p14, p15) -- line: 572
-	p14.cache:writeQuery(p15)
-	p14.queryManager:broadcastQueries()
+
+function class:writeQuery(p)
+	self.cache:writeQuery(p)
+	self.queryManager:broadcastQueries()
 end
-function t2.writeFragment(p16, p17) -- line: 588
-	p16.cache:writeFragment(p17)
-	p16.queryManager:broadcastQueries()
+
+function class:writeFragment(p)
+	self.cache:writeFragment(p)
+	self.queryManager:broadcastQueries()
 end
-function t2.__actionHookForDevTools(t6: {[any]: any}, p18: ((...any) -> ...any)) -- line: 593
-	t6.devToolsHookCb = p18
+
+function class:__actionHookForDevTools(devToolsHookCb)
+	self.devToolsHookCb = devToolsHookCb
 end
-function t2.__requestRaw(p19, p20) -- line: 597
-	-- upvalues: execute (copy)
-	return execute(p19.link, p20)
+
+function class.__requestRaw(p, p2)
+	return execute(p.link, p2)
 end
-function t2.resetStore(p21) -- line: 617
-	-- upvalues: Promise (copy), Array (copy)
-	return Promise.delay(0):andThen(function() -- line: 619
-		-- upvalues: p21 (copy)
-		return p21.queryManager:clearStore()
-	end):andThen(function() -- line: 622
-		-- upvalues: Promise (copy), Array (copy), p21 (copy)
-		return Promise.all(Array.map(p21.resetStoreCallbacks, function(p22) -- line: 623
-			return p22()
+
+function class:resetStore()
+	return Promise.delay(0):andThen(function()
+		return self.queryManager:clearStore()
+	end):andThen(function()
+		return Promise.all(Array.map(self.resetStoreCallbacks, function(callback)
+			return callback()
 		end))
-	end):andThen(function() -- line: 627
-		-- upvalues: p21 (copy)
-		return p21:reFetchObservableQueries()
+	end):andThen(function()
+		return self:reFetchObservableQueries()
 	end)
 end
-function t2.clearStore(p23) -- line: 636
-	-- upvalues: Promise (copy), Array (copy)
-	return Promise.delay(0):andThen(function() -- line: 638
-		-- upvalues: p23 (copy)
-		return p23.queryManager:clearStore()
-	end):andThen(function() -- line: 641
-		-- upvalues: Promise (copy), Array (copy), p23 (copy)
-		return Promise.all(Array.map(p23.clearStoreCallbacks, function(p24) -- line: 642
-			return p24()
+
+function class:clearStore()
+	return Promise.delay(0):andThen(function()
+		return self.queryManager:clearStore()
+	end):andThen(function()
+		return Promise.all(Array.map(self.clearStoreCallbacks, function(callback)
+			return callback()
 		end))
 	end)
 end
-function t2.onResetStore(t7: {[any]: any}, p25: ((...any) -> ...any)) -- line: 653
-	-- upvalues: Array (copy)
-	table.insert(t7.resetStoreCallbacks, p25)
 
-	return function() -- line: 655
-		-- upvalues: t7 (copy), Array (copy), p25 (copy)
-		t7.resetStoreCallbacks = Array.filter(t7.resetStoreCallbacks, function(p26) -- line: 656
-			-- upvalues: p25 (copy)
-			return p26 ~= p25
+function class:onResetStore(callback)
+	table.insert(self.resetStoreCallbacks, callback)
+	return function()
+		self.resetStoreCallbacks = Array.filter(self.resetStoreCallbacks, function(p): boolean
+			return p ~= callback
 		end)
 	end
 end
-function t2.onClearStore(t8: {[any]: any}, p27: ((...any) -> ...any)) -- line: 667
-	-- upvalues: Array (copy)
-	table.insert(t8.clearStoreCallbacks, p27)
 
-	return function() -- line: 669
-		-- upvalues: t8 (copy), Array (copy), p27 (copy)
-		t8.clearStoreCallbacks = Array.filter(t8.clearStoreCallbacks, function(p28) -- line: 670
-			-- upvalues: p27 (copy)
-			return p28 ~= p27
+function class:onClearStore(callback)
+	table.insert(self.clearStoreCallbacks, callback)
+	return function()
+		self.clearStoreCallbacks = Array.filter(self.clearStoreCallbacks, function(p): boolean
+			return p ~= callback
 		end)
 	end
 end
-function t2.reFetchObservableQueries(t9: {[any]: any}, b3: boolean?) -- line: 688
-	return t9.queryManager:reFetchObservableQueries(b3)
-end
-function t2.refetchQueries(p29, p30) -- line: 703
-	-- upvalues: Promise (copy), invariant2 (copy)
-	local t10 = {}
-	local t11 = {}
 
-	p29.queryManager:refetchQueries(p30):forEach(function(p31, p32) -- line: 708
-		-- upvalues: t10 (copy), t11 (copy)
-		table.insert(t10, p32)
-		table.insert(t11, p31)
+function class:reFetchObservableQueries(flag: boolean?)
+	return self.queryManager:reFetchObservableQueries(flag)
+end
+
+function class:refetchQueries(p)
+	local queries = {}
+	local results = {}
+	self.queryManager:refetchQueries(p):forEach(function(p2, p3)
+		table.insert(queries, p3)
+		table.insert(results, p2)
 	end)
 
-	local v78 = Promise.all(t11)
+	local all = Promise.all(results)
 
-	v78.queries = t10
-	v78.results = t11
-	v78:catch(function(p33) -- line: 723
-		-- upvalues: invariant2 (copy)
-		invariant2.debug(("In client.refetchQueries, Promise.all promise rejected with error %s"):format(p33.message))
+	all.queries = queries
+	all.results = results
+
+	all:catch(function(p2)
+		invariant2.debug(("In client.refetchQueries, Promise.all promise rejected with error %s"):format(p2.message))
 	end)
 
-	return v78
-end
-function t2.getObservableQueries(p34, p35) -- line: 738
-	if p35 == nil then
-		p35 = "active"
-	end
-
-	return p34.queryManager:getObservableQueries(p35)
-end
-function t2.extract(t12: {[any]: any}, b4: boolean?) -- line: 748
-	return t12.cache:extract(b4)
-end
-function t2.restore(p36, p37) -- line: 759
-	return p36.cache:restore(p37)
-end
-function t2.addResolvers(p38, p39) -- line: 766
-	p38.localState:addResolvers(p39)
-end
-function t2.setResolvers(p40, p41) -- line: 773
-	p40.localState:setResolvers(p41)
-end
-function t2.getResolvers(p42) -- line: 780
-	return p42.localState:getResolvers()
-end
-function t2.setLocalStateFragmentMatcher(p43, p44) -- line: 787
-	p43.localState:setFragmentMatcher(p44)
-end
-function t2.setLink(p45, p46) -- line: 794
-	p45.queryManager.link = p46
-	p45.link = p45.queryManager.link
+	return all
 end
 
-t1.ApolloClient = t2
+function class:getObservableQueries(p)
+	local v = p == nil and "active" or p
 
-return t1
+	return self.queryManager:getObservableQueries(v)
+end
+
+function class:extract(flag: boolean?)
+	return self.cache:extract(flag)
+end
+
+function class:restore(p)
+	return self.cache:restore(p)
+end
+
+function class:addResolvers(p)
+	self.localState:addResolvers(p)
+end
+
+function class:setResolvers(p)
+	self.localState:setResolvers(p)
+end
+
+function class:getResolvers()
+	return self.localState:getResolvers()
+end
+
+function class.setLocalStateFragmentMatcher(p, p2)
+	p.localState:setFragmentMatcher(p2)
+end
+
+function class:setLink(link)
+	self.queryManager.link = link
+	self.link = self.queryManager.link
+end
+
+ApolloClient.ApolloClient = class
+
+return ApolloClient

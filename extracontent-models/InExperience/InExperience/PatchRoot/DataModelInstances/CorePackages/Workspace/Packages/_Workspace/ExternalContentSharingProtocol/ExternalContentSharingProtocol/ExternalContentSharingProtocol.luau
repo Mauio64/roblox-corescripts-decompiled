@@ -1,81 +1,82 @@
-local ParentParent = script.Parent.Parent
-local MessageBus = require(ParentParent.MessageBus).MessageBus
-local t = require(ParentParent.t)
+local parent = script.Parent.Parent
 
+local MessageBus = require(parent.MessageBus)
+local messageBus = MessageBus.MessageBus
+local t = require(parent.t)
 require(script.Parent.ExternalContentSharingProtocolTypes)
-require(ParentParent.MessageBus)
+require(parent.MessageBus)
 
-local v4 = t.strictInterface({
-	text = t.string,
-	context = t.optional(t.string)
-})
-local v5 = t.strictInterface({
-	url = t.string,
-	context = t.optional(t.string)
-})
-local v6 = t.strictInterface({
+local strictInterface = t.strictInterface({ text = t.string, context = t.optional(t.string) })
+
+local strictInterface2 = t.strictInterface({ url = t.string, context = t.optional(t.string) })
+
+local strictInterface3 = t.strictInterface({
 	context = t.optional(t.string),
 	image = t.string,
 	shareSheetTitle = t.optional(t.string),
 	url = t.optional(t.string)
 })
-local v7 = t.strictInterface({
+
+local strictInterface4 = t.strictInterface({
 	context = t.optional(t.string),
 	shareSheetTitle = t.optional(t.string),
 	url = t.optional(t.string),
 	video = t.string
 })
-local v8 = t.strictInterface({
-	text = t.string,
-	context = t.optional(t.string)
-})
-local t1 = {
+
+local strictInterface5 = t.strictInterface({ text = t.string, context = t.optional(t.string) })
+
+local ExternalContentSharingProtocol = {
 	EXTERNAL_CONTENT_SHARING_SHARE_TEXT_DESCRIPTOR = {
-		mid = MessageBus.getMessageId("ExternalContentSharing", "shareText"),
-		validateParams = v4
+		mid = messageBus.getMessageId("ExternalContentSharing", "shareText"),
+		validateParams = strictInterface
 	},
 	EXTERNAL_CONTENT_SHARING_SHARE_URL_DESCRIPTOR = {
-		mid = MessageBus.getMessageId("ExternalContentSharing", "shareUrl"),
-		validateParams = v5
+		mid = messageBus.getMessageId("ExternalContentSharing", "shareUrl"),
+		validateParams = strictInterface2
 	},
 	EXTERNAL_CONTENT_SHARING_SHARE_IMAGE_DESCRIPTOR = {
-		mid = MessageBus.getMessageId("ExternalContentSharing", "shareImage"),
-		validateParams = v6
+		mid = messageBus.getMessageId("ExternalContentSharing", "shareImage"),
+		validateParams = strictInterface3
 	},
 	EXTERNAL_CONTENT_SHARING_SHARE_VIDEO_DESCRIPTOR = {
-		mid = MessageBus.getMessageId("ExternalContentSharing", "shareVideo"),
-		validateParams = v7
+		mid = messageBus.getMessageId("ExternalContentSharing", "shareVideo"),
+		validateParams = strictInterface4
 	},
 	EXTERNAL_CONTENT_SHARING_SET_CLIPBOARD_TEXT_DESCRIPTOR = {
-		mid = MessageBus.getMessageId("ExternalContentSharing", "setClipboardText"),
-		validateParams = v8
+		mid = messageBus.getMessageId("ExternalContentSharing", "setClipboardText"),
+		validateParams = strictInterface5
 	}
 }
 
-t1.__index = t1
+ExternalContentSharingProtocol.__index = ExternalContentSharingProtocol
 
-function t1.new(p1) -- line: 82
-	-- upvalues: MessageBus (copy), t1 (copy)
+function ExternalContentSharingProtocol.new(p)
 	return (setmetatable({
-		messageBus = p1 or MessageBus
-	}, t1))
-end
-function t1.shareText(p2, p3) -- line: 90
-	p2.messageBus.publish(p2.EXTERNAL_CONTENT_SHARING_SHARE_TEXT_DESCRIPTOR, p3)
-end
-function t1.shareUrl(p4, p5) -- line: 94
-	p4.messageBus.publish(p4.EXTERNAL_CONTENT_SHARING_SHARE_URL_DESCRIPTOR, p5)
-end
-function t1.shareImage(p6, p7) -- line: 101
-	p6.messageBus.publish(p6.EXTERNAL_CONTENT_SHARING_SHARE_IMAGE_DESCRIPTOR, p7)
-end
-function t1.shareVideo(p8, p9) -- line: 105
-	p8.messageBus.publish(p8.EXTERNAL_CONTENT_SHARING_SHARE_VIDEO_DESCRIPTOR, p9)
-end
-function t1.setClipboardText(p10, p11) -- line: 109
-	p10.messageBus.publish(p10.EXTERNAL_CONTENT_SHARING_SET_CLIPBOARD_TEXT_DESCRIPTOR, p11)
+		messageBus = p or messageBus
+	}, ExternalContentSharingProtocol))
 end
 
-t1.default = t1.new()
+function ExternalContentSharingProtocol.shareText(p, p2)
+	p.messageBus.publish(p.EXTERNAL_CONTENT_SHARING_SHARE_TEXT_DESCRIPTOR, p2)
+end
 
-return t1
+function ExternalContentSharingProtocol.shareUrl(p, p2)
+	p.messageBus.publish(p.EXTERNAL_CONTENT_SHARING_SHARE_URL_DESCRIPTOR, p2)
+end
+
+function ExternalContentSharingProtocol.shareImage(p, p2)
+	p.messageBus.publish(p.EXTERNAL_CONTENT_SHARING_SHARE_IMAGE_DESCRIPTOR, p2)
+end
+
+function ExternalContentSharingProtocol.shareVideo(p, p2)
+	p.messageBus.publish(p.EXTERNAL_CONTENT_SHARING_SHARE_VIDEO_DESCRIPTOR, p2)
+end
+
+function ExternalContentSharingProtocol.setClipboardText(p, p2)
+	p.messageBus.publish(p.EXTERNAL_CONTENT_SHARING_SET_CLIPBOARD_TEXT_DESCRIPTOR, p2)
+end
+
+ExternalContentSharingProtocol.default = ExternalContentSharingProtocol.new()
+
+return ExternalContentSharingProtocol

@@ -1,78 +1,94 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Divider = Foundation.Divider
 local Icon = Foundation.Icon
 local Enums = Foundation.Enums
-local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
 
-local function v9() -- line: 14
-end
+local function fn() end
 
-local t1 = {
-	affordance = Enums.StateLayerAffordance.None
-}
+local v = { affordance = Enums.StateLayerAffordance.None }
 
-local function InfoTableCell(t2: {[any]: any}) -- line: 36
-	-- upvalues: FFlagSduiExperienceDetailsSupport (copy), React (copy), View (copy), v9 (copy), t1 (copy), Divider (copy), Icon (copy), Enums (copy)
-	local v13 = (t2.numColumns or 1) == 1
-	local u14 = nil
-	local v15 = nil
+local function InfoTableCell(props)
+	local v2 = (props.numColumns or 1) == 1
 
-	if FFlagSduiExperienceDetailsSupport then
-		u14 = t2.selectable ~= false
-		v15 = React.useMemo(function() -- line: 44
-			-- upvalues: u14 (ref), t2 (copy)
-			if not u14 then
-				return nil
-			end
+	local selectable = props.selectable ~= false
+	local selection = React.useMemo(function()
+		if selectable then
+			return { Selectable = true, SelectionOrder = props.selectionOrder }
+		end
 
-			return {
-				Selectable = true,
-				SelectionOrder = t2.selectionOrder
-			}
-		end, {
-			u14,
-			t2.selectionOrder
-		})
+		return nil
+	end, { selectable, props.selectionOrder })
+
+	local createElement = React.createElement
+
+	local onActivated = props.onActivated
+
+	if not onActivated then
+		onActivated = if selectable then fn else nil
 	end
 
-	return React.createElement(View, {
+	local stateLayer
+
+	if selectable and not props.onActivated then
+		stateLayer = v
+	end
+
+	local v3 = {
 		tag = "col size-full-0 auto-y",
-		onActivated = if not FFlagSduiExperienceDetailsSupport then t2.onActivated else t2.onActivated or if not u14 then nil else v9,
-		selection = if not FFlagSduiExperienceDetailsSupport then nil else v15,
-		stateLayer = if not FFlagSduiExperienceDetailsSupport or (not u14 or t2.onActivated) then nil else t1,
-		testId = t2.testId
-	}, {
-		TopDivider = if v13 then nil else React.createElement(Divider, {
-			LayoutOrder = 1
-		}),
-		LabelValueContainer = React.createElement(View, {
+		onActivated = onActivated,
+		selection = selection,
+		stateLayer = stateLayer,
+		testId = props.testId
+	}
+	local topDivider
+
+	if not v2 then
+		topDivider = React.createElement(Divider, { LayoutOrder = 1 })
+	end
+
+	local createElement2 = React.createElement
+
+	local v4 = { Label = props.labelComponent, ValueContainer = 0 }
+	local createElement3 = React.createElement
+
+	local v5 = { Value = props.valueComponent, ChevronIcon = 0 }
+	local chevronIcon
+
+	if props.onActivated then
+		chevronIcon = React.createElement(Icon, { name = Enums.IconName.ChevronSmallRight })
+	end
+
+	v5.ChevronIcon = chevronIcon
+	v4.ValueContainer = createElement3(View, {
+		LayoutOrder = 2,
+		tag = {
+			["row size-0-full auto-xy fill align-x-right"] = v2,
+			["row size-full-0 auto-y"] = not v2
+		}
+	}, v5)
+	local v6 = {
+		TopDivider = topDivider,
+		LabelValueContainer = createElement2(View, {
 			LayoutOrder = 2,
 			tag = {
-				["row size-full-0 auto-y flex-x-between gap-medium padding-y-large"] = v13,
-				["col size-full-0 auto-y padding-y-medium"] = not v13
+				["row size-full-0 auto-y flex-x-between gap-medium padding-y-large"] = v2,
+				["col size-full-0 auto-y padding-y-medium"] = not v2
 			}
-		}, {
-			Label = t2.labelComponent,
-			ValueContainer = React.createElement(View, {
-				LayoutOrder = 2,
-				tag = {
-					["row size-0-full auto-xy fill align-x-right"] = v13,
-					["row size-full-0 auto-y"] = not v13
-				}
-			}, {
-				Value = t2.valueComponent,
-				ChevronIcon = if not t2.onActivated then nil else React.createElement(Icon, {
-					name = Enums.IconName.ChevronSmallRight
-				})
-			})
-		}),
-		BottomDivider = if t2.isLastInSingleColumn or not v13 then nil else React.createElement(Divider, {
-			LayoutOrder = 3
-		})
-	})
+		}, v4),
+		BottomDivider = 0
+	}
+	local bottomDivider
+
+	if not (props.isLastInSingleColumn or not v2) then
+		bottomDivider = React.createElement(Divider, { LayoutOrder = 3 })
+	end
+
+	v6.BottomDivider = bottomDivider
+	return createElement(View, v3, v6)
 end
 
 return React.memo(InfoTableCell)

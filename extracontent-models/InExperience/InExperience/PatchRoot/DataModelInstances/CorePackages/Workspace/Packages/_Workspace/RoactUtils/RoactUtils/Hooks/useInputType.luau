@@ -1,37 +1,35 @@
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+
+local React = require(parent.React)
 local useExternalEvent = require(script.Parent.useExternalEvent)
-local getInputGroup = require(Parent.InputType).getInputGroup
+local InputType = require(parent.InputType)
+local getInputGroup = InputType.getInputGroup
 
-local function useInputType(p1) -- line: 13
-	-- upvalues: UserInputService (copy), getInputGroup (copy), React (copy), useExternalEvent (copy)
-	local v8 = p1 or UserInputService
+local function useInputType(p)
+	local v = p or UserInputService
 
-	local function getLastInputType() -- line: 16
-		-- upvalues: v8 (copy), getInputGroup (copy)
-		local LastInputType = v8:GetLastInputType()
-
-		return getInputGroup(LastInputType)
+	local function getLastInputType()
+		return getInputGroup((v:GetLastInputType()))
 	end
 
-	local v10, v11 = React.useState(getLastInputType)
-	local v12 = React.useCallback(function(p2) -- line: 23
-		-- upvalues: getInputGroup (copy), v11 (copy)
-		local v15 = getInputGroup(p2)
+	local state, setState = React.useState(getLastInputType)
 
-		if v15 ~= nil then
-			v11(v15)
+	local v2 = React.useCallback(function(p2)
+		local inputGroup = getInputGroup(p2)
+
+		if inputGroup ~= nil then
+			setState(inputGroup)
 		end
 	end)
 
-	useExternalEvent(v8.LastInputTypeChanged, v12)
-	React.useEffect(function() -- line: 34
-		-- upvalues: v11 (copy), getLastInputType (copy)
-		v11(getLastInputType())
+	useExternalEvent(v.LastInputTypeChanged, v2)
+
+	React.useEffect(function()
+		setState(getLastInputType())
 	end, {})
 
-	return v10
+	return state
 end
 
 return useInputType

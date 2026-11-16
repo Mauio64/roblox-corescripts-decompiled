@@ -1,6 +1,6 @@
 require(script.Types)
 
-local t1 = {
+local modules = {
 	all = require(script.all),
 	append = require(script.append),
 	assertEqual = require(script.assertEqual),
@@ -75,4 +75,4 @@ local t1 = {
 	zip = require(script.zip)
 }
 
-return table.freeze(t1)
+return table.freeze(modules)

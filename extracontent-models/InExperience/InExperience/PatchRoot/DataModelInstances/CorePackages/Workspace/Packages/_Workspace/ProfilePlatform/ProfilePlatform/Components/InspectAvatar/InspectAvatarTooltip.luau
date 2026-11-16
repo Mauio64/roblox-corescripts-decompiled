@@ -1,76 +1,107 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local parent = ProfilePlatform.Parent
+
+local React = require(parent.React)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local useAppFocusRoot = FocusNavigationUtils.useAppFocusRoot
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local useInspectAvatarTooltip = require(script.Parent.useInspectAvatarTooltip)
+
+local FFlagProfileInspectAndBuyTooltipGamepadFocus = require(ProfilePlatform.Flags.FFlagProfileInspectAndBuyTooltipGamepadFocus)
+
 local Popover = Foundation.Popover
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local IconButton = Foundation.IconButton
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 local ButtonVariant = Foundation.Enums.ButtonVariant
 
-return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 32
-	-- upvalues: useTokens (copy), useInspectAvatarTooltip (copy), useLocalization (copy), React (copy), Popover (copy), PopoverSide (copy), PopoverAlign (copy), EnumsRadius (copy), View (copy), FoundationText (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy)
-	local v19 = useTokens()
-	local v20 = useInspectAvatarTooltip()
-	local v21 = useLocalization({
+return (React.forwardRef(function(p, p2)
+	local v = useTokens()
+	local v2 = useInspectAvatarTooltip()
+	local v3 = useLocalization({
 		title = "Feature.Profile.Header.InspectAndBuy.Tooltip",
 		body = "Feature.Profile.Description.InspectAndBuy"
 	})
 
-	React.useImperativeHandle(p1, function() -- line: 40
-		-- upvalues: v20 (copy)
-		return {
-			onDismiss = v20.onDismiss
-		}
-	end, { v20.onDismiss })
+	React.useImperativeHandle(p2, function()
+		return { onDismiss = v2.onDismiss }
+	end, { v2.onDismiss })
+	local ref
 
-	return React.createElement(Popover.Root, {
-		isOpen = v20.showTooltip
-	}, {
-		Anchor = React.createElement(Popover.Anchor, {
-			anchorRef = t1.anchorRef
-		}),
-		Content = React.createElement(Popover.Content, {
-			hasArrow = true,
-			side = PopoverSide.Right,
-			align = PopoverAlign.Center,
-			radius = EnumsRadius.Medium,
-			backgroundStyle = v19.Color.System.Contrast
-		}, {
-			Layout = React.createElement(View, {
-				tag = "col gap-xsmall auto-y padding-medium",
-				Size = UDim2.fromOffset(160, 0)
-			}, {
-				Header = React.createElement(View, {
-					tag = "row flex-between align-y-center size-full-0 auto-y",
-					LayoutOrder = 1
-				}, {
-					Title = React.createElement(FoundationText, {
-						tag = "auto-xy text-title-large content-inverse-emphasis",
-						Text = v21.title
+	if FFlagProfileInspectAndBuyTooltipGamepadFocus then
+		ref = useAppFocusRoot({
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ContextualMenu,
+			isAutoFocusRoot = true,
+			isFocusable = v2.showTooltip
+		})
+	end
+
+	local createElement = React.createElement
+	local root = Popover.Root
+	local v4 = { isOpen = v2.showTooltip }
+	local v5 = {
+		Anchor = React.createElement(Popover.Anchor, { anchorRef = p.anchorRef }),
+		Content = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Popover.Content
+	local v6 = {
+		side = PopoverSide.Right,
+		align = PopoverAlign.Center,
+		hasArrow = true,
+		radius = Radius.Medium,
+		backgroundStyle = v.Color.System.Contrast
+	}
+
+	local createElement3 = React.createElement
+	local v7 = {
+		tag = "col gap-xsmall auto-y padding-medium",
+		Size = UDim2.fromOffset(160, 0),
+		ref = 0
+	}
+
+	if not FFlagProfileInspectAndBuyTooltipGamepadFocus then
+		ref = nil
+	end
+
+	v7.ref = ref
+	v5.Content = createElement2(content, v6, {
+		Layout = createElement3(View, v7, {
+			Header = React.createElement(
+				View,
+				{ tag = "row flex-between align-y-center size-full-0 auto-y", LayoutOrder = 1 },
+				{
+					Title = React.createElement(Text, {
+						Text = v3.title,
+						tag = "auto-xy text-title-large content-inverse-emphasis"
 					}),
 					CloseButton = React.createElement(IconButton, {
 						icon = IconName.X,
 						size = IconSize.Small,
-						onActivated = v20.onDismiss,
+						onActivated = v2.onDismiss,
 						variant = ButtonVariant.OverMedia
 					})
-				}),
-				Body = React.createElement(FoundationText, {
-					tag = "size-full-0 auto-y text-body-medium content-inverse-default",
-					TextWrapped = true,
-					LayoutOrder = 2,
-					Text = v21.body,
-					TextXAlignment = Enum.TextXAlignment.Left
-				})
+				}
+			),
+			Body = React.createElement(Text, {
+				Text = v3.body,
+				tag = "size-full-0 auto-y text-body-medium content-inverse-default",
+				TextWrapped = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				LayoutOrder = 2
 			})
 		})
 	})
+	return createElement(root, v4, v5)
 end))

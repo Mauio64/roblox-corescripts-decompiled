@@ -1,104 +1,94 @@
-local function isPartySystemMessage(p1) -- line: 50
-	local cards = p1.cards
+local function isPartySystemMessage(p): boolean
+	local cards = p.cards
 
 	if type(cards) ~= "table" then
 		return false
 	end
 
-	for _, v8 in cards do
-		if type(v8) == "table" and type(v8.components) == "table" then
-			for _, v10 in v8.components do
-				if type(v10) ~= "table" then
-					continue
-				end
+	for _, card in cards do
+		if not (type(card) == "table" and type(card.components) == "table") then
+			continue
+		end
 
-				local type2 = v10.type
+		for _, component in card.components do
+			if type(component) ~= "table" then
+				continue
+			end
 
-				if type2 == "group_up" or type2 == "scheduled_group_up" then
-					return true
-				end
+			local kind = component.type
+
+			if kind == "group_up" or kind == "scheduled_group_up" then
+				return true
 			end
 		end
 	end
 
 	return false
 end
-local function getSystemMessageBody(p2) -- line: 74
-	local cards = p2.cards
-	local v14 = if type(cards) ~= "table" then nil else cards[1]
 
-	if type(v14) == "table" and (type(v14.alt_text) == "string" and v14.alt_text ~= "") then
-		return v14.alt_text
+local function getSystemMessageBody(p) -- 1 equivalent call inferred from this helper
+	local cards = p.cards
+	local v
+
+	if type(cards) == "table" then
+		v = cards[1]
 	end
 
-	return p2.content or ""
+	if type(v) == "table" and type(v.alt_text) == "string" and v.alt_text ~= "" then
+		return v.alt_text
+	end
+
+	return p.content or ""
 end
-local function classifySystemMessage(p3) -- line: 83
-	-- upvalues: isPartySystemMessage (copy)
-	local t1 = {
-		kind = "systemMessage"
+
+local function classifySystemMessage(data) -- 1 equivalent call inferred from this helper
+	return {
+		kind = "systemMessage",
+		body = getSystemMessageBody(data), -- inferred equivalent call
+		variant = isPartySystemMessage(data) and "party" or "default"
 	}
-	local cards = p3.cards
-	local v18 = if type(cards) ~= "table" then nil else cards[1]
-
-	t1.body = if type(v18) ~= "table" or (type(v18.alt_text) ~= "string" or v18.alt_text == "") then p3.content or "" else v18.alt_text
-	t1.variant = not isPartySystemMessage(p3) and "default" or "party"
-
-	return t1
 end
-local function classifyMessage(p4) -- line: 91
-	-- upvalues: isPartySystemMessage (copy)
-	if p4.type == "system" or p4.sender_user_id == nil then
-		local t2 = {}
-		local t3 = {
-			kind = "systemMessage"
-		}
-		local cards = p4.cards
-		local v23 = if type(cards) ~= "table" then nil else cards[1]
 
-		t3.body = if type(v23) ~= "table" or (type(v23.alt_text) ~= "string" or v23.alt_text == "") then p4.content or "" else v23.alt_text
-		t3.variant = not isPartySystemMessage(p4) and "default" or "party"
-		t2[1] = t3
-
-		return t2
-	end
-
-	local sender_user_id = p4.sender_user_id
-	local t4 = {}
-	local replies_to = p4.replies_to
-
-	if type(replies_to) == "table" and replies_to.sender_user_id ~= nil then
-		table.insert(t4, {
-			kind = "replyHeader",
-			senderUserId = sender_user_id,
-			repliedToUserId = replies_to.sender_user_id
-		})
-	end
-
-	local status = p4.status
-	local v28 = status == "Moderated" or status == "Failed"
-
-	if p4.visibility == "hidden" then
-		table.insert(t4, {
-			kind = "hiddenUser",
-			senderUserId = sender_user_id
-		})
+local function classifyMessage(data)
+	if data.type == "system" or data.sender_user_id == nil then
+		local v = classifySystemMessage(data) -- inferred equivalent call
+		return { v }
 	else
-		table.insert(t4, {
-			kind = "userText",
-			senderUserId = sender_user_id,
-			body = p4.content or "",
-			moderated = v28
-		})
-	end
+		local sender_user_id = data.sender_user_id
 
-	if v28 then
-		table.insert(t4, {
-			kind = "moderationNotice"
-		})
-	end
+		local v = {}
 
-	return t4
+		local replies_to = data.replies_to
+
+		if type(replies_to) == "table" and replies_to.sender_user_id ~= nil then
+			table.insert(v, {
+				kind = "replyHeader",
+				senderUserId = sender_user_id,
+				repliedToUserId = replies_to.sender_user_id
+			})
+		end
+
+		local status = data.status
+		local moderated = status == "Moderated" or status == "Failed"
+
+		if data.visibility == "hidden" then
+			table.insert(v, { kind = "hiddenUser", senderUserId = sender_user_id })
+		else
+			table.insert(v, {
+				kind = "userText",
+				senderUserId = sender_user_id,
+				body = data.content or "",
+				moderated = moderated,
+				messageId = data.id
+			})
+		end
+
+		if moderated then
+			table.insert(v, { kind = "moderationNotice" })
+		end
+
+		return v
+	end
 end
 
 return classifyMessage

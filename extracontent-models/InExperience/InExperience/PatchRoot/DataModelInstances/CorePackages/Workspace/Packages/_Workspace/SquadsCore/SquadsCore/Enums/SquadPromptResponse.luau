@@ -1,5 +1,1 @@
-return {
-	Cancel = "Cancel",
-	Create = "Create",
-	Update = "Update"
-}
+return { Cancel = "Cancel", Create = "Create", Update = "Update" }

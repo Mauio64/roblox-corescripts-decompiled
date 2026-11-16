@@ -1,51 +1,44 @@
 local getPlayersFromService = require(script.Parent.getPlayersFromService)
 
-local function resolvePlayerTarget(s1: string?, s2: string, s3: string) -- line: 15
-	-- upvalues: getPlayersFromService (copy)
-	if not s1 or s1 == "" then
+local function resolvePlayerTarget(value: string?, p: string, p2: string)
+	if not value or value == "" then
 		return {
 			key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
-			args = {
-				RBX_NAME = ""
-			}
+			args = { RBX_NAME = "" }
 		}
 	end
 
-	local v6 = getPlayersFromService(s1)
+	local playersFromService = getPlayersFromService(value)
 
-	if #v6 == 0 then
+	if #playersFromService == 0 then
 		return {
 			key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
-			args = {
-				RBX_NAME = s1
-			}
+			args = { RBX_NAME = value }
 		}
 	end
 
-	if #v6 > 1 then
-		return {
-			key = "CoreScripts.TextChat.Mute.Error.MultipleMatches",
-			args = {}
-		}
+	if #playersFromService > 1 then
+		return { key = "CoreScripts.TextChat.Mute.Error.MultipleMatches", args = {} }
 	end
 
-	local v7 = v6[1]
+	local playerInfo = playersFromService[1]
 
-	if s2 == v7.userId then
-		return {
-			key = "CoreScripts.TextChat.Mute.Error.CannotMuteSelf",
-			args = {}
-		}
+	if playerInfo.userId == p then
+		return { key = "CoreScripts.TextChat.Mute.Error.CannotMuteSelf", args = {} }
 	end
 
-	local v8 = if string.sub(string.lower(s1), 1, 1) ~= "@" then v7.displayName else "@" .. v7.username
+	local v
+
+	if string.sub(string.lower(value), 1, 1) == "@" then
+		v = "@" .. playerInfo.username
+	else
+		v = playerInfo.displayName
+	end
 
 	return {
-		key = s3,
-		args = {
-			RBX_NAME = v8
-		},
-		playerInfo = v7
+		key = p2,
+		args = { RBX_NAME = v },
+		playerInfo = playerInfo
 	}
 end
 

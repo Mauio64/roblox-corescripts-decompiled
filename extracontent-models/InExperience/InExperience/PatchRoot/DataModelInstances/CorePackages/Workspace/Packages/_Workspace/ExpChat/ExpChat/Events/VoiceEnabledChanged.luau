@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.VoiceEnabledChanged)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local VoiceEnabledChanged = require(actions.VoiceEnabledChanged)
+
+return event(VoiceEnabledChanged)

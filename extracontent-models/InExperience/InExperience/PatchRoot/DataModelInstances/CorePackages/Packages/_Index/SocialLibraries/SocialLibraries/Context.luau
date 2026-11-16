@@ -1,4 +1,1 @@
-return {
-	getConnect = require(script.getConnect),
-	getWith = require(script.getWith)
-}
+return { getConnect = require(script.getConnect), getWith = require(script.getWith) }

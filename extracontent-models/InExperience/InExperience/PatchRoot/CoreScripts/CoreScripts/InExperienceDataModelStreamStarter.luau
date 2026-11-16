@@ -1,10 +1,10 @@
 local CorePackages = game:GetService("CorePackages")
-local ok, result = pcall(function() -- line: 3
-	-- upvalues: CorePackages (copy)
+
+local success, result = pcall(function()
 	return require(CorePackages.Workspace.Packages.DataModelStreaming)
 end)
 
-if not ok or type(result) ~= "table" then
+if not success or type(result) ~= "table" then
 	return
 end
 

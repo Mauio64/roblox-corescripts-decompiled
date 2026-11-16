@@ -1,1 +1,3 @@
-return (game:GetService("PlatformFriendsService"))
+local PlatformFriendsService = game:GetService("PlatformFriendsService")
+
+return PlatformFriendsService

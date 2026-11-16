@@ -1,23 +1,32 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
-local GameGetGameInfoStore = require(Parent.DataHydration.GameGetGameInfoStore)
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local GameGetGameInfoStore = require(parent.DataHydration.GameGetGameInfoStore)
+
 local useSignalState = SignalsReact.useSignalState
-local v6 = Signals.createComputed(function() -- line: 21
+local computed = Signals.createComputed(function(): nil
 	return nil
 end)
 
-local function useExperienceName(n1: number?) -- line: 25
-	-- upvalues: GameGetGameInfoStore (copy), v6 (copy), useSignalState (copy)
-	local v9 = if n1 == nil or n1 == 0 then nil else tostring(n1)
-	local v10 = if v9 == nil then v6 else GameGetGameInfoStore(false).getAndFetchGameInfo(v9).data
-	local v11 = useSignalState(v10)
+local function useExperienceName(p: number?)
+	local v
 
-	if v11 ~= nil then
-		return v11.name
+	if not (p == nil or p == 0) then
+		v = tostring(p)
 	end
 
-	return nil
+	local v2
+
+	if v == nil then
+		v2 = computed
+	else
+		v2 = GameGetGameInfoStore(false).getAndFetchGameInfo(v).data
+	end
+
+	local v3 = useSignalState(v2)
+	return if v3 ~= nil then v3.name else nil
 end
 
 return useExperienceName

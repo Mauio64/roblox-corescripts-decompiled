@@ -1,81 +1,114 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 local Workspace = game:GetService("Workspace")
 
-require(ParentParent.types)
+require(parent.types)
 
-local SetPromptState = require(ParentParent.Actions.SetPromptState)
-local PurchaseCompleteRecieved = require(ParentParent.Actions.PurchaseCompleteRecieved)
-local PromptState = require(ParentParent.Enums.PromptState)
-local Thunk = require(ParentParent.Thunk)
-local completeRequest = require(ParentParent.Thunks.completeRequest)
-local FFlagEnableUnifiedProductPurchaseFlow = require(ParentParent.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
-local FFlagSkipCompletionModalForMarketplace = require(ParentParent.Parent.SharedFlags).FFlagSkipCompletionModalForMarketplace
-local logUnifiedPurchaseTelemetryCounter = require(ParentParent.Utils.logUnifiedPurchaseTelemetryCounter)
-local UnifiedPurchaseTelemetry = require(ParentParent.Events.UnifiedPurchaseTelemetry)
-local sendUnifiedPurchaseEventLog = require(ParentParent.Utils.sendUnifiedPurchaseEventLog)
-local UnifiedPurchaseEventNameEnum = require(ParentParent.Enums.UnifiedPurchaseEventNameEnum)
+local SetPromptState = require(parent.Actions.SetPromptState)
+local PurchaseCompleteRecieved = require(parent.Actions.PurchaseCompleteRecieved)
+local PromptState = require(parent.Enums.PromptState)
+local Thunk = require(parent.Thunk)
+local completeRequest = require(parent.Thunks.completeRequest)
+local SharedFlags = require(parent.Parent.SharedFlags)
+local FFlagSkipCompletionModalForMarketplace = SharedFlags.FFlagSkipCompletionModalForMarketplace
+local logUnifiedPurchaseTelemetryCounter = require(parent.Utils.logUnifiedPurchaseTelemetryCounter)
+local UnifiedPurchaseTelemetry = require(parent.Events.UnifiedPurchaseTelemetry)
+local sendUnifiedPurchaseEventLog = require(parent.Utils.sendUnifiedPurchaseEventLog)
+local UnifiedPurchaseEventNameEnum = require(parent.Enums.UnifiedPurchaseEventNameEnum)
+local getFeatureKeyForSurface = require(parent.Utils.getFeatureKeyForSurface)
+local FFlagRefetchBothOfferKeysAfterPurchase = require(parent.Flags.FFlagRefetchBothOfferKeysAfterPurchase)
+local InExperienceOffers = require(parent.Parent.InExperienceOffers)
 
-local function completePurchase(p1) -- line: 30
-	-- upvalues: Thunk (copy), Workspace (copy), PurchaseCompleteRecieved (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), sendUnifiedPurchaseEventLog (copy), UnifiedPurchaseEventNameEnum (copy), FFlagSkipCompletionModalForMarketplace (copy), SetPromptState (copy), PromptState (copy), completeRequest (copy)
-	return Thunk.new(script.Name, {}, function(p2, _) -- line: 31
-		-- upvalues: Workspace (copy), PurchaseCompleteRecieved (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), p1 (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), sendUnifiedPurchaseEventLog (copy), UnifiedPurchaseEventNameEnum (copy), FFlagSkipCompletionModalForMarketplace (copy), SetPromptState (copy), PromptState (copy), completeRequest (copy)
-		local purchasingStartTime = p2:getState().purchasingStartTime
-		local v19 = Workspace.DistributedGameTime - purchasingStartTime
+local function completePurchase(p)
+	return Thunk.new(script.Name, {}, function(object, _)
+		local purchasingStartTime = object:getState().purchasingStartTime
+		local v = Workspace.DistributedGameTime - purchasingStartTime
 
-		p2:dispatch(PurchaseCompleteRecieved())
+		object:dispatch(PurchaseCompleteRecieved())
 
-		if FFlagEnableUnifiedProductPurchaseFlow and p2:getState().isUserEligibleForUnifiedPurchaseFlow then
-			local v20 = p2:getState()
-			local postPurchaseActions = v20.postPurchaseActions
-			local v22 = v20.postPurchaseActionsState or {}
+		object:flush()
+
+		local purchaseAnalyticsMetadata = object:getState().purchaseAnalyticsMetadata
+
+		if purchaseAnalyticsMetadata then
+			local offersStore = InExperienceOffers.getOffersStore(false)
+			local offers = offersStore.getOffers(false)
+			local featureKeys = InExperienceOffers.FeatureKeys
+			local getOffersForKey = InExperienceOffers.Utils.getOffersForKey
+
+			if FFlagRefetchBothOfferKeysAfterPurchase then
+				local v2 = { featureKeys.RobloxShop, featureKeys.DeveloperShop }
+
+				if InExperienceOffers.Utils.hasOfferForAnyKey(offers, v2) then
+					offersStore.fetchOffers(v2)
+				end
+			elseif getFeatureKeyForSurface(purchaseAnalyticsMetadata.surface) == featureKeys.RobloxShop then
+				if getOffersForKey(offers, featureKeys.RobloxShop) ~= nil then
+					offersStore.fetchOffers({ featureKeys.RobloxShop })
+				end
+			elseif getOffersForKey(offers, featureKeys.DeveloperShop) ~= nil then
+				offersStore.fetchOffers({ featureKeys.DeveloperShop })
+			end
+		end
+
+		if object:getState().isUserEligibleForUnifiedPurchaseFlow then
+			local state = object:getState()
+			local postPurchaseActions = state.postPurchaseActions
+			local postPurchaseActionsState = state.postPurchaseActionsState or {}
 
 			if postPurchaseActions then
-				for _, v in ipairs(postPurchaseActions) do
-					if v and v.actionKey and v.isActionSelected ~= nil then
-						v22[v.actionKey] = v.isActionSelected
+				for _, postPurchaseAction in ipairs(postPurchaseActions) do
+					if
+						postPurchaseAction
+						and postPurchaseAction.actionKey
+						and postPurchaseAction.isActionSelected ~= nil
+					then
+						postPurchaseActionsState[postPurchaseAction.actionKey] = postPurchaseAction.isActionSelected
 					end
 				end
 			end
 
-			if v20.purchaseCallbacks and v20.purchaseCallbacks.onPurchaseSuccess then
-				v20.purchaseCallbacks.onPurchaseSuccess(p1, v22)
+			if state.purchaseCallbacks and state.purchaseCallbacks.onPurchaseSuccess then
+				state.purchaseCallbacks.onPurchaseSuccess(p, postPurchaseActionsState)
 			end
 
-			if v20.purchaseAnalyticsMetadata then
-				local purchaseAnalyticsMetadata = v20.purchaseAnalyticsMetadata
+			if state.purchaseAnalyticsMetadata then
+				local purchaseAnalyticsMetadata2 = state.purchaseAnalyticsMetadata
 
-				logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedProductPurchaseModalPurchaseSuccessCounter, purchaseAnalyticsMetadata.surface, purchaseAnalyticsMetadata.productType)
+				logUnifiedPurchaseTelemetryCounter(
+					UnifiedPurchaseTelemetry.UnifiedProductPurchaseModalPurchaseSuccessCounter,
+					purchaseAnalyticsMetadata2.surface,
+					purchaseAnalyticsMetadata2.productType
+				)
+
 				sendUnifiedPurchaseEventLog({
 					event_name = UnifiedPurchaseEventNameEnum.ItemPurchaseSuccess,
-					purchase_flow_uuid = purchaseAnalyticsMetadata.purchaseFlowUUID,
-					product_id = purchaseAnalyticsMetadata.productId,
-					product_type = purchaseAnalyticsMetadata.productType,
-					product_target_id = purchaseAnalyticsMetadata.productTargetId,
-					robux_price = purchaseAnalyticsMetadata.price,
-					surface = purchaseAnalyticsMetadata.surface,
-					user_roblox_balance = purchaseAnalyticsMetadata.userRobuxBalance,
-					salelocation_universeid = purchaseAnalyticsMetadata.saleLocationUniverseId
+					purchase_flow_uuid = purchaseAnalyticsMetadata2.purchaseFlowUUID,
+					product_id = purchaseAnalyticsMetadata2.productId,
+					product_type = purchaseAnalyticsMetadata2.productType,
+					product_target_id = purchaseAnalyticsMetadata2.productTargetId,
+					robux_price = purchaseAnalyticsMetadata2.price,
+					surface = purchaseAnalyticsMetadata2.surface,
+					user_roblox_balance = purchaseAnalyticsMetadata2.userRobuxBalance,
+					salelocation_universeid = purchaseAnalyticsMetadata2.saleLocationUniverseId
 				})
 			end
 		end
 
 		if FFlagSkipCompletionModalForMarketplace then
-			local purchaseOptions = p2:getState().purchaseOptions
+			local purchaseOptions = object:getState().purchaseOptions
 
 			if purchaseOptions and purchaseOptions.skipPurchaseSuccessModal then
-				p2:dispatch(SetPromptState(PromptState.PurchaseComplete))
-
-				return p2:dispatch(completeRequest())
+				object:dispatch(SetPromptState(PromptState.PurchaseComplete))
+				return object:dispatch(completeRequest())
 			end
 		end
 
-		if v19 >= 1 then
-			return p2:dispatch(SetPromptState(PromptState.PurchaseComplete))
+		if v >= 1 then
+			return object:dispatch(SetPromptState(PromptState.PurchaseComplete))
 		end
 
-		delay(1 - v19, function() -- line: 87
-			-- upvalues: p2 (copy), SetPromptState (copy), PromptState (copy)
-			return p2:dispatch(SetPromptState(PromptState.PurchaseComplete))
+		delay(1 - v, function()
+			return object:dispatch(SetPromptState(PromptState.PurchaseComplete))
 		end)
 	end)
 end

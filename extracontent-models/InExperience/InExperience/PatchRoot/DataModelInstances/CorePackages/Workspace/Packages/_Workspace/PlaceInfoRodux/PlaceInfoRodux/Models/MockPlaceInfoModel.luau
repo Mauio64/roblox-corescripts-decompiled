@@ -1,30 +1,31 @@
-local Parent = script:FindFirstAncestor("PlaceInfoRodux").Parent
-local GenerateStringId = require(Parent.AppCommonLib).GenerateStringId
+local parent = script:FindFirstAncestor("PlaceInfoRodux").Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local GenerateStringId = AppCommonLib.GenerateStringId
+
 local PlaceInfoModel = require(script.Parent.PlaceInfoModel)
-local t1 = {
-	mock = function() -- line: 11
-		-- upvalues: PlaceInfoModel (copy), GenerateStringId (copy)
-		local v5 = PlaceInfoModel.new()
 
-		v5.builder = "builder"
-		v5.builderId = GenerateStringId()
-		v5.description = "description"
-		v5.imageToken = GenerateStringId()
-		v5.isPlayable = true
-		v5.name = "name"
-		v5.placeId = GenerateStringId()
-		v5.price = 0
-		v5.reasonProhibited = nil
-		v5.universeId = GenerateStringId()
-		v5.universeRootPlaceId = GenerateStringId()
-		v5.url = "url"
+local MockPlaceInfoModel = {
+	mock = function()
+		local v = PlaceInfoModel.new()
 
-		return v5
+		v.builder = "builder"
+		v.builderId = GenerateStringId()
+		v.description = "description"
+		v.imageToken = GenerateStringId()
+		v.isPlayable = true
+		v.name = "name"
+		v.placeId = GenerateStringId()
+		v.price = 0
+		v.reasonProhibited = nil
+		v.universeId = GenerateStringId()
+		v.universeRootPlaceId = GenerateStringId()
+		v.url = "url"
+
+		return v
 	end
 }
 
-setmetatable(t1, {
-	__index = PlaceInfoModel
-})
+setmetatable(MockPlaceInfoModel, { __index = PlaceInfoModel })
 
-return t1
+return MockPlaceInfoModel

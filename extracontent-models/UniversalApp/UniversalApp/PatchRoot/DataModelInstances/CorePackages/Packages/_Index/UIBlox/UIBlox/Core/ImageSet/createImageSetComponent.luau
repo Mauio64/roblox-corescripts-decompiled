@@ -1,77 +1,76 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local uiblox = require(ParentParentParent.BuilderIcons).Migration.uiblox
-local Foundation = require(ParentParentParent.Foundation)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local Roact = require(parent3.Roact)
+local BuilderIcons = require(parent3.BuilderIcons)
+local uiblox = BuilderIcons.Migration.uiblox
+local Foundation = require(parent3.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
-local scaleSliceToResolution = require(ParentParent.App.ImageSet.scaleSliceToResolution)
-local ImagesInverse = require(ParentParent.App.ImageSet.ImagesInverse)
-local getBuilderIconElement = require(scriptParent.getBuilderIconElement)
+local scaleSliceToResolution = require(parent2.App.ImageSet.scaleSliceToResolution)
+local ImagesInverse = require(parent2.App.ImageSet.ImagesInverse)
+local getBuilderIconElement = require(parent.getBuilderIconElement)
 
-return function(p1, p2) -- line: 16
-	-- upvalues: Roact (copy), uiblox (copy), useTokens (copy), useTextSizeOffset (copy), ImagesInverse (copy), getBuilderIconElement (copy), scaleSliceToResolution (copy)
+return function(p, p2)
 	assert(p2 > 0, "resolutionScale for ImageSet must be greater than 0! got " .. tostring(p2))
 
-	return Roact.forwardRef(function(p3, p4) -- line: 22
-		-- upvalues: Roact (copy), uiblox (copy), useTokens (copy), useTextSizeOffset (copy), ImagesInverse (copy), getBuilderIconElement (copy), p1 (copy), p2 (copy), scaleSliceToResolution (copy)
-		local t1 = {
-			[Roact.Ref] = p4,
-			[Roact.Children] = p3[Roact.Children]
-		}
-		local v17 = nil
-		local vImage = nil
-		local v19 = false
-		local v20 = false
+	return Roact.forwardRef(function(props, p3)
+		local v = { [Roact.Ref] = p3, [Roact.Children] = props[Roact.Children] }
+		local flag = false
+		local v2 = false
+		local v3 = nil
+		local v4 = nil
 
-		for k, v in pairs(p3) do
-			if k == "Image" and typeof(v) == "table" then
-				if uiblox[v.Image] then
-					v20 = true
-					vImage = v.Image
+		for k, v5 in pairs(props) do
+			if k == "Image" and typeof(v5) == "table" then
+				if uiblox[v5.Image] then
+					v3 = v5.Image
+					v2 = true
 				else
-					v19 = true
-					v17 = v
+					v4 = v5
+					flag = true
 				end
 			else
-				t1[k] = v
+				v[k] = v5
 			end
 		end
 
-		local v23 = useTokens()
-		local v24 = useTextSizeOffset()
+		local v5 = useTokens()
+		local v6 = useTextSizeOffset()
 
-		if v19 or v20 then
-			local v25 = if not v20 then ImagesInverse[v17] else vImage
+		if flag or v2 then
+			if not v2 then
+				v3 = ImagesInverse[v4]
+			end
 
-			if v25 and uiblox[v25] then
-				if not v23.Stroke then
-					error(`No StyleProvider in tree for migrated icon ImageSetComponent.\n UIBlox Icon: { v25 }, BuilderIcon: { uiblox[v25] }`)
+			if v3 and uiblox[v3] then
+				if not v5.Stroke then
+					error(`No StyleProvider in tree for migrated icon ImageSetComponent.\n UIBlox Icon: {v3}, BuilderIcon: {uiblox[v3]}`)
 				end
 
-				local Standard = v23.Stroke.Standard
-
-				return getBuilderIconElement(t1, p1, uiblox[v25], v25, v23, v24, Standard)
+				local standard = v5.Stroke.Standard
+				return getBuilderIconElement(v, p, uiblox[v3], v3, v5, v6, standard)
 			end
 		end
 
-		if v19 then
-			for k, v in pairs(v17) do
-				if not t1[k] then
-					t1[k] = v
-				elseif k == "ImageRectOffset" then
-					t1[k] = v + t1[k] * p2
-				elseif k == "ImageRectSize" then
-					t1[k] = t1[k] * p2
+		if flag then
+			for k, v7 in pairs(v4) do
+				if v[k] then
+					if k == "ImageRectOffset" then
+						v.ImageRectOffset = v7 + v.ImageRectOffset * p2
+					elseif k == "ImageRectSize" then
+						v.ImageRectSize *= p2
+					end
+				else
+					v[k] = v7
 				end
 			end
 		end
 
-		if v19 then
-			t1 = scaleSliceToResolution(t1, p2)
+		if flag then
+			v = scaleSliceToResolution(v, p2)
 		end
 
-		return Roact.createElement(p1, t1)
+		return Roact.createElement(p, v)
 	end)
 end

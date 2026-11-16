@@ -1,43 +1,40 @@
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
-local NumberLocalization = require(Parent.Localization).NumberLocalization
-local Foundation = require(Parent.Foundation)
+
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local NumberLocalization = Localization.NumberLocalization
+
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local getIconRichText = Foundation.Utility.getIconRichText
 local IconName = Foundation.Enums.IconName
 
-local function Price(t1: {[any]: any}) -- line: 22
-	-- upvalues: NumberLocalization (copy), LocalizationService (copy), getIconRichText (copy), IconName (copy), React (copy), FoundationText (copy), View (copy)
-	local v12 = NumberLocalization.localize(t1.amount, LocalizationService.RobloxLocaleId)
-	local v13 = `{ getIconRichText(IconName.Robux) } { v12 }`
-	local v14 = React.createElement(FoundationText, {
+local function Price(props)
+	local localize = NumberLocalization.localize(props.amount, LocalizationService.RobloxLocaleId)
+	local formatted = `{getIconRichText(IconName.Robux)} {localize}`
+
+	local element = React.createElement(Text, {
+		Text = formatted,
 		RichText = true,
-		tag = "auto-xy text-align-x-right",
-		Text = v13,
-		fontStyle = t1.fontStyle,
-		textStyle = t1.textStyle
+		fontStyle = props.fontStyle,
+		textStyle = props.textStyle,
+		tag = "auto-xy text-align-x-right"
 	})
 
-	if t1.strikethrough then
-		return React.createElement(View, {
-			tag = "auto-xy",
-			LayoutOrder = t1.LayoutOrder
-		}, {
-			Content = v14,
+	if props.strikethrough then
+		return React.createElement(View, { LayoutOrder = props.LayoutOrder, tag = "auto-xy" }, {
+			Content = element,
 			Strikethrough = React.createElement(View, {
-				tag = "position-center-center anchor-center-center size-full-50",
-				backgroundStyle = t1.textStyle
+				backgroundStyle = props.textStyle,
+				tag = "position-center-center anchor-center-center size-full-50"
 			})
 		})
 	end
 
-	return React.createElement(View, {
-		tag = "auto-xy",
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		Content = v14
+	return React.createElement(View, { LayoutOrder = props.LayoutOrder, tag = "auto-xy" }, {
+		Content = element
 	})
 end
 

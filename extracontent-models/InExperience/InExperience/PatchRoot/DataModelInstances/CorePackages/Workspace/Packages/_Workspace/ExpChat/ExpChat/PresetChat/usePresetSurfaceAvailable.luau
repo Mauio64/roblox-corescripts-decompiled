@@ -1,25 +1,21 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local SignalsReact = require(ExpChatParent.SignalsReact)
+local parent = ExpChat.Parent
+local SignalsReact = require(parent.SignalsReact)
+
 local GetPresetChatStore = require(ExpChat.Stores.GetPresetChatStore)
 local FFlagExpChatUniverseChatPresetEnabled = require(ExpChat.Flags.FFlagExpChatUniverseChatPresetEnabled)
 local Constants = require(ExpChat.PresetChat.Constants)
 
-local function usePresetSurfaceAvailable(p1) -- line: 26
-	-- upvalues: GetPresetChatStore (copy), SignalsReact (copy), Constants (copy), FFlagExpChatUniverseChatPresetEnabled (copy)
-	local v9 = GetPresetChatStore(false)
-	local v10 = SignalsReact.useSignalState(v9.getIsEnabled)
-	local v11 = SignalsReact.useSignalState(v9.getAccessLevel)
+local function usePresetSurfaceAvailable(p)
+	local presetChatStore = GetPresetChatStore(false)
+	local v = SignalsReact.useSignalState(presetChatStore.getIsEnabled)
+	local v2 = SignalsReact.useSignalState(presetChatStore.getAccessLevel)
 
-	if not v10 or v11 ~= Constants.AccessLevel.Enabled then
-		return false
+	if v and v2 == Constants.AccessLevel.Enabled then
+		return (p ~= nil or FFlagExpChatUniverseChatPresetEnabled) and true or false
 	end
 
-	if p1 == nil and not FFlagExpChatUniverseChatPresetEnabled then
-		return false
-	end
-
-	return true
+	return false
 end
 
 return usePresetSurfaceAvailable

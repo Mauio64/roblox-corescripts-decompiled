@@ -1,84 +1,167 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local NavigationRodux = require(Parent.NavigationRodux)
-local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
-local AppNavBar = require(Parent.AppNavBar)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local NavigationRodux = require(parent.NavigationRodux)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local AppNavBar = require(parent.AppNavBar)
 local useNavBarPlacement = AppNavBar.useNavBarPlacement
 local Placement = AppNavBar.Placement
 local FlyoutHamburgerButton = require(script.Parent.FlyoutHamburgerButton)
 local Constants = require(script.Parent.Parent.Constants)
-local v13 = game:DefineFastFlag("EnableHomeBetaBadge", false)
-local SharedFlags = require(Parent.SharedFlags)
+
+local defineFastFlag = game:DefineFastFlag("EnableHomeBetaBadge", false)
+local SharedFlags = require(parent.SharedFlags)
 local FFlagAppIaHomeSubTab = SharedFlags.FFlagAppIaHomeSubTab
 local FFlagEnableCoreContentBadge = SharedFlags.FFlagEnableCoreContentBadge
 local FFlagEnableHomeRobloxLogo = SharedFlags.FFlagEnableHomeRobloxLogo
 local FFlagEnableConsoleRobloxLogo = SharedFlags.FFlagEnableConsoleRobloxLogo
 local FFlagEnableFlyoutOnNavRail = SharedFlags.FFlagEnableFlyoutOnNavRail
+local FFlagFlyoutHeaderFixPadding = SharedFlags.FFlagFlyoutHeaderFixPadding
 
-local function FlyoutLeftHeader(t1: {[any]: any}) -- line: 38
-	-- upvalues: useTokens (copy), FFlagEnableFlyoutOnNavRail (copy), useNavBarPlacement (copy), Placement (copy), FFlagEnableCoreContentBadge (copy), useAppPolicy (copy), AppPage (copy), FFlagAppIaHomeSubTab (copy), NavigationRodux (copy), FFlagEnableHomeRobloxLogo (copy), FFlagEnableConsoleRobloxLogo (copy), React (copy), Foundation (copy), FlyoutHamburgerButton (copy), Constants (copy), v13 (copy)
-	local v22 = useTokens()
-	local Size_500 = v22.Size.Size_500
-	local v24 = nil
+local function FlyoutLeftHeader(props)
+	local v = useTokens()
+	local size_500 = v.Size.Size_500
+	local vector2 = Vector2.new(size_500 * Constants.ROBLOX_LOGO_ASPECT_RATIO, size_500)
+	local v2
 
 	if FFlagEnableFlyoutOnNavRail then
-		v24 = useNavBarPlacement() == Placement.Bottom
+		v2 = useNavBarPlacement() == Placement.Bottom
 	end
 
-	local v25 = if not FFlagEnableCoreContentBadge then nil else useAppPolicy(function(p1) -- line: 50
-		return p1.getCoreContentBadgeText()
-	end)
-	local v26 = not not FFlagEnableCoreContentBadge and (v25 and v25 ~= "")
-	local v27 = t1.alwaysShowLogo or (t1.routeName == AppPage.Home or FFlagAppIaHomeSubTab and t1.routeName == NavigationRodux.Constants.HomeContainerName)
-	local s1 = "auto-xy row align-x-left align-y-center"
+	local text
 
-	if FFlagEnableHomeRobloxLogo or FFlagEnableConsoleRobloxLogo or t1.isAlternateEntryPointEnabled then
-		s1 ..= " gap-small"
+	if FFlagEnableCoreContentBadge then
+		text = useAppPolicy(function(p)
+			return p.getCoreContentBadgeText()
+		end)
 	end
 
-	local v29 = (not FFlagEnableHomeRobloxLogo and not FFlagEnableConsoleRobloxLogo or t1.isFlyoutEntrypointEnabled) and (not FFlagEnableFlyoutOnNavRail or v24)
+	local v3
 
-	return React.createElement(Foundation.View, {
-		tag = s1
-	}, {
-		FlyoutHamburgerButton = if not v29 then nil else React.createElement(FlyoutHamburgerButton, {
+	if FFlagEnableCoreContentBadge then
+		v3 = text and text ~= ""
+	else
+		v3 = false
+	end
+
+	local alwaysShowLogo = props.alwaysShowLogo
+		or props.routeName == AppPage.Home
+		or FFlagAppIaHomeSubTab and props.routeName == NavigationRodux.Constants.HomeContainerName
+	local tag = "auto-xy row align-x-left align-y-center"
+
+	if
+		not FFlagFlyoutHeaderFixPadding
+		and (FFlagEnableHomeRobloxLogo or FFlagEnableConsoleRobloxLogo or props.isAlternateEntryPointEnabled)
+	then
+		tag ..= " gap-small"
+	end
+
+	local v4 = (not (FFlagEnableHomeRobloxLogo or FFlagEnableConsoleRobloxLogo) or props.isFlyoutEntrypointEnabled)
+		and (not FFlagEnableFlyoutOnNavRail or v2)
+	local coreContentBadge
+
+	if
+		FFlagEnableCoreContentBadge
+		and (FFlagEnableHomeRobloxLogo or FFlagEnableConsoleRobloxLogo or props.isRobloxLogoEnabled)
+		and alwaysShowLogo
+		and v3
+	then
+		coreContentBadge = React.createElement(
+			Foundation.View,
+			{
+				tag = "auto-xy padding-x-xsmall padding-y-xxsmall radius-small bg-system-contrast",
+				LayoutOrder = 3
+			},
+			{
+				Text = React.createElement(Foundation.Text, {
+					Text = text,
+					tag = "auto-xy text-title-small",
+					textStyle = v.Color.Surface.Surface_0
+				})
+			}
+		)
+	end
+
+	local betaBadge
+
+	if defineFastFlag and props.isRobloxLogoEnabled and alwaysShowLogo then
+		betaBadge = React.createElement(
+			Foundation.View,
+			{
+				LayoutOrder = 4,
+				tag = "auto-xy padding-xxsmall stroke-standard stroke-emphasis radius-small"
+			},
+			{
+				Text = React.createElement(Foundation.Text, {
+					Text = "Beta",
+					tag = "auto-xy text-body-small content-emphasis"
+				})
+			}
+		)
+	end
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local flyoutHamburgerButton
+
+	if v4 then
+		flyoutHamburgerButton = React.createElement(FlyoutHamburgerButton, {
+			titleText = props.titleText,
 			LayoutOrder = 1,
-			titleText = t1.titleText,
-			isAlternateEntryPointEnabled = t1.isAlternateEntryPointEnabled
-		}),
-		TitleOrRobloxLogoFrame = if not FFlagEnableHomeRobloxLogo and (not FFlagEnableConsoleRobloxLogo and not t1.isRobloxLogoEnabled) or not v27 then if not t1.titleText then nil else React.createElement(Foundation.Text, {
+			isAlternateEntryPointEnabled = props.isAlternateEntryPointEnabled
+		})
+	end
+
+	local titleOrRobloxLogoFrame
+
+	if (FFlagEnableHomeRobloxLogo or FFlagEnableConsoleRobloxLogo or props.isRobloxLogoEnabled) and alwaysShowLogo then
+		if props.useHeaderLogo then
+			titleOrRobloxLogoFrame = React.createElement(require(script.Parent.HeaderLogo))
+		else
+			titleOrRobloxLogoFrame = React.createElement(Foundation.Image, {
+				LayoutOrder = 2,
+				tag = "size-full-full",
+				Image = "icons/logo/letterform",
+				imageStyle = v.Color.Content.Emphasis,
+				Size = UDim2.fromOffset(vector2.X, vector2.Y)
+			})
+		end
+	elseif props.titleText then
+		titleOrRobloxLogoFrame = React.createElement(Foundation.Text, {
 			tag = "auto-xy text-heading-large content-emphasis",
 			LayoutOrder = 2,
-			Text = t1.titleText
-		}) else React.createElement(Foundation.Image, {
-			LayoutOrder = 2,
-			tag = "size-full-full",
-			Image = "icons/logo/letterform",
-			imageStyle = v22.Color.Content.Emphasis,
-			Size = UDim2.fromOffset(Size_500 * Constants.ROBLOX_LOGO_ASPECT_RATIO, Size_500)
-		}),
-		CoreContentBadge = if not FFlagEnableCoreContentBadge or (not FFlagEnableHomeRobloxLogo and (not FFlagEnableConsoleRobloxLogo and not t1.isRobloxLogoEnabled) or (not v27 or not v26)) then nil else React.createElement(Foundation.View, {
-			tag = "auto-xy bg-system-contrast padding-x-xsmall padding-y-xxsmall radius-small",
-			LayoutOrder = 3
-		}, {
-			Text = React.createElement(Foundation.Text, {
-				tag = "auto-xy text-title-small",
-				Text = v25,
-				textStyle = v22.Color.Surface.Surface_0
-			})
-		}),
-		BetaBadge = if not v13 or (not t1.isRobloxLogoEnabled or not v27) then nil else React.createElement(Foundation.View, {
-			LayoutOrder = 4,
-			tag = "auto-xy padding-xxsmall stroke-standard stroke-emphasis radius-small"
-		}, {
-			Text = React.createElement(Foundation.Text, {
-				Text = "Beta",
-				tag = "auto-xy text-body-small content-emphasis"
-			})
+			Text = props.titleText
 		})
+	end
+
+	local badges
+
+	if FFlagFlyoutHeaderFixPadding then
+		badges = React.createElement(
+			Foundation.View,
+			{ tag = "row gap-xsmall auto-xy align-y-center padding-left-xsmall", LayoutOrder = 3 },
+			{ CoreContentBadge = coreContentBadge, BetaBadge = betaBadge }
+		)
+	end
+
+	if FFlagFlyoutHeaderFixPadding then
+		coreContentBadge = nil
+	end
+
+	if FFlagFlyoutHeaderFixPadding then
+		betaBadge = nil
+	end
+
+	return createElement(view, { tag = tag }, {
+		FlyoutHamburgerButton = flyoutHamburgerButton,
+		TitleOrRobloxLogoFrame = titleOrRobloxLogoFrame,
+		Badges = badges,
+		CoreContentBadge = coreContentBadge,
+		BetaBadge = betaBadge
 	})
 end
 

@@ -1,241 +1,285 @@
 local UserInputService = game:GetService("UserInputService")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
 
-require(ParentParent.Configs.ConfigTypes)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-local ExtraKeysEnum = require(ParentParent.Enums.ExtraKeysEnum)
-local Localization = require(ParentParentParent.Localization)
-local Constants = require(ParentParent.Constants)
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+require(parent.Configs.ConfigTypes)
+local ExtraKeysEnum = require(parent.Enums.ExtraKeysEnum)
+local Localization = require(parent2.Localization)
+local Constants = require(parent.Constants)
+local FFlagHelpPageCCL = require(parent.Flags.FFlagHelpPageCCL)
+local useLocalizedLabels = require(parent.Hooks.useLocalizedLabels)
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 local useLocalization = Localization.Hooks.useLocalization
 local KEYCODE_ORDER = Constants.HELP_PAGE.KEYCODE_ORDER
 
-local function getKeyCodeName(p1) -- line: 45
-	-- upvalues: Constants (copy), UserInputService (copy)
-	if Constants.HELP_PAGE.KEYCODES_LOCALIZED[p1] then
-		return {
-			needsLocalization = true,
-			keyCodeName = Constants.HELP_PAGE.KEYCODES_LOCALIZED[p1]
-		}
+local function getKeyCodeName(p)
+	if Constants.HELP_PAGE.KEYCODES_LOCALIZED[p] then
+		return { needsLocalization = true, keyCodeName = Constants.HELP_PAGE.KEYCODES_LOCALIZED[p] }
 	end
 
-	if Constants.HELP_PAGE.KEYCODES_UNLOCALIZED[p1] then
+	if Constants.HELP_PAGE.KEYCODES_UNLOCALIZED[p] then
 		return {
 			needsLocalization = false,
-			keyCodeName = Constants.HELP_PAGE.KEYCODES_UNLOCALIZED[p1]
+			keyCodeName = Constants.HELP_PAGE.KEYCODES_UNLOCALIZED[p]
 		}
 	end
-
-	local StringForKeyCode = UserInputService:GetStringForKeyCode(p1)
 
 	return {
 		needsLocalization = false,
-		keyCodeName = StringForKeyCode
+		keyCodeName = UserInputService:GetStringForKeyCode(p)
 	}
 end
-local function getKeycodeLayoutOrder(p2) -- line: 65
-	-- upvalues: KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
-	if KEYCODE_ORDER[p2] then
-		return KEYCODE_ORDER[p2]
+
+local function getKeycodeLayoutOrder(p) -- 4 equivalent calls inferred from this helper
+	if KEYCODE_ORDER[p] then
+		return KEYCODE_ORDER[p]
 	end
 
-	if p2 ~= ExtraKeysEnum.DPad and p2 ~= ExtraKeysEnum.TouchPad then
-		return p2.Value
+	if p == ExtraKeysEnum.DPad or p == ExtraKeysEnum.TouchPad then
+		return 1e999
 	end
 
-	return 1e999
+	return p.Value
 end
-local function KeyCodeComponent(t1: {[any]: any}) -- line: 75
-	-- upvalues: useTokens (copy), getKeyCodeName (copy), useLocalization (copy), Constants (copy), React (copy), FoundationText (copy)
-	local v23 = useTokens()
-	local v24 = getKeyCodeName(t1.keyCode)
-	local t2 = {}
 
-	if v24.needsLocalization then
-		t2[v24.keyCodeName] = v24.keyCodeName
+local function getDisplayableKeyCodes(list)
+	local displayableKeyCodes = {}
+
+	for i = 1, #list do
+		local item = list[i]
+
+		if item ~= Enum.KeyCode.None and getKeyCodeName(item).keyCodeName ~= "" then
+			table.insert(displayableKeyCodes, item)
+		end
 	end
 
-	local v26 = useLocalization(t2)
-	local v27 = v24.needsLocalization and v26[v24.keyCodeName] or v24.keyCodeName
+	return displayableKeyCodes
+end
 
-	if t1.addSeparator then
-		v27 = Constants.HELP_PAGE.SEPARATORS.COMBO .. v27
+local function KeyCodeComponent(props)
+	local v = useTokens()
+	local keyCodeName = getKeyCodeName(props.keyCode)
+
+	local keyCodeNamesByKeyCodeName = {}
+
+	if keyCodeName.needsLocalization then
+		keyCodeNamesByKeyCodeName[keyCodeName.keyCodeName] = keyCodeName.keyCodeName
 	end
 
-	return React.createElement(FoundationText, {
-		tag = "auto-xy text-align-x-left text-wrap text-body-small",
-		textStyle = v23.Color.Extended.White.White_100,
-		Text = v27
+	local v2 = useLocalization(keyCodeNamesByKeyCodeName)
+
+	local text = keyCodeName.needsLocalization and v2[keyCodeName.keyCodeName] or keyCodeName.keyCodeName
+
+	if props.addSeparator then
+		text = Constants.HELP_PAGE.SEPARATORS.COMBO .. text
+	end
+
+	local createElement = React.createElement
+	local textStyle
+
+	if FFlagHelpPageCCL and props.disabled then
+		textStyle = v.Color.Extended.White.White_50
+	else
+		textStyle = v.Color.Extended.White.White_100
+	end
+
+	return createElement(Text, {
+		tag = "auto-xy text-body-small text-wrap text-align-x-left",
+		textStyle = textStyle,
+		Text = text
 	})
 end
-local function KeyCodeComboComponent(t3: {[any]: any}) -- line: 97
-	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationText (copy), Constants (copy), KeyCodeComponent (copy)
-	local v29 = useTokens()
-	local v30 = React.useMemo(function() -- line: 100
-		-- upvalues: t3 (copy), React (copy), View (copy), FoundationText (copy), v29 (copy), Constants (copy), KeyCodeComponent (copy)
-		local t4 = {}
 
-		if t3.addSeparator then
-			table.insert(t4, React.createElement(View, {
-				tag = "auto-xy",
-				LayoutOrder = -1e999,
-				key = "separator"
-			}, {
-				Separator = React.createElement(FoundationText, {
-					tag = "auto-xy text-align-x-left text-truncate text-body-small",
-					textStyle = v29.Color.Extended.White.White_100,
+local function KeyCodeComboComponent(props)
+	local v = useTokens()
+	local displayableKeyCodes = getDisplayableKeyCodes(props.combo)
+
+	local v2 = React.useMemo(function()
+		local children = {}
+
+		if props.addSeparator then
+			local createElement = React.createElement
+			local v2 = { tag = "auto-xy", LayoutOrder = -1e999, key = "separator" }
+
+			local createElement2 = React.createElement
+			local textStyle
+
+			if FFlagHelpPageCCL and props.disabled then
+				textStyle = v.Color.Extended.White.White_50
+			else
+				textStyle = v.Color.Extended.White.White_100
+			end
+
+			local v3 = {
+				Separator = createElement2(Text, {
+					tag = "auto-xy text-body-small text-align-x-left text-truncate-end",
+					textStyle = textStyle,
 					Text = Constants.HELP_PAGE.SEPARATORS.ALTERNATIVE
 				})
-			}))
+			}
+			table.insert(children, createElement(View, v2, v3))
 		end
 
-		for i, v in ipairs(t3.combo) do
-			local v41 = i ~= 1
-
-			table.insert(t4, React.createElement(View, {
+		for i, displayableKeyCode in ipairs(displayableKeyCodes) do
+			local addSeparator = i ~= 1
+			table.insert(children, React.createElement(View, {
 				tag = "auto-xy",
 				LayoutOrder = i,
 				key = i
 			}, {
 				KeyCodeComponent = React.createElement(KeyCodeComponent, {
-					keyCode = v,
-					addSeparator = v41
+					keyCode = displayableKeyCode,
+					addSeparator = addSeparator,
+					disabled = props.disabled
 				})
 			}))
 		end
 
-		return t4
+		return children
 	end, {
-		t3.combo,
-		t3.addSeparator
+		displayableKeyCodes,
+		props.addSeparator,
+		props.disabled,
+		v.Color.Extended.White.White_50,
+		v.Color.Extended.White.White_100
 	})
 
-	return React.createElement(View, {
-		tag = "row auto-xy wrap"
-	}, v30)
+	return React.createElement(View, { tag = "row wrap auto-xy" }, v2)
 end
-local function InputComponent(t5: {[any]: any}) -- line: 145
-	-- upvalues: React (copy), KEYCODE_ORDER (copy), ExtraKeysEnum (copy), View (copy), KeyCodeComboComponent (copy)
-	if t5.input == nil then
-		return nil
-	end
 
-	React.useMemo(function() -- line: 153
-		-- upvalues: t5 (copy), KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
-		for _, v in ipairs(t5.input) do
-			table.sort(v, function(p3, p4) -- line: 155
-				-- upvalues: KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
-				return ((if not KEYCODE_ORDER[p3] then (p3 == ExtraKeysEnum.DPad or p3 == ExtraKeysEnum.TouchPad) and 1e999 or p3.Value else KEYCODE_ORDER[p3])) < if not KEYCODE_ORDER[p4] then (p4 == ExtraKeysEnum.DPad or p4 == ExtraKeysEnum.TouchPad) and 1e999 or p4.Value else KEYCODE_ORDER[p4]
+local function InputComponent(p)
+	local v = React.useMemo(function()
+		for _, list in ipairs(p.input) do
+			table.sort(list, function(a, b): boolean
+				return getKeycodeLayoutOrder(a) < getKeycodeLayoutOrder(b) -- inferred equivalent call
 			end)
 		end
 
-		table.sort(t5.input, function(p5, p6) -- line: 160
-			-- upvalues: KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
-			if #p5 == #p6 then
-				for i = 1, #p5 do
-					if p5[i] ~= p6[i] then
-						local v54 = p5[i]
-						local v55 = if not KEYCODE_ORDER[v54] then (v54 == ExtraKeysEnum.DPad or v54 == ExtraKeysEnum.TouchPad) and 1e999 or v54.Value else KEYCODE_ORDER[v54]
-						local v56 = p6[i]
-
-						return v55 < if not KEYCODE_ORDER[v56] then (v56 == ExtraKeysEnum.DPad or v56 == ExtraKeysEnum.TouchPad) and 1e999 or v56.Value else KEYCODE_ORDER[v56]
-					end
-				end
-
-				return false
+		table.sort(p.input, function(a, b): boolean
+			if #a ~= #b then
+				return #a < #b
 			end
 
-			return #p5 < #p6
+			for i = 1, #a do
+				if a[i] ~= b[i] then
+					return getKeycodeLayoutOrder(a[i]) < getKeycodeLayoutOrder(b[i]) -- inferred equivalent call
+				end
+			end
+
+			return false
 		end)
-	end, { t5.input })
 
-	local v32 = React.useMemo(function() -- line: 175
-		-- upvalues: t5 (copy), React (copy), View (copy), KeyCodeComboComponent (copy)
-		local t6 = {}
+		local children = {}
 
-		for i, v in ipairs(t5.input) do
-			local v47 = i ~= 1
+		for i, combo in ipairs(p.input) do
+			if #getDisplayableKeyCodes(combo) == 0 then
+				continue
+			end
 
-			table.insert(t6, React.createElement(View, {
+			local addSeparator = #children ~= 0
+
+			table.insert(children, React.createElement(View, {
 				tag = "auto-xy",
 				LayoutOrder = i,
 				key = i
 			}, {
 				KeyCodeComboComponent = React.createElement(KeyCodeComboComponent, {
-					combo = v,
-					addSeparator = v47,
-					layoutOrder = i
+					combo = combo,
+					addSeparator = addSeparator,
+					layoutOrder = i,
+					disabled = p.disabled
 				})
 			}))
 		end
 
-		return t6
-	end, { t5.input })
+		return children
+	end, { p.input, p.disabled })
 
-	return React.createElement(View, {
-		tag = "row auto-xy wrap"
-	}, v32)
+	return React.createElement(View, { tag = "row wrap auto-xy" }, v)
 end
 
-return React.memo(function(t7: {[any]: any}) -- line: 205
-	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), UserInputService (copy), View (copy), FoundationText (copy), InputComponent (copy)
-	local v34 = useTokens()
-	local v35 = useLocalization({
-		actionText = t7.control.label
-	})
-	local keyboardInput = t7.control.keyboardInput
-	local v37 = React.useMemo(function() -- line: 216
-		-- upvalues: keyboardInput (copy), UserInputService (copy)
+return React.memo(function(p)
+	local v = useTokens()
+	local control = p.control
+	local v2 = useLocalizedLabels({ actionText = control.label })
+
+	local keyboardInput = control.keyboardInput
+
+	local input = React.useMemo(function()
 		if keyboardInput == nil then
 			return nil
 		end
 
 		local input = keyboardInput.input
 
-		if input == nil then
-			if UserInputService:GetPlatform() == Enum.Platform.OSX then
-				return keyboardInput.macInput
-			end
-
-			input = keyboardInput.winInput
+		if input ~= nil then
+			return input
 		end
 
-		return input
+		if UserInputService:GetPlatform() == Enum.Platform.OSX then
+			return keyboardInput.macInput
+		end
+
+		return keyboardInput.winInput
 	end, { keyboardInput })
 
-	if keyboardInput == nil or v37 == nil then
+	if keyboardInput == nil or input == nil then
 		return nil
 	end
 
+	local disabled = control.disabled
+	local textStyle
+
+	if FFlagHelpPageCCL and disabled then
+		textStyle = v.Color.Extended.White.White_50
+	else
+		textStyle = v.Color.Extended.White.White_100
+	end
+
+	local backgroundStyle
+
+	if FFlagHelpPageCCL and disabled then
+		backgroundStyle = v.Color.Extended.Gray.Gray_1000
+	else
+		backgroundStyle = v.Color.Extended.Gray.Gray_800
+	end
+
 	return React.createElement(View, {
-		tag = "size-full-1100 row align-y-center align-x-left wrap flex-fill padding-x-small gap-small radius-xsmall",
-		ClipsDescendants = true,
-		backgroundStyle = v34.Color.Extended.Gray.Gray_800,
+		tag = {
+			["row wrap flex-x-fill align-x-left align-y-center gap-small size-full-0 auto-y padding-small radius-xsmall clip"] = FFlagHelpPageCCL,
+			["row wrap flex-fill align-x-left align-y-center gap-small size-full-1100 padding-x-small radius-xsmall clip"] = not FFlagHelpPageCCL
+		},
+		backgroundStyle = backgroundStyle,
 		LayoutOrder = keyboardInput.layoutOrder
 	}, {
 		ActionLabelContainer = React.createElement(View, {
-			tag = "align-y-center align-x-left col",
+			tag = {
+				["col align-x-left align-y-center auto-y"] = FFlagHelpPageCCL,
+				["col align-x-left align-y-center"] = not FFlagHelpPageCCL
+			},
 			LayoutOrder = 1
 		}, {
-			ActionLabel = React.createElement(FoundationText, {
-				tag = "auto-xy text-align-x-left text-title-small text-wrap",
-				textStyle = v34.Color.Extended.White.White_100,
-				Text = v35.actionText
+			ActionLabel = React.createElement(Text, {
+				tag = "auto-xy text-title-small text-wrap text-align-x-left",
+				textStyle = textStyle,
+				Text = v2.actionText
 			})
 		}),
 		InputLabelContainer = React.createElement(View, {
-			tag = "align-y-center align-x-left col",
+			tag = {
+				["col align-x-left align-y-center auto-y"] = FFlagHelpPageCCL,
+				["col align-x-left align-y-center"] = not FFlagHelpPageCCL
+			},
 			LayoutOrder = 2,
 			testId = "input-label-container"
 		}, {
-			InputLabel = React.createElement(InputComponent, {
-				input = v37
-			})
+			InputLabel = React.createElement(InputComponent, { input = input, disabled = disabled })
 		})
 	})
 end)

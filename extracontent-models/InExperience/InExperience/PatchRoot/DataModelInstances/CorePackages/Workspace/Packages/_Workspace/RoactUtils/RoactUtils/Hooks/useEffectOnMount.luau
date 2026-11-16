@@ -1,10 +1,9 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
 
-return function(p1: ((...any) -> ...any)) -- line: 10
-	-- upvalues: React (copy)
-	React.useEffect(function() -- line: 11
-		-- upvalues: p1 (copy)
-		p1()
+local React = require(parent.React)
+
+return function(callback)
+	React.useEffect(function()
+		callback()
 	end, {})
 end

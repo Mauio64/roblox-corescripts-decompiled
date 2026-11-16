@@ -1,31 +1,28 @@
-local function tracebackReporter(p1) -- line: 9
-	return debug.traceback(p1)
+local function tracebackReporter(p)
+	return debug.traceback(p)
 end
-local function makeThunkMiddleware(p2) -- line: 13
-	-- upvalues: tracebackReporter (copy)
-	local function thunkMiddleware(p3, p4) -- line: 14
-		-- upvalues: p2 (copy), tracebackReporter (copy)
-		return function(p5) -- line: 15
-			-- upvalues: p4 (copy), p2 (copy), tracebackReporter (copy), p3 (copy)
-			if typeof(p5) == "function" then
-				local ok, result = xpcall(function() -- line: 17
-					-- upvalues: p5 (copy), p4 (copy), p2 (copy)
-					return p5(p4, p2)
-				end, tracebackReporter)
 
-				if not ok then
-					p4._errorReporter.reportReducerError(p4:getState(), p5, {
-						message = "Caught error in thunk",
-						thrownValue = result
-					})
+local function makeThunkMiddleware(p)
+	local function thunkMiddleware(callback, object)
+		return function(callback2)
+			if typeof(callback2) ~= "function" then
+				return callback(callback2)
+			end
 
-					return nil
-				end
+			local success, result = xpcall(function()
+				return callback2(object, p)
+			end, tracebackReporter)
 
+			if success then
 				return result
 			end
 
-			return p3(p5)
+			object._errorReporter.reportReducerError(object:getState(), callback2, {
+				message = "Caught error in thunk",
+				thrownValue = result
+			})
+
+			return nil
 		end
 	end
 

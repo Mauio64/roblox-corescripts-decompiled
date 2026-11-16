@@ -1,45 +1,53 @@
-local Parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Icon = Foundation.Icon
 local Enums = Foundation.Enums
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local EnumGameDetailErrorTypes = require(Parent.DiscoveryTypes).EnumGameDetailErrorTypes
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-local function getErrorDisplayMessage(s1: string, t1: {[any]: any}) -- line: 18
-	-- upvalues: EnumGameDetailErrorTypes (copy)
-	if s1 == EnumGameDetailErrorTypes.ExperienceUnavailable then
-		return t1.experienceUnavailable
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local EnumGameDetailErrorTypes = DiscoveryTypes.EnumGameDetailErrorTypes
+
+local function getErrorDisplayMessage(errorType: string, p) -- 1 equivalent call inferred from this helper
+	if errorType == EnumGameDetailErrorTypes.ExperienceUnavailable then
+		return p.experienceUnavailable
 	end
 
-	return t1.noInternet
+	return p.noInternet
 end
-local function InExperienceDetailsPromptErrorContent(t2: {[any]: any}) -- line: 25
-	-- upvalues: useTokens (copy), useLocalization (copy), EnumGameDetailErrorTypes (copy), React (copy), View (copy), Icon (copy), Enums (copy), FoundationText (copy)
-	local v16 = useTokens()
-	local v17 = useLocalization({
+
+local function InExperienceDetailsPromptErrorContent(p)
+	local v = useTokens()
+
+	local v2 = useLocalization({
 		experienceUnavailable = "Feature.GamePage.QuickLaunch.LaunchError.TemporarilyUnavailable",
 		noInternet = "Feature.EmptyStatePage.Message.NoInternet"
 	})
-	local v18 = if t2.errorType ~= EnumGameDetailErrorTypes.ExperienceUnavailable then v17.noInternet else v17.experienceUnavailable
 
-	return React.createElement(View, {
-		tag = "col size-full-0 auto-y items-center gap-medium padding-bottom-large padding-top-large"
-	}, {
-		Icon = React.createElement(Icon, {
-			layoutOrder = 1,
-			name = Enums.IconName.TriangleExclamation,
-			size = v16.Size.Size_1700
-		}),
-		Message = React.createElement(FoundationText, {
-			tag = "text-body-large size-full-0 auto-y text-center text-wrap",
-			layoutOrder = 2,
-			Text = v18
-		})
-	})
+	local errorDisplayMessage = getErrorDisplayMessage(p.errorType, v2) -- inferred equivalent call
+
+	return React.createElement(
+		View,
+		{
+			tag = "col size-full-0 auto-y items-center gap-medium padding-bottom-large padding-top-large"
+		},
+		{
+			Icon = React.createElement(Icon, {
+				name = Enums.IconName.TriangleExclamation,
+				size = v.Size.Size_1700,
+				layoutOrder = 1
+			}),
+			Message = React.createElement(Text, {
+				Text = errorDisplayMessage,
+				tag = "text-body-large size-full-0 auto-y text-center text-wrap",
+				layoutOrder = 2
+			})
+		}
+	)
 end
 
 return InExperienceDetailsPromptErrorContent

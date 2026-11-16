@@ -1,54 +1,45 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
 
-require(DataHydrationParent.HttpClient)
+require(parent.HttpClient)
 
 local createSingleEntityResolver = require(DataHydration.createSingleEntityResolver)
-local fetchServerManagement = require(script.Parent.fetchServerManagement)
 
+local fetchServerManagement = require(script.Parent.fetchServerManagement)
 require(script.Parent.ServerManagementStoreTypes)
 
-local function createServerManagementStore(t1: {[any]: any}?) -- line: 21
-	-- upvalues: createSingleEntityResolver (copy), fetchServerManagement (copy)
-	local v7 = t1 or {}
-	local t2 = {
-		network = v7.network,
-		baseUrl = v7.baseUrl
-	}
-	local v9 = createSingleEntityResolver(function(n1: number) -- line: 25
-		-- upvalues: fetchServerManagement (copy), t2 (copy)
-		return fetchServerManagement.fetchListRestartStatuses(n1, t2)
+local function createServerManagementStore(options)
+	local v = options or {}
+	local v2 = { network = v.network, baseUrl = v.baseUrl }
+
+	local singleEntityResolver = createSingleEntityResolver(function(p: number)
+		return fetchServerManagement.fetchListRestartStatuses(p, v2)
 	end)
-	local v10 = createSingleEntityResolver(function(n2: number) -- line: 28
-		-- upvalues: fetchServerManagement (copy), t2 (copy)
-		return fetchServerManagement.fetchForecastRestart(n2, t2)
+
+	local singleEntityResolver2 = createSingleEntityResolver(function(p: number)
+		return fetchServerManagement.fetchForecastRestart(p, v2)
 	end)
 
 	return {
-		getRestartStatuses = v9.get,
-		fetchRestartStatuses = v9.fetch,
-		getAndFetchRestartStatuses = v9.getAndFetch,
-		getForecast = v10.get,
-		fetchForecast = v10.fetch,
-		getAndFetchForecast = v10.getAndFetch,
-		launchRestart = function(n3: number, p1) -- line: 32
-			-- upvalues: fetchServerManagement (copy), t2 (copy), v9 (copy)
-			return fetchServerManagement.launchRestart(n3, p1, t2):andThen(function(p2) -- line: 33
-				-- upvalues: v9 (copy), n3 (copy)
-				v9.fetch(n3)
-
-				return p2
+		getRestartStatuses = singleEntityResolver.get,
+		fetchRestartStatuses = singleEntityResolver.fetch,
+		getAndFetchRestartStatuses = singleEntityResolver.getAndFetch,
+		getForecast = singleEntityResolver2.get,
+		fetchForecast = singleEntityResolver2.fetch,
+		getAndFetchForecast = singleEntityResolver2.getAndFetch,
+		launchRestart = function(p: number, p2)
+			return fetchServerManagement.launchRestart(p, p2, v2):andThen(function(p3)
+				singleEntityResolver.fetch(p)
+				return p3
 			end)
 		end,
-		clear = function() -- line: 40
-			-- upvalues: v9 (copy), v10 (copy)
-			v9.clear()
-			v10.clear()
+		clear = function()
+			singleEntityResolver.clear()
+			singleEntityResolver2.clear()
 		end,
-		dispose = function() -- line: 45
-			-- upvalues: v9 (copy), v10 (copy)
-			v9.dispose()
-			v10.dispose()
+		dispose = function()
+			singleEntityResolver.dispose()
+			singleEntityResolver2.dispose()
 		end
 	}
 end

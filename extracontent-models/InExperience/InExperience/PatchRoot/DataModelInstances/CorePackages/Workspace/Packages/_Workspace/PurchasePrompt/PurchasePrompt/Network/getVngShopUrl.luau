@@ -1,14 +1,11 @@
-local ParentParent = script.Parent.Parent
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
-local Promise = require(ParentParent.Promise)
+local parent = script.Parent.Parent
+local PurchaseError = require(parent.Enums.PurchaseError)
+local Promise = require(parent.Promise)
 
-local function getVngShopUrl(p1) -- line: 5
-	-- upvalues: Promise (copy), PurchaseError (copy)
-	return p1.getVngShopUrl():andThen(function(p2) -- line: 8
-		-- upvalues: Promise (copy)
+local function getVngShopUrl(p)
+	return p.getVngShopUrl():andThen(function(p2)
 		return Promise.resolve(p2)
-	end):catch(function(_) -- line: 11
-		-- upvalues: Promise (copy), PurchaseError (copy)
+	end):catch(function(_)
 		return Promise.reject(PurchaseError.UnknownFailure)
 	end)
 end

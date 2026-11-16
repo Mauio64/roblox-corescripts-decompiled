@@ -1,214 +1,139 @@
-local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Dash = require(GenericAbuseReportingParent.Dash)
-local React = require(GenericAbuseReportingParent.React)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local React = require(parent.React)
+
 local LoaderContext = require(script.Parent.LoaderContext)
-local FFlagAbuseReportDensifyResolvedArrays = require(GenericAbuseReporting.Flags.FFlagAbuseReportDensifyResolvedArrays)
 
-local function isLoadDescriptor(p1) -- line: 21
-	return typeof(p1) == "table" and p1["$load"] ~= nil
+local function isLoadDescriptor(p): boolean -- 1 equivalent call inferred from this helper
+	return typeof(p) == "table" and p["$load"] ~= nil
 end
-local function cacheKey(s1: string, t1: {[any]: any}?) -- line: 28
-	if not t1 then
-		return s1 .. "::{}"
+
+local function cacheKey(load: string, params)
+	if not params then
+		return load .. "::{}"
 	end
 
-	local t2 = {}
+	local v = {}
 
-	for k in pairs(t1) do
-		table.insert(t2, k)
+	for k in pairs(params) do
+		table.insert(v, k)
 	end
 
-	table.sort(t2)
+	table.sort(v)
+	local v2 = {}
 
-	local t3 = {}
-
-	for _, v in ipairs(t2) do
-		table.insert(t3, v .. "=" .. t1[v])
+	for _, v3 in ipairs(v) do
+		table.insert(v2, v3 .. "=" .. params[v3])
 	end
 
-	return s1 .. "::" .. table.concat(t3, ",")
+	return load .. "::" .. table.concat(v2, ",")
 end
-local function useLoader(p2) -- line: 62
-	-- upvalues: LoaderContext (copy), React (copy), cacheKey (copy)
-	local v19 = LoaderContext.useLoaderContext()
-	local registryRef = v19.registryRef
-	local cacheRef = v19.cacheRef
-	local v22 = typeof(p2) == "table" and p2["$load"] ~= nil
-	local v23 = if not v22 then nil else p2["$load"]
-	local v24 = if not v22 then nil else p2.params
-	local v25, v26 = React.useState(if not v22 then {
-		loading = false,
-		error = nil,
-		data = p2
-	} else {
+
+local function useLoader(p)
+	local v = LoaderContext.useLoaderContext()
+	local registryRef = v.registryRef
+	local cacheRef = v.cacheRef
+	local loadDescriptor = isLoadDescriptor(p) -- inferred equivalent call
+	local load
+
+	if loadDescriptor then
+		load = p["$load"]
+	else
+		load = nil
+	end
+
+	local params
+
+	if loadDescriptor then
+		params = p.params
+	else
+		params = nil
+	end
+
+	local state, setState = React.useState(loadDescriptor and {
 		data = nil,
 		loading = true,
 		error = nil
-	})
-	local v27, v28 = React.useState(0)
+	} or { data = p, loading = false, error = nil })
 
-	React.useEffect(function() -- line: 78
-		-- upvalues: v22 (copy), v26 (copy), p2 (copy), registryRef (copy), v23 (copy), cacheKey (copy), v24 (copy), cacheRef (copy)
-		if not v22 then
-			v26({
-				loading = false,
-				error = nil,
-				data = p2
-			})
+	local state2, setState2 = React.useState(0)
 
+	React.useEffect(function()
+		if not loadDescriptor then
+			setState({ data = p, loading = false, error = nil })
 			return
 		end
 
-		local v34 = registryRef.current[v23]
+		local v2 = registryRef.current[load]
 
-		if not v34 then
-			v26({
+		if not v2 then
+			setState({
 				data = nil,
 				loading = false,
-				error = string.format("Loader \"%s\" not found in registry", v23)
+				error = string.format("Loader \"%s\" not found in registry", load)
 			})
 
 			return
 		end
 
-		local v35 = cacheKey(v23, v24)
-		local v36 = cacheRef.current[v35]
+		local v3 = cacheKey(load, params)
+		local v4 = cacheRef.current[v3]
 
-		if v36 then
-			v26({
-				loading = false,
-				error = nil,
-				data = v36
-			})
-
+		if v4 then
+			setState({ data = v4, loading = false, error = nil })
 			return
 		end
 
-		local u37 = false
+		local flag = false
+		setState({ data = nil, loading = true, error = nil })
 
-		v26({
-			data = nil,
-			loading = true,
-			error = nil
-		})
-		v34.fetch(v24 or {}):andThen(function(p3) -- line: 109
-			-- upvalues: u37 (ref), cacheRef (copy), v35 (copy), v26 (copy)
-			if u37 then
+		v2.fetch(params or {}):andThen(function(p2)
+			if flag then
 				return
 			end
 
-			cacheRef.current[v35] = p3
-			v26({
-				loading = false,
-				error = nil,
-				data = p3
-			})
-		end):catch(function(p4) -- line: 116
-			-- upvalues: u37 (ref), v26 (copy)
-			if u37 then
+			cacheRef.current[v3] = p2
+			setState({ data = p2, loading = false, error = nil })
+		end):catch(function(p2)
+			if flag then
 				return
 			end
 
-			v26({
-				data = nil,
-				loading = false,
-				error = tostring(p4)
-			})
+			setState({ data = nil, loading = false, error = tostring(p2) })
 		end)
 
-		return function() -- line: 127
-			-- upvalues: u37 (ref)
-			u37 = true
+		return function()
+			flag = true
 		end
-	end, {
-		v24,
-		p2,
-		v27,
-		v22
-	})
+	end, { params, p, state2, loadDescriptor })
 
-	local v29 = React.useCallback(function() -- line: 133
-		-- upvalues: v22 (copy), cacheRef (copy), cacheKey (copy), v23 (copy), v24 (copy), v28 (copy)
-		if not v22 then
+	local retry = React.useCallback(function()
+		if not loadDescriptor then
 			return
 		end
 
-		cacheRef.current[cacheKey(v23, v24)] = nil
-		v28(function(p5) -- line: 138
-			return p5 + 1
+		cacheRef.current[cacheKey(load, params)] = nil
+		setState2(function(p2)
+			return p2 + 1
 		end)
-	end, {
-		p2,
-		v24,
-		v22
-	})
+	end, { p, params, loadDescriptor })
 
-	return {
-		data = v25.data,
-		loading = v25.loading,
-		error = v25.error,
-		retry = v29
-	}
+	return { data = state.data, loading = state.loading, error = state.error, retry = retry }
 end
 
-return {
-	useLoader = useLoader,
-	useListLoader = function(p6) -- line: 157
-		-- upvalues: useLoader (copy), React (copy), FFlagAbuseReportDensifyResolvedArrays (copy), Dash (copy)
-		local v31 = useLoader(p6)
+local UseLoader = {}
+UseLoader.useLoader = useLoader
 
-		return {
-			data = React.useMemo(function() -- line: 159
-				-- upvalues: v31 (copy), FFlagAbuseReportDensifyResolvedArrays (copy), Dash (copy)
-				if not v31.data then
-					return nil
-				end
+function UseLoader.useListLoader(p)
+	local v = useLoader(p)
 
-				local data = v31.data
+	return { data = v.data, loading = v.loading, error = v.error, retry = v.retry }
+end
 
-				if FFlagAbuseReportDensifyResolvedArrays then
-					return data
-				end
+function UseLoader.useGroupedListLoader(p)
+	local v = useLoader(p)
 
-				return (Dash.values(data))
-			end, { v31.data }),
-			loading = v31.loading,
-			error = v31.error,
-			retry = v31.retry
-		}
-	end,
-	useGroupedListLoader = function(p7) -- line: 181
-		-- upvalues: useLoader (copy), React (copy), FFlagAbuseReportDensifyResolvedArrays (copy), Dash (copy)
-		local v33 = useLoader(p7)
+	return { data = v.data, loading = v.loading, error = v.error, retry = v.retry }
+end
 
-		return {
-			data = React.useMemo(function() -- line: 183
-				-- upvalues: v33 (copy), FFlagAbuseReportDensifyResolvedArrays (copy), Dash (copy)
-				if not v33.data then
-					return nil
-				end
-
-				local data = v33.data
-
-				if FFlagAbuseReportDensifyResolvedArrays then
-					return data
-				end
-
-				return (Dash.map(Dash.values(data), function(p8) -- line: 193
-					-- upvalues: Dash (copy)
-					if p8.items then
-						return Dash.join(p8, {
-							items = Dash.values(p8.items)
-						})
-					end
-
-					return p8
-				end))
-			end, { v33.data }),
-			loading = v33.loading,
-			error = v33.error,
-			retry = v33.retry
-		}
-	end
-}
+return UseLoader

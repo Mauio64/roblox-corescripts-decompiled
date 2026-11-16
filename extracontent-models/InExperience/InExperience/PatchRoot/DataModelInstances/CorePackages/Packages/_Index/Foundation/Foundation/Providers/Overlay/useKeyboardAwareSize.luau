@@ -1,69 +1,53 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
+local parent = Foundation.Parent
+
 local Wrappers = require(Foundation.Utility.Wrappers)
+
 local GuiService = Wrappers.Services.GuiService
 local UserInputService = Wrappers.Services.UserInputService
-local Flags = require(Foundation.Utility.Flags)
-local React = require(FoundationParent.React)
 
-local function useKeyboardAwareSize(p1) -- line: 13
-	-- upvalues: React (copy), UserInputService (copy), GuiService (copy), Flags (copy)
-	local v10, v11 = React.useBinding(UDim2.fromScale(1, 1))
+local React = require(parent.React)
 
-	React.useLayoutEffect(function() -- line: 16
-		-- upvalues: p1 (copy), UserInputService (copy), v11 (copy), GuiService (copy), Flags (copy), v10 (copy)
-		if not p1 then
+local function useKeyboardAwareSize(instance)
+	local v, v2 = React.useBinding(UDim2.fromScale(1, 1))
+
+	React.useLayoutEffect(function()
+		if not instance then
 			return
 		end
 
-		local function updateSafeAreaSize() -- line: 21
-			-- upvalues: UserInputService (copy), v11 (copy), GuiService (copy), p1 (copy), Flags (copy), v10 (copy)
+		local function updateSafeAreaSize()
 			if not UserInputService.OnScreenKeyboardVisible then
-				v11(UDim2.fromScale(1, 1))
-
+				v2(UDim2.fromScale(1, 1))
 				return
 			end
 
-			local GuiInset = GuiService:GetGuiInset()
-			local v17 = UserInputService.OnScreenKeyboardPosition.Y - GuiInset.Y
-			local AbsoluteSize = p1.AbsoluteSize
-			local v19 = p1.AbsolutePosition.Y + AbsoluteSize.Y - v17
+			local guiInset = GuiService:GetGuiInset()
+			local v3 = UserInputService.OnScreenKeyboardPosition.Y - guiInset.Y
 
-			if Flags.FoundationOverlayKeyboardAwarenessHardened then
-				local uDim2 = UDim2.new(1, 0, 1, -v19)
+			local absoluteSize = instance.AbsoluteSize
+			local v4 = instance.AbsolutePosition.Y + absoluteSize.Y - v3
+			local udim = UDim2.new(1, 0, 1, -v4)
 
-				if uDim2 ~= v10:getValue() then
-					v11(uDim2)
-
-					return
-				end
-			else
-				v11(v10:getValue() - UDim2.fromOffset(0, v19))
+			if v:getValue() ~= udim then
+				v2(udim)
 			end
 		end
 
 		updateSafeAreaSize()
 
-		local connection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(updateSafeAreaSize)
-		local connection2 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(updateSafeAreaSize)
-		local connection3 = nil
+		local onScreenKeyboardVisibleChangedConnection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(updateSafeAreaSize)
+		local onScreenKeyboardPositionChangedConnection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(updateSafeAreaSize)
+		local absoluteSizeChangedConnection = instance:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSafeAreaSize)
 
-		if Flags.FoundationOverlayKeyboardAwarenessHardened then
-			connection3 = p1:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSafeAreaSize)
+		return function()
+			onScreenKeyboardVisibleChangedConnection:Disconnect()
+			onScreenKeyboardPositionChangedConnection:Disconnect()
+			absoluteSizeChangedConnection:Disconnect()
 		end
+	end, { instance })
 
-		return function() -- line: 58
-			-- upvalues: connection (copy), connection2 (copy), Flags (copy), connection3 (ref)
-			connection:Disconnect()
-			connection2:Disconnect()
-
-			if Flags.FoundationOverlayKeyboardAwarenessHardened then
-				connection3:Disconnect()
-			end
-		end
-	end, { p1 })
-
-	return v10
+	return v
 end
 
 return useKeyboardAwareSize

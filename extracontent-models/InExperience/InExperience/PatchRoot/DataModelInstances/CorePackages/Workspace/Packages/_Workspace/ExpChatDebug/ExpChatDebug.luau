@@ -1,3 +1,1 @@
-return {
-	start = require(script.start)
-}
+return { start = require(script.start) }

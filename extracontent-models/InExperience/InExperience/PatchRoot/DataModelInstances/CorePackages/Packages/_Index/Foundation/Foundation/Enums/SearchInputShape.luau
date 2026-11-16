@@ -1,5 +1,1 @@
-return {
-	Rounded = "Rounded",
-	Pill = "Pill",
-	Box = "Box"
-}
+return { Rounded = "Rounded", Pill = "Pill", Box = "Box" }

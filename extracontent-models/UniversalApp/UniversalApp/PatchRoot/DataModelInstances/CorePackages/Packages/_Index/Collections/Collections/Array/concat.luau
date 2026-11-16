@@ -1,46 +1,46 @@
 local __DEV__ = _G.__DEV__
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local isArray = require(scriptParent.isArray)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local isArray = require(parent.isArray)
+require(parent2.ES7Types)
 
-require(ParentParent.ES7Types)
+local function concat(list, ...)
+	local v = 0
+	local result, v2
 
-local function concat(p1, ...) -- line: 29
-	-- upvalues: isArray (copy), __DEV__ (copy)
-	local v7, v8
-
-	if isArray(p1) then
-		v7 = table.clone(p1)
-		v8 = #p1
+	if isArray(list) then
+		result = table.clone(list)
+		v2 = #list
 	else
-		v8 = 0 + 1
-		v7 = {
-			[v8] = p1
-		}
+		v2 = v + 1
+		result = {}
+		result[v2] = list
 	end
 
 	for i = 1, select("#", ...) do
-		local v10 = select(i, ...)
-		local v11 = typeof(v10)
+		local v3 = select(i, ...)
+		local typeName = typeof(v3)
 
-		if v10 ~= nil then
-			if v11 == "table" then
-				if __DEV__ and not isArray(v10) then
-					error("Array.concat(...) only works with array-like tables but it received an object-like table.\nYou can avoid this error by wrapping the object-like table into an array. Example: `concat({1, 2}, {a = true})` should be `concat({1, 2}, { {a = true} }`")
-				end
+		if v3 == nil then
+			continue
+		end
 
-				for j = 1, #v10 do
-					v8 += 1
-					v7[v8] = v10[j]
-				end
-			else
-				v8 += 1
-				v7[v8] = v10
+		if typeName == "table" then
+			if __DEV__ and not isArray(v3) then
+				error("Array.concat(...) only works with array-like tables but it received an object-like table.\nYou can avoid this error by wrapping the object-like table into an array. Example: `concat({1, 2}, {a = true})` should be `concat({1, 2}, { {a = true} }`")
 			end
+
+			for j = 1, #v3 do
+				v2 += 1
+				result[v2] = v3[j]
+			end
+		else
+			v2 += 1
+			result[v2] = v3
 		end
 	end
 
-	return v7
+	return result
 end
 
 return concat

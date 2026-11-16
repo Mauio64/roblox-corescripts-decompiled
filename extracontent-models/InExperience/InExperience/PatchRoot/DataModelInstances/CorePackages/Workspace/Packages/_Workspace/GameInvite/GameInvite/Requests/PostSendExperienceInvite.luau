@@ -1,21 +1,28 @@
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("GameInvite").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("GameInvite").Parent
+
+local Http = require(parent.Http)
+local Url = Http.Url
 
 game:DefineFastFlag("LuaAppExperienceJoinIdempotencyKey", false)
 
-return function(p1, s1: string, s2: string, s3: string, s4: string?, s5: string?) -- line: 9
-	-- upvalues: HttpService (copy), Url (copy)
-	local json = HttpService:JSONEncode({
-		recipientUserId = s1,
-		inviteMessageId = s4,
-		placeId = s2,
-		launchData = s5,
-		trigger = s3,
-		idempotencyKey = if not game:GetFastFlag("LuaAppExperienceJoinIdempotencyKey") then nil else HttpService:GenerateGUID(false)
+return function(callback, recipientUserId: string, placeId: string, trigger: string, inviteMessageId: string?, launchData: string?)
+	local idempotencyKey
+
+	if game:GetFastFlag("LuaAppExperienceJoinIdempotencyKey") then
+		idempotencyKey = HttpService:GenerateGUID(false)
+	end
+
+	local jsonEncode = HttpService:JSONEncode({
+		recipientUserId = recipientUserId,
+		inviteMessageId = inviteMessageId,
+		placeId = placeId,
+		launchData = launchData,
+		trigger = trigger,
+		idempotencyKey = idempotencyKey
 	})
 
-	return p1(string.format("%snotifications/v1/send-experience-invite", Url.APIS_URL), "POST", {
-		postBody = json
+	return callback(string.format("%snotifications/v1/send-experience-invite", Url.APIS_URL), "POST", {
+		postBody = jsonEncode
 	})
 end

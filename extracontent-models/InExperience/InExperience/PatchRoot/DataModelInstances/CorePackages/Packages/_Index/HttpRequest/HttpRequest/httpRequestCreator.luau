@@ -1,30 +1,26 @@
-local Parent = script:FindFirstAncestor("HttpRequest").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("HttpRequest").Parent
+local Promise = require(parent.Promise)
+
 local HttpRequest = require(script.Parent.HttpRequest)
 
-return function(p1) -- line: 6
-	-- upvalues: HttpRequest (copy), Promise (copy)
-	assert(type(p1.requestFunction) == "function", "Expected requestFunction to be a function")
+return function(p)
+	assert(type(p.requestFunction) == "function", "Expected requestFunction to be a function")
 
-	return function(p2, p3, p4) -- line: 9
-		-- upvalues: HttpRequest (copy), p1 (copy), Promise (copy)
-		assert(type(p2) == "string", "Expected url to be a string")
-		assert(type(p3) == "string", "Expected requestMethod to be a string")
-		assert(not p4 or type(p4) == "table", "Expected options to be a table")
+	return function(value, value2, p2)
+		assert(type(value) == "string", "Expected url to be a string")
+		assert(type(value2) == "string", "Expected requestMethod to be a string")
+		assert(not p2 or type(p2) == "table", "Expected options to be a table")
+		local v = string.upper(value2)
 
-		local v8 = string.upper(p3)
-		local v9 = HttpRequest.new(p1, p2, v8, p4)
+		local v2 = HttpRequest.new(p, value, v, p2)
 
-		local function cancel() -- line: 23
-			-- upvalues: v9 (copy)
-			v9:cancel()
+		local function cancel()
+			v2:cancel()
 		end
 
-		return Promise.new(function(resolve, reject) -- line: 17
-			-- upvalues: v9 (copy)
-			coroutine.wrap(function() -- line: 18
-				-- upvalues: v9 (copy), resolve (copy), reject (copy)
-				v9:start(resolve, reject)
+		return Promise.new(function(p3, p4)
+			coroutine.wrap(function()
+				v2:start(p3, p4)
 			end)()
 		end), cancel
 	end

@@ -1,9 +1,12 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Rodux = require(CorePackages.Packages.Rodux)
 local Cryo = require(CorePackages.Packages.Cryo)
-local ParentParent = script.Parent.Parent
 
-if require(ParentParent.Flags.FFlagTopBarDeprecateMoreMenuRodux) then
+local parent = script.Parent.Parent
+local FFlagTopBarDeprecateMoreMenuRodux = require(parent.Flags.FFlagTopBarDeprecateMoreMenuRodux)
+
+if FFlagTopBarDeprecateMoreMenuRodux then
 	return nil
 end
 
@@ -13,46 +16,27 @@ local SetBackpackOpen = require(Actions.SetBackpackOpen)
 local SetEmotesOpen = require(Actions.SetEmotesOpen)
 local SetLeaderboardOpen = require(Actions.SetLeaderboardOpen)
 local SetEmotesEnabled = require(Actions.SetEmotesEnabled)
-local t1 = {
+
+return (Rodux.createReducer({
 	open = false,
 	backpackOpen = false,
 	leaderboardOpen = false,
 	emotesOpen = false,
 	emotesEnabled = true
-}
-
-return (Rodux.createReducer(t1, {
-	[SetMoreMenuOpen.name] = function(p1, p2) -- line: 30
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p1, {
-			open = p2.open
-		})
+}, {
+	[SetMoreMenuOpen.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { open = p2.open })
 	end,
-	[SetBackpackOpen.name] = function(p3, p4) -- line: 36
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p3, {
-			open = false,
-			backpackOpen = p4.open
-		})
+	[SetBackpackOpen.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { open = false, backpackOpen = p2.open })
 	end,
-	[SetEmotesOpen.name] = function(p5, p6) -- line: 43
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p5, {
-			open = false,
-			emotesOpen = p6.open
-		})
+	[SetEmotesOpen.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { open = false, emotesOpen = p2.open })
 	end,
-	[SetEmotesEnabled.name] = function(p7, p8) -- line: 50
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p7, {
-			emotesEnabled = p8.enabled
-		})
+	[SetEmotesEnabled.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { emotesEnabled = p2.enabled })
 	end,
-	[SetLeaderboardOpen.name] = function(p9, p10) -- line: 56
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p9, {
-			open = false,
-			leaderboardOpen = p10.open
-		})
+	[SetLeaderboardOpen.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { open = false, leaderboardOpen = p2.open })
 	end
 }))

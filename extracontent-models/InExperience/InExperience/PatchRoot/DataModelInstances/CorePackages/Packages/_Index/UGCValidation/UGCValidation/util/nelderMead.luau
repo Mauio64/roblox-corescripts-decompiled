@@ -1,18 +1,18 @@
-local ParentParent = script.Parent.Parent
-local FloatVector = require(ParentParent.util.FloatVector)
-local t1 = {}
+local parent = script.Parent.Parent
 
-t1.__index = t1
+local FloatVector = require(parent.util.FloatVector)
 
-function t1.new(t2: {[any]: any}, p1: ((...any) -> ...any), p2: ((...any) -> ...any)) -- line: 24
-	-- upvalues: t1 (copy), FloatVector (copy)
-	local self = setmetatable({}, t1)
+local NelderMead = {}
+NelderMead.__index = NelderMead
 
-	if t2 and #t2 > 0 then
-		local v8 = t2[1]
+function NelderMead.new(list, objectFunction, terminateFunction)
+	local self = setmetatable({}, NelderMead)
 
-		for _, v10 in t2 do
-			if not v8:checkCompatible(v10) then
+	if list and #list > 0 then
+		local item = list[1]
+
+		for _, item2 in list do
+			if not item:checkCompatible(item2) then
 				error("initial simplex has vectors that are not compatible")
 			end
 		end
@@ -22,150 +22,123 @@ function t1.new(t2: {[any]: any}, p1: ((...any) -> ...any), p2: ((...any) -> ...
 
 	self.simplex = {}
 
-	for _, v12 in t2 do
-		table.insert(self.simplex, FloatVector.new(v12))
+	for _, item in list do
+		table.insert(self.simplex, FloatVector.new(item))
 	end
 
-	self.objectFunction = p1
-	self.terminateFunction = p2
-
+	self.objectFunction = objectFunction
+	self.terminateFunction = terminateFunction
 	return self
 end
-function t1.evaluate(p3) -- line: 51
-	-- upvalues: FloatVector (copy)
-	local simplex = p3.simplex
-	local t3 = {}
-	local n1 = 0
-	local g27 = nil
 
-	while not p3.terminateFunction(simplex, n1) do
-		t3 = {}
-		table.sort(simplex, function(p4, p5) -- line: 68
-			-- upvalues: t3 (ref), p3 (copy)
-			local v51 = t3[p4]
+function NelderMead.evaluate(data)
+	local simplex = data.simplex
 
-			if not v51 then
-				v51 = p3.objectFunction(p4)
-				t3[p4] = v51
-			end
+	local v = {}
+	local count = 0
 
-			local v52 = t3[p5]
+	local function fn(p) -- 5 equivalent calls inferred from this helper
+		local v2 = v[p]
 
-			if not v52 then
-				v52 = p3.objectFunction(p5)
-				t3[p5] = v52
-			end
+		if not v2 then
+			v2 = data.objectFunction(p)
+			v[p] = v2
+		end
 
-			return v51 < v52
+		return v2
+	end
+
+	while not data.terminateFunction(simplex, count) do
+		v = {}
+
+		table.sort(simplex, function(a, b): boolean
+			return fn(a) < fn(b) -- inferred equivalent call
 		end)
 
-		local v17 = simplex[#simplex]
-		local t4 = {}
+		local v2 = simplex[#simplex]
+
+		local v3 = {}
 
 		for _ = 1, simplex[1]:getSize() do
-			table.insert(t4, 0)
+			table.insert(v3, 0)
 		end
 
-		local v20 = FloatVector.new(t4)
+		local v4 = FloatVector.new(v3)
 
 		for i = 1, #simplex - 1 do
-			v20 += simplex[i]
+			v4 += simplex[i]
 		end
 
-		local v22 = v20 / (#simplex - 1) - v17
-		local v23 = v17 + v22 * 2
-		local v24 = t3[v23]
+		local v5 = v4 / (#simplex - 1) - v2
+		local v6 = v2 + v5 * 2
+		local v7 = fn(v6) -- inferred equivalent call
+		local v8 = fn(simplex[1]) -- inferred equivalent call
+		local v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19
 
-		if not v24 then
-			v24 = p3.objectFunction(v23)
-			t3[v23] = v24
-		end
-
-		local v25 = simplex[1]
-		local v26 = t3[v25]
-
-		if not v26 then
-			v26 = p3.objectFunction(v25)
-			t3[v25] = v26
-		end
-
-		repeat
-			if not g27 and v26 < v24 then
-				local v28 = simplex[#simplex - 1]
-				local v29 = t3[v28]
-
-				if not v29 then
-					v29 = p3.objectFunction(v28)
-					t3[v28] = v29
-				end
-
-				if not (v24 < v29) then
-					g27 = true
-				end
-
-				if not g27 then
-					simplex[#simplex] = v23
-				end
+		if v8 < v7 then
+			if v7 < fn(simplex[#simplex - 1]) then -- inferred equivalent call
+				simplex[#simplex] = v6
 			else
-				g27 = false
+				v9 = simplex[1]
+				v10 = v[v9]
 
-				local v30 = simplex[1]
-				local v31 = t3[v30]
-
-				if not v31 then
-					v31 = p3.objectFunction(v30)
-					t3[v30] = v31
+				if not v10 then
+					v10 = data.objectFunction(v9)
+					v[v9] = v10
 				end
 
-				if v24 < v31 then
-					local v32 = v23 + v22
-					local v33 = t3[v32]
+				if v7 < v10 then
+					v11 = v6 + v5
+					v12 = v[v11]
 
-					if not v33 then
-						v33 = p3.objectFunction(v32)
-						t3[v32] = v33
+					if not v12 then
+						v12 = data.objectFunction(v11)
+						v[v11] = v12
 					end
 
-					if v33 < v24 then
-						simplex[#simplex] = v32
+					if v12 < v7 then
+						simplex[#simplex] = v11
 					else
-						simplex[#simplex] = v23
+						simplex[#simplex] = v6
 					end
 				else
-					local v34 = v17 + v22 * 0.5
-					local v35 = v17 + v22 * 1.5
-					local v36 = t3[v34]
+					v13 = v2 + v5 * 0.5
+					v14 = v2 + v5 * 1.5
+					v15 = v[v13]
 
-					if not v36 then
-						v36 = p3.objectFunction(v34)
-						t3[v34] = v36
+					if not v15 then
+						v15 = data.objectFunction(v13)
+						v[v13] = v15
 					end
 
-					local v37 = t3[v35]
+					v16 = v[v14]
 
-					if not v37 then
-						v37 = p3.objectFunction(v35)
-						t3[v35] = v37
+					if not v16 then
+						v16 = data.objectFunction(v14)
+						v[v14] = v16
 					end
 
-					local v38 = if not (v36 < v37) then v35 else v34
-					local v39 = t3[v38]
-
-					if not v39 then
-						v39 = p3.objectFunction(v38)
-						t3[v38] = v39
+					if v15 < v16 then
+						v14 = v13
 					end
 
-					local v40 = simplex[#simplex - 1]
-					local v41 = t3[v40]
+					v17 = v[v14]
 
-					if not v41 then
-						v41 = p3.objectFunction(v40)
-						t3[v40] = v41
+					if not v17 then
+						v17 = data.objectFunction(v14)
+						v[v14] = v17
 					end
 
-					if v39 < v41 then
-						simplex[#simplex] = v38
+					v18 = simplex[#simplex - 1]
+					v19 = v[v18]
+
+					if not v19 then
+						v19 = data.objectFunction(v18)
+						v[v18] = v19
+					end
+
+					if v17 < v19 then
+						simplex[#simplex] = v14
 					else
 						for i = 1, #simplex do
 							simplex[i] = (simplex[i] - simplex[1]) * 0.8 + simplex[1]
@@ -173,21 +146,89 @@ function t1.evaluate(p3) -- line: 51
 					end
 				end
 			end
-		until not g27
+		else
+			v9 = simplex[1]
+			v10 = v[v9]
 
-		n1 += 1
+			if not v10 then
+				v10 = data.objectFunction(v9)
+				v[v9] = v10
+			end
+
+			if v7 < v10 then
+				v11 = v6 + v5
+				v12 = v[v11]
+
+				if not v12 then
+					v12 = data.objectFunction(v11)
+					v[v11] = v12
+				end
+
+				if v12 < v7 then
+					simplex[#simplex] = v11
+				else
+					simplex[#simplex] = v6
+				end
+			else
+				v13 = v2 + v5 * 0.5
+				v14 = v2 + v5 * 1.5
+				v15 = v[v13]
+
+				if not v15 then
+					v15 = data.objectFunction(v13)
+					v[v13] = v15
+				end
+
+				v16 = v[v14]
+
+				if not v16 then
+					v16 = data.objectFunction(v14)
+					v[v14] = v16
+				end
+
+				if v15 < v16 then
+					v14 = v13
+				end
+
+				v17 = v[v14]
+
+				if not v17 then
+					v17 = data.objectFunction(v14)
+					v[v14] = v17
+				end
+
+				v18 = simplex[#simplex - 1]
+				v19 = v[v18]
+
+				if not v19 then
+					v19 = data.objectFunction(v18)
+					v[v18] = v19
+				end
+
+				if v17 < v19 then
+					simplex[#simplex] = v14
+				else
+					for i = 1, #simplex do
+						simplex[i] = (simplex[i] - simplex[1]) * 0.8 + simplex[1]
+					end
+				end
+			end
+		end
+
+		count += 1
 	end
 end
-function t1.calculateMaxLengthBetweenVertices(t5: {[any]: any}) -- line: 122
-	local n2 = 0
 
-	for i = 1, #t5 - 1 do
-		for j = i + 1, #t5 do
-			n2 = math.max(n2, ((t5[j] - t5[i]):magnitude()))
+function NelderMead.calculateMaxLengthBetweenVertices(list)
+	local maxValue = 0
+
+	for i = 1, #list - 1 do
+		for j = i + 1, #list do
+			maxValue = math.max(maxValue, ((list[j] - list[i]):magnitude()))
 		end
 	end
 
-	return n2
+	return maxValue
 end
 
-return t1
+return NelderMead

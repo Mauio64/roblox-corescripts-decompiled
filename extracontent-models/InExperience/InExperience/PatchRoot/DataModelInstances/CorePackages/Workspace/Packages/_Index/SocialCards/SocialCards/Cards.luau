@@ -1,68 +1,69 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Cryo = require(scriptParentParent.Cryo)
-local Foundation = require(scriptParentParent.Foundation)
-local React = require(scriptParentParent.React)
-local AltTextCard = require(scriptParent.Components).AltTextCard.AltTextCard
-local CardComponent = require(scriptParent.utils).CardsHelper.CardComponent
+local parent = script.Parent
+local parent2 = parent.Parent
 
-require(scriptParent.CardsType)
+local Cryo = require(parent2.Cryo)
+local Foundation = require(parent2.Foundation)
+local React = require(parent2.React)
+
+local Components = require(parent.Components)
+local AltTextCard = Components.AltTextCard.AltTextCard
+local utils = require(parent.utils)
+local cardComponent = utils.CardsHelper.CardComponent
+require(parent.CardsType)
 
 local useTokens = Foundation.Hooks.useTokens
-local t1 = {
-	layoutOrder = 1,
-	anchorPoint = Vector2.new(0, 0),
-	position = UDim2.fromScale(0, 0)
-}
 
-local function Cards(t2: {[any]: any}) -- line: 30
-	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), React (copy), CardComponent (copy), AltTextCard (copy), Foundation (copy)
-	local v12 = Cryo.Dictionary.union(t1, t2)
-	local v13 = useTokens()
-	local v14 = React.useCallback(function(p1) -- line: 34
-		-- upvalues: CardComponent (copy), v12 (copy), Cryo (copy), React (copy), AltTextCard (copy), Foundation (copy), v13 (copy)
-		local t3 = {}
+local v = { anchorPoint = Vector2.new(0, 0), layoutOrder = 1, position = UDim2.fromScale(0, 0) }
 
-		for _, v in ipairs(p1.components) do
-			if not CardComponent[v.type] then
-				t3 = { React.createElement(AltTextCard, {
-					altText = p1.alt_text
-				}) }
+local function Cards(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local v2 = useTokens()
 
-				return React.createElement(Foundation.View, {
-					AutomaticSize = Enum.AutomaticSize.XY,
-					backgroundStyle = v13.Color.Shift.Shift_200,
-					cornerRadius = UDim.new(0, v13.Radius.Large)
-				}, t3)
+	local v3 = React.useCallback(function(p2)
+		local children = {}
+
+		for _, component in ipairs(p2.components) do
+			if cardComponent[component.type] then
+				local data = component.data
+
+				if union.analyticsInfo then
+					data = Cryo.Dictionary.join(data, union.analyticsInfo)
+				end
+
+				table.insert(children, React.createElement(cardComponent[component.type], data))
+			else
+				children = { React.createElement(AltTextCard, { altText = p2.alt_text }) }
+				break
 			end
-
-			local data = v.data
-
-			if v12.analyticsInfo then
-				data = Cryo.Dictionary.join(data, v12.analyticsInfo)
-			end
-
-			table.insert(t3, React.createElement(CardComponent[v.type], data))
 		end
 
-		return React.createElement(Foundation.View, {
-			AutomaticSize = Enum.AutomaticSize.XY,
-			backgroundStyle = v13.Color.Shift.Shift_200,
-			cornerRadius = UDim.new(0, v13.Radius.Large)
-		}, t3)
+		return React.createElement(
+			Foundation.View,
+			{
+				AutomaticSize = Enum.AutomaticSize.XY,
+				backgroundStyle = v2.Color.Shift.Shift_200,
+				cornerRadius = UDim.new(0, v2.Radius.Large)
+			},
+			children
+		)
 	end, {})
-	local t4 = {}
 
-	for _, v in pairs(v12.cards) do
-		table.insert(t4, v14(v))
+	local v4 = {}
+
+	for _, card in pairs(union.cards) do
+		table.insert(v4, v3(card))
 	end
 
-	return React.createElement(Foundation.View, {
-		AutomaticSize = Enum.AutomaticSize.XY,
-		AnchorPoint = v12.anchorPoint,
-		Position = v12.position,
-		LayoutOrder = v12.layoutOrder
-	}, t4)
+	return React.createElement(
+		Foundation.View,
+		{
+			AutomaticSize = Enum.AutomaticSize.XY,
+			AnchorPoint = union.anchorPoint,
+			Position = union.position,
+			LayoutOrder = union.layoutOrder
+		},
+		v4
+	)
 end
 
 return Cards

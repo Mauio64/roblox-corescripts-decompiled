@@ -1,228 +1,272 @@
-local t1 = {}
 local version = require(script.version)
+local GraphQL = {}
 
-t1.version = version.version
-t1.versionInfo = version.versionInfo
+GraphQL.version = version.version
+GraphQL.versionInfo = version.versionInfo
 
 local graphql = require(script.graphql)
+GraphQL.graphql = graphql.graphql
+GraphQL.graphqlSync = graphql.graphqlSync
 
-t1.graphql = graphql.graphql
-t1.graphqlSync = graphql.graphqlSync
+local kind = require(script.type)
 
-local type = require(script.type)
+GraphQL.GraphQLSchema = kind.GraphQLSchema
+GraphQL.GraphQLDirective = kind.GraphQLDirective
+GraphQL.GraphQLScalarType = kind.GraphQLScalarType
+GraphQL.GraphQLObjectType = kind.GraphQLObjectType
+GraphQL.GraphQLInterfaceType = kind.GraphQLInterfaceType
+GraphQL.GraphQLUnionType = kind.GraphQLUnionType
+GraphQL.GraphQLEnumType = kind.GraphQLEnumType
+GraphQL.GraphQLInputObjectType = kind.GraphQLInputObjectType
+GraphQL.GraphQLList = kind.GraphQLList
+GraphQL.GraphQLNonNull = kind.GraphQLNonNull
 
-t1.GraphQLSchema = type.GraphQLSchema
-t1.GraphQLDirective = type.GraphQLDirective
-t1.GraphQLScalarType = type.GraphQLScalarType
-t1.GraphQLObjectType = type.GraphQLObjectType
-t1.GraphQLInterfaceType = type.GraphQLInterfaceType
-t1.GraphQLUnionType = type.GraphQLUnionType
-t1.GraphQLEnumType = type.GraphQLEnumType
-t1.GraphQLInputObjectType = type.GraphQLInputObjectType
-t1.GraphQLList = type.GraphQLList
-t1.GraphQLNonNull = type.GraphQLNonNull
-t1.specifiedScalarTypes = type.specifiedScalarTypes
-t1.GraphQLInt = type.GraphQLInt
-t1.GraphQLFloat = type.GraphQLFloat
-t1.GraphQLString = type.GraphQLString
-t1.GraphQLBoolean = type.GraphQLBoolean
-t1.GraphQLID = type.GraphQLID
-t1.specifiedDirectives = type.specifiedDirectives
-t1.GraphQLIncludeDirective = type.GraphQLIncludeDirective
-t1.GraphQLSkipDirective = type.GraphQLSkipDirective
-t1.GraphQLDeprecatedDirective = type.GraphQLDeprecatedDirective
-t1.GraphQLSpecifiedByDirective = type.GraphQLSpecifiedByDirective
-t1.TypeKind = type.TypeKind
-t1.DEFAULT_DEPRECATION_REASON = type.DEFAULT_DEPRECATION_REASON
-t1.introspectionTypes = type.introspectionTypes
-t1.__Schema = type.__Schema
-t1.__Directive = type.__Directive
-t1.__DirectiveLocation = type.__DirectiveLocation
-t1.__Type = type.__Type
-t1.__Field = type.__Field
-t1.__InputValue = type.__InputValue
-t1.__EnumValue = type.__EnumValue
-t1.__TypeKind = type.__TypeKind
-t1.SchemaMetaFieldDef = type.SchemaMetaFieldDef
-t1.TypeMetaFieldDef = type.TypeMetaFieldDef
-t1.TypeNameMetaFieldDef = type.TypeNameMetaFieldDef
-t1.isSchema = type.isSchema
-t1.isDirective = type.isDirective
-t1.isType = type.isType
-t1.isScalarType = type.isScalarType
-t1.isObjectType = type.isObjectType
-t1.isInterfaceType = type.isInterfaceType
-t1.isUnionType = type.isUnionType
-t1.isEnumType = type.isEnumType
-t1.isInputObjectType = type.isInputObjectType
-t1.isListType = type.isListType
-t1.isNonNullType = type.isNonNullType
-t1.isInputType = type.isInputType
-t1.isOutputType = type.isOutputType
-t1.isLeafType = type.isLeafType
-t1.isCompositeType = type.isCompositeType
-t1.isAbstractType = type.isAbstractType
-t1.isWrappingType = type.isWrappingType
-t1.isNullableType = type.isNullableType
-t1.isNamedType = type.isNamedType
-t1.isRequiredArgument = type.isRequiredArgument
-t1.isRequiredInputField = type.isRequiredInputField
-t1.isSpecifiedScalarType = type.isSpecifiedScalarType
-t1.isIntrospectionType = type.isIntrospectionType
-t1.isSpecifiedDirective = type.isSpecifiedDirective
-t1.assertSchema = type.assertSchema
-t1.assertDirective = type.assertDirective
-t1.assertType = type.assertType
-t1.assertScalarType = type.assertScalarType
-t1.assertObjectType = type.assertObjectType
-t1.assertInterfaceType = type.assertInterfaceType
-t1.assertUnionType = type.assertUnionType
-t1.assertEnumType = type.assertEnumType
-t1.assertInputObjectType = type.assertInputObjectType
-t1.assertListType = type.assertListType
-t1.assertNonNullType = type.assertNonNullType
-t1.assertInputType = type.assertInputType
-t1.assertOutputType = type.assertOutputType
-t1.assertLeafType = type.assertLeafType
-t1.assertCompositeType = type.assertCompositeType
-t1.assertAbstractType = type.assertAbstractType
-t1.assertWrappingType = type.assertWrappingType
-t1.assertNullableType = type.assertNullableType
-t1.assertNamedType = type.assertNamedType
-t1.getNullableType = type.getNullableType
-t1.getNamedType = type.getNamedType
-t1.validateSchema = type.validateSchema
-t1.assertValidSchema = type.assertValidSchema
+GraphQL.specifiedScalarTypes = kind.specifiedScalarTypes
+GraphQL.GraphQLInt = kind.GraphQLInt
+GraphQL.GraphQLFloat = kind.GraphQLFloat
+GraphQL.GraphQLString = kind.GraphQLString
+GraphQL.GraphQLBoolean = kind.GraphQLBoolean
+GraphQL.GraphQLID = kind.GraphQLID
+
+GraphQL.specifiedDirectives = kind.specifiedDirectives
+GraphQL.GraphQLIncludeDirective = kind.GraphQLIncludeDirective
+GraphQL.GraphQLSkipDirective = kind.GraphQLSkipDirective
+GraphQL.GraphQLDeprecatedDirective = kind.GraphQLDeprecatedDirective
+GraphQL.GraphQLSpecifiedByDirective = kind.GraphQLSpecifiedByDirective
+
+GraphQL.TypeKind = kind.TypeKind
+
+GraphQL.DEFAULT_DEPRECATION_REASON = kind.DEFAULT_DEPRECATION_REASON
+
+GraphQL.introspectionTypes = kind.introspectionTypes
+GraphQL.__Schema = kind.__Schema
+GraphQL.__Directive = kind.__Directive
+GraphQL.__DirectiveLocation = kind.__DirectiveLocation
+GraphQL.__Type = kind.__Type
+GraphQL.__Field = kind.__Field
+GraphQL.__InputValue = kind.__InputValue
+GraphQL.__EnumValue = kind.__EnumValue
+GraphQL.__TypeKind = kind.__TypeKind
+
+GraphQL.SchemaMetaFieldDef = kind.SchemaMetaFieldDef
+GraphQL.TypeMetaFieldDef = kind.TypeMetaFieldDef
+GraphQL.TypeNameMetaFieldDef = kind.TypeNameMetaFieldDef
+
+GraphQL.isSchema = kind.isSchema
+GraphQL.isDirective = kind.isDirective
+GraphQL.isType = kind.isType
+GraphQL.isScalarType = kind.isScalarType
+GraphQL.isObjectType = kind.isObjectType
+GraphQL.isInterfaceType = kind.isInterfaceType
+GraphQL.isUnionType = kind.isUnionType
+GraphQL.isEnumType = kind.isEnumType
+GraphQL.isInputObjectType = kind.isInputObjectType
+GraphQL.isListType = kind.isListType
+GraphQL.isNonNullType = kind.isNonNullType
+GraphQL.isInputType = kind.isInputType
+GraphQL.isOutputType = kind.isOutputType
+GraphQL.isLeafType = kind.isLeafType
+GraphQL.isCompositeType = kind.isCompositeType
+GraphQL.isAbstractType = kind.isAbstractType
+GraphQL.isWrappingType = kind.isWrappingType
+GraphQL.isNullableType = kind.isNullableType
+GraphQL.isNamedType = kind.isNamedType
+GraphQL.isRequiredArgument = kind.isRequiredArgument
+GraphQL.isRequiredInputField = kind.isRequiredInputField
+GraphQL.isSpecifiedScalarType = kind.isSpecifiedScalarType
+GraphQL.isIntrospectionType = kind.isIntrospectionType
+GraphQL.isSpecifiedDirective = kind.isSpecifiedDirective
+
+GraphQL.assertSchema = kind.assertSchema
+GraphQL.assertDirective = kind.assertDirective
+GraphQL.assertType = kind.assertType
+GraphQL.assertScalarType = kind.assertScalarType
+GraphQL.assertObjectType = kind.assertObjectType
+GraphQL.assertInterfaceType = kind.assertInterfaceType
+GraphQL.assertUnionType = kind.assertUnionType
+GraphQL.assertEnumType = kind.assertEnumType
+GraphQL.assertInputObjectType = kind.assertInputObjectType
+GraphQL.assertListType = kind.assertListType
+GraphQL.assertNonNullType = kind.assertNonNullType
+GraphQL.assertInputType = kind.assertInputType
+GraphQL.assertOutputType = kind.assertOutputType
+GraphQL.assertLeafType = kind.assertLeafType
+GraphQL.assertCompositeType = kind.assertCompositeType
+GraphQL.assertAbstractType = kind.assertAbstractType
+GraphQL.assertWrappingType = kind.assertWrappingType
+GraphQL.assertNullableType = kind.assertNullableType
+GraphQL.assertNamedType = kind.assertNamedType
+
+GraphQL.getNullableType = kind.getNullableType
+GraphQL.getNamedType = kind.getNamedType
+
+GraphQL.validateSchema = kind.validateSchema
+GraphQL.assertValidSchema = kind.assertValidSchema
 
 local language = require(script.language)
 
-t1.Token = language.Token
-t1.Source = language.Source
-t1.Location = language.Location
-t1.getLocation = language.getLocation
-t1.printLocation = language.printLocation
-t1.printSourceLocation = language.printSourceLocation
-t1.Lexer = language.Lexer
-t1.TokenKind = language.TokenKind
-t1.parse = language.parse
-t1.parseValue = language.parseValue
-t1.parseType = language.parseType
-t1.print = language.print
-t1.visit = language.visit
-t1.visitInParallel = language.visitInParallel
-t1.getVisitFn = language.getVisitFn
-t1.BREAK = language.BREAK
-t1.REMOVE = language.REMOVE
-t1.Kind = language.Kind
-t1.DirectiveLocation = language.DirectiveLocation
-t1.isDefinitionNode = language.isDefinitionNode
-t1.isExecutableDefinitionNode = language.isExecutableDefinitionNode
-t1.isSelectionNode = language.isSelectionNode
-t1.isValueNode = language.isValueNode
-t1.isTypeNode = language.isTypeNode
-t1.isTypeSystemDefinitionNode = language.isTypeSystemDefinitionNode
-t1.isTypeDefinitionNode = language.isTypeDefinitionNode
-t1.isTypeSystemExtensionNode = language.isTypeSystemExtensionNode
-t1.isTypeExtensionNode = language.isTypeExtensionNode
+GraphQL.Token = language.Token
+GraphQL.Source = language.Source
+GraphQL.Location = language.Location
+GraphQL.getLocation = language.getLocation
+
+GraphQL.printLocation = language.printLocation
+GraphQL.printSourceLocation = language.printSourceLocation
+
+GraphQL.Lexer = language.Lexer
+
+GraphQL.TokenKind = language.TokenKind
+
+GraphQL.parse = language.parse
+GraphQL.parseValue = language.parseValue
+GraphQL.parseType = language.parseType
+
+GraphQL.print = language.print
+
+GraphQL.visit = language.visit
+GraphQL.visitInParallel = language.visitInParallel
+GraphQL.getVisitFn = language.getVisitFn
+GraphQL.BREAK = language.BREAK
+GraphQL.REMOVE = language.REMOVE
+GraphQL.Kind = language.Kind
+GraphQL.DirectiveLocation = language.DirectiveLocation
+
+GraphQL.isDefinitionNode = language.isDefinitionNode
+GraphQL.isExecutableDefinitionNode = language.isExecutableDefinitionNode
+GraphQL.isSelectionNode = language.isSelectionNode
+GraphQL.isValueNode = language.isValueNode
+GraphQL.isTypeNode = language.isTypeNode
+GraphQL.isTypeSystemDefinitionNode = language.isTypeSystemDefinitionNode
+GraphQL.isTypeDefinitionNode = language.isTypeDefinitionNode
+GraphQL.isTypeSystemExtensionNode = language.isTypeSystemExtensionNode
+GraphQL.isTypeExtensionNode = language.isTypeExtensionNode
 
 local execution = require(script.execution)
 
-t1.execute = execution.execute
-t1.executeSync = execution.executeSync
-t1.defaultFieldResolver = execution.defaultFieldResolver
-t1.defaultTypeResolver = execution.defaultTypeResolver
-t1.responsePathAsArray = execution.responsePathAsArray
-t1.getDirectiveValues = execution.getDirectiveValues
+GraphQL.execute = execution.execute
+GraphQL.executeSync = execution.executeSync
+GraphQL.defaultFieldResolver = execution.defaultFieldResolver
+GraphQL.defaultTypeResolver = execution.defaultTypeResolver
+GraphQL.responsePathAsArray = execution.responsePathAsArray
+GraphQL.getDirectiveValues = execution.getDirectiveValues
 
 local subscription = require(script.subscription)
-
-t1.subscribe = subscription.subscribe
-t1.createSourceEventStream = subscription.createSourceEventStream
+GraphQL.subscribe = subscription.subscribe
+GraphQL.createSourceEventStream = subscription.createSourceEventStream
 
 local validation = require(script.validation)
 
-t1.validate = validation.validate
-t1.ValidationContext = validation.ValidationContext
-t1.specifiedRules = validation.specifiedRules
-t1.ExecutableDefinitionsRule = validation.ExecutableDefinitionsRule
-t1.FieldsOnCorrectTypeRule = validation.FieldsOnCorrectTypeRule
-t1.FragmentsOnCompositeTypesRule = validation.FragmentsOnCompositeTypesRule
-t1.KnownArgumentNamesRule = validation.KnownArgumentNamesRule
-t1.KnownDirectivesRule = validation.KnownDirectivesRule
-t1.KnownFragmentNamesRule = validation.KnownFragmentNamesRule
-t1.KnownTypeNamesRule = validation.KnownTypeNamesRule
-t1.LoneAnonymousOperationRule = validation.LoneAnonymousOperationRule
-t1.NoFragmentCyclesRule = validation.NoFragmentCyclesRule
-t1.NoUndefinedVariablesRule = validation.NoUndefinedVariablesRule
-t1.NoUnusedFragmentsRule = validation.NoUnusedFragmentsRule
-t1.NoUnusedVariablesRule = validation.NoUnusedVariablesRule
-t1.OverlappingFieldsCanBeMergedRule = validation.OverlappingFieldsCanBeMergedRule
-t1.PossibleFragmentSpreadsRule = validation.PossibleFragmentSpreadsRule
-t1.ProvidedRequiredArgumentsRule = validation.ProvidedRequiredArgumentsRule
-t1.ScalarLeafsRule = validation.ScalarLeafsRule
-t1.SingleFieldSubscriptionsRule = validation.SingleFieldSubscriptionsRule
-t1.UniqueArgumentNamesRule = validation.UniqueArgumentNamesRule
-t1.UniqueDirectivesPerLocationRule = validation.UniqueDirectivesPerLocationRule
-t1.UniqueFragmentNamesRule = validation.UniqueFragmentNamesRule
-t1.UniqueInputFieldNamesRule = validation.UniqueInputFieldNamesRule
-t1.UniqueOperationNamesRule = validation.UniqueOperationNamesRule
-t1.UniqueVariableNamesRule = validation.UniqueVariableNamesRule
-t1.ValuesOfCorrectTypeRule = validation.ValuesOfCorrectTypeRule
-t1.VariablesAreInputTypesRule = validation.VariablesAreInputTypesRule
-t1.VariablesInAllowedPositionRule = validation.VariablesInAllowedPositionRule
-t1.LoneSchemaDefinitionRule = validation.LoneSchemaDefinitionRule
-t1.UniqueOperationTypesRule = validation.UniqueOperationTypesRule
-t1.UniqueTypeNamesRule = validation.UniqueTypeNamesRule
-t1.UniqueEnumValueNamesRule = validation.UniqueEnumValueNamesRule
-t1.UniqueFieldDefinitionNamesRule = validation.UniqueFieldDefinitionNamesRule
-t1.UniqueDirectiveNamesRule = validation.UniqueDirectiveNamesRule
-t1.PossibleTypeExtensionsRule = validation.PossibleTypeExtensionsRule
-t1.NoDeprecatedCustomRule = validation.NoDeprecatedCustomRule
-t1.NoSchemaIntrospectionCustomRule = validation.NoSchemaIntrospectionCustomRule
+GraphQL.validate = validation.validate
+GraphQL.ValidationContext = validation.ValidationContext
 
-local error = require(script.error)
+GraphQL.specifiedRules = validation.specifiedRules
 
-t1.GraphQLError = error.GraphQLError
-t1.syntaxError = error.syntaxError
-t1.locatedError = error.locatedError
-t1.printError = error.printError
-t1.formatError = error.formatError
+GraphQL.ExecutableDefinitionsRule = validation.ExecutableDefinitionsRule
+GraphQL.FieldsOnCorrectTypeRule = validation.FieldsOnCorrectTypeRule
+GraphQL.FragmentsOnCompositeTypesRule = validation.FragmentsOnCompositeTypesRule
+GraphQL.KnownArgumentNamesRule = validation.KnownArgumentNamesRule
+GraphQL.KnownDirectivesRule = validation.KnownDirectivesRule
+GraphQL.KnownFragmentNamesRule = validation.KnownFragmentNamesRule
+GraphQL.KnownTypeNamesRule = validation.KnownTypeNamesRule
+GraphQL.LoneAnonymousOperationRule = validation.LoneAnonymousOperationRule
+GraphQL.NoFragmentCyclesRule = validation.NoFragmentCyclesRule
+GraphQL.NoUndefinedVariablesRule = validation.NoUndefinedVariablesRule
+GraphQL.NoUnusedFragmentsRule = validation.NoUnusedFragmentsRule
+GraphQL.NoUnusedVariablesRule = validation.NoUnusedVariablesRule
+GraphQL.OverlappingFieldsCanBeMergedRule = validation.OverlappingFieldsCanBeMergedRule
+GraphQL.PossibleFragmentSpreadsRule = validation.PossibleFragmentSpreadsRule
+GraphQL.ProvidedRequiredArgumentsRule = validation.ProvidedRequiredArgumentsRule
+GraphQL.ScalarLeafsRule = validation.ScalarLeafsRule
+GraphQL.SingleFieldSubscriptionsRule = validation.SingleFieldSubscriptionsRule
+GraphQL.UniqueArgumentNamesRule = validation.UniqueArgumentNamesRule
+GraphQL.UniqueDirectivesPerLocationRule = validation.UniqueDirectivesPerLocationRule
+GraphQL.UniqueFragmentNamesRule = validation.UniqueFragmentNamesRule
+GraphQL.UniqueInputFieldNamesRule = validation.UniqueInputFieldNamesRule
+GraphQL.UniqueOperationNamesRule = validation.UniqueOperationNamesRule
+GraphQL.UniqueVariableNamesRule = validation.UniqueVariableNamesRule
+GraphQL.ValuesOfCorrectTypeRule = validation.ValuesOfCorrectTypeRule
+GraphQL.VariablesAreInputTypesRule = validation.VariablesAreInputTypesRule
+GraphQL.VariablesInAllowedPositionRule = validation.VariablesInAllowedPositionRule
+
+GraphQL.LoneSchemaDefinitionRule = validation.LoneSchemaDefinitionRule
+GraphQL.UniqueOperationTypesRule = validation.UniqueOperationTypesRule
+GraphQL.UniqueTypeNamesRule = validation.UniqueTypeNamesRule
+GraphQL.UniqueEnumValueNamesRule = validation.UniqueEnumValueNamesRule
+GraphQL.UniqueFieldDefinitionNamesRule = validation.UniqueFieldDefinitionNamesRule
+GraphQL.UniqueDirectiveNamesRule = validation.UniqueDirectiveNamesRule
+GraphQL.PossibleTypeExtensionsRule = validation.PossibleTypeExtensionsRule
+
+GraphQL.NoDeprecatedCustomRule = validation.NoDeprecatedCustomRule
+GraphQL.NoSchemaIntrospectionCustomRule = validation.NoSchemaIntrospectionCustomRule
+
+local err = require(script.error)
+GraphQL.GraphQLError = err.GraphQLError
+GraphQL.syntaxError = err.syntaxError
+GraphQL.locatedError = err.locatedError
+GraphQL.printError = err.printError
+GraphQL.formatError = err.formatError
 
 local utilities = require(script.utilities)
 
-t1.getIntrospectionQuery = utilities.getIntrospectionQuery
-t1.getOperationAST = utilities.getOperationAST
-t1.getOperationRootType = utilities.getOperationRootType
-t1.introspectionFromSchema = utilities.introspectionFromSchema
-t1.buildClientSchema = utilities.buildClientSchema
-t1.buildASTSchema = utilities.buildASTSchema
-t1.buildSchema = utilities.buildSchema
-t1.parse = utilities.parse
-t1.extendSchema = utilities.extendSchema
-t1.lexicographicSortSchema = utilities.lexicographicSortSchema
-t1.printSchema = utilities.printSchema
-t1.printType = utilities.printType
-t1.printIntrospectionSchema = utilities.printIntrospectionSchema
-t1.typeFromAST = utilities.typeFromAST
-t1.valueFromAST = utilities.valueFromAST
-t1.valueFromASTUntyped = utilities.valueFromASTUntyped
-t1.astFromValue = utilities.astFromValue
-t1.TypeInfo = utilities.TypeInfo
-t1.visitWithTypeInfo = utilities.visitWithTypeInfo
-t1.coerceInputValue = utilities.coerceInputValue
-t1.concatAST = utilities.concatAST
-t1.separateOperations = utilities.separateOperations
-t1.stripIgnoredCharacters = utilities.stripIgnoredCharacters
-t1.isEqualType = utilities.isEqualType
-t1.isTypeSubTypeOf = utilities.isTypeSubTypeOf
-t1.doTypesOverlap = utilities.doTypesOverlap
-t1.assertValidName = utilities.assertValidName
-t1.isValidNameError = utilities.isValidNameError
-t1.BreakingChangeType = utilities.BreakingChangeType
-t1.DangerousChangeType = utilities.DangerousChangeType
-t1.findBreakingChanges = utilities.findBreakingChanges
-t1.findDangerousChanges = utilities.findDangerousChanges
-t1.NULL = require(script.luaUtils.null)
-t1.stringify = require(script.luaUtils.stringify)
+GraphQL.getIntrospectionQuery = utilities.getIntrospectionQuery
 
-return t1
+GraphQL.getOperationAST = utilities.getOperationAST
+
+GraphQL.getOperationRootType = utilities.getOperationRootType
+
+GraphQL.introspectionFromSchema = utilities.introspectionFromSchema
+
+GraphQL.buildClientSchema = utilities.buildClientSchema
+
+GraphQL.buildASTSchema = utilities.buildASTSchema
+
+GraphQL.buildSchema = utilities.buildSchema
+GraphQL.parse = utilities.parse
+
+GraphQL.extendSchema = utilities.extendSchema
+
+GraphQL.lexicographicSortSchema = utilities.lexicographicSortSchema
+
+GraphQL.printSchema = utilities.printSchema
+
+GraphQL.printType = utilities.printType
+
+GraphQL.printIntrospectionSchema = utilities.printIntrospectionSchema
+
+GraphQL.typeFromAST = utilities.typeFromAST
+
+GraphQL.valueFromAST = utilities.valueFromAST
+
+GraphQL.valueFromASTUntyped = utilities.valueFromASTUntyped
+
+GraphQL.astFromValue = utilities.astFromValue
+
+GraphQL.TypeInfo = utilities.TypeInfo
+GraphQL.visitWithTypeInfo = utilities.visitWithTypeInfo
+
+GraphQL.coerceInputValue = utilities.coerceInputValue
+
+GraphQL.concatAST = utilities.concatAST
+
+GraphQL.separateOperations = utilities.separateOperations
+
+GraphQL.stripIgnoredCharacters = utilities.stripIgnoredCharacters
+
+GraphQL.isEqualType = utilities.isEqualType
+GraphQL.isTypeSubTypeOf = utilities.isTypeSubTypeOf
+GraphQL.doTypesOverlap = utilities.doTypesOverlap
+
+GraphQL.assertValidName = utilities.assertValidName
+
+GraphQL.isValidNameError = utilities.isValidNameError
+
+GraphQL.BreakingChangeType = utilities.BreakingChangeType
+GraphQL.DangerousChangeType = utilities.DangerousChangeType
+GraphQL.findBreakingChanges = utilities.findBreakingChanges
+GraphQL.findDangerousChanges = utilities.findDangerousChanges
+
+GraphQL.NULL = require(script.luaUtils.null)
+
+GraphQL.stringify = require(script.luaUtils.stringify)
+
+return GraphQL

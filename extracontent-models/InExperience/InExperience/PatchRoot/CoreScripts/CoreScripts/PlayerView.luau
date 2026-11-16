@@ -1,27 +1,35 @@
 local CoreGui = game:GetService("CoreGui")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local PlayerViewService = game:GetService("PlayerViewService")
+
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
-local v5 = require(RobloxGui.Modules.Flags.GetFIntPlayerViewRemoteEventTimeout)()
-local RequestDeviceCameraCFrame = RobloxReplicatedStorage:WaitForChild("RequestDeviceCameraCFrame", v5)
-local ReplicateDeviceCameraCFrame = RobloxReplicatedStorage:WaitForChild("ReplicateDeviceCameraCFrame", v5)
-local EngineFeature = game:GetEngineFeature("PlayerViewRemoteEventSupport")
+local GetFIntPlayerViewRemoteEventTimeout = require(RobloxGui.Modules.Flags.GetFIntPlayerViewRemoteEventTimeout)
+
+local fIntPlayerViewRemoteEventTimeout = GetFIntPlayerViewRemoteEventTimeout()
+
+local RequestDeviceCameraCFrame = RobloxReplicatedStorage:WaitForChild(
+	"RequestDeviceCameraCFrame",
+	fIntPlayerViewRemoteEventTimeout
+)
+
+local ReplicateDeviceCameraCFrame = RobloxReplicatedStorage:WaitForChild(
+	"ReplicateDeviceCameraCFrame",
+	fIntPlayerViewRemoteEventTimeout
+)
+
+local engineFeature = game:GetEngineFeature("PlayerViewRemoteEventSupport")
 
 if RequestDeviceCameraCFrame and ReplicateDeviceCameraCFrame then
-	ReplicateDeviceCameraCFrame.OnClientEvent:Connect(function(p1, p2, p3) -- line: 19
-		-- upvalues: EngineFeature (copy), PlayerViewService (copy)
-		if EngineFeature then
-			PlayerViewService:UpdateDeviceCFrame(p1, p2, p3)
+	ReplicateDeviceCameraCFrame.OnClientEvent:Connect(function(p, p2, p3)
+		if engineFeature then
+			PlayerViewService:UpdateDeviceCFrame(p, p2, p3)
 		end
 	end)
-	RequestDeviceCameraCFrame.OnClientEvent:Connect(function() -- line: 24
-		-- upvalues: EngineFeature (copy), PlayerViewService (copy)
-		if EngineFeature then
+	RequestDeviceCameraCFrame.OnClientEvent:Connect(function()
+		if engineFeature then
 			PlayerViewService:OnCameraCFrameReplicationRequest()
 		end
 	end)
-
-	return
+else
+	warn("PlayerViewService failed to initialize.")
 end
-
-warn("PlayerViewService failed to initialize.")

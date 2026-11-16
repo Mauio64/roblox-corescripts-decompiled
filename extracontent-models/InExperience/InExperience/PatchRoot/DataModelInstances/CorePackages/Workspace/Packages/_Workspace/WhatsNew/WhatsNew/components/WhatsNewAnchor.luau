@@ -1,83 +1,64 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
-local WhatsNewParent = WhatsNew.Parent
-local Foundation = require(WhatsNewParent.Foundation)
-local React = require(WhatsNewParent.React)
+local parent = WhatsNew.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 local GetWhatsNewStore = require(WhatsNew.store.GetWhatsNewStore)
+
 local View = Foundation.View
 
-local function isGuiObjectReady(p1) -- line: 26
-	local AbsoluteSize = p1.AbsoluteSize
-
-	return AbsoluteSize.X > 0 and AbsoluteSize.Y > 0
+local function isGuiObjectReady(p): boolean -- 1 equivalent call inferred from this helper
+	local absoluteSize = p.AbsoluteSize
+	return absoluteSize.X > 0 and absoluteSize.Y > 0
 end
-local function WhatsNewAnchor(t1: {[any]: any}) -- line: 31
-	-- upvalues: GetWhatsNewStore (copy), React (copy), View (copy)
-	local v12 = GetWhatsNewStore()
-	local anchorId = t1.anchorId
-	local v14 = React.useRef(nil)
-	local v15 = React.useCallback(function(p2) -- line: 36
-		-- upvalues: v12 (copy), anchorId (copy)
-		if p2 == nil then
+
+local function WhatsNewAnchor(props)
+	local whatsNewStore = GetWhatsNewStore()
+	local anchorId = props.anchorId
+	local ref = React.useRef(nil)
+
+	local v = React.useCallback(function(p)
+		if p == nil then
 			return
 		end
 
-		local setAnchorReady = v12.setAnchorReady
-		local v20 = anchorId
-		local AbsoluteSize = p2.AbsoluteSize
+		whatsNewStore.setAnchorReady(anchorId, isGuiObjectReady(p), p) -- inferred equivalent call
+	end, { whatsNewStore, anchorId })
 
-		setAnchorReady(v20, AbsoluteSize.X > 0 and AbsoluteSize.Y > 0, p2)
-	end, {
-		v12,
-		anchorId
-	})
-	local v16 = React.useCallback(function(p3) -- line: 43
-		-- upvalues: v14 (copy), v12 (copy), anchorId (copy), v15 (copy)
-		if p3 == nil then
-			local current = v14.current
+	local ref2 = React.useCallback(function(current)
+		if current == nil then
+			local current2 = ref.current
+			ref.current = nil
 
-			v14.current = nil
-
-			if current ~= nil then
-				v12.unregisterAnchor(anchorId, current)
+			if current2 ~= nil then
+				whatsNewStore.unregisterAnchor(anchorId, current2)
 			end
+		else
+			ref.current = current
+			whatsNewStore.registerAnchor(anchorId, current)
 
-			return
+			if whatsNewStore.getAnchorRef(anchorId) == current then
+				v(current)
+			end
 		end
+	end, { whatsNewStore, anchorId, v })
 
-		v14.current = p3
-		v12.registerAnchor(anchorId, p3)
-
-		if p3 == v12.getAnchorRef(anchorId) then
-			v15(p3)
+	React.useEffect(function()
+		return function()
+			whatsNewStore.unregisterAnchor(anchorId, ref.current)
 		end
-	end, {
-		v12,
-		anchorId,
-		v15
-	})
+	end, { whatsNewStore, anchorId })
 
-	React.useEffect(function() -- line: 59
-		-- upvalues: v12 (copy), anchorId (copy), v14 (copy)
-		return function() -- line: 60
-			-- upvalues: v12 (copy), anchorId (copy), v14 (copy)
-			v12.unregisterAnchor(anchorId, v14.current)
-		end
-	end, {
-		v12,
-		anchorId
-	})
-
-	local v17 = React.useCallback(function(p4) -- line: 65
-		-- upvalues: v15 (copy)
-		v15(p4)
-	end, { v15 })
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		v(p)
+	end, { v })
 
 	return React.createElement(View, {
-		ref = v16,
-		tag = t1.tag or "size-full-0 auto-y",
-		LayoutOrder = t1.LayoutOrder,
-		onAbsoluteSizeChanged = v17
-	}, t1.children)
+		ref = ref2,
+		tag = props.tag or "size-full-0 auto-y",
+		LayoutOrder = props.LayoutOrder,
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged
+	}, props.children)
 end
 
 return React.memo(WhatsNewAnchor)

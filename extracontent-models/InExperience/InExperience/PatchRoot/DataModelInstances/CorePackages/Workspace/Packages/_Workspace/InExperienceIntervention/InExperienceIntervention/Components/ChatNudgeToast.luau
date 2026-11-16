@@ -1,20 +1,21 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
-local React = require(InExperienceInterventionParent.React)
-local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
-local useLocalization = require(InExperienceInterventionParent.Localization).Hooks.useLocalization
+local parent = InExperienceIntervention.Parent
+local React = require(parent.React)
+local InterventionShared = require(parent.InterventionShared)
+local Constants = InterventionShared.Utils.Constants
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local InExperienceInterventionAnalytics = require(InExperienceIntervention.InExperienceInterventionAnalytics)
 local ChatInterventionGenericToast = require(InExperienceIntervention.Components.ChatInterventionGenericToast)
 
-function ChatNudgeToast(t1: {[any]: any}) -- line: 14
-	-- upvalues: useLocalization (copy), Constants (copy), React (copy), ChatInterventionGenericToast (copy), InExperienceInterventionAnalytics (copy)
-	local v9 = useLocalization(Constants.localizationKeys)
+function ChatNudgeToast(p)
+	local v = useLocalization(Constants.localizationKeys)
 
 	return React.createElement(ChatInterventionGenericToast, {
-		eventId = t1.eventId,
-		violatingChatLine = t1.violatingChatLine,
-		toastTitle = v9.ChatBreaksRulesText,
-		toastBody = v9.TextChatMayBeSuspendedText,
+		eventId = p.eventId,
+		violatingChatLine = p.violatingChatLine,
+		toastTitle = v.ChatBreaksRulesText,
+		toastBody = v.TextChatMayBeSuspendedText,
 		interventionType = InExperienceInterventionAnalytics.Constants.InterventionTypes.Nudge,
 		toastAppearEventName = InExperienceInterventionAnalytics.Constants.EventTypes.NudgeToastAppeared,
 		toastDismissEventName = InExperienceInterventionAnalytics.Constants.EventTypes.NudgeToastDismissed

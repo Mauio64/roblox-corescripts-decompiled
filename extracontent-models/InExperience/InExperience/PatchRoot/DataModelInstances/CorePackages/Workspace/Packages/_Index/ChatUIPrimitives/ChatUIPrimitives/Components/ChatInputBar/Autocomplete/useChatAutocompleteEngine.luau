@@ -1,289 +1,328 @@
 local ContextActionService = game:GetService("ContextActionService")
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
+
+local ChatUIPrimitives = script:FindFirstAncestor("ChatUIPrimitives")
+local parent = ChatUIPrimitives.Parent
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+
 local internalProviders = require(script.Parent.internalProviders)
-local t1 = {
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatAutocompleteOptimization = SharedFlags.FFlagExpChatAutocompleteOptimization
+
+local FFlagExpChatAutocompleteLazyBuild = require(ChatUIPrimitives.Flags.FFlagExpChatAutocompleteLazyBuild)
+
+local v = {
 	activated = false,
+	results = {},
 	selectedIndex = 0,
 	keyboardIndex = 0,
-	currentMatch = nil,
-	results = {}
+	currentMatch = nil
 }
 
-local function useChatAutocompleteEngine(t2: {[any]: any}, t3: {[any]: any}?) -- line: 40
-	-- upvalues: React (copy), internalProviders (copy), t1 (copy), UserInputService (copy), ContextActionService (copy), Cryo (copy)
-	local v11 = if not t3 then nil else t3.commands
-	local v12 = not not t3 and not not t3.emojis
-	local v13 = React.useMemo(function() -- line: 48
-		-- upvalues: v11 (copy), v12 (copy), internalProviders (copy)
-		if not v11 and not v12 then
+local function spliceInto(current, replaceStart: number, replaceFinish: number, list: string) -- 2 equivalent calls inferred from this helper
+	local text = current.Text
+	current.Text = string.sub(text, 1, replaceStart - 1) .. list .. string.sub(text, replaceFinish + 1)
+	current.CursorPosition = replaceStart + #list
+end
+
+local function useChatAutocompleteEngine(p, p2)
+	local commands
+
+	if p2 then
+		commands = p2.commands
+	else
+		commands = nil
+	end
+
+	local current4 = p2 and p2.emojis and true or false
+
+	local current5 = React.useMemo(function()
+		if not (commands or current4) then
 			return nil
 		end
 
-		return internalProviders.buildTrie(v11, v12)
-	end, {
-		v11 or false,
-		v12
-	})
-	local v14, v15 = React.useState(t1)
-	local v16 = React.useRef(0)
-	local v17 = React.useRef(false)
-	local v18 = React.useRef(v14)
-
-	v18.current = v14
-
-	local v19 = React.useRef(v13)
-
-	v19.current = v13
-
-	local v20 = "ChatAutocompleteSink_" .. tostring(t2)
-
-	React.useEffect(function() -- line: 69
-		-- upvalues: t2 (copy), t3 (copy), v16 (copy)
-		local current = t2.current
-
-		if not current or not t3 then
-			return
+		if not FFlagExpChatAutocompleteOptimization then
+			return internalProviders.buildTrie(commands, current4)
 		end
 
-		local connection = current:GetPropertyChangedSignal("CursorPosition"):Connect(function() -- line: 74
-			-- upvalues: current (copy), v16 (copy)
-			local CursorPosition = current.CursorPosition
+		local emoji
 
-			if CursorPosition >= 0 then
-				v16.current = CursorPosition
+		if current4 and not FFlagExpChatAutocompleteLazyBuild then
+			emoji = internalProviders.getEmojiStructure()
+		end
+
+		local command
+
+		if commands then
+			command = internalProviders.buildCommandTrie(commands)
+		end
+
+		return { emoji = emoji, command = command }
+	end, { commands or false, current4 })
+
+	local state, setState = React.useState(v)
+	local ref = React.useRef(0)
+	local ref2 = React.useRef(false)
+	local ref3 = React.useRef(state)
+	ref3.current = state
+	local ref4 = React.useRef(current5)
+	ref4.current = current5
+	local ref5 = React.useRef(current4)
+	ref5.current = current4
+
+	local v2 = "ChatAutocompleteSink_" .. tostring(p)
+
+	React.useEffect(function()
+		local current = p.current
+
+		if current and p2 then
+			local cursorPositionChangedConnection = current:GetPropertyChangedSignal("CursorPosition"):Connect(function()
+				local cursorPosition = current.CursorPosition
+
+				if cursorPosition >= 0 then
+					ref.current = cursorPosition
+				end
+			end)
+			return function()
+				cursorPositionChangedConnection:Disconnect()
 			end
-		end)
-
-		return function() -- line: 80
-			-- upvalues: connection (copy)
-			connection:Disconnect()
 		end
-	end, {
-		t2.current,
-		t3
-	})
+	end, { p.current, p2 })
 
-	local function spliceResult(n1: number) -- line: 85
-		-- upvalues: v18 (copy), t2 (copy), internalProviders (copy), v15 (copy), t1 (copy)
-		local current = v18.current
-		local v30 = current.results[n1]
-		local current2 = t2.current
+	local function spliceResult(p3: number) -- 2 equivalent calls inferred from this helper
+		local current = ref3.current
+		local result = current.results[p3]
+		local current2 = p.current
 		local currentMatch = current.currentMatch
 
-		if not v30 or (not current2 or not currentMatch) then
+		if not (result and current2 and currentMatch) then
 			return
 		end
 
-		local v33 = internalProviders.formatReplacement(v30)
-		local current2Text = current2.Text
-
-		current2.Text = string.sub(current2Text, 1, currentMatch.replaceStart - 1) .. v33 .. string.sub(current2Text, currentMatch.replaceFinish + 1)
-		current2.CursorPosition = currentMatch.replaceStart + #v33
-		v15(t1)
+		spliceInto( -- inferred equivalent call
+			current2,
+			currentMatch.replaceStart,
+			currentMatch.replaceFinish,
+			internalProviders.formatReplacement(result)
+		)
+		setState(v)
 	end
 
-	React.useEffect(function() -- line: 121
-		-- upvalues: t3 (copy), UserInputService (copy), v18 (copy), v15 (copy), t1 (copy), t2 (copy), v16 (copy)
-		if not t3 then
+	local function commitSelection(p3: number)
+		ref2.current = true
+		spliceResult(p3) -- inferred equivalent call
+		task.defer(function()
+			ref2.current = false
+			local current = p.current
+
+			if current then
+				current:CaptureFocus()
+			end
+		end)
+	end
+
+	React.useEffect(function()
+		if not p2 then
 			return
 		end
 
-		local connection = UserInputService.InputBegan:Connect(function(input) -- line: 125
-			-- upvalues: v18 (copy), v15 (copy), t1 (copy), t2 (copy), v16 (copy)
-			local current = v18.current
+		local inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
+			local current = ref3.current
 
 			if not current.activated or #current.results == 0 then
 				return
 			end
 
 			if input.KeyCode == Enum.KeyCode.Up then
-				v15(function(p1) -- line: 132
-					local v54 = if not (p1.selectedIndex <= 0) then if p1.selectedIndex ~= 1 then p1.selectedIndex - 1 else #p1.results else 1
+				setState(function(data)
+					local v3
 
-					return {
-						activated = p1.activated,
-						results = p1.results,
-						selectedIndex = v54,
-						keyboardIndex = v54,
-						currentMatch = p1.currentMatch
-					}
-				end)
-
-				return
-			end
-
-			if input.KeyCode == Enum.KeyCode.Down then
-				v15(function(p2) -- line: 150
-					local v56 = p2.selectedIndex + 1
-
-					if v56 > #p2.results then
-						v56 = 1
+					if data.selectedIndex <= 0 then
+						v3 = 1
+					elseif data.selectedIndex == 1 then
+						v3 = #data.results
+					else
+						v3 = data.selectedIndex - 1
 					end
 
 					return {
-						activated = p2.activated,
-						results = p2.results,
-						selectedIndex = v56,
-						keyboardIndex = v56,
-						currentMatch = p2.currentMatch
+						activated = data.activated,
+						results = data.results,
+						selectedIndex = v3,
+						keyboardIndex = v3,
+						currentMatch = data.currentMatch
 					}
 				end)
+			elseif input.KeyCode == Enum.KeyCode.Down then
+				setState(function(data)
+					local v3 = data.selectedIndex + 1
+					local v4 = #data.results < v3 and 1 or v3
 
-				return
-			end
-
-			if input.KeyCode == Enum.KeyCode.Escape then
-				v15(t1)
-
-				local current3 = t2.current
-
-				task.defer(function() -- line: 166
-					-- upvalues: current3 (copy), v16 (copy)
-					if current3 then
-						current3:CaptureFocus()
-						current3.CursorPosition = v16.current
+					return {
+						activated = data.activated,
+						results = data.results,
+						selectedIndex = v4,
+						keyboardIndex = v4,
+						currentMatch = data.currentMatch
+					}
+				end)
+			elseif input.KeyCode == Enum.KeyCode.Escape then
+				setState(v)
+				local current2 = p.current
+				task.defer(function()
+					if current2 then
+						current2:CaptureFocus()
+						current2.CursorPosition = ref.current
 					end
 				end)
 			end
 		end)
-
-		return function() -- line: 174
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			inputBeganConnection:Disconnect()
 		end
-	end, { t3 })
-	React.useEffect(function() -- line: 179
-		-- upvalues: v14 (copy), ContextActionService (copy), v20 (copy)
-		if not v14.activated or #v14.results == 0 then
+	end, { p2 })
+
+	React.useEffect(function()
+		if not state.activated or #state.results == 0 then
 			return
 		end
 
-		ContextActionService:BindCoreAction(v20, function() -- line: 183
+		ContextActionService:BindCoreAction(v2, function()
 			return Enum.ContextActionResult.Sink
 		end, false, Enum.KeyCode.Up, Enum.KeyCode.Down, Enum.KeyCode.Escape)
-
-		return function() -- line: 186
-			-- upvalues: ContextActionService (copy), v20 (copy)
-			ContextActionService:UnbindCoreAction(v20)
+		return function()
+			ContextActionService:UnbindCoreAction(v2)
 		end
-	end, {
-		v14.activated,
-		#v14.results
-	})
+	end, { state.activated, #state.results })
 
-	local v22 = React.useCallback(function(s1: string) -- line: 191
-		-- upvalues: v17 (copy), v19 (copy), t2 (copy), v16 (copy), internalProviders (copy), Cryo (copy), v15 (copy), v18 (copy), t1 (copy)
-		if v17.current then
+	local onTextChanged = React.useCallback(function(p3: string)
+		if ref2.current then
 			return
 		end
 
-		local current = v19.current
+		local current = ref4.current
 
 		if not current then
 			return
 		end
 
-		local current4 = t2.current
-		local v40 = if not current4 or not (current4.CursorPosition >= 0) then v16.current else current4.CursorPosition
-		local v41 = internalProviders.matchTrigger(s1, v40)
+		local current2 = p.current
+		local v3
 
-		if v41 then
-			local v42 = internalProviders.search(current, v41.query)
-
-			if #v42 > 20 then
-				v42 = Cryo.List.getRange(v42, 1, 20)
-			end
-
-			v15({
-				selectedIndex = 0,
-				keyboardIndex = 0,
-				activated = #v42 > 0,
-				results = v42,
-				currentMatch = v41
-			})
-
-			return
+		if current2 and current2.CursorPosition >= 0 then
+			v3 = current2.CursorPosition
+		else
+			v3 = ref.current
 		end
 
-		if v18.current.activated then
-			v15(t1)
+		local v4 = ref5.current and current2 and internalProviders.matchColonCompletion(p3, v3)
+
+		if v4 then
+			ref2.current = true
+			spliceInto(current2, v4.replaceStart, v4.replaceFinish, v4.replacement) -- inferred equivalent call
+			task.defer(function()
+				ref2.current = false
+				local current3 = p.current
+
+				if current3 then
+					current3:CaptureFocus()
+				end
+			end)
+
+			if ref3.current.activated then
+				setState(v)
+			end
+		else
+			local matchTrigger = internalProviders.matchTrigger(p3, v3)
+
+			if matchTrigger then
+				if
+					FFlagExpChatAutocompleteOptimization
+					and FFlagExpChatAutocompleteLazyBuild
+					and ref5.current
+					and not current.emoji
+					and string.sub(matchTrigger.query, 1, 1) == ":"
+				then
+					current.emoji = internalProviders.getEmojiStructure()
+				end
+
+				local results
+
+				if FFlagExpChatAutocompleteOptimization then
+					results = internalProviders.searchStructures(current, matchTrigger.query)
+				else
+					results = internalProviders.search(current, matchTrigger.query)
+				end
+
+				if #results > 20 then
+					results = Cryo.List.getRange(results, 1, 20)
+				end
+
+				setState({
+					activated = #results > 0,
+					results = results,
+					selectedIndex = 0,
+					keyboardIndex = 0,
+					currentMatch = matchTrigger
+				})
+			elseif ref3.current.activated then
+				setState(v)
+			end
 		end
 	end, {})
-	local v23 = React.useCallback(function(p3, b1: boolean) -- line: 223
-		-- upvalues: v18 (copy), v17 (copy), spliceResult (copy)
-		if not b1 then
+
+	local interceptSend = React.useCallback(function(object, flag: boolean): boolean
+		if not flag then
 			return false
 		end
 
-		local current = v18.current
+		local current = ref3.current
 
-		if not current.activated or #current.results == 0 then
+		if not current.activated or #current.results == 0 or current.selectedIndex < 1 then
 			return false
 		end
 
-		if current.selectedIndex < 1 then
-			return false
-		end
+		ref2.current = true
+		spliceResult(current.selectedIndex) -- inferred equivalent call
+		task.defer(function()
+			ref2.current = false
 
-		v17.current = true
-		spliceResult(current.selectedIndex)
-		task.defer(function() -- line: 236
-			-- upvalues: v17 (copy), p3 (copy)
-			v17.current = false
-
-			if p3 then
-				p3:CaptureFocus()
+			if object then
+				object:CaptureFocus()
 			end
 		end)
-
 		return true
 	end, {})
-	local v24 = React.useCallback(function() -- line: 249
-		-- upvalues: v15 (copy), t1 (copy)
-		v15(t1)
+
+	local dismiss = React.useCallback(function()
+		setState(v)
 	end, {})
-	local v25 = React.useCallback(function(n2: number) -- line: 256
-		-- upvalues: v15 (copy)
-		v15(function(p4) -- line: 257
-			-- upvalues: n2 (copy)
+
+	local setSelectedIndex = React.useCallback(function(value: number)
+		setState(function(data)
 			return {
-				activated = p4.activated,
-				results = p4.results,
-				selectedIndex = math.clamp(n2, 1, (math.max(1, #p4.results))),
-				keyboardIndex = p4.keyboardIndex,
-				currentMatch = p4.currentMatch
+				activated = data.activated,
+				results = data.results,
+				selectedIndex = math.clamp(value, 1, (math.max(1, #data.results))),
+				keyboardIndex = data.keyboardIndex,
+				currentMatch = data.currentMatch
 			}
 		end)
 	end, {})
 
 	return {
-		isOpen = v14.activated and #v14.results > 0,
-		results = v14.results,
-		selectedIndex = v14.selectedIndex,
-		keyboardIndex = v14.keyboardIndex,
+		isOpen = state.activated and #state.results > 0,
+		results = state.results,
+		selectedIndex = state.selectedIndex,
+		keyboardIndex = state.keyboardIndex,
 		renderEntry = internalProviders.renderEntry,
-		onTextChanged = v22,
-		setSelectedIndex = v25,
-		commitSelection = function(n3: number) -- line: 106
-			-- upvalues: v17 (copy), spliceResult (copy), t2 (copy)
-			v17.current = true
-			spliceResult(n3)
-			task.defer(function() -- line: 109
-				-- upvalues: v17 (copy), t2 (copy)
-				v17.current = false
-
-				local current = t2.current
-
-				if current then
-					current:CaptureFocus()
-				end
-			end)
-		end,
-		interceptSend = v23,
-		dismiss = v24
+		onTextChanged = onTextChanged,
+		setSelectedIndex = setSelectedIndex,
+		commitSelection = commitSelection,
+		interceptSend = interceptSend,
+		dismiss = dismiss
 	}
 end
 

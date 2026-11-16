@@ -1,5 +1,4 @@
 local responses = script.responses
-
 require(responses.SharedTypes)
 require(responses["create-conversations"])
 require(responses["expand-to-group-conversation"])
@@ -7,6 +6,7 @@ require(responses["get-conversation-messages"])
 require(responses["get-conversations"])
 require(responses["get-suggestions"])
 require(responses["get-user-conversations"])
+require(responses["search-conversations"])
 require(responses["get-conversations-participants-metadata"])
 require(responses["get-metadata"])
 require(responses["get-conversation-metadata"])

@@ -1,84 +1,87 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
+local parent = Moments.Parent
+
 local Players = game:GetService("Players")
-local Foundation = require(MomentsParent.Foundation)
-local Localization = require(MomentsParent.Localization)
-local MomentsCommon = require(MomentsParent.MomentsCommon)
 
-require(MomentsParent.MomentsTypes)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.MomentsTypes)
+local React = require(parent.React)
 
-local React = require(MomentsParent.React)
-local FoundationImage = Foundation.Image
+local Image = Foundation.Image
 local Skeleton = Foundation.Skeleton
 local View = Foundation.View
-local FoundationText = Foundation.Text
-local useFormFactor = MomentsCommon.Hooks.useFormFactor
+local Text = Foundation.Text
+
 local useImageLoadingState = MomentsCommon.Hooks.useImageLoadingState
 local useLocalization = Localization.Hooks.useLocalization
+
 local Constants = require(Moments.Constants)
-local FormFactor = MomentsCommon.Enums.FormFactor
-local FFlagMomentsUseCompositionLibrary = require(Moments.Flags.FFlagMomentsUseCompositionLibrary)
-local t1 = {
+
+local v = {
 	moderatedBody = "Feature.Moments.Label.ModeratedRodeoBody",
 	unavailableBody = "Feature.Moments.Label.MomentUnavailableDefault"
 }
 
-local function ModeratedMomentItem(t2: {[any]: any}) -- line: 37
-	-- upvalues: useLocalization (copy), t1 (copy), FFlagMomentsUseCompositionLibrary (copy), useFormFactor (copy), Players (copy), React (copy), useImageLoadingState (copy), FoundationImage (copy), Skeleton (copy), View (copy), Constants (copy), FormFactor (copy), FoundationText (copy)
-	local v21 = useLocalization(t1)
-	local v22 = nil
+local function ModeratedMomentItem(p)
+	local v2 = useLocalization(v)
+	local localPlayer = Players.LocalPlayer
+	local userId
 
-	if not FFlagMomentsUseCompositionLibrary then
-		v22 = useFormFactor()
+	if localPlayer then
+		userId = localPlayer.UserId
+	else
+		userId = nil
 	end
 
-	local LocalPlayer = Players.LocalPlayer
-	local v24 = if not LocalPlayer then nil else LocalPlayer.UserId
-	local v25 = React.useMemo(function() -- line: 46
-		-- upvalues: v24 (copy), t2 (copy)
-		return v24 ~= nil and t2.creatorId == v24
-	end, {
-		t2.creatorId,
-		v24 or false
-	})
-	local v26 = "rbxthumb://type=Asset&id=" .. t2.moment.assetId .. "&w=480&h=270"
-	local v27 = useImageLoadingState(if not v25 then nil else v26)
-	local v28 = nil
+	local v3 = React.useMemo(function(): boolean
+		return userId ~= nil and p.creatorId == userId
+	end, { p.creatorId, userId or false })
 
-	if v25 then
-		v28 = React.createElement(FoundationImage, {
-			Size = UDim2.fromScale(1, 1),
-			ScaleType = Enum.ScaleType.Crop,
-			Image = v26
-		}, {
-			Skeleton = if v27 then nil else React.createElement(Skeleton, {
-				Size = UDim2.fromScale(1, 1)
-			})
-		})
+	local image = "rbxthumb://type=Asset&id=" .. p.moment.assetId .. "&w=480&h=270"
+	local v4
+
+	if v3 then
+		v4 = image
 	end
 
-	return React.createElement(View, {
-		tag = "position-center-center anchor-center-center size-full"
-	}, {
-		OverlayText = React.createElement(View, {
-			tag = "col flex-evenly align-x-center position-center-center anchor-center-center size-full padding-xlarge",
-			testId = "--moments-moderated-overlay-text",
-			ZIndex = 3,
-			sizeConstraint = {
-				MaxSize = if not FFlagMomentsUseCompositionLibrary then if v22 == FormFactor.Wide then Constants.MaxSize.BottomUI else nil else Constants.MaxSize.BottomUI
-			}
-		}, {
-			Text = React.createElement(FoundationText, {
-				tag = "auto-xy text-wrap",
-				LayoutOrder = 1,
-				Text = if not v25 then v21.unavailableBody else v21.moderatedBody
-			})
+	local v5 = useImageLoadingState(v4)
+	local content
+
+	if v3 then
+		local createElement = React.createElement
+		local v6 = { Size = UDim2.fromScale(1, 1), ScaleType = Enum.ScaleType.Crop, Image = image }
+		local skeleton
+
+		if not v5 then
+			skeleton = React.createElement(Skeleton, { Size = UDim2.fromScale(1, 1) })
+		end
+
+		content = createElement(Image, v6, { Skeleton = skeleton })
+	end
+
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+	local v6 = {
+		sizeConstraint = { MaxSize = Constants.MaxSize.BottomUI },
+		tag = "col flex-evenly align-x-center position-center-center anchor-center-center size-full padding-xlarge",
+		testId = "--moments-moderated-overlay-text",
+		ZIndex = 3
+	}
+
+	local createElement3 = React.createElement
+	local text = if v3 then v2.moderatedBody else v2.unavailableBody
+	return createElement(View, { tag = "position-center-center anchor-center-center size-full" }, {
+		OverlayText = createElement2(View, v6, {
+			Text = createElement3(Text, { Text = text, tag = "auto-xy text-wrap", LayoutOrder = 1 })
 		}),
 		Overlay = React.createElement(View, {
 			tag = "position-center-center anchor-center-center size-full bg-over-media-0",
 			ZIndex = 2
 		}),
-		Content = v28
+		Content = content
 	})
 end
 

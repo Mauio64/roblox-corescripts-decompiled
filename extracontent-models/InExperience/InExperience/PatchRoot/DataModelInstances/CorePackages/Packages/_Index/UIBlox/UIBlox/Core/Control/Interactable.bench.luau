@@ -1,19 +1,22 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local Interactable = require(scriptParent.Interactable)
-local describe = require(ParentParentParent.Dev.JestGlobals).describe
-local benchmarks = require(ParentParent.Utility.benchmarks)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+local Interactable = require(parent.Interactable)
+
+local JestGlobals = require(parent3.Dev.JestGlobals)
+local describe = JestGlobals.describe
+
+local benchmarks = require(parent2.Utility.benchmarks)
 local mountComponentTimes = benchmarks.mountComponentTimes
 local scrollComponentTimes = benchmarks.scrollComponentTimes
-local v10 = Roact.createElement(Interactable, {
-	onStateChanged = function() -- line: 17
-	end
+
+local element = Roact.createElement(Interactable, {
+	onStateChanged = function() end
 })
 
-describe("Interactable", function() -- line: 20
-	-- upvalues: mountComponentTimes (copy), v10 (copy), scrollComponentTimes (copy)
-	mountComponentTimes(v10, 100, "Interactable")
-	scrollComponentTimes(v10, 100, "Interactable")
+describe("Interactable", function()
+	mountComponentTimes(element, 100, "Interactable")
+	scrollComponentTimes(element, 100, "Interactable")
 end)

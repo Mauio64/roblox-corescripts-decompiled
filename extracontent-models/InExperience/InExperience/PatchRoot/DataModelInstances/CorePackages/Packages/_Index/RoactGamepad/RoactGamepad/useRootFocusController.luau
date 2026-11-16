@@ -1,16 +1,16 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent
+local React = require(parent.React)
+
 local FocusController = require(script.Parent.FocusController)
 
-local function useRootFocusController() -- line: 19
-	-- upvalues: React (copy), FocusController (copy)
-	local v5 = React.useRef(nil)
+local function useRootFocusController()
+	local ref = React.useRef(nil)
 
-	if v5.current == nil then
-		v5.current = FocusController.createPublicApiWrapper()
+	if ref.current == nil then
+		ref.current = FocusController.createPublicApiWrapper()
 	end
 
-	return v5.current
+	return ref.current
 end
 
 return useRootFocusController

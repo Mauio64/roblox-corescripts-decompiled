@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.SocialModalsCommon.SocialModalsCommon))
+local SocialModalsCommon = require(index.SocialModalsCommon.SocialModalsCommon)
+
+return SocialModalsCommon

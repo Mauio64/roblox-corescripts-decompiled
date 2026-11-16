@@ -1,55 +1,58 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
-local Constants = require(Parent.AvatarExperienceCommon).Constants
-local FFlagAXCatalogMakeupSupport = require(Parent.AvatarExperienceFlags).FFlagAXCatalogMakeupSupport
-local AssetTypeToAssetCategory = require(script.Parent.Parent.Constants).AssetTypeToAssetCategory
+local parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local Constants = AvatarExperienceCommon.Constants
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXCatalogMakeupSupport = AvatarExperienceFlags.FFlagAXCatalogMakeupSupport
+
+local Constants2 = require(script.Parent.Parent.Constants)
+local AssetTypeToAssetCategory = Constants2.AssetTypeToAssetCategory
 
 require(script.Parent.Parent.Types.BodyColors)
 require(script.Parent.Parent.Types.OutfitTryOn)
 
 local LOOK_TYPE = Constants.LOOK_TYPE
+local ReducerUtils = {}
 
-return {
-	filterTryOns = function(p1, p2) -- line: 42
-		-- upvalues: AssetTypeToAssetCategory (copy)
-		local t1 = {}
-		local v9 = nil
+function ReducerUtils.filterTryOns(items, p)
+	local result = {}
+	local v = nil
 
-		for v10, v11 in p1 do
-			local v12 = AssetTypeToAssetCategory[p2.itemSubType]
-			local v13 = not v12 or v12 ~= AssetTypeToAssetCategory[v11.itemSubType]
+	for k, item in items do
+		local v2 = AssetTypeToAssetCategory[p.itemSubType]
+		local v3 = not v2 or AssetTypeToAssetCategory[item.itemSubType] ~= v2
 
-			if v11.itemSubType ~= p2.itemSubType and v13 then
-				t1[v10] = v11
-			else
-				v9 = v11
-			end
+		if item.itemSubType == p.itemSubType or not v3 then
+			v = item
+		else
+			result[k] = item
 		end
-
-		return t1, v9
-	end,
-	convertDefaultBodyColorRanges = function(t2: {[any]: any}) -- line: 62
-		local t3 = {}
-
-		for _, v17 in t2 do
-			table.insert(t3, {
-				rangeId = v17[1]:ToHex(),
-				range = v17
-			})
-		end
-
-		return t3
-	end,
-	generateTryOnItemIdKey = function(s1: string, p3, p4) -- line: 76
-		-- upvalues: LOOK_TYPE (copy), FFlagAXCatalogMakeupSupport (copy)
-		if p4 ~= nil and (p4 == LOOK_TYPE.Avatar or FFlagAXCatalogMakeupSupport and p4 == LOOK_TYPE.Makeup) then
-			return tostring(s1) .. "-" .. p3
-		end
-
-		return s1
-	end,
-	generateRecommendedItemsKey = function(s2: string?, s3: string?) -- line: 89
-		local v23 = s2 or ""
-
-		return (s3 or "") .. "-" .. v23
 	end
-}
+
+	return result, v
+end
+
+function ReducerUtils.convertDefaultBodyColorRanges(items)
+	local result = {}
+
+	for _, item in items do
+		table.insert(result, { ["rangeId"] = item[1]:ToHex(), range = item })
+	end
+
+	return result
+end
+
+function ReducerUtils.generateTryOnItemIdKey(p: string, p2, p3)
+	if p3 == nil or p3 ~= LOOK_TYPE.Avatar and (not FFlagAXCatalogMakeupSupport or p3 ~= LOOK_TYPE.Makeup) then
+		return p
+	end
+
+	return tostring(p) .. "-" .. p2
+end
+
+function ReducerUtils.generateRecommendedItemsKey(value: string?, value2: string?)
+	return (value2 or "") .. "-" .. (value or "")
+end
+
+return ReducerUtils

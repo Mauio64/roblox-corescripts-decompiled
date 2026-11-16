@@ -1,143 +1,187 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local UIBlox = require(ProfilePlatformParent.UIBlox)
-local SharedFlags = require(ProfilePlatformParent.SharedFlags)
-local RobloxAppEnums = require(ProfilePlatformParent.RobloxAppEnums)
-local DataHydration = require(ProfilePlatformParent.DataHydration)
-local SocialLuaAnalytics = require(ProfilePlatformParent.SocialLuaAnalytics)
+local parent = ProfilePlatform.Parent
+
+local UIBlox = require(parent.UIBlox)
+local SharedFlags = require(parent.SharedFlags)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local DataHydration = require(parent.DataHydration)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+
 local Images = UIBlox.App.ImageSet.Images
 local AppPage = RobloxAppEnums.AppPage
 local Sources = SocialLuaAnalytics.Analytics.Enums.Sources
-local SetCurrentToastMessage = require(ProfilePlatformParent.ToastRodux).Actions.SetCurrentToastMessage
+
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
 local refreshProfilePlatformActionInfo = require(ProfilePlatform.Networking.refreshProfilePlatformActionInfo)
 local Enums = require(ProfilePlatform.Common.Enums)
-
 require(ProfilePlatform.Components.CTARow.Types)
-
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local ProfileTypes = Enums.ProfileTypes
+
 local FFlagProfilePlatformAddTC = SharedFlags.FFlagProfilePlatformAddTC
-local FFlagPendingIncomingTrustedConnection = require(ProfilePlatform.Flags.FFlagPendingIncomingTrustedConnection)
-local v18 = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+local FFlagFixTFLinksVRGating = require(ProfilePlatform.Flags.FFlagFixTFLinksVRGating)
+local FFlagProfileTFCardUseQrScanContext = SharedFlags.FFlagProfileTFCardUseQrScanContext
+
+local v = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
 
 return {
-	[Enums.ProfileActions.RemoveTrustedConnection] = function(p1) -- line: 27
-		-- upvalues: Enums (copy), ProfileTypes (copy), EventNames (copy), v18 (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
+	[Enums.ProfileActions.RemoveTrustedConnection] = function(data)
 		return {
-			text = p1.localized[Enums.ProfileActions.RemoveTrustedConnection],
+			text = data.localized[Enums.ProfileActions.RemoveTrustedConnection],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 31
-					-- upvalues: p1 (copy), EventNames (copy), v18 (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
-					p1.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonRemoveTrustedConnection, {
-						buttonSurface = p1.buttonSurface
+				[ProfileTypes.User] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonRemoveTrustedConnection, {
+						buttonSurface = data.buttonSurface
 					})
 
-					return v18.removeTrustedConnectionRequest(p1.profileId):andThen(function() -- line: 35
-						-- upvalues: p1 (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
-						p1.dispatch(SetCurrentToastMessage({
-							isLocalized = true,
-							toastMessage = p1.localized.trustedConnectionRemovedToast,
-							toastIcon = Images["icons/actions/friends/friendRemove"]
+					return v.removeTrustedConnectionRequest(data.profileId):andThen(function()
+						data.dispatch(SetCurrentToastMessage({
+							toastMessage = data.localized.trustedConnectionRemovedToast,
+							toastIcon = Images["icons/actions/friends/friendRemove"],
+							isLocalized = true
 						}))
 
-						return p1.dispatch(refreshProfilePlatformActionInfo(p1.profileId, p1.actionsComponentRequest))
+						return data.dispatch(refreshProfilePlatformActionInfo(
+							data.profileId,
+							data.actionsComponentRequest
+						))
 					end)
 				end
 			}
 		}
 	end,
-	[Enums.ProfileActions.AddTrustedConnection] = if not FFlagProfilePlatformAddTC then nil else function(p2) -- line: 51
-		-- upvalues: Enums (copy), ProfileTypes (copy), EventNames (copy), AppPage (copy), Sources (copy), refreshProfilePlatformActionInfo (copy)
+	[Enums.ProfileActions.AddTrustedConnection] = FFlagProfilePlatformAddTC and function(data)
 		return {
-			text = p2.localized[Enums.ProfileActions.AddTrustedConnection],
+			text = data.localized[Enums.ProfileActions.AddTrustedConnection],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 55
-					-- upvalues: p2 (copy), EventNames (copy), AppPage (copy), Sources (copy), refreshProfilePlatformActionInfo (copy)
-					p2.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonAddTrustedConnection, {
-						buttonSurface = p2.buttonSurface
+				[ProfileTypes.User] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonAddTrustedConnection, {
+						buttonSurface = data.buttonSurface
 					})
-					p2.navigation.push(AppPage.TrustedContactsModal, {
-						props = {
-							userId = p2.profileId,
-							source = Sources.ProfilePlatform,
-							onRequestSent = function() -- line: 63
-								-- upvalues: p2 (copy), refreshProfilePlatformActionInfo (copy)
-								return p2.dispatch(refreshProfilePlatformActionInfo(p2.profileId, p2.actionsComponentRequest))
-							end
-						}
-					})
+
+					local props = {
+						userId = data.profileId,
+						source = Sources.ProfilePlatform,
+						onRequestSent = function()
+							return data.dispatch(refreshProfilePlatformActionInfo(
+								data.profileId,
+								data.actionsComponentRequest
+							))
+						end
+					}
+
+					if
+						FFlagProfileTFCardUseQrScanContext
+						and data.profileWrapperContext.sourceInfo.source == Enums.Sources.QrCode
+					then
+						props.sentFromQrCode = true
+					end
+
+					data.navigation.push(AppPage.TrustedContactsModal, { props = props })
 				end
 			}
 		}
-	end,
-	[Enums.ProfileActions.AddTrustedConnectionViaLink] = function(p3) -- line: 79
-		-- upvalues: Enums (copy), ProfileTypes (copy), EventNames (copy), Sources (copy), AppPage (copy), refreshProfilePlatformActionInfo (copy)
+	end or nil,
+	[Enums.ProfileActions.AddTrustedConnectionViaLink] = not FFlagFixTFLinksVRGating and function(data)
 		return {
-			text = p3.localized[Enums.ProfileActions.AddTrustedConnection],
+			text = data.localized[Enums.ProfileActions.AddTrustedConnection],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 83
-					-- upvalues: p3 (copy), EventNames (copy), Sources (copy), AppPage (copy), refreshProfilePlatformActionInfo (copy)
-					p3.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonAddTrustedConnection, {
-						buttonSurface = p3.buttonSurface,
+				[ProfileTypes.User] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonAddTrustedConnection, {
+						buttonSurface = data.buttonSurface,
 						modalVariantOverride = Sources.ShareLinkSender
 					})
-					p3.navigation.push(AppPage.TrustedContactsModal, {
+
+					data.navigation.push(AppPage.TrustedContactsModal, {
 						props = {
-							userId = p3.profileId,
+							userId = data.profileId,
 							source = Sources.ProfilePlatform,
 							modalVariantOverride = Sources.ShareLinkSender,
-							onRequestSent = function() -- line: 93
-								-- upvalues: p3 (copy), refreshProfilePlatformActionInfo (copy)
-								return p3.dispatch(refreshProfilePlatformActionInfo(p3.profileId, p3.actionsComponentRequest))
+							onRequestSent = function()
+								return data.dispatch(refreshProfilePlatformActionInfo(
+									data.profileId,
+									data.actionsComponentRequest
+								))
 							end
 						}
 					})
 				end
 			}
 		}
-	end,
-	[Enums.ProfileActions.AddIncomingTrustedConnection] = if not FFlagProfilePlatformAddTC then nil else function(p4) -- line: 106
-		-- upvalues: Enums (copy), ProfileTypes (copy), EventNames (copy), AppPage (copy), refreshProfilePlatformActionInfo (copy)
+	end or FFlagProfilePlatformAddTC and function(data)
 		return {
-			text = p4.localized[Enums.ProfileActions.AddIncomingTrustedConnection],
+			text = data.localized[Enums.ProfileActions.AddTrustedConnection],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 110
-					-- upvalues: p4 (copy), EventNames (copy), AppPage (copy), refreshProfilePlatformActionInfo (copy)
-					p4.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonAddIncomingTrustedConnection, {
-						buttonSurface = p4.buttonSurface
+				[ProfileTypes.User] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonAddTrustedConnection, {
+						buttonSurface = data.buttonSurface,
+						modalVariantOverride = Sources.ShareLinkSender
 					})
-					p4.navigation.push(AppPage.TrustedContactsModal, {
+
+					local props = {
+						userId = data.profileId,
+						source = Sources.ProfilePlatform,
+						modalVariantOverride = Sources.ShareLinkSender,
+						onRequestSent = function()
+							return data.dispatch(refreshProfilePlatformActionInfo(
+								data.profileId,
+								data.actionsComponentRequest
+							))
+						end
+					}
+
+					if
+						FFlagProfileTFCardUseQrScanContext
+						and data.profileWrapperContext.sourceInfo.source == Enums.Sources.QrCode
+					then
+						props.sentFromQrCode = true
+					end
+
+					data.navigation.push(AppPage.TrustedContactsModal, { props = props })
+				end
+			}
+		}
+	end or nil,
+	[Enums.ProfileActions.AddIncomingTrustedConnection] = FFlagProfilePlatformAddTC and function(data)
+		return {
+			text = data.localized[Enums.ProfileActions.AddIncomingTrustedConnection],
+			onActivated = {
+				[ProfileTypes.User] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonAddIncomingTrustedConnection, {
+						buttonSurface = data.buttonSurface
+					})
+
+					data.navigation.push(AppPage.TrustedContactsModal, {
 						props = {
-							userId = p4.profileId,
-							onRequestAccepted = function() -- line: 120
-								-- upvalues: p4 (copy), refreshProfilePlatformActionInfo (copy)
-								return p4.dispatch(refreshProfilePlatformActionInfo(p4.profileId, p4.actionsComponentRequest))
+							userId = data.profileId,
+							onRequestAccepted = function()
+								return data.dispatch(refreshProfilePlatformActionInfo(
+									data.profileId,
+									data.actionsComponentRequest
+								))
 							end
 						}
 					})
 				end
 			}
 		}
-	end,
-	[Enums.ProfileActions.PendingTrustedConnection] = if not FFlagProfilePlatformAddTC then nil else function(p5) -- line: 137
-		-- upvalues: Enums (copy), ProfileTypes (copy)
+	end or nil,
+	[Enums.ProfileActions.PendingTrustedConnection] = FFlagProfilePlatformAddTC and function(p)
 		return {
+			text = p.localized[Enums.ProfileActions.AddTrustedConnection],
 			isDisabled = true,
-			text = p5.localized[Enums.ProfileActions.AddTrustedConnection],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 142
-				end
+				[ProfileTypes.User] = function() end
 			}
 		}
-	end,
-	[Enums.ProfileActions.PendingIncomingTrustedConnection] = if not FFlagPendingIncomingTrustedConnection then nil else function(p6) -- line: 149
-		-- upvalues: Enums (copy), ProfileTypes (copy)
+	end or nil,
+	[Enums.ProfileActions.PendingIncomingTrustedConnection] = function(p)
 		return {
+			text = p.localized[Enums.ProfileActions.AddIncomingTrustedConnection],
 			isDisabled = true,
-			text = p6.localized[Enums.ProfileActions.AddIncomingTrustedConnection],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 154
-				end
+				[ProfileTypes.User] = function() end
 			}
 		}
 	end

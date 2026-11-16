@@ -1,1 +1,3 @@
-return (require(script.InternalInput))
+local InternalInput = require(script.InternalInput)
+
+return InternalInput

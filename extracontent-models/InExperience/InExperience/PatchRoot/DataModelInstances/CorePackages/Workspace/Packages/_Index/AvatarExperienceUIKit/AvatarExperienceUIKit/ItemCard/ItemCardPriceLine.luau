@@ -1,149 +1,193 @@
 local AvatarExperienceUIKit = script:FindFirstAncestor("AvatarExperienceUIKit")
-local AvatarExperienceUIKitParent = AvatarExperienceUIKit.Parent
-local React = require(AvatarExperienceUIKitParent.React)
-local Foundation = require(AvatarExperienceUIKitParent.Foundation)
-local AvatarExperienceFlags = require(AvatarExperienceUIKitParent.AvatarExperienceFlags)
-local FoundationText = Foundation.Text
+local parent = AvatarExperienceUIKit.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local Text = Foundation.Text
 local Icon = Foundation.Icon
 local Badge = Foundation.Badge
 local IconSize = Foundation.Enums.IconSize
 local BadgeVariant = Foundation.Enums.BadgeVariant
 local useTokens = Foundation.Hooks.useTokens
-local useDesignTokens = require(AvatarExperienceUIKitParent.Style).useDesignTokens
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+
 local getLocalizedPrice = require(AvatarExperienceUIKit.ItemCard.Utils.getLocalizedPrice)
+
 local FFlagAXDurablesFooter = AvatarExperienceFlags.FFlagAXDurablesFooter
-local FFlagAXMISEnableMultiShopping = AvatarExperienceFlags.FFlagAXMISEnableMultiShopping
-local FFlagAXEnableIaBTimedOptionsBulkPurchase = AvatarExperienceFlags.FFlagAXEnableIaBTimedOptionsBulkPurchase
 
-local function renderIconTextPair(t1: {[any]: any}) -- line: 88
-	-- upvalues: React (copy), Icon (copy), IconSize (copy), FoundationText (copy)
-	local t2 = {}
+local function renderIconTextPair(props)
+	local children = {}
 
-	if t1.iconName then
-		t2[t1.iconKey] = React.createElement(Icon, {
-			name = t1.iconName,
-			style = t1.resolvedColorStyle,
+	if props.iconName then
+		children[props.iconKey] = React.createElement(Icon, {
+			name = props.iconName,
+			style = props.resolvedColorStyle,
 			size = IconSize.Small,
-			LayoutOrder = t1.iconLayoutOrder,
-			testId = t1.iconKey
+			LayoutOrder = props.iconLayoutOrder,
+			testId = props.iconKey
 		})
 	end
 
-	t2[t1.textKey] = React.createElement(FoundationText, {
-		textStyle = t1.resolvedColorStyle,
-		fontStyle = t1.tokens.Typography.BodyMedium,
-		LayoutOrder = t1.textLayoutOrder,
-		Text = t1.text,
+	children[props.textKey] = React.createElement(Text, {
+		textStyle = props.resolvedColorStyle,
+		fontStyle = props.tokens.Typography.BodyMedium,
+		LayoutOrder = props.textLayoutOrder,
+		Text = props.text,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Center,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		TextTruncate = Enum.TextTruncate.SplitWord
 	})
 
-	return t2
+	return children
 end
-local function renderContentChildren(t3: {[any]: any}, s1: string, n1: number, n2: number, p1, p2, p3) -- line: 115
-	-- upvalues: getLocalizedPrice (copy), renderIconTextPair (copy)
-	local s2 = nil
-	local v30, s3, s4
 
-	if t3.type == "price" then
-		s2 = "robux"
-		v30 = getLocalizedPrice(t3.price)
-		s3 = "RobuxIcon"
-		s4 = "Amount"
-	elseif t3.type == "timedOption" then
-		s2 = t3.icon
-		v30 = t3.text
-		s3 = "TimedOptionIcon"
-		s4 = "TimedOptionText"
+local function renderContentChildren(content, p: string, textLayoutOrder: number, p2: number, resolvedColorStyle, tokens, designTokens)
+	local iconName = nil
+	local text, v, v2
+
+	if content.type == "price" then
+		text = getLocalizedPrice(content.price)
+		iconName = "robux"
+		v = "RobuxIcon"
+		v2 = "Amount"
+	elseif content.type == "timedOption" then
+		iconName = content.icon
+		text = content.text
+		v = "TimedOptionIcon"
+		v2 = "TimedOptionText"
 	else
-		if t3.type ~= "text" then
+		if content.type ~= "text" then
 			return {}
 		end
 
-		v30 = t3.text
-		s3 = "Text"
-		s4 = "Text"
+		text = content.text
+		v = "Text"
+		v2 = "Text"
 	end
 
-	return (renderIconTextPair({
-		iconName = s2,
-		text = v30,
-		iconKey = `{ s1 }{ s3 }`,
-		textKey = `{ s1 }{ s4 }`,
-		iconLayoutOrder = n1,
-		textLayoutOrder = if not s2 then n1 else n2,
-		resolvedColorStyle = p1,
-		tokens = p2,
-		designTokens = p3
-	}))
+	local v3 = {
+		iconName = iconName,
+		text = text,
+		iconKey = `{p}{v}`,
+		textKey = `{p}{v2}`,
+		iconLayoutOrder = textLayoutOrder,
+		textLayoutOrder = 0,
+		resolvedColorStyle = 0,
+		tokens = 0,
+		designTokens = 0
+	}
+
+	if iconName then
+		textLayoutOrder = p2
+	end
+
+	v3.textLayoutOrder = textLayoutOrder
+	v3.resolvedColorStyle = resolvedColorStyle
+	v3.tokens = tokens
+	v3.designTokens = designTokens
+	return renderIconTextPair(v3)
 end
-local function ItemCardPriceLine(t4: {[any]: any}) -- line: 160
-	-- upvalues: useTokens (copy), useDesignTokens (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), React (copy), Badge (copy), BadgeVariant (copy), FFlagAXMISEnableMultiShopping (copy), IconSize (copy), FFlagAXDurablesFooter (copy), renderContentChildren (copy), Icon (copy), FoundationText (copy), getLocalizedPrice (copy)
-	local v34 = useTokens()
-	local v35 = useDesignTokens()
 
-	if FFlagAXEnableIaBTimedOptionsBulkPurchase and t4.content.type == "badge" then
-		return (React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			LayoutOrder = t4.LayoutOrder
-		}, {
-			Padding = React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v34.Padding.XSmall)
-			}),
-			Badge = React.createElement(Badge, {
-				text = t4.content.text,
-				variant = BadgeVariant.Neutral,
-				Position = UDim2.new(0, 0, 0, -v34.Gap.XXSmall)
-			})
-		}))
+local function ItemCardPriceLine(p)
+	local tokens = useTokens()
+	local designTokens = useDesignTokens()
+
+	if p.content.type == "badge" then
+		return (React.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				LayoutOrder = p.LayoutOrder
+			},
+			{
+				Padding = React.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, tokens.Padding.XSmall)
+				}),
+				Badge = React.createElement(Badge, {
+					text = p.content.text,
+					variant = BadgeVariant.Neutral,
+					Position = UDim2.new(0, 0, 0, -tokens.Gap.XXSmall)
+				})
+			}
+		))
 	end
 
-	local v36 = if not t4.content or not t4.content.colorStyle then v34.Color.Content.Emphasis else t4.content.colorStyle
-	local v37 = if not FFlagAXMISEnableMultiShopping or (not t4.content or not t4.content.iconSize) then IconSize.Small else t4.content.iconSize
-	local v38 = if not FFlagAXMISEnableMultiShopping or (not t4.content or not t4.content.fontStyle) then v34.Typography.BodyMedium else t4.content.fontStyle
+	local v
 
-	if FFlagAXDurablesFooter and t4.content.type == "multi" then
-		local content = t4.content
-		local t5 = {
+	if p.content and p.content.colorStyle then
+		v = p.content.colorStyle
+	else
+		v = tokens.Color.Content.Emphasis
+	end
+
+	local size
+
+	if p.content and p.content.iconSize then
+		size = p.content.iconSize
+	else
+		size = IconSize.Small
+	end
+
+	local fontStyle
+
+	if p.content and p.content.fontStyle then
+		fontStyle = p.content.fontStyle
+	else
+		fontStyle = tokens.Typography.BodyMedium
+	end
+
+	if FFlagAXDurablesFooter and p.content.type == "multi" then
+		local content = p.content
+		local children = {
 			ItemCardPriceLineLayout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
 				HorizontalAlignment = Enum.HorizontalAlignment.Left,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
-				Padding = UDim.new(0, v34.Gap.XXSmall)
+				Padding = UDim.new(0, tokens.Gap.XXSmall)
 			})
 		}
-		local n3 = 1
+		local total = 1
 
-		for v42, v43 in content.contents do
-			if v42 > 1 then
-				t5[`priceLineSpacer{ v42 }`] = React.createElement("Frame", {
+		for k, content2 in content.contents do
+			if k > 1 then
+				children[`priceLineSpacer{k}`] = React.createElement("Frame", {
 					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(v34.Gap.XSmall, 0),
-					LayoutOrder = n3
+					Size = UDim2.fromOffset(tokens.Gap.XSmall, 0),
+					LayoutOrder = total
 				})
-				n3 += 1
+
+				total += 1
 			end
 
-			if FFlagAXEnableIaBTimedOptionsBulkPurchase and v43.type == "badge" then
-				t5[`priceLine{ v42 }Badge`] = React.createElement(Badge, {
-					text = v43.text,
+			if content2.type == "badge" then
+				children[`priceLine{k}Badge`] = React.createElement(Badge, {
+					text = content2.text,
 					variant = BadgeVariant.Neutral,
-					Position = UDim2.new(0, 0, 0, -v34.Gap.XXSmall)
+					Position = UDim2.new(0, 0, 0, -tokens.Gap.XXSmall)
 				})
-				n3 += 1
-			else
-				local v44 = if not v43.colorStyle then v34.Color.Content.Emphasis else v43.colorStyle
 
-				for v45, v46 in (renderContentChildren(v43, `priceLine{ v42 }`, n3, n3 + 1, v44, v34, v35)) do
-					t5[v45] = v46
+				total += 1
+			else
+				local v2
+
+				if content2.colorStyle then
+					v2 = content2.colorStyle
+				else
+					v2 = tokens.Color.Content.Emphasis
 				end
 
-				n3 += 2
+				local v3 = renderContentChildren(content2, `priceLine{k}`, total, total + 1, v2, tokens, designTokens)
+
+				for k2, v4 in v3 do
+					children[k2] = v4
+				end
+
+				total += 2
 			end
 		end
 
@@ -152,42 +196,63 @@ local function ItemCardPriceLine(t4: {[any]: any}) -- line: 160
 			BorderSizePixel = 0,
 			AutomaticSize = Enum.AutomaticSize.Y,
 			Size = UDim2.fromScale(1, 0),
-			LayoutOrder = t4.LayoutOrder
-		}, t5)
-	end
+			LayoutOrder = p.LayoutOrder
+		}, children)
+	else
+		local createElement = React.createElement
+		local v2 = {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.fromScale(1, 0),
+			LayoutOrder = p.LayoutOrder
+		}
+		local v3 = {
+			ItemCardPriceLineLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, tokens.Gap.XXSmall)
+			}),
+			ItemCardPriceLineRobuxIcon = 0,
+			ItemCardPriceLineAmount = 0
+		}
+		local itemCardPriceLineRobuxIcon
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.fromScale(1, 0),
-		LayoutOrder = t4.LayoutOrder
-	}, {
-		ItemCardPriceLineLayout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v34.Gap.XXSmall)
-		}),
-		ItemCardPriceLineRobuxIcon = if t4.content.type ~= "price" then nil else React.createElement(Icon, {
-			name = "robux",
-			LayoutOrder = 1,
-			testId = "priceLineRobuxIcon",
-			style = v36,
-			size = v37
-		}),
-		ItemCardPriceLineAmount = React.createElement(FoundationText, {
+		if p.content.type == "price" then
+			itemCardPriceLineRobuxIcon = React.createElement(Icon, {
+				name = "robux",
+				style = v,
+				size = size,
+				LayoutOrder = 1,
+				testId = "priceLineRobuxIcon"
+			})
+		end
+
+		v3.ItemCardPriceLineRobuxIcon = itemCardPriceLineRobuxIcon
+
+		local createElement2 = React.createElement
+		local text
+
+		if p.content.type == "price" then
+			text = getLocalizedPrice(p.content.price)
+		else
+			text = p.content.text
+		end
+
+		v3.ItemCardPriceLineAmount = createElement2(Text, {
+			textStyle = v,
+			fontStyle = fontStyle,
 			LayoutOrder = 2,
-			textStyle = v36,
-			fontStyle = v38,
-			Text = if t4.content.type ~= "price" then t4.content.text else getLocalizedPrice(t4.content.price),
+			Text = text,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center,
 			AutomaticSize = Enum.AutomaticSize.XY,
 			TextTruncate = Enum.TextTruncate.SplitWord
 		})
-	})
+		return createElement("Frame", v2, v3)
+	end
 end
 
 if AvatarExperienceFlags.FFlagAXItemCardComponentsMemo then

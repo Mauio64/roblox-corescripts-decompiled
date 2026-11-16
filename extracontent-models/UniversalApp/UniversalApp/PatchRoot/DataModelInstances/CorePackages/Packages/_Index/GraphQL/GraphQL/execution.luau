@@ -1,8 +1,9 @@
 local execute = require(script.execute)
 local values = require(script.values)
 
+local Path = require(script.Parent.jsutils.Path)
 return {
-	responsePathAsArray = require(script.Parent.jsutils.Path).pathToArray,
+	responsePathAsArray = Path.pathToArray,
 	execute = execute.execute,
 	executeSync = execute.executeSync,
 	defaultFieldResolver = execute.defaultFieldResolver,

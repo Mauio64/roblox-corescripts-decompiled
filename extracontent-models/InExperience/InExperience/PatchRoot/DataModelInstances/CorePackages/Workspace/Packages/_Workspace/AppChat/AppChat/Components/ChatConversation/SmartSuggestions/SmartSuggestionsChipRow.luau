@@ -1,74 +1,57 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local Types = require(script.Parent.Types)
-local useSmartSuggestions = require(script.Parent.useSmartSuggestions)
-local Chip = Foundation.Chip
+
+local ChipGroup = Foundation.ChipGroup
+local ChipGroupVariant = Foundation.Enums.ChipGroupVariant
 local ChipSize = Foundation.Enums.ChipSize
-local useTokens = Foundation.Hooks.useTokens
+local Divider = Foundation.Divider
+local View = Foundation.View
+
 local SuggestionType = Types.SuggestionType
-local t1 = {
+
+local v = {
 	[SuggestionType.GameCard] = Foundation.Enums.IconName.Controller,
 	[SuggestionType.StartParty] = Foundation.Enums.IconName.ThreePeople
 }
 
-local function attachGrowFlexItem(p1) -- line: 43
-	if p1 ~= nil and p1:FindFirstChildOfClass("UIFlexItem") == nil then
-		local UIFlexItem = Instance.new("UIFlexItem")
+local function SmartSuggestionsChipRow(props)
+	local chips = {}
 
-		UIFlexItem.FlexMode = Enum.UIFlexMode.Grow
-		UIFlexItem.Parent = p1
-	end
-end
-local function SmartSuggestionsChipRow(t2: {[any]: any}) -- line: 51
-	-- upvalues: useTokens (copy), useSmartSuggestions (copy), React (copy), Chip (copy), t1 (copy), ChipSize (copy), attachGrowFlexItem (copy), Foundation (copy)
-	local v16 = useTokens()
-	local v17 = useSmartSuggestions(t2.conversationId, t2.sendMessage, t2.sendGameLinkChatMessage)
-	local v18 = t2.suggestions or v17.suggestions
-	local hiddenSuggestions = v17.hiddenSuggestions
-	local onActivated = v17.onActivated
-	local t3 = {}
-	local v22 = false
-
-	for v23, v24 in v18 do
-		local v25 = hiddenSuggestions[v24] == true
-
-		v22 = v22 or not v25
-		t3[`chip_{ v23 }`] = React.createElement(Chip, {
-			text = v24.display_text,
-			leading = t1[v24.type],
-			size = ChipSize.Large,
-			LayoutOrder = v23,
-			Visible = not v25,
-			ref = attachGrowFlexItem,
-			onActivated = function() -- line: 70
-				-- upvalues: onActivated (copy), v24 (copy)
-				onActivated(v24)
+	for k, suggestion in props.suggestions do
+		chips[k] = {
+			text = suggestion.display_text,
+			leading = v[suggestion.type],
+			onActivated = function()
+				props.onActivated(suggestion)
 			end
-		})
-	end
-
-	if not v22 then
-		return nil
-	end
-
-	return React.createElement(Foundation.ScrollView, {
-		tag = "size-full-0 auto-y",
-		LayoutOrder = t2.LayoutOrder,
-		layout = {
-			FillDirection = Enum.FillDirection.Horizontal,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v16.Gap.Small),
-			SortOrder = Enum.SortOrder.LayoutOrder
-		},
-		scroll = {
-			ScrollingDirection = Enum.ScrollingDirection.X,
-			AutomaticCanvasSize = Enum.AutomaticSize.X,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			CanvasSize = UDim2.new(),
-			scrollBarVisibility = Foundation.Enums.Visibility.None
 		}
-	}, t3)
+	end
+
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = props.LayoutOrder,
+			tag = "col gap-small size-full-0 auto-y clip",
+			testId = "SmartSuggestionsChipRow--clip"
+		},
+		{
+			Divider = React.createElement(Divider, {
+				LayoutOrder = 1,
+				testId = "SmartSuggestionsChipRow--divider"
+			}),
+			ChipGroup = React.createElement(ChipGroup, {
+				chips = chips,
+				LayoutOrder = 2,
+				size = ChipSize.Medium,
+				variant = ChipGroupVariant.Row,
+				testId = "SmartSuggestionsChipRow"
+			})
+		}
+	)
 end
 
 return React.memo(SmartSuggestionsChipRow)

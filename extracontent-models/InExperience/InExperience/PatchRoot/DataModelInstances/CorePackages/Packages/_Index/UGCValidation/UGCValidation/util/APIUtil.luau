@@ -1,57 +1,48 @@
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local ContentProvider = game:GetService("ContentProvider")
-local t1 = {
-	getBaseDomain = function() -- line: 10
-		-- upvalues: ContentProvider (copy)
-		local BaseUrl = ContentProvider.BaseUrl
 
-		if string.sub(BaseUrl, #BaseUrl) ~= "/" then
-			BaseUrl ..= "/"
-		end
+local APIUtil = {}
 
-		local _, stop = string.find(BaseUrl, "://")
-		local _, stop2 = string.find(BaseUrl, "%.", stop + 1)
+function APIUtil.getBaseDomain()
+	local v = ContentProvider.BaseUrl
 
-		return (string.sub(BaseUrl, stop2 + 1))
-	end
-}
-
-local function requestAndRetry(p1: ((...any) -> ...any), n1: number?) -- line: 21
-	-- upvalues: requestAndRetry (copy)
-	if n1 == nil then
-		n1 = 0
+	if string.sub(v, #v) ~= "/" then
+		v ..= "/"
 	end
 
-	local ok, result = pcall(p1)
+	local _, v2 = string.find(v, "://")
+	local _, v3 = string.find(v, "%.", v2 + 1)
+	return (string.sub(v, v3 + 1))
+end
 
-	if ok then
+local function requestAndRetry(fn, p: number?)
+	local v = p == nil and 0 or p
+
+	local success, result = pcall(fn)
+
+	if success then
 		return true, result
 	end
 
-	if n1 >= 2 then
+	if v >= 2 then
 		return false, result
 	end
 
-	local v14 = 2 ^ (n1 - 1)
-
-	wait(v14)
-
-	return requestAndRetry(p1, n1 + 1)
+	local v2 = 2 ^ (v - 1)
+	wait(v2)
+	return requestAndRetry(fn, v + 1)
 end
 
-function t1.requestAndRetryPost(p2, p3) -- line: 39
-	-- upvalues: requestAndRetry (copy), HttpRbxApiService (copy)
-	return requestAndRetry(function() -- line: 40
-		-- upvalues: HttpRbxApiService (copy), p2 (copy), p3 (copy)
-		return HttpRbxApiService:PostAsyncFullUrl(p2, p3)
-	end)
-end
-function t1.requestAndRetryGet(p4) -- line: 45
-	-- upvalues: requestAndRetry (copy), HttpRbxApiService (copy)
-	return requestAndRetry(function() -- line: 46
-		-- upvalues: HttpRbxApiService (copy), p4 (copy)
-		return HttpRbxApiService:GetAsyncFullUrl(p4)
+function APIUtil.requestAndRetryPost(p, p2)
+	return requestAndRetry(function()
+		return HttpRbxApiService:PostAsyncFullUrl(p, p2)
 	end)
 end
 
-return t1
+function APIUtil.requestAndRetryGet(p)
+	return requestAndRetry(function()
+		return HttpRbxApiService:GetAsyncFullUrl(p)
+	end)
+end
+
+return APIUtil

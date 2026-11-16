@@ -1,17 +1,17 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 
 return (LuauPolyfill.Object.assign({}, LuauPolyfill.Object, {
-	getPrototypeOf = function(p1) -- line: 12
-		local mt = getmetatable(p1)
+	getPrototypeOf = function(p)
+		local metatable = getmetatable(p)
 
-		return mt ~= false and mt or nil
-	end,
-	create = function(p2, p3) -- line: 16
-		if p3 == nil then
-			p3 = {}
+		if metatable == false or not metatable then
+			metatable = nil
 		end
 
-		return (setmetatable(p3, p2))
+		return metatable
+	end,
+	create = function(p, p2)
+		return (setmetatable(p2 == nil and {} or p2, p))
 	end
 }))

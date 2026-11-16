@@ -1,10 +1,9 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
 
 require(DataHydration.DataHydrationTypes)
-require(DataHydrationParent.Signals)
-
-local t = require(DataHydrationParent.t)
+require(parent.Signals)
+local t = require(parent.t)
 
 return {
 	followingResponseValidator = t.interface({

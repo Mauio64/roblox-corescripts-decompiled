@@ -1,5 +1,1 @@
-return {
-	Hover = "Hover",
-	Selection = "Selection",
-	Viewport = "Viewport"
-}
+return { Hover = "Hover", Selection = "Selection", Viewport = "Viewport" }

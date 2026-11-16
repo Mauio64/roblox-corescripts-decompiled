@@ -1,16 +1,17 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
-local React = require(ParentParent2.React)
-local StatGroup = require(ParentParent.Indicator.StatGroup)
-local FooterFrame = require(scriptParent.FooterFrame)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent.Parent
 
-local function SocialProofFooter(p1) -- line: 19
-	-- upvalues: React (copy), FooterFrame (copy), StatGroup (copy)
-	return React.createElement(FooterFrame, p1, {
+local React = require(parent3.React)
+
+local StatGroup = require(parent2.Indicator.StatGroup)
+local FooterFrame = require(parent.FooterFrame)
+
+local function SocialProofFooter(p)
+	return React.createElement(FooterFrame, p, {
 		Stats = React.createElement(StatGroup, {
-			ratingText = p1.ratingText,
-			playingText = p1.playingText
+			ratingText = p.ratingText,
+			playingText = p.playingText
 		})
 	})
 end

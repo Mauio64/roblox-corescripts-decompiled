@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.Memory.Memory))
+local Memory = require(Workspace.Memory.Memory)
+
+return Memory

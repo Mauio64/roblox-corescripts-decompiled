@@ -1,27 +1,29 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local ConversationOverlay = require(AppChatParent.AppChatNetworking).Constants.ConversationOverlay
+local parent = AppChat.Parent
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local ConversationOverlay = AppChatNetworking.Constants.ConversationOverlay
 local Logger = require(AppChat.Logger)
 local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local FFlagAppChatEnableDoubleOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableDoubleOptIn
-local t1 = {
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+local set = {
 	[ConversationOverlay.TrustedConnectionCreated] = true,
-	[ConversationOverlay.AddTrustedConnectionU18] = FFlagAppChatEnableDoubleOptIn,
-	[ConversationOverlay.TrustedConnectionRequestU18] = FFlagAppChatEnableDoubleOptIn
+	[ConversationOverlay.AddTrustedConnectionU18] = true,
+	[ConversationOverlay.TrustedConnectionRequestU18] = true
 }
 
-return function(s1: string) -- line: 20
-	-- upvalues: useSelector (copy), getDeepValue2 (copy), t1 (copy), ConversationOverlay (copy), Logger (copy)
-	local v10 = useSelector(function(p1) -- line: 21
-		-- upvalues: getDeepValue2 (copy), s1 (copy)
-		return getDeepValue2(p1, `ChatAppReducer.Modals.conversationOverlays.{ s1 }.modal_variant`) or ""
+return function(p: string)
+	local v = useSelector(function(p2)
+		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationOverlays.{p}.modal_variant`) or ""
 	end)
-	local v11 = t1[v10]
 
-	if not v11 and (v10 ~= ConversationOverlay.None and v10 ~= "") then
-		Logger:warning(`Unsupported ConversationOverlay modal variant: { v10 } for conversationId: { s1 }`)
+	local v2 = set[v]
+
+	if not v2 and v ~= ConversationOverlay.None and v ~= "" then
+		Logger:warning(`Unsupported ConversationOverlay modal variant: {v} for conversationId: {p}`)
 	end
 
-	return not not v11
+	return v2 and true or false
 end

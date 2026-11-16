@@ -1,15 +1,15 @@
-return function(p1) -- line: 4
+return function(items)
 	local self = setmetatable({}, {
-		__index = function(p2, p3) -- line: 6
-			return (rawget(p2, p3:lower()))
+		__index = function(p, value)
+			return (rawget(p, value:lower()))
 		end,
-		__newindex = function(p4, p5, p6) -- line: 9
-			rawset(p4, p5:lower(), p6)
+		__newindex = function(p, value, p2)
+			rawset(p, value:lower(), p2)
 		end
 	})
 
-	for k, v in pairs(p1) do
-		self[k] = v
+	for k, item in pairs(items) do
+		self[k] = item
 	end
 
 	return self

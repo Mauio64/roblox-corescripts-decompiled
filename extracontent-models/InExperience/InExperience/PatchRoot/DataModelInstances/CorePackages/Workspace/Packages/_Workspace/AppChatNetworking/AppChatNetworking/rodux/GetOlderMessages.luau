@@ -1,14 +1,16 @@
 local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
-local AppChatNetworkingParent = AppChatNetworking.Parent
+local parent = AppChatNetworking.Parent
 local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
-local RoduxNetworking = require(script.Parent.RoduxNetworking)
-local GetFFlagEnableSocialCards = require(AppChatNetworkingParent.SharedFlags).GetFFlagEnableSocialCards
 
-return RoduxNetworking.GET(script.Name, function(p1, p2, p3) -- line: 16
-	-- upvalues: CHAT_PLATFORM_BASE_URL (copy), GetFFlagEnableSocialCards (copy)
-	return p1(CHAT_PLATFORM_BASE_URL):path("v1"):path("get-conversation-messages"):queryArgs({
-		conversation_id = p2,
-		cursor = p3,
-		include_cards = not not GetFFlagEnableSocialCards()
-	}):setStatusIds({ p2 })
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnableSocialCards = SharedFlags.GetFFlagEnableSocialCards
+
+return RoduxNetworking.GET(script.Name, function(callback, conversation_id, cursor)
+	return callback(CHAT_PLATFORM_BASE_URL):path("v1"):path("get-conversation-messages"):queryArgs({
+		conversation_id = conversation_id,
+		cursor = cursor,
+		include_cards = GetFFlagEnableSocialCards() and true or false
+	}):setStatusIds({ conversation_id })
 end)

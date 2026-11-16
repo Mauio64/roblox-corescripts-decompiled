@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local ChatConversationTelemetryLayer = require(Workspace.AppChat.AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
 
-return (require(_Workspace.AppChat.AppChat.Telemetry.Layers.ChatConversationTelemetryLayer))
+return ChatConversationTelemetryLayer

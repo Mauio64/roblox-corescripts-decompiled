@@ -1,5 +1,4 @@
 local Components = script.Components
-
 require(script.Types)
 require(Components.InlineLayout)
 require(Components.InlineLayout.InlineLayoutElements.RenderableInlineElement)

@@ -1,16 +1,22 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local ExperienceQuestionnaire = require(Parent.DataHydration.ExperienceQuestionnaire)
-local Game = require(Parent.DataHydration).Game
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
+
+local DataHydration = require(parent.DataHydration)
+local Game = DataHydration.Game
 local refreshPublishEligibility = require(script.Parent.refreshPublishEligibility)
+local refreshAdCampaignEligibility = require(script.Parent.refreshAdCampaignEligibility)
+local FFlagEnableBuildAdPromotion = require(BuildExperience.Flags.FFlagEnableBuildAdPromotion)
 
-local function rehydrateGameMetadata(n1: number) -- line: 7
-	-- upvalues: Game (copy), refreshPublishEligibility (copy), ExperienceQuestionnaire (copy)
-	local str = tostring(n1)
+local function rehydrateGameMetadata(p: number)
+	local v = tostring(p)
 
-	Game.getGameInfoStore().fetchGameInfo(str)
-	Game.getGameMediaStore().fetchGameMedia(str)
-	refreshPublishEligibility(n1)
-	ExperienceQuestionnaire.getExperienceQuestionnaireStore().fetchLatestSubmission(n1)
+	Game.getGameInfoStore().fetchGameInfo(v)
+	Game.getGameMediaStore().fetchGameMedia(v)
+	refreshPublishEligibility(p)
+
+	if FFlagEnableBuildAdPromotion then
+		refreshAdCampaignEligibility(p)
+	end
 end
 
 return rehydrateGameMetadata

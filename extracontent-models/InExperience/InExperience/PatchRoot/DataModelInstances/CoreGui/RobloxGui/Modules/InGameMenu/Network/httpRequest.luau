@@ -1,103 +1,74 @@
 local HttpService = game:GetService("HttpService")
+
 local Promise = require(script.Parent.Parent.Utility.Promise)
+
 local Extreme = Enum.ThrottlingPriority.Extreme
 local ApplicationJson = Enum.HttpContentType.ApplicationJson
 
-return function(p1) -- line: 9
-	-- upvalues: ApplicationJson (copy), Extreme (copy), Promise (copy), HttpService (copy)
-	local function doHttpPost(p2, p3) -- line: 11
-		-- upvalues: ApplicationJson (copy), Extreme (copy), p1 (copy)
-		assert(p3.postBody, "Expected a postBody to be specified with this request")
-		assert(type(p3.postBody) == "string", "Expected postBody to be a string")
+return function(object)
+	local function doHttpPost(value, state) -- 1 equivalent call inferred from this helper
+		assert(state.postBody, "Expected a postBody to be specified with this request")
+		assert(type(state.postBody) == "string", "Expected postBody to be a string")
 
-		if not p3.contentType then
-			p3.contentType = ApplicationJson
+		if not state.contentType then
+			state.contentType = ApplicationJson
 		end
 
-		if not p3.throttlingPriority then
-			p3.throttlingPriority = Extreme
+		if not state.throttlingPriority then
+			state.throttlingPriority = Extreme
 		end
 
-		return function() -- line: 23
-			-- upvalues: p1 (copy), p2 (copy), p3 (copy)
-			return p1:PostAsyncFullUrl(p2, p3.postBody, p3.throttlingPriority, p3.contentType)
-		end
-	end
-	local function doHttpGet(p4) -- line: 33
-		-- upvalues: p1 (copy), Extreme (copy)
-		return function() -- line: 34
-			-- upvalues: p1 (copy), p4 (copy), Extreme (copy)
-			return p1:GetAsyncFullUrl(p4, Extreme)
+		return function()
+			return object:PostAsyncFullUrl(value, state.postBody, state.throttlingPriority, state.contentType)
 		end
 	end
 
-	return function(p5, p6, p7) -- line: 47
-		-- upvalues: ApplicationJson (copy), Extreme (copy), p1 (copy), Promise (copy), HttpService (copy)
-		assert(type(p5) == "string", "Expected url to be a string")
-		assert(type(p6) == "string", "Expected requestMethod to be a string")
-		assert(not p7 or type(p7) == "table", "Expected options to be a table")
+	local function doHttpGet(value) -- 1 equivalent call inferred from this helper
+		return function()
+			return object:GetAsyncFullUrl(value, Extreme)
+		end
+	end
 
-		local v14 = string.upper(p6)
-		local u15 = nil
+	return function(value, value2, state)
+		assert(type(value) == "string", "Expected url to be a string")
+		assert(type(value2) == "string", "Expected requestMethod to be a string")
+		assert(not state or type(state) == "table", "Expected options to be a table")
+		local v = string.upper(value2)
 
-		if v14 == "POST" then
-			assert(p7.postBody, "Expected a postBody to be specified with this request")
-			assert(type(p7.postBody) == "string", "Expected postBody to be a string")
+		local v2 = nil
 
-			if not p7.contentType then
-				p7.contentType = ApplicationJson
-			end
-
-			if not p7.throttlingPriority then
-				p7.throttlingPriority = Extreme
-			end
-
-			function u15() -- line: 23
-				-- upvalues: p1 (copy), p5 (copy), p7 (copy)
-				return p1:PostAsyncFullUrl(p5, p7.postBody, p7.throttlingPriority, p7.contentType)
-			end
-		elseif v14 == "GET" then
-			function u15() -- line: 34
-				-- upvalues: p1 (copy), p5 (copy), Extreme (copy)
-				return p1:GetAsyncFullUrl(p5, Extreme)
-			end
+		if v == "POST" then
+			v2 = doHttpPost(value, state) -- inferred equivalent call
+		elseif v == "GET" then
+			v2 = doHttpGet(value) -- inferred equivalent call
 		else
-			error(string.format("Unsupported requestMethod : %s", v14 or "nil"))
+			error(string.format("Unsupported requestMethod : %s", v or "nil"))
 		end
 
-		return Promise.new(function(resolve, reject) -- line: 62
-			-- upvalues: u15 (ref), HttpService (copy)
-			if u15 then
-				coroutine.wrap(function() -- line: 64
-					-- upvalues: u15 (ref), HttpService (copy), resolve (copy), reject (copy)
-					local ok, result = pcall(u15)
+		return Promise.new(function(callback, callback2)
+			if v2 then
+				coroutine.wrap(function()
+					local success, result = pcall(v2)
 
-					if ok then
-						local ok2, result2 = pcall(function() -- line: 68
-							-- upvalues: HttpService (copy), result (copy)
-							return HttpService:JSONDecode(result)
-						end)
-
-						if ok2 then
-							resolve({
-								responseBody = result2
-							})
-
-							return
-						end
-
-						reject(result2)
+					if not success then
+						callback2(result)
 
 						return
 					end
 
-					reject(result)
+					local success2, result2 = pcall(function()
+						return HttpService:JSONDecode(result)
+					end)
+
+					if success2 then
+						callback({ responseBody = result2 })
+					else
+						callback2(result2)
+					end
 				end)()
-
-				return
+			else
+				callback2()
 			end
-
-			reject()
 		end)
 	end
 end

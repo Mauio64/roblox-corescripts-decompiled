@@ -1,30 +1,25 @@
-local Parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
+local parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
 
-require(Parent.Chrome)
+require(parent.Chrome)
+local React = require(parent.React)
 
-local React = require(Parent.React)
+local function useNotificationCount(object)
+	local state, setState = React.useState(not object:isEmpty())
+	local v, v2 = React.useBinding(object:get().value or 0)
 
-local function useNotificationCount(p1) -- line: 12
-	-- upvalues: React (copy)
-	local v5, v6 = React.useState(not p1:isEmpty())
-	local v7, v8 = React.useBinding(p1:get().value or 0)
-
-	React.useEffect(function() -- line: 16
-		-- upvalues: p1 (copy), v6 (copy), v8 (copy)
-		p1:connect(function(p2) -- line: 17
-			-- upvalues: p1 (copy), v6 (copy), v8 (copy)
-			if p1:isEmpty() then
-				v6(false)
-
+	React.useEffect(function()
+		object:connect(function(p)
+			if object:isEmpty() then
+				setState(false)
 				return
 			end
 
-			v8((math.min(p2.value, 99)))
-			v6(true)
+			v2((math.min(p.value, 99)))
+			setState(true)
 		end)
-	end, { p1 })
+	end, { object })
 
-	return v5, v7
+	return state, v
 end
 
 return useNotificationCount

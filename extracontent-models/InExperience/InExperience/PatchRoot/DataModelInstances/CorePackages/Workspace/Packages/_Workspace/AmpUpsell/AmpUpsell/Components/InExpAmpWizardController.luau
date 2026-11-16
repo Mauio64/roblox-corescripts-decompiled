@@ -1,151 +1,144 @@
 local AmpUpsell = script:FindFirstAncestor("AmpUpsell")
-local AmpUpsellParent = AmpUpsell.Parent
+local parent = AmpUpsell.Parent
+
 local HttpService = game:GetService("HttpService")
-local React = require(AmpUpsellParent.React)
-local ReactRoblox = require(AmpUpsellParent.ReactRoblox)
-local Roact = require(AmpUpsellParent.Roact)
-local SetScreenSize = require(AmpUpsellParent.InExperienceContainer).SetScreenSize
-local useDispatch = require(AmpUpsellParent.RoactUtils).Hooks.RoactRodux.useDispatch
 
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+local Roact = require(parent.Roact)
+
+local InExperienceContainer = require(parent.InExperienceContainer)
+local SetScreenSize = InExperienceContainer.SetScreenSize
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+require(AmpUpsell.Common.Types)
+local AppAmpWizardLaunchBridge = require(AmpUpsell.Common.AppAmpWizardLaunchBridge)
 require(AmpUpsell.Components.WizardContainer)
-
 local InExpWizardNavigator = require(AmpUpsell.Components.InExpWizardNavigator)
-local InExperienceProviderContainer = require(AmpUpsellParent.InExperienceContainer).InExperienceProviderContainer
+local InExperienceContainer2 = require(parent.InExperienceContainer)
+local InExperienceProviderContainer = InExperienceContainer2.InExperienceProviderContainer
 
 game:DefineFastString("DummyAMPWizardAccessResponse", "Granted")
 game:DefineFastString("DummyAMPWizardActionsTakenJSON", "{}")
-
 local GetFFlagEnableDummyAMPWizard = require(AmpUpsell.Flags.GetFFlagEnableDummyAMPWizard)
-local GetFFlagInExperienceContainerScreenSizeReducer = require(AmpUpsellParent.SharedFlags).GetFFlagInExperienceContainerScreenSizeReducer
-local GetFFlagMoveAmpUpsellOffNavigateDown = require(AmpUpsellParent.SharedFlags).GetFFlagMoveAmpUpsellOffNavigateDown
-local FFlagConnectionAmpUpsellOnLeave = require(AmpUpsellParent.SharedFlags).FFlagConnectionAmpUpsellOnLeave
-local v15 = game:DefineFastInt("InExpAmpWizardDisplayOrder", 6)
-local ApolloProvider = nil
 
-if FFlagConnectionAmpUpsellOnLeave then
-	ApolloProvider = require(AmpUpsellParent.ApolloClient).ApolloProvider
-end
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagInExperienceContainerScreenSizeReducer = SharedFlags.GetFFlagInExperienceContainerScreenSizeReducer
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagMoveAmpUpsellOffNavigateDown = SharedFlags2.GetFFlagMoveAmpUpsellOffNavigateDown
+local defineFastInt = game:DefineFastInt("InExpAmpWizardDisplayOrder", 6)
 
-local u17 = nil
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagRouteStandaloneAmpThroughUniversalApp = SharedFlags3.FFlagRouteStandaloneAmpThroughUniversalApp
 
-local function WizardScreenGui(p1) -- line: 35
-	-- upvalues: useDispatch (copy), v15 (copy), FFlagConnectionAmpUpsellOnLeave (copy), React (copy), Roact (copy), SetScreenSize (copy), InExpWizardNavigator (copy)
-	local v21 = useDispatch()
-	local v22 = v15
+local ApolloClient = require(parent.ApolloClient)
+local ApolloProvider = ApolloClient.ApolloProvider
 
-	if FFlagConnectionAmpUpsellOnLeave and (p1 and p1.displayOrder) then
-		v22 = p1.displayOrder
+local v = nil
+
+local function WizardScreenGui(extraProps)
+	local v2 = useDispatch()
+	local displayOrder = defineFastInt
+
+	if extraProps and extraProps.displayOrder then
+		displayOrder = extraProps.displayOrder
 	end
 
-	local v23 = nil
-
-	if FFlagConnectionAmpUpsellOnLeave and p1 and p1.onTopOfCoreBlur then
-		v23 = true
-	end
+	local onTopOfCoreBlur = extraProps and extraProps.onTopOfCoreBlur and true or nil
 
 	return React.createElement("ScreenGui", {
 		IgnoreGuiInset = true,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		ResetOnSpawn = false,
-		DisplayOrder = v22,
+		DisplayOrder = displayOrder,
 		Enabled = true,
-		OnTopOfCoreBlur = v23,
-		[Roact.Change.AbsoluteSize] = function(p2) -- line: 52
-			-- upvalues: v21 (copy), SetScreenSize (copy)
-			v21(SetScreenSize(p2.AbsoluteSize))
+		OnTopOfCoreBlur = onTopOfCoreBlur,
+		[Roact.Change.AbsoluteSize] = function(p)
+			v2(SetScreenSize(p.AbsoluteSize))
 		end
 	}, { React.createElement(InExpWizardNavigator, {
-		screenProps = {
-			extraProps = p1
-		}
-	}) })
+			screenProps = { extraProps = extraProps }
+		}) })
 end
-local function renderAmpWizard(p3, p4) -- line: 64
-	-- upvalues: u17 (ref), ReactRoblox (copy), FFlagConnectionAmpUpsellOnLeave (copy), React (copy), InExperienceProviderContainer (copy), WizardScreenGui (copy), ApolloProvider (ref)
-	if u17 == nil then
+
+local function renderAmpWizard(p, client)
+	if v == nil then
 		local CoreGui = game:GetService("CoreGui")
-		local Folder = Instance.new("Folder")
+		local ampWizard = Instance.new("Folder")
+		ampWizard.Name = "AmpWizard"
+		ampWizard.Parent = CoreGui
 
-		Folder.Name = "AmpWizard"
-		Folder.Parent = CoreGui
-		u17 = ReactRoblox.createRoot(Folder)
+		v = ReactRoblox.createRoot(ampWizard)
 	end
 
-	if FFlagConnectionAmpUpsellOnLeave then
-		local v28 = React.createElement(InExperienceProviderContainer, {}, React.createElement(WizardScreenGui, p3))
+	local element = React.createElement(InExperienceProviderContainer, {}, React.createElement(WizardScreenGui, p))
 
-		if p4 then
-			u17:render(React.createElement(ApolloProvider, {
-				client = p4
-			}, v28))
-
-			return
-		end
-
-		u17:render(v28)
-
-		return
+	if client then
+		v:render(React.createElement(ApolloProvider, { client = client }, element))
+	else
+		v:render(element)
 	end
-
-	u17:render(React.createElement(InExperienceProviderContainer, {}, React.createElement(WizardScreenGui, p3)))
 end
 
 return {
-	OpenAmpWizardContainerInExp = function(s1: string, p5: ((...any) -> ...any), p6, s2: string?, t1: {[any]: any}?, s3: string?, p7, n1: number?, b1: boolean?, b2: boolean?) -- line: 91
-		-- upvalues: GetFFlagEnableDummyAMPWizard (copy), HttpService (copy), GetFFlagInExperienceContainerScreenSizeReducer (copy), GetFFlagMoveAmpUpsellOffNavigateDown (copy), u17 (ref), FFlagConnectionAmpUpsellOnLeave (copy), renderAmpWizard (copy)
+	OpenAmpWizardContainerInExp = function(featureName: string, completionCallback, recourseData, entryPointEventCtx: string?, extraParameters, nameSpace: string?, client, displayOrder: number?, onTopOfCoreBlur: boolean?, usePrologue: boolean?, prologueOptions)
 		if GetFFlagEnableDummyAMPWizard() then
-			task.delay(0.5, function() -- line: 104
-				-- upvalues: p5 (copy), HttpService (copy)
-				if p5 then
-					local FastString = game:GetFastString("DummyAMPWizardAccessResponse")
-					local FastString2 = game:GetFastString("DummyAMPWizardActionsTakenJSON")
+			task.delay(0.5, function()
+				if completionCallback then
+					local fastString = game:GetFastString("DummyAMPWizardAccessResponse")
+					local fastString2 = game:GetFastString("DummyAMPWizardActionsTakenJSON")
 
-					if not pcall(function() -- line: 110
-						-- upvalues: HttpService (copy), FastString2 (copy)
-						HttpService:JSONDecode(FastString2)
+					if pcall(function()
+						HttpService:JSONDecode(fastString2)
 					end) then
+						completionCallback(fastString, (HttpService:JSONDecode(fastString2)))
+					else
 						print("Failed to decode DummyWizardActionsTakenJSON, not calling completionCallback")
-
-						return
 					end
-
-					local data = HttpService:JSONDecode(FastString2)
-
-					p5(FastString, data)
 				end
 			end)
+			return
+		end
 
+		if FFlagRouteStandaloneAmpThroughUniversalApp and AppAmpWizardLaunchBridge.requestOpen({
+			featureName = featureName,
+			nameSpace = nameSpace,
+			recourseData = recourseData,
+			entryPointEventCtx = entryPointEventCtx,
+			extraParameters = extraParameters,
+			usePrologue = usePrologue,
+			prologueOptions = prologueOptions,
+			completionCallback = completionCallback
+		}) then
 			return
 		end
 
 		if GetFFlagInExperienceContainerScreenSizeReducer() and GetFFlagMoveAmpUpsellOffNavigateDown() then
-			local t2 = {
+			renderAmpWizard({
 				isInExperienceEntry = true,
-				nameSpace = s3,
-				featureName = s1,
-				completionCallback = function(p8, p9) -- line: 127
-					-- upvalues: u17 (ref), p5 (copy)
-					if u17 then
-						u17:render(nil)
+				nameSpace = nameSpace,
+				featureName = featureName,
+				completionCallback = function(p, p2)
+					if v then
+						v:render(nil)
 					end
 
-					if p5 then
-						p5(p8, p9)
+					if completionCallback then
+						completionCallback(p, p2)
 					end
 				end,
-				recourseData = p6,
-				entryPointEventCtx = s2,
-				extraParameters = t1,
-				usePrologue = b2,
-				displayOrder = if not FFlagConnectionAmpUpsellOnLeave then nil else n1,
-				onTopOfCoreBlur = if not FFlagConnectionAmpUpsellOnLeave then nil else b1
-			}
-
-			renderAmpWizard(t2, if not FFlagConnectionAmpUpsellOnLeave then nil else p7)
-
-			return
+				recourseData = recourseData,
+				entryPointEventCtx = entryPointEventCtx,
+				extraParameters = extraParameters,
+				usePrologue = usePrologue,
+				prologueOptions = prologueOptions,
+				displayOrder = displayOrder,
+				onTopOfCoreBlur = onTopOfCoreBlur
+			}, client)
+		else
+			print("InExpAmpWizardController: OpenAmpWizardContainerInExp called without necessary flags")
 		end
-
-		print("InExpAmpWizardController: OpenAmpWizardContainerInExp called without necessary flags")
 	end
 }

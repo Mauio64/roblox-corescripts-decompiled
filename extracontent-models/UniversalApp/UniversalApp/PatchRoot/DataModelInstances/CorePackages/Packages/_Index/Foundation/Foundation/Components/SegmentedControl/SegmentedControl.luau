@@ -1,134 +1,262 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Dash = require(FoundationParent.Dash)
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local Dash = require(parent.Dash)
+local React = require(parent.React)
 
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 
 require(Foundation.Enums.ControlState)
 
+local FillBehavior = require(Foundation.Enums.FillBehavior)
+
 local InputSize = require(Foundation.Enums.InputSize)
+
+local SegmentedControlVariant = require(Foundation.Enums.SegmentedControlVariant)
+
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
+
 local useAnimatedHighlight = require(Foundation.Utility.useAnimatedHighlight)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local Segment = require(script.Parent.Segment)
 local useSegmentedControlVariants = require(script.Parent.useSegmentedControlVariants)
-local t1 = {
+
+local Flags = require(Foundation.Utility.Flags)
+
+local v = {
+	size = InputSize.Medium,
+	variant = SegmentedControlVariant.Filled,
+	fillBehavior = FillBehavior.Fit,
 	testId = "--foundation-segmented-control",
-	ZIndex = 1,
-	size = InputSize.Medium
+	ZIndex = 1
 }
 
-local function SegmentedControl(p1, p2) -- line: 42
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useSegmentedControlVariants (copy), React (copy), useAnimatedHighlight (copy), View (copy), withCommonProps (copy), Dash (copy), Segment (copy)
-	local v17 = withDefaults(p1, t1)
-	local v18 = useTokens()
-	local v19 = useSegmentedControlVariants(v18, v17.size, v17.isCircular)
-	local u20 = React.useRef(nil)
-	local v21 = React.useRef({})
-	local u22 = React.useMemo(function() -- line: 60
-		-- upvalues: v21 (copy), v17 (copy), React (copy)
-		local current = v21.current
+local function SegmentedControl(p, p2)
+	local v2 = withDefaults(p, v)
+	local variant
 
-		for _, v35 in v17.segments do
-			if v35.ref then
-				current[v35.id] = v35.ref
-			elseif not current[v35.id] then
-				current[v35.id] = React.createRef()
+	if Flags.FoundationSegmentedControlBeta then
+		variant = v2.variant
+	else
+		variant = nil
+	end
+
+	local fillBehavior
+
+	if Flags.FoundationSegmentedControlBeta then
+		fillBehavior = v2.fillBehavior
+	else
+		fillBehavior = nil
+	end
+
+	local v3 = useTokens()
+
+	local size = v2.size
+	local v4
+
+	if Flags.FoundationSegmentedControlBeta then
+		v4 = variant
+	end
+
+	local v5
+
+	if Flags.FoundationSegmentedControlBeta then
+		v5 = fillBehavior
+	end
+
+	local v6 = useSegmentedControlVariants(v3, size, v4, v5, v2.isCircular)
+	local v7
+
+	if Flags.FoundationSegmentedControlBeta then
+		v7 = fillBehavior == FillBehavior.Fill
+	end
+
+	local ref = React.useRef(nil)
+
+	local ref2 = React.useRef({})
+	local v8 = React.useMemo(function()
+		local current = ref2.current
+
+		for _, segment in v2.segments do
+			if segment.ref then
+				current[segment.id] = segment.ref
+			elseif not current[segment.id] then
+				current[segment.id] = React.createRef()
 			end
 		end
 
 		return current
-	end, { v17.segments })
-	local v23 = useAnimatedHighlight(v17.value, p2 or u20, u22)
-	local activeItemHeight = v23.activeItemHeight
-	local highlightPosition = v23.highlightPosition
-	local highlightWidth = v23.highlightWidth
-	local v27, v28 = React.useBinding(Vector2.new(0, 0))
-	local u29 = v28
-	local u30 = React.useCallback(function(p3) -- line: 77
-		-- upvalues: u29 (ref)
-		u29(p3.AbsoluteSize)
-	end, { v19.container.tag })
-	local v31 = React.useCallback(function(p4) -- line: 81
-		-- upvalues: v17 (copy), u30 (ref)
-		if v17.onAbsoluteSizeChanged then
-			v17.onAbsoluteSizeChanged(p4)
+	end, { v2.segments })
+
+	local value = v2.value
+	local size2
+
+	if Flags.FoundationSegmentedControlBeta then
+		size2 = v2.size
+	end
+
+	local v9
+
+	if Flags.FoundationSegmentedControlBeta then
+		v9 = fillBehavior
+	end
+
+	local v10 = useAnimatedHighlight(value, p2 or ref, v8, size2, v9)
+
+	local activeItemHeight = v10.activeItemHeight
+	local highlightPosition = v10.highlightPosition
+	local highlightWidth = v10.highlightWidth
+	local v11, v12 = React.useBinding(Vector2.new(0, 0))
+
+	local v13 = React.useCallback(function(p3)
+		v12(p3.AbsoluteSize)
+	end, { v6.container.tag })
+
+	local onAbsoluteSizeChanged = React.useCallback(function(p3)
+		if v2.onAbsoluteSizeChanged then
+			v2.onAbsoluteSizeChanged(p3)
 		end
 
-		u30(p4)
-	end, {
-		v17.onAbsoluteSizeChanged,
-		u30
-	})
-	local u32 = React.useCallback(function(t2: {[any]: any}) -- line: 88
-		-- upvalues: u22 (ref), v17 (copy)
-		local n1 = 0
+		v13(p3)
+	end, { v2.onAbsoluteSizeChanged, v13 })
 
-		if t2.current then
-			local current = u22[v17.value].current
+	local v14 = React.useCallback(function(p3)
+		local v14 = 0
+
+		if p3.current then
+			local current = v8[v2.value].current
 
 			if current then
-				n1 = current.AbsolutePosition.Y - t2.current.AbsolutePosition.Y
+				return current.AbsolutePosition.Y - p3.current.AbsolutePosition.Y
 			end
 		end
 
-		return n1
-	end, { v17.value })
+		return v14
+	end, { v2.value })
 
-	return React.createElement(View, withCommonProps(v17, {
-		Size = v27:map(function(vector2: Vector2) -- line: 104
+	local createElement = React.createElement
+
+	local v15 = {
+		tag = Flags.FoundationSegmentedControlBeta and v7 and "size-full-0 auto-y" or nil,
+		Size = 0
+	}
+	local size3
+
+	if Flags.FoundationSegmentedControlBeta then
+		if not v7 then
+			size3 = v11:map(function(vector2: Vector2)
+				return UDim2.fromOffset(vector2.X, vector2.Y)
+			end)
+		end
+	else
+		size3 = v11:map(function(vector2: Vector2)
 			return UDim2.fromOffset(vector2.X, vector2.Y)
 		end)
-	}), {
-		SegmentsContainer = React.createElement(View, withDefaults({
-			tag = v19.container.tag,
-			ref = p2 or u20
-		}, {
-			onAbsoluteSizeChanged = v31
-		}), Dash.map(v17.segments, function(p5, n2: number) -- line: 117
-			-- upvalues: React (copy), Segment (copy), v17 (copy), u22 (ref)
-			local v44 = (n2 - 1) * 2 + 1
+	end
 
-			return React.createElement(React.Fragment, {
-				key = tostring(p5.id)
-			}, {
-				Segment = React.createElement(Segment, {
-					id = p5.id,
-					size = v17.size,
-					isCircular = v17.isCircular,
-					text = p5.text,
-					icon = p5.icon,
-					isActive = p5.id == v17.value,
-					onActivated = v17.onActivated,
-					LayoutOrder = v44,
-					testId = `{ v17.testId }--segment-{ p5.id }`,
-					ref = u22[p5.id]
-				})
-			})
-		end)),
-		Overlay = React.createElement(View, {
-			testId = "--foundation-segmented-control--animated-overlay",
-			backgroundStyle = v18.Color.Shift.Shift_400,
-			tag = v19.segment.tag,
-			Size = React.joinBindings({
-				highlightWidth,
-				activeItemHeight
-			}):map(function(p6) -- line: 140
-				return UDim2.fromOffset(p6[1], p6[2])
-			end),
-			Position = highlightPosition:map(function(n3: number) -- line: 143
-				-- upvalues: u32 (ref), p2 (copy), u20 (ref)
-				local v47 = u32(p2 or u20)
+	v15.Size = size3
+	local v16 = withCommonProps(v2, v15)
 
-				return UDim2.fromOffset(n3, v47)
-			end),
-			ZIndex = v17.ZIndex + 1
-		})
-	})
+	local createElement2 = React.createElement
+
+	local v17 = { tag = v6.container.tag, stroke = 0, ref = 0, testId = 0 }
+	local stroke
+
+	if Flags.FoundationSegmentedControlBeta then
+		stroke = v6.container.stroke
+	end
+
+	v17.stroke = stroke
+	v17.ref = p2 or ref
+	v17.testId = `{v2.testId}--segments-container`
+	local children = {
+		SegmentsContainer = createElement2(
+			View,
+			withDefaults(v17, { onAbsoluteSizeChanged = onAbsoluteSizeChanged }),
+			Dash.map(v2.segments, function(props, p3: number)
+				local layoutOrder = (p3 - 1) * 2 + 1
+				local createElement3 = React.createElement
+				local fragment = React.Fragment
+				local v18 = { key = tostring(props.id) }
+
+				local createElement4 = React.createElement
+				local v19 = {
+					id = props.id,
+					size = v2.size,
+					variant = 0,
+					fillBehavior = 0,
+					isCircular = 0,
+					text = 0,
+					icon = 0,
+					isActive = 0,
+					onActivated = 0,
+					LayoutOrder = 0,
+					testId = 0,
+					ref = 0
+				}
+				local variant2
+
+				if Flags.FoundationSegmentedControlBeta then
+					variant2 = variant
+				end
+
+				v19.variant = variant2
+				local fillBehavior2
+
+				if Flags.FoundationSegmentedControlBeta then
+					fillBehavior2 = fillBehavior
+				end
+
+				v19.fillBehavior = fillBehavior2
+				v19.isCircular = v2.isCircular
+				v19.text = props.text
+				v19.icon = props.icon
+				v19.isActive = props.id == v2.value
+				v19.onActivated = v2.onActivated
+				v19.LayoutOrder = layoutOrder
+				v19.testId = `{v2.testId}--segment-{props.id}`
+				v19.ref = v8[props.id]
+				return createElement3(fragment, v18, { Segment = createElement4(Segment, v19) })
+			end)
+		),
+		Overlay = 0
+	}
+
+	local createElement3 = React.createElement
+	local v18 = {
+		tag = v6.segment.tag,
+		backgroundStyle = 0,
+		Size = 0,
+		Position = 0,
+		ZIndex = 0,
+		testId = 0
+	}
+	local backgroundStyle
+
+	if Flags.FoundationSegmentedControlBeta then
+		backgroundStyle = v3.Color.Shift.Shift_300
+	else
+		backgroundStyle = v3.Color.Shift.Shift_400
+	end
+
+	v18.backgroundStyle = backgroundStyle
+
+	v18.Size = React.joinBindings({ highlightWidth, activeItemHeight }):map(function(list)
+		return UDim2.fromOffset(list[1], list[2])
+	end)
+
+	v18.Position = highlightPosition:map(function(p3: number)
+		local v19 = v14(p2 or ref)
+		return UDim2.fromOffset(p3, v19)
+	end)
+
+	v18.ZIndex = v2.ZIndex + 1
+	v18.testId = `{v2.testId}--animated-overlay`
+	children.Overlay = createElement3(View, v18)
+	return createElement(View, v16, children)
 end
 
 return React.memo(React.forwardRef(SegmentedControl))

@@ -1,25 +1,23 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local React = require(parent.React)
 
 require(script.Parent.Constants)
-
 local useLayoutMode = require(script.Parent.useLayoutMode)
 local usePresetSurfaceAvailable = require(script.Parent.usePresetSurfaceAvailable)
 
-local function PresetChatGate(t1: {[any]: any}) -- line: 27
-	-- upvalues: usePresetSurfaceAvailable (copy), useLayoutMode (copy), React (copy)
-	local v7 = usePresetSurfaceAvailable(t1.targetTextChannel)
-	local v8 = useLayoutMode()
+local function PresetChatGate(props)
+	local v = usePresetSurfaceAvailable(props.targetTextChannel)
+	local v2 = useLayoutMode()
 
-	if not v7 then
+	if not v then
 		return nil
 	end
 
-	if t1.layoutMode ~= nil and v8 ~= t1.layoutMode then
-		return nil
+	if props.layoutMode == nil or v2 == props.layoutMode then
+		return React.createElement(React.Fragment, nil, props.children)
 	end
 
-	return React.createElement(React.Fragment, nil, t1.children)
+	return nil
 end
 
 return React.memo(PresetChatGate)

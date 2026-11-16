@@ -1,12 +1,11 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 local React = require(AppChat.Parent.React)
 
-local function UIListLayout(t1: {[any]: any}) -- line: 10
-	-- upvalues: React (copy)
+local function UIListLayout(props)
 	return React.createElement("UIListLayout", {
-		HorizontalAlignment = t1.HorizontalAlignment,
-		FillDirection = t1.FillDirection,
-		VerticalAlignment = t1.VerticalAlignment,
+		HorizontalAlignment = props.HorizontalAlignment,
+		FillDirection = props.FillDirection,
+		VerticalAlignment = props.VerticalAlignment,
 		SortOrder = Enum.SortOrder.LayoutOrder
 	})
 end

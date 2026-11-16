@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("SduiCompat").Parent
-
-require(Parent.React)
+local parent = script:FindFirstAncestor("SduiCompat").Parent
+require(parent.React)
 
 return {}

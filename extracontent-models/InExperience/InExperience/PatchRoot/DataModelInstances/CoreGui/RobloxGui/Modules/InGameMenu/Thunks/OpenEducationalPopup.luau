@@ -1,36 +1,28 @@
-local ParentParent = script.Parent.Parent
-local OpenNativeClosePrompt = require(ParentParent.Actions.OpenNativeClosePrompt)
+local parent = script.Parent.Parent
+local OpenNativeClosePrompt = require(parent.Actions.OpenNativeClosePrompt)
 
-return function(p1, p2, p3) -- line: 6
-	-- upvalues: OpenNativeClosePrompt (copy)
-	local function getDisplayCount() -- line: 7
-		-- upvalues: p2 (copy)
-		return tonumber(p2:GetItem("NativeCloseLuaPromptDisplayCount")) or 0
-	end
-	local function setDisplayCount(p4) -- line: 11
-		-- upvalues: p2 (copy)
-		p2:SetItem("NativeCloseLuaPromptDisplayCount", (tostring(p4)))
-		p2:flush()
+return function(object, object2, p)
+	local function getDisplayCount() -- 1 equivalent call inferred from this helper
+		return tonumber(object2:GetItem("NativeCloseLuaPromptDisplayCount")) or 0
 	end
 
-	local NotificationTypeList = p1:GetNotificationTypeList()
+	local function setDisplayCount(p2) -- 1 equivalent call inferred from this helper
+		object2:SetItem("NativeCloseLuaPromptDisplayCount", (tostring(p2)))
+		object2:flush()
+	end
 
-	return function(p5) -- line: 18
-		-- upvalues: p2 (copy), p3 (copy), p1 (copy), NotificationTypeList (copy), OpenNativeClosePrompt (copy)
-		local closingApp = p5:getState().nativeClosePrompt.closingApp
-		local v12 = tonumber(p2:GetItem("NativeCloseLuaPromptDisplayCount")) or 0
+	local notificationTypeList = object:GetNotificationTypeList()
 
-		if closingApp or v12 >= p3 then
-			p1:BroadcastNotification("", NotificationTypeList.NATIVE_EXIT)
+	return function(object3)
+		local closingApp = object3:getState().nativeClosePrompt.closingApp
+		local displayCount = getDisplayCount() -- inferred equivalent call
 
+		if closingApp or p <= displayCount then
+			object:BroadcastNotification("", notificationTypeList.NATIVE_EXIT)
 			return
 		end
 
-		p5:dispatch(OpenNativeClosePrompt())
-
-		local v13 = v12 + 1
-
-		p2:SetItem("NativeCloseLuaPromptDisplayCount", (tostring(v13)))
-		p2:flush()
+		object3:dispatch(OpenNativeClosePrompt())
+		setDisplayCount(displayCount + 1) -- inferred equivalent call
 	end
 end

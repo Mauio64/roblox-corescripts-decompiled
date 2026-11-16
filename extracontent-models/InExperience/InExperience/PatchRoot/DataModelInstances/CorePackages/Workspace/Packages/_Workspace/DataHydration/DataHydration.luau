@@ -14,13 +14,26 @@ local MarketplaceCatalogSort = require(script.MarketplaceCatalogSort)
 local MarketplaceAsset = require(script.MarketplaceAsset)
 local MarketplaceBundle = require(script.MarketplaceBundle)
 local MarketplaceLook = require(script.MarketplaceLook)
+local MarketplaceItemFavorite = require(script.MarketplaceItemFavorite)
+local CollectibleItem = require(script.CollectibleItem)
 local Song = require(script.Song)
 local UserSettings = require(script.UserSettings)
-local DataHydrationUtils = require(script.DataHydrationUtils)
-local FFlagSduiExperienceDetailsSupport = require(script.Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
-local v21 = if not FFlagSduiExperienceDetailsSupport then nil else require(script.UserProfile)
 
-return {
+local DataHydrationUtils = require(script.DataHydrationUtils)
+
+local SharedFlags = require(script.Parent.SharedFlags)
+local FFlagSduiNotificationBadgeHydration = SharedFlags.FFlagSduiNotificationBadgeHydration
+local FFlagSduiLeaderboardComponent = SharedFlags.FFlagSduiLeaderboardComponent
+local FFlagSduiBuyRobuxHydration = SharedFlags.FFlagSduiBuyRobuxHydration
+
+local UserProfile = require(script.UserProfile)
+local Community = require(script.Community)
+local CommunityUserMembership = require(script.CommunityUserMembership)
+local NotificationBadge = require(script.NotificationBadge)
+local LeaderboardStats = require(script.LeaderboardStats)
+local BuyRobux = require(script.BuyRobux)
+
+local DataHydration = {
 	["jest.config"] = script["jest.config"],
 	createDataResolver = require(script.createDataResolver),
 	createDataCache = require(script.createDataCache),
@@ -43,7 +56,30 @@ return {
 	MarketplaceAsset = MarketplaceAsset,
 	MarketplaceBundle = MarketplaceBundle,
 	MarketplaceLook = MarketplaceLook,
+	MarketplaceItemFavorite = MarketplaceItemFavorite,
+	CollectibleItem = CollectibleItem,
 	Song = Song,
 	UserSettings = UserSettings,
-	UserProfile = if not FFlagSduiExperienceDetailsSupport then nil else v21
+	UserProfile = UserProfile,
+	Community = Community,
+	CommunityUserMembership = CommunityUserMembership
 }
+
+if not FFlagSduiNotificationBadgeHydration then
+	NotificationBadge = nil
+end
+
+DataHydration.NotificationBadge = NotificationBadge
+
+if not FFlagSduiLeaderboardComponent then
+	LeaderboardStats = nil
+end
+
+DataHydration.LeaderboardStats = LeaderboardStats
+
+if not FFlagSduiBuyRobuxHydration then
+	BuyRobux = nil
+end
+
+DataHydration.BuyRobux = BuyRobux
+return DataHydration

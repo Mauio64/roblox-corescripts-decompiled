@@ -1,86 +1,80 @@
 local CorePackages = game:GetService("CorePackages")
-local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local CoreGui = game:GetService("CoreGui")
+local Modules = CoreGui.RobloxGui.Modules
+
 local React = require(CorePackages.Packages.React)
-local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local BlockingUtility = require(CorePackages.Workspace.Packages.BlockingUtility)
 local isNewInGameMenuEnabled = require(Modules.isNewInGameMenuEnabled)
-local Toast = require(CorePackages.Packages.UIBlox).App.Dialog.Toast
+
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Toast = UIBlox.App.Dialog.Toast
+
 local ActionModal = require(script.Parent.ActionModal)
-local FFlagConnectionsToFriendsRename = require(CorePackages.Workspace.Packages.SharedFlags).FFlagConnectionsToFriendsRename
 
-local function BlockingModalContainer(t1: {[any]: any}) -- line: 33
-	-- upvalues: BlockingUtility (copy), React (copy), isNewInGameMenuEnabled (copy), Modules (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), Toast (copy), ActionModal (copy)
-	local player = t1.player
-	local closeModal = t1.closeModal
-	local v14 = t1.blockingUtility or BlockingUtility
-	local analytics = t1.analytics
-	local source = t1.source
-	local onBlockingSuccess = t1.onBlockingSuccess
-	local v18, v19 = React.useState(Vector2.new(1000, 1000))
-	local v20, v21 = React.useState(false)
-	local v22 = React.useCallback(function() -- line: 45
-		-- upvalues: v14 (copy), player (copy), analytics (copy), source (copy), onBlockingSuccess (copy), closeModal (copy), v21 (copy)
-		if v14:BlockPlayerAsync(player) then
-			analytics:action("SettingsHub", "blockUser", {
-				blockeeUserId = player.UserId,
-				source = source
-			})
+local function BlockingModalContainer(props)
+	local player = props.player
+	local closeModal = props.closeModal
+	local blockingUtility = props.blockingUtility or BlockingUtility
+	local analytics = props.analytics
+	local source = props.source
+	local onBlockingSuccess = props.onBlockingSuccess
 
-			if onBlockingSuccess then
-				onBlockingSuccess()
-			end
+	local state, setState = React.useState(Vector2.new(1000, 1000))
+	local state2, setState2 = React.useState(false)
 
-			closeModal()
+	local block = React.useCallback(function()
+		if not blockingUtility:BlockPlayerAsync(player) then
+			setState2(true)
 
 			return
 		end
 
-		v21(true)
-	end, {
-		closeModal,
-		player,
-		analytics,
-		source,
-		onBlockingSuccess
-	})
-	local v23 = React.useCallback(function() -- line: 62
-		-- upvalues: v22 (copy), source (copy), isNewInGameMenuEnabled (copy), Modules (copy), player (copy)
-		v22()
+		analytics:action("SettingsHub", "blockUser", {
+			blockeeUserId = player.UserId,
+			source = source
+		})
 
-		local v25 = source or "BlockingModal"
+		if onBlockingSuccess then
+			onBlockingSuccess()
+		end
+
+		closeModal()
+	end, { closeModal, player, analytics, source, onBlockingSuccess })
+
+	local blockAndReport = React.useCallback(function()
+		block()
+
+		local v = source or "BlockingModal"
 
 		if isNewInGameMenuEnabled() then
-			require(Modules.InGameMenuInit).openReportDialog(player, v25)
-
-			return
+			local InGameMenuInit = require(Modules.InGameMenuInit)
+			InGameMenuInit.openReportDialog(player, v)
+		else
+			local ReportAbuseMenuContainerPage = require(Modules.Settings.Pages.ReportAbuseMenuContainerPage)
+			ReportAbuseMenuContainerPage:ReportPlayer(player, v)
 		end
+	end, { block, player, source })
 
-		require(Modules.Settings.Pages.ReportAbuseMenuNewContainerPage):ReportPlayer(player, v25)
-	end, {
-		v22,
-		player,
-		source
-	})
-	local v24 = useLocalization({
-		cancelTextKey = "Feature.BlockingModal.Action.Cancel",
-		blockTextKey = "Feature.BlockingModal.Action.Block",
-		blockAndReportTextKey = "Feature.BlockingModal.Action.BlockAndReport",
-		blockingFailed = "Feature.Toast.NetworkingError.SomethingIsWrong",
+	local v = useLocalization({
 		titleKey = {
 			"Feature.BlockingModal.Heading.BlockUser",
 			DisplayName = player.DisplayName
 		},
-		bodyKey = not FFlagConnectionsToFriendsRename and "Feature.BlockingModal.Message.BlockConfirmation" or "Feature.BlockingModal.Message.BlockConfirmation.FriendsRename"
+		bodyKey = "Feature.BlockingModal.Message.BlockConfirmation.FriendsRename",
+		cancelTextKey = "Feature.BlockingModal.Action.Cancel",
+		blockTextKey = "Feature.BlockingModal.Action.Block",
+		blockAndReportTextKey = "Feature.BlockingModal.Action.BlockAndReport",
+		blockingFailed = "Feature.Toast.NetworkingError.SomethingIsWrong"
 	})
 
-	if v20 then
+	if state2 then
 		return React.createElement(Toast, {
 			duration = 3,
-			show = v20,
-			toastContent = {
-				toastTitle = v24.blockingFailed,
-				onDismissed = closeModal
-			}
+			show = state2,
+			toastContent = { toastTitle = v.blockingFailed, onDismissed = closeModal }
 		})
 	end
 
@@ -88,21 +82,20 @@ local function BlockingModalContainer(t1: {[any]: any}) -- line: 33
 		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundTransparency = 1,
 		ZIndex = 2,
-		[React.Change.AbsoluteSize] = function(p1) -- line: 105
-			-- upvalues: v19 (copy)
-			v19(p1.AbsoluteSize)
+		[React.Change.AbsoluteSize] = function(p)
+			setState(p.AbsoluteSize)
 		end
 	}, {
 		BlockingModal = React.createElement(ActionModal, {
-			screenSize = v18,
-			title = v24.titleKey,
-			body = v24.bodyKey,
-			blockText = v24.blockTextKey,
-			blockAndReportText = v24.blockAndReportTextKey,
-			cancelText = v24.cancelTextKey,
+			screenSize = state,
+			title = v.titleKey,
+			body = v.bodyKey,
+			blockText = v.blockTextKey,
+			blockAndReportText = v.blockAndReportTextKey,
+			cancelText = v.cancelTextKey,
 			cancel = closeModal,
-			block = v22,
-			blockAndReport = v23
+			block = block,
+			blockAndReport = blockAndReport
 		})
 	})
 end

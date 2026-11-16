@@ -1,54 +1,67 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent
 
-local Analytics = require(ParentParent.Analytics)
-local getFIntUGCValidationPartMaxMass = require(ParentParent.flags.getFIntUGCValidationPartMaxMass)
+require(parent.util.Types)
 
-local function resetPhysicsData(t1: {[any]: any}, p1) -- line: 14
-	-- upvalues: UGCValidationService (copy), Analytics (copy), getFIntUGCValidationPartMaxMass (copy)
-	local timestamp = tick()
+local Analytics = require(parent.Analytics)
+
+local getFIntUGCValidationPartMaxMass = require(parent.flags.getFIntUGCValidationPartMaxMass)
+
+local function resetPhysicsData(items, p)
+	local now = tick()
 
 	if not game:GetEngineFeature("EngineResetCollisionFidelity") then
 		return false, "EngineResetCollisionFidelity is not enabled"
 	end
 
-	local v9 = not not p1.bypassFlags and p1.bypassFlags.skipPhysicsDataReset
+	local v
 
-	for _, v11 in t1 do
-		local descendants = v11:GetDescendants()
+	if p.bypassFlags then
+		v = p.bypassFlags.skipPhysicsDataReset
+	else
+		v = false
+	end
 
-		table.insert(descendants, 1, v11)
+	for _, folder in items do
+		local descendants = folder:GetDescendants()
+		table.insert(descendants, 1, folder)
 
-		for _, v14 in descendants do
-			if not v14:IsA("MeshPart") or v9 then
+		for _, part in descendants do
+			if not part:IsA("MeshPart") or v then
 				continue
 			end
 
-			if not pcall(function() -- line: 31
-				-- upvalues: UGCValidationService (copy), v14 (copy)
-				UGCValidationService:ResetCollisionFidelity(v14, v14.CollisionFidelity)
+			local v2 = part
+
+			if pcall(function()
+				UGCValidationService:ResetCollisionFidelity(v2, v2.CollisionFidelity)
 			end) then
-				if p1.isServer then
+				if part:GetMass() > getFIntUGCValidationPartMaxMass() then
+					Analytics.reportFailure(Analytics.ErrorType.resetPhysicsData_LargeMass, nil, p)
+
+					return
+						false,
+						string.format(
+							"%s has a mass of %d while the limit is %d.",
+							part.Name,
+							part:GetMass(),
+							getFIntUGCValidationPartMaxMass()
+						)
+				end
+			else
+				if p.isServer then
 					error("Failed to load mesh data")
 				end
 
-				Analytics.reportFailure(Analytics.ErrorType.resetPhysicsData_FailedToLoadMesh, nil, p1)
+				Analytics.reportFailure(Analytics.ErrorType.resetPhysicsData_FailedToLoadMesh, nil, p)
 
 				return false, "Failed to load mesh data"
-			end
-
-			if v14:GetMass() > getFIntUGCValidationPartMaxMass() then
-				Analytics.reportFailure(Analytics.ErrorType.resetPhysicsData_LargeMass, nil, p1)
-
-				return false, string.format("%s has a mass of %d while the limit is %d.", v14.Name, v14:GetMass(), getFIntUGCValidationPartMaxMass())
 			end
 		end
 	end
 
-	Analytics.recordScriptTime(script.Name, timestamp, p1)
-
+	Analytics.recordScriptTime(script.Name, now, p)
 	return true
 end
 

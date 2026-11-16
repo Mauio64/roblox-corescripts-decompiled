@@ -1,153 +1,161 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Array = require(ParentParentParent.LuauPolyfill).Array
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local language = ParentParent.language
-local jsutils = ParentParent.jsutils
-local inspect = require(jsutils.inspect).inspect
-local invariant = require(jsutils.invariant).invariant
-local Kind = require(language.kinds).Kind
-local DirectiveLocation = require(language.directiveLocation).DirectiveLocation
-local specifiedDirectives = require(ParentParent.type.directives).specifiedDirectives
-local t1 = {}
-local getDirectiveLocationForASTPath = nil
-local getDirectiveLocationForOperation = nil
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-function t1.KnownDirectivesRule(p1) -- line: 35
-	-- upvalues: specifiedDirectives (copy), Kind (copy), Array (copy), GraphQLError (copy), getDirectiveLocationForASTPath (ref)
-	local t2 = {}
-	local v17 = p1:getSchema()
-	local v18 = specifiedDirectives
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local language = parent.language
+local jsutils = parent.jsutils
+local inspect = require(jsutils.inspect)
+local inspect2 = inspect.inspect
+local invariant = require(jsutils.invariant)
+local invariant2 = invariant.invariant
+local kinds = require(language.kinds)
+local kind = kinds.Kind
+local directiveLocation = require(language.directiveLocation)
+local directiveLocation2 = directiveLocation.DirectiveLocation
+local directives = require(parent.type.directives)
+local specifiedDirectives = directives.specifiedDirectives
 
-	if v17 then
-		v18 = v17:getDirectives()
-	end
+local getDirectiveLocationForASTPath
+local getDirectiveLocationForOperation
+local KnownDirectivesRule = {
+	KnownDirectivesRule = function(object)
+		local values = {}
 
-	for _, v in ipairs(v18) do
-		t2[v.name] = v.locations
-	end
+		local schema = object:getSchema()
+		local v = specifiedDirectives
 
-	local definitions = p1:getDocument().definitions
-
-	for _, v in ipairs(definitions) do
-		if v.kind == Kind.DIRECTIVE_DEFINITION then
-			t2[v.name.value] = Array.map(v.locations, function(p2) -- line: 50
-				return p2.value
-			end)
+		if schema then
+			v = schema:getDirectives()
 		end
-	end
 
-	return {
-		Directive = function(_, p4, _, _, _, p8) -- line: 57
-			-- upvalues: t2 (copy), p1 (copy), GraphQLError (copy), getDirectiveLocationForASTPath (ref), Array (copy)
-			local value = p4.name.value
-			local v36 = t2[value]
+		for _, v2 in ipairs(v) do
+			values[v2.name] = v2.locations
+		end
 
-			if not v36 then
-				p1:reportError(GraphQLError.new(("Unknown directive \"@%s\"."):format(value), p4))
+		local definitions = object:getDocument().definitions
 
-				return
-			end
-
-			local v37 = getDirectiveLocationForASTPath(p8)
-
-			if v37 and Array.indexOf(v36, v37) == -1 then
-				p1:reportError(GraphQLError.new(("Directive \"@%s\" may not be used on %s."):format(value, v37), p4))
+		for _, definition in ipairs(definitions) do
+			if definition.kind == kind.DIRECTIVE_DEFINITION then
+				values[definition.name.value] = Array.map(definition.locations, function(p)
+					return p.value
+				end)
 			end
 		end
-	}
-end
-function getDirectiveLocationForASTPath(p9) -- line: 83
-	-- upvalues: invariant (copy), Array (copy), Kind (copy), getDirectiveLocationForOperation (ref), DirectiveLocation (copy)
-	local v25 = p9[#p9]
 
-	invariant(not Array.isArray(v25))
+		return {
+			Directive = function(_, p, _, _, _, p2)
+				local value = p.name.value
+				local v2 = values[value]
 
-	local kind = v25.kind
+				if not v2 then
+					object:reportError(graphQLError.new(("Unknown directive \"@%s\"."):format(value), p))
 
-	if kind == Kind.OPERATION_DEFINITION then
-		return getDirectiveLocationForOperation(v25.operation)
+					return
+				end
+
+				local v3 = getDirectiveLocationForASTPath(p2)
+
+				if v3 and Array.indexOf(v2, v3) == -1 then
+					object:reportError(graphQLError.new(
+						("Directive \"@%s\" may not be used on %s."):format(value, v3),
+						p
+					))
+				end
+			end
+		}
+	end
+}
+
+getDirectiveLocationForASTPath = function(list)
+	local item = list[#list]
+	invariant2(not Array.isArray(item))
+
+	local kind2 = item.kind
+
+	if kind2 == kind.OPERATION_DEFINITION then
+		return getDirectiveLocationForOperation(item.operation)
 	end
 
-	if kind == Kind.FIELD then
-		return DirectiveLocation.FIELD
+	if kind2 == kind.FIELD then
+		return directiveLocation2.FIELD
 	end
 
-	if kind == Kind.FRAGMENT_SPREAD then
-		return DirectiveLocation.FRAGMENT_SPREAD
+	if kind2 == kind.FRAGMENT_SPREAD then
+		return directiveLocation2.FRAGMENT_SPREAD
 	end
 
-	if kind == Kind.INLINE_FRAGMENT then
-		return DirectiveLocation.INLINE_FRAGMENT
+	if kind2 == kind.INLINE_FRAGMENT then
+		return directiveLocation2.INLINE_FRAGMENT
 	end
 
-	if kind == Kind.FRAGMENT_DEFINITION then
-		return DirectiveLocation.FRAGMENT_DEFINITION
+	if kind2 == kind.FRAGMENT_DEFINITION then
+		return directiveLocation2.FRAGMENT_DEFINITION
 	end
 
-	if kind == Kind.VARIABLE_DEFINITION then
-		return DirectiveLocation.VARIABLE_DEFINITION
+	if kind2 == kind.VARIABLE_DEFINITION then
+		return directiveLocation2.VARIABLE_DEFINITION
 	end
 
-	if kind == Kind.SCHEMA_DEFINITION or kind == Kind.SCHEMA_EXTENSION then
-		return DirectiveLocation.SCHEMA
+	if kind2 == kind.SCHEMA_DEFINITION or kind2 == kind.SCHEMA_EXTENSION then
+		return directiveLocation2.SCHEMA
 	end
 
-	if kind == Kind.SCALAR_TYPE_DEFINITION or kind == Kind.SCALAR_TYPE_EXTENSION then
-		return DirectiveLocation.SCALAR
+	if kind2 == kind.SCALAR_TYPE_DEFINITION or kind2 == kind.SCALAR_TYPE_EXTENSION then
+		return directiveLocation2.SCALAR
 	end
 
-	if kind == Kind.OBJECT_TYPE_DEFINITION or kind == Kind.OBJECT_TYPE_EXTENSION then
-		return DirectiveLocation.OBJECT
+	if kind2 == kind.OBJECT_TYPE_DEFINITION or kind2 == kind.OBJECT_TYPE_EXTENSION then
+		return directiveLocation2.OBJECT
 	end
 
-	if kind == Kind.FIELD_DEFINITION then
-		return DirectiveLocation.FIELD_DEFINITION
+	if kind2 == kind.FIELD_DEFINITION then
+		return directiveLocation2.FIELD_DEFINITION
 	end
 
-	if kind == Kind.INTERFACE_TYPE_DEFINITION or kind == Kind.INTERFACE_TYPE_EXTENSION then
-		return DirectiveLocation.INTERFACE
+	if kind2 == kind.INTERFACE_TYPE_DEFINITION or kind2 == kind.INTERFACE_TYPE_EXTENSION then
+		return directiveLocation2.INTERFACE
 	end
 
-	if kind == Kind.UNION_TYPE_DEFINITION or kind == Kind.UNION_TYPE_EXTENSION then
-		return DirectiveLocation.UNION
+	if kind2 == kind.UNION_TYPE_DEFINITION or kind2 == kind.UNION_TYPE_EXTENSION then
+		return directiveLocation2.UNION
 	end
 
-	if kind == Kind.ENUM_TYPE_DEFINITION or kind == Kind.ENUM_TYPE_EXTENSION then
-		return DirectiveLocation.ENUM
+	if kind2 == kind.ENUM_TYPE_DEFINITION or kind2 == kind.ENUM_TYPE_EXTENSION then
+		return directiveLocation2.ENUM
 	end
 
-	if kind == Kind.ENUM_VALUE_DEFINITION then
-		return DirectiveLocation.ENUM_VALUE
+	if kind2 == kind.ENUM_VALUE_DEFINITION then
+		return directiveLocation2.ENUM_VALUE
 	end
 
-	if kind == Kind.INPUT_OBJECT_TYPE_DEFINITION or kind == Kind.INPUT_OBJECT_TYPE_EXTENSION then
-		return DirectiveLocation.INPUT_OBJECT
+	if kind2 == kind.INPUT_OBJECT_TYPE_DEFINITION or kind2 == kind.INPUT_OBJECT_TYPE_EXTENSION then
+		return directiveLocation2.INPUT_OBJECT
 	end
 
-	if kind == Kind.INPUT_VALUE_DEFINITION then
-		return p9[#p9 - 2].kind == Kind.INPUT_OBJECT_TYPE_DEFINITION and DirectiveLocation.INPUT_FIELD_DEFINITION or DirectiveLocation.ARGUMENT_DEFINITION
+	if kind2 == kind.INPUT_VALUE_DEFINITION then
+		return list[#list - 2].kind == kind.INPUT_OBJECT_TYPE_DEFINITION
+			and directiveLocation2.INPUT_FIELD_DEFINITION
+			or directiveLocation2.ARGUMENT_DEFINITION
 	end
 
 	return nil
 end
-function getDirectiveLocationForOperation(p10) -- line: 146
-	-- upvalues: DirectiveLocation (copy), invariant (copy), inspect (copy)
-	if p10 == "query" then
-		return DirectiveLocation.QUERY
+
+getDirectiveLocationForOperation = function(operation)
+	if operation == "query" then
+		return directiveLocation2.QUERY
+	elseif operation == "mutation" then
+		return directiveLocation2.MUTATION
+	elseif operation == "subscription" then
+		return directiveLocation2.SUBSCRIPTION
 	end
 
-	if p10 == "mutation" then
-		return DirectiveLocation.MUTATION
-	end
-
-	if p10 == "subscription" then
-		return DirectiveLocation.SUBSCRIPTION
-	end
-
-	invariant(false, "Unexpected operation: " .. inspect(p10))
+	invariant2(false, "Unexpected operation: " .. inspect2(operation))
 
 	return nil
 end
 
-return t1
+return KnownDirectivesRule

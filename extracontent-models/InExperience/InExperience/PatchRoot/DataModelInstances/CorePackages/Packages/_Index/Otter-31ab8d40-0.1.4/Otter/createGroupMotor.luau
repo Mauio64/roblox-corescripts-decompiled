@@ -1,132 +1,131 @@
 local RunService = game:GetService("RunService")
+
 local assign = require(script.Parent.assign)
 local createSignal = require(script.Parent.createSignal)
-local t1 = {
-	prototype = {}
-}
 
-t1.__index = t1.prototype
+local v = {}
+v.prototype = {}
+v.__index = v.prototype
 
-local function createGroupMotor(p1) -- line: 10
-	-- upvalues: createSignal (copy), t1 (copy)
-	assert(typeof(p1) == "table")
+local function createGroupMotor(items)
+	assert(typeof(items) == "table")
 
-	local t2 = {}
+	local states = {}
 
-	for k, v in pairs(p1) do
-		t2[k] = {
-			complete = true,
-			value = v
-		}
+	for k, item in pairs(items) do
+		states[k] = { value = item, complete = true }
 	end
 
-	local t3 = {
-		__allComplete = true,
-		__running = false,
+	local groupMotor = {
 		__goals = {},
-		__states = t2,
+		__states = states,
+		__allComplete = true,
 		__onComplete = createSignal(),
-		__onStep = createSignal()
+		__onStep = createSignal(),
+		__running = false
 	}
 
-	setmetatable(t3, t1)
+	setmetatable(groupMotor, v)
 
-	return t3
+	return groupMotor
 end
 
-function t1.prototype.start(p2) -- line: 36
-	-- upvalues: RunService (copy)
-	if p2.__running then
+function v.prototype:start()
+	if self.__running then
 		return
 	end
 
-	p2.__connection = RunService.Heartbeat:Connect(function(dt) -- line: 41
-		-- upvalues: p2 (copy)
-		p2:step(dt)
+	self.__connection = RunService.Heartbeat:Connect(function(dt)
+		self:step(dt)
 	end)
-	p2.__running = true
+
+	self.__running = true
 end
-function t1.prototype.stop(p3) -- line: 48
-	if p3.__connection ~= nil then
-		p3.__connection:Disconnect()
-		p3.__running = false
+
+function v.prototype:stop()
+	if self.__connection ~= nil then
+		self.__connection:Disconnect()
+		self.__running = false
 	end
 end
-function t1.prototype.step(p4, p5) -- line: 55
-	assert(typeof(p5) == "number")
 
-	if p4.__allComplete then
+function v.prototype:step(value)
+	assert(typeof(value) == "number")
+
+	if self.__allComplete then
 		return
 	end
 
-	local v15 = true
-	local t4 = {}
+	local v2 = {}
+	local allComplete = true
 
-	for k, v in pairs(p4.__states) do
-		local v19 = v
+	for k, __state in pairs(self.__states) do
+		if not __state.complete then
+			local __goal = self.__goals[k]
 
-		if not v19.complete then
-			local v20 = p4.__goals[k]
-
-			if v20 ~= nil then
-				local v21 = v20:step(v19, p5)
-
-				if v21 ~= nil then
-					v19 = v21
-					p4.__states[k] = v21
-				end
+			if __goal == nil then
+				__state.complete = true
 			else
-				v19.complete = true
+				local v3 = __goal:step(__state, value)
+
+				if v3 ~= nil then
+					self.__states[k] = v3
+					__state = v3
+				end
 			end
 
-			if not v19.complete then
-				v15 = false
+			if not __state.complete then
+				allComplete = false
 			end
 		end
 
-		t4[k] = v19.value
+		v2[k] = __state.value
 	end
 
-	local __allComplete = p4.__allComplete
+	local __allComplete = self.__allComplete
+	self.__allComplete = allComplete
 
-	p4.__allComplete = v15
-	p4.__onStep:fire(t4)
+	self.__onStep:fire(v2)
 
-	if p4.__allComplete and not __allComplete and p4.__running then
-		p4:stop()
-		p4.__onComplete:fire(t4)
+	if self.__allComplete and not __allComplete and self.__running then
+		self:stop()
+		self.__onComplete:fire(v2)
 	end
 end
-function t1.prototype.setGoal(p6, p7) -- line: 102
-	-- upvalues: assign (copy)
-	assert(typeof(p7) == "table")
-	p6.__goals = assign({}, p6.__goals, p7)
 
-	for k in pairs(p7) do
-		local v26 = p6.__states[k]
+function v.prototype:setGoal(items)
+	assert(typeof(items) == "table")
 
-		if v26 == nil then
+	self.__goals = assign({}, self.__goals, items)
+
+	for k in pairs(items) do
+		local __state = self.__states[k]
+
+		if __state == nil then
 			error(("Cannot set goal for the value %s because it doesn't exist"):format((tostring(k))), 2)
 		end
 
-		v26.complete = false
+		__state.complete = false
 	end
 
-	p6.__allComplete = false
-	p6:start()
+	self.__allComplete = false
+	self:start()
 end
-function t1.prototype.onStep(p8, p9) -- line: 121
-	assert(typeof(p9) == "function")
 
-	return p8.__onStep:subscribe(p9)
-end
-function t1.prototype.onComplete(p10, p11) -- line: 127
-	assert(typeof(p11) == "function")
+function v.prototype:onStep(callback)
+	assert(typeof(callback) == "function")
 
-	return p10.__onComplete:subscribe(p11)
+	return self.__onStep:subscribe(callback)
 end
-function t1.prototype.destroy(p12) -- line: 133
-	p12:stop()
+
+function v.prototype:onComplete(callback)
+	assert(typeof(callback) == "function")
+
+	return self.__onComplete:subscribe(callback)
+end
+
+function v.prototype:destroy()
+	self:stop()
 end
 
 return createGroupMotor

@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent
+local Roact = require(parent.Roact)
 
-return (require(ParentParent.Roact).createContext(function() -- line: 4
+return (Roact.createContext(function(): nil
 	return nil
 end))

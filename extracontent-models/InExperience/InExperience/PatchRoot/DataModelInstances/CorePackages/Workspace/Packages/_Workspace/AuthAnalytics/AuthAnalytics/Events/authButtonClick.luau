@@ -1,33 +1,36 @@
-local ParentParent = script.Parent.Parent
-local checkAndSendEvent = require(ParentParent.Utils.checkAndSendEvent)
+local parent = script.Parent.Parent
+local checkAndSendEvent = require(parent.Utils.checkAndSendEvent)
 
-return function(s1: string, s2: string, s3: string?, s4: string?, b1: boolean?, s5: string?, s6: string?) -- line: 4
-	-- upvalues: checkAndSendEvent (copy)
-	local t1 = {}
+return function(p: string, btn: string, state: string?, url: string?, is_alt_attempt: boolean?, origin: string?, ctype: string?, associatedText: string?)
+	local v = {}
 
-	if s2 then
-		t1.btn = s2
+	if btn then
+		v.btn = btn
 	end
 
-	if s3 then
-		t1.state = s3
+	if state then
+		v.state = state
 	end
 
-	if s4 then
-		t1.url = s4
+	if url then
+		v.url = url
 	end
 
-	if b1 ~= nil then
-		t1.is_alt_attempt = b1
+	if is_alt_attempt ~= nil then
+		v.is_alt_attempt = is_alt_attempt
 	end
 
-	if s5 then
-		t1.origin = s5
+	if origin then
+		v.origin = origin
 	end
 
-	if s6 then
-		t1.ctype = s6
+	if ctype then
+		v.ctype = ctype
 	end
 
-	checkAndSendEvent(s1, "authButtonClick", t1)
+	if associatedText then
+		v.associatedText = associatedText
+	end
+
+	checkAndSendEvent(p, "authButtonClick", v)
 end

@@ -1,9 +1,9 @@
-return function(p1, p2) -- line: 1
-	local v3 = p1 or {}
+return function(options, p)
+	local v = options or {}
 
-	if (p2 == "POST" or p2 == "PATCH") and not v3["Content-Type"] then
-		v3["Content-Type"] = "application/json"
+	if (p == "POST" or p == "PATCH") and not v["Content-Type"] then
+		v["Content-Type"] = "application/json"
 	end
 
-	return v3
+	return v
 end

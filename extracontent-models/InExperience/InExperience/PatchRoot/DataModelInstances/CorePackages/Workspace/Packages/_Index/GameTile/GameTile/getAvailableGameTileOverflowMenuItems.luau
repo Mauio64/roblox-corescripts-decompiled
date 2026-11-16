@@ -1,33 +1,38 @@
 local GameTile = script:FindFirstAncestor("GameTile")
-local GameTileParent = GameTile.Parent
+local parent = GameTile.Parent
+
 local GameTileConstants = require(GameTile.GameTileConstants)
-local SharedFlags = require(GameTileParent.SharedFlags)
+local SharedFlags = require(parent.SharedFlags)
 local TileOverflowMenuItems = GameTileConstants.TileOverflowMenuItems
-local FFlagLuaAppEnableSponsoredReportAd = SharedFlags.FFlagLuaAppEnableSponsoredReportAd
+local FFlagLuaAppContinueSortInstantPlay = SharedFlags.FFlagLuaAppContinueSortInstantPlay
+local FFlagLuaAppEnableReportExperience = SharedFlags.FFlagLuaAppEnableReportExperience
 
-local function getAvailableGameTileOverflowMenuItems(t1: {[any]: any}) -- line: 10
-	-- upvalues: FFlagLuaAppEnableSponsoredReportAd (copy), TileOverflowMenuItems (copy)
-	local t2 = {}
+local function getAvailableGameTileOverflowMenuItems(data)
+	local availableGameTileOverflowMenuItems = {}
 
-	if FFlagLuaAppEnableSponsoredReportAd then
-		if t1.isSponsored then
-			if t1.enableSponsoredFeedback then
-				t2[TileOverflowMenuItems.WhyThisAd] = true
-			end
-
-			if t1.enableReportAd then
-				t2[TileOverflowMenuItems.ReportAd] = true
-			end
+	if data.isSponsored then
+		if data.enableSponsoredFeedback then
+			availableGameTileOverflowMenuItems[TileOverflowMenuItems.WhyThisAd] = true
 		end
-	elseif t1.enableSponsoredFeedback and t1.isSponsored then
-		t2[TileOverflowMenuItems.WhyThisAd] = true
+
+		if data.enableReportAd then
+			availableGameTileOverflowMenuItems[TileOverflowMenuItems.ReportAd] = true
+		end
 	end
 
-	if t1.enableExplicitFeedback then
-		t2[TileOverflowMenuItems.NotInterested] = true
+	if data.enableExplicitFeedback then
+		availableGameTileOverflowMenuItems[TileOverflowMenuItems.NotInterested] = true
 	end
 
-	return t2
+	if FFlagLuaAppContinueSortInstantPlay and data.enableGameDetails then
+		availableGameTileOverflowMenuItems[TileOverflowMenuItems.GameDetails] = true
+	end
+
+	if FFlagLuaAppEnableReportExperience and data.enableReportExperience and not data.isSponsored then
+		availableGameTileOverflowMenuItems[TileOverflowMenuItems.ReportExperience] = true
+	end
+
+	return availableGameTileOverflowMenuItems
 end
 
 return getAvailableGameTileOverflowMenuItems

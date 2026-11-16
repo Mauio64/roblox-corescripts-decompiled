@@ -1,30 +1,27 @@
 local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
-local GameDetailRoduxParent = GameDetailRodux.Parent
-local Immutable = require(GameDetailRoduxParent.AppCommonLib).Immutable
+local parent = GameDetailRodux.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
 local AddGameDetails = require(GameDetailRodux.GameDetails.AddGameDetails)
 local SetGameDetailError = require(GameDetailRodux.GameDetails.SetGameDetailError)
 
-return function(p1, p2) -- line: 8
-	-- upvalues: SetGameDetailError (copy), Immutable (copy), AddGameDetails (copy)
-	local v8 = p1 or {}
+return function(options, data)
+	options = options or {}
 
-	if p2.type == SetGameDetailError.name then
-		return (Immutable.Set(v8, p2.universeId, {
-			errorType = p2.errorType
-		}))
+	if data.type == SetGameDetailError.name then
+		return (Immutable.Set(options, data.universeId, { errorType = data.errorType }))
 	end
 
-	if p2.type == AddGameDetails.name then
-		if not next(v8) then
-			return v8
-		end
+	if not (data.type == AddGameDetails.name and next(options)) then
+		return options
+	end
 
-		for k, _ in pairs(p2.gameDetails) do
-			if v8[k] then
-				v8 = Immutable.RemoveFromDictionary(v8, k)
-			end
+	for k, _ in pairs(data.gameDetails) do
+		if options[k] then
+			options = Immutable.RemoveFromDictionary(options, k)
 		end
 	end
 
-	return v8
+	return options
 end

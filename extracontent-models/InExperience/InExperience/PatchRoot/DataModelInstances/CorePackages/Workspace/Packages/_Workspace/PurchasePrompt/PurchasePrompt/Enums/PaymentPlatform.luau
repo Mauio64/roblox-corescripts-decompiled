@@ -1,8 +1,11 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local enumerate = require(PurchasePromptParent.PurchasePromptDeps).enumerate
+local parent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local enumerate = PurchasePromptDeps.enumerate
+
 local addRawValueMethodToEnum = require(PurchasePrompt.Utils.addRawValueMethodToEnum)
-local t1 = {
+
+local v = {
 	None = "None",
 	Apple = "Apple",
 	Google = "Google",
@@ -14,10 +17,12 @@ local t1 = {
 	Maquettes = "Maquettes",
 	Palisades = "Palisades",
 	Microsoft = "Microsoft",
-	MilkyWay = "MilkyWay"
+	MilkyWay = "MilkyWay",
+	Pioneer = "Pioneer"
 }
-local v6 = enumerate(script.Name, t1)
 
-addRawValueMethodToEnum(v6, t1)
+local v2 = enumerate(script.Name, v)
 
-return v6
+addRawValueMethodToEnum(v2, v)
+
+return v2

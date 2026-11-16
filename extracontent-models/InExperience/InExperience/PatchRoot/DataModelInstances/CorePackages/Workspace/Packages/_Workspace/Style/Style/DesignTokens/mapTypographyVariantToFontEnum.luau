@@ -1,21 +1,20 @@
-local t1 = {
+local v = {
 	Black = Enum.Font.GothamBlack,
 	Bold = Enum.Font.GothamBold,
 	Medium = Enum.Font.GothamMedium,
 	Book = Enum.Font.Gotham
 }
 
-local function mapTypographyVariantToFontEnum(p1) -- line: 55
-	-- upvalues: t1 (copy)
-	if p1.Font then
-		return p1.Font
+local function mapTypographyVariantToFontEnum(p)
+	if p.Font then
+		return p.Font
 	end
 
-	if p1.FontWeight then
-		return t1[p1.FontWeight] or t1.Book
+	if p.FontWeight then
+		return v[p.FontWeight] or v.Book
 	end
 
-	return t1.Book
+	return v.Book
 end
 
 return mapTypographyVariantToFontEnum

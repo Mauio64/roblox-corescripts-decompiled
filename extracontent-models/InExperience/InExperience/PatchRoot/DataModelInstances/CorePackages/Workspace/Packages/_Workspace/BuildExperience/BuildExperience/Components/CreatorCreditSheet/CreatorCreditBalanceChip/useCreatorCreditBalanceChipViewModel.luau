@@ -1,47 +1,46 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
+
 local LocalizationService = game:GetService("LocalizationService")
-local CreatorCredit = require(Parent.DataHydration.CreatorCredit)
-local NumberLocalization = require(Parent.Localization).NumberLocalization
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
+
+local CreatorCredit = require(parent.DataHydration.CreatorCredit)
+local Localization = require(parent.Localization)
+local NumberLocalization = Localization.NumberLocalization
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
 
 require(script.Parent.CreatorCreditBalanceChipView)
-
 local useOpenBuyRobuxWebView = require(script.Parent.Parent.useOpenBuyRobuxWebView)
+local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
+local GetBuildCreatorCreditRefreshStore = require(BuildExperience.Stores.GetBuildCreatorCreditRefreshStore)
 
-local function formatBalance(n1: number) -- line: 17
-	-- upvalues: NumberLocalization (copy), LocalizationService (copy)
-	return NumberLocalization.localize(string.format("%.0f", (math.floor(n1))), LocalizationService.RobloxLocaleId)
+local function formatBalance(robuxBalance: number) -- 1 equivalent call inferred from this helper
+	return NumberLocalization.localize(
+		string.format("%.0f", (math.floor(robuxBalance))),
+		LocalizationService.RobloxLocaleId
+	)
 end
-local function useCreatorCreditBalanceChipViewModel() -- line: 21
-	-- upvalues: CreatorCredit (copy), React (copy), SignalsReact (copy), useOpenBuyRobuxWebView (copy), NumberLocalization (copy), LocalizationService (copy)
-	local v11 = CreatorCredit.getCreatorCreditStore(false)
-	local v12 = React.useMemo(function() -- line: 23
-		-- upvalues: v11 (copy)
-		return v11.getQuotaSummary()
-	end, { v11 })
-	local v13 = SignalsReact.useSignalState(v12.data)
-	local v14 = React.useCallback(function() -- line: 27
-		-- upvalues: v11 (copy)
-		v11.refreshQuotaSummary():catch(function() -- line: 28
-		end)
-	end, { v11 })
-	local v15 = useOpenBuyRobuxWebView(v14)
-	local t1 = {}
-	local v18
 
-	if v13 ~= nil then
-		local robuxBalance = v13.robuxBalance
+local function useCreatorCreditBalanceChipViewModel()
+	local creatorCreditStore = CreatorCredit.getCreatorCreditStore(false)
+	local v = React.useMemo(function()
+		return creatorCreditStore.getQuotaSummary()
+	end, { creatorCreditStore })
+	local v2 = SignalsReact.useSignalState(v.data)
+	local onActivated = useOpenBuyRobuxWebView((React.useCallback(function()
+		if FFlagBuildExperienceModelPicker then
+			GetBuildCreatorCreditRefreshStore(false).refresh()
+		else
+			creatorCreditStore.refreshQuotaSummary():catch(function() end)
+		end
+	end, { creatorCreditStore })))
+	local balanceText
 
-		v18 = NumberLocalization.localize(string.format("%.0f", (math.floor(robuxBalance))), LocalizationService.RobloxLocaleId)
-	else
-		v18 = nil
+	if v2 ~= nil then
+		balanceText = formatBalance(v2.robuxBalance) -- inferred equivalent call
 	end
 
-	t1.balanceText = v18
-	t1.onActivated = v15
-
-	return t1
+	return { balanceText = balanceText, onActivated = onActivated }
 end
 
 return useCreatorCreditBalanceChipViewModel

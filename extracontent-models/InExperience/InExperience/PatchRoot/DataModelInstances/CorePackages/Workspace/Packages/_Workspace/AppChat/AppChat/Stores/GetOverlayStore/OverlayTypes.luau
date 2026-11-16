@@ -1,3 +1,1 @@
-return {
-	GroupOSADialog = "GroupOSADialog"
-}
+return { GroupOSADialog = "GroupOSADialog" }

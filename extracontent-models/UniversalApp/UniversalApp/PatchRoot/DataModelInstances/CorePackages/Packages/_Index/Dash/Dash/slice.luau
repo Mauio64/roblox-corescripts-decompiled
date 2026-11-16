@@ -1,24 +1,24 @@
 local insert = table.insert
 
-local function slice(t1: {[any]: any}, n1: number?, n2: number?) -- line: 19
-	-- upvalues: insert (copy)
-	local t2 = {}
-	local v7 = n1 or 1
-	local v8 = n2 or #t1
+local function slice(list, value: number?, p: number?)
+	local result = {}
 
-	if v7 < 0 then
-		v7 = #t1 + v7
+	local v = value or 1
+	local v2 = p or #list
+
+	if v < 0 then
+		v = #list + v
 	end
 
-	if v8 and v8 < 0 then
-		v8 = #t1 + v8
+	if v2 and v2 < 0 then
+		v2 = #list + v2
 	end
 
-	for i = v7, v8 do
-		insert(t2, t1[i])
+	for i = v, v2 do
+		insert(result, list[i])
 	end
 
-	return t2
+	return result
 end
 
 return slice

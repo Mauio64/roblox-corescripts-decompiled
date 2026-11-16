@@ -1,51 +1,57 @@
 local Songbird = script:FindFirstAncestor("Songbird")
+
 local React = require(Songbird.Parent.React)
 local Foundation = require(Songbird.Parent.Foundation)
 local ReactUtils = require(Songbird.Parent.ReactUtils)
+
 local ProgressCountdown = require(Songbird.Components.ProgressCountdown)
+
 local createNextOrder = ReactUtils.createNextOrder
 
-local function AudioPlaybackTimeline(t1: {[any]: any}) -- line: 22
-	-- upvalues: createNextOrder (copy), React (copy), Foundation (copy), ProgressCountdown (copy)
-	local v9 = createNextOrder()
+local function AudioPlaybackTimeline(props)
+	local nextOrder = createNextOrder()
 
-	return React.createElement(Foundation.View, {
-		tag = "size-full-0 auto-y row flex-between align-y-center gap-large",
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		TimeElapsed = React.createElement(ProgressCountdown, {
-			counterType = "Elapsed",
-			timeLength = t1.duration,
-			timePosition = t1.elapsed,
-			LayoutOrder = v9()
-		}),
-		ProgressBar = React.createElement(Foundation.View, {
-			tag = "size-full-0 auto-y shrink padding-top-xxsmall",
-			LayoutOrder = v9()
-		}, {
-			Slider = React.createElement(Foundation.Slider, {
-				value = t1.elapsed:map(function(n1: number) -- line: 41
-					-- upvalues: t1 (copy)
-					if t1.duration > 0 then
-						return n1 / t1.duration
-					end
+	return React.createElement(
+		Foundation.View,
+		{
+			tag = "size-full-0 auto-y row flex-between align-y-center gap-large",
+			LayoutOrder = props.LayoutOrder
+		},
+		{
+			TimeElapsed = React.createElement(ProgressCountdown, {
+				timeLength = props.duration,
+				timePosition = props.elapsed,
+				counterType = "Elapsed",
+				LayoutOrder = nextOrder()
+			}),
+			ProgressBar = React.createElement(
+				Foundation.View,
+				{ tag = "size-full-0 auto-y shrink padding-top-xxsmall", LayoutOrder = nextOrder() },
+				{
+					Slider = React.createElement(Foundation.Slider, {
+						value = props.elapsed:map(function(p: number)
+							if props.duration > 0 then
+								return p / props.duration
+							end
 
-					return 0
-				end),
-				onValueChanged = t1.onDragTimeline,
-				onDragStarted = t1.onDragTimelineStart,
-				onDragEnded = t1.onDragTimelineEnd,
-				size = Foundation.Enums.InputSize.Medium,
-				knobVisibility = Foundation.Enums.ScrollBarVisibility.Auto,
-				variant = Foundation.Enums.SliderVariant.Standard
+							return 0
+						end),
+						onValueChanged = props.onDragTimeline,
+						onDragStarted = props.onDragTimelineStart,
+						onDragEnded = props.onDragTimelineEnd,
+						size = Foundation.Enums.InputSize.Medium,
+						knobVisibility = Foundation.Enums.ScrollBarVisibility.Auto,
+						variant = Foundation.Enums.SliderVariant.Standard
+					})
+				}
+			),
+			TimeRemaining = React.createElement(ProgressCountdown, {
+				timeLength = props.duration,
+				timePosition = props.elapsed,
+				LayoutOrder = nextOrder()
 			})
-		}),
-		TimeRemaining = React.createElement(ProgressCountdown, {
-			timeLength = t1.duration,
-			timePosition = t1.elapsed,
-			LayoutOrder = v9()
-		})
-	})
+		}
+	)
 end
 
 return AudioPlaybackTimeline

@@ -1,37 +1,32 @@
-local ParentParent = script.Parent.Parent
-local ControlState = require(ParentParent.Core.Control.Enum.ControlState)
+local parent = script.Parent.Parent
 
-require(ParentParent.App.Style.StyleTypes)
+local ControlState = require(parent.Core.Control.Enum.ControlState)
+require(parent.App.Style.StyleTypes)
 
-return function(p1, p2) -- line: 10
-	-- upvalues: ControlState (copy)
-	if p1 == ControlState.Initialize then
-		return p2.Initialize
+return function(p, data)
+	if p == ControlState.Initialize then
+		return data.Initialize
 	end
 
-	if p1 == ControlState.Default then
-		return p2.Default
+	if p == ControlState.Default then
+		return data.Default
 	end
 
-	if p1 == ControlState.Pressed then
-		return p2.Pressed
+	if p == ControlState.Pressed then
+		return data.Pressed
 	end
 
-	if p1 == ControlState.Hover then
-		return p2.Hover
+	if p == ControlState.Hover then
+		return data.Hover
 	end
 
-	if p1 == ControlState.Selected then
-		return p2.Selected
+	if p == ControlState.Selected then
+		return data.Selected
 	end
 
-	if p1 == ControlState.SelectedPressed then
-		return p2.SelectedPressed
+	if p == ControlState.SelectedPressed then
+		return data.SelectedPressed
 	end
 
-	if p1 == ControlState.Disabled then
-		return p2.Disabled
-	end
-
-	return nil
+	return if p == ControlState.Disabled then data.Disabled else nil
 end

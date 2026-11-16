@@ -1,6 +1,6 @@
-local ParentParent = script.Parent.Parent
-
-return require(ParentParent.dependencies).enumerate(script.Name, {
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+return dependencies.enumerate(script.Name, {
 	OpenPeopleList = "openPeopleList",
 	RequestFriendship = "requestFriendship",
 	RevokeFriendRequest = "revokeFriendRequest",

@@ -1,75 +1,74 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local React = require(SocialCarouselParent.React)
-local Tile = require(SocialCarousel.Common.Enums).Tile
+local parent = SocialCarousel.Parent
+local React = require(parent.React)
+local Enums = require(SocialCarousel.Common.Enums)
+local Tile = Enums.Tile
 local UserTile = require(SocialCarousel.Components.Tiles.UserTile)
 local AddFriendsTile = require(SocialCarousel.Components.Tiles.AddFriendsTile)
 local FriendsHintTile = require(SocialCarousel.Components.Tiles.FriendsHintTile)
 local StartSquadTile = require(SocialCarousel.Components.Tiles.StartSquadTile)
 local ShareQRTile = require(SocialCarousel.Components.Tiles.ShareQRTile)
 local Tile2 = require(SocialCarousel.BaseComponents.Tile)
-local FFlagSocialCarouselShareQREnabled = require(SocialCarouselParent.SharedFlags).FFlagSocialCarouselShareQREnabled
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSocialCarouselInGameTitleMarquee = SharedFlags2.FFlagSocialCarouselInGameTitleMarquee
+
+local function renderUserTile(p, p2: number, itemSize: UDim2, selectionOrder: number?, onTileContentChanged, playStatus, onMarqueeFinished, marqueeRunId: number?, onManualMarqueeStart, onManualMarqueeEnd, marqueeOnFocusEnabled: boolean?)
+	local v = {
+		item = p,
+		index = p2,
+		itemSize = itemSize,
+		selectionOrder = selectionOrder,
+		onTileContentChanged = onTileContentChanged
+	}
+
+	if FFlagSocialCarouselInGameTitleMarquee then
+		v.playStatus = playStatus
+		v.onMarqueeFinished = onMarqueeFinished
+		v.marqueeRunId = marqueeRunId
+		v.onManualMarqueeStart = onManualMarqueeStart
+		v.onManualMarqueeEnd = onManualMarqueeEnd
+		v.marqueeOnFocusEnabled = marqueeOnFocusEnabled
+	end
+
+	return React.createElement(UserTile, v)
+end
 
 return {
-	[Tile.Friend] = function(p1, n1: number, uDim2: UDim2, n2: number?, p2) -- line: 14
-		-- upvalues: React (copy), UserTile (copy)
-		return React.createElement(UserTile, {
-			item = p1,
-			index = n1,
-			itemSize = uDim2,
-			selectionOrder = n2,
-			onTileContentChanged = p2
-		})
-	end,
-	[Tile.Recommendation] = function(p3, n3: number, uDim2: UDim2, n4: number?, p4) -- line: 29
-		-- upvalues: React (copy), UserTile (copy)
-		return React.createElement(UserTile, {
-			item = p3,
-			index = n3,
-			itemSize = uDim2,
-			selectionOrder = n4,
-			onTileContentChanged = p4
-		})
-	end,
-	[Tile.AddFriends] = function(_, n5: number, uDim2: UDim2, n6: number?, _) -- line: 44
-		-- upvalues: React (copy), AddFriendsTile (copy)
+	[Tile.Friend] = renderUserTile,
+	[Tile.Recommendation] = renderUserTile,
+	[Tile.FriendRequest] = renderUserTile,
+	[Tile.AddFriends] = function(_, p: number, itemSize: UDim2, selectionOrder: number?, _)
 		return React.createElement(AddFriendsTile, {
-			index = n5,
-			itemSize = uDim2,
-			selectionOrder = n6
+			index = p,
+			itemSize = itemSize,
+			selectionOrder = selectionOrder
 		})
 	end,
-	[Tile.FriendsHint] = function(_, n7: number, uDim2: UDim2, n8: number?, _) -- line: 51
-		-- upvalues: React (copy), FriendsHintTile (copy)
+	[Tile.FriendsHint] = function(_, p: number, itemSize: UDim2, selectionOrder: number?, _)
 		return React.createElement(FriendsHintTile, {
-			index = n7,
-			itemSize = uDim2,
-			selectionOrder = n8
+			index = p,
+			itemSize = itemSize,
+			selectionOrder = selectionOrder
 		})
 	end,
-	[Tile.StartSquad] = function(p9, n9: number, uDim2: UDim2, n10: number?, _) -- line: 58
-		-- upvalues: React (copy), StartSquadTile (copy)
+	[Tile.StartSquad] = function(p, p2: number, itemSize: UDim2, selectionOrder: number?, _)
 		return React.createElement(StartSquadTile, {
-			index = n9,
-			item = p9,
-			itemSize = uDim2,
-			selectionOrder = n10
+			index = p2,
+			item = p,
+			itemSize = itemSize,
+			selectionOrder = selectionOrder
 		})
 	end,
-	[Tile.ShareQR] = if not FFlagSocialCarouselShareQREnabled then nil else function(_, n11: number, uDim2: UDim2, n12: number?, _) -- line: 67
-		-- upvalues: React (copy), ShareQRTile (copy)
+	[Tile.ShareQR] = FFlagSocialCarouselShareQREnabled and function(_, p: number, itemSize: UDim2, selectionOrder: number?, _)
 		return React.createElement(ShareQRTile, {
-			index = n11,
-			itemSize = uDim2,
-			selectionOrder = n12
+			index = p,
+			itemSize = itemSize,
+			selectionOrder = selectionOrder
 		})
-	end,
-	[Tile.Skeleton] = function(_, n13: number, uDim2: UDim2, _: number?, _) -- line: 75
-		-- upvalues: React (copy), Tile2 (copy)
-		return React.createElement(Tile2, {
-			isLoading = true,
-			index = n13,
-			itemSize = uDim2
-		})
+	end or nil,
+	[Tile.Skeleton] = function(_, p: number, itemSize: UDim2, _: number?, _)
+		return React.createElement(Tile2, { isLoading = true, index = p, itemSize = itemSize })
 	end
 }

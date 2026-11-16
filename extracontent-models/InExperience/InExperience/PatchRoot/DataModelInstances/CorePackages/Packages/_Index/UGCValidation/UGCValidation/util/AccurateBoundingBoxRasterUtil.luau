@@ -1,13 +1,14 @@
-local ParentParent = script.Parent.Parent
-local validateAccurateBoundingBoxRasterMethod = require(ParentParent.validation.validateAccurateBoundingBoxRasterMethod)
+local parent = script.Parent.Parent
 
-return {
-	getBoundsViewsForAssetType = function(p1) -- line: 22
-		-- upvalues: validateAccurateBoundingBoxRasterMethod (copy)
-		return validateAccurateBoundingBoxRasterMethod.getBoundsViewsForAssetType(p1)
-	end,
-	validate = function(p2, p3, p4) -- line: 26
-		-- upvalues: validateAccurateBoundingBoxRasterMethod (copy)
-		return validateAccurateBoundingBoxRasterMethod.validate(p2, p3, p4)
-	end
-}
+local validateAccurateBoundingBoxRasterMethod = require(parent.validation.validateAccurateBoundingBoxRasterMethod)
+local AccurateBoundingBoxRasterUtil = {}
+
+function AccurateBoundingBoxRasterUtil.getBoundsViewsForAssetType(p)
+	return validateAccurateBoundingBoxRasterMethod.getBoundsViewsForAssetType(p)
+end
+
+function AccurateBoundingBoxRasterUtil.validate(p, p2, p3)
+	return validateAccurateBoundingBoxRasterMethod.validate(p, p2, p3)
+end
+
+return AccurateBoundingBoxRasterUtil

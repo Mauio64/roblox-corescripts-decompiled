@@ -1,27 +1,22 @@
 local AppComposition = script:FindFirstAncestor("AppComposition")
-local AppCompositionParent = AppComposition.Parent
-local Foundation = require(AppCompositionParent.Foundation)
-local React = require(AppCompositionParent.React)
-local SignalsReact = require(AppCompositionParent.SignalsReact)
+local parent = AppComposition.Parent
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
 
 require(AppComposition.AppCompositionTypes)
-
 local CompositionConfig = require(AppComposition.CompositionConfig)
 local getGlobalViewportBreakpoint = require(AppComposition.getGlobalViewportBreakpoint)
+
 local useTokens = Foundation.Hooks.useTokens
 
-local function useCompositionLayout() -- line: 16
-	-- upvalues: useTokens (copy), SignalsReact (copy), getGlobalViewportBreakpoint (copy), React (copy), CompositionConfig (copy)
-	local v10 = useTokens()
-	local v11 = SignalsReact.useSignalState(getGlobalViewportBreakpoint)
+local function useCompositionLayout()
+	local v = useTokens()
+	local v2 = SignalsReact.useSignalState(getGlobalViewportBreakpoint)
 
-	return React.useMemo(function() -- line: 20
-		-- upvalues: CompositionConfig (copy), v11 (copy), v10 (copy)
-		return CompositionConfig.getBaseConfig(v11, v10)
-	end, {
-		v11,
-		v10
-	})
+	return React.useMemo(function()
+		return CompositionConfig.getBaseConfig(v2, v)
+	end, { v2, v })
 end
 
 return useCompositionLayout

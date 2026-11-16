@@ -1,54 +1,48 @@
 local GuiService = game:GetService("GuiService")
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
 
-local function getSelectionIsOutsideGuiObject(p1) -- line: 7
-	-- upvalues: GuiService (copy)
-	return GuiService.SelectedCoreObject and (not GuiService.SelectedCoreObject:IsDescendantOf(p1) and p1 ~= GuiService.SelectedCoreObject)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(parent.React)
+
+local function getSelectionIsOutsideGuiObject(current) -- 2 equivalent calls inferred from this helper
+	local selectionIsOutsideGuiObject = GuiService.SelectedCoreObject
+		and not GuiService.SelectedCoreObject:IsDescendantOf(current)
+
+	if selectionIsOutsideGuiObject then
+		selectionIsOutsideGuiObject = GuiService.SelectedCoreObject ~= current
+	end
+
+	return selectionIsOutsideGuiObject
 end
-local function useRedirectFocusIntoGuiObject(t1: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), GuiService (copy)
-	React.useEffect(function() -- line: 31
-		-- upvalues: t1 (copy), GuiService (copy)
-		local current = t1.current
+
+local function useRedirectFocusIntoGuiObject(p)
+	React.useEffect(function()
+		local current = p.current
 
 		if current then
-			if GuiService.SelectedCoreObject and (not GuiService.SelectedCoreObject:IsDescendantOf(current) and current ~= GuiService.SelectedCoreObject) then
+			if getSelectionIsOutsideGuiObject(current) then -- inferred equivalent call
 				current.Selectable = true
 			else
 				current.Selectable = false
 			end
 		end
 
-		local connection = GuiService.Changed:Connect(function(property) -- line: 45
-			-- upvalues: t1 (copy), GuiService (copy)
-			if property == "SelectedCoreObject" then
-				local current2 = t1.current
+		local changedConnection = GuiService.Changed:Connect(function(p2)
+			local current2 = p2 == "SelectedCoreObject" and p.current
 
-				if current2 then
-					if GuiService.SelectedCoreObject and (not GuiService.SelectedCoreObject:IsDescendantOf(current2) and current2 ~= GuiService.SelectedCoreObject) then
-						current2.Selectable = true
-
-						return
-					end
-
-					if current2 == GuiService.SelectedCoreObject then
-						current2.Selectable = false
-						GuiService:Select(current2)
-
-						return
-					end
-
-					if GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(current2) then
-						current2.Selectable = false
-					end
+			if current2 then
+				if getSelectionIsOutsideGuiObject(current2) then -- inferred equivalent call
+					current2.Selectable = true
+				elseif GuiService.SelectedCoreObject == current2 then
+					current2.Selectable = false
+					GuiService:Select(current2)
+				elseif GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(current2) then
+					current2.Selectable = false
 				end
 			end
 		end)
 
-		return function() -- line: 68
-			-- upvalues: connection (copy)
-			return connection:Disconnect()
+		return function()
+			return changedConnection:Disconnect()
 		end
 	end, {})
 end

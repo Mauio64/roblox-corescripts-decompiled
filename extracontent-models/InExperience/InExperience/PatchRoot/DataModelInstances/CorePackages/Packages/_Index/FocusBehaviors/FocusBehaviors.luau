@@ -1,51 +1,39 @@
-local scriptParent = script.Parent
-
-require(scriptParent.FocusNavigation)
+local parent = script.Parent
+require(parent.FocusNavigation)
 
 local composeFocusBehaviors = require(script.composeFocusBehaviors)
 
-local function defaultDescendantBehavior(p1) -- line: 8
+local function defaultDescendantBehavior(p) -- 1 equivalent call inferred from this helper
 	return {
-		getTargets = function() -- line: 10
-			-- upvalues: p1 (copy)
-			if p1 then
-				return { p1 }
+		getTargets = function()
+			if p then
+				return { p }
 			end
 
 			return {}
 		end
 	}
 end
-local function mostRecentDescendantBehavior() -- line: 16
-	local u7 = nil
+
+local function mostRecentDescendantBehavior()
+	local v = nil
 
 	return {
-		onDescendantFocusChanged = function(p2) -- line: 20
-			-- upvalues: u7 (ref)
-			u7 = p2 or u7
+		onDescendantFocusChanged = function(p)
+			v = p or v
 		end,
-		getTargets = function() -- line: 23
-			-- upvalues: u7 (ref)
-			if u7 then
-				return { u7 }
+		getTargets = function()
+			if v then
+				return { v }
 			end
 
 			return {}
 		end
 	}
 end
-local function mostRecentDescendantOrDefaultBehavior(p3) -- line: 29
-	-- upvalues: composeFocusBehaviors (copy), mostRecentDescendantBehavior (copy)
-	return composeFocusBehaviors(mostRecentDescendantBehavior(), {
-		getTargets = function() -- line: 10
-			-- upvalues: p3 (copy)
-			if p3 then
-				return { p3 }
-			end
 
-			return {}
-		end
-	})
+local function mostRecentDescendantOrDefaultBehavior(p)
+	return composeFocusBehaviors(mostRecentDescendantBehavior(), defaultDescendantBehavior(p)) -- inferred equivalent call
 end
 
 return {

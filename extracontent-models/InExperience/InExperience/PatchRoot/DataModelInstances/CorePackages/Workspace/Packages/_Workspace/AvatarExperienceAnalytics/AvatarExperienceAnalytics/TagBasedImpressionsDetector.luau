@@ -1,179 +1,214 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+
 local CollectionService = game:GetService("CollectionService")
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
 local UnifiedEventLogEnums = require(script.Parent.UnifiedEventLogEnums)
+
 local AvatarExperienceScreenSizeImpressionsDetector = require(script.Parent.AvatarExperienceScreenSizeImpressionsDetector)
-local AvatarExperienceNavigation = require(Parent.AvatarExperienceNavigation)
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
 local useAvatarRoute = AvatarExperienceNavigation.AvatarRoute.Hooks.useAvatarRoute
 local AvatarScreenProperties = AvatarExperienceNavigation.AvatarRoute.AvatarScreenProperties
 local sendUnifiedEventLogForInstance = require(script.Parent.sendUnifiedEventLogForInstance)
 local SeenImpressionsStore = require(script.Parent.Store.SeenImpressionsStore)
+
 local UnifiedImpressions = SeenImpressionsStore.Category.UnifiedImpressions
-local AvatarExperienceCommon = require(Parent.AvatarExperienceCommon)
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
 local useSelectorSignal = AvatarExperienceCommon.Hooks.useSelectorSignal
 local selectSearchKeyword = AvatarExperienceCommon.State.Selectors.selectSearchKeyword
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXItemDetailsIxpExposure = AvatarExperienceFlags.FFlagAXItemDetailsIxpExposure
 local FFlagAXUnifiedImpressionsOnThumbnail = AvatarExperienceFlags.FFlagAXUnifiedImpressionsOnThumbnail
 
-local function AnalyticsMetadataSelector(p1) -- line: 36
-	return p1.AvatarExperience.AnalyticsMetadata
+local function AnalyticsMetadataSelector(p)
+	return p.AvatarExperience.AnalyticsMetadata
 end
-local function getImpressionDedupKey(p2) -- line: 40
-	-- upvalues: UnifiedEventLogConstants (copy)
+
+local function getImpressionDedupKey(instance)
 	local ATTRIBUTE_PREFIX = UnifiedEventLogConstants.ATTRIBUTE_PREFIX
-	local v25 = p2:GetAttribute(ATTRIBUTE_PREFIX .. "widgetId")
-	local v26 = p2:GetAttribute(ATTRIBUTE_PREFIX .. "itemId")
+	local attribute = instance:GetAttribute(ATTRIBUTE_PREFIX .. "widgetId")
+	local attribute2 = instance:GetAttribute(ATTRIBUTE_PREFIX .. "itemId")
 
-	if v26 ~= nil then
-		return string.format("item|%s|%s|%s|%s|%s", tostring(v25), tostring(v26), tostring(p2:GetAttribute(ATTRIBUTE_PREFIX .. "gridPositionRow")), tostring(p2:GetAttribute(ATTRIBUTE_PREFIX .. "gridPositionColumn")), (tostring(p2:GetAttribute(ATTRIBUTE_PREFIX .. "itemPosition"))))
+	if attribute2 ~= nil then
+		return string.format(
+			"item|%s|%s|%s|%s|%s",
+			tostring(attribute),
+			tostring(attribute2),
+			tostring(instance:GetAttribute(ATTRIBUTE_PREFIX .. "gridPositionRow")),
+			tostring(instance:GetAttribute(ATTRIBUTE_PREFIX .. "gridPositionColumn")),
+			(tostring(instance:GetAttribute(ATTRIBUTE_PREFIX .. "itemPosition")))
+		)
 	end
 
-	if v25 ~= nil then
-		return "widget|" .. tostring(v25)
+	if attribute == nil then
+		return instance:GetFullName()
 	end
 
-	return p2:GetFullName()
+	return "widget|" .. tostring(attribute)
 end
 
-return function(t1: {[any]: any}) -- line: 59
-	-- upvalues: FFlagAXItemDetailsIxpExposure (copy), useAvatarRoute (copy), useSelectorSignal (copy), selectSearchKeyword (copy), AnalyticsMetadataSelector (copy), React (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), UnifiedEventLogConstants (copy), SeenImpressionsStore (copy), UnifiedImpressions (copy), getImpressionDedupKey (copy), AvatarScreenProperties (copy), sendUnifiedEventLogForInstance (copy), Cryo (copy), UnifiedEventLogEnums (copy), CollectionService (copy), AvatarExperienceScreenSizeImpressionsDetector (copy)
-	local u28 = nil
-	local u29 = nil
-	local u30 = nil
-
-	if not FFlagAXItemDetailsIxpExposure then
-		u28 = useAvatarRoute()
-		u29 = useSelectorSignal(selectSearchKeyword)
-		u30 = useSelectorSignal(AnalyticsMetadataSelector)
-	end
-
-	local v31 = React.useRef({})
-	local u32 = nil
+return function(props)
+	local v, v2, v3
 
 	if FFlagAXItemDetailsIxpExposure then
-		u32 = React.useRef({})
+		v = nil
+		v2 = nil
+		v3 = nil
+	else
+		v = useAvatarRoute()
+		v3 = useSelectorSignal(selectSearchKeyword)
+		v2 = useSelectorSignal(AnalyticsMetadataSelector)
 	end
 
-	local v33 = React.useCallback(function(p3) -- line: 75
-		-- upvalues: FFlagAXUnifiedImpressionsOnThumbnail (copy), UnifiedEventLogConstants (copy), SeenImpressionsStore (copy), UnifiedImpressions (copy), getImpressionDedupKey (copy), v31 (copy)
-		if FFlagAXUnifiedImpressionsOnThumbnail then
-			if p3:GetAttribute(UnifiedEventLogConstants.SKIP_IMPRESSION_DETECTION) then
-				return false
-			end
+	local ref = React.useRef({})
+	local ref2
 
-			return not SeenImpressionsStore.hasSeen(UnifiedImpressions, getImpressionDedupKey(p3))
+	if FFlagAXItemDetailsIxpExposure then
+		ref2 = React.useRef({})
+	else
+		ref2 = nil
+	end
+
+	local filterImpressionFunc = React.useCallback(function(instance): boolean
+		if not FFlagAXUnifiedImpressionsOnThumbnail then
+			return not ref.current[instance:GetFullName()]
 		end
 
-		return not v31.current[p3:GetFullName()]
+		if instance:GetAttribute(UnifiedEventLogConstants.SKIP_IMPRESSION_DETECTION) then
+			return false
+		end
+
+		return not SeenImpressionsStore.hasSeen(UnifiedImpressions, getImpressionDedupKey(instance))
 	end, {})
-	local v34 = React.useCallback(function(p4) -- line: 86
-		-- upvalues: FFlagAXUnifiedImpressionsOnThumbnail (copy), SeenImpressionsStore (copy), UnifiedImpressions (copy), getImpressionDedupKey (copy), v31 (copy), FFlagAXItemDetailsIxpExposure (copy), u32 (ref), AvatarScreenProperties (copy), u28 (ref), sendUnifiedEventLogForInstance (copy), Cryo (copy), u30 (ref), UnifiedEventLogEnums (copy), u29 (ref), t1 (copy)
-		local t2 = {}
 
-		for _, v40 in p4 do
-			local FullName = v40:GetFullName()
+	local useCallback = React.useCallback
+	local function fn(items)
+		local v4 = {}
 
-			if not if not FFlagAXUnifiedImpressionsOnThumbnail then v31.current[FullName] else SeenImpressionsStore.hasSeen(UnifiedImpressions, getImpressionDedupKey(v40)) then
-				if FFlagAXItemDetailsIxpExposure then
-					t2[FullName] = v40
+		for _, item in items do
+			local fullName = item:GetFullName()
+			local v5
 
-					if not FFlagAXUnifiedImpressionsOnThumbnail and not u32.current[FullName] then
-						u32.current[FullName] = v40.AncestryChanged:Connect(function() -- line: 106
-							-- upvalues: v40 (copy), v31 (copy), FullName (copy), u32 (ref)
-							if not v40.Parent then
-								v31.current[FullName] = nil
+			if FFlagAXUnifiedImpressionsOnThumbnail then
+				v5 = SeenImpressionsStore.hasSeen(UnifiedImpressions, getImpressionDedupKey(item))
+			else
+				v5 = ref.current[fullName]
+			end
 
-								if u32.current[FullName] then
-									u32.current[FullName]:Disconnect()
-									u32.current[FullName] = nil
-								end
+			if v5 then
+				continue
+			end
+
+			if FFlagAXItemDetailsIxpExposure then
+				v4[fullName] = item
+
+				if not (FFlagAXUnifiedImpressionsOnThumbnail or ref2.current[fullName]) then
+					ref2.current[fullName] = item.AncestryChanged:Connect(function()
+						if not item.Parent then
+							ref.current[fullName] = nil
+
+							if ref2.current[fullName] then
+								ref2.current[fullName]:Disconnect()
+								ref2.current[fullName] = nil
 							end
-						end)
-					end
-				else
-					local v42 = AvatarScreenProperties[u28.current.name]
+						end
+					end)
+				end
+			else
+				local avatarScreenProperty = AvatarScreenProperties[v.current.name]
 
-					sendUnifiedEventLogForInstance(v40, Cryo.Dictionary.join(u30(false), {
-						action = UnifiedEventLogEnums.MarketplaceUnifiedAction.ITEM_IMPRESSION,
-						surface = if not v42 or not v42.analyticsData then nil else v42.analyticsData.unifiedLoggingSurface,
-						keyword = u29(false)
-					}), {
-						includeScreenSize = true,
-						includeElementSizeAndPosition = true
-					})
+				local join = Cryo.Dictionary.join
+				local v6 = v2(false)
+				local v7 = {
+					action = UnifiedEventLogEnums.MarketplaceUnifiedAction.ITEM_IMPRESSION,
+					surface = 0,
+					keyword = 0
+				}
+				local surface
+
+				if avatarScreenProperty and avatarScreenProperty.analyticsData then
+					surface = avatarScreenProperty.analyticsData.unifiedLoggingSurface
 				end
 
-				if FFlagAXUnifiedImpressionsOnThumbnail then
-					SeenImpressionsStore.markSeen(UnifiedImpressions, getImpressionDedupKey(v40))
-				else
-					v31.current[FullName] = true
-				end
+				v7.surface = surface
+
+				v7.keyword = v3(false)
+				sendUnifiedEventLogForInstance(item, join(v6, v7), {
+					includeScreenSize = true,
+					includeElementSizeAndPosition = true
+				})
+			end
+
+			if FFlagAXUnifiedImpressionsOnThumbnail then
+				SeenImpressionsStore.markSeen(UnifiedImpressions, getImpressionDedupKey(item))
+			else
+				ref.current[fullName] = true
 			end
 		end
 
-		if FFlagAXItemDetailsIxpExposure and next(t2) and t1.extensions then
-			for _, v44 in t2 do
-				for _, v46 in t1.extensions do
-					v46({
-						visibleInstance = v44
-					})
+		if FFlagAXItemDetailsIxpExposure and next(v4) and props.extensions then
+			for _, visibleInstance in v4 do
+				for _, extension in props.extensions do
+					extension({ visibleInstance = visibleInstance })
 				end
 			end
 		end
-	end, if not FFlagAXItemDetailsIxpExposure then {
-		u28,
-		u29,
-		u30
-	} else { t1.extensions })
+	end
+
+	local v4
 
 	if FFlagAXItemDetailsIxpExposure then
-		React.useEffect(function() -- line: 162
-			-- upvalues: u32 (ref)
-			return function() -- line: 163
-				-- upvalues: u32 (ref)
-				for _, v53 in u32.current do
-					if v53 then
-						v53:Disconnect()
+		v4 = { props.extensions }
+	else
+		v4 = { v, v3, v2 }
+	end
+
+	local onImpressionsDetected = useCallback(fn, v4)
+
+	if FFlagAXItemDetailsIxpExposure then
+		React.useEffect(function()
+			return function()
+				for _, connection in ref2.current do
+					if connection then
+						connection:Disconnect()
 					end
 				end
 
-				u32.current = {}
+				ref2.current = {}
 			end
 		end, {})
 	end
 
-	local v35 = React.useCallback(function(p5) -- line: 174
-		-- upvalues: FFlagAXUnifiedImpressionsOnThumbnail (copy), CollectionService (copy), UnifiedEventLogConstants (copy)
-		if FFlagAXUnifiedImpressionsOnThumbnail then
-			local UnifiedEventLogConstantsTAG_NAME = CollectionService:GetTagged(UnifiedEventLogConstants.TAG_NAME)
-
-			if p5 then
-				local t3 = {}
-
-				for _, v51 in UnifiedEventLogConstantsTAG_NAME do
-					if v51:IsDescendantOf(p5) then
-						table.insert(t3, v51)
-					end
-				end
-
-				return t3
-			end
-
-			return UnifiedEventLogConstantsTAG_NAME
+	local collectObjectsFunc = React.useCallback(function(ancestor)
+		if not FFlagAXUnifiedImpressionsOnThumbnail then
+			return CollectionService:GetTagged(UnifiedEventLogConstants.TAG_NAME)
 		end
 
-		return CollectionService:GetTagged(UnifiedEventLogConstants.TAG_NAME)
+		local tagged = CollectionService:GetTagged(UnifiedEventLogConstants.TAG_NAME)
+
+		if not ancestor then
+			return tagged
+		end
+
+		local result = {}
+
+		for _, v5 in tagged do
+			if v5:IsDescendantOf(ancestor) then
+				table.insert(result, v5)
+			end
+		end
+
+		return result
 	end, {})
 
 	return React.createElement(AvatarExperienceScreenSizeImpressionsDetector, {
-		parentRef = t1.parentRef,
-		pageFilter = t1.pageFilter,
-		onRequestImpressionsSignal = t1.requestImpressionsSignal,
-		filterImpressionFunc = v33,
-		onImpressionsDetected = v34,
-		collectObjectsFunc = v35
+		parentRef = props.parentRef,
+		pageFilter = props.pageFilter,
+		onRequestImpressionsSignal = props.requestImpressionsSignal,
+		filterImpressionFunc = filterImpressionFunc,
+		onImpressionsDetected = onImpressionsDetected,
+		collectObjectsFunc = collectObjectsFunc
 	})
 end

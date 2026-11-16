@@ -1,21 +1,27 @@
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
 local UserInputService = game:GetService("UserInputService")
 local VRService = game:GetService("VRService")
+
 local PaymentPlatformEnum = require(BulkPurchaseApp.Enums.PaymentPlatformEnum)
 
-local function getPaymentPlatform() -- line: 9
-	-- upvalues: UserInputService (copy), PaymentPlatformEnum (copy), VRService (copy)
-	local Platform = UserInputService:GetPlatform()
+local function getPaymentPlatform()
+	local platform = UserInputService:GetPlatform()
 
-	if Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.Linux) then
+	if platform == Enum.Platform.Windows or platform == Enum.Platform.OSX or platform == Enum.Platform.Linux then
 		return PaymentPlatformEnum.Desktop
 	end
 
-	if Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android or Platform == Enum.Platform.UWP then
+	if platform == Enum.Platform.IOS or platform == Enum.Platform.Android or platform == Enum.Platform.UWP then
 		return PaymentPlatformEnum.Mobile
 	end
 
-	if Platform == Enum.Platform.XBoxOne or Platform == Enum.Platform.XBox360 or Platform == Enum.Platform.PS3 or Platform == Enum.Platform.PS4 or Platform == Enum.Platform.PS5 then
+	if
+		platform == Enum.Platform.XBoxOne
+		or platform == Enum.Platform.XBox360
+		or platform == Enum.Platform.PS3
+		or platform == Enum.Platform.PS4
+		or platform == Enum.Platform.PS5
+	then
 		return PaymentPlatformEnum.Console
 	end
 

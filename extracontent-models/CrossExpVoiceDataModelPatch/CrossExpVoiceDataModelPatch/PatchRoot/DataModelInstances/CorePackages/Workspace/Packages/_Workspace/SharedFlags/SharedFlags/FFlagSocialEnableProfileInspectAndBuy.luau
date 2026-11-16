@@ -1,1 +1,2 @@
-return game:DefineFastFlag("SocialEnableProfileInspectAndBuy_8", false) and game:GetEngineFeature("ProfileInspectAndBuyImpressionCountStorageKey")
+return game:DefineFastFlag("SocialEnableProfileInspectAndBuy_8", false)
+	and game:GetEngineFeature("ProfileInspectAndBuyImpressionCountStorageKey")

@@ -1,5 +1,1 @@
-return {
-	Directional = "Directional",
-	Pointer = "Pointer",
-	Touch = "Touch"
-}
+return { Directional = "Directional", Pointer = "Pointer", Touch = "Touch" }

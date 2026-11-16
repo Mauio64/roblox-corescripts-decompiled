@@ -1,69 +1,233 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("ShareSheet").Parent
-local EventIngest = require(Parent.LoggingProtocol).TelemetryBackends.EventIngest
-local v4 = game:DefineFastInt("ShareSheetTelemetryThrottleHundredthsPercent", 10000)
-local t1 = {
+
+local ShareSheet = script:FindFirstAncestor("ShareSheet")
+local parent = ShareSheet.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
+require(parent.AppChat.GetExternalChatMessageSenderStore)
+local LoggingProtocol = require(parent.LoggingProtocol)
+require(ShareSheet.Recipients.RecipientSource)
+local getElapsedTimeMs = require(ShareSheet.getElapsedTimeMs)
+
+local EventIngest = LoggingProtocol.TelemetryBackends.EventIngest
+
+local defineFastInt = game:DefineFastInt("ShareSheetTelemetryThrottleHundredthsPercent", 10000)
+
+local v = {
 	shareSheetOpened = {
 		eventName = "shareSheetOpened",
-		description = "Share sheet was opened",
 		backends = { EventIngest },
-		throttlingPercentage = v4,
-		lastUpdated = {
-			2025,
-			7,
-			22
-		}
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2025, 7, 22 },
+		description = "Share sheet was opened"
 	},
 	shareSheetLinkCopied = {
 		eventName = "shareSheetLinkCopied",
-		description = "Link was copied from share sheet",
 		backends = { EventIngest },
-		throttlingPercentage = v4,
-		lastUpdated = {
-			2025,
-			7,
-			22
-		}
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2025, 7, 22 },
+		description = "Link was copied from share sheet"
 	},
 	shareSheetMessageSent = {
 		eventName = "shareSheetMessageSent",
-		description = "Message was sent from share sheet",
 		backends = { EventIngest },
-		throttlingPercentage = v4,
-		lastUpdated = {
-			2025,
-			7,
-			22
-		}
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2025, 7, 22 },
+		description = "Message was sent from share sheet"
+	},
+	Lifecycle = {
+		eventName = "shareSheetLifecycle",
+		backends = { EventIngest },
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2026, 8, 3 },
+		description = "Share sheet request lifecycle transitions"
+	},
+	Interaction = {
+		eventName = "shareSheetInteraction",
+		backends = { EventIngest },
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2026, 8, 3 },
+		description = "User interactions within the share sheet"
+	},
+	MessageSendResult = {
+		eventName = "shareSheetMessageSendResult",
+		backends = { EventIngest },
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2026, 9, 8 },
+		description = "Per-recipient share sheet message send results"
 	}
 }
-local t2 = {
-	"addPlaceId",
-	"addUniverseId",
-	"addPlaySessionId",
-	"addSessionInfo"
+
+local standardizedFields = { "addPlaceId", "addUniverseId", "addPlaySessionId", "addSessionInfo" }
+
+local ShareSheetTelemetry = {}
+
+ShareSheetTelemetry.LifecycleType = { Open = "open", Close = "close" }
+
+ShareSheetTelemetry.CloseReason = {
+	UserDismissed = "userDismissed",
+	SendSuccess = "sendSuccess",
+	Programmatic = "programmatic",
+	Replaced = "replaced"
 }
 
-return {
-	logShareSheetOpened = function(t3: {[any]: any}) -- line: 48
-		-- upvalues: TelemetryService (copy), t1 (copy), t2 (copy)
-		TelemetryService:LogEvent(t1.shareSheetOpened, {
-			standardizedFields = t2,
-			customFields = t3
-		})
-	end,
-	logShareSheetLinkCopied = function(t4: {[any]: any}) -- line: 55
-		-- upvalues: TelemetryService (copy), t1 (copy), t2 (copy)
-		TelemetryService:LogEvent(t1.shareSheetLinkCopied, {
-			standardizedFields = t2,
-			customFields = t4
-		})
-	end,
-	logShareSheetMessageSent = function(t5: {[any]: any}) -- line: 62
-		-- upvalues: TelemetryService (copy), t1 (copy), t2 (copy)
-		TelemetryService:LogEvent(t1.shareSheetMessageSent, {
-			standardizedFields = t2,
-			customFields = t5
-		})
-	end
+ShareSheetTelemetry.InteractionType = {
+	CopyLink = "copyLink",
+	NativeShare = "nativeShare",
+	ConversationSelected = "conversationSelected",
+	ConversationDeselected = "conversationDeselected",
+	CustomMessageComposerFocused = "customMessageComposerFocused",
+	CustomMessageSubmitted = "customMessageSubmitted",
+	ViewMessage = "viewMessage"
 }
+
+ShareSheetTelemetry.ViewDestination = { Conversation = "conversation", ChatLanding = "chatLanding" }
+
+local v2 = {
+	eventName = "shareSheetOpened",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 8, 3 },
+	description = "Count of share sheet requests opened"
+}
+
+local v3 = {
+	eventName = "shareSheetClosed",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 8, 3 },
+	description = "Count of share sheet requests closed"
+}
+
+local v4 = {
+	eventName = "shareSheetInteraction",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 8, 3 },
+	description = "Count of share sheet interactions"
+}
+
+local v5 = {
+	eventName = "shareSheetMessageSendResult",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 9, 8 },
+	description = "Count of per-recipient share sheet message send results"
+}
+
+local v6 = {
+	eventName = "shareSheetMessageSendResultDurationMs",
+	backends = { LoggingProtocol.TelemetryBackends.Stats },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 9, 8 },
+	description = "Duration in milliseconds from recipient send invocation to result"
+}
+
+function ShareSheetTelemetry.logShareSheetOpened(customFields)
+	TelemetryService:LogEvent(v.shareSheetOpened, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
+	})
+end
+
+function ShareSheetTelemetry.logShareSheetLinkCopied(customFields)
+	TelemetryService:LogEvent(v.shareSheetLinkCopied, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
+	})
+end
+
+function ShareSheetTelemetry.logShareSheetMessageSent(customFields)
+	TelemetryService:LogEvent(v.shareSheetMessageSent, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
+	})
+end
+
+function ShareSheetTelemetry.logLifecycle(customFields)
+	TelemetryService:LogEvent(v.Lifecycle, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
+	})
+	local v7
+
+	if customFields.lifecycleType == ShareSheetTelemetry.LifecycleType.Open then
+		v7 = v2
+	else
+		v7 = v3
+	end
+
+	TelemetryService:LogCounter(v7, {
+		customFields = { context = customFields.context, closeReason = customFields.closeReason }
+	}, 1)
+end
+
+function ShareSheetTelemetry.logInteraction(customFields)
+	TelemetryService:LogEvent(v.Interaction, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
+	})
+
+	TelemetryService:LogCounter(v4, {
+		customFields = {
+			context = customFields.context,
+			interactionType = customFields.interactionType
+		}
+	}, 1)
+end
+
+function ShareSheetTelemetry.logMessageSendResult(customFields)
+	TelemetryService:LogEvent(v.MessageSendResult, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
+	})
+
+	TelemetryService:LogStat(v6, {
+		customFields = {
+			context = customFields.context,
+			sendStatus = customFields.sendStatus,
+			hasCustomMessage = customFields.hasCustomMessage
+		}
+	}, customFields.durationMs)
+	TelemetryService:LogCounter(v5, {
+		customFields = {
+			context = customFields.context,
+			sendStatus = customFields.sendStatus,
+			hasCustomMessage = customFields.hasCustomMessage
+		}
+	}, 1)
+end
+
+function ShareSheetTelemetry.startMessageSendResult(data)
+	local now = os.clock()
+	return function(p)
+		local logMessageSendResult = ShareSheetTelemetry.logMessageSendResult
+		local v7 = {
+			context = data.context,
+			recipientSource = 0,
+			telemetryId = 0,
+			requestedConversationId = 0,
+			resolvedConversationId = 0,
+			sendStatus = 0,
+			hasCustomMessage = 0,
+			durationMs = 0
+		}
+		local recipientSource
+
+		if FFlagShareSheetFriendsSort then
+			recipientSource = data.recipientSource
+		end
+
+		v7.recipientSource = recipientSource
+		v7.telemetryId = data.telemetryId
+		v7.requestedConversationId = data.requestedConversationId
+		v7.resolvedConversationId = p.conversationId
+		v7.sendStatus = p.status
+		v7.hasCustomMessage = data.hasCustomMessage
+		v7.durationMs = getElapsedTimeMs(now)
+		logMessageSendResult(v7)
+	end
+end
+
+return ShareSheetTelemetry

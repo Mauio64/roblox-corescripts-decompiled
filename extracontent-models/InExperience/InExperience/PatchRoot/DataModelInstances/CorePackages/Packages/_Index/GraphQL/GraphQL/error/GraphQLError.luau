@@ -1,141 +1,168 @@
-local ParentParent = script.Parent.Parent
-local language = ParentParent.language
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local language = parent.language
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Error = LuauPolyfill.Error
 local Object = LuauPolyfill.Object
+
 local HttpService = game:GetService("HttpService")
-local isObjectLike = require(ParentParent.jsutils.isObjectLike).isObjectLike
+
+local isObjectLike = require(parent.jsutils.isObjectLike)
+local isObjectLike2 = isObjectLike.isObjectLike
 
 require(language.ast)
+
 require(language.source)
 
-local getLocation = require(language.location).getLocation
+local location = require(language.location)
+
+local getLocation = location.getLocation
 local printLocation = require(language.printLocation)
 local printLocation2 = printLocation.printLocation
 local printSourceLocation = printLocation.printSourceLocation
-local printError = nil
-local undefinedIfEmpty = nil
-local self = setmetatable({}, {
-	__index = Error
-})
 
-self.__index = self
+local printError
+local undefinedIfEmpty
 
-function self.__tostring(p1) -- line: 45
-	-- upvalues: printError (ref)
-	return printError(p1)
+local object = setmetatable({}, { __index = Error })
+
+object.__index = object
+function object.__tostring(p)
+	return printError(p)
 end
-function self.new(s1: string, p2, p3, p4, p5, p6, t1: {[any]: any}?) -- line: 124
-	-- upvalues: Error (copy), undefinedIfEmpty (ref), Array (copy), getLocation (copy), isObjectLike (copy), Object (copy), self (copy)
-	local v25 = Error.new(s1)
 
-	v25.name = "GraphQLError"
-	v25.originalError = p6
-	v25.nodes = undefinedIfEmpty(if not Array.isArray(p2) then if not p2 then nil else { p2 } else p2)
+function object.new(p: string, p2, p3, p4, p5, originalError, p6)
+	local v = Error.new(p)
 
-	local t2 = {}
+	v.name = "GraphQLError"
+	v.originalError = originalError
 
-	if v25.nodes then
-		for _, v in ipairs(v25.nodes) do
-			local loc = v.loc
+	local v2 = undefinedIfEmpty
+
+	if not Array.isArray(p2) then
+		p2 = p2 and { p2 } or nil
+	end
+
+	v.nodes = v2(p2)
+
+	local locs = {}
+
+	if v.nodes then
+		for _, node in ipairs(v.nodes) do
+			local loc = node.loc
 
 			if loc ~= nil then
-				table.insert(t2, loc)
+				table.insert(locs, loc)
 			end
 		end
 	end
 
-	local v30 = undefinedIfEmpty(t2)
+	local v3 = undefinedIfEmpty(locs)
+	local source
 
-	v25.source = if not p3 then if v30 ~= nil then v30[1].source else nil else p3
-	v25.positions = if not p4 then if v30 then Array.map(v30, function(p7) -- line: 165
-		return p7.start
-	end) else nil else p4
-	v25.locations = if not p4 or not p3 then if not v30 then nil else Array.map(v30, function(p8) -- line: 174
-		-- upvalues: getLocation (copy)
-		return getLocation(p8.source, p8.start)
-	end) else Array.map(p4, function(p9) -- line: 170
-		-- upvalues: getLocation (copy), p3 (copy)
-		return getLocation(p3, p9)
-	end)
-	v25.path = p5 or nil
+	if p3 then
+		source = p3
+	elseif v3 ~= nil then
+		source = v3[1].source
+	end
 
-	local v31 = if p6 then p6.extensions else nil
+	v.source = source
+	local positions
 
-	if t1 == nil and isObjectLike(v31) then
-		v25.extensions = Object.assign({}, v31)
+	if p4 then
+		positions = p4
+	elseif v3 then
+		positions = Array.map(v3, function(p7)
+			return p7.start
+		end)
+	end
+
+	v.positions = positions
+	local mapped
+
+	if p4 and p3 then
+		mapped = Array.map(p4, function(p7)
+			return getLocation(p3, p7)
+		end)
+	elseif v3 then
+		mapped = Array.map(v3, function(p7)
+			return getLocation(p7.source, p7.start)
+		end)
+	end
+
+	v.locations = mapped
+
+	v.path = p5 or nil
+	local extensions
+
+	if originalError then
+		extensions = originalError.extensions
+	end
+
+	if p6 == nil and isObjectLike2(extensions) then
+		v.extensions = Object.assign({}, extensions)
 	else
-		v25.extensions = t1 or nil
+		v.extensions = p6 or nil
 	end
 
-	if p6 and p6.stack then
-		v25.stack = p6.stack
+	if originalError and originalError.stack then
+		v.stack = originalError.stack
 	end
 
-	return (setmetatable(v25, self))
+	return (setmetatable(v, object))
 end
-function self.toString(p10) -- line: 209
-	-- upvalues: printError (ref)
-	return printError(p10)
+
+function object.toString(p)
+	return printError(p)
 end
-function self.toJSON(p11) -- line: 214
-	-- upvalues: Array (copy), HttpService (copy)
-	local t3 = { "message" }
 
-	if p11.locations ~= nil then
-		table.insert(t3, "locations")
+function object.toJSON(data)
+	local v = { "message" }
+
+	if data.locations ~= nil then
+		table.insert(v, "locations")
 	end
 
-	if p11.path ~= nil then
-		table.insert(t3, "path")
+	if data.path ~= nil then
+		table.insert(v, "path")
 	end
 
-	if p11.extensions ~= nil then
-		table.insert(t3, "extensions")
+	if data.extensions ~= nil then
+		table.insert(v, "extensions")
 	end
 
-	return "{" .. Array.join(Array.map(t3, function(p12) -- line: 231
-		-- upvalues: HttpService (copy), p11 (copy)
-		return HttpService:JSONEncode(p12) .. ":" .. HttpService:JSONEncode(p11[p12])
+	return "{" .. Array.join(Array.map(v, function(p)
+		return HttpService:JSONEncode(p) .. ":" .. HttpService:JSONEncode(data[p])
 	end), ",") .. "}"
 end
-function undefinedIfEmpty(p13) -- line: 239
-	if p13 == nil or #p13 == 0 then
-		return nil
-	end
 
-	return p13
+undefinedIfEmpty = function(locs)
+	return if not (locs == nil or #locs == 0) then locs else nil
 end
-function printError(t4: {[any]: any}) -- line: 243
-	-- upvalues: printLocation2 (copy), printSourceLocation (copy)
-	local message = t4.message
 
-	if t4.nodes ~= nil then
-		for i = 1, #t4.nodes do
-			local v39 = t4.nodes[i]
+printError = function(data)
+	local v = data.message
 
-			if v39.loc ~= nil then
-				message ..= "\n\n" .. printLocation2(v39.loc)
+	if data.nodes == nil then
+		if data.source ~= nil and data.locations ~= nil then
+			for i = 1, #data.locations do
+				local location2 = data.locations[i]
+				v ..= "\n\n" .. printSourceLocation(data.source, location2)
 			end
 		end
+	else
+		for i = 1, #data.nodes do
+			local node = data.nodes[i]
 
-		return message
-	end
-
-	if t4.source ~= nil and t4.locations ~= nil then
-		for i = 1, #t4.locations do
-			local v41 = t4.locations[i]
-
-			message ..= "\n\n" .. printSourceLocation(t4.source, v41)
+			if node.loc ~= nil then
+				v ..= "\n\n" .. printLocation2(node.loc)
+			end
 		end
 	end
 
-	return message
+	return v
 end
 
-return {
-	printError = printError,
-	GraphQLError = self
-}
+return { printError = printError, GraphQLError = object }

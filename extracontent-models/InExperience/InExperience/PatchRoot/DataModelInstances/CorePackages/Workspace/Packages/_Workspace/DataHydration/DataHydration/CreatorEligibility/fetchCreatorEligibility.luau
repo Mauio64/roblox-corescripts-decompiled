@@ -1,30 +1,31 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local HttpClient = require(Parent.HttpClient)
-local UrlBase = require(Parent.UrlBuilder).UrlBase
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
 
 require(script.Parent.CreatorEligibilityStoreTypes)
 
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
+local FetchCreatorEligibility = {}
 
-return {
-	fetchEligibility = function(n1: number, t1: {[any]: any}?) -- line: 19
-		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
-		local v8 = t1 or {}
-		local v9 = v8.baseUrl or UrlBase.APIS
-		local v10 = fetch({
-			method = "GET",
-			analyticsKey = "creator-eligibility.get",
-			network = v8.network,
-			url = ("%s/core-content/v1/creator-eligibility/%d"):format(v9, n1),
-			decode = function(p1) -- line: 30
-				return p1
-			end
-		})
+function FetchCreatorEligibility.fetchEligibility(p: number, options)
+	local v = options or {}
+	local baseUrl = v.baseUrl or UrlBase.APIS
+	return asPromise((fetch({
+		network = v.network,
+		method = "GET",
+		url = ("%s/core-content/v1/creator-eligibility/%d"):format(baseUrl, p),
+		analyticsKey = "creator-eligibility.get",
+		decode = function(p2)
+			return p2
+		end
+	})))
+end
 
-		return asPromise(v10)
-	end,
-	isFlagPresent = function(p2, p3) -- line: 37
-		return table.find(p2.creatorEligibility, p3) ~= nil
-	end
-}
+function FetchCreatorEligibility.isFlagPresent(p, p2): boolean
+	return table.find(p.creatorEligibility, p2) ~= nil
+end
+
+return FetchCreatorEligibility

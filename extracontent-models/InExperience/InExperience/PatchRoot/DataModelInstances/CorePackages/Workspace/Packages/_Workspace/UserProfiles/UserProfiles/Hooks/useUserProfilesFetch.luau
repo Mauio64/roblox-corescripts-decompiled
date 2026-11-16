@@ -1,146 +1,158 @@
 local UserProfiles = script:FindFirstAncestor("UserProfiles")
-local UserProfilesParent = UserProfiles.Parent
-local Cryo = require(UserProfilesParent.Cryo)
-local React = require(UserProfilesParent.React)
-local RoactUtils = require(UserProfilesParent.RoactUtils)
+local parent = UserProfiles.Parent
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
 local setupFireDiag = require(UserProfiles.Analytics.setupFireDiag)
 local EventNames = require(UserProfiles.Analytics.EventNames)
 local UserProfilesAnalytics = require(UserProfiles.Analytics.UserProfilesAnalytics)
-local SocialCommon = require(UserProfilesParent.SocialCommon)
-local getDeepValue = require(UserProfilesParent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue
+local SocialCommon = require(parent.SocialCommon)
+
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local getDeepValue = LuaSocialLibrariesDeps.SocialLibraries.config({}).Dictionary.getDeepValue
+
 local useApolloAutoRetry = SocialCommon.Hooks.useApolloAutoRetry
+
 local useEffectOnce = RoactUtils.Hooks.useEffectOnce
 local useEffectOnMount = RoactUtils.Hooks.useEffectOnMount
-local useQuery = require(UserProfilesParent.ApolloClient).useQuery
-local v15 = game:DefineFastFlag("UserProfilesEnableRetries", false)
+
+local ApolloClient = require(parent.ApolloClient)
+local useQuery = ApolloClient.useQuery
+
+local defineFastFlag = game:DefineFastFlag("UserProfilesEnableRetries", false)
 local FFlagUserProfilesLogCancelledRequests = require(UserProfiles.Flags.FFlagUserProfilesLogCancelledRequests)
 local FFlagUserProfilesLogErrorCodes = require(UserProfiles.Flags.FFlagUserProfilesLogErrorCodes)
-local v18 = game:DefineFastInt("UserProfileDefaultRetryCount", 2)
-local v19 = game:DefineFastFlag("UserProfilesFilterInvalidUserIds", false)
+local defineFastInt = game:DefineFastInt("UserProfileDefaultRetryCount", 2)
+local defineFastFlag2 = game:DefineFastFlag("UserProfilesFilterInvalidUserIds", false)
 
-return function(t1: {[any]: any}) -- line: 29
-	-- upvalues: v19 (copy), React (copy), Cryo (copy), useQuery (copy), v15 (copy), useApolloAutoRetry (copy), v18 (copy), FFlagUserProfilesLogCancelledRequests (copy), setupFireDiag (copy), UserProfilesAnalytics (copy), useEffectOnMount (copy), EventNames (copy), useEffectOnce (copy), FFlagUserProfilesLogErrorCodes (copy), getDeepValue (copy)
-	local v21 = nil
+return function(data)
+	local userIds
 
-	if v19 then
-		v21 = React.useMemo(function() -- line: 37
-			-- upvalues: Cryo (copy), t1 (copy)
-			return Cryo.List.filter(t1.userIds, function(p1) -- line: 38
-				return tonumber(p1) ~= nil
+	if defineFastFlag2 then
+		userIds = React.useMemo(function()
+			return Cryo.List.filter(data.userIds, function(p): boolean
+				return tonumber(p) ~= nil
 			end)
-		end, { t1.userIds })
+		end, { data.userIds })
 	end
 
-	local v22 = if not v19 then #t1.userIds == 0 else #v21 == 0
-	local v23 = useQuery(t1.query, {
+	local v
+
+	if defineFastFlag2 then
+		v = #userIds == 0
+	else
+		v = #data.userIds == 0
+	end
+
+	local query = data.query
+	local v2 = {
 		errorPolicy = "all",
-		skip = v22 or t1.skip,
-		variables = {
-			userIds = if not v19 then t1.userIds else v21
-		}
-	})
-	local u24 = v23
+		skip = v or data.skip,
+		variables = 0
+	}
 
-	if v15 then
-		u24 = useApolloAutoRetry(v23, {
-			retryCount = if not t1.overrideRetryCount then v18 else t1.overrideRetryCount
-		})
+	if not defineFastFlag2 then
+		userIds = data.userIds
 	end
 
-	local v25 = React.useRef(u24.loading or u24.isRetrying)
+	v2.variables = { userIds = userIds }
+	local v3 = useQuery(query, v2)
+
+	if defineFastFlag then
+		local retryCount
+
+		if data.overrideRetryCount then
+			retryCount = data.overrideRetryCount
+		else
+			retryCount = defineFastInt
+		end
+
+		v3 = useApolloAutoRetry(v3, { retryCount = retryCount })
+	end
+
+	local ref = React.useRef(v3.loading or v3.isRetrying)
 
 	if FFlagUserProfilesLogCancelledRequests then
-		v25.current = u24.loading or u24.isRetrying
+		ref.current = v3.loading or v3.isRetrying
 	end
 
-	local v26 = React.useMemo(function() -- line: 68
-		-- upvalues: setupFireDiag (copy), UserProfilesAnalytics (copy)
+	local v4 = React.useMemo(function()
 		return setupFireDiag({
-			analytics = {
-				Diag = UserProfilesAnalytics.Diag
-			}
+			analytics = { Diag = UserProfilesAnalytics.Diag }
 		})
 	end, {})
-	local v27 = React.useRef(DateTime.now())
 
-	useEffectOnMount(function() -- line: 78
-		-- upvalues: v27 (copy), v26 (copy), EventNames (copy)
-		v27.current = DateTime.now()
-		v26(EventNames.UserProfilesRequestBegin)
+	local ref2 = React.useRef(DateTime.now())
+
+	useEffectOnMount(function()
+		ref2.current = DateTime.now()
+		v4(EventNames.UserProfilesRequestBegin)
 	end)
 
-	if v15 then
-		useEffectOnce(function() -- line: 84
-			-- upvalues: v27 (copy), v26 (copy), EventNames (copy), UserProfilesAnalytics (copy), FFlagUserProfilesLogErrorCodes (copy), getDeepValue (copy), u24 (ref)
-			if v27.current then
-				local v28 = DateTime.now().UnixTimestampMillis - v27.current.UnixTimestampMillis
+	if defineFastFlag then
+		useEffectOnce(function()
+			if ref2.current then
+				local v5 = DateTime.now().UnixTimestampMillis - ref2.current.UnixTimestampMillis
+				v4(EventNames.UserProfilesRequestFail)
+				UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestFailDuration, v5)
 
-				v26(EventNames.UserProfilesRequestFail)
-				UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestFailDuration, v28)
+				local v6 = FFlagUserProfilesLogErrorCodes and getDeepValue(v3, "error.graphQLErrors")
 
-				if FFlagUserProfilesLogErrorCodes then
-					local v29 = getDeepValue(u24, "error.graphQLErrors")
+				if v6 then
+					local deepValue = getDeepValue(v6[1] or {}, "extensions.status")
 
-					if v29 then
-						local v30 = v29[1] or {}
-						local v31 = getDeepValue(v30, "extensions.status")
+					v4(EventNames.UserProfilesErrorCode, { status = deepValue })
+				end
+			end
+		end, v3.error)
 
-						v26(EventNames.UserProfilesErrorCode, {
-							status = v31
-						})
+		local function fn()
+			if ref2.current then
+				local v5 = DateTime.now().UnixTimestampMillis - ref2.current.UnixTimestampMillis
+
+				if v3.data and v3.retryCount == 0 then
+					v4(EventNames.UserProfilesRequestSuccess)
+					UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestSuccessDuration, v5)
+				elseif v3.data then
+					v4(EventNames.UserProfilesRequestSuccessAfterRetry)
+					UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestSuccessAfterRetry, v5)
+				else
+					v4(EventNames.UserProfilesRequestFailAfterRetry)
+					UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestFailAfterRetryDuration, v5)
+
+					local v6 = FFlagUserProfilesLogErrorCodes and getDeepValue(v3, "error.graphQLErrors")
+
+					if v6 then
+						local deepValue = getDeepValue(v6[1] or {}, "extensions.status")
+
+						v4(EventNames.UserProfilesErrorCode, { status = deepValue })
 					end
 				end
 			end
-		end, u24.error)
-		useEffectOnce(function() -- line: 105
-			-- upvalues: v27 (copy), u24 (ref), v26 (copy), EventNames (copy), UserProfilesAnalytics (copy), FFlagUserProfilesLogErrorCodes (copy), getDeepValue (copy)
-			if v27.current then
-				local v32 = DateTime.now().UnixTimestampMillis - v27.current.UnixTimestampMillis
+		end
 
-				if u24.data and u24.retryCount == 0 then
-					v26(EventNames.UserProfilesRequestSuccess)
-					UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestSuccessDuration, v32)
+		local v5
 
-					return
-				end
+		if FFlagUserProfilesLogCancelledRequests then
+			v5 = not ref.current
+		elseif v3.loading == false then
+			v5 = v3.isRetrying == false
+		else
+			v5 = false
+		end
 
-				if u24.data then
-					v26(EventNames.UserProfilesRequestSuccessAfterRetry)
-					UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestSuccessAfterRetry, v32)
-
-					return
-				end
-
-				v26(EventNames.UserProfilesRequestFailAfterRetry)
-				UserProfilesAnalytics.Diag:reportStats(EventNames.UserProfilesRequestFailAfterRetryDuration, v32)
-
-				if FFlagUserProfilesLogErrorCodes then
-					local v33 = getDeepValue(u24, "error.graphQLErrors")
-
-					if v33 then
-						local v34 = v33[1] or {}
-						local v35 = getDeepValue(v34, "extensions.status")
-
-						v26(EventNames.UserProfilesErrorCode, {
-							status = v35
-						})
-					end
-				end
-			end
-		end, if not FFlagUserProfilesLogCancelledRequests then u24.loading == false and u24.isRetrying == false else not v25.current)
+		useEffectOnce(fn, v5)
 	end
 
 	if FFlagUserProfilesLogCancelledRequests then
-		React.useEffect(function() -- line: 148
-			-- upvalues: v25 (copy), v26 (copy), EventNames (copy)
-			return function() -- line: 149
-				-- upvalues: v25 (copy), v26 (copy), EventNames (copy)
-				if v25.current then
-					v26(EventNames.UserProfilesUnmountEarly)
+		React.useEffect(function()
+			return function()
+				if ref.current then
+					v4(EventNames.UserProfilesUnmountEarly)
 				end
 			end
 		end, {})
 	end
 
-	return u24
+	return v3
 end

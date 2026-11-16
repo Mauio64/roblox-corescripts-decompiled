@@ -1,22 +1,21 @@
-local ParentParent = script.Parent.Parent
-local checkAndSendEvent = require(ParentParent.Utils.checkAndSendEvent)
-local v3 = game:DefineFastFlag("ClientErrorAdditionalArgs", false)
+local parent = script.Parent.Parent
+local checkAndSendEvent = require(parent.Utils.checkAndSendEvent)
+local defineFastFlag = game:DefineFastFlag("ClientErrorAdditionalArgs", false)
 
-return function(s1: string, s2: string, s3: string?, s4: string?) -- line: 5
-	-- upvalues: v3 (copy), checkAndSendEvent (copy)
-	local t1 = {}
+return function(p: string, state: string, url: string?, origin: string?)
+	local v = {}
 
-	if s2 then
-		t1.state = s2
+	if state then
+		v.state = state
 	end
 
-	if v3 and s3 then
-		t1.url = s3
+	if defineFastFlag and url then
+		v.url = url
 	end
 
-	if v3 and s4 then
-		t1.origin = s4
+	if defineFastFlag and origin then
+		v.origin = origin
 	end
 
-	checkAndSendEvent(s1, "authClientError", t1)
+	checkAndSendEvent(p, "authClientError", v)
 end

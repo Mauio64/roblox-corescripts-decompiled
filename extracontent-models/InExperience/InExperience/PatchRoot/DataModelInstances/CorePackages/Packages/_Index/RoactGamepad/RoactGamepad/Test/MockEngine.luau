@@ -1,11 +1,12 @@
-local ParentParent = script.Parent.Parent.Parent
-local Cryo = require(ParentParent.Cryo)
+local parent = script.Parent.Parent.Parent
+local Cryo = require(parent.Cryo)
+
 local createSignal = require(script.Parent.Parent.createSignal)
-local t1 = {}
 
-t1.__index = t1
+local MockEngine = {}
+MockEngine.__index = MockEngine
 
-local t2 = {
+local set = {
 	[Enum.UserInputType.Gamepad1] = true,
 	[Enum.UserInputType.Gamepad2] = true,
 	[Enum.UserInputType.Gamepad3] = true,
@@ -16,7 +17,8 @@ local t2 = {
 	[Enum.UserInputType.Gamepad8] = true,
 	[Enum.UserInputType.Keyboard] = true
 }
-local t3 = {
+
+local v = {
 	Enum.KeyCode.Thumbstick2,
 	Enum.KeyCode.DPadDown,
 	Enum.KeyCode.DPadUp,
@@ -36,7 +38,8 @@ local t3 = {
 	Enum.KeyCode.ButtonA,
 	Enum.KeyCode.ButtonL1
 }
-local t4 = {
+
+local v2 = {
 	[Enum.KeyCode.DPadUp] = "NextSelectionUp",
 	[Enum.KeyCode.Up] = "NextSelectionUp",
 	[Enum.KeyCode.DPadDown] = "NextSelectionDown",
@@ -47,183 +50,168 @@ local t4 = {
 	[Enum.KeyCode.Right] = "NextSelectionRight"
 }
 
-local function defaultInputObject(p1) -- line: 53
+local function defaultInputObject(keyCode) -- 1 equivalent call inferred from this helper
 	return {
-		KeyCode = p1,
+		KeyCode = keyCode,
 		Delta = Vector3.new(),
 		Position = Vector3.new(),
 		UserInputType = Enum.UserInputType.Gamepad1,
 		UserInputState = Enum.UserInputState.End
 	}
 end
-local function wrapDisconnector(p2) -- line: 64
-	return {
-		Disconnect = p2
-	}
+
+local function wrapDisconnector(disconnect) -- 7 equivalent calls inferred from this helper
+	return { Disconnect = disconnect }
 end
 
-function t1.new() -- line: 70
-	-- upvalues: createSignal (copy), t1 (copy), Cryo (copy)
-	local v12 = setmetatable({
+function MockEngine.new()
+	local object = setmetatable({
 		__mockSelected = nil,
-		__interface = nil,
 		__connectedGamepads = {},
 		__gamepadStates = {},
 		__selectionChangedSignal = createSignal(),
 		__inputSignal = createSignal(),
 		__renderStepped = createSignal(),
 		__gamepadConnected = createSignal(),
-		__gamepadDisconnected = createSignal()
-	}, t1)
-	local t5 = {
-		getSelection = function() -- line: 88
-			-- upvalues: v12 (copy)
-			return v12.__mockSelected
+		__gamepadDisconnected = createSignal(),
+		__interface = nil
+	}, MockEngine)
+
+	local interface = {
+		getSelection = function()
+			return object.__mockSelected
 		end,
-		setSelection = function(p3) -- line: 91
-			-- upvalues: v12 (copy)
-			v12.__mockSelected = p3
-			v12.__selectionChangedSignal:fire()
+		setSelection = function(mockSelected)
+			object.__mockSelected = mockSelected
+
+			object.__selectionChangedSignal:fire()
 		end,
-		getGamepadConnected = function(p4) -- line: 97
-			-- upvalues: v12 (copy)
-			return v12.__connectedGamepads[p4] or false
+		getGamepadConnected = function(p)
+			return object.__connectedGamepads[p] or false
 		end,
-		getGamepadState = function(p5) -- line: 100
-			-- upvalues: v12 (copy)
-			if v12.__gamepadStates[p5] == nil then
-				v12:__initializeGamepadState(p5)
+		getGamepadState = function(p)
+			if object.__gamepadStates[p] == nil then
+				object:__initializeGamepadState(p)
 			end
 
-			return v12.__gamepadStates[p5]
+			return object.__gamepadStates[p]
 		end,
-		getNavigationGamepads = function(_) -- line: 109
-			-- upvalues: Cryo (copy), v12 (copy)
-			return Cryo.Dictionary.keys(v12.__connectedGamepads)
+		getNavigationGamepads = function(_)
+			return Cryo.Dictionary.keys(object.__connectedGamepads)
 		end,
-		subscribeToSelectionChanged = function(p7) -- line: 112
-			-- upvalues: v12 (copy)
-			return {
-				Disconnect = v12.__selectionChangedSignal:subscribe(p7)
-			}
+		subscribeToSelectionChanged = function(p)
+			return wrapDisconnector(object.__selectionChangedSignal:subscribe(p)) -- inferred equivalent call
 		end,
-		subscribeToInputBegan = function(p8) -- line: 117
-			-- upvalues: v12 (copy)
-			return {
-				Disconnect = v12.__inputSignal:subscribe(p8)
-			}
+		subscribeToInputBegan = function(p)
+			return wrapDisconnector(object.__inputSignal:subscribe(p)) -- inferred equivalent call
 		end,
-		subscribeToInputChanged = function(p9) -- line: 122
-			-- upvalues: v12 (copy)
-			return {
-				Disconnect = v12.__inputSignal:subscribe(p9)
-			}
+		subscribeToInputChanged = function(p)
+			return wrapDisconnector(object.__inputSignal:subscribe(p)) -- inferred equivalent call
 		end,
-		subscribeToInputEnded = function(p10) -- line: 127
-			-- upvalues: v12 (copy)
-			return {
-				Disconnect = v12.__inputSignal:subscribe(p10)
-			}
+		subscribeToInputEnded = function(p)
+			return wrapDisconnector(object.__inputSignal:subscribe(p)) -- inferred equivalent call
 		end,
-		subscribeToRenderStepped = function(p11) -- line: 132
-			-- upvalues: v12 (copy)
-			return {
-				Disconnect = v12.__renderStepped:subscribe(p11)
-			}
+		subscribeToRenderStepped = function(p)
+			return wrapDisconnector(object.__renderStepped:subscribe(p)) -- inferred equivalent call
 		end,
-		subscribeToGamepadConnected = function(p12) -- line: 137
-			-- upvalues: v12 (copy)
-			return {
-				Disconnect = v12.__gamepadConnected:subscribe(p12)
-			}
+		subscribeToGamepadConnected = function(p)
+			return wrapDisconnector(object.__gamepadConnected:subscribe(p)) -- inferred equivalent call
 		end,
-		subscribeToGamepadDisconnected = function(p13) -- line: 142
-			-- upvalues: v12 (copy)
-			return {
-				Disconnect = v12.__gamepadDisconnected:subscribe(p13)
-			}
+		subscribeToGamepadDisconnected = function(p)
+			return wrapDisconnector(object.__gamepadDisconnected:subscribe(p)) -- inferred equivalent call
 		end
 	}
 
-	v12.__interface = t5
+	object.__interface = interface
 
-	return v12, t5
+	return object, interface
 end
-function t1.__initializeGamepadState(p14, p15) -- line: 154
-	-- upvalues: Cryo (copy), t3 (copy)
-	p14.__gamepadStates[p15] = Cryo.List.map(t3, function(p16) -- line: 155
-		return {
-			KeyCode = p16,
-			Delta = Vector3.new(),
-			Position = Vector3.new(),
-			UserInputType = Enum.UserInputType.Gamepad1,
-			UserInputState = Enum.UserInputState.End
-		}
+
+function MockEngine:__initializeGamepadState(p)
+	self.__gamepadStates[p] = Cryo.List.map(v, function(keyCode)
+		return defaultInputObject(keyCode) -- inferred equivalent call
 	end)
 end
-function t1.simulateSelectionChanged(p17, p18) -- line: 160
-	p17.__mockSelected = p18
-	p17.__selectionChangedSignal:fire()
+
+function MockEngine:simulateSelectionChanged(mockSelected)
+	self.__mockSelected = mockSelected
+	self.__selectionChangedSignal:fire()
 end
-function t1.simulateInput(p19, p20) -- line: 165
-	-- upvalues: Cryo (copy), t2 (copy), t4 (copy)
-	local v20 = Cryo.Dictionary.join({
-		Delta = Vector3.new(),
-		Position = Vector3.new(),
-		UserInputType = Enum.UserInputType.Gamepad1
-	}, p20)
 
-	assert(typeof(v20.KeyCode) == "EnumItem" and v20.KeyCode.EnumType == Enum.KeyCode, "Invalid inputObject.KeyCode: expected a member of Enum.KeyCode")
-	assert(t2[v20.UserInputType], "Invalid inputObject.UserInputType")
+function MockEngine:simulateInput(p)
+	local joined = Cryo.Dictionary.join(
+		{
+			Delta = Vector3.new(),
+			Position = Vector3.new(),
+			UserInputType = Enum.UserInputType.Gamepad1
+		},
+		p
+	)
 
-	local KeyCode = v20.KeyCode
-	local v22 = t4[KeyCode]
+	local v3 = typeof(joined.KeyCode) == "EnumItem" and joined.KeyCode.EnumType == Enum.KeyCode
+	assert(v3, "Invalid inputObject.KeyCode: expected a member of Enum.KeyCode")
 
-	if v22 ~= nil and p19.__interface.getSelection() ~= nil then
-		p19.__interface.setSelection(p19.__interface.getSelection()[v22])
+	assert(set[joined.UserInputType], "Invalid inputObject.UserInputType")
+
+	local keyCode = joined.KeyCode
+	local v4 = v2[keyCode]
+
+	if v4 ~= nil and self.__interface.getSelection() ~= nil then
+		self.__interface.setSelection(self.__interface.getSelection()[v4])
 	end
 
-	if v20.UserInputType ~= Enum.UserInputType.Keyboard then
-		local UserInputType = v20.UserInputType
+	if joined.UserInputType ~= Enum.UserInputType.Keyboard then
+		local userInputType = joined.UserInputType
 
-		if not p19.__connectedGamepads[UserInputType] then
-			p19:connectGamepad(UserInputType)
+		if not self.__connectedGamepads[userInputType] then
+			self:connectGamepad(userInputType)
 		end
 
-		local v24 = p19.__gamepadStates[UserInputType]
-		local v25 = Cryo.List.findWhere(v24, function(p21) -- line: 201
-			-- upvalues: KeyCode (copy)
-			return p21.KeyCode == KeyCode
+		local __gamepadState = self.__gamepadStates[userInputType]
+		local where = Cryo.List.findWhere(__gamepadState, function(p2): boolean
+			return p2.KeyCode == keyCode
 		end)
 
-		if v25 == nil then
-			error(("Invalid InputObject: KeyCode %s is not possible on %s"):format(tostring(KeyCode), (tostring(UserInputType))), 2)
+		if where == nil then
+			error(
+				("Invalid InputObject: KeyCode %s is not possible on %s"):format(
+					tostring(keyCode),
+					(tostring(userInputType))
+				),
+				2
+			)
 		end
 
-		for k, v in pairs(v20) do
-			v24[v25][k] = v
+		for k, v5 in pairs(joined) do
+			__gamepadState[where][k] = v5
 		end
 	end
 
-	p19.__inputSignal:fire(v20)
-end
-function t1.renderStep(p22, p23) -- line: 222
-	if p23 == nil then
-		p23 = 0.03333333333333333
-	end
-
-	p22.__renderStepped:fire(p23)
-end
-function t1.connectGamepad(p24, p25) -- line: 230
-	assert(typeof(p25) == "EnumItem" and p25.EnumType == Enum.UserInputType, "Invalid argument #1: expected a member of Enum.UserInputType")
-	p24.__connectedGamepads[p25] = true
-	p24:__initializeGamepadState(p25)
-	p24.__gamepadConnected:fire(p25)
-end
-function t1.disconnectGamepad(p26, p27) -- line: 242
-	assert(typeof(p27) == "EnumItem" and p27.EnumType == Enum.UserInputType, "Invalid argument #1: expected a member of Enum.UserInputType")
-	p26.__connectedGamepads[p27] = nil
-	p26.__gamepadDisconnected:fire(p27)
+	self.__inputSignal:fire(joined)
 end
 
-return t1
+function MockEngine:renderStep(p)
+	local v3 = p == nil and 1 / 30 or p
+
+	self.__renderStepped:fire(v3)
+end
+
+function MockEngine:connectGamepad(p)
+	local v3 = typeof(p) == "EnumItem" and p.EnumType == Enum.UserInputType
+	assert(v3, "Invalid argument #1: expected a member of Enum.UserInputType")
+
+	self.__connectedGamepads[p] = true
+	self:__initializeGamepadState(p)
+
+	self.__gamepadConnected:fire(p)
+end
+
+function MockEngine:disconnectGamepad(p)
+	local v3 = typeof(p) == "EnumItem" and p.EnumType == Enum.UserInputType
+	assert(v3, "Invalid argument #1: expected a member of Enum.UserInputType")
+
+	self.__connectedGamepads[p] = nil
+	self.__gamepadDisconnected:fire(p)
+end
+
+return MockEngine

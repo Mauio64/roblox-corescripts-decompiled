@@ -1,12 +1,8 @@
-local _ = script.Parent.Parent
-local TextService = game:GetService("TextService")
+local parent = script.Parent.Parent.Parent
+local Foundation = require(parent.Foundation)
+local getTextSizeOffset = Foundation.Utility.getTextSizeOffset
 
-return function(p1) -- line: 5
-	-- upvalues: TextService (copy)
-	local ok, result = pcall(function() -- line: 6
-		-- upvalues: TextService (copy), p1 (copy)
-		return TextService:GetTextSize("", 0, p1, Vector2.new(1e999, 1e999)).Y
-	end)
-
-	return ok, result
+return function(_)
+	local textSizeOffset = getTextSizeOffset()
+	return textSizeOffset ~= nil, textSizeOffset
 end

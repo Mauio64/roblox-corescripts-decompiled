@@ -1,42 +1,43 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("NotInterestedFeedbackFormActionThrottleHundredthsPercent", 0)
-local FFlagLuaAppFixExplicitFeedbackTelemetry = require(Parent.SharedFlags).FFlagLuaAppFixExplicitFeedbackTelemetry
-local v7 = t.strictInterface({
-	ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t.string else nil,
+local parent = script:FindFirstAncestor("GameTile").Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local defineFastInt = game:DefineFastInt("NotInterestedFeedbackFormActionThrottleHundredthsPercent", 0)
+
+local strictInterface = t.strictInterface({
 	universeId = t.string,
 	sortId = t.optional(t.string),
 	actionType = t.string
 })
-local t1 = {
+
+local v = {
 	eventName = "notInterestedFeedbackFormAction",
-	description = "User has taken an action with the Not Interested Feedback Form",
 	backends = { "EventIngest" },
-	throttlingPercentage = v5,
-	lastUpdated = {
-		25,
-		10,
-		22
-	}
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 25, 10, 22 },
+	description = "User has taken an action with the Not Interested Feedback Form"
 }
 
-return function(p1, s1: string) -- line: 30
-	-- upvalues: FFlagLuaAppFixExplicitFeedbackTelemetry (copy), DiscoveryEventErrorLogger (copy), v7 (copy), TelemetryService (copy), t1 (copy)
-	if FFlagLuaAppFixExplicitFeedbackTelemetry and not s1 then
-		DiscoveryEventErrorLogger.reportError("NotInterestedFeedbackFormActionInvalidInterface", "event is missing context")
+return function(customFields, eventContext: string)
+	if not eventContext then
+		DiscoveryEventErrorLogger.reportError(
+			"NotInterestedFeedbackFormActionInvalidInterface",
+			"event is missing context"
+		)
 	end
 
-	local v11, v12 = v7(p1)
+	local v2, v3 = strictInterface(customFields)
 
-	if not v11 then
-		DiscoveryEventErrorLogger.reportError("NotInterestedFeedbackFormActionInvalidInterface", v12)
+	if not v2 then
+		DiscoveryEventErrorLogger.reportError("NotInterestedFeedbackFormActionInvalidInterface", v3)
 	end
 
-	TelemetryService:LogEvent(t1, {
-		eventContext = if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else s1,
+	TelemetryService:LogEvent(v, {
+		eventContext = eventContext,
 		standardizedFields = { "addSessionInfo" },
-		customFields = p1
+		customFields = customFields
 	})
 end

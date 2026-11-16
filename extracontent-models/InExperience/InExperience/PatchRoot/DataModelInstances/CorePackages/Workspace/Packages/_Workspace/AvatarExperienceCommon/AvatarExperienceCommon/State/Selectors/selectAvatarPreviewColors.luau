@@ -1,21 +1,28 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local join = require(Parent.Dash).join
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local Dash = require(parent.Dash)
+local join = Dash.join
+
 local selectHasBodyTryOn = require(script.Parent.selectHasBodyTryOn)
 local selectDefaultTryOnBodyColors = require(script.Parent.selectDefaultTryOnBodyColors)
 
-local function selectAvatarPreviewColors(p1) -- line: 9
-	-- upvalues: selectHasBodyTryOn (copy), selectDefaultTryOnBodyColors (copy), join (copy)
-	local OutfitTryOn = p1.AvatarExperience.AvatarScene.OutfitTryOn
-	local AvatarEditor = p1.AvatarExperience.AvatarEditor
-	local v9 = selectHasBodyTryOn(p1)
-	local BodyColor3s = AvatarEditor.Character.BodyColor3s
-	local v11 = if not OutfitTryOn.DefaultTryOnBodyColorsToggled then OutfitTryOn.BodyColor3s else selectDefaultTryOnBodyColors(p1)
+local function selectAvatarPreviewColors(p)
+	local outfitTryOn = p.AvatarExperience.AvatarScene.OutfitTryOn
+	local avatarEditor = p.AvatarExperience.AvatarEditor
+	local v = selectHasBodyTryOn(p)
+	local bodyColor3s = avatarEditor.Character.BodyColor3s
+	local v2
 
-	if v9 and (BodyColor3s and v11) then
-		return (join(BodyColor3s, v11))
+	if outfitTryOn.DefaultTryOnBodyColorsToggled then
+		v2 = selectDefaultTryOnBodyColors(p)
+	else
+		v2 = outfitTryOn.BodyColor3s
 	end
 
-	return BodyColor3s
+	if v and bodyColor3s and v2 then
+		return (join(bodyColor3s, v2))
+	end
+
+	return bodyColor3s
 end
 
 return selectAvatarPreviewColors

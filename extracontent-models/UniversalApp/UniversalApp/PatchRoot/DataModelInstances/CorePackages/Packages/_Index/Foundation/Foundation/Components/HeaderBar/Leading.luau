@@ -1,1 +1,3 @@
-return (require(script.HeaderBarLeading))
+local HeaderBarLeading = require(script.HeaderBarLeading)
+
+return HeaderBarLeading

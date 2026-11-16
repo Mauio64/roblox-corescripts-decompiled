@@ -1,89 +1,133 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Core = ParentParent.Core
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local useStyle = require(Core.Style.useStyle)
-local useTextSizeOffset = require(ParentParent.Core.Style.useTextSizeOffset)
+local parent = script.Parent.Parent.Parent.Parent
+local core = parent.Core
+local parent2 = parent.Parent
+local Foundation = require(parent2.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
 
-require(ParentParent.App.Style.Fonts)
-require(ParentParent.App.Style.StyleTypes)
+local React = require(parent2.React)
+local useStyle = require(core.Style.useStyle)
+local useTextSizeOffset = require(parent.Core.Style.useTextSizeOffset)
 
-local setDefault = require(ParentParent.Utility.setDefault)
+require(parent.App.Style.Fonts)
+require(parent.App.Style.StyleTypes)
+local setDefault = require(parent.Utility.setDefault)
 
-local function TileContentPanel(t1: {[any]: any}) -- line: 44
-	-- upvalues: useStyle (copy), useTextSizeOffset (copy), setDefault (copy), React (copy)
-	local v10 = useStyle()
-	local Settings = v10.Settings
-	local v12 = useTextSizeOffset()
-	local v13 = not Settings.ReducedMotion and 8 or 6
-	local contentTitle = t1.contentTitle
-	local contentFooter = t1.contentFooter
-	local v16 = setDefault(t1.textLineCount, 2)
-	local v17 = setDefault(t1.hasSidePadding, true)
-	local v18, v19, v20, v21
+local function TileContentPanel(props)
+	local v = useStyle()
+	local settings = v.Settings
+	local v2 = useTextSizeOffset()
 
-	if t1.outerPadding == nil or type(t1.outerPadding) == "number" then
-		v18 = setDefault(t1.outerPadding, v13)
-		v19 = v18
-		v20 = v18
-		v21 = v18
+	local v3 = settings.ReducedMotion and 6 or 8
+	local contentTitle = props.contentTitle
+	local contentFooter = props.contentFooter
+	local v4 = setDefault(props.textLineCount, 2)
+	local v5 = setDefault(props.hasSidePadding, true)
+	local v6, v7, v8, v9
+
+	if props.outerPadding == nil or type(props.outerPadding) == "number" then
+		v6 = setDefault(props.outerPadding, v3)
+		v7 = v6
+		v8 = v7
+		v9 = v8
+		v7 = v9
+		v8 = v7
 	else
-		v18 = setDefault(t1.outerPadding.Left, v13)
-		v19 = setDefault(t1.outerPadding.Right, v13)
-		v20 = setDefault(t1.outerPadding.Top, v13)
-		v21 = setDefault(t1.outerPadding.Bottom, v13)
+		v6 = setDefault(props.outerPadding.Left, v3)
+		v9 = setDefault(props.outerPadding.Right, v3)
+		v8 = setDefault(props.outerPadding.Top, v3)
+		v7 = setDefault(props.outerPadding.Bottom, v3)
 	end
 
-	local v22 = setDefault(t1.titlePadding, v13)
-	local panelHeight = t1.panelHeight
-	local footerHeight = t1.footerHeight
-	local Font = v10.Font
-	local v26 = setDefault(t1.titleFont, Font.Header2)
-	local Theme = v10.Theme
-	local v28 = (Font.BaseSize + v12) * v26.RelativeSize * v16
-	local TextEmphasis = Theme.TextEmphasis
+	local v10 = setDefault(props.titlePadding, v3)
+	local panelHeight = props.panelHeight
+	local footerHeight = props.footerHeight
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(UDim.new(1, 0), panelHeight)
-	}, {
+	local font = v.Font
+	local v11 = setDefault(props.titleFont, font.Header2)
+	local theme = v.Theme
+
+	local v12 = (font.BaseSize + v2) * v11.RelativeSize * v4
+
+	local textEmphasis = theme.TextEmphasis
+
+	local createElement = React.createElement
+	local v13 = {
+		Size = UDim2.new(UDim.new(1, 0), panelHeight),
+		BackgroundTransparency = 1
+	}
+
+	local v14 = {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v22)
+			Padding = UDim.new(0, v10)
 		}),
-		Padding = React.createElement("UIPadding", {
-			PaddingLeft = if not v17 then nil else UDim.new(0, v18),
-			PaddingRight = if not v17 then nil else UDim.new(0, v19),
-			PaddingTop = UDim.new(0, v20),
-			PaddingBottom = UDim.new(0, v21)
-		}),
-		TitleText = if not (v16 > 0) or (not contentTitle or not (string.len(contentTitle) > 0)) then nil else React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			TextWrapped = true,
-			LayoutOrder = 1,
+		Padding = 0,
+		TitleText = 0,
+		ContentFooter = 0
+	}
+
+	local createElement2 = React.createElement
+	local paddingLeft
+
+	if v5 then
+		paddingLeft = UDim.new(0, v6)
+	end
+
+	local paddingRight
+
+	if v5 then
+		paddingRight = UDim.new(0, v9)
+	end
+
+	v14.Padding = createElement2("UIPadding", {
+		PaddingLeft = paddingLeft,
+		PaddingRight = paddingRight,
+		PaddingTop = UDim.new(0, v8),
+		PaddingBottom = UDim.new(0, v7)
+	})
+	local titleText
+
+	if v4 > 0 and contentTitle and string.len(contentTitle) > 0 then
+		titleText = React.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
 			Text = contentTitle,
-			Font = v26.Font,
-			TextSize = Font.BaseSize * v26.RelativeSize,
-			TextTransparency = TextEmphasis.Transparency,
-			TextColor3 = TextEmphasis.Color,
+			FontFace = normalizeFontFace(v11.Font),
+			TextSize = font.BaseSize * v11.RelativeSize,
+			TextTransparency = textEmphasis.Transparency,
+			TextColor3 = textEmphasis.Color,
+			TextWrapped = true,
 			TextTruncate = Enum.TextTruncate.AtEnd,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			TextYAlignment = Enum.TextYAlignment.Top
+			TextYAlignment = Enum.TextYAlignment.Top,
+			LayoutOrder = 1
 		}, {
 			UISizeConstraint = React.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(1e999, v28)
+				MaxSize = Vector2.new(1e999, v12)
 			})
-		}),
-		ContentFooter = if not contentFooter then nil else React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			LayoutOrder = 2,
-			Size = UDim2.new(UDim.new(1, 0), footerHeight)
-		}, { contentFooter })
-	})
+		})
+	end
+
+	v14.TitleText = titleText
+	local contentFooter2
+
+	if contentFooter then
+		contentFooter2 = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(UDim.new(1, 0), footerHeight),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2
+			},
+			{ contentFooter }
+		)
+	end
+
+	v14.ContentFooter = contentFooter2
+	return createElement("Frame", v13, v14)
 end
 
 return TileContentPanel

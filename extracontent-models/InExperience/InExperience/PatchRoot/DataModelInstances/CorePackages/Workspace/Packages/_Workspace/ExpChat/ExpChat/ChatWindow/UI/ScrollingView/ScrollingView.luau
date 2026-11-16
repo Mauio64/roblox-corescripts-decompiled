@@ -1,54 +1,86 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Roact = require(ExpChatParent.Roact)
-local Dictionary = require(ExpChatParent.llama).Dictionary
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnableFocusNavigation)
+local parent = ExpChat.Parent
+local Roact = require(parent.Roact)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local ExpChatShared = require(parent.ExpChatShared)
 local FFlagExpChatEnableV2ChatWindow = require(ExpChat.Flags.FFlagExpChatEnableV2ChatWindow)
-local FFlagExpChatEnableFriendsTab = require(ExpChatParent.SharedFlags).FFlagExpChatEnableFriendsTab
-local FFlagExpChatWindowMessageSourceRefactor = require(ExpChatParent.SharedFlags).FFlagExpChatWindowMessageSourceRefactor
-local FFlagExpChatChannelTabRefactor = require(ExpChatParent.SharedFlags).FFlagExpChatChannelTabRefactor
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
+
 local BottomLockedScrollViewV3 = require(ExpChat.ChatWindow.UI.BottomLockedScrollViewV3)
-local v13 = Roact.PureComponent:extend("ScrollingView")
 
-v13.defaultProps = {}
+local extended = Roact.PureComponent:extend("ScrollingView")
+extended.defaultProps = {}
 
-function v13.render(p1) -- line: 19
-	-- upvalues: FFlagExpChatEnableV2ChatWindow (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatWindowMessageSourceRefactor (copy), Roact (copy), FFlagExpChatEnableFocusNavigation (copy), BottomLockedScrollViewV3 (copy), Dictionary (copy), FFlagExpChatChannelTabRefactor (copy), FFlagExpChatEnableFriendsTab (copy)
-	local t1 = {}
+function extended.render(p)
+	local v
 
 	if FFlagExpChatEnableV2ChatWindow then
-		t1 = {
-			showTranslationButton = p1.props.showTranslationButton,
-			chatWindowSettings = p1.props.chatWindowSettings,
-			textTransparency = p1.props.textTransparency,
-			onTextMessageLabelButtonActivated = p1.props.onTextMessageLabelButtonActivated,
-			isSpatialUIEnabled = p1.props.isSpatialUIEnabled,
-			chatWindowTransparencyBindable = p1.props.chatWindowTransparencyBindable,
-			visible = p1.props.visible,
-			selectedChannelName = if not GetFFlagTextChatEnableUniverseChatTabs() then nil else p1.props.selectedChannelName
+		v = {
+			showTranslationButton = p.props.showTranslationButton,
+			chatWindowSettings = p.props.chatWindowSettings,
+			textTransparency = p.props.textTransparency,
+			onTextMessageLabelButtonActivated = p.props.onTextMessageLabelButtonActivated,
+			isSpatialUIEnabled = p.props.isSpatialUIEnabled,
+			chatWindowTransparencyBindable = p.props.chatWindowTransparencyBindable,
+			visible = p.props.visible,
+			selectedChannelName = 0,
+			historicalMessageCountSignal = 0
 		}
+		local selectedChannelName
+
+		if GetFFlagTextChatEnableUniverseChatTabs() then
+			selectedChannelName = p.props.selectedChannelName
+		end
+
+		v.selectedChannelName = selectedChannelName
+
+		v.historicalMessageCountSignal = p.props.historicalMessageCountSignal
+	else
+		v = {}
 	end
 
-	if FFlagExpChatWindowMessageSourceRefactor then
-		t1.messageComponentsSignal = p1.props.messageComponentsSignal
+	v.messageComponentsSignal = p.props.messageComponentsSignal
+	local createElement = Roact.createElement
+	local v2 = { BackgroundTransparency = 1, Selectable = false, Size = p.props.size }
+
+	local createElement2 = Roact.createElement
+
+	local join = dictionary.join
+	local v3 = {
+		Size = UDim2.fromScale(1, 1),
+		isChannelBarVisible = p.props.isChannelBarVisible,
+		scrollResetKey = p.props.scrollResetKey,
+		scrollToTopOnReset = 0,
+		onCanvasPositionChanged = 0,
+		contentTopPadding = 0
+	}
+	local scrollToTopOnReset
+
+	if FFlagExpChatEnableFriendsTab then
+		scrollToTopOnReset = p.props.scrollToTopOnReset
 	end
 
-	return Roact.createElement("ImageButton", {
-		BackgroundTransparency = 1,
-		Selectable = not FFlagExpChatEnableFocusNavigation and nil,
-		Size = p1.props.size
-	}, {
-		bottomLockedScrollView = Roact.createElement(BottomLockedScrollViewV3, Dictionary.join({
-			Size = UDim2.fromScale(1, 1),
-			targetTextChannel = p1.props.targetTextChannel,
-			isChannelBarVisible = p1.props.isChannelBarVisible,
-			scrollResetKey = if not FFlagExpChatChannelTabRefactor then nil else p1.props.scrollResetKey,
-			onCanvasPositionChanged = if not FFlagExpChatEnableFriendsTab then nil else p1.props.onCanvasPositionChanged,
-			contentTopPadding = if not FFlagExpChatEnableFriendsTab then nil else p1.props.contentTopPadding
-		}, t1), if not FFlagExpChatEnableV2ChatWindow and not FFlagExpChatWindowMessageSourceRefactor then p1.props[Roact.Children] else nil)
+	v3.scrollToTopOnReset = scrollToTopOnReset
+	local onCanvasPositionChanged
+
+	if FFlagExpChatEnableFriendsTab then
+		onCanvasPositionChanged = p.props.onCanvasPositionChanged
+	end
+
+	v3.onCanvasPositionChanged = onCanvasPositionChanged
+	local contentTopPadding
+
+	if FFlagExpChatEnableFriendsTab then
+		contentTopPadding = p.props.contentTopPadding
+	end
+
+	v3.contentTopPadding = contentTopPadding
+	return createElement("ImageButton", v2, {
+		bottomLockedScrollView = createElement2(BottomLockedScrollViewV3, join(v3, v))
 	})
 end
 
-return v13
+return extended

@@ -1,23 +1,25 @@
 local IAPExperience = script:FindFirstAncestor("IAPExperience")
-
 require(IAPExperience.ProductPurchase.PricingTypes)
 
 local multiItemPriceQualifiesForDetailsDiscountSummary = require(IAPExperience.Generic.multiItemPriceQualifiesForDetailsDiscountSummary)
 
-local function multiItemPriceShowsDiscountAccordion(p1) -- line: 16
-	-- upvalues: multiItemPriceQualifiesForDetailsDiscountSummary (copy)
-	if not p1 then
+local function multiItemPriceShowsDiscountAccordion(p)
+	if not p then
 		return false
 	end
 
-	local basePriceInRobux = p1.basePriceInRobux
-	local priceInRobux = p1.priceInRobux
+	local basePriceInRobux = p.basePriceInRobux
+	local priceInRobux = p.priceInRobux
 
-	if typeof(basePriceInRobux) ~= "number" or typeof(priceInRobux) ~= "number" or basePriceInRobux <= priceInRobux then
-		return false
+	if
+		typeof(basePriceInRobux) == "number"
+		and typeof(priceInRobux) == "number"
+		and not (basePriceInRobux <= priceInRobux)
+	then
+		return multiItemPriceQualifiesForDetailsDiscountSummary(p)
 	end
 
-	return multiItemPriceQualifiesForDetailsDiscountSummary(p1)
+	return false
 end
 
 return multiItemPriceShowsDiscountAccordion

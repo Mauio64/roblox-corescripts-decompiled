@@ -1,18 +1,20 @@
 local makeDefaultReadPolicy = require(script.Parent.utils.makeDefaultReadPolicy)
-local GetFFlagEnableMergeOmniFeedSorts = require(script.Parent.Parent.Flags).GetFFlagEnableMergeOmniFeedSorts
+
+local Flags = require(script.Parent.Parent.Flags)
+local GetFFlagEnableMergeOmniFeedSorts = Flags.GetFFlagEnableMergeOmniFeedSorts
+
 local makeMergeOverlappingArraysPolicy = require(script.Parent.utils.makeMergeOverlappingArraysPolicy)
+local merge
+
+if GetFFlagEnableMergeOmniFeedSorts() then
+	merge = makeMergeOverlappingArraysPolicy("topicId")
+end
 
 return {
 	keyFields = { "pageType" },
 	fields = {
-		sorts = {
-			merge = if not GetFFlagEnableMergeOmniFeedSorts() then nil else makeMergeOverlappingArraysPolicy("topicId")
-		},
-		nextPageToken = {
-			read = makeDefaultReadPolicy("")
-		},
-		globalLayoutData = {
-			read = makeDefaultReadPolicy({})
-		}
+		sorts = { merge = merge },
+		nextPageToken = { read = makeDefaultReadPolicy("") },
+		globalLayoutData = { read = makeDefaultReadPolicy({}) }
 	}
 }

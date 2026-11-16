@@ -1,210 +1,266 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local getPrivatePlaytestersStore = require(BuildExperienceParent.DataHydration.PrivatePlaytesters).getPrivatePlaytestersStore
-local FriendsStore = require(BuildExperienceParent.DataHydration.Friends).FriendsStore
+local parent = BuildExperience.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local Loggers = require(parent.Loggers)
+local Logger = Loggers.Logger
+
+local PrivatePlaytesters = require(parent.DataHydration.PrivatePlaytesters)
+local getPrivatePlaytestersStore = PrivatePlaytesters.getPrivatePlaytestersStore
+local Friends = require(parent.DataHydration.Friends)
+local FriendsStore = Friends.FriendsStore
 local searchFriendsAsync = require(script.Parent.searchFriendsAsync)
 local useUserPicker = require(BuildExperience.Components.UserPicker.useUserPicker)
-
 require(BuildExperience.Components.UserPicker.UserPickerTypes)
-
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local sendBuildExperienceEvent = require(BuildExperience.Telemetry.sendBuildExperienceEvent)
-
 require(script.Parent.PrivateInvitesPickerView)
 
-local function usePrivateInvitesPickerViewModel(t1: {[any]: any}) -- line: 37
-	-- upvalues: React (copy), sendBuildExperienceEvent (copy), getPrivatePlaytestersStore (copy), SignalsReact (copy), FriendsStore (copy), searchFriendsAsync (copy), useUserPicker (copy), LocalizationStrings (copy)
-	local universeId = t1.universeId
-	local onInvitesSent = t1.onInvitesSent
-	local v15 = React.useRef(false)
+local function usePrivateInvitesPickerViewModel(data)
+	local universeId = data.universeId
 
-	React.useEffect(function() -- line: 43
-		-- upvalues: v15 (copy), sendBuildExperienceEvent (copy), universeId (copy)
-		if v15.current then
+	local v = useLocalization({
+		addPlaytester = LocalizationStrings.PRIVATE_INVITES_ADD_PLAYTESTER,
+		addPlaytesters = LocalizationStrings.PRIVATE_INVITES_ADD_PLAYTESTERS,
+		allFriendsAdded = LocalizationStrings.PRIVATE_INVITES_ALL_FRIENDS_ADDED,
+		friendsLoadError = LocalizationStrings.PRIVATE_INVITES_FRIENDS_LOAD_ERROR,
+		noFriends = LocalizationStrings.PRIVATE_INVITES_NO_FRIENDS,
+		searchPlaceholder = LocalizationStrings.PRIVATE_INVITES_SEARCH_PLACEHOLDER
+	})
+
+	local sendButtonText = v.addPlaytester
+	local addPlaytesters = v.addPlaytesters
+	local allFriendsAdded = v.allFriendsAdded
+	local friendsLoadError = v.friendsLoadError
+	local emptyText = v.noFriends
+	local searchPlaceholder = v.searchPlaceholder
+	local onInvitesSent = data.onInvitesSent
+
+	local state, setState = React.useState(false)
+
+	local state2, setState2 = React.useState({ userIds = {}, navigateOnDismiss = false })
+
+	local ref = React.useRef(false)
+	React.useEffect(function()
+		if ref.current then
 			return
 		end
 
-		v15.current = true
-		sendBuildExperienceEvent("PLAYTEST_PICKER_IMPRESSION", {
-			universeId = universeId
-		})
+		ref.current = true
+		sendBuildExperienceEvent("PLAYTEST_PICKER_IMPRESSION", { universeId = universeId })
 	end, { universeId })
 
-	local v16 = getPrivatePlaytestersStore(false)
-	local v17 = React.useMemo(function() -- line: 52
-		-- upvalues: v16 (copy), universeId (copy)
-		return v16.getAndFetchInvitedPlayers(universeId)
-	end, {
-		v16,
-		universeId
-	})
-	local v18 = SignalsReact.useSignalState(v17.players)
-	local v19 = SignalsReact.useSignalState(v17.status) ~= "Ready" and 0 or math.max(0, v16.MAX_INVITES - #v18)
-	local v20 = React.useMemo(function() -- line: 65
-		-- upvalues: v18 (copy)
-		local t2 = {}
+	local privatePlaytestersStore = getPrivatePlaytestersStore(false)
+	local v2 = React.useMemo(function()
+		return privatePlaytestersStore.getAndFetchInvitedPlayers(universeId)
+	end, { privatePlaytestersStore, universeId })
+	local v3 = SignalsReact.useSignalState(v2.players)
+	local selectionLimit = SignalsReact.useSignalState(v2.status) ~= "Ready" and 0
+		or math.max(0, privatePlaytestersStore.MAX_INVITES - #v3)
 
-		for _, v42 in v18 do
-			t2[v42] = true
+	local excludeUserIds = React.useMemo(function()
+		local result = {}
+
+		for _, v4 in v3 do
+			result[v4] = true
 		end
 
-		return t2
-	end, { v18 })
-	local v21 = React.useMemo(function() -- line: 75
-		-- upvalues: FriendsStore (copy)
+		return result
+	end, { v3 })
+
+	local v4 = React.useMemo(function()
 		return FriendsStore.get()
 	end, {})
-	local v22 = React.useMemo(function() -- line: 78
-		-- upvalues: v21 (copy)
-		return v21.GetAllFriends()
-	end, { v21 })
-	local v23 = React.useMemo(function() -- line: 81
-		-- upvalues: v21 (copy)
-		return v21.GetAllFriendsStatus()
-	end, { v21 })
-	local v24 = SignalsReact.useSignalState(v22)
-	local v25 = SignalsReact.useSignalState(v23)
-	local v26 = React.useMemo(function() -- line: 87
-		-- upvalues: v24 (copy)
-		local t3 = {}
+	local v5 = React.useMemo(function()
+		return v4.GetAllFriends()
+	end, { v4 })
+	local v6 = React.useMemo(function()
+		return v4.GetAllFriendsStatus()
+	end, { v4 })
+	local v7 = SignalsReact.useSignalState(v5)
+	local v8 = SignalsReact.useSignalState(v6)
 
-		if v24 ~= nil then
-			for _, v45 in v24.friends do
-				local num = tonumber(v45.id)
+	local browseIds = React.useMemo(function()
+		local ids = {}
 
-				if num ~= nil then
-					table.insert(t3, num)
-				end
+		if v7 == nil then
+			return ids
+		end
+
+		for _, friend in v7.friends do
+			local id = tonumber(friend.id)
+
+			if id ~= nil then
+				table.insert(ids, id)
 			end
 		end
 
-		return t3
-	end, { v24 })
-	local v27 = v25 == "NotReady"
-	local v28 = React.useCallback(function() -- line: 101
-		-- upvalues: v21 (copy)
-		v21.FetchMoreFriends()
-	end, { v21 })
-	local v29 = React.useCallback(function(s1: string, s2: string?) -- line: 107
-		-- upvalues: searchFriendsAsync (copy)
-		return searchFriendsAsync(s1, s2, 20)
+		return ids
+	end, { v7 })
+	local browseIsLoading = v8 == "NotReady"
+	local loadMoreBrowse = React.useCallback(function()
+		v4.FetchMoreFriends()
+	end, { v4 })
+
+	local onSearch = React.useCallback(function(p: string, p2: string?)
+		return searchFriendsAsync(p, p2, 20)
 	end, {})
-	local v30 = React.useCallback(function(t4: {[any]: any}, s3: string?) -- line: 111
-		-- upvalues: v16 (copy), universeId (copy), sendBuildExperienceEvent (copy), onInvitesSent (copy)
-		return v16.sendInvites(universeId, t4, s3):andThen(function() -- line: 114
-			-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), t4 (copy), onInvitesSent (copy)
-			sendBuildExperienceEvent("PLAYTESTERS_ADDED", {
-				universeId = universeId
-			}, {
-				count = tostring(#t4)
+
+	local onSubmit = React.useCallback(function(list, p: string?)
+		return privatePlaytestersStore.sendInvites(universeId, list, p):andThen(function(p2)
+			local added = p2.added
+
+			local rejected = p2.rejected
+			sendBuildExperienceEvent("PLAYTESTERS_ADDED", { universeId = universeId }, {
+				count = tostring(#added)
 			})
-			onInvitesSent()
-		end):catch(function(p1) -- line: 120
-			-- upvalues: sendBuildExperienceEvent (copy), universeId (copy), t4 (copy)
-			sendBuildExperienceEvent("PLAYTESTERS_ADD_FAILED", {
-				universeId = universeId
-			}, {
-				count = tostring(#t4)
+
+			if #added == 0 then
+				if #rejected > 0 then
+					setState2({ userIds = rejected, navigateOnDismiss = false })
+				else
+					onInvitesSent()
+				end
+			elseif #rejected > 0 then
+				setState2({ userIds = rejected, navigateOnDismiss = true })
+			else
+				onInvitesSent()
+			end
+		end):catch(function(p2)
+			sendBuildExperienceEvent("PLAYTESTERS_ADD_FAILED", { universeId = universeId }, {
+				count = tostring(#list)
 			})
-			error(p1)
+
+			Logger:warning("PrivateInvitesPicker: add playtesters failed for universe {}: {}", universeId, p2)
+			setState(true)
 		end)
-	end, {
-		v16,
-		universeId,
-		onInvitesSent
-	})
-	local v31 = React.useMemo(function() -- line: 131
-		-- upvalues: v26 (copy), v27 (copy), v28 (copy), v29 (copy), v30 (copy), v19 (copy), v20 (copy)
+	end, { privatePlaytestersStore, universeId, onInvitesSent })
+
+	local onDismissAddError = React.useCallback(function()
+		setState(false)
+	end, {})
+
+	local onDismissRejectedInvite = React.useCallback(function()
+		local navigateOnDismiss = state2.navigateOnDismiss
+		setState2({ userIds = {}, navigateOnDismiss = false })
+
+		if navigateOnDismiss then
+			onInvitesSent()
+		end
+	end, { state2, onInvitesSent })
+
+	local v9 = useUserPicker((React.useMemo(function()
 		return {
-			browseIds = v26,
-			browseIsLoading = v27,
-			loadMoreBrowse = v28,
-			onSearch = v29,
-			onSubmit = v30,
-			selectionLimit = v19,
-			excludeUserIds = v20
+			browseIds = browseIds,
+			browseIsLoading = browseIsLoading,
+			loadMoreBrowse = loadMoreBrowse,
+			onSearch = onSearch,
+			onSubmit = onSubmit,
+			selectionLimit = selectionLimit,
+			excludeUserIds = excludeUserIds
 		}
 	end, {
-		v26,
-		v27,
-		v28,
-		v29,
-		v30,
-		v19,
-		v20
-	})
-	local v32 = useUserPicker(v31)
-	local v33, v34 = React.useState(true)
-	local v35 = React.useCallback(function() -- line: 158
-		-- upvalues: v34 (copy)
-		v34(false)
-	end, {})
-	local v36, v37 = React.useState(nil)
-	local v38 = React.useCallback(function(p2) -- line: 167
-		-- upvalues: v37 (copy)
-		v37(p2)
-	end, {})
-	local loadMore = v32.loadMore
+		browseIds,
+		browseIsLoading,
+		loadMoreBrowse,
+		onSearch,
+		onSubmit,
+		selectionLimit,
+		excludeUserIds
+	})))
 
-	React.useEffect(function() -- line: 171
-		-- upvalues: v36 (copy), loadMore (copy)
-		if v36 == nil then
+	local state3, setState3 = React.useState(true)
+	local onRequestClose = React.useCallback(function()
+		setState3(false)
+	end, {})
+
+	local state4, setState4 = React.useState(nil)
+
+	local scrollingFrameRef = React.useCallback(function(p)
+		setState4(p)
+	end, {})
+	local loadMore = v9.loadMore
+	React.useEffect(function()
+		if state4 == nil then
 			return
 		end
 
-		local v52 = v36
+		local v10 = state4
+		local function maybeLoadMore() -- 1 equivalent call inferred from this helper
+			local v11 = v10.AbsoluteCanvasSize.Y - (v10.CanvasPosition.Y + v10.AbsoluteWindowSize.Y)
 
-		local function maybeLoadMore() -- line: 176
-			-- upvalues: v52 (copy), loadMore (copy)
-			local v59 = v52.AbsoluteCanvasSize.Y - (v52.CanvasPosition.Y + v52.AbsoluteWindowSize.Y)
-
-			if v52.AbsoluteCanvasSize.Y > 0 and v59 <= 240 then
+			if v10.AbsoluteCanvasSize.Y > 0 and v11 <= 240 then
 				loadMore()
 			end
 		end
-
-		local connection = v52:GetPropertyChangedSignal("CanvasPosition"):Connect(maybeLoadMore)
-		local connection2 = v52:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(maybeLoadMore)
-		local connection3 = v52:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(maybeLoadMore)
-		local v57 = v52.AbsoluteCanvasSize.Y - (v52.CanvasPosition.Y + v52.AbsoluteWindowSize.Y)
-
-		if v52.AbsoluteCanvasSize.Y > 0 and v57 <= 240 then
-			loadMore()
+		local canvasPositionChangedConnection = v10:GetPropertyChangedSignal("CanvasPosition"):Connect(maybeLoadMore)
+		local absoluteCanvasSizeChangedConnection = v10:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(maybeLoadMore)
+		local absoluteWindowSizeChangedConnection = v10:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(maybeLoadMore)
+		maybeLoadMore() -- inferred equivalent call
+		return function()
+			canvasPositionChangedConnection:Disconnect()
+			absoluteCanvasSizeChangedConnection:Disconnect()
+			absoluteWindowSizeChangedConnection:Disconnect()
 		end
+	end, { state4, loadMore })
 
-		return function() -- line: 187
-			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
-			connection3:Disconnect()
-		end
-	end, {
-		v36,
-		loadMore
-	})
-
-	return {
-		isOpen = v33,
-		onClose = t1.onClose,
-		onRequestClose = v35,
-		scrollingFrameRef = v38,
-		searchText = v32.searchText,
-		setSearchText = v32.setSearchText,
-		searchPlaceholder = LocalizationStrings.PRIVATE_INVITES_SEARCH_PLACEHOLDER,
-		userIds = v32.userIds,
-		isLoading = v32.isLoading,
-		emptyText = if v25 ~= "Failed" then if not (#v26 > 0) then LocalizationStrings.PRIVATE_INVITES_NO_FRIENDS else LocalizationStrings.PRIVATE_INVITES_ALL_FRIENDS_ADDED else LocalizationStrings.PRIVATE_INVITES_FRIENDS_LOAD_ERROR,
-		isSelected = v32.isSelected,
-		canSelect = v32.canSelect,
-		toggleSelected = v32.toggleSelected,
-		hasSelection = v32.hasSelection,
-		submit = v32.submit,
-		isSubmitting = v32.isSubmitting,
-		sendButtonText = if not (v32.selectedCount > 1) then LocalizationStrings.PRIVATE_INVITES_ADD_PLAYTESTER else LocalizationStrings.PRIVATE_INVITES_ADD_PLAYTESTERS,
-		testId = t1.testId
+	local v10 = {
+		isOpen = state3,
+		onClose = data.onClose,
+		onRequestClose = onRequestClose,
+		scrollingFrameRef = scrollingFrameRef,
+		searchText = v9.searchText,
+		setSearchText = v9.setSearchText,
+		searchPlaceholder = searchPlaceholder,
+		userIds = v9.userIds,
+		isLoading = v9.isLoading,
+		emptyText = 0,
+		isSelected = 0,
+		canSelect = 0,
+		toggleSelected = 0,
+		hasSelection = 0,
+		submit = 0,
+		isSubmitting = 0,
+		sendButtonText = 0,
+		hasAddError = 0,
+		onDismissAddError = 0,
+		rejectedInviteUserIds = 0,
+		onDismissRejectedInvite = 0,
+		testId = 0
 	}
+
+	if v8 == "Failed" then
+		emptyText = friendsLoadError
+	elseif #browseIds > 0 then
+		emptyText = allFriendsAdded
+	end
+
+	v10.emptyText = emptyText
+
+	v10.isSelected = v9.isSelected
+	v10.canSelect = v9.canSelect
+	v10.toggleSelected = v9.toggleSelected
+	v10.hasSelection = v9.hasSelection
+	v10.submit = v9.submit
+	v10.isSubmitting = v9.isSubmitting
+
+	if v9.selectedCount > 1 then
+		sendButtonText = addPlaytesters
+	end
+
+	v10.sendButtonText = sendButtonText
+
+	v10.hasAddError = state
+	v10.onDismissAddError = onDismissAddError
+
+	v10.rejectedInviteUserIds = state2.userIds
+	v10.onDismissRejectedInvite = onDismissRejectedInvite
+	v10.testId = data.testId
+	return v10
 end
 
 return usePrivateInvitesPickerViewModel

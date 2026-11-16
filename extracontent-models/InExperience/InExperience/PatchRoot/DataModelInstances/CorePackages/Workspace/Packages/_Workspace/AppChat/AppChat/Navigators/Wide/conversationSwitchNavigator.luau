@@ -1,8 +1,11 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local RoactNavigation = require(AppChatParent.RoactNavigation)
+local parent = AppChat.Parent
+
+local RoactNavigation = require(parent.RoactNavigation)
+
 local EnumScreens = require(AppChat.EnumScreens)
 local EmptyConversationScreen = require(AppChat.Components.ChatConversation.EmptyConversationScreen)
+
 local ConversationStackNavigatorConnector = require(script.Parent.ConversationStackNavigatorConnector)
 
 return (RoactNavigation.createRobloxSwitchNavigator({
@@ -10,17 +13,12 @@ return (RoactNavigation.createRobloxSwitchNavigator({
 		[EnumScreens.EmptyConversation] = {
 			screen = EmptyConversationScreen,
 			navigationOptions = {
+				headerText = { raw = "testing", shouldLocalize = false },
 				backButtonEnabled = false,
 				isRoot = true,
-				tabBarVisible = true,
-				headerText = {
-					raw = "testing",
-					shouldLocalize = false
-				}
+				tabBarVisible = true
 			}
 		}
 	},
-	{
-		ConversationStackNavigator = ConversationStackNavigatorConnector
-	}
+	{ ConversationStackNavigator = ConversationStackNavigatorConnector }
 }))

@@ -1,29 +1,31 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
 
-require(scriptParentParent.SettingsService)
+require(parent2.SettingsService)
+local FieldRow = require(parent.FieldRow)
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local View = Foundation.View
 
-local FieldRow = require(scriptParent.FieldRow)
-local React = require(scriptParentParent.React)
-local View = require(scriptParentParent.Foundation).View
+local function _createPageView(p)
+	local function getFields()
+		local children = {}
 
-local function _createPageView(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy), FieldRow (copy), View (copy)
-	local function getFields() -- line: 18
-		-- upvalues: t1 (copy), React (copy), FieldRow (copy)
-		local t2 = {}
-
-		for _, v11 in t1.settings do
-			t2[v11.id] = React.createElement(FieldRow, v11)
+		for _, setting in p.settings do
+			children[setting.id] = React.createElement(FieldRow, setting)
 		end
 
-		return t2
+		return children
 	end
 
-	return React.createElement(View, {
-		tag = "padding-x-medium align-x-center align-y-top padding-small col size-full auto-y gui-object-defaults",
-		Visible = t1.visible
-	}, { (getFields()) })
+	return React.createElement(
+		View,
+		{
+			tag = "padding-x-medium align-x-center align-y-top padding-small col size-full auto-y gui-object-defaults",
+			Visible = p.visible
+		},
+		{ getFields() }
+	)
 end
 
 return _createPageView

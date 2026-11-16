@@ -1,51 +1,46 @@
 local SocialExperienceJoin = script:FindFirstAncestor("SocialExperienceJoin")
-local SocialExperienceJoinParent = SocialExperienceJoin.Parent
-local React = require(SocialExperienceJoinParent.React)
-local Localization = require(SocialExperienceJoinParent.Localization)
-local UIBlox = require(SocialExperienceJoinParent.UIBlox)
+local parent = SocialExperienceJoin.Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local UIBlox = require(parent.UIBlox)
+
 local useLocalization = Localization.Hooks.useLocalization
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local TextKeys = require(SocialExperienceJoin.Common.TextKeys)
 
-return function(t1: {[any]: any}) -- line: 22
-	-- upvalues: useLocalization (copy), TextKeys (copy), React (copy), InteractiveAlert (copy), ButtonType (copy)
-	local v11 = useLocalization({
+return function(props)
+	local v = useLocalization({
 		titleText = TextKeys.PurchaseExperienceModalTitle,
 		bodyText = {
 			TextKeys.PurchaseExperienceModalBody,
-			gameName = t1.experienceName,
-			X = t1.price
+			gameName = props.experienceName,
+			X = props.price
 		},
 		confirmButtonText = TextKeys.Unlock,
 		cancelButtonText = TextKeys.Cancel,
 		successToastTitle = TextKeys.SuccessPurchaseToastTitle,
 		successToastMessage = {
 			TextKeys.SuccessPurchaseToastMessage,
-			gameName = t1.experienceName,
-			price = t1.price
+			gameName = props.experienceName,
+			price = props.price
 		}
 	})
 
 	return React.createElement(InteractiveAlert, {
-		screenSize = t1.screenSize,
-		title = v11.titleText,
-		bodyText = v11.bodyText,
+		screenSize = props.screenSize,
+		title = v.titleText,
+		bodyText = v.bodyText,
 		buttonStackInfo = {
 			buttons = {
 				{
 					buttonType = nil,
-					props = {
-						text = v11.cancelButtonText,
-						onActivated = t1.cancelPurchase
-					}
+					props = { text = v.cancelButtonText, onActivated = props.cancelPurchase }
 				},
 				{
 					buttonType = ButtonType.PrimarySystem,
-					props = {
-						text = v11.confirmButtonText,
-						onActivated = t1.purchaseExperience
-					}
+					props = { text = v.confirmButtonText, onActivated = props.purchaseExperience }
 				}
 			}
 		}

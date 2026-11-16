@@ -1,5 +1,7 @@
-local function isCallable(p1) -- line: 9
-	return type(p1) == "function" or type(p1) == "table" and (not not getmetatable(p1) and (getmetatable(p1).__call ~= nil or false))
+local function isCallable(value)
+	return (type(value) == "function" or type(value) == "table" and getmetatable(value) and getmetatable(value).__call ~= nil)
+		and true
+		or false
 end
 
 return isCallable

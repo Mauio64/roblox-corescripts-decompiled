@@ -1,290 +1,308 @@
 local GuiService = game:GetService("GuiService")
 local VRService = game:GetService("VRService")
-local Parent = script:FindFirstAncestor("Responsive").Parent
-local StandardBreakpoints = require(script.Parent.CommonConfigs.StandardBreakpoints)
-local InputMode = require(script.Parent.InputMode)
-local Signal = require(Parent.AppCommonLib).Signal
-local FindFirstAncestorWithTag = require(script.Parent.FindFirstAncestorWithTag)
-local self = setmetatable({}, {
-	__mode = "k"
-})
-local t1 = {}
 
-t1.__index = t1
+local parent = script:FindFirstAncestor("Responsive").Parent
+
+local StandardBreakpoints = require(script.Parent.CommonConfigs.StandardBreakpoints)
+
+local InputMode = require(script.Parent.InputMode)
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
+local FindFirstAncestorWithTag = require(script.Parent.FindFirstAncestorWithTag)
+
+local object = setmetatable({}, { __mode = "k" })
+
+local class = {}
+class.__index = class
 
 local rules = StandardBreakpoints.rules
-local t2 = {}
 
-t2.__index = t2
+local class2 = {}
+class2.__index = class2
 
-function t2.new(t3: {[any]: any}) -- line: 62
-	-- upvalues: t2 (copy)
-	local t4 = {
+function class2.new(options)
+	local hasSizeRules = false
+	local hasInputRules = false
+	local v = {
 		_hasSizeRules = false,
 		_hasInputRules = false,
-		_currentKey = "Default",
-		_config = t3 or {},
-		_currentRule = {
-			Key = "Default"
-		}
+		_config = options or {},
+		_currentRule = { Key = "Default" },
+		_currentKey = "Default"
 	}
-	local v14 = false
-	local v15 = false
 
-	for _, v17 in t3 do
-		v14 = v14 or (v17.minWidth ~= nil or (v17.maxWidth ~= nil or (v17.minHeight ~= nil or (v17.maxHeight ~= nil or (v17.maxRatio ~= nil or v17.minRatio ~= nil)))))
-		v15 = v15 or (v17.preferredInput ~= nil or v17.lastInput ~= nil)
+	for _, option in options do
+		hasSizeRules = hasSizeRules
+			or option.minWidth ~= nil
+			or option.maxWidth ~= nil
+			or option.minHeight ~= nil
+			or option.maxHeight ~= nil
+			or option.maxRatio ~= nil
+			or option.minRatio ~= nil
+
+		hasInputRules = hasInputRules or option.preferredInput ~= nil or option.lastInput ~= nil
 	end
 
-	t4._hasSizeRules = v14
-	t4._hasInputRules = v15
+	v._hasSizeRules = hasSizeRules
+	v._hasInputRules = hasInputRules
 
-	return (setmetatable(t4, t2))
+	return (setmetatable(v, class2))
 end
-function t2.hasSizeRules(p1) -- line: 98
-	return p1._hasSizeRules
-end
-function t2.hasInputRules(p2) -- line: 101
-	return p2._hasInputRules
-end
-function t2.currentRule(p3) -- line: 105
-	return p3._currentRule
-end
-function t2.currentKey(p4) -- line: 108
-	return p4._currentKey
-end
-function t2.resolve(t5: {[any]: any}, n1: number, n2: number, s1: string, s2: string, b1: boolean) -- line: 114
-	local s3 = "Default"
-	local t6 = {}
-	local v30 = n1 / n2
 
-	for _, v32 in t5._config do
-		if (v32.minWidth == nil or n1 >= v32.minWidth) and ((v32.maxWidth == nil or n1 <= v32.maxWidth) and ((v32.minHeight == nil or n2 >= v32.minHeight) and ((v32.maxHeight == nil or n2 <= v32.maxHeight) and ((v32.minRatio == nil or v30 >= v32.minRatio) and ((v32.maxRatio == nil or v30 <= v32.maxRatio) and ((v32.preferredInput == nil or s1 == v32.preferredInput) and ((v32.lastInput == nil or s2 == v32.lastInput) and (v32.spatial == nil or b1 == v32.spatial)))))))) then
-			t6 = v32
-			s3 = v32.Key
+function class2:hasSizeRules()
+	return self._hasSizeRules
+end
 
+function class2:hasInputRules()
+	return self._hasInputRules
+end
+
+function class2:currentRule()
+	return self._currentRule
+end
+
+function class2:currentKey()
+	return self._currentKey
+end
+
+function class2:resolve(p: number, p2: number, p3: string, p4: string, flag: boolean): boolean
+	local v = p / p2
+	local currentKey = "Default"
+	local currentRule = {}
+
+	for _, v2 in self._config do
+		local v3
+
+		if
+			(v2.minWidth == nil or v2.minWidth <= p)
+			and (v2.maxWidth == nil or p <= v2.maxWidth)
+			and (v2.minHeight == nil or v2.minHeight <= p2)
+			and (v2.maxHeight == nil or p2 <= v2.maxHeight)
+			and (v2.minRatio == nil or v2.minRatio <= v)
+			and (v2.maxRatio == nil or v <= v2.maxRatio)
+			and (v2.preferredInput == nil or p3 == v2.preferredInput)
+			and (v2.lastInput == nil or p4 == v2.lastInput)
+		then
+			v3 = v2.spatial == nil or flag == v2.spatial
+		else
+			v3 = false
+		end
+
+		if v3 then
+			currentKey = v2.Key
+			currentRule = v2
 			break
 		end
 	end
 
-	if s3 ~= t5._currentKey then
-		t5._currentKey = s3
-		t5._currentRule = t6
-
-		return true
+	if currentKey == self._currentKey then
+		return false
 	end
 
-	return false
+	self._currentKey = currentKey
+	self._currentRule = currentRule
+	return true
 end
-function t1.new() -- line: 154
-	-- upvalues: VRService (copy), Signal (copy), t1 (copy), InputMode (copy)
-	local t7 = {
+
+function class.new()
+	local v = {
 		_layerCollectorSizeConnection = nil,
 		_inputModeConnection = nil,
 		_vrEnabledConnection = nil,
-		_hasInputRules = false,
-		_hasSizeRules = false,
-		_refCount = 1,
 		_vrEnabled = VRService.VREnabled,
 		_changed = Signal.new(),
 		_absoluteSize = Vector2.zero,
-		_configResolvers = {
-			default = {}
-		}
+		_hasInputRules = false,
+		_hasSizeRules = false,
+		_refCount = 1,
+		_configResolvers = { default = {} }
 	}
-	local v34 = setmetatable(t7, t1)
 
-	t7._inputModeConnection = InputMode.connect(function() -- line: 182
-		-- upvalues: t7 (copy), v34 (copy)
-		if t7._hasInputRules then
-			v34:resolve()
+	local object2 = setmetatable(v, class)
+
+	v._inputModeConnection = InputMode.connect(function()
+		if v._hasInputRules then
+			object2:resolve()
 		end
 	end)
-	t7._vrEnabledConnection = VRService:GetPropertyChangedSignal("VREnabled"):Connect(function() -- line: 188
-		-- upvalues: t7 (copy), VRService (copy), v34 (copy)
-		t7._vrEnabled = VRService.VREnabled
-		v34:resolve()
+
+	v._vrEnabledConnection = VRService:GetPropertyChangedSignal("VREnabled"):Connect(function()
+		v._vrEnabled = VRService.VREnabled
+		object2:resolve()
 	end)
 
-	return v34
+	return object2
 end
-function t1.incRef(p5) -- line: 196
-	p5._refCount = p5._refCount + 1
-end
-function t1.destroy(p6) -- line: 201
-	-- upvalues: self (copy)
-	if p6._refCount > 1 then
-		p6._refCount = p6._refCount - 1
 
+function class:incRef()
+	self._refCount += 1
+end
+
+function class:destroy()
+	if self._refCount > 1 then
+		self._refCount -= 1
 		return
 	end
 
-	if p6._layerCollectorSizeConnection then
-		p6._layerCollectorSizeConnection:Disconnect()
-		p6._layerCollectorSizeConnection = nil
+	if self._layerCollectorSizeConnection then
+		self._layerCollectorSizeConnection:Disconnect()
+		self._layerCollectorSizeConnection = nil
 	end
 
-	if p6._inputModeConnection then
-		p6._inputModeConnection:disconnect()
-		p6._inputModeConnection = nil
+	if self._inputModeConnection then
+		self._inputModeConnection:disconnect()
+		self._inputModeConnection = nil
 	end
 
-	if p6._vrEnabledConnection then
-		p6._vrEnabledConnection:Disconnect()
-		p6._vrEnabledConnection = nil
+	if self._vrEnabledConnection then
+		self._vrEnabledConnection:Disconnect()
+		self._vrEnabledConnection = nil
 	end
 
-	p6._changed = nil
+	self._changed = nil
 
-	for v37, v38 in self do
-		if v38 == p6 then
-			self[v37] = nil
+	for k, v in object do
+		if v == self then
+			object[k] = nil
 		end
 	end
 end
-function t1.connect(p7, p8) -- line: 228
-	if p7._changed == nil then
+
+function class:connect(p)
+	if self._changed == nil then
 		error("Connecting to dead signal!")
 	end
 
-	return p7._changed:connect(p8)
+	return self._changed:connect(p)
 end
-function t1.currentRule(t8: {[any]: any}, s4: string?) -- line: 236
-	local v43 = s4 or "default"
 
-	return t8._configResolvers[v43]:currentRule()
+function class:currentRule(value: string?)
+	return self._configResolvers[value or "default"]:currentRule()
 end
-function t1.currentKey(t9: {[any]: any}, s5: string?) -- line: 241
-	local v46 = s5 or "default"
 
-	return t9._configResolvers[v46]:currentKey()
+function class:currentKey(value: string?)
+	return self._configResolvers[value or "default"]:currentKey()
 end
-function t1.updateAbsoluteSize(p9, p10) -- line: 247
-	-- upvalues: GuiService (copy)
-	local AbsoluteSize = p10.AbsoluteSize
 
-	if p10:IsA("LayerCollector") then
-		local ok, result = pcall(function() -- line: 251
-			-- upvalues: p10 (copy)
-			return p10.IgnoreGuiInset
+function class:updateAbsoluteSize(layerCollector)
+	local absoluteSize = layerCollector.AbsoluteSize
+
+	if layerCollector:IsA("LayerCollector") then
+		local success, result = pcall(function()
+			return layerCollector.IgnoreGuiInset
 		end)
 
-		if ok and result then
-			local v52, _ = GuiService:GetGuiInset()
-
-			AbsoluteSize += v52
+		if success and result then
+			local guiInset, _ = GuiService:GetGuiInset()
+			absoluteSize += guiInset
 		end
 	end
 
-	if AbsoluteSize.X ~= p9._absoluteSize.X or AbsoluteSize.Y ~= p9._absoluteSize.Y then
-		p9._absoluteSize = AbsoluteSize
+	if absoluteSize.X ~= self._absoluteSize.X or absoluteSize.Y ~= self._absoluteSize.Y then
+		self._absoluteSize = absoluteSize
 
-		if p9._hasSizeRules then
-			p9:resolve()
+		if self._hasSizeRules then
+			self:resolve()
 		end
 	end
 end
-function t1.resolve(p11) -- line: 270
-	-- upvalues: InputMode (copy)
-	if not p11._configResolvers then
+
+function class:resolve()
+	if not self._configResolvers then
 		return
 	end
 
-	local v55 = p11._absoluteSize.X or 1
-	local v56 = p11._absoluteSize.Y or 1
-	local v57 = InputMode.preferred()
-	local v58 = InputMode.last()
-	local _vrEnabled = p11._vrEnabled
-	local v60 = false
+	local x = self._absoluteSize.X or 1
+	local y = self._absoluteSize.Y or 1
+	local preferred = InputMode.preferred()
+	local last = InputMode.last()
+	local vrEnabled = self._vrEnabled
+	local flag = false
 
-	for _, v62 in p11._configResolvers do
-		if v62:resolve(v55, v56, v57, v58, _vrEnabled) then
-			v60 = true
+	for _, configResolver in self._configResolvers do
+		if configResolver:resolve(x, y, preferred, last, vrEnabled) then
+			flag = true
 		end
 	end
 
-	if v60 then
-		p11._changed:fire()
+	if flag then
+		self._changed:fire()
 	end
 end
-function is_array(p12) -- line: 293
-	return type(p12) == "table" and p12[1] ~= nil
+
+function is_array(list): boolean
+	return type(list) == "table" and list[1] ~= nil
 end
-function t1.setConfig(p13, p14) -- line: 300
-	-- upvalues: t2 (copy)
-	if is_array(p14) then
-		p14 = {
-			default = p14
-		}
-	end
 
-	local v66 = false
-	local v67 = false
-	local t10 = {}
+function class:setConfig(default)
+	local v = is_array(default) and { default = default } or default
 
-	if p14 then
-		for v69, v70 in p14 do
-			t10[v69] = t2.new(v70)
-			v66 = v66 or t10[v69]:hasSizeRules()
-			v67 = v67 or t10[v69]:hasInputRules()
+	local hasSizeRules = false
+	local hasInputRules = false
+	local configResolvers = {}
+
+	if v then
+		for k, v2 in v do
+			configResolvers[k] = class2.new(v2)
+			hasSizeRules = hasSizeRules or configResolvers[k]:hasSizeRules()
+			hasInputRules = hasInputRules or configResolvers[k]:hasInputRules()
 		end
 	end
 
-	p13._hasInputRules = v67
-	p13._hasSizeRules = v66
-	p13._configResolvers = t10
-	p13:resolve()
+	self._hasInputRules = hasInputRules
+	self._hasSizeRules = hasSizeRules
+	self._configResolvers = configResolvers
+	self:resolve()
 end
-function t1.setLocalInstance(t11: {[any]: any}, p15, p16) -- line: 328
-	-- upvalues: FindFirstAncestorWithTag (copy)
-	if typeof(p15) ~= "Instance" then
+
+function class:setLocalInstance(instance, value)
+	if typeof(instance) ~= "Instance" then
 		error("setLocalInstance arg1 expects Instance")
-
 		return
 	end
 
-	local u74 = if typeof(p16) ~= "string" then if typeof(p16) ~= "Instance" then p15:FindFirstAncestorWhichIsA("LayerCollector") else p16 else FindFirstAncestorWithTag(p15, p16) or p15
-
-	if u74 == nil then
-		u74 = p15
+	if typeof(value) == "string" then
+		value = FindFirstAncestorWithTag(instance, value) or instance
+	elseif typeof(value) ~= "Instance" then
+		value = instance:FindFirstAncestorWhichIsA("LayerCollector")
 	end
 
-	if t11._layerCollectorSizeConnection then
-		t11._layerCollectorSizeConnection:Disconnect()
-		t11._layerCollectorSizeConnection = nil
+	if value == nil then
+		value = instance
 	end
 
-	if u74 then
-		t11._layerCollectorSizeConnection = u74:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 354
-			-- upvalues: t11 (copy), u74 (ref)
-			t11:updateAbsoluteSize(u74)
+	if self._layerCollectorSizeConnection then
+		self._layerCollectorSizeConnection:Disconnect()
+		self._layerCollectorSizeConnection = nil
+	end
+
+	if value then
+		self._layerCollectorSizeConnection = value:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+			self:updateAbsoluteSize(value)
 		end)
-		t11:updateAbsoluteSize(u74)
+		self:updateAbsoluteSize(value)
 	end
 end
 
 return {
 	DefaultKey = "Default",
-	bindContainer = function(p17, p18) -- line: 363
-		-- upvalues: self (copy), t1 (copy), rules (copy)
-		local v77 = self[p17]
-		local v78 = p18 == nil
+	bindContainer = function(p, p2)
+		local v = object[p]
+		local v2 = p2 == nil
 
-		if v78 and v77 then
-			v77:incRef()
-
-			return v77
+		if v2 and v then
+			v:incRef()
+			return v
 		end
 
-		local v79 = t1.new()
+		local v3 = class.new()
+		v3:setLocalInstance(p, p)
+		v3:setConfig(p2 or rules)
 
-		v79:setLocalInstance(p17, p17)
-		v79:setConfig(p18 or rules)
-
-		if v78 then
-			self[p17] = v79
+		if v2 then
+			object[p] = v3
 		end
 
-		return v79
+		return v3
 	end
 }

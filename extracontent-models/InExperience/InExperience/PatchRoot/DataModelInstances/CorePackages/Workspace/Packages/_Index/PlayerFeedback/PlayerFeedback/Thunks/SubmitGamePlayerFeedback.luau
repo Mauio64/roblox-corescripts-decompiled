@@ -1,30 +1,29 @@
 local PlayerFeedback = script:FindFirstAncestor("PlayerFeedback")
-local PlayerFeedbackParent = PlayerFeedback.Parent
-local Promise = require(PlayerFeedbackParent.Promise)
-local PerformFetch = require(PlayerFeedbackParent.Http).PerformFetch
+local parent = PlayerFeedback.Parent
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
+local PerformFetch = Http.PerformFetch
 local PostGamePlayerFeedback = require(PlayerFeedback.Utils.PostGamePlayerFeedback)
 local FeedbackChannel = require(PlayerFeedback.Enums.FeedbackChannel)
 
-local function fetchKeymapper(p1) -- line: 8
-	return "luaapp.asset-review-api.channels.reviews" .. p1
+local function fetchKeymapper(p) -- 2 equivalent calls inferred from this helper
+	return "luaapp.asset-review-api.channels.reviews" .. p
 end
 
-return {
-	Post = function(p2, s1: string, s2: string, t1: {[any]: any}, s3: string) -- line: 14
-		-- upvalues: PerformFetch (copy), PostGamePlayerFeedback (copy), FeedbackChannel (copy), Promise (copy)
-		return PerformFetch.Single("luaapp.asset-review-api.channels.reviews" .. s1, function(_) -- line: 21
-			-- upvalues: PostGamePlayerFeedback (copy), p2 (copy), FeedbackChannel (copy), s1 (copy), s2 (copy), t1 (copy), s3 (copy), Promise (copy)
-			return PostGamePlayerFeedback(p2, FeedbackChannel.ExperienceDiscoveryPage, s1, s2, t1, s3):andThen(function(p4) -- line: 29
-				-- upvalues: Promise (copy)
-				return Promise.resolve(p4)
-			end, function(p5) -- line: 31
-				-- upvalues: Promise (copy)
-				return Promise.reject(p5)
-			end)
+local SubmitGamePlayerFeedback = {}
+
+function SubmitGamePlayerFeedback.Post(p, p2: string, p3: string, p4, p5: string)
+	return PerformFetch.Single(fetchKeymapper(p2), function(_) -- inferred equivalent call
+		return PostGamePlayerFeedback(p, FeedbackChannel.ExperienceDiscoveryPage, p2, p3, p4, p5):andThen(function(p6)
+			return Promise.resolve(p6)
+		end, function(p6)
+			return Promise.reject(p6)
 		end)
-	end,
-	GetPostingStatus = function(p6, p7) -- line: 36
-		-- upvalues: PerformFetch (copy)
-		return PerformFetch.GetStatus(p6, "luaapp.asset-review-api.channels.reviews" .. p7)
-	end
-}
+	end)
+end
+
+function SubmitGamePlayerFeedback.GetPostingStatus(p, p2)
+	return PerformFetch.GetStatus(p, fetchKeymapper(p2)) -- inferred equivalent call
+end
+
+return SubmitGamePlayerFeedback

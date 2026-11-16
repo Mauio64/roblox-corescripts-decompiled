@@ -1,196 +1,153 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.Shared)
 
-require(ParentParent.Shared)
+local Shared = require(parent.Shared)
+local invariant = Shared.invariant
 
-local invariant = require(ParentParent.Shared).invariant
-local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local Shared2 = require(parent.Shared)
+local ReactSymbols = Shared2.ReactSymbols
 local getIteratorFn = ReactSymbols.getIteratorFn
 local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
 local REACT_PORTAL_TYPE = ReactSymbols.REACT_PORTAL_TYPE
-local Array = require(ParentParent.LuauPolyfill).Array
+
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+
 local ReactElement = require(script.Parent.ReactElement)
 local isValidElement = ReactElement.isValidElement
 local cloneAndReplaceKey = ReactElement.cloneAndReplaceKey
 
-local function escape(s1: string) -- line: 45
-	local v20 = string.gsub(s1, "=", "=0")
-
-	return "$" .. string.gsub(v20, ":", "=2")
+local function escape(key: string) -- 1 equivalent call inferred from this helper
+	local v = string.gsub(key, "=", "=0")
+	return "$" .. string.gsub(v, ":", "=2")
 end
-local function escapeUserProvidedKey(s2: string) -- line: 60
-	return s2
-end
-local function getElementKey(p1, n1: number) -- line: 73
-	if typeof(p1) == "table" and (p1 ~= nil and p1.key ~= nil) then
-		local str = tostring(p1.key)
-		local v25 = string.gsub(str, "=", "=0")
 
-		return "$" .. string.gsub(v25, ":", "=2")
+local function escapeUserProvidedKey(p: string)
+	return p
+end
+
+local function getElementKey(p, p2: number) -- 3 equivalent calls inferred from this helper
+	if typeof(p) ~= "table" or p == nil or p.key == nil then
+		return (tostring(p2))
 	end
 
-	return (tostring(n1))
+	return escape(tostring(p.key)) -- inferred equivalent call
 end
-local function mapIntoArray(p2, p3, s3: string, s4: string, p4: ((...any) -> ...any)) -- line: 86
-	-- upvalues: REACT_ELEMENT_TYPE (copy), REACT_PORTAL_TYPE (copy), Array (copy), mapIntoArray (copy), isValidElement (copy), cloneAndReplaceKey (copy), getIteratorFn (copy)
-	local v31 = typeof(p2)
 
-	if v31 == "nil" or (v31 == "boolean" or v31 == "userdata") then
-		p2 = nil
+local function mapIntoArray(p, list, p2: string, p3: string, fn)
+	local typeName = typeof(p)
+
+	if typeName == "nil" or typeName == "boolean" or typeName == "userdata" then
+		p = nil
 	end
 
-	local v32 = false
+	local v = false
 
-	if p2 == nil then
-		v32 = true
-	elseif v31 == "string" or v31 == "number" then
-		v32 = true
-	elseif v31 == "table" then
-		local v33 = p2["$$typeof"]
+	if p == nil or typeName == "string" or typeName == "number" then
+		v = true
+	elseif typeName == "table" then
+		local Typeof = p["$$typeof"]
 
-		if v33 == REACT_ELEMENT_TYPE or v33 == REACT_PORTAL_TYPE then
-			v32 = true
-		end
+		v = Typeof == REACT_ELEMENT_TYPE or Typeof == REACT_PORTAL_TYPE or false
 	end
 
-	if v32 then
-		local v34 = p4(p2)
+	if v then
+		local v2 = fn(p)
 
-		if s4 == "" then
-			local v37
-
-			if typeof(p2) == "table" and p2 ~= nil and p2.key ~= nil then
-				local str = tostring(p2.key)
-				local v36 = string.gsub(str, "=", "=0")
-
-				v37 = "$" .. string.gsub(v36, ":", "=2")
-			else
-				v37 = tostring(1)
-			end
-
-			s4 = "." .. v37
+		if p3 == "" then
+			p3 = "." .. getElementKey(p, 1) -- inferred equivalent call
 		end
 
-		if Array.isArray(v34) then
-			local s5 = ""
-
-			if s4 ~= nil then
-				s5 = s4 .. "/"
-			end
-
-			mapIntoArray(v34, p3, s5, "", function(p5) -- line: 135
-				return p5
+		if Array.isArray(v2) then
+			mapIntoArray(v2, list, p3 == nil and "" or p3 .. "/", "", function(p4)
+				return p4
 			end)
-		elseif v34 ~= nil then
-			if isValidElement(v34) then
-				local key = v34.key
-
-				v34 = cloneAndReplaceKey(v34, s3 .. ((not key or not not p2 and key == p2.key) and "" or tostring(key) .. "/") .. s4)
+		elseif v2 ~= nil then
+			if isValidElement(v2) then
+				local key = v2.key
+				v2 = cloneAndReplaceKey(
+					v2,
+					p2 .. ((not key or p and p.key == key) and "" or tostring(key) .. "/") .. p3
+				)
 			end
 
-			table.insert(p3, v34)
+			table.insert(list, v2)
 		end
 
 		return 1
-	end
+	else
+		local total = 0
+		local v2 = p3 == "" and "." or p3 .. ":"
 
-	local n2 = 0
-	local v41 = if s4 ~= "" then s4 .. ":" else "."
-
-	if Array.isArray(p2) then
-		for i = 1, #p2 do
-			local v43 = p2[i]
-			local v46
-
-			if typeof(v43) == "table" and v43 ~= nil and v43.key ~= nil then
-				local str = tostring(v43.key)
-				local v45 = string.gsub(str, "=", "=0")
-
-				v46 = "$" .. string.gsub(v45, ":", "=2")
-			else
-				v46 = tostring(i)
+		if Array.isArray(p) then
+			for i = 1, #p do
+				local v3 = p[i]
+				total += mapIntoArray(v3, list, p2, v2 .. getElementKey(v3, i), fn) -- inferred equivalent call
 			end
 
-			local v47 = v41 .. v46
+			return total
+		else
+			local iteratorFn = getIteratorFn(p)
 
-			n2 += mapIntoArray(v43, p3, s3, v47, p4)
-		end
-
-		return n2
-	end
-
-	local v48 = getIteratorFn(p2)
-
-	if typeof(v48) == "function" then
-		local v49 = v48(p2)
-		local n3 = 1
-		local v51 = v49.next()
-
-		while not v51.done do
-			local value = v51.value
-			local v55
-
-			if typeof(value) == "table" and value ~= nil and value.key ~= nil then
-				local str = tostring(value.key)
-				local v54 = string.gsub(str, "=", "=0")
-
-				v55 = "$" .. string.gsub(v54, ":", "=2")
-			else
-				v55 = tostring(n3)
+			if typeof(iteratorFn) ~= "function" then
+				return total
 			end
 
-			local v56 = v41 .. v55
+			local v3 = iteratorFn(p)
 
-			n3 += 1
-			n2 += mapIntoArray(value, p3, s3, v56, p4)
-			v51 = v49.next()
+			local v4 = v3.next()
+			local v5 = 1
+
+			while not v4.done do
+				local value = v4.value
+				local v6 = v2 .. getElementKey(value, v5) -- inferred equivalent call
+
+				v5 += 1
+				total += mapIntoArray(value, list, p2, v6, fn)
+
+				v4 = v3.next()
+			end
+
+			return total
 		end
 	end
-
-	return n2
 end
-local function mapChildren(p6, p7: ((...any) -> ...any), _) -- line: 253
-	-- upvalues: mapIntoArray (copy)
-	if p6 == nil then
+
+local function mapChildren(p, fn, _)
+	if p == nil then
 		return nil
 	end
 
-	local t1 = {}
-	local n4 = 1
-
-	mapIntoArray(p6, t1, "", "", function(p9) -- line: 263
-		-- upvalues: p7 (copy), n4 (ref)
-		local v71 = p7(p9, n4)
-
-		n4 += 1
-
-		return v71
+	local v = {}
+	local v2 = 1
+	mapIntoArray(p, v, "", "", function(p2)
+		local v3 = fn(p2, v2)
+		v2 += 1
+		return v3
 	end)
 
-	return t1
+	return v
 end
-local function countChildren(p10) -- line: 281
-	-- upvalues: mapChildren (copy)
-	local n5 = 0
 
-	mapChildren(p10, function() -- line: 283
-		-- upvalues: n5 (ref)
-		n5 += 1
+local function countChildren(p)
+	local count = 0
+	mapChildren(p, function()
+		count += 1
 	end)
 
-	return n5
+	return count
 end
-local function forEachChildren(p11, p12: ((...any) -> ...any), p13) -- line: 305
-	-- upvalues: mapChildren (copy)
-	mapChildren(p11, function(...) -- line: 310
-		-- upvalues: p12 (copy)
-		p12(...)
-	end, p13)
-end
-local function onlyChild(p14) -- line: 345
-	-- upvalues: invariant (copy), isValidElement (copy)
-	invariant(isValidElement(p14), "React.Children.only expected to receive a single React element child.")
 
-	return p14
+local function forEachChildren(p, callback, p2)
+	mapChildren(p, function(...)
+		callback(...)
+	end, p2)
+end
+
+local function onlyChild(p)
+	invariant(isValidElement(p), "React.Children.only expected to receive a single React element child.")
+
+	return p
 end
 
 return {
@@ -198,10 +155,9 @@ return {
 	map = mapChildren,
 	count = countChildren,
 	only = onlyChild,
-	toArray = function(p15) -- line: 324
-		-- upvalues: mapChildren (copy)
-		return mapChildren(p15, function(p16) -- line: 325
-			return p16
+	toArray = function(p)
+		return mapChildren(p, function(p2)
+			return p2
 		end) or {}
 	end
 }

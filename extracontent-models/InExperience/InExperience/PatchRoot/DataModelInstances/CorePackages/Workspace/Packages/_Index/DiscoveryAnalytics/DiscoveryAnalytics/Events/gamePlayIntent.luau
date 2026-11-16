@@ -2,56 +2,53 @@ local HttpService = game:GetService("HttpService")
 local AppStorageService = game:GetService("AppStorageService")
 local TelemetryService = game:GetService("TelemetryService")
 local DiscoveryAnalytics = script:FindFirstAncestor("DiscoveryAnalytics")
-local DiscoveryAnalyticsParent = DiscoveryAnalytics.Parent
-local Cryo = require(DiscoveryAnalyticsParent.Cryo)
-local getPlatformTarget = require(DiscoveryAnalyticsParent.Analytics).getPlatformTarget
-local t = require(DiscoveryAnalyticsParent.t)
-local DiscoveryEventErrorLogger = require(DiscoveryAnalyticsParent.DiscoveryUtils).DiscoveryEventErrorLogger
-local FFlagLuaAppGamePlayIntentEventMobileAdsId = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppGamePlayIntentEventMobileAdsId
-local FFlagTraversalHistoryDiscoveryTelemetry = require(DiscoveryAnalyticsParent.SharedFlags).FFlagTraversalHistoryDiscoveryTelemetry
-local FFlagLuaAppAddSubIdToHomeEvents = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppAddSubIdToHomeEvents
-local v13 = game:DefineFastFlag("LuaAppRemoveNumericalSortIndexSearch", false)
-local FFlagSduiExperienceDetailsSupport = require(DiscoveryAnalyticsParent.SharedFlags).FFlagSduiExperienceDetailsSupport
-local FFlagLuaAppMigrateGameEventsTelemetryService = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppMigrateGameEventsTelemetryService
-local FFlagLuaAppGameEventsTelemetryServiceShadowTraffic = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppGameEventsTelemetryServiceShadowTraffic
-local FFlagLuaAppGameItemTelemetryServiceTarget = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppGameItemTelemetryServiceTarget
-local FFlagLuaAppDemoModePlayButtonTelemetry = require(DiscoveryAnalyticsParent.SharedFlags).FFlagLuaAppDemoModePlayButtonTelemetry
-local v19 = game:DefineFastInt("LuaAppGamePlayIntentEventThrottlingHundredthsPercent", 10000)
-local v20 = game:DefineFastInt("LuaAppGamePlayIntentShadowThrottlingHundredthsPercent", 10000)
+local parent = DiscoveryAnalytics.Parent
+
+local Cryo = require(parent.Cryo)
+local Analytics = require(parent.Analytics)
+local getPlatformTarget = Analytics.getPlatformTarget
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppGamePlayIntentEventMobileAdsId = SharedFlags.FFlagLuaAppGamePlayIntentEventMobileAdsId
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagTraversalHistoryDiscoveryTelemetry = SharedFlags2.FFlagTraversalHistoryDiscoveryTelemetry
+
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppMigrateGameEventsTelemetryService = SharedFlags3.FFlagLuaAppMigrateGameEventsTelemetryService
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppGameEventsTelemetryServiceShadowTraffic = SharedFlags4.FFlagLuaAppGameEventsTelemetryServiceShadowTraffic
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagLuaAppContinueSortInstantPlay = SharedFlags5.FFlagLuaAppContinueSortInstantPlay
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppDemoModePlayButtonTelemetry = SharedFlags6.FFlagLuaAppDemoModePlayButtonTelemetry
+
+local defineFastInt = game:DefineFastInt("LuaAppGamePlayIntentEventThrottlingHundredthsPercent", 10000)
+
+local defineFastInt2 = game:DefineFastInt("LuaAppGamePlayIntentShadowThrottlingHundredthsPercent", 10000)
+
 local Constants = require(DiscoveryAnalytics.Constants)
-local t1 = nil
 
-if FFlagLuaAppMigrateGameEventsTelemetryService then
-	t1 = {
-		eventName = "gamePlayIntent",
-		description = "Fires when the user clicks on a Play Button",
-		backends = { "EventIngest" },
-		throttlingPercentage = v19,
-		lastUpdated = {
-			26,
-			2,
-			4
-		}
-	}
-end
+local v = FFlagLuaAppMigrateGameEventsTelemetryService and {
+	eventName = "gamePlayIntent",
+	backends = { "EventIngest" },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 26, 2, 4 },
+	description = "Fires when the user clicks on a Play Button"
+} or nil
 
-local t2 = nil
+local v2 = FFlagLuaAppGameEventsTelemetryServiceShadowTraffic and {
+	eventName = "gamePlayIntentShadow",
+	backends = { "EventIngest" },
+	throttlingPercentage = defineFastInt2,
+	lastUpdated = { 26, 3, 4 },
+	description = "Shadow traffic for gamePlayIntent event recovery percentage"
+} or nil
 
-if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
-	t2 = {
-		eventName = "gamePlayIntentShadow",
-		description = "Shadow traffic for gamePlayIntent event recovery percentage",
-		backends = { "EventIngest" },
-		throttlingPercentage = v20,
-		lastUpdated = {
-			26,
-			3,
-			4
-		}
-	}
-end
-
-local v24 = t.strictInterface({
+local strictInterface = t.strictInterface({
 	placeId = t.union(t.string, t.number),
 	rootPlaceId = t.union(t.number, t.string),
 	referralSource = t.optional(t.string),
@@ -66,9 +63,11 @@ local v24 = t.strictInterface({
 	joinAttemptId = t.optional(t.string),
 	uid = t.optional(t.string),
 	launchData = t.optional(t.string),
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
+	pageName = t.optional(t.string)
 })
-local v25 = t.strictInterface({
+
+local strictInterface2 = t.strictInterface
+local v3 = {
 	placeId = t.union(t.string, t.number),
 	rootPlaceId = t.union(t.number, t.string),
 	referralSource = t.optional(t.string),
@@ -76,10 +75,20 @@ local v25 = t.strictInterface({
 	launchData = t.optional(t.string),
 	tileType = t.optional(t.string),
 	nativeAdData = t.optional(t.string),
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string),
-	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
-})
-local v26 = t.strictInterface({
+	pageName = t.optional(t.string),
+	actionType = 0
+}
+local actionType
+
+if FFlagLuaAppDemoModePlayButtonTelemetry then
+	actionType = t.optional(t.string)
+end
+
+v3.actionType = actionType
+local playButton = strictInterface2(v3)
+
+local strictInterface3 = t.strictInterface
+local v4 = {
 	placeId = t.string,
 	rootPlaceId = t.number,
 	universeId = t.string,
@@ -98,18 +107,28 @@ local v26 = t.strictInterface({
 	heroUnitId = t.optional(t.string),
 	loadSource = t.optional(t.string),
 	launchData = t.optional(t.string),
-	sortSubId = if not FFlagLuaAppAddSubIdToHomeEvents then nil else t.optional(t.string),
+	sortSubId = t.optional(t.string),
 	tileType = t.string,
 	analyticsData = t.optional(t.table),
-	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
-})
-local v27 = t.strictInterface({
+	actionType = 0
+}
+local actionType2
+
+if FFlagLuaAppDemoModePlayButtonTelemetry then
+	actionType2 = t.optional(t.string)
+end
+
+v4.actionType = actionType2
+local v5 = strictInterface3(v4)
+
+local strictInterface4 = t.strictInterface
+local v6 = {
 	placeId = t.string,
 	rootPlaceId = t.number,
 	universeId = t.string,
 	sortEntryIndex = t.string,
 	gameSetTypeId = t.string,
-	sortIndex = if not v13 then t.union(t.string, t.number) else t.string,
+	sortIndex = t.string,
 	rowOnPage = t.optional(t.number),
 	topicDataPosition = t.optional(t.number),
 	nativeAdData = t.optional(t.string),
@@ -119,46 +138,61 @@ local v27 = t.strictInterface({
 	positionInRow = t.optional(t.number),
 	rowNumber = t.optional(t.number),
 	feedRowNumber = t.optional(t.number),
-	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
-})
-local v28 = t.strictInterface({
+	actionType = 0
+}
+local actionType3
+
+if FFlagLuaAppDemoModePlayButtonTelemetry then
+	actionType3 = t.optional(t.string)
+end
+
+v6.actionType = actionType3
+local v7 = strictInterface4(v6)
+
+local strictInterface5 = t.strictInterface({
 	placeId = t.string,
 	rootPlaceId = t.number,
 	joinAttemptId = t.optional(t.string),
 	friendId = t.string,
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
+	pageName = t.optional(t.string)
 })
-local v29 = t.strictInterface({
+
+local strictInterface6 = t.strictInterface({
 	placeId = t.string,
 	rootPlaceId = t.number,
 	joinAttemptId = t.optional(t.string),
 	friendId = t.string,
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
+	pageName = t.optional(t.string)
 })
-local v30 = t.strictInterface({
+
+local strictInterface7 = t.strictInterface({
 	placeId = t.string,
 	rootPlaceId = t.number,
 	joinAttemptId = t.optional(t.string),
 	conversationId = t.optional(t.string),
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
+	pageName = t.optional(t.string)
 })
-local v31 = t.strictInterface({
+
+local strictInterface8 = t.strictInterface({
 	placeId = t.union(t.string, t.number),
 	rootPlaceId = t.union(t.number, t.string),
 	linkId = t.string,
 	linkType = t.string,
 	linkStatus = t.string,
 	joinAttemptId = t.optional(t.string),
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
+	pageName = t.optional(t.string)
 })
-local v32 = t.strictInterface({
+
+local strictInterface9 = t.strictInterface({
 	friendId = t.string,
 	pageName = t.string,
 	placeId = t.optional(t.string),
 	rootPlaceId = t.optional(t.string),
 	joinAttemptId = t.string
 })
-local v33 = t.strictInterface({
+
+local strictInterface10 = t.strictInterface
+local v8 = {
 	placeId = t.string,
 	rootPlaceId = t.number,
 	universeId = t.string,
@@ -171,206 +205,276 @@ local v33 = t.strictInterface({
 	nativeAdData = t.optional(t.string),
 	pageName = t.optional(t.string),
 	tileType = t.string,
-	actionType = if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else t.optional(t.string)
-})
-local v34 = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else t.strictInterface({
-	placeId = t.string,
-	universeId = t.string,
-	sortEntryIndex = t.string,
-	pageName = if not FFlagSduiExperienceDetailsSupport then nil else t.optional(t.string)
-})
-local t3 = {
-	PlayButton = v25,
-	[Constants.Context.ExperienceTile] = v26,
-	[Constants.Context.SearchExperienceTile] = v27,
-	[Constants.Context.PeopleListInHomePage] = v28,
-	[Constants.Context.GamePlayIntentInPlacesList] = v29,
-	shareLinks = v31,
-	PlayGameFromPlayTogether = v24,
-	PlayGameFromLinkCard = v30,
-	[Constants.Context.PlayerContextualMenu] = v32,
-	[Constants.Context.HoldToPlayLauncher] = v33,
-	[Constants.Context.InExpHistoryTile] = if not FFlagTraversalHistoryDiscoveryTelemetry then nil else v34
+	actionType = 0
 }
+local actionType4
 
-local function addMobileAdvertisingIdToEventParams(p1) -- line: 213
-	-- upvalues: AppStorageService (copy)
-	local Item = AppStorageService:GetItem("MobileAdvertisingId")
+if FFlagLuaAppDemoModePlayButtonTelemetry then
+	actionType4 = t.optional(t.string)
+end
 
-	if Item and Item ~= "" then
-		p1.mobileAdvertisingId = Item
+v8.actionType = actionType4
+local v9 = strictInterface10(v8)
+local v10
+
+if FFlagTraversalHistoryDiscoveryTelemetry then
+	v10 = t.strictInterface({
+		placeId = t.string,
+		universeId = t.string,
+		sortEntryIndex = t.string,
+		pageName = t.optional(t.string)
+	})
+end
+
+local v11 = {
+	PlayButton = playButton,
+	[Constants.Context.ExperienceTile] = v5,
+	[Constants.Context.SearchExperienceTile] = v7,
+	[Constants.Context.PeopleListInHomePage] = strictInterface5,
+	[Constants.Context.GamePlayIntentInPlacesList] = strictInterface6,
+	shareLinks = strictInterface8,
+	PlayGameFromPlayTogether = strictInterface,
+	PlayGameFromLinkCard = strictInterface7,
+	[Constants.Context.PlayerContextualMenu] = strictInterface9,
+	[Constants.Context.HoldToPlayLauncher] = v9
+}
+local InExpHistoryTile = Constants.Context.InExpHistoryTile
+
+if not FFlagTraversalHistoryDiscoveryTelemetry then
+	v10 = nil
+end
+
+v11[InExpHistoryTile] = v10
+
+local InstantPlay = Constants.Context.InstantPlay
+
+if not FFlagLuaAppContinueSortInstantPlay then
+	v5 = nil
+end
+
+v11[InstantPlay] = v5
+
+local function addMobileAdvertisingIdToEventParams(state) -- 1 equivalent call inferred from this helper
+	local item = AppStorageService:GetItem("MobileAdvertisingId")
+
+	if item and item ~= "" then
+		state.mobileAdvertisingId = item
 	end
 end
 
-return function(p2, s1: string, p3) -- line: 220
-	-- upvalues: t3 (copy), DiscoveryEventErrorLogger (copy), HttpService (copy), FFlagLuaAppGamePlayIntentEventMobileAdsId (copy), AppStorageService (copy), FFlagLuaAppMigrateGameEventsTelemetryService (copy), FFlagLuaAppAddSubIdToHomeEvents (copy), Cryo (copy), TelemetryService (copy), t1 (ref), FFlagLuaAppGameItemTelemetryServiceTarget (copy), getPlatformTarget (copy), FFlagLuaAppGameEventsTelemetryServiceShadowTraffic (copy), t2 (ref)
-	if t3[s1] ~= nil then
-		local v42, v43 = t3[s1](p3)
-
-		if not v42 then
-			DiscoveryEventErrorLogger.reportError("GamePlayIntentInvalidInterface", v43)
-		end
+return function(object, eventContext: string, state)
+	if v11[eventContext] == nil then
+		DiscoveryEventErrorLogger.reportError(
+			"GamePlayIntentMissingInterface",
+			`Missing interface for eventContext {eventContext} to type check gamePlayIntent event parameters`,
+			{ eventContext = eventContext }
+		)
 	else
-		DiscoveryEventErrorLogger.reportError("GamePlayIntentMissingInterface", `Missing interface for eventContext { s1 } to type check gamePlayIntent event parameters`, {
-			eventContext = s1
-		})
+		local v12, v13 = v11[eventContext](state)
+
+		if not v12 then
+			DiscoveryEventErrorLogger.reportError("GamePlayIntentInvalidInterface", v13)
+		end
 	end
 
-	local analyticsData = p3.analyticsData
+	local analyticsData = state.analyticsData
 
-	if not p3.interactionUuid then
-		p3.interactionUuid = HttpService:GenerateGUID(false)
+	if not state.interactionUuid then
+		state.interactionUuid = HttpService:GenerateGUID(false)
 	end
 
-	if not p3.contentType then
-		p3.contentType = "Game"
+	if not state.contentType then
+		state.contentType = "Game"
 	end
 
-	if not p3.actionType then
-		p3.actionType = "PlayButtonClick"
+	if not state.actionType then
+		state.actionType = "PlayButtonClick"
 	end
 
 	if FFlagLuaAppGamePlayIntentEventMobileAdsId then
-		local Item = AppStorageService:GetItem("MobileAdvertisingId")
-
-		if Item and Item ~= "" then
-			p3.mobileAdvertisingId = Item
-		end
+		addMobileAdvertisingIdToEventParams(state) -- inferred equivalent call
 	end
 
 	if FFlagLuaAppMigrateGameEventsTelemetryService then
-		local t4 = {
-			placeId = p3.placeId,
-			rootPlaceId = p3.rootPlaceId,
-			universeId = p3.universeId,
-			referralSource = p3.referralSource,
-			sortIndex = p3.sortIndex,
-			sortEntryIndex = p3.sortEntryIndex,
-			gameSetTypeId = p3.gameSetTypeId,
-			gameSetTargetId = p3.gameSetTargetId,
-			linkId = p3.linkId,
-			linkType = p3.linkType,
-			linkStatus = p3.linkStatus,
-			conversationId = p3.conversationId,
-			joinAttemptId = p3.joinAttemptId,
-			friendId = p3.friendId,
-			pageName = p3.pageName,
-			rowOnPage = p3.rowOnPage,
-			appliedFilters = p3.appliedFilters,
-			topicDataPosition = p3.topicDataPosition,
-			nativeAdData = p3.nativeAdData,
-			interactionUuid = p3.interactionUuid,
-			contentType = p3.contentType,
-			actionType = p3.actionType,
-			positionInRow = p3.positionInRow,
-			rowNumber = p3.rowNumber,
-			feedRowNumber = p3.feedRowNumber,
-			heroUnitId = p3.heroUnitId,
-			mobileAdvertisingId = if not FFlagLuaAppGamePlayIntentEventMobileAdsId then nil else p3.mobileAdvertisingId,
-			loadSource = p3.loadSource,
-			launchData = if not p3.launchData then nil else p3.launchData,
-			sortSubId = if not FFlagLuaAppAddSubIdToHomeEvents then nil else p3.sortSubId,
-			tileType = p3.tileType
+		local joined = {
+			placeId = state.placeId,
+			rootPlaceId = state.rootPlaceId,
+			universeId = state.universeId,
+			referralSource = state.referralSource,
+			sortIndex = state.sortIndex,
+			sortEntryIndex = state.sortEntryIndex,
+			gameSetTypeId = state.gameSetTypeId,
+			gameSetTargetId = state.gameSetTargetId,
+			linkId = state.linkId,
+			linkType = state.linkType,
+			linkStatus = state.linkStatus,
+			conversationId = state.conversationId,
+			joinAttemptId = state.joinAttemptId,
+			friendId = state.friendId,
+			pageName = state.pageName,
+			rowOnPage = state.rowOnPage,
+			appliedFilters = state.appliedFilters,
+			topicDataPosition = state.topicDataPosition,
+			nativeAdData = state.nativeAdData,
+			interactionUuid = state.interactionUuid,
+			contentType = state.contentType,
+			actionType = state.actionType,
+			positionInRow = state.positionInRow,
+			rowNumber = state.rowNumber,
+			feedRowNumber = state.feedRowNumber,
+			heroUnitId = state.heroUnitId,
+			mobileAdvertisingId = 0,
+			loadSource = 0,
+			launchData = 0,
+			sortSubId = 0,
+			tileType = 0
 		}
+		local mobileAdvertisingId
 
-		if analyticsData then
-			t4 = Cryo.Dictionary.join(analyticsData, t4)
+		if FFlagLuaAppGamePlayIntentEventMobileAdsId then
+			mobileAdvertisingId = state.mobileAdvertisingId
 		end
 
-		TelemetryService:LogEvent(t1, {
-			eventContext = s1,
-			standardizedFields = {
-				"addSessionInfo",
-				"addSessionId",
-				"addOSInfo"
-			},
-			customFields = t4,
-			legacyOverrideTargetForEventIngest = if not FFlagLuaAppGameItemTelemetryServiceTarget then nil else getPlatformTarget()
+		joined.mobileAdvertisingId = mobileAdvertisingId
+
+		joined.loadSource = state.loadSource
+		local launchData
+
+		if state.launchData then
+			launchData = state.launchData
+		end
+
+		joined.launchData = launchData
+		joined.sortSubId = state.sortSubId
+		joined.tileType = state.tileType
+
+		if analyticsData then
+			joined = Cryo.Dictionary.join(analyticsData, joined)
+		end
+
+		TelemetryService:LogEvent(v, {
+			eventContext = eventContext,
+			standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" },
+			customFields = joined,
+			legacyOverrideTargetForEventIngest = getPlatformTarget()
 		})
 	else
-		local t5 = {
-			placeId = p3.placeId,
-			rootPlaceId = p3.rootPlaceId,
-			universeId = p3.universeId,
-			referralSource = p3.referralSource,
-			sortIndex = p3.sortIndex,
-			sortEntryIndex = p3.sortEntryIndex,
-			gameSetTypeId = p3.gameSetTypeId,
-			gameSetTargetId = p3.gameSetTargetId,
-			linkId = p3.linkId,
-			linkType = p3.linkType,
-			linkStatus = p3.linkStatus,
-			conversationId = p3.conversationId,
-			joinAttemptId = p3.joinAttemptId,
-			friendId = p3.friendId,
-			pageName = p3.pageName,
-			rowOnPage = p3.rowOnPage,
-			appliedFilters = p3.appliedFilters,
-			topicDataPosition = p3.topicDataPosition,
-			nativeAdData = p3.nativeAdData,
-			interactionUuid = p3.interactionUuid,
-			contentType = p3.contentType,
-			actionType = p3.actionType,
-			positionInRow = p3.positionInRow,
-			rowNumber = p3.rowNumber,
-			feedRowNumber = p3.feedRowNumber,
-			heroUnitId = p3.heroUnitId,
-			mobileAdvertisingId = if not FFlagLuaAppGamePlayIntentEventMobileAdsId then nil else p3.mobileAdvertisingId,
-			loadSource = p3.loadSource,
-			launchData = if not p3.launchData then nil else p3.launchData,
-			sortSubId = if not FFlagLuaAppAddSubIdToHomeEvents then nil else p3.sortSubId,
-			tileType = p3.tileType
+		local joined = {
+			placeId = state.placeId,
+			rootPlaceId = state.rootPlaceId,
+			universeId = state.universeId,
+			referralSource = state.referralSource,
+			sortIndex = state.sortIndex,
+			sortEntryIndex = state.sortEntryIndex,
+			gameSetTypeId = state.gameSetTypeId,
+			gameSetTargetId = state.gameSetTargetId,
+			linkId = state.linkId,
+			linkType = state.linkType,
+			linkStatus = state.linkStatus,
+			conversationId = state.conversationId,
+			joinAttemptId = state.joinAttemptId,
+			friendId = state.friendId,
+			pageName = state.pageName,
+			rowOnPage = state.rowOnPage,
+			appliedFilters = state.appliedFilters,
+			topicDataPosition = state.topicDataPosition,
+			nativeAdData = state.nativeAdData,
+			interactionUuid = state.interactionUuid,
+			contentType = state.contentType,
+			actionType = state.actionType,
+			positionInRow = state.positionInRow,
+			rowNumber = state.rowNumber,
+			feedRowNumber = state.feedRowNumber,
+			heroUnitId = state.heroUnitId,
+			mobileAdvertisingId = 0,
+			loadSource = 0,
+			launchData = 0,
+			sortSubId = 0,
+			tileType = 0
 		}
+		local mobileAdvertisingId
 
-		if analyticsData then
-			t5 = Cryo.Dictionary.join(analyticsData, t5)
+		if FFlagLuaAppGamePlayIntentEventMobileAdsId then
+			mobileAdvertisingId = state.mobileAdvertisingId
 		end
 
-		p2:sendEventDeferred(s1, "gamePlayIntent", t5)
+		joined.mobileAdvertisingId = mobileAdvertisingId
+
+		joined.loadSource = state.loadSource
+		local launchData
+
+		if state.launchData then
+			launchData = state.launchData
+		end
+
+		joined.launchData = launchData
+		joined.sortSubId = state.sortSubId
+		joined.tileType = state.tileType
+
+		if analyticsData then
+			joined = Cryo.Dictionary.join(analyticsData, joined)
+		end
+
+		object:sendEventDeferred(eventContext, "gamePlayIntent", joined)
 	end
 
 	if FFlagLuaAppGameEventsTelemetryServiceShadowTraffic then
-		TelemetryService:LogEvent(t2, {
-			eventContext = s1,
-			standardizedFields = {
-				"addSessionInfo",
-				"addSessionId",
-				"addOSInfo"
-			},
-			customFields = {
-				placeId = p3.placeId,
-				rootPlaceId = p3.rootPlaceId,
-				universeId = p3.universeId,
-				referralSource = p3.referralSource,
-				sortIndex = p3.sortIndex,
-				sortEntryIndex = p3.sortEntryIndex,
-				gameSetTypeId = p3.gameSetTypeId,
-				gameSetTargetId = p3.gameSetTargetId,
-				linkId = p3.linkId,
-				linkType = p3.linkType,
-				linkStatus = p3.linkStatus,
-				conversationId = p3.conversationId,
-				joinAttemptId = p3.joinAttemptId,
-				friendId = p3.friendId,
-				pageName = p3.pageName,
-				rowOnPage = p3.rowOnPage,
-				appliedFilters = p3.appliedFilters,
-				topicDataPosition = p3.topicDataPosition,
-				nativeAdData = p3.nativeAdData,
-				interactionUuid = p3.interactionUuid,
-				contentType = p3.contentType,
-				actionType = p3.actionType,
-				positionInRow = p3.positionInRow,
-				rowNumber = p3.rowNumber,
-				feedRowNumber = p3.feedRowNumber,
-				heroUnitId = p3.heroUnitId,
-				mobileAdvertisingId = if not FFlagLuaAppGamePlayIntentEventMobileAdsId then nil else p3.mobileAdvertisingId,
-				loadSource = p3.loadSource,
-				launchData = if not p3.launchData then nil else p3.launchData,
-				sortSubId = if not FFlagLuaAppAddSubIdToHomeEvents then nil else p3.sortSubId,
-				tileType = p3.tileType
-			},
-			legacyOverrideTargetForEventIngest = if not FFlagLuaAppGameItemTelemetryServiceTarget then nil else getPlatformTarget()
+		local customFields = {
+			placeId = state.placeId,
+			rootPlaceId = state.rootPlaceId,
+			universeId = state.universeId,
+			referralSource = state.referralSource,
+			sortIndex = state.sortIndex,
+			sortEntryIndex = state.sortEntryIndex,
+			gameSetTypeId = state.gameSetTypeId,
+			gameSetTargetId = state.gameSetTargetId,
+			linkId = state.linkId,
+			linkType = state.linkType,
+			linkStatus = state.linkStatus,
+			conversationId = state.conversationId,
+			joinAttemptId = state.joinAttemptId,
+			friendId = state.friendId,
+			pageName = state.pageName,
+			rowOnPage = state.rowOnPage,
+			appliedFilters = state.appliedFilters,
+			topicDataPosition = state.topicDataPosition,
+			nativeAdData = state.nativeAdData,
+			interactionUuid = state.interactionUuid,
+			contentType = state.contentType,
+			actionType = state.actionType,
+			positionInRow = state.positionInRow,
+			rowNumber = state.rowNumber,
+			feedRowNumber = state.feedRowNumber,
+			heroUnitId = state.heroUnitId,
+			mobileAdvertisingId = 0,
+			loadSource = 0,
+			launchData = 0,
+			sortSubId = 0,
+			tileType = 0
+		}
+		local mobileAdvertisingId
+
+		if FFlagLuaAppGamePlayIntentEventMobileAdsId then
+			mobileAdvertisingId = state.mobileAdvertisingId
+		end
+
+		customFields.mobileAdvertisingId = mobileAdvertisingId
+
+		customFields.loadSource = state.loadSource
+		local launchData
+
+		if state.launchData then
+			launchData = state.launchData
+		end
+
+		customFields.launchData = launchData
+		customFields.sortSubId = state.sortSubId
+		customFields.tileType = state.tileType
+		TelemetryService:LogEvent(v2, {
+			eventContext = eventContext,
+			standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" },
+			customFields = customFields,
+			legacyOverrideTargetForEventIngest = getPlatformTarget()
 		})
 	end
 end

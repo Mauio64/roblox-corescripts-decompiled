@@ -1,46 +1,55 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
+local parent = CurrencyTransfers.Parent
+
+local React = require(parent.React)
+
 local TransferFAEBlockSheet = require(CurrencyTransfers.Components.Generic.TransferFAEBlockSheet)
 local VPCBlockContainer = require(CurrencyTransfers.Components.Generic.VPCBlockContainer)
+
 local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
 
 require(CurrencyTransfers.Enums.TransferDirection)
 
 local AmpWizardTransferConstants = require(CurrencyTransfers.Constants.AmpWizardTransferConstants)
 
-local function ReceiveBlockSheet(_: {[any]: any}) -- line: 22
-	-- upvalues: useTransferStore (copy), AmpWizardTransferConstants (copy), React (copy), TransferFAEBlockSheet (copy), VPCBlockContainer (copy)
-	local v10 = useTransferStore()
-	local v11 = v10.getDirection(false)
-	local v12 = v10.getAmpRecourseActions(false)
-	local v13 = v10.getAmpFeatureCheck(false)
-	local v14 = false
-	local v15 = false
+local function ReceiveBlockSheet(_)
+	local v = useTransferStore()
+	local direction = v.getDirection(false)
+	local ampRecourseActions = v.getAmpRecourseActions(false)
+	local ampFeatureCheck = v.getAmpFeatureCheck(false)
 
-	if v12 then
-		for _, v in ipairs(v12) do
-			if v == AmpWizardTransferConstants.RECOURSE_ID_VERIFICATION or v == AmpWizardTransferConstants.RECOURSE_AGE_ESTIMATION then
-				v14 = true
-			elseif v == AmpWizardTransferConstants.RECOURSE_PARENT_LINK or v == AmpWizardTransferConstants.RECOURSE_PARENT_CONSENT then
-				v15 = true
+	local v2 = false
+	local v3 = false
+
+	if ampRecourseActions then
+		for _, ampRecourseAction in ipairs(ampRecourseActions) do
+			if
+				ampRecourseAction == AmpWizardTransferConstants.RECOURSE_ID_VERIFICATION
+				or ampRecourseAction == AmpWizardTransferConstants.RECOURSE_AGE_ESTIMATION
+			then
+				v2 = true
+			elseif
+				ampRecourseAction == AmpWizardTransferConstants.RECOURSE_PARENT_LINK
+				or ampRecourseAction == AmpWizardTransferConstants.RECOURSE_PARENT_CONSENT
+			then
+				v3 = true
 			end
 		end
 	end
 
-	if v14 and v11 then
+	if v2 and direction then
 		return React.createElement(TransferFAEBlockSheet, {
-			direction = v11,
-			ampRecourseActions = v12,
-			ampFeatureCheck = v13
+			direction = direction,
+			ampRecourseActions = ampRecourseActions,
+			ampFeatureCheck = ampFeatureCheck
 		})
 	end
 
-	if v15 and v11 then
+	if v3 and direction then
 		return React.createElement(VPCBlockContainer, {
-			direction = v11,
-			ampRecourseActions = v12,
-			ampFeatureCheck = v13
+			direction = direction,
+			ampRecourseActions = ampRecourseActions,
+			ampFeatureCheck = ampFeatureCheck
 		})
 	end
 

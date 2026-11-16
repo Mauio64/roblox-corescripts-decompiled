@@ -1,26 +1,27 @@
-return function(p1) -- line: 3
-	if not p1 then
+return function(state)
+	if not state then
 		return {}
 	end
 
-	if not p1._childrenNavigation then
-		p1._childrenNavigation = {}
+	if not state._childrenNavigation then
+		state._childrenNavigation = {}
 	end
 
-	local _childrenNavigation = p1._childrenNavigation
-	local t1 = {}
+	local childrenNavigation = state._childrenNavigation
 
-	for _, v5 in p1.state.routes or {} do
-		t1[v5.key] = true
+	local set = {}
+
+	for _, v in state.state.routes or {} do
+		set[v.key] = true
 	end
 
-	if not p1.state.isTransitioning then
-		for v6, _ in _childrenNavigation do
-			if not t1[v6] then
-				_childrenNavigation[v6] = nil
+	if not state.state.isTransitioning then
+		for k, _ in childrenNavigation do
+			if not set[k] then
+				childrenNavigation[k] = nil
 			end
 		end
 	end
 
-	return p1._childrenNavigation
+	return state._childrenNavigation
 end

@@ -1,55 +1,52 @@
 local CaptureService = game:GetService("CaptureService")
-local ParentParent = script.Parent.Parent
-local CaptureType = require(ParentParent.Enums.CaptureType)
 
-require(ParentParent.Types)
+local parent = script.Parent.Parent
 
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+local CaptureType = require(parent.Enums.CaptureType)
+require(parent.Types)
 
-function formatBytes(n1: number) -- line: 12
-	local t1 = {
-		"Bytes",
-		"KB",
-		"MB",
-		"GB",
-		"TB"
-	}
-	local v9 = math.floor(math.log(n1) / 6.931471805599453)
-	local v10 = n1 / math.pow(1024, v9)
-	local s1 = "%.2f%s"
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
 
-	if v9 <= 2 then
-		v10 = math.round(v10)
-		s1 = "%d%s"
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
+function formatBytes(p: number)
+	local v = { "Bytes", "KB", "MB", "GB", "TB" }
+
+	local v2 = math.floor(math.log(p) / 6.931471805599453)
+	local v3 = p / math.pow(1024, v2)
+	local v4
+
+	if v2 <= 2 then
+		v3 = math.round(v3)
+		v4 = "%d%s"
+	else
+		v4 = "%.2f%s"
 	end
 
-	if not t1[v9 + 1] then
-		return ""
+	if v[v2 + 1] then
+		return string.format(v4, v3, v[v2 + 1])
 	end
 
-	return string.format(s1, v10, t1[v9 + 1])
+	return ""
 end
 
-local function getCaptureStorageUsage(t2: {[any]: any}) -- line: 31
-	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), CaptureService (copy)
-	if #t2 == 0 then
+local function getCaptureStorageUsage(list)
+	if #list == 0 then
 		return
 	end
 
-	local t3 = {}
+	local filePaths = {}
 
 	if not FFlagEnableCapturesGalleryRetrievalCoreScript then
-		for _, v in ipairs(t2) do
-			if not FFlagUseRbxstorageInGallery or v.type ~= CaptureType.Video then
-				table.insert(t3, v.filePath)
+		for _, item in ipairs(list) do
+			if not FFlagUseRbxstorageInGallery or item.type ~= CaptureType.Video then
+				table.insert(filePaths, item.filePath)
 			end
 		end
 	end
 
-	local _, result = pcall(function() -- line: 47
-		-- upvalues: CaptureService (copy), t3 (copy)
-		return CaptureService:GetCaptureStorageSizeAsync(t3)
+	local _, result = pcall(function()
+		return CaptureService:GetCaptureStorageSizeAsync(filePaths)
 	end)
 
 	return formatBytes(result)

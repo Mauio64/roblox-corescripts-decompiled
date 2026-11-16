@@ -1,46 +1,34 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local UrlMatcher = require(script.Parent.UrlMatcher)
 local UrlValidation = require(script.Parent.UrlValidation)
-
 require(script.Parent.Types)
+local Cryo = require(parent.Cryo)
 
-local Cryo = require(ParentParent.Cryo)
-local t1 = {}
+local UrlProcessor = {}
+UrlProcessor.__index = UrlProcessor
 
-t1.__index = t1
-
-function t1.new(p1, p2) -- line: 32
-	-- upvalues: Cryo (copy), UrlMatcher (copy), t1 (copy)
-	local v8 = Cryo.Dictionary.union(p1 or {}, {
-		pathPatterns = Cryo.Dictionary.keys(p2)
+function UrlProcessor.new(options, urlMap)
+	local union = Cryo.Dictionary.union(options or {}, {
+		pathPatterns = Cryo.Dictionary.keys(urlMap)
 	})
-	local t2 = {
-		_urlMatcher = UrlMatcher.new(v8),
-		_urlMap = p2
-	}
+	local v = { _urlMatcher = UrlMatcher.new(union), _urlMap = urlMap }
 
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v, UrlProcessor)
+	return v
 end
-function t1.process(t3: {[any]: any}, s1: string) -- line: 48
-	-- upvalues: Cryo (copy), UrlValidation (copy)
-	local v12 = t3._urlMatcher:match(s1)
 
-	return Cryo.List.filterMap(v12, function(p3) -- line: 50
-		-- upvalues: UrlValidation (copy), t3 (copy)
-		local v14, v15 = UrlValidation.validateUrlMatch(p3, t3._urlMap)
+function UrlProcessor:process(p: string)
+	local match = self._urlMatcher:match(p)
+	return Cryo.List.filterMap(match, function(p2)
+		local v, v2 = UrlValidation.validateUrlMatch(p2, self._urlMap)
 
-		if v14 then
-			return {
-				startIndex = p3.startIndex,
-				endIndex = p3.endIndex,
-				result = v15
-			}
+		if v then
+			return { startIndex = p2.startIndex, endIndex = p2.endIndex, result = v2 }
 		end
 
 		return nil
 	end)
 end
 
-return t1
+return UrlProcessor

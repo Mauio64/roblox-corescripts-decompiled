@@ -1,34 +1,40 @@
 local CoreGui = game:GetService("CoreGui")
-local Parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
-local React = require(Parent.React)
-local useCursor = require(Parent.UIBlox).App.SelectionCursor.useCursor
-local useDesignTokens = require(Parent.Style).useDesignTokens
+local parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local useCursor = UIBlox.App.SelectionCursor.useCursor
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
 
-local function useGlobalDefaultSelectionCursor() -- line: 10
-	-- upvalues: useDesignTokens (copy), useCursor (copy), React (copy), CoreGui (copy)
-	local v7 = useDesignTokens(function(p1) -- line: 11
+local function useGlobalDefaultSelectionCursor()
+	local v = useDesignTokens(function(p)
 		return {
-			width = p1.Size.Size_50,
-			radius = UDim.new(0, p1.Radius.Medium),
-			offset = p1.Size.Size_50
+			width = p.Size.Size_50,
+			radius = UDim.new(0, p.Radius.Medium),
+			offset = p.Size.Size_50
 		}
 	end)
-	local v8 = useCursor(v7.radius, v7.offset, v7.width)
-	local v9 = if not v8 then nil else v8.current
 
-	React.useEffect(function() -- line: 22
-		-- upvalues: CoreGui (copy), v9 (copy)
-		if CoreGui.SelectionImageObject == nil and v9 ~= nil then
-			CoreGui.SelectionImageObject = v9
+	local v2 = useCursor(v.radius, v.offset, v.width)
+	local current
 
-			return function() -- line: 26
-				-- upvalues: CoreGui (copy)
-				CoreGui.SelectionImageObject = nil
-			end
+	if v2 then
+		current = v2.current
+	else
+		current = nil
+	end
+
+	React.useEffect(function()
+		if CoreGui.SelectionImageObject ~= nil or current == nil then
+			return nil
 		end
 
-		return nil
-	end, { v9 })
+		CoreGui.SelectionImageObject = current
+
+		return function()
+			CoreGui.SelectionImageObject = nil
+		end
+	end, { current })
 end
 
 return useGlobalDefaultSelectionCursor

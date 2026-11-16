@@ -1,180 +1,208 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
 
-require(ParentParent.GraphQL)
+require(parent.GraphQL)
 
-local getArgumentValues = require(script.Parent.getArgumentValues).getArgumentValues
+local getArgumentValues = require(script.Parent.getArgumentValues)
+local getArgumentValues2 = getArgumentValues.getArgumentValues
 
-local function getDirectivesInExtensions(p1, p2) -- line: 95
-	-- upvalues: Array (copy), Object (copy)
-	local v13 = if p2 == nil then { "directives" } else p2
+local function getDirectivesInExtensions(p, p2)
+	local v = p2 == nil and { "directives" } or p2
+	local reduce = Array.reduce
 
-	return (Array.reduce(v13, function(p3, p4) -- line: 104
-		-- upvalues: Object (copy)
+	local function fn(p3, p4)
 		if p3 == Object.None or p3 == nil then
 			return nil
 		end
 
 		return p3[p4]
-	end, if typeof(p1) ~= "table" or not p1.extensions then Object.None else p1.extensions))
+	end
+
+	local v2
+
+	if typeof(p) == "table" and p.extensions then
+		v2 = p.extensions
+	else
+		v2 = Object.None
+	end
+
+	return (reduce(v, fn, v2))
 end
 
-t1.getDirectivesInExtensions = getDirectivesInExtensions
+local GetDirectives = {}
+GetDirectives.getDirectivesInExtensions = getDirectivesInExtensions
 
-local function _getDirectiveInExtensions(p5, s1: string) -- line: 121
-	-- upvalues: Array (copy)
-	local v16 = Array.filter(p5, function(p6) -- line: 125
-		-- upvalues: s1 (copy)
-		return p6.name == s1
+local function _getDirectiveInExtensions(p, p2: string)
+	local filtered = Array.filter(p, function(p3): boolean
+		return p3.name == p2
 	end)
 
-	if #v16 == 0 then
+	if #filtered == 0 then
 		return nil
 	end
 
-	return (Array.map(v16, function(p7) -- line: 134
-		if p7.args ~= nil then
-			return p7.args
+	return (Array.map(filtered, function(p3)
+		if p3.args == nil then
+			return {}
 		end
 
-		return {}
+		return p3.args
 	end))
 end
-local function getDirectiveInExtensions(p8, s2: string, p9) -- line: 141
-	-- upvalues: Array (copy), Object (copy), Boolean (copy), _getDirectiveInExtensions (copy)
-	local v20 = if p9 == nil then { "directives" } else p9
-	local v21 = Array.reduce(v20, function(p10, p11) -- line: 151
-		-- upvalues: Object (copy)
-		if p10 == Object.None or p10 == nil then
+
+local function getDirectiveInExtensions(p, p2: string, p3)
+	local v = p3 == nil and { "directives" } or p3
+	local reduce = Array.reduce
+
+	local function fn(p4, p5)
+		if p4 == Object.None or p4 == nil then
 			return nil
 		end
 
-		return p10[p11]
-	end, if typeof(p8) ~= "table" or not p8.extensions then Object.None else p8.extensions)
+		return p4[p5]
+	end
 
-	if v21 == nil then
+	local v2
+
+	if typeof(p) == "table" and p.extensions then
+		v2 = p.extensions
+	else
+		v2 = Object.None
+	end
+
+	local reduced = reduce(v, fn, v2)
+
+	if reduced == nil then
 		return nil
 	end
 
-	if Boolean.toJSBoolean(Array.isArray(v21)) then
-		return (_getDirectiveInExtensions(v21, s2))
+	if Boolean.toJSBoolean(Array.isArray(reduced)) then
+		return _getDirectiveInExtensions(reduced, p2)
 	end
 
-	local t2 = {}
+	local v3 = {}
 
-	for _, v24 in Object.entries(v21) do
-		local v25, v26 = table.unpack(v24, 1, 2)
+	for _, list in Object.entries(reduced) do
+		local name, args = table.unpack(list, 1, 2)
 
-		if Boolean.toJSBoolean(Array.isArray(v26)) then
-			for _, v28 in v26 do
-				table.insert(t2, {
-					name = v25,
-					args = v28
-				})
+		if Boolean.toJSBoolean(Array.isArray(args)) then
+			for _, args2 in args do
+				table.insert(v3, { name = name, args = args2 })
 			end
 		else
-			table.insert(t2, {
-				name = v25,
-				args = v26
-			})
+			table.insert(v3, { name = name, args = args })
 		end
 	end
 
-	return (_getDirectiveInExtensions(t2, s2))
+	return _getDirectiveInExtensions(v3, p2)
 end
 
-t1.getDirectiveInExtensions = getDirectiveInExtensions
+GetDirectives.getDirectiveInExtensions = getDirectiveInExtensions
+function GetDirectives:getDirectives(p, p2)
+	local directivesInExtensions = getDirectivesInExtensions(p, p2 == nil and { "directives" } or p2)
 
-function t1.getDirectives(p12, p13, p14) -- line: 214
-	-- upvalues: getDirectivesInExtensions (copy), Boolean (copy), Array (copy), Object (copy), getArgumentValues (copy)
-	local v32 = if p14 == nil then { "directives" } else p14
-	local v33 = getDirectivesInExtensions(p13, v32)
-
-	if v33 ~= nil and #v33 > 0 then
-		return v33
+	if directivesInExtensions ~= nil and #directivesInExtensions > 0 then
+		return directivesInExtensions
 	end
 
-	local v34 = if not Boolean.toJSBoolean(if not Boolean.toJSBoolean(p12) then p12 else p12.getDirectives) then {} else p12:getDirectives()
-	local v35 = Array.reduce(v34, function(p15, p16) -- line: 237
-		p15[tostring(p16.name)] = p16
+	local toJSBoolean = Boolean.toJSBoolean
+	local v
 
-		return p15
+	if Boolean.toJSBoolean(self) then
+		v = self.getDirectives
+	else
+		v = self
+	end
+
+	local v2 = not toJSBoolean(v) and {} or self:getDirectives()
+	local reduced = Array.reduce(v2, function(p3, p4)
+		p3[tostring(p4.name)] = p4
+		return p3
 	end, {})
-	local t3 = {}
+	local joined = {}
 
-	if Boolean.toJSBoolean(p13.astNode) then
-		table.insert(t3, p13.astNode)
+	if Boolean.toJSBoolean(p.astNode) then
+		table.insert(joined, p.astNode)
 	end
 
-	if Array.indexOf(Object.keys(p13), "extensionASTNodes") ~= -1 and Boolean.toJSBoolean(p13.extensionASTNodes) then
-		t3 = Array.concat({}, t3, p13.extensionASTNodes)
+	if Array.indexOf(Object.keys(p), "extensionASTNodes") ~= -1 and Boolean.toJSBoolean(p.extensionASTNodes) then
+		joined = Array.concat({}, joined, p.extensionASTNodes)
 	end
 
-	local t4 = {}
+	local result = {}
 
-	for _, v39 in t3 do
-		if Boolean.toJSBoolean(v39.directives) then
-			for _, v41 in v39.directives do
-				local v42 = v35[tostring(v41.name.value)]
+	for _, v3 in joined do
+		if not Boolean.toJSBoolean(v3.directives) then
+			continue
+		end
 
-				if Boolean.toJSBoolean(v42) then
-					table.insert(t4, {
-						name = v41.name.value,
-						args = getArgumentValues(v42, v41)
-					})
-				end
+		for _, directive in v3.directives do
+			local v4 = reduced[tostring(directive.name.value)]
+
+			if Boolean.toJSBoolean(v4) then
+				table.insert(result, {
+					name = directive.name.value,
+					args = getArgumentValues2(v4, directive)
+				})
 			end
 		end
 	end
 
-	return t4
+	return result
 end
-function t1.getDirective(p17, p18, s3: string, p19) -- line: 278
-	-- upvalues: getDirectiveInExtensions (copy), Boolean (copy), Array (copy), Object (copy), getArgumentValues (copy)
-	local v47 = if p19 == nil then { "directives" } else p19
-	local v48 = getDirectiveInExtensions(p18, s3, v47)
+function GetDirectives:getDirective(p, p2: string, p3)
+	local directiveInExtensions = getDirectiveInExtensions(p, p2, p3 == nil and { "directives" } or p3)
 
-	if v48 ~= nil then
-		return v48
+	if directiveInExtensions ~= nil then
+		return directiveInExtensions
 	end
 
-	local v49 = if not Boolean.toJSBoolean(if not Boolean.toJSBoolean(p17) then p17 else p17.getDirective) then nil else p17:getDirective(s3)
+	local toJSBoolean = Boolean.toJSBoolean
+	local v
 
-	if v49 == nil then
+	if Boolean.toJSBoolean(self) then
+		v = self.getDirective
+	else
+		v = self
+	end
+
+	local v2
+
+	if toJSBoolean(v) then
+		v2 = self:getDirective(p2)
+	end
+
+	if v2 == nil then
 		return nil
 	end
 
-	local t5 = {}
+	local joined = {}
 
-	if Boolean.toJSBoolean(p18.astNode) then
-		table.insert(t5, p18.astNode)
+	if Boolean.toJSBoolean(p.astNode) then
+		table.insert(joined, p.astNode)
 	end
 
-	if Array.indexOf(Object.keys(p18), "extensionASTNodes") ~= -1 and Boolean.toJSBoolean(p18.extensionASTNodes) then
-		t5 = Array.concat({}, t5, p18.extensionASTNodes)
+	if Array.indexOf(Object.keys(p), "extensionASTNodes") ~= -1 and Boolean.toJSBoolean(p.extensionASTNodes) then
+		joined = Array.concat({}, joined, p.extensionASTNodes)
 	end
 
-	local t6 = {}
+	local result = {}
 
-	for _, v53 in t5 do
-		if Boolean.toJSBoolean(v53.directives) then
-			for _, v55 in v53.directives do
-				if s3 == v55.name.value then
-					table.insert(t6, getArgumentValues(v49, v55))
-				end
+	for _, v3 in joined do
+		if not Boolean.toJSBoolean(v3.directives) then
+			continue
+		end
+
+		for _, directive in v3.directives do
+			if directive.name.value == p2 then
+				table.insert(result, getArgumentValues2(v2, directive))
 			end
 		end
 	end
 
-	if not Boolean.toJSBoolean(#t6) then
-		return nil
-	end
-
-	return t6
+	return if Boolean.toJSBoolean(#result) then result else nil
 end
-
-return t1
+return GetDirectives

@@ -1,17 +1,19 @@
-local function join(...) -- line: 1
-	local t1 = {}
+local function join(...)
+	local result = {}
 
 	for i = 1, select("#", ...) do
-		local v4 = select(i, ...)
+		local v = select(i, ...)
 
-		if v4 ~= nil then
-			for k, v in pairs(v4) do
-				t1[k] = v
-			end
+		if v == nil then
+			continue
+		end
+
+		for k, v2 in pairs(v) do
+			result[k] = v2
 		end
 	end
 
-	return t1
+	return result
 end
 
 return join

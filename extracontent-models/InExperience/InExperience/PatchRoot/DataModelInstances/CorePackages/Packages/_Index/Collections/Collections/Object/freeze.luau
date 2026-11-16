@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.ES7Types)
+require(parent.ES7Types)
 
-return function(p1) -- line: 23
-	return (table.freeze(p1))
+return function(list)
+	return (table.freeze(list))
 end

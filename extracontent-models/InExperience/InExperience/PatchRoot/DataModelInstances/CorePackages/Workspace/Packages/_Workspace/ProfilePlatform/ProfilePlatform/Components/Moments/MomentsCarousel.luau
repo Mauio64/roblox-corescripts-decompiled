@@ -1,188 +1,210 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local CollectionViews = require(ProfilePlatformParent.CollectionViews)
-local Foundation = require(ProfilePlatformParent.Foundation)
-local Navigation = require(ProfilePlatformParent.Navigation)
+local parent = ProfilePlatform.Parent
 
-require(ProfilePlatformParent.DataHydration.MomentsStoreTypes)
+local React = require(parent.React)
+local CollectionViews = require(parent.CollectionViews)
+local Foundation = require(parent.Foundation)
+local Navigation = require(parent.Navigation)
+
+require(parent.DataHydration.MomentsStoreTypes)
 
 local MomentTile = require(script.Parent.MomentTile)
 local MomentsCarouselMediaProvider = require(script.Parent.MomentsCarouselMediaProvider)
 local getVisibleTileRange = require(script.Parent.getVisibleTileRange)
+local isPlayableVideoMoment = require(script.Parent.isPlayableVideoMoment)
 local useDynamicSizeMargin = require(ProfilePlatform.Hooks.useDynamicSizeMargin)
 local useProfileFormFactor = require(ProfilePlatform.Hooks.useProfileFormFactor)
 local Enums = require(ProfilePlatform.Common.Enums)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfileMomentSceneOutfitPoster = SharedFlags.FFlagProfileMomentSceneOutfitPoster
+
 local CollectionCarousel = CollectionViews.CollectionCarousel
 local useNavigationFocus = Navigation.useNavigationFocus
 local useTokens = Foundation.Hooks.useTokens
 
-local function MomentsCarousel(t1: {[any]: any}) -- line: 44
-	-- upvalues: useTokens (copy), useProfileFormFactor (copy), Enums (copy), useNavigationFocus (copy), useDynamicSizeMargin (copy), React (copy), getVisibleTileRange (copy), MomentTile (copy), CollectionCarousel (copy), MomentsCarouselMediaProvider (copy)
-	local moments = t1.moments
-	local v19 = useTokens()
-	local v20 = useProfileFormFactor().formFactor == Enums.ProfileFormFactor.Wide
-	local v21 = useNavigationFocus()
-	local v22, v23 = useDynamicSizeMargin()
-	local v24, v25 = React.useState(0)
-	local v26, v27 = React.useState(1)
-	local v28 = React.useRef(nil)
-	local v29 = React.useRef(nil)
-	local v30 = not v20 and 3 or 4
-	local v31 = not v20 and 0.2 or nil
-	local onTileImpression = t1.onTileImpression
-	local v33 = React.useRef({})
-	local v34 = React.useRef(nil)
-	local v35 = React.useMemo(function() -- line: 69
-		-- upvalues: moments (copy)
-		for _, v44 in moments do
-			if v44.metadata.captureType == Enum.CaptureType.Video then
+local function MomentsCarousel(props)
+	local moments = props.moments
+	local v = useTokens()
+	local v2 = useProfileFormFactor().formFactor == Enums.ProfileFormFactor.Wide
+	local v3 = useNavigationFocus()
+	local sideMargin, v4 = useDynamicSizeMargin()
+	local state, setState = React.useState(0)
+
+	local state2, setState2 = React.useState(1)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+	local numColumns = v2 and 4 or 3
+	local fractionalItemAmount = not v2 and 0.2 or nil
+	local onTileImpression = props.onTileImpression
+
+	local ref4 = React.useRef({})
+
+	local ref5 = React.useRef(nil)
+
+	local v5 = React.useMemo(function(): boolean
+		for _, moment in moments do
+			local v5
+
+			if FFlagProfileMomentSceneOutfitPoster then
+				v5 = isPlayableVideoMoment(moment)
+			else
+				v5 = moment.metadata.captureType == Enum.CaptureType.Video
+			end
+
+			if v5 then
 				return true
 			end
 		end
 
 		return false
 	end, { moments })
-	local v36 = moments[v26]
-	local v37 = v36 ~= nil and v36.metadata.captureType == Enum.CaptureType.Video
-	local v38 = React.useCallback(function(n1: number) -- line: 81
-		-- upvalues: v25 (copy)
-		v25(n1)
 
-		return n1 * 1.5 + 48
+	local moment = moments[state2]
+	local playbackActive
+
+	if FFlagProfileMomentSceneOutfitPoster then
+		if moment == nil then
+			playbackActive = false
+		else
+			playbackActive = isPlayableVideoMoment(moment)
+		end
+	elseif moment == nil then
+		playbackActive = false
+	else
+		playbackActive = moment.metadata.captureType == Enum.CaptureType.Video
+	end
+
+	local getItemHeight = React.useCallback(function(p: number)
+		setState(p)
+		return p * 1.5 + 48
 	end, {})
-	local v39 = React.useCallback(function() -- line: 90
-		-- upvalues: onTileImpression (copy), v24 (copy), v28 (copy), getVisibleTileRange (copy), v30 (copy), v31 (copy), moments (copy), v33 (copy)
-		if onTileImpression == nil or v24 <= 0 then
+
+	local v6 = React.useCallback(function()
+		if onTileImpression == nil or state <= 0 then
 			return
 		end
 
-		local current = v28.current
-		local v47 = current == nil and 0 or current.CanvasPosition.X
-		local v48, v49 = getVisibleTileRange(v47, v24, 12, v30, v31, #moments)
+		local current = ref.current
+		local visibleTileRange, v6 = getVisibleTileRange(
+			current == nil and 0 or current.CanvasPosition.X,
+			state,
+			12,
+			numColumns,
+			fractionalItemAmount,
+			#moments
+		)
 
-		for i = v48, v49 do
-			if not v33.current[i] then
-				v33.current[i] = true
-				onTileImpression(i)
+		for i = visibleTileRange, v6 do
+			if ref4.current[i] then
+				continue
 			end
+
+			ref4.current[i] = true
+			onTileImpression(i)
 		end
 	end, {
 		onTileImpression,
-		v24,
-		v30,
-		v31,
+		state,
+		numColumns,
+		fractionalItemAmount,
 		#moments
 	})
 
-	React.useEffect(function() -- line: 106
-		-- upvalues: v34 (copy), moments (copy), v33 (copy), v39 (copy)
-		if v34.current ~= moments then
-			v34.current = moments
-			v33.current = {}
+	React.useEffect(function()
+		if ref5.current ~= moments then
+			ref5.current = moments
+			ref4.current = {}
 		end
 
-		v39()
-	end, {
-		moments,
-		v39
-	})
+		v6()
+	end, { moments, v6 })
 
-	local v40 = React.useCallback(function() -- line: 117
-		-- upvalues: v28 (copy), v24 (copy), v29 (copy), moments (copy), v27 (copy), v39 (copy)
-		if v28.current == nil or v24 <= 0 then
+	local onChangeCanvasPosition = React.useCallback(function()
+		if ref.current == nil or state <= 0 then
 			return
 		end
 
-		if v29.current ~= nil then
-			task.cancel(v29.current)
+		if ref2.current ~= nil then
+			task.cancel(ref2.current)
 		end
 
-		v29.current = task.delay(0.2, function() -- line: 125
-			-- upvalues: v29 (copy), v28 (copy), v24 (copy), moments (copy), v27 (copy), v39 (copy)
-			v29.current = nil
-
-			local current = v28.current
+		ref2.current = task.delay(0.2, function()
+			ref2.current = nil
+			local current = ref.current
 
 			if current == nil then
 				return
 			end
 
-			local v55 = v24 + 12
-			local v56 = math.clamp(math.round(current.CanvasPosition.X / v55) + 1, 1, #moments)
+			local v7 = state + 12
+			setState2((math.clamp(math.round(current.CanvasPosition.X / v7) + 1, 1, #moments)))
 
-			v27(v56)
-			v39()
+			v6()
 		end)
-	end, {
-		v24,
-		#moments,
-		v39
-	})
+	end, { state, #moments, v6 })
 
-	React.useEffect(function() -- line: 140
-		-- upvalues: v29 (copy)
-		return function() -- line: 141
-			-- upvalues: v29 (copy)
-			if v29.current ~= nil then
-				task.cancel(v29.current)
-				v29.current = nil
+	React.useEffect(function()
+		return function()
+			if ref2.current ~= nil then
+				task.cancel(ref2.current)
+				ref2.current = nil
 			end
 		end
 	end, {})
 
-	local v41 = React.useCallback(function(p1, n2: number, uDim2: UDim2) -- line: 149
-		-- upvalues: React (copy), MomentTile (copy), v21 (copy), v26 (copy), t1 (copy)
+	local renderItem = React.useCallback(function(moment2, layoutOrder: number, itemSize: UDim2)
 		return React.createElement(MomentTile, {
-			moment = p1,
-			layoutOrder = n2,
-			itemSize = uDim2,
-			isActive = v21 and n2 == v26,
-			onActivated = function() -- line: 155
-				-- upvalues: t1 (copy), n2 (copy)
-				t1.onSelectMoment(n2)
+			moment = moment2,
+			layoutOrder = layoutOrder,
+			itemSize = itemSize,
+			isActive = v3 and layoutOrder == state2,
+			onActivated = function()
+				local current = ref3.current
+
+				if current ~= nil then
+					current.release()
+				end
+
+				props.onSelectMoment(layoutOrder)
 			end
-		}), p1.momentId
-	end, {
-		v21,
-		v26,
-		t1.onSelectMoment
-	})
-	local v42 = React.createElement("Frame", {
+		}), moment2.momentId
+	end, { v3, state2, props.onSelectMoment })
+
+	local element = React.createElement("Frame", {
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
-		LayoutOrder = t1.layoutOrder,
-		Size = UDim2.new(1, 0, 0, v24 * 1.5 + 48),
-		[React.Change.AbsoluteSize] = v23
+		LayoutOrder = props.layoutOrder,
+		Size = UDim2.new(1, 0, 0, state * 1.5 + 48),
+		[React.Change.AbsoluteSize] = v4
 	}, {
 		CollectionCarousel = React.createElement(CollectionCarousel, {
 			LayoutOrder = 1,
 			title = "Moments",
-			columnGap = 12,
 			items = moments,
-			renderItem = v41,
-			getItemHeight = v38,
-			scrollingFrameRef = v28,
-			onChangeCanvasPosition = v40,
-			numColumns = v30,
-			fractionalItemAmount = v31,
-			sideMargin = v22,
-			onActivateHeader = t1.onActivateHeader
+			renderItem = renderItem,
+			getItemHeight = getItemHeight,
+			scrollingFrameRef = ref,
+			onChangeCanvasPosition = onChangeCanvasPosition,
+			numColumns = numColumns,
+			fractionalItemAmount = fractionalItemAmount,
+			columnGap = 12,
+			sideMargin = sideMargin,
+			onActivateHeader = props.onActivateHeader
 		})
 	})
 
-	if v21 and v35 then
+	if v3 and v5 then
 		return React.createElement(MomentsCarouselMediaProvider, {
 			moments = moments,
-			activeIndex = v26,
-			playbackActive = v37,
-			mediaCornerRadius = v19.Radius.Large
-		}, {
-			Carousel = v42
-		})
+			activeIndex = state2,
+			playbackActive = playbackActive,
+			mediaCornerRadius = v.Radius.Large,
+			handoffRef = ref3
+		}, { Carousel = element })
 	end
 
-	return v42
+	return element
 end
 
 return MomentsCarousel

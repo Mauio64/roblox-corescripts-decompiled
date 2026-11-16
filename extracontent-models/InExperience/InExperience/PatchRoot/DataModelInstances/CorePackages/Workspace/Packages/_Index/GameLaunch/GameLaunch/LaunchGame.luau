@@ -1,28 +1,45 @@
-local Parent = script:FindFirstAncestor("GameLaunch").Parent
-local default = require(Parent.LoggingProtocol).default
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("GameLaunch").Parent
 
-require(Parent.ExperienceService)
+local LoggingProtocol = require(parent.LoggingProtocol)
+local default = LoggingProtocol.default
+local Cryo = require(parent.Cryo)
+require(parent.ExperienceService)
+local ExperienceService = require(parent.ExperienceService)
+local experienceService = ExperienceService.ExperienceService
 
-local ExperienceService = require(Parent.ExperienceService).ExperienceService
-local GetFFlagMoveLuaExpLaunchBegin = require(Parent.ExperienceService).Flags.GetFFlagMoveLuaExpLaunchBegin
+local ExperienceService2 = require(parent.ExperienceService)
+local GetFFlagMoveLuaExpLaunchBegin = ExperienceService2.Flags.GetFFlagMoveLuaExpLaunchBegin
 
-local function LaunchGame(s1: string?, s2: string?, t1: {[any]: any}?, _, s3: string?, p2: ((...any) -> ...any)?) -- line: 10
-	-- upvalues: GetFFlagMoveLuaExpLaunchBegin (copy), default (copy), Cryo (copy), ExperienceService (copy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDeferInExperienceRbxmDownload = SharedFlags.FFlagDeferInExperienceRbxmDownload
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnableDeferredAssetManagerService = SharedFlags2.FFlagEnableDeferredAssetManagerService
+local DeferredAssetManagerService
+
+if FFlagDeferInExperienceRbxmDownload and FFlagEnableDeferredAssetManagerService then
+	DeferredAssetManagerService = game:GetService("DeferredAssetManagerService")
+else
+	DeferredAssetManagerService = nil
+end
+
+local function LaunchGame(p: string?, referralPage: string?, p2, _, p3: string?, callback)
 	if not GetFFlagMoveLuaExpLaunchBegin() then
 		default:logEvent("experience_launch_begin")
 	end
 
-	local t2 = {
-		placeId = tonumber(s1),
-		referralPage = s2
-	}
+	local joined = { placeId = tonumber(p), referralPage = referralPage }
 
-	if t1 then
-		t2 = Cryo.Dictionary.join(t2, t1)
+	if p2 then
+		joined = Cryo.Dictionary.join(joined, p2)
 	end
 
-	ExperienceService:LaunchExperience(t2, s3, p2)
+	if FFlagDeferInExperienceRbxmDownload and FFlagEnableDeferredAssetManagerService then
+		local v = DeferredAssetManagerService
+		v.JoiningPlaceId = joined.placeId or 0
+		v.JoiningUniverseId = tonumber(joined.universeId) or 0
+	end
+
+	experienceService:LaunchExperience(joined, p3, callback)
 end
 
 return LaunchGame

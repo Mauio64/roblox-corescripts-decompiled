@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("UserList").Parent
+local parent = script:FindFirstAncestor("UserList").Parent
 
-require(Parent.React)
-require(Parent.Foundation)
-require(Parent.SocialCommon)
+require(parent.React)
+require(parent.Foundation)
+require(parent.SocialCommon)
+require(parent.DataHydration)
 
 return nil

@@ -1,159 +1,150 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local t = require(CorePackages.Packages.t)
-local withStyle = require(CorePackages.Packages.UIBlox).Style.withStyle
-local CameraUtility = require(CorePackages.Packages.Thumbnailing).CameraUtility
-local MannequinUtility = require(CorePackages.Packages.Thumbnailing).MannequinUtility
+
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local withStyle = UIBlox.Style.withStyle
+local Thumbnailing = require(CorePackages.Packages.Thumbnailing)
+local CameraUtility = Thumbnailing.CameraUtility
+local Thumbnailing2 = require(CorePackages.Packages.Thumbnailing)
+local MannequinUtility = Thumbnailing2.MannequinUtility
 local Constants = require(script.Parent.Parent.Parent.Parent.Constants)
 local MakeupPreviewUtils = require(script.Parent.Parent.Parent.Parent.MakeupPreviewUtils)
-local GetFFlagSingleUploadMakeupSupport = require(script.Parent.Parent.Parent.Parent.Flags.GetFFlagSingleUploadMakeupSupport)
-local v10 = Roact.PureComponent:extend("AvatarPartViewport")
 
-v10.validateProps = t.strictInterface({
+local GetFFlagSingleUploadMakeupSupport = require(script.Parent.Parent.Parent.Parent.Flags.GetFFlagSingleUploadMakeupSupport)
+
+local extended = Roact.PureComponent:extend("AvatarPartViewport")
+
+extended.validateProps = t.strictInterface({
 	LayoutOrder = t.optional(t.number),
 	asset = t.union(t.table, t.instanceOf("MeshPart"), t.instanceOf("Accessory"), t.instanceIsA("Decal")),
 	assetType = t.optional(t.EnumItem),
 	viewportSize = t.optional(t.Vector2)
 })
 
-function v10.init(p1) -- line: 38
-	-- upvalues: Roact (copy)
-	p1.camera = nil
-	p1.modelRef = Roact.createRef()
-
-	local v12, v13 = Roact.createBinding(nil)
-
-	p1.camera = v12
-	p1.updateCamera = v13
+function extended:init()
+	self.camera = nil
+	self.modelRef = Roact.createRef()
+	local binding, updateCamera = Roact.createBinding(nil)
+	self.camera = binding
+	self.updateCamera = updateCamera
 end
-function v10.createViewportCamera(p2) -- line: 44
-	local Camera = Instance.new("Camera")
 
-	Camera.Parent = p2.modelRef:getValue()
-	Camera.CameraType = Enum.CameraType.Scriptable
-	Camera.HeadLocked = true
-	Camera.VRTiltAndRollEnabled = true
+function extended:createViewportCamera()
+	local camera = Instance.new("Camera")
+	camera.Parent = self.modelRef:getValue()
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.HeadLocked = true
+	camera.VRTiltAndRollEnabled = true
 
-	return Camera
+	return camera
 end
-function v10.addBodyPartMannequinToViewport(p3) -- line: 55
-	-- upvalues: MannequinUtility (copy), CameraUtility (copy)
-	local v17, v18, v19 = MannequinUtility.CreateBodyPartMannequin(p3.props.asset, false)
-	local v20, v21 = MannequinUtility.SetupBodyPartMannequin(v17, v18, v19, p3.props.asset)
 
-	v19.Parent = p3.modelRef:getValue()
+function extended:addBodyPartMannequinToViewport()
+	local bodyPartMannequin, v, v2 = MannequinUtility.CreateBodyPartMannequin(self.props.asset, false)
 
-	local v22 = p3:createViewportCamera()
-
-	CameraUtility.SetupBodyPartCamera(v19, v20, v21, v22)
-	p3.updateCamera(v22)
+	local v3, v4 = MannequinUtility.SetupBodyPartMannequin(bodyPartMannequin, v, v2, self.props.asset)
+	v2.Parent = self.modelRef:getValue()
+	local viewportCamera = self:createViewportCamera()
+	CameraUtility.SetupBodyPartCamera(v2, v3, v4, viewportCamera)
+	self.updateCamera(viewportCamera)
 end
-function v10.addHeadModelToViewport(p4) -- line: 67
-	-- upvalues: MannequinUtility (copy), CameraUtility (copy)
-	local v24 = MannequinUtility.CreateHeadModel(p4.props.asset)
 
-	v24.Parent = p4.modelRef:getValue()
-
-	local v25 = p4:createViewportCamera()
-
-	CameraUtility.SetupHeadCamera(v24, v25)
-	p4.updateCamera(v25)
+function extended:addHeadModelToViewport()
+	local headModel = MannequinUtility.CreateHeadModel(self.props.asset)
+	headModel.Parent = self.modelRef:getValue()
+	local viewportCamera = self:createViewportCamera()
+	CameraUtility.SetupHeadCamera(headModel, viewportCamera)
+	self.updateCamera(viewportCamera)
 end
-function v10.addAccessoryToViewport(p5) -- line: 76
-	-- upvalues: CameraUtility (copy)
-	local asset = p5.props.asset
-	local Model = Instance.new("Model")
 
-	asset.Parent = Model
-	Model.Parent = p5.modelRef:getValue()
-
-	local v29 = p5:createViewportCamera()
-
-	CameraUtility.SetupAccessoryCamera(Model, v29)
-	p5.updateCamera(v29)
+function extended:addAccessoryToViewport()
+	local asset = self.props.asset
+	local model = Instance.new("Model")
+	asset.Parent = model
+	model.Parent = self.modelRef:getValue()
+	local viewportCamera = self:createViewportCamera()
+	CameraUtility.SetupAccessoryCamera(model, viewportCamera)
+	self.updateCamera(viewportCamera)
 end
-function v10.addMakeupDecalToViewport(p6) -- line: 86
-	-- upvalues: MakeupPreviewUtils (copy), CameraUtility (copy)
-	local v31 = MakeupPreviewUtils.createMakeupThumbnailPreview(p6.props.asset, p6.props.assetType)
 
-	if not v31 then
+function extended:addMakeupDecalToViewport()
+	local makeupThumbnailPreview = MakeupPreviewUtils.createMakeupThumbnailPreview(
+		self.props.asset,
+		self.props.assetType
+	)
+
+	if not makeupThumbnailPreview then
 		return
 	end
 
-	v31.Parent = p6.modelRef:getValue()
+	makeupThumbnailPreview.Parent = self.modelRef:getValue()
+	local viewportCamera = self:createViewportCamera()
 
-	local v32 = p6:createViewportCamera()
-
-	CameraUtility.SetupHeadCamera(v31, v32)
-	p6.updateCamera(v32)
-end
-function v10.didMount(p7) -- line: 98
-	-- upvalues: GetFFlagSingleUploadMakeupSupport (copy), MakeupPreviewUtils (copy)
-	local asset = p7.props.asset
-
-	if typeof(asset) == "Instance" then
-		if asset:IsA("MeshPart") then
-			p7:addHeadModelToViewport()
-
-			return
-		end
-
-		if GetFFlagSingleUploadMakeupSupport() and (asset:IsA("Decal") or p7.props.assetType and MakeupPreviewUtils.isMakeupAssetType(p7.props.assetType)) then
-			p7:addMakeupDecalToViewport()
-
-			return
-		end
-
-		p7:addAccessoryToViewport()
-
-		return
+	if MakeupPreviewUtils.setupMakeupThumbnailCamera(makeupThumbnailPreview, viewportCamera, self.props.assetType) then
+		self.updateCamera(viewportCamera)
 	end
-
-	p7:addBodyPartMannequinToViewport()
 end
-function v10.render(p8) -- line: 119
-	-- upvalues: withStyle (copy), Constants (copy), Roact (copy)
-	return withStyle(function(p9) -- line: 120
-		-- upvalues: p8 (copy), Constants (copy), Roact (copy)
-		local Theme = p9.Theme
-		local v38 = if not p8.props.viewportSize then Constants.ItemCardWidthLandscape else p8.props.viewportSize
+
+function extended:didMount()
+	local asset = self.props.asset
+
+	if typeof(asset) ~= "Instance" then
+		self:addBodyPartMannequinToViewport()
+	elseif asset:IsA("MeshPart") then
+		self:addHeadModelToViewport()
+	elseif
+		GetFFlagSingleUploadMakeupSupport()
+		and (asset:IsA("Decal") or self.props.assetType and MakeupPreviewUtils.isMakeupAssetType(self.props.assetType))
+	then
+		self:addMakeupDecalToViewport()
+	else
+		self:addAccessoryToViewport()
+	end
+end
+
+function extended.render(data)
+	return withStyle(function(p)
+		local theme = p.Theme
+		local v
+
+		if data.props.viewportSize then
+			v = data.props.viewportSize
+		else
+			v = Constants.ItemCardWidthLandscape
+		end
 
 		return Roact.createElement("Frame", {
+			LayoutOrder = data.props.LayoutOrder,
+			BackgroundColor3 = theme.PlaceHolder.Color,
+			BackgroundTransparency = theme.PlaceHolder.Transparency,
 			BorderSizePixel = 0,
-			ZIndex = 0,
-			LayoutOrder = p8.props.LayoutOrder,
-			BackgroundColor3 = Theme.PlaceHolder.Color,
-			BackgroundTransparency = Theme.PlaceHolder.Transparency,
-			Size = UDim2.fromOffset(v38, v38)
+			Size = UDim2.fromOffset(v, v),
+			ZIndex = 0
 		}, {
-			UICorner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 10)
-			}),
+			UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 10) }),
 			AspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1,
 				AspectType = Enum.AspectType.FitWithinMaxSize,
 				DominantAxis = Enum.DominantAxis.Width
 			}),
 			ViewportFrame = Roact.createElement("ViewportFrame", {
-				ImageTransparency = 0,
-				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1),
 				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
+				ImageTransparency = 0,
+				BackgroundTransparency = 1,
 				LightColor = Constants.ViewportLightColor,
 				Ambient = Constants.ViewportLightAmbient,
 				LightDirection = Constants.ViewportLightDirection,
-				CurrentCamera = p8.camera
+				CurrentCamera = data.camera
 			}, {
-				UICorner = Roact.createElement("UICorner", {
-					CornerRadius = UDim.new(0, 10)
-				}),
-				WorldModel = Roact.createElement("WorldModel", {
-					[Roact.Ref] = p8.modelRef
-				})
+				UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 10) }),
+				WorldModel = Roact.createElement("WorldModel", { [Roact.Ref] = data.modelRef })
 			})
 		})
 	end)
 end
 
-return v10
+return extended

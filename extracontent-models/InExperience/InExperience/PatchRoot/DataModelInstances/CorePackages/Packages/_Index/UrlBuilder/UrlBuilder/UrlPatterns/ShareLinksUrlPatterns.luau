@@ -1,22 +1,17 @@
-return function(p1) -- line: 7
+return function(p)
 	return {
-		appsflyer = function(s1: string, s2: string) -- line: 10
-			-- upvalues: p1 (copy)
-			local t1 = {
-				linkId = s1,
-				linkType = s2
-			}
-			local v5 = p1.fromString("mobilenav:share_links?code={linkId}&type={linkType}")(t1)
-			local v6 = p1.fromString("www:share-links?code={linkId}&type={linkType}")(t1)
+		appsflyer = function(linkId: string, linkType: string)
+			local v = { linkId = linkId, linkType = linkType }
 
-			return p1.fromString("appsflyer:Ebh5?pid=share&is_retargeting=true&af_dp={mobileUrl}&af_web_dp={webUrl}")({
-				mobileUrl = v5,
-				webUrl = v6
+			local mobileUrl = p.fromString("mobilenav:share_links?code={linkId}&type={linkType}")(v)
+			local webUrl = p.fromString("www:share-links?code={linkId}&type={linkType}")(v)
+			return p.fromString("appsflyer:Ebh5?pid=share&is_retargeting=true&af_dp={mobileUrl}&af_web_dp={webUrl}")({
+				mobileUrl = mobileUrl,
+				webUrl = webUrl
 			})
 		end,
-		shortUrl = function(t2: {[any]: any}) -- line: 25
-			-- upvalues: p1 (copy)
-			return p1.fromString("www:share?code={linkId}&type={type}&stamp={stamp|}")(t2)
+		shortUrl = function(p2)
+			return p.fromString("www:share?code={linkId}&type={type}&stamp={stamp|}")(p2)
 		end
 	}
 end

@@ -1,28 +1,24 @@
 local join = require(script.Parent.join)
+local function flatMap(item, callback)
+	local typeName = type(item)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-local function flatMap(p1, p2) -- line: 4
-	-- upvalues: join (copy), flatMap (copy)
-	local v5 = type(p1)
+	local typeName2 = type(callback)
+	assert(typeName2 == "function", "expected a function for second argument, got " .. typeName2)
 
-	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+	local result = {}
 
-	local v6 = type(p2)
-
-	assert(v6 == "function", "expected a function for second argument, got " .. v6)
-
-	local t1 = {}
-
-	for k, v in pairs(p1) do
-		if type(v) == "table" then
-			t1 = join(flatMap(v, p2), t1)
+	for k, item2 in pairs(item) do
+		if type(item2) == "table" then
+			result = join(flatMap(item2, callback), result)
 		else
-			local v10, v11 = p2(v, k)
+			local v, v2 = callback(item2, k)
 
-			t1[v11 or k] = v10
+			result[v2 or k] = v
 		end
 	end
 
-	return t1
+	return result
 end
 
 return flatMap

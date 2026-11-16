@@ -1,339 +1,417 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
 local TextChatService = game:GetService("TextChatService")
+
 local Flags = ExpChat.Flags
 local getEnablePerBubbleCustomization = require(Flags.getEnablePerBubbleCustomization)
-local ExpChatParent = ExpChat.Parent
-local Roact = require(ExpChatParent.Roact)
-local Otter = require(ExpChatParent.Otter)
-local Dictionary = require(ExpChatParent.llama).Dictionary
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
+
+local parent = ExpChat.Parent
+local Roact = require(parent.Roact)
+local Otter = require(parent.Otter)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local ExpChatShared = require(parent.ExpChatShared)
+
 local Config = require(ExpChat.Config)
+
 local memoize = require(ExpChat.memoize)
+
 local Helpers = ExpChat.BubbleChat.Helpers
 local getSpringFromSettings = require(Helpers.getSpringFromSettings)
 local getTextBounds = require(Helpers.getTextBounds)
 local getDictFromBubbleChatMessageProperties = require(Helpers.getDictFromBubbleChatMessageProperties)
 local shouldSendHighFrequencyTelemetry = require(ExpChat.shouldSendHighFrequencyTelemetry)
+
 local ClientSettingsUtility = require(ExpChat.ClientSettings.ClientSettingsUtility)
 local getFFlagExpChatUseUpdatedMessageRendered = require(ExpChat.Flags.getFFlagExpChatUseUpdatedMessageRendered)
-local v19 = require(ExpChat.Flags.getFIntExpChatMessageRenderUserThrottlePermyriad)()
+
+local getFIntExpChatMessageRenderUserThrottlePermyriad = require(ExpChat.Flags.getFIntExpChatMessageRenderUserThrottlePermyriad)
+local fIntExpChatMessageRenderUserThrottlePermyriad = getFIntExpChatMessageRenderUserThrottlePermyriad()
 local getFFlagExpChatExcludeFOMORenders = require(ExpChat.Flags.getFFlagExpChatExcludeFOMORenders)
 local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
+
 local EngineFeatureExpChatGlobalChatEngineTelemetryEnabled = require(ExpChat.Flags.EngineFeatureExpChatGlobalChatEngineTelemetryEnabled)
+
 local getPresetIconRichText = ExpChatShared.getPresetIconRichText
 local getPresetIconSize = ExpChatShared.getPresetIconSize
 local isPresetMessage = ExpChatShared.isPresetMessage
-local v26 = Roact.Component:extend("ChatBubble")
 
-v26.defaultProps = {
-	isMostRecent = true,
-	text = "",
-	timestamp = 0
-}
+local extended = Roact.Component:extend("ChatBubble")
+extended.defaultProps = { isMostRecent = true, text = "", timestamp = 0 }
 
-local v27 = memoize(function(p1, p2) -- line: 43
-	-- upvalues: Dictionary (copy), getDictFromBubbleChatMessageProperties (copy)
+local v = memoize(function(p, p2)
 	if p2 then
-		return Dictionary.join(p1, getDictFromBubbleChatMessageProperties(p2))
+		return dictionary.join(p, getDictFromBubbleChatMessageProperties(p2))
 	end
 
-	return p1
+	return p
 end)
 
-function v26.init(p3) -- line: 54
-	-- upvalues: Roact (copy), Otter (copy)
-	local v31, v32 = Roact.createBinding(0)
-
-	p3.width = v31
-	p3.updateWidth = v32
-	p3.widthMotor = Otter.createSingleMotor(0)
-	p3.widthMotor:onStep(function(p4) -- line: 57
-		-- upvalues: p3 (copy)
-		p3.updateWidth((math.round(p4)))
+function extended:init()
+	local binding, updateWidth = Roact.createBinding(0)
+	self.width = binding
+	self.updateWidth = updateWidth
+	self.widthMotor = Otter.createSingleMotor(0)
+	self.widthMotor:onStep(function(p)
+		self.updateWidth((math.round(p)))
 	end)
 
-	local v33, v34 = Roact.createBinding(0)
-
-	p3.height = v33
-	p3.updateHeight = v34
-	p3.heightMotor = Otter.createSingleMotor(0)
-	p3.heightMotor:onStep(function(p5) -- line: 63
-		-- upvalues: p3 (copy)
-		p3.updateHeight((math.round(p5)))
+	local binding2, updateHeight = Roact.createBinding(0)
+	self.height = binding2
+	self.updateHeight = updateHeight
+	self.heightMotor = Otter.createSingleMotor(0)
+	self.heightMotor:onStep(function(p)
+		self.updateHeight((math.round(p)))
 	end)
 
-	local v35, v36 = Roact.createBinding(1)
+	local binding3, updateTransparency = Roact.createBinding(1)
+	self.transparency = binding3
+	self.updateTransparency = updateTransparency
+	self.transparencyMotor = Otter.createSingleMotor(1)
+	self.transparencyMotor:onStep(self.updateTransparency)
 
-	p3.transparency = v35
-	p3.updateTransparency = v36
-	p3.transparencyMotor = Otter.createSingleMotor(1)
-	p3.transparencyMotor:onStep(p3.updateTransparency)
+	local binding4, updateBackgroundTransparency = Roact.createBinding(1)
+	self.backgroundTransparency = binding4
+	self.updateBackgroundTransparency = updateBackgroundTransparency
+	self.backgroundTransparencyMotor = Otter.createSingleMotor(1)
+	self.backgroundTransparencyMotor:onStep(self.updateBackgroundTransparency)
 
-	local v37, v38 = Roact.createBinding(1)
-
-	p3.backgroundTransparency = v37
-	p3.updateBackgroundTransparency = v38
-	p3.backgroundTransparencyMotor = Otter.createSingleMotor(1)
-	p3.backgroundTransparencyMotor:onStep(p3.updateBackgroundTransparency)
-	p3.size = Roact.joinBindings({
-		p3.width,
-		p3.height
-	}):map(function(p6) -- line: 75
-		return UDim2.fromOffset(p6[1], p6[2])
+	self.size = Roact.joinBindings({ self.width, self.height }):map(function(list)
+		return UDim2.fromOffset(list[1], list[2])
 	end)
 end
-function v26.render(p7) -- line: 80
-	-- upvalues: getEnablePerBubbleCustomization (copy), v27 (copy), Config (copy), FFlagExpChatPresetChatEnabled (copy), isPresetMessage (copy), getFFlagExpChatUseUpdatedMessageRendered (copy), shouldSendHighFrequencyTelemetry (copy), v19 (copy), getFFlagExpChatExcludeFOMORenders (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), TextChatService (copy), getPresetIconRichText (copy), Roact (copy), Dictionary (copy)
-	local chatSettings = p7.props.chatSettings
+
+function extended.render(props)
+	local v2 = props.props.chatSettings
 
 	if getEnablePerBubbleCustomization() then
-		chatSettings = v27(p7.props.chatSettings, p7.props.bubbleChatMessageProperties)
+		v2 = v(props.props.chatSettings, props.props.bubbleChatMessageProperties)
 	end
 
-	local UICorner = nil
-	local chatSettingsFontFace = nil
-	local ImageLabel, UIGradient, UIPadding
+	local v3 = nil
 
-	if p7.props.isTextChatServiceOn then
-		ImageLabel = chatSettings.ImageLabel
-		UIGradient = chatSettings.UIGradient
-		UICorner = chatSettings.UICorner
-		UIPadding = chatSettings.UIPadding
-		chatSettingsFontFace = chatSettings.FontFace
+	local fontFace = nil
+	local v4, v5, v6, v7
+
+	if props.props.isTextChatServiceOn then
+		v4 = v2.ImageLabel
+		v5 = v2.UIGradient
+		v6 = v2.UICorner
+		v7 = v2.UIPadding
+		fontFace = v2.FontFace
 	else
-		ImageLabel = chatSettings.BackgroundImage
-		UIGradient = chatSettings.BackgroundGradient
+		v4 = v2.BackgroundImage
 
-		if chatSettings.CornerEnabled then
-			UICorner = {
-				CornerRadius = chatSettings.CornerRadius
-			}
-		elseif chatSettings.CornerEnabled == false then
-			UICorner = {
-				CornerRadius = UDim.new(0, 0)
-			}
-		end
+		v5 = v2.BackgroundGradient
 
-		UIPadding = chatSettings.Padding and {
-			PaddingTop = UDim.new(0, chatSettings.Padding),
-			PaddingRight = UDim.new(0, chatSettings.Padding),
-			PaddingBottom = UDim.new(0, chatSettings.Padding),
-			PaddingLeft = UDim.new(0, chatSettings.Padding)
-		} or nil
-	end
-
-	local CornerRadius = Config.DefaultBubbleChatChildrenCustomizationProperties.UICorner.CornerRadius
-	local UIPadding2 = Config.DefaultBubbleChatChildrenCustomizationProperties.UIPadding
-	local v48 = p7.props.renderInsert and p7.props.insertSize.X + chatSettings.Padding or 0
-	local v49 = FFlagExpChatPresetChatEnabled and (isPresetMessage(p7.props) and p7.props.isTextChatServiceOn)
-	local v50 = p7.props.isMostRecent and (chatSettings.TailVisible and p7.props.showCaret)
-
-	if getFFlagExpChatUseUpdatedMessageRendered() and p7.props.textChatMessageInstance and shouldSendHighFrequencyTelemetry(v19) and (not getFFlagExpChatExcludeFOMORenders() or not p7.props.isHiddenMessage) then
-		if EngineFeatureExpChatGlobalChatEngineTelemetryEnabled then
-			TextChatService:SendExpChatMessageClientRendered(p7.props.textChatMessageInstance, "bubble_chat", -1)
+		if v2.CornerEnabled then
+			v6 = { CornerRadius = v2.CornerRadius }
 		else
-			TextChatService:SendExpChatMessageClientRendered(p7.props.textChatMessageInstance, "bubble_chat")
+			v6 = v2.CornerEnabled == false and { CornerRadius = UDim.new(0, 0) } or v3
+		end
+
+		v7 = v2.Padding
+			and ({
+				PaddingTop = UDim.new(0, v2.Padding),
+				PaddingRight = UDim.new(0, v2.Padding),
+				PaddingBottom = UDim.new(0, v2.Padding),
+				PaddingLeft = UDim.new(0, v2.Padding)
+			} or nil)
+			or nil
+	end
+
+	local cornerRadius = Config.DefaultBubbleChatChildrenCustomizationProperties.UICorner.CornerRadius
+	local uiPadding = Config.DefaultBubbleChatChildrenCustomizationProperties.UIPadding
+
+	local v8 = props.props.renderInsert and props.props.insertSize.X + v2.Padding or 0
+
+	local isTextChatServiceOn = FFlagExpChatPresetChatEnabled
+		and isPresetMessage(props.props)
+		and props.props.isTextChatServiceOn
+	local showCaret = props.props.isMostRecent and v2.TailVisible and props.props.showCaret
+
+	if
+		getFFlagExpChatUseUpdatedMessageRendered()
+		and props.props.textChatMessageInstance
+		and shouldSendHighFrequencyTelemetry(fIntExpChatMessageRenderUserThrottlePermyriad)
+		and not (getFFlagExpChatExcludeFOMORenders() and props.props.isHiddenMessage)
+	then
+		if EngineFeatureExpChatGlobalChatEngineTelemetryEnabled then
+			TextChatService:SendExpChatMessageClientRendered(props.props.textChatMessageInstance, "bubble_chat", -1)
+		else
+			TextChatService:SendExpChatMessageClientRendered(props.props.textChatMessageInstance, "bubble_chat")
 		end
 	end
 
-	local v51 = nil
+	local text
 
 	if FFlagExpChatPresetChatEnabled then
-		v51 = if not p7.props.useTranslation or (not p7.props.translation or p7.props.translation == "") then p7.props.text else p7.props.translation
+		if props.props.useTranslation and props.props.translation and props.props.translation ~= "" then
+			text = props.props.translation
+		else
+			text = props.props.text
+		end
 
-		if v49 then
-			v51 ..= (" %*"):format((getPresetIconRichText(chatSettings.TextSize)))
+		if isTextChatServiceOn then
+			text ..= ` {getPresetIconRichText(v2.TextSize)}`
 		end
 	end
 
-	return Roact.createElement("Frame", {
-		Transparency = 1,
-		LayoutOrder = p7.props.timestamp,
+	local createElement = Roact.createElement
+	local v9 = {
+		LayoutOrder = props.props.timestamp,
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Size = p7.size,
-		Position = UDim2.fromScale(1, 0.5)
-	}, {
+		Size = props.size,
+		Position = UDim2.fromScale(1, 0.5),
+		Transparency = 1
+	}
+
+	local v10 = {
 		Layout = Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			Padding = UDim.new(0, -1)
 		}),
-		ChatBubbleFrame = Roact.createElement("ImageLabel", Dictionary.join(ImageLabel, {
-			LayoutOrder = 1,
-			BorderSizePixel = 0,
-			ClipsDescendants = true,
-			BackgroundColor3 = chatSettings.BackgroundColor3,
-			AnchorPoint = Vector2.new(0.5, 0),
-			Size = UDim2.fromScale(1, 1),
-			Position = UDim2.new(0.5, 0, 0, 0),
-			BackgroundTransparency = if not ImageLabel or ImageLabel.Image == "" then p7.backgroundTransparency or p7.transparency else 1,
-			ImageTransparency = p7.backgroundTransparency or p7.transparency
-		}), {
-			UICorner = UICorner and Roact.createElement("UICorner", {
-				CornerRadius = UICorner.CornerRadius
-			}) or Roact.createElement("UICorner", {
-				CornerRadius = CornerRadius
-			}),
-			UIListLayout = Roact.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Bottom,
-				Padding = UDim.new(0, chatSettings.Padding)
-			}),
-			Padding = UIPadding and Roact.createElement("UIPadding", UIPadding) or Roact.createElement("UIPadding", UIPadding2),
-			Insert = p7.props.renderInsert and p7.props.renderInsert(),
-			Text = Roact.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				TextWrapped = true,
-				AutoLocalize = false,
-				LayoutOrder = 2,
-				Text = if FFlagExpChatPresetChatEnabled then v51 else if not p7.props.useTranslation or (not p7.props.translation or p7.props.translation == "") then p7.props.text else p7.props.translation,
-				Size = UDim2.new(1, -v48, 1, 0),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				FontFace = chatSettingsFontFace or nil,
-				Font = if chatSettingsFontFace then nil else chatSettings.Font,
-				TextColor3 = chatSettings.TextColor3,
-				TextSize = chatSettings.TextSize,
-				TextTransparency = p7.transparency,
-				RichText = p7.props.isTextChatServiceOn
-			}),
-			Gradient = UIGradient ~= nil and Roact.createElement("UIGradient", UIGradient)
-		}),
-		Caret = if not v50 then nil else Roact.createElement("ImageLabel", {
-			LayoutOrder = 2,
-			BackgroundTransparency = 1,
-			Image = "rbxasset://textures/ui/InGameChat/Caret.png",
-			Size = UDim2.fromOffset(9, 6),
-			ImageColor3 = chatSettings.BackgroundColor3,
-			ImageTransparency = p7.backgroundTransparency
-		}, {
-			Gradient = UIGradient ~= nil and Roact.createElement("UIGradient", UIGradient)
-		})
-	})
-end
-function v26.fadeOut(p8) -- line: 246
-	-- upvalues: getEnablePerBubbleCustomization (copy), v27 (copy), getSpringFromSettings (copy)
-	local chatSettings = p8.props.chatSettings
+		ChatBubbleFrame = 0,
+		Caret = 0
+	}
 
-	if getEnablePerBubbleCustomization() then
-		chatSettings = v27(p8.props.chatSettings, p8.props.bubbleChatMessageProperties)
+	local createElement2 = Roact.createElement
+
+	local joined = dictionary.join(v4, {
+		LayoutOrder = 1,
+		BackgroundColor3 = v2.BackgroundColor3,
+		AnchorPoint = Vector2.new(0.5, 0),
+		Size = UDim2.fromScale(1, 1),
+		BorderSizePixel = 0,
+		Position = UDim2.new(0.5, 0, 0, 0),
+		BackgroundTransparency = v4 and v4.Image ~= "" and 1 or props.backgroundTransparency or props.transparency,
+		ClipsDescendants = true,
+		ImageTransparency = props.backgroundTransparency or props.transparency
+	})
+
+	local v11 = {
+		UICorner = v6 and Roact.createElement("UICorner", { CornerRadius = v6.CornerRadius }) or Roact.createElement("UICorner", {
+			CornerRadius = cornerRadius
+		}),
+		UIListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Bottom,
+			Padding = UDim.new(0, v2.Padding)
+		}),
+		Padding = v7 and Roact.createElement("UIPadding", v7) or Roact.createElement("UIPadding", uiPadding),
+		Insert = props.props.renderInsert and props.props.renderInsert(),
+		Text = 0,
+		Gradient = 0
+	}
+
+	local createElement3 = Roact.createElement
+
+	if not FFlagExpChatPresetChatEnabled then
+		if props.props.useTranslation and props.props.translation and props.props.translation ~= "" then
+			text = props.props.translation
+		else
+			text = props.props.text
+		end
 	end
 
-	if not p8.isFadingOut then
-		p8.isFadingOut = true
-		p8.transparencyMotor:onComplete(function() -- line: 254
-			-- upvalues: p8 (copy)
-			if p8.props.onFadeOut then
-				p8.props.onFadeOut(p8.props.messageId)
+	local v12 = {
+		Text = text,
+		Size = UDim2.new(1, -v8, 1, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		BackgroundTransparency = 1,
+		FontFace = fontFace or nil,
+		Font = 0,
+		TextColor3 = 0,
+		TextSize = 0,
+		TextTransparency = 0,
+		TextWrapped = true,
+		AutoLocalize = false,
+		LayoutOrder = 2,
+		RichText = 0
+	}
+	local font
+
+	if not fontFace then
+		font = v2.Font
+	end
+
+	v12.Font = font
+	v12.TextColor3 = v2.TextColor3
+	v12.TextSize = v2.TextSize
+	v12.TextTransparency = props.transparency
+
+	v12.RichText = props.props.isTextChatServiceOn
+	v11.Text = createElement3("TextLabel", v12)
+
+	v11.Gradient = v5 ~= nil and Roact.createElement("UIGradient", v5)
+	v10.ChatBubbleFrame = createElement2("ImageLabel", joined, v11)
+	local caret
+
+	if showCaret then
+		caret = Roact.createElement("ImageLabel", {
+			LayoutOrder = 2,
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(9, 6),
+			Image = "rbxasset://textures/ui/InGameChat/Caret.png",
+			ImageColor3 = v2.BackgroundColor3,
+			ImageTransparency = props.backgroundTransparency
+		}, {
+			Gradient = v5 ~= nil and Roact.createElement("UIGradient", v5)
+		})
+	end
+
+	v10.Caret = caret
+	return createElement("Frame", v9, v10)
+end
+
+function extended:fadeOut()
+	local v2 = self.props.chatSettings
+
+	if getEnablePerBubbleCustomization() then
+		v2 = v(self.props.chatSettings, self.props.bubbleChatMessageProperties)
+	end
+
+	if not self.isFadingOut then
+		self.isFadingOut = true
+
+		self.transparencyMotor:onComplete(function()
+			if self.props.onFadeOut then
+				self.props.onFadeOut(self.props.messageId)
 			end
 		end)
 
-		local v54 = getSpringFromSettings(chatSettings, "transparency")
-
-		p8.transparencyMotor:setGoal(v54(1))
-		p8.backgroundTransparencyMotor:setGoal(v54(1))
+		local springFromSettings = getSpringFromSettings(v2, "transparency")
+		self.transparencyMotor:setGoal(springFromSettings(1))
+		self.backgroundTransparencyMotor:setGoal(springFromSettings(1))
 	end
 end
-function v26.didUpdate(p9, p10) -- line: 266
-	-- upvalues: getEnablePerBubbleCustomization (copy), v27 (copy), getTextBounds (copy), getSpringFromSettings (copy), FFlagExpChatPresetChatEnabled (copy), isPresetMessage (copy), getPresetIconSize (copy)
-	if p9.props.fadingOut then
-		p9:fadeOut()
+
+function extended:didUpdate(data)
+	if self.props.fadingOut then
+		self:fadeOut()
 	end
 
-	local chatSettings = p9.props.chatSettings
+	local v2 = self.props.chatSettings
 
 	if getEnablePerBubbleCustomization() then
-		chatSettings = v27(p9.props.chatSettings, p9.props.bubbleChatMessageProperties)
+		v2 = v(self.props.chatSettings, self.props.bubbleChatMessageProperties)
 	end
 
-	if p10.text ~= p9.props.text or p10.useTranslation ~= p9.props.useTranslation or p10.translation ~= p9.props.translation or p10.chatSettings ~= p9.props.chatSettings or p10.renderInsert ~= p9.props.renderInsert or p10.insertSize ~= p9.props.insertSize then
-		local v58 = if not p9.props.useTranslation or (not p9.props.translation or p9.props.translation == "") then getTextBounds(p9.props.text, chatSettings) else getTextBounds(p9.props.translation, chatSettings)
-		local v59 = getSpringFromSettings(chatSettings, "size")
-		local chatSettingsPadding = chatSettings.Padding
-		local X = v58.X
-		local Y = v58.Y
+	if
+		data.text ~= self.props.text
+		or data.useTranslation ~= self.props.useTranslation
+		or data.translation ~= self.props.translation
+		or data.chatSettings ~= self.props.chatSettings
+		or data.renderInsert ~= self.props.renderInsert
+		or data.insertSize ~= self.props.insertSize
+	then
+		local v3
 
-		if p9.props.renderInsert then
-			X += p9.props.insertSize.X + chatSettingsPadding
-			Y = math.max(Y, p9.props.insertSize.Y + chatSettingsPadding * 2)
+		if self.props.useTranslation and self.props.translation and self.props.translation ~= "" then
+			v3 = getTextBounds(self.props.translation, v2)
+		else
+			v3 = getTextBounds(self.props.text, v2)
 		end
 
-		local v63 = FFlagExpChatPresetChatEnabled and (isPresetMessage(p9.props) and p9.props.isTextChatServiceOn)
+		local springFromSettings = getSpringFromSettings(v2, "size")
+		local padding = v2.Padding
 
-		if FFlagExpChatPresetChatEnabled and v63 then
-			local v64 = getPresetIconSize(chatSettings.TextSize)
+		local x = v3.X
+		local y = v3.Y
 
-			X += v64 + chatSettingsPadding
-			Y = math.max(Y, v64)
+		if self.props.renderInsert then
+			x += self.props.insertSize.X + padding
+			y = math.max(y, self.props.insertSize.Y + padding * 2)
 		end
 
-		p9.heightMotor:setGoal(v59(Y))
-		p9.widthMotor:setGoal(v59(X))
+		local isTextChatServiceOn = FFlagExpChatPresetChatEnabled
+			and isPresetMessage(self.props)
+			and self.props.isTextChatServiceOn
+
+		if FFlagExpChatPresetChatEnabled and isTextChatServiceOn then
+			local presetIconSize = getPresetIconSize(v2.TextSize)
+			x += presetIconSize + padding
+			y = math.max(y, presetIconSize)
+		end
+
+		self.heightMotor:setGoal(springFromSettings(y))
+		self.widthMotor:setGoal(springFromSettings(x))
 	end
 end
-function v26.didMount(p11) -- line: 311
-	-- upvalues: getEnablePerBubbleCustomization (copy), v27 (copy), getTextBounds (copy), getSpringFromSettings (copy), FFlagExpChatPresetChatEnabled (copy), isPresetMessage (copy), getPresetIconSize (copy), Otter (copy), ClientSettingsUtility (copy)
-	p11.isMounted = true
 
-	local chatSettings = p11.props.chatSettings
+function extended:didMount()
+	self.isMounted = true
+
+	local v2 = self.props.chatSettings
 
 	if getEnablePerBubbleCustomization() then
-		chatSettings = v27(p11.props.chatSettings, p11.props.bubbleChatMessageProperties)
+		v2 = v(self.props.chatSettings, self.props.bubbleChatMessageProperties)
 	end
 
-	local v67 = if not p11.props.useTranslation or (not p11.props.translation or p11.props.translation == "") then getTextBounds(p11.props.text, chatSettings) else getTextBounds(p11.props.translation, chatSettings)
-	local v68 = getSpringFromSettings(chatSettings, "size")
-	local v69 = getSpringFromSettings(chatSettings, "transparency")
-	local X = v67.X
-	local Y = v67.Y
+	local v3
 
-	if p11.props.renderInsert then
-		X += p11.props.insertSize.X + chatSettings.Padding
-		Y = math.max(Y, p11.props.insertSize.Y + chatSettings.Padding * 2)
-	end
-
-	local v72 = FFlagExpChatPresetChatEnabled and (isPresetMessage(p11.props) and p11.props.isTextChatServiceOn)
-
-	if FFlagExpChatPresetChatEnabled and v72 then
-		local v73 = getPresetIconSize(chatSettings.TextSize)
-
-		X += v73 + chatSettings.Padding
-		Y = math.max(Y, v73)
-	end
-
-	if p11.props.isMostRecent then
-		p11.heightMotor:setGoal(v68(Y))
-		p11.widthMotor:setGoal(Otter.instant(X))
+	if self.props.useTranslation and self.props.translation and self.props.translation ~= "" then
+		v3 = getTextBounds(self.props.translation, v2)
 	else
-		p11.heightMotor:setGoal(v68(Y))
-		p11.widthMotor:setGoal(v68(X))
+		v3 = getTextBounds(self.props.text, v2)
 	end
 
-	local chatSettingsTransparency = chatSettings.Transparency
+	local springFromSettings = getSpringFromSettings(v2, "size")
+	local springFromSettings2 = getSpringFromSettings(v2, "transparency")
 
-	p11.transparencyMotor:setGoal(v69(chatSettingsTransparency))
+	local x = v3.X
+	local y = v3.Y
 
-	local v75 = ClientSettingsUtility.getBackgroundTransparency(chatSettings, p11.props.clientSettings)
+	if self.props.renderInsert then
+		x += self.props.insertSize.X + v2.Padding
+		y = math.max(y, self.props.insertSize.Y + v2.Padding * 2)
+	end
+
+	local isTextChatServiceOn = FFlagExpChatPresetChatEnabled
+		and isPresetMessage(self.props)
+		and self.props.isTextChatServiceOn
+
+	if FFlagExpChatPresetChatEnabled and isTextChatServiceOn then
+		local presetIconSize = getPresetIconSize(v2.TextSize)
+		x += presetIconSize + v2.Padding
+		y = math.max(y, presetIconSize)
+	end
+
+	if self.props.isMostRecent then
+		self.heightMotor:setGoal(springFromSettings(y))
+		self.widthMotor:setGoal(Otter.instant(x))
+	else
+		self.heightMotor:setGoal(springFromSettings(y))
+		self.widthMotor:setGoal(springFromSettings(x))
+	end
+
+	local transparency = v2.Transparency
+	self.transparencyMotor:setGoal(springFromSettings2(transparency))
+
+	local v4 = ClientSettingsUtility.getBackgroundTransparency(v2, self.props.clientSettings)
 
 	if getEnablePerBubbleCustomization() then
-		local bubbleChatMessageProperties = p11.props.bubbleChatMessageProperties
+		local bubbleChatMessageProperties = self.props.bubbleChatMessageProperties
 
 		if bubbleChatMessageProperties and bubbleChatMessageProperties.BackgroundTransparency then
-			v75 = ClientSettingsUtility.getBackgroundTransparency({
-				BackgroundTransparency = bubbleChatMessageProperties.BackgroundTransparency
-			}, p11.props.clientSettings)
+			v4 = ClientSettingsUtility.getBackgroundTransparency(
+				{ BackgroundTransparency = bubbleChatMessageProperties.BackgroundTransparency },
+				self.props.clientSettings
+			)
 		end
 	end
 
-	p11.backgroundTransparencyMotor:setGoal(v69(v75))
-end
-function v26.willUnmount(p12) -- line: 370
-	p12.isMounted = false
-	p12.transparencyMotor:destroy()
-	p12.backgroundTransparencyMotor:destroy()
-	p12.heightMotor:destroy()
-	p12.widthMotor:destroy()
+	self.backgroundTransparencyMotor:setGoal(springFromSettings2(v4))
 end
 
-return v26
+function extended:willUnmount()
+	self.isMounted = false
+	self.transparencyMotor:destroy()
+	self.backgroundTransparencyMotor:destroy()
+	self.heightMotor:destroy()
+	self.widthMotor:destroy()
+end
+
+return extended

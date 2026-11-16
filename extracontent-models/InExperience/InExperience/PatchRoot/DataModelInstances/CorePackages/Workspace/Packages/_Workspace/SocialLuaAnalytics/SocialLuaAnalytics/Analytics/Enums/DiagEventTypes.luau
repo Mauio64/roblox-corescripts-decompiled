@@ -1,4 +1,1 @@
-return {
-	Counter = "Counter",
-	Stats = "Stats"
-}
+return { Counter = "Counter", Stats = "Stats" }

@@ -1,76 +1,55 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
+local v = {}
 
-local t1 = {}
-
-local function replaceNil(p1) -- line: 19
-	-- upvalues: t1 (copy)
-	if p1 == nil then
-		return t1
-	end
-
-	return p1
+local function replaceNil(p) -- 4 equivalent calls inferred from this helper
+	return if p == nil then v else p
 end
-local function newWeakMap() -- line: 26
-	return (setmetatable({}, {
-		__mode = "kv"
-	}))
+
+local function newWeakMap() -- 3 equivalent calls inferred from this helper
+	return (setmetatable({}, { __mode = "kv" }))
 end
 
 return {
-	memoize3 = function(p2: ((...any) -> ...any)) -- line: 33
-		-- upvalues: t1 (copy)
-		local self = nil
+	memoize3 = function(callback)
+		local v2 = nil
 
-		return function(p3, p4, p5) -- line: 36
-			-- upvalues: t1 (copy), self (ref), p2 (copy)
-			local v11 = if p3 ~= nil then p3 else t1
-			local v12 = if p4 ~= nil then p4 else t1
-			local v13 = if p5 ~= nil then p5 else t1
+		return function(p, p2, p3)
+			local v3 = replaceNil(p) -- inferred equivalent call
+			local v4 = replaceNil(p2) -- inferred equivalent call
+			local v5 = replaceNil(p3) -- inferred equivalent call
 
-			if not self then
-				self = setmetatable({}, {
-					__mode = "kv"
-				})
+			if not v2 then
+				v2 = newWeakMap() -- inferred equivalent call
 			end
 
-			local v14 = self[v11]
-			local v15 = nil
+			local v6 = v2[v3]
+			local v7 = nil
 
-			if v14 then
-				v15 = v14[v12]
+			if v6 then
+				v7 = v6[v4]
 
-				if v15 then
-					local v16 = v15[v13]
+				if v7 then
+					local v8 = v7[v5]
 
-					if v16 ~= nil then
-						if v16 == t1 then
-							return nil
-						end
-
-						return v16
+					if v8 ~= nil then
+						return if v8 ~= v then v8 else nil
 					end
 				end
 			else
-				v14 = setmetatable({}, {
-					__mode = "kv"
-				})
-				self[v11] = v14
+				v6 = newWeakMap() -- inferred equivalent call
+				v2[v3] = v6
 			end
 
-			if not v15 then
-				v15 = setmetatable({}, {
-					__mode = "kv"
-				})
-				v14[v12] = v15
+			if not v7 then
+				v7 = newWeakMap() -- inferred equivalent call
+				v6[v4] = v7
 			end
 
-			local v17 = p2(p3, p4, p5)
-
-			v15[v13] = if v17 ~= nil then v17 else t1
-
-			return v17
+			local v8 = callback(p, p2, p3)
+			v7[v5] = replaceNil(v8) -- inferred equivalent call
+			return v8
 		end
 	end
 }

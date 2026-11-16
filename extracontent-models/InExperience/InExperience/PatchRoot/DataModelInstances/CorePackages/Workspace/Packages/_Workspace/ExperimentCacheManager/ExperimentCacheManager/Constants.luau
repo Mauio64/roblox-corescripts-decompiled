@@ -1,3 +1,1 @@
-return {
-	APP_STORAGE_KEY = "ExperimentCache"
-}
+return { APP_STORAGE_KEY = "ExperimentCache" }

@@ -1,3 +1,5 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 
-return (require(scriptParent:WaitForChild("FFlagUnibarMenuOpenHamburgerGamepadIXP")))
+local FFlagUnibarMenuOpenHamburgerGamepadIXP = require(parent:WaitForChild("FFlagUnibarMenuOpenHamburgerGamepadIXP"))
+
+return FFlagUnibarMenuOpenHamburgerGamepadIXP

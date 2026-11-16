@@ -1,40 +1,60 @@
-local Parent = script:FindFirstAncestor("SocialCommon").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("SocialCommon").Parent
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local useStyle = UIBlox.Core.Style.useStyle
-local Text = require(Parent.AppCommonLib).Text
-local t1 = {
-	width = require(script.Parent.Constants).TILE_SIZE
-}
+local AppCommonLib = require(parent.AppCommonLib)
+local Text = AppCommonLib.Text
 
-return function(t2: {[any]: any}) -- line: 25
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), React (copy), Text (copy), StyledTextLabel (copy)
-	local v10 = Cryo.Dictionary.join(t1, t2)
-	local v11 = useStyle()
-	local Theme = v11.Theme
-	local Font = v11.Font
-	local v14 = React.useMemo(function() -- line: 32
-		-- upvalues: Text (copy), v10 (copy), Font (copy)
-		return Text.GetTextHeight(v10.name, Font.CaptionHeader.Font, Font.BaseSize * Font.CaptionHeader.RelativeSize, 10000)
-	end, {
-		v10.name,
-		Font.CaptionHeader.Font,
-		Font.BaseSize * Font.CaptionHeader.RelativeSize
-	})
+local Constants = require(script.Parent.Constants)
+
+local v = { width = Constants.TILE_SIZE }
+
+return function(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local v2 = useStyle()
+
+	local theme = v2.Theme
+	local font = v2.Font
+	local v3
+
+	if FoundationFontFaceMigration then
+		v3 = React.useMemo(function()
+			return GetTextSize(
+				joined.name,
+				font.BaseSize * font.CaptionHeader.RelativeSize,
+				v2.Tokens.Typography.CaptionLarge.Font,
+				Vector2.new(10000, 10000)
+			).Y
+		end, { joined.name, font.BaseSize * font.CaptionHeader.RelativeSize, v2.Tokens.Typography.CaptionLarge.Font })
+	else
+		v3 = React.useMemo(function()
+			return Text.GetTextHeight(
+				joined.name,
+				font.CaptionHeader.Font,
+				font.BaseSize * font.CaptionHeader.RelativeSize,
+				10000
+			)
+		end, { joined.name, font.CaptionHeader.Font, font.BaseSize * font.CaptionHeader.RelativeSize })
+	end
 
 	return React.createElement(StyledTextLabel, {
-		lineHeight = 1,
-		fluidSizing = false,
-		richText = true,
-		layoutOrder = v10.layoutOrder,
-		text = v10.name,
-		fontStyle = Font.CaptionHeader,
-		colorStyle = Theme.TextEmphasis,
-		size = UDim2.fromOffset(v10.width, v14),
+		layoutOrder = joined.layoutOrder,
+		text = joined.name,
+		fontStyle = font.CaptionHeader,
+		colorStyle = theme.TextEmphasis,
+		size = UDim2.fromOffset(joined.width, v3),
 		textTruncate = Enum.TextTruncate.AtEnd,
 		textXAlignment = Enum.TextXAlignment.Left,
-		textYAlignment = Enum.TextYAlignment.Center
+		textYAlignment = Enum.TextYAlignment.Center,
+		lineHeight = 1,
+		fluidSizing = false,
+		richText = true
 	})
 end

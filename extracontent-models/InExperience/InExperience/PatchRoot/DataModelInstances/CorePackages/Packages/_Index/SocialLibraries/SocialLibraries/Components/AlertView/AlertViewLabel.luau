@@ -1,39 +1,53 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
 local dependencies = require(SocialLibraries.dependencies)
-local Roact = dependencies.Roact
-local UIBlox = dependencies.UIBlox
-local v5 = Roact.PureComponent:extend("AlertViewLabel")
+local roact = dependencies.Roact
+local uiBlox = dependencies.UIBlox
+local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
+local normalizeFontFace = dependencies.Foundation.Utility.normalizeFontFace
 
-v5.defaultProps = {
+local extended = roact.PureComponent:extend("AlertViewLabel")
+extended.defaultProps = {
 	BackgroundTransparency = 1,
-	Text = "",
 	Size = UDim2.new(1, 0, 0, 40),
+	Text = "",
 	TextXAlignment = Enum.TextXAlignment.Center
 }
 
-function v5.render(p1) -- line: 14
-	-- upvalues: UIBlox (copy), Roact (copy)
-	return UIBlox.Style.withStyle(function(p2) -- line: 15
-		-- upvalues: p1 (copy), Roact (copy)
-		local propsBackgroundTransparency = p1.props.BackgroundTransparency
-		local v9 = p1.props.Font or p2.Font.Body.Font
-		local propsText = p1.props.Text
-		local v11 = p1.props.TextColor3 or p2.Theme.TextDefault.Color
-		local v12 = p1.props.TextSize or p2.Font.Body.RelativeSize * p2.Font.BaseSize
-		local TextXAlignment = p1.props.TextXAlignment
+function extended.render(p)
+	return uiBlox.Style.withStyle(function(p2)
+		local backgroundTransparency = p.props.BackgroundTransparency
+		local font = p.props.Font or p2.Font.Body.Font
+		local text = p.props.Text
+		local textColor3 = p.props.TextColor3 or p2.Theme.TextDefault.Color
+		local textSize = p.props.TextSize or p2.Font.Body.RelativeSize * p2.Font.BaseSize
+		local textXAlignment = p.props.TextXAlignment
 
-		return Roact.createElement("TextLabel", {
+		local createElement = roact.createElement
+		local font2
+
+		if not foundationFontFaceMigration then
+			font2 = font
+		end
+
+		local fontFace
+
+		if foundationFontFaceMigration then
+			fontFace = normalizeFontFace(font)
+		end
+
+		return createElement("TextLabel", {
+			BackgroundTransparency = backgroundTransparency,
+			Font = font2,
+			FontFace = fontFace,
+			LayoutOrder = p.props.LayoutOrder,
+			Size = p.props.Size,
+			Text = text,
+			TextColor3 = textColor3,
+			TextSize = textSize,
 			TextWrapped = true,
-			BackgroundTransparency = propsBackgroundTransparency,
-			Font = v9,
-			LayoutOrder = p1.props.LayoutOrder,
-			Size = p1.props.Size,
-			Text = propsText,
-			TextColor3 = v11,
-			TextSize = v12,
-			TextXAlignment = TextXAlignment
+			TextXAlignment = textXAlignment
 		})
 	end)
 end
 
-return v5
+return extended

@@ -1,24 +1,29 @@
-local Parent = script:FindFirstAncestor("FriendsNetworking").Parent
-local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
+local parent = script:FindFirstAncestor("FriendsNetworking").Parent
 
+local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
 require(script.Parent.Parent.networkingFriendsTypes)
 
-local FFlagAddFriendsSessionId = require(Parent.SharedFlags).FFlagAddFriendsSessionId
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddFriendsSessionId = SharedFlags.FFlagAddFriendsSessionId
 
-return function(p1) -- line: 9
-	-- upvalues: FRIENDS_URL (copy), FFlagAddFriendsSessionId (copy)
-	return p1.roduxNetworking.GET({
-		Name = "GetFriendRequests"
-	}, function(p2, p3) -- line: 14
-		-- upvalues: FRIENDS_URL (copy), FFlagAddFriendsSessionId (copy)
-		return p2(FRIENDS_URL, {
-			currentUserId = p3.currentUserId
-		}):path("v1"):path("my"):path("friends"):path("requests"):queryArgs({
-			fetchMutualFriends = p3.fetchMutualFriends,
-			sortOrder = p3.sortOrder,
-			limit = p3.limit,
-			cursor = p3.cursor,
-			sessionId = if not FFlagAddFriendsSessionId then nil else p3.sessionId
-		})
+return function(p)
+	return p.roduxNetworking.GET("GetFriendRequests", function(callback, data)
+		local path = callback(FRIENDS_URL, { currentUserId = data.currentUserId }):path("v1"):path("my"):path("friends"):path("requests")
+		local v = {
+			fetchMutualFriends = data.fetchMutualFriends,
+			sortOrder = data.sortOrder,
+			limit = data.limit,
+			cursor = data.cursor,
+			sessionId = 0,
+			uprankUnseen = true
+		}
+		local sessionId
+
+		if FFlagAddFriendsSessionId then
+			sessionId = data.sessionId
+		end
+
+		v.sessionId = sessionId
+		return path:queryArgs(v)
 	end)
 end

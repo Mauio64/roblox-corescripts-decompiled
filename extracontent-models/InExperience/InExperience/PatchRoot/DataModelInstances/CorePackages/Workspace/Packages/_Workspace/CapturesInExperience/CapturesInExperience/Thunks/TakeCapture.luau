@@ -1,138 +1,158 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local CaptureService = game:GetService("CaptureService")
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
-local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
-local getAvatarAssets = require(ParentParent.Utils.getAvatarAssets)
-local getScreenshotHud = require(ParentParent.Utils.getScreenshotHud)
-local getUserMetadata = require(ParentParent.Utils.getUserMetadata)
-local IXPServiceWrapper = require(ParentParentParent.IXPServiceWrapper).IXPServiceWrapper
-local OverlayActivated = require(ParentParent.Actions.OverlayActivated)
-local OverlayDeactivated = require(ParentParent.Actions.OverlayDeactivated)
-local OverlayFlashActivated = require(ParentParent.Actions.OverlayFlashActivated)
-local OverlayFlashDeactivated = require(ParentParent.Actions.OverlayFlashDeactivated)
-local removeCoreUI = require(ParentParent.Utils.removeCoreUI)
-local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
-local FStringSocialCaptureTakenIXPLayer = require(ParentParentParent.SharedFlags).FStringSocialCaptureTakenIXPLayer
-local v19 = game:DefineFastFlag("DebugAPPEXP4747B", false)
 
-local function hideGui(p1) -- line: 25
-	-- upvalues: GuiService (copy)
-	if GuiService:GetGuiIsVisible(p1) then
-		GuiService:ToggleGuiIsVisibleForCaptures(p1)
+local CaptureService = require(parent.Services.CaptureService)
+local CapturesToastType = require(parent.Enums.CapturesToastType)
+local Constants = require(parent.Constants)
+local getAvatarAssets = require(parent.Utils.getAvatarAssets)
+local getScreenshotHud = require(parent.Utils.getScreenshotHud)
+local getUserMetadata = require(parent.Utils.getUserMetadata)
+local isEligibleForMoments = require(parent.Utils.isEligibleForMoments)
+local IXPServiceWrapper = require(parent2.IXPServiceWrapper)
+local ixpServiceWrapper = IXPServiceWrapper.IXPServiceWrapper
+local logCaptureEndLayerExposure = require(parent.Utils.logCaptureEndLayerExposure)
+local OverlayActivated = require(parent.Actions.OverlayActivated)
+local OverlayDeactivated = require(parent.Actions.OverlayDeactivated)
+local OverlayFlashActivated = require(parent.Actions.OverlayFlashActivated)
+local OverlayFlashDeactivated = require(parent.Actions.OverlayFlashDeactivated)
+local pendingCaptureToastAction = require(parent.Utils.pendingCaptureToastAction)
+local removeCoreUI = require(parent.Utils.removeCoreUI)
+local ToastTriggered = require(parent.Actions.ToastTriggered)
+require(parent.Types)
+
+local SharedFlags = require(parent2.SharedFlags)
+local FStringSocialCaptureTakenIXPLayer = SharedFlags.FStringSocialCaptureTakenIXPLayer
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagBuildExperienceInGameCaptureToChat = SharedFlags2.FFlagBuildExperienceInGameCaptureToChat
+local FFlagMomentsCaptureEndIxpEnabled = require(parent.Flags.FFlagMomentsCaptureEndIxpEnabled)
+
+local defineFastFlag = game:DefineFastFlag("DebugAPPEXP4747B", false)
+
+local function hideGui(p) -- 2 equivalent calls inferred from this helper
+	if GuiService:GetGuiIsVisible(p) then
+		GuiService:ToggleGuiIsVisibleForCaptures(p)
 	end
 end
-local function showGui(p2) -- line: 31
-	-- upvalues: GuiService (copy)
-	if not GuiService:GetGuiIsVisible(p2) then
-		GuiService:ToggleGuiIsVisibleForCaptures(p2)
+
+local function showGui(p) -- 2 equivalent calls inferred from this helper
+	if not GuiService:GetGuiIsVisible(p) then
+		GuiService:ToggleGuiIsVisibleForCaptures(p)
 	end
 end
-local function hidePlayerGui() -- line: 37
-	-- upvalues: GuiService (copy)
+
+local function hidePlayerGui() -- 1 equivalent call inferred from this helper
 	if GuiService:GetGuiIsVisible(Enum.GuiType.Custom) then
 		GuiService:ToggleGuiIsVisibleForCaptures(Enum.GuiType.Custom)
 	end
 end
-local function showPlayerGui() -- line: 43
-	-- upvalues: GuiService (copy)
+
+local function showPlayerGui() -- 1 equivalent call inferred from this helper
 	if not GuiService:GetGuiIsVisible(Enum.GuiType.Custom) then
 		GuiService:ToggleGuiIsVisibleForCaptures(Enum.GuiType.Custom)
 	end
 end
 
-return function() -- line: 49
-	-- upvalues: ToastTriggered (copy), CapturesToastType (copy), UserInputService (copy), getScreenshotHud (copy), v19 (copy), GuiService (copy), removeCoreUI (copy), OverlayActivated (copy), CaptureService (copy), getAvatarAssets (copy), getUserMetadata (copy), HttpService (copy), OverlayFlashActivated (copy), OverlayFlashDeactivated (copy), OverlayDeactivated (copy), IXPServiceWrapper (copy), FStringSocialCaptureTakenIXPLayer (copy)
-	return function(p3) -- line: 50
-		-- upvalues: ToastTriggered (copy), CapturesToastType (copy), UserInputService (copy), getScreenshotHud (copy), v19 (copy), GuiService (copy), removeCoreUI (copy), OverlayActivated (copy), CaptureService (copy), getAvatarAssets (copy), getUserMetadata (copy), HttpService (copy), OverlayFlashActivated (copy), OverlayFlashDeactivated (copy), OverlayDeactivated (copy), IXPServiceWrapper (copy), FStringSocialCaptureTakenIXPLayer (copy)
-		local v27 = false
-		local v28 = false
+return function(p)
+	return function(object)
+		local flag = false
+		local flag2 = false
 
-		p3:dispatch(ToastTriggered(CapturesToastType.None))
+		if FFlagBuildExperienceInGameCaptureToChat then
+			local set = pendingCaptureToastAction.set
+			local v
 
-		local OverrideMouseIconBehavior = UserInputService.OverrideMouseIconBehavior
+			if p then
+				v = p.toastAction
+			end
 
+			set(v)
+		end
+
+		object:dispatch(ToastTriggered(CapturesToastType.None))
+
+		local overrideMouseIconBehavior = UserInputService.OverrideMouseIconBehavior
 		UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
 
-		local v30 = getScreenshotHud()
+		local screenshotHud = getScreenshotHud()
 
-		if not v19 and (not v30 or v30.HidePlayerGuiForCaptures) then
-			if GuiService:GetGuiIsVisible(Enum.GuiType.Custom) then
-				GuiService:ToggleGuiIsVisibleForCaptures(Enum.GuiType.Custom)
-			end
-
-			v28 = true
+		if not defineFastFlag and (not screenshotHud or screenshotHud.HidePlayerGuiForCaptures) then
+			hidePlayerGui() -- inferred equivalent call
+			flag2 = true
 		end
 
-		local v31 = nil
+		local v = nil
 
-		if not v19 then
-			if not v30 or v30.HideCoreGuiForCaptures then
-				v31 = removeCoreUI()
-				v27 = true
+		if not defineFastFlag then
+			if not screenshotHud or screenshotHud.HideCoreGuiForCaptures then
+				v = removeCoreUI()
+				flag = true
 			end
 
-			local CustomBillboards = Enum.GuiType.CustomBillboards
-
-			if GuiService:GetGuiIsVisible(CustomBillboards) then
-				GuiService:ToggleGuiIsVisibleForCaptures(CustomBillboards)
-			end
-
-			local PlayerNameplates = Enum.GuiType.PlayerNameplates
-
-			if GuiService:GetGuiIsVisible(PlayerNameplates) then
-				GuiService:ToggleGuiIsVisibleForCaptures(PlayerNameplates)
-			end
+			hideGui(Enum.GuiType.CustomBillboards) -- inferred equivalent call
+			hideGui(Enum.GuiType.PlayerNameplates) -- inferred equivalent call
 		end
 
-		p3:dispatch(OverlayActivated())
+		object:dispatch(OverlayActivated())
+
 		CaptureService:OnCaptureBegan()
+
 		task.wait(0.1)
 
-		local v34 = getAvatarAssets()
-		local v35 = getUserMetadata()
+		local avatarAssets = getAvatarAssets()
+		local userMetadata = getUserMetadata()
 
-		if next(v34) == nil and next(v35) == nil then
+		if next(avatarAssets) == nil and next(userMetadata) == nil then
 			CaptureService:SaveScreenshotCapture()
 		else
-			local t1 = {
-				avatarItems = if next(v34) == nil then nil else v34,
-				userMetadata = if next(v35) == nil then nil else v35
-			}
+			if next(avatarAssets) == nil then
+				avatarAssets = nil
+			end
 
-			CaptureService:SaveScreenshotCapture(HttpService:JSONEncode(t1))
+			if next(userMetadata) == nil then
+				userMetadata = nil
+			end
+
+			CaptureService:SaveScreenshotCapture(HttpService:JSONEncode({
+				avatarItems = avatarAssets,
+				userMetadata = userMetadata
+			}))
 		end
 
 		task.wait()
-		p3:dispatch(OverlayFlashActivated())
+
+		object:dispatch(OverlayFlashActivated())
+
 		task.wait(0.5)
+
 		CaptureService:OnCaptureEnded()
-		p3:dispatch(OverlayFlashDeactivated())
-		p3:dispatch(OverlayDeactivated())
-		UserInputService.OverrideMouseIconBehavior = OverrideMouseIconBehavior
 
-		if v28 and not GuiService:GetGuiIsVisible(Enum.GuiType.Custom) then
-			GuiService:ToggleGuiIsVisibleForCaptures(Enum.GuiType.Custom)
+		object:dispatch(OverlayFlashDeactivated())
+		object:dispatch(OverlayDeactivated())
+
+		UserInputService.OverrideMouseIconBehavior = overrideMouseIconBehavior
+
+		if flag2 then
+			showPlayerGui() -- inferred equivalent call
 		end
 
-		if v27 then
-			v31()
+		if flag then
+			v()
 		end
 
-		local CustomBillboards = Enum.GuiType.CustomBillboards
+		showGui(Enum.GuiType.CustomBillboards) -- inferred equivalent call
+		showGui(Enum.GuiType.PlayerNameplates) -- inferred equivalent call
 
-		if not GuiService:GetGuiIsVisible(CustomBillboards) then
-			GuiService:ToggleGuiIsVisibleForCaptures(CustomBillboards)
+		ixpServiceWrapper:LogUserLayerExposure(FStringSocialCaptureTakenIXPLayer)
+
+		if
+			FFlagMomentsCaptureEndIxpEnabled
+			and isEligibleForMoments(object:getState()[Constants.RoduxKey].MomentsEligibility)
+		then
+			logCaptureEndLayerExposure()
 		end
-
-		local PlayerNameplates = Enum.GuiType.PlayerNameplates
-
-		if not GuiService:GetGuiIsVisible(PlayerNameplates) then
-			GuiService:ToggleGuiIsVisibleForCaptures(PlayerNameplates)
-		end
-
-		IXPServiceWrapper:LogUserLayerExposure(FStringSocialCaptureTakenIXPLayer)
 	end
 end

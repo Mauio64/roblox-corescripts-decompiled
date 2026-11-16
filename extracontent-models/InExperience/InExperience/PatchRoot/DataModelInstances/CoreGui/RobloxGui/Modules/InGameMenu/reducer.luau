@@ -1,18 +1,23 @@
 local CorePackages = game:GetService("CorePackages")
-local Cryo = require(CorePackages.Packages.InGameMenuDependencies).Cryo
-local scriptParent = script.Parent
-local SetMenuOpen = require(scriptParent.Actions.SetMenuOpen)
-local SetMainPageMoreMenuOpen = require(scriptParent.Actions.SetMainPageMoreMenuOpen)
-local SetCurrentPage = require(scriptParent.Actions.SetCurrentPage)
-local SetScreenSize = require(scriptParent.Actions.SetScreenSize)
-local StartLeavingGame = require(scriptParent.Actions.StartLeavingGame)
-local CancelLeavingGame = require(scriptParent.Actions.CancelLeavingGame)
-local SetControlLayout = require(scriptParent.Actions.SetControlLayout)
-local SetRespawning = require(scriptParent.Actions.SetRespawning)
-local SetCurrentZone = require(scriptParent.Actions.SetCurrentZone)
-local SetControllerBarHeight = require(scriptParent.Actions.SetControllerBarHeight)
-local DecrementControllerBar = require(scriptParent.Actions.DecrementControllerBar)
-local IncrementControllerBar = require(scriptParent.Actions.IncrementControllerBar)
+
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Cryo = InGameMenuDependencies.Cryo
+
+local parent = script.Parent
+
+local SetMenuOpen = require(parent.Actions.SetMenuOpen)
+local SetMainPageMoreMenuOpen = require(parent.Actions.SetMainPageMoreMenuOpen)
+local SetCurrentPage = require(parent.Actions.SetCurrentPage)
+local SetScreenSize = require(parent.Actions.SetScreenSize)
+local StartLeavingGame = require(parent.Actions.StartLeavingGame)
+local CancelLeavingGame = require(parent.Actions.CancelLeavingGame)
+local SetControlLayout = require(parent.Actions.SetControlLayout)
+local SetRespawning = require(parent.Actions.SetRespawning)
+local SetCurrentZone = require(parent.Actions.SetCurrentZone)
+local SetControllerBarHeight = require(parent.Actions.SetControllerBarHeight)
+local DecrementControllerBar = require(parent.Actions.DecrementControllerBar)
+local IncrementControllerBar = require(parent.Actions.IncrementControllerBar)
+
 local navigationReducer = require(script.navigationReducer)
 local respawn = require(script.respawn)
 local invites = require(script.invites)
@@ -21,140 +26,111 @@ local report = require(script.report)
 local friends = require(script.friends)
 local displayOptions = require(script.displayOptions)
 local nativeClosePrompt = require(script.nativeClosePrompt)
-local voiceState = require(scriptParent.Parent.VoiceChat.Reducers.voiceState)
-local Constants = require(scriptParent.Resources.Constants)
-local Controls = require(scriptParent.Resources.Controls)
-local t1 = {
-	[SetMenuOpen.name] = function(p1, p2) -- line: 36
-		-- upvalues: Cryo (copy)
-		local v31 = nil
+local voiceState = require(parent.Parent.VoiceChat.Reducers.voiceState)
+
+local Constants = require(parent.Resources.Constants)
+local Controls = require(parent.Resources.Controls)
+
+local v = {
+	[SetMenuOpen.name] = function(p, p2)
+		local isMainPageMoreMenuOpen
 
 		if not p2.isMenuOpen then
-			v31 = false
+			isMainPageMoreMenuOpen = false
 		end
 
-		return Cryo.Dictionary.join(p1, {
+		return Cryo.Dictionary.join(p, {
 			isMenuOpen = p2.isMenuOpen,
-			isMainPageMoreMenuOpen = v31,
-			currentZone = if p1.isMenuOpen == p2.isMenuOpen then nil else 1
+			isMainPageMoreMenuOpen = isMainPageMoreMenuOpen,
+			currentZone = p.isMenuOpen ~= p2.isMenuOpen and 1 or nil
 		})
 	end,
-	[SetMainPageMoreMenuOpen.name] = function(p3, p4) -- line: 49
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p3, {
-			isMainPageMoreMenuOpen = p4.isMainPageMoreMenuOpen
-		})
+	[SetMainPageMoreMenuOpen.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { isMainPageMoreMenuOpen = p2.isMainPageMoreMenuOpen })
 	end,
-	[StartLeavingGame.name] = function(p5, _) -- line: 54
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p5, {
-			leavingGame = true
-		})
+	[StartLeavingGame.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { leavingGame = true })
 	end,
-	[CancelLeavingGame.name] = function(p7, _) -- line: 59
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p7, {
-			leavingGame = false
-		})
+	[CancelLeavingGame.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { leavingGame = false })
 	end,
-	[SetCurrentPage.name] = function(p9, p10) -- line: 64
-		-- upvalues: Cryo (copy), Constants (copy)
-		return Cryo.Dictionary.join(p9, {
+	[SetCurrentPage.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, {
+			menuPage = p2.newPage,
 			isMainPageMoreMenuOpen = false,
-			menuPage = p10.newPage,
-			currentZone = p10.newPage ~= Constants.InitalPageKey and 1 or 0
+			currentZone = p2.newPage == Constants.InitalPageKey and 0 or 1
 		})
 	end,
-	[SetControlLayout.name] = function(p11, p12) -- line: 72
-		-- upvalues: Cryo (copy)
-		local controlLayout = p12.controlLayout
+	[SetControlLayout.name] = function(p, p2)
+		local controlLayout = p2.controlLayout
 
-		return Cryo.Dictionary.join(p11, {
-			controlLayout = controlLayout
-		})
+		return Cryo.Dictionary.join(p, { controlLayout = controlLayout })
 	end,
-	[SetScreenSize.name] = function(p13, p14) -- line: 79
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p13, {
-			screenSize = p14.newScreenSize
-		})
+	[SetScreenSize.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { screenSize = p2.newScreenSize })
 	end,
-	[SetRespawning.name] = function(p15, p16) -- line: 84
-		-- upvalues: Cryo (copy)
-		local v47 = not p16.respawning and p15.isMainPageMoreMenuOpen
+	[SetRespawning.name] = function(p, p2)
+		local isMainPageMoreMenuOpen = not p2.respawning and p.isMainPageMoreMenuOpen
 
-		return Cryo.Dictionary.join(p15, {
-			isMainPageMoreMenuOpen = v47
+		return Cryo.Dictionary.join(p, { isMainPageMoreMenuOpen = isMainPageMoreMenuOpen })
+	end,
+	[SetCurrentZone.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { currentZone = p2.zone })
+	end,
+	[SetControllerBarHeight.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { controllerBarHeight = p2.controllerBarHeight })
+	end,
+	[IncrementControllerBar.name] = function(p, _)
+		return Cryo.Dictionary.join(p, {
+			controllerBarCount = p.controllerBarCount + 1
 		})
 	end,
-	[SetCurrentZone.name] = function(p17, p18) -- line: 96
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p17, {
-			currentZone = p18.zone
-		})
-	end,
-	[SetControllerBarHeight.name] = function(p19, p20) -- line: 101
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p19, {
-			controllerBarHeight = p20.controllerBarHeight
-		})
-	end,
-	[IncrementControllerBar.name] = function(p21, _) -- line: 106
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p21, {
-			controllerBarCount = p21.controllerBarCount + 1
-		})
-	end,
-	[DecrementControllerBar.name] = function(p23, _) -- line: 111
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(p23, {
-			controllerBarCount = p23.controllerBarCount - 1
+	[DecrementControllerBar.name] = function(p, _)
+		return Cryo.Dictionary.join(p, {
+			controllerBarCount = p.controllerBarCount - 1
 		})
 	end
 }
 
-local function reducer(p25, p26) -- line: 118
-	-- upvalues: Controls (copy), Constants (copy), invites (copy), respawn (copy), gameInfo (copy), friends (copy), displayOptions (copy), nativeClosePrompt (copy), t1 (copy), navigationReducer (copy), voiceState (copy), report (copy)
-	if p25 == nil then
-		p25 = {
-			isMenuOpen = false,
-			leavingGame = false,
-			currentZone = nil,
-			voiceState = nil,
-			recording = false,
-			isMainPageMoreMenuOpen = false,
-			controllerBarHeight = 0,
-			controllerBarCount = 0,
-			controlLayout = Controls.ControlLayouts.KEYBOARD,
-			menuPage = Constants.defaultPageKey,
-			invites = invites(nil, p26),
-			respawn = respawn(nil, p26),
-			gameInfo = gameInfo(nil, p26),
-			friends = friends(nil, p26),
-			displayOptions = displayOptions(nil, p26),
-			screenSize = Vector2.new(0, 0),
-			nativeClosePrompt = nativeClosePrompt(nil, p26)
-		}
+local function reducer(p, p2)
+	local v2 = p == nil and {
+		controlLayout = Controls.ControlLayouts.KEYBOARD,
+		isMenuOpen = false,
+		leavingGame = false,
+		currentZone = nil,
+		menuPage = Constants.defaultPageKey,
+		voiceState = nil,
+		invites = invites(nil, p2),
+		respawn = respawn(nil, p2),
+		gameInfo = gameInfo(nil, p2),
+		friends = friends(nil, p2),
+		displayOptions = displayOptions(nil, p2),
+		screenSize = Vector2.new(0, 0),
+		recording = false,
+		isMainPageMoreMenuOpen = false,
+		nativeClosePrompt = nativeClosePrompt(nil, p2),
+		controllerBarHeight = 0,
+		controllerBarCount = 0
+	} or p
+
+	local v3 = v[p2.type]
+
+	if v3 ~= nil then
+		v2 = v3(v2, p2)
 	end
 
-	local v58 = t1[p26.type]
+	local v4 = navigationReducer(v2, p2)
 
-	if v58 ~= nil then
-		p25 = v58(p25, p26)
-	end
+	v4.respawn = respawn(v4.respawn, p2)
+	v4.invites = invites(v4.invites, p2)
+	v4.voiceState = voiceState(v4.voiceState, p2)
+	v4.gameInfo = gameInfo(v4.gameInfo, p2)
+	v4.report = report(v4.report, p2)
+	v4.friends = friends(v4.friends, p2)
+	v4.displayOptions = displayOptions(v4.displayOptions, p2)
+	v4.nativeClosePrompt = nativeClosePrompt(v4.nativeClosePrompt, p2)
 
-	local v59 = navigationReducer(p25, p26)
-
-	v59.respawn = respawn(v59.respawn, p26)
-	v59.invites = invites(v59.invites, p26)
-	v59.voiceState = voiceState(v59.voiceState, p26)
-	v59.gameInfo = gameInfo(v59.gameInfo, p26)
-	v59.report = report(v59.report, p26)
-	v59.friends = friends(v59.friends, p26)
-	v59.displayOptions = displayOptions(v59.displayOptions, p26)
-	v59.nativeClosePrompt = nativeClosePrompt(v59.nativeClosePrompt, p26)
-
-	return v59
+	return v4
 end
 
 return reducer

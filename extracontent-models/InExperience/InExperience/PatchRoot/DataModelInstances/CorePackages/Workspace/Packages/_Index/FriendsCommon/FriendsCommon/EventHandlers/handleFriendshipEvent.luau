@@ -1,40 +1,38 @@
-local Parent = script:FindFirstAncestor("FriendsCommon").Parent
-local ApolloFriends = require(Parent.ApolloFriends)
-local FFlagFriendSortedByPresenceSignalsImplementation = require(Parent.SharedFlags).FFlagFriendSortedByPresenceSignalsImplementation
-local DataHydration = require(Parent.DataHydration)
-local v5 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else DataHydration.Friends.FriendsStore.get()
+local parent = script:FindFirstAncestor("FriendsCommon").Parent
 
-local function handleFriendshipEvent(t1: {[any]: any}) -- line: 21
-	-- upvalues: FFlagFriendSortedByPresenceSignalsImplementation (copy), v5 (copy), ApolloFriends (copy)
-	if t1.friendshipUpdate.removedUserId then
-		if FFlagFriendSortedByPresenceSignalsImplementation then
-			v5.UpdateIsFriendsWith(t1.friendshipUpdate.removedUserId, false)
+local ApolloFriends = require(parent.ApolloFriends)
 
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFriendSortedByPresenceSignalsImplementation = SharedFlags.FFlagFriendSortedByPresenceSignalsImplementation
+
+local DataHydration = require(parent.DataHydration)
+local v = DataHydration.Friends.FriendsStore.get()
+
+local function handleFriendshipEvent(data)
+	if data.friendshipUpdate.removedUserId then
+		if not FFlagFriendSortedByPresenceSignalsImplementation then
+			ApolloFriends.Cache.removeFriendFromCache(data.apolloClient, {
+				targetUserId = data.localUserId,
+				userId = data.friendshipUpdate.removedUserId
+			})
 			return
 		end
 
-		ApolloFriends.Cache.removeFriendFromCache(t1.apolloClient, {
-			targetUserId = t1.localUserId,
-			userId = t1.friendshipUpdate.removedUserId
-		})
-
-		return
-	end
-
-	if t1.friendshipUpdate.addedUserId then
+		v.UpdateIsFriendsWith(data.friendshipUpdate.removedUserId, false)
+		v.UpdateFriendshipStatus(data.friendshipUpdate.removedUserId, Enum.FriendStatus.NotFriend)
+	elseif data.friendshipUpdate.addedUserId then
 		if FFlagFriendSortedByPresenceSignalsImplementation then
-			v5.RefetchOnlineFriends()
-			v5.UpdateIsFriendsWith(t1.friendshipUpdate.addedUserId, true)
-
-			return
+			v.RefetchOnlineFriends()
+			v.UpdateIsFriendsWith(data.friendshipUpdate.addedUserId, true)
+			v.UpdateFriendshipStatus(data.friendshipUpdate.addedUserId, Enum.FriendStatus.Friend)
+		else
+			data.onlineFriendsRef:refetch()
+			ApolloFriends.Cache.addFriendToFriendsByUserIdCache(data.apolloClient, {
+				targetUserId = data.localUserId,
+				userId = data.friendshipUpdate.addedUserId,
+				hasVerifiedBadge = nil
+			})
 		end
-
-		t1.onlineFriendsRef:refetch()
-		ApolloFriends.Cache.addFriendToFriendsByUserIdCache(t1.apolloClient, {
-			hasVerifiedBadge = nil,
-			targetUserId = t1.localUserId,
-			userId = t1.friendshipUpdate.addedUserId
-		})
 	end
 end
 

@@ -1,14 +1,17 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
 local ContentPosition = require(script.Parent.ContentPosition)
 local validateDetailsPageComponentList = require(script.Parent.validateDetailsPageComponentList)
+
 local getPlatformConfig = require(script.Parent.getPlatformConfig)
 local DetailsPageTitleContent = require(script.Parent.DetailsPageTitleContent)
-local Roact = require(Parent.Roact)
-local t = require(Parent.t)
-local FFlagLuaAppFixEdpRecommendedCarouselHoverZIndex = require(Parent.SharedFlags).FFlagLuaAppFixEdpRecommendedCarouselHoverZIndex
-local v9 = Roact.PureComponent:extend("DetailsPageBody")
 
-v9.validateProps = t.strictInterface({
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+
+local extended = Roact.PureComponent:extend("DetailsPageBody")
+
+extended.validateProps = t.strictInterface({
 	titleText = t.optional(t.string),
 	subTitleText = t.optional(t.string),
 	renderInfoContent = t.optional(t.callback),
@@ -21,40 +24,32 @@ v9.validateProps = t.strictInterface({
 	deviceType = t.optional(t.string),
 	bottomPadding = t.optional(t.number)
 })
-v9.defaultProps = {
-	bodyClipsDescendants = true,
-	showPageDetails = false
-}
 
-function v9.init(p1) -- line: 51
-	-- upvalues: Roact (copy)
-	p1.state = {
-		containerWidth = nil
-	}
-	p1.containerFrameRef = Roact.createRef()
-	p1.mounted = false
+extended.defaultProps = { bodyClipsDescendants = true, showPageDetails = false }
 
-	function p1.onContainerSizeChange(p2) -- line: 57
-		-- upvalues: p1 (copy)
-		if not p1.mounted then
+function extended:init()
+	self.state = { containerWidth = nil }
+	self.containerFrameRef = Roact.createRef()
+
+	self.mounted = false
+
+	function self.onContainerSizeChange(p)
+		if not self.mounted then
 			return
 		end
 
-		p1:setState(function(p3, _) -- line: 62
-			-- upvalues: p2 (copy)
-			if p3.containerWidth ~= p2.AbsoluteSize.x then
-				return {
-					containerWidth = p2.AbsoluteSize.x
-				}
+		self:setState(function(p2, _)
+			if p2.containerWidth == p.AbsoluteSize.x then
+				return nil
 			end
 
-			return nil
+			return { containerWidth = p.AbsoluteSize.x }
 		end)
 	end
 end
-function v9.renderSinglePanel(p5) -- line: 73
-	-- upvalues: Roact (copy), FFlagLuaAppFixEdpRecommendedCarouselHoverZIndex (copy)
-	local t1 = {
+
+function extended:renderSinglePanel()
+	local children = {
 		Layout = Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical,
@@ -62,47 +57,44 @@ function v9.renderSinglePanel(p5) -- line: 73
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			Padding = UDim.new(0, 24)
 		}),
-		UISizeConstraint = if not p5.props.maxContentWidth then nil else Roact.createElement("UISizeConstraint", {
-			MaxSize = Vector2.new(p5.props.maxContentWidth, 1e999)
-		})
+		UISizeConstraint = 0
 	}
+	local uiSizeConstraint
 
-	for k, v in pairs(p5.props.componentList) do
-		t1[k .. "Container"] = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
+	if self.props.maxContentWidth then
+		uiSizeConstraint = Roact.createElement("UISizeConstraint", {
+			MaxSize = Vector2.new(self.props.maxContentWidth, 1e999)
+		})
+	end
+
+	children.UISizeConstraint = uiSizeConstraint
+
+	for k, component in pairs(self.props.componentList) do
+		children[k .. "Container"] = Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = v.portraitLayoutOrder,
-			ZIndex = if not FFlagLuaAppFixEdpRecommendedCarouselHoverZIndex then nil else v.portraitZIndex
-		}, {
-			[k] = v.renderComponent()
-		})
+			BackgroundTransparency = 1,
+			LayoutOrder = component.portraitLayoutOrder,
+			ZIndex = component.portraitZIndex
+		}, { [k] = component.renderComponent() })
 	end
 
 	return {
 		Panel = Roact.createElement("Frame", {
-			ClipsDescendants = false,
-			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.fromScale(0.5, 0),
 			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, t1)
+			ClipsDescendants = false,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1
+		}, children)
 	}
 end
-function v9.renderDualPanel(p6) -- line: 113
-	-- upvalues: Roact (copy), ContentPosition (copy)
-	local v16 = not (p6.state.containerWidth < 1920) and 96 or 48
-	local t2 = {
-		Layout = Roact.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Vertical,
-			VerticalAlignment = Enum.VerticalAlignment.Top,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			Padding = UDim.new(0, 24)
-		})
-	}
-	local t3 = {
+
+function extended:renderDualPanel()
+	local v = self.state.containerWidth < 1920 and 48 or 96
+
+	local v2 = {
 		Layout = Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical,
@@ -112,37 +104,52 @@ function v9.renderDualPanel(p6) -- line: 113
 		})
 	}
 
-	for k, v in pairs(p6.props.componentList) do
-		local v21 = t2
+	local v3 = {
+		Layout = Roact.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			Padding = UDim.new(0, 24)
+		})
+	}
 
-		if v.landscapePosition == ContentPosition.Right then
-			v21 = t3
+	for k, component in pairs(self.props.componentList) do
+		local children
+
+		if component.landscapePosition == ContentPosition.Right then
+			children = v3
+		else
+			children = v2
 		end
 
-		v21[k .. "Container"] = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = v.landscapeLayoutOrder
-		}, {
-			[k] = v.renderComponent()
-		})
+		children[k .. "Container"] = Roact.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				LayoutOrder = component.landscapeLayoutOrder
+			},
+			{ [k] = component.renderComponent() }
+		)
 	end
 
-	local v22 = Roact.createElement("Frame", {
+	local element = Roact.createElement("Frame", {
+		Size = UDim2.new(0.5, -v / 2, 0, 0),
 		ClipsDescendants = true,
 		BackgroundTransparency = 1,
-		LayoutOrder = 1,
-		Size = UDim2.new(0.5, -v16 / 2, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, t2)
-	local v23 = Roact.createElement("Frame", {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = 1
+	}, v2)
+
+	local element2 = Roact.createElement("Frame", {
+		Size = UDim2.new(0.5, -v / 2, 0, 0),
 		ClipsDescendants = false,
 		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Size = UDim2.new(0.5, -v16 / 2, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, t3)
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = 2
+	}, v3)
 
 	return {
 		Layout = Roact.createElement("UIListLayout", {
@@ -150,37 +157,44 @@ function v9.renderDualPanel(p6) -- line: 113
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			Padding = UDim.new(0, v16)
+			Padding = UDim.new(0, v)
 		}),
-		LeftPanel = v22,
-		RightPanel = v23
+		LeftPanel = element,
+		RightPanel = element2
 	}
 end
-function v9.renderBodyContent(p7) -- line: 180
-	local v25 = p7.props.dualPanelBreakpoint or 1280
 
-	if p7.state.containerWidth and p7.props.componentList then
-		if v25 > p7.state.containerWidth then
-			return p7:renderSinglePanel()
+function extended:renderBodyContent()
+	local dualPanelBreakpoint = self.props.dualPanelBreakpoint or 1280
+
+	if self.state.containerWidth and self.props.componentList then
+		if self.state.containerWidth < dualPanelBreakpoint then
+			return self:renderSinglePanel()
 		end
 
-		return p7:renderDualPanel()
+		return self:renderDualPanel()
 	end
 
 	return {}
 end
-function v9.render(p8) -- line: 193
-	-- upvalues: getPlatformConfig (copy), Roact (copy), DetailsPageTitleContent (copy)
-	local v27 = getPlatformConfig(p8.props.deviceType)
-	local v28 = if not p8.props.sideMargin then v27.sideMargin else p8.props.sideMargin
+
+function extended:render()
+	local platformConfig = getPlatformConfig(self.props.deviceType)
+	local sideMargin
+
+	if self.props.sideMargin then
+		sideMargin = self.props.sideMargin
+	else
+		sideMargin = platformConfig.sideMargin
+	end
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0),
 		BackgroundTransparency = 1,
-		ClipsDescendants = p8.props.bodyClipsDescendants,
+		ClipsDescendants = self.props.bodyClipsDescendants,
 		AutomaticSize = Enum.AutomaticSize.Y,
-		[Roact.Ref] = p8.containerFrameRef,
-		[Roact.Change.AbsoluteSize] = p8.onContainerSizeChange
+		[Roact.Ref] = self.containerFrameRef,
+		[Roact.Change.AbsoluteSize] = self.onContainerSizeChange
 	}, {
 		Layout = Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -189,43 +203,49 @@ function v9.render(p8) -- line: 193
 			HorizontalAlignment = Enum.HorizontalAlignment.Left
 		}),
 		UIPadding = Roact.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, v28),
-			PaddingRight = UDim.new(0, v28)
+			PaddingLeft = UDim.new(0, sideMargin),
+			PaddingRight = UDim.new(0, sideMargin)
 		}),
-		TitleInfo = p8.props.showPageDetails and Roact.createElement(DetailsPageTitleContent, {
-			layoutOrder = 1,
-			titleText = p8.props.titleText,
-			subTitleText = p8.props.subTitleText,
-			renderInfoContent = p8.props.renderInfoContent,
-			verticalAlignment = Enum.VerticalAlignment.Top
+		TitleInfo = self.props.showPageDetails and Roact.createElement(DetailsPageTitleContent, {
+			titleText = self.props.titleText,
+			subTitleText = self.props.subTitleText,
+			renderInfoContent = self.props.renderInfoContent,
+			verticalAlignment = Enum.VerticalAlignment.Top,
+			layoutOrder = 1
 		} or nil),
 		Padding = Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, not self.props.showPageDetails and 24 or sideMargin),
 			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, if p8.props.showPageDetails then v28 else 24)
+			LayoutOrder = 2
 		}),
-		ContentFrame = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 3,
-			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, p8:renderBodyContent()),
+		ContentFrame = Roact.createElement(
+			"Frame",
+			{
+				Size = UDim2.fromScale(1, 0),
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = 3
+			},
+			self:renderBodyContent()
+		),
 		BottomPadding = Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, self.props.bottomPadding or 3 * sideMargin),
 			BackgroundTransparency = 1,
-			LayoutOrder = 4,
-			Size = UDim2.new(1, 0, 0, p8.props.bottomPadding or 3 * v28)
+			LayoutOrder = 4
 		})
 	})
 end
-function v9.didMount(p9) -- line: 243
-	p9.mounted = true
 
-	if p9.containerFrameRef.current then
-		p9.onContainerSizeChange(p9.containerFrameRef.current)
+function extended:didMount()
+	self.mounted = true
+
+	if self.containerFrameRef.current then
+		self.onContainerSizeChange(self.containerFrameRef.current)
 	end
 end
-function v9.willUnmount(p10) -- line: 251
-	p10.mounted = false
+
+function extended:willUnmount()
+	self.mounted = false
 end
 
-return v9
+return extended

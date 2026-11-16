@@ -1,24 +1,19 @@
-local Parent = script:FindFirstAncestor("Responsive").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Responsive").Parent
+local React = require(parent.React)
 local HardwareSafeAreaInsets = require(script.Parent.Parent.HardwareSafeAreaInsets)
 
-return function() -- line: 6
-	-- upvalues: React (copy), HardwareSafeAreaInsets (copy)
-	local v4, v5 = React.useState(HardwareSafeAreaInsets.deviceInsets())
+return function()
+	local state, setState = React.useState(HardwareSafeAreaInsets.deviceInsets())
+	React.useLayoutEffect(function()
+		local connection = HardwareSafeAreaInsets:connect(setState)
 
-	React.useLayoutEffect(function() -- line: 8
-		-- upvalues: HardwareSafeAreaInsets (copy), v5 (copy), v4 (copy)
-		local v6 = HardwareSafeAreaInsets:connect(v5)
-
-		if HardwareSafeAreaInsets.diffInsets(v4, HardwareSafeAreaInsets.deviceInsets()) then
-			v5(HardwareSafeAreaInsets.deviceInsets)
+		if HardwareSafeAreaInsets.diffInsets(state, HardwareSafeAreaInsets.deviceInsets()) then
+			setState(HardwareSafeAreaInsets.deviceInsets)
 		end
 
-		return function() -- line: 13
-			-- upvalues: v6 (copy)
-			v6:disconnect()
+		return function()
+			connection:disconnect()
 		end
 	end, {})
-
-	return v4
+	return state
 end

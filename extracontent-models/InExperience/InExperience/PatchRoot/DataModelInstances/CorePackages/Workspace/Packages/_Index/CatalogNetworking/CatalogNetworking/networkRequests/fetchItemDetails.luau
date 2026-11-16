@@ -1,20 +1,16 @@
 local HttpService = game:GetService("HttpService")
+
 local CatalogNetworking = script:FindFirstAncestor("CatalogNetworking")
+
 local CATALOG_URL = require(CatalogNetworking.CATALOG_URL)
 
-local function fetchItemDetails(p1, t1: {[any]: any}) -- line: 7
-	-- upvalues: HttpService (copy), CATALOG_URL (copy)
-	local json = HttpService:JSONEncode({
-		items = t1
-	})
+local function fetchItemDetails(callback, items)
+	local jsonEncode = HttpService:JSONEncode({ items = items })
 
-	return p1(`{ CATALOG_URL }/v1/catalog/items/details`, "POST", {
-		postBody = json
-	}):andThen(function(p2) -- line: 12
-		return p2.responseBody
-	end):catch(function(p3) -- line: 15
-		warn("[CatalogNetworking] fetchItemDetails failed:", (tostring(p3)))
-
+	return callback(`{CATALOG_URL}/v1/catalog/items/details`, "POST", { postBody = jsonEncode }):andThen(function(p)
+		return p.responseBody
+	end):catch(function(p): nil
+		warn("[CatalogNetworking] fetchItemDetails failed:", (tostring(p)))
 		return nil
 	end)
 end

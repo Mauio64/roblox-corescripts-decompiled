@@ -1,68 +1,82 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
 
+local React = require(parent.React)
+
+local Flags = require(Foundation.Utility.Flags)
 require(Foundation.Utility.Plugin.StudioUri)
-
 local usePlugin = require(Foundation.Providers.Plugin.usePlugin)
+local useWidgetsContext = require(Foundation.Providers.StudioWidgets.useWidgetsContext)
+
 local PanelsContext = require(script.Parent.PanelsContext)
 local PopoverManager = require(script.Parent.Managers.PopoverManager)
 
 require(script.Parent.Types)
 
-local function PanelsProvider(t1: {[any]: any}) -- line: 26
-	-- upvalues: usePlugin (copy), React (copy), PopoverManager (copy), PanelsContext (copy)
-	local v9 = usePlugin()
+local function PanelsProvider(p)
+	local v = usePlugin()
 
-	if v9 == nil then
+	if v == nil then
 		error("PanelsProvider must be used within a plugin context")
 	end
 
-	local v10 = React.useMemo(function() -- line: 32
-		-- upvalues: PopoverManager (copy), v9 (copy), t1 (copy)
-		return PopoverManager.new(v9, t1.uriScope)
-	end, {
-		v9,
-		t1.uriScope
-	})
+	local v2
 
-	React.useEffect(function() -- line: 36
-		-- upvalues: v10 (copy)
-		local thread = task.spawn(function() -- line: 37
-			-- upvalues: v10 (copy)
-			v10:prewarmPoolAsync(2)
+	if Flags.FoundationPopoverPluginAnchorRefresh then
+		v2 = useWidgetsContext()
+	else
+		v2 = nil
+	end
+
+	local v3 = React.useMemo(function()
+		return PopoverManager.new(v, p.uriScope)
+	end, { v, p.uriScope })
+
+	React.useEffect(function()
+		local thread = task.spawn(function()
+			v3:prewarmPoolAsync(2)
 		end)
 
-		return function() -- line: 41
-			-- upvalues: thread (copy), v10 (copy)
+		return function()
 			if thread then
 				task.cancel(thread)
 			end
 
-			v10:destroy()
+			v3:destroy()
 		end
-	end, { v10 })
+	end, { v3 })
 
-	local t2 = {
-		registerPopoverAsync = React.useCallback(function(p1, p2, p3: ((...any) -> ...any), n1: number?, s1: string?) -- line: 51
-			-- upvalues: v10 (copy)
-			local v18 = v10:openAtAsync({
-				targetWidgetUri = p1,
-				targetAnchorPoint = p2.targetAnchorPoint,
-				subjectAnchorPoint = p2.subjectAnchorPoint,
-				offset = p2.offset
-			}, p3, n1, s1)
-
-			return v18, function() -- line: 65
-				-- upvalues: v18 (copy)
-				v18.close()
+	local registerPopoverAsync = React.useCallback(
+		function(targetWidgetUri, data, callback, p2: number?, p3: string?, flag: boolean?)
+			if Flags.FoundationPopoverPluginAnchorRefresh then
+				v2.refreshAsync(targetWidgetUri)
 			end
-		end, { v10 })
-	}
 
-	return React.createElement(PanelsContext.Provider, {
-		value = t2
-	}, t1.children)
+			local v4 = {
+				targetWidgetUri = targetWidgetUri,
+				targetAnchorPoint = data.targetAnchorPoint,
+				subjectAnchorPoint = data.subjectAnchorPoint,
+				offset = data.offset
+			}
+
+			if not Flags.FoundationPopoverPluginFocusable then
+				flag = nil
+			end
+
+			local v5 = v3:openAtAsync(v4, callback, p2, p3, flag)
+
+			return v5, function()
+				v5.close()
+			end
+		end,
+		{ v3, v2 }
+	)
+
+	local v4 = React.useMemo(function()
+		return { registerPopoverAsync = registerPopoverAsync }
+	end, { registerPopoverAsync })
+
+	return React.createElement(PanelsContext.Provider, { value = v4 }, p.children)
 end
 
 return PanelsProvider

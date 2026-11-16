@@ -1,3 +1,4 @@
 require(script.DictationMode)
+local useDictation = require(script.useDictation)
 
-return (require(script.useDictation))
+return useDictation

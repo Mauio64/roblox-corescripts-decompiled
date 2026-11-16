@@ -1,28 +1,27 @@
-local function insert(p1, p2, ...) -- line: 2
-	local v4 = type(p1)
+local function insert(list, p, ...)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+	local count = #list
+	local v = p >= 1 and p <= count + 1
+	assert(v, "index must be in bounds of list")
 
-	local v5 = #p1
+	local result = {}
+	local v2 = 1
 
-	assert(p2 >= 1 and p2 <= v5 + 1, "index must be in bounds of list")
-
-	local t1 = {}
-	local n1 = 1
-
-	for i = 1, v5 do
-		if i == p2 then
+	for i = 1, count do
+		if i == p then
 			for j = 1, select("#", ...) do
-				t1[n1] = select(j, ...)
-				n1 += 1
+				result[v2] = select(j, ...)
+				v2 += 1
 			end
 		end
 
-		t1[n1] = p1[i]
-		n1 += 1
+		result[v2] = list[i]
+		v2 += 1
 	end
 
-	return t1
+	return result
 end
 
 return insert

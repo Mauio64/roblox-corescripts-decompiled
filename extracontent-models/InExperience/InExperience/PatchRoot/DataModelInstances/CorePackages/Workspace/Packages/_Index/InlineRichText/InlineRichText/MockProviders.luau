@@ -1,74 +1,70 @@
-local Parent = script:FindFirstAncestor("InlineRichText").Parent
-local React = require(Parent.React)
-local ProviderContainer = require(Parent.RoactUtils).Components.ProviderContainer
-local Style = require(Parent.Style)
+local parent = script:FindFirstAncestor("InlineRichText").Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local ProviderContainer = RoactUtils.Components.ProviderContainer
+local Style = require(parent.Style)
 local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
-local FoundationProvider = require(Parent.Foundation).FoundationProvider
-local Cryo = require(Parent.Cryo)
-local Rodux = require(Parent.Rodux)
-local RoactRodux = require(Parent.RoactRodux)
-local LocalizationProvider = require(Parent.Localization).LocalizationProvider
-local NavigationRodux = require(Parent.NavigationRodux)
-local t1 = {
-	withUiModeSupport = false
-}
+local Foundation = require(parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+local Cryo = require(parent.Cryo)
+local Rodux = require(parent.Rodux)
+local RoactRodux = require(parent.RoactRodux)
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local NavigationRodux = require(parent.NavigationRodux)
 
-local function MockProviders(t2: {[any]: any}) -- line: 31
-	-- upvalues: Cryo (copy), t1 (copy), FoundationProvider (copy), RoactRodux (copy), Rodux (copy), NavigationRodux (copy), StyleProviderWithDefaultTheme (copy), Style (copy), LocalizationProvider (copy), React (copy), ProviderContainer (copy)
-	local v15 = Cryo.Dictionary.union(t1, t2)
-	local t3 = {}
+local v = { withUiModeSupport = false }
 
-	table.insert(t3, {
+local function MockProviders(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local providers = {}
+
+	table.insert(providers, {
 		class = FoundationProvider,
-		props = {
-			device = "Desktop",
-			theme = v15.themeName
-		}
+		props = { device = "Desktop", theme = union.themeName }
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = RoactRodux.StoreProvider,
 		props = {
-			store = Rodux.Store.new(function(p1, _) -- line: 47
-				return p1
+			store = Rodux.Store.new(function(p2, _)
+				return p2
 			end, {
-				Navigation = {
-					lockNavigationActions = false
-				}
+				Navigation = { lockNavigationActions = false }
 			}, {
 				Rodux.thunkMiddleware,
-				NavigationRodux.Thunks.RNAdapterThunk.middleware(function(p3) -- line: 55
-					print(`[Mock Providers Debug] Navigating to { p3.routeName } with detail { p3.params.detail }`)
+				NavigationRodux.Thunks.RNAdapterThunk.middleware(function(p2)
+					print(`[Mock Providers Debug] Navigating to {p2.routeName} with detail {p2.params.detail}`)
 				end)
 			})
 		}
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = StyleProviderWithDefaultTheme,
 		props = {
-			withDarkTheme = v15.themeName ~= "Light",
-			withUiModeSupport = v15.withUiModeSupport
+			withDarkTheme = union.themeName ~= "Light",
+			withUiModeSupport = union.withUiModeSupport
 		}
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = Style.DesignTokenProvider,
-		props = {
-			tokenMappers = {}
-		}
+		props = { tokenMappers = {} }
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = LocalizationProvider,
 		props = {
 			localization = {
-				Format = function(_, s1: string) -- line: 81
-					return s1
+				Format = function(_, p2: string)
+					return p2
 				end
 			}
 		}
 	})
 
-	return React.createElement(ProviderContainer, {
-		providers = t3
-	}, v15.children)
+	return React.createElement(ProviderContainer, { providers = providers }, union.children)
 end
 
 return MockProviders

@@ -1,251 +1,302 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Foundation = require(AppChatParent.Foundation)
-local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
-local InputHandlers = require(AppChatParent.InputHandlers)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
 
-require(AppChatParent.ReactFocusNavigation)
+local Foundation = require(parent.Foundation)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local InputHandlers = require(parent.InputHandlers)
+local React = require(parent.React)
+require(parent.ReactFocusNavigation)
+local SharedFlags = require(parent.SharedFlags)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-local SharedFlags = require(AppChatParent.SharedFlags)
-local SquadExternalContractProvider = require(AppChatParent.SquadsCore.SquadExternalContractProvider)
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
 local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
 local ConversationActionType = require(AppChat.Analytics.Enums.ConversationActionType)
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
+
 local ChatConversationTelemetryEvents = require(script.Parent.ChatConversationTelemetryEvents)
-local leaveSquad = require(AppChatParent.SquadsCore.Thunks).leaveSquad
-local SquadPromptType = require(AppChatParent.SquadsCore.Enums).SquadPromptType
-local useCurrentSquadId = require(AppChatParent.SquadsCore.Hooks).useCurrentSquadId
-local useCurrentSquadParentChannelId = require(AppChatParent.SquadsCore.Hooks).useCurrentSquadParentChannelId
+
+local Thunks = require(parent.SquadsCore.Thunks)
+local leaveSquad = Thunks.leaveSquad
+local Enums = require(parent.SquadsCore.Enums)
+local SquadPromptType = Enums.SquadPromptType
+local Hooks = require(parent.SquadsCore.Hooks)
+local useCurrentSquadId = Hooks.useCurrentSquadId
+local Hooks2 = require(parent.SquadsCore.Hooks)
+local useCurrentSquadParentChannelId = Hooks2.useCurrentSquadParentChannelId
 local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
-local EventNames = require(AppChatParent.SquadsCore.EventNames)
-local ScheduledSquadSheet = require(AppChatParent.Squads.ScheduledSquadSheet)
-local ScheduledSquadActionEnum = require(AppChatParent.Squads.Enums).ScheduledSquadActionEnum
-local ScheduledSquadActionSourceEnum = require(AppChatParent.Squads.Enums).ScheduledSquadActionSourceEnum
-local SquadButtonClickIntentionEnum = require(AppChatParent.Squads.Enums).SquadButtonClickIntentionEnum
-local SquadButtonSourceEnum = require(AppChatParent.Squads.Enums).SquadButtonSourceEnum
+local EventNames = require(parent.SquadsCore.EventNames)
+
+local ScheduledSquadSheet = require(parent.Squads.ScheduledSquadSheet)
+local Enums2 = require(parent.Squads.Enums)
+local ScheduledSquadActionEnum = Enums2.ScheduledSquadActionEnum
+local Enums3 = require(parent.Squads.Enums)
+local ScheduledSquadActionSourceEnum = Enums3.ScheduledSquadActionSourceEnum
+local Enums4 = require(parent.Squads.Enums)
+local SquadButtonClickIntentionEnum = Enums4.SquadButtonClickIntentionEnum
+local Enums5 = require(parent.Squads.Enums)
+local SquadButtonSourceEnum = Enums5.SquadButtonSourceEnum
+
 local IconName = Foundation.Enums.IconName
 local Menu = Foundation.Menu
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local PopoverSide = Foundation.Enums.PopoverSide
 local useTokens = Foundation.Hooks.useTokens
+
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local useAppFocusRoot = FocusNavigationUtils.useAppFocusRoot
+
 local FFlagPartyDevAPIToRespectThirdPartySettingsEnabled = SharedFlags.FFlagPartyDevAPIToRespectThirdPartySettingsEnabled
 
-return React.memo(function(t1: {[any]: any}) -- line: 59
-	-- upvalues: useTelemetry (copy), ChatConversationTelemetryLayer (copy), useDispatch (copy), useTokens (copy), useLocalization (copy), useCurrentSquadId (copy), useCurrentSquadParentChannelId (copy), React (copy), SquadExternalContractContext (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), leaveSquad (copy), SquadPromptType (copy), SquadButtonSourceEnum (copy), SquadButtonClickIntentionEnum (copy), ChatConversationTelemetryEvents (copy), ConversationActionType (copy), IconName (copy), Foundation (copy), ScheduledSquadSheet (copy), Menu (copy), PopoverSide (copy), PopoverAlign (copy)
-	local v36 = useTelemetry(ChatConversationTelemetryLayer.Context)
-	local v37 = useDispatch()
-	local v38 = useTokens()
-	local v39 = useLocalization({
+return React.memo(function(props)
+	local v = useTelemetry(ChatConversationTelemetryLayer.Context)
+	local v2 = useDispatch()
+	local v3 = useTokens()
+	local v4 = useLocalization({
 		joinParty = "Feature.Squads.Label.JoinParty",
 		moreText = "CommonUI.Features.Label.More",
 		scheduleAParty = "Feature.Squads.Action.ScheduleAParty",
 		startParty = "Feature.Squads.Label.StartParty",
 		viewParty = "Feature.Squads.Label.ViewParty"
 	})
-	local v40 = useCurrentSquadId()
-	local v41 = useCurrentSquadParentChannelId()
-	local v42 = React.useContext(SquadExternalContractContext)
-	local v43 = not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v42.useIsChatEnabled()
-	local v44, v45 = React.useState(false)
-	local v46, v47 = React.useState(false)
-	local v48, v49 = React.useState(t1.tooltipText and t1.tooltipText ~= "")
-	local v50 = React.useRef(nil)
-	local v51 = React.useMemo(function() -- line: 83
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v47 (copy)
-		return {
-			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(p1) -- line: 86
-					-- upvalues: v47 (copy)
-					p1.cancelled = true
-					v47(false)
-				end)
-			}
+
+	local squadId = useCurrentSquadId()
+	local v5 = useCurrentSquadParentChannelId()
+	local v6 = React.useContext(SquadExternalContractContext)
+
+	local v7 = not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v6.useIsChatEnabled()
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(props.tooltipText and props.tooltipText ~= "")
+
+	local ref = React.useRef(nil)
+
+	local customEventHandlers = React.useMemo(function()
+		local v8 = {}
+		v8[FocusNavigationEventNameEnum.NavigateBack] = {
+			handler = InputHandlers.onRelease(function(p)
+				p.cancelled = true
+				setState2(false)
+			end)
 		}
-	end, { v47 })
-	local v52 = useAppFocusRoot({
+
+		return v8
+	end, { setState2 })
+
+	local v8 = useAppFocusRoot({
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ContextualMenu,
-		isFocusable = v46,
-		customEventHandlers = v51
+		isFocusable = state2,
+		customEventHandlers = customEventHandlers
 	})
-	local v53 = React.useCallback(function(p2) -- line: 101
-		-- upvalues: v50 (copy), v52 (copy)
-		v50.current = p2
 
-		if type(v52) == "function" then
-			v52(p2)
+	local ref3 = React.useCallback(function(current)
+		ref.current = current
+
+		if type(v8) == "function" then
+			v8(current)
 		end
-	end, { v52 })
+	end, { v8 })
 
-	React.useEffect(function() -- line: 108
-		-- upvalues: v50 (copy)
-		if v50 and v50.current then
-			v50.current.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
-			v50.current.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
-			v50.current.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
-			v50.current.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
-			v50.current.SelectionGroup = true
+	React.useEffect(function()
+		if ref and ref.current then
+			ref.current.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
+			ref.current.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
+			ref.current.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+			ref.current.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+			ref.current.SelectionGroup = true
 		end
-	end, { v46 })
+	end, { state2 })
 
-	local v54 = React.useCallback(function() -- line: 119
-		-- upvalues: v47 (copy)
-		v47(false)
+	local onPressedOutside = React.useCallback(function()
+		setState2(false)
 	end, {})
-	local v55 = React.useCallback(function() -- line: 124
-		-- upvalues: v45 (copy), v42 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), t1 (copy), ScheduledSquadActionSourceEnum (copy), v40 (copy)
-		v45(true)
-		v42.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
+
+	local v9 = React.useCallback(function()
+		setState(true)
+
+		v6.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
 			actionType = ScheduledSquadActionEnum.ScheduleParty,
-			conversationId = t1.conversationId,
+			conversationId = props.conversationId,
 			source = ScheduledSquadActionSourceEnum.ChatConversationMoreMenu,
-			squadId = v40,
-			squadLocation = v42.squadLocation
+			squadId = squadId,
+			squadLocation = v6.squadLocation
 		})
 	end, {
-		v42.setSquadPrompt,
-		t1.conversationId,
-		v40,
-		v42.squadLocation,
-		v42.fireSquadAnalytics
+		v6.setSquadPrompt,
+		props.conversationId,
+		squadId,
+		v6.squadLocation,
+		v6.fireSquadAnalytics
 	})
-	local v56 = React.useCallback(function() -- line: 145
-		-- upvalues: v40 (copy), t1 (copy), v41 (copy), v37 (copy), leaveSquad (copy), SquadPromptType (copy), v42 (copy), v43 (copy), EventNames (copy), SquadButtonSourceEnum (copy), SquadButtonClickIntentionEnum (copy)
-		if v40 and t1.conversationId ~= v41 then
-			v37(leaveSquad(SquadPromptType.JoinAnotherSquad, v42.setSquadPrompt, function() -- line: 148
-				-- upvalues: t1 (copy)
-				t1.navigateToSquadLobby(t1.conversationId)
-			end, v42.squadLocation, v43))
+
+	local v10 = React.useCallback(function()
+		if squadId and props.conversationId ~= v5 then
+			v2(leaveSquad(SquadPromptType.JoinAnotherSquad, v6.setSquadPrompt, function()
+				props.navigateToSquadLobby(props.conversationId)
+			end, v6.squadLocation, v7))
 		else
-			t1.navigateToSquadLobby(t1.conversationId)
+			props.navigateToSquadLobby(props.conversationId)
 		end
 
-		v42.fireSquadAnalytics(EventNames.EnterSquadButtonPressed, {
-			conversationId = t1.conversationId,
+		local fireSquadAnalytics = v6.fireSquadAnalytics
+		local enterSquadButtonPressed = EventNames.EnterSquadButtonPressed
+		local v10 = {
+			conversationId = props.conversationId,
 			squadButtonSource = SquadButtonSourceEnum.ChatConversationMoreMenu,
-			squadId = v40,
-			squadLocation = v42.squadLocation,
-			userIntention = if not t1.conversation or (not t1.conversation.hasGroupUp or t1.conversationId ~= v41) then if not t1.conversation or not t1.conversation.hasGroupUp then SquadButtonClickIntentionEnum.Create else SquadButtonClickIntentionEnum.Join else SquadButtonClickIntentionEnum.View
-		})
-	end, {
-		t1.navigateToSquadLobby,
-		t1.conversationId,
-		t1.conversation and t1.conversation.hasGroupUp,
-		v40,
-		v41,
-		v42,
-		v43
-	})
-	local v57 = React.useCallback(function(p3) -- line: 180
-		-- upvalues: v56 (copy), v55 (copy), v47 (copy)
-		if p3 == "createJoinViewParty" then
-			v56()
-		elseif p3 == "scheduleParty" then
-			v55()
+			squadId = squadId,
+			squadLocation = v6.squadLocation,
+			userIntention = 0
+		}
+		local userIntention
+
+		if props.conversation and props.conversation.hasGroupUp and props.conversationId == v5 then
+			userIntention = SquadButtonClickIntentionEnum.View
+		elseif props.conversation and props.conversation.hasGroupUp then
+			userIntention = SquadButtonClickIntentionEnum.Join
+		else
+			userIntention = SquadButtonClickIntentionEnum.Create
 		end
 
-		v47(false)
+		v10.userIntention = userIntention
+		fireSquadAnalytics(enterSquadButtonPressed, v10)
 	end, {
-		v56,
-		v55
+		props.navigateToSquadLobby,
+		props.conversationId,
+		props.conversation and props.conversation.hasGroupUp,
+		squadId,
+		v5,
+		v6,
+		v7
 	})
-	local v58 = React.useCallback(function() -- line: 195
-		-- upvalues: v36 (copy), ChatConversationTelemetryEvents (copy), v46 (copy), ConversationActionType (copy), v47 (copy)
-		v36.emit(ChatConversationTelemetryEvents.ConversationMoreMenuBtnClicked, {
-			action = if not v46 then ConversationActionType.OpenMoreMenu else ConversationActionType.CloseMoreMenu
-		})
-		v47(not v46)
-	end, {
-		v46,
-		v36
-	})
-	local v59 = React.useCallback(function() -- line: 203
-		-- upvalues: v49 (copy)
-		v49(false)
-	end, {})
-	local v60 = React.useMemo(function() -- line: 208
-		-- upvalues: t1 (copy), v41 (copy), v39 (copy), IconName (copy)
-		local t2 = {}
 
-		table.insert(t2, {
+	local onActivated = React.useCallback(function(p)
+		if p == "createJoinViewParty" then
+			v10()
+		elseif p == "scheduleParty" then
+			v9()
+		end
+
+		setState2(false)
+	end, { v10, v9 })
+
+	local onActivated2 = React.useCallback(function()
+		local emit = v.emit
+		local conversationMoreMenuBtnClicked = ChatConversationTelemetryEvents.ConversationMoreMenuBtnClicked
+		local action
+
+		if state2 then
+			action = ConversationActionType.CloseMoreMenu
+		else
+			action = ConversationActionType.OpenMoreMenu
+		end
+
+		emit(conversationMoreMenuBtnClicked, { action = action })
+
+		setState2(not state2)
+	end, { state2, v })
+
+	local onPressedOutside2 = React.useCallback(function()
+		setState3(false)
+	end, {})
+
+	local items = React.useMemo(function()
+		local v11 = {}
+		local text
+
+		if props.conversation and props.conversation.hasGroupUp and props.conversationId == v5 then
+			text = v4.viewParty
+		elseif props.conversation and props.conversation.hasGroupUp then
+			text = v4.joinParty
+		else
+			text = v4.startParty
+		end
+
+		table.insert(v11, {
 			icon = "icons/menu/groups",
 			id = "createJoinViewParty",
 			isDisabled = false,
 			isChecked = false,
-			text = if not t1.conversation or (not t1.conversation.hasGroupUp or t1.conversationId ~= v41) then if not t1.conversation or not t1.conversation.hasGroupUp then v39.startParty else v39.joinParty else v39.viewParty
+			text = text
 		})
-		table.insert(t2, {
+
+		table.insert(v11, {
+			icon = IconName.Calendar,
 			id = "scheduleParty",
 			isDisabled = false,
 			isChecked = false,
-			icon = IconName.Calendar,
-			text = v39.scheduleAParty
+			text = v4.scheduleAParty
 		})
 
-		return t2
-	end, {
-		t1.conversation and t1.conversation.hasGroupUp,
-		t1.conversationId,
-		v41
-	})
-	local v61 = React.useRef(nil)
+		return v11
+	end, { props.conversation and props.conversation.hasGroupUp, props.conversationId, v5 })
 
-	return React.createElement(Foundation.View, {
-		tag = "auto-xy align-y-center"
-	}, {
-		MoreMenuButton = React.createElement(Foundation.IconButton, {
+	local ref2 = React.useRef(nil)
+	local createElement = React.createElement
+	local view = Foundation.View
+
+	local createElement2 = React.createElement
+	local iconButton = Foundation.IconButton
+	local icon = { name = Foundation.Enums.IconName.PlusLarge, variant = 0 }
+	local variant
+
+	if state2 then
+		variant = Foundation.Enums.IconVariant.Filled
+	else
+		variant = Foundation.Enums.IconVariant.Regular
+	end
+
+	icon.variant = variant
+	local variant2
+
+	if state2 then
+		variant2 = Foundation.Enums.ButtonVariant.Standard
+	else
+		variant2 = Foundation.Enums.ButtonVariant.Utility
+	end
+
+	return createElement(view, { tag = "auto-xy align-y-center" }, {
+		MoreMenuButton = createElement2(iconButton, {
+			icon = icon,
+			variant = variant2,
 			isCircular = true,
-			testId = "ChatConversationMoreMenuButton",
-			icon = {
-				name = Foundation.Enums.IconName.PlusLarge,
-				variant = if not v46 then Foundation.Enums.IconVariant.Regular else Foundation.Enums.IconVariant.Filled
-			},
-			variant = if not v46 then Foundation.Enums.ButtonVariant.Utility else Foundation.Enums.ButtonVariant.Standard,
-			LayoutOrder = t1.layoutOrder,
-			onActivated = v58,
+			LayoutOrder = props.layoutOrder,
+			onActivated = onActivated2,
 			size = Foundation.Enums.InputSize.Medium,
-			ref = v61
+			testId = "ChatConversationMoreMenuButton",
+			ref = ref2
 		}),
 		ScheduledSquadSheet = React.createElement(ScheduledSquadSheet, {
-			conversationId = t1.conversationId,
-			isOpen = v44,
-			onClose = function() -- line: 270
-				-- upvalues: v45 (copy)
-				v45(false)
+			conversationId = props.conversationId,
+			isOpen = state,
+			onClose = function()
+				setState(false)
 			end
 		}),
 		Menu = React.createElement(Menu, {
-			anchorRef = v61,
-			items = v60,
-			isOpen = v46,
-			onActivated = v57,
-			onPressedOutside = v54,
-			ref = v53,
+			anchorRef = ref2,
+			items = items,
+			isOpen = state2,
+			onActivated = onActivated,
+			onPressedOutside = onPressedOutside,
+			ref = ref3,
 			side = PopoverSide.Top
 		}),
-		Tooltip = React.createElement(Foundation.Popover.Root, {
-			isOpen = v48
-		}, {
-			Anchor = React.createElement(Foundation.Popover.Anchor, {
-				anchorRef = v61
-			}),
+		Tooltip = React.createElement(Foundation.Popover.Root, { isOpen = state3 }, {
+			Anchor = React.createElement(Foundation.Popover.Anchor, { anchorRef = ref2 }),
 			Content = React.createElement(Foundation.Popover.Content, {
+				align = { position = PopoverAlign.Start, offset = 0 },
+				backgroundStyle = v3.Inverse.Surface.Surface_0,
 				hasArrow = true,
-				align = {
-					offset = 0,
-					position = PopoverAlign.Start
-				},
-				backgroundStyle = v38.Inverse.Surface.Surface_0,
-				onPressedOutside = v59
+				onPressedOutside = onPressedOutside2
 			}, {
 				TooltipText = React.createElement(Foundation.Text, {
-					tag = "auto-xy text-wrap padding-small content-inverse-emphasis text-body-small",
-					Text = t1.tooltipText
+					Text = props.tooltipText,
+					tag = "auto-xy text-wrap padding-small content-inverse-emphasis text-body-small"
 				})
 			})
 		})

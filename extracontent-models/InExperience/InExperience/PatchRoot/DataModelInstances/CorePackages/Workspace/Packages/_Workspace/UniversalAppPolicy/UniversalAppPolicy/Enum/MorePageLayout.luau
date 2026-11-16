@@ -1,5 +1,1 @@
-return {
-	Grid = "Grid",
-	List = "List",
-	Carousel = "Carousel"
-}
+return { Grid = "Grid", List = "List", Carousel = "Carousel" }

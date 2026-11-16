@@ -1,18 +1,19 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
+
 local Components = script.Parent.Parent.Parent.Components
 local DataConsumer = require(Components.DataConsumer)
 local MemoryView = require(Components.Memory.MemoryView)
-local v6 = Roact.Component:extend("ClientMemory")
 
-function v6.render(p1) -- line: 10
-	-- upvalues: Roact (copy), MemoryView (copy)
+local extended = Roact.Component:extend("ClientMemory")
+
+function extended.render(p)
 	return Roact.createElement(MemoryView, {
-		layoutOrder = p1.props.layoutOrder,
-		size = p1.props.size,
-		searchTerm = p1.props.searchTerm,
-		targetMemoryData = p1.props.ClientMemoryData
+		layoutOrder = p.props.layoutOrder,
+		size = p.props.size,
+		searchTerm = p.props.searchTerm,
+		targetMemoryData = p.props.ClientMemoryData
 	})
 end
 
-return DataConsumer(v6, "ClientMemoryData")
+return DataConsumer(extended, "ClientMemoryData")

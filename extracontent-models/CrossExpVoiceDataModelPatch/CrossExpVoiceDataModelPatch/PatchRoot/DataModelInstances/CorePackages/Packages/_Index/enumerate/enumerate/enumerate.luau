@@ -1,111 +1,103 @@
-local function strict(t1: {[any]: any}, s1: string?) -- line: 2
-	local v6 = s1 or tostring(t1)
+local function strict(p, p2: string?)
+	local v = p2 or tostring(p)
 
-	return (setmetatable(t1, {
-		__index = function(_, p2) -- line: 6
-			-- upvalues: v6 (copy)
-			local v27 = ("%q (%s) is not a valid member of %s"):format(tostring(p2), typeof(p2), v6)
+	return (setmetatable(p, {
+		__index = function(_, p3)
+			local formatted = ("%q (%s) is not a valid member of %s"):format(tostring(p3), typeof(p3), v)
 
-			error(v27, 2)
+			error(formatted, 2)
 		end,
-		__newindex = function(_, p4, _) -- line: 12
-			-- upvalues: v6 (copy)
-			local v31 = ("%q (%s) is not a valid member of %s"):format(tostring(p4), typeof(p4), v6)
+		__newindex = function(_, p3, _)
+			local formatted = ("%q (%s) is not a valid member of %s"):format(tostring(p3), typeof(p3), v)
 
-			error(v31, 2)
+			error(formatted, 2)
 		end
 	}))
 end
-local function addEnumValue(p6, p7, p8, p9, p10) -- line: 20
-	-- upvalues: strict (copy)
-	local v12 = typeof(p9) == "string"
 
-	assert(v12, "Only string names are supported for enums!")
+local function addEnumValue(p, p2, value, value2, item)
+	local v = typeof(value2) == "string"
+	assert(v, "Only string names are supported for enums!")
 
-	if v12 then
-		assert(p9 ~= "fromRawValue", "fromRawValue is reserved")
-		assert(p9 ~= "isEnumValue", "isEnumValue is reserved")
-		assert(p9 ~= "allValues", "allValues is reserved")
+	if v then
+		assert(value2 ~= "fromRawValue", "fromRawValue is reserved")
+		assert(value2 ~= "isEnumValue", "isEnumValue is reserved")
+		assert(value2 ~= "allValues", "allValues is reserved")
 	end
 
-	assert(p6[p9] == nil, "Enum value names can only be used once!")
-	assert(p7[p9] == nil, "Enum values can only be used once!")
+	assert(p[value2] == nil, "Enum value names can only be used once!")
+	assert(p2[value2] == nil, "Enum values can only be used once!")
 
-	local v13 = newproxy(true)
-	local mt = getmetatable(v13)
+	local v2 = newproxy(true)
+	local metatable = getmetatable(v2)
 
-	function mt.__tostring() -- line: 34
-		-- upvalues: p8 (copy), p9 (copy)
-		return ("%s.%s"):format(p8, p9)
+	function metatable.__tostring()
+		return ("%s.%s"):format(value, value2)
 	end
 
-	mt.__index = strict({
-		rawValue = function() -- line: 39
-			-- upvalues: p10 (copy)
-			return p10
+	metatable.__index = strict({
+		rawValue = function()
+			return item
 		end
 	})
-	p6[p9] = v13
-	p7[p10] = v13
+
+	p[value2] = v2
+	p2[item] = v2
 end
-local function enumerate(p11, t2: {[any]: any}) -- line: 51
-	-- upvalues: addEnumValue (copy), strict (copy)
-	assert(typeof(p11) == "string", "Bad argument #1 - enums must be created using a string name!")
-	assert(typeof(t2) == "table", "Bad argument #2 - enums must be created using a table!")
 
-	local t3 = {}
-	local t4 = {}
+local function enumerate(value, list)
+	assert(typeof(value) == "string", "Bad argument #1 - enums must be created using a string name!")
+	assert(typeof(list) == "table", "Bad argument #2 - enums must be created using a table!")
 
-	if t2[1] ~= nil then
-		for _, v in ipairs(t2) do
-			addEnumValue(t3, t4, p11, v, v)
+	local v = {}
+	local v2 = {}
+
+	if list[1] == nil then
+		for k, item in pairs(list) do
+			addEnumValue(v, v2, value, k, item)
 		end
 	else
-		for k, v in pairs(t2) do
-			addEnumValue(t3, t4, p11, k, v)
+		for _, item in ipairs(list) do
+			addEnumValue(v, v2, value, item, item)
 		end
 	end
 
-	function t3.fromRawValue(p12) -- line: 69
-		-- upvalues: t4 (copy)
-		return t4[p12]
+	function v.fromRawValue(p)
+		return v2[p]
 	end
-	function t3.isEnumValue(p13) -- line: 73
-		-- upvalues: t3 (copy)
-		if typeof(p13) ~= "userdata" then
+
+	function v.isEnumValue(p): boolean
+		if typeof(p) ~= "userdata" then
 			return false
 		end
 
-		for _, v in pairs(t3) do
-			if v == p13 then
+		for _, v3 in pairs(v) do
+			if v3 == p then
 				return true
 			end
 		end
 
 		return false
 	end
-	function t3.allValues() -- line: 87
-		-- upvalues: t4 (copy)
-		local t5 = {}
 
-		for _, v in pairs(t4) do
-			table.insert(t5, v)
+	function v.allValues()
+		local result = {}
+
+		for _, v3 in pairs(v2) do
+			table.insert(result, v3)
 		end
 
-		return t5
+		return result
 	end
 
-	local v23 = newproxy(true)
-	local mt = getmetatable(v23)
-
-	mt.__index = strict(t3, p11)
-
-	function mt.__tostring() -- line: 100
-		-- upvalues: p11 (copy)
-		return p11
+	local v3 = newproxy(true)
+	local metatable = getmetatable(v3)
+	metatable.__index = strict(v, value)
+	function metatable.__tostring()
+		return value
 	end
 
-	return v23
+	return v3
 end
 
 return enumerate

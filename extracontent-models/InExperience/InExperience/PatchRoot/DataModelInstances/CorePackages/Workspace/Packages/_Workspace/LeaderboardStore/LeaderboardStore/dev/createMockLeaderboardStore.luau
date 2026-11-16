@@ -1,140 +1,109 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Signals = require(ParentParentParent.Signals)
-local createSignalMap = require(ParentParentParent.CoreScriptsRoactCommon).Utilities.createSignalMap
+local parent = script.Parent.Parent
 
-require(ParentParent.LeaderboardStoreTypes)
+local parent2 = parent.Parent
 
-local function createMockLeaderboardStore() -- line: 19
-	-- upvalues: Signals (copy), createSignalMap (copy)
-	return function() -- line: 20
-		-- upvalues: Signals (copy), createSignalMap (copy)
-		Instance.new("Team").Name = "Neutral"
+local Signals = require(parent2.Signals)
 
-		local Team = Instance.new("Team")
+local CoreScriptsRoactCommon = require(parent2.CoreScriptsRoactCommon)
+local createSignalMap = CoreScriptsRoactCommon.Utilities.createSignalMap
 
-		Team.Name = "Team 1"
+require(parent.LeaderboardStoreTypes)
 
-		local Team2 = Instance.new("Team")
+local function createMockLeaderboardStore()
+	return function()
+		local team = Instance.new("Team")
+		team.Name = "Neutral"
+		local team1 = Instance.new("Team")
+		team1.Name = "Team 1"
+		local team2 = Instance.new("Team")
+		team2.Name = "Team 2"
 
-		Team2.Name = "Team 2"
-
-		local t1 = {
+		local player1 = {
 			Name = "player1",
-			Team = Team,
+			Team = team1,
 			UserId = math.random(1, 1234567890),
 			leaderstats = {
-				stat1 = {
-					Value = 100
-				},
-				stat2 = {
-					Value = 200
-				}
+				stat1 = { Value = 100 },
+				stat2 = { Value = 200 }
 			}
 		}
-		local t2 = {
-			order = Signals.createSignal(1),
-			stats = createSignalMap()
-		}
 
-		t2.stats.setData("stat1", Signals.createSignal(t1.leaderstats.stat1.Value), false)
-		t2.stats.setData("stat2", Signals.createSignal(t1.leaderstats.stat2.Value), false)
+		local v = { order = Signals.createSignal(1), stats = createSignalMap() }
 
-		local t3 = {
+		v.stats.setData("stat1", Signals.createSignal(player1.leaderstats.stat1.Value), false)
+		v.stats.setData("stat2", Signals.createSignal(player1.leaderstats.stat2.Value), false)
+
+		local player2 = {
 			Name = "player2",
-			Team = Team,
+			Team = team1,
 			UserId = math.random(1, 1234567890),
 			leaderstats = {
-				stat1 = {
-					Value = 30
-				},
-				stat2 = {
-					Value = 40
-				}
+				stat1 = { Value = 30 },
+				stat2 = { Value = 40 }
 			}
 		}
-		local t4 = {
-			order = Signals.createSignal(2),
-			stats = createSignalMap()
-		}
 
-		t4.stats.setData("stat1", Signals.createSignal(t3.leaderstats.stat1.Value), false)
-		t4.stats.setData("stat2", Signals.createSignal(t3.leaderstats.stat2.Value), false)
+		local v2 = { order = Signals.createSignal(2), stats = createSignalMap() }
 
-		local t5 = {
+		v2.stats.setData("stat1", Signals.createSignal(player2.leaderstats.stat1.Value), false)
+		v2.stats.setData("stat2", Signals.createSignal(player2.leaderstats.stat2.Value), false)
+
+		local player3 = {
 			Name = "player3",
-			Team = Team2,
+			Team = team2,
 			UserId = math.random(1, 1234567890),
 			leaderstats = {
-				stat1 = {
-					Value = 500
-				},
-				stat2 = {
-					Value = 600
-				}
+				stat1 = { Value = 500 },
+				stat2 = { Value = 600 }
 			}
 		}
-		local t6 = {
-			order = Signals.createSignal(1),
-			stats = createSignalMap()
-		}
 
-		t6.stats.setData("stat1", Signals.createSignal(t5.leaderstats.stat1.Value), false)
-		t6.stats.setData("stat2", Signals.createSignal(t5.leaderstats.stat2.Value), false)
+		local v3 = { order = Signals.createSignal(1), stats = createSignalMap() }
 
-		local t7 = {
+		v3.stats.setData("stat1", Signals.createSignal(player3.leaderstats.stat1.Value), false)
+		v3.stats.setData("stat2", Signals.createSignal(player3.leaderstats.stat2.Value), false)
+
+		local player4 = {
 			Name = "player4",
-			Team = Team2,
+			Team = team2,
 			UserId = math.random(1, 1234567890),
 			leaderstats = {
-				stat1 = {
-					Value = 70
-				},
-				stat2 = {
-					Value = 80
-				}
+				stat1 = { Value = 70 },
+				stat2 = { Value = 80 }
 			}
 		}
-		local t8 = {
-			order = Signals.createSignal(2),
-			stats = createSignalMap()
-		}
 
-		t8.stats.setData("stat1", Signals.createSignal(t7.leaderstats.stat1.Value), false)
-		t8.stats.setData("stat2", Signals.createSignal(t7.leaderstats.stat2.Value), false)
+		local v4 = { order = Signals.createSignal(2), stats = createSignalMap() }
 
-		local t9 = {
+		v4.stats.setData("stat1", Signals.createSignal(player4.leaderstats.stat1.Value), false)
+		v4.stats.setData("stat2", Signals.createSignal(player4.leaderstats.stat2.Value), false)
+
+		local player5 = {
 			Name = "player5",
 			UserId = math.random(1, 1234567890),
 			leaderstats = {
-				stat1 = {
-					Value = 90
-				},
-				stat2 = {
-					Value = 100
-				}
+				stat1 = { Value = 90 },
+				stat2 = { Value = 100 }
 			}
 		}
-		local t10 = {
-			order = Signals.createSignal(1),
-			stats = createSignalMap()
-		}
 
-		t10.stats.setData("stat1", Signals.createSignal(t9.leaderstats.stat1.Value), false)
-		t10.stats.setData("stat2", Signals.createSignal(t9.leaderstats.stat2.Value), false)
+		local v5 = { order = Signals.createSignal(1), stats = createSignalMap() }
 
-		local u18 = createSignalMap()
+		v5.stats.setData("stat1", Signals.createSignal(player5.leaderstats.stat1.Value), false)
+		v5.stats.setData("stat2", Signals.createSignal(player5.leaderstats.stat2.Value), false)
 
-		u18.setData(t1, t2, false)
-		u18.setData(t3, t4, false)
-		u18.setData(t5, t6, false)
-		u18.setData(t7, t8, false)
-		u18.setData(t9, t10, false)
+		local signalMap = createSignalMap()
 
-		local u19 = createSignalMap()
-		local u20 = createSignalMap()
+		signalMap.setData(player1, v, false)
+		signalMap.setData(player2, v2, false)
+		signalMap.setData(player3, v3, false)
+		signalMap.setData(player4, v4, false)
+		signalMap.setData(player5, v5, false)
 
-		u20.setData("Neutral", {
+		local signalMap2 = createSignalMap()
+
+		local signalMap3 = createSignalMap()
+		signalMap3.setData("Neutral", {
 			name = Signals.createSignal("Neutral"),
 			color = Signals.createSignal(Color3.fromRGB(0, 0, 0)),
 			order = Signals.createSignal(1),
@@ -142,12 +111,12 @@ local function createMockLeaderboardStore() -- line: 19
 			players = createSignalMap()
 		}, false)
 
-		local v21 = u20.getData("Neutral", false)
+		local data = signalMap3.getData("Neutral", false)
+		data.players.setData(player5, player5.UserId, false)
+		data.stats.setData("stat1", Signals.createSignal(player5.leaderstats.stat1.Value), false)
+		data.stats.setData("stat2", Signals.createSignal(player5.leaderstats.stat2.Value), false)
 
-		v21.players.setData(t9, t9.UserId, false)
-		v21.stats.setData("stat1", Signals.createSignal(t9.leaderstats.stat1.Value), false)
-		v21.stats.setData("stat2", Signals.createSignal(t9.leaderstats.stat2.Value), false)
-		u20.setData(Team, {
+		signalMap3.setData(team1, {
 			name = Signals.createSignal("Team 1"),
 			color = Signals.createSignal(Color3.fromRGB(255, 0, 0)),
 			order = Signals.createSignal(2),
@@ -155,13 +124,22 @@ local function createMockLeaderboardStore() -- line: 19
 			players = createSignalMap()
 		}, false)
 
-		local v22 = u20.getData(Team, false)
+		local data2 = signalMap3.getData(team1, false)
+		data2.players.setData(player1, player1.UserId, false)
+		data2.players.setData(player2, player2.UserId, false)
+		data2.stats.setData(
+			"stat1",
+			Signals.createSignal(player1.leaderstats.stat1.Value + player2.leaderstats.stat1.Value),
+			false
+		)
 
-		v22.players.setData(t1, t1.UserId, false)
-		v22.players.setData(t3, t3.UserId, false)
-		v22.stats.setData("stat1", Signals.createSignal(t1.leaderstats.stat1.Value + t3.leaderstats.stat1.Value), false)
-		v22.stats.setData("stat2", Signals.createSignal(t1.leaderstats.stat2.Value + t3.leaderstats.stat2.Value), false)
-		u20.setData(Team2, {
+		data2.stats.setData(
+			"stat2",
+			Signals.createSignal(player1.leaderstats.stat2.Value + player2.leaderstats.stat2.Value),
+			false
+		)
+
+		signalMap3.setData(team2, {
 			name = Signals.createSignal("Team 2"),
 			color = Signals.createSignal(Color3.fromRGB(0, 255, 0)),
 			order = Signals.createSignal(3),
@@ -169,42 +147,44 @@ local function createMockLeaderboardStore() -- line: 19
 			players = createSignalMap()
 		}, false)
 
-		local v23 = u20.getData(Team2, false)
+		local data3 = signalMap3.getData(team2, false)
+		data3.players.setData(player3, player3.UserId, false)
+		data3.players.setData(player4, player4.UserId, false)
+		data3.stats.setData(
+			"stat1",
+			Signals.createSignal(player3.leaderstats.stat1.Value + player4.leaderstats.stat1.Value),
+			false
+		)
 
-		v23.players.setData(t5, t5.UserId, false)
-		v23.players.setData(t7, t7.UserId, false)
-		v23.stats.setData("stat1", Signals.createSignal(t5.leaderstats.stat1.Value + t7.leaderstats.stat1.Value), false)
-		v23.stats.setData("stat2", Signals.createSignal(t5.leaderstats.stat2.Value + t7.leaderstats.stat2.Value), false)
+		data3.stats.setData(
+			"stat2",
+			Signals.createSignal(player3.leaderstats.stat2.Value + player4.leaderstats.stat2.Value),
+			false
+		)
 
-		local u24 = createSignalMap()
-
-		u24.setData("Neutral", u20.getData("Neutral", false), false)
-		u24.setData(Team, u20.getData(Team, false), false)
-		u24.setData(Team2, u20.getData(Team2, false), false)
+		local signalMap4 = createSignalMap()
+		signalMap4.setData("Neutral", signalMap3.getData("Neutral", false), false)
+		signalMap4.setData(team1, signalMap3.getData(team1, false), false)
+		signalMap4.setData(team2, signalMap3.getData(team2, false), false)
 
 		return {
-			getGameStatsList = function() -- line: 207
-				-- upvalues: u19 (ref)
-				return u19
+			getGameStatsList = function()
+				return signalMap2
 			end,
-			getTeamList = function() -- line: 210
-				-- upvalues: u24 (ref)
-				return u24
+			getTeamList = function()
+				return signalMap4
 			end,
-			getTeamPlayerList = function(p1, _) -- line: 213
-				-- upvalues: u20 (ref)
-				return u20.getData(p1, false).players
+			getTeamPlayerList = function(p, _)
+				return signalMap3.getData(p, false).players
 			end,
-			getPlayerEntry = function(p3) -- line: 217
-				-- upvalues: u18 (ref)
-				return (u18.getData(p3, false))
+			getPlayerEntry = function(p)
+				return (signalMap.getData(p, false))
 			end,
-			cleanUp = function() -- line: 220
-				-- upvalues: u19 (ref), u24 (ref), u20 (ref), u18 (ref)
-				u19 = nil
-				u24 = nil
-				u20 = nil
-				u18 = nil
+			cleanUp = function()
+				signalMap2 = nil
+				signalMap4 = nil
+				signalMap3 = nil
+				signalMap = nil
 			end
 		}
 	end

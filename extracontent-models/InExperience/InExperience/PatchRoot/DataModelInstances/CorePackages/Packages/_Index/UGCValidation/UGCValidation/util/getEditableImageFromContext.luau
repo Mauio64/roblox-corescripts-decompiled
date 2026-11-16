@@ -1,16 +1,14 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local getEditableInstanceFromContext = require(parent.util.getEditableInstanceFromContext)
 
-local getEditableInstanceFromContext = require(ParentParent.util.getEditableInstanceFromContext)
+return function(p, p2: string, p3)
+	local editableInstanceFromContext, v = getEditableInstanceFromContext(p, p2, p3.editableImages, p3)
 
-return function(p1, s1: string, p2) -- line: 6
-	-- upvalues: getEditableInstanceFromContext (copy)
-	local v6, v7 = getEditableInstanceFromContext(p1, s1, p2.editableImages, p2)
-
-	if not v6 then
-		return false
+	if editableInstanceFromContext then
+		return true, v
 	end
 
-	return true, v7
+	return false
 end

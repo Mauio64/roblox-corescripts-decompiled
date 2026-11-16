@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local NavigateIntoSquadLobbyIfExists = require(Workspace.AppChat.AppChat.Conversations.Thunks.NavigateIntoSquadLobbyIfExists)
 
-return (require(_Workspace.AppChat.AppChat.Conversations.Thunks.NavigateIntoSquadLobbyIfExists))
+return NavigateIntoSquadLobbyIfExists

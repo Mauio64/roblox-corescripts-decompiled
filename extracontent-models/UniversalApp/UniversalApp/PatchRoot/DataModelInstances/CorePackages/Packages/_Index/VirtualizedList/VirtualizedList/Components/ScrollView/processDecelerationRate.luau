@@ -1,13 +1,11 @@
-local function processDecelerationRate(p1) -- line: 16
-	if p1 == "normal" then
+local function processDecelerationRate(p)
+	if p == "normal" then
 		return 0.985
-	end
-
-	if p1 == "fast" then
+	elseif p == "fast" then
 		return 0.9
 	end
 
-	return p1
+	return p
 end
 
 return processDecelerationRate

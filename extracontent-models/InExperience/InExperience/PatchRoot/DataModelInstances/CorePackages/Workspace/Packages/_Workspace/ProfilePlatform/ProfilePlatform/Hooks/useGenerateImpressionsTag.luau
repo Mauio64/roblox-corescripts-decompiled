@@ -1,15 +1,12 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-
+local parent = ProfilePlatform.Parent
 require(ProfilePlatform.Common.Enums)
+local React = require(parent.React)
 
-local React = require(ProfilePlatformParent.React)
 local HttpService = game:GetService("HttpService")
 
-return function(p1) -- line: 10
-	-- upvalues: React (copy), HttpService (copy)
-	return React.useMemo(function() -- line: 11
-		-- upvalues: p1 (copy), HttpService (copy)
-		return `ProfilePlatform_${ p1 }_${ HttpService:GenerateGUID() }`
-	end, { p1 })
+return function(p)
+	return React.useMemo(function()
+		return `ProfilePlatform_${p}_${HttpService:GenerateGUID()}`
+	end, { p })
 end

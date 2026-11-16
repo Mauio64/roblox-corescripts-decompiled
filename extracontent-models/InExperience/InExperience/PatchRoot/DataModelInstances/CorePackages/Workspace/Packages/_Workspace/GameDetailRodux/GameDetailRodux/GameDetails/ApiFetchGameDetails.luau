@@ -1,67 +1,68 @@
 local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
-local GameDetailRoduxParent = GameDetailRodux.Parent
-local Promise = require(GameDetailRoduxParent.Promise)
-local ArgCheck = require(GameDetailRoduxParent.ArgCheck)
-local Result = require(GameDetailRoduxParent.Result)
-local PerformFetch = require(GameDetailRoduxParent.Http).PerformFetch
+local parent = GameDetailRodux.Parent
+
+local Promise = require(parent.Promise)
+local ArgCheck = require(parent.ArgCheck)
+local Result = require(parent.Result)
+local Http = require(parent.Http)
+local PerformFetch = Http.PerformFetch
+
 local GamesMultigetDetails = require(script.Parent.GamesMultigetDetails)
 local AddGameDetails = require(GameDetailRodux.GameDetails.AddGameDetails)
 local SetGameDetailError = require(GameDetailRodux.GameDetails.SetGameDetailError)
 local GameDetailModel = require(GameDetailRodux.GameDetails.GameDetailModel)
-local EnumGameDetailErrorTypes = require(GameDetailRoduxParent.DiscoveryTypes).EnumGameDetailErrorTypes
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local EnumGameDetailErrorTypes = DiscoveryTypes.EnumGameDetailErrorTypes
+
 local Logger = require(GameDetailRodux.Logger)
-local t1 = {}
 
-local function v14(p1) -- line: 20
-	return "luaapp.gamesapi.games." .. p1
+local function fn(p) -- 2 equivalent calls inferred from this helper
+	return "luaapp.gamesapi.games." .. p
 end
 
-t1.KeyMapper = v14
+local ApiFetchGameDetails = {}
+ApiFetchGameDetails.KeyMapper = fn
 
-function t1.GetFetchingStatus(p2, p3) -- line: 26
-	-- upvalues: PerformFetch (copy)
-	return PerformFetch.GetStatus(p2, "luaapp.gamesapi.games." .. p3)
+function ApiFetchGameDetails.GetFetchingStatus(p, p2)
+	return PerformFetch.GetStatus(p, fn(p2)) -- inferred equivalent call
 end
-function t1.Fetch(p4, p5) -- line: 30
-	-- upvalues: ArgCheck (copy), PerformFetch (copy), v14 (copy), GamesMultigetDetails (copy), GameDetailModel (copy), Result (copy), SetGameDetailError (copy), EnumGameDetailErrorTypes (copy), AddGameDetails (copy), Logger (copy), Promise (copy)
-	ArgCheck.isType(p5, "table", "ApiFetchGameDetails: universeIds")
 
-	return PerformFetch.Batch(p5, v14, function(p6, p7) -- line: 33
-		-- upvalues: GamesMultigetDetails (copy), p4 (copy), GameDetailModel (copy), Result (copy), SetGameDetailError (copy), EnumGameDetailErrorTypes (copy), AddGameDetails (copy), Logger (copy), Promise (copy)
-		return GamesMultigetDetails(p4, p7):andThen(function(p8) -- line: 34
-			-- upvalues: GameDetailModel (copy), Result (copy), p7 (copy), p6 (copy), SetGameDetailError (copy), EnumGameDetailErrorTypes (copy), AddGameDetails (copy), Logger (copy), Promise (copy)
-			local t2 = {}
-			local v24 = p8 and (p8.responseBody and p8.responseBody.data)
+function ApiFetchGameDetails.Fetch(p, p2)
+	ArgCheck.isType(p2, "table", "ApiFetchGameDetails: universeIds")
 
-			if v24 ~= nil then
-				local t3 = {}
+	return PerformFetch.Batch(p2, fn, function(object, items)
+		return GamesMultigetDetails(p, items):andThen(function(p3)
+			local v = {}
 
-				for _, v in ipairs(v24) do
-					local v28 = GameDetailModel.fromJsonData(v)
+			local data = p3 and p3.responseBody and p3.responseBody.data
 
-					t3[v28.id] = v28
-					t2["luaapp.gamesapi.games." .. v28.id] = Result.new(true, v28)
+			if data == nil then
+				Logger:warning("Response from GamesMultigetDetails is malformed!")
+			else
+				local v2 = {}
+
+				for _, v3 in ipairs(data) do
+					local v4 = GameDetailModel.fromJsonData(v3)
+					v2[v4.id] = v4
+					v[fn(v4.id)] = Result.new(true, v4) -- inferred equivalent call
 				end
 
-				for _, v in pairs(p7) do
-					if not t3[v] then
-						p6:dispatch(SetGameDetailError(v, EnumGameDetailErrorTypes.ExperienceUnavailable))
+				for _, item in pairs(items) do
+					if not v2[item] then
+						object:dispatch(SetGameDetailError(item, EnumGameDetailErrorTypes.ExperienceUnavailable))
 					end
 				end
 
-				if next(t3) then
-					p6:dispatch(AddGameDetails(t3))
+				if next(v2) then
+					object:dispatch(AddGameDetails(v2))
 				end
-			else
-				Logger:warning("Response from GamesMultigetDetails is malformed!")
 			end
 
-			return Promise.resolve(t2)
-		end, function(_) -- line: 61
-			-- upvalues: Promise (copy)
+			return Promise.resolve(v)
+		end, function(_)
 			return Promise.resolve({})
 		end)
 	end)
 end
 
-return t1
+return ApiFetchGameDetails

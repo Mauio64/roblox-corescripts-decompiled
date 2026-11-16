@@ -1,5 +1,1 @@
-return {
-	Default = "default",
-	Quick = "quick",
-	Slow = "slow"
-}
+return { Default = "default", Quick = "quick", Slow = "slow" }

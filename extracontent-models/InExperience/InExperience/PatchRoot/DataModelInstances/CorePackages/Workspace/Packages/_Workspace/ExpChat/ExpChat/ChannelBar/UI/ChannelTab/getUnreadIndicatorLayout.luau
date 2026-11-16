@@ -1,17 +1,22 @@
-return function(b1: boolean, b2: boolean, n1: number?, n2: number?, n3: number, n4: number, n5: number) -- line: 9
-	if not b1 or (b2 or n1 == nil or n2 == nil) then
+return function(flag: boolean, flag2: boolean, p: number?, p2: number?, p3: number, p4: number, p5: number)
+	if not flag or flag2 or p == nil or p2 == nil then
 		return nil
 	end
 
-	local v8 = math.max(0, n1 - n3 * 2)
-	local v9 = n4 + n5
-	local v10 = v8 < n2 + v9 * 2
-	local v11 = if not v10 then (n1 - n2) / 2 else n3 + v9
-	local v12 = math.min(n2, if not v10 then v8 else math.max(0, v8 - v9))
+	local v = math.max(0, p - p3 * 2)
+	local v2 = p4 + p5
+	local isPinned = v < p2 + v2 * 2
+	local textLeft
 
-	return {
-		isPinned = v10,
-		textLeft = v11,
-		textWidth = v12
-	}
+	if isPinned then
+		textLeft = p3 + v2
+	else
+		textLeft = (p - p2) / 2
+	end
+
+	if isPinned then
+		v = math.max(0, v - v2)
+	end
+
+	return { isPinned = isPinned, textLeft = textLeft, textWidth = math.min(p2, v) }
 end

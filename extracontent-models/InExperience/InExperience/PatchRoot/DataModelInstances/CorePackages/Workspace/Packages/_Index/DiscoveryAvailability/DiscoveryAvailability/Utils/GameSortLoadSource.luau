@@ -1,22 +1,20 @@
-local t1 = {}
-
-return {
-	GameSortLoadSourceType = {
-		API = "API",
-		ClientFallbackCache = "ClientFallbackCache"
-	},
-	setSortLoadSource = function(s1: string, s2: string?) -- line: 10
-		-- upvalues: t1 (copy)
-		if s2 then
-			t1[s1] = s2
-
-			return
-		end
-
-		t1[s1] = nil
-	end,
-	getSortLoadSource = function(s3: string) -- line: 18
-		-- upvalues: t1 (copy)
-		return t1[s3]
-	end
+local v = {}
+local GameSortLoadSource = {}
+GameSortLoadSource.GameSortLoadSourceType = {
+	API = "API",
+	ClientFallbackCache = "ClientFallbackCache"
 }
+
+function GameSortLoadSource.setSortLoadSource(p: string, p2: string?)
+	if p2 then
+		v[p] = p2
+	else
+		v[p] = nil
+	end
+end
+
+function GameSortLoadSource.getSortLoadSource(p: string)
+	return v[p]
+end
+
+return GameSortLoadSource

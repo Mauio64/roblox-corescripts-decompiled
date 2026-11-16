@@ -1,51 +1,55 @@
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local SocialService = game:GetService("SocialService")
-local SharedFlags = require(SquadsCoreParent.SharedFlags)
-local validateSquadId = require(SquadsCore.Common.validateSquadId)
-local t1 = {}
+local parent = SquadsCore.Parent
 
-t1.__index = t1
+local SocialService = game:GetService("SocialService")
+
+local SharedFlags = require(parent.SharedFlags)
+
+local validateSquadId = require(SquadsCore.Common.validateSquadId)
+
+local class = {}
+class.__index = class
 
 local FFlagPartyDevAPIToRespectThirdPartySettingsEnabled = SharedFlags.FFlagPartyDevAPIToRespectThirdPartySettingsEnabled
 
-function t1.new() -- line: 29
-	-- upvalues: t1 (copy)
-	return (setmetatable({
-		isLeaveSquadPending = false,
-		lastFiredSquadId = ""
-	}, t1))
-end
-function t1.setLeaveSquadPendingAndFireEvent(t2: {[any]: any}, b1: boolean, b2: boolean) -- line: 40
-	if t2:_setLeaveSquadPending(b1) then
-		t2:fireSquadChangeEvent(nil, b2)
-	end
-end
-function t1.fireSquadChangeEvent(t3: {[any]: any}, s1: string?, b3: boolean) -- line: 46
-	-- upvalues: validateSquadId (copy), SocialService (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy)
-	local v14 = s1 or ""
-
-	assert(v14 == "" or validateSquadId(v14), "Try to fire with wrong squadId")
-
-	if v14 ~= "" then
-		t3:_setLeaveSquadPending(false)
-	end
-
-	if (not t3.isLeaveSquadPending or v14 ~= "") and v14 ~= t3.lastFiredSquadId then
-		t3.lastFiredSquadId = v14
-		SocialService:UpdatePlayerPartyData(v14, if not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then nil else not b3)
-	end
-end
-function t1._setLeaveSquadPending(t4: {[any]: any}, b4: boolean) -- line: 63
-	if b4 ~= t4.isLeaveSquadPending then
-		t4.isLeaveSquadPending = b4
-
-		return true
-	end
-
-	return false
+function class.new()
+	return (setmetatable({ isLeaveSquadPending = false, lastFiredSquadId = "" }, class))
 end
 
-t1.default = t1.new()
+function class:setLeaveSquadPendingAndFireEvent(flag: boolean, flag2: boolean)
+	if self:_setLeaveSquadPending(flag) then
+		self:fireSquadChangeEvent(nil, flag2)
+	end
+end
 
-return t1.default
+function class:fireSquadChangeEvent(value: string?, flag: boolean)
+	local lastFiredSquadId = value or ""
+	assert(lastFiredSquadId == "" or validateSquadId(lastFiredSquadId), "Try to fire with wrong squadId")
+
+	if lastFiredSquadId ~= "" then
+		self:_setLeaveSquadPending(false)
+	end
+
+	if (not self.isLeaveSquadPending or lastFiredSquadId ~= "") and self.lastFiredSquadId ~= lastFiredSquadId then
+		self.lastFiredSquadId = lastFiredSquadId
+		local v
+
+		if FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then
+			v = not flag
+		end
+
+		SocialService:UpdatePlayerPartyData(lastFiredSquadId, v)
+	end
+end
+
+function class:_setLeaveSquadPending(isLeaveSquadPending: boolean): boolean
+	if self.isLeaveSquadPending == isLeaveSquadPending then
+		return false
+	end
+
+	self.isLeaveSquadPending = isLeaveSquadPending
+	return true
+end
+
+class.default = class.new()
+return class.default

@@ -1,177 +1,305 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
-local AppCommonLib = require(ParentParentParent.AppCommonLib)
-local Localization = require(ParentParentParent.Localization)
-local React = require(ParentParentParent.React)
-local UIBlox = require(ParentParentParent.UIBlox)
+
+local AppCommonLib = require(parent2.AppCommonLib)
+local Localization = require(parent2.Localization)
+local React = require(parent2.React)
+local UIBlox = require(parent2.UIBlox)
+local Foundation = require(parent2.Foundation)
+local Style = require(parent2.Style)
+local GetTextSize = Style.GetTextSize
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local useLocalization = Localization.Hooks.useLocalization
 local useStyle = UIBlox.Core.Style.useStyle
-local AppCommonLibText = AppCommonLib.Text
-local CapturesContext = require(ParentParent.Context.CapturesContext)
-local CapturesPolicy = require(ParentParent.App.CapturesPolicy)
-local OnOffButton = require(ParentParent.Components.CoreUI.OnOffButton)
-local VideoCaptureCTA = require(ParentParent.Components.CoreUI.VideoCaptureCTA)
-local useKeyboardEnabled = require(ParentParent.Hooks.useKeyboardEnabled)
-local uDim = UDim.new(0, 8)
-local v18 = UserInputService:GetPlatform() ~= Enum.Platform.OSX and "Alt" or "Opt"
 
-return (CapturesPolicy.connect(function(p1) -- line: 222
-	return {
-		eligibleForVideoCapture = p1.eligibleForVideoCapture()
-	}
-end)(function(t1: {[any]: any}) -- line: 44
-	-- upvalues: useStyle (copy), React (copy), CapturesContext (copy), GuiService (copy), useLocalization (copy), v18 (copy), UserInputService (copy), useKeyboardEnabled (copy), AppCommonLibText (copy), uDim (copy), OnOffButton (copy), VideoCaptureCTA (copy)
-	local v20 = useStyle()
+local Text = AppCommonLib.Text
+
+local CapturesContext = require(parent.Context.CapturesContext)
+local CapturesPolicy = require(parent.App.CapturesPolicy)
+local OnOffButton = require(parent.Components.CoreUI.OnOffButton)
+local VideoCaptureCTA = require(parent.Components.CoreUI.VideoCaptureCTA)
+
+local useKeyboardEnabled = require(parent.Hooks.useKeyboardEnabled)
+
+local udim = UDim.new(0, 8)
+
+local keyOne = UserInputService:GetPlatform() == Enum.Platform.OSX and "Opt" or "Alt"
+
+return (CapturesPolicy.connect(function(p)
+	return { eligibleForVideoCapture = p.eligibleForVideoCapture() }
+end)(function(props)
+	local v = useStyle()
 	local chromeEnabled = React.useContext(CapturesContext).chromeEnabled
-	local v22, v23 = React.useState(Vector2.new(0, 0))
-	local v24, v25 = React.useState(GuiService.PreferredTextSize)
 
-	React.useEffect(function() -- line: 51
-		-- upvalues: v25 (copy), GuiService (copy)
-		local function onPreferredTextSizeChangedSignal() -- line: 52
-			-- upvalues: v25 (copy), GuiService (copy)
-			v25(GuiService.PreferredTextSize)
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(GuiService.PreferredTextSize)
+
+	React.useEffect(function()
+		local function onPreferredTextSizeChangedSignal()
+			setState2(GuiService.PreferredTextSize)
 		end
+		local preferredTextSizeChangedConnection = GuiService:GetPropertyChangedSignal("PreferredTextSize"):Connect(onPreferredTextSizeChangedSignal)
 
-		local connection = GuiService:GetPropertyChangedSignal("PreferredTextSize"):Connect(onPreferredTextSizeChangedSignal)
-
-		return function() -- line: 58
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			preferredTextSizeChangedConnection:Disconnect()
 		end
 	end, {})
 
-	local v26 = useLocalization({
+	local v2 = useLocalization({
 		capturesTitle = "Feature.Captures.Title.Captures",
 		educationalText = "Feature.Captures.Label.EducationalText",
 		hotkeyEducationalText = {
 			"Feature.Captures.Label.HotkeyEducationalText",
-			keyOne = v18,
+			keyOne = keyOne,
 			keyTwo = UserInputService:GetStringForKeyCode(Enum.KeyCode.One)
 		}
 	})
-	local v27 = if not useKeyboardEnabled() then v26.educationalText else v26.hotkeyEducationalText
-	local BackgroundDefaultColor = v20.Theme.BackgroundDefault.Color
-	local BackgroundDefaultTransparency = v20.Theme.BackgroundDefault.Transparency
-	local TextDefaultColor = v20.Theme.TextDefault.Color
-	local CaptionBodyFont = v20.Font.CaptionBody.Font
-	local v32 = v20.Font.BaseSize * v20.Font.CaptionBody.RelativeSize
-	local TextEmphasisColor = v20.Theme.TextEmphasis.Color
-	local Header2Font = v20.Font.Header2.Font
-	local v35 = v20.Font.BaseSize * v20.Font.Header2.RelativeSize
-	local v36 = React.useCallback(function(p2) -- line: 89
-		-- upvalues: v23 (copy), t1 (copy)
-		v23(p2.AbsoluteSize)
+	local text
 
-		if t1.onAbsoluteSizeChanged then
-			t1.onAbsoluteSizeChanged(p2.AbsoluteSize)
-		end
-	end, {})
-	local v37 = React.useMemo(function() -- line: 96
-		-- upvalues: AppCommonLibText (copy), v27 (copy), CaptionBodyFont (copy), v32 (copy)
-		return AppCommonLibText.GetTextWidth(v27, CaptionBodyFont, v32)
-	end, {
-		CaptionBodyFont,
-		v32,
-		v24,
-		v27
-	})
-	local X = v22.X
-	local v39 = v37 < X - 224 - 24
-	local n1 = 20
-
-	if not v39 and not (v37 < X - 24) then
-		n1 = AppCommonLibText.GetTextHeight(v27, CaptionBodyFont, v32, X - 24) + 10
+	if useKeyboardEnabled() then
+		text = v2.hotkeyEducationalText
+	else
+		text = v2.educationalText
 	end
 
-	return React.createElement("Frame", {
+	local color = v.Theme.BackgroundDefault.Color
+	local transparency = v.Theme.BackgroundDefault.Transparency
+
+	local color2 = v.Theme.TextDefault.Color
+	local font
+
+	if FoundationFontFaceMigration then
+		font = v.Tokens.Typography.BodySmall.Font
+	else
+		font = v.Font.CaptionBody.Font
+	end
+
+	local textSize = v.Font.BaseSize * v.Font.CaptionBody.RelativeSize
+
+	local color3 = v.Theme.TextEmphasis.Color
+	local font2
+
+	if FoundationFontFaceMigration then
+		font2 = v.Tokens.Typography.TitleLarge.Font
+	else
+		font2 = v.Font.Header2.Font
+	end
+
+	local textSize2 = v.Font.BaseSize * v.Font.Header2.RelativeSize
+
+	local v3 = React.useCallback(function(p)
+		setState(p.AbsoluteSize)
+
+		if props.onAbsoluteSizeChanged then
+			props.onAbsoluteSizeChanged(p.AbsoluteSize)
+		end
+	end, {})
+
+	local v4 = React.useMemo(function()
+		if FoundationFontFaceMigration then
+			return GetTextSize(text, textSize, font, Vector2.new(10000, 10000)).X
+		end
+
+		return (Text.GetTextWidth(text, font, textSize))
+	end, { font, textSize, state2, text })
+
+	local x = state.X
+	local v5 = v4 < x - 224 - 24
+	local v6
+
+	if v5 or v4 < x - 24 then
+		v6 = 20
+	else
+		local v7
+
+		if FoundationFontFaceMigration then
+			v7 = GetTextSize(text, textSize, font, Vector2.new(x - 24, 10000)).Y
+		else
+			v7 = Text.GetTextHeight(text, font, textSize, x - 24)
+		end
+
+		v6 = v7 + 10
+	end
+
+	local createElement = React.createElement
+	local v7 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = BackgroundDefaultColor,
-		BackgroundTransparency = BackgroundDefaultTransparency,
+		BackgroundColor3 = color,
+		BackgroundTransparency = transparency,
 		BorderSizePixel = 0,
-		LayoutOrder = t1.LayoutOrder,
+		LayoutOrder = props.LayoutOrder,
 		Size = UDim2.fromScale(1, 0),
-		[React.Change.AbsoluteSize] = v36
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = uDim
-		}),
+		[React.Change.AbsoluteSize] = v3
+	}
+	local v8 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = udim }),
 		UIPadding = React.createElement("UIPadding", {
 			PaddingBottom = UDim.new(0, 12),
 			PaddingLeft = UDim.new(0, 12),
 			PaddingRight = UDim.new(0, 12),
 			PaddingTop = UDim.new(0, 12)
 		}),
-		Layout = if chromeEnabled then nil else React.createElement("UIListLayout", {
+		Layout = 0,
+		CapturesToggleCTA = 0,
+		Space = 0,
+		VideoCaptureCTA = 0
+	}
+	local layout
+
+	if not chromeEnabled then
+		layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Top
-		}),
-		CapturesToggleCTA = if chromeEnabled then nil else React.createElement("Frame", {
+		})
+	end
+
+	v8.Layout = layout
+	local capturesToggleCTA
+
+	if not chromeEnabled then
+		local createElement2 = React.createElement
+		local v9 = {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundColor3 = color,
+			BackgroundTransparency = transparency,
 			BorderSizePixel = 0,
 			LayoutOrder = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			BackgroundColor3 = BackgroundDefaultColor,
-			BackgroundTransparency = BackgroundDefaultTransparency,
 			Size = UDim2.fromScale(1, 0)
-		}, {
-			TextFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.fromScale(1, 0)
-			}, {
-				Layout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Top
-				}),
-				Title = React.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					Font = Header2Font,
-					Size = UDim2.new(1, 0, 0, 30),
-					Text = v26.capturesTitle,
-					TextColor3 = TextEmphasisColor,
-					TextSize = v35,
-					TextXAlignment = Enum.TextXAlignment.Left
-				}),
-				EducationalLabel = React.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					TextWrapped = true,
-					Font = CaptionBodyFont,
-					Size = UDim2.new(1, 0, 0, n1),
-					Text = v27,
-					TextColor3 = TextDefaultColor,
-					TextSize = v32,
-					TextXAlignment = Enum.TextXAlignment.Left
-				})
+		}
+
+		local createElement3 = React.createElement
+		local v10 = {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 0)
+		}
+		local children2 = {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Top
 			}),
-			CapturesToggleFrame = React.createElement("Frame", {
+			Title = 0,
+			EducationalLabel = 0
+		}
+
+		local createElement4 = React.createElement
+		local font3
+
+		if not FoundationFontFaceMigration then
+			font3 = font2
+		end
+
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(font2)
+		end
+
+		children2.Title = createElement4("TextLabel", {
+			BackgroundTransparency = 1,
+			Font = font3,
+			FontFace = fontFace,
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, 30),
+			Text = v2.capturesTitle,
+			TextColor3 = color3,
+			TextSize = textSize2,
+			TextXAlignment = Enum.TextXAlignment.Left
+		})
+
+		local createElement5 = React.createElement
+		local font4
+
+		if not FoundationFontFaceMigration then
+			font4 = font
+		end
+
+		local fontFace2
+
+		if FoundationFontFaceMigration then
+			fontFace2 = normalizeFontFace(font)
+		end
+
+		children2.EducationalLabel = createElement5("TextLabel", {
+			BackgroundTransparency = 1,
+			Font = font4,
+			FontFace = fontFace2,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, v6),
+			Text = text,
+			TextColor3 = color2,
+			TextSize = textSize,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left
+		})
+		local children = {
+			TextFrame = createElement3("Frame", v10, children2),
+			CapturesToggleFrame = 0
+		}
+
+		local createElement6 = React.createElement
+		local anchorPoint
+
+		if v5 then
+			anchorPoint = Vector2.new(1, 0.5)
+		else
+			anchorPoint = Vector2.new(1, 0)
+		end
+
+		local position
+
+		if v5 then
+			position = UDim2.fromScale(1, 0.5)
+		else
+			position = UDim2.new(1, 0, 0, -10)
+		end
+
+		children.CapturesToggleFrame = createElement6(
+			"Frame",
+			{
+				AnchorPoint = anchorPoint,
 				BackgroundTransparency = 1,
-				AnchorPoint = if not v39 then Vector2.new(1, 0) else Vector2.new(1, 0.5),
-				Position = if not v39 then UDim2.new(1, 0, 0, -10) else UDim2.fromScale(1, 0.5),
+				Position = position,
 				Size = UDim2.fromOffset(224, 44)
-			}, {
-				OnOffButton = React.createElement(OnOffButton, {
-					height = 44,
-					width = 224
-				})
-			})
-		}),
-		Space = if not t1.eligibleForVideoCapture or chromeEnabled then nil else React.createElement("Frame", {
+			},
+			{
+				OnOffButton = React.createElement(OnOffButton, { height = 44, width = 224 })
+			}
+		)
+		capturesToggleCTA = createElement2("Frame", v9, children)
+	end
+
+	v8.CapturesToggleCTA = capturesToggleCTA
+	local space
+
+	if props.eligibleForVideoCapture and not chromeEnabled then
+		space = React.createElement("Frame", {
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(0, 0, 0, 20)
-		}),
-		VideoCaptureCTA = if not t1.eligibleForVideoCapture then nil else React.createElement(VideoCaptureCTA, {
-			LayoutOrder = 3,
-			closeSettingsMenu = t1.closeSettingsMenu
+			Size = UDim2.new(0, 0, 0, 20),
+			LayoutOrder = 2
 		})
-	})
+	end
+
+	v8.Space = space
+	local videoCaptureCTA
+
+	if props.eligibleForVideoCapture then
+		videoCaptureCTA = React.createElement(VideoCaptureCTA, {
+			closeSettingsMenu = props.closeSettingsMenu,
+			LayoutOrder = 3
+		})
+	end
+
+	v8.VideoCaptureCTA = videoCaptureCTA
+	return createElement("Frame", v7, v8)
 end))

@@ -1,34 +1,30 @@
-return function(p1) -- line: 7
+return function(items)
+	local v = 1
 	local v2 = false
-	local v3 = false
-	local v4 = true
-	local n1 = 1
+	local flag = false
+	local v3 = true
 
-	for k, _ in pairs(p1) do
+	for k, _ in pairs(items) do
 		if type(k) == "string" then
-			v3 = true
+			v2 = true
 		else
 			if type(k) ~= "number" then
 				return false
 			end
 
-			if n1 ~= k then
-				v4 = false
+			if v ~= k then
+				v3 = false
 			end
 
-			v2 = true
+			flag = true
 		end
 
-		if v3 and v2 then
+		if v2 and flag then
 			return false
 		end
 
-		n1 += 1
+		v += 1
 	end
 
-	if v2 then
-		return v4
-	end
-
-	return true
+	return not flag or v3
 end

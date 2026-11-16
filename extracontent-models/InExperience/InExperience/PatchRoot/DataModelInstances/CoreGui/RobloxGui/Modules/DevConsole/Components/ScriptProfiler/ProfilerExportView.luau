@@ -3,101 +3,93 @@ local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 
 game:GetService("ScriptContext")
-
 local ScriptProfilerService = game:GetService("ScriptProfilerService")
 
 require(script.Parent.ProfilerDataFormatV2)
 
 local Components = script.Parent.Parent.Parent.Components
 local ScrollingTextBox = require(Components.ScrollingTextBox)
-local _ = script.Parent.Parent.Parent.Actions
+
+local Actions = script.Parent.Parent.Parent.Actions
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
 local MainRowPadding = Constants.GeneralFormatting.MainRowPadding
+
 local MainWindowHeader = Constants.Font.MainWindowHeader
 local MainWindow = Constants.Font.MainWindow
 local ButtonTextSize = Constants.MicroProfilerFormatting.ButtonTextSize
 local UnselectedGray = Constants.Color.UnselectedGray
+
 local ButtonWidth = Constants.MicroProfilerFormatting.ButtonWidth
-local v15 = Roact.PureComponent:extend("ProfilerExportView")
 
-local function generateDefaultExportName(b1: boolean, p1, s1: string) -- line: 31
-	local s2 = ""
-	local v22 = not b1 and "server" or "client"
-	local v23 = p1 and p1.SessionStartTime
+local extended = Roact.PureComponent:extend("ProfilerExportView")
 
-	if v23 then
-		s2 = os.date("%Y%b%d-%H%M%S-", v23 / 1000) or ""
-	end
+local function generateDefaultExportName(flag: boolean, p, p2: string)
+	local sessionStartTime = p and p.SessionStartTime
 
-	return "scriptprofiler-" .. s2 .. v22 .. s1
+	return "scriptprofiler-" .. (sessionStartTime and (os.date("%Y%b%d-%H%M%S-", sessionStartTime / 1000) or "") or "") .. (flag and "client" or "server") .. p2
 end
 
-function v15.init(_) -- line: 45
+function extended.init(_) end
+
+function extended.didMount(object)
+	local data = object.props.client.data
+	local sessionStartTime = data and data.SessionStartTime
+
+	local v = {
+		exportFilenameClient = "scriptprofiler-" .. (sessionStartTime and (os.date("%Y%b%d-%H%M%S-", sessionStartTime / 1000) or "") or "") .. "client.json",
+		exportFilenameServer = 0
+	}
+
+	local data2 = object.props.server.data
+	local sessionStartTime2 = data2 and data2.SessionStartTime
+
+	v.exportFilenameServer = "scriptprofiler-" .. (sessionStartTime2 and (os.date("%Y%b%d-%H%M%S-", sessionStartTime2 / 1000) or "") or "") .. "server.json"
+	object:setState(v)
 end
-function v15.didMount(p3) -- line: 47
-	local t1 = {}
-	local data = p3.props.client.data
-	local s3 = ""
-	local v29 = data and data.SessionStartTime
 
-	if v29 then
-		s3 = os.date("%Y%b%d-%H%M%S-", v29 / 1000) or ""
-	end
+function extended.didUpdate(_) end
 
-	t1.exportFilenameClient = "scriptprofiler-" .. s3 .. "client" .. ".json"
+function extended:renderExportInputAndButton(flag: boolean, text: string, p: string)
+	local createElement = Roact.createElement
 
-	local data2 = p3.props.server.data
-	local s4 = ""
-	local v32 = data2 and data2.SessionStartTime
-
-	if v32 then
-		s4 = os.date("%Y%b%d-%H%M%S-", v32 / 1000) or ""
-	end
-
-	t1.exportFilenameServer = "scriptprofiler-" .. s4 .. "server" .. ".json"
-	p3:setState(t1)
-end
-function v15.didUpdate(_) -- line: 54
-end
-function v15.renderExportInputAndButton(t2: {[any]: any}, b2: boolean, s5: string, s6: string) -- line: 56
-	-- upvalues: Roact (copy), UnselectedGray (copy), ButtonTextSize (copy), MainWindow (copy), Constants (copy), ScrollingTextBox (copy), MainWindowHeader (copy), ScriptProfilerService (copy)
-	return Roact.createElement("TextLabel", {
-		BackgroundTransparency = 0,
+	local v = {
 		Size = UDim2.new(0.9, 0, 0, 30),
 		Position = UDim2.new(0.05, 0, 0, 37.5),
+		BackgroundTransparency = 0,
 		BackgroundColor3 = UnselectedGray,
-		Text = not s6 and "Complete a profiling session to export data" or "",
+		Text = p and "" or "Complete a profiling session to export data",
 		TextSize = ButtonTextSize,
 		Font = MainWindow,
 		TextColor3 = Constants.Color.Text
-	}, if not s6 then {} else {
-		InputField = Roact.createElement(ScrollingTextBox, {
-			ShowNativeInput = true,
-			ClearTextOnFocus = false,
-			PlaceholderText = "Filename for export",
-			Text = s5,
-			TextSize = ButtonTextSize,
-			Font = MainWindow,
-			Size = UDim2.new(0.8, 0, 1, 0),
-			Position = UDim2.new(0, 0, 0, 0),
-			TextColor3 = Constants.Color.Text,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextBoxFocusLost = function(p5, _, _) -- line: 86
-				-- upvalues: b2 (copy), t2 (copy)
-				if b2 then
-					t2:setState({
-						exportFilenameClient = p5.text
-					})
+	}
+	local v2
 
-					return
+	if p then
+		v2 = {
+			InputField = Roact.createElement(ScrollingTextBox, {
+				Text = text,
+				TextSize = ButtonTextSize,
+				Font = MainWindow,
+				Size = UDim2.new(0.8, 0, 1, 0),
+				Position = UDim2.new(0, 0, 0, 0),
+				ShowNativeInput = true,
+				TextColor3 = Constants.Color.Text,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				ClearTextOnFocus = false,
+				PlaceholderText = "Filename for export",
+				TextBoxFocusLost = function(p2, _, _)
+					if flag then
+						self:setState({ exportFilenameClient = p2.text })
+					else
+						self:setState({ exportFilenameServer = p2.text })
+					end
 				end
+			}),
+			ExportButton = 0
+		}
 
-				t2:setState({
-					exportFilenameServer = p5.text
-				})
-			end
-		}),
-		ExportButton = Roact.createElement("TextButton", {
+		v2.ExportButton = Roact.createElement("TextButton", {
 			Size = UDim2.new(0.2, 0, 1, 0),
 			Position = UDim2.new(0.8, 0, 0, 0),
 			Text = "Export",
@@ -107,104 +99,109 @@ function v15.renderExportInputAndButton(t2: {[any]: any}, b2: boolean, s5: strin
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextYAlignment = Enum.TextYAlignment.Center,
 			BackgroundColor3 = UnselectedGray,
-			[Roact.Event.Activated] = function() -- line: 110
-				-- upvalues: ScriptProfilerService (copy), s6 (copy), s5 (copy), b2 (copy), t2 (copy)
-				local v50 = ScriptProfilerService:SaveScriptProfilingData(s6, s5)
+			[Roact.Event.Activated] = function()
+				local v3 = ScriptProfilerService:SaveScriptProfilingData(p, text)
 
-				if b2 then
-					t2:setState({
-						clientSavePath = v50
-					})
-
-					return
+				if flag then
+					self:setState({ clientSavePath = v3 })
+				else
+					self:setState({ serverSavePath = v3 })
 				end
-
-				t2:setState({
-					serverSavePath = v50
-				})
 			end
 		})
-	})
-end
-function v15.renderExportSection(t3: {[any]: any}, b3: boolean, s7: string) -- line: 129
-	-- upvalues: Roact (copy), ButtonWidth (copy), MainWindowHeader (copy), ButtonTextSize (copy), Constants (copy), UnselectedGray (copy)
-	local exportFilenameClient, serializedData, clientSavePath
-
-	if b3 then
-		exportFilenameClient = t3.state.exportFilenameClient
-		serializedData = t3.props.client.serializedData
-		clientSavePath = t3.state.clientSavePath
 	else
-		exportFilenameClient = t3.state.exportFilenameServer
-		serializedData = t3.props.server.serializedData
-		clientSavePath = t3.state.serverSavePath
+		v2 = {}
 	end
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Size = UDim2.new(1, 0, 0, 90)
-	}, {
+	return createElement("TextLabel", v, v2)
+end
+
+function extended:renderExportSection(flag: boolean, text: string)
+	local v, serializedData, v2
+
+	if flag then
+		v = self.state.exportFilenameClient
+		serializedData = self.props.client.serializedData
+		v2 = self.state.clientSavePath
+	else
+		v = self.state.exportFilenameServer
+		serializedData = self.props.server.serializedData
+		v2 = self.state.serverSavePath
+	end
+
+	local createElement = Roact.createElement
+	local v3 = { Size = UDim2.new(1, 0, 0, 90), BackgroundTransparency = 1, LayoutOrder = 2 }
+
+	local v4 = {
 		Label = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
 			Size = UDim2.new(0, ButtonWidth, 0, 30),
 			Position = UDim2.new(0.1, 0, 0, 0),
-			Text = s7,
+			Text = text,
 			Font = MainWindowHeader,
 			TextSize = ButtonTextSize,
 			TextColor3 = Constants.Color.Text,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center,
-			BackgroundColor3 = UnselectedGray
+			BackgroundColor3 = UnselectedGray,
+			BackgroundTransparency = 1
 		}),
 		HorizontalLine = Roact.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 1),
 			Position = UDim2.new(0, 0, 0, 30)
 		}),
-		Export = t3:renderExportInputAndButton(b3, exportFilenameClient, serializedData),
-		SavedPath = if clientSavePath then Roact.createElement("TextBox", {
-			BackgroundTransparency = 1,
-			TextEditable = false,
-			ClearTextOnFocus = false,
+		Export = self:renderExportInputAndButton(flag, v, serializedData),
+		SavedPath = 0
+	}
+	local savedPath
+
+	if v2 then
+		savedPath = Roact.createElement("TextBox", {
 			Size = UDim2.new(0.95, 0, 0, 30),
 			Position = UDim2.new(0.05, 0, 0, 75),
-			Text = "Saved to " .. clientSavePath,
+			Text = "Saved to " .. v2,
 			Font = MainWindowHeader,
 			TextSize = ButtonTextSize,
 			TextColor3 = Constants.Color.Text,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Center,
-			BackgroundColor3 = UnselectedGray
-		}) else nil
-	})
-end
-function v15.render(p8) -- line: 188
-	-- upvalues: Roact (copy), Constants (copy), MainRowPadding (copy)
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Size = p8.props.size,
-		BackgroundColor3 = Constants.Color.BaseGray
-	}, {
-		UIListLayout = Roact.createElement("UIListLayout", {
-			Padding = UDim.new(0, MainRowPadding * 2),
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
-		Row = p8:renderExportSection(true, "Client"),
-		HorizontalLine = Roact.createElement("Frame", {
+			BackgroundColor3 = UnselectedGray,
 			BackgroundTransparency = 1,
-			LayoutOrder = 3,
-			Size = UDim2.new(1, 0, 0, MainRowPadding)
-		}),
-		Row2 = p8:renderExportSection(false, "Server")
-	})
+			TextEditable = false,
+			ClearTextOnFocus = false
+		})
+	end
+
+	v4.SavedPath = savedPath
+	return createElement("Frame", v3, v4)
 end
 
-local function mapStateToProps(p9, _) -- line: 212
-	return {
-		client = p9.ScriptProfiler.client,
-		server = p9.ScriptProfiler.server
-	}
+function extended:render()
+	return Roact.createElement(
+		"Frame",
+		{
+			Size = self.props.size,
+			BackgroundColor3 = Constants.Color.BaseGray,
+			BackgroundTransparency = 1,
+			LayoutOrder = 2
+		},
+		{
+			UIListLayout = Roact.createElement("UIListLayout", {
+				Padding = UDim.new(0, MainRowPadding * 2),
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Row = self:renderExportSection(true, "Client"),
+			HorizontalLine = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, MainRowPadding),
+				BackgroundTransparency = 1,
+				LayoutOrder = 3
+			}),
+			Row2 = self:renderExportSection(false, "Server")
+		}
+	)
 end
 
-return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(v15)
+local function mapStateToProps(p, _)
+	return { client = p.ScriptProfiler.client, server = p.ScriptProfiler.server }
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(extended)

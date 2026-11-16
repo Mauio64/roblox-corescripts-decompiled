@@ -5,9 +5,7 @@ local peekViewDismissedEvent = require(script.analytics.peekViewDismissedEvent)
 local Scrim = require(script.Scrim)
 
 return {
-	analytics = {
-		peekViewDismissedEvent = peekViewDismissedEvent
-	},
+	analytics = { peekViewDismissedEvent = peekViewDismissedEvent },
 	["jest.config"] = script["jest.config"],
 	PeekViewState = PeekViewState,
 	PeekView = PeekView,

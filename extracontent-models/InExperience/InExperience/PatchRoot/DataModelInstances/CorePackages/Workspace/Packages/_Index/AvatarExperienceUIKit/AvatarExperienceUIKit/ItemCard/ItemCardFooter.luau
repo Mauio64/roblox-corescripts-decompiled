@@ -1,63 +1,120 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+
 local ItemCardPriceLine = require(script.Parent.ItemCardPriceLine)
 local ItemCardCreatorName = require(script.Parent.ItemCardCreatorName)
 local ItemCardTitle = require(script.Parent.ItemCardTitle)
-local FFlagAXAddTextXAlignmentProp = require(Parent.AvatarExperienceFlags).FFlagAXAddTextXAlignmentProp
 
-local function ItemCardFooter(t1: {[any]: any}) -- line: 27
-	-- upvalues: useTokens (copy), React (copy), ItemCardTitle (copy), FFlagAXAddTextXAlignmentProp (copy), ItemCardCreatorName (copy), ItemCardPriceLine (copy)
-	local v10 = useTokens()
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXAddTextXAlignmentProp = AvatarExperienceFlags.FFlagAXAddTextXAlignmentProp
+local AvatarExperienceFlags2 = require(parent.AvatarExperienceFlags)
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		ClipsDescendants = true,
+local function ItemCardFooter(props)
+	local v = useTokens()
+	local createElement = React.createElement
+	local v2 = {
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.LayoutOrder
-	}, {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = props.LayoutOrder,
+		ClipsDescendants = true
+	}
+
+	local v3 = {
 		ItemCardFooterLayout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = UDim.new(0, v10.Gap.XSmall)
+			Padding = UDim.new(0, v.Gap.XSmall)
 		}),
-		ItemCardFooterInfo = if not t1.title and not t1.creatorName then nil else React.createElement("Frame", {
+		ItemCardFooterInfo = 0,
+		ItemCardFooterPrice = 0
+	}
+	local itemCardFooterInfo
+
+	if props.title or props.creatorName then
+		local createElement2 = React.createElement
+		local v4 = {
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			LayoutOrder = 1,
-			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, {
+			LayoutOrder = 1
+		}
+
+		local v5 = {
 			ItemCardFooterInfoLayout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Vertical,
 				HorizontalAlignment = Enum.HorizontalAlignment.Left,
-				Padding = UDim.new(0, v10.Gap.XXSmall)
+				Padding = UDim.new(0, v.Gap.XXSmall)
 			}),
-			ItemCardFooterInfoTitle = if not t1.title then nil else React.createElement(ItemCardTitle, {
+			ItemCardFooterInfoTitle = 0,
+			ItemCardFooterInfoCreatorName = 0
+		}
+		local itemCardFooterInfoTitle
+
+		if props.title then
+			local createElement3 = React.createElement
+			local v6 = {
+				title = props.title,
+				titleTextSize = props.titleTextSize,
 				LayoutOrder = 1,
-				title = t1.title,
-				titleTextSize = t1.titleTextSize,
-				TextXAlignment = if not FFlagAXAddTextXAlignmentProp then nil else t1.TextXAlignment
-			}),
-			ItemCardFooterInfoCreatorName = if not t1.creatorName then nil else React.createElement(ItemCardCreatorName, {
+				TextXAlignment = 0
+			}
+			local textXAlignment
+
+			if FFlagAXAddTextXAlignmentProp then
+				textXAlignment = props.TextXAlignment
+			end
+
+			v6.TextXAlignment = textXAlignment
+			itemCardFooterInfoTitle = createElement3(ItemCardTitle, v6)
+		end
+
+		v5.ItemCardFooterInfoTitle = itemCardFooterInfoTitle
+		local itemCardFooterInfoCreatorName
+
+		if props.creatorName then
+			local createElement3 = React.createElement
+			local v6 = {
+				name = props.creatorName,
+				hasVerifiedBadge = props.creatorHasVerifiedBadge,
 				LayoutOrder = 2,
-				name = t1.creatorName,
-				hasVerifiedBadge = t1.creatorHasVerifiedBadge,
-				TextXAlignment = if not FFlagAXAddTextXAlignmentProp then nil else t1.TextXAlignment
-			})
-		}),
-		ItemCardFooterPrice = if not t1.priceLineContent then nil else React.createElement(ItemCardPriceLine, {
-			LayoutOrder = 2,
-			content = t1.priceLineContent
+				TextXAlignment = 0
+			}
+			local textXAlignment
+
+			if FFlagAXAddTextXAlignmentProp then
+				textXAlignment = props.TextXAlignment
+			end
+
+			v6.TextXAlignment = textXAlignment
+			itemCardFooterInfoCreatorName = createElement3(ItemCardCreatorName, v6)
+		end
+
+		v5.ItemCardFooterInfoCreatorName = itemCardFooterInfoCreatorName
+		itemCardFooterInfo = createElement2("Frame", v4, v5)
+	end
+
+	v3.ItemCardFooterInfo = itemCardFooterInfo
+	local itemCardFooterPrice
+
+	if props.priceLineContent then
+		itemCardFooterPrice = React.createElement(ItemCardPriceLine, {
+			content = props.priceLineContent,
+			LayoutOrder = 2
 		})
-	})
+	end
+
+	v3.ItemCardFooterPrice = itemCardFooterPrice
+	return createElement("Frame", v2, v3)
 end
 
-if require(Parent.AvatarExperienceFlags).FFlagAXItemCardComponentsMemo then
+if AvatarExperienceFlags2.FFlagAXItemCardComponentsMemo then
 	return (React.memo(ItemCardFooter))
 end
 

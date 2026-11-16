@@ -1,7 +1,9 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local Cryo = require(MomentsCommonParent.Cryo)
-local React = require(MomentsCommonParent.React)
+local parent = MomentsCommon.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+
 local useAudioPlayback = require(MomentsCommon.Hooks.useAudioPlayback)
 local useCallback = React.useCallback
 local useEffect = React.useEffect
@@ -10,220 +12,196 @@ local useMemo = React.useMemo
 local useRef = React.useRef
 local useToggleState = require(MomentsCommon.Hooks.useToggleState)
 local useVideoPlayback = require(MomentsCommon.Hooks.useVideoPlayback)
-local Signal = require(MomentsCommon.Utils.Signal)
-local Constants = require(MomentsCommon.Constants)
 
+local Signal = require(MomentsCommon.Utils.Signal)
+
+local Constants = require(MomentsCommon.Constants)
 require(MomentsCommon.Types)
 
-local t1 = {
+local v = {
 	autoplay = false,
+	edits = { music = nil, trim = nil },
 	looping = false,
 	content = nil,
-	captureType = nil,
-	edits = {
-		music = nil,
-		trim = nil
-	}
+	captureType = nil
 }
 
-local function useUnifiedPlayback(b1: boolean, t2: {[any]: any}) -- line: 40
-	-- upvalues: Cryo (copy), t1 (copy), useToggleState (copy), useRef (copy), Signal (copy), useMemo (copy), Constants (copy), useAudioPlayback (copy), useVideoPlayback (copy), useImageDisplay (copy), useCallback (copy), useEffect (copy)
-	local v19 = Cryo.Dictionary.union(t1, t2)
-	local v20 = useToggleState(false)
-	local v21 = useToggleState(false)
-	local v22 = useRef(Signal.new())
-	local v23 = useMemo(function() -- line: 49
-		-- upvalues: v19 (copy)
-		if v19.edits.music then
-			return v19.edits.music.assetId
+local function useUnifiedPlayback(flag: boolean, p)
+	local union = Cryo.Dictionary.union(v, p)
+	local v2 = useToggleState(false)
+	local v3 = useToggleState(false)
+	local onContentLoadedSignalRef = useRef(Signal.new())
+
+	local v4 = useMemo(function()
+		if union.edits.music then
+			return union.edits.music.assetId
 		end
 
 		return nil
-	end, { v19.edits })
-	local v24 = useMemo(function() -- line: 57
-		-- upvalues: v19 (copy), Constants (copy)
-		if v19.captureType == Enum.CaptureType.Screenshot then
+	end, { union.edits })
+
+	local playbackRegion = useMemo(function()
+		if union.captureType == Enum.CaptureType.Screenshot then
 			return NumberRange.new(0, Constants.ScreenshotMusicDuration)
 		end
 
-		if v19.edits.trim then
-			return NumberRange.new(v19.edits.trim.startTime, v19.edits.trim.endTime)
+		if union.edits.trim then
+			return NumberRange.new(union.edits.trim.startTime, union.edits.trim.endTime)
 		end
 
 		return NumberRange.new(0, 1e999)
-	end, {
-		v19.edits,
-		v19.captureType
-	})
-	local v25 = useMemo(function() -- line: 69
-		-- upvalues: v19 (copy), v24 (copy)
-		if v19.edits.music then
-			return NumberRange.new(v19.edits.music.startTime, v19.edits.music.startTime + (v24.Max - v24.Min))
-		end
+	end, { union.edits, union.captureType })
 
-		return NumberRange.new(0, 1e999)
-	end, {
-		v19.edits,
-		v24
+	local v5 = useAudioPlayback(flag, v4, {
+		playbackRegion = useMemo(function()
+			if union.edits.music then
+				return NumberRange.new(
+					union.edits.music.startTime,
+					union.edits.music.startTime + (playbackRegion.Max - playbackRegion.Min)
+				)
+			end
+
+			return NumberRange.new(0, 1e999)
+		end, { union.edits, playbackRegion }),
+		looping = p.looping
 	})
-	local v26 = useAudioPlayback(b1, v23, {
-		playbackRegion = v25,
-		looping = t2.looping
-	})
-	local v27 = useVideoPlayback(b1, if v19.captureType ~= Enum.CaptureType.Screenshot then v19.content else nil, {
-		playbackRegion = v24,
-		looping = t2.looping
-	})
-	local v28 = useImageDisplay(b1, if v19.captureType ~= Enum.CaptureType.Screenshot then nil else v19.content)
-	local v29 = useCallback(function(n1: number) -- line: 94
-		-- upvalues: v27 (copy), v26 (copy)
-		if not v27.ref.current or not v27.ref.current.IsLoaded then
+	local v6
+
+	if union.captureType ~= Enum.CaptureType.Screenshot then
+		v6 = union.content
+	end
+
+	local v7 = useVideoPlayback(flag, v6, { playbackRegion = playbackRegion, looping = p.looping })
+	local v8
+
+	if union.captureType == Enum.CaptureType.Screenshot then
+		v8 = union.content
+	end
+
+	local v9 = useImageDisplay(flag, v8)
+
+	local seek = useCallback(function(p2: number)
+		if v7.ref.current and v7.ref.current.IsLoaded then
+			v7.timeline.seek(p2)
+			v5.timeline.seek(p2)
+		end
+	end, { v7.timeline.seek, v5.timeline.seek })
+
+	useEffect(function()
+		if not (v7.ref.current and v7.ref.current.IsLoaded or v9.ref.current and v9.isLoadedRef.current) then
 			return
 		end
 
-		v27.timeline.seek(n1)
-		v26.timeline.seek(n1)
-	end, {
-		v27.timeline.seek,
-		v26.timeline.seek
-	})
-
-	useEffect(function() -- line: 103
-		-- upvalues: v27 (copy), v28 (copy), b1 (copy), v20 (copy)
-		if (not v27.ref.current or not v27.ref.current.IsLoaded) and (not v28.ref.current or not v28.isLoadedRef.current) then
-			return
-		end
-
-		if b1 then
-			v20.enable()
-
-			return
-		end
-
-		v20.disable()
-	end, { b1 })
-	useEffect(function() -- line: 118
-		-- upvalues: v27 (copy), v28 (copy), v20 (copy), v26 (copy)
-		if (not v27.ref.current or not v27.ref.current.IsLoaded) and (not v28.ref.current or not v28.isLoadedRef.current) then
-			return
-		end
-
-		if v20.enabled then
-			v27.playback.play()
-			v26.playback.play()
-
-			return
-		end
-
-		v27.playback.pause()
-		v26.playback.pause()
-	end, { v20.enabled })
-	useEffect(function() -- line: 135
-		-- upvalues: v21 (copy), v26 (copy), v23 (copy), v27 (copy)
-		if v21.enabled then
-			v26.volume.mute()
+		if flag then
+			v2.enable()
 		else
-			v26.volume.unmute()
+			v2.disable()
 		end
+	end, { flag })
 
-		if v23 or v21.enabled then
-			v27.volume.mute()
-
+	useEffect(function()
+		if not (v7.ref.current and v7.ref.current.IsLoaded or v9.ref.current and v9.isLoadedRef.current) then
 			return
 		end
 
-		v27.volume.unmute()
-	end, {
-		v21.enabled,
-		v23
-	})
+		if v2.enabled then
+			v7.playback.play()
+			v5.playback.play()
+		else
+			v7.playback.pause()
+			v5.playback.pause()
+		end
+	end, { v2.enabled })
 
-	local v30 = useCallback(function(p1) -- line: 149
-		-- upvalues: b1 (copy), v19 (copy), v20 (copy), v22 (copy)
-		if b1 and v19.autoplay then
-			v20.enable()
+	useEffect(function()
+		if v3.enabled then
+			v5.volume.mute()
+		else
+			v5.volume.unmute()
 		end
 
-		v22.current:fire(p1)
-	end, {
-		b1,
-		v19.autoplay
-	})
-	local v31 = useCallback(function() -- line: 156
-		-- upvalues: v30 (copy)
-		v30(Enum.AssetType.Image)
-	end, { v30 })
-	local v32 = useCallback(function() -- line: 160
-		-- upvalues: v30 (copy)
-		v30(Enum.AssetType.Video)
-	end, { v30 })
-	local v33 = useCallback(function() -- line: 164
-		-- upvalues: v26 (copy)
-		v26.timeline.seek(0)
-	end, { v26.timeline.seek })
+		if v4 or v3.enabled then
+			v7.volume.mute()
+		else
+			v7.volume.unmute()
+		end
+	end, { v3.enabled, v4 })
 
-	useEffect(function() -- line: 168
-		-- upvalues: v27 (copy), v33 (copy), v32 (copy), v28 (copy), v31 (copy)
-		local t3 = {}
-
-		if v27.onVideoDidLoopSignalRef.current then
-			table.insert(t3, v27.onVideoDidLoopSignalRef.current:connect(v33))
+	local v10 = useCallback(function(p2)
+		if flag and union.autoplay then
+			v2.enable()
 		end
 
-		if v27.onVideoLoadedSignalRef.current then
-			table.insert(t3, v27.onVideoLoadedSignalRef.current:connect(v32))
+		onContentLoadedSignalRef.current:fire(p2)
+	end, { flag, union.autoplay })
+
+	local v11 = useCallback(function()
+		v10(Enum.AssetType.Image)
+	end, { v10 })
+
+	local v12 = useCallback(function()
+		v10(Enum.AssetType.Video)
+	end, { v10 })
+
+	local v13 = useCallback(function()
+		v5.timeline.seek(0)
+	end, { v5.timeline.seek })
+
+	useEffect(function()
+		local connections = {}
+
+		if v7.onVideoDidLoopSignalRef.current then
+			table.insert(connections, v7.onVideoDidLoopSignalRef.current:connect(v13))
 		end
 
-		if v28.onImageLoadedSignalRef.current then
-			table.insert(t3, v28.onImageLoadedSignalRef.current:connect(v31))
+		if v7.onVideoLoadedSignalRef.current then
+			table.insert(connections, v7.onVideoLoadedSignalRef.current:connect(v12))
 		end
 
-		return function() -- line: 183
-			-- upvalues: t3 (copy)
-			for _, v38 in t3 do
-				v38.disconnect()
+		if v9.onImageLoadedSignalRef.current then
+			table.insert(connections, v9.onImageLoadedSignalRef.current:connect(v11))
+		end
+
+		return function()
+			for _, connection in connections do
+				connection.disconnect()
 			end
 		end
-	end, {
-		v32,
-		v33,
-		v31
-	})
+	end, { v12, v13, v11 })
+	local timeline
+
+	if union.captureType == Enum.CaptureType.Video then
+		timeline = {
+			duration = v7.timeline.duration,
+			elapsed = v7.timeline.elapsed,
+			seek = seek,
+			timeLength = v7.timeline.timeLength,
+			timePosition = v7.timeline.timePosition
+		}
+	else
+		timeline = {
+			duration = Constants.ScreenshotMusicDuration,
+			elapsed = v5.timeline.elapsed,
+			seek = seek,
+			timeLength = Constants.ScreenshotMusicDuration,
+			timePosition = v5.timeline.timePosition
+		}
+	end
 
 	return {
-		timeline = if v19.captureType ~= Enum.CaptureType.Video then {
-			duration = Constants.ScreenshotMusicDuration,
-			elapsed = v26.timeline.elapsed,
-			seek = v29,
-			timeLength = Constants.ScreenshotMusicDuration,
-			timePosition = v26.timeline.timePosition
-		} else {
-			duration = v27.timeline.duration,
-			elapsed = v27.timeline.elapsed,
-			seek = v29,
-			timeLength = v27.timeline.timeLength,
-			timePosition = v27.timeline.timePosition
-		},
+		timeline = timeline,
 		playback = {
-			isPlaying = v20.enabled,
-			pause = v20.disable,
-			play = v20.enable,
-			toggle = v20.toggle
+			isPlaying = v2.enabled,
+			pause = v2.disable,
+			play = v2.enable,
+			toggle = v2.toggle
 		},
-		volume = {
-			isMuted = v21.enabled,
-			mute = v21.enable,
-			unmute = v21.disable,
-			toggle = v21.toggle
-		},
-		audio = {
-			timeLength = v26.timeline.timeLength,
-			timePosition = v26.timeline.timePosition
-		},
-		onContentLoadedSignalRef = v22,
-		imageRef = v28.updateRef,
-		videoRef = v27.updateRef,
-		audioRef = v26.ref
+		volume = { isMuted = v3.enabled, mute = v3.enable, unmute = v3.disable, toggle = v3.toggle },
+		audio = { timeLength = v5.timeline.timeLength, timePosition = v5.timeline.timePosition },
+		onContentLoadedSignalRef = onContentLoadedSignalRef,
+		imageRef = v9.updateRef,
+		videoRef = v7.updateRef,
+		audioRef = v5.ref
 	}
 end
 

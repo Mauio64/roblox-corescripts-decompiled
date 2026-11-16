@@ -1,5 +1,8 @@
-local scriptParent = script.Parent
-local Object = require(scriptParent.Collections).Object
+local parent = script.Parent
+
+local Collections = require(parent.Collections)
+local Object = Collections.Object
+
 local makeTimerImpl = require(script.makeTimerImpl)
 local makeIntervalImpl = require(script.makeIntervalImpl)
 

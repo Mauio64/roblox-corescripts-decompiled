@@ -1,12 +1,24 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local Cryo = require(Parent.Cryo)
-local FetchGamePlayabilityAndProductInfo = require(Parent.GameDetailRodux).FetchGamePlayabilityAndProductInfo
-local RetrievalStatus = require(Parent.Http).Enum.RetrievalStatus
-local PlayabilityStatusEnum = require(Parent.DiscoveryTypes).PlayabilityStatusEnum
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local FFlagLuaAppAddVideoIneligiblePlayabilityStatus = require(Parent.SharedFlags).FFlagLuaAppAddVideoIneligiblePlayabilityStatus
-local FFlagLuaAppUsePrevalidatedVideoGamePlayability = require(Parent.SharedFlags).FFlagLuaAppUsePrevalidatedVideoGamePlayability
-local t1 = {
+local parent = script:FindFirstAncestor("GameTile").Parent
+local Cryo = require(parent.Cryo)
+local GameDetailRodux = require(parent.GameDetailRodux)
+local FetchGamePlayabilityAndProductInfo = GameDetailRodux.FetchGamePlayabilityAndProductInfo
+local Http = require(parent.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
+
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local PlayabilityStatusEnum = DiscoveryTypes.PlayabilityStatusEnum
+local VideoUtils = require(parent.VideoUtils)
+local isVideoEligibleForPlayability = VideoUtils.isVideoEligibleForPlayability
+
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppUsePrevalidatedVideoGamePlayability = SharedFlags.FFlagLuaAppUsePrevalidatedVideoGamePlayability
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppSduiVideoThumbnail = SharedFlags2.FFlagLuaAppSduiVideoThumbnail
+
+local v = not FFlagLuaAppSduiVideoThumbnail and {
 	PlayabilityStatusEnum.UnderReview,
 	PlayabilityStatusEnum.UniverseRootPlaceIsPrivate,
 	PlayabilityStatusEnum.InsufficientPermissionFriendsOnly,
@@ -20,40 +32,34 @@ local t1 = {
 	PlayabilityStatusEnum.ContextualPlayabilityUnrated,
 	PlayabilityStatusEnum.ContextualPlayabilityAgeGatedByDescriptor,
 	PlayabilityStatusEnum.ContextualPlayabilityExperienceBlockedParentalControls,
-	if not FFlagLuaAppAddVideoIneligiblePlayabilityStatus then nil else PlayabilityStatusEnum.ContextualPlayabilityRequireParentApproval,
-	if not FFlagLuaAppAddVideoIneligiblePlayabilityStatus then nil else PlayabilityStatusEnum.ContextualPlayabilityAgeCheckRequired,
-	if not FFlagLuaAppAddVideoIneligiblePlayabilityStatus then nil else PlayabilityStatusEnum.ContextualPlayabilityCoreGated,
-	if not FFlagLuaAppAddVideoIneligiblePlayabilityStatus then nil else PlayabilityStatusEnum.ContextualPlayabilityUnverifiedSeventeenPlusUser
-}
+	PlayabilityStatusEnum.ContextualPlayabilityRequireParentApproval,
+	PlayabilityStatusEnum.ContextualPlayabilityAgeCheckRequired,
+	PlayabilityStatusEnum.ContextualPlayabilityCoreGated,
+	PlayabilityStatusEnum.ContextualPlayabilityUnverifiedSeventeenPlusUser
+} or nil
 
-local function useIsVideoEligible(p1, b1: boolean?) -- line: 49
-	-- upvalues: useSelector (copy), FetchGamePlayabilityAndProductInfo (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), RetrievalStatus (copy), Cryo (copy), t1 (copy)
-	local v13 = useSelector(function(p2) -- line: 50
-		-- upvalues: FetchGamePlayabilityAndProductInfo (copy), p1 (copy)
-		return FetchGamePlayabilityAndProductInfo.GetFetchingStatus(p2, p1)
-	end)
-	local v14 = useSelector(function(p3) -- line: 54
-		-- upvalues: p1 (copy)
-		return p3.PlayabilityStatus and p3.PlayabilityStatus[p1] or nil
+local function useIsVideoEligible(p, flag: boolean?)
+	local v2 = useSelector(function(p2)
+		return FetchGamePlayabilityAndProductInfo.GetFetchingStatus(p2, p)
 	end)
 
-	if FFlagLuaAppUsePrevalidatedVideoGamePlayability and b1 then
+	local v3 = useSelector(function(p2)
+		return p2.PlayabilityStatus and p2.PlayabilityStatus[p] or nil
+	end)
+
+	if FFlagLuaAppSduiVideoThumbnail then
+		return isVideoEligibleForPlayability(v2 == RetrievalStatus.Done, v3, flag)
+	end
+
+	if FFlagLuaAppUsePrevalidatedVideoGamePlayability and flag then
 		return true
 	end
 
-	if v13 == RetrievalStatus.Done and v14 ~= nil then
-		if v14.isPlayable == true then
-			return true
-		end
-
-		if Cryo.List.find(t1, v14.playabilityStatus) ~= nil then
-			return false
-		end
-
-		return true
+	if v2 ~= RetrievalStatus.Done or v3 == nil then
+		return false
 	end
 
-	return false
+	return v3.isPlayable == true or Cryo.List.find(v, v3.playabilityStatus) == nil
 end
 
 return useIsVideoEligible

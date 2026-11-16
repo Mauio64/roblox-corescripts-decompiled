@@ -1,85 +1,74 @@
 local GameCollections = script:FindFirstAncestor("GameCollections")
 local TelemetryService = game:GetService("TelemetryService")
-local GameCollectionsParent = GameCollections.Parent
+local parent = GameCollections.Parent
 
-require(GameCollectionsParent.DiscoveryTypes)
+require(parent.DiscoveryTypes)
+local SharedFlags = require(parent.SharedFlags)
 
-local SharedFlags = require(GameCollectionsParent.SharedFlags)
-local v5 = game:DefineFastFlag("LuaAppNullableGridLayoutTelemetryFields", false)
+local defineFastFlag = game:DefineFastFlag("LuaAppNullableGridLayoutTelemetryFields", false)
 local FFlagLuaAppFixTotalColsBound = SharedFlags.FFlagLuaAppFixTotalColsBound
-local t1 = {
-	"addOSInfo",
-	"addSessionInfo",
-	"addSessionId"
-}
-local t2 = {
+
+local standardizedFields = { "addOSInfo", "addSessionInfo", "addSessionId" }
+
+local v = {
 	eventName = "TileSkipped",
-	description = "This is fired when a tile render gets skipped.",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("TileSkippedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		26,
-		1,
-		16
-	}
+	lastUpdated = { 26, 1, 16 },
+	description = "This is fired when a tile render gets skipped."
 }
-local t3 = {
+
+local v2 = {
 	eventName = "TilePlaced",
-	description = "This is fired when a tile position has been determined.",
-	backends = {
-		"EventIngest",
-		"Points"
-	},
+	backends = { "EventIngest", "Points" },
 	throttlingPercentage = game:DefineFastInt("TilePlacedTelemetryThrottleHundredthsPercent", 0),
-	lastUpdated = {
-		26,
-		1,
-		16
+	lastUpdated = { 26, 1, 16 },
+	description = "This is fired when a tile position has been determined."
+}
+local GridLayoutTelemetry = {}
+
+function GridLayoutTelemetry.logTileSkipped(value: string?, value2: string?, tileType, pageContext: string, numColumns: number, numRows: number, originalFeedIndex: number, value3: number?, value4: string?)
+	TelemetryService:LogEvent(v, {
+		standardizedFields = standardizedFields,
+		customFields = {
+			adId = not defineFastFlag and (value or "") or value,
+			universeId = not defineFastFlag and (value2 or "") or value2,
+			tileType = tileType,
+			pageContext = pageContext,
+			numColumns = numColumns,
+			numRows = numRows,
+			originalFeedIndex = originalFeedIndex,
+			sortIndex = not defineFastFlag and (value3 or -1) or value3,
+			topicId = not defineFastFlag and (value4 or "") or value4
+		}
+	})
+end
+
+function GridLayoutTelemetry.logTilePlaced(value: string?, value2: string?, tileType, pageContext: string, numColumns: number, numRows: number, originalFeedIndex: number, finalFeedIndex: number, sortIndex: number?, topicId: string?, totalFilledColumns: number?)
+	local customFields = {
+		adId = not defineFastFlag and (value or "") or value,
+		universeId = not defineFastFlag and (value2 or "") or value2,
+		tileType = tileType,
+		pageContext = pageContext,
+		numColumns = numColumns,
+		numRows = numRows,
+		originalFeedIndex = originalFeedIndex,
+		finalFeedIndex = finalFeedIndex,
+		sortIndex = sortIndex,
+		topicId = topicId,
+		totalFilledColumns = nil
 	}
-}
 
-return {
-	logTileSkipped = function(s1: string?, s2: string?, p1, s3: string, n1: number, n2: number, n3: number, n4: number?, s4: string?) -- line: 40
-		-- upvalues: v5 (copy), TelemetryService (copy), t2 (copy), t1 (copy)
-		local t4 = {
-			adId = if not v5 then s1 or "" else s1,
-			universeId = if not v5 then s2 or "" else s2,
-			tileType = p1,
-			pageContext = s3,
-			numColumns = n1,
-			numRows = n2,
-			originalFeedIndex = n3,
-			sortIndex = if not v5 then n4 or -1 else n4,
-			topicId = if not v5 then s4 or "" else s4
-		}
-
-		TelemetryService:LogEvent(t2, {
-			standardizedFields = t1,
-			customFields = t4
-		})
-	end,
-	logTilePlaced = function(s5: string?, s6: string?, p2, s7: string, n5: number, n6: number, n7: number, n8: number, n9: number?, s8: string?, n10: number?) -- line: 69
-		-- upvalues: v5 (copy), FFlagLuaAppFixTotalColsBound (copy), TelemetryService (copy), t3 (copy), t1 (copy)
-		local t5 = {
-			adId = if not v5 then s5 or "" else s5,
-			universeId = if not v5 then s6 or "" else s6,
-			tileType = p2,
-			pageContext = s7,
-			numColumns = n5,
-			numRows = n6,
-			originalFeedIndex = n7,
-			finalFeedIndex = n8,
-			sortIndex = n9,
-			topicId = s8,
-			totalFilledColumns = if not FFlagLuaAppFixTotalColsBound then nil else n10
-		}
-
-		TelemetryService:LogEvent(t3, {
-			standardizedFields = t1,
-			customFields = t5
-		})
+	if not FFlagLuaAppFixTotalColsBound then
+		totalFilledColumns = nil
 	end
-}
+
+	customFields.totalFilledColumns = totalFilledColumns
+
+	TelemetryService:LogEvent(v2, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
+	})
+end
+
+return GridLayoutTelemetry

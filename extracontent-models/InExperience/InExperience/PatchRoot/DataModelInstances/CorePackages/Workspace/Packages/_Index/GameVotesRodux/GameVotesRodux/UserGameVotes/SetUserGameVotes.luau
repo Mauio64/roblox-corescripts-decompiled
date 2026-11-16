@@ -1,15 +1,15 @@
-local Parent = script:FindFirstAncestor("GameVotesRodux").Parent
-
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2, p3, p4) -- line: 12
-	assert(type(p1) == "string", "SetUserGameVotes: universeId must be a string")
-	assert(type(p2) == "boolean", "SetUserGameVotes: canVote must be a boolean")
-	assert(type(p3) == "string", "SetUserGameVotes: userVote must be a string")
-	assert(type(p4) == "string", "SetUserGameVotes: reasonForNotVoteable must be a string")
+local parent = script:FindFirstAncestor("GameVotesRodux").Parent
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(universeId, canVote, value, value2)
+	assert(type(universeId) == "string", "SetUserGameVotes: universeId must be a string")
+	assert(type(canVote) == "boolean", "SetUserGameVotes: canVote must be a boolean")
+	assert(type(value) == "string", "SetUserGameVotes: userVote must be a string")
+	assert(type(value2) == "string", "SetUserGameVotes: reasonForNotVoteable must be a string")
 
 	return {
-		universeId = p1,
-		canVote = p2,
-		userVote = p3,
-		reasonForNotVoteable = p4
+		universeId = universeId,
+		canVote = canVote,
+		userVote = value,
+		reasonForNotVoteable = value2
 	}
 end)

@@ -1,138 +1,111 @@
 local TelemetryService = game:GetService("TelemetryService")
-local WhatsNew = script:FindFirstAncestor("WhatsNew")
-local WhatsNewParent = WhatsNew.Parent
-local LoggingProtocol = require(WhatsNewParent.LoggingProtocol)
 
+local WhatsNew = script:FindFirstAncestor("WhatsNew")
+local parent = WhatsNew.Parent
+
+local LoggingProtocol = require(parent.LoggingProtocol)
 require(WhatsNew.Types)
 
 local EventIngest = LoggingProtocol.TelemetryBackends.EventIngest
-local v6 = game:DefineFastInt("WhatsNewTelemetryThrottleHundredthsPercent", 10000)
-local t1 = {
-	IMPRESSION = 1,
-	CLICK = 2,
-	DISMISS = 3,
-	SKIP = 4
-}
-local t2 = {
-	NEXT = 1,
-	BACK = 2,
-	CLOSE = 3
-}
-local t3 = {
-	TOUR_ENDED_EARLY = 1
-}
-local t4 = {
-	TOUR_STARTED = 1,
-	TOUR_COMPLETED = 2,
-	TOUR_STOPPED = 3
-}
-local t5 = {
-	DISMISS = 1,
-	ABORT = 2
-}
-local t6 = {
-	ROOT = 1,
-	GATEWAY = 2,
-	IDLE = 3
-}
-local t7 = {
+
+local defineFastInt = game:DefineFastInt("WhatsNewTelemetryThrottleHundredthsPercent", 10000)
+
+local events = {
 	tourtipInteraction = {
 		eventName = "whatsNewTourtipInteraction",
-		description = "Fires for tourtip impressions, clicks, dismissals, and skipped steps",
-		links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/coreui/whatsnew/tourtip_interaction.proto",
 		backends = { EventIngest },
-		throttlingPercentage = v6,
-		lastUpdated = {
-			2026,
-			7,
-			6
-		}
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2026, 7, 6 },
+		description = "Fires for tourtip impressions, clicks, dismissals, and skipped steps",
+		links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/coreui/whatsnew/tourtip_interaction.proto"
 	},
 	tourLifecycle = {
 		eventName = "whatsNewTourLifecycle",
-		description = "Fires for tour session lifecycle transitions",
-		links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/coreui/whatsnew/tour_lifecycle.proto",
 		backends = { EventIngest },
-		throttlingPercentage = v6,
-		lastUpdated = {
-			2026,
-			7,
-			6
-		}
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 2026, 7, 6 },
+		description = "Fires for tour session lifecycle transitions",
+		links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/coreui/whatsnew/tour_lifecycle.proto"
 	}
 }
+
 local _ = {
 	placeId = "addPlaceId",
 	universeId = "addUniverseId",
 	playsessionId = "addPlaySessionId"
 }
-local t8 = {
-	"addPlaceId",
-	"addUniverseId",
-	"addPlaySessionId"
-}
-local t9 = {
-	Events = t7,
-	InteractionType = t1,
-	Button = t2,
-	SkipReason = t3,
-	LifecycleType = t4,
-	StopReason = t5,
-	StartContext = t6,
-	buildTourSessionFields = function(p1) -- line: 122
-		local currentScopeTour = p1.currentScopeTour
 
-		return {
-			screen_scope_id = p1.screenScopeId,
-			scope_id = if currentScopeTour == nil then nil else currentScopeTour.id,
-			root_array = p1.activeTourType,
-			global_step_index = p1.globalStepIndex,
-			global_total_steps = p1.globalTotalSteps
-		}
-	end
+local standardizedFields = { "addPlaceId", "addUniverseId", "addPlaySessionId" }
+local WhatsNewTelemetry = {
+	Events = events,
+	InteractionType = { IMPRESSION = 1, CLICK = 2, DISMISS = 3, SKIP = 4 },
+	Button = { NEXT = 1, BACK = 2, CLOSE = 3 },
+	SkipReason = { TOUR_ENDED_EARLY = 1 },
+	LifecycleType = { TOUR_STARTED = 1, TOUR_COMPLETED = 2, TOUR_STOPPED = 3 },
+	StopReason = { DISMISS = 1, ABORT = 2 },
+	StartContext = { ROOT = 1, GATEWAY = 2, IDLE = 3 }
 }
 
-function t9.logTourtipInteraction(n1: number, s1: string, n2: number?, p2, n3: number?) -- line: 133
-	-- upvalues: t9 (copy), TelemetryService (copy), t7 (copy), t8 (copy)
-	local v24 = t9.buildTourSessionFields(p2)
+function WhatsNewTelemetry.buildTourSessionFields(data)
+	local currentScopeTour = data.currentScopeTour
+	local tourSessionFields = {
+		screen_scope_id = data.screenScopeId,
+		scope_id = 0,
+		root_array = 0,
+		global_step_index = 0,
+		global_total_steps = 0
+	}
+	local scope_id
 
-	v24.entry_id = s1
-	v24.interaction_type = n1
-	v24.button = n2
-
-	local currentEntry = p2.currentEntry
-
-	if currentEntry ~= nil and s1 == currentEntry.id then
-		v24.is_gateway = currentEntry.gateway ~= nil
+	if currentScopeTour ~= nil then
+		scope_id = currentScopeTour.id
 	end
 
-	if n3 ~= nil then
-		v24.skip_reason = n3
-	end
-
-	TelemetryService:LogEvent(t7.tourtipInteraction, {
-		standardizedFields = t8,
-		customFields = v24
-	})
+	tourSessionFields.scope_id = scope_id
+	tourSessionFields.root_array = data.activeTourType
+	tourSessionFields.global_step_index = data.globalStepIndex
+	tourSessionFields.global_total_steps = data.globalTotalSteps
+	return tourSessionFields
 end
-function t9.logTourLifecycle(n4: number, p3, n5: number?, n6: number?) -- line: 160
-	-- upvalues: t9 (copy), TelemetryService (copy), t7 (copy), t8 (copy)
-	local v30 = t9.buildTourSessionFields(p3)
 
-	v30.lifecycle_type = n4
+function WhatsNewTelemetry.logTourtipInteraction(interaction_type: number, entry_id: string, button: number?, p, skip_reason: number?)
+	local tourSessionFields = WhatsNewTelemetry.buildTourSessionFields(p)
+	tourSessionFields.entry_id = entry_id
+	tourSessionFields.interaction_type = interaction_type
+	tourSessionFields.button = button
 
-	if n5 ~= nil then
-		v30.stop_reason = n5
+	local currentEntry = p.currentEntry
+
+	if currentEntry ~= nil and entry_id == currentEntry.id then
+		tourSessionFields.is_gateway = currentEntry.gateway ~= nil
 	end
 
-	if n6 ~= nil then
-		v30.start_context = n6
+	if skip_reason ~= nil then
+		tourSessionFields.skip_reason = skip_reason
 	end
 
-	TelemetryService:LogEvent(t7.tourLifecycle, {
-		standardizedFields = t8,
-		customFields = v30
+	TelemetryService:LogEvent(events.tourtipInteraction, {
+		standardizedFields = standardizedFields,
+		customFields = tourSessionFields
 	})
 end
 
-return t9
+function WhatsNewTelemetry.logTourLifecycle(lifecycle_type: number, p, stop_reason: number?, start_context: number?)
+	local tourSessionFields = WhatsNewTelemetry.buildTourSessionFields(p)
+	tourSessionFields.lifecycle_type = lifecycle_type
+
+	if stop_reason ~= nil then
+		tourSessionFields.stop_reason = stop_reason
+	end
+
+	if start_context ~= nil then
+		tourSessionFields.start_context = start_context
+	end
+
+	TelemetryService:LogEvent(events.tourLifecycle, {
+		standardizedFields = standardizedFields,
+		customFields = tourSessionFields
+	})
+end
+
+return WhatsNewTelemetry

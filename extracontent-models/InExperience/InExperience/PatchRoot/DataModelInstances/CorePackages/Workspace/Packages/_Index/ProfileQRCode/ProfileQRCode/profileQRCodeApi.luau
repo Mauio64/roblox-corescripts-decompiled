@@ -1,7 +1,15 @@
-return {
-	["jest.config"] = script.Parent["jest.config"],
-	installReducer = require(script.Parent.Rodux).installReducer,
-	ProfileQRCodeEntryPoint = require(script.Parent.Components.ProfileQRCodeEntryPoint),
-	RoduxKey = require(script.Parent.Common.Constants).RODUX_KEY,
-	TitleKey = require(script.Parent.Common.TextKeys).Title
+local ProfileQRCodeApi = {
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = nil,
+	["jest.config"] = script.Parent["jest.config"]
 }
+local Rodux = require(script.Parent.Rodux)
+ProfileQRCodeApi.installReducer = Rodux.installReducer
+ProfileQRCodeApi.ProfileQRCodeEntryPoint = require(script.Parent.Components.ProfileQRCodeEntryPoint)
+local Constants = require(script.Parent.Common.Constants)
+ProfileQRCodeApi.RoduxKey = Constants.RODUX_KEY
+local TextKeys = require(script.Parent.Common.TextKeys)
+ProfileQRCodeApi.TitleKey = TextKeys.Title
+return ProfileQRCodeApi

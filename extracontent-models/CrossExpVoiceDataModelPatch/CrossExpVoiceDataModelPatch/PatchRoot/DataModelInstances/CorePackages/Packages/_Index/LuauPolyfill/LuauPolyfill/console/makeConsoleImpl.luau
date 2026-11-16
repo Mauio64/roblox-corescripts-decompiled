@@ -1,65 +1,97 @@
-local inspect = require(script.Parent.Parent.util).inspect
+local util = require(script.Parent.Parent.util)
+local inspect = util.inspect
 
-return function() -- line: 5
-	-- upvalues: inspect (copy)
-	local t1 = {}
-	local n1 = 0
+return function()
+	local v = 0
 
-	local function indent() -- line: 9
-		-- upvalues: n1 (ref)
-		return string.rep("  ", n1)
+	local function indent() -- 7 equivalent calls inferred from this helper
+		return string.rep("  ", v)
 	end
 
-	function t1.log(p1, ...) -- line: 13
-		-- upvalues: inspect (copy), n1 (ref)
-		local v6 = if typeof(p1) ~= "string" then inspect(p1) else string.format(p1, ...)
+	return {
+		log = function(formatString, ...)
+			local v2
 
-		print(string.rep("  ", n1) .. v6)
-	end
-	function t1.debug(p2, ...) -- line: 23
-		-- upvalues: inspect (copy), n1 (ref)
-		local v8 = if typeof(p2) ~= "string" then inspect(p2) else string.format(p2, ...)
+			if typeof(formatString) == "string" then
+				v2 = string.format(formatString, ...)
+			else
+				v2 = inspect(formatString)
+			end
 
-		print(string.rep("  ", n1) .. v8)
-	end
-	function t1.info(p3, ...) -- line: 33
-		-- upvalues: inspect (copy), n1 (ref)
-		local v10 = if typeof(p3) ~= "string" then inspect(p3) else string.format(p3, ...)
+			print(indent() .. v2) -- inferred equivalent call
+		end,
+		debug = function(formatString, ...)
+			local v2
 
-		print(string.rep("  ", n1) .. v10)
-	end
-	function t1.warn(p4, ...) -- line: 43
-		-- upvalues: inspect (copy), n1 (ref)
-		local v12 = if typeof(p4) ~= "string" then inspect(p4) else string.format(p4, ...)
+			if typeof(formatString) == "string" then
+				v2 = string.format(formatString, ...)
+			else
+				v2 = inspect(formatString)
+			end
 
-		warn(string.rep("  ", n1) .. v12)
-	end
-	function t1.error(p5, ...) -- line: 53
-		-- upvalues: inspect (copy), n1 (ref)
-		local v14 = if typeof(p5) ~= "string" then inspect(p5) else string.format(p5, ...)
+			print(indent() .. v2) -- inferred equivalent call
+		end,
+		info = function(formatString, ...)
+			local v2
 
-		warn(string.rep("  ", n1) .. v14)
-	end
-	function t1.group(p6, ...) -- line: 65
-		-- upvalues: inspect (copy), n1 (ref)
-		local v16 = if typeof(p6) ~= "string" then inspect(p6) else string.format(p6, ...)
+			if typeof(formatString) == "string" then
+				v2 = string.format(formatString, ...)
+			else
+				v2 = inspect(formatString)
+			end
 
-		print(string.rep("  ", n1) .. v16)
-		n1 += 1
-	end
-	function t1.groupCollapsed(p7, ...) -- line: 76
-		-- upvalues: inspect (copy), n1 (ref)
-		local v18 = if typeof(p7) ~= "string" then inspect(p7) else string.format(p7, ...)
+			print(indent() .. v2) -- inferred equivalent call
+		end,
+		warn = function(formatString, ...)
+			local v2
 
-		print(string.rep("  ", n1) .. v18)
-		n1 += 1
-	end
-	function t1.groupEnd() -- line: 88
-		-- upvalues: n1 (ref)
-		if n1 > 0 then
-			n1 -= 1
+			if typeof(formatString) == "string" then
+				v2 = string.format(formatString, ...)
+			else
+				v2 = inspect(formatString)
+			end
+
+			warn(indent() .. v2) -- inferred equivalent call
+		end,
+		error = function(formatString, ...)
+			local v2
+
+			if typeof(formatString) == "string" then
+				v2 = string.format(formatString, ...)
+			else
+				v2 = inspect(formatString)
+			end
+
+			warn(indent() .. v2) -- inferred equivalent call
+		end,
+		group = function(formatString, ...)
+			local v2
+
+			if typeof(formatString) == "string" then
+				v2 = string.format(formatString, ...)
+			else
+				v2 = inspect(formatString)
+			end
+
+			print(indent() .. v2) -- inferred equivalent call
+			v += 1
+		end,
+		groupCollapsed = function(formatString, ...)
+			local v2
+
+			if typeof(formatString) == "string" then
+				v2 = string.format(formatString, ...)
+			else
+				v2 = inspect(formatString)
+			end
+
+			print(indent() .. v2) -- inferred equivalent call
+			v += 1
+		end,
+		groupEnd = function()
+			if v > 0 then
+				v -= 1
+			end
 		end
-	end
-
-	return t1
+	}
 end

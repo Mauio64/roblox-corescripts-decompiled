@@ -1,48 +1,57 @@
 local UserInputService = game:GetService("UserInputService")
+
 local AppShortcutBar = script:FindFirstAncestor("AppShortcutBar")
-local AppShortcutBarParent = AppShortcutBar.Parent
-local React = require(AppShortcutBarParent.React)
-local Cryo = require(AppShortcutBarParent.Cryo)
-local FocusNavigationEventNameEnum = require(AppShortcutBarParent.FocusNavigationUtils).FocusNavigationEventNameEnum
-local ReactFocusNavigation = require(AppShortcutBarParent.ReactFocusNavigation)
-
+local parent = AppShortcutBar.Parent
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
 require(AppShortcutBar.Components.AppShortcutBar)
+local Localization = require(parent.Localization)
+local LocalizationRoactContext = Localization.LocalizationRoactContext
+local Responsive = require(parent.Responsive)
 
-local LocalizationRoactContext = require(AppShortcutBarParent.Localization).LocalizationRoactContext
-local UiMode = require(AppShortcutBarParent.RobloxAppEnums).UiMode
-local Responsive = require(AppShortcutBarParent.Responsive)
-local useHeldProgressByEvent = require(AppShortcutBar.Hooks.AppShortcutBarContext).useHeldProgressByEvent
-local useSelector = require(AppShortcutBarParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useLastInputMethod = require(AppShortcutBarParent.FocusNavigationUtils).useLastInputMethod
-local useUiModeInfo = require(AppShortcutBarParent.RobloxAppHooks).useUiModeInfo
-local useDesignTokens = require(AppShortcutBarParent.Style).useDesignTokens
-local useIsStickyShortcutBarEnabled = require(AppShortcutBar.Hooks).useIsStickyShortcutBarEnabled
-local useAppPolicy = require(AppShortcutBarParent.UniversalAppPolicy).useAppPolicy
-local useSignalState = require(AppShortcutBarParent.SignalsReact).useSignalState
-local useIsTvRemoteDevice = require(AppShortcutBarParent.RoactUtils).Hooks.useIsTvRemoteDevice
-local Display = require(AppShortcutBarParent.Display)
-local v21 = game:DefineFastFlag("NoShortcutBarWithTvRemote", false)
-local SharedFlags = require(AppShortcutBarParent.SharedFlags)
-local FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation = SharedFlags.FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation
-local FFlagAXMigrateAvatarEditorPageInputBindings = SharedFlags.FFlagAXMigrateAvatarEditorPageInputBindings
+local AppShortcutBarContext = require(AppShortcutBar.Hooks.AppShortcutBarContext)
+local useHeldProgressByEvent = AppShortcutBarContext.useHeldProgressByEvent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local FocusNavigationUtils2 = require(parent.FocusNavigationUtils)
+local useLastInputMethod = FocusNavigationUtils2.useLastInputMethod
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local RoactUtils2 = require(parent.RoactUtils)
+local useIsTvRemoteDevice = RoactUtils2.Hooks.useIsTvRemoteDevice
+local RoactUtils3 = require(parent.RoactUtils)
+local useIsRealGamepadConnected = RoactUtils3.Hooks.useIsRealGamepadConnected
+local RoactUtils4 = require(parent.RoactUtils)
+local useExternalEvent = RoactUtils4.Hooks.useExternalEvent
+local Display = require(parent.Display)
+
+local defineFastFlag = game:DefineFastFlag("NoShortcutBarWithTvRemote", false)
+local Flags = require(AppShortcutBar.Flags)
+local FFlagStickyShortcutBarTvRemoteWithGamepad = Flags.FFlagStickyShortcutBarTvRemoteWithGamepad
+local Flags2 = require(AppShortcutBar.Flags)
+local FFlagShortcutBarPlatformGamepadIcons = Flags2.FFlagShortcutBarPlatformGamepadIcons
+
+local SharedFlags = require(parent.SharedFlags)
+
 local FFlagAXMigrateEquipSlotsInputBindingsToRoactGamepad = SharedFlags.FFlagAXMigrateEquipSlotsInputBindingsToRoactGamepad
 local FFlagAXMigrateEmoteMenuFromRoactGamepad = SharedFlags.FFlagAXMigrateEmoteMenuFromRoactGamepad
-local FFlagAXMigrateSceneGamepadHandlerInputBindings = SharedFlags.FFlagAXMigrateSceneGamepadHandlerInputBindings
-local FFlagAXMigratePurchasePromptInteractiveToFocusNavigation = SharedFlags.FFlagAXMigratePurchasePromptInteractiveToFocusNavigation
+
 local FFlagAXMigrateAdjustAccessoryViewToFocusNavigation = SharedFlags.FFlagAXMigrateAdjustAccessoryViewToFocusNavigation
+
 local FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation = SharedFlags.FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation
-local FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation = SharedFlags.FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation
-local FFlagAXMigrateCatalogSearchToFocusNavigation = SharedFlags.FFlagAXMigrateCatalogSearchToFocusNavigation
-local FFlagAXMigrateCatalogPageInputBindings = SharedFlags.FFlagAXMigrateCatalogPageInputBindings
-local FFlagAXMigrateLookDetailsPeekViewToFocusNavigation = SharedFlags.FFlagAXMigrateLookDetailsPeekViewToFocusNavigation
-local FFlagAXMigrateProfilePictureEditorEmotesPageToFocusNavigation = SharedFlags.FFlagAXMigrateProfilePictureEditorEmotesPageToFocusNavigation
-local FFlagLuaAppEnableStickyShortcutBar = SharedFlags.FFlagLuaAppEnableStickyShortcutBar
 local FFlagLuaAppResponsiveEnginePreferredInput = SharedFlags.FFlagLuaAppResponsiveEnginePreferredInput
-local FFlagEnableLeftNavOnConsole = SharedFlags.FFlagEnableLeftNavOnConsole
-local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
-local FFlagGuacStickyShortcutBarEnabled = SharedFlags.FFlagGuacStickyShortcutBarEnabled
-local FFlagSocialCarouselPressXToViewProfile = SharedFlags.FFlagSocialCarouselPressXToViewProfile
-local t1 = {
+local FFlagLuaAppMediaGalleryGamepadSupport = SharedFlags.FFlagLuaAppMediaGalleryGamepadSupport
+local FFlagEnableStickyShortcutBarOnAllPlatforms = SharedFlags.FFlagEnableStickyShortcutBarOnAllPlatforms
+local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
+
+local v = {
 	[Enum.KeyCode.Thumbstick1] = {
 		vertical = "rbxasset://textures/ui/Controls/DesignSystem/Thumbstick1Vertical.png",
 		horizontal = "rbxasset://textures/ui/Controls/DesignSystem/Thumbstick1Horizontal.png"
@@ -52,7 +61,8 @@ local t1 = {
 		horizontal = "rbxasset://textures/ui/Controls/DesignSystem/Thumbstick2Horizontal.png"
 	}
 }
-local t2 = {
+
+local v2 = {
 	Enum.KeyCode.ButtonA,
 	Enum.KeyCode.ButtonX,
 	Enum.KeyCode.ButtonY,
@@ -68,7 +78,8 @@ local t2 = {
 	Enum.KeyCode.RightBracket,
 	Enum.KeyCode.PageDown
 }
-local t3 = {
+
+local v3 = {
 	FocusNavigationEventNameEnum.HoldToAcceptTrustedFriendRequest,
 	FocusNavigationEventNameEnum.HoldToAcceptFriendRequest,
 	FocusNavigationEventNameEnum.HoldToAddFriend,
@@ -92,15 +103,17 @@ local t3 = {
 	FocusNavigationEventNameEnum.ScrollDown
 }
 
-table.insert(t3, FocusNavigationEventNameEnum.Confirm)
-table.insert(t3, FocusNavigationEventNameEnum.SelectItem)
-table.insert(t3, FocusNavigationEventNameEnum.OpenItemDetailsPage)
+table.insert(v3, FocusNavigationEventNameEnum.Confirm)
+table.insert(v3, FocusNavigationEventNameEnum.SelectItem)
+table.insert(v3, FocusNavigationEventNameEnum.OpenItemDetailsPage)
+table.insert(v3, FocusNavigationEventNameEnum.ToggleTryOnManager)
 
-if FFlagAXMigrateCatalogPageInputBindings then
-	table.insert(t3, FocusNavigationEventNameEnum.ToggleTryOnManager)
+if FFlagEnableSplitPane then
+	table.insert(v3, FocusNavigationEventNameEnum.CollapseAvatar)
+	table.insert(v3, FocusNavigationEventNameEnum.ExpandAvatar)
 end
 
-local t4 = {
+local set = {
 	[Enum.KeyCode.ButtonA] = true,
 	[Enum.KeyCode.ButtonB] = true,
 	[Enum.KeyCode.ButtonX] = true,
@@ -120,12 +133,14 @@ local t4 = {
 	[Enum.KeyCode.Thumbstick1] = true,
 	[Enum.KeyCode.Thumbstick2] = true
 }
-local t5 = {
+
+local set2 = {
 	[Enum.KeyCode.ButtonB] = true,
 	[Enum.KeyCode.ButtonL1] = true,
 	[Enum.KeyCode.ButtonR1] = true
 }
-local t6 = {
+
+local v4 = {
 	[Enum.KeyCode.ButtonA] = "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png",
 	[Enum.KeyCode.ButtonB] = "rbxasset://textures/ui/Controls/DesignSystem/ButtonB.png",
 	[Enum.KeyCode.ButtonY] = "rbxasset://textures/ui/Controls/DesignSystem/ButtonY.png",
@@ -136,106 +151,234 @@ local t6 = {
 	[Enum.KeyCode.Thumbstick2] = "rbxasset://textures/ui/Controls/DesignSystem/Thumbstick2Directional.png",
 	[Enum.KeyCode.ButtonStart] = "rbxasset://textures/ui/Controls/DesignSystem/ButtonStart.png"
 }
-local v48 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled then nil else {
+
+local imageForKeyCodesByButtonA = {
 	[Enum.KeyCode.ButtonA] = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonA)
 }
-local t7 = {
-	[Enum.KeyCode.ButtonY] = {
-		[FocusNavigationEventNameEnum.Search] = t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.DisplayStatsAndInfo] = t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.OpenLayeredClothingSortResetPrompt] = t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.OpenLayeredMakeupSortResetPrompt] = t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.SortAndFiltersReset] = t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.WearAfterPurchase] = if not FFlagAXMigratePurchasePromptInteractiveToFocusNavigation then nil else t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.FormPeekViewReset] = t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.AdjustAccessoryViewReset] = if not FFlagAXMigrateAdjustAccessoryViewToFocusNavigation then nil else t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.ManageOutfitsRename] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.OpenItemDetailsPeekView] = if not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.CloseItemDetailsPeekView] = if not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.ToggleTryOn] = if not FFlagAXMigrateCatalogSearchToFocusNavigation then nil else t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.ToggleTryOnManager] = if not FFlagAXMigrateLookDetailsPeekViewToFocusNavigation and not FFlagAXMigrateCatalogPageInputBindings then nil else t6[Enum.KeyCode.ButtonY],
-		[FocusNavigationEventNameEnum.RemoveClothingTile] = t6[Enum.KeyCode.ButtonY]
-	},
-	[Enum.KeyCode.ButtonX] = {
-		[FocusNavigationEventNameEnum.Play] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.SeeAll] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.AcceptFriendRequest] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.AddFriend] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.OpenBuyCatalogItemPrompt] = if not FFlagAXMigrateAvatarEditorPageInputBindings and not FFlagAXMigrateCatalogSearchToFocusNavigation then nil else t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.OpenItemDetailsPage] = if not FFlagAXMigrateEmoteMenuFromRoactGamepad then nil else t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.SortAndFiltersApply] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.SaveAsCharacter] = if not FFlagAXMigratePurchasePromptInteractiveToFocusNavigation then nil else t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.FormPeekViewApply] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.ManageOutfitsDelete] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.OpenItemDetailsPrompt] = if not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.UpdateOutfit] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.IgnoreTrustedFriendRequest] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.IgnoreFriendRequest] = t6[Enum.KeyCode.ButtonX],
-		[FocusNavigationEventNameEnum.ViewProfile] = if not FFlagSocialCarouselPressXToViewProfile then nil else t6[Enum.KeyCode.ButtonX]
-	},
-	[Enum.KeyCode.ButtonA] = {
-		[FocusNavigationEventNameEnum.HoldToAcceptTrustedFriendRequest] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToAcceptFriendRequest] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToAddFriend] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToJoinEvent] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToUnfollowEvent] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToNotifyMe] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToPlay] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToJoinFriend] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.SelectItem] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.SlotEmote] = if not FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.UnslotEmote] = if not FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.EquipSlotsSelectSlot] = if not FFlagAXMigrateEquipSlotsInputBindingsToRoactGamepad then nil else t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.Confirm] = t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.SelectOutfit] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.UnselectOutfit] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.SelectClothingTile] = t6[Enum.KeyCode.ButtonA]
-	},
-	[Enum.KeyCode.ButtonB] = {
-		[FocusNavigationEventNameEnum.CancelAndReset] = t6[Enum.KeyCode.ButtonB]
-	},
-	[Enum.KeyCode.ButtonR3] = {
-		[FocusNavigationEventNameEnum.ExitAvatarFullView] = if not FFlagAXMigrateSceneGamepadHandlerInputBindings then nil else t6[Enum.KeyCode.ButtonR3],
-		[FocusNavigationEventNameEnum.Fullscreen] = t6[Enum.KeyCode.ButtonR3],
-		[FocusNavigationEventNameEnum.ExitFullscreen] = t6[Enum.KeyCode.ButtonR3]
-	},
-	[Enum.KeyCode.ButtonL3] = {
-		[FocusNavigationEventNameEnum.OpenCatalogContextMenu] = if not FFlagAXMigrateAvatarEditorPageInputBindings and (not FFlagAXMigrateCatalogPageInputBindings and (not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation and not FFlagAXMigrateProfilePictureEditorEmotesPageToFocusNavigation)) then nil else t6[Enum.KeyCode.ButtonL3],
-		[FocusNavigationEventNameEnum.OpenItemDetailsPage] = t6[Enum.KeyCode.ButtonL3],
-		[FocusNavigationEventNameEnum.ManageOutfitsToggleMultiSelect] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonL3],
-		[FocusNavigationEventNameEnum.ManageOutfitsCancelMultiSelect] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonL3],
-		[FocusNavigationEventNameEnum.OpenEditorDetailsPage] = if not FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation then nil else t6[Enum.KeyCode.ButtonL3],
-		[FocusNavigationEventNameEnum.Mute] = t6[Enum.KeyCode.ButtonL3],
-		[FocusNavigationEventNameEnum.Unmute] = t6[Enum.KeyCode.ButtonL3]
-	},
-	[Enum.KeyCode.ButtonStart] = {
-		[FocusNavigationEventNameEnum.OpenQuickMenu] = t6[Enum.KeyCode.ButtonStart]
-	},
-	[Enum.KeyCode.Thumbstick1] = {
-		[FocusNavigationEventNameEnum.PanAvatar] = if not FFlagAXMigrateSceneGamepadHandlerInputBindings then nil else t6[Enum.KeyCode.Thumbstick1],
-		[FocusNavigationEventNameEnum.MoveClothingTile] = t6[Enum.KeyCode.Thumbstick1]
-	},
-	[Enum.KeyCode.Thumbstick2] = {
-		[FocusNavigationEventNameEnum.RotateAndZoomAvatar] = if not FFlagAXMigrateSceneGamepadHandlerInputBindings then nil else t6[Enum.KeyCode.Thumbstick2]
-	}
+
+local v5 = {}
+local ButtonY = Enum.KeyCode.ButtonY
+local v6 = {
+	[FocusNavigationEventNameEnum.Search] = v4[Enum.KeyCode.ButtonY],
+	[FocusNavigationEventNameEnum.DisplayStatsAndInfo] = v4[Enum.KeyCode.ButtonY],
+	[FocusNavigationEventNameEnum.OpenLayeredClothingSortResetPrompt] = v4[Enum.KeyCode.ButtonY],
+	[FocusNavigationEventNameEnum.OpenLayeredMakeupSortResetPrompt] = v4[Enum.KeyCode.ButtonY],
+	[FocusNavigationEventNameEnum.SortAndFiltersReset] = v4[Enum.KeyCode.ButtonY],
+	[FocusNavigationEventNameEnum.WearAfterPurchase] = v4[Enum.KeyCode.ButtonY],
+	[FocusNavigationEventNameEnum.FormPeekViewReset] = v4[Enum.KeyCode.ButtonY]
 }
-local v50 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled then nil else {
-	[Enum.KeyCode.ButtonA] = {
-		[FocusNavigationEventNameEnum.HoldToAcceptTrustedFriendRequest] = v48[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToAcceptFriendRequest] = v48[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToAddFriend] = v48[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToJoinEvent] = v48[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToUnfollowEvent] = v48[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToNotifyMe] = v48[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToPlay] = v48[Enum.KeyCode.ButtonA],
-		[FocusNavigationEventNameEnum.HoldToJoinFriend] = v48[Enum.KeyCode.ButtonA]
-	}
+local AdjustAccessoryViewReset = FocusNavigationEventNameEnum.AdjustAccessoryViewReset
+local v7
+
+if FFlagAXMigrateAdjustAccessoryViewToFocusNavigation then
+	v7 = v4[Enum.KeyCode.ButtonY]
+end
+
+v6[AdjustAccessoryViewReset] = v7
+
+local ManageOutfitsRename = FocusNavigationEventNameEnum.ManageOutfitsRename
+local v8
+
+if FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then
+	v8 = v4[Enum.KeyCode.ButtonY]
+end
+
+v6[ManageOutfitsRename] = v8
+
+v6[FocusNavigationEventNameEnum.OpenItemDetailsPeekView] = v4[Enum.KeyCode.ButtonY]
+v6[FocusNavigationEventNameEnum.CloseItemDetailsPeekView] = v4[Enum.KeyCode.ButtonY]
+v6[FocusNavigationEventNameEnum.ToggleTryOn] = v4[Enum.KeyCode.ButtonY]
+v6[FocusNavigationEventNameEnum.ToggleTryOnManager] = v4[Enum.KeyCode.ButtonY]
+v6[FocusNavigationEventNameEnum.RemoveClothingTile] = v4[Enum.KeyCode.ButtonY]
+v5[ButtonY] = v6
+
+local ButtonX = Enum.KeyCode.ButtonX
+local v9 = {
+	[FocusNavigationEventNameEnum.Play] = v4[Enum.KeyCode.ButtonX],
+	[FocusNavigationEventNameEnum.SeeAll] = v4[Enum.KeyCode.ButtonX],
+	[FocusNavigationEventNameEnum.AcceptFriendRequest] = v4[Enum.KeyCode.ButtonX],
+	[FocusNavigationEventNameEnum.AddFriend] = v4[Enum.KeyCode.ButtonX],
+	[FocusNavigationEventNameEnum.OpenBuyCatalogItemPrompt] = v4[Enum.KeyCode.ButtonX]
 }
-local t8 = {
+local OpenItemDetailsPage = FocusNavigationEventNameEnum.OpenItemDetailsPage
+local v10
+
+if FFlagAXMigrateEmoteMenuFromRoactGamepad then
+	v10 = v4[Enum.KeyCode.ButtonX]
+end
+
+v9[OpenItemDetailsPage] = v10
+
+v9[FocusNavigationEventNameEnum.SortAndFiltersApply] = v4[Enum.KeyCode.ButtonX]
+v9[FocusNavigationEventNameEnum.SaveAsCharacter] = v4[Enum.KeyCode.ButtonX]
+v9[FocusNavigationEventNameEnum.FormPeekViewApply] = v4[Enum.KeyCode.ButtonX]
+local ManageOutfitsDelete = FocusNavigationEventNameEnum.ManageOutfitsDelete
+local v11
+
+if FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then
+	v11 = v4[Enum.KeyCode.ButtonX]
+end
+
+v9[ManageOutfitsDelete] = v11
+
+v9[FocusNavigationEventNameEnum.OpenItemDetailsPrompt] = v4[Enum.KeyCode.ButtonX]
+v9[FocusNavigationEventNameEnum.UpdateOutfit] = v4[Enum.KeyCode.ButtonX]
+v9[FocusNavigationEventNameEnum.IgnoreTrustedFriendRequest] = v4[Enum.KeyCode.ButtonX]
+v9[FocusNavigationEventNameEnum.IgnoreFriendRequest] = v4[Enum.KeyCode.ButtonX]
+v9[FocusNavigationEventNameEnum.ViewProfile] = v4[Enum.KeyCode.ButtonX]
+v5[ButtonX] = v9
+
+local ButtonA = Enum.KeyCode.ButtonA
+local PlayVideo = FocusNavigationEventNameEnum.PlayVideo
+local v13
+
+if FFlagLuaAppMediaGalleryGamepadSupport then
+	v13 = v4[Enum.KeyCode.ButtonA]
+end
+
+local v12 = { [PlayVideo] = v13 }
+
+local PauseVideo = FocusNavigationEventNameEnum.PauseVideo
+local v14
+
+if FFlagLuaAppMediaGalleryGamepadSupport then
+	v14 = v4[Enum.KeyCode.ButtonA]
+end
+
+v12[PauseVideo] = v14
+
+v12[FocusNavigationEventNameEnum.HoldToAcceptTrustedFriendRequest] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.HoldToAcceptFriendRequest] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.HoldToAddFriend] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.HoldToJoinEvent] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.HoldToUnfollowEvent] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.HoldToNotifyMe] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.HoldToPlay] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.HoldToJoinFriend] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.SelectItem] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.SlotEmote] = v4[Enum.KeyCode.ButtonA]
+v12[FocusNavigationEventNameEnum.UnslotEmote] = v4[Enum.KeyCode.ButtonA]
+local EquipSlotsSelectSlot = FocusNavigationEventNameEnum.EquipSlotsSelectSlot
+local v15
+
+if FFlagAXMigrateEquipSlotsInputBindingsToRoactGamepad then
+	v15 = v4[Enum.KeyCode.ButtonA]
+end
+
+v12[EquipSlotsSelectSlot] = v15
+
+v12[FocusNavigationEventNameEnum.Confirm] = v4[Enum.KeyCode.ButtonA]
+local SelectOutfit = FocusNavigationEventNameEnum.SelectOutfit
+local v16
+
+if FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then
+	v16 = v4[Enum.KeyCode.ButtonA]
+end
+
+v12[SelectOutfit] = v16
+
+local UnselectOutfit = FocusNavigationEventNameEnum.UnselectOutfit
+local v17
+
+if FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then
+	v17 = v4[Enum.KeyCode.ButtonA]
+end
+
+v12[UnselectOutfit] = v17
+
+v12[FocusNavigationEventNameEnum.SelectClothingTile] = v4[Enum.KeyCode.ButtonA]
+v5[ButtonA] = v12
+
+local ButtonB = Enum.KeyCode.ButtonB
+v5[ButtonB] = { [FocusNavigationEventNameEnum.CancelAndReset] = v4[Enum.KeyCode.ButtonB] }
+
+local ButtonR3 = Enum.KeyCode.ButtonR3
+local v18 = {
+	[FocusNavigationEventNameEnum.ExitAvatarFullView] = v4[Enum.KeyCode.ButtonR3],
+	[FocusNavigationEventNameEnum.Fullscreen] = v4[Enum.KeyCode.ButtonR3],
+	[FocusNavigationEventNameEnum.ExitFullscreen] = v4[Enum.KeyCode.ButtonR3]
+}
+local CollapseAvatar = FocusNavigationEventNameEnum.CollapseAvatar
+local v19
+
+if FFlagEnableSplitPane then
+	v19 = v4[Enum.KeyCode.ButtonR3]
+end
+
+v18[CollapseAvatar] = v19
+
+local ExpandAvatar = FocusNavigationEventNameEnum.ExpandAvatar
+local v20
+
+if FFlagEnableSplitPane then
+	v20 = v4[Enum.KeyCode.ButtonR3]
+end
+
+v18[ExpandAvatar] = v20
+v5[ButtonR3] = v18
+
+local ButtonL3 = Enum.KeyCode.ButtonL3
+local v21 = {
+	[FocusNavigationEventNameEnum.OpenCatalogContextMenu] = v4[Enum.KeyCode.ButtonL3],
+	[FocusNavigationEventNameEnum.OpenItemDetailsPage] = v4[Enum.KeyCode.ButtonL3]
+}
+local ManageOutfitsToggleMultiSelect = FocusNavigationEventNameEnum.ManageOutfitsToggleMultiSelect
+local v22
+
+if FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then
+	v22 = v4[Enum.KeyCode.ButtonL3]
+end
+
+v21[ManageOutfitsToggleMultiSelect] = v22
+
+local ManageOutfitsCancelMultiSelect = FocusNavigationEventNameEnum.ManageOutfitsCancelMultiSelect
+local v23
+
+if FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then
+	v23 = v4[Enum.KeyCode.ButtonL3]
+end
+
+v21[ManageOutfitsCancelMultiSelect] = v23
+
+v21[FocusNavigationEventNameEnum.OpenEditorDetailsPage] = v4[Enum.KeyCode.ButtonL3]
+v21[FocusNavigationEventNameEnum.Mute] = v4[Enum.KeyCode.ButtonL3]
+v21[FocusNavigationEventNameEnum.Unmute] = v4[Enum.KeyCode.ButtonL3]
+v5[ButtonL3] = v21
+
+local ButtonStart = Enum.KeyCode.ButtonStart
+v5[ButtonStart] = { [FocusNavigationEventNameEnum.OpenQuickMenu] = v4[Enum.KeyCode.ButtonStart] }
+
+local Thumbstick1 = Enum.KeyCode.Thumbstick1
+v5[Thumbstick1] = {
+	[FocusNavigationEventNameEnum.PanAvatar] = v4[Enum.KeyCode.Thumbstick1],
+	[FocusNavigationEventNameEnum.MoveClothingTile] = v4[Enum.KeyCode.Thumbstick1]
+}
+
+local Thumbstick2 = Enum.KeyCode.Thumbstick2
+v5[Thumbstick2] = {
+	[FocusNavigationEventNameEnum.RotateAndZoomAvatar] = v4[Enum.KeyCode.Thumbstick2]
+}
+
+local v24 = {}
+local buttonA = Enum.KeyCode.ButtonA
+v24[buttonA] = {
+	[FocusNavigationEventNameEnum.HoldToAcceptTrustedFriendRequest] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA],
+	[FocusNavigationEventNameEnum.HoldToAcceptFriendRequest] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA],
+	[FocusNavigationEventNameEnum.HoldToAddFriend] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA],
+	[FocusNavigationEventNameEnum.HoldToJoinEvent] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA],
+	[FocusNavigationEventNameEnum.HoldToUnfollowEvent] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA],
+	[FocusNavigationEventNameEnum.HoldToNotifyMe] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA],
+	[FocusNavigationEventNameEnum.HoldToPlay] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA],
+	[FocusNavigationEventNameEnum.HoldToJoinFriend] = imageForKeyCodesByButtonA[Enum.KeyCode.ButtonA]
+}
+
+local v25 = {
 	[FocusNavigationEventNameEnum.Fullscreen] = "Feature.ExperienceDetails.Action.FullScreen",
 	[FocusNavigationEventNameEnum.ExitFullscreen] = "Feature.ExperienceDetails.Action.ExitFullScreen",
 	[FocusNavigationEventNameEnum.Mute] = "Feature.ExperienceDetails.Action.Mute",
 	[FocusNavigationEventNameEnum.Unmute] = "Feature.ExperienceDetails.Action.Unmute",
+	[FocusNavigationEventNameEnum.PlayVideo] = FFlagLuaAppMediaGalleryGamepadSupport and "Feature.GameDetails.Action.PlayVideo" or nil,
+	[FocusNavigationEventNameEnum.PauseVideo] = FFlagLuaAppMediaGalleryGamepadSupport and "Feature.GameDetails.Action.PauseVideo" or nil,
 	[FocusNavigationEventNameEnum.Search] = "CommonUI.Features.Label.ControllerBar.Search",
 	[FocusNavigationEventNameEnum.SeeAll] = "Feature.Home.ActionSeeAll",
 	[FocusNavigationEventNameEnum.Play] = "Common.VisitGame.Label.Play",
@@ -243,11 +386,11 @@ local t8 = {
 	[FocusNavigationEventNameEnum.HoldToPlay] = "CommonUI.Features.Label.ControllerBar.ToPlaySuffix",
 	[FocusNavigationEventNameEnum.HoldToJoinFriend] = "Feature.Profile.Action.JoinGame",
 	[FocusNavigationEventNameEnum.IgnoreTrustedFriendRequest] = "Feature.AddFriends.Action.IgnoreTrustedFriendRequest",
-	[FocusNavigationEventNameEnum.IgnoreFriendRequest] = not FFlagConnectionsToFriendsRename and "Feature.AddFriends.Action.IgnoreConnectionRequest" or "Feature.AddFriends.Action.IgnoreFriendRequest",
-	[FocusNavigationEventNameEnum.AcceptFriendRequest] = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.AcceptConnection" or "CommonUI.Features.Label.AcceptFriend",
-	[FocusNavigationEventNameEnum.AddFriend] = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.AddConnection" or "CommonUI.Features.Label.AddFriend",
-	[FocusNavigationEventNameEnum.HoldToAddFriend] = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.AddConnection" or "CommonUI.Features.Label.AddFriend",
-	[FocusNavigationEventNameEnum.HoldToAcceptFriendRequest] = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.AcceptConnection" or "CommonUI.Features.Label.AcceptFriend",
+	[FocusNavigationEventNameEnum.IgnoreFriendRequest] = "Feature.AddFriends.Action.IgnoreFriendRequest",
+	[FocusNavigationEventNameEnum.AcceptFriendRequest] = "CommonUI.Features.Label.AcceptFriend",
+	[FocusNavigationEventNameEnum.AddFriend] = "CommonUI.Features.Label.AddFriend",
+	[FocusNavigationEventNameEnum.HoldToAddFriend] = "CommonUI.Features.Label.AddFriend",
+	[FocusNavigationEventNameEnum.HoldToAcceptFriendRequest] = "CommonUI.Features.Label.AcceptFriend",
 	[FocusNavigationEventNameEnum.HoldToAcceptTrustedFriendRequest] = "Feature.Friends.TrustedFriend.AcceptTrustedRequest",
 	[FocusNavigationEventNameEnum.HoldToJoinEvent] = "Feature.VirtualEvents.JoinEvent",
 	[FocusNavigationEventNameEnum.HoldToUnfollowEvent] = "Feature.VirtualEvents.UnfollowEvent",
@@ -256,53 +399,58 @@ local t8 = {
 	[FocusNavigationEventNameEnum.ScrollUp] = "Feature.Accessibility.Action.ScrollUp",
 	[FocusNavigationEventNameEnum.ScrollDown] = "Feature.Accessibility.Action.ScrollDown",
 	[FocusNavigationEventNameEnum.NavigateBack] = "CommonUI.Controls.Action.Back",
-	[FocusNavigationEventNameEnum.OpenBuyCatalogItemPrompt] = if not FFlagAXMigrateAvatarEditorPageInputBindings and not FFlagAXMigrateCatalogSearchToFocusNavigation then nil else "Feature.Catalog.Action.Buy",
-	[FocusNavigationEventNameEnum.OpenCatalogContextMenu] = if not FFlagAXMigrateAvatarEditorPageInputBindings and (not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation and not FFlagAXMigrateProfilePictureEditorEmotesPageToFocusNavigation) then nil else "Feature.Catalog.Action.ItemOptions",
+	[FocusNavigationEventNameEnum.OpenBuyCatalogItemPrompt] = "Feature.Catalog.Action.Buy",
+	[FocusNavigationEventNameEnum.OpenCatalogContextMenu] = "Feature.Catalog.Action.ItemOptions",
 	[FocusNavigationEventNameEnum.OpenItemDetailsPage] = "Feature.Catalog.Action.OpenDetails",
 	[FocusNavigationEventNameEnum.SelectItem] = "Feature.Avatar.Action.Select",
-	[FocusNavigationEventNameEnum.EquipSlotsSelectSlot] = if not FFlagAXMigrateEquipSlotsInputBindingsToRoactGamepad then nil else "Feature.Avatar.Action.SelectSlot",
-	[FocusNavigationEventNameEnum.SlotEmote] = if not FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.SlotEmote",
-	[FocusNavigationEventNameEnum.UnslotEmote] = if not FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.UnslotEmote",
-	[FocusNavigationEventNameEnum.OpenEditorDetailsPage] = if not FFlagAXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation then nil else "Feature.Catalog.Action.OpenDetails",
-	[FocusNavigationEventNameEnum.PanAvatar] = if not FFlagAXMigrateSceneGamepadHandlerInputBindings then nil else "Feature.Avatar.Action.Pan",
-	[FocusNavigationEventNameEnum.RotateAndZoomAvatar] = if not FFlagAXMigrateSceneGamepadHandlerInputBindings then nil else "Feature.Avatar.Action.Rotate",
-	[FocusNavigationEventNameEnum.ExitAvatarFullView] = if not FFlagAXMigrateSceneGamepadHandlerInputBindings then nil else "Feature.Avatar.Action.DefaultView",
+	[FocusNavigationEventNameEnum.EquipSlotsSelectSlot] = FFlagAXMigrateEquipSlotsInputBindingsToRoactGamepad and "Feature.Avatar.Action.SelectSlot" or nil,
+	[FocusNavigationEventNameEnum.SlotEmote] = "Feature.Avatar.Action.SlotEmote",
+	[FocusNavigationEventNameEnum.UnslotEmote] = "Feature.Avatar.Action.UnslotEmote",
+	[FocusNavigationEventNameEnum.OpenEditorDetailsPage] = "Feature.Catalog.Action.OpenDetails",
+	[FocusNavigationEventNameEnum.PanAvatar] = "Feature.Avatar.Action.Pan",
+	[FocusNavigationEventNameEnum.RotateAndZoomAvatar] = "Feature.Avatar.Action.Rotate",
+	[FocusNavigationEventNameEnum.ExitAvatarFullView] = "Feature.Avatar.Action.DefaultView",
 	[FocusNavigationEventNameEnum.OpenLayeredClothingSortResetPrompt] = "CommonUI.Messages.Action.Reset",
 	[FocusNavigationEventNameEnum.OpenLayeredMakeupSortResetPrompt] = "CommonUI.Messages.Action.Reset",
 	[FocusNavigationEventNameEnum.SortAndFiltersApply] = "CommonUI.Messages.Action.Apply",
 	[FocusNavigationEventNameEnum.SortAndFiltersReset] = "CommonUI.Messages.Action.Reset",
-	[FocusNavigationEventNameEnum.SaveAsCharacter] = if not FFlagAXMigratePurchasePromptInteractiveToFocusNavigation then nil else "Feature.Avatar.Heading.SaveCostume",
-	[FocusNavigationEventNameEnum.WearAfterPurchase] = if not FFlagAXMigratePurchasePromptInteractiveToFocusNavigation then nil else "Feature.Avatar.Heading.WearConfirmation",
+	[FocusNavigationEventNameEnum.SaveAsCharacter] = "Feature.Avatar.Heading.SaveCostume",
+	[FocusNavigationEventNameEnum.WearAfterPurchase] = "Feature.Avatar.Heading.WearConfirmation",
 	[FocusNavigationEventNameEnum.Confirm] = "CommonUI.Controls.Action.Confirm",
 	[FocusNavigationEventNameEnum.FormPeekViewApply] = "CommonUI.Messages.Action.Apply",
 	[FocusNavigationEventNameEnum.FormPeekViewReset] = "CommonUI.Messages.Action.Reset",
-	[FocusNavigationEventNameEnum.AdjustAccessoryViewReset] = if not FFlagAXMigrateAdjustAccessoryViewToFocusNavigation then nil else "CommonUI.Messages.Action.Reset",
-	[FocusNavigationEventNameEnum.ManageOutfitsToggleMultiSelect] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.SelectMultipleItems",
-	[FocusNavigationEventNameEnum.ManageOutfitsCancelMultiSelect] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.CancelSelection",
-	[FocusNavigationEventNameEnum.ManageOutfitsDelete] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.Delete",
-	[FocusNavigationEventNameEnum.ManageOutfitsRename] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.Rename",
-	[FocusNavigationEventNameEnum.SelectOutfit] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.Select",
-	[FocusNavigationEventNameEnum.UnselectOutfit] = if not FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation then nil else "Feature.Avatar.Action.Unselect",
-	[FocusNavigationEventNameEnum.OpenItemDetailsPeekView] = if not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation then nil else "Feature.Catalog.Action.OpenDetails",
-	[FocusNavigationEventNameEnum.CloseItemDetailsPeekView] = if not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation then nil else "Feature.Catalog.Action.CloseDetails",
-	[FocusNavigationEventNameEnum.OpenItemDetailsPrompt] = if not FFlagAXMigrateItemDetailsInputBindingsToFocusNavigation then nil else "Feature.Catalog.Action.Buy",
-	[FocusNavigationEventNameEnum.ToggleTryOn] = if not FFlagAXMigrateCatalogSearchToFocusNavigation then nil else "Feature.Catalog.Label.TryOns",
+	[FocusNavigationEventNameEnum.AdjustAccessoryViewReset] = FFlagAXMigrateAdjustAccessoryViewToFocusNavigation and "CommonUI.Messages.Action.Reset" or nil,
+	[FocusNavigationEventNameEnum.ManageOutfitsToggleMultiSelect] = FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation and "Feature.Avatar.Action.SelectMultipleItems" or nil,
+	[FocusNavigationEventNameEnum.ManageOutfitsCancelMultiSelect] = FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation and "Feature.Avatar.Action.CancelSelection" or nil,
+	[FocusNavigationEventNameEnum.ManageOutfitsDelete] = FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation and "Feature.Avatar.Action.Delete" or nil,
+	[FocusNavigationEventNameEnum.ManageOutfitsRename] = FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation and "Feature.Avatar.Action.Rename" or nil,
+	[FocusNavigationEventNameEnum.SelectOutfit] = FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation and "Feature.Avatar.Action.Select" or nil,
+	[FocusNavigationEventNameEnum.UnselectOutfit] = FFlagAXMigrateManageOutfitPageInputBindingsToFocusNavigation and "Feature.Avatar.Action.Unselect" or nil,
+	[FocusNavigationEventNameEnum.OpenItemDetailsPeekView] = "Feature.Catalog.Action.OpenDetails",
+	[FocusNavigationEventNameEnum.CloseItemDetailsPeekView] = "Feature.Catalog.Action.CloseDetails",
+	[FocusNavigationEventNameEnum.OpenItemDetailsPrompt] = "Feature.Catalog.Action.Buy",
+	[FocusNavigationEventNameEnum.ToggleTryOn] = "Feature.Catalog.Label.TryOns",
 	[FocusNavigationEventNameEnum.UpdateOutfit] = "Feature.Avatar.Action.Update",
-	[FocusNavigationEventNameEnum.ToggleTryOnManager] = if not FFlagAXMigrateLookDetailsPeekViewToFocusNavigation and not FFlagAXMigrateCatalogPageInputBindings then nil else "Feature.Catalog.Label.TryOns",
+	[FocusNavigationEventNameEnum.ToggleTryOnManager] = "Feature.Catalog.Label.TryOns",
 	[FocusNavigationEventNameEnum.SelectClothingTile] = "Feature.Avatar.Action.Select",
 	[FocusNavigationEventNameEnum.MoveClothingTile] = "Feature.Avatar.Title.Move",
 	[FocusNavigationEventNameEnum.RemoveClothingTile] = "Feature.Catalog.Action.Remove",
 	[FocusNavigationEventNameEnum.CancelAndReset] = "Feature.Catalog.Action.Cancel",
-	[FocusNavigationEventNameEnum.ViewProfile] = if not FFlagSocialCarouselPressXToViewProfile then nil else "Feature.Profile.Action.ViewProfile"
+	[FocusNavigationEventNameEnum.ViewProfile] = "Feature.Profile.Action.ViewProfile",
+	[FocusNavigationEventNameEnum.CollapseAvatar] = FFlagEnableSplitPane and "Feature.SplitPane.Label.CollapseAvatar" or nil,
+	[FocusNavigationEventNameEnum.ExpandAvatar] = FFlagEnableSplitPane and "Feature.SplitPane.Label.ExpandAvatar" or nil
 }
-local t9 = {
+
+local v26 = {
 	[FocusNavigationEventNameEnum.HoldToPlay] = "Common.VisitGame.Label.Play",
 	[FocusNavigationEventNameEnum.HoldToJoinFriend] = "Feature.Profile.Action.JoinGame"
 }
-local t10 = {
+
+local v27 = {
 	[FocusNavigationEventNameEnum.HoldToPlay] = "CommonUI.Features.Label.ControllerBar.HoldPrefix"
 }
-local t11 = {
+
+local set3 = {
 	[FocusNavigationEventNameEnum.HoldToAcceptTrustedFriendRequest] = true,
 	[FocusNavigationEventNameEnum.HoldToAcceptFriendRequest] = true,
 	[FocusNavigationEventNameEnum.HoldToAddFriend] = true,
@@ -313,207 +461,389 @@ local t11 = {
 	[FocusNavigationEventNameEnum.HoldToJoinFriend] = true
 }
 
-local function getLegacyInputBindings(p1, p2, p3) -- line: 472
-	-- upvalues: t1 (copy), t6 (copy)
+local function applyPlatformGamepadIcon(p, p2, p3)
+	local icon = p3[p2]
+
+	if icon then
+		p.icon = icon
+		p.isPlatformIcon = true
+	end
+end
+
+local function getLegacyInputBindings(p, p2, object, p3)
 	if p2.axes then
 		local vertical = p2.axes.vertical
 		local horizontal = p2.axes.horizontal
-		local v66 = t1[p1]
-		local t12 = {}
+		local v28 = v[p]
+
+		local v29 = {}
 
 		if vertical then
-			table.insert(t12, {
-				icon = v66.vertical,
-				text = p3:Format(vertical.key)
-			})
+			table.insert(v29, { icon = v28.vertical, text = object:Format(vertical.key) })
 		end
 
 		if horizontal then
-			table.insert(t12, {
-				icon = v66.horizontal,
-				text = p3:Format(horizontal.key)
-			})
+			table.insert(v29, { icon = v28.horizontal, text = object:Format(horizontal.key) })
 		end
 
-		return t12
-	end
+		return v29
+	else
+		if not p2.key then
+			return {}
+		end
 
-	if p2.key then
-		return {{
-			icon = t6[p1],
-			text = p3:Format(p2.key)
-		}}
-	end
+		local v28 = { icon = v4[p], text = object:Format(p2.key) }
+		local icon = FFlagShortcutBarPlatformGamepadIcons and p3 and p3[p]
 
-	return {}
+		if icon then
+			v28.icon = icon
+			v28.isPlatformIcon = true
+		end
+
+		return { v28 }
+	end
 end
-local function selectRoactGamepadBindings(p4) -- line: 505
-	if p4.GamepadBottomBar then
-		return p4.GamepadBottomBar.boundInputs
+
+local function selectRoactGamepadBindings(p)
+	if p.GamepadBottomBar then
+		return p.GamepadBottomBar.boundInputs
 	end
 
 	return nil
 end
-local function getGamepadItems(p5, p6, p7, p8, p9) -- line: 509
-	-- upvalues: t2 (copy), t4 (copy), t5 (copy), getLegacyInputBindings (copy), t7 (copy), FFlagLuaAppEnableStickyShortcutBar (copy), FFlagGuacStickyShortcutBarEnabled (copy), v50 (copy), t9 (copy), t8 (copy), t10 (copy), t11 (copy), FocusNavigationEventNameEnum (copy), t6 (copy)
-	local t13 = {}
 
-	for _, v76 in t2 do
-		if not t4[v76] or p8 and t5[v76] then
+local function getPlatformGamepadImages()
+	local imageForKeyCodes = {}
+
+	for k in v4 do
+		if not (k ~= Enum.KeyCode.Thumbstick1 and k ~= Enum.KeyCode.Thumbstick2) then
 			continue
 		end
 
-		if p8 then
-			if t5[v76] then
+		local imageForKeyCode = UserInputService:GetImageForKeyCode(k)
+
+		if imageForKeyCode ~= "" then
+			imageForKeyCodes[k] = imageForKeyCode
+		end
+	end
+
+	return imageForKeyCodes
+end
+
+local function usePlatformGamepadImages()
+	local state, setState = React.useState(getPlatformGamepadImages)
+
+	local v28 = React.useCallback(function()
+		setState(getPlatformGamepadImages())
+	end, {})
+
+	useExternalEvent(UserInputService.GamepadConnected, v28)
+	useExternalEvent(UserInputService.GamepadDisconnected, v28)
+
+	return state
+end
+
+local function getGamepadItems(p, p2, object, p3, p4, p5)
+	local gamepadItems = {}
+
+	for _, v28 in v2 do
+		if not set[v28] or p3 and set2[v28] then
+			continue
+		end
+
+		if p3 then
+			if set2[v28] then
 				continue
 			end
 
-			local v77 = p8[v76]
+			local v29 = p3[v28]
 
-			if v77 then
-				for _, v79 in (getLegacyInputBindings(v76, v77, p7)) do
-					table.insert(t13, v79)
+			if v29 then
+				local legacyInputBindings = getLegacyInputBindings(v28, v29, object, p5)
+
+				for _, legacyInputBinding in legacyInputBindings do
+					table.insert(gamepadItems, legacyInputBinding)
 				end
 			end
 		end
 
-		local v80 = p5[v76]
+		local eventName = p[v28]
 
-		if v80 then
-			local v81 = t7[v76]
-			local v82 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p9 then nil else v50[v76]
-			local v83 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or (not p9 or not v81) then nil else v81[v80]
-			local v84 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or (not p9 or not v82) then nil else v82[v80]
-			local v85 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p9 then if not v81 then nil else v81[v80] else v84 or v83
-			local v86 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p9 then nil else t9[v80]
-			local v87 = t8[v80]
-			local v88 = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p9 then t8[v80] else v86 or v87
-			local v89 = if not v88 then nil else p7:Format(v88)
-			local v90 = t10[v80]
-			local v91 = if not v90 then nil else p7:Format(v90)
-			local v92 = p6[v80]
-			local v93 = t11[v80]
-
-			if v85 and v89 then
-				table.insert(t13, {
-					icon = v85,
-					text = v89,
-					actionText = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p9 then v91 else nil,
-					progress = v92,
-					hasProgress = v93,
-					inputKeyCode = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p9 then nil else v76,
-					eventName = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p9 then nil else v80
-				})
-			end
+		if not eventName then
+			continue
 		end
+
+		local v29 = v5[v28]
+		local v30
+
+		if p4 then
+			v30 = v24[v28]
+		end
+
+		local v31
+
+		if p4 and v29 then
+			v31 = v29[eventName]
+		end
+
+		local v32
+
+		if p4 and v30 then
+			v32 = v30[eventName]
+		end
+
+		local icon
+
+		if p4 then
+			icon = v32 or v31
+		elseif v29 then
+			icon = v29[eventName]
+		end
+
+		local v40
+
+		if p4 then
+			v40 = v26[eventName]
+		end
+
+		local v41 = v25[eventName]
+		local v42
+
+		if p4 then
+			v42 = v40 or v41
+		else
+			v42 = v25[eventName]
+		end
+
+		local text
+
+		if v42 then
+			text = object:Format(v42)
+		end
+
+		local v44 = v27[eventName]
+		local actionText
+
+		if v44 then
+			actionText = object:Format(v44)
+		end
+
+		local progress = p2[eventName]
+		local hasProgress = set3[eventName]
+
+		if not (icon and text) then
+			continue
+		end
+
+		if p4 then
+			actionText = nil
+		end
+
+		local inputKeyCode
+
+		if p4 then
+			inputKeyCode = v28
+		end
+
+		if not p4 then
+			eventName = nil
+		end
+
+		local v48 = {
+			icon = icon,
+			text = text,
+			actionText = actionText,
+			progress = progress,
+			hasProgress = hasProgress,
+			inputKeyCode = inputKeyCode,
+			eventName = eventName
+		}
+		local icon2 = FFlagShortcutBarPlatformGamepadIcons and p5 and p5[v28]
+
+		if icon2 then
+			v48.icon = icon2
+			v48.isPlatformIcon = true
+		end
+
+		table.insert(gamepadItems, v48)
 	end
 
-	if (FFlagLuaAppEnableStickyShortcutBar or FFlagGuacStickyShortcutBarEnabled) and p9 then
-		local v94 = p5[Enum.KeyCode.ButtonB]
-
-		if v94 == FocusNavigationEventNameEnum.NavigateBack then
-			table.insert(t13, {
-				icon = t6[Enum.KeyCode.ButtonB],
-				text = p7:Format(t8[v94]),
-				inputKeyCode = Enum.KeyCode.ButtonB,
-				eventName = v94
-			})
-		end
+	if not p4 then
+		return gamepadItems
 	end
 
-	return t13
+	local eventName = p[Enum.KeyCode.ButtonB]
+
+	if eventName ~= FocusNavigationEventNameEnum.NavigateBack then
+		return gamepadItems
+	end
+
+	local v28 = {
+		icon = v4[Enum.KeyCode.ButtonB],
+		text = object:Format(v25[eventName]),
+		inputKeyCode = Enum.KeyCode.ButtonB,
+		eventName = eventName
+	}
+	local icon = FFlagShortcutBarPlatformGamepadIcons and p5 and p5[Enum.KeyCode.ButtonB]
+
+	if icon then
+		v28.icon = icon
+		v28.isPlatformIcon = true
+	end
+
+	table.insert(gamepadItems, v28)
+
+	return gamepadItems
 end
-local function getKeyboardItems(p10, p11, p12, p13) -- line: 613
-	-- upvalues: t4 (copy), t3 (copy), t8 (copy), t10 (copy), t11 (copy), FFlagLuaAppEnableStickyShortcutBar (copy), FFlagGuacStickyShortcutBarEnabled (copy)
-	local t14 = {}
-	local t15 = {}
 
-	for v101, v102 in p10 do
-		if not t4[v101] then
-			if typeof(t15[v102]) == "table" then
-				table.insert(t15[v102], v101)
-			else
-				t15[v102] = { v101 }
-			end
+local function getKeyboardItems(items, p, object, p2)
+	local v28 = {}
+	local keyboardItems = {}
+
+	for k, item in items do
+		if set[k] then
+			continue
+		end
+
+		if typeof(v28[item]) == "table" then
+			table.insert(v28[item], k)
+		else
+			v28[item] = { k }
 		end
 	end
 
-	for _, v104 in t3 do
-		local v105 = t15[v104]
+	for _, eventName in v3 do
+		local icon = v28[eventName]
 
-		if v105 then
-			local v106 = t8[v104]
-			local v107 = if not v106 then nil else p12:Format(v106)
-			local v108 = t10[v104]
-			local v109 = if not v108 then nil else p12:Format(v108)
-			local v110 = p11[v104]
-			local v111 = t11[v104]
-
-			if v107 then
-				table.insert(t14, {
-					icon = v105,
-					text = v107,
-					actionText = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p13 then v109 else nil,
-					progress = v110,
-					hasProgress = v111,
-					inputKeyCode = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p13 then nil else v105[1],
-					eventName = if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled or not p13 then nil else v104
-				})
-			end
+		if not icon then
+			continue
 		end
+
+		local v29 = v25[eventName]
+		local text
+
+		if v29 then
+			text = object:Format(v29)
+		end
+
+		local v30 = v27[eventName]
+		local actionText
+
+		if v30 then
+			actionText = object:Format(v30)
+		end
+
+		local progress = p[eventName]
+		local hasProgress = set3[eventName]
+
+		if not text then
+			continue
+		end
+
+		if p2 then
+			actionText = nil
+		end
+
+		local inputKeyCode
+
+		if p2 then
+			inputKeyCode = icon[1]
+		end
+
+		if not p2 then
+			eventName = nil
+		end
+
+		table.insert(keyboardItems, {
+			icon = icon,
+			text = text,
+			actionText = actionText,
+			progress = progress,
+			hasProgress = hasProgress,
+			inputKeyCode = inputKeyCode,
+			eventName = eventName
+		})
 	end
 
-	return t14
+	return keyboardItems
 end
-local function useShortcutBarFrameProps() -- line: 667
-	-- upvalues: useUiModeInfo (copy), useDesignTokens (copy), UiMode (copy), FFlagEnableLeftNavOnConsole (copy), useSignalState (copy), Display (copy)
-	local v112 = useUiModeInfo()
-	local v113 = if not v112 then nil else v112.uiMode
-	local v114 = useDesignTokens()
 
-	if v113 == UiMode.TenFoot and not FFlagEnableLeftNavOnConsole then
-		return {}
-	end
+local function useShortcutBarFrameProps()
+	local v28 = useDesignTokens()
 
-	local v115 = if not FFlagEnableLeftNavOnConsole then nil else useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
+	local v29 = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
 
 	return {
-		Position = UDim2.new(0.5, 0, 1, not v114 and 0 or -v114.Size.Size_200 + (not FFlagEnableLeftNavOnConsole and 0 or v115.bottom)),
+		Position = UDim2.new(0.5, 0, 1, not v28 and 0 or -v28.Size.Size_200 + v29.bottom),
 		AnchorPoint = Vector2.new(0.5, 1)
 	}
 end
-local function useShortcutBarItems() -- line: 697
-	-- upvalues: ReactFocusNavigation (copy), React (copy), LocalizationRoactContext (copy), useHeldProgressByEvent (copy), useLastInputMethod (copy), FFlagLuaAppResponsiveEnginePreferredInput (copy), Responsive (copy), v21 (copy), useIsTvRemoteDevice (copy), useSelector (copy), selectRoactGamepadBindings (copy), FFlagGuacStickyShortcutBarEnabled (copy), useAppPolicy (copy), FFlagLuaAppEnableStickyShortcutBar (copy), useIsStickyShortcutBarEnabled (copy), getGamepadItems (copy), getKeyboardItems (copy)
-	local v116 = ReactFocusNavigation.useActiveEventMap()
-	local v117 = React.useContext(LocalizationRoactContext)
-	local v118 = useHeldProgressByEvent()
-	local v119 = useLastInputMethod()
-	local v120 = if not FFlagLuaAppResponsiveEnginePreferredInput then nil else Responsive.usePreferredInput()
-	local v121 = if not v21 then nil else useIsTvRemoteDevice()
-	local v122 = useSelector(selectRoactGamepadBindings)
-	local v123 = if not FFlagGuacStickyShortcutBarEnabled then if not FFlagLuaAppEnableStickyShortcutBar then nil else useIsStickyShortcutBarEnabled() else useAppPolicy(function(p14) -- line: 710
-		return p14.getStickyShortcutBarEnabled()
-	end)
 
-	if if not FFlagLuaAppResponsiveEnginePreferredInput then v119 == "Gamepad" else v120 == Responsive.Input.Directional then
-		if v121 then
-			return {}
-		end
+local function useShortcutBarItems()
+	local v28 = ReactFocusNavigation.useActiveEventMap()
+	local v29 = React.useContext(LocalizationRoactContext)
+	local v30 = useHeldProgressByEvent()
+	local v31 = useLastInputMethod()
+	local v32
 
-		return (getGamepadItems(v116, v118, v117, v122, if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled then nil else v123))
+	if FFlagLuaAppResponsiveEnginePreferredInput then
+		v32 = Responsive.usePreferredInput()
 	end
 
-	return (getKeyboardItems(v116, v118, v117, if not FFlagLuaAppEnableStickyShortcutBar and not FFlagGuacStickyShortcutBarEnabled then nil else v123))
+	local v38
+
+	if defineFastFlag then
+		v38 = useIsTvRemoteDevice()
+	end
+
+	local v39
+
+	if FFlagStickyShortcutBarTvRemoteWithGamepad then
+		v39 = useIsRealGamepadConnected()
+	else
+		v39 = false
+	end
+
+	local v40
+
+	if FFlagShortcutBarPlatformGamepadIcons then
+		v40 = usePlatformGamepadImages()
+	end
+
+	local v41 = useSelector(selectRoactGamepadBindings)
+
+	local v42 = useAppPolicy(function(p)
+		return p.getStickyShortcutBarEnabled()
+	end) or FFlagEnableStickyShortcutBarOnAllPlatforms
+
+	if FFlagShortcutBarPlatformGamepadIcons and not v42 then
+		v40 = nil
+	end
+
+	local v43
+
+	if FFlagLuaAppResponsiveEnginePreferredInput then
+		v43 = v32 == Responsive.Input.Directional
+	else
+		v43 = v31 == "Gamepad"
+	end
+
+	if not v43 then
+		return getKeyboardItems(v28, v30, v29, v42)
+	end
+
+	if v38 and not v39 then
+		return {}
+	end
+
+	return getGamepadItems(v28, v30, v29, v41, v42, v40)
 end
 
-function useAppShortcutBarProps() -- line: 749
-	-- upvalues: useShortcutBarFrameProps (copy), useShortcutBarItems (copy), Cryo (copy)
-	local v124 = useShortcutBarFrameProps()
-	local v125 = useShortcutBarItems()
+function useAppShortcutBarProps()
+	local v28 = useShortcutBarFrameProps()
+	local items = useShortcutBarItems()
 
-	return Cryo.Dictionary.union(v124, {
-		items = v125
-	})
+	return Cryo.Dictionary.union(v28, { items = items })
 end
 
 return useAppShortcutBarProps

@@ -1,12 +1,11 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local Object = require(Parent.LuauPolyfill).Object
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
-local function buildRootValue(p1) -- line: 6
-	-- upvalues: Object (copy)
-	local v5 = p1.Query or {}
-	local v6 = p1.Mutation or {}
-
-	return (Object.assign({}, v5, v6))
+local function buildRootValue(p)
+	local query = p.Query or {}
+	local mutation = p.Mutation or {}
+	return (Object.assign({}, query, mutation))
 end
 
 return buildRootValue

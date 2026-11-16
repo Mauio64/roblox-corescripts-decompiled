@@ -1,121 +1,110 @@
 local CoreGui = game:GetService("CoreGui")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
-
 game:GetService("StarterPlayer")
 
-local Common = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Common")
-local EngineFeature = game:GetEngineFeature("AvatarJointUpgradeFeature")
-local EngineFeature2 = game:GetEngineFeature("AvatarJointUpgradeDefaultOnFeature")
+local common = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Common")
 
-local function jointUpgradeActive() -- line: 11
-	-- upvalues: EngineFeature (copy), EngineFeature2 (copy)
-	return EngineFeature and EngineFeature2
+local engineFeature = game:GetEngineFeature("AvatarJointUpgradeFeature")
+local engineFeature2 = game:GetEngineFeature("AvatarJointUpgradeDefaultOnFeature")
+local function jointUpgradeActive() -- 4 equivalent calls inferred from this helper
+	return engineFeature and engineFeature2
 end
 
-local RagdollRigging = require(Common:FindFirstChild("RagdollRigging"))
-local HumanoidReadyUtil = require(Common:FindFirstChild("HumanoidReadyUtil"))
+local RagdollRigging = require(common:FindFirstChild("RagdollRigging"))
+local HumanoidReadyUtil = require(common:FindFirstChild("HumanoidReadyUtil"))
 
-local function getDefaultDeathType() -- line: 23
+local function getDefaultDeathType()
 	if not game:GetEngineFeature("PolicyInfoForServerRobloxOnlyAsyncEnabled") then
 		return game:DefineFastString("DeathTypeValue", "Classic")
 	end
 
-	local DefaultAvatarDeathType = game:GetService("PolicyService"):GetPolicyInfoForServerRobloxOnlyAsync().DefaultAvatarDeathType
+	local PolicyService = game:GetService("PolicyService")
+	local defaultAvatarDeathType = PolicyService:GetPolicyInfoForServerRobloxOnlyAsync().DefaultAvatarDeathType
 
-	if DefaultAvatarDeathType == nil then
+	if defaultAvatarDeathType == nil then
 		error("PolicyService did not have death type policy")
 	end
 
-	return DefaultAvatarDeathType
+	return defaultAvatarDeathType
 end
 
-local v10 = getDefaultDeathType()
-local StringValue = Instance.new("StringValue")
+local defaultDeathType = getDefaultDeathType()
 
-StringValue.Name = "DeathType"
-StringValue.Value = v10
-StringValue.Parent = RobloxReplicatedStorage
+local deathType = Instance.new("StringValue")
+deathType.Name = "DeathType"
+deathType.Value = defaultDeathType
+deathType.Parent = RobloxReplicatedStorage
 
-if not EngineFeature and v10 ~= "Ragdoll" then
+if not engineFeature and defaultDeathType ~= "Ragdoll" then
 	return
 end
 
-local t1 = {}
+local v = {}
 
-if not EngineFeature then
-	local RemoteEvent = Instance.new("RemoteEvent")
+if not engineFeature then
+	local onRagdoll = Instance.new("RemoteEvent")
+	onRagdoll.Name = "OnRagdoll"
+	onRagdoll.OnServerEvent:Connect(function(p, p2)
+		if p2 and v[p] == p2 then
+			local parent = p2 and p2.Parent
 
-	RemoteEvent.Name = "OnRagdoll"
-	RemoteEvent.OnServerEvent:Connect(function(player, p1) -- line: 62
-		-- upvalues: t1 (copy), RagdollRigging (copy)
-		if p1 and p1 == t1[player] then
-			local v17 = p1 and p1.Parent
-
-			if v17 and v17:IsA("Model") then
-				RagdollRigging.disableMotors(v17, p1.RigType)
+			if parent and parent:IsA("Model") then
+				RagdollRigging.disableMotors(parent, p2.RigType)
 			end
 
-			t1[player] = nil
+			v[p] = nil
 		end
 	end)
-	RemoteEvent.Parent = RobloxReplicatedStorage
+	onRagdoll.Parent = RobloxReplicatedStorage
 end
 
-HumanoidReadyUtil.registerHumanoidReady(function(p2, p3, p4) -- line: 75
-	-- upvalues: EngineFeature (copy), EngineFeature2 (copy), RagdollRigging (copy), v10 (copy), t1 (copy)
-	if EngineFeature then
-		if p4.RigType == Enum.HumanoidRigType.R15 and (EngineFeature and EngineFeature2) then
-			RagdollRigging.createRagdollJoints(p3, p4.RigType, EngineFeature and EngineFeature2)
-		elseif v10 == "Ragdoll" then
-			RagdollRigging.createRagdollJoints(p3, p4.RigType, false)
+HumanoidReadyUtil.registerHumanoidReady(function(p, p2, state)
+	if engineFeature then
+		if state.RigType == Enum.HumanoidRigType.R15 and jointUpgradeActive() then -- inferred equivalent call
+			RagdollRigging.createRagdollJoints(p2, state.RigType, jointUpgradeActive()) -- inferred equivalent call
+		elseif defaultDeathType == "Ragdoll" then
+			RagdollRigging.createRagdollJoints(p2, state.RigType, false)
 		end
 	end
 
-	if v10 ~= "Ragdoll" then
+	if defaultDeathType ~= "Ragdoll" then
 		return
 	end
 
-	local connection = nil
+	local characterRemovingConnection = nil
+	local function disconnect() -- 1 equivalent call inferred from this helper
+		characterRemovingConnection:Disconnect()
 
-	local function disconnect() -- line: 89
-		-- upvalues: connection (ref), t1 (copy), p2 (copy), p4 (copy)
-		connection:Disconnect()
-
-		if t1[p2] == p4 then
-			t1[p2] = nil
+		if v[p] == state then
+			v[p] = nil
 		end
 	end
 
-	connection = p2.CharacterRemoving:Connect(function(character) -- line: 97
-		-- upvalues: p3 (copy), connection (ref), t1 (copy), p2 (copy), p4 (copy)
-		if character == p3 then
-			connection:Disconnect()
-
-			if t1[p2] == p4 then
-				t1[p2] = nil
-			end
+	characterRemovingConnection = p.CharacterRemoving:Connect(function(character)
+		if character == p2 then
+			disconnect() -- inferred equivalent call
 		end
 	end)
-	p4.BreakJointsOnDeath = false
 
-	if not EngineFeature then
-		RagdollRigging.createRagdollJoints(p3, p4.RigType, EngineFeature and EngineFeature2)
+	state.BreakJointsOnDeath = false
+
+	if not engineFeature then
+		RagdollRigging.createRagdollJoints(p2, state.RigType, jointUpgradeActive()) -- inferred equivalent call
 	end
 
-	t1[p2] = p4
+	v[p] = state
 
-	if EngineFeature then
-		p4.Died:Connect(function() -- line: 114
-			-- upvalues: t1 (copy), p2 (copy), p4 (copy), RagdollRigging (copy), EngineFeature (copy), EngineFeature2 (copy)
-			t1[p2] = nil
+	if engineFeature then
+		state.Died:Connect(function()
+			v[p] = nil
 
-			local p4Parent = p4.Parent
+			local parent = state.Parent
 
-			if p4Parent and p4Parent:IsA("Model") then
-				RagdollRigging.disableMotors(p4Parent, p4.RigType)
+			if parent and parent:IsA("Model") then
+				RagdollRigging.disableMotors(parent, state.RigType)
 
-				if EngineFeature and EngineFeature2 then
-					RagdollRigging.easeNongraphicJointFriction(p4Parent, 0.85)
+				if jointUpgradeActive() then -- inferred equivalent call
+					RagdollRigging.easeNongraphicJointFriction(parent, 0.85)
 				end
 			end
 		end)

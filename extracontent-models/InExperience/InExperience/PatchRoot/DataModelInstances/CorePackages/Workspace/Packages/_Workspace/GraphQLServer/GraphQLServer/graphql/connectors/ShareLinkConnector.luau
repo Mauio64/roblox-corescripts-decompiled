@@ -1,75 +1,57 @@
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
 
-require(Parent.LuauPolyfill)
+require(parent.LuauPolyfill)
+local UrlBuilder = require(parent.UrlBuilder)
+local Promise = require(parent.Promise)
+local Fetch = require(parent.Fetch)
 
-local UrlBuilder = require(Parent.UrlBuilder)
-local Promise = require(Parent.Promise)
-local Fetch = require(Parent.Fetch)
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local urlBuilder = UrlBuilder.UrlBuilder
 local UrlBase = UrlBuilder.UrlBase
-local GraphQLError = require(Parent.GraphQL).GraphQLError
-local fetch = Fetch.fetch
-local Response = Fetch.Response
 
+local GraphQL = require(parent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
+local fetch = Fetch.fetch
+
+local Response = Fetch.Response
 require(script.Parent.Parent.generatedTypes)
 
-local v11 = UrlBuilder2.new({
-	path = "sharelinks/v1/get-or-create-link",
-	base = UrlBase.APIS
-})()
+local v = urlBuilder.new({ base = UrlBase.APIS, path = "sharelinks/v1/get-or-create-link" })()
 
 return {
-	fetchShareLink = function(p1, p2) -- line: 40
-		-- upvalues: fetch (copy), HttpService (copy), Promise (copy), v11 (copy), Response (copy), GraphQLError (copy)
-		local v14 = p2 or fetch
-		local json = HttpService:JSONEncode(p1.data)
-		local json2 = HttpService:JSONEncode({
-			linkType = p1.linkType,
-			data = json
-		})
+	fetchShareLink = function(p, p2)
+		local v2 = p2 or fetch
+		local jsonEncode = HttpService:JSONEncode(p.data)
 
-		return Promise.new(function(resolve, reject) -- line: 50
-			-- upvalues: v14 (copy), v11 (copy), json2 (copy), Response (copy), GraphQLError (copy)
-			local v19 = v14(v11, {
+		local jsonEncode2 = HttpService:JSONEncode({ linkType = p.linkType, data = jsonEncode })
+
+		return Promise.new(function(callback, callback2)
+			local expect = v2(v, {
+				body = jsonEncode2,
 				method = "POST",
-				body = json2,
-				headers = {
-					["Content-Type"] = "application/json",
-					Accept = "application/json"
-				}
-			}):catch(function(p3) -- line: 59
-				-- upvalues: Response (copy)
-				local v22 = Response.error()
-
-				v22.statusText = p3.message
-
-				return v22
+				headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
+			}):catch(function(p3)
+				local v3 = Response.error()
+				v3.statusText = p3.message
+				return v3
 			end):expect()
 
-			if not v19.ok then
-				print(v19.statusText .. " " .. v19.status)
-				reject(GraphQLError.new(v19.statusText, nil, nil, nil, nil, {
-					extensions = {
-						status = v19.status,
-						statusText = v19.statusText
-					}
+			if expect.ok then
+				local expect2 = expect:json():catch(function(): nil
+					return nil
+				end):expect()
+
+				if expect then
+					callback(expect2)
+				else
+					callback2(GraphQLError.new(`Failed to decode HTTP response as JSON for share link matching type: {type}`))
+				end
+			else
+				print(expect.statusText .. " " .. expect.status)
+				callback2(GraphQLError.new(expect.statusText, nil, nil, nil, nil, {
+					extensions = { status = expect.status, statusText = expect.statusText }
 				}))
-
-				return
 			end
-
-			local v20 = v19:json():catch(function() -- line: 83
-				return nil
-			end):expect()
-
-			if not v19 then
-				reject(GraphQLError.new(`Failed to decode HTTP response as JSON for share link matching type: { type }`))
-
-				return
-			end
-
-			resolve(v20)
 		end)
 	end
 }

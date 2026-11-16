@@ -1,52 +1,41 @@
 local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
-local FriendsMenuParent = FriendsMenu.Parent
-local UIBlox = require(FriendsMenuParent.UIBlox)
+local parent = FriendsMenu.Parent
 
-UIBlox.init(require(FriendsMenuParent.Dev.RobloxAppUIBloxConfig))
+local UIBlox = require(parent.UIBlox)
 
-local mockLocale = require(FriendsMenuParent.Dev.SocialTestHelpers).StoryHelpers.mockLocale
-local Cryo = require(FriendsMenuParent.Cryo)
-local Roact = require(FriendsMenuParent.Dev.Roact)
+UIBlox.init(require(parent.Dev.RobloxAppUIBloxConfig))
+
+local SocialTestHelpers = require(parent.Dev.SocialTestHelpers)
+local mockLocale = SocialTestHelpers.StoryHelpers.mockLocale
+
+local Cryo = require(parent.Cryo)
+local Roact = require(parent.Dev.Roact)
+
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
-local t1 = {
-	Default = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Light = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Dark = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	}
-}
-local t2 = {
-	language = "en-us"
+
+local v = {
+	Default = { themeName = "Light", fontName = "Gotham" },
+	Light = { themeName = "Light", fontName = "Gotham" },
+	Dark = { themeName = "Dark", fontName = "Gotham" }
 }
 
-return {
-	name = "FriendsMenu",
-	storyRoot = FriendsMenu,
-	roact = Roact,
-	mapDefinition = function(p1) -- line: 39
-		-- upvalues: Cryo (copy), t2 (copy)
-		local v11 = Cryo.Dictionary.join(t2, p1.controls or {})
+local v2 = { language = "en-us" }
+local Storybook = {}
+Storybook.name = "FriendsMenu"
+Storybook.storyRoot = FriendsMenu
+Storybook.roact = Roact
 
-		return Cryo.Dictionary.join(p1, {
-			controls = v11
-		})
-	end,
-	mapStory = function(p2) -- line: 43
-		-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy)
-		return function(p3) -- line: 44
-			-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy), p2 (copy)
-			return Roact.createElement(AppStyleProvider, {
-				style = p3 and t1[p3.theme] or t1.Default
-			}, {
-				Child = mockLocale(p2, p3)
-			})
-		end
+function Storybook.mapDefinition(p)
+	local joined = Cryo.Dictionary.join(v2, p.controls or {})
+	return Cryo.Dictionary.join(p, { controls = joined })
+end
+
+function Storybook.mapStory(p)
+	return function(p2)
+		return Roact.createElement(AppStyleProvider, {
+			style = p2 and v[p2.theme] or v.Default
+		}, { Child = mockLocale(p, p2) })
 	end
-}
+end
+
+return Storybook

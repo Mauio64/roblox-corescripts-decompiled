@@ -1,25 +1,25 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local React = require(MomentsCommonParent.React)
+local parent = MomentsCommon.Parent
+
+local React = require(parent.React)
+
 local useScreenSize = require(script.Parent.useScreenSize)
 local FormFactor = require(MomentsCommon.Enums.FormFactor)
 
-local function useFormFactor() -- line: 27
-	-- upvalues: useScreenSize (copy), React (copy), FormFactor (copy)
-	local v7 = useScreenSize()
+local function useFormFactor()
+	local v = useScreenSize()
 
-	return (React.useMemo(function() -- line: 32
-		-- upvalues: v7 (copy), FormFactor (copy)
-		if v7.X < 600 then
+	return (React.useMemo(function()
+		if v.X < 600 then
 			return FormFactor.MobilePortrait
 		end
 
-		if v7.Y < 480 then
+		if v.Y < 480 then
 			return FormFactor.MobileLandscape
 		end
 
 		return FormFactor.Wide
-	end, { v7 }))
+	end, { v }))
 end
 
 return useFormFactor

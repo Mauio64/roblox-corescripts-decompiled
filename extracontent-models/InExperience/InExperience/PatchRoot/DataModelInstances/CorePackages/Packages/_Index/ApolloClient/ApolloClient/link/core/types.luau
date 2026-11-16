@@ -1,6 +1,5 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent
+require(parent.GraphQL)
 
-require(ParentParent.GraphQL)
 require(script.Parent.Parent.Parent.utilities)
-
 return {}

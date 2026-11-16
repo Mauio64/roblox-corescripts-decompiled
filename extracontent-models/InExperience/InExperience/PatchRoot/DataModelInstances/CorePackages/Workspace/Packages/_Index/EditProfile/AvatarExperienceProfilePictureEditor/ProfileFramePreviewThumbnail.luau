@@ -1,0 +1,4 @@
+local index = script.Parent.Parent.Parent.Parent._Index
+local ProfileFrameThumbnail = require(index.AvatarExperienceProfilePictureEditor.AvatarExperienceProfilePictureEditor.Components.ProfileFrameThumbnail.ProfileFrameThumbnail)
+
+return ProfileFrameThumbnail

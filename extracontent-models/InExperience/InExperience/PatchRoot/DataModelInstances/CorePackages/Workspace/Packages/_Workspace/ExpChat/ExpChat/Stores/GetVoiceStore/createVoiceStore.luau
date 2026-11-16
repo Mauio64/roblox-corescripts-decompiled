@@ -1,103 +1,90 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(parent.Signals)
+
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
-local VOICE_STATE = require(Parent.VoiceChat).Constants.VOICE_STATE
 
-local function createVoiceStore() -- line: 26
-	-- upvalues: createSignal (copy), createComputed (copy), VOICE_STATE (copy)
-	local v7, v8 = createSignal({})
-	local t1 = {}
+local VoiceChat = require(parent.VoiceChat)
+local VOICE_STATE = VoiceChat.Constants.VOICE_STATE
 
-	local function getKey(p1) -- line: 32
-		return (tostring(p1))
+local function createVoiceStore()
+	local signal, v = createSignal({})
+
+	local v2 = {}
+
+	local function getKey(p) -- 5 equivalent calls inferred from this helper
+		return (tostring(p))
 	end
 
 	return {
-		getOrCreateVoiceState = function(p2) -- line: 36
-			-- upvalues: t1 (copy), createComputed (copy), v7 (copy)
-			local str = tostring(p2)
+		getOrCreateVoiceState = function(p)
+			local key = getKey(p) -- inferred equivalent call
 
-			if not t1[str] then
-				t1[str] = createComputed(function(p3) -- line: 39
-					-- upvalues: v7 (copy), str (copy)
-					return v7(p3)[str]
+			if not v2[key] then
+				v2[key] = createComputed(function(p2)
+					return signal(p2)[key]
 				end)
 			end
 
-			return t1[str]
+			return v2[key]
 		end,
-		getVoiceParticipants = v7,
-		handleVoiceParticipantAdded = function(p4) -- line: 48
-			-- upvalues: v8 (copy), VOICE_STATE (copy)
-			local str = tostring(p4)
+		getVoiceParticipants = signal,
+		handleVoiceParticipantAdded = function(p)
+			local key = getKey(p) -- inferred equivalent call
+			v(function(p2)
+				local clone = table.clone(p2)
+				clone[key] = clone[key] or VOICE_STATE.HIDDEN
 
-			v8(function(p5) -- line: 51
-				-- upvalues: str (copy), VOICE_STATE (copy)
-				local v24 = table.clone(p5)
-
-				v24[str] = v24[str] or VOICE_STATE.HIDDEN
-
-				return v24
+				return clone
 			end)
 		end,
-		handleVoiceParticipantRemoved = function(p6) -- line: 61
-			-- upvalues: v8 (copy), t1 (copy)
-			local str = tostring(p6)
-
-			v8(function(p7) -- line: 64
-				-- upvalues: t1 (copy), str (copy)
-				if t1[str] then
-					t1[str] = nil
+		handleVoiceParticipantRemoved = function(p)
+			local key = getKey(p) -- inferred equivalent call
+			v(function(p2)
+				if v2[key] then
+					v2[key] = nil
 				end
 
-				local v26 = table.clone(p7)
-
-				v26[str] = nil
-
-				return v26
+				local clone = table.clone(p2)
+				clone[key] = nil
+				return clone
 			end)
 		end,
-		handleVoiceParticipantsChanged = function(t2: {[any]: any}) -- line: 75
-			-- upvalues: v8 (copy), VOICE_STATE (copy)
-			v8(function(p8) -- line: 76
-				-- upvalues: t2 (copy), VOICE_STATE (copy)
-				local v28 = table.clone(p8)
+		handleVoiceParticipantsChanged = function(items)
+			v(function(p)
+				local clone = table.clone(p)
 
-				for v29, v30 in t2 do
-					local INACTIVE = VOICE_STATE.INACTIVE
+				for k, item in items do
+					local v3 = VOICE_STATE.INACTIVE
 
-					if not v30.subscriptionCompleted then
-						INACTIVE = VOICE_STATE.CONNECTING
-					elseif v30.isMutedLocally then
-						INACTIVE = VOICE_STATE.LOCAL_MUTED
-					elseif v30.isMuted then
-						INACTIVE = VOICE_STATE.MUTED
-					elseif v30.isSignalActive then
-						INACTIVE = VOICE_STATE.TALKING
+					if item.subscriptionCompleted then
+						if item.isMutedLocally then
+							v3 = VOICE_STATE.LOCAL_MUTED
+						elseif item.isMuted then
+							v3 = VOICE_STATE.MUTED
+						elseif item.isSignalActive then
+							v3 = VOICE_STATE.TALKING
+						end
+					else
+						v3 = VOICE_STATE.CONNECTING
 					end
 
-					v28[tostring(v29)] = INACTIVE
+					clone[getKey(k)] = v3 -- inferred equivalent call
 				end
 
-				return v28
+				return clone
 			end)
 		end,
-		handleVoiceStateChanged = function(p9, s1: string?) -- line: 96
-			-- upvalues: v8 (copy)
-			local str = tostring(p9)
-
-			v8(function(p10) -- line: 99
-				-- upvalues: str (copy), s1 (copy)
-				if p10[str] then
-					local v33 = table.clone(p10)
-
-					v33[str] = s1
-
-					return v33
+		handleVoiceStateChanged = function(p, p2: string?)
+			local key = getKey(p) -- inferred equivalent call
+			v(function(p3)
+				if not p3[key] then
+					return p3
 				end
 
-				return p10
+				local clone = table.clone(p3)
+				clone[key] = p2
+				return clone
 			end)
 		end
 	}

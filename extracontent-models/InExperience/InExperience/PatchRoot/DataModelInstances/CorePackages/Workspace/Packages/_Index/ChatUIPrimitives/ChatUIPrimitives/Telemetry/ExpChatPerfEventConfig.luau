@@ -1,130 +1,96 @@
-local ChatUIPrimitives = script:FindFirstAncestor("ChatUIPrimitives")
-local FFlagExpChatScrollPerfTracking = require(ChatUIPrimitives.Flags.FFlagExpChatScrollPerfTracking)
-local u3 = nil
-local t1 = {}
-local t2 = {}
-local t3 = {
-	TTI = "TTI",
-	Interval = "Interval"
-}
-local t4 = {
+local v = nil
+local v2 = {}
+local v3 = {}
+
+local eventTypes = { TTI = "TTI", Interval = "Interval" }
+
+local events = {
 	ChatWindowMountTTI = "ChatWindowMountTTI",
 	ChatWindowTabSwitchTTI = "ChatWindowTabSwitchTTI",
 	MessageSendToWindowRenderInterval = "MessageSendToWindowRenderInterval",
 	MessageReceiveToWindowRenderInterval = "MessageReceiveToWindowRenderInterval",
 	ChatWindowScrollInterval = "ChatWindowScrollInterval"
 }
-local t5 = {
-	[t4.ChatWindowMountTTI] = {
+
+local eventConfig = {
+	[events.ChatWindowMountTTI] = {
+		type = eventTypes.TTI,
 		baseName = "ExpChat_ChatWindowMountTTI",
-		type = t3.TTI,
-		canFinish = function(_) -- line: 59
+		canFinish = function(_): boolean
 			return true
 		end,
-		onStart = function(_) -- line: 62
-		end
+		onStart = function(_) end
 	},
-	[t4.ChatWindowTabSwitchTTI] = {
+	[events.ChatWindowTabSwitchTTI] = {
+		type = eventTypes.TTI,
 		baseName = "ExpChat_ChatWindowTabSwitchTTI",
-		type = t3.TTI,
-		canFinish = function(p3) -- line: 67
-			-- upvalues: u3 (ref)
-			return (p3 and p3.tabId) == u3
+		canFinish = function(p): boolean
+			return (p and p.tabId) == v
 		end,
-		onStart = function(p4) -- line: 71
-			-- upvalues: u3 (ref)
-			u3 = if not p4 then nil else p4.tabId
+		onStart = function(p)
+			local v4
+
+			if p then
+				v4 = p.tabId
+			end
+
+			v = v4
 		end
 	},
-	[t4.MessageSendToWindowRenderInterval] = {
+	[events.MessageSendToWindowRenderInterval] = {
+		type = eventTypes.Interval,
 		name = "ExpChat_MessageSendToWindowRenderInterval",
-		type = t3.Interval,
-		intervalMetrics = {
-			"duration",
-			"averageFPS",
-			"longestFrameTime"
-		},
-		canStart = function(_) -- line: 79
-			-- upvalues: t2 (ref)
-			local v14 = t2.timestamp or 0
-
-			return t2.id == nil or v14 + 5 < os.clock()
+		intervalMetrics = { "duration", "averageFPS", "longestFrameTime" },
+		canStart = function(_): boolean
+			local timestamp = v3.timestamp or 0
+			return v3.id == nil or timestamp + 5 < os.clock()
 		end,
-		canFinish = function(p6) -- line: 83
-			-- upvalues: t2 (ref)
-			return p6 and p6.messageId == t2.id
+		canFinish = function(p)
+			return p and p.messageId == v3.id
 		end,
-		onStart = function(p7) -- line: 86
-			-- upvalues: t2 (ref)
-			if p7 then
-				t2 = {
-					id = p7.messageId,
-					timestamp = os.clock()
-				}
+		onStart = function(p)
+			if p then
+				v3 = { id = p.messageId, timestamp = os.clock() }
 			end
 		end,
-		onFinish = function(_) -- line: 94
-			-- upvalues: t2 (ref)
-			t2 = {}
+		onFinish = function(_)
+			v3 = {}
 		end
 	},
-	[t4.MessageReceiveToWindowRenderInterval] = {
+	[events.MessageReceiveToWindowRenderInterval] = {
+		type = eventTypes.Interval,
 		name = "ExpChat_MessageReceiveToWindowRenderInterval",
-		type = t3.Interval,
-		intervalMetrics = {
-			"duration",
-			"averageFPS",
-			"longestFrameTime"
-		},
-		canStart = function(_) -- line: 102
-			-- upvalues: t1 (ref)
-			local v19 = t1.timestamp or 0
-
-			return t1.id == nil or v19 + 5 < os.clock()
+		intervalMetrics = { "duration", "averageFPS", "longestFrameTime" },
+		canStart = function(_): boolean
+			local timestamp = v2.timestamp or 0
+			return v2.id == nil or timestamp + 5 < os.clock()
 		end,
-		canFinish = function(p10) -- line: 106
-			-- upvalues: t1 (ref)
-			return p10 and p10.messageId == t1.id
+		canFinish = function(p)
+			return p and p.messageId == v2.id
 		end,
-		onStart = function(p11) -- line: 109
-			-- upvalues: t1 (ref)
-			if p11 then
-				t1 = {
-					id = p11.messageId,
-					timestamp = os.clock()
-				}
+		onStart = function(p)
+			if p then
+				v2 = { id = p.messageId, timestamp = os.clock() }
 			end
 		end,
-		onFinish = function(_) -- line: 117
-			-- upvalues: t1 (ref)
-			t1 = {}
+		onFinish = function(_)
+			v2 = {}
 		end
 	}
 }
 
-if FFlagExpChatScrollPerfTracking then
-	t5[t4.ChatWindowScrollInterval] = {
-		name = "ExpChat_ChatWindowScrollInterval",
-		type = t3.Interval,
-		intervalMetrics = {
-			"averageFPS",
-			"longestFrameTime"
-		},
-		canStart = function() -- line: 128
-			return true
-		end,
-		canFinish = function() -- line: 131
-			return true
-		end,
-		onStart = function() -- line: 134
-		end,
-		onFinish = function() -- line: 135
-		end
-	}
-end
-
-return {
-	EventTypes = t3,
-	Events = t4,
-	EventConfig = t5
+eventConfig[events.ChatWindowScrollInterval] = {
+	type = eventTypes.Interval,
+	name = "ExpChat_ChatWindowScrollInterval",
+	intervalMetrics = { "averageFPS", "longestFrameTime" },
+	canStart = function(): boolean
+		return true
+	end,
+	canFinish = function(): boolean
+		return true
+	end,
+	onStart = function() end,
+	onFinish = function() end
 }
+
+return { EventTypes = eventTypes, Events = events, EventConfig = eventConfig }

@@ -1,21 +1,21 @@
-local function getFacePileParticipantIds(t1: {[any]: any}, n1: number) -- line: 13
-	if #t1 <= 1 then
-		return { n1 }
+local function getFacePileParticipantIds(list, p: number)
+	if #list <= 1 then
+		return { p }
 	end
 
-	local t2 = {}
+	local result = {}
 
-	for _, v6 in t1 do
-		if v6 ~= n1 then
-			table.insert(t2, v6)
+	for _, item in list do
+		if item ~= p then
+			table.insert(result, item)
 		end
 	end
 
-	if #t2 == 0 then
-		return { n1 }
+	if #result == 0 then
+		return { p }
 	end
 
-	return t2
+	return result
 end
 
 return getFacePileParticipantIds

@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("PageLoadTracker").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("PageLoadTracker").Parent
+local React = require(parent.React)
 
 require(script.Parent.createPageTracker)
 

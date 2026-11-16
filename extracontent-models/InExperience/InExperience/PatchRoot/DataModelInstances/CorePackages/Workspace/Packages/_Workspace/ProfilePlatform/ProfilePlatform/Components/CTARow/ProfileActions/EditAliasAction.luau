@@ -1,28 +1,27 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local SetAlias = require(ProfilePlatformParent.SetAlias)
-local SocialStopwatch = require(ProfilePlatformParent.SocialStopwatch)
+local parent = ProfilePlatform.Parent
+
+local SetAlias = require(parent.SetAlias)
+local SocialStopwatch = require(parent.SocialStopwatch)
+
 local Enums = require(ProfilePlatform.Common.Enums)
-
 require(ProfilePlatform.Components.CTARow.Types)
-
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local ProfileTypes = Enums.ProfileTypes
 
 return {
-	[Enums.ProfileActions.EditAlias] = function(p1) -- line: 13
-		-- upvalues: Enums (copy), ProfileTypes (copy), SocialStopwatch (copy), EventNames (copy), SetAlias (copy)
+	[Enums.ProfileActions.EditAlias] = function(data)
 		return {
-			text = p1.localized[Enums.ProfileActions.EditAlias],
+			text = data.localized[Enums.ProfileActions.EditAlias],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 17
-					-- upvalues: SocialStopwatch (copy), p1 (copy), EventNames (copy), Enums (copy), SetAlias (copy)
+				[ProfileTypes.User] = function()
 					SocialStopwatch.Stopwatch.start(SocialStopwatch.Events.CustomizeNameOpened)
-					p1.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonSetAlias, {
-						buttonSurface = p1.buttonSurface
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonSetAlias, {
+						buttonSurface = data.buttonSurface
 					})
-					p1.navigation.navigate(Enums.Screens.SetAliasModal, {
-						profileUserId = p1.profileId,
+
+					data.navigation.navigate(Enums.Screens.SetAliasModal, {
+						profileUserId = data.profileId,
 						origin = SetAlias.Analytics.EntryPoints.ContextualMenu
 					})
 				end

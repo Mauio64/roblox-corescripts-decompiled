@@ -1,14 +1,14 @@
 local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
-local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
-local React = require(AvatarExperienceControlBarParent.React)
+
+local parent = AvatarExperienceControlBar.Parent
+local React = require(parent.React)
+
 local useBaseControlBarProps = require(AvatarExperienceControlBar.useBaseControlBarProps)
 local BaseControlBar = require(AvatarExperienceControlBar.BaseControlBar)
 
-local function BaseControlBarContainer(p1) -- line: 9
-	-- upvalues: useBaseControlBarProps (copy), React (copy), BaseControlBar (copy)
-	local v8 = useBaseControlBarProps(p1)
-
-	return React.createElement(BaseControlBar, v8)
+local function BaseControlBarContainer(p)
+	local v = useBaseControlBarProps(p)
+	return React.createElement(BaseControlBar, v)
 end
 
 return React.memo(BaseControlBarContainer)

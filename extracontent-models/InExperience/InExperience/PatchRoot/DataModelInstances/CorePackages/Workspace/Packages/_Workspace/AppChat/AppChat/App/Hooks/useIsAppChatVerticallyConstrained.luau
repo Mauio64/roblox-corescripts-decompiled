@@ -1,8 +1,10 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local useLayerCollector = require(Parent.UIBlox).Core.Layout.LayerCollector.useLayerCollector
-local v3 = game:DefineFastInt("AppChatVerticalConstraintThreshold", 300)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function() -- line: 10
-	-- upvalues: useLayerCollector (copy), v3 (copy)
-	return useLayerCollector().absoluteSize.Y <= v3
+local UIBlox = require(parent.UIBlox)
+local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
+
+local defineFastInt = game:DefineFastInt("AppChatVerticalConstraintThreshold", 300)
+
+return function(): boolean
+	return useLayerCollector().absoluteSize.Y <= defineFastInt
 end

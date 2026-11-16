@@ -1,6 +1,8 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local Components = script.Parent.Parent.Components
 local LogData = require(Components.Log.LogData)
 local ClientMemoryData = require(Components.Memory.ClientMemoryData)
@@ -14,69 +16,91 @@ local ServerJobsData = require(Components.ServerJobs.ServerJobsData)
 local DebugVisualizationsData = require(Components.DebugVisualizations.DebugVisualizationsData)
 local LuauHeapData = require(Components.LuauHeap.LuauHeapData)
 local VoiceChatData = require(Components.VoiceChat.VoiceChatData)
+local VoiceDebugData = require(Components.VoiceDebug.VoiceDebugData)
+local GetFFlagVoiceDebugConsoleV2 = require(Components.VoiceDebug.GetFFlagVoiceDebugConsoleV2)
 local DataContext = require(Components.DataContext)
-local v18 = Roact.Component:extend("DataProvider")
-local EngineFeature = game:GetEngineFeature("VoiceChatDevConsoleTabEnabled")
-local v20 = game:DefineFastFlag("DevConsoleStartDataOnMount", false)
 
-function v18.init(p1) -- line: 26
-	-- upvalues: LogData (copy), ClientMemoryData (copy), ServerMemoryData (copy), NetworkData (copy), ServerScriptsData (copy), DataStoresData (copy), ServerStatsData (copy), ActionBindingsData (copy), ServerJobsData (copy), DebugVisualizationsData (copy), LuauHeapData (copy), EngineFeature (copy), VoiceChatData (copy)
-	p1:setState({
-		DevConsoleData = {
-			ClientLogData = LogData.new(true),
-			ServerLogData = LogData.new(false),
-			ClientMemoryData = ClientMemoryData.new(),
-			ServerMemoryData = ServerMemoryData.new(),
-			ClientNetworkData = NetworkData.new(true),
-			ServerNetworkData = NetworkData.new(false),
-			ServerScriptsData = ServerScriptsData.new(),
-			DataStoresData = DataStoresData.new(),
-			ServerStatsData = ServerStatsData.new(),
-			ActionBindingsData = ActionBindingsData.new(),
-			ServerJobsData = ServerJobsData.new(),
-			DebugVisualizationsData = DebugVisualizationsData.new(),
-			LuauHeapData = LuauHeapData.new(),
-			VoiceChatData = if not EngineFeature then nil else VoiceChatData.new()
-		}
-	})
-end
-function v18.didMount(p2) -- line: 47
-	-- upvalues: EngineFeature (copy), v20 (copy)
-	p2.state.DevConsoleData.ClientLogData:start()
-	p2.state.DevConsoleData.ClientMemoryData:start()
+local extended = Roact.Component:extend("DataProvider")
 
-	if EngineFeature then
-		p2.state.DevConsoleData.VoiceChatData:start()
-	end
+local engineFeature = game:GetEngineFeature("VoiceChatDevConsoleTabEnabled")
+local defineFastFlag = game:DefineFastFlag("DevConsoleStartDataOnMount", false)
 
-	if v20 and p2.props.isDeveloperView then
-		for _, v in pairs(p2.state.DevConsoleData) do
-			if not v:isRunning() then
-				v:start()
-			end
-		end
-	end
-end
-function v18.willUpdate(p3, p4, _) -- line: 64
-	if p4.isDeveloperView and not p3.props.isDeveloperView then
-		for _, v in pairs(p3.state.DevConsoleData) do
-			if not v:isRunning() then
-				v:start()
-			end
-		end
-	end
-end
-function v18.render(p6) -- line: 74
-	-- upvalues: Roact (copy), DataContext (copy)
-	return Roact.createElement(DataContext.Provider, {
-		value = p6.state.DevConsoleData
-	}, Roact.oneChild(p6.props[Roact.Children]))
-end
-
-local function mapStateToProps(p7, _) -- line: 80
-	return {
-		isDeveloperView = p7.MainView.isDeveloperView
+function extended.init(object)
+	local devConsoleData = {
+		ClientLogData = LogData.new(true),
+		ServerLogData = LogData.new(false),
+		ClientMemoryData = ClientMemoryData.new(),
+		ServerMemoryData = ServerMemoryData.new(),
+		ClientNetworkData = NetworkData.new(true),
+		ServerNetworkData = NetworkData.new(false),
+		ServerScriptsData = ServerScriptsData.new(),
+		DataStoresData = DataStoresData.new(),
+		ServerStatsData = ServerStatsData.new(),
+		ActionBindingsData = ActionBindingsData.new(),
+		ServerJobsData = ServerJobsData.new(),
+		DebugVisualizationsData = DebugVisualizationsData.new(),
+		LuauHeapData = LuauHeapData.new(),
+		VoiceChatData = 0,
+		VoiceDebugData = 0
 	}
+	local voiceChatData
+
+	if engineFeature and not GetFFlagVoiceDebugConsoleV2() then
+		voiceChatData = VoiceChatData.new()
+	end
+
+	devConsoleData.VoiceChatData = voiceChatData
+	local voiceDebugData
+
+	if engineFeature and GetFFlagVoiceDebugConsoleV2() then
+		voiceDebugData = VoiceDebugData.new()
+	end
+
+	devConsoleData.VoiceDebugData = voiceDebugData
+	object:setState({ DevConsoleData = devConsoleData })
 end
 
-return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(v18)
+function extended.didMount(p)
+	p.state.DevConsoleData.ClientLogData:start()
+	p.state.DevConsoleData.ClientMemoryData:start()
+
+	if engineFeature then
+		if GetFFlagVoiceDebugConsoleV2() then
+			p.state.DevConsoleData.VoiceDebugData:start()
+		else
+			p.state.DevConsoleData.VoiceChatData:start()
+		end
+	end
+
+	if defineFastFlag and p.props.isDeveloperView then
+		for _, v in pairs(p.state.DevConsoleData) do
+			if not v:isRunning() then
+				v:start()
+			end
+		end
+	end
+end
+
+function extended.willUpdate(p, p2, _)
+	if p2.isDeveloperView and not p.props.isDeveloperView then
+		for _, v in pairs(p.state.DevConsoleData) do
+			if not v:isRunning() then
+				v:start()
+			end
+		end
+	end
+end
+
+function extended.render(p)
+	return Roact.createElement(
+		DataContext.Provider,
+		{ value = p.state.DevConsoleData },
+		Roact.oneChild(p.props[Roact.Children])
+	)
+end
+
+local function mapStateToProps(p, _)
+	return { isDeveloperView = p.MainView.isDeveloperView }
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(extended)

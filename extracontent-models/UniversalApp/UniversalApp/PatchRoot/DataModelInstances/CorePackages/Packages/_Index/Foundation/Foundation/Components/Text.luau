@@ -1,1 +1,3 @@
-return (require(script.Text))
+local Text = require(script.Text)
+
+return Text

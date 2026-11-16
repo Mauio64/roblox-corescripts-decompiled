@@ -1,22 +1,20 @@
-local function alwaysTrue() -- line: 2
+local function alwaysTrue(): boolean
 	return true
 end
-local function count(p1, p2) -- line: 6
-	-- upvalues: alwaysTrue (copy)
-	local v5 = type(p1)
 
-	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+local function count(items, p)
+	local typeName = type(items)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
+	local v = p or alwaysTrue
+	local count2 = 0
 
-	local n1 = 0
-	local v7 = p2 or alwaysTrue
-
-	for k, v in pairs(p1) do
-		if v7(v, k) then
-			n1 += 1
+	for k, item in pairs(items) do
+		if v(item, k) then
+			count2 += 1
 		end
 	end
 
-	return n1
+	return count2
 end
 
 return count

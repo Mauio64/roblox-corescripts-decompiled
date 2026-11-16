@@ -1,0 +1,4 @@
+local Workspace = script.Parent.Parent._Workspace
+local createVoiceRestrictionController_DEPRECATED = require(Workspace.VoiceChat.VoiceChat.Restrictions.createVoiceRestrictionController_DEPRECATED)
+
+return createVoiceRestrictionController_DEPRECATED

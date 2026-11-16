@@ -1,3 +1,1 @@
-return {
-	AppTopBanner = require(script.AppTopBanner)
-}
+return { AppTopBanner = require(script.AppTopBanner) }

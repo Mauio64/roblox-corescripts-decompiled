@@ -1,79 +1,63 @@
-local v1, v2 = ...
-
-arg0 = v1
+local v, v2 = ...
+arg0 = v
 arg1 = v2
 
-local function x1(p1, p2) -- line: 6
-	return p1 + p2
+local function x1(p, p2) -- 1 equivalent call inferred from this helper
+	return p + p2
 end
-local function x2(p3, p4) -- line: 7
-	return p3 - p4
+local function x2(p, p2) -- 1 equivalent call inferred from this helper
+	return p - p2
 end
-local function x3(p5, p6) -- line: 8
-	return p6 - p5
+local function x3(p, p2)
+	return p2 - p
 end
-local function x4(p7, p8) -- line: 9
-	return (tonumber(tostring(p8 % 1000) .. tostring((math.abs(p7 % 1000)))))
+local function x4(p, p2)
+	return (tonumber(tostring(p2 % 1000) .. tostring((math.abs(p % 1000)))))
 end
-local function x5(p9, p10) -- line: 10
-	return (tonumber(tostring(p10 % 1337) .. tostring((math.abs(p9 % 1337)))))
+local function x5(p, p2)
+	return (tonumber(tostring(p2 % 1337) .. tostring((math.abs(p % 1337)))))
 end
-local function x6(p11, p12) -- line: 11
-	return p11 % 1000 * (p12 % 1000)
+local function x6(p, p2) -- 1 equivalent call inferred from this helper
+	return p % 1000 * (p2 % 1000)
 end
-local function x7(p13, p14) -- line: 12
-	return p13 % 1337 * (p14 % 1337)
+local function x7(p, p2)
+	return p % 1337 * (p2 % 1337)
 end
-local function x8(p15, p16) -- line: 13
-	local v35 = p15 + p16
-	local v36 = p15 - p16
-
-	return v35 % 1000 * (v36 % 1000)
+local function x8(p, p2)
+	return x6(x1(p, p2), x2(p, p2)) -- inferred equivalent call
 end
 
-local t1 = {
-	1,
-	2,
-	3,
-	4,
-	5,
-	6,
-	7,
-	8
-}
 local random = Random.new(5)
+local v3 = { 1, 2, 3, 4, 5, 6, 7, 8 }
 
 for _ = 1, 32 do
-	local v14 = random:NextInteger(1, 8)
-	local v15 = random:NextInteger(1, 8)
-	local v16 = t1[v14]
-
-	t1[v14] = t1[v15]
-	t1[v15] = v16
+	local integer = random:NextInteger(1, 8)
+	local integer2 = random:NextInteger(1, 8)
+	local v4 = v3[integer]
+	v3[integer] = v3[integer2]
+	v3[integer2] = v4
 end
 
-local t2 = {
-	[t1[1]] = x1,
-	[t1[2]] = x2,
-	[t1[3]] = x3,
-	[t1[4]] = x4,
-	[t1[5]] = x5,
-	[t1[6]] = x6,
-	[t1[7]] = x7,
-	[t1[8]] = x8
-}
+local v4 = {}
+v4[v3[1]] = x1
+v4[v3[2]] = x2
+v4[v3[3]] = x3
+v4[v3[4]] = x4
+v4[v3[5]] = x5
+v4[v3[6]] = x6
+v4[v3[7]] = x7
+v4[v3[8]] = x8
 
-local function x9(p17, p18) -- line: 35
-	-- upvalues: t2 (copy)
-	local n1 = 393
-	local n2 = 1
+local function x9(arg0, arg1)
+	local v5 = 393
+	local v6 = 1
 
 	for _ = 1, 16 do
-		n1 = (n1 + t2[math.abs(p18 + n1 + n2) % 8 + 1](n1 + p17, p18)) % 10000000
-		n2 += 1
+		v5 = (v5 + v4[math.abs(arg1 + v5 + v6) % 8 + 1](v5 + arg0, arg1)) % 10000000
+		v6 += 1
 	end
 
-	return n1
+	return v5
 end
 
-return (x9(arg0, arg1))
+return x9(arg0, arg1)

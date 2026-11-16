@@ -1,7 +1,4 @@
-local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent.Parent
+local enumerate = require(parent.enumerate)
 
-return require(ParentParent.enumerate)("StandardButtonSize", {
-	"Regular",
-	"Small",
-	"XSmall"
-})
+return enumerate("StandardButtonSize", { "Regular", "Small", "XSmall" })

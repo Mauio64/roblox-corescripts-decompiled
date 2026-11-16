@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("SocialContextToasts").Parent
+local parent = script:FindFirstAncestor("SocialContextToasts").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 5
-	return {
-		isConfirmationModalOpen = p1,
-		closeCallback = p2
-	}
+return Rodux.makeActionCreator(script.Name, function(isConfirmationModalOpen, closeCallback)
+	return { isConfirmationModalOpen = isConfirmationModalOpen, closeCallback = closeCallback }
 end)

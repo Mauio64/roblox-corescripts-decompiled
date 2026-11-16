@@ -1,54 +1,70 @@
 local HoldToPlay = script:FindFirstAncestor("HoldToPlay")
-local HoldToPlayParent = HoldToPlay.Parent
-local React = require(HoldToPlayParent.React)
-local FocusNavigationUtils = require(HoldToPlayParent.FocusNavigationUtils)
+local parent = HoldToPlay.Parent
+
+local React = require(parent.React)
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local ButtonHoldStateEnum = FocusNavigationUtils.ButtonHoldStateEnum
-local AppShortcutBarContext = require(HoldToPlayParent.AppShortcutBar).AppShortcutBarContext
+local AppShortcutBar = require(parent.AppShortcutBar)
+local AppShortcutBarContext = AppShortcutBar.AppShortcutBarContext
+
 local HoldToPlayLoader = require(HoldToPlay.HoldToPlayLoader)
-local FFlagLuaAppDemoModePlayButtonTelemetry = require(HoldToPlayParent.SharedFlags).FFlagLuaAppDemoModePlayButtonTelemetry
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDemoModePlayButtonTelemetry = SharedFlags.FFlagLuaAppDemoModePlayButtonTelemetry
 
-local function HoldToPlayLauncher(t1: {[any]: any}) -- line: 38
-	-- upvalues: AppShortcutBarContext (copy), React (copy), ButtonHoldStateEnum (copy), FocusNavigationEventNameEnum (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy), HoldToPlayLoader (copy)
-	local v12 = AppShortcutBarContext.useDispatchButtonHoldStarted()
-	local v13 = AppShortcutBarContext.useDispatchButtonHoldEnded()
+local function HoldToPlayLauncher(props)
+	local v = AppShortcutBarContext.useDispatchButtonHoldStarted()
+	local v2 = AppShortcutBarContext.useDispatchButtonHoldEnded()
 
-	React.useEffect(function() -- line: 42
-		-- upvalues: t1 (copy), ButtonHoldStateEnum (copy), v12 (copy), FocusNavigationEventNameEnum (copy), v13 (copy)
-		if t1.holdState == ButtonHoldStateEnum.JUST_PRESSED then
-			v12(FocusNavigationEventNameEnum.HoldToPlay, t1.holdProgress)
+	React.useEffect(function()
+		if props.holdState == ButtonHoldStateEnum.JUST_PRESSED then
+			v(FocusNavigationEventNameEnum.HoldToPlay, props.holdProgress)
+		elseif props.holdState == ButtonHoldStateEnum.NOT_HELD then
+			v2(FocusNavigationEventNameEnum.HoldToPlay)
+		end
+	end, { props.holdState, props.holdProgress, v, v2 })
 
-			return
+	local reportExperienceLaunched = React.useCallback(function(p: string?)
+		local reportExperienceLaunched = props.reportExperienceLaunched
+		local selectedEntry = props.selectedEntry
+		local referralSource = props.referralSource
+
+		local launchContext = props.launchContext
+		local selectedIndex = props.selectedIndex
+
+		if not FFlagLuaAppDemoModePlayButtonTelemetry then
+			p = nil
 		end
 
-		if t1.holdState == ButtonHoldStateEnum.NOT_HELD then
-			v13(FocusNavigationEventNameEnum.HoldToPlay)
+		reportExperienceLaunched(selectedEntry, referralSource, nil, launchContext, selectedIndex, p)
+	end, {
+		props.reportExperienceLaunched,
+		props.selectedEntry,
+		props.referralSource,
+		props.selectedIndex,
+		props.launchContext
+	})
+
+	local universeId = props.selectedNavigationUniverseId
+
+	if not universeId then
+		if props.selectedEntry then
+			universeId = props.selectedEntry.universeId or nil
+		else
+			universeId = nil
 		end
-	end, {
-		t1.holdState,
-		t1.holdProgress,
-		v12,
-		v13
-	})
+	end
 
-	local v14 = React.useCallback(function(s1: string?) -- line: 51
-		-- upvalues: t1 (copy), FFlagLuaAppDemoModePlayButtonTelemetry (copy)
-		t1.reportExperienceLaunched(t1.selectedEntry, t1.referralSource, nil, t1.launchContext, t1.selectedIndex, if not FFlagLuaAppDemoModePlayButtonTelemetry then nil else s1)
-	end, {
-		t1.reportExperienceLaunched,
-		t1.selectedEntry,
-		t1.referralSource,
-		t1.selectedIndex,
-		t1.launchContext
-	})
-	local v15 = t1.selectedNavigationUniverseId or (t1.selectedEntry and t1.selectedEntry.universeId or nil)
-
-	if v15 and (t1.holdState == ButtonHoldStateEnum.HOLDING or t1.holdState == ButtonHoldStateEnum.COMPLETED) then
+	if
+		universeId
+		and (props.holdState == ButtonHoldStateEnum.HOLDING or props.holdState == ButtonHoldStateEnum.COMPLETED)
+	then
 		return React.createElement(HoldToPlayLoader, {
-			universeId = v15,
-			shouldAttemptLaunch = t1.holdState == ButtonHoldStateEnum.COMPLETED,
-			reportExperienceLaunched = v14,
-			onLaunched = t1.cancelHold
+			universeId = universeId,
+			shouldAttemptLaunch = props.holdState == ButtonHoldStateEnum.COMPLETED,
+			reportExperienceLaunched = reportExperienceLaunched,
+			onLaunched = props.cancelHold
 		})
 	end
 

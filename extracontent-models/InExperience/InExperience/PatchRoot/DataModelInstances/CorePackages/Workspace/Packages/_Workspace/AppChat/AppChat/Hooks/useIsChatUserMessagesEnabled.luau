@@ -1,18 +1,25 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = AppChat.Parent
+
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
 local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
+local GetFriendsChatSettingsStore = require(AppChat.Stores.GetFriendsChatSettingsStore)
 
-return function() -- line: 7
-	-- upvalues: useSelector (copy), getDeepValue2 (copy)
-	return useSelector(function(p1) -- line: 8
-		-- upvalues: getDeepValue2 (copy)
-		local v6 = getDeepValue2(p1, "ChatAppReducer.ChatSettings.chatUserMessagesEnabled")
+local FFlagAppChatUseSignalsForChatSettings = require(AppChat.Flags.FFlagAppChatUseSignalsForChatSettings)
 
-		if v6 == nil then
-			return true
-		end
+return function()
+	local selected
 
-		return v6
-	end)
+	if FFlagAppChatUseSignalsForChatSettings then
+		selected = useSignalState(GetFriendsChatSettingsStore(false).getChatUserMessagesEnabled)
+	else
+		selected = useSelector(function(p)
+			return getDeepValue2(p, "ChatAppReducer.ChatSettings.chatUserMessagesEnabled")
+		end)
+	end
+
+	return selected == nil or selected
 end

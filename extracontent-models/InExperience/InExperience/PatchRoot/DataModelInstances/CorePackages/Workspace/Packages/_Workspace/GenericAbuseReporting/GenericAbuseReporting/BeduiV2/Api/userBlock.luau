@@ -1,17 +1,19 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 
-return {
-	blockUser = function(p1, s1: string) -- line: 8
-		-- upvalues: Url (copy)
-		return p1(`{ Url.APIS_URL }user-blocking-api/v1/users/{ s1 }/block-user`, "POST")
-	end,
-	unblockUser = function(p2, s2: string) -- line: 13
-		-- upvalues: Url (copy)
-		return p2(`{ Url.APIS_URL }user-blocking-api/v1/users/{ s2 }/unblock-user`, "POST")
-	end,
-	isBlockedUser = function(p3, s3: string) -- line: 18
-		-- upvalues: Url (copy)
-		return p3(`{ Url.APIS_URL }user-blocking-api/v1/users/{ s3 }/is-blocked`, "GET")
-	end
-}
+local Http = require(parent.Http)
+local Url = Http.Url
+local UserBlock = {}
+
+function UserBlock.blockUser(callback, p: string)
+	return callback(`{Url.APIS_URL}user-blocking-api/v1/users/{p}/block-user`, "POST")
+end
+
+function UserBlock.unblockUser(callback, p: string)
+	return callback(`{Url.APIS_URL}user-blocking-api/v1/users/{p}/unblock-user`, "POST")
+end
+
+function UserBlock.isBlockedUser(callback, p: string)
+	return callback(`{Url.APIS_URL}user-blocking-api/v1/users/{p}/is-blocked`, "GET")
+end
+
+return UserBlock

@@ -1,3 +1,1 @@
-return {
-	DeviceAccessTokenChallenge = script.DeviceAccessTokenChallenge
-}
+return { DeviceAccessTokenChallenge = script.DeviceAccessTokenChallenge }

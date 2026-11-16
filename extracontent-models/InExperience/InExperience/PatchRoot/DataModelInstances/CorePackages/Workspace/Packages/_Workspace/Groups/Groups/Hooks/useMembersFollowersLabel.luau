@@ -1,65 +1,59 @@
 local Groups = script:FindFirstAncestor("Groups")
-local GroupsParent = Groups.Parent
-local React = require(GroupsParent.React)
-local useLocalization = require(GroupsParent.Localization).Hooks.useLocalization
+local parent = Groups.Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local TextKeys = require(Groups.Common.TextKeys)
 
-local function useMembersFollowersLabel(t1: {[any]: any}) -- line: 31
-	-- upvalues: React (copy), TextKeys (copy), useLocalization (copy)
-	local hasSocialModules = t1.hasSocialModules
-	local count = t1.count
-	local truncatedCount = t1.truncatedCount
-	local v11 = t1.capitalize or false
-	local v12 = React.useMemo(function() -- line: 38
-		-- upvalues: count (copy), hasSocialModules (copy), v11 (copy), TextKeys (copy)
-		local v14 = count == 1
+local function useMembersFollowersLabel(data)
+	local hasSocialModules = data.hasSocialModules
+	local count = data.count
+	local truncatedCount = data.truncatedCount
+	local capitalize = data.capitalize or false
 
-		if hasSocialModules then
-			if v14 then
-				if v11 then
-					return TextKeys.LabelMember
+	local v = useLocalization({
+		noun = React.useMemo(function()
+			local v = count == 1
+
+			if hasSocialModules then
+				if v then
+					if capitalize then
+						return TextKeys.LabelMember
+					end
+
+					return TextKeys.LabelMemberLowerCase
+				elseif capitalize then
+					return TextKeys.LabelMemberCapitalPlural
+				else
+					return TextKeys.LabelMemberLowerCasePlural
+				end
+			elseif v then
+				if capitalize then
+					return TextKeys.LabelFollowerCapital
 				end
 
-				return TextKeys.LabelMemberLowerCase
+				return TextKeys.LabelFollower
+			elseif capitalize then
+				return TextKeys.LabelFollowerCapitalPlural
+			else
+				return TextKeys.LabelFollowerPlural
 			end
-
-			if v11 then
-				return TextKeys.LabelMemberCapitalPlural
-			end
-
-			return TextKeys.LabelMemberLowerCasePlural
-		end
-
-		if v14 then
-			if v11 then
-				return TextKeys.LabelFollowerCapital
-			end
-
-			return TextKeys.LabelFollower
-		end
-
-		if v11 then
-			return TextKeys.LabelFollowerCapitalPlural
-		end
-
-		return TextKeys.LabelFollowerPlural
-	end, {
-		count,
-		v11,
-		hasSocialModules
-	})
-	local v13 = useLocalization({
-		noun = v12
+		end, { count, capitalize, hasSocialModules })
 	})
 
-	return (React.useMemo(function() -- line: 61
-		-- upvalues: truncatedCount (copy), count (copy), v13 (copy)
-		return `{ (if not truncatedCount or truncatedCount == "" then tostring(count) else truncatedCount) } { v13.noun }`
-	end, {
-		truncatedCount,
-		count,
-		v13.noun
-	}))
+	return (React.useMemo(function()
+		local v2
+
+		if truncatedCount and truncatedCount ~= "" then
+			v2 = truncatedCount
+		else
+			v2 = tostring(count)
+		end
+
+		return `{v2} {v.noun}`
+	end, { truncatedCount, count, v.noun }))
 end
 
 return useMembersFollowersLabel

@@ -1,26 +1,23 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.types)
 
-require(ParentParent.types)
+return function(value: string, callback, p)
+	local count = #value
+	local result = table.create(count)
 
-return function(s1: string, p1: ((...any) -> ...any)?, p2) -- line: 11
-	local v5 = #s1
-	local t1 = table.create(v5)
-
-	if p1 then
-		for i = 1, v5 do
-			if p2 ~= nil then
-				t1[i] = p1(p2, string.sub(s1, i, i), i)
+	if callback then
+		for i = 1, count do
+			if p == nil then
+				result[i] = callback(string.sub(value, i, i), i)
 			else
-				t1[i] = p1(string.sub(s1, i, i), i)
+				result[i] = callback(p, string.sub(value, i, i), i)
 			end
 		end
-
-		return t1
+	else
+		for i = 1, count do
+			result[i] = string.sub(value, i, i)
+		end
 	end
 
-	for i = 1, v5 do
-		t1[i] = string.sub(s1, i, i)
-	end
-
-	return t1
+	return result
 end

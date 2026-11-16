@@ -1,29 +1,36 @@
-local Parent = script:FindFirstAncestor("GamePlayButton").Parent
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v5 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local parent = script:FindFirstAncestor("GamePlayButton").Parent
 
-local function openFiatPurchasePage(p1, p2) -- line: 12
-	-- upvalues: AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v5 (copy), NavigateDown (copy)
-	return function(p3) -- line: 13
-		-- upvalues: AppPage (copy), p1 (copy), p2 (copy), FFlagSignalsNavP3Dispatch (copy), v5 (copy), NavigateDown (copy)
-		local t1 = {
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local function openFiatPurchasePage(detail, onClose)
+	return function(object)
+		local v = {
 			name = AppPage.GenericWebPage,
-			detail = p1,
+			detail = detail,
 			extraProps = {
 				titleKey = "Feature.PaidAccessPurchases.Webview.Title.Checkout",
-				onClose = p2
+				onClose = onClose
 			}
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v5.down(v5.fromLegacyPage(t1))
-
-			return
+			navigationCommands.down(navigationCommands.fromLegacyPage(v))
+		else
+			object:dispatch(NavigateDown(v))
 		end
-
-		p3:dispatch(NavigateDown(t1))
 	end
 end
 

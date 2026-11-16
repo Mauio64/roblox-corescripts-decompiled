@@ -1,111 +1,150 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
+local parent = AvatarSwitcher.Parent
+
 local SessionService = game:GetService("SessionService")
-local React = require(AvatarSwitcherParent.React)
-local Foundation = require(AvatarSwitcherParent.Foundation)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local Signals = require(AvatarSwitcherParent.Signals)
-local SignalsReact = require(AvatarSwitcherParent.SignalsReact)
-local AvatarExperienceAnalytics = require(AvatarSwitcherParent.AvatarExperienceAnalytics)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
 local addUnifiedEventLogging = AvatarExperienceAnalytics.addUnifiedEventLogging
 local UnifiedEventLogEnums = AvatarExperienceAnalytics.UnifiedEventLogEnums
-local UnifiedLoggingSurface = require(AvatarSwitcherParent.AvatarExperienceNavigation).Enums.UnifiedLoggingSurface
-local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
 
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local UnifiedLoggingSurface = AvatarExperienceNavigation.Enums.UnifiedLoggingSurface
+
+local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
 require(AvatarSwitcher.types)
 
-local FFlagAvatarSwitcherUseAvatarInventoryEndpoint = require(AvatarSwitcherParent.AvatarExperienceFlags).FFlagAvatarSwitcherUseAvatarInventoryEndpoint
-local FFlagAXBackgroundsInOutfitThumbnails = require(AvatarSwitcherParent.SharedFlags).FFlagAXBackgroundsInOutfitThumbnails
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAvatarSwitcherUseAvatarInventoryEndpoint = AvatarExperienceFlags.FFlagAvatarSwitcherUseAvatarInventoryEndpoint
+local AvatarExperienceFlags2 = require(parent.AvatarExperienceFlags)
+local FFlagAXUnifiedEventStrictPayloads = AvatarExperienceFlags2.FFlagAXUnifiedEventStrictPayloads
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAXBackgroundsInOutfitThumbnails = SharedFlags.FFlagAXBackgroundsInOutfitThumbnails
 
-local function OutfitTile(t1: {[any]: any}) -- line: 39
-	-- upvalues: SignalsReact (copy), getAvatarSwitcherStore (copy), React (copy), useTokens (copy), addUnifiedEventLogging (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy), Signals (copy), Foundation (copy), FFlagAvatarSwitcherUseAvatarInventoryEndpoint (copy), FFlagAXBackgroundsInOutfitThumbnails (copy)
-	local v18 = SignalsReact.useSignalState(getAvatarSwitcherStore)
-	local v19 = React.useRef(nil)
-	local v20 = useTokens()
-	local id = t1.outfitInfo.id
+local function OutfitTile(props)
+	local v = SignalsReact.useSignalState(getAvatarSwitcherStore)
+	local ref = React.useRef(nil)
+	local v2 = useTokens()
 
-	React.useEffect(function() -- line: 46
-		-- upvalues: addUnifiedEventLogging (copy), v19 (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), t1 (copy), id (copy), SessionService (copy)
-		task.delay(0, function() -- line: 49
-			-- upvalues: addUnifiedEventLogging (copy), v19 (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), t1 (copy), id (copy), SessionService (copy)
-			addUnifiedEventLogging(v19, {
-				elementName = "OUTFIT_TILE",
+	local id = props.outfitInfo.id
+
+	React.useEffect(function()
+		task.delay(0, function()
+			local v3 = {
 				action = UnifiedEventLogEnums.MarketplaceUnifiedAction.UI_ELEMENT_CLICK,
 				surface = UnifiedLoggingSurface.IN_EXPERIENCE_AVATAR_SWITCHER,
-				gridPositionRow = t1.gridPosition.row,
-				gridPositionColumn = t1.gridPosition.column,
+				gridPositionRow = props.gridPosition.row,
+				gridPositionColumn = props.gridPosition.column,
+				itemId = 0,
+				elementName = "OUTFIT_TILE"
+			}
+			local itemId
+
+			if FFlagAXUnifiedEventStrictPayloads then
+				if id then
+					itemId = tostring(id)
+				end
+			else
 				itemId = id
-			}, {
+			end
+
+			v3.itemId = itemId
+			addUnifiedEventLogging(ref, v3, {
 				sessionTagName = SessionService:GetSessionTag("level2a")
 			})
 		end)
-	end, {
-		t1.gridPosition,
-		id
-	})
+	end, { props.gridPosition, id })
 
-	local v22 = React.useMemo(function() -- line: 63
-		-- upvalues: Signals (copy), id (copy), v18 (copy)
-		return Signals.createComputed(function(p1) -- line: 64
-			-- upvalues: id (copy), v18 (copy)
-			return id ~= nil and v18.getSelectedOutfitId(p1) == id
+	local v3 = React.useMemo(function()
+		return Signals.createComputed(function(p): boolean
+			return id ~= nil and v.getSelectedOutfitId(p) == id
 		end)
-	end, {
-		v18,
-		id
-	})
-	local v23 = SignalsReact.useSignalState(v22) and not t1.disabled
-	local v24 = React.useCallback(function() -- line: 70
-		-- upvalues: v18 (copy), id (copy)
-		v18.selectOutfit(id)
-	end, {
-		v18,
-		id
-	})
+	end, { v, id })
+	local strokestandardstrokesystemcontrast = SignalsReact.useSignalState(v3) and not props.disabled
 
-	return (React.createElement(Foundation.View, {
+	local onActivated = React.useCallback(function()
+		v.selectOutfit(id)
+	end, { v, id })
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v4 = {
 		tag = "col gap-small auto-y size-full-0",
-		GroupTransparency = if not t1.disabled then nil else 0.5,
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		Thumbnail = id and React.createElement(Foundation.Image, {
-			LayoutOrder = 1,
+		GroupTransparency = props.disabled and 0.5 or nil,
+		LayoutOrder = props.LayoutOrder
+	}
+	local thumbnail
+
+	if id then
+		local createElement2 = React.createElement
+		local image = Foundation.Image
+		local v5 = {
 			tag = {
-				[not FFlagAvatarSwitcherUseAvatarInventoryEndpoint and "radius-medium bg-shift-200" or "radius-medium bg-shift-200 padding-small"] = true,
-				["stroke-standard stroke-system-contrast"] = v23
+				[FFlagAvatarSwitcherUseAvatarInventoryEndpoint and "radius-medium bg-shift-200 padding-small" or "radius-medium bg-shift-200"] = true,
+				["stroke-standard stroke-system-contrast"] = strokestandardstrokesystemcontrast
 			},
 			Size = UDim2.fromScale(1, 1.5),
 			SizeConstraint = Enum.SizeConstraint.RelativeXX,
-			Image = if not FFlagAXBackgroundsInOutfitThumbnails then `rbxthumb://type=Outfit&id={ id }&w=150&h=150` else `rbxthumb://type=Outfit&id={ id }&w=150&h=150&includeBackground=true`,
-			ScaleType = Enum.ScaleType.Crop,
-			onActivated = if not t1.disabled then v24 else nil,
-			ref = v19
-		}, {
-			WarningIcon = FFlagAvatarSwitcherUseAvatarInventoryEndpoint and (t1.outfitInfo.hasWarning and React.createElement(Foundation.Image, {
-				tag = "size-500",
-				Image = "icons/actions/info",
-				imageStyle = if v23 then nil else {
-					Transparency = 0.5
-				}
-			}))
-		}),
-		ThumbnailShimmer = not id and React.createElement(Foundation.View, {
+			Image = 0,
+			ScaleType = 0,
 			LayoutOrder = 1,
-			Size = UDim2.fromScale(1, 1.5),
-			SizeConstraint = Enum.SizeConstraint.RelativeXX
-		}, {
-			Shimmer = React.createElement(Foundation.Skeleton, {
-				Size = UDim2.fromScale(1, 1)
+			onActivated = 0,
+			ref = 0
+		}
+		local image2
+
+		if FFlagAXBackgroundsInOutfitThumbnails then
+			image2 = `rbxthumb://type=Outfit&id={id}&w=150&h=150&includeBackground=true`
+		else
+			image2 = `rbxthumb://type=Outfit&id={id}&w=150&h=150`
+		end
+
+		v5.Image = image2
+
+		v5.ScaleType = Enum.ScaleType.Crop
+
+		if props.disabled then
+			onActivated = nil
+		end
+
+		v5.onActivated = onActivated
+		v5.ref = ref
+		thumbnail = createElement2(image, v5, {
+			WarningIcon = FFlagAvatarSwitcherUseAvatarInventoryEndpoint and props.outfitInfo.hasWarning and React.createElement(Foundation.Image, {
+				tag = "size-500",
+				imageStyle = not strokestandardstrokesystemcontrast and { Transparency = 0.5 } or nil,
+				Image = "icons/actions/info"
 			})
-		}),
-		NameLabel = t1.outfitInfo.name and React.createElement(Foundation.Text, {
+		})
+	else
+		thumbnail = id
+	end
+
+	return (createElement(view, v4, {
+		Thumbnail = thumbnail,
+		ThumbnailShimmer = not id and React.createElement(
+			Foundation.View,
+			{
+				Size = UDim2.fromScale(1, 1.5),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX,
+				LayoutOrder = 1
+			},
+			{
+				Shimmer = React.createElement(Foundation.Skeleton, { Size = UDim2.fromScale(1, 1) })
+			}
+		),
+		NameLabel = props.outfitInfo.name and React.createElement(Foundation.Text, {
 			tag = "size-full-0 auto-y text-align-x-left text-title-small content-emphasis text-wrap",
-			LayoutOrder = 2,
-			Text = t1.outfitInfo.name
+			Text = props.outfitInfo.name,
+			LayoutOrder = 2
 		}),
-		NameLabelShimmer = not t1.outfitInfo.name and React.createElement(Foundation.Skeleton, {
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, v20.FontSize.FontSize_300)
+		NameLabelShimmer = not props.outfitInfo.name and React.createElement(Foundation.Skeleton, {
+			Size = UDim2.new(1, 0, 0, v2.FontSize.FontSize_300),
+			LayoutOrder = 2
 		})
 	}))
 end

@@ -1,11 +1,10 @@
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local v3 = game:DefineFastInt("LuaAppJoinGameFailureInfluxHundredthsPercentage", 0)
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
 
-return function(p1, p2, p3) -- line: 8
-	-- upvalues: ArgCheck (copy), v3 (copy)
-	local v7 = p3 or {}
+local ArgCheck = require(parent.ArgCheck)
 
-	ArgCheck.isType(p2, "string", "documentName")
-	p1:reportSeries(p2, v7, v3)
+local defineFastInt = game:DefineFastInt("LuaAppJoinGameFailureInfluxHundredthsPercentage", 0)
+
+return function(object, p, options)
+	ArgCheck.isType(p, "string", "documentName")
+	object:reportSeries(p, options or {}, defineFastInt)
 end

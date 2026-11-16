@@ -1,29 +1,29 @@
-local function insertNewlineAtCursor(s1: string, n1: number) -- line: 1
-	if n1 < 1 then
-		local v4 = utf8.len(s1)
-		local v5 = s1 .. "\n"
+local function insertNewlineAtCursor(value: string, p: number)
+	if p < 1 then
+		local v = utf8.len(value)
+		local v2 = value .. "\n"
 
-		if v4 then
-			return v5, v4 + 1
+		if v then
+			return v2, v + 1
 		end
 
-		return v5, 1
-	end
+		return v2, 1
+	else
+		local v = utf8.offset(value, p)
 
-	local v6 = utf8.offset(s1, n1)
-
-	if v6 == nil then
-		local v7 = utf8.len(s1)
-		local v8 = s1 .. "\n"
-
-		if v7 then
-			return v8, v7 + 1
+		if v ~= nil then
+			return string.sub(value, 1, v - 1) .. "\n" .. string.sub(value, v), p + 1
 		end
 
-		return v8, 1
-	end
+		local v2 = utf8.len(value)
+		local v3 = value .. "\n"
 
-	return string.sub(s1, 1, v6 - 1) .. "\n" .. string.sub(s1, v6), n1 + 1
+		if v2 then
+			return v3, v2 + 1
+		end
+
+		return v3, 1
+	end
 end
 
 return insertNewlineAtCursor

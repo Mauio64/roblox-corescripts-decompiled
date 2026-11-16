@@ -1,37 +1,38 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Signals = require(ExpChatParent.Signals)
-local SharedFlags = require(ExpChatParent.SharedFlags)
+local parent = ExpChat.Parent
+
+local Signals = require(parent.Signals)
+local SharedFlags = require(parent.SharedFlags)
+
 local FriendsChatChannelAdded = require(ExpChat.Actions.FriendsChatChannelAdded)
 local FriendsChatChannelRemoved = require(ExpChat.Actions.FriendsChatChannelRemoved)
 local GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
-local GetFriendsTabVisibilityStore = require(ExpChatParent.FriendsChat.GetFriendsTabVisibilityStore)
+local GetFriendsTabVisibilityStore = require(parent.FriendsChat.GetFriendsTabVisibilityStore)
+local FriendsChatTabName = require(parent.FriendsChat.FriendsChatTabName)
+
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
 
-local function syncFriendsTabVisibility(p1) -- line: 16
-	-- upvalues: GetFriendsTabVisibilityStore (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy), Signals (copy), FriendsChatChannelAdded (copy), FriendsChatChannelRemoved (copy)
-	local v12 = GetFriendsTabVisibilityStore(false)
-	local v13 = if not FFlagExpChatUseChannelTabsStore then nil else GetChannelTabsStore(false)
+local function syncFriendsTabVisibility(object)
+	local friendsTabVisibilityStore = GetFriendsTabVisibilityStore(false)
+	local v
 
-	return Signals.createEffect(function(p2) -- line: 20
-		-- upvalues: v12 (copy), p1 (copy), FriendsChatChannelAdded (copy), v13 (copy), FriendsChatChannelRemoved (copy)
-		if v12.getIsFriendsTabVisible(p2) then
-			p1:dispatch(FriendsChatChannelAdded("FriendsChat"))
+	if FFlagExpChatUseChannelTabsStore then
+		v = GetChannelTabsStore(false)
+	else
+		v = nil
+	end
 
-			if v13 then
-				v13.addChannelTab({
-					type = "FriendsChat",
-					name = "FriendsChat"
-				}, nil)
-
-				return
+	return Signals.createEffect(function(p)
+		if friendsTabVisibilityStore.getIsFriendsTabVisible(p) then
+			if v then
+				v.addChannelTab({ type = "FriendsChat", name = FriendsChatTabName }, nil)
+			else
+				object:dispatch(FriendsChatChannelAdded(FriendsChatTabName))
 			end
+		elseif v then
+			v.handleChannelRemoved(FriendsChatTabName)
 		else
-			p1:dispatch(FriendsChatChannelRemoved("FriendsChat"))
-
-			if v13 then
-				v13.handleChannelRemoved("FriendsChat")
-			end
+			object:dispatch(FriendsChatChannelRemoved(FriendsChatTabName))
 		end
 	end)
 end

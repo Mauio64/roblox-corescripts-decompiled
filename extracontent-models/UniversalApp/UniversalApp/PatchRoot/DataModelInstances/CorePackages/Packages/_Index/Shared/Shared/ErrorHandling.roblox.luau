@@ -1,9 +1,13 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+
 local Error = LuauPolyfill.Error
 local inspect = LuauPolyfill.util.inspect
-local filterInternalStackFrames = require(script.Parent.ReactFeatureFlags).filterInternalStackFrames
-local t1 = {
+
+local ReactFeatureFlags = require(script.Parent.ReactFeatureFlags)
+local filterInternalStackFrames = ReactFeatureFlags.filterInternalStackFrames
+
+local v = {
 	"React",
 	"ReactDevtoolsShared",
 	"ReactNoopRenderer",
@@ -14,160 +18,163 @@ local t1 = {
 	"Scheduler",
 	"Shared"
 }
-local u7 = nil
 
-local function getReactPackagePrefixes() -- line: 52
-	-- upvalues: u7 (ref), t1 (copy), ParentParent (copy)
-	if u7 then
-		return u7
+local v2 = nil
+
+local function getReactPackagePrefixes()
+	if _G.ENVIRONMENT == "PRODUCTION" then
+		return {}
 	end
 
-	local t2 = {}
+	if v2 then
+		return v2
+	end
 
-	for _, v13 in t1 do
-		local v14 = ParentParent.Parent:FindFirstChild(v13)
+	local result = {}
 
-		if v14 then
-			table.insert(t2, (v14:GetFullName():gsub("^game%.", "")))
+	for _, childName in v do
+		local child = parent.Parent:FindFirstChild(childName)
+
+		if child then
+			table.insert(result, (child:GetFullName():gsub("^game%.", "")))
 		end
 	end
 
-	u7 = t2
-
-	return t2
+	v2 = result
+	return result
 end
-local function isInternalFrame(s1: string) -- line: 79
-	-- upvalues: getReactPackagePrefixes (copy)
-	for _, v17 in (getReactPackagePrefixes()) do
-		if v17 == string.sub(s1, 1, #v17) then
+
+local function isInternalFrame(value: string): boolean
+	local reactPackagePrefixes = getReactPackagePrefixes()
+
+	for _, reactPackagePrefix in reactPackagePrefixes do
+		if string.sub(value, 1, #reactPackagePrefix) == reactPackagePrefix then
 			return true
 		end
 	end
 
 	return false
 end
-local function buildStackString(n1: number) -- line: 98
-	-- upvalues: getReactPackagePrefixes (copy)
-	local s2 = ""
-	local v20 = false
-	local v21 = false
-	local g29 = nil
-	local v28 = nil
-	local g33 = nil
-	local v32 = nil
 
-	for i = n1 + 1, 1e999 do
-		local v23, v24, v25 = debug.info(i, "sln")
+local function buildStackString(p: number)
+	local v3 = false
+	local v4 = false
+	local v5 = ""
 
-		if not v23 then
-			return (string.gsub(s2, "\n$", ""))
+	for i = p + 1, 1e999 do
+		local v6, v7, v8 = debug.info(i, "sln")
+
+		if not v6 then
+			break
 		end
 
-		if v23 == "[C]" then
+		if v6 == "[C]" then
 			continue
 		end
 
-		if not v20 then
-			for _, v27 in (getReactPackagePrefixes()) do
-				if v27 == string.sub(v23, 1, #v27) then
-					v28 = true
-					g29 = true
-				end
+		if not v3 then
+			local reactPackagePrefixes = getReactPackagePrefixes()
+			local flag = true
+			local v9
 
-				if g29 then
+			for _, reactPackagePrefix in reactPackagePrefixes do
+				if string.sub(v6, 1, #reactPackagePrefix) == reactPackagePrefix then
+					v9 = true
+					flag = false
 					break
 				end
 			end
 
-			if not g29 then
-				v28 = false
+			if flag then
+				v9 = false
 			end
 
-			g29 = false
-			v21 = not v28
-			v20 = true
+			v4 = not v9
+			v3 = true
 		end
 
-		if v21 then
-			for _, v31 in (getReactPackagePrefixes()) do
-				if v31 == string.sub(v23, 1, #v31) then
-					v32 = true
-					g33 = true
-				end
+		if v4 then
+			local reactPackagePrefixes = getReactPackagePrefixes()
+			local flag = true
+			local flag2
 
-				if g33 then
+			for _, reactPackagePrefix in reactPackagePrefixes do
+				if string.sub(v6, 1, #reactPackagePrefix) == reactPackagePrefix then
+					flag2 = true
+					flag = false
 					break
 				end
 			end
 
-			if not g33 then
-				v32 = false
+			if flag then
+				flag2 = false
 			end
 
-			g33 = false
-
-			if v32 then
+			if flag2 then
 				continue
 			end
 		end
 
-		s2 ..= ("%*:%* function %*\n"):format(v23, v24, v25 or "?")
+		v5 ..= `{v6}:{v7} function {v8 or "?"}\n`
 	end
 
-	return (string.gsub(s2, "\n$", ""))
+	return (string.gsub(v5, "\n$", ""))
 end
 
-return {
-	__ERROR_DIVIDER = "\n------ Error caught by React ------\n",
-	describeError = function(p1) -- line: 141
-		-- upvalues: LuauPolyfill (copy), filterInternalStackFrames (copy), buildStackString (copy)
-		if typeof(p1) == "string" then
-			local _, stop = string.find(p1, ":[%d]+: ")
-			local v37 = if not stop then p1 else string.sub(p1, stop + 1)
-			local v38 = LuauPolyfill.Error.new(v37)
+local Roblox = {}
 
-			if filterInternalStackFrames then
-				v38.stack = buildStackString(2)
-
-				return v38
-			end
-
-			v38.stack = debug.traceback(nil, 2)
-
-			return v38
-		end
-
-		return p1
-	end,
-	errorToString = function(p2) -- line: 165
-		-- upvalues: inspect (copy)
-		if typeof(p2) == "table" then
-			if p2.message and p2.stack then
-				return "\n------ Error caught by React ------\n" .. p2.message .. "\n------ Error caught by React ------\n" .. tostring(p2.stack)
-			end
-
-			return (inspect(p2))
-		end
-
-		return (inspect(p2))
-	end,
-	parseReactError = function(s3: string) -- line: 191
-		-- upvalues: Error (copy)
-		local parts = string.split(s3, "\n------ Error caught by React ------\n")
-
-		if #parts == 3 then
-			local v42, v43, v44 = table.unpack(parts)
-			local v45 = Error.new(v43)
-
-			v45.stack = v44
-
-			return v45, v42
-		end
-
-		local v46 = Error.new(s3)
-
-		v46.stack = nil
-
-		return v46, ""
+function Roblox.describeError(value)
+	if typeof(value) ~= "string" then
+		return value
 	end
-}
+
+	local _, v3 = string.find(value, ":[%d]+: ")
+
+	if v3 then
+		value = string.sub(value, v3 + 1)
+	end
+
+	local err = LuauPolyfill.Error.new(value)
+
+	if filterInternalStackFrames then
+		err.stack = buildStackString(2)
+		return err
+	end
+
+	err.stack = debug.traceback(nil, 2)
+
+	return err
+end
+
+function Roblox.errorToString(p)
+	if typeof(p) ~= "table" then
+		return (inspect(p))
+	end
+
+	if p.message and p.stack then
+		return "\n------ Error caught by React ------\n" .. p.message .. "\n------ Error caught by React ------\n" .. tostring(p.stack)
+	end
+
+	return (inspect(p))
+end
+
+function Roblox.parseReactError(value: string)
+	local v3 = string.split(value, "\n------ Error caught by React ------\n")
+
+	if #v3 == 3 then
+		local v4, v5, stack = table.unpack(v3)
+
+		local v6 = Error.new(v5)
+		v6.stack = stack
+
+		return v6, v4
+	else
+		local v4 = Error.new(value)
+		v4.stack = nil
+
+		return v4, ""
+	end
+end
+
+Roblox.__ERROR_DIVIDER = "\n------ Error caught by React ------\n"
+return Roblox

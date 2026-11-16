@@ -1,29 +1,29 @@
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
-local EngineFeature = game:GetEngineFeature("ReadHasRobloxSubscriptionLua")
-local EngineFeature2 = game:GetEngineFeature("EnablePromptSignalRobloxSubscriptionPurchaseFinished")
 
-local function getSubscriptionPurchaseCloseCallback() -- line: 8
-	-- upvalues: EngineFeature (copy), Players (copy), EngineFeature2 (copy), MarketplaceService (copy)
-	local v6 = false
+local engineFeature = game:GetEngineFeature("ReadHasRobloxSubscriptionLua")
 
-	if EngineFeature then
-		local ok, result = pcall(function() -- line: 11
-			-- upvalues: Players (copy)
+local engineFeature2 = game:GetEngineFeature("EnablePromptSignalRobloxSubscriptionPurchaseFinished")
+
+local function getSubscriptionPurchaseCloseCallback()
+	local v
+
+	if engineFeature then
+		local success, result = pcall(function()
 			return Players.LocalPlayer.HasRobloxSubscription
 		end)
-
-		v6 = ok and result == true
+		v = success and result == true
+	else
+		v = false
 	end
 
-	if not v6 and EngineFeature2 then
-		return function() -- line: 18
-			-- upvalues: MarketplaceService (copy)
-			MarketplaceService:signalPromptRobloxSubscriptionPurchaseFinished(" ", true)
-		end
+	if v or not engineFeature2 then
+		return nil
 	end
 
-	return nil
+	return function()
+		MarketplaceService:signalPromptRobloxSubscriptionPurchaseFinished(" ", true)
+	end
 end
 
 return getSubscriptionPurchaseCloseCallback

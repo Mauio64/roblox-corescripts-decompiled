@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.BlockingUtility.BlockingUtility))
+local BlockingUtility = require(Workspace.BlockingUtility.BlockingUtility)
+
+return BlockingUtility

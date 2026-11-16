@@ -1,28 +1,33 @@
 local PageLoadConfig = require(script.Parent.PageLoadConfig)
 
-function isElementInScreenBounds(p1, vector2: Vector2, n1: number) -- line: 3
-	-- upvalues: PageLoadConfig (copy)
-	local AbsolutePosition = p1.AbsolutePosition
-	local AbsoluteSize = p1.AbsoluteSize
+function isElementInScreenBounds(p, vector2: Vector2, p2: number)
+	local absolutePosition = p.AbsolutePosition
+	local absoluteSize = p.AbsoluteSize
 
-	if AbsoluteSize.X <= 0 or AbsoluteSize.Y <= 0 then
+	if absoluteSize.X <= 0 or absoluteSize.Y <= 0 then
 		return false
 	end
 
-	local AbsolutePositionX = AbsolutePosition.X
-	local v8 = AbsolutePosition.X + AbsoluteSize.X
-	local vector2X = vector2.X
-	local v10 = math.max(AbsolutePositionX, 0)
-	local v11 = math.max(0, math.min(v8, vector2X) - v10)
-	local AbsolutePositionY = AbsolutePosition.Y
-	local v13 = AbsolutePosition.Y + AbsoluteSize.Y
-	local vector2Y = vector2.Y
-	local v15 = math.max(AbsolutePositionY, n1)
-	local v16 = math.max(0, math.min(v13, vector2Y) - v15)
-	local v17 = v11 >= AbsoluteSize.X * PageLoadConfig.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO
-	local v18 = v16 >= AbsoluteSize.Y * PageLoadConfig.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO
+	local x = absolutePosition.X
+	local v = absolutePosition.X + absoluteSize.X
 
-	return v17 and v18
+	local x2 = vector2.X
+
+	local v2 = math.max(x, 0)
+	local v3 = math.max(0, math.min(v, x2) - v2)
+
+	local y = absolutePosition.Y
+	local v4 = absolutePosition.Y + absoluteSize.Y
+
+	local y2 = vector2.Y
+
+	local v5 = math.max(y, p2)
+	local v6 = math.max(0, math.min(v4, y2) - v5)
+
+	local v7 = absoluteSize.X * PageLoadConfig.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO <= v3
+	local v8 = absoluteSize.Y * PageLoadConfig.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO <= v6
+
+	return v7 and v8
 end
 
 return isElementInScreenBounds

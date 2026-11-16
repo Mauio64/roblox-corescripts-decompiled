@@ -1,59 +1,69 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
-
-require(ParentParent.util.Types)
-
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local parent = script.Parent.Parent.Parent
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
 local CollectionService = game:GetService("CollectionService")
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local t1 = {
-	categories = Constants.AllAssetUploadCategories,
-	requiredData = { ValidationEnums.SharedDataMember.rootInstance },
-	expectedFailures = {
-		"Asset_EF_TaggedJacket",
-		"Bundle_EF_BodyWithLLLTagged.LeftLeg"
-	}
-}
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local function collectTaggedPaths(p1, t2: {[any]: any}) -- line: 16
-	-- upvalues: CollectionService (copy)
-	local descendants = p1:GetDescendants()
+local getFFlagUGCValidateNoExtraTagsRequireHsrAssets = require(parent.flags.getFFlagUGCValidateNoExtraTagsRequireHsrAssets)
 
-	table.insert(descendants, p1)
+local NoExtraTags = {}
 
-	for _, v13 in descendants do
-		if #CollectionService:GetTags(v13) > 0 then
-			table.insert(t2, v13:GetFullName())
+NoExtraTags.categories = Constants.AllAssetUploadCategories
+local requiredData
+
+if getFFlagUGCValidateNoExtraTagsRequireHsrAssets() then
+	requiredData = { ValidationEnums.SharedDataMember.rootInstance, ValidationEnums.SharedDataMember.hsrAssets }
+else
+	requiredData = { ValidationEnums.SharedDataMember.rootInstance }
+end
+
+NoExtraTags.requiredData = requiredData
+
+NoExtraTags.expectedFailures = { "Asset_EF_TaggedJacket", "Bundle_EF_BodyWithLLLTagged.LeftLeg" }
+
+local function collectTaggedPaths(folder, fullNames)
+	local descendants = folder:GetDescendants()
+	table.insert(descendants, folder)
+
+	for _, descendant in descendants do
+		if #CollectionService:GetTags(descendant) > 0 then
+			table.insert(fullNames, descendant:GetFullName())
 		end
 	end
 end
 
-function t1.run(p2, p3) -- line: 26
-	-- upvalues: collectTaggedPaths (copy), getFFlagUGCValidateMigrateSchemaProperties (copy), ErrorSourceStrings (copy)
-	local t3 = {}
+function NoExtraTags.run(object, p)
+	local v = {}
+	collectTaggedPaths(p.rootInstance, v)
 
-	collectTaggedPaths(p3.rootInstance, t3)
-
-	if getFFlagUGCValidateMigrateSchemaProperties() then
-		local hsrAssets = p3.hsrAssets
+	if getFFlagUGCValidateNoExtraTagsRequireHsrAssets() then
+		for _, hsrAsset in p.hsrAssets do
+			for _, v2 in hsrAsset do
+				collectTaggedPaths(v2, v)
+			end
+		end
+	else
+		local hsrAssets = p.hsrAssets
 
 		if type(hsrAssets) == "table" then
-			for _, v19 in hsrAssets do
-				if type(v19) == "table" then
-					for _, v21 in v19 do
-						collectTaggedPaths(v21, t3)
-					end
+			for _, hsrAsset in hsrAssets do
+				if type(hsrAsset) ~= "table" then
+					continue
+				end
+
+				for _, v2 in hsrAsset do
+					collectTaggedPaths(v2, v)
 				end
 			end
 		end
 	end
 
-	if #t3 > 0 then
-		p2:fail(ErrorSourceStrings.Keys.InstanceTagsFound, {
-			ProblematicDescendantPaths = table.concat(t3, ", ")
+	if #v > 0 then
+		object:fail(ErrorSourceStrings.Keys.InstanceTagsFound, {
+			ProblematicDescendantPaths = table.concat(v, ", ")
 		})
 	end
 end
 
-return t1
+return NoExtraTags

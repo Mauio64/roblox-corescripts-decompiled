@@ -1,8 +1,10 @@
-local scriptParent = script.Parent
-local llama = require(scriptParent.llama)
-local RoduxNetworking = require(scriptParent.RoduxNetworking)
-local NetworkingBlocking = require(scriptParent.LuaSocialLibrariesDeps).NetworkingBlocking
-local UserBlockingNetworking = require(scriptParent.UserBlockingNetworking)
+local parent = script.Parent
+local llama = require(parent.llama)
+local RoduxNetworking = require(parent.RoduxNetworking)
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local NetworkingBlocking = LuaSocialLibrariesDeps.NetworkingBlocking
+local UserBlockingNetworking = require(parent.UserBlockingNetworking)
+
 local FriendsReducer = require(script.Reducers.FriendsReducer)
 local Actions = require(script.Actions)
 local Selectors = require(script.Selectors)
@@ -11,10 +13,11 @@ local Enums = require(script.Enums)
 
 return {
 	["jest.config"] = script["jest.config"],
-	config = function(p1) -- line: 16
-		-- upvalues: llama (copy), scriptParent (copy), RoduxNetworking (copy), NetworkingBlocking (copy), UserBlockingNetworking (copy), FriendsReducer (copy), Actions (copy), Selectors (copy), Models (copy), Enums (copy)
-		local u12 = llama.Dictionary.join(p1, {
-			friendsNetworking = require(scriptParent.FriendsNetworking).config({
+	config = function(p)
+		local join = llama.Dictionary.join
+		local FriendsNetworking = require(parent.FriendsNetworking)
+		local v = join(p, {
+			friendsNetworking = FriendsNetworking.config({
 				roduxNetworking = RoduxNetworking.mock()
 			}),
 			networkingBlocking = NetworkingBlocking.config({
@@ -26,12 +29,11 @@ return {
 		})
 
 		return {
-			installReducer = function() -- line: 30
-				-- upvalues: FriendsReducer (copy), u12 (ref)
-				return FriendsReducer(u12)
+			installReducer = function()
+				return FriendsReducer(v)
 			end,
-			Actions = Actions(u12),
-			Selectors = Selectors(u12),
+			Actions = Actions(v),
+			Selectors = Selectors(v),
 			Models = Models,
 			Enums = Enums
 		}

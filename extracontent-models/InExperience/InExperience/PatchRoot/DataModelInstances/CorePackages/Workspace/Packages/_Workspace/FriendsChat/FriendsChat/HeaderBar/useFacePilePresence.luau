@@ -1,53 +1,91 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
-local Foundation = require(Parent.Foundation)
-local DataHydration = require(Parent.DataHydration)
+local FriendsChat = script:FindFirstAncestor("FriendsChat")
+local parent = FriendsChat.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local Foundation = require(parent.Foundation)
+local DataHydration = require(parent.DataHydration)
+local FFlagFriendsChatFacePileGroupPresence = require(FriendsChat.Flags.FFlagFriendsChatFacePileGroupPresence)
+
 local UserPresence = Foundation.Enums.UserPresence
 local PresenceType = DataHydration.Presence.PresenceEnums.PresenceType
-local v9 = DataHydration.Presence.PresenceStore.get()
 
-local function toUserPresence(p1) -- line: 26
-	-- upvalues: PresenceType (copy), UserPresence (copy)
-	if p1 == PresenceType.InGame then
+local v = DataHydration.Presence.PresenceStore.get()
+
+local function toUserPresence(p) -- 1 equivalent call inferred from this helper
+	if p == PresenceType.InGame then
 		return UserPresence.InExperience
 	end
 
-	if p1 == PresenceType.InStudio or p1 == PresenceType.Online then
+	if p == PresenceType.InStudio or p == PresenceType.Online then
 		return UserPresence.Active
 	end
 
 	return UserPresence.None
 end
-local function useFacePilePresence(t1: {[any]: any}) -- line: 38
-	-- upvalues: React (copy), Signals (copy), UserPresence (copy), v9 (copy), PresenceType (copy), SignalsReact (copy)
-	local v14 = t1[1]
-	local v15 = v14 == nil and "" or tostring(v14)
-	local v16 = React.useMemo(function() -- line: 48
-		-- upvalues: Signals (copy), v14 (copy), UserPresence (copy), v9 (copy), PresenceType (copy)
-		return Signals.createComputed(function(p2) -- line: 49
-			-- upvalues: v14 (copy), UserPresence (copy), v9 (copy), PresenceType (copy)
-			if v14 == nil then
+
+local function aggregateGroupPresence(list, p)
+	local flag = false
+	local flag2 = false
+
+	for _, item in list do
+		local data = v.GetPresenceByUserId((tostring(item))).data(p)
+
+		if not data then
+			continue
+		end
+
+		local userPresenceType = data.userPresenceType
+
+		if userPresenceType == PresenceType.InGame or userPresenceType == PresenceType.InStudio then
+			flag = true
+		elseif userPresenceType == PresenceType.Online then
+			flag2 = true
+		end
+	end
+
+	if flag then
+		return UserPresence.InExperience
+	end
+
+	return if flag2 then UserPresence.Active else UserPresence.None
+end
+
+local function useFacePilePresence(list)
+	local item = list[1]
+
+	local v2 = FFlagFriendsChatFacePileGroupPresence and #list >= 2
+	local v3
+
+	if v2 then
+		v3 = table.concat(list, ",")
+	else
+		v3 = item == nil and "" or tostring(item)
+	end
+
+	local v4 = React.useMemo(function()
+		return Signals.createComputed(function(p)
+			if v2 then
+				return aggregateGroupPresence(list, p)
+			end
+
+			if item == nil then
 				return UserPresence.None
 			end
 
-			local v18 = v9.GetPresenceByUserId((tostring(v14))).data(p2)
-			local v19 = if not v18 then nil else v18.userPresenceType
+			local data = v.GetPresenceByUserId((tostring(item))).data(p)
+			local v4
 
-			if v19 == PresenceType.InGame then
-				return UserPresence.InExperience
+			if data then
+				v4 = data.userPresenceType
 			end
 
-			if v19 == PresenceType.InStudio or v19 == PresenceType.Online then
-				return UserPresence.Active
-			end
-
-			return UserPresence.None
+			return toUserPresence(v4) -- inferred equivalent call
 		end)
-	end, { v15 })
+	end, { v3 })
 
-	return (SignalsReact.useSignalState(v16))
+	return (SignalsReact.useSignalState(v4))
 end
 
 return useFacePilePresence

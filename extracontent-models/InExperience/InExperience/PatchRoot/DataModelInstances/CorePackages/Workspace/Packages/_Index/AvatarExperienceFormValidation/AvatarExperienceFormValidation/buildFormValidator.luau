@@ -1,13 +1,12 @@
 require(script.Parent.FormValidationErrorEnum)
 
-local function buildFormValidator(t1: {[any]: any}) -- line: 4
-	return function(p1) -- line: 5
-		-- upvalues: t1 (copy)
-		for _, v5 in t1 do
-			local v6, v7 = v5(p1)
+local function buildFormValidator(items)
+	return function(p)
+		for _, item in items do
+			local v, v2 = item(p)
 
-			if not v6 then
-				return false, v7
+			if not v then
+				return false, v2
 			end
 		end
 

@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("UserProfiles").Parent
+local parent = script:FindFirstAncestor("UserProfiles").Parent
 
-return require(Parent.Analytics).Analytics.new(game:GetService("RbxAnalyticsService"))
+local Analytics = require(parent.Analytics)
+return Analytics.Analytics.new(game:GetService("RbxAnalyticsService"))

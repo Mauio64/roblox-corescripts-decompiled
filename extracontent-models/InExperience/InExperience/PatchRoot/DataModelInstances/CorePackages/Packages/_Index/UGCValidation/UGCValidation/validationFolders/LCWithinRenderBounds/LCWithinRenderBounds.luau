@@ -1,74 +1,54 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCageGeometry = require(ParentParent.flags.getFFlagUGCValidateMigrateCageGeometry)
-local getEngineFeatureEngineUGCValidationLCOOB = require(ParentParent.flags.getEngineFeatureEngineUGCValidationLCOOB)
-local getFFlagEnforceMaxSizeOffsetForLC = require(ParentParent.flags.getFFlagEnforceMaxSizeOffsetForLC)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+
+local getEngineFeatureEngineUGCValidationLCOOB = require(parent.flags.getEngineFeatureEngineUGCValidationLCOOB)
 
 return {
-	fflag = getFFlagUGCValidateMigrateCageGeometry,
-	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING },
+	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING, ValidationEnums.UploadCategory.EYEBROW_EYELASH },
 	requiredData = {},
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 20
-		-- upvalues: getEngineFeatureEngineUGCValidationLCOOB (copy), ErrorSourceStrings (copy), getFFlagEnforceMaxSizeOffsetForLC (copy), UGCValidationService (copy)
-		if p2.consumerConfig.consumerEnv == "IEC" then
+	run = function(object, p)
+		if p.consumerConfig.consumerEnv == "IEC" then
 			return
 		end
 
-		local rootInstance = p2.rootInstance
+		local rootInstance = p.rootInstance
 
 		if not getEngineFeatureEngineUGCValidationLCOOB() then
-			p1:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_EngineFeatureDisabled, {
+			object:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_EngineFeatureDisabled, {
 				accessoryName = rootInstance.Name
 			})
 
 			return
 		end
 
-		local Handle = rootInstance:FindFirstChild("Handle")
+		local handle = rootInstance:FindFirstChild("Handle")
 
-		if not Handle then
-			p1:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NoHandle, {
+		if not handle then
+			object:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NoHandle, {
 				accessoryName = rootInstance.Name
 			})
 
 			return
 		end
 
-		local WrapLayer = Handle:FindFirstChildWhichIsA("WrapLayer")
+		local wrapLayer = handle:FindFirstChildWhichIsA("WrapLayer")
 
-		if not WrapLayer then
-			p1:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NoWrapLayer, {
+		if not wrapLayer then
+			object:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NoWrapLayer, {
 				accessoryName = rootInstance.Name
 			})
-
-			return
-		end
-
-		if getFFlagEnforceMaxSizeOffsetForLC() then
-			if WrapLayer.MaxSize ~= Vector3.new(0, 0, 0) then
-				p1:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NonZeroMaxSize, {})
-
-				return
-			end
-
-			if WrapLayer.Offset ~= Vector3.new(0, 0, 0) then
-				p1:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NonZeroOffset, {})
-
-				return
-			end
-		else
-			WrapLayer.MaxSize = Vector3.new(0, 0, 0)
-			WrapLayer.Offset = Vector3.new(0, 0, 0)
-		end
-
-		if UGCValidationService:IsDeformedLayeredClothingOutOfRenderBounds(rootInstance) then
-			p1:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_OutOfBounds, {
+		elseif wrapLayer.MaxSize ~= Vector3.new(0, 0, 0) then
+			object:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NonZeroMaxSize, {})
+		elseif wrapLayer.Offset ~= Vector3.new(0, 0, 0) then
+			object:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_NonZeroOffset, {})
+		elseif UGCValidationService:IsDeformedLayeredClothingOutOfRenderBounds(rootInstance) then
+			object:fail(ErrorSourceStrings.Keys.LCWithinRenderBounds_OutOfBounds, {
 				accessoryName = rootInstance.Name
 			})
 		end

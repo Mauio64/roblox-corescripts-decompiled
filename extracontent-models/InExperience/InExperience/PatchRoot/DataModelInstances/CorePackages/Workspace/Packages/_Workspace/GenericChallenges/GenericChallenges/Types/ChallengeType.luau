@@ -1,17 +1,19 @@
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
-local GenericChallengesParent = GenericChallenges.Parent
+local parent = GenericChallenges.Parent
 local Utils = GenericChallenges.Utils
 local addRawValueMethodToEnum = require(Utils.addRawValueMethodToEnum)
-local enumerate = require(GenericChallengesParent.enumerate)
-local t1 = {
+local enumerate = require(parent.enumerate)
+
+local v = {
 	Captcha = "captcha",
 	TwoStepVerification = "two-step-verification",
 	SecurityQuestions = "security-questions",
 	Reauthentication = "reauthentication",
 	Generic = "generic"
 }
-local v7 = enumerate(script.Name, t1)
 
-addRawValueMethodToEnum(v7, t1)
+local v2 = enumerate(script.Name, v)
 
-return v7
+addRawValueMethodToEnum(v2, v)
+
+return v2

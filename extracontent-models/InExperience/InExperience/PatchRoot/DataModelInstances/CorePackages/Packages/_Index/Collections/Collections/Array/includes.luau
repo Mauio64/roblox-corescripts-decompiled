@@ -1,10 +1,8 @@
-local ParentParent = script.Parent.Parent.Parent
-
-require(ParentParent.ES7Types)
+local parent = script.Parent.Parent.Parent
+require(parent.ES7Types)
 
 local indexOf = require(script.Parent.indexOf)
 
-return function(p1, p2, n1: number?) -- line: 22
-	-- upvalues: indexOf (copy)
-	return indexOf(p1, p2, n1) ~= -1
+return function(p, p2, p3: number?): boolean
+	return indexOf(p, p2, p3) ~= -1
 end

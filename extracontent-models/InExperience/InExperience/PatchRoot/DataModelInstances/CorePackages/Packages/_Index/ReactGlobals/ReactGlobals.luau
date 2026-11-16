@@ -1,1 +1,3 @@
-return (require(script["ReactGlobals.global"]))
+local ReactGlobalsglobal = require(script["ReactGlobals.global"])
+
+return ReactGlobalsglobal

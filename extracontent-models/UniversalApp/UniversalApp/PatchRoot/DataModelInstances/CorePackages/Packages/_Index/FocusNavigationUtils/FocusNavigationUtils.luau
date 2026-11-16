@@ -1,13 +1,7 @@
-local createSignal = require(script.createSignal)
-local shallowEqual = require(script.shallowEqual)
-local getAncestors = require(script.getAncestors)
-local mockableWarn = require(script.mockableWarn)
-local waitForEvents = require(script.waitForEvents)
-
 return {
-	createSignal = createSignal,
-	shallowEqual = shallowEqual,
-	getAncestors = getAncestors,
-	mockableWarn = mockableWarn,
-	waitForEvents = waitForEvents
+	createSignal = require(script.createSignal),
+	shallowEqual = require(script.shallowEqual),
+	getAncestors = require(script.getAncestors),
+	mockableWarn = require(script.mockableWarn),
+	waitForEvents = require(script.waitForEvents)
 }

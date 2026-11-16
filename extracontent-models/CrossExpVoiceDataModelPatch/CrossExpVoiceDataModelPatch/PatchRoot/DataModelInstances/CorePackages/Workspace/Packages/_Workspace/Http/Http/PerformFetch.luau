@@ -1,177 +1,162 @@
 local Http = script:FindFirstAncestor("Http")
-local HttpParent = Http.Parent
-local Result = require(HttpParent.Result)
-local Promise = require(HttpParent.Promise)
-local PromiseUtilities = require(HttpParent.AppCommonLib).Utils.PromiseUtilities
-local RetrievalStatus = require(Http.Enum).RetrievalStatus
-local BatchUpdateFetchingStatus = require(Http.Actions).BatchUpdateFetchingStatus
-local t1 = {}
-local t2 = {}
+local parent = Http.Parent
 
-function t1.ClearOutstandingPromiseStatus() -- line: 37
-	-- upvalues: t2 (ref)
-	t2 = {}
+local Result = require(parent.Result)
+local Promise = require(parent.Promise)
+
+local AppCommonLib = require(parent.AppCommonLib)
+local PromiseUtilities = AppCommonLib.Utils.PromiseUtilities
+local Enum2 = require(Http.Enum)
+local RetrievalStatus = Enum2.RetrievalStatus
+local Actions = require(Http.Actions)
+local BatchUpdateFetchingStatus = Actions.BatchUpdateFetchingStatus
+
+local PerformFetch = {}
+
+local v = {}
+
+function PerformFetch.ClearOutstandingPromiseStatus()
+	v = {}
 end
 
-local function singleFetchKeymapper(p1) -- line: 41
-	return p1
+local function singleFetchKeymapper(p)
+	return p
 end
 
-function t1.GetStatus(p2, p3) -- line: 50
-	-- upvalues: RetrievalStatus (copy)
-	assert(typeof(p2) == "table")
-	assert(typeof(p3) == "string")
-	assert(#p3 > 0)
-
-	return p2.FetchingStatus[p3] or RetrievalStatus.NotStarted
+function PerformFetch.GetStatus(p, value)
+	assert(typeof(p) == "table")
+	assert(typeof(value) == "string")
+	assert(#value > 0)
+	return p.FetchingStatus[value] or RetrievalStatus.NotStarted
 end
-function t1.Single(p4, p5) -- line: 81
-	-- upvalues: t1 (copy), singleFetchKeymapper (copy), Promise (copy), Result (copy)
-	assert(typeof(p4) == "string")
-	assert(typeof(p5) == "function")
-	assert(#p4 > 0)
 
-	return function(p6) -- line: 86
-		-- upvalues: t1 (copy), p4 (copy), singleFetchKeymapper (copy), p5 (copy), Promise (copy), Result (copy)
-		return t1.Batch({ p4 }, singleFetchKeymapper, function(p7, p8) -- line: 88
-			-- upvalues: p5 (copy), Promise (copy), p4 (copy), Result (copy)
-			assert(#p8 == 1)
+function PerformFetch.Single(value, callback)
+	assert(typeof(value) == "string")
+	assert(typeof(callback) == "function")
+	assert(#value > 0)
 
-			local v36 = p5(p7)
+	return function(p)
+		return PerformFetch.Batch({ value }, singleFetchKeymapper, function(p2, list)
+			assert(#list == 1)
 
-			assert(Promise.is(v36))
+			local v2 = callback(p2)
+			assert(Promise.is(v2))
 
-			return v36:andThen(function(...) -- line: 94
-				-- upvalues: Promise (copy), p4 (copy), Result (copy)
+			return v2:andThen(function(...)
 				assert(#{ ... } <= 1)
-
 				return Promise.resolve({
-					[p4] = Result.new(true, (...))
+					[value] = Result.new(true, (...))
 				})
-			end, function(...) -- line: 97
-				-- upvalues: Promise (copy), p4 (copy), Result (copy)
+			end, function(...)
 				assert(#{ ... } <= 1)
-
 				return Promise.resolve({
-					[p4] = Result.new(false, (...))
+					[value] = Result.new(false, (...))
 				})
 			end)
-		end)(p6):andThen(function(p9) -- line: 101
-			-- upvalues: p4 (copy), Promise (copy)
-			local v38, v39 = p9[p4]:unwrap()
+		end)(p):andThen(function(p2)
+			local unwrapped, v2 = p2[value]:unwrap()
 
-			if v38 then
-				return Promise.resolve(v39)
+			if unwrapped then
+				return Promise.resolve(v2)
 			end
 
-			return Promise.reject(v39)
+			return Promise.reject(v2)
 		end)
 	end
 end
-function t1.Batch(p10, p11, p12) -- line: 154
-	-- upvalues: t2 (ref), Promise (copy), RetrievalStatus (copy), BatchUpdateFetchingStatus (copy), PromiseUtilities (copy), Result (copy)
-	assert(typeof(p10) == "table")
-	assert(typeof(p11) == "function")
-	assert(typeof(p12) == "function")
 
-	return function(p13) -- line: 159
-		-- upvalues: p10 (copy), p11 (copy), t2 (ref), Promise (copy), RetrievalStatus (copy), BatchUpdateFetchingStatus (copy), p12 (copy), PromiseUtilities (copy), Result (copy)
-		local t3 = {}
-		local t4 = {}
-		local t5 = {}
+function PerformFetch.Batch(list, callback, callback2)
+	assert(typeof(list) == "table")
+	assert(typeof(callback) == "function")
+	assert(typeof(callback2) == "function")
 
-		for _, v in ipairs(p10) do
-			local v26 = p11(v)
-			local v27 = t2[v26]
+	return function(object)
+		local v2 = {}
+		local v3 = {}
+		local v4 = {}
 
-			if v27 then
-				t5[v26] = v27
+		for _, item in ipairs(list) do
+			local v5 = callback(item)
+			local v6 = v[v5]
+
+			if v6 then
+				v2[v5] = v6
 			else
-				table.insert(t3, v)
-				t4[v] = v26
+				table.insert(v3, item)
+				v4[item] = v5
 			end
 		end
 
-		local u28 = nil
-		local v29 = Promise.new(function(resolve) -- line: 178
-			-- upvalues: u28 (ref)
-			u28 = resolve
+		local v5 = nil
+		local v6 = Promise.new(function(p)
+			v5 = p
 		end)
-		local v33
+		local v7
 
-		if #t3 > 0 then
-			local t6 = {}
+		if #v3 > 0 then
+			local v8 = {}
 
-			for _, v in pairs(t4) do
-				table.insert(t6, {
-					key = v,
-					status = RetrievalStatus.Fetching
-				})
-				t2[v] = v29
+			for _, v9 in pairs(v4) do
+				table.insert(v8, { key = v9, status = RetrievalStatus.Fetching })
+				v[v9] = v6
 			end
 
-			if #t6 > 0 then
-				p13:dispatch(BatchUpdateFetchingStatus(t6))
+			if #v8 > 0 then
+				object:dispatch(BatchUpdateFetchingStatus(v8))
 			end
 
-			v33 = p12(p13, t3)
-			assert(Promise.is(v33))
+			v7 = callback2(object, v3)
+			assert(Promise.is(v7))
 		else
-			v33 = Promise.resolve({})
+			v7 = Promise.resolve({})
 		end
 
-		v33:andThen(function(p14) -- line: 209
-			-- upvalues: PromiseUtilities (copy), t5 (copy)
-			local u42 = p14 or {}
+		v7:andThen(function(options)
+			local v8 = options or {}
 
-			return PromiseUtilities.Batch(t5):andThen(function(p15) -- line: 212
-				-- upvalues: u42 (ref)
-				local t7 = {}
+			return PromiseUtilities.Batch(v2):andThen(function(items)
+				local result = {}
 
-				for k, v in pairs(p15) do
-					local _, v56 = v:unwrap()
-
-					t7[k] = v56[k]
+				for k, item in pairs(items) do
+					local _, v9 = item:unwrap()
+					result[k] = v9[k]
 				end
 
-				return u42, t7
+				return v8, result
 			end)
-		end, function() -- line: 222
+		end, function()
 			assert(false, "PerformFetch fetchFunctor should never reject")
-		end):andThen(function(p16, p17) -- line: 225
-			-- upvalues: t4 (copy), Result (copy), RetrievalStatus (copy), t2 (ref), p13 (copy), BatchUpdateFetchingStatus (copy)
-			local t8 = {}
+		end):andThen(function(p, p2)
+			local v8 = {}
 
-			for _, v in pairs(t4) do
-				local v48 = p16[v]
+			for _, v9 in pairs(v4) do
+				local v10 = p[v9]
 
-				if Result.is(v48) then
-					p17[v] = v48
+				if Result.is(v10) then
+					p2[v9] = v10
 				else
-					p17[v] = Result.error()
+					p2[v9] = Result.error()
 				end
 
-				local v49 = p17[v]:unwrap() and RetrievalStatus.Done or RetrievalStatus.Failed
-
-				table.insert(t8, {
-					key = v,
-					status = v49
+				table.insert(v8, {
+					key = v9,
+					status = p2[v9]:unwrap() and RetrievalStatus.Done or RetrievalStatus.Failed
 				})
-				t2[v] = nil
+
+				v[v9] = nil
 			end
 
-			if #t8 > 0 then
-				p13:dispatch(BatchUpdateFetchingStatus(t8))
+			if #v8 > 0 then
+				object:dispatch(BatchUpdateFetchingStatus(v8))
 			end
 
-			return p17
-		end):andThen(function(p18) -- line: 255
-			-- upvalues: u28 (ref)
-			u28(p18)
+			return p2
+		end):andThen(function(p)
+			v5(p)
 		end)
 
-		return v29
+		return v6
 	end
 end
 
-return t1
+return PerformFetch

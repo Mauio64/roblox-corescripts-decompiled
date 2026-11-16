@@ -2,224 +2,234 @@ local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
 
 require(InExperienceShop.Types)
 require(script.Parent.multiGetProductInfo)
-
 local shopItemMapping = require(script.Parent.shopItemMapping)
+
 local makeRequestKey = shopItemMapping.makeRequestKey
 local toShopItem = shopItemMapping.toShopItem
 
-local function refreshShopItemFromProductInfo(p1, p2) -- line: 200
-	-- upvalues: toShopItem (copy)
-	local v50 = toShopItem(p2, p1.itemType, (tonumber(p1.id)))
+local function infoTypeForShopItemType(itemType) -- 2 equivalent calls inferred from this helper
+	if itemType == "Product" then
+		return Enum.InfoType.Product
+	elseif itemType == "GamePass" then
+		return Enum.InfoType.GamePass
+	end
 
+	return nil
+end
+
+local function refreshShopItemFromProductInfo(item, value)
+	local v = toShopItem(value, item.itemType, (tonumber(item.id)))
 	return {
-		id = p1.id,
-		itemType = p1.itemType,
-		isOwned = p1.isOwned,
-		creator = v50.creator or p1.creator,
-		universeId = p1.universeId,
-		originalIndex = p1.originalIndex,
-		name = v50.name,
-		thumbnail = v50.thumbnail,
-		price = v50.price,
-		description = v50.description,
-		updated = v50.updated
+		id = item.id,
+		itemType = item.itemType,
+		isOwned = item.isOwned,
+		creator = v.creator or item.creator,
+		universeId = item.universeId,
+		originalIndex = item.originalIndex,
+		name = v.name,
+		thumbnail = v.thumbnail,
+		price = v.price,
+		userBasePriceInRobux = v.userBasePriceInRobux,
+		description = v.description,
+		updated = v.updated
 	}
 end
 
-return {
-	infoTypeForShopItemType = function(p3) -- line: 26
-		if p3 == "Product" then
-			return Enum.InfoType.Product
-		end
+local RefreshShopItems = {}
+RefreshShopItems.infoTypeForShopItemType = infoTypeForShopItemType
 
-		if p3 == "GamePass" then
-			return Enum.InfoType.GamePass
-		end
+function RefreshShopItems.buildRequestsFromSections(list)
+	local requestKeySet = {}
+	local requestsFromSections = {}
 
-		return nil
-	end,
-	buildRequestsFromSections = function(t1: {[any]: any}) -- line: 39
-		-- upvalues: makeRequestKey (copy)
-		local t2 = {}
-		local t3 = {}
+	for _, item in ipairs(list) do
+		for _, item2 in ipairs(item.items) do
+			local infoType = infoTypeForShopItemType(item2.itemType) -- inferred equivalent call
 
-		for _, v in ipairs(t1) do
-			for _, v2 in ipairs(v.items) do
-				local itemType = v2.itemType
-				local v15 = if itemType ~= "Product" then if itemType ~= "GamePass" then nil else Enum.InfoType.GamePass else Enum.InfoType.Product
-
-				if v15 ~= nil then
-					local num = tonumber(v2.id)
-
-					if num ~= nil then
-						local v17 = makeRequestKey(num, v15)
-
-						if not t3[v17] then
-							t3[v17] = true
-							table.insert(t2, {
-								id = num,
-								infoType = v15
-							})
-						end
-					end
-				end
-			end
-		end
-
-		return t2
-	end,
-	appendFailedItemRequests = function(t4: {[any]: any}, t5: {[any]: any}) -- line: 66
-		-- upvalues: makeRequestKey (copy)
-		local t6 = {}
-
-		for _, v in ipairs(t4) do
-			t6[makeRequestKey(v.id, v.infoType)] = true
-		end
-
-		for _, v in ipairs(t5) do
-			local v25 = makeRequestKey(v.id, v.infoType)
-
-			if not t6[v25] then
-				t6[v25] = true
-				table.insert(t4, {
-					id = v.id,
-					infoType = v.infoType
-				})
-			end
-		end
-
-		return t4
-	end,
-	refreshShopItemFromProductInfo = refreshShopItemFromProductInfo,
-	mergeProductInfoIntoSections = function(t7: {[any]: any}, t8: {[any]: any}) -- line: 230
-		-- upvalues: makeRequestKey (copy), refreshShopItemFromProductInfo (copy)
-		local t9 = {}
-
-		for _, v in ipairs(t8) do
-			t9[makeRequestKey(v.request.id, v.request.infoType)] = v
-		end
-
-		local t10 = table.create(#t7)
-
-		for i, v in ipairs(t7) do
-			local t11 = nil
-
-			for i2, v3 in ipairs(v.items) do
-				local itemType = v3.itemType
-				local v63 = if itemType ~= "Product" then if itemType ~= "GamePass" then nil else Enum.InfoType.GamePass else Enum.InfoType.Product
-				local num = tonumber(v3.id)
-				local v65 = nil
-
-				if v63 ~= nil and num ~= nil then
-					v65 = t9[makeRequestKey(num, v63)]
-				end
-
-				if v65 ~= nil and v65.ok then
-					if t11 == nil then
-						t11 = table.create(#v.items)
-
-						for i3 = 1, i2 - 1 do
-							t11[i3] = v.items[i3]
-						end
-					end
-
-					t11[i2] = refreshShopItemFromProductInfo(v3, v65.value)
-				elseif t11 ~= nil then
-					t11[i2] = v3
-				end
+			if infoType == nil then
+				continue
 			end
 
-			if t11 == nil then
-				t10[i] = v
-			else
-				t10[i] = {
-					id = v.id,
-					name = v.name,
-					items = t11,
-					paymentSessionId = v.paymentSessionId,
-					robuxPackages = v.robuxPackages
-				}
+			local id = tonumber(item2.id)
+
+			if id == nil then
+				continue
 			end
-		end
 
-		return t10
-	end,
-	insertRecoveredItemsIntoSections = function(t12: {[any]: any}, t13: {[any]: any}, t14: {[any]: any}) -- line: 108
-		-- upvalues: makeRequestKey (copy), toShopItem (copy)
-		local t15 = {}
+			local requestKey = makeRequestKey(id, infoType)
 
-		for _, v in ipairs(t13) do
-			t15[makeRequestKey(v.request.id, v.request.infoType)] = v
-		end
-
-		local t16 = {}
-		local t17 = {}
-
-		for _, v in ipairs(t14) do
-			local v36 = t15[makeRequestKey(v.id, v.infoType)]
-
-			if v36 == nil or not v36.ok then
-				table.insert(t17, v)
-			else
-				local v37 = t16[v.sectionId]
-
-				if v37 == nil then
-					v37 = {}
-					t16[v.sectionId] = v37
-				end
-
-				local v38 = toShopItem(v36.value, v.itemType, v.id)
-
-				v38.originalIndex = v.originalIndex
-				table.insert(v37, v38)
+			if requestKeySet[requestKey] then
+				continue
 			end
+
+			requestKeySet[requestKey] = true
+			table.insert(requestsFromSections, { id = id, infoType = infoType })
 		end
-
-		local t18 = table.create(#t12)
-
-		for i, v in ipairs(t12) do
-			local v42 = t16[v.id]
-
-			if v42 == nil then
-				t18[i] = v
-			else
-				table.sort(v42, function(p4, p5) -- line: 159
-					return (p4.originalIndex or 0) < (p5.originalIndex or 0)
-				end)
-
-				local t19 = table.create(#v.items + #v42)
-				local n1 = 1
-				local n2 = 1
-
-				while n1 <= #v.items or n2 <= #v42 do
-					local v46 = v.items[n1]
-					local v47 = v42[n2]
-
-					if v47 == nil then
-						table.insert(t19, v46)
-						n1 += 1
-					elseif v46 == nil then
-						table.insert(t19, v47)
-						n2 += 1
-					elseif (v46.originalIndex or 0) <= (v47.originalIndex or 0) then
-						table.insert(t19, v46)
-						n1 += 1
-					else
-						table.insert(t19, v47)
-						n2 += 1
-					end
-				end
-
-				t18[i] = {
-					id = v.id,
-					name = v.name,
-					items = t19,
-					paymentSessionId = v.paymentSessionId,
-					robuxPackages = v.robuxPackages
-				}
-			end
-		end
-
-		return t18, t17
 	end
-}
+
+	return requestsFromSections
+end
+
+function RefreshShopItems.appendFailedItemRequests(list, list2)
+	local set = {}
+
+	for _, item in ipairs(list) do
+		set[makeRequestKey(item.id, item.infoType)] = true
+	end
+
+	for _, item in ipairs(list2) do
+		local requestKey = makeRequestKey(item.id, item.infoType)
+
+		if set[requestKey] then
+			continue
+		end
+
+		set[requestKey] = true
+		table.insert(list, { id = item.id, infoType = item.infoType })
+	end
+
+	return list
+end
+
+RefreshShopItems.refreshShopItemFromProductInfo = refreshShopItemFromProductInfo
+
+function RefreshShopItems.mergeProductInfoIntoSections(list, list2)
+	local v = {}
+
+	for _, item in ipairs(list2) do
+		v[makeRequestKey(item.request.id, item.request.infoType)] = item
+	end
+
+	local result = table.create(#list)
+
+	for i, item in ipairs(list) do
+		local items = nil
+
+		for j, item2 in ipairs(item.items) do
+			local v2 = infoTypeForShopItemType(item2.itemType) -- inferred equivalent call
+			local id = tonumber(item2.id)
+			local v3
+
+			if not (v2 == nil or id == nil) then
+				v3 = v[makeRequestKey(id, v2)]
+			end
+
+			if v3 == nil or not v3.ok then
+				if items ~= nil then
+					items[j] = item2
+				end
+			else
+				if items == nil then
+					items = table.create(#item.items)
+
+					for k = 1, j - 1 do
+						items[k] = item.items[k]
+					end
+				end
+
+				items[j] = refreshShopItemFromProductInfo(item2, v3.value)
+			end
+		end
+
+		if items == nil then
+			result[i] = item
+		else
+			result[i] = {
+				id = item.id,
+				name = item.name,
+				items = items,
+				categoryType = item.categoryType,
+				stableCategoryId = item.stableCategoryId,
+				categoryGroup = item.categoryGroup,
+				paymentSessionId = item.paymentSessionId,
+				bonusJwt = item.bonusJwt,
+				robuxPackages = item.robuxPackages
+			}
+		end
+	end
+
+	return result
+end
+
+function RefreshShopItems.insertRecoveredItemsIntoSections(list, list2, list3)
+	local v = {}
+
+	for _, item in ipairs(list2) do
+		v[makeRequestKey(item.request.id, item.request.infoType)] = item
+	end
+
+	local result = {}
+	local v2 = {}
+
+	for _, item in ipairs(list3) do
+		local v3 = v[makeRequestKey(item.id, item.infoType)]
+
+		if v3 == nil or not v3.ok then
+			table.insert(result, item)
+		else
+			local v4 = v2[item.sectionId]
+
+			if v4 == nil then
+				v4 = {}
+				v2[item.sectionId] = v4
+			end
+
+			local v5 = toShopItem(v3.value, item.itemType, item.id)
+			v5.originalIndex = item.originalIndex
+			table.insert(v4, v5)
+		end
+	end
+
+	local result2 = table.create(#list)
+
+	for i, item in ipairs(list) do
+		local v3 = v2[item.id]
+
+		if v3 == nil then
+			result2[i] = item
+		else
+			table.sort(v3, function(a, b): boolean
+				return (a.originalIndex or 0) < (b.originalIndex or 0)
+			end)
+
+			local items = table.create(#item.items + #v3)
+			local v4 = 1
+			local v5 = 1
+
+			while v4 <= #item.items or v5 <= #v3 do
+				local item2 = item.items[v4]
+				local v6 = v3[v5]
+
+				if v6 == nil then
+					table.insert(items, item2)
+					v4 += 1
+				elseif item2 == nil then
+					table.insert(items, v6)
+					v5 += 1
+				elseif (item2.originalIndex or 0) <= (v6.originalIndex or 0) then
+					table.insert(items, item2)
+					v4 += 1
+				else
+					table.insert(items, v6)
+					v5 += 1
+				end
+			end
+
+			result2[i] = {
+				id = item.id,
+				name = item.name,
+				items = items,
+				categoryType = item.categoryType,
+				stableCategoryId = item.stableCategoryId,
+				categoryGroup = item.categoryGroup,
+				paymentSessionId = item.paymentSessionId,
+				bonusJwt = item.bonusJwt,
+				robuxPackages = item.robuxPackages
+			}
+		end
+	end
+
+	return result2, result
+end
+
+return RefreshShopItems

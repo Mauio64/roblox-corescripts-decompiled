@@ -1,44 +1,38 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local createSignal = require(Parent.Signals).createSignal
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+local Signals = require(parent.Signals)
+local createSignal = Signals.createSignal
 
-return function() -- line: 19
-	-- upvalues: createSignal (copy)
-	local v3, v4 = createSignal(false)
-	local v5, v6 = createSignal(nil)
-	local v7, v8 = createSignal({})
+return function()
+	local signal, v = createSignal(false)
+	local signal2, v2 = createSignal(nil)
+
+	local signal3, v3 = createSignal({})
 
 	return {
-		getHasEnteredFriendsTab = v3,
-		getActiveConversationId = v5,
-		getLocalUnreadConversationIds = v7,
-		markFriendsTabEntered = function() -- line: 31
-			-- upvalues: v4 (copy)
-			v4(true)
+		getHasEnteredFriendsTab = signal,
+		getActiveConversationId = signal2,
+		getLocalUnreadConversationIds = signal3,
+		markFriendsTabEntered = function()
+			v(true)
 		end,
-		setActiveConversationId = function(s1: string?) -- line: 35
-			-- upvalues: v6 (copy)
-			v6(s1)
+		setActiveConversationId = function(p: string?)
+			v2(p)
 		end,
-		addLocalUnread = function(s2: string) -- line: 39
-			-- upvalues: v8 (copy)
-			v8(function(p1) -- line: 40
-				-- upvalues: s2 (copy)
-				if p1[s2] then
-					return p1
+		addLocalUnread = function(p: string)
+			v3(function(p2)
+				if p2[p] then
+					return p2
 				end
 
-				local v12 = table.clone(p1)
-
-				v12[s2] = true
-
-				return v12
+				local clone = table.clone(p2)
+				clone[p] = true
+				return clone
 			end)
 		end,
-		clearLocalUnread = function() -- line: 50
-			-- upvalues: v8 (copy)
-			v8(function(p2) -- line: 51
-				if next(p2) == nil then
-					return p2
+		clearLocalUnread = function()
+			v3(function(items)
+				if next(items) == nil then
+					return items
 				end
 
 				return {}

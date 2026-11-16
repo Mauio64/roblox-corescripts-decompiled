@@ -1,16 +1,19 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local FFlagAEGIS2UseGuacToShowEnabledMessage = require(Parent.SharedFlags).FFlagAEGIS2UseGuacToShowEnabledMessage
-local UniversalAppPolicy = nil
+local parent = script:FindFirstAncestor("ExpChat").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAEGIS2UseGuacToShowEnabledMessage = SharedFlags.FFlagAEGIS2UseGuacToShowEnabledMessage
+local UniversalAppPolicy
 
 if FFlagAEGIS2UseGuacToShowEnabledMessage then
-	UniversalAppPolicy = require(Parent.UniversalAppPolicy)
+	UniversalAppPolicy = require(parent.UniversalAppPolicy)
+else
+	UniversalAppPolicy = nil
 end
 
-return function() -- line: 12
-	-- upvalues: FFlagAEGIS2UseGuacToShowEnabledMessage (copy), UniversalAppPolicy (ref)
-	if not FFlagAEGIS2UseGuacToShowEnabledMessage then
-		return false
+return function()
+	if FFlagAEGIS2UseGuacToShowEnabledMessage then
+		return UniversalAppPolicy.getAppFeaturePolicies().getInCommsRegionBubble()
 	end
 
-	return UniversalAppPolicy.getAppFeaturePolicies().getInCommsRegionBubble()
+	return false
 end

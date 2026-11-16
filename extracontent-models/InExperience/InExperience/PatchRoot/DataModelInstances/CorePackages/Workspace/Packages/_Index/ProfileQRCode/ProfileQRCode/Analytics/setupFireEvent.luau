@@ -1,28 +1,25 @@
-local Parent = script:FindFirstAncestor("ProfileQRCode").Parent
-local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local parent = script:FindFirstAncestor("ProfileQRCode").Parent
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+
 local DiagActionList = require(script.Parent.DiagActionList)
 local fireEventStream = SocialLuaAnalytics.Analytics.FireEvent.fireEventStream
 local fireDiagCounter = SocialLuaAnalytics.Analytics.FireEvent.fireDiagCounter
 local EventStreamActionList = require(script.Parent.EventStreamActionList)
 
-return function(t1: {[any]: any}) -- line: 10
-	-- upvalues: fireEventStream (copy), EventStreamActionList (copy), fireDiagCounter (copy), DiagActionList (copy)
-	local v8 = fireEventStream({
-		eventStreamImpl = t1.analytics.EventStream,
+return function(p)
+	local v = fireEventStream({
+		eventStreamImpl = p.analytics.EventStream,
 		eventList = EventStreamActionList,
-		infoForAllEvents = t1.infoForAllEvents
-	})
-	local v9 = fireDiagCounter({
-		diagImpl = t1.analytics.Diag,
-		eventList = DiagActionList
+		infoForAllEvents = p.infoForAllEvents
 	})
 
-	return function(p1, p2) -- line: 26
-		-- upvalues: DiagActionList (copy), v9 (copy), v8 (copy)
-		if DiagActionList[p1] then
-			v9(p1)
+	local v2 = fireDiagCounter({ diagImpl = p.analytics.Diag, eventList = DiagActionList })
+
+	return function(p2, p3)
+		if DiagActionList[p2] then
+			v2(p2)
 		end
 
-		return v8(p1, p2)
+		return v(p2, p3)
 	end
 end

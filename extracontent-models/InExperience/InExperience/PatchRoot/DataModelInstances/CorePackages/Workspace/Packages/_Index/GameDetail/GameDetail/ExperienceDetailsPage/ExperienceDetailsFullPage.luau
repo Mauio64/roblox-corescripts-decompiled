@@ -1,5 +1,10 @@
 local GameDetail = script:FindFirstAncestor("GameDetail")
-local GameDetailParent = GameDetail.Parent
+local parent = GameDetail.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local isTenFootInterface = AppCommonLib.isTenFootInterface
+
+local FFlagSduiEdpRenderStarted = require(GameDetail.Flags.FFlagSduiEdpRenderStarted)
 local ExperienceDetailsPageUtils = require(script.Parent.ExperienceDetailsPageUtils)
 local ExperienceDetailsPageConstants = require(script.Parent.ExperienceDetailsPageConstants)
 local ExperienceDetailsPageScopeFields = require(script.Parent.ExperienceDetailsPageScopeFields)
@@ -7,25 +12,35 @@ local fetchExperienceDetailsPage = require(script.Parent.fetchExperienceDetailsP
 local getExperienceDetailsPageKey = require(script.Parent.getExperienceDetailsPageKey)
 local removeGameDetailSessionIfDeparted = require(script.Parent.removeGameDetailSessionIfDeparted)
 local useEdpFunctionallyReadyLogger = require(script.Parent.useEdpFunctionallyReadyLogger)
+local createExperienceDetailsPageTimer = require(script.Parent.createExperienceDetailsPageTimer)
+local usePublishContainerWidth = require(script.Parent.usePublishContainerWidth)
 local ExperienceDetailsFallbackBannerImage = require(script.Parent.Fallback.ExperienceDetailsFallbackBannerImage)
 local ExperienceDetailsFallbackFeed = require(script.Parent.Fallback.ExperienceDetailsFallbackFeed)
+local ExperienceDetailsPersistentActionBar = require(script.Parent.ExperienceDetailsPersistentActionBar)
 
-require(GameDetailParent.Navigation)
-
-local Foundation = require(GameDetailParent.Foundation)
-local React = require(GameDetailParent.React)
+require(parent.Navigation)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 local useTokens = Foundation.Hooks.useTokens
-local AppSessionService = require(GameDetailParent.RoactServiceTags).AppSessionService
-local useNavigation = require(GameDetailParent.Navigation).useNavigation
-local useRoactService = require(GameDetailParent.RobloxAppHooks).useRoactService
-local SessionType = require(GameDetailParent.RobloxAppSessionization).SessionType
-local DetailsPageLayout = require(GameDetailParent.AppBlox).DetailsPageLayout
-local AppPage = require(GameDetailParent.RobloxAppEnums).AppPage
-local DataHydration = require(GameDetailParent.DataHydration)
-local Responsive = require(GameDetailParent.Responsive)
-local useGetCurrentLegacyRoute = require(GameDetailParent.DiscoveryRouting).useGetCurrentLegacyRoute
-local EDPTTIConstants = require(GameDetailParent.GameDetailTelemetry).EDPTTIConstants
-local SduiSharedUtilities = require(GameDetailParent.SduiSharedUtilities)
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppSessionService = RoactServiceTags.AppSessionService
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local AppBlox = require(parent.AppBlox)
+local DetailsPageLayout = AppBlox.DetailsPageLayout
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local DataHydration = require(parent.DataHydration)
+local Responsive = require(parent.Responsive)
+local DiscoveryRouting = require(parent.DiscoveryRouting)
+local useGetCurrentLegacyRoute = DiscoveryRouting.useGetCurrentLegacyRoute
+
+local GameDetailTelemetry = require(parent.GameDetailTelemetry)
+local EDPTTIConstants = GameDetailTelemetry.EDPTTIConstants
+
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local getSduiClientPageScope = SduiSharedUtilities.getSduiClientPageScope
 local SduiSurfaceLoadTimeTracker = SduiSharedUtilities.SduiSurfaceLoadTimeTracker
 local usePageScopeRef = SduiSharedUtilities.usePageScopeRef
@@ -34,234 +49,355 @@ local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
 local UiStatus = SduiSharedUtilities.UiStatus
 local useUiStatus = SduiSharedUtilities.useUiStatus
 local FilterPlayWithReward = ExperienceDetailsPageScopeFields.FilterPlayWithReward
-local CompositionTags = require(GameDetailParent.AppComposition).CompositionTags
-local SharedFlags = require(GameDetailParent.SharedFlags)
-local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
+local IsTenFoot = ExperienceDetailsPageScopeFields.IsTenFoot
+
+local AppComposition = require(parent.AppComposition)
+local CompositionTags = AppComposition.CompositionTags
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEDPTTIParityDefinitions = SharedFlags.FFlagEDPTTIParityDefinitions
 local FFlagSduiPageEntryUseSharedHooks = SharedFlags.FFlagSduiPageEntryUseSharedHooks
-local FFlagSduiEdpPageScopeTimerFix = SharedFlags.FFlagSduiEdpPageScopeTimerFix
-local FFlagSduiPlayWithRewardGapFix = SharedFlags.FFlagSduiPlayWithRewardGapFix
-local FFlagLuaAppSduiEdpRouteAwareSessionRemoval = SharedFlags.FFlagLuaAppSduiEdpRouteAwareSessionRemoval
-local v41 = game:DefineFastInt("EdpFullBleedOverlapOffset", 180)
-local v42 = game:DefineFastInt("EdpBannerBottomVisiblePercent", 20)
-local t1 = {
+local FFlagSduiContainerQueries = SharedFlags.FFlagSduiContainerQueries
+local defineFastFlag = game:DefineFastFlag("SduiEdpPageScopeIsTenFoot", false)
+local FFlagLuaAppMediaGalleryGamepadSupport = SharedFlags.FFlagLuaAppMediaGalleryGamepadSupport
+local FFlagLuaAppEdpDirectionalGradientMidTransparency = SharedFlags.FFlagLuaAppEdpDirectionalGradientMidTransparency
+local FFlagEnableSplitPaneEDPFix = SharedFlags.FFlagEnableSplitPaneEDPFix
+local defineFastInt = game:DefineFastInt("EdpBannerAspectRatioTenths", 0)
+local defineFastInt2 = game:DefineFastInt("EdpFullBleedOverlapOffset", 180)
+local defineFastInt3 = game:DefineFastInt("EdpGradientTopBleedOffset", 120)
+local defineFastInt4 = game:DefineFastInt("EdpBannerBottomVisiblePercent", 20)
+local defineFastInt5 = game:DefineFastInt("EdpDirectionalFullBleedOverlapOffset", 195)
+local defineFastInt6 = game:DefineFastInt("EdpDirectionalBannerBottomVisiblePercent", 50)
+
+local defineFastInt7 = game:DefineFastInt("EdpDirectionalGradientMidTransparencyHundredths", 12)
+
+local selectionGroup = {
 	SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
 	SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
 	SelectionBehaviorRight = Enum.SelectionBehavior.Stop
 }
 
-local function ExperienceDetailsFullPage(p1) -- line: 67
-	-- upvalues: GameDetail (copy), ExperienceDetailsPageUtils (copy), getExperienceDetailsPageKey (copy), React (copy), FFlagSduiEdpPageScopeTimerFix (copy), usePageScopeRef (copy), SduiSurfaceLoadTimeTracker (copy), EDPTTIConstants (copy), getSduiClientPageScope (copy), useEdpFunctionallyReadyLogger (copy), useNavigation (copy), useRoactService (copy), AppSessionService (copy), useTokens (copy), FFlagLuaAppSduiEdpRouteAwareSessionRemoval (copy), useGetCurrentLegacyRoute (copy), FFlagSduiPlayWithRewardGapFix (copy), FilterPlayWithReward (copy), removeGameDetailSessionIfDeparted (copy), SessionType (copy), fetchExperienceDetailsPage (copy), useUiStatus (copy), UiStatus (copy), DataHydration (copy), Responsive (copy), DetailsPageLayout (copy), t1 (copy), v41 (copy), v42 (copy), SduiFeatureEntryPoint (copy), AppPage (copy), ExperienceDetailsPageConstants (copy), ExperienceDetailsFallbackBannerImage (copy), Foundation (copy), SduiPageEntryPoint (copy), FFlagSduiPageEntryUseSharedHooks (copy), FFlagSduiExperienceDetailsSupport (copy), CompositionTags (copy), ExperienceDetailsFallbackFeed (copy)
+local function ExperienceDetailsFullPage(p)
 	local useExperienceDetailsFocusNavigation = require(GameDetail.FocusNavigation.useExperienceDetailsFocusNavigation)
-	local v47 = ExperienceDetailsPageUtils.getUniverseId(p1)
-	local v48 = getExperienceDetailsPageKey(v47)
-	local v49 = React.useRef(nil)
 
-	if FFlagSduiEdpPageScopeTimerFix then
-		usePageScopeRef(v48)
-	end
+	local universeId = ExperienceDetailsPageUtils.getUniverseId(p)
+	local experienceDetailsPageKey = getExperienceDetailsPageKey(universeId)
 
-	local v50 = React.useMemo(function() -- line: 78
-		-- upvalues: ExperienceDetailsPageUtils (copy), p1 (copy), FFlagSduiEdpPageScopeTimerFix (copy), SduiSurfaceLoadTimeTracker (copy), v48 (copy), EDPTTIConstants (copy), getSduiClientPageScope (copy)
-		local v63 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "pageTimer")
+	local ref = React.useRef(nil)
+	usePageScopeRef(experienceDetailsPageKey)
+	local v = React.useMemo(function()
+		local v = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "pageTimer")
+		local v2
 
-		if FFlagSduiEdpPageScopeTimerFix then
-			local v64 = v63 or SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(v48, {
-				manualSurfaceReady = true,
+		if FFlagEDPTTIParityDefinitions then
+			v2 = v
+				or createExperienceDetailsPageTimer(experienceDetailsPageKey, {
+					page = "Untracked",
+					category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE
+				})
+		else
+			v2 = v or SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(experienceDetailsPageKey, {
 				eventName = EDPTTIConstants.EDP_TTI_EVENT_NAME,
 				metadata = {
 					page = "Untracked",
 					category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE
-				}
+				},
+				manualSurfaceReady = true
 			})
-
-			getSduiClientPageScope(v48).set(SduiSurfaceLoadTimeTracker.SURFACE_LOAD_TIME_PAGE_SCOPE_KEY, v64)
-
-			return v64
 		end
 
-		if v63 then
-			return v63
-		end
-
-		return SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(v48, {
-			manualSurfaceReady = true,
-			eventName = EDPTTIConstants.EDP_TTI_EVENT_NAME,
-			metadata = {
-				page = "Untracked",
-				category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE
-			}
-		})
+		getSduiClientPageScope(experienceDetailsPageKey).set(
+			SduiSurfaceLoadTimeTracker.SURFACE_LOAD_TIME_PAGE_SCOPE_KEY,
+			v2
+		)
+		return v2
 	end, {})
 
-	useEdpFunctionallyReadyLogger(v50, v47)
-
-	local v51 = useNavigation()
-	local v52 = useRoactService(AppSessionService)
-	local v53 = useTokens()
-	local u54 = nil
-
-	if FFlagLuaAppSduiEdpRouteAwareSessionRemoval then
-		u54 = useGetCurrentLegacyRoute()
+	if FFlagSduiEdpRenderStarted then
+		v.logRenderStarted()
 	end
 
-	local v55 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "referralSource")
-	local v56 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "experienceJoinData")
-	local v57 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "placeIdOverride")
+	useEdpFunctionallyReadyLogger(v, universeId)
 
-	if not FFlagSduiEdpPageScopeTimerFix then
-		usePageScopeRef(v48)
-	end
+	local v2 = useNavigation()
+	local v3 = useRoactService(AppSessionService)
+	local v4 = useTokens()
 
-	React.useEffect(function() -- line: 125
-		-- upvalues: getSduiClientPageScope (copy), v48 (copy), v55 (copy), v56 (copy), v57 (copy), FFlagSduiPlayWithRewardGapFix (copy), FilterPlayWithReward (copy)
-		local v65 = getSduiClientPageScope(v48)
+	local v5 = useGetCurrentLegacyRoute()
 
-		v65.set("referralSource", v55)
-		v65.set("experienceJoinData", v56)
-		v65.set("placeId", v57)
-		v65.set("launchSource", "ExperienceDetailsPage")
+	local referralSource = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "referralSource")
+	local experienceJoinData = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "experienceJoinData")
+	local placeIdOverride = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "placeIdOverride")
+	React.useEffect(function()
+		local sduiClientPageScope = getSduiClientPageScope(experienceDetailsPageKey)
+		sduiClientPageScope.set("referralSource", referralSource)
+		sduiClientPageScope.set("experienceJoinData", experienceJoinData)
+		sduiClientPageScope.set("placeId", placeIdOverride)
+		sduiClientPageScope.set("launchSource", "ExperienceDetailsPage")
+		sduiClientPageScope.set(FilterPlayWithReward, nil)
 
-		if FFlagSduiPlayWithRewardGapFix then
-			v65.set(FilterPlayWithReward, nil)
+		if defineFastFlag then
+			sduiClientPageScope.set(IsTenFoot, isTenFootInterface())
 		end
-	end, {
-		v48,
-		v55,
-		v56,
-		v57
-	})
+	end, { experienceDetailsPageKey, referralSource, experienceJoinData, placeIdOverride })
 
-	local v58 = React.useCallback(function() -- line: 137
-		-- upvalues: FFlagLuaAppSduiEdpRouteAwareSessionRemoval (copy), u54 (ref), v51 (copy), removeGameDetailSessionIfDeparted (copy), v52 (copy), SessionType (copy)
-		local v66 = if not FFlagLuaAppSduiEdpRouteAwareSessionRemoval then nil else u54()
+	local onClose = React.useCallback(function()
+		local v6 = v5()
+		v2.goBack()
+		removeGameDetailSessionIfDeparted(v3, v6)
+	end, { v2, v3, v5 })
 
-		v51.goBack()
-
-		if FFlagLuaAppSduiEdpRouteAwareSessionRemoval then
-			removeGameDetailSessionIfDeparted(v52, v66)
-
-			return
+	React.useEffect(function()
+		if universeId and v then
+			fetchExperienceDetailsPage(universeId, v)
 		end
+	end, { universeId, v })
 
-		if v52 then
-			v52:RemoveSession(SessionType.StructuralIdentifier.GameDetailSource)
-		end
-	end, {
-		v51,
-		v52,
-		if not FFlagLuaAppSduiEdpRouteAwareSessionRemoval then nil else u54
-	})
-
-	React.useEffect(function() -- line: 153
-		-- upvalues: v47 (copy), v50 (copy), fetchExperienceDetailsPage (copy)
-		if v47 and v50 then
-			fetchExperienceDetailsPage(v47, v50)
-		end
-	end, {
-		v47,
-		v50
-	})
-
-	local v59 = useUiStatus(v48)
-
-	React.useEffect(function() -- line: 160
-		-- upvalues: v59 (copy), UiStatus (copy), v47 (copy), DataHydration (copy)
-		if v59 == UiStatus.Error and v47 then
-			DataHydration.Game.getGameInfoStore(false).getAndFetchGameInfo(v47, function(p2) -- line: 164
+	local v6 = useUiStatus(experienceDetailsPageKey)
+	React.useEffect(function()
+		if v6 == UiStatus.Error and universeId then
+			DataHydration.Game.getGameInfoStore(false).getAndFetchGameInfo(universeId, function(p2): boolean
 				return p2 == nil or p2.creator == nil
 			end)
-			DataHydration.Game.getAgeRecommendationStore(false).getAndFetchAgeRecommendation(v47)
-		end
-	end, {
-		v59,
-		v47
-	})
 
-	local v60 = React.useCallback(function() -- line: 171
-		-- upvalues: v47 (copy), v50 (copy), fetchExperienceDetailsPage (copy)
-		if v47 and v50 then
-			fetchExperienceDetailsPage(v47, v50, true)
+			DataHydration.Game.getAgeRecommendationStore(false).getAndFetchAgeRecommendation(universeId)
 		end
-	end, {
-		v47,
-		v50
-	})
-	local v61 = useExperienceDetailsFocusNavigation(v58)
-	local v62 = Responsive.usePreferredInput() == Responsive.Input.Directional
+	end, { v6, universeId })
 
-	if v47 == nil then
+	local refresh = React.useCallback(function()
+		if universeId and v then
+			fetchExperienceDetailsPage(universeId, v, true)
+		end
+	end, { universeId, v })
+
+	local ref2 = useExperienceDetailsFocusNavigation(onClose)
+
+	if FFlagSduiContainerQueries then
+		ref2 = usePublishContainerWidth(experienceDetailsPageKey, ref2)
+	end
+
+	local v7
+
+	if FFlagLuaAppMediaGalleryGamepadSupport then
+		v7 = Responsive.useLastInput() == Responsive.Input.Directional
+	else
+		v7 = Responsive.usePreferredInput() == Responsive.Input.Directional
+	end
+
+	local v8
+
+	if FFlagEnableSplitPaneEDPFix then
+		v8 = p.hideCloseButtonOnHeader == true
+	else
+		v8 = nil
+	end
+
+	if FFlagEnableSplitPaneEDPFix then
+		React.useEffect(function()
+			getSduiClientPageScope(experienceDetailsPageKey).set(
+				ExperienceDetailsPageScopeFields.HideCloseButtonOnHeader,
+				v8
+			)
+		end, { experienceDetailsPageKey, v8 })
+	end
+
+	local v9, v10
+
+	if FFlagEnableSplitPaneEDPFix then
+		v9 = p.showBottomActionBar == true
+		v10 = v7 or v9
+	else
+		v10 = v7
+	end
+
+	if universeId == nil then
 		return nil
 	end
 
-	return React.createElement(DetailsPageLayout.Root, {
-		ref = v61,
-		onClose = if not v62 then v58 else nil,
-		selectionGroup = t1,
-		fullBleedOverlapOffset = v41,
-		bannerBottomVisiblePercent = v42 / 100,
-		fullBleedContent = React.createElement(SduiFeatureEntryPoint, {
-			appPage = AppPage.ExperienceDetail,
-			configKey = v48,
-			identifier = ExperienceDetailsPageConstants.EDP_BANNER_IMAGE_IDENTIFIER,
-			loadTimer = v50,
-			Size = UDim2.fromScale(1, 1),
-			loadingSlot = React.createElement(ExperienceDetailsFallbackBannerImage.Skeleton),
-			errorSlot = React.createElement(ExperienceDetailsFallbackBannerImage.Error, {
-				universeId = v47
-			})
-		})
-	}, {
-		Header = if not v62 then React.createElement(DetailsPageLayout.Header, {
-			fullWidthContent = true,
-			closeIconName = Foundation.Enums.IconName.X,
-			backgroundColor = v53.Color.Surface.Surface_300
-		}, {
-			StickyHeaderContent = React.createElement(SduiFeatureEntryPoint, {
-				shouldDisplayLoading = false,
-				shouldDisplayError = false,
-				appPage = AppPage.ExperienceDetail,
-				configKey = v48,
-				identifier = ExperienceDetailsPageConstants.EDP_STICKY_HEADER_IDENTIFIER,
-				loadTimer = v50,
-				Size = UDim2.fromScale(1, 1),
-				AutomaticSize = Enum.AutomaticSize.None
-			})
-		}) else nil,
-		Content = React.createElement(DetailsPageLayout.Content, {
-			scrollingFrameRef = v49
-		}, {
-			Feed = React.createElement(SduiPageEntryPoint, {
-				includeNavigationHeaderBar = false,
-				snackbarPortalLayoutOrder = 2147483647,
-				appPage = AppPage.ExperienceDetail,
-				configKey = v48,
-				identifier = if not FFlagSduiPageEntryUseSharedHooks then ExperienceDetailsPageUtils.getResolvedIdentifier(v48, ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER_SUFFIX) else ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER,
-				pageTimer = v50,
-				scrollingFrameRef = v49,
-				backgroundStyle = v53.Color.None,
-				disableRootPadding = not not FFlagSduiExperienceDetailsSupport or nil,
-				clipsDescendantsOverride = not FFlagSduiExperienceDetailsSupport and nil,
-				contentTag = CompositionTags.ContentRegion.Body,
-				loadingSlot = React.createElement(ExperienceDetailsFallbackFeed.Skeleton, {
-					launchSource = "ExperienceDetailsPage",
-					isSmallScreen = false,
-					universeId = v47,
-					referralSource = v55,
-					experienceJoinData = v56,
-					placeIdOverride = v57
-				}),
-				errorSlot = React.createElement(ExperienceDetailsFallbackFeed.Error, {
-					launchSource = "ExperienceDetailsPage",
-					isSmallScreen = false,
-					universeId = v47,
-					refresh = v60,
-					referralSource = v55,
-					experienceJoinData = v56,
-					placeIdOverride = v57
-				})
-			})
+	local createElement = React.createElement
+	local root = DetailsPageLayout.Root
+
+	if v10 or v8 then
+		onClose = nil
+	end
+
+	local v11 = {
+		ref = ref2,
+		onClose = onClose,
+		selectionGroup = selectionGroup,
+		fullBleedAspectRatio = 0,
+		fullBleedOverlapOffset = 0,
+		gradientTopBleedOffset = 0,
+		gradientMidTransparency = 0,
+		bannerBottomVisiblePercent = 0,
+		reserveHeaderBarSpace = 0,
+		disableFocusNavEngineScroll = 0,
+		fullBleedContent = 0
+	}
+	local fullBleedAspectRatio
+
+	if FFlagLuaAppMediaGalleryGamepadSupport and v7 and defineFastInt > 0 then
+		fullBleedAspectRatio = defineFastInt / 10
+	end
+
+	v11.fullBleedAspectRatio = fullBleedAspectRatio
+	local fullBleedOverlapOffset
+
+	if FFlagLuaAppMediaGalleryGamepadSupport and v7 then
+		fullBleedOverlapOffset = defineFastInt5
+	else
+		fullBleedOverlapOffset = defineFastInt2
+	end
+
+	v11.fullBleedOverlapOffset = fullBleedOverlapOffset
+	local gradientTopBleedOffset
+
+	if FFlagLuaAppMediaGalleryGamepadSupport and v7 then
+		gradientTopBleedOffset = defineFastInt3
+	end
+
+	v11.gradientTopBleedOffset = gradientTopBleedOffset
+	local gradientMidTransparency
+
+	if FFlagLuaAppEdpDirectionalGradientMidTransparency and FFlagLuaAppMediaGalleryGamepadSupport and v7 then
+		gradientMidTransparency = defineFastInt7 / 100
+	end
+
+	v11.gradientMidTransparency = gradientMidTransparency
+	local bannerBottomVisiblePercent
+
+	if FFlagLuaAppMediaGalleryGamepadSupport and v7 then
+		bannerBottomVisiblePercent = defineFastInt6 / 100
+	else
+		bannerBottomVisiblePercent = defineFastInt4 / 100
+	end
+
+	v11.bannerBottomVisiblePercent = bannerBottomVisiblePercent
+
+	v11.reserveHeaderBarSpace = not (FFlagLuaAppMediaGalleryGamepadSupport and v7) and nil
+	v11.disableFocusNavEngineScroll = FFlagLuaAppMediaGalleryGamepadSupport and v7 and true or nil
+
+	v11.fullBleedContent = React.createElement(SduiFeatureEntryPoint, {
+		appPage = AppPage.ExperienceDetail,
+		configKey = experienceDetailsPageKey,
+		identifier = ExperienceDetailsPageConstants.EDP_BANNER_IMAGE_IDENTIFIER,
+		loadTimer = v,
+		Size = UDim2.fromScale(1, 1),
+		loadingSlot = React.createElement(ExperienceDetailsFallbackBannerImage.Skeleton),
+		errorSlot = React.createElement(ExperienceDetailsFallbackBannerImage.Error, {
+			universeId = universeId
 		})
 	})
+	local header
+
+	if not v10 then
+		header = React.createElement(
+			DetailsPageLayout.Header,
+			{
+				closeIconName = Foundation.Enums.IconName.X,
+				backgroundColor = v4.Color.Surface.Surface_300,
+				fullWidthContent = true
+			},
+			{
+				StickyHeaderContent = React.createElement(SduiFeatureEntryPoint, {
+					appPage = AppPage.ExperienceDetail,
+					configKey = experienceDetailsPageKey,
+					identifier = ExperienceDetailsPageConstants.EDP_STICKY_HEADER_IDENTIFIER,
+					loadTimer = v,
+					shouldDisplayLoading = false,
+					shouldDisplayError = false,
+					Size = UDim2.fromScale(1, 1),
+					AutomaticSize = Enum.AutomaticSize.None
+				})
+			}
+		)
+	end
+
+	local createElement2 = React.createElement
+	local content = DetailsPageLayout.Content
+
+	local createElement3 = React.createElement
+	local children = {
+		appPage = AppPage.ExperienceDetail,
+		configKey = experienceDetailsPageKey,
+		identifier = 0,
+		pageTimer = 0,
+		includeNavigationHeaderBar = false,
+		scrollingFrameRef = 0,
+		scrollToSelectionRevealOnly = 0,
+		backgroundStyle = 0,
+		disableRootPadding = true,
+		clipsDescendantsOverride = false,
+		contentTag = 0,
+		loadingSlot = 0,
+		errorSlot = 0,
+		snackbarPortalLayoutOrder = 2147483647
+	}
+	local identifier
+
+	if FFlagSduiPageEntryUseSharedHooks then
+		identifier = ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER
+	else
+		identifier = ExperienceDetailsPageUtils.getResolvedIdentifier(
+			experienceDetailsPageKey,
+			ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER_SUFFIX
+		)
+	end
+
+	children.identifier = identifier
+
+	children.pageTimer = v
+
+	children.scrollingFrameRef = ref
+	children.scrollToSelectionRevealOnly = FFlagLuaAppMediaGalleryGamepadSupport and v7 and true or nil
+
+	children.backgroundStyle = v4.Color.None
+
+	children.contentTag = CompositionTags.ContentRegion.Body
+	children.loadingSlot = React.createElement(ExperienceDetailsFallbackFeed.Skeleton, {
+		universeId = universeId,
+		launchSource = "ExperienceDetailsPage",
+		isSmallScreen = false,
+		referralSource = referralSource,
+		experienceJoinData = experienceJoinData,
+		placeIdOverride = placeIdOverride
+	})
+
+	children.errorSlot = React.createElement(ExperienceDetailsFallbackFeed.Error, {
+		universeId = universeId,
+		refresh = refresh,
+		launchSource = "ExperienceDetailsPage",
+		isSmallScreen = false,
+		referralSource = referralSource,
+		experienceJoinData = experienceJoinData,
+		placeIdOverride = placeIdOverride
+	})
+	local v12 = {
+		Header = header,
+		Content = createElement2(content, { scrollingFrameRef = ref }, {
+			Feed = createElement3(SduiPageEntryPoint, children)
+		}),
+		Actions = 0
+	}
+	local actions
+
+	if FFlagEnableSplitPaneEDPFix and v9 then
+		actions = React.createElement(DetailsPageLayout.Actions, {}, {
+			ActionBar = React.createElement(ExperienceDetailsPersistentActionBar, {
+				universeId = universeId,
+				configKey = experienceDetailsPageKey,
+				loadTimer = v,
+				launchSource = "ExperienceDetailsPage",
+				referralSource = referralSource,
+				experienceJoinData = experienceJoinData,
+				placeIdOverride = placeIdOverride,
+				showOutline = false
+			})
+		})
+	end
+
+	v12.Actions = actions
+	return createElement(root, v11, v12)
 end
 
 return React.memo(ExperienceDetailsFullPage)

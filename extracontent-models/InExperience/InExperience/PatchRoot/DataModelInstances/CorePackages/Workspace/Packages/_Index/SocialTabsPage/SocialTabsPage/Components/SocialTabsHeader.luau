@@ -1,40 +1,54 @@
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local React = require(SocialTabsPageParent.React)
-local Foundation = require(SocialTabsPageParent.Foundation)
-local useNavigation = require(SocialTabsPageParent.Navigation).useNavigation
+local parent = SocialTabsPage.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
 local useSocialTabsContext = require(SocialTabsPage.Contexts.useSocialTabsContext)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialTabsPageSplitPaneLayout = SharedFlags.FFlagSocialTabsPageSplitPaneLayout
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local IconButton = Foundation.IconButton
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 
-local function SocialTabsHeader(t1: {[any]: any}) -- line: 20
-	-- upvalues: useSocialTabsContext (copy), useNavigation (copy), React (copy), View (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy)
-	local v15 = useSocialTabsContext()
-	local v16 = useNavigation()
-	local v17 = React.useCallback(function() -- line: 24
-		-- upvalues: v16 (copy)
-		v16.goBack()
-	end, { v16 })
+local function SocialTabsHeader(p)
+	local v = useSocialTabsContext()
+	local v2 = useNavigation()
 
-	return React.createElement(View, {
+	local onActivated = React.useCallback(function()
+		v2.goBack()
+	end, { v2 })
+
+	local createElement = React.createElement
+	local v3 = {
 		tag = "row align-y-center gap-small size-full-0 auto-y padding-x-xlarge bg-surface-0",
-		LayoutOrder = t1.layoutOrder
-	}, {
-		BackButton = React.createElement(IconButton, {
-			LayoutOrder = 1,
+		LayoutOrder = p.layoutOrder
+	}
+	local backButton
+
+	if FFlagSocialTabsPageSplitPaneLayout and p.hideBackButton then
+		backButton = React.createElement(View, { Size = UDim2.fromOffset(36, 36), LayoutOrder = 1 })
+	else
+		backButton = React.createElement(IconButton, {
 			icon = IconName.ChevronLargeLeft,
 			size = IconSize.Medium,
 			variant = ButtonVariant.Utility,
-			onActivated = v17
-		}),
-		Title = React.createElement(FoundationText, {
+			onActivated = onActivated,
+			LayoutOrder = 1
+		})
+	end
+
+	return createElement(View, v3, {
+		BackButton = backButton,
+		Title = React.createElement(Text, {
 			tag = "fill auto-y text-heading-medium text-align-x-left text-truncate-end content-emphasis",
 			LayoutOrder = 2,
-			Text = v15.title or ""
+			Text = v.title or ""
 		})
 	})
 end

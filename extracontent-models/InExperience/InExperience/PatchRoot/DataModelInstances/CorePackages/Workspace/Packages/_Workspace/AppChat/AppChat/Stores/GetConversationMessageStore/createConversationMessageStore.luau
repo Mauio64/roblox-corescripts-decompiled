@@ -1,42 +1,112 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local createProxy = require(AppChatParent.SignalsExperimental).createProxy
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local SignalsExperimental = require(parent.SignalsExperimental)
+local createProxy = SignalsExperimental.createProxy
 
 require(AppChat.MessageData.Types)
+local SignalsMigrationConfig = require(AppChat.Flags.SignalsMigrationConfig)
+local FFlagAppChatParseMessageTimestampsOnce = require(AppChat.Flags.FFlagAppChatParseMessageTimestampsOnce)
+local parseIsoDateUnixMillis = require(AppChat.Utils.parseIsoDateUnixMillis)
 
-local function createConversationMessageStore() -- line: 31
-	-- upvalues: createProxy (copy), Cryo (copy)
-	local v6 = createProxy({})
+local function keepSendingMessageStableKey(p, item)
+	if p == nil or p.stableKey == nil or p.stableKey == p.id or item.stableKey ~= nil and item.stableKey ~= item.id then
+		return item
+	end
+
+	return Cryo.Dictionary.join(item, { stableKey = p.stableKey })
+end
+
+local function getCreatedAtUnixMillis(p, p2) -- 2 equivalent calls inferred from this helper
+	if p2 == nil or p2.created_at ~= p.created_at or p2.createdAtUnixMillis == nil then
+		return parseIsoDateUnixMillis(p.created_at)
+	end
+
+	return p2.createdAtUnixMillis
+end
+
+local function withCreatedAtUnixMillis(p, p2)
+	local v = {}
+	local createdAtUnixMillis = getCreatedAtUnixMillis(p, p2) -- inferred equivalent call
+
+	if createdAtUnixMillis ~= p.createdAtUnixMillis then
+		if createdAtUnixMillis == nil then
+			createdAtUnixMillis = Cryo.None
+		end
+
+		v.createdAtUnixMillis = createdAtUnixMillis
+	end
+
+	local replies_to = p.replies_to
+
+	if replies_to ~= nil then
+		local v2
+
+		if p2 ~= nil then
+			v2 = p2.replies_to
+		end
+
+		local createdAtUnixMillis2 = getCreatedAtUnixMillis(replies_to, v2) -- inferred equivalent call
+
+		if createdAtUnixMillis2 ~= replies_to.createdAtUnixMillis then
+			local join = Cryo.Dictionary.join
+
+			if createdAtUnixMillis2 == nil then
+				createdAtUnixMillis2 = Cryo.None
+			end
+
+			v.replies_to = join(replies_to, { createdAtUnixMillis = createdAtUnixMillis2 })
+		end
+	end
+
+	if next(v) == nil then
+		return p
+	end
+
+	return Cryo.Dictionary.join(p, v)
+end
+
+local function createConversationMessageStore()
+	local proxy = createProxy({})
 
 	return {
-		messages = v6,
-		getMessage = function(s1: string, p1) -- line: 35
-			-- upvalues: v6 (copy)
-			return v6(p1)[s1]
+		messages = proxy,
+		getMessage = function(p: string, p2)
+			return proxy(p2)[p]
 		end,
-		upsertMessages = function(t1: {[any]: any}) -- line: 39
-			-- upvalues: v6 (copy)
-			for v10, v11 in t1 do
-				v6[v10] = v11
-			end
-		end,
-		updateMessage = function(s2: string, t2: {[any]: any}) -- line: 45
-			-- upvalues: v6 (copy), Cryo (copy)
-			local v14 = v6[s2]
+		upsertMessages = function(items)
+			for k, item in items do
+				if SignalsMigrationConfig.shouldUseViewRecyclerMessageList then
+					item = keepSendingMessageStableKey(proxy[k], item)
+				end
 
-			if v14 ~= nil then
-				v6[s2] = Cryo.Dictionary.join(v14, t2)
+				if FFlagAppChatParseMessageTimestampsOnce then
+					item = withCreatedAtUnixMillis(item, proxy[k])
+				end
+
+				proxy[k] = item
 			end
 		end,
-		removeMessage = function(s3: string) -- line: 52
-			-- upvalues: v6 (copy)
-			v6[s3] = nil
+		updateMessage = function(p: string, p2)
+			local v = proxy[p]
+
+			if v ~= nil then
+				local joined = Cryo.Dictionary.join(v, p2)
+
+				if FFlagAppChatParseMessageTimestampsOnce then
+					joined = withCreatedAtUnixMillis(joined, v)
+				end
+
+				proxy[p] = joined
+			end
 		end,
-		clear = function() -- line: 56
-			-- upvalues: v6 (copy)
-			for v16 in v6 do
-				v6[v16] = nil
+		removeMessage = function(p: string)
+			proxy[p] = nil
+		end,
+		clear = function()
+			for k in proxy do
+				proxy[k] = nil
 			end
 		end
 	}

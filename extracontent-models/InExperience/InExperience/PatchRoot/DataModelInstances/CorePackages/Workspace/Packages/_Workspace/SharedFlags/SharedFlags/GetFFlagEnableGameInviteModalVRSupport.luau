@@ -1,5 +1,4 @@
 game:DefineFastFlag("EnableGameInviteModalVRSupportV2", false)
-
-return function() -- line: 2
+return function()
 	return game:GetFastFlag("EnableGameInviteModalVRSupportV2")
 end

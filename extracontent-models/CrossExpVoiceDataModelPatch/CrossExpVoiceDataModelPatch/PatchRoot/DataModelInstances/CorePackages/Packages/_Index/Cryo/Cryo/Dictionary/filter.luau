@@ -1,13 +1,13 @@
-local function filter(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 6
-	local t2 = {}
+local function filter(items, callback)
+	local result = {}
 
-	for v5, v6 in t1 do
-		if p1(v6, v5) then
-			t2[v5] = v6
+	for k, item in items do
+		if callback(item, k) then
+			result[k] = item
 		end
 	end
 
-	return t2
+	return result
 end
 
 return filter

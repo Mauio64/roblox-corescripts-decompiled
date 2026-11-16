@@ -1,17 +1,12 @@
-local ParentParent = script.Parent.Parent
-local getPaymentFromPlatform = require(ParentParent.Utils.getPaymentFromPlatform)
+local parent = script.Parent.Parent
 
-require(ParentParent.Utils.getPaymentFromPlatformLegacy)
+local getPaymentFromPlatform = require(parent.Utils.getPaymentFromPlatform)
+require(parent.Utils.getPaymentFromPlatformLegacy)
+local getHasAmazonUserAgent = require(parent.Utils.getHasAmazonUserAgent)
+local getHasQuestUserAgent = require(parent.Utils.getHasQuestUserAgent)
+local GetFFlagEnableLuobuInGameUpsell = require(parent.Flags.GetFFlagEnableLuobuInGameUpsell)
 
-local getHasAmazonUserAgent = require(ParentParent.Utils.getHasAmazonUserAgent)
-local getHasQuestUserAgent = require(ParentParent.Utils.getHasQuestUserAgent)
-local GetFFlagEnableLuobuInGameUpsell = require(ParentParent.Flags.GetFFlagEnableLuobuInGameUpsell)
-
-return function(p1) -- line: 9
-	-- upvalues: getHasAmazonUserAgent (copy), GetFFlagEnableLuobuInGameUpsell (copy), getHasQuestUserAgent (copy), getPaymentFromPlatform (copy)
-	local v7 = getHasAmazonUserAgent()
-	local v8 = GetFFlagEnableLuobuInGameUpsell()
-	local v9 = getHasQuestUserAgent()
-
-	return getPaymentFromPlatform(p1, v8, v7, v9)
+return function(p)
+	local hasAmazonUserAgent = getHasAmazonUserAgent()
+	return getPaymentFromPlatform(p, GetFFlagEnableLuobuInGameUpsell(), hasAmazonUserAgent, (getHasQuestUserAgent()))
 end

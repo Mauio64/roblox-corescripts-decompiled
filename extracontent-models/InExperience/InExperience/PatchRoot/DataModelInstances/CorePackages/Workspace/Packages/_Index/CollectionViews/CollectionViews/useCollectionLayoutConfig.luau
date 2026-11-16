@@ -1,23 +1,23 @@
 local CollectionViews = script:FindFirstAncestor("CollectionViews")
-local CollectionViewsParent = CollectionViews.Parent
-local React = require(CollectionViewsParent.React)
-local CollectionItemSize = require(CollectionViews.CollectionViewTypes).CollectionItemSize
+local parent = CollectionViews.Parent
+local React = require(parent.React)
+local CollectionViewTypes = require(CollectionViews.CollectionViewTypes)
+local CollectionItemSize = CollectionViewTypes.CollectionItemSize
+
 local useCollectionLayoutParamsComputed = require(CollectionViews.useCollectionLayoutParamsComputed)
 
-local function useCollectionLayoutConfig(p1, n1: number?) -- line: 15
-	-- upvalues: useCollectionLayoutParamsComputed (copy), React (copy), CollectionItemSize (copy)
-	local v9 = useCollectionLayoutParamsComputed(p1, n1)
+local function useCollectionLayoutConfig(p, p2: number?)
+	local v = useCollectionLayoutParamsComputed(p, p2)
 
-	return (React.useMemo(function() -- line: 21
-		-- upvalues: CollectionItemSize (copy), v9 (copy)
-		local t1 = {}
+	return (React.useMemo(function()
+		local result = {}
 
-		for _, v12 in CollectionItemSize do
-			t1[v12] = v9(v12)
+		for _, v2 in CollectionItemSize do
+			result[v2] = v(v2)
 		end
 
-		return t1
-	end, { v9 }))
+		return result
+	end, { v }))
 end
 
 return useCollectionLayoutConfig

@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local Signals = require(parent.Signals)
+
 local createFriendsChatMetadataStore = require(script.createFriendsChatMetadataStore)
 
-return Signals.createComputed(function() -- line: 9
-	-- upvalues: createFriendsChatMetadataStore (copy)
+return Signals.createComputed(function()
 	return createFriendsChatMetadataStore()
 end)

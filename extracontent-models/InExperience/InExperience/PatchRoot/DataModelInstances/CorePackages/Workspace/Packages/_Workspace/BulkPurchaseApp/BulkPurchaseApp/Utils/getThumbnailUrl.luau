@@ -1,19 +1,18 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local UserLib = require(Parent.UserLib)
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local UserLib = require(parent.UserLib)
 local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
 local Constants = UserLib.Utils.Constants
 
-local function getRbxThumbType(s1: string) -- line: 9
-	-- upvalues: Constants (copy)
-	if s1 == "AvatarBundle" then
+local function getRbxThumbType(p: string) -- 1 equivalent call inferred from this helper
+	if p == "AvatarBundle" then
 		return Constants.RbxthumbTypes.BundleThumbnail
 	end
 
 	return Constants.RbxthumbTypes.Asset
 end
-local function getThumbnailUrl(s2: string, s3: string) -- line: 16
-	-- upvalues: getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy)
-	return getRbxthumbWithTypeSizeAndOptions(s2, if s3 ~= "AvatarBundle" then Constants.RbxthumbTypes.Asset else Constants.RbxthumbTypes.BundleThumbnail, 150)
+
+local function getThumbnailUrl(p: string, p2: string)
+	return getRbxthumbWithTypeSizeAndOptions(p, getRbxThumbType(p2), 150) -- inferred equivalent call
 end
 
 return getThumbnailUrl

@@ -1,5 +1,6 @@
 local createBrickColorsFromIds = require(script.Parent.createBrickColorsFromIds)
-local t1 = {
+
+local v = {
 	MAIN = {
 		141,
 		301,
@@ -147,6 +148,6 @@ local t1 = {
 }
 
 return {
-	MAIN = createBrickColorsFromIds(t1.MAIN),
-	BOTTOM = createBrickColorsFromIds(t1.BOTTOM)
+	MAIN = createBrickColorsFromIds(v.MAIN),
+	BOTTOM = createBrickColorsFromIds(v.BOTTOM)
 }

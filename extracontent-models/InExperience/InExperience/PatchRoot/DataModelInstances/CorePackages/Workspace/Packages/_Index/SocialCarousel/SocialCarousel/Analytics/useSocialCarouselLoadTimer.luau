@@ -1,33 +1,27 @@
-local Parent = script:FindFirstAncestor("SocialCarousel").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
-local useLoadingTimers = require(Parent.SocialLuaAnalytics).Analytics.Timing.useLoadingTimers
+local parent = script:FindFirstAncestor("SocialCarousel").Parent
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
 
-return function(p1: ((...any) -> ...any)) -- line: 10
-	-- upvalues: useLoadingTimers (copy), React (copy), Cryo (copy)
-	local v6 = useLoadingTimers({})
-	local v7 = React.useRef({})
-	local v8 = React.useCallback(function(s1: string) -- line: 16
-		-- upvalues: v7 (copy), Cryo (copy), v6 (copy), p1 (copy)
-		if v7.current[s1] then
+local useLoadingTimers = SocialLuaAnalytics.Analytics.Timing.useLoadingTimers
+
+return function(callback)
+	local v = useLoadingTimers({})
+	local ref = React.useRef({})
+
+	local onSuccessfulRender = React.useCallback(function(p: string)
+		if ref.current[p] then
 			return
 		end
 
-		v7.current = Cryo.Dictionary.join(v7.current, {
-			[s1] = true
-		})
+		ref.current = Cryo.Dictionary.join(ref.current, { [p] = true })
 
-		local v10 = v6.getTime("carouselLoadingTime")
-
-		p1(s1, v10)
+		callback(p, (v.getTime("carouselLoadingTime")))
 	end, {})
 
-	React.useEffect(function() -- line: 29
-		-- upvalues: v6 (copy)
-		v6.start("carouselLoadingTime")
+	React.useEffect(function()
+		v.start("carouselLoadingTime")
 	end, {})
 
-	return {
-		onSuccessfulRender = v8
-	}
+	return { onSuccessfulRender = onSuccessfulRender }
 end

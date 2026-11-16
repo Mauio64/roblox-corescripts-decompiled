@@ -1,142 +1,137 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Cryo = require(ParentParentParent.Cryo)
+
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
+
 local useState = React.useState
-local PromptConnections = require(ParentParent.Components.CoreUI.PromptConnections)
-local RsvpPrompt = require(ParentParent.Components.CoreUI.RsvpPrompt)
-local FocusNavigationUtils = require(ParentParentParent.FocusNavigationUtils)
+
+local PromptConnections = require(parent.Components.CoreUI.PromptConnections)
+local RsvpPrompt = require(parent.Components.CoreUI.RsvpPrompt)
+
+local FocusNavigationUtils = require(parent2.FocusNavigationUtils)
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
-local v12 = game:DefineFastFlag("FixFocusWhenInGameMenuIsOpen", false)
-local _ = {
-	PromptRsvp = "PromptRsvp"
-}
-local t1 = {
-	PromptRsvp = RsvpPrompt
-}
 
-return function(t2: {[any]: any}) -- line: 52
-	-- upvalues: useState (copy), React (copy), Cryo (copy), t1 (copy), v12 (copy), GuiService (copy), PromptConnections (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v16, v17 = useState({
-		promptType = nil,
-		promptData = nil,
-		promptQueue = {}
-	})
-	local promptData = v16.promptData
-	local promptType = v16.promptType
-	local v20 = React.useCallback(function() -- line: 62
-		-- upvalues: Cryo (copy), v16 (copy), v17 (copy)
-		if not Cryo.isEmpty(v16.promptQueue) then
-			v17(Cryo.Dictionary.join(v16, {
-				promptType = v16.promptQueue[1].promptType,
-				promptData = v16.promptQueue[1].promptData,
-				promptQueue = Cryo.List.removeIndex(v16.promptQueue, 1)
+local defineFastFlag = game:DefineFastFlag("FixFocusWhenInGameMenuIsOpen", false)
+
+local _ = { PromptRsvp = "PromptRsvp" }
+
+local v = { PromptRsvp = RsvpPrompt }
+
+return function(p)
+	local state, setState = useState({ promptType = nil, promptData = nil, promptQueue = {} })
+
+	local promptData = state.promptData
+	local promptType = state.promptType
+
+	local closePrompt = React.useCallback(function()
+		if Cryo.isEmpty(state.promptQueue) then
+			setState({ promptType = nil, promptData = {}, promptQueue = {} })
+		else
+			setState(Cryo.Dictionary.join(state, {
+				promptType = state.promptQueue[1].promptType,
+				promptData = state.promptQueue[1].promptData,
+				promptQueue = Cryo.List.removeIndex(state.promptQueue, 1)
 			}))
-
-			return
 		end
+	end, { state, setState })
 
-		v17({
-			promptType = nil,
-			promptData = {},
-			promptQueue = {}
-		})
-	end, {
-		v16,
-		v17
-	})
-	local u21 = nil
+	local prompt = nil
 
 	if promptType then
-		local v22 = t1[promptType]
+		local v2 = v[promptType]
 
-		if v22 then
-			u21 = React.createElement(v22, {
-				enableInputDelayed = t2.enableInputDelayed,
+		if v2 then
+			prompt = React.createElement(v2, {
+				enableInputDelayed = p.enableInputDelayed,
 				promptData = promptData,
-				closePrompt = v20,
-				overrideUseWideMode = t2.overrideUseWideMode
+				closePrompt = closePrompt,
+				overrideUseWideMode = p.overrideUseWideMode
 			})
 		else
-			error(`Unexpected prompt type: { promptType }!`)
+			error(`Unexpected prompt type: {promptType}!`)
 		end
 	end
 
-	local v23 = React.useCallback(function(s1: string, t3: {[any]: any}) -- line: 93
-		-- upvalues: v16 (copy), v17 (copy), Cryo (copy)
-		if v16.promptType ~= nil then
-			v17(Cryo.Dictionary.join(v16, {
-				promptQueue = Cryo.List.join(v16.promptQueue, {{
-					promptType = "PromptRsvp",
-					promptData = {
-						eventId = s1,
-						eventDetails = t3
+	local openRsvpPrompt = React.useCallback(function(eventId: string, eventDetails)
+		if state.promptType == nil then
+			setState({
+				promptType = "PromptRsvp",
+				promptData = { eventId = eventId, eventDetails = eventDetails },
+				promptQueue = {}
+			})
+		else
+			setState(Cryo.Dictionary.join(state, {
+				promptQueue = Cryo.List.join(state.promptQueue, {
+					{
+						promptType = "PromptRsvp",
+						promptData = { eventId = eventId, eventDetails = eventDetails }
 					}
-				}})
+				})
 			}))
-
-			return
 		end
+	end, { state, setState })
 
-		v17({
-			promptType = "PromptRsvp",
-			promptData = {
-				eventId = s1,
-				eventDetails = t3
-			},
-			promptQueue = {}
-		})
-	end, {
-		v16,
-		v17
-	})
-	local v24 = nil
-	local u25 = nil
+	local state2 = nil
+	local v2 = nil
 
-	if v12 then
-		local v26
+	if defineFastFlag then
+		local setState2
+		state2, setState2 = React.useState(GuiService.MenuIsOpen)
+		v2 = setState2
 
-		v24, v26 = React.useState(GuiService.MenuIsOpen)
-		u25 = v26
-		React.useEffect(function() -- line: 123
-			-- upvalues: u21 (ref), u25 (ref), GuiService (copy)
-			if not u21 then
+		React.useEffect(function()
+			if not prompt then
 				return
 			end
 
-			u25(GuiService.MenuIsOpen)
+			v2(GuiService.MenuIsOpen)
 
-			local connection = GuiService.MenuOpened:Connect(function() -- line: 131
-				-- upvalues: u25 (ref)
-				u25(true)
+			local menuOpenedConnection = GuiService.MenuOpened:Connect(function()
+				v2(true)
 			end)
-			local connection2 = GuiService.MenuClosed:Connect(function() -- line: 134
-				-- upvalues: u25 (ref)
-				u25(false)
+			local menuClosedConnection = GuiService.MenuClosed:Connect(function()
+				v2(false)
 			end)
-
-			return function() -- line: 137
-				-- upvalues: connection (copy), connection2 (copy)
-				connection:Disconnect()
-				connection2:Disconnect()
+			return function()
+				menuOpenedConnection:Disconnect()
+				menuClosedConnection:Disconnect()
 			end
-		end, { u21 })
+		end, { prompt })
 	end
 
-	return React.createElement(React.Fragment, {}, {
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v3 = {
 		PromptConnections = React.createElement(PromptConnections, {
-			openRsvpPrompt = v23,
-			closePrompt = v20
+			openRsvpPrompt = openRsvpPrompt,
+			closePrompt = closePrompt
 		}),
-		FocusNavigationCoreScriptsWrapper = if not u21 then nil else React.createElement(FocusRoot, {
+		FocusNavigationCoreScriptsWrapper = 0
+	}
+	local focusNavigationCoreScriptsWrapper
+
+	if prompt then
+		local createElement2 = React.createElement
+		local v4 = {
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
 			isIsolated = true,
 			isAutoFocusRoot = true,
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
-			isFocusable = if not v12 then nil else not v24
-		}, {
-			Prompt = u21
-		})
-	})
+			isFocusable = 0
+		}
+		local isFocusable
+
+		if defineFastFlag then
+			isFocusable = not state2
+		end
+
+		v4.isFocusable = isFocusable
+		focusNavigationCoreScriptsWrapper = createElement2(FocusRoot, v4, { Prompt = prompt })
+	end
+
+	v3.FocusNavigationCoreScriptsWrapper = focusNavigationCoreScriptsWrapper
+	return createElement(fragment, {}, v3)
 end

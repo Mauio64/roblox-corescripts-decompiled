@@ -3,26 +3,26 @@ local GlobalClearCommand = require(script.GlobalClearCommand)
 local GlobalMuteCommand = require(script.GlobalMuteCommand)
 local GlobalUnmuteCommand = require(script.GlobalUnmuteCommand)
 local GlobalOnlineCommand = require(script.GlobalOnlineCommand)
-local EngineFeature = game:GetEngineFeature("ExpChatGlobalUserCountEnabled")
-local v7 = game:DefineFastFlag("ExpChatEnableGlobalOnlineCommand", false)
+
+local engineFeature = game:GetEngineFeature("ExpChatGlobalUserCountEnabled")
+local defineFastFlag = game:DefineFastFlag("ExpChatEnableGlobalOnlineCommand", false)
 
 require(script.types)
 
 return {
-	getGlobalEnabledCommands = function() -- line: 13
-		-- upvalues: GlobalClearCommand (copy), GlobalHelpCommand (copy), GlobalMuteCommand (copy), GlobalUnmuteCommand (copy), EngineFeature (copy), v7 (copy), GlobalOnlineCommand (copy)
-		local t1 = {}
+	getGlobalEnabledCommands = function()
+		local globalEnabledCommands = {}
 
-		table.insert(t1, GlobalClearCommand)
-		table.insert(t1, GlobalHelpCommand)
-		table.insert(t1, GlobalMuteCommand)
-		table.insert(t1, GlobalUnmuteCommand)
+		table.insert(globalEnabledCommands, GlobalClearCommand)
+		table.insert(globalEnabledCommands, GlobalHelpCommand)
+		table.insert(globalEnabledCommands, GlobalMuteCommand)
+		table.insert(globalEnabledCommands, GlobalUnmuteCommand)
 
-		if EngineFeature and v7 then
-			table.insert(t1, GlobalOnlineCommand)
+		if engineFeature and defineFastFlag then
+			table.insert(globalEnabledCommands, GlobalOnlineCommand)
 		end
 
-		return t1
+		return globalEnabledCommands
 	end,
 	GlobalHelpCommand = GlobalHelpCommand,
 	GlobalClearCommand = GlobalClearCommand,

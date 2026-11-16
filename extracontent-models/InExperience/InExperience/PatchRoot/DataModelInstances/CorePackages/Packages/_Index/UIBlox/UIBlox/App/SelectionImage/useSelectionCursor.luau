@@ -1,11 +1,12 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParent2 = script.Parent.Parent.Parent
-local useCursor = require(ParentParent.Foundation).Hooks.useCursor
-local mapCursorType = require(ParentParent2.App.SelectionCursor.mapCursorType)
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = script.Parent.Parent.Parent
 
-local function useSelectionCursor(p1) -- line: 14
-	-- upvalues: useCursor (copy), mapCursorType (copy)
-	return useCursor(mapCursorType(p1, true))
+local Foundation = require(parent.Foundation)
+local useCursor = Foundation.Hooks.useCursor
+local mapCursorType = require(parent2.App.SelectionCursor.mapCursorType)
+
+local function useSelectionCursor(p)
+	return useCursor(mapCursorType(p, true))
 end
 
 return useSelectionCursor

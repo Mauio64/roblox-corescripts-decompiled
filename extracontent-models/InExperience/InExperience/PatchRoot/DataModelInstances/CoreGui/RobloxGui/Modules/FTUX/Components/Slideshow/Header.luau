@@ -1,59 +1,71 @@
 local CorePackages = game:GetService("CorePackages")
+
 local React = require(CorePackages.Packages.React)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
-local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
-local ParentParent = script.Parent.Parent.Parent
-local FTUXConstants = require(ParentParent.Resources.FTUXConstants)
 
-require(ParentParent.Enums.PlatformEnum)
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local withLocalization = Localization.withLocalization
+local parent = script.Parent.Parent.Parent
+local FTUXConstants = require(parent.Resources.FTUXConstants)
 
-local function Header(t1: {[any]: any}) -- line: 18
-	-- upvalues: useStyle (copy), FTUXConstants (copy), withLocalization (copy), React (copy), UIBlox (copy)
-	local v10 = useStyle()
-	local Theme = v10.Theme
-	local Font = v10.Font
-	local PanelConstants = FTUXConstants[t1.platform].PanelConstants
-	local BackgroundContrastColor = Theme.BackgroundContrast.Color
-	local HEADER_HEIGHT_RATIO = PanelConstants.HEADER_HEIGHT_RATIO
-	local v16 = PanelConstants.CONTENT_PADDING / PanelConstants.SLIDESHOW_FRAME_WIDTH
-	local v17 = 1 - 2 * v16
+require(parent.Enums.PlatformEnum)
 
-	return withLocalization({
-		headerText = "CoreScripts.VRFTUX.Heading.Header"
-	})(function(p1) -- line: 33
-		-- upvalues: React (copy), BackgroundContrastColor (copy), HEADER_HEIGHT_RATIO (copy), v17 (copy), v16 (copy), UIBlox (copy), Font (copy), Theme (copy)
-		return React.createElement("Frame", {
-			BackgroundTransparency = 0,
-			LayoutOrder = 1,
-			BackgroundColor3 = BackgroundContrastColor,
-			Size = UDim2.new(1, 0, HEADER_HEIGHT_RATIO, 0)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0.26, 0)
-			}),
-			HeaderFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0),
-				Position = UDim2.new(0, 0, 0, 0)
-			}, {
-				Box = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					Size = UDim2.new(v17, 0, 1, 0),
-					Position = UDim2.new(v16, 0, 0, 0)
-				}, {
-					HeaderText = React.createElement(UIBlox.App.Text.StyledTextLabel, {
-						fluidSizing = true,
-						text = p1.headerText,
-						fontStyle = Font.Header1,
-						colorStyle = Theme.TextEmphasis,
-						textXAlignment = Enum.TextXAlignment.Left,
-						size = UDim2.new(1, 0, 1, 0),
-						automaticSize = Enum.AutomaticSize.XY
-					})
-				})
-			})
-		})
+local function Header(p)
+	local v = useStyle()
+
+	local theme = v.Theme
+	local font = v.Font
+	local panelConstants = FTUXConstants[p.platform].PanelConstants
+
+	local color = theme.BackgroundContrast.Color
+
+	local HEADER_HEIGHT_RATIO = panelConstants.HEADER_HEIGHT_RATIO
+	local v2 = panelConstants.CONTENT_PADDING / panelConstants.SLIDESHOW_FRAME_WIDTH
+	local v3 = 1 - 2 * v2
+
+	return withLocalization({ headerText = "CoreScripts.VRFTUX.Heading.Header" })(function(p2)
+		return React.createElement(
+			"Frame",
+			{
+				BackgroundColor3 = color,
+				BackgroundTransparency = 0,
+				Size = UDim2.new(1, 0, HEADER_HEIGHT_RATIO, 0),
+				LayoutOrder = 1
+			},
+			{
+				UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0.26, 0) }),
+				HeaderFrame = React.createElement(
+					"Frame",
+					{
+						Size = UDim2.new(1, 0, 1, 0),
+						Position = UDim2.new(0, 0, 0, 0),
+						BackgroundTransparency = 1
+					},
+					{
+						Box = React.createElement(
+							"Frame",
+							{
+								Size = UDim2.new(v3, 0, 1, 0),
+								Position = UDim2.new(v2, 0, 0, 0),
+								BackgroundTransparency = 1
+							},
+							{
+								HeaderText = React.createElement(UIBlox.App.Text.StyledTextLabel, {
+									text = p2.headerText,
+									fontStyle = font.Header1,
+									colorStyle = theme.TextEmphasis,
+									textXAlignment = Enum.TextXAlignment.Left,
+									size = UDim2.new(1, 0, 1, 0),
+									fluidSizing = true,
+									automaticSize = Enum.AutomaticSize.XY
+								})
+							}
+						)
+					}
+				)
+			}
+		)
 	end)
 end
 

@@ -1,24 +1,23 @@
-local function endsWith(s1: string, s2: string, n1: number?) -- line: 2
-	local v5 = s2:len()
+local function endsWith(value: string, value2: string, p: number?): boolean
+	local v = value2:len()
 
-	if v5 == 0 then
+	if v == 0 then
 		return true
 	end
 
-	local v6 = s1:len()
-	local v7 = n1 or v6
+	local v2 = value:len()
+	local v3 = p or v2
 
-	if v6 < v7 then
-		v7 = v6
+	if v2 < v3 then
+		v3 = v2
 	end
 
-	if v7 < 1 then
+	if v3 < 1 then
 		return false
 	end
 
-	local v8 = v7 - v5 + 1
-
-	return v8 == s1:find(s2, v8, true)
+	local v4 = v3 - v + 1
+	return value:find(value2, v4, true) == v4
 end
 
 return endsWith

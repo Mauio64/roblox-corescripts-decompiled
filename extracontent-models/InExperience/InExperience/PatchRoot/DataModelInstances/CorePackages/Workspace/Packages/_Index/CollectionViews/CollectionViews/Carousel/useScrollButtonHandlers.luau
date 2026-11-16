@@ -1,172 +1,108 @@
 local TweenService = game:GetService("TweenService")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local CollectionViews = script:FindFirstAncestor("CollectionViews")
-local CollectionViewsParent = CollectionViews.Parent
-local React = require(CollectionViewsParent.React)
-local ArgCheck = require(CollectionViewsParent.ArgCheck)
-local FFlagCollectionViewMathChanges = require(CollectionViewsParent.SharedFlags).FFlagCollectionViewMathChanges
+local parent = script:FindFirstAncestor("CollectionViews").Parent
+local React = require(parent.React)
+local ArgCheck = require(parent.ArgCheck)
 
-require(CollectionViews.Carousel.calculateCarouselSpacingMetrics)
+local function useScrollButtonHandlers(p, p2: number, flag: boolean, p3: number, object, p4: number, value: number?)
+	ArgCheck.assert(p3 >= 1)
+	ArgCheck.assert(p2 >= 0)
 
-local function useScrollButtonHandlers(t1: {[any]: any}, n1: number, b1: boolean, n2: number, p1, n3: number, n4: number?, p2) -- line: 16
-	-- upvalues: ArgCheck (copy), React (copy), FFlagCollectionViewMathChanges (copy), UserGameSettings (copy), TweenService (copy)
-	ArgCheck.assert(n2 >= 1)
-	ArgCheck.assert(n1 >= 0)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(flag)
 
-	local v17, v18 = React.useState(false)
-	local v19, v20 = React.useState(b1)
-	local v21 = React.useRef(0)
-	local v22 = math.max(0, n1 - n2)
-	local v23 = React.useRef(nil)
-	local v24 = React.useCallback(function(n5: number?) -- line: 38
-		-- upvalues: v21 (copy), v22 (copy)
-		v21.current = math.max(0, (math.min(v22, n5)))
+	local ref = React.useRef(0)
+	local v = math.max(0, p2 - p3)
 
-		return v21.current
-	end, {
-		v22,
-		v21
-	})
-	local v25 = React.useCallback(function() -- line: 45
-		-- upvalues: b1 (copy), v18 (copy), v20 (copy), v21 (copy), v22 (copy)
-		if not b1 then
-			v18(false)
-			v20(false)
+	local ref2 = React.useRef(nil)
 
-			return
+	local v2 = React.useCallback(function(p5: number?)
+		ref.current = math.max(0, (math.min(v, p5)))
+		return ref.current
+	end, { v, ref })
+
+	local v3 = React.useCallback(function()
+		if flag then
+			setState(ref.current > 0)
+			setState2(ref.current < v)
+		else
+			setState(false)
+			setState2(false)
 		end
+	end, { flag, v, ref })
 
-		v18(v21.current > 0)
-		v20(v21.current < v22)
-	end, {
-		b1,
-		v22,
-		v21
-	})
-	local v26 = React.useCallback(function(n6: number, b2: boolean?) -- line: 63
-		-- upvalues: t1 (copy), FFlagCollectionViewMathChanges (copy), n2 (copy), p2 (copy), p1 (copy), n3 (copy), UserGameSettings (copy), v23 (copy), TweenService (copy), n4 (copy), v25 (copy)
-		local current = t1.current
+	local v4 = React.useCallback(function(p5: number, flag2: boolean?)
+		local current = p.current
 
 		if current ~= nil then
-			local v33
+			local v4 = p5 * (object:getValue().X + p4)
+			local canvasPosition = current.CanvasPosition
+			local vector2 = Vector2.new(v4, canvasPosition.Y)
 
-			if FFlagCollectionViewMathChanges then
-				if n2 < 1 then
-					return
+			if flag2 and not UserGameSettings.ReducedMotion then
+				if ref2.current then
+					ref2.current:Cancel()
 				end
 
-				v33 = math.floor(n6 * p2:getValue().stride + 0.5)
+				ref2.current = TweenService:Create(
+					current,
+					TweenInfo.new(value or 0.75, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut),
+					{ CanvasPosition = vector2 }
+				):Play()
 			else
-				v33 = n6 * (p1:getValue().X + n3)
+				current.CanvasPosition = vector2
+				v3()
 			end
-
-			local CanvasPosition = current.CanvasPosition
-
-			if FFlagCollectionViewMathChanges and math.abs(CanvasPosition.X - v33) < 1 then
-				return
-			end
-
-			local vector2 = Vector2.new(v33, CanvasPosition.Y)
-
-			if b2 and not UserGameSettings.ReducedMotion then
-				if v23.current then
-					v23.current:Cancel()
-				end
-
-				v23.current = TweenService:Create(current, TweenInfo.new(n4 or 0.75, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut), {
-					CanvasPosition = vector2
-				}):Play()
-
-				return
-			end
-
-			current.CanvasPosition = vector2
-			v25()
 		end
-	end, {
-		v25,
-		if not FFlagCollectionViewMathChanges then p1 else p2,
-		if not FFlagCollectionViewMathChanges then n3 else n2,
-		v23,
-		n4,
-		t1
-	})
-	local v27 = React.useCallback(function() -- line: 113
-		-- upvalues: v24 (copy), v21 (copy), n2 (copy), v26 (copy)
-		local v36 = v24(v21.current - n2)
+	end, { v3, object, p4, ref2, value, p })
 
-		v26(v36, true)
-	end, {
-		v26,
-		v24,
-		n2,
-		v21
-	})
-	local v28 = React.useCallback(function() -- line: 118
-		-- upvalues: v24 (copy), v21 (copy), n2 (copy), v26 (copy)
-		local v37 = v24(v21.current + n2)
+	local v5 = React.useCallback(function()
+		v4(v2(ref.current - p3), true)
+	end, { v4, v2, p3, ref })
 
-		v26(v37, true)
-	end, {
-		v26,
-		v24,
-		n2,
-		v21
-	})
+	local v6 = React.useCallback(function()
+		v4(v2(ref.current + p3), true)
+	end, { v4, v2, p3, ref })
 
-	React.useEffect(function() -- line: 126
-		-- upvalues: v24 (copy), v21 (copy), b1 (copy), v26 (copy), v25 (copy)
-		v24(v21.current)
+	React.useEffect(function()
+		v2(ref.current)
 
-		if b1 then
-			v26(v21.current)
+		if flag then
+			v4(ref.current)
 		end
 
-		v25()
-	end, {
-		v24,
-		v26,
-		b1
-	})
-	React.useEffect(function() -- line: 142
-		-- upvalues: b1 (copy), t1 (copy), v24 (copy), v21 (copy), v26 (copy), v25 (copy)
-		if not b1 then
+		v3()
+	end, { v2, v4, flag })
+
+	React.useEffect(function()
+		if not flag then
 			return nil
 		end
 
-		local t2 = {}
+		local connections = {}
 
-		if t1.current ~= nil then
-			local current = t1.current
-
-			table.insert(t2, current:GetPropertyChangedSignal("CanvasSize"):Connect(function() -- line: 152
-				-- upvalues: v24 (copy), v21 (copy), v26 (copy), v25 (copy)
-				v24(v21.current)
-				v26(v21.current)
-				v25()
+		if p.current ~= nil then
+			local current = p.current
+			table.insert(connections, current:GetPropertyChangedSignal("CanvasSize"):Connect(function()
+				v2(ref.current)
+				v4(ref.current)
+				v3()
 			end))
-			table.insert(t2, current:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 161
-				-- upvalues: v24 (copy), v21 (copy), v25 (copy)
-				v24(v21.current)
-				v25()
+
+			table.insert(connections, current:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+				v2(ref.current)
+				v3()
 			end))
 		end
 
-		return function() -- line: 168
-			-- upvalues: t2 (copy)
-			for _, v41 in t2 do
-				v41:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, {
-		v26,
-		v21,
-		t1,
-		b1,
-		v24
-	})
+	end, { v4, ref, p, flag, v2 })
 
-	return v27, v28, v17, v19
+	return v5, v6, state, state2
 end
 
 return useScrollButtonHandlers

@@ -1,52 +1,51 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local LuauPolyfill = require(Parent.LuauPolyfill)
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
-local mergeDeep = require(script.Parent.mergeDeep)
 
-local function mergeResolvers(p1, t1: {[any]: any}?) -- line: 14
-	-- upvalues: Array (copy), mergeResolvers (copy), mergeDeep (copy), Boolean (copy)
-	if not p1 or Array.isArray(p1) and #p1 == 0 then
+local mergeDeep = require(script.Parent.mergeDeep)
+local function mergeResolvers(list, p)
+	if not list or Array.isArray(list) and #list == 0 then
 		return {}
 	end
 
-	if not Array.isArray(p1) then
-		return p1
+	if not Array.isArray(list) then
+		return list
 	end
 
-	if #p1 == 1 then
-		return p1[1] or {}
+	if #list == 1 then
+		return list[1] or {}
 	end
 
-	local t2 = {}
+	local v = {}
 
-	for _, v11 in p1 do
-		local v12 = v11
-
-		if Array.isArray(v12) then
-			v12 = mergeResolvers(v12)
+	for _, item in list do
+		if Array.isArray(item) then
+			item = mergeResolvers(item)
 		end
 
-		if type(v12) == "table" and v12 then
-			table.insert(t2, v12)
+		if type(item) == "table" and item then
+			table.insert(v, item)
 		end
 	end
 
-	local v13 = mergeDeep(t2, true)
+	local result = mergeDeep(v, true)
 
-	if t1 and t1.exclusions then
-		for _, v15 in t1.exclusions do
-			local v16, v17 = table.unpack(v15:split("."), 1, 2)
+	if p and p.exclusions then
+		for _, exclusion in p.exclusions do
+			local v2, v3 = table.unpack(exclusion:split("."), 1, 2)
 
-			if not v17 or v17 == "*" then
-				v13[tostring(v16)] = nil
-			elseif Boolean.toJSBoolean(v13[tostring(v16)]) then
-				v13[tostring(v16)][tostring(v17)] = nil
+			if v3 and v3 ~= "*" then
+				if Boolean.toJSBoolean(result[tostring(v2)]) then
+					result[tostring(v2)][tostring(v3)] = nil
+				end
+			else
+				result[tostring(v2)] = nil
 			end
 		end
 	end
 
-	return v13
+	return result
 end
 
 return mergeResolvers

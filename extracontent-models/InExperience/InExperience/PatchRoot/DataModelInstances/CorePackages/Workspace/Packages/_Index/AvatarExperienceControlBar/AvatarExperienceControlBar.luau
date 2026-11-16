@@ -1,4 +1,5 @@
 require(script.useBaseControlBarProps)
+
 require(script.ControlBarTypes)
 
 return {

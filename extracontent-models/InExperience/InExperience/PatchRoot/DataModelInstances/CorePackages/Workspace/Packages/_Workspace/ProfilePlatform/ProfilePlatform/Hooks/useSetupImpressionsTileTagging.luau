@@ -1,22 +1,15 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local React = require(Parent.React)
-local ImpressionsTagUtility = require(Parent.Impressions).ImpressionsTagUtility
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local React = require(parent.React)
 
-local function useSetupImpressionsTileTagging(p1, s1: string, n1: number) -- line: 8
-	-- upvalues: React (copy), ImpressionsTagUtility (copy)
-	React.useEffect(function() -- line: 9
-		-- upvalues: ImpressionsTagUtility (copy), p1 (copy), s1 (copy), n1 (copy)
-		ImpressionsTagUtility.AddTag(p1, s1, n1)
+local Impressions = require(parent.Impressions)
+local ImpressionsTagUtility = Impressions.ImpressionsTagUtility
 
-		return function() -- line: 11
-			-- upvalues: ImpressionsTagUtility (copy), p1 (copy), s1 (copy), n1 (copy)
-			ImpressionsTagUtility.RemoveTag(p1, s1, n1)
+local function useSetupImpressionsTileTagging(p, p2: string, p3: number)
+	React.useEffect(function()
+		ImpressionsTagUtility.AddTag(p, p2, p3)
+		return function()
+			ImpressionsTagUtility.RemoveTag(p, p2, p3)
 		end
-	end, {
-		p1,
-		s1,
-		n1
-	})
+	end, { p, p2, p3 })
 end
-
 return useSetupImpressionsTileTagging

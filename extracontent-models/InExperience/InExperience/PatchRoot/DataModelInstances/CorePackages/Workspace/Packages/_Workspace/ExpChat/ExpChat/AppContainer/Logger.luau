@@ -1,4 +1,5 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local Logger = require(ExpChat.Parent.ExpChatShared).Logger
+local ExpChatShared = require(ExpChat.Parent.ExpChatShared)
+local logger = ExpChatShared.Logger
 
-return Logger:new(Logger.name .. "/AppContainer")
+return logger:new(logger.name .. "/AppContainer")

@@ -1,14 +1,13 @@
 game:DefineFastString("UGCValidationMaxCageDistance", "0.3")
 
-local t1 = {
-	asString = function() -- line: 9
-		return game:GetFastString("UGCValidationMaxCageDistance")
-	end
-}
+local GetFStringUGCValidationMaxCageDistance = {}
 
-function t1.asNumber() -- line: 13
-	-- upvalues: t1 (copy)
-	return (tonumber(t1.asString()))
+function GetFStringUGCValidationMaxCageDistance.asString()
+	return game:GetFastString("UGCValidationMaxCageDistance")
 end
 
-return t1
+function GetFStringUGCValidationMaxCageDistance.asNumber()
+	return (tonumber(GetFStringUGCValidationMaxCageDistance.asString()))
+end
+
+return GetFStringUGCValidationMaxCageDistance

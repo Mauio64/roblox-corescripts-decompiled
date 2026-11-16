@@ -1,3 +1,1 @@
-return {
-	NoFriendsView = require(script.NoFriendsView)
-}
+return { NoFriendsView = require(script.NoFriendsView) }

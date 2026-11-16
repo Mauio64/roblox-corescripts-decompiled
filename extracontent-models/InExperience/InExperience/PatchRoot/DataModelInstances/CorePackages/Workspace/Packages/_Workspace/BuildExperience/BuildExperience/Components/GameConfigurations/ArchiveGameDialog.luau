@@ -1,67 +1,67 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 
-local function ArchiveGameDialog(t1: {[any]: any}) -- line: 26
-	-- upvalues: React (copy), LocalizationStrings (copy), ButtonVariant (copy), Dialog (copy), DialogSize (copy)
-	local v11 = t1.testId or "archive-game-dialog"
-	local v12 = React.useCallback(function() -- line: 28
-		-- upvalues: t1 (copy)
-		t1.onArchive()
-	end, { t1.onArchive })
-	local v13 = React.useCallback(function() -- line: 31
-		-- upvalues: t1 (copy)
-		t1.onCancel()
-	end, { t1.onCancel })
-	local v14 = React.useMemo(function() -- line: 35
-		-- upvalues: LocalizationStrings (copy), ButtonVariant (copy), v12 (copy), v13 (copy)
+local function ArchiveGameDialog(props)
+	local v = useLocalization({
+		archiveGame = LocalizationStrings.ARCHIVE_GAME_ARCHIVE,
+		cancel = LocalizationStrings.ARCHIVE_GAME_CANCEL,
+		description = LocalizationStrings.ARCHIVE_GAME_DESCRIPTION,
+		title = LocalizationStrings.ARCHIVE_GAME_TITLE
+	})
+
+	local testId = props.testId or "archive-game-dialog"
+	local onActivated = React.useCallback(function()
+		props.onArchive()
+	end, { props.onArchive })
+	local onActivated2 = React.useCallback(function()
+		props.onCancel()
+	end, { props.onCancel })
+
+	local v2 = React.useMemo(function()
 		return {
 			LayoutOrder = 3,
 			actions = {
 				{
-					text = LocalizationStrings.ARCHIVE_GAME_ARCHIVE,
+					text = v.archiveGame,
 					variant = ButtonVariant.Standard,
-					onActivated = v12
+					onActivated = onActivated
 				},
-				{
-					text = LocalizationStrings.ARCHIVE_GAME_CANCEL,
-					variant = ButtonVariant.Standard,
-					onActivated = v13
-				}
+				{ text = v.cancel, variant = ButtonVariant.Standard, onActivated = onActivated2 }
 			}
 		}
-	end, {
-		v12,
-		v13
-	})
+	end, { onActivated, onActivated2 })
 
-	if t1.isOpen == false then
+	if props.isOpen == false then
 		return nil
 	end
 
 	return React.createElement(Dialog.Root, {
-		disablePortal = t1.disablePortal == true,
-		hasBackdrop = t1.hasBackdrop == nil or t1.hasBackdrop,
+		disablePortal = props.disablePortal == true,
+		hasBackdrop = props.hasBackdrop == nil or props.hasBackdrop,
 		size = DialogSize.Small,
-		testId = v11
+		testId = testId
 	}, {
 		Title = React.createElement(Dialog.Title, {
 			LayoutOrder = 1,
-			text = t1.title or LocalizationStrings.ARCHIVE_GAME_TITLE
+			text = props.title or v.title
 		}),
-		Content = React.createElement(Dialog.Content, {
-			LayoutOrder = 2
-		}, {
+		Content = React.createElement(Dialog.Content, { LayoutOrder = 2 }, {
 			Description = React.createElement(Dialog.Text, {
-				Text = t1.description or LocalizationStrings.ARCHIVE_GAME_DESCRIPTION
+				Text = props.description or v.description
 			})
 		}),
-		Actions = React.createElement(Dialog.Actions, v14)
+		Actions = React.createElement(Dialog.Actions, v2)
 	})
 end
 

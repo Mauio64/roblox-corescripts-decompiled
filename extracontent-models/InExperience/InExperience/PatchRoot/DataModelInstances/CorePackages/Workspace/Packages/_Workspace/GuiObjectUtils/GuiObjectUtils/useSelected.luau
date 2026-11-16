@@ -1,60 +1,46 @@
 local GuiService = game:GetService("GuiService")
-local Parent = script:FindFirstAncestor("GuiObjectUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GuiObjectUtils").Parent
+local React = require(parent.React)
 
-local function isGuiObjectSelected(t1: {[any]: any}) -- line: 12
-	-- upvalues: GuiService (copy)
-	if t1.current == nil then
+local function isGuiObjectSelected(p): boolean -- 2 equivalent calls inferred from this helper
+	if p.current == nil then
 		return false
 	end
 
-	return GuiService.SelectedCoreObject == t1.current or GuiService.SelectedObject == t1.current
+	return GuiService.SelectedCoreObject == p.current or GuiService.SelectedObject == p.current
 end
-local function useSelected(t2: {[any]: any}) -- line: 19
-	-- upvalues: React (copy), GuiService (copy)
-	local v8, v9 = React.useState(function() -- line: 20
-		-- upvalues: t2 (copy), GuiService (copy)
-		local v10 = t2
 
-		if v10.current == nil then
-			return false
-		end
-
-		return GuiService.SelectedCoreObject == v10.current or GuiService.SelectedObject == v10.current
+local function useSelected(p)
+	local state, setState = React.useState(function()
+		return isGuiObjectSelected(p) -- inferred equivalent call
 	end)
 
-	React.useEffect(function() -- line: 25
-		-- upvalues: v9 (copy), t2 (copy), GuiService (copy)
-		local v11 = v9
-		local v12 = t2
+	React.useEffect(function()
+		setState(isGuiObjectSelected(p)) -- inferred equivalent call
+	end, { p })
 
-		v11(v12.current ~= nil and (GuiService.SelectedCoreObject == v12.current or GuiService.SelectedObject == v12.current))
-	end, { t2 })
-	React.useEffect(function() -- line: 33
-		-- upvalues: t2 (copy), v9 (copy)
-		local t3 = {}
-		local current = t2.current
+	React.useEffect(function()
+		local connections = {}
+		local current = p.current
 
 		if current then
-			table.insert(t3, current.SelectionGained:Connect(function() -- line: 39
-				-- upvalues: v9 (copy)
-				v9(true)
+			table.insert(connections, current.SelectionGained:Connect(function()
+				setState(true)
 			end))
-			table.insert(t3, current.SelectionLost:Connect(function() -- line: 45
-				-- upvalues: v9 (copy)
-				v9(false)
+
+			table.insert(connections, current.SelectionLost:Connect(function()
+				setState(false)
 			end))
 		end
 
-		return function() -- line: 51
-			-- upvalues: t3 (copy)
-			for _, v in ipairs(t3) do
-				v:Disconnect()
+		return function()
+			for _, connection in ipairs(connections) do
+				connection:Disconnect()
 			end
 		end
-	end, { t2 })
+	end, { p })
 
-	return v8
+	return state
 end
 
 return useSelected

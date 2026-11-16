@@ -1,19 +1,25 @@
-local ParentParent = script.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local t = require(ParentParent.t)
-local Images = require(ParentParent.UIBlox.App.ImageSet.Images)
-local ImageSetComponent = require(ParentParent.UIBlox.Core.ImageSet.ImageSetComponent)
-local withStyle = require(ParentParent.UIBlox.Core.Style.withStyle)
-local RoundedFrame = require(ParentParent.UIBlox.App.Menu.RoundedFrame)
-local v8 = Roact.PureComponent:extend("ModalBottomSheetButton")
-local ImageRectSize = Images["component_assets/circle_17"].ImageRectSize
-local ImageRectOffset = Images["component_assets/circle_17"].ImageRectOffset
-local v11 = 8 * Images.ImagesResolutionScale
-local v12 = 8 * Images.ImagesResolutionScale
-local rect = Rect.new(v11, v12, ImageRectSize.x - v11, ImageRectSize.y - v12)
-local v14 = 8 * Images.ImagesResolutionScale
+local parent = script.Parent.Parent.Parent
 
-v8.validateProps = t.strictInterface({
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+
+local Images = require(parent.UIBlox.App.ImageSet.Images)
+local ImageSetComponent = require(parent.UIBlox.Core.ImageSet.ImageSetComponent)
+local withStyle = require(parent.UIBlox.Core.Style.withStyle)
+local RoundedFrame = require(parent.UIBlox.App.Menu.RoundedFrame)
+
+local extended = Roact.PureComponent:extend("ModalBottomSheetButton")
+local imageRectSize = Images["component_assets/circle_17"].ImageRectSize
+local imageRectOffset = Images["component_assets/circle_17"].ImageRectOffset
+
+local v = 8 * Images.ImagesResolutionScale
+local v2 = 8 * Images.ImagesResolutionScale
+local rect = Rect.new(v, v2, imageRectSize.x - v, imageRectSize.y - v2)
+local v3 = 8 * Images.ImagesResolutionScale
+
+extended.validateProps = t.strictInterface({
 	icon = t.optional(t.union(t.table, t.string)),
 	text = t.optional(t.string),
 	onActivated = t.optional(t.callback),
@@ -27,199 +33,236 @@ v8.validateProps = t.strictInterface({
 	LayoutOrder = t.integer,
 	stayOnActivated = t.optional(t.boolean)
 })
-v8.defaultProps = {
-	text = "",
+
+extended.defaultProps = {
 	icon = {},
-	onActivated = function() -- line: 45
-	end
+	text = "",
+	onActivated = function() end
 }
 
-function v8.init(p1) -- line: 48
-	-- upvalues: Roact (copy)
-	local v16, v17 = Roact.createBinding(false)
-
-	p1.pressed = v16
-	p1.updatePressed = v17
-	p1.ref = Roact.createRef()
-
-	function p1.onColorChange(p2) -- line: 51
-		-- upvalues: p1 (copy)
-		if not p1.ref.current then
+function extended:init()
+	local binding, updatePressed = Roact.createBinding(false)
+	self.pressed = binding
+	self.updatePressed = updatePressed
+	self.ref = Roact.createRef()
+	function self.onColorChange(imageColor)
+		if not self.ref.current then
 			return
 		end
 
-		p1.ref.current.ImageColor3 = p2
+		self.ref.current.ImageColor3 = imageColor
 	end
-	function p1.onInputBegan(p3) -- line: 58
-		return p3.UserInputType == Enum.UserInputType.MouseButton1 or p3.UserInputType == Enum.UserInputType.Touch
+
+	function self.onInputBegan(p): boolean
+		return p.UserInputType == Enum.UserInputType.MouseButton1 or p.UserInputType == Enum.UserInputType.Touch
 	end
-	function p1.onInputEnd(p4) -- line: 62
-		return p4.UserInputType == Enum.UserInputType.MouseButton1 or p4.UserInputType == Enum.UserInputType.Touch
+
+	function self.onInputEnd(p): boolean
+		return p.UserInputType == Enum.UserInputType.MouseButton1 or p.UserInputType == Enum.UserInputType.Touch
 	end
 end
-function v8.render(p5) -- line: 68
-	-- upvalues: ImageRectSize (copy), ImageRectOffset (copy), rect (copy), withStyle (copy), Roact (copy), Images (copy), ImageSetComponent (copy), RoundedFrame (copy), v14 (copy)
-	local hasRoundTop = p5.props.hasRoundTop
-	local hasRoundBottom = p5.props.hasRoundBottom
-	local u21 = nil
-	local ImageRectSizeX = ImageRectSize.X
-	local v23 = ImageRectSizeX / 2
-	local u24, u25
+
+function extended.render(data)
+	local hasRoundTop = data.props.hasRoundTop
+	local hasRoundBottom = data.props.hasRoundBottom
+
+	local sliceCenter = nil
+
+	local x = imageRectSize.X
+	local halfX = x / 2
+	local imageRectSize2, imageRectOffset2
 
 	if hasRoundTop and hasRoundBottom then
-		u24 = ImageRectSize
-		u25 = ImageRectOffset
-		u21 = rect
+		imageRectSize2 = imageRectSize
+		imageRectOffset2 = imageRectOffset
+		sliceCenter = rect
 	elseif hasRoundTop then
-		u24 = Vector2.new(ImageRectSizeX, v23)
-		u25 = ImageRectOffset
-		u21 = Rect.new(v23 - 1, v23 - 1, v23 + 1, v23)
+		imageRectSize2 = Vector2.new(x, halfX)
+		imageRectOffset2 = imageRectOffset
+		sliceCenter = Rect.new(halfX - 1, halfX - 1, halfX + 1, halfX)
 	elseif hasRoundBottom then
-		u24 = Vector2.new(ImageRectSizeX, v23)
-		u25 = ImageRectOffset + Vector2.new(0, v23)
-		u21 = Rect.new(v23 - 1, 0, v23 + 1, 1)
+		imageRectSize2 = Vector2.new(x, halfX)
+		imageRectOffset2 = imageRectOffset + Vector2.new(0, halfX)
+		sliceCenter = Rect.new(halfX - 1, 0, halfX + 1, 1)
 	else
-		u24 = Vector2.new(1, 1)
-		u25 = ImageRectOffset + Vector2.new(v23, v23)
+		imageRectSize2 = Vector2.new(1, 1)
+		imageRectOffset2 = imageRectOffset + Vector2.new(halfX, halfX)
 	end
 
-	local elementHeight = p5.props.elementHeight
-	local u27 = if not p5.props.isFixed then UDim2.new(1, -32, 0, elementHeight) else UDim2.new(0, 300, 0, elementHeight)
-	local n1 = 24
+	local elementHeight = data.props.elementHeight
+	local udim
 
-	if p5.props.showImage or p5.props.renderRightElement then
-		n1 = 12
+	if data.props.isFixed then
+		udim = UDim2.new(0, 300, 0, elementHeight)
+	else
+		udim = UDim2.new(1, -32, 0, elementHeight)
 	end
 
-	local u29 = n1
-	local v30 = elementHeight * 0.8
+	local v4 = (data.props.showImage or data.props.renderRightElement) and 12 or 24
 
-	if p5.props.showImage then
-		u29 = u29 + v30 + n1
+	local v5 = v4
+	local v6 = elementHeight * 0.8
+
+	if data.props.showImage then
+		v5 = v5 + v6 + v4
 	end
 
-	if p5.props.renderRightElement then
-		u29 = u29 + v30 + n1
+	if data.props.renderRightElement then
+		v5 = v5 + v6 + v4
 	end
 
-	return withStyle(function(p6) -- line: 120
-		-- upvalues: p5 (copy), Roact (copy), u21 (ref), Images (copy), u24 (ref), u25 (ref), n1 (ref), ImageSetComponent (copy), v30 (copy), u29 (ref), hasRoundBottom (copy), u27 (ref), RoundedFrame (copy), hasRoundTop (copy), v14 (copy)
-		local Theme = p6.Theme
-		local p6Font = p6.Font
-		local v37 = p5.pressed:map(function(p7) -- line: 128
-			-- upvalues: Theme (copy)
-			if p7 then
-				return Theme.BackgroundOnPress.Color
+	return withStyle(function(p)
+		local theme = p.Theme
+		local font = p.Font
+
+		local mapped = data.pressed:map(function(p2)
+			if p2 then
+				return theme.BackgroundOnPress.Color
 			end
 
-			return Theme.BackgroundUIDefault.Color
+			return theme.BackgroundUIDefault.Color
 		end)
-		local v38 = p5.pressed:map(function(p8) -- line: 131
-			-- upvalues: Theme (copy)
-			if p8 then
-				return Theme.BackgroundOnPress.Transparency
+
+		local mapped2 = data.pressed:map(function(p2)
+			if p2 then
+				return theme.BackgroundOnPress.Transparency
 			end
 
-			return Theme.BackgroundUIDefault.Transparency
+			return theme.BackgroundUIDefault.Transparency
 		end)
-		local TextEmphasisColor = Theme.TextEmphasis.Color
-		local TextEmphasisTransparency = Theme.TextEmphasis.Transparency
-		local v41 = Roact.createElement("ImageButton", {
+
+		local color = theme.TextEmphasis.Color
+		local transparency = theme.TextEmphasis.Transparency
+
+		local createElement = Roact.createElement
+		local v7 = {
 			AutoButtonColor = false,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = u21,
+			SliceCenter = sliceCenter,
 			Image = Images["component_assets/circle_17"].Image,
-			ImageColor3 = v37,
-			ImageRectSize = u24,
-			ImageRectOffset = u25,
-			ImageTransparency = v38,
+			ImageColor3 = mapped,
+			ImageRectSize = imageRectSize2,
+			ImageRectOffset = imageRectOffset2,
+			ImageTransparency = mapped2,
 			Size = UDim2.fromScale(1, 1),
-			LayoutOrder = p5.props.LayoutOrder,
-			[Roact.Ref] = p5.ref,
-			[Roact.Event.Activated] = p5.props.onActivatedAndDismissed,
-			[Roact.Event.InputBegan] = function(_, p10) -- line: 152
-				-- upvalues: p5 (copy)
-				if p5.onInputBegan(p10) then
-					p5.updatePressed(true)
+			LayoutOrder = data.props.LayoutOrder,
+			[Roact.Ref] = data.ref,
+			[Roact.Event.Activated] = data.props.onActivatedAndDismissed,
+			[Roact.Event.InputBegan] = function(_, p2)
+				if data.onInputBegan(p2) then
+					data.updatePressed(true)
 				end
 			end,
-			[Roact.Event.InputEnded] = function(_, p12) -- line: 157
-				-- upvalues: p5 (copy)
-				if p5.onInputEnd(p12) then
-					p5.updatePressed(false)
+			[Roact.Event.InputEnded] = function(_, p2)
+				if data.onInputEnd(p2) then
+					data.updatePressed(false)
 				end
 			end
-		}, {
-			buttonContents = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				horizontalLayout = Roact.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, n1)
-				}),
-				padding = Roact.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, n1),
-					PaddingTop = UDim.new(0.1, 0),
-					PaddingBottom = UDim.new(0.1, 0)
-				}),
-				icon = p5.props.showImage and Roact.createElement(ImageSetComponent.Label, {
-					BackgroundTransparency = 1,
-					LayoutOrder = 1,
-					Image = p5.props.icon,
-					ImageColor3 = TextEmphasisColor,
-					ImageTransparency = TextEmphasisTransparency,
-					Size = UDim2.new(0, v30, 0, v30)
-				}) or nil,
-				textLabel = Roact.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Size = UDim2.new(1, -u29, 1, 0),
-					Text = p5.props.text,
-					TextTransparency = TextEmphasisTransparency,
-					Font = p6Font.Header2.Font,
-					TextColor3 = TextEmphasisColor,
-					TextSize = p6Font.Header2.RelativeSize * p6Font.BaseSize,
-					TextTruncate = Enum.TextTruncate.AtEnd
-				}),
-				rightContainer = p5.props.renderRightElement and Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 3,
-					Size = UDim2.new(0, v30, 0, v30)
-				}, {
-					hint = p5.props.renderRightElement()
-				})
+		}
+
+		local createElement2 = Roact.createElement
+		local v8 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }
+
+		local v9 = {
+			horizontalLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, v4)
 			}),
+			padding = Roact.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v4),
+				PaddingTop = UDim.new(0.1, 0),
+				PaddingBottom = UDim.new(0.1, 0)
+			}),
+			icon = 0,
+			textLabel = 0,
+			rightContainer = 0
+		}
+		local icon
+
+		if data.props.showImage then
+			icon = Roact.createElement(ImageSetComponent.Label, {
+				Image = data.props.icon,
+				ImageColor3 = color,
+				ImageTransparency = transparency,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, v6, 0, v6),
+				LayoutOrder = 1
+			}) or nil
+		end
+
+		v9.icon = icon
+
+		v9.textLabel = Roact.createElement("TextLabel", {
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, -v5, 1, 0),
+			Text = data.props.text,
+			TextTransparency = transparency,
+			FontFace = normalizeFontFace(font.Header2.Font),
+			TextColor3 = color,
+			TextSize = font.Header2.RelativeSize * font.BaseSize,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			LayoutOrder = 2
+		})
+
+		v9.rightContainer = data.props.renderRightElement
+			and Roact.createElement(
+				"Frame",
+				{ BackgroundTransparency = 1, Size = UDim2.new(0, v6, 0, v6), LayoutOrder = 3 },
+				{
+					hint = data.props.renderRightElement()
+				}
+			)
+		local element = createElement("ImageButton", v7, {
+			buttonContents = createElement2("Frame", v8, v9),
 			bottomBorder = not hasRoundBottom and Roact.createElement("Frame", {
 				LayoutOrder = 0,
 				BackgroundTransparency = 1,
+				BackgroundColor3 = theme.Divider.Color,
 				BorderSizePixel = 0,
-				BackgroundColor3 = Theme.Divider.Color,
 				Size = UDim2.new(1, 0, 0, 1),
 				AnchorPoint = Vector2.new(0, 1),
 				Position = UDim2.new(0, 0, 1, 0)
 			})
 		})
 
-		return Roact.createElement("Frame", {
+		local createElement3 = Roact.createElement
+		local v10 = {
+			LayoutOrder = data.props.LayoutOrder,
+			Size = udim,
 			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			LayoutOrder = p5.props.LayoutOrder,
-			Size = u27
-		}, {
-			Background = Roact.createElement(RoundedFrame, {
-				zIndex = -1,
-				background = Theme.BackgroundUIDefault,
-				topCornerRadius = if not hasRoundTop then nil else UDim.new(0, v14),
-				bottomCornerRadius = if not hasRoundBottom then nil else UDim.new(0, v14)
-			}),
-			Button = v41
+			BorderSizePixel = 0
+		}
+
+		local createElement4 = Roact.createElement
+		local v11 = {
+			zIndex = -1,
+			background = theme.BackgroundUIDefault,
+			topCornerRadius = 0,
+			bottomCornerRadius = 0
+		}
+		local topCornerRadius
+
+		if hasRoundTop then
+			topCornerRadius = UDim.new(0, v3)
+		end
+
+		v11.topCornerRadius = topCornerRadius
+		local bottomCornerRadius
+
+		if hasRoundBottom then
+			bottomCornerRadius = UDim.new(0, v3)
+		end
+
+		v11.bottomCornerRadius = bottomCornerRadius
+		return createElement3("Frame", v10, {
+			Background = createElement4(RoundedFrame, v11),
+			Button = element
 		})
 	end)
 end
 
-return v8
+return extended

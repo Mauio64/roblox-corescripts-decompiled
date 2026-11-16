@@ -1,13 +1,13 @@
 local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
 
 require(AvatarExperienceSave.Context.AvatarSaveContext)
-
 local getSaveDict = require(script.Parent.getSaveDict)
 
-local function checkHasChangesToSave(p1, p2) -- line: 6
-	-- upvalues: getSaveDict (copy)
-	for _, v7 in (getSaveDict(p1, p2)) do
-		if v7 then
+local function checkHasChangesToSave(p, p2): boolean
+	local saveDict = getSaveDict(p, p2)
+
+	for _, save in saveDict do
+		if save then
 			return true
 		end
 	end

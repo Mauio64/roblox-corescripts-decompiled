@@ -1,15 +1,18 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
 
-local function waitForFlashOverlay(p1) -- line: 5
-	-- upvalues: Constants (copy)
-	if not p1:getState()[Constants.RoduxKey].IsOverlayFlashActive then
+local Constants = require(parent.Constants)
+
+local function waitForFlashOverlay(object)
+	if not object:getState()[Constants.RoduxKey].IsOverlayFlashActive then
 		return
 	end
 
-	local timestamp = tick()
+	local lastTime = tick()
 
-	while p1:getState()[Constants.RoduxKey].IsOverlayFlashActive and not (tick() - timestamp > Constants.FlashTimeout) do
+	while
+		object:getState()[Constants.RoduxKey].IsOverlayFlashActive
+		and not (tick() - lastTime > Constants.FlashTimeout)
+	do
 		task.wait()
 	end
 end

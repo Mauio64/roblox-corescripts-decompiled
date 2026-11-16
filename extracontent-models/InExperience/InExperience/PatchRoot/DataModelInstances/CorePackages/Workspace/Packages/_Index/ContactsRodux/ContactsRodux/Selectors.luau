@@ -1,6 +1,4 @@
-return function(p1) -- line: 1
-	return {
-		sortContacts = require(script.sortContacts)(p1),
-		getPhoneNumber = require(script.getPhoneNumber)
-	}
+return function(p)
+	local sortContacts = require(script.sortContacts)
+	return { sortContacts = sortContacts(p), getPhoneNumber = require(script.getPhoneNumber) }
 end

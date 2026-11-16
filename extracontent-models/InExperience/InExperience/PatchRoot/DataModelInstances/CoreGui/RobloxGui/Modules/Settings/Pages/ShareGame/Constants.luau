@@ -1,15 +1,21 @@
 local CorePackages = game:GetService("CorePackages")
-local UserModel = require(CorePackages.Workspace.Packages.UserLib).Models.UserModel
-local ThumbnailRequest = require(CorePackages.Workspace.Packages.UserLib).Utils.ThumbnailRequest
-local Constants = require(CorePackages.Workspace.Packages.UserLib).Utils.Constants
-local t1 = {
+
+local UserLib = require(CorePackages.Workspace.Packages.UserLib)
+local UserModel = UserLib.Models.UserModel
+local UserLib2 = require(CorePackages.Workspace.Packages.UserLib)
+local ThumbnailRequest = UserLib2.Utils.ThumbnailRequest
+local UserLib3 = require(CorePackages.Workspace.Packages.UserLib)
+local constants = UserLib3.Utils.Constants
+
+local deviceLayout = {
 	PHONE_PORTRAIT = "PHONE_PORTRAIT",
 	PHONE_LANDSCAPE = "PHONE_LANDSCAPE",
 	TABLET_PORTRAIT = "TABLET_PORTRAIT",
 	TABLET_LANDSCAPE = "TABLET_LANDSCAPE",
 	DESKTOP = "DESKTOP"
 }
-local t2 = {
+
+local color = {
 	WHITE = Color3.fromRGB(255, 255, 255),
 	GRAY1 = Color3.fromRGB(25, 25, 25),
 	GRAY2 = Color3.fromRGB(117, 117, 117),
@@ -19,14 +25,14 @@ local t2 = {
 	GRAY6 = Color3.fromRGB(245, 245, 245),
 	RED = Color3.fromRGB(254, 68, 72)
 }
-local t3 = {
-	SHARE_GAME_Z_INDEX = 2,
-	Color = t2,
+
+local Constants = {
+	Color = color,
 	PresenceColors = {
 		[UserModel.PresenceType.ONLINE] = Color3.fromRGB(0, 162, 255),
 		[UserModel.PresenceType.IN_GAME] = Color3.fromRGB(2, 183, 87),
 		[UserModel.PresenceType.IN_STUDIO] = Color3.fromRGB(246, 136, 2),
-		[UserModel.PresenceType.OFFLINE] = t2.GRAY3
+		[UserModel.PresenceType.OFFLINE] = color.GRAY3
 	},
 	PresenceTextKey = {
 		[UserModel.PresenceType.ONLINE] = "InGame.Presence.Label.Online",
@@ -40,19 +46,12 @@ local t3 = {
 		Failed = "Failed",
 		Pending = "Pending"
 	},
-	DeviceOrientation = {
-		PORTRAIT = "PORTRAIT",
-		LANDSCAPE = "LANDSCAPE",
-		INVALID = "INVALID"
-	},
-	PageRoute = {
-		NONE = "NONE",
-		SETTINGS_HUB = "SETTINGS_HUB",
-		SHARE_GAME = "SHARE_GAME"
-	},
-	DeviceLayout = t1,
+	DeviceOrientation = { PORTRAIT = "PORTRAIT", LANDSCAPE = "LANDSCAPE", INVALID = "INVALID" },
+	PageRoute = { NONE = "NONE", SETTINGS_HUB = "SETTINGS_HUB", SHARE_GAME = "SHARE_GAME" },
+	SHARE_GAME_Z_INDEX = 2,
+	DeviceLayout = deviceLayout,
 	LayoutSpecific = {
-		[t1.PHONE_LANDSCAPE] = {
+		[deviceLayout.PHONE_LANDSCAPE] = {
 			HEADER_HEIGHT = 40,
 			PAGE_TITLE_TEXT_SIZE = 23,
 			SEARCH_BOX_MARGIN = 12,
@@ -63,7 +62,7 @@ local t3 = {
 			EXTEND_BOTTOM_SIZE = 0,
 			TOAST_HEIGHT = 40
 		},
-		[t1.PHONE_PORTRAIT] = {
+		[deviceLayout.PHONE_PORTRAIT] = {
 			HEADER_HEIGHT = 40,
 			PAGE_TITLE_TEXT_SIZE = 23,
 			SEARCH_BOX_MARGIN = 15,
@@ -74,7 +73,7 @@ local t3 = {
 			EXTEND_BOTTOM_SIZE = 0,
 			TOAST_HEIGHT = 40
 		},
-		[t1.TABLET_PORTRAIT] = {
+		[deviceLayout.TABLET_PORTRAIT] = {
 			HEADER_HEIGHT = 40,
 			PAGE_TITLE_TEXT_SIZE = 23,
 			SEARCH_BOX_MARGIN = 15,
@@ -85,7 +84,7 @@ local t3 = {
 			EXTEND_BOTTOM_SIZE = 0,
 			TOAST_HEIGHT = 80
 		},
-		[t1.TABLET_LANDSCAPE] = {
+		[deviceLayout.TABLET_LANDSCAPE] = {
 			HEADER_HEIGHT = 60,
 			PAGE_TITLE_TEXT_SIZE = 23,
 			SEARCH_BOX_MARGIN = 15,
@@ -96,7 +95,7 @@ local t3 = {
 			EXTEND_BOTTOM_SIZE = 68,
 			TOAST_HEIGHT = 80
 		},
-		[t1.DESKTOP] = {
+		[deviceLayout.DESKTOP] = {
 			HEADER_HEIGHT = 60,
 			PAGE_TITLE_TEXT_SIZE = 29,
 			SEARCH_BOX_MARGIN = 0,
@@ -112,14 +111,18 @@ local t3 = {
 		DeveloperMultiple = "DeveloperMultiple",
 		DeveloperSingle = "DeveloperSingle",
 		GameMenu = "GameMenu"
-	},
-	InviteAvatarThumbnailType = Constants.RbxAvatarThumbnailTypesFromEnum.HeadShot,
-	InviteAvatarThumbnailSize = Constants.RbxThumbnailSizes.Size150x150,
-	InviteAvatarRbxthumbType = Constants.RbxthumbTypes.AvatarHeadShot
+	}
 }
 
-t3.ThumbnailRequest = {
-	InviteToGame = { ThumbnailRequest.fromData(t3.InviteAvatarThumbnailType, t3.InviteAvatarThumbnailSize) }
+Constants.InviteAvatarThumbnailType = constants.RbxAvatarThumbnailTypesFromEnum.HeadShot
+Constants.InviteAvatarThumbnailSize = constants.RbxThumbnailSizes.Size150x150
+Constants.InviteAvatarRbxthumbType = constants.RbxthumbTypes.AvatarHeadShot
+
+Constants.ThumbnailRequest = {
+	InviteToGame = { ThumbnailRequest.fromData(
+			Constants.InviteAvatarThumbnailType,
+			Constants.InviteAvatarThumbnailSize
+		) }
 }
 
-return t3
+return Constants

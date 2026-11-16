@@ -1,121 +1,231 @@
-local Parent = script:FindFirstAncestor("NotificationsCommon").Parent
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
+local parent = script:FindFirstAncestor("NotificationsCommon").Parent
+local parent2 = script.Parent.Parent
+local dependencies = require(parent2.dependencies)
 local useStyle = dependencies.UIBlox.Core.Style.useStyle
+require(parent2.type)
+local AppCommonLib = require(parent.AppCommonLib)
+local Text = AppCommonLib.Text
 
-require(ParentParent.type)
+local react = dependencies.React
+local Foundation = require(parent.Foundation)
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-local Text = require(Parent.AppCommonLib).Text
-local React = dependencies.React
-local t1 = {
-	highlight = function(s1: string) -- line: 49
-		return "<b>" .. s1 .. "</b>"
+local defineFastFlag = game:DefineFastFlag("EnableNotificationStyledTextUtf16Offsets", false)
+
+local v = {
+	highlight = function(p: string)
+		return "<b>" .. p .. "</b>"
 	end,
-	warning = function(s2: string) -- line: 52
-		return "<b>" .. s2 .. "</b>"
+	warning = function(p: string)
+		return "<b>" .. p .. "</b>"
 	end
 }
 
-function utf8Sub(s3: string, n1: number, n2: number) -- line: 57
-	local v14 = utf8.offset(s3, n1)
-	local v15 = utf8.offset(s3, n2 + 1)
+function utf8Sub(value: string, p: number, p2: number)
+	local v2 = utf8.offset(value, p)
+	local v3 = utf8.offset(value, p2 + 1)
 
-	if v14 == nil or v15 == nil then
-		return (string.sub(s3, n1, n2))
+	if v2 == nil or v3 == nil then
+		return (string.sub(value, p, p2))
 	end
 
-	return (string.sub(s3, v14, v15 - 1))
+	return (string.sub(value, v2, v3 - 1))
 end
 
-local function formatString(p1) -- line: 66
-	-- upvalues: t1 (copy), Text (copy)
-	local v17 = p1.text .. " "
-	local styledElements = p1.styledElements
-	local t2 = {
-		{
-			Position = 0,
-			ReferenceCount = 0,
-			Format = "highlight"
-		},
-		{
-			ReferenceCount = 0,
-			Format = "highlight",
-			Position = utf8.len(p1.text)
+local function utf16IndexToCodepointIndex(text: string, p: number)
+	local total = 0
+	local count = 0
+
+	for _, v2 in utf8.codes(text) do
+		if p <= total then
+			break
+		end
+
+		total += v2 > 65535 and 2 or 1
+		count += 1
+	end
+
+	return count
+end
+
+local function formatString(text)
+	if defineFastFlag then
+		local text2 = text.text
+		local position = utf8.len(text2)
+
+		if position == nil then
+			return text2
+		end
+
+		local styledElements = text.styledElements
+
+		local v2 = {
+			{ Position = 0, ReferenceCount = 0, Format = "highlight" },
+			{ Position = position, ReferenceCount = 0, Format = "highlight" }
 		}
-	}
 
-	if styledElements then
-		for _, v in pairs(styledElements) do
-			table.insert(t2, {
-				ReferenceCount = 1,
-				Position = v.offset,
-				Format = v.styledElementType
-			})
-			table.insert(t2, {
-				ReferenceCount = -1,
-				Position = v.offset + v.length,
-				Format = v.styledElementType
-			})
-		end
-	end
+		if styledElements then
+			for _, styledElement in pairs(styledElements) do
+				table.insert(v2, {
+					Position = utf16IndexToCodepointIndex(text2, styledElement.offset),
+					ReferenceCount = 1,
+					Format = styledElement.styledElementType
+				})
 
-	table.sort(t2, function(p2, p3) -- line: 101
-		return p2.Position < p3.Position
-	end)
-
-	local t3 = {}
-
-	for k in pairs(t1) do
-		t3[k] = 0
-	end
-
-	local s4 = ""
-
-	for i = 1, #t2 - 1 do
-		local v26 = t2[i]
-		local v27 = t2[i + 1]
-
-		if v26.Format then
-			local Format = v26.Format
-
-			t3[Format] = t3[Format] + v26.ReferenceCount
+				table.insert(v2, {
+					Position = utf16IndexToCodepointIndex(text2, styledElement.offset + styledElement.length),
+					ReferenceCount = -1,
+					Format = styledElement.styledElementType
+				})
+			end
 		end
 
-		if v26.Position ~= v27.Position then
-			local v29 = utf8Sub(v17, v26.Position + 1, v27.Position)
+		table.sort(v2, function(a, b): boolean
+			return a.Position < b.Position
+		end)
 
-			for k, v in pairs(t1) do
-				if t3[k] > 0 then
-					v29 = v(v29)
+		local v3 = {}
+
+		for k in pairs(v) do
+			v3[k] = 0
+		end
+
+		local v4 = ""
+
+		for i = 1, #v2 - 1 do
+			local v5 = v2[i]
+			local v6 = v2[i + 1]
+
+			if v5.Format then
+				local format = v5.Format
+				v3[format] += v5.ReferenceCount
+			end
+
+			if v5.Position == v6.Position then
+				continue
+			end
+
+			local v7 = utf8Sub(text2, v5.Position + 1, v6.Position)
+
+			for k, v8 in pairs(v) do
+				if v3[k] > 0 then
+					v7 = v8(v7)
 				end
 			end
 
-			s4 ..= v29
+			v4 ..= v7
 		end
-	end
 
-	return Text.Trim(s4)
+		return Text.Trim(v4)
+	else
+		local v2 = text.text .. " "
+		local styledElements = text.styledElements
+
+		local v3 = {
+			{ Position = 0, ReferenceCount = 0, Format = "highlight" },
+			{ Position = utf8.len(text.text), ReferenceCount = 0, Format = "highlight" }
+		}
+
+		if styledElements then
+			for _, styledElement in pairs(styledElements) do
+				table.insert(v3, {
+					Position = styledElement.offset,
+					ReferenceCount = 1,
+					Format = styledElement.styledElementType
+				})
+
+				table.insert(v3, {
+					Position = styledElement.offset + styledElement.length,
+					ReferenceCount = -1,
+					Format = styledElement.styledElementType
+				})
+			end
+		end
+
+		table.sort(v3, function(a, b): boolean
+			return a.Position < b.Position
+		end)
+
+		local v4 = {}
+
+		for k in pairs(v) do
+			v4[k] = 0
+		end
+
+		local v5 = ""
+
+		for i = 1, #v3 - 1 do
+			local v6 = v3[i]
+			local v7 = v3[i + 1]
+
+			if v6.Format then
+				local format = v6.Format
+				v4[format] += v6.ReferenceCount
+			end
+
+			if v6.Position == v7.Position then
+				continue
+			end
+
+			local v8 = utf8Sub(v2, v6.Position + 1, v7.Position)
+
+			for k, v9 in pairs(v) do
+				if v4[k] > 0 then
+					v8 = v9(v8)
+				end
+			end
+
+			v5 ..= v8
+		end
+
+		return Text.Trim(v5)
+	end
 end
 
-return function(t4: {[any]: any}) -- line: 132
-	-- upvalues: useStyle (copy), formatString (copy), React (copy)
-	local v33 = useStyle()
-	local v34 = not t4.Text and "" or formatString(t4.Text)
+return function(props)
+	local v2 = useStyle()
+	local text = not props.Text and "" or formatString(props.Text)
 
-	return React.createElement("TextLabel", {
+	local createElement = react.createElement
+	local v3 = {
 		RichText = true,
+		Text = text,
 		BackgroundTransparency = 1,
+		TextColor3 = props.TextColor3 or v2.Theme.TextDefault.Color,
+		TextTransparency = props.TextTransparency or v2.Theme.TextDefault.Transparency,
+		Font = 0,
+		FontFace = 0,
+		AutomaticSize = 0,
+		Size = 0,
+		TextSize = 0,
+		Position = 0,
+		AnchorPoint = 0,
+		TextXAlignment = 0,
 		TextWrapped = true,
-		Text = v34,
-		TextColor3 = t4.TextColor3 or v33.Theme.TextDefault.Color,
-		TextTransparency = t4.TextTransparency or v33.Theme.TextDefault.Transparency,
-		Font = t4.Font or v33.Font.Body.Font,
-		AutomaticSize = t4.AutomaticSize,
-		Size = t4.Size,
-		TextSize = t4.TextSize,
-		Position = t4.Position,
-		AnchorPoint = t4.AnchorPoint,
-		TextXAlignment = t4.TextXAlignment,
-		LayoutOrder = t4.LayoutOrder
-	})
+		LayoutOrder = 0
+	}
+	local font
+
+	if not (FoundationFontFaceMigration and props.FontFace) then
+		font = props.Font or v2.Font.Body.Font
+	end
+
+	v3.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = props.FontFace
+	end
+
+	v3.FontFace = fontFace
+
+	v3.AutomaticSize = props.AutomaticSize
+	v3.Size = props.Size
+	v3.TextSize = props.TextSize
+	v3.Position = props.Position
+	v3.AnchorPoint = props.AnchorPoint
+	v3.TextXAlignment = props.TextXAlignment
+
+	v3.LayoutOrder = props.LayoutOrder
+	return createElement("TextLabel", v3)
 end

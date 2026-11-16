@@ -1,31 +1,31 @@
-return function(n1: number, n2: number, n3: number) -- line: 3
-	if n2 <= 0 then
+return function(p: number, p2: number, value: number)
+	if p2 <= 0 then
 		return NumberSequence.new(0)
 	end
 
-	local v4 = math.clamp(n3, 0, 1)
-	local v5 = math.clamp(n1 / n2, 0, 1)
+	local v = math.clamp(value, 0, 1)
+	local v2 = math.clamp(p / p2, 0, 1)
 
-	if v4 == 0 or v5 == 0 then
+	if v == 0 or v2 == 0 then
 		return NumberSequence.new(0)
 	end
 
-	if v5 == 1 then
-		return NumberSequence.new(v4)
+	if v2 == 1 then
+		return NumberSequence.new(v)
 	end
 
-	if v5 <= 0.001 then
+	if v2 <= 0.001 then
 		return NumberSequence.new({
-			NumberSequenceKeypoint.new(0, v4),
-			NumberSequenceKeypoint.new(v5, 0),
+			NumberSequenceKeypoint.new(0, v),
+			NumberSequenceKeypoint.new(v2, 0),
 			NumberSequenceKeypoint.new(1, 0)
 		})
 	end
 
 	return NumberSequence.new({
-		NumberSequenceKeypoint.new(0, v4),
-		NumberSequenceKeypoint.new(v5 - 0.001, v4),
-		NumberSequenceKeypoint.new(v5, 0),
+		NumberSequenceKeypoint.new(0, v),
+		NumberSequenceKeypoint.new(v2 - 0.001, v),
+		NumberSequenceKeypoint.new(v2, 0),
 		NumberSequenceKeypoint.new(1, 0)
 	})
 end

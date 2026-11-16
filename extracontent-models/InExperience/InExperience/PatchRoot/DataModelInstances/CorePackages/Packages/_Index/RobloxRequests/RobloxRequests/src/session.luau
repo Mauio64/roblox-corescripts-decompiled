@@ -1,139 +1,132 @@
-local ParentParent = script.Parent.Parent
-local _ = ParentParent.lib
-local src = ParentParent.src
+local parent = script.Parent.Parent
+local lib = parent.lib
+local src = parent.src
+
 local request = require(src.request)
 local cookies = require(src.cookies)
 local ratelimit = require(src.ratelimit)
 local util = require(src.util)
 
-local function randomString(p1) -- line: 15
-	local s1 = ""
+local function randomString(p)
+	local v = ""
 
-	for _ = 1, p1 do
-		s1 ..= string.char(math.random(97, 122))
+	for _ = 1, p do
+		v ..= string.char(math.random(97, 122))
 	end
 
-	return s1
+	return v
 end
 
-local t1 = {}
-
-t1.__index = t1
-
-function t1.new(p2) -- line: 28
-	-- upvalues: t1 (copy), cookies (copy)
-	local self = setmetatable({}, t1)
+local Session = {}
+Session.__index = Session
+function Session.new(value)
+	local self = setmetatable({}, Session)
 
 	self.headers = {}
 	self.cookies = cookies.new()
-	self.base_url = p2 or ""
+
+	self.base_url = value or ""
+
 	self._ratelimit = nil
 	self.ignore_ratelimit = false
+
 	self.before_request = nil
 	self.after_request = nil
+
 	self.no_stats = false
+
 	self.log = true
 
 	return self
 end
-function t1.set_ratelimit(p3, p4, p5) -- line: 52
-	-- upvalues: ratelimit (copy), randomString (copy)
-	if not p4 then
-		p3:disable_ratelimit()
+
+function Session:set_ratelimit(p, value)
+	if not p then
+		self:disable_ratelimit()
 	end
 
-	local v20 = p5 or 60
-
-	if p3._ratelimit then
-		ratelimit.ratelimit[p3._ratelimit.id] = nil
+	if self._ratelimit then
+		ratelimit.ratelimit[self._ratelimit.id] = nil
 	end
 
-	local v21 = "http.session-" .. randomString(12)
+	local v = "http.session-" .. randomString(12)
 
-	p3._ratelimit = ratelimit.get(v21, p4, v20)
+	self._ratelimit = ratelimit.get(v, p, value or 60)
 end
-function t1.disable_ratelimit(p6) -- line: 70
-	-- upvalues: ratelimit (copy)
-	if p6._ratelimit then
-		ratelimit.ratelimit[p6._ratelimit.id] = nil
-		p6._ratelimit = nil
+
+function Session:disable_ratelimit()
+	if self._ratelimit then
+		ratelimit.ratelimit[self._ratelimit.id] = nil
+		self._ratelimit = nil
 	end
 end
-function t1.set_headers(p7, p8) -- line: 79
-	for k, v in pairs(p8) do
-		p7.headers[k] = v
+
+function Session:set_headers(items)
+	for k, item in pairs(items) do
+		self.headers[k] = item
 	end
 
-	return p7
+	return self
 end
-function t1.Request(p9, p10, p11, p12) -- line: 89
-	-- upvalues: request (copy)
-	local v31 = p12 or {}
 
-	if p11:sub(1, 7) ~= "http://" and p11:sub(1, 8) ~= "https://" then
-		p11 = p9.base_url .. p11
+function Session:Request(p, value, options)
+	local v = options or {}
+
+	if value:sub(1, 7) ~= "http://" and value:sub(1, 8) ~= "https://" then
+		value = self.base_url .. value
 	end
 
-	local log = p9.log
+	local log = self.log
 
-	if v31.log ~= nil then
-		log = v31.log
+	if v.log ~= nil then
+		log = v.log
 	end
 
-	local v33 = request.new(p10, p11, {
-		headers = p9.headers,
-		query = v31.query,
-		data = v31.data,
+	local v2 = request.new(p, value, {
+		headers = self.headers,
+		query = v.query,
+		data = v.data,
 		log = log,
-		cookies = v31.cookies or p9.cookies,
-		ignore_ratelimit = v31.ignore_ratelimit or p9.ignore_ratelimit,
-		no_stats = p9.no_stats or false
+		cookies = v.cookies or self.cookies,
+		ignore_ratelimit = v.ignore_ratelimit or self.ignore_ratelimit,
+		no_stats = self.no_stats or false
 	})
 
-	if p9._ratelimit then
-		table.insert(v33._ratelimits, p9._ratelimit)
+	if self._ratelimit then
+		table.insert(v2._ratelimits, self._ratelimit)
 	end
 
-	v33:set_headers(v31.headers or {})
+	v2:set_headers(v.headers or {})
 
-	function v33._callback(p13) -- line: 122
-		-- upvalues: p9 (copy)
-		for _, v in ipairs(p13.cookies.cookies) do
-			table.insert(p9.cookies.cookies, v)
+	function v2._callback(p2)
+		for _, v3 in ipairs(p2.cookies.cookies) do
+			table.insert(self.cookies.cookies, v3)
 		end
 	end
 
-	return v33
-end
-function t1.request(p14, p15, p16, p17) -- line: 131
-	return p14:Request(p15, p16, p17 or {}):send()
+	return v2
 end
 
-t1.send = util.deprecate(t1.request, "0.5", "Session:send")
-
-function t1.promise_request(p18, p19, p20, p21) -- line: 149
-	return p18:Request(p19, p20, p21 or {}):send(true)
+function Session:request(p, p2, options)
+	return self:Request(p, p2, options or {}):send()
 end
 
-t1.promise_send = util.deprecate(t1.promise_request, "0.5", "Session:promise_send")
+Session.send = util.deprecate(Session.request, "0.5", "Session:send")
 
-for _, v in pairs({
-	"GET",
-	"POST",
-	"HEAD",
-	"OPTIONS",
-	"PUT",
-	"DELETE",
-	"PATCH"
-}) do
-	t1[v:lower()] = function(p22, p23, p24) -- line: 161
-		-- upvalues: v (copy)
-		return p22:send(v, p23, p24)
+function Session:promise_request(p, p2, options)
+	return self:Request(p, p2, options or {}):send(true)
+end
+
+Session.promise_send = util.deprecate(Session.promise_request, "0.5", "Session:promise_send")
+
+for _, v in pairs({ "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "PATCH" }) do
+	Session[v:lower()] = function(object, p, p2)
+		return object:send(v, p, p2)
 	end
-	t1["promise_" .. v:lower()] = function(p25, p26, p27) -- line: 165
-		-- upvalues: v (copy)
-		return p25:promise_send(v, p26, p27)
+
+	Session["promise_" .. v:lower()] = function(object, p, p2)
+		return object:promise_send(v, p, p2)
 	end
 end
 
-return t1
+return Session

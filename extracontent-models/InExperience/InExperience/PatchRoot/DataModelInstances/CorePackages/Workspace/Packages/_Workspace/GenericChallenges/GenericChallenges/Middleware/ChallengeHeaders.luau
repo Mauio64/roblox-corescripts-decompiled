@@ -1,31 +1,32 @@
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
 local constants = require(GenericChallenges.Utils.constants)
 local GenericType = require(GenericChallenges.Types.GenericType)
-local GenericChallengesParent = GenericChallenges.Parent
-local Base64 = require(GenericChallengesParent.AuthCommon).Utils.Base64
+local parent = GenericChallenges.Parent
+
+local AuthCommon = require(parent.AuthCommon)
+local Base64 = AuthCommon.Utils.Base64
+
 local HttpService = game:GetService("HttpService")
-local t1 = {}
 
-t1.__index = t1
+local ChallengeHeaders = {}
+ChallengeHeaders.__index = ChallengeHeaders
 
-function t1.new(t2: {[any]: any}) -- line: 41
-	-- upvalues: constants (copy), Base64 (copy), HttpService (copy), GenericType (copy), t1 (copy)
-	local t3 = {
-		challengeId = t2[constants.challengeIdHeader]
-	}
-	local v10 = Base64.Decode(t2[constants.challengeMetadataHeader])
-
-	t3.challengeMetadata = {
-		raw = t2[constants.challengeMetadataHeader],
-		decoded = v10,
-		typed = HttpService:JSONDecode(v10)
-	}
-	t3.challengeType = {
-		raw = t2[constants.challengeTypeHeader],
-		typed = GenericType.fromRawValue(t2[constants.challengeTypeHeader])
+function ChallengeHeaders.new(p)
+	local v = {}
+	v.challengeId = p[constants.challengeIdHeader]
+	local decoded = Base64.Decode(p[constants.challengeMetadataHeader])
+	v.challengeMetadata = {
+		raw = p[constants.challengeMetadataHeader],
+		decoded = decoded,
+		typed = HttpService:JSONDecode(decoded)
 	}
 
-	return (setmetatable(t3, t1))
+	v.challengeType = {
+		raw = p[constants.challengeTypeHeader],
+		typed = GenericType.fromRawValue(p[constants.challengeTypeHeader])
+	}
+
+	return (setmetatable(v, ChallengeHeaders))
 end
 
-return t1
+return ChallengeHeaders

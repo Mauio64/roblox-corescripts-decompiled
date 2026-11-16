@@ -1,36 +1,32 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Promise = require(AuthCommonParent.Promise)
+local parent = AuthCommon.Parent
+
+local Promise = require(parent.Promise)
+
 local GetGameMedia = require(AuthCommon.Http.Requests.GetGameMedia)
 
-function FetchGameMedia(p1, s1: string) -- line: 8
-	-- upvalues: GetGameMedia (copy), Promise (copy)
-	assert(typeof(s1) == "string", "universeId must be a string")
-	assert(#s1 > 0, "universeId must be a non-empty string")
+function FetchGameMedia(p, value: string)
+	assert(typeof(value) == "string", "universeId must be a string")
+	assert(#value > 0, "universeId must be a non-empty string")
 
-	return GetGameMedia(p1, s1):andThen(function(p2) -- line: 12
-		-- upvalues: Promise (copy)
-		if p2 and p2.responseBody then
-			local data = p2.responseBody.data
-
-			if data == nil then
-				return Promise.reject()
-			end
-
-			local t1 = {}
-
-			for _, v in ipairs(data) do
-				table.insert(t1, {
-					id = v.id,
-					assetTypeId = v.assetTypeId,
-					imageId = v.imageId
-				})
-			end
-
-			return Promise.resolve(t1)
+	return GetGameMedia(p, value):andThen(function(p2)
+		if not (p2 and p2.responseBody) then
+			return Promise.reject()
 		end
 
-		return Promise.reject()
+		local data = p2.responseBody.data
+
+		if data == nil then
+			return Promise.reject()
+		end
+
+		local v = {}
+
+		for _, v2 in ipairs(data) do
+			table.insert(v, { id = v2.id, assetTypeId = v2.assetTypeId, imageId = v2.imageId })
+		end
+
+		return Promise.resolve(v)
 	end)
 end
 

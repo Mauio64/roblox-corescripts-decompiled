@@ -1,46 +1,43 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local parent = AppChat.Parent
+local AppChatNetworking = require(parent.AppChatNetworking)
+
 local RoduxNetworking = require(AppChat.Http.RoduxNetworking)
-local Promise = require(AppChatParent.Promise)
-local v6 = require(AppChat.Logger):new(script.Name)
+local Promise = require(parent.Promise)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
+
 local getNewestWithNilPreviousMessageId = require(AppChat.Components.ChatConversation.Utils.getNewestWithNilPreviousMessageId)
 
-return function(p1: ((...any) -> ...any), s1: string) -- line: 11
-	-- upvalues: v6 (copy), Promise (copy), AppChatNetworking (copy), RoduxNetworking (copy), getNewestWithNilPreviousMessageId (copy)
-	v6:info("Maybe getting older messages for {}", s1)
+return function(callback, p: string)
+	v:info("Maybe getting older messages for {}", p)
+	return function(object)
+		local chatAppReducer = object:getState().ChatAppReducer
 
-	return function(p2) -- line: 13
-		-- upvalues: Promise (copy), s1 (copy), AppChatNetworking (copy), RoduxNetworking (copy), v6 (copy), getNewestWithNilPreviousMessageId (copy), p1 (copy)
-		local ChatAppReducer = p2:getState().ChatAppReducer
-
-		if not ChatAppReducer or not ChatAppReducer.Conversations then
+		if not (chatAppReducer and chatAppReducer.Conversations) then
 			return Promise.resolve()
 		end
 
-		local v12 = ChatAppReducer.Conversations[s1]
-		local v13 = AppChatNetworking.rodux.GetOlderMessages.getStatus(p2:getState(), s1) == RoduxNetworking.Enum.NetworkStatus.Fetching
+		local conversation = chatAppReducer.Conversations[p]
 
-		if not v12 then
-			v6:info("Canceling since conversation id {} is not in local state", s1)
+		local v2 = AppChatNetworking.rodux.GetOlderMessages.getStatus(object:getState(), p) == RoduxNetworking.Enum.NetworkStatus.Fetching
 
+		if not conversation then
+			v:info("Canceling since conversation id {} is not in local state", p)
 			return Promise.resolve()
 		end
 
-		if v13 then
-			v6:info("Canceling since we are already fetching older messages for conversation id {}", s1)
-
+		if v2 then
+			v:info("Canceling since we are already fetching older messages for conversation id {}", p)
 			return Promise.resolve()
 		end
 
-		if v12.fetchedOldestMessage then
-			v6:info("Canceling since we have already fetched the oldest message for conversation id {}", s1)
-
-			return Promise.resolve()
+		if not conversation.fetchedOldestMessage then
+			return callback(p, getNewestWithNilPreviousMessageId(conversation.messages), conversation.nextCursor)
 		end
 
-		local v14 = getNewestWithNilPreviousMessageId(v12.messages)
+		v:info("Canceling since we have already fetched the oldest message for conversation id {}", p)
 
-		return p1(s1, v14, v12.nextCursor)
+		return Promise.resolve()
 	end
 end

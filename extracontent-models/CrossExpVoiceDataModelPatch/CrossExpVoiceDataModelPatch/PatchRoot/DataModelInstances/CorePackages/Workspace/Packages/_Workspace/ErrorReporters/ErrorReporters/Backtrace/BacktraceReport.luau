@@ -1,9 +1,12 @@
-local Parent = script:FindFirstAncestor("ErrorReporters").Parent
+local parent = script:FindFirstAncestor("ErrorReporters").Parent
 local HttpService = game:GetService("HttpService")
-local Cryo = require(Parent.Cryo)
-local t = require(Parent.t)
+
+local Cryo = require(parent.Cryo)
+local t = require(parent.t)
+
 local ProcessErrorStack = require(script.Parent.Parent.ProcessErrorStack)
-local v6 = t.strictInterface({
+
+local strictInterface = t.strictInterface({
 	guessed_frame = t.optional(t.boolean),
 	funcName = t.optional(t.string),
 	address = t.optional(t.string),
@@ -15,16 +18,19 @@ local v6 = t.strictInterface({
 	faulted = t.optional(t.boolean),
 	registers = t.optional(t.map(t.string, t.some(t.string, t.number)))
 })
-local v7 = t.strictInterface({
+
+local strictInterface2 = t.strictInterface({
 	name = t.optional(t.string),
 	fault = t.optional(t.boolean),
-	stack = t.optional(t.array(v6))
+	stack = t.optional(t.array(strictInterface))
 })
-local v8 = t.strictInterface({
+
+local strictInterface3 = t.strictInterface({
 	name = t.string,
 	registers = t.map(t.string, t.string)
 })
-local v9 = t.strictInterface({
+
+local strictInterface4 = t.strictInterface({
 	text = t.optional(t.string),
 	startLine = t.optional(t.number),
 	startColumn = t.optional(t.number),
@@ -32,18 +38,17 @@ local v9 = t.strictInterface({
 	path = t.optional(t.string),
 	tabWidth = t.optional(t.number)
 })
-local v10 = t.strictInterface({
-	read = t.boolean,
-	write = t.boolean,
-	exec = t.boolean
-})
-local v11 = t.strictInterface({
+
+local strictInterface5 = t.strictInterface({ read = t.boolean, write = t.boolean, exec = t.boolean })
+
+local strictInterface6 = t.strictInterface({
 	start = t.string,
 	size = t.optional(t.number),
 	data = t.optional(t.string),
-	perms = t.optional(v10)
+	perms = t.optional(strictInterface5)
 })
-local v12 = t.strictInterface({
+
+local strictInterface7 = t.strictInterface({
 	start = t.string,
 	size = t.number,
 	code_file = t.optional(t.string),
@@ -52,252 +57,193 @@ local v12 = t.strictInterface({
 	debug_identifier = t.optional(t.string),
 	debug_file_exists = t.optional(t.boolean)
 })
-local v13 = t.optional(t.map(t.string, t.some(t.string, t.number, t.boolean)))
-local v14 = t.optional(t.map(t.string, function(p1) -- line: 76
-	-- upvalues: t (copy)
-	local function checkTypeRecursive(p2) -- line: 77
-		-- upvalues: checkTypeRecursive (copy), t (copy)
-		if type(p2) == "table" then
-			for k, v in pairs(p2) do
-				local v71, v72 = checkTypeRecursive(v)
 
-				if not v71 then
-					return false, string.format("error when checking key: %s - %s", k, v72)
-				end
-			end
+local optional = t.optional(t.map(t.string, t.some(t.string, t.number, t.boolean)))
 
-			return true
+local optional2 = t.optional(t.map(t.string, function(p)
+	local function checkTypeRecursive(items)
+		if type(items) ~= "table" then
+			return t.some(t.string, t.number, t.boolean)(items)
 		end
 
-		return t.some(t.string, t.number, t.boolean)(p2)
+		for k, item in pairs(items) do
+			local v, v2 = checkTypeRecursive(item)
+
+			if not v then
+				return false, string.format("error when checking key: %s - %s", k, v2)
+			end
+		end
+
+		return true
 	end
 
-	return checkTypeRecursive(p1)
+	return checkTypeRecursive(p)
 end))
-local v15 = t.intersection(t.strictInterface({
+
+local intersection = t.intersection(t.strictInterface({
 	uuid = t.string,
 	timestamp = t.number,
 	lang = t.string,
 	langVersion = t.string,
 	agent = t.string,
 	agentVersion = t.string,
-	threads = t.map(t.string, v7),
+	threads = t.map(t.string, strictInterface2),
 	mainThread = t.string,
-	attributes = v13,
-	annotations = v14,
+	attributes = optional,
+	annotations = optional2,
 	symbolication = t.optional(t.literal("minidump")),
 	entryThread = t.optional(t.string),
-	arch = t.optional(v8),
+	arch = t.optional(strictInterface3),
 	fingerprint = t.optional(t.string),
 	classifiers = t.optional(t.array(t.string)),
-	sourceCode = t.optional(t.map(t.string, v9)),
-	memory = t.optional(t.array(v11)),
-	modules = t.optional(t.array(v12))
-}), function(p3) -- line: 121
-	local v20 = false
-	local threads = p3.threads
+	sourceCode = t.optional(t.map(t.string, strictInterface4)),
+	memory = t.optional(t.array(strictInterface6)),
+	modules = t.optional(t.array(strictInterface7))
+}), function(p)
+	local threads = p.threads
+	local flag = false
 
-	for _, v in pairs(threads) do
-		local stack = v.stack
+	for _, thread in pairs(threads) do
+		local stack = thread.stack
 
 		if stack ~= nil then
-			for _, v2 in ipairs(stack) do
-				if v2.registers ~= nil then
-					v20 = true
-
+			for _, v in ipairs(stack) do
+				if v.registers ~= nil then
+					flag = true
 					break
 				end
 			end
 		end
 
-		if v20 then
+		if flag then
 			break
 		end
 	end
 
-	if v20 and p3.arch == nil then
+	if flag and p.arch == nil then
 		return false, "arch must exist if you want to have registers in the stack"
 	end
 
 	return true
 end)
-local t1 = {
-	IAttributes = v13,
-	IAnnotations = v14
-}
 
-t1.__index = t1
+local BacktraceReport = { IAttributes = optional, IAnnotations = optional2 }
 
-function t1.validate(p4) -- line: 167
-	-- upvalues: v15 (copy)
-	return v15(p4)
+BacktraceReport.__index = BacktraceReport
+
+function BacktraceReport.validate(p)
+	return intersection(p)
 end
-function t1.new() -- line: 172
-	-- upvalues: HttpService (copy), t1 (copy)
-	local t2 = {
+
+function BacktraceReport.new()
+	local v = {
+		uuid = HttpService:GenerateGUID(false):lower(),
+		timestamp = os.time(),
 		lang = "lua",
 		langVersion = "Roblox",
 		agent = "backtrace-Lua",
 		agentVersion = "0.1.0",
-		mainThread = "default",
-		uuid = HttpService:GenerateGUID(false):lower(),
-		timestamp = os.time(),
-		threads = {}
+		threads = {},
+		mainThread = "default"
 	}
 
-	setmetatable(t2, t1)
+	setmetatable(v, BacktraceReport)
 
-	return t2
+	return v
 end
-function t1.addAttributes(p5, p6) -- line: 189
-	-- upvalues: Cryo (copy)
-	if type(p6) ~= "table" then
-		warn("Cannot add attributes of type: ", (type(p6)))
 
+function BacktraceReport:addAttributes(p)
+	if type(p) ~= "table" then
+		warn("Cannot add attributes of type: ", (type(p)))
 		return
 	end
 
-	local v34 = p5.attributes or {}
+	local attributes = self.attributes or {}
 
-	p5.attributes = Cryo.Dictionary.join(v34, p6)
+	self.attributes = Cryo.Dictionary.join(attributes, p)
 end
-function t1.addAnnotations(p7, p8) -- line: 202
-	-- upvalues: Cryo (copy)
-	if type(p8) ~= "table" then
-		warn("Cannot add annotations of type: ", (type(p8)))
 
+function BacktraceReport:addAnnotations(p)
+	if type(p) ~= "table" then
+		warn("Cannot add annotations of type: ", (type(p)))
 		return
 	end
 
-	local v37 = p7.annotations or {}
+	local annotations = self.annotations or {}
 
-	p7.annotations = Cryo.Dictionary.join(v37, p8)
+	self.annotations = Cryo.Dictionary.join(annotations, p)
 end
-function t1.addStackToThread(p9, p10, p11) -- line: 215
-	-- upvalues: Cryo (copy)
-	local threads = p9.threads
 
-	p9.threads = Cryo.Dictionary.join(threads, {
-		[p11] = {
-			name = p11,
-			stack = p10
-		}
+function BacktraceReport:addStackToThread(stack, name)
+	local threads = self.threads
+
+	self.threads = Cryo.Dictionary.join(threads, {
+		[name] = { name = name, stack = stack }
 	})
 end
-function t1.addStackToMainThread(p12, p13) -- line: 228
-	p12:addStackToThread(p13, p12.mainThread)
+
+function BacktraceReport:addStackToMainThread(p)
+	self:addStackToThread(p, self.mainThread)
 end
-function t1.fromMessageAndStack(p14, p15) -- line: 232
-	-- upvalues: t1 (copy), ProcessErrorStack (copy), Cryo (copy)
-	local v46 = t1.new()
 
-	v46:addAttributes({
-		["error.message"] = p14
-	})
+local function fn(sourceCode) -- 2 equivalent calls inferred from this helper
+	if not sourceCode or type(sourceCode) ~= "table" then
+		return ""
+	end
 
-	local v47, v48 = ProcessErrorStack(p15)
+	local keys = Cryo.Dictionary.keys(sourceCode)
 
-	v46:addStackToMainThread(v47)
-	v46.sourceCode = v48
+	if #keys > 0 then
+		local v = sourceCode[keys[1]]
 
-	local t3 = {}
-	local sourceCode = v46.sourceCode
-	local g51 = nil
-	local v52 = nil
-	local v53 = nil
-	local path = nil
-
-	repeat
-		if g51 or sourceCode and type(sourceCode) == "table" then
-			if not g51 then
-				v52 = Cryo.Dictionary.keys(sourceCode)
-			end
-
-			if g51 or #v52 > 0 then
-				if not g51 then
-					v53 = sourceCode[v52[1]]
-				end
-
-				if g51 or v53 and v53.path ~= nil then
-					if not g51 then
-						path = v53.path
-					end
-
-					g51 = false
-					t3.MainSourcePath = path
-					v46:addAttributes(t3)
-
-					return v46
-				end
-			end
+		if v and v.path ~= nil then
+			return v.path
 		end
+	end
 
-		path = ""
-		g51 = true
-	until not g51
+	return ""
 end
-function t1.fromDetails(p16) -- line: 250
-	-- upvalues: t1 (copy), ProcessErrorStack (copy), Cryo (copy)
-	local v56 = t1.new()
 
-	v56:addAttributes({
-		["error.message"] = p16.message
-	})
-	v56.sourceCode = {}
+function BacktraceReport.fromMessageAndStack(errormessage, p)
+	local v = BacktraceReport.new()
 
-	local n1 = 0
-	local g64 = nil
-	local v65 = nil
-	local v66 = nil
-	local path = nil
+	v:addAttributes({ ["error.message"] = errormessage })
 
-	for i, v in ipairs(p16.stacks) do
-		local v60, v61
+	local v2, sourceCode = ProcessErrorStack(p)
+	v:addStackToMainThread(v2)
+	v.sourceCode = sourceCode
 
-		v60, v61, n1 = ProcessErrorStack(v, n1)
+	v:addAttributes({ MainSourcePath = fn(v.sourceCode) }) -- inferred equivalent call
+
+	return v
+end
+
+function BacktraceReport.fromDetails(data)
+	local result = BacktraceReport.new()
+
+	result:addAttributes({ ["error.message"] = data.message })
+
+	result.sourceCode = {}
+	local v = 0
+
+	for i, stack in ipairs(data.stacks) do
+		local v2, v3
+		v2, v3, v = ProcessErrorStack(stack, v)
 
 		if i == 1 then
-			v56:addStackToMainThread(v60)
+			result:addStackToMainThread(v2)
 		else
-			v56:addStackToThread(v60, "stack" .. i)
+			result:addStackToThread(v2, "stack" .. i)
 		end
 
-		v56.sourceCode = Cryo.Dictionary.join(v56.sourceCode, v61)
+		result.sourceCode = Cryo.Dictionary.join(result.sourceCode, v3)
 	end
 
-	v56:addAnnotations(p16.annotations)
+	result:addAnnotations(data.annotations)
 
-	local t4 = {}
-	local sourceCode = v56.sourceCode
+	result:addAttributes({ MainSourcePath = fn(result.sourceCode) }) -- inferred equivalent call
 
-	repeat
-		if g64 or sourceCode and type(sourceCode) == "table" then
-			if not g64 then
-				v65 = Cryo.Dictionary.keys(sourceCode)
-			end
-
-			if g64 or #v65 > 0 then
-				if not g64 then
-					v66 = sourceCode[v65[1]]
-				end
-
-				if g64 or v66 and v66.path ~= nil then
-					if not g64 then
-						path = v66.path
-					end
-
-					g64 = false
-					t4.MainSourcePath = path
-					v56:addAttributes(t4)
-
-					return v56
-				end
-			end
-		end
-
-		path = ""
-		g64 = true
-	until not g64
+	return result
 end
 
-return t1
+return BacktraceReport

@@ -1,53 +1,55 @@
 local UserLib = script:FindFirstAncestor("UserLib")
-local UserLibParent = UserLib.Parent
+local parent = UserLib.Parent
+
 local User = require(UserLib.Models.User)
 local AddUsers = require(UserLib.Actions.AddUsers)
-local SetFriendCount = require(UserLibParent.LegacyFriendsRodux).Actions.SetFriendCount
+local LegacyFriendsRodux = require(parent.LegacyFriendsRodux)
+local SetFriendCount = LegacyFriendsRodux.Actions.SetFriendCount
+local SharedFlags = require(parent.SharedFlags)
+local FFlagRemoveUnusedFriendCountRoduxSlice = SharedFlags.FFlagRemoveUnusedFriendCountRoduxSlice
 
-return function(p1) -- line: 9
-	-- upvalues: User (copy), AddUsers (copy), SetFriendCount (copy)
-	return function(p2) -- line: 10
-		-- upvalues: p1 (copy), User (copy), AddUsers (copy), SetFriendCount (copy)
-		local n1 = 0
-		local t1 = {}
+return function(items)
+	return function(object)
+		local total = 0
+		local v = {}
 
-		for _, v in pairs(p1) do
-			local v12 = false
-			local id = v.id
-			local isFriend = v.isFriend
-			local n2 = 0
+		for _, item in pairs(items) do
+			local flag = false
+			local id = item.id
+			local isFriend = item.isFriend
+			local v2 = 0
 
 			assert(typeof(isFriend) == "boolean", "Expected isFriend to be a string")
 
-			local v16 = p2:getState().Users[id]
+			local user = object:getState().Users[id]
 
-			if v16 then
-				if not User.compare(v16, v) then
-					v12 = true
+			if user then
+				if not User.compare(user, item) then
+					flag = true
 
-					if isFriend ~= v16.isFriend then
-						n2 = not isFriend and -1 or 1
+					if user.isFriend ~= isFriend then
+						v2 = isFriend and 1 or -1
 					end
 				end
 			else
-				v12 = true
-				n2 = not isFriend and 0 or 1
+				flag = true
+				v2 = isFriend and 1 or 0
 			end
 
-			if v12 then
-				n1 += n2
-				t1[id] = v
+			if not flag then
+				continue
 			end
+
+			total += v2
+			v[id] = item
 		end
 
-		if next(t1) then
-			p2:dispatch(AddUsers(t1))
+		if next(v) then
+			object:dispatch(AddUsers(v))
 		end
 
-		if n1 ~= 0 then
-			local FriendCount = p2:getState().FriendCount
-
-			p2:dispatch(SetFriendCount(FriendCount + n1))
+		if not FFlagRemoveUnusedFriendCountRoduxSlice and total ~= 0 then
+			object:dispatch(SetFriendCount(object:getState().FriendCount + total))
 		end
 	end
 end

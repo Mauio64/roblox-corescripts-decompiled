@@ -1,246 +1,259 @@
 local RunService = game:GetService("RunService")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Foundation = require(ParentParentParent.Foundation)
-local React = require(ParentParentParent.React)
+
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local Foundation = require(parent2.Foundation)
+local React = require(parent2.React)
+
 local ButtonSize = Foundation.Enums.ButtonSize
 local Enums = Foundation.Enums
 local IconButton = Foundation.IconButton
 local StateLayerAffordance = Enums.StateLayerAffordance
-local FoundationImage = Foundation.Image
-local FoundationText = Foundation.Text
+local Image = Foundation.Image
+local Text = Foundation.Text
 local View = Foundation.View
-local LoadableVideo = require(ParentParent.Components.LoadableVideo)
-local ProgressBar = require(ParentParent.Components.ProgressBar)
 
-local function getCurrent(p1) -- line: 49
-	if typeof(p1) == "table" and p1.current ~= nil then
-		return p1.current
+local LoadableVideo = require(parent.Components.LoadableVideo)
+local ProgressBar = require(parent.Components.ProgressBar)
+
+local function getCurrent(videoRef) -- 7 equivalent calls inferred from this helper
+	if typeof(videoRef) == "table" and videoRef.current ~= nil then
+		return videoRef.current
 	end
 
 	return nil
 end
-local function MediaPlayer(t1: {[any]: any}) -- line: 56
-	-- upvalues: React (copy), RunService (copy), View (copy), StateLayerAffordance (copy), IconButton (copy), ButtonSize (copy), LoadableVideo (copy), FoundationText (copy), ProgressBar (copy), Foundation (copy), FoundationImage (copy)
-	local v19, v20 = React.useState(0)
-	local v21, v22 = React.useState(0)
-	local v23, v24 = React.useState(false)
-	local v25, v26 = React.useState(false)
-	local v27, v28 = React.useState(false)
-	local v29, v30 = React.useState(true)
 
-	React.useEffect(function() -- line: 64
-		-- upvalues: t1 (copy), v24 (copy), RunService (copy), v20 (copy)
-		local videoRef = t1.videoRef
-		local v46 = if typeof(videoRef) ~= "table" or videoRef.current == nil then nil else videoRef.current
+local function MediaPlayer(props)
+	local state, setState = React.useState(0)
+	local state2, setState2 = React.useState(0)
+	local state3, setState3 = React.useState(false)
+	local state4, setState4 = React.useState(false)
+	local state5, setState5 = React.useState(false)
+	local state6, setState6 = React.useState(true)
 
-		if not v46 then
+	React.useEffect(function()
+		local current = getCurrent(props.videoRef) -- inferred equivalent call
+
+		if not current then
 			return
 		end
 
-		local connection = v46.Played:Connect(function() -- line: 70
-			-- upvalues: v24 (copy)
-			v24(false)
-		end)
-		local connection2 = v46.Ended:Connect(function() -- line: 74
-			-- upvalues: v24 (copy)
-			v24(true)
-		end)
-		local connection3 = RunService.RenderStepped:Connect(function() -- line: 78
-			-- upvalues: v20 (copy), v46 (copy)
-			v20(v46.TimePosition)
+		local playedConnection = current.Played:Connect(function()
+			setState3(false)
 		end)
 
-		return function() -- line: 82
-			-- upvalues: connection3 (copy), connection (copy), connection2 (copy)
-			connection3:Disconnect()
-			connection:Disconnect()
-			connection2:Disconnect()
+		local endedConnection = current.Ended:Connect(function()
+			setState3(true)
+		end)
+
+		local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+			setState(current.TimePosition)
+		end)
+
+		return function()
+			renderSteppedConnection:Disconnect()
+			playedConnection:Disconnect()
+			endedConnection:Disconnect()
 		end
-	end, {
-		t1.videoRef,
-		v29,
-		v23
-	})
+	end, { props.videoRef, state6, state3 })
 
-	local v31 = React.useCallback(function(p2) -- line: 89
-		-- upvalues: t1 (copy), v22 (copy)
-		local videoRef = t1.videoRef
-		local v52 = if typeof(videoRef) ~= "table" or videoRef.current == nil then nil else videoRef.current
+	local onLoaded = React.useCallback(function(p)
+		local current = getCurrent(props.videoRef) -- inferred equivalent call
 
-		if not v52 then
+		if not current then
 			return
 		end
 
-		v22(v52.TimeLength)
-		t1.onLoaded(p2)
-	end, {
-		t1.onLoaded,
-		t1.videoRef
-	})
-	local v32 = React.useCallback(function() -- line: 99
-		-- upvalues: v30 (copy), v29 (copy)
-		v30(not v29)
-	end, { v29 })
-	local v33 = React.useCallback(function() -- line: 103
-		-- upvalues: t1 (copy), v23 (copy), v24 (copy), v19 (copy), v21 (copy)
-		local videoRef = t1.videoRef
-		local v54 = if typeof(videoRef) ~= "table" or videoRef.current == nil then nil else videoRef.current
+		setState2(current.TimeLength)
+		props.onLoaded(p)
+	end, { props.onLoaded, props.videoRef })
 
-		if not v54 then
+	local onActivated = React.useCallback(function()
+		setState6(not state6)
+	end, { state6 })
+
+	local onPlayButtonActivated = React.useCallback(function()
+		local current = getCurrent(props.videoRef) -- inferred equivalent call
+
+		if not current then
 			return
 		end
 
-		if not v23 then
-			v54:Pause()
-			v24(true)
+		if state3 then
+			if math.abs(state - state2) <= 0.1 then
+				current.TimePosition = 0
+			end
 
+			current:Play()
+			setState3(false)
+		else
+			current:Pause()
+			setState3(true)
+		end
+	end, { state3, props.videoRef, state, state2 })
+
+	local onActivated2 = React.useCallback(function()
+		if props.onExpandCallback then
+			props.onExpandCallback()
+		end
+
+		setState5(not state5)
+	end, { state5, props.onExpandCallback })
+
+	local onProgressBarActivated = React.useCallback(function(p)
+		local current = getCurrent(props.videoRef) -- inferred equivalent call
+
+		if not current then
 			return
 		end
 
-		if math.abs(v19 - v21) <= 0.1 then
-			v54.TimePosition = 0
+		current.TimePosition = current.TimeLength * p
+	end, { props.videoRef })
+
+	local onMuteButtonActivated = React.useCallback(function()
+		if props.onMuteCallback then
+			props.onMuteCallback()
 		end
 
-		v54:Play()
-		v24(false)
-	end, {
-		v23,
-		t1.videoRef,
-		v19,
-		v21
-	})
-	local v34 = React.useCallback(function() -- line: 121
-		-- upvalues: t1 (copy), v28 (copy), v27 (copy)
-		if t1.onExpandCallback then
-			t1.onExpandCallback()
-		end
+		local current = getCurrent(props.videoRef) -- inferred equivalent call
 
-		v28(not v27)
-	end, {
-		v27,
-		t1.onExpandCallback
-	})
-	local v35 = React.useCallback(function(p3) -- line: 129
-		-- upvalues: t1 (copy)
-		local videoRef = t1.videoRef
-		local v57 = if typeof(videoRef) ~= "table" or videoRef.current == nil then nil else videoRef.current
-
-		if not v57 then
+		if not current then
 			return
 		end
 
-		v57.TimePosition = v57.TimeLength * p3
-	end, { t1.videoRef })
-	local v36 = React.useCallback(function() -- line: 138
-		-- upvalues: t1 (copy), v25 (copy), v26 (copy)
-		if t1.onMuteCallback then
-			t1.onMuteCallback()
+		current.Volume = state4 and 1 or 0
+		setState4(not state4)
+	end, { state4, props.onMuteCallback, props.videoRef })
+
+	local v = not props.Playing
+
+	if v then
+		if props.thumbnailImage == nil then
+			v = false
+		else
+			v = props.thumbnailImage ~= ""
 		end
+	end
 
-		local videoRef = t1.videoRef
-		local v59 = if typeof(videoRef) ~= "table" or videoRef.current == nil then nil else videoRef.current
+	local playing = (props.Video or props.VideoContent)
+		and (props.Playing ~= nil and props.Playing or not props.thumbnailImage)
 
-		if not v59 then
-			return
-		end
-
-		v59.Volume = not v25 and 0 or 1
-		v26(not v25)
-	end, {
-		v25,
-		t1.onMuteCallback,
-		t1.videoRef
-	})
-	local v37 = not t1.Playing and (t1.thumbnailImage ~= nil and t1.thumbnailImage ~= "")
-	local v38 = (t1.Video or t1.VideoContent) and (t1.Playing ~= nil and t1.Playing or not t1.thumbnailImage)
 	local createElement = React.createElement
-	local v40 = View
-	local t2 = {
+	local v2 = {
 		tag = "shrink size-full",
-		onActivated = v32,
-		stateLayer = {
-			affordance = StateLayerAffordance.None
-		},
-		ZIndex = t1.ZIndex
+		onActivated = onActivated,
+		stateLayer = { affordance = StateLayerAffordance.None },
+		ZIndex = props.ZIndex
 	}
-	local t3 = {}
-	local videoRef = t1.videoRef
 
-	t3.HeaderBarContainer = if ((if typeof(videoRef) ~= "table" or videoRef.current == nil then nil else videoRef.current)) == nil or (not t1.onExpandCallback or (t1.isZooming or (v29 or t1.isOverlayDisabled))) then nil else React.createElement(View, {
-		tag = "anchor-top-center position-top-center size-full-0 auto-y padding-medium row align-x-right",
-		ZIndex = 3
-	}, {
-		ExpandButton = React.createElement(IconButton, {
-			isDisabled = false,
-			LayoutOrder = 1,
-			icon = not v27 and "icons/actions/previewExpand" or "icons/actions/previewShrink",
-			onActivated = v34,
-			size = ButtonSize.Medium
-		})
-	})
-	t3.VideoPreview = if not v38 then React.createElement(View, {
-		tag = "align-x-center align-y-center auto-xy items-center gap-medium"
-	}, {
-		Text = React.createElement(FoundationText, {
-			Text = "No video to display",
-			tag = "auto-xy"
-		})
-	}) else React.createElement(LoadableVideo, {
-		AnchorPoint = t1.AnchorPoint,
-		BackgroundTransparency = t1.BackgroundTransparency,
-		cornerRadius = t1.cornerRadius,
-		Looped = t1.Looped,
-		onLoaded = v31,
-		Playing = t1.Playing,
-		Position = t1.Position,
-		renderOnFailed = t1.renderOnFailed,
-		scaleType = t1.scaleType,
-		Size = t1.Size,
-		Video = t1.Video,
-		VideoContent = t1.VideoContent,
-		videoRef = t1.videoRef
-	})
+	local current = getCurrent(props.videoRef) -- inferred equivalent call
+	local headerBarContainer
 
-	local videoRef2 = t1.videoRef
+	if not (current == nil or not props.onExpandCallback or props.isZooming or state6 or props.isOverlayDisabled) then
+		headerBarContainer = React.createElement(
+			View,
+			{
+				tag = "anchor-top-center position-top-center size-full-0 auto-y padding-medium row align-x-right",
+				ZIndex = 3
+			},
+			{
+				ExpandButton = React.createElement(IconButton, {
+					icon = state5 and "icons/actions/previewShrink" or "icons/actions/previewExpand",
+					isDisabled = false,
+					LayoutOrder = 1,
+					onActivated = onActivated2,
+					size = ButtonSize.Medium
+				})
+			}
+		)
+	end
 
-	t3.ProgressBarContainer = if ((if typeof(videoRef2) ~= "table" or videoRef2.current == nil then nil else videoRef2.current)) == nil or (t1.isZooming or (v29 or t1.isOverlayDisabled)) then nil else React.createElement(View, {
-		tag = "anchor-bottom-center position-bottom-center size-full-0 auto-y",
-		ZIndex = 3
-	}, {
-		ProgressBar = React.createElement(ProgressBar, {
-			isMuted = v25,
-			isPlaying = not v23,
-			isTimeHidden = t1.isTimeHidden,
-			onMuteButtonActivated = v36,
-			onPlayButtonActivated = v33,
-			onProgressBarActivated = v35,
-			timePosition = v19,
-			timeLength = v21
-		})
-	})
-	t3.ShadowBlock = if v29 or t1.isOverlayDisabled then nil else React.createElement(View, {
-		tag = "size-full-full",
-		ZIndex = 2,
-		backgroundStyle = {
-			Transparency = 0.4,
-			Color3 = Color3.fromRGB(0, 0, 0)
-		},
-		stateLayer = {
-			affordance = Foundation.Enums.StateLayerAffordance.None
-		}
-	})
-	t3.ThumbnailImage = if not v37 then nil else React.createElement(FoundationImage, {
-		ZIndex = 2,
-		Image = t1.thumbnailImage,
-		Size = UDim2.fromScale(1, 1)
-	}, {
-		UICorner = if not t1.cornerRadius then nil else React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, t1.cornerRadius)
-		})
-	})
+	local videoPreview
 
-	return createElement(v40, t2, t3)
+	if playing then
+		videoPreview = React.createElement(LoadableVideo, {
+			AnchorPoint = props.AnchorPoint,
+			BackgroundTransparency = props.BackgroundTransparency,
+			cornerRadius = props.cornerRadius,
+			Looped = props.Looped,
+			onLoaded = onLoaded,
+			Playing = props.Playing,
+			Position = props.Position,
+			renderOnFailed = props.renderOnFailed,
+			scaleType = props.scaleType,
+			Size = props.Size,
+			Video = props.Video,
+			VideoContent = props.VideoContent,
+			videoRef = props.videoRef
+		})
+	else
+		videoPreview = React.createElement(
+			View,
+			{ tag = "align-x-center align-y-center auto-xy items-center gap-medium" },
+			{
+				Text = React.createElement(Text, { Text = "No video to display", tag = "auto-xy" })
+			}
+		)
+	end
+
+	local current2 = getCurrent(props.videoRef) -- inferred equivalent call
+	local progressBarContainer
+
+	if not (current2 == nil or props.isZooming or state6 or props.isOverlayDisabled) then
+		progressBarContainer = React.createElement(
+			View,
+			{ tag = "anchor-bottom-center position-bottom-center size-full-0 auto-y", ZIndex = 3 },
+			{
+				ProgressBar = React.createElement(ProgressBar, {
+					isMuted = state4,
+					isPlaying = not state3,
+					isTimeHidden = props.isTimeHidden,
+					onMuteButtonActivated = onMuteButtonActivated,
+					onPlayButtonActivated = onPlayButtonActivated,
+					onProgressBarActivated = onProgressBarActivated,
+					timePosition = state,
+					timeLength = state2
+				})
+			}
+		)
+	end
+
+	local shadowBlock
+
+	if not (state6 or props.isOverlayDisabled) then
+		shadowBlock = React.createElement(View, {
+			backgroundStyle = { Color3 = Color3.fromRGB(0, 0, 0), Transparency = 0.4 },
+			stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
+			tag = "size-full-full",
+			ZIndex = 2
+		})
+	end
+
+	local thumbnailImage
+
+	if v then
+		local createElement2 = React.createElement
+		local v3 = { Image = props.thumbnailImage, Size = UDim2.fromScale(1, 1), ZIndex = 2 }
+		local uiCorner
+
+		if props.cornerRadius then
+			uiCorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, props.cornerRadius)
+			})
+		end
+
+		thumbnailImage = createElement2(Image, v3, { UICorner = uiCorner })
+	end
+
+	return createElement(View, v2, {
+		HeaderBarContainer = headerBarContainer,
+		VideoPreview = videoPreview,
+		ProgressBarContainer = progressBarContainer,
+		ShadowBlock = shadowBlock,
+		ThumbnailImage = thumbnailImage
+	})
 end
 
 return MediaPlayer

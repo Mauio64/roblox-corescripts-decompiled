@@ -1,5 +1,5 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local t = require(ParentParent.Parent.t)
+local parent = script.Parent.Parent.Parent.Parent
+local t = require(parent.Parent.t)
 
 return t.strictInterface({
 	Color = t.Color3,

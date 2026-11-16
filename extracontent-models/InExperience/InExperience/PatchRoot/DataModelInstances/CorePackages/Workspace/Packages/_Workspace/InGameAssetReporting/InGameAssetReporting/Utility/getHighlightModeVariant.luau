@@ -1,15 +1,18 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
+
 local IXPService = game:GetService("IXPService")
-local InGameAssetReportingParent = InGameAssetReporting.Parent
-local SharedFlags = require(InGameAssetReportingParent.SharedFlags)
+
+local parent = InGameAssetReporting.Parent
+local SharedFlags = require(parent.SharedFlags)
+
 local FStringReportMenuIXPLayer = SharedFlags.FStringReportMenuIXPLayer
 local FFlagHighlightModePreciseSelectionEnabled = SharedFlags.FFlagHighlightModePreciseSelectionEnabled
 local FStringHighlightModePreciseSelectionIXPField = SharedFlags.FStringHighlightModePreciseSelectionIXPField
 local FStringHighlightModePreciseSelectionForceVariant = SharedFlags.FStringHighlightModePreciseSelectionForceVariant
+
 local Constants = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants)
 
-local function getHighlightModeVariant() -- line: 15
-	-- upvalues: FFlagHighlightModePreciseSelectionEnabled (copy), Constants (copy), FStringHighlightModePreciseSelectionForceVariant (copy), IXPService (copy), FStringReportMenuIXPLayer (copy), FStringHighlightModePreciseSelectionIXPField (copy)
+local function getHighlightModeVariant()
 	if not FFlagHighlightModePreciseSelectionEnabled then
 		return Constants.HighlightModeVariants.Default
 	end
@@ -18,16 +21,15 @@ local function getHighlightModeVariant() -- line: 15
 		return FStringHighlightModePreciseSelectionForceVariant
 	end
 
-	local ok, result = pcall(function() -- line: 24
-		-- upvalues: IXPService (copy), FStringReportMenuIXPLayer (copy)
+	local success, result = pcall(function()
 		return IXPService:GetUserLayerVariables(FStringReportMenuIXPLayer)
 	end)
 
-	if not ok or not result or result[FStringHighlightModePreciseSelectionIXPField] == nil then
-		return Constants.HighlightModeVariants.Default
+	if success and result and result[FStringHighlightModePreciseSelectionIXPField] ~= nil then
+		return result[FStringHighlightModePreciseSelectionIXPField]
 	end
 
-	return result[FStringHighlightModePreciseSelectionIXPField]
+	return Constants.HighlightModeVariants.Default
 end
 
 return getHighlightModeVariant

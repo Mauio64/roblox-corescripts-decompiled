@@ -1,3 +1,1 @@
-return {
-	TabBarVisible = require(script.TabBarVisible)
-}
+return { TabBarVisible = require(script.TabBarVisible) }

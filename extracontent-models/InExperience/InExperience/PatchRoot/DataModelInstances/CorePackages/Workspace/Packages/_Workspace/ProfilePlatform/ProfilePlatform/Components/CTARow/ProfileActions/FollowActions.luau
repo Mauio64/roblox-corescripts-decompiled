@@ -1,66 +1,133 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local ButtonVariant = require(ProfilePlatformParent.Foundation).Enums.ButtonVariant
+local parent = ProfilePlatform.Parent
+
+local Foundation = require(parent.Foundation)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialFollowAttribution = SharedFlags.FFlagSocialFollowAttribution
+local FollowAttribution
+
+if FFlagSocialFollowAttribution then
+	FollowAttribution = require(parent.SocialCommon.FollowAttribution)
+else
+	FollowAttribution = nil
+end
+
+local ButtonVariant = Foundation.Enums.ButtonVariant
+
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
 local GroupsNetworking = require(ProfilePlatform.Networking.GroupsNetworking)
 local getProfilePlatform = require(ProfilePlatform.Networking.getProfilePlatform)
+local refreshProfilePlatformActionInfo = require(ProfilePlatform.Networking.refreshProfilePlatformActionInfo)
 local getAvailableCommunityComponents = require(ProfilePlatform.Hooks.getAvailableCommunityComponents)
 local Enums = require(ProfilePlatform.Common.Enums)
-
 require(ProfilePlatform.Components.CTARow.Types)
-
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local ProfileTypes = Enums.ProfileTypes
-local FFlagProfilePlatformUpdateUXForNonSocialCommunities = require(ProfilePlatform.Flags.FFlagProfilePlatformUpdateUXForNonSocialCommunities)
+
+local FFlagProfilePlatformEnableUserFollow = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableUserFollow)
+local Following = require(parent.DataHydration.Following)
+local FollowingStore = Following.FollowingStore
+local FollowingUpdateErrorTypeEnum = Following.FollowingUpdateErrorTypeEnum
+local GenericChallenges = require(parent.GenericChallenges)
+local createChallengeNetwork = GenericChallenges.Middleware.createChallengeNetwork
+
+local function handleUpdateUserFollowStatus(data, callback, toastMessage: string, callback2)
+	return callback(data.profileId, createChallengeNetwork()):andThen(function()
+		if FFlagSocialFollowAttribution and callback2 then
+			callback2()
+		end
+
+		data.dispatch(SetCurrentToastMessage({ toastMessage = toastMessage, isLocalized = true }))
+
+		return data.dispatch(refreshProfilePlatformActionInfo(data.profileId, data.actionsComponentRequest))
+	end, function(p)
+		local dispatch = data.dispatch
+		local toastMessage2
+
+		if p == nil or p.errorType ~= FollowingUpdateErrorTypeEnum.Captcha then
+			toastMessage2 = data.localized.somethingIsWrongToast
+		else
+			toastMessage2 = data.localized.userNotPassedCaptchaError
+		end
+
+		dispatch(SetCurrentToastMessage({ toastMessage = toastMessage2, isLocalized = true }))
+	end)
+end
 
 return {
-	[Enums.ProfileActions.Follow] = if not FFlagProfilePlatformUpdateUXForNonSocialCommunities then nil else function(p1) -- line: 21
-		-- upvalues: ButtonVariant (copy), Enums (copy), ProfileTypes (copy), EventNames (copy), GroupsNetworking (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
+	[Enums.ProfileActions.Follow] = function(data)
 		return {
 			variant = ButtonVariant.Standard,
-			text = p1.localized[Enums.ProfileActions.Follow],
+			text = data.localized[Enums.ProfileActions.Follow],
 			onActivated = {
-				[ProfileTypes.Community] = function() -- line: 26
-					-- upvalues: p1 (copy), EventNames (copy), GroupsNetworking (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
-					p1.analytics.fireAnalyticsEvent(EventNames.CTAButtonFollow, {
-						buttonSurface = p1.buttonSurface
+				[ProfileTypes.User] = FFlagProfilePlatformEnableUserFollow and function()
+					data.analytics.fireAnalyticsEvent(EventNames.CTAButtonFollow, {
+						buttonSurface = data.buttonSurface
 					})
 
-					return p1.dispatch(GroupsNetworking.JoinGroup.API({
-						groupId = p1.profileId
-					})):andThen(function() -- line: 34
-						-- upvalues: p1 (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
-						p1.dispatch(getProfilePlatform.API({
-							includeComponentOrdering = true,
-							profileType = p1.profileType,
-							profileId = p1.profileId,
-							components = getAvailableCommunityComponents()
+					return handleUpdateUserFollowStatus(
+						data,
+						FollowingStore.get().Follow,
+						data.localized.followedToast,
+						FFlagSocialFollowAttribution and function()
+							FollowAttribution.reportFollowSuccess({
+								surface = FollowAttribution.Surface.Profile,
+								source = data.profileWrapperContext.sourceInfo.source
+							})
+						end or nil
+					)
+				end or nil,
+				[ProfileTypes.Community] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.CTAButtonFollow, {
+						buttonSurface = data.buttonSurface
+					})
+
+					return data.dispatch(GroupsNetworking.JoinGroup.API({ groupId = data.profileId })):andThen(function()
+						data.dispatch(getProfilePlatform.API({
+							profileType = data.profileType,
+							profileId = data.profileId,
+							components = getAvailableCommunityComponents(),
+							includeComponentOrdering = true
 						}))
 					end)
 				end
 			}
 		}
 	end,
-	[Enums.ProfileActions.Unfollow] = if not FFlagProfilePlatformUpdateUXForNonSocialCommunities then nil else function(p2) -- line: 49
-		-- upvalues: Enums (copy), ProfileTypes (copy), EventNames (copy), GroupsNetworking (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
+	[Enums.ProfileActions.Unfollow] = function(data)
+		if data.profileType == ProfileTypes.Community and data.viewerOwnsOpenCommunity then
+			return nil
+		end
+
 		return {
-			text = p2.localized[Enums.ProfileActions.Unfollow],
+			text = data.localized[Enums.ProfileActions.Unfollow],
 			onActivated = {
-				[ProfileTypes.Community] = function() -- line: 53
-					-- upvalues: p2 (copy), EventNames (copy), GroupsNetworking (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
-					p2.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonUnfollow, {
-						buttonSurface = p2.buttonSurface
+				[ProfileTypes.User] = FFlagProfilePlatformEnableUserFollow and function()
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonUnfollow, {
+						buttonSurface = data.buttonSurface
 					})
 
-					return p2.dispatch(GroupsNetworking.LeaveGroup.API({
-						groupId = p2.profileId,
-						userId = p2.localUserId
-					})):andThen(function() -- line: 63
-						-- upvalues: p2 (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
-						p2.dispatch(getProfilePlatform.API({
-							includeComponentOrdering = true,
-							profileType = p2.profileType,
-							profileId = p2.profileId,
-							components = getAvailableCommunityComponents()
+					return handleUpdateUserFollowStatus(
+						data,
+						FollowingStore.get().Unfollow,
+						data.localized.unfollowedToast
+					)
+				end or nil,
+				[ProfileTypes.Community] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.ContextualMenuButtonUnfollow, {
+						buttonSurface = data.buttonSurface
+					})
+
+					return data.dispatch(GroupsNetworking.LeaveGroup.API({
+						groupId = data.profileId,
+						userId = data.localUserId
+					})):andThen(function()
+						data.dispatch(getProfilePlatform.API({
+							profileType = data.profileType,
+							profileId = data.profileId,
+							components = getAvailableCommunityComponents(),
+							includeComponentOrdering = true
 						}))
 					end)
 				end

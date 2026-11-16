@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagLuaAppEdpMediaGalleryVideoPreview) and game:DefineFastFlag("LuaAppEdpConsoleMediaGalleryVideo", false)
+local FFlagLuaAppEdpMediaGalleryVideoPreview = require(script.Parent.FFlagLuaAppEdpMediaGalleryVideoPreview)
+
+return FFlagLuaAppEdpMediaGalleryVideoPreview and game:DefineFastFlag("LuaAppEdpConsoleMediaGalleryVideo", false)

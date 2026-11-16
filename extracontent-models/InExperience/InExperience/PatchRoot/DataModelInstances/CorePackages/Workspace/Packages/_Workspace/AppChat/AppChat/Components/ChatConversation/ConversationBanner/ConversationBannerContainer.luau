@@ -1,25 +1,26 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
 
+local AppChatNetworking = require(parent.AppChatNetworking)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 require(AppChat.types)
-
 local ConversationTopModal = AppChatNetworking.Constants.ConversationTopModal
 local ConversationOverlay = AppChatNetworking.Constants.ConversationOverlay
 local EnumScreens = require(AppChat.EnumScreens)
-local useNavigation = require(AppChatParent.Navigation).useNavigation
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
 local ConversationTopModalTelemetry = require(script.Parent.Parent.ConversationTopModalTelemetry)
 local ModalTelemetry = require(AppChat.Components.ModalTelemetry)
 local useGetConversationFromId = require(AppChat.Hooks.useGetConversationFromId)
-
+local useGetOneToOneFriendIdFromConversationId = require(AppChat.Hooks.useGetOneToOneFriendIdFromConversationId)
 require(AppChat.Models.ConversationChannels)
 
 local ConversationBanner = require(script.Parent.ConversationBanner)
-local t1 = {
+
+local v = {
 	[ConversationTopModal.AddTrustedConnection] = {
 		onActivatedOverlayVariant = ConversationOverlay.AddTrustedConnectionU18
 	},
@@ -27,70 +28,69 @@ local t1 = {
 		onActivatedOverlayVariant = ConversationOverlay.TrustedConnectionRequestU18
 	}
 }
-local t2 = {
+
+local v2 = {
 	actionText = "PLACEHOLDER Action",
 	bodyText = "PLACEHOLDER Body",
-	onDismissed = function() -- line: 53
-	end
+	onDismissed = function() end
 }
 
-local function ConversationBannerContainer(t3: {[any]: any}) -- line: 56
-	-- upvalues: Cryo (copy), t2 (copy), useNavigation (copy), t1 (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), useGetConversationFromId (copy), React (copy), ConversationTopModalTelemetry (copy), ModalTelemetry (copy), EnumScreens (copy), ConversationBanner (copy)
-	local v20 = Cryo.Dictionary.union(t2, t3)
-	local v21 = useNavigation()
-	local v22 = t1[v20.modalVariant]
-	local u23 = nil
-	local v24 = useTelemetry(ChatConversationTelemetryLayer.Context)
-	local v25 = useGetConversationFromId(v20.conversationId)
+local function ConversationBannerContainer(p)
+	local union = Cryo.Dictionary.union(v2, p)
+	local v3 = useNavigation()
+	local v4 = v[union.modalVariant]
 
-	if v25 and v25.participants then
-		u23 = table.concat(v25.participants, ",")
+	local v5 = useTelemetry(ChatConversationTelemetryLayer.Context)
+	local v6 = useGetConversationFromId(union.conversationId)
+	local joined
+
+	if v6 and v6.participants then
+		joined = table.concat(v6.participants, ",")
+	else
+		joined = nil
 	end
 
-	React.useEffect(function() -- line: 66
-		-- upvalues: v24 (copy), ConversationTopModalTelemetry (copy), v20 (copy), u23 (ref)
-		v24.emit(ConversationTopModalTelemetry.Events.ModalRendered, {
-			modalVariant = v20.modalVariant,
-			modalContext = u23
+	local userId = useGetOneToOneFriendIdFromConversationId(union.conversationId)
+	React.useEffect(function()
+		v5.emit(ConversationTopModalTelemetry.Events.ModalRendered, {
+			modalVariant = union.modalVariant,
+			modalContext = joined
 		})
-	end, { v20.modalVariant })
+	end, { union.modalVariant })
 
-	local v26 = React.useCallback(function() -- line: 73
-		-- upvalues: v20 (copy), v24 (copy), ConversationTopModalTelemetry (copy), ModalTelemetry (copy), u23 (ref)
-		v20.onDismissed()
-		v24.emit(ConversationTopModalTelemetry.Events.ModalAction, {
-			modalVariant = v20.modalVariant,
+	local onDismissed = React.useCallback(function()
+		union.onDismissed()
+		v5.emit(ConversationTopModalTelemetry.Events.ModalAction, {
+			modalVariant = union.modalVariant,
 			action = ModalTelemetry.Enums.ModalActions.Dismiss,
-			modalContext = u23
+			modalContext = joined
 		})
-	end, { v20.onDismissed })
-	local v27 = React.useCallback(function() -- line: 82
-		-- upvalues: v22 (copy), v21 (copy), EnumScreens (copy), v20 (copy), v24 (copy), ConversationTopModalTelemetry (copy), ModalTelemetry (copy), u23 (ref)
-		if v22 then
-			v21.navigate(EnumScreens.TrustedConnectionsUpsell, {
-				isOverlay = true,
-				modalVariant = v22.onActivatedOverlayVariant,
-				conversationId = v20.conversationId
+	end, { union.onDismissed })
+
+	local onActivated = React.useCallback(function()
+		if v4 then
+			v3.navigate(EnumScreens.TrustedConnectionsUpsell, {
+				userId = userId,
+				modalVariant = v4.onActivatedOverlayVariant,
+				conversationId = union.conversationId,
+				isOverlay = true
 			})
 		end
 
-		v24.emit(ConversationTopModalTelemetry.Events.ModalAction, {
-			modalVariant = v20.modalVariant,
+		v5.emit(ConversationTopModalTelemetry.Events.ModalAction, {
+			modalVariant = union.modalVariant,
 			action = ModalTelemetry.Enums.ModalActions.PrimaryCta,
-			modalContext = u23
+			modalContext = joined
 		})
-	end, {
-		v21,
-		v22
-	})
+	end, { v3, v4, userId })
 
-	if v22 then
+	if v4 then
 		return React.createElement(ConversationBanner, {
-			actionText = v20.actionText,
-			bodyText = v20.bodyText,
-			onDismissed = v26,
-			onActivated = v27,
-			layoutOrder = v20.layoutOrder
+			actionText = union.actionText,
+			bodyText = union.bodyText,
+			onDismissed = onDismissed,
+			onActivated = onActivated,
+			layoutOrder = union.layoutOrder
 		})
 	end
 

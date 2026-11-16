@@ -1,17 +1,32 @@
 local ChromeShared = script:FindFirstAncestor("ChromeShared")
+
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagEnableMenuTrailingBadge = SharedFlags.FFlagEnableMenuTrailingBadge
-local v8 = game:DefineFastFlag("AvatarSwitcherHamburgerExposure", false)
-local v9 = game:DefineFastString("AvatarSwitcherIXPLayer", "UIEcosystem.User.Migration")
-local FFlagUnibarMenuOpenSubmenu = require(script.Parent.Parent.Parent.Flags).FFlagUnibarMenuOpenSubmenu
-local FFlagTokenizeUnibarConstantsWithStyleProvider = require(ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider
+local defineFastFlag = game:DefineFastFlag("AvatarSwitcherHamburgerExposure", false)
+local defineFastString = game:DefineFastString("AvatarSwitcherIXPLayer", "UIEcosystem.User.Migration")
+
+local Flags = require(script.Parent.Parent.Parent.Flags)
+local FFlagUnibarMenuOpenSubmenu = Flags.FFlagUnibarMenuOpenSubmenu
+
+local Flags2 = require(ChromeShared.Flags)
+local FFlagTokenizeUnibarConstantsWithStyleProvider = Flags2.FFlagTokenizeUnibarConstantsWithStyleProvider
+
 local React = require(CorePackages.Packages.React)
 local UIBlox = require(CorePackages.Packages.UIBlox)
-local v14 = if not FFlagEnableConsoleExpControls then nil else require(CorePackages.Workspace.Packages.InputUi).Gamepad.GamepadUtils
+local gamepadUtils
+
+if FFlagEnableConsoleExpControls then
+	local InputUi = require(CorePackages.Workspace.Packages.InputUi)
+	gamepadUtils = InputUi.Gamepad.GamepadUtils
+else
+	gamepadUtils = nil
+end
+
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local useStyle = UIBlox.Core.Style.useStyle
 local Interactable = UIBlox.Core.Control.Interactable
@@ -19,61 +34,83 @@ local ControlState = UIBlox.Core.Control.Enum.ControlState
 local VerticalScrollView = UIBlox.App.Container.VerticalScrollView
 local ScrollBarType = UIBlox.App.Container.Enum.ScrollBarType
 local ReactOtter = require(CorePackages.Packages.ReactOtter)
-local IXPServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper
+local IxpServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper)
+local IXPServiceWrapper = IxpServiceWrapper.IXPServiceWrapper
+
 local Foundation = require(CorePackages.Packages.Foundation)
 local useCursor = Foundation.Hooks.useCursor
+
 local Service = require(ChromeShared.Service)
 local Chrome = require(CorePackages.Workspace.Packages.Chrome)
 local ViewportUtil = require(ChromeShared.Service.ViewportUtil)
 local Constants = require(ChromeShared.Unibar.Constants)
-local v29 = if not FFlagEnableConsoleExpControls then nil else require(ChromeShared.Parent.Parent.TopBar.Components.MenuIconContext)
+local MenuIconContext
+
+if FFlagEnableConsoleExpControls then
+	MenuIconContext = require(ChromeShared.Parent.Parent.TopBar.Components.MenuIconContext)
+else
+	MenuIconContext = nil
+end
+
 local SubMenuContext = require(ChromeShared.Unibar.SubMenuContext)
-local v31 = if not FFlagEnableMenuTrailingBadge then nil else require(ChromeShared.Unibar.MenuTrailingBadge)
+local MenuTrailingBadge
+
+if FFlagEnableMenuTrailingBadge then
+	MenuTrailingBadge = require(ChromeShared.Unibar.MenuTrailingBadge)
+else
+	MenuTrailingBadge = nil
+end
+
 local UnibarStyle = Chrome.UnibarStyle
+
 local UserInputService = game:GetService("UserInputService")
+
 local useChromeMenuItems = require(ChromeShared.Hooks.useChromeMenuItems)
 local useObservableValue = require(ChromeShared.Hooks.useObservableValue)
 local useTopbarInsetHeight = require(ChromeShared.Hooks.useTopbarInsetHeight)
 local useMappedObservableValue = require(ChromeShared.Hooks.useMappedObservableValue)
-local v38 = game:DefineFastFlag("FixChromeIntegrationLayoutBug", false)
-local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
-local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
-local InExperienceUIVRIXP = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).InExperienceUIVRIXP
-local UIManager = nil
+
+local defineFastFlag2 = game:DefineFastFlag("FixChromeIntegrationLayoutBug", false)
+
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
+
+local SharedExperimentDefinition = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local isInExperienceUIVREnabled = SharedExperimentDefinition.isInExperienceUIVREnabled
+local SharedExperimentDefinition2 = require(CorePackages.Workspace.Packages.SharedExperimentDefinition)
+local InExperienceUIVRIXP = SharedExperimentDefinition2.InExperienceUIVRIXP
+local uiManager
 
 if isInExperienceUIVREnabled then
-	UIManager = require(CorePackages.Workspace.Packages.VrSpatialUi).UIManager
+	local VrSpatialUi = require(CorePackages.Workspace.Packages.VrSpatialUi)
+	uiManager = VrSpatialUi.UIManager
+else
+	uiManager = nil
 end
 
 local IconHost = require(ChromeShared.Unibar.ComponentHosts.IconHost)
 local RoundedSlot = Foundation.Enums.CursorType.RoundedSlot
-local vector2 = Vector2.new(0, 0)
-local _ = {
-	Closed = 0,
-	Open = 1
-}
-local t1 = {}
-local u48 = nil
 
-function MenuRow(p1) -- line: 86
-	-- upvalues: useStyle (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy), SubMenuContext (copy), FFlagEnableConsoleExpControls (copy), v29 (copy), ControlState (copy), FFlagEnableMenuTrailingBadge (copy), Service (copy), GuiService (copy), StyledTextLabel (copy), IconHost (copy), v31 (copy), isInExperienceUIVREnabled (copy), InExperienceUIVRIXP (copy), UIManager (ref), Interactable (copy), useCursor (copy), RoundedSlot (copy), v38 (copy)
-	local Theme = useStyle().Theme
-	local t2 = {
-		Transparency = 1,
-		Color = Color3.new(0, 0, 0)
-	}
+local vector2 = Vector2.new(0, 0)
+
+local _ = { Closed = 0, Open = 1 }
+local items = {}
+local v = nil
+
+function MenuRow(props)
+	local theme = useStyle().Theme
+	local v2 = { Color = Color3.new(0, 0, 0), Transparency = 1 }
 	local ICON_SIZE, SUB_MENU_ROW_HEIGHT, SUBMENU_PADDING_LEFT, SUBMENU_PADDING_RIGHT, SUBMENU_ROW_LABEL_FONT, SUBMENU_ROW_PADDING, SUBMENU_ROW_CORNER_RADIUS
 
 	if FFlagTokenizeUnibarConstantsWithStyleProvider then
-		local v52 = UnibarStyle.use()
-
-		ICON_SIZE = v52.ICON_SIZE
-		SUB_MENU_ROW_HEIGHT = v52.SUB_MENU_ROW_HEIGHT
-		SUBMENU_PADDING_LEFT = v52.SUBMENU_PADDING_LEFT
-		SUBMENU_PADDING_RIGHT = v52.SUBMENU_PADDING_RIGHT
-		SUBMENU_ROW_LABEL_FONT = v52.SUBMENU_ROW_LABEL_FONT
-		SUBMENU_ROW_PADDING = v52.SUBMENU_ROW_PADDING
-		SUBMENU_ROW_CORNER_RADIUS = v52.SUBMENU_ROW_CORNER_RADIUS
+		local v3 = UnibarStyle.use()
+		ICON_SIZE = v3.ICON_SIZE
+		SUB_MENU_ROW_HEIGHT = v3.SUB_MENU_ROW_HEIGHT
+		SUBMENU_PADDING_LEFT = v3.SUBMENU_PADDING_LEFT
+		SUBMENU_PADDING_RIGHT = v3.SUBMENU_PADDING_RIGHT
+		SUBMENU_ROW_LABEL_FONT = v3.SUBMENU_ROW_LABEL_FONT
+		SUBMENU_ROW_PADDING = v3.SUBMENU_ROW_PADDING
+		SUBMENU_ROW_CORNER_RADIUS = v3.SUBMENU_ROW_CORNER_RADIUS
 	else
 		ICON_SIZE = Constants.ICON_SIZE
 		SUB_MENU_ROW_HEIGHT = Constants.SUB_MENU_ROW_HEIGHT
@@ -84,67 +121,92 @@ function MenuRow(p1) -- line: 86
 		SUBMENU_ROW_CORNER_RADIUS = Constants.SUBMENU_ROW_CORNER_RADIUS
 	end
 
-	local v60 = React.useContext(SubMenuContext)
-	local v61 = if not FFlagEnableConsoleExpControls then nil else React.useContext(v29)
-	local v62, v63 = React.useBinding(t2)
-	local v64 = React.useCallback(function(_, p3) -- line: 125
-		-- upvalues: ControlState (copy), v63 (copy), Theme (copy), t2 (copy)
-		if p3 == ControlState.Pressed then
-			v63(Theme.BackgroundOnPress)
+	local v3 = React.useContext(SubMenuContext)
+	local v4
 
-			return
+	if FFlagEnableConsoleExpControls then
+		v4 = React.useContext(MenuIconContext)
+	end
+
+	local v5, v6 = React.useBinding(v2)
+
+	local onStateChanged = React.useCallback(function(_, p)
+		if p == ControlState.Pressed then
+			v6(theme.BackgroundOnPress)
+		elseif p == ControlState.Hover then
+			v6(theme.BackgroundOnHover)
+		else
+			v6(v2)
 		end
-
-		if p3 == ControlState.Hover then
-			v63(Theme.BackgroundOnHover)
-
-			return
-		end
-
-		v63(t2)
 	end)
-	local v65 = if not FFlagEnableMenuTrailingBadge then nil else p1.integration.menuTrailingBadgeConfig
-	local v66 = React.useCallback(function() -- line: 137
-		-- upvalues: FFlagEnableConsoleExpControls (copy), Service (copy), GuiService (copy), p1 (copy)
-		if FFlagEnableConsoleExpControls then
-			Service:disableFocusNav()
-			GuiService.SelectedCoreObject = nil
-			Service:setShortcutBar(nil)
-			Service:selectedItem():set(nil)
-			p1.activated()
+	local menuTrailingBadgeConfig
+
+	if FFlagEnableMenuTrailingBadge then
+		menuTrailingBadgeConfig = props.integration.menuTrailingBadgeConfig
+	end
+
+	local v7 = React.useCallback(function()
+		if not FFlagEnableConsoleExpControls then
+			props.activated()
 
 			return
 		end
 
-		p1.activated()
-	end, { p1.id })
-	local v67 = React.createElement(StyledTextLabel, {
-		lineHeight = 1,
-		fluidSizing = true,
-		richText = true,
-		size = if not FFlagEnableMenuTrailingBadge then UDim2.new(1, -ICON_SIZE - SUBMENU_PADDING_LEFT - SUBMENU_PADDING_RIGHT, 1, 0) else UDim2.fromScale(1, 1),
-		fontStyle = SUBMENU_ROW_LABEL_FONT,
-		colorStyle = if not v60 then Theme.TextEmphasis else {
-			Color = Theme.TextEmphasis.Color,
-			Transparency = v60:map(function(p4) -- line: 161
-				return 1 - p4
+		Service:disableFocusNav()
+		GuiService.SelectedCoreObject = nil
+		Service:setShortcutBar(nil)
+		Service:selectedItem():set(nil)
+		props.activated()
+	end, { props.id })
+
+	local createElement = React.createElement
+	local size
+
+	if FFlagEnableMenuTrailingBadge then
+		size = UDim2.fromScale(1, 1)
+	else
+		size = UDim2.new(1, -ICON_SIZE - SUBMENU_PADDING_LEFT - SUBMENU_PADDING_RIGHT, 1, 0)
+	end
+
+	local colorStyle
+
+	if v3 then
+		colorStyle = {
+			Color = theme.TextEmphasis.Color,
+			Transparency = v3:map(function(p)
+				return 1 - p
 			end)
-		},
-		text = p1.integration.label,
+		}
+	else
+		colorStyle = theme.TextEmphasis
+	end
+
+	local v8 = createElement(StyledTextLabel, {
+		size = size,
+		lineHeight = 1,
+		fontStyle = SUBMENU_ROW_LABEL_FONT,
+		colorStyle = colorStyle,
+		text = props.integration.label,
 		textTruncate = Enum.TextTruncate.AtEnd,
-		textXAlignment = Enum.TextXAlignment.Left
+		textXAlignment = Enum.TextXAlignment.Left,
+		fluidSizing = true,
+		richText = true
 	})
-	local v68 = if not FFlagEnableMenuTrailingBadge then v67 else React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = UDim2.fromScale(0, 1)
-	}, {
-		UIFlexItem = React.createElement("UIFlexItem", {
-			FlexMode = Enum.UIFlexMode.Fill
-		}),
-		StyledTextLabel = v67
-	})
-	local v69 = React.createElement(React.Fragment, nil, {
+
+	if FFlagEnableMenuTrailingBadge then
+		v8 = React.createElement(
+			"Frame",
+			{ Size = UDim2.fromScale(0, 1), BackgroundTransparency = 1, BorderSizePixel = 0 },
+			{
+				UIFlexItem = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill }),
+				StyledTextLabel = v8
+			}
+		)
+	end
+
+	local createElement2 = React.createElement
+	local fragment = React.Fragment
+	local v9 = {
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, SUBMENU_PADDING_LEFT),
 			PaddingRight = UDim.new(0, SUBMENU_PADDING_RIGHT)
@@ -156,64 +218,95 @@ function MenuRow(p1) -- line: 86
 			Padding = UDim.new(0, SUBMENU_ROW_PADDING)
 		}),
 		IconHost = React.createElement(IconHost, {
-			disableButtonBehaviors = true,
-			integration = p1
+			integration = props,
+			disableButtonBehaviors = true
 		}),
-		Label = v68,
-		TrailingBadge = if not FFlagEnableMenuTrailingBadge or not v65 then nil else React.createElement(v31, {
-			integrationId = p1.integration.id,
-			config = v65
-		})
-	})
-	local v70 = (not isInExperienceUIVREnabled or InExperienceUIVRIXP:isSpatialUIScalingFixEnabled()) and 1 or UIManager.getInstance():getAdditionalCameraScaleIfNeeded()
+		Label = v8,
+		TrailingBadge = 0
+	}
+	local trailingBadge
 
-	return React.createElement(Interactable, {
-		Size = UDim2.new(1, 0, 0, SUB_MENU_ROW_HEIGHT * v70),
+	if FFlagEnableMenuTrailingBadge and menuTrailingBadgeConfig then
+		trailingBadge = React.createElement(MenuTrailingBadge, {
+			integrationId = props.integration.id,
+			config = menuTrailingBadgeConfig
+		})
+	end
+
+	v9.TrailingBadge = trailingBadge
+	local rowLabel = createElement2(fragment, nil, v9)
+
+	local v10 = (not isInExperienceUIVREnabled or InExperienceUIVRIXP:isSpatialUIScalingFixEnabled()) and 1
+		or uiManager.getInstance():getAdditionalCameraScaleIfNeeded()
+
+	local createElement3 = React.createElement
+	local v11 = {
+		["Size"] = nil,
+		Size = UDim2.new(1, 0, 0, SUB_MENU_ROW_HEIGHT * v10),
 		BorderSizePixel = 0,
-		BackgroundTransparency = v62:map(function(p5) -- line: 225
-			return p5.Transparency
+		BackgroundTransparency = v5:map(function(p)
+			return p.Transparency
 		end),
-		BackgroundColor3 = v62:map(function(p6) -- line: 228
-			return p6.Color
+		BackgroundColor3 = v5:map(function(p)
+			return p.Color
 		end),
 		SelectionImageObject = useCursor(RoundedSlot),
-		[React.Event.Activated] = v66,
-		LayoutOrder = p1.order,
-		onStateChanged = v64,
-		NextSelectionLeft = if not FFlagEnableConsoleExpControls then nil else v61.menuIconRef
-	}, {
+		[React.Event.Activated] = v7,
+		LayoutOrder = props.order,
+		onStateChanged = onStateChanged
+	}
+	local nextSelectionLeft
+
+	if FFlagEnableConsoleExpControls then
+		nextSelectionLeft = v4.menuIconRef
+	end
+
+	v11.NextSelectionLeft = nextSelectionLeft
+	local v12 = {
 		UICorner = React.createElement("UICorner", {
 			CornerRadius = UDim.new(0, SUBMENU_ROW_CORNER_RADIUS)
 		}),
-		RowLabel = if not v38 then v69 else React.createElement("Frame", {
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0),
-			LayoutOrder = p1.order
-		}, { v69 })
-	})
+		RowLabel = 0
+	}
+
+	if defineFastFlag2 then
+		rowLabel = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 1, 0),
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				LayoutOrder = props.order
+			},
+			{ rowLabel }
+		)
+	end
+
+	v12.RowLabel = rowLabel
+	return createElement3(Interactable, v11, v12)
 end
-function isLeft(p7) -- line: 253
-	return p7 == Enum.HorizontalAlignment.Left
+
+function isLeft(p): boolean
+	return p == Enum.HorizontalAlignment.Left
 end
-function SubMenu(t3: {[any]: any}) -- line: 257
-	-- upvalues: useStyle (copy), React (copy), useObservableValue (copy), ViewportUtil (copy), useTopbarInsetHeight (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), GuiService (copy), Service (copy), FFlagEnableConsoleExpControls (copy), UserInputService (copy), v14 (copy), v8 (copy), IXPServiceWrapper (copy), v9 (copy), isInExperienceUIVREnabled (copy), InExperienceUIVRIXP (copy), UIManager (ref), isSpatial (copy), UserGameSettings (copy), useMappedObservableValue (copy), VerticalScrollView (copy), ScrollBarType (copy)
-	local v73 = useStyle()
-	local Theme = v73.Theme
-	local v75 = React.useRef(nil)
-	local v76 = useObservableValue(ViewportUtil.screenSize)
-	local v77 = useTopbarInsetHeight()
+
+function SubMenu(props)
+	local v2 = useStyle()
+
+	local theme = v2.Theme
+	local ref = React.useRef(nil)
+	local v3 = useObservableValue(ViewportUtil.screenSize)
+	local v4 = useTopbarInsetHeight()
 	local UNIBAR_LEFT_MARGIN, ICON_CELL_WIDTH, UNIBAR_END_PADDING, SUB_MENU_ROW_HEIGHT, SUBMENU_CORNER_RADIUS, SUBMENU_BOTTOM_PADDING
 
 	if FFlagTokenizeUnibarConstantsWithStyleProvider then
-		local v78 = UnibarStyle.use()
-
-		UNIBAR_LEFT_MARGIN = v78.UNIBAR_LEFT_MARGIN
-		ICON_CELL_WIDTH = v78.ICON_CELL_WIDTH
-		UNIBAR_END_PADDING = v78.UNIBAR_END_PADDING
-		SUB_MENU_ROW_HEIGHT = v78.SUB_MENU_ROW_HEIGHT
-		SUBMENU_CORNER_RADIUS = v78.SUBMENU_CORNER_RADIUS
-		SUBMENU_BOTTOM_PADDING = v78.SUBMENU_BOTTOM_PADDING
+		local v5 = UnibarStyle.use()
+		UNIBAR_LEFT_MARGIN = v5.UNIBAR_LEFT_MARGIN
+		ICON_CELL_WIDTH = v5.ICON_CELL_WIDTH
+		UNIBAR_END_PADDING = v5.UNIBAR_END_PADDING
+		SUB_MENU_ROW_HEIGHT = v5.SUB_MENU_ROW_HEIGHT
+		SUBMENU_CORNER_RADIUS = v5.SUBMENU_CORNER_RADIUS
+		SUBMENU_BOTTOM_PADDING = v5.SUBMENU_BOTTOM_PADDING
 	else
 		UNIBAR_LEFT_MARGIN = Constants.UNIBAR_LEFT_MARGIN
 		ICON_CELL_WIDTH = Constants.ICON_CELL_WIDTH
@@ -223,250 +316,348 @@ function SubMenu(t3: {[any]: any}) -- line: 257
 		SUBMENU_BOTTOM_PADDING = Constants.SUBMENU_BOTTOM_PADDING
 	end
 
-	local v85 = SUB_MENU_ROW_HEIGHT * 0.5
-
-	React.useEffect(function() -- line: 287
-		-- upvalues: v75 (copy), GuiService (copy), Service (copy), FFlagEnableConsoleExpControls (copy), UserInputService (copy), v14 (copy)
-		local function moveLeft() -- line: 288
-			-- upvalues: v75 (copy), GuiService (copy), Service (copy)
-			if v75.current and v75.current:IsAncestorOf(GuiService.SelectedCoreObject) then
+	local v5 = SUB_MENU_ROW_HEIGHT * 0.5
+	React.useEffect(function()
+		local function moveLeft() -- 2 equivalent calls inferred from this helper
+			if ref.current and ref.current:IsAncestorOf(GuiService.SelectedCoreObject) then
 				Service:setSelectedByOffset(-1)
 			end
 		end
-		local function moveRight() -- line: 295
-			-- upvalues: v75 (copy), GuiService (copy), Service (copy)
-			if v75.current and v75.current:IsAncestorOf(GuiService.SelectedCoreObject) then
+
+		local function moveRight() -- 2 equivalent calls inferred from this helper
+			if ref.current and ref.current:IsAncestorOf(GuiService.SelectedCoreObject) then
 				Service:setSelectedByOffset(1)
 			end
 		end
 
-		local connection = nil
+		local inputChangedConnection
 
 		if FFlagEnableConsoleExpControls then
-			connection = UserInputService.InputChanged:Connect(function(_) -- line: 306
-				-- upvalues: UserInputService (copy), v14 (copy), v75 (copy), GuiService (copy), Service (copy)
-				for _, v127 in (UserInputService:GetGamepadState(Enum.UserInputType.Gamepad1)) do
-					if v127.KeyCode == Enum.KeyCode.Thumbstick1 then
-						local X = v14.normalizeStickByDeadzone(Vector2.new(v127.Position.X, v127.Position.Y)).X
+			inputChangedConnection = UserInputService.InputChanged:Connect(function(_)
+				local gamepadState = UserInputService:GetGamepadState(Enum.UserInputType.Gamepad1)
 
-						if X < -0.5 then
-							if v75.current and v75.current:IsAncestorOf(GuiService.SelectedCoreObject) then
-								Service:setSelectedByOffset(-1)
-							end
-						elseif X > 0.5 and (v75.current and v75.current:IsAncestorOf(GuiService.SelectedCoreObject)) then
-							Service:setSelectedByOffset(1)
-						end
+				for _, v6 in gamepadState do
+					if v6.KeyCode ~= Enum.KeyCode.Thumbstick1 then
+						continue
+					end
+
+					local x = gamepadUtils.normalizeStickByDeadzone(Vector2.new(v6.Position.X, v6.Position.Y)).X
+
+					if x < -0.5 then
+						moveLeft() -- inferred equivalent call
+					elseif x > 0.5 then
+						moveRight() -- inferred equivalent call
 					end
 				end
 			end)
+		else
+			inputChangedConnection = nil
 		end
 
-		local connection2 = UserInputService.InputBegan:Connect(function(input) -- line: 328
-			-- upvalues: v75 (copy), GuiService (copy), Service (copy)
-			local KeyCode = input.KeyCode
+		local inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
+			local keyCode = input.KeyCode
 
-			if KeyCode == Enum.KeyCode.Left or KeyCode == Enum.KeyCode.DPadLeft then
-				if v75.current and v75.current:IsAncestorOf(GuiService.SelectedCoreObject) then
-					Service:setSelectedByOffset(-1)
-
-					return
-				end
-			elseif (KeyCode == Enum.KeyCode.Right or KeyCode == Enum.KeyCode.DPadRight) and (v75.current and v75.current:IsAncestorOf(GuiService.SelectedCoreObject)) then
-				Service:setSelectedByOffset(1)
+			if keyCode == Enum.KeyCode.Left or keyCode == Enum.KeyCode.DPadLeft then
+				moveLeft() -- inferred equivalent call
+			elseif keyCode == Enum.KeyCode.Right or keyCode == Enum.KeyCode.DPadRight then
+				moveRight() -- inferred equivalent call
 			end
 		end)
 
-		return function() -- line: 337
-			-- upvalues: FFlagEnableConsoleExpControls (copy), connection (ref), connection2 (copy)
+		return function()
 			if FFlagEnableConsoleExpControls then
-				connection:Disconnect()
+				inputChangedConnection:Disconnect()
 			end
 
-			connection2:Disconnect()
+			inputBeganConnection:Disconnect()
 		end
 	end, {})
 
-	if v8 then
-		React.useEffect(function() -- line: 347
-			-- upvalues: IXPServiceWrapper (copy), v9 (copy)
-			IXPServiceWrapper:LogFlagLinkedUserLayerExposure(v9)
+	if defineFastFlag then
+		React.useEffect(function()
+			IXPServiceWrapper:LogFlagLinkedUserLayerExposure(defineFastString)
 		end, {})
 	end
 
-	local v86 = v77 + ICON_CELL_WIDTH
-	local v87 = (not t3 or not t3.items) and 0 or SUB_MENU_ROW_HEIGHT * #t3.items
-	local v88 = v87 * ((not isInExperienceUIVREnabled or InExperienceUIVRIXP:isSpatialUIScalingFixEnabled()) and 1 or UIManager.getInstance():getAdditionalCameraScaleIfNeeded())
-	local v89 = if not t3.panelSize then v88 else t3.panelSize.Y
-	local v90 = isInExperienceUIVREnabled and isSpatial()
-	local u91 = if not v90 then math.min(v76.Y - v86, v87) else math.min(v88, v89)
+	local v6 = v4 + ICON_CELL_WIDTH
+	local v7 = not (props and props.items) and 0 or SUB_MENU_ROW_HEIGHT * #props.items
+	local v8 = v7 * ((not isInExperienceUIVREnabled or InExperienceUIVRIXP:isSpatialUIScalingFixEnabled()) and 1 or uiManager.getInstance():getAdditionalCameraScaleIfNeeded())
+	local v9 = if props.panelSize then props.panelSize.Y else v8
+	local v10 = isInExperienceUIVREnabled and isSpatial()
+	local v11
 
-	if not v90 and v87 > v76.Y - v86 then
-		local v92 = math.floor((v76.Y - v86) / SUB_MENU_ROW_HEIGHT)
-
-		u91 = if not (SUB_MENU_ROW_HEIGHT * v92 + v85 <= v76.Y - v86) then SUB_MENU_ROW_HEIGHT * v92 - v85 else SUB_MENU_ROW_HEIGHT * v92 + v85
+	if v10 then
+		v11 = math.min(v8, v9)
+	else
+		v11 = math.min(v3.Y - v6, v7)
 	end
 
-	local t4 = {
+	if not v10 and v3.Y - v6 < v7 then
+		local v12 = math.floor((v3.Y - v6) / SUB_MENU_ROW_HEIGHT)
+
+		if SUB_MENU_ROW_HEIGHT * v12 + v5 <= v3.Y - v6 then
+			v11 = SUB_MENU_ROW_HEIGHT * v12 + v5
+		else
+			v11 = SUB_MENU_ROW_HEIGHT * v12 - v5
+		end
+	end
+
+	local children = {
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		UISizeConstraint = React.createElement("UISizeConstraint", {
-			MinSize = if UserGameSettings.ReducedMotion or not t3.menuTransition then Vector2.new(0, u91) else t3.menuTransition:map(function(p9) -- line: 384
-				-- upvalues: u91 (ref)
-				return Vector2.new(0, u91 * p9)
-			end)
-		}),
-		BottomPadding = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 10000,
-			Size = UDim2.new(0, 0, 0, SUBMENU_BOTTOM_PADDING)
-		})
+		UISizeConstraint = 0,
+		BottomPadding = 0
 	}
 
-	for _, v95 in t3.items do
-		t4[v95.id] = React.createElement(MenuRow, v95)
+	local createElement = React.createElement
+	local minSize
+
+	if UserGameSettings.ReducedMotion or not props.menuTransition then
+		minSize = Vector2.new(0, v11)
+	else
+		minSize = props.menuTransition:map(function(p)
+			return Vector2.new(0, v11 * p)
+		end)
 	end
 
-	local v96 = useMappedObservableValue(Service:orderAlignment(), isLeft)
-	local v97 = v73.Theme.BackgroundUIContrast.Transparency * v73.Settings.PreferredTransparency
-	local v98 = if not v90 then if not v96 then Vector2.new(1, 0) else Vector2.zero else Vector2.new(0, 1)
+	children.UISizeConstraint = createElement("UISizeConstraint", { MinSize = minSize })
 
-	return React.createElement("Frame", {
-		Size = if not v90 then UDim2.new(0, ICON_CELL_WIDTH * 4 + UNIBAR_LEFT_MARGIN + UNIBAR_END_PADDING * 2, 0, 0) else UDim2.new(1, 0, 0, if not v90 then v88 else math.min(v88, v89)),
-		AnchorPoint = v98,
-		Position = if not v90 then UDim2.new(0, -v77 - 2 + UNIBAR_LEFT_MARGIN, 0, 0) else UDim2.new(0, 0, 1, 0),
-		BackgroundColor3 = Theme.BackgroundUIContrast.Color,
-		BackgroundTransparency = if not t3.menuTransition then v97 else t3.menuTransition:map(function(p10) -- line: 424
-			-- upvalues: v97 (copy)
-			return v97 + (1 - v97) * (1 - p10)
-		end),
-		AutomaticSize = if not v90 then Enum.AutomaticSize.Y else nil,
-		ref = v75,
-		SelectionGroup = not not FFlagEnableConsoleExpControls or nil,
-		SelectionBehaviorDown = if not FFlagEnableConsoleExpControls then nil else Enum.SelectionBehavior.Stop
-	}, {
+	children.BottomPadding = React.createElement("Frame", {
+		Size = UDim2.new(0, 0, 0, SUBMENU_BOTTOM_PADDING),
+		BackgroundTransparency = 1,
+		LayoutOrder = 10000
+	})
+
+	for _, item in props.items do
+		children[item.id] = React.createElement(MenuRow, item)
+	end
+
+	local v12 = useMappedObservableValue(Service:orderAlignment(), isLeft)
+
+	local v13 = v2.Theme.BackgroundUIContrast.Transparency * v2.Settings.PreferredTransparency
+	local anchorPoint
+
+	if v10 then
+		anchorPoint = Vector2.new(0, 1)
+	elseif v12 then
+		anchorPoint = Vector2.zero
+	else
+		anchorPoint = Vector2.new(1, 0)
+	end
+
+	local createElement2 = React.createElement
+	local udim
+
+	if v10 then
+		local v14
+
+		if v10 then
+			v14 = math.min(v8, v9)
+		else
+			v14 = v8
+		end
+
+		udim = UDim2.new(1, 0, 0, v14)
+	else
+		udim = UDim2.new(0, ICON_CELL_WIDTH * 4 + UNIBAR_LEFT_MARGIN + UNIBAR_END_PADDING * 2, 0, 0)
+	end
+
+	local position
+
+	if v10 then
+		position = UDim2.new(0, 0, 1, 0)
+	else
+		position = UDim2.new(0, -v4 - 2 + UNIBAR_LEFT_MARGIN, 0, 0)
+	end
+
+	local v14 = {
+		Size = udim,
+		AnchorPoint = anchorPoint,
+		Position = position,
+		BackgroundColor3 = theme.BackgroundUIContrast.Color,
+		BackgroundTransparency = 0,
+		AutomaticSize = 0,
+		ref = 0,
+		SelectionGroup = 0,
+		SelectionBehaviorDown = 0
+	}
+	local backgroundTransparency
+
+	if props.menuTransition then
+		backgroundTransparency = props.menuTransition:map(function(p)
+			return v13 + (1 - v13) * (1 - p)
+		end)
+	else
+		backgroundTransparency = v13
+	end
+
+	v14.BackgroundTransparency = backgroundTransparency
+	local automaticSize
+
+	if not v10 then
+		automaticSize = Enum.AutomaticSize.Y
+	end
+
+	v14.AutomaticSize = automaticSize
+	v14.ref = ref
+	v14.SelectionGroup = FFlagEnableConsoleExpControls and true or nil
+	local selectionBehaviorDown
+
+	if FFlagEnableConsoleExpControls then
+		selectionBehaviorDown = Enum.SelectionBehavior.Stop
+	end
+
+	v14.SelectionBehaviorDown = selectionBehaviorDown
+	local v15 = {
 		UICorner = React.createElement("UICorner", {
 			CornerRadius = UDim.new(0, SUBMENU_CORNER_RADIUS)
 		}),
-		ScrollingFrame = React.createElement(VerticalScrollView, {
-			selectable = false,
-			size = UDim2.new(1, 0, 1, 0),
-			canvasSizeY = UDim.new(0, if not v90 then v87 else v88),
-			scrollBarType = ScrollBarType.Compact
-		}, t4)
-	})
+		ScrollingFrame = 0
+	}
+
+	local createElement3 = React.createElement
+	local v16 = {
+		size = UDim2.new(1, 0, 1, 0),
+		canvasSizeY = 0,
+		selectable = false,
+		scrollBarType = 0
+	}
+
+	if v10 then
+		v7 = v8
+	end
+
+	v16.canvasSizeY = UDim.new(0, v7)
+
+	v16.scrollBarType = ScrollBarType.Compact
+	v15.ScrollingFrame = createElement3(VerticalScrollView, v16, children)
+	return createElement2("Frame", v14, v15)
 end
 
-return function(t5: {[any]: any}) -- line: 450
-	-- upvalues: React (copy), useObservableValue (copy), Service (copy), useChromeMenuItems (copy), ReactOtter (copy), t1 (ref), u48 (ref), Constants (copy), UserInputService (copy), vector2 (ref), isInExperienceUIVREnabled (copy), isSpatial (copy), InExperienceUIVRIXP (copy), FFlagUnibarMenuOpenSubmenu (copy), SubMenuContext (copy)
-	local t6 = {}
-	local v101 = React.useRef(nil)
-	local v102 = React.useRef(nil)
-	local v103 = React.useRef(nil)
-	local v104 = useObservableValue(Service:currentSubMenu())
-	local _, v106 = React.useState(0)
-	local v107 = useChromeMenuItems()
-	local t7 = {}
-	local v109, v110 = ReactOtter.useAnimatedBinding(0, function(p11) -- line: 463
-		-- upvalues: v106 (copy)
-		v106(p11)
+return function(p)
+	local children = {}
+
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+	local v2 = useObservableValue(Service:currentSubMenu())
+
+	local _, setState = React.useState(0)
+
+	local v3 = useChromeMenuItems()
+	local items2 = {}
+
+	local menuTransition, v4 = ReactOtter.useAnimatedBinding(0, function(p2)
+		setState(p2)
 	end)
 
-	React.useEffect(function() -- line: 468
-		-- upvalues: t1 (ref), t7 (ref), u48 (ref), v104 (copy), v106 (copy), v110 (copy), ReactOtter (copy), Constants (copy), v103 (copy), UserInputService (copy), vector2 (ref), v102 (copy), Service (copy), v101 (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), InExperienceUIVRIXP (copy)
-		t1 = t7
-		u48 = v104
+	React.useEffect(function()
+		items = items2
+		v = v2
 
-		if v104 then
-			v106(0)
-			v110(ReactOtter.spring(1, Constants.MENU_ANIMATION_SPRING))
-			v103.current = UserInputService.TouchStarted:Connect(function(p12) -- line: 476
-				-- upvalues: vector2 (ref)
-				vector2 = Vector2.new(p12.Position.X, p12.Position.Y)
+		if v2 then
+			setState(0)
+			v4(ReactOtter.spring(1, Constants.MENU_ANIMATION_SPRING))
+
+			ref3.current = UserInputService.TouchStarted:Connect(function(p2)
+				vector2 = Vector2.new(p2.Position.X, p2.Position.Y)
 			end)
-			v102.current = UserInputService.TouchTap:Connect(function(p13) -- line: 480
-				-- upvalues: vector2 (ref), Service (copy)
-				if p13[1] - vector2 ~= Vector2.zero then
+
+			ref2.current = UserInputService.TouchTap:Connect(function(list)
+				if list[1] - vector2 ~= Vector2.zero then
 					return
 				end
 
-				local v133 = Service:currentSubMenu():get()
+				local v5 = Service:currentSubMenu():get()
 
-				if v133 then
-					Service:toggleSubMenu(v133)
+				if v5 then
+					Service:toggleSubMenu(v5)
 				end
 			end)
-			v101.current = UserInputService.InputEnded:Connect(function(input, _) -- line: 491
-				-- upvalues: isInExperienceUIVREnabled (copy), isSpatial (copy), InExperienceUIVRIXP (copy), Service (copy)
-				if isInExperienceUIVREnabled and (isSpatial() and not InExperienceUIVRIXP:isMovePanelToCenter()) then
+
+			ref.current = UserInputService.InputEnded:Connect(function(input, _)
+				if isInExperienceUIVREnabled and isSpatial() and not InExperienceUIVRIXP:isMovePanelToCenter() then
 					return
 				end
 
-				local v136 = input.UserInputType == Enum.UserInputType.MouseButton1
-				local v137 = Service:currentSubMenu():get()
+				local v5 = input.UserInputType == Enum.UserInputType.MouseButton1
 
-				if v137 and v136 then
-					Service:toggleSubMenu(v137)
+				local v6 = Service:currentSubMenu():get()
+
+				if v6 and v5 then
+					Service:toggleSubMenu(v6)
 				end
 			end)
 		else
-			v106(1)
-			v110(ReactOtter.spring(0, Constants.MENU_ANIMATION_SPRING))
+			setState(1)
+			v4(ReactOtter.spring(0, Constants.MENU_ANIMATION_SPRING))
 		end
 
-		return function() -- line: 512
-			-- upvalues: v101 (copy), v102 (copy), v103 (copy)
-			if v101.current then
-				v101.current:Disconnect()
-				v101.current = nil
+		return function()
+			if ref.current then
+				ref.current:Disconnect()
+				ref.current = nil
 			end
 
-			if v102.current then
-				v102.current:Disconnect()
-				v102.current = nil
+			if ref2.current then
+				ref2.current:Disconnect()
+				ref2.current = nil
 			end
 
-			if v103.current then
-				v103.current:Disconnect()
-				v103.current = nil
+			if ref3.current then
+				ref3.current:Disconnect()
+				ref3.current = nil
 			end
 		end
-	end, { v104 })
+	end, { v2 })
 
-	if v104 and v107 then
-		for _, v112 in v107 do
-			if v104 == v112.id then
-				t7 = v112.children
-
+	if v2 and v3 then
+		for _, v5 in v3 do
+			if v2 == v5.id then
+				items2 = v5.children
 				break
 			end
 		end
 	end
 
-	if #t7 > 0 then
-		t6[v104] = React.createElement(SubMenu, {
-			items = t7,
-			menuTransition = v109,
-			panelSize = t5.panelSize
+	if #items2 > 0 then
+		children[v2] = React.createElement(SubMenu, {
+			items = items2,
+			menuTransition = menuTransition,
+			panelSize = p.panelSize
 		})
-	elseif #t1 > 0 then
-		t6[u48] = React.createElement(SubMenu, {
-			items = t1,
-			menuTransition = v109,
-			panelSize = t5.panelSize
+	elseif #items > 0 then
+		children[v] = React.createElement(SubMenu, {
+			items = items,
+			menuTransition = menuTransition,
+			panelSize = p.panelSize
 		})
 	end
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local size
+
+	if isInExperienceUIVREnabled and isSpatial() then
+		size = UDim2.new(1, 0, 1, 0)
+	else
+		size = UDim2.new(0, 0, 1, 0)
+	end
+
+	local ref4
+
+	if FFlagUnibarMenuOpenSubmenu then
+		ref4 = p.subMenuHostRef
+	end
+
+	return createElement("Frame", {
 		Name = "SubMenuHost",
+		Size = size,
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		Size = if not isInExperienceUIVREnabled or not isSpatial() then UDim2.new(0, 0, 1, 0) else UDim2.new(1, 0, 1, 0),
-		ref = if not FFlagUnibarMenuOpenSubmenu then nil else t5.subMenuHostRef
-	}, React.createElement(SubMenuContext.Provider, {
-		value = v109
-	}, t6))
+		ref = ref4
+	}, React.createElement(SubMenuContext.Provider, { value = menuTransition }, children))
 end

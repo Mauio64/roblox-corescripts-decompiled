@@ -1,11 +1,11 @@
-local Parent = script:FindFirstAncestor("ExpChatIntegration").Parent
-local SignalsReact = require(Parent.SignalsReact)
+local parent = script:FindFirstAncestor("ExpChatIntegration").Parent
+
+local SignalsReact = require(parent.SignalsReact)
+
 local useChatPlatform = require(script.Parent.useChatPlatform)
 
-local function useChatInputBarSettings() -- line: 8
-	-- upvalues: useChatPlatform (copy), SignalsReact (copy)
+local function useChatInputBarSettings()
 	local getChatInputBarSettings = useChatPlatform().getChatInputBarSettings
-
 	return SignalsReact.useSignalState(getChatInputBarSettings)
 end
 

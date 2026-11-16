@@ -1,17 +1,16 @@
-local function reverse(p1) -- line: 2
-	local v3 = type(p1)
+local function reverse(list)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+	local count = #list
+	local v = count + 1
+	local result = {}
 
-	local t1 = {}
-	local v5 = #p1
-	local v6 = v5 + 1
-
-	for i = 1, v5 do
-		t1[i] = p1[v6 - i]
+	for i = 1, count do
+		result[i] = list[v - i]
 	end
 
-	return t1
+	return result
 end
 
 return reverse

@@ -1,8 +1,10 @@
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local RoduxNetworking = require(SocialTabsPageParent.RoduxNetworking)
+local parent = SocialTabsPage.Parent
+
+local RoduxNetworking = require(parent.RoduxNetworking)
 local networkImpl = require(SocialTabsPage.Networking.networkImpl)
-local RODUX_KEY = require(SocialTabsPage.Common.Constants).RODUX_KEY
+local Constants = require(SocialTabsPage.Common.Constants)
+local RODUX_KEY = Constants.RODUX_KEY
 
 return RoduxNetworking.config({
 	keyPath = RODUX_KEY .. ".NetworkStatus",

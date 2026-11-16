@@ -1,24 +1,25 @@
-return function(p1, p2, p3) -- line: 1
-	local storyRoots = p1.storyRoots
-	local mapStory = p1.mapStory
+return function(p, callback, callback2)
+	local storyRoots = p.storyRoots
+	local mapStory = p.mapStory
 
-	p2("SHOULD run all stories with no issue", function() -- line: 5
-		-- upvalues: storyRoots (copy), p3 (copy), mapStory (copy)
-		for _, v in ipairs(storyRoots) do
-			for _, descendant in ipairs(v:GetDescendants()) do
-				if descendant:IsA("ModuleScript") and descendant.Name:find(".story$") then
-					p3("SHOULD mount: " .. descendant:GetFullName(), function(p4) -- line: 10
-						-- upvalues: descendant (copy), mapStory (copy)
-						local lib = require(descendant)
-						local v12 = mapStory(function() -- line: 12
-							-- upvalues: lib (copy)
-							return lib
-						end)()
-						local _, v14 = p4.UnitTestHelpers.mountFrame(v12)
-
-						v14()
-					end)
+	callback("SHOULD run all stories with no issue", function()
+		for _, folder in ipairs(storyRoots) do
+			for _, moduleScript in ipairs(folder:GetDescendants()) do
+				if not (moduleScript:IsA("ModuleScript") and moduleScript.Name:find(".story$")) then
+					continue
 				end
+
+				local v = moduleScript
+				callback2("SHOULD mount: " .. moduleScript:GetFullName(), function(p2)
+					local module = require(v)
+					local v2 = mapStory(function()
+						return module
+					end)()
+
+					local _, v3 = p2.UnitTestHelpers.mountFrame(v2)
+
+					v3()
+				end)
 			end
 		end
 	end)

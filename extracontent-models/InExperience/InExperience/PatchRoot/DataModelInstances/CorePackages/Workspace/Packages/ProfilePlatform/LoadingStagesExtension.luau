@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local LoadingStagesExtension = require(Workspace.ProfilePlatform.ProfilePlatform.Analytics.LoadingStagesExtension)
 
-return (require(_Workspace.ProfilePlatform.ProfilePlatform.Analytics.LoadingStagesExtension))
+return LoadingStagesExtension

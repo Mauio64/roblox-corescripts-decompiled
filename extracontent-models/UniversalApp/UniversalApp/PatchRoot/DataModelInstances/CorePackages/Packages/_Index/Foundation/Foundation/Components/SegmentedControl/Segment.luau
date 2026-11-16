@@ -1,68 +1,133 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
 
-require(FoundationParent.BuilderIcons)
+local React = require(parent.React)
+
+require(parent.BuilderIcons)
 
 local Icon = require(Foundation.Components.Icon)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 
+require(Foundation.Enums.FillBehavior)
+local Flags = require(Foundation.Utility.Flags)
 require(Foundation.Enums.IconSize)
 require(Foundation.Enums.InputSize)
+require(Foundation.Enums.SegmentedControlVariant)
 
+local devAssert = require(Foundation.Utility.devAssert)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
+
 local useSegmentedControlVariants = require(script.Parent.useSegmentedControlVariants)
 
-local function Segment(p1, p2) -- line: 43
-	-- upvalues: useTokens (copy), useSegmentedControlVariants (copy), React (copy), View (copy), withCommonProps (copy), Icon (copy), Text (copy)
-	local v13 = useTokens()
-	local v14 = useSegmentedControlVariants(v13, p1.size, p1.isCircular)
+local function Segment(props, ref)
+	local variant
 
-	if _G.__DEV__ == true then
-		assert(p1.text == nil or p1.icon == nil, "Segment: `text` and `icon` are mutually exclusive. Only one can be provided.")
+	if Flags.FoundationSegmentedControlBeta then
+		variant = props.variant
 	end
 
-	local v15 = p1.icon ~= nil
-	local name = nil
-	local variant = nil
-	local icon = nil
+	local fillBehavior
 
-	if v15 then
-		if typeof(p1.icon) == "table" then
-			local icon2 = p1.icon
+	if Flags.FoundationSegmentedControlBeta then
+		fillBehavior = props.fillBehavior
+	end
+
+	local v = useTokens()
+
+	local size = props.size
+
+	if not Flags.FoundationSegmentedControlBeta then
+		variant = nil
+	end
+
+	if not Flags.FoundationSegmentedControlBeta then
+		fillBehavior = nil
+	end
+
+	local isCircular = props.isCircular
+	local v2
+
+	if Flags.FoundationSegmentedControlBeta then
+		v2 = props.isActive
+	end
+
+	local v3 = useSegmentedControlVariants(v, size, variant, fillBehavior, isCircular, v2)
+
+	devAssert(
+		props.text == nil or props.icon == nil,
+		"Segment: `text` and `icon` are mutually exclusive. Only one can be provided."
+	)
+
+	local v4 = props.icon ~= nil
+
+	local variant2 = nil
+	local name, icon
+
+	if v4 then
+		if typeof(props.icon) == "table" then
+			local icon2 = props.icon
 
 			name = icon2.name
-			variant = icon2.variant
+			variant2 = icon2.variant
 		else
-			name = p1.icon
+			name = props.icon
 		end
 
-		icon = v14.icon
+		icon = v3.icon
 	end
 
-	return React.createElement(View, withCommonProps(p1, {
-		tag = v14.segment.tag,
-		onActivated = function() -- line: 77
-			-- upvalues: p1 (copy)
-			p1.onActivated(p1.id)
+	local createElement = React.createElement
+
+	local v5 = withCommonProps(props, {
+		tag = v3.segment.tag,
+		onActivated = function()
+			props.onActivated(props.id)
 		end,
-		ref = p2
-	}), {
-		Text = if not v15 then React.createElement(Text, {
-			tag = v14.text.tag,
-			Text = p1.text
-		}) else React.createElement(Icon, {
-			name = name,
-			variant = variant,
-			size = icon.size,
-			style = icon.style
-		})
+		ref = ref
 	})
+	local text
+
+	if v4 then
+		local createElement2 = React.createElement
+		local v6 = {
+			name = name,
+			variant = variant2,
+			size = icon.size,
+			style = icon.style,
+			testId = 0
+		}
+		local testId
+
+		if Flags.FoundationSegmentedControlBeta then
+			testId = `{props.testId}--icon`
+		end
+
+		v6.testId = testId
+		text = createElement2(Icon, v6)
+	else
+		local createElement2 = React.createElement
+		local v6 = { tag = v3.text.tag, Text = props.text, textStyle = 0, testId = 0 }
+		local textStyle
+
+		if Flags.FoundationSegmentedControlBeta then
+			textStyle = v3.text.style
+		end
+
+		v6.textStyle = textStyle
+		local testId
+
+		if Flags.FoundationSegmentedControlBeta then
+			testId = `{props.testId}--text`
+		end
+
+		v6.testId = testId
+		text = createElement2(Text, v6)
+	end
+
+	return createElement(View, v5, { Text = text })
 end
 
 return React.memo(React.forwardRef(Segment))

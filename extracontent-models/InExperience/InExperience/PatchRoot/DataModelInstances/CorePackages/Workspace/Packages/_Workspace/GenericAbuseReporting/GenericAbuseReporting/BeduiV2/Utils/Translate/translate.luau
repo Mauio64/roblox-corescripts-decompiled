@@ -1,158 +1,153 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Foundation = require(Parent.Foundation)
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local Foundation = require(parent.Foundation)
+local SharedFlags = require(parent.SharedFlags)
+
 local getIconRichText = Foundation.Utility.getIconRichText
 local IconName = Foundation.Enums.IconName
+
 local FFlagUpdateTranslateInReportRevamp = SharedFlags.FFlagUpdateTranslateInReportRevamp
-local FFlagAbuseReportMenuV2 = SharedFlags.FFlagAbuseReportMenuV2
 
-local function getWrappedText(p1, s1: string, color3: Color3) -- line: 66
-	-- upvalues: FFlagAbuseReportMenuV2 (copy), getIconRichText (copy), IconName (copy)
-	local v21 = "{" .. p1.type .. "Start}"
-	local v22 = "{" .. p1.type .. "End}"
+local function getWrappedText(wrapper, value: string)
+	local v = "{" .. wrapper.type .. "Start}"
+	local v2 = "{" .. wrapper.type .. "End}"
 
-	if p1.type == "link" then
-		if s1:find(v21) == nil or s1:find(v22) == nil then
-			return s1, nil
+	if wrapper.type == "link" then
+		if value:find(v) == nil or value:find(v2) == nil then
+			return value, nil
 		end
 
-		return if not FFlagAbuseReportMenuV2 then s1:gsub(`{ v21 }(.-){ v22 }`, string.format("<font color=\"rgb(%d, %d, %d)\">%s</font>", math.floor(color3.R * 255), math.floor(color3.G * 255), math.floor(color3.B * 255), "%1")) else string.gsub(s1, `{ v21 }(.-){ v22 }`, "%1 " .. getIconRichText(IconName.ArrowUpRightFromSquare)), p1
+		return string.gsub(value, `{v}(.-){v2}`, "%1 " .. getIconRichText(IconName.ArrowUpRightFromSquare)), wrapper
+	elseif wrapper.type == "strong" then
+		local v3 = string.gsub(value, v, "<b>")
+		return string.gsub(v3, v2, "</b>"), nil
+	else
+		warn("Unknown wrapper type: " .. tostring(wrapper.type))
+		return value, nil
 	end
-
-	if p1.type == "strong" then
-		local v23 = string.gsub(s1, v21, "<b>")
-
-		return string.gsub(v23, v22, "</b>"), nil
-	end
-
-	warn("Unknown wrapper type: " .. tostring(p1.type))
-
-	return s1, nil
 end
 
-local u9 = nil
+local fn
 
-local function resolveParams(t1: {[any]: any}, t2: {[any]: any}?) -- line: 100
-	-- upvalues: u9 (ref)
-	if t2 == nil then
+local function resolveParams(p, params)
+	if params == nil then
 		return nil
 	end
 
-	local t3 = {}
+	local result = {}
 
-	for k, v in pairs(t2) do
-		if type(v) == "string" then
-			t3[k] = v
+	for k, item in pairs(params) do
+		if type(item) == "string" then
+			result[k] = item
 		else
-			t3[k] = u9(t1, v)
+			result[k] = fn(p, item)
 		end
 	end
 
-	return t3
+	return result
 end
 
-function u9(t4: {[any]: any}, p2) -- line: 181
-	-- upvalues: FFlagUpdateTranslateInReportRevamp (copy), resolveParams (copy)
-	if p2 == nil then
+fn = function(p, item)
+	if item == nil then
 		return ""
 	end
 
-	if type(p2) == "string" then
-		return p2
+	if type(item) == "string" then
+		return item
 	end
 
-	local v42 = p2["$translate"]
-	local params = p2.params
-	local v44 = nil
+	local translate = item["$translate"]
+	local params = item.params
+	local v
 
 	if FFlagUpdateTranslateInReportRevamp then
-		v44 = resolveParams(t4, params)
+		v = resolveParams(p, params)
 	end
 
-	local v45 = t4[v42] or v42
+	local v2 = p[translate] or translate
 
-	if FFlagUpdateTranslateInReportRevamp and v44 ~= nil then
-		v45 = v45:gsub("{(.-)}", v44)
+	if FFlagUpdateTranslateInReportRevamp and v ~= nil then
+		v2 = v2:gsub("{(.-)}", v)
 	elseif params ~= nil then
-		v45 = v45:gsub("{(.-)}", params)
+		v2 = v2:gsub("{(.-)}", params)
 	end
 
-	return (v45:gsub("{%w+Start}(.-)({%w+End})", "%1"):gsub("{%w+Start}", ""):gsub("{%w+End}", ""))
+	return (v2:gsub("{%w+Start}(.-)({%w+End})", "%1"):gsub("{%w+Start}", ""):gsub("{%w+End}", ""))
 end
 
-return {
-	mergeTranslationParams = function(p3, t5: {[any]: any}) -- line: 38
-		if type(p3) == "string" then
-			return p3
-		end
+local Translate = {}
 
-		local t6 = {}
-
-		if p3.params then
-			for k, v in pairs(p3.params) do
-				t6[k] = v
-			end
-		end
-
-		for k, v in pairs(t5) do
-			t6[k] = v
-		end
-
-		return {
-			["$translate"] = p3["$translate"],
-			params = t6,
-			wrappers = p3.wrappers
-		}
-	end,
-	translateIntoString = u9,
-	translateIntoRichTextString = function(t7: {[any]: any}, p4, color3: Color3) -- line: 125
-		-- upvalues: FFlagUpdateTranslateInReportRevamp (copy), resolveParams (copy), getWrappedText (copy)
-		if p4 == nil then
-			return "", nil
-		end
-
-		if type(p4) == "string" then
-			return p4, nil
-		end
-
-		if type(p4) ~= "table" then
-			return tostring(p4), nil
-		end
-
-		local v32 = p4["$translate"]
-
-		if not v32 or type(v32) ~= "string" then
-			return "", nil
-		end
-
-		local params = p4.params
-		local v34 = nil
-
-		if FFlagUpdateTranslateInReportRevamp then
-			v34 = resolveParams(t7, params)
-		end
-
-		local v35 = t7[v32] or v32
-		local v36 = nil
-
-		if FFlagUpdateTranslateInReportRevamp and v34 ~= nil then
-			v35 = v35:gsub("{(.-)}", v34)
-		elseif params ~= nil then
-			v35 = v35:gsub("{(.-)}", params)
-		end
-
-		if p4.wrappers then
-			for _, v in pairs(p4.wrappers) do
-				local v39
-
-				v35, v39 = getWrappedText(v, v35, color3)
-
-				if v39 ~= nil and v36 == nil then
-					v36 = v39
-				end
-			end
-		end
-
-		return v35, v36
+function Translate.mergeTranslationParams(value, items)
+	if type(value) == "string" then
+		return value
 	end
-}
+
+	local params = {}
+
+	if value.params then
+		for k, param in pairs(value.params) do
+			params[k] = param
+		end
+	end
+
+	for k, item in pairs(items) do
+		params[k] = item
+	end
+
+	return { ["$translate"] = value["$translate"], params = params, wrappers = value.wrappers }
+end
+
+Translate.translateIntoString = fn
+
+function Translate.translateIntoRichTextString(p, value)
+	if value == nil then
+		return "", nil
+	end
+
+	if type(value) == "string" then
+		return value, nil
+	end
+
+	if type(value) ~= "table" then
+		return tostring(value), nil
+	end
+
+	local translate = value["$translate"]
+
+	if not translate or type(translate) ~= "string" then
+		return "", nil
+	end
+
+	local params = value.params
+	local v
+
+	if FFlagUpdateTranslateInReportRevamp then
+		v = resolveParams(p, params)
+	end
+
+	local v2 = p[translate] or translate
+	local v3 = nil
+
+	if FFlagUpdateTranslateInReportRevamp and v ~= nil then
+		v2 = v2:gsub("{(.-)}", v)
+	elseif params ~= nil then
+		v2 = v2:gsub("{(.-)}", params)
+	end
+
+	if not value.wrappers then
+		return v2, v3
+	end
+
+	for _, wrapper in pairs(value.wrappers) do
+		local v4
+		v2, v4 = getWrappedText(wrapper, v2)
+
+		if v4 ~= nil and v3 == nil then
+			v3 = v4
+		end
+	end
+
+	return v2, v3
+end
+
+return Translate

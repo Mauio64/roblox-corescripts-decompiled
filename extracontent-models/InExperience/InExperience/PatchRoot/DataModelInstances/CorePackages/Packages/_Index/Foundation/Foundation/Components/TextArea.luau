@@ -1,1 +1,3 @@
-return (require(script.TextArea))
+local TextArea = require(script.TextArea)
+
+return TextArea

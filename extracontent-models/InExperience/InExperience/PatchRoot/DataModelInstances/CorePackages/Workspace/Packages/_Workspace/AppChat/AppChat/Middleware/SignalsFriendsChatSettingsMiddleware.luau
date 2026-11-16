@@ -1,43 +1,47 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local parent = AppChat.Parent
+
+local AppChatNetworking = require(parent.AppChatNetworking)
 local FFlagAppChatFriendsTabIxpEnabled = require(AppChat.Flags.FFlagAppChatFriendsTabIxpEnabled)
-local FFlagExpChatEnableFriendsTab = require(AppChatParent.SharedFlags).FFlagExpChatEnableFriendsTab
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local FFlagAppChatUseSignalsForChatSettings = require(AppChat.Flags.FFlagAppChatUseSignalsForChatSettings)
+
 local ThirdPartyChatSettingsLoaded = require(AppChat.Actions.ThirdPartyChatSettingsLoaded)
 local GetFriendsChatMetadataStore = require(AppChat.Stores.GetFriendsChatMetadataStore)
 local GetFriendsChatSettingsStore = require(AppChat.Stores.GetFriendsChatSettingsStore)
 
-local function handleGetMetadataSucceeded(p1) -- line: 12
-	-- upvalues: GetFriendsChatMetadataStore (copy)
-	GetFriendsChatMetadataStore(false).updateFriendsChatMetadata(p1.responseBody)
-end
-local function handleThirdPartyChatSettingsLoaded(p2) -- line: 16
-	-- upvalues: GetFriendsChatSettingsStore (copy)
-	GetFriendsChatSettingsStore(false).setThirdPartyChatRestrictionStatus(p2.status)
+local function handleGetMetadataSucceeded(p)
+	GetFriendsChatMetadataStore(false).updateFriendsChatMetadata(p.responseBody)
 end
 
-local t1 = {
+local function handleThirdPartyChatSettingsLoaded(p)
+	GetFriendsChatSettingsStore(false).setThirdPartyChatRestrictionStatus(p.status)
+end
+
+local v = {
 	[AppChatNetworking.rodux.GetMetadata.Succeeded.name] = handleGetMetadataSucceeded,
 	[ThirdPartyChatSettingsLoaded.name] = handleThirdPartyChatSettingsLoaded
 }
 
-local function SignalsFriendsChatSettingsMiddleware(p3: ((...any) -> ...any), _) -- line: 25
-	-- upvalues: FFlagAppChatFriendsTabIxpEnabled (copy), FFlagExpChatEnableFriendsTab (copy), t1 (copy)
-	return function(p5) -- line: 26
-		-- upvalues: p3 (copy), FFlagAppChatFriendsTabIxpEnabled (copy), FFlagExpChatEnableFriendsTab (copy), t1 (copy)
-		local v18 = p3(p5)
+local function SignalsFriendsChatSettingsMiddleware(callback, _)
+	return function(p)
+		local v2 = callback(p)
 
-		if not FFlagAppChatFriendsTabIxpEnabled and not FFlagExpChatEnableFriendsTab then
-			return v18
+		if
+			not (FFlagAppChatFriendsTabIxpEnabled or FFlagExpChatEnableFriendsTab)
+			or FFlagAppChatUseSignalsForChatSettings
+		then
+			return v2
 		end
 
-		local v19 = t1[p5.type]
+		local v3 = v[p.type]
 
-		if v19 then
-			v19(p5)
+		if v3 then
+			v3(p)
 		end
 
-		return v18
+		return v2
 	end
 end
 

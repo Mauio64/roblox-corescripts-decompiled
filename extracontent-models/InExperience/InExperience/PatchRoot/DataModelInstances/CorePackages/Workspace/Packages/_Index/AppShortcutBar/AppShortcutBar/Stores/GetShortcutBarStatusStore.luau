@@ -1,5 +1,13 @@
-local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("AppShortcutBar").Parent
+
+local Signals = require(parent.Signals)
 local createShortcutBarStatusStore = require(script.createShortcutBarStatusStore)
 
-return Signals.createComputed(createShortcutBarStatusStore)
+local SharedFlags = require(parent.SharedFlags)
+
+if not SharedFlags.FFlagEnableStickyShortcutBarOnAllPlatforms then
+	return Signals.createComputed(createShortcutBarStatusStore)
+end
+
+local AppShortcutBarStore = require(parent.AppShortcutBarStore)
+return AppShortcutBarStore.GetShortcutBarStatusStore

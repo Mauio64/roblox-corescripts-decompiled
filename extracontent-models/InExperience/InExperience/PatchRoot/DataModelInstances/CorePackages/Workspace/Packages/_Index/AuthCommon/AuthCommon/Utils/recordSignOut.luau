@@ -1,67 +1,52 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
 local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
-
 require(AuthCommon.Utils.PreviousAccountEntry)
-
 local User = require(AuthCommon.Thunks.User)
-local AuthCommonParent = AuthCommon.Parent
-local Cryo = require(AuthCommonParent.Cryo)
+local parent = AuthCommon.Parent
+local Cryo = require(parent.Cryo)
 local prunePreviousAccountsList = require(AuthCommon.Utils.prunePreviousAccountsList)
 
-local function recordSignOut(t1: {[any]: any}?, b1: boolean?) -- line: 16
-	-- upvalues: User (copy), AppStorageUtilities (copy), Cryo (copy), prunePreviousAccountsList (copy)
-	local v10 = b1 or true
-	local v11
+local function recordSignOut(data, flag: boolean?)
+	local showInAccountPicker = flag or true
+	local v
 
-	if not t1 then
-		v11 = User.fromLocalStorage()
-
-		if v11 == nil or v11.userId == -1 then
-			return
-		end
-
-		if v11.username == nil or v11.username == "" then
-			return
-		end
+	if data then
+		v = { userId = data.user_id, username = data.username, displayName = data.display_name }
 	else
-		v11 = {
-			userId = t1.user_id,
-			username = t1.username,
-			displayName = t1.display_name
+		v = User.fromLocalStorage()
+
+		if v == nil or v.userId == -1 or (v.username == nil or v.username == "") then
+			return
+		end
+	end
+
+	local previousAccountsList = AppStorageUtilities.getPreviousAccountsList()
+	local userId = tostring(v.userId)
+	local previousAccount = previousAccountsList[userId]
+
+	if previousAccount then
+		previousAccountsList[userId] = Cryo.Dictionary.join(previousAccount, {
+			userId = userId,
+			username = v.username,
+			displayName = (not v.displayName or v.displayName == "nil") and "" or v.displayName,
+			signOutTimestamp = os.time(),
+			showInAccountPicker = showInAccountPicker
+		})
+	else
+		previousAccountsList[userId] = {
+			userId = userId,
+			username = v.username,
+			userIdentifier = v.username,
+			loginMethod = nil,
+			signInTimestamp = nil,
+			displayName = (not v.displayName or v.displayName == "nil") and "" or v.displayName,
+			signOutTimestamp = os.time(),
+			showInAccountPicker = showInAccountPicker
 		}
 	end
 
-	local v12 = AppStorageUtilities.getPreviousAccountsList()
-	local str = tostring(v11.userId)
-	local v14 = v12[str]
-
-	if v14 then
-		v12[str] = Cryo.Dictionary.join(v14, {
-			userId = str,
-			username = v11.username,
-			displayName = (not v11.displayName or v11.displayName == "nil") and "" or v11.displayName,
-			signOutTimestamp = os.time(),
-			showInAccountPicker = v10
-		})
-		AppStorageUtilities.setPreviousAccountsList(v12)
-		prunePreviousAccountsList()
-
-		return true
-	end
-
-	v12[str] = {
-		loginMethod = nil,
-		signInTimestamp = nil,
-		userId = str,
-		username = v11.username,
-		userIdentifier = v11.username,
-		displayName = (not v11.displayName or v11.displayName == "nil") and "" or v11.displayName,
-		signOutTimestamp = os.time(),
-		showInAccountPicker = v10
-	}
-	AppStorageUtilities.setPreviousAccountsList(v12)
+	AppStorageUtilities.setPreviousAccountsList(previousAccountsList)
 	prunePreviousAccountsList()
-
 	return true
 end
 

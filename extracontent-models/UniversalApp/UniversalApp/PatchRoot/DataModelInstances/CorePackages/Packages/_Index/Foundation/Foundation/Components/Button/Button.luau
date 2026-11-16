@@ -1,284 +1,333 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Motion = require(FoundationParent.Motion)
+local parent = Foundation.Parent
+
+local Motion = require(parent.Motion)
 local useMotion = Motion.useMotion
 local AnimatePresence = Motion.AnimatePresence
-local React = require(FoundationParent.React)
-local ReactOtter = require(FoundationParent.ReactOtter)
+
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+
 local InputSize = require(Foundation.Enums.InputSize)
 local Spinner = require(script.Parent.Spinner)
 local endAlignedIcons = require(script.Parent.endAlignedIcons)
+
 local ButtonVariant = require(Foundation.Enums.ButtonVariant)
+
 local FillBehavior = require(Foundation.Enums.FillBehavior)
+
 local ControlState = require(Foundation.Enums.ControlState)
+
 local ButtonIcon = require(script.Parent.ButtonIcon)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
+
 local Constants = require(Foundation.Constants)
+
 local Flags = require(Foundation.Utility.Flags)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local withCommonProps = require(Foundation.Utility.withCommonProps)
+
 local useButtonMotionStates = require(script.Parent.useButtonMotionStates)
 local useButtonVariants = require(script.Parent.useButtonVariants)
 local useTokens = require(Foundation.Providers.Style.useTokens)
-local usePresentationContext = require(Foundation.Providers.Style.PresentationContext).usePresentationContext
-local t1 = {
+local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
+local usePresentationContext = PresentationContext.usePresentationContext
+
+local v = {
 	[ButtonVariant.Link] = {
 		format = "<u>%s</u>",
-		controlState = {
-			ControlState.Hover,
-			ControlState.Pressed
-		}
+		controlState = { ControlState.Hover, ControlState.Pressed }
 	}
 }
 
-local function onProgressChange(n1: number) -- line: 52
-	-- upvalues: Constants (copy)
+local function onProgressChange(p: number)
 	return NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 0),
-		NumberSequenceKeypoint.new(math.max(0, n1 - 0.0001), 0),
-		NumberSequenceKeypoint.new(math.min(1, n1 + 0.0001), Constants.DISABLED_TRANSPARENCY),
+		NumberSequenceKeypoint.new(math.max(0, p - 0.0001), 0),
+		NumberSequenceKeypoint.new(math.min(1, p + 0.0001), Constants.DISABLED_TRANSPARENCY),
 		NumberSequenceKeypoint.new(1, Constants.DISABLED_TRANSPARENCY)
 	})
 end
-local function getTransparency(n2: number?, p1) -- line: 61
-	return p1:map(function(p2) -- line: 65
-		-- upvalues: n2 (copy)
-		if n2 ~= nil then
-			return n2 + (1 - n2) * p2
+
+local function getTransparency(transparency: number?, transparency2) -- 2 equivalent calls inferred from this helper
+	return transparency2:map(function(p)
+		if transparency == nil then
+			return p
 		end
 
-		return p2
+		return transparency + (1 - transparency) * p
 	end)
 end
 
-local t2 = {
+local v2 = {
 	isDisabled = false,
 	isLoading = false,
-	inputDelay = 0,
-	testId = "--foundation-button",
 	variant = ButtonVariant.Standard,
 	size = InputSize.Medium,
-	width = UDim.new(0, 0)
+	width = UDim.new(0, 0),
+	inputDelay = 0,
+	testId = "--foundation-button"
 }
 
-local function Button(p3, p4) -- line: 100
-	-- upvalues: withDefaults (copy), t2 (copy), React (copy), ControlState (copy), ReactOtter (copy), endAlignedIcons (copy), useTokens (copy), usePresentationContext (copy), useButtonVariants (copy), useButtonMotionStates (copy), Constants (copy), useMotion (copy), t1 (copy), View (copy), withCommonProps (copy), Flags (copy), FillBehavior (copy), AnimatePresence (copy), Spinner (copy), ButtonIcon (copy), Text (copy), onProgressChange (copy)
-	local v35 = withDefaults(p3, t2)
-	local inputDelay = v35.inputDelay
-	local v37, v38 = React.useBinding(ControlState.Initialize)
-	local v39, v40 = React.useState(inputDelay > 0)
-	local v41, v42 = ReactOtter.useAnimatedBinding(0, function() -- line: 106
-		-- upvalues: v40 (copy)
-		v40(false)
-	end)
-	local v43 = v35.icon and endAlignedIcons[v35.icon]
+local function Button(p, ref)
+	local v3 = withDefaults(p, v2)
+	local inputDelay = v3.inputDelay
 
-	React.useEffect(function() -- line: 112
-		-- upvalues: v39 (copy), v42 (copy), ReactOtter (copy)
-		if v39 == false then
-			v42(ReactOtter.instant(0))
+	local v4, onStateChanged = React.useBinding(ControlState.Initialize)
+	local state, setState = React.useState(inputDelay > 0)
+	local v5, v6 = ReactOtter.useAnimatedBinding(0, function()
+		setState(false)
+	end)
+
+	local v7 = v3.icon and endAlignedIcons[v3.icon]
+
+	React.useEffect(function()
+		if state == false then
+			v6(ReactOtter.instant(0))
 		end
-	end, { v39 })
-	React.useEffect(function() -- line: 118
-		-- upvalues: v39 (copy), v40 (copy), inputDelay (copy), v42 (copy), ReactOtter (copy)
-		if v39 then
-			v40(false)
+	end, { state })
+
+	React.useEffect(function()
+		if state then
+			setState(false)
 		end
 
 		if inputDelay > 0 then
-			v40(true)
-			v42((ReactOtter.ease(1, {
-				duration = inputDelay,
-				easingStyle = Enum.EasingStyle.Quad
-			})))
+			setState(true)
+			v6((ReactOtter.ease(1, { duration = inputDelay, easingStyle = Enum.EasingStyle.Quad })))
 		end
 	end, { inputDelay })
 
-	local v44 = useTokens()
-	local v45 = usePresentationContext()
-	local v46 = useButtonVariants(v44, v35.size, v35.variant, if not v45 then nil else v45.colorNamespace)
-	local v47 = useButtonMotionStates(v46.content.style.Transparency, Constants.DISABLED_TRANSPARENCY)
-	local v48, v49 = useMotion(v47.Default)
-	local v50, v51 = useMotion(v47.Default)
+	local v8 = useTokens()
+	local v9 = usePresentationContext()
 
-	React.useEffect(function() -- line: 147
-		-- upvalues: v35 (copy), v51 (copy), v47 (copy)
-		if v35.isLoading then
-			v51(v47.Loading)
+	local size = v3.size
+	local variant = v3.variant
+	local v10
 
-			return
+	if v9 then
+		v10 = v9.colorNamespace
+	end
+
+	local v11 = useButtonVariants(v8, size, variant, v10)
+
+	local v12 = useButtonMotionStates(v11.content.style.Transparency, Constants.DISABLED_TRANSPARENCY)
+	local v13, v14 = useMotion(v12.Default)
+	local v15, v16 = useMotion(v12.Default)
+
+	React.useEffect(function()
+		if v3.isLoading then
+			v16(v12.Loading)
+		else
+			v16(v12.Default)
 		end
+	end, { v3.isLoading })
 
-		v51(v47.Default)
-	end, { v35.isLoading })
-	React.useEffect(function() -- line: 155
-		-- upvalues: v35 (copy), v49 (copy), v47 (copy)
-		if v35.isDisabled then
-			v49(v47.Disabled)
-
-			return
+	React.useEffect(function()
+		if v3.isDisabled then
+			v14(v12.Disabled)
+		else
+			v14(v12.Default)
 		end
+	end, { v3.isDisabled })
 
-		v49(v47.Default)
-	end, { v35.isDisabled })
-
-	local v52 = React.useMemo(function() -- line: 163
-		-- upvalues: v46 (copy), v44 (copy)
+	local cursor = React.useMemo(function()
 		return {
-			radius = UDim.new(0, v46.container.radius),
-			offset = v44.Size.Size_200,
-			borderWidth = v44.Stroke.Thicker
+			radius = UDim.new(0, v11.container.radius),
+			offset = v8.Size.Size_200,
+			borderWidth = v8.Stroke.Thicker
 		}
-	end, {
-		v44,
-		v46.container.radius
-	})
-	local v53 = v35.text and v35.text ~= ""
-	local v54 = React.useCallback(function(p5) -- line: 173
-		-- upvalues: t1 (copy), v35 (copy), v53 (copy)
-		local v65 = t1[v35.variant]
+	end, { v8, v11.container.radius })
 
-		if v53 and (v65 and table.find(v65.controlState, p5)) then
-			return (v65.format:format(v35.text))
+	local v17 = v3.text and v3.text ~= ""
+
+	local v18 = React.useCallback(function(p2)
+		local v18 = v[v3.variant]
+
+		if v17 and v18 and table.find(v18.controlState, p2) then
+			return (v18.format:format(v3.text))
 		end
 
-		return v35.text
-	end, {
-		v35.text,
-		v35.variant,
-		v53
-	})
+		return v3.text
+	end, { v3.text, v3.variant, v17 })
+
 	local createElement = React.createElement
-	local v56 = View
-	local v57 = withCommonProps
-	local t3 = {
-		AutomaticSize = if Flags.FoundationButtonFillBehaviorEqualSize and v35.fillBehavior == FillBehavior.Fill or (v35.width.Scale ~= 0 or v35.width.Offset ~= 0) then nil else Enum.AutomaticSize.X,
-		cornerRadius = UDim.new(0, v46.container.radius)
-	}
-	local v60
+	local automaticSize
 
-	if v46.container.style then
-		local styleTransparency = v46.container.style.Transparency
-
-		v60 = v48.transparency:map(function(p6) -- line: 65
-			-- upvalues: styleTransparency (copy)
-			if styleTransparency ~= nil then
-				return styleTransparency + (1 - styleTransparency) * p6
-			end
-
-			return p6
-		end):map(function(p7) -- line: 194
-			-- upvalues: v46 (copy)
-			return {
-				Color3 = v46.container.style.Color3,
-				Transparency = p7
-			}
-		end)
-	else
-		v60 = nil
+	if v3.width.Scale == 0 and v3.width.Offset == 0 then
+		automaticSize = Enum.AutomaticSize.X
 	end
 
-	t3.backgroundStyle = v60
-	t3.flexItem = if not v35.fillBehavior then nil else {
-		FlexMode = if v35.fillBehavior ~= FillBehavior.Fill then Enum.UIFlexMode.Shrink else Enum.UIFlexMode.Fill
+	local v19 = {
+		AutomaticSize = automaticSize,
+		cornerRadius = UDim.new(0, v11.container.radius),
+		backgroundStyle = 0,
+		flexItem = 0,
+		stroke = 0,
+		Size = 0,
+		selection = 0,
+		cursor = 0,
+		onActivated = 0,
+		onStateChanged = 0,
+		isDisabled = 0,
+		stateLayer = 0,
+		tag = 0,
+		ref = 0
 	}
+	local backgroundStyle
 
-	local t4
-
-	if v46.container.stroke then
-		t4 = {
-			Color = v46.container.stroke.Color
-		}
-
-		local strokeTransparency = v46.container.stroke.Transparency
-
-		t4.Transparency = v48.transparency:map(function(p8) -- line: 65
-			-- upvalues: strokeTransparency (copy)
-			if strokeTransparency ~= nil then
-				return strokeTransparency + (1 - strokeTransparency) * p8
-			end
-
-			return p8
+	if v11.container.style then
+		backgroundStyle = getTransparency(v11.container.style.Transparency, v13.transparency):map(function(transparency) -- inferred equivalent call
+			return { Color3 = v11.container.style.Color3, Transparency = transparency }
 		end)
-	else
-		t4 = nil
 	end
 
-	t3.stroke = t4
-	t3.Size = UDim2.new(if v35.fillBehavior ~= FillBehavior.Fill then v35.width.Scale else 1, if v35.fillBehavior ~= FillBehavior.Fill then v35.width.Offset else 0, 0, v46.container.height)
-	t3.selection = {
-		Selectable = not v35.isDisabled and v35.Selectable,
-		NextSelectionUp = v35.NextSelectionUp,
-		NextSelectionDown = v35.NextSelectionDown,
-		NextSelectionLeft = v35.NextSelectionLeft,
-		NextSelectionRight = v35.NextSelectionRight
-	}
-	t3.cursor = v52
-	t3.onActivated = v35.onActivated
-	t3.onStateChanged = v38
-	t3.isDisabled = v35.isDisabled or (v35.isLoading or v39)
-	t3.stateLayer = v46.container.stateLayer
-	t3.tag = v46.container.tag
-	t3.ref = p4
+	v19.backgroundStyle = backgroundStyle
+	local flexItem
 
-	return createElement(v56, v57(v35, t3), {
-		Loading = if not v35.isLoading then nil else React.createElement("Folder", {}, {
-			PresenceWrapper = React.createElement(AnimatePresence, {}, {
-				Spinner = React.createElement(Spinner, {
-					Size = v46.icon.size - if not Flags.FoundationUsePath2DSpinner then UDim2.fromOffset(0, 0) else UDim2.fromOffset(v44.Padding.XSmall, v44.Padding.XSmall),
-					style = v48.transparency:map(function(p9) -- line: 248
-						-- upvalues: v46 (copy)
-						return {
-							Color3 = v46.content.style.Color3,
-							Transparency = p9
-						}
+	if v3.fillBehavior then
+		flexItem = { FlexMode = 0 }
+		local flexMode
+
+		if v3.fillBehavior == FillBehavior.Fill then
+			flexMode = Enum.UIFlexMode.Fill
+		else
+			flexMode = Enum.UIFlexMode.Shrink
+		end
+
+		flexItem.FlexMode = flexMode
+	end
+
+	v19.flexItem = flexItem
+	local stroke
+
+	if v11.container.stroke then
+		stroke = { Color = v11.container.stroke.Color, Transparency = 0 }
+		stroke.Transparency = getTransparency(v11.container.stroke.Transparency, v13.transparency) -- inferred equivalent call
+	end
+
+	v19.stroke = stroke
+
+	v19.Size = UDim2.new(
+		v3.fillBehavior == FillBehavior.Fill and 1 or v3.width.Scale,
+		v3.fillBehavior == FillBehavior.Fill and 0 or v3.width.Offset,
+		0,
+		v11.container.height
+	)
+
+	v19.selection = {
+		Selectable = not v3.isDisabled and v3.Selectable,
+		NextSelectionUp = v3.NextSelectionUp,
+		NextSelectionDown = v3.NextSelectionDown,
+		NextSelectionLeft = v3.NextSelectionLeft,
+		NextSelectionRight = v3.NextSelectionRight
+	}
+
+	v19.cursor = cursor
+	v19.onActivated = v3.onActivated
+	v19.onStateChanged = onStateChanged
+	v19.isDisabled = v3.isDisabled or v3.isLoading or state
+	v19.stateLayer = v11.container.stateLayer
+	v19.tag = v11.container.tag
+	v19.ref = ref
+	local v20 = withCommonProps(v3, v19)
+	local loading
+
+	if v3.isLoading then
+		local createElement2 = React.createElement
+		local createElement3 = React.createElement
+		local createElement4 = React.createElement
+		local size2 = v11.icon.size
+		local v21
+
+		if Flags.FoundationUsePath2DSpinner then
+			v21 = UDim2.fromOffset(v8.Padding.XSmall, v8.Padding.XSmall)
+		else
+			v21 = UDim2.fromOffset(0, 0)
+		end
+
+		loading = createElement2("Folder", {}, {
+			PresenceWrapper = createElement3(AnimatePresence, {}, {
+				Spinner = createElement4(Spinner, {
+					Size = size2 - v21,
+					style = v13.transparency:map(function(transparency)
+						return { Color3 = v11.content.style.Color3, Transparency = transparency }
 					end),
-					testId = `{ v35.testId }--spinner`
+					testId = `{v3.testId}--spinner`
 				})
 			})
-		}),
-		IconWrapper = if not v35.icon then nil else React.createElement(View, {
-			Size = if not v35.icon then nil else v46.icon.size,
-			LayoutOrder = if not v35.icon then nil else not v43 and 1 or 3,
-			testId = if not v35.icon then nil else `{ v35.testId }--icon-wrapper`
-		}, {
-			Icon = React.createElement(ButtonIcon, {
-				icon = v35.icon,
-				isLoading = v35.isLoading,
-				variant = v35.variant,
-				size = v35.size,
-				disabledTransparencyBinding = v48.transparency,
-				textTransparencyBinding = v50.textTransparency,
-				testId = v35.testId
-			})
-		}),
-		Text = if not v53 then nil else React.createElement(Text, {
-			LayoutOrder = 2,
-			Text = v37:map(v54),
-			RichText = t1[v35.variant] ~= nil,
-			tag = v46.text.tag,
-			textStyle = React.joinBindings({
-				v48.transparency,
-				v50.textTransparency
-			}):map(function(p10) -- line: 286
-				-- upvalues: v46 (copy)
-				local v71 = p10[1]
-				local v72 = p10[2]
+		})
+	end
 
+	local iconWrapper
+
+	if v3.icon then
+		local createElement2 = React.createElement
+		local size2
+
+		if v3.icon then
+			size2 = v11.icon.size
+		end
+
+		local v21 = {
+			Size = size2,
+			LayoutOrder = v3.icon and (v7 and 3 or 1) or nil,
+			testId = 0
+		}
+		local testId
+
+		if v3.icon then
+			testId = `{v3.testId}--icon-wrapper`
+		end
+
+		v21.testId = testId
+		iconWrapper = createElement2(View, v21, {
+			Icon = React.createElement(ButtonIcon, {
+				icon = v3.icon,
+				isLoading = v3.isLoading,
+				variant = v3.variant,
+				size = v3.size,
+				disabledTransparencyBinding = v13.transparency,
+				textTransparencyBinding = v15.textTransparency,
+				testId = v3.testId
+			})
+		})
+	end
+
+	local text
+
+	if v17 then
+		text = React.createElement(Text, {
+			Text = v4:map(v18),
+			RichText = v[v3.variant] ~= nil,
+			tag = v11.text.tag,
+			textStyle = React.joinBindings({ v13.transparency, v15.textTransparency }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
 				return {
-					Color3 = v46.content.style.Color3,
-					Transparency = v72 + v71
+					Color3 = v11.content.style.Color3,
+					Transparency = item2 + item
 				}
 			end),
-			testId = `{ v35.testId }--text`
-		}),
-		Gradient = if not v39 then nil else React.createElement("UIGradient", {
-			Transparency = v41:map(onProgressChange)
+			LayoutOrder = 2,
+			testId = `{v3.testId}--text`
 		})
+	end
+
+	local gradient
+
+	if state then
+		gradient = React.createElement("UIGradient", { Transparency = v5:map(onProgressChange) })
+	end
+
+	return createElement(View, v20, {
+		Loading = loading,
+		IconWrapper = iconWrapper,
+		Text = text,
+		Gradient = gradient
 	})
 end
 

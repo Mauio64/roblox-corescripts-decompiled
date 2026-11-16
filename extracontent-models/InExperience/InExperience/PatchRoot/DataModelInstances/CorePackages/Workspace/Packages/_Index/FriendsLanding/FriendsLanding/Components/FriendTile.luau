@@ -1,1 +1,3 @@
-return (require(script.FriendTileContainer))
+local FriendTileContainer = require(script.FriendTileContainer)
+
+return FriendTileContainer

@@ -1,439 +1,360 @@
 local OnPlatformSurveys = script:FindFirstAncestor("OnPlatformSurveys")
-local OnPlatformSurveysParent = OnPlatformSurveys.Parent
-local FFlagInlineSurveyBranching = require(OnPlatformSurveysParent.SharedFlags).FFlagInlineSurveyBranching
+local parent = OnPlatformSurveys.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagInlineSurveyBranching = SharedFlags.FFlagInlineSurveyBranching
+local FFlagInlineSurveyChoiceTextEntry = SharedFlags.FFlagInlineSurveyChoiceTextEntry
+
 local InlineQuestionType = require(OnPlatformSurveys.Enums.InlineQuestionType)
 local InlineSurveyTypes = require(OnPlatformSurveys.Types.InlineSurveyTypes)
-local t1 = {}
-local t2 = {}
 
-local function trim(s1: string) -- line: 23
-	return (s1:gsub("^%s*(.-)%s*$", "%1"))
+local v = {}
+local v2 = {}
+
+local function trim(value: string) -- 2 equivalent calls inferred from this helper
+	return (value:gsub("^%s*(.-)%s*$", "%1"))
 end
-local function buildResponse(p1, p2) -- line: 40
-	-- upvalues: InlineQuestionType (copy)
-	if p1.type == InlineQuestionType.Text then
-		local v19 = (p2.text or ""):gsub("^%s*(.-)%s*$", "%1")
 
-		if v19 == "" then
-			return nil
-		end
+local function buildChoiceTexts(p)
+	local choiceTexts = p.choiceTexts
 
-		return {
-			text = v19
-		}
-	end
-
-	local v20 = p2.choiceIds or {}
-
-	if #v20 == 0 then
+	if choiceTexts == nil then
 		return nil
 	end
 
-	return {
-		choiceIds = v20
-	}
-end
-local function canSubmitAll(t3: {[any]: any}, t4: {[any]: any}) -- line: 85
-	-- upvalues: t1 (copy), InlineQuestionType (copy)
-	for _, v34 in t3 do
-		if v34.required ~= true then
+	local result = {}
+	local flag = false
+
+	for _, v3 in p.choiceIds or v2 do
+		local v4 = trim(choiceTexts[v3] or "") -- inferred equivalent call
+
+		if v4 == "" then
 			continue
 		end
 
-		local v35 = t4[v34.questionId] or t1
+		result[v3] = v4
+		flag = true
+	end
 
-		if v34.type ~= InlineQuestionType.Text and not if v34.type ~= InlineQuestionType.MultipleChoiceSingle then v34.type == InlineQuestionType.MultipleChoiceMulti and (v35.choiceIds ~= nil and #v35.choiceIds >= 1) else v35.choiceIds ~= nil and #v35.choiceIds == 1 then
+	return if flag then result else nil
+end
+
+local function buildResponse(item, p)
+	if item.type == InlineQuestionType.Text then
+		local text = trim(p.text or "") -- inferred equivalent call
+
+		if text == "" then
+			return nil
+		end
+
+		return { text = text }
+	else
+		local choiceIds = p.choiceIds or {}
+
+		if #choiceIds == 0 then
+			return nil
+		end
+
+		local choiceTexts
+
+		if FFlagInlineSurveyChoiceTextEntry then
+			choiceTexts = buildChoiceTexts(p)
+		end
+
+		return { choiceIds = choiceIds, choiceTexts = choiceTexts }
+	end
+end
+
+local function canSubmitAll(items, p): boolean
+	for _, item in items do
+		if item.required ~= true then
+			continue
+		end
+
+		local v3 = p[item.questionId] or v
+		local v4
+
+		if item.type == InlineQuestionType.Text then
+			v4 = true
+		elseif item.type == InlineQuestionType.MultipleChoiceSingle then
+			if v3.choiceIds == nil then
+				v4 = false
+			else
+				v4 = #v3.choiceIds == 1
+			end
+		elseif item.type == InlineQuestionType.MultipleChoiceMulti and v3.choiceIds ~= nil then
+			v4 = #v3.choiceIds >= 1
+		else
+			v4 = false
+		end
+
+		if not v4 then
 			return false
 		end
 	end
 
 	return true
 end
-local function indexOfQuestion(t5: {[any]: any}, s2: string) -- line: 110
-	for v42, v43 in t5 do
-		if s2 == v43.questionId then
-			return v42
+
+local function mergeCurrentAnswerIntoBatch(p, p2, p3) -- 1 equivalent call inferred from this helper
+	local clone = table.clone(p)
+
+	if p2 ~= nil then
+		clone[p2.questionId] = p3
+	end
+
+	return clone
+end
+
+local function indexOfQuestion(items, nextQuestionId: string) -- 2 equivalent calls inferred from this helper
+	for k, item in items do
+		if item.questionId == nextQuestionId then
+			return k
 		end
 	end
 
 	return nil
 end
-local function resolveNextQuestionId(p3, p4) -- line: 121
-	local choiceIds = p4.choiceIds
 
-	if p3.choices ~= nil and (choiceIds ~= nil and #choiceIds > 0) then
-		local v47 = choiceIds[1]
+local function resolveNextQuestionId(item, p)
+	local choiceIds = p.choiceIds
 
-		for _, v49 in p3.choices do
-			if v47 == v49.id then
-				return v49.next or p3.next
+	if item.choices == nil or choiceIds == nil or not (#choiceIds > 0) then
+		return item.next
+	end
+
+	local choiceId = choiceIds[1]
+
+	for _, choice in item.choices do
+		if choice.id == choiceId then
+			return choice.next or item.next
+		end
+	end
+
+	return item.next
+end
+
+local function getVisitedQuestions(list, p)
+	local visitedQuestions = {}
+	local set = {}
+	local v3
+
+	if #list > 0 then
+		v3 = 1
+	end
+
+	while v3 ~= nil and not set[v3] do
+		set[v3] = true
+		local item = list[v3]
+		table.insert(visitedQuestions, item)
+		local v4 = p[item.questionId] or v
+		local item2 = list[v3]
+
+		if item2 == nil then
+			v3 = nil
+		else
+			local nextQuestionId = resolveNextQuestionId(item2, v4)
+
+			if nextQuestionId == nil then
+				v3 += 1
+
+				if not (v3 <= #list) then
+					v3 = nil
+				end
+			elseif nextQuestionId == InlineSurveyTypes.NEXT_END then
+				v3 = nil
+			else
+				local k = indexOfQuestion(list, nextQuestionId) -- inferred equivalent call
+
+				if k == nil then
+					v3 += 1
+
+					if not (v3 <= #list) then
+						v3 = nil
+					end
+				else
+					v3 = k
+				end
 			end
 		end
 	end
 
-	return p3.next
+	return visitedQuestions
 end
-local function getVisitedQuestions(t6: {[any]: any}, t7: {[any]: any}) -- line: 161
-	-- upvalues: t1 (copy), resolveNextQuestionId (copy), InlineSurveyTypes (copy)
-	local t8 = {}
-	local t9 = {}
-	local v64 = if not (#t6 > 0) then nil else 1
-	local g72 = nil
-	local v71 = nil
 
-	while v64 ~= nil and not t9[v64] do
-		t9[v64] = true
+local function isLastQuestion(list, p: number, p2): boolean -- 1 equivalent call inferred from this helper
+	if not FFlagInlineSurveyBranching then
+		return #list <= p
+	end
 
-		local v65 = t6[v64]
+	local item = list[p]
+	local v3
 
-		table.insert(t8, v65)
+	if item ~= nil then
+		local nextQuestionId = resolveNextQuestionId(item, p2)
 
-		local v66 = t7[v65.questionId] or t1
-		local v67 = t6[v64]
+		if nextQuestionId == nil then
+			v3 = p + 1
 
-		if v67 == nil then
-			v64 = nil
-
-			continue
-		end
-
-		local v68 = resolveNextQuestionId(v67, v66)
-
-		if v68 ~= nil then
-			if v68 == InlineSurveyTypes.NEXT_END then
-				v64 = nil
-
-				continue
+			if not (v3 <= #list) then
+				v3 = nil
 			end
-
-			for v69, v70 in t6 do
-				if v68 == v70.questionId then
-					v71 = v69
-					g72 = true
-				end
-
-				if g72 then
+		elseif nextQuestionId ~= InlineSurveyTypes.NEXT_END then
+			for k, item2 in list do
+				if item2.questionId == nextQuestionId then
+					v3 = k
 					break
 				end
 			end
 
-			if not g72 then
-				v71 = nil
-			end
+			if v3 == nil then
+				v3 = p + 1
 
-			g72 = false
-
-			if v71 ~= nil then
-				v64 = v71
-
-				continue
+				if not (v3 <= #list) then
+					v3 = nil
+				end
 			end
 		end
-
-		local v73 = v64 + 1
-
-		v64 = if not (v73 <= #t6) then nil else v73
 	end
 
-	return t8
+	return v3 == nil
 end
 
-return {
-	isAnswerComplete = function(p5, p6) -- line: 28
-		-- upvalues: InlineQuestionType (copy)
-		if p5.type == InlineQuestionType.Text then
-			return true
-		end
+local InlineSurveyHelpers = {}
 
-		if p5.type == InlineQuestionType.MultipleChoiceSingle then
-			return p6.choiceIds ~= nil and #p6.choiceIds == 1
-		end
+function InlineSurveyHelpers.isAnswerComplete(p, p2): boolean
+	if p.type == InlineQuestionType.Text then
+		return true
+	end
 
-		if p5.type == InlineQuestionType.MultipleChoiceMulti then
-			return p6.choiceIds ~= nil and #p6.choiceIds >= 1
-		end
+	if p.type == InlineQuestionType.MultipleChoiceSingle then
+		return p2.choiceIds ~= nil and #p2.choiceIds == 1
+	end
 
+	if p.type ~= InlineQuestionType.MultipleChoiceMulti then
 		return false
-	end,
-	buildSubmitPayload = function(s3: string, t10: {[any]: any}, t11: {[any]: any}, s4: string, t12: {[any]: any}?) -- line: 57
-		-- upvalues: t1 (copy), buildResponse (copy)
-		local t13 = {}
+	end
 
-		for _, v28 in t10 do
-			local v29 = t11[v28.questionId] or t1
-			local v30 = buildResponse(v28, v29)
+	return p2.choiceIds ~= nil and #p2.choiceIds >= 1
+end
 
-			if v30 ~= nil then
-				table.insert(t13, {
-					questionId = v28.questionId,
-					type = v28.type,
-					response = v30
-				})
-			end
+function InlineSurveyHelpers.buildSubmitPayload(surveyId: string, items, p, idempotencyKey: string, p2)
+	local answers = {}
+
+	for _, item in items do
+		local response = buildResponse(item, p[item.questionId] or v)
+
+		if response ~= nil then
+			table.insert(answers, {
+				questionId = item.questionId,
+				type = item.type,
+				response = response
+			})
+		end
+	end
+
+	local finished
+
+	if p2 ~= nil then
+		finished = p2.finished
+	end
+
+	return {
+		surveyId = surveyId,
+		idempotencyKey = idempotencyKey,
+		answers = answers,
+		finished = finished
+	}
+end
+
+InlineSurveyHelpers.canSubmitAll = canSubmitAll
+
+function InlineSurveyHelpers.canAdvance(p, p2: number, p3, p4)
+	local v3 = p[p2]
+
+	if v3 == nil then
+		return false
+	end
+
+	if isLastQuestion(p, p2, p4) then -- inferred equivalent call
+		local clone = mergeCurrentAnswerIntoBatch(p3, v3, p4) -- inferred equivalent call
+
+		if FFlagInlineSurveyBranching then
+			p = getVisitedQuestions(p, clone)
 		end
 
-		return {
-			surveyId = s3,
-			idempotencyKey = s4,
-			answers = t13,
-			finished = if t12 == nil then nil else t12.finished
-		}
-	end,
-	canSubmitAll = canSubmitAll,
-	canAdvance = function(t14: {[any]: any}, n1: number, t15: {[any]: any}, p7) -- line: 187
-		-- upvalues: FFlagInlineSurveyBranching (copy), resolveNextQuestionId (copy), InlineSurveyTypes (copy), getVisitedQuestions (copy), canSubmitAll (copy), InlineQuestionType (copy)
-		local v88 = t14[n1]
+		return canSubmitAll(p, clone)
+	end
 
-		if v88 == nil then
-			return false
+	if not (v3.required == true and v3.type ~= InlineQuestionType.Text) then
+		return true
+	end
+
+	if v3.type == InlineQuestionType.MultipleChoiceSingle then
+		if p4.choiceIds ~= nil then
+			return #p4.choiceIds == 1
 		end
+	elseif v3.type == InlineQuestionType.MultipleChoiceMulti and p4.choiceIds ~= nil then
+		return #p4.choiceIds >= 1
+	end
 
-		local g90 = nil
-		local g93 = nil
-		local v94 = nil
-		local g97 = nil
-		local v92 = nil
-		local v89 = nil
+	return false
+end
 
-		if not FFlagInlineSurveyBranching then
-			v89 = n1 >= #t14
-			g90 = true
-		end
+function InlineSurveyHelpers.resolveNextIndex(list, p: number, p2)
+	local item = list[p]
 
-		if not g90 then
-			local v91 = t14[n1]
+	if item == nil then
+		return nil
+	end
 
-			if v91 == nil then
-				v92 = nil
-				g93 = true
-			end
+	local nextQuestionId = resolveNextQuestionId(item, p2)
+	local v3
 
-			if not g93 then
-				v94 = resolveNextQuestionId(v91, p7)
-			end
-		end
-
-		repeat
-			if g90 or (g93 or (g93 or v94 ~= nil)) then
-				if not g90 then
-					if not g93 then
-						if not g93 then
-							if v94 == InlineSurveyTypes.NEXT_END then
-								v92 = nil
-								g93 = true
-							end
-
-							if not g93 then
-								for v95, v96 in t14 do
-									if v94 == v96.questionId then
-										v92 = v95
-										g97 = true
-									end
-
-									if g97 then
-										break
-									end
-								end
-
-								if not g97 then
-									v92 = nil
-								end
-
-								g97 = false
-							end
-						end
-					end
-				end
-
-				if g90 or (g93 or (g93 or (g93 or v92 ~= nil))) then
-					if not g90 then
-						g93 = false
-						v89 = v92 == nil
-					end
-
-					g90 = false
-
-					if v89 then
-						local v98 = table.clone(t15)
-
-						if v88 ~= nil then
-							v98[v88.questionId] = p7
-						end
-
-						local v99 = if not FFlagInlineSurveyBranching then t14 else getVisitedQuestions(t14, v98)
-
-						return (canSubmitAll(v99, v98))
-					end
-
-					local v100 = true
-
-					if v88.required == true then
-						if v88.type == InlineQuestionType.Text then
-							return true
-						end
-
-						if v88.type == InlineQuestionType.MultipleChoiceSingle then
-							v100 = false
-
-							if p7.choiceIds ~= nil then
-								return #p7.choiceIds == 1
-							end
-						elseif v88.type == InlineQuestionType.MultipleChoiceMulti then
-							v100 = false
-
-							if p7.choiceIds ~= nil then
-								return #p7.choiceIds >= 1
-							end
-						else
-							v100 = false
-						end
-					end
-
-					return v100
-				end
-			end
-
-			local v101 = n1 + 1
-
-			v92 = if not (v101 <= #t14) then nil else v101
-			g93 = true
-		until not g93
-	end,
-	resolveNextIndex = function(t16: {[any]: any}, n2: number, p8) -- line: 139
-		-- upvalues: resolveNextQuestionId (copy), InlineSurveyTypes (copy)
-		local v53 = t16[n2]
-
-		if v53 == nil then
+	if nextQuestionId == nil then
+		v3 = p + 1
+		return if v3 <= #list then v3 else nil
+	else
+		if nextQuestionId == InlineSurveyTypes.NEXT_END then
 			return nil
 		end
 
-		local v54 = resolveNextQuestionId(v53, p8)
+		local k = indexOfQuestion(list, nextQuestionId) -- inferred equivalent call
 
-		if v54 ~= nil then
-			if v54 == InlineSurveyTypes.NEXT_END then
-				return nil
-			end
-
-			local g58 = nil
-			local v57 = nil
-
-			for v55, v56 in t16 do
-				if v54 == v56.questionId then
-					v57 = v55
-					g58 = true
-				end
-
-				if g58 then
-					break
-				end
-			end
-
-			if not g58 then
-				v57 = nil
-			end
-
-			g58 = false
-
-			if v57 ~= nil then
-				return v57
-			end
+		if k ~= nil then
+			return k
 		end
 
-		local v59 = n2 + 1
-
-		if v59 <= #t16 then
-			return v59
-		end
-
-		return nil
-	end,
-	getVisitedQuestions = getVisitedQuestions,
-	isLastQuestion = function(t17: {[any]: any}, n3: number, p9) -- line: 179
-		-- upvalues: FFlagInlineSurveyBranching (copy), resolveNextQuestionId (copy), InlineSurveyTypes (copy)
-		if not FFlagInlineSurveyBranching then
-			return n3 >= #t17
-		end
-
-		local v77 = t17[n3]
-		local v78
-
-		if v77 == nil then
-			v78 = nil
-
-			return v78 == nil
-		end
-
-		local v79 = resolveNextQuestionId(v77, p9)
-
-		if v79 ~= nil then
-			if v79 == InlineSurveyTypes.NEXT_END then
-				v78 = nil
-
-				return v78 == nil
-			end
-
-			local g82 = nil
-
-			v78 = nil
-
-			for v80, v81 in t17 do
-				if v79 == v81.questionId then
-					v78 = v80
-					g82 = true
-				end
-
-				if g82 then
-					break
-				end
-			end
-
-			if not g82 then
-				v78 = nil
-			end
-
-			g82 = false
-
-			if v78 ~= nil then
-				return v78 == nil
-			end
-		end
-
-		local v83 = n3 + 1
-
-		v78 = if not (v83 <= #t17) then nil else v83
-
-		return v78 == nil
-	end,
-	mergeCurrentAnswerIntoBatch = function(t18: {[any]: any}, p10, p11) -- line: 98
-		local v39 = table.clone(t18)
-
-		if p10 ~= nil then
-			v39[p10.questionId] = p11
-		end
-
-		return v39
-	end,
-	toggleChoice = function(p12, s5: string, b1: boolean) -- line: 206
-		-- upvalues: t2 (copy)
-		if not b1 then
-			return { s5 }
-		end
-
-		local t19 = {}
-		local v106 = false
-
-		for _, v108 in p12.choiceIds or t2 do
-			if v108 == s5 then
-				v106 = true
-			else
-				table.insert(t19, v108)
-			end
-		end
-
-		if not v106 then
-			table.insert(t19, s5)
-		end
-
-		return t19
+		v3 = p + 1
+		return if v3 <= #list then v3 else nil
 	end
-}
+end
+
+InlineSurveyHelpers.getVisitedQuestions = getVisitedQuestions
+InlineSurveyHelpers.isLastQuestion = isLastQuestion
+InlineSurveyHelpers.mergeCurrentAnswerIntoBatch = mergeCurrentAnswerIntoBatch
+
+function InlineSurveyHelpers.toggleChoice(p, p2: string, flag: boolean)
+	if not flag then
+		return { p2 }
+	end
+
+	local result = {}
+	local v3 = false
+
+	for _, v4 in p.choiceIds or v2 do
+		if v4 == p2 then
+			v3 = true
+		else
+			table.insert(result, v4)
+		end
+	end
+
+	if not v3 then
+		table.insert(result, p2)
+	end
+
+	return result
+end
+
+return InlineSurveyHelpers

@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-return require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+return SharedFlags.FFlagEnableConsoleExpControls

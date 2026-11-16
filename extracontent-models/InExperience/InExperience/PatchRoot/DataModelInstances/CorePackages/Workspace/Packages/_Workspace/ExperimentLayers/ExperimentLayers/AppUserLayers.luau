@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("ExperimentLayers").Parent
-local SharedFlags = require(Parent.SharedFlags)
+local parent = script:FindFirstAncestor("ExperimentLayers").Parent
+local SharedFlags = require(parent.SharedFlags)
 local getFStringDesktopToastNotificationLayer = SharedFlags.getFStringDesktopToastNotificationLayer
 local GetFStringUniversalAppGameInviteMenuLayer = SharedFlags.GetFStringUniversalAppGameInviteMenuLayer
 local GetFStringAndroidPhoneVerificationLayer = SharedFlags.GetFStringAndroidPhoneVerificationLayer
@@ -10,14 +10,18 @@ local FStringLuaAppDevStoreSeeAllSduiIxpLayer = SharedFlags.FStringLuaAppDevStor
 game:DefineFastString("LuaAppOmniSearchLayer", "PlayerApp.SearchResultsPage")
 game:DefineFastString("XboxClassicUILayer", "Consoles.Xbox.Classic.UI")
 
-local v9 = game:DefineFastString("VoiceUpsellV2ExperimentLayerLua", "SocialVoice.VoiceUpsell")
-
+local defineFastString = game:DefineFastString("VoiceUpsellV2ExperimentLayerLua", "SocialVoice.VoiceUpsell")
 game:DefineFastString("MobileSoundAndHapticsLayer", "Mobile.UI.Shell")
 
-local v10 = game:DefineFastString("ExperienceMenuGamepadExposureLayer", "Experience.Menu.Gamepad.Exposure")
+local defineFastString2 = game:DefineFastString(
+	"ExperienceMenuGamepadExposureLayer",
+	"Experience.Menu.Gamepad.Exposure"
+)
+
 local FStringRMLayer = SharedFlags.FStringRMLayer
 
 return {
+	UniversalAppPageLoadLayer = "UniversalApp.PageLoad",
 	ServeThumbnailsFromEdge = "CoreServices.Thumbnail.ServeThumbnailsFromEdge",
 	GameTileLayer = "PlayerApp.HomeGamePage.UX",
 	OmniSearchLayer = game:GetFastString("LuaAppOmniSearchLayer"),
@@ -37,7 +41,6 @@ return {
 	SocialFriendsLandingLayer = "Social.FriendsLanding",
 	SocialConnectTabLayer = "Social.ConnectTab",
 	SocialDisplayNameLayer = "Social.DisplayNameSetting",
-	SocialMomentsMigration = "Social.MomentsMigration",
 	SocialExperienceDetails = "Social.ExperienceDetails",
 	SocialExperienceDetailsContextualMenu = "Social.ExperienceDetailsContextualMenu",
 	SocialProfilePeekViewLayer = "Social.ProfilePeekView",
@@ -60,6 +63,9 @@ return {
 	PlayerAppSeeAllUXLayer = "PlayerApp.SeeAll.UX",
 	PlayButtonUXExposureLayer = "PlayerApp.PlayButton.UX",
 	MorePageExposureLayer = "Universality.MorePage",
+	SettingsRootPageExposureLayer = "UniversalApp.SettingsRootPage",
+	UCUASettingsPageExposureLayer = "UniversalApp.SettingsPage",
+	UnifyShortcutBarExposureLayer = "UniversalApp.UnifyShortcutBar",
 	AvatarExperienceUAAllViews = "AvatarExperience.UA.AllViews",
 	AvatarExperienceUAAllViewsSecondary = "AvatarExperience.UA.AllViews.Secondary",
 	AvatarExperienceUAMarketplaceView = "AvatarExperience.UA.MarketplaceView",
@@ -97,11 +103,19 @@ return {
 	AccessLayer = "Experimentation.ExposureTest.AccessLayer",
 	GridUILayer = "PlayerApp.GridUI",
 	ExpChatHiddenMessagesExpLayer = "ExperienceChat.HiddenMessages",
+	ExpChatMessageHistoryLayer = "ExperienceChat.MessageHistory",
 	ExpChatSystemMessagesExpLayer = "ExperienceChat.SystemMessages",
+	ExpChatTabOrderLayer = "ExperienceChat.TabOrder",
+	ExpChatPresetChatLayer = "UniverseChat.PresetChat",
+	ExpChatPresetChatAutocompleteLayer = "UniverseChat.PresetChatAutocomplete",
+	ExpChatPresetChatEmojiTabLayer = "UniverseChat.PresetChat.Emojis",
+	ExpChatPresetChatEmojiEffectLayer = "UniverseChat.PresetChat.Emojis.Experiment1",
+	ExpChatPresetChatBadgePresetFTUXLayer = "UniverseChat.PresetChat.BadgePresetFTUX",
+	ExpChatOpenExpressionTrayLayer = "UniverseChat.OpenExpressionTray",
 	ExperienceDetailsPageLayer = "PlayerApp.GameDetailsPage",
 	ExperienceDetailsPageExposureLayer = "PlayerApp.GameDetailsPage.Exposure",
 	ExperienceMenuLayer = "Experience.Menu",
-	ExperienceMenuGamepadExposureLayer = v10,
+	ExperienceMenuGamepadExposureLayer = defineFastString2,
 	ExperienceMenuSettingsExposureLayer = "Experience.Menu.Settings.Exposure",
 	ExperienceMenuExitModalLayer = "Experience.Menu.ExitModal",
 	ConsoleExperienceMenuLayer = "Experience.Menu.Console",
@@ -115,6 +129,7 @@ return {
 	XboxClassicUILayer = game:GetFastString("XboxClassicUILayer"),
 	EventsOnExperienceDetailsPageLayer = "Ecosystems.EventsOnExperienceDetailsPage",
 	AdsAdBlock = "Ads.AdBlock",
+	SponsoredGamePreviewVideo = "Ads.GamePreviewVideo",
 	ProfileQRCodeFriendRequestAlertsLayer = "ProfileQRCodeFriendRequestAlertsLayer",
 	ProfileQRCodeLayer = "ProfileQRCodeLayer",
 	ProfileQRCodeScannerLayer = "ProfileQRCodeScannerLayer",
@@ -133,7 +148,7 @@ return {
 	CameraButton = "AvatarExperience.CameraButtonExposure",
 	VoiceCivilityAndSafety = "Voice.CivilityAndSafety",
 	VoiceVolumeControls = "Voice.VolumeControls",
-	VoiceUpsellV2ExperimentLayerLua = v9,
+	VoiceUpsellV2ExperimentLayerLua = defineFastString,
 	LuaGameInviteMenuLayer = GetFStringUniversalAppGameInviteMenuLayer(),
 	EDPCommunityLinksLayer = "UserCommunities.EDP.CommunityLinks",
 	EDPPlayerFeedbackExposureLayer = "PlayerApp.EDP.PlayerFeedback.Exposure",
@@ -150,7 +165,9 @@ return {
 	CreatorSuccessVirtualEvents = "CreatorSuccess.VirtualEvents",
 	AppBadgingLayer = game:DefineFastString("AppBadgingLayer", "Notifications.AppBadging"),
 	ConsoleVoiceLayer = "User.Communication.ConsoleVoice",
+	FriendsChatRestrictionUserIDLayer = "UserSafety.FriendsChatRestriction.UserID",
 	NotApprovedPageUserIDLayer = "UserSafety.NotApprovedPage.UserID",
+	VoiceUserIDLayer = "UserSafety.Voice.UserID",
 	EconomyDeveloperMonetizationEdpVirtualProductsRanking = "Economy.DeveloperMonetization.EdpVirtualProductsRanking",
 	RMLayer = FStringRMLayer,
 	PlayerAppBadgesExposure = FStringLuaAppBadgesSeeAllIxpLayer,
@@ -167,5 +184,8 @@ return {
 	PartySchedule = "Party.Schedule",
 	ConnectionsHubExposureLayer = "Social.ConnectionsHub",
 	AdsPlayWithRewardBetaLayer = "Ads.RewardedAds.PlayWithRewardBeta",
-	AdsPlayWithRewardBetaAndroidLayer = game:DefineFastString("LuaAppAdsPlayWithRewardBetaAndroidLayer", "Ads.RewardedAds.PlayWithRewardBeta.Android")
+	AdsPlayWithRewardBetaAndroidLayer = game:DefineFastString(
+		"LuaAppAdsPlayWithRewardBetaAndroidLayer",
+		"Ads.RewardedAds.PlayWithRewardBeta.Android"
+	)
 }

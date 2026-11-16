@@ -1,0 +1,2 @@
+return game:DefineFastFlag("ExpChatUniverseChatPresetEnabled2", false)
+	and game:GetEngineFeature("TextChatUniverseChatPresetsEnabled")

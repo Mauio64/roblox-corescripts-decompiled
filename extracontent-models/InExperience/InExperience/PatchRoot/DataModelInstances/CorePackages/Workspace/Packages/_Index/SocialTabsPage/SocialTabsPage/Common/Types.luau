@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("SocialTabsPage").Parent
+local parent = script:FindFirstAncestor("SocialTabsPage").Parent
 
-require(Parent.React)
+require(parent.React)
 
 return nil

@@ -1,3 +1,1 @@
-return {
-	OsaContextCardOneToOne = "OsaContextCardOneToOne"
-}
+return { OsaContextCardOneToOne = "OsaContextCardOneToOne" }

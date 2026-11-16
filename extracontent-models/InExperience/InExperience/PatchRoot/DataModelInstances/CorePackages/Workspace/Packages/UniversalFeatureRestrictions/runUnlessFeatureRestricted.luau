@@ -1,0 +1,4 @@
+local Workspace = script.Parent.Parent._Workspace
+local runUnlessFeatureRestricted = require(Workspace.UniversalFeatureRestrictions.UniversalFeatureRestrictions.Utils.runUnlessFeatureRestricted)
+
+return runUnlessFeatureRestricted

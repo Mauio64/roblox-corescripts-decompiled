@@ -1,91 +1,87 @@
-local Parent = script:FindFirstAncestor("System").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("System").Parent
+local Signals = require(parent.Signals)
 local createSignal = Signals.createSignal
 local createEffect = Signals.createEffect
-local t1 = {}
 
-t1.__index = t1
+local Lifecycle = {}
+Lifecycle.__index = Lifecycle
 
-function t1.new(t2: {[any]: any}?) -- line: 36
-	-- upvalues: t1 (copy), createSignal (copy), createEffect (copy)
-	local self = setmetatable({}, t1)
-	local v8 = false
-	local v9 = false
+function Lifecycle.new(p)
+	local object = setmetatable({}, Lifecycle)
+	local v, v2
 
-	if t2 then
-		v8 = t2.defaultVisible
-		v9 = t2.defaultEnabled
+	if p then
+		v = p.defaultVisible
+		v2 = p.defaultEnabled
+	else
+		v = false
+		v2 = false
 	end
 
-	local v10, v11 = createSignal(v8)
-	local v12, v13 = createSignal(v9)
+	local signal, setVisible = createSignal(v)
+	local signal2, setEnabled = createSignal(v2)
 
-	self.getVisible = v10
-	self.setVisible = v11
-	self.getEnabled = v12
-	self.setEnabled = v13
+	object.getVisible = signal
+	object.setVisible = setVisible
+	object.getEnabled = signal2
+	object.setEnabled = setEnabled
 
-	local t3 = {}
-	local t4 = {}
-	local v16 = createEffect(function(p1) -- line: 58
-		-- upvalues: v10 (copy), self (copy), t3 (copy), v11 (copy)
-		local v19 = v10(p1)
+	local v3 = {}
+	local callbacks = {}
 
-		if self.getEnabled(false) then
-			for _, v21 in t3 do
-				local v22 = v21(v19)
+	local effect = createEffect(function(p2)
+		local v4 = signal(p2)
 
-				if type(v22) == "boolean" and v22 ~= v19 then
-					v11(v22)
+		if object.getEnabled(false) then
+			for _, v5 in v3 do
+				local v6 = v5(v4)
 
+				if type(v6) == "boolean" and v6 ~= v4 then
+					setVisible(v6)
 					return
 				end
 			end
 		end
 	end)
-	local v17 = createEffect(function(p2) -- line: 71
-		-- upvalues: v12 (copy), t4 (copy)
-		local v24 = v12(p2)
 
-		for _, v26 in t4 do
-			v26(v24)
+	local effect2 = createEffect(function(p2)
+		local v4 = signal2(p2)
+
+		for _, v5 in callbacks do
+			v5(v4)
 		end
 	end)
 
-	function self.dispose(_) -- line: 78
-		-- upvalues: v16 (copy), v17 (copy)
-		v16()
-		v17()
+	function object.dispose(_)
+		effect()
+		effect2()
 	end
-	function self.onVisibilityChanged(_, p5: ((...any) -> ...any)) -- line: 83
-		-- upvalues: t3 (copy)
-		table.insert(t3, p5)
 
-		return function() -- line: 86
-			-- upvalues: t3 (copy), p5 (copy)
-			local v32 = table.find(t3, p5)
+	function object.onVisibilityChanged(_, callback)
+		table.insert(v3, callback)
 
-			if v32 then
-				table.remove(t3, v32)
-			end
-		end
-	end
-	function self.onEnabledChanged(_, p7: ((...any) -> ...any)) -- line: 94
-		-- upvalues: t4 (copy), v12 (copy)
-		table.insert(t4, p7)
-		p7(v12(false))
+		return function()
+			local index = table.find(v3, callback)
 
-		return function() -- line: 97
-			-- upvalues: t4 (copy), p7 (copy)
-			local v33 = table.find(t4, p7)
-
-			if v33 then
-				table.remove(t4, v33)
+			if index then
+				table.remove(v3, index)
 			end
 		end
 	end
 
-	return self
+	function object.onEnabledChanged(_, callback)
+		table.insert(callbacks, callback)
+		callback(signal2(false))
+		return function()
+			local index = table.find(callbacks, callback)
+
+			if index then
+				table.remove(callbacks, index)
+			end
+		end
+	end
+
+	return object
 end
 
-return t1
+return Lifecycle

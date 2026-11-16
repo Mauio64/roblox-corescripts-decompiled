@@ -1,70 +1,80 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
-
-local t1 = {}
-local GraphQL = require(ParentParent.GraphQL)
+local GraphQL = require(parent.GraphQL)
 local GraphQLObjectType = GraphQL.GraphQLObjectType
+
 local GraphQLInterfaceType = GraphQL.GraphQLInterfaceType
+
 local GraphQLInputObjectType = GraphQL.GraphQLInputObjectType
+
 local GraphQLString = GraphQL.GraphQLString
+
 local GraphQLInt = GraphQL.GraphQLInt
 local GraphQLFloat = GraphQL.GraphQLFloat
 local GraphQLBoolean = GraphQL.GraphQLBoolean
 local GraphQLID = GraphQL.GraphQLID
+
 local Kind = GraphQL.Kind
+
 local GraphQLList = GraphQL.GraphQLList
 local GraphQLNonNull = GraphQL.GraphQLNonNull
 
-local function createNamedStub(s1: string, p1) -- line: 68
-	-- upvalues: GraphQLObjectType (copy), GraphQLInterfaceType (copy), GraphQLInputObjectType (copy), GraphQLString (copy)
-	return ((if p1 ~= "object" then (if p1 ~= "interface" then GraphQLInputObjectType else GraphQLInterfaceType) else GraphQLObjectType)).new({
-		name = s1,
+local function createNamedStub(name: string, p)
+	local v
+
+	if p == "object" then
+		v = GraphQLObjectType
+	elseif p == "interface" then
+		v = GraphQLInterfaceType
+	else
+		v = GraphQLInputObjectType
+	end
+
+	return v.new({
+		name = name,
 		fields = {
-			_fake = {
-				type = GraphQLString
-			}
+			_fake = { type = GraphQLString }
 		}
 	})
 end
 
-t1.createNamedStub = createNamedStub
+local Stub = {}
+Stub.createNamedStub = createNamedStub
+local function createStub(kind, p)
+	local kind2 = kind.kind
 
-local function createStub(p2, p3) -- line: 96
-	-- upvalues: Kind (copy), GraphQLList (copy), createStub (copy), GraphQLNonNull (copy), createNamedStub (copy)
-	local kind = p2.kind
-
-	if kind == Kind.LIST_TYPE then
-		return GraphQLList.new(createStub(p2.type, p3))
+	if kind2 == Kind.LIST_TYPE then
+		return GraphQLList.new(createStub(kind.type, p))
 	end
 
-	if kind == Kind.NON_NULL_TYPE then
-		return GraphQLNonNull.new(createStub(p2.type, p3))
+	if kind2 == Kind.NON_NULL_TYPE then
+		return GraphQLNonNull.new(createStub(kind.type, p))
 	end
 
-	if p3 == "output" then
-		return createNamedStub(p2.name.value, "object")
+	if p == "output" then
+		return createNamedStub(kind.name.value, "object")
 	end
 
-	return createNamedStub(p2.name.value, "input")
+	return createNamedStub(kind.name.value, "input")
 end
 
-t1.createStub = createStub
+Stub.createStub = createStub
 
-function t1.isNamedStub(p4) -- line: 125
-	if p4.getFields ~= nil then
-		local v23 = p4:getFields()
+function Stub.isNamedStub(object): boolean
+	if object.getFields ~= nil then
+		local fields = object:getFields()
 
-		for _, v25 in v23 do
-			return v23[tostring((table.unpack(v25)))].name == "_fake"
+		for _, list in fields do
+			return fields[tostring((table.unpack(list)))].name == "_fake"
 		end
 	end
 
 	return false
 end
-function t1.getBuiltInForStub(p5) -- line: 149
-	-- upvalues: GraphQLInt (copy), GraphQLFloat (copy), GraphQLString (copy), GraphQLBoolean (copy), GraphQLID (copy)
-	local name = p5.name
+
+function Stub.getBuiltInForStub(p)
+	local name = p.name
 
 	if name == GraphQLInt.name then
 		return GraphQLInt
@@ -82,11 +92,6 @@ function t1.getBuiltInForStub(p5) -- line: 149
 		return GraphQLBoolean
 	end
 
-	if name == GraphQLID.name then
-		return GraphQLID
-	end
-
-	return p5
+	return if name == GraphQLID.name then GraphQLID else p
 end
-
-return t1
+return Stub

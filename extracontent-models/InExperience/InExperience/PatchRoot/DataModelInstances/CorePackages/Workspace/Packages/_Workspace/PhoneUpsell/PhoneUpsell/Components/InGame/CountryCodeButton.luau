@@ -1,56 +1,86 @@
-local Parent = script:FindFirstAncestor("PhoneUpsell").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("PhoneUpsell").Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
 local useStyle = UIBlox.Core.Style.useStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local GetImageData = require(Parent.RobloxAppAssets).GetImageData
-local Roact = require(Parent.Roact)
-local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local RobloxAppAssets = require(parent.RobloxAppAssets)
+local GetImageData = RobloxAppAssets.GetImageData
+local Roact = require(parent.Roact)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-local function CountryCodeButton(t1: {[any]: any}) -- line: 25
-	-- upvalues: useStyle (copy), FFlagRenameDeprecatedUIBloxTokens (copy), React (copy), ImageSetLabel (copy), GetImageData (copy), Roact (copy)
-	local v11 = useStyle()
-	local Tokens = v11.Tokens
-	local v13 = if not FFlagRenameDeprecatedUIBloxTokens then Tokens.Component.TextField else {
+local function CountryCodeButton(props)
+	local v = useStyle()
+	local tokens = v.Tokens
+	local v2 = {
 		Base = {
-			Field = {
-				Typography = Tokens.Typography.BodyLarge
-			},
-			FieldValue = {
-				ContentColor = Tokens.Color.Content.Emphasis
-			}
+			Field = { Typography = tokens.Typography.BodyLarge },
+			FieldValue = { ContentColor = tokens.Color.Content.Emphasis }
 		}
 	}
-	local size = t1.size
-	local layoutOrder = t1.layoutOrder
-	local countryPrefix = t1.countryPrefix
-	local v17 = if not t1.error then v11.Theme.UIDefault.Color else Tokens.Color.System.Alert.Color3
-	local UIDefaultTransparency = v11.Theme.UIDefault.Transparency
-	local v19 = t1.font or v13.Base.Field.Typography.Font
-	local v20 = t1.textSize or v13.Base.Field.Typography.FontSize
 
-	return React.createElement(ImageSetLabel, {
+	local size = props.size
+	local layoutOrder = props.layoutOrder
+	local countryPrefix = props.countryPrefix
+	local imageColor
+
+	if props.error then
+		imageColor = tokens.Color.System.Alert.Color3
+	else
+		imageColor = v.Theme.UIDefault.Color
+	end
+
+	local transparency = v.Theme.UIDefault.Transparency
+	local font = props.font or v2.Base.Field.Typography.Font
+	local textSize = props.textSize or v2.Base.Field.Typography.FontSize
+
+	local createElement = React.createElement
+	local v3 = {
 		ZIndex = 2,
-		BackgroundTransparency = 1,
 		Size = size,
+		BackgroundTransparency = 1,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(9, 9, 9, 9),
 		Image = GetImageData("LuaApp/buttons/buttonStroke"),
-		ImageColor3 = v17,
-		ImageTransparency = UIDefaultTransparency,
+		ImageColor3 = imageColor,
+		ImageTransparency = transparency,
 		LayoutOrder = layoutOrder
-	}, {
-		Button = React.createElement("TextButton", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, 0),
-			Text = countryPrefix,
-			Font = v19,
-			TextSize = v20,
-			TextColor3 = v13.Base.FieldValue.ContentColor.Color3,
-			TextTransparency = v13.Base.FieldValue.ContentColor.Transparency,
-			[Roact.Event.Activated] = t1.onButtonClick,
-			[Roact.Ref] = t1.forwardRef
-		})
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		["BackgroundTransparency"] = nil,
+		["BackgroundTransparency"] = nil,
+		["BackgroundTransparency"] = nil,
+		["BackgroundTransparency"] = nil,
+		["BackgroundTransparency"] = nil,
+		["BackgroundTransparency"] = nil,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		Text = countryPrefix
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font
+	end
+
+	v4.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(font)
+	end
+
+	v4.FontFace = fontFace
+	v4.TextSize = textSize
+	v4.TextColor3 = v2.Base.FieldValue.ContentColor.Color3
+	v4.TextTransparency = v2.Base.FieldValue.ContentColor.Transparency
+	v4[Roact.Event.Activated] = props.onButtonClick
+	v4[Roact.Ref] = props.forwardRef
+	return createElement(ImageSetLabel, v3, {
+		Button = createElement2("TextButton", v4)
 	})
 end
 

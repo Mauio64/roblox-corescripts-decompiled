@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
+local parent = script:FindFirstAncestor("Moments").Parent
 
-return require(Parent.DataHydration.MomentsFFlagMomentsEmojiSetsApi)
+return require(parent.DataHydration.MomentsFFlagMomentsEmojiSetsApi)

@@ -1,22 +1,29 @@
-local Parent = script:FindFirstAncestor("ErrorReporters").Parent
+local parent = script:FindFirstAncestor("ErrorReporters").Parent
 local RunService = game:GetService("RunService")
-local Cryo = require(Parent.Cryo)
-local t = require(Parent.t)
+
+local Cryo = require(parent.Cryo)
+local t = require(parent.t)
+
 local BacktraceReport = require(script.Parent.BacktraceReport)
 local ErrorQueue = require(script.Parent.Parent.ErrorQueue)
 local FFlagLuaAppEnableBacktraceSessionInfo = require(script.Parent.Flags.FFlagLuaAppEnableBacktraceSessionInfo)
-local v8 = RunService:IsStudio()
+
+local isStudio = RunService:IsStudio()
+
 local FIntOldestUAVersionToReportErrors = require(script.Parent.Parent.FIntOldestUAVersionToReportErrors)
-local t1 = {}
 
-t1.__index = t1
+local BacktraceReporter = {}
+BacktraceReporter.__index = BacktraceReporter
 
-local v11 = t.strictInterface({
-	httpService = t.some(t.instanceOf("HttpService"), t.interface({
-		JSONEncode = t.callback,
-		JSONDecode = t.callback,
-		RequestInternal = t.callback
-	})),
+local strictInterface = t.strictInterface({
+	httpService = t.some(
+		t.instanceOf("HttpService"),
+		t.interface({
+			JSONEncode = t.callback,
+			JSONDecode = t.callback,
+			RequestInternal = t.callback
+		})
+	),
 	token = t.string,
 	processErrorReportMethod = t.optional(t.callback),
 	queueOptions = t.optional(t.table),
@@ -24,254 +31,241 @@ local v11 = t.strictInterface({
 	logIntervalInSeconds = t.optional(t.numberPositive)
 })
 
-function t1.new(p1) -- line: 42
-	-- upvalues: v11 (copy), v8 (copy), t1 (copy), ErrorQueue (copy)
-	local v15, v16 = v11(p1)
-	local t2 = nil
+function BacktraceReporter.new(data)
+	local v, v2 = strictInterface(data)
+	local v3 = nil
 
-	if v15 then
-		t2 = {
+	if v then
+		v3 = {
 			_isEnabled = true,
+			_httpService = data.httpService,
 			_errorQueue = nil,
-			_lastLogTime = 0,
-			_httpService = p1.httpService,
-			_reportUrl = game:GetFastString("ErrorUploadToBacktraceBaseUrl") .. "token=" .. p1.token,
-			_processErrorReportMethod = p1.processErrorReportMethod,
+			_reportUrl = game:GetFastString("ErrorUploadToBacktraceBaseUrl") .. "token=" .. data.token,
+			_processErrorReportMethod = data.processErrorReportMethod,
 			_sharedAttributes = {},
 			_sharedAnnotations = {},
-			_generateLogMethod = p1.generateLogMethod,
-			_logIntervalInSeconds = p1.logIntervalInSeconds or 60
+			_generateLogMethod = data.generateLogMethod,
+			_logIntervalInSeconds = data.logIntervalInSeconds or 60,
+			_lastLogTime = 0
 		}
-	elseif v8 or _G.__DEV__ then
-		error("invalid arguments for BacktraceReporter: " .. v16)
+	elseif isStudio or _G.__DEV__ then
+		error("invalid arguments for BacktraceReporter: " .. v2)
 	else
-		t2 = {
-			_isEnabled = false
-		}
+		v3 = { _isEnabled = false }
 	end
 
-	setmetatable(t2, t1)
+	setmetatable(v3, BacktraceReporter)
 
-	if t2._isEnabled then
-		t2._errorQueue = ErrorQueue.new(function(...) -- line: 72
-			-- upvalues: t2 (ref)
-			t2:_reportErrorFromErrorQueue(...)
-		end, p1.queueOptions)
-		t2._errorQueue:startTimer()
+	if v3._isEnabled then
+		v3._errorQueue = ErrorQueue.new(function(...)
+			v3:_reportErrorFromErrorQueue(...)
+		end, data.queueOptions)
+
+		v3._errorQueue:startTimer()
 	end
 
-	return t2
+	return v3
 end
-function t1.isTooOldToReportErrors(_) -- line: 85
-	-- upvalues: RunService (copy), FIntOldestUAVersionToReportErrors (copy)
-	local RobloxVersion = RunService:GetRobloxVersion()
-	local num = tonumber(string.match(RobloxVersion, ".(%d+)."))
 
-	if not num then
-		return false
-	end
+function BacktraceReporter:isTooOldToReportErrors(): boolean
+	local robloxVersion = RunService:GetRobloxVersion()
+	local v = tonumber(string.match(robloxVersion, ".(%d+)."))
 
-	if num < FIntOldestUAVersionToReportErrors then
-		return true
+	if v then
+		return v < FIntOldestUAVersionToReportErrors
 	end
 
 	return false
 end
-function t1.sendErrorReport(p3, p4, p5) -- line: 97
-	-- upvalues: v8 (copy)
-	if not p3._isEnabled then
+
+function BacktraceReporter:sendErrorReport(object, p)
+	if not self._isEnabled or self:isTooOldToReportErrors() then
 		return
 	end
 
-	if p3:isTooOldToReportErrors() then
-		return
+	if isStudio or _G.__DEV__ then
+		assert(object:validate())
 	end
 
-	if v8 or _G.__DEV__ then
-		assert(p4:validate())
-	end
-
-	local ok, result = pcall(function() -- line: 113
-		-- upvalues: p3 (copy), p4 (copy)
-		return p3._httpService:JSONEncode(p4)
+	local success, result = pcall(function()
+		return self._httpService:JSONEncode(object)
 	end)
 
-	if not ok then
-		warn("Cannot convert report to Json")
+	if success then
+		pcall(function()
+			self._httpService:RequestInternal({
+				Url = self._reportUrl .. "&format=json",
+				Method = "POST",
+				Headers = { ["Content-Type"] = "application/json" },
+				Body = result
+			}):Start(function(_, p2)
+				if p2.StatusCode == 200 and p ~= nil then
+					local success2, result2 = pcall(function()
+						return self._httpService:JSONDecode(p2.Body)
+					end)
 
-		return
-	end
-
-	pcall(function() -- line: 122
-		-- upvalues: p3 (copy), result (copy), p5 (copy)
-		p3._httpService:RequestInternal({
-			Method = "POST",
-			Url = p3._reportUrl .. "&format=json",
-			Headers = {
-				["Content-Type"] = "application/json"
-			},
-			Body = result
-		}):Start(function(_, p7) -- line: 132
-			-- upvalues: p5 (copy), p3 (copy)
-			if p7.StatusCode == 200 and p5 ~= nil then
-				local ok2, result2 = pcall(function() -- line: 136
-					-- upvalues: p3 (copy), p7 (copy)
-					return p3._httpService:JSONDecode(p7.Body)
-				end)
-
-				if ok2 and result2._rxid ~= nil then
-					p3:_sendLogToReport(result2._rxid, p5)
+					if success2 and result2._rxid ~= nil then
+						self:_sendLogToReport(result2._rxid, p)
+					end
 				end
-			end
+			end)
 		end)
-	end)
+	else
+		warn("Cannot convert report to Json")
+	end
 end
-function t1._sendLogToReport(p8, p9, p10) -- line: 148
-	if type(p10) ~= "string" or #p10 == 0 then
+
+function BacktraceReporter:_sendLogToReport(p, body)
+	if type(body) ~= "string" or #body == 0 then
 		return
 	end
 
-	pcall(function() -- line: 153
-		-- upvalues: p8 (copy), p9 (copy), p10 (copy)
-		p8._httpService:RequestInternal({
+	pcall(function()
+		self._httpService:RequestInternal({
+			Url = self._reportUrl .. "&object=" .. p .. "&attachment_name=log.txt",
 			Method = "POST",
-			Url = p8._reportUrl .. "&object=" .. p9 .. "&attachment_name=log.txt",
-			Headers = {
-				["Content-Type"] = "text/plain"
-			},
-			Body = p10
-		}):Start(function(_, _) -- line: 163
-		end)
+			Headers = { ["Content-Type"] = "text/plain" },
+			Body = body
+		}):Start(function(_, _) end)
 	end)
 end
-function t1._generateLog(p13) -- line: 169
-	if p13._generateLogMethod ~= nil and tick() - p13._lastLogTime > p13._logIntervalInSeconds then
-		p13._lastLogTime = tick()
 
-		local ok, result = pcall(function() -- line: 173
-			-- upvalues: p13 (copy)
-			return p13._generateLogMethod()
-		end)
+function BacktraceReporter:_generateLog()
+	if self._generateLogMethod == nil or not (tick() - self._lastLogTime > self._logIntervalInSeconds) then
+		return nil
+	end
 
-		if ok and type(result) == "string" and #result > 0 then
-			return result
-		end
+	self._lastLogTime = tick()
+
+	local success, result = pcall(function()
+		return self._generateLogMethod()
+	end)
+
+	if success and type(result) == "string" and #result > 0 then
+		return result
 	end
 
 	return nil
 end
-function t1._generateErrorReport(p14, p15, p16, p17, p18) -- line: 185
-	-- upvalues: BacktraceReport (copy), FFlagLuaAppEnableBacktraceSessionInfo (copy)
-	local v37 = if type(p17) ~= "table" then BacktraceReport.fromMessageAndStack(p15, p16) else BacktraceReport.fromDetails(p17)
 
-	if FFlagLuaAppEnableBacktraceSessionInfo and p18 ~= nil then
-		v37:addAttributes(p18)
+function BacktraceReporter:_generateErrorReport(p, p2, stackDetails, p3)
+	local errorReport
+
+	if type(stackDetails) == "table" then
+		errorReport = BacktraceReport.fromDetails(stackDetails)
+	else
+		errorReport = BacktraceReport.fromMessageAndStack(p, p2)
 	end
 
-	v37:addAttributes(p14._sharedAttributes)
-	v37:addAnnotations(p14._sharedAnnotations)
-
-	if type(p17) == "string" and p17 ~= "" then
-		v37:addAnnotations({
-			stackDetails = p17
-		})
+	if FFlagLuaAppEnableBacktraceSessionInfo and p3 ~= nil then
+		errorReport:addAttributes(p3)
 	end
 
-	return v37
+	errorReport:addAttributes(self._sharedAttributes)
+	errorReport:addAnnotations(self._sharedAnnotations)
+
+	if type(stackDetails) == "string" and stackDetails ~= "" then
+		errorReport:addAnnotations({ stackDetails = stackDetails })
+	end
+
+	return errorReport
 end
-function t1.reportErrorImmediately(p19, p20, p21, p22, p23) -- line: 211
-	if not p19._isEnabled then
+
+function BacktraceReporter:reportErrorImmediately(p, p2, p3, p4)
+	if not self._isEnabled then
 		return
 	end
 
-	local v43 = p19:_generateErrorReport(p20, p21, p22, p23)
+	local errorReport = self:_generateErrorReport(p, p2, p3, p4)
 
-	if p19._processErrorReportMethod ~= nil then
-		v43 = p19._processErrorReportMethod(v43)
+	if self._processErrorReportMethod ~= nil then
+		errorReport = self._processErrorReportMethod(errorReport)
 	end
 
-	p19:sendErrorReport(v43, (p19:_generateLog()))
+	self:sendErrorReport(errorReport, (self:_generateLog()))
 end
-function t1.reportErrorDeferred(p24, p25, p26, p27, p28) -- line: 228
-	if not p24._isEnabled then
+
+function BacktraceReporter:reportErrorDeferred(p, p2, p3, p4)
+	if not self._isEnabled then
 		return
 	end
 
-	local v49 = string.format("%s | %s", p25, p26)
-	local t3 = {}
+	local v = string.format("%s | %s", p, p2)
+	local v2
 
-	if not p24._errorQueue:hasError(v49) then
-		local v51 = p24:_generateErrorReport(p25, p26, p27, p28)
+	if self._errorQueue:hasError(v) then
+		v2 = {}
+	else
+		local errorReport = self:_generateErrorReport(p, p2, p3, p4)
 
-		if p24._processErrorReportMethod ~= nil then
-			v51 = p24._processErrorReportMethod(v51)
+		if self._processErrorReportMethod ~= nil then
+			errorReport = self._processErrorReportMethod(errorReport)
 		end
 
-		t3 = {
-			backtraceReport = v51,
-			log = p24:_generateLog()
-		}
+		v2 = { backtraceReport = errorReport, log = self:_generateLog() }
 	end
 
-	p24._errorQueue:addError(v49, t3)
+	self._errorQueue:addError(v, v2)
 end
-function t1._reportErrorFromErrorQueue(p29, _, p31, p32) -- line: 255
-	local backtraceReport = p31.backtraceReport
-	local log = p31.log
 
-	backtraceReport:addAttributes({
-		ErrorCount = p32
-	})
-	p29:sendErrorReport(backtraceReport, log)
+function BacktraceReporter:_reportErrorFromErrorQueue(_, p, errorCount)
+	local backtraceReport = p.backtraceReport
+	local log = p.log
+
+	backtraceReport:addAttributes({ ErrorCount = errorCount })
+
+	self:sendErrorReport(backtraceReport, log)
 end
 
 local IAttributes = BacktraceReport.IAttributes
 
-function t1.updateSharedAttributes(p33, p34) -- line: 269
-	-- upvalues: Cryo (copy), IAttributes (copy), v8 (copy)
-	local v60 = Cryo.Dictionary.join(p33._sharedAttributes, p34)
-	local v61, v62 = IAttributes(v60)
+function BacktraceReporter:updateSharedAttributes(p)
+	local joined = Cryo.Dictionary.join(self._sharedAttributes, p)
 
-	if not v61 then
-		if not v8 and not _G.__DEV__ then
+	local v, v2 = IAttributes(joined)
+
+	if not v then
+		if isStudio or _G.__DEV__ then
+			assert(v, v2)
+		else
 			return
 		end
-
-		assert(v61, v62)
 	end
 
-	p33._sharedAttributes = v60
+	self._sharedAttributes = joined
 end
 
 local IAnnotations = BacktraceReport.IAnnotations
 
-function t1.updateSharedAnnotations(p35, p36) -- line: 288
-	-- upvalues: Cryo (copy), IAnnotations (copy), v8 (copy)
-	local v65 = Cryo.Dictionary.join(p35._sharedAnnotations, p36)
-	local v66, v67 = IAnnotations(v65)
+function BacktraceReporter:updateSharedAnnotations(p)
+	local joined = Cryo.Dictionary.join(self._sharedAnnotations, p)
 
-	if not v66 then
-		if not v8 and not _G.__DEV__ then
+	local v, v2 = IAnnotations(joined)
+
+	if not v then
+		if isStudio or _G.__DEV__ then
+			assert(v, v2)
+		else
 			return
 		end
-
-		assert(v66, v67)
 	end
 
-	p35._sharedAnnotations = v65
+	self._sharedAnnotations = joined
 end
-function t1.reportAllErrors(p37) -- line: 305
-	if p37._errorQueue ~= nil then
-		p37._errorQueue:reportAllErrors()
-	end
-end
-function t1.stop(p38) -- line: 311
-	p38._isEnabled = false
 
-	if p38._errorQueue ~= nil then
-		p38:reportAllErrors()
-		p38._errorQueue:stopTimer()
+function BacktraceReporter:reportAllErrors()
+	if self._errorQueue ~= nil then
+		self._errorQueue:reportAllErrors()
 	end
 end
 
-return t1
+function BacktraceReporter:stop()
+	self._isEnabled = false
+
+	if self._errorQueue ~= nil then
+		self:reportAllErrors()
+		self._errorQueue:stopTimer()
+	end
+end
+
+return BacktraceReporter

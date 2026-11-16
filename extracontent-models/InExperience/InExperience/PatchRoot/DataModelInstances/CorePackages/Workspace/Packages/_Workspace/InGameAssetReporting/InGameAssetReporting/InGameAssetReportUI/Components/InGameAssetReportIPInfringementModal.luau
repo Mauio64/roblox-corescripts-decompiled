@@ -1,108 +1,99 @@
-local Parent = script:FindFirstAncestor("InGameAssetReporting").Parent
-local React = require(Parent.React)
-local ReactOtter = require(Parent.ReactOtter)
-local UIBlox = require(Parent.UIBlox)
-local Localization = require(Parent.Localization)
-local Foundation = require(Parent.Foundation)
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("InGameAssetReporting").Parent
+
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local UIBlox = require(parent.UIBlox)
+local Localization = require(parent.Localization)
+
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local View = Foundation.View
+
 local useLocalization = Localization.Hooks.useLocalization
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local t1 = {
-	stiffness = 400,
-	damping = 40,
-	mass = 1
-}
 
-local function InGameAssetReportIPInfringementModal(t2: {[any]: any}) -- line: 31
-	-- upvalues: React (copy), useLocalization (copy), ReactOtter (copy), t1 (copy), View (copy), FoundationText (copy), InteractiveAlert (copy), ButtonType (copy)
-	local v15, v16 = React.useState(true)
-	local v17 = useLocalization({
+local v = { stiffness = 400, damping = 40, mass = 1 }
+
+local function InGameAssetReportIPInfringementModal(props)
+	local state, setState = React.useState(true)
+	local v2 = useLocalization({
 		yourReportCode = "Feature.ReportAbuse.Label.YourReportCode",
 		ipInfringementModalText = "Feature.ReportAbuse.Description.IpInfringementReportModal",
 		reportCompleteClose = "Feature.ReportAbuse.Action.Close",
 		thankYouIpInfringementReport = "Feature.ReportAbuse.Title.SelectInSceneIpReport"
 	})
-	local v18, v19 = ReactOtter.useAnimatedBinding(1, function() -- line: 40
-		-- upvalues: v15 (copy), t2 (copy)
-		if not v15 then
-			t2.onClose()
+
+	local v3, v4 = ReactOtter.useAnimatedBinding(1, function()
+		if not state then
+			props.onClose()
 		end
 	end)
-	local v20 = React.useMemo(function() -- line: 47
-		-- upvalues: v15 (copy)
-		if v15 then
-			return 0
-		end
 
-		return 1
-	end, { v15 })
+	local v5 = React.useMemo(function(): number
+		return if state then 0 else 1
+	end, { state })
 
-	React.useEffect(function() -- line: 51
-		-- upvalues: v19 (copy), ReactOtter (copy), v20 (copy), t1 (copy)
-		v19(ReactOtter.spring(v20, t1))
-	end, { v20 })
+	React.useEffect(function()
+		v4(ReactOtter.spring(v5, v))
+	end, { v5 })
 
-	local v21 = React.useCallback(function() -- line: 55
-		-- upvalues: v16 (copy)
-		v16(false)
-	end, { v16 })
-	local v22 = React.useCallback(function() -- line: 59
-		-- upvalues: React (copy), View (copy), FoundationText (copy), v17 (copy), t2 (copy)
-		return React.createElement(View, {
-			tag = "auto-xy col gap-small align-x-center"
-		}, {
-			text1 = React.createElement(FoundationText, {
+	local onActivated = React.useCallback(function()
+		setState(false)
+	end, { setState })
+
+	local middleContent = React.useCallback(function()
+		return React.createElement(View, { tag = "auto-xy col gap-small align-x-center" }, {
+			text1 = React.createElement(Text, {
+				Text = v2.yourReportCode,
 				tag = "auto-xy text-title-medium content-default text-align-x-center",
-				LayoutOrder = 1,
-				Text = v17.yourReportCode
+				LayoutOrder = 1
 			}),
-			text2 = React.createElement(FoundationText, {
+			text2 = React.createElement(Text, {
+				Text = props.reportCode,
 				tag = "auto-xy text-heading-medium content-emphasis text-align-x-center",
-				LayoutOrder = 2,
-				Text = t2.reportCode
+				LayoutOrder = 2
 			}),
-			text3 = React.createElement(FoundationText, {
+			text3 = React.createElement(Text, {
+				Text = v2.ipInfringementModalText,
 				tag = "auto-xy text-body-medium content-default text-align-x-center text-wrap",
 				RichText = true,
-				LayoutOrder = 3,
-				Text = v17.ipInfringementModalText
+				LayoutOrder = 3
 			})
 		})
-	end, { t2.reportCode })
+	end, { props.reportCode })
 
 	return React.createElement("TextButton", {
 		AutoButtonColor = false,
 		BorderSizePixel = 0,
-		BackgroundTransparency = v18:map(function(n1: number) -- line: 85
-			return n1 + 0.3
+		BackgroundTransparency = v3:map(function(p: number)
+			return p + 0.3
 		end),
 		BackgroundColor3 = Color3.fromHex("#000000"),
 		Size = UDim2.new(1, 0, 1, 0),
 		Text = "",
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		[React.Event.Activated] = v21,
+		[React.Event.Activated] = onActivated,
 		ZIndex = 10
 	}, {
 		Alert = React.createElement(InteractiveAlert, {
+			screenSize = props.screenSize,
+			title = v2.thankYouIpInfringementReport,
 			richText = true,
-			screenSize = t2.screenSize,
-			title = v17.thankYouIpInfringementReport,
-			middleContent = v22,
+			middleContent = middleContent,
 			anchorPoint = Vector2.new(0.5, 0.5),
-			position = v18:map(function(p1) -- line: 102
-				return UDim2.new(0.5, 0, 0.5, 0):Lerp(UDim2.new(0.5, 0, -0.5, 0), p1)
+			position = v3:map(function(p)
+				return UDim2.new(0.5, 0, 0.5, 0):Lerp(UDim2.new(0.5, 0, -0.5, 0), p)
 			end),
 			buttonStackInfo = {
-				buttons = {{
-					buttonType = ButtonType.PrimarySystem,
-					props = {
-						onActivated = v21,
-						text = v17.reportCompleteClose
+				buttons = {
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = { onActivated = onActivated, text = v2.reportCompleteClose }
 					}
-				}}
+				}
 			}
 		})
 	})

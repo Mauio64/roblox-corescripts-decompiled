@@ -1,19 +1,17 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+require(parent2.ES7Types)
 
-require(ParentParent.ES7Types)
+local map = require(parent.map)
 
-local map = require(scriptParent.map)
-
-return function(p1, s1: string?) -- line: 22
-	-- upvalues: map (copy)
-	if #p1 == 0 then
+return function(list, value: string?)
+	if #list == 0 then
 		return ""
 	end
 
-	local v6 = map(p1, function(p2) -- line: 27
-		return (tostring(p2))
+	local v = map(list, function(p)
+		return (tostring(p))
 	end)
 
-	return table.concat(v6, s1 or ",")
+	return table.concat(v, value or ",")
 end

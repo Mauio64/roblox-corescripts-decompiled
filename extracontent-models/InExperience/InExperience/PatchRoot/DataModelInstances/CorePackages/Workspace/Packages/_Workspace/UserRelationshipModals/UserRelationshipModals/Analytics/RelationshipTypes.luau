@@ -1,3 +1,1 @@
-return {
-	Friends = "Friends"
-}
+return { Friends = "Friends" }

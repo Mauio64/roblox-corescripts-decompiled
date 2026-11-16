@@ -2,127 +2,122 @@ local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
-
 CoreGui:WaitForChild("RobloxGui")
+local VrCommon = require(CorePackages.Workspace.Packages.VrCommon)
+local Panel3D = VrCommon.Panel3D
+local VrCommon2 = require(CorePackages.Workspace.Packages.VrCommon)
+local VRHub = VrCommon2.VRHub
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Create = AppCommonLib.Create
 
-local Panel3D = require(CorePackages.Workspace.Packages.VrCommon).Panel3D
-local VRHub = require(CorePackages.Workspace.Packages.VrCommon).VRHub
-local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
-local u8 = false
-local t1 = {
+local v = false
+
+local Recenter = {
+	["ModuleName"] = nil,
 	ModuleName = "Recenter",
 	KeepVRTopbarOpen = true,
 	VRIsExclusive = true,
 	VRClosesNonExclusive = false
 }
 
-VRHub:RegisterModule(t1)
+VRHub:RegisterModule(Recenter)
 
-local v10 = Panel3D.Get("RecenterCountdown")
+local recenterCountdown = Panel3D.Get("RecenterCountdown")
+recenterCountdown:SetType(Panel3D.Type.HorizontalFollow)
+recenterCountdown:ResizeStuds(5, 3, 128)
+recenterCountdown:SetCanFade(false)
 
-v10:SetType(Panel3D.Type.HorizontalFollow)
-v10:ResizeStuds(5, 3, 128)
-v10:SetCanFade(false)
-
-local v11 = Create("TextLabel")({
-	BackgroundTransparency = 0.9,
-	Text = "",
-	TextScaled = true,
-	Visible = true,
-	Parent = v10:GetGUI(),
+local v2 = Create("TextLabel")({
+	Parent = recenterCountdown:GetGUI(),
 	Position = UDim2.new(0.5, -64, 0.5, -64),
 	Size = UDim2.new(0, 128, 0, 128),
+	BackgroundTransparency = 0.9,
 	BackgroundColor3 = Color3.new(0.2, 0.2, 0.2),
 	TextColor3 = Color3.new(1, 1, 1),
-	Font = Enum.Font.SourceSansBold
+	Text = "",
+	TextScaled = true,
+	Font = Enum.Font.SourceSansBold,
+	Visible = true
 })
 
 Create("ImageLabel")({
-	BackgroundTransparency = 1,
-	Image = "rbxasset://textures/ui/VR/recenterFrame.png",
-	Parent = v10:GetGUI(),
+	Parent = recenterCountdown:GetGUI(),
 	Position = UDim2.new(0, 0, 0, 0),
-	Size = UDim2.new(1, 0, 1, 0)
+	Size = UDim2.new(1, 0, 1, 0),
+	BackgroundTransparency = 1,
+	Image = "rbxasset://textures/ui/VR/recenterFrame.png"
 })
-v10:SetVisible(false)
 
-local u12 = false
+recenterCountdown:SetVisible(false)
 
-local function cancelCountdown() -- line: 55
-	-- upvalues: u12 (ref), v10 (copy)
-	u12 = false
-	v10:SetVisible(false)
+local flag = false
+local function cancelCountdown() -- 3 equivalent calls inferred from this helper
+	flag = false
+	recenterCountdown:SetVisible(false)
 end
 
-VRHub.ModuleOpened.Event:connect(function(p1) -- line: 60
-	-- upvalues: t1 (copy), VRHub (copy), u12 (ref), v10 (copy)
-	if p1 ~= t1.ModuleName and VRHub:GetModule(p1).VRIsExclusive then
-		u12 = false
-		v10:SetVisible(false)
+VRHub.ModuleOpened.Event:connect(function(p)
+	if p ~= Recenter.ModuleName and VRHub:GetModule(p).VRIsExclusive then
+		cancelCountdown() -- inferred equivalent call
 	end
 end)
 
-function t1.SetVisible(_, p3) -- line: 69
-	-- upvalues: u8 (ref), u12 (ref), v10 (copy), VRHub (copy), t1 (copy), ContextActionService (copy), v11 (copy), UserInputService (copy)
-	u8 = p3
+function Recenter:SetVisible(p)
+	v = p
 
-	if u8 then
-		if u12 then
-			u12 = false
-			v10:SetVisible(false)
-			VRHub:FireModuleClosed(t1.ModuleName)
+	if v then
+		if flag then
+			cancelCountdown() -- inferred equivalent call
+			VRHub:FireModuleClosed(Recenter.ModuleName)
+		else
+			VRHub:FireModuleOpened(Recenter.ModuleName)
 
-			return
-		end
+			spawn(function()
+				flag = true
+				recenterCountdown:SetVisible(true)
 
-		VRHub:FireModuleOpened(t1.ModuleName)
-		spawn(function() -- line: 81
-			-- upvalues: u12 (ref), v10 (copy), ContextActionService (copy), v11 (copy), UserInputService (copy), VRHub (copy), t1 (copy)
-			u12 = true
-			v10:SetVisible(true)
-			ContextActionService:BindCoreAction("CancelRecenterShortcut", function(_, p5, _) -- line: 85
-				-- upvalues: u12 (ref), v10 (copy)
-				if p5 == Enum.UserInputState.Begin then
-					u12 = false
-					v10:SetVisible(false)
+				ContextActionService:BindCoreAction("CancelRecenterShortcut", function(_, p2, _)
+					if p2 == Enum.UserInputState.Begin then
+						flag = false
+						recenterCountdown:SetVisible(false)
+					end
+				end, false, Enum.KeyCode.ButtonB)
+
+				if flag then
+					v2.Text = tostring(3)
+					wait(1)
 				end
-			end, false, Enum.KeyCode.ButtonB)
 
-			if u12 then
-				v11.Text = tostring(3)
-				wait(1)
-			end
+				if flag then
+					v2.Text = tostring(2)
+					wait(1)
+				end
 
-			if u12 then
-				v11.Text = tostring(2)
-				wait(1)
-			end
+				if flag then
+					v2.Text = tostring(1)
+					wait(1)
+				end
 
-			if u12 then
-				v11.Text = tostring(1)
-				wait(1)
-			end
+				if flag then
+					UserInputService:RecenterUserHeadCFrame()
+				end
 
-			if u12 then
-				UserInputService:RecenterUserHeadCFrame()
-			end
+				recenterCountdown:SetVisible(false)
+				flag = false
 
-			v10:SetVisible(false)
-			u12 = false
-			ContextActionService:UnbindCoreAction("CancelRecenterShortcut")
-			VRHub:FireModuleClosed(t1.ModuleName)
-		end)
+				ContextActionService:UnbindCoreAction("CancelRecenterShortcut")
 
-		return
+				VRHub:FireModuleClosed(Recenter.ModuleName)
+			end)
+		end
+	else
+		cancelCountdown() -- inferred equivalent call
+		VRHub:FireModuleClosed(Recenter.ModuleName)
 	end
-
-	u12 = false
-	v10:SetVisible(false)
-	VRHub:FireModuleClosed(t1.ModuleName)
-end
-function t1.IsVisible(_) -- line: 115
-	-- upvalues: u8 (ref)
-	return u8
 end
 
-return t1
+function Recenter.IsVisible(_)
+	return v
+end
+
+return Recenter

@@ -1,4 +1,1 @@
-return {
-	Clear = "Clear",
-	Highlight = "Highlight"
-}
+return { Clear = "Clear", Highlight = "Highlight" }

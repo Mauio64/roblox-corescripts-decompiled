@@ -1,6 +1,7 @@
 local AvatarExperienceAnalytics = script:FindFirstAncestor("AvatarExperienceAnalytics")
-local AvatarExperienceAnalyticsParent = AvatarExperienceAnalytics.Parent
-local Cryo = require(AvatarExperienceAnalyticsParent.Cryo)
+local parent = AvatarExperienceAnalytics.Parent
+
+local Cryo = require(parent.Cryo)
 local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
 local UnifiedEventLoggingUtils = require(AvatarExperienceAnalytics.Utils.UnifiedEventLoggingUtils)
 local sendUnifiedEventLog = require(script.Parent.sendUnifiedEventLog)
@@ -8,39 +9,67 @@ local UnifiedSelectionListStore = require(script.Parent.Store.UnifiedSelectionLi
 local reportAvatarEventCounterV1 = require(script.Parent.reportAvatarEventCounterV1)
 local Constants = require(script.Parent.Constants)
 local UnifiedEventLogEnums = require(AvatarExperienceAnalytics.UnifiedEventLogEnums)
-local v11 = game:DefineFastFlag("AXAddV1CountersForMISPurchaseSuccess", false)
+require(script.Parent.Generated.UnifiedEventTypes)
 
-return function(p1, p2) -- line: 15
-	-- upvalues: UnifiedSelectionListStore (copy), UnifiedEventLogConstants (copy), UnifiedEventLoggingUtils (copy), Cryo (copy), v11 (copy), UnifiedEventLogEnums (copy), reportAvatarEventCounterV1 (copy), Constants (copy), sendUnifiedEventLog (copy)
-	local v14 = UnifiedSelectionListStore.getSelectionList()
-	local v15 = UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "itemId"
-	local v16 = UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "itemType"
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXFixSearchPurchaseSurface = AvatarExperienceFlags.FFlagAXFixSearchPurchaseSurface
+local FFlagAXUnifiedEventStrictPayloads = AvatarExperienceFlags.FFlagAXUnifiedEventStrictPayloads
 
-	for _, v18 in p1 do
-		local v19 = nil
+return function(items, p: number?, p2)
+	local selectionList = UnifiedSelectionListStore.getSelectionList()
 
-		for _, v21 in v14 do
-			if tostring(v21[v15]) == tostring(v18.itemId) and tostring(v21[v16]) == tostring(v18.itemType) then
-				v19 = v21
+	local v = UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "itemId"
+	local v2 = UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. "itemType"
 
+	for k, item in items do
+		local v3 = nil
+
+		for _, selection in selectionList do
+			if
+				tostring(selection[v]) == tostring(item.itemId)
+				and tostring(selection[v2]) == tostring(item.itemType)
+			then
+				v3 = selection
 				break
 			end
 		end
 
-		local v22 = UnifiedEventLoggingUtils.getFieldsToSendFromInstanceAttributes(v19)
-		local v23 = Cryo.Dictionary.join(v22, v18)
-		local v24 = Cryo.Dictionary.join(v23, {
-			surface = p2
-		})
+		local fieldsToSendFromInstanceAttributes = UnifiedEventLoggingUtils.getFieldsToSendFromInstanceAttributes(v3)
+		local joined = Cryo.Dictionary.join(fieldsToSendFromInstanceAttributes, item)
+		local surface
 
-		if v11 and v24.action == UnifiedEventLogEnums.MarketplaceUnifiedAction.PURCHASE_SUCCESS then
-			if v24.itemType == UnifiedEventLogEnums.MarketplaceUnifiedItemType.ASSET then
+		if
+			FFlagAXUnifiedEventStrictPayloads
+			and FFlagAXFixSearchPurchaseSurface
+			and fieldsToSendFromInstanceAttributes.surface ~= nil
+		then
+			surface = fieldsToSendFromInstanceAttributes.surface
+		elseif FFlagAXFixSearchPurchaseSurface and joined.surface ~= nil then
+			surface = joined.surface
+		else
+			surface = p
+		end
+
+		local joined2 = Cryo.Dictionary.join(joined, { surface = surface })
+
+		if FFlagAXUnifiedEventStrictPayloads then
+			local v4
+
+			if p2 then
+				v4 = p2[k]
+			end
+
+			joined2 = Cryo.Dictionary.join(v4 or {}, joined2)
+		end
+
+		if joined2.action == UnifiedEventLogEnums.MarketplaceUnifiedAction.PURCHASE_SUCCESS then
+			if joined2.itemType == UnifiedEventLogEnums.MarketplaceUnifiedItemType.ASSET then
 				reportAvatarEventCounterV1(Constants.AVATAR_EVENT_COUNTER_NAME.AXPurchaseAsset)
-			elseif v24.itemType == UnifiedEventLogEnums.MarketplaceUnifiedItemType.BUNDLE then
+			elseif joined2.itemType == UnifiedEventLogEnums.MarketplaceUnifiedItemType.BUNDLE then
 				reportAvatarEventCounterV1(Constants.AVATAR_EVENT_COUNTER_NAME.AXPurchaseBundle)
 			end
 		end
 
-		sendUnifiedEventLog(v24)
+		sendUnifiedEventLog(joined2)
 	end
 end

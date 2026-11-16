@@ -1,115 +1,231 @@
-local Parent = script:FindFirstAncestor("ProgressLoading").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("ProgressLoading").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Progress = Foundation.Progress
 local ProgressShape = Foundation.Enums.ProgressShape
+
 local Badge = Foundation.Badge
+local Icon = Foundation.Icon
 local IconButton = Foundation.IconButton
+local Text = Foundation.Text
 local Enums = Foundation.Enums
+local IconSize = Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local PioneerUtils = require(parent.PioneerUtils)
+local isPioneerLaunch = PioneerUtils.isPioneerLaunch
 local TiltLockup = require(script.Parent.Components.TiltLockup)
 local TiltLoadingScreenStatusPanel = require(script.Parent.Components.TiltLoadingScreenStatusPanel)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagTiltLoadingScreenConsoleHints = SharedFlags.FFlagTiltLoadingScreenConsoleHints
 
 require(script.Parent.Types)
 
-local function TiltLoadingScreenView(p1) -- line: 22
-	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), View (copy), IconButton (copy), Enums (copy), TiltLockup (copy), Badge (copy), TiltLoadingScreenStatusPanel (copy), Progress (copy), ProgressShape (copy)
-	local v16 = useTokens()
-	local v17 = useLocalization({
-		autoTranslate = "CoreScripts.TopBar.LoadingScreen.AutoTranslate"
+local function TiltLoadingScreenView(props)
+	local v = useTokens()
+	local v2 = useLocalization({
+		autoTranslate = "CoreScripts.TopBar.LoadingScreen.AutoTranslate",
+		back = FFlagTiltLoadingScreenConsoleHints and "CoreScripts.TopBar.Back" or nil
 	})
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v3 = {
 		tag = "size-full bg-surface-0",
-		testId = "tilt-loading-screen-root",
-		GroupTransparency = p1.chromeReveal:map(function(n1: number) -- line: 30
-			return 1 - n1
-		end)
-	}, {
+		GroupTransparency = props.chromeReveal:map(function(p: number)
+			return 1 - p
+		end),
+		testId = "tilt-loading-screen-root"
+	}
+
+	local v4 = {
 		Overlay = React.createElement(View, {
 			tag = "size-full",
-			ZIndex = 0,
-			backgroundStyle = v16.Color.Extended.Black.Black_50
+			backgroundStyle = v.Color.Extended.Black.Black_50,
+			ZIndex = 0
 		}),
-		CancelButton = React.createElement(View, {
-			tag = "col size-full align-x-left align-y-top padding-xlarge",
-			ZIndex = 2
-		}, {
-			Button = React.createElement(IconButton, {
-				isCircular = true,
-				testId = "tilt-loading-screen-cancel-button",
-				icon = Enums.IconName.X,
-				variant = Enums.ButtonVariant.Standard,
-				size = Enums.InputSize.Large,
-				onActivated = p1.onCancel
-			})
-		}),
-		Layout = React.createElement(View, {
-			tag = "col size-full",
-			ZIndex = 1
-		}, {
-			Content = React.createElement(View, {
-				LayoutOrder = 1,
-				tag = "col align-x-center align-y-center grow gap-large size-full-0 padding-x-xxlarge",
-				testId = "tilt-loading-screen-lockup-slot"
-			}, {
-				Lockup = React.createElement(TiltLockup, {
-					LayoutOrder = 1,
-					gameName = if not p1.gameData then nil else p1.gameData.name,
-					creatorName = if not p1.gameData then nil else p1.gameData.creator,
-					isCreatorVerified = if not p1.gameData then nil else p1.gameData.verified,
-					thumbnailUrl = p1.thumbnailUrl,
-					animation = p1.animation
-				}),
-				AutoTranslate = if not p1.isAutoTranslated then nil else React.createElement(View, {
-					LayoutOrder = 2,
-					tag = "auto-xy",
-					GroupTransparency = p1.animation.creator.reveal:map(function(p2) -- line: 74
-						return 1 - p2
-					end)
-				}, {
-					Badge = React.createElement(Badge, {
-						text = v17.autoTranslate,
-						variant = Enums.BadgeVariant.Neutral,
-						shape = Enums.BadgeShape.Box,
-						icon = {
-							name = Enums.IconName.LanguageCharacters,
-							size = Enums.IconSize.XSmall,
-							position = Enums.IconPosition.Left
-						}
+		SafeArea = 0
+	}
+	local safeArea
+
+	if props.showContent then
+		local createElement2 = React.createElement
+		local v5 = {
+			tag = "size-full",
+			padding = {
+				left = UDim.new(0, props.safeAreaInsets.left),
+				top = UDim.new(0, props.safeAreaInsets.top),
+				right = UDim.new(0, props.safeAreaInsets.right),
+				bottom = UDim.new(0, props.safeAreaInsets.bottom)
+			},
+			ZIndex = 1,
+			testId = "tilt-loading-screen-safe-area"
+		}
+		local cancelButton
+
+		if not (isPioneerLaunch() or props.isDirectionalInput) then
+			cancelButton = React.createElement(
+				View,
+				{ tag = "col align-x-left align-y-top size-full padding-xlarge", ZIndex = 2 },
+				{
+					Button = React.createElement(IconButton, {
+						icon = Enums.IconName.X,
+						variant = Enums.ButtonVariant.Standard,
+						size = Enums.InputSize.Large,
+						isCircular = true,
+						onActivated = props.onCancel,
+						testId = "tilt-loading-screen-cancel-button"
 					})
-				})
+				}
+			)
+		end
+
+		local gamepadCancelHint
+
+		if not (isPioneerLaunch() or not props.isDirectionalInput) then
+			gamepadCancelHint = React.createElement(
+				View,
+				{
+					tag = "col align-x-left align-y-bottom size-full padding-xlarge",
+					ZIndex = 2,
+					testId = "tilt-loading-screen-gamepad-cancel-hint"
+				},
+				{
+					Hint = React.createElement(
+						View,
+						{ tag = "row align-y-center gap-small auto-xy padding-x-medium" },
+						{
+							ButtonIcon = React.createElement(Icon, {
+								LayoutOrder = 1,
+								name = props.gamepadCancelIcon,
+								size = IconSize.Medium,
+								style = v.Color.System.Contrast
+							}),
+							Label = React.createElement(Text, {
+								LayoutOrder = 2,
+								Text = v2.back,
+								tag = "auto-xy text-title-large content-system-contrast"
+							})
+						}
+					)
+				}
+			)
+		end
+
+		local createElement3 = React.createElement
+
+		local createElement4 = React.createElement
+
+		local createElement5 = React.createElement
+		local gameName
+
+		if props.gameData then
+			gameName = props.gameData.name
+		end
+
+		local creatorName
+
+		if props.gameData then
+			creatorName = props.gameData.creator
+		end
+
+		local isCreatorVerified
+
+		if props.gameData then
+			isCreatorVerified = props.gameData.verified
+		end
+
+		local v6 = {
+			Lockup = createElement5(TiltLockup, {
+				LayoutOrder = 1,
+				gameName = gameName,
+				creatorName = creatorName,
+				isCreatorVerified = isCreatorVerified,
+				thumbnailUrl = props.thumbnailUrl,
+				onThumbnailLoaded = props.onThumbnailLoaded,
+				animation = props.animation
 			}),
+			AutoTranslate = 0
+		}
+		local autoTranslate
+
+		if props.isAutoTranslated then
+			autoTranslate = React.createElement(View, {
+				LayoutOrder = 2,
+				tag = "auto-xy",
+				GroupTransparency = props.animation.creator.reveal:map(function(p)
+					return 1 - p
+				end)
+			}, {
+				Badge = React.createElement(Badge, {
+					text = v2.autoTranslate,
+					variant = Enums.BadgeVariant.Neutral,
+					shape = Enums.BadgeShape.Box,
+					icon = {
+						name = Enums.IconName.LanguageCharacters,
+						size = Enums.IconSize.XSmall,
+						position = Enums.IconPosition.Left
+					}
+				})
+			})
+		end
+
+		v6.AutoTranslate = autoTranslate
+		local children = {
+			Content = createElement4(
+				View,
+				{
+					LayoutOrder = 1,
+					tag = "col align-x-center align-y-center grow gap-large size-full-0 padding-x-xxlarge",
+					testId = "tilt-loading-screen-lockup-slot"
+				},
+				v6
+			),
 			StatusPanel = React.createElement(TiltLoadingScreenStatusPanel, {
 				LayoutOrder = 3,
-				status = p1.statusPanel.status,
-				statusText = p1.statusPanel.statusText,
-				queuePosition = p1.statusPanel.queuePosition,
-				queueTreatment = p1.statusPanel.queueTreatment,
-				followUserId = p1.statusPanel.followUserId,
-				isSubjectToChinaPolicies = p1.statusPanel.isSubjectToChinaPolicies,
-				onAutoJoinNewServer = p1.statusPanel.onAutoJoinNewServer,
-				onJoinNewServer = p1.statusPanel.onJoinNewServer,
-				onJoinTheLine = p1.statusPanel.onJoinTheLine,
-				onShowConnectionHealth = p1.statusPanel.onShowConnectionHealth
+				status = props.statusPanel.status,
+				statusText = props.statusPanel.statusText,
+				queuePosition = props.statusPanel.queuePosition,
+				queueTreatment = props.statusPanel.queueTreatment,
+				followUserId = props.statusPanel.followUserId,
+				isSubjectToChinaPolicies = props.statusPanel.isSubjectToChinaPolicies,
+				onAutoJoinNewServer = props.statusPanel.onAutoJoinNewServer,
+				onJoinNewServer = props.statusPanel.onJoinNewServer,
+				onJoinTheLine = props.statusPanel.onJoinTheLine,
+				onShowConnectionHealth = props.statusPanel.onShowConnectionHealth
 			}),
-			ProgressBar = if p1.statusPanel.queueTreatment ~= nil then nil else React.createElement(View, {
+			ProgressBar = 0
+		}
+		local progressBar
+
+		if props.statusPanel.queueTreatment == nil then
+			progressBar = React.createElement(View, {
 				LayoutOrder = 4,
 				testId = "tilt-loading-screen-progress-slot",
 				tag = {
-					["size-full-0 auto-y padding-x-medium padding-bottom-xlarge"] = p1.isMobile,
-					["size-full-0 auto-y"] = not p1.isMobile
+					["size-full-0 auto-y padding-x-medium padding-bottom-xlarge"] = props.isMobile,
+					["size-full-0 auto-y"] = not props.isMobile
 				}
 			}, {
 				Bar = React.createElement(Progress, {
-					testId = "loading-screen-progress-bar",
-					shape = ProgressShape.Bar
+					shape = ProgressShape.Bar,
+					testId = "loading-screen-progress-bar"
 				})
 			})
+		end
+
+		children.ProgressBar = progressBar
+		safeArea = createElement2(View, v5, {
+			CancelButton = cancelButton,
+			GamepadCancelHint = gamepadCancelHint,
+			Layout = createElement3(View, { tag = "col size-full", ZIndex = 1 }, children)
 		})
-	})
+	end
+
+	v4.SafeArea = safeArea
+	return createElement(View, v3, v4)
 end
 
 return React.memo(TiltLoadingScreenView)

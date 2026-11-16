@@ -1,4 +1,2 @@
-return {
-	require(script.MuteCommand),
-	require(script.UnmuteCommand)
-}
+local MuteCommand = require(script.MuteCommand)
+return { MuteCommand, require(script.UnmuteCommand) }

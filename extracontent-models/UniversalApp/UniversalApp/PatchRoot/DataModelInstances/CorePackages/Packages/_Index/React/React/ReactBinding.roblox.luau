@@ -1,177 +1,246 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
-local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local parent = script.Parent.Parent
 
-require(ParentParent.Shared)
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Shared = require(parent.Shared)
+local ReactSymbols = Shared.ReactSymbols
+
+require(parent.Shared)
 
 local Symbol = LuauPolyfill.Symbol
-local lib = require(script.Parent["createSignal.roblox"])
-local v7 = Symbol("BindingImpl")
-local t1 = {}
-local t4 = {
+local createSignalroblox = require(script.Parent["createSignal.roblox"])
+
+local Shared2 = require(parent.Shared)
+local enableAllocationTrims = Shared2.ReactFeatureFlags.enableAllocationTrims
+
+local symbol = Symbol("BindingImpl")
+
+local Roblox = {}
+
+local v = {
 	__index = {
-		getValue = function(t2: {[any]: any}) -- line: 48
-			-- upvalues: t1 (copy)
-			return t1.getValue(t2)
+		getValue = function(p)
+			return Roblox.getValue(p)
 		end,
-		map = function(t3: {[any]: any}, p1: ((...any) -> ...any)) -- line: 52
-			-- upvalues: t1 (copy)
-			return t1.map(t3, p1)
+		map = function(p, callback)
+			return Roblox.map(p, callback)
 		end
 	},
-	__tostring = function(p2) -- line: 61
-		return string.format("RoactBinding(%s)", (tostring(p2:getValue())))
+	__tostring = function(object)
+		return string.format("RoactBinding(%s)", (tostring(object:getValue())))
 	end
 }
 
-function t1.update(p3, p4) -- line: 66
-	-- upvalues: v7 (copy)
-	return p3[v7].update(p4)
-end
-function t1.subscribe(p5, p6: ((...any) -> ...any)) -- line: 70
-	-- upvalues: v7 (copy)
-	return p5[v7].subscribe(p6)
-end
-function t1.getValue(p7) -- line: 74
-	-- upvalues: v7 (copy)
-	return p7[v7]:getValue()
-end
-function t1.create(p8) -- line: 78
-	-- upvalues: lib (copy), ReactGlobals (copy), ReactSymbols (copy), v7 (copy), t4 (copy)
-	local v20, v21 = lib()
-	local t5 = {
-		value = p8,
-		subscribe = v20
-	}
+local v2 = {
+	getValue = function(p)
+		return p.value
+	end,
+	update = function(p, p2)
+		p.value = p2
+		local fire = p.fire
 
-	function t5.update(p9) -- line: 85
-		-- upvalues: t5 (copy), v21 (copy)
-		t5.value = p9
-		v21(p9)
-	end
-	function t5.getValue() -- line: 90
-		-- upvalues: t5 (copy)
-		return t5.value
-	end
-
-	local trace = nil
-
-	if ReactGlobals.__DEV__ then
-		trace = debug.traceback("Binding created at:", 3)
-	end
-
-	return setmetatable({
-		["$$typeof"] = ReactSymbols.REACT_BINDING_TYPE,
-		[v7] = t5,
-		_source = trace
-	}, t4), t5.update
-end
-function t1.map(t6: {[any]: any}, p10: ((...any) -> ...any)) -- line: 108
-	-- upvalues: ReactGlobals (copy), ReactSymbols (copy), t1 (copy), v7 (copy), t4 (copy)
-	if ReactGlobals.__DEV__ then
-		assert(typeof(t6) == "table" and t6["$$typeof"] == ReactSymbols.REACT_BINDING_TYPE, "Expected `self` to be a binding")
-		assert(typeof(p10) == "function", "Expected arg #1 to be a function")
-	end
-
-	local t7 = {
-		subscribe = function(p11) -- line: 124
-			-- upvalues: t1 (copy), t6 (copy), p10 (copy)
-			return t1.subscribe(t6, function(p12) -- line: 125
-				-- upvalues: p11 (copy), p10 (copy)
-				p11(p10(p12))
-			end)
-		end,
-		update = function(_) -- line: 130
-			error("Bindings created by Binding:map(fn) cannot be updated directly", 2)
-		end,
-		getValue = function() -- line: 134
-			-- upvalues: p10 (copy), t6 (copy)
-			return p10(t6:getValue())
+		if fire ~= nil then
+			fire(p2)
 		end
-	}
-	local trace = nil
+	end,
+	subscribe = function(p, callback)
+		local subscribeToSignal = p.subscribeToSignal
+
+		if subscribeToSignal == nil then
+			local fire
+			subscribeToSignal, fire = createSignalroblox()
+			p.fire = fire
+			p.subscribeToSignal = subscribeToSignal
+		end
+
+		return subscribeToSignal(callback)
+	end
+}
+
+local v3 = { __index = v2 }
+
+function Roblox.update(p, p2)
+	if not enableAllocationTrims then
+		return p[symbol].update(p2)
+	end
+
+	local v4 = p[symbol]
+
+	if getmetatable(v4) == v3 then
+		return v2.update(v4, p2)
+	end
+
+	return v4.update(p2)
+end
+
+function Roblox.subscribe(p, callback)
+	if not enableAllocationTrims then
+		return p[symbol].subscribe(callback)
+	end
+
+	local v4 = p[symbol]
+
+	if getmetatable(v4) == v3 then
+		return v2.subscribe(v4, callback)
+	end
+
+	return v4.subscribe(callback)
+end
+
+function Roblox.getValue(p)
+	return p[symbol]:getValue()
+end
+
+function Roblox.createWithoutUpdater(p, source: string?)
+	local object = setmetatable({ value = p }, v3)
+
+	return (setmetatable({
+		["$$typeof"] = ReactSymbols.REACT_BINDING_TYPE,
+		[symbol] = object,
+		_source = source
+	}, v))
+end
+
+function Roblox.create(p)
+	if enableAllocationTrims then
+		local v4
+
+		if ReactGlobals.__DEV__ then
+			v4 = debug.traceback("Binding created at:", 3)
+		end
+
+		local withoutUpdater = Roblox.createWithoutUpdater(p, v4)
+		local v5 = withoutUpdater[symbol]
+
+		return withoutUpdater, function(p2)
+			v2.update(v5, p2)
+		end
+	else
+		local signalroblox, v4 = createSignalroblox()
+		local v5 = { value = p, subscribe = signalroblox }
+
+		function v5.update(p2)
+			v5.value = p2
+			v4(p2)
+		end
+
+		function v5.getValue()
+			return v5.value
+		end
+
+		local source
+
+		if ReactGlobals.__DEV__ then
+			source = debug.traceback("Binding created at:", 3)
+		end
+
+		return
+			setmetatable({
+				["$$typeof"] = ReactSymbols.REACT_BINDING_TYPE,
+				[symbol] = v5,
+				_source = source
+			}, v),
+			v5.update
+	end
+end
+
+function Roblox:map(callback)
+	if ReactGlobals.__DEV__ then
+		local v4 = typeof(self) == "table" and self["$$typeof"] == ReactSymbols.REACT_BINDING_TYPE
+		assert(v4, "Expected `self` to be a binding")
+
+		assert(typeof(callback) == "function", "Expected arg #1 to be a function")
+	end
+
+	local source
 
 	if ReactGlobals.__DEV__ then
-		trace = debug.traceback("Mapped binding created at:", 3)
+		source = debug.traceback("Mapped binding created at:", 3)
 	end
 
 	return (setmetatable({
 		["$$typeof"] = ReactSymbols.REACT_BINDING_TYPE,
-		[v7] = t7,
-		_source = trace
-	}, t4))
+		[symbol] = {
+			subscribe = function(callback2)
+				return Roblox.subscribe(self, function(p)
+					callback2(callback(p))
+				end)
+			end,
+			update = function(_)
+				error("Bindings created by Binding:map(fn) cannot be updated directly", 2)
+			end,
+			getValue = function()
+				return callback(self:getValue())
+			end
+		},
+		_source = source
+	}, v))
 end
-function t1.join(t8: {[any]: any}) -- line: 155
-	-- upvalues: ReactGlobals (copy), ReactSymbols (copy), t1 (copy), v7 (copy), t4 (copy)
+
+function Roblox.join(items)
 	if ReactGlobals.__DEV__ then
-		assert(typeof(t8) == "table", "Expected arg #1 to be of type table")
+		assert(typeof(items) == "table", "Expected arg #1 to be of type table")
 
-		for v29, v30 in t8 do
-			if typeof(v30) ~= "table" or v30["$$typeof"] ~= ReactSymbols.REACT_BINDING_TYPE then
-				local v31 = ("Expected arg #1 to contain only bindings, but key %q had a non-binding value"):format((tostring(v29)))
-
-				error(v31, 2)
-			end
-		end
-	end
-
-	local t9 = {}
-
-	local function getValue() -- line: 176
-		-- upvalues: t8 (copy)
-		local t10 = {}
-
-		for k, v in pairs(t8) do
-			t10[k] = v:getValue()
-		end
-
-		return t10
-	end
-
-	function t9.subscribe(p14) -- line: 187
-		-- upvalues: t8 (copy), t1 (copy), getValue (copy)
-		local t11 = {}
-
-		for v43, v44 in t8 do
-			t11[v43] = t1.subscribe(v44, function(_) -- line: 192
-				-- upvalues: p14 (copy), getValue (copy)
-				p14((getValue()))
-			end)
-		end
-
-		return function() -- line: 197
-			-- upvalues: t11 (ref)
-			if t11 == nil then
-				return
+		for k, item in items do
+			if not (typeof(item) ~= "table" or item["$$typeof"] ~= ReactSymbols.REACT_BINDING_TYPE) then
+				continue
 			end
 
-			for _, v49 in t11 do
-				v49()
-			end
+			local formatted = ("Expected arg #1 to contain only bindings, but key %q had a non-binding value"):format((tostring(k)))
 
-			t11 = nil
+			error(formatted, 2)
 		end
 	end
-	function t9.update(_) -- line: 210
-		error("Bindings created by joinBindings(...) cannot be updated directly", 2)
-	end
-	function t9.getValue() -- line: 214
-		-- upvalues: getValue (copy)
-		return (getValue())
+
+	local function getValue()
+		local value = {}
+
+		for k, item in pairs(items) do
+			value[k] = item:getValue()
+		end
+
+		return value
 	end
 
-	local trace = nil
+	local source
 
 	if ReactGlobals.__DEV__ then
-		trace = debug.traceback("Joined binding created at:", 2)
+		source = debug.traceback("Joined binding created at:", 2)
 	end
 
 	return (setmetatable({
 		["$$typeof"] = ReactSymbols.REACT_BINDING_TYPE,
-		[v7] = t9,
-		_source = trace
-	}, t4))
+		[symbol] = {
+			subscribe = function(callback)
+				local v4 = {}
+
+				for k, item in items do
+					v4[k] = Roblox.subscribe(item, function(_)
+						callback(getValue())
+					end)
+				end
+
+				return function()
+					if v4 == nil then
+						return
+					end
+
+					for _, v5 in v4 do
+						v5()
+					end
+
+					v4 = nil
+				end
+			end,
+			update = function(_)
+				error("Bindings created by joinBindings(...) cannot be updated directly", 2)
+			end,
+			getValue = function()
+				return getValue()
+			end
+		},
+		_source = source
+	}, v))
 end
 
-return t1
+return Roblox

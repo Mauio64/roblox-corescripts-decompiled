@@ -1,44 +1,60 @@
 local CorePackages = game:GetService("CorePackages")
 local ModelUtils = require(script.Parent.Parent.Utils.ModelUtils)
 local UserInputService = game:GetService("UserInputService")
-local Service = game:FindService("FaceAnimatorService")
-local CharacterUtility = require(CorePackages.Packages.Thumbnailing).CharacterUtility
-local CFrameUtility = require(CorePackages.Packages.Thumbnailing).CFrameUtility
-local EngineFeature = game:GetEngineFeature("AnimatorAndADFRefactor")
-local EngineFeature2 = game:GetEngineFeature("PlayerViewRemoteEventSupport")
-local TrackerStreamAnimation = nil
-local u10 = nil
-local v11 = game:DefineFastFlag("SelfViewNewPoseSynchronization", false)
-local v12 = game:DefineFastFlag("DebugSelfViewPerfBenchmark", false)
-local GetFFlagSelfViewVisibilityFix = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagSelfViewVisibilityFix
+local service = game:FindService("FaceAnimatorService")
+
+local Thumbnailing = require(CorePackages.Packages.Thumbnailing)
+local CharacterUtility = Thumbnailing.CharacterUtility
+local Thumbnailing2 = require(CorePackages.Packages.Thumbnailing)
+local CFrameUtility = Thumbnailing2.CFrameUtility
+
+local engineFeature = game:GetEngineFeature("AnimatorAndADFRefactor")
+local engineFeature2 = game:GetEngineFeature("PlayerViewRemoteEventSupport")
+
+local trackerStreamAnimation = nil
+local v = nil
+local defineFastFlag = game:DefineFastFlag("SelfViewNewPoseSynchronization", false)
+local defineFastFlag2 = game:DefineFastFlag("DebugSelfViewPerfBenchmark", false)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagSelfViewVisibilityFix = SharedFlags.GetFFlagSelfViewVisibilityFix
+
 local RunService = game:GetService("RunService")
-local n1 = 1.31
-local n2 = 0
-local u17 = nil
-local u18 = nil
-local t1 = {}
-local t2 = {}
-local u21 = nil
-local t3 = {}
-local t4 = {}
-local p7Color = nil
-local p7Size = nil
-local ViewportFrame = nil
-local Camera = nil
-local vector3 = Vector3.new(1.1720999479293823, 1.1811000108718872, 1.1577999591827393)
-local u29 = nil
-local u30 = nil
-local u31 = nil
-local clone = nil
-local u33 = nil
-local cloneCFrame = nil
-local u35 = nil
-local u36 = nil
-local u37 = nil
-local u38 = false
-local n3 = 0
-local t5 = {}
-local t6 = {
+
+local v2 = 1.31
+
+local v3 = 0
+
+local connection = nil
+local characterAddedConnection = nil
+local connections = {}
+
+local v4 = {}
+
+local animator = nil
+local v5 = {}
+local playingAnimationTracksByAnimationId = {}
+local v6 = nil
+local size = nil
+
+local viewportFrame = nil
+local camera = nil
+
+local v7 = Vector3.new(1.1721, 1.1811, 1.1578)
+local parent = nil
+local selfAvatar = nil
+local v8 = nil
+local v9 = nil
+local v10 = nil
+local cframe = nil
+local parent2 = nil
+local v11 = nil
+local v12 = nil
+local flag = false
+
+local count = 0
+
+local v13 = {}
+local v14 = {
 	AnimationPlayed = "AnimationPlayed",
 	AnimationPlayedCoreScript = "AnimationPlayedCoreScript",
 	DescendantAdded = "DescendantAdded",
@@ -50,6 +66,7 @@ local t6 = {
 	HumanoidStateChanged = "HumanoidStateChanged",
 	FaceControlsChanged = "FaceControlsChanged"
 }
+
 local Players = game:GetService("Players")
 
 if not Players.LocalPlayer then
@@ -57,996 +74,918 @@ if not Players.LocalPlayer then
 end
 
 local LocalPlayer = Players.LocalPlayer
-local u44 = false
 
-function setCloneDirty(b1: boolean) -- line: 93
-	-- upvalues: n2 (ref)
-	if b1 then
-		n2 = 0.35
+local v15 = false
 
-		return
-	end
-
-	n2 = 0
-end
-function createCloneAnchor() -- line: 101
-	-- upvalues: u29 (ref), ViewportFrame (ref)
-	if u29 ~= nil then
-		u29:Destroy()
-		u29 = nil
-	end
-
-	local WorldModel = Instance.new("WorldModel")
-
-	WorldModel.Parent = ViewportFrame
-	u29 = WorldModel
+function setCloneDirty(flag2: boolean)
+	v3 = if flag2 then 0.35 else 0
 end
 
-local function clearObserver(s1: string) -- line: 113
-	-- upvalues: t5 (copy)
-	if t5[s1] then
-		t5[s1]:Disconnect()
-		t5[s1] = nil
+function createCloneAnchor()
+	if parent ~= nil then
+		parent:Destroy()
+		parent = nil
+	end
+
+	local worldModel = Instance.new("WorldModel")
+	worldModel.Parent = viewportFrame
+
+	parent = worldModel
+end
+
+local function clearObserver(p: string) -- 19 equivalent calls inferred from this helper
+	if v13[p] then
+		v13[p]:Disconnect()
+		v13[p] = nil
 	end
 end
 
-function clearCloneCharacter() -- line: 120
-	-- upvalues: u30 (ref), u29 (ref)
-	if u30 then
-		u30:Destroy()
-		u30 = nil
+function clearCloneCharacter()
+	if selfAvatar then
+		selfAvatar:Destroy()
+		selfAvatar = nil
 	end
 
-	if not u29 then
+	if not parent then
 		warn("cloneAnchor is nil, this shouldn't be possible")
-
 		return
 	end
 
-	assert(u29 ~= nil)
+	assert(parent ~= nil)
+	local selfAvatar2 = parent:FindFirstChild("SelfAvatar")
 
-	local SelfAvatar = u29:FindFirstChild("SelfAvatar")
-
-	if SelfAvatar then
-		SelfAvatar:Destroy()
+	if selfAvatar2 then
+		selfAvatar2:Destroy()
 	end
 
 	createCloneAnchor()
 end
 
-local function clearClone() -- line: 139
-	-- upvalues: t5 (copy), t3 (ref), u10 (ref), u21 (ref)
+local function clearClone()
 	stopRenderStepped()
+	clearObserver("AnimationPlayed") -- inferred equivalent call
+	clearObserver("AnimationPlayedCoreScript") -- inferred equivalent call
 
-	if t5.AnimationPlayed then
-		t5.AnimationPlayed:Disconnect()
-		t5.AnimationPlayed = nil
-	end
-
-	if t5.AnimationPlayedCoreScript then
-		t5.AnimationPlayedCoreScript:Disconnect()
-		t5.AnimationPlayedCoreScript = nil
-	end
-
-	for _, v63 in t3 do
-		if v63 then
-			v63:Stop(0)
+	for _, v16 in v5 do
+		if v16 then
+			v16:Stop(0)
 		end
 	end
 
-	if u10 then
-		u10:Stop(0)
-		u10 = nil
+	if v then
+		v:Stop(0)
+		v = nil
 	end
 
-	u21 = nil
-	t3 = {}
+	animator = nil
+	v5 = {}
+
 	clearCloneCharacter()
 end
-local function syncTrack(p1, p2) -- line: 160
-	-- upvalues: u10 (ref), TrackerStreamAnimation (ref), LocalPlayer (copy), t1 (copy)
-	if not p1 or not p2.Animation then
+
+local function syncTrack(animator2, data)
+	if not (animator2 and data.Animation) then
 		return
 	end
 
-	local u66 = nil
+	local v16 = nil
 
-	if not p2.Animation or not p2.Animation:IsA("Animation") then
-		if p2.Animation and p2.Animation:IsA("TrackerStreamAnimation") then
-			if u10 then
-				u10:Stop(0)
+	if not (data.Animation and data.Animation:IsA("Animation")) then
+		if data.Animation and data.Animation:IsA("TrackerStreamAnimation") then
+			if v then
+				v:Stop(0)
 			end
 
-			TrackerStreamAnimation = Instance.new("TrackerStreamAnimation")
-			assert(TrackerStreamAnimation ~= nil)
+			trackerStreamAnimation = Instance.new("TrackerStreamAnimation")
+			assert(trackerStreamAnimation ~= nil)
 
 			if game:GetEngineFeature("UseNewLoadStreamAnimationAPI") then
-				u10 = p1:LoadStreamAnimationV2(TrackerStreamAnimation, LocalPlayer, false, false)
+				v = animator2:LoadStreamAnimationV2(trackerStreamAnimation, LocalPlayer, false, false)
 			else
-				u10 = p1:LoadStreamAnimationForSelfieView_deprecated(TrackerStreamAnimation, LocalPlayer)
+				v = animator2:LoadStreamAnimationForSelfieView_deprecated(trackerStreamAnimation, LocalPlayer)
 			end
 
-			u66 = u10
+			v16 = v
 		else
 			warn("No animation to clone in SelfView")
 		end
 	end
 
-	if u66 then
-		u66:Play()
-		u66.Priority = p2.Priority
-		t1[p2] = p2.Stopped:Connect(function() -- line: 192
-			-- upvalues: u66 (ref), t1 (copy), p2 (copy)
-			u66:Stop(0)
+	if v16 then
+		v16:Play()
+		v16.Priority = data.Priority
 
-			if t1[p2] then
-				t1[p2]:Disconnect()
+		connections[data] = data.Stopped:Connect(function()
+			v16:Stop(0)
+
+			if connections[data] then
+				connections[data]:Disconnect()
 			end
 		end)
 	end
 end
-local function updateClone(p3) -- line: 201
-	-- upvalues: clearClone (copy), ModelUtils (copy), u30 (ref), t2 (copy), u29 (ref), Camera (ref), CFrameUtility (copy), CharacterUtility (copy), vector3 (ref), n1 (ref), clone (ref), u33 (ref), cloneCFrame (ref), u21 (ref), EngineFeature (copy), v11 (copy), TrackerStreamAnimation (ref), syncTrack (copy), t5 (copy)
+
+local function updateClone(player)
 	clearClone()
 
-	if not p3 then
+	if not player then
 		return
 	end
 
-	assert(p3 ~= nil)
-	startRenderStepped(p3)
+	assert(player ~= nil)
 
-	local _ = p3.Character
+	startRenderStepped(player)
 
-	if not p3 or not p3.Character then
+	local _character = player.Character
+
+	if not (player and player.Character) then
 		return
 	end
 
-	local Character = p3.Character
+	local character = player.Character
 
-	if not Character then
+	if not character then
 		return
 	end
 
-	assert(Character ~= nil)
+	assert(character ~= nil)
 
-	local v70 = ModelUtils.getAnimator(Character, 10)
+	local animator2 = ModelUtils.getAnimator(character, 10)
 
 	clearCloneCharacter()
 
-	local Archivable = Character.Archivable
+	local archivable = character.Archivable
+	character.Archivable = true
 
-	Character.Archivable = true
+	local head = ModelUtils.getHead(character)
 
-	local v72 = ModelUtils.getHead(Character)
-
-	if not v72 then
+	if not head then
 		return
 	end
 
-	u30 = Character:Clone()
+	selfAvatar = character:Clone()
 
-	if u30 == nil then
+	if selfAvatar == nil then
 		return
 	end
 
-	assert(u30 ~= nil)
-	ModelUtils.resetPartOrientation(u30)
-	ModelUtils.updateTransparency(u30, t2)
-	ModelUtils.removeTags(u30)
-	u30.Name = "SelfAvatar"
-	ModelUtils.removeScripts(u30)
-	ModelUtils.sanitizeCharacter(u30)
-	Character.Archivable = Archivable
-	u30.Parent = u29
+	assert(selfAvatar ~= nil)
 
-	local HumanoidRootPart = u30:FindFirstChild("HumanoidRootPart")
+	ModelUtils.resetPartOrientation(selfAvatar)
 
-	if HumanoidRootPart then
-		HumanoidRootPart.CFrame = CFrame.new((Vector3.new(0, 0, 0)))
-		assert(Camera ~= nil)
+	ModelUtils.updateTransparency(selfAvatar, v4)
 
-		if v72 then
-			local v74 = ModelUtils.getHead(u30)
+	ModelUtils.removeTags(selfAvatar)
 
-			if v74 then
-				assert(v74 ~= nil)
+	selfAvatar.Name = "SelfAvatar"
 
-				local v75 = CFrameUtility.CalculateTargetCFrame(v74.CFrame)
-				local v76, v77 = CharacterUtility.CalculateHeadExtents(u30, v75)
-				local vector3_2 = Vector3.new(v76.X, v76.Y, v76.Z)
+	ModelUtils.removeScripts(selfAvatar)
 
-				vector3 = Vector3.new(v77.X, v77.Y, v77.Z) - vector3_2
-				assert(vector3 ~= nil)
-				n1 = v74.Size.Y
-				math.min(vector3.X, vector3.Y)
+	ModelUtils.sanitizeCharacter(selfAvatar)
 
-				local v79 = math.min(vector3.X, vector3.Z)
-				local Model = Instance.new("Model")
+	character.Archivable = archivable
 
-				Model.Parent = u30
+	selfAvatar.Parent = parent
 
-				local v81 = ModelUtils.getHead(u30)
+	local humanoidRootPart = selfAvatar:FindFirstChild("HumanoidRootPart")
 
-				Character.Archivable = true
-				clone = v81:Clone()
-				assert(clone ~= nil)
-				clone.CanCollide = false
-				clone.Parent = Model
-				u33 = ModelUtils.getNeck(u30, clone)
-				cloneCFrame = clone.CFrame
-				clone:Destroy()
-				assert(cloneCFrame ~= nil)
+	if humanoidRootPart then
+		humanoidRootPart.CFrame = CFrame.new(Vector3.new(0, 0, 0))
+		assert(camera ~= nil)
 
-				local v82 = cloneCFrame.Position + cloneCFrame.LookVector * (v79 * 2)
+		if head then
+			local head2 = ModelUtils.getHead(selfAvatar)
 
-				Camera.CFrame = CFrame.lookAt(v82 + Vector3.new(0, 0.10499999672174454, -0.25), cloneCFrame.Position)
-				Camera.Focus = cloneCFrame
-				Character.Archivable = Archivable
-				Model:Destroy()
+			if head2 then
+				assert(head2 ~= nil)
+
+				local targetCFrame = CFrameUtility.CalculateTargetCFrame(head2.CFrame)
+				local headExtents, v16 = CharacterUtility.CalculateHeadExtents(selfAvatar, targetCFrame)
+
+				local vector3 = Vector3.new(headExtents.X, headExtents.Y, headExtents.Z)
+				v7 = Vector3.new(v16.X, v16.Y, v16.Z) - vector3
+
+				assert(v7 ~= nil)
+
+				v2 = head2.Size.Y
+				math.min(v7.X, v7.Y)
+				local v17 = math.min(v7.X, v7.Z)
+
+				local model = Instance.new("Model")
+				model.Parent = selfAvatar
+				local head3 = ModelUtils.getHead(selfAvatar)
+				character.Archivable = true
+				v9 = head3:Clone()
+
+				assert(v9 ~= nil)
+				v9.CanCollide = false
+				v9.Parent = model
+
+				v10 = ModelUtils.getNeck(selfAvatar, v9)
+
+				cframe = v9.CFrame
+				v9:Destroy()
+				assert(cframe ~= nil)
+
+				local v18 = cframe.Position + cframe.LookVector * (v17 * 2)
+				camera.CFrame = CFrame.lookAt(v18 + Vector3.new(0, 0.105, -0.25), cframe.Position)
+				camera.Focus = cframe
+
+				character.Archivable = archivable
+				model:Destroy()
 			end
 		else
-			local v83 = HumanoidRootPart.Position + HumanoidRootPart.CFrame.LookVector * 2.5
-
-			Camera.CFrame = CFrame.lookAt(v83 + Vector3.new(0, 1.5, 0), HumanoidRootPart.Position)
-			Camera.CFrame = CFrame.new(Camera.CFrame.Position) * CFrame.Angles(-0.0006981317007977319, 3.141592653589793, 0)
+			local v16 = humanoidRootPart.Position + humanoidRootPart.CFrame.LookVector * 2.5
+			camera.CFrame = CFrame.lookAt(v16 + Vector3.new(0, 1.5, 0), humanoidRootPart.Position)
+			camera.CFrame = CFrame.new(camera.CFrame.Position) * CFrame.Angles(-0.0006981317007977319, 3.141592653589793, 0)
 		end
 	end
 
-	if u30 == nil then
+	if selfAvatar == nil then
 		return
 	end
 
-	local Humanoid = u30:FindFirstChildWhichIsA("Humanoid")
+	local humanoid = selfAvatar:FindFirstChildWhichIsA("Humanoid")
 
-	if Humanoid then
-		Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	if humanoid then
+		humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	end
 
-	u21 = ModelUtils.getAnimator(u30, 0)
+	animator = ModelUtils.getAnimator(selfAvatar, 0)
 
-	if u21 then
-		if not EngineFeature or not v11 then
-			local PlayingAnimationTracks = u21:GetPlayingAnimationTracks()
-			local PlayingAnimationTracksCoreScript = u21:GetPlayingAnimationTracksCoreScript()
+	if animator then
+		if not (engineFeature and defineFastFlag) then
+			local playingAnimationTracks = animator:GetPlayingAnimationTracks()
+			local playingAnimationTracksCoreScript = animator:GetPlayingAnimationTracksCoreScript()
 
-			for _, v in ipairs(PlayingAnimationTracks) do
-				if v ~= nil then
-					v:Stop(0)
-					v:Destroy()
+			for _, playingAnimationTrack in ipairs(playingAnimationTracks) do
+				if playingAnimationTrack == nil then
+					continue
 				end
+
+				playingAnimationTrack:Stop(0)
+				playingAnimationTrack:Destroy()
 			end
 
-			for _, v in ipairs(PlayingAnimationTracksCoreScript) do
-				if v ~= nil then
-					v:Stop(0)
-					v:Destroy()
+			for _, v16 in ipairs(playingAnimationTracksCoreScript) do
+				if v16 == nil then
+					continue
 				end
+
+				v16:Stop(0)
+				v16:Destroy()
 			end
 
-			if TrackerStreamAnimation then
-				TrackerStreamAnimation:Destroy()
-				TrackerStreamAnimation = nil
+			if trackerStreamAnimation then
+				trackerStreamAnimation:Destroy()
+				trackerStreamAnimation = nil
 			end
 		end
 
-		if v70 then
-			if EngineFeature and v11 then
-				u21:SynchronizeWith(v70)
+		if animator2 then
+			if engineFeature and defineFastFlag then
+				animator:SynchronizeWith(animator2)
 			else
-				for _, v in ipairs(v70:GetPlayingAnimationTracksCoreScript()) do
-					syncTrack(u21, v)
+				for _, v16 in ipairs(animator2:GetPlayingAnimationTracksCoreScript()) do
+					syncTrack(animator, v16)
 				end
 
-				t5.AnimationPlayedCoreScript = v70.AnimationPlayedCoreScript:Connect(function(p4) -- line: 389
-					-- upvalues: syncTrack (copy), u21 (ref)
-					syncTrack(u21, p4)
+				v13.AnimationPlayedCoreScript = animator2.AnimationPlayedCoreScript:Connect(function(p)
+					syncTrack(animator, p)
 				end)
 			end
 
 			setCloneDirty(false)
-
-			return
 		end
 	end
 end
-local function hasProperty(p5, p6) -- line: 405
-	local _ = p5[p6]
+
+local function hasProperty(p, p2) -- 4 equivalent calls inferred from this helper
+	local _ = p[p2]
 end
 
-function updateCachedHeadColor(p7) -- line: 412
-	-- upvalues: p7Color (ref), p7Size (ref)
-	if p7 == nil then
+function updateCachedHeadColor(p)
+	if p == nil then
 		return
 	end
 
-	assert(p7 ~= nil)
+	assert(p ~= nil)
 
-	if pcall(function() -- line: 418
-		-- upvalues: p7 (copy)
-		local _ = p7.Color
+	if pcall(function()
+		hasProperty(p, "Color") -- inferred equivalent call
 	end) then
-		p7Color = p7.Color
+		v6 = p.Color
 
-		if pcall(function() -- line: 424
-			-- upvalues: p7 (copy)
-			local _ = p7.Size
+		if pcall(function()
+			hasProperty(p, "Size") -- inferred equivalent call
 		end) then
-			p7Size = p7.Size
+			size = p.Size
 		end
 	end
 end
 
-local function addHumanoidStateChangedObserver(p8) -- line: 435
-	-- upvalues: t5 (copy)
-	if not p8 then
+local function addHumanoidStateChangedObserver(p)
+	if not p then
 		return
 	end
 
-	if not t5.HumanoidStateChanged then
-		t5.HumanoidStateChanged = p8.StateChanged:Connect(function(oldState, newState) -- line: 440
-			if oldState == Enum.HumanoidStateType.PlatformStanding and newState == Enum.HumanoidStateType.Running then
+	if not v13.HumanoidStateChanged then
+		v13.HumanoidStateChanged = p.StateChanged:Connect(function(p2, p3)
+			if p2 == Enum.HumanoidStateType.PlatformStanding and p3 == Enum.HumanoidStateType.Running then
 				setCloneDirty(true)
 			end
 
-			if newState == Enum.HumanoidStateType.GettingUp then
+			if p3 == Enum.HumanoidStateType.GettingUp then
 				setCloneDirty(true)
 			end
 		end)
 	end
 end
-local function addFaceControlsObserver(p9) -- line: 453
-	-- upvalues: t5 (copy)
-	if not t5.FaceControlsChanged then
-		t5.FaceControlsChanged = p9.InternalFacsOverrideChanged:Connect(function() -- line: 455
+
+local function addFaceControlsObserver(p)
+	if not v13.FaceControlsChanged then
+		v13.FaceControlsChanged = p.InternalFacsOverrideChanged:Connect(function()
 			setCloneDirty(true)
 		end)
 	end
 end
-local function characterAdded(p10) -- line: 461
-	-- upvalues: ViewportFrame (ref), u35 (ref), u31 (ref), ModelUtils (copy), t5 (copy), t6 (copy), u38 (ref)
-	if ViewportFrame == nil or u35 == nil then
+
+local function characterAdded(instance)
+	if viewportFrame == nil or parent2 == nil or not instance then
 		return
 	end
 
-	if not p10 then
-		return
+	v8 = ModelUtils.getHead(instance)
+	updateCachedHeadColor(v8)
+	clearObserver("DescendantAdded") -- inferred equivalent call
+	clearObserver("DescendantRemoving") -- inferred equivalent call
+	clearObserver("HeadSize") -- inferred equivalent call
+	clearObserver("Color") -- inferred equivalent call
+	local humanoid = instance:FindFirstChildWhichIsA("Humanoid")
+
+	if humanoid and not v13[v14.HumanoidStateChanged] then
+		v13[v14.HumanoidStateChanged] = humanoid.StateChanged:Connect(function(p, p2)
+			if p == Enum.HumanoidStateType.PlatformStanding and p2 == Enum.HumanoidStateType.Running then
+				setCloneDirty(true)
+			end
+
+			if p2 == Enum.HumanoidStateType.GettingUp then
+				setCloneDirty(true)
+			end
+		end)
 	end
 
-	u31 = ModelUtils.getHead(p10)
-	updateCachedHeadColor(u31)
+	local faceControls = instance:FindFirstChildWhichIsA("FaceControls", true)
 
-	if t5.DescendantAdded then
-		t5.DescendantAdded:Disconnect()
-		t5.DescendantAdded = nil
-	end
-
-	if t5.DescendantRemoving then
-		t5.DescendantRemoving:Disconnect()
-		t5.DescendantRemoving = nil
-	end
-
-	if t5.HeadSize then
-		t5.HeadSize:Disconnect()
-		t5.HeadSize = nil
-	end
-
-	if t5.Color then
-		t5.Color:Disconnect()
-		t5.Color = nil
-	end
-
-	local Humanoid = p10:FindFirstChildWhichIsA("Humanoid")
-
-	if Humanoid then
-		if Humanoid and not t5[t6.HumanoidStateChanged] then
-			t5[t6.HumanoidStateChanged] = Humanoid.StateChanged:Connect(function(oldState, newState) -- line: 440
-				if oldState == Enum.HumanoidStateType.PlatformStanding and newState == Enum.HumanoidStateType.Running then
-					setCloneDirty(true)
-				end
-
-				if newState == Enum.HumanoidStateType.GettingUp then
-					setCloneDirty(true)
-				end
-			end)
-		end
-	end
-
-	local FaceControls = p10:FindFirstChildWhichIsA("FaceControls", true)
-
-	if FaceControls and not t5[t6.FaceControlsChanged] then
-		t5[t6.FaceControlsChanged] = FaceControls.InternalFacsOverrideChanged:Connect(function() -- line: 455
+	if faceControls and not v13[v14.FaceControlsChanged] then
+		v13[v14.FaceControlsChanged] = faceControls.InternalFacsOverrideChanged:Connect(function()
 			setCloneDirty(true)
 		end)
 	end
 
-	t5.DescendantAdded = p10.DescendantAdded:Connect(function(descendant) -- line: 491
-		-- upvalues: ViewportFrame (ref), u35 (ref), u31 (ref), ModelUtils (copy), p10 (copy), t5 (copy), t6 (copy)
-		if ViewportFrame == nil or u35 == nil then
+	v13.DescendantAdded = instance.DescendantAdded:Connect(function(instance2)
+		if viewportFrame == nil or parent2 == nil then
 			return
 		end
 
-		if descendant.Name == "Head" then
-			u31 = ModelUtils.getHead(p10)
-			updateCachedHeadColor(u31)
+		if instance2.Name == "Head" then
+			v8 = ModelUtils.getHead(instance)
+
+			updateCachedHeadColor(v8)
 		end
 
-		if descendant:IsA("Humanoid") and descendant and not t5[t6.HumanoidStateChanged] then
-			t5[t6.HumanoidStateChanged] = descendant.StateChanged:Connect(function(oldState, newState) -- line: 440
-				if oldState == Enum.HumanoidStateType.PlatformStanding and newState == Enum.HumanoidStateType.Running then
+		if instance2:IsA("Humanoid") and instance2 and not v13[v14.HumanoidStateChanged] then
+			v13[v14.HumanoidStateChanged] = instance2.StateChanged:Connect(function(p, p2)
+				if p == Enum.HumanoidStateType.PlatformStanding and p2 == Enum.HumanoidStateType.Running then
 					setCloneDirty(true)
 				end
 
-				if newState == Enum.HumanoidStateType.GettingUp then
+				if p2 == Enum.HumanoidStateType.GettingUp then
 					setCloneDirty(true)
 				end
 			end)
 		end
 
-		if descendant:IsA("FaceControls") and not t5[t6.FaceControlsChanged] then
-			t5[t6.FaceControlsChanged] = descendant.InternalFacsOverrideChanged:Connect(function() -- line: 455
+		if instance2:IsA("FaceControls") and not v13[v14.FaceControlsChanged] then
+			v13[v14.FaceControlsChanged] = instance2.InternalFacsOverrideChanged:Connect(function()
 				setCloneDirty(true)
 			end)
 		end
 
-		if ModelUtils.shouldMarkCloneDirtyForDescendant(descendant) then
+		if ModelUtils.shouldMarkCloneDirtyForDescendant(instance2) then
 			setCloneDirty(true)
 		end
 	end)
-	t5.DescendantRemoving = p10.DescendantRemoving:Connect(function(descendant) -- line: 514
-		-- upvalues: ViewportFrame (ref), u35 (ref), ModelUtils (copy)
-		if ViewportFrame == nil or u35 == nil then
+	v13.DescendantRemoving = instance.DescendantRemoving:Connect(function(instance2)
+		if viewportFrame == nil or parent2 == nil then
 			return
 		end
 
-		if descendant and (descendant:IsA("MeshPart") or descendant:IsA("Accessory")) then
-			if descendant:IsA("MeshPart") and descendant.MeshId == "" then
+		if instance2 and (instance2:IsA("MeshPart") or instance2:IsA("Accessory")) then
+			if instance2:IsA("MeshPart") and instance2.MeshId == "" then
 				return
 			end
 
-			if ModelUtils.shouldMarkCloneDirtyForDescendant(descendant) then
+			if ModelUtils.shouldMarkCloneDirtyForDescendant(instance2) then
 				setCloneDirty(true)
 			end
 		end
 	end)
+
 	setCloneDirty(true)
-	u38 = true
+	flag = true
 end
-local function createViewport() -- line: 536
-	-- upvalues: ViewportFrame (ref), u35 (ref), Camera (ref)
-	if ViewportFrame then
-		ViewportFrame:Destroy()
+
+local function createViewport()
+	if viewportFrame then
+		viewportFrame:Destroy()
 	end
 
-	ViewportFrame = Instance.new("ViewportFrame")
-	ViewportFrame.Position = UDim2.new(0, 0, 0, 0)
-	ViewportFrame.Size = UDim2.new(1, 0, 1, 0)
-	ViewportFrame.BackgroundTransparency = 1
-	ViewportFrame.Parent = u35
-	ViewportFrame.Ambient = Color3.new(0.7529411765, 0.7098039216, 0.7137254902)
-	ViewportFrame.LightColor = Color3.new(1, 0.9960784314, 0.9960784314)
-	ViewportFrame.LightDirection = Vector3.new(9.5, -12, 7.5)
-	ViewportFrame.IsMirrored = true
+	viewportFrame = Instance.new("ViewportFrame")
+	viewportFrame.Position = UDim2.new(0, 0, 0, 0)
+	viewportFrame.Size = UDim2.new(1, 0, 1, 0)
+	viewportFrame.BackgroundTransparency = 1
+	viewportFrame.Parent = parent2
+
+	viewportFrame.Ambient = Color3.new(0.7529411765, 0.7098039216, 0.7137254902)
+	viewportFrame.LightColor = Color3.new(1, 0.9960784314, 0.9960784314)
+	viewportFrame.LightDirection = Vector3.new(9.5, -12, 7.5)
+	viewportFrame.IsMirrored = true
+
 	Instance.new("UICorner")
-	Instance.new("UICorner").Parent = ViewportFrame
+	local uiCorner = Instance.new("UICorner")
+	uiCorner.Parent = viewportFrame
+
 	createCloneAnchor()
 
-	if u35 then
-		u35.Destroying:Connect(clearViewportFrame)
+	if parent2 then
+		parent2.Destroying:Connect(clearViewportFrame)
 	end
 
-	Camera = Instance.new("Camera")
-	assert(Camera ~= nil)
-	Camera.FieldOfView = 70
-	ViewportFrame.CurrentCamera = Camera
-	Camera.Parent = ViewportFrame
+	camera = Instance.new("Camera")
+	assert(camera ~= nil)
+
+	camera.FieldOfView = 70
+	viewportFrame.CurrentCamera = camera
+	camera.Parent = viewportFrame
 end
 
-function ReInit(p11) -- line: 570
-	-- upvalues: GetFFlagSelfViewVisibilityFix (copy), u37 (ref), u44 (ref), u31 (ref), ModelUtils (copy), t5 (copy), clearClone (copy), createViewport (copy)
-	assert(p11.Character ~= nil)
+function ReInit(player)
+	assert(player.Character ~= nil)
 
-	if GetFFlagSelfViewVisibilityFix() and u37 and not u37.Visible then
-		u44 = false
-
+	if GetFFlagSelfViewVisibilityFix() and v12 and not v12.Visible then
+		v15 = false
 		return
 	end
 
-	u31 = ModelUtils.getHead(p11.Character)
-	updateCachedHeadColor(u31)
+	v8 = ModelUtils.getHead(player.Character)
+	updateCachedHeadColor(v8)
+
 	setCloneDirty(false)
-
-	if t5.CharacterAdded then
-		t5.CharacterAdded:Disconnect()
-		t5.CharacterAdded = nil
-	end
-
-	if t5.CharacterRemoving then
-		t5.CharacterRemoving:Disconnect()
-		t5.CharacterRemoving = nil
-	end
-
+	clearObserver("CharacterAdded") -- inferred equivalent call
+	clearObserver("CharacterRemoving") -- inferred equivalent call
 	clearClone()
 	createViewport()
-	playerAdded(p11)
-	startRenderStepped(p11)
+	playerAdded(player)
+	startRenderStepped(player)
 end
 
-local function onCharacterAdded(p12) -- line: 592
-	-- upvalues: u18 (ref), u38 (ref), characterAdded (copy), LocalPlayer (copy), t5 (copy), t6 (copy)
-	if u18 then
-		u18:Disconnect()
+local function onCharacterAdded(instance)
+	if characterAddedConnection then
+		characterAddedConnection:Disconnect()
 	end
 
-	if not u38 then
-		characterAdded(p12)
-	else
+	if flag then
 		ReInit(LocalPlayer)
+	else
+		characterAdded(instance)
 	end
 
-	if t5.HumanoidStateChanged then
-		t5.HumanoidStateChanged:Disconnect()
-		t5.HumanoidStateChanged = nil
-	end
+	clearObserver("HumanoidStateChanged") -- inferred equivalent call
+	local humanoid = instance:FindFirstChildWhichIsA("Humanoid")
 
-	local Humanoid = p12:FindFirstChildWhichIsA("Humanoid")
-
-	if Humanoid then
-		if not Humanoid then
+	if humanoid then
+		if not humanoid then
 			return
 		end
 
-		if not t5[t6.HumanoidStateChanged] then
-			t5[t6.HumanoidStateChanged] = Humanoid.StateChanged:Connect(function(oldState, newState) -- line: 440
-				if oldState == Enum.HumanoidStateType.PlatformStanding and newState == Enum.HumanoidStateType.Running then
+		if not v13[v14.HumanoidStateChanged] then
+			v13[v14.HumanoidStateChanged] = humanoid.StateChanged:Connect(function(p, p2)
+				if p == Enum.HumanoidStateType.PlatformStanding and p2 == Enum.HumanoidStateType.Running then
 					setCloneDirty(true)
 				end
 
-				if newState == Enum.HumanoidStateType.GettingUp then
+				if p2 == Enum.HumanoidStateType.GettingUp then
 					setCloneDirty(true)
 				end
 			end)
 		end
 	end
 end
-local function FindInParents(s2: string?) -- line: 610
-	-- upvalues: u35 (ref)
-	if not s2 then
+
+local function FindInParents(ancestorName: string?) -- 1 equivalent call inferred from this helper
+	if not (ancestorName and parent2) then
 		return nil
 	end
 
-	if not u35 then
-		return nil
-	end
+	assert(parent2 ~= nil, "Wrapper Frame cannot be nil")
+	assert(ancestorName ~= nil, "Frame name cannot be nil ")
 
-	assert(u35 ~= nil, "Wrapper Frame cannot be nil")
-	assert(s2 ~= nil, "Frame name cannot be nil ")
-
-	return u35:FindFirstAncestor(s2)
+	return parent2:FindFirstAncestor(ancestorName)
 end
 
-function clearViewportFrame() -- line: 625
-	-- upvalues: ViewportFrame (ref), u35 (ref)
-	if ViewportFrame then
-		ViewportFrame:Destroy()
+function clearViewportFrame()
+	if viewportFrame then
+		viewportFrame:Destroy()
 	end
 
-	u35 = nil
+	parent2 = nil
 	stopRenderStepped()
 end
 
-local function onOuterContainerVisibilityChanged() -- line: 633
-	-- upvalues: u37 (ref), u38 (ref), u44 (ref)
-	if u37 then
-		if u37.Visible then
-			if not u38 then
+local function onOuterContainerVisibilityChanged()
+	if v12 then
+		if v12.Visible then
+			if not flag then
 				return
 			end
 
-			u44 = true
-
-			return
+			v15 = true
+		else
+			v15 = false
 		end
-
-		u44 = false
 	end
 end
 
-function playerAdded(p13) -- line: 652
-	-- upvalues: LocalPlayer (copy), u18 (ref), t5 (copy), onCharacterAdded (copy), characterAdded (copy), clearClone (copy)
-	if p13 ~= nil and p13 == LocalPlayer then
-		if u18 ~= nil then
-			u18:Disconnect()
-			u18 = nil
-
-			if t5.CharacterAdded then
-				t5.CharacterAdded:Disconnect()
-				t5.CharacterAdded = nil
-			end
+function playerAdded(player)
+	if player ~= nil and player == LocalPlayer then
+		if characterAddedConnection ~= nil then
+			characterAddedConnection:Disconnect()
+			characterAddedConnection = nil
+			clearObserver("CharacterAdded") -- inferred equivalent call
 		end
 
-		local _ = p13.Character
-		local Character = p13.Character
+		local _character = player.Character
+		local character = player.Character
 
-		u18 = p13.CharacterAdded:Connect(onCharacterAdded)
+		characterAddedConnection = player.CharacterAdded:Connect(onCharacterAdded)
 
-		if Character then
-			characterAdded(Character)
+		if character then
+			characterAdded(character)
 		end
 
-		t5.CharacterAdded = p13.CharacterAdded:Connect(characterAdded)
-		t5.CharacterRemoving = p13.CharacterRemoving:Connect(function() -- line: 671
-			-- upvalues: t5 (copy), clearClone (copy)
-			if t5.DescendantAdded then
-				t5.DescendantAdded:Disconnect()
-				t5.DescendantAdded = nil
-			end
-
-			if t5.DescendantRemoving then
-				t5.DescendantRemoving:Disconnect()
-				t5.DescendantRemoving = nil
-			end
-
-			if t5.HeadSize then
-				t5.HeadSize:Disconnect()
-				t5.HeadSize = nil
-			end
-
-			if t5.Color then
-				t5.Color:Disconnect()
-				t5.Color = nil
-			end
-
+		v13.CharacterAdded = player.CharacterAdded:Connect(characterAdded)
+		v13.CharacterRemoving = player.CharacterRemoving:Connect(function()
+			clearObserver("DescendantAdded") -- inferred equivalent call
+			clearObserver("DescendantRemoving") -- inferred equivalent call
+			clearObserver("HeadSize") -- inferred equivalent call
+			clearObserver("Color") -- inferred equivalent call
 			clearClone()
-
-			if t5.CharacterRemoving then
-				t5.CharacterRemoving:Disconnect()
-				t5.CharacterRemoving = nil
-			end
+			clearObserver("CharacterRemoving") -- inferred equivalent call
 		end)
 	end
 end
-function stopRenderStepped() -- line: 682
-	-- upvalues: u17 (ref)
-	if u17 then
-		u17:Disconnect()
-		u17 = nil
+
+function stopRenderStepped()
+	if connection then
+		connection:Disconnect()
+		connection = nil
 	end
 end
-function updateClonePartsColor(p14) -- line: 689
-	-- upvalues: u31 (ref), p7Color (ref), LocalPlayer (copy), u30 (ref)
-	if pcall(function() -- line: 690
-		-- upvalues: u31 (ref)
-		local _ = u31.Color
-	end) and (u31 and u31.Color ~= p7Color) then
-		local Character = LocalPlayer.Character
 
-		if not Character then
+function updateClonePartsColor(p)
+	if pcall(function()
+		hasProperty(v8, "Color") -- inferred equivalent call
+	end) and v8 and v8.Color ~= v6 then
+		local character = LocalPlayer.Character
+
+		if not character then
 			return
 		end
 
-		assert(Character ~= nil)
+		assert(character ~= nil)
 
-		if not u30 then
+		if not selfAvatar then
 			return
 		end
 
-		assert(u30 ~= nil)
+		assert(selfAvatar ~= nil)
 
-		for _, child in pairs(Character:GetChildren()) do
-			if child:IsA("MeshPart") then
-				local childName = u30:FindFirstChild(child.Name)
+		for _, part in pairs(character:GetChildren()) do
+			if not part:IsA("MeshPart") then
+				continue
+			end
 
-				if childName and childName:IsA("MeshPart") and childName.Color and child.Color then
-					childName.Color = child.Color
-				end
+			local part2 = selfAvatar:FindFirstChild(part.Name)
+
+			if part2 and part2:IsA("MeshPart") and part2.Color and part.Color then
+				part2.Color = part.Color
 			end
 		end
 	end
 
-	p7Color = p14
+	v6 = p
 end
-function startRenderStepped(p15) -- line: 722
-	-- upvalues: v12 (copy), RunService (copy), u17 (ref), GetFFlagSelfViewVisibilityFix (copy), u30 (ref), u37 (ref), u44 (ref), u21 (ref), LocalPlayer (copy), u31 (ref), ModelUtils (copy), t4 (ref), t3 (ref), UserInputService (copy), n3 (ref), clone (ref), u33 (ref), cloneCFrame (ref), Camera (ref), vector3 (ref), Service (copy), EngineFeature2 (copy), n1 (ref), p7Size (ref), p7Color (ref), n2 (ref), updateClone (copy)
+
+function startRenderStepped(p)
 	stopRenderStepped()
-	u17 = ((if not v12 then RunService.RenderStepped else RunService.Heartbeat)):Connect(function(n4: number) -- line: 729
-		-- upvalues: v12 (copy), GetFFlagSelfViewVisibilityFix (copy), u30 (ref), u37 (ref), u44 (ref), u21 (ref), LocalPlayer (copy), u31 (ref), ModelUtils (copy), t4 (ref), t3 (ref), UserInputService (copy), n3 (ref), clone (ref), u33 (ref), cloneCFrame (ref), Camera (ref), vector3 (ref), Service (copy), EngineFeature2 (copy), n1 (ref), p7Size (ref), p7Color (ref), n2 (ref), updateClone (copy), p15 (copy)
-		if v12 then
+	local v16
+
+	if defineFastFlag2 then
+		v16 = RunService.Heartbeat
+	else
+		v16 = RunService.RenderStepped
+	end
+
+	connection = v16:Connect(function(p2: number)
+		if defineFastFlag2 then
 			debug.profilebegin("faceclone")
 		end
 
-		if GetFFlagSelfViewVisibilityFix() and u30 and u37 and not u44 then
-			if u21 ~= nil then
-				local PlayingAnimationTracks = u21:GetPlayingAnimationTracks()
+		if GetFFlagSelfViewVisibilityFix() and selfAvatar and v12 and not v15 then
+			if animator ~= nil then
+				local playingAnimationTracks = animator:GetPlayingAnimationTracks()
 
-				for _, v in pairs(PlayingAnimationTracks) do
-					if v ~= nil then
-						v:Stop(0)
+				for _, playingAnimationTrack in pairs(playingAnimationTracks) do
+					if playingAnimationTrack ~= nil then
+						playingAnimationTrack:Stop(0)
 					end
 				end
 			end
+		else
+			if LocalPlayer then
+				local character = LocalPlayer.Character
 
-			return
-		end
+				if not character or character.Parent == nil then
+					return
+				end
 
-		if LocalPlayer then
-			local Character = LocalPlayer.Character
+				assert(character ~= nil)
 
-			if not Character or Character.Parent == nil then
-				return
-			end
+				if v8 == nil or v8.Parent ~= character then
+					v8 = ModelUtils.getHead(character)
+				end
 
-			assert(Character ~= nil)
+				if v8 then
+					local animator2 = ModelUtils.getAnimator(character, 0)
 
-			if u31 == nil or Character ~= u31.Parent then
-				u31 = ModelUtils.getHead(Character)
-			end
+					if animator ~= nil and animator2 ~= nil then
+						assert(animator ~= nil)
 
-			if u31 then
-				local v137 = ModelUtils.getAnimator(Character, 0)
+						local playingAnimationTracks = animator:GetPlayingAnimationTracks()
 
-				if u21 ~= nil and v137 ~= nil then
-					assert(u21 ~= nil)
-
-					local PlayingAnimationTracks = u21:GetPlayingAnimationTracks()
-
-					for _, v in pairs(PlayingAnimationTracks) do
-						if v ~= nil then
-							v:Stop(0)
+						for _, playingAnimationTrack in pairs(playingAnimationTracks) do
+							if playingAnimationTrack ~= nil then
+								playingAnimationTrack:Stop(0)
+							end
 						end
-					end
 
-					local PlayingAnimationTracks2 = v137:GetPlayingAnimationTracks()
+						local playingAnimationTracks2 = animator2:GetPlayingAnimationTracks()
 
-					t4 = {}
+						playingAnimationTracksByAnimationId = {}
 
-					for _, v in ipairs(PlayingAnimationTracks2) do
-						local Animation = v.Animation
+						for _, playingAnimationTrack in ipairs(playingAnimationTracks2) do
+							local animation = playingAnimationTrack.Animation
 
-						if Animation and Animation:IsA("Animation") and Animation.AnimationId ~= "" then
-							t4[Animation.AnimationId] = v
-
-							if not t3[Animation.AnimationId] then
-								t3[Animation.AnimationId] = u21:LoadAnimation(Animation)
+							if not (animation and animation:IsA("Animation") and animation.AnimationId ~= "") then
+								continue
 							end
 
-							local v145 = t3[Animation.AnimationId]
+							playingAnimationTracksByAnimationId[animation.AnimationId] = playingAnimationTrack
 
-							assert(v145 ~= nil)
-							v145:Play()
-							v145.TimePosition = v.TimePosition
-							v145.Priority = v.Priority
-							v145:AdjustWeight(v.WeightCurrent, 0.1)
+							if not v5[animation.AnimationId] then
+								v5[animation.AnimationId] = animator:LoadAnimation(animation)
+							end
+
+							local v17 = v5[animation.AnimationId]
+							assert(v17 ~= nil)
+							v17:Play()
+							v17.TimePosition = playingAnimationTrack.TimePosition
+							v17.Priority = playingAnimationTrack.Priority
+							v17:AdjustWeight(playingAnimationTrack.WeightCurrent, 0.1)
 						end
-					end
 
-					for v146 in t3 do
-						local v147 = t3[v146]
+						for k in v5 do
+							local v17 = v5[k]
 
-						if v147 then
-							local Animation = v147.Animation
+							if not v17 then
+								continue
+							end
 
-							if Animation and not t4[Animation.AnimationId] then
-								local v149 = t3[Animation.AnimationId]
+							local animation = v17.Animation
 
-								if v149 ~= nil then
-									v149:Stop(0)
+							if not animation or playingAnimationTracksByAnimationId[animation.AnimationId] then
+								continue
+							end
+
+							local v18 = v5[animation.AnimationId]
+
+							if v18 ~= nil then
+								v18:Stop(0)
+							end
+
+							v5[animation.AnimationId] = nil
+						end
+
+						for _, v17 in ipairs(animator2:GetPlayingAnimationTracksCoreScript()) do
+							local playingAnimationTracksCoreScript = animator:GetPlayingAnimationTracksCoreScript()
+
+							for _, v18 in pairs(playingAnimationTracksCoreScript) do
+								if not v18.Animation:IsA("TrackerStreamAnimation") then
+									continue
 								end
 
-								t3[Animation.AnimationId] = nil
-							end
-						end
-					end
-
-					for _, v in ipairs(v137:GetPlayingAnimationTracksCoreScript()) do
-						local PlayingAnimationTracksCoreScript = u21:GetPlayingAnimationTracksCoreScript()
-
-						for _, v2 in pairs(PlayingAnimationTracksCoreScript) do
-							if v2.Animation:IsA("TrackerStreamAnimation") then
-								v2.Priority = v.Priority
-								v2:AdjustWeight(v.WeightCurrent, 0)
+								v18.Priority = v17.Priority
+								v18:AdjustWeight(v17.WeightCurrent, 0)
 							end
 						end
 					end
 				end
-			end
 
-			local v155 = nil
-			local Platform = UserInputService:GetPlatform()
+				local cframe2 = nil
 
-			if (Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android) and u21 ~= nil then
-				local PlayingAnimationTracksCoreScript = u21:GetPlayingAnimationTracksCoreScript()
+				local platform = UserInputService:GetPlatform()
 
-				for _, v in pairs(PlayingAnimationTracksCoreScript) do
-					if v.Animation:IsA("TrackerStreamAnimation") then
-						local TrackerData, v161
+				if (platform == Enum.Platform.IOS or platform == Enum.Platform.Android) and animator ~= nil then
+					local playingAnimationTracksCoreScript = animator:GetPlayingAnimationTracksCoreScript()
 
-						TrackerData, v155, v161 = v:GetTrackerData()
-					end
-				end
-			end
-
-			n3 += 1
-
-			if n3 == 1 then
-				n3 = 0
-
-				if u30 then
-					if not clone then
-						clone = ModelUtils.getHead(u30)
-
-						if clone then
-							u33 = ModelUtils.getNeck(u30, clone)
+					for _, v17 in pairs(playingAnimationTracksCoreScript) do
+						if not v17.Animation:IsA("TrackerStreamAnimation") then
+							continue
 						end
-					end
 
-					if clone then
-						cloneCFrame = clone.CFrame
+						local trackerData, v18
+						trackerData, cframe2, v18 = v17:GetTrackerData()
 					end
 				end
 
-				if Camera and clone then
-					local clonePosition = clone.Position
-					local clonePosition2 = clone.Position
-					local _ = clone.CFrame
+				count += 1
 
-					if u33 then
-						local Part0 = u33.Part0
-						local _ = u33.Part1
-						local C0 = u33.C0
-						local C1 = u33.C1
-						local Transform = u33.Transform
+				if count == 1 then
+					count = 0
 
-						if Part0 and C0 then
-							local v170 = Part0.CFrame * C0 * Transform * C1:Inverse()
+					if selfAvatar then
+						if not v9 then
+							v9 = ModelUtils.getHead(selfAvatar)
 
-							clonePosition2 = Vector3.new(v170.Position.X * 0.25, (clone.CFrame.Position.Y + v170.Position.Y + v170.Position.Y * 0.75) * 0.33333, v170.Position.Z)
-							clonePosition = Vector3.new(v170.Position.X * 0.6, (clone.CFrame.Position.Y + v170.Position.Y + v170.Position.Y * 0.75) * 0.33333, v170.Position.Z)
-						end
-					end
-
-					if not vector3 then
-						warn("boundsSize is nil, this shouldn't be possible")
-					end
-
-					assert(vector3 ~= nil)
-
-					if Service and Service.VideoAnimationEnabled and (v155 ~= nil or EngineFeature2) then
-						if EngineFeature2 then
-							local DeviceCameraCFrameForSelfView = game:GetService("PlayerViewService"):GetDeviceCameraCFrameForSelfView()
-							local DeviceCameraCFrameForSelfViewPosition = DeviceCameraCFrameForSelfView.Position
-							local v173, v174, v175 = DeviceCameraCFrameForSelfView:ToEulerAnglesYXZ()
-							local cFrame = CFrame.fromEulerAnglesYXZ(v173, v174, v175)
-							local n5 = 0
-
-							if DeviceCameraCFrameForSelfViewPosition.Z > 0 then
-								n5 = math.clamp(0.5 - DeviceCameraCFrameForSelfViewPosition.Z * 3, -0.5, 0.5)
+							if v9 then
+								v10 = ModelUtils.getNeck(selfAvatar, v9)
 							end
-
-							local v178 = -(vector3.Z + 1)
-							local vector3_3 = Vector3.new(0, 0.105, math.floor((v178 + n5 * v178) * 100) / 100)
-
-							Camera.CFrame = Camera.CFrame:Lerp(CFrame.lookAt(cFrame * (clonePosition + vector3_3), clonePosition2), 0.5)
-						elseif v155 then
-							local vector3_4 = Vector3.new(0, 0.105, -(vector3.Z + 1))
-							local v181, v182, v183 = v155:ToEulerAnglesXYZ()
-							local cFrame = CFrame.Angles(-v181 * 0.5, -v182 * 0.5, -v183 * 0.5)
-
-							Camera.CFrame = CFrame.lookAt(cFrame * (clonePosition + vector3_4), clonePosition2)
 						end
-					else
-						local vector3_5 = Vector3.new(0, n1 * 0.25 - 1.25, -(vector3.Z + 1) + 0.125)
 
-						if Character then
-							local Head = Character:FindFirstChild("Head")
+						if v9 then
+							cframe = v9.CFrame
+						end
+					end
 
-							if Head then
-								local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+					if camera and v9 then
+						local v17 = v9.Position
+						local v18 = v9.Position
 
-								if HumanoidRootPart then
-									local v188 = HumanoidRootPart.CFrame:Inverse() * Head.CFrame
-									local vector3_6 = Vector3.new(v188.Position.X * 0.15 + 0.125, v188.Position.Y, v188.Position.Z * 0.05)
+						local _cframe = v9.CFrame
 
-									Camera.CFrame = CFrame.lookAt(clonePosition + vector3_5 + vector3_6, clonePosition2)
-									Camera.Focus = clone.CFrame
+						if v10 then
+							local part0 = v10.Part0
+							local _part1 = v10.Part1
+							local c0 = v10.C0
+							local c1 = v10.C1
+							local transform = v10.Transform
+
+							if part0 and c0 then
+								local v19 = part0.CFrame * c0 * transform * c1:Inverse()
+
+								v18 = Vector3.new(
+									v19.Position.X * 0.25,
+									(v9.CFrame.Position.Y + v19.Position.Y + v19.Position.Y * 0.75) * 0.33333,
+									v19.Position.Z
+								)
+
+								v17 = Vector3.new(
+									v19.Position.X * 0.6,
+									(v9.CFrame.Position.Y + v19.Position.Y + v19.Position.Y * 0.75) * 0.33333,
+									v19.Position.Z
+								)
+							end
+						end
+
+						if not v7 then
+							warn("boundsSize is nil, this shouldn't be possible")
+						end
+
+						assert(v7 ~= nil)
+
+						if service and service.VideoAnimationEnabled and (cframe2 ~= nil or engineFeature2) then
+							if engineFeature2 then
+								local PlayerViewService = game:GetService("PlayerViewService")
+								local deviceCameraCFrameForSelfView = PlayerViewService:GetDeviceCameraCFrameForSelfView()
+								local position = deviceCameraCFrameForSelfView.Position
+								local eulerAnglesYXZ, v19, v20 = deviceCameraCFrameForSelfView:ToEulerAnglesYXZ()
+								local cframe3 = CFrame.fromEulerAnglesYXZ(eulerAnglesYXZ, v19, v20)
+
+								local v21 = not (position.Z > 0) and 0 or math.clamp(0.5 - position.Z * 3, -0.5, 0.5)
+
+								local v22 = -(v7.Z + 1)
+
+								local vector3 = Vector3.new(0, 0.105, math.floor((v22 + v21 * v22) * 100) / 100)
+
+								camera.CFrame = camera.CFrame:Lerp(CFrame.lookAt(cframe3 * (v17 + vector3), v18), 0.5)
+							elseif cframe2 then
+								local vector3 = Vector3.new(0, 0.105, -(v7.Z + 1))
+								local eulerAnglesXYZ, v19, v20 = cframe2:ToEulerAnglesXYZ()
+
+								local cframe3 = CFrame.Angles(-eulerAnglesXYZ * 0.5, -v19 * 0.5, -v20 * 0.5)
+
+								camera.CFrame = CFrame.lookAt(cframe3 * (v17 + vector3), v18)
+							end
+						else
+							local vector3 = Vector3.new(0, v2 * 0.25 - 1.25, -(v7.Z + 1) + 0.125)
+
+							if character then
+								local head = character:FindFirstChild("Head")
+
+								local humanoidRootPart = head and character:FindFirstChild("HumanoidRootPart")
+
+								if humanoidRootPart then
+									local v19 = humanoidRootPart.CFrame:Inverse() * head.CFrame
+
+									local vector3_2 = Vector3.new(
+										v19.Position.X * 0.15 + 0.125,
+										v19.Position.Y,
+										v19.Position.Z * 0.05
+									)
+
+									camera.CFrame = CFrame.lookAt(v17 + vector3 + vector3_2, v18)
+									camera.Focus = v9.CFrame
 								end
 							end
 						end
 					end
 				end
-			end
 
-			if u31 then
-				if u31.Size ~= p7Size then
-					p7Size = u31.Size
-					setCloneDirty(true)
+				if v8 then
+					if v8.Size ~= size then
+						size = v8.Size
+						setCloneDirty(true)
+					end
+
+					if pcall(function()
+						hasProperty(v8, "Color") -- inferred equivalent call
+					end) and v8.Color ~= v6 then
+						updateClonePartsColor(v8.Color)
+					end
 				end
+			end
 
-				if pcall(function() -- line: 983
-					-- upvalues: u31 (ref)
-					local _ = u31.Color
-				end) and u31.Color ~= p7Color then
-					updateClonePartsColor(u31.Color)
+			if v3 > 0 then
+				v3 -= p2
+
+				if v3 <= 0 then
+					updateClone(p)
+					v3 = 0
 				end
 			end
-		end
 
-		if n2 > 0 then
-			n2 -= n4
-
-			if n2 <= 0 then
-				updateClone(p15)
-				n2 = 0
+			if defineFastFlag2 then
+				debug.profileend()
 			end
-		end
-
-		if v12 then
-			debug.profileend()
 		end
 	end)
 end
 
-local function Initialize(p16, p17, s3: string?) -- line: 1007
-	-- upvalues: u35 (ref), GetFFlagSelfViewVisibilityFix (copy), u36 (ref), u37 (ref), onOuterContainerVisibilityChanged (copy), createViewport (copy), Players (copy), LocalPlayer (copy), t5 (copy), clearClone (copy)
-	if p17 then
-		u35 = p17
-
-		if GetFFlagSelfViewVisibilityFix() and s3 then
-			u36 = s3
-
-			local v118 = u36
-			local v119
-
-			if not v118 then
-				v119 = nil
-			elseif not u35 then
-				v119 = nil
-			else
-				assert(u35 ~= nil, "Wrapper Frame cannot be nil")
-				assert(v118 ~= nil, "Frame name cannot be nil ")
-				v119 = u35:FindFirstAncestor(v118)
-			end
-
-			u37 = v119
-
-			if u37 then
-				u37:GetPropertyChangedSignal("Visible"):Connect(onOuterContainerVisibilityChanged)
-			end
-		end
-
-		createViewport()
-		playerAdded(p16)
-		Players.PlayerAdded:Connect(playerAdded)
-		Players.PlayerRemoving:Connect(function(player) -- line: 1035
-			-- upvalues: LocalPlayer (copy), t5 (copy), clearClone (copy)
-			if player == LocalPlayer then
-				if t5.HumanoidStateChanged then
-					t5.HumanoidStateChanged:Disconnect()
-					t5.HumanoidStateChanged = nil
-				end
-
-				if t5.CharacterAdded then
-					t5.CharacterAdded:Disconnect()
-					t5.CharacterAdded = nil
-				end
-
-				if t5.CharacterRemoving then
-					t5.CharacterRemoving:Disconnect()
-					t5.CharacterRemoving = nil
-				end
-
-				if t5.FaceControlsChanged then
-					t5.FaceControlsChanged:Disconnect()
-					t5.FaceControlsChanged = nil
-				end
-
-				clearClone()
-			end
-		end)
-		startRenderStepped(p16)
-
-		return clearClone
+local function Initialize(p, p2, p3: string?)
+	if not p2 then
+		return
 	end
+
+	parent2 = p2
+
+	if GetFFlagSelfViewVisibilityFix() and p3 then
+		v11 = p3
+		v12 = FindInParents(v11) -- inferred equivalent call
+
+		if v12 then
+			v12:GetPropertyChangedSignal("Visible"):Connect(onOuterContainerVisibilityChanged)
+		end
+	end
+
+	createViewport()
+
+	playerAdded(p)
+
+	Players.PlayerAdded:Connect(playerAdded)
+	Players.PlayerRemoving:Connect(function(player)
+		if player == LocalPlayer then
+			clearObserver("HumanoidStateChanged") -- inferred equivalent call
+			clearObserver("CharacterAdded") -- inferred equivalent call
+			clearObserver("CharacterRemoving") -- inferred equivalent call
+			clearObserver("FaceControlsChanged") -- inferred equivalent call
+			clearClone()
+		end
+	end)
+
+	startRenderStepped(p)
+
+	return clearClone
 end
 
 return Initialize

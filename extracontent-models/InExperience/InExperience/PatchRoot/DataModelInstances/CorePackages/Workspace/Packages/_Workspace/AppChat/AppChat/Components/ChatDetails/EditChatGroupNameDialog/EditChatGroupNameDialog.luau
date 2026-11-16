@@ -1,35 +1,35 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local SocialLibraries = require(AppChat.SocialLibraries)
 
 require(AppChat.types)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
 local TextInput = SocialLibraries.Components.AlertViews.TextInput
 local usePositionOffsetForVirtualKeyboard = require(AppChat.Hooks.usePositionOffsetForVirtualKeyboard)
-local t1 = {
+
+local v = {
 	titleText = "Placeholder",
 	cancelText = "CancelText",
 	confirmText = "ConfirmText",
 	warningText = nil,
 	inputText = nil,
 	placeholderText = nil,
+	soakAreaColor3 = Color3.fromRGB(25, 25, 25),
 	soakAreaTransparency = 0.8,
 	onActivated = nil,
-	onModalClose = nil,
-	soakAreaColor3 = Color3.fromRGB(25, 25, 25)
+	onModalClose = nil
 }
 
-function EditChatGroupNameDialog(t2: {[any]: any}) -- line: 46
-	-- upvalues: Cryo (copy), t1 (copy), usePositionOffsetForVirtualKeyboard (copy), React (copy), TextInput (copy)
-	local v10 = Cryo.Dictionary.join(t1, t2)
-	local v11 = usePositionOffsetForVirtualKeyboard({
-		isNearBottomOfScreen = false
-	})
+function EditChatGroupNameDialog(p)
+	local joined = Cryo.Dictionary.join(v, p)
 
-	return React.createElement(TextInput, Cryo.Dictionary.join(v10, {
-		shouldAdjustForKeyboard = v11 == nil
+	local v2 = usePositionOffsetForVirtualKeyboard({ isNearBottomOfScreen = false })
+
+	return React.createElement(TextInput, Cryo.Dictionary.join(joined, {
+		shouldAdjustForKeyboard = v2 == nil
 	}))
 end
 

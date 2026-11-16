@@ -1,26 +1,12 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local enumerate = require(ParentParentParent.enumerate)
-local strict = require(ParentParent.Utility.strict)
-local v5 = enumerate("ItemIconType", {
-	"AnimationBundle",
-	"Bundle",
-	"DynamicHead"
-})
-local v6 = enumerate("Restriction", {
-	"Limited",
-	"LimitedUnique",
-	"Collectible"
-})
-local v7 = enumerate("StatusStyle", {
-	"Alert",
-	"Info",
-	"PendingIcon",
-	"AlertIcon"
-})
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local enumerate = require(parent2.enumerate)
+
+local strict = require(parent.Utility.strict)
 
 return strict({
-	ItemIconType = v5,
-	Restriction = v6,
-	StatusStyle = v7
+	ItemIconType = enumerate("ItemIconType", { "AnimationBundle", "Bundle", "DynamicHead" }),
+	Restriction = enumerate("Restriction", { "Limited", "LimitedUnique", "Collectible" }),
+	StatusStyle = enumerate("StatusStyle", { "Alert", "Info", "PendingIcon", "AlertIcon" })
 }, script.Name)

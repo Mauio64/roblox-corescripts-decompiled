@@ -1,29 +1,33 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
 
-return {
-	isSymbol = function(p1) -- line: 9
-		return typeof(p1) == "userdata" and string.sub(tostring(p1), 1, 7) == "Symbol("
-	end,
-	getOwnPropertySymbols = function(t1: {[any]: any}) -- line: 14
-		-- upvalues: Array (copy), Object (copy)
-		return Array.filter(Object.keys(t1), function(p2) -- line: 15
-			return typeof(p2) == "userdata" and string.sub(tostring(p2), 1, 7) == "Symbol("
-		end)
-	end,
-	getOwnPropertyNames = function(t2: {[any]: any}) -- line: 21
-		-- upvalues: Array (copy), Object (copy)
-		Array.filter(Object.keys(t2), function(p3) -- line: 22
-			return not (typeof(p3) == "userdata" and string.sub(tostring(p3), 1, 7) == "Symbol(")
-		end)
-	end,
-	create = function(t3: {[any]: any}?) -- line: 28
-		if not t3 then
-			return {}
-		end
+local function isSymbol(p): boolean -- 2 equivalent calls inferred from this helper
+	return typeof(p) == "userdata" and string.sub(tostring(p), 1, 7) == "Symbol("
+end
 
-		return (setmetatable({}, t3))
+local JsHelpers = {}
+JsHelpers.isSymbol = isSymbol
+
+function JsHelpers.getOwnPropertySymbols(p)
+	return Array.filter(Object.keys(p), function(p2)
+		return isSymbol(p2) -- inferred equivalent call
+	end)
+end
+
+function JsHelpers.getOwnPropertyNames(p)
+	Array.filter(Object.keys(p), function(p2): boolean
+		return not isSymbol(p2) -- inferred equivalent call
+	end)
+end
+
+function JsHelpers.create(p)
+	if p then
+		return (setmetatable({}, p))
 	end
-}
+
+	return {}
+end
+
+return JsHelpers

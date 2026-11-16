@@ -1,11 +1,11 @@
-local function toSet(p1) -- line: 6
-	local t1 = {}
+local function toSet(list)
+	local set = {}
 
-	for i = 1, #p1 do
-		t1[p1[i]] = true
+	for i = 1, #list do
+		set[list[i]] = true
 	end
 
-	return t1
+	return set
 end
 
 return toSet

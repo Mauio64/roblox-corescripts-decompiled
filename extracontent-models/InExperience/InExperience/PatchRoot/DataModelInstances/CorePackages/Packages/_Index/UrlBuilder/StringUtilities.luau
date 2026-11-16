@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index["string-utilities"]["string-utilities"]))
+local stringutilities = require(index["string-utilities"]["string-utilities"])
+
+return stringutilities

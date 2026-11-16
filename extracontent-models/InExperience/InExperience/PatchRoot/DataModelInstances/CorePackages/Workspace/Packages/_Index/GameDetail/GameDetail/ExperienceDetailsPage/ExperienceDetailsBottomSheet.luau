@@ -1,39 +1,70 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
+local GameDetail = script:FindFirstAncestor("GameDetail")
+local parent = GameDetail.Parent
+
+local FFlagSduiEdpRenderStarted = require(GameDetail.Flags.FFlagSduiEdpRenderStarted)
 local ExperienceDetailsPageUtils = require(script.Parent.ExperienceDetailsPageUtils)
 local ExperienceDetailsPageConstants = require(script.Parent.ExperienceDetailsPageConstants)
+local ExperienceDetailsPageScopeFields = require(script.Parent.ExperienceDetailsPageScopeFields)
 local ExperienceDetailsBottomSheetTopBar = require(script.Parent.ExperienceDetailsBottomSheetTopBar)
 local fetchExperienceDetailsPage = require(script.Parent.fetchExperienceDetailsPage)
 local getExperienceDetailsPageKey = require(script.Parent.getExperienceDetailsPageKey)
 local removeGameDetailSessionIfDeparted = require(script.Parent.removeGameDetailSessionIfDeparted)
 local useEdpFunctionallyReadyLogger = require(script.Parent.useEdpFunctionallyReadyLogger)
+local createExperienceDetailsPageTimer = require(script.Parent.createExperienceDetailsPageTimer)
 local useMotionJitterMetric = require(script.Parent.useMotionJitterMetric)
+local usePublishContainerWidth = require(script.Parent.usePublishContainerWidth)
 local ExperienceDetailsFallbackActionBar = require(script.Parent.Fallback.ExperienceDetailsFallbackActionBar)
 local ExperienceDetailsFallbackFeed = require(script.Parent.Fallback.ExperienceDetailsFallbackFeed)
-local SetTabBarVisible = require(Parent.AppTabBarRodux).Actions.SetTabBarVisible
-local DiscoveryTypes = require(Parent.DiscoveryTypes)
-local gameDetailsPeekViewEvents = require(Parent.DiscoveryAnalytics).Events.gameDetailsPeekViewEvents
-local Navigation = require(Parent.Navigation)
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+
+local AppTabBarRodux = require(parent.AppTabBarRodux)
+local SetTabBarVisible = AppTabBarRodux.Actions.SetTabBarVisible
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local gameDetailsPeekViewEvents = DiscoveryAnalytics.Events.gameDetailsPeekViewEvents
+
+local Navigation = require(parent.Navigation)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 local Sheet = Foundation.Sheet
 local OverlayProvider = Foundation.OverlayProvider
 local useTokens = Foundation.Hooks.useTokens
 local useNavigation = Navigation.useNavigation
-local getSafeAreaSize = require(Parent.InputUi).getSafeAreaSize
-local useDeviceInsets = require(Parent.Responsive).useDeviceInsets
-local DataHydration = require(Parent.DataHydration)
-local useTopBarHeight = require(Parent.RobloxAppHooks).useTopBarHeight
-local useScreenSize = require(Parent.RobloxAppHooks).useScreenSize
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
-local RoactServiceTags = require(Parent.RoactServiceTags)
+local InputUi = require(parent.InputUi)
+local getSafeAreaSize = InputUi.getSafeAreaSize
+local Responsive = require(parent.Responsive)
+local useDeviceInsets = Responsive.useDeviceInsets
+local DataHydration = require(parent.DataHydration)
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useTopBarHeight = RobloxAppHooks.useTopBarHeight
+local Display = require(parent.Display)
+local shouldUseDeviceSafeInsets = Display.shouldUseDeviceSafeInsets
+local RobloxAppHooks2 = require(parent.RobloxAppHooks)
+local useScreenSize = RobloxAppHooks2.useScreenSize
+local RobloxAppHooks3 = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks3.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
 local AppEventIngestService = RoactServiceTags.AppEventIngestService
 local AppSessionService = RoactServiceTags.AppSessionService
-local SessionType = require(Parent.RobloxAppSessionization).SessionType
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useGetCurrentLegacyRoute = require(Parent.DiscoveryRouting).useGetCurrentLegacyRoute
-local EDPTTIConstants = require(Parent.GameDetailTelemetry).EDPTTIConstants
-local SduiSharedUtilities = require(Parent.SduiSharedUtilities)
+local RobloxAppSessionization = require(parent.RobloxAppSessionization)
+local SessionType = RobloxAppSessionization.SessionType
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useStore = RoactUtils.Hooks.RoactRodux.useStore
+local DiscoveryRouting = require(parent.DiscoveryRouting)
+local useGetCurrentLegacyRoute = DiscoveryRouting.useGetCurrentLegacyRoute
+local DiscoveryRouting2 = require(parent.DiscoveryRouting)
+local hasPageInCurrentRoute = DiscoveryRouting2.hasPageInCurrentRoute
+local PeekView = require(parent.PeekView)
+local PeekViewState = PeekView.PeekViewState
+local SetGameDetailsPeekViewState = require(GameDetail.PeekView.SetGameDetailsPeekViewState)
+local GameDetailTelemetry = require(parent.GameDetailTelemetry)
+local EDPTTIConstants = GameDetailTelemetry.EDPTTIConstants
+
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local getSduiClientPageScope = SduiSharedUtilities.getSduiClientPageScope
 local SduiSurfaceLoadTimeTracker = SduiSharedUtilities.SduiSurfaceLoadTimeTracker
 local usePageScopeRef = SduiSharedUtilities.usePageScopeRef
@@ -42,357 +73,494 @@ local SduiPageEntryPoint = SduiSharedUtilities.SduiPageEntryPoint
 local UiStatus = SduiSharedUtilities.UiStatus
 local useUiStatus = SduiSharedUtilities.useUiStatus
 local useEntrySurfacing = SduiSharedUtilities.useEntrySurfacing
-local CompositionTags = require(Parent.AppComposition).CompositionTags
+local FilterPlayWithReward = ExperienceDetailsPageScopeFields.FilterPlayWithReward
+
+local AppComposition = require(parent.AppComposition)
+local CompositionTags = AppComposition.CompositionTags
+
 local ExperienceDetailsPersistentActionBar = require(script.Parent.ExperienceDetailsPersistentActionBar)
-local SharedFlags = require(Parent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiContainerQueries = SharedFlags.FFlagSduiContainerQueries
+local FFlagEDPTTIParityDefinitions = SharedFlags.FFlagEDPTTIParityDefinitions
 local FFlagSduiPageEntryUseSharedHooks = SharedFlags.FFlagSduiPageEntryUseSharedHooks
 local FFlagEnableExperienceDetailsBottomSheetTopBar = SharedFlags.FFlagEnableExperienceDetailsBottomSheetTopBar
 local FFlagEnableMotionJitterMetric = SharedFlags.FFlagEnableMotionJitterMetric
-local FFlagLuaAppSduiEdpRouteAwareSessionRemoval = SharedFlags.FFlagLuaAppSduiEdpRouteAwareSessionRemoval
 local FFlagSduiEdpPersistentActionBarPlayButton = SharedFlags.FFlagSduiEdpPersistentActionBarPlayButton
-local FoundationFullBleedSheetContent = Foundation.Utility.Flags.FoundationFullBleedSheetContent
 local FFlagLuaAppEdpBottomSheetPeekViewEvents = SharedFlags.FFlagLuaAppEdpBottomSheetPeekViewEvents
+local FFlagSduiPlayWithRewardRefactor = SharedFlags.FFlagSduiPlayWithRewardRefactor
+local FFlagFixOverlayTopInsetForDeviceSafeInsets = SharedFlags.FFlagFixOverlayTopInsetForDeviceSafeInsets
 
-local function ExperienceDetailsBottomSheet(p1) -- line: 78
-	-- upvalues: ExperienceDetailsPageUtils (copy), getExperienceDetailsPageKey (copy), usePageScopeRef (copy), React (copy), SduiSurfaceLoadTimeTracker (copy), EDPTTIConstants (copy), getSduiClientPageScope (copy), useEdpFunctionallyReadyLogger (copy), useTokens (copy), useNavigation (copy), useRoactService (copy), AppSessionService (copy), useDispatch (copy), FFlagLuaAppEdpBottomSheetPeekViewEvents (copy), AppEventIngestService (copy), FFlagLuaAppSduiEdpRouteAwareSessionRemoval (copy), useGetCurrentLegacyRoute (copy), SetTabBarVisible (copy), FFlagEnableExperienceDetailsBottomSheetTopBar (copy), useTopBarHeight (copy), useScreenSize (copy), useDeviceInsets (copy), getSafeAreaSize (copy), DiscoveryTypes (copy), useEntrySurfacing (copy), ExperienceDetailsPageConstants (copy), gameDetailsPeekViewEvents (copy), FFlagEnableMotionJitterMetric (copy), useMotionJitterMetric (copy), removeGameDetailSessionIfDeparted (copy), SessionType (copy), AppPage (copy), fetchExperienceDetailsPage (copy), useUiStatus (copy), UiStatus (copy), DataHydration (copy), OverlayProvider (copy), ExperienceDetailsBottomSheetTopBar (copy), Sheet (copy), FoundationFullBleedSheetContent (copy), Foundation (copy), SduiPageEntryPoint (copy), FFlagSduiPageEntryUseSharedHooks (copy), CompositionTags (copy), ExperienceDetailsFallbackFeed (copy), FFlagSduiEdpPersistentActionBarPlayButton (copy), ExperienceDetailsPersistentActionBar (copy), SduiFeatureEntryPoint (copy), ExperienceDetailsFallbackActionBar (copy)
-	local v57 = ExperienceDetailsPageUtils.getUniverseId(p1)
-	local v58 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "onPeekViewClosed")
-	local v59 = getExperienceDetailsPageKey(v57)
+local function snapPointIndexFor(flag: boolean): number -- 2 equivalent calls inferred from this helper
+	return if flag then 2 else 1
+end
 
-	usePageScopeRef(v59)
+local function ExperienceDetailsBottomSheet(p)
+	local universeId = ExperienceDetailsPageUtils.getUniverseId(p)
+	local v = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "onPeekViewClosed")
+	local experienceDetailsPageKey = getExperienceDetailsPageKey(universeId)
 
-	local v60 = React.useMemo(function() -- line: 84
-		-- upvalues: ExperienceDetailsPageUtils (copy), p1 (copy), SduiSurfaceLoadTimeTracker (copy), v59 (copy), EDPTTIConstants (copy), getSduiClientPageScope (copy)
-		local v95 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "pageTimer") or SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(v59, {
-			manualSurfaceReady = true,
-			eventName = EDPTTIConstants.EDP_TTI_EVENT_NAME,
-			metadata = {
-				page = "Untracked",
-				category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
-			}
-		})
+	usePageScopeRef(experienceDetailsPageKey)
+	local v2 = React.useMemo(function()
+		local v2 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "pageTimer")
+		local v3
 
-		getSduiClientPageScope(v59).set(SduiSurfaceLoadTimeTracker.SURFACE_LOAD_TIME_PAGE_SCOPE_KEY, v95)
+		if FFlagEDPTTIParityDefinitions then
+			v3 = v2
+				or createExperienceDetailsPageTimer(experienceDetailsPageKey, {
+					page = "Untracked",
+					category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
+				})
+		else
+			v3 = v2 or SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(experienceDetailsPageKey, {
+				eventName = EDPTTIConstants.EDP_TTI_EVENT_NAME,
+				metadata = {
+					page = "Untracked",
+					category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
+				},
+				manualSurfaceReady = true
+			})
+		end
 
-		return v95
+		getSduiClientPageScope(experienceDetailsPageKey).set(
+			SduiSurfaceLoadTimeTracker.SURFACE_LOAD_TIME_PAGE_SCOPE_KEY,
+			v3
+		)
+		return v3
 	end, {})
 
-	useEdpFunctionallyReadyLogger(v60, v57)
+	if FFlagSduiEdpRenderStarted then
+		v2.logRenderStarted()
+	end
 
-	local v61 = useTokens()
-	local v62 = useNavigation()
-	local v63 = useRoactService(AppSessionService)
-	local v64 = useDispatch()
-	local u65 = nil
+	useEdpFunctionallyReadyLogger(v2, universeId)
+
+	local tokens = useTokens()
+	local navigation = useNavigation()
+	local v3 = useRoactService(AppSessionService)
+	local v4 = useDispatch()
+	local v5
 
 	if FFlagLuaAppEdpBottomSheetPeekViewEvents then
-		u65 = useRoactService(AppEventIngestService)
+		v5 = useRoactService(AppEventIngestService)
+	else
+		v5 = nil
 	end
 
-	local u66 = nil
+	local v6 = useGetCurrentLegacyRoute()
 
-	if FFlagLuaAppSduiEdpRouteAwareSessionRemoval then
-		u66 = useGetCurrentLegacyRoute()
-	end
+	React.useEffect(function()
+		v4(SetTabBarVisible(false))
+	end, { v4 })
 
-	React.useEffect(function() -- line: 115
-		-- upvalues: v64 (copy), SetTabBarVisible (copy)
-		v64(SetTabBarVisible(false))
-	end, { v64 })
+	local referralSource = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "referralSource")
+	local experienceJoinData = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "experienceJoinData")
+	local placeIdOverride = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "placeIdOverride")
 
-	local v67 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "referralSource")
-	local v68 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "experienceJoinData")
-	local v69 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "placeIdOverride")
+	React.useEffect(function()
+		local sduiClientPageScope = getSduiClientPageScope(experienceDetailsPageKey)
+		sduiClientPageScope.set("referralSource", referralSource)
+		sduiClientPageScope.set("experienceJoinData", experienceJoinData)
+		sduiClientPageScope.set("placeId", placeIdOverride)
+		sduiClientPageScope.set("launchSource", "LuaGameCard")
 
-	React.useEffect(function() -- line: 123
-		-- upvalues: getSduiClientPageScope (copy), v59 (copy), v67 (copy), v68 (copy), v69 (copy)
-		local v96 = getSduiClientPageScope(v59)
-
-		v96.set("referralSource", v67)
-		v96.set("experienceJoinData", v68)
-		v96.set("placeId", v69)
-		v96.set("launchSource", "LuaGameCard")
-	end, {
-		v59,
-		v67,
-		v68,
-		v69
-	})
-
-	local u70 = nil
+		if FFlagSduiPlayWithRewardRefactor then
+			sduiClientPageScope.set(FilterPlayWithReward, nil)
+		end
+	end, { experienceDetailsPageKey, referralSource, experienceJoinData, placeIdOverride })
+	local topBarHeight
 
 	if FFlagEnableExperienceDetailsBottomSheetTopBar then
-		u70 = useTopBarHeight()
+		topBarHeight = useTopBarHeight()
+	else
+		topBarHeight = nil
 	end
 
-	local v71 = useScreenSize()
-	local v72 = useDeviceInsets()
-	local v73 = getSafeAreaSize(v71, v72)
-	local v74 = math.min(v73.X.Offset, 640)
-	local v75 = nil
+	local v7 = useScreenSize()
+	local deviceInsets = useDeviceInsets()
+
+	if
+		FFlagEnableExperienceDetailsBottomSheetTopBar
+		and FFlagFixOverlayTopInsetForDeviceSafeInsets
+		and shouldUseDeviceSafeInsets
+	then
+		topBarHeight += deviceInsets.top
+	end
+
+	local safeAreaSize = getSafeAreaSize(v7, deviceInsets)
+	local v8 = math.min(safeAreaSize.X.Offset, 640)
+	local ref4
+
+	if FFlagSduiContainerQueries then
+		ref4 = usePublishContainerWidth(experienceDetailsPageKey)
+	end
+
+	local ref
 
 	if FFlagEnableExperienceDetailsBottomSheetTopBar then
-		v75 = React.useRef(nil)
+		ref = React.useRef(nil)
 	end
 
-	local v76 = React.useRef(nil)
-	local v77, v78 = React.useState(nil)
-	local v79, v80 = React.useState(DiscoveryTypes.Constants.GAME_DETAILS_ACTION_BAR_HEIGHT)
-	local v81 = React.useCallback(function(p2) -- line: 147
-		-- upvalues: v80 (copy)
-		local AbsoluteSizeY = p2.AbsoluteSize.Y
+	local ref2 = React.useRef(nil)
+	local state, setState = React.useState(nil)
+	local state2, setState2 = React.useState(DiscoveryTypes.Constants.GAME_DETAILS_ACTION_BAR_HEIGHT)
 
-		if AbsoluteSizeY > 0 then
-			v80(AbsoluteSizeY)
+	local onAbsoluteSizeChange = React.useCallback(function(p2)
+		local y = p2.AbsoluteSize.Y
+
+		if y > 0 then
+			setState2(y)
 		end
 	end, {})
-	local v82 = useEntrySurfacing(v59, ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER, "peekView")
-	local v83 = v82 and v82.heightOffset or 0
-	local v84 = React.useMemo(function() -- line: 158
-		-- upvalues: v74 (copy), v79 (copy), v83 (copy), FFlagEnableExperienceDetailsBottomSheetTopBar (copy), v71 (copy), v72 (copy), u70 (ref), v73 (copy)
-		return {
-			v74 + v79 + v83 + 25,
-			if not FFlagEnableExperienceDetailsBottomSheetTopBar then v73.Y.Offset else math.ceil(v71.Y) - v72.bottom - u70
-		}
-	end, if not FFlagEnableExperienceDetailsBottomSheetTopBar then {
-		v74,
-		v79,
-		v83,
-		v73.Y.Offset
-	} else {
-		v74,
-		v79,
-		v83,
-		v71.Y,
-		v72.bottom,
-		u70
-	})
-	local v85 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p1, "mountAsFullView") == true
-	local v86 = not v85 and 1 or 2
-	local u87 = nil
-	local v88 = nil
+
+	local v9 = useEntrySurfacing(
+		experienceDetailsPageKey,
+		ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER,
+		"peekView"
+	)
+	local heightOffset = v9 and v9.heightOffset or 0
+
+	local useMemo = React.useMemo
+	local function fn()
+		local v10 = v8 + state2 + heightOffset + 25
+		local v11
+
+		if FFlagEnableExperienceDetailsBottomSheetTopBar then
+			v11 = math.ceil(v7.Y) - deviceInsets.bottom - topBarHeight
+		else
+			v11 = safeAreaSize.Y.Offset
+		end
+
+		return { v10, v11 }
+	end
+
+	local v10
+
+	if FFlagEnableExperienceDetailsBottomSheetTopBar then
+		v10 = { v8, state2, heightOffset, v7.Y, deviceInsets.bottom, topBarHeight }
+	else
+		v10 = { v8, state2, heightOffset, safeAreaSize.Y.Offset }
+	end
+
+	local snapPoints = useMemo(fn, v10)
+
+	local v11 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(p, "mountAsFullView")
+	local shouldMountAsFullView = v11 == true
+	local onSnapPointChanged
 
 	if FFlagLuaAppEdpBottomSheetPeekViewEvents then
-		local v89 = ExperienceDetailsPageUtils.getAnalyticsSource(p1)
-		local v90 = ExperienceDetailsPageUtils.getTilePositionIndex(p1)
+		local v12 = useStore()
+		local analyticsSource = ExperienceDetailsPageUtils.getAnalyticsSource(p)
+		local tilePositionIndex = ExperienceDetailsPageUtils.getTilePositionIndex(p)
 
-		u87 = React.useRef(v86)
-		v88 = React.useCallback(function(_: number, n2: number) -- line: 192
-			-- upvalues: u87 (ref), v57 (copy), gameDetailsPeekViewEvents (copy), u65 (ref), v89 (copy), v90 (copy), ExperienceDetailsPageConstants (copy)
-			local current = u87.current
+		local v13 = React.useMemo(function()
+			return v12:getState().GameDetailsPeekView.viewState
+		end, {})
 
-			u87.current = n2
+		if v11 == nil then
+			shouldMountAsFullView = v13 == PeekViewState.Full or v13 == PeekViewState.Extended
+		else
+			shouldMountAsFullView = v11 == true
+		end
 
-			if v57 and (current == 1 and n2 == 2) then
-				gameDetailsPeekViewEvents(u65, "GoToFullView", v57, v89, v90, ExperienceDetailsPageConstants.EDP_BOTTOM_SHEET_SURFACE)
+		React.useEffect(function()
+			local v14 = universeId
+				and not shouldMountAsFullView
+				and (v13 == PeekViewState.Brief and "SwitchGame" or v13 == PeekViewState.Closed and "OpenPeekView" or nil)
+
+			if v14 then
+				gameDetailsPeekViewEvents(
+					v5,
+					v14,
+					universeId,
+					analyticsSource,
+					tilePositionIndex,
+					ExperienceDetailsPageConstants.EDP_BOTTOM_SHEET_SURFACE
+				)
 			end
-		end, {
-			u65,
-			v57,
-			v89,
-			v90
-		})
+
+			local v15
+
+			if shouldMountAsFullView then
+				v15 = PeekViewState.Full
+			else
+				v15 = PeekViewState.Brief
+			end
+
+			v4(SetGameDetailsPeekViewState(v15))
+
+			return function()
+				if not hasPageInCurrentRoute(v6(), AppPage.GameDetail) then
+					v4(SetGameDetailsPeekViewState(PeekViewState.Closed))
+				end
+			end
+		end, {})
+
+		local ref3 = React.useRef(snapPointIndexFor(shouldMountAsFullView)) -- inferred equivalent call
+		onSnapPointChanged = React.useCallback(function(_: number, current: number)
+			local current2 = ref3.current
+			ref3.current = current
+
+			if navigation.isFocused() then
+				local v14
+
+				if current == 2 then
+					v14 = PeekViewState.Full
+				else
+					v14 = PeekViewState.Brief
+				end
+
+				v4(SetGameDetailsPeekViewState(v14))
+			end
+
+			if universeId and current2 == 1 and current == 2 then
+				gameDetailsPeekViewEvents(
+					v5,
+					"GoToFullView",
+					universeId,
+					analyticsSource,
+					tilePositionIndex,
+					ExperienceDetailsPageConstants.EDP_BOTTOM_SHEET_SURFACE
+				)
+			end
+		end, { v5, universeId, analyticsSource, tilePositionIndex, v4, navigation })
 	end
+
+	local defaultSnapPointIndex = snapPointIndexFor(shouldMountAsFullView) -- inferred equivalent call
 
 	if FFlagEnableMotionJitterMetric then
-		useMotionJitterMetric(v76, ExperienceDetailsPageConstants.EDP_BOTTOM_SHEET_SURFACE, false, "AbsolutePosition")
+		useMotionJitterMetric(ref2, ExperienceDetailsPageConstants.EDP_BOTTOM_SHEET_SURFACE, false, "AbsolutePosition")
 	end
 
-	local v91 = React.useCallback(function() -- line: 218
-		-- upvalues: v62 (copy), FFlagLuaAppSduiEdpRouteAwareSessionRemoval (copy), u66 (ref), v58 (copy), removeGameDetailSessionIfDeparted (copy), v63 (copy), SessionType (copy)
-		if v62.isFocused() then
-			local v102 = if not FFlagLuaAppSduiEdpRouteAwareSessionRemoval then nil else u66()
+	local onBack = React.useCallback(function()
+		if navigation.isFocused() then
+			local v12 = v6()
 
-			if v58 and typeof(v58) == "function" then
-				v58()
+			if v and typeof(v) == "function" then
+				v()
 			end
 
-			v62.goBack()
+			navigation.goBack()
+			removeGameDetailSessionIfDeparted(v3, v12)
+		end
+	end, { navigation, v3, v, v6 })
 
-			if FFlagLuaAppSduiEdpRouteAwareSessionRemoval then
-				removeGameDetailSessionIfDeparted(v63, v102)
-
-				return
+	local onClose = React.useCallback(function()
+		if navigation.isFocused() then
+			if v and typeof(v) == "function" then
+				v()
 			end
 
-			if v63 then
-				v63:RemoveSession(SessionType.StructuralIdentifier.GameDetailSource)
+			navigation.clearAppScreens({ AppPage.GameDetail })
+
+			if v3 then
+				v3:RemoveSession(SessionType.StructuralIdentifier.GameDetailSource)
 			end
 		end
-	end, {
-		v62,
-		v63,
-		v58,
-		if not FFlagLuaAppSduiEdpRouteAwareSessionRemoval then nil else u66
-	})
-	local v92 = React.useCallback(function() -- line: 240
-		-- upvalues: v62 (copy), v58 (copy), AppPage (copy), v63 (copy), SessionType (copy)
-		if v62.isFocused() then
-			if v58 and typeof(v58) == "function" then
-				v58()
-			end
+	end, { navigation, v3, v })
+	local onClose2
 
-			v62.clearAppScreens({ AppPage.GameDetail })
+	if FFlagLuaAppEdpBottomSheetPeekViewEvents then
+		onClose2 = onClose
+	else
+		onClose2 = if shouldMountAsFullView then onBack else onClose
+	end
 
-			if v63 then
-				v63:RemoveSession(SessionType.StructuralIdentifier.GameDetailSource)
-			end
+	React.useEffect(function()
+		if universeId and v2 then
+			fetchExperienceDetailsPage(universeId, v2)
 		end
-	end, {
-		v62,
-		v63,
-		v58
-	})
+	end, { universeId, v2 })
 
-	React.useEffect(function() -- line: 252
-		-- upvalues: v57 (copy), v60 (copy), fetchExperienceDetailsPage (copy)
-		if v57 and v60 then
-			fetchExperienceDetailsPage(v57, v60)
-		end
-	end, {
-		v57,
-		v60
-	})
-
-	local v93 = useUiStatus(v59)
-
-	React.useEffect(function() -- line: 259
-		-- upvalues: v93 (copy), UiStatus (copy), v57 (copy), DataHydration (copy)
-		if v93 == UiStatus.Error and v57 then
-			DataHydration.Game.getGameInfoStore(false).getAndFetchGameInfo(v57, function(p3) -- line: 261
-				return p3 == nil or p3.creator == nil
+	local v12 = useUiStatus(experienceDetailsPageKey)
+	React.useEffect(function()
+		if v12 == UiStatus.Error and universeId then
+			DataHydration.Game.getGameInfoStore(false).getAndFetchGameInfo(universeId, function(p2): boolean
+				return p2 == nil or p2.creator == nil
 			end)
-			DataHydration.Game.getAgeRecommendationStore(false).getAndFetchAgeRecommendation(v57)
-		end
-	end, {
-		v93,
-		v57
-	})
 
-	local v94 = React.useCallback(function() -- line: 268
-		-- upvalues: v57 (copy), v60 (copy), fetchExperienceDetailsPage (copy)
-		if v57 and v60 then
-			fetchExperienceDetailsPage(v57, v60, true)
+			DataHydration.Game.getAgeRecommendationStore(false).getAndFetchAgeRecommendation(universeId)
 		end
-	end, {
-		v57,
-		v60
-	})
+	end, { v12, universeId })
 
-	if v57 == nil then
+	local refresh = React.useCallback(function()
+		if universeId and v2 then
+			fetchExperienceDetailsPage(universeId, v2, true)
+		end
+	end, { universeId, v2 })
+
+	if universeId == nil then
 		return nil
 	end
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		ref = v78
-	}, {
-		SheetProvider = v77 and React.createElement(OverlayProvider, {
-			gui = v77
-		}, {
-			TopBar = if not FFlagEnableExperienceDetailsBottomSheetTopBar then nil else React.createElement(ExperienceDetailsBottomSheetTopBar, {
-				tokens = v61,
-				navigation = v62,
-				deviceInsets = v72,
-				topBarHeight = u70,
-				briefH = v84[1],
-				fullH = v84[2],
-				overlayFrame = v77,
-				sheetContentRef = v75,
-				shouldMountAsFullView = v85,
-				onBack = v91,
-				onClose = v92
-			}),
-			SheetRoot = React.createElement(Sheet.Root, {
-				isOpen = true,
-				testId = "--experience-details-bottom-sheet",
-				onClose = if not v85 then v92 else v91,
-				snapPoints = v84,
-				defaultSnapPointIndex = v86,
-				onSnapPointChanged = if not FFlagLuaAppEdpBottomSheetPeekViewEvents then nil else v88
+	local createElement = React.createElement
+	local v13 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ref = setState }
+	local sheetProvider
+
+	if state then
+		local createElement2 = React.createElement
+		local topBar
+
+		if FFlagEnableExperienceDetailsBottomSheetTopBar then
+			topBar = React.createElement(ExperienceDetailsBottomSheetTopBar, {
+				tokens = tokens,
+				navigation = navigation,
+				deviceInsets = deviceInsets,
+				topBarHeight = topBarHeight,
+				briefH = snapPoints[1],
+				fullH = snapPoints[2],
+				overlayFrame = state,
+				sheetContentRef = ref,
+				shouldMountAsFullView = shouldMountAsFullView,
+				onBack = onBack,
+				onClose = onClose
+			})
+		end
+
+		local createElement3 = React.createElement
+		local root = Sheet.Root
+
+		if not FFlagLuaAppEdpBottomSheetPeekViewEvents then
+			onSnapPointChanged = nil
+		end
+
+		local createElement4 = React.createElement
+		local content = Sheet.Content
+
+		if not FFlagEnableExperienceDetailsBottomSheetTopBar then
+			ref = nil
+		end
+
+		local createElement5 = React.createElement
+		local view = Foundation.View
+
+		if not FFlagSduiContainerQueries then
+			ref4 = nil
+		end
+
+		local createElement6 = React.createElement
+		local children2 = {
+			appPage = AppPage.GameDetail,
+			configKey = experienceDetailsPageKey,
+			identifier = 0,
+			pageTimer = 0,
+			backgroundStyle = 0,
+			includeNavigationHeaderBar = false,
+			scrollingFrameRef = 0,
+			contentTag = 0,
+			loadingSlot = 0,
+			errorSlot = 0,
+			snackbarPortalLayoutOrder = 2147483647
+		}
+		local identifier
+
+		if FFlagSduiPageEntryUseSharedHooks then
+			identifier = ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER
+		else
+			identifier = ExperienceDetailsPageUtils.getResolvedIdentifier(
+				experienceDetailsPageKey,
+				ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER_SUFFIX
+			)
+		end
+
+		children2.identifier = identifier
+
+		children2.pageTimer = v2
+		children2.backgroundStyle = tokens.Color.Surface.Surface_100
+
+		children2.scrollingFrameRef = ref2
+		children2.contentTag = CompositionTags.ContentRegion.Body
+		children2.loadingSlot = React.createElement(ExperienceDetailsFallbackFeed.Skeleton, {
+			universeId = universeId,
+			isSmallScreen = true,
+			launchSource = "LuaGameCard"
+		})
+
+		children2.errorSlot = React.createElement(ExperienceDetailsFallbackFeed.Error, {
+			universeId = universeId,
+			refresh = refresh,
+			isSmallScreen = true,
+			launchSource = "LuaGameCard",
+			referralSource = referralSource,
+			experienceJoinData = experienceJoinData,
+			placeIdOverride = placeIdOverride
+		})
+		local children = {
+			Content = createElement4(content, {
+				isContentFullBleed = true,
+				scrollingFrameRef = ref2,
+				ref = ref
 			}, {
-				Content = React.createElement(Sheet.Content, {
-					isContentFullBleed = not not FoundationFullBleedSheetContent or nil,
-					scrollingFrameRef = v76,
-					ref = if not FFlagEnableExperienceDetailsBottomSheetTopBar then nil else v75
-				}, {
-					ContentWrapper = React.createElement(Foundation.View, {
-						tag = "col size-full-0 auto-y",
-						padding = if FoundationFullBleedSheetContent then nil else {
-							bottom = UDim.new(0, -v61.Margin.Small),
-							left = UDim.new(0, -(v61.Padding.Small + v61.Padding.Medium)),
-							right = UDim.new(0, -(v61.Padding.Small + v61.Padding.Medium))
-						}
-					}, {
-						Content = React.createElement(SduiPageEntryPoint, {
-							includeNavigationHeaderBar = false,
-							snackbarPortalLayoutOrder = 2147483647,
-							appPage = AppPage.GameDetail,
-							configKey = v59,
-							identifier = if not FFlagSduiPageEntryUseSharedHooks then ExperienceDetailsPageUtils.getResolvedIdentifier(v59, ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER_SUFFIX) else ExperienceDetailsPageConstants.EDP_FEED_IDENTIFIER,
-							pageTimer = v60,
-							backgroundStyle = v61.Color.Surface.Surface_100,
-							scrollingFrameRef = v76,
-							contentTag = CompositionTags.ContentRegion.Body,
-							loadingSlot = React.createElement(ExperienceDetailsFallbackFeed.Skeleton, {
-								isSmallScreen = true,
-								launchSource = "LuaGameCard",
-								universeId = v57
-							}),
-							errorSlot = React.createElement(ExperienceDetailsFallbackFeed.Error, {
-								isSmallScreen = true,
-								launchSource = "LuaGameCard",
-								universeId = v57,
-								refresh = v94,
-								referralSource = v67,
-								experienceJoinData = v68,
-								placeIdOverride = v69
-							})
-						})
-					})
+				ContentWrapper = createElement5(view, { ref = ref4, tag = "col size-full-0 auto-y" }, {
+					Content = createElement6(SduiPageEntryPoint, children2)
+				})
+			}),
+			Actions = 0
+		}
+
+		local createElement7 = React.createElement
+		local actions = Sheet.Actions
+		local createElement8 = React.createElement
+		local view2 = Foundation.View
+		local v14 = {
+			tag = "col size-full-0 auto-y",
+			padding = UDim.new(0, -tokens.Margin.Small)
+		}
+		local actionBar
+
+		if FFlagSduiEdpPersistentActionBarPlayButton then
+			actionBar = React.createElement(ExperienceDetailsPersistentActionBar, {
+				universeId = universeId,
+				configKey = experienceDetailsPageKey,
+				loadTimer = v2,
+				launchSource = "LuaGameCard",
+				referralSource = referralSource,
+				experienceJoinData = experienceJoinData,
+				placeIdOverride = placeIdOverride,
+				onAbsoluteSizeChange = onAbsoluteSizeChange
+			})
+		else
+			actionBar = React.createElement(SduiFeatureEntryPoint, {
+				appPage = AppPage.GameDetail,
+				configKey = experienceDetailsPageKey,
+				identifier = ExperienceDetailsPageConstants.EDP_ACTION_BAR_IDENTIFIER,
+				loadTimer = v2,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				onAbsoluteSizeChange = onAbsoluteSizeChange,
+				loadingSlot = React.createElement(ExperienceDetailsFallbackActionBar.Skeleton, {
+					universeId = universeId,
+					launchSource = "LuaGameCard",
+					referralSource = referralSource,
+					experienceJoinData = experienceJoinData,
+					placeIdOverride = placeIdOverride
 				}),
-				Actions = React.createElement(Sheet.Actions, {}, {
-					ActionBarWrapper = React.createElement(Foundation.View, {
-						tag = "col size-full-0 auto-y",
-						padding = UDim.new(0, -v61.Margin.Small)
-					}, {
-						ActionBar = if not FFlagSduiEdpPersistentActionBarPlayButton then React.createElement(SduiFeatureEntryPoint, {
-							appPage = AppPage.GameDetail,
-							configKey = v59,
-							identifier = ExperienceDetailsPageConstants.EDP_ACTION_BAR_IDENTIFIER,
-							loadTimer = v60,
-							AutomaticSize = Enum.AutomaticSize.XY,
-							onAbsoluteSizeChange = v81,
-							loadingSlot = React.createElement(ExperienceDetailsFallbackActionBar.Skeleton, {
-								launchSource = "LuaGameCard",
-								universeId = v57,
-								referralSource = v67,
-								experienceJoinData = v68,
-								placeIdOverride = v69
-							}),
-							errorSlot = React.createElement(ExperienceDetailsFallbackActionBar.Error, {
-								launchSource = "LuaGameCard",
-								universeId = v57,
-								referralSource = v67,
-								experienceJoinData = v68,
-								placeIdOverride = v69
-							})
-						}) else React.createElement(ExperienceDetailsPersistentActionBar, {
-							launchSource = "LuaGameCard",
-							universeId = v57,
-							configKey = v59,
-							loadTimer = v60,
-							referralSource = v67,
-							experienceJoinData = v68,
-							placeIdOverride = v69,
-							onAbsoluteSizeChange = v81
-						})
-					})
+				errorSlot = React.createElement(ExperienceDetailsFallbackActionBar.Error, {
+					universeId = universeId,
+					launchSource = "LuaGameCard",
+					referralSource = referralSource,
+					experienceJoinData = experienceJoinData,
+					placeIdOverride = placeIdOverride
 				})
 			})
+		end
+
+		children.Actions = createElement7(actions, {}, {
+			ActionBarWrapper = createElement8(view2, v14, { ActionBar = actionBar })
+		})
+		sheetProvider = createElement2(OverlayProvider, { gui = state }, {
+			TopBar = topBar,
+			SheetRoot = createElement3(root, {
+				isOpen = true,
+				onClose = onClose2,
+				snapPoints = snapPoints,
+				defaultSnapPointIndex = defaultSnapPointIndex,
+				onSnapPointChanged = onSnapPointChanged,
+				testId = "--experience-details-bottom-sheet"
+			}, children)
 		}) or nil
-	})
+	end
+
+	return createElement("Frame", v13, { SheetProvider = sheetProvider })
 end
 
 return React.memo(ExperienceDetailsBottomSheet)

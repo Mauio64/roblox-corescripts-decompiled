@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local AbuseEntrypoint = require(Workspace.GenericAbuseReporting.GenericAbuseReporting.Enums.AbuseEntrypoint)
 
-return (require(_Workspace.GenericAbuseReporting.GenericAbuseReporting.Enums.AbuseEntrypoint))
+return AbuseEntrypoint

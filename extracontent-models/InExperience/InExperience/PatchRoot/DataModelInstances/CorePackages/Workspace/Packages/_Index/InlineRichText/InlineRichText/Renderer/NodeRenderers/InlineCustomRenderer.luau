@@ -1,22 +1,22 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
-local v3 = require(InlineRichText.Logger):new(script.Name)
+local parent = InlineRichText.Parent
 
+local Logger = require(InlineRichText.Logger)
+local v = Logger:new(script.Name)
 require(InlineRichText.Types)
 
-local Cryo = require(InlineRichTextParent.Cryo)
+local Cryo = require(parent.Cryo)
 
-return function(p1, p2) -- line: 9
-	-- upvalues: v3 (copy), Cryo (copy)
-	local v7 = p2.inlineCustomRenderers[p1.name]
+return function(p, p2)
+	local inlineCustomRenderer = p2.inlineCustomRenderers[p.name]
 
-	if not v7 or typeof(v7) ~= "function" then
-		v3:warning(`Node { p1.name }: No custom renderer found. For custom tags, you must provide a renderer function in the renderers prop`)
-
-		return {}
+	if inlineCustomRenderer and typeof(inlineCustomRenderer) == "function" then
+		return inlineCustomRenderer(p, Cryo.Dictionary.join(p2, {
+			nodeProps = p2.nodeProps[p.name] or {}
+		}))
 	end
 
-	return v7(p1, Cryo.Dictionary.join(p2, {
-		nodeProps = p2.nodeProps[p1.name] or {}
-	}))
+	v:warning(`Node {p.name}: No custom renderer found. For custom tags, you must provide a renderer function in the renderers prop`)
+
+	return {}
 end

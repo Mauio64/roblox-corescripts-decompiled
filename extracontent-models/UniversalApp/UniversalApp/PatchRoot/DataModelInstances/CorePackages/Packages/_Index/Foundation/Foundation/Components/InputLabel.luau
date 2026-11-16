@@ -1,1 +1,3 @@
-return (require(script.InputLabel))
+local InputLabel = require(script.InputLabel)
+
+return InputLabel

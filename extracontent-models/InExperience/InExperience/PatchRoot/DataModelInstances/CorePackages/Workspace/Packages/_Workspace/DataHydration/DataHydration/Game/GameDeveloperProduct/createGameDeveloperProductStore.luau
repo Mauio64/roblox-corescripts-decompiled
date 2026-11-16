@@ -1,111 +1,117 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Promise = require(DataHydrationParent.Promise)
-local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+local parent = DataHydration.Parent
+
+local Promise = require(parent.Promise)
+
+local DiscoveryUtils = require(parent.DiscoveryUtils)
 local logResponseError = DiscoveryUtils.logResponseError
 local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
-local FFlagSduiDevStoreSeeAllSupport = require(DataHydrationParent.SharedFlags).FFlagSduiDevStoreSeeAllSupport
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiDevStoreSeeAllSupport = SharedFlags.FFlagSduiDevStoreSeeAllSupport
+local FFlagEnableHomeGameItemOwnershipUpdate = SharedFlags.FFlagEnableHomeGameItemOwnershipUpdate
+local FFlagEnableSearchGameItemOwnershipUpdate = SharedFlags.FFlagEnableSearchGameItemOwnershipUpdate
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
-require(script.Parent.GameDeveloperProductStoreTypes)
 
+require(script.Parent.GameDeveloperProductStoreTypes)
 local fetchGameDeveloperProductStatuses = require(script.Parent.fetchGameDeveloperProductStatuses)
 
-local function buildStatusesKey(s1: string, s2: string) -- line: 27
-	return s1 .. "|" .. s2
+local function buildStatusesKey(p: string, p2: string) -- 1 equivalent call inferred from this helper
+	return p .. "|" .. p2
 end
-local function createGameDeveloperProductStore() -- line: 31
-	-- upvalues: createDataCache (copy), FFlagSduiDevStoreSeeAllSupport (copy), createDataResolver (copy), logResponseError (copy), DiscoveryEventErrorLogger (copy), Promise (copy), fetchGameDeveloperProductStatuses (copy)
-	local v15 = createDataCache()
-	local u16 = nil
-	local u17 = nil
 
-	if FFlagSduiDevStoreSeeAllSupport then
-		u16 = createDataCache()
-		u17 = createDataResolver({
+local function createGameDeveloperProductStore()
+	local dataCache = createDataCache()
+	local cache, v
+
+	if
+		FFlagSduiDevStoreSeeAllSupport
+		or FFlagEnableHomeGameItemOwnershipUpdate
+		or FFlagEnableSearchGameItemOwnershipUpdate
+	then
+		cache = createDataCache()
+		v = createDataResolver({
+			cache = cache,
 			supportsMultiGet = false,
-			cache = u16,
-			logError = function(p1) -- line: 41
-				-- upvalues: logResponseError (copy), DiscoveryEventErrorLogger (copy)
-				local v19 = if type(p1) ~= "table" or not p1.StatusCode then nil else p1.StatusCode
+			logError = function(p)
+				local statusCode
 
-				logResponseError("developer-products/v1/game-transactions", {
-					StatusCode = v19
-				})
-				DiscoveryEventErrorLogger.reportError("GameDeveloperProductStore", "Failed to fetch developer product statuses", {
-					err = tostring(p1)
-				})
-			end,
-			fetchFn = function(s3: string, p2) -- line: 50
-				-- upvalues: Promise (copy), fetchGameDeveloperProductStatuses (copy), v15 (copy)
-				local v22, v23 = string.match(s3, "^(.-)|(.+)$")
-
-				if v22 == nil or v23 == nil then
-					return Promise.reject("Invalid developer product statuses key: " .. tostring(s3))
+				if type(p) == "table" and p.StatusCode then
+					statusCode = p.StatusCode
 				end
 
-				return fetchGameDeveloperProductStatuses.fetch(v22, v23):andThen(function(p3) -- line: 57
-					-- upvalues: p2 (copy), v15 (copy)
-					local t1 = {}
+				logResponseError("game-transactions/v1/receipts", { StatusCode = statusCode })
+				DiscoveryEventErrorLogger.reportError(
+					"GameDeveloperProductStore",
+					"Failed to fetch developer product statuses",
+					{ err = tostring(p) }
+				)
+			end,
+			fetchFn = function(value: string, p)
+				local v2, v3 = string.match(value, "^(.-)|(.+)$")
 
-					for v28, v29 in p3.counts do
-						t1[v28] = {
-							pendingReceiptCount = v29
-						}
+				if v2 == nil or v3 == nil then
+					return Promise.reject("Invalid developer product statuses key: " .. tostring(value))
+				end
+
+				return fetchGameDeveloperProductStatuses.fetch(v2, v3):andThen(function(p2)
+					local v4 = {}
+
+					for k, count in p2.counts do
+						v4[k] = { pendingReceiptCount = count }
 					end
 
-					local v30 = p2 and p2.data(false)
+					local v5 = p and p.data(false)
 
-					if v30 and v30.counts then
-						for v31 in v30.counts do
-							if p3.counts[v31] == nil then
-								t1[v31] = {
-									pendingReceiptCount = 0
-								}
+					if v5 and v5.counts then
+						for k in v5.counts do
+							if p2.counts[k] == nil then
+								v4[k] = { pendingReceiptCount = 0 }
 							end
 						end
 					end
 
-					if next(t1) ~= nil then
-						v15.updateItems(t1)
+					if next(v4) ~= nil then
+						dataCache.updateItems(v4)
 					end
 
-					return p3
+					return p2
 				end)
 			end
 		})
+	else
+		cache = nil
+		v = nil
 	end
 
 	return {
-		getGameDeveloperProductInfo = v15.getItem,
-		updateGameDeveloperProductInfos = v15.updateItems,
-		fetchStatuses = function(s4: string, s5: string) -- line: 102
-			-- upvalues: u17 (ref)
-			if u17 then
-				u17.fetchItem(s4 .. "|" .. s5)
+		getGameDeveloperProductInfo = dataCache.getItem,
+		updateGameDeveloperProductInfos = dataCache.updateItems,
+		fetchStatuses = function(p: string, p2: string)
+			if v then
+				v.fetchItem(buildStatusesKey(p, p2)) -- inferred equivalent call
 			end
 		end,
-		clear = function() -- line: 82
-			-- upvalues: u16 (ref), u17 (ref), v15 (copy)
-			if u16 then
-				u16.clear()
+		clear = function()
+			if cache then
+				cache.clear()
 			end
 
-			if u17 then
-				u17.clear()
+			if v then
+				v.clear()
 			end
 
-			v15.clear()
+			dataCache.clear()
 		end,
-		dispose = function() -- line: 92
-			-- upvalues: u17 (ref), v15 (copy)
-			if u17 then
-				u17.dispose()
+		dispose = function()
+			if v then
+				v.dispose()
 			end
 
-			v15.dispose()
+			dataCache.dispose()
 		end
 	}
 end

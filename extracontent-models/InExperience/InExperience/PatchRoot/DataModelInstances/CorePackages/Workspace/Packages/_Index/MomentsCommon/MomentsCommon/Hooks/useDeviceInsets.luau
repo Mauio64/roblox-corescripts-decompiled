@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("MomentsCommon").Parent
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
 
-return require(Parent.Responsive).useDeviceInsets
+local Responsive = require(parent.Responsive)
+
+return Responsive.useDeviceInsets

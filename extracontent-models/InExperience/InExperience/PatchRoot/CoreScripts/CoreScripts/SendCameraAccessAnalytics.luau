@@ -1,30 +1,27 @@
 local CorePackages = game:GetService("CorePackages")
-
 game:GetService("VideoCaptureService")
-
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local CoreGui = game:GetService("CoreGui")
+
 local Cryo = require(CorePackages.Packages.Cryo)
 local getCamMicPermissions = require(CoreGui.RobloxGui.Modules.Settings.getCamMicPermissions)
-local default = require(CorePackages.Workspace.Packages.PermissionsProtocol).PermissionsProtocol.default
-local v7 = require(CoreGui.RobloxGui.Modules.Settings.cameraDevicesHelper).GetDevices()
-local v8 = not Cryo.isEmpty(v7)
+local PermissionsProtocol = require(CorePackages.Workspace.Packages.PermissionsProtocol)
+local default = PermissionsProtocol.PermissionsProtocol.default
+local cameraDevicesHelper = require(CoreGui.RobloxGui.Modules.Settings.cameraDevicesHelper)
 
-if v8 then
-	getCamMicPermissions(function(p1) -- line: 14
-		-- upvalues: RbxAnalyticsService (copy), v8 (copy)
-		local hasCameraPermissions = p1.hasCameraPermissions
+local devices = cameraDevicesHelper.GetDevices()
+local hasEligibleCamera = not Cryo.isEmpty(devices)
 
+if hasEligibleCamera then
+	getCamMicPermissions(function(p)
 		RbxAnalyticsService:SendEventDeferred("client", "avatarChat", "CameraDevicePermissionResponse", {
-			hasAccessToCamera = hasCameraPermissions,
-			hasEligibleCamera = v8
+			hasAccessToCamera = p.hasCameraPermissions,
+			hasEligibleCamera = hasEligibleCamera
 		})
 	end, { default.Permissions.CAMERA_ACCESS }, true)
-
-	return
+else
+	RbxAnalyticsService:SendEventDeferred("client", "avatarChat", "CameraDevicePermissionResponse", {
+		hasAccessToCamera = false,
+		hasEligibleCamera = hasEligibleCamera
+	})
 end
-
-RbxAnalyticsService:SendEventDeferred("client", "avatarChat", "CameraDevicePermissionResponse", {
-	hasAccessToCamera = false,
-	hasEligibleCamera = v8
-})

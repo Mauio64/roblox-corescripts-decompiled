@@ -1,84 +1,92 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Cryo = require(ProfilePlatformParent.Cryo)
-local Localization = require(ProfilePlatformParent.Localization)
+local parent = ProfilePlatform.Parent
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local Localization = require(parent.Localization)
+
 local Enums = require(ProfilePlatform.Common.Enums)
 local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local useProfileJson = require(ProfilePlatform.Hooks.useProfileJson)
 local useLocalization = Localization.Hooks.useLocalization
 local abbreviateCount = Localization.abbreviateCount
+
 local SocialCountsConfig = require(script.Parent.Parent.config.SocialCountsConfig)
+local FFlagProfilePlatformGracefulVisibility = require(ProfilePlatform.Flags.FFlagProfilePlatformGracefulVisibility)
 
-local function useSocialCountsData(_: string, b1: boolean, b2: boolean, t1: {[any]: any}?) -- line: 25
-	-- upvalues: useProfileJsonComponent (copy), Enums (copy), React (copy), Cryo (copy), SocialCountsConfig (copy), useLocalization (copy), abbreviateCount (copy)
+local function useSocialCountsData(_: string, flag: boolean, flag2: boolean, mutualFriendIds)
 	local counts = useProfileJsonComponent(Enums.Components.UserProfileHeader).counts
-	local v17 = React.useMemo(function() -- line: 33
-		-- upvalues: Cryo (copy), SocialCountsConfig (copy)
-		return Cryo.Dictionary.map(SocialCountsConfig.RowConfig, function(p1) -- line: 34
-			return p1.textKey
+	local v
+
+	if FFlagProfilePlatformGracefulVisibility then
+		local v2 = useProfileJson()
+
+		if v2.components == nil then
+			v = false
+		else
+			v = v2.components[Enums.Components.Friends] ~= nil
+		end
+	else
+		v = true
+	end
+
+	local v2 = useLocalization((React.useMemo(function()
+		return Cryo.Dictionary.map(SocialCountsConfig.RowConfig, function(p)
+			return p.textKey
 		end)
-	end, {})
-	local v18 = useLocalization(v17)
-	local v19 = React.useMemo(function() -- line: 41
-		-- upvalues: Cryo (copy), SocialCountsConfig (copy)
-		return Cryo.Dictionary.map(SocialCountsConfig.RowConfig, function(p2) -- line: 42
-			return p2.singleTextKey
+	end, {})))
+
+	local v3 = useLocalization((React.useMemo(function()
+		return Cryo.Dictionary.map(SocialCountsConfig.RowConfig, function(p)
+			return p.singleTextKey
 		end)
-	end, {})
-	local v20 = useLocalization(v19)
+	end, {})))
 
-	return React.useMemo(function() -- line: 49
-		-- upvalues: counts (copy), SocialCountsConfig (copy), v18 (copy), v20 (copy), t1 (copy), abbreviateCount (copy), b2 (copy), b1 (copy)
-		local t2 = {}
+	return React.useMemo(function()
+		local result = {}
 
-		for v22, v23 in counts do
-			local v24 = SocialCountsConfig.RowConfig[v22]
+		for k, count in counts do
+			local v4 = SocialCountsConfig.RowConfig[k]
 
-			if v24 then
-				local v25 = counts[v24.enabledKey]
-
-				if v25 == nil then
-					v25 = true
-				end
-
-				local v26 = v18[v22]
-
-				if v23 == 1 and v20[v22] then
-					v26 = v20[v22]
-				end
-
-				local v27 = nil
-
-				if v24.getLeading and t1 then
-					v27 = v24.getLeading({
-						mutualFriendIds = t1
-					})
-				end
-
-				table.insert(t2, {
-					fieldName = v22,
-					count = abbreviateCount(v23),
-					text = v26,
-					layoutOrder = v24.layoutOrder,
-					leading = v27,
-					isDisabled = v24.getIsDisabled(b2, b1, v25)
-				})
+			if not v4 then
+				continue
 			end
+
+			local count2 = counts[v4.enabledKey]
+			local v5 = count2 == nil or count2
+
+			if FFlagProfilePlatformGracefulVisibility and k == "friendsCount" then
+				v5 = v5 and v
+			end
+
+			local text = v2[k]
+
+			if count == 1 and v3[k] then
+				text = v3[k]
+			end
+
+			local leading
+
+			if v4.getLeading and mutualFriendIds then
+				leading = v4.getLeading({ mutualFriendIds = mutualFriendIds })
+			end
+
+			table.insert(result, {
+				fieldName = k,
+				count = abbreviateCount(count),
+				text = text,
+				layoutOrder = v4.layoutOrder,
+				leading = leading,
+				isDisabled = v4.getIsDisabled(flag2, flag, v5)
+			})
 		end
 
-		table.sort(t2, function(p3, p4) -- line: 89
-			return p3.layoutOrder < p4.layoutOrder
+		table.sort(result, function(a, b): boolean
+			return a.layoutOrder < b.layoutOrder
 		end)
 
-		return t2
-	end, {
-		counts,
-		v18,
-		v20,
-		b2,
-		b1,
-		t1
-	})
+		return result
+	end, { counts, v2, v3, flag2, flag, mutualFriendIds, v })
 end
 
 return useSocialCountsData

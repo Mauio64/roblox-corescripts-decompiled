@@ -1,14 +1,15 @@
-local ParentParent = script.Parent.Parent
-local console = require(ParentParent.Shared).console
-local t1 = {}
+local parent = script.Parent.Parent
+local Shared = require(parent.Shared)
+local console = Shared.console
 
-local function warnOnce(s1: string, s2: string) -- line: 22
-	-- upvalues: t1 (copy), console (copy)
-	if not t1[s1] then
-		console.warn("The legacy Roact API '%s' is deprecated, and will be removed in a future release.\n\n%s", s1, s2)
+local set = {}
+
+local function warnOnce(p: string, p2: string)
+	if not set[p] then
+		console.warn("The legacy Roact API '%s' is deprecated, and will be removed in a future release.\n\n%s", p, p2)
 	end
 
-	t1[s1] = true
+	set[p] = true
 end
 
 return warnOnce

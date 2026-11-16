@@ -1,47 +1,51 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedContactsParent = TrustedContacts.Parent
-local React = require(TrustedContactsParent.React)
+local parent = TrustedContacts.Parent
+
+local React = require(parent.React)
+
 local getTFAction = require(TrustedContacts.Requests.getTFAction)
-
 require(script.Parent.TFActionsEnum)
-
 local FFlagTFPassQRCodeSource = require(TrustedContacts.Flags.FFlagTFPassQRCodeSource)
 
-local function useTrustedFriendAction(t1: {[any]: any}) -- line: 23
-	-- upvalues: FFlagTFPassQRCodeSource (copy), React (copy), getTFAction (copy)
-	local userId = t1.userId
-	local tokens = t1.tokens
-	local v10 = if not FFlagTFPassQRCodeSource then nil else t1.sentFromQrCode
-	local v11, v12 = React.useState({
-		isLoading = true,
-		enum = nil
-	})
+local function useTrustedFriendAction(data)
+	local userId = data.userId
+	local tokens = data.tokens
+	local sentFromQrCode
 
-	React.useEffect(function() -- line: 33
-		-- upvalues: getTFAction (copy), userId (copy), tokens (copy), FFlagTFPassQRCodeSource (copy), v10 (copy), v12 (copy)
-		getTFAction(userId, {
-			friendRequestToken = tokens,
-			sentFromQrCode = if not FFlagTFPassQRCodeSource then nil else v10
-		}):andThen(function(p1) -- line: 38
-			-- upvalues: v12 (copy)
-			v12({
-				isLoading = false,
-				enum = p1
-			})
-		end):catch(function(_) -- line: 44
-			-- upvalues: v12 (copy)
-			v12({
-				isLoading = false,
-				enum = nil
-			})
+	if FFlagTFPassQRCodeSource then
+		sentFromQrCode = data.sentFromQrCode
+	else
+		sentFromQrCode = nil
+	end
+
+	local state, setState = React.useState({ isLoading = true, enum = nil })
+
+	local useEffect = React.useEffect
+	local function fn()
+		local v = { friendRequestToken = tokens, sentFromQrCode = nil }
+		local sentFromQrCode2
+
+		if FFlagTFPassQRCodeSource then
+			sentFromQrCode2 = sentFromQrCode
+		end
+
+		v.sentFromQrCode = sentFromQrCode2
+		getTFAction(userId, v):andThen(function(enum)
+			setState({ isLoading = false, enum = enum })
+		end):catch(function(_)
+			setState({ isLoading = false, enum = nil })
 		end)
-	end, {
-		userId,
-		tokens,
-		if not FFlagTFPassQRCodeSource then nil else v10
-	})
+	end
 
-	return v11
+	local v
+
+	if FFlagTFPassQRCodeSource then
+		v = sentFromQrCode
+	end
+
+	useEffect(fn, { userId, tokens, v })
+
+	return state
 end
 
 return useTrustedFriendAction

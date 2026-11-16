@@ -1,84 +1,106 @@
 local HttpService = game:GetService("HttpService")
 local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
-local GraphQLServerParent = GraphQLServer.Parent
+local parent = GraphQLServer.Parent
+
 local FFlagUserProfileBetterErrors = require(GraphQLServer.Flags.FFlagUserProfileBetterErrors)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserProfilePlatformProfile = SharedFlags.FFlagUserProfilePlatformProfile
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUserProfileMergeCachedNames = SharedFlags2.FFlagUserProfileMergeCachedNames
+local SharedFlags3 = require(parent.SharedFlags)
+local FIntUserProfileStoreBatchSize = SharedFlags3.FIntUserProfileStoreBatchSize
+local PlatformProfileRequest = require(GraphQLServer.PlatformProfileRequest)
+local fillRequestedNames = require(GraphQLServer.fillRequestedNames)
+require(parent.LuauPolyfill)
+local UrlBuilder = require(parent.UrlBuilder)
+local Promise = require(parent.Promise)
+local Fetch = require(parent.Fetch)
+local Http = require(parent.Http)
+local Url = Http.Url
 
-require(GraphQLServerParent.LuauPolyfill)
+local urlBuilder = UrlBuilder.UrlBuilder
 
-local UrlBuilder = require(GraphQLServerParent.UrlBuilder)
-local Promise = require(GraphQLServerParent.Promise)
-local Fetch = require(GraphQLServerParent.Fetch)
-local Url = require(GraphQLServerParent.Http).Url
-local UrlBuilder2 = UrlBuilder.UrlBuilder
-local GraphQLError = require(GraphQLServerParent.GraphQL).GraphQLError
+local GraphQL = require(parent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
 local fetch = Fetch.fetch
-local Response = Fetch.Response
 
+local Response = Fetch.Response
 require(script.Parent.Parent.generatedTypes)
 
-local v13 = UrlBuilder2.new({
-	path = "user-profile-api/v1/user/profiles/get-profiles",
-	base = Url.APIS_URL
+local v = urlBuilder.new({
+	base = Url.APIS_URL,
+	path = "user-profile-api/v1/user/profiles/get-profiles"
 })()
+local function fetchProfilesByIds(userIds, fields, p)
+	local v2 = p or fetch
+	return Promise.new(function(callback, callback2)
+		if FFlagUserProfilePlatformProfile and FIntUserProfileStoreBatchSize < #userIds then
+			local v3 = {}
 
-return {
-	fetchProfilesByIds = function(t1: {[any]: any}, t2: {[any]: any}, p1) -- line: 33
-		-- upvalues: fetch (copy), Promise (copy), v13 (copy), HttpService (copy), FFlagUserProfileBetterErrors (copy), Response (copy), GraphQLError (copy)
-		local v17 = p1 or fetch
+			for i = 1, #userIds, FIntUserProfileStoreBatchSize do
+				local v4 = {}
 
-		return Promise.new(function(resolve, reject) -- line: 39
-			-- upvalues: v17 (copy), v13 (copy), HttpService (copy), t1 (copy), t2 (copy), FFlagUserProfileBetterErrors (copy), Response (copy), GraphQLError (copy)
-			local v20 = v17(v13, {
-				method = "POST",
-				body = HttpService:JSONEncode({
-					UserIds = t1,
-					Fields = t2
-				}),
-				headers = {
-					["Content-Type"] = "application/json",
-					Accept = "application/json"
-				}
-			}):catch(function(p2) -- line: 51
-				-- upvalues: FFlagUserProfileBetterErrors (copy), Response (copy)
-				if FFlagUserProfileBetterErrors then
-					local v23 = Response.error()
-
-					v23.statusText = p2.message
-
-					return v23
+				for j = i, math.min(i + FIntUserProfileStoreBatchSize - 1, #userIds) do
+					table.insert(v4, userIds[j])
 				end
 
-				return Response.error()
+				local expect = fetchProfilesByIds(v4, fields, v2):expect()
+
+				for _, v5 in expect do
+					table.insert(v3, v5)
+				end
+			end
+
+			callback(v3)
+		else
+			local expect = v2(v, {
+				body = HttpService:JSONEncode({
+					UserIds = userIds,
+					Fields = fields,
+					includePlatformProfile = FFlagUserProfilePlatformProfile and PlatformProfileRequest.hasPlatformFields(fields) and true or nil
+				}),
+				method = "POST",
+				headers = { ["Content-Type"] = "application/json", Accept = "application/json" }
+			}):catch(function(p2)
+				if not FFlagUserProfileBetterErrors then
+					return Response.error()
+				end
+
+				local v3 = Response.error()
+				v3.statusText = p2.message
+				return v3
 			end):expect()
 
-			if not v20.ok then
-				if FFlagUserProfileBetterErrors then
-					reject(GraphQLError.new(v20.statusText, nil, nil, nil, nil, {
-						extensions = {
-							status = v20.status,
-							statusText = v20.statusText
-						}
-					}))
+			if expect.ok then
+				local expect2 = expect:json():catch(function(): nil
+					return nil
+				end):expect()
 
+				if not expect then
+					callback2(GraphQLError.new(`Failed to decode HTTP response as JSON for user matching id: {userIds[1]}`))
 					return
 				end
 
-				reject(GraphQLError.new(`Failed to fetch user profiles. Error code: { v20.status }`))
+				local profileDetails = expect2.profileDetails
 
-				return
+				if FFlagUserProfilePlatformProfile then
+					profileDetails = PlatformProfileRequest.normalizeProfiles(profileDetails, fields)
+				end
+
+				if FFlagUserProfileMergeCachedNames then
+					profileDetails = fillRequestedNames(profileDetails, fields)
+				end
+
+				callback(profileDetails)
+			elseif FFlagUserProfileBetterErrors then
+				callback2(GraphQLError.new(expect.statusText, nil, nil, nil, nil, {
+					extensions = { status = expect.status, statusText = expect.statusText }
+				}))
+			else
+				callback2(GraphQLError.new(`Failed to fetch user profiles. Error code: {expect.status}`))
 			end
+		end
+	end)
+end
 
-			local v21 = v20:json():catch(function() -- line: 82
-				return nil
-			end):expect()
-
-			if not v20 then
-				reject(GraphQLError.new(`Failed to decode HTTP response as JSON for user matching id: { t1[1] }`))
-
-				return
-			end
-
-			resolve(v21.profileDetails)
-		end)
-	end
-}
+return { fetchProfilesByIds = fetchProfilesByIds }

@@ -1,25 +1,16 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
 
+local React = require(parent.React)
 require(Foundation.Components.Types)
-
 local useTokens = require(Foundation.Providers.Style.useTokens)
-local v5 = React.createContext(nil)
 
-function useBackgroundStyle() -- line: 11
-	-- upvalues: React (copy), v5 (copy), useTokens (copy)
-	local v6 = React.useContext(v5)
-	local v7 = useTokens()
+local context = React.createContext(nil)
 
-	if v6 == nil then
-		return v7.Color.Surface.Surface_0
-	end
-
-	return v6
+function useBackgroundStyle()
+	local v = React.useContext(context)
+	local v2 = useTokens()
+	return if v == nil then v2.Color.Surface.Surface_0 else v
 end
 
-return {
-	useBackgroundStyle = useBackgroundStyle,
-	Provider = v5.Provider
-}
+return { useBackgroundStyle = useBackgroundStyle, Provider = context.Provider }

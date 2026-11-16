@@ -1,31 +1,30 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local React = require(parent.React)
 
 require(GenericAbuseReporting.BeduiV2.Analytics.analyticsService)
 
-local v4 = React.createContext(nil)
+local context = React.createContext(nil)
+local AbuseReportAnalyticsContext = {}
+AbuseReportAnalyticsContext.AbuseReportAnalyticsContext = context
 
-return {
-	AbuseReportAnalyticsContext = v4,
-	AbuseReportAnalyticsProvider = function(t1: {[any]: any}) -- line: 25
-		-- upvalues: React (copy), v4 (copy)
-		return React.createElement(v4.Provider, {
-			value = t1.analytics
-		}, t1.children)
-	end,
-	useAbuseReportAnalytics = function() -- line: 36
-		-- upvalues: React (copy), v4 (copy)
-		local v6 = React.useContext(v4)
+function AbuseReportAnalyticsContext.AbuseReportAnalyticsProvider(p)
+	return React.createElement(context.Provider, { value = p.analytics }, p.children)
+end
 
-		if not v6 then
-			error("Invalid use of `useAbuseReportAnalytics` hook. Ensure your component has an ancestor wrapped in `AbuseReportAnalyticsProvider`")
-		end
+function AbuseReportAnalyticsContext.useAbuseReportAnalytics()
+	local v = React.useContext(context)
 
-		return v6
-	end,
-	useOptionalAbuseReportAnalytics = function() -- line: 52
-		-- upvalues: React (copy), v4 (copy)
-		return React.useContext(v4)
+	if not v then
+		error("Invalid use of `useAbuseReportAnalytics` hook. Ensure your component has an ancestor wrapped in `AbuseReportAnalyticsProvider`")
 	end
-}
+
+	return v
+end
+
+function AbuseReportAnalyticsContext.useOptionalAbuseReportAnalytics()
+	return React.useContext(context)
+end
+
+return AbuseReportAnalyticsContext

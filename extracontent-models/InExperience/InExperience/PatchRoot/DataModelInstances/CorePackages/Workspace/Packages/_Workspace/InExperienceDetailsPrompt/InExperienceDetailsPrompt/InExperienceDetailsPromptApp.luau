@@ -1,83 +1,72 @@
 local TeleportService = game:GetService("TeleportService")
 local InExperienceDetailsPrompt = script:FindFirstAncestor("InExperienceDetailsPrompt")
-local InExperienceDetailsPromptParent = InExperienceDetailsPrompt.Parent
-local React = require(InExperienceDetailsPromptParent.React)
+local parent = InExperienceDetailsPrompt.Parent
+local React = require(parent.React)
 local InExperienceDetailsPromptContainer = require(InExperienceDetailsPrompt.Features.InExperienceDetailsPromptContainer)
-local fireInExperienceDetailsPromptOpenedEvent = require(InExperienceDetailsPromptParent.DiscoveryAnalytics).Events.fireInExperienceDetailsPromptOpenedEvent
-local DiscoveryEventErrorLogger = require(InExperienceDetailsPromptParent.DiscoveryUtils).DiscoveryEventErrorLogger
-local FFlagLuaAppIedpOverlayAndNavigationFix = require(InExperienceDetailsPromptParent.SharedFlags).FFlagLuaAppIedpOverlayAndNavigationFix
-local FFlagLuaAppIedpControlledJoin = require(InExperienceDetailsPromptParent.SharedFlags).FFlagLuaAppIedpControlledJoin
 
-local function InExperienceDetailsPromptApp() -- line: 16
-	-- upvalues: React (copy), TeleportService (copy), fireInExperienceDetailsPromptOpenedEvent (copy), FFlagLuaAppIedpControlledJoin (copy), DiscoveryEventErrorLogger (copy), FFlagLuaAppIedpOverlayAndNavigationFix (copy), InExperienceDetailsPromptContainer (copy)
-	local v11, v12 = React.useState(nil)
-	local v13, v14 = React.useState(false)
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local fireInExperienceDetailsPromptOpenedEvent = DiscoveryAnalytics.Events.fireInExperienceDetailsPromptOpenedEvent
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 
-	React.useEffect(function() -- line: 20
-		-- upvalues: TeleportService (copy), v12 (copy), v14 (copy), fireInExperienceDetailsPromptOpenedEvent (copy)
-		local connection = TeleportService.OpenExperienceDetailsPrompt:Connect(function(p1) -- line: 21
-			-- upvalues: v12 (copy), v14 (copy), fireInExperienceDetailsPromptOpenedEvent (copy)
-			v12((tostring(p1)))
-			v14(true)
-			fireInExperienceDetailsPromptOpenedEvent({
-				targetUniverseId = tostring(p1)
-			})
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppIedpOverlayAndNavigationFix = SharedFlags.FFlagLuaAppIedpOverlayAndNavigationFix
+
+local function InExperienceDetailsPromptApp()
+	local state, setState = React.useState(nil)
+	local state2, setState2 = React.useState(false)
+
+	React.useEffect(function()
+		local openExperienceDetailsPromptConnection = TeleportService.OpenExperienceDetailsPrompt:Connect(function(p)
+			setState((tostring(p)))
+			setState2(true)
+			fireInExperienceDetailsPromptOpenedEvent({ targetUniverseId = tostring(p) })
 		end)
-
-		return function() -- line: 28
-			-- upvalues: connection (copy)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if openExperienceDetailsPromptConnection then
+				openExperienceDetailsPromptConnection:Disconnect()
 			end
 		end
 	end, {})
 
-	if not v13 or not v11 then
+	if not (state2 and state) then
 		return nil
 	end
 
-	local function closePrompt() -- line: 39
-		-- upvalues: v12 (copy), v14 (copy)
-		v12(nil)
-		v14(false)
+	local function closePrompt() -- 2 equivalent calls inferred from this helper
+		setState(nil)
+		setState2(false)
 	end
 
-	local v16 = if not FFlagLuaAppIedpControlledJoin then {
-		universeId = v11,
-		onClose = closePrompt
-	} else {
-		universeId = v11,
-		onJoin = function(n1: number?) -- line: 47
-			-- upvalues: TeleportService (copy), v12 (copy), v14 (copy), DiscoveryEventErrorLogger (copy), v11 (copy)
-			if n1 then
-				TeleportService:PromptExperienceDetailsCompleted(Enum.PromptExperienceDetailsResult.TeleportAttempted)
-				TeleportService:Teleport(n1)
-				v12(nil)
-				v14(false)
+	local v = {
+		universeId = state,
+		onJoin = function(p: number?)
+			if not p then
+				DiscoveryEventErrorLogger.reportError(
+					"InExperienceDetailsPromptAppOnJoinMissingRootPlaceId",
+					"Missing valid root place id for universe id",
+					{ universeId = state }
+				)
 
 				return
 			end
 
-			DiscoveryEventErrorLogger.reportError("InExperienceDetailsPromptAppOnJoinMissingRootPlaceId", "Missing valid root place id for universe id", {
-				universeId = v11
-			})
+			TeleportService:PromptExperienceDetailsCompleted(Enum.PromptExperienceDetailsResult.TeleportAttempted)
+			TeleportService:Teleport(p)
+			closePrompt() -- inferred equivalent call
 		end,
-		onClose = function() -- line: 62
-			-- upvalues: TeleportService (copy), v12 (copy), v14 (copy)
+		onClose = function()
 			TeleportService:PromptExperienceDetailsCompleted(Enum.PromptExperienceDetailsResult.PromptClosed)
-			v12(nil)
-			v14(false)
+			closePrompt() -- inferred equivalent call
 		end
 	}
 
 	if FFlagLuaAppIedpOverlayAndNavigationFix then
-		return (React.createElement(InExperienceDetailsPromptContainer, v16))
+		return (React.createElement(InExperienceDetailsPromptContainer, v))
 	end
 
-	return (React.createElement("ScreenGui", {
-		ScreenInsets = Enum.ScreenInsets.None
-	}, {
-		InExperienceDetailsPrompt = React.createElement(InExperienceDetailsPromptContainer, v16)
+	return (React.createElement("ScreenGui", { ScreenInsets = Enum.ScreenInsets.None }, {
+		InExperienceDetailsPrompt = React.createElement(InExperienceDetailsPromptContainer, v)
 	}))
 end
 

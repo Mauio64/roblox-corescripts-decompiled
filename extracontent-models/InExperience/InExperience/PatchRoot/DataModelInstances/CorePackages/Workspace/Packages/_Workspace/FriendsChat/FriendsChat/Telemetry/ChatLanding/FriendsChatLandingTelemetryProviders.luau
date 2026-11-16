@@ -1,32 +1,28 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local React = require(Parent.React)
-local ChatLandingTelemetryLayer = require(Parent.AppChat.ChatLandingTelemetryLayer)
-local ChatLandingTelemetryState = require(Parent.AppChat.ChatLandingTelemetryState)
-local useGetAndSetRef = require(Parent.AppChat.useGetAndSetRef)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
 
-local function FriendsChatLandingTelemetryProviders(t1: {[any]: any}) -- line: 20
-	-- upvalues: useGetAndSetRef (copy), React (copy), ChatLandingTelemetryState (copy), ChatLandingTelemetryLayer (copy)
-	local v8, v9 = useGetAndSetRef({})
-	local v10 = React.useCallback(function() -- line: 22
-		-- upvalues: v8 (copy)
-		local v11 = v8()
+local React = require(parent.React)
 
+local ChatLandingTelemetryLayer = require(parent.AppChat.ChatLandingTelemetryLayer)
+local ChatLandingTelemetryState = require(parent.AppChat.ChatLandingTelemetryState)
+local useGetAndSetRef = require(parent.AppChat.useGetAndSetRef)
+
+local function FriendsChatLandingTelemetryProviders(p)
+	local get, set = useGetAndSetRef({})
+	local v = React.useCallback(function()
+		local v = get()
 		return {
-			chatLandingListCount = v11.chatLandingListCount,
-			pendingConversationCount = v11.pendingConversationCount,
-			unfilteredConversationCount = v11.unfilteredConversationCount
+			chatLandingListCount = v.chatLandingListCount,
+			pendingConversationCount = v.pendingConversationCount,
+			unfilteredConversationCount = v.unfilteredConversationCount,
+			searchSessionId = v.searchSessionId,
+			activeFilters = v.activeFilters
 		}
-	end, { v8 })
+	end, { get })
 
 	return React.createElement(ChatLandingTelemetryState.Provider, {
-		value = {
-			get = v8,
-			set = v9
-		}
+		value = { get = get, set = set }
 	}, {
-		Layer = React.createElement(ChatLandingTelemetryLayer.Provider, {
-			value = v10
-		}, t1.children)
+		Layer = React.createElement(ChatLandingTelemetryLayer.Provider, { value = v }, p.children)
 	})
 end
 

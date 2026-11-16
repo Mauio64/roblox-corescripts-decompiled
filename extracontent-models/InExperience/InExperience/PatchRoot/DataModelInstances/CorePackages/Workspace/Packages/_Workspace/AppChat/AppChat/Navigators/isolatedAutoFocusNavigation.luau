@@ -1,38 +1,45 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local InputHandlers = require(Parent.InputHandlers)
-local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
+local InputHandlers = require(parent.InputHandlers)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+
 local autoFocusNavigation = require(script.Parent.autoFocusNavigation)
 
-local function isolatedAutoFocusNavigation(p1, p2, p3: ((...any) -> ...any)?) -- line: 13
-	-- upvalues: React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FocusNavigationUtils (copy), autoFocusNavigation (copy)
-	return function(p4) -- line: 18
-		-- upvalues: React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), p3 (copy), FocusNavigationUtils (copy), p2 (copy), autoFocusNavigation (copy), p1 (copy)
-		local v12 = React.useMemo(function() -- line: 19
-			-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), p3 (copy), p4 (copy)
+local function isolatedAutoFocusNavigation(p, surfaceIdentifier, callback)
+	return function(p2)
+		local customEventHandlers = React.useMemo(function()
 			return {
 				[FocusNavigationEventNameEnum.NavigateBack] = {
-					handler = InputHandlers.onRelease(function(p5) -- line: 22
-						-- upvalues: p3 (copy), p4 (copy)
-						if p3 then
-							p3(p4)
-							p5:cancel()
+					handler = InputHandlers.onRelease(function(object)
+						if callback then
+							callback(p2)
+							object:cancel()
 						end
 					end)
 				}
 			}
-		end, { p3 })
+		end, { callback })
 
-		return React.createElement(FocusNavigationUtils.FocusNavigableSurfaceWrapper, {
+		local createElement = React.createElement
+		local focusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
+		local v = {
+			surfaceIdentifier = surfaceIdentifier,
 			isIsolated = true,
 			shouldRestoreFocus = true,
 			isAutoFocusRoot = false,
 			isFocusable = true,
-			surfaceIdentifier = p2,
-			customEventHandlers = if not p3 then nil else v12
-		}, {
-			content = React.createElement(autoFocusNavigation(p1), p4)
+			customEventHandlers = nil
+		}
+
+		if not callback then
+			customEventHandlers = nil
+		end
+
+		v.customEventHandlers = customEventHandlers
+		return createElement(focusNavigableSurfaceWrapper, v, {
+			content = React.createElement(autoFocusNavigation(p), p2)
 		})
 	end
 end

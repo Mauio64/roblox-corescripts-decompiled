@@ -1,7 +1,10 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local PresenceType = require(ProfilePlatform.Rodux.Presence).Enums.PresenceType
+
+local Presence = require(ProfilePlatform.Rodux.Presence)
+local PresenceType = Presence.Enums.PresenceType
 local Enums = require(ProfilePlatform.Common.Enums)
-local t1 = {
+
+local v = {
 	[PresenceType.Offline] = Enums.PresenceTypes.Offline,
 	[PresenceType.Online] = Enums.PresenceTypes.Online,
 	[PresenceType.InGame] = Enums.PresenceTypes.InGame,
@@ -12,13 +15,12 @@ local t1 = {
 	InStudio = Enums.PresenceTypes.InStudio
 }
 
-return function(s1: string, n1: number?) -- line: 18
-	-- upvalues: t1 (copy), Enums (copy)
-	local v7 = t1[s1] or Enums.PresenceTypes.Offline
+return function(p: string, p2: number?)
+	local selected = v[p] or Enums.PresenceTypes.Offline
 
-	if v7 == Enums.PresenceTypes.InGame and n1 == nil then
+	if selected == Enums.PresenceTypes.InGame and p2 == nil then
 		return Enums.PresenceTypes.Online
 	end
 
-	return v7
+	return selected
 end

@@ -1,58 +1,59 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Cryo = require(CorePackages.Packages.Cryo)
+
 local Actions = script.Parent.Parent.Actions
 local AddPlayer = require(Actions.AddPlayer)
 local RemovePlayer = require(Actions.RemovePlayer)
 local SetPlayerLeaderstat = require(Actions.SetPlayerLeaderstat)
 
-local function createKey(p1, p2, p3) -- line: 10
-	local v12 = nil
+local function createKey(player, name, playerStats)
+	local v
 
-	if p2 ~= nil and (p3 ~= nil and p3[p1.UserId] ~= nil) then
-		v12 = p3[p1.UserId][p2]
+	if not (name == nil or playerStats == nil or playerStats[player.UserId] == nil) then
+		v = playerStats[player.UserId][name]
 	end
 
 	return {
-		name = p1.DisplayName:upper(),
-		stat = v12 and (tonumber(v12) or v12)
+		name = player.DisplayName:upper(),
+		stat = v and (tonumber(v) or v)
 	}
 end
-local function PlayerKeys(p4, p5, p6) -- line: 22
-	-- upvalues: createKey (copy), AddPlayer (copy), SetPlayerLeaderstat (copy), Cryo (copy), RemovePlayer (copy)
-	local v16 = p6.gameStats[1] and p6.gameStats[1].name or nil
 
-	if not p4 or v16 ~= p4.primaryStat then
-		local t1 = {}
+local function PlayerKeys(p, p2, data)
+	local name
 
-		for _, v in pairs(p6.players) do
-			t1[v] = createKey(v, v16, p6.playerStats)
+	if data.gameStats[1] then
+		name = data.gameStats[1].name or nil
+	end
+
+	if p and name == p.primaryStat then
+		if p2.type == AddPlayer.name or p2.type == SetPlayerLeaderstat.name then
+			return {
+				primaryStat = name,
+				keys = Cryo.Dictionary.join(p.keys, {
+					[p2.player] = createKey(p2.player, name, data.playerStats)
+				})
+			}
+		end
+
+		if p2.type ~= RemovePlayer.name then
+			return p
 		end
 
 		return {
-			primaryStat = v16,
-			keys = t1
+			primaryStat = name,
+			keys = Cryo.Dictionary.join(p.keys, { [p2.player] = Cryo.None })
 		}
-	end
+	else
+		local keys = {}
 
-	if p5.type == AddPlayer.name or p5.type == SetPlayerLeaderstat.name then
-		return {
-			primaryStat = v16,
-			keys = Cryo.Dictionary.join(p4.keys, {
-				[p5.player] = createKey(p5.player, v16, p6.playerStats)
-			})
-		}
-	end
+		for _, player in pairs(data.players) do
+			keys[player] = createKey(player, name, data.playerStats)
+		end
 
-	if p5.type == RemovePlayer.name then
-		return {
-			primaryStat = v16,
-			keys = Cryo.Dictionary.join(p4.keys, {
-				[p5.player] = Cryo.None
-			})
-		}
+		return { primaryStat = name, keys = keys }
 	end
-
-	return p4
 end
 
 return PlayerKeys

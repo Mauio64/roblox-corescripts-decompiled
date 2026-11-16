@@ -1,58 +1,86 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local Enums = require(UserList.Common.Enums)
+local parent = UserList.Parent
 
+local React = require(parent.React)
+local Enums = require(UserList.Common.Enums)
 require(UserList.Common.Types)
 
 local UserRow = require(script.Parent.UserRow)
 local ContactRow = require(script.Parent.ContactRow)
-local FFlagUserListCtaIntegrationEnabled = require(UserListParent.SharedFlags).FFlagUserListCtaIntegrationEnabled
 
-local function EntityRow(t1: {[any]: any}) -- line: 41
-	-- upvalues: React (copy), Enums (copy), ContactRow (copy), UserRow (copy), FFlagUserListCtaIntegrationEnabled (copy)
-	local entity = t1.entity
-	local v11 = React.useCallback(function() -- line: 44
-		-- upvalues: t1 (copy), entity (copy)
-		if t1.onActivated then
-			t1.onActivated(entity.id, entity.type)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAddStatusIndicatorToBaseRow = SharedFlags2.FFlagAddStatusIndicatorToBaseRow
+
+local function EntityRow(props)
+	local entity = props.entity
+
+	local onActivated = React.useCallback(function()
+		if props.onActivated then
+			props.onActivated(entity.id, entity.type)
 		end
-	end, {
-		t1.onActivated,
-		entity.id,
-		entity.type
-	})
-	local v12 = if t1.layoutMode ~= Enums.LayoutMode.Horizontal then Enums.RowLayoutMode.Wide else Enums.RowLayoutMode.Compact
+	end, { props.onActivated, entity.id, entity.type })
+	local layoutMode
+
+	if props.layoutMode == Enums.LayoutMode.Horizontal then
+		layoutMode = Enums.RowLayoutMode.Compact
+	else
+		layoutMode = Enums.RowLayoutMode.Wide
+	end
 
 	if entity.type == Enums.EntityType.Contact then
 		return React.createElement(ContactRow, {
 			entityId = entity.id,
-			layoutMode = v12,
-			onActivated = v11,
-			layoutOrder = t1.layoutOrder,
-			primaryCta = t1.primaryCta,
-			secondaryCta = t1.secondaryCta,
-			contextualInfo = t1.contextualInfo,
-			loadingState = t1.loadingState,
-			trailingContent = t1.trailingContent,
-			configs = t1.configs
+			layoutMode = layoutMode,
+			onActivated = onActivated,
+			layoutOrder = props.layoutOrder,
+			primaryCta = props.primaryCta,
+			secondaryCta = props.secondaryCta,
+			contextualInfo = props.contextualInfo,
+			loadingState = props.loadingState,
+			trailingContent = props.trailingContent,
+			configs = props.configs
 		})
 	end
 
-	return React.createElement(UserRow, {
+	local createElement = React.createElement
+	local v = {
 		entityId = entity.id,
-		layoutMode = v12,
-		onActivated = v11,
-		primaryCta = t1.primaryCta,
-		secondaryCta = t1.secondaryCta,
-		ctaLoading = if not FFlagUserListCtaIntegrationEnabled then nil else t1.ctaLoading,
-		contextualInfo = t1.contextualInfo,
-		layoutOrder = t1.layoutOrder,
-		loadingState = t1.loadingState,
-		presence = t1.presence,
-		trailingContent = t1.trailingContent,
-		configs = t1.configs
-	})
+		layoutMode = layoutMode,
+		onActivated = onActivated,
+		primaryCta = props.primaryCta,
+		secondaryCta = props.secondaryCta,
+		ctaLoading = 0,
+		contextualInfo = 0,
+		layoutOrder = 0,
+		loadingState = 0,
+		presence = 0,
+		shouldShowNewIndicator = 0,
+		trailingContent = 0,
+		configs = 0
+	}
+	local ctaLoading
+
+	if FFlagUserListCtaIntegrationEnabled then
+		ctaLoading = props.ctaLoading
+	end
+
+	v.ctaLoading = ctaLoading
+	v.contextualInfo = props.contextualInfo
+	v.layoutOrder = props.layoutOrder
+	v.loadingState = props.loadingState
+	v.presence = props.presence
+	local shouldShowNewIndicator
+
+	if FFlagAddStatusIndicatorToBaseRow then
+		shouldShowNewIndicator = props.shouldShowNewIndicator
+	end
+
+	v.shouldShowNewIndicator = shouldShowNewIndicator
+	v.trailingContent = props.trailingContent
+	v.configs = props.configs
+	return createElement(UserRow, v)
 end
 
 return React.memo(EntityRow)

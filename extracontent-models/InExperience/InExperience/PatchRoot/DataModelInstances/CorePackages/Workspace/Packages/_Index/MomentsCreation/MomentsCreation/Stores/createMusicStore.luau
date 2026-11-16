@@ -1,249 +1,213 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local Dash = require(MomentsCreationParent.Dash)
-local Signals = require(MomentsCreationParent.Signals)
-local Constants = require(MomentsCreation.Constants)
+local parent = MomentsCreation.Parent
+
+local Signals = require(parent.Signals)
+
+local createMusicSource = require(MomentsCreation.Stores.createMusicSource)
+
 local GetFFlagMomentsCreationMusicSearchStateFix = require(MomentsCreation.Flags.GetFFlagMomentsCreationMusicSearchStateFix)
+require(MomentsCreation.Types.Music)
+
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
 
-local function makeDefaultSource() -- line: 71
-	-- upvalues: Dash (copy), Constants (copy)
-	local function formatMusic(t1: {[any]: any}) -- line: 72
-		local t2 = {}
+local function createMusicStore(p)
+	local v = p or createMusicSource()
 
-		for _, v28 in t1 do
-			local num = tonumber(v28.AssetId)
+	local signal, v2 = createSignal({})
+	local signal2, v3 = createSignal({})
+	local signal3, v4 = createSignal("idle")
+	local signal4, v5 = createSignal(false)
+	local signal5, v6 = createSignal(false)
 
-			if num ~= nil and v28.RecordingCode ~= nil then
-				table.insert(t2, {
-					Artist = v28.Artist,
-					AssetId = num,
-					AudioType = v28.AudioType,
-					Duration = v28.Duration,
-					RecordingCode = v28.RecordingCode,
-					Title = v28.Title
-				})
+	local count = 0
+
+	local v7 = {}
+
+	local v8 = ""
+	local v9 = nil
+
+	local v10 = nil
+
+	local getResults = createComputed(function(p2)
+		local v11 = signal(p2)
+		local result = {}
+
+		for _, v12 in signal2(p2) do
+			local v13 = v11[v12]
+
+			if v13 ~= nil then
+				table.insert(result, v13)
 			end
 		end
 
-		return t2
-	end
-
-	return {
-		searchMusic = function(s1: string, n1: number) -- line: 94
-			-- upvalues: Dash (copy), Constants (copy), formatMusic (copy)
-			local AssetService = game:GetService("AssetService")
-			local AudioSearchParams = Instance.new("AudioSearchParams")
-
-			AudioSearchParams.SearchKeyword = s1
-			AudioSearchParams.AudioSubType = Enum.AudioSubType.Music
-			AudioSearchParams.MinDuration = n1
-
-			local t3 = {}
-
-			for _, v36 in (AssetService:SearchAudio(AudioSearchParams):GetCurrentPage()) do
-				if not Dash.includes(Constants.SearchMusicCreatorFilter, v36.Creator.Id) then
-					table.insert(t3, v36.Id)
-				end
-			end
-
-			if #t3 == 0 then
-				return {}
-			end
-
-			return (formatMusic(AssetService:GetAudioMetadataAsync(t3)))
-		end,
-		getMetadata = function(t4: {[any]: any}) -- line: 114
-			-- upvalues: formatMusic (copy)
-			local AssetService = game:GetService("AssetService")
-
-			return (formatMusic(AssetService:GetAudioMetadataAsync(t4)))
-		end
-	}
-end
-local function createMusicStore(t5: {[any]: any}?) -- line: 121
-	-- upvalues: makeDefaultSource (copy), createSignal (copy), createComputed (copy), GetFFlagMomentsCreationMusicSearchStateFix (copy)
-	local v13 = t5 or makeDefaultSource()
-	local v14, v15 = createSignal({})
-	local v16, v17 = createSignal({})
-	local v18, v19 = createSignal("idle")
-	local n2 = 0
-	local t6 = {}
-	local v22 = createComputed(function(p1) -- line: 134
-		-- upvalues: v14 (copy), v16 (copy)
-		local v40 = v14(p1)
-		local t7 = {}
-
-		for _, v43 in v16(p1) do
-			local v44 = v40[v43]
-
-			if v44 ~= nil then
-				table.insert(t7, v44)
-			end
-		end
-
-		return t7
+		return result
 	end)
 
-	local function mergeInfo(t8: {[any]: any}) -- line: 146
-		-- upvalues: v14 (copy), v15 (copy)
-		if #t8 == 0 then
+	local function mergeInfo(result) -- 5 equivalent calls inferred from this helper
+		if #result == 0 then
 			return
 		end
 
-		local v46 = table.clone(v14(false))
+		local clone = table.clone(signal(false))
 
-		for _, v48 in t8 do
-			v46[v48.AssetId] = v48
+		for _, item in result do
+			clone[item.AssetId] = item
 		end
 
-		v15(v46)
+		v2(clone)
 	end
-	local function extractIds(t9: {[any]: any}) -- line: 157
-		local t10 = {}
 
-		for _, v52 in t9 do
-			table.insert(t10, v52.AssetId)
+	local function extractIds(result) -- 2 equivalent calls inferred from this helper
+		local assetIds = {}
+
+		for _, item in result do
+			table.insert(assetIds, item.AssetId)
 		end
 
-		return t10
+		return assetIds
+	end
+
+	local function setCursor(p2) -- 3 equivalent calls inferred from this helper
+		v10 = p2
+		v5(p2 ~= nil and not p2.isFinished())
+		v6(false)
+	end
+
+	local function search(p2: string, value: number?)
+		v8 = p2
+		v9 = value
+		v10 = nil
+		v5(false)
+		v6(false)
+
+		if not GetFFlagMomentsCreationMusicSearchStateFix() then
+			task.spawn(function()
+				local success, result, v11 = pcall(v.searchMusic, p2, value or 30)
+
+				if not success then
+					return
+				end
+
+				mergeInfo(result) -- inferred equivalent call
+				v3(extractIds(result)) -- inferred equivalent call
+				setCursor(v11) -- inferred equivalent call
+			end)
+			return
+		end
+
+		count += 1
+		local v11 = count
+		v4("loading")
+
+		v3({})
+		task.spawn(function()
+			local success, result, v12 = pcall(v.searchMusic, p2, value or 30)
+
+			if v11 ~= count then
+				return
+			end
+
+			if not success then
+				v4("error")
+				return
+			end
+
+			mergeInfo(result) -- inferred equivalent call
+			v3(extractIds(result)) -- inferred equivalent call
+			setCursor(v12) -- inferred equivalent call
+			v4("success")
+		end)
+	end
+
+	local function fetchInfo(p2: number)
+		if signal(false)[p2] ~= nil then
+			return
+		end
+
+		if not GetFFlagMomentsCreationMusicSearchStateFix() then
+			task.spawn(function()
+				local success, result = pcall(v.getMetadata, { p2 })
+
+				if success then
+					mergeInfo(result) -- inferred equivalent call
+				end
+			end)
+			return
+		end
+
+		if v7[p2] then
+			return
+		end
+
+		v7[p2] = true
+		task.spawn(function()
+			local success, result = pcall(v.getMetadata, { p2 })
+			v7[p2] = nil
+
+			if success then
+				mergeInfo(result) -- inferred equivalent call
+			end
+		end)
+	end
+
+	local function retry()
+		search(v8, v9)
+	end
+
+	local function loadMore()
+		local v11 = v10
+
+		if v11 == nil or not signal4(false) or signal5(false) then
+			return
+		end
+
+		v6(true)
+		task.spawn(function()
+			local success, result = pcall(v11.nextPage)
+
+			if v10 ~= v11 then
+				return
+			end
+
+			if success then
+				mergeInfo(result) -- inferred equivalent call
+				local clone = table.clone(signal2(false))
+				local set = {}
+
+				for _, v12 in clone do
+					set[v12] = true
+				end
+
+				for _, v12 in result do
+					if set[v12.AssetId] then
+						continue
+					end
+
+					set[v12.AssetId] = true
+					table.insert(clone, v12.AssetId)
+				end
+
+				v3(clone)
+				setCursor(v11) -- inferred equivalent call
+			else
+				v10 = nil
+				v5(false)
+				v6(false)
+			end
+		end)
 	end
 
 	return {
-		getInfoMap = v14,
-		getResults = v22,
-		getSearchStatus = v18,
-		search = function(s2: string, n3: number?) -- line: 165
-			-- upvalues: GetFFlagMomentsCreationMusicSearchStateFix (copy), v13 (copy), v14 (copy), v15 (copy), v17 (copy), n2 (ref), v19 (copy)
-			if not GetFFlagMomentsCreationMusicSearchStateFix() then
-				task.spawn(function() -- line: 167
-					-- upvalues: v13 (copy), s2 (copy), n3 (copy), v14 (copy), v15 (copy), v17 (copy)
-					local ok, result = pcall(v13.searchMusic, s2, n3 or 30)
-
-					if not ok then
-						return
-					end
-
-					if #result ~= 0 then
-						local v59 = table.clone(v14(false))
-
-						for _, v61 in result do
-							v59[v61.AssetId] = v61
-						end
-
-						v15(v59)
-					end
-
-					local v62 = v17
-					local t11 = {}
-
-					for _, v65 in result do
-						table.insert(t11, v65.AssetId)
-					end
-
-					v62(t11)
-				end)
-
-				return
-			end
-
-			n2 += 1
-
-			local v55 = n2
-
-			v19("loading")
-			v17({})
-			task.spawn(function() -- line: 185
-				-- upvalues: v13 (copy), s2 (copy), n3 (copy), v55 (copy), n2 (ref), v19 (copy), v14 (copy), v15 (copy), v17 (copy)
-				local ok, result = pcall(v13.searchMusic, s2, n3 or 30)
-
-				if v55 ~= n2 then
-					return
-				end
-
-				if not ok then
-					v19("error")
-
-					return
-				end
-
-				if #result ~= 0 then
-					local v68 = table.clone(v14(false))
-
-					for _, v70 in result do
-						v68[v70.AssetId] = v70
-					end
-
-					v15(v68)
-				end
-
-				local v71 = v17
-				local t12 = {}
-
-				for _, v74 in result do
-					table.insert(t12, v74.AssetId)
-				end
-
-				v71(t12)
-				v19("success")
-			end)
-		end,
-		fetchInfo = function(n4: number) -- line: 201
-			-- upvalues: v14 (copy), GetFFlagMomentsCreationMusicSearchStateFix (copy), t6 (copy), v13 (copy), v15 (copy)
-			if v14(false)[n4] ~= nil then
-				return
-			end
-
-			if GetFFlagMomentsCreationMusicSearchStateFix() then
-				if t6[n4] then
-					return
-				end
-
-				t6[n4] = true
-				task.spawn(function() -- line: 211
-					-- upvalues: v13 (copy), n4 (copy), t6 (copy), v14 (copy), v15 (copy)
-					local ok, result = pcall(v13.getMetadata, { n4 })
-
-					t6[n4] = nil
-
-					if ok then
-						if #result == 0 then
-							return
-						end
-
-						local v77 = table.clone(v14(false))
-
-						for _, v79 in result do
-							v77[v79.AssetId] = v79
-						end
-
-						v15(v77)
-					end
-				end)
-
-				return
-			end
-
-			task.spawn(function() -- line: 220
-				-- upvalues: v13 (copy), n4 (copy), v14 (copy), v15 (copy)
-				local ok, result = pcall(v13.getMetadata, { n4 })
-
-				if ok then
-					if #result == 0 then
-						return
-					end
-
-					local v82 = table.clone(v14(false))
-
-					for _, v84 in result do
-						v82[v84.AssetId] = v84
-					end
-
-					v15(v82)
-				end
-			end)
-		end
+		getInfoMap = signal,
+		getResults = getResults,
+		getSearchStatus = signal3,
+		search = search,
+		retry = retry,
+		getHasMore = signal4,
+		getIsLoadingMore = signal5,
+		loadMore = loadMore,
+		fetchInfo = fetchInfo
 	}
 end
 

@@ -1,1 +1,3 @@
-return (require(script.ChipGroup))
+local ChipGroup = require(script.ChipGroup)
+
+return ChipGroup

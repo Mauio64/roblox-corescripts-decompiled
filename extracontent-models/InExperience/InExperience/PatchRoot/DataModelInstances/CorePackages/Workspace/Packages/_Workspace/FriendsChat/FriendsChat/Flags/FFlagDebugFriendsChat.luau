@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+local SharedFlags = require(parent.SharedFlags)
 
-return require(Parent.SharedFlags).FFlagDebugFriendsChat
+return SharedFlags.FFlagDebugFriendsChat

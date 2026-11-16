@@ -1,6 +1,7 @@
-local Parent = script:FindFirstAncestor("ProfileQRCode").Parent
+local parent = script:FindFirstAncestor("ProfileQRCode").Parent
+local Enumerate = require(parent.Enumerate)
 
-return require(Parent.Enumerate)(script.Name, {
+return Enumerate(script.Name, {
 	QRPageLoad = "QRPageLoad",
 	QRPageLoadFailed = "QRPageLoadFailed",
 	QRPageFriendRequestBannerShown = "QRPageFriendRequestBannerShown",

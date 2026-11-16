@@ -1,35 +1,26 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local React = require(MomentsParent.React)
-local MessageBus = require(MomentsParent.MessageBus).MessageBus
+local parent = Moments.Parent
+
+local React = require(parent.React)
+local MessageBus = require(parent.MessageBus)
+local messageBus = MessageBus.MessageBus
+
 local GetMomentsPreferencesStore = require(Moments.Stores.GetMomentsPreferencesStore)
-local GetFFlagMomentsPauseAudioThroughTeleport = require(Moments.Flags.GetFFlagMomentsPauseAudioThroughTeleport)
 
-local function gameLeaveMessageValidator(p1) -- line: 30
-	return typeof(p1) == "table"
+local function gameLeaveMessageValidator(p): boolean
+	return typeof(p) == "table"
 end
-local function useResetTeleportingOnGameLeave() -- line: 34
-	-- upvalues: React (copy), GetFFlagMomentsPauseAudioThroughTeleport (copy), MessageBus (copy), gameLeaveMessageValidator (copy), GetMomentsPreferencesStore (copy)
-	React.useEffect(function() -- line: 35
-		-- upvalues: GetFFlagMomentsPauseAudioThroughTeleport (copy), MessageBus (copy), gameLeaveMessageValidator (copy), GetMomentsPreferencesStore (copy)
-		if not GetFFlagMomentsPauseAudioThroughTeleport() then
-			return
-		end
 
-		local v10 = MessageBus.Subscriber.new()
-		local v11 = MessageBus.getMessageId("Game", "onGameLeave")
-
-		v10:subscribe({
-			mid = v11,
-			validateParams = gameLeaveMessageValidator
-		}, function(_) -- line: 45
-			-- upvalues: GetMomentsPreferencesStore (copy)
+local function useResetTeleportingOnGameLeave()
+	React.useEffect(function()
+		local subscriber = messageBus.Subscriber.new()
+		local messageId = messageBus.getMessageId("Game", "onGameLeave")
+		subscriber:subscribe({ mid = messageId, validateParams = gameLeaveMessageValidator }, function(_)
 			GetMomentsPreferencesStore(false).setTeleporting(false)
 		end)
 
-		return function() -- line: 51
-			-- upvalues: v10 (copy), v11 (copy)
-			v10:unsubscribeWithMsgId(v11)
+		return function()
+			subscriber:unsubscribeWithMsgId(messageId)
 		end
 	end, {})
 end

@@ -1,15 +1,14 @@
-local v1 = game:DefineFastString("PriceChangedSubscriptionMembershipCheckProductTypes", "")
+local defineFastString = game:DefineFastString("PriceChangedSubscriptionMembershipCheckProductTypes", "")
 
-local function shouldCheckSubscriptionMembershipForProductType(s1: string?) -- line: 9
-	-- upvalues: v1 (copy)
-	if s1 == nil or v1 == "" then
+local function shouldCheckSubscriptionMembershipForProductType(p: string?): boolean
+	if p == nil or defineFastString == "" then
 		return false
 	end
 
-	for match in string.gmatch(v1, "[^,]+") do
-		local v5 = match:gsub("^%s+", ""):gsub("%s+$", "")
+	for k in string.gmatch(defineFastString, "[^,]+") do
+		local v = k:gsub("^%s+", ""):gsub("%s+$", "")
 
-		if v5 ~= "" and v5 == s1 then
+		if v ~= "" and v == p then
 			return true
 		end
 	end

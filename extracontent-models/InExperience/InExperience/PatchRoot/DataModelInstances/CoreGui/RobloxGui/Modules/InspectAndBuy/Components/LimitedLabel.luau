@@ -1,53 +1,64 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
+local parent = script.Parent.Parent
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Roact = require(CorePackages.Packages.Roact)
-local v8 = Roact.PureComponent:extend("LimitedLabel")
-local GetFFlagIBEnableCollectiblesSystemSupport = require(ParentParent.Flags.GetFFlagIBEnableCollectiblesSystemSupport)
 
-function v8.render(p1) -- line: 21
-	-- upvalues: Images (copy), Roact (copy), ImageSetLabel (copy), GetFFlagIBEnableCollectiblesSystemSupport (copy), AppFonts (copy)
-	local frameSize = p1.props.frameSize
-	local framePosition = p1.props.framePosition
-	local imageSize = p1.props.imageSize
-	local imagePosition = p1.props.imagePosition
-	local textSize = p1.props.textSize
-	local textPosition = p1.props.textPosition
-	local text = p1.props.text
-	local v18 = Images["icons/status/item/limited"]
+local extended = Roact.PureComponent:extend("LimitedLabel")
 
-	return Roact.createElement("Frame", {
+local GetFFlagIBEnableCollectiblesSystemSupport = require(parent.Flags.GetFFlagIBEnableCollectiblesSystemSupport)
+
+function extended.render(p)
+	local frameSize = p.props.frameSize
+	local framePosition = p.props.framePosition
+	local imageSize = p.props.imageSize
+	local imagePosition = p.props.imagePosition
+	local textSize = p.props.textSize
+	local textPosition = p.props.textPosition
+	local text = p.props.text
+
+	local iconsstatusitemlimited = Images["icons/status/item/limited"]
+
+	local createElement = Roact.createElement
+	local v = {
+		Size = frameSize,
 		BorderSizePixel = 0,
 		LayoutOrder = 3,
-		Size = frameSize,
 		Position = framePosition,
 		BackgroundColor3 = Color3.fromRGB(120, 120, 120)
-	}, {
-		Corner = Roact.createElement("UICorner", {
-			CornerRadius = UDim.new(0, 8)
-		}),
+	}
+	local v2 = {
+		Corner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 		CollectiblesIcon = Roact.createElement(ImageSetLabel, {
+			Position = imagePosition,
+			Size = imageSize,
 			BackgroundTransparency = 1,
 			ZIndex = 2,
 			Visible = true,
-			Position = imagePosition,
-			Size = imageSize,
-			Image = v18
+			Image = iconsstatusitemlimited
 		}),
-		CollectiblesText = if not GetFFlagIBEnableCollectiblesSystemSupport() or text then Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			TextSize = 12,
+		CollectiblesText = 0
+	}
+	local collectiblesText
+
+	if not (GetFFlagIBEnableCollectiblesSystemSupport() and not text) then
+		collectiblesText = Roact.createElement("TextLabel", {
 			Position = textPosition,
 			Size = textSize,
+			BackgroundTransparency = 1,
 			Text = text,
 			Font = AppFonts.default:getDefault(),
 			TextXAlignment = Enum.TextXAlignment.Left,
+			TextSize = 12,
 			TextColor3 = Color3.new(1, 1, 1)
-		}) else nil
-	})
+		})
+	end
+
+	v2.CollectiblesText = collectiblesText
+	return createElement("Frame", v, v2)
 end
 
-return v8
+return extended

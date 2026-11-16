@@ -1,11 +1,23 @@
-local ParentParent = script.Parent.Parent
-local Boolean = require(ParentParent.LuauPolyfill).Boolean
-local t1 = {}
-local Kind = require(ParentParent.GraphQL).Kind
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 
-function t1.isDocumentNode(p1) -- line: 18
-	-- upvalues: Boolean (copy), Kind (copy)
-	return Boolean.toJSBoolean(p1) and (typeof(p1) == "table" and (Boolean.toJSBoolean(p1.kind) and p1.kind == Kind.DOCUMENT))
-end
+local Boolean = LuauPolyfill.Boolean
 
-return t1
+local GraphQL = require(parent.GraphQL)
+
+local Kind = GraphQL.Kind
+return {
+	isDocumentNode = function(p)
+		local v = Boolean.toJSBoolean(p)
+
+		if v then
+			if typeof(p) == "table" then
+				return Boolean.toJSBoolean(p.kind) and p.kind == Kind.DOCUMENT
+			end
+
+			return false
+		end
+
+		return v
+	end
+}

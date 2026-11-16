@@ -1,5 +1,9 @@
 local VirtualEventsState = script:FindFirstAncestor("VirtualEventsState")
-local Players = game:GetService("Players")
-local NetworkingVirtualEvents = require(VirtualEventsState.network).NetworkingVirtualEvents
 
-return require(script.Parent["rsvps.impl"])(NetworkingVirtualEvents, Players)
+local Players = game:GetService("Players")
+
+local network = require(VirtualEventsState.network)
+local networkingVirtualEvents = network.NetworkingVirtualEvents
+local rsvpsimpl = require(script.Parent["rsvps.impl"])
+
+return rsvpsimpl(networkingVirtualEvents, Players)

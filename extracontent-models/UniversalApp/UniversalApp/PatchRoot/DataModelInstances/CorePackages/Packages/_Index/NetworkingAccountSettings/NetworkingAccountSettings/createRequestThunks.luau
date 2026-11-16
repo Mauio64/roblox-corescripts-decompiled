@@ -1,12 +1,8 @@
-local scriptParent = script.Parent
-local networkRequests = scriptParent.networkRequests
+local parent = script.Parent
+local networkRequests = parent.networkRequests
 local createGetEmailSettings = require(networkRequests.createGetEmailSettings)
+require(parent.Types.networkRequestsTypes)
 
-require(scriptParent.Types.networkRequestsTypes)
-
-return function(p1) -- line: 6
-	-- upvalues: createGetEmailSettings (copy)
-	return {
-		GetEmailSettings = createGetEmailSettings(p1)
-	}
+return function(p)
+	return { GetEmailSettings = createGetEmailSettings(p) }
 end

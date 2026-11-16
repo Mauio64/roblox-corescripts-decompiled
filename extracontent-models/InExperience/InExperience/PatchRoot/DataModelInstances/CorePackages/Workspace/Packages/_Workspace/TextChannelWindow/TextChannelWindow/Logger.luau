@@ -1,11 +1,13 @@
-local ParentParent = script.Parent.Parent
-local v2 = require(ParentParent.Lumberyak).Logger.new(nil, "TextChannelWindow")
+local parent = script.Parent.Parent
+local Lumberyak = require(parent.Lumberyak)
 
-v2:addSink({
-	maxLevel = v2.Levels.Warning,
-	log = function(_, p2, _) -- line: 8
-		print(p2)
+local logger = Lumberyak.Logger.new(nil, "TextChannelWindow")
+
+logger:addSink({
+	maxLevel = logger.Levels.Warning,
+	log = function(_, p, _)
+		print(p)
 	end
 })
 
-return v2
+return logger

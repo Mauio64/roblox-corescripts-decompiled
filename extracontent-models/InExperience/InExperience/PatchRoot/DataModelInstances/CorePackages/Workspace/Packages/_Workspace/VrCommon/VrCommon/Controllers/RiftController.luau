@@ -1,80 +1,83 @@
-local Parent = script:FindFirstAncestor("VrCommon").Parent
-local Create = require(Parent.AppCommonLib).Create
+local parent = script:FindFirstAncestor("VrCommon").Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local Create = AppCommonLib.Create
+
 local Granite = Enum.Material.Granite
-local t1 = {}
 
-t1.__index = t1
+local RiftController = {}
+RiftController.__index = RiftController
 
-function t1.new(p1) -- line: 13
-	-- upvalues: t1 (copy), Create (copy), Granite (copy)
-	local self = setmetatable({}, t1)
+function RiftController.new(userCFrame)
+	local self = setmetatable({}, RiftController)
+	self.userCFrame = userCFrame
 
-	self.userCFrame = p1
-	self.model = Create("Model")({
-		Name = "RiftController",
-		Archivable = false
-	})
+	self.model = Create("Model")({ Name = "RiftController", Archivable = false })
+
 	self.origin = Create("Part")({
+		Parent = self.model,
 		Name = "Origin",
 		Anchored = true,
 		Transparency = 1,
-		Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
+		Size = Vector3.new(0.05, 0.05, 0.05),
 		CanCollide = false,
 		CanQuery = false,
-		CanTouch = false,
-		Parent = self.model
+		CanTouch = false
 	})
+
 	self.parts = {}
 
-	local v7 = Create("Part")({
+	local v = Create("Part")({
+		Parent = self.model,
 		Name = "body",
 		Anchored = true,
-		Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
+		Material = Granite,
+		Size = Vector3.new(0.05, 0.05, 0.05),
 		Transparency = 0.25,
+		CFrame = self.origin.CFrame,
 		CanCollide = false,
 		CanQuery = false,
-		CanTouch = false,
-		Parent = self.model,
-		Material = Granite,
-		CFrame = self.origin.CFrame
+		CanTouch = false
 	})
 
 	self.mesh = Create("SpecialMesh")({
+		Parent = v,
 		Name = "Mesh",
+		MeshId = userCFrame == Enum.UserCFrame.LeftHand and "rbxassetid://9597097835" or "rbxassetid://9597101144",
 		TextureId = "rbxassetid://9597123835",
-		Scale = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844),
-		Parent = v7,
-		MeshId = p1 ~= Enum.UserCFrame.LeftHand and "rbxassetid://9597101144" or "rbxassetid://9597097835"
+		Scale = Vector3.new(0.032, 0.032, 0.032)
 	})
-	Create("Weld")({
-		Name = "Weld",
-		Parent = v7,
-		Part0 = self.origin,
-		Part1 = v7
-	})
-	self.parts.body = v7
+	Create("Weld")({ Parent = v, Name = "Weld", Part0 = self.origin, Part1 = v })
+
+	self.parts.body = v
+
 	self.model.PrimaryPart = self.origin
 
 	return self
 end
-function t1.setCFrame(p2, p3) -- line: 68
-	p2.model:SetPrimaryPartCFrame(p3 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03, 0.06))
-end
-function t1.setCFrameAndScale(p4, p5, p6) -- line: 72
-	p4.model:SetPrimaryPartCFrame(p5 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03 * p6, 0.06 * p6))
-	p4.mesh.Scale = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844) * p6
-end
-function t1.onButtonInputChanged(_, _, _) -- line: 79
-end
-function t1.onInputBegan(p10, p11) -- line: 81
-	p10:onButtonInputChanged(p11, true)
-end
-function t1.onInputChanged(_, _) -- line: 85
-end
-function t1.onInputEnded(p14, p15) -- line: 87
-	p14:onButtonInputChanged(p15, false)
-end
-function t1.onTouchpadModeChanged(_, _, _) -- line: 91
+
+function RiftController.setCFrame(p, p2)
+	p.model:SetPrimaryPartCFrame(p2 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03, 0.06))
 end
 
-return t1
+function RiftController.setCFrameAndScale(p, p2, p3)
+	p.model:SetPrimaryPartCFrame(p2 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03 * p3, 0.06 * p3))
+
+	p.mesh.Scale = Vector3.new(0.032, 0.032, 0.032) * p3
+end
+
+function RiftController:onButtonInputChanged(_, _) end
+
+function RiftController:onInputBegan(p)
+	self:onButtonInputChanged(p, true)
+end
+
+function RiftController.onInputChanged(_, _) end
+
+function RiftController:onInputEnded(p)
+	self:onButtonInputChanged(p, false)
+end
+
+function RiftController.onTouchpadModeChanged(_, _, _) end
+
+return RiftController

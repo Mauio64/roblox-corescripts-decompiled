@@ -1,25 +1,33 @@
 local VoiceChat = script:FindFirstAncestor("VoiceChat")
 local SetShowAgeVerificationOverlay = require(VoiceChat.AgeVerificationOverlay.SetShowAgeVerificationOverlay)
-local VoiceChatParent = VoiceChat.Parent
-local Cryo = require(VoiceChatParent.Cryo)
+local parent = VoiceChat.Parent
+local Cryo = require(parent.Cryo)
 
-return function(p1, p2) -- line: 6
-	-- upvalues: SetShowAgeVerificationOverlay (copy), Cryo (copy)
-	local v7 = p1 or {}
+return function(options, data)
+	local v = options or {}
 
-	if p2.type == SetShowAgeVerificationOverlay.name then
-		v7 = Cryo.Dictionary.join(v7, p2.universeId ~= nil and {
-			[p2.universeId] = {
-				universeId = p2.universeId,
-				isPlaceEnabledForVoice = p2.isPlaceEnabledForVoice,
-				showVoiceOptInOverlay = p2.showVoiceOptInOverlay,
-				isUniverseEnabledForVoice = p2.isUniverseEnabledForVoice,
-				isVoiceEnabled = p2.isVoiceEnabled,
-				isUniverseEnabledForAvatarVideo = p2.isUniverseEnabledForAvatarVideo,
-				elegibleToSeeVoiceUpsell = p2.elegibleToSeeVoiceUpsell
-			}
-		} or {})
+	if data.type ~= SetShowAgeVerificationOverlay.name then
+		return v
 	end
 
-	return v7
+	local join = Cryo.Dictionary.join
+	local v2
+
+	if data.universeId == nil then
+		v2 = {}
+	else
+		v2 = {
+			[data.universeId] = {
+				universeId = data.universeId,
+				isPlaceEnabledForVoice = data.isPlaceEnabledForVoice,
+				showVoiceOptInOverlay = data.showVoiceOptInOverlay,
+				isUniverseEnabledForVoice = data.isUniverseEnabledForVoice,
+				isVoiceEnabled = data.isVoiceEnabled,
+				isUniverseEnabledForAvatarVideo = data.isUniverseEnabledForAvatarVideo,
+				elegibleToSeeVoiceUpsell = data.elegibleToSeeVoiceUpsell
+			}
+		} or {}
+	end
+
+	return (join(v, v2))
 end

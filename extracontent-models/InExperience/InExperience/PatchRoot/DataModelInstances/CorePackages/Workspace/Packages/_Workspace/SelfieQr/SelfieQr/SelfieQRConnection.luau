@@ -1,56 +1,64 @@
 local AvatarCreationService = game:GetService("AvatarCreationService")
+
 local SelfieQr = script:FindFirstAncestor("SelfieQr")
-local SelfieQrParent = SelfieQr.Parent
-local FocusNavigationUtils = require(SelfieQrParent.FocusNavigationUtils)
-local React = require(SelfieQrParent.React)
-local ReactUtils = require(SelfieQrParent.ReactUtils)
+local parent = SelfieQr.Parent
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
 local SelfieQRCode = require(SelfieQr.SelfieQRCode)
+
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+
 local useEventConnection = ReactUtils.useEventConnection
 
-local function v11(t1: {[any]: any}) -- line: 21
-	-- upvalues: React (copy), useEventConnection (copy), AvatarCreationService (copy)
-	local v13 = React.useCallback(function(p1, p2) -- line: 22
-		-- upvalues: t1 (copy)
-		t1.displaySelfieQRCode(true)
-		t1.jobData.url = p1
-		t1.jobData.jobId = p2
+local function fn(p)
+	local v = React.useCallback(function(url, jobId)
+		p.displaySelfieQRCode(true)
+		p.jobData.url = url
+		p.jobData.jobId = jobId
 	end)
-
-	useEventConnection(AvatarCreationService.OpenSelfieQRCode, v13)
-
+	useEventConnection(AvatarCreationService.OpenSelfieQRCode, v)
 	return React.createElement(React.Fragment, {}, {})
 end
 
-return function(_: {[any]: any}) -- line: 31
-	-- upvalues: React (copy), SelfieQRCode (copy), v11 (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v15, v16 = React.useState(false)
-	local current = React.useRef({
-		url = "",
-		jobId = ""
-	}).current
-	local v18 = nil
+return function(_)
+	local state, setState = React.useState(false)
+	local current = React.useRef({ url = "", jobId = "" }).current
+	local dialog
 
-	if v15 then
-		v18 = React.createElement(SelfieQRCode, {
-			displaySelfieQRCode = v16,
+	if state then
+		dialog = React.createElement(SelfieQRCode, {
+			displaySelfieQRCode = setState,
 			url = current.url,
 			jobId = current.jobId
 		})
 	end
 
-	return React.createElement(React.Fragment, {}, {
-		EventListener = React.createElement(v11, {
-			displaySelfieQRCode = v16,
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v = {
+		EventListener = React.createElement(fn, {
+			displaySelfieQRCode = setState,
 			jobData = current
 		}),
-		FocusNavigationCoreScriptsWrapper = if v18 == nil then nil else React.createElement(FocusRoot, {
-			isIsolated = true,
-			isAutoFocusRoot = true,
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
-		}, {
-			Dialog = v18
-		})
-	})
+		FocusNavigationCoreScriptsWrapper = 0
+	}
+	local focusNavigationCoreScriptsWrapper
+
+	if dialog ~= nil then
+		focusNavigationCoreScriptsWrapper = React.createElement(
+			FocusRoot,
+			{
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+				isIsolated = true,
+				isAutoFocusRoot = true
+			},
+			{ Dialog = dialog }
+		)
+	end
+
+	v.FocusNavigationCoreScriptsWrapper = focusNavigationCoreScriptsWrapper
+	return createElement(fragment, {}, v)
 end

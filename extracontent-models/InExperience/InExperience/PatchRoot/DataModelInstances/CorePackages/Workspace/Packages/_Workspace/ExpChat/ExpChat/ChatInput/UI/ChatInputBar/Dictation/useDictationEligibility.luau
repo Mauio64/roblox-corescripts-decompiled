@@ -1,4 +1,4 @@
-local function useDictationEligibility() -- line: 6
+local function useDictationEligibility(): boolean
 	return true
 end
 

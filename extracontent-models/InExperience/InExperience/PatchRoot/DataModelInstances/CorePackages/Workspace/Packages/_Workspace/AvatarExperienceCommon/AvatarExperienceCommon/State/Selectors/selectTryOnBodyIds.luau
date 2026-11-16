@@ -1,25 +1,26 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local ItemTypeEnum = require(AvatarExperienceCommon.Enums.ItemTypeEnum)
+local AvatarExperienceModel = require(AvatarExperienceCommon.Parent.AvatarExperienceModel)
+
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
 local Constants = require(AvatarExperienceCommon.Constants)
 
-local function getBodiesInTryOns(t1: {[any]: any}) -- line: 6
-	-- upvalues: ItemTypeEnum (copy), Constants (copy)
-	local t2 = {}
+local function getBodiesInTryOns(tryOnItems)
+	local itemIds = {}
 
-	for _, v9 in t1 do
-		if v9.itemType == ItemTypeEnum.Bundle and v9.itemSubType == Constants.BODY_BUNDLE_TYPE_ID then
-			table.insert(t2, v9.itemId)
+	for _, item in tryOnItems do
+		if item.itemType == ItemTypeEnum.Bundle and item.itemSubType == Constants.BODY_BUNDLE_TYPE_ID then
+			table.insert(itemIds, item.itemId)
 		end
 	end
 
-	return t2
+	return itemIds
 end
-local function selectTryOnBodyIds(p1) -- line: 19
-	-- upvalues: getBodiesInTryOns (copy)
-	local OutfitTryOn = p1.AvatarExperience.AvatarScene.OutfitTryOn
 
-	if OutfitTryOn and OutfitTryOn.TryOnItems then
-		return (getBodiesInTryOns(OutfitTryOn.TryOnItems))
+local function selectTryOnBodyIds(p)
+	local outfitTryOn = p.AvatarExperience.AvatarScene.OutfitTryOn
+
+	if outfitTryOn and outfitTryOn.TryOnItems then
+		return getBodiesInTryOns(outfitTryOn.TryOnItems)
 	end
 
 	return {}

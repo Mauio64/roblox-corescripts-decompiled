@@ -1,47 +1,46 @@
 local CommerceService = game:GetService("CommerceService")
+
 local CommercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
-local CommercePurchaseAppParent = CommercePurchaseApp.Parent
-local React = require(CommercePurchaseAppParent.React)
-local useDispatch = require(CommercePurchaseAppParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalization = require(CommercePurchaseAppParent.Localization).Hooks.useLocalization
-local useSelector = require(CommercePurchaseAppParent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = CommercePurchaseApp.Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
+
 local CommercePurchasePromptStateEnum = require(CommercePurchaseApp.Enums.CommercePurchasePromptStateEnum)
 local selectPromptState = require(CommercePurchaseApp.Store.Selectors.selectPromptState)
 local InitiateCommercePurchaseFlow = require(CommercePurchaseApp.Store.Thunks.InitiateCommercePurchaseFlow)
 local FFlagAddCommerceErrors = require(CommercePurchaseApp.Flags.FFlagAddCommerceErrors)
 
-local function useCommercePurchaseRequestListenerEffect() -- line: 15
-	-- upvalues: useDispatch (copy), useSelector (copy), selectPromptState (copy), useLocalization (copy), FFlagAddCommerceErrors (copy), React (copy), CommerceService (copy), CommercePurchasePromptStateEnum (copy), InitiateCommercePurchaseFlow (copy)
-	local v13 = useDispatch()
-	local v14 = useSelector(selectPromptState)
-	local v15 = useLocalization({
-		genericError = not FFlagAddCommerceErrors and "CoreScripts.CommercePurchasePrompt.ErrorPrompt.GenericError" or "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Body.ErrorLoading"
+local function useCommercePurchaseRequestListenerEffect()
+	local v = useDispatch()
+	local v2 = useSelector(selectPromptState)
+	local v3 = useLocalization({
+		genericError = FFlagAddCommerceErrors and "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Body.ErrorLoading" or "CoreScripts.CommercePurchasePrompt.ErrorPrompt.GenericError"
 	})
 
-	React.useEffect(function() -- line: 24
-		-- upvalues: v13 (copy), CommerceService (copy), v14 (copy), CommercePurchasePromptStateEnum (copy), InitiateCommercePurchaseFlow (copy), v15 (copy)
-		local connection = nil
+	React.useEffect(function()
+		local promptCommerceProductPurchaseRequestedConnection
 
-		if v13 then
-			connection = CommerceService.PromptCommerceProductPurchaseRequested:Connect(function(s1: string) -- line: 28
-				-- upvalues: v14 (copy), CommercePurchasePromptStateEnum (copy), v13 (copy), InitiateCommercePurchaseFlow (copy), v15 (copy)
-				if v14 == CommercePurchasePromptStateEnum.None then
-					v13(InitiateCommercePurchaseFlow(s1, v15.genericError))
+		if v then
+			promptCommerceProductPurchaseRequestedConnection = CommerceService.PromptCommerceProductPurchaseRequested:Connect(function(p: string)
+				if v2 == CommercePurchasePromptStateEnum.None then
+					v(InitiateCommercePurchaseFlow(p, v3.genericError))
 				end
 			end)
+		else
+			promptCommerceProductPurchaseRequestedConnection = nil
 		end
 
-		return function() -- line: 35
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
-				connection = nil
+		return function()
+			if promptCommerceProductPurchaseRequestedConnection then
+				promptCommerceProductPurchaseRequestedConnection:Disconnect()
+				promptCommerceProductPurchaseRequestedConnection = nil
 			end
 		end
-	end, {
-		v13,
-		v15
-	})
+	end, { v, v3 })
 end
-
 return useCommercePurchaseRequestListenerEffect

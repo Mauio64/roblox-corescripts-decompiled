@@ -2,56 +2,70 @@ local CorePackages = game:GetService("CorePackages")
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableModerateChatRemoteEvent = SharedFlags.FFlagEnableModerateChatRemoteEvent
 local FFlagPlatformLeaderboardRccEnabled = SharedFlags.FFlagPlatformLeaderboardRccEnabled
-local v5 = game:DefineFastFlag("RemoteAllowListAddExpChatFeatureValueChanged", false)
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags.FFlagLuaAppsEnablePromptVIPServerPurchase
 
-return function() -- line: 8
-	-- upvalues: FFlagEnableModerateChatRemoteEvent (copy), v5 (copy), FFlagPlatformLeaderboardRccEnabled (copy)
+local defineFastFlag = game:DefineFastFlag("RemoteAllowListAddExpChatFeatureValueChanged", false)
+
+return function()
 	assert(game:FindService("NetworkServer") ~= nil)
-
 	local NetworkServer = game:GetService("NetworkServer")
-	local t1 = {}
 
-	table.insert(t1, "GetServerVersion")
-	table.insert(t1, "GetServerChannel")
-	table.insert(t1, "WhisperChat")
-	table.insert(t1, "GetServerType")
-	table.insert(t1, "ServerSideBulkPurchaseEvent")
-	table.insert(t1, "CanChatWith")
-	table.insert(t1, "SetPlayerBlockList")
-	table.insert(t1, "UpdatePlayerBlockList")
-	table.insert(t1, "NewPlayerGroupDetails")
-	table.insert(t1, "NewPlayerCanManageDetails")
-	table.insert(t1, "SendPlayerBlockList")
-	table.insert(t1, "UpdateLocalPlayerBlockList")
-	table.insert(t1, "SendPlayerProfileSettings")
-	table.insert(t1, "UpdatePlayerProfileSettings")
-	table.insert(t1, "ShowPlayerJoinedFriendsToast")
-	table.insert(t1, "ShowFriendJoinedPlayerToast")
-	table.insert(t1, "CreateOrJoinParty")
-	table.insert(t1, "RequestPlayerProfileSettings")
+	local v = {}
+
+	table.insert(v, "GetServerVersion")
+	table.insert(v, "GetServerChannel")
+
+	table.insert(v, "WhisperChat")
+
+	table.insert(v, "GetServerType")
+
+	table.insert(v, "ServerSideBulkPurchaseEvent")
+
+	table.insert(v, "CanChatWith")
+	table.insert(v, "SetPlayerBlockList")
+	table.insert(v, "UpdatePlayerBlockList")
+	table.insert(v, "NewPlayerGroupDetails")
+	table.insert(v, "NewPlayerCanManageDetails")
+	table.insert(v, "SendPlayerBlockList")
+	table.insert(v, "UpdateLocalPlayerBlockList")
+	table.insert(v, "SendPlayerProfileSettings")
+	table.insert(v, "UpdatePlayerProfileSettings")
+	table.insert(v, "ShowPlayerJoinedFriendsToast")
+	table.insert(v, "ShowFriendJoinedPlayerToast")
+	table.insert(v, "CreateOrJoinParty")
+	table.insert(v, "RequestPlayerProfileSettings")
 
 	if FFlagEnableModerateChatRemoteEvent then
-		table.insert(t1, "ModerateChatSettingUpdated")
+		table.insert(v, "ModerateChatSettingUpdated")
 	end
 
-	if v5 then
-		table.insert(t1, "ExpChatFeatureValueChanged")
+	if defineFastFlag then
+		table.insert(v, "ExpChatFeatureValueChanged")
 	end
 
-	table.insert(t1, "SetDialogInUse")
-	table.insert(t1, "RequestDeviceCameraOrientationCapability")
-	table.insert(t1, "RequestDeviceCameraCFrame")
-	table.insert(t1, "ReplicateDeviceCameraCFrame")
-	table.insert(t1, "ReferredPlayerJoin")
-	table.insert(t1, "BuildExperiencePlaytestTeleport")
-	table.insert(t1, "SetUserActive")
-	table.insert(t1, "AvatarGesturesVRPlayer")
+	table.insert(v, "SetDialogInUse")
+
+	table.insert(v, "RequestDeviceCameraOrientationCapability")
+	table.insert(v, "RequestDeviceCameraCFrame")
+	table.insert(v, "ReplicateDeviceCameraCFrame")
+
+	table.insert(v, "ReferredPlayerJoin")
+
+	table.insert(v, "BuildExperiencePlaytestTeleport")
+
+	if FFlagLuaAppsEnablePromptVIPServerPurchase then
+		table.insert(v, "TeleportToPurchasedVIPServer")
+	end
+
+	table.insert(v, "SetUserActive")
+
+	table.insert(v, "AvatarGesturesVRPlayer")
 
 	if FFlagPlatformLeaderboardRccEnabled then
-		table.insert(t1, "PlatformLeaderboardPush")
-		table.insert(t1, "PlatformLeaderboardTabOpened")
-		table.insert(t1, "PlatformLeaderboardTabClosed")
+		table.insert(v, "PlatformLeaderboardPush")
+		table.insert(v, "PlatformLeaderboardTabOpened")
+		table.insert(v, "PlatformLeaderboardTabClosed")
 	end
 
-	NetworkServer:InitializeRemoteAllowList(t1)
+	NetworkServer:InitializeRemoteAllowList(v)
 end

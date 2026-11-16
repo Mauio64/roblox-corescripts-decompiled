@@ -1,129 +1,174 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local SharedFlags = require(MomentsCommonParent.SharedFlags)
-local TimeToInteractiveTracker = require(MomentsCommonParent.TimeToInteractiveTracker).TimeToInteractiveTracker
-local Milestone = TimeToInteractiveTracker.Milestone
+local parent = MomentsCommon.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local TimeToInteractiveTracker = require(parent.TimeToInteractiveTracker)
+local timeToInteractiveTracker = TimeToInteractiveTracker.TimeToInteractiveTracker
+local Milestone = timeToInteractiveTracker.Milestone
+
 local Analytics = require(MomentsCommon.Analytics)
+require(MomentsCommon.Enums.CaptureKind)
 local EventNames = Analytics.EventNames
 local fireAnalyticsEvent = Analytics.fireAnalyticsEvent
 local FIntMomentsSurfaceLoadTTISamplingRate = SharedFlags.FIntMomentsSurfaceLoadTTISamplingRate
-local n1 = 0
-local elapsed = nil
 
-local function computeElapsedMs() -- line: 29
-	-- upvalues: elapsed (ref)
-	if elapsed == nil then
+local count = 0
+local lastTime = nil
+
+local function isSessionActive(): boolean -- 11 equivalent calls inferred from this helper
+	local events = timeToInteractiveTracker.getEvents()
+	return events ~= nil and events.Watch_MomentsFeed ~= nil
+end
+
+local function computeElapsedMs() -- 1 equivalent call inferred from this helper
+	if lastTime == nil then
 		return 0
 	end
 
-	return (os.clock() - elapsed) * 1000
+	return (os.clock() - lastTime) * 1000
 end
 
-return {
-	EVENT_NAME = "Watch_MomentsFeed",
-	start = function() -- line: 39
-		-- upvalues: n1 (ref), elapsed (ref), TimeToInteractiveTracker (copy)
-		n1 += 1
-		elapsed = os.clock()
-		TimeToInteractiveTracker.trackStart("Watch_MomentsFeed", true)
-	end,
-	isSessionActive = function() -- line: 24
-		-- upvalues: TimeToInteractiveTracker (copy)
-		local v13 = TimeToInteractiveTracker.getEvents()
+local function abortMeasurement(p)
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
 
-		return v13 ~= nil and v13.Watch_MomentsFeed ~= nil
-	end,
-	getSessionGeneration = function() -- line: 47
-		-- upvalues: n1 (ref)
-		return n1
-	end,
-	elapsedMs = computeElapsedMs,
-	renderStarted = function() -- line: 53
-		-- upvalues: TimeToInteractiveTracker (copy), Milestone (copy)
-		local v14 = TimeToInteractiveTracker.getEvents()
+	if p ~= nil then
+		Analytics.reportMomentsSurfaceLoadAbort(p)
+	end
 
-		if v14 == nil or v14.Watch_MomentsFeed == nil then
+	timeToInteractiveTracker.destroyEvent("Watch_MomentsFeed")
+	lastTime = nil
+end
+
+local function scheduleCapTimeout(count2: number) -- 1 equivalent call inferred from this helper
+	local fIntMomentsSurfaceLoadTTIMaxMs = SharedFlags.FIntMomentsSurfaceLoadTTIMaxMs
+
+	if fIntMomentsSurfaceLoadTTIMaxMs <= 0 then
+		return
+	end
+
+	task.delay(fIntMomentsSurfaceLoadTTIMaxMs / 1000, function()
+		if count2 == count and isSessionActive() then -- inferred equivalent call
+			if not isSessionActive() then -- inferred equivalent call
+				return
+			end
+
+			Analytics.reportMomentsSurfaceLoadAbort("capped")
+
+			timeToInteractiveTracker.destroyEvent("Watch_MomentsFeed")
+			lastTime = nil
+		end
+	end)
+end
+
+local MomentsSurfaceLoadManager = {}
+MomentsSurfaceLoadManager.EVENT_NAME = "Watch_MomentsFeed"
+
+function MomentsSurfaceLoadManager.start()
+	count += 1
+	lastTime = os.clock()
+	timeToInteractiveTracker.trackStart("Watch_MomentsFeed", true)
+	scheduleCapTimeout(count) -- inferred equivalent call
+end
+
+MomentsSurfaceLoadManager.isSessionActive = isSessionActive
+
+function MomentsSurfaceLoadManager.getSessionGeneration()
+	return count
+end
+
+MomentsSurfaceLoadManager.elapsedMs = computeElapsedMs
+
+function MomentsSurfaceLoadManager.renderStarted()
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
+
+	timeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.RenderStarted)
+end
+
+function MomentsSurfaceLoadManager.surfaceMounted()
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
+
+	timeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.SurfaceMounted)
+end
+
+function MomentsSurfaceLoadManager.primaryDataStarted()
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
+
+	timeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.PrimaryDataStarted.Name)
+end
+
+function MomentsSurfaceLoadManager.primaryDataNetworkFetch()
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
+
+	timeToInteractiveTracker.trackSubphase(
+		"Watch_MomentsFeed",
+		Milestone.PrimaryDataStarted.Name,
+		Milestone.PrimaryDataStarted.Subphase.NetworkFetch
+	)
+end
+
+function MomentsSurfaceLoadManager.primaryDataResponseReceived()
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
+
+	timeToInteractiveTracker.trackSubphase(
+		"Watch_MomentsFeed",
+		Milestone.PrimaryDataStarted.Name,
+		Milestone.PrimaryDataStarted.Subphase.ResponseReceived
+	)
+end
+
+function MomentsSurfaceLoadManager.primaryDataReady()
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
+
+	timeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.PrimaryDataReady.Name)
+end
+
+function MomentsSurfaceLoadManager.markSurfaceReady(subcategory)
+	if not isSessionActive() then -- inferred equivalent call
+		return
+	end
+
+	local elapsedMs = computeElapsedMs() -- inferred equivalent call
+	local fIntMomentsSurfaceLoadTTIMaxMs = SharedFlags.FIntMomentsSurfaceLoadTTIMaxMs
+
+	if fIntMomentsSurfaceLoadTTIMaxMs > 0 and fIntMomentsSurfaceLoadTTIMaxMs < elapsedMs then
+		if not isSessionActive() then -- inferred equivalent call
 			return
 		end
 
-		TimeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.RenderStarted)
-	end,
-	surfaceMounted = function() -- line: 60
-		-- upvalues: TimeToInteractiveTracker (copy), Milestone (copy)
-		local v15 = TimeToInteractiveTracker.getEvents()
+		Analytics.reportMomentsSurfaceLoadAbort("capped")
 
-		if v15 == nil or v15.Watch_MomentsFeed == nil then
-			return
+		timeToInteractiveTracker.destroyEvent("Watch_MomentsFeed")
+	else
+		if subcategory ~= nil then
+			timeToInteractiveTracker.updateMetadata("Watch_MomentsFeed", {
+				subcategory = subcategory
+			})
 		end
 
-		TimeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.SurfaceMounted)
-	end,
-	primaryDataStarted = function() -- line: 67
-		-- upvalues: TimeToInteractiveTracker (copy), Milestone (copy)
-		local v16 = TimeToInteractiveTracker.getEvents()
-
-		if v16 == nil or v16.Watch_MomentsFeed == nil then
-			return
-		end
-
-		TimeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.PrimaryDataStarted.Name)
-	end,
-	primaryDataNetworkFetch = function() -- line: 74
-		-- upvalues: TimeToInteractiveTracker (copy), Milestone (copy)
-		local v17 = TimeToInteractiveTracker.getEvents()
-
-		if v17 == nil or v17.Watch_MomentsFeed == nil then
-			return
-		end
-
-		TimeToInteractiveTracker.trackSubphase("Watch_MomentsFeed", Milestone.PrimaryDataStarted.Name, Milestone.PrimaryDataStarted.Subphase.NetworkFetch)
-	end,
-	primaryDataResponseReceived = function() -- line: 85
-		-- upvalues: TimeToInteractiveTracker (copy), Milestone (copy)
-		local v18 = TimeToInteractiveTracker.getEvents()
-
-		if v18 == nil or v18.Watch_MomentsFeed == nil then
-			return
-		end
-
-		TimeToInteractiveTracker.trackSubphase("Watch_MomentsFeed", Milestone.PrimaryDataStarted.Name, Milestone.PrimaryDataStarted.Subphase.ResponseReceived)
-	end,
-	primaryDataReady = function() -- line: 96
-		-- upvalues: TimeToInteractiveTracker (copy), Milestone (copy)
-		local v19 = TimeToInteractiveTracker.getEvents()
-
-		if v19 == nil or v19.Watch_MomentsFeed == nil then
-			return
-		end
-
-		TimeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.PrimaryDataReady.Name)
-	end,
-	markSurfaceReady = function() -- line: 103
-		-- upvalues: TimeToInteractiveTracker (copy), Milestone (copy), FIntMomentsSurfaceLoadTTISamplingRate (copy), fireAnalyticsEvent (copy), EventNames (copy), elapsed (ref)
-		local v20 = TimeToInteractiveTracker.getEvents()
-
-		if v20 == nil or v20.Watch_MomentsFeed == nil then
-			return
-		end
-
-		TimeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.SurfaceReady)
-		TimeToInteractiveTracker.trackEnd("Watch_MomentsFeed", {
+		timeToInteractiveTracker.trackMilestone("Watch_MomentsFeed", Milestone.SurfaceReady)
+		timeToInteractiveTracker.trackEnd("Watch_MomentsFeed", {
 			samplingRateOverride = FIntMomentsSurfaceLoadTTISamplingRate
 		})
-		fireAnalyticsEvent(EventNames.MomentsFirstContentLoadedTimestamp, {
-			value = if elapsed ~= nil then (os.clock() - elapsed) * 1000 else 0
-		})
-		elapsed = nil
-	end,
-	abort = function() -- line: 119
-		-- upvalues: TimeToInteractiveTracker (copy), elapsed (ref)
-		local v21 = TimeToInteractiveTracker.getEvents()
 
-		if v21 == nil or v21.Watch_MomentsFeed == nil then
-			return
-		end
-
-		TimeToInteractiveTracker.destroyEvent("Watch_MomentsFeed")
-		elapsed = nil
+		fireAnalyticsEvent(EventNames.MomentsFirstContentLoadedTimestamp, { value = elapsedMs })
 	end
-}
+
+	lastTime = nil
+end
+
+MomentsSurfaceLoadManager.abort = abortMeasurement
+return MomentsSurfaceLoadManager

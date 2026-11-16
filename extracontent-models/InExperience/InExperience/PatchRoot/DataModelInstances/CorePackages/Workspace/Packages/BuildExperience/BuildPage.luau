@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local BuildPage = require(Workspace.BuildExperience.BuildExperience.BuildPage)
 
-return (require(_Workspace.BuildExperience.BuildExperience.BuildPage))
+return BuildPage

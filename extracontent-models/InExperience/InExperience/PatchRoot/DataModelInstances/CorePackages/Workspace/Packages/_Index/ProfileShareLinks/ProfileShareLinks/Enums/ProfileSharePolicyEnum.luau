@@ -1,5 +1,1 @@
-return {
-	Share = "Share",
-	Copy = "Copy",
-	Disabled = "Disabled"
-}
+return { Share = "Share", Copy = "Copy", Disabled = "Disabled" }

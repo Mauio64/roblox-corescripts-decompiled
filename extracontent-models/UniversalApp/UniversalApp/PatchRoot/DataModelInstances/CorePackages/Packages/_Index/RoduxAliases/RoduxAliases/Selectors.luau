@@ -1,9 +1,7 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.RoduxAliasesTypes)
 
-require(scriptParent.RoduxAliasesTypes)
-
-return function(p1) -- line: 6
-	return {
-		getAliasByUserId = require(script.getAliasByUserId)(p1)
-	}
+return function(p)
+	local getAliasByUserId = require(script.getAliasByUserId)
+	return { getAliasByUserId = getAliasByUserId(p) }
 end

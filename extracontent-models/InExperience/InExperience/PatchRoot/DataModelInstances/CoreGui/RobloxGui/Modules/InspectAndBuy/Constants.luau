@@ -1,28 +1,23 @@
 local CorePackages = game:GetService("CorePackages")
-local FFlagAXInspectAndBuyMakeupSupport = require(CorePackages.Workspace.Packages.AvatarExperienceFlags).FFlagAXInspectAndBuyMakeupSupport
-local t1 = {
+local AvatarExperienceFlags = require(CorePackages.Workspace.Packages.AvatarExperienceFlags)
+local FFlagAXInspectAndBuyMakeupSupport = AvatarExperienceFlags.FFlagAXInspectAndBuyMakeupSupport
+
+local Constants = {
 	NotificationKeys = {
 		MultipleBundleNoticeKey = "InGame.InspectMenu.Description.MultipleBundlesNotice",
 		SingleBundleNoticeKey = "InGame.InspectMenu.Description.SingleBundleNotice",
 		LimitedItemNoticeKey = "InGame.InspectMenu.Description.LimitedNotice",
 		LayeredClothingOnR6Key = "InGame.InspectMenu.Description.LayeredClothingR6"
 	},
-	ItemType = {
-		Asset = "Asset",
-		Bundle = "Bundle"
-	},
-	View = {
-		Compact = 0,
-		Wide = 1,
-		WideLandscape = 2
-	},
+	ItemType = { Asset = "Asset", Bundle = "Bundle" },
+	View = { Compact = 0, Wide = 1, WideLandscape = 2 },
 	AssetCategories = {
 		Animation = "Animation",
 		Body = "Body",
 		Clothing = "Clothing",
 		Accessory = "Accessory",
 		Emotes = "Emotes",
-		Makeup = if not FFlagAXInspectAndBuyMakeupSupport then nil else "Makeup"
+		Makeup = FFlagAXInspectAndBuyMakeupSupport and "Makeup" or nil
 	},
 	AssetTypeIdStringToHumanoidDescriptionProp = {
 		[tostring(Enum.AssetType.TShirt.Value)] = "GraphicTShirt",
@@ -98,74 +93,71 @@ local t1 = {
 		[tostring(Enum.AssetType.EyebrowAccessory.Value)] = Enum.AccessoryType.Eyebrow,
 		[tostring(Enum.AssetType.EyelashAccessory.Value)] = Enum.AccessoryType.Eyelash
 	},
-	AssetCategory = {
-		Tops = "Tops",
-		Bottoms = "Bottoms"
-	}
+	AssetCategory = { Tops = "Tops", Bottoms = "Bottoms" }
 }
 
-t1.AssetTypeIdToCategory = {
-	[tostring(Enum.AssetType.TShirt.Value)] = t1.AssetCategories.Clothing,
-	[tostring(Enum.AssetType.Hat.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.HairAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.FaceAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.NeckAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.ShoulderAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.FrontAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.BackAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.WaistAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.Shirt.Value)] = t1.AssetCategories.Clothing,
-	[tostring(Enum.AssetType.Pants.Value)] = t1.AssetCategories.Clothing,
-	[tostring(Enum.AssetType.Gear.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.Head.Value)] = t1.AssetCategories.Body,
-	[tostring(Enum.AssetType.Face.Value)] = t1.AssetCategories.Body,
-	[tostring(Enum.AssetType.Torso.Value)] = t1.AssetCategories.Body,
-	[tostring(Enum.AssetType.RightArm.Value)] = t1.AssetCategories.Body,
-	[tostring(Enum.AssetType.LeftArm.Value)] = t1.AssetCategories.Body,
-	[tostring(Enum.AssetType.LeftLeg.Value)] = t1.AssetCategories.Body,
-	[tostring(Enum.AssetType.RightLeg.Value)] = t1.AssetCategories.Body,
-	[tostring(Enum.AssetType.ClimbAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.FallAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.IdleAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.JumpAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.RunAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.SwimAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.WalkAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.EmoteAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.TShirtAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.ShirtAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.PantsAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.JacketAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.SweaterAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.ShortsAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.LeftShoeAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.RightShoeAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.DressSkirtAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.EyelashAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.EyebrowAccessory.Value)] = t1.AssetCategories.Accessory,
-	[tostring(Enum.AssetType.MoodAnimation.Value)] = t1.AssetCategories.Animation,
-	[tostring(Enum.AssetType.DynamicHead.Value)] = t1.AssetCategories.Body
+Constants.AssetTypeIdToCategory = {
+	[tostring(Enum.AssetType.TShirt.Value)] = Constants.AssetCategories.Clothing,
+	[tostring(Enum.AssetType.Hat.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.HairAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.FaceAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.NeckAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.ShoulderAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.FrontAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.BackAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.WaistAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.Shirt.Value)] = Constants.AssetCategories.Clothing,
+	[tostring(Enum.AssetType.Pants.Value)] = Constants.AssetCategories.Clothing,
+	[tostring(Enum.AssetType.Gear.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.Head.Value)] = Constants.AssetCategories.Body,
+	[tostring(Enum.AssetType.Face.Value)] = Constants.AssetCategories.Body,
+	[tostring(Enum.AssetType.Torso.Value)] = Constants.AssetCategories.Body,
+	[tostring(Enum.AssetType.RightArm.Value)] = Constants.AssetCategories.Body,
+	[tostring(Enum.AssetType.LeftArm.Value)] = Constants.AssetCategories.Body,
+	[tostring(Enum.AssetType.LeftLeg.Value)] = Constants.AssetCategories.Body,
+	[tostring(Enum.AssetType.RightLeg.Value)] = Constants.AssetCategories.Body,
+	[tostring(Enum.AssetType.ClimbAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.FallAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.IdleAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.JumpAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.RunAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.SwimAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.WalkAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.EmoteAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.TShirtAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.ShirtAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.PantsAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.JacketAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.SweaterAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.ShortsAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.LeftShoeAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.RightShoeAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.DressSkirtAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.EyelashAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.EyebrowAccessory.Value)] = Constants.AssetCategories.Accessory,
+	[tostring(Enum.AssetType.MoodAnimation.Value)] = Constants.AssetCategories.Animation,
+	[tostring(Enum.AssetType.DynamicHead.Value)] = Constants.AssetCategories.Body
 }
 
 if FFlagAXInspectAndBuyMakeupSupport then
-	t1.AssetTypeIdToCategory[tostring(Enum.AssetType.EyeMakeup.Value)] = t1.AssetCategories.Makeup
-	t1.AssetTypeIdToCategory[tostring(Enum.AssetType.FaceMakeup.Value)] = t1.AssetCategories.Makeup
-	t1.AssetTypeIdToCategory[tostring(Enum.AssetType.LipMakeup.Value)] = t1.AssetCategories.Makeup
+	Constants.AssetTypeIdToCategory[tostring(Enum.AssetType.EyeMakeup.Value)] = Constants.AssetCategories.Makeup
+	Constants.AssetTypeIdToCategory[tostring(Enum.AssetType.FaceMakeup.Value)] = Constants.AssetCategories.Makeup
+	Constants.AssetTypeIdToCategory[tostring(Enum.AssetType.LipMakeup.Value)] = Constants.AssetCategories.Makeup
 end
 
-t1.AssetCategoriesLocalized = {
-	[t1.AssetCategories.Animation] = "Feature.Catalog.Label.Animation",
-	[t1.AssetCategories.Body] = "Feature.Catalog.Label.Body",
-	[t1.AssetCategories.Clothing] = "Feature.Avatar.Heading.Clothing",
-	[t1.AssetCategories.Accessory] = "Feature.Avatar.Label.Accessory",
-	[t1.AssetCategories.Emotes] = "Feature.Catalog.Label.Emotes"
+Constants.AssetCategoriesLocalized = {
+	[Constants.AssetCategories.Animation] = "Feature.Catalog.Label.Animation",
+	[Constants.AssetCategories.Body] = "Feature.Catalog.Label.Body",
+	[Constants.AssetCategories.Clothing] = "Feature.Avatar.Heading.Clothing",
+	[Constants.AssetCategories.Accessory] = "Feature.Avatar.Label.Accessory",
+	[Constants.AssetCategories.Emotes] = "Feature.Catalog.Label.Emotes"
 }
 
 if FFlagAXInspectAndBuyMakeupSupport then
-	t1.AssetCategoriesLocalized[t1.AssetCategories.Makeup] = "Feature.Catalog.Label.Makeup"
+	Constants.AssetCategoriesLocalized[Constants.AssetCategories.Makeup] = "Feature.Catalog.Label.Makeup"
 end
 
-t1.AssetTypeIdToTypeLocalized = {
+Constants.AssetTypeIdToTypeLocalized = {
 	[tostring(Enum.AssetType.TShirt.Value)] = "Feature.Avatar.Label.ClassicTShirts",
 	[tostring(Enum.AssetType.Hat.Value)] = "Feature.Avatar.Label.Hat",
 	[tostring(Enum.AssetType.HairAccessory.Value)] = "Feature.Avatar.Label.Hair",
@@ -209,49 +201,55 @@ t1.AssetTypeIdToTypeLocalized = {
 }
 
 if FFlagAXInspectAndBuyMakeupSupport then
-	t1.AssetTypeIdToTypeLocalized[tostring(Enum.AssetType.EyeMakeup.Value)] = "Feature.Catalog.Label.EyeMakeup"
-	t1.AssetTypeIdToTypeLocalized[tostring(Enum.AssetType.FaceMakeup.Value)] = "Feature.Catalog.Label.FaceMakeup"
-	t1.AssetTypeIdToTypeLocalized[tostring(Enum.AssetType.LipMakeup.Value)] = "Feature.Catalog.Label.LipMakeup"
+	Constants.AssetTypeIdToTypeLocalized[tostring(Enum.AssetType.EyeMakeup.Value)] = "Feature.Catalog.Label.EyeMakeup"
+	Constants.AssetTypeIdToTypeLocalized[tostring(Enum.AssetType.FaceMakeup.Value)] = "Feature.Catalog.Label.FaceMakeup"
+	Constants.AssetTypeIdToTypeLocalized[tostring(Enum.AssetType.LipMakeup.Value)] = "Feature.Catalog.Label.LipMakeup"
 end
 
-t1.MoodAnimationAssetTypeId = "78"
-t1.DynamicHeadAssetTypeId = "79"
-t1.DetailsThumbnailFrameHeight = 250
-t1.LimitedIconFrameSizeXOffset = 9
-t1.LimitedIconFrameSizeYOffset = 4
-t1.DynamicHeadAssetTypes = {
+Constants.MoodAnimationAssetTypeId = "78"
+Constants.DynamicHeadAssetTypeId = "79"
+
+Constants.DetailsThumbnailFrameHeight = 250
+
+Constants.LimitedIconFrameSizeXOffset = 9
+Constants.LimitedIconFrameSizeYOffset = 4
+
+local set = {
 	[tostring(Enum.AssetType.EyebrowAccessory.Value)] = true,
 	[tostring(Enum.AssetType.EyelashAccessory.Value)] = true,
-	[t1.MoodAnimationAssetTypeId] = true,
-	[t1.DynamicHeadAssetTypeId] = true
+	[Constants.MoodAnimationAssetTypeId] = true,
+	[Constants.DynamicHeadAssetTypeId] = true
 }
-t1.AccessoryTypeEnumToAssetTypeId = {}
+Constants.DynamicHeadAssetTypes = set
 
-for k, v in pairs(t1.AssetTypeIdToAccessoryTypeEnum) do
-	t1.AccessoryTypeEnumToAssetTypeId[v] = k
+Constants.AccessoryTypeEnumToAssetTypeId = {}
+
+for k, accessoryTypeEnum in pairs(Constants.AssetTypeIdToAccessoryTypeEnum) do
+	Constants.AccessoryTypeEnumToAssetTypeId[accessoryTypeEnum] = k
 end
 
-t1.AssetCategoryToAssetType = {
-	[t1.AssetCategory.Tops] = {
+Constants.AssetCategoryToAssetType = {
+	[Constants.AssetCategory.Tops] = {
 		tostring(Enum.AssetType.ShirtAccessory.Value),
 		tostring(Enum.AssetType.TShirtAccessory.Value),
 		(tostring(Enum.AssetType.SweaterAccessory.Value))
 	},
-	[t1.AssetCategory.Bottoms] = {
+	[Constants.AssetCategory.Bottoms] = {
 		tostring(Enum.AssetType.PantsAccessory.Value),
 		tostring(Enum.AssetType.ShortsAccessory.Value),
 		(tostring(Enum.AssetType.DressSkirtAccessory.Value))
 	}
 }
-t1.AssetTypeToAssetCategory = {}
 
-for k, v in pairs(t1.AssetCategoryToAssetType) do
-	for _, v2 in ipairs(v) do
-		t1.AssetTypeToAssetCategory[v2] = k
+Constants.AssetTypeToAssetCategory = {}
+
+for k, list in pairs(Constants.AssetCategoryToAssetType) do
+	for _, item in ipairs(list) do
+		Constants.AssetTypeToAssetCategory[item] = k
 	end
 end
 
-t1.LayeredClothingOrder = {
+Constants.LayeredClothingOrder = {
 	[tostring(Enum.AssetType.Pants.Value)] = 0,
 	[tostring(Enum.AssetType.Shirt.Value)] = 1,
 	[tostring(Enum.AssetType.TShirt.Value)] = 2,
@@ -268,18 +266,18 @@ t1.LayeredClothingOrder = {
 	[tostring(Enum.AssetType.EyebrowAccessory.Value)] = 3,
 	[tostring(Enum.AssetType.EyelashAccessory.Value)] = 3
 }
-t1.ProductType = {
-	CollectibleItem = "Collectible Item"
-}
-t1.ItemRestrictions = {
+
+Constants.ProductType = { CollectibleItem = "Collectible Item" }
+
+Constants.ItemRestrictions = {
 	Limited = "Limited",
 	LimitedUnique = "LimitedUnique",
 	Collectible = "Collectible"
 }
-t1.SaleStatus = {
-	OnSale = "OnSale"
-}
-t1.SaleLocationType = {
+
+Constants.SaleStatus = { OnSale = "OnSale" }
+
+Constants.SaleLocationType = {
 	Invalid = 0,
 	ShopOnly = 1,
 	MyExperiencesOnly = 2,
@@ -289,12 +287,14 @@ t1.SaleLocationType = {
 	ExperiencesDevApiOnly = 6,
 	ShopAndExperiencesById = 7
 }
-t1.CounterSuffix = {
+
+Constants.CounterSuffix = {
 	RequestSucceeded = "RequestSucceeded",
 	RequestRejected = "RequestRejected",
 	RequestFailed = "RequestFailed"
 }
-t1.Counters = {
+
+Constants.Counters = {
 	CreateFavoriteForAsset = "CreateFavoriteForAsset",
 	CreateFavoriteForBundle = "CreateFavoriteForBundle",
 	DeleteFavoriteForAsset = "DeleteFavoriteForAsset",
@@ -328,7 +328,8 @@ t1.Counters = {
 	TryOnButtonClicked = "TryOnButtonClicked",
 	GetAvatarPreview = "GetAvatarPreview",
 	BatchGetAssets = "BatchGetAssets",
-	BatchGetItemDetails = "BatchGetItemDetails"
+	BatchGetItemDetails = "BatchGetItemDetails",
+	GetAvatarBackground = "GetAvatarBackground"
 }
 
-return t1
+return Constants

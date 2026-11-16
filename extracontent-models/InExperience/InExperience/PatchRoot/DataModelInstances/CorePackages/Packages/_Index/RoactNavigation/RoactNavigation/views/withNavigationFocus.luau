@@ -1,62 +1,51 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local Object = require(scriptParentParentParent.LuauPolyfill).Object
-local React = require(scriptParentParentParent.React)
-local Events = require(scriptParentParent.Events)
-local withNavigation = require(scriptParent.withNavigation)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local LuauPolyfill = require(parent3.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local React = require(parent3.React)
+local Events = require(parent2.Events)
+local withNavigation = require(parent.withNavigation)
 
-local function isComponent(p1) -- line: 12
-	local v10 = type(p1)
-
-	return v10 == "function" or v10 == "table"
+local function isComponent(p): boolean -- 1 equivalent call inferred from this helper
+	local typeName = type(p)
+	return typeName == "function" or typeName == "table"
 end
 
-return function(p2) -- line: 17
-	-- upvalues: React (copy), Events (copy), Object (copy), withNavigation (copy)
-	local v12 = type(p2)
+return function(p)
+	assert(isComponent(p), "withNavigationFocus must be called with a Roact component (stateful or functional)") -- inferred equivalent call
+	local extended = React.Component:extend("NavigationFocusComponent")
 
-	assert(v12 == "function" or v12 == "table", "withNavigationFocus must be called with a Roact component (stateful or functional)")
-
-	local v13 = React.Component:extend("NavigationFocusComponent")
-
-	function v13.init(p3) -- line: 21
-		p3.state = {
-			isFocused = p3.props.navigation.isFocused()
+	function extended:init()
+		self.state = {
+			isFocused = self.props.navigation.isFocused()
 		}
 	end
-	function v13.didMount(p4) -- line: 27
-		-- upvalues: Events (copy)
-		local navigation = p4.props.navigation
 
-		p4.subscriptions = {
-			navigation.addListener(Events.WillFocus, function() -- line: 31
-				-- upvalues: p4 (copy)
-				p4:setState({
-					isFocused = true
-				})
+	function extended:didMount()
+		local navigation = self.props.navigation
+
+		self.subscriptions = {
+			navigation.addListener(Events.WillFocus, function()
+				self:setState({ isFocused = true })
 			end),
-			navigation.addListener(Events.WillBlur, function() -- line: 37
-				-- upvalues: p4 (copy)
-				p4:setState({
-					isFocused = false
-				})
+			navigation.addListener(Events.WillBlur, function()
+				self:setState({ isFocused = false })
 			end)
 		}
 	end
-	function v13.willUnmount(p5) -- line: 46
-		for _, v19 in p5.subscriptions do
-			v19.remove()
+
+	function extended.willUnmount(p2)
+		for _, subscription in p2.subscriptions do
+			subscription.remove()
 		end
 	end
-	function v13.render(p6) -- line: 52
-		-- upvalues: React (copy), p2 (copy), Object (copy)
-		return React.createElement(p2, Object.assign(table.clone(p6.props), {
-			isFocused = p6.state.isFocused
+
+	function extended.render(p2)
+		return React.createElement(p, Object.assign(table.clone(p2.props), {
+			isFocused = p2.state.isFocused
 		}))
 	end
 
-	return withNavigation(v13, {
-		forwardRef = false
-	})
+	return withNavigation(extended, { forwardRef = false })
 end

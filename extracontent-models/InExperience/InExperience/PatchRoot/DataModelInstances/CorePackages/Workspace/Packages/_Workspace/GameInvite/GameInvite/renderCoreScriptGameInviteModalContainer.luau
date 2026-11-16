@@ -1,65 +1,83 @@
 local CoreGui = game:GetService("CoreGui")
-local scriptParent = script.Parent
-local Components = scriptParent.Components
-local scriptParentParent = scriptParent.Parent
-local React = require(scriptParentParent.React)
-local RoactRodux = require(scriptParentParent.RoactRodux)
-local ReactRoblox = require(scriptParentParent.ReactRoblox)
-local Style = require(scriptParentParent.Style)
-local UniversalAppPolicy = require(scriptParentParent.UniversalAppPolicy)
-local ApolloProvider = require(scriptParentParent.ApolloClient).ApolloProvider
-local GameInviteConstants = require(scriptParent.GameInviteConstants)
-local GameInviteModal = require(Components.GameInviteModal)
+local parent = script.Parent
+local components = parent.Components
+local parent2 = parent.Parent
 
-require(scriptParent.gameInviteModalType)
+local React = require(parent2.React)
+local RoactRodux = require(parent2.RoactRodux)
+local ReactRoblox = require(parent2.ReactRoblox)
+local Style = require(parent2.Style)
+local UniversalAppPolicy = require(parent2.UniversalAppPolicy)
+local ApolloClient = require(parent2.ApolloClient)
+local ApolloProvider = ApolloClient.ApolloProvider
+local GameInviteConstants = require(parent.GameInviteConstants)
+local GameInviteModal = require(components.GameInviteModal)
+require(parent.gameInviteModalType)
 
 local AppFeaturePolicies = UniversalAppPolicy.AppFeaturePolicies
 local RoactAppPolicy = UniversalAppPolicy.RoactAppPolicy
 local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
-local Localization = require(scriptParentParent.InExperienceLocales).Localization
-local LocalizationProvider = require(scriptParentParent.Localization).LocalizationProvider
+local InExperienceLocales = require(parent2.InExperienceLocales)
+local Localization = InExperienceLocales.Localization
+local Localization2 = require(parent2.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
 local LocalizationService = game:GetService("LocalizationService")
-local FoundationProvider = require(scriptParentParent.Foundation).FoundationProvider
+local Foundation = require(parent2.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
 
 game:DefineFastFlag("FixGameInviteModalLoadTimeIncrease", false)
+local v
 
-local u20 = nil
-
-if not game:GetFastFlag("FixGameInviteModalLoadTimeIncrease") then
-	u20 = require(scriptParentParent.RobloxApolloClient).initializeApolloClient({})
+if game:GetFastFlag("FixGameInviteModalLoadTimeIncrease") then
+	v = nil
+else
+	local RobloxApolloClient = require(parent2.RobloxApolloClient)
+	v = RobloxApolloClient.initializeApolloClient({})
 end
 
-return function(p1) -- line: 34
-	-- upvalues: scriptParent (copy), CoreGui (copy), React (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), RoactRodux (copy), RoactAppPolicy (copy), AppFeaturePolicies (copy), StyleProviderWithDefaultTheme (copy), ApolloProvider (copy), u20 (ref), GameInviteModal (copy), GameInviteConstants (copy), ReactRoblox (copy), FoundationProvider (copy)
-	local GameInviteStore = require(scriptParent.State.GameInviteStore)
-	local Folder = Instance.new("Folder")
+return function(client)
+	local GameInviteStore = require(parent.State.GameInviteStore)
+	local gameInvite = Instance.new("Folder")
+	gameInvite.Name = "GameInvite"
+	gameInvite.Parent = CoreGui
 
-	Folder.Name = "GameInvite"
-	Folder.Parent = CoreGui
-
-	local v24 = React.createElement(LocalizationProvider, {
+	local createElement = React.createElement
+	local v2 = {
 		localization = Localization.new(LocalizationService.RobloxLocaleId)
-	}, { React.createElement(RoactRodux.StoreProvider, {
-		store = GameInviteStore
-	}, {
-		PolicyProvider = React.createElement(RoactAppPolicy.Provider, {
-			policy = { AppFeaturePolicies }
-		}, {
-			StyleProvider = React.createElement(StyleProviderWithDefaultTheme, {}, {
-				ApolloClientProvider = React.createElement(ApolloProvider, {
-					client = if not game:GetFastFlag("FixGameInviteModalLoadTimeIncrease") then u20 else p1
-				}, {
-					GameInviteModalWrapper = React.createElement(GameInviteModal, {
-						displayOrder = -1,
-						renderLocation = GameInviteConstants.RenderLocation.CoreScripts
+	}
+
+	local createElement2 = React.createElement
+	local storeProvider = RoactRodux.StoreProvider
+
+	local createElement3 = React.createElement
+	local provider = RoactAppPolicy.Provider
+
+	local createElement4 = React.createElement
+	local createElement5 = React.createElement
+
+	if not game:GetFastFlag("FixGameInviteModalLoadTimeIncrease") then
+		client = v
+	end
+
+	local element = createElement(LocalizationProvider, v2, {
+		createElement2(storeProvider, { store = GameInviteStore }, {
+			PolicyProvider = createElement3(provider, {
+				policy = { AppFeaturePolicies }
+			}, {
+				StyleProvider = createElement4(StyleProviderWithDefaultTheme, {}, {
+					ApolloClientProvider = createElement5(ApolloProvider, { client = client }, {
+						GameInviteModalWrapper = React.createElement(GameInviteModal, {
+							displayOrder = -1,
+							renderLocation = GameInviteConstants.RenderLocation.CoreScripts
+						})
 					})
 				})
 			})
 		})
-	}) })
-	local v25 = ReactRoblox.createRoot(Folder)
+	})
 
-	v25:render(React.createElement(FoundationProvider, nil, { v24 }))
+	local root = ReactRoblox.createRoot(gameInvite)
+	root:render(React.createElement(FoundationProvider, nil, { element }))
 
-	return v25
+	return root
 end

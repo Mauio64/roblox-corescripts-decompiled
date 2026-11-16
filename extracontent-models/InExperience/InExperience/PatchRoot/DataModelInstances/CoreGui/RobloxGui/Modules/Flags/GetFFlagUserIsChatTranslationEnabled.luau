@@ -1,8 +1,7 @@
-local ok, result = pcall(function() -- line: 1
+local success, result = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserIsChatTranslationEnabled2")
 end)
 
-return function() -- line: 5
-	-- upvalues: ok (copy), result (copy)
-	return ok and result
+return function()
+	return success and result
 end

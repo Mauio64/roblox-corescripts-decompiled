@@ -1,5 +1,1 @@
-return {
-	Finished = "CallFinished",
-	Declined = "CallDeclined",
-	Missed = "CallMissed"
-}
+return { Finished = "CallFinished", Declined = "CallDeclined", Missed = "CallMissed" }

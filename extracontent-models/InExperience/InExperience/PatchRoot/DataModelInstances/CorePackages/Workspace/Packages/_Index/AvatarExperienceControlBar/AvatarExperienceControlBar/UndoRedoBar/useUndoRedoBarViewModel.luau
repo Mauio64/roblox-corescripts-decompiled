@@ -1,223 +1,234 @@
 local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
-local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
-local React = require(AvatarExperienceControlBarParent.React)
-local AvatarExperienceSave = require(AvatarExperienceControlBarParent.AvatarExperienceSave)
-local AvatarExperienceCommon = require(AvatarExperienceControlBarParent.AvatarExperienceCommon)
-local SignalsReact = require(AvatarExperienceControlBarParent.SignalsReact)
-local Navigation = require(AvatarExperienceControlBarParent.Navigation)
-local AvatarExperienceNavigation = require(AvatarExperienceControlBarParent.AvatarExperienceNavigation)
-local AvatarExperienceAnalytics = require(AvatarExperienceControlBarParent.AvatarExperienceAnalytics)
-local AvatarExperienceFlags = require(AvatarExperienceControlBarParent.AvatarExperienceFlags)
-local Foundation = require(AvatarExperienceControlBarParent.Foundation)
-local ToastRodux = require(AvatarExperienceControlBarParent.ToastRodux)
-local tutils = require(AvatarExperienceControlBarParent.tutils)
+
+local parent = AvatarExperienceControlBar.Parent
+local React = require(parent.React)
+local AvatarExperienceSave = require(parent.AvatarExperienceSave)
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local SignalsReact = require(parent.SignalsReact)
+local Navigation = require(parent.Navigation)
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local Foundation = require(parent.Foundation)
+local ToastRodux = require(parent.ToastRodux)
+local tutils = require(parent.tutils)
+
 local IconName = Foundation.Enums.IconName
+
 local FFlagAXExtendUndoRedoTracking = AvatarExperienceFlags.FFlagAXExtendUndoRedoTracking
+
 local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
 local FFlagAXResetAvatarButton = AvatarExperienceFlags.FFlagAXResetAvatarButton
-local FFlagDynamicHeadsMigration = AvatarExperienceFlags.FFlagDynamicHeadsMigration
+
 local SlotBasedEditorAnalytics = AvatarExperienceAnalytics.Surfaces.SlotBasedEditorAnalytics
+
 local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
 local ToastType = ToastRodux.Enums.ToastType
+
 local useSelectorSignal = AvatarExperienceCommon.Hooks.useSelectorSignal
 local useTokens = Foundation.Hooks.useTokens
-local useDispatch = require(AvatarExperienceControlBarParent.RoactUtils).Hooks.RoactRodux.useDispatch
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useAvatarSaveContext = AvatarExperienceSave.Context.useAvatarSaveContext
 local useNavigation = Navigation.useNavigation
 local useAvatarRoute = AvatarExperienceNavigation.AvatarRoute.Hooks.useAvatarRoute
 local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
+
 local CharacterHistoryStateChangeButtonActivated = AvatarExperienceCommon.State.Actions.CharacterHistoryStateChangeButtonActivated
 local ClearScreens = AvatarExperienceNavigation.Actions.ClearScreens
-local FFlagAXMISEnableMultiShopping = AvatarExperienceFlags.FFlagAXMISEnableMultiShopping
+
 local MenuItemEnum = require(AvatarExperienceControlBar.Enums.MenuItemEnum)
-local v33 = if not FFlagAXResetAvatarButton then nil else AvatarExperienceSave.Selectors.selectCharacterData
-local ClearTryOns = require(AvatarExperienceControlBarParent.AvatarExperienceRodux).Actions.ClearTryOns
+local selectCharacterData
+
+if FFlagAXResetAvatarButton then
+	selectCharacterData = AvatarExperienceSave.Selectors.selectCharacterData
+else
+	selectCharacterData = nil
+end
+
+local AvatarExperienceRodux = require(parent.AvatarExperienceRodux)
+local ClearTryOns = AvatarExperienceRodux.Actions.ClearTryOns
 
 require(AvatarExperienceControlBar.ControlBarTypes)
-
 local Constants = require(AvatarExperienceControlBar.Constants)
-local v36 = if not FFlagAXResetAvatarButton then nil else {
-	toastMessage = "Feature.Avatar.Message.OutfitCleared",
-	isLocalized = false,
-	toastType = ToastType.SuccessConfirmation
-}
 
-local function useUndoRedoBarViewModel() -- line: 61
-	-- upvalues: useNavigation (copy), useDispatch (copy), FFlagAXMigrateBuilderIcons (copy), useTokens (copy), useAvatarSaveContext (copy), FFlagAXResetAvatarButton (copy), useSelectorSignal (copy), v33 (copy), tutils (copy), FFlagAXExtendUndoRedoTracking (copy), useAvatarRoute (copy), SignalsReact (copy), React (copy), FFlagDynamicHeadsMigration (copy), Constants (copy), SlotBasedEditorAnalytics (copy), CharacterHistoryStateChangeButtonActivated (copy), FFlagAXMISEnableMultiShopping (copy), AvatarScreen (copy), ClearScreens (copy), ClearTryOns (copy), SetCurrentToastMessage (copy), v36 (copy), MenuItemEnum (copy), IconName (copy)
-	local v38 = useNavigation()
-	local v39 = useDispatch()
-	local v40 = if not FFlagAXMigrateBuilderIcons then nil else useTokens()
-	local v41 = useAvatarSaveContext()
-	local getHistorySignal = v41.getHistorySignal
-	local getCurrentHistoryIndexSignal = v41.getCurrentHistoryIndexSignal
-	local v44 = if not FFlagAXResetAvatarButton then nil else useSelectorSignal(v33, tutils.deepEqual)
-	local v45 = if not FFlagAXExtendUndoRedoTracking then nil else useAvatarRoute()
-	local v46 = SignalsReact.useSignalState(getHistorySignal)
-	local v47 = SignalsReact.useSignalState(getCurrentHistoryIndexSignal)
-	local v48 = if not FFlagAXResetAvatarButton then nil else SignalsReact.useSignalState(v44)
-	local v49 = React.useMemo(function() -- line: 86
-		-- upvalues: v47 (copy), v46 (copy)
-		local v54 = v47
+local v = FFlagAXResetAvatarButton
+	and {
+		toastMessage = "Feature.Avatar.Message.OutfitCleared",
+		isLocalized = false,
+		toastType = ToastType.SuccessConfirmation
+	}
+	or nil
 
-		if v54 and v46 then
-			return v54 == 1
-		end
+local function useUndoRedoBarViewModel()
+	local v2 = useNavigation()
+	local v3 = useDispatch()
+	local v4
 
-		return true
-	end, {
-		v47,
-		v46
-	})
-	local v50 = React.useMemo(function() -- line: 94
-		-- upvalues: v47 (copy), v46 (copy)
-		local v55 = v47
+	if FFlagAXMigrateBuilderIcons then
+		v4 = useTokens()
+	else
+		v4 = nil
+	end
 
-		if v55 and v46 then
-			return v55 == #v46
-		end
+	local v5 = useAvatarSaveContext()
+	local getHistorySignal = v5.getHistorySignal
+	local getCurrentHistoryIndexSignal = v5.getCurrentHistoryIndexSignal
+	local v6
 
-		return true
-	end, {
-		v47,
-		v46
-	})
-	local v51 = if not FFlagAXResetAvatarButton then nil else React.useMemo(function() -- line: 103
-		-- upvalues: FFlagDynamicHeadsMigration (copy), v48 (copy), Constants (copy)
-		if FFlagDynamicHeadsMigration then
-			if v48 and v48.tryOn and v48.tryOn.OutfitTryOn and next(v48.tryOn.OutfitTryOn.TryOnItems) ~= nil then
+	if FFlagAXResetAvatarButton then
+		v6 = useSelectorSignal(selectCharacterData, tutils.deepEqual)
+	else
+		v6 = nil
+	end
+
+	local v7
+
+	if FFlagAXExtendUndoRedoTracking then
+		v7 = useAvatarRoute()
+	else
+		v7 = nil
+	end
+
+	local v8 = SignalsReact.useSignalState(getHistorySignal)
+	local v9 = SignalsReact.useSignalState(getCurrentHistoryIndexSignal)
+	local v10
+
+	if FFlagAXResetAvatarButton then
+		v10 = SignalsReact.useSignalState(v6)
+	else
+		v10 = nil
+	end
+
+	local disabled = React.useMemo(function(): boolean
+		local v11 = v9
+		return not (v11 and v8) or v11 == 1
+	end, { v9, v8 })
+
+	local disabled2 = React.useMemo(function(): boolean
+		local v11 = v9
+
+		return not (v11 and v8) or v11 == #v8
+	end, { v9, v8 })
+	local disabled3
+
+	if FFlagAXResetAvatarButton then
+		disabled3 = React.useMemo(function(): boolean
+			if v10 and v10.tryOn and v10.tryOn.OutfitTryOn and next(v10.tryOn.OutfitTryOn.TryOnItems) ~= nil then
 				return false
 			end
 
-			if not v48 or not v48.equipped or not v48.equipped.EquippedAssets then
+			if not (v10 and v10.equipped and v10.equipped.EquippedAssets) then
 				return true
 			end
 
-			for v56 in v48.equipped.EquippedAssets do
-				if table.find(Constants.AssetTypeStringsToKeep, v56) == nil then
+			for k in v10.equipped.EquippedAssets do
+				if table.find(Constants.AssetTypeStringsToKeep, k) == nil then
 					return false
 				end
 			end
 
 			return true
-		end
+		end, { v10, v8 })
+	else
+		disabled3 = nil
+	end
 
-		if next(v48.tryOn.OutfitTryOn.TryOnItems) ~= nil then
-			return false
-		end
+	local v11 = React.useCallback(function(isUndo: boolean)
+		local v11 = v5 and v5.updateHistoryIndexAndGetCharacterData(v9 + (isUndo and -1 or 1))
 
-		for v57 in v48.equipped.EquippedAssets do
-			if table.find(Constants.AssetTypeStringsToKeep, v57) == nil then
-				return false
+		if v11 then
+			local trackUndoRedoClick = SlotBasedEditorAnalytics.trackUndoRedoClick
+			local v12
+
+			if FFlagAXExtendUndoRedoTracking and v7 and v7.opaque then
+				v12 = v7.opaque.name
 			end
+
+			trackUndoRedoClick(isUndo, v12)
+
+			v3(CharacterHistoryStateChangeButtonActivated({
+				isUndo = isUndo,
+				equipped = v11.equipped,
+				tryOn = v11.tryOn
+			}))
+
+			v2.dispatch(ClearScreens({ AvatarScreen.LookDetails }))
 		end
+	end, { v3, v5, v9, v2, v7, v8 })
+	local v12
 
-		return true
-	end, {
-		v48,
-		v46
-	})
-	local v52 = React.useCallback(function(b1: boolean) -- line: 142
-		-- upvalues: v41 (copy), v47 (copy), SlotBasedEditorAnalytics (copy), FFlagAXExtendUndoRedoTracking (copy), v45 (copy), v39 (copy), CharacterHistoryStateChangeButtonActivated (copy), FFlagAXMISEnableMultiShopping (copy), v38 (copy), AvatarScreen (copy), ClearScreens (copy)
-		if v41 then
-			local v59 = v41.updateHistoryIndexAndGetCharacterData(v47 + (not b1 and 1 or -1))
+	if FFlagAXResetAvatarButton then
+		v12 = React.useCallback(function()
+			local v13 = v6(false)
 
-			if v59 then
-				SlotBasedEditorAnalytics.trackUndoRedoClick(b1, if not FFlagAXExtendUndoRedoTracking or (not v45 or not v45.opaque) then nil else v45.opaque.name)
-				v39(CharacterHistoryStateChangeButtonActivated({
-					isUndo = b1,
-					equipped = v59.equipped,
-					tryOn = v59.tryOn
-				}))
-
-				if v59.tryOn.OutfitTryOn and v59.tryOn.OutfitTryOn.LookId ~= nil and v59.tryOn.OutfitTryOn.LookId ~= "" and not FFlagAXMISEnableMultiShopping then
-					v38.navigate(AvatarScreen.LookDetails)
-
-					return
+			if v13 then
+				if SlotBasedEditorAnalytics.trackAvatarRemoveAllClick and v7 and v7.opaque then
+					SlotBasedEditorAnalytics.trackAvatarRemoveAllClick(v7.opaque.name)
 				end
 
-				v38.dispatch(ClearScreens({ AvatarScreen.LookDetails }))
+				local equippedAssets = {}
+
+				for _, v14 in Constants.AssetTypeStringsToKeep do
+					equippedAssets[v14] = v13.equipped.EquippedAssets[v14]
+				end
+
+				v13.equipped.EquippedAssets = equippedAssets
+
+				v3(CharacterHistoryStateChangeButtonActivated(v13))
+
+				v3(ClearTryOns())
+
+				v3(SetCurrentToastMessage(v))
 			end
-		end
-	end, {
-		v39,
-		v41,
-		v47,
-		v38,
-		v45,
-		v46
-	})
-	local v53 = if not FFlagAXResetAvatarButton then nil else React.useCallback(function() -- line: 179
-		-- upvalues: v44 (copy), SlotBasedEditorAnalytics (copy), v45 (copy), Constants (copy), v39 (copy), CharacterHistoryStateChangeButtonActivated (copy), ClearTryOns (copy), SetCurrentToastMessage (copy), v36 (copy)
-		local v60 = v44(false)
-
-		if v60 then
-			if SlotBasedEditorAnalytics.trackAvatarRemoveAllClick and v45 and v45.opaque then
-				SlotBasedEditorAnalytics.trackAvatarRemoveAllClick(v45.opaque.name)
-			end
-
-			local t1 = {}
-
-			for _, v63 in Constants.AssetTypeStringsToKeep do
-				t1[v63] = v60.equipped.EquippedAssets[v63]
-			end
-
-			v60.equipped.EquippedAssets = t1
-			v39(CharacterHistoryStateChangeButtonActivated(v60))
-			v39(ClearTryOns())
-			v39(SetCurrentToastMessage(v36))
-		end
-	end, { v39 })
+		end, { v3 })
+	else
+		v12 = nil
+	end
 
 	if FFlagAXExtendUndoRedoTracking then
-		React.useEffect(function() -- line: 209
-			-- upvalues: SlotBasedEditorAnalytics (copy), v45 (copy), v46 (copy)
-			if SlotBasedEditorAnalytics.trackUndoHistoryCount and (v45 and v45.opaque and v46 and #v46) then
-				SlotBasedEditorAnalytics.trackUndoHistoryCount(v45.opaque.name, #v46)
+		React.useEffect(function()
+			if SlotBasedEditorAnalytics.trackUndoHistoryCount and v7 and v7.opaque and v8 and #v8 then
+				SlotBasedEditorAnalytics.trackUndoHistoryCount(v7.opaque.name, #v8)
 			end
-		end, {
-			v46,
-			v45
-		})
+		end, { v8, v7 })
 	end
 
 	return {
-		items = React.useMemo(function() -- line: 224
-			-- upvalues: FFlagAXResetAvatarButton (copy), MenuItemEnum (copy), IconName (copy), v40 (copy), v53 (copy), v51 (copy), FFlagAXMigrateBuilderIcons (copy), v52 (copy), v49 (copy), v50 (copy)
+		items = React.useMemo(function()
 			if FFlagAXResetAvatarButton then
 				return {
 					{
 						type = "icon",
-						isActive = false,
 						id = MenuItemEnum.Reset.Reset,
 						icon = IconName.ArrowSpinClockwise,
-						iconSize = v40.Size.Size_500,
-						onActivated = function() -- line: 233
-							-- upvalues: v53 (copy)
-							v53()
+						iconSize = v4.Size.Size_500,
+						isActive = false,
+						onActivated = function()
+							v12()
 						end,
-						disabled = v51
+						disabled = disabled3
 					},
 					{
 						type = "icon",
-						isActive = false,
 						id = MenuItemEnum.Undo,
 						icon = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/undo" or IconName.ArrowCurlToLeft,
-						onActivated = function() -- line: 244
-							-- upvalues: v52 (copy)
-							v52(true)
+						onActivated = function()
+							v11(true)
 						end,
-						disabled = v49
+						disabled = disabled,
+						isActive = false
 					},
 					{
 						type = "icon",
-						isActive = false,
 						id = MenuItemEnum.Redo,
 						icon = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/redo" or IconName.ArrowCurlToRight,
-						onActivated = function() -- line: 256
-							-- upvalues: v52 (copy)
-							v52(false)
+						onActivated = function()
+							v11(false)
 						end,
-						disabled = v50
+						disabled = disabled2,
+						isActive = false
 					}
 				}
 			end
@@ -225,38 +236,26 @@ local function useUndoRedoBarViewModel() -- line: 61
 			return {
 				{
 					type = "icon",
-					isActive = false,
 					id = MenuItemEnum.Undo,
 					icon = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/undo" or IconName.ArrowCurlToLeft,
-					onActivated = function() -- line: 271
-						-- upvalues: v52 (copy)
-						v52(true)
+					onActivated = function()
+						v11(true)
 					end,
-					disabled = v49
+					disabled = disabled,
+					isActive = false
 				},
 				{
 					type = "icon",
-					isActive = false,
 					id = MenuItemEnum.Redo,
 					icon = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/redo" or IconName.ArrowCurlToRight,
-					onActivated = function() -- line: 283
-						-- upvalues: v52 (copy)
-						v52(false)
+					onActivated = function()
+						v11(false)
 					end,
-					disabled = v50
+					disabled = disabled2,
+					isActive = false
 				}
 			}
-		end, if not FFlagAXResetAvatarButton then {
-			v49,
-			v50,
-			v52
-		} else {
-			v49,
-			v50,
-			v51,
-			v52,
-			v53
-		})
+		end, FFlagAXResetAvatarButton and { disabled, disabled2, disabled3, v11, v12 } or { disabled, disabled2, v11 })
 	}
 end
 

@@ -1,1 +1,3 @@
-return (require(script.Slider))
+local Slider = require(script.Slider)
+
+return Slider

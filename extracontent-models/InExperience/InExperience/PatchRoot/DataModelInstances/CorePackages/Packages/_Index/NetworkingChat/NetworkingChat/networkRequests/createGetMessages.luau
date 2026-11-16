@@ -1,19 +1,16 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.networkingChatTypes)
+local CHAT_URL = require(parent.CHAT_URL)
 
-require(ParentParent.networkingChatTypes)
-
-local CHAT_URL = require(ParentParent.CHAT_URL)
-
-return function(p1) -- line: 6
-	-- upvalues: CHAT_URL (copy)
-	return p1.roduxNetworking.GET({
-		Name = "GetMessages"
-	}, function(p2, p3, p4, p5) -- line: 9
-		-- upvalues: CHAT_URL (copy)
-		return p2(CHAT_URL):path("v2"):path("get-messages"):queryArgs({
-			conversationId = p3,
-			pageSize = p4,
-			exclusiveStartMessageId = p5
-		}):setStatusIds({ p3 })
-	end)
+return function(p)
+	return p.roduxNetworking.GET(
+		{ Name = "GetMessages" },
+		function(callback, conversationId, pageSize, exclusiveStartMessageId)
+			return callback(CHAT_URL):path("v2"):path("get-messages"):queryArgs({
+				conversationId = conversationId,
+				pageSize = pageSize,
+				exclusiveStartMessageId = exclusiveStartMessageId
+			}):setStatusIds({ conversationId })
+		end
+	)
 end

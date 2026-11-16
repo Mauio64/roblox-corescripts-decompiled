@@ -1,54 +1,60 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Roact = require(Parent.Roact)
-local AppFonts = require(Parent.Style).AppFonts
-local Colors = require(Parent.Style).Colors
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+
+local Roact = require(parent.Roact)
+local Style = require(parent.Style)
+local AppFonts = Style.AppFonts
+
+local Style2 = require(parent.Style)
+local Colors = Style2.Colors
 local White = Colors.White
 local Gray2 = Colors.Gray2
-local v7 = Roact.PureComponent:extend("CountryCodeSelectorButton")
-local Text = require(Parent.AppCommonLib).Text
 
-function v7.init(p1) -- line: 14
-	function p1.selectionCallback() -- line: 15
-		-- upvalues: p1 (copy)
-		if p1.props.ListButtonProps.SelectionCallback then
-			p1.props.ListButtonProps.SelectionCallback(p1.props.Data)
+local extended = Roact.PureComponent:extend("CountryCodeSelectorButton")
+local AppCommonLib = require(parent.AppCommonLib)
+local Text = AppCommonLib.Text
+
+function extended:init()
+	function self.selectionCallback()
+		if self.props.ListButtonProps.SelectionCallback then
+			self.props.ListButtonProps.SelectionCallback(self.props.Data)
 		end
 	end
 end
-function v7.render(p2) -- line: 22
-	-- upvalues: Text (copy), AppFonts (copy), Roact (copy), White (copy), Gray2 (copy)
-	local v11 = p2.props.Data.localizedName or ""
-	local v12 = "+" .. (p2.props.Data.prefix or "")
-	local ListButtonPropsTextSize = p2.props.ListButtonProps.TextSize
-	local v14 = Text.GetTextWidth(v12, AppFonts.default:getDefault(), ListButtonPropsTextSize)
+
+function extended.render(p)
+	local localizedName = p.props.Data.localizedName or ""
+	local text = "+" .. (p.props.Data.prefix or "")
+	local textSize = p.props.ListButtonProps.TextSize
+
+	local textWidth = Text.GetTextWidth(text, AppFonts.default:getDefault(), textSize)
 
 	return Roact.createElement("TextButton", {
-		Size = p2.props.Size,
+		Size = p.props.Size,
 		BackgroundTransparency = 1,
-		LayoutOrder = p2.props.LayoutOrder,
+		LayoutOrder = p.props.LayoutOrder,
 		Text = "",
-		[Roact.Event.Activated] = p2.selectionCallback
+		[Roact.Event.Activated] = p.selectionCallback
 	}, {
 		CountryName = Roact.createElement("TextLabel", {
+			Size = UDim2.new(1, -textWidth, 1, 0),
+			Text = localizedName,
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -v14, 1, 0),
-			Text = v11,
 			Font = AppFonts.default:getDefault(),
 			TextColor3 = White,
-			TextSize = ListButtonPropsTextSize,
+			TextSize = textSize,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd
 		}),
 		CountryPrefix = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
-			Text = v12,
+			Text = text,
+			BackgroundTransparency = 1,
 			Font = AppFonts.default:getDefault(),
 			TextColor3 = Gray2,
-			TextSize = ListButtonPropsTextSize,
+			TextSize = textSize,
 			TextXAlignment = Enum.TextXAlignment.Right
 		})
 	})
 end
 
-return v7
+return extended

@@ -1,14 +1,13 @@
 local Players = game:GetService("Players")
 
-local function getCurrentUserId() -- line: 7
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
+local function getCurrentUserId()
+	local localPlayer = Players.LocalPlayer
 
-	if LocalPlayer == nil then
+	if localPlayer == nil then
 		return nil
 	end
 
-	return (tostring(LocalPlayer.UserId))
+	return (tostring(localPlayer.UserId))
 end
 
 return getCurrentUserId

@@ -1,212 +1,216 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local invariant = require(ParentParent.jsUtils.invariant)
 
+local invariant = require(parent.jsUtils.invariant)
 require(script.Parent.ViewabilityHelper)
 
-local keyExtractor = require(script.Parent.VirtualizeUtils).keyExtractor
-local View = require(ParentParent.Components.View.View)
+local VirtualizeUtils = require(script.Parent.VirtualizeUtils)
+local keyExtractor = VirtualizeUtils.keyExtractor
+
+local View = require(parent.Components.View.View)
 local VirtualizedList = require(script.Parent.VirtualizedList)
-local React = require(ParentParentParent.React)
-local ItemWithSeparator = nil
-local v13 = React.PureComponent:extend("VirtualizedSectionList")
 
-function v13.init(p1) -- line: 206
-	-- upvalues: invariant (copy), keyExtractor (copy), Object (copy), Array (copy), Boolean (copy), React (copy), ItemWithSeparator (ref)
-	p1._updateHighlightMap = {}
-	p1._updatePropsMap = {}
-	p1._listRef = nil
+local React = require(parent2.React)
 
-	function p1._captureRef(p2) -- line: 210
-		-- upvalues: p1 (copy)
-		p1._listRef = p2
+local ItemWithSeparator
+
+local extended = React.PureComponent:extend("VirtualizedSectionList")
+
+function extended:init()
+	self._updateHighlightMap = {}
+	self._updatePropsMap = {}
+	self._listRef = nil
+	function self._captureRef(listRef)
+		self._listRef = listRef
 	end
-	function p1._keyExtractor(_, n1: number) -- line: 214
-		-- upvalues: p1 (copy)
-		local v90 = p1:_subExtractor(n1)
 
-		if v90 then
-			return v90.key
+	function self._keyExtractor(_, p: number)
+		local v = self:_subExtractor(p)
+
+		if v then
+			return v.key
 		end
 
-		return (tostring(n1))
+		return (tostring(p))
 	end
-	function p1._convertViewable(p4) -- line: 219
-		-- upvalues: invariant (copy), p1 (copy), keyExtractor (copy), Object (copy)
-		invariant(p4.index ~= nil, "Received a broken ViewToken")
 
-		local v92 = p1:_subExtractor(p4.index)
+	function self._convertViewable(p)
+		invariant(p.index ~= nil, "Received a broken ViewToken")
+		local v = self:_subExtractor(p.index)
 
-		if not v92 then
+		if not v then
 			return nil
 		end
 
-		local keyExtractor2 = v92.section.keyExtractor
-		local v94 = if not p1.props.keyExtractor then keyExtractor else p1.props.keyExtractor
-		local v95 = if keyExtractor2 == nil then v94(p4.item, if v92.index ~= nil then v92.index else 1) else keyExtractor2(p4.item, v92.index)
+		local keyExtractor2 = v.section.keyExtractor
+		local v2
 
-		return Object.assign({}, p4, {
-			index = v92.index,
-			key = v95,
-			section = v92.section
-		})
+		if self.props.keyExtractor then
+			v2 = self.props.keyExtractor
+		else
+			v2 = keyExtractor
+		end
+
+		local v3
+
+		if keyExtractor2 == nil then
+			v3 = v2(p.item, v.index == nil and 1 or v.index)
+		else
+			v3 = keyExtractor2(p.item, v.index)
+		end
+
+		return Object.assign({}, p, { index = v.index, key = v3, section = v.section })
 	end
-	function p1._onViewableItemsChanged(t1: {[any]: any}) -- line: 242
-		-- upvalues: p1 (copy), Array (copy), Boolean (copy)
-		local viewableItems = t1.viewableItems
-		local changed = t1.changed
-		local onViewableItemsChanged = p1.props.onViewableItemsChanged
+
+	function self._onViewableItemsChanged(p)
+		local viewableItems = p.viewableItems
+		local changed = p.changed
+		local onViewableItemsChanged = self.props.onViewableItemsChanged
 
 		if onViewableItemsChanged ~= nil then
 			onViewableItemsChanged({
-				viewableItems = Array.filter(Array.map(viewableItems, p1._convertViewable, p1), Boolean.toJSBoolean),
-				changed = Array.filter(Array.map(changed, p1._convertViewable, p1), Boolean.toJSBoolean)
+				viewableItems = Array.filter(Array.map(viewableItems, self._convertViewable, self), Boolean.toJSBoolean),
+				changed = Array.filter(Array.map(changed, self._convertViewable, self), Boolean.toJSBoolean)
 			})
 		end
 	end
-	function p1._renderItem(n2: number) -- line: 259
-		-- upvalues: p1 (copy), Boolean (copy), invariant (copy), React (copy), ItemWithSeparator (ref)
-		return function(t2: {[any]: any}) -- line: 260
-			-- upvalues: p1 (copy), Boolean (copy), n2 (copy), invariant (copy), React (copy), ItemWithSeparator (ref)
-			local item = t2.item
-			local index = t2.index
-			local v118 = p1:_subExtractor(index)
 
-			if not v118 then
+	function self._renderItem(p: number)
+		return function(p2)
+			local item = p2.item
+			local index = p2.index
+			local v = self:_subExtractor(index)
+
+			if not v then
 				return nil
 			end
 
-			local index2 = v118.index
+			local index2 = v.index
 
 			if index2 == nil then
-				local section = v118.section
+				local section = v.section
 
-				if v118.header == true then
-					local renderSectionHeader = p1.props.renderSectionHeader
+				if v.header == true then
+					local renderSectionHeader = self.props.renderSectionHeader
 
 					if Boolean.toJSBoolean(renderSectionHeader) then
-						return (renderSectionHeader({
-							section = section
-						}))
+						return (renderSectionHeader({ section = section }))
+					end
+
+					return nil
+				else
+					local renderSectionFooter = self.props.renderSectionFooter
+
+					if Boolean.toJSBoolean(renderSectionFooter) then
+						return (renderSectionFooter({ section = section }))
 					end
 
 					return nil
 				end
+			else
+				local renderItem = v.section.renderItem or self.props.renderItem
+				local separatorComponent = self:_getSeparatorComponent(index, v, p)
+				invariant(renderItem, "no renderItem!")
+				local createElement = React.createElement
+				local v2 = ItemWithSeparator
+				local leadingSeparatorComponent
 
-				local renderSectionFooter = p1.props.renderSectionFooter
-
-				if Boolean.toJSBoolean(renderSectionFooter) then
-					return (renderSectionFooter({
-						section = section
-					}))
+				if index2 == 1 then
+					leadingSeparatorComponent = self.props.SectionSeparatorComponent
 				end
 
-				return nil
+				return createElement(v2, {
+					SeparatorComponent = separatorComponent,
+					LeadingSeparatorComponent = leadingSeparatorComponent,
+					cellKey = v.key,
+					index = index2,
+					item = item,
+					leadingItem = v.leadingItem,
+					leadingSection = v.leadingSection,
+					prevCellKey = (self:_subExtractor(index - 1) or {}).key,
+					setSelfHighlightCallback = self._setUpdateHighlightFor,
+					setSelfUpdatePropsCallback = self._setUpdatePropsFor,
+					updateHighlightFor = self._updateHighlightFor,
+					updatePropsFor = self._updatePropsFor,
+					renderItem = renderItem,
+					section = v.section,
+					trailingItem = v.trailingItem,
+					trailingSection = v.trailingSection,
+					inverted = Boolean.toJSBoolean(self.props.inverted),
+					horizontal = self.props.horizontal
+				})
 			end
-
-			local v123 = v118.section.renderItem or p1.props.renderItem
-			local v124 = p1:_getSeparatorComponent(index, v118, n2)
-
-			invariant(v123, "no renderItem!")
-
-			return React.createElement(ItemWithSeparator, {
-				SeparatorComponent = v124,
-				LeadingSeparatorComponent = if index2 ~= 1 then nil else p1.props.SectionSeparatorComponent,
-				cellKey = v118.key,
-				index = index2,
-				item = item,
-				leadingItem = v118.leadingItem,
-				leadingSection = v118.leadingSection,
-				prevCellKey = (p1:_subExtractor(index - 1) or {}).key,
-				setSelfHighlightCallback = p1._setUpdateHighlightFor,
-				setSelfUpdatePropsCallback = p1._setUpdatePropsFor,
-				updateHighlightFor = p1._updateHighlightFor,
-				updatePropsFor = p1._updatePropsFor,
-				renderItem = v123,
-				section = v118.section,
-				trailingItem = v118.trailingItem,
-				trailingSection = v118.trailingSection,
-				inverted = Boolean.toJSBoolean(p1.props.inverted),
-				horizontal = p1.props.horizontal
-			})
 		end
 	end
-	function p1._updatePropsFor(s1: string, p5) -- line: 312
-		-- upvalues: p1 (copy)
-		local v103 = p1._updatePropsMap[s1]
 
-		if v103 ~= nil then
-			v103(p5)
+	function self._updatePropsFor(p: string, p2)
+		local updateProp = self._updatePropsMap[p]
+
+		if updateProp ~= nil then
+			updateProp(p2)
 		end
 	end
-	function p1._updateHighlightFor(s2: string, b1: boolean) -- line: 319
-		-- upvalues: p1 (copy)
-		local v106 = p1._updateHighlightMap[s2]
 
-		if v106 ~= nil then
-			v106(b1)
+	function self._updateHighlightFor(p: string, flag: boolean)
+		local updateHighlight = self._updateHighlightMap[p]
+
+		if updateHighlight ~= nil then
+			updateHighlight(flag)
 		end
 	end
-	function p1._setUpdateHighlightFor(s3: string, p6: ((...any) -> ...any)?) -- line: 326
-		-- upvalues: p1 (copy)
-		if p6 ~= nil then
-			p1._updateHighlightMap[s3] = p6
 
-			return
+	function self._setUpdateHighlightFor(p: string, callback)
+		if callback == nil then
+			self._updateHighlightMap[p] = nil
+		else
+			self._updateHighlightMap[p] = callback
 		end
-
-		p1._updateHighlightMap[s3] = nil
 	end
-	function p1._setUpdatePropsFor(s4: string, p7: ((...any) -> ...any)?) -- line: 334
-		-- upvalues: p1 (copy)
-		if p7 ~= nil then
-			p1._updatePropsMap[s4] = p7
 
-			return
+	function self._setUpdatePropsFor(p: string, callback)
+		if callback == nil then
+			self._updatePropsMap[p] = nil
+		else
+			self._updatePropsMap[p] = callback
 		end
-
-		p1._updatePropsMap[s4] = nil
 	end
 end
-function v13.scrollToLocation(t3: {[any]: any}, t4: {[any]: any}) -- line: 343
-	-- upvalues: Object (copy)
-	local itemIndex = t4.itemIndex
-	local n3 = 1
 
-	while n3 < t4.sectionIndex do
-		itemIndex += t3.props.getItemCount(t3.props.sections[n3].data) + 2
-		n3 += 1
+function extended:scrollToLocation(data)
+	local itemIndex = data.itemIndex
+	local v = 1
+
+	while v < data.sectionIndex do
+		itemIndex += self.props.getItemCount(self.props.sections[v].data) + 2
+		v += 1
 	end
 
-	local v19 = t4.viewOffset or 0
+	local viewOffset = data.viewOffset or 0
 
-	if t3._listRef == nil then
+	if self._listRef == nil then
 		return
 	end
 
-	if t4.itemIndex > 1 and t3.props.stickySectionHeadersEnabled then
-		v19 += t3._listRef.__getFrameMetricsApprox(itemIndex - t4.itemIndex).length
+	if data.itemIndex > 1 and self.props.stickySectionHeadersEnabled then
+		viewOffset += self._listRef.__getFrameMetricsApprox(itemIndex - data.itemIndex).length
 	end
 
-	local v20 = Object.assign({}, t4, {
-		viewOffset = v19,
-		index = itemIndex
-	})
+	local v2 = Object.assign({}, data, { viewOffset = viewOffset, index = itemIndex })
+	self._listRef:scrollToIndex(v2)
+end
 
-	t3._listRef:scrollToIndex(v20)
+function extended:getListRef()
+	return self._listRef
 end
-function v13.getListRef(p8) -- line: 365
-	return p8._listRef
-end
-function v13.render(p9) -- line: 369
-	-- upvalues: Object (copy), React (copy), VirtualizedList (copy)
-	local _ = p9.props.renderItem
-	local _ = p9.props.sections
-	local v25 = Object.assign({}, p9.props, {
+
+function extended:render()
+	local _renderItem = self.props.renderItem
+	local _sections = self.props.sections
+	local v = Object.assign({}, self.props, {
 		ItemSeparatorComponent = Object.None,
 		SectionSeparatorComponent = Object.None,
 		renderItem = Object.None,
@@ -215,256 +219,304 @@ function v13.render(p9) -- line: 369
 		sections = Object.None,
 		stickySectionHeadersEnabled = Object.None
 	})
-	local v26 = not p9.props.ListHeaderComponent and 0 or 1
-	local v27 = if not p9.props.stickySectionHeadersEnabled then nil else {}
-	local n4 = 0
 
-	for _, v in ipairs(p9.props.sections) do
-		if v27 ~= nil then
-			table.insert(v27, n4 + v26)
+	local v2 = self.props.ListHeaderComponent and 1 or 0
+
+	local stickyHeaderIndices = self.props.stickySectionHeadersEnabled and {} or nil
+	local itemCount = 0
+
+	for _, section in ipairs(self.props.sections) do
+		if stickyHeaderIndices ~= nil then
+			table.insert(stickyHeaderIndices, itemCount + v2)
 		end
 
-		n4 = n4 + 2 + p9.props.getItemCount(v.data)
+		itemCount = itemCount + 2 + self.props.getItemCount(section.data)
 	end
 
-	local v31 = p9._renderItem(n4)
+	local item = self._renderItem(itemCount)
 
-	return React.createElement(VirtualizedList, Object.assign({}, v25, {
-		keyExtractor = p9._keyExtractor,
-		stickyHeaderIndices = v27,
-		renderItem = v31,
-		data = p9.props.sections,
-		getItem = function(p10, p11) -- line: 406
-			-- upvalues: p9 (copy)
-			return p9:_getItem(p9.props, p10, p11)
+	local createElement = React.createElement
+
+	local assign = Object.assign
+	local v3 = {
+		keyExtractor = self._keyExtractor,
+		stickyHeaderIndices = stickyHeaderIndices,
+		renderItem = item,
+		data = self.props.sections,
+		getItem = function(p, p2)
+			return self:_getItem(self.props, p, p2)
 		end,
-		getItemCount = function() -- line: 409
-			-- upvalues: n4 (ref)
-			return n4
+		getItemCount = function()
+			return itemCount
 		end,
-		onViewableItemsChanged = if not p9.props.onViewableItemsChanged then nil else p9._onViewableItemsChanged,
-		ref = p9._captureRef
-	}))
+		onViewableItemsChanged = 0,
+		ref = 0
+	}
+	local onViewableItemsChanged
+
+	if self.props.onViewableItemsChanged then
+		onViewableItemsChanged = self._onViewableItemsChanged
+	end
+
+	v3.onViewableItemsChanged = onViewableItemsChanged
+	v3.ref = self._captureRef
+	return createElement(VirtualizedList, assign({}, v, v3))
 end
-function v13._getItem(_: {[any]: any}, p12, p13, n5: number) -- line: 418
-	if not p13 then
+
+function extended:_getItem(p, list, p2: number)
+	if not list then
 		return nil
 	end
 
-	local v36 = n5 - 1
-	local n6 = 1
+	local v = p2 - 1
+	local v2 = 1
 
-	while n6 <= #p13 do
-		local v38 = p13[n6]
-		local data = v38.data
-		local v40 = p12.getItemCount(data)
+	while v2 <= #list do
+		local item = list[v2]
+		local data = item.data
+		local itemCount = p.getItemCount(data)
 
-		if v36 == 0 or v36 == v40 + 1 then
-			return v38
+		if v == 0 or v == itemCount + 1 then
+			return item
 		end
 
-		if v36 <= v40 then
-			return p12.getItem(data, v36)
+		if v <= itemCount then
+			return p.getItem(data, v)
 		end
 
-		v36 -= v40 + 2
-		n6 += 1
+		v -= itemCount + 2
+
+		v2 += 1
 	end
 
 	return nil
 end
-function v13._subExtractor(t6: {[any]: any}, n7: number) -- line: 449
-	-- upvalues: Boolean (copy), keyExtractor (copy)
-	local props = t6.props
+
+function extended:_subExtractor(p: number)
+	local props = self.props
 	local getItem = props.getItem
 	local getItemCount = props.getItemCount
-	local keyExtractor3 = props.keyExtractor
+	local keyExtractor2 = props.keyExtractor
 	local sections = props.sections
-	local n8 = 1
+	local v = 1
 
-	while n8 <= #sections do
-		local v49 = sections[n8]
-		local data = v49.data
-		local v51 = if not Boolean.toJSBoolean(v49.key) then tostring(n8) else tostring(v49.key)
-		local v52 = n7 - 1
+	while v <= #sections do
+		local section = sections[v]
+		local data = section.data
+		local v2
 
-		if not (v52 > getItemCount(data) + 1) then
-			if v52 == 0 then
-				return {
-					index = nil,
-					header = true,
-					section = v49,
-					key = v51 .. ":header",
-					trailingSection = sections[n8 + 1]
-				}
-			end
-
-			if v52 == getItemCount(data) + 1 then
-				return {
-					index = nil,
-					header = false,
-					section = v49,
-					key = v51 .. ":footer",
-					trailingSection = sections[n8 + 1]
-				}
-			end
-
-			local v53 = v49.keyExtractor or (keyExtractor3 or keyExtractor)
-
-			return {
-				section = v49,
-				key = v51 .. ":" .. tostring(v53(getItem(data, v52), v52)),
-				index = v52,
-				leadingItem = getItem(data, v52 - 1),
-				leadingSection = sections[n8 - 1],
-				trailingItem = getItem(data, v52 + 1),
-				trailingSection = sections[n8 + 1]
-			}
+		if Boolean.toJSBoolean(section.key) then
+			v2 = tostring(section.key)
+		else
+			v2 = tostring(v)
 		end
 
-		n7 = v52 - (getItemCount(data) + 1)
-		n8 += 1
+		local v3 = p - 1
+
+		if getItemCount(data) + 1 < v3 then
+			p = v3 - (getItemCount(data) + 1)
+
+			v += 1
+		else
+			if v3 == 0 then
+				return {
+					section = section,
+					key = v2 .. ":header",
+					index = nil,
+					header = true,
+					trailingSection = sections[v + 1]
+				}
+			end
+
+			if v3 == getItemCount(data) + 1 then
+				return {
+					section = section,
+					key = v2 .. ":footer",
+					index = nil,
+					header = false,
+					trailingSection = sections[v + 1]
+				}
+			end
+
+			return {
+				section = section,
+				key = v2 .. ":" .. tostring((section.keyExtractor or keyExtractor2 or keyExtractor)(
+					getItem(data, v3),
+					v3
+				)),
+				index = v3,
+				leadingItem = getItem(data, v3 - 1),
+				leadingSection = sections[v - 1],
+				trailingItem = getItem(data, v3 + 1),
+				trailingSection = sections[v + 1]
+			}
+		end
 	end
 
 	return nil
 end
-function v13._getSeparatorComponent(t7: {[any]: any}, n9: number, p14, n10: number) -- line: 511
-	-- upvalues: Boolean (copy)
-	if not p14 then
-		p14 = t7:_subExtractor(n9)
-	end
 
-	if not p14 then
+function extended:_getSeparatorComponent(p: number, p2, p3: number)
+	p2 = p2 or self:_subExtractor(p)
+
+	if not p2 then
 		return nil
 	end
 
-	local v58 = Boolean.toJSBoolean(p14.section.ItemSeparatorComponent) and p14.section.ItemSeparatorComponent or t7.props.ItemSeparatorComponent
-	local SectionSeparatorComponent = t7.props.SectionSeparatorComponent
-	local v60 = n9 == n10
-	local v61 = p14.index == t7.props.getItemCount(p14.section.data)
+	local itemSeparatorComponent = Boolean.toJSBoolean(p2.section.ItemSeparatorComponent)
+		and p2.section.ItemSeparatorComponent
+		or self.props.ItemSeparatorComponent
+	local sectionSeparatorComponent = self.props.SectionSeparatorComponent
+	local v = p == p3
+	local v2 = p2.index == self.props.getItemCount(p2.section.data)
 
-	if SectionSeparatorComponent and v61 then
-		return SectionSeparatorComponent
+	if sectionSeparatorComponent and v2 then
+		return sectionSeparatorComponent
 	end
 
-	if v58 and not v61 and not v60 then
-		return v58
+	if itemSeparatorComponent and not (v2 or v) then
+		return itemSeparatorComponent
 	end
 
 	return nil
 end
-function ItemWithSeparator(p15) -- line: 563
-	-- upvalues: React (copy), Object (copy), View (copy)
-	local LeadingSeparatorComponent = p15.LeadingSeparatorComponent
-	local SeparatorComponent = p15.SeparatorComponent
-	local cellKey = p15.cellKey
-	local prevCellKey = p15.prevCellKey
-	local setSelfHighlightCallback = p15.setSelfHighlightCallback
-	local updateHighlightFor = p15.updateHighlightFor
-	local setSelfUpdatePropsCallback = p15.setSelfUpdatePropsCallback
-	local updatePropsFor = p15.updatePropsFor
-	local item = p15.item
-	local index = p15.index
-	local section = p15.section
-	local inverted = p15.inverted
-	local v75, v76 = React.useState(false)
-	local v77, v78 = React.useState(false)
-	local v79, v80 = React.useState({
-		LayoutOrder = -1,
-		leadingItem = p15.leadingItem,
-		leadingSection = p15.leadingSection,
-		section = p15.section,
-		trailingItem = p15.item,
-		trailingSection = p15.trailingSection
-	})
-	local v81, v82 = React.useState({
-		LayoutOrder = 1,
-		leadingItem = p15.item,
-		leadingSection = p15.leadingSection,
-		section = p15.section,
-		trailingItem = p15.trailingItem,
-		trailingSection = p15.trailingSection
+
+ItemWithSeparator = function(props)
+	local leadingSeparatorComponent = props.LeadingSeparatorComponent
+	local separatorComponent = props.SeparatorComponent
+	local cellKey = props.cellKey
+	local prevCellKey = props.prevCellKey
+	local setSelfHighlightCallback = props.setSelfHighlightCallback
+	local updateHighlightFor = props.updateHighlightFor
+	local setSelfUpdatePropsCallback = props.setSelfUpdatePropsCallback
+	local updatePropsFor = props.updatePropsFor
+	local item = props.item
+	local index = props.index
+	local section = props.section
+	local inverted = props.inverted
+
+	local state, setState = React.useState(false)
+
+	local state2, setState2 = React.useState(false)
+
+	local state3, setState3 = React.useState({
+		leadingItem = props.leadingItem,
+		leadingSection = props.leadingSection,
+		section = props.section,
+		trailingItem = props.item,
+		trailingSection = props.trailingSection,
+		LayoutOrder = -1
 	})
 
-	React.useEffect(function() -- line: 601
-		-- upvalues: setSelfHighlightCallback (copy), cellKey (copy), v78 (copy), setSelfUpdatePropsCallback (copy), v82 (copy)
-		setSelfHighlightCallback(cellKey, v78)
-		setSelfUpdatePropsCallback(cellKey, v82)
+	local state4, setState4 = React.useState({
+		leadingItem = props.item,
+		leadingSection = props.leadingSection,
+		section = props.section,
+		trailingItem = props.trailingItem,
+		trailingSection = props.trailingSection,
+		LayoutOrder = 1
+	})
 
-		return function() -- line: 604
-			-- upvalues: setSelfUpdatePropsCallback (copy), cellKey (copy), setSelfHighlightCallback (copy)
+	React.useEffect(function()
+		setSelfHighlightCallback(cellKey, setState2)
+		setSelfUpdatePropsCallback(cellKey, setState4)
+		return function()
 			setSelfUpdatePropsCallback(cellKey, nil)
 			setSelfHighlightCallback(cellKey, nil)
 		end
-	end, {
-		cellKey,
-		setSelfHighlightCallback,
-		v82,
-		setSelfUpdatePropsCallback
-	})
+	end, { cellKey, setSelfHighlightCallback, setState4, setSelfUpdatePropsCallback })
 
-	local t8 = {
-		highlight = function() -- line: 611
-			-- upvalues: v76 (copy), v78 (copy), prevCellKey (copy), updateHighlightFor (copy)
-			v76(true)
-			v78(true)
-
-			if prevCellKey ~= nil then
-				updateHighlightFor(prevCellKey, true)
-			end
-		end,
-		unhighlight = function() -- line: 618
-			-- upvalues: v76 (copy), v78 (copy), prevCellKey (copy), updateHighlightFor (copy)
-			v76(false)
-			v78(false)
-
-			if prevCellKey ~= nil then
-				updateHighlightFor(prevCellKey, false)
-			end
-		end,
-		updateProps = function(s5: string, p16) -- line: 625
-			-- upvalues: LeadingSeparatorComponent (copy), v80 (copy), Object (copy), v79 (copy), prevCellKey (copy), updatePropsFor (copy), SeparatorComponent (copy), v82 (copy), v81 (copy)
-			if s5 == "leading" then
-				if LeadingSeparatorComponent ~= nil then
-					v80(Object.assign({}, v79, p16))
-
-					return
-				end
-
-				if prevCellKey ~= nil then
-					updatePropsFor(prevCellKey, Object.assign({}, v79, p16))
-
-					return
-				end
-			elseif s5 == "trailing" and SeparatorComponent ~= nil then
-				v82(Object.assign({}, v81, p16))
-			end
-		end
-	}
-	local v84 = p15.renderItem({
+	local item2 = props.renderItem({
 		item = item,
 		index = index,
 		section = section,
-		separators = t8
-	})
-	local v85 = LeadingSeparatorComponent ~= nil and React.createElement(LeadingSeparatorComponent, Object.assign({
-		highlighted = v75
-	}, v79))
-	local v86 = SeparatorComponent ~= nil and React.createElement(SeparatorComponent, Object.assign({
-		highlighted = v77
-	}, v81))
+		separators = {
+			highlight = function()
+				setState(true)
+				setState2(true)
 
-	if v85 or v86 then
-		return (React.createElement(View, {
-			Size = if not p15.horizontal then UDim2.new(1, 0, 0, 0) else UDim2.new(0, 0, 1, 0),
-			AutomaticSize = if not p15.horizontal then Enum.AutomaticSize.Y else Enum.AutomaticSize.X
-		}, React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = if not p15.horizontal then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal
-		}), if inverted ~= false then v86 else v85, v84, if inverted ~= false then v85 else v86))
+				if prevCellKey ~= nil then
+					updateHighlightFor(prevCellKey, true)
+				end
+			end,
+			unhighlight = function()
+				setState(false)
+				setState2(false)
+
+				if prevCellKey ~= nil then
+					updateHighlightFor(prevCellKey, false)
+				end
+			end,
+			updateProps = function(p: string, p2)
+				if p == "leading" then
+					if leadingSeparatorComponent ~= nil then
+						setState3(Object.assign({}, state3, p2))
+					elseif prevCellKey ~= nil then
+						updatePropsFor(prevCellKey, Object.assign({}, state3, p2))
+					end
+				elseif p == "trailing" and separatorComponent ~= nil then
+					setState4(Object.assign({}, state4, p2))
+				end
+			end
+		}
+	})
+	local v
+
+	if leadingSeparatorComponent == nil then
+		v = false
+	else
+		v = React.createElement(leadingSeparatorComponent, Object.assign({ highlighted = state }, state3))
 	end
 
-	return v84
+	local v2
+
+	if separatorComponent == nil then
+		v2 = false
+	else
+		v2 = React.createElement(separatorComponent, Object.assign({ highlighted = state2 }, state4))
+	end
+
+	if not (v or v2) then
+		return item2
+	end
+
+	local createElement = React.createElement
+	local size
+
+	if props.horizontal then
+		size = UDim2.new(0, 0, 1, 0)
+	else
+		size = UDim2.new(1, 0, 0, 0)
+	end
+
+	local automaticSize
+
+	if props.horizontal then
+		automaticSize = Enum.AutomaticSize.X
+	else
+		automaticSize = Enum.AutomaticSize.Y
+	end
+
+	local createElement2 = React.createElement
+	local v3 = { SortOrder = Enum.SortOrder.LayoutOrder, FillDirection = 0 }
+	local fillDirection
+
+	if props.horizontal then
+		fillDirection = Enum.FillDirection.Horizontal
+	else
+		fillDirection = Enum.FillDirection.Vertical
+	end
+
+	v3.FillDirection = fillDirection
+	local element = createElement2("UIListLayout", v3)
+
+	local v4 = if inverted == false then v else v2
+
+	if inverted == false then
+		v = v2
+	end
+
+	return (createElement(View, { Size = size, AutomaticSize = automaticSize }, element, v4, item2, v))
 end
 
-return v13
+return extended

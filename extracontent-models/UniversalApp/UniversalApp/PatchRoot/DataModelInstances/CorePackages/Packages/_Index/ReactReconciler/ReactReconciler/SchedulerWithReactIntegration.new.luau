@@ -1,17 +1,25 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local Array = require(ParentParent.LuauPolyfill).Array
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
 require(script.Parent.ReactInternalTypes)
 
-local Scheduler = require(ParentParent.Scheduler)
-local decoupleUpdatePriorityFromScheduler = require(ParentParent.Shared).ReactFeatureFlags.decoupleUpdatePriorityFromScheduler
-local invariant = require(ParentParent.Shared).invariant
-local describeError = require(ParentParent.Shared).describeError
+local Scheduler = require(parent.Scheduler)
+
+local Shared = require(parent.Shared)
+local ReactFeatureFlags = Shared.ReactFeatureFlags
+
+local decoupleUpdatePriorityFromScheduler = ReactFeatureFlags.decoupleUpdatePriorityFromScheduler
+local Shared2 = require(parent.Shared)
+local invariant = Shared2.invariant
+local Shared3 = require(parent.Shared)
+local describeError = Shared3.describeError
 local ReactFiberLane = require(script.Parent.ReactFiberLane)
 local SyncLanePriority = ReactFiberLane.SyncLanePriority
 local getCurrentUpdateLanePriority = ReactFiberLane.getCurrentUpdateLanePriority
 local setCurrentUpdateLanePriority = ReactFiberLane.setCurrentUpdateLanePriority
+
 local unstable_runWithPriority = Scheduler.unstable_runWithPriority
 local unstable_scheduleCallback = Scheduler.unstable_scheduleCallback
 local unstable_cancelCallback = Scheduler.unstable_cancelCallback
@@ -24,41 +32,44 @@ local unstable_UserBlockingPriority = Scheduler.unstable_UserBlockingPriority
 local unstable_NormalPriority = Scheduler.unstable_NormalPriority
 local unstable_LowPriority = Scheduler.unstable_LowPriority
 local unstable_IdlePriority = Scheduler.unstable_IdlePriority
-local lib = require(script.Parent["ReactFiberSchedulerPriorities.roblox"])
-local ImmediatePriority = lib.ImmediatePriority
-local UserBlockingPriority = lib.UserBlockingPriority
-local NormalPriority = lib.NormalPriority
-local LowPriority = lib.LowPriority
-local IdlePriority = lib.IdlePriority
-local NoPriority = lib.NoPriority
-local u31 = nil
-local t1 = {}
-local v33 = unstable_requestPaint == nil and function() -- line: 94
-end or unstable_requestPaint
-local u34 = nil
-local u35 = nil
-local u36 = false
-local v37 = unstable_now()
 
-function reactPriorityToSchedulerPriority(p1) -- line: 141
-	-- upvalues: ImmediatePriority (copy), unstable_ImmediatePriority (copy), UserBlockingPriority (copy), unstable_UserBlockingPriority (copy), NormalPriority (copy), unstable_NormalPriority (copy), LowPriority (copy), unstable_LowPriority (copy), IdlePriority (copy), unstable_IdlePriority (copy), invariant (copy)
-	if p1 == ImmediatePriority then
+local ReactFiberSchedulerPrioritiesroblox = require(script.Parent["ReactFiberSchedulerPriorities.roblox"])
+local ImmediatePriority = ReactFiberSchedulerPrioritiesroblox.ImmediatePriority
+local UserBlockingPriority = ReactFiberSchedulerPrioritiesroblox.UserBlockingPriority
+local NormalPriority = ReactFiberSchedulerPrioritiesroblox.NormalPriority
+local LowPriority = ReactFiberSchedulerPrioritiesroblox.LowPriority
+local IdlePriority = ReactFiberSchedulerPrioritiesroblox.IdlePriority
+local NoPriority = ReactFiberSchedulerPrioritiesroblox.NoPriority
+
+local fn
+
+local v = {}
+
+local fn2 = unstable_requestPaint == nil and function() end or unstable_requestPaint
+
+local v2 = nil
+local v3 = nil
+local v4 = false
+local v5 = unstable_now()
+
+function reactPriorityToSchedulerPriority(p)
+	if p == ImmediatePriority then
 		return unstable_ImmediatePriority
 	end
 
-	if p1 == UserBlockingPriority then
+	if p == UserBlockingPriority then
 		return unstable_UserBlockingPriority
 	end
 
-	if p1 == NormalPriority then
+	if p == NormalPriority then
 		return unstable_NormalPriority
 	end
 
-	if p1 == LowPriority then
+	if p == LowPriority then
 		return unstable_LowPriority
 	end
 
-	if p1 == IdlePriority then
+	if p == IdlePriority then
 		return unstable_IdlePriority
 	end
 
@@ -67,215 +78,216 @@ function reactPriorityToSchedulerPriority(p1) -- line: 141
 	return nil
 end
 
-local function runWithPriority(p2, p3: ((...any) -> ...any)) -- line: 160
-	-- upvalues: unstable_runWithPriority (copy)
-	local v44 = reactPriorityToSchedulerPriority(p2)
-
-	return unstable_runWithPriority(v44, p3)
+local function runWithPriority(immediatePriority, fn3) -- 2 equivalent calls inferred from this helper
+	return unstable_runWithPriority(reactPriorityToSchedulerPriority(immediatePriority), fn3)
 end
-local function flushSyncCallbackQueue() -- line: 202
-	-- upvalues: u35 (ref), unstable_cancelCallback (copy), u31 (ref)
-	if u35 ~= nil then
-		local v51 = u35
 
-		u35 = nil
-		unstable_cancelCallback(v51)
+local function scheduleSyncCallback(callback)
+	if v2 == nil then
+		v2 = { callback }
+
+		v3 = unstable_scheduleCallback(unstable_ImmediatePriority, fn)
+	else
+		table.insert(v2, callback)
 	end
 
-	return u31()
+	return v
 end
 
-function u31() -- line: 211
-	-- upvalues: u36 (ref), u34 (ref), decoupleUpdatePriorityFromScheduler (copy), getCurrentUpdateLanePriority (copy), ReactGlobals (copy), setCurrentUpdateLanePriority (copy), SyncLanePriority (copy), runWithPriority (copy), describeError (copy), ImmediatePriority (copy), unstable_runWithPriority (copy), Array (copy), unstable_scheduleCallback (copy), unstable_ImmediatePriority (copy), flushSyncCallbackQueue (copy)
-	if not u36 and u34 ~= nil then
-		u36 = true
-
-		local n1 = 1
-
-		if decoupleUpdatePriorityFromScheduler then
-			local v53 = getCurrentUpdateLanePriority()
-			local result = nil
-			local ok
-
-			if not ReactGlobals.__YOLO__ then
-				local v55 = u34
-
-				setCurrentUpdateLanePriority(SyncLanePriority)
-				ok, result = xpcall(runWithPriority, describeError, ImmediatePriority, function() -- line: 232
-					-- upvalues: v55 (copy), n1 (ref)
-					for v66, v67 in v55 do
-						local v68 = v67
-
-						n1 = v66
-
-						repeat
-							v68 = v68(true)
-						until v68 == nil
-					end
-				end)
-				u34 = nil
-			else
-				ok = true
-
-				local v57 = u34
-
-				setCurrentUpdateLanePriority(SyncLanePriority)
-
-				local v58 = ImmediatePriority
-				local v59 = reactPriorityToSchedulerPriority(v58)
-
-				unstable_runWithPriority(v59, function() -- line: 250
-					-- upvalues: v57 (copy), n1 (ref)
-					for v69, v70 in v57 do
-						local v71 = v70
-
-						n1 = v69
-
-						repeat
-							v71 = v71(true)
-						until v71 == nil
-
-						n1 += 1
-					end
-				end)
-				u34 = nil
-			end
-
-			setCurrentUpdateLanePriority(v53)
-			u36 = false
-
-			if not ok then
-				if u34 ~= nil then
-					u34 = Array.slice(u34, n1 + 1)
-				end
-
-				unstable_scheduleCallback(unstable_ImmediatePriority, flushSyncCallbackQueue)
-				error(result)
-			end
-		else
-			local result = nil
-			local ok
-
-			if not ReactGlobals.__YOLO__ then
-				local v61 = u34
-
-				ok, result = xpcall(runWithPriority, describeError, ImmediatePriority, function() -- line: 292
-					-- upvalues: v61 (copy), n1 (ref)
-					for v72, v73 in v61 do
-						local v74 = v73
-
-						n1 = v72
-
-						repeat
-							v74 = v74(true)
-						until v74 == nil
-					end
-				end)
-				u34 = nil
-			else
-				ok = true
-
-				local v63 = u34
-				local v64 = ImmediatePriority
-				local v65 = reactPriorityToSchedulerPriority(v64)
-
-				unstable_runWithPriority(v65, function() -- line: 308
-					-- upvalues: v63 (copy), n1 (ref)
-					for v75, v76 in v63 do
-						local v77 = v76
-
-						n1 = v75
-
-						repeat
-							v77 = v77(true)
-						until v77 == nil
-					end
-				end)
-				u34 = nil
-			end
-
-			u36 = false
-
-			if not ok then
-				if u34 ~= nil then
-					u34 = Array.slice(u34, n1 + 1)
-				end
-
-				unstable_scheduleCallback(unstable_ImmediatePriority, flushSyncCallbackQueue)
-				error(result)
-			end
-		end
-
-		return true
+local function flushSyncCallbackQueue()
+	if v3 ~= nil then
+		local v6 = v3
+		v3 = nil
+		unstable_cancelCallback(v6)
 	end
 
-	return false
+	return fn()
 end
 
-return {
-	ImmediatePriority = ImmediatePriority,
-	UserBlockingPriority = UserBlockingPriority,
-	NormalPriority = NormalPriority,
-	LowPriority = LowPriority,
-	IdlePriority = IdlePriority,
-	NoPriority = NoPriority,
-	getCurrentPriorityLevel = function() -- line: 122
-		-- upvalues: unstable_getCurrentPriorityLevel (copy), unstable_ImmediatePriority (copy), ImmediatePriority (copy), unstable_UserBlockingPriority (copy), UserBlockingPriority (copy), unstable_NormalPriority (copy), NormalPriority (copy), unstable_LowPriority (copy), LowPriority (copy), unstable_IdlePriority (copy), IdlePriority (copy), invariant (copy), NoPriority (copy)
-		local v40 = unstable_getCurrentPriorityLevel()
+fn = function(): boolean
+	if v4 or v2 == nil then
+		return false
+	end
 
-		if v40 == unstable_ImmediatePriority then
-			return ImmediatePriority
-		end
+	v4 = true
+	local v6 = 1
 
-		if v40 == unstable_UserBlockingPriority then
-			return UserBlockingPriority
-		end
+	if decoupleUpdatePriorityFromScheduler then
+		local currentUpdateLanePriority = getCurrentUpdateLanePriority()
 
-		if v40 == unstable_NormalPriority then
-			return NormalPriority
-		end
+		local result = nil
+		local success
 
-		if v40 == unstable_LowPriority then
-			return LowPriority
-		end
+		if ReactGlobals.__YOLO__ then
+			success = true
 
-		if v40 == unstable_IdlePriority then
-			return IdlePriority
-		end
+			local v7 = v2
 
-		invariant(false, "Unknown priority level.")
+			setCurrentUpdateLanePriority(SyncLanePriority)
 
-		return NoPriority
-	end,
-	flushSyncCallbackQueue = flushSyncCallbackQueue,
-	runWithPriority = runWithPriority,
-	scheduleCallback = function(p4, p5: ((...any) -> ...any), t2: {[any]: any}?) -- line: 168
-		-- upvalues: unstable_scheduleCallback (copy)
-		local v48 = reactPriorityToSchedulerPriority(p4)
+			local function fn3()
+				for k, v8 in v7 do
+					v6 = k
 
-		return unstable_scheduleCallback(v48, p5, t2)
-	end,
-	scheduleSyncCallback = function(p6: ((...any) -> ...any)) -- line: 177
-		-- upvalues: u34 (ref), u35 (ref), unstable_scheduleCallback (copy), unstable_ImmediatePriority (copy), u31 (ref), t1 (copy)
-		if u34 == nil then
-			u34 = { p6 }
-			u35 = unstable_scheduleCallback(unstable_ImmediatePriority, u31)
+					repeat
+						v8 = v8(true)
+					until v8 == nil
+
+					v6 += 1
+				end
+			end
+
+			runWithPriority(ImmediatePriority, fn3) -- inferred equivalent call
+			v2 = nil
 		else
-			table.insert(u34, p6)
+			local v7 = v2
+
+			setCurrentUpdateLanePriority(SyncLanePriority)
+			success, result = xpcall(runWithPriority, describeError, ImmediatePriority, function()
+				for k, v8 in v7 do
+					v6 = k
+
+					repeat
+						v8 = v8(true)
+					until v8 == nil
+				end
+			end)
+
+			if ReactFeatureFlags.keepSyncQueueOnError then
+				if success then
+					v2 = nil
+				end
+			else
+				v2 = nil
+			end
 		end
 
-		return t1
-	end,
-	cancelCallback = function(p7) -- line: 196
-		-- upvalues: t1 (copy), unstable_cancelCallback (copy)
-		if p7 ~= t1 then
-			unstable_cancelCallback(p7)
+		setCurrentUpdateLanePriority(currentUpdateLanePriority)
+		v4 = false
+
+		if not success then
+			if v2 ~= nil then
+				v2 = Array.slice(v2, v6 + 1)
+			end
+
+			unstable_scheduleCallback(unstable_ImmediatePriority, flushSyncCallbackQueue)
+
+			error(result)
 		end
-	end,
-	now = function() -- line: 118
-		-- upvalues: unstable_now (copy), v37 (copy)
-		return unstable_now() - v37
-	end,
-	requestPaint = v33,
-	shouldYield = unstable_shouldYield
-}
+	else
+		local result = nil
+		local success
+
+		if ReactGlobals.__YOLO__ then
+			success = true
+
+			local v7 = v2
+
+			local function fn3()
+				for k, v8 in v7 do
+					v6 = k
+
+					repeat
+						v8 = v8(true)
+					until v8 == nil
+				end
+			end
+
+			runWithPriority(ImmediatePriority, fn3) -- inferred equivalent call
+			v2 = nil
+		else
+			local v7 = v2
+
+			success, result = xpcall(runWithPriority, describeError, ImmediatePriority, function()
+				for k, v8 in v7 do
+					v6 = k
+
+					repeat
+						v8 = v8(true)
+					until v8 == nil
+				end
+			end)
+
+			if ReactFeatureFlags.keepSyncQueueOnError then
+				if success then
+					v2 = nil
+				end
+			else
+				v2 = nil
+			end
+		end
+
+		v4 = false
+
+		if not success then
+			if v2 ~= nil then
+				v2 = Array.slice(v2, v6 + 1)
+			end
+
+			unstable_scheduleCallback(unstable_ImmediatePriority, flushSyncCallbackQueue)
+
+			error(result)
+		end
+	end
+
+	return true
+end
+
+local New = {}
+New.ImmediatePriority = ImmediatePriority
+New.UserBlockingPriority = UserBlockingPriority
+New.NormalPriority = NormalPriority
+New.LowPriority = LowPriority
+New.IdlePriority = IdlePriority
+New.NoPriority = NoPriority
+
+function New.getCurrentPriorityLevel()
+	local v6 = unstable_getCurrentPriorityLevel()
+
+	if v6 == unstable_ImmediatePriority then
+		return ImmediatePriority
+	end
+
+	if v6 == unstable_UserBlockingPriority then
+		return UserBlockingPriority
+	end
+
+	if v6 == unstable_NormalPriority then
+		return NormalPriority
+	end
+
+	if v6 == unstable_LowPriority then
+		return LowPriority
+	end
+
+	if v6 == unstable_IdlePriority then
+		return IdlePriority
+	end
+
+	invariant(false, "Unknown priority level.")
+
+	return NoPriority
+end
+
+New.flushSyncCallbackQueue = flushSyncCallbackQueue
+New.runWithPriority = runWithPriority
+
+function New.scheduleCallback(p, callback, p2)
+	return unstable_scheduleCallback(reactPriorityToSchedulerPriority(p), callback, p2)
+end
+
+New.scheduleSyncCallback = scheduleSyncCallback
+
+function New.cancelCallback(p)
+	if p ~= v then
+		unstable_cancelCallback(p)
+	end
+end
+
+function New.now()
+	return unstable_now() - v5
+end
+
+New.requestPaint = fn2
+New.shouldYield = unstable_shouldYield
+return New

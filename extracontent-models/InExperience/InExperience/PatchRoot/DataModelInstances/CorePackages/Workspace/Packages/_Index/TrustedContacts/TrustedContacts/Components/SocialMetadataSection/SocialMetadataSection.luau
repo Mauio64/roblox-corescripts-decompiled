@@ -1,94 +1,123 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedContactsParent = TrustedContacts.Parent
-local React = require(TrustedContactsParent.React)
-local UserProfiles = require(TrustedContactsParent.UserProfiles)
-local useLocalization = require(TrustedContactsParent.Localization).Hooks.useLocalization
+local parent = TrustedContacts.Parent
 
-require(TrustedContactsParent.GraphQLServer)
+local React = require(parent.React)
+local UserProfiles = require(parent.UserProfiles)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-local ApolloProfileInsights = require(TrustedContactsParent.ApolloProfileInsights)
+require(parent.GraphQLServer)
+
+local ApolloProfileInsights = require(parent.ApolloProfileInsights)
 local useProfileInsightsByUserIds = ApolloProfileInsights.Hooks.useProfileInsightsByUserIds
 local getProfileInsightsByUserIdFromData = ApolloProfileInsights.Selectors.getProfileInsightsByUserIdFromData
 local isCustomNil = require(TrustedContacts.Utils.isCustomNil)
-local Signals = require(TrustedContactsParent.Signals)
-local SignalsReact = require(TrustedContactsParent.SignalsReact)
-local Foundation = require(TrustedContactsParent.Foundation)
+
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
 local Skeleton = Foundation.Skeleton
+
 local View = Foundation.View
-local UserTile = require(TrustedContactsParent.UserTile).UserTile
-local LayoutMode = require(TrustedContactsParent.UserTile).LayoutMode
+
+local UserTile = require(parent.UserTile)
+local userTile = UserTile.UserTile
+local UserTile2 = require(parent.UserTile)
+local LayoutMode = UserTile2.LayoutMode
+
 local SocialMetadataIconsAndTextsSection = require(script.Parent.SocialMetadataIconsAndTextsSection)
-local useSignalProfileInsightsByUserId = require(TrustedContactsParent.ProfileInsights).useSignalProfileInsightsByUserId
-local AmpUpsell = require(TrustedContactsParent.AmpUpsell)
+local ProfileInsights = require(parent.ProfileInsights)
+local useSignalProfileInsightsByUserId = ProfileInsights.useSignalProfileInsightsByUserId
+local AmpUpsell = require(parent.AmpUpsell)
 local AmpApiProvider = AmpUpsell.AmpApiProvider
 local AccessResponseEnum = AmpUpsell.AmpEnums.AccessResponseEnum
-local FFlagProfilePlatformAddTC = require(TrustedContactsParent.SharedFlags).FFlagProfilePlatformAddTC
-local FStringParentLinkAmpNameSpace = require(TrustedContactsParent.SharedFlags).FStringParentLinkAmpNameSpace
-local GetFFlagEnableProfileInsightsApolloMigration = require(TrustedContactsParent.SharedFlags).GetFFlagEnableProfileInsightsApolloMigration
-local v25 = game:DefineFastFlag("SocialMetadataSectionMigrateUserProfileToSignals", false)
-local v26 = if not v25 then nil else UserProfiles.Stores.UserProfileStore.get()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformAddTC = SharedFlags.FFlagProfilePlatformAddTC
+local SharedFlags2 = require(parent.SharedFlags)
+local FStringParentLinkAmpNameSpace = SharedFlags2.FStringParentLinkAmpNameSpace
 
-return function(t1: {[any]: any}) -- line: 51
-	-- upvalues: v25 (copy), UserProfiles (copy), React (copy), Signals (copy), v26 (copy), SignalsReact (copy), GetFFlagEnableProfileInsightsApolloMigration (copy), useSignalProfileInsightsByUserId (copy), useProfileInsightsByUserIds (copy), getProfileInsightsByUserIdFromData (copy), isCustomNil (copy), useLocalization (copy), AmpApiProvider (copy), FStringParentLinkAmpNameSpace (copy), AccessResponseEnum (copy), Foundation (copy), View (copy), UserTile (copy), LayoutMode (copy), Skeleton (copy), FFlagProfilePlatformAddTC (copy), SocialMetadataIconsAndTextsSection (copy)
-	local v28 = if v25 then nil else UserProfiles.Hooks.useUserProfilesFetch({
-		userIds = { t1.userId },
-		query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
-	})
-	local s1 = ""
-	local s2 = ""
+local SharedFlags3 = require(parent.SharedFlags)
+local GetFFlagEnableProfileInsightsApolloMigration = SharedFlags3.GetFFlagEnableProfileInsightsApolloMigration
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagTFClassmatesProfileInsight = SharedFlags4.FFlagTFClassmatesProfileInsight
 
-	if not v25 and (v28 and v28.data) then
-		s1 = UserProfiles.Selectors.getCombinedNameFromId(v28.data, t1.userId) or ""
-		s2 = UserProfiles.Selectors.getUsernameFromId(v28.data, t1.userId) or ""
+local defineFastFlag = game:DefineFastFlag("SocialMetadataSectionMigrateUserProfileToSignals", false)
+local v
+
+if defineFastFlag then
+	v = UserProfiles.Stores.UserProfileStore.get()
+else
+	v = nil
+end
+
+return function(props)
+	local v2
+
+	if not defineFastFlag then
+		v2 = UserProfiles.Hooks.useUserProfilesFetch({
+			userIds = { props.userId },
+			query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
+		})
 	end
 
-	if v25 then
-		local v31 = React.useMemo(function() -- line: 71
-			-- upvalues: Signals (copy), v26 (copy), t1 (copy)
-			return Signals.createComputed(function(p1) -- line: 72
-				-- upvalues: v26 (copy), t1 (copy)
-				local v51 = v26 and v26.fetchNamesByUserIds({ (tostring(t1.userId)) })(p1)
-				local v52 = v51 and (v51.data and v51.data[1])
-				local v53 = v52 and v52.names
+	local v3, v4
 
+	if defineFastFlag or not (v2 and v2.data) then
+		v3 = ""
+		v4 = ""
+	else
+		v3 = UserProfiles.Selectors.getCombinedNameFromId(v2.data, props.userId) or ""
+		v4 = UserProfiles.Selectors.getUsernameFromId(v2.data, props.userId) or ""
+	end
+
+	if defineFastFlag then
+		local v5 = React.useMemo(function()
+			return Signals.createComputed(function(p)
+				local v5 = v and v.fetchNamesByUserIds({ (tostring(props.userId)) })(p)
+				local v6 = v5 and v5.data and v5.data[1]
+				local names = v6 and v6.names
 				return {
-					combinedName = not v53 and "" or v53.getCombinedName(p1),
-					username = not v53 and "" or v53.getUsername()
+					combinedName = not names and "" or names.getCombinedName(p),
+					username = not names and "" or names.getUsername()
 				}
 			end)
-		end, { t1.userId })
-		local v32 = SignalsReact.useSignalState(v31)
+		end, { props.userId })
 
-		s2 = v32.username
-		s1 = v32.combinedName
+		local v6 = SignalsReact.useSignalState(v5)
+		v4 = v6.username
+		v3 = v6.combinedName
 	end
 
-	local t2 = {}
-	local v35
+	local v5 = {}
+	local v6
 
 	if GetFFlagEnableProfileInsightsApolloMigration() then
-		local v34
-
-		v34, v35 = useSignalProfileInsightsByUserId({
+		v5, v6 = useSignalProfileInsightsByUserId({
+			userId = props.userId,
 			rankingStrategy = "tc_info_boost",
-			userId = t1.userId
+			forceFetch = true
 		})
-		t2 = v34
 	else
-		local v36 = useProfileInsightsByUserIds({
+		local v7 = useProfileInsightsByUserIds({
+			userIds = { props.userId },
 			rankingStrategy = "tc_info_boost",
-			fetchPolicy = "network-only",
-			userIds = { t1.userId }
+			fetchPolicy = "network-only"
 		})
 
-		if v36 and v36.data and not v36.loading then
-			t2 = getProfileInsightsByUserIdFromData(v36.data, t1.userId)
+		if v7 and v7.data and not v7.loading then
+			v5 = getProfileInsightsByUserIdFromData(v7.data, props.userId)
 		end
 
-		v35 = v36.loading
+		v6 = v7.loading
 	end
 
-	local v37 = if isCustomNil(t2.userAgeVerifiedBracket) then nil else t2.userAgeVerifiedBracket
+	local userAgeVerifiedBracket
+
+	if not isCustomNil(v5.userAgeVerifiedBracket) then
+		userAgeVerifiedBracket = v5.userAgeVerifiedBracket
+	end
+
 	local _ = {
 		under13 = "AccountIdentity.AgeCheck.Label.AgeBandUnder13",
 		under17 = "AccountIdentity.AgeCheck.Label.AgeBandOver13",
@@ -104,89 +133,129 @@ return function(t1: {[any]: any}) -- line: 51
 		ageGroup18To24 = "AccountIdentity.AgeCheck.Label.AgeGroup18To24",
 		ageGroupOver25 = "AccountIdentity.AgeCheck.Label.AgeGroupOver25"
 	}
-	local v39 = useLocalization({
-		yourLinkedParent = "Feature.Friends.Label.YourLinkedParent",
-		userAgeVerifiedBracket = v37
+
+	local v7 = useLocalization({
+		userAgeVerifiedBracket = userAgeVerifiedBracket,
+		yourLinkedParent = "Feature.Friends.Label.YourLinkedParent"
 	})
-	local v40, v41 = React.useState(false)
-	local u42 = v40
-	local u43 = v41
 
-	React.useEffect(function() -- line: 139
-		-- upvalues: t1 (copy), AmpApiProvider (copy), FStringParentLinkAmpNameSpace (copy), u43 (ref), AccessResponseEnum (copy)
-		local t3 = {
-			name = "otherUser",
-			type = "UserId",
-			value = t1.userId
+	local state, setState = React.useState(false)
+
+	React.useEffect(function()
+		local v8 = {
+			{ name = "otherUser", type = "UserId", value = props.userId }
 		}
-		local v48 = AmpApiProvider.upsellFeatureAccess("IsLinkedChildOf", {}, FStringParentLinkAmpNameSpace, { t3 })
+		setState(AmpApiProvider.upsellFeatureAccess("IsLinkedChildOf", {}, FStringParentLinkAmpNameSpace, v8).access == AccessResponseEnum.Granted)
+	end, { props.userId })
 
-		u43(v48.access == AccessResponseEnum.Granted)
-	end, { t1.userId })
-
-	local v44 = React.useMemo(function() -- line: 152
-		-- upvalues: v39 (copy)
-		if v39.userAgeVerifiedBracket then
-			return ` • { v39.userAgeVerifiedBracket }`
+	local v8 = React.useMemo(function()
+		if v7.userAgeVerifiedBracket then
+			return ` • {v7.userAgeVerifiedBracket}`
 		end
 
 		return nil
-	end, { v39.userAgeVerifiedBracket })
-	local v45 = React.useMemo(function() -- line: 163
-		-- upvalues: Foundation (copy), React (copy), View (copy), UserTile (copy), t1 (copy), LayoutMode (copy), u42 (ref), v39 (copy), s1 (ref), s2 (ref), v44 (copy)
-		local v49 = Foundation.Hooks.useTokens()
+	end, { v7.userAgeVerifiedBracket })
 
-		return React.createElement(View, {
+	local avatarWithNames = React.useMemo(function()
+		local v9 = Foundation.Hooks.useTokens()
+		local createElement = React.createElement
+		local createElement2 = React.createElement
+		local v10 = {
+			userId = props.userId,
+			userPresenceType = Foundation.Enums.UserPresence.None,
+			layoutMode = LayoutMode.wide,
+			title = 0,
+			subtitle = 0,
+			titleStyle = 0,
+			subtitleStyle = 0,
+			onActivated = nil
+		}
+		local title = if state then v7.yourLinkedParent else v3
+		v10.title = title
+		local subtitle
+
+		if v4 ~= "" then
+			subtitle = `@{v4}{v8 or ""}`
+		end
+
+		v10.subtitle = subtitle
+		v10.titleStyle = v9.Typography.TitleMedium
+		v10.subtitleStyle = v9.Typography.BodyMedium
+		return createElement(View, {
 			tag = "size-0-1200 auto-x row align-y-center",
 			LayoutOrder = 1
 		}, {
-			UserTile = React.createElement(UserTile, {
-				onActivated = nil,
-				userId = t1.userId,
-				userPresenceType = Foundation.Enums.UserPresence.None,
-				layoutMode = LayoutMode.wide,
-				title = if not u42 then s1 else v39.yourLinkedParent,
-				subtitle = if s2 == "" then nil else `@{ s2 }{ v44 or "" }`,
-				titleStyle = v49.Typography.TitleMedium,
-				subtitleStyle = v49.Typography.BodyMedium
-			})
+			UserTile = createElement2(userTile, v10)
 		})
-	end, {
-		t1.userId,
-		s1,
-		u42,
-		u43,
-		v39.yourLinkedParent,
-		s2,
-		v44
-	})
-	local v46 = React.useMemo(function() -- line: 190
-		-- upvalues: isCustomNil (copy), t2 (ref)
-		return {
-			mutualFriends = if isCustomNil(t2.mutualFriends) then nil else t2.mutualFriends,
-			friendshipAgeUnixSeconds = if isCustomNil(t2.friendshipAgeUnixSeconds) then nil else t2.friendshipAgeUnixSeconds,
-			friendRequestOriginSource = if isCustomNil(t2.friendRequestOriginSource) then nil else t2.friendRequestOriginSource,
-			accountCreationDateUnixSeconds = if isCustomNil(t2.accountCreationDateUnixSeconds) then nil else t2.accountCreationDateUnixSeconds,
-			localizedCountryName = if isCustomNil(t2.localizedCountryName) then nil else t2.localizedCountryName
-		}
-	end, { t2 })
+	end, { props.userId, v3, state, setState, v7.yourLinkedParent, v4, v8 })
 
-	return React.createElement(View, {
-		LayoutOrder = 2,
+	local profileInsightIconItems = React.useMemo(function()
+		local mutualFriends
+
+		if not isCustomNil(v5.mutualFriends) then
+			mutualFriends = v5.mutualFriends
+		end
+
+		local friendshipAgeUnixSeconds
+
+		if not isCustomNil(v5.friendshipAgeUnixSeconds) then
+			friendshipAgeUnixSeconds = v5.friendshipAgeUnixSeconds
+		end
+
+		local friendRequestOriginSource
+
+		if not isCustomNil(v5.friendRequestOriginSource) then
+			friendRequestOriginSource = v5.friendRequestOriginSource
+		end
+
+		local accountCreationDateUnixSeconds
+
+		if not isCustomNil(v5.accountCreationDateUnixSeconds) then
+			accountCreationDateUnixSeconds = v5.accountCreationDateUnixSeconds
+		end
+
+		local localizedCountryName
+
+		if not isCustomNil(v5.localizedCountryName) then
+			localizedCountryName = v5.localizedCountryName
+		end
+
+		return {
+			mutualFriends = mutualFriends,
+			friendshipAgeUnixSeconds = friendshipAgeUnixSeconds,
+			friendRequestOriginSource = friendRequestOriginSource,
+			accountCreationDateUnixSeconds = accountCreationDateUnixSeconds,
+			localizedCountryName = localizedCountryName,
+			isClassmate = FFlagTFClassmatesProfileInsight and v5.isClassmate == true and true or nil
+		}
+	end, { v5 })
+
+	local createElement = React.createElement
+	local v9 = {
 		tag = {
 			["col size-full-0 auto-y align-x-left radius-medium bg-shift-100"] = true,
-			["gap-medium padding-medium"] = t1.isVerticallyConstrained,
-			["gap-large padding-large"] = not t1.isVerticallyConstrained
-		}
-	}, {
-		AvatarWithNames = v45,
-		SocialMetadataIconAndTextList = if not v35 then React.createElement(SocialMetadataIconsAndTextsSection, {
-			profileInsightIconItems = v46,
-			isVerticallyConstrained = t1.isVerticallyConstrained,
-			layoutOrder = not FFlagProfilePlatformAddTC and 2 or t1.layoutOrder
-		}) else React.createElement(Skeleton, {
+			["gap-medium padding-medium"] = props.isVerticallyConstrained,
+			["gap-large padding-large"] = not props.isVerticallyConstrained
+		},
+		LayoutOrder = 2
+	}
+	local socialMetadataIconAndTextList
+
+	if v6 then
+		socialMetadataIconAndTextList = React.createElement(Skeleton, {
 			Size = UDim2.new(1, 0, 0, 50),
-			LayoutOrder = not FFlagProfilePlatformAddTC and 2 or t1.layoutOrder
+			LayoutOrder = not FFlagProfilePlatformAddTC and 2 or props.layoutOrder
 		})
+	else
+		socialMetadataIconAndTextList = React.createElement(SocialMetadataIconsAndTextsSection, {
+			profileInsightIconItems = profileInsightIconItems,
+			isVerticallyConstrained = props.isVerticallyConstrained,
+			layoutOrder = not FFlagProfilePlatformAddTC and 2 or props.layoutOrder
+		})
+	end
+
+	return createElement(View, v9, {
+		AvatarWithNames = avatarWithNames,
+		SocialMetadataIconAndTextList = socialMetadataIconAndTextList
 	})
 end

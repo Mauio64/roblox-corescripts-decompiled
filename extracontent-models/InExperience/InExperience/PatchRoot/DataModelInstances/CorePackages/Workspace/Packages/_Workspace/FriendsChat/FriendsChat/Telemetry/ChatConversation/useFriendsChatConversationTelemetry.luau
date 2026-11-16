@@ -1,43 +1,52 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local React = require(Parent.React)
-local ChatConversationTelemetryEvents = require(Parent.AppChat.ChatConversationTelemetryEvents)
-local ChatConversationTelemetryLayer = require(Parent.AppChat.ChatConversationTelemetryLayer)
-local ConversationExitType = require(Parent.AppChat.ConversationExitType)
-local useTelemetry = require(Parent.AppChat.useTelemetry)
+local FriendsChat = script:FindFirstAncestor("FriendsChat")
+local parent = FriendsChat.Parent
 
-local function useFriendsChatConversationTelemetry(t1: {[any]: any}) -- line: 33
-	-- upvalues: useTelemetry (copy), ChatConversationTelemetryLayer (copy), React (copy), ChatConversationTelemetryEvents (copy), ConversationExitType (copy)
+local React = require(parent.React)
+
+local ChatConversationTelemetryEvents = require(parent.AppChat.ChatConversationTelemetryEvents)
+local ChatConversationTelemetryLayer = require(parent.AppChat.ChatConversationTelemetryLayer)
+local ConversationExitType = require(parent.AppChat.ConversationExitType)
+local useTelemetry = require(parent.AppChat.useTelemetry)
+
+local FFlagFriendsChatScreenExitLoadedMessageCount = require(FriendsChat.Flags.FFlagFriendsChatScreenExitLoadedMessageCount)
+
+local function useFriendsChatConversationTelemetry(p)
 	local emit = useTelemetry(ChatConversationTelemetryLayer.Context).emit
-	local v10 = React.useRef(emit)
 
-	v10.current = emit
+	local ref = React.useRef(emit)
+	ref.current = emit
+	local ref2 = React.useRef(p.getLoadedMessageCount)
+	ref2.current = p.getLoadedMessageCount
 
-	local v11 = React.useRef(t1.getLoadedMessageCount)
-
-	v11.current = t1.getLoadedMessageCount
-
-	local conversationId = t1.conversationId
-
-	React.useEffect(function() -- line: 50
-		-- upvalues: v10 (copy), ChatConversationTelemetryEvents (copy), v11 (copy)
-		v10.current(ChatConversationTelemetryEvents.ScreenRendered, {
-			loadedMessageCount = v11.current()
+	local v = { p.conversationId }
+	React.useEffect(function()
+		ref.current(ChatConversationTelemetryEvents.ScreenRendered, {
+			loadedMessageCount = ref2.current()
 		})
-	end, { conversationId })
-	React.useEffect(function() -- line: 60
-		-- upvalues: v10 (copy), ChatConversationTelemetryEvents (copy), ConversationExitType (copy)
-		return function() -- line: 61
-			-- upvalues: v10 (copy), ChatConversationTelemetryEvents (copy), ConversationExitType (copy)
-			v10.current(ChatConversationTelemetryEvents.ScreenExit, {
-				conversationExitType = ConversationExitType.Default
-			})
+	end, v)
+
+	React.useEffect(function()
+		return function()
+			local current = ref.current
+			local screenExit = ChatConversationTelemetryEvents.ScreenExit
+			local v2 = {
+				conversationExitType = ConversationExitType.Default,
+				loadedMessageCount = 0
+			}
+			local loadedMessageCount
+
+			if FFlagFriendsChatScreenExitLoadedMessageCount then
+				loadedMessageCount = ref2.current()
+			end
+
+			v2.loadedMessageCount = loadedMessageCount
+			current(screenExit, v2)
 		end
 	end, {})
 
 	return {
-		fireInfoButtonClicked = React.useCallback(function() -- line: 71
-			-- upvalues: v10 (copy), ChatConversationTelemetryEvents (copy)
-			v10.current(ChatConversationTelemetryEvents.ConversationInfoBtnClicked, {})
+		fireInfoButtonClicked = React.useCallback(function()
+			ref.current(ChatConversationTelemetryEvents.ConversationInfoBtnClicked, {})
 		end, {})
 	}
 end

@@ -1,4 +1,1 @@
-return {
-	CTALoaded = "CTALoaded",
-	LazyLoaded = "LazyLoaded"
-}
+return { CTALoaded = "CTALoaded", LazyLoaded = "LazyLoaded" }

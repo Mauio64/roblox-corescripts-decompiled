@@ -1,1 +1,3 @@
-return (require(script.SheetFullBleed))
+local SheetFullBleed = require(script.SheetFullBleed)
+
+return SheetFullBleed

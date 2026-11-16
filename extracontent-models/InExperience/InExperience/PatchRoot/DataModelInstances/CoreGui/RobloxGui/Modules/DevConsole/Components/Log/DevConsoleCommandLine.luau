@@ -2,105 +2,107 @@ local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
 local LogService = game:GetService("LogService")
 local Roact = require(CorePackages.Packages.Roact)
+
 local DataConsumer = require(script.Parent.Parent.DataConsumer)
+
 local ScrollingTextBox = require(script.Parent.Parent.ScrollingTextBox)
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
 local CommandLineIndent = Constants.LogFormatting.CommandLineIndent
 local CommandLine = Constants.DefaultFontSize.CommandLine
 local Log = Constants.Font.Log
-local v11 = Roact.PureComponent:extend("DevConsoleCommandLine")
 
-function v11.init(p1) -- line: 17
-	-- upvalues: LogService (copy), Roact (copy)
-	function p1.onFocusLost(p2, p3, _) -- line: 18
-		-- upvalues: LogService (copy)
-		if p3 then
-			LogService:ExecuteScript(p2.Text)
-			p2:CaptureFocus()
+local extended = Roact.PureComponent:extend("DevConsoleCommandLine")
+
+function extended:init()
+	function self.onFocusLost(object, p, _)
+		if p then
+			LogService:ExecuteScript(object.Text)
+			object:CaptureFocus()
 		end
 	end
 
-	p1.textbox = Roact.createRef()
+	self.textbox = Roact.createRef()
 end
-function v11.didMount(p5) -- line: 28
-	-- upvalues: UserInputService (copy)
-	if not p5.onFocusConnection then
-		p5.onFocusConnection = UserInputService.InputBegan:Connect(function(input) -- line: 30
-			-- upvalues: p5 (copy)
-			if p5.textbox.current and p5.textbox.current:IsFocused() then
-				local current = p5.textbox.current
-				local ServerLogData = p5.props.ServerLogData
-				local v26 = ServerLogData:getCommandLineHistory()
-				local v27 = ServerLogData:getCommandLineIndex()
+
+function extended:didMount()
+	if not self.onFocusConnection then
+		self.onFocusConnection = UserInputService.InputBegan:Connect(function(input)
+			if self.textbox.current and self.textbox.current:IsFocused() then
+				local current = self.textbox.current
+				local serverLogData = self.props.ServerLogData
+				local commandLineHistory = serverLogData:getCommandLineHistory()
+				local commandLineIndex = serverLogData:getCommandLineIndex()
+				local v
 
 				if input.KeyCode == Enum.KeyCode.Up then
-					local v28 = v27 + 1
+					local v2 = commandLineIndex + 1
+					v = math.min(commandLineHistory:getSize(), v2)
 
-					v27 = math.min(v26:getSize(), v28)
-					current.Text = v26:reverseAt(v27) or ""
+					current.Text = commandLineHistory:reverseAt(v) or ""
 				elseif input.KeyCode == Enum.KeyCode.Down then
-					v27 = math.max(0, v27 - 1)
-					current.Text = v26:reverseAt(v27) or ""
+					v = math.max(0, commandLineIndex - 1)
+
+					current.Text = commandLineHistory:reverseAt(v) or ""
 				elseif input.KeyCode == Enum.KeyCode.Return then
-					if #current.Text:gsub("%s+", "") > 0 and v26:reverseAt(1) ~= current.Text then
-						v26:push_back(current.Text)
+					if #current.Text:gsub("%s+", "") > 0 and commandLineHistory:reverseAt(1) ~= current.Text then
+						commandLineHistory:push_back(current.Text)
 					end
 
-					v27 = 0
-				elseif v27 ~= 0 then
-					v27 = 0
+					v = 0
+				else
+					v = commandLineIndex ~= 0 and 0 or commandLineIndex
 				end
 
-				ServerLogData:setCommandLineIndex(v27)
+				serverLogData:setCommandLineIndex(v)
 			end
 		end)
 	end
 
-	if not p5.fixUnwantedReturnCapture then
-		p5.fixUnwantedReturnCapture = UserInputService.InputEnded:Connect(function(input) -- line: 70
-			-- upvalues: p5 (copy)
-			if p5.textbox.current and (p5.textbox.current:IsFocused() and input.KeyCode == Enum.KeyCode.Return) then
-				p5.textbox.current.Text = ""
+	if not self.fixUnwantedReturnCapture then
+		self.fixUnwantedReturnCapture = UserInputService.InputEnded:Connect(function(input)
+			if self.textbox.current and self.textbox.current:IsFocused() and input.KeyCode == Enum.KeyCode.Return then
+				self.textbox.current.Text = ""
 			end
 		end)
 	end
 end
-function v11.willUnmount(p6) -- line: 80
-	if p6.onFocusConnection then
-		p6.onFocusConnection:Disconnect()
-		p6.onFocusConnection = nil
+
+function extended:willUnmount()
+	if self.onFocusConnection then
+		self.onFocusConnection:Disconnect()
+		self.onFocusConnection = nil
 	end
 
-	if p6.fixUnwantedReturnCapture then
-		p6.fixUnwantedReturnCapture:Disconnect()
-		p6.fixUnwantedReturnCapture = nil
+	if self.fixUnwantedReturnCapture then
+		self.fixUnwantedReturnCapture:Disconnect()
+		self.fixUnwantedReturnCapture = nil
 	end
 end
-function v11.render(p7) -- line: 91
-	-- upvalues: Roact (copy), Constants (copy), CommandLineIndent (copy), CommandLine (copy), Log (copy), ScrollingTextBox (copy)
-	local height = p7.props.height
-	local pos = p7.props.pos
-	local s1 = ""
-	local v19 = p7.props.ServerLogData:getCommandLineIndex()
 
-	if v19 ~= 0 then
-		s1 = p7.props.ServerLogData:getCommandLineHistory():reverseAt(v19) or ""
-	end
+function extended.render(props)
+	local height = props.props.height
+	local pos = props.props.pos
+
+	local commandLineIndex = props.props.ServerLogData:getCommandLineIndex()
+	local text = commandLineIndex == 0 and ""
+		or props.props.ServerLogData:getCommandLineHistory():reverseAt(commandLineIndex)
+		or ""
 
 	return Roact.createElement("Frame", {
-		BackgroundTransparency = 0,
-		BorderSizePixel = 1,
 		Position = pos,
 		Size = UDim2.new(1, 0, 0, height),
+		BackgroundTransparency = 0,
 		BackgroundColor3 = Constants.Color.TextBoxGray,
-		BorderColor3 = Constants.Color.BorderGray
+		BorderColor3 = Constants.Color.BorderGray,
+		BorderSizePixel = 1
 	}, {
 		Arrow = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			Text = "> ",
 			Size = UDim2.new(0, CommandLineIndent, 1, 0),
+			BackgroundTransparency = 1,
 			TextSize = CommandLine,
 			Font = Log,
+			Text = "> ",
 			TextColor3 = Constants.Color.Text,
 			TextXAlignment = Enum.TextXAlignment.Right
 		}),
@@ -112,13 +114,13 @@ function v11.render(p7) -- line: 91
 			TextColor3 = Constants.Color.Text,
 			TextXAlignment = 0,
 			TextSize = CommandLine,
-			Text = s1,
+			Text = text,
 			Font = Log,
 			PlaceholderText = "command line",
-			[Roact.Ref] = p7.textbox,
-			TextBoxFocusLost = p7.onFocusLost
+			[Roact.Ref] = props.textbox,
+			TextBoxFocusLost = props.onFocusLost
 		})
 	})
 end
 
-return DataConsumer(v11, "ServerLogData")
+return DataConsumer(extended, "ServerLogData")

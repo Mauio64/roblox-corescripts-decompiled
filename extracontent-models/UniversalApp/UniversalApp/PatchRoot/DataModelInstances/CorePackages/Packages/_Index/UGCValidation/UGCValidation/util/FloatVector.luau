@@ -1,174 +1,173 @@
-local t1 = {}
+local FloatVector = {}
 
-function t1.new(...) -- line: 12
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
-
+function FloatVector.new(...)
+	local self = setmetatable({}, FloatVector)
 	self.data = {}
 
-	local t2 = { ... }
+	local v = { ... }
 
-	if #t2 == 1 and typeof(t2[1]) == "table" then
-		t2 = if getmetatable(t2[1]) ~= t1 then t2[1] else t2[1].data
+	if #v == 1 and typeof(v[1]) == "table" then
+		if getmetatable(v[1]) == FloatVector then
+			v = v[1].data
+		else
+			v = v[1]
+		end
 	end
 
-	for _, v5 in t2 do
-		if typeof(v5) ~= "number" then
-			error("arg to FloatVector.new() not a number")
+	for _, v2 in v do
+		if typeof(v2) == "number" then
+			table.insert(self.data, v2)
 		else
-			table.insert(self.data, v5)
+			error("arg to FloatVector.new() not a number")
 		end
 	end
 
 	return self
 end
-function t1.getSize(p1) -- line: 37
-	return #p1.data
+
+function FloatVector.getSize(p)
+	return #p.data
 end
-function t1.checkCompatible(p2, p3) -- line: 41
-	-- upvalues: t1 (copy)
-	if typeof(p2) ~= typeof(t1) or typeof(p3) ~= typeof(t1) then
+
+function FloatVector.checkCompatible(p, p2): boolean
+	if typeof(p) ~= typeof(FloatVector) or typeof(p2) ~= typeof(FloatVector) then
 		error("vector operation on non-vector type")
-
 		return false
 	end
 
-	if #p2.data ~= #p3.data then
-		error("operating on vectors of different dimension")
-
-		return false
+	if #p.data == #p2.data then
+		return true
 	end
 
-	return true
+	error("operating on vectors of different dimension")
+	return false
 end
-function t1.__index(p4, p5) -- line: 54
-	-- upvalues: t1 (copy)
-	if typeof(p5) == "number" then
-		return p4.data[p5]
+
+function FloatVector.__index(p, value)
+	if typeof(value) == "number" then
+		return p.data[value]
 	end
 
-	return t1[p5]
+	return FloatVector[value]
 end
-function t1.__newindex(p6, p7, p8) -- line: 62
-	if typeof(p7) == "number" then
-		p6.data[p7] = p8
 
-		return
+function FloatVector.__newindex(p, value, p2)
+	if typeof(value) == "number" then
+		p.data[value] = p2
+	else
+		rawset(p, value, p2)
+	end
+end
+
+function FloatVector.__add(p, p2)
+	FloatVector.checkCompatible(p, p2)
+	local v = {}
+
+	for i = 1, #p.data do
+		table.insert(v, p.data[i] + p2.data[i])
 	end
 
-	rawset(p6, p7, p8)
+	return FloatVector.new(v)
 end
-function t1.__add(p9, p10) -- line: 71
-	-- upvalues: t1 (copy)
-	t1.checkCompatible(p9, p10)
 
-	local t3 = {}
+function FloatVector.__sub(p, p2)
+	FloatVector.checkCompatible(p, p2)
+	local v = {}
 
-	for i = 1, #p9.data do
-		table.insert(t3, p9.data[i] + p10.data[i])
+	for i = 1, #p.data do
+		table.insert(v, p.data[i] - p2.data[i])
 	end
 
-	return t1.new(t3)
+	return FloatVector.new(v)
 end
-function t1.__sub(p11, p12) -- line: 80
-	-- upvalues: t1 (copy)
-	t1.checkCompatible(p11, p12)
 
-	local t4 = {}
+function FloatVector.__mul(p, value)
+	if typeof(p) == typeof(FloatVector) and typeof(value) == "number" then
+		local v = {}
 
-	for i = 1, #p11.data do
-		table.insert(t4, p11.data[i] - p12.data[i])
-	end
-
-	return t1.new(t4)
-end
-function t1.__mul(p13, p14) -- line: 89
-	-- upvalues: t1 (copy)
-	if typeof(p13) == typeof(t1) and typeof(p14) == "number" then
-		local t5 = {}
-
-		for _, v26 in p13.data do
-			table.insert(t5, v26 * p14)
+		for _, v2 in p.data do
+			table.insert(v, v2 * value)
 		end
 
-		return t1.new(t5)
-	end
+		return FloatVector.new(v)
+	else
+		FloatVector.checkCompatible(p, value)
+		local v = {}
 
-	t1.checkCompatible(p13, p14)
-
-	local t6 = {}
-
-	for i = 1, #p13.data do
-		table.insert(t6, p13.data[i] * p14.data[i])
-	end
-
-	return t1.new(t6)
-end
-function t1.__div(p15, p16) -- line: 106
-	-- upvalues: t1 (copy)
-	if typeof(p15) == typeof(t1) and typeof(p16) == "number" then
-		local t7 = {}
-
-		for _, v33 in p15.data do
-			table.insert(t7, v33 / p16)
+		for i = 1, #p.data do
+			table.insert(v, p.data[i] * value.data[i])
 		end
 
-		return t1.new(t7)
+		return FloatVector.new(v)
 	end
-
-	t1.checkCompatible(p15, p16)
-
-	local t8 = {}
-
-	for i = 1, #p15.data do
-		table.insert(t8, p15.data[i] / p16.data[i])
-	end
-
-	return t1.new(t8)
 end
-function t1.dot(p17, p18) -- line: 123
-	-- upvalues: t1 (copy)
-	t1.checkCompatible(p17, p18)
 
-	local n1 = 0
+function FloatVector.__div(p, value)
+	if typeof(p) == typeof(FloatVector) and typeof(value) == "number" then
+		local v = {}
 
-	for i = 1, #p17.data do
-		n1 += p17.data[i] * p18.data[i]
+		for _, v2 in p.data do
+			table.insert(v, v2 / value)
+		end
+
+		return FloatVector.new(v)
+	else
+		FloatVector.checkCompatible(p, value)
+		local v = {}
+
+		for i = 1, #p.data do
+			table.insert(v, p.data[i] / value.data[i])
+		end
+
+		return FloatVector.new(v)
+	end
+end
+
+function FloatVector.dot(p, p2)
+	FloatVector.checkCompatible(p, p2)
+	local total = 0
+
+	for i = 1, #p.data do
+		total += p.data[i] * p2.data[i]
 	end
 
-	return n1
+	return total
 end
-function t1.cross(p19, p20) -- line: 133
-	-- upvalues: t1 (copy)
-	t1.checkCompatible(p19, p20)
 
-	if #p19.data ~= 3 or #p20.data ~= 3 then
-		error("cross product is only defined for two 3 dimensional vectors")
+function FloatVector.cross(p, p2)
+	FloatVector.checkCompatible(p, p2)
 
-		return nil
+	if #p.data == 3 and #p2.data == 3 then
+		return FloatVector.new(
+			p.data[2] * p2.data[3] - p.data[3] * p2.data[2],
+			p.data[3] * p2.data[1] - p.data[1] * p2.data[3],
+			p.data[1] * p2.data[2] - p.data[2] * p2.data[1]
+		)
 	end
 
-	return t1.new(p19.data[2] * p20.data[3] - p19.data[3] * p20.data[2], p19.data[3] * p20.data[1] - p19.data[1] * p20.data[3], p19.data[1] * p20.data[2] - p19.data[2] * p20.data[1])
+	error("cross product is only defined for two 3 dimensional vectors")
+	return nil
 end
-function t1.magnitude(p21) -- line: 146
-	local n2 = 0
 
-	for _, v45 in p21.data do
-		n2 += v45 ^ 2
+function FloatVector.magnitude(p)
+	local total = 0
+
+	for _, v in p.data do
+		total += v ^ 2
 	end
 
-	return (math.sqrt(n2))
+	return (math.sqrt(total))
 end
-function t1.fuzzyEq(t9: {[any]: any}, p22, n3: number) -- line: 154
-	-- upvalues: t1 (copy)
-	if not t1.checkCompatible(t9, p22) then
+
+function FloatVector.fuzzyEq(p, p2, value: number): boolean
+	if not FloatVector.checkCompatible(p, p2) then
 		return false
 	end
 
-	local v49 = n3 or 1E-05
+	local v = value or 0.00001
 
-	for i = 1, #t9.data do
-		if v49 < math.abs(t9.data[i] - p22.data[i]) then
+	for i = 1, #p.data do
+		if v < math.abs(p.data[i] - p2.data[i]) then
 			return false
 		end
 	end
@@ -176,4 +175,4 @@ function t1.fuzzyEq(t9: {[any]: any}, p22, n3: number) -- line: 154
 	return true
 end
 
-return t1
+return FloatVector

@@ -1,51 +1,62 @@
 local CollectionService = game:GetService("CollectionService")
-local Parent = script:FindFirstAncestor("SponsoredAdViewability").Parent
-
-require(Parent.DiscoveryTypes)
 
 local Constants = require(script.Parent.Constants)
-local t1 = {}
-local n1 = 0
+require(script.Parent.sponsoredAdViewabilityTypes)
 
-return {
-	bind = function(p1, t2: {[any]: any}) -- line: 23
-		-- upvalues: n1 (ref), t1 (copy), Constants (copy), CollectionService (copy)
-		n1 += 1
+local v = {}
 
-		local str = tostring(n1)
+local count = 0
+local SponsoredAdViewabilityRegistry = {}
 
-		t1[str] = t2
-		p1:SetAttribute(Constants.ViewabilityTargetIdAttribute, str)
-		CollectionService:AddTag(p1, Constants.CandidateTag)
+function SponsoredAdViewabilityRegistry.bind(instance, data)
+	local v2 = data.mediaType == "video"
 
-		return function() -- line: 30
-			-- upvalues: p1 (copy), Constants (copy), str (copy), CollectionService (copy), t1 (copy)
-			if p1:GetAttribute(Constants.ViewabilityTargetIdAttribute) == str then
-				CollectionService:RemoveTag(p1, Constants.CandidateTag)
-				p1:SetAttribute(Constants.ViewabilityTargetIdAttribute, nil)
-			end
-
-			t1[str] = nil
-		end
-	end,
-	get = function(s1: string) -- line: 40
-		-- upvalues: t1 (copy)
-		return t1[s1]
-	end,
-	_clear = function() -- line: 44
-		-- upvalues: t1 (copy)
-		for v10 in t1 do
-			t1[v10] = nil
-		end
-	end,
-	_size = function() -- line: 50
-		-- upvalues: t1 (copy)
-		local n2 = 0
-
-		for _ in t1 do
-			n2 += 1
-		end
-
-		return n2
+	if data.mediaType ~= "image" and not v2 then
+		return function() end
 	end
-}
+
+	if v2 ~= (data.videoPlaybackStateRef ~= nil) then
+		return function() end
+	end
+
+	if data.isFullscreen == true and not v2 then
+		return function() end
+	end
+
+	count += 1
+	local v3 = tostring(count)
+	v[v3] = data
+	instance:SetAttribute(Constants.ViewabilityTargetIdAttribute, v3)
+	CollectionService:AddTag(instance, Constants.CandidateTag)
+
+	return function()
+		if instance:GetAttribute(Constants.ViewabilityTargetIdAttribute) == v3 then
+			CollectionService:RemoveTag(instance, Constants.CandidateTag)
+			instance:SetAttribute(Constants.ViewabilityTargetIdAttribute, nil)
+		end
+
+		v[v3] = nil
+	end
+end
+
+function SponsoredAdViewabilityRegistry.get(p: string)
+	return v[p]
+end
+
+function SponsoredAdViewabilityRegistry._clear()
+	for k in v do
+		v[k] = nil
+	end
+end
+
+function SponsoredAdViewabilityRegistry._size()
+	local count2 = 0
+
+	for _ in v do
+		count2 += 1
+	end
+
+	return count2
+end
+
+return SponsoredAdViewabilityRegistry

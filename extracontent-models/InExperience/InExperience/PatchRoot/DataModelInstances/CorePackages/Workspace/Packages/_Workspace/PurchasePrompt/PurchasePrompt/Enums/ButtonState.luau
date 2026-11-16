@@ -1,4 +1,3 @@
-return (require(script.Parent.createEnum)("ButtonState", {
-	"Enabled",
-	"Disabled"
-}))
+local createEnum = require(script.Parent.createEnum)
+
+return (createEnum("ButtonState", { "Enabled", "Disabled" }))

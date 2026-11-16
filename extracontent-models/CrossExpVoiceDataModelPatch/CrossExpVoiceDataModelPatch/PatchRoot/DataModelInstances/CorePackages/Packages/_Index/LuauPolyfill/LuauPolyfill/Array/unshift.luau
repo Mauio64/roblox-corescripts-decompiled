@@ -1,22 +1,20 @@
-local scriptParent = script.Parent
-local isArray = require(scriptParent.isArray)
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local isArray = require(parent.isArray)
+local parent2 = parent.Parent
+require(parent2.types)
 
-require(scriptParentParent.types)
-
-return function(p1, ...) -- line: 8
-	-- upvalues: isArray (copy)
-	if _G.__DEV__ and not isArray(p1) then
-		error(string.format("Array.unshift called on non-array %s", (typeof(p1))))
+return function(list, ...)
+	if _G.__DEV__ and not isArray(list) then
+		error(string.format("Array.unshift called on non-array %s", (typeof(list))))
 	end
 
-	local v5 = select("#", ...)
+	local v = select("#", ...)
 
-	if v5 > 0 then
-		for i = v5, 1, -1 do
-			table.insert(p1, 1, (select(i, ...)))
+	if v > 0 then
+		for i = v, 1, -1 do
+			table.insert(list, 1, (select(i, ...)))
 		end
 	end
 
-	return #p1
+	return #list
 end

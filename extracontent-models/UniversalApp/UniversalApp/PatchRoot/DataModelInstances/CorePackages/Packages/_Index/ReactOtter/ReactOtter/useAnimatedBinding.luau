@@ -1,15 +1,13 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent
+local React = require(parent.React)
 
-require(ParentParent.Otter)
+require(parent.Otter)
 
 local useMotor = require(script.Parent.useMotor)
 
-local function useAnimatedBinding(p1, p2) -- line: 12
-	-- upvalues: React (copy), useMotor (copy)
-	local v7, v8 = React.useBinding(p1)
-
-	return v7, (useMotor(p1, v8, p2))
+local function useAnimatedBinding(p, p2)
+	local v, v2 = React.useBinding(p)
+	return v, (useMotor(p, v2, p2))
 end
 
 return useAnimatedBinding

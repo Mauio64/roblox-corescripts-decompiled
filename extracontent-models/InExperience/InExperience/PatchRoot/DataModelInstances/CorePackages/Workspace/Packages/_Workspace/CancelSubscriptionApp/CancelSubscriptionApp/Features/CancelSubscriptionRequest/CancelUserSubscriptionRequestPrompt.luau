@@ -1,48 +1,47 @@
-local Parent = script:FindFirstAncestor("CancelSubscriptionApp").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("CancelSubscriptionApp").Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useScreenSize = require(Parent.EconomyCommonCoreScriptHooks).useScreenSize
-local t1 = {
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local EconomyCommonCoreScriptHooks = require(parent.EconomyCommonCoreScriptHooks)
+local useScreenSize = EconomyCommonCoreScriptHooks.useScreenSize
+
+local v = {
 	heading = "CoreScripts.CancelUserSubscriptionPrompt.RequestPrompt.Heading",
 	bodyText = "CoreScripts.CancelUserSubscriptionPrompt.RequestPrompt.Body",
 	noButtonText = "CoreScripts.CancelUserSubscriptionPrompt.RequestPrompt.DontCancelButton",
 	yesButtonText = "CoreScripts.CancelUserSubscriptionPrompt.RequestPrompt.YesCancelButton"
 }
 
-local function CancelUserSubscriptionRequestPrompt(t2: {[any]: any}) -- line: 24
-	-- upvalues: useLocalization (copy), t1 (copy), React (copy), InteractiveAlert (copy), ButtonType (copy), useScreenSize (copy)
-	local v11 = useLocalization(t1)
-	local v12 = v11.bodyText:gsub("{date}", t2.expirationDate)
-
+local function CancelUserSubscriptionRequestPrompt(props)
+	local v2 = useLocalization(v)
+	local bodyText = v2.bodyText:gsub("{date}", props.expirationDate)
 	return React.createElement(InteractiveAlert, {
-		title = v11.heading,
-		bodyText = v12,
+		title = v2.heading,
+		bodyText = bodyText,
 		buttonStackInfo = {
 			forcedFillDirection = Enum.FillDirection.Horizontal,
 			buttons = {
 				{
-					isDefaultChild = true,
 					props = {
-						onActivated = t2.onCancel or function() -- line: 35
-						end,
-						text = v11.noButtonText,
+						onActivated = props.onCancel or function() end,
+						text = v2.noButtonText,
 						delayInputSeconds = 0.75,
 						[React.Tag] = "data-testid=CancelSubscriptionApp_DontCancelButton"
-					}
+					},
+					isDefaultChild = true
 				},
 				{
-					isDefaultChild = false,
 					buttonType = ButtonType.PrimarySystem,
 					props = {
-						onActivated = t2.onConfirm or function() -- line: 45
-						end,
-						text = v11.yesButtonText,
+						onActivated = props.onConfirm or function() end,
+						text = v2.yesButtonText,
 						delayInputSeconds = 0.75,
 						[React.Tag] = "data-testid=CancelSubscriptionApp_YesCancelButton"
-					}
+					},
+					isDefaultChild = false
 				}
 			}
 		},

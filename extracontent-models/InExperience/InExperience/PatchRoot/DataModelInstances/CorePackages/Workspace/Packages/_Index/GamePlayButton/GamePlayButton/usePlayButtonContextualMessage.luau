@@ -1,95 +1,137 @@
 local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
-local GamePlayButtonParent = GamePlayButton.Parent
+local parent = GamePlayButton.Parent
 local PlayButtonStates = require(GamePlayButton.PlayButtonStates)
+require(parent.PlayabilityRodux)
+local DiscoveryTypes = require(parent.DiscoveryTypes)
+local PlayabilityStatusEnum = DiscoveryTypes.PlayabilityStatusEnum
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
+local GameLaunch = require(parent.GameLaunch)
+local LaunchErrorLocalizationKeys = GameLaunch.LaunchErrorLocalizationKeys
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local GameInfosRodux = require(parent.GameInfosRodux)
+local useGameInfosSelector = GameInfosRodux.useGameInfosSelector
+local GameHydrationReact = require(parent.GameHydrationReact)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMigrateGameInfoToStore = SharedFlags.FFlagMigrateGameInfoToStore
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnableGameJoinEarlyAccess = SharedFlags2.FFlagEnableGameJoinEarlyAccess
+local GameProductInfoRodux = require(parent.GameProductInfoRodux)
+local useGameProductInfoSelector = GameProductInfoRodux.useGameProductInfoSelector
+local UniversalAppPolicy2 = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy2.useAppPolicy
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local DiscoveryTypes2 = require(parent.DiscoveryTypes)
+local ExperienceDetailsNoticeType = DiscoveryTypes2.ExperienceDetailsNoticeType
 
-require(GamePlayButtonParent.PlayabilityRodux)
-
-local PlayabilityStatusEnum = require(GamePlayButtonParent.DiscoveryTypes).PlayabilityStatusEnum
-local getAppFeaturePolicies = require(GamePlayButtonParent.UniversalAppPolicy).getAppFeaturePolicies
-local LaunchErrorLocalizationKeys = require(GamePlayButtonParent.GameLaunch).LaunchErrorLocalizationKeys
-local useSelector = require(GamePlayButtonParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useGameInfosSelector = require(GamePlayButtonParent.GameInfosRodux).useGameInfosSelector
-local useGameProductInfoSelector = require(GamePlayButtonParent.GameProductInfoRodux).useGameProductInfoSelector
-local useAppPolicy = require(GamePlayButtonParent.UniversalAppPolicy).useAppPolicy
-local useLocalization = require(GamePlayButtonParent.Localization).Hooks.useLocalization
-local ExperienceDetailsNoticeType = require(GamePlayButtonParent.DiscoveryTypes).ExperienceDetailsNoticeType
-
-local function v13(p1, p2, p3) -- line: 21
-	-- upvalues: PlayabilityStatusEnum (copy), getAppFeaturePolicies (copy), LaunchErrorLocalizationKeys (copy)
-	if p2 then
-		if p1 == nil or (p2.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p2.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired) and (p3 == nil or p3.isForSale == false) then
-			return "Feature.ExperienceDetails.UnplayableError.UnplayableOther"
-		end
-
-		if p2.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
-			local v17 = getAppFeaturePolicies().getPlatformDisplayName() or ""
-
-			if v17 ~= "" then
-				return "Feature.ExperienceDetails.UnplayableError.DeviceRestrictedCustom", {
-					device = v17
-				}
-			end
-		end
-
-		return LaunchErrorLocalizationKeys[p2.playabilityStatus]
+local function fn(p, p2, p3)
+	if not p2 then
+		return nil
 	end
 
-	return nil
+	if
+		p == nil
+		or (p2.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p2.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired)
+		and (p3 == nil or p3.isForSale == false)
+	then
+		return "Feature.ExperienceDetails.UnplayableError.UnplayableOther"
+	end
+
+	if p2.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
+		local device = getAppFeaturePolicies().getPlatformDisplayName() or ""
+
+		if device ~= "" then
+			return "Feature.ExperienceDetails.UnplayableError.DeviceRestrictedCustom", {
+				device = device
+			}
+		end
+	end
+
+	return LaunchErrorLocalizationKeys[p2.playabilityStatus]
 end
 
-return function(p4, s1: string, p5) -- line: 77
-	-- upvalues: useAppPolicy (copy), useSelector (copy), useGameInfosSelector (copy), useGameProductInfoSelector (copy), useLocalization (copy), PlayButtonStates (copy), v13 (copy), ExperienceDetailsNoticeType (copy)
-	local v27 = useAppPolicy(function(p6) -- line: 78
+return function(p, p2: string, p3)
+	local v = useAppPolicy(function(p4)
 		return {
-			experienceDetailsNoticeType = p6.getExperienceDetailsNoticeType()
+			experienceDetailsNoticeType = p4.getExperienceDetailsNoticeType()
 		}
 	end)
-	local v28 = useSelector(function(p7) -- line: 84
-		-- upvalues: p4 (copy)
-		return p7.PlayabilityStatus and (not not p7.PlayabilityStatus[p4] and p7.PlayabilityStatus[p4].unplayableDisplayText) or nil
-	end)
-	local v29 = useSelector(function(p8) -- line: 91
-		-- upvalues: p4 (copy)
-		return p8.GameDetails[p4]
-	end)
-	local v30 = useGameInfosSelector(p4)
-	local v31 = v29 and v29.rootPlaceId or (v30 and v30.placeId or nil)
-	local v32 = useGameProductInfoSelector(p4)
-	local v33 = useLocalization
-	local t1 = {
-		agreeToNotice = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice"
-	}
-	local v37
 
-	if s1 == PlayButtonStates.UnplayableOther then
-		local v35, v36 = v13(v31, p5, v32)
+	local v2 = useSelector(function(p4)
+		return p4.PlayabilityStatus and p4.PlayabilityStatus[p] and p4.PlayabilityStatus[p].unplayableDisplayText or nil
+	end)
 
-		if v35 == nil then
-			v37 = nil
-		elseif v36 then
-			v37 = table.clone(v36)
-			v37[1] = v35
-		else
-			v37 = v35
-		end
+	local v3 = useSelector(function(p4)
+		return p4.GameDetails[p]
+	end)
+
+	local v4 = nil
+	local v5 = nil
+
+	if FFlagMigrateGameInfoToStore then
+		v5 = GameHydrationReact.useGameInfo(p)
 	else
-		v37 = nil
+		v4 = useGameInfosSelector(p)
 	end
 
-	t1.unplayableOtherFallback = v37
+	local v6 = v3 and v3.rootPlaceId
 
-	local v38 = v33(t1)
+	if not v6 then
+		local v7
 
-	if (s1 == PlayButtonStates.Playable or s1 == PlayButtonStates.PlayableWithParty or s1 == PlayButtonStates.WaitingForParty) and v27.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
-		return v38.agreeToNotice
+		if FFlagMigrateGameInfoToStore then
+			v7 = v5 and v5.rootPlaceId
+		else
+			v7 = v4 and v4.placeId
+		end
+
+		v6 = v7 or nil
 	end
 
-	if v28 and v28 ~= "" then
-		return v28
+	local v7 = useGameProductInfoSelector(p)
+	local unplayableOtherFallback
+
+	if p2 == PlayButtonStates.UnplayableOther then
+		local v8, v9 = fn(v6, p3, v7)
+
+		if v8 ~= nil then
+			if v9 then
+				unplayableOtherFallback = table.clone(v9)
+				unplayableOtherFallback[1] = v8
+			else
+				unplayableOtherFallback = v8
+			end
+		end
 	end
 
-	if s1 == PlayButtonStates.UnplayableOther then
-		return v38.unplayableOtherFallback
+	local v8 = useLocalization({
+		agreeToNotice = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice",
+		unplayableOtherFallback = unplayableOtherFallback
+	})
+
+	if
+		(p2 == PlayButtonStates.Playable or p2 == PlayButtonStates.PlayableWithParty or p2 == PlayButtonStates.WaitingForParty)
+		and v.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase
+	then
+		return v8.agreeToNotice
+	end
+
+	if
+		FFlagEnableGameJoinEarlyAccess
+		and p3 ~= nil
+		and p3.playabilityStatus == PlayabilityStatusEnum.PlusSubscriptionRequired
+	then
+		return nil
+	end
+
+	if v2 and v2 ~= "" then
+		return v2
+	end
+
+	if p2 == PlayButtonStates.UnplayableOther then
+		return v8.unplayableOtherFallback
 	end
 
 	return nil

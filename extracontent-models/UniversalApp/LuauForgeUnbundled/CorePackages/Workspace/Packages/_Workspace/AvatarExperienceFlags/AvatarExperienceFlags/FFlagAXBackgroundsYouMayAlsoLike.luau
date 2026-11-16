@@ -1,0 +1,8 @@
+local FFlagAXBackgroundsCustomizeHydration = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXBackgroundsCustomizeHydration")
+local FFlagAXCatalogBackgroundsSupport = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXCatalogBackgroundsSupport")
+local FFlagAXBackgroundsEndTryOnOnSelect = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXBackgroundsEndTryOnOnSelect")
+local FFlagAXSlotsScrollAwayOnlyWithSlots = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXSlotsScrollAwayOnlyWithSlots")
+
+local defineFastFlag = game:DefineFastFlag("AXBackgroundsYouMayAlsoLike", false)
+
+return FFlagAXBackgroundsCustomizeHydration and FFlagAXCatalogBackgroundsSupport and FFlagAXBackgroundsEndTryOnOnSelect and FFlagAXSlotsScrollAwayOnlyWithSlots and defineFastFlag

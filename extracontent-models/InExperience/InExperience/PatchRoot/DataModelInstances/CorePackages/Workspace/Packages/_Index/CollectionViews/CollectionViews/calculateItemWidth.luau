@@ -1,17 +1,15 @@
-local Parent = script:FindFirstAncestor("CollectionViews").Parent
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("CollectionViews").Parent
+local ArgCheck = require(parent.ArgCheck)
 
-local function calculateItemWidth(n1: number, n2: number, n3: number, n4: number, n5: number, n6: number?) -- line: 8
-	-- upvalues: ArgCheck (copy)
-	if n1 <= 0 then
+local function calculateItemWidth(p: number, p2: number, p3: number, p4: number, p5: number, value: number?)
+	if p <= 0 then
 		return 0
 	end
 
-	ArgCheck.assert(n1 >= 1)
+	ArgCheck.assert(p >= 1)
 
-	local v10 = n2 * (n1 - 1)
-
-	return (math.max(1, (n4 - (n3 * 2 + (n6 or 0)) - v10) / (n1 + n5)))
+	local v = p2 * (p - 1)
+	return (math.max(1, (p4 - (p3 * 2 + (value or 0)) - v) / (p + p5)))
 end
 
 return calculateItemWidth

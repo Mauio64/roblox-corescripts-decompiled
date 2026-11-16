@@ -1,11 +1,9 @@
-local ParentParent = script.Parent.Parent
-
-require(ParentParent:WaitForChild("ChatSettings"))
-
+local parent = script.Parent.Parent
+require(parent:WaitForChild("ChatSettings"))
 local Util = require(script.Parent:WaitForChild("Util"))
 
-function CreateUnknownMessageLabel(p1) -- line: 13
-	print("No message creator for message: " .. p1.Message)
+function CreateUnknownMessageLabel(p)
+	print("No message creator for message: " .. p.Message)
 end
 
 return {

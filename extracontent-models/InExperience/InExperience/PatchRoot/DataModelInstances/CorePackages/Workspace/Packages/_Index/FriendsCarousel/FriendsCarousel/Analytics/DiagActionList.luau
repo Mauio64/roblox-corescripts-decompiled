@@ -1,26 +1,54 @@
-local Parent = script:FindFirstAncestor("FriendsCarousel").Parent
-local DiagEventTypes = require(Parent.SocialLuaAnalytics).Analytics.Enums.DiagEventTypes
+local parent = script:FindFirstAncestor("FriendsCarousel").Parent
+
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local DiagEventTypes = SocialLuaAnalytics.Analytics.Enums.DiagEventTypes
+
 local EventNames = require(script.Parent.EventNames)
 local FetchNames = require(script.Parent.FetchNames)
-local t1 = {
+
+local v = {
 	Done = game:DefineFastString("AllFriendsCarouselLoadingTimeDoneStats", "AllFriendsCarouselLoadingTimeDone"),
 	Failed = game:DefineFastString("AllFriendsCarouselLoadingTimeFailedStats", "AllFriendsCarouselLoadingTimeFailed")
 }
-local t2 = {
-	Done = game:DefineFastString("AllFriendsNextPageCarouselLoadingTimeDoneStats", "AllFriendsNextPageCarouselLoadingTimeDone"),
-	Failed = game:DefineFastString("AllFriendsNextPageCarouselLoadingTimeFailedStats", "AllFriendsNextPageCarouselLoadingTimeFailed")
+
+local v2 = {
+	Done = game:DefineFastString(
+		"AllFriendsNextPageCarouselLoadingTimeDoneStats",
+		"AllFriendsNextPageCarouselLoadingTimeDone"
+	),
+	Failed = game:DefineFastString(
+		"AllFriendsNextPageCarouselLoadingTimeFailedStats",
+		"AllFriendsNextPageCarouselLoadingTimeFailed"
+	)
 }
-local t3 = {
+
+local v3 = {
 	Done = game:DefineFastString("OnlineFriendsCarouselLoadingTimeDoneStats", "OnlineFriendsCarouselLoadingTimeDone"),
-	Failed = game:DefineFastString("OnlineFriendsCarouselLoadingTimeFailedStats", "OnlineFriendsCarouselLoadingTimeFailed")
+	Failed = game:DefineFastString(
+		"OnlineFriendsCarouselLoadingTimeFailedStats",
+		"OnlineFriendsCarouselLoadingTimeFailed"
+	)
 }
-local t4 = {
+
+local v4 = {
 	Done = game:DefineFastString("OldAllFriendsCarouselLoadingTimeDoneStats", "OldAllFriendsCarouselLoadingTimeDone"),
-	Failed = game:DefineFastString("OldAllFriendsCarouselLoadingTimeFailedStats", "OldAllFriendsCarouselLoadingTimeFailed")
+	Failed = game:DefineFastString(
+		"OldAllFriendsCarouselLoadingTimeFailedStats",
+		"OldAllFriendsCarouselLoadingTimeFailed"
+	)
 }
-local v9 = game:DefineFastString("FriendsCarouselUILoadingTimeStats", "FriendsCarouselUILoadingTime")
-local v10 = game:DefineFastString("OnlineFriendsRefetchOnPresenceUpdateCounter", "OnlineFriendsRefetchOnPresenceUpdate")
-local v11 = game:DefineFastString("OnlineFriendsRefetchOnFriendshipUpdateCounter", "OnlineFriendsRefetchOnFriendshipUpdate")
+
+local defineFastString = game:DefineFastString("FriendsCarouselUILoadingTimeStats", "FriendsCarouselUILoadingTime")
+
+local defineFastString2 = game:DefineFastString(
+	"OnlineFriendsRefetchOnPresenceUpdateCounter",
+	"OnlineFriendsRefetchOnPresenceUpdate"
+)
+
+local defineFastString3 = game:DefineFastString(
+	"OnlineFriendsRefetchOnFriendshipUpdateCounter",
+	"OnlineFriendsRefetchOnFriendshipUpdate"
+)
 
 return {
 	[EventNames.CarouselLoadedWithUsers] = {
@@ -43,48 +71,45 @@ return {
 	},
 	[EventNames.PaginatedFriendsCarouselLoadingTime] = {
 		type = DiagEventTypes.Stats,
-		name = function(p1) -- line: 71
-			-- upvalues: FetchNames (copy), t2 (copy), t1 (copy), t3 (copy)
-			if p1.fetch == FetchNames.AllFriends then
-				if p1.nextPage then
-					return t2[p1.status]
-				end
-
-				return t1[p1.status]
+		name = function(data)
+			if data.fetch ~= FetchNames.AllFriends then
+				return v3[data.status]
 			end
 
-			return t3[p1.status]
+			if data.nextPage then
+				return v2[data.status]
+			end
+
+			return v[data.status]
 		end,
-		stats = function(p2) -- line: 78
-			return p2.loadingTime or 0
+		stats = function(p)
+			return p.loadingTime or 0
 		end
 	},
 	[EventNames.FriendsEndpointLoadingTime] = {
 		type = DiagEventTypes.Stats,
-		name = function(p3) -- line: 84
-			-- upvalues: t4 (copy)
-			return t4[p3.status]
+		name = function(p)
+			return v4[p.status]
 		end,
-		stats = function(p4) -- line: 87
-			return p4.loadingTime or 0
+		stats = function(p)
+			return p.loadingTime or 0
 		end
 	},
 	[EventNames.FriendsCarouselUILoadingTime] = {
 		type = DiagEventTypes.Stats,
-		name = function(p5) -- line: 93
-			-- upvalues: v9 (copy)
-			return `{ v9 }_{ p5.fetch }`
+		name = function(p)
+			return `{defineFastString}_{p.fetch}`
 		end,
-		stats = function(p6) -- line: 96
-			return p6.loadingTime or 0
+		stats = function(p)
+			return p.loadingTime or 0
 		end
 	},
 	[EventNames.OnlineFriendsRefetchOnPresenceUpdate] = {
 		type = DiagEventTypes.Counter,
-		name = v10
+		name = defineFastString2
 	},
 	[EventNames.OnlineFriendsRefetchOnFriendshipUpdate] = {
 		type = DiagEventTypes.Counter,
-		name = v11
+		name = defineFastString3
 	}
 }

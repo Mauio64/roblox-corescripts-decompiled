@@ -1,16 +1,19 @@
-local Foundation = game:GetService("CorePackages").Packages._Index.Foundation.Foundation
-local GuiService = require(Foundation.Utility.Wrappers).Services.GuiService
+local CorePackages = game:GetService("CorePackages")
+local foundation = CorePackages.Packages._Index.Foundation.Foundation
 
-local function getHardwareSafeAreaInsets() -- line: 9
-	-- upvalues: GuiService (copy)
-	local InsetArea = GuiService:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets)
-	local InsetArea2 = GuiService:GetInsetArea(Enum.ScreenInsets.None)
+local Wrappers = require(foundation.Utility.Wrappers)
+
+local GuiService = Wrappers.Services.GuiService
+
+local function getHardwareSafeAreaInsets()
+	local insetArea = GuiService:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets)
+	local insetArea2 = GuiService:GetInsetArea(Enum.ScreenInsets.None)
 
 	return {
-		left = InsetArea.Min.X - InsetArea2.Min.X,
-		top = InsetArea.Min.Y - InsetArea2.Min.Y,
-		right = InsetArea2.Max.X - InsetArea.Max.X,
-		bottom = InsetArea2.Max.Y - InsetArea.Max.Y
+		left = insetArea.Min.X - insetArea2.Min.X,
+		top = insetArea.Min.Y - insetArea2.Min.Y,
+		right = insetArea2.Max.X - insetArea.Max.X,
+		bottom = insetArea2.Max.Y - insetArea.Max.Y
 	}
 end
 

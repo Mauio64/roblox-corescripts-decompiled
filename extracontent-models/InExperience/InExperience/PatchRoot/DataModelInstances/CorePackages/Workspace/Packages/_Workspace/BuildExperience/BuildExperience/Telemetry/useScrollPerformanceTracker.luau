@@ -1,26 +1,26 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
-local createScrollIntervalPerformanceTracker = require(Parent.IntervalPerformanceTracker).createScrollIntervalPerformanceTracker
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function useScrollPerformanceTracker(s1: string, p1) -- line: 9
-	-- upvalues: React (copy), createScrollIntervalPerformanceTracker (copy)
-	React.useEffect(function() -- line: 10
-		-- upvalues: p1 (copy), createScrollIntervalPerformanceTracker (copy), s1 (copy)
-		local current = p1.current
+local React = require(parent.React)
+
+local IntervalPerformanceTracker = require(parent.IntervalPerformanceTracker)
+local createScrollIntervalPerformanceTracker = IntervalPerformanceTracker.createScrollIntervalPerformanceTracker
+
+local function useScrollPerformanceTracker(p: string, p2)
+	React.useEffect(function()
+		local current = p2.current
 
 		if current == nil then
 			return
 		end
 
-		local v8 = createScrollIntervalPerformanceTracker(s1, current)
-		local connection = current:GetPropertyChangedSignal("CanvasPosition"):Connect(v8.onScrollTick)
+		local scrollIntervalPerformanceTracker = createScrollIntervalPerformanceTracker(p, current)
+		local canvasPositionChangedConnection = current:GetPropertyChangedSignal("CanvasPosition"):Connect(scrollIntervalPerformanceTracker.onScrollTick)
 
-		return function() -- line: 19
-			-- upvalues: connection (copy), v8 (copy)
-			connection:Disconnect()
-			v8.cleanup()
+		return function()
+			canvasPositionChangedConnection:Disconnect()
+			scrollIntervalPerformanceTracker.cleanup()
 		end
-	end, { s1 })
+	end, { p })
 end
 
 return useScrollPerformanceTracker

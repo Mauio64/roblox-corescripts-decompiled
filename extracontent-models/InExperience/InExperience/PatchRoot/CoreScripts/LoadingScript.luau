@@ -1,20 +1,32 @@
-game:GetService("CoreGui"):WaitForChild("RobloxGui"):WaitForChild("Modules")
-
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules")
 local CorePackages = game:GetService("CorePackages")
-local PlaceId = game.PlaceId
-local v3 = select("#", ...)
 
-if PlaceId <= 0 and v3 > 0 then
-	PlaceId = select(1, ...)
+local v = game.PlaceId
+local v2 = select("#", ...)
+
+if v <= 0 and v2 > 0 then
+	v = select(1, ...)
 end
 
 if game:DefineFastFlag("EnableExperienceGenericChallengeRenderingOnLoadingScript", false) then
-	coroutine.wrap(function() -- line: 23
-		-- upvalues: CorePackages (copy)
-		require(CorePackages.Workspace.Packages.GenericChallenges).Middleware.InitExperienceChallengeInterceptor()
+	coroutine.wrap(function()
+		local GenericChallenges = require(CorePackages.Workspace.Packages.GenericChallenges)
+		GenericChallenges.Middleware.InitExperienceChallengeInterceptor()
 	end)()
 end
 
-local loadingScript = require(CorePackages.Workspace.Packages.ExperienceLoadingScript).loadingScript
+local teamCreateUtils = require(CorePackages.Workspace.Packages.BuildExperiencePlaytestLaunch.teamCreateUtils)
 
-coroutine.wrap(loadingScript)(PlaceId, 72)
+if teamCreateUtils.isViewer() then
+	local UIBlox = require(CorePackages.Packages.UIBlox)
+	local init = UIBlox.init
+	local CoreScriptsInitializer = require(CorePackages.Workspace.Packages.CoreScriptsInitializer)
+	init(CoreScriptsInitializer.UIBloxInGameConfig)
+	local mountTeamCreateViewer = require(CorePackages.Workspace.Packages.BuildExperience.mountTeamCreateViewer)
+	mountTeamCreateViewer(v)
+else
+	local ExperienceLoadingScript = require(CorePackages.Workspace.Packages.ExperienceLoadingScript)
+	local loadingScript = ExperienceLoadingScript.loadingScript
+	coroutine.wrap(loadingScript)(v, 72)
+end

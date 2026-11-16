@@ -1,28 +1,30 @@
-local Parent = script:FindFirstAncestor("UserRelationshipModals").Parent
-local Signal = require(Parent.AppCommonLib).Signal
+local parent = script:FindFirstAncestor("UserRelationshipModals").Parent
 
-return {
-	Format = function(_, s1: string) -- line: 8
-		if s1 == "InGame.FriendPlayerPrompt.Title.SendFriendRequest" or s1 == "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename" then
-			return "Send Friend Request"
-		end
+local AppCommonLib = require(parent.AppCommonLib)
+local MockLocalization = {}
 
-		if s1 == "InGame.FriendPlayerPrompt.Action.Send" then
-			return "Send"
-		end
+function MockLocalization.Format(_, p: string)
+	if
+		p == "InGame.FriendPlayerPrompt.Title.SendFriendRequest"
+		or p == "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename"
+	then
+		return "Send Friend Request"
+	end
 
-		if s1 == "Feature.Friends.Action.FriendRequestSent" then
-			return "Friend Request Sent"
-		end
+	if p == "InGame.FriendPlayerPrompt.Action.Send" then
+		return "Send"
+	elseif p == "Feature.Friends.Action.FriendRequestSent" then
+		return "Friend Request Sent"
+	elseif p == "CommonUI.Messages.Response.SomethingWentWrong" then
+		return "Something Went Wrong"
+	end
 
-		if s1 == "CommonUI.Messages.Response.SomethingWentWrong" then
-			return "Something Went Wrong"
-		end
+	return p
+end
 
-		return s1
-	end,
-	GetLocale = function() -- line: 26
-		return "en-us"
-	end,
-	changed = Signal.new()
-}
+function MockLocalization.GetLocale(): string
+	return "en-us"
+end
+
+MockLocalization.changed = AppCommonLib.Signal.new()
+return MockLocalization

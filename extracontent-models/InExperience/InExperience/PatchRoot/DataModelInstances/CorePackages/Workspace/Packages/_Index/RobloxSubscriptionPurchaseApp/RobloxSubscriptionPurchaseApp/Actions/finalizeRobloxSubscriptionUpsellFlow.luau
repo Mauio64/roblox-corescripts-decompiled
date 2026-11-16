@@ -6,45 +6,74 @@ local cleanupSubscriptionFlow = require(RobloxSubscriptionPurchaseApp.Actions.cl
 local logRobloxSubscriptionUpsellCounter = require(RobloxSubscriptionPurchaseApp.Utils.logRobloxSubscriptionUpsellCounter)
 local logSubscriptionPurchaseFlowEvent = require(RobloxSubscriptionPurchaseApp.Utils.logSubscriptionPurchaseFlowEvent)
 local RobloxSubscriptionUpsellTelemetry = require(RobloxSubscriptionPurchaseApp.Events.RobloxSubscriptionUpsellTelemetry)
-local FFlagEnableSubscriptionPurchaseFlowEventIngest = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnableSubscriptionPurchaseFlowEventIngest)
 
-local function emitCompletionTelemetry(p1) -- line: 61
-	-- upvalues: RobloxSubscriptionFlowCompleteReason (copy), FFlagEnableSubscriptionPurchaseFlowEventIngest (copy), logSubscriptionPurchaseFlowEvent (copy), logRobloxSubscriptionUpsellCounter (copy), RobloxSubscriptionUpsellTelemetry (copy)
-	if p1 == RobloxSubscriptionFlowCompleteReason.UpsellDismissed then
+local FFlagEnableSubscriptionPurchaseFlowEventIngest = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnableSubscriptionPurchaseFlowEventIngest)
+local FFlagBustAvatarCacheAfterSubscriptionPurchase = require(RobloxSubscriptionPurchaseApp.Flags.FFlagBustAvatarCacheAfterSubscriptionPurchase)
+
+local function emitCompletionTelemetry(p)
+	if p == RobloxSubscriptionFlowCompleteReason.UpsellDismissed then
 		if FFlagEnableSubscriptionPurchaseFlowEventIngest then
 			logSubscriptionPurchaseFlowEvent("SubscriptionUpsellPurchaseDismissed")
 		end
 
 		logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionUpsellDismissedCounter)
-	elseif p1 == RobloxSubscriptionFlowCompleteReason.UpsellPurchaseSucceeded then
+	elseif p == RobloxSubscriptionFlowCompleteReason.UpsellPurchaseSucceeded then
 		if FFlagEnableSubscriptionPurchaseFlowEventIngest then
 			logSubscriptionPurchaseFlowEvent("SubscriptionUpsellPurchaseSucceeded")
 		end
 
 		logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionUpsellPurchaseSucceededCounter)
-	elseif p1 == RobloxSubscriptionFlowCompleteReason.UpsellPurchaseFailed then
+	elseif p == RobloxSubscriptionFlowCompleteReason.UpsellPurchaseFailed then
 		if FFlagEnableSubscriptionPurchaseFlowEventIngest then
 			logSubscriptionPurchaseFlowEvent("SubscriptionUpsellPurchaseFailed")
 		end
 
 		logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionUpsellNativePurchasePollingTimeoutCounter)
-	elseif p1 == RobloxSubscriptionFlowCompleteReason.UpsellPurchaseAttempted then
+	elseif p == RobloxSubscriptionFlowCompleteReason.UpsellPurchaseAttempted then
 		logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionPurchaseAttemptedCounter)
 	end
 
 	logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionUpsellFlowCompletedCounter)
 end
-local function finalizeRobloxSubscriptionUpsellFlow(b1: boolean) -- line: 93
-	-- upvalues: RobloxSubscriptionStore (copy), RobloxSubscriptionFlowCompleteReason (copy), PromptState (copy), emitCompletionTelemetry (copy), cleanupSubscriptionFlow (copy)
-	local v18 = RobloxSubscriptionStore.get()
-	local v19 = v18.getDidTryPurchasing()
-	local v20 = v18.getIsNativePurchase()
-	local v21 = v18.getPurchaseFlowOptions().skipWaitingForPurchaseResult or false
-	local v22 = if v19 then if not b1 then if not v20 or v21 then RobloxSubscriptionFlowCompleteReason.UpsellPurchaseAttempted else RobloxSubscriptionFlowCompleteReason.UpsellPurchaseFailed else RobloxSubscriptionFlowCompleteReason.UpsellPurchaseSucceeded else RobloxSubscriptionFlowCompleteReason.UpsellDismissed
 
-	v18.setPromptState(PromptState.SubscriptionPurchaseCompleted)
-	emitCompletionTelemetry(v22)
-	v18.triggerOnFlowComplete(v22)
+local function fn(flag: boolean, flag2: boolean, flag3: boolean, skipWaitingForPurchaseResult: boolean) -- 1 equivalent call inferred from this helper
+	if not flag then
+		return RobloxSubscriptionFlowCompleteReason.UpsellDismissed
+	end
+
+	if flag2 then
+		return RobloxSubscriptionFlowCompleteReason.UpsellPurchaseSucceeded
+	end
+
+	if flag3 and not skipWaitingForPurchaseResult then
+		return RobloxSubscriptionFlowCompleteReason.UpsellPurchaseFailed
+	end
+
+	return RobloxSubscriptionFlowCompleteReason.UpsellPurchaseAttempted
+end
+
+local function finalizeRobloxSubscriptionUpsellFlow(flag: boolean)
+	local v = RobloxSubscriptionStore.get()
+	local v2 = fn( -- inferred equivalent call
+		v.getDidTryPurchasing(),
+		flag,
+		v.getIsNativePurchase(),
+		v.getPurchaseFlowOptions().skipWaitingForPurchaseResult or false
+	)
+
+	v.setPromptState(PromptState.SubscriptionPurchaseCompleted)
+
+	emitCompletionTelemetry(v2)
+
+	if
+		FFlagBustAvatarCacheAfterSubscriptionPurchase
+		and v2 == RobloxSubscriptionFlowCompleteReason.UpsellPurchaseSucceeded
+	then
+		local AvatarEditorService = game:GetService("AvatarEditorService")
+		AvatarEditorService:BustAvatarFetchCache()
+	end
+
+	v.triggerOnFlowComplete(v2)
 	cleanupSubscriptionFlow()
 end
 

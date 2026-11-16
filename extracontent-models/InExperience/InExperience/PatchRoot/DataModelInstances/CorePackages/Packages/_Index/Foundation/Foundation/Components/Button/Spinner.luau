@@ -1,122 +1,128 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+local React = require(parent.React)
 local isPluginSecurity = require(Foundation.Utility.isPluginSecurity)
-local Motion = require(FoundationParent.Motion)
+
+local Motion = require(parent.Motion)
 local useMotion = Motion.useMotion
 local usePresence = Motion.usePresence
+
 local useSpinnerMotionStates = require(script.Parent.useSpinnerMotionStates)
+
 local Flags = require(Foundation.Utility.Flags)
 local Image = require(Foundation.Components.Image)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useRotation = require(Foundation.Utility.useRotation)
 local withDefaults = require(Foundation.Utility.withDefaults)
 
-local function IconSpinner(t1: {[any]: any}) -- line: 26
-	-- upvalues: useRotation (copy), React (copy), Image (copy)
-	local v20 = useRotation(2)
+local function IconSpinner(props)
+	local rotation = useRotation(2)
 
 	return React.createElement(Image, {
 		Image = "icons/status/loading_large",
+		imageStyle = props.style,
+		Rotation = rotation,
 		tag = "position-center-center anchor-center-center size-full-full",
-		imageStyle = t1.style,
-		Rotation = v20,
-		testId = t1.testId
+		testId = props.testId
 	}, {
-		UIScale = React.createElement("UIScale", {
-			Scale = t1.scale
-		})
+		UIScale = React.createElement("UIScale", { Scale = props.scale })
 	})
 end
 
-local t2 = {
+local v = {
 	Path2DControlPoint.new(UDim2.fromScale(1, 0.5), UDim2.fromScale(0, 0.25), UDim2.fromScale(0, -0.25)),
 	Path2DControlPoint.new(UDim2.fromScale(0.5, 0), UDim2.fromScale(0.25, 0), UDim2.fromScale(-0.25, 0)),
 	Path2DControlPoint.new(UDim2.fromScale(0, 0.5), UDim2.fromScale(0, -0.33), UDim2.fromScale(0, 0.33)),
 	Path2DControlPoint.new(UDim2.fromScale(0.5, 1), UDim2.fromScale(-0.25, 0), UDim2.fromScale(0.25, 0))
 }
 
-local function Path2DSpinner(t3: {[any]: any}) -- line: 50
-	-- upvalues: React (copy), useRotation (copy), t2 (copy), View (copy), isPluginSecurity (copy)
-	local v22 = React.useRef(nil)
-	local v23 = useRotation(2)
+local function Path2DSpinner(props)
+	local ref = React.useRef(nil)
+	local rotation = useRotation(2)
 
-	React.useEffect(function() -- line: 54
-		-- upvalues: v22 (copy), t2 (copy)
-		local current = v22.current
+	React.useEffect(function()
+		local current = ref.current
 
 		if current ~= nil then
-			current:SetControlPoints(t2)
+			current:SetControlPoints(v)
 		end
 	end, {})
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v2 = {
 		tag = "position-center-center anchor-center-center size-full",
-		Rotation = v23,
-		testId = t3.testId
-	}, {
-		Circle = React.createElement("Path2D", {
-			Closed = false,
-			ref = v22,
-			Color3 = t3.style:map(function(p1) -- line: 69
-				return p1.Color3
-			end),
-			Transparency = if not isPluginSecurity() then nil else t3.style:map(function(p2) -- line: 73
-				return p2.Transparency
-			end),
-			Thickness = t3.Thickness
-		}),
-		UIScale = React.createElement("UIScale", {
-			Scale = t3.scale
-		})
+		Rotation = rotation,
+		testId = props.testId
+	}
+
+	local createElement2 = React.createElement
+	local v3 = {
+		ref = ref,
+		Closed = false,
+		Color3 = props.style:map(function(p)
+			return p.Color3
+		end),
+		Transparency = 0,
+		Thickness = 0
+	}
+	local transparency
+
+	if isPluginSecurity() then
+		transparency = props.style:map(function(p)
+			return p.Transparency
+		end)
+	end
+
+	v3.Transparency = transparency
+
+	v3.Thickness = props.Thickness
+	return createElement(View, v2, {
+		Circle = createElement2("Path2D", v3),
+		UIScale = React.createElement("UIScale", { Scale = props.scale })
 	})
 end
 
-local t4 = {
-	style = {}
-}
+local v2 = { style = {} }
 
-local function Spinner(t5: {[any]: any}, p3) -- line: 95
-	-- upvalues: withDefaults (copy), t4 (copy), useSpinnerMotionStates (copy), useMotion (copy), usePresence (copy), React (copy), View (copy), Flags (copy), Path2DSpinner (copy), IconSpinner (copy)
-	local v26 = withDefaults(t5, t4)
-	local v27 = useSpinnerMotionStates()
-	local v28, v29 = useMotion(v27.Default)
-	local v30 = usePresence()
+local function Spinner(p, ref)
+	local v3 = withDefaults(p, v2)
 
-	React.useEffect(function() -- line: 102
-		-- upvalues: v30 (copy), v29 (copy), v27 (copy)
-		if v30.isPresent then
-			v29(v27.Loading)
+	local v4 = useSpinnerMotionStates()
+	local v5, v6 = useMotion(v4.Default)
+	local v7 = usePresence()
 
-			return
+	React.useEffect(function()
+		if v7.isPresent then
+			v6(v4.Loading)
+		else
+			v6(v4.Default, { onAnimationComplete = v7.onExitComplete })
 		end
+	end, { v7.isPresent })
 
-		v29(v27.Default, {
-			onAnimationComplete = v30.onExitComplete
-		})
-	end, { v30.isPresent })
+	local createElement = React.createElement
+	local v8 = { tag = "position-center-center anchor-center-center", Size = v3.Size, ref = ref }
 
-	return React.createElement(View, {
-		tag = "position-center-center anchor-center-center",
-		Size = v26.Size,
-		ref = p3
-	}, {
-		Spinner = React.createElement(if not Flags.FoundationUsePath2DSpinner then IconSpinner else Path2DSpinner, {
-			scale = v28.scale,
-			style = React.joinBindings({
-				style = v26.style,
-				transparency = v28.transparency
-			}):map(function(p4) -- line: 122
+	local createElement2 = React.createElement
+	local v9
+
+	if Flags.FoundationUsePath2DSpinner then
+		v9 = Path2DSpinner
+	else
+		v9 = IconSpinner
+	end
+
+	return createElement(View, v8, {
+		Spinner = createElement2(v9, {
+			scale = v5.scale,
+			style = React.joinBindings({ style = v3.style, transparency = v5.transparency }):map(function(p2)
 				return {
-					Color3 = p4.style.Color3,
-					Transparency = p4.style.Transparency + p4.transparency / 2
+					Color3 = p2.style.Color3,
+					Transparency = p2.style.Transparency + p2.transparency / 2
 				}
 			end),
-			Thickness = math.max(math.floor(v26.Size.X.Offset / 8), 1),
-			testId = v26.testId
+			Thickness = math.max(math.floor(v3.Size.X.Offset / 8), 1),
+			testId = v3.testId
 		})
 	})
 end

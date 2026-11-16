@@ -1,69 +1,81 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Core = ParentParent.Core
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Interactable = require(Core.Control.Interactable)
-local useControlState = require(Core.Control.useControlState)
-local useStyle = require(Core.Style.useStyle)
-local ControlState = require(Core.Control.Enum.ControlState)
-local setDefault = require(ParentParent.Utility.setDefault)
-local uDim = UDim.new(0, 8)
+local parent = script.Parent.Parent.Parent.Parent
+local core = parent.Core
+local parent2 = parent.Parent
 
-local function TileOverlay(t1: {[any]: any}) -- line: 33
-	-- upvalues: setDefault (copy), useControlState (copy), useStyle (copy), ControlState (copy), React (copy), uDim (copy), Interactable (copy)
-	local onActivated = t1.onActivated
-	local v14 = setDefault(t1.isVisible, true)
-	local v15 = setDefault(t1.isActive, true)
-	local v16 = t1.reservedBottomHeight or 0
-	local v17 = v16 > 0
+local React = require(parent2.React)
 
-	if not v14 and not v15 then
+local Interactable = require(core.Control.Interactable)
+local useControlState = require(core.Control.useControlState)
+local useStyle = require(core.Style.useStyle)
+local ControlState = require(core.Control.Enum.ControlState)
+
+local setDefault = require(parent.Utility.setDefault)
+
+local udim = UDim.new(0, 8)
+
+local function TileOverlay(props)
+	local onActivated = props.onActivated
+	local v = setDefault(props.isVisible, true)
+	local v2 = setDefault(props.isActive, true)
+	local reservedBottomHeight = props.reservedBottomHeight or 0
+	local v3 = reservedBottomHeight > 0
+
+	if not (v or v2) then
 		return nil
 	end
 
-	local v18, v19 = useControlState()
-	local Theme = useStyle().Theme
-	local BackgroundOnPressColor = nil
-	local n1 = 1
+	local v4, onStateChanged = useControlState()
+	local theme = useStyle().Theme
+	local color = nil
+	local backgroundTransparency = 1
 
-	if v14 and v15 then
-		if v18 == ControlState.Pressed then
-			BackgroundOnPressColor = Theme.BackgroundOnPress.Color
-			n1 = Theme.BackgroundOnPress.Transparency
-		elseif v18 == ControlState.Hover then
-			BackgroundOnPressColor = Theme.BackgroundOnHover.Color
-			n1 = Theme.BackgroundOnHover.Transparency
+	if v and v2 then
+		if v4 == ControlState.Pressed then
+			color = theme.BackgroundOnPress.Color
+			backgroundTransparency = theme.BackgroundOnPress.Transparency
+		elseif v4 == ControlState.Hover then
+			color = theme.BackgroundOnHover.Color
+			backgroundTransparency = theme.BackgroundOnHover.Transparency
 		end
 	end
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v5 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ZIndex = props.zIndex }
+	local v6 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = udim }),
+		ClippingFrame = 0
+	}
+
+	local createElement2 = React.createElement
+	local v7 = {
+		Size = UDim2.new(1, 0, 1, not v3 and 0 or -reservedBottomHeight),
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		ZIndex = t1.zIndex
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = uDim
-		}),
-		ClippingFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ClipsDescendants = true,
-			Size = UDim2.new(1, 0, 1, not v17 and 0 or -v16)
-		}, {
-			Interactable = React.createElement(Interactable, {
-				Size = UDim2.new(1, 0, 1, not v17 and 0 or uDim.Offset),
-				BackgroundColor3 = BackgroundOnPressColor,
-				BackgroundTransparency = n1,
-				AutoButtonColor = false,
-				onStateChanged = v19,
-				[React.Event.Activated] = if not v15 then nil else onActivated,
-				ZIndex = 3
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = uDim
-				})
-			})
+		ClipsDescendants = true
+	}
+
+	local createElement3 = React.createElement
+	local onActivatedsByActivated = {
+		["Size"] = UDim2.new(1, 0, 1, not v3 and 0 or udim.Offset),
+		BackgroundColor3 = color,
+		BackgroundTransparency = backgroundTransparency,
+		AutoButtonColor = false,
+		onStateChanged = onStateChanged
+	}
+
+	local activated = React.Event.Activated
+
+	if not v2 then
+		onActivated = nil
+	end
+
+	onActivatedsByActivated[activated] = onActivated
+	onActivatedsByActivated.ZIndex = 3
+	v6.ClippingFrame = createElement2("Frame", v7, {
+		Interactable = createElement3(Interactable, onActivatedsByActivated, {
+			UICorner = React.createElement("UICorner", { CornerRadius = udim })
 		})
 	})
+	return createElement("Frame", v5, v6)
 end
 
 return TileOverlay

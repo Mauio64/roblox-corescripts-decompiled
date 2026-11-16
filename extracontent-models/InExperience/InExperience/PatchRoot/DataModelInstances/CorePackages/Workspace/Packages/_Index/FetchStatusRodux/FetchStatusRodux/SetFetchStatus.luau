@@ -1,9 +1,6 @@
-local Parent = script:FindFirstAncestor("FetchStatusRodux").Parent
+local parent = script:FindFirstAncestor("FetchStatusRodux").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2, p3) -- line: 6
-	return {
-		fetchNamespace = p1,
-		fetchKey = p2,
-		fetchStatus = p3
-	}
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(fetchNamespace, fetchKey, fetchStatus)
+	return { fetchNamespace = fetchNamespace, fetchKey = fetchKey, fetchStatus = fetchStatus }
 end)

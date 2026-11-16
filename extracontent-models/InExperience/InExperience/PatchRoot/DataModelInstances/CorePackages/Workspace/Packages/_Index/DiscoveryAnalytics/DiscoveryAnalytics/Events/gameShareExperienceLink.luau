@@ -1,41 +1,51 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("GameShareExperienceLinkThrottleHundrethsPercent", 10000)
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppAddUniverseIdToEngagementEvents = SharedFlags.FFlagLuaAppAddUniverseIdToEngagementEvents
+
+local defineFastInt = game:DefineFastInt("GameShareExperienceLinkThrottleHundrethsPercent", 10000)
+
+local strictInterface = t.strictInterface
+local v = {
 	placeId = t.string,
 	uid = t.string,
 	ctx = t.string,
 	shortShareLinkFailed = t.optional(t.boolean),
 	shareToAppsflyer = t.optional(t.boolean),
 	stamp = t.optional(t.string),
-	linkId = t.optional(t.string)
-})
+	linkId = t.optional(t.string),
+	targetId = 0
+}
+local targetId
 
-return function(p1, s1: string) -- line: 21
-	-- upvalues: v6 (copy), DiscoveryEventErrorLogger (copy), v5 (copy), TelemetryService (copy)
-	local v9, v10 = v6(p1)
+if FFlagLuaAppAddUniverseIdToEngagementEvents then
+	targetId = t.optional(t.string)
+end
 
-	if not v9 then
-		DiscoveryEventErrorLogger.reportError("GameShareExperienceLinkInvalidInterface", v10)
+v.targetId = targetId
+local v2 = strictInterface(v)
+
+return function(customFields, eventContext: string)
+	local v3, v4 = v2(customFields)
+
+	if not v3 then
+		DiscoveryEventErrorLogger.reportError("GameShareExperienceLinkInvalidInterface", v4)
 	end
 
-	local t1 = {
+	TelemetryService:LogEvent({
 		eventName = "shareExperienceLink",
-		description = "User has shared an experience link",
 		backends = { "EventIngest" },
-		throttlingPercentage = v5,
-		lastUpdated = {
-			25,
-			11,
-			11
-		}
-	}
-
-	TelemetryService:LogEvent(t1, {
-		eventContext = s1,
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 25, 11, 11 },
+		description = "User has shared an experience link"
+	}, {
+		eventContext = eventContext,
 		standardizedFields = { "addSessionInfo" },
-		customFields = p1
+		customFields = customFields
 	})
 end

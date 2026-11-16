@@ -1,74 +1,79 @@
 local CorePackages = game:GetService("CorePackages")
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local InExperienceAppChatModal = require(CorePackages.Workspace.Packages.AppChat.InExperienceAppChatModal)
 local PolicyProvider = require(CorePackages.Packages.PolicyProvider)
 local UniversalAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy)
+
 local registerPartyIntegration = require(script.Parent.registerPartyIntegration)
+
 local Service = require(Chrome.Service)
 local isConnectUnibarEnabled = require(Chrome.Integrations.Connect.isConnectUnibarEnabled)
 local isConnectDropdownEnabled = require(Chrome.Integrations.Connect.isConnectDropdownEnabled)
-local GetFFlagIsSquadEnabled = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagIsSquadEnabled
-local v11 = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
 
-local function canAccessParty() -- line: 18
-	-- upvalues: UniversalAppPolicy (copy)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
+
+local memStorageService = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+
+local function canAccessParty() -- 1 equivalent call inferred from this helper
 	return UniversalAppPolicy.getAppFeaturePolicies().getCanAccessParty()
 end
-local function shouldEnableIntegrationForParty() -- line: 22
-	-- upvalues: GetFFlagIsSquadEnabled (copy), UniversalAppPolicy (copy), isConnectDropdownEnabled (copy)
-	return GetFFlagIsSquadEnabled() and (UniversalAppPolicy.getAppFeaturePolicies().getCanAccessParty() and isConnectDropdownEnabled())
+
+local function shouldEnableIntegrationForParty() -- 1 equivalent call inferred from this helper
+	return GetFFlagIsSquadEnabled() and canAccessParty() and isConnectDropdownEnabled() -- inferred equivalent call
 end
 
-local u14 = nil
-local u15 = nil
+local v = nil
+local fn = nil
 
-local function updatePartyIntegration(p1) -- line: 29
-	-- upvalues: u14 (ref), registerPartyIntegration (copy), Service (copy), u15 (ref), InExperienceAppChatModal (copy)
-	if not u14 then
-		u14 = registerPartyIntegration("party_entrypoint", if not p1 then Service.AvailabilitySignal.Unavailable else Service.AvailabilitySignal.Pinned)
+local function updatePartyIntegration(p)
+	if not v then
+		local v2
+
+		if p then
+			v2 = Service.AvailabilitySignal.Pinned
+		else
+			v2 = Service.AvailabilitySignal.Unavailable
+		end
+
+		v = registerPartyIntegration("party_entrypoint", v2)
 	end
 
-	if not p1 then
-		u14.availability:unavailable()
-
-		if u15 then
-			u15()
-			u15 = nil
-
-			return
-		end
-	else
+	if p then
 		if InExperienceAppChatModal.default.currentSquadId ~= "" then
-			u14.availability:pinned()
+			v.availability:pinned()
 		end
 
-		if not u15 then
-			local connection = InExperienceAppChatModal.default.currentSquadIdSignal.Event:Connect(function(p2) -- line: 55
-				-- upvalues: u14 (ref)
+		if not fn then
+			local eventConnection = InExperienceAppChatModal.default.currentSquadIdSignal.Event:Connect(function(p2)
 				if p2 == "" then
-					u14.availability:unavailable()
-
-					return
+					v.availability:unavailable()
+				else
+					v.availability:pinned()
 				end
-
-				u14.availability:pinned()
 			end)
-
-			function u15() -- line: 62
-				-- upvalues: connection (copy)
-				connection:Disconnect()
+			fn = function()
+				eventConnection:Disconnect()
 			end
 		end
+	else
+		v.availability:unavailable()
+
+		if fn then
+			fn()
+			fn = nil
+		end
 	end
 end
-local function handlePolicyUpdate() -- line: 69
-	-- upvalues: updatePartyIntegration (copy), GetFFlagIsSquadEnabled (copy), UniversalAppPolicy (copy), isConnectDropdownEnabled (copy)
-	updatePartyIntegration(GetFFlagIsSquadEnabled() and (UniversalAppPolicy.getAppFeaturePolicies().getCanAccessParty() and isConnectDropdownEnabled()))
+
+local function handlePolicyUpdate() -- 1 equivalent call inferred from this helper
+	updatePartyIntegration(shouldEnableIntegrationForParty()) -- inferred equivalent call
 end
 
 if isConnectUnibarEnabled() then
-	updatePartyIntegration(GetFFlagIsSquadEnabled() and (UniversalAppPolicy.getAppFeaturePolicies().getCanAccessParty() and isConnectDropdownEnabled()))
-	v11.onPolicyChanged(handlePolicyUpdate)
+	handlePolicyUpdate() -- inferred equivalent call
+	memStorageService.onPolicyChanged(handlePolicyUpdate)
 end
 
-return u14
+return v

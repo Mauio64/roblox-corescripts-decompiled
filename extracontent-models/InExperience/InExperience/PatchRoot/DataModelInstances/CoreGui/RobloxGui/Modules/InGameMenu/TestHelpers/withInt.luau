@@ -1,9 +1,12 @@
-local function withInt(p1, p2, p3) -- line: 4
-	local v5 = game:SetFastIntForTesting(p1, p2)
-	local ok, result = pcall(p3)
+local function withInt(p, p2, callback)
+	local v = game:SetFastIntForTesting(p, p2)
+	local success, result = pcall(callback)
 
-	game:SetFastIntForTesting(p1, v5)
-	assert(ok, result)
+	game:SetFastIntForTesting(p, v)
+
+	if not success then
+		error(result)
+	end
 end
 
 return withInt

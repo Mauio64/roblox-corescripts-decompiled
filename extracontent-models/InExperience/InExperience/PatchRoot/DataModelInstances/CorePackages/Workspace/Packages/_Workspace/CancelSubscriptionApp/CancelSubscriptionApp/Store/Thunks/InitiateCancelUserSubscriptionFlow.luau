@@ -6,35 +6,33 @@ local CancelSubscriptionFailed = require(CancelSubscriptionApp.Store.Actions.Can
 local ErrorStateEnum = require(CancelSubscriptionApp.Enums.ErrorStateEnum)
 local LocalizationService = game:GetService("LocalizationService")
 
-local function InitiateCancelUserSubscriptionFlow(p1, s1: string) -- line: 9
-	-- upvalues: CancelSubscriptionRequested (copy), LocalizationService (copy), ErrorStateEnum (copy), getUserSubscriptionDetails (copy), CancelSubscriptionStarted (copy), CancelSubscriptionFailed (copy)
-	return function(p2) -- line: 10
-		-- upvalues: CancelSubscriptionRequested (copy), s1 (copy), LocalizationService (copy), ErrorStateEnum (copy), getUserSubscriptionDetails (copy), p1 (copy), CancelSubscriptionStarted (copy), CancelSubscriptionFailed (copy)
-		p2:dispatch(CancelSubscriptionRequested(s1))
+local function InitiateCancelUserSubscriptionFlow(p, p2: string)
+	return function(object)
+		object:dispatch(CancelSubscriptionRequested(p2))
 
-		local RobloxLocaleId = LocalizationService.RobloxLocaleId
-		local ErrorCancelling = ErrorStateEnum.ErrorCancelling
-
-		return getUserSubscriptionDetails(p1, s1):andThen(function(p3) -- line: 16
-			-- upvalues: RobloxLocaleId (copy), p2 (copy), CancelSubscriptionStarted (copy), s1 (copy), ErrorCancelling (ref), ErrorStateEnum (copy), CancelSubscriptionFailed (copy)
-			if p3.SubscriptionState == Enum.SubscriptionState.SubscribedWillRenew or p3.SubscriptionState == Enum.SubscriptionState.SubscribedRenewalPaymentPending then
-				local v15 = p3.NextRenewTime:FormatLocalTime("LL", RobloxLocaleId)
-
-				p2:dispatch(CancelSubscriptionStarted(s1, v15))
-
+		local robloxLocaleId = LocalizationService.RobloxLocaleId
+		local v = ErrorStateEnum.ErrorCancelling
+		return getUserSubscriptionDetails(p, p2):andThen(function(p3)
+			if
+				p3.SubscriptionState == Enum.SubscriptionState.SubscribedWillRenew
+				or p3.SubscriptionState == Enum.SubscriptionState.SubscribedRenewalPaymentPending
+			then
+				object:dispatch(CancelSubscriptionStarted(p2, (p3.NextRenewTime:FormatLocalTime("LL", robloxLocaleId))))
 				return
 			end
 
-			if p3.SubscriptionState == Enum.SubscriptionState.NeverSubscribed or p3.SubscriptionState == Enum.SubscriptionState.Expired then
-				ErrorCancelling = ErrorStateEnum.Unsubscribed
+			if
+				p3.SubscriptionState == Enum.SubscriptionState.NeverSubscribed
+				or p3.SubscriptionState == Enum.SubscriptionState.Expired
+			then
+				v = ErrorStateEnum.Unsubscribed
 			elseif p3.SubscriptionState == Enum.SubscriptionState.SubscribedWillNotRenew then
-				ErrorCancelling = ErrorStateEnum.Expiring
+				v = ErrorStateEnum.Expiring
 			end
 
-			p2:dispatch(CancelSubscriptionFailed(ErrorCancelling, s1))
-		end):catch(function(_) -- line: 35
-			-- upvalues: p2 (copy), CancelSubscriptionFailed (copy), ErrorStateEnum (copy), s1 (copy)
-			p2:dispatch(CancelSubscriptionFailed(ErrorStateEnum.ErrorCancelling, s1))
+			object:dispatch(CancelSubscriptionFailed(v, p2))
+		end):catch(function(_)
+			object:dispatch(CancelSubscriptionFailed(ErrorStateEnum.ErrorCancelling, p2))
 		end)
 	end
 end

@@ -1,100 +1,158 @@
-local ParentParent = script.Parent.Parent
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
-local Promise = require(ParentParent.Promise)
-local FFlagRefreshPriceOnRetryAfterUpsell = require(ParentParent.Flags.FFlagRefreshPriceOnRetryAfterUpsell)
-local FFlagEnableDiscountInfoInUnifiedPurchaseModal = require(ParentParent.Parent.SharedFlags).FFlagEnableDiscountInfoInUnifiedPurchaseModal
-local getCatalogItemDetails = require(ParentParent.Network.getCatalogItemDetails)
-local getResellers = require(ParentParent.Network.getResellers)
-local resolveRefreshedExpectedPrice = require(ParentParent.Utils.resolveRefreshedExpectedPrice)
-local FFlagFixTimedOptionRefresh = require(ParentParent.Flags.FFlagFixTimedOptionRefresh)
-local resolveRefreshedProductInfo = require(ParentParent.Utils.resolveRefreshedProductInfo)
+local parent = script.Parent.Parent
 
-local function convertDiscountInfoToPriceDiscountDetails(p1) -- line: 21
-	if not p1 or type(p1.discounts) ~= "table" then
+local PurchaseError = require(parent.Enums.PurchaseError)
+local Promise = require(parent.Promise)
+require(parent.Parent.LuauPolyfill)
+
+local FFlagRefreshPriceOnRetryAfterUpsell = require(parent.Flags.FFlagRefreshPriceOnRetryAfterUpsell)
+
+local SharedFlags = require(parent.Parent.SharedFlags)
+local FFlagEnableFetchCartPricingDuringInExperience = SharedFlags.FFlagEnableFetchCartPricingDuringInExperience
+local getCatalogItemDetails = require(parent.Network.getCatalogItemDetails)
+local getResellers = require(parent.Network.getResellers)
+local resolveRefreshedExpectedPrice = require(parent.Utils.resolveRefreshedExpectedPrice)
+local FFlagFixTimedOptionRefresh = require(parent.Flags.FFlagFixTimedOptionRefresh)
+local resolveRefreshedProductInfo = require(parent.Utils.resolveRefreshedProductInfo)
+
+local function convertDiscountInfoToPriceDiscountDetails(discountInformation)
+	if not discountInformation or type(discountInformation.discounts) ~= "table" then
 		return nil
 	end
 
-	local t1 = {}
+	local result = {}
 
-	for _, v in ipairs(p1.discounts) do
-		table.insert(t1, {
-			Type = v.discountCampaign,
-			AmountInRobux = v.robuxDiscountAmount,
-			Percent = v.robuxDiscountPercentage
+	for _, discount in ipairs(discountInformation.discounts) do
+		table.insert(result, {
+			Type = discount.discountCampaign,
+			AmountInRobux = discount.robuxDiscountAmount,
+			Percent = discount.robuxDiscountPercentage
 		})
 	end
 
-	return t1
+	return result
 end
-local function normalizeBundleFields(p2) -- line: 36
-	-- upvalues: FFlagEnableDiscountInfoInUnifiedPurchaseModal (copy), convertDiscountInfoToPriceDiscountDetails (copy)
-	if not FFlagEnableDiscountInfoInUnifiedPurchaseModal then
-		return p2
+
+local function normalizeBundleFields(state)
+	if not state.UserBasePriceInRobux then
+		local discountInformation = state.discountInformation
+		local userBasePriceInRobux = state.BasePriceInRobux
+
+		if not userBasePriceInRobux then
+			local v
+
+			if discountInformation then
+				v = discountInformation.originalPrice
+			end
+
+			userBasePriceInRobux = v or state.PriceInRobux
+
+			if not userBasePriceInRobux then
+				local v2
+
+				if state.product then
+					v2 = state.product.priceInRobux
+				end
+
+				userBasePriceInRobux = v2 or 0
+			end
+		end
+
+		state.UserBasePriceInRobux = userBasePriceInRobux
 	end
 
-	if not p2.UserBasePriceInRobux then
-		local discountInformation = p2.discountInformation
-
-		p2.UserBasePriceInRobux = p2.BasePriceInRobux or (((if not discountInformation then nil else discountInformation.originalPrice)) or (p2.PriceInRobux or (((if not p2.product then nil else p2.product.priceInRobux)) or 0)))
+	if not state.PriceDiscountDetails and state.discountInformation then
+		state.PriceDiscountDetails = convertDiscountInfoToPriceDiscountDetails(state.discountInformation)
 	end
 
-	if not p2.PriceDiscountDetails and p2.discountInformation then
-		p2.PriceDiscountDetails = convertDiscountInfoToPriceDiscountDetails(p2.discountInformation)
-	end
-
-	return p2
+	return state
 end
-local function getBundleDetails(p3, p4, t2: {[any]: any}?) -- line: 57
-	-- upvalues: Promise (copy), normalizeBundleFields (copy), PurchaseError (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), getCatalogItemDetails (copy), getResellers (copy), FFlagFixTimedOptionRefresh (copy), resolveRefreshedProductInfo (copy), resolveRefreshedExpectedPrice (copy)
-	local v23 = p3.getBundleDetails(p4):andThen(function(p5) -- line: 60
-		-- upvalues: Promise (copy), normalizeBundleFields (copy)
-		return Promise.resolve((normalizeBundleFields(p5)))
-	end):catch(function(_) -- line: 63
-		-- upvalues: Promise (copy), PurchaseError (copy)
+
+local function getBundleDetails(p, p2, data, callback)
+	local bundleDetails2 = p.getBundleDetails(p2):andThen(function(p3)
+		if
+			FFlagEnableFetchCartPricingDuringInExperience
+			and p3.collectibleItemDetail
+			and p3.collectibleItemDetail.collectibleItemId
+			and callback
+		then
+			return callback(p3.collectibleItemDetail.collectibleItemId):andThen(function()
+				return normalizeBundleFields(p3)
+			end):catch(function()
+				return normalizeBundleFields(p3)
+			end)
+		end
+
+		return Promise.resolve(normalizeBundleFields(p3))
+	end):catch(function(_)
 		return Promise.reject(PurchaseError.UnknownFailure)
 	end)
 
-	if not FFlagRefreshPriceOnRetryAfterUpsell or not t2 then
-		return v23
+	if not (FFlagRefreshPriceOnRetryAfterUpsell and data) then
+		return bundleDetails2
 	end
 
-	local collectibleItemId = t2.collectibleItemId
-	local collectibleItemInstanceId = t2.collectibleItemInstanceId
-	local v26 = Promise.all({
-		catalogItemDetails = getCatalogItemDetails(p3, p4, "bundle"):catch(function() -- line: 76
+	local collectibleItemId = data.collectibleItemId
+	local collectibleItemInstanceId = data.collectibleItemInstanceId
+
+	local all = Promise.all
+	local v = {
+		catalogItemDetails = getCatalogItemDetails(p, p2, "bundle"):catch(function(): nil
 			return nil
 		end),
-		resellersData = if not collectibleItemInstanceId or (collectibleItemInstanceId == "" or (not collectibleItemId or collectibleItemId == "")) then Promise.resolve(nil) else getResellers(p3, collectibleItemId, 10):catch(function() -- line: 83
+		resellersData = 0
+	}
+	local resellersData
+
+	if
+		collectibleItemInstanceId
+		and collectibleItemInstanceId ~= ""
+		and collectibleItemId
+		and collectibleItemId ~= ""
+	then
+		resellersData = getResellers(p, collectibleItemId, 10):catch(function(): nil
 			return nil
 		end)
-	}):andThen(function(p7) -- line: 87
-		-- upvalues: FFlagFixTimedOptionRefresh (copy), resolveRefreshedProductInfo (copy), collectibleItemInstanceId (copy), t2 (copy), resolveRefreshedExpectedPrice (copy)
+	else
+		resellersData = Promise.resolve(nil)
+	end
+
+	v.resellersData = resellersData
+	local refreshedExpectedPrice2 = all(v):andThen(function(p3)
 		if FFlagFixTimedOptionRefresh then
-			return resolveRefreshedProductInfo(p7.catalogItemDetails, p7.resellersData, collectibleItemInstanceId, t2.timedOptionDays)
+			return resolveRefreshedProductInfo(
+				p3.catalogItemDetails,
+				p3.resellersData,
+				collectibleItemInstanceId,
+				data.timedOptionDays
+			)
 		end
 
-		return (resolveRefreshedExpectedPrice(p7.catalogItemDetails, p7.resellersData, collectibleItemInstanceId, t2.timedOptionDays))
+		return (resolveRefreshedExpectedPrice(
+			p3.catalogItemDetails,
+			p3.resellersData,
+			collectibleItemInstanceId,
+			data.timedOptionDays
+		))
 	end)
 
 	return Promise.all({
-		bundleDetails = v23,
-		refreshedExpectedPrice = v26
-	}):andThen(function(p8) -- line: 107
-		-- upvalues: FFlagFixTimedOptionRefresh (copy)
-		local bundleDetails = p8.bundleDetails
+		bundleDetails = bundleDetails2,
+		refreshedExpectedPrice = refreshedExpectedPrice2
+	}):andThen(function(p3)
+		local bundleDetails = p3.bundleDetails
 
 		if FFlagFixTimedOptionRefresh then
-			local refreshedExpectedPrice = p8.refreshedExpectedPrice
+			local refreshedExpectedPrice = p3.refreshedExpectedPrice
 
 			if refreshedExpectedPrice ~= nil then
-				for k, v in pairs(refreshedExpectedPrice) do
-					bundleDetails[k] = v
+				for k, v2 in pairs(refreshedExpectedPrice) do
+					bundleDetails[k] = v2
 				end
 
 				return bundleDetails
 			end
 		else
-			bundleDetails.refreshedExpectedPrice = p8.refreshedExpectedPrice
+			bundleDetails.refreshedExpectedPrice = p3.refreshedExpectedPrice
 		end
 
 		return bundleDetails

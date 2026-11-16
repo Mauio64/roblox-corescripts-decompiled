@@ -1,116 +1,306 @@
-local Parent = script:FindFirstAncestor("SplitPane").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
-local AppSplitView = require(Parent.AppSplitView)
-local Constants = require(Parent.NavigationRodux).Constants
+local parent = script:FindFirstAncestor("SplitPane").Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Responsive = require(parent.Responsive)
+local AppSplitView = require(parent.AppSplitView)
+local NavigationRodux = require(parent.NavigationRodux)
+local Constants = NavigationRodux.Constants
 local SplitPaneContext = require(script.Parent.Parent.Context.SplitPaneContext)
+
 local SplitPaneStore = require(script.Parent.Parent.Stores.SplitPaneStore)
+local isSupportPaneScreen = require(script.Parent.Parent.Utils.isSupportPaneScreen)
+local SplitPaneVariant = require(script.Parent.Parent.Utils.SplitPaneVariant)
+local SplitPaneTelemetry = require(script.Parent.Parent.Telemetry.SplitPaneTelemetry)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableSplitPaneTelemetry = SharedFlags.FFlagEnableSplitPaneTelemetry
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAXPauseSceneWhenSplitPaneCollapsed = SharedFlags2.FFlagAXPauseSceneWhenSplitPaneCollapsed
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagFixSplitPaneGamepadLayoutJitter = SharedFlags3.FFlagFixSplitPaneGamepadLayoutJitter
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagSplitPaneAvatarOnlyAlwaysExpanded = SharedFlags4.FFlagSplitPaneAvatarOnlyAlwaysExpanded
+
+local supportPaneInputRules = require(script.Parent.Parent.Utils.supportPaneInputRules)
+
+local usePreferredInput = Responsive.usePreferredInput
+
 local SupportPaneMode = AppSplitView.Enums.SupportPaneMode
+
 local TempRnSwitchNavigatorName = Constants.TempRnSwitchNavigatorName
 
-local function useSplitPaneRender(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}, b1: boolean) -- line: 41
-	-- upvalues: SplitPaneStore (copy), SignalsReact (copy), React (copy), SplitPaneContext (copy), TempRnSwitchNavigatorName (copy), SupportPaneMode (copy)
-	local v15 = SplitPaneStore.getStore()
-	local v16 = SignalsReact.useSignalState(v15.getSupportPaneMode)
-	local v17 = SignalsReact.useSignalState(v15.getSupportWidth)
-	local v18 = SignalsReact.useSignalState(v15.getIsBreakpointEnabled)
-	local v19 = React.useContext(SplitPaneContext)
-	local v20 = not b1 and 0 or #t3
-	local v21 = table.clone(t2)
-	local t4 = {}
-	local t5 = {}
+local function resolveTemporarySupportPaneMode(current: number, p: number, p2, flag: boolean)
+	local v
 
-	if b1 then
-		for _, v25 in t3 do
-			local key = t1[v25].descriptor.key
-			local v27 = v21[key]
+	if current > 0 then
+		v = p == 0
+	else
+		v = false
+	end
 
-			if v27 ~= nil then
-				v21[key] = nil
-				t4[key] = v27
+	local v2
+
+	if current == 0 then
+		v2 = p > 0
+	else
+		v2 = false
+	end
+
+	local v3 = not v2 and p > 0
+
+	if v2 then
+		if FFlagSplitPaneAvatarOnlyAlwaysExpanded and SplitPaneVariant.isSupportPaneAlwaysExpanded() then
+			return SupportPaneMode.Expanded, true
+		end
+
+		local v4
+
+		if SplitPaneVariant.shouldAutoExpandOnSupportOpen() then
+			v4 = supportPaneInputRules.resolveOpenedMode(p2)
+		else
+			v4 = supportPaneInputRules.resolveInputChangedMode(p2)
+		end
+
+		return v4, true
+	end
+
+	if v then
+		return nil, true
+	end
+
+	if flag and v3 then
+		if FFlagSplitPaneAvatarOnlyAlwaysExpanded and SplitPaneVariant.isSupportPaneAlwaysExpanded() then
+			return SupportPaneMode.Expanded, true
+		end
+
+		return supportPaneInputRules.resolveInputChangedMode(p2), true
+	end
+
+	return nil, false
+end
+
+local function useSplitPaneRender(list, p, list2, flag: boolean)
+	local store = SplitPaneStore.getStore()
+
+	local v = flag and #list2 or 0
+	local isRootAppStack
+
+	if list[1] == nil or list[1].descriptor == nil or list[1].descriptor.state == nil then
+		isRootAppStack = false
+	else
+		isRootAppStack = list[1].descriptor.state.routeName == TempRnSwitchNavigatorName
+	end
+
+	local ref = React.useRef(0)
+	local v2 = usePreferredInput()
+
+	if FFlagFixSplitPaneGamepadLayoutJitter and isRootAppStack then
+		local current = ref.current
+		local v3
+
+		if current > 0 then
+			v3 = v == 0
+		else
+			v3 = false
+		end
+
+		local v4
+
+		if current == 0 then
+			v4 = v > 0
+		else
+			v4 = false
+		end
+
+		if not v4 then
+			local _ = v > 0
+		end
+
+		local v5, flag2
+
+		if v4 then
+			if FFlagSplitPaneAvatarOnlyAlwaysExpanded and SplitPaneVariant.isSupportPaneAlwaysExpanded() then
+				v5 = SupportPaneMode.Expanded
+			elseif SplitPaneVariant.shouldAutoExpandOnSupportOpen() then
+				v5 = supportPaneInputRules.resolveOpenedMode(v2)
+			else
+				v5 = supportPaneInputRules.resolveInputChangedMode(v2)
 			end
+
+			flag2 = true
+		else
+			flag2 = if v3 then true else false
+		end
+
+		if flag2 then
+			store.setTemporarySupportPaneMode(v5)
 		end
 	end
 
-	if v18 then
-		local n1 = 0
+	local supportPaneMode = SignalsReact.useSignalState(store.getSupportPaneMode)
+	local supportWidth = SignalsReact.useSignalState(store.getSupportWidth)
+	local isBreakpointEnabled = SignalsReact.useSignalState(store.getIsBreakpointEnabled)
 
-		for v29, v30 in t1 do
-			local options = v30.descriptor.options
+	local v3 = React.useContext(SplitPaneContext)
+
+	local clone = table.clone(p)
+	local supportSlotChildren = {}
+	local overlaySlotChildren = {}
+
+	if flag then
+		for _, item in list2 do
+			local key = list[item].descriptor.key
+			local v4 = clone[key]
+
+			if v4 == nil then
+				continue
+			end
+
+			clone[key] = nil
+			supportSlotChildren[key] = v4
+		end
+	end
+
+	if isBreakpointEnabled then
+		local v4 = 0
+
+		for k, item in list do
+			local options = item.descriptor.options
 
 			if options ~= nil and options.splitPaneEligibility ~= nil then
-				n1 = v29
+				v4 = k
 			end
 		end
 
-		for v32, v33 in t1 do
-			local options = v33.descriptor.options
+		for k, item in list do
+			local options = item.descriptor.options
 
-			if options ~= nil and options.transparent and not options.overlayEnabled and options.splitPaneEligibility == nil then
-				local key = v33.descriptor.key
-				local v36 = v21[key]
+			if
+				options == nil
+				or not options.transparent
+				or options.overlayEnabled
+				or options.splitPaneEligibility ~= nil
+			then
+				continue
+			end
 
-				if v36 ~= nil then
-					v21[key] = nil
+			local key = item.descriptor.key
+			local v5 = clone[key]
 
-					if n1 < v32 then
-						t5[key] = v36
-					end
-				end
+			if v5 == nil then
+				continue
+			end
+
+			clone[key] = nil
+
+			if v4 < k then
+				overlaySlotChildren[key] = v5
 			end
 		end
 	end
 
-	local v37 = t1[1] ~= nil and (t1[1].descriptor ~= nil and (t1[1].descriptor.state ~= nil and t1[1].descriptor.state.routeName == TempRnSwitchNavigatorName))
-	local v38 = React.useRef(0)
+	if FFlagAXPauseSceneWhenSplitPaneCollapsed then
+		React.useEffect(function()
+			if isRootAppStack then
+				store.setHasSupportRoute(v > 0)
+			end
+		end, { isRootAppStack, v, store })
+		React.useEffect(function()
+			return function()
+				if isRootAppStack then
+					store.setHasSupportRoute(false)
+				end
+			end
+		end, { isRootAppStack, store })
+	end
 
-	React.useEffect(function() -- line: 107
-		-- upvalues: v38 (copy), v20 (copy), v37 (copy), v16 (copy), SupportPaneMode (copy), v15 (copy)
-		local current = v38.current
+	React.useEffect(function()
+		local current = ref.current
+		ref.current = v
 
-		v38.current = v20
-
-		if not v37 or v16 == SupportPaneMode.Normal then
+		if not isRootAppStack then
 			return
 		end
 
-		local v43 = current > 0 and v20 == 0
-		local v44 = current == 0 and v20 > 0
+		local v4
 
-		if v43 or v44 then
-			v15.setSupportPaneMode(SupportPaneMode.Normal)
+		if current == 0 then
+			v4 = v > 0
+		else
+			v4 = false
 		end
-	end, {
-		v37,
-		v20,
-		v15,
-		v16
-	})
 
-	local v39 = if not (v20 > 0) then nil else t3[v20]
-	local v40 = if v39 == nil then {} else t1[v39].descriptor.options
-	local t6 = {
-		hostNavigation = if v39 == nil then nil else t1[v39].descriptor.navigation,
-		hasDetailOnTop = v39 ~= nil,
-		paneCount = v20,
-		splitPaneExpandable = v40.splitPaneExpandable,
-		splitPaneCollapsible = v40.splitPaneCollapsible
+		if v4 and FFlagEnableSplitPaneTelemetry then
+			SplitPaneTelemetry.logSupportRouteOpened()
+		end
+
+		local temporarySupportPaneMode, v5 = resolveTemporarySupportPaneMode(current, v, v2, true)
+
+		if v5 then
+			store.setTemporarySupportPaneMode(temporarySupportPaneMode)
+		end
+	end, { isRootAppStack, v, store, supportPaneMode, v2 })
+	local v4
+
+	if v > 0 then
+		v4 = list2[v]
+	end
+
+	local v5 = v4 == nil and {} or list[v4].descriptor.options
+	local navigation
+
+	if v4 ~= nil then
+		navigation = list[v4].descriptor.navigation
+	end
+
+	local hasDetailOnTop = v4 ~= nil
+	local supportRouteKeys = {}
+
+	if flag then
+		for _, item in list do
+			if not isSupportPaneScreen(item) then
+				continue
+			end
+
+			local state = item.descriptor.state
+
+			if state ~= nil and state.key ~= nil then
+				table.insert(supportRouteKeys, state.key)
+			end
+		end
+	end
+
+	local supportContentProps = {
+		hostNavigation = navigation,
+		hasDetailOnTop = hasDetailOnTop,
+		paneCount = v,
+		splitPaneExpandable = v5.splitPaneExpandable,
+		splitPaneCollapsible = v5.splitPaneCollapsible,
+		supportRouteKeys = supportRouteKeys
 	}
 
+	local v6 = v5.splitPaneCollapsible == true or not hasDetailOnTop
+
+	if v6 then
+		v6 = not (hasDetailOnTop and v > 1)
+	end
+
 	return {
-		primarySlotChildren = v21,
-		supportSlotChildren = t4,
-		overlaySlotChildren = t5,
-		supportContentProps = t6,
-		supportWidth = v17,
-		supportMinWidth = v15.getMinSupportWidth(),
-		supportMaxWidth = v15.getMaxSupportWidth(),
-		onSupportPaneWidthChanged = v15.setSupportWidth,
-		supportPaneMode = v16,
-		supportPaneResizable = v19.supportPaneResizable == true,
-		isBreakpointEnabled = v18,
-		renderSupportContent = v19.renderSupportContent,
-		onContentRegionRectChanged = v19.onContentRegionRectChanged
+		primarySlotChildren = clone,
+		supportSlotChildren = supportSlotChildren,
+		overlaySlotChildren = overlaySlotChildren,
+		supportContentProps = supportContentProps,
+		supportWidth = supportWidth,
+		supportMinWidth = store.getMinSupportWidth(),
+		supportMaxWidth = store.getMaxSupportWidth(),
+		onSupportPaneWidthChanged = store.setSupportWidth,
+		supportPaneMode = supportPaneMode,
+		supportPaneResizable = v3.supportPaneResizable == true,
+		supportResizerAbovePane = not v6,
+		isBreakpointEnabled = isBreakpointEnabled,
+		isRootAppStack = isRootAppStack,
+		renderSupportContent = v3.renderSupportContent,
+		onContentRegionRectChanged = v3.onContentRegionRectChanged
 	}
 end
 

@@ -1,123 +1,217 @@
 local StreamNotifications = script:FindFirstAncestor("StreamNotifications")
-local StreamNotificationsParent = StreamNotifications.Parent
+local parent = StreamNotifications.Parent
 local constants = require(StreamNotifications.constants)
-local useLocalization = require(StreamNotificationsParent.Localization).Hooks.useLocalization
-local React = require(StreamNotificationsParent.React)
-local useDispatch = require(StreamNotificationsParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local UIBlox = require(StreamNotificationsParent.UIBlox)
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
 local useStyle = UIBlox.Core.Style.useStyle
+local useTokens = Foundation.Hooks.useTokens
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local IconButton = UIBlox.App.Button.IconButton
 local IconSize = UIBlox.App.ImageSet.Enum.IconSize
 local UserInputService = game:GetService("UserInputService")
-local EventStream = require(StreamNotifications.analytics.analyticsService).EventStream
-local NotificationHelper = require(StreamNotificationsParent.NotificationsCommon).NotificationHelper
+
+local analyticsService = require(StreamNotifications.analytics.analyticsService)
+local eventStream = analyticsService.EventStream
+local NotificationsCommon = require(parent.NotificationsCommon)
+local NotificationHelper = NotificationsCommon.NotificationHelper
 local analyticsConstants = require(StreamNotifications.analytics.analyticsConstants)
+
 local StreamNotificationDropdownExperimentation = require(StreamNotifications.StreamNotificationDropdownExperimentation)
 local StreamNotificationSettingsExperimentation = require(StreamNotifications.StreamNotificationSettingsExperimentation)
 local StreamNotificationSettingsActivation = require(StreamNotifications.StreamNotificationSettingsActivation)
-local FFlagStreamNotificationUXSettingsHeader = require(StreamNotificationsParent.SharedFlags).FFlagStreamNotificationUXSettingsHeader
+local SharedFlags = require(parent.SharedFlags)
+local FFlagStreamNotificationUXSettingsHeader = SharedFlags.FFlagStreamNotificationUXSettingsHeader
 
-local function getSettingsButtonSize(n1: number, n2: number) -- line: 30
-	return n1 - n2 * 2
+local function getSettingsButtonSize(p: number, p2: number) -- 5 equivalent calls inferred from this helper
+	return p - p2 * 2
 end
 
-return function(t1: {[any]: any}) -- line: 34
-	-- upvalues: useStyle (copy), UserInputService (copy), useLocalization (copy), constants (copy), StreamNotificationDropdownExperimentation (copy), FFlagStreamNotificationUXSettingsHeader (copy), useDispatch (copy), StreamNotificationSettingsExperimentation (copy), StreamNotificationSettingsActivation (copy), React (copy), IconButton (copy), IconSize (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy)
-	local v23 = useStyle()
-	local Font = v23.Font
-	local Header1Font = Font.Header1.Font
-	local v26 = Font.BaseSize * Font.Header1.RelativeSize
-	local v27 = (not UserInputService.StatusBarSize or not t1.isSmallScreen) and 0 or UserInputService.StatusBarSize.Y
-	local v28 = useLocalization({
-		headerText = constants.Text.HeaderKey
-	})
-	local v29 = StreamNotificationDropdownExperimentation.getDropdownEnabled()
-	local v30 = false
+return function(p)
+	local v = useStyle()
+	local v2
 
-	local function v31() -- line: 51
+	if FoundationFontFaceMigration then
+		v2 = useTokens()
 	end
+
+	local font = v.Font
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Header1.Font
+	end
+
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v2.Typography.HeadingSmall.Font)
+	end
+
+	local textSize
+
+	if FoundationFontFaceMigration then
+		textSize = v2.Typography.HeadingSmall.FontSize
+	else
+		textSize = font.BaseSize * font.Header1.RelativeSize
+	end
+
+	local v3 = not (UserInputService.StatusBarSize and p.isSmallScreen) and 0 or UserInputService.StatusBarSize.Y
+
+	local v4 = useLocalization({ headerText = constants.Text.HeaderKey })
+
+	local dropdownEnabled = StreamNotificationDropdownExperimentation.getDropdownEnabled()
+	local v5, onActivated
 
 	if FFlagStreamNotificationUXSettingsHeader then
-		local v32 = useDispatch()
+		local v6 = useDispatch()
+		v5 = StreamNotificationSettingsExperimentation.getSettingsGearEnabled()
+		onActivated = StreamNotificationSettingsActivation.createOnSettingsActivated(
+			v5,
+			dropdownEnabled,
+			p.displayStream,
+			v6
+		)
+	else
+		v5 = false
 
-		v30 = StreamNotificationSettingsExperimentation.getSettingsGearEnabled()
-		v31 = StreamNotificationSettingsActivation.createOnSettingsActivated(v30, v29, t1.displayStream, v32)
+		onActivated = function() end
 	end
 
-	if v29 then
-		local HeaderMinHeight = constants.Dropdown.HeaderMinHeight
-		local v34 = HeaderMinHeight - constants.DefaultPadding * 2
-		local v35 = not v30 and 0 or v34
+	if dropdownEnabled then
+		local headerMinHeight = constants.Dropdown.HeaderMinHeight
+		local settingsButtonSize = getSettingsButtonSize(headerMinHeight, constants.DefaultPadding) -- inferred equivalent call
 
-		return React.createElement("Frame", {
+		local createElement = React.createElement
+		local v6 = {
+			Size = UDim2.new(1, 0, 0, headerMinHeight),
 			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, HeaderMinHeight)
-		}, {
+			LayoutOrder = 1
+		}
+
+		local v7 = {
 			HeaderText = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				Text = v28 and v28.headerText,
-				Font = Header1Font,
-				TextSize = v26,
-				TextColor3 = v23.Theme.TextEmphasis.Color,
+				Text = v4 and v4.headerText,
+				Font = font2,
+				FontFace = fontFace,
+				TextSize = textSize,
+				TextColor3 = v.Theme.TextEmphasis.Color,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				Size = UDim2.new(1, -v35, 1, 0)
+				Size = UDim2.new(1, -(not v5 and 0 or settingsButtonSize), 1, 0),
+				BackgroundTransparency = 1
 			}),
-			SettingsButton = if not FFlagStreamNotificationUXSettingsHeader or not v30 then nil else React.createElement(IconButton, {
+			SettingsButton = 0
+		}
+		local settingsButton
+
+		if FFlagStreamNotificationUXSettingsHeader and v5 then
+			settingsButton = React.createElement(IconButton, {
 				anchorPoint = Vector2.new(1, 0.5),
 				iconSize = IconSize.Medium,
 				icon = constants.Modal.SettingsIcon,
 				position = UDim2.new(1, 0, 0.5, 0),
-				size = UDim2.fromOffset(v34, v34),
-				onActivated = v31
+				size = UDim2.fromOffset(settingsButtonSize, settingsButtonSize),
+				onActivated = onActivated
 			})
-		})
-	end
+		end
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, constants.Modal.HeaderHeight + v27)
-	}, {
-		HeaderFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
+		v7.SettingsButton = settingsButton
+		return createElement("Frame", v6, v7)
+	else
+		local createElement = React.createElement
+		local v6 = {
+			Size = UDim2.new(1, 0, 0, constants.Modal.HeaderHeight + v3),
+			BackgroundTransparency = 1
+		}
+
+		local createElement2 = React.createElement
+		local v7 = {
 			Size = UDim2.new(1, 0, 0, constants.Modal.HeaderHeight),
+			BackgroundTransparency = 1,
 			Position = UDim2.new(0, 0, 1, 0),
 			AnchorPoint = Vector2.new(0, 1)
-		}, {
-			CloseModal = React.createElement(IconButton, {
-				layoutOrder = 1,
-				anchorPoint = Vector2.new(0, 0),
-				iconSize = IconSize.Medium,
-				icon = if not t1.isSmallScreen then constants.Modal.CloseIcon else constants.Modal.BackIcon,
-				size = UDim2.new(0, constants.Modal.HeaderHeight - constants.Modal.Padding * 2, 0, constants.Modal.HeaderHeight - constants.Modal.Padding * 2),
-				position = UDim2.fromOffset(constants.Modal.Padding, constants.Modal.Padding),
-				onActivated = function() -- line: 121
-					-- upvalues: t1 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy)
-					t1.displayStream(false)
-					NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, analyticsConstants.EventNames.closeContent, {
-						closeMethod = analyticsConstants.CloseMethod.closeIcon
-					})
-				end
-			}),
+		}
+
+		local createElement3 = React.createElement
+		local v8 = {
+			anchorPoint = Vector2.new(0, 0),
+			iconSize = IconSize.Medium,
+			icon = 0,
+			layoutOrder = 1,
+			size = 0,
+			position = 0,
+			onActivated = 0
+		}
+		local icon
+
+		if p.isSmallScreen then
+			icon = constants.Modal.BackIcon
+		else
+			icon = constants.Modal.CloseIcon
+		end
+
+		v8.icon = icon
+
+		v8.size = UDim2.new(
+			0,
+			getSettingsButtonSize(constants.Modal.HeaderHeight, constants.Modal.Padding), -- inferred equivalent call
+			0,
+			getSettingsButtonSize(constants.Modal.HeaderHeight, constants.Modal.Padding) -- inferred equivalent call
+		)
+
+		v8.position = UDim2.fromOffset(constants.Modal.Padding, constants.Modal.Padding)
+		function v8.onActivated()
+			p.displayStream(false)
+			NotificationHelper.fireEvent(
+				eventStream,
+				analyticsConstants.Context.click,
+				analyticsConstants.EventNames.closeContent,
+				{ closeMethod = analyticsConstants.CloseMethod.closeIcon }
+			)
+		end
+
+		local children = {
+			CloseModal = createElement3(IconButton, v8),
 			HeaderText = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				Text = v28 and v28.headerText,
-				Font = Header1Font,
-				TextSize = v26,
-				TextColor3 = v23.Theme.TextEmphasis.Color,
+				Text = v4 and v4.headerText,
+				Font = font2,
+				FontFace = fontFace,
+				TextSize = textSize,
+				TextColor3 = v.Theme.TextEmphasis.Color,
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
-				Size = UDim2.new(1, 0, 0, constants.Modal.HeaderHeight)
+				Size = UDim2.new(1, 0, 0, constants.Modal.HeaderHeight),
+				BackgroundTransparency = 1
 			}),
-			SettingsButton = if not FFlagStreamNotificationUXSettingsHeader or not v30 then nil else React.createElement(IconButton, {
+			SettingsButton = 0
+		}
+		local settingsButton
+
+		if FFlagStreamNotificationUXSettingsHeader and v5 then
+			settingsButton = React.createElement(IconButton, {
 				anchorPoint = Vector2.new(1, 0),
 				iconSize = IconSize.Medium,
 				icon = constants.Modal.SettingsIcon,
 				position = UDim2.new(1, -constants.Modal.Padding, 0, constants.Modal.Padding),
-				size = UDim2.fromOffset(constants.Modal.HeaderHeight - constants.Modal.Padding * 2, constants.Modal.HeaderHeight - constants.Modal.Padding * 2),
-				onActivated = v31
+				size = UDim2.fromOffset(
+					getSettingsButtonSize(constants.Modal.HeaderHeight, constants.Modal.Padding), -- inferred equivalent call
+					getSettingsButtonSize(constants.Modal.HeaderHeight, constants.Modal.Padding) -- inferred equivalent call
+				),
+				onActivated = onActivated
 			})
+		end
+
+		children.SettingsButton = settingsButton
+		return createElement("Frame", v6, {
+			HeaderFrame = createElement2("Frame", v7, children)
 		})
-	})
+	end
 end

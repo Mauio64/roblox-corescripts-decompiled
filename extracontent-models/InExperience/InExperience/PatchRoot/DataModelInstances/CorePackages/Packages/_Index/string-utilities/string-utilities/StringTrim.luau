@@ -1,40 +1,35 @@
-local function StringTrim(p1, p2, p3) -- line: 3
-	if not p2 then
-		p2 = "%s"
+local function StringTrim(value, value2, p)
+	value2 = value2 or "%s"
+
+	if #value2 == 0 then
+		return value
 	end
 
-	if #p2 == 0 then
-		return p1
-	end
+	p = p or { left = true, right = true }
 
-	if not p3 then
-		p3 = {
-			left = true,
-			right = true
-		}
-	end
+	if p.left then
+		local v = string.find(value, "[^" .. value2 .. "]")
 
-	if p3.left then
-		local v5 = string.find(p1, "[^" .. p2 .. "]")
-
-		if not v5 then
+		if not v then
 			return ""
 		end
 
-		p1 = string.sub(p1, v5)
+		value = string.sub(value, v)
 	end
 
-	if p3.right then
-		local v6 = string.find(p1, "[" .. p2 .. "]+$")
-
-		if not v6 then
-			return p1
-		end
-
-		p1 = string.sub(p1, 1, v6 - 1)
+	if not p.right then
+		return value
 	end
 
-	return p1
+	local v = string.find(value, "[" .. value2 .. "]+$")
+
+	if not v then
+		return value
+	end
+
+	value = string.sub(value, 1, v - 1)
+
+	return value
 end
 
 return StringTrim

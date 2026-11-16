@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local tutils = require(Parent.tutils)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local tutils = require(parent.tutils)
 
-return function() -- line: 6
-	-- upvalues: tutils (copy)
+return function()
 	return tutils.deepEqual
 end

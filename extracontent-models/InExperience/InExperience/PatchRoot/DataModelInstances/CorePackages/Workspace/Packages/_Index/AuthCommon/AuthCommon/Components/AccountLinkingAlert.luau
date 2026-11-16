@@ -1,223 +1,247 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
+local parent = AuthCommon.Parent
 local GuiService = game:GetService("GuiService")
-local React = require(AuthCommonParent.React)
-local UIBlox = require(AuthCommonParent.UIBlox)
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local withStyle = UIBlox.Style.withStyle
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local useScreenSize = require(AuthCommonParent.RobloxAppHooks).useScreenSize
-local default = require(AuthCommonParent.LinkingProtocol).LinkingProtocol.default
-local Text = require(AuthCommonParent.Foundation).Text
-local useAppPolicy = require(AuthCommonParent.UniversalAppPolicy).useAppPolicy
-local useDispatch = require(AuthCommonParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalization = require(AuthCommonParent.Localization).Hooks.useLocalization
-local useNavigation = require(AuthCommonParent.Navigation).useNavigation
-local AppPage = require(AuthCommonParent.RobloxAppEnums).AppPage
-local NotificationType = require(AuthCommonParent.RobloxAppEnums).NotificationType
-local AuthAnalytics = require(AuthCommonParent.AuthAnalytics)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useScreenSize = RobloxAppHooks.useScreenSize
+local LinkingProtocol = require(parent.LinkingProtocol)
+local default = LinkingProtocol.LinkingProtocol.default
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
+
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local RobloxAppEnums2 = require(parent.RobloxAppEnums)
+local NotificationType = RobloxAppEnums2.NotificationType
+local AuthAnalytics = require(parent.AuthAnalytics)
 local EventStreamConstants = AuthAnalytics.EventStreamConstants
 local authModalShown = AuthAnalytics.Events.authModalShown
 local authButtonClick = AuthAnalytics.Events.authButtonClick
-local v22 = game:DefineFastString("IncompatibleAccountsSupportLink", "https://help.roblox.com/hc/articles/360000334523-Xbox-One-App-Trouble-logging-into-Roblox-account")
+local defineFastString = game:DefineFastString(
+	"IncompatibleAccountsSupportLink",
+	"https://help.roblox.com/hc/articles/360000334523-Xbox-One-App-Trouble-logging-into-Roblox-account"
+)
+
 local AccountLinkingAlertType = require(AuthCommon.Enums.AccountLinkingAlertType)
 
-local function AccountLinkingAlert(t1: {[any]: any}) -- line: 51
-	-- upvalues: ButtonType (copy), useScreenSize (copy), React (copy), Text (copy), withStyle (copy), InteractiveAlert (copy)
-	local t2 = {}
+local function AccountLinkingAlert(data)
+	local buttons = {}
 
-	if t1.secondaryButtonText and t1.secondaryButtonCallback then
-		table.insert(t2, {
+	if data.secondaryButtonText and data.secondaryButtonCallback then
+		table.insert(buttons, {
 			buttonType = ButtonType.Secondary,
 			props = {
-				text = t1.secondaryButtonText,
-				onActivated = function() -- line: 59
-					-- upvalues: t1 (copy)
-					t1.secondaryButtonCallback()
+				text = data.secondaryButtonText,
+				onActivated = function()
+					data.secondaryButtonCallback()
 				end
 			}
 		})
 	end
 
-	if t1.primaryButtonText and t1.primaryButtonCallback then
-		table.insert(t2, {
+	if data.primaryButtonText and data.primaryButtonCallback then
+		table.insert(buttons, {
 			buttonType = ButtonType.PrimarySystem,
 			props = {
-				text = t1.primaryButtonText,
-				onActivated = function() -- line: 71
-					-- upvalues: t1 (copy)
-					t1.primaryButtonCallback()
+				text = data.primaryButtonText,
+				onActivated = function()
+					data.primaryButtonCallback()
 				end
 			}
 		})
 	end
 
-	local v32 = useScreenSize()
-	local v33 = React.useCallback(function() -- line: 80
-		-- upvalues: t1 (copy), React (copy), Text (copy)
-		if t1.footerText and t1.footerCallback then
-			return React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1),
-				AutomaticSize = Enum.AutomaticSize.XY
-			}, {
-				Text = React.createElement(Text, {
-					Text = t1.footerText,
+	local screenSize = useScreenSize()
+
+	local footerContent = React.useCallback(function()
+		if data.footerText and data.footerCallback then
+			return React.createElement(
+				"Frame",
+				{
+					Size = UDim2.fromScale(1, 1),
 					AutomaticSize = Enum.AutomaticSize.XY,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Position = UDim2.fromScale(0.5, 0.5),
-					onActivated = t1.footerCallback
-				})
-			})
+					BackgroundTransparency = 1
+				},
+				{
+					Text = React.createElement(Text, {
+						Text = data.footerText,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.fromScale(0.5, 0.5),
+						onActivated = data.footerCallback
+					})
+				}
+			)
 		end
 
 		return nil
-	end, {
-		t1.footerText,
-		t1.footerCallback
-	})
+	end, { data.footerText, data.footerCallback })
 
-	return withStyle(function(_) -- line: 99
-		-- upvalues: React (copy), InteractiveAlert (copy), t1 (copy), t2 (copy), v33 (copy), v32 (copy)
+	return withStyle(function(_)
 		return React.createElement(InteractiveAlert, {
+			title = data.titleText,
+			bodyText = data.bodyText,
+			buttonStackInfo = { buttons = buttons },
+			footerContent = footerContent,
 			isRoactGamepadEnabled = false,
-			title = t1.titleText,
-			bodyText = t1.bodyText,
-			buttonStackInfo = {
-				buttons = t2
-			},
-			footerContent = v33,
 			position = UDim2.fromScale(0.5, 0.5),
-			screenSize = v32
+			screenSize = screenSize
 		})
 	end)
 end
-local function useIncompatibleAccountsAlertProps(t3: {[any]: any}) -- line: 114
-	-- upvalues: useDispatch (copy), useNavigation (copy), useAppPolicy (copy), useLocalization (copy), React (copy), GuiService (copy), NotificationType (copy), authButtonClick (copy), EventStreamConstants (copy), AppPage (copy), default (copy), v22 (copy)
-	local v35 = useDispatch()
-	local v36 = useNavigation()
-	local v37 = useAppPolicy(function(p2) -- line: 118
+
+local function useIncompatibleAccountsAlertProps(p)
+	local v = useDispatch()
+	local v2 = useNavigation()
+
+	local v3 = useAppPolicy(function(p2)
 		return p2.getPlatformAccountName()
 	end)
-	local v38 = useLocalization({
+
+	local v4 = useLocalization({
 		titleText = "Authentication.Login.Heading.IncompatibleAccounts",
-		secondaryButtonText = "Authentication.Login.Button.UseDifferentRobloxAccount",
-		footerText = "Authentication.Login.Label.LearnMore",
 		bodyText = {
 			"Authentication.Login.Response.AlreadyLinked",
-			platform = v37
+			platform = v3
 		},
 		primaryButtonText = {
 			"Authentication.Login.Button.CloseAndSwitchPlatformAccount",
-			platformAccountName = v37
-		}
+			platformAccountName = v3
+		},
+		secondaryButtonText = "Authentication.Login.Button.UseDifferentRobloxAccount",
+		footerText = "Authentication.Login.Label.LearnMore"
 	})
-	local v39 = React.useCallback(function() -- line: 133
-		-- upvalues: GuiService (copy), NotificationType (copy), t3 (copy), v35 (copy), authButtonClick (copy), EventStreamConstants (copy)
+
+	local primaryButtonCallback = React.useCallback(function()
 		GuiService:BroadcastNotification("", NotificationType.NATIVE_EXIT)
 
-		if t3.closeCentralOverlayThunk then
-			v35(t3.closeCentralOverlayThunk())
+		if p.closeCentralOverlayThunk then
+			v(p.closeCentralOverlayThunk())
 		end
 
 		authButtonClick(EventStreamConstants.Context.AccountLinking, EventStreamConstants.Button.PrimaryButton)
-	end, { t3.closeCentralOverlayThunk })
-	local v40 = React.useCallback(function() -- line: 141
-		-- upvalues: v36 (copy), AppPage (copy), t3 (copy), v35 (copy), authButtonClick (copy), EventStreamConstants (copy)
-		v36.navigate(AppPage.Landing)
+	end, { p.closeCentralOverlayThunk })
 
-		if t3.closeCentralOverlayThunk then
-			v35(t3.closeCentralOverlayThunk())
+	local secondaryButtonCallback = React.useCallback(function()
+		v2.navigate(AppPage.Landing)
+
+		if p.closeCentralOverlayThunk then
+			v(p.closeCentralOverlayThunk())
 		end
 
 		authButtonClick(EventStreamConstants.Context.AccountLinking, EventStreamConstants.Button.SecondaryButton)
-	end, {
-		v36,
-		t3.closeCentralOverlayThunk
-	})
-	local v41 = React.useCallback(function() -- line: 149
-		-- upvalues: default (copy), v22 (copy), authButtonClick (copy), EventStreamConstants (copy)
-		default:openURL(v22)
+	end, { v2, p.closeCentralOverlayThunk })
+
+	local footerCallback = React.useCallback(function()
+		default:openURL(defineFastString)
 		authButtonClick(EventStreamConstants.Context.AccountLinking, EventStreamConstants.Button.Support)
 	end, {})
 
-	return {
-		titleText = v38.titleText,
-		bodyText = if not t3.userFacingMessage then v38.bodyText else t3.userFacingMessage,
-		primaryButtonText = v38.primaryButtonText,
-		secondaryButtonText = v38.secondaryButtonText,
-		primaryButtonCallback = v39,
-		secondaryButtonCallback = v40,
-		footerText = v38.footerText,
-		footerCallback = v41,
-		closeCentralOverlayThunk = t3.closeCentralOverlayThunk
+	local v5 = {
+		titleText = v4.titleText,
+		bodyText = 0,
+		primaryButtonText = 0,
+		secondaryButtonText = 0,
+		primaryButtonCallback = 0,
+		secondaryButtonCallback = 0,
+		footerText = 0,
+		footerCallback = 0,
+		closeCentralOverlayThunk = 0
 	}
-end
-local function IncompatibleAccountsAlert(t4: {[any]: any}) -- line: 167
-	-- upvalues: useIncompatibleAccountsAlertProps (copy), React (copy), AccountLinkingAlert (copy)
-	local v43 = useIncompatibleAccountsAlertProps(t4)
+	local bodyText
 
-	return React.createElement(AccountLinkingAlert, v43)
+	if p.userFacingMessage then
+		bodyText = p.userFacingMessage
+	else
+		bodyText = v4.bodyText
+	end
+
+	v5.bodyText = bodyText
+	v5.primaryButtonText = v4.primaryButtonText
+	v5.secondaryButtonText = v4.secondaryButtonText
+	v5.primaryButtonCallback = primaryButtonCallback
+	v5.secondaryButtonCallback = secondaryButtonCallback
+	v5.footerText = v4.footerText
+	v5.footerCallback = footerCallback
+	v5.closeCentralOverlayThunk = p.closeCentralOverlayThunk
+	return v5
 end
-local function useRetryLogInAlertProps(t5: {[any]: any}) -- line: 172
-	-- upvalues: useDispatch (copy), useNavigation (copy), useAppPolicy (copy), AccountLinkingAlertType (copy), useLocalization (copy), React (copy), AppPage (copy)
-	local v45 = useDispatch()
-	local v46 = useNavigation()
-	local v47 = useAppPolicy(function(p3) -- line: 176
-		return p3.getPlatformAccountName()
+
+local function IncompatibleAccountsAlert(p)
+	local v = useIncompatibleAccountsAlertProps(p)
+	return React.createElement(AccountLinkingAlert, v)
+end
+
+local function useRetryLogInAlertProps(p)
+	local v = useDispatch()
+	local v2 = useNavigation()
+
+	local platformAccountName = useAppPolicy(function(p2)
+		return p2.getPlatformAccountName()
 	end)
-	local v48 = if t5.alertType ~= AccountLinkingAlertType.RetryLogInAlreadyLinked then t5.alertType ~= AccountLinkingAlertType.RetryLogInConnectionFailure and "Authentication.SignUp.Response.ErrorTryAgain" or "Authentication.Login.Error.PlatformAccountConnectionFailure" else {
-		"Authentication.SignUp.Description.AccountAlreadyLinked",
-		platformAccountName = v47
-	}
-	local v49 = useLocalization({
-		titleText = "Authentication.SignUp.Heading.RetryLogIn",
-		primaryButtonText = "Authentication.SignUp.Button.RetryLogIn",
-		bodyText = v48
-	})
-	local v50 = React.useCallback(function() -- line: 196
-		-- upvalues: v46 (copy), AppPage (copy), t5 (copy), v45 (copy)
-		v46.navigate(AppPage.PlatformAccountRouter)
 
-		if t5.closeCentralOverlayThunk then
-			v45(t5.closeCentralOverlayThunk())
-		end
-	end, {
-		v46,
-		t5.closeCentralOverlayThunk
+	local v3 = useLocalization({
+		titleText = "Authentication.SignUp.Heading.RetryLogIn",
+		bodyText = p.alertType == AccountLinkingAlertType.RetryLogInAlreadyLinked and {
+			"Authentication.SignUp.Description.AccountAlreadyLinked",
+			platformAccountName = platformAccountName
+		} or p.alertType == AccountLinkingAlertType.RetryLogInConnectionFailure and "Authentication.Login.Error.PlatformAccountConnectionFailure" or "Authentication.SignUp.Response.ErrorTryAgain",
+		primaryButtonText = "Authentication.SignUp.Button.RetryLogIn"
 	})
+
+	local primaryButtonCallback = React.useCallback(function()
+		v2.navigate(AppPage.PlatformAccountRouter)
+
+		if p.closeCentralOverlayThunk then
+			v(p.closeCentralOverlayThunk())
+		end
+	end, { v2, p.closeCentralOverlayThunk })
 
 	return {
-		titleText = v49.titleText,
-		bodyText = v49.bodyText,
-		primaryButtonText = v49.primaryButtonText,
-		primaryButtonCallback = v50,
-		closeCentralOverlayThunk = t5.closeCentralOverlayThunk
+		titleText = v3.titleText,
+		bodyText = v3.bodyText,
+		primaryButtonText = v3.primaryButtonText,
+		primaryButtonCallback = primaryButtonCallback,
+		closeCentralOverlayThunk = p.closeCentralOverlayThunk
 	}
 end
-local function RetryLogInAlert(t6: {[any]: any}) -- line: 212
-	-- upvalues: useRetryLogInAlertProps (copy), React (copy), AccountLinkingAlert (copy)
-	local v52 = useRetryLogInAlertProps(t6)
 
-	return React.createElement(AccountLinkingAlert, v52)
+local function RetryLogInAlert(p)
+	local v = useRetryLogInAlertProps(p)
+	return React.createElement(AccountLinkingAlert, v)
 end
-local function AccountLinkingAlertContainer(t7: {[any]: any}) -- line: 217
-	-- upvalues: React (copy), authModalShown (copy), EventStreamConstants (copy), AccountLinkingAlertType (copy), IncompatibleAccountsAlert (copy), RetryLogInAlert (copy)
-	React.useEffect(function() -- line: 218
-		-- upvalues: authModalShown (copy), EventStreamConstants (copy), t7 (copy)
-		authModalShown(EventStreamConstants.Context.AccountLinking, nil, t7.alertType)
-	end, { t7.alertType })
 
-	if t7.alertType == AccountLinkingAlertType.IncompatibleAccounts then
-		return React.createElement(IncompatibleAccountsAlert, t7)
+local function AccountLinkingAlertContainer(p)
+	React.useEffect(function()
+		authModalShown(EventStreamConstants.Context.AccountLinking, nil, p.alertType)
+	end, { p.alertType })
+
+	if p.alertType == AccountLinkingAlertType.IncompatibleAccounts then
+		return React.createElement(IncompatibleAccountsAlert, p)
 	end
 
-	if t7.alertType == AccountLinkingAlertType.RetryLogInAlreadyLinked or t7.alertType == AccountLinkingAlertType.RetryLogInConnectionFailure or t7.alertType == AccountLinkingAlertType.RetryLogInGenericError then
-		return React.createElement(RetryLogInAlert, t7)
+	if
+		p.alertType == AccountLinkingAlertType.RetryLogInAlreadyLinked
+		or p.alertType == AccountLinkingAlertType.RetryLogInConnectionFailure
+		or p.alertType == AccountLinkingAlertType.RetryLogInGenericError
+	then
+		return React.createElement(RetryLogInAlert, p)
 	end
 
-	warn("AccountLinkingAlert: Unknown alert type: " .. tostring(t7.alertType))
-
+	warn("AccountLinkingAlert: Unknown alert type: " .. tostring(p.alertType))
 	return nil
 end
 

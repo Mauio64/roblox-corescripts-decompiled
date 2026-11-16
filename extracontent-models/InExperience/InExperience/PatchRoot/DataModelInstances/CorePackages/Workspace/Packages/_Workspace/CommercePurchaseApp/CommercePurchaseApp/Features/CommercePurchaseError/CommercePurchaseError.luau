@@ -1,17 +1,22 @@
 local CommercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
-local CommercePurchaseAppParent = CommercePurchaseApp.Parent
-local React = require(CommercePurchaseAppParent.React)
-local useScreenSize = require(CommercePurchaseAppParent.EconomyCommonCoreScriptHooks).useScreenSize
-local useLocalization = require(CommercePurchaseAppParent.Localization).Hooks.useLocalization
-local UIBlox = require(CommercePurchaseAppParent.UIBlox)
+local parent = CommercePurchaseApp.Parent
+local React = require(parent.React)
+local EconomyCommonCoreScriptHooks = require(parent.EconomyCommonCoreScriptHooks)
+local useScreenSize = EconomyCommonCoreScriptHooks.useScreenSize
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local UIBlox = require(parent.UIBlox)
 local Images = UIBlox.App.ImageSet.Images
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ErrorCodeEnum = require(CommercePurchaseApp.Enums.ErrorCodeEnum)
 local FFlagAddCommerceErrors = require(CommercePurchaseApp.Flags.FFlagAddCommerceErrors)
-local t1 = {
+
+local v = {
 	[ErrorCodeEnum.NotPurchasable] = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.NotPurchasable"
 }
-local t2 = {
+
+local v2 = {
 	[ErrorCodeEnum.NotPurchasable] = {
 		title = "CoreScripts.CommercePurchasePrompt.ProductNotAvailable",
 		reason = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.NotPurchasable"
@@ -26,30 +31,38 @@ local t2 = {
 	}
 }
 
-local function CommercePurchaseError(t3: {[any]: any}) -- line: 39
-	-- upvalues: useScreenSize (copy), useLocalization (copy), FFlagAddCommerceErrors (copy), t2 (copy), t1 (copy), React (copy), InteractiveAlert (copy), Images (copy)
-	local v15 = useScreenSize()
-	local v16 = useLocalization({
-		dismissCTA = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.DismissCTA",
-		title = not FFlagAddCommerceErrors and "CoreScripts.CommercePurchasePrompt.ErrorPrompt.CantBuy" or t2[t3.errorCode].title,
-		errorReason = if not FFlagAddCommerceErrors then t1[t3.errorCode] else t2[t3.errorCode].reason
-	})
+local function CommercePurchaseError(p)
+	local screenSize = useScreenSize()
+	local v3 = {
+		title = not FFlagAddCommerceErrors and "CoreScripts.CommercePurchasePrompt.ErrorPrompt.CantBuy" or v2[p.errorCode].title,
+		errorReason = 0,
+		dismissCTA = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.DismissCTA"
+	}
+	local errorReason
+
+	if FFlagAddCommerceErrors then
+		errorReason = v2[p.errorCode].reason
+	else
+		errorReason = v[p.errorCode]
+	end
+
+	v3.errorReason = errorReason
+	local v4 = useLocalization(v3)
 
 	return React.createElement(InteractiveAlert, {
-		title = v16.title,
+		title = v4.title,
 		titleIcon = Images["icons/status/error_large"],
-		bodyText = v16.errorReason,
+		bodyText = v4.errorReason,
 		buttonStackInfo = {
-			buttons = {{
-				isDefaultChild = true,
-				props = {
-					onActivated = t3.onDismiss,
-					text = v16.dismissCTA
+			buttons = {
+				{
+					props = { onActivated = p.onDismiss, text = v4.dismissCTA },
+					isDefaultChild = true
 				}
-			}}
+			}
 		},
 		position = UDim2.fromScale(0.5, 0.5),
-		screenSize = v15
+		screenSize = screenSize
 	})
 end
 

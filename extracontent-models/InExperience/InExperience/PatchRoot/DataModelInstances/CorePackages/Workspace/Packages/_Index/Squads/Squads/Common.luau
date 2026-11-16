@@ -1,3 +1,1 @@
-return {
-	ModelTypes = require(script.ModelTypes)
-}
+return { ModelTypes = require(script.ModelTypes) }

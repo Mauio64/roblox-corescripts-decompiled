@@ -1,70 +1,95 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local ParseContentIds = require(ParentParent.util.ParseContentIds)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local Constants = require(parent.Constants)
+local ParseContentIds = require(parent.util.ParseContentIds)
+require(parent.util.Types)
 
-local getFFlagUGCValidateAllowEmissives = require(ParentParent.flags.getFFlagUGCValidateAllowEmissives)
+local getFFlagUGCValidateVersionedContentIds = require(parent.flags.getFFlagUGCValidateVersionedContentIds)
 
 return {
-	getData = function(p1) -- line: 11
-		-- upvalues: Constants (copy), ParseContentIds (copy), getFFlagUGCValidateAllowEmissives (copy)
-		local rootInstance = p1.rootInstance
-		local t1 = {}
+	getData = function(p)
+		local rootInstance = p.rootInstance
+
 		local descendants = rootInstance:GetDescendants()
-
 		table.insert(descendants, rootInstance)
+		local data = {}
 
-		for _, v10 in descendants do
-			local v11 = Constants.CONTENT_ID_FIELDS[v10.ClassName]
+		for _, descendant in descendants do
+			local v = Constants.CONTENT_ID_FIELDS[descendant.ClassName]
 
-			if v11 then
-				for _, v13 in v11 do
-					local v14 = v10[v13]
+			if not v then
+				continue
+			end
 
-					if v14 ~= "" then
-						local v15 = ParseContentIds.tryGetAssetIdFromContentId(v14)
+			for _, fieldName in v do
+				local v2 = descendant[fieldName]
 
-						if v15 ~= nil then
-							if t1[v15] == nil then
-								t1[v15] = {}
-							end
-
-							table.insert(t1[v15], {
-								fieldName = v13,
-								instance = v10
-							})
-						end
-					end
+				if v2 == "" then
+					continue
 				end
 
-				if getFFlagUGCValidateAllowEmissives() then
-					local v16 = Constants.CONTENT_FIELDS_WITHOUT_CONTENTID[v10.ClassName]
+				local version = nil
+				local v3
 
-					if v16 then
-						for _, v18 in v16 do
-							local v19 = v10[v18]
-
-							if v19.SourceType == Enum.ContentSourceType.Uri then
-								local v20 = ParseContentIds.tryGetAssetIdFromContentId(v19.Uri)
-
-								if v20 ~= nil then
-									if t1[v20] == nil then
-										t1[v20] = {}
-									end
-
-									table.insert(t1[v20], {
-										fieldName = v18,
-										instance = v10
-									})
-								end
-							end
-						end
-					end
+				if getFFlagUGCValidateVersionedContentIds() then
+					v3, version = ParseContentIds.tryParseContentId(v2)
+				else
+					v3 = ParseContentIds.tryGetAssetIdFromContentId(v2)
 				end
+
+				if v3 == nil then
+					continue
+				end
+
+				if data[v3] == nil then
+					data[v3] = {}
+				end
+
+				table.insert(data[v3], {
+					fieldName = fieldName,
+					instance = descendant,
+					version = version
+				})
+			end
+
+			local v2 = Constants.CONTENT_FIELDS_WITHOUT_CONTENTID[descendant.ClassName]
+
+			if not v2 then
+				continue
+			end
+
+			for _, fieldName in v2 do
+				local v3 = descendant[fieldName]
+
+				if v3.SourceType ~= Enum.ContentSourceType.Uri then
+					continue
+				end
+
+				local version = nil
+				local v4
+
+				if getFFlagUGCValidateVersionedContentIds() then
+					v4, version = ParseContentIds.tryParseContentId(v3.Uri)
+				else
+					v4 = ParseContentIds.tryGetAssetIdFromContentId(v3.Uri)
+				end
+
+				if v4 == nil then
+					continue
+				end
+
+				if data[v4] == nil then
+					data[v4] = {}
+				end
+
+				table.insert(data[v4], {
+					fieldName = fieldName,
+					instance = descendant,
+					version = version
+				})
 			end
 		end
 
-		return t1
+		return data
 	end
 }

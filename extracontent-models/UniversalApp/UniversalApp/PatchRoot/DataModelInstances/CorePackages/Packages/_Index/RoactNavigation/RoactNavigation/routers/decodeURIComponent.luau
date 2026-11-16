@@ -1,151 +1,149 @@
-local ParentParent = script.Parent.Parent.Parent
-local Array = require(ParentParent.LuauPolyfill).Array
-local RegExp = require(ParentParent.RegExp)
+local parent = script.Parent.Parent.Parent
 
-local function stringMatch(p1, p2) -- line: 11
-	local v17 = p2:exec(p1)
-	local t1 = {}
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local RegExp = require(parent.RegExp)
 
-	while v17 do
-		local v19 = v17[1]
+local function stringMatch(p, object)
+	local v = object:exec(p)
+	local result = {}
 
-		table.insert(t1, v19)
-		v17 = p2:exec((v17.input:sub(v17.index + v19:len())))
+	while v do
+		local v2 = v[1]
+		table.insert(result, v2)
+		v = object:exec((v.input:sub(v.index + v2:len())))
 	end
 
-	return t1
-end
-local function TypeError(p3) -- line: 25
-	return p3
+	return result
 end
 
-local v6 = RegExp("(%[a-fA-F0-9]{2})+", "i")
+local function TypeError(p)
+	return p
+end
 
-local function decodeURIComponent(p4) -- line: 33
-	-- upvalues: v6 (copy)
-	local v22 = v6:exec(p4)
+local regExp = RegExp("(%[a-fA-F0-9]{2})+", "i")
 
-	if v22 then
-		local t2 = {}
+local function decodeURIComponent(p)
+	local v = regExp:exec(p)
 
-		for match in v22[1]:gmatch("%%(%x%x)") do
-			local num = tonumber(match, 16)
+	if not v then
+		return p
+	end
 
-			if num >= 128 then
-				error("malformed URI sequence")
-			end
+	local v2 = {}
 
-			table.insert(t2, num)
+	for k in v[1]:gmatch("%%(%x%x)") do
+		local v3 = tonumber(k, 16)
+
+		if v3 >= 128 then
+			error("malformed URI sequence")
 		end
 
-		p4 = utf8.char(unpack(t2))
+		table.insert(v2, v3)
 	end
 
-	return p4
+	p = utf8.char(unpack(v2))
+
+	return p
 end
 
-local v8 = RegExp("%[a-fA-F0-9]{2}", "i")
-local v9 = RegExp("(%[a-fA-F0-9]{2})+", "i")
+local regExp2 = RegExp("%[a-fA-F0-9]{2}", "i")
+local regExp3 = RegExp("(%[a-fA-F0-9]{2})+", "i")
+local function decodeComponents(list, value)
+	local success, result = pcall(decodeURIComponent, table.concat(list, ""))
 
-local function decodeComponents(p5, p6) -- line: 61
-	-- upvalues: decodeURIComponent (copy), Array (copy), decodeComponents (copy)
-	local ok, result = pcall(decodeURIComponent, table.concat(p5, ""))
-
-	if ok then
+	if success then
 		return result
 	end
 
-	if #p5 == 1 then
-		return p5
+	if #list == 1 then
+		return list
 	end
 
-	local v30 = p6 or 1
-	local v31 = Array.slice(p5, 1, v30 + 1)
-	local v32 = Array.slice(p5, v30 + 1)
+	value = value or 1
 
-	return Array.concat(decodeComponents(v31), decodeComponents(v32))
+	local slice = Array.slice(list, 1, value + 1)
+	local slice2 = Array.slice(list, value + 1)
+
+	return Array.concat(decodeComponents(slice), decodeComponents(slice2))
 end
-local function decode(p7) -- line: 83
-	-- upvalues: decodeURIComponent (copy), stringMatch (copy), v8 (copy), decodeComponents (copy)
-	local ok, result = pcall(decodeURIComponent, p7)
 
-	if ok then
+local function decode(p)
+	local success, result = pcall(decodeURIComponent, p)
+
+	if success then
 		return result
 	end
 
-	local v36 = stringMatch(p7, v8)
-	local n1 = 2
+	local v = stringMatch(p, regExp2)
+	local v2 = 2
 
-	while v36[n1] do
-		p7 = table.concat(decodeComponents(v36, n1), "")
-		v36 = stringMatch(p7, v8)
-		n1 += 1
+	while v[v2] do
+		p = table.concat(decodeComponents(v, v2), "")
+
+		v = stringMatch(p, regExp2)
+		v2 += 1
 	end
 
-	return p7
+	return p
 end
-local function escapePercent(p8) -- line: 107
-	return (p8:gsub("%%", "%%%%"))
+
+local function escapePercent(value) -- 2 equivalent calls inferred from this helper
+	return (value:gsub("%%", "%%%%"))
 end
-local function customDecodeURIComponent(p9) -- line: 112
-	-- upvalues: v9 (copy), decodeURIComponent (copy), decode (copy)
-	local v40 = utf8.char(65533)
-	local t3 = {
-		["%FE%FF"] = v40 .. v40,
-		["%FF%FE"] = v40 .. v40
-	}
-	local t4 = {
-		"%FE%FF",
-		"%FF%FE"
-	}
-	local v43 = v9:exec(p9)
 
-	while v43 do
-		local v44 = v43[1]
-		local ok, result = xpcall(decodeURIComponent, function(_) -- line: 130
-			-- upvalues: decode (copy), v44 (copy), t3 (copy), t4 (copy)
-			local v53 = decode(v44)
+local function customDecodeURIComponent(value)
+	local c2 = utf8.char(65533)
+	local v = {
+		["%FE%FF"] = c2 .. c2,
+		["%FF%FE"] = c2 .. c2
+	}
 
-			if v53 ~= v44 then
-				if t3[v44] == nil then
-					table.insert(t4, v44)
+	local v2 = regExp3:exec(value)
+	local v3 = { "%FE%FF", "%FF%FE" }
+
+	while v2 do
+		local v4 = v2[1]
+
+		local success, result = xpcall(decodeURIComponent, function(_)
+			local v5 = decode(v4)
+
+			if v5 ~= v4 then
+				if v[v4] == nil then
+					table.insert(v3, v4)
 				end
 
-				t3[v44] = v53
+				v[v4] = v5
 			end
-		end, v44)
+		end, v4)
 
-		if ok then
-			if t3[v44] == nil then
-				table.insert(t4, v44)
+		if success then
+			if v[v4] == nil then
+				table.insert(v3, v4)
 			end
 
-			t3[v44] = result
+			v[v4] = result
 		end
 
-		local v47 = v43.input:sub(v43.index + v44:len())
-
-		v43 = v9:exec(v47)
+		v2 = regExp3:exec((v2.input:sub(v2.index + v4:len())))
 	end
 
-	t3["%C2"] = v40
-	table.insert(t4, "%C2")
+	v["%C2"] = c2
+	table.insert(v3, "%C2")
 
-	for _, v49 in t4 do
-		p9 = string.gsub(p9, v49:gsub("%%", "%%%%"), (t3[v49]:gsub("%%", "%%%%")))
+	for _, v4 in v3 do
+		value = string.gsub(value, escapePercent(v4), escapePercent(v[v4])) -- inferred equivalent call
 	end
 
-	return p9
+	return value
 end
-local function decodeComponent(p11) -- line: 172
-	-- upvalues: customDecodeURIComponent (copy)
-	if type(p11) ~= "string" then
-		error("Expected `encodedURI` to be of type `string`, got `" .. typeof(p11) .. "`")
+
+local function decodeComponent(value)
+	if type(value) ~= "string" then
+		error("Expected `encodedURI` to be of type `string`, got `" .. typeof(value) .. "`")
 	end
 
-	local v51 = p11:gsub("%+", " ")
-
-	return (customDecodeURIComponent(v51))
+	return customDecodeURIComponent(value:gsub("%+", " "))
 end
 
 return decodeComponent

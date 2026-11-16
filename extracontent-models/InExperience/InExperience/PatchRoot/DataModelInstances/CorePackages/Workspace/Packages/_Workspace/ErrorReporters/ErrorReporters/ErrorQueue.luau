@@ -1,105 +1,117 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local RunService = game:GetService("RunService")
-local Cryo = require(ParentParent.Cryo)
-local t = require(ParentParent.t)
-local t1 = {}
 
-t1.__index = t1
+local Cryo = require(parent.Cryo)
+local t = require(parent.t)
 
-local v6 = t.tuple(t.callback, t.optional(t.strictInterface({
-	queueTimeLimit = t.optional(t.numberPositive),
-	queueErrorLimit = t.optional(t.numberPositive),
-	queueKeyLimit = t.optional(t.numberPositive)
-})))
+local ErrorQueue = {}
+ErrorQueue.__index = ErrorQueue
 
-function t1.new(p1: ((...any) -> ...any), t2: {[any]: any}?) -- line: 54
-	-- upvalues: v6 (copy), t1 (copy)
-	assert(v6(p1, t2))
+local tuple = t.tuple(
+	t.callback,
+	t.optional(t.strictInterface({
+		queueTimeLimit = t.optional(t.numberPositive),
+		queueErrorLimit = t.optional(t.numberPositive),
+		queueKeyLimit = t.optional(t.numberPositive),
+		flushImmediately = t.optional(t.boolean)
+	}))
+)
 
-	local v9 = t2 or {}
-	local t3 = {
+function ErrorQueue.new(reportMethod, options)
+	assert(tuple(reportMethod, options))
+
+	local v = options or {}
+
+	local v2 = {
+		_reportMethod = reportMethod,
+		_queueTimeLimit = v.queueTimeLimit or 30,
+		_queueErrorLimit = v.queueErrorLimit or 30,
+		_queueKeyLimit = v.queueKeyLimit or 10,
+		_flushImmediately = v.flushImmediately == true,
+		_errors = {},
 		_totalErrorCount = 0,
 		_totalKeyCount = 0,
 		_runningTime = 0,
-		_renderSteppedConnection = nil,
-		_reportMethod = p1,
-		_queueTimeLimit = v9.queueTimeLimit or 30,
-		_queueErrorLimit = v9.queueErrorLimit or 30,
-		_queueKeyLimit = v9.queueKeyLimit or 10,
-		_errors = {}
+		_renderSteppedConnection = nil
 	}
 
-	setmetatable(t3, t1)
+	setmetatable(v2, ErrorQueue)
 
-	return t3
+	return v2
 end
-function t1.hasError(t4: {[any]: any}, s1: string) -- line: 80
-	if type(s1) ~= "string" or s1 == "" then
-		return false
-	end
 
-	return t4._errors[s1] ~= nil
+function ErrorQueue:hasError(value: string): boolean
+	return type(value) == "string" and value ~= "" and self._errors[value] ~= nil
 end
-function t1.addError(t5: {[any]: any}, s2: string, p2) -- line: 88
-	if type(s2) ~= "string" or s2 == "" then
+
+function ErrorQueue:addError(value: string, p)
+	if type(value) ~= "string" or value == "" then
 		return
 	end
 
-	if not t5._errors[s2] then
-		t5._errors[s2] = {
-			count = 1,
-			data = p2
-		}
-		t5._totalKeyCount = t5._totalKeyCount + 1
+	if self._errors[value] then
+		self._errors[value].count = self._errors[value].count + 1
 	else
-		t5._errors[s2].count = t5._errors[s2].count + 1
+		self._errors[value] = { data = p, count = 1 }
+
+		self._totalKeyCount += 1
 	end
 
-	t5._totalErrorCount = t5._totalErrorCount + 1
+	self._totalErrorCount += 1
 
-	if t5:isReadyToReport() then
-		t5:reportAllErrors()
+	if self:isReadyToReport() then
+		self:reportAllErrors()
 	end
 end
-function t1.isReadyToReport(p3) -- line: 112
-	return p3._totalKeyCount >= p3._queueKeyLimit or (p3._totalErrorCount >= p3._queueErrorLimit or p3._totalErrorCount > 0 and p3._runningTime >= p3._queueTimeLimit)
-end
-function t1.reportAllErrors(p4) -- line: 118
-	-- upvalues: Cryo (copy)
-	local v18 = Cryo.Dictionary.join(p4._errors, {})
 
-	p4._errors = {}
-	p4._totalErrorCount = 0
-	p4._totalKeyCount = 0
-	p4._runningTime = 0
-
-	for k, v in pairs(v18) do
-		p4._reportMethod(k, v.data, v.count)
+function ErrorQueue:isReadyToReport(): boolean
+	if self._totalKeyCount >= self._queueKeyLimit or self._totalErrorCount >= self._queueErrorLimit then
+		return true
+	elseif self._totalErrorCount > 0 then
+		return self._runningTime >= self._queueTimeLimit
+	else
+		return false
 	end
 end
-function t1._onRenderStep(t6: {[any]: any}, n1: number) -- line: 133
-	t6._runningTime = t6._runningTime + n1
 
-	if t6:isReadyToReport() then
-		t6:reportAllErrors()
+function ErrorQueue:reportAllErrors()
+	local joined = Cryo.Dictionary.join(self._errors, {})
+
+	self._errors = {}
+	self._totalErrorCount = 0
+	self._totalKeyCount = 0
+	self._runningTime = 0
+
+	for k, v in pairs(joined) do
+		self._reportMethod(k, v.data, v.count)
 	end
 end
-function t1.startTimer(p5) -- line: 141
-	-- upvalues: RunService (copy)
-	if p5._renderSteppedConnection == nil then
-		p5._runningTime = 0
-		p5._renderSteppedConnection = RunService.renderStepped:Connect(function(p6) -- line: 145
-			-- upvalues: p5 (copy)
-			p5:_onRenderStep(p6)
+
+function ErrorQueue:_onRenderStep(p: number)
+	self._runningTime += p
+
+	if self:isReadyToReport() then
+		self:reportAllErrors()
+	end
+end
+
+function ErrorQueue:startTimer()
+	if self._renderSteppedConnection == nil then
+		self._runningTime = not self._flushImmediately and 0 or self._queueTimeLimit
+
+		self._renderSteppedConnection = RunService.renderStepped:Connect(function(p)
+			self:_onRenderStep(p)
 		end)
 	end
 end
-function t1.stopTimer(p7) -- line: 151
-	if p7._renderSteppedConnection ~= nil then
-		p7._renderSteppedConnection:Disconnect()
-		p7._runningTime = 0
-		p7._renderSteppedConnection = nil
+
+function ErrorQueue:stopTimer()
+	if self._renderSteppedConnection ~= nil then
+		self._renderSteppedConnection:Disconnect()
+		self._runningTime = 0
+		self._renderSteppedConnection = nil
 	end
 end
 
-return t1
+return ErrorQueue

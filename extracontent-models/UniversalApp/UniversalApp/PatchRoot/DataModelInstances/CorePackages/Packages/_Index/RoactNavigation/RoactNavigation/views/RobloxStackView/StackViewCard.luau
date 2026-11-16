@@ -1,83 +1,86 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local invariant = require(ParentParent.utils.invariant)
-local v5 = React.Component:extend("StackViewCard")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-function v5.init(p1) -- line: 29
-	-- upvalues: React (copy)
-	local index = p1.props.navigation.state.index
+local React = require(parent2.React)
+local invariant = require(parent.utils.invariant)
 
-	p1._isMounted = false
-	p1._positionLastValue = index
-	p1._ref = React.createRef()
+local extended = React.Component:extend("StackViewCard")
+
+function extended:init()
+	local index = self.props.navigation.state.index
+
+	self._isMounted = false
+	self._positionLastValue = index
+
+	self._ref = React.createRef()
 end
-function v5.render(p2) -- line: 38
-	-- upvalues: invariant (copy), React (copy)
-	local forceHidden = p2.props.forceHidden
-	local cardColor3 = p2.props.cardColor3
-	local initialPosition = p2.props.initialPosition
-	local renderScene = p2.props.renderScene
-	local scene = p2.props.scene
+
+function extended:render()
+	local forceHidden = self.props.forceHidden
+	local cardColor3 = self.props.cardColor3
+	local initialPosition = self.props.initialPosition
+	local renderScene = self.props.renderScene
+	local scene = self.props.scene
 
 	invariant(type(renderScene) == "function", "renderScene must be a function")
 
 	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		ClipsDescendants = false,
 		Position = initialPosition,
 		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundColor3 = cardColor3,
-		BackgroundTransparency = if cardColor3 ~= nil then nil else 1,
+		BackgroundTransparency = cardColor3 == nil and 1 or nil,
+		BorderSizePixel = 0,
+		ClipsDescendants = false,
 		Visible = not forceHidden,
-		ref = p2._ref
-	}, {
-		Content = renderScene(scene)
-	})
+		ref = self._ref
+	}, { Content = renderScene(scene) })
 end
-function v5.didMount(p3) -- line: 61
-	p3._isMounted = true
-	p3._positionDisconnector = p3.props.position:onStep(function(...) -- line: 65
-		-- upvalues: p3 (copy)
-		p3:_onPositionStep(...)
+
+function extended:didMount()
+	self._isMounted = true
+
+	self._positionDisconnector = self.props.position:onStep(function(...)
+		self:_onPositionStep(...)
 	end)
 end
-function v5.willUnmount(p4) -- line: 70
-	p4._isMounted = false
 
-	if p4._positionDisconnector then
-		p4._positionDisconnector()
-		p4._positionDisconnector = nil
+function extended:willUnmount()
+	self._isMounted = false
+
+	if self._positionDisconnector then
+		self._positionDisconnector()
+		self._positionDisconnector = nil
 	end
 end
-function v5.didUpdate(p5, p6) -- line: 79
-	local position = p5.props.position
-	local positionStep = p5.props.positionStep
 
-	if position ~= p6.position then
-		p5._positionDisconnector()
-		p5._positionDisconnector = position:onStep(function(...) -- line: 85
-			-- upvalues: p5 (copy)
-			p5:_onPositionStep(...)
+function extended:didUpdate(p)
+	local position = self.props.position
+	local positionStep = self.props.positionStep
+
+	if position ~= p.position then
+		self._positionDisconnector()
+		self._positionDisconnector = position:onStep(function(...)
+			self:_onPositionStep(...)
 		end)
 	end
 
-	if positionStep ~= p6.positionStep then
-		p5:_onPositionStep(p5._positionLastValue)
+	if positionStep ~= p.positionStep then
+		self:_onPositionStep(self._positionLastValue)
 	end
 end
-function v5._onPositionStep(p7, p8) -- line: 97
-	if not p7._isMounted then
+
+function extended:_onPositionStep(positionLastValue)
+	if not self._isMounted then
 		return
 	end
 
-	local positionStep = p7.props.positionStep
+	local positionStep = self.props.positionStep
 
 	if positionStep then
-		positionStep(p7._ref, p8)
+		positionStep(self._ref, positionLastValue)
 	end
 
-	p7._positionLastValue = p8
+	self._positionLastValue = positionLastValue
 end
 
-return v5
+return extended

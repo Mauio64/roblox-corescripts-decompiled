@@ -1,34 +1,239 @@
-local v1 = game:DefineFastFlag("DebugMyStatsExperienceAgentSpec", false)
+local defineFastFlag = game:DefineFastFlag("DebugMyStatsExperienceAgentSpec", false)
 
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Signals = require(parent.Signals)
 require(script.Parent.Types.acpSession)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagBuildExperienceModelPickerData = SharedFlags.FFlagBuildExperienceModelPickerData
+local v = Signals.createSignal
 
-local u2 = nil
+if FFlagBuildExperienceModelPickerData and defineFastFlag then
+	local SignalsUtils = require(parent.SignalsUtils)
+	v = SignalsUtils.createSessionScopedSignal
+end
 
-return {
-	isEnabled = function() -- line: 12
-		-- upvalues: v1 (copy)
-		return v1
-	end,
-	get = function() -- line: 15
-		-- upvalues: u2 (ref)
-		return u2
-	end,
-	set = function(s1: string?) -- line: 18
-		-- upvalues: u2 (ref)
-		u2 = if s1 ~= nil and (s1 ~= "" and s1 ~= "latest") then s1 else nil
-	end,
-	getExperiment = function() -- line: 22
-		-- upvalues: v1 (copy), u2 (ref)
-		if not v1 or u2 == nil then
-			return nil
-		end
+local v2, v3 = v({})
+local v4, v5 = v({})
+local v6 = {}
+local v7, v8
 
-		return {
-			specVersion = u2,
-			clientToolConfig = {
-				mode = "exclude",
-				tools = {}
-			}
-		}
+if FFlagBuildExperienceModelPickerData and defineFastFlag then
+	v7, v8 = v({})
+else
+	v7 = function(_)
+		return v6
 	end
-}
+
+	v8 = function(_) end
+end
+
+local function normalize(p: string?) -- 1 equivalent call inferred from this helper
+	return if p == nil or p == "" or p == "latest" then "" else p
+end
+
+local function getState(p: string?, p2)
+	local v9
+
+	if p ~= nil then
+		v9 = v2(p2 or false)[p]
+	end
+
+	local state = {
+		isSet = v9 ~= nil,
+		specVersion = 0
+	}
+	local specVersion
+
+	if not (v9 == nil or v9.specVersion == "") then
+		specVersion = v9.specVersion
+	end
+
+	state.specVersion = specVersion
+	return state
+end
+
+local function isPending(p: string?): boolean -- 5 equivalent calls inferred from this helper
+	return p ~= nil and v4(false)[p] == true
+end
+
+local function writeDisplay(p: string, p2: string?, p3)
+	local clone = table.clone(v2(false))
+	local clone2 = table.clone(p3 or clone[p] or {
+		clientToolConfig = { mode = "exclude", tools = {} }
+	})
+
+	clone2.specVersion = normalize(p2) -- inferred equivalent call
+	clone[p] = clone2
+	v3(clone)
+end
+
+local function setPendingFlag(p: string, pending: boolean) -- 6 equivalent calls inferred from this helper
+	if isPending(p) == pending then -- inferred equivalent call
+		return
+	end
+
+	local clone = table.clone(v4(false))
+
+	if pending then
+		clone[p] = true
+	else
+		clone[p] = nil
+	end
+
+	v5(clone)
+end
+
+local count = 0
+
+local function buildPromptPayload(p: string) -- 2 equivalent calls inferred from this helper
+	local clone = table.clone(v2(false)[p])
+
+	if v7(false)[p] == false then
+		clone.specVersion = ""
+	end
+
+	return clone
+end
+
+local ExperimentOverride = {}
+
+function ExperimentOverride.isEnabled()
+	return defineFastFlag
+end
+
+function ExperimentOverride.getKey(p: string?)
+	if p == nil or p == "" then
+		return nil
+	end
+
+	return `session:{p}`
+end
+
+function ExperimentOverride.selectInternal(p: string, flag: boolean)
+	if not getState(p).isSet then
+		writeDisplay(p, nil)
+	end
+
+	local clone = table.clone(v7(false))
+	clone[p] = flag
+	v8(clone)
+	setPendingFlag(p, true) -- inferred equivalent call
+end
+
+function ExperimentOverride.getInternalSelection(p: string, p2)
+	local isSelected = v7(p2)[p]
+	local state = getState(p, p2)
+
+	if isSelected == nil then
+		isSelected = state.specVersion ~= nil
+	end
+
+	return { isSelected = isSelected, previewHash = state.specVersion }
+end
+
+function ExperimentOverride.hasInternalEdit(p: string?): boolean
+	return p ~= nil and v7(false)[p] ~= nil
+end
+
+ExperimentOverride.normalize = normalize
+
+function ExperimentOverride.createPendingKey()
+	count += 1
+	return `pending:{count}`
+end
+
+ExperimentOverride.getState = getState
+
+function ExperimentOverride.getStateSignal(p: string?)
+	return Signals.createComputed(function(p2)
+		return getState(p, p2)
+	end)
+end
+
+function ExperimentOverride.get(p: string?)
+	return getState(p, nil).specVersion
+end
+
+function ExperimentOverride.has(p: string?)
+	return getState(p, nil).isSet
+end
+
+ExperimentOverride.isPending = isPending
+
+function ExperimentOverride.set(p: string?, p2: string?)
+	if p == nil then
+		return
+	end
+
+	writeDisplay(p, p2)
+	setPendingFlag(p, true) -- inferred equivalent call
+end
+
+function ExperimentOverride.hydrate(p: string?, p2: string?, p3)
+	if p ~= nil and not isPending(p) and v7(false)[p] == nil then -- inferred equivalent call
+		writeDisplay(p, p2, p3)
+	end
+end
+
+function ExperimentOverride.clear(p: string?)
+	if p == nil then
+		return
+	end
+
+	local clone = table.clone(v2(false))
+	clone[p] = nil
+	v3(clone)
+	setPendingFlag(p, false) -- inferred equivalent call
+	local clone2 = table.clone(v7(false))
+	clone2[p] = nil
+	v8(clone2)
+end
+
+function ExperimentOverride.consumePending(p: string?)
+	if p ~= nil and isPending(p) then -- inferred equivalent call
+		setPendingFlag(p, false) -- inferred equivalent call
+	end
+end
+
+function ExperimentOverride.move(p: string?, p2: string?)
+	local v9 = v2(false)
+
+	if p == nil or p2 == nil or v9[p] == nil or p == p2 then
+		return
+	end
+
+	local clone = table.clone(v9)
+	clone[p2] = clone[p]
+	clone[p] = nil
+	v3(clone)
+	local clone2 = table.clone(v7(false))
+	clone2[p2] = clone2[p]
+	clone2[p] = nil
+	v8(clone2)
+	local pending = isPending(p) -- inferred equivalent call
+	setPendingFlag(p, false) -- inferred equivalent call
+	setPendingFlag(p2, pending) -- inferred equivalent call
+end
+
+function ExperimentOverride.getExperiment(p: string?)
+	local state = getState(p, nil)
+
+	if not defineFastFlag or state.specVersion == nil then
+		return nil
+	end
+
+	return buildPromptPayload(p) -- inferred equivalent call
+end
+
+function ExperimentOverride.getPromptExperiment(p: string?)
+	local state = getState(p, nil)
+
+	if defineFastFlag and isPending(p) and state.isSet then -- inferred equivalent call
+		return buildPromptPayload(p) -- inferred equivalent call
+	end
+
+	return nil
+end
+
+return ExperimentOverride

@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.VrCommon.VrCommon))
+local VrCommon = require(Workspace.VrCommon.VrCommon)
+
+return VrCommon

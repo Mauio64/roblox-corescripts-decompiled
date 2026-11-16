@@ -1,78 +1,82 @@
-local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local useDispatch = require(UserListParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local NetworkingPresence = require(UserList.Networking.NetworkingPresence)
-local FFlagUserListPresenceStoreMigration = require(UserList.Flags.FFlagUserListPresenceStoreMigration)
-local View = require(UserListParent.Foundation).View
-local NavigateDown = require(UserListParent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(UserListParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v10 = if not FFlagSignalsNavP3Dispatch then nil else require(UserListParent.RobloxAppNavigation).NavigationCommands
-local AppPage = require(UserListParent.RobloxAppEnums).AppPage
-local Constants = require(UserList.Common.Constants)
+local userList = script:FindFirstAncestor("UserList")
+local parent = userList.Parent
+
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local NetworkingPresence = require(userList.Networking.NetworkingPresence)
+local FFlagUserListPresenceStoreMigration = require(userList.Flags.FFlagUserListPresenceStoreMigration)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local Constants = require(userList.Common.Constants)
+
 local UserRowWrapper = require(script.Parent.UserRowWrapper)
 
-local function UserList2(t1: {[any]: any}) -- line: 26
-	-- upvalues: useDispatch (copy), React (copy), AppPage (copy), Constants (copy), FFlagSignalsNavP3Dispatch (copy), v10 (copy), NavigateDown (copy), FFlagUserListPresenceStoreMigration (copy), NetworkingPresence (copy), View (copy), UserRowWrapper (copy)
-	local v16 = useDispatch()
-	local v17 = React.useCallback(function(s1: string) -- line: 29
-		-- upvalues: t1 (copy), AppPage (copy), Constants (copy), FFlagSignalsNavP3Dispatch (copy), v10 (copy), v16 (copy), NavigateDown (copy)
-		if t1.onUserSelected then
-			t1.onUserSelected(s1)
+local function UserList(props)
+	local v = useDispatch()
 
+	local onActivated = React.useCallback(function(detail: string)
+		if props.onUserSelected then
+			props.onUserSelected(detail)
 			return
 		end
 
-		local t2 = {
+		local v2 = {
 			name = AppPage.ProfilePlatform,
-			detail = s1,
-			extraProps = {
-				profileType = Constants.PROFILE_TYPE
-			}
+			detail = detail,
+			extraProps = { profileType = Constants.PROFILE_TYPE }
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v10.down(v10.fromLegacyPage(t2))
-
-			return
+			navigationCommands.down(navigationCommands.fromLegacyPage(v2))
+		else
+			v(NavigateDown(v2))
 		end
+	end, { props.onUserSelected, v })
 
-		v16(NavigateDown(t2))
-	end, {
-		t1.onUserSelected,
-		v16
-	})
-
-	React.useEffect(function() -- line: 50
-		-- upvalues: FFlagUserListPresenceStoreMigration (copy), t1 (copy), v16 (copy), NetworkingPresence (copy)
-		if not FFlagUserListPresenceStoreMigration and #t1.userIds > 0 then
-			v16(NetworkingPresence.GetPresencesFromUserIds.API(t1.userIds))
+	React.useEffect(function()
+		if not FFlagUserListPresenceStoreMigration and #props.userIds > 0 then
+			v(NetworkingPresence.GetPresencesFromUserIds.API(props.userIds))
 		end
-	end, { t1.userIds })
+	end, { props.userIds })
 
-	if #t1.userIds == 0 then
+	if #props.userIds == 0 then
 		return nil
 	end
 
 	return React.createElement(View, {
 		tag = "size-full-0 auto-y col gap-large",
-		LayoutOrder = t1.layoutOrder or 0
+		LayoutOrder = props.layoutOrder or 0
 	}, {
-		UserRows = React.createElement(React.Fragment, {}, unpack(React.useMemo(function() -- line: 67
-			-- upvalues: t1 (copy), React (copy), UserRowWrapper (copy), v17 (copy)
-			local t3 = {}
+		UserRows = React.createElement(React.Fragment, {}, unpack(React.useMemo(function()
+			local children = {}
 
-			for i, v in ipairs(t1.userIds) do
-				t3[i] = React.createElement(UserRowWrapper, {
-					userId = v,
+			for i, userId in ipairs(props.userIds) do
+				children[i] = React.createElement(UserRowWrapper, {
+					userId = userId,
 					LayoutOrder = i,
-					onActivated = v17
+					onActivated = onActivated
 				})
 			end
 
-			return t3
-		end, { t1.userIds })))
+			return children
+		end, { props.userIds })))
 	})
 end
 
-return UserList2
+return UserList

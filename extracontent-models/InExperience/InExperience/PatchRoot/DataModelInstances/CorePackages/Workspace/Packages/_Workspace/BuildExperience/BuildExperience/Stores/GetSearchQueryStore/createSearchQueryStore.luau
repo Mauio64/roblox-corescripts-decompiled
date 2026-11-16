@@ -1,74 +1,85 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
-local v4 = game:DefineFastInt("MyStatsExperienceSearchDebounceMs", 200)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function createSearchQueryStore(t1: {[any]: any}?) -- line: 47
-	-- upvalues: v4 (copy), Signals (copy), SignalsReact (copy)
-	local v7 = t1 or {}
-	local v8 = v7.debounceMs or v4
-	local v9 = v7.schedule or task.delay
-	local v10 = v7.cancel or task.cancel
-	local v11, v12 = Signals.createSignal("")
-	local v13, v14 = Signals.createSignal("")
-	local u15 = nil
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
 
-	local function cancelPending() -- line: 58
-		-- upvalues: u15 (ref), v10 (copy)
-		if u15 ~= nil then
-			pcall(v10, u15)
-			u15 = nil
+local defineFastInt = game:DefineFastInt("MyStatsExperienceSearchDebounceMs", 200)
+
+local function createSearchQueryStore(options)
+	local v = options or {}
+	local debounceMs = v.debounceMs or defineFastInt
+	local schedule = v.schedule or task.delay
+	local cancel = v.cancel or task.cancel
+
+	local signal, v2 = Signals.createSignal("")
+	local signal2, v3 = Signals.createSignal("")
+	local signal3, setIsSearchActive = Signals.createSignal(false)
+
+	local getShowEmptyState = Signals.createComputed(function(p)
+		return signal3(p) and signal(p) == ""
+	end)
+
+	local v4 = nil
+
+	local function cancelPending() -- 3 equivalent calls inferred from this helper
+		if v4 ~= nil then
+			pcall(cancel, v4)
+			v4 = nil
 		end
 	end
 
+	local function clear() -- 1 equivalent call inferred from this helper
+		cancelPending() -- inferred equivalent call
+		v2("")
+		v3("")
+	end
+
 	return {
-		getDraftQuery = v11,
-		useDraftQuery = function() -- line: 94
-			-- upvalues: SignalsReact (copy), v11 (copy)
-			return SignalsReact.useSignalState(v11)
+		getDraftQuery = signal,
+		useDraftQuery = function()
+			return SignalsReact.useSignalState(signal)
 		end,
-		getDebouncedQuery = v13,
-		useDebouncedQuery = function() -- line: 98
-			-- upvalues: SignalsReact (copy), v13 (copy)
-			return SignalsReact.useSignalState(v13)
+		getDebouncedQuery = signal2,
+		useDebouncedQuery = function()
+			return SignalsReact.useSignalState(signal2)
 		end,
-		setQuery = function(s1: string) -- line: 68
-			-- upvalues: v12 (copy), u15 (ref), v10 (copy), v13 (copy), v8 (copy), v9 (copy), v14 (copy)
-			v12(s1)
+		getIsSearchActive = signal3,
+		useIsSearchActive = function()
+			return SignalsReact.useSignalState(signal3)
+		end,
+		getShowEmptyState = getShowEmptyState,
+		useShowEmptyState = function()
+			return SignalsReact.useSignalState(getShowEmptyState)
+		end,
+		setQuery = function(p: string)
+			v2(p)
+			cancelPending() -- inferred equivalent call
 
-			if u15 ~= nil then
-				pcall(v10, u15)
-				u15 = nil
-			end
-
-			if s1 == v13() then
+			if p == signal2() then
 				return
 			end
 
-			local v18 = v8 / 1000
-
-			u15 = v9(v18, function() -- line: 78
-				-- upvalues: u15 (ref), v14 (copy), s1 (copy)
-				u15 = nil
-				v14(s1)
+			v4 = schedule(debounceMs / 1000, function()
+				v4 = nil
+				v3(p)
 			end)
 		end,
-		clear = function() -- line: 84
-			-- upvalues: u15 (ref), v10 (copy), v12 (copy), v14 (copy)
-			if u15 ~= nil then
-				pcall(v10, u15)
-				u15 = nil
-			end
-
-			v12("")
-			v14("")
+		setIsSearchActive = setIsSearchActive,
+		beginSearch = function()
+			setIsSearchActive(true)
 		end,
-		destroy = function() -- line: 90
-			-- upvalues: u15 (ref), v10 (copy)
-			if u15 ~= nil then
-				pcall(v10, u15)
-				u15 = nil
+		endSearch = function()
+			clear() -- inferred equivalent call
+			setIsSearchActive(false)
+		end,
+		endSearchIfEmpty = function()
+			if signal() == "" then
+				setIsSearchActive(false)
 			end
+		end,
+		clear = clear,
+		destroy = function()
+			cancelPending() -- inferred equivalent call
 		end
 	}
 end

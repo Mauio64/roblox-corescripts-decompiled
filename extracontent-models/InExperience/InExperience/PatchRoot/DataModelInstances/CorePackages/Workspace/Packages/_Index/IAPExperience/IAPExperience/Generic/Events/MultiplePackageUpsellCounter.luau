@@ -1,50 +1,34 @@
-local Parent = script:FindFirstAncestor("IAPExperience").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
+local parent = script:FindFirstAncestor("IAPExperience").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
 
 return {
 	MultiplePackageUpsellShownCounter = {
 		eventName = "MultiplePackageUpsellShownCounter",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = { 2025, 5, 1 },
 		throttlingPercentage = 100,
 		description = "Counter on all multiple package upsell shown",
-		links = "",
-		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			5,
-			1
-		}
+		links = ""
 	},
 	MultiplePackageUpsellSelectedCounter = {
 		eventName = "MultiplePackageUpsellSelectedCounter",
-		throttlingPercentage = 100,
-		description = "Counter on all multiple package upsell selections",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			5,
-			1
-		}
+		lastUpdated = { 2025, 5, 1 },
+		throttlingPercentage = 100,
+		description = "Counter on all multiple package upsell selections"
 	},
 	MultiplePackageUpsellModalClosedCounter = {
 		eventName = "MultiplePackageUpsellModalClosedCounter",
-		throttlingPercentage = 100,
-		description = "Counter on all multiple package upsell modal closed",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			5,
-			1
-		}
+		lastUpdated = { 2025, 5, 1 },
+		throttlingPercentage = 100,
+		description = "Counter on all multiple package upsell modal closed"
 	},
 	MultiplePackageUpsellModalBuyClickedCounter = {
 		eventName = "MultiplePackageUpsellModalBuyClickedCounter",
-		throttlingPercentage = 100,
-		description = "Counter on all multiple package upsell modal buy clicked",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			5,
-			1
-		}
+		lastUpdated = { 2025, 5, 1 },
+		throttlingPercentage = 100,
+		description = "Counter on all multiple package upsell modal buy clicked"
 	}
 }

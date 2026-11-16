@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
-local SharedFlags = require(Parent.SharedFlags)
-local FFlagAppIaHomeSubTab = SharedFlags.FFlagAppIaHomeSubTab
-local FFlagEnableDrawerFocusNav = SharedFlags.FFlagEnableDrawerFocusNav
+local parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
 
+local SharedFlags = require(parent.SharedFlags)
 return {
 	ModerationOverlay = "ModerationOverlay",
 	CentralOverlay = "CentralOverlay",
@@ -14,6 +12,6 @@ return {
 	PopUp = "PopUp",
 	PeekView = "PeekView",
 	Auxiliary = "Auxiliary",
-	HeaderView = if not FFlagAppIaHomeSubTab then nil else "HeaderView",
-	Drawer = if not FFlagEnableDrawerFocusNav then nil else "Drawer"
+	HeaderView = SharedFlags.FFlagAppIaHomeSubTab and "HeaderView" or nil,
+	Drawer = SharedFlags.FFlagEnableDrawerFocusNav and "Drawer" or nil
 }

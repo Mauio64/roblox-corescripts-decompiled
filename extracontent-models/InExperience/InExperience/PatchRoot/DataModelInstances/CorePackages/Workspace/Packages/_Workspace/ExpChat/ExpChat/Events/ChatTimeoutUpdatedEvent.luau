@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.ChatTimeoutUpdated)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local ChatTimeoutUpdated = require(actions.ChatTimeoutUpdated)
+
+return event(ChatTimeoutUpdated)

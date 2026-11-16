@@ -1,30 +1,36 @@
-local RbxAnalyticsService = nil
+local v = nil
 
-pcall(function() -- line: 5
-	-- upvalues: RbxAnalyticsService (ref)
-	RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+pcall(function()
+	local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+	v = RbxAnalyticsService
 end)
 
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local Core = scriptParentParentParent.Core
-local Roact = require(scriptParentParentParentParent.Roact)
-local t = require(scriptParentParentParentParent.t)
-local Cryo = require(scriptParentParentParentParent.Cryo)
-local Skeleton = require(scriptParentParentParentParent.Foundation).Skeleton
-local DebugProps = require(scriptParent.Enum.DebugProps)
-local LoadingStrategy = require(scriptParent.Enum.LoadingStrategy)
-local withStyle = require(scriptParentParentParent.Core.Style.withStyle)
-local getClosestRadius = require(scriptParentParent.Loading.getClosestRadius)
-local Images = require(scriptParentParentParent.App.ImageSet.Images)
-local ImageSetComponent = require(scriptParentParentParent.Core.ImageSet.ImageSetComponent)
-local validateImageSetData = require(Core.ImageSet.Validator.validateImageSetData)
-local ContentProvider = require(scriptParentParentParent.App.Context.ContentProvider)
-local v19 = Roact.PureComponent:extend("LoadableImage")
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
+local core = parent3.Core
 
-v19.validateProps = t.strictInterface({
+local Roact = require(parent4.Roact)
+local t = require(parent4.t)
+local Cryo = require(parent4.Cryo)
+local Foundation = require(parent4.Foundation)
+
+local Skeleton = Foundation.Skeleton
+local DebugProps = require(parent.Enum.DebugProps)
+local LoadingStrategy = require(parent.Enum.LoadingStrategy)
+local withStyle = require(parent3.Core.Style.withStyle)
+local getClosestRadius = require(parent2.Loading.getClosestRadius)
+
+local Images = require(parent3.App.ImageSet.Images)
+local ImageSetComponent = require(parent3.Core.ImageSet.ImageSetComponent)
+local validateImageSetData = require(core.ImageSet.Validator.validateImageSetData)
+
+local ContentProvider = require(parent3.App.Context.ContentProvider)
+
+local extended = Roact.PureComponent:extend("LoadableImage")
+
+extended.validateProps = t.strictInterface({
 	AnchorPoint = t.optional(t.Vector2),
 	BackgroundColor3 = t.optional(t.Color3),
 	BackgroundTransparency = t.optional(t.number),
@@ -55,424 +61,424 @@ v19.validateProps = t.strictInterface({
 	[DebugProps.forceLoading] = t.optional(t.boolean),
 	[DebugProps.forceFailed] = t.optional(t.boolean)
 })
-v19.defaultProps = {
+
+extended.defaultProps = {
 	BackgroundTransparency = 0,
-	useShimmerAnimationWhileLoading = false,
-	showFailedStateWhenLoadingFailed = false,
-	loadingTimeout = 30,
-	shouldHandleReloads = false,
 	cornerRadius = UDim.new(0, 0),
 	MaxSize = Vector2.new(1e999, 1e999),
 	MinSize = Vector2.new(0, 0),
-	loadingStrategy = LoadingStrategy.Default
+	useShimmerAnimationWhileLoading = false,
+	showFailedStateWhenLoadingFailed = false,
+	loadingStrategy = LoadingStrategy.Default,
+	loadingTimeout = 30,
+	shouldHandleReloads = false
 }
 
-function v19.init(p1) -- line: 114
-	-- upvalues: Roact (copy)
-	p1.currentImageLoadIndex = 0
-	p1:setState({
-		eagerRetrying = false
-	})
-	p1.imageRef = Roact.createRef()
-	p1._isMounted = false
+function extended:init()
+	self.currentImageLoadIndex = 0
+	self:setState({ eagerRetrying = false })
+
+	self.imageRef = Roact.createRef()
+	self._isMounted = false
 end
-function v19.renderShimmer(p2, p3, p4, p5) -- line: 124
-	-- upvalues: Roact (copy), Skeleton (copy), getClosestRadius (copy)
+
+function extended:renderShimmer(p, uiSizeConstraint, p2)
 	return Roact.createElement("Frame", {
+		AnchorPoint = self.props.AnchorPoint,
 		BorderSizePixel = 0,
-		AnchorPoint = p2.props.AnchorPoint,
-		BackgroundColor3 = p3.PlaceHolder.Color,
-		BackgroundTransparency = p3.PlaceHolder.Transparency,
-		LayoutOrder = p2.props.LayoutOrder,
-		Position = p2.props.Position,
-		Size = p2.props.Size,
-		ZIndex = p2.props.ZIndex
+		BackgroundColor3 = p.PlaceHolder.Color,
+		BackgroundTransparency = p.PlaceHolder.Transparency,
+		LayoutOrder = self.props.LayoutOrder,
+		Position = self.props.Position,
+		Size = self.props.Size,
+		ZIndex = self.props.ZIndex
 	}, {
 		Shimmer = Roact.createElement(Skeleton, {
 			Size = UDim2.fromScale(1, 1),
-			radius = getClosestRadius(p5.Semantic.Radius, p2.props.cornerRadius)
+			radius = getClosestRadius({
+				None = p2.Radius.None,
+				Small = p2.Radius.Small,
+				Medium = p2.Radius.Medium,
+				Large = p2.Size.Size_300,
+				XLarge = p2.Radius.Large,
+				Circle = p2.Radius.Circle
+			}, self.props.cornerRadius)
 		}),
-		UISizeConstraint = p4,
-		UICorner = Roact.createElement("UICorner", {
-			CornerRadius = p2.props.cornerRadius
-		}) or nil
+		UISizeConstraint = uiSizeConstraint,
+		UICorner = Roact.createElement("UICorner", { CornerRadius = self.props.cornerRadius }) or nil
 	})
 end
-function v19.defaultRenderOnFail(p6, p7, p8) -- line: 146
-	-- upvalues: Images (copy), Roact (copy), ImageSetComponent (copy)
-	local cornerRadius = p6.props.cornerRadius
-	local v29 = Images["icons/status/imageunavailable"]
-	local v30 = v29.ImageRectSize / Images.ImagesResolutionScale
 
-	return Roact.createElement("Frame", {
+function extended:defaultRenderOnFail(p, uiSizeConstraint)
+	local cornerRadius = self.props.cornerRadius
+
+	local iconsstatusimageunavailable = Images["icons/status/imageunavailable"]
+	local v2 = iconsstatusimageunavailable.ImageRectSize / Images.ImagesResolutionScale
+
+	local createElement = Roact.createElement
+	local v3 = {
+		AnchorPoint = self.props.AnchorPoint,
 		BorderSizePixel = 0,
-		AnchorPoint = p6.props.AnchorPoint,
-		BackgroundColor3 = p7.PlaceHolder.Color,
-		BackgroundTransparency = p7.PlaceHolder.Transparency,
-		LayoutOrder = p6.props.LayoutOrder,
-		Position = p6.props.Position,
-		Size = p6.props.Size,
-		ZIndex = p6.props.ZIndex
-	}, {
-		EmptyIcon = Roact.createElement(ImageSetComponent.Label, {
-			BackgroundTransparency = 1,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Image = v29,
-			ImageColor3 = p7.UIDefault.Color,
-			ImageTransparency = p7.UIDefault.Transparency,
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(0, v30.X, 0, v30.Y)
-		}, {
-			UICorner = cornerRadius ~= UDim.new(0, 0) and Roact.createElement("UICorner", {
-				CornerRadius = cornerRadius
-			}) or nil
-		}),
-		UISizeConstraint = p8,
-		UICorner = cornerRadius ~= UDim.new(0, 0) and Roact.createElement("UICorner", {
-			CornerRadius = cornerRadius
-		}) or nil
-	})
-end
-function v19.isImageNonNil(p9) -- line: 182
-	-- upvalues: Roact (copy)
-	return p9.props.Image ~= Roact.None and p9.props.Image ~= nil
-end
-function v19.getCurrentImageAssetFetchStatus(p10, p11) -- line: 186
-	local v34 = p11[p10:getAssetFetchStatusStateKey(p10.currentImageLoadIndex)]
+		BackgroundColor3 = p.PlaceHolder.Color,
+		BackgroundTransparency = p.PlaceHolder.Transparency,
+		LayoutOrder = self.props.LayoutOrder,
+		Position = self.props.Position,
+		Size = self.props.Size,
+		ZIndex = self.props.ZIndex
+	}
 
-	if v34 == nil then
-		v34 = Enum.AssetFetchStatus.None
+	local createElement2 = Roact.createElement
+	local label = ImageSetComponent.Label
+	local v4 = {
+		BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Image = iconsstatusimageunavailable,
+		ImageColor3 = p.UIDefault.Color,
+		ImageTransparency = p.UIDefault.Transparency,
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, v2.X, 0, v2.Y)
+	}
+	local uiCorner
+
+	if cornerRadius ~= UDim.new(0, 0) then
+		uiCorner = Roact.createElement("UICorner", { CornerRadius = cornerRadius }) or nil
 	end
 
-	return v34
-end
-function v19.isLoadingComplete(p12, p13) -- line: 196
-	local v37 = p12:getCurrentImageAssetFetchStatus(p13)
+	local v5 = {
+		EmptyIcon = createElement2(label, v4, { UICorner = uiCorner }),
+		UISizeConstraint = uiSizeConstraint,
+		UICorner = 0
+	}
+	local uiCorner2
 
-	if v37 == Enum.AssetFetchStatus.None or v37 == Enum.AssetFetchStatus.Loading then
-		return false
+	if cornerRadius ~= UDim.new(0, 0) then
+		uiCorner2 = Roact.createElement("UICorner", { CornerRadius = cornerRadius }) or nil
 	end
 
-	if (v37 == Enum.AssetFetchStatus.Failure or v37 == Enum.AssetFetchStatus.TimedOut) and p13.eagerRetrying then
+	v5.UICorner = uiCorner2
+	return createElement("Frame", v3, v5)
+end
+
+function extended:isImageNonNil(): boolean
+	return self.props.Image ~= Roact.None and self.props.Image ~= nil
+end
+
+function extended:getCurrentImageAssetFetchStatus(p)
+	local currentImageAssetFetchStatus = p[self:getAssetFetchStatusStateKey(self.currentImageLoadIndex)]
+
+	if currentImageAssetFetchStatus == nil then
+		currentImageAssetFetchStatus = Enum.AssetFetchStatus.None
+	end
+
+	return currentImageAssetFetchStatus
+end
+
+function extended:isLoadingComplete(p): boolean
+	local currentImageAssetFetchStatus = self:getCurrentImageAssetFetchStatus(p)
+
+	if
+		currentImageAssetFetchStatus == Enum.AssetFetchStatus.None
+		or currentImageAssetFetchStatus == Enum.AssetFetchStatus.Loading
+		or (currentImageAssetFetchStatus == Enum.AssetFetchStatus.Failure or currentImageAssetFetchStatus == Enum.AssetFetchStatus.TimedOut)
+		and p.eagerRetrying
+	then
 		return false
 	end
 
 	return true
 end
-function v19.render(p14) -- line: 209
-	-- upvalues: DebugProps (copy), Roact (copy), withStyle (copy), LoadingStrategy (copy), ImageSetComponent (copy)
-	local propsAnchorPoint = p14.props.AnchorPoint
-	local propsLayoutOrder = p14.props.LayoutOrder
-	local propsSize = p14.props.Size
-	local propsPosition = p14.props.Position
-	local propsBackgroundColor3 = p14.props.BackgroundColor3
-	local propsBackgroundTransparency = p14.props.BackgroundTransparency
-	local cornerRadius = p14.props.cornerRadius
-	local propsScaleType = p14.props.ScaleType
-	local propsZIndex = p14.props.ZIndex
-	local propsImage = p14.props.Image
-	local propsImageTransparency = p14.props.ImageTransparency
-	local ImageRectOffset = p14.props.ImageRectOffset
-	local ImageRectSize = p14.props.ImageRectSize
-	local propsImageColor3 = p14.props.ImageColor3
-	local MaxSize = p14.props.MaxSize
-	local MinSize = p14.props.MinSize
-	local renderOnLoading = p14.props.renderOnLoading
-	local renderOnFailed = p14.props.renderOnFailed
-	local loadingImage = p14.props.loadingImage
-	local loadingStrategy = p14.props.loadingStrategy
-	local useShimmerAnimationWhileLoading = p14.props.useShimmerAnimationWhileLoading
-	local showFailedStateWhenLoadingFailed = p14.props.showFailedStateWhenLoadingFailed
-	local u61 = p14:isImageNonNil() and p14:isLoadingComplete(p14.state)
-	local v62 = p14:getCurrentImageAssetFetchStatus(p14.state)
-	local v63 = v62 ~= Enum.AssetFetchStatus.None
-	local u64 = v62 == Enum.AssetFetchStatus.Failure
-	local v65 = false
 
-	if p14.props[DebugProps.forceLoading] then
-		u61 = false
+function extended:render()
+	local anchorPoint = self.props.AnchorPoint
+	local layoutOrder = self.props.LayoutOrder
+	local size = self.props.Size
+	local position = self.props.Position
+	local backgroundColor3 = self.props.BackgroundColor3
+	local backgroundTransparency = self.props.BackgroundTransparency
+	local cornerRadius = self.props.cornerRadius
+	local scaleType = self.props.ScaleType
+	local zIndex = self.props.ZIndex
+	local image = self.props.Image
+	local imageTransparency = self.props.ImageTransparency
+	local imageRectOffset = self.props.ImageRectOffset
+	local imageRectSize = self.props.ImageRectSize
+	local imageColor3 = self.props.ImageColor3
+	local maxSize = self.props.MaxSize
+	local minSize = self.props.MinSize
+	local renderOnLoading = self.props.renderOnLoading
+	local renderOnFailed = self.props.renderOnFailed
+	local loadingImage = self.props.loadingImage
+	local loadingStrategy = self.props.loadingStrategy
+	local useShimmerAnimationWhileLoading = self.props.useShimmerAnimationWhileLoading
+	local showFailedStateWhenLoadingFailed = self.props.showFailedStateWhenLoadingFailed
+	local v2 = self:isImageNonNil() and self:isLoadingComplete(self.state)
+
+	local currentImageAssetFetchStatus = self:getCurrentImageAssetFetchStatus(self.state)
+	local v3 = currentImageAssetFetchStatus ~= Enum.AssetFetchStatus.None
+	local v4 = currentImageAssetFetchStatus == Enum.AssetFetchStatus.Failure
+
+	if self.props[DebugProps.forceLoading] then
+		v2 = false
 	end
 
-	if p14.props[DebugProps.forceFailed] then
-		u64 = true
-	end
+	local v5 = self.props[DebugProps.forceFailed] and true or v4
 
-	if MaxSize.X ~= 1e999 or MaxSize.Y ~= 1e999 or MinSize.X ~= 0 or MinSize.Y ~= 0 then
-		v65 = true
-	end
+	local uiSizeConstraint = (maxSize.X ~= 1e999 or maxSize.Y ~= 1e999 or minSize.X ~= 0 or minSize.Y ~= 0 or false)
+		and Roact.createElement("UISizeConstraint", { MaxSize = maxSize, MinSize = minSize })
 
-	local v66 = v65 and Roact.createElement("UISizeConstraint", {
-		MaxSize = MaxSize,
-		MinSize = MinSize
-	})
+	return withStyle(function(p)
+		local theme = p.Theme
+		local tokens = p.Tokens
 
-	return withStyle(function(p15) -- line: 257
-		-- upvalues: u64 (ref), renderOnFailed (copy), showFailedStateWhenLoadingFailed (copy), p14 (copy), v66 (copy), u61 (ref), renderOnLoading (copy), loadingStrategy (copy), LoadingStrategy (copy), useShimmerAnimationWhileLoading (copy), v63 (copy), Roact (copy), ImageSetComponent (copy), propsAnchorPoint (copy), propsBackgroundColor3 (copy), propsBackgroundTransparency (copy), propsImage (copy), loadingImage (copy), propsImageTransparency (copy), ImageRectOffset (copy), ImageRectSize (copy), propsImageColor3 (copy), propsLayoutOrder (copy), propsPosition (copy), propsScaleType (copy), propsSize (copy), propsZIndex (copy), cornerRadius (copy)
-		local Theme = p15.Theme
-		local Tokens = p15.Tokens
-
-		if u64 and renderOnFailed then
+		if v5 and renderOnFailed then
 			return renderOnFailed()
 		end
 
-		if u64 and showFailedStateWhenLoadingFailed then
-			return p14:defaultRenderOnFail(Theme, v66)
+		if v5 and showFailedStateWhenLoadingFailed then
+			return self:defaultRenderOnFail(theme, uiSizeConstraint)
 		end
 
-		if not u61 and renderOnLoading and loadingStrategy ~= LoadingStrategy.Default then
+		if not v2 and renderOnLoading and loadingStrategy ~= LoadingStrategy.Default then
 			return renderOnLoading()
 		end
 
-		if not u61 and useShimmerAnimationWhileLoading and loadingStrategy ~= LoadingStrategy.Default then
-			return p14:renderShimmer(Theme, v66, Tokens)
+		if not v2 and useShimmerAnimationWhileLoading and loadingStrategy ~= LoadingStrategy.Default then
+			return self:renderShimmer(theme, uiSizeConstraint, tokens)
 		end
 
-		local v110 = u61 or loadingStrategy == LoadingStrategy.Default
-		local v111 = nil
+		local v6 = v2 or loadingStrategy == LoadingStrategy.Default
+		local onLoading
 
-		if not u61 and renderOnLoading and loadingStrategy == LoadingStrategy.Default then
-			v111 = renderOnLoading()
+		if not (v2 or not renderOnLoading or loadingStrategy ~= LoadingStrategy.Default) then
+			onLoading = renderOnLoading()
 		end
 
-		local v112 = nil
+		local shimmer
 
-		if not u61 and useShimmerAnimationWhileLoading and loadingStrategy == LoadingStrategy.Default and v63 then
-			v112 = p14:renderShimmer(Theme, v66, Tokens)
+		if not (v2 or not useShimmerAnimationWhileLoading or loadingStrategy ~= LoadingStrategy.Default or not v3) then
+			shimmer = self:renderShimmer(theme, uiSizeConstraint, tokens)
 		end
 
-		return Roact.createElement(ImageSetComponent.Label, {
-			AnchorPoint = propsAnchorPoint,
-			BackgroundColor3 = propsBackgroundColor3 or Theme.PlaceHolder.Color,
-			BackgroundTransparency = propsBackgroundTransparency or Theme.PlaceHolder.Transparency,
+		local createElement = Roact.createElement
+		local label = ImageSetComponent.Label
+		local imageRefsByRef = {
+			AnchorPoint = anchorPoint,
+			BackgroundColor3 = backgroundColor3 or theme.PlaceHolder.Color,
+			BackgroundTransparency = backgroundTransparency or theme.PlaceHolder.Transparency,
 			BorderSizePixel = 0,
-			Image = v110 and propsImage or loadingImage,
-			ImageTransparency = propsImageTransparency,
-			ImageRectOffset = ImageRectOffset,
-			ImageRectSize = ImageRectSize,
-			ImageColor3 = v110 and propsImageColor3 or nil,
-			LayoutOrder = propsLayoutOrder,
-			Position = propsPosition,
-			ScaleType = propsScaleType,
-			TileSize = p14.props.TileSize,
-			Size = propsSize,
-			ZIndex = propsZIndex,
-			[Roact.Ref] = p14.imageRef
-		}, {
-			UISizeConstraint = v66,
-			UICorner = cornerRadius ~= UDim.new(0, 0) and Roact.createElement("UICorner", {
-				CornerRadius = cornerRadius
-			}) or nil,
-			OnLoading = v111,
-			Shimmer = v112
-		})
+			Image = v6 and image or loadingImage,
+			ImageTransparency = imageTransparency,
+			ImageRectOffset = imageRectOffset,
+			ImageRectSize = imageRectSize,
+			ImageColor3 = v6 and imageColor3 or nil,
+			LayoutOrder = layoutOrder,
+			Position = position,
+			ScaleType = scaleType,
+			TileSize = self.props.TileSize,
+			Size = size,
+			ZIndex = zIndex,
+			[Roact.Ref] = self.imageRef
+		}
+		local v7 = { UISizeConstraint = uiSizeConstraint, UICorner = 0, OnLoading = 0, Shimmer = 0 }
+		local uiCorner
+
+		if cornerRadius ~= UDim.new(0, 0) then
+			uiCorner = Roact.createElement("UICorner", { CornerRadius = cornerRadius }) or nil
+		end
+
+		v7.UICorner = uiCorner
+
+		v7.OnLoading = onLoading
+		v7.Shimmer = shimmer
+		return createElement(label, imageRefsByRef, v7)
 	end)
 end
-function v19.maybeCallOnLoaded(p16, p17) -- line: 321
-	if p16.props.onLoaded then
-		local v69 = p16:isLoadingComplete(p17)
-		local v70 = p16:isLoadingComplete(p16.state)
 
-		if not v69 and v70 then
-			p16.props.onLoaded()
+function extended:maybeCallOnLoaded(p)
+	if self.props.onLoaded then
+		local loadingComplete = self:isLoadingComplete(p)
+		local loadingComplete2 = self:isLoadingComplete(self.state)
+
+		if not loadingComplete and loadingComplete2 then
+			self.props.onLoaded()
 		end
 	end
 end
-function v19.didUpdate(p18, p19, p20) -- line: 331
-	if p19.Image ~= p18.props.Image then
-		p18:loadImage()
+
+function extended:didUpdate(p, p2)
+	if p.Image ~= self.props.Image then
+		self:loadImage()
 	end
 
-	p18:maybeCallOnLoaded(p20)
+	self:maybeCallOnLoaded(p2)
 end
-function v19.didMount(p21) -- line: 338
-	p21._isMounted = true
-	p21:loadImage()
-end
-function v19.willUnmount(p22) -- line: 346
-	p22._isMounted = false
-	p22:dropConnections()
-end
-function v19.isTerminalStatus(_, p24) -- line: 351
-	return p24 == Enum.AssetFetchStatus.Success or (p24 == Enum.AssetFetchStatus.Failure or p24 == Enum.AssetFetchStatus.TimedOut)
-end
-function v19.getImageUri(p25) -- line: 361
-	if p25.props.Image then
-		if typeof(p25.props.Image) == "string" then
-			return p25.props.Image
-		end
 
-		return p25.props.Image.Image
+function extended:didMount()
+	self._isMounted = true
+
+	self:loadImage()
+end
+
+function extended:willUnmount()
+	self._isMounted = false
+	self:dropConnections()
+end
+
+function extended:isTerminalStatus(p): boolean
+	return p == Enum.AssetFetchStatus.Success
+		or p == Enum.AssetFetchStatus.Failure
+		or p == Enum.AssetFetchStatus.TimedOut
+end
+
+function extended:getImageUri()
+	if not self.props.Image then
+		return nil
 	end
 
-	return nil
+	if typeof(self.props.Image) == "string" then
+		return self.props.Image
+	end
+
+	return self.props.Image.Image
 end
-function v19.awaitImageLoaded(p26, p27, p28) -- line: 375
-	if p26:isTerminalStatus(p28) then
+
+function extended:awaitImageLoaded(p, p2)
+	if self:isTerminalStatus(p2) then
 		return
 	end
 
-	local v82 = p26:getImageUri()
+	local imageUri = self:getImageUri()
 
-	if v82 == "" then
-		local Success = Enum.AssetFetchStatus.Success
+	local function fn(success) -- 1 equivalent call inferred from this helper
+		self:updateAssetFetchStatusForImageLoadIndex(success, p, imageUri)
+		self:maybeReportCounter("Await", success)
 
-		p26:updateAssetFetchStatusForImageLoadIndex(Success, p27, v82)
-		p26:maybeReportCounter("Await", Success)
-
-		if p26:isTerminalStatus(Success) and p26.awaitImageLoadedConnection then
-			p26.awaitImageLoadedConnection:Disconnect()
-			p26.awaitImageLoadedConnection = nil
+		if self:isTerminalStatus(success) and self.awaitImageLoadedConnection then
+			self.awaitImageLoadedConnection:Disconnect()
+			self.awaitImageLoadedConnection = nil
 		end
+	end
 
+	if imageUri ~= "" then
+		self.awaitImageLoadedConnection = self.props.contentProvider:GetAssetFetchStatusChangedSignal(imageUri):Connect(fn)
 		return
 	end
 
-	p26.awaitImageLoadedConnection = p26.props.contentProvider:GetAssetFetchStatusChangedSignal(v82):Connect(function(p29) -- line: 386
-		-- upvalues: p26 (copy), p27 (copy), v82 (copy)
-		p26:updateAssetFetchStatusForImageLoadIndex(p29, p27, v82)
-		p26:maybeReportCounter("Await", p29)
+	fn(Enum.AssetFetchStatus.Success) -- inferred equivalent call
+end
 
-		if p26:isTerminalStatus(p29) and p26.awaitImageLoadedConnection then
-			p26.awaitImageLoadedConnection:Disconnect()
-			p26.awaitImageLoadedConnection = nil
-		end
+function extended:maybeReportCounter(p, p2)
+	pcall(function()
+		local v2 = "UIBlox_LoadableImage_" .. p .. "_" .. tostring(p2)
+		v:ReportCounter(v2)
 	end)
 end
-function v19.maybeReportCounter(_, p31, p32) -- line: 404
-	-- upvalues: RbxAnalyticsService (ref)
-	pcall(function() -- line: 407
-		-- upvalues: p31 (copy), p32 (copy), RbxAnalyticsService (ref)
-		local v114 = "UIBlox_LoadableImage_" .. p31 .. "_" .. tostring(p32)
 
-		RbxAnalyticsService:ReportCounter(v114)
-	end)
-end
-function v19.preloadImageWithRetryLogic(p33, p34) -- line: 419
-	local v89 = p33:getImageUri()
-	local n1 = 0
-	local None = Enum.AssetFetchStatus.None
-	local g93 = nil
+function extended:preloadImageWithRetryLogic(p)
+	local imageUri = self:getImageUri()
 
-	while p33._isMounted do
-		if n1 > 0 then
-			task.wait(math.pow(2, n1 - 1) * 1.5)
+	local v2 = Enum.AssetFetchStatus.None
+	local count = 0
+
+	while self._isMounted do
+		if count > 0 then
+			task.wait(math.pow(2, count - 1) * 1.5)
 		end
 
-		p33.props.contentProvider:PreloadAsync({ v89 }, function(_, p36) -- line: 434
-			-- upvalues: p33 (copy), v89 (copy), None (ref), p34 (copy)
-			local v117 = p33:getImageUri()
+		self.props.contentProvider:PreloadAsync({ imageUri }, function(_, p2)
+			local imageUri2 = self:getImageUri()
 
-			if p33._isMounted and v117 == v89 then
-				p33:maybeReportCounter("PreloadAsync", p36)
-				None = p36
-				p33:updateAssetFetchStatusForImageLoadIndex(p36, p34, v89)
+			if self._isMounted and imageUri2 == imageUri then
+				self:maybeReportCounter("PreloadAsync", p2)
+				v2 = p2
+				self:updateAssetFetchStatusForImageLoadIndex(p2, p, imageUri)
 			end
 		end)
 
-		local v92 = p33:getImageUri()
+		local imageUri2 = self:getImageUri()
 
-		if not p33._isMounted or v92 ~= v89 then
-			return
+		if not self._isMounted or imageUri2 ~= imageUri then
+			break
 		end
 
-		repeat
-			if g93 or None == Enum.AssetFetchStatus.Success then
-				g93 = false
-				p33:setState({
-					eagerRetrying = false
-				})
+		if v2 ~= Enum.AssetFetchStatus.Success then
+			count += 1
 
-				return
+			if
+				(v2 ~= Enum.AssetFetchStatus.Failure or not (count > 3))
+				and (v2 ~= Enum.AssetFetchStatus.TimedOut or not (count > 5))
+			then
+				self:setState({ eagerRetrying = true })
+				continue
 			end
+		end
 
-			n1 += 1
-
-			if None == Enum.AssetFetchStatus.Failure and n1 > 3 or None == Enum.AssetFetchStatus.TimedOut and n1 > 5 then
-				g93 = true
-			end
-		until not g93
-
-		p33:setState({
-			eagerRetrying = true
-		})
-	end
-end
-function v19.getAssetFetchStatusStateKey(_, p38) -- line: 481
-	return "assetFetchStatus_" .. tostring(p38)
-end
-function v19.updateAssetFetchStatusForImageLoadIndex(p39, p40, p41, _) -- line: 485
-	p39:setState({
-		[p39:getAssetFetchStatusStateKey(p41)] = p40
-	})
-end
-function v19.dropConnections(p43) -- line: 492
-	if p43.listenForReloadsConnection then
-		p43.listenForReloadsConnection:Disconnect()
-		p43.listenForReloadsConnection = nil
-	end
-
-	if p43.awaitImageLoadedConnection then
-		p43.awaitImageLoadedConnection:Disconnect()
-		p43.awaitImageLoadedConnection = nil
-	end
-end
-function v19.loadImage(p44) -- line: 503
-	-- upvalues: LoadingStrategy (copy)
-	local v102 = p44.currentImageLoadIndex + 1
-
-	p44.currentImageLoadIndex = v102
-
-	local v103 = p44:getImageUri()
-	local loadingStrategy = p44.props.loadingStrategy
-
-	p44:dropConnections()
-
-	if v103 == nil then
-		p44:updateAssetFetchStatusForImageLoadIndex(Enum.AssetFetchStatus.Success, v102, v103)
-		p44:setState({
-			eagerRetrying = false
-		})
-
-		return
-	end
-
-	local AssetFetchStatus = p44.props.contentProvider:GetAssetFetchStatus(v103)
-
-	p44:maybeReportCounter("InitialStatus", AssetFetchStatus)
-	p44:updateAssetFetchStatusForImageLoadIndex(AssetFetchStatus, v102, v103)
-
-	if p44.props.shouldHandleReloads then
-		p44.listenForReloadsConnection = p44.props.contentProvider:GetAssetFetchStatusChangedSignal(v103):Connect(function(p45, _) -- line: 534
-			-- upvalues: p44 (copy), v102 (copy), v103 (copy)
-			p44:maybeReportCounter("Reloads", p45)
-			p44:updateAssetFetchStatusForImageLoadIndex(p45, v102, v103)
-		end)
-	end
-
-	if loadingStrategy == LoadingStrategy.Eager then
-		task.spawn(function() -- line: 543
-			-- upvalues: p44 (copy), v102 (copy)
-			p44:preloadImageWithRetryLogic(v102)
-		end)
-
-		return
-	end
-
-	if loadingStrategy == LoadingStrategy.Default then
-		p44:awaitImageLoaded(v102, AssetFetchStatus)
+		self:setState({ eagerRetrying = false })
+		break
 	end
 end
 
-return function(p47) -- line: 551
-	-- upvalues: Roact (copy), ContentProvider (copy), Cryo (copy), v19 (copy)
+function extended:getAssetFetchStatusStateKey(p)
+	return "assetFetchStatus_" .. tostring(p)
+end
+
+function extended:updateAssetFetchStatusForImageLoadIndex(p, p2, _)
+	self:setState({ [self:getAssetFetchStatusStateKey(p2)] = p })
+end
+
+function extended:dropConnections()
+	if self.listenForReloadsConnection then
+		self.listenForReloadsConnection:Disconnect()
+		self.listenForReloadsConnection = nil
+	end
+
+	if self.awaitImageLoadedConnection then
+		self.awaitImageLoadedConnection:Disconnect()
+		self.awaitImageLoadedConnection = nil
+	end
+end
+
+function extended:loadImage()
+	local currentImageLoadIndex = self.currentImageLoadIndex + 1
+	self.currentImageLoadIndex = currentImageLoadIndex
+
+	local imageUri = self:getImageUri()
+	local loadingStrategy = self.props.loadingStrategy
+
+	self:dropConnections()
+
+	if imageUri == nil then
+		self:updateAssetFetchStatusForImageLoadIndex(Enum.AssetFetchStatus.Success, currentImageLoadIndex, imageUri)
+
+		self:setState({ eagerRetrying = false })
+	else
+		local assetFetchStatus = self.props.contentProvider:GetAssetFetchStatus(imageUri)
+		self:maybeReportCounter("InitialStatus", assetFetchStatus)
+		self:updateAssetFetchStatusForImageLoadIndex(assetFetchStatus, currentImageLoadIndex, imageUri)
+
+		if self.props.shouldHandleReloads then
+			self.listenForReloadsConnection = self.props.contentProvider:GetAssetFetchStatusChangedSignal(imageUri):Connect(function(p, _)
+				self:maybeReportCounter("Reloads", p)
+				self:updateAssetFetchStatusForImageLoadIndex(p, currentImageLoadIndex, imageUri)
+			end)
+		end
+
+		if loadingStrategy == LoadingStrategy.Eager then
+			task.spawn(function()
+				self:preloadImageWithRetryLogic(currentImageLoadIndex)
+			end)
+		elseif loadingStrategy == LoadingStrategy.Default then
+			self:awaitImageLoaded(currentImageLoadIndex, assetFetchStatus)
+		end
+	end
+end
+
+return function(p)
 	return Roact.createElement(ContentProvider.Consumer, {
-		render = function(p48) -- line: 553
-			-- upvalues: Cryo (copy), p47 (copy), Roact (copy), v19 (copy)
-			local v121 = Cryo.Dictionary.join(p47, {
-				contentProvider = p48
-			})
+		render = function(contentProvider)
+			local joined = Cryo.Dictionary.join(p, { contentProvider = contentProvider })
 
-			return Roact.createElement(v19, v121)
+			return Roact.createElement(extended, joined)
 		end
 	})
 end

@@ -1,162 +1,142 @@
 local GuiService = game:GetService("GuiService")
+
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local React = require(ExpChatParent.React)
-local Localization = require(ExpChatParent.RobloxAppLocales).Localization
+local parent = ExpChat.Parent
+local React = require(parent.React)
+
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
 local LocalizationService = game:GetService("LocalizationService")
-local LocalizationProvider = require(ExpChatParent.Localization).LocalizationProvider
-local ChatBoxContextMenu = require(ExpChatParent.ChatLineReporting).ChatBoxContextMenu
-local Constants = require(ExpChatParent.ChatLineReporting).Constants
-local FocusNavigationUtils = require(ExpChatParent.FocusNavigationUtils)
-local GetFFlagMemoizeChatReportingMenu = require(ExpChatParent.SharedFlags).GetFFlagMemoizeChatReportingMenu
-local ReactFocusNavigation = require(ExpChatParent.ReactFocusNavigation)
-local Signals = require(ExpChatParent.Signals)
-local SignalsReact = require(ExpChatParent.SignalsReact)
-local UIBlox = require(ExpChatParent.UIBlox)
-local IconButton = UIBlox.App.Button.IconButton
-local Images = UIBlox.App.ImageSet.Images
-local Foundation = require(ExpChatParent.Foundation)
+local Localization2 = require(parent.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+
+local ChatLineReporting = require(parent.ChatLineReporting)
+local ChatBoxContextMenu = ChatLineReporting.ChatBoxContextMenu
+local ChatLineReporting2 = require(parent.ChatLineReporting)
+local Constants = ChatLineReporting2.Constants
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagMemoizeChatReportingMenu = SharedFlags.GetFFlagMemoizeChatReportingMenu
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
 local Icon = Foundation.Icon
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local View = Foundation.View
-local FFlagExpChatFocusViaLastModeFix = require(ExpChat.Flags.FFlagExpChatFocusViaLastModeFix)
+
 local getFFlagChatWindowUseCallbackOptimizations = require(ExpChat.Flags.getFFlagChatWindowUseCallbackOptimizations)
-local v25 = game:DefineFastFlag("ReplaceChatLineReportingIcon", false)
-local v26 = game:DefineFastFlag("ExpChatTopBannerZIndexFix", false)
-local v27 = require(ExpChat.Stores.GetFocusNavigationStore)(false)
+local defineFastFlag = game:DefineFastFlag("ExpChatTopBannerZIndexFix", false)
 
-local function v28(p1) -- line: 38
-	-- upvalues: React (copy), Localization (copy), LocalizationService (copy), ReactFocusNavigation (copy), FFlagExpChatFocusViaLastModeFix (copy), FocusNavigationUtils (copy), SignalsReact (copy), v27 (copy), GuiService (copy), Signals (copy), Constants (copy), v26 (copy), v25 (copy), View (copy), getFFlagChatWindowUseCallbackOptimizations (copy), Icon (copy), IconName (copy), IconSize (copy), IconButton (copy), Images (copy), LocalizationProvider (copy), ChatBoxContextMenu (copy), GetFFlagMemoizeChatReportingMenu (copy)
-	local v30 = React.useRef(nil)
-	local v31, v32 = React.useState(false)
-	local v33 = Localization.new(LocalizationService.RobloxLocaleId)
-	local v34 = ReactFocusNavigation.useFocusGuiObject()
-	local v35 = if not FFlagExpChatFocusViaLastModeFix then FocusNavigationUtils.useLastInputMode() else nil
-	local v36 = if not FFlagExpChatFocusViaLastModeFix then nil else SignalsReact.useSignalState(v27.getChatInputBarFocused)
-	local v37 = React.useCallback(function() -- line: 50
-		-- upvalues: p1 (copy), FFlagExpChatFocusViaLastModeFix (copy), v36 (copy), v35 (copy), v30 (copy), v34 (copy), GuiService (copy)
-		p1.onUnfocus()
+local GetFocusNavigationStore = require(ExpChat.Stores.GetFocusNavigationStore)
+local focusNavigationStore = GetFocusNavigationStore(false)
 
-		if (FFlagExpChatFocusViaLastModeFix and v36 or not FFlagExpChatFocusViaLastModeFix and v35 == "Focus") and v30.current then
-			v34(v30.current)
+local function fn(props)
+	local ref = React.useRef(nil)
+	local state, setState = React.useState(false)
+	local localization = Localization.new(LocalizationService.RobloxLocaleId)
+
+	local v = ReactFocusNavigation.useFocusGuiObject()
+	local v2 = SignalsReact.useSignalState(focusNavigationStore.getChatInputBarFocused)
+
+	local current = React.useCallback(function()
+		props.onUnfocus()
+
+		if v2 and ref.current then
+			v(ref.current)
 			GuiService.SelectedCoreObject = nil
 		end
-	end, {
-		if not FFlagExpChatFocusViaLastModeFix then nil else v36,
-		v34,
-		if not FFlagExpChatFocusViaLastModeFix then v35 else nil,
-		p1.onUnfocus
-	})
-	local v38 = React.useRef(v37)
+	end, { v2, v, props.onUnfocus })
 
-	React.useEffect(function() -- line: 74
-		-- upvalues: v38 (copy), v37 (copy)
-		v38.current = v37
-	end, { v37 })
-	React.useEffect(function() -- line: 78
-		-- upvalues: v31 (copy), v38 (copy)
-		return function() -- line: 79
-			-- upvalues: v31 (copy), v38 (copy)
-			if v31 and v38.current then
-				v38.current()
+	local ref2 = React.useRef(current)
+
+	React.useEffect(function()
+		ref2.current = current
+	end, { current })
+
+	React.useEffect(function()
+		return function()
+			if state and ref2.current then
+				ref2.current()
 			end
 		end
-	end, { v31 })
-	React.useEffect(function() -- line: 87
-		-- upvalues: FFlagExpChatFocusViaLastModeFix (copy), v36 (copy), v31 (copy), v32 (copy), v35 (copy), Signals (copy), v27 (copy)
-		if FFlagExpChatFocusViaLastModeFix then
-			if v36 and v31 then
-				return function() -- line: 91
-					-- upvalues: v32 (copy)
-					v32(false)
-				end
+	end, { state })
+
+	React.useEffect(function()
+		if v2 and state then
+			return function()
+				setState(false)
 			end
-
-			return nil
-		end
-
-		if v35 == "Focus" and v31 then
-			return Signals.createEffect(function(p2) -- line: 99
-				-- upvalues: v27 (copy), v32 (copy)
-				if not v27.getChatInputBarFocused(p2) then
-					v32(false)
-				end
-			end)
 		end
 
 		return nil
-	end, {
-		if not FFlagExpChatFocusViaLastModeFix then nil else v36,
-		v31,
-		if not FFlagExpChatFocusViaLastModeFix then v35 else nil
-	})
+	end, { v2, state })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
+	local createElement = React.createElement
+	local v3 = {
 		Size = UDim2.new(1, 0, 0, Constants.TopBannerSize),
-		ZIndex = if not v26 then nil else 2
-	}, {
-		DotMenu = if not v25 then React.createElement(IconButton, {
-			showBackground = true,
-			backgroundTransparency = 1,
-			size = UDim2.new(0, Constants.IconButtonSize, 0, Constants.IconButtonSize),
-			position = UDim2.new(1, Constants.IconButtonPositionXOffset, 0, Constants.IconButtonPositionYOffset),
-			icon = Images["icons/menu/more_off"],
-			iconTransparency = p1.iconTransparency,
-			buttonRef = v30,
-			onActivated = not getFFlagChatWindowUseCallbackOptimizations() and function() -- line: 170
-				-- upvalues: v32 (copy), p1 (copy)
-				v32(true)
-				p1.onFocus()
-			end or React.useCallback(function() -- line: 166
-				-- upvalues: v32 (copy), p1 (copy)
-				v32(true)
-				p1.onFocus()
-			end, {
-				v32,
-				p1.onFocus
-			})
-		}) else React.createElement(View, {
-			tag = "auto-xy padding-small radius-medium align-x-center align-y-center",
+		BackgroundTransparency = 1,
+		ZIndex = defineFastFlag and 2 or nil
+	}
+
+	local v4 = {
+		DotMenu = React.createElement(View, {
 			Size = UDim2.new(0, Constants.IconButtonSize, 0, Constants.IconButtonSize),
 			Position = UDim2.new(1, Constants.IconButtonPositionXOffset, 0, Constants.IconButtonPositionYOffset),
-			onActivated = not getFFlagChatWindowUseCallbackOptimizations() and function() -- line: 137
-				-- upvalues: v32 (copy), p1 (copy)
-				v32(true)
-				p1.onFocus()
-			end or React.useCallback(function() -- line: 133
-				-- upvalues: v32 (copy), p1 (copy)
-				v32(true)
-				p1.onFocus()
-			end, {
-				v32,
-				p1.onFocus
-			}),
-			ref = v30
+			onActivated = not getFFlagChatWindowUseCallbackOptimizations() and function()
+				setState(true)
+				props.onFocus()
+			end or React.useCallback(function()
+				setState(true)
+				props.onFocus()
+			end, { setState, props.onFocus }),
+			tag = "auto-xy padding-small radius-medium align-x-center align-y-center",
+			ref = ref
 		}, React.createElement(Icon, {
 			name = IconName.ThreeDotsHorizontal,
 			size = IconSize.Large,
-			style = {
-				Transparency = p1.iconTransparency
-			}
+			style = { Transparency = props.iconTransparency }
 		})),
-		LocalizationProvider = React.createElement(LocalizationProvider, {
-			localization = v33
-		}, {
-			ContextMenu = if not v31 then nil else React.createElement(ChatBoxContextMenu, {
-				setContextMenuOpen = v32,
-				backgroundColor3 = p1.backgroundColor3,
-				backgroundTransparency = p1.backgroundTransparency,
-				getMessages = if not GetFFlagMemoizeChatReportingMenu() then nil else p1.getMessages,
-				messages = if GetFFlagMemoizeChatReportingMenu() then nil else p1.messages
-			})
-		})
+		LocalizationProvider = 0
+	}
+
+	local createElement2 = React.createElement
+	local contextMenu
+
+	if state then
+		local createElement3 = React.createElement
+		local v5 = {
+			setContextMenuOpen = setState,
+			backgroundColor3 = props.backgroundColor3,
+			backgroundTransparency = props.backgroundTransparency,
+			getMessages = 0,
+			messages = 0
+		}
+		local getMessages
+
+		if GetFFlagMemoizeChatReportingMenu() then
+			getMessages = props.getMessages
+		end
+
+		v5.getMessages = getMessages
+		local messages
+
+		if not GetFFlagMemoizeChatReportingMenu() then
+			messages = props.messages
+		end
+
+		v5.messages = messages
+		contextMenu = createElement3(ChatBoxContextMenu, v5)
+	end
+
+	v4.LocalizationProvider = createElement2(LocalizationProvider, { localization = localization }, {
+		ContextMenu = contextMenu
 	})
+	return createElement("Frame", v3, v4)
 end
 
 if GetFFlagMemoizeChatReportingMenu() then
-	return (React.memo(v28))
+	return (React.memo(fn))
 end
 
-return v28
+return fn

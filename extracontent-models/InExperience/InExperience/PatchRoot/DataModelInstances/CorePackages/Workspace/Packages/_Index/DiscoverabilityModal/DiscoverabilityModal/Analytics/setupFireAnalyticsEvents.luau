@@ -1,25 +1,38 @@
-local ParentParent = script.Parent.Parent
-local SocialLuaAnalytics = require(ParentParent.dependencies).SocialLuaAnalytics
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+local socialLuaAnalytics = dependencies.SocialLuaAnalytics
+
 local DiagEvents = require(script.Parent.DiagEvents)
-local fireEventStream = SocialLuaAnalytics.Analytics.FireEvent.fireEventStream
-local fireDiagCounter = SocialLuaAnalytics.Analytics.FireEvent.fireDiagCounter
+local fireEventStream = socialLuaAnalytics.Analytics.FireEvent.fireEventStream
+local fireDiagCounter = socialLuaAnalytics.Analytics.FireEvent.fireDiagCounter
 local AnalyticsEvents = require(script.Parent.AnalyticsEvents)
 
-return function(t1: {[any]: any}) -- line: 10
-	-- upvalues: fireEventStream (copy), AnalyticsEvents (copy), fireDiagCounter (copy), DiagEvents (copy)
-	local v8 = fireEventStream({
-		eventStreamImpl = if not t1.analytics then t1.eventStreamImpl else t1.analytics.EventStream,
-		eventList = AnalyticsEvents,
-		infoForAllEvents = t1.defaultAnalyticsInfo
-	})
-	local v9 = fireDiagCounter({
-		diagImpl = if not t1.analytics then t1.diag else t1.analytics.Diag,
-		eventList = DiagEvents
-	})
+return function(data)
+	local eventStreamImpl
 
-	return function(p1, p2) -- line: 28
-		-- upvalues: v9 (copy), v8 (copy)
-		v9(p1)
-		v8(p1, p2)
+	if data.analytics then
+		eventStreamImpl = data.analytics.EventStream
+	else
+		eventStreamImpl = data.eventStreamImpl
+	end
+
+	local v = fireEventStream({
+		eventStreamImpl = eventStreamImpl,
+		eventList = AnalyticsEvents,
+		infoForAllEvents = data.defaultAnalyticsInfo
+	})
+	local diagImpl
+
+	if data.analytics then
+		diagImpl = data.analytics.Diag
+	else
+		diagImpl = data.diag
+	end
+
+	local v2 = fireDiagCounter({ diagImpl = diagImpl, eventList = DiagEvents })
+
+	return function(p, p2)
+		v2(p)
+		v(p, p2)
 	end
 end

@@ -1,41 +1,38 @@
-local t1 = {}
+local GoogleAnalytics = {}
+GoogleAnalytics.__index = GoogleAnalytics
 
-t1.__index = t1
+function GoogleAnalytics.new(reporter)
+	local typeName = type(reporter)
+	assert(typeName == "table" or typeName == "userdata", "Unexpected value for reportingService")
 
-function t1.new(p1) -- line: 24
-	-- upvalues: t1 (copy)
-	local v3 = type(p1)
+	local v = { _reporter = reporter, _isEnabled = true }
 
-	assert(v3 == "table" or v3 == "userdata", "Unexpected value for reportingService")
+	setmetatable(v, GoogleAnalytics)
 
-	local t2 = {
-		_isEnabled = true,
-		_reporter = p1
-	}
-
-	setmetatable(t2, t1)
-
-	return t2
+	return v
 end
-function t1.setEnabled(t3: {[any]: any}, b1: boolean) -- line: 37
-	assert(type(b1) == "boolean", "Expected isEnabled to be a boolean")
-	t3._isEnabled = b1
-end
-function t1.trackEvent(t4: {[any]: any}, s1: string, s2: string, s3: string?, n1: number?) -- line: 46
-	assert(type(s1) == "string", "Expected category to be a string")
-	assert(type(s2) == "string", "Expected action to be a string")
 
-	if s3 then
-		assert(type(s3) == "string", "Expected label to be a string")
+function GoogleAnalytics:setEnabled(isEnabled: boolean)
+	assert(type(isEnabled) == "boolean", "Expected isEnabled to be a boolean")
+	self._isEnabled = isEnabled
+end
+
+function GoogleAnalytics:trackEvent(value: string, value2: string, value3: string?, value4: number?)
+	assert(type(value) == "string", "Expected category to be a string")
+	assert(type(value2) == "string", "Expected action to be a string")
+
+	if value3 then
+		assert(type(value3) == "string", "Expected label to be a string")
 	end
 
-	if n1 then
-		assert(type(n1) == "number", "Expected value to be a number")
-		assert(n1 >= 0, "Expected value must not be a negative value")
+	if value4 then
+		assert(type(value4) == "number", "Expected value to be a number")
+		assert(value4 >= 0, "Expected value must not be a negative value")
 	end
 
-	assert(t4._isEnabled, "This reporting service is disabled")
-	t4._reporter:TrackEvent(s1, s2, s3, n1)
+	assert(self._isEnabled, "This reporting service is disabled")
+
+	self._reporter:TrackEvent(value, value2, value3, value4)
 end
 
-return t1
+return GoogleAnalytics

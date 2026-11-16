@@ -1,43 +1,38 @@
-local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
-local SduiSharedUtilities = require(Parent.SduiSharedUtilities)
+local parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 
 require(script.Parent.PromptStyle)
-
 local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
 
-local function usePromptEntries(s1: string, p1) -- line: 27
-	-- upvalues: SignalsReact (copy), getSduiApiStore (copy), React (copy)
-	local v9 = SignalsReact.useSignalState(getSduiApiStore().getData(s1).data)
+local function usePromptEntries(p: string, p2)
+	local v = SignalsReact.useSignalState(getSduiApiStore().getData(p).data)
 
-	return React.useMemo(function() -- line: 30
-		-- upvalues: v9 (copy), p1 (copy)
-		local t1 = {}
+	return React.useMemo(function()
+		local result = {}
 
-		if not v9 then
-			return t1
+		if not v then
+			return result
 		end
 
-		for _, v12 in v9 do
-			local category = v12.category
+		for _, v2 in v do
+			local category = v2.category
 
-			if p1 == nil or category == p1 then
-				table.insert(t1, {
-					identifier = v12.identifier,
-					robloxComponentType = v12.robloxComponentType,
-					title = v12.title,
+			if p2 == nil or category == p2 then
+				table.insert(result, {
+					identifier = v2.identifier,
+					robloxComponentType = v2.robloxComponentType,
+					title = v2.title,
 					promptStyle = category,
-					config = v12.config
+					config = v2.config
 				})
 			end
 		end
 
-		return t1
-	end, {
-		v9,
-		p1
-	})
+		return result
+	end, { v, p2 })
 end
 
 return usePromptEntries

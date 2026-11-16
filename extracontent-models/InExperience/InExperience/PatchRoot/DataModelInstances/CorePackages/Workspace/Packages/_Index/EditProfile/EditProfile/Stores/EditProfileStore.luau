@@ -1,32 +1,42 @@
-local Parent = script:FindFirstAncestor("EditProfile").Parent
+local parent = script:FindFirstAncestor("EditProfile").Parent
+require(parent.Signals)
 
-require(Parent.Signals)
-
-local DataHydration = require(Parent.DataHydration)
+local DataHydration = require(parent.DataHydration)
 local createDataCache = DataHydration.createDataCache
 local createDataResolver = DataHydration.createDataResolver
 local fetchUserDescription = require(script.Parent.Requests.fetchUserDescription)
+local fetchUsernameChangePrice = require(script.Parent.Requests.fetchUsernameChangePrice)
 local updateUserDescription = require(script.Parent.Requests.updateUserDescription)
-local v7 = createDataCache()
-local v8 = createDataResolver({
+
+local dataCache = createDataCache()
+local dataResolver = createDataResolver({
+	cache = dataCache,
 	supportsMultiGet = false,
-	queueProcessDelaySec = 0,
-	cache = v7,
-	fetchFn = fetchUserDescription
+	fetchFn = fetchUserDescription,
+	queueProcessDelaySec = 0
 })
 
-return {
-	getDescription = function(s1: string) -- line: 29
-		-- upvalues: v8 (copy)
-		return (v8.getAndFetchItem(s1))
-	end,
-	updateDescription = function(s2: string, s3: string) -- line: 34
-		-- upvalues: updateUserDescription (copy), v7 (copy)
-		return updateUserDescription(s3):andThen(function(p1) -- line: 35
-			-- upvalues: v7 (copy), s2 (copy)
-			v7.replaceItem(s2, p1)
+local dataResolver2 = createDataResolver({
+	cache = createDataCache(),
+	supportsMultiGet = false,
+	fetchFn = fetchUsernameChangePrice,
+	queueProcessDelaySec = 0
+})
+local EditProfileStore = {}
 
-			return p1
-		end)
-	end
-}
+function EditProfileStore.getDescription(p: string)
+	return (dataResolver.getAndFetchItem(p))
+end
+
+function EditProfileStore.getUsernameChangePrice(p: string)
+	return dataResolver2.getAndFetchItem(p)
+end
+
+function EditProfileStore.updateDescription(p: string, p2: string)
+	return updateUserDescription(p2):andThen(function(p3)
+		dataCache.replaceItem(p, p3)
+		return p3
+	end)
+end
+
+return EditProfileStore

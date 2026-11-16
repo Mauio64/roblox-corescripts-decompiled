@@ -1,5 +1,1 @@
-return {
-	Emphasis = "Emphasis",
-	Standard = "Standard",
-	Utility = "Utility"
-}
+return { Emphasis = "Emphasis", Standard = "Standard", Utility = "Utility" }

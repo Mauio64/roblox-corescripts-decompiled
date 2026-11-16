@@ -1,9 +1,11 @@
 local SocialExperienceJoin = script:FindFirstAncestor("SocialExperienceJoin")
-local SocialExperienceJoinParent = SocialExperienceJoin.Parent
+local parent = SocialExperienceJoin.Parent
 local Constants = require(SocialExperienceJoin.Common.Constants)
-local LuaSocialLibrariesDeps = require(SocialExperienceJoinParent.LuaSocialLibrariesDeps)
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
 
-if require(SocialExperienceJoin.Flags.FFlagSocialExperienceJoinPresenceStoreMigration) then
+local FFlagSocialExperienceJoinPresenceStoreMigration = require(SocialExperienceJoin.Flags.FFlagSocialExperienceJoinPresenceStoreMigration)
+
+if FFlagSocialExperienceJoinPresenceStoreMigration then
 	return nil
 end
 

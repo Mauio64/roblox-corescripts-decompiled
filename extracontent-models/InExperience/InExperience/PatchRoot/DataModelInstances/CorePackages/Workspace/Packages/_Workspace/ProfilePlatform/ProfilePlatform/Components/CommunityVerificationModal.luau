@@ -1,1 +1,3 @@
-return (require(script.CommunityVerificationModal))
+local CommunityVerificationModal = require(script.CommunityVerificationModal)
+
+return CommunityVerificationModal

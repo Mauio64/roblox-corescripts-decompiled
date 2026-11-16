@@ -1,24 +1,14 @@
 require(script.Parent.Types)
 
-local Parent = script:FindFirstAncestor("WhatsNew").Parent
-local Foundation = require(Parent.Foundation)
-local t1 = {
-	WhatsNew = "whatsNew",
-	Onboarding = "onboarding"
-}
-local t2 = {
-	Idle = "idle",
-	TourTip = "tourTip",
-	WaitingForAnchor = "waitingForAnchor"
-}
+local parent = script:FindFirstAncestor("WhatsNew").Parent
+local Foundation = require(parent.Foundation)
+
+local tourType = { WhatsNew = "whatsNew", Onboarding = "onboarding" }
 
 return {
-	TourType = t1,
-	TourTypeList = {
-		t1.Onboarding,
-		t1.WhatsNew
-	},
-	WhatsNewSurface = t2,
+	TourType = tourType,
+	TourTypeList = { tourType.Onboarding, tourType.WhatsNew },
+	WhatsNewSurface = { Idle = "idle", TourTip = "tourTip", WaitingForAnchor = "waitingForAnchor" },
 	PopoverSide = Foundation.Enums.PopoverSide,
 	PopoverAlign = Foundation.Enums.PopoverAlign
 }

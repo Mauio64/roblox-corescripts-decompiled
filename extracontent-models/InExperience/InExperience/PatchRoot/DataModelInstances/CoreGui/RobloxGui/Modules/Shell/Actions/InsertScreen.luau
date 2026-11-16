@@ -1,7 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
-
-return require(CorePackages.Packages.Rodux).makeActionCreator("InsertScreen", function(p1) -- line: 4
-	return {
-		item = p1
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("InsertScreen", function(p)
+	return { item = p }
 end)

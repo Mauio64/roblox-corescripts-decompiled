@@ -1,1 +1,3 @@
-return (require(script.Image))
+local Image = require(script.Image)
+
+return Image

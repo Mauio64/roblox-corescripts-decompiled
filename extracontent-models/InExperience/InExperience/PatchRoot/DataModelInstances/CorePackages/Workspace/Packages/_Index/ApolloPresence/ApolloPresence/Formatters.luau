@@ -1,71 +1,69 @@
-local Parent = script:FindFirstAncestor("ApolloPresence").Parent
-local Cryo = require(Parent.Cryo)
-local PresenceType = require(Parent.GraphQLServer).types.PresenceType
-local t1 = {
-	[PresenceType.Offline] = 0,
-	[PresenceType.Online] = 1,
-	[PresenceType.InGame] = 2,
-	[PresenceType.InStudio] = 3
-}
-local v5 = Cryo.List.foldLeft(Cryo.Dictionary.keys(t1), function(p1, p2) -- line: 18
-	-- upvalues: t1 (copy)
-	p1[tostring(t1[p2])] = p2
+local parent = script:FindFirstAncestor("ApolloPresence").Parent
 
-	return p1
+local Cryo = require(parent.Cryo)
+
+local GraphQLServer = require(parent.GraphQLServer)
+local presenceType = GraphQLServer.types.PresenceType
+
+local v = {
+	[presenceType.Offline] = 0,
+	[presenceType.Online] = 1,
+	[presenceType.InGame] = 2,
+	[presenceType.InStudio] = 3
+}
+
+local foldLeft = Cryo.List.foldLeft(Cryo.Dictionary.keys(v), function(p, p2)
+	p[tostring(v[p2])] = p2
+	return p
 end, {})
 
-local function convertToStringWithDefault(p3) -- line: 23
-	if p3 then
-		return (tostring(p3))
+local function convertToStringWithDefault(p) -- 4 equivalent calls inferred from this helper
+	if p then
+		return (tostring(p))
 	end
 
 	return ""
 end
 
-return {
-	formatNumberToPresenceType = function(p4) -- line: 27
-		-- upvalues: v5 (copy), PresenceType (copy)
-		return p4 and v5[tostring(p4)] or PresenceType.Offline
-	end,
-	formatPresenceTypeToNumber = function(p5) -- line: 31
-		-- upvalues: t1 (copy), PresenceType (copy)
-		return p5 and t1[p5] or t1[PresenceType.Offline]
-	end,
-	formatUserPresence = function(t2: {[any]: any}) -- line: 58
-		-- upvalues: v5 (copy), PresenceType (copy)
-		local t3 = {
-			id = t2.id
-		}
-		local userPresenceType
+local function formatNumberToPresenceType(userPresenceNumber) -- 1 equivalent call inferred from this helper
+	return userPresenceNumber and foldLeft[tostring(userPresenceNumber)] or presenceType.Offline
+end
 
-		if t2.userPresenceType then
-			userPresenceType = t2.userPresenceType
-		else
-			local userPresenceNumber = t2.userPresenceNumber
+local Formatters = {}
+Formatters.formatNumberToPresenceType = formatNumberToPresenceType
 
-			userPresenceType = userPresenceNumber and v5[tostring(userPresenceNumber)] or PresenceType.Offline
-		end
+function Formatters.formatPresenceTypeToNumber(p)
+	return p and v[p] or v[presenceType.Offline]
+end
 
-		t3.userPresenceType = userPresenceType
-		t3.lastLocation = t2.lastLocation or ""
-		t3.lastOnline = t2.lastOnline or ""
+function Formatters.formatUserPresence(data)
+	local v2 = {
+		id = data.id,
+		userPresenceType = 0,
+		lastLocation = 0,
+		lastOnline = 0,
+		gameId = 0,
+		placeId = 0,
+		rootPlaceId = 0,
+		universeId = 0
+	}
+	local userPresenceType
 
-		local gameId = t2.gameId
-
-		t3.gameId = not gameId and "" or tostring(gameId)
-
-		local placeId = t2.placeId
-
-		t3.placeId = not placeId and "" or tostring(placeId)
-
-		local rootPlaceId = t2.rootPlaceId
-
-		t3.rootPlaceId = not rootPlaceId and "" or tostring(rootPlaceId)
-
-		local universeId = t2.universeId
-
-		t3.universeId = not universeId and "" or tostring(universeId)
-
-		return t3
+	if data.userPresenceType then
+		userPresenceType = data.userPresenceType
+	else
+		userPresenceType = formatNumberToPresenceType(data.userPresenceNumber) -- inferred equivalent call
 	end
-}
+
+	v2.userPresenceType = userPresenceType
+
+	v2.lastLocation = data.lastLocation or ""
+	v2.lastOnline = data.lastOnline or ""
+	v2.gameId = convertToStringWithDefault(data.gameId) -- inferred equivalent call
+	v2.placeId = convertToStringWithDefault(data.placeId) -- inferred equivalent call
+	v2.rootPlaceId = convertToStringWithDefault(data.rootPlaceId) -- inferred equivalent call
+	v2.universeId = convertToStringWithDefault(data.universeId) -- inferred equivalent call
+	return v2
+end
+
+return Formatters

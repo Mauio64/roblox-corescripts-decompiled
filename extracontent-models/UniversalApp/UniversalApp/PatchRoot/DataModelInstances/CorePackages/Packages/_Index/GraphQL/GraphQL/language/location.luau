@@ -1,31 +1,24 @@
-local ParentParent = script.Parent.Parent.Parent
-local String = require(ParentParent.LuauPolyfill).String
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local String = LuauPolyfill.String
 
 require(script.Parent.source)
 
 return {
-	getLocation = function(p1, n1: number) -- line: 27
-		-- upvalues: String (copy)
-		local t1 = {
-			"\r\n",
-			"\r",
-			"\n"
-		}
-		local n2 = 1
-		local v7 = n1
-		local v8 = String.findOr(p1.body, t1)
+	getLocation = function(p, p2: number)
+		local v = { "\r\n", "\r", "\n" }
 
-		while v8 ~= nil and n1 > v8.index do
-			local v9 = v8.index + string.len(v8.match)
+		local v2 = String.findOr(p.body, v)
+		local column = p2
+		local line = 1
 
-			n2 += 1
-			v7 = n1 + 1 - v9
-			v8 = String.findOr(p1.body, t1, v9)
+		while v2 ~= nil and v2.index < p2 do
+			local v3 = v2.index + string.len(v2.match)
+			line += 1
+			column = p2 + 1 - v3
+			v2 = String.findOr(p.body, v, v3)
 		end
 
-		return {
-			line = n2,
-			column = v7
-		}
+		return { line = line, column = column }
 	end
 }

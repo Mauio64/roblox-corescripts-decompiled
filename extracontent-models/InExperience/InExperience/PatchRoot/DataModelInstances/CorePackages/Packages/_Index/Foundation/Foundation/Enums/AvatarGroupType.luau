@@ -1,4 +1,1 @@
-return {
-	Stacked = "Stacked",
-	Spread = "Spread"
-}
+return { Stacked = "Stacked", Spread = "Spread" }

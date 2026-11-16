@@ -1,187 +1,370 @@
+local LocalizationService = game:GetService("LocalizationService")
+
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local CreatorCredit = require(BuildExperienceParent.DataHydration.CreatorCredit)
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
+local parent = BuildExperience.Parent
+
+local CreatorCredit = require(parent.DataHydration.CreatorCredit)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local NumberLocalization = Localization.NumberLocalization
+
 local CreatorCreditConfig = require(BuildExperience.CreatorCreditConfig)
 local useOpenBuyRobuxWebView = require(BuildExperience.Components.CreatorCreditSheet.useOpenBuyRobuxWebView)
+
 local useRefreshCreatorCreditOnUnhide = require(BuildExperience.Components.CreatorCreditSheet.useRefreshCreatorCreditOnUnhide)
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+local FFlagBuildExperienceFreeLimitCard = require(BuildExperience.Flags.FFlagBuildExperienceFreeLimitCard)
+local FFlagBuildExperienceModelPicker = require(BuildExperience.Flags.FFlagBuildExperienceModelPicker)
+local GetBuildCreatorCreditRefreshStore = require(BuildExperience.Stores.GetBuildCreatorCreditRefreshStore)
+local LocalUserIdStore = require(parent.LocalUserIdStore)
+local localUserIdStore = LocalUserIdStore.LocalUserIdStore
 
-local function getQuotaBlockReason(p1) -- line: 34
-	-- upvalues: CreatorCreditConfig (copy)
-	if p1 == nil then
+local function formatRobux(p: number) -- 1 equivalent call inferred from this helper
+	return NumberLocalization.localize(string.format("%.0f", (math.floor(p))), LocalizationService.RobloxLocaleId)
+end
+
+local function getQuotaBlockReason(data)
+	if data == nil then
 		return nil
 	end
 
-	if p1.allowed ~= nil then
-		if p1.allowed then
+	if FFlagBuildExperienceModelPicker then
+		return if data.allowed == false then data.reason else nil
+	elseif data.allowed == nil then
+		if data.freeTrialRemaining > 0 then
 			return nil
 		end
 
-		return p1.reason
-	end
-
-	if p1.freeTrialRemaining > 0 then
-		return nil
-	end
-
-	if not p1.limitSettings.additionalUsageEnabled then
-		return "FreeTrialExhausted"
-	end
-
-	if p1.robuxBalance < CreatorCreditConfig.FIntMinimumUsableRobuxBalance then
-		return "InsufficientRobuxBalance"
-	end
-
-	if p1.limitSettings.dailyLimitSet and p1.limitRemaining < CreatorCreditConfig.FIntMinimumUsableRobuxBalance then
-		return "DailyLimitReached"
-	end
-
-	return nil
-end
-local function useCreatorCreditChatUpsellViewModel(t1: {[any]: any}) -- line: 59
-	-- upvalues: CreatorCredit (copy), React (copy), SignalsReact (copy), CreatorCreditConfig (copy), useOpenBuyRobuxWebView (copy), useRefreshCreatorCreditOnUnhide (copy), LocalizationStrings (copy)
-	local v14 = CreatorCredit.getCreatorCreditStore(false)
-	local v15 = React.useMemo(function() -- line: 61
-		-- upvalues: v14 (copy)
-		return v14.getQuotaSummary()
-	end, { v14 })
-	local v16 = SignalsReact.useSignalState(v15.data)
-	local v17 = if v16 == nil then nil else v16.nextResetEligibleTime
-	local v18, v19 = React.useState(false)
-	local v20 = t1.outOfCreditsPromptFailureCount or 0
-	local v21 = React.useRef(v20)
-	local v22 = React.useRef(0)
-	local v23, v24 = React.useState(nil)
-	local v25 = React.useCallback(function() -- line: 73
-		-- upvalues: v22 (copy), v14 (copy), v24 (copy), CreatorCreditConfig (copy)
-		local current = v22.current
-
-		v14.refreshQuotaSummary():andThen(function(p2) -- line: 77
-			-- upvalues: current (copy), v22 (copy), v24 (copy), CreatorCreditConfig (copy)
-			if p2 ~= nil and current == v22.current then
-				v24(if p2 ~= nil then if p2.allowed == nil then if not (p2.freeTrialRemaining > 0) then if p2.limitSettings.additionalUsageEnabled then if not (p2.robuxBalance < CreatorCreditConfig.FIntMinimumUsableRobuxBalance) then if not p2.limitSettings.dailyLimitSet or not (p2.limitRemaining < CreatorCreditConfig.FIntMinimumUsableRobuxBalance) then nil else "DailyLimitReached" else "InsufficientRobuxBalance" else "FreeTrialExhausted" else nil else if not p2.allowed then p2.reason else nil else nil)
-			end
-		end):catch(function() -- line: 82
-		end)
-	end, { v14 })
-
-	React.useEffect(function() -- line: 84
-		-- upvalues: v20 (copy), v21 (copy), v22 (copy), v24 (copy), t1 (copy), v19 (copy), v25 (copy)
-		if v20 > v21.current then
-			local v37 = v22
-
-			v37.current = v37.current + 1
-			v24(t1.outOfCreditsPromptFailureReason)
-			v19(false)
-			v25()
+		if not data.limitSettings.additionalUsageEnabled then
+			return "FreeTrialExhausted"
 		end
 
-		v21.current = v20
-	end, {
-		v20,
-		t1.outOfCreditsPromptFailureReason,
-		v25
-	})
+		if data.robuxBalance < CreatorCreditConfig.FIntMinimumUsableRobuxBalance then
+			return "InsufficientRobuxBalance"
+		end
 
-	local v26 = React.useRef(t1.isAssistantResponding)
+		if
+			data.limitSettings.dailyLimitSet
+			and data.limitRemaining < CreatorCreditConfig.FIntMinimumUsableRobuxBalance
+		then
+			return "DailyLimitReached"
+		end
 
-	React.useEffect(function() -- line: 95
-		-- upvalues: v26 (copy), t1 (copy), CreatorCreditConfig (copy), v25 (copy)
-		local v38 = v26.current and not t1.isAssistantResponding
+		return nil
+	else
+		return if not data.allowed then data.reason else nil
+	end
+end
 
-		v26.current = t1.isAssistantResponding
+local function useCreatorCreditChatUpsellViewModel(data)
+	local creatorCreditStore = CreatorCredit.getCreatorCreditStore(false)
+	local v
 
-		if not v38 then
+	if FFlagBuildExperienceModelPicker then
+		v = SignalsReact.useSignalState(localUserIdStore.getCurrentUserId)
+	end
+
+	local useMemo = React.useMemo
+	local function fn()
+		if FFlagBuildExperienceModelPicker then
+			return assert(creatorCreditStore.getTierQuotaSummary, "Model picker requires tier quotas")(
+				"PRODUCT_BUILD",
+				data.namedTier or "default"
+			)
+		end
+
+		return creatorCreditStore.getQuotaSummary()
+	end
+
+	local v2
+
+	if FFlagBuildExperienceModelPicker then
+		v2 = data.namedTier
+	end
+
+	local v3 = useMemo(fn, { creatorCreditStore, v2, v })
+	local v4 = SignalsReact.useSignalState(v3.data)
+	local nextResetEligibleTime
+
+	if v4 == nil then
+		nextResetEligibleTime = nil
+	else
+		nextResetEligibleTime = v4.nextResetEligibleTime
+	end
+
+	local v5 = nil
+
+	if FFlagBuildExperienceModelPicker and v4 ~= nil and v4.blockDetails ~= nil then
+		local requiredRobux = v4.blockDetails.requiredRobux
+
+		if requiredRobux ~= nil and requiredRobux > 0 then
+			v5 = requiredRobux
+		end
+	end
+
+	local v6 = {
+		adjustLimit = LocalizationStrings.CREATOR_CREDIT_ADJUST_LIMIT_BUTTON,
+		buyMoreDescription = LocalizationStrings.CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION,
+		buyMoreTitle = LocalizationStrings.CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE,
+		buyRobux = LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM,
+		modelBuyRobux = 0,
+		insufficientTitle = 0,
+		insufficientDescription = 0,
+		dailyLimitDescription = 0,
+		dailyLimitTitle = 0,
+		freeTrialDescription = 0,
+		freeTrialTitle = 0,
+		freeTrialAction = 0,
+		notNow = 0,
+		viewUsage = 0
+	}
+	local modelBuyRobux
+
+	if v5 ~= nil then
+		modelBuyRobux = LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_BUTTON
+	end
+
+	v6.modelBuyRobux = modelBuyRobux
+	local insufficientTitle
+
+	if v5 ~= nil then
+		insufficientTitle = LocalizationStrings.CREATOR_CREDIT_INSUFFICIENT_ROBUX_TITLE
+	end
+
+	v6.insufficientTitle = insufficientTitle
+	local insufficientDescription
+
+	if v5 ~= nil then
+		insufficientDescription = { [1] = nil, nil }
+		local v7
+
+		if data.namedTier == "advanced" then
+			v7 = LocalizationStrings.CREATOR_CREDIT_INSUFFICIENT_ROBUX_ADVANCED_AMOUNT_DESCRIPTION
+		else
+			v7 = LocalizationStrings.CREATOR_CREDIT_INSUFFICIENT_ROBUX_DEFAULT_AMOUNT_DESCRIPTION
+		end
+
+		insufficientDescription[1] = v7
+		insufficientDescription.ROBUX = formatRobux(v5) -- inferred equivalent call
+	end
+
+	v6.insufficientDescription = insufficientDescription
+
+	v6.dailyLimitDescription = LocalizationStrings.CREATOR_CREDIT_DAILY_LIMIT_REACHED_DESCRIPTION
+	v6.dailyLimitTitle = LocalizationStrings.CREATOR_CREDIT_DAILY_LIMIT_REACHED_TITLE
+	local freeTrialDescription
+
+	if FFlagBuildExperienceFreeLimitCard then
+		freeTrialDescription = LocalizationStrings.CREATOR_CREDIT_FREE_LIMIT_REACHED_DESCRIPTION
+	else
+		freeTrialDescription = LocalizationStrings.CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_DESCRIPTION
+	end
+
+	v6.freeTrialDescription = freeTrialDescription
+	local freeTrialTitle
+
+	if FFlagBuildExperienceFreeLimitCard then
+		freeTrialTitle = LocalizationStrings.CREATOR_CREDIT_FREE_LIMIT_REACHED_TITLE
+	else
+		freeTrialTitle = LocalizationStrings.CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_TITLE
+	end
+
+	v6.freeTrialTitle = freeTrialTitle
+	local freeTrialAction
+
+	if FFlagBuildExperienceFreeLimitCard then
+		freeTrialAction = LocalizationStrings.CREATOR_CREDIT_MANAGE_USAGE_BUTTON
+	else
+		freeTrialAction = LocalizationStrings.CREATOR_CREDIT_VIEW_USAGE_BUTTON
+	end
+
+	v6.freeTrialAction = freeTrialAction
+
+	v6.notNow = LocalizationStrings.CREATOR_CREDIT_NOT_NOW_BUTTON
+	v6.viewUsage = LocalizationStrings.CREATOR_CREDIT_VIEW_USAGE_BUTTON
+	local v7 = useLocalization(v6)
+
+	local state, setState = React.useState(false)
+	local outOfCreditsPromptFailureCount = data.outOfCreditsPromptFailureCount or 0
+	local ref = React.useRef(outOfCreditsPromptFailureCount)
+	local ref2 = React.useRef(0)
+
+	local state2, setState2 = React.useState(nil)
+	local ref3
+
+	if FFlagBuildExperienceModelPicker then
+		ref3 = React.useRef(v4)
+	else
+		ref3 = nil
+	end
+
+	local useCallback = React.useCallback
+	local function fn2()
+		local current = ref2.current
+
+		if FFlagBuildExperienceModelPicker then
+			GetBuildCreatorCreditRefreshStore(false).refresh()
+		else
+			creatorCreditStore.refreshQuotaSummary():andThen(function(p)
+				if p ~= nil and current == ref2.current then
+					setState2(getQuotaBlockReason(p))
+				end
+			end):catch(function() end)
+		end
+	end
+
+	local v8
+
+	if FFlagBuildExperienceModelPicker then
+		v8 = data.namedTier
+	end
+
+	local v9 = useCallback(fn2, { creatorCreditStore, v8 })
+
+	if FFlagBuildExperienceModelPicker then
+		React.useEffect(function()
+			setState2(nil)
+			return function()
+				ref2.current += 1
+			end
+		end, { v, data.namedTier })
+	end
+
+	local useEffect = React.useEffect
+	local function fn3()
+		if outOfCreditsPromptFailureCount > ref.current then
+			ref2.current += 1
+
+			if ref3 then
+				ref3.current = v3.data(false)
+			end
+
+			setState2(data.outOfCreditsPromptFailureReason)
+			setState(false)
+			v9()
+		end
+
+		ref.current = outOfCreditsPromptFailureCount
+	end
+
+	local outOfCreditsPromptFailureReason = data.outOfCreditsPromptFailureReason
+	local v10
+
+	if FFlagBuildExperienceModelPicker then
+		v10 = v3
+	end
+
+	useEffect(fn3, { outOfCreditsPromptFailureCount, outOfCreditsPromptFailureReason, v9, v10 })
+
+	if FFlagBuildExperienceModelPicker then
+		React.useEffect(function()
+			if ref3 and v4 ~= ref3.current and v3.status(false) == "Ready" then
+				setState2(nil)
+			end
+		end, { v4, v3 })
+	end
+
+	local ref4 = React.useRef(data.isAssistantResponding)
+	React.useEffect(function()
+		if FFlagBuildExperienceModelPicker then
 			return
 		end
 
-		local thread = task.delay(CreatorCreditConfig.FIntPostTurnRefreshDelaySeconds, v25)
+		local v11 = ref4.current and not data.isAssistantResponding
+		ref4.current = data.isAssistantResponding
 
-		return function() -- line: 102
-			-- upvalues: thread (copy)
+		if not v11 then
+			return
+		end
+
+		local thread = task.delay(CreatorCreditConfig.FIntPostTurnRefreshDelaySeconds, v9)
+		return function()
 			task.cancel(thread)
 		end
-	end, {
-		t1.isAssistantResponding,
-		v25
-	})
-	React.useEffect(function() -- line: 107
-		-- upvalues: v17 (copy), CreatorCreditConfig (copy), v25 (copy)
-		if v17 == nil or v17 == "" then
+	end, { data.isAssistantResponding, v9 })
+
+	React.useEffect(function()
+		if FFlagBuildExperienceModelPicker or (nextResetEligibleTime == nil or nextResetEligibleTime == "") then
 			return
 		end
 
-		local dateTime = DateTime.fromIsoDate(v17)
+		local dateTime = DateTime.fromIsoDate(nextResetEligibleTime)
 
 		if dateTime == nil then
 			return
 		end
 
-		local v41 = math.max(1, dateTime.UnixTimestamp - DateTime.now().UnixTimestamp + CreatorCreditConfig.FIntResetRefreshBufferSeconds)
-		local thread = task.delay(v41, v25)
+		local v11 = math.max(
+			1,
+			dateTime.UnixTimestamp - DateTime.now().UnixTimestamp + CreatorCreditConfig.FIntResetRefreshBufferSeconds
+		)
 
-		return function() -- line: 122
-			-- upvalues: thread (copy)
+		local thread = task.delay(v11, v9)
+		return function()
 			task.cancel(thread)
 		end
-	end, {
-		v17,
-		v25
-	})
+	end, { nextResetEligibleTime, v9 })
 
-	local v27 = React.useCallback(function() -- line: 127
-		-- upvalues: v25 (copy), v19 (copy)
-		v25()
-		v19(true)
-	end, { v25 })
-	local v28 = useOpenBuyRobuxWebView(v27)
+	local v11 = useOpenBuyRobuxWebView((React.useCallback(function()
+		v9()
+		setState(true)
+	end, { v9 })))
 
-	useRefreshCreatorCreditOnUnhide(v25)
+	if not FFlagBuildExperienceModelPicker then
+		useRefreshCreatorCreditOnUnhide(v9)
+	end
 
-	local v29 = React.useCallback(function() -- line: 134
-		-- upvalues: v19 (copy), t1 (copy)
-		v19(true)
+	local onBuyMoreRobuxCardPrimaryAction = React.useCallback(function()
+		setState(true)
 
-		if t1.onOpenCreatorCreditPage then
-			t1.onOpenCreatorCreditPage()
+		if data.onOpenCreatorCreditPage then
+			data.onOpenCreatorCreditPage()
 		end
-	end, { t1.onOpenCreatorCreditPage })
-	local v30 = React.useCallback(function() -- line: 140
-		-- upvalues: v19 (copy)
-		v19(true)
+	end, { data.onOpenCreatorCreditPage })
+	local onBuyMoreRobuxCardSecondaryAction = React.useCallback(function()
+		setState(true)
 	end, {})
-	local v31 = v23 or if v16 ~= nil then if v16.allowed == nil then if not (v16.freeTrialRemaining > 0) then if v16.limitSettings.additionalUsageEnabled then if not (v16.robuxBalance < CreatorCreditConfig.FIntMinimumUsableRobuxBalance) then if not v16.limitSettings.dailyLimitSet or not (v16.limitRemaining < CreatorCreditConfig.FIntMinimumUsableRobuxBalance) then nil else "DailyLimitReached" else "InsufficientRobuxBalance" else "FreeTrialExhausted" else nil else if not v16.allowed then v16.reason else nil else nil
-	local CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = LocalizationStrings.CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE
-	local CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = LocalizationStrings.CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION
-	local CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM = LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM
-	local CREATOR_CREDIT_VIEW_USAGE_BUTTON = LocalizationStrings.CREATOR_CREDIT_VIEW_USAGE_BUTTON
 
-	if v31 == "FreeTrialExhausted" then
-		CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = LocalizationStrings.CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_TITLE
-		CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = LocalizationStrings.CREATOR_CREDIT_FREE_TRIAL_EXHAUSTED_DESCRIPTION
-		CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM = LocalizationStrings.CREATOR_CREDIT_VIEW_USAGE_BUTTON
-		v28 = v29
-		CREATOR_CREDIT_VIEW_USAGE_BUTTON = LocalizationStrings.CREATOR_CREDIT_NOT_NOW_BUTTON
-		v29 = v30
-	elseif v31 == "DailyLimitReached" then
-		CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE = LocalizationStrings.CREATOR_CREDIT_DAILY_LIMIT_REACHED_TITLE
-		CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION = LocalizationStrings.CREATOR_CREDIT_DAILY_LIMIT_REACHED_DESCRIPTION
-		CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM = LocalizationStrings.CREATOR_CREDIT_ADJUST_LIMIT_BUTTON
-		v28 = v29
-		CREATOR_CREDIT_VIEW_USAGE_BUTTON = LocalizationStrings.CREATOR_CREDIT_NOT_NOW_BUTTON
-		v29 = v30
+	local v12 = state2 or getQuotaBlockReason(v4)
+
+	local buyMoreRobuxCardTitle = v7.buyMoreTitle
+	local buyMoreRobuxCardDescription = v7.buyMoreDescription
+	local buyMoreRobuxCardPrimaryActionText = v7.buyRobux
+	local buyMoreRobuxCardSecondaryActionText = v7.viewUsage
+
+	if v12 == "FreeTrialExhausted" then
+		buyMoreRobuxCardTitle = v7.freeTrialTitle
+		buyMoreRobuxCardDescription = v7.freeTrialDescription
+		buyMoreRobuxCardPrimaryActionText = v7.freeTrialAction
+		buyMoreRobuxCardSecondaryActionText = v7.notNow
+	elseif v12 == "DailyLimitReached" then
+		buyMoreRobuxCardTitle = v7.dailyLimitTitle
+		buyMoreRobuxCardDescription = v7.dailyLimitDescription
+		buyMoreRobuxCardPrimaryActionText = v7.adjustLimit
+		buyMoreRobuxCardSecondaryActionText = v7.notNow
+	else
+		if v12 == "InsufficientRobuxBalance" and v5 ~= nil then
+			buyMoreRobuxCardTitle = v7.insufficientTitle
+			buyMoreRobuxCardDescription = v7.insufficientDescription
+			buyMoreRobuxCardPrimaryActionText = v7.modelBuyRobux
+			buyMoreRobuxCardSecondaryActionText = v7.notNow
+		else
+			onBuyMoreRobuxCardSecondaryAction = onBuyMoreRobuxCardPrimaryAction
+		end
+
+		onBuyMoreRobuxCardPrimaryAction = v11
 	end
 
 	return {
-		showBuyMoreRobuxCard = v31 ~= nil and (not v18 and t1.onOpenCreatorCreditPage ~= nil),
-		buyMoreRobuxCardTitle = CREATOR_CREDIT_BUY_MORE_ROBUX_TITLE,
-		buyMoreRobuxCardDescription = CREATOR_CREDIT_BUY_MORE_ROBUX_DESCRIPTION,
-		buyMoreRobuxCardPrimaryActionText = CREATOR_CREDIT_BUY_ROBUX_SHEET_CONFIRM,
-		onBuyMoreRobuxCardPrimaryAction = v28,
-		buyMoreRobuxCardSecondaryActionText = CREATOR_CREDIT_VIEW_USAGE_BUTTON,
-		onBuyMoreRobuxCardSecondaryAction = v29
+		showBuyMoreRobuxCard = v12 ~= nil and not state and data.onOpenCreatorCreditPage ~= nil,
+		buyMoreRobuxCardTitle = buyMoreRobuxCardTitle,
+		buyMoreRobuxCardDescription = buyMoreRobuxCardDescription,
+		buyMoreRobuxCardPrimaryActionText = buyMoreRobuxCardPrimaryActionText,
+		onBuyMoreRobuxCardPrimaryAction = onBuyMoreRobuxCardPrimaryAction,
+		buyMoreRobuxCardSecondaryActionText = buyMoreRobuxCardSecondaryActionText,
+		onBuyMoreRobuxCardSecondaryAction = onBuyMoreRobuxCardSecondaryAction
 	}
 end
 

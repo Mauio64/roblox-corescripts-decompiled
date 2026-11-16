@@ -1,283 +1,462 @@
 local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
-local ProfileQRCodeParent = ProfileQRCode.Parent
-local React = require(ProfileQRCodeParent.React)
-local UIBlox = require(ProfileQRCodeParent.UIBlox)
-local Localization = require(ProfileQRCodeParent.Localization)
-local ReactFocusNavigation = require(ProfileQRCodeParent.ReactFocusNavigation)
-local FocusNavigationUtils = require(ProfileQRCodeParent.FocusNavigationUtils)
-local Contexts = require(ProfileQRCodeParent.SocialLuaAnalytics).Analytics.Enums.Contexts
-local ProfileShareLinks = require(ProfileQRCodeParent.ProfileShareLinks)
-local useAppPolicy = require(ProfileQRCodeParent.UniversalAppPolicy).useAppPolicy
+local parent = ProfileQRCode.Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Localization = require(parent.Localization)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Contexts = SocialLuaAnalytics.Analytics.Enums.Contexts
+local ProfileShareLinks = require(parent.ProfileShareLinks)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
 local useProfileShareLink = ProfileShareLinks.Hooks.useProfileShareLink
 local ProfileSharePolicyEnum = ProfileShareLinks.Enums.ProfileSharePolicyEnum
-local RoactUtils = require(ProfileQRCodeParent.RoactUtils)
+local RoactUtils = require(parent.RoactUtils)
+
 local Button = UIBlox.App.Button.Button
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local StandardButtonSize = UIBlox.App.Button.Enum.StandardButtonSize
 local VerticalScrollView = UIBlox.App.Container.VerticalScrollView
+
 local Images = UIBlox.App.ImageSet.Images
-local Foundation = require(ProfileQRCodeParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local InputLabel = Foundation.InputLabel
 local InputLabelSize = Foundation.Enums.InputLabelSize
-local AppPage = require(ProfileQRCodeParent.RobloxAppEnums).AppPage
-local NavigateDown = require(ProfileQRCodeParent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(ProfileQRCodeParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v26 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfileQRCodeParent.RobloxAppNavigation).NavigationCommands
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
 local ProfileQRCodeTopElements = require(ProfileQRCode.Components.ProfileQRCodeTopElements)
 local QRCodeView = require(ProfileQRCode.Components.QRCodeView)
 local TextKeys = require(ProfileQRCode.Common.TextKeys)
-local useIsWideMode = require(ProfileQRCodeParent.SocialCommon).Hooks.useIsWideMode
+local SocialCommon = require(parent.SocialCommon)
+local useIsWideMode = SocialCommon.Hooks.useIsWideMode
+
 local useLocalization = Localization.Hooks.useLocalization
 local useStyle = UIBlox.Core.Style.useStyle
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
 local useLastInputMode = FocusNavigationUtils.useLastInputMode
-local color3 = Color3.new(1, 1, 1)
-local FFlagProfileQRCodeFixFocusNavigation = require(ProfileQRCode.Flags.FFlagProfileQRCodeFixFocusNavigation)
-local FFlagQRCodeCopyUpdates = require(ProfileQRCodeParent.SharedFlags).FFlagQRCodeCopyUpdates
-local FFlagConnectionsToFriendsRename = require(ProfileQRCodeParent.SharedFlags).FFlagConnectionsToFriendsRename
-local FStringCanAccessTrustedContactsAmpFeature = require(ProfileQRCodeParent.SharedFlags).FStringCanAccessTrustedContactsAmpFeature
-local FFlagTCPolicyCheckRedirect = require(ProfileQRCodeParent.SharedFlags).FFlagTCPolicyCheckRedirect
-local FStringIsUserInTcEligibleCountryAmpFeature = require(ProfileQRCodeParent.SharedFlags).FStringIsUserInTcEligibleCountryAmpFeature
-local FStringCanAccessTrustedContactsAmpNameSpace = require(ProfileQRCodeParent.SharedFlags).FStringCanAccessTrustedContactsAmpNameSpace
-local AmpApiProvider = require(ProfileQRCodeParent.AmpUpsell).AmpApiProvider
-local AmpEnums = require(ProfileQRCodeParent.AmpUpsell).AmpEnums
 
-return function(t1: {[any]: any}) -- line: 85
-	-- upvalues: useDispatch (copy), useAppPolicy (copy), useLocalization (copy), TextKeys (copy), FFlagQRCodeCopyUpdates (copy), FFlagConnectionsToFriendsRename (copy), React (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), NavigateDown (copy), FFlagProfileQRCodeFixFocusNavigation (copy), useIsWideMode (copy), useStyle (copy), useLastInputMode (copy), useFocusGuiObject (copy), useProfileShareLink (copy), Contexts (copy), ProfileSharePolicyEnum (copy), Images (copy), FFlagTCPolicyCheckRedirect (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpFeature (copy), AmpApiProvider (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AmpEnums (copy), ProfileQRCodeTopElements (copy), VerticalScrollView (copy), color3 (copy), QRCodeView (copy), StyledTextLabel (copy), InputLabel (copy), InputLabelSize (copy), Button (copy), ButtonType (copy), StandardButtonSize (copy)
-	local v47 = useDispatch()
-	local v48 = useAppPolicy(function(p1) -- line: 88
-		return p1.getWebViewSupport()
+local color = Color3.new(1, 1, 1)
+
+local FFlagProfileQRCodeFixFocusNavigation = require(ProfileQRCode.Flags.FFlagProfileQRCodeFixFocusNavigation)
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagQRCodeCopyUpdates = SharedFlags2.FFlagQRCodeCopyUpdates
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagQRCodePageVisualRefresh = SharedFlags3.FFlagQRCodePageVisualRefresh
+local SharedFlags4 = require(parent.SharedFlags)
+local FStringCanAccessTrustedContactsAmpFeature = SharedFlags4.FStringCanAccessTrustedContactsAmpFeature
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagTCPolicyCheckRedirect = SharedFlags5.FFlagTCPolicyCheckRedirect
+local SharedFlags6 = require(parent.SharedFlags)
+local FStringIsUserInTcEligibleCountryAmpFeature = SharedFlags6.FStringIsUserInTcEligibleCountryAmpFeature
+local SharedFlags7 = require(parent.SharedFlags)
+local FStringCanAccessTrustedContactsAmpNameSpace = SharedFlags7.FStringCanAccessTrustedContactsAmpNameSpace
+local AmpUpsell = require(parent.AmpUpsell)
+local AmpApiProvider = AmpUpsell.AmpApiProvider
+local AmpUpsell2 = require(parent.AmpUpsell)
+local AmpEnums = AmpUpsell2.AmpEnums
+
+return function(props)
+	local v = useDispatch()
+
+	local v2 = useAppPolicy(function(p)
+		return p.getWebViewSupport()
 	end)
-	local v49 = useLocalization({
-		learnMore = "Feature.Chat.Action.LearnMore",
+
+	local v3 = useLocalization({
 		description = TextKeys.ScanQRText,
-		descriptionTCEducation = if not FFlagQRCodeCopyUpdates then nil else TextKeys.TrustedConnectionDescription,
-		descriptionTrustedFriends = if not FFlagConnectionsToFriendsRename then nil else TextKeys.TrustedFriendsDescription,
+		descriptionTrustedFriends = TextKeys.TrustedFriendsDescription,
 		shareProfileLink = TextKeys.ShareProfileLink,
-		copyProfileLink = TextKeys.CopyProfileLink
+		copyProfileLink = TextKeys.CopyProfileLink,
+		learnMore = "Feature.Chat.Action.LearnMore"
 	})
-	local v50 = React.useCallback(function() -- line: 101
-		-- upvalues: AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), v47 (copy), NavigateDown (copy)
-		local t2 = {
-			detail = "https://en.help.roblox.com/hc/en-us/articles/37725513985812",
+
+	local onActivated = React.useCallback(function()
+		local v4 = {
 			name = AppPage.GenericWebPage,
-			extraProps = {
-				title = ""
-			}
+			detail = "https://en.help.roblox.com/hc/en-us/articles/37725513985812",
+			extraProps = { title = "" }
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v26.down(v26.fromLegacyPage(t2))
-
-			return
+			navigationCommands.down(navigationCommands.fromLegacyPage(v4))
+		else
+			v(NavigateDown(v4, nil))
 		end
+	end, { v })
 
-		v47(NavigateDown(t2, nil))
-	end, { v47 })
-	local v51, v52 = React.useState(false)
-	local v53 = if not FFlagProfileQRCodeFixFocusNavigation then nil else React.useRef(nil)
-	local v54 = useIsWideMode()
-	local v55 = useStyle()
-	local v56 = if not FFlagProfileQRCodeFixFocusNavigation then nil else useLastInputMode()
-	local v57 = if not FFlagProfileQRCodeFixFocusNavigation then nil else useFocusGuiObject()
-	local v58 = useProfileShareLink({
-		context = Contexts.ProfileQRCode
-	})
-	local v59 = v58.policy ~= ProfileSharePolicyEnum.Disabled and v58.hasLoaded
-	local shareProfileLink = nil
-	local v61 = nil
+	local state, setState = React.useState(false)
+	local ref
 
-	if v58.policy == ProfileSharePolicyEnum.Share then
-		shareProfileLink = v49.shareProfileLink
-		v61 = Images["icons/actions/share"]
-	elseif v58.policy == ProfileSharePolicyEnum.Copy then
-		shareProfileLink = v49.copyProfileLink
-		v61 = Images["icons/menu/link"]
+	if FFlagProfileQRCodeFixFocusNavigation then
+		ref = React.useRef(nil)
+	else
+		ref = nil
+	end
+
+	local v4 = useIsWideMode()
+	local v5 = useStyle()
+	local v6
+
+	if FFlagProfileQRCodeFixFocusNavigation then
+		v6 = useLastInputMode()
+	else
+		v6 = nil
+	end
+
+	local v7
+
+	if FFlagProfileQRCodeFixFocusNavigation then
+		v7 = useFocusGuiObject()
+	else
+		v7 = nil
+	end
+
+	local v8 = useProfileShareLink({ context = Contexts.ProfileQRCode })
+	local v9
+
+	if v8.policy == ProfileSharePolicyEnum.Disabled then
+		v9 = false
+	else
+		v9 = v8.hasLoaded
+	end
+
+	local text = nil
+	local icon = nil
+
+	if v8.policy == ProfileSharePolicyEnum.Share then
+		text = v3.shareProfileLink
+		icon = Images["icons/actions/share"]
+	elseif v8.policy == ProfileSharePolicyEnum.Copy then
+		text = v3.copyProfileLink
+		icon = Images["icons/menu/link"]
 	end
 
 	if FFlagProfileQRCodeFixFocusNavigation then
-		React.useEffect(function() -- line: 137
-			-- upvalues: v57 (copy), v53 (copy), v56 (copy)
-			if v57 and (v53 and v53.current and v56 == "Focus") then
-				v57(v53.current)
+		React.useEffect(function()
+			if v7 and ref and ref.current and v6 == "Focus" then
+				v7(ref.current)
 			end
 		end, {})
 	end
 
-	local v62, v63 = React.useState(false)
-	local v64, v65 = React.useState(false)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
 
 	if FFlagQRCodeCopyUpdates then
-		React.useEffect(function() -- line: 148
-			-- upvalues: FFlagTCPolicyCheckRedirect (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpFeature (copy), AmpApiProvider (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AmpEnums (copy), v63 (copy), v65 (copy)
-			local v68 = if not FFlagTCPolicyCheckRedirect then FStringCanAccessTrustedContactsAmpFeature else FStringIsUserInTcEligibleCountryAmpFeature
+		React.useEffect(function()
+			local v10
 
-			if AmpApiProvider.upsellFeatureAccess(v68, {}, FStringCanAccessTrustedContactsAmpNameSpace).access == AmpEnums.AccessResponseEnum.Granted then
-				v63(true)
+			if FFlagTCPolicyCheckRedirect then
+				v10 = FStringIsUserInTcEligibleCountryAmpFeature
+			else
+				v10 = FStringCanAccessTrustedContactsAmpFeature
 			end
 
-			v65(true)
+			if AmpApiProvider.upsellFeatureAccess(v10, {}, FStringCanAccessTrustedContactsAmpNameSpace).access == AmpEnums.AccessResponseEnum.Granted then
+				setState2(true)
+			end
+
+			setState3(true)
 		end, {})
 	end
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = UDim2.fromScale(1, 1)
-	}, {
+	local createElement = React.createElement
+	local v10 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0 }
+	local widePanel
+
+	if FFlagQRCodePageVisualRefresh and v4 then
+		widePanel = React.createElement(Foundation.View, {
+			tag = "bg-over-media-100",
+			Size = UDim2.fromScale(0.6, 1),
+			ZIndex = 0
+		})
+	end
+
+	local children = {
+		WidePanel = widePanel,
 		TopElements = React.createElement(ProfileQRCodeTopElements, {
-			appStorageService = t1.appStorageService,
-			onClose = t1.onClose,
-			openQrCodeScanner = t1.openQrCodeScanner,
-			robloxEventReceiver = t1.robloxEventReceiver
+			appStorageService = props.appStorageService,
+			onClose = props.onClose,
+			openQrCodeScanner = props.openQrCodeScanner,
+			robloxEventReceiver = props.robloxEventReceiver
 		}),
-		VerticalScrollView = React.createElement(VerticalScrollView, {
-			useAutomaticCanvasSize = true,
-			size = if not v54 then UDim2.new(1, 0, 1, -24) else nil,
-			canvasSizeY = UDim.new(),
-			position = UDim2.new(0, 0, 0, 56)
-		}, {
-			GradientBackground = React.createElement("Frame", {
+		VerticalScrollView = 0
+	}
+
+	local createElement2 = React.createElement
+	local size
+
+	if not v4 then
+		size = UDim2.new(1, 0, 1, -24)
+	end
+
+	local v11 = {
+		useAutomaticCanvasSize = true,
+		size = size,
+		canvasSizeY = UDim.new(),
+		position = UDim2.new(0, 0, 0, 56)
+	}
+
+	local createElement3 = React.createElement
+	local v12 = {}
+	v12.AutomaticSize = Enum.AutomaticSize.Y
+	v12.BackgroundColor3 = color
+	v12.BackgroundTransparency = v4 and not FFlagQRCodePageVisualRefresh and 0.7 or 1
+	v12.Position = UDim2.fromScale(0, 0)
+	local size2
+
+	if v4 then
+		size2 = UDim2.fromScale(0.6, 1)
+	else
+		size2 = UDim2.fromScale(1, 1)
+	end
+
+	v12.Size = size2
+	v12.BorderSizePixel = 0
+	v12[React.Change.AbsoluteSize] = React.useCallback(function(p)
+		if p.AbsoluteSize.Y >= 450 then
+			setState(true)
+		else
+			setState(false)
+		end
+	end)
+	local children2 = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Bottom
+		}),
+		Content = 0,
+		Gradient = 0
+	}
+
+	local createElement4 = React.createElement
+	local v13 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		Size = 0,
+		BorderSizePixel = 0
+	}
+	local size3
+
+	if v4 then
+		size3 = UDim2.new(1, 0, 1, -56)
+	else
+		size3 = UDim2.new(1, 0, 0.5, 0)
+	end
+
+	v13.Size = size3
+
+	local v14 = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		Padding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 24),
+			PaddingRight = UDim.new(0, 24),
+			PaddingBottom = UDim.new(0, 24),
+			PaddingLeft = UDim.new(0, 24)
+		}),
+		QRCodeView = React.createElement(QRCodeView, { layoutOrder = 1, isSmallScreen = state }),
+		Spacer1 = React.createElement("Frame", {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(0, state and 12 or 24),
+			LayoutOrder = 2
+		}),
+		Description = 0,
+		LearnMoreWebLink = 0,
+		ProfileShareButtonContainer = 0,
+		UISizeConstraint = 0
+	}
+	local description
+
+	if FFlagQRCodeCopyUpdates and state3 == false then
+		description = React.createElement("Frame", {
+			Size = UDim2.new(0, 304, 0, 45),
+			BackgroundTransparency = 1,
+			LayoutOrder = 3
+		})
+	else
+		local createElement5 = React.createElement
+		local text2
+
+		if FFlagQRCodeCopyUpdates and state2 then
+			text2 = v3.descriptionTrustedFriends
+		else
+			text2 = v3.description
+		end
+
+		local v15 = {
+			layoutOrder = 3,
+			text = text2,
+			fontStyle = v5.Font.CaptionBody,
+			lineHeight = 1,
+			colorStyle = v5.Theme.TextDefault,
+			size = 0,
+			automaticSize = 0,
+			textXAlignment = 0,
+			textYAlignment = 0,
+			fluidSizing = false,
+			richText = false
+		}
+		local size4
+
+		if FFlagQRCodeCopyUpdates and state2 then
+			size4 = UDim2.new(0, 304, 0, 0)
+		else
+			size4 = UDim2.new(1, 0, 0, 0)
+		end
+
+		v15.size = size4
+
+		v15.automaticSize = Enum.AutomaticSize.Y
+		local textXAlignment
+
+		if FFlagQRCodeCopyUpdates and state2 then
+			textXAlignment = Enum.TextXAlignment.Left
+		else
+			textXAlignment = Enum.TextXAlignment.Center
+		end
+
+		v15.textXAlignment = textXAlignment
+		local textYAlignment
+
+		if FFlagQRCodeCopyUpdates and state2 then
+			textYAlignment = Enum.TextYAlignment.Top
+		else
+			textYAlignment = Enum.TextYAlignment.Center
+		end
+
+		v15.textYAlignment = textYAlignment
+		description = createElement5(StyledTextLabel, v15)
+	end
+
+	v14.Description = description
+	local learnMoreWebLink
+
+	if v2 then
+		if FFlagQRCodeCopyUpdates and state3 == false then
+			learnMoreWebLink = React.createElement("Frame", {
+				Size = UDim2.new(0, 304, 0, 15),
+				BackgroundTransparency = 1,
+				LayoutOrder = 4
+			})
+		elseif FFlagQRCodeCopyUpdates and state2 then
+			learnMoreWebLink = React.createElement("Frame", {
+				Size = UDim2.new(0, 304, 0, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
-				BackgroundColor3 = color3,
-				BackgroundTransparency = not v54 and 1 or 0.7,
-				Position = UDim2.fromScale(0, 0),
-				Size = if not v54 then UDim2.fromScale(1, 1) else UDim2.fromScale(0.6, 1),
+				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				[React.Change.AbsoluteSize] = React.useCallback(function(p2) -- line: 183
-					-- upvalues: v52 (copy)
-					if p2.AbsoluteSize.Y >= 450 then
-						v52(true)
-
-						return
-					end
-
-					v52(false)
-				end)
+				LayoutOrder = 4
 			}, {
 				Layout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					VerticalAlignment = Enum.VerticalAlignment.Bottom
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Top
 				}),
-				Content = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					BorderSizePixel = 0,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = if not v54 then UDim2.new(1, 0, 0.5, 0) else UDim2.new(1, 0, 1, -56)
-				}, {
-					Layout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						SortOrder = Enum.SortOrder.LayoutOrder
-					}),
-					Padding = React.createElement("UIPadding", {
-						PaddingTop = UDim.new(0, 24),
-						PaddingRight = UDim.new(0, 24),
-						PaddingBottom = UDim.new(0, 24),
-						PaddingLeft = UDim.new(0, 24)
-					}),
-					QRCodeView = React.createElement(QRCodeView, {
-						layoutOrder = 1,
-						isSmallScreen = v51
-					}),
-					Spacer1 = React.createElement("Frame", {
-						BorderSizePixel = 0,
-						BackgroundTransparency = 1,
-						LayoutOrder = 2,
-						AutomaticSize = Enum.AutomaticSize.Y,
-						Size = UDim2.fromOffset(0, not v51 and 24 or 12)
-					}),
-					Description = if not FFlagQRCodeCopyUpdates or v64 ~= false then React.createElement(StyledTextLabel, {
-						layoutOrder = 3,
-						lineHeight = 1,
-						fluidSizing = false,
-						richText = false,
-						text = if not FFlagQRCodeCopyUpdates or not v62 then v49.description else if not FFlagConnectionsToFriendsRename then v49.descriptionTCEducation else v49.descriptionTrustedFriends,
-						fontStyle = v55.Font.CaptionBody,
-						colorStyle = v55.Theme.TextDefault,
-						size = if not FFlagQRCodeCopyUpdates or not v62 then UDim2.new(1, 0, 0, 0) else UDim2.new(0, 304, 0, 0),
-						automaticSize = Enum.AutomaticSize.Y,
-						textXAlignment = if not FFlagQRCodeCopyUpdates or not v62 then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left,
-						textYAlignment = if not FFlagQRCodeCopyUpdates or not v62 then Enum.TextYAlignment.Center else Enum.TextYAlignment.Top
-					}) else React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 3,
-						Size = UDim2.new(0, 304, 0, 45)
-					}),
-					LearnMoreWebLink = if not v48 then nil else if not FFlagQRCodeCopyUpdates or v64 ~= false then if not FFlagQRCodeCopyUpdates or not v62 then React.createElement(InputLabel, {
-						LayoutOrder = 4,
-						tag = "auto-y size-full-0",
-						RichText = true,
-						Text = `<u>{ v49.learnMore }</u>`,
-						size = InputLabelSize.Small,
-						onActivated = v50
-					}) else React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
-						LayoutOrder = 4,
-						Size = UDim2.new(0, 304, 0, 0),
-						AutomaticSize = Enum.AutomaticSize.Y
-					}, {
-						Layout = React.createElement("UIListLayout", {
-							HorizontalAlignment = Enum.HorizontalAlignment.Left,
-							VerticalAlignment = Enum.VerticalAlignment.Top
-						}),
-						LearnMoreWebLink = React.createElement(InputLabel, {
-							tag = "auto-y size-full-0 text-align-x-left",
-							RichText = true,
-							Text = `<u>{ v49.learnMore }</u>`,
-							size = InputLabelSize.Small,
-							onActivated = v50
-						})
-					}) else React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 4,
-						Size = UDim2.new(0, 304, 0, 15)
-					}),
-					ProfileShareButtonContainer = if not v59 then nil else React.createElement("Frame", {
-						BorderSizePixel = 0,
-						BackgroundTransparency = 1,
-						LayoutOrder = 5,
-						AutomaticSize = Enum.AutomaticSize.Y,
-						Size = UDim2.fromScale(1, 0)
-					}, {
-						Layout = React.createElement("UIListLayout", {
-							HorizontalAlignment = Enum.HorizontalAlignment.Center
-						}),
-						UIPadding = React.createElement("UIPadding", {
-							PaddingTop = UDim.new(0, 24),
-							PaddingBottom = UDim.new(0, 24)
-						}),
-						ProfileShareButton = React.createElement(Button, {
-							maxWidth = 304,
-							buttonType = ButtonType.PrimarySystem,
-							standardSize = StandardButtonSize.Regular,
-							text = shareProfileLink,
-							icon = v61,
-							onActivated = v58.onActivated,
-							ref = if not FFlagProfileQRCodeFixFocusNavigation then nil else v53
-						})
-					}),
-					UISizeConstraint = React.createElement("UISizeConstraint", {
-						MinSize = Vector2.new(0, 420)
-					})
-				}),
-				Gradient = React.createElement("UIGradient", {
-					Rotation = 90,
-					Color = ColorSequence.new({
-						ColorSequenceKeypoint.new(0, v55.Theme.BackgroundContrast.Color),
-						ColorSequenceKeypoint.new(1, v55.Theme.BackgroundContrast.Color)
-					}),
-					Transparency = NumberSequence.new({
-						NumberSequenceKeypoint.new(0, 0.4),
-						NumberSequenceKeypoint.new(1, 0)
-					})
+				LearnMoreWebLink = React.createElement(InputLabel, {
+					tag = "auto-y size-full-0 text-align-x-left",
+					RichText = true,
+					Text = `<u>{v3.learnMore}</u>`,
+					size = InputLabelSize.Small,
+					onActivated = onActivated
 				})
 			})
-		})
+		else
+			learnMoreWebLink = React.createElement(InputLabel, {
+				LayoutOrder = 4,
+				tag = "auto-y size-full-0",
+				RichText = true,
+				Text = `<u>{v3.learnMore}</u>`,
+				size = InputLabelSize.Small,
+				onActivated = onActivated
+			})
+		end
+	end
+
+	v14.LearnMoreWebLink = learnMoreWebLink
+	local profileShareButtonContainer
+
+	if v9 then
+		local createElement5 = React.createElement
+		local v15 = {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.fromScale(1, 0),
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = 5
+		}
+
+		local v16 = {
+			Layout = React.createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			}),
+			UIPadding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 24),
+				PaddingBottom = UDim.new(0, 24)
+			}),
+			ProfileShareButton = 0
+		}
+
+		local createElement6 = React.createElement
+		local v17 = {
+			buttonType = ButtonType.PrimarySystem,
+			standardSize = StandardButtonSize.Regular,
+			text = text,
+			icon = icon,
+			maxWidth = 304,
+			onActivated = v8.onActivated,
+			ref = 0
+		}
+		local ref2
+
+		if FFlagProfileQRCodeFixFocusNavigation then
+			ref2 = ref
+		end
+
+		v17.ref = ref2
+		v16.ProfileShareButton = createElement6(Button, v17)
+		profileShareButtonContainer = createElement5("Frame", v15, v16)
+	end
+
+	v14.ProfileShareButtonContainer = profileShareButtonContainer
+
+	v14.UISizeConstraint = React.createElement("UISizeConstraint", { MinSize = Vector2.new(0, 420) })
+	children2.Content = createElement4("Frame", v13, v14)
+
+	children2.Gradient = React.createElement("UIGradient", {
+		Rotation = 90,
+		Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, v5.Theme.BackgroundContrast.Color),
+			ColorSequenceKeypoint.new(1, v5.Theme.BackgroundContrast.Color)
+		}),
+		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.4), NumberSequenceKeypoint.new(1, 0) })
 	})
+	children.VerticalScrollView = createElement2(VerticalScrollView, v11, {
+		GradientBackground = createElement3("Frame", v12, children2)
+	})
+	return createElement("Frame", v10, children)
 end

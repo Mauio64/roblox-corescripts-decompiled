@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.InExperienceClickout.InExperienceClickout))
+local InExperienceClickout = require(Workspace.InExperienceClickout.InExperienceClickout)
+
+return InExperienceClickout

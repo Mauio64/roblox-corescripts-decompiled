@@ -1,16 +1,13 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
-local WhatsNewParent = WhatsNew.Parent
-local SignalsReact = require(WhatsNewParent.SignalsReact)
+local parent = WhatsNew.Parent
 
+local SignalsReact = require(parent.SignalsReact)
 require(WhatsNew.Types)
-
 local GetWhatsNewStore = require(WhatsNew.store.GetWhatsNewStore)
 
-local function useWhatsNewRuntimeState() -- line: 12
-	-- upvalues: GetWhatsNewStore (copy), SignalsReact (copy)
-	local v6 = GetWhatsNewStore()
-
-	return SignalsReact.useSignalState(v6.getRuntimeStateSignal)
+local function useWhatsNewRuntimeState()
+	local whatsNewStore = GetWhatsNewStore()
+	return SignalsReact.useSignalState(whatsNewStore.getRuntimeStateSignal)
 end
 
 return useWhatsNewRuntimeState

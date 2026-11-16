@@ -1,49 +1,69 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local Object = require(ParentParent.LuauPolyfill).Object
-local console = require(ParentParent.Shared).console
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
-require(ParentParent.Shared)
+local Shared = require(parent.Shared)
+local console = Shared.console
+
+local Shared2 = require(parent.Shared)
+local enableAllocationTrims = Shared2.ReactFeatureFlags.enableAllocationTrims
 
 local ReactNoopUpdateQueue = require(script.Parent.ReactNoopUpdateQueue)
-local t1 = {}
+local refs = {}
+
 local __DEV__ = ReactGlobals.__DEV__
 local __COMPAT_WARNINGS__ = ReactGlobals.__COMPAT_WARNINGS__
 
 if __DEV__ then
-	Object.freeze(t1)
+	Object.freeze(refs)
 end
 
-local UninitializedState = require(ParentParent.Shared).UninitializedState
-local t2 = {
-	isReactComponent = true
-}
+local Shared3 = require(parent.Shared)
+local UninitializedState = Shared3.UninitializedState
 
-local function trimPath(s1: string) -- line: 51
-	local match = string.match(s1, "%.%u[%.%w]-$")
+local function trimPath(value: string)
+	local v = string.match(value, "%.%u[%.%w]-$")
 
-	if match then
-		return string.gsub(match, "^%.", "")
+	if v then
+		return string.gsub(v, "^%.", "")
 	end
 
-	return s1
+	return value
 end
-local function warnAboutExistingLifecycle(p1, p2, p3) -- line: 65
-	-- upvalues: console (copy)
-	console.warn("%s already defined '%s', but it also defining the deprecated Roact method '%s'. %s should only implement one of these methods, preferably using the non-deprecated name.", p1, p3, p2, p1)
+
+local function warnAboutExistingLifecycle(p, p2, p3)
+	console.warn(
+		"%s already defined '%s', but it also defining the deprecated Roact method '%s'. %s should only implement one of these methods, preferably using the non-deprecated name.",
+		p,
+		p3,
+		p2,
+		p
+	)
 end
-local function warnAboutDeprecatedLifecycleName(p4, p5, p6) -- line: 75
-	-- upvalues: __DEV__ (copy), __COMPAT_WARNINGS__ (copy), console (copy)
+
+local function warnAboutDeprecatedLifecycleName(p, p2, p3)
 	if __DEV__ and __COMPAT_WARNINGS__ then
-		local v37, v38 = debug.info(3, "sln")
-		local warn = console.warn
-		local match = string.match(v37, "%.%u[%.%w]-$")
+		local v, v2 = debug.info(3, "sln")
+		local Warn = console.warn
+		local v3 = string.match(v, "%.%u[%.%w]-$")
 
-		warn("%s is using method '%s', which is no longer supported and should be updated to '%s'\nFile: %s:%s", p4, p5, p6, if not match then v37 else string.gsub(match, "^%.", ""), (tostring(v38)))
+		if v3 then
+			v = string.gsub(v3, "^%.", "")
+		end
+
+		Warn(
+			"%s is using method '%s', which is no longer supported and should be updated to '%s'\nFile: %s:%s",
+			p,
+			p2,
+			p3,
+			v,
+			(tostring(v2))
+		)
 	end
 end
 
-local t3 = {
+local v = {
 	didMount = "componentDidMount",
 	shouldUpdate = "shouldComponentUpdate",
 	willUpdate = "UNSAFE_componentWillUpdate",
@@ -51,148 +71,193 @@ local t3 = {
 	willUnmount = "componentWillUnmount"
 }
 
-local function handleNewLifecycle(p7, p8, p9) -- line: 97
-	-- upvalues: t3 (copy), console (copy), __DEV__ (copy), __COMPAT_WARNINGS__ (copy)
-	if t3[p8] ~= nil then
-		if p7[t3[p8]] ~= nil then
-			local __componentName = p7.__componentName
-			local v45 = t3[p8]
+local function handleNewLifecycle(p, p2, p3)
+	if v[p2] ~= nil then
+		if p[v[p2]] == nil then
+			if p2 == "willUpdate" and p.componentWillUpdate then
+				local __componentName = p.__componentName
+				console.warn(
+					"%s already defined '%s', but it also defining the deprecated Roact method '%s'. %s should only implement one of these methods, preferably using the non-deprecated name.",
+					__componentName,
+					"UNSAFE_componentWillUpdate",
+					"willUpdate",
+					__componentName
+				)
+			else
+				local __componentName = p.__componentName
 
-			console.warn("%s already defined '%s', but it also defining the deprecated Roact method '%s'. %s should only implement one of these methods, preferably using the non-deprecated name.", __componentName, v45, p8, __componentName)
-		elseif p8 == "willUpdate" and p7.componentWillUpdate then
-			local __componentName = p7.__componentName
+				local v2 = v[p2]
 
-			console.warn("%s already defined '%s', but it also defining the deprecated Roact method '%s'. %s should only implement one of these methods, preferably using the non-deprecated name.", __componentName, "UNSAFE_componentWillUpdate", p8, __componentName)
-		else
-			local __componentName = p7.__componentName
-			local v48 = t3[p8]
+				if __DEV__ and __COMPAT_WARNINGS__ then
+					local v3, v4 = debug.info(3, "sln")
+					local Warn = console.warn
+					local v5 = string.match(v3, "%.%u[%.%w]-$")
 
-			if __DEV__ and __COMPAT_WARNINGS__ then
-				local v49, v50 = debug.info(3, "sln")
-				local warn = console.warn
-				local match = string.match(v49, "%.%u[%.%w]-$")
+					if v5 then
+						v3 = string.gsub(v5, "^%.", "")
+					end
 
-				warn("%s is using method '%s', which is no longer supported and should be updated to '%s'\nFile: %s:%s", __componentName, p8, v48, if not match then v49 else string.gsub(match, "^%.", ""), (tostring(v50)))
+					Warn(
+						"%s is using method '%s', which is no longer supported and should be updated to '%s'\nFile: %s:%s",
+						__componentName,
+						p2,
+						v2,
+						v3,
+						(tostring(v4))
+					)
+				end
 			end
+		else
+			local __componentName = p.__componentName
+			local v2 = v[p2]
+			console.warn(
+				"%s already defined '%s', but it also defining the deprecated Roact method '%s'. %s should only implement one of these methods, preferably using the non-deprecated name.",
+				__componentName,
+				v2,
+				p2,
+				__componentName
+			)
 		end
 
-		p8 = t3[p8]
+		p2 = v[p2]
 	end
 
-	rawset(p7, p8, p9)
+	rawset(p, p2, p3)
 end
 
-local t4 = {
+local object = setmetatable({ __componentName = "Component" }, {
 	__newindex = handleNewLifecycle,
-	__index = t2,
-	__tostring = function(p10) -- line: 127
-		return p10.__componentName
+	__index = { isReactComponent = true },
+	__tostring = function(p)
+		return p.__componentName
 	end
-}
-local v17 = setmetatable({
-	__componentName = "Component"
-}, t4)
-local v18 = ReactGlobals.__TESTEZ_RUNNING_TEST__ and 0 or 900
-local n1 = 1
-local t5 = table.create(v18)
+})
 
-for _ = 1, v18 do
-	table.insert(t5, {
+local v2 = ReactGlobals.__TESTEZ_RUNNING_TEST__ and 0 or 900
+
+local v3 = table.create(v2)
+local v4 = 1
+
+for _ = 1, v2 do
+	table.insert(v3, {
 		props = nil,
 		context = nil,
 		state = UninitializedState,
-		__refs = t1,
+		__refs = refs,
 		__updater = ReactNoopUpdateQueue
 	})
 end
 
-local function setStateInInit(p11, p12, p13: nil) -- line: 163
-	-- upvalues: __DEV__ (copy), console (copy), Object (copy)
-	if __DEV__ and p13 ~= nil then
-		console.warn("Received a `callback` argument to `setState` during initialization of \"%s\". The callback behavior is not supported when using `setState` in `init`.\n\nConsider defining similar behavior in a `compontentDidMount` method instead.", p11.__componentName)
+local function setStateInInit(state, callback, p: nil)
+	if __DEV__ and p ~= nil then
+		console.warn(
+			"Received a `callback` argument to `setState` during initialization of \"%s\". The callback behavior is not supported when using `setState` in `init`.\n\nConsider defining similar behavior in a `compontentDidMount` method instead.",
+			state.__componentName
+		)
 	end
 
-	local v57 = p12 and type(p12)
+	local typeName = callback and type(callback)
 
-	if p12 == nil or v57 ~= "table" and v57 ~= "function" then
+	if callback == nil or typeName ~= "table" and typeName ~= "function" then
 		error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.")
 	end
 
-	local state = p11.state
-	local v59 = if v57 ~= "function" then p12 else p12(state, p11.props)
+	local state2 = state.state
 
-	p11.state = Object.assign({}, state, v59)
+	if typeName == "function" then
+		callback = callback(state2, state.props)
+	end
+
+	if not enableAllocationTrims then
+		state.state = Object.assign({}, state2, callback)
+
+		return
+	end
+
+	local state3
+
+	if type(state2) == "table" and getmetatable(state2) == nil then
+		state3 = Object.assign(table.clone(state2), callback)
+	else
+		state3 = Object.assign({}, state2, callback)
+	end
+
+	state.state = state3
 end
 
-function v17.extend(p14, p15) -- line: 203
-	-- upvalues: __COMPAT_WARNINGS__ (copy), console (copy), n1 (ref), v18 (copy), t5 (copy), UninitializedState (copy), t1 (copy), ReactNoopUpdateQueue (copy), setStateInInit (copy)
-	if p15 == nil then
+function object:extend(componentName)
+	if componentName == nil then
 		if __COMPAT_WARNINGS__ then
 			console.warn("Component:extend() accepting no arguments is deprecated, and will not be supported in a future version of Roact. Please provide an explicit name.")
 		end
 
-		p15 = ""
-	elseif type(p15) ~= "string" then
+		componentName = ""
+	elseif type(componentName) ~= "string" then
 		error("Component class name must be a string")
 	end
 
-	local t6 = {
-		init = nil,
-		__componentName = p15,
-		setState = p14.setState,
-		forceUpdate = p14.forceUpdate
+	local v5 = {
+		__componentName = componentName,
+		setState = self.setState,
+		forceUpdate = self.forceUpdate,
+		init = nil
 	}
 
-	t6.__index = t6
+	v5.__index = v5
 
-	function t6.__ctor(p16, p17, p18) -- line: 237
-		-- upvalues: n1 (ref), v18 (copy), t5 (copy), UninitializedState (copy), t1 (copy), ReactNoopUpdateQueue (copy), t6 (copy), setStateInInit (copy)
-		local v74
+	function v5.__ctor(props, context, p)
+		local v6
 
-		if n1 <= v18 then
-			v74 = t5[n1]
-			v74.props = p16
-			v74.context = p17
-			t5[n1] = nil
-			n1 += 1
+		if v4 <= v2 then
+			v6 = v3[v4]
+
+			v6.props = props
+			v6.context = context
+
+			v3[v4] = nil
+			v4 += 1
 		else
-			v74 = {
-				props = p16,
-				context = p17,
+			v6 = {
+				props = props,
+				context = context,
 				state = UninitializedState,
-				__refs = t1,
-				__updater = p18 or ReactNoopUpdateQueue
+				__refs = refs,
+				__updater = p or ReactNoopUpdateQueue
 			}
 		end
 
-		local v75 = setmetatable(v74, t6)
+		local object2 = setmetatable(v6, v5)
 
-		if t6.init and type(t6.init) == "function" then
-			v75.setState = setStateInInit
-			t6.init(v75, p16, p17)
-			v75.setState = nil
+		if v5.init and type(v5.init) == "function" then
+			object2.setState = setStateInInit
+
+			v5.init(object2, props, context)
+
+			object2.setState = nil
 		end
 
-		return v75
+		return object2
 	end
 
-	setmetatable(t6, (getmetatable(p14)))
+	setmetatable(v5, (getmetatable(self)))
 
-	return t6
+	return v5
 end
-function v17.setState(p19, p20, p21) -- line: 329
-	if p20 ~= nil and (type(p20) ~= "table" and type(p20) ~= "function") then
+
+function object:setState(value, p)
+	if value ~= nil and type(value) ~= "table" and type(value) ~= "function" then
 		error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.")
 	end
 
-	p19.__updater.enqueueSetState(p19, p20, p21, "setState")
+	self.__updater.enqueueSetState(self, value, p, "setState")
 end
-function v17.forceUpdate(p22, p23) -- line: 358
-	p22.__updater.enqueueForceUpdate(p22, p23, "forceUpdate")
+
+function object:forceUpdate(p)
+	self.__updater.enqueueForceUpdate(self, p, "forceUpdate")
 end
 
 if __DEV__ then
-	local t7 = {
+	local v5 = {
 		isMounted = {
 			"isMounted",
 			"Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks."
@@ -203,38 +268,31 @@ if __DEV__ then
 		}
 	}
 
-	for v24, _ in t7 do
-		if t7[v24] ~= nil then
-			local v26 = t7[v24]
+	for k, _ in v5 do
+		if v5[k] == nil then
+			continue
+		end
 
-			v17[v24] = function() -- line: 383
-				-- upvalues: console (copy), v26 (copy)
-				console.warn("%s(...) is deprecated in plain JavaScript React classes. %s", v26[1], v26[2])
+		local v6 = v5[k]
 
-				return nil
-			end
+		object[k] = function(): nil
+			console.warn("%s(...) is deprecated in plain JavaScript React classes. %s", v6[1], v6[2])
+
+			return nil
 		end
 	end
 end
 
-local v27 = v17:extend("PureComponent")
+local extended = object:extend("PureComponent")
 
-v27.extend = v17.extend
+extended.extend = object.extend
 
-local t8 = {
-	isReactComponent = true,
-	isPureReactComponent = true
-}
-
-setmetatable(v27, {
+setmetatable(extended, {
 	__newindex = handleNewLifecycle,
-	__index = t8,
-	__tostring = function(p24) -- line: 430
-		return p24.__componentName
+	__index = { isReactComponent = true, isPureReactComponent = true },
+	__tostring = function(p)
+		return p.__componentName
 	end
 })
 
-return {
-	Component = v17,
-	PureComponent = v27
-}
+return { Component = object, PureComponent = extended }

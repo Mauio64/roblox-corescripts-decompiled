@@ -1,1 +1,3 @@
-return (require(script.SignalsScheduler))
+local SignalsScheduler = require(script.SignalsScheduler)
+
+return SignalsScheduler

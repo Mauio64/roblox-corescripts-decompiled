@@ -1,138 +1,214 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Foundation = require(AppChatParent.Foundation)
-local SignalsReact = require(AppChatParent.SignalsReact)
-local Text = require(AppChatParent.AppCommonLib).Text
+local parent = AppChat.Parent
+local FFlagAppChatUseProfileFrameThumbnail = require(AppChat.Flags.FFlagAppChatUseProfileFrameThumbnail)
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local SignalsReact = require(parent.SignalsReact)
+local AppCommonLib = require(parent.AppCommonLib)
+local Text = AppCommonLib.Text
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local useSignalState = SignalsReact.useSignalState
+
 local GetSelectedUsersStore = require(AppChat.Stores.GetSelectedUsersStore)
 local useUserData = require(AppChat.Hooks.useUserData)
-local FFlagEnableBlackbirdCheck = require(AppChatParent.SharedFlags).FFlagEnableBlackbirdCheck
-local useIsRobloxSubscriber = require(AppChatParent.UserProfiles).Hooks.useIsRobloxSubscriber
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+local UserProfiles = require(parent.UserProfiles)
+local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local DomLocators = require(AppChat.Utils.DomLocators)
 
-local function noOp() -- line: 29
-end
+local function noOp() end
 
-local v15 = string.rep("W", 20)
+local v = string.rep("W", 20)
 
-return React.memo(function(t1: {[any]: any}) -- line: 35
-	-- upvalues: useUserData (copy), Foundation (copy), useIsRobloxSubscriber (copy), FFlagEnableBlackbirdCheck (copy), GetSelectedUsersStore (copy), useSignalState (copy), React (copy), Text (copy), v15 (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), noOp (copy)
-	local v17 = useUserData(t1.userId)
-	local v18 = Foundation.Hooks.useTokens()
-	local v19 = useIsRobloxSubscriber(if not FFlagEnableBlackbirdCheck then nil else t1.userId)
-	local v20 = GetSelectedUsersStore(false)
-	local v21 = useSignalState(v20.getIsUserSelected(t1.userId))
-	local v22 = React.useCallback(function() -- line: 44
-		-- upvalues: v20 (copy), t1 (copy)
-		v20.toggleUserId(t1.userId)
-	end, { t1.userId })
-	local v23 = React.useMemo(function() -- line: 48
-		-- upvalues: Text (copy), v15 (copy), v18 (copy)
-		local v28 = Text.GetTextBounds(v15, v18.Typography.TitleLarge.Font, v18.Typography.TitleLarge.FontSize, Vector2.zero)
+return React.memo(function(p)
+	local v2 = useUserData(p.userId)
+	local v3 = Foundation.Hooks.useTokens()
+	local v4
 
-		return UDim2.fromOffset(v28.X, v28.Y)
-	end, {
-		v18.Typography.TitleLarge.Font,
-		v18.Typography.TitleLarge.FontSize
-	})
-	local v24 = React.useMemo(function() -- line: 58
-		-- upvalues: Text (copy), v18 (copy)
-		local v29 = Text.GetTextBounds("Roblox Studio", v18.Typography.CaptionMedium.Font, v18.Typography.CaptionMedium.FontSize, Vector2.zero)
+	if FFlagEnableBlackbirdCheck then
+		v4 = p.userId
+	end
 
-		return UDim2.fromOffset(v29.X, v29.Y)
-	end, {
-		v18.Typography.CaptionMedium.Font,
-		v18.Typography.CaptionMedium.FontSize
-	})
-	local v25 = nil
-	local u26 = nil
+	local v5 = useIsRobloxSubscriber(v4)
+
+	local selectedUsersStore = GetSelectedUsersStore(false)
+	local isChecked = useSignalState(selectedUsersStore.getIsUserSelected(p.userId))
+
+	local onActivated = React.useCallback(function()
+		selectedUsersStore.toggleUserId(p.userId)
+	end, { p.userId })
+
+	local v6 = React.useMemo(function()
+		local v6
+
+		if FoundationFontFaceMigration then
+			v6 = GetTextSize(v, v3.Typography.TitleLarge.FontSize, v3.Typography.TitleLarge.Font, Vector2.zero)
+		else
+			v6 = Text.GetTextBounds(v, v3.Typography.TitleLarge.Font, v3.Typography.TitleLarge.FontSize, Vector2.zero)
+		end
+
+		return UDim2.fromOffset(v6.X, v6.Y)
+	end, { v3.Typography.TitleLarge.Font, v3.Typography.TitleLarge.FontSize })
+
+	local v7 = React.useMemo(function()
+		local v7
+
+		if FoundationFontFaceMigration then
+			v7 = GetTextSize(
+				"Roblox Studio",
+				v3.Typography.CaptionMedium.FontSize,
+				v3.Typography.CaptionMedium.Font,
+				Vector2.zero
+			)
+		else
+			v7 = Text.GetTextBounds(
+				"Roblox Studio",
+				v3.Typography.CaptionMedium.Font,
+				v3.Typography.CaptionMedium.FontSize,
+				Vector2.zero
+			)
+		end
+
+		return UDim2.fromOffset(v7.X, v7.Y)
+	end, { v3.Typography.CaptionMedium.Font, v3.Typography.CaptionMedium.FontSize })
+
+	local state = nil
+	local v8 = nil
 
 	if FFlagDebugAppChatEnableDomLocators then
-		local v27
-
-		v25, v27 = React.useState("")
-		u26 = v27
-		React.__subscribeToBinding(v17.username, function(p1) -- line: 71
-			-- upvalues: u26 (ref)
-			u26(p1)
+		local setState
+		state, setState = React.useState("")
+		v8 = setState
+		React.__subscribeToBinding(v2.username, function(p2)
+			v8(p2)
 		end)
 	end
 
-	return React.createElement(Foundation.View, {
-		tag = "row size-full-0 auto-y stroke-muted stroke-thin gap-medium padding-x-medium padding-y-small align-y-center",
-		onActivated = v22,
-		testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.selectChatMembersUserCellWithCheckbox(v25, v21)
-	}, {
+	local createElement = React.createElement
+	local view = Foundation.View
+	local testId
+
+	if FFlagDebugAppChatEnableDomLocators then
+		testId = DomLocators.selectChatMembersUserCellWithCheckbox(state, isChecked)
+	end
+
+	local children = {
 		Avatar = React.createElement(Foundation.Avatar, {
-			LayoutOrder = 1,
-			userId = v17.id,
-			userPresence = v17.presence,
+			userId = v2.id,
+			userPresence = v2.presence,
 			size = Foundation.Enums.InputSize.Medium,
-			backgroundStyle = v18.Color.Shift.Shift_300
+			backgroundStyle = v3.Color.Shift.Shift_300,
+			includeProfileFrame = FFlagAppChatUseProfileFrameThumbnail,
+			LayoutOrder = 1
 		}),
-		UserInfo = React.createElement(Foundation.View, {
-			tag = "col fill auto-y clip",
-			LayoutOrder = 2
-		}, {
-			UserDataSkeleton = React.createElement(Foundation.Skeleton, {
-				LayoutOrder = 1,
-				Size = UDim2.new(v23.X, v23.Y + v24.Y),
-				Visible = v17.isLoading
-			}),
-			DisplayNameRow = if not FFlagEnableBlackbirdCheck then nil else React.createElement(Foundation.View, {
-				tag = "row auto-xy align-y-center gap-xsmall",
-				LayoutOrder = 1,
-				Visible = v17.isLoading:map(function(p2) -- line: 104
-					return not p2
-				end)
-			}, {
-				DisplayName = React.createElement(Foundation.Text, {
-					tag = "auto-xy text-title-large text-truncate-end content-emphasis",
-					LayoutOrder = 1,
-					Text = v17.combinedName
-				}),
-				SubscriptionBadge = if not v19 then nil else React.createElement(Foundation.Icon, {
-					LayoutOrder = 2,
-					name = Foundation.Enums.IconName.RobloxPlus,
-					size = Foundation.Enums.IconSize.Small,
-					style = v18.Color.Content.Emphasis
-				})
-			}),
-			DisplayName = if FFlagEnableBlackbirdCheck then nil else React.createElement(Foundation.Text, {
+		UserInfo = 0,
+		CheckboxContainer = 0
+	}
+
+	local createElement2 = React.createElement
+	local view2 = Foundation.View
+
+	local v9 = {
+		UserDataSkeleton = React.createElement(Foundation.Skeleton, {
+			Size = UDim2.new(v6.X, v6.Y + v7.Y),
+			Visible = v2.isLoading,
+			LayoutOrder = 1
+		}),
+		DisplayNameRow = 0,
+		DisplayName = 0,
+		PresenceText = 0
+	}
+	local displayNameRow
+
+	if FFlagEnableBlackbirdCheck then
+		local createElement3 = React.createElement
+		local view3 = Foundation.View
+		local v10 = {
+			tag = "row auto-xy align-y-center gap-xsmall",
+			LayoutOrder = 1,
+			Visible = v2.isLoading:map(function(p2): boolean
+				return not p2
+			end)
+		}
+
+		local v11 = {
+			DisplayName = React.createElement(Foundation.Text, {
 				tag = "auto-xy text-title-large text-truncate-end content-emphasis",
-				LayoutOrder = 1,
-				Text = v17.combinedName,
-				Visible = v17.isLoading:map(function(p3) -- line: 128
-					return not p3
-				end)
+				Text = v2.combinedName,
+				LayoutOrder = 1
 			}),
-			PresenceText = React.createElement(Foundation.Text, {
-				tag = "auto-xy text-caption-medium text-truncate-end content-muted",
-				LayoutOrder = 3,
-				Text = v17.presenceText,
-				Visible = v17.isLoading:map(function(p4) -- line: 137
-					return not p4
-				end)
+			SubscriptionBadge = 0
+		}
+		local subscriptionBadge
+
+		if v5 then
+			subscriptionBadge = React.createElement(Foundation.Icon, {
+				LayoutOrder = 2,
+				name = Foundation.Enums.IconName.RobloxPlus,
+				size = Foundation.Enums.IconSize.Small,
+				style = v3.Color.Content.Emphasis
 			})
-		}),
-		CheckboxContainer = React.createElement(Foundation.View, {
-			tag = "auto-xy padding-x-medium",
-			isDisabled = true,
-			LayoutOrder = 3,
+		end
+
+		v11.SubscriptionBadge = subscriptionBadge
+		displayNameRow = createElement3(view3, v10, v11)
+	end
+
+	v9.DisplayNameRow = displayNameRow
+	local displayName
+
+	if not FFlagEnableBlackbirdCheck then
+		displayName = React.createElement(Foundation.Text, {
+			tag = "auto-xy text-title-large text-truncate-end content-emphasis",
+			Text = v2.combinedName,
+			LayoutOrder = 1,
+			Visible = v2.isLoading:map(function(p2): boolean
+				return not p2
+			end)
+		})
+	end
+
+	v9.DisplayName = displayName
+
+	v9.PresenceText = React.createElement(Foundation.Text, {
+		tag = "auto-xy text-caption-medium text-truncate-end content-muted",
+		Text = v2.presenceText,
+		LayoutOrder = 3,
+		Visible = v2.isLoading:map(function(p2): boolean
+			return not p2
+		end)
+	})
+	children.UserInfo = createElement2(view2, { tag = "col fill auto-y clip", LayoutOrder = 2 }, v9)
+
+	children.CheckboxContainer = React.createElement(Foundation.View, {
+		tag = "auto-xy padding-x-medium",
+		onActivated = noOp,
+		isDisabled = true,
+		LayoutOrder = 3,
+		selection = { Selectable = false }
+	}, {
+		checkbox = React.createElement(Foundation.Checkbox, {
+			label = "",
+			isChecked = isChecked,
+			size = Foundation.Enums.InputSize.XSmall,
 			onActivated = noOp,
-			selection = {
-				Selectable = false
-			}
-		}, {
-			checkbox = React.createElement(Foundation.Checkbox, {
-				label = "",
-				Selectable = false,
-				isChecked = v21,
-				size = Foundation.Enums.InputSize.XSmall,
-				onActivated = noOp
-			})
+			Selectable = false
 		})
 	})
+	return createElement(
+		view,
+		{
+			tag = "row size-full-0 auto-y stroke-muted stroke-thin gap-medium padding-x-medium padding-y-small align-y-center",
+			onActivated = onActivated,
+			testId = testId
+		},
+		children
+	)
 end)

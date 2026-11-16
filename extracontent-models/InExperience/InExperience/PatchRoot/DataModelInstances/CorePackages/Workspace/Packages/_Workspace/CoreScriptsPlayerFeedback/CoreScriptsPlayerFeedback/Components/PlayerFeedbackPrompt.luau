@@ -1,41 +1,51 @@
 local CoreScriptsPlayerFeedback = script:FindFirstAncestor("CoreScriptsPlayerFeedback")
-local CoreScriptsPlayerFeedbackParent = CoreScriptsPlayerFeedback.Parent
-local React = require(CoreScriptsPlayerFeedbackParent.React)
-local UIBlox = require(CoreScriptsPlayerFeedbackParent.UIBlox)
+local parent = CoreScriptsPlayerFeedback.Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local MouseIconOverrideService = require(CoreScriptsPlayerFeedbackParent.CoreScriptsCommon).MouseIconOverrideService
+
+local CoreScriptsCommon = require(parent.CoreScriptsCommon)
+local MouseIconOverrideService = CoreScriptsCommon.MouseIconOverrideService
+
 local constants = require(CoreScriptsPlayerFeedback.constants)
 local useEscapeDismiss = require(CoreScriptsPlayerFeedback.Hooks.useEscapeDismiss)
-local useScreenSize = require(CoreScriptsPlayerFeedbackParent.CoreScriptsRoactCommon).useScreenSize
-local useLastInputMethod = require(CoreScriptsPlayerFeedbackParent.FocusNavigationUtils).useLastInputMethod
+
+local CoreScriptsRoactCommon = require(parent.CoreScriptsRoactCommon)
+local useScreenSize = CoreScriptsRoactCommon.useScreenSize
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local useLastInputMethod = FocusNavigationUtils.useLastInputMethod
+
 local GuiService = game:GetService("GuiService")
 local ContextActionService = game:GetService("ContextActionService")
 local TelemetryService = game:GetService("TelemetryService")
-local useLocalization = require(CoreScriptsPlayerFeedbackParent.Localization).Hooks.useLocalization
-local v19 = Images["component_assets/circle_21"]
 
-return (React.memo(function(t1: {[any]: any}) -- line: 42
-	-- upvalues: useScreenSize (copy), useStyle (copy), useLastInputMethod (copy), React (copy), useLocalization (copy), GuiService (copy), constants (copy), MouseIconOverrideService (copy), TelemetryService (copy), useEscapeDismiss (copy), ContextActionService (copy), ImageSetLabel (copy), v19 (copy), ButtonType (copy), InteractiveAlert (copy)
-	local v21 = useScreenSize()
-	local v22 = useStyle()
-	local v23 = useLastInputMethod()
-	local v24, v25 = React.useState(false)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
-	React.useEffect(function() -- line: 48
-		-- upvalues: v24 (copy), v23 (copy), v25 (copy)
-		if not v24 and (v23 == "Keyboard" or v23 == "Gamepad") then
-			v25(true)
+local component_assetscircle_21 = Images["component_assets/circle_21"]
+
+return (React.memo(function(p)
+	local screenSize = useScreenSize()
+	local v = useStyle()
+	local v2 = useLastInputMethod()
+	local state, setState = React.useState(false)
+
+	React.useEffect(function()
+		if not state and (v2 == "Keyboard" or v2 == "Gamepad") then
+			setState(true)
 		end
-	end, {
-		v24,
-		v23
-	})
+	end, { state, v2 })
 
-	local v26 = useLocalization({
+	local v3 = useLocalization({
 		Title = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Title",
 		Submit = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Submit",
 		Submitting = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Submitting",
@@ -43,136 +53,113 @@ return (React.memo(function(t1: {[any]: any}) -- line: 42
 		Intro = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Intro",
 		Footer = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Footer"
 	})
-	local v27, v28 = React.useState("")
-	local v29, v30 = React.useState(false)
-	local v31 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 67
-		-- upvalues: v24 (copy), v31 (copy), GuiService (copy)
-		if not v24 then
+	local state2, setState2 = React.useState("")
+	local state3, setState3 = React.useState(false)
+	local ref = React.useRef(nil)
+
+	React.useEffect(function()
+		if not state then
 			return
 		end
 
-		local current = v31.current
+		local current = ref.current
 
 		if current then
-			pcall(function() -- line: 74
-				-- upvalues: GuiService (copy), current (copy)
+			pcall(function()
 				GuiService:Select(current)
 			end)
 		end
-	end, { v24 })
+	end, { state })
 
 	local MIN_FEEDBACK_LENGTH = constants.MIN_FEEDBACK_LENGTH
 	local MAX_FEEDBACK_LENGTH = constants.MAX_FEEDBACK_LENGTH
 	local DELAYED_INPUT_ANIM_SEC = constants.DELAYED_INPUT_ANIM_SEC
 
-	React.useEffect(function() -- line: 84
-		-- upvalues: MouseIconOverrideService (copy)
+	React.useEffect(function()
 		MouseIconOverrideService.push("PlayerFeedbackPromptOverride", Enum.OverrideMouseIconBehavior.ForceShow)
-
-		return function() -- line: 86
-			-- upvalues: MouseIconOverrideService (copy)
+		return function()
 			MouseIconOverrideService.pop("PlayerFeedbackPromptOverride")
 		end
 	end, {})
 
-	local v35 = React.useCallback(function() -- line: 91
-		-- upvalues: v27 (copy), MIN_FEEDBACK_LENGTH (copy), MAX_FEEDBACK_LENGTH (copy), v30 (copy), TelemetryService (copy), t1 (copy)
-		if #v27 < MIN_FEEDBACK_LENGTH then
+	local onActivated = React.useCallback(function()
+		if #state2 < MIN_FEEDBACK_LENGTH or MAX_FEEDBACK_LENGTH < #state2 then
 			return
 		end
 
-		if #v27 > MAX_FEEDBACK_LENGTH then
-			return
-		end
-
-		v30(true)
-		pcall(function() -- line: 99
-			-- upvalues: TelemetryService (copy)
+		setState3(true)
+		pcall(function()
 			TelemetryService:LogCounter({
 				eventName = "FeedbackPrompt_Submitted",
 				backends = { "RobloxTelemetryCounter" }
-			}, {
-				customFields = {}
-			}, 1)
+			}, { customFields = {} }, 1)
 		end)
-		pcall(function() -- line: 106
-			-- upvalues: v27 (copy)
+		pcall(function()
 			local SocialService = game:GetService("SocialService")
 
 			if SocialService.SignalFeedbackSubmissionCompleted then
-				SocialService:SignalFeedbackSubmissionCompleted(v27)
+				SocialService:SignalFeedbackSubmissionCompleted(state2)
 			end
 		end)
-		t1.closePrompt()
-	end, { v27 })
-	local v36 = React.useCallback(function() -- line: 115
-		-- upvalues: TelemetryService (copy), t1 (copy)
-		pcall(function() -- line: 116
-			-- upvalues: TelemetryService (copy)
+		p.closePrompt()
+	end, { state2 })
+
+	local onCloseClicked = React.useCallback(function()
+		pcall(function()
 			TelemetryService:LogCounter({
 				eventName = "FeedbackPrompt_Cancelled",
 				backends = { "RobloxTelemetryCounter" }
-			}, {
-				customFields = {}
-			}, 1)
+			}, { customFields = {} }, 1)
 		end)
-		pcall(function() -- line: 123
+		pcall(function()
 			local SocialService = game:GetService("SocialService")
 
 			if SocialService.SignalFeedbackSubmissionPermissionDenied then
 				SocialService:SignalFeedbackSubmissionPermissionDenied()
 			end
 		end)
-		t1.closePrompt()
+		p.closePrompt()
 	end, {})
 
-	useEscapeDismiss("FeedbackPromptCancel", v36)
-	React.useEffect(function() -- line: 134
-		-- upvalues: ContextActionService (copy), GuiService (copy), v35 (copy)
-		ContextActionService:BindCoreActionAtPriority("FeedbackPromptDisableGameControls", function(_, _, p3) -- line: 137
-			if p3 and p3.KeyCode == Enum.KeyCode.Escape then
+	useEscapeDismiss("FeedbackPromptCancel", onCloseClicked)
+
+	React.useEffect(function()
+		ContextActionService:BindCoreActionAtPriority("FeedbackPromptDisableGameControls", function(_, _, p2)
+			if p2 and p2.KeyCode == Enum.KeyCode.Escape then
 				return Enum.ContextActionResult.Pass
 			end
 
 			return Enum.ContextActionResult.Sink
 		end, false, Enum.ContextActionPriority.Low.Value, Enum.PlayerActions.CharacterForward, Enum.PlayerActions.CharacterBackward, Enum.PlayerActions.CharacterLeft, Enum.PlayerActions.CharacterRight, Enum.PlayerActions.CharacterJump)
-		ContextActionService:BindCoreAction("FeedbackPromptSubmit", function(_, p5) -- line: 152
-			-- upvalues: GuiService (copy), v35 (copy)
-			if p5 == Enum.UserInputState.Begin then
-				local SelectedCoreObject = GuiService.SelectedCoreObject
 
-				if SelectedCoreObject and SelectedCoreObject:IsA("TextBox") then
-					return Enum.ContextActionResult.Pass
-				end
-
-				v35()
-
-				return Enum.ContextActionResult.Sink
+		ContextActionService:BindCoreAction("FeedbackPromptSubmit", function(_, p2)
+			if p2 ~= Enum.UserInputState.Begin then
+				return Enum.ContextActionResult.Pass
 			end
 
-			return Enum.ContextActionResult.Pass
+			local selectedCoreObject = GuiService.SelectedCoreObject
+
+			if selectedCoreObject and selectedCoreObject:IsA("TextBox") then
+				return Enum.ContextActionResult.Pass
+			end
+
+			onActivated()
+			return Enum.ContextActionResult.Sink
 		end, false, Enum.KeyCode.ButtonA, Enum.KeyCode.Return)
 
-		return function() -- line: 164
-			-- upvalues: ContextActionService (copy)
+		return function()
 			ContextActionService:UnbindCoreAction("FeedbackPromptDisableGameControls")
 			ContextActionService:UnbindCoreAction("FeedbackPromptSubmit")
 		end
-	end, {
-		v35,
-		v36
-	})
-	React.useEffect(function() -- line: 170
-		-- upvalues: v31 (copy), GuiService (copy)
-		local function trySelect() -- line: 171
-			-- upvalues: v31 (copy), GuiService (copy)
-			local current = v31.current
+	end, { onActivated, onCloseClicked })
+
+	React.useEffect(function()
+		local function trySelect()
+			local current = ref.current
 
 			if current then
-				pcall(function() -- line: 174
-					-- upvalues: GuiService (copy), current (copy)
+				pcall(function()
 					GuiService:Select(current)
 				end)
 			end
@@ -184,194 +171,273 @@ return (React.memo(function(t1: {[any]: any}) -- line: 42
 		task.delay(0.2, trySelect)
 		task.delay(0.25, trySelect)
 
-		local connection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 182
-			-- upvalues: GuiService (copy), v31 (copy)
-			local SelectedCoreObject = GuiService.SelectedCoreObject
+		local selectedCoreObjectChangedConnection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function()
+			local selectedCoreObject = GuiService.SelectedCoreObject
+			local current = (selectedCoreObject == nil or selectedCoreObject and not selectedCoreObject.Parent)
+				and ref.current
 
-			if SelectedCoreObject == nil or SelectedCoreObject and not SelectedCoreObject.Parent then
-				local current = v31.current
-
-				if current then
-					pcall(function() -- line: 174
-						-- upvalues: GuiService (copy), current (copy)
-						GuiService:Select(current)
-					end)
-				end
+			if current then
+				pcall(function()
+					GuiService:Select(current)
+				end)
 			end
 		end)
-
-		return function() -- line: 188
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			selectedCoreObjectChangedConnection:Disconnect()
 		end
 	end, {})
 
-	local Title = v26.Title
-	local v38 = v29 and v26.Submitting or v26.Submit
-	local Placeholder = v26.Placeholder
-	local v40 = MIN_FEEDBACK_LENGTH <= #v27 and MAX_FEEDBACK_LENGTH >= #v27
-	local v41 = React.useCallback(function(p6) -- line: 199
-		-- upvalues: v28 (copy)
-		local p6Text = p6.Text
+	local title = v3.Title
+	local submitting = state3 and v3.Submitting or v3.Submit
+	local placeholder = v3.Placeholder
+	local v4
 
-		v28(p6Text)
+	if MIN_FEEDBACK_LENGTH <= #state2 then
+		v4 = #state2 <= MAX_FEEDBACK_LENGTH
+	else
+		v4 = false
+	end
+
+	local v5 = React.useCallback(function(p2)
+		setState2(p2.Text)
 	end, {})
-	local v42 = React.useCallback(function() -- line: 204
-		-- upvalues: v22 (copy), v21 (copy), constants (copy), React (copy), v26 (copy), ImageSetLabel (copy), v19 (copy), v27 (copy), Placeholder (copy), v31 (copy), v41 (copy)
-		local Body = v22.Font.Body
-		local BaseSize = v22.Font.BaseSize
-		local v53 = math.floor(Body.RelativeSize * BaseSize)
-		local v54 = math.clamp(v21.Y - 320, constants.MIN_TEXTBOX_HEIGHT, constants.MAX_TEXTBOX_HEIGHT)
-		local v55 = math.max(constants.MIN_TEXTBOX_HEIGHT, (math.min(constants.MAX_TEXTBOX_HEIGHT, v54)))
 
-		return React.createElement("Frame", {
+	local middleContent = React.useCallback(function()
+		local body = v.Font.Body
+		local baseSize = v.Font.BaseSize
+		local textSize = math.floor(body.RelativeSize * baseSize)
+
+		local v6 = math.clamp(screenSize.Y - 320, constants.MIN_TEXTBOX_HEIGHT, constants.MAX_TEXTBOX_HEIGHT)
+
+		local v7 = math.max(constants.MIN_TEXTBOX_HEIGHT, (math.min(constants.MAX_TEXTBOX_HEIGHT, v6)))
+
+		local createElement = React.createElement
+		local v8 = {
 			BackgroundTransparency = 1,
-			Selectable = false,
-			Size = UDim2.new(1, 0, 0, v55 + 16 + 24)
-		}, {
+			Size = UDim2.new(1, 0, 0, v7 + 16 + 24),
+			Selectable = false
+		}
+
+		local children = {
 			Layout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 16),
 				FillDirection = Enum.FillDirection.Vertical,
 				HorizontalAlignment = Enum.HorizontalAlignment.Left
 			}),
-			Intro = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				TextWrapped = true,
-				LayoutOrder = 0,
-				Selectable = false,
-				Text = v26.Intro,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Top,
-				TextColor3 = v22.Theme.TextEmphasis.Color,
-				TextTransparency = v22.Theme.TextEmphasis.Transparency,
-				Font = Body.Font,
-				TextSize = v53,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}),
-			TextBoxFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				Selectable = false,
-				Size = UDim2.new(1, 0, 0, v55)
-			}, {
-				InputBg = React.createElement(ImageSetLabel, {
-					BackgroundTransparency = 1,
-					Selectable = false,
-					Size = UDim2.new(1, 0, 1, 0),
-					Image = v19,
-					ImageTransparency = v22.Theme.UIMuted.Transparency,
-					ImageColor3 = v22.Theme.UIMuted.Color,
-					ScaleType = Enum.ScaleType.Slice,
-					SliceCenter = Rect.new(8, 8, 9, 9)
-				}, {
-					Padding = React.createElement("UIPadding", {
-						PaddingTop = UDim.new(0, 12),
-						PaddingBottom = UDim.new(0, 12),
-						PaddingLeft = UDim.new(0, 12),
-						PaddingRight = UDim.new(0, 12)
-					}),
-					TextBox = React.createElement("TextBox", {
-						Size = UDim2.new(1, 0, 1, 0),
-						BackgroundTransparency = 1,
-						Text = v27,
-						PlaceholderText = Placeholder,
-						TextWrapped = true,
-						TextXAlignment = Enum.TextXAlignment.Left,
-						TextYAlignment = Enum.TextYAlignment.Top,
-						TextColor3 = v22.Theme.TextEmphasis.Color,
-						TextTransparency = v22.Theme.TextEmphasis.Transparency,
-						PlaceholderColor3 = v22.Theme.TextMuted.Color,
-						Font = Body.Font,
-						TextSize = v53,
-						ClearTextOnFocus = false,
-						MultiLine = true,
-						OverlayNativeInput = true,
-						ref = v31,
-						[React.Change.Text] = v41,
-						[React.Tag] = "data-testid=feedbackTextBox"
-					})
-				})
-			})
-		})
-	end, {
-		v22,
-		v27,
-		v41
-	})
-	local v43 = React.useMemo(function() -- line: 288
-		-- upvalues: ButtonType (copy), v35 (copy), v38 (copy), t1 (copy), DELAYED_INPUT_ANIM_SEC (copy), v40 (copy), v29 (copy)
-		return {
-			buttons = {{
-				buttonType = ButtonType.PrimaryContextual,
-				props = {
-					onActivated = v35,
-					text = v38,
-					isDelayedInput = t1.enableInputDelayed,
-					enableInputDelayed = t1.enableInputDelayed,
-					delayInputSeconds = DELAYED_INPUT_ANIM_SEC,
-					isDisabled = not v40,
-					isLoading = v29
-				}
-			}}
+			Intro = 0,
+			TextBoxFrame = 0
 		}
-	end, {
-		v35,
-		v38,
-		t1.enableInputDelayed,
-		v40,
-		v29
-	})
-	local Footer = v26.Footer
-	local v45 = React.useCallback(function() -- line: 309
-		-- upvalues: Footer (copy), React (copy), v22 (copy)
-		local v56 = Footer
 
-		if type(v56) == "string" and string.find(v56, "Roblox Terms of Use", 1, true) then
-			v56 = string.gsub(v56, "Roblox Terms of Use", "<u>Roblox Terms of Use</u>", 1)
+		local createElement2 = React.createElement
+		local v9 = {
+			BackgroundTransparency = 1,
+			Text = v3.Intro,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			TextColor3 = v.Theme.TextEmphasis.Color,
+			TextTransparency = v.Theme.TextEmphasis.Transparency,
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			Size = 0,
+			AutomaticSize = 0,
+			LayoutOrder = 0,
+			Selectable = false
+		}
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = body.Font
 		end
 
-		return React.createElement("Frame", {
+		v9.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
+		end
+
+		v9.FontFace = fontFace
+
+		v9.TextSize = textSize
+		v9.Size = UDim2.new(1, 0, 0, 0)
+		v9.AutomaticSize = Enum.AutomaticSize.Y
+		children.Intro = createElement2("TextLabel", v9)
+
+		local createElement3 = React.createElement
+		local v10 = {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, v7),
+			LayoutOrder = 1,
+			Selectable = false
+		}
+
+		local createElement4 = React.createElement
+		local v11 = {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			Image = component_assetscircle_21,
+			ImageTransparency = v.Theme.UIMuted.Transparency,
+			ImageColor3 = v.Theme.UIMuted.Color,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(8, 8, 9, 9),
+			Selectable = false
+		}
+
+		local v12 = {
+			Padding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 12),
+				PaddingBottom = UDim.new(0, 12),
+				PaddingLeft = UDim.new(0, 12),
+				PaddingRight = UDim.new(0, 12)
+			}),
+			TextBox = 0
+		}
+
+		local createElement5 = React.createElement
+		local v13 = {}
+		v13.Size = UDim2.new(1, 0, 1, 0)
+		v13.BackgroundTransparency = 1
+		v13.Text = state2
+		v13.PlaceholderText = placeholder
+		v13.TextWrapped = true
+		v13.TextXAlignment = Enum.TextXAlignment.Left
+		v13.TextYAlignment = Enum.TextYAlignment.Top
+		v13.TextColor3 = v.Theme.TextEmphasis.Color
+		v13.TextTransparency = v.Theme.TextEmphasis.Transparency
+		v13.PlaceholderColor3 = v.Theme.TextMuted.Color
+		local font2
+
+		if not FoundationFontFaceMigration then
+			font2 = body.Font
+		end
+
+		v13.Font = font2
+		local fontFace2
+
+		if FoundationFontFaceMigration then
+			fontFace2 = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
+		end
+
+		v13.FontFace = fontFace2
+
+		v13.TextSize = textSize
+		v13.ClearTextOnFocus = false
+		v13.MultiLine = true
+		v13.OverlayNativeInput = true
+		v13.ref = ref
+		v13[React.Change.Text] = v5
+		v13[React.Tag] = "data-testid=feedbackTextBox"
+		v12.TextBox = createElement5("TextBox", v13)
+		children.TextBoxFrame = createElement3("Frame", v10, {
+			InputBg = createElement4(ImageSetLabel, v11, v12)
+		})
+		return createElement("Frame", v8, children)
+	end, { v, state2, v5 })
+
+	local buttonStackInfo = React.useMemo(function()
+		return {
+			buttons = {
+				{
+					buttonType = ButtonType.PrimaryContextual,
+					props = {
+						onActivated = onActivated,
+						text = submitting,
+						isDelayedInput = p.enableInputDelayed,
+						enableInputDelayed = p.enableInputDelayed,
+						delayInputSeconds = DELAYED_INPUT_ANIM_SEC,
+						isDisabled = not v4,
+						isLoading = state3
+					}
+				}
+			}
+		}
+	end, { onActivated, submitting, p.enableInputDelayed, v4, state3 })
+
+	local footer = v3.Footer
+
+	local footerContent = React.useCallback(function()
+		local text = footer
+
+		if type(text) == "string" and string.find(text, "Roblox Terms of Use", 1, true) then
+			text = string.gsub(text, "Roblox Terms of Use", "<u>Roblox Terms of Use</u>", 1)
+		end
+
+		local createElement = React.createElement
+		local v6 = {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y
-		}, {
-			Pad = React.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 12)
-			}),
-			Note = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				RichText = true,
-				TextWrapped = true,
-				LayoutOrder = 1,
-				Selectable = false,
-				Text = v56,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Top,
-				TextSize = math.floor(v22.Font.CaptionHeader.RelativeSize * v22.Font.BaseSize),
-				Font = v22.Font.CaptionHeader.Font,
-				TextColor3 = v22.Theme.TextMuted.Color,
-				TextTransparency = v22.Theme.TextMuted.Transparency,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			})
-		})
-	end, {
-		v22,
-		Footer
-	})
+		}
+		local v7 = {
+			Pad = React.createElement("UIPadding", { PaddingTop = UDim.new(0, 12) }),
+			Note = 0
+		}
 
-	return React.createElement(InteractiveAlert, {
+		local createElement2 = React.createElement
+		local v8 = {
+			BackgroundTransparency = 1,
+			Text = text,
+			RichText = true,
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			TextSize = math.floor(v.Font.CaptionHeader.RelativeSize * v.Font.BaseSize),
+			Font = 0,
+			FontFace = 0,
+			TextColor3 = 0,
+			TextTransparency = 0,
+			Size = 0,
+			AutomaticSize = 0,
+			LayoutOrder = 1,
+			Selectable = false
+		}
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = v.Font.CaptionHeader.Font
+		end
+
+		v8.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font)
+		end
+
+		v8.FontFace = fontFace
+
+		v8.TextColor3 = v.Theme.TextMuted.Color
+		v8.TextTransparency = v.Theme.TextMuted.Transparency
+		v8.Size = UDim2.new(1, 0, 0, 0)
+		v8.AutomaticSize = Enum.AutomaticSize.Y
+		v7.Note = createElement2("TextLabel", v8)
+		return createElement("Frame", v6, v7)
+	end, { v, footer })
+
+	local createElement = React.createElement
+	local v6 = {
+		title = title,
+		onCloseClicked = onCloseClicked,
+		buttonStackInfo = buttonStackInfo,
 		isMiddleContentFocusable = true,
-		title = Title,
-		onCloseClicked = v36,
-		buttonStackInfo = v43,
-		middleContent = v42,
+		middleContent = middleContent,
 		position = UDim2.fromScale(0.5, 0.5),
-		screenSize = v21,
-		defaultChildRef = if not v24 then nil else v31,
-		isRoactGamepadEnabled = v24,
-		footerContent = v45
-	})
+		screenSize = screenSize,
+		defaultChildRef = 0,
+		isRoactGamepadEnabled = 0,
+		footerContent = 0
+	}
+	local defaultChildRef
+
+	if state then
+		defaultChildRef = ref
+	end
+
+	v6.defaultChildRef = defaultChildRef
+	v6.isRoactGamepadEnabled = state
+	v6.footerContent = footerContent
+	return createElement(InteractiveAlert, v6)
 end))

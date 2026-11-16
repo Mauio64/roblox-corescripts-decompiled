@@ -1,23 +1,22 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Dash = require(FoundationParent.Dash)
-local FoundationImages = require(FoundationParent.FoundationImages)
+local parent = Foundation.Parent
+
+local Dash = require(parent.Dash)
+local FoundationImages = require(parent.FoundationImages)
 local Images = FoundationImages.Images
 local isBuilderIcon = require(Foundation.Utility.isBuilderIcon)
+
 local IconSize = require(Foundation.Enums.IconSize)
-local t1 = {
-	[IconSize.Small] = {
-		Vector2.new(16, 16),
-		Vector2.new(18, 18)
-	},
-	[IconSize.Medium] = {
-		Vector2.new(28, 28),
-		Vector2.new(36, 36)
-	},
+
+local v = {
+	[IconSize.Small] = { Vector2.new(16, 16), Vector2.new(18, 18) },
+	[IconSize.Medium] = { Vector2.new(28, 28), Vector2.new(36, 36) },
 	[IconSize.Large] = { Vector2.new(48, 48) }
 }
-local v9 = FoundationImages.getResolutionScale()
-local t2 = {
+
+local resolutionScale = FoundationImages.getResolutionScale()
+
+local v2 = {
 	Small = {
 		[IconSize.XSmall] = 0.66667,
 		[IconSize.Small] = 0.88889,
@@ -38,30 +37,30 @@ local t2 = {
 	}
 }
 
-local function useIcon(s1: string?, p1) -- line: 55
-	-- upvalues: isBuilderIcon (copy), Images (copy), v9 (copy), IconSize (copy), Dash (copy), t1 (copy), t2 (copy)
-	if not s1 or isBuilderIcon(s1) then
+local function useIcon(p: string?, p2)
+	if not p or isBuilderIcon(p) then
 		return nil, 1
 	end
 
-	local v14 = Images[s1]
+	local image = Images[p]
 
-	if not v14 then
+	if not image then
 		return nil, 1
 	end
 
-	local vector2 = Vector2.new(v14.ImageRectSize.X / v9, v14.ImageRectSize.Y / v9)
-	local Medium = IconSize.Medium
+	local vector2 = Vector2.new(image.ImageRectSize.X / resolutionScale, image.ImageRectSize.Y / resolutionScale)
 
-	if Dash.includes(t1[IconSize.Small], vector2) then
-		Medium = IconSize.Small
-	elseif Dash.includes(t1[IconSize.Medium], vector2) then
-		Medium = IconSize.Medium
-	elseif Dash.includes(t1[IconSize.Large], vector2) then
-		Medium = IconSize.Large
+	local v3 = IconSize.Medium
+
+	if Dash.includes(v[IconSize.Small], vector2) then
+		v3 = IconSize.Small
+	elseif Dash.includes(v[IconSize.Medium], vector2) then
+		v3 = IconSize.Medium
+	elseif Dash.includes(v[IconSize.Large], vector2) then
+		v3 = IconSize.Large
 	end
 
-	return vector2, t2[Medium][p1]
+	return vector2, v2[v3][p2]
 end
 
 return useIcon

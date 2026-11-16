@@ -1,116 +1,126 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local Analytics = require(ParentParent.Analytics)
-local util = ParentParent.util
-local floatEquals = require(ParentParent.util.floatEquals)
+local parent = script.Parent.Parent
+local Constants = require(parent.Constants)
 
+local Analytics = require(parent.Analytics)
+
+local util = parent.util
+local floatEquals = require(parent.util.floatEquals)
 require(util.Types)
-
 local pcallDeferred = require(util.pcallDeferred)
 local getMeshSize = require(util.getMeshSize)
 local getEditableMeshFromContext = require(util.getEditableMeshFromContext)
 local FailureReasonsAccumulator = require(util.FailureReasonsAccumulator)
-local t1 = {}
 
-local function reportFailure(s1: string, s2: string, p1, b1: boolean) -- line: 21
-	-- upvalues: Analytics (copy)
-	if b1 and (p1.isServer ~= nil and p1.isServer) then
-		error(s1)
+local function reportFailure(message: string, p: string, p2, flag: boolean)
+	if flag and p2.isServer ~= nil and p2.isServer then
+		error(message)
 	end
 
-	Analytics.reportFailure(s2, nil, p1)
+	Analytics.reportFailure(p, nil, p2)
+	return false, { message }
+end
 
-	return false, { s1 }
+local function vector3Equals(meshSize: Vector3, vector3: Vector3) -- 1 equivalent call inferred from this helper
+	return floatEquals(meshSize.X, vector3.X, 0.00001)
+		and floatEquals(meshSize.Y, vector3.Y, 0.00001)
+		and floatEquals(meshSize.Z, vector3.Z, 0.00001)
 end
-local function vector3Equals(vector3: Vector3, vector3_2: Vector3) -- line: 40
-	-- upvalues: floatEquals (copy)
-	return floatEquals(vector3.X, vector3_2.X, 1E-05) and (floatEquals(vector3.Y, vector3_2.Y, 1E-05) and floatEquals(vector3.Z, vector3_2.Z, 1E-05))
-end
-local function calculateMeshSize(p2, p3) -- line: 45
-	-- upvalues: getEditableMeshFromContext (copy), reportFailure (copy), Analytics (copy), pcallDeferred (copy), getMeshSize (copy)
-	local t2 = {
+
+local function calculateMeshSize(instance, p)
+	local v = {
+		fullName = instance:GetFullName(),
 		fieldName = "MeshId",
-		fullName = p2:GetFullName(),
-		contentId = p2.MeshId,
-		context = p2.Name
+		contentId = instance.MeshId,
+		context = instance.Name
 	}
-	local v24, v25 = getEditableMeshFromContext(p2, "MeshId", p3)
 
-	if not v24 then
-		return reportFailure(string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", p2.Name), Analytics.ErrorType.validateMeshSizeProperty_FailedToLoadMesh, p3, false)
+	local editableMeshFromContext, editableMesh = getEditableMeshFromContext(instance, "MeshId", p)
+
+	if not editableMeshFromContext then
+		return reportFailure(
+			string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", instance.Name),
+			Analytics.ErrorType.validateMeshSizeProperty_FailedToLoadMesh,
+			p,
+			false
+		)
 	end
 
-	t2.editableMesh = v25
+	v.editableMesh = editableMesh
 
-	local v26, v27 = pcallDeferred(function() -- line: 68
-		-- upvalues: getMeshSize (copy), t2 (copy)
-		return getMeshSize(t2)
-	end, p3)
+	local v2, v3 = pcallDeferred(function()
+		return getMeshSize(v)
+	end, p)
 
-	if not v26 then
-		return reportFailure(string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", p2.Name), Analytics.ErrorType.validateMeshSizeProperty_FailedToLoadMesh, p3, true)
+	if v2 then
+		return true, nil, v3
 	end
 
-	return true, nil, v27
-end
-local function validateInternal(p4, p5) -- line: 83
-	-- upvalues: calculateMeshSize (copy), floatEquals (copy), reportFailure (copy), Analytics (copy)
-	local timestamp = tick()
-	local v31, v32, v33 = calculateMeshSize(p4, p5)
-
-	if not v31 or not v33 then
-		return v31, v32
-	end
-
-	local MeshSize = p4.MeshSize
-
-	if not floatEquals(MeshSize.X, v33.X, 1E-05) or (not floatEquals(MeshSize.Y, v33.Y, 1E-05) or not floatEquals(MeshSize.Z, v33.Z, 1E-05)) then
-		return reportFailure(string.format("Calculated mesh size for %s does not match MeshSize property value", p4.Name), Analytics.ErrorType.validateMeshSizeProperty_Mismatch, p5, false)
-	end
-
-	Analytics.recordScriptTime(script.Name, timestamp, p5)
-
-	return true
+	return reportFailure(
+		string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", instance.Name),
+		Analytics.ErrorType.validateMeshSizeProperty_FailedToLoadMesh,
+		p,
+		true
+	)
 end
 
-function t1.validateSingleMeshPart(p6, p7) -- line: 107
-	-- upvalues: validateInternal (copy)
-	if p7.allowEditableInstances then
+local function validateInternal(p, p2)
+	local now = tick()
+
+	local v, v2, v3 = calculateMeshSize(p, p2)
+
+	if not (v and v3) then
+		return v, v2
+	end
+
+	if vector3Equals(p.MeshSize, v3) then -- inferred equivalent call
+		Analytics.recordScriptTime(script.Name, now, p2)
 		return true
 	end
 
-	return validateInternal(p6, p7)
+	return reportFailure(
+		string.format("Calculated mesh size for %s does not match MeshSize property value", p.Name),
+		Analytics.ErrorType.validateMeshSizeProperty_Mismatch,
+		p2,
+		false
+	)
 end
-function t1.validateBodyAsset(p8, p9) -- line: 117
-	-- upvalues: validateInternal (copy), Analytics (copy), FailureReasonsAccumulator (copy), Constants (copy)
-	local timestamp = tick()
 
-	if p9.allowEditableInstances then
+local ValidateMeshSizeProperty = {}
+
+function ValidateMeshSizeProperty.validateSingleMeshPart(p, p2)
+	if p2.allowEditableInstances then
 		return true
 	end
 
-	local assetTypeEnum = p9.assetTypeEnum
-
-	if assetTypeEnum == Enum.AssetType.DynamicHead then
-		local v41, v42 = validateInternal(p8, p9)
-
-		Analytics.recordScriptTime(script.Name, timestamp, p9)
-
-		return v41, v42
-	end
-
-	local v43 = FailureReasonsAccumulator.new()
-
-	for v44 in Constants.ASSET_TYPE_INFO[assetTypeEnum].subParts do
-		local v45 = p8:FindFirstChild(v44)
-
-		assert(v45)
-		v43:updateReasons(validateInternal(v45, p9))
-	end
-
-	Analytics.recordScriptTime(script.Name, timestamp, p9)
-
-	return v43:getFinalResults()
+	return validateInternal(p, p2)
 end
 
-return t1
+function ValidateMeshSizeProperty.validateBodyAsset(instance, p)
+	local now = tick()
+
+	if p.allowEditableInstances then
+		return true
+	end
+
+	local assetTypeEnum = p.assetTypeEnum
+
+	if Enum.AssetType.DynamicHead == assetTypeEnum then
+		local v, v2 = validateInternal(instance, p)
+		Analytics.recordScriptTime(script.Name, now, p)
+		return v, v2
+	else
+		local v = FailureReasonsAccumulator.new()
+
+		for childName in Constants.ASSET_TYPE_INFO[assetTypeEnum].subParts do
+			local child = instance:FindFirstChild(childName)
+			assert(child)
+
+			v:updateReasons(validateInternal(child, p))
+		end
+
+		Analytics.recordScriptTime(script.Name, now, p)
+		return v:getFinalResults()
+	end
+end
+
+return ValidateMeshSizeProperty

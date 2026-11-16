@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-return require(ParentParent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 6
-	return {
-		serverType = p1
-	}
+local Rodux = require(parent.Rodux)
+
+return Rodux.makeActionCreator(script.Name, function(serverType)
+	return { serverType = serverType }
 end)

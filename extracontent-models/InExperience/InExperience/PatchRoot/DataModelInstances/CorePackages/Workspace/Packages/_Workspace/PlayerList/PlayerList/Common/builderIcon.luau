@@ -1,8 +1,8 @@
-local function builderIcon(s1: string, s2: string?) -- line: 1
+local function builderIcon(name: string, value: string?)
 	return {
 		isFoundationIcon = true,
-		name = s1,
-		variant = s2 or "Regular"
+		name = name,
+		variant = value or "Regular"
 	}
 end
 

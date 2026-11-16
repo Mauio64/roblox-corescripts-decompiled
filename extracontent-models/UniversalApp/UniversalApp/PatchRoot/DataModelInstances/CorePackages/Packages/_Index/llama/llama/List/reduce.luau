@@ -1,23 +1,17 @@
-local function reduce(p1, p2, p3) -- line: 2
-	local v5 = type(p1)
+local function reduce(list, callback, p)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+	local typeName2 = type(callback)
+	assert(typeName2 == "function", "expected a function for second argument, got " .. typeName2)
 
-	local v6 = type(p2)
+	local v = if p == nil then list[1] else p
 
-	assert(v6 == "function", "expected a function for second argument, got " .. v6)
-
-	local v7 = p3
-
-	if v7 == nil then
-		v7 = p1[1]
+	for i = p == nil and 2 or 1, #list do
+		v = callback(v, list[i], i)
 	end
 
-	for i = p3 ~= nil and 1 or 2, #p1 do
-		v7 = p2(v7, p1[i], i)
-	end
-
-	return v7
+	return v
 end
 
 return reduce

@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("Navigation").Parent
+local parent = script:FindFirstAncestor("Navigation").Parent
 
-require(Parent.React)
+require(parent.React)
 
 return nil

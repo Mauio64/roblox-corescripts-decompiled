@@ -1,5 +1,1 @@
-return {
-	UsernameMatch = "UsernameMatch",
-	Length = "Length",
-	Simple = "Simple"
-}
+return { UsernameMatch = "UsernameMatch", Length = "Length", Simple = "Simple" }

@@ -1,8 +1,12 @@
-local Parent = script:FindFirstAncestor("SquadsCore").Parent
-local Dash = require(Parent.Dash)
-local Enums = require(Parent.SocialLuaAnalytics).Analytics.Enums
+local parent = script:FindFirstAncestor("SquadsCore").Parent
+
+local Dash = require(parent.Dash)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Enums = SocialLuaAnalytics.Analytics.Enums
+
 local Contexts = Enums.Contexts
 local EventTypes = Enums.EventTypes
+
 local EventNames = require(script.Parent.EventNames)
 
 return {

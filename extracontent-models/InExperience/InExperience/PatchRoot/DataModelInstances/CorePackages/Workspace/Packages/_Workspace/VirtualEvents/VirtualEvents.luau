@@ -1,5 +1,6 @@
-local _script = script
-local VirtualEventsState = require(_script.Parent.VirtualEventsState)
+local script2 = script
+local VirtualEventsState = require(script2.Parent.VirtualEventsState)
+
 local EventNotificationsModal = require(script.Components.EventNotificationsModal)
 
 return {

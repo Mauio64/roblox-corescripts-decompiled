@@ -1,1 +1,3 @@
-return (require(script.ChipFilterGroup))
+local ChipFilterGroup = require(script.ChipFilterGroup)
+
+return ChipFilterGroup

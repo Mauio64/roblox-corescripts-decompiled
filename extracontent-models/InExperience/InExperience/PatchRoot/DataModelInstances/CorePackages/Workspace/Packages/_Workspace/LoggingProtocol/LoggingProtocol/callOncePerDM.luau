@@ -1,11 +1,10 @@
-local t1 = {}
+local set = {}
 
-return function(s1: string, p1: ((...any) -> ...any)) -- line: 3
-	-- upvalues: t1 (copy)
-	if t1[s1] then
+return function(p: string, callback)
+	if set[p] then
 		return
 	end
 
-	t1[s1] = true
-	p1()
+	set[p] = true
+	callback()
 end

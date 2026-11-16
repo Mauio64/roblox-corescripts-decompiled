@@ -1,1 +1,3 @@
-return (require(script.AvatarIconGroup))
+local AvatarIconGroup = require(script.AvatarIconGroup)
+
+return AvatarIconGroup

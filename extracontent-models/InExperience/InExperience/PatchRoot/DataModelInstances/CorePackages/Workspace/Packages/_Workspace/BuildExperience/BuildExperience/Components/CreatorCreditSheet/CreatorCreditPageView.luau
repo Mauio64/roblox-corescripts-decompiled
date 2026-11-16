@@ -1,16 +1,26 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
+local parent = BuildExperience.Parent
+
 local LocalizationService = game:GetService("LocalizationService")
-local Foundation = require(BuildExperienceParent.Foundation)
-local NumberLocalization = require(BuildExperienceParent.Localization).NumberLocalization
-local React = require(BuildExperienceParent.React)
+
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local NumberLocalization = Localization.NumberLocalization
+local React = require(parent.React)
+local Localization2 = require(parent.Localization)
+local useLocalization = Localization2.Hooks.useLocalization
+
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
+local FFlagBuildExperienceFreeTrialResetPeriod = require(BuildExperience.Flags.FFlagBuildExperienceFreeTrialResetPeriod)
+
 local Button = Foundation.Button
 local Icon = Foundation.Icon
 local Progress = Foundation.Progress
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Toggle = Foundation.Toggle
 local View = Foundation.View
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
@@ -18,248 +28,358 @@ local InputSize = Foundation.Enums.InputSize
 local ProgressShape = Foundation.Enums.ProgressShape
 local ProgressSize = Foundation.Enums.ProgressSize
 
-local function noop() -- line: 26
-end
-local function clampPct(n1: number) -- line: 46
-	if n1 < 0 then
+local function noop() end
+
+local function clampPct(pctUsed: number) -- 1 equivalent call inferred from this helper
+	if pctUsed < 0 then
 		return 0
 	end
 
-	if n1 > 100 then
-		return 100
-	end
-
-	return n1
+	return if pctUsed > 100 then 100 else pctUsed
 end
-local function formatNumber(n2: number) -- line: 55
-	-- upvalues: NumberLocalization (copy), LocalizationService (copy)
-	return NumberLocalization.localize(string.format("%.0f", (math.floor(n2))), LocalizationService.RobloxLocaleId)
+
+local function formatNumber(p: number) -- 2 equivalent calls inferred from this helper
+	return NumberLocalization.localize(string.format("%.0f", (math.floor(p))), LocalizationService.RobloxLocaleId)
 end
-local function FreeUsageCard(t1: {[any]: any}) -- line: 59
-	-- upvalues: LocalizationStrings (copy), React (copy), View (copy), FoundationText (copy), Progress (copy), ProgressShape (copy), ProgressSize (copy)
-	local pctUsed = t1.pctUsed
-	local v31 = if not (pctUsed < 0) then if not (pctUsed > 100) then pctUsed else 100 else 0
-	local v32 = if not (math.floor(v31 + 0.5) > 0) or t1.resetHours == nil then LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_CAPTION else LocalizationStrings.formatCreatorCreditResetHours(t1.resetHours)
 
-	return React.createElement(View, {
-		tag = "col gap-small size-full-0 auto-y padding-large radius-large bg-shift-100",
-		testId = "creator-credit-page-free-usage-card",
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		Label = React.createElement(FoundationText, {
-			LayoutOrder = 1,
-			tag = "size-full-0 auto-y text-title-medium text-align-x-left content-emphasis",
-			testId = "creator-credit-page-free-usage-label",
-			Text = LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_LABEL
-		}),
-		Value = React.createElement(FoundationText, {
-			LayoutOrder = 2,
-			tag = "size-full-0 auto-y text-heading-small text-align-x-left content-emphasis",
-			testId = "creator-credit-page-free-usage-value",
-			Text = LocalizationStrings.formatCreatorCreditPercentUsed(v31)
-		}),
-		Bar = React.createElement(Progress, {
-			LayoutOrder = 3,
-			testId = "creator-credit-page-daily-progress",
-			shape = ProgressShape.Bar,
-			size = ProgressSize.Medium,
-			value = v31,
-			width = UDim.new(1, 0)
-		}),
-		Caption = React.createElement(FoundationText, {
-			LayoutOrder = 4,
-			tag = "size-full-0 auto-y padding-top-medium text-body-small text-align-x-left content-muted",
-			testId = "creator-credit-page-free-usage-reset",
-			Text = v32
-		})
-	})
-end
-local function RobuxLine(t2: {[any]: any}) -- line: 103
-	-- upvalues: LocalizationStrings (copy), NumberLocalization (copy), LocalizationService (copy), formatNumber (copy), React (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy)
-	local v36
+local function FreeUsageCard(props)
+	local v = clampPct(props.pctUsed) -- inferred equivalent call
+	local v2 = {
+		caption = LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_CAPTION,
+		captionWeekly = LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_CAPTION_WEEKLY,
+		captionMonthly = LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_CAPTION_MONTHLY,
+		label = LocalizationStrings.CREATOR_CREDIT_FREE_USAGE_LABEL,
+		percentUsed = {
+			LocalizationStrings.CREATOR_CREDIT_PERCENT_USED,
+			PERCENT = math.floor(v + 0.5)
+		},
+		resetHours = 0
+	}
+	local resetHours
 
-	if t2.kind == "used" then
-		assert(t2.usedOf ~= nil, "usedOf required when kind == 'used'")
-
-		local formatCreatorCreditAdditionalUsed = LocalizationStrings.formatCreatorCreditAdditionalUsed
-		local amount = t2.amount
-
-		v36 = formatCreatorCreditAdditionalUsed(NumberLocalization.localize(string.format("%.0f", (math.floor(amount))), LocalizationService.RobloxLocaleId), formatNumber(t2.usedOf))
-	elseif t2.kind == "usedNoLimit" then
-		v36 = LocalizationStrings.formatCreatorCreditAdditionalUsedNoLimit(formatNumber(t2.amount))
+	if props.resetHours == 1 then
+		resetHours = LocalizationStrings.CREATOR_CREDIT_RESET_ONE_HOUR
 	else
-		local amount = t2.amount
-
-		v36 = `{ NumberLocalization.localize(string.format("%.0f", (math.floor(amount))), LocalizationService.RobloxLocaleId) } { LocalizationStrings.CREATOR_CREDIT_AVAILABLE_SUFFIX }`
+		resetHours = props.resetHours ~= nil and {
+			LocalizationStrings.CREATOR_CREDIT_RESET_HOURS,
+			HOURS = props.resetHours
+		} or nil
 	end
 
-	return React.createElement(View, {
-		tag = "row align-y-center gap-xsmall size-full-0 auto-y padding-bottom-medium",
-		LayoutOrder = t2.LayoutOrder
-	}, {
-		IconEl = React.createElement(Icon, {
-			LayoutOrder = 1,
-			name = IconName.Robux,
-			size = IconSize.Medium,
-			tag = {
-				["auto-xy"] = true,
-				["content-muted"] = not t2.isEnabled,
-				["content-emphasis"] = t2.isEnabled
-			}
-		}),
-		Amount = React.createElement(FoundationText, {
-			LayoutOrder = 2,
-			testId = "creator-credit-page-robux-line",
-			Text = v36,
-			tag = {
-				["auto-xy text-heading-small"] = true,
-				["content-muted"] = not t2.isEnabled,
-				["content-emphasis"] = t2.isEnabled
-			}
-		})
-	})
-end
-local function AdditionalUsageCard(t3: {[any]: any}) -- line: 150
-	-- upvalues: LocalizationStrings (copy), React (copy), View (copy), FoundationText (copy), Toggle (copy), InputSize (copy), RobuxLine (copy), Button (copy), ButtonVariant (copy), noop (copy)
-	local v39 = t3.additionalEnabled and t3.dailyLimit ~= nil
-	local v40 = v39 or t3.additionalEnabled and t3.hasLimitConfigured == true
-	local v41 = v40 and not v39
-	local v42 = if not t3.additionalEnabled then LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USAGE_LABEL else LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_DAILY_USAGE_LABEL
-	local t4 = {
-		Header = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "row align-y-center size-full-0 auto-y"
-		}, {
-			Label = React.createElement(FoundationText, {
+	v2.resetHours = resetHours
+	local v3 = useLocalization(v2)
+
+	local label = v3.label
+	local percentUsed = v3.percentUsed
+	local text
+
+	if FFlagBuildExperienceFreeTrialResetPeriod then
+		if props.resetPeriod == "Weekly" then
+			text = v3.captionWeekly
+		elseif props.resetPeriod == "Monthly" then
+			text = v3.captionMonthly
+		else
+			text = v3.caption
+		end
+
+		if
+			(props.resetPeriod == nil or props.resetPeriod == "Daily")
+			and math.floor(v + 0.5) > 0
+			and props.resetHours ~= nil
+		then
+			text = v3.resetHours
+		end
+	else
+		text = v3.caption
+
+		if math.floor(v + 0.5) > 0 and props.resetHours ~= nil then
+			text = v3.resetHours
+		end
+	end
+
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = props.LayoutOrder,
+			tag = "col gap-small size-full-0 auto-y padding-large radius-large bg-shift-100",
+			testId = "creator-credit-page-free-usage-card"
+		},
+		{
+			Label = React.createElement(Text, {
 				LayoutOrder = 1,
-				testId = "creator-credit-page-additional-usage-label",
-				Text = v42,
+				Text = label,
+				tag = "size-full-0 auto-y text-title-medium text-align-x-left content-emphasis",
+				testId = "creator-credit-page-free-usage-label"
+			}),
+			Value = React.createElement(Text, {
+				LayoutOrder = 2,
+				Text = percentUsed,
+				tag = "size-full-0 auto-y text-heading-small text-align-x-left content-emphasis",
+				testId = "creator-credit-page-free-usage-value"
+			}),
+			Bar = React.createElement(Progress, {
+				LayoutOrder = 3,
+				shape = ProgressShape.Bar,
+				size = ProgressSize.Medium,
+				value = v,
+				width = UDim.new(1, 0),
+				testId = "creator-credit-page-daily-progress"
+			}),
+			Caption = React.createElement(Text, {
+				LayoutOrder = 4,
+				Text = text,
+				tag = "size-full-0 auto-y padding-top-medium text-body-small text-align-x-left content-muted",
+				testId = "creator-credit-page-free-usage-reset"
+			})
+		}
+	)
+end
+
+local function RobuxLine(props)
+	local v = formatNumber(props.amount) -- inferred equivalent call
+	local usedOf = props.usedOf
+
+	if props.kind == "used" then
+		assert(usedOf ~= nil, "usedOf required when kind == 'used'")
+	end
+
+	local limit = usedOf == nil and "" or formatNumber(usedOf) -- inferred equivalent call
+	local v2 = {
+		available = props.kind == "available" and {
+			LocalizationStrings.CREATOR_CREDIT_AMOUNT_AVAILABLE,
+			AMOUNT = v
+		} or nil,
+		used = 0
+	}
+	local used
+
+	if props.kind == "used" then
+		used = {
+			LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USED,
+			USED = v,
+			LIMIT = limit
+		}
+	else
+		used = props.kind == "usedNoLimit" and {
+			LocalizationStrings.CREATOR_CREDIT_UNLIMITED_USED,
+			USED = v
+		} or nil
+	end
+
+	v2.used = used
+	local v3 = useLocalization(v2)
+	local text
+
+	if props.kind == "available" then
+		text = v3.available
+	else
+		text = v3.used
+	end
+
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = props.LayoutOrder,
+			tag = "row align-y-center gap-xsmall size-full-0 auto-y padding-bottom-medium"
+		},
+		{
+			IconEl = React.createElement(Icon, {
+				LayoutOrder = 1,
+				name = IconName.Robux,
+				size = IconSize.Medium,
 				tag = {
-					["fill auto-y text-title-medium text-align-x-left"] = true,
-					["content-default"] = not t3.additionalEnabled,
-					["content-emphasis"] = t3.additionalEnabled
+					["auto-xy"] = true,
+					["content-muted"] = not props.isEnabled,
+					["content-emphasis"] = props.isEnabled
 				}
 			}),
-			ToggleSwitch = React.createElement(Toggle, {
+			Amount = React.createElement(Text, {
 				LayoutOrder = 2,
-				label = "",
-				testId = "creator-credit-page-additional-toggle",
-				size = InputSize.Medium,
-				isChecked = t3.additionalEnabled,
-				isDisabled = t3.settingsDisabled == true,
-				onActivated = function(b1: boolean) -- line: 193
-					-- upvalues: t3 (copy)
-					if not t3.settingsDisabled then
-						t3.onToggleAdditional(b1)
-					end
-				end
+				Text = text,
+				tag = {
+					["auto-xy text-heading-small"] = true,
+					["content-muted"] = not props.isEnabled,
+					["content-emphasis"] = props.isEnabled
+				},
+				testId = "creator-credit-page-robux-line"
 			})
-		})
-	}
+		}
+	)
+end
 
-	if v39 then
-		assert(t3.dailyLimit ~= nil, "dailyLimit must be provided when a numeric limit is configured")
-		t4.UsageLine = React.createElement(RobuxLine, {
+local function AdditionalUsageCard(props)
+	local v = useLocalization({
+		additionalDailyUsage = LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_DAILY_USAGE_LABEL,
+		additionalUsage = LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USAGE_LABEL,
+		description = LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USAGE_DESCRIPTION,
+		setDailyLimit = LocalizationStrings.CREATOR_CREDIT_SET_DAILY_LIMIT,
+		manageLimit = LocalizationStrings.CREATOR_CREDIT_MANAGE_LIMIT,
+		settingsSaveError = LocalizationStrings.CREATOR_CREDIT_SETTINGS_SAVE_ERROR,
+		buyRobux = LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_BUTTON
+	})
+
+	local additionalDailyUsage = v.additionalDailyUsage
+	local text = v.additionalUsage
+	local description = v.description
+	local text2 = v.setDailyLimit
+	local manageLimit = v.manageLimit
+	local settingsSaveError = v.settingsSaveError
+	local buyRobux = v.buyRobux
+	local v2 = props.additionalEnabled and props.dailyLimit ~= nil
+	local v3 = v2 or props.additionalEnabled and props.hasLimitConfigured == true
+	local v4 = v3 and not v2
+
+	if props.additionalEnabled then
+		text = additionalDailyUsage
+	end
+
+	local children = {}
+
+	children.Header = React.createElement(View, {
+		LayoutOrder = 1,
+		tag = "row align-y-center size-full-0 auto-y"
+	}, {
+		Label = React.createElement(Text, {
+			LayoutOrder = 1,
+			Text = text,
+			tag = {
+				["fill auto-y text-title-medium text-align-x-left"] = true,
+				["content-default"] = not props.additionalEnabled,
+				["content-emphasis"] = props.additionalEnabled
+			},
+			testId = "creator-credit-page-additional-usage-label"
+		}),
+		ToggleSwitch = React.createElement(Toggle, {
 			LayoutOrder = 2,
-			kind = "used",
-			amount = t3.additionalUsed,
-			usedOf = t3.dailyLimit,
-			isEnabled = t3.additionalEnabled
+			size = InputSize.Medium,
+			label = "",
+			isChecked = props.additionalEnabled,
+			isDisabled = props.settingsDisabled == true,
+			onActivated = function(flag: boolean)
+				if not props.settingsDisabled then
+					props.onToggleAdditional(flag)
+				end
+			end,
+			testId = "creator-credit-page-additional-toggle"
 		})
-	elseif v41 then
-		t4.UsageLine = React.createElement(RobuxLine, {
+	})
+
+	if v2 then
+		assert(props.dailyLimit ~= nil, "dailyLimit must be provided when a numeric limit is configured")
+		children.UsageLine = React.createElement(RobuxLine, {
 			LayoutOrder = 2,
+			amount = props.additionalUsed,
+			kind = "used",
+			usedOf = props.dailyLimit,
+			isEnabled = props.additionalEnabled
+		})
+	elseif v4 then
+		children.UsageLine = React.createElement(RobuxLine, {
+			LayoutOrder = 2,
+			amount = props.additionalUsed,
 			kind = "usedNoLimit",
-			amount = t3.additionalUsed,
-			isEnabled = t3.additionalEnabled
+			isEnabled = props.additionalEnabled
 		})
 	else
-		t4.AvailableLine = React.createElement(RobuxLine, {
+		children.AvailableLine = React.createElement(RobuxLine, {
 			LayoutOrder = 2,
+			amount = props.robuxAvailable,
 			kind = "available",
-			amount = t3.robuxAvailable,
-			isEnabled = t3.additionalEnabled
+			isEnabled = props.additionalEnabled
 		})
 	end
 
-	if not t3.additionalEnabled then
-		t4.Description = React.createElement(FoundationText, {
-			LayoutOrder = 3,
-			tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-muted",
-			Text = LocalizationStrings.CREATOR_CREDIT_ADDITIONAL_USAGE_DESCRIPTION
-		})
-	else
-		local v44 = if not v40 then LocalizationStrings.CREATOR_CREDIT_SET_DAILY_LIMIT else LocalizationStrings.CREATOR_CREDIT_MANAGE_LIMIT
-		local v45 = not v40 and "creator-credit-page-set-daily-limit" or "creator-credit-page-manage-limit"
+	if props.additionalEnabled then
+		if v3 then
+			text2 = manageLimit
+		end
 
-		t4.ActionsRow = React.createElement(View, {
-			LayoutOrder = 3,
-			tag = "row align-x-left align-y-center gap-small size-full-0 auto-y"
-		}, {
-			BuyRobuxButton = if not t3.showBuyRobux then nil else React.createElement(Button, {
+		local createElement = React.createElement
+		local buyRobuxButton
+
+		if props.showBuyRobux then
+			buyRobuxButton = React.createElement(Button, {
 				LayoutOrder = 1,
-				testId = "creator-credit-page-buy-robux",
-				text = LocalizationStrings.CREATOR_CREDIT_BUY_ROBUX_BUTTON,
+				text = buyRobux,
 				variant = ButtonVariant.Emphasis,
 				size = InputSize.Medium,
-				onActivated = t3.onOpenBuyRobux or noop,
-				isDisabled = t3.onOpenBuyRobux == nil
-			}),
-			LimitButton = React.createElement(Button, {
-				LayoutOrder = 2,
-				text = v44,
-				variant = ButtonVariant.Standard,
-				size = InputSize.Medium,
-				onActivated = t3.onOpenLimitSheet or noop,
-				isDisabled = t3.settingsDisabled == true or t3.onOpenLimitSheet == nil,
-				testId = v45
+				onActivated = props.onOpenBuyRobux or noop,
+				isDisabled = props.onOpenBuyRobux == nil,
+				testId = "creator-credit-page-buy-robux"
 			})
+		end
+
+		children.ActionsRow = createElement(
+			View,
+			{
+				LayoutOrder = 3,
+				tag = "row align-x-left align-y-center gap-small size-full-0 auto-y"
+			},
+			{
+				BuyRobuxButton = buyRobuxButton,
+				LimitButton = React.createElement(Button, {
+					LayoutOrder = 2,
+					text = text2,
+					variant = ButtonVariant.Standard,
+					size = InputSize.Medium,
+					onActivated = props.onOpenLimitSheet or noop,
+					isDisabled = props.settingsDisabled == true or props.onOpenLimitSheet == nil,
+					testId = v3 and "creator-credit-page-manage-limit" or "creator-credit-page-set-daily-limit"
+				})
+			}
+		)
+	else
+		children.Description = React.createElement(Text, {
+			LayoutOrder = 3,
+			Text = description,
+			tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-muted"
 		})
 	end
 
-	if t3.settingsError then
-		t4.SettingsError = React.createElement(FoundationText, {
+	if props.settingsError then
+		children.SettingsError = React.createElement(Text, {
 			LayoutOrder = 4,
+			Text = settingsSaveError,
 			tag = "size-full-0 auto-y text-caption-medium text-wrap text-align-x-left content-system-alert",
-			testId = "creator-credit-page-settings-error",
-			Text = LocalizationStrings.CREATOR_CREDIT_SETTINGS_SAVE_ERROR
+			testId = "creator-credit-page-settings-error"
 		})
 	end
 
 	return React.createElement(View, {
-		testId = "creator-credit-page-additional-usage-card",
-		LayoutOrder = t3.LayoutOrder,
+		LayoutOrder = props.LayoutOrder,
 		tag = {
 			["col gap-small size-full-0 auto-y padding-large radius-large"] = true,
-			["bg-shift-100"] = t3.additionalEnabled,
-			["stroke-standard stroke-default"] = not t3.additionalEnabled
-		}
-	}, t4)
+			["bg-shift-100"] = props.additionalEnabled,
+			["stroke-standard stroke-default"] = not props.additionalEnabled
+		},
+		testId = "creator-credit-page-additional-usage-card"
+	}, children)
 end
-local function CreatorCreditPageView(t5: {[any]: any}) -- line: 288
-	-- upvalues: React (copy), View (copy), FreeUsageCard (copy), AdditionalUsageCard (copy)
+
+local function CreatorCreditPageView(props)
 	return React.createElement(View, {
 		tag = "col gap-medium size-full-0 auto-y padding-y-xlarge",
-		testId = t5.testId or "creator-credit-page"
+		testId = props.testId or "creator-credit-page"
 	}, {
 		FreeUsage = React.createElement(FreeUsageCard, {
 			LayoutOrder = 1,
-			pctUsed = t5.dailyPctUsed,
-			resetHours = t5.resetHours
+			pctUsed = props.dailyPctUsed,
+			resetHours = props.resetHours,
+			resetPeriod = props.resetPeriod
 		}),
 		AdditionalUsage = React.createElement(AdditionalUsageCard, {
 			LayoutOrder = 2,
-			additionalEnabled = t5.additionalEnabled,
-			dailyLimit = t5.dailyLimit,
-			hasLimitConfigured = t5.hasLimitConfigured,
-			additionalUsed = t5.additionalUsed,
-			robuxAvailable = t5.robuxAvailable,
-			settingsDisabled = t5.settingsDisabled,
-			settingsError = t5.settingsError,
-			showBuyRobux = t5.showBuyRobux,
-			onToggleAdditional = t5.onToggleAdditional,
-			onOpenLimitSheet = t5.onOpenLimitSheet,
-			onOpenBuyRobux = t5.onOpenBuyRobux
+			additionalEnabled = props.additionalEnabled,
+			dailyLimit = props.dailyLimit,
+			hasLimitConfigured = props.hasLimitConfigured,
+			additionalUsed = props.additionalUsed,
+			robuxAvailable = props.robuxAvailable,
+			settingsDisabled = props.settingsDisabled,
+			settingsError = props.settingsError,
+			showBuyRobux = props.showBuyRobux,
+			onToggleAdditional = props.onToggleAdditional,
+			onOpenLimitSheet = props.onOpenLimitSheet,
+			onOpenBuyRobux = props.onOpenBuyRobux
 		})
 	})
 end

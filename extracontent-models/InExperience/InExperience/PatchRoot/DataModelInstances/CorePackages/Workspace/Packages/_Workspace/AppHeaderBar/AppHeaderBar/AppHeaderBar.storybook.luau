@@ -1,61 +1,46 @@
 local AppHeaderBar = script:FindFirstAncestor("AppHeaderBar")
-local AppHeaderBarParent = AppHeaderBar.Parent
-local RoactCompat = require(AppHeaderBarParent.Dev.RoactCompat)
-local React = require(AppHeaderBarParent.React)
-local RobloxAppUIBloxConfig = require(AppHeaderBarParent.Dev.RobloxAppUIBloxConfig)
-local UIBlox = require(AppHeaderBarParent.UIBlox)
+local parent = AppHeaderBar.Parent
+local RoactCompat = require(parent.Dev.RoactCompat)
+local React = require(parent.React)
+local RobloxAppUIBloxConfig = require(parent.Dev.RobloxAppUIBloxConfig)
+local UIBlox = require(parent.UIBlox)
 
 UIBlox.init(RobloxAppUIBloxConfig)
 
+local Foundation = require(parent.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
+
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 local Constants = UIBlox.App.Style.Constants
-local Light = Constants.ThemeName.Light
-local Dark = Constants.ThemeName.Dark
+local Light = ColorMode.Light
+local Dark = ColorMode.Dark
 local Gotham = Constants.FontName.Gotham
 
-RoactCompat.setGlobalConfig({
-	elementTracing = true
-})
+RoactCompat.setGlobalConfig({ elementTracing = true })
 
-local t1 = {
-	Default = {
-		themeName = Light,
-		fontName = Gotham
-	},
-	Light = {
-		themeName = Light,
-		fontName = Gotham
-	},
-	Dark = {
-		themeName = Dark,
-		fontName = Gotham
-	}
+local v = {
+	Default = { themeName = Light, fontName = Gotham },
+	Light = { themeName = Light, fontName = Gotham },
+	Dark = { themeName = Dark, fontName = Gotham }
 }
-local t2 = {
-	Console = Constants.DeviceType.Console,
-	Desktop = Constants.DeviceType.Desktop
-}
+
+local v2 = { Console = Constants.DeviceType.Console, Desktop = Constants.DeviceType.Desktop }
 
 return {
 	name = "AppHeaderBar",
 	storyRoots = { AppHeaderBar },
 	roact = RoactCompat,
-	mapStory = function(p1) -- line: 45
-		-- upvalues: t1 (copy), React (copy), AppStyleProvider (copy), t2 (copy)
-		return function(p2) -- line: 46
-			-- upvalues: t1 (copy), React (copy), AppStyleProvider (copy), t2 (copy), p1 (copy)
-			local v16 = t1[p2.theme]
-
+	mapStory = function(p)
+		return function(props)
+			local v3 = v[props.theme]
 			return React.createElement(AppStyleProvider, {
 				style = {
-					themeName = v16.themeName,
-					fontName = v16.fontName,
-					deviceType = t2[p2.platform],
-					settings = p2.settings
+					themeName = v3.themeName,
+					fontName = v3.fontName,
+					deviceType = v2[props.platform],
+					settings = props.settings
 				}
-			}, {
-				Child = React.createElement(p1, p2)
-			})
+			}, { Child = React.createElement(p, props) })
 		end
 	end
 }

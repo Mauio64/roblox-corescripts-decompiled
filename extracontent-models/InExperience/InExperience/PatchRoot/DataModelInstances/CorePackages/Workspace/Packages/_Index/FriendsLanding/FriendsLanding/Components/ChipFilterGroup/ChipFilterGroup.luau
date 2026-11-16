@@ -1,72 +1,94 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local FriendsLandingParent = FriendsLanding.Parent
-local useLocalization = require(FriendsLandingParent.Localization).Hooks.useLocalization
-local dependencyArray = require(FriendsLandingParent.RoactUtils).Hooks.dependencyArray
-local React = require(FriendsLandingParent.React)
-local Chip = require(FriendsLandingParent.Foundation).Chip
+local parent = FriendsLanding.Parent
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils = require(parent.RoactUtils)
+local dependencyArray = RoactUtils.Hooks.dependencyArray
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Chip = Foundation.Chip
 local filterStates = require(FriendsLanding.Friends.filterStates)
 local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
-local t1 = {
-	filterStates.All,
-	filterStates.Online,
-	filterStates.Trusted
-}
-local t2 = {
+local FFlagDisableFriendsLandingFilterChipsWithNoFriends = require(FriendsLanding.Flags.FFlagDisableFriendsLandingFilterChipsWithNoFriends)
+
+local v = { filterStates.All, filterStates.Online, filterStates.Trusted }
+
+local v2 = {
 	[filterStates.All] = "all",
 	[filterStates.Online] = "online",
 	[filterStates.Trusted] = "trusted"
 }
-local t3 = {
-	"allFriendsChip",
-	"onlineFriendsChip",
-	"trustedFriendsChip"
-}
 
-function ChipFilterGroup(t4: {[any]: any}) -- line: 34
-	-- upvalues: React (copy), FriendsLandingContext (copy), useLocalization (copy), t1 (copy), t3 (copy), Chip (copy), t2 (copy), dependencyArray (copy)
+local v3 = { "allFriendsChip", "onlineFriendsChip", "trustedFriendsChip" }
+
+function ChipFilterGroup(props)
 	local filter = React.useContext(FriendsLandingContext.Context).filter
-	local v14 = useLocalization({
+	local v4 = useLocalization({
 		all = "Feature.Friends.Label.All",
 		online = "Common.Presence.Label.Online",
 		trusted = "Feature.Friends.TrustedConnection.Label.Trusted"
 	})
-	local v15 = React.useMemo(function() -- line: 43
-		-- upvalues: t1 (copy), t3 (copy), React (copy), Chip (copy), v14 (copy), t2 (copy), t4 (copy), filter (copy)
-		local t5 = {}
 
-		for i, v in ipairs(t1) do
-			t5[t3[i]] = React.createElement(Chip, {
-				id = v,
-				text = v14[t2[v]],
+	local useMemo = React.useMemo
+	local function fn()
+		local children = {}
+
+		for i, id in ipairs(v) do
+			local v5 = v3[i]
+			local createElement = React.createElement
+			local v6 = {
+				id = id,
+				text = v4[v2[id]],
 				LayoutOrder = i,
-				onActivated = function() -- line: 50
-					-- upvalues: t4 (copy), v (copy)
-					t4.onActivated(v)
+				onActivated = function()
+					props.onActivated(id)
 				end,
-				isChecked = v == filter
-			})
+				isChecked = filter == id,
+				isDisabled = 0
+			}
+			local isDisabled
+
+			if FFlagDisableFriendsLandingFilterChipsWithNoFriends then
+				isDisabled = props.isDisabled
+			end
+
+			v6.isDisabled = isDisabled
+			children[v5] = createElement(Chip, v6)
 		end
 
-		return t5
-	end, dependencyArray(v14, filter, t4.onActivated))
+		return children
+	end
+	local onActivated = props.onActivated
+	local v5
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = UDim2.new(1, 0, 0, 32),
-		LayoutOrder = t4.layoutOrder
-	}, {
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, 8)
-		}),
-		allFriendsChip = v15.allFriendsChip,
-		onlineFriendsChip = v15.onlineFriendsChip,
-		trustedFriendsChip = v15.trustedFriendsChip
-	})
+	if FFlagDisableFriendsLandingFilterChipsWithNoFriends then
+		v5 = props.isDisabled
+	end
+
+	local v6 = useMemo(fn, dependencyArray(v4, filter, onActivated, v5))
+
+	return React.createElement(
+		"Frame",
+		{
+			Size = UDim2.new(1, 0, 0, 32),
+			LayoutOrder = props.layoutOrder,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0
+		},
+		{
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 8)
+			}),
+			allFriendsChip = v6.allFriendsChip,
+			onlineFriendsChip = v6.onlineFriendsChip,
+			trustedFriendsChip = v6.trustedFriendsChip
+		}
+	)
 end
 
 return ChipFilterGroup

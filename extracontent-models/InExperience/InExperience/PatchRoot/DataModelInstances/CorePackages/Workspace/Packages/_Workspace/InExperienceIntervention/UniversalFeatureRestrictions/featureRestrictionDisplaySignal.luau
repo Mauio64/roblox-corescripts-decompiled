@@ -1,3 +1,3 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
 
-return require(_Workspace.UniversalFeatureRestrictions.UniversalFeatureRestrictions.Signals.featureRestrictionDisplaySignal)
+return require(Workspace.UniversalFeatureRestrictions.UniversalFeatureRestrictions.Signals.featureRestrictionDisplaySignal)

@@ -1,4 +1,4 @@
 local FFlagRefactorHelpPage = require(script.Parent.FFlagRefactorHelpPage)
-local v2 = game:DefineFastFlag("HelpPageMountVR3", false)
+local defineFastFlag = game:DefineFastFlag("HelpPageMountVR3", false)
 
-return FFlagRefactorHelpPage and v2
+return FFlagRefactorHelpPage and defineFastFlag

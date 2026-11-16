@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
 
-return function(p1, s1: string) -- line: 6
-	-- upvalues: Url (copy)
-	return p1(string.format("%sv1/sponsored-games/click", Url.ADS_URL), "POST", {
-		postBody = "\"" .. s1 .. "\""
+local Http = require(parent.Http)
+local Url = Http.Url
+
+return function(callback, p: string)
+	return callback(string.format("%sv1/sponsored-games/click", Url.ADS_URL), "POST", {
+		postBody = "\"" .. p .. "\""
 	})
 end

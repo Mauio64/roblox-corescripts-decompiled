@@ -1,20 +1,14 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 local selectTryOnBodyIds = require(script.Parent.selectTryOnBodyIds)
-local FFlagAXMISEnableMultiShopping = require(Parent.AvatarExperienceFlags).FFlagAXMISEnableMultiShopping
 
-local function selectShowColorQuickButton(p1) -- line: 9
-	-- upvalues: selectTryOnBodyIds (copy), FFlagAXMISEnableMultiShopping (copy)
-	local v6 = selectTryOnBodyIds(p1)
-	local v7 = if not FFlagAXMISEnableMultiShopping then nil else p1.AvatarExperience.AvatarScene.OutfitTryOn.LastToggledItem
+local function selectShowColorQuickButton(p): boolean
+	local v = selectTryOnBodyIds(p)
 
-	for _, v9 in v6 do
-		local v10 = p1.AvatarExperience.Common.BundleInfos[v9]
+	local lastToggledItem = p.AvatarExperience.AvatarScene.OutfitTryOn.LastToggledItem
 
-		if FFlagAXMISEnableMultiShopping and v10 and v10.isRecolorable and v7 and v9 == v7.itemId then
-			return true
-		end
+	for _, v2 in v do
+		local bundleInfo = p.AvatarExperience.Common.BundleInfos[v2]
 
-		if not FFlagAXMISEnableMultiShopping and v10 and v10.isRecolorable then
+		if bundleInfo and bundleInfo.isRecolorable and lastToggledItem and lastToggledItem.itemId == v2 then
 			return true
 		end
 	end

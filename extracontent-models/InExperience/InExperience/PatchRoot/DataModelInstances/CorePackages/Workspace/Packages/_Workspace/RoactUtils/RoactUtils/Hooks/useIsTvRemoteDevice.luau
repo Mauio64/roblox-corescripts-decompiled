@@ -1,49 +1,59 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local UserInputService = game:GetService("UserInputService")
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
 
-local function useIsTvRemoteDevice() -- line: 20
-	-- upvalues: React (copy), UserInputService (copy)
-	local v5 = React.useCallback(function() -- line: 21
-		-- upvalues: UserInputService (copy)
-		if UserInputService.PreferredInput ~= Enum.PreferredInput.Gamepad then
+local UserInputService = game:GetService("UserInputService")
+
+local React = require(parent.React)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaSupportMicroGamepadPreferredInput = SharedFlags.FFlagLuaSupportMicroGamepadPreferredInput
+local v
+
+if game:GetEngineFeature("EnableMicroGamepadKeycodes") then
+	v = Enum.KeyCode.ButtonCenter
+else
+	v = Enum.KeyCode.Return
+end
+
+local function useIsTvRemoteDevice()
+	local v2 = React.useCallback(function(): boolean
+		local v2 = FFlagLuaSupportMicroGamepadPreferredInput
+			and UserInputService.PreferredInput == Enum.PreferredInput.MicroGamepad
+
+		if UserInputService.PreferredInput ~= Enum.PreferredInput.Gamepad and not v2 then
 			return false
 		end
 
-		for _, v in ipairs(UserInputService:GetConnectedGamepads()) do
-			if UserInputService:GamepadSupports(v, Enum.KeyCode.Return) then
+		for _, v3 in ipairs(UserInputService:GetConnectedGamepads()) do
+			if UserInputService:GamepadSupports(v3, v) then
 				return true
 			end
 		end
 
 		return false
 	end, {})
-	local v6, v7 = React.useState(function() -- line: 35
-		-- upvalues: v5 (copy)
-		return v5()
+
+	local state, setState = React.useState(function()
+		return v2()
 	end)
 
-	React.useEffect(function() -- line: 39
-		-- upvalues: UserInputService (copy), v7 (copy), v5 (copy)
-		local connection = UserInputService.GamepadConnected:Connect(function() -- line: 40
-			-- upvalues: v7 (copy), v5 (copy)
-			v7(v5())
-		end)
-		local connection2 = UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function() -- line: 44
-			-- upvalues: v7 (copy), v5 (copy)
-			v7(v5())
+	React.useEffect(function()
+		local gamepadConnectedConnection = UserInputService.GamepadConnected:Connect(function()
+			setState(v2())
 		end)
 
-		v7(v5())
+		local preferredInputChangedConnection = UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function()
+			setState(v2())
+		end)
 
-		return function() -- line: 50
-			-- upvalues: connection (copy), connection2 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+		setState(v2())
+
+		return function()
+			gamepadConnectedConnection:Disconnect()
+			preferredInputChangedConnection:Disconnect()
 		end
-	end, { v5 })
+	end, { v2 })
 
-	return v6
+	return state
 end
 
 return useIsTvRemoteDevice

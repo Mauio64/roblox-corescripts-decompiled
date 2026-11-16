@@ -1,7 +1,6 @@
 local ChatIntervention = script:FindFirstAncestor("ChatIntervention")
+local Rodux = require(ChatIntervention.Parent.Rodux)
 
-return require(ChatIntervention.Parent.Rodux).makeActionCreator(script.Name, function(b1: boolean) -- line: 9
-	return {
-		isShow = b1
-	}
+return Rodux.makeActionCreator(script.Name, function(isShow: boolean)
+	return { isShow = isShow }
 end)

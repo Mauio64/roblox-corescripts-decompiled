@@ -1,235 +1,279 @@
+local AppShortcutBar = script:FindFirstAncestor("AppShortcutBar")
+local parent = AppShortcutBar.Parent
+
 local TextService = game:GetService("TextService")
-local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local UIBlox = require(Parent.UIBlox)
-local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local UIBlox = require(parent.UIBlox)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local useStyle = UIBlox.Core.Style.useStyle
 local useTokens = Foundation.Hooks.useTokens
 local Icon = Foundation.Icon
+local Image = Foundation.Image
 local KeyLabel = UIBlox.App.Menu.KeyLabel
 local KeyLabelUtilities = UIBlox.App.Menu.KeyLabelUtilities
 local StateLayer = UIBlox.Core.Control.StateLayer
 local Shortcut = UIBlox.App.Navigation.Shortcut
+
 local IconWithHoldAnimation = require(script.Parent.IconWithHoldAnimation)
-local v15 = game:DefineFastFlag("ShortcutUseDispatchSyntheticEvent", false)
 
-local function getKeyLabelsWidth(p1, p2) -- line: 25
-	-- upvalues: KeyLabelUtilities (copy)
-	local n1 = 0
+local Flags = require(AppShortcutBar.Flags)
+local FFlagShortcutBarPlatformGamepadIcons = Flags.FFlagShortcutBarPlatformGamepadIcons
+local defineFastFlag = game:DefineFastFlag("ShortcutUseDispatchSyntheticEvent", false)
 
-	for _, v22 in p1 do
-		n1 += KeyLabelUtilities.getKeyLabelWidth(v22, p2)
+local function getKeyLabelsWidth(items, p)
+	local keyLabelsWidth = 0
+
+	for _, item in items do
+		keyLabelsWidth += KeyLabelUtilities.getKeyLabelWidth(item, p)
 	end
 
-	return n1
+	return keyLabelsWidth
 end
-local function useOnShortcutActivated(p3) -- line: 33
-	-- upvalues: v15 (copy), React (copy), ReactFocusNavigation (copy)
-	if v15 then
-		local v24 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
-		local v25 = ReactFocusNavigation.useDispatchSyntheticEvent()
 
-		return (React.useCallback(function() -- line: 38
-			-- upvalues: p3 (copy), v25 (copy), v24 (copy)
-			if p3.hasProgress then
-				v25(p3.eventName, v24.focusedGuiObject:getValue(), {
-					immediateDispatch = true,
-					UserInputState = Enum.UserInputState.Begin,
-					KeyCode = p3.inputKeyCode,
-					UserInputType = Enum.UserInputType.None
-				})
+local function useOnShortcutActivated(item)
+	if not defineFastFlag then
+		local v = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+		return (React.useMemo(function()
+			return function()
+				local selection = v._engineInterface.getSelection()
 
-				return
+				if not selection then
+					return
+				end
+
+				local v2 = v.activeEventMap:getValue()[item.inputKeyCode]
+
+				if v2 ~= item.eventName then
+					return
+				end
+
+				v._eventPropagationService:propagateEvent(
+					selection,
+					v2,
+					{ KeyCode = item.inputKeyCode, UserInputState = Enum.UserInputState.Begin },
+					false
+				)
+
+				task.wait(0.1)
+				v._eventPropagationService:propagateEvent(
+					selection,
+					v2,
+					{ KeyCode = item.inputKeyCode, UserInputState = Enum.UserInputState.End },
+					false
+				)
 			end
+		end, { v, item.inputKeyCode, item.eventName }))
+	end
 
-			v25(p3.eventName, v24.focusedGuiObject:getValue(), {
-				immediateDispatch = true,
-				UserInputState = Enum.UserInputState.End,
-				KeyCode = p3.inputKeyCode,
-				UserInputType = Enum.UserInputType.None
+	local v = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+	local v2 = ReactFocusNavigation.useDispatchSyntheticEvent()
+
+	return (React.useCallback(function()
+		if item.hasProgress then
+			v2(item.eventName, v.focusedGuiObject:getValue(), {
+				UserInputState = Enum.UserInputState.Begin,
+				KeyCode = item.inputKeyCode,
+				UserInputType = Enum.UserInputType.None,
+				immediateDispatch = true
 			})
-		end, {
-			p3.hasProgress,
-			p3.eventName,
-			p3.inputKeyCode,
-			v24,
-			v25
-		}))
-	end
-
-	local v26 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
-
-	return (React.useMemo(function() -- line: 59
-		-- upvalues: v26 (copy), p3 (copy)
-		return function() -- line: 60
-			-- upvalues: v26 (copy), p3 (copy)
-			local v53 = v26._engineInterface.getSelection()
-
-			if not v53 then
-				return
-			end
-
-			local v54 = v26.activeEventMap:getValue()[p3.inputKeyCode]
-
-			if v54 ~= p3.eventName then
-				return
-			end
-
-			v26._eventPropagationService:propagateEvent(v53, v54, {
-				KeyCode = p3.inputKeyCode,
-				UserInputState = Enum.UserInputState.Begin
-			}, false)
-			task.wait(0.1)
-			v26._eventPropagationService:propagateEvent(v53, v54, {
-				KeyCode = p3.inputKeyCode,
-				UserInputState = Enum.UserInputState.End
-			}, false)
+		else
+			v2(item.eventName, v.focusedGuiObject:getValue(), {
+				UserInputState = Enum.UserInputState.End,
+				KeyCode = item.inputKeyCode,
+				UserInputType = Enum.UserInputType.None,
+				immediateDispatch = true
+			})
 		end
-	end, {
-		v26,
-		p3.inputKeyCode,
-		p3.eventName
-	}))
+	end, { item.hasProgress, item.eventName, item.inputKeyCode, v, v2 }))
 end
 
-function AppShortcut(p4) -- line: 83
-	-- upvalues: useStyle (copy), useTokens (copy), KeyLabelUtilities (copy), React (copy), TextService (copy), KeyLabel (copy), IconWithHoldAnimation (copy), Icon (copy), useOnShortcutActivated (copy), Shortcut (copy), StateLayer (copy)
-	local layoutOrder = p4.layoutOrder
-	local item = p4.item
-	local v30 = useStyle()
-	local v31 = useTokens()
-	local v32 = typeof(item.icon) == "table"
-	local u33, u34
+function AppShortcut(p)
+	local layoutOrder = p.layoutOrder
+	local item = p.item
+
+	local v = useStyle()
+	local v2 = useTokens()
+
+	local v3 = typeof(item.icon) == "table"
+	local v4, v5
 
 	if item.hasProgress then
-		u33 = v31.Size.Size_1300 / 2
-		u34 = v31.Size.Size_1300 / 2
-	elseif v32 then
+		v4 = v2.Size.Size_1300 / 2
+		v5 = v2.Size.Size_1300 / 2
+	elseif v3 then
 		local icon = item.icon
-		local Font = v30.Font
-		local n2 = 0
+		local font = v.Font
+		v4 = 0
 
-		for _, v39 in icon do
-			n2 += KeyLabelUtilities.getKeyLabelWidth(v39, Font)
+		for _, v6 in icon do
+			v4 += KeyLabelUtilities.getKeyLabelWidth(v6, font)
 		end
 
-		u33 = n2
-		u34 = v31.Size.Size_900
+		v5 = v2.Size.Size_900
 	else
-		u33 = v31.Size.Size_600
-		u34 = v31.Size.Size_600
+		v4 = v2.Size.Size_600
+		v5 = v2.Size.Size_600
 	end
 
-	local v40 = React.useMemo(function() -- line: 105
-		-- upvalues: v31 (copy), TextService (copy), item (copy), u33 (ref)
-		local XSmall = v31.Gap.XSmall
-		local LabelMedium = v31.Typography.LabelMedium
-		local TextSize = TextService:GetTextSize(item.text, math.floor(LabelMedium.FontSize), LabelMedium.Font, Vector2.new(1e999, 1e999))
-		local v48 = u33 + XSmall + TextSize.X
+	local size = React.useMemo(function()
+		local xSmall = v2.Gap.XSmall
+		local labelMedium = v2.Typography.LabelMedium
+		local vector2 = Vector2.new(1e999, 1e999)
+		local v6
 
-		return UDim2.new(0, v48, 1, 0)
-	end, {
-		v31,
-		u33,
-		item.text
-	})
-	local v41 = React.useMemo(function() -- line: 118
-		-- upvalues: v40 (copy), v31 (copy)
-		return v40 + UDim2.fromOffset(v31.Size.Size_100 * 2, 0)
-	end, {
-		v40,
-		v31
-	})
-	local v42 = React.useMemo(function() -- line: 122
-		-- upvalues: v32 (copy), React (copy), item (copy), KeyLabel (copy)
-		if v32 then
-			local t1 = {
-				ListLayout = React.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				})
-			}
-
-			for v50, v51 in item.icon do
-				t1["KeyLabel_" .. tostring(v50)] = React.createElement(KeyLabel, {
-					iconThemeKey = "IconEmphasis",
-					LayoutOrder = v50,
-					keyCode = v51
-				})
-			end
-
-			return t1
+		if FoundationFontFaceMigration then
+			v6 = GetTextSize(item.text, math.floor(labelMedium.FontSize), labelMedium.Font, vector2, {
+				addTemporaryPadding = false
+			})
+		else
+			v6 = TextService:GetTextSize(item.text, math.floor(labelMedium.FontSize), labelMedium.Font, vector2)
 		end
 
-		return nil
-	end, {
-		v32,
-		item.icon,
-		v31
-	})
-	local v43 = React.useCallback(function(p5) -- line: 144
-		-- upvalues: item (copy), React (copy), IconWithHoldAnimation (copy), u33 (ref), u34 (ref), v31 (copy), v32 (copy), v42 (copy), Icon (copy)
+		local v7 = v4 + xSmall + v6.X
+		return UDim2.new(0, v7, 1, 0)
+	end, { v2, v4, item.text })
+
+	local size2 = React.useMemo(function()
+		return size + UDim2.fromOffset(v2.Size.Size_100 * 2, 0)
+	end, { size, v2 })
+
+	local v6 = React.useMemo(function()
+		if not v3 then
+			return nil
+		end
+
+		local children = {
+			ListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			})
+		}
+
+		for k, keyCode in item.icon do
+			children["KeyLabel_" .. tostring(k)] = React.createElement(KeyLabel, {
+				LayoutOrder = k,
+				keyCode = keyCode,
+				iconThemeKey = "IconEmphasis"
+			})
+		end
+
+		return children
+	end, { v3, item.icon, v2 })
+
+	local useCallback = React.useCallback
+	local function fn(p2)
 		if item.hasProgress then
 			return React.createElement(IconWithHoldAnimation, {
-				layoutOrder = p5.layoutOrder,
-				size = UDim2.fromOffset(u33, u34),
+				layoutOrder = p2.layoutOrder,
+				size = UDim2.fromOffset(v4, v5),
 				progress = item.progress,
 				icon = item.icon,
-				iconSize = v31.Size.Size_900 / 2
+				iconSize = v2.Size.Size_900 / 2
 			})
 		end
 
-		return React.createElement("Frame", {
+		local createElement = React.createElement
+
+		local v7 = {
+			LayoutOrder = p2.layoutOrder,
 			BackgroundTransparency = 1,
-			LayoutOrder = p5.layoutOrder,
-			Size = UDim2.fromOffset(u33, u34)
-		}, if not v32 then {
-			Icon = React.createElement(Icon, {
-				name = item.icon,
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5)
-			})
-		} else v42)
-	end, {
-		item.hasProgress,
-		item.progress,
-		item.icon,
-		u33,
-		u34,
-		v32,
-		v42
+			Size = UDim2.fromOffset(v4, v5)
+		}
+		local v8
+
+		if v3 then
+			v8 = v6
+		elseif FFlagShortcutBarPlatformGamepadIcons and item.isPlatformIcon then
+			v8 = {
+				Icon = React.createElement(Image, {
+					Image = item.icon,
+					imageStyle = v2.Color.Content.Default,
+					tag = "size-full"
+				})
+			}
+		else
+			v8 = {
+				Icon = React.createElement(Icon, {
+					name = item.icon,
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5)
+				})
+			}
+		end
+
+		return createElement("Frame", v7, v8)
+	end
+
+	local hasProgress = item.hasProgress
+	local progress = item.progress
+	local icon = item.icon
+	local isPlatformIcon
+
+	if FFlagShortcutBarPlatformGamepadIcons then
+		isPlatformIcon = item.isPlatformIcon
+	end
+
+	local v7
+
+	if FFlagShortcutBarPlatformGamepadIcons then
+		v7 = v2
+	end
+
+	local v8
+
+	if FoundationFontFaceMigration then
+		v8 = v2.Size.Size_900
+	end
+
+	local renderIcon = useCallback(fn, {
+		hasProgress,
+		progress,
+		icon,
+		isPlatformIcon,
+		v7,
+		v4,
+		v5,
+		v3,
+		v6,
+		v8
 	})
-	local v44 = useOnShortcutActivated(item)
+
+	local onActivated = useOnShortcutActivated(item)
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
 		LayoutOrder = layoutOrder,
-		Size = v40
+		BackgroundTransparency = 1,
+		Size = size
 	}, {
-		ShortcutFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 2,
-			Size = UDim2.fromScale(1, 1)
-		}, {
-			Shortcut = React.createElement(Shortcut, {
-				size = UDim2.fromScale(1, 1),
-				automaticSize = Enum.AutomaticSize.None,
-				iconLabelGap = v31.Gap.XSmall,
-				publicProps = item,
-				labelTextSize = v31.Typography.LabelMedium.FontSize,
-				labelColorStyle = v31.Color.Label,
-				labelFontStyle = v31.Typography.LabelMedium,
-				renderIcon = v43
-			})
-		}),
+		ShortcutFrame = React.createElement(
+			"Frame",
+			{ Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 2 },
+			{
+				Shortcut = React.createElement(Shortcut, {
+					size = UDim2.fromScale(1, 1),
+					automaticSize = Enum.AutomaticSize.None,
+					iconLabelGap = v2.Gap.XSmall,
+					publicProps = item,
+					labelTextSize = v2.Typography.LabelMedium.FontSize,
+					labelColorStyle = v2.Color.Label,
+					labelFontStyle = v2.Typography.LabelMedium,
+					renderIcon = renderIcon
+				})
+			}
+		),
 		StateLayer = React.createElement(StateLayer, {
 			selectable = false,
+			cornerRadius = UDim.new(0, v2.Radius.Medium),
+			size = size2,
 			zIndex = 1,
-			cornerRadius = UDim.new(0, v31.Radius.Medium),
-			size = v41,
-			onActivated = v44
+			onActivated = onActivated
 		})
 	})
 end

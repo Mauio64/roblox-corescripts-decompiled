@@ -1,84 +1,54 @@
 require(script.Parent.types)
 
-local function once(p1) -- line: 5
-	local u4 = false
-
-	local function notAgain() -- line: 7
-		-- upvalues: u4 (ref), p1 (copy)
-		if not u4 then
-			u4 = true
-			p1()
+local function once(disposeResource) -- 1 equivalent call inferred from this helper
+	local v = false
+	local function notAgain()
+		if not v then
+			v = true
+			disposeResource()
 		end
 	end
-
 	return notAgain
 end
-local function createCachedResource(p2) -- line: 16
-	local u7 = nil
-	local u8 = nil
-	local n1 = 0
 
-	local function disposeResource() -- line: 21
-		-- upvalues: n1 (ref), u7 (ref), u8 (ref)
-		n1 -= 1
+local function createCachedResource(callback)
+	local v = nil
+	local v2 = nil
+	local v3 = 0
 
-		if n1 == 0 then
-			u7 = nil
+	local function disposeResource() -- 1 equivalent call inferred from this helper
+		v3 -= 1
 
-			if u8 ~= nil then
-				local v14 = u8
+		if v3 == 0 then
+			v = nil
 
-				u8 = nil
-				v14()
+			if v2 ~= nil then
+				local v4 = v2
+				v2 = nil
+				v4()
 			end
 		end
 	end
-	local function constructResource() -- line: 33
-		-- upvalues: u8 (ref), u7 (ref), p2 (copy)
-		local v15, v16 = p2()
 
-		u8 = v15
-		u7 = v16
+	local function constructResource()
+		v2, v = callback()
 	end
-	local function handleError(b1: boolean, ...) -- line: 37
-		-- upvalues: n1 (ref), u7 (ref), u8 (ref)
-		if not b1 then
-			n1 -= 1
 
-			if n1 == 0 then
-				u7 = nil
-
-				if u8 ~= nil then
-					local v18 = u8
-
-					u8 = nil
-					v18()
-				end
-			end
-
+	local function handleError(flag: boolean, ...)
+		if not flag then
+			disposeResource() -- inferred equivalent call
 			error(...)
 		end
 	end
-	local function cachedResource() -- line: 44
-		-- upvalues: n1 (ref), handleError (copy), constructResource (copy), disposeResource (copy), u7 (ref)
-		n1 += 1
 
-		if n1 == 1 then
+	local function cachedResource()
+		v3 += 1
+
+		if v3 == 1 then
 			handleError(pcall(constructResource))
 		end
 
-		local v19 = disposeResource
-		local u20 = false
-
-		local function notAgain() -- line: 7
-			-- upvalues: u20 (ref), v19 (copy)
-			if not u20 then
-				u20 = true
-				v19()
-			end
-		end
-
-		return notAgain, u7
+		return once(disposeResource), v -- inferred equivalent call
 	end
 
 	return cachedResource

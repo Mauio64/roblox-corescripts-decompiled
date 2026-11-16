@@ -1,79 +1,75 @@
 local AdService = game:GetService("AdService")
 local CoreGui = game:GetService("CoreGui")
 local LocalizationService = game:GetService("LocalizationService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local React = require(scriptParentParent.React)
-local ReactRoblox = require(scriptParentParent.ReactRoblox)
-local InExperienceLocales = require(scriptParentParent.InExperienceLocales)
-local Localization = require(scriptParentParent.Localization)
-local Foundation = require(scriptParentParent.Foundation)
-local Roact = require(scriptParentParent.Roact)
-local DisclosureButtonListenerComponent = require(scriptParent.DisclosureButtonListenerComponent)
-local AdsInteractivityControls = require(scriptParent.AdsInteractivityControls)
+
+local parent = script.Parent
+local parent2 = parent.Parent
+local React = require(parent2.React)
+local ReactRoblox = require(parent2.ReactRoblox)
+local InExperienceLocales = require(parent2.InExperienceLocales)
+local Localization = require(parent2.Localization)
+local Foundation = require(parent2.Foundation)
+local Roact = require(parent2.Roact)
+
+local DisclosureButtonListenerComponent = require(parent.DisclosureButtonListenerComponent)
+local AdsInteractivityControls = require(parent.AdsInteractivityControls)
+
 local LocalizationProvider = Localization.LocalizationProvider
 local FoundationProvider = Foundation.FoundationProvider
-local v16 = game:DefineFastFlag("AdsInteractivityControlsFixStyleLink", false)
 
-local function initializeImmersiveAds() -- line: 22
-	-- upvalues: CoreGui (copy), AdService (copy), Roact (copy), AdsInteractivityControls (copy), v16 (copy)
-	local Folder = Instance.new("Folder")
+local function initializeImmersiveAds()
+	local adGuiInteractivityControls = Instance.new("Folder")
+	adGuiInteractivityControls.Name = "AdGuiInteractivityControls"
+	adGuiInteractivityControls.Parent = CoreGui
 
-	Folder.Name = "AdGuiInteractivityControls"
-	Folder.Parent = CoreGui
+	local v = {}
 
-	local t1 = {}
-
-	AdService.adGuiRegisterUI:Connect(function(p1) -- line: 30
-		-- upvalues: t1 (copy), Roact (copy), AdsInteractivityControls (copy), v16 (copy), Folder (copy)
-		if not p1:IsA("AdGui") then
+	AdService.adGuiRegisterUI:Connect(function(adGui)
+		if not adGui:IsA("AdGui") or v[adGui] then
 			return
 		end
 
-		if t1[p1] then
-			return
-		end
+		local element = Roact.createElement(AdsInteractivityControls, { adGui = adGui })
+		local element2 = Roact.createElement("Folder", nil, element)
 
-		local v23 = Roact.createElement(AdsInteractivityControls, {
-			adGui = p1
-		})
+		v[adGui] = Roact.mount(element2, adGuiInteractivityControls, "AdsInteractivityControls")
 
-		if v16 then
-			v23 = Roact.createElement("Folder", nil, v23)
-		end
-
-		t1[p1] = Roact.mount(v23, Folder, "AdsInteractivityControls")
-		p1.Destroying:Connect(function() -- line: 46
-			-- upvalues: Roact (copy), t1 (copy), p1 (copy)
-			Roact.unmount(t1[p1])
-			t1[p1] = nil
+		adGui.Destroying:Connect(function()
+			Roact.unmount(v[adGui])
+			v[adGui] = nil
 		end)
 	end)
+
 	AdService:SetAdGuiInteractivityHandlerInitialized()
 end
-local function initializeImmersiveBrandedAds() -- line: 55
-	-- upvalues: CoreGui (copy), ReactRoblox (copy), React (copy), LocalizationProvider (copy), InExperienceLocales (copy), LocalizationService (copy), FoundationProvider (copy), Foundation (copy), DisclosureButtonListenerComponent (copy)
-	local ScreenGui = Instance.new("ScreenGui")
 
-	ScreenGui.Name = "ImmersiveBrandedAds"
-	ScreenGui.ResetOnSpawn = false
-	ScreenGui.IgnoreGuiInset = true
-	ScreenGui.Parent = CoreGui
-	ReactRoblox.createRoot(ScreenGui):render({
-		localizationProvider = React.createElement(LocalizationProvider, {
-			localization = InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
-		}, {
-			foundationProvider = React.createElement(FoundationProvider, {
-				theme = Foundation.Enums.Theme.Dark
-			}, {
-				disclosureButtonListener = React.createElement(DisclosureButtonListenerComponent)
-			})
-		})
+local function initializeImmersiveBrandedAds()
+	local immersiveBrandedAds = Instance.new("ScreenGui")
+	immersiveBrandedAds.Name = "ImmersiveBrandedAds"
+	immersiveBrandedAds.ResetOnSpawn = false
+	immersiveBrandedAds.IgnoreGuiInset = true
+	immersiveBrandedAds.Parent = CoreGui
+
+	ReactRoblox.createRoot(immersiveBrandedAds):render({
+		localizationProvider = React.createElement(
+			LocalizationProvider,
+			{
+				localization = InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
+			},
+			{
+				foundationProvider = React.createElement(
+					FoundationProvider,
+					{ colorMode = Foundation.Enums.ColorMode.Dark },
+					{
+						disclosureButtonListener = React.createElement(DisclosureButtonListenerComponent)
+					}
+				)
+			}
+		)
 	})
 end
 
-return function() -- line: 75
-	-- upvalues: initializeImmersiveAds (copy), initializeImmersiveBrandedAds (copy)
+return function()
 	initializeImmersiveAds()
 	initializeImmersiveBrandedAds()
 end

@@ -1,19 +1,20 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
-local AppPage = require(Parent.RobloxAppEnums).AppPage
+local parent = script:FindFirstAncestor("GameDetail").Parent
 
-require(Parent.NavigationRodux)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+require(parent.NavigationRodux)
+local RobloxAppSessionization = require(parent.RobloxAppSessionization)
+local SessionType = RobloxAppSessionization.SessionType
+local DiscoveryRouting = require(parent.DiscoveryRouting)
+local hasPageInCurrentRoute = DiscoveryRouting.hasPageInCurrentRoute
 
-local SessionType = require(Parent.RobloxAppSessionization).SessionType
-local hasPageInCurrentRoute = require(Parent.DiscoveryRouting).hasPageInCurrentRoute
-
-local function removeGameDetailSessionIfDeparted(p1, p2) -- line: 11
-	-- upvalues: hasPageInCurrentRoute (copy), AppPage (copy), SessionType (copy)
-	if not p1 or not p2 then
-		return
-	end
-
-	if not hasPageInCurrentRoute(p2, AppPage.GameDetail, true) and not hasPageInCurrentRoute(p2, AppPage.ExperienceDetail, true) then
-		p1:RemoveSession(SessionType.StructuralIdentifier.GameDetailSource)
+local function removeGameDetailSessionIfDeparted(object, p)
+	if
+		object
+		and p
+		and not (hasPageInCurrentRoute(p, AppPage.GameDetail, true) or hasPageInCurrentRoute(p, AppPage.ExperienceDetail, true))
+	then
+		object:RemoveSession(SessionType.StructuralIdentifier.GameDetailSource)
 	end
 end
 

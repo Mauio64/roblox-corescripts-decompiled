@@ -1,15 +1,9 @@
-local function step(p1, _, _) -- line: 1
-	return {
-		complete = true,
-		value = p1.__targetValue
-	}
+local function step(p, _, _)
+	return { value = p.__targetValue, complete = true }
 end
-local function instant(p4) -- line: 8
-	-- upvalues: step (copy)
-	return {
-		__targetValue = p4,
-		step = step
-	}
+
+local function instant(targetValue)
+	return { __targetValue = targetValue, step = step }
 end
 
 return instant

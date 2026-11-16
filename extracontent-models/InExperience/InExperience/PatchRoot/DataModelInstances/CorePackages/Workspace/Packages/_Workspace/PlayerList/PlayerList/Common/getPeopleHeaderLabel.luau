@@ -1,8 +1,8 @@
-local ParentParent = script.Parent.Parent.Parent
-local RobloxTranslator = require(ParentParent.RobloxTranslator)
+local parent = script.Parent.Parent.Parent
 
-local function getPeopleHeaderLabel() -- line: 7
-	-- upvalues: RobloxTranslator (copy)
+local RobloxTranslator = require(parent.RobloxTranslator)
+
+local function getPeopleHeaderLabel()
 	return RobloxTranslator:FormatByKey("InGame.PlayerList.Players")
 end
 

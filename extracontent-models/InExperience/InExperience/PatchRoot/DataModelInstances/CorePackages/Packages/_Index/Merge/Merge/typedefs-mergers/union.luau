@@ -1,34 +1,60 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
-local Kind = require(ParentParent.GraphQL).Kind
-local mergeDirectives = require(script.Parent.directives).mergeDirectives
-local mergeNamedTypeArray = require(script.Parent["merge-named-type-array"]).mergeNamedTypeArray
+local Union = {}
+local GraphQL = require(parent.GraphQL)
+local Kind = GraphQL.Kind
+
+local directives = require(script.Parent.directives)
+local mergeDirectives = directives.mergeDirectives
+local mergenamedtypearray = require(script.Parent["merge-named-type-array"])
+local mergeNamedTypeArray = mergenamedtypearray.mergeNamedTypeArray
 
 require(script.Parent["merge-typedefs_types"])
 
-function t1.mergeUnion(p1, p2, p3) -- line: 26
-	-- upvalues: Boolean (copy), mergeDirectives (copy), Kind (copy), mergeNamedTypeArray (copy), Object (copy)
-	if p2 then
-		return {
-			name = p1.name,
-			description = if not Boolean.toJSBoolean(p1.description) then p2.description else p1.description,
-			directives = mergeDirectives(p1.directives, p2.directives, p3),
-			kind = if not (not not p3 and Boolean.toJSBoolean(p3.convertExtensions)) and (p1.kind ~= "UnionTypeDefinition" and p2.kind ~= "UnionTypeDefinition") then Kind.UNION_TYPE_EXTENSION else Kind.UNION_TYPE_DEFINITION,
-			loc = p1.loc,
-			types = mergeNamedTypeArray(p1.types, p2.types, p3)
+function Union.mergeUnion(data, data2, p)
+	if data2 then
+		local v = {
+			name = data.name,
+			description = 0,
+			directives = 0,
+			kind = 0,
+			loc = 0,
+			types = 0
 		}
-	end
+		local description
 
-	if p3 and Boolean.toJSBoolean(p3.convertExtensions) then
-		return (Object.assign({}, p1, {
+		if Boolean.toJSBoolean(data.description) then
+			description = data.description
+		else
+			description = data2.description
+		end
+
+		v.description = description
+
+		v.directives = mergeDirectives(data.directives, data2.directives, p)
+		local kind
+
+		if
+			p and Boolean.toJSBoolean(p.convertExtensions)
+			or data.kind == "UnionTypeDefinition"
+			or data2.kind == "UnionTypeDefinition"
+		then
 			kind = Kind.UNION_TYPE_DEFINITION
-		}))
+		else
+			kind = Kind.UNION_TYPE_EXTENSION
+		end
+
+		v.kind = kind
+
+		v.loc = data.loc
+		v.types = mergeNamedTypeArray(data.types, data2.types, p)
+		return v
+	elseif p and Boolean.toJSBoolean(p.convertExtensions) then
+		return (Object.assign({}, data, { kind = Kind.UNION_TYPE_DEFINITION }))
+	else
+		return data
 	end
-
-	return p1
 end
-
-return t1
+return Union

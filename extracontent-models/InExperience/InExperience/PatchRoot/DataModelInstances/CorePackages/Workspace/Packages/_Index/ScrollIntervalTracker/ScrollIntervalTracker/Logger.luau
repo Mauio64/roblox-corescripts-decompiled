@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("ScrollIntervalTracker").Parent
-
-return (require(Parent.Loggers).Logger:new("ScrollIntervalTracker"))
+local parent = script:FindFirstAncestor("ScrollIntervalTracker").Parent
+local Loggers = require(parent.Loggers)
+return (Loggers.Logger:new("ScrollIntervalTracker"))

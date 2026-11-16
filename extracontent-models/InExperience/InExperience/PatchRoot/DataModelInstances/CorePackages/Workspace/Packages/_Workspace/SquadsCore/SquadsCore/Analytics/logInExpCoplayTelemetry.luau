@@ -1,69 +1,73 @@
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
+local parent = SquadsCore.Parent
+
 local EventNames = require(SquadsCore.Analytics.EventNames)
-
 require(SquadsCore.Enums.SquadCoplayJoin)
-
 local SquadLocationEnum = require(SquadsCore.Enums.SquadLocationEnum)
 local FFlagEncodeSquadMembersUpdated = require(SquadsCore.Flags.FFlagEncodeSquadMembersUpdated)
 local encodeSquadMembers = require(SquadsCore.Common.encodeSquadMembers)
-local Cryo = require(SquadsCoreParent.Cryo)
 
-require(SquadsCoreParent.RoduxSquads)
+local Cryo = require(parent.Cryo)
+require(parent.RoduxSquads)
 
-local v10 = not FFlagEncodeSquadMembersUpdated and function(p1) -- line: 21
-	-- upvalues: HttpService (copy)
-	local ok, result = pcall(function() -- line: 22
-		-- upvalues: HttpService (copy), p1 (copy)
-		return HttpService:JSONEncode(p1)
+local fn = not FFlagEncodeSquadMembersUpdated and function(p)
+	local success, result = pcall(function()
+		return HttpService:JSONEncode(p)
 	end)
-
-	if ok then
-		return result
-	end
-
-	return "[]"
+	return if success then result else "[]"
 end or require(SquadsCore.Common.encodeUserIds)
 
-return function(s1: string, t1: {[any]: any}, p2, p3, p4: ((...any) -> ...any)) -- line: 33
-	-- upvalues: SquadLocationEnum (copy), Players (copy), FFlagEncodeSquadMembersUpdated (copy), v10 (copy), encodeSquadMembers (copy), Cryo (copy), EventNames (copy)
-	if p2 == SquadLocationEnum.InExperience then
-		local t2 = {}
-		local t3 = {}
+return function(partyId: string, list, p, partyCoplayEvent, callback)
+	if p == SquadLocationEnum.InExperience then
+		local userIdSet = {}
+		local userIds = {}
 
-		for _, v in ipairs(t1) do
-			t2[v.userId] = true
+		for _, item in ipairs(list) do
+			userIdSet[item.userId] = true
 		end
 
-		for _, player in Players:GetPlayers() do
-			if t2[player.UserId] then
-				table.insert(t3, player.UserId)
+		for _, v in Players:GetPlayers() do
+			if userIdSet[v.UserId] then
+				table.insert(userIds, v.UserId)
 			end
 		end
 
-		local v25 = nil
-		local v26, v27
+		local mapped = nil
+		local partyPlayersInGameInstanceUserIds, partyTotalSizeUserIds
 
 		if FFlagEncodeSquadMembersUpdated then
-			v26 = v10(t3)
-			v27 = encodeSquadMembers(t1)
+			partyPlayersInGameInstanceUserIds = fn(userIds)
+			partyTotalSizeUserIds = encodeSquadMembers(list)
 		else
-			v25 = Cryo.List.map(t1, function(p5) -- line: 63
-				return p5.userId
+			mapped = Cryo.List.map(list, function(p2)
+				return p2.userId
 			end)
-			v26 = v10(t3)
-			v27 = v10(v25)
+
+			partyPlayersInGameInstanceUserIds = fn(userIds)
+			partyTotalSizeUserIds = fn(mapped)
 		end
 
-		p4(EventNames.PartyCoplay, {
-			partyCoplayEvent = p3,
-			partyId = s1,
-			partyPlayersInGameInstanceCount = #t3,
-			partyPlayersInGameInstanceUserIds = v26,
-			partyTotalSize = if not FFlagEncodeSquadMembersUpdated then #v25 else #t1,
-			partyTotalSizeUserIds = v27
-		})
+		local partyCoplay = EventNames.PartyCoplay
+		local v = {
+			partyCoplayEvent = partyCoplayEvent,
+			partyId = partyId,
+			partyPlayersInGameInstanceCount = #userIds,
+			partyPlayersInGameInstanceUserIds = partyPlayersInGameInstanceUserIds,
+			partyTotalSize = 0,
+			partyTotalSizeUserIds = 0
+		}
+		local partyTotalSize
+
+		if FFlagEncodeSquadMembersUpdated then
+			partyTotalSize = #list
+		else
+			partyTotalSize = #mapped
+		end
+
+		v.partyTotalSize = partyTotalSize
+		v.partyTotalSizeUserIds = partyTotalSizeUserIds
+		callback(partyCoplay, v)
 	end
 end

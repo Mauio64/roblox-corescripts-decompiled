@@ -1,6 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetSettings", function(p1) -- line: 4
-	return {
-		preferredTransparency = p1.preferredTransparency,
-		reducedMotion = p1.reducedMotion
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetSettings", function(p)
+	return { preferredTransparency = p.preferredTransparency, reducedMotion = p.reducedMotion }
 end)

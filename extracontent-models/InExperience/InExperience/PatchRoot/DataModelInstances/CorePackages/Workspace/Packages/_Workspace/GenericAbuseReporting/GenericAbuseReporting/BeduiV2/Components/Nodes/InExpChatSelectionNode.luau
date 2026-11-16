@@ -1,10 +1,13 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Dash = require(GenericAbuseReportingParent.Dash)
-local FocusNavigationUtils = require(GenericAbuseReportingParent.FocusNavigationUtils)
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local React = require(GenericAbuseReportingParent.React)
-local FFlagAbuseReportSelectItemAddId = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportSelectItemAddId
+local parent = GenericAbuseReporting.Parent
+
+local Dash = require(parent.Dash)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
+local FFlagAbuseReportImproveErrorEvents = require(GenericAbuseReporting.Flags.FFlagAbuseReportImproveErrorEvents)
+
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
@@ -15,624 +18,522 @@ local IconName = Foundation.Enums.IconName
 local IconVariant = Foundation.Enums.IconVariant
 local List = Foundation.List
 local ListItemInputType = Foundation.Enums.ListItemInputType
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local Sheet = Foundation.Sheet
 local Skeleton = Foundation.Skeleton
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 local View = Foundation.View
+
 local useInExpCustomSubmit = require(GenericAbuseReporting.BeduiV2.Hooks.useInExpCustomSubmit)
 local useInExpFocusNavigationRefs = require(GenericAbuseReporting.BeduiV2.Hooks.FocusNavigation.useInExpFocusNavigationRefs)
+
 local AbuseReportAnalyticsContext = require(GenericAbuseReporting.BeduiV2.Analytics.AbuseReportAnalyticsContext)
-
 require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
-
 local analyticsService = require(GenericAbuseReporting.BeduiV2.Analytics.analyticsService)
 local Footer = require(GenericAbuseReporting.BeduiV2.Components.Footer)
 local InExpDropdownWithPopover = require(GenericAbuseReporting.BeduiV2.Components.InExpDropdownWithPopover)
 local LayoutSlots = require(GenericAbuseReporting.BeduiV2.Components.LayoutSlots)
 local scrollToItem = require(GenericAbuseReporting.BeduiV2.Utils.scrollToItem)
 local TextWithTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.TextWithTranslation)
-
 require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
+local arTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation)
+local useArTranslation = arTranslation.useArTranslation
+local useLoader = require(GenericAbuseReporting.BeduiV2.Loaders.useLoader)
+local useGroupedListLoader = useLoader.useGroupedListLoader
 
-local useArTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation).useArTranslation
-local useGroupedListLoader = require(GenericAbuseReporting.BeduiV2.Loaders.useLoader).useGroupedListLoader
-local TelemetryEventType = analyticsService.TelemetryEventType
+local formatErrorDetailForAnalytics = analyticsService.formatErrorDetailForAnalytics
+local telemetryEventType = analyticsService.TelemetryEventType
 local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
 local useLayoutSlots = LayoutSlots.useLayoutSlots
-local v38 = game:DefineFastFlag("FixChatSelectorDropdownPadding", false)
 
-local function useScrollToSelected(s1: string?, t1: {[any]: any}) -- line: 49
-	-- upvalues: React (copy), scrollToItem (copy)
-	React.useEffect(function() -- line: 50
-		-- upvalues: s1 (copy), t1 (copy), scrollToItem (copy)
-		if not s1 then
+local defineFastFlag = game:DefineFastFlag("FixChatSelectorDropdownPadding", false)
+
+local function useScrollToSelected(state: string?, ref) -- 1 equivalent call inferred from this helper
+	React.useEffect(function()
+		if not state then
 			return
 		end
 
-		local v81 = t1.current[s1]
+		local current = ref.current[state]
 
-		if not v81 then
+		if not current then
 			return
 		end
 
-		local ScrollingFrame = v81:FindFirstAncestorWhichIsA("ScrollingFrame")
+		local scrollingFrame = current:FindFirstAncestorWhichIsA("ScrollingFrame")
 
-		if not ScrollingFrame then
+		if not scrollingFrame then
 			return
 		end
 
-		local u83 = false
-		local t2 = {
-			current = ScrollingFrame.Parent
-		}
-		local t3 = {
-			current = v81
-		}
+		local flag = false
 
-		local function performScroll() -- line: 72
-			-- upvalues: u83 (ref), scrollToItem (copy), t2 (copy), t3 (copy)
-			if u83 then
+		local v = { current = scrollingFrame.Parent }
+		local v2 = { current = current }
+
+		local function performScroll() -- 2 equivalent calls inferred from this helper
+			if flag then
 				return
 			end
 
-			scrollToItem(t2, t3)
+			scrollToItem(v, v2)
 		end
 
-		if v81.AbsoluteSize.Y > 0 then
-			if not u83 then
-				scrollToItem(t2, t3)
-			end
+		if current.AbsoluteSize.Y > 0 then
+			performScroll() -- inferred equivalent call
 		else
-			local connection = nil
-
-			connection = v81:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 84
-				-- upvalues: v81 (copy), connection (ref), u83 (ref), scrollToItem (copy), t2 (copy), t3 (copy)
-				if v81.AbsoluteSize.Y > 0 then
-					connection:Disconnect()
-
-					if u83 then
-						return
-					end
-
-					scrollToItem(t2, t3)
+			local absoluteSizeChangedConnection = nil
+			absoluteSizeChangedConnection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				if current.AbsoluteSize.Y > 0 then
+					absoluteSizeChangedConnection:Disconnect()
+					performScroll() -- inferred equivalent call
 				end
 			end)
-			task.delay(2, function() -- line: 91
-				-- upvalues: connection (ref)
-				if connection.Connected then
-					connection:Disconnect()
+
+			task.delay(2, function()
+				if absoluteSizeChangedConnection.Connected then
+					absoluteSizeChangedConnection:Disconnect()
 				end
 			end)
 		end
 
-		return function() -- line: 98
-			-- upvalues: u83 (ref)
-			u83 = true
+		return function()
+			flag = true
 		end
-	end, { s1 })
+	end, { state })
 end
 
 local REPORT_MESSAGE_NOT_SHOWN_ITEM_ID = useInExpCustomSubmit.REPORT_MESSAGE_NOT_SHOWN_ITEM_ID
 
-local function LoadingContent() -- line: 139
-	-- upvalues: useTokens (copy), React (copy), Sheet (copy), View (copy), Dash (copy), Skeleton (copy), EnumsRadius (copy)
-	local v46 = useTokens()
+local function LoadingContent()
+	local v = useTokens()
 
 	return React.createElement(Sheet.Content, nil, {
-		SkeletonContainer = React.createElement(View, {
-			tag = "col gap-medium size-full-0 auto-y"
-		}, Dash.map(table.create(5, true), function(_: boolean, n1: number) -- line: 146
-			-- upvalues: React (copy), Skeleton (copy), EnumsRadius (copy), v46 (copy)
-			return React.createElement(Skeleton, {
-				key = tostring(n1),
-				radius = EnumsRadius.Medium,
-				Size = UDim2.new(1, 0, 0, v46.Size.Size_800)
-			})
-		end))
+		SkeletonContainer = React.createElement(
+			View,
+			{ tag = "col gap-medium size-full-0 auto-y" },
+			Dash.map(table.create(5, true), function(_: boolean, p: number)
+				return React.createElement(Skeleton, {
+					key = tostring(p),
+					radius = Radius.Medium,
+					Size = UDim2.new(1, 0, 0, v.Size.Size_800)
+				})
+			end)
+		)
 	})
 end
-local function ErrorContent(t4: {[any]: any}) -- line: 157
-	-- upvalues: useArTranslation (copy), React (copy), Sheet (copy), View (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
+
+local function ErrorContent(props)
 	local translateIntoString = useArTranslation().translateIntoString
 
 	return React.createElement(Sheet.Content, nil, {
 		ErrorContainer = React.createElement(View, {
 			tag = "align-x-center align-y-center gap-medium size-full"
 		}, {
-			ErrorText = React.createElement(FoundationText, {
+			ErrorText = React.createElement(Text, {
+				Text = translateIntoString(props.errorText),
 				RichText = true,
-				tag = "auto-xy text-body-medium text-wrap text-align-x-left",
-				Text = translateIntoString(t4.errorText)
+				tag = "auto-xy text-body-medium text-wrap text-align-x-left"
 			}),
 			RetryButton = React.createElement(Button, {
-				text = translateIntoString(t4.retryButtonText),
+				text = translateIntoString(props.retryButtonText),
 				variant = ButtonVariant.Standard,
 				fillBehavior = FillBehavior.Fit,
-				onActivated = t4.retry or function() -- line: 177
-				end
+				onActivated = props.retry or function() end
 			})
 		})
 	})
 end
-local function InExpChatSelectionNode(t5: {[any]: any}) -- line: 189
-	-- upvalues: React (copy), useArTranslation (copy), useAbuseReportAnalytics (copy), useLayoutSlots (copy), useGroupedListLoader (copy), scrollToItem (copy), TelemetryEventType (copy), Dash (copy), REPORT_MESSAGE_NOT_SHOWN_ITEM_ID (copy), useInExpFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), LoadingContent (copy), ErrorContent (copy), Sheet (copy), View (copy), TextWithTranslation (copy), FoundationText (copy), v38 (copy), InExpDropdownWithPopover (copy), List (copy), Icon (copy), IconName (copy), IconVariant (copy), FFlagAbuseReportSelectItemAddId (copy), ListItemInputType (copy), Footer (copy), DialogSize (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v50, v51 = React.useState(t5.initialValue or nil)
-	local v52 = React.useRef(nil)
-	local v53, v54 = React.useState(nil)
-	local v55, v56 = React.useState(true)
+
+local function InExpChatSelectionNode(props)
+	local state, setState = React.useState(props.initialValue or nil)
+	local ref = React.useRef(nil)
+	local state2, setState2 = React.useState(nil)
+	local state3, setState3 = React.useState(true)
 	local translateIntoString = useArTranslation().translateIntoString
-	local v58 = React.useRef({})
-	local v59 = React.useRef(false)
+	local ref2 = React.useRef({})
+	local ref3 = React.useRef(false)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
-	local v61 = React.useRef(false)
-	local v62 = React.useRef(false)
-	local v63 = React.useRef(nil)
-	local v64 = React.useRef(false)
-	local v65 = React.useRef(false)
-	local Layout = useLayoutSlots().Layout
-	local v67 = useGroupedListLoader(t5.items)
-	local v68 = v67.data or {}
+	local ref4 = React.useRef(false)
+	local ref5 = React.useRef(false)
+	local ref6 = React.useRef(nil)
+	local ref7 = React.useRef(false)
+	local ref8 = React.useRef(false)
 
-	React.useEffect(function() -- line: 50
-		-- upvalues: v50 (copy), v58 (copy), scrollToItem (copy)
-		if not v50 then
-			return
-		end
+	local layout = useLayoutSlots().Layout
 
-		local v90 = v58.current[v50]
-
-		if not v90 then
-			return
-		end
-
-		local ScrollingFrame = v90:FindFirstAncestorWhichIsA("ScrollingFrame")
-
-		if not ScrollingFrame then
-			return
-		end
-
-		local u92 = false
-		local t6 = {
-			current = ScrollingFrame.Parent
-		}
-		local t7 = {
-			current = v90
-		}
-
-		local function performScroll() -- line: 72
-			-- upvalues: u92 (ref), scrollToItem (copy), t6 (copy), t7 (copy)
-			if u92 then
-				return
-			end
-
-			scrollToItem(t6, t7)
-		end
-
-		if v90.AbsoluteSize.Y > 0 then
-			if not u92 then
-				scrollToItem(t6, t7)
-			end
-		else
-			local connection = nil
-
-			connection = v90:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 84
-				-- upvalues: v90 (copy), connection (ref), u92 (ref), scrollToItem (copy), t6 (copy), t7 (copy)
-				if v90.AbsoluteSize.Y > 0 then
-					connection:Disconnect()
-
-					if u92 then
-						return
-					end
-
-					scrollToItem(t6, t7)
-				end
-			end)
-			task.delay(2, function() -- line: 91
-				-- upvalues: connection (ref)
-				if connection.Connected then
-					connection:Disconnect()
-				end
-			end)
-		end
-
-		return function() -- line: 98
-			-- upvalues: u92 (ref)
-			u92 = true
-		end
-	end, { v50 })
-	React.useEffect(function() -- line: 213
-		-- upvalues: v63 (copy), v61 (copy), v62 (copy)
-		local current = v63.current
+	local v = useGroupedListLoader(props.items)
+	local data = v.data or {}
+	useScrollToSelected(state, ref2) -- inferred equivalent call
+	React.useEffect(function()
+		local current = ref6.current
 
 		if not current then
 			return
 		end
 
-		local ScrollingFrame = current:FindFirstChildWhichIsA("ScrollingFrame", true)
+		local scrollingFrame = current:FindFirstChildWhichIsA("ScrollingFrame", true)
 
-		if not ScrollingFrame then
+		if not scrollingFrame then
 			return
 		end
 
-		local function checkScrollbar() -- line: 224
-			-- upvalues: v61 (copy), ScrollingFrame (copy)
-			v61.current = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
+		local function checkScrollbar() -- 1 equivalent call inferred from this helper
+			ref4.current = scrollingFrame.AbsoluteCanvasSize.Y > scrollingFrame.AbsoluteWindowSize.Y
 		end
-		local function onScroll() -- line: 228
-			-- upvalues: ScrollingFrame (copy), v62 (copy)
-			if ScrollingFrame.CanvasPosition.Y > 0 then
-				v62.current = true
+
+		local function onScroll()
+			if scrollingFrame.CanvasPosition.Y > 0 then
+				ref5.current = true
 			end
 		end
 
-		v61.current = ScrollingFrame.AbsoluteCanvasSize.Y > ScrollingFrame.AbsoluteWindowSize.Y
+		checkScrollbar() -- inferred equivalent call
+		local absoluteCanvasSizeChangedConnection = scrollingFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(checkScrollbar)
 
-		local connection = ScrollingFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(checkScrollbar)
-		local connection2 = ScrollingFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(checkScrollbar)
-		local connection3 = ScrollingFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(onScroll)
+		local absoluteWindowSizeChangedConnection = scrollingFrame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(checkScrollbar)
+		local canvasPositionChangedConnection = scrollingFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(onScroll)
 
-		return function() -- line: 241
-			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
-			connection3:Disconnect()
+		return function()
+			absoluteCanvasSizeChangedConnection:Disconnect()
+			absoluteWindowSizeChangedConnection:Disconnect()
+			canvasPositionChangedConnection:Disconnect()
 		end
-	end, { v67.loading })
-	React.useEffect(function() -- line: 248
-		-- upvalues: v67 (copy), v64 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if v67.error and not v64.current then
-			v64.current = true
-			sendEvent({
-				sub_event_type = TelemetryEventType.Error,
+	end, { v.loading })
+
+	React.useEffect(function()
+		if v.error and not ref7.current then
+			ref7.current = true
+			local v2 = { sub_event_type = telemetryEventType.Error, error_detail = 0 }
+			local error_detail
+
+			if FFlagAbuseReportImproveErrorEvents then
+				error_detail = formatErrorDetailForAnalytics("inExpChatSelection: load failed", v.error)
+			else
 				error_detail = {
-					error_message = "inExpChatSelection: load failed: " .. v67.error
+					error_message = "inExpChatSelection: load failed: " .. v.error
 				}
-			})
-		end
-	end, {
-		v67.error,
-		sendEvent
-	})
+			end
 
-	local v69 = #v68 > 1
-	local v70 = React.useMemo(function() -- line: 259
-		-- upvalues: v53 (copy), v50 (copy), v68 (copy)
-		if v53 then
-			return v53
+			v2.error_detail = error_detail
+			sendEvent(v2)
+		end
+	end, { v.error, sendEvent })
+
+	local v2 = #data > 1
+	local v3 = React.useMemo(function()
+		if state2 then
+			return state2
 		end
 
-		if v50 then
-			for _, v in ipairs(v68) do
-				for _, v2 in ipairs(v.items) do
-					if v2.id == v50 then
-						return v.id
-					end
+		if not state then
+			return data[1] and data[1].id or nil
+		end
+
+		for _, v3 in ipairs(data) do
+			for _, item in ipairs(v3.items) do
+				if item.id == state then
+					return v3.id
 				end
 			end
 		end
 
-		return v68[1] and v68[1].id or nil
-	end, {
-		v53,
-		v50,
-		v68
-	})
-	local v71 = React.useMemo(function() -- line: 275
-		-- upvalues: v68 (copy), Dash (copy), v70 (copy), t5 (copy), REPORT_MESSAGE_NOT_SHOWN_ITEM_ID (copy)
-		if #v68 == 0 then
+		return data[1] and data[1].id or nil
+	end, { state2, state, data })
+
+	local v4 = React.useMemo(function()
+		if #data == 0 then
 			return {}
 		end
 
-		local v108 = Dash.find(v68, function(p1) -- line: 279
-			-- upvalues: v70 (copy)
-			return p1.id == v70
+		local v4 = Dash.find(data, function(p): boolean
+			return p.id == v3
 		end)
-		local v109 = if not t5.reportMessageNotShownText or t5.reportMessageNotShownText == "" then {} else {{
-			id = REPORT_MESSAGE_NOT_SHOWN_ITEM_ID,
-			label = t5.reportMessageNotShownText
-		}}
 
-		for _, v in ipairs(v108 and v108.items or {}) do
-			table.insert(v109, v)
+		local result = props.reportMessageNotShownText and props.reportMessageNotShownText ~= "" and {
+			{ id = REPORT_MESSAGE_NOT_SHOWN_ITEM_ID, label = props.reportMessageNotShownText }
+		} or {}
+
+		for _, v5 in ipairs(v4 and v4.items or {}) do
+			table.insert(result, v5)
 		end
 
-		return v109
-	end, {
-		v68,
-		v70,
-		t5.reportMessageNotShownText
-	})
-	local v72 = v71[#v71] and v71[#v71].id or nil
+		return result
+	end, { data, v3, props.reportMessageNotShownText })
+	local id
 
-	React.useEffect(function() -- line: 300
-		-- upvalues: v50 (copy), v72 (copy), v58 (copy), scrollToItem (copy), v63 (copy)
-		if v50 then
+	if v4[#v4] then
+		id = v4[#v4].id or nil
+	else
+		id = nil
+	end
+
+	React.useEffect(function()
+		if state or not id then
 			return
 		end
 
-		if not v72 then
+		local current = ref2.current[id]
+
+		if not current then
 			return
 		end
 
-		local v112 = v58.current[v72]
+		local flag = false
 
-		if not v112 then
-			return
-		end
-
-		local u113 = false
-
-		local function performScroll() -- line: 315
-			-- upvalues: u113 (ref), scrollToItem (copy), v63 (copy), v112 (copy)
-			if u113 then
+		local function performScroll() -- 2 equivalent calls inferred from this helper
+			if flag then
 				return
 			end
 
-			scrollToItem(v63, {
-				current = v112
-			})
+			scrollToItem(ref6, { current = current })
 		end
 
-		if v112.AbsoluteSize.Y > 0 then
-			if not u113 then
-				scrollToItem(v63, {
-					current = v112
-				})
-			end
+		if current.AbsoluteSize.Y > 0 then
+			performScroll() -- inferred equivalent call
 		else
-			local connection = nil
-
-			connection = v112:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 326
-				-- upvalues: v112 (copy), connection (ref), u113 (ref), scrollToItem (copy), v63 (copy)
-				if v112.AbsoluteSize.Y > 0 then
-					connection:Disconnect()
-
-					if u113 then
-						return
-					end
-
-					scrollToItem(v63, {
-						current = v112
-					})
+			local absoluteSizeChangedConnection = nil
+			absoluteSizeChangedConnection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				if current.AbsoluteSize.Y > 0 then
+					absoluteSizeChangedConnection:Disconnect()
+					performScroll() -- inferred equivalent call
 				end
 			end)
-			task.delay(2, function() -- line: 334
-				-- upvalues: connection (ref)
-				if connection.Connected then
-					connection:Disconnect()
+
+			task.delay(2, function()
+				if absoluteSizeChangedConnection.Connected then
+					absoluteSizeChangedConnection:Disconnect()
 				end
 			end)
 		end
 
-		return function() -- line: 341
-			-- upvalues: u113 (ref)
-			u113 = true
+		return function()
+			flag = true
 		end
-	end, {
-		v72,
-		v50
-	})
-	React.useEffect(function() -- line: 346
-		-- upvalues: v67 (copy), v71 (copy), v65 (copy), sendEvent (copy), TelemetryEventType (copy)
-		if not v67.loading and (not v67.error and #v71 == 0 and not v65.current) then
-			v65.current = true
-			sendEvent({
-				sub_event_type = TelemetryEventType.EmptyState
-			})
-		end
-	end, {
-		v67.loading,
-		v67.error,
-		v71,
-		sendEvent
-	})
+	end, { id, state })
 
-	local v73 = React.useCallback(function() -- line: 360
-		-- upvalues: v59 (copy), v56 (copy)
-		v59.current = true
-		v56(false)
+	React.useEffect(function()
+		if not v.loading and not v.error and #v4 == 0 and not ref8.current then
+			ref8.current = true
+			sendEvent({ sub_event_type = telemetryEventType.EmptyState })
+		end
+	end, { v.loading, v.error, v4, sendEvent })
+
+	local onActivated = React.useCallback(function()
+		ref3.current = true
+		setState3(false)
 	end, {})
-	local v74 = React.useCallback(function() -- line: 365
-		-- upvalues: v56 (copy)
-		v56(false)
+
+	local v5 = React.useCallback(function()
+		setState3(false)
 	end, {})
-	local v75, v76 = React.useState(false)
-	local v77 = useInExpFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v74, not v75)
-	local v78 = React.useMemo(function() -- line: 380
-		-- upvalues: Dash (copy), v68 (copy)
-		return Dash.map(v68, function(t8: {[any]: any}) -- line: 381
-			return {
-				id = t8.id,
-				text = t8.label
-			}
+
+	local state4, setState4 = React.useState(false)
+
+	local ref9 = useInExpFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v5, not state4)
+
+	local items = React.useMemo(function()
+		return Dash.map(data, function(p)
+			return { id = p.id, text = p.label }
 		end)
-	end, { v68 })
-	local v79 = React.useCallback(function() -- line: 386
-		-- upvalues: v51 (copy), REPORT_MESSAGE_NOT_SHOWN_ITEM_ID (copy), v52 (copy), t5 (copy), v73 (copy)
-		v51(REPORT_MESSAGE_NOT_SHOWN_ITEM_ID)
-		v52.current = {
+	end, { data })
+
+	local onActivated2 = React.useCallback(function()
+		setState(REPORT_MESSAGE_NOT_SHOWN_ITEM_ID)
+		ref.current = {
 			id = REPORT_MESSAGE_NOT_SHOWN_ITEM_ID,
-			label = t5.reportMessageNotShownText
+			label = props.reportMessageNotShownText
 		}
-		v73()
-	end, { v73 })
-	local v80 = if not v67.loading then if not v67.error then if #v71 ~= 0 then React.createElement(Sheet.Content, {
-		isContentFullBleed = true,
-		ref = v63
-	}, {
-		ChannelDropdown = if not v38 or not v69 then if not v69 then nil else React.createElement(InExpDropdownWithPopover, {
-			LayoutOrder = 1,
-			value = v70,
-			items = v78,
-			onOpenChange = v76,
-			onItemChanged = function(p2) -- line: 459
-				-- upvalues: v70 (copy), v51 (copy), v54 (copy), sendEvent (copy), TelemetryEventType (copy), v68 (copy)
-				local v120 = v70 or ""
-				local str = tostring(p2)
+		onActivated()
+	end, { onActivated })
+	local sheetContent
 
-				v51(nil)
-				v54(str)
-				sendEvent({
-					sub_event_type = TelemetryEventType.TextChannelSwitch,
-					text_channel_switch_detail = {
-						previous_channel_name = v120,
-						new_channel_name = str,
-						channel_count = #v68
-					}
+	if v.loading then
+		sheetContent = React.createElement(LoadingContent)
+	elseif v.error then
+		sheetContent = React.createElement(ErrorContent, {
+			retry = v.retry,
+			errorText = props.errorText,
+			retryButtonText = props.retryButtonText
+		})
+	elseif #v4 == 0 then
+		sheetContent = React.createElement(Sheet.Content, nil, {
+			Empty = React.createElement(View, {
+				tag = "col align-x-center align-y-center gap-medium size-full"
+			}, {
+				Empty = React.createElement(TextWithTranslation, {
+					input = props.emptyText,
+					tag = "auto-xy",
+					LayoutOrder = 1
+				}),
+				ReportAMessageNotShown = React.createElement(Text, {
+					Text = `<u>{translateIntoString(props.reportMessageNotShownText)}</u>`,
+					RichText = true,
+					tag = "auto-xy padding-small text-wrap text-align-x-center radius-medium",
+					onActivated = onActivated2,
+					LayoutOrder = 2
 				})
-			end
-		}) else React.createElement(View, {
-			tag = "auto-xy padding-x-xlarge padding-top-xsmall",
-			LayoutOrder = 1
-		}, React.createElement(InExpDropdownWithPopover, {
-			LayoutOrder = 1,
-			value = v70,
-			items = v78,
-			onOpenChange = v76,
-			onItemChanged = function(p3) -- line: 438
-				-- upvalues: v70 (copy), v51 (copy), v54 (copy), sendEvent (copy), TelemetryEventType (copy), v68 (copy)
-				local v117 = v70 or ""
-				local str = tostring(p3)
+			})
+		})
+	else
+		local createElement = React.createElement
+		local content = Sheet.Content
+		local channelDropdown
 
-				v51(nil)
-				v54(str)
-				sendEvent({
-					sub_event_type = TelemetryEventType.TextChannelSwitch,
-					text_channel_switch_detail = {
-						previous_channel_name = v117,
-						new_channel_name = str,
-						channel_count = #v68
-					}
-				})
-			end
-		})),
-		ItemList = React.createElement(List.Root, {
-			LayoutOrder = 2,
-			hasDivider = {
-				hasDivider = true,
-				isInset = false
-			},
-			isContained = {
-				isContained = false,
-				hasMargin = true
-			}
-		}, { Dash.map(v71, function(p4, n2: number) -- line: 486
-			-- upvalues: React (copy), Icon (copy), IconName (copy), IconVariant (copy), List (copy), translateIntoString (copy), v51 (copy), v52 (copy), sendEvent (copy), TelemetryEventType (copy), FFlagAbuseReportSelectItemAddId (copy), v71 (copy), v61 (copy), v62 (copy), ListItemInputType (copy), v50 (copy), v58 (copy)
-			local v124 = nil
-
-			if p4.meta and (p4.meta.presetId and p4.meta.presetId ~= "") then
-				v124 = React.createElement(Icon, {
-					name = IconName.LightningBolt,
-					variant = IconVariant.Filled
-				})
-			end
-
-			return React.createElement(List.Item, {
-				description = translateIntoString(p4.label),
-				trailing = v124,
-				onActivated = {
-					onActivated = function() -- line: 499
-						-- upvalues: v51 (copy), p4 (copy), v52 (copy), sendEvent (copy), TelemetryEventType (copy), n2 (copy), FFlagAbuseReportSelectItemAddId (copy), v71 (copy), v61 (copy), v62 (copy)
-						v51(p4.id)
-						v52.current = p4
+		if defineFastFlag and v2 then
+			channelDropdown = React.createElement(
+				View,
+				{ tag = "auto-xy padding-x-xlarge padding-top-xsmall", LayoutOrder = 1 },
+				React.createElement(InExpDropdownWithPopover, {
+					value = v3,
+					items = items,
+					LayoutOrder = 1,
+					onOpenChange = setState4,
+					onItemChanged = function(p)
+						local new_channel_name = tostring(p)
+						setState(nil)
+						setState2(new_channel_name)
 						sendEvent({
-							sub_event_type = TelemetryEventType.SelectItem,
-							select_item_detail = {
-								selected_index = n2,
-								selected_id = if not FFlagAbuseReportSelectItemAddId then nil else p4.id,
-								list_length = #v71,
-								has_scroll = v61.current,
-								did_scroll = v62.current
+							sub_event_type = telemetryEventType.TextChannelSwitch,
+							text_channel_switch_detail = {
+								previous_channel_name = v3 or "",
+								new_channel_name = new_channel_name,
+								channel_count = #data
 							}
 						})
-					end,
-					inputType = ListItemInputType.Radio,
-					isChecked = v50 == p4.id
-				},
-				LayoutOrder = n2,
-				ref = function(p5) -- line: 517
-					-- upvalues: v58 (copy), p4 (copy)
-					v58.current[p4.id] = p5
-				end,
-				key = p4.id
-			})
-		end) }),
-		Footer = t5.footerItems and React.createElement(Footer, {
-			additionalTag = "padding-top-medium",
-			layoutOrder = 3,
-			footerItems = t5.footerItems
-		})
-	}) else React.createElement(Sheet.Content, nil, {
-		Empty = React.createElement(View, {
-			tag = "col align-x-center align-y-center gap-medium size-full"
-		}, {
-			Empty = React.createElement(TextWithTranslation, {
-				tag = "auto-xy",
-				LayoutOrder = 1,
-				input = t5.emptyText
-			}),
-			ReportAMessageNotShown = React.createElement(FoundationText, {
-				RichText = true,
-				tag = "auto-xy padding-small text-wrap text-align-x-center radius-medium",
-				LayoutOrder = 2,
-				Text = `<u>{ translateIntoString(t5.reportMessageNotShownText) }</u>`,
-				onActivated = v79
-			})
-		})
-	}) else React.createElement(ErrorContent, {
-		retry = v67.retry,
-		errorText = t5.errorText,
-		retryButtonText = t5.retryButtonText
-	}) else React.createElement(LoadingContent)
-
-	return React.createElement(React.Fragment, nil, {
-		Content = React.createElement(Layout, {
-			body = nil,
-			actions = nil
-		}),
-		ChatSelectionSheet = React.createElement(Sheet.Root, {
-			centerSheetHeight = 1,
-			preferCenterSheet = true,
-			ref = v77,
-			isOpen = v55,
-			size = DialogSize.Medium,
-			snapPoints = { 0.9 },
-			onClose = function() -- line: 542
-				-- upvalues: v59 (copy), t5 (copy), v50 (copy), v52 (copy)
-				if v59.current then
-					v59.current = false
-
-					if t5.onNext then
-						t5.onNext(v50, v52.current)
-
-						return
 					end
-				elseif t5.goBack then
-					t5.goBack()
+				})
+			)
+		elseif v2 then
+			channelDropdown = React.createElement(InExpDropdownWithPopover, {
+				value = v3,
+				items = items,
+				LayoutOrder = 1,
+				onOpenChange = setState4,
+				onItemChanged = function(p)
+					local new_channel_name = tostring(p)
+					setState(nil)
+					setState2(new_channel_name)
+					sendEvent({
+						sub_event_type = telemetryEventType.TextChannelSwitch,
+						text_channel_switch_detail = {
+							previous_channel_name = v3 or "",
+							new_channel_name = new_channel_name,
+							channel_count = #data
+						}
+					})
 				end
-			end
-		}, {
-			SheetHeader = React.createElement(Sheet.Header, nil, {
-				Title = React.createElement(FoundationText, {
-					tag = "align-x-left auto-xy text-title-large text-truncate-end content-emphasis",
-					Text = translateIntoString(t5.title)
-				})
-			}),
-			SheetContent = v80,
-			SheetActions = if v67.loading or (v67.error or (v50 == nil or v50 == REPORT_MESSAGE_NOT_SHOWN_ITEM_ID and not (#v71 > 0))) then nil else React.createElement(Sheet.Actions, nil, {
-				Button = React.createElement(Button, {
-					variant = ButtonVariant.Emphasis,
-					text = translateIntoString(t5.nextButtonText),
-					isLoading = t5.isSubmitting,
-					isDisabled = t5.isSubmitting,
-					fillBehavior = FillBehavior.Fill,
-					onActivated = v73
-				})
+			})
+		end
+
+		sheetContent = createElement(content, { isContentFullBleed = true, ref = ref6 }, {
+			ChannelDropdown = channelDropdown,
+			ItemList = React.createElement(List.Root, {
+				hasDivider = { hasDivider = true, isInset = false },
+				isContained = { isContained = false, hasMargin = true },
+				LayoutOrder = 2
+			}, { Dash.map(v4, function(props2, p: number)
+					local trailing
+
+					if props2.meta and props2.meta.presetId and props2.meta.presetId ~= "" then
+						trailing = React.createElement(Icon, {
+							name = IconName.LightningBolt,
+							variant = IconVariant.Filled
+						})
+					end
+
+					return React.createElement(List.Item, {
+						description = translateIntoString(props2.label),
+						trailing = trailing,
+						onActivated = {
+							onActivated = function()
+								setState(props2.id)
+								ref.current = props2
+								sendEvent({
+									sub_event_type = telemetryEventType.SelectItem,
+									select_item_detail = {
+										selected_index = p,
+										selected_id = props2.id,
+										list_length = #v4,
+										has_scroll = ref4.current,
+										did_scroll = ref5.current
+									}
+								})
+							end,
+							inputType = ListItemInputType.Radio,
+							isChecked = state == props2.id
+						},
+						LayoutOrder = p,
+						ref = function(p2)
+							ref2.current[props2.id] = p2
+						end,
+						key = props2.id
+					})
+				end) }),
+			Footer = props.footerItems and React.createElement(Footer, {
+				footerItems = props.footerItems,
+				additionalTag = "padding-top-medium",
+				layoutOrder = 3
 			})
 		})
-	})
+	end
+
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v6 = {
+		Content = React.createElement(layout, { body = nil, actions = nil }),
+		ChatSelectionSheet = 0
+	}
+	local createElement2 = React.createElement
+	local root = Sheet.Root
+	local v7 = {
+		ref = ref9,
+		isOpen = state3,
+		centerSheetHeight = 1,
+		size = DialogSize.Medium,
+		preferCenterSheet = true,
+		snapPoints = { 0.9 },
+		onClose = function()
+			if ref3.current then
+				ref3.current = false
+
+				if props.onNext then
+					props.onNext(state, ref.current)
+				end
+			elseif props.goBack then
+				props.goBack()
+			end
+		end
+	}
+	local v8 = {
+		SheetHeader = React.createElement(Sheet.Header, nil, {
+			Title = React.createElement(Text, {
+				tag = "align-x-left auto-xy text-title-large text-truncate-end content-emphasis",
+				Text = translateIntoString(props.title)
+			})
+		}),
+		SheetContent = sheetContent,
+		SheetActions = 0
+	}
+	local sheetActions
+
+	if not (v.loading or v.error or state == nil or state == REPORT_MESSAGE_NOT_SHOWN_ITEM_ID and not (#v4 > 0)) then
+		sheetActions = React.createElement(Sheet.Actions, nil, {
+			Button = React.createElement(Button, {
+				variant = ButtonVariant.Emphasis,
+				text = translateIntoString(props.nextButtonText),
+				isLoading = props.isSubmitting,
+				isDisabled = props.isSubmitting,
+				fillBehavior = FillBehavior.Fill,
+				onActivated = onActivated
+			})
+		})
+	end
+
+	v8.SheetActions = sheetActions
+	v6.ChatSelectionSheet = createElement2(root, v7, v8)
+	return createElement(fragment, nil, v6)
 end
 
 return React.memo(InExpChatSelectionNode)

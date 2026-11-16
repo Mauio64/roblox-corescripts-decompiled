@@ -1,10 +1,12 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParent.Core
-local t = require(ParentParentParent.t)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local validateFontInfo = require(Core.Style.Validator.validateFontInfo)
-local validateTypographyInfo = require(ParentParent.Core.Style.Validator.validateTypographyInfo)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local core = parent.Core
+
+local t = require(parent2.t)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+
+local validateFontInfo = require(core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(parent.Core.Style.Validator.validateTypographyInfo)
 
 return t.array(t.strictInterface({
 	icon = t.optional(t.union(t.table, t.string)),
@@ -12,10 +14,10 @@ return t.array(t.strictInterface({
 	onActivated = t.callback,
 	disabled = t.optional(t.boolean),
 	inputBindingKey = t.optional(t.string),
-	keyCodeLabel = t.optional(t.union(t.enum(Enum.KeyCode), t.strictInterface({
-		key = t.enum(Enum.KeyCode),
-		axis = t.optional(t.string)
-	}))),
+	keyCodeLabel = t.optional(t.union(
+		t.enum(Enum.KeyCode),
+		t.strictInterface({ key = t.enum(Enum.KeyCode), axis = t.optional(t.string) })
+	)),
 	selected = t.optional(t.boolean),
 	stayOnActivated = t.optional(t.boolean),
 	renderRightSideGadget = t.optional(t.callback),
@@ -29,10 +31,7 @@ return t.array(t.strictInterface({
 	iconSize = t.optional(t.integer),
 	selectedIconSize = t.optional(t.integer),
 	iconPaddingLeft = t.optional(t.integer),
-	textPadding = t.optional(t.strictInterface({
-		left = t.integer,
-		right = t.integer
-	})),
+	textPadding = t.optional(t.strictInterface({ left = t.integer, right = t.integer })),
 	selectedIconPaddingRight = t.optional(t.integer),
 	keyLabelPaddingRight = t.optional(t.integer),
 	textOnlyPadding = t.optional(t.integer),

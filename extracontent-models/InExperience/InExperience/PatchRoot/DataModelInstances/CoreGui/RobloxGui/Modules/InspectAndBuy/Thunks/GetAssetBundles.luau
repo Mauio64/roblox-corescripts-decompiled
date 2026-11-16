@@ -1,70 +1,71 @@
 local CorePackages = game:GetService("CorePackages")
-local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local Network = require(ParentParent.Services.Network)
-local BundleInfo = require(ParentParent.Models.BundleInfo)
-local SetBundles = require(ParentParent.Actions.SetBundles)
-local GetProductInfo = require(ParentParent.Thunks.GetProductInfo)
-local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
-local SetAssetToBundlesMapping = require(ParentParent.Actions.SetAssetToBundlesMapping)
-local SendCounter = require(ParentParent.Thunks.SendCounter)
-local Constants = require(ParentParent.Constants)
-local t1 = { Network }
-local v14 = createInspectAndBuyKeyMapper("getAssetBundles")
+local Http = require(CorePackages.Workspace.Packages.Http)
+local PerformFetch = Http.PerformFetch
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local Network = require(parent.Services.Network)
+local BundleInfo = require(parent.Models.BundleInfo)
+local SetBundles = require(parent.Actions.SetBundles)
+local GetProductInfo = require(parent.Thunks.GetProductInfo)
+local createInspectAndBuyKeyMapper = require(parent.createInspectAndBuyKeyMapper)
+local SetAssetToBundlesMapping = require(parent.Actions.SetAssetToBundlesMapping)
+local SendCounter = require(parent.Thunks.SendCounter)
+local Constants = require(parent.Constants)
 
-local function GetAssetBundles(p1) -- line: 23
-	-- upvalues: Thunk (copy), t1 (copy), Network (copy), v14 (copy), PerformFetch (copy), BundleInfo (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), SendCounter (copy), Constants (copy)
-	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 24
-		-- upvalues: Network (copy), v14 (copy), p1 (copy), PerformFetch (copy), BundleInfo (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), SendCounter (copy), Constants (copy)
-		local v19 = p3[Network]
-		local v20 = v14(p2:getState().storeId, p1)
+local v = { Network }
 
-		return PerformFetch.Single(v20, function(_) -- line: 29
-			-- upvalues: v19 (copy), p1 (copy), BundleInfo (copy), p2 (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), SendCounter (copy), Constants (copy)
-			return v19.getAssetBundles(p1):andThen(function(p5) -- line: 30
-				-- upvalues: BundleInfo (copy), p2 (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), p1 (copy), SendCounter (copy), Constants (copy)
-				local t2 = {}
-				local t3 = {}
+local inspectAndBuyKeyMapper = createInspectAndBuyKeyMapper("getAssetBundles")
 
-				for _, v in pairs(p5.data) do
-					local v28 = BundleInfo.fromGetAssetBundles(v)
+local function GetAssetBundles(p)
+	return Thunk.new(script.Name, v, function(object, p2)
+		local v2 = p2[Network]
 
-					table.insert(t3, v28)
-					table.insert(t2, (tostring(v28.bundleId)))
+		local v3 = inspectAndBuyKeyMapper(object:getState().storeId, p)
 
-					local v29 = false
+		return PerformFetch.Single(v3, function(_)
+			return v2.getAssetBundles(p):andThen(function(p3)
+				local v4 = {}
+				local bundleIds = {}
 
-					for _, v2 in pairs(v.items) do
-						if v2.type == "UserOutfit" then
-							v29 = true
+				for _, v5 in pairs(p3.data) do
+					local v6 = BundleInfo.fromGetAssetBundles(v5)
+					table.insert(v4, v6)
+					table.insert(bundleIds, (tostring(v6.bundleId)))
+					local v7 = false
 
+					for _, item in pairs(v5.items) do
+						if item.type == "UserOutfit" then
+							v7 = true
 							break
 						end
 					end
 
-					if not v29 then
-						for _, v3 in pairs(v.items) do
-							if not p2:getState().assets[v3.id] then
-								coroutine.wrap(function() -- line: 54
-									-- upvalues: p2 (copy), GetProductInfo (copy), v3 (copy)
-									p2:dispatch(GetProductInfo(v3.id))
-								end)()
-							end
+					if v7 then
+						continue
+					end
+
+					for _, item in pairs(v5.items) do
+						if object:getState().assets[item.id] then
+							continue
 						end
+
+						local v8 = item
+						coroutine.wrap(function()
+							object:dispatch(GetProductInfo(v8.id))
+						end)()
 					end
 				end
 
-				p2:dispatch(SetBundles(t3))
-				p2:dispatch(SetAssetToBundlesMapping(tostring(p1), t2))
-				p2:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestSucceeded))
-			end, function(_) -- line: 69
-				-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
-				p2:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestRejected))
+				object:dispatch(SetBundles(v4))
+
+				object:dispatch(SetAssetToBundlesMapping(tostring(p), bundleIds))
+
+				object:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestSucceeded))
+			end, function(_)
+				object:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestRejected))
 			end)
-		end)(p2):catch(function(_) -- line: 74
-			-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
-			p2:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestFailed))
+		end)(object):catch(function(_)
+			object:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestFailed))
 		end)
 	end)
 end

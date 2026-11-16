@@ -1,4 +1,1 @@
-return {
-	UserRemoved = require(script.UserRemoved),
-	UserUpdated = require(script.UserUpdated)
-}
+return { UserRemoved = require(script.UserRemoved), UserUpdated = require(script.UserUpdated) }

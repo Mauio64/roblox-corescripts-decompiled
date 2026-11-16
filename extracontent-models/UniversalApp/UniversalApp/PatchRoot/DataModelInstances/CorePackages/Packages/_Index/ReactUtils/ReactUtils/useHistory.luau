@@ -1,21 +1,21 @@
 local ChangeHistoryService = game:GetService("ChangeHistoryService")
+
 local ReactUtils = script:FindFirstAncestor("ReactUtils")
-local ReactUtilsParent = ReactUtils.Parent
-local React = require(ReactUtilsParent.React)
-local LUAU_ANALYZE_ERROR = ReactUtils.LUAU_ANALYZE_ERROR
 
-local function useHistory(p1, p2: ((...any) -> ...any), t1: {[any]: any}) -- line: 11
-	-- upvalues: React (copy), ChangeHistoryService (copy), LUAU_ANALYZE_ERROR (copy)
-	local v10 = React.useRef(p1)
-	local v11 = React.useRef({})
-	local v12 = React.useRef({})
+local parent = ReactUtils.Parent
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 16
-		-- upvalues: ChangeHistoryService (copy), v11 (copy), v12 (copy), LUAU_ANALYZE_ERROR (copy), v10 (copy), p2 (copy)
-		local connection = ChangeHistoryService.OnUndo:Connect(function(p3) -- line: 17
-			-- upvalues: v11 (copy), v12 (copy), LUAU_ANALYZE_ERROR (copy), v10 (copy), p2 (copy)
-			local current = v11.current
-			local current2 = v12.current
+local LUAU_ANALYZE_ERROR = require(ReactUtils.LUAU_ANALYZE_ERROR)
+
+local function useHistory(p, callback, p2)
+	local ref = React.useRef(p)
+	local ref2 = React.useRef({})
+	local ref3 = React.useRef({})
+
+	React.useEffect(function()
+		local onUndoConnection = ChangeHistoryService.OnUndo:Connect(function(p3)
+			local current = ref2.current
+			local current2 = ref3.current
 
 			assert(current ~= nil, LUAU_ANALYZE_ERROR)
 			assert(current2 ~= nil, LUAU_ANALYZE_ERROR)
@@ -28,74 +28,78 @@ local function useHistory(p1, p2: ((...any) -> ...any), t1: {[any]: any}) -- lin
 				current2[p3] = {}
 			end
 
-			local v21 = #current[p3]
-			local v22 = current[p3][v21]
+			local count = #current[p3]
+			local current3 = current[p3][count]
 
-			table.insert(current2[p3], v10.current)
-			table.remove(current[p3], v21)
-			v10.current = v22
-			p2(v22)
-			v11.current = current
-			v12.current = current2
+			table.insert(current2[p3], ref.current)
+			table.remove(current[p3], count)
+
+			ref.current = current3
+			callback(current3)
+
+			ref2.current = current
+			ref3.current = current2
 		end)
-		local connection2 = ChangeHistoryService.OnRedo:Connect(function(p4) -- line: 48
-			-- upvalues: v11 (copy), v12 (copy), LUAU_ANALYZE_ERROR (copy), v10 (copy), p2 (copy)
-			local current = v11.current
-			local current3 = v12.current
+
+		local onRedoConnection = ChangeHistoryService.OnRedo:Connect(function(p3)
+			local current = ref2.current
+			local current2 = ref3.current
 
 			assert(current ~= nil, LUAU_ANALYZE_ERROR)
-			assert(current3 ~= nil, LUAU_ANALYZE_ERROR)
+			assert(current2 ~= nil, LUAU_ANALYZE_ERROR)
 
-			if not current3[p4] or #current3[p4] == 0 then
+			if not current2[p3] or #current2[p3] == 0 then
 				return
 			end
 
-			local v26 = #current3[p4]
-			local v27 = current3[p4][v26]
+			local count = #current2[p3]
+			local current3 = current2[p3][count]
 
-			table.insert(current[p4], v10.current)
-			table.remove(current3[p4], v26)
-			assert(v27 ~= nil, LUAU_ANALYZE_ERROR)
-			v10.current = v27
-			p2(v27)
-			v11.current = current
-			v12.current = current3
+			table.insert(current[p3], ref.current)
+			table.remove(current2[p3], count)
+
+			assert(current3 ~= nil, LUAU_ANALYZE_ERROR)
+
+			ref.current = current3
+			callback(current3)
+
+			ref2.current = current
+			ref3.current = current2
 		end)
 
-		return function() -- line: 76
-			-- upvalues: connection (copy), connection2 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+		return function()
+			onUndoConnection:Disconnect()
+			onRedoConnection:Disconnect()
 		end
-	end, t1)
-	React.useEffect(function() -- line: 82
-		-- upvalues: v11 (copy), v12 (copy)
-		v11.current = {}
-		v12.current = {}
-	end, t1)
+	end, p2)
 
-	return (React.useCallback(function(s1: string, p5) -- line: 87
-		-- upvalues: v11 (copy), LUAU_ANALYZE_ERROR (copy), v12 (copy), ChangeHistoryService (copy), v10 (copy)
-		local current = v11.current
+	React.useEffect(function()
+		ref2.current = {}
+		ref3.current = {}
+	end, p2)
 
-		assert(current ~= nil, LUAU_ANALYZE_ERROR)
+	return (React.useCallback(function(p3: string, current)
+		local current2 = ref2.current
 
-		if not current[s1] then
-			current[s1] = {}
+		assert(current2 ~= nil, LUAU_ANALYZE_ERROR)
+
+		if not current2[p3] then
+			current2[p3] = {}
 		end
 
-		v12.current = {}
-		ChangeHistoryService:SetWaypoint(s1)
+		ref3.current = {}
 
-		if typeof(v10.current) == "table" then
-			table.insert(current[s1], table.clone(v10.current))
+		ChangeHistoryService:SetWaypoint(p3)
+
+		if typeof(ref.current) == "table" then
+			table.insert(current2[p3], table.clone(ref.current))
 		else
-			table.insert(current[s1], v10.current)
+			table.insert(current2[p3], ref.current)
 		end
 
-		v10.current = p5
-		v11.current = current
-	end, t1))
+		ref.current = current
+		ref2.current = current2
+	end, p2))
 end
 
 return useHistory

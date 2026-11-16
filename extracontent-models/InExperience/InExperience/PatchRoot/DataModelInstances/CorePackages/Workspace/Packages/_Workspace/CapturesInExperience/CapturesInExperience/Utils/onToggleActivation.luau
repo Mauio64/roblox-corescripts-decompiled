@@ -1,23 +1,21 @@
-local ParentParent = script.Parent.Parent
-local CapturesActivated = require(ParentParent.Actions.CapturesActivated)
-local CapturesDeactivated = require(ParentParent.Actions.CapturesDeactivated)
-local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
-local ToastDismissed = require(ParentParent.Actions.ToastDismissed)
-local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
+local parent = script.Parent.Parent
 
-return function(b1: boolean, n1: number?, p1, p2, p3, p4) -- line: 9
-	-- upvalues: CapturesActivated (copy), ToastTriggered (copy), CapturesToastType (copy), CapturesDeactivated (copy), ToastDismissed (copy)
-	if (not n1 or n1 == 1) and not b1 then
-		p1(p3)
-		p2(CapturesActivated())
-		p2(ToastTriggered(CapturesToastType.CapturesActivated))
+local CapturesActivated = require(parent.Actions.CapturesActivated)
+local CapturesDeactivated = require(parent.Actions.CapturesDeactivated)
+local CapturesToastType = require(parent.Enums.CapturesToastType)
+local ToastDismissed = require(parent.Actions.ToastDismissed)
+local ToastTriggered = require(parent.Actions.ToastTriggered)
 
-		return
-	end
-
-	if b1 then
-		p1(p4)
-		p2(CapturesDeactivated())
-		p2(ToastDismissed())
+return function(flag: boolean, p: number?, callback, callback2, p2, p3)
+	if p and p ~= 1 or flag then
+		if flag then
+			callback(p3)
+			callback2(CapturesDeactivated())
+			callback2(ToastDismissed())
+		end
+	else
+		callback(p2)
+		callback2(CapturesActivated())
+		callback2(ToastTriggered(CapturesToastType.CapturesActivated))
 	end
 end

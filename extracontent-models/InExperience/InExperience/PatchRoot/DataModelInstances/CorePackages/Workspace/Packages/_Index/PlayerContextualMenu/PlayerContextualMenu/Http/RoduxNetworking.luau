@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
-local RoduxNetworking = require(Parent.LuaSocialLibrariesDeps).RoduxNetworking
+local parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local roduxNetworking = LuaSocialLibrariesDeps.RoduxNetworking
 local httpRequest = require(script.Parent.httpRequest)
 
-return RoduxNetworking.config({
+return roduxNetworking.config({
 	keyPath = "EventReceievers.NetworkStatus",
 	networkImpl = httpRequest
 })

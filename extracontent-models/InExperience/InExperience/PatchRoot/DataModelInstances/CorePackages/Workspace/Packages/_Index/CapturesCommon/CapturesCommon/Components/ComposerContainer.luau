@@ -1,108 +1,148 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Foundation = require(ParentParentParent.Foundation)
-local React = require(ParentParentParent.React)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local Foundation = require(parent2.Foundation)
+local React = require(parent2.React)
+
 local Icon = Foundation.Icon
 local View = Foundation.View
+
 local useCallback = React.useCallback
-local useScreenSize = require(ParentParent.Hooks.useScreenSize)
+local useScreenSize = require(parent.Hooks.useScreenSize)
 local useState = React.useState
 local useTokens = Foundation.Hooks.useTokens
-local CaptureItem = require(ParentParent.Components.CaptureItem)
 
-require(ParentParent.Types)
+local CaptureItem = require(parent.Components.CaptureItem)
+require(parent.Types)
 
 local vector2 = Vector2.new(700, 500)
 
-return function(t1: {[any]: any}) -- line: 31
-	-- upvalues: useTokens (copy), useScreenSize (copy), useState (copy), useCallback (copy), vector2 (copy), React (copy), View (copy), Foundation (copy), Icon (copy), CaptureItem (copy)
-	local v14 = useTokens()
-	local v15 = useScreenSize()
-	local v16, v17 = useState(v15)
-	local v18 = useCallback(function(p1) -- line: 37
-		-- upvalues: v17 (copy), t1 (copy)
-		v17(p1.AbsoluteSize)
-		t1.onAbsoluteSizeChangedCallback(p1)
-	end, { t1.onAbsoluteSizeChangedCallback })
-	local Y = v15.Y
-	local X = v15.X
-	local v21 = t1.enableLargeScreenMode and (v16.X > vector2.X and v16.Y > vector2.Y)
-	local v22 = Y < X
-	local v23 = t1.children ~= nil and 0.6 or 1
+return function(props)
+	local v = useTokens()
 
-	return React.createElement(View, {
-		tag = "size-full-full bg-over-media-0",
-		onAbsoluteSizeChanged = v18,
-		stateLayer = {
-			affordance = Foundation.Enums.StateLayerAffordance.None
+	local v2 = useScreenSize()
+	local state, setState = useState(v2)
+
+	local onAbsoluteSizeChanged = useCallback(function(p)
+		setState(p.AbsoluteSize)
+		props.onAbsoluteSizeChangedCallback(p)
+	end, { props.onAbsoluteSizeChangedCallback })
+
+	local y = v2.Y
+	local x = v2.X
+	local v3 = props.enableLargeScreenMode
+
+	if v3 then
+		if state.X > vector2.X then
+			v3 = state.Y > vector2.Y
+		else
+			v3 = false
+		end
+	end
+
+	local v4 = y < x
+	local v5 = props.children == nil and 1 or 0.6
+
+	local createElement = React.createElement
+	local v6 = {
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+		stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
+		tag = "size-full-full bg-over-media-0"
+	}
+
+	local createElement2 = React.createElement
+	local size
+
+	if v3 then
+		size = UDim2.fromOffset(math.min(state.X, vector2.X), (math.min(state.Y, vector2.Y)))
+	else
+		size = UDim2.fromScale(1, 1)
+	end
+
+	local v7 = {
+		Size = size,
+		stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None },
+		tag = {
+			["anchor-center-center bg-surface-200 position-center-center"] = true,
+			["radius-large"] = v3
 		}
-	}, {
-		ComposerScreenContainer = React.createElement(View, {
-			Size = if not v21 then UDim2.fromScale(1, 1) else UDim2.fromOffset(math.min(v16.X, vector2.X), (math.min(v16.Y, vector2.Y))),
-			stateLayer = {
-				affordance = Foundation.Enums.StateLayerAffordance.None
-			},
-			tag = {
-				["anchor-center-center bg-surface-200 position-center-center"] = true,
-				["radius-large"] = v21
-			}
+	}
+
+	local createElement3 = React.createElement
+
+	local v8 = {
+		BackButtonContainer = React.createElement(View, {
+			tag = "auto-xy bg-action-subtle",
+			ZIndex = 2
 		}, {
-			ComposerContainer = React.createElement(View, {
+			Padding = React.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0, v.Padding.Large),
+				PaddingLeft = UDim.new(0, v.Padding.XXLarge),
+				PaddingRight = UDim.new(0, v.Padding.Large),
+				PaddingTop = UDim.new(0, v.Padding.XXLarge)
+			}),
+			BackButton = React.createElement(View, {
+				onActivated = props.onCloseCallback,
+				tag = { ["auto-xy bg-over-media-300 padding-medium radius-circle"] = true }
+			}, {
+				BackIcon = React.createElement(Icon, {
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					IconSize = Foundation.Enums.IconSize.Small,
+					name = v3 and "icons/navigation/close" or "icons/actions/cycleLeft",
+					Position = UDim2.fromScale(0.5, 0.5),
+					style = v.Color.ActionEmphasis.Foreground,
+					ZIndex = 2
+				})
+			})
+		}),
+		CaptureContainer = 0,
+		ComposerBody = 0
+	}
+
+	local createElement4 = React.createElement
+	local size2
+
+	if v4 then
+		size2 = UDim2.new(v5, not v3 and 0 or v.Padding.Large, 1, 0)
+	else
+		size2 = UDim2.fromScale(1, v5)
+	end
+
+	v8.CaptureContainer = createElement4(View, {
+		Size = size2,
+		tag = {
+			["bg-surface-100 clip"] = true,
+			["padding-right-large"] = v3 and props.children ~= nil,
+			["radius-large"] = v3
+		},
+		ZIndex = 1
+	}, {
+		CapturePreviewFrame = React.createElement(
+			View,
+			{
+				LayoutOrder = 2,
+				tag = "anchor-center-center bg-action-subtle position-center-center size-full-full"
+			},
+			{
+				CapturePreview = React.createElement(CaptureItem, {
+					capture = props.capture,
+					isVideoPlaying = true,
+					onActivated = function() end,
+					scaleType = Enum.ScaleType.Fit
+				})
+			}
+		)
+	})
+
+	v8.ComposerBody = props.children
+	return createElement(View, v6, {
+		ComposerScreenContainer = createElement2(View, v7, {
+			ComposerContainer = createElement3(View, {
 				tag = {
 					["anchor-center-center bg-action-subtle position-center-center size-full-full"] = true,
-					["padding-right-large"] = v21
+					["padding-right-large"] = v3
 				}
-			}, {
-				BackButtonContainer = React.createElement(View, {
-					tag = "auto-xy bg-action-subtle",
-					ZIndex = 2
-				}, {
-					Padding = React.createElement("UIPadding", {
-						PaddingBottom = UDim.new(0, v14.Padding.Large),
-						PaddingLeft = UDim.new(0, v14.Padding.XXLarge),
-						PaddingRight = UDim.new(0, v14.Padding.Large),
-						PaddingTop = UDim.new(0, v14.Padding.XXLarge)
-					}),
-					BackButton = React.createElement(View, {
-						onActivated = t1.onCloseCallback,
-						tag = {
-							["auto-xy bg-over-media-300 padding-medium radius-circle"] = true
-						}
-					}, {
-						BackIcon = React.createElement(Icon, {
-							ZIndex = 2,
-							AnchorPoint = Vector2.new(0.5, 0.5),
-							IconSize = Foundation.Enums.IconSize.Small,
-							name = not v21 and "icons/actions/cycleLeft" or "icons/navigation/close",
-							Position = UDim2.fromScale(0.5, 0.5),
-							style = v14.Color.ActionEmphasis.Foreground
-						})
-					})
-				}),
-				CaptureContainer = React.createElement(View, {
-					ZIndex = 1,
-					Size = if not v22 then UDim2.fromScale(1, v23) else UDim2.new(v23, not v21 and 0 or v14.Padding.Large, 1, 0),
-					tag = {
-						["bg-surface-100 clip"] = true,
-						["padding-right-large"] = v21 and t1.children ~= nil,
-						["radius-large"] = v21
-					}
-				}, {
-					CapturePreviewFrame = React.createElement(View, {
-						LayoutOrder = 2,
-						tag = "anchor-center-center bg-action-subtle position-center-center size-full-full"
-					}, {
-						CapturePreview = React.createElement(CaptureItem, {
-							isVideoPlaying = true,
-							capture = t1.capture,
-							onActivated = function() -- line: 120
-							end,
-							scaleType = Enum.ScaleType.Fit
-						})
-					})
-				}),
-				ComposerBody = t1.children
-			})
+			}, v8)
 		})
 	})
 end

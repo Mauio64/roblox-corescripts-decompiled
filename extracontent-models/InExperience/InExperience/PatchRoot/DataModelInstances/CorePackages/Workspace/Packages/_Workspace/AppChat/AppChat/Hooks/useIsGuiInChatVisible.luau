@@ -1,170 +1,147 @@
 local CoreGui = game:GetService("CoreGui")
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
-local useChatIsVisible = require(script.Parent.useChatIsVisible)
-local setTimeout = require(Parent.LuauPolyfill).setTimeout
-local v7 = game:DefineFastInt("AppChat.GuiVisibleBatchUpdateIntervalMs", 1000)
+local AppChat = script:FindFirstAncestor("AppChat")
+local parent = AppChat.Parent
 
-local function getGuiObjectIsObscuredAtPosition(p1, n1: number, n2: number) -- line: 24
-	-- upvalues: CoreGui (copy)
-	for _, v15 in (CoreGui:GetGuiObjectsAtPosition(n1, n2)) do
-		if not v15:IsA("GuiObject") then
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local useChatIsVisible = require(script.Parent.useChatIsVisible)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local setTimeout = LuauPolyfill.setTimeout
+local getGuiObjectBackgroundTransparency = require(AppChat.Utils.getGuiObjectBackgroundTransparency)
+local FFlagAppChatGuiVisibleUsesStyledTransparency = require(AppChat.Flags.FFlagAppChatGuiVisibleUsesStyledTransparency)
+
+local defineFastInt = game:DefineFastInt("AppChat.GuiVisibleBatchUpdateIntervalMs", 1000)
+
+local function getGuiObjectIsObscuredAtPosition(ancestor, p: number, p2: number): boolean
+	local guiObjectsAtPosition = CoreGui:GetGuiObjectsAtPosition(p, p2)
+
+	for _, guiObject in guiObjectsAtPosition do
+		if not guiObject:IsA("GuiObject") then
 			continue
 		end
 
-		if v15 == p1 then
+		local v
+
+		if FFlagAppChatGuiVisibleUsesStyledTransparency then
+			v = getGuiObjectBackgroundTransparency(guiObject)
+		else
+			v = guiObject.BackgroundTransparency
+		end
+
+		if guiObject == ancestor then
 			return false
 		end
 
-		if v15.Visible ~= false and not (v15.BackgroundTransparency > 0.95) and not v15:IsDescendantOf(p1) then
+		if guiObject.Visible ~= false and not (v > 0.95) and not guiObject:IsDescendantOf(ancestor) then
 			return true
 		end
 	end
 
 	return false
 end
-local function getGuiObjectIsObscured(p2) -- line: 42
-	-- upvalues: getGuiObjectIsObscuredAtPosition (copy)
-	local AbsolutePosition = p2.AbsolutePosition
-	local AbsoluteSize = p2.AbsoluteSize
-	local v19 = AbsolutePosition + AbsoluteSize * 0.5
-	local v20 = AbsolutePosition + AbsoluteSize
-	local v21 = AbsolutePosition + Vector2.new(AbsoluteSize.X, 0)
-	local v22 = AbsolutePosition + Vector2.new(0, AbsoluteSize.Y)
-	local n3 = 1
-	local UICorner = p2:FindFirstChildOfClass("UICorner")
 
-	if UICorner and UICorner:IsA("UICorner") then
-		local CornerRadiusOffset = UICorner.CornerRadius.Offset
+local function getGuiObjectIsObscured(current)
+	local absolutePosition = current.AbsolutePosition
+	local absoluteSize = current.AbsoluteSize
+	local v = absolutePosition + absoluteSize * 0.5
 
-		if CornerRadiusOffset > 0 then
-			n3 = math.ceil(CornerRadiusOffset * 0.3) + 1
+	local v2 = absolutePosition + absoluteSize
+	local v3 = absolutePosition + Vector2.new(absoluteSize.X, 0)
+	local v4 = absolutePosition + Vector2.new(0, absoluteSize.Y)
+	local v5 = 1
+
+	local uiCorner = current:FindFirstChildOfClass("UICorner")
+
+	if uiCorner and uiCorner:IsA("UICorner") then
+		local offset = uiCorner.CornerRadius.Offset
+
+		if offset > 0 then
+			v5 = math.ceil(offset * 0.3) + 1
 		end
 	end
 
-	local v26 = getGuiObjectIsObscuredAtPosition(p2, v19.X, v19.Y)
-	local v27 = getGuiObjectIsObscuredAtPosition(p2, AbsolutePosition.X + n3, AbsolutePosition.Y + n3)
-	local v28 = getGuiObjectIsObscuredAtPosition(p2, v22.X + n3, v22.Y - n3)
-	local v29 = getGuiObjectIsObscuredAtPosition(p2, v21.X - n3, v21.Y + n3)
-	local v30 = getGuiObjectIsObscuredAtPosition(p2, v20.X - n3, v20.Y - n3)
+	local guiObjectIsObscuredAtPosition = getGuiObjectIsObscuredAtPosition(current, v.X, v.Y)
 
-	return v26 or (v27 or (v28 or (v29 or v30)))
+	local guiObjectIsObscuredAtPosition2 = getGuiObjectIsObscuredAtPosition(
+		current,
+		absolutePosition.X + v5,
+		absolutePosition.Y + v5
+	)
+
+	local guiObjectIsObscuredAtPosition3 = getGuiObjectIsObscuredAtPosition(current, v4.X + v5, v4.Y - v5)
+
+	local guiObjectIsObscuredAtPosition4 = getGuiObjectIsObscuredAtPosition(current, v3.X - v5, v3.Y + v5)
+
+	local guiObjectIsObscuredAtPosition5 = getGuiObjectIsObscuredAtPosition(current, v2.X - v5, v2.Y - v5)
+
+	return guiObjectIsObscuredAtPosition
+		or guiObjectIsObscuredAtPosition2
+		or guiObjectIsObscuredAtPosition3
+		or guiObjectIsObscuredAtPosition4
+		or guiObjectIsObscuredAtPosition5
 end
-local function useIsGuiInChatVisible(t1: {[any]: any}, t2: {[any]: any}) -- line: 82
-	-- upvalues: useChatIsVisible (copy), React (copy), getGuiObjectIsObscured (copy), setTimeout (copy), v7 (copy), Cryo (copy)
-	local v33 = useChatIsVisible()
-	local v34, v35 = React.useState(false)
-	local v36 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 92
-		-- upvalues: t1 (copy), getGuiObjectIsObscured (copy), v35 (copy), v36 (copy), setTimeout (copy), v7 (copy), v33 (copy)
-		local function updateIsGuiVisible() -- line: 93
-			-- upvalues: t1 (copy), getGuiObjectIsObscured (copy), v35 (copy)
-			if t1.current and t1.current:IsA("GuiObject") then
-				local IsNotOccluded = t1.current.IsNotOccluded
-				local v43 = getGuiObjectIsObscured(t1.current)
-				local v44 = IsNotOccluded and not v43
+local function useIsGuiInChatVisible(p, p2)
+	local v = useChatIsVisible()
+	local state, setState = React.useState(false)
+	local ref = React.useRef(nil)
 
-				v35(v44)
+	React.useEffect(function()
+		local function updateIsGuiVisible() -- 1 equivalent call inferred from this helper
+			if not (p.current and p.current:IsA("GuiObject")) then
+				setState(false)
 
 				return
 			end
 
-			v35(false)
+			local isNotOccluded = p.current.IsNotOccluded
+			local guiObjectIsObscured = getGuiObjectIsObscured(p.current)
+
+			setState(isNotOccluded and not guiObjectIsObscured)
 		end
-		local function queueUpdateIsGuiVisible() -- line: 103
-			-- upvalues: v36 (copy), setTimeout (copy), t1 (copy), getGuiObjectIsObscured (copy), v35 (copy), v7 (copy)
-			if v36.current then
+		local function queueUpdateIsGuiVisible() -- 2 equivalent calls inferred from this helper
+			if ref.current then
 				return
 			end
 
-			v36.current = setTimeout(function() -- line: 107
-				-- upvalues: v36 (copy), t1 (copy), getGuiObjectIsObscured (copy), v35 (copy)
-				v36.current = nil
-
-				if t1.current and t1.current:IsA("GuiObject") then
-					local IsNotOccluded = t1.current.IsNotOccluded
-					local v52 = getGuiObjectIsObscured(t1.current)
-					local v53 = IsNotOccluded and not v52
-
-					v35(v53)
-
-					return
-				end
-
-				v35(false)
-			end, v7)
+			ref.current = setTimeout(function()
+				ref.current = nil
+				updateIsGuiVisible() -- inferred equivalent call
+			end, defineFastInt)
 		end
-		local function onDescendantEvent(p3) -- line: 112
-			-- upvalues: v36 (copy), setTimeout (copy), t1 (copy), getGuiObjectIsObscured (copy), v35 (copy), v7 (copy)
-			if not p3:IsA("GuiObject") then
+		local function onDescendantEvent(guiObject)
+			if not guiObject:IsA("GuiObject") then
 				return
 			end
 
-			if v36.current then
-				return
-			end
-
-			v36.current = setTimeout(function() -- line: 107
-				-- upvalues: v36 (copy), t1 (copy), getGuiObjectIsObscured (copy), v35 (copy)
-				v36.current = nil
-
-				if t1.current and t1.current:IsA("GuiObject") then
-					local IsNotOccluded = t1.current.IsNotOccluded
-					local v55 = getGuiObjectIsObscured(t1.current)
-					local v56 = IsNotOccluded and not v55
-
-					v35(v56)
-
-					return
-				end
-
-				v35(false)
-			end, v7)
+			queueUpdateIsGuiVisible() -- inferred equivalent call
 		end
 
-		if not v36.current then
-			v36.current = setTimeout(function() -- line: 107
-				-- upvalues: v36 (copy), t1 (copy), getGuiObjectIsObscured (copy), v35 (copy)
-				v36.current = nil
+		queueUpdateIsGuiVisible() -- inferred equivalent call
+		local connections = {}
 
-				if t1.current and t1.current:IsA("GuiObject") then
-					local IsNotOccluded = t1.current.IsNotOccluded
-					local v47 = getGuiObjectIsObscured(t1.current)
-					local v48 = IsNotOccluded and not v47
+		if p.current and p.current:IsA("GuiObject") and v then
+			table.insert(
+				connections,
+				p.current:GetPropertyChangedSignal("IsNotOccluded"):Connect(queueUpdateIsGuiVisible)
+			)
 
-					v35(v48)
+			local layerCollector = p.current:FindFirstAncestorWhichIsA("LayerCollector")
 
-					return
-				end
-
-				v35(false)
-			end, v7)
-		end
-
-		local t3 = {}
-
-		if t1.current and t1.current:IsA("GuiObject") and v33 then
-			table.insert(t3, t1.current:GetPropertyChangedSignal("IsNotOccluded"):Connect(queueUpdateIsGuiVisible))
-
-			local LayerCollector = t1.current:FindFirstAncestorWhichIsA("LayerCollector")
-
-			if LayerCollector then
-				table.insert(t3, LayerCollector.DescendantAdded:Connect(onDescendantEvent))
-				table.insert(t3, LayerCollector.DescendantRemoving:Connect(onDescendantEvent))
+			if layerCollector then
+				table.insert(connections, layerCollector.DescendantAdded:Connect(onDescendantEvent))
+				table.insert(connections, layerCollector.DescendantRemoving:Connect(onDescendantEvent))
 			end
 		end
 
-		return function() -- line: 133
-			-- upvalues: t3 (copy)
-			for _, v50 in t3 do
-				v50:Disconnect()
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
 			end
 		end
-	end, Cryo.List.join(t2, { v33 }))
+	end, Cryo.List.join(p2, { v }))
 
-	return v33 and v34
+	return v and state
 end
 
 return useIsGuiInChatVisible

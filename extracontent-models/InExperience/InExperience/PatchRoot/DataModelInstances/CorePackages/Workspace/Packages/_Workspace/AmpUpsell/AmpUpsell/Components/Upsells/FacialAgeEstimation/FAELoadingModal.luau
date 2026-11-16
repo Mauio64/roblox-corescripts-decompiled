@@ -1,40 +1,46 @@
-local Parent = script:FindFirstAncestor("AmpUpsell").Parent
-local React = require(Parent.React)
-local useScreenSize = require(Parent.RobloxAppHooks).useScreenSize
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local UIBlox = require(Parent.UIBlox)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AmpUpsell").Parent
+
+local React = require(parent.React)
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useScreenSize = RobloxAppHooks.useScreenSize
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
-local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local authButtonClick = require(Parent.AuthAnalytics).Events.authButtonClick
 
-local function FAELoadingModal(t1: {[any]: any}) -- line: 27
-	-- upvalues: useScreenSize (copy), useLocalization (copy), React (copy), authButtonClick (copy), Loading (copy), IconSize (copy), InteractiveAlert (copy), ButtonType (copy)
-	local onCancel = t1.onCancel
-	local sessionId = t1.sessionId
-	local entryPointEventCtx = t1.entryPointEventCtx
-	local v17 = useScreenSize()
-	local v18 = useLocalization({
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+
+local AuthAnalytics = require(parent.AuthAnalytics)
+local authButtonClick = AuthAnalytics.Events.authButtonClick
+
+local function FAELoadingModal(props)
+	local onCancel = props.onCancel
+	local sessionId = props.sessionId
+	local entryPointEventCtx = props.entryPointEventCtx
+
+	local screenSize = useScreenSize()
+
+	local v = useLocalization({
 		title = "Amp.FAEUpsell.Modal.Loading.Title",
 		bodyText = "Amp.FAEUpsell.Modal.Loading.Text",
 		cancelBtn = "Amp.FAEUpsell.Modal.Loading.ButtonCancel"
 	})
-	local v19 = React.useCallback(function() -- line: 40
-		-- upvalues: authButtonClick (copy), entryPointEventCtx (copy), sessionId (copy), onCancel (copy)
+
+	local onActivated = React.useCallback(function()
 		authButtonClick(entryPointEventCtx, "faeLoadingCancel", sessionId)
 		onCancel()
-	end, {
-		onCancel,
-		sessionId,
-		entryPointEventCtx
-	})
-	local v20 = React.useCallback(function() -- line: 45
-		-- upvalues: React (copy), Loading (copy), IconSize (copy)
+	end, { onCancel, sessionId, entryPointEventCtx })
+
+	local middleContent = React.useCallback(function()
 		return React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 80)
+			Size = UDim2.new(1, 0, 0, 80),
+			BackgroundTransparency = 1
 		}, {
 			Spinner = React.createElement(Loading, {
 				size = IconSize.Medium,
@@ -45,19 +51,18 @@ local function FAELoadingModal(t1: {[any]: any}) -- line: 27
 	end, {})
 
 	return React.createElement(InteractiveAlert, {
-		screenSize = v17,
-		title = v18.title,
-		bodyText = v18.bodyText,
+		screenSize = screenSize,
+		title = v.title,
+		bodyText = v.bodyText,
 		buttonStackInfo = {
-			buttons = {{
-				buttonType = ButtonType.Secondary,
-				props = {
-					onActivated = v19,
-					text = v18.cancelBtn
+			buttons = {
+				{
+					buttonType = ButtonType.Secondary,
+					props = { onActivated = onActivated, text = v.cancelBtn }
 				}
-			}}
+			}
 		},
-		middleContent = v20
+		middleContent = middleContent
 	})
 end
 

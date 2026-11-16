@@ -1,43 +1,50 @@
 local Players = game:GetService("Players")
-local Parent = script:FindFirstAncestor("GameDetail").Parent
-local Signals = require(Parent.Signals)
-local FFlagLuaAppDismissUnlockUpsell = require(Parent.SharedFlags).FFlagLuaAppDismissUnlockUpsell
-local v5, v6 = Signals.createSignal(false)
 
-local function getLocalPlayerUserId() -- line: 23
-	-- upvalues: Players (copy)
-	local v11 = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
+local parent = script:FindFirstAncestor("GameDetail").Parent
+local Signals = require(parent.Signals)
 
-	if v11 == nil or v11 <= 0 then
-		return nil
-	end
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppDismissUnlockUpsell = SharedFlags.FFlagLuaAppDismissUnlockUpsell
 
-	return v11
+local signal, v = Signals.createSignal(false)
+
+local function getIsAgeCheckUpsellDismissed(p)
+	return signal(p)
+end
+
+local function setAgeCheckUpsellDismissed()
+	v(true)
+end
+
+local function getLocalPlayerUserId() -- 1 equivalent call inferred from this helper
+	local userId = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
+	return if not (userId == nil or userId <= 0) then userId else nil
 end
 
 if FFlagLuaAppDismissUnlockUpsell then
-	local v8 = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
-	local u9 = if v8 ~= nil and not (v8 <= 0) then v8 else nil
+	local v2
 
-	Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 35
-		-- upvalues: Players (copy), u9 (ref), v6 (copy)
-		local v12 = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
-		local v13 = if v12 ~= nil and not (v12 <= 0) then v12 else nil
+	if Players.LocalPlayer then
+		v2 = Players.LocalPlayer.UserId or nil
+	else
+		v2 = nil
+	end
 
-		if v13 ~= u9 then
-			u9 = v13
-			v6(false)
+	if v2 == nil or v2 <= 0 then
+		v2 = nil
+	end
+
+	Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function()
+		local localPlayerUserId = getLocalPlayerUserId() -- inferred equivalent call
+
+		if localPlayerUserId ~= v2 then
+			v2 = localPlayerUserId
+			v(false)
 		end
 	end)
 end
 
 return {
-	getIsAgeCheckUpsellDismissed = function(p1) -- line: 15
-		-- upvalues: v5 (copy)
-		return v5(p1)
-	end,
-	setAgeCheckUpsellDismissed = function() -- line: 19
-		-- upvalues: v6 (copy)
-		v6(true)
-	end
+	getIsAgeCheckUpsellDismissed = getIsAgeCheckUpsellDismissed,
+	setAgeCheckUpsellDismissed = setAgeCheckUpsellDismissed
 }

@@ -1,6 +1,4 @@
 return {
-	DefaultChannelNames = {
-		RBXGeneral = true,
-		RBXSystem = true
-	}
+	ChatWindowMessageHideRootFadeThreshold = 0.85,
+	DefaultChannelNames = { RBXGeneral = true, RBXSystem = true }
 }

@@ -1,22 +1,18 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
-require(Parent.Signals)
+require(parent.Signals)
 
-local GetFFlagEdpPlayerFeedbackEnabled = require(Parent.SharedFlags).GetFFlagEdpPlayerFeedbackEnabled
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEdpPlayerFeedbackEnabled = SharedFlags.GetFFlagEdpPlayerFeedbackEnabled
 
 require(script.Parent.UserVoteFeedbackMetadataStoreTypes)
 
 return {
-	calculateDerivedField = function(s1: string, p1, _) -- line: 13
-		-- upvalues: GetFFlagEdpPlayerFeedbackEnabled (copy)
-		if s1 == "isHidden" then
-			if GetFFlagEdpPlayerFeedbackEnabled() and p1 and p1.canSubmitReview then
-				return false
-			end
-
-			return true
+	calculateDerivedField = function(p: string, p2, _): nil | boolean
+		if p ~= "isHidden" then
+			return nil
 		end
 
-		return nil
+		return not (GetFFlagEdpPlayerFeedbackEnabled() and p2 and p2.canSubmitReview)
 	end
 }

@@ -1,42 +1,37 @@
 local UserInputService = game:GetService("UserInputService")
+
 local KeyCode = Enum.KeyCode
 local UserInputType = Enum.UserInputType
-local t1 = {
-	KEYBOARD = "Keyboard",
-	GAMEPAD = "Gamepad"
+
+local controlLayouts = { KEYBOARD = "Keyboard", GAMEPAD = "Gamepad" }
+
+local inputToControlTypeMap = {
+	[Enum.UserInputType.MouseButton2] = controlLayouts.KEYBOARD,
+	[Enum.UserInputType.MouseButton3] = controlLayouts.KEYBOARD,
+	[Enum.UserInputType.MouseWheel] = controlLayouts.KEYBOARD,
+	[Enum.UserInputType.MouseMovement] = controlLayouts.KEYBOARD,
+	[Enum.UserInputType.Keyboard] = controlLayouts.KEYBOARD,
+	[Enum.UserInputType.Gamepad1] = controlLayouts.GAMEPAD,
+	[Enum.UserInputType.Gamepad2] = controlLayouts.GAMEPAD,
+	[Enum.UserInputType.Gamepad3] = controlLayouts.GAMEPAD,
+	[Enum.UserInputType.Gamepad4] = controlLayouts.GAMEPAD,
+	[Enum.UserInputType.Gamepad5] = controlLayouts.GAMEPAD,
+	[Enum.UserInputType.Gamepad6] = controlLayouts.GAMEPAD,
+	[Enum.UserInputType.Gamepad7] = controlLayouts.GAMEPAD,
+	[Enum.UserInputType.Gamepad8] = controlLayouts.GAMEPAD
 }
-local t2 = {
-	[Enum.UserInputType.MouseButton2] = t1.KEYBOARD,
-	[Enum.UserInputType.MouseButton3] = t1.KEYBOARD,
-	[Enum.UserInputType.MouseWheel] = t1.KEYBOARD,
-	[Enum.UserInputType.MouseMovement] = t1.KEYBOARD,
-	[Enum.UserInputType.Keyboard] = t1.KEYBOARD,
-	[Enum.UserInputType.Gamepad1] = t1.GAMEPAD,
-	[Enum.UserInputType.Gamepad2] = t1.GAMEPAD,
-	[Enum.UserInputType.Gamepad3] = t1.GAMEPAD,
-	[Enum.UserInputType.Gamepad4] = t1.GAMEPAD,
-	[Enum.UserInputType.Gamepad5] = t1.GAMEPAD,
-	[Enum.UserInputType.Gamepad6] = t1.GAMEPAD,
-	[Enum.UserInputType.Gamepad7] = t1.GAMEPAD,
-	[Enum.UserInputType.Gamepad8] = t1.GAMEPAD
-}
-local t3 = {
+
+local keybinds = {
 	{
 		title = "CoreScripts.InGameMenu.Controls.CharacterMovementTitle",
 		controls = {
 			{
 				desc = "CoreScripts.InGameMenu.Controls.MoveForward",
-				inputs = {
-					KeyCode.Up,
-					KeyCode.W
-				}
+				inputs = { KeyCode.Up, KeyCode.W }
 			},
 			{
 				desc = "CoreScripts.InGameMenu.Controls.MoveBackward",
-				inputs = {
-					KeyCode.Down,
-					KeyCode.S
-				}
+				inputs = { KeyCode.Down, KeyCode.S }
 			},
 			{
 				desc = "CoreScripts.InGameMenu.Controls.MoveLeft",
@@ -57,11 +52,7 @@ local t3 = {
 		controls = {
 			{
 				desc = "CoreScripts.InGameMenu.Controls.RotateCamera",
-				inputs = {
-					KeyCode.Left,
-					KeyCode.Right,
-					UserInputType.MouseButton2
-				}
+				inputs = { KeyCode.Left, KeyCode.Right, UserInputType.MouseButton2 }
 			},
 			{
 				desc = "CoreScripts.InGameMenu.Controls.ZoomInOutCamera",
@@ -86,12 +77,8 @@ local t3 = {
 		controls = {
 			{
 				desc = "CoreScripts.InGameMenu.Controls.EquipUnequipTools",
-				list = true,
-				inputs = {
-					KeyCode.One,
-					KeyCode.Two,
-					KeyCode.Three
-				}
+				inputs = { KeyCode.One, KeyCode.Two, KeyCode.Three },
+				list = true
 			},
 			{
 				desc = "CoreScripts.InGameMenu.Controls.DropTool",
@@ -125,7 +112,8 @@ local t3 = {
 		}
 	}
 }
-local t4 = {
+
+local v = {
 	title = "CoreScripts.InGameMenu.Controls.MiscellaneousTitle",
 	controls = {
 		{
@@ -134,66 +122,47 @@ local t4 = {
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.Screenshot",
-			inputs = {{
-				KeyCode.LeftSuper,
-				KeyCode.LeftShift,
-				KeyCode.Three
-			}}
+			inputs = {
+				{ KeyCode.LeftSuper, KeyCode.LeftShift, KeyCode.Three }
+			}
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.DevConsole",
 			inputs = {
-				{
-					KeyCode.LeftMeta,
-					KeyCode.F9
-				},
+				{ KeyCode.LeftMeta, KeyCode.F9 },
 				KeyCode.F9
 			}
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.GraphicsLevelUp",
 			inputs = {
-				{
-					KeyCode.LeftMeta,
-					KeyCode.F10
-				},
+				{ KeyCode.LeftMeta, KeyCode.F10 },
 				KeyCode.F10
 			}
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.GraphicsLevelDown",
 			inputs = {
-				{
-					KeyCode.LeftMeta,
-					KeyCode.LeftShift,
-					KeyCode.F10
-				},
-				{
-					KeyCode.LeftShift,
-					KeyCode.F10
-				}
+				{ KeyCode.LeftMeta, KeyCode.LeftShift, KeyCode.F10 },
+				{ KeyCode.LeftShift, KeyCode.F10 }
 			}
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.ToggleFullscreen",
-			inputs = {{
-				KeyCode.LeftControl,
-				KeyCode.LeftSuper,
-				KeyCode.F
-			}}
+			inputs = {
+				{ KeyCode.LeftControl, KeyCode.LeftSuper, KeyCode.F }
+			}
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.PerformanceStats",
-			inputs = {{
-				KeyCode.LeftMeta,
-				KeyCode.LeftAlt,
-				KeyCode.LeftSuper,
-				KeyCode.F7
-			}}
+			inputs = {
+				{ KeyCode.LeftMeta, KeyCode.LeftAlt, KeyCode.LeftSuper, KeyCode.F7 }
+			}
 		}
 	}
 }
-local t5 = {
+
+local v2 = {
 	title = "CoreScripts.InGameMenu.Controls.MiscellaneousTitle",
 	controls = {
 		{
@@ -218,10 +187,9 @@ local t5 = {
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.GraphicsLevelDown",
-			inputs = {{
-				KeyCode.LeftShift,
-				KeyCode.F10
-			}}
+			inputs = {
+				{ KeyCode.LeftShift, KeyCode.F10 }
+			}
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.ToggleFullscreen",
@@ -229,88 +197,83 @@ local t5 = {
 		},
 		{
 			desc = "CoreScripts.InGameMenu.Controls.PerformanceStats",
-			inputs = {{
-				KeyCode.LeftControl,
-				KeyCode.LeftShift,
-				KeyCode.F7
-			}}
+			inputs = {
+				{ KeyCode.LeftControl, KeyCode.LeftShift, KeyCode.F7 }
+			}
 		}
 	}
 }
 
 if UserInputService:GetPlatform() == Enum.Platform.OSX then
-	table.insert(t3, t4)
+	table.insert(keybinds, v)
 else
-	table.insert(t3, t5)
+	table.insert(keybinds, v2)
 end
 
-local t6 = {
-	left = {
-		"CoreScripts.InGameMenu.Controls.SwitchToolGamepad",
-		"CoreScripts.InGameMenu.Controls.GameMenuToggleGamepad",
-		"CoreScripts.InGameMenu.Controls.MoveGamepad",
-		"CoreScripts.InGameMenu.Controls.MenuNavigationGamepad"
-	},
-	right = {
-		"CoreScripts.InGameMenu.Controls.UseTool",
-		"CoreScripts.InGameMenu.Controls.RobloxMenu",
-		"CoreScripts.InGameMenu.Controls.BackGamepad",
-		"CoreScripts.InGameMenu.Controls.Jump"
-	},
-	camera = {
-		"CoreScripts.InGameMenu.Controls.RotateCameraGamepad",
-		"CoreScripts.InGameMenu.Controls.CameraZoomGamepad"
-	}
-}
-local t7 = {
-	{
-		labelKey = "ResetCameraLabel",
-		xPosition = -0.015,
-		yPosition = 0.335,
-		width = 0.17,
-		xAlignment = Enum.TextXAlignment.Right
-	},
-	{
-		labelKey = "MenuLabel",
-		xPosition = -0.015,
-		yPosition = 0.397,
-		width = 0.17,
-		xAlignment = Enum.TextXAlignment.Right
-	},
-	{
-		labelKey = "SelectItemLabel",
-		xPosition = 0.442,
-		yPosition = 0.621,
-		width = 0.09,
-		xAlignment = Enum.TextXAlignment.Center
-	},
-	{
-		labelKey = "BackExitLabel",
-		xPosition = 0.818,
-		yPosition = 0.287,
-		width = 0.17,
-		xAlignment = Enum.TextXAlignment.Left
-	},
-	{
-		labelKey = "FirstPersonCameraLabel",
-		xPosition = 0.818,
-		yPosition = 0.342,
-		width = 0.17,
-		xAlignment = Enum.TextXAlignment.Left
-	},
-	{
-		labelKey = "JumpSelectLabel",
-		xPosition = 0.818,
-		yPosition = 0.413,
-		width = 0.17,
-		xAlignment = Enum.TextXAlignment.Left
-	}
-}
-
 return {
-	ControlLayouts = t1,
-	keybinds = t3,
-	inputToControlTypeMap = t2,
-	gamepadLabels = t6,
-	questGamepadLabels = t7
+	ControlLayouts = controlLayouts,
+	keybinds = keybinds,
+	inputToControlTypeMap = inputToControlTypeMap,
+	gamepadLabels = {
+		left = {
+			"CoreScripts.InGameMenu.Controls.SwitchToolGamepad",
+			"CoreScripts.InGameMenu.Controls.GameMenuToggleGamepad",
+			"CoreScripts.InGameMenu.Controls.MoveGamepad",
+			"CoreScripts.InGameMenu.Controls.MenuNavigationGamepad"
+		},
+		right = {
+			"CoreScripts.InGameMenu.Controls.UseTool",
+			"CoreScripts.InGameMenu.Controls.RobloxMenu",
+			"CoreScripts.InGameMenu.Controls.BackGamepad",
+			"CoreScripts.InGameMenu.Controls.Jump"
+		},
+		camera = {
+			"CoreScripts.InGameMenu.Controls.RotateCameraGamepad",
+			"CoreScripts.InGameMenu.Controls.CameraZoomGamepad"
+		}
+	},
+	questGamepadLabels = {
+		{
+			labelKey = "ResetCameraLabel",
+			xPosition = -0.015,
+			yPosition = 0.335,
+			xAlignment = Enum.TextXAlignment.Right,
+			width = 0.17
+		},
+		{
+			labelKey = "MenuLabel",
+			xPosition = -0.015,
+			yPosition = 0.397,
+			xAlignment = Enum.TextXAlignment.Right,
+			width = 0.17
+		},
+		{
+			labelKey = "SelectItemLabel",
+			xPosition = 0.442,
+			yPosition = 0.621,
+			xAlignment = Enum.TextXAlignment.Center,
+			width = 0.09
+		},
+		{
+			labelKey = "BackExitLabel",
+			xPosition = 0.818,
+			yPosition = 0.287,
+			xAlignment = Enum.TextXAlignment.Left,
+			width = 0.17
+		},
+		{
+			labelKey = "FirstPersonCameraLabel",
+			xPosition = 0.818,
+			yPosition = 0.342,
+			xAlignment = Enum.TextXAlignment.Left,
+			width = 0.17
+		},
+		{
+			labelKey = "JumpSelectLabel",
+			xPosition = 0.818,
+			yPosition = 0.413,
+			xAlignment = Enum.TextXAlignment.Left,
+			width = 0.17
+		}
+	}
 }

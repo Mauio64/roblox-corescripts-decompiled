@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
 require(script.Parent.ReactInternalTypes)
 
 local ReactWorkTags = require(script.Parent.ReactWorkTags)
@@ -14,84 +14,85 @@ local IndeterminateComponent = ReactWorkTags.IndeterminateComponent
 local ForwardRef = ReactWorkTags.ForwardRef
 local SimpleMemoComponent = ReactWorkTags.SimpleMemoComponent
 local ClassComponent = ReactWorkTags.ClassComponent
-local ReactComponentStackFrame = require(ParentParent.Shared).ReactComponentStackFrame
+
+local Shared = require(parent.Shared)
+local ReactComponentStackFrame = Shared.ReactComponentStackFrame
+
 local describeBuiltInComponentFrame = ReactComponentStackFrame.describeBuiltInComponentFrame
+
 local describeFunctionComponentFrame = ReactComponentStackFrame.describeFunctionComponentFrame
 local describeClassComponentFrame = ReactComponentStackFrame.describeClassComponentFrame
 
-local function describeFiber(p1) -- line: 39
-	-- upvalues: ReactGlobals (copy), HostComponent (copy), describeBuiltInComponentFrame (copy), LazyComponent (copy), SuspenseComponent (copy), SuspenseListComponent (copy), FunctionComponent (copy), IndeterminateComponent (copy), SimpleMemoComponent (copy), describeFunctionComponentFrame (copy), ForwardRef (copy), ClassComponent (copy), describeClassComponentFrame (copy)
-	local type = nil
+local function describeFiber(data)
+	local kind = nil
 
 	if ReactGlobals.__DEV__ then
-		local _debugOwner = p1._debugOwner
+		local debugOwner = data._debugOwner
 
-		if _debugOwner then
-			type = _debugOwner.type
+		if debugOwner then
+			kind = debugOwner.type
 		end
 	end
 
-	local _debugSource = nil
+	local debugSource
 
 	if ReactGlobals.__DEV__ then
-		_debugSource = p1._debugSource
+		debugSource = data._debugSource
 	end
 
-	if p1.tag == HostComponent then
-		return describeBuiltInComponentFrame(p1.type, _debugSource, type)
+	if data.tag == HostComponent then
+		return describeBuiltInComponentFrame(data.type, debugSource, kind)
 	end
 
-	if p1.tag == LazyComponent then
-		return describeBuiltInComponentFrame("Lazy", _debugSource, type)
+	if data.tag == LazyComponent then
+		return describeBuiltInComponentFrame("Lazy", debugSource, kind)
 	end
 
-	if p1.tag == SuspenseComponent then
-		return describeBuiltInComponentFrame("Suspense", _debugSource, type)
+	if data.tag == SuspenseComponent then
+		return describeBuiltInComponentFrame("Suspense", debugSource, kind)
 	end
 
-	if p1.tag == SuspenseListComponent then
-		return describeBuiltInComponentFrame("SuspenseList", _debugSource, type)
+	if data.tag == SuspenseListComponent then
+		return describeBuiltInComponentFrame("SuspenseList", debugSource, kind)
 	end
 
-	if p1.tag == FunctionComponent or p1.tag == IndeterminateComponent or p1.tag == SimpleMemoComponent then
-		return describeFunctionComponentFrame(p1.type, _debugSource, type)
+	if data.tag == FunctionComponent or data.tag == IndeterminateComponent or data.tag == SimpleMemoComponent then
+		return describeFunctionComponentFrame(data.type, debugSource, kind)
 	end
 
-	if p1.tag == ForwardRef then
-		return describeFunctionComponentFrame(p1.type.render, _debugSource, type)
+	if data.tag == ForwardRef then
+		return describeFunctionComponentFrame(data.type.render, debugSource, kind)
 	end
 
-	if p1.tag == ClassComponent then
-		return describeClassComponentFrame(p1.type, _debugSource, type)
+	if data.tag == ClassComponent then
+		return describeClassComponentFrame(data.type, debugSource, kind)
 	end
 
 	return ""
 end
 
 return {
-	getStackByFiberInDevAndProd = function(p2) -- line: 77
-		-- upvalues: describeFiber (copy)
-		local ok, result = pcall(function() -- line: 78
-			-- upvalues: p2 (copy), describeFiber (copy)
-			local s1 = ""
-			local v26 = p2
+	getStackByFiberInDevAndProd = function(p)
+		local success, result = pcall(function()
+			local v = p
+			local v2 = ""
 
 			repeat
-				s1 ..= describeFiber(v26)
-				v26 = v26.return_
-			until v26 == nil
+				v2 ..= describeFiber(v)
+				v = v.return_
+			until v == nil
 
-			return s1
+			return v2
 		end)
 
-		if not ok then
-			if typeof(result) == "table" and result.message and result.stack then
-				return "\nError generating stack: " .. result.message .. "\n" .. tostring(result.stack)
-			end
-
-			return "\nError generating stack: " .. tostring(result)
+		if success then
+			return result
 		end
 
-		return result
+		if typeof(result) == "table" and result.message and result.stack then
+			return "\nError generating stack: " .. result.message .. "\n" .. tostring(result.stack)
+		end
+
+		return "\nError generating stack: " .. tostring(result)
 	end
 }

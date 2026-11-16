@@ -1,13 +1,14 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Flags = require(Foundation.Utility.Flags)
-local t1 = {
+
+local context = React.createContext(Flags.FoundationPopoverPluginOverlayMeasurement and {
 	id = nil,
 	ready = true
-}
-local v6 = React.createContext(if not Flags.FoundationPopoverPluginOverlayMeasurement then nil else t1)
+} or nil)
+context.displayName = "PluginPopoverParentContext"
 
-v6.displayName = "PluginPopoverParentContext"
-
-return v6
+return context

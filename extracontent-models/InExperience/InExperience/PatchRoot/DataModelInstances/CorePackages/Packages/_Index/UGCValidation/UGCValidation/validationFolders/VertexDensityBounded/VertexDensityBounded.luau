@@ -1,23 +1,23 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFIntUGCValidationVertexDensityThreshold = require(ParentParent.flags.getFIntUGCValidationVertexDensityThreshold)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
+local getFIntUGCValidationVertexDensityThreshold = require(parent.flags.getFIntUGCValidationVertexDensityThreshold)
 return {
-	fflag = require(ParentParent.flags.getFFlagUGCValidateMigrateMeshGeometry),
-	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING },
+	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING, ValidationEnums.UploadCategory.EYEBROW_EYELASH },
 	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 19
-		-- upvalues: UGCValidationService (copy), getFIntUGCValidationVertexDensityThreshold (copy), ErrorSourceStrings (copy)
-		for _, v9 in p2.renderMeshesData do
-			if UGCValidationService:GetEditableMeshMaxNearbyVerticesCollisions(v9.editable, v9.scale) > getFIntUGCValidationVertexDensityThreshold() then
-				p1:fail(ErrorSourceStrings.Keys.MeshGeometry_VertexDensityExceeded, {})
+	run = function(object, p)
+		for _, v in p.renderMeshesData do
+			if not (UGCValidationService:GetEditableMeshMaxNearbyVerticesCollisions(v.editable, v.scale) > getFIntUGCValidationVertexDensityThreshold()) then
+				continue
 			end
+
+			object:fail(ErrorSourceStrings.Keys.MeshGeometry_VertexDensityExceeded, {})
 		end
 	end
 }

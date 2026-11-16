@@ -1,12 +1,12 @@
-local scriptParent = script.Parent
-local React = require(scriptParent.React)
-local ReactRoblox = require(scriptParent.ReactRoblox)
-local Shared = require(scriptParent.Shared)
+local parent = script.Parent
+
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+local Shared = require(parent.Shared)
+
 local RoactTree = require(script.RoactTree)
 
 return {
-	Ref = "ref",
-	Children = "children",
 	Component = React.Component,
 	PureComponent = React.PureComponent,
 	createElement = React.createElement,
@@ -21,6 +21,8 @@ return {
 	oneChild = require(script.oneChild),
 	setGlobalConfig = require(script.setGlobalConfig),
 	Portal = require(script.Portal),
+	Ref = "ref",
+	Children = "children",
 	Event = Shared.Event,
 	Change = Shared.Change,
 	createBinding = React.createBinding,

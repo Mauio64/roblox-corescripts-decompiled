@@ -1,45 +1,43 @@
 local CorePackages = game:GetService("CorePackages")
 local SocialService = game:GetService("SocialService")
-local default = require(CorePackages.Workspace.Packages.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
-local v4 = require(CorePackages.Workspace.Packages.CachedPolicyService):IsContentSharingAllowed()
-local v5 = require(CorePackages.Packages.PolicyProvider).GetPolicyImplementations.MemStorageService("app-policy")
-local v6 = game:DefineFastFlag("DifferentiateSharingBaseOnPlatform", false)
-local u7 = false
 
-if v6 then
-	local v8 = v5.read()
+local ExternalContentSharingProtocol = require(CorePackages.Workspace.Packages.ExternalContentSharingProtocol)
+local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
+local CachedPolicyService = require(CorePackages.Workspace.Packages.CachedPolicyService)
 
-	u7 = not not v8 and (not not v8.EnableShareCaptureCTA and (v8.EligibleForCapturesFeature or false))
+local isContentSharingAllowed = CachedPolicyService:IsContentSharingAllowed()
+
+local PolicyProvider = require(CorePackages.Packages.PolicyProvider)
+local memStorageService = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+
+local defineFastFlag = game:DefineFastFlag("DifferentiateSharingBaseOnPlatform", false)
+local v
+
+if defineFastFlag then
+	local v2 = memStorageService.read()
+	v = v2 and v2.EnableShareCaptureCTA and v2.EligibleForCapturesFeature or false
+else
+	v = false
 end
 
-SocialService.OpenShareSheetWithLink:Connect(function(s1: string) -- line: 21
-	-- upvalues: default (copy), v6 (copy), u7 (ref), v4 (copy)
+SocialService.OpenShareSheetWithLink:Connect(function(p: string)
 	if not default then
 		return
 	end
 
 	assert(default ~= nil, "ExternalContentSharingProtocol is required")
 
-	if v6 then
-		if not u7 then
-			default:setClipboardText({
-				context = "PromptLinkSharing",
-				text = s1
-			})
+	if defineFastFlag then
+		if not v then
+			default:setClipboardText({ context = "PromptLinkSharing", text = p })
 
 			return
 		end
-	elseif not v4 then
-		default:setClipboardText({
-			context = "PromptLinkSharing",
-			text = s1
-		})
+	elseif not isContentSharingAllowed then
+		default:setClipboardText({ context = "PromptLinkSharing", text = p })
 
 		return
 	end
 
-	default:shareUrl({
-		context = "PromptLinkSharing",
-		url = s1
-	})
+	default:shareUrl({ context = "PromptLinkSharing", url = p })
 end)

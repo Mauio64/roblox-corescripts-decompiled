@@ -1,9 +1,9 @@
-local ParentParent = script.Parent.Parent.Parent
-local String = require(ParentParent.LuauPolyfill).String
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local String = LuauPolyfill.String
 
-return function(p1) -- line: 6
-	-- upvalues: String (copy)
-	local v4 = "0000" .. string.format("%x", p1)
+return function(p)
+	local v = "0000" .. string.format("%x", p)
 
-	return "\"\\u" .. String.slice(v4, -4):upper() .. "\""
+	return "\"\\u" .. String.slice(v, -4):upper() .. "\""
 end

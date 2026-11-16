@@ -1,1 +1,3 @@
-return (require(script.Tabs))
+local Tabs = require(script.Tabs)
+
+return Tabs

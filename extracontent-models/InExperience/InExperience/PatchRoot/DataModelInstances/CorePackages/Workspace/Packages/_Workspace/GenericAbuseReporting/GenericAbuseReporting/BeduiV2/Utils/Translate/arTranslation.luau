@@ -1,46 +1,38 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local React = require(parent.React)
 local translate = require(script.Parent.translate)
-local useTokens = Foundation.Hooks.useTokens
+
 local translateIntoString = translate.translateIntoString
 local translateIntoRichTextString = translate.translateIntoRichTextString
-local v8 = React.createContext(nil)
 
-return {
-	ArTranslationContext = v8,
-	ArTranslationProvider = function(t1: {[any]: any}) -- line: 27
-		-- upvalues: useTokens (copy), React (copy), translateIntoString (copy), translateIntoRichTextString (copy), v8 (copy)
-		local LinkColor3 = useTokens().Color.Content.Link.Color3
-		local v11 = React.useMemo(function() -- line: 31
-			-- upvalues: translateIntoString (copy), t1 (copy), translateIntoRichTextString (copy), LinkColor3 (copy)
-			return {
-				translateIntoString = function(p1) -- line: 32
-					-- upvalues: translateIntoString (copy), t1 (copy)
-					return translateIntoString(t1.translations, p1)
-				end,
-				translateIntoRichTextString = function(p2) -- line: 36
-					-- upvalues: translateIntoRichTextString (copy), t1 (copy), LinkColor3 (copy)
-					return translateIntoRichTextString(t1.translations, p2, LinkColor3)
-				end
-			}
-		end, {
-			t1.translations,
-			LinkColor3
-		})
+local context = React.createContext(nil)
+local ArTranslation = {}
+ArTranslation.ArTranslationContext = context
 
-		return React.createElement(v8.Provider, {
-			value = v11
-		}, t1.children)
-	end,
-	useArTranslation = function() -- line: 51
-		-- upvalues: React (copy), v8 (copy)
-		local v12 = React.useContext(v8)
+function ArTranslation.ArTranslationProvider(p)
+	local v = React.useMemo(function()
+		return {
+			translateIntoString = function(p2)
+				return translateIntoString(p.translations, p2)
+			end,
+			translateIntoRichTextString = function(p2)
+				return translateIntoRichTextString(p.translations, p2)
+			end
+		}
+	end, { p.translations })
 
-		if not v12 then
-			error("Invalid use of `useArTranslation` hook. Ensure your component has an ancestor wrapped in `ArTranslationProvider`")
-		end
+	return React.createElement(context.Provider, { value = v }, p.children)
+end
 
-		return v12
+function ArTranslation.useArTranslation()
+	local v = React.useContext(context)
+
+	if not v then
+		error("Invalid use of `useArTranslation` hook. Ensure your component has an ancestor wrapped in `ArTranslationProvider`")
 	end
-}
+
+	return v
+end
+
+return ArTranslation

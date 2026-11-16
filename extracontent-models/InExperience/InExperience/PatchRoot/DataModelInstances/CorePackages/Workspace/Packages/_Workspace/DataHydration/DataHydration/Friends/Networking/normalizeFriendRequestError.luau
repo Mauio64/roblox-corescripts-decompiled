@@ -1,15 +1,23 @@
 local HttpService = game:GetService("HttpService")
 
-return function(p1) -- line: 14
-	-- upvalues: HttpService (copy)
-	local v3 = if type(p1) ~= "table" then nil else p1.StatusCode
+return function(p)
+	local statusCode
+
+	if type(p) == "table" then
+		statusCode = p.StatusCode
+	end
+
 	local code = nil
-	local v5 = if type(p1) ~= "table" then nil else p1.Body
+	local body
 
-	if type(v5) == "string" then
-		local ok, result = pcall(HttpService.JSONDecode, HttpService, v5)
+	if type(p) == "table" then
+		body = p.Body
+	end
 
-		if ok and type(result) == "table" then
+	if type(body) == "string" then
+		local success, result = pcall(HttpService.JSONDecode, HttpService, body)
+
+		if success and type(result) == "table" then
 			local errors = result.errors
 
 			if type(errors) == "table" and errors[1] then
@@ -18,8 +26,5 @@ return function(p1) -- line: 14
 		end
 	end
 
-	return {
-		statusCode = v3,
-		firstErrorCode = code
-	}
+	return { statusCode = statusCode, firstErrorCode = code }
 end

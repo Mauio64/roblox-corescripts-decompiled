@@ -1,3 +1,4 @@
-require(script.Parent.Parent.Enums.ItemTypeEnum)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+require(parent.AvatarExperienceModel)
 
 return {}

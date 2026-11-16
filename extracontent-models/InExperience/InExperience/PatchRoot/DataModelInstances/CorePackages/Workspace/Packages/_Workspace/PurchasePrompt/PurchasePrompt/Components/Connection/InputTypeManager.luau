@@ -1,89 +1,99 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
+local parent = PurchasePrompt.Parent
 local UserInputService = game:GetService("UserInputService")
-local Roact = require(PurchasePromptParent.PurchasePromptDeps).Roact
-local MouseIconOverrideService = require(PurchasePromptParent.CoreScriptsCommon).MouseIconOverrideService
+
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local Roact = PurchasePromptDeps.Roact
+
+local CoreScriptsCommon = require(parent.CoreScriptsCommon)
+local MouseIconOverrideService = CoreScriptsCommon.MouseIconOverrideService
+
 local SetGamepadEnabled = require(PurchasePrompt.Actions.SetGamepadEnabled)
 local PromptState = require(PurchasePrompt.Enums.PromptState)
 local connectToStore = require(PurchasePrompt.connectToStore)
+
 local ExternalEventConnection = require(script.Parent.ExternalEventConnection)
-local t1 = {
+
+local set = {
 	[Enum.UserInputType.Gamepad1] = true,
 	[Enum.UserInputType.Gamepad2] = true,
 	[Enum.UserInputType.Gamepad3] = true,
 	[Enum.UserInputType.Gamepad4] = true
 }
-local v11 = Roact.Component:extend("InputTypeManager")
 
-function v11.init(p1) -- line: 31
-	-- upvalues: t1 (copy)
-	local setGamepadEnabled = p1.props.setGamepadEnabled
+local extended = Roact.Component:extend("InputTypeManager")
 
-	function p1.dispatchOnChange(p2) -- line: 34
-		-- upvalues: t1 (copy), p1 (copy), setGamepadEnabled (copy)
-		local v27 = not not t1[p2]
+function extended:init()
+	local setGamepadEnabled = self.props.setGamepadEnabled
 
-		if v27 == p1.props.gamepadEnabled then
+	function self.dispatchOnChange(p)
+		local v = set[p] and true or false
+
+		if v == self.props.gamepadEnabled then
 			return
 		end
 
-		setGamepadEnabled(v27)
+		setGamepadEnabled(v)
 	end
 
-	p1.cursorOverridden = false
+	self.cursorOverridden = false
 end
-function v11.render(p3) -- line: 50
-	-- upvalues: Roact (copy), ExternalEventConnection (copy), UserInputService (copy)
+
+function extended.render(p)
 	return Roact.createElement(ExternalEventConnection, {
 		event = UserInputService.LastInputTypeChanged,
-		callback = p3.dispatchOnChange
+		callback = p.dispatchOnChange
 	})
 end
-function v11.didUpdate(p4, p5, _) -- line: 57
-	-- upvalues: PromptState (copy), MouseIconOverrideService (copy)
-	local v20 = p5.promptState == PromptState.None and p4.props.promptState ~= PromptState.None
-	local v21 = p5.promptState ~= PromptState.None and p4.props.promptState == PromptState.None
-	local v22 = p4.props.promptState ~= PromptState.None
-	local v23 = p4.props.gamepadEnabled and Enum.OverrideMouseIconBehavior.ForceHide or Enum.OverrideMouseIconBehavior.ForceShow
 
-	if v22 and p5.gamepadEnabled ~= p4.props.gamepadEnabled then
-		if p4.cursorOverridden then
+function extended:didUpdate(p, _)
+	local v
+
+	if p.promptState == PromptState.None then
+		v = self.props.promptState ~= PromptState.None
+	else
+		v = false
+	end
+
+	local v2
+
+	if p.promptState == PromptState.None then
+		v2 = false
+	else
+		v2 = self.props.promptState == PromptState.None
+	end
+
+	local v3 = self.props.promptState ~= PromptState.None
+
+	local forceHide = self.props.gamepadEnabled and Enum.OverrideMouseIconBehavior.ForceHide
+		or Enum.OverrideMouseIconBehavior.ForceShow
+
+	if v3 and p.gamepadEnabled ~= self.props.gamepadEnabled then
+		if self.cursorOverridden then
 			MouseIconOverrideService.pop("PurchasePromptOverrideKey")
 		end
 
-		MouseIconOverrideService.push("PurchasePromptOverrideKey", v23)
-		p4.cursorOverridden = true
-
-		return
-	end
-
-	if v20 then
-		MouseIconOverrideService.push("PurchasePromptOverrideKey", v23)
-		p4.cursorOverridden = true
-
-		return
-	end
-
-	if v21 then
+		MouseIconOverrideService.push("PurchasePromptOverrideKey", forceHide)
+		self.cursorOverridden = true
+	elseif v then
+		MouseIconOverrideService.push("PurchasePromptOverrideKey", forceHide)
+		self.cursorOverridden = true
+	elseif v2 then
 		MouseIconOverrideService.pop("PurchasePromptOverrideKey")
-		p4.cursorOverridden = false
+		self.cursorOverridden = false
 	end
 end
 
-local function mapStateToProps(p7) -- line: 84
-	return {
-		promptState = p7.promptState,
-		gamepadEnabled = p7.gamepadEnabled
-	}
+local function mapStateToProps(p)
+	return { promptState = p.promptState, gamepadEnabled = p.gamepadEnabled }
 end
-local function mapDispatchToProps(p8) -- line: 91
-	-- upvalues: SetGamepadEnabled (copy)
+
+local function mapDispatchToProps(callback)
 	return {
-		setGamepadEnabled = function(p9) -- line: 93
-			-- upvalues: p8 (copy), SetGamepadEnabled (copy)
-			p8(SetGamepadEnabled(p9))
+		setGamepadEnabled = function(p)
+			callback(SetGamepadEnabled(p))
 		end
 	}
 end
 
-return (connectToStore(mapStateToProps, mapDispatchToProps)(v11))
+return (connectToStore(mapStateToProps, mapDispatchToProps)(extended))

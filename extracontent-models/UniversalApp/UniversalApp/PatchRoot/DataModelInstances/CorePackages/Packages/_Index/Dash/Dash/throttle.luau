@@ -1,64 +1,44 @@
-local scriptParent = script.Parent
-local assign = require(scriptParent.assign)
+local parent = script.Parent
+local assign = require(parent.assign)
 
-local function throttle(p1, n1: number, t1: {[any]: any}?) -- line: 43
-	-- upvalues: assign (copy)
-	local t2 = {
-		leading = true,
-		trailing = true
-	}
-	local v8 = assign(t2, t1)
-	local v9 = math.max(0, n1)
-	local leading = v8.leading
-	local trailing = v8.trailing
-	local n2 = -1e999
-	local u13 = nil
-	local t3 = {}
+local function throttle(callback, p: number, p2)
+	local v = assign({ leading = true, trailing = true }, p2)
 
-	local function clearScheduled() -- line: 59
-		-- upvalues: u13 (ref)
-		if u13 then
-			task.cancel(u13)
-			u13 = nil
+	local v2 = math.max(0, p)
+	local leading = v.leading
+	local trailing = v.trailing
+
+	local v3 = -1e999
+	local thread = nil
+	local v4 = {}
+
+	local function clearScheduled() -- 1 equivalent call inferred from this helper
+		if thread then
+			task.cancel(thread)
+			thread = nil
 		end
 	end
-	local function invoke() -- line: 66
-		-- upvalues: n2 (ref), u13 (ref), p1 (copy), t3 (ref)
-		n2 = os.clock()
-		u13 = nil
-		p1(table.unpack(t3))
+
+	local function invoke() -- 1 equivalent call inferred from this helper
+		v3 = os.clock()
+		thread = nil
+		callback(table.unpack(v4))
 	end
 
-	return function(...) -- line: 73
-		-- upvalues: t3 (ref), n2 (ref), leading (copy), v9 (copy), u13 (ref), p1 (copy), trailing (copy), invoke (copy)
-		local elapsed = os.clock()
+	return function(...)
+		local now = os.clock()
+		v4 = { ... }
 
-		t3 = { ... }
+		local v5 = now - v3
 
-		local v18 = elapsed - n2
+		if leading and v2 <= v5 then
+			clearScheduled() -- inferred equivalent call
+			invoke() -- inferred equivalent call
+		elseif trailing and not thread then
+			local v6 = v2 - (now - (v3 == -1e999 and now or v3))
+			local v7 = v6 < 0 and 0 or v6
 
-		if leading and v18 >= v9 then
-			if u13 then
-				task.cancel(u13)
-				u13 = nil
-			end
-
-			n2 = os.clock()
-			u13 = nil
-			p1(table.unpack(t3))
-
-			return
-		end
-
-		if trailing and not u13 then
-			local v19 = n2 == -1e999 and elapsed or n2
-			local v20 = v9 - (elapsed - v19)
-
-			if v20 < 0 then
-				v20 = 0
-			end
-
-			u13 = task.delay(v20, invoke)
+			thread = task.delay(v7, invoke)
 		end
 	end
 end

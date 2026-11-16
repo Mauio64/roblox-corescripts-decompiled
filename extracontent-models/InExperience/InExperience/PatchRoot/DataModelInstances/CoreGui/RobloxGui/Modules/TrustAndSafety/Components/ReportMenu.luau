@@ -1,65 +1,70 @@
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
+
 local Cryo = require(CorePackages.Packages.Cryo)
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local t = require(CorePackages.Packages.t)
-local ParentParent = script.Parent.Parent
-local Dependencies = require(ParentParent.Dependencies)
+
+local parent = script.Parent.Parent
+local Dependencies = require(parent.Dependencies)
 local BarOnTopScrollingFrame = require(Dependencies.BarOnTopScrollingFrame)
 local Divider = require(Dependencies.Divider)
 local PlayerCell = require(Dependencies.PlayerCell)
 local PlayerSearchPredicate = require(Dependencies.PlayerSearchPredicate)
 local SearchBar = require(Dependencies.SearchBar)
-
 require(Dependencies.ThemedTextLabel)
-
 local withLocalization = require(Dependencies.withLocalization)
-local NavigateBack = require(ParentParent.Actions.NavigateBack)
-local EndReportFlow = require(ParentParent.Actions.EndReportFlow)
-local SelectReportListing = require(ParentParent.Actions.SelectReportListing)
 
-require(ParentParent.Resources.Assets)
+local NavigateBack = require(parent.Actions.NavigateBack)
+local EndReportFlow = require(parent.Actions.EndReportFlow)
+local SelectReportListing = require(parent.Actions.SelectReportListing)
+require(parent.Resources.Assets)
+local Constants = require(parent.Resources.Constants)
+local ModalDialog = require(parent.Components.ModalDialog)
+local GameCell = require(parent.Components.GameCell)
+local SendAnalytics = require(parent.Utility.SendAnalytics)
+local SessionUtility = require(parent.Utility.SessionUtility)
 
-local Constants = require(ParentParent.Resources.Constants)
-local ModalDialog = require(ParentParent.Components.ModalDialog)
-local GameCell = require(ParentParent.Components.GameCell)
-local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
-local SessionUtility = require(ParentParent.Utility.SessionUtility)
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 local VoiceIndicatorFunc = require(RobloxGui.Modules.VoiceChat.Components.VoiceIndicatorFunc)
 local VoiceStateContext = require(RobloxGui.Modules.VoiceChat.VoiceStateContext)
 local Constants2 = require(RobloxGui.Modules.VoiceChat.Constants)
 local React = require(CorePackages.Packages.React)
+
 local Colors = UIBlox.App.Style.Colors
+
 local HeaderBar = UIBlox.App.Bar.HeaderBar
 local IconButton = UIBlox.App.Button.IconButton
 local IconSize = UIBlox.App.ImageSet.Enum.IconSize
 local Provider = UIBlox.Core.Style.Provider
 local Images = UIBlox.App.ImageSet.Images
 local withStyle = UIBlox.Core.Style.withStyle
-local isPlayerVerified = require(CorePackages.Workspace.Packages.UserLib).Utils.isPlayerVerified
-local makeBackButton = require(CorePackages.Workspace.Packages.AppHeaderBar).makeBackButton
-local t1 = {
-	BackgroundDefault = {
-		Transparency = 1,
-		Color = Colors.Flint
-	}
-}
-local v40 = Roact.PureComponent:extend("ReportMenu")
 
-local function v41(p1) -- line: 63
-	-- upvalues: React (copy), VoiceStateContext (copy), VoiceIndicatorFunc (copy), Cryo (copy)
-	if not React.useContext(VoiceStateContext.Context).voiceEnabled then
-		return nil
+local UserLib = require(CorePackages.Workspace.Packages.UserLib)
+local isPlayerVerified = UserLib.Utils.isPlayerVerified
+local AppHeaderBar = require(CorePackages.Workspace.Packages.AppHeaderBar)
+local makeBackButton = AppHeaderBar.makeBackButton
+
+local v = {
+	BackgroundDefault = { Color = Colors.Flint, Transparency = 1 }
+}
+
+local extended = Roact.PureComponent:extend("ReportMenu")
+
+local function fn(p)
+	if React.useContext(VoiceStateContext.Context).voiceEnabled then
+		return React.createElement(VoiceIndicatorFunc, Cryo.Dictionary.join(p, {}))
 	end
 
-	return React.createElement(VoiceIndicatorFunc, Cryo.Dictionary.join(p1, {}))
+	return nil
 end
 
-v40.validateProps = t.strictInterface({
+extended.validateProps = t.strictInterface({
 	isReportMenuOpen = t.boolean,
 	screenSize = t.Vector2,
 	closeDialog = t.callback,
@@ -69,339 +74,328 @@ v40.validateProps = t.strictInterface({
 	navigateBack = t.optional(t.callback)
 })
 
-function v40.init(p2) -- line: 81
-	-- upvalues: Roact (copy), default (copy)
-	p2.scrollingFrameRef = Roact.createRef()
-	p2.state = {
-		isFilterMode = false,
-		filterText = nil
-	}
+function extended:init()
+	self.scrollingFrameRef = Roact.createRef()
 
-	function p2.onSearch() -- line: 89
-		-- upvalues: p2 (copy)
-		p2:setState({
-			isFilterMode = true,
-			filterText = ""
-		})
-	end
-	function p2.onTextChanged(p3) -- line: 96
-		-- upvalues: p2 (copy)
-		p2:setState({
-			filterText = p3
-		})
-	end
-	function p2.onCancel() -- line: 102
-		-- upvalues: p2 (copy), Roact (copy)
-		p2:setState({
-			isFilterMode = false,
-			filterText = Roact.None
-		})
-	end
-	function p2.scrollToTop() -- line: 109
-		-- upvalues: p2 (copy)
-		local v80 = p2.scrollingFrameRef:getValue()
+	self.state = { isFilterMode = false, filterText = nil }
 
-		if v80 then
-			v80:scrollToTop()
+	function self.onSearch()
+		self:setState({ isFilterMode = true, filterText = "" })
+	end
+
+	function self.onTextChanged(filterText)
+		self:setState({ filterText = filterText })
+	end
+
+	function self.onCancel()
+		self:setState({ isFilterMode = false, filterText = Roact.None })
+	end
+
+	function self.scrollToTop()
+		local value = self.scrollingFrameRef:getValue()
+
+		if value then
+			value:scrollToTop()
 		end
 	end
-	function p2.navigateBack() -- line: 116
-		-- upvalues: p2 (copy)
-		p2.props.navigateBack(p2.state.filterText ~= nil)
-	end
-	function p2.closeDialog() -- line: 120
-		-- upvalues: p2 (copy)
-		p2.props.closeDialog(p2.state.filterText ~= nil)
+
+	function self.navigateBack()
+		self.props.navigateBack(self.state.filterText ~= nil)
 	end
 
-	p2.layoutBindings = {}
+	function self.closeDialog()
+		self.props.closeDialog(self.state.filterText ~= nil)
+	end
 
-	function p2.getLayoutBinding(p4, p5) -- line: 125
-		-- upvalues: p2 (copy), Roact (copy)
-		local v83 = p2.layoutBindings[p4]
+	self.layoutBindings = {}
+	function self.getLayoutBinding(p, p2)
+		local v2 = self.layoutBindings[p]
 
-		if not v83 then
-			local v84, v85 = Roact.createBinding(p5)
+		if not v2 then
+			local binding, setValue = Roact.createBinding(p2)
+			v2 = { valueBinding = binding, setValue = setValue, value = p2 }
 
-			v83 = {
-				valueBinding = v84,
-				setValue = v85,
-				value = p5
-			}
-			p2.layoutBindings[p4] = v83
+			self.layoutBindings[p] = v2
 		end
 
-		if p5 ~= v83.value then
-			v83.value = p5
-			v83.setValue(p5)
+		if v2.value ~= p2 then
+			v2.value = p2
+			v2.setValue(p2)
 		end
 
-		return v83.valueBinding
-	end
-	function p2.playerIsVoiceActive(n1: number) -- line: 145
-		-- upvalues: default (copy)
-		return default.participants[tostring(n1)] ~= nil
+		return v2.valueBinding
 	end
 
-	p2.sortedUserIds = {}
+	function self.playerIsVoiceActive(p: number): boolean
+		return default.participants[tostring(p)] ~= nil
+	end
+
+	self.sortedUserIds = {}
 end
 
-local function sortPlayers(p6, p7) -- line: 152
-	return p6.DisplayName:lower() < p7.DisplayName:lower()
+local function sortPlayers(p, p2): boolean
+	return p.DisplayName:lower() < p2.DisplayName:lower()
 end
 
-function v40.getPlayerList(p8) -- line: 156
-	-- upvalues: Cryo (copy), Players (copy), sortPlayers (copy), PlayerSearchPredicate (copy)
-	local t2 = {}
-	local v50 = Cryo.List.sort(Players:GetPlayers(), sortPlayers)
+function extended:getPlayerList()
+	local sorted = Cryo.List.sort(Players:GetPlayers(), sortPlayers)
+	local v2 = {}
 
-	for _, v in ipairs(v50) do
-		if v ~= Players.LocalPlayer then
-			if not p8.state.isFilterMode then
-				table.insert(t2, v)
-			elseif PlayerSearchPredicate(p8.state.filterText, v.Name, v.DisplayName) then
-				table.insert(t2, v)
+	for _, v3 in ipairs(sorted) do
+		if v3 == Players.LocalPlayer then
+			continue
+		end
+
+		if self.state.isFilterMode then
+			if PlayerSearchPredicate(self.state.filterText, v3.Name, v3.DisplayName) then
+				table.insert(v2, v3)
 			end
+		else
+			table.insert(v2, v3)
 		end
 	end
 
-	return (Cryo.List.sort(t2, function(p9, p10) -- line: 172
-		return p9.DisplayName:lower() < p10.DisplayName:lower()
+	return (Cryo.List.sort(v2, function(p, p2): boolean
+		return p.DisplayName:lower() < p2.DisplayName:lower()
 	end))
 end
 
-local t3 = {
+local v2 = {
 	[Constants.Category.Voice] = "CoreScripts.InGameMenu.Report.Title.VoiceChat",
 	[Constants.Category.Text] = "CoreScripts.InGameMenu.Report.Title.TextChat",
 	[Constants.Category.Other] = "CoreScripts.InGameMenu.Report.Title.Other"
 }
 
-function v40.categoryTitle(p11) -- line: 184
-	-- upvalues: t3 (copy)
-	return t3[p11.props.reportCategory] or "CoreScripts.InGameMenu.Report.MenuTitle"
+function extended:categoryTitle()
+	return v2[self.props.reportCategory] or "CoreScripts.InGameMenu.Report.MenuTitle"
 end
-function v40.renderHeaderBar(p12) -- line: 188
-	-- upvalues: makeBackButton (copy), Roact (copy), IconButton (copy), IconSize (copy), Images (copy), withLocalization (copy), HeaderBar (copy), SearchBar (copy)
-	local u55 = not p12.props.canNavigateBack and function() -- line: 193
-		-- upvalues: Roact (copy), IconButton (copy), IconSize (copy), Images (copy), p12 (copy)
-		return Roact.createElement(IconButton, {
-			iconSize = IconSize.Medium,
-			icon = Images["icons/navigation/close"],
-			onActivated = p12.closeDialog
-		})
-	end or makeBackButton(p12.navigateBack)
 
-	if not p12.state.isFilterMode then
-		return withLocalization({
-			titleText = p12:categoryTitle()
-		})(function(p13) -- line: 205
-			-- upvalues: Roact (copy), HeaderBar (copy), u55 (ref), IconButton (copy), IconSize (copy), Images (copy), p12 (copy)
-			return Roact.createElement(HeaderBar, {
-				backgroundTransparency = 1,
-				barHeight = 48,
-				renderLeft = u55,
-				renderRight = function() -- line: 210
-					-- upvalues: Roact (copy), IconButton (copy), IconSize (copy), Images (copy), p12 (copy)
-					return Roact.createElement(IconButton, {
-						iconSize = IconSize.Medium,
-						icon = Images["icons/common/search"],
-						onActivated = p12.onSearch
-					})
-				end,
-				onHeaderActivated = p12.scrollToTop,
-				title = p13.titleText
+function extended:renderHeaderBar()
+	local renderLeft
+
+	if self.props.canNavigateBack then
+		renderLeft = makeBackButton(self.navigateBack)
+	else
+		renderLeft = function()
+			return Roact.createElement(IconButton, {
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/close"],
+				onActivated = self.closeDialog
 			})
-		end)
+		end
 	end
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(24, 6),
-		Size = UDim2.new(1, -48, 1, -12)
-	}, { Roact.createElement(SearchBar, {
-		autoCaptureFocus = true,
-		size = UDim2.fromScale(1, 1),
-		text = p12.state.filterText,
-		onTextChanged = p12.onTextChanged,
-		onCancelled = p12.onCancel
-	}) })
+	if self.state.isFilterMode then
+		return Roact.createElement(
+			"Frame",
+			{
+				BackgroundTransparency = 1,
+				Position = UDim2.fromOffset(24, 6),
+				Size = UDim2.new(1, -48, 1, -12)
+			},
+			{ Roact.createElement(SearchBar, {
+					size = UDim2.fromScale(1, 1),
+					text = self.state.filterText,
+					autoCaptureFocus = true,
+					onTextChanged = self.onTextChanged,
+					onCancelled = self.onCancel
+				}) }
+		)
+	end
+
+	return withLocalization({ titleText = self:categoryTitle() })(function(p)
+		return Roact.createElement(HeaderBar, {
+			backgroundTransparency = 1,
+			barHeight = 48,
+			renderLeft = renderLeft,
+			renderRight = function()
+				return Roact.createElement(IconButton, {
+					iconSize = IconSize.Medium,
+					icon = Images["icons/common/search"],
+					onActivated = self.onSearch
+				})
+			end,
+			onHeaderActivated = self.scrollToTop,
+			title = p.titleText
+		})
+	end)
 end
-function v40.renderContents(p14) -- line: 238
-	-- upvalues: Constants (copy), Roact (copy), GameCell (copy), default (copy), Divider (copy), PlayerCell (copy), isPlayerVerified (copy), v41 (copy), Constants2 (copy), withStyle (copy), Cryo (copy), t1 (copy), Provider (copy), BarOnTopScrollingFrame (copy)
-	local props = p14.props
-	local v58 = p14.props.reportCategory == Constants.Category.Voice
-	local n2 = 0
-	local t4 = {
+
+function extended:renderContents()
+	local props = self.props
+	local v3 = self.props.reportCategory == Constants.Category.Voice
+
+	local v4 = 0
+	local children = {
 		ListLayout = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		})
 	}
 
-	if not p14.state.isFilterMode and p14.props.reportCategory == Constants.Category.None then
-		t4.GameCell = Roact.createElement(GameCell, {
+	if not self.state.isFilterMode and self.props.reportCategory == Constants.Category.None then
+		children.GameCell = Roact.createElement(GameCell, {
 			gameId = game.GameId,
-			layoutOrder = p14.getLayoutBinding("GameCell", n2),
-			onActivated = function() -- line: 255
-				-- upvalues: props (copy), Constants (copy)
+			layoutOrder = self.getLayoutBinding("GameCell", v4),
+			onActivated = function()
 				props.openReportDialog(Constants.ReportType.Place, nil)
 			end
 		})
 	end
 
-	local v61 = n2 + 1
-	local n3 = 72
-	local v63 = p14:getPlayerList()
-	local t5 = {}
+	local v5 = v4 + 1
 
-	if v58 then
-		t5 = default:getRecentUsersInteractionData()
-	end
+	local playerList = self:getPlayerList()
+	local v6 = not v3 and {} or default:getRecentUsersInteractionData()
 
-	p14.sortedUserIds = {}
+	self.sortedUserIds = {}
+	local total = 72
 
-	for _, v in pairs(v63) do
-		local str = tostring(v.UserId)
+	for _, player in pairs(playerList) do
+		local userId = tostring(player.UserId)
 
-		if not v58 or t5[tostring(v.UserId)] then
-			table.insert(p14.sortedUserIds, v.UserId)
-
-			local n4 = 0
-
-			if v58 then
-				n4 += 1
-			end
-
-			if p14.props.isReportMenuOpen then
-				n4 += 2
-			end
-
-			t4["Divider" .. str] = Roact.createElement(Divider, {
-				LayoutOrder = p14.getLayoutBinding("Divider" .. str, v61),
-				Size = UDim2.new(1, 0, 0, 1)
-			})
-
-			local v69 = v61 + 1
-
-			t4["PlayerCell" .. str] = Roact.createElement(PlayerCell, {
-				isOnline = true,
-				isSelected = false,
-				userId = v.UserId,
-				username = v.Name,
-				displayName = v.DisplayName,
-				hasVerifiedBadge = isPlayerVerified(v),
-				LayoutOrder = p14.getLayoutBinding("PlayerCell" .. str, v69),
-				onActivated = function() -- line: 300
-					-- upvalues: props (copy), Constants (copy), v (copy)
-					props.openReportDialog(Constants.ReportType.Player, v)
-				end,
-				memoKey = n4
-			}, {
-				VoiceIndicator = v58 and (not not p14.props.isReportMenuOpen and Roact.createElement(v41, {
-					hideOnError = true,
-					iconStyle = "SpeakerLight",
-					userId = tostring(v.UserId),
-					size = UDim2.fromOffset(36, 36),
-					onClicked = function() -- line: 312
-						-- upvalues: default (copy), v (copy), Constants2 (copy)
-						default:ToggleMutePlayer(v.UserId, Constants2.VOICE_CONTEXT_TYPE.REPORT_MENU)
-					end
-				})) or nil
-			})
-			v61 = v69 + 1
-			n3 += 73
+		if not (not v3 or v6[tostring(player.UserId)]) then
+			continue
 		end
+
+		table.insert(self.sortedUserIds, player.UserId)
+
+		local total2 = 0
+
+		if v3 then
+			total2 += 1
+		end
+
+		if self.props.isReportMenuOpen then
+			total2 += 2
+		end
+
+		children["Divider" .. userId] = Roact.createElement(Divider, {
+			LayoutOrder = self.getLayoutBinding("Divider" .. userId, v5),
+			Size = UDim2.new(1, 0, 0, 1)
+		})
+
+		v5 += 1
+
+		local v7 = "PlayerCell" .. userId
+		local createElement = Roact.createElement
+		local v8 = {
+			userId = player.UserId,
+			username = player.Name,
+			displayName = player.DisplayName,
+			hasVerifiedBadge = isPlayerVerified(player),
+			isOnline = true,
+			isSelected = false,
+			LayoutOrder = self.getLayoutBinding("PlayerCell" .. userId, v5),
+			onActivated = function()
+				props.openReportDialog(Constants.ReportType.Player, player)
+			end,
+			memoKey = total2
+		}
+		local voiceIndicator
+
+		if v3 and self.props.isReportMenuOpen then
+			voiceIndicator = Roact.createElement(fn, {
+				userId = tostring(player.UserId),
+				hideOnError = true,
+				iconStyle = "SpeakerLight",
+				size = UDim2.fromOffset(36, 36),
+				onClicked = function()
+					default:ToggleMutePlayer(player.UserId, Constants2.VOICE_CONTEXT_TYPE.REPORT_MENU)
+				end
+			}) or nil
+		end
+
+		children[v7] = createElement(PlayerCell, v8, { VoiceIndicator = voiceIndicator })
+
+		v5 += 1
+
+		total += 73
 	end
 
-	t4.DividerEnd = Roact.createElement(Divider, {
-		LayoutOrder = p14.getLayoutBinding("DividerEnd", v61),
+	children.DividerEnd = Roact.createElement(Divider, {
+		LayoutOrder = self.getLayoutBinding("DividerEnd", v5),
 		Size = UDim2.new(1, 0, 0, 1)
 	})
 
-	local _ = v61 + 1
+	v5 += 1
 
-	return withStyle(function(p15) -- line: 332
-		-- upvalues: Cryo (copy), t1 (copy), Roact (copy), Provider (copy), BarOnTopScrollingFrame (copy), n3 (ref), p14 (copy), t4 (copy)
-		local v91 = Cryo.Dictionary.join(p15.Theme, t1)
-		local v92 = Cryo.Dictionary.join(p15, {
-			Theme = v91
+	return withStyle(function(p)
+		local joined = Cryo.Dictionary.join(p.Theme, v)
+		local joined2 = Cryo.Dictionary.join(p, { Theme = joined })
+
+		return Roact.createElement(Provider, { style = joined2 }, {
+			Roact.createElement(
+				BarOnTopScrollingFrame,
+				{
+					Size = UDim2.fromScale(1, 1),
+					CanvasSize = UDim2.new(1, 0, 0, total),
+					scrollingFrameRef = self.scrollingFrameRef
+				},
+				children
+			)
 		})
-
-		return Roact.createElement(Provider, {
-			style = v92
-		}, { Roact.createElement(BarOnTopScrollingFrame, {
-			Size = UDim2.fromScale(1, 1),
-			CanvasSize = UDim2.new(1, 0, 0, n3),
-			scrollingFrameRef = p14.scrollingFrameRef
-		}, t4) })
 	end)
 end
-function v40.render(p16) -- line: 349
-	-- upvalues: Roact (copy), ModalDialog (copy)
-	local v72 = p16.props.reportCategory ~= nil
+
+function extended:render()
+	local v3 = self.props.reportCategory ~= nil
 
 	return Roact.createFragment({
 		ModalDialog = Roact.createElement(ModalDialog, {
-			visible = p16.props.isReportMenuOpen,
-			screenSize = p16.props.screenSize,
-			headerBar = p16:renderHeaderBar(),
-			showCloseButton = not v72,
-			contents = p16:renderContents(),
-			onDismiss = p16.closeDialog
+			visible = self.props.isReportMenuOpen,
+			screenSize = self.props.screenSize,
+			headerBar = self:renderHeaderBar(),
+			showCloseButton = not v3,
+			contents = self:renderContents(),
+			onDismiss = self.closeDialog
 		})
 	})
 end
-function v40.didUpdate(p17, p18) -- line: 365
-	-- upvalues: Roact (copy)
-	if p18.isReportMenuOpen and not p17.props.isReportMenuOpen then
-		p17:setState({
-			isFilterMode = false,
-			filterText = Roact.None
-		})
 
-		local v75 = p17.scrollingFrameRef:getValue()
+function extended.didUpdate(object, p)
+	if p.isReportMenuOpen and not object.props.isReportMenuOpen then
+		object:setState({ isFilterMode = false, filterText = Roact.None })
 
-		if v75 and v75.CanvasPosition.Y > 0 then
-			v75.CanvasPosition = Vector2.new(0, 0)
+		local value = object.scrollingFrameRef:getValue()
+
+		if value and value.CanvasPosition.Y > 0 then
+			value.CanvasPosition = Vector2.new(0, 0)
 		end
 	end
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p19, _) -- line: 379
-	-- upvalues: Constants (copy)
+return RoactRodux.UNSTABLE_connect2(function(p, _)
 	return {
-		isReportMenuOpen = p19.report.currentPage == Constants.Page.Listing,
-		screenSize = p19.displayOptions.screenSize,
-		reportCategory = p19.report.reportCategory,
-		canNavigateBack = #p19.report.history > 1
+		isReportMenuOpen = p.report.currentPage == Constants.Page.Listing,
+		screenSize = p.displayOptions.screenSize,
+		reportCategory = p.report.reportCategory,
+		canNavigateBack = #p.report.history > 1
 	}
-end, function(p21) -- line: 387
-	-- upvalues: NavigateBack (copy), SendAnalytics (copy), Constants (copy), EndReportFlow (copy), SessionUtility (copy), SelectReportListing (copy)
+end, function(callback)
 	return {
-		navigateBack = function(p22) -- line: 389
-			-- upvalues: p21 (copy), NavigateBack (copy), SendAnalytics (copy), Constants (copy)
-			p21(NavigateBack())
+		navigateBack = function(filterTextChanged)
+			callback(NavigateBack())
 			SendAnalytics(Constants.Page.Listing, Constants.Analytics.ReportFlowBack, {
 				source = Constants.Page.Listing,
-				filterTextChanged = p22
+				filterTextChanged = filterTextChanged
 			})
 		end,
-		closeDialog = function(p23) -- line: 396
-			-- upvalues: p21 (copy), EndReportFlow (copy), SendAnalytics (copy), Constants (copy), SessionUtility (copy)
-			p21(EndReportFlow())
+		closeDialog = function(filterTextChanged)
+			callback(EndReportFlow())
 			SendAnalytics(Constants.Page.Listing, Constants.Analytics.ReportFlowAbandoned, {
 				source = Constants.Page.Listing,
-				filterTextChanged = p23
+				filterTextChanged = filterTextChanged
 			})
+
 			SessionUtility.endAbuseReportSession()
 		end,
-		openReportDialog = function(p24, p25, p26) -- line: 404
-			-- upvalues: p21 (copy), SelectReportListing (copy), SendAnalytics (copy), Constants (copy)
-			p21(SelectReportListing(p24, p25, p26))
+		openReportDialog = function(reportType, p, p2)
+			callback(SelectReportListing(reportType, p, p2))
 			SendAnalytics(Constants.Page.Listing, Constants.Analytics.ReportFlowAdvance, {
 				source = Constants.Page.Listing,
-				reportType = p24
+				reportType = reportType
 			})
 		end
 	}
-end)(v40)
+end)(extended)

@@ -1,0 +1,5 @@
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+local FFlagBuildExperienceMonetizationNativeUI = require(script.Parent.FFlagBuildExperienceMonetizationNativeUI)
+
+local FFlagBuildExperienceMonetizationMultiKind = require(parent.DataHydration.FFlagBuildExperienceMonetizationMultiKind)
+return FFlagBuildExperienceMonetizationMultiKind and FFlagBuildExperienceMonetizationNativeUI

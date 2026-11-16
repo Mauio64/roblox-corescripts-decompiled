@@ -1,214 +1,188 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
+local parent = InlineRichText.Parent
 
 require(InlineRichText.Types)
-
 local NodeType = require(InlineRichText.Enums.NodeType)
-local v4 = require(InlineRichText.Logger):new(script.Name)
-local Cryo = require(InlineRichTextParent.Cryo)
+local Logger = require(InlineRichText.Logger)
+local v = Logger:new(script.Name)
+local Cryo = require(parent.Cryo)
 local NodeConfig = require(InlineRichText.NodeConfig)
-local t1 = {}
 
-t1.__index = t1
+local NodeStack = {}
+NodeStack.__index = NodeStack
 
-function t1.new() -- line: 42
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
-
+function NodeStack.new()
+	local self = setmetatable({}, NodeStack)
 	self.__stack = {}
 	self.__index = 1
-
 	return self
 end
-function t1.push(p1, p2) -- line: 51
-	-- upvalues: NodeConfig (copy), v4 (copy), NodeType (copy), Cryo (copy)
-	if not NodeConfig.getByNode(p2) then
+
+function NodeStack:push(p)
+	if not NodeConfig.getByNode(p) then
 		return {}, false
 	end
 
-	local v11 = p1:peek()
-	local t2 = {}
+	local v2 = self:peek()
+	local result = {}
 
-	while v11 and not NodeConfig.isDescendant(v11, p2) do
-		if not p1:__canCloseTop() then
-			v4:error("push: Cannot closeAndReduce top node. Last item in stack is not the root node")
-
-			return t2, false
+	while v2 and not NodeConfig.isDescendant(v2, p) do
+		if not self:__canCloseTop() then
+			v:error("push: Cannot closeAndReduce top node. Last item in stack is not the root node")
+			return result, false
 		end
 
-		local v13 = p1:__closeTopAndReduce()
+		local __closeTopAndReduce = self:__closeTopAndReduce()
 
-		if not v13 then
-			v4:error("push: Failed to closeAndReduce top node")
-
-			return t2, false
+		if __closeTopAndReduce then
+			v2 = self:peek()
+			table.insert(result, __closeTopAndReduce)
+		else
+			v:error("push: Failed to closeAndReduce top node")
+			return result, false
 		end
-
-		v11 = p1:peek()
-		table.insert(t2, v13)
 	end
 
-	if not v11 and p2.type == NodeType.Root then
-		p1:__push(p2)
-
-		return t2, true
+	if not v2 and p.type == NodeType.Root then
+		self:__push(p)
+		return result, true
 	end
 
-	local v14 = v11 and NodeConfig.getByNode(v11)
+	local v3 = v2 and NodeConfig.getByNode(v2)
 
-	if v14 and v14.children[p2.type] then
-		p1:__push(p2)
-
-		return t2, true
+	if v3 and v3.children[p.type] then
+		self:__push(p)
+		return result, true
 	end
 
-	local v15 = NodeConfig.getByNode(p2)
-	local v16 = v15 and v15.defaultParent
+	local v4 = NodeConfig.getByNode(p)
+	local defaultParent = v4 and v4.defaultParent
 
-	if not v16 then
-		v4:error(`push: No default parent found for node type { p2.type }`)
-
-		return t2, false
+	if not defaultParent then
+		v:error(`push: No default parent found for node type {p.type}`)
+		return result, false
 	end
 
-	local v17, v18 = p1:pushDefault(v16)
-	local v19 = Cryo.List.join(t2, v17)
+	local v5, v6 = self:pushDefault(defaultParent)
+	local joined = Cryo.List.join(result, v5)
 
-	if not v18 then
-		return v19, false
+	if not v6 then
+		return joined, false
 	end
 
-	p1:__push(p2)
-
-	return v19, true
+	self:__push(p)
+	return joined, true
 end
-function t1.pushDefault(p3, p4) -- line: 102
-	-- upvalues: NodeConfig (copy), v4 (copy)
-	local v22 = NodeConfig.getByType(p4)
 
-	if not v22 or not v22.getDefault then
-		v4:error(`pushDefault: No config or getDefault function found for node type { p4 }`)
+function NodeStack:pushDefault(p)
+	local v2 = NodeConfig.getByType(p)
 
+	if v2 and v2.getDefault then
+		return self:push((v2.getDefault()))
+	end
+
+	v:error(`pushDefault: No config or getDefault function found for node type {p}`)
+	return {}, false
+end
+
+function NodeStack:findAndClose(p: string)
+	if not self:__has(p) then
 		return {}, false
 	end
 
-	return p3:push((v22.getDefault()))
-end
-function t1.findAndClose(p5, s1: string) -- line: 112
-	-- upvalues: v4 (copy)
-	if not p5:__has(s1) then
-		return {}, false
+	local result = {}
+
+	while self:__canCloseTop() do
+		local __closeTopAndReduce = self:__closeTopAndReduce()
+
+		if not __closeTopAndReduce then
+			v:error("findAndClose: Failed to closeAndReduce top node")
+			return result, false
+		end
+
+		table.insert(result, __closeTopAndReduce)
+
+		if __closeTopAndReduce.name == p then
+			return result, true
+		end
 	end
 
-	local t3 = {}
-
-	repeat
-		if not p5:__canCloseTop() then
-			return t3, false
-		end
-
-		local v26 = p5:__closeTopAndReduce()
-
-		if not v26 then
-			v4:error("findAndClose: Failed to closeAndReduce top node")
-
-			return t3, false
-		end
-
-		table.insert(t3, v26)
-	until s1 == v26.name
-
-	return t3, true
+	return result, false
 end
-function t1.buildRoot(p6) -- line: 135
-	-- upvalues: v4 (copy), NodeType (copy)
-	local g28 = nil
 
-	repeat
-		if not p6:__canCloseTop() then
-			g28 = true
-		end
-
-		if g28 then
+function NodeStack:buildRoot()
+	while self:__canCloseTop() do
+		if not self:__closeTopAndReduce() then
+			v:error("buildRoot: Failed to closeAndReduce top node")
 			break
 		end
-	until not p6:__closeTopAndReduce()
-
-	if not g28 then
-		v4:error("buildRoot: Failed to closeAndReduce top node")
 	end
 
-	g28 = false
-
-	if #p6.__stack == 0 then
-		p6:pushDefault(NodeType.Root)
+	if #self.__stack == 0 then
+		self:pushDefault(NodeType.Root)
 	end
 
-	local v29 = p6.__stack[1]
+	local v2 = self.__stack[1]
 
-	if v29 and v29.type ~= NodeType.Root then
-		v4:error("buildRoot: Last node on stack is not the root node")
+	if v2 and v2.type ~= NodeType.Root then
+		v:error("buildRoot: Last node on stack is not the root node")
 	end
 
 	return {
 		name = "ROOT",
 		text = "",
 		type = NodeType.Root,
-		children = v29.children,
-		attributes = v29.attributes,
-		index = v29.index
+		children = v2.children,
+		attributes = v2.attributes,
+		index = v2.index
 	}
 end
-function t1.peek(p7) -- line: 162
-	return p7.__stack[#p7.__stack]
+
+function NodeStack:peek()
+	return self.__stack[#self.__stack]
 end
-function t1.__push(p8, p9) -- line: 169
-	-- upvalues: Cryo (copy)
-	local v33 = Cryo.Dictionary.join(p9, {
-		index = p8.__index
-	})
 
-	table.insert(p8.__stack, v33)
-	p8.__index = p8.__index + 1
+function NodeStack:__push(p): nil
+	local joined = Cryo.Dictionary.join(p, { index = self.__index })
 
+	table.insert(self.__stack, joined)
+	self.__index += 1
 	return nil
 end
-function t1.__closeTopAndReduce(p10) -- line: 179
-	-- upvalues: v4 (copy), Cryo (copy)
-	local v35 = p10.__stack[#p10.__stack]
-	local v36 = p10.__stack[#p10.__stack - 1]
 
-	if not v35 or not v36 then
-		v4:error("closeTop: No top or next node found")
+function NodeStack:__closeTopAndReduce()
+	local v2 = self.__stack[#self.__stack]
+	local v3 = self.__stack[#self.__stack - 1]
 
+	if not (v2 and v3) then
+		v:error("closeTop: No top or next node found")
 		return nil
 	end
 
-	local v37 = Cryo.Dictionary.join(v36, {
-		children = Cryo.List.join(v36.children, { v35 })
+	local joined = Cryo.Dictionary.join(v3, {
+		children = Cryo.List.join(v3.children, { v2 })
 	})
 
-	table.remove(p10.__stack, #p10.__stack)
-	p10.__stack[#p10.__stack] = v37
-
+	table.remove(self.__stack, #self.__stack)
+	self.__stack[#self.__stack] = joined
 	return {
+		name = v2.name,
 		text = "",
-		name = v35.name,
-		type = v35.type,
+		type = v2.type,
 		children = {},
-		attributes = v35.attributes,
-		index = v35.index
+		attributes = v2.attributes,
+		index = v2.index
 	}
 end
-function t1.__canCloseTop(p11) -- line: 202
-	return #p11.__stack > 1
+
+function NodeStack:__canCloseTop(): boolean
+	return #self.__stack > 1
 end
-function t1.__has(p12, s2: string) -- line: 206
-	-- upvalues: Cryo (copy)
-	return Cryo.List.findWhere(p12.__stack, function(p13) -- line: 207
-		-- upvalues: s2 (copy)
-		return p13.name == s2
+
+function NodeStack:__has(p: string): boolean
+	return Cryo.List.findWhere(self.__stack, function(p2): boolean
+		return p2.name == p
 	end) ~= nil
 end
 
-return t1
+return NodeStack

@@ -1,22 +1,44 @@
-local scriptParent = script.Parent
-local ActionBindableEvent = require(scriptParent.ExpChatShared).ActionBindableEvent
+local parent = script.Parent
+local ExpChatShared = require(parent.ExpChatShared)
+
+local ActionBindableEvent = ExpChatShared.ActionBindableEvent
 local useExpChatMessagesReducerSlice = require(script.useExpChatMessagesReducerSlice)
 
-return {
+local ExpChat = {
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
+	["Events"] = nil,
 	Events = require(script.Events),
-	mountClientApp = require(script.mountClientApp),
-	listenToDispatch = require(script.listenToDispatch)(ActionBindableEvent),
-	GlobalFlags = require(script.GlobalFlags),
-	getExperienceChatVisualConfig = require(script.getExperienceChatVisualConfig),
-	Stores = require(script.Stores),
-	Hooks = {
-		useExpChatMessagesReducerSlice = useExpChatMessagesReducerSlice
-	},
-	isUserChatEnabled = require(script.isUserChatEnabled),
-	requestSelectTab = require(script.requestSelectTab),
-	shouldSuppressUnreadForTabMetadata = require(script.shouldSuppressUnreadForTabMetadata),
-	ExpChatPerfTracker = require(scriptParent.ChatUIPrimitives).Telemetry.ExpChatPerfTracker,
-	["jest.config"] = script["jest.config"],
-	["jest.bench.config"] = script["jest.bench.config"],
-	["mockDataModel-jest.config"] = script["mockDataModel-jest.config"]
+	mountClientApp = require(script.mountClientApp)
 }
+local listenToDispatch = require(script.listenToDispatch)
+ExpChat.listenToDispatch = listenToDispatch(ActionBindableEvent)
+ExpChat.GlobalFlags = require(script.GlobalFlags)
+ExpChat.getExperienceChatVisualConfig = require(script.getExperienceChatVisualConfig)
+ExpChat.Stores = require(script.Stores)
+ExpChat.Hooks = { useExpChatMessagesReducerSlice = useExpChatMessagesReducerSlice }
+
+ExpChat.isUserChatEnabled = require(script.isUserChatEnabled)
+ExpChat.requestSelectTab = require(script.ExternalNavigation.requestSelectTab)
+ExpChat.requestSelectFriendsTab = require(script.ExternalNavigation.requestSelectFriendsTab)
+ExpChat.isHistoricalMessage = require(script.isHistoricalMessage)
+ExpChat.shouldSkipHistoricalMessage = require(script.shouldSkipHistoricalMessage)
+ExpChat.shouldSuppressUnreadForTabMetadata = require(script.shouldSuppressUnreadForTabMetadata)
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+ExpChat.ExpChatPerfTracker = ChatUIPrimitives.Telemetry.ExpChatPerfTracker
+ExpChat["jest.config"] = script["jest.config"]
+ExpChat["jest.bench.config"] = script["jest.bench.config"]
+ExpChat["mockDataModel-jest.config"] = script["mockDataModel-jest.config"]
+return ExpChat

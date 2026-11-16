@@ -1,16 +1,18 @@
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
 
-require(InExperienceSideSheetParent.Chrome)
+local parent = InExperienceSideSheet.Parent
+
+require(parent.Chrome)
 
 local GetIntegrationsStore = require(InExperienceSideSheet.Stores.GetIntegrationsStore)
 
-return function(t1: {[any]: any}) -- line: 18
-	-- upvalues: GetIntegrationsStore (copy)
-	local v5 = GetIntegrationsStore()
+return function(data)
+	local integrationsStore = GetIntegrationsStore()
 
-	v5.setUnibarIntegrations(t1.unibarIntegrations)
-	v5.setToggleIntegrations(t1.toggleIntegrations)
-	v5.setPageIntegrations(t1.pageIntegrations)
-	v5.setSessionActionIntegrations(t1.sessionActionIntegrations)
+	integrationsStore.setUnibarIntegrations(data.unibarIntegrations)
+	integrationsStore.setAboveFoldIntegrations(data.aboveFoldIntegrations)
+	integrationsStore.setBelowFoldIntegrations(data.belowFoldIntegrations)
+	integrationsStore.setSessionActionIntegrations(data.sessionActionIntegrations)
+	integrationsStore.setScrollableContentTopWidgetIntegrations(data.scrollableContentTopWidgetIntegrations)
+	integrationsStore.setScrollableContentBottomWidgetIntegrations(data.scrollableContentBottomWidgetIntegrations)
 end

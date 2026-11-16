@@ -1,10 +1,13 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local React = require(GenericAbuseReportingParent.React)
-local AbuseReportBeduiContextStatus = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes).AbuseReportBeduiContextStatus
+local parent = GenericAbuseReporting.Parent
+
+local React = require(parent.React)
+
+local AbuseReportBeduiTypes = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
+local AbuseReportBeduiContextStatus = AbuseReportBeduiTypes.AbuseReportBeduiContextStatus
 
 return React.createContext({
+	status = AbuseReportBeduiContextStatus.Loading,
 	beduiData = nil,
-	error = nil,
-	status = AbuseReportBeduiContextStatus.Loading
+	error = nil
 })

@@ -1,347 +1,434 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Dash = require(FoundationParent.Dash)
-local Otter = require(FoundationParent.Otter)
-local React = require(FoundationParent.React)
-local ReactOtter = require(FoundationParent.ReactOtter)
-local ReactRoblox = require(FoundationParent.ReactRoblox)
+local parent = Foundation.Parent
+local Dash = require(parent.Dash)
+local Otter = require(parent.Otter)
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local ReactRoblox = require(parent.ReactRoblox)
 local useAnimatedBinding = ReactOtter.useAnimatedBinding
 local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
+local Flags = require(Foundation.Utility.Flags)
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
 local useOverlay = require(Foundation.Providers.Overlay.useOverlay)
 local useScaledValue = require(Foundation.Utility.useScaledValue)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withDefaults = require(Foundation.Utility.withDefaults)
-local DIALOG_SIZES = require(Foundation.Components.Dialog.useDialogVariants).DIALOG_SIZES
+local useDialogVariants = require(Foundation.Components.Dialog.useDialogVariants)
+local DIALOG_SIZES = useDialogVariants.DIALOG_SIZES
 local Constants = require(Foundation.Constants)
 local DialogSize = require(Foundation.Enums.DialogSize)
+
 local ElevationLayer = require(Foundation.Enums.ElevationLayer)
+
 local useElevation = require(Foundation.Providers.Elevation.useElevation)
-local ElevationOwnerScope = require(Foundation.Providers.Elevation.ElevationProvider).ElevationOwnerScope
-local Flags = require(Foundation.Utility.Flags)
+local ElevationProvider = require(Foundation.Providers.Elevation.ElevationProvider)
+local ElevationOwnerScope = ElevationProvider.ElevationOwnerScope
+
 local usePreferences = require(Foundation.Providers.Preferences.usePreferences)
+
 local SheetContext = require(script.Parent.SheetContext)
 local Types = require(script.Parent.Types)
+
 local SheetType = require(script.Parent.SheetType)
+
 local childrenHasFullBleed = require(script.Parent.childrenHasFullBleed)
+
+local Backdrop = require(Foundation.Components.Backdrop)
 local CloseAffordance = require(Foundation.Components.CloseAffordance)
 local Image = require(Foundation.Components.Image)
 local View = require(Foundation.Components.View)
-local t1 = {
-	testId = "--foundation-sheet",
-	size = DialogSize.Medium
-}
+
+local v = { size = DialogSize.Medium, testId = "--foundation-sheet" }
+
 local SHADOW_IMAGE = Constants.SHADOW_IMAGE
 local SHADOW_SIZE = Constants.SHADOW_SIZE
 
-local function CenterSheet(p1, p2) -- line: 52
-	-- upvalues: withDefaults (copy), t1 (copy), useOverlay (copy), useTokens (copy), useElevation (copy), ElevationLayer (copy), usePreferences (copy), useScaledValue (copy), DIALOG_SIZES (copy), React (copy), useAnimatedBinding (copy), Flags (copy), childrenHasFullBleed (copy), Otter (copy), Dash (copy), SheetType (copy), View (copy), StateLayerAffordance (copy), Types (copy), SheetContext (copy), ElevationOwnerScope (copy), CloseAffordance (copy), CloseAffordanceVariant (copy), Image (copy), SHADOW_IMAGE (copy), SHADOW_SIZE (copy), ReactRoblox (copy)
-	local v36 = withDefaults(p1, t1)
-	local v37 = useOverlay()
-	local v38 = useTokens()
-	local v39 = useElevation(ElevationLayer.Sheet, {
-		stackAboveOwner = false
-	})
+local function CenterSheet(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useOverlay()
+	local v4 = useTokens()
+	local owner = useElevation(ElevationLayer.Sheet, { stackAboveOwner = false })
+
 	local reducedMotion = usePreferences().reducedMotion
-	local v41 = useScaledValue(DIALOG_SIZES[v36.size])
-	local v42 = useScaledValue(600)
-	local Size_800 = v38.Size.Size_800
-	local v44, v45 = React.useBinding(v42)
-	local v46 = if not v44 then nil else v44:map(function(n1: number) -- line: 69
-		-- upvalues: v36 (copy)
-		if v36.centerSheetHeight then
-			if v36.centerSheetHeight > 0 and v36.centerSheetHeight <= 1 then
-				return n1 * v36.centerSheetHeight
+
+	local v5 = useScaledValue(DIALOG_SIZES[v2.size])
+	local v6 = useScaledValue(600)
+	local size_800 = v4.Size.Size_800
+
+	local v7, v8 = React.useBinding(v6)
+	local sheetContentHeight
+
+	if v7 then
+		sheetContentHeight = v7:map(function(p2: number)
+			if not v2.centerSheetHeight then
+				return nil
 			end
 
-			if v36.centerSheetHeight > 1 then
-				return (math.min(v36.centerSheetHeight, n1))
+			if v2.centerSheetHeight > 0 and v2.centerSheetHeight <= 1 then
+				return p2 * v2.centerSheetHeight
 			end
-		end
 
-		return nil
-	end)
-	local v47, v48 = React.useState(true)
-	local v49 = React.useRef(false)
-	local v50, v51 = useAnimatedBinding(1, function() -- line: 84
-		-- upvalues: v49 (copy), v36 (copy)
-		if v49.current then
-			v36.onClose()
-		end
-	end)
-	local v52, v53 = useAnimatedBinding(Size_800, function() -- line: 90
-		-- upvalues: v48 (copy)
-		v48(false)
-	end)
-	local v54, v55 = React.useBinding(false)
-	local v56, v57 = React.useBinding(false)
-	local u58 = nil
-	local u59 = nil
-	local u60 = nil
-
-	if Flags.FoundationSheetFullBleed then
-		u58 = childrenHasFullBleed(v36.children)
-
-		local v61, v62 = React.useBinding(0)
-
-		u59 = v61
-		u60 = v62
-	end
-
-	local v63, v64 = React.useBinding(0)
-	local v65, v66 = React.useBinding(0)
-	local v67 = React.useRef(nil)
-	local v68, v69 = React.useState(nil)
-	local v70 = if not Flags.FoundationCenterSheetUseStableContainer then nil else React.useMemo(function() -- line: 112
-		local Frame = Instance.new("Frame")
-
-		Frame.BackgroundTransparency = 1
-		Frame.BorderSizePixel = 0
-		Frame.AutomaticSize = Enum.AutomaticSize.XY
-
-		return Frame
-	end, {})
-
-	if Flags.FoundationCenterSheetUseStableContainer then
-		React.useEffect(function() -- line: 122
-			-- upvalues: v70 (copy)
-			return function() -- line: 123
-				-- upvalues: v70 (copy)
-				v70:Destroy()
-			end
-		end, {})
-	end
-
-	local v71 = if not Flags.FoundationCenterSheetUseStableContainer then nil else React.useCallback(function(p3) -- line: 131
-		-- upvalues: v70 (copy)
-		if p3 then
-			v70.Parent = p3
-
-			return
-		end
-
-		v70.Parent = nil
-	end, {})
-
-	React.useEffect(function() -- line: 143
-		-- upvalues: reducedMotion (copy), v53 (copy), Otter (copy), v51 (copy), v38 (copy)
-		if reducedMotion then
-			v53((Otter.instant(0)))
-			v51((Otter.instant(0)))
-
-			return
-		end
-
-		v53(Otter.ease(0, {
-			easingStyle = v38.Ease.StandardOut,
-			duration = v38.Time.Time_300
-		}))
-		v51(Otter.ease(0, {
-			duration = v38.Time.Time_100
-		}))
-	end, {})
-
-	local v72 = React.useCallback(function() -- line: 159
-		-- upvalues: v49 (copy), reducedMotion (copy), v53 (copy), Otter (copy), Size_800 (copy), v51 (copy), v38 (copy), v48 (copy)
-		if v49.current then
-			return
-		end
-
-		if reducedMotion then
-			v49.current = true
-			v53(Otter.instant(Size_800))
-			v51(Otter.instant(1))
-
-			return
-		end
-
-		v53(Otter.ease(Size_800, {
-			easingStyle = v38.Ease.StandardIn,
-			duration = v38.Time.Time_100
-		}))
-		v51(Otter.ease(1, {
-			duration = v38.Time.Time_100
-		}))
-		v48(true)
-		v49.current = true
-	end, {
-		Size_800,
-		reducedMotion
-	})
-
-	React.useImperativeHandle(v36.sheetRef, function() -- line: 180
-		-- upvalues: v72 (copy)
-		return {
-			close = v72
-		}
-	end, {})
-
-	local v73 = React.useMemo(function() -- line: 187
-		-- upvalues: Dash (copy), v54 (copy), v55 (copy), v46 (copy), v63 (copy), v64 (copy), v56 (copy), v57 (copy), Flags (copy), u58 (ref), u59 (ref), u60 (ref), v72 (copy), SheetType (copy), v36 (copy), v67 (copy), v68 (copy), v69 (copy)
-		return {
-			actionsHeight = 0,
-			sheetHeightAvailable = 0,
-			safeAreaPadding = 0,
-			bottomPadding = 0,
-			innerScrollingEnabled = true,
-			setActionsHeight = Dash.noop,
-			hasActionsDivider = v54,
-			setHasActionsDivider = v55,
-			sheetContentHeight = v46,
-			setSheetContentHeight = Dash.noop,
-			setSheetHeightAvailable = Dash.noop,
-			innerScrollY = v63,
-			setInnerScrollY = v64,
-			hasHeader = v56,
-			setHasHeader = v57,
-			hasFullBleed = if not Flags.FoundationSheetFullBleed then nil else u58,
-			fullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u59,
-			setFullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u60,
-			closeSheet = v72,
-			hasRadius = not not Flags.FoundationSheetFullBleed or nil,
-			sheetType = SheetType.Center,
-			testId = v36.testId,
-			closeAffordanceRef = v67,
-			contentStartRef = v68,
-			setContentStartRef = v69
-		}
-	end, {
-		v36.testId,
-		v72,
-		v68,
-		v67,
-		v46,
-		u58
-	})
-	local v74 = React.createElement(View, {
-		ClipsDescendants = true,
-		ZIndex = 2,
-		Size = if not v36.centerSheetHeight or not v46 then nil else v46:map(function(n2: number?) -- line: 222
-			if n2 then
-				return (UDim2.new(1, 0, 0, n2))
+			if v2.centerSheetHeight > 1 then
+				return (math.min(v2.centerSheetHeight, p2))
 			end
 
 			return nil
-		end),
-		sizeConstraint = if not v36.centerSheetHeight or not v44 then nil else {
-			MaxSize = v44:map(function(n3: number) -- line: 228
-				return Vector2.new(1e999, n3)
+		end)
+	else
+		sheetContentHeight = nil
+	end
+
+	local state, setState = React.useState(true)
+
+	local ref2 = React.useRef(false)
+	local transparency, v9 = useAnimatedBinding(1, function()
+		if ref2.current then
+			v2.onClose()
+		end
+	end)
+
+	local v10, v11 = useAnimatedBinding(size_800, function()
+		setState(false)
+	end)
+
+	local hasActionsDivider, setHasActionsDivider = React.useBinding(false)
+	local hasHeader, setHasHeader = React.useBinding(false)
+
+	local hasFullBleed = childrenHasFullBleed(v2.children)
+	local fullBleedHeight, setFullBleedHeight = React.useBinding(0)
+
+	local innerScrollY, setInnerScrollY = React.useBinding(0)
+	local v12, v13 = React.useBinding(0)
+
+	local ref3 = React.useRef(nil)
+	local state2, setState2 = React.useState(nil)
+
+	local v14 = React.useMemo(function()
+		local frame = Instance.new("Frame")
+		frame.BackgroundTransparency = 1
+		frame.BorderSizePixel = 0
+		frame.AutomaticSize = Enum.AutomaticSize.XY
+		return frame
+	end, {})
+	React.useEffect(function()
+		return function()
+			v14:Destroy()
+		end
+	end, {})
+
+	local ref4 = React.useCallback(function(parent2)
+		if parent2 then
+			v14.Parent = parent2
+		else
+			v14.Parent = nil
+		end
+	end, {})
+
+	React.useEffect(function()
+		if reducedMotion then
+			v11((Otter.instant(0)))
+			v9((Otter.instant(0)))
+		else
+			v11(Otter.ease(0, { easingStyle = v4.Ease.StandardOut, duration = v4.Time.Time_300 }))
+
+			v9(Otter.ease(0, { duration = v4.Time.Time_100 }))
+		end
+	end, {})
+
+	local v15 = React.useCallback(function()
+		if ref2.current then
+			return
+		end
+
+		if reducedMotion then
+			ref2.current = true
+			v11(Otter.instant(size_800))
+			v9(Otter.instant(1))
+		else
+			v11(Otter.ease(size_800, {
+				easingStyle = v4.Ease.StandardIn,
+				duration = v4.Time.Time_100
+			}))
+
+			v9(Otter.ease(1, { duration = v4.Time.Time_100 }))
+
+			setState(true)
+			ref2.current = true
+		end
+	end, { size_800, reducedMotion })
+
+	React.useImperativeHandle(v2.sheetRef, function()
+		return { close = v15 }
+	end, {})
+
+	local v16 = React.useMemo(function()
+		return {
+			actionsHeight = 0,
+			setActionsHeight = Dash.noop,
+			hasActionsDivider = hasActionsDivider,
+			setHasActionsDivider = setHasActionsDivider,
+			sheetContentHeight = sheetContentHeight,
+			setSheetContentHeight = Dash.noop,
+			sheetHeightAvailable = 0,
+			setSheetHeightAvailable = Dash.noop,
+			safeAreaPadding = 0,
+			bottomPadding = 0,
+			innerScrollingEnabled = true,
+			innerScrollY = innerScrollY,
+			setInnerScrollY = setInnerScrollY,
+			hasHeader = hasHeader,
+			setHasHeader = setHasHeader,
+			hasFullBleed = hasFullBleed,
+			fullBleedHeight = fullBleedHeight,
+			setFullBleedHeight = setFullBleedHeight,
+			closeSheet = v15,
+			hasRadius = true,
+			sheetType = SheetType.Center,
+			testId = v2.testId,
+			closeAffordanceRef = ref3,
+			contentStartRef = state2,
+			setContentStartRef = setState2
+		}
+	end, { v2.testId, v15, state2, ref3, sheetContentHeight, hasFullBleed })
+
+	local createElement = React.createElement
+	local size
+
+	if v2.centerSheetHeight and sheetContentHeight then
+		size = sheetContentHeight:map(function(p2: number?)
+			if p2 then
+				return (UDim2.new(1, 0, 0, p2))
+			end
+
+			return nil
+		end)
+	end
+
+	local v17 = {
+		ClipsDescendants = true,
+		Size = size,
+		sizeConstraint = v2.centerSheetHeight and v7 and {
+			MaxSize = v7:map(function(p2: number)
+				return Vector2.new(1e999, p2)
 			end)
-		},
-		stateLayer = {
-			affordance = StateLayerAffordance.None
-		},
+		} or nil,
+		stateLayer = { affordance = StateLayerAffordance.None },
+		ZIndex = 2,
 		onActivated = Dash.noop,
-		onAbsoluteSizeChanged = function(p4) -- line: 239
-			-- upvalues: v66 (copy)
-			v66(p4.AbsoluteSize.Y)
+		onAbsoluteSizeChanged = function(p2)
+			v13(p2.AbsoluteSize.Y)
 		end,
-		ref = p2,
+		ref = ref,
 		selection = Types.nonSelectable,
 		selectionGroup = Types.isolatedSelectionGroup,
 		tag = {
 			["bg-surface-100 stroke-default stroke-standard radius-large"] = true,
-			["size-full-0 auto-y"] = v36.centerSheetHeight == nil
+			["size-full-0 auto-y"] = v2.centerSheetHeight == nil
 		},
-		testId = v36.testId
-	}, {
-		Content = React.createElement(View, {
-			tag = "col items-center size-full-0 auto-y clip",
-			Size = if not v36.centerSheetHeight or not v46 then nil else v46:map(function(n4: number?) -- line: 255
-				if n4 then
-					return (UDim2.new(1, 0, 0, n4))
-				end
+		testId = v2.testId
+	}
 
-				return nil
-			end)
-		}, React.createElement(SheetContext.Provider, {
-			value = v73
-		}, React.createElement(ElevationOwnerScope, {
-			owner = v39
-		}, v36.children))),
-		CloseAffordance = React.createElement(CloseAffordance, {
-			onActivated = v72,
-			ref = v67,
-			NextSelectionDown = v68,
-			variant = if not Flags.FoundationSheetFullBleed or not u58 then CloseAffordanceVariant.Utility else CloseAffordanceVariant.OverMedia,
-			Position = UDim2.new(1, -v38.Margin.Small, 0, v38.Margin.Small),
-			AnchorPoint = Vector2.new(1, 0),
-			Visible = v56:map(function(b1: boolean) -- line: 274
-				return not b1
+	local createElement2 = React.createElement
+	local size2
+
+	if v2.centerSheetHeight and sheetContentHeight then
+		size2 = sheetContentHeight:map(function(p2: number?)
+			if p2 then
+				return (UDim2.new(1, 0, 0, p2))
+			end
+
+			return nil
+		end)
+	end
+
+	local children = {
+		Content = createElement2(
+			View,
+			{ Size = size2, tag = "col items-center size-full-0 auto-y clip" },
+			React.createElement(
+				SheetContext.Provider,
+				{ value = v16 },
+				React.createElement(ElevationOwnerScope, { owner = owner }, v2.children)
+			)
+		),
+		CloseAffordance = 0
+	}
+
+	local createElement3 = React.createElement
+	local v18 = {
+		onActivated = v15,
+		ref = ref3,
+		NextSelectionDown = state2,
+		variant = 0,
+		Position = 0,
+		AnchorPoint = 0,
+		Visible = 0,
+		testId = 0
+	}
+	local variant
+
+	if hasFullBleed then
+		variant = CloseAffordanceVariant.OverMedia
+	else
+		variant = CloseAffordanceVariant.Utility
+	end
+
+	v18.variant = variant
+	v18.Position = UDim2.new(1, -v4.Margin.Small, 0, v4.Margin.Small)
+	v18.AnchorPoint = Vector2.new(1, 0)
+	v18.Visible = hasHeader:map(function(flag: boolean): boolean
+		return not flag
+	end)
+
+	v18.testId = `{v2.testId}--close-affordance`
+	children.CloseAffordance = createElement3(CloseAffordance, v18)
+	local element = createElement(View, v17, children)
+	local shadow
+
+	if Flags.FoundationCenterSheetOverlayShadow then
+		shadow = React.createElement(View, {
+			tag = "shadow-overlay-300 radius-large",
+			Size = v12:map(function(p2: number)
+				return UDim2.new(1, 0, 0, p2)
 			end),
-			testId = `{ v36.testId }--close-affordance`
+			ZIndex = 1,
+			testId = `{v2.testId}--shadow`
 		})
-	})
-	local v75 = React.createElement(Image, {
-		ZIndex = 1,
-		tag = "anchor-center-left",
-		Image = SHADOW_IMAGE,
-		Size = v65:map(function(n5: number) -- line: 283
-			-- upvalues: SHADOW_SIZE (copy)
-			return UDim2.new(1, SHADOW_SIZE * 2, 0, n5 + SHADOW_SIZE * 2)
-		end),
-		Position = UDim2.new(0, -SHADOW_SIZE, 0.5, 0),
-		slice = {
-			scale = 2,
-			center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1)
-		},
-		imageStyle = v38.Color.Extended.Black.Black_10
-	})
+	else
+		shadow = React.createElement(Image, {
+			Image = SHADOW_IMAGE,
+			Size = v12:map(function(p2: number)
+				return UDim2.new(1, SHADOW_SIZE * 2, 0, p2 + SHADOW_SIZE * 2)
+			end),
+			Position = UDim2.new(0, -SHADOW_SIZE, 0.5, 0),
+			ZIndex = 1,
+			slice = {
+				center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1),
+				scale = 2
+			},
+			imageStyle = v4.Color.Extended.Black.Black_10,
+			tag = "anchor-center-left"
+		})
+	end
 
-	return v37 and React.createElement(React.Fragment, nil, {
-		OverlayPortal = ReactRoblox.createPortal(React.createElement(View, {
-			tag = "size-full",
-			ZIndex = v39.zIndex,
-			testId = `{ v36.testId }--surface`
+	if not v3 then
+		return v3
+	end
+
+	local createElement4 = React.createElement
+	local fragment = React.Fragment
+	local createPortal = ReactRoblox.createPortal
+	local createElement5 = React.createElement
+	local v19 = { ZIndex = owner.zIndex, tag = "size-full", testId = `{v2.testId}--surface` }
+	local shadowHost
+
+	if Flags.FoundationCenterSheetOverlayShadow then
+		shadowHost = React.createElement(View, {
+			ZIndex = 2,
+			sizeConstraint = {
+				MaxSize = Vector2.new(
+					v5 + math.max(0, v4.Size.Size_1400 - v4.Padding.Medium) * 2,
+					v6 + math.max(0, v4.Size.Size_1400 - v4.Padding.Medium) + math.max(
+						0,
+						v4.Size.Size_1400 + v4.Size.Size_1200 - v4.Padding.Medium
+					)
+				)
+			},
+			Position = v10:map(function(p2: number)
+				return UDim2.new(0.5, 0, 0.5, p2)
+			end),
+			tag = "anchor-center-center size-full",
+			GroupTransparency = v10:map(function(p2: number)
+				return p2 / size_800
+			end)
 		}, {
 			SheetContainer = React.createElement(View, {
+				ref = ref4,
 				ZIndex = 2,
+				sizeConstraint = { MaxSize = Vector2.new(v5, v6) },
+				Position = UDim2.fromScale(0.5, 0.5),
 				tag = "col align-y-center anchor-center-center size-full padding-medium",
-				ref = v71,
-				sizeConstraint = {
-					MaxSize = Vector2.new(v41, v42)
-				},
-				Position = v52:map(function(n6: number) -- line: 312
-					return UDim2.new(0.5, 0, 0.5, n6)
-				end),
-				testId = `{ v36.testId }--center-sheet-container`,
-				GroupTransparency = if not v47 then nil else v52:map(function(n7: number) -- line: 318
-					-- upvalues: Size_800 (copy)
-					return n7 / Size_800
-				end),
-				onAbsoluteSizeChanged = if not v36.centerSheetHeight or not v45 then nil else function(p5) -- line: 323
-					-- upvalues: v38 (copy), v45 (copy), v42 (copy)
-					local v88 = v38.Margin.Medium * 2
+				testId = `{v2.testId}--center-sheet-container`,
+				onAbsoluteSizeChanged = (Flags.FoundationCenterSheetHeightFix or v2.centerSheetHeight and v8) and function(p2)
+					local v20 = v4.Margin.Medium * 2
+					v8((math.min(p2.AbsoluteSize.Y - v20, v6)))
+				end or nil
+			}, nil)
+		})
+	end
 
-					v45((math.min(p5.AbsoluteSize.Y - v88, v42)))
-				end
-			}, if Flags.FoundationCenterSheetUseStableContainer then nil else {
-				Sheet = v74,
-				Shadow = React.createElement("Folder", nil, v75)
+	local sheetContainer
+
+	if not Flags.FoundationCenterSheetOverlayShadow then
+		local createElement6 = React.createElement
+		local v20 = {
+			ref = ref4,
+			ZIndex = 2,
+			sizeConstraint = { MaxSize = Vector2.new(v5, v6) },
+			Position = v10:map(function(p2: number)
+				return UDim2.new(0.5, 0, 0.5, p2)
+			end),
+			tag = "col align-y-center anchor-center-center size-full padding-medium",
+			testId = `{v2.testId}--center-sheet-container`,
+			GroupTransparency = 0,
+			onAbsoluteSizeChanged = 0
+		}
+		local groupTransparency
+
+		if state then
+			groupTransparency = v10:map(function(p2: number)
+				return p2 / size_800
+			end)
+		end
+
+		v20.GroupTransparency = groupTransparency
+
+		v20.onAbsoluteSizeChanged = (Flags.FoundationCenterSheetHeightFix or v2.centerSheetHeight and v8)
+			and function(p2)
+				local v21 = v4.Margin.Medium * 2
+				v8((math.min(p2.AbsoluteSize.Y - v21, v6)))
+			end
+			or nil
+		sheetContainer = createElement6(View, v20, nil)
+	end
+
+	local backdrop
+
+	if Flags.FoundationCenterSheetInternalBackdrop then
+		backdrop = React.createElement(Backdrop, {
+			transparency = transparency,
+			onActivated = v15,
+			ZIndex = 1,
+			testId = `{v2.testId}--backdrop`
+		})
+	else
+		backdrop = React.createElement(View, {
+			Size = UDim2.fromScale(2, 2),
+			Position = UDim2.fromScale(-0.5, -0.5),
+			ZIndex = 1,
+			stateLayer = { affordance = StateLayerAffordance.None },
+			backgroundStyle = transparency:map(function(p2: number)
+				return {
+					Color3 = v4.Color.Common.Backdrop.Color3,
+					Transparency = math.lerp(v4.Color.Common.Backdrop.Transparency, 1, p2)
+				}
+			end),
+			onActivated = v15,
+			testId = `{v2.testId}--backdrop`
+		})
+	end
+
+	return (createElement4(fragment, nil, {
+		OverlayPortal = createPortal(
+			createElement5(View, v19, {
+				ShadowHost = shadowHost,
+				SheetContainer = sheetContainer,
+				Backdrop = backdrop
 			}),
-			Backdrop = React.createElement(View, {
-				ZIndex = 1,
-				Size = UDim2.fromScale(2, 2),
-				Position = UDim2.fromScale(-0.5, -0.5),
-				stateLayer = {
-					affordance = StateLayerAffordance.None
-				},
-				backgroundStyle = v50:map(function(n8: number) -- line: 343
-					-- upvalues: v38 (copy)
-					return {
-						Color3 = v38.Color.Common.Backdrop.Color3,
-						Transparency = math.lerp(v38.Color.Common.Backdrop.Transparency, 1, n8)
-					}
-				end),
-				onActivated = v72,
-				testId = `{ v36.testId }--backdrop`
-			})
-		}), v37),
-		SheetContent = if not Flags.FoundationCenterSheetUseStableContainer then nil else ReactRoblox.createPortal({
-			Sheet = v74,
-			Shadow = v75
-		}, v70)
-	})
+			v3
+		),
+		SheetContent = ReactRoblox.createPortal({ Sheet = element, Shadow = shadow }, v14)
+	}))
 end
 
 return React.memo(React.forwardRef(CenterSheet))

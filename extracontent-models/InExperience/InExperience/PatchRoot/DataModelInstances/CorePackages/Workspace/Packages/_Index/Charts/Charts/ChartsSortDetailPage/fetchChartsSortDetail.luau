@@ -1,147 +1,176 @@
 local Charts = script:FindFirstAncestor("Charts")
-local ChartsParent = Charts.Parent
-local SduiSharedUtilities = require(ChartsParent.SduiSharedUtilities)
+local parent = Charts.Parent
+
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local SduiResponseType = SduiSharedUtilities.SduiResponseType
 local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
 local getSduiTemplateStore = SduiSharedUtilities.getSduiTemplateStore
 local getSduiClientPageScope = SduiSharedUtilities.getSduiClientPageScope
 local SduiApiStorePostConfigContentType = SduiSharedUtilities.SduiApiStorePostConfigContentType
 local SduiCapabilities = SduiSharedUtilities.SduiCapabilities
+
 local ChartsConstants = require(Charts.ChartsPage.ChartsConstants)
 local ChartsPageScopeFields = require(Charts.ChartsPage.ChartsPageScopeFields)
 local ChartsPageSession = require(Charts.ChartsPage.ChartsPageSession)
-local getChartsSortDetailUrl = require(Charts.ChartsSortDetailPage.getChartsSortDetailUrl)
+local ChartsSortDetailScopeFields = require(Charts.ChartsSortDetailPage.ChartsSortDetailScopeFields)
 local getChartsSortDetailPostUrl = require(Charts.ChartsSortDetailPage.getChartsSortDetailPostUrl)
 local getChartsSortDetailPageKey = require(Charts.ChartsSortDetailPage.getChartsSortDetailPageKey)
 local buildChartsSortDetailRequest = require(Charts.ChartsSortDetailPage.buildChartsSortDetailRequest)
-local FFlagSduiChartsPostBody = require(ChartsParent.SharedFlags).FFlagSduiChartsPostBody
 
-local function getInheritedFilterSelections() -- line: 29
-	-- upvalues: getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiChartsSortDetailGenreFilter = SharedFlags.FFlagSduiChartsSortDetailGenreFilter
+local FFlagSduiAdvertiseRuntimeSupportSets = SharedFlags.FFlagSduiAdvertiseRuntimeSupportSets
+
+local function getInheritedFilterSelections() -- 3 equivalent calls inferred from this helper
 	return getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections)
 end
-local function extractNextContentPageToken(p1) -- line: 34
-	local v22 = p1 and p1.next_content_page_token
 
-	if v22 and v22 ~= "" then
-		return v22
+local function extractNextContentPageToken(p) -- 2 equivalent calls inferred from this helper
+	local next_content_page_token = p and p.next_content_page_token
+
+	if next_content_page_token and next_content_page_token ~= "" then
+		return next_content_page_token
 	end
 
 	return nil
 end
-local function fetchChartsSortDetail(s1: string, p2) -- line: 42
-	-- upvalues: getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy), FFlagSduiChartsPostBody (copy), getChartsSortDetailPageKey (copy), getChartsSortDetailPostUrl (copy), ChartsParent (copy), SduiCapabilities (copy), buildChartsSortDetailRequest (copy), ChartsPageSession (copy), getSduiTemplateStore (copy), getSduiApiStore (copy), SduiResponseType (copy), SduiApiStorePostConfigContentType (copy), getChartsSortDetailUrl (copy)
-	local v25 = getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections)
 
-	if FFlagSduiChartsPostBody then
-		local v26 = getChartsSortDetailPageKey(s1, nil, v25)
-		local v27 = getChartsSortDetailPostUrl()
-		local ServiceContractsProto = require(ChartsParent.ServiceContractsProto)
-		local charts_page = ServiceContractsProto.apppageplatform.charts.charts_page
-		local v30 = ServiceContractsProto.apppageplatform.shared.client_capabilities.ClientCapabilities.new({
-			enabled_capabilities = SduiCapabilities.getEnabledCapabilityNumbers({ "CAPABILITY_SUPPORTS_HYDRATION_CLIENT_HINTS" })
-		})
+local function getGenreForRequest(p: string)
+	local sduiClientPageScope = getSduiClientPageScope(p)
+	local v = sduiClientPageScope.get(ChartsSortDetailScopeFields.DesiredGenre)
+	local v2 = sduiClientPageScope.get(ChartsSortDetailScopeFields.SafeGenre)
+	local v3
 
-		local function buildBody(s2: string?) -- line: 67
-			-- upvalues: buildChartsSortDetailRequest (copy), charts_page (copy), s1 (copy), ChartsPageSession (copy), getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy), getSduiTemplateStore (copy), v30 (copy)
-			return buildChartsSortDetailRequest(charts_page, {
-				sortId = s1,
-				contentPageToken = s2,
-				sessionId = ChartsPageSession:Get(),
-				filterSelections = getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections),
-				cachedRobloxComponentToTemplateId = getSduiTemplateStore().getCachedRobloxComponentToTemplateId("ChartsSortDetail"),
-				clientCapabilities = v30
-			})
-		end
-
-		getSduiApiStore().fetchIfNeeded({
-			surfaceKey = "ChartsSortDetail",
-			enableTemplateCache = true,
-			responseType = SduiResponseType.Protobuf,
-			url = v27,
-			configKey = v26,
-			loadTimer = p2,
-			apiProto = charts_page.GetChartsSortDetailResponse,
-			postConfig = {
-				contentType = SduiApiStorePostConfigContentType.Proto,
-				protoMessage = charts_page.GetChartsSortDetailRequest,
-				body = buildBody(nil)
-			},
-			buildNextPageUrl = function(p3) -- line: 94
-				-- upvalues: v27 (copy)
-				local v37 = p3 and p3.next_content_page_token
-
-				if if not v37 or v37 == "" then nil else v37 then
-					return v27
-				end
-
-				return nil
-			end,
-			buildNextPagePostBody = function(p4) -- line: 97
-				-- upvalues: buildBody (copy)
-				local v39 = p4 and p4.next_content_page_token
-				local v40 = if not v39 or v39 == "" then nil else v39
-
-				if not v40 then
-					return nil
-				end
-
-				return buildBody(v40)
-			end,
-			buildRefreshUrl = function() -- line: 104
-				-- upvalues: v27 (copy)
-				return v27
-			end,
-			buildRefreshPostBody = function() -- line: 108
-				-- upvalues: buildBody (copy)
-				return buildBody(nil)
-			end
-		})
-
-		return v26
+	if typeof(v) == "string" then
+		v3 = v ~= ""
+	else
+		v3 = false
 	end
 
-	local v32 = getChartsSortDetailUrl({
-		sortId = s1,
-		sessionId = ChartsPageSession:Get(),
-		filterSelections = v25
-	})
-	local v33 = getChartsSortDetailPageKey(s1, nil, v25)
-	local charts_page = require(ChartsParent.ServiceContractsProto).apppageplatform.charts.charts_page
+	local v4
+
+	if typeof(v2) == "string" then
+		v4 = v2 ~= ""
+	else
+		v4 = false
+	end
+
+	if v3 and v ~= v2 then
+		return v
+	end
+
+	return if v4 then v2 else nil
+end
+
+local function getFilterSelectionsWithGenre(chartsSortDetailPageKey: string)
+	local inheritedFilterSelections = getInheritedFilterSelections() -- inferred equivalent call
+	local genreForRequest = getGenreForRequest(chartsSortDetailPageKey)
+
+	if genreForRequest == nil then
+		return inheritedFilterSelections
+	end
+
+	local selected = not inheritedFilterSelections and {} or table.clone(inheritedFilterSelections)
+	selected.selectedGenre = genreForRequest
+	return selected
+end
+
+local function resetStickyGenreIfStale(chartsSortDetailPageKey: string) -- 1 equivalent call inferred from this helper
+	local _, v = getSduiApiStore().getData(chartsSortDetailPageKey)
+
+	if v then
+		local sduiClientPageScope = getSduiClientPageScope(chartsSortDetailPageKey)
+		sduiClientPageScope.set(ChartsSortDetailScopeFields.DesiredGenre, nil)
+		sduiClientPageScope.set(ChartsSortDetailScopeFields.SafeGenre, nil)
+	end
+end
+
+local function fetchChartsSortDetail(sortId: string, loadTimer)
+	local chartsSortDetailPageKey = getChartsSortDetailPageKey(sortId, nil, (getInheritedFilterSelections())) -- inferred equivalent call
+
+	if FFlagSduiChartsSortDetailGenreFilter then
+		resetStickyGenreIfStale(chartsSortDetailPageKey) -- inferred equivalent call
+	end
+
+	local chartsSortDetailPostUrl = getChartsSortDetailPostUrl()
+
+	local ServiceContractsProto = require(parent.ServiceContractsProto)
+	local charts_page = ServiceContractsProto.apppageplatform.charts.charts_page
+
+	local clientCapabilities = ServiceContractsProto.apppageplatform.shared.client_capabilities.ClientCapabilities
+	local clientCapabilities2
+
+	if FFlagSduiAdvertiseRuntimeSupportSets then
+		clientCapabilities2 = SduiCapabilities.buildClientCapabilities()
+	else
+		clientCapabilities2 = clientCapabilities.new({
+			enabled_capabilities = SduiCapabilities.getEnabledCapabilityNumbers({ "CAPABILITY_SUPPORTS_HYDRATION_CLIENT_HINTS" })
+		})
+	end
+
+	local function buildBody(contentPageToken: string?)
+		local v = {
+			sortId = sortId,
+			contentPageToken = contentPageToken,
+			sessionId = ChartsPageSession:Get(),
+			filterSelections = 0,
+			cachedRobloxComponentToTemplateId = 0,
+			clientCapabilities = 0
+		}
+		local filterSelections
+
+		if FFlagSduiChartsSortDetailGenreFilter then
+			filterSelections = getFilterSelectionsWithGenre(chartsSortDetailPageKey)
+		else
+			filterSelections = getInheritedFilterSelections() -- inferred equivalent call
+		end
+
+		v.filterSelections = filterSelections
+
+		v.cachedRobloxComponentToTemplateId = getSduiTemplateStore().getCachedRobloxComponentToTemplateId("ChartsSortDetail")
+
+		v.clientCapabilities = clientCapabilities2
+		return buildChartsSortDetailRequest(charts_page, v)
+	end
 
 	getSduiApiStore().fetchIfNeeded({
-		surfaceKey = "ChartsSortDetail",
 		responseType = SduiResponseType.Protobuf,
-		url = v32,
-		configKey = v33,
-		loadTimer = p2,
+		url = chartsSortDetailPostUrl,
+		surfaceKey = "ChartsSortDetail",
+		configKey = chartsSortDetailPageKey,
+		loadTimer = loadTimer,
 		apiProto = charts_page.GetChartsSortDetailResponse,
-		buildNextPageUrl = function(p5) -- line: 134
-			-- upvalues: getChartsSortDetailUrl (copy), s1 (copy), ChartsPageSession (copy), getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy)
-			local v42 = p5 and p5.next_content_page_token
-
-			if v42 and v42 ~= "" then
-				return getChartsSortDetailUrl({
-					sortId = s1,
-					contentPageToken = v42,
-					sessionId = ChartsPageSession:Get(),
-					filterSelections = getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections)
-				})
+		postConfig = {
+			contentType = SduiApiStorePostConfigContentType.Proto,
+			protoMessage = charts_page.GetChartsSortDetailRequest,
+			body = buildBody(nil)
+		},
+		enableTemplateCache = true,
+		buildNextPageUrl = function(p)
+			if extractNextContentPageToken(p) then -- inferred equivalent call
+				return chartsSortDetailPostUrl
 			end
 
 			return nil
 		end,
-		buildRefreshUrl = function() -- line: 146
-			-- upvalues: getChartsSortDetailUrl (copy), s1 (copy), ChartsPageSession (copy), getSduiClientPageScope (copy), ChartsConstants (copy), ChartsPageScopeFields (copy)
-			return getChartsSortDetailUrl({
-				sortId = s1,
-				sessionId = ChartsPageSession:Get(),
-				filterSelections = getSduiClientPageScope(ChartsConstants.ConfigKey).get(ChartsPageScopeFields.FilterSelections)
-			})
+		buildNextPagePostBody = function(p)
+			local contentPageToken = extractNextContentPageToken(p) -- inferred equivalent call
+
+			if contentPageToken then
+				return buildBody(contentPageToken)
+			end
+
+			return nil
+		end,
+		buildRefreshUrl = function()
+			return chartsSortDetailPostUrl
+		end,
+		buildRefreshPostBody = function()
+			return buildBody(nil)
 		end
 	})
 
-	return v33
+	return chartsSortDetailPageKey
 end
 
 return fetchChartsSortDetail

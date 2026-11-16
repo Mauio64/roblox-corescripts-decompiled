@@ -1,13 +1,14 @@
-local Parent = script:FindFirstAncestor("AppChatNetworking").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
+local parent = script:FindFirstAncestor("AppChatNetworking").Parent
 
-return require(Parent.SocialLuaAnalytics).Telemetry.createEmitter({
+local LoggingProtocol = require(parent.LoggingProtocol)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+return SocialLuaAnalytics.Telemetry.createEmitter({
 	telemetryImpl = LoggingProtocol.default,
 	defaultTelemetryConfig = {
-		links = "",
-		throttlingThousandths = game:DefineFastInt("AppChatNetworkingTelemetryThrottlingThousandths", 800)
+		throttlingThousandths = game:DefineFastInt("AppChatNetworkingTelemetryThrottlingThousandths", 800),
+		links = ""
 	},
-	getSharedInfo = function() -- line: 13
+	getSharedInfo = function()
 		return {}
 	end
 })

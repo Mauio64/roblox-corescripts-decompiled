@@ -1,9 +1,9 @@
-return function(p1) -- line: 1
+return function(p)
 	return {
-		moderationDetail = p1.fromString("usermoderation:v1/not-approved"),
-		reactivate = p1.fromString("usermoderation:v1/not-approved/reactivate"),
-		reminder = p1.fromString("usermoderation:v1/reminder"),
-		dismissIntervention = p1.fromString("usermoderation:v1/dismiss-intervention"),
-		accessDetail = p1.fromString("usermoderation:v2/not-approved")
+		["moderationDetail"] = p.fromString("usermoderation:v1/not-approved"),
+		reactivate = p.fromString("usermoderation:v1/not-approved/reactivate"),
+		reminder = p.fromString("usermoderation:v1/reminder"),
+		dismissIntervention = p.fromString("usermoderation:v1/dismiss-intervention"),
+		accessDetail = p.fromString("usermoderation:v2/not-approved")
 	}
 end

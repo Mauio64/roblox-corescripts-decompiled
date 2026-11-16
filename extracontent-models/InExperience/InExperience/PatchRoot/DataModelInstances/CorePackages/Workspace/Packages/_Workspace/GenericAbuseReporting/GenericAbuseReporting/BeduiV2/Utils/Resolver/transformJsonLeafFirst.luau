@@ -1,54 +1,43 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
 
 require(GenericAbuseReporting.BeduiV2.Types)
-
-local FFlagAbuseReportDensifyResolvedArrays = require(GenericAbuseReporting.Flags.FFlagAbuseReportDensifyResolvedArrays)
-
-local function transformJsonLeafFirst(p1, p2: ((...any) -> ...any)) -- line: 13
-	-- upvalues: FFlagAbuseReportDensifyResolvedArrays (copy), transformJsonLeafFirst (copy)
-	if type(p1) == "table" then
-		local v6 = false
-
-		for k, _ in pairs(p1) do
-			if type(k) ~= "number" then
-				v6 = false
-
-				break
-			end
-
-			v6 = true
-		end
-
-		if v6 then
-			local t1 = {}
-
-			if FFlagAbuseReportDensifyResolvedArrays then
-				for _, v in ipairs(p1) do
-					local v12 = transformJsonLeafFirst(v, p2)
-
-					if v12 ~= nil then
-						table.insert(t1, v12)
-					end
-				end
-			else
-				for i, v in ipairs(p1) do
-					t1[i] = transformJsonLeafFirst(v, p2)
-				end
-			end
-
-			return p2(t1)
-		end
-
-		local t2 = {}
-
-		for k, v in pairs(p1) do
-			t2[k] = transformJsonLeafFirst(v, p2)
-		end
-
-		return p2(t2)
+local function transformJsonLeafFirst(list, callback)
+	if type(list) ~= "table" then
+		return callback(list)
 	end
 
-	return p2(p1)
+	local flag = false
+
+	for k, _ in pairs(list) do
+		if type(k) == "number" then
+			flag = true
+		else
+			flag = false
+			break
+		end
+	end
+
+	if flag then
+		local v = {}
+
+		for _, item in ipairs(list) do
+			local v2 = transformJsonLeafFirst(item, callback)
+
+			if v2 ~= nil then
+				table.insert(v, v2)
+			end
+		end
+
+		return callback(v)
+	else
+		local v = {}
+
+		for k, item in pairs(list) do
+			v[k] = transformJsonLeafFirst(item, callback)
+		end
+
+		return callback(v)
+	end
 end
 
 return transformJsonLeafFirst

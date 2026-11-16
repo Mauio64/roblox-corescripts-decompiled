@@ -10,6 +10,7 @@ return {
 		SetAppTopBanner = Actions.SetAppTopBanner
 	},
 	Enums = Enums,
+	GetAppTopBannerStore = require(script.Stores.GetAppTopBannerStore),
 	AppTopBanner = Components.AppTopBanner,
 	["jest.config"] = script["jest.config"]
 }

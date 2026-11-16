@@ -1,47 +1,39 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local UpsellFlow = require(ParentParent.Enums.UpsellFlow)
-local getUpsellFlow = require(ParentParent.NativeUpsell.getUpsellFlow)
-local ExternalSettings = require(ParentParent.Services.ExternalSettings)
-local PlatformInterface = require(ParentParent.Services.PlatformInterface)
-local Thunk = require(ParentParent.Thunk)
-local AppPage = require(ParentParentParent.RobloxAppEnums).AppPage
-local TermsOfUse = require(ParentParent.Misc.Constants).TermsOfUse
-local AppContext = require(ParentParent.Utils.AppContext)
-local FFlagEnableUnifiedProductPurchaseFlow = require(ParentParentParent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
-local getAppFeaturePolicies = require(ParentParentParent.UniversalAppPolicy).getAppFeaturePolicies
-local t1 = {
-	ExternalSettings,
-	PlatformInterface
-}
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local function openTermsOfUse(p1) -- line: 23
-	-- upvalues: Thunk (copy), t1 (copy), ExternalSettings (copy), PlatformInterface (copy), getUpsellFlow (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), getAppFeaturePolicies (copy), AppContext (copy), AppPage (copy), TermsOfUse (copy), UpsellFlow (copy)
-	return Thunk.new(script.Name, t1, function(_, p3) -- line: 24
-		-- upvalues: ExternalSettings (copy), PlatformInterface (copy), getUpsellFlow (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), getAppFeaturePolicies (copy), AppContext (copy), p1 (copy), AppPage (copy), TermsOfUse (copy), UpsellFlow (copy)
-		local v18 = p3[ExternalSettings]
-		local v19 = p3[PlatformInterface]
-		local v20 = getUpsellFlow(v18.getPlatform())
+local UpsellFlow = require(parent.Enums.UpsellFlow)
+local getUpsellFlow = require(parent.NativeUpsell.getUpsellFlow)
+local ExternalSettings = require(parent.Services.ExternalSettings)
+local PlatformInterface = require(parent.Services.PlatformInterface)
+local Thunk = require(parent.Thunk)
+local RobloxAppEnums = require(parent2.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local Constants = require(parent.Misc.Constants)
+local TermsOfUse = Constants.TermsOfUse
+local AppContext = require(parent.Utils.AppContext)
+local UniversalAppPolicy = require(parent2.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
 
-		if FFlagEnableUnifiedProductPurchaseFlow and getAppFeaturePolicies().getShouldUseDMCCALegalDisclosureInApp() then
+local v = { ExternalSettings, PlatformInterface }
+
+local function openTermsOfUse(p)
+	return Thunk.new(script.Name, v, function(_, p2)
+		local v2 = p2[ExternalSettings]
+		local v3 = p2[PlatformInterface]
+
+		local upsellFlow = getUpsellFlow(v2.getPlatform())
+
+		if getAppFeaturePolicies().getShouldUseDMCCALegalDisclosureInApp() then
 			if AppContext.get() == AppContext.Enum.IN_APP then
-				p1.navigate(AppPage.GenericWebPage, {
+				p.navigate(AppPage.GenericWebPage, {
 					detail = TermsOfUse.DMCCAUrl,
-					extraProps = {
-						title = ""
-					}
+					extraProps = { title = "" }
 				})
-
-				return
+			else
+				v3.openTermsOfUseDMCCA()
 			end
-
-			v19.openTermsOfUseDMCCA()
-
-			return
-		end
-
-		if v20 == UpsellFlow.Web then
-			v19.openTermsOfUse()
+		elseif upsellFlow == UpsellFlow.Web then
+			v3.openTermsOfUse()
 		end
 	end)
 end

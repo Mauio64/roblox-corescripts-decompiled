@@ -1,29 +1,31 @@
 local HttpService = game:GetService("HttpService")
-local ParentParent = script.Parent.Parent.Parent
-local v3, v4 = require(ParentParent.Signals).createSignal("")
 
-return {
-	Get = function(_) -- line: 15
-		-- upvalues: v3 (copy), HttpService (copy), v4 (copy)
-		local v6 = v3(false)
+local parent = script.Parent.Parent.Parent
 
-		if v6 == "" then
-			v6 = HttpService:GenerateGUID(false)
-			v4(v6)
-		end
+local Signals = require(parent.Signals)
 
-		return v6
-	end,
-	Refresh = function(_) -- line: 24
-		-- upvalues: HttpService (copy), v4 (copy)
-		local guid = HttpService:GenerateGUID(false)
+local signal, v = Signals.createSignal("")
+local ChartsPageSession = {}
 
-		v4(guid)
+function ChartsPageSession.Get(_)
+	local v2 = signal(false)
 
-		return guid
-	end,
-	GetSignal = function(_) -- line: 30
-		-- upvalues: v3 (copy)
-		return v3
+	if v2 == "" then
+		v2 = HttpService:GenerateGUID(false)
+		v(v2)
 	end
-}
+
+	return v2
+end
+
+function ChartsPageSession.Refresh(_)
+	local guid = HttpService:GenerateGUID(false)
+	v(guid)
+	return guid
+end
+
+function ChartsPageSession.GetSignal(_)
+	return signal
+end
+
+return ChartsPageSession

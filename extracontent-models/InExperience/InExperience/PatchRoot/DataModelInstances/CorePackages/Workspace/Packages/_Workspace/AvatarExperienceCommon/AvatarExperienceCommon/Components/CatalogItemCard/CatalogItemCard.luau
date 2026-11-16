@@ -1,8 +1,9 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local AvatarExperienceUIKit = require(Parent.AvatarExperienceUIKit)
-local BuilderIcons = require(Parent.BuilderIcons)
-local Responsive = require(Parent.Responsive)
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local parent = AvatarExperienceCommon.Parent
+local React = require(parent.React)
+local AvatarExperienceUIKit = require(parent.AvatarExperienceUIKit)
+local Responsive = require(parent.Responsive)
+
 local ItemCardComponents = AvatarExperienceUIKit.ItemCardComponents
 local ItemCardFooter = ItemCardComponents.ItemCardFooter
 local ItemCardHeader = ItemCardComponents.ItemCardHeader
@@ -10,234 +11,510 @@ local ItemCard = ItemCardComponents.ItemCard
 local ItemCardBadge = ItemCardComponents.ItemCardBadge
 local ItemCardStatus = ItemCardComponents.ItemCardStatus
 local ItemCardHeaderCornersOverlay = ItemCardComponents.ItemCardHeaderCornersOverlay
-local _ = ItemCardComponents.ItemCardPriceLine
+local ItemCardPriceLine = ItemCardComponents.ItemCardPriceLine
 local ItemCardIcon = ItemCardComponents.ItemCardIcon
-local Foundation = require(Parent.Foundation)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
+local BadgeSize = Foundation.Enums.BadgeSize
 local IconSize = Foundation.Enums.IconSize
 local Icon = Foundation.Icon
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local CatalogItemCardItemTypeEnum = require(script.Parent.Enums.CatalogItemCardItemTypeEnum)
-local CatalogItemCardItemInfoEnum = require(script.Parent.Enums.CatalogItemCardItemInfoEnum)
+
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+local IndicatorStack = require(AvatarExperienceCommon.Components.IndicatorStack.IndicatorStack)
+local shouldRenderIndicatorStack = require(AvatarExperienceCommon.Utils.shouldRenderIndicatorStack)
+local LicensingBadge = require(AvatarExperienceCommon.Components.LicensingBadge.LicensingBadge)
+require(script.Parent.Enums.CatalogItemCardItemTypeEnum)
+require(script.Parent.Enums.CatalogItemCardItemInfoEnum)
 local CatalogItemCardStatusIconTypeEnum = require(script.Parent.Enums.CatalogItemCardStatusIconTypeEnum)
+local ItemStatusTypeEnum = require(script.Parent.Enums.ItemStatusTypeEnum)
+local CatalogItemCardBadgeMaps = require(script.Parent.CatalogItemCardBadgeMaps)
+
 local CatalogItemCardSelectedOverlay = require(script.Parent.CatalogItemCardSelectedOverlay)
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local v25 = game:DefineFastFlag("MoveLimitedBadgeToTopLeft", false)
-local FFlagAXRootSlotBasedEditorFlag = require(Parent.AvatarExperienceFlags).FFlagAXRootSlotBasedEditorFlag
-local FFlagAXMISEnableMultiShopping = AvatarExperienceFlags.FFlagAXMISEnableMultiShopping
+local useSelectedOverlayButton = require(script.Parent.useSelectedOverlayButton)
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
 local FFlagAXInventoryDurablesSupport = AvatarExperienceFlags.FFlagAXInventoryDurablesSupport
 local FFlagAXModeratedItemIconUpdates = AvatarExperienceFlags.FFlagAXModeratedItemIconUpdates
 local FFlagAXShowFaeUpsell = AvatarExperienceFlags.FFlagAXShowFaeUpsell
 local FFlagAXFixBadgeStatusConfigOptions = AvatarExperienceFlags.FFlagAXFixBadgeStatusConfigOptions
-local FFlagAXSelectedBorderWrapsBackground = AvatarExperienceFlags.FFlagAXSelectedBorderWrapsBackground
-local _ = {
-	Text = "text",
-	Icon = "icon",
-	Badge = "badge",
-	Placeholder = "placeholder"
-}
-local v34 = not FFlagAXModeratedItemIconUpdates and "icons/actions/info_small" or BuilderIcons.Icon.CircleI
-local v35 = not FFlagAXModeratedItemIconUpdates and "icons/status/pending_small" or BuilderIcons.Icon.ClockDashed
-local v36 = not FFlagAXModeratedItemIconUpdates and "icons/status/pending_small" or BuilderIcons.Icon.Clock
-local v37 = not FFlagAXModeratedItemIconUpdates and "icons/actions/info_small" or BuilderIcons.Icon.CircleI
-local v38 = if not FFlagAXShowFaeUpsell then nil else not FFlagAXModeratedItemIconUpdates and "icons/status/private" or BuilderIcons.Icon.LockClosed
-local v39 = not FFlagAXModeratedItemIconUpdates and "icons/status/warning_small" or BuilderIcons.Icon.CircleI
-local v40 = not FFlagAXModeratedItemIconUpdates and "icons/status/error_large" or BuilderIcons.Icon.TriangleExclamation
-local t1 = {
-	[CatalogItemCardStatusIconTypeEnum.Moderated] = v34,
-	[CatalogItemCardStatusIconTypeEnum.PendingModeration] = v35,
-	[CatalogItemCardStatusIconTypeEnum.Durable] = v36,
-	[CatalogItemCardStatusIconTypeEnum.Info] = v37,
-	[CatalogItemCardStatusIconTypeEnum.Unavailable] = v39,
-	[CatalogItemCardStatusIconTypeEnum.Error] = v40,
-	[CatalogItemCardStatusIconTypeEnum.FAE] = v38
-}
-local t2 = {
-	[CatalogItemCardItemTypeEnum.Limited] = {{
-		type = "icon",
-		icon = "icons/status/item/limited"
-	}},
-	[CatalogItemCardItemTypeEnum.Collectible] = {
-		{
-			type = "icon",
-			icon = "icons/status/item/limited"
-		},
-		{
-			type = "text",
-			text = "#"
-		}
+local FFlagAXRemoveDynamicHeadBadge = AvatarExperienceFlags.FFlagAXRemoveDynamicHeadBadge
+local FFlagAXMarketplaceItemCardIndicatorStack = AvatarExperienceFlags.FFlagAXMarketplaceItemCardIndicatorStack
+local FFlagAXMarketplaceLicensingItemCards = AvatarExperienceFlags.FFlagAXMarketplaceLicensingItemCards
+
+require(parent.AvatarExperienceModel)
+
+local DURABLE_ICON = CatalogItemCardBadgeMaps.DURABLE_ICON
+local FAE_ICON = CatalogItemCardBadgeMaps.FAE_ICON
+
+local itemTypeToContentMap = CatalogItemCardBadgeMaps.itemTypeToContentMap
+local itemInfoIconMap = CatalogItemCardBadgeMaps.itemInfoIconMap
+local itemStatusIconTypeToIconMap = CatalogItemCardBadgeMaps.itemStatusIconTypeToIconMap
+
+local function selectIsPortrait(p): boolean
+	return p.DeviceOrientation == Responsive.Keys.Portrait
+end
+
+local function buildBadgeStatusContent(icon: string?, text: string?)
+	local badgeStatusContent = {
+		{ type = "icon", icon = icon }
 	}
-}
-local t3 = {
-	[CatalogItemCardItemInfoEnum.DynamicHead] = "icons/menu/clothing/dynamicHead"
-}
 
-local function selectIsPortrait(p1) -- line: 137
-	-- upvalues: Responsive (copy)
-	return p1.DeviceOrientation == Responsive.Keys.Portrait
+	if text then
+		table.insert(badgeStatusContent, { type = "text", text = text })
+	end
+
+	return badgeStatusContent
 end
-local function buildBadgeStatusContent(s1: string?, s2: string?) -- line: 141
-	local t4 = {{
-		type = "icon",
-		icon = s1
-	}}
 
-	if s2 then
-		table.insert(t4, {
-			type = "text",
-			text = s2
-		})
+local function buildItemStatusContent(itemStatus, icon: string?, expirationTime: string?, isSelected: boolean?)
+	if itemStatus then
+		local content
+
+		if itemStatus.type == ItemStatusTypeEnum.Badge then
+			if FFlagAXFixBadgeStatusConfigOptions or FFlagAXShowFaeUpsell then
+				content = buildBadgeStatusContent(icon, itemStatus.text)
+			else
+				content = {
+					{ type = "icon", icon = icon },
+					{ type = "text", text = itemStatus.text }
+				}
+			end
+		end
+
+		if itemStatus.type == ItemStatusTypeEnum.Text and itemStatus.text then
+			return { type = "text", text = itemStatus.text }
+		end
+
+		if itemStatus.type == ItemStatusTypeEnum.Badge and content then
+			return { type = "badge", content = content, displayBorder = true }
+		end
+
+		if icon then
+			return { type = "icon", icon = icon }
+		end
+
+		if not isSelected or itemStatus.iconType == CatalogItemCardStatusIconTypeEnum.Moderated then
+			return nil
+		end
 	end
 
-	return t4
-end
-local function buildSelectedOverlayBadge(t5: {[any]: any}?, s3: string?, s4: string?) -- line: 154
-	-- upvalues: FFlagAXShowFaeUpsell (copy), CatalogItemCardStatusIconTypeEnum (copy), v38 (copy), FFlagAXInventoryDurablesSupport (copy), v36 (copy)
-	local v54 = t5 and t5.iconType
-	local v55 = t5 and t5.text
-
-	if FFlagAXShowFaeUpsell and v54 == CatalogItemCardStatusIconTypeEnum.FAE then
+	if FFlagAXInventoryDurablesSupport and expirationTime then
 		return {
-			icon = v38
-		}
-	end
-
-	if s3 and v55 then
-		return {
-			icon = s3,
-			text = v55
-		}
-	end
-
-	if FFlagAXInventoryDurablesSupport and s4 and v54 ~= CatalogItemCardStatusIconTypeEnum.Moderated then
-		return {
-			icon = v36,
-			text = s4
+			type = "badge",
+			content = {
+				{ type = "icon", icon = DURABLE_ICON },
+				{ type = "text", text = expirationTime }
+			},
+			displayBorder = true
 		}
 	end
 
 	return nil
 end
 
-return (React.forwardRef(function(t6: {[any]: any}, p2) -- line: 178
-	-- upvalues: FFlagAXModeratedItemIconUpdates (copy), useTokens (copy), t3 (copy), t2 (copy), useSelector (copy), selectIsPortrait (copy), t1 (copy), FFlagAXSelectedBorderWrapsBackground (copy), React (copy), Foundation (copy), Icon (copy), IconSize (copy), ItemCard (copy), FFlagAXMISEnableMultiShopping (copy), ItemCardHeader (copy), CatalogItemCardSelectedOverlay (copy), FFlagAXFixBadgeStatusConfigOptions (copy), buildSelectedOverlayBadge (copy), FFlagAXShowFaeUpsell (copy), CatalogItemCardStatusIconTypeEnum (copy), v38 (copy), FFlagAXInventoryDurablesSupport (copy), v36 (copy), ItemCardHeaderCornersOverlay (copy), ItemCardStatus (copy), ItemCardBadge (copy), buildBadgeStatusContent (copy), ItemCardIcon (copy), v25 (copy), ItemCardFooter (copy), FFlagAXRootSlotBasedEditorFlag (copy)
-	local v58 = if not FFlagAXModeratedItemIconUpdates then nil else useTokens()
-	local v59 = t6.title or (t6.creator or t6.priceLineContent)
-	local v60 = if not t6.itemInfo then nil else t3[t6.itemInfo]
-	local v61 = if not t6.itemType then nil else t2[t6.itemType]
-	local v62 = if not FFlagAXModeratedItemIconUpdates then nil else useSelector(selectIsPortrait)
-	local v63 = if not t6.itemStatus or (t6.itemStatus.type ~= "icon" and t6.itemStatus.type ~= "badge" or not t6.itemStatus.iconType) then nil else t1[t6.itemStatus.iconType]
-	local backgroundLayers = t6.backgroundLayers
-	local v65 = if not FFlagAXSelectedBorderWrapsBackground then nil else backgroundLayers ~= nil and #backgroundLayers > 0
+local function buildSelectedOverlayBadge(itemStatus, icon: string?, expirationTime: string?)
+	local iconType = itemStatus and itemStatus.iconType
+	local text = itemStatus and itemStatus.text
 
-	local function renderPresentationSlot() -- line: 198
-		-- upvalues: t6 (copy), React (copy), Foundation (copy), FFlagAXModeratedItemIconUpdates (copy), Icon (copy), t1 (copy), v58 (copy), v62 (copy), IconSize (copy)
-		if t6.itemStatus and t6.itemStatus.type == "placeholder" then
-			if not t6.itemStatus.iconType then
-				return nil
+	if FFlagAXShowFaeUpsell and iconType == CatalogItemCardStatusIconTypeEnum.FAE then
+		return { icon = FAE_ICON }
+	end
+
+	if icon and text then
+		return { icon = icon, text = text }
+	end
+
+	if
+		FFlagAXInventoryDurablesSupport
+		and expirationTime
+		and iconType ~= CatalogItemCardStatusIconTypeEnum.Moderated
+	then
+		return { icon = DURABLE_ICON, text = expirationTime }
+	end
+
+	return nil
+end
+
+local function SelectedIndicatorCorners(props)
+	local v = useSelectedOverlayButton(props.hasOverlayButton)
+
+	local createElement = React.createElement
+	local topLeftSlot
+
+	if FFlagAXMarketplaceLicensingItemCards then
+		topLeftSlot = props.topLeftSlot
+	end
+
+	local v2 = {
+		topLeftSlot = topLeftSlot,
+		bottomRightSlot = props.bottomRightSlot,
+		bottomInset = 0,
+		constrainTopLeftSlot = 0
+	}
+	local bottomInset
+
+	if v.isVisible then
+		bottomInset = v.occupiedHeight
+	end
+
+	v2.bottomInset = bottomInset
+	v2.constrainTopLeftSlot = FFlagAXMarketplaceLicensingItemCards and props.topLeftSlot ~= nil
+	return createElement(ItemCardHeaderCornersOverlay, v2)
+end
+
+return (React.forwardRef(function(props, p)
+	local v
+
+	if FFlagAXModeratedItemIconUpdates or FFlagAXMarketplaceLicensingItemCards then
+		v = useTokens()
+	else
+		v = nil
+	end
+
+	local state, ref2, onAbsoluteSizeChanged
+
+	if FFlagAXMarketplaceLicensingItemCards then
+		local size_3000 = v.Size.Size_3000
+		local setState
+		state, setState = React.useState(false)
+
+		local ref = React.useRef(state)
+		ref2 = React.useRef(nil)
+
+		React.useImperativeHandle(p, function()
+			return ref2.current
+		end, {})
+		onAbsoluteSizeChanged = React.useCallback(function(p2)
+			local x = p2.AbsoluteSize.X
+
+			if x == 0 then
+				return
 			end
 
-			return React.createElement(Foundation.View, {
-				tag = "size-full clip radius-medium row align-x-center align-y-center"
-			}, {
-				icon = if not FFlagAXModeratedItemIconUpdates then React.createElement(Foundation.Image, {
-					Image = t1[t6.itemStatus.iconType],
-					Size = UDim2.fromScale(0.33, 0.33)
-				}) else React.createElement(Icon, {
-					name = t1[t6.itemStatus.iconType],
-					style = v58.Color.Content.Muted,
-					size = not v62 and 40 or IconSize.Large
-				})
+			local current = x <= size_3000
+
+			if current ~= ref.current then
+				ref.current = current
+				setState(current)
+			end
+		end, { size_3000 })
+
+		React.useLayoutEffect(function()
+			if ref2.current then
+				onAbsoluteSizeChanged(ref2.current)
+			end
+		end, { onAbsoluteSizeChanged })
+	else
+		ref2 = p
+		state = false
+		onAbsoluteSizeChanged = nil
+	end
+
+	local title = props.title or props.creator or props.priceLineContent
+	local icon
+
+	if props.itemInfo then
+		icon = itemInfoIconMap[props.itemInfo]
+	end
+
+	local v2
+
+	if props.itemType then
+		v2 = itemTypeToContentMap[props.itemType]
+	end
+
+	local v3
+
+	if FFlagAXModeratedItemIconUpdates then
+		v3 = useSelector(selectIsPortrait)
+	else
+		v3 = nil
+	end
+
+	local v4
+
+	if
+		props.itemStatus
+		and (props.itemStatus.type == ItemStatusTypeEnum.Icon or props.itemStatus.type == ItemStatusTypeEnum.Badge)
+		and props.itemStatus.iconType
+	then
+		v4 = itemStatusIconTypeToIconMap[props.itemStatus.iconType]
+	end
+
+	local backgroundLayers = props.backgroundLayers
+	local suppressBorder
+
+	if backgroundLayers == nil then
+		suppressBorder = false
+	else
+		suppressBorder = #backgroundLayers > 0
+	end
+
+	local topLeftSlot
+
+	if FFlagAXMarketplaceLicensingItemCards and props.itemLicensingInfo then
+		local createElement = React.createElement
+		local v5 = {
+			itemLicensingInfo = props.itemLicensingInfo,
+			isInteractive = false,
+			passiveSize = 0
+		}
+		local passiveSize
+
+		if state then
+			passiveSize = BadgeSize.XSmall
+		else
+			passiveSize = BadgeSize.Small
+		end
+
+		v5.passiveSize = passiveSize
+		topLeftSlot = createElement(LicensingBadge, v5)
+	end
+
+	local bottomRightSlot
+
+	if FFlagAXMarketplaceItemCardIndicatorStack then
+		local itemStatusContent = buildItemStatusContent(props.itemStatus, v4, props.expirationTime, props.isSelected)
+
+		if shouldRenderIndicatorStack(itemStatusContent, v2) then
+			bottomRightSlot = React.createElement(IndicatorStack, {
+				statusContent = itemStatusContent,
+				itemTypeContent = v2
+			})
+		end
+	end
+
+	local function renderPresentationSlot()
+		if not props.itemStatus or props.itemStatus.type ~= ItemStatusTypeEnum.Placeholder then
+			return props.presentationSlot
+		end
+
+		if not props.itemStatus.iconType then
+			return nil
+		end
+
+		local createElement = React.createElement
+		local view = Foundation.View
+		local icon2
+
+		if FFlagAXModeratedItemIconUpdates then
+			icon2 = React.createElement(Icon, {
+				name = itemStatusIconTypeToIconMap[props.itemStatus.iconType],
+				style = v.Color.Content.Muted,
+				size = not v3 and 40 or IconSize.Large
+			})
+		else
+			icon2 = React.createElement(Foundation.Image, {
+				Image = itemStatusIconTypeToIconMap[props.itemStatus.iconType],
+				Size = UDim2.fromScale(0.33, 0.33)
 			})
 		end
 
-		return t6.presentationSlot
+		return createElement(view, {
+			tag = "size-full clip radius-medium row align-x-center align-y-center"
+		}, {
+			icon = icon2
+		})
 	end
 
-	return React.createElement(ItemCard, {
-		onActivated = t6.onActivated,
-		isDisabled = t6.isDisabled,
-		ref = p2,
-		Size = t6.Size,
-		AutomaticSize = t6.AutomaticSize,
-		LayoutOrder = t6.LayoutOrder,
-		tag = t6.tag,
-		Selectable = if not FFlagAXMISEnableMultiShopping then nil else t6.Selectable,
-		showSelectionBorderWithBackground = if not FFlagAXSelectedBorderWrapsBackground then nil else t6.isSelected,
+	local createElement = React.createElement
+	local v5 = {
+		onActivated = props.onActivated,
+		isDisabled = props.isDisabled,
+		ref = ref2,
+		Size = props.Size,
+		AutomaticSize = props.AutomaticSize,
+		LayoutOrder = props.LayoutOrder,
+		tag = props.tag,
+		Selectable = props.Selectable,
+		showSelectionBorderWithBackground = props.isSelected,
 		backgroundLayers = backgroundLayers,
-		imageScaleType = t6.imageScaleType,
-		headerSlot = React.createElement(ItemCardHeader, {
-			aspectRatio = t6.headerAspectRatio,
-			overlaySlot = if not t6.isSelected then React.createElement(ItemCardHeaderCornersOverlay, {
-				topLeftSlot = if not t6.itemStatus then if not FFlagAXInventoryDurablesSupport or not t6.expirationTime then if not v25 or not v61 then nil else React.createElement(ItemCardBadge, {
-					content = v61
-				}) else React.createElement(ItemCardBadge, {
-					displayBorder = true,
-					content = {
-						{
-							type = "icon",
-							icon = v36
-						},
-						{
-							type = "text",
-							text = t6.expirationTime
-						}
-					}
-				}) else if t6.itemStatus.type ~= "text" or not t6.itemStatus.text then if t6.itemStatus.type ~= "badge" then if not v63 then nil else React.createElement(ItemCardIcon, {
-					icon = v63
-				}) else React.createElement(ItemCardBadge, {
-					displayBorder = true,
-					content = if not FFlagAXFixBadgeStatusConfigOptions and not FFlagAXShowFaeUpsell then {
-						{
-							type = "icon",
-							icon = v63
-						},
-						{
-							type = "text",
-							text = t6.itemStatus.text
-						}
-					} else buildBadgeStatusContent(v63, t6.itemStatus.text)
-				}) else React.createElement(ItemCardStatus, {
-					text = t6.itemStatus.text
-				}),
-				bottomLeftSlot = if v25 or not v61 then nil else React.createElement(ItemCardBadge, {
-					content = v61
-				}),
-				bottomRightSlot = if not v60 then nil else React.createElement(ItemCardBadge, {
-					content = {{
-						type = "icon",
-						icon = v60
-					}}
-				})
-			}) else React.createElement(CatalogItemCardSelectedOverlay, if not t6.onOverlayButtonActivated or not t6.overlayButtonText then if not FFlagAXInventoryDurablesSupport or not v63 then if not FFlagAXSelectedBorderWrapsBackground or not v65 then nil else {
-				suppressBorder = true
-			} else {
-				itemStatusIcon = v63,
-				suppressBorder = if not FFlagAXSelectedBorderWrapsBackground then nil else v65
-			} else {
-				onActivated = t6.onOverlayButtonActivated,
-				buttonText = t6.overlayButtonText,
-				suppressBorder = if not FFlagAXSelectedBorderWrapsBackground then nil else v65,
-				badge = if not FFlagAXFixBadgeStatusConfigOptions then if not FFlagAXShowFaeUpsell or (not t6.itemStatus or t6.itemStatus.iconType ~= CatalogItemCardStatusIconTypeEnum.FAE) then if not v63 or (not t6.itemStatus or not t6.itemStatus.text) then if not FFlagAXInventoryDurablesSupport or (not t6.expirationTime or not not t6.itemStatus and t6.itemStatus.iconType == CatalogItemCardStatusIconTypeEnum.Moderated) then nil else {
-					icon = v36,
-					text = t6.expirationTime
-				} else {
-					icon = v63,
-					text = t6.itemStatus.text
-				} else {
-					icon = v38
-				} else buildSelectedOverlayBadge(t6.itemStatus, v63, t6.expirationTime)
-			}),
-			BackgroundTransparency = if not backgroundLayers then nil else 1,
-			Size = t6.headerSize
-		}, renderPresentationSlot()),
-		footerSlot = if not v59 then nil else React.createElement(ItemCardFooter, {
-			LayoutOrder = 2,
-			title = t6.title,
-			creatorName = if not t6.creator then nil else t6.creator.name,
-			creatorHasVerifiedBadge = if not t6.creator then nil else t6.creator.verified,
-			priceLineContent = t6.priceLineContent,
-			titleTextSize = if not FFlagAXRootSlotBasedEditorFlag then nil else t6.titleTextSize
+		imageScaleType = props.imageScaleType,
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+		headerSlot = 0,
+		footerSlot = 0
+	}
+
+	local createElement2 = React.createElement
+	local v6 = {
+		aspectRatio = props.headerAspectRatio,
+		overlaySlot = 0,
+		BackgroundTransparency = 0,
+		Size = 0
+	}
+	local overlaySlot
+
+	if FFlagAXMarketplaceItemCardIndicatorStack then
+		local createElement3 = React.createElement
+		local fragment = React.Fragment
+		local catalogItemCardCorners
+
+		if props.isSelected and bottomRightSlot then
+			catalogItemCardCorners = React.createElement(SelectedIndicatorCorners, {
+				topLeftSlot = topLeftSlot,
+				bottomRightSlot = bottomRightSlot,
+				hasOverlayButton = props.onOverlayButtonActivated ~= nil and props.overlayButtonText ~= nil
+			})
+		else
+			catalogItemCardCorners = React.createElement(ItemCardHeaderCornersOverlay, {
+				topLeftSlot = topLeftSlot,
+				bottomRightSlot = bottomRightSlot,
+				constrainTopLeftSlot = topLeftSlot ~= nil
+			})
+		end
+
+		local catalogItemCardSelection
+
+		if props.isSelected then
+			catalogItemCardSelection = React.createElement(
+				CatalogItemCardSelectedOverlay,
+				props.onOverlayButtonActivated and props.overlayButtonText and {
+					onActivated = props.onOverlayButtonActivated,
+					buttonText = props.overlayButtonText,
+					suppressBorder = suppressBorder
+				} or suppressBorder and { suppressBorder = true } or nil
+			)
+		end
+
+		overlaySlot = createElement3(fragment, nil, {
+			CatalogItemCardCorners = catalogItemCardCorners,
+			CatalogItemCardSelection = catalogItemCardSelection
 		})
-	})
+	elseif props.isSelected then
+		local createElement3 = React.createElement
+		local v7
+
+		if props.onOverlayButtonActivated and props.overlayButtonText then
+			v7 = {
+				onActivated = props.onOverlayButtonActivated,
+				buttonText = props.overlayButtonText,
+				suppressBorder = suppressBorder,
+				badge = 0
+			}
+			local badge
+
+			if FFlagAXFixBadgeStatusConfigOptions then
+				badge = buildSelectedOverlayBadge(props.itemStatus, v4, props.expirationTime)
+			elseif
+				FFlagAXShowFaeUpsell
+				and props.itemStatus
+				and props.itemStatus.iconType == CatalogItemCardStatusIconTypeEnum.FAE
+			then
+				badge = { icon = FAE_ICON }
+			elseif v4 and props.itemStatus and props.itemStatus.text then
+				badge = { icon = v4, text = props.itemStatus.text }
+			else
+				badge = FFlagAXInventoryDurablesSupport
+					and props.expirationTime
+					and (not props.itemStatus or props.itemStatus.iconType ~= CatalogItemCardStatusIconTypeEnum.Moderated)
+					and { icon = DURABLE_ICON, text = props.expirationTime }
+					or nil
+			end
+
+			v7.badge = badge
+		else
+			v7 = FFlagAXInventoryDurablesSupport and v4 and {
+					itemStatusIcon = v4,
+					suppressBorder = suppressBorder
+				}
+				or suppressBorder and { suppressBorder = true }
+				or nil
+		end
+
+		overlaySlot = createElement3(CatalogItemCardSelectedOverlay, v7)
+	else
+		local createElement3 = React.createElement
+		local topLeftSlot2
+
+		if props.itemStatus then
+			if props.itemStatus.type == ItemStatusTypeEnum.Text and props.itemStatus.text then
+				topLeftSlot2 = React.createElement(ItemCardStatus, { text = props.itemStatus.text })
+			elseif props.itemStatus.type == ItemStatusTypeEnum.Badge then
+				local createElement4 = React.createElement
+				local content
+
+				if FFlagAXFixBadgeStatusConfigOptions or FFlagAXShowFaeUpsell then
+					content = buildBadgeStatusContent(v4, props.itemStatus.text)
+				else
+					content = {
+						{ type = "icon", icon = v4 },
+						{ type = "text", text = props.itemStatus.text }
+					}
+				end
+
+				topLeftSlot2 = createElement4(ItemCardBadge, {
+					content = content,
+					displayBorder = true
+				})
+			elseif v4 then
+				topLeftSlot2 = React.createElement(ItemCardIcon, { icon = v4 })
+			end
+		elseif FFlagAXInventoryDurablesSupport and props.expirationTime then
+			topLeftSlot2 = React.createElement(ItemCardBadge, {
+				content = {
+					{ type = "icon", icon = DURABLE_ICON },
+					{ type = "text", text = props.expirationTime }
+				},
+				displayBorder = true
+			})
+		elseif v2 then
+			topLeftSlot2 = React.createElement(ItemCardBadge, { content = v2 })
+		end
+
+		local bottomRightSlot2
+
+		if not (FFlagAXRemoveDynamicHeadBadge or not icon) then
+			bottomRightSlot2 = React.createElement(ItemCardBadge, {
+				content = {
+					{ type = "icon", icon = icon }
+				}
+			})
+		end
+
+		overlaySlot = createElement3(ItemCardHeaderCornersOverlay, {
+			topLeftSlot = topLeftSlot2,
+			bottomRightSlot = bottomRightSlot2
+		})
+	end
+
+	v6.overlaySlot = overlaySlot
+
+	v6.BackgroundTransparency = backgroundLayers and 1 or nil
+	v6.Size = props.headerSize
+	v5.headerSlot = createElement2(ItemCardHeader, v6, renderPresentationSlot())
+	local footerSlot
+
+	if title then
+		local createElement3 = React.createElement
+		local v7 = {
+			title = props.title,
+			creatorName = 0,
+			creatorHasVerifiedBadge = 0,
+			priceLineContent = 0,
+			titleTextSize = 0,
+			LayoutOrder = 2
+		}
+		local creatorName
+
+		if props.creator then
+			creatorName = props.creator.name
+		end
+
+		v7.creatorName = creatorName
+		local creatorHasVerifiedBadge
+
+		if props.creator then
+			creatorHasVerifiedBadge = props.creator.verified
+		end
+
+		v7.creatorHasVerifiedBadge = creatorHasVerifiedBadge
+		v7.priceLineContent = props.priceLineContent
+		v7.titleTextSize = props.titleTextSize
+		footerSlot = createElement3(ItemCardFooter, v7)
+	end
+
+	v5.footerSlot = footerSlot
+	return createElement(ItemCard, v5)
 end))

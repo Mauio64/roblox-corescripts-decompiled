@@ -1,106 +1,204 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local React = require(InExperienceShopParent.React)
-local SignalsReact = require(InExperienceShopParent.SignalsReact)
-local useLocalization = require(InExperienceShopParent.Localization).Hooks.useLocalization
-local SharedFlags = require(InExperienceShopParent.SharedFlags)
-local AbuseVector = require(InExperienceShopParent.GenericAbuseReporting.AbuseVector)
+local parent = InExperienceShop.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local SharedFlags = require(parent.SharedFlags)
+local AbuseVector = require(parent.GenericAbuseReporting.AbuseVector)
+local FFlagLuaAppEnableGamePassFreeTrials = require(InExperienceShop.Flags.FFlagLuaAppEnableGamePassFreeTrials)
+local FFlagEnableGamePassTrialUnifiedLogging = require(InExperienceShop.Flags.FFlagEnableGamePassTrialUnifiedLogging)
+
 local initiateShopItemPurchase = require(InExperienceShop.initiateShopItemPurchase)
+local FFlagCategoryLoggingInShopPurchase = require(InExperienceShop.Flags.FFlagCategoryLoggingInShopPurchase)
 local formatUpdatedDate = require(InExperienceShop.Utils.formatUpdatedDate)
 local getInExperienceShopStore = require(InExperienceShop.Stores.getInExperienceShopStore)
-local v11 = if not SharedFlags.FFlagPassShopPurchaseSurfaceToBuyModal then nil else require(InExperienceShop.Analytics.Constants).ShopPageType
+local Constants = require(InExperienceShop.Constants)
+local shopPageType
+
+if SharedFlags.FFlagPassShopPurchaseSurfaceToBuyModal then
+	local Constants2 = require(InExperienceShop.Analytics.Constants)
+	shopPageType = Constants2.ShopPageType
+else
+	shopPageType = nil
+end
+
+local useGamePassTrialRedemption = require(InExperienceShop.Hooks.useGamePassTrialRedemption)
 local useShopReportOverflow = require(InExperienceShop.Hooks.useShopReportOverflow)
 
 require(InExperienceShop.Types)
+
 require(script.Parent.ItemDetailsView)
 
-local t1 = {
-	product = "Feature.DeveloperProducts.Label.Product"
-}
+local v = { product = "Feature.DeveloperProducts.Label.Product" }
 
-local function categoryLabelForType(p1, s1: string) -- line: 47
-	if p1 == "GamePass" then
-		return "Game pass"
+local function findSectionForItem(items, id: string, itemType)
+	for _, item in items do
+		for _, item2 in item.items do
+			if item2.id == id and item2.itemType == itemType then
+				return item
+			end
+		end
 	end
 
-	return s1
+	return nil
 end
-local function useItemDetailsViewModel(t2: {[any]: any}) -- line: 54
-	-- upvalues: useLocalization (copy), t1 (copy), SignalsReact (copy), getInExperienceShopStore (copy), React (copy), initiateShopItemPurchase (copy), v11 (copy), SharedFlags (copy), AbuseVector (copy), useShopReportOverflow (copy), formatUpdatedDate (copy)
-	local item = t2.item
-	local v20 = useLocalization(t1)
-	local v21 = SignalsReact.useSignalState(getInExperienceShopStore)
-	local v22 = SignalsReact.useSignalState(function(p2) -- line: 64
-		-- upvalues: v21 (copy), item (copy)
-		return v21.getOwnership(p2)[item.id]
+
+local function categoryLabelForType(itemType, product: string) -- 1 equivalent call inferred from this helper
+	return if itemType == "GamePass" then "Game pass" else product
+end
+
+local function useItemDetailsViewModel(data)
+	local item = data.item
+	local v2 = useLocalization(v)
+
+	local v3 = SignalsReact.useSignalState(getInExperienceShopStore)
+	local v4
+
+	if FFlagCategoryLoggingInShopPurchase then
+		v4 = SignalsReact.useSignalState(v3.getSections)
+	else
+		v4 = nil
+	end
+
+	local v5 = SignalsReact.useSignalState(function(p)
+		return v3.getOwnership(p)[item.id]
 	end)
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: item (copy), v21 (copy)
-		if item.itemType == "GamePass" then
-			v21.fetchGamePassOwnership(item.id)
+	local showTry = SignalsReact.useSignalState(function(p): boolean
+		if FFlagLuaAppEnableGamePassFreeTrials and item.itemType == "GamePass" then
+			return v3.getTrialAvailabilities(p).available[item.id] == true
 		end
-	end, {
-		item.id,
-		item.itemType,
-		v21.fetchGamePassOwnership
-	})
 
-	local v23 = if v22 == nil then item.isOwned else v22
-	local v24 = React.useCallback(function() -- line: 83
-		-- upvalues: initiateShopItemPurchase (copy), item (copy), v11 (copy)
-		initiateShopItemPurchase(item.id, item.itemType, if not v11 then nil else v11.Category)
-	end, {
-		item.id,
-		item.itemType
-	})
-	local FFlagEnableReportingFlowForExperienceShop = SharedFlags.FFlagEnableReportingFlowForExperienceShop
-	local v26 = React.useCallback(function() -- line: 89
-		-- upvalues: item (copy), AbuseVector (copy)
+		v3.getOwnership(p)
+		return false
+	end)
+
+	React.useEffect(function()
 		if item.itemType == "GamePass" then
-			return {
-				abuseVector = AbuseVector.GamePass,
-				targetId = item.id
-			}
+			v3.fetchGamePassOwnership(item.id)
+		end
+	end, { item.id, item.itemType, v3.fetchGamePassOwnership })
+	local isOwned
+
+	if v5 == nil then
+		isOwned = item.isOwned
+	else
+		isOwned = v5
+	end
+
+	local useMemo = React.useMemo
+	local function fn()
+		local categoryLocation = nil
+
+		if FFlagCategoryLoggingInShopPurchase and v4 ~= nil then
+			local sectionForItem = findSectionForItem(v4, item.id, item.itemType)
+
+			categoryLocation = sectionForItem ~= nil
+				and {
+					categoryGroup = sectionForItem.categoryGroup,
+					categoryPosition = sectionForItem.id,
+					categoryName = sectionForItem.name,
+					stableCategoryId = sectionForItem.stableCategoryId
+				}
+				or categoryLocation
+		end
+
+		local shopPageType2
+
+		if shopPageType then
+			shopPageType2 = shopPageType.Category
 		end
 
 		return {
-			abuseVector = AbuseVector.DeveloperProduct,
-			targetId = item.id
+			shopPageType = shopPageType2,
+			categoryLocation = categoryLocation,
+			trialStatus = FFlagEnableGamePassTrialUnifiedLogging and item.itemType == "GamePass" and (showTry and isOwned ~= true and "available" or "unavailable") or nil
 		}
-	end, {
-		item.id,
-		item.itemType
+	end
+
+	local id = item.id
+	local itemType = item.itemType
+	local v6
+
+	if FFlagEnableGamePassTrialUnifiedLogging then
+		v6 = showTry
+	end
+
+	local v7
+
+	if FFlagEnableGamePassTrialUnifiedLogging then
+		v7 = isOwned
+	end
+
+	local v8 = useMemo(fn, { id, itemType, v4, v6, v7 })
+
+	local onBuyActivated = React.useCallback(function()
+		local categoryLocation = v8.categoryLocation
+
+		if categoryLocation == nil then
+			initiateShopItemPurchase(item.id, item.itemType, v8.shopPageType)
+		else
+			initiateShopItemPurchase(item.id, item.itemType, v8.shopPageType, categoryLocation)
+		end
+	end, { item.id, item.itemType, v8 })
+
+	local v9 = useGamePassTrialRedemption(item.id, v8)
+
+	if FFlagEnableGamePassTrialUnifiedLogging then
+		local ref = React.useRef(nil)
+		React.useEffect(function()
+			if item.itemType ~= "GamePass" or not showTry or v5 ~= false or ref.current == item.id then
+				return
+			end
+
+			ref.current = item.id
+			local sendGamePassTrialUnifiedEvent = require(InExperienceShop.Analytics.sendGamePassTrialUnifiedEvent)
+			sendGamePassTrialUnifiedEvent.send({
+				action = sendGamePassTrialUnifiedEvent.impressionAction,
+				elementName = sendGamePassTrialUnifiedEvent.trialElement,
+				itemId = item.id,
+				shopPageType = v8.shopPageType,
+				trialStatus = v8.trialStatus
+			})
+		end, { item.id, item.itemType, showTry, v5, v8 })
+	end
+
+	local fFlagEnableReportingFlowForExperienceShop = SharedFlags.FFlagEnableReportingFlowForExperienceShop
+
+	local buildReportSession = React.useCallback(function()
+		if item.itemType == "GamePass" then
+			return { abuseVector = AbuseVector.GamePass, targetId = item.id }
+		end
+
+		return { abuseVector = AbuseVector.DeveloperProduct, targetId = item.id }
+	end, { item.id, item.itemType })
+
+	local v10 = useShopReportOverflow.useShopReportOverflow({
+		isReportingEnabled = fFlagEnableReportingFlowForExperienceShop,
+		buildReportSession = buildReportSession
 	})
-	local v27 = useShopReportOverflow.useShopReportOverflow({
-		isReportingEnabled = FFlagEnableReportingFlowForExperienceShop,
-		buildReportSession = v26
-	})
-	local v28 = React.useMemo(function() -- line: 107
-		-- upvalues: formatUpdatedDate (copy), item (copy)
+
+	local updated = React.useMemo(function()
 		return formatUpdatedDate(item.updated)
 	end, { item.updated })
-	local itemType = item.itemType
-	local product = v20.product
-	local v31 = if itemType ~= "GamePass" then product else "Game pass"
-	local v32, v33 = React.useState(false)
-	local v34 = React.useCallback(function(p3) -- line: 115
-		-- upvalues: v33 (copy)
-		local AbsoluteSizeX = p3.AbsoluteSize.X
 
-		if AbsoluteSizeX <= 0 then
+	local categoryLabel = categoryLabelForType(item.itemType, v2.product) -- inferred equivalent call
+
+	local state, setState = React.useState(false)
+
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		local x = p.AbsoluteSize.X
+
+		if x <= 0 then
 			return
 		end
 
-		local v38 = AbsoluteSizeX < 480
-
-		v33(function(p4) -- line: 121
-			-- upvalues: v38 (copy)
-			if p4 == v38 then
-				return p4
-			end
-
-			return v38
+		local v11 = x < Constants.COMPACT_BREAKPOINT_WIDTH
+		setState(function(p2)
+			return if p2 == v11 then p2 else v11
 		end)
 	end, {})
 
@@ -109,23 +207,27 @@ local function useItemDetailsViewModel(t2: {[any]: any}) -- line: 54
 		name = item.name,
 		thumbnail = item.thumbnail,
 		price = item.price,
-		isOwned = v23,
-		isBuyDisabled = t2.disableBuy == true,
+		isOwned = isOwned,
+		showTry = showTry,
+		isActionLoading = v9.isActionLoading,
+		isActionDisabled = v9.isActionDisabled,
+		isBuyDisabled = data.disableBuy == true,
 		description = item.description,
 		creator = item.creator,
-		categoryLabel = v31,
-		updated = v28,
-		isCompact = v32,
-		isOverflowMenuOpen = v27.isOverflowMenuOpen,
-		isReportingEnabled = v27.isReportingEnabled,
-		reportSession = v27.reportSession,
-		onClose = t2.onClose,
-		onBuyActivated = v24,
-		onOverflowActivated = v27.onOverflowActivated,
-		onOverflowMenuClosed = v27.onOverflowMenuClosed,
-		onMenuItemActivated = v27.onMenuItemActivated,
-		onReportClose = v27.onReportClose,
-		onAbsoluteSizeChanged = v34
+		categoryLabel = categoryLabel,
+		updated = updated,
+		isCompact = state,
+		isOverflowMenuOpen = v10.isOverflowMenuOpen,
+		isReportingEnabled = v10.isReportingEnabled,
+		reportSession = v10.reportSession,
+		onClose = data.onClose,
+		onBuyActivated = onBuyActivated,
+		onTryActivated = v9.onTryActivated,
+		onOverflowActivated = v10.onOverflowActivated,
+		onOverflowMenuClosed = v10.onOverflowMenuClosed,
+		onMenuItemActivated = v10.onMenuItemActivated,
+		onReportClose = v10.onReportClose,
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged
 	}
 end
 

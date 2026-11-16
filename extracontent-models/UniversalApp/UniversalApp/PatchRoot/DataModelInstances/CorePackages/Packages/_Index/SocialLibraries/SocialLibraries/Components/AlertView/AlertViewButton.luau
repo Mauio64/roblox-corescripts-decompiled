@@ -1,35 +1,34 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
 local dependencies = require(SocialLibraries.dependencies)
-local Roact = dependencies.Roact
-local UIBlox = dependencies.UIBlox
-local Button = UIBlox.App.Button.Button
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local v7 = Roact.PureComponent:extend("AlertViewButton")
+local roact = dependencies.Roact
+local uiBlox = dependencies.UIBlox
+local button = uiBlox.App.Button.Button
+local buttonType = uiBlox.App.Button.Enum.ButtonType
 
-v7.defaultProps = {
+local extended = roact.PureComponent:extend("AlertViewButton")
+
+extended.defaultProps = {
 	LayoutOrder = 0,
 	secondary = false,
-	Text = "",
-	onActivated = function() -- line: 13
-	end,
-	Size = UDim2.new(1, 0, 1, 0)
+	onActivated = function() end,
+	Size = UDim2.new(1, 0, 1, 0),
+	Text = ""
 }
 
-function v7.render(p1) -- line: 18
-	-- upvalues: ButtonType (copy), Roact (copy), Button (copy)
-	local PrimarySystem = ButtonType.PrimarySystem
+function extended.render(p)
+	local buttonType2 = buttonType.PrimarySystem
 
-	if p1.props.secondary then
-		PrimarySystem = ButtonType.Secondary
+	if p.props.secondary then
+		buttonType2 = buttonType.Secondary
 	end
 
-	return Roact.createElement(Button, {
-		buttonType = PrimarySystem,
-		size = p1.props.Size,
-		layoutOrder = p1.props.LayoutOrder,
-		text = p1.props.Text,
-		onActivated = p1.props.onActivated
+	return roact.createElement(button, {
+		buttonType = buttonType2,
+		size = p.props.Size,
+		layoutOrder = p.props.LayoutOrder,
+		text = p.props.Text,
+		onActivated = p.props.onActivated
 	})
 end
 
-return v7
+return extended

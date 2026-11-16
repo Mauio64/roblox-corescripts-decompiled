@@ -1,19 +1,20 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
 
-require(scriptParent.Types)
+local function collectSet(items, callback)
+	local set = {}
 
-local function collectSet(t1: {[any]: any}, p1: ((...any) -> ...any)?) -- line: 16
-	local t2 = {}
+	for k, item in items do
+		if callback ~= nil then
+			item = callback(k, item)
+		end
 
-	for v6, v7 in t1 do
-		local v8 = if p1 ~= nil then p1(v6, v7) else v7
-
-		if v8 ~= nil then
-			t2[v8] = true
+		if item ~= nil then
+			set[item] = true
 		end
 	end
 
-	return t2
+	return set
 end
 
 return collectSet

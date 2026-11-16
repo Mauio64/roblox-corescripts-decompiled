@@ -1,9 +1,10 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local Signals = require(MomentsCreationParent.Signals)
+local parent = MomentsCreation.Parent
+
+local Signals = require(parent.Signals)
+
 local createMusicStore = require(MomentsCreation.Stores.createMusicStore)
 
-return Signals.createComputed(function() -- line: 15
-	-- upvalues: createMusicStore (copy)
+return Signals.createComputed(function()
 	return createMusicStore()
 end)

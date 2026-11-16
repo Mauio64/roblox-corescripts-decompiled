@@ -1,11 +1,12 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Url = require(Parent.Http).Url
-local v3 = require(Parent.UrlBuilder).UrlBuilder.new({
-	path = "phone-number-api/v1/phone-prefix-list",
-	base = Url.APIS_URL
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+local Http = require(parent.Http)
+local Url = Http.Url
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder.new({
+	base = Url.APIS_URL,
+	path = "phone-number-api/v1/phone-prefix-list"
 })
 
-return function(p1) -- line: 23
-	-- upvalues: v3 (copy)
-	return p1(v3(), "GET")
+return function(callback)
+	return callback(urlBuilder(), "GET")
 end

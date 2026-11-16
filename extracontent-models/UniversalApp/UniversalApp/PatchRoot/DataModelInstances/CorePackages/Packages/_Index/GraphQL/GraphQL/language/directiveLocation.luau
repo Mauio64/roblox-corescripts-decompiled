@@ -1,5 +1,6 @@
+local LuauPolyfill = require(script.Parent.Parent.Parent.LuauPolyfill)
 return {
-	DirectiveLocation = require(script.Parent.Parent.Parent.LuauPolyfill).Object.freeze({
+	DirectiveLocation = LuauPolyfill.Object.freeze({
 		QUERY = "QUERY",
 		MUTATION = "MUTATION",
 		SUBSCRIPTION = "SUBSCRIPTION",

@@ -1,12 +1,14 @@
-local Parent = script:FindFirstAncestor("SquadsCore").Parent
-local HttpService = game:GetService("HttpService")
-local FFlagDebugSquadLogsEnabled = require(Parent.SharedFlags).FFlagDebugSquadLogsEnabled
+local parent = script:FindFirstAncestor("SquadsCore").Parent
 
-return function(p1) -- line: 8
-	-- upvalues: FFlagDebugSquadLogsEnabled (copy), HttpService (copy)
+local HttpService = game:GetService("HttpService")
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDebugSquadLogsEnabled = SharedFlags.FFlagDebugSquadLogsEnabled
+
+return function(p)
 	if FFlagDebugSquadLogsEnabled then
-		return HttpService:JSONEncode(p1)
+		return HttpService:JSONEncode(p)
 	end
 
-	return p1
+	return p
 end

@@ -1,13 +1,13 @@
-local function sort(p1, p2) -- line: 6
-	local t1 = {}
+local function sort(list, p)
+	local result = {}
 
-	for i = 1, #p1 do
-		t1[i] = p1[i]
+	for i = 1, #list do
+		result[i] = list[i]
 	end
 
-	table.sort(t1, p2)
+	table.sort(result, p)
 
-	return t1
+	return result
 end
 
 return sort

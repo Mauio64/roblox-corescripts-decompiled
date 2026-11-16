@@ -1,40 +1,50 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Map = require(ParentParentParent.LuauPolyfill).Map
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local isEnumType = require(ParentParent.type.definition).isEnumType
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Map = LuauPolyfill.Map
+
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local definition = require(parent.type.definition)
+local isEnumType = definition.isEnumType
 
 return {
-	UniqueEnumValueNamesRule = function(p1) -- line: 25
-		-- upvalues: Map (copy), isEnumType (copy), GraphQLError (copy)
-		local v7 = p1:getSchema()
-		local v8 = v7 and v7:getTypeMap() or Map.new()
-		local t1 = {}
+	UniqueEnumValueNamesRule = function(object)
+		local schema = object:getSchema()
 
-		local function checkValueUniqueness(_, p3) -- line: 33
-			-- upvalues: t1 (copy), v8 (copy), isEnumType (copy), p1 (copy), GraphQLError (copy)
-			local value = p3.name.value
+		local v = schema and schema:getTypeMap() or Map.new()
+		local v2 = {}
 
-			if not t1[value] then
-				t1[value] = {}
+		local function checkValueUniqueness(_, p): boolean
+			local value = p.name.value
+
+			if not v2[value] then
+				v2[value] = {}
 			end
 
-			local v14 = p3.values or {}
-			local v15 = t1[value]
+			local values = p.values or {}
+			local names = v2[value]
 
-			for _, v in ipairs(v14) do
-				local value2 = v.name.value
-				local v19 = v8:get(value)
+			for _, value2 in ipairs(values) do
+				local value3 = value2.name.value
 
-				if isEnumType(v19) and v19:getValue(value2) then
-					p1:reportError(GraphQLError.new(("Enum value \"%s.%s\" already exists in the schema. It cannot also be defined in this type extension."):format(value, value2), v.name))
-				elseif v15[value2] then
-					p1:reportError(GraphQLError.new(("Enum value \"%s.%s\" can only be defined once."):format(value, value2), {
-						v15[value2],
-						v.name
-					}))
+				local v3 = v:get(value)
+
+				if isEnumType(v3) and v3:getValue(value3) then
+					object:reportError(graphQLError.new(
+						("Enum value \"%s.%s\" already exists in the schema. It cannot also be defined in this type extension."):format(
+							value,
+							value3
+						),
+						value2.name
+					))
+				elseif names[value3] then
+					object:reportError(graphQLError.new(
+						("Enum value \"%s.%s\" can only be defined once."):format(value, value3),
+						{ names[value3], value2.name }
+					))
 				else
-					v15[value2] = v.name
+					names[value3] = value2.name
 				end
 			end
 

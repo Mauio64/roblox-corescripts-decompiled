@@ -1,35 +1,34 @@
-local scriptParent = script.Parent
-local DevConsoleDisplayOptions = require(scriptParent.DevConsoleDisplayOptions)
-local MainView = require(scriptParent.MainView)
-local MemoryData = require(scriptParent.MemoryData)
-local NetworkData = require(scriptParent.NetworkData)
-local ScriptsData = require(scriptParent.ScriptsData)
-local DataStoresData = require(scriptParent.DataStoresData)
-local ServerStatsData = require(scriptParent.ServerStatsData)
-local ServerJobsData = require(scriptParent.ServerJobsData)
-local ActionBindingsData = require(scriptParent.ActionBindingsData)
-local MicroProfiler = require(scriptParent.MicroProfiler)
-local DebugVisualizationsData = require(scriptParent.DebugVisualizationsData)
-local ScriptProfiler = require(scriptParent.ScriptProfiler)
-local LuauHeap = require(scriptParent.LuauHeap)
+local parent = script.Parent
+local DevConsoleDisplayOptions = require(parent.DevConsoleDisplayOptions)
+local MainView = require(parent.MainView)
 
-return function(t1: {[any]: any}?, t2: {[any]: any}) -- line: 18
-	-- upvalues: DevConsoleDisplayOptions (copy), MainView (copy), MemoryData (copy), NetworkData (copy), ScriptsData (copy), DataStoresData (copy), ServerStatsData (copy), ServerJobsData (copy), ActionBindingsData (copy), MicroProfiler (copy), DebugVisualizationsData (copy), ScriptProfiler (copy), LuauHeap (copy)
-	local v17 = t1 or {}
+local MemoryData = require(parent.MemoryData)
+local NetworkData = require(parent.NetworkData)
+local ScriptsData = require(parent.ScriptsData)
+local DataStoresData = require(parent.DataStoresData)
+local ServerStatsData = require(parent.ServerStatsData)
+local ServerJobsData = require(parent.ServerJobsData)
+local ActionBindingsData = require(parent.ActionBindingsData)
+local MicroProfiler = require(parent.MicroProfiler)
+local DebugVisualizationsData = require(parent.DebugVisualizationsData)
+local ScriptProfiler = require(parent.ScriptProfiler)
+local LuauHeap = require(parent.LuauHeap)
 
+return function(options, p)
+	local v = options or {}
 	return {
-		DisplayOptions = DevConsoleDisplayOptions(v17.DisplayOptions, t2),
-		MainView = MainView(v17.MainView, t2),
-		MemoryData = MemoryData(v17.MemoryData, t2),
-		NetworkData = NetworkData(v17.NetworkData, t2),
-		ScriptsData = ScriptsData(v17.ScriptsData, t2),
-		DataStoresData = DataStoresData(v17.DataStoresData, t2),
-		ServerStatsData = ServerStatsData(v17.ServerStatsData, t2),
-		ServerJobsData = ServerJobsData(v17.ServerJobsData, t2),
-		ActionBindingsData = ActionBindingsData(v17.ActionBindingsData, t2),
-		MicroProfiler = MicroProfiler(v17.MicroProfiler, t2),
-		DebugVisualizationsData = DebugVisualizationsData(v17.DebugVisualizationsData, t2),
-		ScriptProfiler = ScriptProfiler(v17.ScriptProfiler, t2),
-		LuauHeap = LuauHeap(v17.LuauHeap, t2)
+		DisplayOptions = DevConsoleDisplayOptions(v.DisplayOptions, p),
+		MainView = MainView(v.MainView, p),
+		MemoryData = MemoryData(v.MemoryData, p),
+		NetworkData = NetworkData(v.NetworkData, p),
+		ScriptsData = ScriptsData(v.ScriptsData, p),
+		DataStoresData = DataStoresData(v.DataStoresData, p),
+		ServerStatsData = ServerStatsData(v.ServerStatsData, p),
+		ServerJobsData = ServerJobsData(v.ServerJobsData, p),
+		ActionBindingsData = ActionBindingsData(v.ActionBindingsData, p),
+		MicroProfiler = MicroProfiler(v.MicroProfiler, p),
+		DebugVisualizationsData = DebugVisualizationsData(v.DebugVisualizationsData, p),
+		ScriptProfiler = ScriptProfiler(v.ScriptProfiler, p),
+		LuauHeap = LuauHeap(v.LuauHeap, p)
 	}
 end

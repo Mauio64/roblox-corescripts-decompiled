@@ -1,11 +1,11 @@
-return function(p1, s1: string) -- line: 20
-	for _, v in ipairs(s1:split(".")) do
-		if p1[v] == nil then
+return function(p, value: string)
+	for _, v in ipairs(value:split(".")) do
+		if p[v] == nil then
 			return nil
 		end
 
-		p1 = p1[v]
+		p = p[v]
 	end
 
-	return p1
+	return p
 end

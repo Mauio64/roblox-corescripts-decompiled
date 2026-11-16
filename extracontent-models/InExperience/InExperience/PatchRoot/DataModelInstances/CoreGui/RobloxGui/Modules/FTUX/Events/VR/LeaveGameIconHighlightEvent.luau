@@ -1,17 +1,17 @@
 local CorePackages = game:GetService("CorePackages")
 
 require(script.Parent.Parent.EventType)
+local VrCommon = require(CorePackages.Workspace.Packages.VrCommon)
+local VRHub = VrCommon.VRHub
 
-local VRHub = require(CorePackages.Workspace.Packages.VrCommon).VRHub
+local LeaveGameIconHighlightEvent = { Name = "LeaveGameIconHighlightEvent" }
 
-return {
-	Name = "LeaveGameIconHighlightEvent",
-	StartEvent = function() -- line: 16
-		-- upvalues: VRHub (copy)
-		VRHub:SetShowHighlightedLeaveGameIconToggled(true)
-	end,
-	StopEvent = function() -- line: 20
-		-- upvalues: VRHub (copy)
-		VRHub:SetShowHighlightedLeaveGameIconToggled(false)
-	end
-}
+function LeaveGameIconHighlightEvent.StartEvent()
+	VRHub:SetShowHighlightedLeaveGameIconToggled(true)
+end
+
+function LeaveGameIconHighlightEvent.StopEvent()
+	VRHub:SetShowHighlightedLeaveGameIconToggled(false)
+end
+
+return LeaveGameIconHighlightEvent

@@ -1,11 +1,8 @@
-local SuggestionType = require(script.Parent.Types).SuggestionType
-local t1 = {
-	SuggestionType.Message,
-	SuggestionType.GameCard,
-	SuggestionType.StartParty
-}
+local Types = require(script.Parent.Types)
+
+local SuggestionType = Types.SuggestionType
 
 return {
-	MAX_SUGGESTIONS = 4,
-	SUGGESTION_TYPES = t1
+	SUGGESTION_TYPES = { SuggestionType.Message, SuggestionType.GameCard, SuggestionType.StartParty },
+	MAX_SUGGESTIONS = 4
 }

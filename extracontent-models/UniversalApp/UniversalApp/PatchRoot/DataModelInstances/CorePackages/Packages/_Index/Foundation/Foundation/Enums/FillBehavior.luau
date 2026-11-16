@@ -1,4 +1,1 @@
-return {
-	Fit = "Fit",
-	Fill = "Fill"
-}
+return { Fit = "Fit", Fill = "Fill" }

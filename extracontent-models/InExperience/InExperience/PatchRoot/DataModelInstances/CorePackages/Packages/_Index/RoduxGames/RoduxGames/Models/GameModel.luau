@@ -1,46 +1,48 @@
-local Parent = script:FindFirstAncestor("RoduxGames").Parent
-local t = require(Parent.t)
+local parent = script:FindFirstAncestor("RoduxGames").Parent
+local t = require(parent.t)
 local CreatorModel = require(script.Parent.CreatorModel)
-local t1 = {}
 
-function t1.new(p1) -- line: 18
-	-- upvalues: t1 (copy)
-	assert(t1.isValid(p1))
-	t1.__index = t1
-	setmetatable(p1, t1)
+local GameModel = {}
 
-	return p1
+function GameModel.new(p)
+	assert(GameModel.isValid(p))
+
+	GameModel.__index = GameModel
+
+	setmetatable(p, GameModel)
+
+	return p
 end
-function t1.mock(p2) -- line: 30
-	-- upvalues: t1 (copy), CreatorModel (copy)
-	local v7 = p2 or {}
 
-	return (t1.new({
-		experienceId = v7.experienceId or "experienceId",
-		name = v7.name or "name",
-		description = v7.description or "description",
-		price = v7.price or 666,
-		rootPlaceId = v7.rootPlaceId or "rootPlaceId",
-		creator = CreatorModel.mock(v7.creator),
-		maxPlayers = v7.maxPlayers or 6,
-		playing = v7.playing or 1000
-	}))
-end
-function t1.format(p3) -- line: 47
-	-- upvalues: t1 (copy), CreatorModel (copy)
-	return (t1.new({
-		experienceId = tostring(p3.id),
-		name = p3.name,
-		description = p3.description or "",
-		price = p3.price or 0,
-		rootPlaceId = tostring(p3.rootPlaceId),
-		creator = CreatorModel.format(p3.creator),
-		maxPlayers = p3.maxPlayers,
-		playing = p3.playing
+function GameModel.mock(options)
+	local v = options or {}
+
+	return (GameModel.new({
+		experienceId = v.experienceId or "experienceId",
+		name = v.name or "name",
+		description = v.description or "description",
+		price = v.price or 666,
+		rootPlaceId = v.rootPlaceId or "rootPlaceId",
+		creator = CreatorModel.mock(v.creator),
+		maxPlayers = v.maxPlayers or 6,
+		playing = v.playing or 1000
 	}))
 end
 
-t1.isValid = t.strictInterface({
+function GameModel.format(data)
+	return (GameModel.new({
+		experienceId = tostring(data.id),
+		name = data.name,
+		description = data.description or "",
+		price = data.price or 0,
+		rootPlaceId = tostring(data.rootPlaceId),
+		creator = CreatorModel.format(data.creator),
+		maxPlayers = data.maxPlayers,
+		playing = data.playing
+	}))
+end
+
+GameModel.isValid = t.strictInterface({
 	experienceId = t.string,
 	name = t.string,
 	description = t.string,
@@ -51,4 +53,4 @@ t1.isValid = t.strictInterface({
 	playing = t.number
 })
 
-return t1
+return GameModel

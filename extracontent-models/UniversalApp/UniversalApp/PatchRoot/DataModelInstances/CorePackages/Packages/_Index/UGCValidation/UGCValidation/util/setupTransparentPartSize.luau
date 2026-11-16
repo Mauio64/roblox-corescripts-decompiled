@@ -1,71 +1,80 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.util.Types)
+local AssetTraversalUtils = require(parent.util.AssetTraversalUtils)
+local ConstantsInterface = require(parent.ConstantsInterface)
+local R15plusUtils = require(parent.util.R15plusUtils)
+local getAttachmentCFrameInPartSpace = require(parent.util.getAttachmentCFrameInPartSpace)
 
-require(ParentParent.util.Types)
+return function(p, instance, p2, p3, p4): boolean
+	local v = {}
 
-local AssetTraversalUtils = require(ParentParent.util.AssetTraversalUtils)
-local ConstantsInterface = require(ParentParent.ConstantsInterface)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local getAttachmentCFrameInPartSpace = require(ParentParent.util.getAttachmentCFrameInPartSpace)
+	if Enum.AssetType.DynamicHead == p3 then
+		AssetTraversalUtils.calculateBounds(p3, p2, CFrame.new(), v, p4)
 
-return function(p1, p2, p3, p4, p5) -- line: 15
-	-- upvalues: AssetTraversalUtils (copy), ConstantsInterface (copy), R15plusUtils (copy), getAttachmentCFrameInPartSpace (copy)
-	local t1 = {}
+		p.CFrame = CFrame.new()
+		instance.CFrame = CFrame.new()
 
-	if p4 == Enum.AssetType.DynamicHead then
-		AssetTraversalUtils.calculateBounds(p4, p3, CFrame.new(), t1, p5)
-		p1.CFrame = CFrame.new()
-		p2.CFrame = CFrame.new()
-		p1.Size = p2.Size
+		p.Size = instance.Size
 	else
-		local v12 = AssetTraversalUtils.assetHierarchy[p4]
+		local v2 = AssetTraversalUtils.assetHierarchy[p3]
+		AssetTraversalUtils.traverseHierarchy(nil, p2, p3, nil, CFrame.new(), v2.root, v2, v, p4)
+		local function moveParts(instance2, root: string?, cframe: CFrame, childName: string, child)
+			local child2 = instance2:FindFirstChild(childName)
 
-		AssetTraversalUtils.traverseHierarchy(nil, p3, p4, nil, CFrame.new(), v12.root, v12, t1, p5)
+			if root then
+				local child3 = instance2:FindFirstChild(root)
+				local rigAttachmentToParent = ConstantsInterface.getRigAttachmentToParent(p3, childName)
+				local child4 = child3:FindFirstChild(rigAttachmentToParent, R15plusUtils.checkFlagEnabledForAllowHrd())
 
-		local function moveParts(p6, s1: string?, cFrame: CFrame, s2: string, p7) -- line: 48
-			-- upvalues: ConstantsInterface (copy), p4 (copy), R15plusUtils (copy), getAttachmentCFrameInPartSpace (copy), moveParts (copy)
-			local s2_2 = p6:FindFirstChild(s2)
+				local child5 = child2:FindFirstChild(rigAttachmentToParent, R15plusUtils.checkFlagEnabledForAllowHrd())
 
-			if s1 then
-				local s1_2 = p6:FindFirstChild(s1)
-				local v27 = ConstantsInterface.getRigAttachmentToParent(p4, s2)
-				local v28 = s1_2:FindFirstChild(v27, R15plusUtils.checkFlagEnabledForAllowHrd())
-				local v29 = s2_2:FindFirstChild(v27, R15plusUtils.checkFlagEnabledForAllowHrd())
-
-				cFrame = cFrame * getAttachmentCFrameInPartSpace(v28) * getAttachmentCFrameInPartSpace(v29):Inverse()
+				cframe = cframe * getAttachmentCFrameInPartSpace(child4) * getAttachmentCFrameInPartSpace(child5):Inverse()
 			end
 
-			s2_2.CFrame = cFrame
+			child2.CFrame = cframe
 
-			if p7.children then
-				for v30, v31 in p7.children do
-					moveParts(p6, s2, cFrame, v30, v31)
+			if child.children then
+				for k, child3 in child.children do
+					moveParts(instance2, childName, cframe, k, child3)
 				end
 			end
 		end
+		local cframe = CFrame.new()
+		local root = v2.root
+		local findFirstChild = instance:FindFirstChild(root)
 
-		local cFrame = CFrame.new()
-		local root = v12.root
+		findFirstChild.CFrame = cframe
 
-		p2:FindFirstChild(root).CFrame = cFrame
-
-		if v12.children then
-			for v16, v17 in v12.children do
-				moveParts(p2, root, cFrame, v16, v17)
+		if v2.children then
+			for k, child in v2.children do
+				moveParts(instance, root, cframe, k, child)
 			end
 		end
 
 		Vector3.new()
 		Vector3.new()
+		local v3
 
-		local v18 = if not t1.maxOverall then Vector3.new() else t1.maxOverall
-		local v19 = if not t1.minOverall then Vector3.new() else t1.minOverall
+		if v.maxOverall then
+			v3 = v.maxOverall
+		else
+			v3 = Vector3.new()
+		end
 
-		if t1.minOverall == nil or t1.maxOverall == nil then
+		local v4
+
+		if v.minOverall then
+			v4 = v.minOverall
+		else
+			v4 = Vector3.new()
+		end
+
+		if v.minOverall == nil or v.maxOverall == nil then
 			return false
 		end
 
-		p1.Size = Vector3.new(v18.X - v19.X, v18.Y - v19.Y, v18.Z - v19.Z)
-		p1.Position = Vector3.new(v19.X + p1.Size.X / 2, v19.Y + p1.Size.Y / 2, v19.Z + p1.Size.Z / 2)
+		p.Size = Vector3.new(v3.X - v4.X, v3.Y - v4.Y, v3.Z - v4.Z)
+		p.Position = Vector3.new(v4.X + p.Size.X / 2, v4.Y + p.Size.Y / 2, v4.Z + p.Size.Z / 2)
 	end
 
 	return true

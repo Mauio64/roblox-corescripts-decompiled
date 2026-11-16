@@ -1,334 +1,239 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Moments").Parent
 
-require(Parent.MomentsCommon)
+local React = require(parent.React)
+require(parent.MomentsCommon)
 
 local sampleWindow = require(script.Parent.sampleWindow)
+
 local RunService = game:GetService("RunService")
 local VideoService = game:GetService("VideoService")
+
 local defaultConfig = sampleWindow.defaultConfig
 
-local function useVideoScrubPreview(p1, b1: boolean, p2: ((...any) -> ...any)) -- line: 59
-	-- upvalues: React (copy), VideoService (copy), sampleWindow (copy), defaultConfig (copy), RunService (copy)
-	local v11, v12 = React.useBinding(nil)
-	local v13, v14 = React.useBinding(nil)
-	local v15, v16 = React.useBinding(true)
-	local v17 = React.useRef(nil)
-	local v18 = React.useRef(nil)
-	local v19, v20 = React.useState(true)
-	local v21 = React.useRef(nil)
-	local v22 = React.useRef(false)
-	local v23 = React.useRef(0)
-	local v24 = React.useRef(false)
-	local v25 = React.useRef(false)
-	local v26 = React.useRef(0)
-	local v27 = React.useRef(nil)
-	local v28 = React.useRef(false)
-	local v29 = React.useRef(0)
-	local v30 = React.useRef({})
-	local v31 = React.useRef(nil)
+local function useVideoScrubPreview(p, flag: boolean, callback)
+	local contentA, v = React.useBinding(nil)
+	local contentB, v2 = React.useBinding(nil)
+	local frontIsA, v3 = React.useBinding(true)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local state, setState = React.useState(true)
 
-	if v31.current == nil then
-		v31.current = {
-			byTime = {},
-			set = {},
-			times = {}
-		}
+	local ref3 = React.useRef(nil)
+	local ref4 = React.useRef(false)
+	local ref5 = React.useRef(0)
+	local ref6 = React.useRef(false)
+	local ref7 = React.useRef(false)
+	local ref8 = React.useRef(0)
+	local ref9 = React.useRef(nil)
+	local ref10 = React.useRef(false)
+	local ref11 = React.useRef(0)
+	local ref12 = React.useRef({})
+
+	local ref13 = React.useRef(nil)
+
+	if ref13.current == nil then
+		ref13.current = { byTime = {}, set = {}, times = {} }
 	end
 
-	local current = v31.current
+	local current = ref13.current
 
-	local function rebuildCache() -- line: 89
-		-- upvalues: current (copy)
-		local t1 = {}
-		local t2 = {}
+	local function rebuildCache()
+		local set = {}
+		local times = {}
 
-		for v40 in current.byTime do
-			t1[v40] = true
-			table.insert(t2, v40)
+		for k in current.byTime do
+			set[k] = true
+			table.insert(times, k)
 		end
 
-		table.sort(t2)
-		current.set = t1
-		current.times = t2
+		table.sort(times)
+		current.set = set
+		current.times = times
 	end
-	local function getRange() -- line: 103
-		-- upvalues: p1 (copy), v23 (copy)
-		if p1 ~= nil and p1.region ~= nil then
-			return {
-				min = p1.region.startTime,
-				max = p1.region.endTime
-			}
+
+	local function getRange()
+		if p == nil or p.region == nil then
+			return { min = 0, max = ref5.current }
 		end
 
-		return {
-			min = 0,
-			max = v23.current
-		}
+		return { min = p.region.startTime, max = p.region.endTime }
 	end
-	local function ensureSampler() -- line: 110
-		-- upvalues: v21 (copy), v22 (copy), p1 (copy), v26 (copy), VideoService (copy), v23 (copy)
-		if v21.current ~= nil or (v22.current or p1 == nil) then
+
+	local function ensureSampler() -- 1 equivalent call inferred from this helper
+		if ref3.current ~= nil or ref4.current or p == nil then
 			return
 		end
 
-		v22.current = true
-
-		local current2 = v26.current
-		local content = p1.content
-
-		task.spawn(function() -- line: 117
-			-- upvalues: VideoService (copy), content (copy), current2 (copy), v26 (copy), v22 (copy), v21 (copy), v23 (copy)
-			local ok, result = pcall(function() -- line: 118
-				-- upvalues: VideoService (copy), content (copy)
+		ref4.current = true
+		local current2 = ref8.current
+		local content = p.content
+		task.spawn(function()
+			local success, result = pcall(function()
 				return VideoService:CreateVideoSamplerAsync(content, {
 					Size = Enum.VideoSampleSize.Small
 				})
 			end)
 
-			if current2 ~= v26.current then
+			if current2 ~= ref8.current then
 				return
 			end
 
-			v22.current = false
+			ref4.current = false
 
-			if not ok then
-				warn(`[moments] scrub preview sampler failed: { tostring(result) }`)
-
+			if not success then
+				warn(`[moments] scrub preview sampler failed: {tostring(result)}`)
 				return
 			end
 
-			v21.current = result
-			v23.current = result.TimeLength or 0
+			ref3.current = result
+			ref5.current = result.TimeLength or 0
 		end)
 	end
-	local function runFetch(t3: {[any]: any}) -- line: 136
-		-- upvalues: v24 (copy), v26 (copy), v21 (copy), current (copy), rebuildCache (copy)
-		v24.current = true
 
-		local current3 = v26.current
-
-		task.spawn(function() -- line: 139
-			-- upvalues: v21 (copy), t3 (copy), current3 (copy), v26 (copy), v24 (copy), current (copy), rebuildCache (copy)
-			local current4 = v21.current
-			local ok, result = pcall(function() -- line: 141
-				-- upvalues: current4 (copy), t3 (copy)
-				return current4:GetSamplesAtTimesAsync(t3)
+	local function runFetch(fetch) -- 1 equivalent call inferred from this helper
+		ref6.current = true
+		local current2 = ref8.current
+		task.spawn(function()
+			local current3 = ref3.current
+			local success, result = pcall(function()
+				return current3:GetSamplesAtTimesAsync(fetch)
 			end)
 
-			if current3 ~= v26.current then
+			if current2 ~= ref8.current then
 				return
 			end
 
-			v24.current = false
+			ref6.current = false
 
-			if not ok then
+			if not success then
 				return
 			end
 
-			for v70, v71 in t3 do
-				local v72 = result[v70]
+			for k, item in fetch do
+				local v4 = result[k]
 
-				if v72 ~= nil and v72.Image ~= nil then
-					current.byTime[v71] = v72.Image
+				if v4 ~= nil and v4.Image ~= nil then
+					current.byTime[item] = v4.Image
 				end
 			end
 
 			rebuildCache()
 		end)
 	end
-	local function tick() -- line: 161
-		-- upvalues: p2 (copy), getRange (copy), v30 (copy), sampleWindow (copy), defaultConfig (copy), current (copy), rebuildCache (copy), v24 (copy), v21 (copy), v26 (copy), v28 (copy), v15 (copy), v17 (copy), v18 (copy), v29 (copy), v16 (copy), v25 (copy), v20 (copy), v27 (copy), v12 (copy), v14 (copy)
-		local v45 = p2()
 
-		if v45 == nil then
+	local function tick()
+		local v4 = callback()
+
+		if v4 == nil then
 			return
 		end
 
-		local v46 = getRange()
+		local range = getRange()
 
-		if v46.max <= v46.min then
+		if range.max <= range.min then
 			return
 		end
 
-		local v47 = v46.min + v45 * (v46.max - v46.min)
-		local elapsed = os.clock()
-		local current5 = v30.current
+		local position = range.min + v4 * (range.max - range.min)
 
-		table.insert(current5, {
-			time = elapsed,
-			position = v47
-		})
+		local now = os.clock()
+		local current2 = ref12.current
+		table.insert(current2, { time = now, position = position })
 
-		while #current5 > 1 and elapsed - current5[1].time > 0.12 do
-			table.remove(current5, 1)
+		while #current2 > 1 and now - current2[1].time > 0.12 do
+			table.remove(current2, 1)
 		end
 
-		local v50 = sampleWindow.estimateVelocity(current5)
-		local v51 = sampleWindow.planTargets(v47, v50, v46, defaultConfig)
-		local v52 = sampleWindow.diff(v51, current.set)
+		local estimateVelocity = sampleWindow.estimateVelocity(current2)
 
-		if #v52.evict > 0 then
-			for _, v54 in v52.evict do
-				current.byTime[v54] = nil
+		local planTargets = sampleWindow.planTargets(position, estimateVelocity, range, defaultConfig)
+		local diff = sampleWindow.diff(planTargets, current.set)
+
+		if #diff.evict > 0 then
+			for _, v5 in diff.evict do
+				current.byTime[v5] = nil
 			end
 
 			rebuildCache()
 		end
 
-		if not v24.current and #v52.fetch > 0 and v21.current ~= nil then
-			local fetch = v52.fetch
-
-			v24.current = true
-
-			local current6 = v26.current
-
-			task.spawn(function() -- line: 139
-				-- upvalues: v21 (copy), fetch (copy), current6 (copy), v26 (copy), v24 (copy), current (copy), rebuildCache (copy)
-				local current7 = v21.current
-				local ok, result = pcall(function() -- line: 141
-					-- upvalues: current7 (copy), fetch (copy)
-					return current7:GetSamplesAtTimesAsync(fetch)
-				end)
-
-				if current6 ~= v26.current then
-					return
-				end
-
-				v24.current = false
-
-				if not ok then
-					return
-				end
-
-				for v76, v77 in fetch do
-					local v78 = result[v76]
-
-					if v78 ~= nil and v78.Image ~= nil then
-						current.byTime[v77] = v78.Image
-					end
-				end
-
-				rebuildCache()
-			end)
+		if not ref6.current and #diff.fetch > 0 and ref3.current ~= nil then
+			runFetch(diff.fetch) -- inferred equivalent call
 		end
 
-		if v28.current then
-			local v57 = not v15:getValue()
-			local v58 = if not v57 then v18.current else v17.current
-			local v59 = os.clock() - v29.current
+		if ref10.current then
+			local v5 = not frontIsA:getValue()
+			local current3 = if v5 then ref.current else ref2.current
+			local v6 = os.clock() - ref11.current
 
-			if v58 == nil or v58.IsLoaded or v59 >= 0.2 then
-				v16(v57)
-				v28.current = false
+			if current3 == nil or current3.IsLoaded or v6 >= 0.2 then
+				v3(v5)
+				ref10.current = false
 
-				if not v25.current then
-					v25.current = true
-					v20(false)
+				if not ref7.current then
+					ref7.current = true
+					setState(false)
 				end
 			end
 		end
 
-		local v60 = sampleWindow.selectFrameTime(v47, current.times)
-		local v61 = if v60 == nil then nil else current.byTime[v60]
+		local frameTime = sampleWindow.selectFrameTime(position, current.times)
+		local current3
 
-		if v61 ~= nil and v61 ~= v27.current then
-			v27.current = v61
+		if frameTime ~= nil then
+			current3 = current.byTime[frameTime]
+		end
 
-			if not v15:getValue() then
-				v12(v61)
+		if current3 ~= nil and current3 ~= ref9.current then
+			ref9.current = current3
+
+			if frontIsA:getValue() then
+				v2(current3)
 			else
-				v14(v61)
+				v(current3)
 			end
 
-			v29.current = os.clock()
-			v28.current = true
+			ref11.current = os.clock()
+			ref10.current = true
 		end
 	end
 
-	React.useEffect(function() -- line: 231
-		-- upvalues: b1 (copy), p1 (copy), v21 (copy), v22 (copy), v26 (copy), VideoService (copy), v23 (copy), v30 (copy), RunService (copy), tick (copy)
-		if not b1 or p1 == nil then
+	React.useEffect(function()
+		if not flag or p == nil then
 			return
 		end
 
-		if v21.current == nil and not v22.current and p1 ~= nil then
-			v22.current = true
-
-			local current8 = v26.current
-			local content = p1.content
-
-			task.spawn(function() -- line: 117
-				-- upvalues: VideoService (copy), content (copy), current8 (copy), v26 (copy), v22 (copy), v21 (copy), v23 (copy)
-				local ok, result = pcall(function() -- line: 118
-					-- upvalues: VideoService (copy), content (copy)
-					return VideoService:CreateVideoSamplerAsync(content, {
-						Size = Enum.VideoSampleSize.Small
-					})
-				end)
-
-				if current8 ~= v26.current then
-					return
-				end
-
-				v22.current = false
-
-				if not ok then
-					warn(`[moments] scrub preview sampler failed: { tostring(result) }`)
-
-					return
-				end
-
-				v21.current = result
-				v23.current = result.TimeLength or 0
-			end)
+		ensureSampler() -- inferred equivalent call
+		ref12.current = {}
+		local renderSteppedConnection = RunService.RenderStepped:Connect(tick)
+		return function()
+			renderSteppedConnection:Disconnect()
 		end
+	end, { flag, p })
 
-		v30.current = {}
+	React.useEffect(function()
+		return function()
+			ref8.current += 1
+			local current2 = ref3.current
 
-		local connection = RunService.RenderStepped:Connect(tick)
-
-		return function() -- line: 238
-			-- upvalues: connection (copy)
-			connection:Disconnect()
-		end
-	end, {
-		b1,
-		p1
-	})
-	React.useEffect(function() -- line: 244
-		-- upvalues: v26 (copy), v21 (copy), v31 (copy)
-		return function() -- line: 245
-			-- upvalues: v26 (copy), v21 (copy), v31 (copy)
-			local v81 = v26
-
-			v81.current = v81.current + 1
-
-			local current9 = v21.current
-
-			if current9 ~= nil then
-				pcall(function() -- line: 249
-					-- upvalues: current9 (copy)
-					current9:Destroy()
+			if current2 ~= nil then
+				pcall(function()
+					current2:Destroy()
 				end)
 			end
 
-			v21.current = nil
-			v31.current = {
-				byTime = {},
-				set = {},
-				times = {}
-			}
+			ref3.current = nil
+			ref13.current = { byTime = {}, set = {}, times = {} }
 		end
 	end, {})
 
 	return {
-		contentA = v11,
-		contentB = v13,
-		frontIsA = v15,
-		imageARef = v17,
-		imageBRef = v18,
-		isLoading = v19
+		contentA = contentA,
+		contentB = contentB,
+		frontIsA = frontIsA,
+		imageARef = ref,
+		imageBRef = ref2,
+		isLoading = state
 	}
 end
 

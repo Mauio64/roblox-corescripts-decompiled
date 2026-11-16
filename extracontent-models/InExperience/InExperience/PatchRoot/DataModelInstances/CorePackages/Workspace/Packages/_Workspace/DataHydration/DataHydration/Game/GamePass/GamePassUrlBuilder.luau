@@ -1,12 +1,15 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Http = require(Parent.Http)
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Http = require(parent.Http)
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+
 local Url = Http.Url
 
 return {
-	buildGamePassesUrl = UrlBuilder.new({
+	buildGamePassesUrl = urlBuilder.new({
+		base = Url.APIS_URL,
 		path = "game-passes/v1/universes/{universeId}/game-passes",
-		query = "pageSize=50&passView=Full",
-		base = Url.APIS_URL
+		query = "pageSize=50&passView=Full"
 	})
 }

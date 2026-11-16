@@ -1,37 +1,35 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local gamePlayIntent = require(Parent.DiscoveryAnalytics).Events.gamePlayIntent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-local function ReportAnEvent(p1, p2, p3) -- line: 9
-	-- upvalues: gamePlayIntent (copy)
-	local t1, eventIngest
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local gamePlayIntent = DiscoveryAnalytics.Events.gamePlayIntent
 
-	if p2 == "gamePlayIntent" then
-		t1 = {
-			conversationId = p1.conversationId,
-			rootPlaceId = p1.placeId,
-			joinAttemptId = p1.joinAttemptId
+local function ReportAnEvent(data, p, p2)
+	local v, v2
+
+	if p == "gamePlayIntent" then
+		v = {
+			conversationId = data.conversationId,
+			rootPlaceId = data.placeId,
+			joinAttemptId = data.joinAttemptId
 		}
-		eventIngest = p1.eventIngest
+
+		v2 = data.eventIngest
 	else
-		t1 = {
-			conversationId = p1.conversationId,
-			placeId = p1.placeId
-		}
-		eventIngest = p1.eventStream
+		v = { conversationId = data.conversationId, placeId = data.placeId }
+
+		v2 = data.eventStream
 	end
 
-	if p2 == "gamePlayIntent" then
-		gamePlayIntent(eventIngest, p3, {
-			placeId = t1.rootPlaceId,
-			rootPlaceId = tonumber(t1.rootPlaceId),
-			conversationId = t1.conversationId,
-			joinAttemptId = t1.joinAttemptId
+	if p == "gamePlayIntent" then
+		gamePlayIntent(v2, p2, {
+			placeId = v.rootPlaceId,
+			rootPlaceId = tonumber(v.rootPlaceId),
+			conversationId = v.conversationId,
+			joinAttemptId = v.joinAttemptId
 		})
-
-		return
+	else
+		v2:setRBXEventStream(p2, p, v)
 	end
-
-	eventIngest:setRBXEventStream(p3, p2, t1)
 end
 
 return ReportAnEvent

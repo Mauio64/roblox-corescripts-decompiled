@@ -2,16 +2,17 @@ local SceneUnderstanding = script:FindFirstAncestor("SceneUnderstanding")
 
 require(SceneUnderstanding.wiring.types)
 
-local function getOutputWires(p1) -- line: 7
-	local t1 = {}
+local function getOutputWires(object)
+	local outputPins = object:GetOutputPins()
+	local outputWires = {}
 
-	for _, v6 in (p1:GetOutputPins()) do
-		for _, v8 in p1:GetConnectedWires(v6) do
-			table.insert(t1, v8)
+	for _, outputPin in outputPins do
+		for _, v in object:GetConnectedWires(outputPin) do
+			table.insert(outputWires, v)
 		end
 	end
 
-	return t1
+	return outputWires
 end
 
 return getOutputWires

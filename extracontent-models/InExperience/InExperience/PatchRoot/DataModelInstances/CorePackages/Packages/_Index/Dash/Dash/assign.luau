@@ -1,32 +1,24 @@
-local scriptParent = script.Parent
-local None = require(scriptParent.None)
+local parent = script.Parent
+local None = require(parent.None)
+require(parent.Types)
+local forEach = require(parent.forEach)
+local forEachArgs = require(parent.forEachArgs)
 
-require(scriptParent.Types)
-
-local forEach = require(scriptParent.forEach)
-local forEachArgs = require(scriptParent.forEachArgs)
-
-local function assign(t1: {[any]: any}, ...) -- line: 54
-	-- upvalues: forEachArgs (copy), None (copy), forEach (copy)
-	forEachArgs(function(t2: {[any]: any}?) -- line: 56
-		-- upvalues: None (copy), forEach (copy), t1 (copy)
-		if t2 == nil or t2 == None then
+local function assign(p, ...)
+	forEachArgs(function(p2)
+		if p2 == nil or p2 == None then
 			return
 		end
 
-		forEach(t2, function(p1, p2) -- line: 62
-			-- upvalues: None (copy), t1 (copy)
-			if p1 == None then
-				t1[p2] = nil
-
-				return
+		forEach(p2, function(p3, p4)
+			if p3 == None then
+				p[p4] = nil
+			else
+				p[p4] = p3
 			end
-
-			t1[p2] = p1
 		end)
 	end, ...)
-
-	return t1
+	return p
 end
 
 return assign

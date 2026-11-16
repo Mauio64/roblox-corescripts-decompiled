@@ -1,80 +1,56 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage = require(ParentParent.flags.getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage)
-local GetFStringUGCValidationMaxAnimationDeltas = require(ParentParent.flags.GetFStringUGCValidationMaxAnimationDeltas)
-local getFIntUGCValidateMaxAnimationFPS = require(ParentParent.flags.getFIntUGCValidateMaxAnimationFPS)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
-}
+local GetFStringUGCValidationMaxAnimationDeltas = require(parent.flags.GetFStringUGCValidationMaxAnimationDeltas)
+local getFIntUGCValidateMaxAnimationFPS = require(parent.flags.getFIntUGCValidateMaxAnimationFPS)
+return {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = {
+		ValidationEnums.SharedDataMember.curveAnimations,
+		ValidationEnums.SharedDataMember.curveAnimComputedFrames
+	},
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
+	run = function(object, p)
+		local animFrames = p.curveAnimComputedFrames.animFrames
+		local v = 1 / getFIntUGCValidateMaxAnimationFPS()
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+		local v2 = v / (1 / 30)
+		local v3 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * v2
 
-t1.requiredData = {
-	ValidationEnums.SharedDataMember.curveAnimations,
-	ValidationEnums.SharedDataMember.curveAnimComputedFrames
-}
-t1.fflag = getFFlagUGCValidateMigrateCurveAnim
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
+		local v4 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * 30
 
-function t1.run(p1, p2) -- line: 28
-	-- upvalues: getFIntUGCValidateMaxAnimationFPS (copy), GetFStringUGCValidationMaxAnimationDeltas (copy), getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage (copy), ErrorSourceStrings (copy)
-	local animFrames = p2.curveAnimComputedFrames.animFrames
-	local v13 = 1 / getFIntUGCValidateMaxAnimationFPS()
-	local v14 = v13 / 0.03333333333333333
-	local v15 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * v14
-	local v16 = nil
+		local v5 = {}
 
-	if getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage() then
-		v16 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * 30
-	end
+		for k, animFrame in animFrames do
+			for k2, v6 in animFrame do
+				local v7 = v5[k2]
 
-	local t2 = {}
+				if not v7 then
+					continue
+				end
 
-	for v18, v19 in animFrames do
-		for v20, v21 in v19 do
-			local v22 = t2[v20]
+				local magnitude = (v6.Position - v7.Position).Magnitude
 
-			if not v22 then
-				continue
-			end
+				if v3 < magnitude then
+					local v8 = (k - 1) * v
+					local v9 = magnitude / v2 * 30
 
-			local Magnitude = (v21.Position - v22.Position).Magnitude
-
-			if v15 < Magnitude then
-				if getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage() then
-					local v24 = (v18 - 1) * v13
-					local v25 = Magnitude / v14 * 30
-
-					p1:fail(ErrorSourceStrings.Keys.CurveAnim_SpeedTooFast, {
-						time = string.format("%.2f", v24),
-						bodyPart = v20,
-						speed = string.format("%.2f", v25),
-						maxSpeed = string.format("%.2f", v16)
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_SpeedTooFast, {
+						time = string.format("%.2f", v8),
+						bodyPart = k2,
+						speed = string.format("%.2f", v9),
+						maxSpeed = string.format("%.2f", v4)
 					})
 
 					return
 				end
-
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_SpeedTooFastLegacy, {
-					bodyPart = v20,
-					maxMovement = GetFStringUGCValidationMaxAnimationDeltas.asString()
-				})
-
-				return
 			end
+
+			v5 = animFrame
 		end
-
-		t2 = v19
 	end
-end
-
-return t1
+}

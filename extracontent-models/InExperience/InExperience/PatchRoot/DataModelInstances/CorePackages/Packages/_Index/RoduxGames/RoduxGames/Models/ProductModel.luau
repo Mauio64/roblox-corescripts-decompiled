@@ -1,41 +1,43 @@
-local Parent = script:FindFirstAncestor("RoduxGames").Parent
-local t = require(Parent.t)
-local t1 = {}
+local parent = script:FindFirstAncestor("RoduxGames").Parent
+local t = require(parent.t)
 
-function t1.new(p1) -- line: 13
-	-- upvalues: t1 (copy)
-	assert(t1.isValid(p1))
-	t1.__index = t1
-	setmetatable(p1, t1)
+local ProductModel = {}
 
-	return p1
+function ProductModel.new(p)
+	assert(ProductModel.isValid(p))
+
+	ProductModel.__index = ProductModel
+
+	setmetatable(p, ProductModel)
+
+	return p
 end
-function t1.mock(p2) -- line: 25
-	-- upvalues: t1 (copy)
-	local v6 = p2 or {}
 
-	return (t1.new({
-		productId = v6.productId or "productId",
-		sellerId = v6.sellerId or "sellerId",
-		price = v6.price or 666,
-		isForSale = v6.isForSale or true
-	}))
-end
-function t1.format(p3) -- line: 38
-	-- upvalues: t1 (copy)
-	return (t1.new({
-		productId = tostring(p3.productId),
-		sellerId = tostring(p3.sellerId),
-		isForSale = p3.isForSale or false,
-		price = p3.price or 0
+function ProductModel.mock(options)
+	local v = options or {}
+
+	return (ProductModel.new({
+		productId = v.productId or "productId",
+		sellerId = v.sellerId or "sellerId",
+		price = v.price or 666,
+		isForSale = v.isForSale or true
 	}))
 end
 
-t1.isValid = t.strictInterface({
+function ProductModel.format(data)
+	return (ProductModel.new({
+		productId = tostring(data.productId),
+		sellerId = tostring(data.sellerId),
+		isForSale = data.isForSale or false,
+		price = data.price or 0
+	}))
+end
+
+ProductModel.isValid = t.strictInterface({
 	productId = t.string,
 	sellerId = t.string,
 	price = t.number,
 	isForSale = t.boolean
 })
 
-return t1
+return ProductModel

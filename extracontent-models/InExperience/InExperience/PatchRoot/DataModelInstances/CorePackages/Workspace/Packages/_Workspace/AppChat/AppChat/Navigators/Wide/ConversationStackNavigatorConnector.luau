@@ -1,130 +1,157 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
 require(AppChat.types)
 
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local useStyle = require(AppChatParent.UIBlox).Core.Style.useStyle
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+
 local EnumScreens = require(AppChat.EnumScreens)
 local configureTopBarWithNavigationOptions = require(AppChat.configureTopBarWithNavigationOptions)
 local conversationStackNavigator = require(script.Parent.conversationStackNavigator)
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
-local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
 local ChatConversationTopBar = require(AppChat.Components.TopBar.ChatConversationTopBar)
 local ChatTopBarBase = require(AppChat.Components.TopBar.ChatTopBarBase)
 local SystemMenuTopBar = require(AppChat.Components.TopBar.SystemMenuTopBar)
 local SquadAddFriendsIconButton = require(AppChat.Components.Squads.SquadAddFriendsIconButton)
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
-local t1 = {
+local useChatWideModeFocus = require(AppChat.Contexts.ChatWideModeFocus.useChatWideModeFocus)
+
+local v = {
 	configureTopBar = configureTopBarWithNavigationOptions,
 	createNewNavigator = conversationStackNavigator
 }
 
-function ConversationStackNavigatorConnector(p1) -- line: 40
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), React (copy), UserGameSettings (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), EnumScreens (copy), ChatConversationTopBar (copy), ChatTopBarBase (copy), SquadAddFriendsIconButton (copy), SystemMenuTopBar (copy)
-	local v20 = Cryo.Dictionary.union(t1, p1)
-	local v21 = useStyle()
-	local v22, v23 = React.useState(UserGameSettings.ReducedMotion)
+function ConversationStackNavigatorConnector(p)
+	local union = Cryo.Dictionary.union(v, p)
 
-	React.useEffect(function() -- line: 47
-		-- upvalues: UserGameSettings (copy), v23 (copy)
-		local connection = UserGameSettings:GetPropertyChangedSignal("ReducedMotion"):Connect(function() -- line: 48
-			-- upvalues: v23 (copy), UserGameSettings (copy)
-			v23(UserGameSettings.ReducedMotion)
+	local v2 = useStyle()
+	local v3 = useChatWideModeFocus()
+
+	local state, setState = React.useState(UserGameSettings.ReducedMotion)
+
+	React.useEffect(function()
+		local reducedMotionChangedConnection = UserGameSettings:GetPropertyChangedSignal("ReducedMotion"):Connect(function()
+			setState(UserGameSettings.ReducedMotion)
 		end)
-
-		return function() -- line: 51
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			reducedMotionChangedConnection:Disconnect()
 		end
 	end, {})
 
-	local v24 = React.useMemo(function() -- line: 56
-		-- upvalues: v20 (copy), v21 (copy), v22 (copy)
-		local v30 = v20.createNewNavigator({
-			transparent = true,
-			cardColor3 = v21.Theme.BackgroundDefault.Color
-		}, v22)
+	local v4 = React.useMemo(function()
+		local newNavigator = union.createNewNavigator(
+			{ cardColor3 = v2.Theme.BackgroundDefault.Color, transparent = true },
+			state
+		)
 
-		v20.setRouter(v30.router)
+		union.setRouter(newNavigator.router)
+		return newNavigator
+	end, { v2.Theme.BackgroundDefault.Color, state, union.createNewNavigator, union.setRouter })
 
-		return v30
-	end, {
-		v21.Theme.BackgroundDefault.Color,
-		v22
-	})
-	local v25 = nil
+	local v5 = nil
 
-	if FFlagAppChatTopBarConfigDriven() then
-		if FFlagAppChatPerfTracking then
-			AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
-		end
-
-		local v26 = v20.navigation and v20.navigation.state
-		local v27 = v26 and (not not v26.routes and (not not v26.index and (not not v26.routes[v26.index] and v26.routes[v26.index].routeName))) or nil
-
-		if v27 == EnumScreens.ChatConversation then
-			v25 = React.createElement(ChatConversationTopBar, {
-				screenName = EnumScreens.ChatConversation,
-				navigation = v20.navigation
-			})
-		elseif v27 == EnumScreens.ChatDetails then
-			v25 = React.createElement(ChatTopBarBase, {
-				screenName = EnumScreens.ChatDetails,
-				navigation = v20.navigation
-			})
-		elseif v27 == EnumScreens.SquadLobby then
-			v25 = React.createElement(ChatTopBarBase, {
-				screenName = EnumScreens.SquadLobby,
-				navigation = v20.navigation,
-				renderRight = function() -- line: 92
-					-- upvalues: React (copy), SquadAddFriendsIconButton (copy), v20 (copy)
-					return React.createElement(SquadAddFriendsIconButton, {
-						navigation = v20.navigation
-					})
-				end
-			})
-		elseif v27 == EnumScreens.SquadInviteFriends then
-			v25 = React.createElement(SystemMenuTopBar, {
-				screenName = EnumScreens.SquadInviteFriends,
-				navigation = v20.navigation
-			})
-		end
+	if FFlagAppChatPerfTracking then
+		AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
 	end
 
-	if not v25 then
-		v25 = v20.configureTopBar(v20.navigation)
+	local state2 = union.navigation and union.navigation.state
+
+	local routeName = state2
+		and state2.routes
+		and state2.index
+		and state2.routes[state2.index]
+		and state2.routes[state2.index].routeName
+		or nil
+
+	if routeName == EnumScreens.ChatConversation then
+		v5 = React.createElement(ChatConversationTopBar, {
+			screenName = EnumScreens.ChatConversation,
+			navigation = union.navigation
+		})
+	elseif routeName == EnumScreens.ChatDetails then
+		v5 = React.createElement(ChatTopBarBase, {
+			screenName = EnumScreens.ChatDetails,
+			navigation = union.navigation
+		})
+	elseif routeName == EnumScreens.SquadLobby then
+		v5 = React.createElement(ChatTopBarBase, {
+			screenName = EnumScreens.SquadLobby,
+			navigation = union.navigation,
+			renderRight = function()
+				return React.createElement(SquadAddFriendsIconButton, {
+					navigation = union.navigation
+				})
+			end
+		})
+	elseif routeName == EnumScreens.SquadInviteFriends then
+		v5 = React.createElement(SystemMenuTopBar, {
+			screenName = EnumScreens.SquadInviteFriends,
+			navigation = union.navigation
+		})
 	end
 
-	return React.createElement(React.Fragment, nil, {
-		layout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
-		topBar = v25,
-		navigatorFrame = React.createElement("Frame", {
+	local v6 = v5 or union.configureTopBar(union.navigation)
+
+	local screenProps = union.navigation.getScreenProps("topBarHeight", 0)
+
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v7 = {
+		layout = React.createElement("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }),
+		topBar = 0,
+		navigatorFrame = 0
+	}
+
+	if FFlagAppChatConsoleFocusFixes then
+		v6 = React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, screenProps),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 1, -v20.navigation.getScreenProps("topBarHeight", 0))
-		}, {
-			navigator = React.createElement(v24, v20)
-		})
-	})
+			LayoutOrder = -1,
+			ref = v3 and v3.conversationTopBarRef
+		}, { Content = v6 })
+	end
+
+	v7.topBar = v6
+
+	local createElement2 = React.createElement
+	local v8 = {
+		Size = UDim2.new(1, 0, 1, -screenProps),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ref = 0
+	}
+	local ref
+
+	if FFlagAppChatConsoleFocusFixes and v3 then
+		ref = v3.conversationPanelRef
+	end
+
+	v8.ref = ref
+	v7.navigatorFrame = createElement2("Frame", v8, { navigator = React.createElement(v4, union) })
+	return createElement(fragment, nil, v7)
 end
 
-local v18 = React.PureComponent:extend("ConversationStackNavigatorConnectorWrapper")
+local extended = React.PureComponent:extend("ConversationStackNavigatorConnectorWrapper")
 
-v18.router = conversationStackNavigator().router
+extended.router = conversationStackNavigator().router
 
-function v18.render(p2) -- line: 129
-	-- upvalues: React (copy), Cryo (copy), v18 (copy)
-	return React.createElement(ConversationStackNavigatorConnector, Cryo.Dictionary.join(p2.props, {
-		setRouter = function(p3) -- line: 133
-			-- upvalues: v18 (copy)
-			v18.router = p3
-		end
-	}))
+function extended:init()
+	function self.setRouter(router)
+		extended.router = router
+	end
 end
 
-return v18
+function extended.render(p)
+	return React.createElement(
+		ConversationStackNavigatorConnector,
+		Cryo.Dictionary.join(p.props, { setRouter = p.setRouter })
+	)
+end
+
+return extended

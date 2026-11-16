@@ -1,8 +1,10 @@
 local CorePackages = game:GetService("CorePackages")
-local InGameMenu = script.Parent.Parent.InGameMenu
-local v3 = game:DefineFastFlag("SwitchTnSTranslationsPackage", false)
 
-return {
+local InGameMenu = script.Parent.Parent.InGameMenu
+
+local defineFastFlag = game:DefineFastFlag("SwitchTnSTranslationsPackage", false)
+
+local Dependencies = {
 	BarOnTopScrollingFrame = InGameMenu.Components.BarOnTopScrollingFrame,
 	Divider = InGameMenu.Components.Divider,
 	FocusHandler = InGameMenu.Components.Connection.FocusHandler,
@@ -11,8 +13,22 @@ return {
 	GameIcon = InGameMenu.Components.GameIcon,
 	PlayerSearchPredicate = InGameMenu.Utility.PlayerSearchPredicate,
 	SearchBar = InGameMenu.Components.SearchBar,
-	Localization = if not v3 then require(InGameMenu.Localization.Localization) else require(CorePackages.Workspace.Packages.InExperienceLocales).Localization,
-	LocalizationProvider = InGameMenu.Localization.LocalizationProvider,
-	withLocalization = InGameMenu.Localization.withLocalization,
-	playerInterface = script.Parent.Parent.Interfaces.playerInterface
+	Localization = 0,
+	LocalizationProvider = 0,
+	withLocalization = 0,
+	playerInterface = 0
 }
+local localization
+
+if defineFastFlag then
+	local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
+	localization = InExperienceLocales.Localization
+else
+	localization = require(InGameMenu.Localization.Localization)
+end
+
+Dependencies.Localization = localization
+Dependencies.LocalizationProvider = InGameMenu.Localization.LocalizationProvider
+Dependencies.withLocalization = InGameMenu.Localization.withLocalization
+Dependencies.playerInterface = script.Parent.Parent.Interfaces.playerInterface
+return Dependencies

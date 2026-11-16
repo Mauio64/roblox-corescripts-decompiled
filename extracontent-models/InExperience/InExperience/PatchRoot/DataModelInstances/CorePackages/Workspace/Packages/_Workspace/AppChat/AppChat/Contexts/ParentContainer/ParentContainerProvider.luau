@@ -1,23 +1,24 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local React = require(parent.React)
 local ParentContainerContext = require(script.Parent.ParentContainerContext)
 
-local function ParentContainerProvider(p1) -- line: 11
-	-- upvalues: React (copy), ParentContainerContext (copy)
+local function ParentContainerProvider(props)
 	return React.createElement(ParentContainerContext.Provider, {
 		value = {
-			getParentContainer = p1.getParentContainer,
-			visibilitySignal = p1.visibilitySignal,
-			getRequestedRoute = p1.getRequestedRoute,
-			requestedRouteSignal = p1.requestedRouteSignal,
-			clearRequestedRoute = p1.clearRequestedRoute,
-			getShouldSetAppChatVisible = p1.getShouldSetAppChatVisible,
-			entryPoint = p1.entryPoint,
-			hideParentContainer = p1.hideParentContainer,
-			showParentContainer = p1.showParentContainer,
-			updateCurrentSquadId = p1.updateCurrentSquadId
+			getParentContainer = props.getParentContainer,
+			visibilitySignal = props.visibilitySignal,
+			getRequestedRoute = props.getRequestedRoute,
+			requestedRouteSignal = props.requestedRouteSignal,
+			clearRequestedRoute = props.clearRequestedRoute,
+			getShouldSetAppChatVisible = props.getShouldSetAppChatVisible,
+			entryPoint = props.entryPoint,
+			hideParentContainer = props.hideParentContainer,
+			showParentContainer = props.showParentContainer,
+			updateCurrentSquadId = props.updateCurrentSquadId,
+			openFriendsChatConversation = props.openFriendsChatConversation
 		}
-	}, p1.children)
+	}, props.children)
 end
 
 return ParentContainerProvider

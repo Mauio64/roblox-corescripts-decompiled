@@ -1,4 +1,5 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local FFlagAXCustomizeBackgrounds = require(Parent.AvatarExperienceFlags).FFlagAXCustomizeBackgrounds
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXCustomizeBackgrounds = AvatarExperienceFlags.FFlagAXCustomizeBackgrounds
 
 return game:DefineFastFlag("ProfilePlatformEditBackgroundMenuItem", false) and FFlagAXCustomizeBackgrounds

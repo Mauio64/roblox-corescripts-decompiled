@@ -1,80 +1,71 @@
-local Parent = script:FindFirstAncestor("InGameAssetReporting").Parent
-local React = require(Parent.React)
-local ReactOtter = require(Parent.ReactOtter)
-local UIBlox = require(Parent.UIBlox)
-local withLocalization = require(Parent.Localization).withLocalization
+local parent = script:FindFirstAncestor("InGameAssetReporting").Parent
+
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local UIBlox = require(parent.UIBlox)
+local Localization = require(parent.Localization)
+local withLocalization = Localization.withLocalization
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local t1 = {
-	stiffness = 400,
-	damping = 40,
-	mass = 1
-}
 
-local function InGameAssetReportErrorModal(t2: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), ReactOtter (copy), t1 (copy), withLocalization (copy), InteractiveAlert (copy), ButtonType (copy)
-	local v11, v12 = React.useState(true)
-	local v13, v14 = ReactOtter.useAnimatedBinding(1, function() -- line: 27
-		-- upvalues: v11 (copy), t2 (copy)
-		if not v11 then
-			t2.onBack()
+local v = { stiffness = 400, damping = 40, mass = 1 }
+
+local function InGameAssetReportErrorModal(p)
+	local state, setState = React.useState(true)
+
+	local v2, v3 = ReactOtter.useAnimatedBinding(1, function()
+		if not state then
+			p.onBack()
 		end
 	end)
-	local v15 = React.useMemo(function() -- line: 34
-		-- upvalues: v11 (copy)
-		if v11 then
-			return 0
-		end
 
-		return 1
-	end, { v11 })
+	local v4 = React.useMemo(function(): number
+		return if state then 0 else 1
+	end, { state })
 
-	React.useEffect(function() -- line: 38
-		-- upvalues: v14 (copy), ReactOtter (copy), v15 (copy), t1 (copy)
-		v14(ReactOtter.spring(v15, t1))
-	end, { v15 })
+	React.useEffect(function()
+		v3(ReactOtter.spring(v4, v))
+	end, { v4 })
 
-	local v16 = React.useCallback(function() -- line: 42
-		-- upvalues: v12 (copy)
-		v12(false)
-	end, { v12 })
+	local onActivated = React.useCallback(function()
+		setState(false)
+	end, { setState })
 
 	return withLocalization({
 		errorTitle = "Feature.ReportAbuse.Heading.SelectInSceneErrorTitle",
 		errorDescription = "Feature.ReportAbuse.Label.SelectInSceneErrorDescription",
 		errorBack = "Feature.ReportAbuse.Action.ErrorModalGoBack"
-	})(function(p1) -- line: 50
-		-- upvalues: React (copy), v13 (copy), v16 (copy), InteractiveAlert (copy), t2 (copy), ButtonType (copy)
+	})(function(props)
 		return React.createElement("TextButton", {
 			AutoButtonColor = false,
 			BorderSizePixel = 0,
-			BackgroundTransparency = v13:map(function(n1: number) -- line: 54
-				return n1 + 0.3
+			BackgroundTransparency = v2:map(function(p2: number)
+				return p2 + 0.3
 			end),
 			BackgroundColor3 = Color3.fromHex("#000000"),
 			Size = UDim2.new(1, 0, 1, 0),
 			Text = "",
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			[React.Event.Activated] = v16,
+			[React.Event.Activated] = onActivated,
 			ZIndex = 10
 		}, {
 			Alert = React.createElement(InteractiveAlert, {
-				screenSize = t2.screenSize,
-				title = p1.errorTitle,
-				bodyText = p1.errorDescription,
+				screenSize = p.screenSize,
+				title = props.errorTitle,
+				bodyText = props.errorDescription,
 				anchorPoint = Vector2.new(0.5, 0.5),
-				position = v13:map(function(p2) -- line: 70
+				position = v2:map(function(p2)
 					return UDim2.new(0.5, 0, 0.5, 0):Lerp(UDim2.new(0.5, 0, -0.5, 0), p2)
 				end),
 				buttonStackInfo = {
-					buttons = {{
-						buttonType = ButtonType.PrimarySystem,
-						props = {
-							onActivated = v16,
-							text = p1.errorBack
+					buttons = {
+						{
+							buttonType = ButtonType.PrimarySystem,
+							props = { onActivated = onActivated, text = props.errorBack }
 						}
-					}}
+					}
 				}
 			})
 		})

@@ -1,3 +1,3 @@
-return function(s1: string) -- line: 2
-	return (s1:gsub("^[%s]+", ""))
+return function(value: string)
+	return (value:gsub("^[%s]+", ""))
 end

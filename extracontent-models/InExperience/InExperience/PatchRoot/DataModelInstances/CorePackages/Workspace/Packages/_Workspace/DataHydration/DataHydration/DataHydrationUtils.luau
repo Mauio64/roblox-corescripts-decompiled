@@ -1,61 +1,114 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
 local Players = game:GetService("Players")
-local FFlagAddFriendsPageTrustedFriendRequestSection = require(Parent.SharedFlags).FFlagAddFriendsPageTrustedFriendRequestSection
-local v4 = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else require(Parent.Cryo)
 
-local function mergeListsWithoutDuplicates(t1: {[any]: any}?, t2: {[any]: any}?, s1: string?) -- line: 32
-	-- upvalues: v4 (copy)
-	if not t2 or #t2 == 0 then
-		if t1 then
-			return t1
-		end
+local Cryo = require(parent.Cryo)
 
-		return {}
-	end
+local function getLocalPlayerUserId() -- 2 equivalent calls inferred from this helper
+	local userId = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
 
-	if not t1 or #t1 == 0 then
-		return t2
-	end
-
-	local v14 = v4.List.toSet(v4.List.map(t1, function(p1) -- line: 40
-		-- upvalues: s1 (copy)
-		if s1 then
-			return p1[s1]
-		end
-
-		return p1
-	end))
-	local v15 = v4.List.filter(t2, function(p2) -- line: 45
-		-- upvalues: s1 (copy), v14 (copy)
-		return not v14[if not s1 then p2 else p2[s1]]
-	end)
-
-	return v4.List.join(table.clone(t1), v15)
+	return if not (userId == nil or userId <= 0) then userId else nil
 end
 
-return {
-	areAllKeysPresent = function(p3, t3: {[any]: any}) -- line: 20
-		if p3 == nil or type(p3) ~= "table" then
-			return #t3 == 0
+local DataHydrationUtils = {}
+
+function DataHydrationUtils.areAllKeysPresent(p, list): boolean
+	if p == nil or type(p) ~= "table" then
+		return #list == 0
+	end
+
+	for _, item in list do
+		if p[item] == nil then
+			return false
+		end
+	end
+
+	return true
+end
+
+DataHydrationUtils.getLocalPlayerUserId = getLocalPlayerUserId
+
+function DataHydrationUtils.observeLocalPlayerUserId(callback)
+	local userId = getLocalPlayerUserId() -- inferred equivalent call
+	local userIdChangedConnection = nil
+
+	local flag = false
+
+	local function notifyIfChanged() -- 1 equivalent call inferred from this helper
+		local localPlayerUserId = getLocalPlayerUserId() -- inferred equivalent call
+
+		if localPlayerUserId == userId then
+			return
 		end
 
-		for _, v10 in t3 do
-			if p3[v10] == nil then
-				return false
+		userId = localPlayerUserId
+		callback(localPlayerUserId)
+	end
+
+	local function bindLocalPlayer() -- 2 equivalent calls inferred from this helper
+		if userIdChangedConnection ~= nil then
+			userIdChangedConnection:Disconnect()
+			userIdChangedConnection = nil
+		end
+
+		local localPlayer = Players.LocalPlayer
+
+		if localPlayer ~= nil then
+			userIdChangedConnection = localPlayer:GetPropertyChangedSignal("UserId"):Connect(notifyIfChanged)
+		end
+	end
+
+	bindLocalPlayer() -- inferred equivalent call
+	local localPlayerChangedConnection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function()
+		bindLocalPlayer() -- inferred equivalent call
+		notifyIfChanged() -- inferred equivalent call
+	end)
+
+	return function()
+		if flag then
+			return
+		end
+
+		flag = true
+
+		if userIdChangedConnection ~= nil then
+			userIdChangedConnection:Disconnect()
+			userIdChangedConnection = nil
+		end
+
+		if localPlayerChangedConnection ~= nil then
+			localPlayerChangedConnection:Disconnect()
+			localPlayerChangedConnection = nil
+		end
+	end
+end
+
+function DataHydrationUtils.mergeListsWithoutDuplicates(list, list2, p: string?)
+	if list2 and #list2 ~= 0 then
+		if not list or #list == 0 then
+			return list2
+		end
+
+		local set = Cryo.List.toSet(Cryo.List.map(list, function(p2)
+			if p then
+				return p2[p]
 			end
-		end
 
-		return true
-	end,
-	getLocalPlayerUserId = function() -- line: 11
-		-- upvalues: Players (copy)
-		local v6 = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
+			return p2
+		end))
 
-		if v6 == nil or v6 <= 0 then
-			return nil
-		end
+		local filtered = Cryo.List.filter(list2, function(p2): boolean
+			if p then
+				p2 = p2[p]
+			end
 
-		return v6
-	end,
-	mergeListsWithoutDuplicates = if not FFlagAddFriendsPageTrustedFriendRequestSection then nil else mergeListsWithoutDuplicates
-}
+			return not set[p2]
+		end)
+
+		return Cryo.List.join(table.clone(list), filtered)
+	end
+
+	return list or {}
+end
+
+return DataHydrationUtils

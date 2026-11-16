@@ -1,13 +1,13 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactUtils = require(FoundationParent.ReactUtils)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+
 local AlertActions = require(Foundation.Components.AlertActions)
 local AlertConstants = require(Foundation.Components.AlertActions.AlertConstants)
-
 require(Foundation.Enums.AlertSeverity)
-
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+local BuilderIcons = require(parent.BuilderIcons)
 local CloseAffordance = require(Foundation.Components.CloseAffordance)
 local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
 local ControlState = require(Foundation.Enums.ControlState)
@@ -16,108 +16,155 @@ local IconSize = require(Foundation.Enums.IconSize)
 local InputSize = require(Foundation.Enums.InputSize)
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local escapeRichText = require(Foundation.Utility.escapeRichText)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
 local IconVariant = BuilderIcons.IconVariant
-local useFeedbackAlertVariants = require(script.Parent.useFeedbackAlertVariants)
-local t1 = {
-	testId = "--foundation-feedback-alert"
-}
 
-local function FeedbackAlert(p1, p2) -- line: 50
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useFeedbackAlertVariants (copy), ReactUtils (copy), escapeRichText (copy), React (copy), ControlState (copy), View (copy), withCommonProps (copy), Icon (copy), AlertConstants (copy), IconSize (copy), IconVariant (copy), Text (copy), StateLayerAffordance (copy), CloseAffordance (copy), InputSize (copy), CloseAffordanceVariant (copy), AlertActions (copy)
-	local v27 = withDefaults(p1, t1)
-	local v28 = useTokens()
-	local v29 = useFeedbackAlertVariants(v28, v27.severity)
-	local v30 = ReactUtils.useComposedRef(p2)
-	local v31 = if not v27.link then nil else escapeRichText(v27.link.text)
-	local v32, v33 = React.useState(false)
-	local v34 = React.useCallback(function(p3) -- line: 60
-		-- upvalues: v33 (copy), ControlState (copy)
-		v33(p3 == ControlState.Hover)
+local useFeedbackAlertVariants = require(script.Parent.useFeedbackAlertVariants)
+
+local v = { testId = "--foundation-feedback-alert" }
+
+local function FeedbackAlert(p, p2)
+	local v2 = withDefaults(p, v)
+	local v3 = useFeedbackAlertVariants(useTokens(), v2.severity)
+
+	local ref = ReactUtils.useComposedRef(p2)
+	local text
+
+	if v2.link then
+		text = escapeRichText(v2.link.text)
+	end
+
+	local state, setState = React.useState(false)
+	local onStateChanged = React.useCallback(function(p3)
+		setState(p3 == ControlState.Hover)
 	end, {})
 
-	return React.createElement(View, withCommonProps(v27, {
-		tag = v29.container.tag,
-		stroke = v29.stroke,
-		backgroundStyle = v29.backgroundStyle,
-		ref = v30
-	}), {
-		HeaderRow = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = v29.headerRow.tag,
-			testId = `{ v27.testId }--header`
-		}, {
-			Icon = React.createElement(Icon, {
-				LayoutOrder = 1,
-				name = AlertConstants.SEVERITY_TO_ICON[v27.severity],
-				size = IconSize.Large,
-				variant = IconVariant.Filled,
-				style = v29.icon.style,
-				testId = `{ v27.testId }--icon`
-			}),
-			Content = React.createElement(View, {
-				LayoutOrder = 2,
-				tag = "row align-y-center fill gap-xsmall auto-y",
-				testId = `{ v27.testId }--content`
-			}, {
-				Title = React.createElement(Text, {
-					LayoutOrder = 1,
-					Text = v27.title,
-					tag = v29.title.tag,
-					testId = `{ v27.testId }--title`
-				}),
-				Subtitle = if not v27.subtitle then nil else React.createElement(Text, {
-					LayoutOrder = 2,
-					Text = v27.subtitle,
-					tag = v29.subtitle.tag,
-					testId = `{ v27.testId }--subtitle`
-				}),
-				Separator = if not v27.link then nil else React.createElement(Text, {
-					Text = "·",
-					tag = "auto-xy text-body-medium content-default",
-					LayoutOrder = 3,
-					testId = `{ v27.testId }--separator`
-				}),
-				Link = if not v27.link then nil else React.createElement(Text, {
-					RichText = true,
-					LayoutOrder = 4,
-					Text = if not v32 then v31 else `<u>{ v31 }</u>`,
-					tag = v29.link.tag,
-					stateLayer = {
-						affordance = StateLayerAffordance.None
-					},
-					onStateChanged = v34,
-					onActivated = v27.link.onActivated,
-					testId = `{ v27.testId }--link`
-				})
-			}),
-			Close = if v27.onClose == nil then nil else React.createElement(CloseAffordance, {
-				LayoutOrder = 3,
-				onActivated = v27.onClose,
-				size = InputSize.XSmall,
-				variant = CloseAffordanceVariant.Utility,
-				testId = `{ v27.testId }--close`
-			})
-		}),
-		Description = if not v27.description then nil else React.createElement(Text, {
-			LayoutOrder = 2,
-			Text = v27.description,
-			tag = v29.description.tag,
-			testId = `{ v27.testId }--description`
-		}),
-		Actions = React.createElement(AlertActions, {
-			LayoutOrder = 3,
-			actions = v27.actions,
-			testId = `{ v27.testId }--actions`
-		})
+	local createElement = React.createElement
+
+	local v4 = withCommonProps(v2, {
+		tag = v3.container.tag,
+		stroke = v3.stroke,
+		backgroundStyle = v3.backgroundStyle,
+		ref = ref
 	})
+
+	local createElement2 = React.createElement
+	local v5 = { LayoutOrder = 1, tag = v3.headerRow.tag, testId = `{v2.testId}--header` }
+	local v6 = {
+		Icon = React.createElement(Icon, {
+			LayoutOrder = 1,
+			name = AlertConstants.SEVERITY_TO_ICON[v2.severity],
+			size = IconSize.Large,
+			variant = IconVariant.Filled,
+			style = v3.icon.style,
+			testId = `{v2.testId}--icon`
+		}),
+		Content = 0,
+		Close = 0
+	}
+
+	local createElement3 = React.createElement
+	local v7 = {
+		LayoutOrder = 2,
+		tag = "row align-y-center fill gap-xsmall auto-y",
+		testId = `{v2.testId}--content`
+	}
+	local v8 = {
+		Title = React.createElement(Text, {
+			Text = v2.title,
+			tag = v3.title.tag,
+			LayoutOrder = 1,
+			testId = `{v2.testId}--title`
+		}),
+		Subtitle = 0,
+		Separator = 0,
+		Link = 0
+	}
+	local subtitle
+
+	if v2.subtitle then
+		subtitle = React.createElement(Text, {
+			Text = v2.subtitle,
+			tag = v3.subtitle.tag,
+			LayoutOrder = 2,
+			testId = `{v2.testId}--subtitle`
+		})
+	end
+
+	v8.Subtitle = subtitle
+	local separator
+
+	if v2.link then
+		separator = React.createElement(Text, {
+			Text = "·",
+			tag = "auto-xy text-body-medium content-default",
+			LayoutOrder = 3,
+			testId = `{v2.testId}--separator`
+		})
+	end
+
+	v8.Separator = separator
+	local link
+
+	if v2.link then
+		local createElement4 = React.createElement
+
+		if state then
+			text = `<u>{text}</u>`
+		end
+
+		link = createElement4(Text, {
+			Text = text,
+			RichText = true,
+			tag = v3.link.tag,
+			LayoutOrder = 4,
+			stateLayer = { affordance = StateLayerAffordance.None },
+			onStateChanged = onStateChanged,
+			onActivated = v2.link.onActivated,
+			testId = `{v2.testId}--link`
+		})
+	end
+
+	v8.Link = link
+	v6.Content = createElement3(View, v7, v8)
+	local close
+
+	if v2.onClose ~= nil then
+		close = React.createElement(CloseAffordance, {
+			onActivated = v2.onClose,
+			size = InputSize.XSmall,
+			variant = CloseAffordanceVariant.Utility,
+			LayoutOrder = 3,
+			testId = `{v2.testId}--close`
+		})
+	end
+
+	v6.Close = close
+	local children = { HeaderRow = createElement2(View, v5, v6), Description = 0, Actions = 0 }
+	local description
+
+	if v2.description then
+		description = React.createElement(Text, {
+			Text = v2.description,
+			tag = v3.description.tag,
+			LayoutOrder = 2,
+			testId = `{v2.testId}--description`
+		})
+	end
+
+	children.Description = description
+
+	children.Actions = React.createElement(AlertActions, {
+		actions = v2.actions,
+		testId = `{v2.testId}--actions`,
+		LayoutOrder = 3
+	})
+	return createElement(View, v4, children)
 end
 
 return React.memo(React.forwardRef(FeedbackAlert))

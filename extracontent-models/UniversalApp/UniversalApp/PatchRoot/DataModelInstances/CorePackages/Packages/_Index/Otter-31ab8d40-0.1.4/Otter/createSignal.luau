@@ -1,70 +1,59 @@
-local function addToMap(p1, p2, p3) -- line: 1
-	local t1 = {}
+local function addToMap(items, p, p2)
+	local result = {}
 
-	for k, v in pairs(p1) do
-		t1[k] = v
+	for k, item in pairs(items) do
+		result[k] = item
 	end
 
-	t1[p2] = p3
+	result[p] = p2
 
-	return t1
+	return result
 end
-local function removeFromMap(p4, p5) -- line: 13
-	local t2 = {}
 
-	for k, v in pairs(p4) do
-		if k ~= p5 then
-			t2[k] = v
+local function removeFromMap(items, callback) -- 1 equivalent call inferred from this helper
+	local result = {}
+
+	for k, item in pairs(items) do
+		if k ~= callback then
+			result[k] = item
 		end
 	end
 
-	return t2
+	return result
 end
-local function createSignal() -- line: 25
-	local t3 = {}
+
+local function createSignal()
+	local v = {}
 
 	return {
-		subscribe = function(_, p7) -- line: 28
-			-- upvalues: t3 (ref)
-			assert(typeof(p7) == "function", "Can only subscribe to signals with a function.")
+		subscribe = function(_, callback)
+			assert(typeof(callback) == "function", "Can only subscribe to signals with a function.")
 
-			local t4 = {
-				callback = p7
-			}
-			local v19 = t3
-			local t5 = {}
+			local v2 = v
+			local v3 = {}
 
-			for k, v in pairs(v19) do
-				t5[k] = v
+			local v4 = { callback = callback }
+
+			for k, v5 in pairs(v2) do
+				v3[k] = v5
 			end
 
-			t5[p7] = t4
-			t3 = t5
+			v3[callback] = v4
 
-			local function disconnect() -- line: 37
-				-- upvalues: t4 (copy), t3 (ref), p7 (copy)
-				assert(not t4.disconnected, "Listeners can only be disconnected once.")
-				t4.disconnected = true
+			v = v3
 
-				local v27 = t3
-				local v28 = p7
-				local t6 = {}
+			local function disconnect()
+				assert(not v4.disconnected, "Listeners can only be disconnected once.")
 
-				for k, v in pairs(v27) do
-					if k ~= v28 then
-						t6[k] = v
-					end
-				end
-
-				t3 = t6
+				v4.disconnected = true
+				v = removeFromMap(v, callback) -- inferred equivalent call
 			end
 
 			return disconnect
 		end,
-		fire = function(_, ...) -- line: 47
-			-- upvalues: t3 (ref)
-			for k, v in pairs(t3) do
-				if not v.disconnected then
+		fire = function(_, ...)
+			for k, v2 in pairs(v) do
+				if not v2.disconnected then
 					k(...)
 				end
 			end

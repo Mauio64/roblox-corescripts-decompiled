@@ -1,67 +1,72 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local LocalizationService = game:GetService("LocalizationService")
-local InExperienceSquadContract = require(AppChat.Contracts).SquadContract.InExperienceSquadContract
+
+local Contracts = require(AppChat.Contracts)
+local InExperienceSquadContract = Contracts.SquadContract.InExperienceSquadContract
+
 local Contexts = require(AppChat.Contexts)
 local UnreadMessagesProvider = Contexts.UnreadMessagesProvider
 local ParentContainerProvider = Contexts.ParentContainer.ParentContainerProvider
-local ApolloProvider = require(AppChatParent.ApolloClient).ApolloProvider
-local Localization = require(AppChatParent.RobloxAppLocales).Localization
-local LocalizationProvider = require(AppChatParent.Localization).LocalizationProvider
-local React = require(AppChatParent.React)
-local RoactUtils = require(AppChatParent.RoactUtils)
-local RoactRodux = require(AppChatParent.RoactRodux)
-local SquadExternalContractProvider = require(AppChatParent.SquadsCore.SquadExternalContractProvider)
-local SharedFlags = require(AppChatParent.SharedFlags)
-local SquadExternalContractProvider2 = SquadExternalContractProvider.SquadExternalContractProvider
-local SquadLocationEnum = require(AppChatParent.SquadsCore.Enums).SquadLocationEnum
+
+local ApolloClient = require(parent.ApolloClient)
+local ApolloProvider = ApolloClient.ApolloProvider
+
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
+local Localization2 = require(parent.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local RoactRodux = require(parent.RoactRodux)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local SharedFlags = require(parent.SharedFlags)
+
+local squadExternalContractProvider = SquadExternalContractProvider.SquadExternalContractProvider
+local Enums = require(parent.SquadsCore.Enums)
+local SquadLocationEnum = Enums.SquadLocationEnum
 local ProviderContainer = RoactUtils.Components.ProviderContainer
-local UniversalAppPolicy = require(AppChatParent.UniversalAppPolicy).UniversalAppPolicy
-local AppFeaturePolicies = require(AppChatParent.UniversalAppPolicy).AppFeaturePolicies
-local ChatPolicies = require(AppChatParent.SocialPolicies).ChatPolicies
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local universalAppPolicy = UniversalAppPolicy.UniversalAppPolicy
+local UniversalAppPolicy2 = require(parent.UniversalAppPolicy)
+local AppFeaturePolicies = UniversalAppPolicy2.AppFeaturePolicies
+local SocialPolicies = require(parent.SocialPolicies)
+local ChatPolicies = SocialPolicies.ChatPolicies
+
 local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 
-return function(t1: {[any]: any}) -- line: 46
-	-- upvalues: React (copy), ParentContainerProvider (copy), UnreadMessagesProvider (copy), RoactRodux (copy), ApolloProvider (copy), UniversalAppPolicy (copy), AppFeaturePolicies (copy), ChatPolicies (copy), GetFFlagIsSquadEnabled (copy), SquadExternalContractProvider2 (copy), InExperienceSquadContract (copy), SquadLocationEnum (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), ProviderContainer (copy)
-	local v24 = React.useMemo(function() -- line: 47
-		-- upvalues: ParentContainerProvider (copy), t1 (copy), UnreadMessagesProvider (copy), RoactRodux (copy), ApolloProvider (copy), UniversalAppPolicy (copy), AppFeaturePolicies (copy), ChatPolicies (copy), GetFFlagIsSquadEnabled (copy), SquadExternalContractProvider2 (copy), InExperienceSquadContract (copy), SquadLocationEnum (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy)
-		local t2 = {}
+return function(props)
+	local providers = React.useMemo(function()
+		local v = {}
 
-		table.insert(t2, {
-			class = ParentContainerProvider,
-			props = t1.parentContainerContext
-		})
-		table.insert(t2, {
+		table.insert(v, { class = ParentContainerProvider, props = props.parentContainerContext })
+
+		table.insert(v, {
 			class = UnreadMessagesProvider,
-			props = {
-				dispatch = t1.updateAppChatUnreadMessagesCount
-			}
+			props = { dispatch = props.updateAppChatUnreadMessagesCount }
 		})
-		table.insert(t2, {
+
+		table.insert(v, {
 			class = RoactRodux.StoreProvider,
-			props = {
-				store = t1.store
-			}
+			props = { store = props.store }
 		})
-		table.insert(t2, {
+
+		table.insert(v, {
 			class = ApolloProvider,
-			props = {
-				client = t1.apolloClient
-			}
+			props = { client = props.apolloClient }
 		})
-		table.insert(t2, {
-			class = UniversalAppPolicy.Provider,
+
+		table.insert(v, {
+			class = universalAppPolicy.Provider,
 			props = {
-				policy = {
-					AppFeaturePolicies,
-					ChatPolicies
-				}
+				policy = { AppFeaturePolicies, ChatPolicies }
 			}
 		})
 
 		if GetFFlagIsSquadEnabled() then
-			table.insert(t2, {
-				class = SquadExternalContractProvider2,
+			table.insert(v, {
+				class = squadExternalContractProvider,
 				props = {
 					contract = InExperienceSquadContract,
 					squadLocation = SquadLocationEnum.InExperience
@@ -69,17 +74,15 @@ return function(t1: {[any]: any}) -- line: 46
 			})
 		end
 
-		table.insert(t2, {
+		table.insert(v, {
 			class = LocalizationProvider,
 			props = {
 				localization = Localization.new(LocalizationService.RobloxLocaleId)
 			}
 		})
 
-		return t2
+		return v
 	end, {})
 
-	return React.createElement(ProviderContainer, {
-		providers = v24
-	}, t1.children)
+	return React.createElement(ProviderContainer, { providers = providers }, props.children)
 end

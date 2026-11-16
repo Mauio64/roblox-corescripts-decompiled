@@ -1,79 +1,86 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Set = LuauPolyfill.Set
 
-require(ParentParent.jsutils.ObjMap)
-require(ParentParent.language.ast)
+require(parent.jsutils.ObjMap)
 
-local Kind = require(ParentParent.language.kinds).Kind
-local visit = require(ParentParent.language.visitor).visit
-local collectDependencies = nil
+require(parent.language.ast)
 
-local function collectTransitiveDependencies(p1, p2, s1: string) -- line: 95
-	-- upvalues: collectTransitiveDependencies (ref)
-	if not p1:has(s1) then
-		p1:add(s1)
+local kinds = require(parent.language.kinds)
+local kind = kinds.Kind
+local visitor = require(parent.language.visitor)
+local visit = visitor.visit
 
-		local v25 = p2[s1]
+local collectDependencies
+local collectTransitiveDependencies
 
-		if v25 ~= nil then
-			for _, v in pairs(v25) do
-				collectTransitiveDependencies(p1, p2, v)
+local function separateOperations(p)
+	local definitions = {}
+	local v = {}
+
+	for _, definition in pairs(p.definitions) do
+		local kind2 = definition.kind
+
+		if kind2 == kind.OPERATION_DEFINITION then
+			table.insert(definitions, definition)
+		elseif kind2 == kind.FRAGMENT_DEFINITION then
+			v[definition.name.value] = collectDependencies(definition.selectionSet)
+		end
+	end
+
+	local result = {}
+
+	for _, v2 in pairs(definitions) do
+		local v3 = Set.new()
+
+		for _, v4 in pairs(collectDependencies(v2.selectionSet)) do
+			collectTransitiveDependencies(v3, v, v4)
+		end
+
+		result[v2.name and v2.name.value or ""] = {
+			kind = kind.DOCUMENT,
+			definitions = Array.filter(p.definitions, function(p2)
+				if p2 == v2 then
+					return true
+				elseif p2.kind == kind.FRAGMENT_DEFINITION then
+					return (v3:has(p2.name.value))
+				else
+					return false
+				end
+			end)
+		}
+	end
+
+	return result
+end
+
+collectTransitiveDependencies = function(object, p, p2: string)
+	if not object:has(p2) then
+		object:add(p2)
+
+		local v = p[p2]
+
+		if v ~= nil then
+			for _, v2 in pairs(v) do
+				collectTransitiveDependencies(object, p, v2)
 			end
 		end
 	end
 end
 
-function collectDependencies(p3) -- line: 112
-	-- upvalues: visit (copy)
-	local t1 = {}
+collectDependencies = function(selectionSet)
+	local dependencies = {}
 
-	visit(p3, {
-		FragmentSpread = function(_, p5) -- line: 116
-			-- upvalues: t1 (copy)
-			table.insert(t1, p5.name.value)
+	visit(selectionSet, {
+		FragmentSpread = function(_, p)
+			table.insert(dependencies, p.name.value)
 		end
 	})
 
-	return t1
+	return dependencies
 end
 
-return {
-	separateOperations = function(p6) -- line: 38
-		-- upvalues: Kind (copy), collectDependencies (ref), Set (copy), collectTransitiveDependencies (ref), Array (copy)
-		local t2 = {}
-		local t3 = {}
-
-		for _, v in pairs(p6.definitions) do
-			local kind = v.kind
-
-			if kind == Kind.OPERATION_DEFINITION then
-				table.insert(t2, v)
-			elseif kind == Kind.FRAGMENT_DEFINITION then
-				t3[v.name.value] = collectDependencies(v.selectionSet)
-			end
-		end
-
-		local t4 = {}
-
-		for _, v in pairs(t2) do
-			local v19 = Set.new()
-
-			for _, v2 in pairs(collectDependencies(v.selectionSet)) do
-				collectTransitiveDependencies(v19, t3, v2)
-			end
-
-			t4[v.name and v.name.value or ""] = {
-				kind = Kind.DOCUMENT,
-				definitions = Array.filter(p6.definitions, function(p7) -- line: 81
-					-- upvalues: v (copy), Kind (copy), v19 (copy)
-					return p7 == v or p7.kind == Kind.FRAGMENT_DEFINITION and v19:has(p7.name.value)
-				end)
-			}
-		end
-
-		return t4
-	end
-}
+return { separateOperations = separateOperations }

@@ -1,85 +1,86 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-require(Parent.Foundation)
+require(parent.Foundation)
 
-local font = Font.new("rbxasset://fonts/families/BuilderMono.json", Enum.FontWeight.Regular)
+local rbxassetfontsfamiliesBuilderMonojson = Font.new(
+	"rbxasset://fonts/families/BuilderMono.json",
+	Enum.FontWeight.Regular
+)
 
-local function colorToHex(p1) -- line: 44
-	return `#{ p1.Color3:ToHex() }`
+local function colorToHex(p) -- 3 equivalent calls inferred from this helper
+	return `#{p.Color3:ToHex()}`
 end
-local function typographyToTextStyles(p2, p3) -- line: 49
-	local p2Font = p2.Font
-	local t1 = {
-		textSize = p2.FontSize,
-		color = `#{ p3.Color3:ToHex() }`,
-		transparency = p3.Transparency
-	}
 
-	if typeof(p2Font) == "EnumItem" then
-		t1.font = p2Font
+local function typographyToTextStyles(p, p2)
+	local font = p.Font
+	local v = { textSize = p.FontSize, color = colorToHex(p2), transparency = p2.Transparency } -- inferred equivalent call
 
-		return t1
+	if typeof(font) == "EnumItem" then
+		v.font = font
+		return v
 	end
 
-	if typeof(p2Font) == "Font" then
-		t1.fontFace = p2Font
-
-		return t1
+	if typeof(font) == "Font" then
+		v.fontFace = font
+		return v
 	end
 
-	if typeof(p2Font) == "table" then
-		t1.fontFace = Font.new(p2Font.Family, p2Font.Weight, p2Font.Style)
+	if typeof(font) == "table" then
+		v.fontFace = Font.new(font.Family, font.Weight, font.Style)
 	end
 
-	return t1
+	return v
 end
-local function getTextSize(p4) -- line: 68
-	return p4.FontSize
+
+local function getTextSize(p) -- 1 equivalent call inferred from this helper
+	return p.FontSize
 end
-local function getLineHeight(p5) -- line: 72
-	return p5.LineHeight
+
+local function getLineHeight(p) -- 1 equivalent call inferred from this helper
+	return p.LineHeight
 end
-local function getColor3(p6) -- line: 76
-	return p6.Color3
+
+local function getColor3(p) -- 1 equivalent call inferred from this helper
+	return p.Color3
 end
-local function getTransparency(p7) -- line: 80
-	return p7.Transparency
+
+local function getTransparency(p) -- 2 equivalent calls inferred from this helper
+	return p.Transparency
 end
-local function getSize(n1: number) -- line: 84
-	return n1
+
+local function getSize(p: number)
+	return p
 end
-local function getMarkdownRendererProps(p8, p9) -- line: 88
-	-- upvalues: typographyToTextStyles (copy), font (copy)
-	local Typography = p8.Typography
-	local Content = p8.Color.Content
-	local Surface = p8.DarkMode.Surface
+
+local function getMarkdownRendererProps(data, p)
+	local typography = data.Typography
+	local content = data.Color.Content
+	local surface = data.DarkMode.Surface
 
 	return {
-		textStyles = typographyToTextStyles(Typography.BodyMedium, p9),
+		textStyles = typographyToTextStyles(typography.BodyMedium, p),
 		headerStyles = {
-			typographyToTextStyles(Typography.HeadingLarge, Content.Emphasis),
-			typographyToTextStyles(Typography.HeadingMedium, Content.Emphasis),
-			typographyToTextStyles(Typography.HeadingSmall, Content.Emphasis),
-			typographyToTextStyles(Typography.TitleLarge, Content.Emphasis),
-			typographyToTextStyles(Typography.TitleMedium, Content.Emphasis),
-			(typographyToTextStyles(Typography.TitleMedium, Content.Emphasis))
+			typographyToTextStyles(typography.HeadingLarge, content.Emphasis),
+			typographyToTextStyles(typography.HeadingMedium, content.Emphasis),
+			typographyToTextStyles(typography.HeadingSmall, content.Emphasis),
+			typographyToTextStyles(typography.TitleLarge, content.Emphasis),
+			typographyToTextStyles(typography.TitleMedium, content.Emphasis),
+			typographyToTextStyles(typography.TitleMedium, content.Emphasis)
 		},
 		codeStyles = {
-			fontFace = font,
-			textSize = Typography.BodyMedium.FontSize,
-			lineHeight = Typography.BodyMedium.LineHeight,
-			color = `#{ Content.Emphasis.Color3:ToHex() }`,
-			transparency = Content.Emphasis.Transparency
+			fontFace = rbxassetfontsfamiliesBuilderMonojson,
+			textSize = getTextSize(typography.BodyMedium), -- inferred equivalent call
+			lineHeight = getLineHeight(typography.BodyMedium), -- inferred equivalent call
+			color = colorToHex(content.Emphasis), -- inferred equivalent call
+			transparency = getTransparency(content.Emphasis) -- inferred equivalent call
 		},
 		codeBackgroundStyles = {
-			backgroundColor3 = Surface.Surface_300.Color3,
-			backgroundTransparency = Surface.Surface_300.Transparency
+			backgroundColor3 = getColor3(surface.Surface_300), -- inferred equivalent call
+			backgroundTransparency = getTransparency(surface.Surface_300) -- inferred equivalent call
 		},
-		linkStyles = {
-			linkColor = `#{ Content.Link.Color3:ToHex() }`
-		},
+		linkStyles = { linkColor = colorToHex(content.Link) }, -- inferred equivalent call
 		imageStyles = {
-			size = UDim2.fromOffset(p8.Size.Size_400, p8.Size.Size_400)
+			size = UDim2.fromOffset(data.Size.Size_400, data.Size.Size_400)
 		}
 	}
 end

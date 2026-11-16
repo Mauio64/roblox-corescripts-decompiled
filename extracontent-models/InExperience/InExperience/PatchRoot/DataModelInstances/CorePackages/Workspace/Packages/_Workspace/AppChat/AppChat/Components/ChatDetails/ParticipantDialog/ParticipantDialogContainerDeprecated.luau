@@ -1,32 +1,39 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local EnumScreens = require(AppChat.EnumScreens)
 local NetworkingFriends = require(AppChat.Http.NetworkingFriends)
-
 require(AppChat.types)
-
 local useAppPolicy = require(AppChat.Hooks.useAppPolicy)
 local useIsExternalNavigationAvailable = require(AppChat.Hooks.useIsExternalNavigationAvailable)
 local Conversation = require(AppChat.Models.Conversation)
-local Cryo = require(AppChatParent.Cryo)
-local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
-local InputHandlers = require(AppChatParent.InputHandlers)
-local React = require(AppChatParent.React)
 
-require(AppChatParent.ReactFocusNavigation)
+local Cryo = require(parent.Cryo)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local InputHandlers = require(parent.InputHandlers)
+local React = require(parent.React)
+require(parent.ReactFocusNavigation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
 
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
 local AppFocusRoot = FocusNavigationUtils.AppFocusRoot
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
-local FFlagEnableChatDetailsOpenChat = require(AppChat.Flags.FFlagEnableChatDetailsOpenChat)
+local FFlagAppChatMigrateFriendshipStatuses = require(AppChat.Flags.FFlagAppChatMigrateFriendshipStatuses)
+local FriendsHydrationReact = require(parent.FriendsHydrationReact)
+local useGetFriendshipStatus = FriendsHydrationReact.useGetFriendshipStatus
+
 local memo = React.memo
+
 local ParticipantDialogDeprecated = require(script.Parent.ParticipantDialogDeprecated)
 local PlayerContextualMenuWrapper = require(script.Parent.PlayerContextualMenuWrapper)
-local t1 = {
+
+local v = {
 	conversationId = nil,
 	participantId = nil,
 	showRemoveUserButton = false,
@@ -40,106 +47,105 @@ local t1 = {
 	openChat = nil,
 	openReportUser = nil,
 	openRemoveUserDialog = nil,
-	onDismiss = function() -- line: 69
-	end
+	onDismiss = function() end
 }
 
-function ParticipantDialogContainerDeprecated(t2: {[any]: any}) -- line: 73
-	-- upvalues: Cryo (copy), t1 (copy), useAppPolicy (copy), FFlagEnableChatDetailsOpenChat (copy), useSelector (copy), Conversation (copy), useDispatch (copy), React (copy), NetworkingFriends (copy), useLocalization (copy), useIsExternalNavigationAvailable (copy), EnumScreens (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), PlayerContextualMenuWrapper (copy), FocusNavigableSurfaceWrapper (copy), ParticipantDialogDeprecated (copy)
-	local v25 = Cryo.Dictionary.join(t1, t2)
-	local v26 = useAppPolicy(function(p1) -- line: 75
-		return p1.getChatViewProfileOption()
+local v2 = { skipFetch = true }
+
+function ParticipantDialogContainerDeprecated(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local showViewProfileButton = useAppPolicy(function(p2)
+		return p2.getChatViewProfileOption()
 	end)
-	local u27 = nil
-	local u28 = nil
-	local v29 = false
 
-	if FFlagEnableChatDetailsOpenChat then
-		u27 = useSelector(function(p2) -- line: 85
-			-- upvalues: v25 (copy), Conversation (copy)
-			local v37 = p2.ChatAppReducer and p2.ChatAppReducer.Conversations
-			local v38 = v37 and v37[v25.conversationId]
+	local v3 = useSelector(function(p2)
+		local conversations = p2.ChatAppReducer and p2.ChatAppReducer.Conversations
+		local v3 = conversations and conversations[joined.conversationId]
+		return v3 and v3.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
+	end)
 
-			return v38 and v38.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
+	local v4 = useDispatch()
+	local v5
+
+	if FFlagAppChatMigrateFriendshipStatuses then
+		local participantId = joined.participantId
+		local v6
+
+		if not v3 then
+			v6 = v2
+		end
+
+		v5 = useGetFriendshipStatus(participantId, v6) == Enum.FriendStatus.Friend
+	else
+		v5 = useSelector(function(p2)
+			local friends = p2.ChatAppReducer and p2.ChatAppReducer.Friends
+			local friendshipStatus = friends and friends.friendshipStatus
+			return friendshipStatus and friendshipStatus[joined.participantId] == Enum.FriendStatus.Friend
 		end)
-		u28 = useDispatch()
 
-		local v30 = useSelector(function(p3) -- line: 93
-			-- upvalues: v25 (copy)
-			local v40 = p3.ChatAppReducer and p3.ChatAppReducer.Friends
-			local v41 = v40 and v40.friendshipStatus
-
-			return v41 and v41[v25.participantId] == Enum.FriendStatus.Friend
-		end)
-
-		React.useEffect(function() -- line: 99
-			-- upvalues: u27 (ref), u28 (ref), NetworkingFriends (copy), v25 (copy)
-			if u27 then
-				u28(NetworkingFriends.GetExtendedFriendshipStatus.API({
-					targetUserId = v25.participantId
+		React.useEffect(function()
+			if v3 then
+				v4(NetworkingFriends.GetExtendedFriendshipStatus.API({
+					targetUserId = joined.participantId
 				}))
 			end
-		end, {
-			v25.participantId,
-			u28,
-			u27
-		})
-		v29 = not not u27 and not not v30
+		end, { joined.participantId, v4, v3 })
 	end
 
-	local v31 = useLocalization({
-		viewProfileText = v25.viewProfileText,
-		chatText = if not FFlagEnableChatDetailsOpenChat then nil else v25.chatText,
-		reportUserText = v25.reportUserText,
-		removeFromGroupText = v25.removeFromGroupText,
-		cancelText = v25.cancelText
-	})
-	local v32 = useIsExternalNavigationAvailable({ EnumScreens.ViewUserProfile })
-	local v33 = React.useMemo(function() -- line: 122
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v25 (copy)
-		return {
-			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(p4) -- line: 125
-					-- upvalues: v25 (copy)
-					v25.onDismiss()
-					p4:cancel()
-				end)
-			}
-		}
-	end, { v25.onDismiss })
-	local v34 = Cryo.Dictionary.join(v25, v31, {
-		showViewProfileButton = v26,
-		showChatButton = v29,
-		isWideMode = v25.isWideMode
+	local v6 = useLocalization({
+		viewProfileText = joined.viewProfileText,
+		chatText = joined.chatText,
+		reportUserText = joined.reportUserText,
+		removeFromGroupText = joined.removeFromGroupText,
+		cancelText = joined.cancelText
 	})
 
-	if not v32[EnumScreens.ViewUserProfile] then
-		return React.createElement(AppFocusRoot, {
+	local v7 = useIsExternalNavigationAvailable({ EnumScreens.ViewUserProfile })
+
+	local customEventHandlers = React.useMemo(function()
+		local v8 = {}
+		v8[FocusNavigationEventNameEnum.NavigateBack] = {
+			handler = InputHandlers.onRelease(function(object)
+				joined.onDismiss()
+				object:cancel()
+			end)
+		}
+
+		return v8
+	end, { joined.onDismiss })
+	local joined2 = Cryo.Dictionary.join(joined, v6, {
+		showViewProfileButton = showViewProfileButton,
+		showChatButton = v3 and v5 and true or false,
+		isWideMode = joined.isWideMode
+	})
+
+	if v7[EnumScreens.ViewUserProfile] then
+		return React.createElement(FocusNavigableSurfaceWrapper, {
+			customEventHandlers = customEventHandlers,
 			isAutoFocusRoot = true,
 			isFocusable = true,
 			isIsolated = true,
-			shouldRestoreFocus = false,
-			customEventHandlers = v33,
 			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
-		}, { React.createElement(PlayerContextualMenuWrapper, {
-			conversationId = v25.conversationId,
-			participantId = v25.participantId,
-			onDismiss = v25.onDismiss,
-			openRemoveUserDialog = v25.openRemoveUserDialog,
-			removeFromGroupText = v31.removeFromGroupText,
-			openReportUser = v25.openReportUser,
-			showRemoveUserButton = v25.showRemoveUserButton,
-			openBlockingModal = v25.openBlockingModal
-		}) })
+		}, { React.createElement(ParticipantDialogDeprecated, joined2) })
 	end
 
-	return React.createElement(FocusNavigableSurfaceWrapper, {
+	return React.createElement(AppFocusRoot, {
+		customEventHandlers = customEventHandlers,
 		isAutoFocusRoot = true,
 		isFocusable = true,
 		isIsolated = true,
-		customEventHandlers = v33,
+		shouldRestoreFocus = false,
 		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
-	}, { React.createElement(ParticipantDialogDeprecated, v34) })
+	}, { React.createElement(PlayerContextualMenuWrapper, {
+			conversationId = joined.conversationId,
+			participantId = joined.participantId,
+			onDismiss = joined.onDismiss,
+			openRemoveUserDialog = joined.openRemoveUserDialog,
+			removeFromGroupText = v6.removeFromGroupText,
+			openReportUser = joined.openReportUser,
+			showRemoveUserButton = joined.showRemoveUserButton,
+			openBlockingModal = joined.openBlockingModal
+		}) })
 end
 
 return memo(ParticipantDialogContainerDeprecated)

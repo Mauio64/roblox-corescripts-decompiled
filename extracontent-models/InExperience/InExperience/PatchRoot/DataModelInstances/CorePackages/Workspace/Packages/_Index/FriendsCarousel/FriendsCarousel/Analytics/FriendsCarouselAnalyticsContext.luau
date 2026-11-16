@@ -1,8 +1,6 @@
 local FriendsCarousel = script:FindFirstAncestor("FriendsCarousel")
 local dependencies = require(FriendsCarousel.dependencies)
-local Roact = dependencies.Roact
-local Dash = dependencies.Dash
+local roact = dependencies.Roact
+local dash = dependencies.Dash
 
-return Roact.createContext({
-	fireEvent = Dash.noop
-})
+return roact.createContext({ fireEvent = dash.noop })

@@ -1,1 +1,3 @@
-return (require(script.PreferencesProvider))
+local PreferencesProvider = require(script.PreferencesProvider)
+
+return PreferencesProvider

@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-return require(Parent.BuilderIcons).getBuilderIconForCurrentPlatform
+local BuilderIcons = require(parent.BuilderIcons)
+
+return BuilderIcons.getBuilderIconForCurrentPlatform

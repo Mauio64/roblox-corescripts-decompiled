@@ -1,3 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
 
-return (require(CorePackages.Packages.Roact).createContext(nil))
+local Roact = require(CorePackages.Packages.Roact)
+
+return (Roact.createContext(nil))

@@ -1,0 +1,3 @@
+local FFlagAXMigrateOutfitsToUserInventory = require(script.Parent.FFlagAXMigrateOutfitsToUserInventory)
+
+return game:DefineFastFlag("AXRefetchInventoryOnUpdate", false) and FFlagAXMigrateOutfitsToUserInventory

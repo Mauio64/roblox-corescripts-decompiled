@@ -1,61 +1,67 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local GenerateStringId = require(AppChatParent.AppCommonLib).GenerateStringId
-local OrderedMap = require(AppChatParent.AppCommonLib).OrderedMap
+local parent = AppChat.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local GenerateStringId = AppCommonLib.GenerateStringId
+local AppCommonLib2 = require(parent.AppCommonLib)
+local OrderedMap = AppCommonLib2.OrderedMap
 local Constants = require(AppChat.Constants)
-local DateTime = require(AppChatParent.Time).DateTime
+local Time = require(parent.Time)
+local DateTime = Time.DateTime
+
 local Conversation = require(script.Parent.Conversation)
 
-local function getMessageId(p1) -- line: 11
-	return p1.id
-end
-local function messageSortPredicate(p2, p3) -- line: 15
-	return p2.sent:GetUnixTimestamp() < p3.sent:GetUnixTimestamp()
-end
-local function sendingMessageSortPredicate(p4, p5) -- line: 22
-	return p4.order < p5.order
+local function getMessageId(p)
+	return p.id
 end
 
-local t1 = {}
+local function messageSortPredicate(p, p2): boolean
+	return p.sent:GetUnixTimestamp() < p2.sent:GetUnixTimestamp()
+end
 
-t1.__index = t1
+local function sendingMessageSortPredicate(p, p2): boolean
+	return p.order < p2.order
+end
 
-function t1.mock(t2: {[any]: any}?) -- line: 29
-	-- upvalues: Conversation (copy), OrderedMap (copy), getMessageId (copy), messageSortPredicate (copy), sendingMessageSortPredicate (copy), GenerateStringId (copy), Constants (copy), DateTime (copy)
-	local v18 = Conversation.new()
+local MockConversation = {}
+MockConversation.__index = MockConversation
 
-	v18.messages = OrderedMap.new(getMessageId, messageSortPredicate)
-	v18.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
-	v18.id = GenerateStringId()
-	v18.clientId = GenerateStringId()
-	v18.title = ""
-	v18.initiator = GenerateStringId()
-	v18.hasUnreadMessages = false
-	v18.conversationType = Conversation.Type.MULTI_USER_CONVERSATION
-	v18.participants = {}
-	v18.usersTyping = {}
-	v18.isUserLeaving = false
-	v18.fetchingOlderMessages = false
-	v18.fetchedOldestMessage = false
-	v18.serverState = Constants.ServerState.NONE
-	v18.pinnedGame = {}
-	v18.pinnedGame.universeId = GenerateStringId()
-	v18.pinnedGame.rootPlaceId = GenerateStringId()
-	v18.lastUpdated = DateTime.now()
-	v18.titleForViewer = "title"
-	v18.isDefaultTitle = true
+function MockConversation.mock(items)
+	local result = Conversation.new()
 
-	if t2 ~= nil then
-		for k, v in pairs(t2) do
-			v18[k] = v
+	result.messages = OrderedMap.new(getMessageId, messageSortPredicate)
+	result.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
+	result.id = GenerateStringId()
+
+	result.clientId = GenerateStringId()
+	result.title = ""
+	result.initiator = GenerateStringId()
+	result.hasUnreadMessages = false
+	result.conversationType = Conversation.Type.MULTI_USER_CONVERSATION
+	result.participants = {}
+	result.usersTyping = {}
+	result.isUserLeaving = false
+	result.fetchingOlderMessages = false
+	result.fetchedOldestMessage = false
+	result.serverState = Constants.ServerState.NONE
+	result.pinnedGame = {}
+	result.pinnedGame.universeId = GenerateStringId()
+	result.pinnedGame.rootPlaceId = GenerateStringId()
+
+	result.lastUpdated = DateTime.now()
+
+	result.titleForViewer = "title"
+	result.isDefaultTitle = true
+
+	if items ~= nil then
+		for k, item in pairs(items) do
+			result[k] = item
 		end
 	end
 
-	setmetatable(v18, {
-		__index = Conversation
-	})
+	setmetatable(result, { __index = Conversation })
 
-	return v18
+	return result
 end
 
-return t1
+return MockConversation

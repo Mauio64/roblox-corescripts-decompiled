@@ -1,107 +1,138 @@
 local StarterGui = game:GetService("StarterGui")
+
 local CoreGuiCommon = script:FindFirstAncestor("CoreGuiCommon")
-local CoreGuiCommonParent = CoreGuiCommon.Parent
+local parent = CoreGuiCommon.Parent
 local Constants = require(CoreGuiCommon.Constants)
-local CachedPolicyService = require(CoreGuiCommonParent.CachedPolicyService)
-local Foundation = require(CoreGuiCommonParent.Foundation)
-local Motion = require(CoreGuiCommonParent.Motion)
-local React = require(CoreGuiCommonParent.React)
-local Signals = require(CoreGuiCommonParent.Signals)
-local SignalsReact = require(CoreGuiCommonParent.SignalsReact)
-local FFlagUseNewHurtOverlayImage = require(CoreGuiCommon.Flags).FFlagUseNewHurtOverlayImage
-local FFlagUseNewHurtOverlayAnimation = require(CoreGuiCommon.Flags).FFlagUseNewHurtOverlayAnimation
-local GetLocalHumanoidStore = require(CoreGuiCommon.Stores).GetLocalHumanoidStore
-local FoundationImage = Foundation.Image
-local color3 = Color3.fromRGB(187, 0, 4)
-local color3_2 = Color3.new(1, 1, 1)
-local t1 = {
-	showOverlay = Motion.createState({
-		transparency = 0,
-		size = if not FFlagUseNewHurtOverlayAnimation then UDim2.fromScale(1.5, 1.5) else nil
-	}, {
-		default = Motion.transition(Motion.TransitionPreset.Default, {
-			duration = not FFlagUseNewHurtOverlayAnimation and 0 or 0.1
-		})
-	}),
-	hideOverlay = Motion.createState({
-		transparency = 1,
-		size = if not FFlagUseNewHurtOverlayAnimation then UDim2.fromScale(3, 3) else nil
-	}, {
-		default = Motion.transition(Motion.TransitionPreset.Default, {
-			duration = not FFlagUseNewHurtOverlayAnimation and 0.3 or 0.5
-		})
+
+local CachedPolicyService = require(parent.CachedPolicyService)
+local Foundation = require(parent.Foundation)
+local Motion = require(parent.Motion)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local Flags = require(CoreGuiCommon.Flags)
+local FFlagUseNewHurtOverlayImage = Flags.FFlagUseNewHurtOverlayImage
+local Flags2 = require(CoreGuiCommon.Flags)
+local FFlagUseNewHurtOverlayAnimation = Flags2.FFlagUseNewHurtOverlayAnimation
+
+local Stores = require(CoreGuiCommon.Stores)
+local GetLocalHumanoidStore = Stores.GetLocalHumanoidStore
+local Image = Foundation.Image
+
+local color = Color3.fromRGB(187, 0, 4)
+local color2 = Color3.new(1, 1, 1)
+
+local v = { showOverlay = 0, hideOverlay = 0 }
+local createState = Motion.createState
+local size
+
+if not FFlagUseNewHurtOverlayAnimation then
+	size = UDim2.fromScale(1.5, 1.5)
+end
+
+v.showOverlay = createState({ size = size, transparency = 0 }, {
+	default = Motion.transition(Motion.TransitionPreset.Default, {
+		duration = FFlagUseNewHurtOverlayAnimation and 0.1 or 0
 	})
-}
+})
 
-function HurtOverlay(t2: {[any]: any}) -- line: 51
-	-- upvalues: StarterGui (copy), Motion (copy), t1 (copy), React (copy), SignalsReact (copy), GetLocalHumanoidStore (copy), Signals (copy), Constants (copy), FFlagUseNewHurtOverlayImage (copy), color3 (copy), CachedPolicyService (copy), color3_2 (copy), FoundationImage (copy), FFlagUseNewHurtOverlayAnimation (copy)
-	local v19 = t2.mockStarterGui or StarterGui
-	local v20, v21 = Motion.useMotion(t1.hideOverlay)
-	local v22, v23 = React.useState(v19:GetCoreGuiEnabled(Enum.CoreGuiType.Health))
-	local v24 = SignalsReact.useSignalState(GetLocalHumanoidStore)
-	local v25 = React.useRef(v24.getHealthValue(false))
+local createState2 = Motion.createState
+local size2
 
-	React.useEffect(function() -- line: 60
-		-- upvalues: Signals (copy), v24 (copy), v25 (copy), Constants (copy), v21 (copy), t1 (copy), v19 (copy), v23 (copy)
-		local v28 = Signals.createEffect(function(p1) -- line: 61
-			-- upvalues: v24 (copy), v25 (copy), Constants (copy), v21 (copy), t1 (copy)
-			local v32 = v24.getHealthValue(p1)
-			local current = v25.current
+if not FFlagUseNewHurtOverlayAnimation then
+	size2 = UDim2.fromScale(3, 3)
+end
 
-			v25.current = v32
+v.hideOverlay = createState2({ size = size2, transparency = 1 }, {
+	default = Motion.transition(Motion.TransitionPreset.Default, {
+		duration = FFlagUseNewHurtOverlayAnimation and 0.5 or 0.3
+	})
+})
 
-			if not v32.health or (not v32.maxHealth or not current.health) or v32.isDead and current.isDead then
+function HurtOverlay(p)
+	local mockStarterGui = p.mockStarterGui or StarterGui
+	local v2, v3 = Motion.useMotion(v.hideOverlay)
+
+	local state, setState = React.useState(mockStarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Health))
+
+	local v4 = SignalsReact.useSignalState(GetLocalHumanoidStore)
+	local ref = React.useRef(v4.getHealthValue(false))
+
+	React.useEffect(function()
+		local effect = Signals.createEffect(function(p2)
+			local healthValue = v4.getHealthValue(p2)
+			local current = ref.current
+			ref.current = healthValue
+
+			if
+				not healthValue.health
+				or not healthValue.maxHealth
+				or not current.health
+				or healthValue.isDead and current.isDead
+			then
 				return
 			end
 
-			if (current.health - v32.health) / v32.maxHealth < Constants.HealthPercentForOverlay then
+			if (current.health - healthValue.health) / healthValue.maxHealth < Constants.HealthPercentForOverlay then
 				return
 			end
 
-			v21(t1.showOverlay, {
-				onAnimationComplete = function(p2) -- line: 79
-					-- upvalues: v21 (copy), t1 (copy)
-					if p2 == true then
-						v21(t1.hideOverlay)
+			v3(v.showOverlay, {
+				onAnimationComplete = function(p3)
+					if p3 == true then
+						v3(v.hideOverlay)
 					end
 				end
 			})
 		end)
-		local connection = v19.CoreGuiChangedSignal:Connect(function(p3, b1: boolean) -- line: 88
-			-- upvalues: v23 (copy)
-			if p3 == Enum.CoreGuiType.Health or p3 == Enum.CoreGuiType.All then
-				v23(b1)
+
+		local coreGuiChangedSignalConnection = mockStarterGui.CoreGuiChangedSignal:Connect(function(p2, flag: boolean)
+			if p2 == Enum.CoreGuiType.Health or p2 == Enum.CoreGuiType.All then
+				setState(flag)
 			end
 		end)
 
-		return function() -- line: 95
-			-- upvalues: v28 (copy), connection (copy)
-			v28()
-			connection:Disconnect()
+		return function()
+			effect()
+			coreGuiChangedSignalConnection:Disconnect()
 		end
-	end, { v24 })
-
-	local v26 = not FFlagUseNewHurtOverlayImage and "rbxasset://textures/ui/TopBar/WhiteOverlayAsset.png" or "rbxasset://textures/ui/TopBar/HurtOverlayAsset.png"
-	local u27 = color3
+	end, { v4 })
+	local image = FFlagUseNewHurtOverlayImage and "rbxasset://textures/ui/TopBar/HurtOverlayAsset.png"
+		or "rbxasset://textures/ui/TopBar/WhiteOverlayAsset.png"
+	local color3 = color
 
 	if CachedPolicyService:IsSubjectToChinaPolicies() then
-		u27 = color3_2
+		color3 = color2
 	end
 
-	return if not v22 then nil else React.createElement(FoundationImage, {
+	local v5
+
+	if not state then
+		return v5
+	end
+
+	local createElement = React.createElement
+	local v6 = {
 		tag = "anchor-center-center position-center-center",
 		testId = "hurt-overlay",
-		Image = v26,
-		imageStyle = v20.transparency:map(function(p4) -- line: 114
-			-- upvalues: u27 (ref)
-			return {
-				Color3 = u27,
-				Transparency = p4
-			}
+		Image = image,
+		imageStyle = v2.transparency:map(function(transparency)
+			return { Color3 = color3, Transparency = transparency }
 		end),
 		ScaleType = Enum.ScaleType.Crop,
-		Size = if not FFlagUseNewHurtOverlayAnimation then v20.size else UDim2.fromScale(1, 1)
-	})
+		Size = 0
+	}
+	local size3
+
+	if FFlagUseNewHurtOverlayAnimation then
+		size3 = UDim2.fromScale(1, 1)
+	else
+		size3 = v2.size
+	end
+
+	v6.Size = size3
+	return (createElement(Image, v6))
 end
 
 return React.memo(HurtOverlay)

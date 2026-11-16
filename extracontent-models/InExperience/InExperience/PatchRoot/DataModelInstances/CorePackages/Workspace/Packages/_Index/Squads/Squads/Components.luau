@@ -1,32 +1,42 @@
-local Parent = script:FindFirstAncestor("Squads").Parent
-local createLazyComponent = require(Parent.RoactUtils).Components.createLazyComponent
+local parent = script:FindFirstAncestor("Squads").Parent
 
+local RoactUtils = require(parent.RoactUtils)
+local createLazyComponent = RoactUtils.Components.createLazyComponent
 return {
-	AppSquadEventReceiver = createLazyComponent(function() -- line: 8
-		return (require(script.AppSquadEventReceiver))
+	AppSquadEventReceiver = createLazyComponent(function()
+		local AppSquadEventReceiver = require(script.AppSquadEventReceiver)
+		return AppSquadEventReceiver
 	end),
-	ScheduledSquadsListSheet = createLazyComponent(function() -- line: 11
-		return (require(script.ScheduledSquads.ScheduledSquadsListSheet))
+	ScheduledSquadsListSheet = createLazyComponent(function()
+		local ScheduledSquadsListSheet = require(script.ScheduledSquads.ScheduledSquadsListSheet)
+		return ScheduledSquadsListSheet
 	end),
-	ScheduledSquadsMoreInfoSheet = createLazyComponent(function() -- line: 14
-		return (require(script.ScheduledSquads.ScheduledSquadsMoreInfoSheet))
+	ScheduledSquadsMoreInfoSheet = createLazyComponent(function()
+		local ScheduledSquadsMoreInfoSheet = require(script.ScheduledSquads.ScheduledSquadsMoreInfoSheet)
+		return ScheduledSquadsMoreInfoSheet
 	end),
-	SquadComponentAccessWrapper = createLazyComponent(function() -- line: 17
-		return (require(script.SquadComponentAccessWrapper))
+	SquadComponentAccessWrapper = createLazyComponent(function()
+		local SquadComponentAccessWrapper = require(script.SquadComponentAccessWrapper)
+		return SquadComponentAccessWrapper
 	end),
-	SquadInviteFriends = createLazyComponent(function() -- line: 20
-		return (require(script.SquadInviteFriends))
+	SquadInviteFriends = createLazyComponent(function()
+		local SquadInviteFriends = require(script.SquadInviteFriends)
+		return SquadInviteFriends
 	end),
-	SquadJoinButton = createLazyComponent(function() -- line: 23
-		return (require(script.SquadJoinButton))
+	SquadJoinButton = createLazyComponent(function()
+		local SquadJoinButton = require(script.SquadJoinButton)
+		return SquadJoinButton
 	end),
-	SquadLobby = createLazyComponent(function() -- line: 26
-		return (require(script.SquadLobby))
+	SquadLobby = createLazyComponent(function()
+		local SquadLobby = require(script.SquadLobby)
+		return SquadLobby
 	end),
-	SquadTopBanner = createLazyComponent(function() -- line: 29
-		return (require(script.SquadTopBanner))
+	SquadTopBanner = createLazyComponent(function()
+		local SquadTopBanner = require(script.SquadTopBanner)
+		return SquadTopBanner
 	end),
-	SquadVoiceAbuseReportScreen = createLazyComponent(function() -- line: 32
-		return (require(script.SquadVoiceAbuseReportScreen))
+	SquadVoiceAbuseReportScreen = createLazyComponent(function()
+		local SquadVoiceAbuseReportScreen = require(script.SquadVoiceAbuseReportScreen)
+		return SquadVoiceAbuseReportScreen
 	end)
 }

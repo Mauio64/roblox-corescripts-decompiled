@@ -1,160 +1,151 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local CaptureService = game:GetService("CaptureService")
 local LocalizationService = game:GetService("LocalizationService")
-local default = require(ParentParentParent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
-local Localization = require(ParentParentParent.RobloxAppLocales).Localization
-local SocialStopwatch = require(ParentParentParent.SocialStopwatch)
-local CaptureType = require(ParentParent.Enums.CaptureType)
-local Constants = require(ParentParent.Constants)
-local ServerType = require(ParentParent.Enums.ServerType)
-local EventNames = require(ParentParent.Analytics.EventNames)
 
-require(ParentParent.Enums.ExternalShareSourceType)
+local ExternalContentSharingProtocol = require(parent2.ExternalContentSharingProtocol)
+local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
+local RobloxAppLocales = require(parent2.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
+local SocialStopwatch = require(parent2.SocialStopwatch)
 
-local FireEvent = require(ParentParent.Analytics.FireEvent)
-local getPlaceIdFromCapture = require(ParentParent.Utils.getPlaceIdFromCapture)
-local Networking = require(ParentParent.App.Networking)
+local CaptureType = require(parent.Enums.CaptureType)
+local Constants = require(parent.Constants)
+local ServerType = require(parent.Enums.ServerType)
+local EventNames = require(parent.Analytics.EventNames)
+require(parent.Enums.ExternalShareSourceType)
+local FireEvent = require(parent.Analytics.FireEvent)
+local getPlaceIdFromCapture = require(parent.Utils.getPlaceIdFromCapture)
+local Networking = require(parent.App.Networking)
+require(parent.Types)
 
-require(ParentParent.Types)
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
 
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
 local ShareLinksNetworking = Networking.ShareLinksNetworking
 local LinkType = Networking.ShareLinksRodux.Enums.LinkType
-local v19 = Localization.new(LocalizationService.RobloxLocaleId)
 
-local function shareImage(s1: string, s2: string?) -- line: 33
-	-- upvalues: default (copy), Constants (copy), v19 (copy)
+local v = Localization.new(LocalizationService.RobloxLocaleId)
+
+local function shareImage(image: string, url: string?)
 	if not default then
 		return
 	end
 
 	assert(default ~= nil, "ExternalContentSharingProtocol is required")
+
 	default:shareImage({
 		context = Constants.CapturesContext,
-		image = s1,
-		shareSheetTitle = v19:Format("Feature.Captures.Action.ShareYourCapture"),
-		url = s2
+		image = image,
+		shareSheetTitle = v:Format("Feature.Captures.Action.ShareYourCapture"),
+		url = url
 	})
 end
-local function shareVideo(s3: string, s4: string?) -- line: 48
-	-- upvalues: default (copy), Constants (copy), v19 (copy)
+
+local function shareVideo(video: string, url: string?)
 	if not default then
 		return
 	end
 
 	assert(default ~= nil, "ExternalContentSharingProtocol is required")
+
 	default:shareVideo({
 		context = Constants.CapturesContext,
-		shareSheetTitle = v19:Format("Feature.Captures.Action.ShareYourCapture"),
-		url = s4,
-		video = s3
+		shareSheetTitle = v:Format("Feature.Captures.Action.ShareYourCapture"),
+		url = url,
+		video = video
 	})
 end
-local function shareCapture(p1, s5: string?) -- line: 63
-	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureService (copy), shareVideo (copy), shareImage (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy)
-	if FFlagEnableCapturesGalleryRetrievalCoreScript and p1.CaptureTime ~= nil then
-		local v30 = CaptureService:PreCaptureShared(p1)
 
-		if p1.CaptureType == Enum.CaptureType.Video then
-			shareVideo(v30, s5)
+local function shareCapture(data, url: string?)
+	if FFlagEnableCapturesGalleryRetrievalCoreScript and data.CaptureTime ~= nil then
+		local preCaptureShared = CaptureService:PreCaptureShared(data)
+
+		if data.CaptureType == Enum.CaptureType.Video then
+			shareVideo(preCaptureShared, url)
 		else
-			shareImage(v30, s5)
+			shareImage(preCaptureShared, url)
 		end
 
-		CaptureService:OnCaptureObjectShared(p1)
-
-		return
+		CaptureService:OnCaptureObjectShared(data)
+	elseif FFlagUseRbxstorageInGallery and data.type == CaptureType.Video then
+		shareVideo(CaptureService:PreVideoCaptureShared(data.videoCapture), url)
+		CaptureService:OnVideoCaptureShared(data.videoCapture)
+	else
+		shareImage(data.filePath, url)
+		CaptureService:OnCaptureShared(data.filePath)
 	end
-
-	if FFlagUseRbxstorageInGallery and p1.type == CaptureType.Video then
-		local v31 = CaptureService:PreVideoCaptureShared(p1.videoCapture)
-
-		shareVideo(v31, s5)
-		CaptureService:OnVideoCaptureShared(p1.videoCapture)
-
-		return
-	end
-
-	shareImage(p1.filePath, s5)
-	CaptureService:OnCaptureShared(p1.filePath)
 end
-local function sendShareLatencyEvent(p2) -- line: 82
-	-- upvalues: SocialStopwatch (copy), FireEvent (copy), EventNames (copy)
-	local v33 = SocialStopwatch.Stopwatch.stop(SocialStopwatch.Events.CaptureShared)
 
-	FireEvent(EventNames.CapturesShareLatency, {
-		statValue = if not v33 then nil else v33.timeElapsed,
-		externalShareSource = p2
+local function sendShareLatencyEvent(externalShareSource) -- 3 equivalent calls inferred from this helper
+	local v2 = SocialStopwatch.Stopwatch.stop(SocialStopwatch.Events.CaptureShared)
+	local capturesShareLatency = EventNames.CapturesShareLatency
+	local statValue
+
+	if v2 then
+		statValue = v2.timeElapsed
+	end
+
+	FireEvent(capturesShareLatency, {
+		statValue = statValue,
+		externalShareSource = externalShareSource
 	})
 end
 
-return function(p3, p4, s6: string?) -- line: 90
-	-- upvalues: ServerType (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy), shareCapture (copy), FireEvent (copy), EventNames (copy), SocialStopwatch (copy), getPlaceIdFromCapture (copy), LinkType (copy), ShareLinksNetworking (copy)
-	return function(p5) -- line: 95
-		-- upvalues: ServerType (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), p3 (copy), CaptureType (copy), shareCapture (copy), FireEvent (copy), EventNames (copy), p4 (copy), SocialStopwatch (copy), getPlaceIdFromCapture (copy), s6 (copy), LinkType (copy), ShareLinksNetworking (copy)
-		local v38 = p5:getState().ServerType == ServerType.StandardServer
-		local v39 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then p3.type == CaptureType.Video else p3.CaptureType == Enum.CaptureType.Video
+return function(data, externalShareSource, launchData: string?)
+	return function(object)
+		local v2 = object:getState().ServerType == ServerType.StandardServer
+		local v3
 
-		if not v38 then
-			shareCapture(p3)
+		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+			v3 = data.CaptureType == Enum.CaptureType.Video
+		else
+			v3 = data.type == CaptureType.Video
+		end
+
+		if v2 then
+			local jobId = nil
+			local placeId = game.PlaceId
+			local placeId2
+
+			if v3 then
+				if FFlagEnableCapturesGalleryRetrievalCoreScript then
+					placeId2 = data.SourcePlaceId
+				else
+					placeId2 = data.videoCapture.SourcePlaceId
+				end
+			else
+				placeId2 = getPlaceIdFromCapture(data)
+			end
+
+			if placeId == placeId2 then
+				jobId = game.JobId
+			end
+
+			local v4 = {
+				instanceId = jobId,
+				launchData = launchData,
+				linkType = LinkType.ScreenshotInvite.rawValue(),
+				placeId = placeId2
+			}
+
+			object:dispatch(ShareLinksNetworking.GenerateLink.API(v4)):andThen(function(p)
+				shareCapture(data, p.responseBody.shortUrl)
+				sendShareLatencyEvent(externalShareSource) -- inferred equivalent call
+			end):catch(function(p)
+				warn("GenerateLink failed with error:", p)
+
+				FireEvent(EventNames.ShareCaptureGenerateLinkFailed, { httpError = p.HttpError })
+
+				shareCapture(data)
+				sendShareLatencyEvent(externalShareSource) -- inferred equivalent call
+			end)
+		else
+			shareCapture(data)
 			FireEvent(EventNames.CapturesShareFromNonStandardServer)
-
-			local v40 = p4
-			local v41 = SocialStopwatch.Stopwatch.stop(SocialStopwatch.Events.CaptureShared)
-
-			FireEvent(EventNames.CapturesShareLatency, {
-				statValue = if not v41 then nil else v41.timeElapsed,
-				externalShareSource = v40
-			})
-
-			return
+			sendShareLatencyEvent(externalShareSource) -- inferred equivalent call
 		end
-
-		local JobId = nil
-		local PlaceId = game.PlaceId
-		local v44 = if not v39 then getPlaceIdFromCapture(p3) else if not FFlagEnableCapturesGalleryRetrievalCoreScript then p3.videoCapture.SourcePlaceId else p3.SourcePlaceId
-
-		if PlaceId == v44 then
-			JobId = game.JobId
-		end
-
-		local t1 = {
-			instanceId = JobId,
-			launchData = s6,
-			linkType = LinkType.ScreenshotInvite.rawValue(),
-			placeId = v44
-		}
-
-		p5:dispatch(ShareLinksNetworking.GenerateLink.API(t1)):andThen(function(p6) -- line: 129
-			-- upvalues: shareCapture (copy), p3 (copy), p4 (copy), SocialStopwatch (copy), FireEvent (copy), EventNames (copy)
-			local shortUrl = p6.responseBody.shortUrl
-
-			shareCapture(p3, shortUrl)
-
-			local v48 = p4
-			local v49 = SocialStopwatch.Stopwatch.stop(SocialStopwatch.Events.CaptureShared)
-
-			FireEvent(EventNames.CapturesShareLatency, {
-				statValue = if not v49 then nil else v49.timeElapsed,
-				externalShareSource = v48
-			})
-		end):catch(function(p7) -- line: 134
-			-- upvalues: FireEvent (copy), EventNames (copy), shareCapture (copy), p3 (copy), p4 (copy), SocialStopwatch (copy)
-			warn("GenerateLink failed with error:", p7)
-			FireEvent(EventNames.ShareCaptureGenerateLinkFailed, {
-				httpError = p7.HttpError
-			})
-			shareCapture(p3)
-
-			local v51 = p4
-			local v52 = SocialStopwatch.Stopwatch.stop(SocialStopwatch.Events.CaptureShared)
-
-			FireEvent(EventNames.CapturesShareLatency, {
-				statValue = if not v52 then nil else v52.timeElapsed,
-				externalShareSource = v51
-			})
-		end)
 	end
 end

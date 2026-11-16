@@ -1,59 +1,53 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent
 
-require(ParentParent.Style.StyleTypes)
-require(ParentParent.Style.Fonts)
+require(parent.Style.StyleTypes)
+require(parent.Style.Fonts)
 
 return {
-	DEFAULT_FOOTER_HEIGHT = 22,
-	DEFAULT_TEXT_LINE_COUNT = 2,
-	getDefaultStyleProps = function(p1) -- line: 33
-		assert(p1.Tokens ~= nil, "Design token support is not enabled!")
-
+	getDefaultStyleProps = function(p)
+		assert(p.Tokens ~= nil, "Design token support is not enabled!")
 		return {
 			backgroundColor = {
-				Color = p1.Tokens.Semantic.Color.Background.Muted.Color3,
-				Transparency = p1.Tokens.Semantic.Color.Background.Muted.Transparency
+				Color = p.Tokens.Color.Surface.Surface_200.Color3,
+				Transparency = p.Tokens.Color.Surface.Surface_200.Transparency
 			},
 			border = {
 				BorderColor = {
-					Color = p1.Tokens.Component.VerticalTile.Base.Container.BorderColor.Color3,
-					Transparency = p1.Tokens.Component.VerticalTile.Base.Container.BorderColor.Transparency
+					Color = p.Tokens.Color.Stroke.Emphasis.Color3,
+					Transparency = p.Tokens.Color.Stroke.Emphasis.Transparency
 				},
-				CornerRadius = UDim.new(0, p1.Tokens.Component.VerticalTile.Base.Container.BorderRadius.LeadingTop),
-				Width = p1.Tokens.Component.VerticalTile.Base.Container.BorderWidth
+				CornerRadius = UDim.new(0, p.Tokens.Radius.Medium),
+				Width = p.Tokens.Stroke.Standard
 			},
 			topContentPadding = {
-				Left = p1.Tokens.Component.VerticalTile.Base.ContentTop.Spacing.Leading,
-				Right = p1.Tokens.Component.VerticalTile.Base.ContentTop.Spacing.Trailing,
-				Top = p1.Tokens.Component.VerticalTile.Base.ContentTop.Spacing.Top,
-				Bottom = p1.Tokens.Component.VerticalTile.Base.ContentTop.Spacing.Bottom
+				Left = p.Tokens.Padding.None,
+				Right = p.Tokens.Padding.None,
+				Top = p.Tokens.Padding.None,
+				Bottom = p.Tokens.Padding.None
 			},
 			bottomContentPadding = {
-				Left = p1.Tokens.Component.VerticalTile.Base.ContentBottom.Spacing.Leading,
-				Right = p1.Tokens.Component.VerticalTile.Base.ContentBottom.Spacing.Trailing,
-				Top = p1.Tokens.Component.VerticalTile.Base.ContentBottom.Spacing.Top,
-				Bottom = p1.Tokens.Component.VerticalTile.Base.ContentBottom.Spacing.Bottom
+				Left = p.Tokens.Padding.Small,
+				Right = p.Tokens.Padding.Small,
+				Top = p.Tokens.Padding.Small,
+				Bottom = p.Tokens.Padding.Small
 			},
 			overlayColors = {},
-			selectionCursorPadding = {
-				Left = 0,
-				Right = 0,
-				Top = 0,
-				Bottom = 0
-			},
+			selectionCursorPadding = { Left = 0, Right = 0, Top = 0, Bottom = 0 },
 			dropShadow = {
-				ImageAssetName = "component_assets/dropshadow_24_6",
 				Position = UDim2.new(0.5, 0, 0.5, 2),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Size = UDim2.new(1, 10, 1, 12),
 				ImageColor = {
-					Color = p1.Tokens.Semantic.Color.Common.DropShadow.Color3,
-					Transparency = p1.Tokens.Semantic.Color.Common.DropShadow.Transparency
+					Color = p.Tokens.Color.Common.Shadow.Color3,
+					Transparency = p.Tokens.Color.Common.Shadow.Transparency
 				},
+				ImageAssetName = "component_assets/dropshadow_24_6",
 				SliceCenter = Rect.new(18, 18, 18, 18)
 			},
-			contentTitlePadding = p1.Tokens.Global.Space_100,
-			contentTitleFont = p1.Font.Header2
+			contentTitlePadding = p.Tokens.Size.Size_200,
+			contentTitleFont = p.Font.Header2
 		}
-	end
+	end,
+	DEFAULT_FOOTER_HEIGHT = 22,
+	DEFAULT_TEXT_LINE_COUNT = 2
 }

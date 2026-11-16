@@ -1,38 +1,39 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local useEventConnection = require(ParentParent.ReactUtils).useEventConnection
+local parent = script.Parent.Parent
+
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
 local isLocalUserInTextChannel = require(script.Parent.isLocalUserInTextChannel)
 
-local function useLocalUserInTextChannel(p1, s1: string) -- line: 12
-	-- upvalues: React (copy), isLocalUserInTextChannel (copy), useEventConnection (copy)
-	local v8, v9 = React.useState(function() -- line: 13
-		-- upvalues: isLocalUserInTextChannel (copy), p1 (copy), s1 (copy)
-		return isLocalUserInTextChannel(p1, s1)
+local function useLocalUserInTextChannel(instance, p: string)
+	local state, setState = React.useState(function()
+		return isLocalUserInTextChannel(instance, p)
 	end)
 
-	React.useEffect(function() -- line: 18
-		-- upvalues: v9 (copy), isLocalUserInTextChannel (copy), p1 (copy), s1 (copy)
-		v9(isLocalUserInTextChannel(p1, s1))
-	end, {
-		p1,
-		s1
-	})
+	React.useEffect(function()
+		setState(isLocalUserInTextChannel(instance, p))
+	end, { instance, p })
 
-	local function onMembershipChanged() -- line: 22
-		-- upvalues: v9 (copy), isLocalUserInTextChannel (copy), p1 (copy), s1 (copy)
-		v9(isLocalUserInTextChannel(p1, s1))
+	local function onMembershipChanged()
+		setState(isLocalUserInTextChannel(instance, p))
 	end
 
-	useEventConnection(if not p1 then nil else p1.ChildAdded, onMembershipChanged, {
-		p1,
-		s1
-	})
-	useEventConnection(if not p1 then nil else p1.ChildRemoved, onMembershipChanged, {
-		p1,
-		s1
-	})
+	local v
 
-	return v8
+	if instance then
+		v = instance.ChildAdded
+	end
+
+	useEventConnection(v, onMembershipChanged, { instance, p })
+	local v2
+
+	if instance then
+		v2 = instance.ChildRemoved
+	end
+
+	useEventConnection(v2, onMembershipChanged, { instance, p })
+
+	return state
 end
 
 return useLocalUserInTextChannel

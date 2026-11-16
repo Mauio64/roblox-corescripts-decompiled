@@ -1,12 +1,12 @@
-local function validateMotor(p1) -- line: 1
-	assert(typeof(p1) == "table")
-	assert(typeof(p1.start) == "function")
-	assert(typeof(p1.stop) == "function")
-	assert(typeof(p1.step) == "function")
-	assert(typeof(p1.setGoal) == "function")
-	assert(typeof(p1.onStep) == "function")
-	assert(typeof(p1.onComplete) == "function")
-	assert(typeof(p1.destroy) == "function")
+local function validateMotor(data)
+	assert(typeof(data) == "table")
+	assert(typeof(data.start) == "function")
+	assert(typeof(data.stop) == "function")
+	assert(typeof(data.step) == "function")
+	assert(typeof(data.setGoal) == "function")
+	assert(typeof(data.onStep) == "function")
+	assert(typeof(data.onComplete) == "function")
+	assert(typeof(data.destroy) == "function")
 end
 
 return validateMotor

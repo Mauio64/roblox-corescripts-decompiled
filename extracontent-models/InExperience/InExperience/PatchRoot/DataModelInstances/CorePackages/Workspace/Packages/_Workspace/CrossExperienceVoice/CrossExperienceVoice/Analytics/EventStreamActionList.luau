@@ -1,20 +1,22 @@
-local Parent = script:FindFirstAncestor("CrossExperienceVoice").Parent
-local Cryo = require(Parent.Cryo)
-local Dash = require(Parent.Dash)
-local Enums = require(Parent.SocialLuaAnalytics).Analytics.Enums
+local parent = script:FindFirstAncestor("CrossExperienceVoice").Parent
+
+local Cryo = require(parent.Cryo)
+local Dash = require(parent.Dash)
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Enums = SocialLuaAnalytics.Analytics.Enums
+
 local Contexts = Enums.Contexts
 local EventTypes = Enums.EventTypes
+
 local EventNames = require(script.Parent.EventNames)
-local t1 = {
-	cevJoinAttemptId = Dash.identity,
-	clientTimeStamp = Dash.identity
-}
+
+local v = { cevJoinAttemptId = Dash.identity, clientTimeStamp = Dash.identity }
 
 return {
 	[EventNames.PartyVoiceStateChanged] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceStateChanged,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity,
 			detail = Dash.identity,
@@ -28,7 +30,7 @@ return {
 	[EventNames.PartyVoiceJoinAttempt] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceJoinAttempt,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity,
 			targetPlaceId = Dash.identity,
@@ -39,7 +41,7 @@ return {
 	[EventNames.PartyVoiceJoinFailure] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceJoinFailure,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity,
 			errorMessage = Dash.identity
@@ -48,7 +50,7 @@ return {
 	[EventNames.PartyVoiceConnectedParticipantsOnJoin] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceConnectedParticipantsOnJoin,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity,
 			status = Dash.identity,
@@ -63,7 +65,7 @@ return {
 	[EventNames.PartyVoiceUnmuteParticipant] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceUnmuteParticipant,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity
 		})
@@ -71,7 +73,7 @@ return {
 	[EventNames.PartyVoiceMuteParticipant] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceMuteParticipant,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity
 		})
@@ -79,7 +81,7 @@ return {
 	[EventNames.PartyVoiceBlockParticipant] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceBlockParticipant,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity
 		})
@@ -87,7 +89,7 @@ return {
 	[EventNames.PartyVoiceUnblockParticipant] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceUnblockParticipant,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			userId = Dash.identity,
 			partyId = Dash.identity
 		})
@@ -95,7 +97,7 @@ return {
 	[EventNames.PartyVoiceOnCrossExperienceStartedSignalReceived] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceOnCrossExperienceStartedSignalReceived,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			hasExperienceStarted = Dash.identity,
 			isActiveDM = Dash.identity
 		})
@@ -103,7 +105,7 @@ return {
 	[EventNames.PartyVoiceStateChangeHandlerRun] = {
 		context = Contexts.PartyVoice,
 		eventType = EventTypes.PartyVoiceStateChangeHandlerRun,
-		formatRulesForAdditionalInfo = Cryo.Dictionary.union(t1, {
+		formatRulesForAdditionalInfo = Cryo.Dictionary.union(v, {
 			isActiveDM = Dash.identity,
 			status = Dash.identity,
 			detail = Dash.identity

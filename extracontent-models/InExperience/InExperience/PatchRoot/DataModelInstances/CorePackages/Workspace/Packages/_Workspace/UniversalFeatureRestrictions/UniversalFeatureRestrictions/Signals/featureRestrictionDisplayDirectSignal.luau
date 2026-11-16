@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("UniversalFeatureRestrictions").Parent
+local parent = script:FindFirstAncestor("UniversalFeatureRestrictions").Parent
 
-return (require(Parent.AppCommonLib).Signal.new())
+local AppCommonLib = require(parent.AppCommonLib)
+return (AppCommonLib.Signal.new())

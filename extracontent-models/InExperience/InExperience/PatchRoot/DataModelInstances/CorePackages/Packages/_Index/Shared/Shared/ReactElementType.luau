@@ -1,6 +1,6 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
 require(script.Parent["flowtypes.roblox"])
 
 return {}

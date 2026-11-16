@@ -1,16 +1,14 @@
-local t1 = {}
+local v = {}
 
-local function prettyPrintVector3(vector3: Vector3, n1: number?) -- line: 7
-	-- upvalues: t1 (copy)
-	local v5 = n1 or 2
+local function prettyPrintVector3(vector3: Vector3, value: number?)
+	local v2 = value or 2
 
-	if not t1[v5] then
-		local v6 = string.format("%%.%df", v5)
-
-		t1[v5] = string.format("%s, %s, %s", v6, v6, v6)
+	if not v[v2] then
+		local v3 = string.format("%%.%df", v2)
+		v[v2] = string.format("%s, %s, %s", v3, v3, v3)
 	end
 
-	return string.format(t1[v5], vector3.X, vector3.Y, vector3.Z)
+	return string.format(v[v2], vector3.X, vector3.Y, vector3.Z)
 end
 
 return prettyPrintVector3

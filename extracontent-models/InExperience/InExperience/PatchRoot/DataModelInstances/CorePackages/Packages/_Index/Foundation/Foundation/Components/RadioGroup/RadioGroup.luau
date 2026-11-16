@@ -1,52 +1,61 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
 
 require(Foundation.Components.Types)
-
-local View = require(Foundation.Components.View)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
+local InternalInputGroup = require(Foundation.Components.InternalInputGroup)
 local RadioGroupContext = require(script.Parent.RadioGroupContext)
-local t1 = {
+
+local InputSize = require(Foundation.Enums.InputSize)
+
+local InputPlacement = require(Foundation.Enums.InputPlacement)
+
+local v = {
+	size = InputSize.Medium,
+	placement = InputPlacement.Start,
 	Selectable = true,
 	testId = "--foundation-radio-group"
 }
 
-local function RadioGroup(p1, p2) -- line: 26
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), View (copy), withCommonProps (copy), RadioGroupContext (copy)
-	local v12 = withDefaults(p1, t1)
-	local v13, v14 = React.useState(v12.value)
+local function RadioGroup(p, ref)
+	local v2 = withDefaults(p, v)
+	local state, setState = React.useState(v2.value)
 
-	React.useEffect(function() -- line: 30
-		-- upvalues: v12 (copy), v14 (copy)
-		if v12.value ~= nil then
-			v14(v12.value)
+	React.useEffect(function()
+		if v2.value ~= nil then
+			setState(v2.value)
 		end
-	end, { v12.value })
+	end, { v2.value })
 
-	local v15 = React.useCallback(function(s1: string) -- line: 36
-		-- upvalues: v14 (copy), v12 (copy)
-		v14(s1)
-		v12.onValueChanged(s1)
-	end, {
-		v14,
-		v12.onValueChanged
-	})
+	local onValueChanged = React.useCallback(function(p2: string)
+		setState(p2)
+		v2.onValueChanged(p2)
+	end, { setState, v2.onValueChanged })
 
-	return React.createElement(View, withCommonProps(v12, {
-		tag = "col gap-medium auto-xy",
-		ref = p2
-	}), {
-		RadioGroupContext = React.createElement(RadioGroupContext.Provider, {
-			value = {
-				value = v13,
-				onValueChanged = v15,
-				Selectable = v12.Selectable,
-				testId = v12.testId
-			}
-		}, v12.children)
-	})
+	local v3 = React.useMemo(function()
+		return {
+			value = state,
+			onValueChanged = onValueChanged,
+			Selectable = v2.Selectable,
+			testId = v2.testId
+		}
+	end, { state, onValueChanged, v2.Selectable, v2.testId })
+	return (React.createElement(
+		InternalInputGroup,
+		withCommonProps(v2, {
+			size = v2.size,
+			placement = v2.placement,
+			legend = v2.legend,
+			ref = ref
+		}),
+		{
+			RadioGroupContext = React.createElement(RadioGroupContext.Provider, { value = v3 }, v2.children)
+		}
+	))
 end
 
 return React.memo(React.forwardRef(RadioGroup))

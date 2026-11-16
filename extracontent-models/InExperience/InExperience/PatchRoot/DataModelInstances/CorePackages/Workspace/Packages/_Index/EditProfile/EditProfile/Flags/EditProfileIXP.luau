@@ -1,25 +1,33 @@
-local Parent = script:FindFirstAncestor("EditProfile").Parent
-local RoactAppExperiment = require(Parent.RoactAppExperiment)
-local getFStringSelfProfileView = require(Parent.SharedFlags).getFStringSelfProfileView
+local parent = script:FindFirstAncestor("EditProfile").Parent
+local RoactAppExperiment = require(parent.RoactAppExperiment)
+local SharedFlags = require(parent.SharedFlags)
+local getFStringSelfProfileView = SharedFlags.getFStringSelfProfileView
+
 local useUserExperiment = RoactAppExperiment.useUserExperiment
 local FFlagEditProfileSetupNewExperimentFlow = require(script.Parent.FFlagEditProfileSetupNewExperimentFlow)
-local v6 = game:DefineFastString("EditProfileExperimentKey", "can_view_edit_profile")
 
-local function v7(p1) -- line: 11
-	-- upvalues: getFStringSelfProfileView (copy), FFlagEditProfileSetupNewExperimentFlow (copy), v6 (copy)
-	local v9 = (p1 or {})[getFStringSelfProfileView()] or {}
+local defineFastString = game:DefineFastString("EditProfileExperimentKey", "can_view_edit_profile")
+
+local function fn(options): boolean
+	local v = (options or {})[getFStringSelfProfileView()] or {}
 
 	if FFlagEditProfileSetupNewExperimentFlow then
-		return v9[v6] == true
+		return v[defineFastString] == true
 	end
 
-	return v9.can_view_edit_profile == true
+	return v.can_view_edit_profile == true
 end
 
 return {
-	isExperimentEnabled = v7,
-	useIsExperimentEnabled = function(t1: {[any]: any}?) -- line: 25
-		-- upvalues: useUserExperiment (copy), getFStringSelfProfileView (copy), v7 (copy)
-		return useUserExperiment({ getFStringSelfProfileView() }, v7, if not t1 then nil else t1.isExposureEnabled)
+	isExperimentEnabled = fn,
+	useIsExperimentEnabled = function(p)
+		local v = { getFStringSelfProfileView() }
+		local v2
+
+		if p then
+			v2 = p.isExposureEnabled
+		end
+
+		return useUserExperiment(v, fn, v2)
 	end
 }

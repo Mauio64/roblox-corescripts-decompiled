@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent
+local GraphQLTag = require(parent.GraphQLTag)
 
-require(ParentParent.GraphQLTag).disableFragmentWarnings()
+GraphQLTag.disableFragmentWarnings()
 
 return {}

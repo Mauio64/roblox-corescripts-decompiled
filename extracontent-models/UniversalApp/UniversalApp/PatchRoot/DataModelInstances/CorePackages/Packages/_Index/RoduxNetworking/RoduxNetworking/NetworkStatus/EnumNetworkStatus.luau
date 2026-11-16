@@ -1,20 +1,13 @@
-local t1 = {}
-local t2 = {
-	NotStarted = "NotStarted",
-	Fetching = "Fetching",
-	Done = "Done",
-	Failed = "Failed"
-}
+local EnumNetworkStatus = {}
 
-setmetatable(t1, {
-	__newindex = function(_, _, _) -- line: 12
-	end,
-	__index = function(_, p5) -- line: 14
-		-- upvalues: t2 (copy)
-		assert(t2[p5] ~= nil, "EnumNetworkStatus has no value: " .. tostring(p5))
+local v = { NotStarted = "NotStarted", Fetching = "Fetching", Done = "Done", Failed = "Failed" }
 
-		return t2[p5]
+setmetatable(EnumNetworkStatus, {
+	__newindex = function(_, _, _) end,
+	__index = function(_, p)
+		assert(v[p] ~= nil, "EnumNetworkStatus has no value: " .. tostring(p))
+		return v[p]
 	end
 })
 
-return t1
+return EnumNetworkStatus

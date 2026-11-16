@@ -1,65 +1,68 @@
 local CorePackages = game:GetService("CorePackages")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local StarterGui = game:GetService("StarterGui")
+
 local Modules = RobloxGui.Modules
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local t = require(CorePackages.Packages.t)
-local ParentParent = script.Parent.Parent.Parent
-local UpdateCoreGuiEnabled = require(ParentParent.Actions.UpdateCoreGuiEnabled)
-local EventConnection = require(ParentParent.Parent.Common.EventConnection)
-local FFlagMountCoreGuiBackpack = require(Modules.Flags.FFlagMountCoreGuiBackpack)
 
-if require(ParentParent.Flags.FFlagTopBarDeprecateCoreGuiRodux) then
+local parent = script.Parent.Parent.Parent
+
+local UpdateCoreGuiEnabled = require(parent.Actions.UpdateCoreGuiEnabled)
+
+local EventConnection = require(parent.Parent.Common.EventConnection)
+
+local FFlagMountCoreGuiBackpack = require(Modules.Flags.FFlagMountCoreGuiBackpack)
+local FFlagTopBarDeprecateCoreGuiRodux = require(parent.Flags.FFlagTopBarDeprecateCoreGuiRodux)
+
+if FFlagTopBarDeprecateCoreGuiRodux then
 	return nil
 end
 
-local FFlagTopBarSignalizeHealthBar = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeHealthBar
-local v13 = Roact.PureComponent:extend("CoreGuiConnector")
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeHealthBar = CoreGuiCommon.Flags.FFlagTopBarSignalizeHealthBar
 
-v13.validateProps = t.strictInterface({
-	updateCoreGuiEnabled = t.callback
-})
+local extended = Roact.PureComponent:extend("CoreGuiConnector")
 
-function v13.didMount(p1) -- line: 37
-	-- upvalues: FFlagMountCoreGuiBackpack (copy), FFlagTopBarSignalizeHealthBar (copy), StarterGui (copy)
-	local EnumItems = Enum.CoreGuiType:GetEnumItems()
+extended.validateProps = t.strictInterface({ updateCoreGuiEnabled = t.callback })
 
-	for _, v in ipairs(EnumItems) do
-		if (not FFlagMountCoreGuiBackpack or v ~= Enum.CoreGuiType.Backpack) and ((not FFlagTopBarSignalizeHealthBar or v ~= Enum.CoreGuiType.Health) and v ~= Enum.CoreGuiType.All) then
-			p1.props.updateCoreGuiEnabled(v, StarterGui:GetCoreGuiEnabled(v))
+function extended.didMount(p)
+	local enumItems = Enum.CoreGuiType:GetEnumItems()
+
+	for _, enumItem in ipairs(enumItems) do
+		if not ((not FFlagMountCoreGuiBackpack or enumItem ~= Enum.CoreGuiType.Backpack) and (not FFlagTopBarSignalizeHealthBar or enumItem ~= Enum.CoreGuiType.Health) and enumItem ~= Enum.CoreGuiType.All) then
+			continue
 		end
+
+		p.props.updateCoreGuiEnabled(enumItem, StarterGui:GetCoreGuiEnabled(enumItem))
 	end
 end
-function v13.render(p2) -- line: 50
-	-- upvalues: Roact (copy), EventConnection (copy), StarterGui (copy), FFlagMountCoreGuiBackpack (copy)
+
+function extended.render(p)
 	return Roact.createFragment({
 		CoreGuiChangedConnection = Roact.createElement(EventConnection, {
 			event = StarterGui.CoreGuiChangedSignal,
-			callback = function(p3, p4) -- line: 54
-				-- upvalues: FFlagMountCoreGuiBackpack (copy), p2 (copy)
+			callback = function(p2, p3)
 				if FFlagMountCoreGuiBackpack then
-					if p3 ~= Enum.CoreGuiType.Backpack then
-						p2.props.updateCoreGuiEnabled(p3, p4)
-
-						return
+					if p2 ~= Enum.CoreGuiType.Backpack then
+						p.props.updateCoreGuiEnabled(p2, p3)
 					end
 				else
-					p2.props.updateCoreGuiEnabled(p3, p4)
+					p.props.updateCoreGuiEnabled(p2, p3)
 				end
 			end
 		})
 	})
 end
 
-local function mapDispatchToProps(p5) -- line: 68
-	-- upvalues: UpdateCoreGuiEnabled (copy)
+local function mapDispatchToProps(callback)
 	return {
-		updateCoreGuiEnabled = function(p6, p7) -- line: 70
-			-- upvalues: p5 (copy), UpdateCoreGuiEnabled (copy)
-			return p5(UpdateCoreGuiEnabled(p6, p7))
+		updateCoreGuiEnabled = function(p, p2)
+			return callback(UpdateCoreGuiEnabled(p, p2))
 		end
 	}
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(v13)
+return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(extended)

@@ -1,5 +1,1 @@
-return {
-	Unknown = "unknown",
-	Eligible = "eligible",
-	Ineligible = "ineligible"
-}
+return { Unknown = "unknown", Eligible = "eligible", Ineligible = "ineligible" }

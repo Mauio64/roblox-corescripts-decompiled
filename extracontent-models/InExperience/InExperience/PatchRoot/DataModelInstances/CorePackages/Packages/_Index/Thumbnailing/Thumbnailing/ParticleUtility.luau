@@ -1,78 +1,73 @@
-local t1 = {
-	InstanceIsAParticleEffect = function(p1) -- line: 10
-		return p1:IsA("ParticleEmitter") or (p1:IsA("Fire") or (p1:IsA("Smoke") or p1:IsA("Sparkles")))
-	end
-}
+local ParticleUtility = {}
 
-local function recurFastForwardParticles(p2) -- line: 14
-	-- upvalues: t1 (copy), recurFastForwardParticles (copy)
-	if t1.InstanceIsAParticleEffect(p2) then
-		p2:FastForward(240)
+function ParticleUtility.InstanceIsAParticleEffect(instance)
+	return instance:IsA("ParticleEmitter") or instance:IsA("Fire") or instance:IsA("Smoke") or instance:IsA("Sparkles")
+end
+
+local function recurFastForwardParticles(instance)
+	if ParticleUtility.InstanceIsAParticleEffect(instance) then
+		instance:FastForward(240)
 	end
 
-	for _, child in (p2:GetChildren()) do
+	local children = instance:GetChildren()
+
+	for _, child in children do
 		recurFastForwardParticles(child)
 	end
 end
 
-function t1.FastForwardParticles(p3) -- line: 25
-	-- upvalues: recurFastForwardParticles (copy)
-	recurFastForwardParticles(p3)
+function ParticleUtility.FastForwardParticles(p)
+	recurFastForwardParticles(p)
 end
 
-local function findNearestBasePart(p4) -- line: 30
-	local p4Parent = p4.Parent
+local function findNearestBasePart(instance)
+	local parent = instance.Parent
 
-	while p4Parent do
-		if p4Parent:IsA("BasePart") then
-			return p4Parent
+	while parent do
+		if parent:IsA("BasePart") then
+			return parent
 		end
 
-		if p4Parent:IsA("Tool") then
-			local Handle = p4Parent:FindFirstChild("Handle")
+		if parent:IsA("Tool") then
+			local handle = parent:FindFirstChild("Handle")
 
-			if Handle and Handle:IsA("BasePart") then
-				return Handle
+			if handle and handle:IsA("BasePart") then
+				return handle
 			end
 		end
 
-		if p4Parent:IsA("Model") then
-			local PrimaryPart = p4Parent.PrimaryPart
+		local primaryPart = parent:IsA("Model") and parent.PrimaryPart
 
-			if PrimaryPart then
-				return PrimaryPart
-			end
+		if primaryPart then
+			return primaryPart
 		end
 
-		p4Parent = p4Parent.Parent
+		parent = parent.Parent
 	end
 
 	return nil
 end
-local function recurReparentOrphanedEffects(p5) -- line: 60
-	-- upvalues: t1 (copy), findNearestBasePart (copy), recurReparentOrphanedEffects (copy)
-	if t1.InstanceIsAParticleEffect(p5) then
-		local p5Parent = p5.Parent
 
-		if p5Parent and not p5Parent:IsA("BasePart") and not p5Parent:IsA("Attachment") then
-			local v16 = findNearestBasePart(p5)
+local function recurReparentOrphanedEffects(instance)
+	if ParticleUtility.InstanceIsAParticleEffect(instance) then
+		local parent = instance.Parent
+		local parent2 = parent
+			and not parent:IsA("BasePart")
+			and not parent:IsA("Attachment")
+			and findNearestBasePart(instance)
 
-			if v16 then
-				p5.Parent = v16
-			end
+		if parent2 then
+			instance.Parent = parent2
 		end
-
-		return
-	end
-
-	for _, child in p5:GetChildren() do
-		recurReparentOrphanedEffects(child)
+	else
+		for _, child in instance:GetChildren() do
+			recurReparentOrphanedEffects(child)
+		end
 	end
 end
 
-function t1.ReparentOrphanedParticleEffects(p6) -- line: 77
-	-- upvalues: recurReparentOrphanedEffects (copy)
-	recurReparentOrphanedEffects(p6)
+function ParticleUtility.ReparentOrphanedParticleEffects(p)
+	recurReparentOrphanedEffects(p)
 end
 
-return t1
+return ParticleUtility

@@ -1,30 +1,24 @@
-local ParentParent = script.Parent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
 
-require(ParentParent.networkingShareLinkTypes)
+local API_URL = require(parent.API_URL)
+require(parent.networkingShareLinkTypes)
 
-return function(p1) -- line: 6
-	-- upvalues: API_URL (copy)
-	local v4 = p1.roduxNetworking.POST({
-		Name = "get-metadata"
-	}, function(p2, p3) -- line: 11
-		-- upvalues: API_URL (copy)
-		return p2(API_URL):path("sharelinks"):path("v1"):path("get-metadata"):body({
-			linkType = p3.linkType,
-			linkId = p3.linkId
+return function(p)
+	local post = p.roduxNetworking.POST("get-metadata", function(callback, p2)
+		return callback(API_URL):path("sharelinks"):path("v1"):path("get-metadata"):body({
+			linkType = p2.linkType,
+			linkId = p2.linkId
 		})
 	end)
 
-	if p1.useMockedResponse then
-		v4.Mock.clear()
-		v4.Mock.reply(function() -- line: 21
+	if p.useMockedResponse then
+		post.Mock.clear()
+		post.Mock.reply(function()
 			return {
-				responseBody = {
-					data = "{ \"universeId\": 123, \"placeId\": 456 }"
-				}
+				responseBody = { data = "{ \"universeId\": 123, \"placeId\": 456 }" }
 			}
 		end)
 	end
 
-	return v4
+	return post
 end

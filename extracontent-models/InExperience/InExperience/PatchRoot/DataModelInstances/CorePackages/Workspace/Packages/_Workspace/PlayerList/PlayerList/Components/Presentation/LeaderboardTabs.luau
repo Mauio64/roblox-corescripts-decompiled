@@ -1,105 +1,128 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local SignalsReact = require(ParentParentParent.SignalsReact)
-local Foundation = require(ParentParentParent.Foundation)
-local RobloxTranslator = require(ParentParentParent.RobloxTranslator)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local SignalsReact = require(parent2.SignalsReact)
+local Foundation = require(parent2.Foundation)
+local RobloxTranslator = require(parent2.RobloxTranslator)
+local Localization = require(parent2.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local IXPServiceWrapper = require(parent2.IXPServiceWrapper)
+local ixpServiceWrapper = IXPServiceWrapper.IXPServiceWrapper
+
 local View = Foundation.View
 local Tabs = Foundation.Tabs
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
-local usePlatformLeaderboard = require(ParentParent.Hooks.usePlatformLeaderboard)
-local FallbackSignals = require(ParentParent.Common.FallbackSignals)
 
-local function translateOr(s1: string, s2: string) -- line: 19
-	-- upvalues: RobloxTranslator (copy)
-	local ok, result = pcall(function() -- line: 20
-		-- upvalues: RobloxTranslator (copy), s1 (copy)
-		return RobloxTranslator:FormatByKey(s1)
+local usePlatformLeaderboard = require(parent.Hooks.usePlatformLeaderboard)
+local FallbackSignals = require(parent.Common.FallbackSignals)
+local FFlagPlayerListLocalizeGameText = require(parent.Flags.FFlagPlayerListLocalizeGameText)
+local PlayerListVisibilityStore = require(parent.Common.PlayerListVisibilityStore)
+
+local FFlagPlatformLeaderboardsExposure3Enabled = require(parent.Flags.FFlagPlatformLeaderboardsExposure3Enabled)
+local FStringPlatformLeaderboardsExposure3Layer = require(parent.Flags.FStringPlatformLeaderboardsExposure3Layer)
+
+local function translateOrLegacy(p: string, p2: string) -- 3 equivalent calls inferred from this helper
+	local success, result = pcall(function()
+		return RobloxTranslator:FormatByKey(p)
 	end)
-
-	if ok and (result and result ~= "") then
-		return result
-	end
-
-	return s2
+	return if success and result and result ~= "" then result else p2
 end
 
-local t1 = {}
-local t2 = {
-	id = "server"
+local v = {
+	{
+		id = "server",
+		text = translateOrLegacy("CoreScripts.TextChat.ChannelTabs.Here", "Here") -- inferred equivalent call
+	},
+	{
+		id = "friends",
+		text = translateOrLegacy("CommonUI.Features.Label.Friends", "Friends") -- inferred equivalent call
+	},
+	{
+		id = "global",
+		text = translateOrLegacy("CoreScripts.TextChat.ChannelTabs.Global2", "Global") -- inferred equivalent call
+	}
 }
-local s3 = "CoreScripts.TextChat.ChannelTabs.Here"
-local ok, result = pcall(function() -- line: 20
-	-- upvalues: RobloxTranslator (copy), s3 (copy)
-	return RobloxTranslator:FormatByKey(s3)
-end)
 
-t2.text = (not ok or (not result or result == "")) and "Here" or result
+local function LeaderboardTabs(props)
+	local v2 = usePlatformLeaderboard()
+	local v3
 
-local t3 = {
-	id = "friends"
-}
-local s4 = "CommonUI.Features.Label.Friends"
-local ok2, result2 = pcall(function() -- line: 20
-	-- upvalues: RobloxTranslator (copy), s4 (copy)
-	return RobloxTranslator:FormatByKey(s4)
-end)
-
-t3.text = (not ok2 or (not result2 or result2 == "")) and "Friends" or result2
-
-local t4 = {
-	id = "global"
-}
-local s5 = "CoreScripts.TextChat.ChannelTabs.Global2"
-local ok3, result3 = pcall(function() -- line: 20
-	-- upvalues: RobloxTranslator (copy), s5 (copy)
-	return RobloxTranslator:FormatByKey(s5)
-end)
-
-t4.text = (not ok3 or (not result3 or result3 == "")) and "Global" or result3
-t1[1] = t2
-t1[2] = t3
-t1[3] = t4
-
-local function LeaderboardTabs(t5: {[any]: any}) -- line: 42
-	-- upvalues: usePlatformLeaderboard (copy), FallbackSignals (copy), SignalsReact (copy), React (copy), View (copy), Tabs (copy), InputSize (copy), FillBehavior (copy), t1 (copy)
-	local v33 = usePlatformLeaderboard()
-	local v34 = if v33 == nil then FallbackSignals.getHasActiveLeaderboard else v33.getHasActiveLeaderboard
-	local v35 = SignalsReact.useSignalState(v34)
-
-	React.useEffect(function() -- line: 51
-		-- upvalues: v35 (copy), t5 (copy)
-		if not v35 and t5.onPlatformTabsUnavailable then
-			t5.onPlatformTabsUnavailable()
-		end
-	end, {
-		v35,
-		t5.onPlatformTabsUnavailable
-	})
-
-	local v36 = React.useCallback(function(p1) -- line: 57
-		-- upvalues: t5 (copy)
-		t5.onActivated((tostring(p1)))
-	end, { t5.onActivated })
-
-	if not v35 then
-		return nil
+	if v2 == nil then
+		v3 = FallbackSignals.getHasActiveLeaderboard
+	else
+		v3 = v2.getHasActiveLeaderboard
 	end
 
-	return React.createElement(View, {
-		Name = "CoreUI_LeaderboardTabs",
-		tag = "col size-full-0 auto-y",
-		LayoutOrder = t5.layoutOrder
-	}, {
-		Tabs = React.createElement(Tabs, {
-			activeTabId = t5.activeTabId,
-			size = InputSize.Small,
-			fillBehavior = FillBehavior.Fill,
-			onActivated = v36,
-			tabs = t1
+	local v4 = SignalsReact.useSignalState(v3)
+
+	if FFlagPlatformLeaderboardsExposure3Enabled then
+		local v5 = SignalsReact.useSignalState(PlayerListVisibilityStore.getEffectiveVisible)
+
+		if props.isVisible ~= nil then
+			v5 = props.isVisible
+		end
+
+		local ref = React.useRef(false)
+
+		React.useEffect(function()
+			if v5 and v4 and not ref.current then
+				ref.current = true
+				ixpServiceWrapper:LogFlagLinkedUserLayerExposure(FStringPlatformLeaderboardsExposure3Layer)
+			end
+		end, { v4, v5 })
+	end
+
+	local tabs
+
+	if FFlagPlayerListLocalizeGameText then
+		local v5 = useLocalization({
+			here = "CoreScripts.InGameMenu.Controls.Playerlist.Here",
+			friends = "CoreScripts.InGameMenu.Controls.Playerlist.Friends",
+			global = "CoreScripts.InGameMenu.Controls.Playerlist.Global"
 		})
-	})
+
+		tabs = {
+			{ id = "server", text = v5.here },
+			{ id = "friends", text = v5.friends },
+			{ id = "global", text = v5.global }
+		}
+	else
+		tabs = v
+	end
+
+	React.useEffect(function()
+		if not v4 and props.onPlatformTabsUnavailable then
+			props.onPlatformTabsUnavailable()
+		end
+	end, { v4, props.onPlatformTabsUnavailable })
+
+	local onActivated = React.useCallback(function(p)
+		props.onActivated((tostring(p)))
+	end, { props.onActivated })
+
+	if v4 then
+		return React.createElement(
+			View,
+			{
+				Name = "CoreUI_LeaderboardTabs",
+				LayoutOrder = props.layoutOrder,
+				tag = "col size-full-0 auto-y"
+			},
+			{
+				Tabs = React.createElement(Tabs, {
+					activeTabId = props.activeTabId,
+					size = InputSize.Small,
+					fillBehavior = FillBehavior.Fill,
+					onActivated = onActivated,
+					tabs = tabs
+				})
+			}
+		)
+	end
+
+	return nil
 end
 
 return React.memo(LeaderboardTabs)

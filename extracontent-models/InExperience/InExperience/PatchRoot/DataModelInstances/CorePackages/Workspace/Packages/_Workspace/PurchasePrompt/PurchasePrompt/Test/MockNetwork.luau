@@ -1,18 +1,20 @@
-local ParentParent = script.Parent.Parent
-local Promise = require(ParentParent.Promise)
-local PurchaseWarning = require(ParentParent.Enums.PurchaseWarning)
-local FFlagRefreshPriceOnRetryAfterUpsell = require(ParentParent.Flags.FFlagRefreshPriceOnRetryAfterUpsell)
+local parent = script.Parent.Parent
+local Promise = require(parent.Promise)
 
-local function getABTestGroup() -- line: 13
-	-- upvalues: Promise (copy)
+local PurchaseWarning = require(parent.Enums.PurchaseWarning)
+
+local FFlagRefreshPriceOnRetryAfterUpsell = require(parent.Flags.FFlagRefreshPriceOnRetryAfterUpsell)
+
+local function getABTestGroup()
 	return Promise.resolve(false)
 end
-local function getProductInfo(_, _) -- line: 17
-	-- upvalues: Promise (copy)
+
+local function getProductInfo(_, _)
 	return Promise.resolve({
 		AssetId = 1,
 		AssetTypeId = 2,
 		ContentRatingTypeId = 0,
+		Creator = { CreatorType = "Group", CreatorTargetId = 1, Name = "ROBLOX", Id = 1 },
 		Description = "This item isn't real!",
 		IconImageAssetId = 1,
 		IsForSale = true,
@@ -23,80 +25,61 @@ local function getProductInfo(_, _) -- line: 17
 		MinimumMembershipLevel = 0,
 		Name = "Test Item",
 		PriceInRobux = 100,
-		ProductId = 1,
-		Creator = {
-			CreatorType = "Group",
-			CreatorTargetId = 1,
-			Name = "ROBLOX",
-			Id = 1
-		}
+		ProductId = 1
 	})
 end
-local function getPlayerOwns(_, _, _) -- line: 42
-	-- upvalues: Promise (copy)
+
+local function getPlayerOwns(_, _, _)
 	return Promise.resolve(false)
 end
-local function performPurchase(_, _, _, _) -- line: 46
-	-- upvalues: Promise (copy)
-	return Promise.resolve({
-		success = true,
-		purchased = true,
-		receipt = "fake-receipt-hash"
-	})
+
+local function performPurchase(_, _, _, _)
+	return Promise.resolve({ success = true, purchased = true, receipt = "fake-receipt-hash" })
 end
-local function loadAssetForEquip(_) -- line: 54
-	-- upvalues: Promise (copy)
+
+local function loadAssetForEquip(_)
 	return Promise.resolve(Instance.new("Tool"))
 end
-local function getAccountInfo() -- line: 58
-	-- upvalues: Promise (copy)
-	return Promise.resolve({
-		isPremium = false
-	})
+
+local function getAccountInfo()
+	return Promise.resolve({ isPremium = false })
 end
-local function getBalanceInfo() -- line: 64
-	-- upvalues: Promise (copy)
-	return Promise.resolve({
-		robux = 2147483647
-	})
+
+local function getBalanceInfo()
+	return Promise.resolve({ robux = 2147483647 })
 end
-local function getBundleDetails(_) -- line: 70
-	-- upvalues: Promise (copy)
+
+local function getBundleDetails(_)
 	return Promise.resolve({
 		id = 1,
 		name = "mock-name",
 		description = "mock-description",
 		items = {
-			[1] = {
-				id = 1,
-				name = "outfit-name",
-				type = "UserOutfit"
-			}
+			{ id = 1, name = "outfit-name", type = "UserOutfit" }
 		},
-		creator = {
-			id = 1,
-			name = "ROBLOX",
-			type = "User"
-		},
-		product = {
-			id = 1,
-			isForSale = true,
-			priceInRobux = 100
-		}
+		creator = { id = 1, name = "ROBLOX", type = "User" },
+		product = { id = 1, isForSale = true, priceInRobux = 100 }
 	})
 end
-local function getProductPurchasableDetails(_) -- line: 95
-	-- upvalues: Promise (copy)
-	return Promise.resolve({
-		purchasable = false,
-		reason = "mock-reason",
-		price = 100
-	})
+
+local function getProductPurchasableDetails(_)
+	return Promise.resolve({ purchasable = false, reason = "mock-reason", price = 100 })
 end
-local function getCatalogItemDetails(_: number, _: string) -- line: 103
-	-- upvalues: Promise (copy)
+
+local function getCatalogItemDetails(_: number, _: string)
 	return Promise.resolve({
 		bundleType = 1,
+		bundledItems = {
+			{ id = 10001, name = "Mock bundle - Left Arm", owned = true, type = "Asset" },
+			{ id = 1002, name = "Mock bundle - Right Leg", owned = true, type = "Asset" },
+			{ id = 1003, name = "Mock bundle - Right Arm", owned = true, type = "Asset" },
+			{ id = 1004, name = "Mock bundle - Left Leg", owned = true, type = "Asset" },
+			{ id = 1005, name = "Mock bundle - Dynamic Head", owned = true, type = "Asset" },
+			{ id = 1006, name = "Default Mood", owned = true, type = "Asset" },
+			{ id = 1007, name = "Mock bundle - Torso", owned = true, type = "Asset" },
+			{ id = 1008, name = "Mock item", owned = true, type = "UserOutfit" },
+			{ id = 1009, name = "Mock bundle Head", owned = true, type = "UserOutfit" }
+		},
 		collectibleItemId = "random-collectible-item-id-123",
 		creatorHasVerifiedBadge = true,
 		creatorName = "mockRobloxCreator",
@@ -108,6 +91,8 @@ local function getCatalogItemDetails(_: number, _: string) -- line: 103
 		hasReseller = false,
 		id = 123456,
 		isPurchasable = true,
+		itemRestrictions = {},
+		itemStatus = {},
 		itemType = "Bundle",
 		lowestPrice = 175,
 		lowestResalePrice = 0,
@@ -118,76 +103,15 @@ local function getCatalogItemDetails(_: number, _: string) -- line: 103
 		purchaseCount = 0,
 		saleLocationType = "ShopAndAllExperiences",
 		totalQuantity = 0,
-		unitsAvailableForConsumption = 0,
-		bundledItems = {
-			[1] = {
-				id = 10001,
-				name = "Mock bundle - Left Arm",
-				owned = true,
-				type = "Asset"
-			},
-			[2] = {
-				id = 1002,
-				name = "Mock bundle - Right Leg",
-				owned = true,
-				type = "Asset"
-			},
-			[3] = {
-				id = 1003,
-				name = "Mock bundle - Right Arm",
-				owned = true,
-				type = "Asset"
-			},
-			[4] = {
-				id = 1004,
-				name = "Mock bundle - Left Leg",
-				owned = true,
-				type = "Asset"
-			},
-			[5] = {
-				id = 1005,
-				name = "Mock bundle - Dynamic Head",
-				owned = true,
-				type = "Asset"
-			},
-			[6] = {
-				id = 1006,
-				name = "Default Mood",
-				owned = true,
-				type = "Asset"
-			},
-			[7] = {
-				id = 1007,
-				name = "Mock bundle - Torso",
-				owned = true,
-				type = "Asset"
-			},
-			[8] = {
-				id = 1008,
-				name = "Mock item",
-				owned = true,
-				type = "UserOutfit"
-			},
-			[9] = {
-				id = 1009,
-				name = "Mock bundle Head",
-				owned = true,
-				type = "UserOutfit"
-			}
-		},
-		itemRestrictions = {},
-		itemStatus = {}
+		unitsAvailableForConsumption = 0
 	})
 end
-local function getResellers(_: string, _: number?) -- line: 189
-	-- upvalues: Promise (copy)
-	return Promise.resolve({
-		nextPageCursor = nil,
-		data = {}
-	})
+
+local function getResellers(_: string, _: number?)
+	return Promise.resolve({ data = {}, nextPageCursor = nil })
 end
-local function getRobuxUpsellProductWithUniverseItemInfo(_, _, _, _, _, _) -- line: 196
-	-- upvalues: Promise (copy)
+
+local function getRobuxUpsellProductWithUniverseItemInfo(_, _, _, _, _, _)
 	return Promise.resolve({
 		roblox_product_id = 50,
 		provider_product_id = "robux50",
@@ -195,40 +119,24 @@ local function getRobuxUpsellProductWithUniverseItemInfo(_, _, _, _, _, _) -- li
 		robux_amount = 500
 	})
 end
-local function postPremiumImpression() -- line: 212
-	-- upvalues: Promise (copy)
+
+local function getPurchaseWarning(_)
+	return Promise.resolve({ action = PurchaseWarning.NoAction })
+end
+
+local function postPurchaseWarningAcknowledge()
 	return Promise.resolve()
 end
-local function getPremiumUpsellPrecheck() -- line: 216
-	-- upvalues: Promise (copy)
-	return Promise.resolve(true)
+
+local function checkUserPurchaseSettings()
+	return Promise.resolve({ isEligible = false, failureReason = "PurchaseNotEnabled" })
 end
-local function getPurchaseWarning(_) -- line: 220
-	-- upvalues: Promise (copy), PurchaseWarning (copy)
-	return Promise.resolve({
-		action = PurchaseWarning.NoAction
-	})
+
+local function getUnifiedPurchaseFlowUserEligibility()
+	return Promise.resolve({ isUserEligibleForUnifiedPurchaseFlow = true, expiresInSeconds = 120 })
 end
-local function postPurchaseWarningAcknowledge() -- line: 226
-	-- upvalues: Promise (copy)
-	return Promise.resolve()
-end
-local function checkUserPurchaseSettings() -- line: 230
-	-- upvalues: Promise (copy)
-	return Promise.resolve({
-		isEligible = false,
-		failureReason = "PurchaseNotEnabled"
-	})
-end
-local function getUnifiedPurchaseFlowUserEligibility() -- line: 237
-	-- upvalues: Promise (copy)
-	return Promise.resolve({
-		isUserEligibleForUnifiedPurchaseFlow = true,
-		expiresInSeconds = 120
-	})
-end
-local function getSubscriptionProductInfo(_) -- line: 244
-	-- upvalues: Promise (copy)
+
+local function getSubscriptionProductInfo(_)
 	return Promise.resolve({
 		Name = "Mock Subscription",
 		Description = "A mock developer subscription",
@@ -241,60 +149,73 @@ local function getSubscriptionProductInfo(_) -- line: 244
 		PriceInRobux = 0
 	})
 end
-local function GetLookDetailsV2ProductInfo(_) -- line: 258
-	-- upvalues: Promise (copy)
+
+local function GetLookDetailsV2ProductInfo(_)
 	return Promise.resolve({
 		look = {
-			items = {{
-				id = 1,
-				itemType = "Asset",
-				priceInRobux = 100
-			}}
+			items = {
+				{ id = 1, itemType = "Asset", priceInRobux = 100 }
+			}
 		}
 	})
 end
 
-local t1 = {}
+local MockNetwork = {}
+MockNetwork.__index = MockNetwork
 
-t1.__index = t1
+function MockNetwork.new(p, p2)
+	local v
 
-function t1.new(p22, p23) -- line: 275
-	-- upvalues: Promise (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), getABTestGroup (copy), getProductInfo (copy), getPlayerOwns (copy), performPurchase (copy), loadAssetForEquip (copy), getAccountInfo (copy), getBalanceInfo (copy), getBundleDetails (copy), getProductPurchasableDetails (copy), getCatalogItemDetails (copy), getResellers (copy), getRobuxUpsellProductWithUniverseItemInfo (copy), postPremiumImpression (copy), getPremiumUpsellPrecheck (copy), getPurchaseWarning (copy), postPurchaseWarningAcknowledge (copy), checkUserPurchaseSettings (copy), getUnifiedPurchaseFlowUserEligibility (copy), getSubscriptionProductInfo (copy), GetLookDetailsV2ProductInfo (copy)
-	local t2
-
-	if p23 or p22 then
-		local function v53() -- line: 279
-			-- upvalues: p22 (copy), Promise (copy), p23 (copy)
-			if p22 then
-				return Promise.resolve(p22)
+	if p2 or p then
+		local function fn()
+			if p then
+				return Promise.resolve(p)
 			end
 
-			return Promise.reject(p23)
+			return Promise.reject(p2)
 		end
 
-		t2 = {
-			getABTestGroup = v53,
-			getProductInfo = v53,
-			getPlayerOwns = v53,
-			performPurchase = v53,
-			loadAssetForEquip = v53,
-			getAccountInfo = v53,
-			getBalanceInfo = v53,
-			getBundleDetails = v53,
-			getProductPurchasableDetails = v53,
-			getCatalogItemDetails = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else v53,
-			getResellers = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else v53,
-			getRobuxUpsellProductWithUniverseItemInfo = v53,
-			postPremiumImpression = v53,
-			getPremiumUpsellPrecheck = v53,
-			getPurchaseWarning = v53,
-			postPurchaseWarningAcknowledge = v53,
-			checkUserPurchaseSettings = v53,
-			getUnifiedPurchaseFlowUserEligibility = v53,
-			getSubscriptionProductInfo = v53
+		v = {
+			getABTestGroup = fn,
+			getProductInfo = fn,
+			getPlayerOwns = fn,
+			performPurchase = fn,
+			loadAssetForEquip = fn,
+			getAccountInfo = fn,
+			getBalanceInfo = fn,
+			getBundleDetails = fn,
+			getProductPurchasableDetails = fn,
+			getCatalogItemDetails = 0,
+			getResellers = 0,
+			getRobuxUpsellProductWithUniverseItemInfo = 0,
+			getPurchaseWarning = 0,
+			postPurchaseWarningAcknowledge = 0,
+			checkUserPurchaseSettings = 0,
+			getUnifiedPurchaseFlowUserEligibility = 0,
+			getSubscriptionProductInfo = 0
 		}
+		local getCatalogItemDetails2
+
+		if FFlagRefreshPriceOnRetryAfterUpsell then
+			getCatalogItemDetails2 = fn
+		end
+
+		v.getCatalogItemDetails = getCatalogItemDetails2
+		local getResellers2
+
+		if FFlagRefreshPriceOnRetryAfterUpsell then
+			getResellers2 = fn
+		end
+
+		v.getResellers = getResellers2
+		v.getRobuxUpsellProductWithUniverseItemInfo = fn
+		v.getPurchaseWarning = fn
+		v.postPurchaseWarningAcknowledge = fn
+		v.checkUserPurchaseSettings = fn
+		v.getUnifiedPurchaseFlowUserEligibility = fn
+		v.getSubscriptionProductInfo = fn
 	else
-		t2 = {
+		v = {
 			getABTestGroup = getABTestGroup,
 			getProductInfo = getProductInfo,
 			getPlayerOwns = getPlayerOwns,
@@ -304,27 +225,46 @@ function t1.new(p22, p23) -- line: 275
 			getBalanceInfo = getBalanceInfo,
 			getBundleDetails = getBundleDetails,
 			getProductPurchasableDetails = getProductPurchasableDetails,
-			getCatalogItemDetails = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else getCatalogItemDetails,
-			getResellers = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else getResellers,
-			getRobuxUpsellProductWithUniverseItemInfo = getRobuxUpsellProductWithUniverseItemInfo,
-			postPremiumImpression = postPremiumImpression,
-			getPremiumUpsellPrecheck = getPremiumUpsellPrecheck,
-			getPurchaseWarning = getPurchaseWarning,
-			postPurchaseWarningAcknowledge = postPurchaseWarningAcknowledge,
-			checkUserPurchaseSettings = checkUserPurchaseSettings,
-			getUnifiedPurchaseFlowUserEligibility = getUnifiedPurchaseFlowUserEligibility,
-			getSubscriptionProductInfo = getSubscriptionProductInfo,
-			GetLookDetailsV2ProductInfo = GetLookDetailsV2ProductInfo
+			getCatalogItemDetails = 0,
+			getResellers = 0,
+			getRobuxUpsellProductWithUniverseItemInfo = 0,
+			getPurchaseWarning = 0,
+			postPurchaseWarningAcknowledge = 0,
+			checkUserPurchaseSettings = 0,
+			getUnifiedPurchaseFlowUserEligibility = 0,
+			getSubscriptionProductInfo = 0,
+			GetLookDetailsV2ProductInfo = 0
 		}
+		local getCatalogItemDetails2
+
+		if FFlagRefreshPriceOnRetryAfterUpsell then
+			getCatalogItemDetails2 = getCatalogItemDetails
+		end
+
+		v.getCatalogItemDetails = getCatalogItemDetails2
+		local getResellers2
+
+		if FFlagRefreshPriceOnRetryAfterUpsell then
+			getResellers2 = getResellers
+		end
+
+		v.getResellers = getResellers2
+		v.getRobuxUpsellProductWithUniverseItemInfo = getRobuxUpsellProductWithUniverseItemInfo
+		v.getPurchaseWarning = getPurchaseWarning
+		v.postPurchaseWarningAcknowledge = postPurchaseWarningAcknowledge
+		v.checkUserPurchaseSettings = checkUserPurchaseSettings
+		v.getUnifiedPurchaseFlowUserEligibility = getUnifiedPurchaseFlowUserEligibility
+		v.getSubscriptionProductInfo = getSubscriptionProductInfo
+		v.GetLookDetailsV2ProductInfo = GetLookDetailsV2ProductInfo
 	end
 
-	setmetatable(t2, {
-		__tostring = function() -- line: 333
+	setmetatable(v, {
+		__tostring = function(): string
 			return "MockService(Network)"
 		end
 	})
 
-	return t2
+	return v
 end
 
-return t1
+return MockNetwork

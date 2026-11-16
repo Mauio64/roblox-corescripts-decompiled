@@ -1,6 +1,6 @@
 local self = setmetatable({}, {
-	__index = function(_, p2) -- line: 2
-		error(("Invalid TimeZone \"%s\""):format((tostring(p2))), 2)
+	__index = function(_, p)
+		error(("Invalid TimeZone \"%s\""):format((tostring(p))), 2)
 	end
 })
 

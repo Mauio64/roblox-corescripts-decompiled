@@ -1,5 +1,5 @@
-if not game:GetEngineFeature("CoreAttributes") then
-	return false
+if game:GetEngineFeature("CoreAttributes") then
+	return game:DefineFastFlag("LeaderstatsWithASideOfClient", false)
 end
 
-return game:DefineFastFlag("LeaderstatsWithASideOfClient", false)
+return false

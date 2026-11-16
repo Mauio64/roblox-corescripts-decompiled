@@ -1,3 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
+local enumerate = require(CorePackages.Packages.enumerate)
 
-return (require(CorePackages.Packages.enumerate))
+return enumerate

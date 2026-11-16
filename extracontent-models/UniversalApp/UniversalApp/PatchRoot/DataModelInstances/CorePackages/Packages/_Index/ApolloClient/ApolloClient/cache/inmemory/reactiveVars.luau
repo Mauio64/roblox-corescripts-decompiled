@@ -1,124 +1,117 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local t1 = {}
-local dep = require(ParentParent.optimism).dep
-local Slot = require(ParentParent.wry.context).Slot
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local optimism = require(parent.optimism)
+local dep = optimism.dep
+
+local context = require(parent.wry.context)
+local slot = context.Slot
 
 require(script.Parent.Parent.core.cache)
 
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Set = LuauPolyfill.Set
 local WeakMap = LuauPolyfill.WeakMap
-local broadcast = nil
-local v11 = Slot.new()
 
-t1.cacheSlot = v11
+local broadcast
 
-local v12 = WeakMap.new()
+local cacheSlot = slot.new()
+local ReactiveVars = {}
+ReactiveVars.cacheSlot = cacheSlot
+local v = WeakMap.new()
 
-local function getCacheInfo(p1) -- line: 57
-	-- upvalues: v12 (copy), Set (copy), dep (copy)
-	local v15 = v12:get(p1)
+local function getCacheInfo(p)
+	local cacheInfo = v:get(p)
 
-	if not v15 then
-		v15 = {
-			vars = Set.new(),
-			dep = dep()
-		}
-		v12:set(p1, v15)
+	if not cacheInfo then
+		cacheInfo = { vars = Set.new(), dep = dep() }
+
+		v:set(p, cacheInfo)
 	end
 
-	return v15
+	return cacheInfo
 end
 
-function t1.forgetCache(p2) -- line: 73
-	-- upvalues: getCacheInfo (copy)
-	getCacheInfo(p2).vars:forEach(function(p3) -- line: 74
-		-- upvalues: p2 (copy)
-		return p3:forgetCache(p2)
+function ReactiveVars:forgetCache()
+	getCacheInfo(self).vars:forEach(function(object)
+		return object:forgetCache(self)
 	end)
 end
-function t1.recallCache(p4) -- line: 88
-	-- upvalues: getCacheInfo (copy)
-	getCacheInfo(p4).vars:forEach(function(p5) -- line: 89
-		-- upvalues: p4 (copy)
-		return p5:attachCache(p4)
-	end)
-end
-function t1.makeVar(p6) -- line: 95
-	-- upvalues: Set (copy), getCacheInfo (copy), broadcast (ref), Array (copy), v11 (copy)
-	local v20 = Set.new()
-	local v21 = Set.new()
-	local self = nil
-	local u23 = nil
 
-	self = setmetatable({}, {
-		__call = function(_, ...) -- line: 104
-			-- upvalues: p6 (ref), v20 (copy), getCacheInfo (copy), self (ref), broadcast (ref), Array (copy), v21 (copy), v11 (copy), u23 (ref)
+function ReactiveVars.recallCache(p)
+	getCacheInfo(p).vars:forEach(function(object)
+		return object:attachCache(p)
+	end)
+end
+
+function ReactiveVars.makeVar(p)
+	local v2 = Set.new()
+	local v3 = Set.new()
+	local var = nil
+
+	local fn
+
+	var = setmetatable({}, {
+		__call = function(_, ...)
 			if select("#", ...) >= 1 then
-				local v28 = ({ ... })[1]
+				local v4 = ({ ... })[1]
 
-				if v28 ~= p6 then
-					p6 = v28
-					v20:forEach(function(p8) -- line: 110
-						-- upvalues: getCacheInfo (copy), self (ref), broadcast (ref)
-						getCacheInfo(p8).dep:dirty(self)
-						broadcast(p8)
+				if p ~= v4 then
+					p = v4
+					v2:forEach(function(p2)
+						getCacheInfo(p2).dep:dirty(var)
+
+						broadcast(p2)
 					end)
 
-					local v29 = Array.from(v21)
-
-					v21:clear()
-					Array.forEach(v29, function(p9) -- line: 122
-						-- upvalues: p6 (ref)
-						p9(p6)
+					local v5 = Array.from(v3)
+					v3:clear()
+					Array.forEach(v5, function(callback)
+						callback(p)
 					end)
 				end
 			else
-				local v30 = v11:getValue()
+				local value = cacheSlot:getValue()
 
-				if v30 then
-					u23(v30)
-					getCacheInfo(v30).dep(self)
+				if value then
+					fn(value)
+					getCacheInfo(value).dep(var)
 				end
 			end
 
-			return p6
+			return p
 		end
 	})
 
-	function self.onNextChange(_, p11) -- line: 142
-		-- upvalues: v21 (copy)
-		v21:add(p11)
-
-		return function() -- line: 144
-			-- upvalues: v21 (copy), p11 (copy)
-			v21:delete(p11)
+	function var.onNextChange(_, p2)
+		v3:add(p2)
+		return function()
+			v3:delete(p2)
 		end
 	end
-	function u23(p12) -- line: 150
-		-- upvalues: v20 (copy), getCacheInfo (copy), self (ref)
-		v20:add(p12)
-		getCacheInfo(p12).vars:add(self)
 
-		return self
-	end
-	function self.attachCache(_, p14) -- line: 155
-		-- upvalues: u23 (ref)
-		return u23(p14)
-	end
-	function self.forgetCache(_, p16) -- line: 160
-		-- upvalues: v20 (copy)
-		return v20:delete(p16)
+	fn = function(p2)
+		v2:add(p2)
+		getCacheInfo(p2).vars:add(var)
+		return var
 	end
 
-	return self
-end
-function broadcast(p17) -- line: 174
-	if p17.broadcastWatches ~= nil then
-		p17:broadcastWatches()
+	function var:attachCache(p2)
+		return fn(p2)
 	end
+
+	function var:forgetCache(p2)
+		return v2:delete(p2)
+	end
+
+	return var
 end
 
-return t1
+broadcast = function(object)
+	if object.broadcastWatches ~= nil then
+		object:broadcastWatches()
+	end
+end
+
+return ReactiveVars

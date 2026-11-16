@@ -1,49 +1,59 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local SharedFlags = require(ProfilePlatformParent.SharedFlags)
-local AppPage = require(ProfilePlatformParent.RobloxAppEnums).AppPage
-local NavigateDown = require(ProfilePlatformParent.NavigationRodux).Thunks.NavigateDown
+local parent = ProfilePlatform.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+
+local AppPage = RobloxAppEnums.AppPage
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
-local v7 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfilePlatformParent.RobloxAppNavigation).NavigationCommands
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
 local Enums = require(ProfilePlatform.Common.Enums)
-
 require(ProfilePlatform.Components.CTARow.Types)
-
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local ProfileTypes = Enums.ProfileTypes
+
 local FFlagProfilePlatformNewProfileHeader = SharedFlags.FFlagProfilePlatformNewProfileHeader
 local FFlagProfileAboutDetailsUseSheet = SharedFlags.FFlagProfileAboutDetailsUseSheet
 
 return {
-	[Enums.ProfileActions.ViewAbout] = if not FFlagProfilePlatformNewProfileHeader then nil else function(p1) -- line: 25
-		-- upvalues: Enums (copy), ProfileTypes (copy), EventNames (copy), AppPage (copy), FFlagProfileAboutDetailsUseSheet (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), NavigateDown (copy)
+	[Enums.ProfileActions.ViewAbout] = FFlagProfilePlatformNewProfileHeader and function(data)
 		return {
-			text = p1.localized[Enums.ProfileActions.ViewAbout],
+			text = data.localized[Enums.ProfileActions.ViewAbout],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 29
-					-- upvalues: p1 (copy), EventNames (copy), AppPage (copy), FFlagProfileAboutDetailsUseSheet (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), NavigateDown (copy)
-					p1.analytics.fireAnalyticsEvent(EventNames.CTAButtonViewFullProfile, {
-						buttonSurface = p1.buttonSurface,
-						btnContext = p1.profileWrapperContext.sourceInfo.source
+				[ProfileTypes.User] = function()
+					data.analytics.fireAnalyticsEvent(EventNames.CTAButtonViewFullProfile, {
+						buttonSurface = data.buttonSurface,
+						btnContext = data.profileWrapperContext.sourceInfo.source
 					})
 
-					local t1 = {
-						name = AppPage.AboutDetailsSheet,
-						extraProps = {
-							sections = p1.aboutSections,
-							profileName = if not FFlagProfileAboutDetailsUseSheet then nil else p1.aboutProfileName
-						}
-					}
+					local v = { name = AppPage.AboutDetailsSheet, extraProps = 0 }
+					local extraProps = { sections = data.aboutSections, profileName = 0 }
+					local profileName
 
-					if FFlagSignalsNavP3Dispatch then
-						v7.down(v7.fromLegacyPage(t1))
-
-						return
+					if FFlagProfileAboutDetailsUseSheet then
+						profileName = data.aboutProfileName
 					end
 
-					p1.dispatch(NavigateDown(t1))
+					extraProps.profileName = profileName
+					v.extraProps = extraProps
+
+					if FFlagSignalsNavP3Dispatch then
+						navigationCommands.down(navigationCommands.fromLegacyPage(v))
+					else
+						data.dispatch(NavigateDown(v))
+					end
 				end
 			}
 		}
-	end
+	end or nil
 }

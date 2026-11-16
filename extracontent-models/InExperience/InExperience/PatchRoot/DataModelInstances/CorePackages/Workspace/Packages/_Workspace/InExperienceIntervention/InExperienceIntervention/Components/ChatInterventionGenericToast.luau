@@ -1,49 +1,69 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
-local React = require(InExperienceInterventionParent.React)
-local UIBlox = require(InExperienceInterventionParent.UIBlox)
-local Foundation = require(InExperienceInterventionParent.Foundation)
+local parent = InExperienceIntervention.Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
 local Images = UIBlox.App.ImageSet.Images
 local useTokens = Foundation.Hooks.useTokens
 local InExperienceInterventionAnalytics = require(InExperienceIntervention.InExperienceInterventionAnalytics)
 local Toast = UIBlox.App.Dialog.Toast
-local v10 = game:DefineFastInt("InExperienceInterventionToastDuration", 5)
 
-function ChatNudgeToast(t1: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), useTokens (copy), InExperienceInterventionAnalytics (copy), Toast (copy), Images (copy), v10 (copy)
-	local v12 = React.useRef(DateTime.now().UnixTimestampMillis)
-	local v13 = useTokens()
+local defineFastInt = game:DefineFastInt("InExperienceInterventionToastDuration", 5)
 
-	return React.createElement("ScreenGui", {
-		IgnoreGuiInset = true,
-		ResetOnSpawn = false,
-		DisplayOrder = 7,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, {
-		Toast = React.createElement(Toast, {
-			toastContent = {
-				toastTitle = t1.toastTitle,
-				iconColorStyle = {
-					Transparency = 0,
-					Color = v13.Color.System.Warning.Color3
+function ChatNudgeToast(props)
+	local ref = React.useRef(DateTime.now().UnixTimestampMillis)
+	local v = useTokens()
+
+	local function onAppeared()
+		ref.current = DateTime.now().UnixTimestampMillis
+		InExperienceInterventionAnalytics.sendAnalyticsEvent(
+			props.toastAppearEventName,
+			props.interventionType,
+			ref.current,
+			props.eventId,
+			props.violatingChatLine,
+			props.remainingDurationSec
+		)
+	end
+
+	local function onTouchSwipeUp()
+		InExperienceInterventionAnalytics.sendAnalyticsEvent(
+			props.toastDismissEventName,
+			props.interventionType,
+			ref.current,
+			props.eventId,
+			props.violatingChatLine,
+			props.remainingDurationSec
+		)
+	end
+
+	return React.createElement(
+		"ScreenGui",
+		{
+			IgnoreGuiInset = true,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			ResetOnSpawn = false,
+			DisplayOrder = 7
+		},
+		{
+			Toast = React.createElement(Toast, {
+				toastContent = {
+					toastTitle = props.toastTitle,
+					iconColorStyle = {
+						Color = props.iconColor or v.Color.System.Warning.Color3,
+						Transparency = 0
+					},
+					iconImage = Images["icons/status/error_large"],
+					iconSize = Vector2.new(36, 36),
+					onAppeared = onAppeared,
+					toastSubtitle = props.toastBody,
+					sequenceNumber = DateTime.now().UnixTimestamp,
+					onTouchSwipeUp = onTouchSwipeUp
 				},
-				iconImage = Images["icons/status/error_large"],
-				iconSize = Vector2.new(36, 36),
-				onAppeared = function() -- line: 28
-					-- upvalues: v12 (copy), InExperienceInterventionAnalytics (copy), t1 (copy)
-					v12.current = DateTime.now().UnixTimestampMillis
-					InExperienceInterventionAnalytics.sendAnalyticsEvent(t1.toastAppearEventName, t1.interventionType, v12.current, t1.eventId, t1.violatingChatLine, t1.remainingDurationSec)
-				end,
-				toastSubtitle = t1.toastBody,
-				sequenceNumber = DateTime.now().UnixTimestamp,
-				onTouchSwipeUp = function() -- line: 40
-					-- upvalues: InExperienceInterventionAnalytics (copy), t1 (copy), v12 (copy)
-					InExperienceInterventionAnalytics.sendAnalyticsEvent(t1.toastDismissEventName, t1.interventionType, v12.current, t1.eventId, t1.violatingChatLine, t1.remainingDurationSec)
-				end
-			},
-			duration = v10
-		})
-	})
+				duration = defineFastInt
+			})
+		}
+	)
 end
 
 return ChatNudgeToast

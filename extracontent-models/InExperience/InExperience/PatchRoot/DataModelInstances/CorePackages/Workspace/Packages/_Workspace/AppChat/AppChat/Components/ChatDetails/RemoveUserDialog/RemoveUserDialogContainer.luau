@@ -1,103 +1,106 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local populateUserWithState = require(AppChat.Users.populateUserWithState)
+local parent = AppChat.Parent
 
+local populateUserWithState = require(AppChat.Users.populateUserWithState)
 require(AppChat.types)
 
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local AppChatNetworking = require(parent.AppChatNetworking)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local memo = React.memo
 local useCallback = React.useCallback
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
 local useState = React.useState
+
 local RemoveUserDialogLayout = require(script.Parent.RemoveUserDialogLayout)
-local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
-local t1 = {
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
+
+local v = {
 	participantId = nil,
+	onModalClose = function() end,
 	titleKey = "Feature.Chat.Action.RemoveUser",
+	messageKey = GetFFlagIsSquadEnabled() and "Feature.Chat.Message.RemoveUser.V2" or "Feature.Chat.Message.RemoveUser",
 	cancelTitleKey = "Feature.Chat.Action.Cancel",
 	confirmationTitleKey = "Feature.Chat.Action.Remove",
 	failureTitleKey = "Feature.Chat.Heading.FailedToRemoveUser",
-	failureButtonKey = "Feature.Chat.Action.Confirm",
-	onModalClose = function() -- line: 40
-	end,
-	messageKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.RemoveUser" or "Feature.Chat.Message.RemoveUser.V2",
-	failureBodyKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.FailedToRemoveUser" or "Feature.Chat.Message.FailedToRemoveUser.V2"
+	failureBodyKey = GetFFlagIsSquadEnabled() and "Feature.Chat.Message.FailedToRemoveUser.V2" or "Feature.Chat.Message.FailedToRemoveUser",
+	failureButtonKey = "Feature.Chat.Action.Confirm"
 }
 
-function RemoveUserDialogContainer(t2: {[any]: any}) -- line: 57
-	-- upvalues: Cryo (copy), t1 (copy), useState (copy), useDispatch (copy), useCallback (copy), AppChatNetworking (copy), useSelector (copy), populateUserWithState (copy), useLocalization (copy), React (copy), RemoveUserDialogLayout (copy)
-	local v17 = Cryo.Dictionary.join(t1, t2)
-	local v18, v19 = useState(true)
-	local v20, v21 = useState(false)
-	local v22, v23 = useState(false)
-	local v24 = useDispatch()
-	local v25 = useCallback(function(p1, p2) -- line: 64
-		-- upvalues: v24 (copy), AppChatNetworking (copy)
-		return v24(AppChatNetworking.rodux.RemoveUserFromConversation.API(p2, p1))
-	end, { v24 })
-	local v26 = useSelector(function(p3) -- line: 68
-		-- upvalues: v17 (copy), populateUserWithState (copy)
-		local v32 = p3.ChatAppReducer.Conversations[v17.conversationId] or {
-			title = nil
-		}
-		local v33 = p3.Users[v17.participantId]
+function RemoveUserDialogContainer(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local state, setState = useState(true)
+	local state2, setState2 = useState(false)
+	local state3, setState3 = useState(false)
+
+	local v2 = useDispatch()
+	local v3 = useCallback(function(p2, p3)
+		return v2(AppChatNetworking.rodux.RemoveUserFromConversation.API(p3, p2))
+	end, { v2 })
+
+	local v4 = useSelector(function(p2)
+		local v4 = p2.ChatAppReducer.Conversations[joined.conversationId] or { title = nil }
+
+		local user = p2.Users[joined.participantId]
 
 		return {
-			conversationTitle = v32.title,
-			targetUser = populateUserWithState(p3, v33)
+			conversationTitle = v4.title,
+			targetUser = populateUserWithState(p2, user)
 		}
 	end)
-	local v27 = useCallback(function() -- line: 80
-		-- upvalues: v21 (copy), v19 (copy), v17 (copy), v25 (copy), v23 (copy)
-		v21(true)
-		v19(false)
 
-		local conversationId = v17.conversationId
+	local onActivated = useCallback(function(): boolean
+		setState2(true)
+		setState(false)
+
+		local conversationId = joined.conversationId
 
 		if conversationId then
-			v25(v17.participantId, conversationId):andThen(function() -- line: 87
-				-- upvalues: v17 (copy)
-				v17.onModalClose()
-			end):catch(function() -- line: 90
-				-- upvalues: v21 (copy), v19 (copy), v23 (copy)
-				v21(false)
-				v19(true)
-				v23(true)
+			v3(joined.participantId, conversationId):andThen(function()
+				joined.onModalClose()
+			end):catch(function()
+				setState2(false)
+				setState(true)
+				setState3(true)
 			end)
 		end
 
 		return true
-	end, {
-		v17.participantId,
-		v17.conversationId
-	})
-	local v28 = useLocalization({
-		failureTitleText = "Feature.Chat.Heading.FailedToRemoveUser",
-		failureButtonText = "Feature.Chat.Action.Confirm",
-		titleText = v17.titleKey,
+	end, { joined.participantId, joined.conversationId })
+
+	local v5 = useLocalization({
+		titleText = joined.titleKey,
 		bodyText = {
-			v17.messageKey,
-			USERNAME = v26.targetUser.displayName
+			joined.messageKey,
+			USERNAME = v4.targetUser.displayName
 		},
-		cancelText = v17.cancelTitleKey,
-		confirmText = v17.confirmationTitleKey,
+		cancelText = joined.cancelTitleKey,
+		confirmText = joined.confirmationTitleKey,
+		failureTitleText = "Feature.Chat.Heading.FailedToRemoveUser",
 		failureBodyText = {
-			v17.failureBodyKey,
-			USERNAME = v26.targetUser.displayName,
-			CONVERSATION_TITLE = v26.conversationTitle
-		}
+			joined.failureBodyKey,
+			USERNAME = v4.targetUser.displayName,
+			CONVERSATION_TITLE = v4.conversationTitle
+		},
+		failureButtonText = "Feature.Chat.Action.Confirm"
 	})
 
-	return React.createElement(RemoveUserDialogLayout, Cryo.Dictionary.join(v17, v28, v26, {
-		onActivated = v27,
-		displayFailed = v22,
-		isModalVisible = v18,
-		isLoading = v20
-	}))
+	return React.createElement(
+		RemoveUserDialogLayout,
+		Cryo.Dictionary.join(joined, v5, v4, {
+			onActivated = onActivated,
+			displayFailed = state3,
+			isModalVisible = state,
+			isLoading = state2
+		})
+	)
 end
 
 return memo(RemoveUserDialogContainer)

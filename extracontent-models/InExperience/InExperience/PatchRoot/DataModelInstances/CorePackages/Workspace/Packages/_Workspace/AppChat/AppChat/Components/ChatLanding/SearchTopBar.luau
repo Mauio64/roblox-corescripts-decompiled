@@ -1,34 +1,42 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local SocialLibraries = require(AppChat.SocialLibraries)
-local Roact = require(AppChatParent.Roact)
-local React = require(AppChatParent.React)
-local Cryo = require(AppChatParent.Cryo)
-local UIBlox = require(AppChatParent.UIBlox)
-local Foundation = require(AppChatParent.Foundation)
-local Text = require(AppChatParent.AppCommonLib).Text
-local memoize = require(AppChatParent.AppCommonLib).memoize
+
+local Roact = require(parent.Roact)
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local AppCommonLib = require(parent.AppCommonLib)
+local Text = AppCommonLib.Text
+local AppCommonLib2 = require(parent.AppCommonLib)
+local memoize = AppCommonLib2.memoize
+
 local TextButton = UIBlox.App.Button.TextButton
 local Images = UIBlox.App.ImageSet.Images
 local IconSize = UIBlox.App.Constant.IconSize
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local ReactFocusNavigation = require(AppChatParent.ReactFocusNavigation)
-local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
+
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigationService = ReactFocusNavigation.FocusNavigationService
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local CoreGui = ReactFocusNavigation.EngineInterface.CoreGui
+
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
-local CallbackInputBox = SocialLibraries.Components.CallbackInputBox
-local v23 = Images["icons/common/search"]
-local v24 = Images["icons/actions/edit/clear_small"]
-local t1 = {
-	Image = Images["squircles/fill"],
-	SliceCenter = Rect.new(8, 8, 9, 9)
-}
-local v26 = Roact.PureComponent:extend("SearchTopBar")
 
-v26.defaultProps = {
+local CallbackInputBox = SocialLibraries.Components.CallbackInputBox
+
+local iconscommonsearch = Images["icons/common/search"]
+local iconsactionseditclear_small = Images["icons/actions/edit/clear_small"]
+
+local v = { Image = Images["squircles/fill"], SliceCenter = Rect.new(8, 8, 9, 9) }
+
+local extended = Roact.PureComponent:extend("SearchTopBar")
+extended.defaultProps = {
 	cancelText = "CancelPlaceholder",
 	searchPlaceholderText = "PlaceholderText",
 	initialInputText = nil,
@@ -37,213 +45,287 @@ v26.defaultProps = {
 	filterBoxPaddingLeft = 0,
 	filterBoxPaddingRight = 0,
 	captureFocusOnMount = false,
+	resetOnMount = function() end,
 	cancelCallback = nil,
 	shouldShowCancel = true,
 	textChangedCallback = nil,
 	LayoutOrder = 1,
+	onSelectCallback = function() end,
 	containerRef = nil,
 	inputBoxRef = nil,
-	focusNavigationEventHandlerRef = nil,
-	resetOnMount = function() -- line: 54
-	end,
-	onSelectCallback = function() -- line: 59
-	end
+	focusNavigationEventHandlerRef = nil
 }
 
-function v26.init(p1) -- line: 66
-	-- upvalues: Roact (copy), memoize (copy), Text (copy)
-	p1.focusNavigationService = p1.props.focusNavigationService
-	p1.inputBoxRef = p1.props.inputBoxRef or Roact.createRef()
-	p1.containerRef = p1.props.containerRef or Roact.createRef()
-	p1.props.onSelectCallback()
+function extended:init()
+	self.focusNavigationService = self.props.focusNavigationService
+	self.inputBoxRef = self.props.inputBoxRef or Roact.createRef()
+	self.containerRef = self.props.containerRef or Roact.createRef()
+	self.props.onSelectCallback()
 
-	function p1.focusInputBox() -- line: 72
-		-- upvalues: p1 (copy)
-		if p1.inputBoxRef and p1.inputBoxRef.current then
-			p1.inputBoxRef.current:CaptureFocus()
+	function self.focusInputBox()
+		if self.inputBoxRef and self.inputBoxRef.current then
+			self.inputBoxRef.current:CaptureFocus()
 		end
 	end
 
-	p1.getTextWidth = memoize(function(p2, p3, p4) -- line: 78
-		-- upvalues: Text (copy)
-		return Text.GetTextWidth(p2, p3, p4)
+	self.getTextWidth = memoize(function(p, p2, p3)
+		return Text.GetTextWidth(p, p2, p3)
 	end)
 end
-function v26.didMount(p5) -- line: 83
-	if p5.props.captureFocusOnMount and (p5.containerRef.current and p5.focusNavigationService and p5.focusNavigationService.focusedGuiObject:getValue() ~= nil) then
-		p5.focusNavigationService:focusGuiObject(p5.containerRef.current)
+
+function extended.didMount(data)
+	if
+		data.props.captureFocusOnMount
+		and data.containerRef.current
+		and data.focusNavigationService
+		and data.focusNavigationService.focusedGuiObject:getValue() ~= nil
+	then
+		data.focusNavigationService:focusGuiObject(data.containerRef.current)
 	end
 
-	if p5.inputBoxRef.current then
-		p5.inputBoxRef.current.Selectable = false
+	if data.inputBoxRef.current then
+		data.inputBoxRef.current.Selectable = false
 	end
 
-	p5.props.resetOnMount()
+	data.props.resetOnMount()
 end
-function v26.willUnmount(p6) -- line: 98
-	if p6.focusNavigationService then
-		p6.focusNavigationService:teardown()
+function extended.willUnmount(p)
+	if p.focusNavigationService then
+		p.focusNavigationService:teardown()
 	end
 end
-function v26.render(p7) -- line: 104
-	-- upvalues: UIBlox (copy), Roact (copy), TextButton (copy), withSelectionCursorProvider (copy), Foundation (copy), CursorKind (copy), ImageSetLabel (copy), t1 (copy), IconSize (copy), v23 (copy), CallbackInputBox (copy), v24 (copy)
-	local function v31(p8) -- line: 105
-		-- upvalues: p7 (copy)
-		if (not p8 or not (#p8 > 0)) and (p7.focusNavigationService and p7.inputBoxRef.current) then
-			if p7.focusNavigationService.focusedGuiObject:getValue() ~= nil then
-				p7.focusNavigationService:focusGuiObject(p7.containerRef.current)
-				p7.focusInputBox()
+
+function extended.render(data)
+	local function fn(list)
+		if not (list and #list > 0) and data.focusNavigationService and data.inputBoxRef.current then
+			if data.focusNavigationService.focusedGuiObject:getValue() == nil then
+				data.focusNavigationService:focusGuiObject(data.inputBoxRef.current)
 			else
-				p7.focusNavigationService:focusGuiObject(p7.inputBoxRef.current)
+				data.focusNavigationService:focusGuiObject(data.containerRef.current)
+				data.focusInputBox()
 			end
 		end
 
-		if p7.props.textChangedCallback then
-			p7.props.textChangedCallback(p8)
+		if data.props.textChangedCallback then
+			data.props.textChangedCallback(list)
 		end
 	end
 
-	return UIBlox.Style.withStyle(function(p9) -- line: 122
-		-- upvalues: p7 (copy), Roact (copy), TextButton (copy), withSelectionCursorProvider (copy), Foundation (copy), CursorKind (copy), ImageSetLabel (copy), t1 (copy), IconSize (copy), v23 (copy), CallbackInputBox (copy), v24 (copy), v31 (copy)
-		local cancelText = p7.props.cancelText
-		local Header2 = p9.Font.Header2
-		local v45 = p9.Font.BaseSize * Header2.RelativeSize
-		local v46 = p7.getTextWidth(cancelText, Header2.Font, v45)
-		local Left = Enum.HorizontalAlignment.Left
-		local uDim = UDim.new(0, 4)
-		local uDim2 = UDim2.new(1, 0, 1, 0)
+	return UIBlox.Style.withStyle(function(props)
+		local cancelText = data.props.cancelText
 
-		if p7.props.shouldShowCancel then
-			uDim2 = UDim2.new(1, -v46 - 12, 1, 0)
+		local header2 = props.Font.Header2
+		local v2 = props.Font.BaseSize * header2.RelativeSize
+		local textWidth = data.getTextWidth(cancelText, header2.Font, v2)
+
+		local left = Enum.HorizontalAlignment.Left
+
+		local udim = UDim.new(0, 4)
+
+		local udim2 = UDim2.new(1, 0, 1, 0)
+
+		if data.props.shouldShowCancel then
+			udim2 = UDim2.new(1, -textWidth - 12, 1, 0)
 		end
 
-		local Body = p9.Font.Body
-		local v51 = p9.Font.BaseSize * Body.RelativeSize
+		local body = props.Font.Body
+		local inputTextSize = props.Font.BaseSize * body.RelativeSize
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = p9.Tokens.Color.None.Transparency,
-			BackgroundColor3 = p9.Theme.BackgroundDefault.Color,
+		local createElement = Roact.createElement
+		local focusNavigationEventHandlerRefsByRef = {
+			BackgroundTransparency = props.Tokens.Color.None.Transparency,
+			BackgroundColor3 = props.Theme.BackgroundDefault.Color,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 1, 0),
-			LayoutOrder = p7.props.LayoutOrder,
-			[Roact.Ref] = p7.props.focusNavigationEventHandlerRef
-		}, {
+			LayoutOrder = data.props.LayoutOrder,
+			[Roact.Ref] = data.props.focusNavigationEventHandlerRef
+		}
+		local v3 = {
 			layout = Roact.createElement("UIListLayout", {
 				VerticalAlignment = Enum.VerticalAlignment.Center,
-				HorizontalAlignment = Left,
+				HorizontalAlignment = left,
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = uDim
+				Padding = udim
 			}),
 			padding = Roact.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, p7.props.filterBoxPaddingTop),
-				PaddingBottom = UDim.new(0, p7.props.filterBoxPaddingBottom),
-				PaddingLeft = UDim.new(0, p7.props.filterBoxPaddingLeft),
-				PaddingRight = UDim.new(0, p7.props.filterBoxPaddingRight)
+				PaddingTop = UDim.new(0, data.props.filterBoxPaddingTop),
+				PaddingBottom = UDim.new(0, data.props.filterBoxPaddingBottom),
+				PaddingLeft = UDim.new(0, data.props.filterBoxPaddingLeft),
+				PaddingRight = UDim.new(0, data.props.filterBoxPaddingRight)
 			}),
-			cancel = if not p7.props.shouldShowCancel then nil else Roact.createElement(TextButton, {
-				layoutOrder = 2,
+			cancel = 0,
+			filterBoxContainer = 0
+		}
+		local cancel
+
+		if data.props.shouldShowCancel then
+			cancel = Roact.createElement(TextButton, {
 				text = cancelText,
-				onActivated = p7.props.cancelCallback
-			}),
-			filterBoxContainer = withSelectionCursorProvider(function(p10) -- line: 174
-				-- upvalues: Roact (copy), Foundation (copy), uDim2 (ref), CursorKind (copy), p7 (copy), ImageSetLabel (copy), t1 (copy), p9 (copy), IconSize (copy), v23 (copy), CallbackInputBox (copy), Body (copy), v51 (copy), v24 (copy), v31 (copy)
-				return Roact.createElement(Foundation.View, {
-					LayoutOrder = 1,
-					Size = uDim2,
-					selection = {
-						Selectable = true,
-						SelectionImageObject = p10(CursorKind.RoundedRect)
-					},
-					onActivated = p7.focusInputBox,
-					ref = p7.containerRef
-				}, {
-					filterBoxBackground = Roact.createElement(ImageSetLabel, {
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
-						Selectable = false,
-						Size = UDim2.fromScale(1, 1),
-						Image = t1.Image,
-						ImageColor3 = p9.Theme.UIDefault.Color,
-						ImageTransparency = p9.Theme.UIDefault.Transparency,
-						ScaleType = Enum.ScaleType.Slice,
-						SliceCenter = t1.SliceCenter
-					}, {
-						layout = Roact.createElement("UIListLayout", {
-							VerticalAlignment = Enum.VerticalAlignment.Center,
-							HorizontalAlignment = Enum.HorizontalAlignment.Left,
-							FillDirection = Enum.FillDirection.Horizontal,
-							SortOrder = Enum.SortOrder.LayoutOrder,
-							Padding = UDim.new(0, 4)
-						}),
-						padding = Roact.createElement("UIPadding", {
-							PaddingLeft = UDim.new(0, 12),
-							PaddingRight = UDim.new(0, 12)
-						}),
-						filterBoxIcon = Roact.createElement(ImageSetLabel, {
-							BackgroundTransparency = 1,
-							LayoutOrder = 1,
-							Size = UDim2.new(0, IconSize.Small, 0, IconSize.Small),
-							Image = v23,
-							ImageColor3 = p9.Theme.IconEmphasis.Color,
-							ImageTransparency = p9.Theme.IconEmphasis.Transparency
-						}),
-						filterBoxContainer = Roact.createElement("Frame", {
-							BackgroundTransparency = 1,
-							LayoutOrder = 2,
-							Size = UDim2.new(1, -(IconSize.Small + 4), 1, 0)
-						}, {
-							filterBox = Roact.createElement(CallbackInputBox, {
-								clearButtonDisabled = false,
-								initialInputText = p7.props.initialInputText,
-								inputTextColor3 = p9.Theme.TextEmphasis.Color,
-								inputTextFont = Body.Font,
-								inputTextSize = v51,
-								inputTextTransparency = p9.Theme.TextEmphasis.Transparency,
-								inputTextXAlignment = Enum.TextXAlignment.Left,
-								placeholderText = p7.props.searchPlaceholderText,
-								placeholderTextColor3 = p9.Theme.TextDefault.Color,
-								placeholderTextTransparency = p9.Theme.TextDefault.Transparency,
-								captureFocusOnMount = p7.props.captureFocusOnMount,
-								clearIcon = v24,
-								clearIconColor3 = p9.Theme.IconEmphasis.Color,
-								clearIconTransparency = p9.Theme.IconEmphasis.Transparency,
-								clearButtonSize = IconSize.Small,
-								textChangedCallback = v31,
-								onSelectCallback = p7.props.onSelectCallback,
-								inputBoxRef = p7.inputBoxRef,
-								clearButtonSelectionImageObject = p10(CursorKind.RoundedRect)
-							})
-						})
-					})
-				})
-			end)
-		})
+				layoutOrder = 2,
+				onActivated = data.props.cancelCallback
+			})
+		end
+
+		v3.cancel = cancel
+
+		v3.filterBoxContainer = withSelectionCursorProvider(function(callback)
+			local createElement2 = Roact.createElement
+			local view = Foundation.View
+			local v4 = {
+				Size = udim2,
+				LayoutOrder = 1,
+				selection = {
+					Selectable = true,
+					SelectionImageObject = callback(CursorKind.RoundedRect)
+				},
+				onActivated = data.focusInputBox,
+				ref = data.containerRef
+			}
+
+			local createElement3 = Roact.createElement
+			local v5 = {
+				Size = UDim2.fromScale(1, 1),
+				Image = v.Image,
+				ImageColor3 = props.Theme.UIDefault.Color,
+				ImageTransparency = props.Theme.UIDefault.Transparency,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = v.SliceCenter,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Selectable = false
+			}
+
+			local v6 = {
+				layout = Roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 4)
+				}),
+				padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 12),
+					PaddingRight = UDim.new(0, 12)
+				}),
+				filterBoxIcon = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, IconSize.Small, 0, IconSize.Small),
+					Image = iconscommonsearch,
+					ImageColor3 = props.Theme.IconEmphasis.Color,
+					ImageTransparency = props.Theme.IconEmphasis.Transparency,
+					LayoutOrder = 1
+				}),
+				filterBoxContainer = 0
+			}
+
+			local createElement4 = Roact.createElement
+			local v7 = {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -(IconSize.Small + 4), 1, 0),
+				LayoutOrder = 2
+			}
+
+			local createElement5 = Roact.createElement
+			local v8 = {
+				initialInputText = data.props.initialInputText,
+				inputTextColor3 = props.Theme.TextEmphasis.Color,
+				inputTextFont = 0,
+				inputTextSize = 0,
+				inputTextTransparency = 0,
+				inputTextXAlignment = 0,
+				placeholderText = 0,
+				placeholderTextColor3 = 0,
+				placeholderTextTransparency = 0,
+				captureFocusOnMount = 0,
+				clearIcon = 0,
+				clearIconColor3 = 0,
+				clearIconTransparency = 0,
+				clearButtonSize = 0,
+				clearButtonDisabled = false,
+				textChangedCallback = 0,
+				onSelectCallback = 0,
+				inputBoxRef = 0,
+				clearButtonSelectionImageObject = 0
+			}
+			local inputTextFont
+
+			if FoundationFontFaceMigration then
+				inputTextFont = props.Tokens.Typography.BodyLarge.Font
+			else
+				inputTextFont = body.Font
+			end
+
+			v8.inputTextFont = inputTextFont
+
+			v8.inputTextSize = inputTextSize
+			v8.inputTextTransparency = props.Theme.TextEmphasis.Transparency
+			v8.inputTextXAlignment = Enum.TextXAlignment.Left
+
+			v8.placeholderText = data.props.searchPlaceholderText
+			v8.placeholderTextColor3 = props.Theme.TextDefault.Color
+			v8.placeholderTextTransparency = props.Theme.TextDefault.Transparency
+
+			v8.captureFocusOnMount = data.props.captureFocusOnMount
+
+			v8.clearIcon = iconsactionseditclear_small
+			v8.clearIconColor3 = props.Theme.IconEmphasis.Color
+			v8.clearIconTransparency = props.Theme.IconEmphasis.Transparency
+			v8.clearButtonSize = IconSize.Small
+
+			v8.textChangedCallback = fn
+			v8.onSelectCallback = data.props.onSelectCallback
+
+			v8.inputBoxRef = data.inputBoxRef
+			v8.clearButtonSelectionImageObject = callback(CursorKind.RoundedRect)
+			v6.filterBoxContainer = createElement4("Frame", v7, {
+				filterBox = createElement5(CallbackInputBox, v8)
+			})
+			return createElement2(view, v4, {
+				filterBoxBackground = createElement3(ImageSetLabel, v5, v6)
+			})
+		end)
+		return createElement("Frame", focusNavigationEventHandlerRefsByRef, v3)
 	end)
 end
-function FocusableSearchTopBar(p11) -- line: 260
-	-- upvalues: React (copy), FocusNavigationService (copy), CoreGui (copy), ReactFocusNavigation (copy), FocusNavigationEventNameEnum (copy), Roact (copy), v26 (copy), Cryo (copy)
-	local v33 = React.useRef(nil)
-	local v34 = React.useRef(nil)
-	local v35 = FocusNavigationService.new(CoreGui)
-	local cancelCallback = p11.cancelCallback
-	local v37 = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.NavigateBack, function(p12) -- line: 268
-		-- upvalues: v35 (copy), v33 (copy), cancelCallback (copy)
-		if p12.eventData and (v35.focusedGuiObject:getValue() == v33.current and p12.eventData.KeyCode ~= Enum.KeyCode.None) then
-			p12:cancel()
 
-			if cancelCallback then
-				cancelCallback()
+function FocusableSearchTopBar(p)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local focusNavigationService = FocusNavigationService.new(CoreGui)
+	local cancelCallback = p.cancelCallback
+
+	local focusNavigationEventHandlerRef = ReactFocusNavigation.useEventHandler(
+		FocusNavigationEventNameEnum.NavigateBack,
+		function(object)
+			if
+				object.eventData
+				and focusNavigationService.focusedGuiObject:getValue() == ref.current
+				and object.eventData.KeyCode ~= Enum.KeyCode.None
+			then
+				object:cancel()
+
+				if cancelCallback then
+					cancelCallback()
+				end
 			end
-		end
-	end, "Bubble", nil)
+		end,
+		"Bubble",
+		nil
+	)
 
-	return Roact.createElement(v26, Cryo.Dictionary.join({
-		inputBoxRef = v34,
-		containerRef = v33,
-		focusNavigationEventHandlerRef = v37,
-		focusNavigationService = v35
-	}, p11))
+	return Roact.createElement(
+		extended,
+		Cryo.Dictionary.join(
+			{
+				inputBoxRef = ref2,
+				containerRef = ref,
+				focusNavigationEventHandlerRef = focusNavigationEventHandlerRef,
+				focusNavigationService = focusNavigationService
+			},
+			p
+		)
+	)
 end
 
 return FocusableSearchTopBar

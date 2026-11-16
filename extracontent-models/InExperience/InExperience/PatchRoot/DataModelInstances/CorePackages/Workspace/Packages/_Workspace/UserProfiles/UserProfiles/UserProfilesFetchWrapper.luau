@@ -1,16 +1,13 @@
-local Parent = script:FindFirstAncestor("UserProfiles").Parent
+local parent = script:FindFirstAncestor("UserProfiles").Parent
 
-require(Parent.ApolloClient)
-require(Parent.React)
+require(parent.ApolloClient)
+require(parent.React)
 
-local useUserProfilesFetch = require(script.Parent.Hooks).useUserProfilesFetch
+local Hooks = require(script.Parent.Hooks)
+local useUserProfilesFetch = Hooks.useUserProfilesFetch
 
-return function(t1: {[any]: any}) -- line: 15
-	-- upvalues: useUserProfilesFetch (copy)
-	local v4 = useUserProfilesFetch({
-		userIds = t1.userIds,
-		query = t1.query
-	})
+return function(data)
+	local v = useUserProfilesFetch({ userIds = data.userIds, query = data.query })
 
-	return t1.renderComponent(v4)
+	return data.renderComponent(v)
 end

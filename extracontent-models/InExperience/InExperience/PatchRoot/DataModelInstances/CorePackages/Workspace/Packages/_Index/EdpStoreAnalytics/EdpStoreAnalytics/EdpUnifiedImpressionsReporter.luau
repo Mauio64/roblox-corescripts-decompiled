@@ -1,23 +1,36 @@
 local EdpStoreAnalytics = script:FindFirstAncestor("EdpStoreAnalytics")
-local EdpStoreAnalyticsParent = EdpStoreAnalytics.Parent
-local Cryo = require(EdpStoreAnalyticsParent.Cryo)
-local AvatarExperienceAnalytics = require(EdpStoreAnalyticsParent.AvatarExperienceAnalytics)
+local parent = EdpStoreAnalytics.Parent
+
+local Cryo = require(parent.Cryo)
+
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
 local UnifiedEventLogEnums = AvatarExperienceAnalytics.UnifiedEventLogEnums
-local UnifiedLoggingSurface = require(EdpStoreAnalyticsParent.AvatarExperienceNavigation).Enums.UnifiedLoggingSurface
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local UnifiedLoggingSurface = AvatarExperienceNavigation.Enums.UnifiedLoggingSurface
 local sendUnifiedEventLogForInstance = AvatarExperienceAnalytics.sendUnifiedEventLogForInstance
+
 local Constants = require(EdpStoreAnalytics.Constants)
 
-local function EdpUnifiedImpressionsReporter(s1: string) -- line: 14
-	-- upvalues: sendUnifiedEventLogForInstance (copy), Cryo (copy), UnifiedEventLogEnums (copy), Constants (copy), UnifiedLoggingSurface (copy)
-	return function(t1: {[any]: any}) -- line: 15
-		-- upvalues: sendUnifiedEventLogForInstance (copy), Cryo (copy), UnifiedEventLogEnums (copy), s1 (copy), Constants (copy), UnifiedLoggingSurface (copy)
-		local visibleInstance = t1.visibleInstance
-		local v13 = visibleInstance:GetAttributes() or {}
+local function EdpUnifiedImpressionsReporter(p: string)
+	return function(p2)
+		local visibleInstance = p2.visibleInstance
+		local attributes = visibleInstance:GetAttributes() or {}
 
-		sendUnifiedEventLogForInstance(visibleInstance, Cryo.Dictionary.join(v13, {
+		local join = Cryo.Dictionary.join
+		local v = {
 			action = UnifiedEventLogEnums.MarketplaceUnifiedAction.ITEM_IMPRESSION,
-			surface = if s1 ~= Constants.StoreEnums.LocationType.Edp then UnifiedLoggingSurface.EDP_STORE else UnifiedLoggingSurface.EDP_PREVIEW
-		}), {
+			surface = 0
+		}
+		local surface
+
+		if p == Constants.StoreEnums.LocationType.Edp then
+			surface = UnifiedLoggingSurface.EDP_PREVIEW
+		else
+			surface = UnifiedLoggingSurface.EDP_STORE
+		end
+
+		v.surface = surface
+		sendUnifiedEventLogForInstance(visibleInstance, join(attributes, v), {
 			includeScreenSize = true,
 			includeElementSizeAndPosition = true
 		})

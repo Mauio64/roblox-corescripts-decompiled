@@ -1,26 +1,24 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local Signals = require(parent.Signals)
 
 require(script.Parent.Parent.Types)
 
 local createSignal = Signals.createSignal
 
-local function createExperienceDetailsSheetStore() -- line: 26
-	-- upvalues: createSignal (copy)
-	local v5, v6 = createSignal(false)
-	local v7, v8 = createSignal(nil)
+local function createExperienceDetailsSheetStore()
+	local signal, v = createSignal(false)
+	local signal2, v2 = createSignal(nil)
 
 	return {
-		getIsOpen = v5,
-		getContext = v7,
-		open = function(p1) -- line: 30
-			-- upvalues: v8 (copy), v6 (copy)
-			v8(p1)
-			v6(true)
+		getIsOpen = signal,
+		getContext = signal2,
+		open = function(p)
+			v2(p)
+			v(true)
 		end,
-		close = function() -- line: 35
-			-- upvalues: v6 (copy)
-			v6(false)
+		close = function()
+			v(false)
 		end
 	}
 end

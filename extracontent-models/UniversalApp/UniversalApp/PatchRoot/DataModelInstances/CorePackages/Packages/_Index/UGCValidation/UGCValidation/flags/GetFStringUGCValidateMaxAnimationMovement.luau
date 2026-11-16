@@ -1,14 +1,13 @@
 game:DefineFastString("UGCValidateMaxAnimationMovement", "0.3")
 
-local t1 = {
-	asString = function() -- line: 9
-		return game:GetFastString("UGCValidateMaxAnimationMovement")
-	end
-}
+local GetFStringUGCValidateMaxAnimationMovement = {}
 
-function t1.asNumber() -- line: 13
-	-- upvalues: t1 (copy)
-	return (tonumber(t1.asString()))
+function GetFStringUGCValidateMaxAnimationMovement.asString()
+	return game:GetFastString("UGCValidateMaxAnimationMovement")
 end
 
-return t1
+function GetFStringUGCValidateMaxAnimationMovement.asNumber()
+	return (tonumber(GetFStringUGCValidateMaxAnimationMovement.asString()))
+end
+
+return GetFStringUGCValidateMaxAnimationMovement

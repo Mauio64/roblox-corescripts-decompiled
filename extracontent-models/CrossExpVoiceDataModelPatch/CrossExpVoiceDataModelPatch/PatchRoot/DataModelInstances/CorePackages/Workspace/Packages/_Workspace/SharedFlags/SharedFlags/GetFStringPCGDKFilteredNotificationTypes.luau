@@ -1,22 +1,22 @@
 game:DefineFastString("PCGDKFilteredNotificationTypes", "ExperienceInvitation,SquadExperienceInvitation")
 
-return function() -- line: 3
-	local FastString = game:GetFastString("PCGDKFilteredNotificationTypes")
+return function()
+	local fastString = game:GetFastString("PCGDKFilteredNotificationTypes")
 
-	if FastString == "" then
+	if fastString == "" then
 		return {}
 	end
 
-	local t1 = {}
-	local parts = string.split(FastString, ",")
+	local v = string.split(fastString, ",")
+	local matchSet = {}
 
-	for _, v in ipairs(parts) do
-		local v6 = v:match("^%s*(.-)%s*$")
+	for _, v2 in ipairs(v) do
+		local match = v2:match("^%s*(.-)%s*$")
 
-		if v6 ~= "" then
-			t1[v6] = true
+		if match ~= "" then
+			matchSet[match] = true
 		end
 	end
 
-	return t1
+	return matchSet
 end

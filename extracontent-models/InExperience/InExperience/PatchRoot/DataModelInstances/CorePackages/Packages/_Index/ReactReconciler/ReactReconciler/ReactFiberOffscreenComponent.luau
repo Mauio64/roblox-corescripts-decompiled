@@ -1,6 +1,6 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.Shared)
 
-require(ParentParent.Shared)
 require(script.Parent.ReactFiberLane)
 
 return {}

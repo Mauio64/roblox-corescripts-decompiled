@@ -1,54 +1,41 @@
 local TelemetryService = game:GetService("TelemetryService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local ParentParent = script.Parent.Parent
-local FFlagLoggingGamepadOpenExpControlsMenu = require(ParentParent.Flags.FFlagLoggingGamepadOpenExpControlsMenu)
-local v5 = game:DefineFastInt("GamepadOpenExperienceControlsMenuThrottleHundrethsPercent", 0)
-local EngineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
-local t1 = {
+
+local parent = script.Parent.Parent
+
+local FFlagLoggingGamepadOpenExpControlsMenu = require(parent.Flags.FFlagLoggingGamepadOpenExpControlsMenu)
+local defineFastInt = game:DefineFastInt("GamepadOpenExperienceControlsMenuThrottleHundrethsPercent", 0)
+local engineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
+
+local v = {
 	eventName = "coreui_gamepad_toggle_exp_controls",
-	description = "Event fired from the client every time Experience Controls Menu is toggled open/closed",
-	links = "https://github.rbx.com/Roblox/proto-schemas/pull/5750",
 	backends = { "EventIngest" },
-	throttlingPercentage = v5,
-	lastUpdated = {
-		25,
-		4,
-		25
-	}
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 25, 4, 25 },
+	description = "Event fired from the client every time Experience Controls Menu is toggled open/closed",
+	links = "https://github.rbx.com/Roblox/proto-schemas/pull/5750"
 }
 
-return function(b1: boolean) -- line: 24
-	-- upvalues: FFlagLoggingGamepadOpenExpControlsMenu (copy), EngineFeature (copy), RbxAnalyticsService (copy), TelemetryService (copy), t1 (copy)
+return function(flag: boolean)
 	if not FFlagLoggingGamepadOpenExpControlsMenu then
 		return
 	end
 
-	local t2, t3
+	local customFields, standardizedFields
 
-	if EngineFeature then
-		t2 = {
-			"addPlaceId",
-			"addUniverseId",
-			"addPlaySessionId",
-			"addSessionInfo"
-		}
-		t3 = {
-			is_toggle_open = tostring(b1)
-		}
+	if engineFeature then
+		customFields = { is_toggle_open = tostring(flag) }
+		standardizedFields = { "addPlaceId", "addUniverseId", "addPlaySessionId", "addSessionInfo" }
 	else
-		t2 = {
-			"addPlaceId",
-			"addUniverseId",
-			"addSessionInfo"
-		}
-		t3 = {
-			is_toggle_open = tostring(b1),
+		customFields = {
+			is_toggle_open = tostring(flag),
 			playsessionid = RbxAnalyticsService:GetPlaySessionId()
 		}
+		standardizedFields = { "addPlaceId", "addUniverseId", "addSessionInfo" }
 	end
 
-	TelemetryService:LogEvent(t1, {
-		standardizedFields = t2,
-		customFields = t3
+	TelemetryService:LogEvent(v, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
 	})
 end

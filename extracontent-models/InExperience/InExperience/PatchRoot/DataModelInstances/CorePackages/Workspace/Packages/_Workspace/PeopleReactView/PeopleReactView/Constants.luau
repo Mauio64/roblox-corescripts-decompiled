@@ -1,39 +1,44 @@
-local Parent = script:FindFirstAncestor("PeopleReactView").Parent
-local SharedFlags = require(Parent.SharedFlags)
-local IconName = require(Parent.Foundation).Enums.IconName
-local GetFFlagFixPeoplePageCardTooltip = require(Parent.PeopleService).getService("Flags").GetFFlagFixPeoplePageCardTooltip
-local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
-local v6 = game:DefineFastString("UniversesExposedToPeopleCardsTooltipKey", "UniversesExposedToCardTooltipKey2")
+local parent = script:FindFirstAncestor("PeopleReactView").Parent
+
+local Foundation = require(parent.Foundation)
+local IconName = Foundation.Enums.IconName
+
+local PeopleService = require(parent.PeopleService)
+
+local getFFlagFixPeoplePageCardTooltip = PeopleService.getService("Flags").GetFFlagFixPeoplePageCardTooltip
+
+local defineFastString = game:DefineFastString(
+	"UniversesExposedToPeopleCardsTooltipKey",
+	"UniversesExposedToCardTooltipKey2"
+)
 
 return {
 	PEOPLEPAGE = {
 		PAGE_ID = "peoplepage",
-		SOURCE = "PeoplePageInIGM",
 		TAB_HEADER = {
 			NAME = "PeopleTab",
 			TEXT = "CoreScripts.InGameMenu.PageTitle.Players",
 			ICON = "icons/menu/friends"
 		},
-		PEOPLE_LIST = {
-			HEADER = "Feature.SettingsHub.PageTitle.InThisServer"
-		},
+		PEOPLE_LIST = { HEADER = "Feature.SettingsHub.PageTitle.InThisServer" },
 		PEOPLE_CARDS = {
 			MAX_CARD_COLUMNS = 5,
 			MIN_CARD_COLUMNS = 2,
-			MINIMUM_CARD_WIDTH = 136
+			MINIMUM_CARD_WIDTH = 136,
+			SIDE_SHEET_MINIMUM_CARD_WIDTH = 96
 		},
+		STACKED_ROW_MAX_WINDOW_WIDTH = 800,
 		PERSON_ROW = {
 			PLATFORM_LOGO_IMAGE = "rbxasset://textures/ui/Shell/Icons/PlatformLogo@3x.png"
 		},
 		CORE_BUTTONS = {
 			LOCALIZED_STRINGS = {
 				INVITE_FRIENDS = "CoreScripts.InGameMenu.PageTitle.InviteFriends",
+				JOIN_OR_INVITE = "CoreScripts.InGameMenu.PageTitle.JoinOrInvite",
 				MUTE_ALL = "Feature.SettingsHub.Action.MuteAll",
 				UNMUTE_ALL = "Feature.SettingsHub.Action.UnmuteAll",
-				SWITCH_SERVER = "CoreScripts.InGameMenu.PeoplePage.SwitchServer",
 				MUTE_SELF = "CoreScripts.InGameMenu.QuickActions.MuteSelf",
-				UNMUTE_SELF = "CoreScripts.InGameMenu.QuickActions.UnmuteSelf",
-				INVITE_CONNECTIONS = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.InviteConnections" or nil
+				UNMUTE_SELF = "CoreScripts.InGameMenu.QuickActions.UnmuteSelf"
 			},
 			ICON = {
 				MICROPHONE = "microphone",
@@ -43,8 +48,7 @@ return {
 				HEADPHONE_LEGACY = "icons/controls/headphone",
 				HEADPHONE_MUTED_LEGACY = "icons/controls/headphoneDeafen",
 				INVITE_FRIENDS_LEGACY = "icons/actions/friends/friendInvite",
-				INVITE_FRIENDS_NEW = "person-arrow-from-bottom-right",
-				SWITCH_SERVER = "two-location-pins-connecting-arrow"
+				INVITE_FRIENDS_NEW = "person-arrow-from-bottom-right"
 			}
 		},
 		PERSON_BUTTONS = {
@@ -56,9 +60,7 @@ return {
 				REQUEST_SENT = "CoreScripts.InGameMenu.GameSettings.RequestSent",
 				MUTE = "Feature.SettingsHub.Label.Mute",
 				UNMUTE = "Feature.SettingsHub.Label.Unmute",
-				REPORT = "CoreScripts.InGameMenu.QuickActions.Report",
-				CONNECTION = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.Connection" or nil,
-				ADD_CONNECTION = not FFlagConnectionsToFriendsRename and "CommonUI.Features.Label.AddConnection" or nil
+				REPORT = "CoreScripts.InGameMenu.QuickActions.Report"
 			},
 			ICON = {
 				ADD_FRIEND_NEW = "person-plus",
@@ -69,15 +71,13 @@ return {
 				FRIEND_NEW = "two-people",
 				REPORT_PLAYER_LEGACY = "icons/actions/feedback",
 				REPORT_PLAYER_NEW = "speech-bubble-exclamation",
+				REPORT_PLAYER_FLAG = IconName.Flag,
 				INSPECT_LEGACY = "icons/actions/zoomIn",
-				INSPECT_NEW = "magnifying-glass-plus",
-				REPORT_PLAYER_FLAG = IconName.Flag
+				INSPECT_NEW = "magnifying-glass-plus"
 			}
 		},
 		CARD_MENU = {
-			LOCALIZED_STRINGS = {
-				VOICE_SECTION_TITLE = "Feature.SettingsHub.Label.VoiceChat"
-			}
+			LOCALIZED_STRINGS = { VOICE_SECTION_TITLE = "Feature.SettingsHub.Label.VoiceChat" }
 		},
 		CARD_TOOLTIP = {
 			LOCALIZED_STRINGS = {
@@ -86,16 +86,8 @@ return {
 				SELECT_USERNAME_TO_VIEW_PROFILE = "Feature.SettingsHub.Description.SelectUsernameToViewProfile",
 				OK = "Feature.SettingsHub.Action.Ok"
 			},
-			UNIVERSES_EXPOSED_TO_CARD_TOOLTIP = not GetFFlagFixPeoplePageCardTooltip() and "UniversesExposedToCardTooltipKey2" or v6
+			UNIVERSES_EXPOSED_TO_CARD_TOOLTIP = not getFFlagFixPeoplePageCardTooltip() and "UniversesExposedToCardTooltipKey2" or defineFastString
 		},
-		SWITCH_SERVER_CONFIRMATION = {
-			TITLE = "CoreScripts.InGameMenu.SwitchServer.ConfirmHeader",
-			BODY = "CoreScripts.InGameMenu.SwitchServer.ConfirmBody",
-			CONFIRM = "CoreScripts.InGameMenu.Actions.Continue",
-			CANCEL = "CoreScripts.InGameMenu.Cancel"
-		},
-		BUTTON_ACTIVATED_TABLE_KEYS = {
-			SWITCH_SERVER = "switchServer"
-		}
+		BUTTON_ACTIVATED_TABLE_KEYS = { SWITCH_SERVER = "switchServer" }
 	}
 }

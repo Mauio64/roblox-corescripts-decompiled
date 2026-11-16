@@ -1,30 +1,28 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local parent = script.Parent.Parent.Parent
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
 
 return {
-	UniqueOperationNamesRule = function(p1) -- line: 19
-		-- upvalues: GraphQLError (copy)
-		local t1 = {}
-
+	UniqueOperationNamesRule = function(object)
+		local names = {}
 		return {
-			OperationDefinition = function(_, p3) -- line: 22
-				-- upvalues: t1 (copy), p1 (copy), GraphQLError (copy)
-				local name = p3.name
+			OperationDefinition = function(_, p): boolean
+				local name = p.name
 
 				if name then
-					if t1[name.value] then
-						p1:reportError(GraphQLError.new(("There can be only one operation named \"%s\"."):format(name.value), {
-							t1[name.value],
-							name
-						}))
+					if names[name.value] then
+						object:reportError(graphQLError.new(
+							("There can be only one operation named \"%s\"."):format(name.value),
+							{ names[name.value], name }
+						))
 					else
-						t1[name.value] = name
+						names[name.value] = name
 					end
 				end
 
 				return false
 			end,
-			FragmentDefinition = function() -- line: 40
+			FragmentDefinition = function(): boolean
 				return false
 			end
 		}

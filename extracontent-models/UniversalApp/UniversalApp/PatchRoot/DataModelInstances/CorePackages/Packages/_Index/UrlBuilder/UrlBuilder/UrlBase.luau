@@ -1,86 +1,99 @@
-local BaseUrl = game:GetService("ContentProvider").BaseUrl
-local v2 = string.gsub(BaseUrl, ".*://", "")
-local v3 = string.gsub(v2, "/.*", "")
-local u4 = string.gsub(v3, "^www%.", "")
-local t1 = {
-	new = function(p1, p2) -- line: 24
-		-- upvalues: u4 (ref)
-		assert(type(p1) == "string", "UrlBase.new: `name` should be a string")
+local ContentProvider = game:GetService("ContentProvider")
 
-		if p2 == nil then
-			p2 = {}
+local BaseUrl = ContentProvider.BaseUrl
+local v = string.gsub(BaseUrl, ".*://", "")
+local v2 = string.gsub(v, "/.*", "")
+local v3 = string.gsub(v2, "^www%.", "")
+
+local UrlBase = {
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	["new"] = nil,
+	new = function(name, p)
+		assert(type(name) == "string", "UrlBase.new: `name` should be a string")
+		local version2 = p == nil and {} or p
+
+		local v4 = (type(version2) == "number" or type(version2) == "string") and {
+			version = version2
+		} or version2
+
+		assert(type(v4) == "table", "UrlBase.new: `params` should be a table")
+		local proto = v4.proto
+		local version = v4.version
+		local path = v4.path
+		local v5 = proto == nil and (v4.secure == false and "http" or "https") or proto
+
+		if #v5 > 0 then
+			v5 ..= "://"
 		end
 
-		if type(p2) == "number" or type(p2) == "string" then
-			p2 = {
-				version = p2
-			}
+		local v6 = v5 .. name
+
+		if #name > 0 then
+			v6 ..= "."
 		end
 
-		assert(type(p2) == "table", "UrlBase.new: `params` should be a table")
-
-		local proto = p2.proto
-		local version = p2.version
-		local path = p2.path
-
-		if proto == nil then
-			proto = p2.secure ~= false and "https" or "http"
-		end
-
-		if #proto > 0 then
-			proto ..= "://"
-		end
-
-		local v12 = proto .. p1
-
-		if #p1 > 0 then
-			v12 ..= "."
-		end
-
-		local v13 = v12 .. u4
+		local v7 = v6 .. v3
 
 		if version ~= nil and #tostring(version) > 0 then
-			v13 ..= "/v" .. tostring(version)
+			v7 ..= "/v" .. tostring(version)
 		end
 
 		if path ~= nil and #path > 0 then
-			v13 ..= "/" .. path
+			return v7 .. "/" .. path
 		end
 
-		return v13
+		return v7
 	end
 }
-local v6 = string.sub(u4, -6) == "qq.com"
 
-t1.API = t1.new("api")
-t1.APIS = t1.new("apis")
-t1.APIS_RBXCDN = "https://apis.rbxcdn.com"
-t1.AUTH = t1.new("auth")
-t1.CHAT = t1.new("chat")
-t1.CREATE = t1.new("create")
-t1.FRIENDS = t1.new("friends", 1)
-t1.ASSETGAME = t1.new("assetgame")
-t1.GAMES = t1.new("games", 1)
-t1.NOTIFICATION = t1.new("notification", 2)
-t1.NOTIFICATIONS = t1.new("notifications", 2)
-t1.PRESENCE = t1.new("presence", 1)
-t1.REALTIME = t1.new("realtime")
-t1.WEB = t1.new("web")
-t1.WWW = t1.new("www")
-t1.ADS = t1.new("ads", 1)
-t1.ADCONFIGURATION = t1.new("adconfiguration", 2)
-t1.FOLLOWINGS = t1.new("followings", 1)
-t1.PREMIUM = t1.new("premiumfeatures", 1)
-t1.BLOG = "https://blog.roblox.com"
-t1.CORP = not v6 and "https://corp.roblox.com" or "https://roblox.qq.com"
-t1.USERMODERATION = t1.new("usermoderation")
-t1.ACCOUNTINFORMATION = t1.new("accountinformation", 1)
-t1.ACCOUNTSETTINGS = t1.new("accountsettings")
-t1.BADGES = t1.new("badges", 1)
-t1.INVENTORY = t1.new("inventory", 1)
-t1.CATALOG = t1.new("catalog", 1)
-t1.AVATAR = t1.new("avatar", 1)
-t1.MOBILENAV = "roblox://navigation"
-t1.APPSFLYER = "https://ro.blox.com"
+local v4 = string.sub(v3, -6) == "qq.com"
 
-return t1
+UrlBase.API = UrlBase.new("api")
+UrlBase.APIS = UrlBase.new("apis")
+UrlBase.APIS_RBXCDN = "https://apis.rbxcdn.com"
+UrlBase.AUTH = UrlBase.new("auth")
+UrlBase.CHAT = UrlBase.new("chat")
+UrlBase.CREATE = UrlBase.new("create")
+UrlBase.FRIENDS = UrlBase.new("friends", 1)
+UrlBase.ASSETGAME = UrlBase.new("assetgame")
+UrlBase.GAMES = UrlBase.new("games", 1)
+UrlBase.NOTIFICATION = UrlBase.new("notification", 2)
+UrlBase.NOTIFICATIONS = UrlBase.new("notifications", 2)
+UrlBase.PRESENCE = UrlBase.new("presence", 1)
+UrlBase.REALTIME = UrlBase.new("realtime")
+UrlBase.WEB = UrlBase.new("web")
+UrlBase.WWW = UrlBase.new("www")
+UrlBase.ADS = UrlBase.new("ads", 1)
+UrlBase.ADCONFIGURATION = UrlBase.new("adconfiguration", 2)
+UrlBase.FOLLOWINGS = UrlBase.new("followings", 1)
+UrlBase.PREMIUM = UrlBase.new("premiumfeatures", 1)
+UrlBase.BLOG = "https://blog.roblox.com"
+UrlBase.CORP = v4 and "https://roblox.qq.com" or "https://corp.roblox.com"
+UrlBase.USERMODERATION = UrlBase.new("usermoderation")
+UrlBase.ACCOUNTINFORMATION = UrlBase.new("accountinformation", 1)
+
+UrlBase.ACCOUNTSETTINGS = UrlBase.new("accountsettings")
+UrlBase.BADGES = UrlBase.new("badges", 1)
+UrlBase.INVENTORY = UrlBase.new("inventory", 1)
+UrlBase.CATALOG = UrlBase.new("catalog", 1)
+
+UrlBase.AVATAR = UrlBase.new("avatar", 1)
+
+UrlBase.MOBILENAV = "roblox://navigation"
+UrlBase.APPSFLYER = "https://ro.blox.com"
+
+return UrlBase

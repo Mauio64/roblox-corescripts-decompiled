@@ -1,14 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-
 require(AppChat.Models.ConversationChannels)
 
-return function(t1: {[any]: any}, s1: string) -- line: 8
-	for v4, v5 in t1 do
-		if v5 and v5.type == "one_to_one" and v5.participants then
-			for _, v7 in v5.participants do
-				if v7 == s1 then
-					return v4
-				end
+return function(items, p: string)
+	for k, item in items do
+		if not (item and item.type == "one_to_one" and item.participants) then
+			continue
+		end
+
+		for _, participant in item.participants do
+			if participant == p then
+				return k
 			end
 		end
 	end

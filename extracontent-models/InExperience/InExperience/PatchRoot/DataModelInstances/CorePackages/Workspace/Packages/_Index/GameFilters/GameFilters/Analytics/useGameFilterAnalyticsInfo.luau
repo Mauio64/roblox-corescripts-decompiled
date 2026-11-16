@@ -1,33 +1,28 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
+local parent = script:FindFirstAncestor("GameFilters").Parent
+require(parent.DiscoveryTypes)
+local React = require(parent.React)
+local TopicInfosRodux = require(parent.TopicInfosRodux)
+local TopicInfosReducer = TopicInfosRodux.TopicInfosReducer
 
-require(Parent.DiscoveryTypes)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local React = require(Parent.React)
-local TopicInfosReducer = require(Parent.TopicInfosRodux).TopicInfosReducer
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-
-local function useGameFilterAnalyticsInfo(s1: string, n1: number) -- line: 10
-	-- upvalues: useSelector (copy), TopicInfosReducer (copy), React (copy)
-	local v8 = useSelector(function(p1) -- line: 11
-		-- upvalues: TopicInfosReducer (copy), s1 (copy)
-		return p1.Personalization[TopicInfosReducer.key][s1]
+local function useGameFilterAnalyticsInfo(p: string, sortPos: number)
+	local v = useSelector(function(p2)
+		return p2.Personalization[TopicInfosReducer.key][p]
 	end)
 
-	return React.useMemo(function() -- line: 15
-		-- upvalues: v8 (copy), n1 (copy)
-		if v8 then
+	return React.useMemo(function()
+		if v then
 			return {
-				gameSetTypeId = v8.gameSetTypeId,
-				gameSetTargetId = v8.gameSetTargetId,
-				sortPos = n1
+				gameSetTypeId = v.gameSetTypeId,
+				gameSetTargetId = v.gameSetTargetId,
+				sortPos = sortPos
 			}
 		end
 
 		return {}
-	end, {
-		v8,
-		n1
-	})
+	end, { v, sortPos })
 end
 
 return useGameFilterAnalyticsInfo

@@ -1,0 +1,1 @@
+return require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXCustomGetStateForActionHandler") and game:DefineFastFlag("AXEnableManualSavingBlockingPrompt3", false)

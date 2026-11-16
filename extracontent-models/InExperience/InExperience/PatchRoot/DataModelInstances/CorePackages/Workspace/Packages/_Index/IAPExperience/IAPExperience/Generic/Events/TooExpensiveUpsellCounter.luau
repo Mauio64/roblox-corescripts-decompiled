@@ -1,41 +1,29 @@
-local Parent = script:FindFirstAncestor("IAPExperience").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
+local parent = script:FindFirstAncestor("IAPExperience").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
 
 return {
 	TooExpensiveUpsellShownCounter = {
 		eventName = "TooExpensiveUpsellShownCounter",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = { 2025, 7, 29 },
 		throttlingPercentage = 100,
 		description = "Counter fired when Robux too expensive upsell modal shown",
-		links = "",
-		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			7,
-			29
-		}
+		links = ""
 	},
 	TooExpensiveUpsellFallbackShownCounter = {
 		eventName = "TooExpensiveUpsellFallbackShownCounter",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = { 2025, 7, 29 },
 		throttlingPercentage = 100,
 		description = "Counter fired when Robux too expensive fallback modal shown",
-		links = "",
-		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			7,
-			29
-		}
+		links = ""
 	},
 	TooExpensiveUnifiedUpsellShownCounter = {
 		eventName = "TooExpensiveUnifiedUpsellShownCounter",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = { 2025, 9, 29 },
 		throttlingPercentage = 100,
 		description = "Counter fired when Robux too expensive unified upsell modal shown",
-		links = "",
-		backends = { LoggingProtocol.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			9,
-			29
-		}
+		links = ""
 	}
 }

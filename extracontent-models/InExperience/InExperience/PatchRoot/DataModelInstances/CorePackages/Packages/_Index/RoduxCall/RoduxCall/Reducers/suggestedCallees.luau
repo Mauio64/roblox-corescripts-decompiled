@@ -1,40 +1,33 @@
 local RoduxCall = script:FindFirstAncestor("RoduxCall")
-local RoduxCallParent = RoduxCall.Parent
-local Rodux = require(RoduxCallParent.Rodux)
-local SuggestedCalleeModel = require(RoduxCall.Models).SuggestedCalleeModel
-local ClearSuggestedCallees = require(RoduxCall.Actions).ClearSuggestedCallees
+local parent = RoduxCall.Parent
+local Rodux = require(parent.Rodux)
+local Models = require(RoduxCall.Models)
+local SuggestedCalleeModel = Models.SuggestedCalleeModel
+local Actions = require(RoduxCall.Actions)
+local ClearSuggestedCallees = Actions.ClearSuggestedCallees
 
 require(script.Parent.Parent.roduxCallTypes)
 
-local t1 = {
-	suggestedCallees = {}
-}
+local v = { suggestedCallees = {} }
 
-return function(p1) -- line: 11
-	-- upvalues: Rodux (copy), t1 (copy), SuggestedCalleeModel (copy), ClearSuggestedCallees (copy)
-	local NetworkingCall = p1.NetworkingCall
+return function(p)
+	local networkingCall = p.NetworkingCall
+	return Rodux.createReducer(v, {
+		[networkingCall.GetSuggestedCallees.Succeeded.name] = function(_, p2)
+			local suggestedCallees = p2.responseBody.suggestedCallees
 
-	return Rodux.createReducer(t1, {
-		[NetworkingCall.GetSuggestedCallees.Succeeded.name] = function(_, p3) -- line: 14
-			-- upvalues: SuggestedCalleeModel (copy)
-			local suggestedCallees = p3.responseBody.suggestedCallees
-			local t2 = {}
+			local values = {}
 
-			for _, v in ipairs(suggestedCallees) do
-				assert(SuggestedCalleeModel.isValid(v))
-
-				local v15 = SuggestedCalleeModel.format(v)
-
-				t2[#t2 + 1] = v15
+			for _, suggestedCallee in ipairs(suggestedCallees) do
+				assert(SuggestedCalleeModel.isValid(suggestedCallee))
+				local formatted = SuggestedCalleeModel.format(suggestedCallee)
+				values[#values + 1] = formatted
 			end
 
-			return {
-				suggestedCallees = t2
-			}
+			return { suggestedCallees = values }
 		end,
-		[ClearSuggestedCallees.name] = function(_, _) -- line: 29
-			-- upvalues: t1 (copy)
-			return t1
+		[ClearSuggestedCallees.name] = function(_, _)
+			return v
 		end
 	})
 end

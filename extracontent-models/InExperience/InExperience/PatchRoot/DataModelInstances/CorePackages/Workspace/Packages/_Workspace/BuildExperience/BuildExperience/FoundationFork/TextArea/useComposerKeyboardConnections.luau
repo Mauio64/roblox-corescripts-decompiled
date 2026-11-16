@@ -1,55 +1,49 @@
 local UserInputService = game:GetService("UserInputService")
-local FoundationParent = game:GetService("CorePackages").Packages._Index.Foundation.Foundation.Parent
-local React = require(FoundationParent.React)
 
-local function isReturnKey(p1) -- line: 13
-	return p1 == Enum.KeyCode.Return or p1 == Enum.KeyCode.KeypadEnter
+local CorePackages = game:GetService("CorePackages")
+local parent = CorePackages.Packages._Index.Foundation.Foundation.Parent
+
+local React = require(parent.React)
+
+local function isReturnKey(keyCode): boolean -- 1 equivalent call inferred from this helper
+	return keyCode == Enum.KeyCode.Return or keyCode == Enum.KeyCode.KeypadEnter
 end
-local function useComposerKeyboardConnections(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy), UserInputService (copy)
-	local v8 = React.useRef(false)
-	local v9 = React.useRef(nil)
-	local v10 = React.useCallback(function() -- line: 21
-		-- upvalues: v9 (copy), v8 (copy)
-		if v9.current then
-			v9.current:Disconnect()
-			v9.current = nil
+
+local function useComposerKeyboardConnections(p)
+	local ref = React.useRef(false)
+	local ref2 = React.useRef(nil)
+
+	local disconnect = React.useCallback(function()
+		if ref2.current then
+			ref2.current:Disconnect()
+			ref2.current = nil
 		end
 
-		v8.current = false
+		ref.current = false
 	end, {})
-	local v11 = React.useCallback(function() -- line: 29
-		-- upvalues: t1 (copy), v8 (copy), v9 (copy), UserInputService (copy)
-		if not t1.enabled or v8.current then
-			return
+
+	local connect = React.useCallback(function()
+		if p.enabled and not ref.current then
+			ref2.current = UserInputService.InputBegan:Connect(function(input, gameProcessed: boolean)
+				if isReturnKey(input.KeyCode) then -- inferred equivalent call
+					p.onReturnPressed(
+						gameProcessed,
+						UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
+					)
+				end
+			end)
+
+			ref.current = true
 		end
+	end, { p.enabled, p.onReturnPressed })
 
-		v9.current = UserInputService.InputBegan:Connect(function(input, gameProcessed: boolean) -- line: 35
-			-- upvalues: t1 (copy), UserInputService (copy)
-			local KeyCode = input.KeyCode
-
-			if KeyCode == Enum.KeyCode.Return or KeyCode == Enum.KeyCode.KeypadEnter then
-				t1.onReturnPressed(gameProcessed, UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift))
-			end
-		end)
-		v8.current = true
-	end, {
-		t1.enabled,
-		t1.onReturnPressed
-	})
-
-	React.useEffect(function() -- line: 48
-		-- upvalues: v10 (copy)
-		return function() -- line: 49
-			-- upvalues: v10 (copy)
-			v10()
+	React.useEffect(function()
+		return function()
+			disconnect()
 		end
-	end, { v10 })
+	end, { disconnect })
 
-	return {
-		connect = v11,
-		disconnect = v10
-	}
+	return { connect = connect, disconnect = disconnect }
 end
 
 return useComposerKeyboardConnections

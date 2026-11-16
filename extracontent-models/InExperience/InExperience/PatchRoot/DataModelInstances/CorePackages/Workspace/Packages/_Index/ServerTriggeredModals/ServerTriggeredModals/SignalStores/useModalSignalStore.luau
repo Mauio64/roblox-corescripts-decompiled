@@ -1,11 +1,11 @@
-local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
+
+local React = require(parent.React)
+
 local getModalSignalStore = require(script.Parent.getModalSignalStore)
 
-return function() -- line: 8
-	-- upvalues: React (copy), getModalSignalStore (copy)
-	return React.useMemo(function() -- line: 9
-		-- upvalues: getModalSignalStore (copy)
+return function()
+	return React.useMemo(function()
 		return getModalSignalStore(false)
 	end, {})
 end

@@ -1,43 +1,42 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
-local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
-local React = require(RobloxSubscriptionPurchaseAppParent.React)
-local ReactRoblox = require(RobloxSubscriptionPurchaseAppParent.ReactRoblox)
+local parent = RobloxSubscriptionPurchaseApp.Parent
+
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+
 local RobloxSubscriptionHeadlessListenerHost = require(RobloxSubscriptionPurchaseApp.Components.RobloxSubscriptionHeadlessListenerHost)
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
-local u7 = nil
 
-return {
-	render = function() -- line: 19
-		-- upvalues: RobloxSubscriptionStore (copy), ReactRoblox (copy), React (copy), RobloxSubscriptionHeadlessListenerHost (copy), u7 (ref)
-		local v8 = RobloxSubscriptionStore.get()
+local v = nil
+local RobloxSubscriptionHeadlessOverlayController = {}
 
-		v8.triggerUnmountUI()
+function RobloxSubscriptionHeadlessOverlayController.render()
+	local v2 = RobloxSubscriptionStore.get()
+	v2.triggerUnmountUI()
 
-		local Folder = Instance.new("Folder")
+	local robloxSubscriptionPurchaseHeadlessOverlay = Instance.new("Folder")
+	robloxSubscriptionPurchaseHeadlessOverlay.Name = "RobloxSubscriptionPurchaseHeadlessOverlay"
+	robloxSubscriptionPurchaseHeadlessOverlay.Parent = game:GetService("CoreGui")
 
-		Folder.Name = "RobloxSubscriptionPurchaseHeadlessOverlay"
-		Folder.Parent = game:GetService("CoreGui")
+	local root = ReactRoblox.createRoot(robloxSubscriptionPurchaseHeadlessOverlay)
+	root:render(React.createElement(RobloxSubscriptionHeadlessListenerHost))
 
-		local v10 = ReactRoblox.createRoot(Folder)
-
-		v10:render(React.createElement(RobloxSubscriptionHeadlessListenerHost))
-
-		local function cleanup() -- line: 30
-			-- upvalues: v10 (copy), Folder (copy)
-			v10:unmount()
-			Folder:Destroy()
-		end
-
-		u7 = cleanup
-		v8.setOnUnmountUI(cleanup)
-
-		return cleanup
-	end,
-	close = function() -- line: 12
-		-- upvalues: u7 (ref)
-		if u7 then
-			u7()
-			u7 = nil
-		end
+	local function cleanup()
+		root:unmount()
+		robloxSubscriptionPurchaseHeadlessOverlay:Destroy()
 	end
-}
+
+	v = cleanup
+	v2.setOnUnmountUI(cleanup)
+
+	return cleanup
+end
+
+function RobloxSubscriptionHeadlessOverlayController.close()
+	if v then
+		v()
+		v = nil
+	end
+end
+
+return RobloxSubscriptionHeadlessOverlayController

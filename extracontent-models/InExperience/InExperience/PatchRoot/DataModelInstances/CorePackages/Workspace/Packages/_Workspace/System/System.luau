@@ -1,8 +1,5 @@
-local Lifecycle = require(script.Lifecycle)
-local Features = require(script.Features)
-
 return {
-	Lifecycle = Lifecycle,
-	Features = Features,
+	Lifecycle = require(script.Lifecycle),
+	Features = require(script.Features),
 	["jest.config"] = script["jest.config"]
 }

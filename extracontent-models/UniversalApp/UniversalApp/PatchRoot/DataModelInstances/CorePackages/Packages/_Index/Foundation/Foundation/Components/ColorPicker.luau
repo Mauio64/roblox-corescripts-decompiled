@@ -1,1 +1,3 @@
-return (require(script.ColorPicker))
+local ColorPicker = require(script.ColorPicker)
+
+return ColorPicker

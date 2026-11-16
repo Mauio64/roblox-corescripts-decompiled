@@ -1,8 +1,7 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-
-require(scriptParentParent.LuauPolyfill)
-require(scriptParent.Enums.CallStatus)
-require(scriptParent.Enums.MessageType)
+local parent = script.Parent
+local parent2 = parent.Parent
+require(parent2.LuauPolyfill)
+require(parent.Enums.CallStatus)
+require(parent.Enums.MessageType)
 
 return nil

@@ -1,17 +1,18 @@
 local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
-local GraphQLServerParent = GraphQLServer.Parent
-local GraphQLError = require(GraphQLServer.Parent.GraphQL).GraphQLError
-
+local parent = GraphQLServer.Parent
+local GraphQL = require(GraphQLServer.Parent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
 require(GraphQLServer.graphql.generatedTypes)
-require(GraphQLServerParent.LuauPolyfill)
+
+require(parent.LuauPolyfill)
 
 local FriendsConnector = require(GraphQLServer.graphql.connectors.FriendsConnector)
 local getAllFriendsByUserId = FriendsConnector.getAllFriendsByUserId
 local getOnlineFriendsByUserId = FriendsConnector.getOnlineFriendsByUserId
 
-local function convertToStringWithDefault(p1) -- line: 20
-	if p1 then
-		return (tostring(p1))
+local function convertToStringWithDefault(p) -- 4 equivalent calls inferred from this helper
+	if p then
+		return (tostring(p))
 	end
 
 	return ""
@@ -19,98 +20,71 @@ end
 
 return {
 	UserPresence = {
-		id = function(p2) -- line: 26
-			return p2.id
+		id = function(p)
+			return p.id
 		end,
-		userPresenceType = function(p3) -- line: 29
-			return p3.userPresence.UserPresenceType
+		userPresenceType = function(p)
+			return p.userPresence.UserPresenceType
 		end,
-		gameId = function(p4) -- line: 32
-			local gameInstanceId = p4.userPresence.gameInstanceId
-
-			if gameInstanceId then
-				return (tostring(gameInstanceId))
-			end
-
-			return ""
+		gameId = function(p)
+			return convertToStringWithDefault(p.userPresence.gameInstanceId) -- inferred equivalent call
 		end,
-		placeId = function(p5) -- line: 35
-			local placeId = p5.userPresence.placeId
-
-			if placeId then
-				return (tostring(placeId))
-			end
-
-			return ""
+		placeId = function(p)
+			return convertToStringWithDefault(p.userPresence.placeId) -- inferred equivalent call
 		end,
-		rootPlaceId = function(p6) -- line: 38
-			local rootPlaceId = p6.userPresence.rootPlaceId
-
-			if rootPlaceId then
-				return (tostring(rootPlaceId))
-			end
-
-			return ""
+		rootPlaceId = function(p)
+			return convertToStringWithDefault(p.userPresence.rootPlaceId) -- inferred equivalent call
 		end,
-		universeId = function(p7) -- line: 41
-			local universeId = p7.userPresence.universeId
-
-			if universeId then
-				return (tostring(universeId))
-			end
-
-			return ""
+		universeId = function(p)
+			return convertToStringWithDefault(p.userPresence.universeId) -- inferred equivalent call
 		end,
-		lastLocation = function(p8) -- line: 44
-			return p8.userPresence.lastLocation
+		lastLocation = function(p)
+			return p.userPresence.lastLocation
 		end,
-		lastOnline = function(p9) -- line: 47
-			return p9.userPresence.lastOnline
+		lastOnline = function(p)
+			return p.userPresence.lastOnline
 		end
 	},
 	Friend = {
-		targetUserId = function(_, _, _, p13) -- line: 52
-			return p13.variableValues.userId
+		targetUserId = function(_, _, _, p)
+			return p.variableValues.userId
 		end,
-		displayName = function() -- line: 55
-			-- upvalues: GraphQLError (copy)
+		displayName = function()
 			return GraphQLError.new("The displayName field is being deprecated, please use UserProfile to retrieve names")
 		end,
-		presence = function(p14) -- line: 60
-			return p14
+		presence = function(p)
+			return p
 		end,
-		hasVerifiedBadge = function(_) -- line: 63
+		hasVerifiedBadge = function(_): boolean
 			return false
 		end,
-		sortScore = function(p16) -- line: 66
-			return p16.sortScore or 0
+		sortScore = function(p)
+			return p.sortScore or 0
 		end
 	},
 	AllFriendsPage = {
-		targetUserId = function(_, _, _, p20) -- line: 71
-			return p20.variableValues.userId
+		targetUserId = function(_, _, _, p)
+			return p.variableValues.userId
 		end,
-		curCursor = function(_, _, _, p24) -- line: 74
-			return p24.variableValues.pageCursor or ""
+		curCursor = function(_, _, _, p)
+			return p.variableValues.pageCursor or ""
 		end,
-		nextCursor = function(p25) -- line: 77
-			return p25.NextCursor or ""
+		nextCursor = function(p)
+			return p.NextCursor or ""
 		end,
-		prevCursor = function(p26) -- line: 80
-			return p26.PreviousCursor or ""
+		prevCursor = function(p)
+			return p.PreviousCursor or ""
 		end,
-		friends = function(p27) -- line: 83
-			return p27.PageItems or {}
+		friends = function(p)
+			return p.PageItems or {}
 		end
 	},
 	Query = {
-		allFriendsByUserId = function(_, p29, p30) -- line: 88
-			-- upvalues: getAllFriendsByUserId (copy)
-			return getAllFriendsByUserId(p29, p30.fetchImpl)
+		allFriendsByUserId = function(_, p, p2)
+			return getAllFriendsByUserId(p, p2.fetchImpl)
 		end,
-		onlineFriendsByUserId = function(_, p32, p33) -- line: 91
-			-- upvalues: getOnlineFriendsByUserId (copy)
-			return getOnlineFriendsByUserId(p32, p33.fetchImpl)
+		onlineFriendsByUserId = function(_, p, p2)
+			return getOnlineFriendsByUserId(p, p2.fetchImpl)
 		end
 	}
 }

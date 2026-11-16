@@ -1,7 +1,10 @@
-local Parent = script:FindFirstAncestor("SocialContextToasts").Parent
-local t = require(Parent.t)
-local mutedError = require(Parent.Loggers).mutedError
-local v4 = t.strictInterface({
+local parent = script:FindFirstAncestor("SocialContextToasts").Parent
+
+local t = require(parent.t)
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+
+local strictInterface = t.strictInterface({
 	toastType = t.string,
 	friendId = t.string,
 	universeId = t.string,
@@ -9,13 +12,12 @@ local v4 = t.strictInterface({
 	actionType = t.string
 })
 
-return function(p1, p2) -- line: 15
-	-- upvalues: v4 (copy), mutedError (copy)
-	local v7, v8 = v4(p2)
+return function(object, p)
+	local v, v2 = strictInterface(p)
 
-	if not v7 then
-		mutedError(v8)
+	if not v then
+		mutedError(v2)
 	end
 
-	p1:sendEventDeferred("SocialContextToast", "socialContextToastEvent", p2)
+	object:sendEventDeferred("SocialContextToast", "socialContextToastEvent", p)
 end

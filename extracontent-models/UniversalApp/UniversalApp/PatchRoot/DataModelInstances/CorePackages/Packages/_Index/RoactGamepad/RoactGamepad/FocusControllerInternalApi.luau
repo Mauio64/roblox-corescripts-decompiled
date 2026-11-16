@@ -1,1 +1,3 @@
-return require(script.Parent.Symbol).named("FocusControllerInternalApi")
+local Symbol = require(script.Parent.Symbol)
+
+return Symbol.named("FocusControllerInternalApi")

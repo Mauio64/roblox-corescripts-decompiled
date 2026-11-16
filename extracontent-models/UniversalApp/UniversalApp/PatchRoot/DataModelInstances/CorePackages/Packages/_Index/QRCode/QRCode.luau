@@ -1,3 +1,3 @@
-return {
-	qrcode = require(script.qrencode).qrcode
-}
+local qrencode = require(script.qrencode)
+
+return { qrcode = qrencode.qrcode }

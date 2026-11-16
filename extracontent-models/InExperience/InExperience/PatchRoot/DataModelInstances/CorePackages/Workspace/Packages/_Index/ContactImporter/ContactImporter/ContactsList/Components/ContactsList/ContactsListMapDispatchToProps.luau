@@ -1,48 +1,60 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local NetworkingFriends = dependencies.NetworkingFriends
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Common.LocalTypes)
-
-local NetworkingContacts = dependencies.NetworkingContacts
-local RoduxContacts = dependencies.RoduxContacts
-local Promise = dependencies.Promise
+local dependencies = require(parent.dependencies)
+local networkingFriends = dependencies.NetworkingFriends
+require(parent.Common.LocalTypes)
+local networkingContacts = dependencies.NetworkingContacts
+local roduxContacts = dependencies.RoduxContacts
+local promise = dependencies.Promise
 local llama = dependencies.llama
 
-return function(p1) -- line: 11
-	-- upvalues: NetworkingFriends (copy), NetworkingContacts (copy), llama (copy), Promise (copy), RoduxContacts (copy)
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagMigrateFriendshipStatusesRemainingActions = SharedFlags.FFlagMigrateFriendshipStatusesRemainingActions
+local friendsStoreChallengeNetwork = require(parent.Networking.friendsStoreChallengeNetwork)
+
+local SharedFlags2 = require(parent2.SharedFlags)
+local FFlagEnableFriendsStoreChallengeInterceptor = SharedFlags2.FFlagEnableFriendsStoreChallengeInterceptor
+local DataHydration = require(parent2.DataHydration)
+local v = DataHydration.Friends.FriendsStore.get()
+
+return function(callback)
 	return {
-		requestFriendship = function(p2) -- line: 13
-			-- upvalues: p1 (copy), NetworkingFriends (copy)
-			return p1(NetworkingFriends.RequestFriendshipFromContactId.API(p2))
-		end,
-		findContacts = function() -- line: 16
-			-- upvalues: p1 (copy), NetworkingContacts (copy)
-			return p1(NetworkingContacts.FindContactFriends.API()):andThen(function(p3) -- line: 17
-				return p3.responseBody.userContactIds
-			end)
-		end,
-		getContactEntities = function(p4) -- line: 21
-			-- upvalues: llama (copy), Promise (copy), p1 (copy), NetworkingContacts (copy)
-			if llama.isEmpty(p4) or not p4 then
-				return Promise.resolve()
+		requestFriendship = function(p)
+			if not FFlagMigrateFriendshipStatusesRemainingActions then
+				return callback(networkingFriends.RequestFriendshipFromContactId.API(p))
 			end
 
-			return p1(NetworkingContacts.GetContactEntitiesByContactId.API(p4))
+			local requestFriendship = v.RequestFriendship
+			local contactId = p.contactId
+			local v2
+
+			if FFlagEnableFriendsStoreChallengeInterceptor then
+				v2 = friendsStoreChallengeNetwork
+			end
+
+			return requestFriendship(contactId, nil, { isContact = true }, v2)
 		end,
-		uploadContacts = function(p5) -- line: 28
-			-- upvalues: p1 (copy), NetworkingContacts (copy)
-			return p1(NetworkingContacts.UploadContactsByUser.API(p5))
+		findContacts = function()
+			return callback(networkingContacts.FindContactFriends.API()):andThen(function(p)
+				return p.responseBody.userContactIds
+			end)
 		end,
-		deviceContactsReceived = function(p6) -- line: 31
-			-- upvalues: p1 (copy), RoduxContacts (copy)
-			return p1(RoduxContacts.Actions.DeviceContactsReceived(p6))
+		getContactEntities = function(p)
+			if llama.isEmpty(p) or not p then
+				return promise.resolve()
+			end
+
+			return callback(networkingContacts.GetContactEntitiesByContactId.API(p))
 		end,
-		requestSent = function(p7) -- line: 34
-			-- upvalues: p1 (copy), RoduxContacts (copy)
-			return p1(RoduxContacts.Actions.RequestSent({
-				id = p7
-			}))
+		uploadContacts = function(p)
+			return callback(networkingContacts.UploadContactsByUser.API(p))
+		end,
+		deviceContactsReceived = function(p)
+			return callback(roduxContacts.Actions.DeviceContactsReceived(p))
+		end,
+		requestSent = function(id)
+			return callback(roduxContacts.Actions.RequestSent({ id = id }))
 		end
 	}
 end

@@ -1,6 +1,6 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.MessageBus)
-require(ParentParent.AppCommonLib)
+require(parent.MessageBus)
+require(parent.AppCommonLib)
 
 return nil

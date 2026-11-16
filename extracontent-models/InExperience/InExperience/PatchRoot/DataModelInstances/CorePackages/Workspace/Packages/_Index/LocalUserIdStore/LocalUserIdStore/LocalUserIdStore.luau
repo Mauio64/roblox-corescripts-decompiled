@@ -1,11 +1,12 @@
-local Parent = script:FindFirstAncestor("LocalUserIdStore").Parent
-local v2, v3 = require(Parent.Signals).createSignal("")
+local parent = script:FindFirstAncestor("LocalUserIdStore").Parent
+local Signals = require(parent.Signals)
+
+local signal, setCurrentUserId = Signals.createSignal("")
 
 return {
-	getCurrentUserId = v2,
-	setCurrentUserId = v3,
-	reset = function() -- line: 26
-		-- upvalues: v3 (copy)
-		v3("")
+	getCurrentUserId = signal,
+	setCurrentUserId = setCurrentUserId,
+	reset = function()
+		setCurrentUserId("")
 	end
 }

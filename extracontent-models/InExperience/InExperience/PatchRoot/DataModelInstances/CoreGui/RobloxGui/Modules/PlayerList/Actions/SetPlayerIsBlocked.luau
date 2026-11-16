@@ -1,7 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerIsBlocked", function(p1, p2) -- line: 4
-	return {
-		player = p1,
-		userId = p1.UserId,
-		isBlocked = p2
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetPlayerIsBlocked", function(player, isBlocked)
+	return { player = player, userId = player.UserId, isBlocked = isBlocked }
 end)

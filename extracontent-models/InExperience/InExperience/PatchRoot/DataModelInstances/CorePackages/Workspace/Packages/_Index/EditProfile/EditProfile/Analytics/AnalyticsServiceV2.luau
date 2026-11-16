@@ -1,19 +1,20 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
+local parent = EditProfile.Parent
 local TelemetryService = game:GetService("TelemetryService")
-local Cryo = require(EditProfileParent.Cryo)
+
+local Cryo = require(parent.Cryo)
 local Constants = require(EditProfile.Common.Constants)
+
 local _ = {
 	OpenEditDisplayName = "openEditDisplayName",
 	SaveDisplayName = "saveDisplayName",
 	OpenEditUsername = "openEditUsername",
 	OpenAvatarMarketplace = "openAvatarMarketplace"
 }
-local _ = {
-	EditProfilePage = "EditProfilePage",
-	EditDisplayNameModal = "EditDisplayNameModal"
-}
-local t1 = {
+
+local _ = { EditProfilePage = "EditProfilePage", EditDisplayNameModal = "EditDisplayNameModal" }
+
+local telemetryEventType = {
 	EditProfileOpened = "EditProfileOpened",
 	DisplayNameModalOpened = "DisplayNameModalOpened",
 	DisplayNameModalLoaded = "DisplayNameModalLoaded",
@@ -25,121 +26,90 @@ local t1 = {
 	DescriptionPINBlocked = "DescriptionPINBlocked",
 	OpenAvatarMarketplace = "OpenAvatarMarketplace"
 }
-local t2 = {
+
+local v = {
 	eventName = "EditProfileEvent",
 	description = "Event to track edit profile",
-	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/edit_profile/lua_edit_profile_button_events.proto",
-	lastUpdated = {
-		2025,
-		1,
-		20
-	},
-	backends = {
-		"EventIngest",
-		"Points"
-	},
-	throttlingPercentage = game:DefineFastInt("EditProfileThrottleHundredthsPercent", 10000)
+	lastUpdated = { 2025, 1, 20 },
+	backends = { "EventIngest", "Points" },
+	throttlingPercentage = game:DefineFastInt("EditProfileThrottleHundredthsPercent", 10000),
+	links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/social/edit_profile/lua_edit_profile_button_events.proto"
 }
 
-local function sendAnalyticsEvent(t3: {[any]: any}?, t4: {[any]: any}) -- line: 68
-	-- upvalues: Cryo (copy), TelemetryService (copy), t2 (copy)
-	local v13 = Cryo.Dictionary.join(t3 or {}, t4)
-
-	TelemetryService:LogEvent(t2, {
-		customFields = v13,
+local function sendAnalyticsEvent(options, p)
+	TelemetryService:LogEvent(v, {
+		customFields = Cryo.Dictionary.join(options or {}, p),
 		standardizedFields = { "addSessionInfo" }
 	})
 end
 
-return {
-	TelemetryEventType = t1,
-	sendEditProfileOpened = function() -- line: 89
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			page = "EditProfilePage"
-		}, {
-			sub_event_type = t1.EditProfileOpened
-		})
-	end,
-	sendDisplayNameModalOpened = function() -- line: 93
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			btn = "openEditDisplayName"
-		}, {
-			sub_event_type = t1.DisplayNameModalOpened
-		})
-	end,
-	sendDisplayNameModalLoaded = function(n1: number?) -- line: 100
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			page = "EditDisplayNameModal",
-			statValue = n1
-		}, {
-			sub_event_type = t1.DisplayNameModalLoaded,
-			statValue = n1
-		})
-	end,
-	sendDisplayNameSaved = function(s1: string?, n2: number?) -- line: 107
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			btn = "saveDisplayName",
-			displayName = s1,
-			statValue = n2
-		}, {
-			sub_event_type = t1.DisplayNameSaved,
-			displayName = s1,
-			statValue = n2
-		})
-	end,
-	sendDisplayNameTooShort = function(s2: string?) -- line: 114
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			displayName = s2
-		}, {
-			sub_event_type = t1.DisplayNameTooShort,
-			displayName = s2
-		})
-	end,
-	sendFilteredDisplayName = function(s3: string?) -- line: 121
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			displayName = s3
-		}, {
-			sub_event_type = t1.FilteredDisplayName,
-			displayName = s3
-		})
-	end,
-	sendEditUsernameOpened = function() -- line: 128
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			btn = "openEditUsername"
-		}, {
-			sub_event_type = t1.EditUsernameOpened
-		})
-	end,
-	sendUsernameSaved = function(n3: number?) -- line: 132
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			statValue = n3
-		}, {
-			sub_event_type = t1.UsernameSaved,
-			statValue = n3
-		})
-	end,
-	sendOpenAvatarMarketplace = function() -- line: 145
-		-- upvalues: sendAnalyticsEvent (copy), t1 (copy)
-		sendAnalyticsEvent({
-			btn = "openAvatarMarketplace"
-		}, {
-			sub_event_type = t1.OpenAvatarMarketplace
-		})
-	end,
-	sendError = function(n4: number) -- line: 139
-		-- upvalues: Constants (copy), sendAnalyticsEvent (copy), t1 (copy)
-		if n4 == Constants.DescriptionErrorCodes.PinLocked then
-			sendAnalyticsEvent(nil, {
-				sub_event_type = t1.DescriptionPINBlocked
-			})
-		end
+local AnalyticsServiceV2 = {}
+AnalyticsServiceV2.TelemetryEventType = telemetryEventType
+
+function AnalyticsServiceV2.sendEditProfileOpened()
+	sendAnalyticsEvent({ page = "EditProfilePage" }, {
+		sub_event_type = telemetryEventType.EditProfileOpened
+	})
+end
+
+function AnalyticsServiceV2.sendDisplayNameModalOpened()
+	sendAnalyticsEvent({ btn = "openEditDisplayName" }, {
+		sub_event_type = telemetryEventType.DisplayNameModalOpened
+	})
+end
+
+function AnalyticsServiceV2.sendDisplayNameModalLoaded(statValue: number?)
+	sendAnalyticsEvent({ page = "EditDisplayNameModal", statValue = statValue }, {
+		sub_event_type = telemetryEventType.DisplayNameModalLoaded,
+		statValue = statValue
+	})
+end
+
+function AnalyticsServiceV2.sendDisplayNameSaved(displayName: string?, statValue: number?)
+	sendAnalyticsEvent({ btn = "saveDisplayName", displayName = displayName, statValue = statValue }, {
+		sub_event_type = telemetryEventType.DisplayNameSaved,
+		displayName = displayName,
+		statValue = statValue
+	})
+end
+
+function AnalyticsServiceV2.sendDisplayNameTooShort(displayName: string?)
+	sendAnalyticsEvent({ displayName = displayName }, {
+		sub_event_type = telemetryEventType.DisplayNameTooShort,
+		displayName = displayName
+	})
+end
+
+function AnalyticsServiceV2.sendFilteredDisplayName(displayName: string?)
+	sendAnalyticsEvent({ displayName = displayName }, {
+		sub_event_type = telemetryEventType.FilteredDisplayName,
+		displayName = displayName
+	})
+end
+
+function AnalyticsServiceV2.sendEditUsernameOpened()
+	sendAnalyticsEvent({ btn = "openEditUsername" }, {
+		sub_event_type = telemetryEventType.EditUsernameOpened
+	})
+end
+
+function AnalyticsServiceV2.sendUsernameSaved(statValue: number?)
+	sendAnalyticsEvent({ statValue = statValue }, {
+		sub_event_type = telemetryEventType.UsernameSaved,
+		statValue = statValue
+	})
+end
+
+function AnalyticsServiceV2.sendOpenAvatarMarketplace()
+	sendAnalyticsEvent({ btn = "openAvatarMarketplace" }, {
+		sub_event_type = telemetryEventType.OpenAvatarMarketplace
+	})
+end
+
+function AnalyticsServiceV2.sendError(p: number)
+	if p == Constants.DescriptionErrorCodes.PinLocked then
+		sendAnalyticsEvent(nil, { sub_event_type = telemetryEventType.DescriptionPINBlocked })
 	end
-}
+end
+
+return AnalyticsServiceV2

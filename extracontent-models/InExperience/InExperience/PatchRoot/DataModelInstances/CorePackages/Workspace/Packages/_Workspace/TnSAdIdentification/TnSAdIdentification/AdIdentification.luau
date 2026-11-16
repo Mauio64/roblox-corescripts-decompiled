@@ -1,290 +1,282 @@
 local AdService = game:GetService("AdService")
 local Players = game:GetService("Players")
+
 local TnSAdIdentification = script:FindFirstAncestor("TnSAdIdentification")
+
 local GetFIntAdIdentificationMinimumAreaPerMyriad = require(TnSAdIdentification.Flags.GetFIntAdIdentificationMinimumAreaPerMyriad)
+
 local GetFIntAdIdentifiedTelemetryThrottleHundredthsPercent = require(TnSAdIdentification.Flags.GetFIntAdIdentifiedTelemetryThrottleHundredthsPercent)
-local TnSAdIdentificationParent = TnSAdIdentification.Parent
-local LoggingProtocol = require(TnSAdIdentificationParent.LoggingProtocol)
+
+local parent = TnSAdIdentification.Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
 local default = LoggingProtocol.default
-local GetFFlagAvatarIdentificationSafeAreaFix = require(TnSAdIdentificationParent.SharedFlags).GetFFlagAvatarIdentificationSafeAreaFix
-local IdentificationUtils = require(TnSAdIdentificationParent.AvatarIdentification).IdentificationUtils
-local v11 = math.max(GetFIntAdIdentificationMinimumAreaPerMyriad() / 10000, 0)
-local t1 = {}
 
-function getLocalCharacterPosition(p1) -- line: 33
-	local HumanoidRootPart = p1:FindFirstChild("HumanoidRootPart")
+local AvatarIdentification = require(parent.AvatarIdentification)
+local IdentificationUtils = AvatarIdentification.IdentificationUtils
 
-	if not HumanoidRootPart then
-		return nil
-	end
+local v = math.max(GetFIntAdIdentificationMinimumAreaPerMyriad() / 10000, 0)
 
-	return HumanoidRootPart.Position
+local AdIdentification = {}
+
+function getLocalCharacterPosition(instance)
+	local humanoidRootPart = instance:FindFirstChild("HumanoidRootPart")
+
+	return if humanoidRootPart then humanoidRootPart.Position else nil
 end
-function checkVisibility(p2, p3, t2: {[any]: any}, t3: {[any]: any}) -- line: 45
-	local CFramePosition = p2.CFrame.Position
-	local ViewportSize = p2.ViewportSize
-	local raycastParams = RaycastParams.new()
 
+function checkVisibility(object, p, list, filterDescendantsInstances)
+	local position = object.CFrame.Position
+	local viewportSize = object.ViewportSize
+
+	local raycastParams = RaycastParams.new()
 	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-	raycastParams.FilterDescendantsInstances = t3
+	raycastParams.FilterDescendantsInstances = filterDescendantsInstances
 	raycastParams.IgnoreWater = true
 
-	local n1 = 0
-	local n2 = 0
-	local v24 = t2[2] - t2[1]
-	local v25 = t2[3] - t2[1]
+	local v2 = list[2] - list[1]
+	local v3 = list[3] - list[1]
+	local count = 0
+	local count2 = 0
 
 	for i = 1, 4 do
-		local v27 = v24 * (i - 0.5) / 4
+		local v4 = v2 * (i - 0.5) / 4
 
 		for j = 1, 4 do
-			local v29 = t2[1] + v27 + v25 * (j - 0.5) / 4
-			local v30 = v29 - CFramePosition
+			local v5 = list[1] + v4 + v3 * (j - 0.5) / 4
+			local v6 = v5 - position
 
-			n1 += 1
+			count += 1
 
-			local v31, _ = p2:WorldToViewportPoint(v29)
+			local worldToViewportPoint, _ = object:WorldToViewportPoint(v5)
 
-			if not (v31.Z < 0) and not (v31.X < 0) and not (v31.Y < 0) and not (v31.X > ViewportSize.X) and not (v31.Y > ViewportSize.Y) then
-				local raycastResult = workspace:Raycast(CFramePosition, v30 * 1.1, raycastParams)
+			if
+				worldToViewportPoint.Z < 0
+				or worldToViewportPoint.X < 0
+				or worldToViewportPoint.Y < 0
+				or worldToViewportPoint.X > viewportSize.X
+				or worldToViewportPoint.Y > viewportSize.Y
+			then
+				continue
+			end
 
-				if raycastResult and p3 == raycastResult.Instance then
-					n2 += 1
-				end
+			local raycastResult = workspace:Raycast(position, v6 * 1.1, raycastParams)
+
+			if raycastResult and raycastResult.Instance == p then
+				count2 += 1
 			end
 		end
 	end
 
-	return n2 / n1
+	return count2 / count
 end
-function createSingleVisibleRegionFromWorldSpaceCorners(t4: {[any]: any}, p4, p5) -- line: 93
-	-- upvalues: GetFFlagAvatarIdentificationSafeAreaFix (copy), IdentificationUtils (copy)
-	local ViewportSize = p4.ViewportSize
-	local t5 = table.create(#t4)
 
-	for i, v in ipairs(t4) do
-		if GetFFlagAvatarIdentificationSafeAreaFix() then
-			local v41, _, _ = IdentificationUtils.worldToFullViewportPointNormalized(v, p4, p5)
+function createSingleVisibleRegionFromWorldSpaceCorners(list, p, p2)
+	local vector2s = table.create(#list)
 
-			t5[i] = Vector2.new(v41.X, v41.Y)
-		else
-			local v44, _ = p4:WorldToViewportPoint(v)
-
-			t5[i] = Vector2.new(v44.X, v44.Y) / ViewportSize
-		end
+	for i, item in ipairs(list) do
+		local worldToFullViewportPointNormalized, _, _ = IdentificationUtils.worldToFullViewportPointNormalized(
+			item,
+			p,
+			p2
+		)
+		vector2s[i] = Vector2.new(worldToFullViewportPointNormalized.X, worldToFullViewportPointNormalized.Y)
 	end
-
-	local t6 = {
-		t5[1],
-		t5[2],
-		t5[4],
-		t5[3]
-	}
 
 	return {
-		id = 1,
-		convexHull = t6
+		convexHull = { vector2s[1], vector2s[2], vector2s[4], vector2s[3] },
+		id = 1
 	}
 end
-function getAdCenterAndScreenArea(p6, p7) -- line: 117
-	local ViewportSize = p7.ViewportSize
-	local vector3 = Vector3.new(0, 0, 0)
-	local t7 = {}
 
-	for _, v in ipairs(p6) do
-		vector3 += v
+function getAdCenterAndScreenArea(list, object)
+	local viewportSize = object.ViewportSize
+	local total = Vector3.new(0, 0, 0)
+	local v2 = {}
 
-		local v54, _ = p7:WorldToViewportPoint(v)
-
-		table.insert(t7, Vector2.new(v54.X, v54.Y) / ViewportSize)
+	for _, item in ipairs(list) do
+		total += item
+		local worldToViewportPoint, _ = object:WorldToViewportPoint(item)
+		table.insert(v2, Vector2.new(worldToViewportPoint.X, worldToViewportPoint.Y) / viewportSize)
 	end
 
-	return vector3 / 4, (0 + math.abs(((t7[2] - t7[1]):Cross(t7[3] - t7[1]))) + math.abs(((t7[2] - t7[4]):Cross(t7[3] - t7[4])))) / 2
+	return
+		total / 4,
+		(0 + math.abs(((v2[2] - v2[1]):Cross(v2[3] - v2[1]))) + math.abs(((v2[2] - v2[4]):Cross(v2[3] - v2[4])))) / 2
 end
-function t1.getAdsForPoint(t8: {[any]: any}, vector2: Vector2) -- line: 185
-	local t9 = {}
 
-	for k, v in pairs(t8) do
-		local boundingBox = v.boundingBox
+function AdIdentification.getAdsForPoint(items, vector2: Vector2)
+	local result = {}
 
-		if not (vector2.X < boundingBox.min.X) and not (vector2.Y < boundingBox.min.Y) and not (vector2.X > boundingBox.max.X) and not (vector2.Y > boundingBox.max.Y) then
-			for _, v2 in ipairs(v.visibleRegions) do
-				local convexHull = v2.convexHull
+	for k, item in pairs(items) do
+		local boundingBox = item.boundingBox
 
-				if #convexHull < 3 then
-					continue
-				end
-
-				local v65 = convexHull[#convexHull]
-				local v66 = true
-				local v67 = true
-
-				for _, v3 in ipairs(convexHull) do
-					local v70 = (v3 - v65):Cross(vector2 - v65)
-
-					v67 = v67 and v70 <= 0
-					v66 = v66 and v70 >= 0
-					v65 = v3
-				end
-
-				if v66 or v67 then
-					t9[k] = v
-
-					break
-				end
-			end
-		end
-	end
-
-	return t9
-end
-function t1.getVisibleAds() -- line: 221
-	-- upvalues: AdService (copy), Players (copy), GetFFlagAvatarIdentificationSafeAreaFix (copy), IdentificationUtils (copy), v11 (copy), default (copy), LoggingProtocol (copy), GetFIntAdIdentifiedTelemetryThrottleHundredthsPercent (copy)
-	local t10 = {}
-	local t11 = {
-		totalAds = 0,
-		checkedAds = 0,
-		duration = 0
-	}
-	local ReportAdInfo = AdService:GetReportAdInfo()
-	local CurrentCamera = workspace.CurrentCamera
-
-	if not CurrentCamera then
-		return t10, t11
-	end
-
-	local LocalPlayer = Players.LocalPlayer
-
-	if not LocalPlayer then
-		return t10, t11
-	end
-
-	local Character = LocalPlayer.Character
-	local v77 = if not Character then CurrentCamera.CFrame.Position else getLocalCharacterPosition(Character) or CurrentCamera.CFrame.Position
-	local v78 = nil
-
-	if GetFFlagAvatarIdentificationSafeAreaFix() then
-		v78 = IdentificationUtils.getViewportInfo()
-		t11.viewportInfo = v78
-	end
-
-	local elapsed = os.clock()
-
-	t11.totalAds = #ReportAdInfo
-
-	local n3 = 1
-
-	for _, v in ipairs(ReportAdInfo) do
-		if os.clock() - elapsed > 0.2 then
-			t11.duration = os.clock() - elapsed
-
-			return t10, t11
-		end
-
-		local basePart = v.basePart
-		local adUnitName = v.adUnitName
-		local assetId = v.assetId
-		local encryptedAdTrackingData = v.encryptedAdTrackingData
-		local encryptionMetadata = v.encryptionMetadata
-
-		if encryptedAdTrackingData ~= "" and encryptionMetadata ~= "" and assetId ~= "11307989327" then
-			local assetCorners = v.assetCorners
-
-			if not assetCorners or #assetCorners < 4 then
-				t11.checkedAds = t11.checkedAds + 1
-
-				continue
-			end
-
-			local v89, v90 = getAdCenterAndScreenArea(assetCorners, CurrentCamera)
-			local Magnitude = (v89 - v77).Magnitude
-
-			if (v89 - CurrentCamera.CFrame.Position):Dot(CurrentCamera.CFrame.LookVector) < 0 then
-				t11.checkedAds = t11.checkedAds + 1
-
-				continue
-			end
-
-			local Unit = (assetCorners[1] - assetCorners[2]):Cross(assetCorners[1] - assetCorners[3]).Unit
-
-			if Unit:Dot(v89 - basePart.Position) < 0 then
-				Unit = -Unit
-			end
-
-			if (CurrentCamera.CFrame.Position - v89):Dot(Unit) < 0 then
-				t11.checkedAds = t11.checkedAds + 1
-
-				continue
-			end
-
-			local v93, v94 = IdentificationUtils.getViewportCorners(assetCorners, CurrentCamera, v78)
-
-			if v93 == IdentificationUtils.defaultMin then
-				t11.checkedAds = t11.checkedAds + 1
-
-				continue
-			end
-
-			if v90 < v11 then
-				t11.checkedAds = t11.checkedAds + 1
-
-				continue
-			end
-
-			local v95 = checkVisibility(CurrentCamera, basePart, assetCorners, {})
-
-			if v95 < 0.3 then
-				t11.checkedAds = t11.checkedAds + 1
-
-				continue
-			end
-
-			if os.clock() - elapsed > 0.2 then
-				t11.duration = os.clock() - elapsed
-
-				return t10, t11
-			end
-
-			t10[n3] = {
-				distance = Magnitude,
-				boundingBox = {
-					min = v93,
-					max = v94
-				},
-				hitRate = v95,
-				visibleRegions = { createSingleVisibleRegionFromWorldSpaceCorners(assetCorners, CurrentCamera, v78) },
-				adUnitName = adUnitName,
-				assetId = assetId,
-				encryptedAdTrackingData = encryptedAdTrackingData,
-				encryptionMetadata = encryptionMetadata
-			}
-			default:logRobloxTelemetryEvent({
-				eventName = "AdIdentifiedInAbuseReport",
-				description = "Ad Identified in Report Anything Screenshot",
-				backends = { LoggingProtocol.TelemetryBackends.Points },
-				throttlingPercentage = GetFIntAdIdentifiedTelemetryThrottleHundredthsPercent(),
-				lastUpdated = {
-					24,
-					6,
-					25
-				}
-			}, nil, {
-				assetId = assetId,
-				encryptedAdTrackingData = encryptedAdTrackingData,
-				encryptionMetadata = encryptionMetadata
-			})
-			t11.checkedAds = t11.checkedAds + 1
-			n3 += 1
-
+		if
+			vector2.X < boundingBox.min.X
+			or vector2.Y < boundingBox.min.Y
+			or vector2.X > boundingBox.max.X
+			or vector2.Y > boundingBox.max.Y
+		then
 			continue
 		end
 
-		t11.checkedAds = t11.checkedAds + 1
+		for _, visibleRegion in ipairs(item.visibleRegions) do
+			local convexHull = visibleRegion.convexHull
+
+			if #convexHull < 3 then
+				continue
+			end
+
+			local v2 = convexHull[#convexHull]
+			local v3 = true
+			local v4 = true
+
+			for _, v5 in ipairs(convexHull) do
+				local cross = (v5 - v2):Cross(vector2 - v2)
+
+				v3 = v3 and cross <= 0
+				v4 = v4 and cross >= 0
+				v2 = v5
+			end
+
+			if v4 or v3 then
+				result[k] = item
+				break
+			end
+		end
 	end
 
-	t11.duration = os.clock() - elapsed
-
-	return t10, t11
+	return result
 end
 
-return t1
+function AdIdentification.getVisibleAds()
+	local result = {}
+	local result2 = { totalAds = 0, checkedAds = 0, duration = 0 }
+
+	local reportAdInfo = AdService:GetReportAdInfo()
+
+	local currentCamera = workspace.CurrentCamera
+
+	if not currentCamera then
+		return result, result2
+	end
+
+	local localPlayer = Players.LocalPlayer
+
+	if not localPlayer then
+		return result, result2
+	end
+
+	local character = localPlayer.Character
+
+	local v2 = {}
+	local v3
+
+	if character then
+		v3 = getLocalCharacterPosition(character) or currentCamera.CFrame.Position
+	else
+		v3 = currentCamera.CFrame.Position
+	end
+
+	local viewportInfo = IdentificationUtils.getViewportInfo()
+	result2.viewportInfo = viewportInfo
+
+	local lastTime = os.clock()
+	result2.totalAds = #reportAdInfo
+	local v4 = 1
+
+	local function fn() -- 3 equivalent calls inferred from this helper
+		result2.duration = os.clock() - lastTime
+		return result2
+	end
+
+	local function fn2(): boolean -- 2 equivalent calls inferred from this helper
+		return os.clock() - lastTime > 0.2
+	end
+
+	for _, v5 in ipairs(reportAdInfo) do
+		if fn2() then -- inferred equivalent call
+			return result, fn() -- inferred equivalent call
+		end
+
+		local basePart = v5.basePart
+		local adUnitName = v5.adUnitName
+		local assetId = v5.assetId
+		local encryptedAdTrackingData = v5.encryptedAdTrackingData
+		local encryptionMetadata = v5.encryptionMetadata
+
+		if encryptedAdTrackingData == "" or encryptionMetadata == "" or assetId == "11307989327" then
+			result2.checkedAds += 1
+		else
+			local assetCorners = v5.assetCorners
+
+			if assetCorners and not (#assetCorners < 4) then
+				local adCenterAndScreenArea, v6 = getAdCenterAndScreenArea(assetCorners, currentCamera)
+
+				local magnitude = (adCenterAndScreenArea - v3).Magnitude
+
+				if not ((adCenterAndScreenArea - currentCamera.CFrame.Position):Dot(currentCamera.CFrame.LookVector) < 0) then
+					local unit = (assetCorners[1] - assetCorners[2]):Cross(assetCorners[1] - assetCorners[3]).Unit
+
+					if unit:Dot(adCenterAndScreenArea - basePart.Position) < 0 then
+						unit = -unit
+					end
+
+					if not ((currentCamera.CFrame.Position - adCenterAndScreenArea):Dot(unit) < 0) then
+						local viewportCorners, max = IdentificationUtils.getViewportCorners(
+							assetCorners,
+							currentCamera,
+							viewportInfo
+						)
+
+						if viewportCorners ~= IdentificationUtils.defaultMin and not (v6 < v) then
+							local hitRate = checkVisibility(currentCamera, basePart, assetCorners, v2)
+
+							if not (hitRate < 0.3) then
+								if fn2() then -- inferred equivalent call
+									return result, fn() -- inferred equivalent call
+								end
+
+								result[v4] = {
+									distance = magnitude,
+									boundingBox = { min = viewportCorners, max = max },
+									hitRate = hitRate,
+									visibleRegions = { createSingleVisibleRegionFromWorldSpaceCorners(
+											assetCorners,
+											currentCamera,
+											viewportInfo
+										) },
+									adUnitName = adUnitName,
+									assetId = assetId,
+									encryptedAdTrackingData = encryptedAdTrackingData,
+									encryptionMetadata = encryptionMetadata
+								}
+
+								default:logRobloxTelemetryEvent({
+									eventName = "AdIdentifiedInAbuseReport",
+									backends = { LoggingProtocol.TelemetryBackends.Points },
+									throttlingPercentage = GetFIntAdIdentifiedTelemetryThrottleHundredthsPercent(),
+									lastUpdated = { 24, 6, 25 },
+									description = "Ad Identified in Report Anything Screenshot"
+								}, nil, {
+									assetId = assetId,
+									encryptedAdTrackingData = encryptedAdTrackingData,
+									encryptionMetadata = encryptionMetadata
+								})
+
+								result2.checkedAds += 1
+								v4 += 1
+								continue
+							end
+						end
+					end
+				end
+			end
+
+			result2.checkedAds += 1
+		end
+	end
+
+	return result, fn() -- inferred equivalent call
+end
+
+return AdIdentification

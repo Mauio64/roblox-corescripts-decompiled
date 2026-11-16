@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+local parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+local Lumberyak = require(parent.Lumberyak)
 
-return (require(Parent.Lumberyak).Logger.new(nil, "SocialLuaAnalytics"))
+return (Lumberyak.Logger.new(nil, "SocialLuaAnalytics"))

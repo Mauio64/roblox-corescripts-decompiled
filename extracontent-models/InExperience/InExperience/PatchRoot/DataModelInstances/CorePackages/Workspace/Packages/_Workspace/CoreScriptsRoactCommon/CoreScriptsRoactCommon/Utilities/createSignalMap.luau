@@ -1,71 +1,60 @@
-local Parent = script:FindFirstAncestor("CoreScriptsRoactCommon").Parent
-local Signals = require(Parent.Signals)
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("CoreScriptsRoactCommon").Parent
 
-local function createSignalMap(t1: {[any]: any}?) -- line: 22
-	-- upvalues: Signals (copy), Cryo (copy)
-	local t2 = {}
-	local n1 = 0
+local Signals = require(parent.Signals)
+local Cryo = require(parent.Cryo)
 
-	if t1 then
-		for k, v in pairs(t1) do
-			t2[k] = v
-			n1 += 1
+local function createSignalMap(items)
+	local v = {}
+	local count = 0
+
+	if items then
+		for k, item in pairs(items) do
+			v[k] = item
+			count += 1
 		end
 	end
 
-	local v10, v11 = Signals.createSignal(t2)
-	local v12, v13 = Signals.createSignal(n1)
-	local v14 = Signals.createComputed(function(p1) -- line: 60
-		-- upvalues: v10 (copy)
-		return v10(p1)
-	end)
+	local signal, v2 = Signals.createSignal(v)
+	local signal2, v3 = Signals.createSignal(count)
 
 	return {
-		getData = function(p2, p3) -- line: 35
-			-- upvalues: v10 (copy)
-			return v10(p3)[p2]
+		getData = function(p, p2)
+			return signal(p2)[p]
 		end,
-		setData = function(p4, p5, p6) -- line: 39
-			-- upvalues: v10 (copy), Cryo (copy), v13 (copy), v12 (copy), v11 (copy)
-			local v20 = v10(p6)
-			local v21 = v20[p4]
-			local v22 = Cryo.Dictionary.join(v20, {
-				[p4] = p5
-			})
+		setData = function(p, p2, p3)
+			local v4 = signal(p3)
+			local v5 = v4[p]
+			local joined = Cryo.Dictionary.join(v4, { [p] = p2 })
 
-			if not v21 then
-				v13(v12(p6) + 1)
+			if not v5 then
+				v3(signal2(p3) + 1)
 			end
 
-			v11(v22)
+			v2(joined)
 		end,
-		removeData = function(p7, p8) -- line: 49
-			-- upvalues: v10 (copy), Cryo (copy), v13 (copy), v12 (copy), v11 (copy)
-			local v25 = v10(p8)
+		removeData = function(p, p2)
+			local v4 = signal(p2)
 
-			if v25[p7] then
-				local v26 = Cryo.Dictionary.join(v25, {
-					[p7] = Cryo.None
-				})
+			if v4[p] then
+				local joined = Cryo.Dictionary.join(v4, { [p] = Cryo.None })
 
-				v13(v12(p8) - 1)
-				v11(v26)
+				v3(signal2(p2) - 1)
+				v2(joined)
 			end
 		end,
-		getCount = v12,
-		iterateData = function(p9: ((...any) -> ...any), p10) -- line: 64
-			-- upvalues: Signals (copy), v10 (copy)
-			return Signals.createEffect(function() -- line: 65
-				-- upvalues: v10 (copy), p10 (copy), p9 (copy)
-				local v30 = v10(p10)
+		getCount = signal2,
+		iterateData = function(callback, p)
+			return Signals.createEffect(function()
+				local v4 = signal(p)
 
-				for k, v in pairs(v30) do
-					p9(k, v)
+				for k, v5 in pairs(v4) do
+					callback(k, v5)
 				end
 			end)
 		end,
-		getAllData = v14
+		getAllData = Signals.createComputed(function(p)
+			return signal(p)
+		end)
 	}
 end
 

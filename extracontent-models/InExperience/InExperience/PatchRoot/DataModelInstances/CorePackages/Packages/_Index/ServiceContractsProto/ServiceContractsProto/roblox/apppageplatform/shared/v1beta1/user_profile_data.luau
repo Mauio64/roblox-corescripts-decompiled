@@ -1,218 +1,232 @@
 local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
 local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
-local t1 = {}
-local t2 = {}
 
-t2.__index = t2
+local v = {}
 
-function t2.new(t3: {[any]: any}?) -- line: 47
-	-- upvalues: t2 (copy)
-	return (setmetatable({
-		user_id = if t3 ~= nil and t3.user_id ~= nil then t3.user_id else nil,
-		username = if t3 ~= nil and t3.username ~= nil then t3.username else nil,
-		display_name = if t3 ~= nil and t3.display_name ~= nil then t3.display_name else nil,
-		is_verified = if t3 ~= nil and t3.is_verified ~= nil then t3.is_verified else nil,
-		previous_usernames = if t3 ~= nil and t3.previous_usernames ~= nil then t3.previous_usernames else {}
-	}, t2))
+local class = {}
+class.__index = class
+
+function class.new(data)
+	local user_id
+
+	if not (data == nil or data.user_id == nil) then
+		user_id = data.user_id
+	end
+
+	local username
+
+	if not (data == nil or data.username == nil) then
+		username = data.username
+	end
+
+	local display_name
+
+	if not (data == nil or data.display_name == nil) then
+		display_name = data.display_name
+	end
+
+	local is_verified
+
+	if not (data == nil or data.is_verified == nil) then
+		is_verified = data.is_verified
+	end
+
+	local v2 = {
+		user_id = user_id,
+		username = username,
+		display_name = display_name,
+		is_verified = is_verified,
+		previous_usernames = (data == nil or data.previous_usernames == nil) and {} or data.previous_usernames
+	}
+	return (setmetatable(v2, class))
 end
-function t2.encode(p1) -- line: 57
-	-- upvalues: proto (copy)
-	local buf = buffer.create(0)
-	local n1 = 0
 
-	if p1.user_id ~= nil then
-		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+function class.encode(data)
+	local v2 = buffer.create(0)
+	local v3 = 0
 
-		buf, n1 = proto.writeVarInt(v9, v10, p1.user_id)
+	if data.user_id ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 1, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.user_id)
 	end
 
-	if p1.username ~= nil then
-		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v11, v12, p1.username)
+	if data.username ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 2, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.username)
 	end
 
-	if p1.display_name ~= nil then
-		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
-
-		buf, n1 = proto.writeString(v13, v14, p1.display_name)
+	if data.display_name ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 3, proto.wireTypes.lengthDelimited)
+		v2, v3 = proto.writeString(v4, v5, data.display_name)
 	end
 
-	if p1.is_verified ~= nil then
-		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.varint)
-
-		buf, n1 = proto.writeVarInt(v15, v16, not p1.is_verified and 0 or 1)
+	if data.is_verified ~= nil then
+		local v4, v5 = proto.writeTag(v2, v3, 4, proto.wireTypes.varint)
+		v2, v3 = proto.writeVarInt(v4, v5, data.is_verified and 1 or 0)
 	end
 
-	if p1.previous_usernames ~= nil and #p1.previous_usernames > 0 then
-		for _, v18 in p1.previous_usernames do
-			local v19, v20 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
-
-			buf, n1 = proto.writeString(v19, v20, v18)
+	if data.previous_usernames ~= nil and #data.previous_usernames > 0 then
+		for _, previous_username in data.previous_usernames do
+			local v4, v5 = proto.writeTag(v2, v3, 5, proto.wireTypes.lengthDelimited)
+			v2, v3 = proto.writeString(v4, v5, previous_username)
 		end
 	end
 
-	local buf2 = buffer.create(n1)
-
-	buffer.copy(buf2, 0, buf, 0, n1)
-
-	return buf2
+	local buf = buffer.create(v3)
+	buffer.copy(buf, 0, v2, 0, v3)
+	return buf
 end
-function t2.decode(p2: buffer) -- line: 93
-	-- upvalues: t2 (copy), proto (copy)
-	local v23 = t2.new()
-	local n2 = 0
 
-	while n2 < buffer.len(p2) do
-		local v25, v26
+function class.decode(buf: buffer)
+	local result = class.new()
+	local v2 = 0
 
-		v25, v26, n2 = proto.readTag(p2, n2)
+	while v2 < buffer.len(buf) do
+		local v3, v4
+		v3, v4, v2 = proto.readTag(buf, v2)
 
-		if v26 == proto.wireTypes.varint then
-			if v25 == 1 then
-				local v27
-
-				v27, n2 = proto.readVarIntI64(p2, n2)
-				v23.user_id = v27
-			elseif v25 == 4 then
-				local v28
-
-				v28, n2 = proto.readVarInt(p2, n2)
-				v23.is_verified = v28 ~= 0
+		if v4 == proto.wireTypes.varint then
+			if v3 == 1 then
+				local user_id
+				user_id, v2 = proto.readVarIntI64(buf, v2)
+				result.user_id = user_id
+			elseif v3 == 4 then
+				local v5
+				v5, v2 = proto.readVarInt(buf, v2)
+				result.is_verified = v5 ~= 0
 			else
-				local v29
-
-				v29, n2 = proto.readVarInt(p2, n2)
+				local _
+				_, v2 = proto.readVarInt(buf, v2)
 			end
-		elseif v26 == proto.wireTypes.lengthDelimited then
-			if v25 == 2 then
-				local v30
-
-				v30, n2 = proto.readBuffer(p2, n2)
-				v23.username = buffer.tostring(v30)
-			elseif v25 == 3 then
-				local v31
-
-				v31, n2 = proto.readBuffer(p2, n2)
-				v23.display_name = buffer.tostring(v31)
-			elseif v25 == 5 then
-				local v32
-
-				v32, n2 = proto.readBuffer(p2, n2)
-				table.insert(v23.previous_usernames, buffer.tostring(v32))
+		elseif v4 == proto.wireTypes.lengthDelimited then
+			if v3 == 2 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.username = buffer.tostring(v5)
+			elseif v3 == 3 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				result.display_name = buffer.tostring(v5)
+			elseif v3 == 5 then
+				local v5
+				v5, v2 = proto.readBuffer(buf, v2)
+				table.insert(result.previous_usernames, buffer.tostring(v5))
 			else
-				local v33, v34 = proto.readVarInt(p2, n2)
+				local varInt, v5 = proto.readVarInt(buf, v2)
 
-				n2 = v34 + v33
+				v2 = v5 + varInt
 			end
-		elseif v26 == proto.wireTypes.i32 then
-			local v35
-
-			v35, n2 = proto.readFixed32(p2, n2)
-		elseif v26 == proto.wireTypes.i64 then
-			local v36
-
-			v36, n2 = proto.readFixed64(p2, n2)
+		elseif v4 == proto.wireTypes.i32 then
+			local _
+			_, v2 = proto.readFixed32(buf, v2)
+		elseif v4 == proto.wireTypes.i64 then
+			local _
+			_, v2 = proto.readFixed64(buf, v2)
 		else
-			error("Unsupported wire type: " .. v26)
+			error("Unsupported wire type: " .. v4)
 		end
 	end
 
-	return v23
-end
-function t2.jsonEncode(p3) -- line: 156
-	local t4 = {}
-
-	if p3.user_id ~= nil then
-		t4.userId = p3.user_id
-	end
-
-	if p3.username ~= nil then
-		t4.username = p3.username
-	end
-
-	if p3.display_name ~= nil then
-		t4.displayName = p3.display_name
-	end
-
-	if p3.is_verified ~= nil then
-		t4.isVerified = p3.is_verified
-	end
-
-	if p3.previous_usernames ~= nil and #p3.previous_usernames > 0 then
-		local t5 = {}
-
-		for _, v41 in p3.previous_usernames do
-			table.insert(t5, v41)
-		end
-
-		t4.previousUsernames = t5
-	end
-
-	return t4
-end
-function t2.jsonDecode(t6: {[any]: any}) -- line: 186
-	-- upvalues: t2 (copy)
-	local v43 = t2.new()
-
-	if t6.user_id ~= nil then
-		v43.user_id = t6.user_id
-	end
-
-	if t6.userId ~= nil then
-		v43.user_id = t6.userId
-	end
-
-	if t6.username ~= nil then
-		v43.username = t6.username
-	end
-
-	if t6.display_name ~= nil then
-		v43.display_name = t6.display_name
-	end
-
-	if t6.displayName ~= nil then
-		v43.display_name = t6.displayName
-	end
-
-	if t6.is_verified ~= nil then
-		v43.is_verified = t6.is_verified
-	end
-
-	if t6.isVerified ~= nil then
-		v43.is_verified = t6.isVerified
-	end
-
-	if t6.previous_usernames ~= nil then
-		local t7 = {}
-
-		for _, v46 in t6.previous_usernames do
-			table.insert(t7, v46)
-		end
-
-		v43.previous_usernames = t7
-	end
-
-	if t6.previousUsernames ~= nil then
-		local t8 = {}
-
-		for _, v49 in t6.previousUsernames do
-			table.insert(t8, v49)
-		end
-
-		v43.previous_usernames = t8
-	end
-
-	return v43
+	return result
 end
 
-t2.descriptor = {
+function class.jsonEncode(data)
+	local v2 = {}
+
+	if data.user_id ~= nil then
+		v2.userId = data.user_id
+	end
+
+	if data.username ~= nil then
+		v2.username = data.username
+	end
+
+	if data.display_name ~= nil then
+		v2.displayName = data.display_name
+	end
+
+	if data.is_verified ~= nil then
+		v2.isVerified = data.is_verified
+	end
+
+	if data.previous_usernames == nil or not (#data.previous_usernames > 0) then
+		return v2
+	end
+
+	local previous_usernames = {}
+
+	for _, previous_username in data.previous_usernames do
+		table.insert(previous_usernames, previous_username)
+	end
+
+	v2.previousUsernames = previous_usernames
+
+	return v2
+end
+
+function class.jsonDecode(data)
+	local v2 = class.new()
+
+	if data.user_id ~= nil then
+		v2.user_id = data.user_id
+	end
+
+	if data.userId ~= nil then
+		v2.user_id = data.userId
+	end
+
+	if data.username ~= nil then
+		v2.username = data.username
+	end
+
+	if data.display_name ~= nil then
+		v2.display_name = data.display_name
+	end
+
+	if data.displayName ~= nil then
+		v2.display_name = data.displayName
+	end
+
+	if data.is_verified ~= nil then
+		v2.is_verified = data.is_verified
+	end
+
+	if data.isVerified ~= nil then
+		v2.is_verified = data.isVerified
+	end
+
+	if data.previous_usernames ~= nil then
+		local previous_usernames = {}
+
+		for _, previous_username in data.previous_usernames do
+			table.insert(previous_usernames, previous_username)
+		end
+
+		v2.previous_usernames = previous_usernames
+	end
+
+	if data.previousUsernames == nil then
+		return v2
+	end
+
+	local previousUsernames = {}
+
+	for _, previousUsername in data.previousUsernames do
+		table.insert(previousUsernames, previousUsername)
+	end
+
+	v2.previous_usernames = previousUsernames
+
+	return v2
+end
+
+class.descriptor = {
 	name = "UserProfileData",
 	fullName = "roblox.apppageplatform.shared.v1beta1.UserProfileData"
 }
-t1.UserProfileData = t2
-typeRegistry.default:register(t1.UserProfileData)
 
-return {
-	UserProfileData = t1.UserProfileData
-}
+v.UserProfileData = class
+
+typeRegistry.default:register(v.UserProfileData)
+
+return { UserProfileData = v.UserProfileData }

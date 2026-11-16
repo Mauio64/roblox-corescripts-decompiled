@@ -1,17 +1,17 @@
-local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
-local React = require(Parent.React)
-local useDesignTokens = require(Parent.Style).useDesignTokens
+local parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(parent.React)
 
-return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 10
-	-- upvalues: useDesignTokens (copy), React (copy)
-	local v6 = useDesignTokens()
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
 
+return (React.forwardRef(function(p, ref)
+	local v = useDesignTokens()
 	return React.createElement("Frame", {
-		ClipsDescendants = false,
-		Active = true,
-		ref = p1,
+		ref = ref,
 		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundTransparency = v6.Color.Common.Scrim.Transparency,
-		BackgroundColor3 = v6.Color.Common.Scrim.Color3
-	}, t1.children)
+		BackgroundTransparency = v.Color.Common.Scrim.Transparency,
+		BackgroundColor3 = v.Color.Common.Scrim.Color3,
+		ClipsDescendants = false,
+		Active = true
+	}, p.children)
 end))

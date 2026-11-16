@@ -1,4 +1,4 @@
-local t1 = {
+local Properties = {
 	SpeedAdjustmentTarget = 0.5,
 	CursorRadius = 40,
 	SelectionRadius = 40,
@@ -10,10 +10,10 @@ local t1 = {
 	ScrollingSpeed = 1000
 }
 
-setmetatable(t1, {
-	__index = function(_, p2) -- line: 20
-		error(string.format("%q is not a valid member of properties", (tostring(p2))), 2)
+setmetatable(Properties, {
+	__index = function(_, p)
+		error(string.format("%q is not a valid member of properties", (tostring(p))), 2)
 	end
 })
 
-return t1
+return Properties

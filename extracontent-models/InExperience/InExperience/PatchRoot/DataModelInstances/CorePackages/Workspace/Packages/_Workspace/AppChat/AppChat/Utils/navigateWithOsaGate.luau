@@ -1,7 +1,9 @@
 local HttpService = game:GetService("HttpService")
+
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local SharedFlags = require(AppChatParent.SharedFlags)
+local parent = AppChat.Parent
+
+local SharedFlags = require(parent.SharedFlags)
 local Constants = require(AppChat.Constants)
 local GetOverlayStore = require(AppChat.Stores.GetOverlayStore)
 local OverlayTypes = require(AppChat.Stores.GetOverlayStore.OverlayTypes)
@@ -10,88 +12,126 @@ local fetchLatestConversationDetails = require(AppChat.Conversations.Thunks.fetc
 local shouldShowOSAForConversation = require(AppChat.Utils.shouldShowOSAForConversation)
 local shouldShowU13ChatOptInForConversation = require(AppChat.Utils.shouldShowU13ChatOptInForConversation)
 local RemovedConversation = require(AppChat.Conversations.Actions.RemovedConversation)
+local ReceivedConversation = require(AppChat.Conversations.Actions.ReceivedConversation)
+local GetConversationStore = require(AppChat.Stores.GetConversationStore)
 local Conversation = require(AppChat.Models.Conversation)
+local ConversationRoduxSeed = require(AppChat.Utils.ConversationRoduxSeed)
+local isFriendsPlaceholderConversation = ConversationRoduxSeed.isFriendsPlaceholderConversation
+
 local FFlagAppChatShowOSAOnPageEntry = SharedFlags.FFlagAppChatShowOSAOnPageEntry
 
-return function(t1: {[any]: any}) -- line: 29
-	-- upvalues: FFlagAppChatShowOSAOnPageEntry (copy), fetchLatestConversationDetails (copy), shouldShowU13ChatOptInForConversation (copy), Conversation (copy), Constants (copy), shouldShowOSAForConversation (copy), GetOverlayStore (copy), Logger (copy), OverlayTypes (copy), HttpService (copy), RemovedConversation (copy)
-	local conversationId = t1.conversationId
-	local dispatch = t1.dispatch
-	local onAccepted = t1.onAccepted
-	local onDeclined = t1.onDeclined
+local function evaluateAndShowGate(data, p)
+	local conversationId = data.conversationId
+	local dispatch = data.dispatch
+	local onAccepted = data.onAccepted
+	local onDeclined = data.onDeclined
+
+	local modalVariant = nil
+	local v = shouldShowU13ChatOptInForConversation(p)
+
+	if v and data.requireMultiUserForU13 then
+		v = p and p.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
+	end
+
+	if v then
+		modalVariant = Constants.OptInVariant.ChatOptInInfoCard
+	elseif shouldShowOSAForConversation(p) then
+		modalVariant = Constants.OptInVariant.OsaContextCard
+	end
+
+	if not modalVariant then
+		onAccepted()
+		return
+	end
+
+	local overlayStore = GetOverlayStore(false)
+	Logger:debug("[OSA Gate] Showing overlay variant={} for conversation {}", modalVariant, conversationId)
+	overlayStore.showOverlay(OverlayTypes.GroupOSADialog, {
+		conversationId = conversationId,
+		impressionId = HttpService:GenerateGUID(false),
+		modalVariant = modalVariant,
+		onJoin = function()
+			overlayStore.dismissOverlay()
+			onAccepted()
+		end,
+		onDecline = function()
+			if conversationId and p and p.conversationType == Conversation.Type.MULTI_USER_CONVERSATION then
+				dispatch(RemovedConversation(conversationId))
+			end
+
+			overlayStore.dismissOverlay()
+
+			if onDeclined then
+				onDeclined()
+			end
+		end,
+		onClose = function()
+			if onDeclined then
+				onDeclined()
+			end
+		end
+	})
+end
+
+local function getConversationFromStore(dispatch, conversationId: string) -- 2 equivalent calls inferred from this helper
+	local conversation = nil
+	dispatch(function(object)
+		conversation = object:getState().ChatAppReducer.Conversations[conversationId]
+	end)
+	return conversation
+end
+
+local function seedConversationFromSignals(callback, p: string)
+	local conversation = GetConversationStore(false).getConversation(p, false)
+
+	if conversation == nil then
+		return nil
+	end
+
+	local storeConversationForRodux = ConversationRoduxSeed.normalizeStoreConversationForRodux(conversation)
+	callback(ReceivedConversation(storeConversationForRodux))
+	return storeConversationForRodux
+end
+
+return function(data)
+	local conversationId = data.conversationId
+	local dispatch = data.dispatch
+	local onAccepted = data.onAccepted
 
 	if not FFlagAppChatShowOSAOnPageEntry then
 		onAccepted()
-
 		return
 	end
 
 	if not conversationId or conversationId == "" then
 		onAccepted()
-
 		return
 	end
 
-	dispatch(fetchLatestConversationDetails(conversationId)):andThen(function() -- line: 46
-		-- upvalues: dispatch (copy), conversationId (copy), shouldShowU13ChatOptInForConversation (copy), t1 (copy), Conversation (copy), Constants (copy), shouldShowOSAForConversation (copy), onAccepted (copy), GetOverlayStore (copy), Logger (copy), OverlayTypes (copy), HttpService (copy), RemovedConversation (copy), onDeclined (copy)
-		local u20 = nil
+	local conversation2 = getConversationFromStore(dispatch, conversationId) -- inferred equivalent call
 
-		dispatch(function(p1) -- line: 48
-			-- upvalues: u20 (ref), conversationId (copy)
-			u20 = p1:getState().ChatAppReducer.Conversations[conversationId]
-		end)
+	if conversation2 == nil then
+		local conversation = GetConversationStore(false).getConversation(conversationId, false)
 
-		local ChatOptInInfoCard = nil
-
-		if shouldShowU13ChatOptInForConversation(u20) and (not t1.requireMultiUserForU13 or u20 and u20.conversationType == Conversation.Type.MULTI_USER_CONVERSATION) then
-			ChatOptInInfoCard = Constants.OptInVariant.ChatOptInInfoCard
-		elseif shouldShowOSAForConversation(u20) then
-			ChatOptInInfoCard = Constants.OptInVariant.OsaContextCard
+		if conversation == nil then
+			conversation2 = nil
+		else
+			conversation2 = ConversationRoduxSeed.normalizeStoreConversationForRodux(conversation)
+			dispatch(ReceivedConversation(conversation2))
 		end
+	end
 
-		if not ChatOptInInfoCard then
-			onAccepted()
+	if isFriendsPlaceholderConversation(conversationId, conversation2) then
+		evaluateAndShowGate(data, conversation2)
+	else
+		dispatch(fetchLatestConversationDetails(conversationId)):andThen(function()
+			evaluateAndShowGate(data, getConversationFromStore(dispatch, conversationId)) -- inferred equivalent call
+		end):catch(function(p)
+			Logger:warning("[OSA Gate] Error fetching conversation details for {}: {}", conversationId, (tostring(p)))
 
-			return
-		end
-
-		local v22 = GetOverlayStore(false)
-
-		Logger:debug("[OSA Gate] Showing overlay variant={} for conversation {}", ChatOptInInfoCard, conversationId)
-		v22.showOverlay(OverlayTypes.GroupOSADialog, {
-			conversationId = conversationId,
-			impressionId = HttpService:GenerateGUID(false),
-			modalVariant = ChatOptInInfoCard,
-			onJoin = function() -- line: 74
-				-- upvalues: v22 (copy), onAccepted (copy)
-				v22.dismissOverlay()
-				onAccepted()
-			end,
-			onDecline = function() -- line: 78
-				-- upvalues: conversationId (copy), u20 (ref), Conversation (copy), dispatch (copy), RemovedConversation (copy), v22 (copy), onDeclined (copy)
-				if conversationId and (u20 and u20.conversationType == Conversation.Type.MULTI_USER_CONVERSATION) then
-					dispatch(RemovedConversation(conversationId))
-				end
-
-				v22.dismissOverlay()
-
-				if onDeclined then
-					onDeclined()
-				end
-			end,
-			onClose = function() -- line: 91
-				-- upvalues: onDeclined (copy)
-				if onDeclined then
-					onDeclined()
-				end
+			if data.onError then
+				data.onError(p)
 			end
-		})
-	end):catch(function(p2) -- line: 98
-		-- upvalues: Logger (copy), conversationId (copy), t1 (copy)
-		Logger:warning("[OSA Gate] Error fetching conversation details for {}: {}", conversationId, (tostring(p2)))
-
-		if t1.onError then
-			t1.onError(p2)
-		end
-	end)
+		end)
+	end
 end

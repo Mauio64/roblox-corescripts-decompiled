@@ -8,10 +8,7 @@ return {
 	COMMUNICATION_CHANNEL_RTN_NAMESPACE = "CommunicationChannels",
 	PRESENCE_BULK_RTN_NAMESPACE = "PresenceBulkNotifications",
 	SQUAD_CHANNEL_TYPE = "LiveChannelGroupUp",
-	PARENT_CHANNEL_TYPES = {
-		"PlatformChatGroup",
-		"PlatformChatOneToOne"
-	},
+	PARENT_CHANNEL_TYPES = { "PlatformChatGroup", "PlatformChatOneToOne" },
 	CHANNEL_LOCAL_USER_ADDED_DETAIL_TYPE = "AddedToChannel",
 	CHANNEL_LOCAL_USER_REMOVED_DETAIL_TYPE = "RemovedFromChannel",
 	CHANNEL_PARTICIPANT_ADDED_DETAIL_TYPE = "ParticipantsAdded",

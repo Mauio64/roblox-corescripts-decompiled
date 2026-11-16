@@ -1,6 +1,10 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local SquadQuickStartExperimentation = require(AppChatParent.SocialExperiments).SquadQuickStartExperimentation
+local parent = AppChat.Parent
+
+local SocialExperiments = require(parent.SocialExperiments)
+
+local SquadQuickStartExperimentation = SocialExperiments.SquadQuickStartExperimentation
+
 local EnumScreens = require(AppChat.EnumScreens)
 local ChatLandingScreen = require(AppChat.Components.ChatLanding.ChatLandingScreen)
 local ChatConversationScreen = require(AppChat.Components.ChatConversation.ChatConversationScreen)
@@ -11,33 +15,24 @@ local EditChatMembersScreen = require(AppChat.Components.EditChatMembers.EditCha
 local SquadInviteFriendsScreen = require(AppChat.Components.Squads.SquadInviteFriendsScreen)
 local SquadLobbyScreen = require(AppChat.Components.Squads.SquadLobbyScreen)
 local QuickStartSquadInviteFriendsScreen = require(AppChat.Components.Squads.QuickStartSquadInviteFriendsScreen)
-local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local getFFlagAppChatRemoveDynamicRequires = require(AppChat.Flags.getFFlagAppChatRemoveDynamicRequires)
-local FFlagEnablePartyQuickStartButton = require(AppChatParent.SharedFlags).FFlagEnablePartyQuickStartButton
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnablePartyQuickStartButton = SharedFlags2.FFlagEnablePartyQuickStartButton
 local getFFlagAppChatEnableRootedNavigation = require(AppChat.Flags.getFFlagAppChatEnableRootedNavigation)
 
-local function getChatDetailsNavigationOptions(p1) -- line: 23
-	-- upvalues: ChatDetailsNavigationOptions (copy)
-	return ChatDetailsNavigationOptions.getNavigationOptions(p1, {
-		tabBarVisible = false
-	})
+local function getChatDetailsNavigationOptions(p)
+	return ChatDetailsNavigationOptions.getNavigationOptions(p, { tabBarVisible = false })
 end
 
-local t1 = {
+local ChatLandingStackNavigatorScreens = {
 	{
 		[EnumScreens.ChatLanding] = {
 			screen = ChatLandingScreen,
-			navigationOptions = if not getFFlagAppChatRemoveDynamicRequires() then {
-				isRoot = true,
-				backButtonEnabled = false,
-				tabBarVisible = true
-			} else function() -- line: 34
-				return {
-					isRoot = true,
-					backButtonEnabled = false,
-					tabBarVisible = true
-				}
-			end
+			navigationOptions = getFFlagAppChatRemoveDynamicRequires() and function()
+				return { isRoot = true, backButtonEnabled = false, tabBarVisible = true }
+			end or { isRoot = true, backButtonEnabled = false, tabBarVisible = true }
 		}
 	},
 	{
@@ -54,68 +49,61 @@ local t1 = {
 	{
 		[EnumScreens.ChatDetails] = {
 			screen = ChatDetailsScreen,
-			navigationOptions = if not getFFlagAppChatEnableRootedNavigation() then {
+			navigationOptions = not getFFlagAppChatEnableRootedNavigation() and {
 				backButtonEnabled = true,
 				tabBarVisible = false
-			} else getChatDetailsNavigationOptions
+			} or getChatDetailsNavigationOptions
 		}
 	},
 	{
 		[EnumScreens.CreateNewChat] = {
 			screen = CreateNewChatScreen,
-			navigationOptions = {
-				backButtonEnabled = true,
-				tabBarVisible = false
-			}
+			navigationOptions = { backButtonEnabled = true, tabBarVisible = false }
 		}
 	},
 	{
 		[EnumScreens.EditChatMembers] = {
 			screen = EditChatMembersScreen,
-			navigationOptions = {
-				backButtonEnabled = true,
-				tabBarVisible = false
-			}
+			navigationOptions = { backButtonEnabled = true, tabBarVisible = false }
 		}
 	}
 }
 
-if GetFFlagIsSquadEnabled() then
-	table.insert(t1, {
-		[EnumScreens.SquadLobby] = {
-			screen = SquadLobbyScreen.CompactSquadLobbyScreen,
-			navigationOptions = {
-				backButtonEnabled = true,
-				tabBarVisible = false
-			}
-		}
-	})
-
-	if SquadQuickStartExperimentation.getPartyQuickStartChangesEnabled() and FFlagEnablePartyQuickStartButton then
-		table.insert(t1, {
-			[EnumScreens.QuickStartSquadInviteFriends] = {
-				screen = QuickStartSquadInviteFriendsScreen,
-				navigationOptions = {
-					backButtonEnabled = true,
-					tabBarVisible = false
-				}
-			}
-		})
-	end
-
-	table.insert(t1, {
-		[EnumScreens.SquadInviteFriends] = {
-			screen = SquadInviteFriendsScreen,
-			navigationOptions = {
-				backButtonEnabled = true,
-				tabBarVisible = false,
-				headerText = if not FFlagEnablePartyQuickStartButton then nil else {
-					raw = "Feature.Squads.Action.Add",
-					shouldLocalize = true
-				}
-			}
-		}
-	})
+if not GetFFlagIsSquadEnabled() then
+	return ChatLandingStackNavigatorScreens
 end
 
-return t1
+local v = {
+	[EnumScreens.SquadLobby] = {
+		screen = SquadLobbyScreen.CompactSquadLobbyScreen,
+		navigationOptions = { backButtonEnabled = true, tabBarVisible = false }
+	}
+}
+table.insert(ChatLandingStackNavigatorScreens, v)
+
+if SquadQuickStartExperimentation.getPartyQuickStartChangesEnabled() and FFlagEnablePartyQuickStartButton then
+	local v2 = {
+		[EnumScreens.QuickStartSquadInviteFriends] = {
+			screen = QuickStartSquadInviteFriendsScreen,
+			navigationOptions = { backButtonEnabled = true, tabBarVisible = false }
+		}
+	}
+	table.insert(ChatLandingStackNavigatorScreens, v2)
+end
+
+local v2 = {
+	[EnumScreens.SquadInviteFriends] = {
+		screen = SquadInviteFriendsScreen,
+		navigationOptions = {
+			backButtonEnabled = true,
+			tabBarVisible = false,
+			headerText = FFlagEnablePartyQuickStartButton and {
+				raw = "Feature.Squads.Action.Add",
+				shouldLocalize = true
+			} or nil
+		}
+	}
+}
+table.insert(ChatLandingStackNavigatorScreens, v2)
+
+return ChatLandingStackNavigatorScreens

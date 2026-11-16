@@ -1,1 +1,3 @@
-return require(script.Parent.PlayerListController).new()
+local PlayerListController = require(script.Parent.PlayerListController)
+
+return PlayerListController.new()

@@ -1,7 +1,6 @@
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
-local function getUserSettings() -- line: 3
-	-- upvalues: UserGameSettings (copy)
+local function getUserSettings()
 	return UserGameSettings
 end
 

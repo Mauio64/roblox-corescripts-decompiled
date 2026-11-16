@@ -1,23 +1,34 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
-local View = Foundation.View
-local FoundationText = Foundation.Text
-local Constants = require(ParentParent.Common.Constants)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-local function EmptyFriendsStateImpl(t1: {[any]: any}) -- line: 16
-	-- upvalues: React (copy), View (copy), Constants (copy), FoundationText (copy)
-	return React.createElement(View, {
-		tag = Constants.STATE_PANEL_TAG,
-		LayoutOrder = t1.layoutOrder
-	}, {
-		Message = React.createElement(FoundationText, {
-			Text = "None of your friends have played this experience yet.",
-			tag = "size-full-0 auto-y text-body-small text-align-x-center content-default",
-			TextWrapped = true
-		})
-	})
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local Localization = require(parent2.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local View = Foundation.View
+local Text = Foundation.Text
+
+local FFlagPlayerListLocalizeGameText = require(parent.Flags.FFlagPlayerListLocalizeGameText)
+local useLegacyAndTransparencyAwarePanelStyle = require(parent.Hooks.useLegacyAndTransparencyAwarePanelStyle)
+
+local function EmptyFriendsStateImpl(p)
+	local v = useLegacyAndTransparencyAwarePanelStyle(p.useLegacyPanelStyling)
+
+	local text = not FFlagPlayerListLocalizeGameText and "None of your friends have played this experience yet."
+		or useLocalization({ friendsEmpty = "InGame.PlayerList.FriendsEmpty" }).friendsEmpty
+
+	return React.createElement(
+		View,
+		{ tag = v.panelTag, LayoutOrder = p.layoutOrder, backgroundStyle = v.backgroundStyle },
+		{
+			Message = React.createElement(Text, {
+				Text = text,
+				tag = "size-full-0 auto-y text-body-small text-align-x-center content-default",
+				TextWrapped = true
+			})
+		}
+	)
 end
 
 return React.memo(EmptyFriendsStateImpl)

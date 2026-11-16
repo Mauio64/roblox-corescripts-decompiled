@@ -1,25 +1,27 @@
-local FoundationParent = game:GetService("CorePackages").Packages._Index.Foundation.Foundation.Parent
-local React = require(FoundationParent.React)
+local CorePackages = game:GetService("CorePackages")
+local parent = CorePackages.Packages._Index.Foundation.Foundation.Parent
 
-local function useComposerFocusLock(b1: boolean, t1: {[any]: any}) -- line: 16
-	-- upvalues: React (copy)
-	React.useEffect(function() -- line: 17
-		-- upvalues: t1 (copy), b1 (copy)
-		for _, v7 in t1 do
-			local current = v7.current
+local React = require(parent.React)
 
-			if current ~= nil then
-				if b1 then
-					current.TextEditable = false
-					current.Active = false
-					current:ReleaseFocus()
-				else
-					current.TextEditable = true
-					current.Active = true
-				end
+local function useComposerFocusLock(flag: boolean, items)
+	React.useEffect(function()
+		for _, item in items do
+			local current = item.current
+
+			if current == nil then
+				continue
+			end
+
+			if flag then
+				current.TextEditable = false
+				current.Active = false
+				current:ReleaseFocus()
+			else
+				current.TextEditable = true
+				current.Active = true
 			end
 		end
-	end, { b1 })
+	end, { flag })
 end
 
 return useComposerFocusLock

@@ -1,69 +1,72 @@
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent
+local Constants = require(parent.Constants)
 
 return {
-	fixUploadInstance = function(p1) -- line: 17
-		-- upvalues: Constants (copy)
-		local HumanoidRigDescription = p1:FindFirstChildWhichIsA("HumanoidRigDescription")
+	fixUploadInstance = function(instance)
+		local humanoidRigDescription = instance:FindFirstChildWhichIsA("HumanoidRigDescription")
 
-		if not HumanoidRigDescription then
+		if not humanoidRigDescription then
 			return
 		end
 
-		for _, v6 in Constants.R15_BODY_PARTS do
-			local v7 = p1:FindFirstChild(v6)
+		for _, childName in Constants.R15_BODY_PARTS do
+			local child = instance:FindFirstChild(childName)
 
-			if v7 then
-				local HumanoidRigDescription2 = v7:FindFirstChildWhichIsA("HumanoidRigDescription")
+			if not child then
+				continue
+			end
 
-				if HumanoidRigDescription2 == nil then
-					HumanoidRigDescription2 = Instance.new("HumanoidRigDescription")
-					HumanoidRigDescription2.Parent = v7
+			local v = child:FindFirstChildWhichIsA("HumanoidRigDescription")
+
+			if v == nil then
+				v = Instance.new("HumanoidRigDescription")
+				v.Parent = child
+			end
+
+			if child.Name == "LowerTorso" then
+				v.OriginOffset = humanoidRigDescription.OriginOffset
+			end
+
+			for _, v2 in v:GetContainedJointLabels(childName) do
+				local joint = humanoidRigDescription:GetJoint(v2)
+
+				if not joint then
+					continue
 				end
 
-				if v7.Name == "LowerTorso" then
-					HumanoidRigDescription2.OriginOffset = HumanoidRigDescription.OriginOffset
-				end
-
-				for _, v10 in HumanoidRigDescription2:GetContainedJointLabels(v6) do
-					local Joint = HumanoidRigDescription:GetJoint(v10)
-
-					if not Joint then
+				if joint:IsA("AnimationConstraint") then
+					if joint.Attachment0 and joint.Attachment0:IsDescendantOf(child) then
+						v:SetJoint(v2, joint.Attachment0)
+					elseif joint.Attachment1 and joint.Attachment1:IsDescendantOf(child) then
+						v:SetJoint(v2, joint.Attachment1)
+					else
 						continue
 					end
-
-					if Joint:IsA("AnimationConstraint") then
-						if Joint.Attachment0 and Joint.Attachment0:IsDescendantOf(v7) then
-							HumanoidRigDescription2:SetJoint(v10, Joint.Attachment0)
-						else
-							if not Joint.Attachment1 or not Joint.Attachment1:IsDescendantOf(v7) then
-								continue
-							end
-
-							HumanoidRigDescription2:SetJoint(v10, Joint.Attachment1)
-						end
-					else
-						HumanoidRigDescription2:SetJoint(v10, Joint)
-					end
-
-					HumanoidRigDescription2:SetTposeAdjustment(v10, HumanoidRigDescription:GetTposeAdjustment(v10))
-					HumanoidRigDescription2:SetJointSize(v10, HumanoidRigDescription:GetJointSize(v10))
-					HumanoidRigDescription2:SetJointRangeMin(v10, HumanoidRigDescription:GetJointRangeMin(v10))
-					HumanoidRigDescription2:SetJointRangeMax(v10, HumanoidRigDescription:GetJointRangeMax(v10))
+				else
+					v:SetJoint(v2, joint)
 				end
+
+				v:SetTposeAdjustment(v2, humanoidRigDescription:GetTposeAdjustment(v2))
+				v:SetJointSize(v2, humanoidRigDescription:GetJointSize(v2))
+				v:SetJointRangeMin(v2, humanoidRigDescription:GetJointRangeMin(v2))
+				v:SetJointRangeMax(v2, humanoidRigDescription:GetJointRangeMax(v2))
 			end
 		end
 
-		local LeftHand = p1:FindFirstChild("LeftHand")
-		local RightHand = p1:FindFirstChild("RightHand")
+		local leftHand = instance:FindFirstChild("LeftHand")
+		local rightHand = instance:FindFirstChild("RightHand")
 
-		for _, child in HumanoidRigDescription:GetChildren() do
-			if child:IsA("DigitsRigDescription") then
-				if child.Side == Enum.DigitsRigDescriptionSide.Left and LeftHand then
-					child:Clone().Parent = LeftHand
-				elseif child.Side == Enum.DigitsRigDescriptionSide.Right and RightHand then
-					child:Clone().Parent = RightHand
-				end
+		for _, digitsRigDescription in humanoidRigDescription:GetChildren() do
+			if not digitsRigDescription:IsA("DigitsRigDescription") then
+				continue
+			end
+
+			if digitsRigDescription.Side == Enum.DigitsRigDescriptionSide.Left and leftHand then
+				local clone = digitsRigDescription:Clone()
+				clone.Parent = leftHand
+			elseif digitsRigDescription.Side == Enum.DigitsRigDescriptionSide.Right and rightHand then
+				local clone = digitsRigDescription:Clone()
+				clone.Parent = rightHand
 			end
 		end
 	end

@@ -1,14 +1,15 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local BuilderIcons = require(FoundationParent.BuilderIcons)
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
+local React = require(parent.React)
+
 local Components = Foundation.Components
 local Icon = require(Components.Icon)
 local InternalTextInput = require(Components.InternalTextInput)
-
 require(Components.Types)
-
 local View = require(Components.View)
+
 local Constants = require(Foundation.Constants)
 local Translator = require(Foundation.Utility.Localization.Translator)
 local useScaledValue = require(Foundation.Utility.useScaledValue)
@@ -16,69 +17,91 @@ local useTextInputVariants = require(Foundation.Components.TextInput.useTextInpu
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local InputSize = require(Foundation.Enums.InputSize)
+
 local InputVariant = require(Foundation.Enums.InputVariant)
+
 local Radius = require(Foundation.Enums.Radius)
+
 local SearchInputShape = require(Foundation.Enums.SearchInputShape)
-local t1 = {
-	[SearchInputShape.Pill] = Radius.Circle,
-	[SearchInputShape.Box] = Radius.None
-}
-local t2 = {
-	hasClearButton = true,
-	testId = "--foundation-search-input",
+
+local v = { [SearchInputShape.Pill] = Radius.Circle, [SearchInputShape.Box] = Radius.None }
+
+local v2 = {
 	size = InputSize.Medium,
 	variant = InputVariant.Standard,
-	shape = SearchInputShape.Pill
+	shape = SearchInputShape.Pill,
+	hasClearButton = true,
+	testId = "--foundation-search-input"
 }
 
-local function SearchInput(p1, p2) -- line: 75
-	-- upvalues: withDefaults (copy), t2 (copy), useTokens (copy), useTextInputVariants (copy), useScaledValue (copy), Constants (copy), React (copy), View (copy), withCommonProps (copy), InternalTextInput (copy), t1 (copy), Translator (copy), Icon (copy), BuilderIcons (copy)
-	local v25 = withDefaults(p1, t2)
-	local v26 = useTokens()
-	local v27 = useTextInputVariants(v26, v25.size, v25.variant)
-	local v28 = useScaledValue(Constants.DEFAULT_INPUT_FIELD_WIDTH_PIXELS)
-	local v29 = React.useMemo(function() -- line: 83
-		-- upvalues: v27 (copy), v26 (copy)
-		return UDim2.fromOffset(0, (v27.container.minHeight - v26.Stroke.Standard) / 2)
-	end, {
-		v27.container.minHeight,
-		v26.Stroke.Standard
+local function SearchInput(p, ref)
+	local v3 = withDefaults(p, v2)
+	local v4 = useTokens()
+	local v5 = useTextInputVariants(v4, v3.size, v3.variant)
+	local v6 = useScaledValue(Constants.DEFAULT_INPUT_FIELD_WIDTH_PIXELS)
+
+	local position = React.useMemo(function()
+		return UDim2.fromOffset(0, (v5.container.minHeight - v4.Stroke.Standard) / 2)
+	end, { v5.container.minHeight, v4.Stroke.Standard })
+
+	local createElement = React.createElement
+	local size
+
+	if v3.width then
+		size = UDim2.new(v3.width, UDim.new(0, 0))
+	else
+		size = UDim2.new(UDim.new(0, v6), UDim.new(0, 0))
+	end
+
+	local v7 = withCommonProps(v3, { Size = size, tag = "auto-y" })
+
+	local createElement2 = React.createElement
+	local v8 = {
+		ref = ref,
+		hasError = v3.hasError,
+		isDisabled = v3.isDisabled,
+		hasClearButton = v3.hasClearButton,
+		text = v3.text,
+		size = v3.size,
+		radius = v[v3.shape],
+		variant = v3.variant,
+		horizontalPadding = {
+			left = v5.container.horizontalPadding,
+			right = v5.container.horizontalPadding
+		},
+		onChanged = v3.onChanged,
+		onFocus = v3.onFocusGained,
+		onFocusLost = v3.onFocusLost,
+		placeholder = 0,
+		leadingElement = 0,
+		testId = 0
+	}
+	local placeholder
+
+	if v3.placeholder then
+		placeholder = v3.placeholder
+	else
+		placeholder = Translator:FormatByKey("CommonUI.Controls.Action.Search")
+	end
+
+	v8.placeholder = placeholder
+
+	v8.leadingElement = React.createElement(View, {
+		Position = position,
+		tag = "anchor-center-left auto-xy"
+	}, {
+		Icon = React.createElement(Icon, {
+			name = BuilderIcons.Icon.MagnifyingGlass,
+			size = v3.size,
+			testId = `{v3.testId}--search-icon`
+		})
 	})
 
-	return React.createElement(View, withCommonProps(v25, {
-		tag = "auto-y",
-		Size = if not v25.width then UDim2.new(UDim.new(0, v28), UDim.new(0, 0)) else UDim2.new(v25.width, UDim.new(0, 0))
-	}), {
-		Input = React.createElement(InternalTextInput, {
-			ref = p2,
-			hasError = v25.hasError,
-			isDisabled = v25.isDisabled,
-			hasClearButton = v25.hasClearButton,
-			text = v25.text,
-			size = v25.size,
-			radius = t1[v25.shape],
-			variant = v25.variant,
-			horizontalPadding = {
-				left = v27.container.horizontalPadding,
-				right = v27.container.horizontalPadding
-			},
-			onChanged = v25.onChanged,
-			onFocus = v25.onFocusGained,
-			onFocusLost = v25.onFocusLost,
-			placeholder = if not v25.placeholder then Translator:FormatByKey("CommonUI.Controls.Action.Search") else v25.placeholder,
-			leadingElement = React.createElement(View, {
-				tag = "anchor-center-left auto-xy",
-				Position = v29
-			}, {
-				Icon = React.createElement(Icon, {
-					name = BuilderIcons.Icon.MagnifyingGlass,
-					size = v25.size,
-					testId = `{ v25.testId }--search-icon`
-				})
-			}),
-			testId = `{ v25.testId }--input`
-		})
+	v8.testId = `{v3.testId}--input`
+	return createElement(View, v7, {
+		Input = createElement2(InternalTextInput, v8)
 	})
 end
 

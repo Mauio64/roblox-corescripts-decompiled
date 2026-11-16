@@ -1,18 +1,23 @@
-return function(p1) -- line: 1
-	local function getPlatformTarget() -- line: 2
-		-- upvalues: p1 (copy)
-		local None = Enum.Platform.None
+return function(object)
+	local function getPlatformTarget()
+		local v = Enum.Platform.None
 
-		pcall(function() -- line: 8
-			-- upvalues: None (ref), p1 (copy)
-			None = p1:GetPlatform()
+		pcall(function()
+			v = object:GetPlatform()
 		end)
 
-		local v4 = None == Enum.Platform.Windows or None == Enum.Platform.OSX
-		local v5 = None == Enum.Platform.IOS or None == Enum.Platform.Android or None == Enum.Platform.UWP
-		local v6 = None == Enum.Platform.XBox360 or None == Enum.Platform.XBoxOne or (None == Enum.Platform.PS3 or (None == Enum.Platform.PS4 or game:GetEngineFeature("PlatformEnumPS5") and None == Enum.Platform.PS5)) or None == Enum.Platform.WiiU
+		local v2 = v == Enum.Platform.Windows or v == Enum.Platform.OSX
 
-		return if not v4 then if not v5 then if not v6 then "unknownLua" .. tostring(None) else "console" else "mobile" else "client"
+		local v3 = v == Enum.Platform.IOS or v == Enum.Platform.Android or v == Enum.Platform.UWP
+
+		local v4 = v == Enum.Platform.XBox360
+			or v == Enum.Platform.XBoxOne
+			or v == Enum.Platform.PS3
+			or v == Enum.Platform.PS4
+			or game:GetEngineFeature("PlatformEnumPS5") and v == Enum.Platform.PS5
+			or v == Enum.Platform.WiiU
+
+		return v2 and "client" or v3 and "mobile" or v4 and "console" or "unknownLua" .. tostring(v)
 	end
 
 	return getPlatformTarget

@@ -1,4 +1,6 @@
 local FFlagLuaAppUnifyPlayButtonTileIxp = require(script.Parent.FFlagLuaAppUnifyPlayButtonTileIxp)
 local FFlagLuaAppUnifyPlayButtonAllSurfacesIxp = require(script.Parent.FFlagLuaAppUnifyPlayButtonAllSurfacesIxp)
 
-return game:DefineFastFlag("LuaAppUnifyPlayButtonTile4", false) or (FFlagLuaAppUnifyPlayButtonTileIxp or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp)
+return game:DefineFastFlag("LuaAppUnifyPlayButtonTile4", false)
+	or FFlagLuaAppUnifyPlayButtonTileIxp
+	or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp

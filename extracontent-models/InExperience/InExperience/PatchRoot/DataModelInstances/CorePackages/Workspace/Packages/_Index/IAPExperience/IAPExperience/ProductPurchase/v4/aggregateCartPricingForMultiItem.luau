@@ -1,47 +1,46 @@
 local cartPricingResponseLineItem = require(script.Parent.cartPricingResponseLineItem)
 
-local function aggregateCartPricingForMultiItem(p1) -- line: 20
-	-- upvalues: cartPricingResponseLineItem (copy)
-	if type(p1) ~= "table" then
+local function aggregateCartPricingForMultiItem(p)
+	if type(p) ~= "table" then
 		return nil
 	end
 
-	local errors = p1.errors
+	local errors = p.errors
 
 	if type(errors) == "table" and next(errors) ~= nil then
 		return nil
 	end
 
-	local items = p1.items
+	local items = p.items
 
 	if type(items) ~= "table" or next(items) == nil then
 		return nil
 	end
 
-	local n1 = 0
-	local n2 = 0
+	local total = 0
+	local total2 = 0
 
-	for _, v in ipairs(items) do
-		local v10 = cartPricingResponseLineItem.getCartLineSalePriceInRobux(v)
+	for _, item in ipairs(items) do
+		local cartLineSalePriceInRobux = cartPricingResponseLineItem.getCartLineSalePriceInRobux(item)
 
-		if v10 == nil then
+		if cartLineSalePriceInRobux == nil then
 			return nil
 		end
 
-		n1 += cartPricingResponseLineItem.getCartLineRegularPriceInRobux(v, v10)
-		n2 += v10
+		total += cartPricingResponseLineItem.getCartLineRegularPriceInRobux(item, cartLineSalePriceInRobux)
+		total2 += cartLineSalePriceInRobux
 	end
 
-	local v11 = n1 - n2
+	local savingsRobux = total - total2
 
-	if v11 <= 0 then
+	if savingsRobux <= 0 then
 		return nil
 	end
 
 	return {
-		subtotalRobux = n1,
-		totalRobux = n2,
-		savingsRobux = v11,
+		subtotalRobux = total,
+		totalRobux = total2,
+		savingsRobux = savingsRobux,
 		itemCount = #items
 	}
 end

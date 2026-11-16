@@ -1,7 +1,7 @@
-local t1 = {
-	Color3.new(0.9921568627450981, 0.1607843137254902, 0.2627450980392157),
-	Color3.new(0.00392156862745098, 0.6352941176470588, 1),
-	Color3.new(0.00784313725490196, 0.7215686274509804, 0.3411764705882353),
+local v = {
+	Color3.new(253 / 255, 41 / 255, 67 / 255),
+	Color3.new(1 / 255, 162 / 255, 1),
+	Color3.new(2 / 255, 184 / 255, 87 / 255),
 	BrickColor.new("Alder").Color,
 	BrickColor.new("Bright orange").Color,
 	BrickColor.new("Bright yellow").Color,
@@ -9,29 +9,29 @@ local t1 = {
 	BrickColor.new("Brick yellow").Color
 }
 
-local function HashNameToColor(s1: string) -- line: 13
-	local n1 = 0
+local function HashNameToColor(value: string)
+	local total = 0
 
-	for i = 1, #s1 do
-		local byte = string.byte((string.sub(s1, i, i)))
-		local v8 = #s1 - i + 1
+	for i = 1, #value do
+		local v2 = string.byte((string.sub(value, i, i)))
+		local v3 = #value - i + 1
 
-		if #s1 % 2 == 1 then
-			v8 -= 1
+		if #value % 2 == 1 then
+			v3 -= 1
 		end
 
-		if v8 % 4 >= 2 then
-			byte = -byte
+		if v3 % 4 >= 2 then
+			v2 = -v2
 		end
 
-		n1 += byte
+		total += v2
 	end
 
-	return n1
+	return total
 end
-local function computeNameColor(s2: string) -- line: 31
-	-- upvalues: t1 (copy), HashNameToColor (copy)
-	return t1[(HashNameToColor(s2) + 0) % #t1 + 1]
+
+local function computeNameColor(p: string)
+	return v[(HashNameToColor(p) + 0) % #v + 1]
 end
 
 return computeNameColor

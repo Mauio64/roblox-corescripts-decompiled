@@ -1,1 +1,3 @@
-return (require(script.AddFriendsIcon))
+local AddFriendsIcon = require(script.AddFriendsIcon)
+
+return AddFriendsIcon

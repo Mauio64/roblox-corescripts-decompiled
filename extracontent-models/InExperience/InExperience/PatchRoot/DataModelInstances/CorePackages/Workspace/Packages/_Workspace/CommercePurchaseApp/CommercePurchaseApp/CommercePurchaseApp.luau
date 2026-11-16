@@ -1,53 +1,68 @@
 local GuiService = game:GetService("GuiService")
-local CommercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
-local CommercePurchaseAppParent = CommercePurchaseApp.Parent
-local React = require(CommercePurchaseAppParent.React)
-local useSelector = require(CommercePurchaseAppParent.RoactUtils).Hooks.RoactRodux.useSelector
-local Toast = require(CommercePurchaseAppParent.ToastLite).Components.Toast
-local CommercePurchasePromptStateEnum = require(CommercePurchaseApp.Enums.CommercePurchasePromptStateEnum)
-local CommercePurchaseErrorContainer = require(CommercePurchaseApp.Features.CommercePurchaseError.CommercePurchaseErrorContainer)
-local ScreenSizeContext = require(CommercePurchaseAppParent.EconomyCommonCoreScriptHooks).ScreenSizeContext
-local useBenefitStatusReceivedListenerEffect = require(CommercePurchaseApp.Hooks.useBenefitStatusReceivedListenerEffect)
-local useCommerceProductPurchaseRequestListenerEffect = require(CommercePurchaseApp.Hooks.useCommerceProductPurchaseRequestListenerEffect)
-local FocusNavigationModalSurface = require(CommercePurchaseAppParent.EconomyCommonCoreScriptHooks).FocusNavigationModalSurface
-local usePurchaseBrowserClosedListenerEffect = require(CommercePurchaseApp.Hooks.usePurchaseBrowserClosedListenerEffect)
-local selectPromptState = require(CommercePurchaseApp.Store.Selectors.selectPromptState)
 
-local function CommercePurchaseApp2() -- line: 20
-	-- upvalues: React (copy), useSelector (copy), selectPromptState (copy), useBenefitStatusReceivedListenerEffect (copy), usePurchaseBrowserClosedListenerEffect (copy), useCommerceProductPurchaseRequestListenerEffect (copy), CommercePurchasePromptStateEnum (copy), GuiService (copy), ScreenSizeContext (copy), FocusNavigationModalSurface (copy), CommercePurchaseErrorContainer (copy), Toast (copy)
-	local v16, v17 = React.useState(Vector2.new(0, 0))
-	local v18 = useSelector(selectPromptState)
+local commercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
+local parent = commercePurchaseApp.Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local ToastLite = require(parent.ToastLite)
+local Toast = ToastLite.Components.Toast
+
+local CommercePurchasePromptStateEnum = require(commercePurchaseApp.Enums.CommercePurchasePromptStateEnum)
+local CommercePurchaseErrorContainer = require(commercePurchaseApp.Features.CommercePurchaseError.CommercePurchaseErrorContainer)
+local EconomyCommonCoreScriptHooks = require(parent.EconomyCommonCoreScriptHooks)
+local ScreenSizeContext = EconomyCommonCoreScriptHooks.ScreenSizeContext
+local useBenefitStatusReceivedListenerEffect = require(commercePurchaseApp.Hooks.useBenefitStatusReceivedListenerEffect)
+
+local useCommerceProductPurchaseRequestListenerEffect = require(commercePurchaseApp.Hooks.useCommerceProductPurchaseRequestListenerEffect)
+local EconomyCommonCoreScriptHooks2 = require(parent.EconomyCommonCoreScriptHooks)
+local FocusNavigationModalSurface = EconomyCommonCoreScriptHooks2.FocusNavigationModalSurface
+local usePurchaseBrowserClosedListenerEffect = require(commercePurchaseApp.Hooks.usePurchaseBrowserClosedListenerEffect)
+local selectPromptState = require(commercePurchaseApp.Store.Selectors.selectPromptState)
+
+local function CommercePurchaseApp()
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local v = useSelector(selectPromptState)
 
 	useBenefitStatusReceivedListenerEffect()
 	usePurchaseBrowserClosedListenerEffect()
 	useCommerceProductPurchaseRequestListenerEffect()
-	React.useEffect(function() -- line: 28
-		-- upvalues: v18 (copy), CommercePurchasePromptStateEnum (copy), GuiService (copy)
-		if v18 == CommercePurchasePromptStateEnum.None then
+
+	React.useEffect(function()
+		if v == CommercePurchasePromptStateEnum.None then
 			GuiService.SelectedCoreObject = nil
 		end
-	end, { v18 })
+	end, { v })
 
-	if v18 == CommercePurchasePromptStateEnum.None then
+	if v == CommercePurchasePromptStateEnum.None then
 		return nil
 	end
 
-	return (React.createElement(ScreenSizeContext.Provider, {
-		value = v16
-	}, React.createElement("ScreenGui", {
-		[React.Change.AbsoluteSize] = function(p1) -- line: 39
-			-- upvalues: v17 (copy)
-			v17(p1.AbsoluteSize)
+	local createElement = React.createElement
+	local provider = ScreenSizeContext.Provider
+
+	local createElement2 = React.createElement
+	local v2 = {
+		[React.Change.AbsoluteSize] = function(p)
+			setState(p.AbsoluteSize)
 		end,
 		ScreenInsets = Enum.ScreenInsets.None
-	}, {
-		FocusNavigationEffects = React.createElement(FocusNavigationModalSurface, {
-			selectionGroupName = "CommercePurchaseApp"
-		}, {
-			Error = if v18 ~= CommercePurchasePromptStateEnum.Error then nil else React.createElement(CommercePurchaseErrorContainer),
-			Toast = React.createElement(Toast)
-		})
+	}
+
+	local createElement3 = React.createElement
+	local err
+
+	if v == CommercePurchasePromptStateEnum.Error then
+		err = React.createElement(CommercePurchaseErrorContainer)
+	end
+
+	return (createElement(provider, { value = state }, createElement2("ScreenGui", v2, {
+		FocusNavigationEffects = createElement3(
+			FocusNavigationModalSurface,
+			{ selectionGroupName = "CommercePurchaseApp" },
+			{ Error = err, Toast = React.createElement(Toast) }
+		)
 	})))
 end
 
-return CommercePurchaseApp2
+return CommercePurchaseApp

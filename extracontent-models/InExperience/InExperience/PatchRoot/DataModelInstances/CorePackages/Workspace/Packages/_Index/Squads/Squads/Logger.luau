@@ -1,15 +1,23 @@
-local Parent = script:FindFirstAncestor("Squads").Parent
-local FFlagDebugSquadLogsEnabled = require(Parent.SharedFlags).FFlagDebugSquadLogsEnabled
-local v3 = require(Parent.Lumberyak).Logger.new(nil, "Squads")
+local parent = script:FindFirstAncestor("Squads").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDebugSquadLogsEnabled = SharedFlags.FFlagDebugSquadLogsEnabled
+local Lumberyak = require(parent.Lumberyak)
+local logger = Lumberyak.Logger.new(nil, "Squads")
 
-v3:setContext({
-	prefix = "[Squads] - "
-})
-v3:addSink({
-	maxLevel = if not FFlagDebugSquadLogsEnabled then v3.Levels.Warning else v3.Levels.Debug,
-	log = function(_, p2, _) -- line: 11
-		print(p2)
+logger:setContext({ prefix = "[Squads] - " })
+local maxLevel
+
+if FFlagDebugSquadLogsEnabled then
+	maxLevel = logger.Levels.Debug
+else
+	maxLevel = logger.Levels.Warning
+end
+
+logger:addSink({
+	maxLevel = maxLevel,
+	log = function(_, p, _)
+		print(p)
 	end
 })
 
-return v3
+return logger

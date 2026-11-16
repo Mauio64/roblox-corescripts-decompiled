@@ -1,7 +1,5 @@
-local ParentParent = script.Parent.Parent.Parent
-local enumerate = require(ParentParent.enumerate)
-local t1 = {
-	Subscription = "Subscription"
-}
+local parent = script.Parent.Parent.Parent
 
-return (enumerate(script.Name, t1))
+local enumerate = require(parent.enumerate)
+
+return (enumerate(script.Name, { Subscription = "Subscription" }))

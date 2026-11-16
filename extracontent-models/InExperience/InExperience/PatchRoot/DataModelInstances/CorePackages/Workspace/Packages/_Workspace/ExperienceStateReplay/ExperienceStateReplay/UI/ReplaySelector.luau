@@ -1,127 +1,116 @@
-local ParentParent = script.Parent.Parent
-local GetFStringPlaybackGuid = require(ParentParent.Flags.GetFStringPlaybackGuid)
+local parent = script.Parent.Parent
+local GetFStringPlaybackGuid = require(parent.Flags.GetFStringPlaybackGuid)
 
 return {
-	create = function(p1, p2) -- line: 7
-		-- upvalues: GetFStringPlaybackGuid (copy)
-		local Frame = Instance.new("Frame")
+	create = function(p, callback)
+		local replaySelector = Instance.new("Frame")
+		replaySelector.Name = "ReplaySelector"
+		replaySelector.Size = UDim2.fromOffset(300, 250)
+		replaySelector.Position = UDim2.fromScale(0.5, 0.5)
+		replaySelector.AnchorPoint = Vector2.new(0.5, 0.5)
+		replaySelector.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+		replaySelector.BorderSizePixel = 0
+		replaySelector.Parent = p.screenGui
 
-		Frame.Name = "ReplaySelector"
-		Frame.Size = UDim2.fromOffset(300, 250)
-		Frame.Position = UDim2.fromScale(0.5, 0.5)
-		Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-		Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-		Frame.BorderSizePixel = 0
-		Frame.Parent = p1.screenGui
+		local uiCorner = Instance.new("UICorner")
+		uiCorner.CornerRadius = UDim.new(0, 8)
+		uiCorner.Parent = replaySelector
 
-		local UICorner = Instance.new("UICorner")
+		local titleLabel = Instance.new("TextLabel")
+		titleLabel.Name = "TitleLabel"
+		titleLabel.Size = UDim2.new(1, 0, 0, 30)
+		titleLabel.Position = UDim2.new(0, 0, 0, 10)
+		titleLabel.BackgroundTransparency = 1
+		titleLabel.Text = "Enter Engine Context"
+		titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		titleLabel.Font = Enum.Font.SourceSansBold
+		titleLabel.TextSize = 16
+		titleLabel.Parent = replaySelector
 
-		UICorner.CornerRadius = UDim.new(0, 8)
-		UICorner.Parent = Frame
+		local guidInput = Instance.new("TextBox")
+		guidInput.Name = "GuidInput"
+		guidInput.Size = UDim2.new(0.9, 0, 0, 40)
+		guidInput.Position = UDim2.new(0.5, 0, 0, 50)
+		guidInput.AnchorPoint = Vector2.new(0.5, 0)
+		guidInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		guidInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+		guidInput.PlaceholderText = "Paste GUID here..."
+		guidInput.Font = Enum.Font.SourceSans
+		guidInput.TextSize = 14
+		guidInput.Text = GetFStringPlaybackGuid()
+		guidInput.Parent = replaySelector
 
-		local TextLabel = Instance.new("TextLabel")
+		local uiCorner2 = Instance.new("UICorner")
+		uiCorner2.CornerRadius = UDim.new(0, 4)
+		uiCorner2.Parent = guidInput
 
-		TextLabel.Name = "TitleLabel"
-		TextLabel.Size = UDim2.new(1, 0, 0, 30)
-		TextLabel.Position = UDim2.new(0, 0, 0, 10)
-		TextLabel.BackgroundTransparency = 1
-		TextLabel.Text = "Enter Engine Context"
-		TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TextLabel.Font = Enum.Font.SourceSansBold
-		TextLabel.TextSize = 16
-		TextLabel.Parent = Frame
+		local closeButton = Instance.new("TextButton")
+		closeButton.Name = "CloseButton"
+		closeButton.Size = UDim2.fromOffset(30, 30)
+		closeButton.Position = UDim2.new(1, -4, 0, 4)
+		closeButton.AnchorPoint = Vector2.new(1, 0)
+		closeButton.BackgroundTransparency = 1
+		closeButton.Text = "X"
+		closeButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+		closeButton.Font = Enum.Font.SourceSansBold
+		closeButton.TextSize = 18
+		closeButton.Parent = replaySelector
 
-		local TextBox = Instance.new("TextBox")
+		local openReplaySelectorButton = Instance.new("TextButton")
+		openReplaySelectorButton.Name = "OpenReplaySelectorButton"
+		openReplaySelectorButton.Size = UDim2.fromOffset(100, 30)
+		openReplaySelectorButton.Position = UDim2.new(0, 10, 0, 10)
+		openReplaySelectorButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+		openReplaySelectorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+		openReplaySelectorButton.Text = "Replay Input"
+		openReplaySelectorButton.Font = Enum.Font.SourceSansBold
+		openReplaySelectorButton.TextSize = 14
+		openReplaySelectorButton.Visible = false
+		openReplaySelectorButton.Parent = p.screenGui
 
-		TextBox.Name = "GuidInput"
-		TextBox.Size = UDim2.new(0.9, 0, 0, 40)
-		TextBox.Position = UDim2.new(0.5, 0, 0, 50)
-		TextBox.AnchorPoint = Vector2.new(0.5, 0)
-		TextBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-		TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TextBox.PlaceholderText = "Paste GUID here..."
-		TextBox.Font = Enum.Font.SourceSans
-		TextBox.TextSize = 14
-		TextBox.Text = GetFStringPlaybackGuid()
-		TextBox.Parent = Frame
+		local uiCorner3 = Instance.new("UICorner")
+		uiCorner3.CornerRadius = UDim.new(0, 4)
+		uiCorner3.Parent = openReplaySelectorButton
 
-		local UICorner2 = Instance.new("UICorner")
-
-		UICorner2.CornerRadius = UDim.new(0, 4)
-		UICorner2.Parent = TextBox
-
-		local TextButton = Instance.new("TextButton")
-
-		TextButton.Name = "CloseButton"
-		TextButton.Size = UDim2.fromOffset(30, 30)
-		TextButton.Position = UDim2.new(1, -4, 0, 4)
-		TextButton.AnchorPoint = Vector2.new(1, 0)
-		TextButton.BackgroundTransparency = 1
-		TextButton.Text = "X"
-		TextButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-		TextButton.Font = Enum.Font.SourceSansBold
-		TextButton.TextSize = 18
-		TextButton.Parent = Frame
-
-		local TextButton2 = Instance.new("TextButton")
-
-		TextButton2.Name = "OpenReplaySelectorButton"
-		TextButton2.Size = UDim2.fromOffset(100, 30)
-		TextButton2.Position = UDim2.new(0, 10, 0, 10)
-		TextButton2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-		TextButton2.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TextButton2.Text = "Replay Input"
-		TextButton2.Font = Enum.Font.SourceSansBold
-		TextButton2.TextSize = 14
-		TextButton2.Visible = false
-		TextButton2.Parent = p1.screenGui
-
-		local UICorner3 = Instance.new("UICorner")
-
-		UICorner3.CornerRadius = UDim.new(0, 4)
-		UICorner3.Parent = TextButton2
-		TextButton2.MouseButton1Click:Connect(function() -- line: 77
-			-- upvalues: Frame (copy), TextButton2 (copy)
-			Frame.Visible = true
-			TextButton2.Visible = false
-		end)
-		TextButton.MouseButton1Click:Connect(function() -- line: 82
-			-- upvalues: Frame (copy), TextButton2 (copy)
-			Frame.Visible = false
-			TextButton2.Visible = true
+		openReplaySelectorButton.MouseButton1Click:Connect(function()
+			replaySelector.Visible = true
+			openReplaySelectorButton.Visible = false
 		end)
 
-		local TextButton3 = Instance.new("TextButton")
+		closeButton.MouseButton1Click:Connect(function()
+			replaySelector.Visible = false
+			openReplaySelectorButton.Visible = true
+		end)
 
-		TextButton3.Name = "SubmitButton"
-		TextButton3.Size = UDim2.new(0.5, 0, 0, 30)
-		TextButton3.Position = UDim2.new(0.5, 0, 0, 200)
-		TextButton3.AnchorPoint = Vector2.new(0.5, 0)
-		TextButton3.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-		TextButton3.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TextButton3.Text = "Load Replay"
-		TextButton3.Font = Enum.Font.SourceSansBold
-		TextButton3.TextSize = 14
-		TextButton3.Parent = Frame
+		local submitButton = Instance.new("TextButton")
+		submitButton.Name = "SubmitButton"
+		submitButton.Size = UDim2.new(0.5, 0, 0, 30)
+		submitButton.Position = UDim2.new(0.5, 0, 0, 200)
+		submitButton.AnchorPoint = Vector2.new(0.5, 0)
+		submitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+		submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+		submitButton.Text = "Load Replay"
+		submitButton.Font = Enum.Font.SourceSansBold
+		submitButton.TextSize = 14
+		submitButton.Parent = replaySelector
 
-		local UICorner4 = Instance.new("UICorner")
+		local uiCorner4 = Instance.new("UICorner")
+		uiCorner4.CornerRadius = UDim.new(0, 4)
+		uiCorner4.Parent = submitButton
 
-		UICorner4.CornerRadius = UDim.new(0, 4)
-		UICorner4.Parent = TextButton3
-		TextButton3.MouseButton1Click:Connect(function() -- line: 103
-			-- upvalues: p2 (copy), TextBox (copy)
-			if p2 then
-				p2(TextBox.Text)
+		submitButton.MouseButton1Click:Connect(function()
+			if callback then
+				callback(guidInput.Text)
 			end
 		end)
 
-		return {
-			Container = Frame,
-			SetVisible = function(_: {[any]: any}, b1: boolean) -- line: 113
-				-- upvalues: Frame (copy), TextButton2 (copy)
-				Frame.Visible = b1
-				TextButton2.Visible = not b1
-			end
-		}
+		local v = { Container = replaySelector }
+
+		function v.SetVisible(_, visible: boolean)
+			replaySelector.Visible = visible
+			openReplaySelectorButton.Visible = not visible
+		end
+
+		return v
 	end
 }

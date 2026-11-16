@@ -1,12 +1,12 @@
-local function parseUserAllowList(s1: string?, n1: number) -- line: 7
-	if not s1 or s1 == "" then
+local function parseUserAllowList(value: string?, p: number): boolean
+	if not value or value == "" then
 		return false
 	end
 
-	for _, v5 in string.split(s1, ",") do
-		local v6 = v5:match("^%s*(.-)%s*$")
+	for _, v in string.split(value, ",") do
+		local match = v:match("^%s*(.-)%s*$")
 
-		if v6 and n1 == tonumber(v6) then
+		if match and tonumber(match) == p then
 			return true
 		end
 	end

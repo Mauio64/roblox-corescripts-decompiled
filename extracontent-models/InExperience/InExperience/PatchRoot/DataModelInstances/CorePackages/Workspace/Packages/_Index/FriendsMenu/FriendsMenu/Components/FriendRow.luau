@@ -1,122 +1,135 @@
 local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
 local Components = FriendsMenu.Components
-local FriendsMenuParent = FriendsMenu.Parent
+local parent = FriendsMenu.Parent
 local Context = FriendsMenu.Context
 local Enums = FriendsMenu.Enums
-local React = require(FriendsMenuParent.React)
-local UIBlox = require(FriendsMenuParent.UIBlox)
-local Cryo = require(FriendsMenuParent.Cryo)
-local SharedFlags = require(FriendsMenuParent.SharedFlags)
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Cryo = require(parent.Cryo)
+local SharedFlags = require(parent.SharedFlags)
 local GetFFlagEnableCommonFriendsMenu = SharedFlags.GetFFlagEnableCommonFriendsMenu
 local GetFFlagFriendsMenuDummyLoadingFriendsFix = SharedFlags.GetFFlagFriendsMenuDummyLoadingFriendsFix
-local Foundation = require(FriendsMenuParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local useCursor = Foundation.Hooks.useCursor
+
 local FriendThumbnail = require(Components.FriendThumbnail)
 local FriendsMenuButton = require(Components.FriendsMenuButton)
 local FriendInfo = require(Components.FriendInfo)
 local FriendsMenuCheckbox = require(Components.FriendsMenuCheckbox)
-local v18 = if not GetFFlagEnableCommonFriendsMenu() then require(Context.InviteFriendContext) else require(Context.InviteCallbackContext)
-local SelectedUsersContext = require(Context.SelectedUsersContext)
-local FriendMenuType = require(Enums.FriendMenuType)
-local useStyle = UIBlox.Core.Style.useStyle
+local v
 
-require(FriendsMenu.friendsMenuModalType)
-
-local uDim2 = UDim2.new(1, 0, 0.5, 0)
-local vector2 = Vector2.new(1, 0.5)
-
-local function v24() -- line: 42
+if GetFFlagEnableCommonFriendsMenu() then
+	v = require(Context.InviteCallbackContext)
+else
+	v = require(Context.InviteFriendContext)
 end
 
-local t1 = {
-	sidePadding = 24,
-	isFullRowActivatable = false,
-	backgroundTransparency = nil
-}
+local SelectedUsersContext = require(Context.SelectedUsersContext)
 
-return function(t2: {[any]: any}) -- line: 62
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), useStyle (copy), v18 (copy), SelectedUsersContext (copy), useCursor (copy), Foundation (copy), GetFFlagFriendsMenuDummyLoadingFriendsFix (copy), FriendMenuType (copy), v24 (copy), FriendThumbnail (copy), FriendInfo (copy), FriendsMenuCheckbox (copy), uDim2 (copy), vector2 (copy), FriendsMenuButton (copy)
-	local v27 = Cryo.Dictionary.join(t1, t2)
-	local v28, v29 = React.useState(false)
-	local Theme = useStyle().Theme
-	local friend = v27.friend
+local FriendMenuType = require(Enums.FriendMenuType)
 
+local useStyle = UIBlox.Core.Style.useStyle
+require(FriendsMenu.friendsMenuModalType)
+
+local udim = UDim2.new(1, 0, 0.5, 0)
+local vector2 = Vector2.new(1, 0.5)
+
+local function fn() end
+
+local v2 = { sidePadding = 24, isFullRowActivatable = false, backgroundTransparency = nil }
+
+return function(p)
+	local joined = Cryo.Dictionary.join(v2, p)
+	local state, setState = React.useState(false)
+	local theme = useStyle().Theme
+	local friend = joined.friend
 	assert(friend, "friend should be non-nil. Silence type checker.")
+	local v3 = React.useContext(v)
+	local v4 = React.useContext(SelectedUsersContext)
+	local sidePadding = joined.sidePadding
 
-	local v32 = React.useContext(v18)
-	local v33 = React.useContext(SelectedUsersContext)
-	local sidePadding = v27.sidePadding
-	local v35 = useCursor(Foundation.Enums.CursorType.RoundedSlot)
-	local v36 = v27.isFullRowActivatable and not v27.isFetchingFriends
-	local v37 = React.useCallback(function() -- line: 78
-		-- upvalues: v32 (copy), friend (copy), v27 (copy)
-		if v32 and (v32.inviteSingleFriend and not friend.isLoadingPlaceholder) then
-			v32.inviteSingleFriend(friend.id, v27.layoutOrder)
+	local selectionImageObject = useCursor(Foundation.Enums.CursorType.RoundedSlot)
+
+	local autoButtonColor = joined.isFullRowActivatable and not joined.isFetchingFriends
+
+	local onInvite = React.useCallback(function()
+		if v3 and v3.inviteSingleFriend and not friend.isLoadingPlaceholder then
+			v3.inviteSingleFriend(friend.id, joined.layoutOrder)
 		end
-	end, {
-		v32,
-		v32.inviteSingleFriend,
-		friend.id,
-		friend.isLoadingPlaceholder,
-		v27.layoutOrder
-	})
-	local v38 = React.useCallback(function() -- line: 93
-		-- upvalues: v33 (copy), v27 (copy)
-		if v33.isFriendSelected(v27.friend.id) then
-			v33.removeFriend(v27.friend.id, v27.friend.displayName)
+	end, { v3, v3.inviteSingleFriend, friend.id, friend.isLoadingPlaceholder, joined.layoutOrder })
 
+	local v5 = React.useCallback(function()
+		if v4.isFriendSelected(joined.friend.id) then
+			v4.removeFriend(joined.friend.id, joined.friend.displayName)
+		else
+			v4.addFriend(joined.friend.id, joined.friend.displayName)
+		end
+	end, { v4.isFriendSelected, v4.removeFriend, v4.addFriend, joined.friend.id })
+
+	local v6 = React.useCallback(function()
+		if not autoButtonColor or GetFFlagFriendsMenuDummyLoadingFriendsFix() and friend.isLoadingPlaceholder then
 			return
 		end
 
-		v33.addFriend(v27.friend.id, v27.friend.displayName)
-	end, {
-		v33.isFriendSelected,
-		v33.removeFriend,
-		v33.addFriend,
-		v27.friend.id
-	})
-	local v39 = React.useCallback(function() -- line: 109
-		-- upvalues: v36 (copy), GetFFlagFriendsMenuDummyLoadingFriendsFix (copy), friend (copy), v27 (copy), FriendMenuType (copy), v37 (copy), v38 (copy)
-		if not v36 or GetFFlagFriendsMenuDummyLoadingFriendsFix() and friend.isLoadingPlaceholder then
-			return
+		if joined.menuType == FriendMenuType.MultiSelect then
+			v5()
+		else
+			onInvite()
 		end
+	end, { autoButtonColor, joined.menuType, onInvite, v5, friend.isLoadingPlaceholder })
 
-		if v27.menuType ~= FriendMenuType.MultiSelect then
-			v37()
-
-			return
-		end
-
-		v38()
-	end, {
-		v36,
-		v27.menuType,
-		v37,
-		v38,
-		friend.isLoadingPlaceholder
-	})
-
-	return React.createElement("ImageButton", {
+	local createElement = React.createElement
+	local v7 = {
+		["Size"] = nil,
+		["Size"] = nil,
+		["Size"] = nil,
+		["Size"] = nil,
+		["Size"] = nil,
+		["Size"] = nil,
 		Size = UDim2.new(1, 0, 0, 72),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = v28 and Theme.BackgroundOnHover.Color or Theme.BackgroundDefault.Color,
-		BackgroundTransparency = if not v28 then if not v27.backgroundTransparency then Theme.BackgroundDefault.Transparency else v27.backgroundTransparency else Theme.BackgroundOnHover.Transparency,
-		BorderSizePixel = 0,
-		LayoutOrder = v27.layoutOrder,
-		SelectionImageObject = if not v27.isFullRowActivatable then nil else v35,
-		[React.Event.MouseEnter] = function() -- line: 144
-			-- upvalues: v27 (copy), v29 (copy)
-			if not v27.isFetchingFriends then
-				v29(true)
-			end
-		end,
-		[React.Event.MouseLeave] = function() -- line: 149
-			-- upvalues: v29 (copy)
-			v29(false)
-		end,
-		[React.Event.Activated] = if not (not not GetFFlagFriendsMenuDummyLoadingFriendsFix() and friend.isLoadingPlaceholder) and v36 then v39 else v24,
-		AutoButtonColor = v36
-	}, {
+		BackgroundColor3 = state and theme.BackgroundOnHover.Color or theme.BackgroundDefault.Color
+	}
+	local backgroundTransparency
+
+	if state then
+		backgroundTransparency = theme.BackgroundOnHover.Transparency
+	elseif joined.backgroundTransparency then
+		backgroundTransparency = joined.backgroundTransparency
+	else
+		backgroundTransparency = theme.BackgroundDefault.Transparency
+	end
+
+	v7.BackgroundTransparency = backgroundTransparency
+
+	v7.BorderSizePixel = 0
+	v7.LayoutOrder = joined.layoutOrder
+
+	if not joined.isFullRowActivatable then
+		selectionImageObject = nil
+	end
+
+	v7.SelectionImageObject = selectionImageObject
+	v7[React.Event.MouseEnter] = function()
+		if not joined.isFetchingFriends then
+			setState(true)
+		end
+	end
+	v7[React.Event.MouseLeave] = function()
+		setState(false)
+	end
+	local activated = React.Event.Activated
+
+	if GetFFlagFriendsMenuDummyLoadingFriendsFix() and friend.isLoadingPlaceholder or not autoButtonColor then
+		v6 = fn
+	end
+
+	v7[activated] = v6
+
+	v7.AutoButtonColor = autoButtonColor
+	local v8 = {
 		UIListLayout = React.createElement("UIListLayout", {
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -130,37 +143,47 @@ return function(t2: {[any]: any}) -- line: 62
 			PaddingTop = UDim.new(0, 8)
 		}),
 		ThumbnailAndPresenceWrapper = React.createElement(FriendThumbnail, {
-			LayoutOrder = 1,
 			friend = friend,
-			isHoverRow = v28,
+			isHoverRow = state,
 			size = UDim2.new(0, 56, 0, 56),
 			position = UDim2.new(0, 0, 0.5, 0),
 			anchorPoint = Vector2.new(0, 0.5),
-			isFetchingFriends = v27.isFetchingFriends
+			isFetchingFriends = joined.isFetchingFriends,
+			LayoutOrder = 1
 		}),
 		UserInfo = React.createElement(FriendInfo, {
-			LayoutOrder = 2,
 			position = UDim2.new(0, 56, 0, 0),
 			size = UDim2.new(1, -134, 0, 0),
 			friend = friend,
-			isFetchingFriendsNames = v27.isFetchingFriendsNames
+			isFetchingFriendsNames = joined.isFetchingFriendsNames,
+			LayoutOrder = 2
 		}),
-		InviteButton = if v27.menuType ~= FriendMenuType.MultiSelect then React.createElement(FriendsMenuButton, {
-			layoutOrder = 3,
+		InviteButton = 0
+	}
+	local inviteButton
+
+	if joined.menuType == FriendMenuType.MultiSelect then
+		inviteButton = React.createElement(FriendsMenuCheckbox, {
 			size = UDim2.new(0, 66, 0, 36),
-			position = uDim2,
+			position = udim,
 			anchorPoint = vector2,
 			friend = friend,
-			onInvite = v37,
-			isFullRowActivatable = v27.isFullRowActivatable
-		}) else React.createElement(FriendsMenuCheckbox, {
+			isDisabled = joined.isFetchingFriends,
 			layoutOrder = 3,
-			size = UDim2.new(0, 66, 0, 36),
-			position = uDim2,
-			anchorPoint = vector2,
-			friend = friend,
-			isDisabled = v27.isFetchingFriends,
-			selectable = not v27.isFullRowActivatable and nil
+			selectable = not joined.isFullRowActivatable and nil
 		})
-	})
+	else
+		inviteButton = React.createElement(FriendsMenuButton, {
+			size = UDim2.new(0, 66, 0, 36),
+			position = udim,
+			anchorPoint = vector2,
+			friend = friend,
+			onInvite = onInvite,
+			isFullRowActivatable = joined.isFullRowActivatable,
+			layoutOrder = 3
+		})
+	end
+
+	v8.InviteButton = inviteButton
+	return createElement("ImageButton", v7, v8)
 end

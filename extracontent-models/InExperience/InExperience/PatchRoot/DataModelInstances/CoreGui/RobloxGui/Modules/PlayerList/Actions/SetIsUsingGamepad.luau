@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetIsUsingGamepad", function(p1) -- line: 4
-	return {
-		isUsingGamepad = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetIsUsingGamepad", function(isUsingGamepad)
+	return { isUsingGamepad = isUsingGamepad }
 end)

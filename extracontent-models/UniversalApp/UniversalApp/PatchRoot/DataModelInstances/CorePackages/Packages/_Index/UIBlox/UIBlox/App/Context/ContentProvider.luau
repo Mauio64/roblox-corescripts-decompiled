@@ -1,4 +1,6 @@
 local ContentProvider = game:GetService("ContentProvider")
-local ParentParent = script.Parent.Parent.Parent.Parent
 
-return require(ParentParent.Roact).createContext(ContentProvider)
+local parent = script.Parent.Parent.Parent.Parent
+local Roact = require(parent.Roact)
+
+return Roact.createContext(ContentProvider)

@@ -1,31 +1,40 @@
-local Parent = script:FindFirstAncestor("MomentsCreation").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local FoundationImage = Foundation.Image
+local parent = script:FindFirstAncestor("MomentsCreation").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
+local Image = Foundation.Image
+
 local useCallback = React.useCallback
 
-local function StickerPickerItem(t1: {[any]: any}) -- line: 25
-	-- upvalues: useCallback (copy), React (copy), FoundationImage (copy)
-	local stickerURI = t1.stickerURI
-	local onStickerSelected = t1.onStickerSelected
-	local v10 = useCallback(function() -- line: 29
-		-- upvalues: onStickerSelected (copy), stickerURI (copy)
+local function StickerPickerItem(props)
+	local stickerURI = props.stickerURI
+	local onStickerSelected = props.onStickerSelected
+
+	local onActivated = useCallback(function()
 		if onStickerSelected then
 			onStickerSelected(stickerURI)
 		end
-	end, {
-		onStickerSelected,
-		stickerURI
-	})
+	end, { onStickerSelected, stickerURI })
 
-	return React.createElement(FoundationImage, {
+	local createElement = React.createElement
+	local v = {
+		LayoutOrder = props.layoutOrder,
+		onActivated = 0,
+		Image = 0,
+		ScaleType = 0,
 		BackgroundTransparency = 1,
-		tag = "size-1000-1000 radius-medium",
-		LayoutOrder = t1.layoutOrder,
-		onActivated = if not onStickerSelected then nil else v10,
-		Image = stickerURI,
-		ScaleType = Enum.ScaleType.Fit
-	})
+		tag = "size-1000-1000 radius-medium"
+	}
+
+	if not onStickerSelected then
+		onActivated = nil
+	end
+
+	v.onActivated = onActivated
+	v.Image = stickerURI
+	v.ScaleType = Enum.ScaleType.Fit
+	return createElement(Image, v)
 end
 
 return StickerPickerItem

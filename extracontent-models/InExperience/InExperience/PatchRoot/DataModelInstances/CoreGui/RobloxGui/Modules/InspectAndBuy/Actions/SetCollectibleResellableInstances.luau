@@ -1,10 +1,9 @@
 local CorePackages = game:GetService("CorePackages")
-
 require(script.Parent.Parent.Models.CollectibleInstance)
-
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(s1: string?, t1: {[any]: any}) -- line: 8
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator(script.Name, function(collectibleItemId: string?, collectibleItemInstances)
 	return {
-		collectibleItemId = s1,
-		collectibleItemInstances = t1
+		collectibleItemId = collectibleItemId,
+		collectibleItemInstances = collectibleItemInstances
 	}
 end)

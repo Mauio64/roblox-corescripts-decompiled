@@ -1,15 +1,24 @@
-local Parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
-local getSduiTelemetryHandlerNameRegistry = require(Parent.SduiCoreSystem).getSduiTelemetryHandlerNameRegistry
-local FFlagSduiSearchPeoplePlayerTileTelemetry = require(Parent.SharedFlags).FFlagSduiSearchPeoplePlayerTileTelemetry
+local parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
 
-local function registerSocialActionTelemetryHandlers() -- line: 9
-	-- upvalues: getSduiTelemetryHandlerNameRegistry (copy), FFlagSduiSearchPeoplePlayerTileTelemetry (copy)
+local SduiCoreSystem = require(parent.SduiCoreSystem)
+local getSduiTelemetryHandlerNameRegistry = SduiCoreSystem.getSduiTelemetryHandlerNameRegistry
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiSearchPeoplePlayerTileTelemetry = SharedFlags.FFlagSduiSearchPeoplePlayerTileTelemetry
+local FFlagSduiSocialUpsellButtonClickTelemetry = SharedFlags.FFlagSduiSocialUpsellButtonClickTelemetry
+
+local function registerSocialActionTelemetryHandlers()
 	getSduiTelemetryHandlerNameRegistry().registerTelemetryHandlers({
-		PlayerTileClick = if not FFlagSduiSearchPeoplePlayerTileTelemetry then nil else {
-			lazyHandler = function() -- line: 13
+		PlayerTileClick = FFlagSduiSearchPeoplePlayerTileTelemetry and {
+			lazyHandler = function()
 				return require(script.Parent.SduiPlayerTileClickTelemetryHandler)
 			end
-		}
+		} or nil,
+		SocialUpsellButtonClick = FFlagSduiSocialUpsellButtonClickTelemetry and {
+			lazyHandler = function()
+				return require(script.Parent.SduiSocialUpsellButtonClickTelemetryHandler)
+			end
+		} or nil
 	})
 end
 

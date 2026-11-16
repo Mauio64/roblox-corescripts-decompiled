@@ -1,4 +1,4 @@
-local function createNavigationMock() -- line: 1
+local function createNavigationMock()
 	return {
 		Enums = {
 			UnifiedLoggingSurface = {

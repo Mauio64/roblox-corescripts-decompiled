@@ -1,11 +1,12 @@
-local _script = script
+local script = script
 
 return {
-	Enums = require(_script.Enums),
-	FireEvent = require(_script.FireEvent),
-	Formatters = require(_script.Formatters),
-	RoduxAnalytics = require(_script.RoduxAnalytics),
-	AnalyticsFactory = require(_script.AnalyticsFactory),
-	DefaultAnalyticsService = require(_script.DefaultAnalyticsService),
-	Timing = require(_script.Timing)
+	Enums = require(script.Enums),
+	FireEvent = require(script.FireEvent),
+	Formatters = require(script.Formatters),
+	RoduxAnalytics = require(script.RoduxAnalytics),
+	AnalyticsFactory = require(script.AnalyticsFactory),
+	DefaultAnalyticsService = require(script.DefaultAnalyticsService),
+	Timing = require(script.Timing),
+	buildUserSeenCollectionPayload = require(script.buildUserSeenCollectionPayload)
 }

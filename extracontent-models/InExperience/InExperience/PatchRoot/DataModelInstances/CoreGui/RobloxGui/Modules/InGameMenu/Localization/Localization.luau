@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-return require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local InExperienceLocales = require(CorePackages.Workspace.Packages.InExperienceLocales)
+return InExperienceLocales.Localization

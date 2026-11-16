@@ -1,105 +1,95 @@
 local Players = game:GetService("Players")
+
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
 local FIntShopFetchOnGameJoinFallbackDelayMs = require(InExperienceShop.Flags.FIntShopFetchOnGameJoinFallbackDelayMs)
 local scheduleFallback = require(script.Parent.scheduleFallback)
 local ShopDebugLogger = require(script.Parent.ShopDebugLogger)
-local v6 = FIntShopFetchOnGameJoinFallbackDelayMs / 1000
 
-local function whenJoinSettles(p1: ((...any) -> ...any)) -- line: 20
-	-- upvalues: ShopDebugLogger (copy), Players (copy), v6 (copy), scheduleFallback (copy)
-	local u9 = false
+local v = FIntShopFetchOnGameJoinFallbackDelayMs / 1000
 
-	local function fire(s1: string) -- line: 22
-		-- upvalues: u9 (ref), ShopDebugLogger (copy), p1 (copy)
-		if u9 then
+local function whenJoinSettles(callback)
+	local flag = false
+	local function fire(p: string)
+		if flag then
 			return
 		end
 
-		u9 = true
-		ShopDebugLogger.logLazy(function() -- line: 27
-			-- upvalues: s1 (copy)
-			return "whenJoinSettles: settled path=" .. s1
+		flag = true
+		ShopDebugLogger.logLazy(function()
+			return "whenJoinSettles: settled path=" .. p
 		end)
-		p1(s1)
+
+		callback(p)
 	end
 
-	task.spawn(function() -- line: 33
-		-- upvalues: Players (copy), u9 (ref), ShopDebugLogger (copy), p1 (copy)
-		xpcall(function() -- line: 36
-			-- upvalues: Players (copy), u9 (ref), ShopDebugLogger (copy), p1 (copy)
-			repeat
-				if Players.LocalPlayer then
-					local LocalPlayer = Players.LocalPlayer
+	task.spawn(function()
+		xpcall(function()
+			while not Players.LocalPlayer do
+				Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 
-					assert(LocalPlayer ~= nil, "LocalPlayer must be non-nil after the wait loop")
+				if flag then
+					return
+				end
+			end
 
-					if LocalPlayer.Character and LocalPlayer:HasAppearanceLoaded() then
-						if u9 then
-							return
-						end
+			local localPlayer = Players.LocalPlayer
+			assert(localPlayer ~= nil, "LocalPlayer must be non-nil after the wait loop")
 
-						u9 = true
-
-						local s2 = "primary"
-
-						ShopDebugLogger.logLazy(function() -- line: 27
-							-- upvalues: s2 (copy)
-							return "whenJoinSettles: settled path=" .. s2
-						end)
-						p1("primary")
-
-						return
-					end
-
-					if u9 then
-						return
-					end
-
-					LocalPlayer.CharacterAppearanceLoaded:Once(function() -- line: 60
-						-- upvalues: u9 (ref), ShopDebugLogger (copy), p1 (copy)
-						if u9 then
-							return
-						end
-
-						u9 = true
-
-						local s3 = "primary"
-
-						ShopDebugLogger.logLazy(function() -- line: 27
-							-- upvalues: s3 (copy)
-							return "whenJoinSettles: settled path=" .. s3
-						end)
-						p1("primary")
-					end)
-
+			if localPlayer.Character and localPlayer:HasAppearanceLoaded() then
+				if flag then
 					return
 				end
 
-				Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-			until u9
-		end, function(err) -- line: 63
-			warn("[InExperienceShop] whenJoinSettles path 1 errored: " .. tostring(err))
+				flag = true
+				local v2
+				v2 = "primary"
+				ShopDebugLogger.logLazy(function()
+					return "whenJoinSettles: settled path=" .. v2
+				end)
+
+				callback("primary")
+			else
+				if flag then
+					return
+				end
+
+				localPlayer.CharacterAppearanceLoaded:Once(function()
+					if flag then
+						return
+					end
+
+					flag = true
+					local v2
+					v2 = "primary"
+					ShopDebugLogger.logLazy(function()
+						return "whenJoinSettles: settled path=" .. v2
+					end)
+
+					callback("primary")
+				end)
+			end
+		end, function(p)
+			warn("[InExperienceShop] whenJoinSettles path 1 errored: " .. tostring(p))
 		end)
 	end)
-	ShopDebugLogger.logLazy(function() -- line: 70
-		-- upvalues: v6 (copy)
-		return "whenJoinSettles: scheduled fallback delaySeconds=" .. v6
+
+	ShopDebugLogger.logLazy(function()
+		return "whenJoinSettles: scheduled fallback delaySeconds=" .. v
 	end)
-	scheduleFallback(v6, function() -- line: 73
-		-- upvalues: u9 (ref), ShopDebugLogger (copy), p1 (copy)
-		if u9 then
+
+	scheduleFallback(v, function()
+		if flag then
 			return
 		end
 
-		u9 = true
-
-		local s4 = "fallback"
-
-		ShopDebugLogger.logLazy(function() -- line: 27
-			-- upvalues: s4 (copy)
-			return "whenJoinSettles: settled path=" .. s4
+		flag = true
+		local v2
+		v2 = "fallback"
+		ShopDebugLogger.logLazy(function()
+			return "whenJoinSettles: settled path=" .. v2
 		end)
-		p1("fallback")
+
+		callback("fallback")
 	end)
 end
 

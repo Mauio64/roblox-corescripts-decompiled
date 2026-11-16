@@ -1,112 +1,129 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+
 local CoreGui = game:GetService("CoreGui")
-local Dash = require(Parent.Dash)
+local Dash = require(parent.Dash)
 local UnifiedEventLogConstants = require(script.Parent.Parent.UnifiedEventLogConstants)
-local FFlagAXMISEnableMultiShoppingUnifiedEvents = require(Parent.AvatarExperienceFlags).FFlagAXMISEnableMultiShoppingUnifiedEvents
-local t1 = {}
 
-local function getParentScrollingFrames(p1, t2: {[any]: any}?) -- line: 14
-	-- upvalues: getParentScrollingFrames (copy)
-	if not t2 then
-		t2 = {}
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMISEnableMultiShoppingUnifiedEvents = AvatarExperienceFlags.FFlagAXMISEnableMultiShoppingUnifiedEvents
+local SharedFlags = require(parent.SharedFlags)
+local FFlagCleanupTenFootUiPaddingAndAnalytics = SharedFlags.FFlagCleanupTenFootUiPaddingAndAnalytics
+
+local UnifiedEventLoggingUtils = {}
+local function getParentScrollingFrames(scrollingFrame, scrollingFrames)
+	local scrollingFrames2 = scrollingFrames or {}
+
+	local scrollingFrame2 = scrollingFrame:FindFirstAncestorWhichIsA("ScrollingFrame")
+
+	if not scrollingFrame2 then
+		return scrollingFrames2
 	end
 
-	local ScrollingFrame = p1:FindFirstAncestorWhichIsA("ScrollingFrame")
-
-	if not ScrollingFrame then
-		return t2
-	end
-
-	table.insert(t2, ScrollingFrame)
-
-	return getParentScrollingFrames(ScrollingFrame, t2)
+	table.insert(scrollingFrames2, scrollingFrame2)
+	return getParentScrollingFrames(scrollingFrame2, scrollingFrames2)
 end
 
-function t1.getUnifiedLoggingFieldName(p2) -- line: 28
-	-- upvalues: UnifiedEventLogConstants (copy)
-	return p2:sub(string.len(UnifiedEventLogConstants.ATTRIBUTE_PREFIX) + 1, (string.len(p2)))
+function UnifiedEventLoggingUtils.getUnifiedLoggingFieldName(value)
+	local ATTRIBUTE_PREFIX = UnifiedEventLogConstants.ATTRIBUTE_PREFIX
+	return value.sub(value, string.len(ATTRIBUTE_PREFIX) + 1, (string.len(value)))
 end
-function t1.isUnifiedLoggingAttribute(p3) -- line: 33
-	-- upvalues: Dash (copy), UnifiedEventLogConstants (copy)
-	return Dash.startsWith(p3, UnifiedEventLogConstants.ATTRIBUTE_PREFIX)
+
+function UnifiedEventLoggingUtils.isUnifiedLoggingAttribute(p)
+	return Dash.startsWith(p, UnifiedEventLogConstants.ATTRIBUTE_PREFIX)
 end
-function t1.formatLookTypeAttribute(p4) -- line: 37
-	return string.upper("LOOK_TYPE_" .. p4)
+
+function UnifiedEventLoggingUtils.formatLookTypeAttribute(p)
+	return string.upper("LOOK_TYPE_" .. p)
 end
 
 if FFlagAXMISEnableMultiShoppingUnifiedEvents then
-	function t1.getFieldsToSendFromInstanceAttributes(p5) -- line: 42
-		-- upvalues: t1 (copy)
-		local t3 = {}
+	function UnifiedEventLoggingUtils.getFieldsToSendFromInstanceAttributes(items)
+		local fieldsToSend = {}
 
-		if p5 then
-			for v16, v17 in p5 do
-				if t1.isUnifiedLoggingAttribute(v16) then
-					t3[t1.getUnifiedLoggingFieldName(v16)] = v17
+		if items then
+			for k, item in items do
+				if UnifiedEventLoggingUtils.isUnifiedLoggingAttribute(k) then
+					fieldsToSend[UnifiedEventLoggingUtils.getUnifiedLoggingFieldName(k)] = item
 				end
 			end
 		end
 
-		return t3
+		return fieldsToSend
 	end
 end
 
-function t1.getElementSizeAndPosition(p6) -- line: 57
-	-- upvalues: getParentScrollingFrames (copy)
-	local AbsolutePositionX = p6.AbsolutePosition.X
-	local AbsolutePositionY = p6.AbsolutePosition.Y
-	local v21 = nil or {}
-	local ScrollingFrame = p6:FindFirstAncestorWhichIsA("ScrollingFrame")
+function UnifiedEventLoggingUtils.getElementSizeAndPosition(instance)
+	local x = instance.AbsolutePosition.X
+	local y = instance.AbsolutePosition.Y
+	local scrollingFrames = nil or {}
 
-	if not ScrollingFrame then
-	else
-		table.insert(v21, ScrollingFrame)
-		v21 = getParentScrollingFrames(ScrollingFrame, v21)
+	local scrollingFrame = instance:FindFirstAncestorWhichIsA("ScrollingFrame")
+
+	if scrollingFrame then
+		table.insert(scrollingFrames, scrollingFrame)
+		scrollingFrames = getParentScrollingFrames(scrollingFrame, scrollingFrames)
 	end
 
-	if v21 then
-		for _, v24 in v21 do
-			AbsolutePositionX += v24.CanvasPosition.X
-			AbsolutePositionY += v24.CanvasPosition.Y
+	if scrollingFrames then
+		for _, v in scrollingFrames do
+			x += v.CanvasPosition.X
+			y += v.CanvasPosition.Y
 		end
 	end
 
 	return {
-		elementSizeWidth = math.round(p6.AbsoluteSize.X),
-		elementSizeHeight = math.round(p6.AbsoluteSize.Y),
-		elementCoordinatesX = math.round(p6.AbsolutePosition.X),
-		elementCoordinatesY = math.round(p6.AbsolutePosition.Y),
-		elementRelativePositionX = math.round(AbsolutePositionX),
-		elementRelativePositionY = math.round(AbsolutePositionY)
+		elementSizeWidth = math.round(instance.AbsoluteSize.X),
+		elementSizeHeight = math.round(instance.AbsoluteSize.Y),
+		elementCoordinatesX = math.round(instance.AbsolutePosition.X),
+		elementCoordinatesY = math.round(instance.AbsolutePosition.Y),
+		elementRelativePositionX = math.round(x),
+		elementRelativePositionY = math.round(y)
 	}
 end
-function t1.getScreenSize(p7) -- line: 78
-	-- upvalues: CoreGui (copy)
-	local v26 = nil
-	local ScreenGui = p7:FindFirstAncestorOfClass("ScreenGui")
 
-	if ScreenGui and ScreenGui:IsA("ScreenGui") then
-		v26 = ScreenGui
+function UnifiedEventLoggingUtils.getScreenSize(instance)
+	local v = nil
+	local screenGui = instance:FindFirstAncestorOfClass("ScreenGui")
+
+	if screenGui and screenGui:IsA("ScreenGui") then
+		v = screenGui
 	else
-		local LuaAppScreenGui = CoreGui:FindFirstChild("LuaAppScreenGui")
-		local v29 = if not LuaAppScreenGui then nil else LuaAppScreenGui:FindFirstChild("MainAppScreen_SurfaceGui")
+		local luaAppScreenGui = CoreGui:FindFirstChild("LuaAppScreenGui")
+		local mainAppScreen_SurfaceGui
 
-		if v29 and v29:IsA("SurfaceGui") then
-			v26 = v29
-		else
-			local TenFootUiSurfaceGuiFolder = CoreGui:FindFirstChild("TenFootUiSurfaceGuiFolder")
-			local v31 = if not TenFootUiSurfaceGuiFolder then nil else TenFootUiSurfaceGuiFolder:FindFirstChild("RootViewSurface_SurfaceGui")
+		if luaAppScreenGui then
+			mainAppScreen_SurfaceGui = luaAppScreenGui:FindFirstChild("MainAppScreen_SurfaceGui")
+		end
 
-			if v31 and v31:IsA("SurfaceGui") then
-				v26 = v31
+		if mainAppScreen_SurfaceGui and mainAppScreen_SurfaceGui:IsA("SurfaceGui") then
+			v = mainAppScreen_SurfaceGui
+		elseif not FFlagCleanupTenFootUiPaddingAndAnalytics then
+			local tenFootUiSurfaceGuiFolder = CoreGui:FindFirstChild("TenFootUiSurfaceGuiFolder")
+			local rootViewSurface_SurfaceGui
+
+			if tenFootUiSurfaceGuiFolder then
+				rootViewSurface_SurfaceGui = tenFootUiSurfaceGuiFolder:FindFirstChild("RootViewSurface_SurfaceGui")
+			end
+
+			if rootViewSurface_SurfaceGui and rootViewSurface_SurfaceGui:IsA("SurfaceGui") then
+				v = rootViewSurface_SurfaceGui
 			end
 		end
 	end
 
-	return {
-		screenSizeWidth = if not v26 or not v26.AbsoluteSize then nil else math.round(v26.AbsoluteSize.X),
-		screenSizeHeight = if not v26 or not v26.AbsoluteSize then nil else math.round(v26.AbsoluteSize.Y)
-	}
+	local screenSizeWidth
+
+	if v and v.AbsoluteSize then
+		screenSizeWidth = math.round(v.AbsoluteSize.X)
+	end
+
+	local screenSizeHeight
+
+	if v and v.AbsoluteSize then
+		screenSizeHeight = math.round(v.AbsoluteSize.Y)
+	end
+
+	return { screenSizeWidth = screenSizeWidth, screenSizeHeight = screenSizeHeight }
 end
 
-return t1
+return UnifiedEventLoggingUtils

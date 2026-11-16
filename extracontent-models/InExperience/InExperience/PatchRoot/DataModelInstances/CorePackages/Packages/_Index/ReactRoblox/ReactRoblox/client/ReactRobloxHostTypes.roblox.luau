@@ -1,6 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.ReactReconciler)
-require(ParentParent.Shared)
+require(parent.ReactReconciler)
+
+require(parent.Shared)
 
 return {}

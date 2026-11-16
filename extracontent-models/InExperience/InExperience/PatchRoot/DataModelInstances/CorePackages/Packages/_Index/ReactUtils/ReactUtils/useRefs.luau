@@ -1,30 +1,28 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(parent.React)
 
-local function useRefs(n1: number, p1) -- line: 14
-	-- upvalues: React (copy)
-	local v6 = React.useRef({})
-	local v7 = React.useRef(n1)
+local function useRefs(current: number, current2)
+	local ref = React.useRef({})
 
-	if n1 > #v6.current then
-		for _ = 1, n1 - #v6.current do
-			local v9 = React.createRef()
+	local ref2 = React.useRef(current)
 
-			v9.current = p1
-			table.insert(v6.current, v9)
+	if #ref.current < current then
+		for _ = 1, current - #ref.current do
+			local ref3 = React.createRef()
+			ref3.current = current2
+			table.insert(ref.current, ref3)
 		end
-	elseif n1 < v7.current then
-		for i = n1 + 1, v7.current do
-			v6.current[i].current = p1
+	elseif current < ref2.current then
+		for i = current + 1, ref2.current do
+			ref.current[i].current = current2
 		end
 	end
 
-	v7.current = n1
+	ref2.current = current
 
-	return (React.useMemo(function() -- line: 33
-		-- upvalues: v6 (copy), n1 (copy)
-		return table.move(v6.current, 1, n1, 1, {})
-	end, { n1 }))
+	return (React.useMemo(function()
+		return table.move(ref.current, 1, current, 1, {})
+	end, { current }))
 end
 
 return useRefs

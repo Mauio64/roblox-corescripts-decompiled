@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 
-return require(ParentParent.LuauPolyfill).Object.None
+return LuauPolyfill.Object.None

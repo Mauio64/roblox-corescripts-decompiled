@@ -1,6 +1,6 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 
-require(Parent.AppCommonLib)
+local React = require(parent.React)
+require(parent.AppCommonLib)
 
 return (React.createContext(nil))

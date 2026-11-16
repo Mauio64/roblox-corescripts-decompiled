@@ -1,112 +1,69 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+
 local EventNames = require(script.Parent.EventNames)
-local Enums = require(ParentParent.SocialLuaAnalytics).Analytics.Enums
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Enums = SocialLuaAnalytics.Analytics.Enums
 local Contexts = Enums.Contexts
 local SubPages = Enums.SubPages
 local EventTypes = Enums.EventTypes
 
-local function v7(p1) -- line: 11
-	return p1
+local function fn(p)
+	return p
 end
 
 return {
 	[EventNames.RequestFriendship] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "addFriend",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "addFriend" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.Unfriend] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "unFriend",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "unFriend" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.AcceptFriendRequest] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "acceptFriend",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "acceptFriend" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.IgnoreFriendRequest] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "ignoreFriend",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "ignoreFriend" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.BlockPlayer] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "block",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "block" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.ReportPlayer] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "report",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "report" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.JoinExperience] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "joinUser",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "joinUser" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.ViewExperienceDetails] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "viewExperienceDetails",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "viewExperienceDetails" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	},
 	[EventNames.ViewPlatformProfile] = {
 		context = Contexts.FriendsLanding,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = "viewPlatformProfile",
-			subpage = SubPages.PlayerContextualMenu
-		},
-		formatRulesForAdditionalInfo = {
-			profileUserId = v7
-		}
+		additionalInfo = { subpage = SubPages.PlayerContextualMenu, btn = "viewPlatformProfile" },
+		formatRulesForAdditionalInfo = { profileUserId = fn }
 	}
 }

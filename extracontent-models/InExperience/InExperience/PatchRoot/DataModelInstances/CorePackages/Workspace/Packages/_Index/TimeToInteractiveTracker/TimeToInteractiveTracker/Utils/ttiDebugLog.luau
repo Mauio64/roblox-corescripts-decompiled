@@ -4,99 +4,95 @@ require(script.Parent.Parent.Stores.types)
 
 local FFlagDebugTimeToInteractiveTracker = require(script.Parent.FFlagDebugTimeToInteractiveTracker)
 
-local function formatPayload(p1) -- line: 9
-	-- upvalues: HttpService (copy)
-	if p1 == nil then
+local function formatPayload(p)
+	if p == nil then
 		return ""
 	end
 
-	if type(p1) ~= "table" then
-		return (tostring(p1))
+	if type(p) ~= "table" then
+		return (tostring(p))
 	end
 
-	local ok, result = pcall(function() -- line: 18
-		-- upvalues: HttpService (copy), p1 (copy)
-		return HttpService:JSONEncode(p1)
+	local success, result = pcall(function()
+		return HttpService:JSONEncode(p)
 	end)
 
-	if ok then
+	if success then
 		return result
 	end
 
-	return (tostring(p1))
+	return (tostring(p))
 end
-local function formatMilestones(t1: {[any]: any}?) -- line: 28
-	if not t1 or #t1 == 0 then
+
+local function formatMilestones(list)
+	if not list or #list == 0 then
 		return ""
 	end
 
-	local t2 = {}
+	local v = {}
 
-	for _, v11 in t1 do
-		local s1 = ""
+	for _, item in list do
+		local v2 = not (item.totalMemoryMB or item.luaHeapMB) and ""
+			or (" [mem: total=%.1fMB lua=%.1fMB]"):format(item.totalMemoryMB or 0, item.luaHeapMB or 0)
 
-		if v11.totalMemoryMB or v11.luaHeapMB then
-			s1 = (" [mem: total=%.1fMB lua=%.1fMB]"):format(v11.totalMemoryMB or 0, v11.luaHeapMB or 0)
-		end
+		table.insert(v, ("  %s %.0fms%s"):format(item.name, item.deltaMs, v2))
 
-		table.insert(t2, ("  %s %.0fms%s"):format(v11.name, v11.deltaMs, s1))
-
-		if v11.subphases then
-			for _, v14 in v11.subphases do
-				table.insert(t2, ("    -> %s %.0fms"):format(v14.name, v14.deltaMs or 0))
+		if item.subphases then
+			for _, subphas in item.subphases do
+				table.insert(v, ("    -> %s %.0fms"):format(subphas.name, subphas.deltaMs or 0))
 			end
 		end
 
-		if v11.requests then
-			for _, v16 in v11.requests do
-				table.insert(t2, ("    -> [req] %s %.0fms"):format(v16.name, v16.deltaMs or 0))
-			end
+		if not item.requests then
+			continue
+		end
+
+		for _, request in item.requests do
+			table.insert(v, ("    -> [req] %s %.0fms"):format(request.name, request.deltaMs or 0))
 		end
 	end
 
-	return "\n" .. table.concat(t2, "\n")
+	return "\n" .. table.concat(v, "\n")
 end
 
-return function(s2: string, s3: string, n1: number?, p2, t3: {[any]: any}?) -- line: 57
-	-- upvalues: FFlagDebugTimeToInteractiveTracker (copy), HttpService (copy), formatMilestones (copy)
+return function(p: string, p2: string, p3: number?, p4, p5)
 	if not FFlagDebugTimeToInteractiveTracker then
 		return
 	end
 
-	local v22 = ("[TimeToInteractiveTracker][%s]"):format(s2)
-	local s4
+	local formatted = ("[TimeToInteractiveTracker][%s]"):format(p)
+	local result
 
-	if p2 == nil then
-		s4 = ""
-	elseif type(p2) ~= "table" then
-		s4 = tostring(p2)
-	else
-		local ok, result = pcall(function() -- line: 18
-			-- upvalues: HttpService (copy), p2 (copy)
-			return HttpService:JSONEncode(p2)
+	if p4 == nil then
+		result = ""
+	elseif type(p4) == "table" then
+		local success
+		success, result = pcall(function()
+			return HttpService:JSONEncode(p4)
 		end)
 
-		s4 = if not ok then tostring(p2) else result
+		if not success then
+			result = tostring(p4)
+		end
+	else
+		result = tostring(p4)
 	end
 
-	local t4 = {
-		v22,
-		s3
-	}
+	local v = { formatted, p2 }
 
-	if n1 ~= nil then
-		table.insert(t4, ("%.0fms"):format(n1))
+	if p3 ~= nil then
+		table.insert(v, ("%.0fms"):format(p3))
 	end
 
-	if s4 ~= "" then
-		table.insert(t4, s4)
+	if result ~= "" then
+		table.insert(v, result)
 	end
 
-	local v27 = formatMilestones(t3)
+	local v2 = formatMilestones(p5)
 
-	if v27 ~= "" then
-		table.insert(t4, v27)
+	if v2 ~= "" then
+		table.insert(v, v2)
 	end
 
-	print(table.unpack(t4))
+	print(table.unpack(v))
 end

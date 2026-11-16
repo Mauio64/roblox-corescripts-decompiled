@@ -1,7 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerAvatarIcon", function(p1, p2) -- line: 4
-	return {
-		player = p1,
-		userId = p1.UserId,
-		avatarIcon = p2
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetPlayerAvatarIcon", function(player, avatarIcon)
+	return { player = player, userId = player.UserId, avatarIcon = avatarIcon }
 end)

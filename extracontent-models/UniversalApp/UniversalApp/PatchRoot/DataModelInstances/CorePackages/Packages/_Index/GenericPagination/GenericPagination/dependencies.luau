@@ -1,8 +1,8 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
 
 return {
-	t = require(scriptParentParent.t),
-	LinkedList = require(scriptParent.LinkedList),
-	Promise = require(scriptParentParent.Promise)
+	t = require(parent2.t),
+	LinkedList = require(parent.LinkedList),
+	Promise = require(parent2.Promise)
 }

@@ -1,75 +1,69 @@
-local Parent = script:FindFirstAncestor("Style").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("Style").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local Theme = Foundation.Enums.Theme
+local ColorMode = Foundation.Enums.ColorMode
 local getSceneOverridesStore = require(script.Parent.getSceneOverridesStore)
 
-local function SceneOverridesRegistry(t1: {[any]: any}) -- line: 14
-	-- upvalues: useTokens (copy), React (copy), Theme (copy), getSceneOverridesStore (copy)
-	local isActive = t1.isActive
-	local v10 = useTokens()
-	local v11 = React.useMemo(function() -- line: 18
-		-- upvalues: v10 (copy), Theme (copy)
-		local Gray_300Color3 = v10.Color.Extended.Gray.Gray_300.Color3
-		local Gray_400Color3 = v10.Color.Extended.Gray.Gray_400.Color3
-		local Gray_500Color3 = v10.Color.Extended.Gray.Gray_500.Color3
-		local Gray_700Color3 = v10.Color.Extended.Gray.Gray_700.Color3
-		local Gray_800Color3 = v10.Color.Extended.Gray.Gray_800.Color3
-		local Gray_900Color3 = v10.Color.Extended.Gray.Gray_900.Color3
-		local Gray_1100Color3 = v10.Color.Extended.Gray.Gray_1100.Color3
-		local Surface_200Color3 = v10.Color.Surface.Surface_200.Color3
-		local Surface_100Color3 = v10.Color.Surface.Surface_100.Color3
+local function SceneOverridesRegistry(p)
+	local isActive = p.isActive
+	local v = useTokens()
 
-		if v10.Config.ColorMode.Name == Theme.Light then
+	local v2 = React.useMemo(function()
+		local color3 = v.Color.Extended.Gray.Gray_300.Color3
+		local color3_2 = v.Color.Extended.Gray.Gray_400.Color3
+		local color3_3 = v.Color.Extended.Gray.Gray_500.Color3
+		local color3_4 = v.Color.Extended.Gray.Gray_700.Color3
+		local color3_5 = v.Color.Extended.Gray.Gray_800.Color3
+		local color3_6 = v.Color.Extended.Gray.Gray_900.Color3
+		local color3_7 = v.Color.Extended.Gray.Gray_1100.Color3
+
+		local color3_8 = v.Color.Surface.Surface_200.Color3
+		local color3_9 = v.Color.Surface.Surface_100.Color3
+
+		if v.Config.ColorMode.Name == ColorMode.Light then
 			return {
+				SkyboxBlockerColor = color3_2:Lerp(color3_8, 0.6),
 				SkyboxBlockerTransparency = 0,
+				BackPanel = color3_3:Lerp(color3_8, 0.6),
+				Clouds = color3_3:Lerp(color3_8, 0.3),
+				LargerShapes = color3_3:Lerp(color3_8, 0.4),
+				AvatarParticles = color3_3:Lerp(color3_8, 0.4),
+				Baseplate = color3:Lerp(color3_8, 0.2),
+				FogColor = color3_2:Lerp(color3_8, 0.4),
 				FogStart = 400,
-				FogEnd = 500,
-				SkyboxBlockerColor = Gray_400Color3:Lerp(Surface_200Color3, 0.6),
-				BackPanel = Gray_500Color3:Lerp(Surface_200Color3, 0.6),
-				Clouds = Gray_500Color3:Lerp(Surface_200Color3, 0.3),
-				LargerShapes = Gray_500Color3:Lerp(Surface_200Color3, 0.4),
-				AvatarParticles = Gray_500Color3:Lerp(Surface_200Color3, 0.4),
-				Baseplate = Gray_300Color3:Lerp(Surface_200Color3, 0.2),
-				FogColor = Gray_400Color3:Lerp(Surface_200Color3, 0.4)
+				FogEnd = 500
 			}
 		end
 
 		return {
+			SkyboxBlockerColor = color3_5:Lerp(color3_8, 0.3),
 			SkyboxBlockerTransparency = 0,
+			BackPanel = color3_4:Lerp(color3_8, 0.3),
+			Clouds = color3_4:Lerp(color3_8, 0.3),
+			LargerShapes = color3_4:Lerp(color3_9, 0.4),
+			AvatarParticles = color3_4:Lerp(color3_8, 0.4),
+			Baseplate = color3_6:Lerp(color3_8, 0.2),
+			FogColor = color3_7:Lerp(color3_8, 0.3),
 			FogStart = 400,
-			FogEnd = 500,
-			SkyboxBlockerColor = Gray_800Color3:Lerp(Surface_200Color3, 0.3),
-			BackPanel = Gray_700Color3:Lerp(Surface_200Color3, 0.3),
-			Clouds = Gray_700Color3:Lerp(Surface_200Color3, 0.3),
-			LargerShapes = Gray_700Color3:Lerp(Surface_100Color3, 0.4),
-			AvatarParticles = Gray_700Color3:Lerp(Surface_200Color3, 0.4),
-			Baseplate = Gray_900Color3:Lerp(Surface_200Color3, 0.2),
-			FogColor = Gray_1100Color3:Lerp(Surface_200Color3, 0.3)
+			FogEnd = 500
 		}
-	end, { v10 })
+	end, { v })
 
-	React.useEffect(function() -- line: 59
-		-- upvalues: getSceneOverridesStore (copy), isActive (copy), v11 (copy)
-		local v21 = getSceneOverridesStore()
+	React.useEffect(function()
+		local sceneOverridesStore = getSceneOverridesStore()
 
 		if not isActive then
 			return
 		end
 
-		v21.setSceneOverrides(v11)
-
-		return function() -- line: 66
-			-- upvalues: v21 (copy)
-			v21.setSceneOverrides(nil)
+		sceneOverridesStore.setSceneOverrides(v2)
+		return function()
+			sceneOverridesStore.setSceneOverrides(nil)
 		end
-	end, {
-		isActive,
-		v11
-	})
+	end, { isActive, v2 })
 
-	return t1.children
+	return p.children
 end
 
 return SceneOverridesRegistry

@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagRefactorButtonTileCircular) and game:DefineFastFlag("EnableNewAddFriendsTileForAll", false)
+local FFlagRefactorButtonTileCircular = require(script.Parent.FFlagRefactorButtonTileCircular)
+
+return FFlagRefactorButtonTileCircular and game:DefineFastFlag("EnableNewAddFriendsTileForAll", false)

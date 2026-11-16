@@ -1,89 +1,77 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local DataHydration = require(AppChatParent.DataHydration)
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local v5 = require(AppChat.Logger):new(script.Name)
+local parent = AppChat.Parent
+
+local DataHydration = require(parent.DataHydration)
+local AppChatNetworking = require(parent.AppChatNetworking)
+
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 local ingestConversationListPage = require(AppChat.Stores.Ingestion.ingestConversationListPage)
 local GetConversationStore = require(AppChat.Stores.GetConversationStore)
+
 local createDataCache = DataHydration.createDataCache
 local createDataResolver = DataHydration.createDataResolver
 
-local function getPageId(s1: string?) -- line: 28
-	if s1 == nil or s1 == "" then
-		return "__initial__"
-	end
+local function getPageId(p: string?) -- 1 equivalent call inferred from this helper
+	return if p == nil or p == "" then "__initial__" else p
+end
 
-	return s1
+local function getCursorFromPageId(p: string) -- 1 equivalent call inferred from this helper
+	return if p ~= "__initial__" then p else nil
 end
-local function getCursorFromPageId(s2: string) -- line: 32
-	if s2 == "__initial__" then
-		return nil
-	end
 
-	return s2
+local function isInitialCursor(p: string?): boolean -- 1 equivalent call inferred from this helper
+	return p == nil or p == ""
 end
-local function isInitialCursor(s3: string?) -- line: 36
-	return s3 == nil or s3 == ""
-end
-local function createConversationPageDataHydrationStore() -- line: 40
-	-- upvalues: createDataCache (copy), GetConversationStore (copy), createDataResolver (copy), v5 (copy), ingestConversationListPage (copy), AppChatNetworking (copy)
-	local v17 = createDataCache(60)
-	local v18 = GetConversationStore(false)
-	local v19 = createDataResolver({
+
+local function createConversationPageDataHydrationStore()
+	local dataCache = createDataCache(60)
+	local conversationStore = GetConversationStore(false)
+	local dataResolver = createDataResolver({
+		cache = dataCache,
 		supportsMultiGet = false,
 		queueProcessDelaySec = 0,
 		replaceItems = true,
-		cache = v17,
-		logError = function(p1) -- line: 48
-			-- upvalues: v5 (copy), ingestConversationListPage (copy), v18 (copy)
-			v5:warning(`Failed to fetch AppChat conversation list page: { tostring(p1) }`)
-			ingestConversationListPage.ingestFailure(v18, p1)
+		logError = function(p)
+			v:warning(`Failed to fetch AppChat conversation list page: {tostring(p)}`)
+			ingestConversationListPage.ingestFailure(conversationStore, p)
 		end,
-		fetchFn = function(s4: string) -- line: 52
-			-- upvalues: AppChatNetworking (copy), ingestConversationListPage (copy), v18 (copy)
-			local v22 = if s4 ~= "__initial__" then s4 else nil
-
-			return AppChatNetworking.http.GetUserConversations(nil, v22):andThen(function(p2) -- line: 55
-				-- upvalues: ingestConversationListPage (copy), v18 (copy), v22 (copy)
-				local v27 = ingestConversationListPage.ingestSuccess(v18, v22, p2)
+		fetchFn = function(cursor: string)
+			cursor = getCursorFromPageId(cursor) -- inferred equivalent call
+			return AppChatNetworking.http.GetUserConversations(nil, cursor):andThen(function(p)
+				local ingestSuccess = ingestConversationListPage.ingestSuccess(conversationStore, cursor, p)
 
 				return {
-					cursor = v22,
-					nextCursor = v27.nextCursor,
-					conversationCount = v27.conversationCount
+					cursor = cursor,
+					nextCursor = ingestSuccess.nextCursor,
+					conversationCount = ingestSuccess.conversationCount
 				}
 			end)
 		end
 	})
 
-	v18.addClearListener(function() -- line: 83
-		-- upvalues: v19 (copy)
-		v19.clear()
+	conversationStore.addClearListener(function()
+		dataResolver.clear()
 	end)
-
 	return {
-		fetchPage = function(s5: string?) -- line: 67
-			-- upvalues: v18 (copy), v19 (copy), ingestConversationListPage (copy)
-			local v24 = if s5 ~= nil and s5 ~= "" then s5 else "__initial__"
-			local v25 = v18.getListStatus(false)
+		fetchPage = function(p: string?)
+			local pageId = getPageId(p) -- inferred equivalent call
+			local listStatus = conversationStore.getListStatus(false)
 
-			if v25.isFetchingConversations == true then
-				return v19.getCachedItem(v24)
+			if
+				listStatus.isFetchingConversations == true
+				or not isInitialCursor(p) and listStatus.isExhausted == true -- inferred equivalent call
+			then
+				return dataResolver.getCachedItem(pageId)
 			end
 
-			if s5 ~= nil and s5 ~= "" and v25.isExhausted == true then
-				return v19.getCachedItem(v24)
-			end
-
-			ingestConversationListPage.beginFetch(v18, s5)
-
-			return v19.fetchItem(v24)
+			ingestConversationListPage.beginFetch(conversationStore, p)
+			return dataResolver.fetchItem(pageId)
 		end,
-		clear = function() -- line: 89
-			-- upvalues: v19 (copy)
-			v19.clear()
+		clear = function()
+			dataResolver.clear()
 		end
 	}
 end
 
-return (createConversationPageDataHydrationStore())
+return createConversationPageDataHydrationStore()

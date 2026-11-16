@@ -1,15 +1,19 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
-local React = require(InExperienceInterventionParent.React)
+local parent = InExperienceIntervention.Parent
+
+local React = require(parent.React)
 local InterventionContestFeedbackFooter = require(InExperienceIntervention.Components.InterventionContestFeedbackFooter)
-local UIBlox = require(InExperienceInterventionParent.UIBlox)
-local Foundation = require(InExperienceInterventionParent.Foundation)
-local FoundationText = Foundation.Text
+
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
 local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
-local useLocalization = require(InExperienceInterventionParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local useStyle = UIBlox.Core.Style.useStyle
-local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
+local InterventionShared = require(parent.InterventionShared)
+local Constants = InterventionShared.Utils.Constants
 local InExperienceInterventionAnalytics = require(InExperienceIntervention.InExperienceInterventionAnalytics)
 local View = Foundation.View
 local Button = Foundation.Button
@@ -18,57 +22,75 @@ local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local useTokens = Foundation.Hooks.useTokens
-local useProperty = require(InExperienceInterventionParent.GuiObjectUtils).useProperty
-local ReactFocusNavigation = require(InExperienceInterventionParent.ReactFocusNavigation)
-local FocusNavigationUtils = require(InExperienceInterventionParent.FocusNavigationUtils)
+local GuiObjectUtils = require(parent.GuiObjectUtils)
+local useProperty = GuiObjectUtils.useProperty
+
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
-local v26 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 
-function ChatTimeoutCustomDialog(t1: {[any]: any}) -- line: 39
-	-- upvalues: useLayerCollector (copy), React (copy), useTokens (copy), useStyle (copy), useLocalization (copy), Constants (copy), useProperty (copy), InExperienceInterventionAnalytics (copy), PartialPageModal (copy), ScrollView (copy), ScrollBarVisibility (copy), ReactFocusNavigation (copy), v26 (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), View (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy), InterventionContestFeedbackFooter (copy)
-	local v28 = useLayerCollector()
-	local v29 = React.useRef(DateTime.now().UnixTimestampMillis)
-	local v30 = React.useRef(nil)
-	local v31, v32 = React.useState(0)
-	local v33 = useTokens()
-	local v34 = useStyle()
-	local v35 = useLocalization(Constants.localizationKeys)
-	local v36 = useProperty(v30, "AbsoluteSize")
-	local v37 = React.useCallback(function() -- line: 53
-		-- upvalues: InExperienceInterventionAnalytics (copy), v29 (copy), t1 (copy)
-		InExperienceInterventionAnalytics.sendAnalyticsEvent(InExperienceInterventionAnalytics.Constants.EventTypes.CtaClicked, InExperienceInterventionAnalytics.Constants.InterventionTypes.Timeout, v29.current, t1.eventId, t1.violatingChatLine, t1.duration)
-		t1.onDismiss()
-	end, { v29 })
+local focusNavigationService = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 
-	React.useEffect(function() -- line: 65
-		-- upvalues: InExperienceInterventionAnalytics (copy), v29 (copy), t1 (copy)
-		InExperienceInterventionAnalytics.sendAnalyticsEvent(InExperienceInterventionAnalytics.Constants.EventTypes.ModalAppeared, InExperienceInterventionAnalytics.Constants.InterventionTypes.Timeout, v29.current, t1.eventId, t1.violatingChatLine, t1.duration)
-	end, { v29 })
-	React.useEffect(function() -- line: 76
-		-- upvalues: v36 (copy), v28 (copy), Constants (copy), v32 (copy)
-		local v39 = not v36 and 0 or v36.Y
-		local v40 = math.min(v28.absoluteSize.Y - Constants.UNIBAR_HEIGHT - Constants.DIALOG_HEADER_HEIGHT, v39)
+function ChatTimeoutCustomDialog(props)
+	local v = useLayerCollector()
+	local ref = React.useRef(DateTime.now().UnixTimestampMillis)
+	local ref2 = React.useRef(nil)
+	local state, setState = React.useState(0)
+	local v2 = useTokens()
 
-		v32(v40)
-	end, {
-		v28.absoluteSize.Y,
-		v36
-	})
+	local v3 = useStyle()
+	local v4 = useLocalization(Constants.localizationKeys)
 
-	local v38 = if not (t1.duration <= 60) then useLocalization({
-		value = {
-			Constants.localizationKeys.CannotSendText,
-			number = math.ceil(t1.duration / 60)
-		}
-	}).value else v35.CannotSend1MinText
+	local v5 = useProperty(ref2, "AbsoluteSize")
+
+	local onActivated = React.useCallback(function()
+		InExperienceInterventionAnalytics.sendAnalyticsEvent(
+			InExperienceInterventionAnalytics.Constants.EventTypes.CtaClicked,
+			InExperienceInterventionAnalytics.Constants.InterventionTypes.Timeout,
+			ref.current,
+			props.eventId,
+			props.violatingChatLine,
+			props.duration
+		)
+
+		props.onDismiss()
+	end, { ref })
+
+	React.useEffect(function()
+		InExperienceInterventionAnalytics.sendAnalyticsEvent(
+			InExperienceInterventionAnalytics.Constants.EventTypes.ModalAppeared,
+			InExperienceInterventionAnalytics.Constants.InterventionTypes.Timeout,
+			ref.current,
+			props.eventId,
+			props.violatingChatLine,
+			props.duration
+		)
+	end, { ref })
+
+	React.useEffect(function()
+		local v6 = not v5 and 0 or v5.Y
+		setState((math.min(v.absoluteSize.Y - Constants.UNIBAR_HEIGHT - Constants.DIALOG_HEADER_HEIGHT, v6)))
+	end, { v.absoluteSize.Y, v5 })
+	local text
+
+	if props.duration <= 60 then
+		text = v4.CannotSend1MinText
+	else
+		text = useLocalization({
+			value = {
+				Constants.localizationKeys.CannotSendText,
+				number = math.ceil(props.duration / 60)
+			}
+		}).value
+	end
 
 	return React.createElement(PartialPageModal, {
-		title = v35.TextChatSuspensionText,
-		screenSize = v28.absoluteSize
+		title = v4.TextChatSuspensionText,
+		screenSize = v.absoluteSize
 	}, {
 		ScrollView = React.createElement(ScrollView, {
-			Size = UDim2.new(1, 0, 0, v31),
+			Size = UDim2.new(1, 0, 0, state),
 			scroll = {
 				AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				CanvasSize = UDim2.new(1, 0, 1, 0),
@@ -76,72 +98,82 @@ function ChatTimeoutCustomDialog(t1: {[any]: any}) -- line: 39
 				ScrollingDirection = Enum.ScrollingDirection.Y
 			}
 		}, {
-			FocusNavigationCoreScriptsProvider = React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
-				value = v26
-			}, {
-				FocusNavigationCoreScriptsWrapper = React.createElement(FocusRoot, {
-					isIsolated = true,
-					isAutoFocusRoot = true,
-					surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
-					frameProps = {
-						Size = UDim2.new(1, 0, 0, 0),
-						AutomaticSize = Enum.AutomaticSize.Y
-					}
-				}, {
-					InnerContent = React.createElement(View, {
-						tag = "col gap-large align-x-center align-y-center padding-x-small padding-top-large",
-						ref = v30,
-						Size = UDim2.new(1, -Constants.SCROLL_BAR_WIDTH, 0, 0),
-						AutomaticSize = Enum.AutomaticSize.Y
+			FocusNavigationCoreScriptsProvider = React.createElement(
+				ReactFocusNavigation.FocusNavigationContext.Provider,
+				{ value = focusNavigationService },
+				{
+					FocusNavigationCoreScriptsWrapper = React.createElement(FocusRoot, {
+						surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+						isIsolated = true,
+						isAutoFocusRoot = true,
+						frameProps = {
+							Size = UDim2.new(1, 0, 0, 0),
+							AutomaticSize = Enum.AutomaticSize.Y
+						}
 					}, {
-						ChatDisabledText = React.createElement(FoundationText, {
-							LayoutOrder = 1,
-							TextWrapped = true,
-							Text = v38,
-							textStyle = v34.Theme.TextEmphasis,
-							fontStyle = v33.Typography.LabelLarge,
-							Size = UDim2.new(1, 0, 0, 0),
-							TextXAlignment = Enum.TextXAlignment.Center,
-							TextYAlignment = Enum.TextYAlignment.Center,
-							AutomaticSize = Enum.AutomaticSize.Y
-						}),
-						WarningTextLabel = React.createElement(FoundationText, {
-							LayoutOrder = 2,
-							tag = "padding-small size-full-800 text-wrap",
-							TextWrapped = true,
-							Text = v35.MayLoseAccessText,
-							AutomaticSize = Enum.AutomaticSize.Y
-						}),
-						UnderstandButtonFrame = React.createElement(View, {
-							LayoutOrder = 3,
-							Size = UDim2.new(1, 0, 0, 0),
-							AutomaticSize = Enum.AutomaticSize.Y
+						InnerContent = React.createElement(View, {
+							ref = ref2,
+							Size = UDim2.new(1, -Constants.SCROLL_BAR_WIDTH, 0, 0),
+							AutomaticSize = Enum.AutomaticSize.Y,
+							tag = "col gap-large align-x-center align-y-center padding-x-small padding-top-large"
 						}, {
-							UnderstandButton = React.createElement(Button, {
-								text = v35.IUnderstandText,
-								variant = ButtonVariant.Standard,
-								onActivated = v37,
-								fillBehavior = FillBehavior.Fill,
-								FillDirection = Enum.FillDirection.Horizontal
-							})
-						}),
-						FeedbackFrame = React.createElement(View, {
-							LayoutOrder = 4,
-							Size = UDim2.new(1, 0, 0, 0),
-							AutomaticSize = Enum.AutomaticSize.Y
-						}, {
-							FeedbackFooter = React.createElement(InterventionContestFeedbackFooter, {
-								onDismiss = t1.onDismiss,
-								renderTimestamp = v29.current,
-								interventionType = InExperienceInterventionAnalytics.Constants.InterventionTypes.Timeout,
-								eventId = t1.eventId,
-								violatingChatLine = t1.violatingChatLine,
-								duration = t1.duration
-							})
+							ChatDisabledText = React.createElement(Text, {
+								LayoutOrder = 1,
+								Text = text,
+								textStyle = v3.Theme.TextEmphasis,
+								fontStyle = v2.Typography.LabelLarge,
+								Size = UDim2.new(1, 0, 0, 0),
+								TextXAlignment = Enum.TextXAlignment.Center,
+								TextYAlignment = Enum.TextYAlignment.Center,
+								AutomaticSize = Enum.AutomaticSize.Y,
+								TextWrapped = true
+							}),
+							WarningTextLabel = React.createElement(Text, {
+								LayoutOrder = 2,
+								Text = v4.MayLoseAccessText,
+								tag = "padding-small size-full-800 text-wrap",
+								TextWrapped = true,
+								AutomaticSize = Enum.AutomaticSize.Y
+							}),
+							UnderstandButtonFrame = React.createElement(
+								View,
+								{
+									Size = UDim2.new(1, 0, 0, 0),
+									AutomaticSize = Enum.AutomaticSize.Y,
+									LayoutOrder = 3
+								},
+								{
+									UnderstandButton = React.createElement(Button, {
+										text = v4.IUnderstandText,
+										variant = ButtonVariant.Standard,
+										onActivated = onActivated,
+										fillBehavior = FillBehavior.Fill,
+										FillDirection = Enum.FillDirection.Horizontal
+									})
+								}
+							),
+							FeedbackFrame = React.createElement(
+								View,
+								{
+									Size = UDim2.new(1, 0, 0, 0),
+									AutomaticSize = Enum.AutomaticSize.Y,
+									LayoutOrder = 4
+								},
+								{
+									FeedbackFooter = React.createElement(InterventionContestFeedbackFooter, {
+										onDismiss = props.onDismiss,
+										renderTimestamp = ref.current,
+										interventionType = InExperienceInterventionAnalytics.Constants.InterventionTypes.Timeout,
+										eventId = props.eventId,
+										violatingChatLine = props.violatingChatLine,
+										duration = props.duration
+									})
+								}
+							)
 						})
 					})
-				})
-			})
+				}
+			)
 		})
 	})
 end

@@ -1,56 +1,62 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-local SocialLuaAnalytics = require(SocialCarouselParent.SocialLuaAnalytics)
+local parent = SocialCarousel.Parent
+
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local SharedFlags = require(parent.SharedFlags)
 local formatRecommendationContextType = SocialLuaAnalytics.Analytics.Formatters.formatRecommendationContextType
 local Enums = SocialLuaAnalytics.Analytics.Enums
 local Contexts = Enums.Contexts
 local EventTypes = Enums.EventTypes
+
 local EventNames = require(script.Parent.EventNames)
 local Constants = require(SocialCarousel.Common.Constants)
-local FIntSocialCarouselShowRecsLimit = require(SocialCarousel.Flags).FIntSocialCarouselShowRecsLimit
-local FFlagLuaAppAddSortDataToSocialCarouselClicks = require(SocialCarouselParent.SharedFlags).FFlagLuaAppAddSortDataToSocialCarouselClicks
-local FFlagSocialCarouselShareQREnabled = require(SocialCarouselParent.SharedFlags).FFlagSocialCarouselShareQREnabled
+local Flags = require(SocialCarousel.Flags)
+local FIntSocialCarouselShowRecsLimit = Flags.FIntSocialCarouselShowRecsLimit
+local FFlagSocialCarouselShareQREnabled = SharedFlags.FFlagSocialCarouselShareQREnabled
+local FFlagLuaAppUserSeenCollectionUnifiedFields = SharedFlags.FFlagLuaAppUserSeenCollectionUnifiedFields
 
-local function v13(p1) -- line: 17
-	return p1
+local FFlagSocialCarouselLogNewFriendRequestsBadge = require(SocialCarousel.Flags.FFlagSocialCarouselLogNewFriendRequestsBadge)
+
+local function fn(p)
+	return p
 end
 
-return {
+local EventStreamActionList = {
 	[EventNames.UserPressed] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
 			btn = Constants.ANALYTICS.BTN_VALUES.OPEN_PEOPLE_LIST,
-			contentType = if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else Constants.ANALYTICS.CONTENT_TYPE,
-			actionType = if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else Constants.ANALYTICS.ACTION_TYPES.OPEN_PROFILE
+			contentType = Constants.ANALYTICS.CONTENT_TYPE,
+			actionType = Constants.ANALYTICS.ACTION_TYPES.OPEN_PROFILE
 		},
 		formatRulesForAdditionalInfo = {
-			absolutePosition = v13,
-			positionInRow = if not FFlagLuaAppAddSortDataToSocialCarouselClicks then nil else v13,
+			absolutePosition = fn,
+			positionInRow = fn,
 			recommendationContextType = formatRecommendationContextType,
-			friendId = v13,
-			friendStatus = v13,
-			isRecommendation = v13,
-			recommendationRank = v13,
-			universeId = v13,
-			presence = v13,
-			source = v13,
-			interactionUuid = v13
+			friendId = fn,
+			friendStatus = fn,
+			isRecommendation = fn,
+			recommendationRank = fn,
+			universeId = fn,
+			presence = fn,
+			source = fn,
+			interactionUuid = fn
 		}
 	},
 	[EventNames.UserSeen] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.UserSeen,
 		formatRulesForAdditionalInfo = {
-			userId = v13,
-			presence = v13,
-			absolutePosition = v13,
-			recommendationRank = v13,
-			friendStatus = v13,
+			userId = fn,
+			presence = fn,
+			absolutePosition = fn,
+			recommendationRank = fn,
+			friendStatus = fn,
 			recommendationContextType = formatRecommendationContextType,
-			isRecommendation = v13,
-			source = v13,
-			universeId = v13
+			isRecommendation = fn,
+			source = fn,
+			universeId = fn
 		}
 	},
 	[EventNames.ViewAddFriends] = {
@@ -58,83 +64,148 @@ return {
 		eventType = EventTypes.ButtonClick,
 		additionalInfo = {
 			btn = Constants.ANALYTICS.BTN_VALUES.ADD_FRIENDS,
-			absolutePosition = v13,
-			positionInRow = v13,
+			absolutePosition = fn,
+			positionInRow = fn,
 			contentType = Constants.ANALYTICS.CONTENT_TYPE,
 			actionType = Constants.ANALYTICS.ACTION_TYPES.OPEN_ADD_FRIENDS
 		},
 		formatRulesForAdditionalInfo = {
-			friendCount = v13,
+			friendCount = fn,
 			recommendationLimit = FIntSocialCarouselShowRecsLimit,
-			recommendationCount = v13,
-			requestCount = v13,
-			source = v13,
-			interactionUuid = v13
+			recommendationCount = fn,
+			requestCount = fn,
+			source = fn,
+			interactionUuid = fn
 		}
 	},
+	[EventNames.AddFriendsTileSeen] = FFlagSocialCarouselLogNewFriendRequestsBadge and {
+		context = Contexts.HomePage,
+		eventType = EventTypes.AddFriendsTileSeen,
+		formatRulesForAdditionalInfo = {
+			newRequestCount = fn,
+			previousCount = fn,
+			trigger = fn,
+			badgeEnabled = fn,
+			badgeShown = fn,
+			badgeCapped = fn,
+			absolutePosition = fn,
+			source = fn
+		}
+	} or nil,
 	[EventNames.ViewAllFriends] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = Constants.ANALYTICS.BTN_VALUES.VIEW_ALL_FRIENDS
-		},
+		additionalInfo = { btn = Constants.ANALYTICS.BTN_VALUES.VIEW_ALL_FRIENDS },
 		formatRulesForAdditionalInfo = {
-			friendCount = v13,
+			friendCount = fn,
 			recommendationLimit = FIntSocialCarouselShowRecsLimit,
-			recommendationCount = v13,
-			source = v13
+			recommendationCount = fn,
+			source = fn
 		}
 	},
 	[EventNames.FriendsCarouselUILoadingTime] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.LoadingTime,
 		formatRulesForAdditionalInfo = {
-			status = v13,
-			fetch = v13,
-			loadingTime = v13,
-			loadingThreshold = v13,
-			nextPage = v13,
-			source = v13
+			status = fn,
+			fetch = fn,
+			loadingTime = fn,
+			loadingThreshold = fn,
+			nextPage = fn,
+			source = fn
 		},
 		additionalInfo = {}
 	},
 	[EventNames.StartSquadPressed] = {
 		context = Contexts.HomePage,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = Constants.ANALYTICS.BTN_VALUES.START_SQUAD
-		},
-		formatRulesForAdditionalInfo = {
-			absolutePosition = v13,
-			source = v13
-		}
+		additionalInfo = { btn = Constants.ANALYTICS.BTN_VALUES.START_SQUAD },
+		formatRulesForAdditionalInfo = { absolutePosition = fn, source = fn }
 	},
-	[EventNames.ShareQRPressed] = if not FFlagSocialCarouselShareQREnabled then nil else {
+	[EventNames.ShareQRPressed] = FFlagSocialCarouselShareQREnabled and {
 		context = Contexts.HomePage,
 		eventType = EventTypes.ButtonClick,
-		additionalInfo = {
-			btn = Constants.ANALYTICS.BTN_VALUES.SHARE_QR
-		},
-		formatRulesForAdditionalInfo = {
-			absolutePosition = v13,
-			source = v13
-		}
-	},
-	[EventNames.TilesSeenCollection] = {
-		context = Contexts.HomePage,
-		eventType = EventTypes.UserSeenCollection,
-		formatRulesForAdditionalInfo = {
-			userId = v13,
-			absolutePosition = v13,
-			presence = v13,
-			recommendationRank = v13,
-			friendStatus = v13,
-			recommendationContextType = v13,
-			isRecommendation = v13,
-			universeId = v13,
-			tileCount = v13,
-			source = v13,
-			sessionEventCount = v13
-		}
-	}
+		additionalInfo = { btn = Constants.ANALYTICS.BTN_VALUES.SHARE_QR },
+		formatRulesForAdditionalInfo = { absolutePosition = fn, source = fn }
+	} or nil
 }
+
+local TilesSeenCollection = EventNames.TilesSeenCollection
+local v = {
+	context = Contexts.HomePage,
+	eventType = EventTypes.UserSeenCollection,
+	formatRulesForAdditionalInfo = 0
+}
+local contentType
+
+if FFlagLuaAppUserSeenCollectionUnifiedFields then
+	contentType = fn
+end
+
+local interactionUuid
+
+if FFlagLuaAppUserSeenCollectionUnifiedFields then
+	interactionUuid = fn
+end
+
+local collectionId
+
+if FFlagLuaAppUserSeenCollectionUnifiedFields then
+	collectionId = fn
+end
+
+local collectionPosition
+
+if FFlagLuaAppUserSeenCollectionUnifiedFields then
+	collectionPosition = fn
+end
+
+local positionsInRow
+
+if FFlagLuaAppUserSeenCollectionUnifiedFields then
+	positionsInRow = fn
+end
+
+local rowNumbers
+
+if FFlagLuaAppUserSeenCollectionUnifiedFields then
+	rowNumbers = fn
+end
+
+local feedRowNumbers
+
+if FFlagLuaAppUserSeenCollectionUnifiedFields then
+	feedRowNumbers = fn
+end
+
+local formatRulesForAdditionalInfo = {
+	userId = fn,
+	absolutePosition = fn,
+	presence = fn,
+	recommendationRank = fn,
+	friendStatus = fn,
+	recommendationContextType = fn,
+	isRecommendation = fn,
+	universeId = fn,
+	tileCount = fn,
+	source = fn,
+	sessionEventCount = fn,
+	contentType = contentType,
+	interactionUuid = interactionUuid,
+	collectionId = collectionId,
+	collectionPosition = collectionPosition,
+	positionsInRow = positionsInRow,
+	rowNumbers = rowNumbers,
+	feedRowNumbers = feedRowNumbers,
+	totalNumberOfItems = nil
+}
+
+if not FFlagLuaAppUserSeenCollectionUnifiedFields then
+	fn = nil
+end
+
+formatRulesForAdditionalInfo.totalNumberOfItems = fn
+v.formatRulesForAdditionalInfo = formatRulesForAdditionalInfo
+EventStreamActionList[TilesSeenCollection] = v
+
+return EventStreamActionList

@@ -1,14 +1,12 @@
-local ParentParent = script.Parent.Parent
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
-local Promise = require(ParentParent.Promise)
+local parent = script.Parent.Parent
 
-local function getProductPurchasableDetails(p1, p2) -- line: 6
-	-- upvalues: Promise (copy), PurchaseError (copy)
-	return p1.getProductPurchasableDetails(p2):andThen(function(p3) -- line: 9
-		-- upvalues: Promise (copy)
+local PurchaseError = require(parent.Enums.PurchaseError)
+local Promise = require(parent.Promise)
+
+local function getProductPurchasableDetails(p, p2)
+	return p.getProductPurchasableDetails(p2):andThen(function(p3)
 		return Promise.resolve(p3)
-	end):catch(function(_) -- line: 12
-		-- upvalues: Promise (copy), PurchaseError (copy)
+	end):catch(function(_)
 		return Promise.reject(PurchaseError.UnknownFailure)
 	end)
 end

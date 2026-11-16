@@ -1,6 +1,6 @@
 require(script.Analytics.uiStatusBarTappedEvent)
-
 local useLogInputTypeChanged = require(script.Hooks.useLogInputTypeChanged)
+local useLogFocusNavigationTelemetry = require(script.Hooks.useLogFocusNavigationTelemetry)
 local useLogKeyboardFocusModeEntered = require(script.Hooks.useLogKeyboardFocusModeEntered)
 local useLogOrientationChanged = require(script.Hooks.useLogOrientationChanged)
 local useLogStatusBarTapped = require(script.Hooks.useLogStatusBarTapped)
@@ -10,6 +10,7 @@ local createAppLaunchReactProfilerLogger = require(script.createAppLaunchReactPr
 return {
 	["jest.config"] = script["jest.config"],
 	useLogInputTypeChanged = useLogInputTypeChanged,
+	useLogFocusNavigationTelemetry = useLogFocusNavigationTelemetry,
 	useLogKeyboardFocusModeEntered = useLogKeyboardFocusModeEntered,
 	useLogOrientationChanged = useLogOrientationChanged,
 	useLogStatusBarTapped = useLogStatusBarTapped,

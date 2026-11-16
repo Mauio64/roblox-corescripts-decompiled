@@ -1,8 +1,13 @@
 local VerifiedBadges = script:FindFirstAncestor("VerifiedBadges")
+
 local Cryo = require(VerifiedBadges.Parent.Cryo)
+local Foundation = require(VerifiedBadges.Parent.Foundation)
 local React = require(VerifiedBadges.Parent.React)
 local ReactRoblox = require(VerifiedBadges.Parent.ReactRoblox)
-local t1 = {
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
+local v = {
 	anchorPoint = Vector2.new(),
 	position = UDim2.new(),
 	color = Color3.fromHex("#fff"),
@@ -12,81 +17,121 @@ local t1 = {
 	verticalAlignment = Enum.VerticalAlignment.Center
 }
 
-local function EmojiWrapper(t2: {[any]: any}) -- line: 88
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), ReactRoblox (copy)
-	local v8 = Cryo.Dictionary.join(t1, t2)
+local function EmojiWrapper(p)
+	local joined = Cryo.Dictionary.join(v, p)
 
-	if v8.children then
-		assert(React.Children.count(v8.children) <= 1, "EmojiWrapper can only contain one child")
+	if joined.children then
+		assert(React.Children.count(joined.children) <= 1, "EmojiWrapper can only contain one child")
 	end
 
-	if v8.emoji == "" then
-		return v8.children
+	if joined.emoji == "" then
+		return joined.children
 	end
 
-	local v9, v10 = React.useState(0)
-	local v11, v12 = React.useState(-1)
-	local v13 = React.useCallback(function(p1) -- line: 102
-		-- upvalues: v8 (copy), v11 (copy), v12 (copy), v9 (copy), v10 (copy)
-		local v15 = if not v8.maximumEmojiSize then p1.AbsoluteSize.Y else math.min(p1.AbsoluteSize.Y, v8.maximumEmojiSize)
+	local state, setState = React.useState(0)
+	local state2, setState2 = React.useState(-1)
 
-		if v15 ~= v11 then
-			v12(v9)
-			v10(v15)
+	local v2 = React.useCallback(function(p2)
+		local v2
+
+		if joined.maximumEmojiSize then
+			v2 = math.min(p2.AbsoluteSize.Y, joined.maximumEmojiSize)
+		else
+			v2 = p2.AbsoluteSize.Y
 		end
-	end, {
-		v9,
-		v11
-	})
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = v8.layoutOrder,
-		AnchorPoint = v8.anchorPoint,
-		Position = v8.position,
-		Size = v8.size,
-		AutomaticSize = v8.automaticSize
-	}, {
+		if v2 ~= state2 then
+			setState2(state)
+			setState(v2)
+		end
+	end, { state, state2 })
+
+	local createElement = React.createElement
+	local v3 = {
+		LayoutOrder = joined.layoutOrder,
+		AnchorPoint = joined.anchorPoint,
+		Position = joined.position,
+		Size = joined.size,
+		AutomaticSize = joined.automaticSize,
+		BackgroundTransparency = 1
+	}
+
+	local children = {
 		Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = v8.horizontalAlignment,
-			VerticalAlignment = v8.verticalAlignment,
-			Padding = UDim.new(0, -v9)
+			HorizontalAlignment = joined.horizontalAlignment,
+			VerticalAlignment = joined.verticalAlignment,
+			Padding = UDim.new(0, -state)
 		}),
-		ChildrenWrapper = React.createElement("Frame", {
-			AutomaticSize = Enum.AutomaticSize.XY,
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			[ReactRoblox.Change.AbsoluteSize] = v13
-		}, {
-			Padding = React.createElement("UIPadding", {
-				PaddingRight = UDim.new(0, v9)
-			}),
-			Children = React.createElement(React.Fragment, nil, v8.children)
-		}),
-		Emoji = React.createElement("TextLabel", {
-			LayoutOrder = 2,
-			BackgroundTransparency = 1,
-			Text = v8.emoji,
-			Font = v8.font,
-			TextColor3 = v8.color,
-			TextSize = v9,
-			TextYAlignment = Enum.TextYAlignment.Center,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			Size = UDim2.fromOffset(v9, v9)
-		}, {
-			Button = t2.onActivated and React.createElement("ImageButton", {
-				Size = UDim2.fromScale(1, 1),
+		ChildrenWrapper = React.createElement(
+			"Frame",
+			{
+				AutomaticSize = Enum.AutomaticSize.XY,
 				BackgroundTransparency = 1,
-				[ReactRoblox.Event.Activated] = t2.onActivated
-			}),
-			UITextSizeConstraint = React.createElement("UITextSizeConstraint", {
-				MinTextSize = 0,
-				MaxTextSize = math.max(v9, 1)
-			})
+				LayoutOrder = 1,
+				[ReactRoblox.Change.AbsoluteSize] = v2
+			},
+			{
+				Padding = React.createElement("UIPadding", { PaddingRight = UDim.new(0, state) }),
+				Children = React.createElement(React.Fragment, nil, joined.children)
+			}
+		),
+		Emoji = 0
+	}
+
+	local createElement2 = React.createElement
+	local v4 = {
+		LayoutOrder = 2,
+		Text = joined.emoji,
+		Font = 0,
+		FontFace = 0,
+		TextColor3 = 0,
+		TextSize = 0,
+		BackgroundTransparency = 1,
+		TextYAlignment = 0,
+		TextXAlignment = 0,
+		Size = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = joined.font
+	end
+
+	v4.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(joined.font)
+	end
+
+	v4.FontFace = fontFace
+	v4.TextColor3 = joined.color
+	v4.TextSize = state
+
+	v4.TextYAlignment = Enum.TextYAlignment.Center
+	v4.TextXAlignment = Enum.TextXAlignment.Center
+	v4.Size = UDim2.fromOffset(state, state)
+
+	local button = p.onActivated
+
+	if button then
+		button = React.createElement("ImageButton", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			[ReactRoblox.Event.Activated] = p.onActivated
+		})
+	end
+
+	children.Emoji = createElement2("TextLabel", v4, {
+		Button = button,
+		UITextSizeConstraint = React.createElement("UITextSizeConstraint", {
+			MaxTextSize = math.max(state, 1),
+			MinTextSize = 0
 		})
 	})
+	return createElement("Frame", v3, children)
 end
 
 return EmojiWrapper

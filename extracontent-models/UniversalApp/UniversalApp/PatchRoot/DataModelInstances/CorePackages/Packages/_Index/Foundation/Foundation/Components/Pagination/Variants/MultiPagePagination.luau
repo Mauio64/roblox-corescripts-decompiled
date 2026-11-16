@@ -1,168 +1,168 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
 
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useChipVariants = require(Foundation.Components.Chip.useChipVariants)
+
 local ChipSize = require(Foundation.Enums.ChipSize)
+
 local ChipVariant = require(Foundation.Enums.ChipVariant)
 local PaginationSize = require(Foundation.Enums.PaginationSize)
+
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local Ellipsis = require(script.Parent.Parent.Nav.Ellipsis)
 local PageNumberSlot = require(script.Parent.Parent.Nav.PageNumberSlot)
 local paginationSlotsUtils = require(script.Parent.Parent.paginationSlotsUtils)
 local paginationUtils = require(script.Parent.Parent.paginationUtils)
 local usePaginationAnimatedHighlight = require(script.Parent.Parent.usePaginationAnimatedHighlight)
 local usePaginationNav = require(script.Parent.Parent.usePaginationNav)
-local t1 = {
+
+local v = {
+	size = PaginationSize.Medium,
 	hasFirstLastButtons = false,
-	testId = "--foundation-pagination",
-	size = PaginationSize.Medium
+	testId = "--foundation-pagination"
 }
 
-local function MultiPagePagination(p1, p2) -- line: 44
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), paginationSlotsUtils (copy), usePaginationNav (copy), usePaginationAnimatedHighlight (copy), PaginationSize (copy), ChipSize (copy), useChipVariants (copy), ChipVariant (copy), Ellipsis (copy), PageNumberSlot (copy), View (copy), paginationUtils (copy)
-	local v21 = withDefaults(p1, t1)
-	local size = v21.size
-	local v23 = useTokens()
-	local v24 = v21.page <= 1
-	local v25 = v21.page >= v21.count
-	local v26 = React.useMemo(function() -- line: 52
-		-- upvalues: paginationSlotsUtils (copy), v21 (copy)
-		return paginationSlotsUtils.getVisiblePageSlots(v21.page, v21.count)
-	end, {
-		v21.page,
-		v21.count
-	})
-	local v27, v28 = React.useState(nil)
-	local v29 = usePaginationNav(v21, {
-		hasFirstLastButtons = v21.hasFirstLastButtons,
-		currentPage = v21.page,
-		pageSlots = v26,
+local function MultiPagePagination(p, p2)
+	local v2 = withDefaults(p, v)
+	local size = v2.size
+	local v3 = useTokens()
+
+	local v4 = v2.page <= 1
+	local v5 = v2.page >= v2.count
+
+	local pageSlots = React.useMemo(function()
+		return paginationSlotsUtils.getVisiblePageSlots(v2.page, v2.count)
+	end, { v2.page, v2.count })
+
+	local state, setState = React.useState(nil)
+
+	local v6 = usePaginationNav(v2, {
+		hasFirstLastButtons = v2.hasFirstLastButtons,
+		currentPage = v2.page,
+		pageSlots = pageSlots,
 		disabledState = {
-			isBackDisabled = v24,
-			isFirstDisabled = v24,
-			isForwardDisabled = v25,
-			isLastDisabled = v25
+			isBackDisabled = v4,
+			isFirstDisabled = v4,
+			isForwardDisabled = v5,
+			isLastDisabled = v5
 		}
-	}, v28)
+	}, setState)
 
-	React.useImperativeHandle(p2, function() -- line: 70
-		-- upvalues: v27 (copy)
-		return v27
-	end, { v27 })
+	React.useImperativeHandle(p2, function()
+		return state
+	end, { state })
 
-	local v30 = React.useRef(nil)
-	local v31 = React.useMemo(function() -- line: 76
-		-- upvalues: v26 (copy), paginationSlotsUtils (copy), v29 (copy)
-		local t2 = {}
+	local ref = React.useRef(nil)
 
-		for _, v40 in v26 do
-			if v40 ~= "ellipsis" then
-				local v41 = paginationSlotsUtils.getPageSlotId(v40)
+	local v7 = React.useMemo(function()
+		local refsByPageSlotId = {}
 
-				t2[v41] = v29.selection.getSlotBindings(v41).ref
+		for _, v7 in pageSlots do
+			if v7 == "ellipsis" then
+				continue
 			end
+
+			local pageSlotId = paginationSlotsUtils.getPageSlotId(v7)
+			refsByPageSlotId[pageSlotId] = v6.selection.getSlotBindings(pageSlotId).ref
 		end
 
-		return t2
-	end, {
-		v26,
-		v29.selection
-	})
-	local v32 = paginationSlotsUtils.getPageSlotId(v21.page)
-	local v33 = usePaginationAnimatedHighlight(v32, v30, v31, size, v26)
-	local v34 = if size ~= PaginationSize.Small then ChipSize.Medium else ChipSize.Small
-	local v35 = useChipVariants(v23, v34, ChipVariant.Utility, true, false, false)
-	local v36 = React.useMemo(function() -- line: 94
-		-- upvalues: v26 (copy), React (copy), Ellipsis (copy), size (copy), v21 (copy), paginationSlotsUtils (copy), v29 (copy), PageNumberSlot (copy)
-		local t3 = {}
+		return refsByPageSlotId
+	end, { pageSlots, v6.selection })
 
-		for v43, v44 in v26 do
-			if v44 == "ellipsis" then
-				t3[v43 ~= 2 and "ellipsis-trailing" or "ellipsis-leading"] = React.createElement(Ellipsis, {
+	local pageSlotId = paginationSlotsUtils.getPageSlotId(v2.page)
+	local v8 = usePaginationAnimatedHighlight(pageSlotId, ref, v7, size, pageSlots)
+	local v9
+
+	if size == PaginationSize.Small then
+		v9 = ChipSize.Small
+	else
+		v9 = ChipSize.Medium
+	end
+
+	local v10 = useChipVariants(v3, v9, ChipVariant.Utility, true, false, false)
+
+	local v11 = React.useMemo(function()
+		local children = {}
+
+		for k, page in pageSlots do
+			if page == "ellipsis" then
+				children[k == 2 and "ellipsis-leading" or "ellipsis-trailing"] = React.createElement(Ellipsis, {
 					slotSize = size,
-					layoutOrder = v43,
-					testId = `{ v21.testId }--ellipsis-{ v43 }`
+					LayoutOrder = k,
+					testId = `{v2.testId}--ellipsis-{k}`
 				})
 			else
-				local v45 = paginationSlotsUtils.getPageSlotId(v44)
-				local v46 = v29.selection.getSlotBindings(v45)
-
-				t3[`Page-{ v44 }`] = React.createElement(PageNumberSlot, {
+				local pageSlotId2 = paginationSlotsUtils.getPageSlotId(page)
+				local slotBindings = v6.selection.getSlotBindings(pageSlotId2)
+				children[`Page-{page}`] = React.createElement(PageNumberSlot, {
 					slotSize = size,
-					isChecked = v44 == v21.page,
-					layoutOrder = v43,
-					onPageActivated = v21.onActivated,
-					page = v44,
-					testId = `{ v21.testId }--page-{ v44 }`,
-					ref = v29.selection.getSlotRef(v45),
-					Selectable = v46.Selectable,
-					NextSelectionLeft = v46.NextSelectionLeft,
-					NextSelectionRight = v46.NextSelectionRight,
-					NextSelectionUp = v46.NextSelectionUp,
-					NextSelectionDown = v46.NextSelectionDown
+					isChecked = page == v2.page,
+					LayoutOrder = k,
+					onPageActivated = v2.onActivated,
+					page = page,
+					testId = `{v2.testId}--page-{page}`,
+					ref = v6.selection.getSlotRef(pageSlotId2),
+					Selectable = slotBindings.Selectable,
+					NextSelectionLeft = slotBindings.NextSelectionLeft,
+					NextSelectionRight = slotBindings.NextSelectionRight,
+					NextSelectionUp = slotBindings.NextSelectionUp,
+					NextSelectionDown = slotBindings.NextSelectionDown
 				})
 			end
 		end
 
-		return t3
-	end, {
-		v26,
-		v21.page,
-		size,
-		v21.testId,
-		v21.onActivated,
-		v29.selection
-	})
-	local v37 = React.useCallback(function() -- line: 138
-		-- upvalues: v31 (copy), v32 (copy), v30 (copy), v33 (copy)
-		local v47 = v31[v32]
+		return children
+	end, { pageSlots, v2.page, size, v2.testId, v2.onActivated, v6.selection })
 
-		if v47 and (v47.current and v30.current) then
-			v33.updateHighlight(v47, true)
+	local onAbsoluteSizeChanged = React.useCallback(function()
+		local v12 = v7[pageSlotId]
+
+		if v12 and v12.current and ref.current then
+			v8.updateHighlight(v12, true)
 		end
-	end, {
-		v32,
-		v31,
-		v33.updateHighlight
-	})
+	end, { pageSlotId, v7, v8.updateHighlight })
 
-	return v29.createLayout(React.createElement(View, {
-		LayoutOrder = 2,
-		tag = "auto-xy",
-		testId = `{ v21.testId }--pages`,
-		ref = v30
-	}, {
-		ActivePageHighlight = if paginationUtils.needsWidePageSlot(v21.page) then nil else React.createElement(View, {
+	local createLayout = v6.createLayout
+	local createElement = React.createElement
+	local v12 = { LayoutOrder = 2, tag = "auto-xy", testId = `{v2.testId}--pages`, ref = ref }
+	local activePageHighlight
+
+	if not paginationUtils.needsWidePageSlot(v2.page) then
+		activePageHighlight = React.createElement(View, {
 			Active = false,
+			backgroundStyle = v10.chip.backgroundStyle,
 			tag = "radius-circle clip",
+			Size = React.joinBindings({ v8.highlightWidth, v8.activeItemHeight }):map(function(list)
+				return UDim2.fromOffset(list[1], list[2])
+			end),
+			Position = v8.highlightPosition:map(function(p3: number)
+				return UDim2.fromOffset(p3, 0)
+			end),
+			Visible = v8.isVisible,
 			ZIndex = 1,
-			backgroundStyle = v35.chip.backgroundStyle,
-			Size = React.joinBindings({
-				v33.highlightWidth,
-				v33.activeItemHeight
-			}):map(function(p3) -- line: 158
-				return UDim2.fromOffset(p3[1], p3[2])
-			end),
-			Position = v33.highlightPosition:map(function(n1: number) -- line: 161
-				return UDim2.fromOffset(n1, 0)
-			end),
-			Visible = v33.isVisible,
-			selection = {
-				Selectable = false
+			selection = { Selectable = false },
+			testId = `{v2.testId}--active-page-highlight`
+		})
+	end
+
+	return createLayout(createElement(View, v12, {
+		ActivePageHighlight = activePageHighlight,
+		PagesRow = React.createElement(
+			View,
+			{
+				tag = "row gap-xsmall auto-xy",
+				LayoutOrder = 1,
+				ZIndex = 2,
+				onAbsoluteSizeChanged = onAbsoluteSizeChanged
 			},
-			testId = `{ v21.testId }--active-page-highlight`
-		}),
-		PagesRow = React.createElement(View, {
-			tag = "row gap-xsmall auto-xy",
-			LayoutOrder = 1,
-			ZIndex = 2,
-			onAbsoluteSizeChanged = v37
-		}, v36)
+			v11
+		)
 	}), nil)
 end
 

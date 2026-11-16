@@ -1,10 +1,13 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-local Roact = require(SocialLibraries.dependencies).Roact
+local dependencies = require(SocialLibraries.dependencies)
+
+local roact = dependencies.Roact
+
 local SortedList = require(script.Parent.SortedList)
 local CallbackInputBoxWithIcon = require(script.Parent.CallbackInputBoxWithIcon)
-local v5 = Roact.Component:extend("FilteredScrollingList")
 
-v5.defaultProps = {
+local extended = roact.Component:extend("FilteredScrollingList")
+extended.defaultProps = {
 	searchBoxCornerRadius = 0,
 	searchBoxHeight = 48,
 	searchBoxTopPadding = 0,
@@ -37,176 +40,174 @@ v5.defaultProps = {
 	renderEntry = nil,
 	entryHeight = 54,
 	scrollTouchedBottomCallback = nil,
-	filterPredicate = function(_, _) -- line: 52
+	filterPredicate = function(_, _): boolean
 		return true
 	end,
-	sortComparator = function(_, _) -- line: 56
+	sortComparator = function(_, _): boolean
 		return true
 	end
 }
 
-function v5.shouldUpdate(p5, p6, p7) -- line: 61
-	if p7 ~= p5.state then
+function extended.shouldUpdate(p, p2, p3): boolean
+	if p3 ~= p.state then
 		return true
 	end
 
-	if p6 == p5.props then
+	if p2 == p.props then
 		return false
 	end
 
-	for k, v in pairs(p6) do
-		if k == "extraProps" and not p5.props.extraProps then
-			return true
-		end
-
-		if v ~= p5.props[k] then
+	for k, v in pairs(p2) do
+		if k == "extraProps" and not p.props.extraProps or p.props[k] ~= v then
 			return true
 		end
 	end
 
-	for k, v in pairs(p5.props) do
-		if k ~= "extraProps" then
-			if v == p6[k] then
-				continue
-			end
-
-			return true
-		end
-
-		if not p6.extraProps then
-			return true
-		end
-
-		for k2, v2 in pairs(v) do
-			if v2 ~= p6.extraProps[k2] then
+	for k, v in pairs(p.props) do
+		if k == "extraProps" then
+			if not p2.extraProps then
 				return true
 			end
+
+			for k2, v2 in pairs(v) do
+				if p2.extraProps[k2] ~= v2 then
+					return true
+				end
+			end
+		elseif p2[k] ~= v then
+			return true
 		end
 	end
 
 	return false
 end
-function v5.init(p8) -- line: 105
-	p8:setState({})
-end
-function v5.render(p9) -- line: 109
-	-- upvalues: Roact (copy), SortedList (copy), CallbackInputBoxWithIcon (copy)
-	local filterPredicate = p9.props.filterPredicate
-	local filterText = p9.state.filterText
-	local t1 = {}
-	local n1 = 0
 
-	for _, v in pairs(p9.props.entries) do
-		if filterPredicate(filterText, v) then
-			n1 += 1
-			table.insert(t1, v)
+function extended.init(object)
+	object:setState({})
+end
+
+function extended:render()
+	local filterPredicate = self.props.filterPredicate
+	local filterText = self.state.filterText
+	local count = 0
+	local entries = {}
+
+	for _, entry in pairs(self.props.entries) do
+		if not filterPredicate(filterText, entry) then
+			continue
 		end
+
+		count += 1
+		table.insert(entries, entry)
 	end
 
-	local t2 = {
-		sortedList = Roact.createElement(SortedList, {
-			entries = t1,
-			renderEntry = p9.props.renderEntry,
-			entryHeight = p9.props.entryHeight,
-			sortComparator = p9.props.sortComparator
+	local v = {
+		sortedList = roact.createElement(SortedList, {
+			entries = entries,
+			renderEntry = self.props.renderEntry,
+			entryHeight = self.props.entryHeight,
+			sortComparator = self.props.sortComparator
 		})
 	}
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
-		layout = Roact.createElement("UIListLayout", {
+	return roact.createElement("Frame", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }, {
+		layout = roact.createElement("UIListLayout", {
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		dividerTop = Roact.createElement("Frame", {
+		dividerTop = roact.createElement("Frame", {
+			BackgroundColor3 = self.props.searchDividerColor3,
+			BackgroundTransparency = self.props.searchDividerTransparency,
 			BorderSizePixel = 0,
-			LayoutOrder = 1,
-			BackgroundColor3 = p9.props.searchDividerColor3,
-			BackgroundTransparency = p9.props.searchDividerTransparency,
-			Size = UDim2.new(1, 0, 0, p9.props.searchDividerHeight)
+			Size = UDim2.new(1, 0, 0, self.props.searchDividerHeight),
+			LayoutOrder = 1
 		}),
-		callbackBoxContainer = Roact.createElement("Frame", {
+		callbackBoxContainer = roact.createElement("Frame", {
 			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, -p9.props.searchBoxBorderThickness * 2, 0, p9.props.searchBoxHeight + p9.props.searchBoxTopPadding + p9.props.searchBoxBottomPadding)
+			Size = UDim2.new(
+				1,
+				-self.props.searchBoxBorderThickness * 2,
+				0,
+				self.props.searchBoxHeight + self.props.searchBoxTopPadding + self.props.searchBoxBottomPadding
+			),
+			LayoutOrder = 2
 		}, {
-			UIPadding = Roact.createElement("UIPadding", {
-				PaddingBottom = UDim.new(0, p9.props.searchBoxBottomPadding),
-				PaddingLeft = UDim.new(0, p9.props.searchBoxLeftPadding),
-				PaddingRight = UDim.new(0, p9.props.searchBoxRightPadding),
-				PaddingTop = UDim.new(0, p9.props.searchBoxTopPadding)
+			UIPadding = roact.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0, self.props.searchBoxBottomPadding),
+				PaddingLeft = UDim.new(0, self.props.searchBoxLeftPadding),
+				PaddingRight = UDim.new(0, self.props.searchBoxRightPadding),
+				PaddingTop = UDim.new(0, self.props.searchBoxTopPadding)
 			}),
-			callbackBox = Roact.createElement(CallbackInputBoxWithIcon, {
-				backgroundTransparency = p9.props.searchBackgroundTransparency,
-				backgroundColor3 = p9.props.searchBackgroundColor3,
-				borderColor = p9.props.searchBoxBorderColor,
-				borderTransparency = p9.props.searchBoxBorderTransparency,
-				borderThickness = p9.props.searchBoxBorderThickness,
-				cornerRadius = p9.props.searchBoxCornerRadius,
-				iconCellWidth = p9.props.searchIconCellWidth,
-				iconSize = p9.props.searchIconSize,
-				iconColor3 = p9.props.searchIconColor3,
-				iconTransparency = p9.props.searchIconTransparency,
-				iconImage = p9.props.searchIconImage,
-				inputTextFont = p9.props.searchInputTextFont,
-				inputTextColor3 = p9.props.searchInputTextColor3,
-				inputTextSize = p9.props.searchInputTextSize,
-				inputTextTransparency = p9.props.searchInputTextTransparency,
-				placeholderTextTransparency = p9.props.searchPlaceholderTextTransparency,
-				placeholderTextColor3 = p9.props.searchPlaceholderTextColor3,
-				placeholderText = p9.props.searchPlaceholderText,
-				clearIconColor3 = p9.props.searchClearIconColor3,
-				clearIcon = p9.props.searchClearIcon,
-				textChangedCallback = function(p10) -- line: 195
-					-- upvalues: p9 (copy)
-					p9:setState({
-						filterText = p10
-					})
+			callbackBox = roact.createElement(CallbackInputBoxWithIcon, {
+				backgroundTransparency = self.props.searchBackgroundTransparency,
+				backgroundColor3 = self.props.searchBackgroundColor3,
+				borderColor = self.props.searchBoxBorderColor,
+				borderTransparency = self.props.searchBoxBorderTransparency,
+				borderThickness = self.props.searchBoxBorderThickness,
+				cornerRadius = self.props.searchBoxCornerRadius,
+				iconCellWidth = self.props.searchIconCellWidth,
+				iconSize = self.props.searchIconSize,
+				iconColor3 = self.props.searchIconColor3,
+				iconTransparency = self.props.searchIconTransparency,
+				iconImage = self.props.searchIconImage,
+				inputTextFont = self.props.searchInputTextFont,
+				inputTextColor3 = self.props.searchInputTextColor3,
+				inputTextSize = self.props.searchInputTextSize,
+				inputTextTransparency = self.props.searchInputTextTransparency,
+				placeholderTextTransparency = self.props.searchPlaceholderTextTransparency,
+				placeholderTextColor3 = self.props.searchPlaceholderTextColor3,
+				placeholderText = self.props.searchPlaceholderText,
+				clearIconColor3 = self.props.searchClearIconColor3,
+				clearIcon = self.props.searchClearIcon,
+				textChangedCallback = function(filterText2)
+					self:setState({ filterText = filterText2 })
 				end
 			})
 		}),
-		dividerBottom = Roact.createElement("Frame", {
+		dividerBottom = roact.createElement("Frame", {
+			BackgroundColor3 = self.props.searchDividerColor3,
+			BackgroundTransparency = self.props.searchDividerTransparency,
 			BorderSizePixel = 0,
-			LayoutOrder = 3,
-			BackgroundColor3 = p9.props.searchDividerColor3,
-			BackgroundTransparency = p9.props.searchDividerTransparency,
-			Size = UDim2.new(1, 0, 0, p9.props.searchDividerHeight)
+			Size = UDim2.new(1, 0, 0, self.props.searchDividerHeight),
+			LayoutOrder = 3
 		}),
-		entryList = Roact.createElement("ScrollingFrame", {
-			Size = UDim2.new(1, 0, 1, -p9.props.searchBoxHeight - p9.props.searchBoxTopPadding - p9.props.searchBoxBottomPadding - p9.props.searchDividerHeight * 2),
-			CanvasSize = UDim2.new(0, 0, 0, n1 * p9.props.entryHeight),
+		entryList = roact.createElement("ScrollingFrame", {
+			Size = UDim2.new(
+				1,
+				0,
+				1,
+				-self.props.searchBoxHeight - self.props.searchBoxTopPadding - self.props.searchBoxBottomPadding - self.props.searchDividerHeight * 2
+			),
+			CanvasSize = UDim2.new(0, 0, 0, count * self.props.entryHeight),
 			BackgroundTransparency = 1,
 			ScrollBarThickness = 5,
 			ElasticBehavior = Enum.ElasticBehavior.Always,
 			ScrollingDirection = Enum.ScrollingDirection.Y,
-			ScrollBarImageTransparency = p9.props.scrollBarImageTransparency,
-			ScrollBarImageColor3 = p9.props.scrollBarImageColor3,
+			ScrollBarImageTransparency = self.props.scrollBarImageTransparency,
+			ScrollBarImageColor3 = self.props.scrollBarImageColor3,
 			BottomImage = "rbxasset://textures/ui/LuaChat/9-slice/scroll-bar.png",
 			MidImage = "rbxasset://textures/ui/LuaChat/9-slice/scroll-bar.png",
 			TopImage = "rbxasset://textures/ui/LuaChat/9-slice/scroll-bar.png",
 			LayoutOrder = 4,
-			[Roact.Change.CanvasPosition] = function(p11) -- line: 234
-				-- upvalues: p9 (copy)
-				local YOffset = p11.CanvasSize.Y.Offset
+			[roact.Change.CanvasPosition] = function(data)
+				local offset = data.CanvasSize.Y.Offset
 
-				if not p9.isTouchingBottom and YOffset <= p11.CanvasPosition.Y + p11.AbsoluteSize.Y then
-					p9.isTouchingBottom = true
-
-					if p9.props.scrollTouchedBottomCallback then
-						p9.props.scrollTouchedBottomCallback()
-
-						return
+				if self.isTouchingBottom or not (offset <= data.CanvasPosition.Y + data.AbsoluteSize.Y) then
+					if data.CanvasPosition.Y + data.AbsoluteSize.Y < offset then
+						self.isTouchingBottom = false
 					end
-				elseif YOffset > p11.CanvasPosition.Y + p11.AbsoluteSize.Y then
-					p9.isTouchingBottom = false
+				else
+					self.isTouchingBottom = true
+
+					if self.props.scrollTouchedBottomCallback then
+						self.props.scrollTouchedBottomCallback()
+					end
 				end
 			end
-		}, t2)
+		}, v)
 	})
 end
 
-return v5
+return extended

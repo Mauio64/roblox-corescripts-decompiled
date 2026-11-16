@@ -1,34 +1,35 @@
 local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
 local JavascriptHybrid = require(GenericChallenges.Types.JavascriptHybrid)
+
 local HttpService = game:GetService("HttpService")
 
-return function(t1: {[any]: any}) -- line: 29
-	-- upvalues: HttpService (copy), JavascriptHybrid (copy)
-	return function(s1: string) -- line: 30
-		-- upvalues: HttpService (copy), JavascriptHybrid (copy), t1 (copy)
-		local data = HttpService:JSONDecode(s1)
+return function(data)
+	return function(json: string)
+		local jsonDecode = HttpService:JSONDecode(json)
 
-		if data.moduleID ~= JavascriptHybrid.Module.Navigation or (data.functionName ~= JavascriptHybrid.Function.navigateToFeature or not data.params or not data.params.params) then
+		if
+			jsonDecode.moduleID ~= JavascriptHybrid.Module.Navigation
+			or jsonDecode.functionName ~= JavascriptHybrid.Function.navigateToFeature
+			or not (jsonDecode.params and jsonDecode.params.params)
+		then
 			return
 		end
 
-		local params = data.params.params
+		local params = jsonDecode.params.params
 
 		if params.feature == JavascriptHybrid.Feature.ChallengeParsed and params.data.parsed == false then
-			t1.OnChallengeLoadFailed(params)
-
+			data.OnChallengeLoadFailed(params)
 			return
 		end
 
 		if params.feature == JavascriptHybrid.Feature.ChallengeInitialized and params.data.initialized == false then
-			t1.OnChallengeLoadFailed(params)
-
+			data.OnChallengeLoadFailed(params)
 			return
 		end
 
-		if t1.Hooks ~= nil then
-			for _, v9 in t1.Hooks do
-				if v9(params) then
+		if data.Hooks ~= nil then
+			for _, hook in data.Hooks do
+				if hook(params) then
 					return
 				end
 			end
@@ -36,30 +37,19 @@ return function(t1: {[any]: any}) -- line: 29
 
 		if params.feature == JavascriptHybrid.Feature.ChallengeCompleted then
 			if params.data ~= nil then
-				t1.OnChallengeCompleted(params)
-
-				return
+				data.OnChallengeCompleted(params)
+			elseif data.OnChallengeAbandoned == nil then
+				data.OnChallengeLoadFailed(params)
+			else
+				data.OnChallengeAbandoned()
 			end
-
-			if t1.OnChallengeAbandoned ~= nil then
-				t1.OnChallengeAbandoned()
-
-				return
-			end
-
-			t1.OnChallengeLoadFailed(params)
-
-			return
-		end
-
-		if params.feature == JavascriptHybrid.Feature.ChallengeInvalidated then
-			t1.OnChallengeInvalidated(params)
-
-			return
-		end
-
-		if data.params.params.feature == JavascriptHybrid.Feature.ChallengeDisplayed and t1.OnChallengeDisplayed ~= nil then
-			t1.OnChallengeDisplayed(params)
+		elseif params.feature == JavascriptHybrid.Feature.ChallengeInvalidated then
+			data.OnChallengeInvalidated(params)
+		elseif
+			jsonDecode.params.params.feature == JavascriptHybrid.Feature.ChallengeDisplayed
+			and data.OnChallengeDisplayed ~= nil
+		then
+			data.OnChallengeDisplayed(params)
 		end
 	end
 end

@@ -1,43 +1,34 @@
-local Parent = script:FindFirstAncestor("GenericChallenges").Parent
-local Promise = require(Parent.Promise)
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("GenericChallenges").Parent
+
+local Promise = require(parent.Promise)
+local Cryo = require(parent.Cryo)
 local IsChallengeHttpResponse = require(script.Parent.IsChallengeHttpResponse)
 local InterceptChallenge = require(script.Parent.InterceptChallenge)
+require(parent.Http)
 
-require(Parent.Http)
+return function(callback, p)
+	local v = InterceptChallenge
 
-return function(p1, p2) -- line: 13
-	-- upvalues: InterceptChallenge (copy), Promise (copy), IsChallengeHttpResponse (copy), Cryo (copy)
-	local u8 = InterceptChallenge
-
-	if p2 ~= nil then
-		u8 = p2
+	if p ~= nil then
+		v = p
 	end
 
-	return function(s1: string, s2: string, p3) -- line: 18
-		-- upvalues: p1 (copy), Promise (copy), IsChallengeHttpResponse (copy), Cryo (copy), u8 (ref)
-		local v12, v13 = p1(s1, s2, p3)
+	return function(p2: string, p3: string, p4)
+		local v2, v3 = callback(p2, p3, p4)
 
-		return v12:andThen(function(p4) -- line: 21
-			-- upvalues: Promise (copy)
-			return Promise.resolve(p4)
-		end):catch(function(p5) -- line: 25
-			-- upvalues: IsChallengeHttpResponse (copy), p1 (copy), s1 (copy), s2 (copy), Cryo (copy), p3 (copy), u8 (ref), Promise (copy)
-			if p5.StatusCode ~= nil and (p5.Headers ~= nil and IsChallengeHttpResponse(p5.StatusCode, p5.Headers)) then
-				local t1 = {
-					retryRequestCallback = function(p6) -- line: 33
-						-- upvalues: p1 (copy), s1 (copy), s2 (copy), Cryo (copy), p3 (copy)
-						return p1(s1, s2, Cryo.Dictionary.join(p3, {
-							headers = p6
-						}))
-					end,
-					rawResponseHeaders = p5.Headers
-				}
-
-				return u8(t1)
+		return v2:andThen(function(p5)
+			return Promise.resolve(p5)
+		end):catch(function(p5)
+			if p5.StatusCode == nil or p5.Headers == nil or not IsChallengeHttpResponse(p5.StatusCode, p5.Headers) then
+				return Promise.reject(p5)
 			end
 
-			return Promise.reject(p5)
-		end), v13
+			return v({
+				retryRequestCallback = function(headers)
+					return callback(p2, p3, Cryo.Dictionary.join(p4, { headers = headers }))
+				end,
+				rawResponseHeaders = p5.Headers
+			})
+		end), v3
 	end
 end

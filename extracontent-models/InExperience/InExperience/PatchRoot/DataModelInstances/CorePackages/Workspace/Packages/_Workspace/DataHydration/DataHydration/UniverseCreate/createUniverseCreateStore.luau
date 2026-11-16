@@ -1,32 +1,22 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
 
-require(DataHydrationParent.HttpClient)
+require(parent.HttpClient)
 
 local fetchUniverseCreate = require(script.Parent.fetchUniverseCreate)
-
 require(script.Parent.UniverseCreateStoreTypes)
-
 local UniverseSearch = require(DataHydration.UniverseSearch)
 
-local function createUniverseCreateStore(t1: {[any]: any}?) -- line: 20
-	-- upvalues: UniverseSearch (copy), fetchUniverseCreate (copy)
-	local v7 = t1 or {}
-	local v8 = v7.getSearchStore or function() -- line: 22
-		-- upvalues: UniverseSearch (copy)
+local function createUniverseCreateStore(options)
+	local v = options or {}
+	local getSearchStore = v.getSearchStore or function()
 		return UniverseSearch.getUniverseSearchStore()
 	end
 
 	return {
-		createUniverse = function(p1) -- line: 26
-			-- upvalues: fetchUniverseCreate (copy), v7 (copy), v8 (copy)
-			return fetchUniverseCreate(p1, {
-				network = v7.network,
-				baseUrl = v7.baseUrl
-			}):andThen(function(p2) -- line: 30
-				-- upvalues: v8 (copy)
-				v8().invalidateAll()
-
+		createUniverse = function(p)
+			return fetchUniverseCreate(p, { network = v.network, baseUrl = v.baseUrl }):andThen(function(p2)
+				getSearchStore().invalidateAll()
 				return p2
 			end)
 		end

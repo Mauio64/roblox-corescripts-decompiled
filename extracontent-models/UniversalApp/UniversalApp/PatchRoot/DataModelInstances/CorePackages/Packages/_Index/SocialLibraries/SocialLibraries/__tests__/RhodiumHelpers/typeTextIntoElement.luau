@@ -1,6 +1,6 @@
-return function(p1, p2) -- line: 2
-	for i = 1, #p2 do
-		p1:sendText(p2:sub(i, i))
+return function(object, value)
+	for i = 1, #value do
+		object:sendText(value:sub(i, i))
 	end
 
 	wait(0)

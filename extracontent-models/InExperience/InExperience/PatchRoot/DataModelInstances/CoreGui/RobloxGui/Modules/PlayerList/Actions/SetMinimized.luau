@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetMinimized", function(p1) -- line: 4
-	return {
-		isMinimized = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetMinimized", function(isMinimized)
+	return { isMinimized = isMinimized }
 end)

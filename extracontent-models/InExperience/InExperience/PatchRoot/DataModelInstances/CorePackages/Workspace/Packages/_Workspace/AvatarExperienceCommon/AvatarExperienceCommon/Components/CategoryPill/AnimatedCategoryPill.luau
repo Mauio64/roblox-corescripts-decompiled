@@ -1,68 +1,64 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local React = require(AvatarExperienceCommonParent.React)
-local Foundation = require(AvatarExperienceCommonParent.Foundation)
-local ReactOtter = require(AvatarExperienceCommonParent.ReactOtter)
+
+local parent = AvatarExperienceCommon.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local ReactOtter = require(parent.ReactOtter)
 local AnimationConstants = require(AvatarExperienceCommon.AnimationConstants)
 
-local function useCategoryPillAnimation(n1: number, b1: boolean, b2: boolean) -- line: 21
-	-- upvalues: ReactOtter (copy), React (copy), AnimationConstants (copy)
-	local v12 = b2 and not b1
-	local v13 = not v12 and 0 or 1
-	local v14, v15 = ReactOtter.useAnimatedBinding(n1)
-	local v16, v17 = ReactOtter.useAnimatedBinding(v13)
+local function useCategoryPillAnimation(targetX: number, isSelected: boolean, shouldShowSubcategories: boolean)
+	local v = shouldShowSubcategories and not isSelected
+	local v2 = v and 1 or 0
+	local v3, v4 = ReactOtter.useAnimatedBinding(targetX)
+	local v5, v6 = ReactOtter.useAnimatedBinding(v2)
 
-	React.useEffect(function() -- line: 31
-		-- upvalues: v15 (copy), ReactOtter (copy), n1 (copy), AnimationConstants (copy)
-		v15(ReactOtter.spring(n1, {
+	React.useEffect(function()
+		v4(ReactOtter.spring(targetX, {
 			frequency = AnimationConstants.FIntAXCategoryPillPositionAnimationFrequency,
 			dampingRatio = AnimationConstants.FIntAXCategoryPillPositionAnimationDampingRatio
 		}))
-	end, {
-		n1,
-		v15
-	})
-	React.useEffect(function() -- line: 38
-		-- upvalues: v13 (copy), v17 (copy), ReactOtter (copy), AnimationConstants (copy)
-		if v13 == 1 then
-			v17(ReactOtter.instant(v13))
+	end, { targetX, v4 })
 
-			return
+	React.useEffect(function()
+		if v2 == 1 then
+			v6(ReactOtter.instant(v2))
+		else
+			v6((ReactOtter.spring(v2, {
+				frequency = AnimationConstants.FIntAXCategoryPillTransparencyAnimationFrequency,
+				dampingRatio = AnimationConstants.FIntAXCategoryPillTransparencyAnimationDampingRatio
+			})))
 		end
+	end, { v2 })
 
-		v17((ReactOtter.spring(v13, {
-			frequency = AnimationConstants.FIntAXCategoryPillTransparencyAnimationFrequency,
-			dampingRatio = AnimationConstants.FIntAXCategoryPillTransparencyAnimationDampingRatio
-		})))
-	end, { v13 })
-
-	return v14, v16, v12
+	return v3, v5, v
 end
-local function AnimatedCategoryPill(t1: {[any]: any}) -- line: 52
-	-- upvalues: useCategoryPillAnimation (copy), React (copy), Foundation (copy)
-	local catInfo = t1.catInfo
-	local pillIndex = t1.pillIndex
-	local isSelected = t1.isSelected
-	local shouldShowSubcategories = t1.shouldShowSubcategories
-	local targetX = t1.targetX
-	local renderCategoryPill = t1.renderCategoryPill
-	local onRef = t1.onRef
-	local v26, v27, v28 = useCategoryPillAnimation(targetX, isSelected, shouldShowSubcategories)
-	local v29 = renderCategoryPill(catInfo, pillIndex, not v28)
-	local v30 = v26:map(function(p1) -- line: 68
-		return UDim2.new(0, p1, 0.5, 0)
+
+local function AnimatedCategoryPill(props)
+	local catInfo = props.catInfo
+	local pillIndex = props.pillIndex
+	local isSelected = props.isSelected
+	local shouldShowSubcategories = props.shouldShowSubcategories
+	local targetX = props.targetX
+	local renderCategoryPill = props.renderCategoryPill
+	local onRef = props.onRef
+
+	local v, groupTransparency, v2 = useCategoryPillAnimation(targetX, isSelected, shouldShowSubcategories)
+
+	local pill = renderCategoryPill(catInfo, pillIndex, not v2)
+
+	local mapped = v:map(function(p)
+		return UDim2.new(0, p, 0.5, 0)
 	end)
 
 	return React.createElement(Foundation.View, {
 		tag = "auto-xy anchor-center-left padding-x-xxsmall",
+		Position = mapped,
 		BackgroundTransparency = 1,
-		Position = v30,
-		GroupTransparency = v27,
+		GroupTransparency = groupTransparency,
 		Size = UDim2.new(0, 0, 1, 0),
 		ref = onRef
-	}, {
-		Pill = v29
-	})
+	}, { Pill = pill })
 end
 
 return AnimatedCategoryPill

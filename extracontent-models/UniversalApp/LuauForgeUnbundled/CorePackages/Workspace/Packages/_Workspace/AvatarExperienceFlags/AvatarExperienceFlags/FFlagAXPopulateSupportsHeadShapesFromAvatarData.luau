@@ -1,0 +1,3 @@
+local FFlagParseHeadShapeFromAPIResponse = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagParseHeadShapeFromAPIResponse")
+
+return game:DefineFastFlag("AXPopulateSupportsHeadShapesFromAvatarData", false) and FFlagParseHeadShapeFromAPIResponse

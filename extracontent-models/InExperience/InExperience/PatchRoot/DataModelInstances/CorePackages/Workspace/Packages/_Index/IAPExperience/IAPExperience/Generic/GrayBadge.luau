@@ -1,27 +1,36 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Foundation = require(ParentParent.Foundation)
-local FoundationText = Foundation.Text
+local parent = script.Parent.Parent.Parent
+
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local View = Foundation.View
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 
-return function(t1: {[any]: any}) -- line: 19
-	-- upvalues: React (copy), View (copy), Icon (copy), IconSize (copy), FoundationText (copy)
-	return React.createElement(View, {
-		tag = "row align-x-center align-y-center gap-xsmall size-600 auto-x padding-x-small radius-circle bg-shift-300",
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		Icon = if not t1.iconName then nil else React.createElement(Icon, {
+return function(props)
+	local createElement = React.createElement
+	local v = {
+		LayoutOrder = props.LayoutOrder,
+		tag = "row align-x-center align-y-center gap-xsmall size-600 auto-x padding-x-small radius-circle bg-shift-300"
+	}
+	local icon
+
+	if props.iconName then
+		icon = React.createElement(Icon, {
 			LayoutOrder = 1,
-			tag = "content-emphasis",
-			name = t1.iconName,
-			size = IconSize.XSmall
-		}),
-		Text = React.createElement(FoundationText, {
+			name = props.iconName,
+			size = IconSize.XSmall,
+			tag = "content-emphasis"
+		})
+	end
+
+	return createElement(View, v, {
+		Icon = icon,
+		Text = React.createElement(Text, {
 			LayoutOrder = 2,
-			tag = "auto-xy text-caption-small text-align-x-center content-emphasis",
-			Text = t1.Text
+			Text = props.Text,
+			tag = "auto-xy text-caption-small text-align-x-center content-emphasis"
 		})
 	})
 end

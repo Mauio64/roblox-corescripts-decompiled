@@ -1,29 +1,27 @@
-local Parent = script:FindFirstAncestor("MomentsCreation").Parent
-local Dash = require(Parent.Dash)
+local parent = script:FindFirstAncestor("MomentsCreation").Parent
 
-require(Parent.MomentsTypes)
+local Dash = require(parent.Dash)
+require(parent.MomentsTypes)
 
-local function makeTextOverlayEditsForEditor(t1: {[any]: any}?, p1, n1: number) -- line: 21
-	-- upvalues: Dash (copy)
-	local v7 = not (n1 > 0) and 1 or n1
+local function makeTextOverlayEditsForEditor(list, p, p2: number)
+	local v = not (p2 > 0) and 1 or p2
 
-	if not t1 or #t1 == 0 then
-		return { Dash.joinDeep(p1, {
-			scale = 1 / v7
-		}) }
+	if list and #list ~= 0 then
+		return Dash.map(list, function(p3)
+			local v2 = p3.scale * v
+
+			return Dash.joinDeep(p3, {
+				scale = 1 / v,
+				textOverlayStyle = {
+					fontSize = p3.textOverlayStyle.fontSize * v2
+				}
+			})
+		end)
 	end
 
-	return Dash.map(t1, function(p2) -- line: 34
-		-- upvalues: v7 (copy), Dash (copy)
-		local v9 = p2.scale * v7
-
-		return Dash.joinDeep(p2, {
-			scale = 1 / v7,
-			textOverlayStyle = {
-				fontSize = p2.textOverlayStyle.fontSize * v9
-			}
-		})
-	end)
+	return { Dash.joinDeep(p, {
+			scale = 1 / v
+		}) }
 end
 
 return makeTextOverlayEditsForEditor

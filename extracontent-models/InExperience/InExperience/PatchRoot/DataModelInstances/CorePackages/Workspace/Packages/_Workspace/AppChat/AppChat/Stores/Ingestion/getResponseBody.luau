@@ -1,9 +1,9 @@
-local function getResponseBody(p1) -- line: 1
-	if p1 == nil then
+local function getResponseBody(p)
+	if p == nil then
 		return nil
 	end
 
-	return p1.responseBody or p1
+	return p.responseBody or p
 end
 
 return getResponseBody

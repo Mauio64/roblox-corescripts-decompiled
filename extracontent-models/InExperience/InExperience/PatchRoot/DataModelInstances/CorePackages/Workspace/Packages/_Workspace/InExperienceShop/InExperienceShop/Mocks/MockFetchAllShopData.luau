@@ -1,39 +1,57 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
+local parent = InExperienceShop.Parent
 
-require(InExperienceShopParent.Promise)
+require(parent.Promise)
+local Constants = require(InExperienceShop.Constants)
 require(InExperienceShop.Types)
-
 local buildShopDataFromWidgets = require(InExperienceShop.Api.buildShopDataFromWidgets)
+local fetchRobuxWidgetsAfterPurchase = require(InExperienceShop.Api.fetchRobuxWidgetsAfterPurchase)
 local multiGetProductInfo = require(InExperienceShop.Api.multiGetProductInfo)
 local MockShopItemIds = require(InExperienceShop.Mocks.MockShopItemIds)
 local MockMultiGetProductInfo = require(InExperienceShop.Mocks.MockMultiGetProductInfo)
 local FFlagShopUseMockMultiGetProductInfo = require(InExperienceShop.Flags.FFlagShopUseMockMultiGetProductInfo)
+local MockFetchAllShopData = {}
 
-return {
-	fetchAllShopData = function(n1: number?) -- line: 34
-		-- upvalues: MockShopItemIds (copy), buildShopDataFromWidgets (copy), FFlagShopUseMockMultiGetProductInfo (copy), MockMultiGetProductInfo (copy), multiGetProductInfo (copy)
-		local v9 = n1 == nil and 0.5 or n1
+function MockFetchAllShopData.fetchAllShopData(p: number?)
+	local v = p == nil and 0.5 or p
+	return MockShopItemIds.getShopItemIds(v):andThen(function(p2)
+		return buildShopDataFromWidgets(p2, function(p3)
+			if FFlagShopUseMockMultiGetProductInfo then
+				return MockMultiGetProductInfo.multiGetProductInfo(p3, v)
+			end
 
-		return MockShopItemIds.getShopItemIds(v9):andThen(function(p1) -- line: 36
-			-- upvalues: buildShopDataFromWidgets (copy), FFlagShopUseMockMultiGetProductInfo (copy), MockMultiGetProductInfo (copy), v9 (copy), multiGetProductInfo (copy)
-			return buildShopDataFromWidgets(p1, function(p2) -- line: 37
-				-- upvalues: FFlagShopUseMockMultiGetProductInfo (copy), MockMultiGetProductInfo (copy), v9 (copy), multiGetProductInfo (copy)
-				if FFlagShopUseMockMultiGetProductInfo then
-					return MockMultiGetProductInfo.multiGetProductInfo(p2, v9)
-				end
-
-				return multiGetProductInfo(p2)
-			end)
+			return multiGetProductInfo(p3)
 		end)
-	end,
-	fetchShopWidgetsOnly = function(n2: number?) -- line: 52
-		-- upvalues: MockShopItemIds (copy), buildShopDataFromWidgets (copy)
-		local v11 = n2 == nil and 0.5 or n2
+	end)
+end
 
-		return MockShopItemIds.getShopItemIds(v11):andThen(function(p3) -- line: 54
-			-- upvalues: buildShopDataFromWidgets (copy)
-			return buildShopDataFromWidgets(p3, nil)
+function MockFetchAllShopData.fetchShopWidgetsOnly(p: number?)
+	local v = p == nil and 0.5 or p
+	return MockShopItemIds.getShopItemIds(v):andThen(function(p2)
+		return buildShopDataFromWidgets(p2, nil)
+	end)
+end
+
+function MockFetchAllShopData.fetchRobuxWidgetsAfterPurchase(p: number?)
+	local v = p == nil and 0.5 or p
+	return MockShopItemIds.getShopItemIds(v):andThen(function(p2)
+		local category2 = nil
+
+		for _, category in ipairs(p2.categories) do
+			if category.name == Constants.ROBUX_CATEGORY_NAME then
+				category2 = category
+				break
+			end
+		end
+
+		return fetchRobuxWidgetsAfterPurchase.buildFromWidgetResponse({ category = category2 }, function(p3)
+			if FFlagShopUseMockMultiGetProductInfo then
+				return MockMultiGetProductInfo.multiGetProductInfo(p3, v)
+			end
+
+			return multiGetProductInfo(p3)
 		end)
-	end
-}
+	end)
+end
+
+return MockFetchAllShopData

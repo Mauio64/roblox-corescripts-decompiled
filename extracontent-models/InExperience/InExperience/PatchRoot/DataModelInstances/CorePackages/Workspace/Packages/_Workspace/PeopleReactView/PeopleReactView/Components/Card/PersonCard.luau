@@ -1,75 +1,138 @@
-local LocalPlayer = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local React = require(PeopleReactViewParent.React)
-local ReactIs = require(PeopleReactViewParent.ReactIs)
-local Signals = require(PeopleReactViewParent.Signals)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
-local View = require(PeopleReactViewParent.Foundation).View
-local PeopleService = require(PeopleReactViewParent.PeopleService)
+local parent = PeopleReactView.Parent
+
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+
+local PeopleService = require(parent.PeopleService)
+
 local CardDetails = require(PeopleReactView.Components.Card.CardDetails)
 local CardThumbnail = require(PeopleReactView.Components.Card.CardThumbnail)
 local CardTooltip = require(PeopleReactView.Components.Card.CardTooltip)
-local v13 = PeopleService.getService("Flags")
-local GetFFlagPeoplePageEnablePersonSignalStore = v13.GetFFlagPeoplePageEnablePersonSignalStore
-local GetFFlagPeoplePageLazyRenderCards = v13.GetFFlagPeoplePageLazyRenderCards
-local GetFFlagFixPeoplePageCardTooltip = v13.GetFFlagFixPeoplePageCardTooltip
-local FFlagPeopleCardsEnableVirtualizedGrid = v13.FFlagPeopleCardsEnableVirtualizedGrid
 
-local function PersonCard(t1: {[any]: any}) -- line: 36
-	-- upvalues: GetFFlagPeoplePageEnablePersonSignalStore (copy), SignalsReact (copy), Signals (copy), ReactIs (copy), React (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), LocalPlayer (copy), View (copy), GetFFlagFixPeoplePageCardTooltip (copy), CardThumbnail (copy), GetFFlagPeoplePageLazyRenderCards (copy), CardDetails (copy), CardTooltip (copy)
-	local v20 = if not GetFFlagPeoplePageEnablePersonSignalStore() then nil else SignalsReact.useSignalBinding(Signals.createComputed(function(p1) -- line: 38
-		-- upvalues: t1 (copy)
-		if type(t1.layoutOrder) == "function" then
-			return t1.layoutOrder(p1)
-		end
+local service = PeopleService.getService("Flags")
+local getFFlagPeoplePageEnablePersonSignalStore = service.GetFFlagPeoplePageEnablePersonSignalStore
+local getFFlagPeoplePageLazyRenderCards = service.GetFFlagPeoplePageLazyRenderCards
+local getFFlagFixPeoplePageCardTooltip = service.GetFFlagFixPeoplePageCardTooltip
+local fFlagPeopleCardsEnableVirtualizedGrid = service.FFlagPeopleCardsEnableVirtualizedGrid
 
-		return t1.layoutOrder or 0
-	end))
-	local v21 = if not ReactIs.isBinding(t1.width) then UDim2.new(0, t1.width, 0, 0) else t1.width:map(function(n1: number) -- line: 48
-		return UDim2.new(0, n1, 0, 0)
-	end)
-	local v22, v23 = React.useState(not FFlagPeopleCardsEnableVirtualizedGrid and t1.showTooltip)
+local function PersonCard(props)
+	local layoutOrder
 
-	if FFlagPeopleCardsEnableVirtualizedGrid then
-		React.useEffect(function() -- line: 60
-			-- upvalues: v23 (copy), t1 (copy), LocalPlayer (copy)
-			v23(t1.showTooltip and (LocalPlayer ~= nil and t1.person.UserId == LocalPlayer.UserId))
-		end, {
-			t1.showTooltip,
-			t1.person
-		})
+	if getFFlagPeoplePageEnablePersonSignalStore() then
+		layoutOrder = SignalsReact.useSignalBinding(Signals.createComputed(function(p)
+			if type(props.layoutOrder) == "function" then
+				return props.layoutOrder(p)
+			end
+
+			return props.layoutOrder or 0
+		end))
 	end
 
-	local v24 = React.useCallback(function() -- line: 65
-		-- upvalues: v23 (copy), t1 (copy)
-		v23(false)
-		t1.onDismissTooltip()
+	local size
+
+	if ReactIs.isBinding(props.width) then
+		size = props.width:map(function(p: number)
+			return UDim2.new(0, p, 0, 0)
+		end)
+	else
+		size = UDim2.new(0, props.width, 0, 0)
+	end
+
+	local useState = React.useState
+	local v
+
+	if fFlagPeopleCardsEnableVirtualizedGrid then
+		v = false
+	else
+		v = props.showTooltip
+	end
+
+	local state, setState = useState(v)
+
+	if fFlagPeopleCardsEnableVirtualizedGrid then
+		React.useEffect(function()
+			local v2 = props.showTooltip
+
+			if v2 then
+				if LocalPlayer == nil then
+					v2 = false
+				else
+					v2 = props.person.UserId == LocalPlayer.UserId
+				end
+			end
+
+			setState(v2)
+		end, { props.showTooltip, props.person })
+	end
+
+	local action = React.useCallback(function()
+		setState(false)
+		props.onDismissTooltip()
 	end, {})
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v2 = {
 		tag = "auto-y",
-		Size = v21,
-		ZIndex = not v22 and 1 or 2,
-		LayoutOrder = if not GetFFlagPeoplePageEnablePersonSignalStore() then t1.layoutOrder else v20
-	}, {
-		CardContent = React.createElement(View, {
-			tag = not GetFFlagFixPeoplePageCardTooltip() and "size-full col bg-surface-100 radius-medium" or "size-full-0 auto-y col bg-surface-100 radius-medium"
-		}, {
-			CardThumbnail = React.createElement(CardThumbnail, {
-				layoutOrder = 1,
-				person = t1.person,
-				shouldShowMenu = if not GetFFlagPeoplePageLazyRenderCards() then nil else t1.shouldShowMenu
-			}),
+		Size = size,
+		ZIndex = state and 2 or 1,
+		LayoutOrder = 0
+	}
+
+	if not getFFlagPeoplePageEnablePersonSignalStore() then
+		layoutOrder = props.layoutOrder
+	end
+
+	v2.LayoutOrder = layoutOrder
+
+	local createElement2 = React.createElement
+	local v3 = {
+		tag = getFFlagFixPeoplePageCardTooltip() and "size-full-0 auto-y col bg-surface-100 radius-medium" or "size-full col bg-surface-100 radius-medium"
+	}
+
+	local createElement3 = React.createElement
+	local v4 = {
+		person = props.person,
+		shouldShowMenu = 0,
+		layoutOrder = 1,
+		isCompactCardLayout = 0
+	}
+	local shouldShowMenu
+
+	if getFFlagPeoplePageLazyRenderCards() then
+		shouldShowMenu = props.shouldShowMenu
+	end
+
+	v4.shouldShowMenu = shouldShowMenu
+
+	v4.isCompactCardLayout = props.isCompactCardLayout
+	local v5 = {
+		CardContent = createElement2(View, v3, {
+			CardThumbnail = createElement3(CardThumbnail, v4),
 			CardDetails = React.createElement(CardDetails, {
+				person = props.person,
 				layoutOrder = 2,
-				person = t1.person
+				isCompactCardLayout = props.isCompactCardLayout
 			})
 		}),
-		CardTooltip = if not v22 then nil else React.createElement(CardTooltip, {
-			action = v24
-		})
-	})
+		CardTooltip = 0
+	}
+	local cardTooltip
+
+	if state then
+		cardTooltip = React.createElement(CardTooltip, { action = action })
+	end
+
+	v5.CardTooltip = cardTooltip
+	return createElement(View, v2, v5)
 end
 
 return React.memo(PersonCard)

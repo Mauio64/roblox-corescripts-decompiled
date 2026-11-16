@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-return (require(ParentParent.AppCommonLib).Signal.new())
+local AppCommonLib = require(parent.AppCommonLib)
+return (AppCommonLib.Signal.new())

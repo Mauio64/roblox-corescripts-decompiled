@@ -1,1 +1,3 @@
-return (require(script.Parent.ColorMode))
+local ColorMode = require(script.Parent.ColorMode)
+
+return ColorMode

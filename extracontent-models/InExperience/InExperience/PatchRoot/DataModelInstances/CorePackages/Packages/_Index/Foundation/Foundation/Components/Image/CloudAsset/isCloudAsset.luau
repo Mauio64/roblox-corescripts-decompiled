@@ -1,7 +1,8 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local Assets = require(Parent.FoundationCloudAssets).Assets
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-return function(s1: string) -- line: 6
-	-- upvalues: Assets (copy)
-	return Assets[s1] ~= nil
+local FoundationCloudAssets = require(parent.FoundationCloudAssets)
+local Assets = FoundationCloudAssets.Assets
+
+return function(p: string): boolean
+	return Assets[p] ~= nil
 end

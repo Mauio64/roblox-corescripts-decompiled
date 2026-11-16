@@ -1,382 +1,362 @@
-local color3 = Color3.new(0.10588235294117647, 0.9882352941176471, 0.4196078431372549)
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
-local GuiService = game:GetService("GuiService")
+local color = Color3.new(27 / 255, 252 / 255, 107 / 255)
+
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local Players = game:GetService("Players")
 local CorePackages = game:GetService("CorePackages")
-local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
-local v7 = GuiService:IsTenFootInterface()
 
-local function CreateModule() -- line: 30
-	-- upvalues: Create (copy), RobloxGui (copy), color3 (copy), Players (copy)
-	local t1 = {
-		Container = nil
-	}
-	local t2 = {}
-	local BindableEvent = Instance.new("BindableEvent")
-	local BindableEvent2 = Instance.new("BindableEvent")
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Create = AppCommonLib.Create
+local AppCommonLib2 = require(CorePackages.Workspace.Packages.AppCommonLib)
+local tenFootInterface = AppCommonLib2.isTenFootInterface()
 
-	local function createContainer() -- line: 39
-		-- upvalues: t1 (copy), Create (copy), RobloxGui (copy)
-		if not t1.Container then
-			t1.Container = Create("ImageButton")({
+local function CreateModule()
+	local module = {}
+	module.Container = nil
+	local states = {}
+	local bindableEvent = Instance.new("BindableEvent")
+	local bindableEvent2 = Instance.new("BindableEvent")
+
+	local function createContainer()
+		if not module.Container then
+			module.Container = Create("ImageButton")({
 				Name = "TopRightContainer",
+				Size = UDim2.new(0, 350, 0, 100),
+				Position = UDim2.new(1, -415, 0, 10),
 				AutoButtonColor = false,
 				Image = "",
 				Active = false,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, 350, 0, 100),
-				Position = UDim2.new(1, -415, 0, 10),
 				Parent = RobloxGui
 			})
 		end
 	end
 
-	function removeFromDisplayStack(p1) -- line: 55
-		-- upvalues: t2 (copy), BindableEvent (copy)
-		local v22 = nil
+	function removeFromDisplayStack(p)
+		local v = nil
 
-		for i = 1, #t2 do
-			if p1 == t2[i] then
-				v22 = i + 1
-
+		for i = 1, #states do
+			if states[i] == p then
+				v = i + 1
 				break
 			end
 		end
 
-		for i = v22, #t2 do
-			local v25 = t2[i]
-
-			v25.Position = UDim2.new(v25.Position.X.Scale, v25.Position.X.Offset, v25.Position.Y.Scale, p1.AbsolutePosition.Y)
-			p1 = v25
+		for i = v, #states do
+			local v2 = states[i]
+			v2.Position = UDim2.new(
+				v2.Position.X.Scale,
+				v2.Position.X.Offset,
+				v2.Position.Y.Scale,
+				p.AbsolutePosition.Y
+			)
+			p = v2
 		end
 
-		BindableEvent:Fire()
+		bindableEvent:Fire()
 	end
-	function addBackToDisplayStack(p2) -- line: 75
-		-- upvalues: t2 (copy), BindableEvent (copy)
-		local n1 = 0
 
-		for i = 1, #t2 do
-			if p2 == t2[i] then
-				n1 = i + 1
+	function addBackToDisplayStack(p)
+		local v = 0
 
+		for i = 1, #states do
+			if states[i] == p then
+				v = i + 1
 				break
 			end
 		end
 
-		for i = n1, #t2 do
-			local v30 = t2[i]
-			local v31 = p2.AbsolutePosition.Y + p2.AbsoluteSize.Y + 4
-
-			v30.Position = UDim2.new(v30.Position.X.Scale, v30.Position.X.Offset, v30.Position.Y.Scale, v31)
-			p2 = v30
+		for i = v, #states do
+			local v2 = states[i]
+			local v3 = p.AbsolutePosition.Y + p.AbsoluteSize.Y + 4
+			v2.Position = UDim2.new(v2.Position.X.Scale, v2.Position.X.Offset, v2.Position.Y.Scale, v3)
+			p = v2
 		end
 
-		BindableEvent:Fire()
+		bindableEvent:Fire()
 	end
-	function addToDisplayStack(p3) -- line: 96
-		-- upvalues: t2 (copy), createContainer (copy), t1 (copy), BindableEvent (copy)
-		local v33 = nil
 
-		if #t2 > 0 then
-			v33 = t2[#t2]
+	function addToDisplayStack(state)
+		local v
+
+		if #states > 0 then
+			v = states[#states]
 		end
 
-		t2[#t2 + 1] = p3
+		states[#states + 1] = state
 
-		local n2 = 0
+		local v2 = not v and 0 or v.AbsolutePosition.Y + v.AbsoluteSize.Y + 4
 
-		if v33 then
-			n2 = v33.AbsolutePosition.Y + v33.AbsoluteSize.Y + 4
-		end
+		state.Position = UDim2.new(state.Position.X.Scale, state.Position.X.Offset, state.Position.Y.Scale, v2)
 
-		p3.Position = UDim2.new(p3.Position.X.Scale, p3.Position.X.Offset, p3.Position.Y.Scale, n2)
 		createContainer()
-		p3.Parent = t1.Container
-		p3.Changed:connect(function(p4) -- line: 114
-			-- upvalues: p3 (copy)
-			if p4 == "Visible" then
-				if not p3.Visible then
-					removeFromDisplayStack(p3)
+		state.Parent = module.Container
 
-					return
+		state.Changed:connect(function(p)
+			if p == "Visible" then
+				if state.Visible then
+					addBackToDisplayStack(state)
+				else
+					removeFromDisplayStack(state)
 				end
-
-				addBackToDisplayStack(p3)
 			end
 		end)
-		BindableEvent:Fire()
+		bindableEvent:Fire()
 	end
-	function t1.CreateHealthBar(_) -- line: 126
-		-- upvalues: t1 (copy), Create (copy), color3 (copy), createContainer (copy), BindableEvent2 (copy)
-		t1.HealthContainer = Create("Frame")({
+
+	function module:CreateHealthBar()
+		module.HealthContainer = Create("Frame")({
 			Name = "HealthContainer",
-			BorderSizePixel = 0,
-			BackgroundTransparency = 0.5,
 			Size = UDim2.new(1, -86, 0, 50),
 			Position = UDim2.new(0, 92, 0, 0),
-			BackgroundColor3 = Color3.new(0, 0, 0)
+			BorderSizePixel = 0,
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			BackgroundTransparency = 0.5
 		})
 
-		local v36 = Create("Frame")({
+		local parent = Create("Frame")({
 			Name = "HealthFillHolder",
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
 			Size = UDim2.new(1, -10, 1, -10),
 			Position = UDim2.new(0, 5, 0, 5),
-			BackgroundColor3 = Color3.new(1, 1, 1),
-			Parent = t1.HealthContainer
-		})
-		local v37 = Create("Frame")({
-			Name = "HealthFill",
 			BorderSizePixel = 0,
-			BackgroundTransparency = 0,
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = 1,
+			Parent = module.HealthContainer
+		})
+
+		local v = Create("Frame")({
+			Name = "HealthFill",
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0, 0, 0, 0),
-			BackgroundColor3 = color3,
-			Parent = v36
+			BorderSizePixel = 0,
+			BackgroundTransparency = 0,
+			BackgroundColor3 = color,
+			Parent = parent
 		})
 
 		Create("TextLabel")({
 			Name = "HealthText",
-			BackgroundTransparency = 0.5,
-			Text = "Health",
-			BorderSizePixel = 0,
 			Size = UDim2.new(0, 98, 0, 50),
 			Position = UDim2.new(0, -100, 0, 0),
+			BackgroundTransparency = 0.5,
 			BackgroundColor3 = Color3.new(0, 0, 0),
 			Font = Enum.Font.SourceSans,
 			FontSize = Enum.FontSize.Size36,
+			Text = "Health",
 			TextColor3 = Color3.new(1, 1, 1),
-			Parent = t1.HealthContainer
+			BorderSizePixel = 0,
+			Parent = module.HealthContainer
 		})
 
-		local v38 = Create("TextLabel")({
-			Visible = false
-		})
-		local v39 = Create("TextLabel")({
-			Visible = false
-		})
+		local v2 = Create("TextLabel")({ Visible = false })
 
-		addToDisplayStack(t1.HealthContainer)
+		local v3 = Create("TextLabel")({ Visible = false })
+
+		addToDisplayStack(module.HealthContainer)
 		createContainer()
-		t1.HealthContainer.Changed:connect(function() -- line: 181
-			-- upvalues: BindableEvent2 (copy)
-			BindableEvent2:Fire()
+
+		module.HealthContainer.Changed:connect(function()
+			bindableEvent2:Fire()
 		end)
 
-		return t1.Container, v38, t1.HealthContainer, v37, v39
+		return module.Container, v2, module.HealthContainer, v, v3
 	end
-	function t1.CreateAccountType(_, p7) -- line: 188
-		-- upvalues: t1 (copy), Create (copy), RobloxGui (copy)
-		t1.AccountTypeContainer = Create("Frame")({
+
+	function module:CreateAccountType(text)
+		module.AccountTypeContainer = Create("Frame")({
 			Name = "AccountTypeContainer",
-			BorderSizePixel = 0,
-			BackgroundTransparency = 0.5,
 			Size = UDim2.new(0, 50, 0, 50),
 			Position = UDim2.new(1, -55, 0, 10),
+			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(0, 0, 0),
+			BackgroundTransparency = 0.5,
 			Parent = RobloxGui
 		})
+
 		Create("TextLabel")({
 			Name = "AccountTypeText",
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0, 0, 0, 0),
+			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.new(0, 0, 0),
 			Font = Enum.Font.SourceSans,
 			FontSize = Enum.FontSize.Size36,
-			Text = p7,
+			Text = text,
 			TextColor3 = Color3.new(1, 1, 1),
-			Parent = t1.AccountTypeContainer,
+			BorderSizePixel = 0,
+			Parent = module.AccountTypeContainer,
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextYAlignment = Enum.TextYAlignment.Center
 		})
 	end
-	function t1.SetupTopStat(_) -- line: 216
-		-- upvalues: Create (copy), Players (copy)
-		local u43 = true
-		local u44 = nil
-		local u45 = nil
-		local u46 = nil
-		local u47 = nil
-		local u48 = nil
 
-		local function makeTenFootInterfaceStat() -- line: 224
-			-- upvalues: u48 (ref), Create (copy)
-			if u48 then
+	function module:SetupTopStat()
+		local v = true
+		local v2 = nil
+		local changedConnection = nil
+		local ancestryChangedConnection = nil
+		local childAddedConnection = nil
+		local parent = nil
+
+		local function makeTenFootInterfaceStat()
+			if parent then
 				return
 			end
 
-			u48 = Create("Frame")({
+			parent = Create("Frame")({
 				Name = "OneStatFrame",
-				BorderSizePixel = 0,
-				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 0, 36),
-				Position = UDim2.new(0, 0, 0, 0)
+				Position = UDim2.new(0, 0, 0, 0),
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1
 			})
 
-			local v56 = Create("TextLabel")({
+			local statValue = Create("TextLabel")({
 				Name = "StatName",
-				BackgroundTransparency = 1,
-				TextStrokeTransparency = 0,
-				Text = " StatName:",
-				BorderSizePixel = 0,
-				ClipsDescendants = true,
 				Size = UDim2.new(0.5, 0, 0, 36),
+				BackgroundTransparency = 1,
 				Font = Enum.Font.SourceSans,
 				FontSize = Enum.FontSize.Size36,
-				TextStrokeColor3 = Color3.new(0.40784313725490196, 0.40784313725490196, 0.40784313725490196),
+				TextStrokeColor3 = Color3.new(104 / 255, 104 / 255, 104 / 255),
+				TextStrokeTransparency = 0,
+				Text = " StatName:",
 				TextColor3 = Color3.new(1, 1, 1),
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Parent = u48
+				BorderSizePixel = 0,
+				ClipsDescendants = true,
+				Parent = parent
 			}):clone()
+			statValue.Position = UDim2.new(0.5, 0, 0, 0)
+			statValue.Name = "StatValue"
+			statValue.Text = "123,643,231"
+			statValue.TextXAlignment = Enum.TextXAlignment.Right
+			statValue.Parent = parent
 
-			v56.Position = UDim2.new(0.5, 0, 0, 0)
-			v56.Name = "StatValue"
-			v56.Text = "123,643,231"
-			v56.TextXAlignment = Enum.TextXAlignment.Right
-			v56.Parent = u48
-			addToDisplayStack(u48)
+			addToDisplayStack(parent)
 		end
 
-		local updateTenFootStat = nil
+		local updateTenFootStat
 
-		local function setDisplayedStat(p9) -- line: 261
-			-- upvalues: u45 (ref), u46 (ref), u44 (ref), makeTenFootInterfaceStat (copy), updateTenFootStat (ref)
-			if u45 then
-				u45:disconnect()
-				u45 = nil
+		local function setDisplayedStat(p)
+			if changedConnection then
+				changedConnection:disconnect()
+				changedConnection = nil
 			end
 
-			if u46 then
-				u46:disconnect()
-				u46 = nil
+			if ancestryChangedConnection then
+				ancestryChangedConnection:disconnect()
+				ancestryChangedConnection = nil
 			end
 
-			u44 = p9
+			v2 = p
 
-			if u44 then
+			if v2 then
 				makeTenFootInterfaceStat()
-				updateTenFootStat(u44)
-				u46 = u44.AncestryChanged:connect(function() -- line: 276
-					-- upvalues: updateTenFootStat (ref), u44 (ref)
-					updateTenFootStat(u44, "Parent")
+				updateTenFootStat(v2)
+				ancestryChangedConnection = v2.AncestryChanged:connect(function()
+					updateTenFootStat(v2, "Parent")
 				end)
-				u45 = u44.Changed:connect(function(p10) -- line: 277
-					-- upvalues: updateTenFootStat (ref), u44 (ref)
-					updateTenFootStat(u44, p10)
+				changedConnection = v2.Changed:connect(function(p2)
+					updateTenFootStat(v2, p2)
 				end)
 			end
 		end
 
-		function updateTenFootStat(p11, p12) -- line: 281
-			-- upvalues: u48 (ref), setDisplayedStat (copy), u43 (ref)
-			if p12 and p12 == "Parent" then
-				u48.StatName.Text = ""
-				u48.StatValue.Text = ""
+		updateTenFootStat = function(p, p2)
+			if p2 and p2 == "Parent" then
+				parent.StatName.Text = ""
+				parent.StatValue.Text = ""
 				setDisplayedStat(nil)
+
 				tenFootInterfaceChanged()
-
-				return
-			end
-
-			if u43 then
-				u48.StatName.Text = " " .. tostring(p11.Name) .. ":"
-				u48.StatValue.Text = tostring(p11.Value)
-
-				return
-			end
-
-			u48.StatName.Text = ""
-			u48.StatValue.Text = ""
-		end
-
-		local function isValidStat(p13) -- line: 299
-			return p13:IsA("StringValue") or (p13:IsA("IntValue") or (p13:IsA("BoolValue") or (p13:IsA("NumberValue") or (p13:IsA("DoubleConstrainedValue") or p13:IsA("IntConstrainedValue")))))
-		end
-		local function tenFootInterfaceNewStat(p14) -- line: 304
-			-- upvalues: u44 (ref), isValidStat (copy), setDisplayedStat (copy)
-			if not u44 and isValidStat(p14) then
-				setDisplayedStat(p14)
+			elseif v then
+				parent.StatName.Text = " " .. tostring(p.Name) .. ":"
+				parent.StatValue.Text = tostring(p.Value)
+			else
+				parent.StatName.Text = ""
+				parent.StatValue.Text = ""
 			end
 		end
 
-		local LocalPlayer = Players.LocalPlayer
+		local function isValidStat(instance)
+			return instance:IsA("StringValue")
+				or instance:IsA("IntValue")
+				or instance:IsA("BoolValue")
+				or instance:IsA("NumberValue")
+				or instance:IsA("DoubleConstrainedValue")
+				or instance:IsA("IntConstrainedValue")
+		end
 
-		while not LocalPlayer do
+		local function tenFootInterfaceNewStat(p) -- 2 equivalent calls inferred from this helper
+			if not v2 and isValidStat(p) then
+				setDisplayedStat(p)
+			end
+		end
+
+		local localPlayer = Players.LocalPlayer
+
+		while not localPlayer do
 			Players.PlayerAdded:wait()
-			LocalPlayer = Players.LocalPlayer
+			localPlayer = Players.LocalPlayer
 		end
 
-		function tenFootInterfaceChanged() -- line: 316
-			-- upvalues: LocalPlayer (ref), u44 (ref), isValidStat (copy), setDisplayedStat (copy), u47 (ref)
-			local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+		function tenFootInterfaceChanged()
+			local leaderstats = localPlayer:FindFirstChild("leaderstats")
 
 			if leaderstats then
 				local children = leaderstats:GetChildren()
 
 				for i = 1, #children do
-					local v65 = children[i]
-
-					if not u44 and isValidStat(v65) then
-						setDisplayedStat(v65)
-					end
+					tenFootInterfaceNewStat(children[i]) -- inferred equivalent call
 				end
 
-				if u47 then
-					u47:disconnect()
+				if childAddedConnection then
+					childAddedConnection:disconnect()
 				end
 
-				u47 = leaderstats.ChildAdded:connect(function(p15) -- line: 324
-					-- upvalues: u44 (ref), isValidStat (copy), setDisplayedStat (copy)
-					if not u44 and isValidStat(p15) then
-						setDisplayedStat(p15)
-					end
+				childAddedConnection = leaderstats.ChildAdded:connect(function(p)
+					tenFootInterfaceNewStat(p) -- inferred equivalent call
 				end)
 			end
 		end
 
-		if LocalPlayer:FindFirstChild("leaderstats") then
+		if localPlayer:FindFirstChild("leaderstats") then
 			tenFootInterfaceChanged()
 		else
-			LocalPlayer.ChildAdded:connect(tenFootInterfaceChanged)
+			localPlayer.ChildAdded:connect(tenFootInterfaceChanged)
 		end
 
 		return {
-			SetTopStatEnabled = function(_, p17) -- line: 341
-				-- upvalues: u43 (ref), u44 (ref), updateTenFootStat (ref)
-				u43 = p17
+			SetTopStatEnabled = function(_, p)
+				v = p
 
-				if u44 then
-					updateTenFootStat(u44, "")
+				if v2 then
+					updateTenFootStat(v2, "")
 				end
 			end
 		}
 	end
 
-	return t1
+	return module
 end
 
-local t3 = {}
-local v10 = CreateModule()
+local module = CreateModule()
+local TenFootInterface = {}
 
-function t3.IsEnabled(_) -- line: 361
-	-- upvalues: v7 (copy)
-	return v7
-end
-function t3.CreateHealthBar(_) -- line: 365
-	-- upvalues: v10 (copy)
-	return v10:CreateHealthBar()
-end
-function t3.CreateAccountType(_, p21) -- line: 369
-	-- upvalues: v10 (copy)
-	return v10:CreateAccountType(p21)
-end
-function t3.SetupTopStat(_) -- line: 373
-	-- upvalues: v10 (copy)
-	return v10:SetupTopStat()
+function TenFootInterface.IsEnabled(_)
+	return tenFootInterface
 end
 
-return t3
+function TenFootInterface:CreateHealthBar()
+	return module:CreateHealthBar()
+end
+
+function TenFootInterface:CreateAccountType(p)
+	return module:CreateAccountType(p)
+end
+
+function TenFootInterface:SetupTopStat()
+	return module:SetupTopStat()
+end
+
+return TenFootInterface

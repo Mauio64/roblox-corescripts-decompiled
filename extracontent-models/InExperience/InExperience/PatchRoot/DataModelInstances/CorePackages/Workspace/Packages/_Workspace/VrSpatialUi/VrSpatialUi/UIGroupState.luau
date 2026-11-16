@@ -1,4 +1,1 @@
-return {
-	Default = "Default",
-	GuiToggleAnimation = "GuiToggleAnimation"
-}
+return { Default = "Default", GuiToggleAnimation = "GuiToggleAnimation" }

@@ -1,31 +1,31 @@
 local None = require(script.Parent.Parent.None)
 local copyDeep = require(script.Parent.copyDeep)
-
-local function joinDeep(...) -- line: 5
-	-- upvalues: None (copy), copyDeep (copy), joinDeep (copy)
-	local t1 = {}
+local function joinDeep(...)
+	local result = {}
 
 	for i = 1, select("#", ...) do
-		local v6 = select(i, ...)
+		local v = select(i, ...)
 
-		if v6 then
-			for k, v in pairs(v6) do
-				if v == None then
-					t1[k] = nil
-				elseif type(v) == "table" then
-					if t1[k] == nil or type(t1[k] ~= "table") then
-						t1[k] = copyDeep(v)
-					else
-						t1[k] = joinDeep(t1[k], v)
-					end
+		if not v then
+			continue
+		end
+
+		for k, v2 in pairs(v) do
+			if v2 == None then
+				result[k] = nil
+			elseif type(v2) == "table" then
+				if result[k] == nil or type(result[k] ~= "table") then
+					result[k] = copyDeep(v2)
 				else
-					t1[k] = v
+					result[k] = joinDeep(result[k], v2)
 				end
+			else
+				result[k] = v2
 			end
 		end
 	end
 
-	return t1
+	return result
 end
 
 return joinDeep

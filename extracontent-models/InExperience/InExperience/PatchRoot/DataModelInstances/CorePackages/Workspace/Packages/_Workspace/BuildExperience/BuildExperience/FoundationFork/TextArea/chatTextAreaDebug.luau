@@ -1,26 +1,24 @@
-local u1 = false
+local v = false
+local ChatTextAreaDebug = {}
 
-return {
-	setEnabled = function(b1: boolean) -- line: 6
-		-- upvalues: u1 (ref)
-		u1 = b1
-	end,
-	isEnabled = function() -- line: 10
-		-- upvalues: u1 (ref)
-		return u1
-	end,
-	log = function(s1: string, s2: string?) -- line: 14
-		-- upvalues: u1 (ref)
-		if not u1 then
-			return
-		end
+function ChatTextAreaDebug.setEnabled(flag: boolean)
+	v = flag
+end
 
-		if s2 then
-			print(`[ChatTextArea] { s1 } | { s2 }`)
+function ChatTextAreaDebug.isEnabled()
+	return v
+end
 
-			return
-		end
-
-		print(`[ChatTextArea] { s1 }`)
+function ChatTextAreaDebug.log(p: string, p2: string?)
+	if not v then
+		return
 	end
-}
+
+	if p2 then
+		print(`[ChatTextArea] {p} | {p2}`)
+	else
+		print(`[ChatTextArea] {p}`)
+	end
+end
+
+return ChatTextAreaDebug

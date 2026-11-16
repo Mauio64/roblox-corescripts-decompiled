@@ -1,17 +1,15 @@
-local ParentParent = script.Parent.Parent.Parent
-
-require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+require(parent.LuauPolyfill)
 
 return {
-	printPathArray = function(p1) -- line: 15
-		local t1 = {}
+	printPathArray = function(list)
+		local v = {}
 
-		for i = 1, #p1 do
-			local v5 = p1[i]
-
-			t1[i] = typeof(v5) == "number" and "[" .. tostring(v5) .. "]" or "." .. v5
+		for i = 1, #list do
+			local item = list[i]
+			v[i] = typeof(item) == "number" and "[" .. tostring(item) .. "]" or "." .. item
 		end
 
-		return table.concat(t1, "")
+		return table.concat(v, "")
 	end
 }

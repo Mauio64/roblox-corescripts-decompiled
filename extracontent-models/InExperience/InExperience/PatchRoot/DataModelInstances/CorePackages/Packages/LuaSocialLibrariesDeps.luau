@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.LuaSocialLibrariesDeps.LuaSocialLibrariesDeps))
+local LuaSocialLibrariesDeps = require(index.LuaSocialLibrariesDeps.LuaSocialLibrariesDeps)
+
+return LuaSocialLibrariesDeps

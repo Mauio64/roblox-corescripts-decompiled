@@ -1,18 +1,15 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local getExpectedPartSize = require(parent.util.getExpectedPartSize)
 
-local getExpectedPartSize = require(ParentParent.util.getExpectedPartSize)
+return function(items, callback, p)
+	local result = {}
 
-return function(t1: {[any]: any}, p1: ((...any) -> ...any), p2) -- line: 10
-	-- upvalues: getExpectedPartSize (copy)
-	local t2 = {}
-
-	for _, v8 in t1 do
-		local v9 = p1(v8)
-
-		t2[v8] = getExpectedPartSize(v9, p2) / getExpectedPartSize(v9, p2, true)
+	for _, item in items do
+		local v = callback(item)
+		result[item] = getExpectedPartSize(v, p) / getExpectedPartSize(v, p, true)
 	end
 
-	return t2
+	return result
 end

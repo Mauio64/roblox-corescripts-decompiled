@@ -1,36 +1,34 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
-
-local function equal(p1, p2) -- line: 12
-	-- upvalues: Array (copy), Object (copy), equal (copy)
-	if typeof(p1) ~= typeof(p2) then
+local function equal(value, list)
+	if typeof(value) ~= typeof(list) then
 		return false
 	end
 
-	if p1 == p2 then
+	if value == list then
 		return true
 	end
 
-	if typeof(p1) == "table" then
-		if Array.isArray(p1) and not Array.isArray(p2) then
+	if typeof(value) == "table" then
+		if Array.isArray(value) and not Array.isArray(list) then
 			return false
 		end
 
-		if #p1 ~= #p2 or #Object.keys(p1) ~= #Object.keys(p2) then
+		if #value ~= #list or #Object.keys(value) ~= #Object.keys(list) then
 			return false
 		end
 
-		if Array.isArray(p1) then
-			for i, _ in ipairs(p1) do
-				if not equal(p1[i], p2[i]) then
+		if Array.isArray(value) then
+			for i, _ in ipairs(value) do
+				if not equal(value[i], list[i]) then
 					return false
 				end
 			end
 		else
-			for k in pairs(p1) do
-				if not equal(p1[tostring(k)], p2[tostring(k)]) then
+			for k in pairs(value) do
+				if not equal(value[tostring(k)], list[tostring(k)]) then
 					return false
 				end
 			end
@@ -39,21 +37,24 @@ local function equal(p1, p2) -- line: 12
 		return true
 	end
 
-	if typeof(p1) == "string" or typeof(p1) == "number" or typeof(p1) == "boolean" then
-		return p1 == p2
+	if typeof(value) == "string" or typeof(value) == "number" or typeof(value) == "boolean" then
+		return value == list
 	end
 
-	if typeof(p1) == "function" then
-		return debug.info(p1, "n") == debug.info(p2, "n") and (debug.info(p1, "s") == debug.info(p2, "s") and (debug.info(p1, "l") == debug.info(p2, "l") and debug.info(p1, "a") == debug.info(p2, "a")))
+	if typeof(value) == "function" then
+		return debug.info(value, "n") == debug.info(list, "n")
+			and debug.info(value, "s") == debug.info(list, "s")
+			and debug.info(value, "l") == debug.info(list, "l")
+			and debug.info(value, "a") == debug.info(list, "a")
 	end
 
-	if typeof(p1) == "thread" then
+	if typeof(value) == "thread" then
 		error("unhandled equality check for type 'thread'")
-	elseif typeof(p1) == "userdata" then
+	elseif typeof(value) == "userdata" then
 		error("unhandled equality check for type 'userdata'")
 	end
 
-	error("unhandled equality check for type " .. typeof(p1))
+	error("unhandled equality check for type " .. typeof(value))
 end
 
 return equal

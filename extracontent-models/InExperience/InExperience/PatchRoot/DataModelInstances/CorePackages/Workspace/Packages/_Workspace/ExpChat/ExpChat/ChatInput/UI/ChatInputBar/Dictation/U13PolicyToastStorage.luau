@@ -1,21 +1,21 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
+
 local perUserAppStorage = require(ExpChat.Utils.perUserAppStorage)
+local U13PolicyToastStorage = {}
 
-return {
-	hasBeenShown = function() -- line: 11
-		-- upvalues: perUserAppStorage (copy)
-		return perUserAppStorage.getEntry("ExpChatDictationU13PolicyToast").shown == true
-	end,
-	markShown = function() -- line: 16
-		-- upvalues: perUserAppStorage (copy)
-		perUserAppStorage.updateEntry("ExpChatDictationU13PolicyToast", function(t1: {[any]: any}) -- line: 17
-			if t1.shown == true then
-				return nil
-			end
+function U13PolicyToastStorage.hasBeenShown(): boolean
+	return perUserAppStorage.getEntry("ExpChatDictationU13PolicyToast").shown == true
+end
 
-			t1.shown = true
+function U13PolicyToastStorage.markShown()
+	perUserAppStorage.updateEntry("ExpChatDictationU13PolicyToast", function(p)
+		if p.shown == true then
+			return nil
+		end
 
-			return t1
-		end)
-	end
-}
+		p.shown = true
+		return p
+	end)
+end
+
+return U13PolicyToastStorage

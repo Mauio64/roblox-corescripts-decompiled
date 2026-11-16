@@ -1,1 +1,3 @@
-return require(script.makeConsoleImpl)()
+local makeConsoleImpl = require(script.makeConsoleImpl)
+
+return makeConsoleImpl()

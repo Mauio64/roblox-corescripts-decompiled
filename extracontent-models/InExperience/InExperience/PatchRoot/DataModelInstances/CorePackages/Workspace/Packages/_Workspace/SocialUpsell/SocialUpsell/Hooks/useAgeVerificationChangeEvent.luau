@@ -1,21 +1,19 @@
 local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
-local SocialUpsellParent = SocialUpsell.Parent
-local React = require(SocialUpsellParent.React)
+local parent = SocialUpsell.Parent
+
+local React = require(parent.React)
+
 local GetAgeVerifiedChangedSignal = require(SocialUpsell.Signals.GetAgeVerifiedChangedSignal)
 
-return function(p1: ((...any) -> ...any)?) -- line: 8
-	-- upvalues: React (copy), GetAgeVerifiedChangedSignal (copy)
-	React.useEffect(function() -- line: 9
-		-- upvalues: GetAgeVerifiedChangedSignal (copy), p1 (copy)
-		local v6 = GetAgeVerifiedChangedSignal()
+return function(callback): nil
+	React.useEffect(function()
+		local ageVerifiedChangedSignal = GetAgeVerifiedChangedSignal()
 
-		if p1 then
-			v6:connect(p1)
+		if callback then
+			ageVerifiedChangedSignal:connect(callback)
 		end
 
-		return function() -- line: 15
-		end
-	end, { p1 })
-
+		return function() end
+	end, { callback })
 	return nil
 end

@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("InExperienceIntervention").Parent
-
-require(Parent.InterventionShared)
+local parent = script:FindFirstAncestor("InExperienceIntervention").Parent
+require(parent.InterventionShared)
 
 return {}

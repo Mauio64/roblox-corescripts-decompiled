@@ -1,38 +1,30 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-require(Parent.Signals)
+require(parent.Signals)
+local SignalsUtils = require(parent.SignalsUtils)
+local createSessionScopedSignal = SignalsUtils.createSessionScopedSignal
 
-local createSessionScopedSignal = require(Parent.SignalsUtils).createSessionScopedSignal
-
-local function createVersionInformationStore() -- line: 20
-	-- upvalues: createSessionScopedSignal (copy)
-	local v4, v5 = createSessionScopedSignal(function() -- line: 22
+local function createVersionInformationStore()
+	local sessionScopedSignal, v = createSessionScopedSignal(function(): nil
 		return nil
 	end)
 
-	local function saveDraft(n1: number, s1: string, s2: string) -- line: 27
-		-- upvalues: v5 (copy)
-		v5({
-			placeId = n1,
-			title = s1,
-			description = s2
-		})
+	local function saveDraft(placeId: number, title: string, description: string)
+		v({ placeId = placeId, title = title, description = description })
 	end
 
 	return {
-		getDraft = v4,
+		getDraft = sessionScopedSignal,
 		setDraft = saveDraft,
-		clearDraft = function(n2: number) -- line: 35
-			-- upvalues: v4 (copy), v5 (copy)
-			local v11 = v4()
+		clearDraft = function(p: number)
+			local v2 = sessionScopedSignal()
 
-			if v11 ~= nil and n2 == v11.placeId then
-				v5(nil)
+			if v2 ~= nil and v2.placeId == p then
+				v(nil)
 			end
 		end,
-		reset = function() -- line: 42
-			-- upvalues: v5 (copy)
-			v5(nil)
+		reset = function()
+			v(nil)
 		end
 	}
 end

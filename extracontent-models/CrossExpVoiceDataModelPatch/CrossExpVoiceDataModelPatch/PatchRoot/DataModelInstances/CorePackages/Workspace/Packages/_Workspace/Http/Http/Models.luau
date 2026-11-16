@@ -1,3 +1,1 @@
-return {
-	Thumbnail = require(script.Thumbnail)
-}
+return { Thumbnail = require(script.Thumbnail) }

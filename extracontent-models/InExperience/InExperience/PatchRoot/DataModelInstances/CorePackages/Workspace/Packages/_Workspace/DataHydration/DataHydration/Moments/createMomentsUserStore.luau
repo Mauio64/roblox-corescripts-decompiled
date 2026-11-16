@@ -1,159 +1,191 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
+
 local HttpService = game:GetService("HttpService")
-local Promise = require(DataHydrationParent.Promise)
-local HttpClient = require(DataHydrationParent.HttpClient)
+
+local Promise = require(parent.Promise)
+local HttpClient = require(parent.HttpClient)
+local Signals = require(parent.Signals)
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
 require(script.Parent.MomentsStoreTypes)
-
 local fetchUserMoments = require(script.Parent.Requests.fetchUserMoments)
-local FFlagProfileMomentsOrderingAndReactions = require(DataHydrationParent.SharedFlags).FFlagProfileMomentsOrderingAndReactions
 
-local function paramsKey(n1: number, s1: string?) -- line: 28
-	-- upvalues: HttpService (copy)
+local function paramsKey(targetUserId: number, value: string?) -- 2 equivalent calls inferred from this helper
 	return HttpService:JSONEncode({
-		targetUserId = n1,
-		hasCursor = s1 ~= nil,
-		cursor = s1 or ""
+		targetUserId = targetUserId,
+		hasCursor = value ~= nil,
+		cursor = value or ""
 	})
 end
-local function createMomentsUserStore(p1) -- line: 36
-	-- upvalues: createDataCache (copy), createDataResolver (copy), Promise (copy), HttpClient (copy), fetchUserMoments (copy), HttpService (copy), FFlagProfileMomentsOrderingAndReactions (copy)
-	local v15 = p1 or {}
-	local t1 = {}
-	local t2 = {}
-	local v18 = createDataCache()
-	local v19 = createDataResolver({
+
+local function createMomentsUserStore(options)
+	local v = options or {}
+	local v2 = {}
+
+	local v3 = {}
+
+	local v4 = {}
+	local dataResolver = createDataResolver({
+		cache = createDataCache(),
 		supportsMultiGet = false,
 		replaceItems = true,
-		cache = v18,
-		fetchFn = function(s2: string, _) -- line: 46
-			-- upvalues: t1 (ref), Promise (copy), HttpClient (copy), fetchUserMoments (copy), v15 (copy)
-			local v24 = t1[s2]
+		fetchFn = function(p: string, _)
+			local v5 = v2[p]
 
-			if v24 == nil then
-				return Promise.reject(`Missing user moments request params for { s2 }`)
+			if v5 == nil then
+				return Promise.reject(`Missing user moments request params for {p}`)
 			end
 
-			return HttpClient.asPromise(fetchUserMoments(v24.targetUserId, v24.cursor, v15.network))
+			return HttpClient.asPromise(fetchUserMoments(v5.targetUserId, v5.cursor, v.network))
 		end
 	})
 
-	local function setParams(n2: number, s3: string?) -- line: 55
-		-- upvalues: HttpService (copy), t1 (ref)
-		local json = HttpService:JSONEncode({
-			targetUserId = n2,
-			hasCursor = s3 ~= nil,
-			cursor = s3 or ""
-		})
+	local function setParams(targetUserId: number, cursor: string?) -- 3 equivalent calls inferred from this helper
+		local v5 = paramsKey(targetUserId, cursor) -- inferred equivalent call
+		v2[v5] = { targetUserId = targetUserId, cursor = cursor }
 
-		t1[json] = {
-			targetUserId = n2,
-			cursor = s3
-		}
-
-		return json
+		return v5
 	end
-	local function fetchUserMomentsItem(n3: number, s4: string?) -- line: 71
-		-- upvalues: v19 (copy), HttpService (copy), t1 (ref)
-		local fetchItem = v19.fetchItem
-		local json = HttpService:JSONEncode({
-			targetUserId = n3,
-			hasCursor = s4 ~= nil,
-			cursor = s4 or ""
-		})
 
-		t1[json] = {
-			targetUserId = n3,
-			cursor = s4
-		}
+	local function getCachedUserMoments(targetUserId: number, cursor: string?)
+		return dataResolver.getCachedItem(setParams(targetUserId, cursor)) -- inferred equivalent call
+	end
 
-		return fetchItem(json)
+	local function fetchUserMomentsItem(targetUserId: number, cursor: string?)
+		return dataResolver.fetchItem(setParams(targetUserId, cursor)) -- inferred equivalent call
+	end
+
+	local function getAndFetchUserMoments(targetUserId: number, cursor: string?)
+		return dataResolver.getAndFetchItem(setParams(targetUserId, cursor)) -- inferred equivalent call
+	end
+
+	local function getUserMoments(targetUserId: number, value: string?)
+		local v5 = paramsKey(targetUserId, value) -- inferred equivalent call
+		local v6 = v3[v5]
+
+		if v6 ~= nil then
+			return v6
+		end
+
+		local promise = HttpClient.asPromise(fetchUserMoments(targetUserId, value, v.network))
+		v3[v5] = promise
+		v4[v5] = targetUserId
+		promise:catch(function()
+			v3[v5] = nil
+			v4[v5] = nil
+		end)
+		return promise
+	end
+
+	local signal, v5 = Signals.createSignal(0)
+
+	local signal2, v6 = Signals.createSignal({})
+
+	local function evictUserMoments(p: number) -- 1 equivalent call inferred from this helper
+		for k, v7 in v4 do
+			if v7 ~= p then
+				continue
+			end
+
+			v3[k] = nil
+			v4[k] = nil
+		end
 	end
 
 	return {
-		getUserMoments = function(n4: number, s5: string?) -- line: 85
-			-- upvalues: FFlagProfileMomentsOrderingAndReactions (copy), HttpClient (copy), fetchUserMoments (copy), v15 (copy), HttpService (copy), t2 (ref)
-			if not FFlagProfileMomentsOrderingAndReactions then
-				return HttpClient.asPromise(fetchUserMoments(n4, s5, v15.network))
-			end
-
-			local json = HttpService:JSONEncode({
-				targetUserId = n4,
-				hasCursor = s5 ~= nil,
-				cursor = s5 or ""
-			})
-			local v43 = t2[json]
-
-			if v43 ~= nil then
-				return v43
-			end
-
-			local v44 = HttpClient.asPromise(fetchUserMoments(n4, s5, v15.network))
-
-			t2[json] = v44
-			v44:catch(function() -- line: 96
-				-- upvalues: t2 (ref), json (copy)
-				t2[json] = nil
-			end)
-
-			return v44
+		getUserMoments = getUserMoments,
+		getFreshUserMoments = function(p: number, p2: string?)
+			return HttpClient.asPromise(fetchUserMoments(p, p2, v.network))
 		end,
-		getCachedUserMoments = function(n5: number, s6: string?) -- line: 64
-			-- upvalues: v19 (copy), HttpService (copy), t1 (ref)
-			local getCachedItem = v19.getCachedItem
-			local json = HttpService:JSONEncode({
-				targetUserId = n5,
-				hasCursor = s6 ~= nil,
-				cursor = s6 or ""
-			})
-
-			t1[json] = {
-				targetUserId = n5,
-				cursor = s6
-			}
-
-			return getCachedItem(json)
-		end,
+		getCachedUserMoments = getCachedUserMoments,
 		fetchUserMoments = fetchUserMomentsItem,
-		getAndFetchUserMoments = function(n6: number, s7: string?) -- line: 78
-			-- upvalues: v19 (copy), HttpService (copy), t1 (ref)
-			local getAndFetchItem = v19.getAndFetchItem
-			local json = HttpService:JSONEncode({
-				targetUserId = n6,
-				hasCursor = s7 ~= nil,
-				cursor = s7 or ""
-			})
-
-			t1[json] = {
-				targetUserId = n6,
-				cursor = s7
-			}
-
-			return getAndFetchItem(json)
+		getAndFetchUserMoments = getAndFetchUserMoments,
+		evictUserMoments = evictUserMoments,
+		invalidateUser = function(p: number)
+			evictUserMoments(p) -- inferred equivalent call
+			v5(signal(false) + 1)
 		end,
-		clear = function() -- line: 102
-			-- upvalues: t1 (ref), FFlagProfileMomentsOrderingAndReactions (copy), t2 (ref), v19 (copy)
-			t1 = {}
+		getUserMomentsVersion = signal,
+		getPendingUserMoments = signal2,
+		prependPendingUserMoment = function(p: number, moment)
+			local clone = table.clone(signal2(false))
+			local clone2 = table.clone(clone[p] or {})
+			table.insert(clone2, 1, { moment = moment })
+			clone[p] = clone2
+			v6(clone)
+		end,
+		removePendingUserMoment = function(p: number, p2: string)
+			local clone = table.clone(signal2(false))
+			local v7 = clone[p]
 
-			if FFlagProfileMomentsOrderingAndReactions then
-				t2 = {}
+			if v7 == nil then
+				return
 			end
 
-			v19.clear()
-		end,
-		dispose = function() -- line: 110
-			-- upvalues: t1 (ref), FFlagProfileMomentsOrderingAndReactions (copy), t2 (ref), v19 (copy)
-			t1 = {}
+			local v8 = {}
 
-			if FFlagProfileMomentsOrderingAndReactions then
-				t2 = {}
+			for _, v9 in v7 do
+				if v9.moment.momentId ~= p2 then
+					table.insert(v8, v9)
+				end
 			end
 
-			v19.dispose()
+			if not (#v8 > 0) then
+				v8 = nil
+			end
+
+			clone[p] = v8
+			v6(clone)
+		end,
+		resolvePendingUserMoment = function(p: number, p2: string, publishedMoment2): boolean
+			local clone = table.clone(signal2(false))
+			local v7 = clone[p] or {}
+
+			local feedItemId = publishedMoment2.recommendationMetadata.feedItemId
+			local v8 = nil
+
+			for k, v9 in v7 do
+				if v9.moment.momentId == p2 then
+					v8 = k
+				elseif v9.publishedMoment ~= nil then
+					local publishedMoment = v9.publishedMoment
+
+					if
+						publishedMoment.momentId == publishedMoment2.momentId
+						or feedItemId ~= nil
+						and feedItemId ~= ""
+						and publishedMoment.recommendationMetadata.feedItemId == feedItemId
+					then
+						return false
+					end
+				end
+			end
+
+			if v8 == nil then
+				return false
+			end
+
+			local clone2 = table.clone(v7)
+			clone2[v8] = { moment = v7[v8].moment, publishedMoment = publishedMoment2 }
+			clone[p] = clone2
+			v6(clone)
+			return true
+		end,
+		clear = function()
+			v6({})
+			v2 = {}
+			v3 = {}
+			v4 = {}
+			dataResolver.clear()
+		end,
+		dispose = function()
+			v6({})
+			v2 = {}
+			v3 = {}
+			v4 = {}
+			dataResolver.dispose()
 		end
 	}
 end

@@ -1,110 +1,167 @@
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local React = require(PeopleReactViewParent.React)
-local Foundation = require(PeopleReactViewParent.Foundation)
-local useLocalization = require(PeopleReactViewParent.Localization).Hooks.useLocalization
-local PeopleService = require(PeopleReactViewParent.PeopleService)
+local parent = PeopleReactView.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local PeopleService = require(parent.PeopleService)
+
 local InputSize = Foundation.Enums.InputSize
 local Popover = Foundation.Popover
-local EnumsRadius = Foundation.Enums.Radius
-local FoundationText = Foundation.Text
+local Radius = Foundation.Enums.Radius
+local Text = Foundation.Text
 local View = Foundation.View
+
 local BaseMenu = Foundation.UNSTABLE.BaseMenu
 local useTokens = Foundation.Hooks.useTokens
-local Flags = Foundation.Utility.Flags
+
 local FFlagVoiceChatVolumePerUserMuteVolumeSync = require(PeopleReactView.Flags.FFlagVoiceChatVolumePerUserMuteVolumeSync)
+
 local FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted = require(PeopleReactView.Flags.FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted)
-local FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry = PeopleService.getService("Flags").FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry
+
+local fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry = PeopleService.getService("Flags").FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry
 local ENTRY_POINT = PeopleService.getService("Constants").ANALYTICS.ENTRY_POINT
+
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
 
-local function VoiceVolumeSlider(t1: {[any]: any}) -- line: 75
-	-- upvalues: useLocalization (copy), FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry (copy), React (copy), PeopleService (copy), FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted (copy), ENTRY_POINT (copy), EngineFeature (copy), RbxAnalyticsService (copy), FFlagVoiceChatVolumePerUserMuteVolumeSync (copy), View (copy), FoundationText (copy), Foundation (copy)
-	local v24 = useLocalization({
-		volumeLabel = "CoreScripts.InGameMenu.GameSettings.Volume"
-	})
-	local u25 = nil
-	local u26 = nil
+local engineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
 
-	if FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
-		u25 = React.useMemo(function() -- line: 83
-			-- upvalues: PeopleService (copy)
+local function VoiceVolumeSlider(props)
+	local v = useLocalization({ volumeLabel = "CoreScripts.InGameMenu.GameSettings.Volume" })
+	local v2, ref
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v2 = React.useMemo(function()
 			return PeopleService.getService("PeopleAnalyticsManager")
 		end, {})
-		u26 = React.useRef(nil)
+		ref = React.useRef(nil)
+	else
+		v2 = nil
+		ref = nil
 	end
 
-	local v27 = FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted and t1.isMutedByLocalUser == true
-	local v28 = React.useRef(false)
-	local v29, v30 = React.useBinding(t1.getPlayerVoiceVolume(t1.userId))
+	local v3 = FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted and props.isMutedByLocalUser == true
 
-	React.useEffect(function() -- line: 95
-		-- upvalues: t1 (copy), v28 (copy), v30 (copy)
-		return t1.subscribePlayerVoiceVolume(t1.userId, function(p1) -- line: 96
-			-- upvalues: v28 (copy), v30 (copy)
-			if not v28.current then
-				v30(p1)
+	local ref2 = React.useRef(false)
+	local v4, v5 = React.useBinding(props.getPlayerVoiceVolume(props.userId))
+
+	React.useEffect(function()
+		return props.subscribePlayerVoiceVolume(props.userId, function(p)
+			if not ref2.current then
+				v5(p)
 			end
 		end)
-	end, {
-		t1.userId,
-		t1.subscribePlayerVoiceVolume
-	})
+	end, { props.userId, props.subscribePlayerVoiceVolume })
 
-	local v31 = React.useCallback(function(n1: number) -- line: 103
-		-- upvalues: v30 (copy), t1 (copy)
-		v30(n1)
-		t1.setPlayerVoiceVolume(t1.userId, n1)
-	end, {
-		t1.userId,
-		t1.setPlayerVoiceVolume
-	})
-	local v32 = React.useCallback(function() -- line: 109
-		-- upvalues: v28 (copy), FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry (copy), u25 (ref), u26 (ref), t1 (copy), ENTRY_POINT (copy)
-		v28.current = true
+	local onValueChanged = React.useCallback(function(p: number)
+		v5(p)
+		props.setPlayerVoiceVolume(props.userId, p)
+	end, { props.userId, props.setPlayerVoiceVolume })
 
-		if FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry and (u25 and u26) then
-			local v45 = if not t1.getPlayerIsLocalMuted then t1.isMutedByLocalUser == true else t1.getPlayerIsLocalMuted(t1.userId)
+	local useCallback = React.useCallback
+	local function fn()
+		ref2.current = true
 
-			u26.current = {
-				oldVolume = t1.getPlayerVoiceVolume(t1.userId),
-				wasMutedAtStart = v45,
+		if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry and v2 and ref then
+			local wasMutedAtStart
+
+			if props.getPlayerIsLocalMuted then
+				wasMutedAtStart = props.getPlayerIsLocalMuted(props.userId)
+			else
+				wasMutedAtStart = props.isMutedByLocalUser == true
+			end
+
+			ref.current = {
+				oldVolume = props.getPlayerVoiceVolume(props.userId),
+				wasMutedAtStart = wasMutedAtStart,
 				startTimestampMs = DateTime.now().UnixTimestampMillis
 			}
-			u25:trackPerUserVoiceVolumeSliderTouch(ENTRY_POINT.PEOPLE_CARD)
+
+			v2:trackPerUserVoiceVolumeSliderTouch(ENTRY_POINT.PEOPLE_CARD)
 		end
-	end, {
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else t1.userId,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else t1.getPlayerVoiceVolume,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else t1.getPlayerIsLocalMuted,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else t1.isMutedByLocalUser,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else u25,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else u26
+	end
+
+	local userId
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		userId = props.userId
+	end
+
+	local getPlayerVoiceVolume
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		getPlayerVoiceVolume = props.getPlayerVoiceVolume
+	end
+
+	local getPlayerIsLocalMuted
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		getPlayerIsLocalMuted = props.getPlayerIsLocalMuted
+	end
+
+	local isMutedByLocalUser
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		isMutedByLocalUser = props.isMutedByLocalUser
+	end
+
+	local v6
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v6 = v2
+	end
+
+	local v7
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v7 = ref
+	end
+
+	local onDragStarted = useCallback(fn, {
+		userId,
+		getPlayerVoiceVolume,
+		getPlayerIsLocalMuted,
+		isMutedByLocalUser,
+		v6,
+		v7
 	})
-	local v33 = React.useCallback(function() -- line: 140
-		-- upvalues: v28 (copy), FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry (copy), u25 (ref), u26 (ref), t1 (copy), EngineFeature (copy), RbxAnalyticsService (copy), ENTRY_POINT (copy), FFlagVoiceChatVolumePerUserMuteVolumeSync (copy), v30 (copy)
-		v28.current = false
 
-		if FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry and (u25 and u26) then
-			local current = u26.current
+	local useCallback2 = React.useCallback
+	local function fn2()
+		ref2.current = false
 
-			u26.current = nil
+		if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry and v2 and ref then
+			local current = ref.current
+			ref.current = nil
 
 			if current then
-				local v47 = t1.getPlayerVoiceVolume(t1.userId)
-				local v48 = if not EngineFeature then nil else RbxAnalyticsService:GetPlaySessionId()
+				local playerVoiceVolume = props.getPlayerVoiceVolume(props.userId)
+				local playSessionId
 
-				u25:trackPerUserVoiceVolumeChanged({
+				if engineFeature then
+					playSessionId = RbxAnalyticsService:GetPlaySessionId()
+				end
+
+				local v8 = {
 					entryPoint = ENTRY_POINT.PEOPLE_CARD,
-					targetUserId = t1.userId,
+					targetUserId = props.userId,
 					oldVolume = current.oldVolume,
-					newVolume = v47,
+					newVolume = playerVoiceVolume,
 					wasMutedAtStart = current.wasMutedAtStart,
-					playSessionId = v48,
-					voiceSessionId = if not t1.getVoiceSessionId then nil else t1.getVoiceSessionId(),
-					dragDurationMs = math.max(0, DateTime.now().UnixTimestampMillis - current.startTimestampMs)
-				})
+					playSessionId = playSessionId,
+					voiceSessionId = 0,
+					dragDurationMs = 0
+				}
+				local voiceSessionId
+
+				if props.getVoiceSessionId then
+					voiceSessionId = props.getVoiceSessionId()
+				end
+
+				v8.voiceSessionId = voiceSessionId
+				v8.dragDurationMs = math.max(0, DateTime.now().UnixTimestampMillis - current.startTimestampMs)
+				v2:trackPerUserVoiceVolumeChanged(v8)
 			end
 		end
 
@@ -112,125 +169,168 @@ local function VoiceVolumeSlider(t1: {[any]: any}) -- line: 75
 			return
 		end
 
-		v30(t1.getPlayerVoiceVolume(t1.userId))
-	end, {
-		t1.userId,
-		t1.getPlayerVoiceVolume,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else t1.getVoiceSessionId,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else u25,
-		if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else u26
-	})
-
-	return React.createElement(View, {
-		tag = "col gap-small size-full-0 auto-y padding-x-medium padding-y-small",
-		LayoutOrder = t1.layoutOrder
-	}, {
-		Title = React.createElement(FoundationText, {
-			Text = v24.volumeLabel,
-			tag = {
-				["auto-xy text-body-medium content-muted"] = v27,
-				["auto-xy text-body-medium content-emphasis"] = not v27
-			}
-		}),
-		VolumeSlider = React.createElement(Foundation.Slider, {
-			isContained = true,
-			step = 0.1,
-			key = if not FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted then nil else not v27 and "enabled" or "disabled",
-			value = v29,
-			range = NumberRange.new(t1.voiceVolumeMin, t1.voiceVolumeMax),
-			knobVisibility = Foundation.Enums.Visibility.Always,
-			width = UDim.new(1, 0),
-			isDisabled = v27,
-			onValueChanged = v31,
-			onDragStarted = v32,
-			onDragEnded = v33
-		})
-	})
-end
-local function CardMenuWithVoiceVolume(t2: {[any]: any}) -- line: 211
-	-- upvalues: useTokens (copy), Flags (copy), React (copy), BaseMenu (copy), View (copy), FoundationText (copy), VoiceVolumeSlider (copy), FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry (copy), Popover (copy), Foundation (copy), EnumsRadius (copy), InputSize (copy)
-	local v35 = useTokens()
-	local Standard = v35.Stroke.Standard
-	local v37 = if not Flags.FoundationBaseMenuBeta then {
-		left = UDim.new(0, v35.Padding.Medium),
-		right = UDim.new(0, v35.Padding.Medium),
-		top = UDim.new(0, v35.Padding.XSmall),
-		bottom = UDim.new(0, v35.Padding.XSmall)
-	} else {
-		left = UDim.new(0, v35.Size.Size_250),
-		right = UDim.new(0, v35.Size.Size_250),
-		top = UDim.new(0, v35.Padding.XSmall),
-		bottom = UDim.new(0, v35.Padding.XSmall)
-	}
-	local t3 = {}
-
-	for v39, v40 in t2.menuGroups do
-		local t4 = {}
-
-		for v42, v43 in v40.items do
-			t4[tostring(v43.id)] = React.createElement(BaseMenu.Item, {
-				LayoutOrder = v42,
-				id = v43.id,
-				text = v43.text,
-				icon = v43.icon,
-				onActivated = v43.onActivated
-			})
-		end
-
-		if v40.title ~= nil then
-			t4.SectionTitle = React.createElement(View, {
-				LayoutOrder = 0,
-				tag = "row align-y-center size-full-0 auto-y",
-				padding = v37
-			}, {
-				Label = React.createElement(FoundationText, {
-					tag = "fill auto-xy text-align-x-left text-truncate-end text-caption-small content-muted",
-					Text = v40.title
-				})
-			})
-		end
-
-		if v40.showVolumeSlider then
-			t4.VoiceVolumeSlider = React.createElement(VoiceVolumeSlider, {
-				userId = t2.userId,
-				voiceVolumeMin = t2.voiceVolumeMin,
-				voiceVolumeMax = t2.voiceVolumeMax,
-				getPlayerVoiceVolume = t2.getPlayerVoiceVolume,
-				subscribePlayerVoiceVolume = t2.subscribePlayerVoiceVolume,
-				setPlayerVoiceVolume = t2.setPlayerVoiceVolume,
-				isMutedByLocalUser = t2.isMutedByLocalUser,
-				getPlayerIsLocalMuted = if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else t2.getPlayerIsLocalMuted,
-				getVoiceSessionId = if not FFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then nil else t2.getVoiceSessionId,
-				layoutOrder = #v40.items + 1
-			})
-		end
-
-		t3[`Group_{ v39 }`] = React.createElement(BaseMenu.Group, {
-			LayoutOrder = v39
-		}, t4)
+		v5(props.getPlayerVoiceVolume(props.userId))
 	end
 
-	return React.createElement(Popover.Root, {
-		testId = "--foundation-menu",
-		isOpen = t2.isOpen
-	}, {
-		Anchor = React.createElement(Popover.Anchor, nil, t2.children),
+	local userId2 = props.userId
+	local getPlayerVoiceVolume2 = props.getPlayerVoiceVolume
+	local getVoiceSessionId
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		getVoiceSessionId = props.getVoiceSessionId
+	end
+
+	local v8
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v8 = v2
+	end
+
+	local v9
+
+	if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+		v9 = ref
+	end
+
+	local onDragEnded = useCallback2(fn2, {
+		userId2,
+		getPlayerVoiceVolume2,
+		getVoiceSessionId,
+		v8,
+		v9
+	})
+
+	return React.createElement(
+		View,
+		{
+			tag = "col gap-small size-full-0 auto-y padding-x-medium padding-y-small",
+			LayoutOrder = props.layoutOrder
+		},
+		{
+			Title = React.createElement(Text, {
+				Text = v.volumeLabel,
+				tag = {
+					["auto-xy text-body-medium content-muted"] = v3,
+					["auto-xy text-body-medium content-emphasis"] = not v3
+				}
+			}),
+			VolumeSlider = React.createElement(Foundation.Slider, {
+				key = FFlagVoiceChatVolumePerUserDisableInteractionWhenMuted and (v3 and "disabled" or "enabled") or nil,
+				value = v4,
+				range = NumberRange.new(props.voiceVolumeMin, props.voiceVolumeMax),
+				knobVisibility = Foundation.Enums.Visibility.Always,
+				isContained = true,
+				step = 0.1,
+				width = UDim.new(1, 0),
+				isDisabled = v3,
+				onValueChanged = onValueChanged,
+				onDragStarted = onDragStarted,
+				onDragEnded = onDragEnded
+			})
+		}
+	)
+end
+
+local function CardMenuWithVoiceVolume(props)
+	local v = useTokens()
+	local standard = v.Stroke.Standard
+	local padding = {
+		left = UDim.new(0, v.Size.Size_250),
+		right = UDim.new(0, v.Size.Size_250),
+		top = UDim.new(0, v.Padding.XSmall),
+		bottom = UDim.new(0, v.Padding.XSmall)
+	}
+
+	local children = {}
+
+	for k, menuGroup in props.menuGroups do
+		local children2 = {}
+
+		for k2, item in menuGroup.items do
+			children2[tostring(item.id)] = React.createElement(BaseMenu.Item, {
+				LayoutOrder = k2,
+				id = item.id,
+				text = item.text,
+				icon = item.icon,
+				onActivated = item.onActivated
+			})
+		end
+
+		if menuGroup.title ~= nil then
+			children2.SectionTitle = React.createElement(
+				View,
+				{
+					LayoutOrder = 0,
+					tag = "row align-y-center size-full-0 auto-y",
+					padding = padding
+				},
+				{
+					Label = React.createElement(Text, {
+						Text = menuGroup.title,
+						tag = "fill auto-xy text-align-x-left text-truncate-end text-caption-small content-muted"
+					})
+				}
+			)
+		end
+
+		if menuGroup.showVolumeSlider then
+			local createElement = React.createElement
+			local v2 = {
+				userId = props.userId,
+				voiceVolumeMin = props.voiceVolumeMin,
+				voiceVolumeMax = props.voiceVolumeMax,
+				getPlayerVoiceVolume = props.getPlayerVoiceVolume,
+				subscribePlayerVoiceVolume = props.subscribePlayerVoiceVolume,
+				setPlayerVoiceVolume = props.setPlayerVoiceVolume,
+				isMutedByLocalUser = props.isMutedByLocalUser,
+				getPlayerIsLocalMuted = 0,
+				getVoiceSessionId = 0,
+				layoutOrder = 0
+			}
+			local getPlayerIsLocalMuted
+
+			if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+				getPlayerIsLocalMuted = props.getPlayerIsLocalMuted
+			end
+
+			v2.getPlayerIsLocalMuted = getPlayerIsLocalMuted
+			local getVoiceSessionId
+
+			if fFlagVoiceVolumeControlsEnablePerUserVolumeInteractionTelemetry then
+				getVoiceSessionId = props.getVoiceSessionId
+			end
+
+			v2.getVoiceSessionId = getVoiceSessionId
+
+			v2.layoutOrder = #menuGroup.items + 1
+			children2.VoiceVolumeSlider = createElement(VoiceVolumeSlider, v2)
+		end
+
+		children[`Group_{k}`] = React.createElement(BaseMenu.Group, { LayoutOrder = k }, children2)
+	end
+
+	return React.createElement(Popover.Root, { isOpen = props.isOpen, testId = "--foundation-menu" }, {
+		Anchor = React.createElement(Popover.Anchor, nil, props.children),
 		Content = React.createElement(Popover.Content, {
-			hasArrow = false,
 			side = {
 				position = Foundation.Enums.PopoverSide.Bottom,
-				offset = Standard + v35.Padding.Small
+				offset = standard + v.Padding.Small
 			},
 			align = Foundation.Enums.PopoverAlign.Start,
-			onPressedOutside = t2.onPressedOutside,
-			backgroundStyle = if not Flags.FoundationBaseMenuBeta then v35.Color.Surface.Surface_100 else v35.Color.Surface.Surface_200,
-			radius = EnumsRadius.Medium
+			hasArrow = false,
+			onPressedOutside = props.onPressedOutside,
+			backgroundStyle = v.Color.Surface.Surface_200,
+			radius = Radius.Medium
 		}, {
-			Menu = React.createElement(BaseMenu.Root, {
-				size = InputSize.Medium,
-				onNestedLeafActivated = t2.onPressedOutside,
-				radius = EnumsRadius.Medium
-			}, t3)
+			Menu = React.createElement(
+				BaseMenu.Root,
+				{
+					size = InputSize.Medium,
+					onNestedLeafActivated = props.onPressedOutside,
+					radius = Radius.Medium
+				},
+				children
+			)
 		})
 	})
 end

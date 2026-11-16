@@ -1,0 +1,5 @@
+local FFlagMarketplaceOffersOptOutRootLowSpender = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagMarketplaceOffersOptOutRootLowSpender")
+local FFlagMarketplaceOffersOptOutRootNoSpender = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagMarketplaceOffersOptOutRootNoSpender")
+local FFlagMarketplaceOffersOptOutRootRandom = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagMarketplaceOffersOptOutRootRandom")
+
+return FFlagMarketplaceOffersOptOutRootLowSpender or FFlagMarketplaceOffersOptOutRootNoSpender or FFlagMarketplaceOffersOptOutRootRandom

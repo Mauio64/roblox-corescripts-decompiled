@@ -1,22 +1,17 @@
-local ParentParent = script.Parent.Parent.Parent
-local Array = require(ParentParent.LuauPolyfill).Array
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
 require(script.Parent.Parent.language.ast)
 
-function concatAST(p1) -- line: 23
-	-- upvalues: Array (copy)
-	local t1 = {}
+function concatAST(list)
+	local joined = {}
 
-	for _, v in ipairs(p1) do
-		t1 = Array.concat(t1, v.definitions)
+	for _, item in ipairs(list) do
+		joined = Array.concat(joined, item.definitions)
 	end
 
-	return {
-		kind = "Document",
-		definitions = t1
-	}
+	return { kind = "Document", definitions = joined }
 end
 
-return {
-	concatAST = concatAST
-}
+return { concatAST = concatAST }

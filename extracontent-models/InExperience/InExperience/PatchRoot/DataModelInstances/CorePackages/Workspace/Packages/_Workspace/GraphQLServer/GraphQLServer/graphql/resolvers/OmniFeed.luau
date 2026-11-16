@@ -1,3 +1,2 @@
-return {
-	default = require(script.OmniFeedResolver).default
-}
+local OmniFeedResolver = require(script.OmniFeedResolver)
+return { default = OmniFeedResolver.default }

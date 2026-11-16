@@ -1,88 +1,133 @@
 local ShareSheet = script:FindFirstAncestor("ShareSheet")
-local ShareSheetParent = ShareSheet.Parent
-local Foundation = require(ShareSheetParent.Foundation)
-local React = require(ShareSheetParent.React)
-local useLocalization = require(ShareSheetParent.Localization).Hooks.useLocalization
+local parent = ShareSheet.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local ShareSheetItemContainer = require(script.Parent.ShareSheetItemContainer)
 local ShareSheetRow = require(script.Parent.ShareSheetRow)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
+require(ShareSheet.Recipients.RecipientSource)
 local ShareSheetTelemetry = require(ShareSheet.telemetry.ShareSheetTelemetry)
 local copyLink = require(ShareSheet.copyLink)
 local shareLink = require(ShareSheet.shareLink)
-local IconName = Foundation.Enums.IconName
 
-local function ShareSheetActionRow(t1: {[any]: any}) -- line: 27
-	-- upvalues: React (copy), useLocalization (copy), copyLink (copy), ShareSheetTelemetry (copy), shareLink (copy), ShareSheetRow (copy), ShareSheetItemContainer (copy), IconName (copy)
-	local v14, v15 = React.useState(false)
-	local v16 = React.useRef(nil)
-	local v17 = useLocalization({
+local IconName = Foundation.Enums.IconName
+local View = Foundation.View
+
+local FFlagShareSheetPeoplePickerEnabled = require(ShareSheet.Flags.FFlagShareSheetPeoplePickerEnabled)
+
+local function ShareSheetActionRow(props)
+	local state, setState = React.useState(false)
+	local ref = React.useRef(nil)
+	local v = useLocalization({
+		copied = "Feature.UniversalShareSheet.Action.CopiedLink",
 		copyLink = "Feature.SocialShare.Action.CopyLink",
 		share = "Feature.SocialShare.Action.Share"
 	})
-	local v18 = React.useCallback(function() -- line: 34
-		-- upvalues: copyLink (copy), t1 (copy), v15 (copy), v16 (copy), ShareSheetTelemetry (copy)
-		copyLink({
-			context = t1.context,
-			url = t1.url
-		})
-		v15(true)
 
-		if v16.current then
-			task.cancel(v16.current)
+	local v2 = React.useCallback(function()
+		setState(true)
+
+		if ref.current then
+			task.cancel(ref.current)
 		end
 
-		v16.current = task.delay(2, function() -- line: 43
-			-- upvalues: v16 (copy), v15 (copy)
-			v16.current = nil
-			v15(false)
+		ref.current = task.delay(2, function()
+			ref.current = nil
+			setState(false)
 		end)
-		ShareSheetTelemetry.logShareSheetLinkCopied({
-			context = t1.context,
-			url = t1.url,
-			telemetryId = t1.telemetryId or ""
-		})
-	end, {
-		t1.context,
-		t1.url,
-		t1.telemetryId
-	})
-	local v19 = React.useCallback(function() -- line: 54
-		-- upvalues: shareLink (copy), t1 (copy)
-		shareLink({
-			context = t1.context,
-			url = t1.url
-		})
-	end, {
-		t1.context,
-		t1.url
-	})
+	end, {})
+	local onActivated = React.useCallback(function()
+		copyLink({ context = props.context, url = props.url })
 
-	React.useEffect(function() -- line: 60
-		-- upvalues: v16 (copy)
-		return function() -- line: 61
-			-- upvalues: v16 (copy)
-			if v16.current then
-				task.cancel(v16.current)
+		v2()
+		local logInteraction = ShareSheetTelemetry.logInteraction
+		local v3 = {
+			context = props.context,
+			recipientSource = 0,
+			telemetryId = 0,
+			interactionType = 0
+		}
+		local recipientSource
+
+		if FFlagShareSheetFriendsSort then
+			recipientSource = props.recipientSource
+		end
+
+		v3.recipientSource = recipientSource
+		v3.telemetryId = props.telemetryId or ""
+		v3.interactionType = ShareSheetTelemetry.InteractionType.CopyLink
+		logInteraction(v3)
+	end, { props.context, props.recipientSource, props.telemetryId, props.url, v2 })
+
+	local onActivated2 = React.useCallback(function()
+		shareLink({ context = props.context, url = props.url })
+
+		local logInteraction = ShareSheetTelemetry.logInteraction
+		local v3 = {
+			context = props.context,
+			recipientSource = 0,
+			telemetryId = 0,
+			interactionType = 0
+		}
+		local recipientSource
+
+		if FFlagShareSheetFriendsSort then
+			recipientSource = props.recipientSource
+		end
+
+		v3.recipientSource = recipientSource
+		v3.telemetryId = props.telemetryId or ""
+		v3.interactionType = ShareSheetTelemetry.InteractionType.NativeShare
+		logInteraction(v3)
+	end, { props.context, props.recipientSource, props.telemetryId, props.url })
+	React.useEffect(function()
+		return function()
+			if ref.current then
+				task.cancel(ref.current)
 			end
 		end
 	end, {})
 
-	return React.createElement(ShareSheetRow, {
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		CopyLink = React.createElement(ShareSheetItemContainer, {
-			LayoutOrder = 1,
-			icon = if not v14 then IconName.ChainLink else IconName.Check,
-			label = if not v14 then v17.copyLink else "Copied",
-			onActivated = v18,
-			shouldAnimate = v14
+	local createElement = React.createElement
+	local icon = if state then IconName.Check else IconName.ChainLink
+	local label = if state then v.copied else v.copyLink
+	local v3 = {
+		CopyLink = createElement(ShareSheetItemContainer, {
+			icon = icon,
+			label = label,
+			onActivated = onActivated,
+			shouldAnimate = state,
+			LayoutOrder = 1
 		}),
-		Share = if not t1.canShare then nil else React.createElement(ShareSheetItemContainer, {
-			LayoutOrder = 2,
+		Share = 0
+	}
+	local share
+
+	if props.canShare then
+		share = React.createElement(ShareSheetItemContainer, {
 			icon = IconName.ArrowUpFromLandscapeRectangle,
-			label = v17.share,
-			onActivated = v19
+			label = v.share,
+			onActivated = onActivated2,
+			LayoutOrder = 2
 		})
-	})
+	end
+
+	v3.Share = share
+
+	if FFlagShareSheetPeoplePickerEnabled then
+		return (React.createElement(
+			View,
+			{ tag = "row gap-medium size-full-0 auto-y", LayoutOrder = props.LayoutOrder },
+			v3
+		))
+	end
+
+	return (React.createElement(ShareSheetRow, { LayoutOrder = props.LayoutOrder }, v3))
 end
 
 return ShareSheetActionRow

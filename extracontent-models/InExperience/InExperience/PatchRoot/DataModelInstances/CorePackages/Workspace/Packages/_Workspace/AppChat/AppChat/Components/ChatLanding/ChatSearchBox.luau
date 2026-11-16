@@ -1,10 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local SearchTopBar = require(AppChat.Components.ChatLanding.SearchTopBar)
-local t1 = {
+
+local v = {
 	paddingTop = 0,
 	paddingBottom = 6,
 	paddingLeft = 12,
@@ -12,37 +17,33 @@ local t1 = {
 	layoutOrder = -1
 }
 
-local function v8() -- line: 32
-end
+local function fn() end
 
-return function(t2: {[any]: any}) -- line: 34
-	-- upvalues: Cryo (copy), t1 (copy), useLocalization (copy), React (copy), SearchTopBar (copy), v8 (copy)
-	local v10 = Cryo.Dictionary.union(t1, t2)
-	local v11 = useLocalization({
+return function(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local v2 = useLocalization({
 		searchPlaceholderText = "Feature.Chat.Label.SearchWord",
 		cancelText = "Feature.Chat.Action.Cancel"
 	})
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, v10.height - v10.paddingBottom - v10.paddingTop),
-		LayoutOrder = v10.layoutOrder
+		Size = UDim2.new(1, 0, 0, union.height - union.paddingBottom - union.paddingTop),
+		LayoutOrder = union.layoutOrder,
+		BackgroundTransparency = 1
 	}, {
 		filterBox = React.createElement(SearchTopBar, {
+			initialInputText = union.initialText or "",
+			cancelText = v2.cancelText,
+			searchPlaceholderText = v2.searchPlaceholderText,
 			shouldShowCancel = false,
+			cancelCallback = fn,
 			captureFocusOnMount = false,
-			initialInputText = v10.initialText or "",
-			cancelText = v11.cancelText,
-			searchPlaceholderText = v11.searchPlaceholderText,
-			cancelCallback = v8,
-			filterBoxPaddingTop = v10.paddingTop,
-			filterBoxPaddingBottom = v10.paddingBottom,
-			filterBoxPaddingLeft = v10.paddingLeft,
-			filterBoxPaddingRight = v10.paddingRight,
-			textChangedCallback = v10.onFilter
+			filterBoxPaddingTop = union.paddingTop,
+			filterBoxPaddingBottom = union.paddingBottom,
+			filterBoxPaddingLeft = union.paddingLeft,
+			filterBoxPaddingRight = union.paddingRight,
+			textChangedCallback = union.onFilter
 		}),
-		heightFlexOverride = React.createElement("UIFlexItem", {
-			FlexMode = Enum.UIFlexMode.None
-		})
+		heightFlexOverride = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.None })
 	})
 end

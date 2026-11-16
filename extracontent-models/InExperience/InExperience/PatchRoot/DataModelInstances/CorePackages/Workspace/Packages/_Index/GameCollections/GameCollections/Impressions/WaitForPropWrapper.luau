@@ -1,67 +1,56 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local React = require(Parent.React)
-local usePrevious = require(Parent.RoactUtils).Hooks.usePrevious
-local ArgCheck = require(Parent.ArgCheck)
-local v5 = game:DefineFastFlag("LuaAppEnableWaitForPropWrapperAssert", false)
+local parent = script:FindFirstAncestor("GameCollections").Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local usePrevious = RoactUtils.Hooks.usePrevious
+local ArgCheck = require(parent.ArgCheck)
 
-local function WaitForPropWrapper(t1: {[any]: any}) -- line: 15
-	-- upvalues: usePrevious (copy), React (copy), v5 (copy), ArgCheck (copy)
-	local waitForProp = t1.waitForProp
-	local maxUpdatesToDelay = t1.maxUpdatesToDelay
-	local wrappedComponent = t1.wrappedComponent
-	local v11 = usePrevious(waitForProp)
-	local v12, v13 = React.useState(maxUpdatesToDelay)
-	local v14 = v11 ~= nil and (waitForProp == nil and (maxUpdatesToDelay ~= nil and v12 < maxUpdatesToDelay))
+local defineFastFlag = game:DefineFastFlag("LuaAppEnableWaitForPropWrapperAssert", false)
 
-	React.useEffect(function() -- line: 27
-		-- upvalues: maxUpdatesToDelay (copy), waitForProp (copy), v14 (copy), v13 (copy), v12 (copy)
-		if not maxUpdatesToDelay then
+local function WaitForPropWrapper(data)
+	local waitForProp = data.waitForProp
+	local maxUpdatesToDelay = data.maxUpdatesToDelay
+	local wrappedComponent = data.wrappedComponent
+
+	local v = usePrevious(waitForProp)
+	local state, setState = React.useState(maxUpdatesToDelay)
+	local v2
+
+	if v == nil or waitForProp ~= nil or maxUpdatesToDelay == nil then
+		v2 = false
+	else
+		v2 = state < maxUpdatesToDelay
+	end
+
+	React.useEffect(function()
+		if not (maxUpdatesToDelay and waitForProp == nil) then
 			return
 		end
 
-		if waitForProp ~= nil then
-			return
-		end
-
-		if v14 then
-			task.delay(0, function() -- line: 38
-				-- upvalues: v13 (copy), maxUpdatesToDelay (copy)
-				v13(maxUpdatesToDelay)
+		if v2 then
+			task.delay(0, function()
+				setState(maxUpdatesToDelay)
 			end)
-
-			return
-		end
-
-		if v12 and v12 > 0 then
-			task.delay(0, function() -- line: 43
-				-- upvalues: v13 (copy), v12 (copy)
-				v13(v12 - 1)
+		elseif state and state > 0 then
+			task.delay(0, function()
+				setState(state - 1)
 			end)
 		end
-	end, {
-		waitForProp,
-		maxUpdatesToDelay,
-		v12,
-		v14
-	})
+	end, { waitForProp, maxUpdatesToDelay, state, v2 })
 
-	local v15 = true
+	local flag = true
 
 	if waitForProp == nil and maxUpdatesToDelay ~= nil then
-		if v14 then
-			v15 = false
-		elseif v12 and v12 > 0 then
-			v15 = false
-		elseif v5 then
-			ArgCheck.assert(waitForProp, `Missing data for prop for this game collection, after waiting { maxUpdatesToDelay } updates`)
+		if v2 or state and state > 0 then
+			flag = false
+		elseif defineFastFlag then
+			ArgCheck.assert(
+				waitForProp,
+				`Missing data for prop for this game collection, after waiting {maxUpdatesToDelay} updates`
+			)
 		end
 	end
 
-	if v15 then
-		return wrappedComponent
-	end
-
-	return nil
+	return if flag then wrappedComponent else nil
 end
 
 return WaitForPropWrapper

@@ -1,27 +1,29 @@
-local Parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
-local Promise = require(Parent.Promise)
-local Url = require(Parent.Http).Url
-local HttpRequest = require(script.Parent.HttpRequest)
-local v5 = game:DefineFastString("RobloxPlusAmpFeatureName", "IsRobloxPlusSubscribed")
-local v6 = game:DefineFastString("RobloxPlusAmpNamespace", "subscriptions/PlusSubscription")
+local parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
 
-local function getAmpFeatureAccess() -- line: 12
-	-- upvalues: Url (copy), v5 (copy), v6 (copy), HttpRequest (copy), Promise (copy)
-	local v8 = Url.APIS_URL .. "access-management/v1/feature-access?" .. Url:makeQueryString({
-		featureNames = v5,
-		namespace = v6
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
+local Url = Http.Url
+
+local HttpRequest = require(script.Parent.HttpRequest)
+
+local defineFastString = game:DefineFastString("RobloxPlusAmpFeatureName", "IsRobloxPlusSubscribed")
+local defineFastString2 = game:DefineFastString("RobloxPlusAmpNamespace", "subscriptions/PlusSubscription")
+
+local function getAmpFeatureAccess()
+	local v = Url.APIS_URL .. "access-management/v1/feature-access?" .. Url:makeQueryString({
+		featureNames = defineFastString,
+		namespace = defineFastString2
 	})
 
-	return HttpRequest.new():get(v8):andThen(function(p1) -- line: 23
-		local v10 = p1 and p1.features
+	return HttpRequest.new():get(v):andThen(function(p)
+		local features = p and p.features
 
-		if type(v10) == "table" and #v10 > 0 then
-			return v10[1].access
+		if type(features) == "table" and #features > 0 then
+			return features[1].access
 		end
 
 		return nil
-	end):catch(function() -- line: 30
-		-- upvalues: Promise (copy)
+	end):catch(function()
 		return Promise.resolve(nil)
 	end)
 end

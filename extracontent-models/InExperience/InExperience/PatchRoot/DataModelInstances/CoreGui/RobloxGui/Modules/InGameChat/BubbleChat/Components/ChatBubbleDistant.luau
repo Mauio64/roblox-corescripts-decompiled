@@ -1,19 +1,23 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Otter = require(CorePackages.Packages.Otter)
 local Roact = require(CorePackages.Packages.Roact)
 local t = require(CorePackages.Packages.t)
 local Cryo = require(CorePackages.Packages.Cryo)
-local ParentParent = script.Parent.Parent
-local Types = require(ParentParent.Types)
-local getSizeSpringFromSettings = require(ParentParent.Helpers.getSizeSpringFromSettings)
-local getTransparencySpringFromSettings = require(ParentParent.Helpers.getTransparencySpringFromSettings)
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
 
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local parent = script.Parent.Parent
+local Types = require(parent.Types)
+local getSizeSpringFromSettings = require(parent.Helpers.getSizeSpringFromSettings)
+local getTransparencySpringFromSettings = require(parent.Helpers.getTransparencySpringFromSettings)
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
 
-local v11 = Roact.PureComponent:extend("ChatBubbleDistant")
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 
-v11.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("ChatBubbleDistant")
+
+extended.validateProps = t.strictInterface({
 	width = t.optional(t.number),
 	height = t.optional(t.number),
 	fadingOut = t.optional(t.boolean),
@@ -22,199 +26,182 @@ v11.validateProps = t.strictInterface({
 	renderInsert = t.optional(t.callback),
 	insertSize = t.optional(t.Vector2)
 })
-v11.defaultProps = {
-	width = 32,
-	height = 16
-}
 
-local function getFullHeight(p1) -- line: 41
-	local height = p1.height
+extended.defaultProps = { width = 32, height = 16 }
 
-	if p1.renderInsert then
-		height = math.max(height, p1.insertSize.Y)
+local function getFullHeight(data) -- 2 equivalent calls inferred from this helper
+	local height = data.height
+
+	if data.renderInsert then
+		height = math.max(height, data.insertSize.Y)
 	end
 
-	return height + p1.chatSettings.Padding * 2
+	return height + data.chatSettings.Padding * 2
 end
 
-function v11.init(p2, p3) -- line: 50
-	-- upvalues: Roact (copy), Otter (copy)
-	local v17, v18 = Roact.createBinding(0)
-
-	p2.width = v17
-	p2.updateWidth = v18
-	p2.widthMotor = Otter.createSingleMotor(0)
-	p2.widthMotor:onStep(function(p4) -- line: 53
-		-- upvalues: p2 (copy)
-		p2.updateWidth((math.round(p4)))
+function extended:init(data)
+	local binding, updateWidth = Roact.createBinding(0)
+	self.width = binding
+	self.updateWidth = updateWidth
+	self.widthMotor = Otter.createSingleMotor(0)
+	self.widthMotor:onStep(function(p)
+		self.updateWidth((math.round(p)))
 	end)
 
-	local createBinding = Roact.createBinding
-	local height = p3.height
+	local binding2, updateHeight = Roact.createBinding(getFullHeight(data)) -- inferred equivalent call
+	self.height = binding2
+	self.updateHeight = updateHeight
 
-	if p3.renderInsert then
-		height = math.max(height, p3.insertSize.Y)
-	end
-
-	local v21, v22 = createBinding(height + p3.chatSettings.Padding * 2)
-
-	p2.height = v21
-	p2.updateHeight = v22
-	p2.frameSize = Roact.joinBindings({
-		p2.width,
-		p2.height
-	}):map(function(p5) -- line: 59
-		return UDim2.fromOffset(p5[1], p5[2])
+	self.frameSize = Roact.joinBindings({ self.width, self.height }):map(function(list)
+		return UDim2.fromOffset(list[1], list[2])
 	end)
 
-	local v23, v24 = Roact.createBinding(1)
+	local binding3, updateTransparency = Roact.createBinding(1)
+	self.transparency = binding3
+	self.updateTransparency = updateTransparency
+	self.transparencyMotor = Otter.createSingleMotor(1)
+	self.transparencyMotor:onStep(self.updateTransparency)
 
-	p2.transparency = v23
-	p2.updateTransparency = v24
-	p2.transparencyMotor = Otter.createSingleMotor(1)
-	p2.transparencyMotor:onStep(p2.updateTransparency)
-
-	if p3.fadingOut then
-		p2:fadeOut()
+	if data.fadingOut then
+		self:fadeOut()
 	end
 end
-function v11.getDerivedStateFromProps(p6, p7) -- line: 74
-	local chatSettings = p6.chatSettings
-	local v28 = if not p6.renderInsert then p6.width + chatSettings.Padding * 2 else p6.width + p6.insertSize.X + chatSettings.Padding * 2
-	local height = p6.height
 
-	if p6.renderInsert then
-		height = math.max(height, p6.insertSize.Y)
+function extended.getDerivedStateFromProps(data, p)
+	local chatSettings = data.chatSettings
+	local fullWidth
+
+	if data.renderInsert then
+		fullWidth = data.width + data.insertSize.X + chatSettings.Padding * 2
+	else
+		fullWidth = data.width + chatSettings.Padding * 2
 	end
 
-	local v30 = height + p6.chatSettings.Padding * 2
+	local fullHeight = getFullHeight(data) -- inferred equivalent call
 
-	if v28 ~= p7.fullWidth or v30 ~= p7.fullHeight then
-		return {
-			fullWidth = v28,
-			fullHeight = v30
-		}
+	if fullWidth == p.fullWidth and fullHeight == p.fullHeight then
+		return nil
 	end
 
-	return nil
+	return { fullWidth = fullWidth, fullHeight = fullHeight }
 end
-function v11.render(p8) -- line: 96
-	-- upvalues: Roact (copy), Cryo (copy), AppFonts (copy)
-	local chatSettings = p8.props.chatSettings
-	local BackgroundImage = chatSettings.BackgroundImage
-	local BackgroundGradient = chatSettings.BackgroundGradient
-	local v35 = p8.props.renderInsert and p8.props.insertSize.X or 0
 
-	return Roact.createElement("Frame", {
-		Transparency = 1,
-		AnchorPoint = Vector2.new(0.5, 1),
-		Size = UDim2.fromOffset(p8.state.fullWidth, p8.state.fullHeight),
-		Position = UDim2.new(0.5, 0, 1, -8)
-	}, {
-		Scale = Roact.createElement("UIScale", {
-			Scale = 0.75
-		}),
-		Carat = chatSettings.TailVisible and Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			Image = "rbxasset://textures/ui/InGameChat/Caret.png",
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 1, -1),
-			Size = UDim2.fromOffset(12, 8),
-			ImageColor3 = chatSettings.BackgroundColor3,
-			ImageTransparency = p8.transparency
-		}),
-		RoundedFrame = Roact.createElement("ImageLabel", Cryo.Dictionary.join(BackgroundImage, {
-			BorderSizePixel = 0,
-			ClipsDescendants = true,
-			Size = p8.frameSize,
-			BackgroundColor3 = chatSettings.BackgroundColor3,
-			BackgroundTransparency = BackgroundImage.Image == "" and p8.transparency or 1,
-			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 0, 0),
-			ImageTransparency = p8.transparency
-		}), {
-			UICorner = chatSettings.CornerEnabled and Roact.createElement("UICorner", {
-				CornerRadius = chatSettings.CornerRadius
-			}),
-			Contents = Roact.createElement("Frame", {
+function extended.render(props)
+	local chatSettings = props.props.chatSettings
+	local backgroundImage = chatSettings.BackgroundImage
+	local backgroundGradient = chatSettings.BackgroundGradient
+
+	local x = props.props.renderInsert and props.props.insertSize.X or 0
+
+	return Roact.createElement(
+		"Frame",
+		{
+			AnchorPoint = Vector2.new(0.5, 1),
+			Size = UDim2.fromOffset(props.state.fullWidth, props.state.fullHeight),
+			Position = UDim2.new(0.5, 0, 1, -8),
+			Transparency = 1
+		},
+		{
+			Scale = Roact.createElement("UIScale", { Scale = 0.75 }),
+			Carat = chatSettings.TailVisible and Roact.createElement("ImageLabel", {
+				AnchorPoint = Vector2.new(0.5, 0),
 				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1)
-			}, {
-				Padding = Roact.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, chatSettings.Padding),
-					PaddingRight = UDim.new(0, chatSettings.Padding),
-					PaddingBottom = UDim.new(0, chatSettings.Padding),
-					PaddingLeft = UDim.new(0, chatSettings.Padding)
-				}),
-				UIListLayout = Roact.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					SortOrder = Enum.SortOrder.LayoutOrder
-				}),
-				Insert = p8.props.renderInsert and p8.props.renderInsert(),
-				Ellipsis = Roact.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					Text = "…",
-					TextScaled = true,
-					LayoutOrder = 2,
-					TextColor3 = chatSettings.TextColor3,
-					TextTransparency = p8.transparency,
-					Font = AppFonts.default:getBlack(),
-					Size = UDim2.new(1, -v35, 1, 0)
-				})
+				Position = UDim2.new(0.5, 0, 1, -1),
+				Size = UDim2.fromOffset(12, 8),
+				Image = "rbxasset://textures/ui/InGameChat/Caret.png",
+				ImageColor3 = chatSettings.BackgroundColor3,
+				ImageTransparency = props.transparency
 			}),
-			Gradient = BackgroundGradient.Enabled and Roact.createElement("UIGradient", BackgroundGradient)
-		})
-	})
+			RoundedFrame = Roact.createElement("ImageLabel", Cryo.Dictionary.join(backgroundImage, {
+				Size = props.frameSize,
+				BackgroundColor3 = chatSettings.BackgroundColor3,
+				BackgroundTransparency = backgroundImage.Image == "" and props.transparency or 1,
+				BorderSizePixel = 0,
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.new(0.5, 0, 0, 0),
+				ClipsDescendants = true,
+				ImageTransparency = props.transparency
+			}), {
+				UICorner = chatSettings.CornerEnabled and Roact.createElement("UICorner", {
+					CornerRadius = chatSettings.CornerRadius
+				}),
+				Contents = Roact.createElement("Frame", {
+					Size = UDim2.fromScale(1, 1),
+					BackgroundTransparency = 1
+				}, {
+					Padding = Roact.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, chatSettings.Padding),
+						PaddingRight = UDim.new(0, chatSettings.Padding),
+						PaddingBottom = UDim.new(0, chatSettings.Padding),
+						PaddingLeft = UDim.new(0, chatSettings.Padding)
+					}),
+					UIListLayout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					Insert = props.props.renderInsert and props.props.renderInsert(),
+					Ellipsis = Roact.createElement("TextLabel", {
+						BackgroundTransparency = 1,
+						Text = "…",
+						TextColor3 = chatSettings.TextColor3,
+						TextTransparency = props.transparency,
+						Font = AppFonts.default:getBlack(),
+						TextScaled = true,
+						Size = UDim2.new(1, -x, 1, 0),
+						LayoutOrder = 2
+					})
+				}),
+				Gradient = backgroundGradient.Enabled and Roact.createElement("UIGradient", backgroundGradient)
+			})
+		}
+	)
 end
-function v11.fadeOut(p9) -- line: 175
-	-- upvalues: getTransparencySpringFromSettings (copy)
-	if not p9.isFadingOut then
-		p9.isFadingOut = true
-		p9.transparencyMotor:onComplete(function() -- line: 179
-			-- upvalues: p9 (copy)
-			if p9.props.onFadeOut then
-				p9.props.onFadeOut()
+
+function extended:fadeOut()
+	if not self.isFadingOut then
+		self.isFadingOut = true
+
+		self.transparencyMotor:onComplete(function()
+			if self.props.onFadeOut then
+				self.props.onFadeOut()
 			end
 		end)
 
-		local v37 = getTransparencySpringFromSettings(p9.props.chatSettings)
-
-		p9.transparencyMotor:setGoal(v37(1))
+		local transparencySpringFromSettings = getTransparencySpringFromSettings(self.props.chatSettings)
+		self.transparencyMotor:setGoal(transparencySpringFromSettings(1))
 	end
 end
-function v11.didUpdate(p10, _, p12) -- line: 190
-	-- upvalues: getSizeSpringFromSettings (copy)
-	if p10.props.fadingOut then
-		p10:fadeOut()
 
+function extended:didUpdate(_, p)
+	if self.props.fadingOut then
+		self:fadeOut()
 		return
 	end
 
-	if p10.state.fullHeight ~= p12.fullHeight then
-		p10.updateHeight(p10.state.fullHeight)
+	if self.state.fullHeight ~= p.fullHeight then
+		self.updateHeight(self.state.fullHeight)
 	end
 
-	if p10.state.fullWidth ~= p12.fullWidth then
-		local chatSettings = p10.props.chatSettings
-		local v42 = getSizeSpringFromSettings(chatSettings)
-
-		p10.widthMotor:setGoal(v42(p10.state.fullWidth))
+	if self.state.fullWidth ~= p.fullWidth then
+		local sizeSpringFromSettings = getSizeSpringFromSettings(self.props.chatSettings)
+		self.widthMotor:setGoal(sizeSpringFromSettings(self.state.fullWidth))
 	end
 end
-function v11.didMount(p13) -- line: 205
-	-- upvalues: getSizeSpringFromSettings (copy), getTransparencySpringFromSettings (copy)
-	if not p13.props.fadingOut then
-		local chatSettings = p13.props.chatSettings
-		local v45 = getSizeSpringFromSettings(chatSettings)
-		local v46 = getTransparencySpringFromSettings(chatSettings)
 
-		p13.transparencyMotor:setGoal(v46(p13.props.chatSettings.Transparency))
-		p13.widthMotor:setGoal(v45(p13.state.fullWidth))
+function extended.didMount(data)
+	if not data.props.fadingOut then
+		local chatSettings = data.props.chatSettings
+		local sizeSpringFromSettings = getSizeSpringFromSettings(chatSettings)
+		local transparencySpringFromSettings = getTransparencySpringFromSettings(chatSettings)
+
+		data.transparencyMotor:setGoal(transparencySpringFromSettings(data.props.chatSettings.Transparency))
+		data.widthMotor:setGoal(sizeSpringFromSettings(data.state.fullWidth))
 	end
 end
-function v11.willUnmount(p14) -- line: 216
-	p14.transparencyMotor:destroy()
-	p14.widthMotor:destroy()
+
+function extended.willUnmount(p)
+	p.transparencyMotor:destroy()
+	p.widthMotor:destroy()
 end
 
-return v11
+return extended

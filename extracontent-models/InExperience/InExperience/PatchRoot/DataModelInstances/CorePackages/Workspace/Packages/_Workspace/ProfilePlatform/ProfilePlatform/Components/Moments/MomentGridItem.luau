@@ -1,91 +1,143 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Foundation = require(ProfilePlatformParent.Foundation)
-local BuilderIcons = require(ProfilePlatformParent.BuilderIcons)
-local MomentsCommon = require(ProfilePlatformParent.MomentsCommon)
+local parent = ProfilePlatform.Parent
 
-require(ProfilePlatformParent.DataHydration.MomentsStoreTypes)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local BuilderIcons = require(parent.BuilderIcons)
+local MomentsCommon = require(parent.MomentsCommon)
+require(parent.DataHydration.MomentsStoreTypes)
+local SignalsReact = require(parent.SignalsReact)
+local ToMediaItem = require(parent.Moments.ToMediaItem)
+local useSceneOutfitMediaItem = require(script.Parent.useSceneOutfitMediaItem)
+local SceneOutfitPoster = require(script.Parent.SceneOutfitPoster)
 
-local ToMediaItem = require(ProfilePlatformParent.Moments.ToMediaItem)
 local MomentEngagementCount = require(script.Parent.MomentEngagementCount)
-local FFlagProfileMomentsOrderingAndReactions = require(ProfilePlatformParent.SharedFlags).FFlagProfileMomentsOrderingAndReactions
+local FFlagMomentsEngagementMetricsFeature = MomentsCommon.Flags.FFlagMomentsEngagementMetricsFeature
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfileMomentSceneOutfitPoster = SharedFlags.FFlagProfileMomentSceneOutfitPoster
+
 local View = Foundation.View
 local ControlState = Foundation.Enums.ControlState
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
 local useTokens = Foundation.Hooks.useTokens
+local useSignalState = SignalsReact.useSignalState
+
 local Analytics = MomentsCommon.Analytics
+local GetMomentsCapabilities = MomentsCommon.Stores.GetMomentsCapabilities
 local fireAnalyticsEvent = Analytics.fireAnalyticsEvent
 local EventNames = Analytics.EventNames
 local makeProfileTileFields = require(ProfilePlatform.Analytics.makeProfileTileFields)
+
 local MomentMediaTile = MomentsCommon.Media.MomentMediaTile
 local GradientBackdrop = MomentsCommon.Components.GradientBackdrop
+
 local ThumbUp = BuilderIcons.Icon.ThumbUp
 
-local function MomentGridItem(t1: {[any]: any}) -- line: 48
-	-- upvalues: useTokens (copy), React (copy), makeProfileTileFields (copy), fireAnalyticsEvent (copy), EventNames (copy), ToMediaItem (copy), ControlState (copy), FFlagProfileMomentsOrderingAndReactions (copy), View (copy), StateLayerAffordance (copy), MomentMediaTile (copy), GradientBackdrop (copy), MomentEngagementCount (copy), ThumbUp (copy)
-	local moment = t1.moment
-	local onHoverChanged = t1.onHoverChanged
-	local v25 = useTokens()
+local function MomentGridItem(props)
+	local moment = props.moment
+	local onHoverChanged = props.onHoverChanged
+	local v = useTokens()
+	local v2
 
-	React.useEffect(function() -- line: 55
-		-- upvalues: t1 (copy), moment (copy), makeProfileTileFields (copy), fireAnalyticsEvent (copy), EventNames (copy)
-		if t1.userId and moment.recommendationMetadata then
-			local v29 = makeProfileTileFields.makeProfileTileImpressionFields(moment, t1.userId, "grid", t1.index or 0)
+	if FFlagMomentsEngagementMetricsFeature then
+		v2 = useSignalState(GetMomentsCapabilities(false).getIsEngagementMetricsEnabled)
+	end
 
-			if v29 then
-				fireAnalyticsEvent(EventNames.ProfileMomentTileImpression, v29)
-			end
+	React.useEffect(function()
+		local v3 = props.userId
+			and moment.recommendationMetadata
+			and makeProfileTileFields.makeProfileTileImpressionFields(moment, props.userId, "grid", props.index or 0)
+
+		if v3 then
+			fireAnalyticsEvent(EventNames.ProfileMomentTileImpression, v3)
 		end
 	end, {})
 
-	local v26 = React.useMemo(function() -- line: 69
-		-- upvalues: ToMediaItem (copy), moment (copy)
-		return (ToMediaItem({
-			kind = "moment",
-			moment = moment
-		}))
+	local mediaItem = React.useMemo(function()
+		return (ToMediaItem({ kind = "moment", moment = moment }))
 	end, { moment.momentId })
-	local v27 = React.useCallback(function(p1) -- line: 73
-		-- upvalues: onHoverChanged (copy), ControlState (copy)
-		onHoverChanged(p1 == ControlState.Hover)
-	end, { onHoverChanged })
-	local v28 = not FFlagProfileMomentsOrderingAndReactions or moment.metadata.likeCount ~= nil and moment.metadata.likeCount > 0
+	local v3
 
-	return React.createElement(View, {
-		tag = "clip",
+	if FFlagProfileMomentSceneOutfitPoster then
+		v3 = useSceneOutfitMediaItem(moment, mediaItem)
+	end
+
+	local onStateChanged = React.useCallback(function(p)
+		onHoverChanged(p == ControlState.Hover)
+	end, { onHoverChanged })
+
+	if not FFlagMomentsEngagementMetricsFeature or v2 then
+		if moment.metadata.likeCount == nil then
+			v2 = false
+		else
+			v2 = moment.metadata.likeCount > 0
+		end
+	end
+
+	local createElement = React.createElement
+	local v4 = {
 		Size = UDim2.fromScale(1, 1),
-		onActivated = t1.onActivated,
-		onStateChanged = v27,
-		stateLayer = {
-			affordance = StateLayerAffordance.None
-		}
-	}, {
-		Media = React.createElement(MomentMediaTile, {
-			mediaItem = v26,
-			isActive = t1.isActive
-		}),
-		BottomGradient = if not v28 then nil else React.createElement(GradientBackdrop, {
-			rotation = -90,
-			startingTransparency = 0,
-			zIndex = 2,
+		onActivated = props.onActivated,
+		onStateChanged = onStateChanged,
+		stateLayer = { affordance = StateLayerAffordance.None },
+		tag = "clip"
+	}
+
+	local createElement2 = React.createElement
+
+	if v3 ~= nil then
+		mediaItem = v3.mediaItem
+	end
+
+	local v5 = {
+		Media = createElement2(MomentMediaTile, { mediaItem = mediaItem, isActive = props.isActive }),
+		ScenePoster = 0,
+		BottomGradient = 0,
+		Engagement = 0
+	}
+	local scenePoster
+
+	if not (v3 == nil or v3.scenePoster == nil) then
+		scenePoster = React.createElement(SceneOutfitPoster, {
+			content = v3.scenePoster,
+			zIndex = 2
+		})
+	end
+
+	v5.ScenePoster = scenePoster
+	local bottomGradient
+
+	if v2 then
+		bottomGradient = React.createElement(GradientBackdrop, {
 			anchorPoint = Vector2.new(0, 1),
-			color3 = v25.Color.Common.Scrim.Color3,
+			color3 = v.Color.Common.Scrim.Color3,
 			position = UDim2.fromScale(0, 1),
-			size = UDim2.fromScale(1, 0.5)
-		}),
-		Engagement = if not v28 then nil else React.createElement(View, {
+			rotation = -90,
+			size = UDim2.fromScale(1, 0.5),
+			startingTransparency = 0,
+			zIndex = FFlagProfileMomentSceneOutfitPoster and 3 or 2
+		})
+	end
+
+	v5.BottomGradient = bottomGradient
+	local engagement
+
+	if v2 then
+		engagement = React.createElement(View, {
 			tag = "row align-x-right align-y-center gap-small position-bottom-right anchor-bottom-right auto-xy padding-small",
-			ZIndex = 3
+			ZIndex = FFlagProfileMomentSceneOutfitPoster and 4 or 3
 		}, {
 			Reactions = React.createElement(MomentEngagementCount, {
 				layoutOrder = 1,
-				onMedia = true,
 				icon = ThumbUp,
-				count = moment.metadata.likeCount
+				count = moment.metadata.likeCount,
+				onMedia = true
 			})
 		})
-	})
+	end
+
+	v5.Engagement = engagement
+	return createElement(View, v4, v5)
 end
 
 return MomentGridItem

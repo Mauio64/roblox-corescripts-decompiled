@@ -1,1 +1,3 @@
-return (require(script["Regexp.global"]))
+local Regexpglobal = require(script["Regexp.global"])
+
+return Regexpglobal

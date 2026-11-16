@@ -1,106 +1,228 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local UIBlox = require(ParentParentParent.UIBlox)
-local FormatStatString = require(ParentParent.Common.FormatStatString)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local UIBlox = require(parent2.UIBlox)
+local Foundation = require(parent2.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local useTokens = Foundation.Hooks.useTokens
+local SharedFlags = require(parent2.SharedFlags)
+local foundationFontFaceMigration = SharedFlags.FFlagFontFacePlayerList
+	and Foundation.Utility.Flags.FoundationFontFaceMigration
+local FormatStatString = require(parent.Common.FormatStatString)
 local useStyle = UIBlox.Core.Style.useStyle
-local useLayoutValues = require(ParentParent.Common.useLayoutValues)
-local FFlagRemoveNewPlayerListOverlay = require(ParentParent.Flags.FFlagRemoveNewPlayerListOverlay)
-local FFlagEnableMobilePlayerListOnConsole = require(ParentParent.Flags.FFlagEnableMobilePlayerListOnConsole)
+local useLayoutValues = require(parent.Common.useLayoutValues)
 
-return React.memo(function(t1: {[any]: any}) -- line: 36
-	-- upvalues: useStyle (copy), useLayoutValues (copy), FFlagEnableMobilePlayerListOnConsole (copy), React (copy), FormatStatString (copy), FFlagRemoveNewPlayerListOverlay (copy)
-	local v11 = useStyle()
-	local v12 = useLayoutValues()
-	local TextDefault = v11.Theme.TextDefault
-	local textStyle = t1.textStyle
-	local v15 = if not textStyle then TextDefault.Color else textStyle.Color
-	local v16 = if not textStyle then TextDefault.Transparency else textStyle.Transparency
-	local v17 = if not textStyle then nil else textStyle.StrokeColor
-	local v18 = if not textStyle or not textStyle.StrokeTransparency then nil else textStyle.StrokeTransparency
-	local CaptionHeaderFont, u20
+local FFlagRemoveNewPlayerListOverlay = require(parent.Flags.FFlagRemoveNewPlayerListOverlay)
+local FFlagEnableMobilePlayerListOnConsole = require(parent.Flags.FFlagEnableMobilePlayerListOnConsole)
 
-	if not v12.IsTenFoot then
-		CaptionHeaderFont = v11.Font.CaptionHeader.Font
-		u20 = if not FFlagEnableMobilePlayerListOnConsole then v11.Font.CaptionHeader.RelativeSize * v11.Font.BaseSize else v12.StatTextSize
+return React.memo(function(props)
+	local v = useStyle()
+	local v2 = useLayoutValues()
+	local v3
+
+	if foundationFontFaceMigration then
+		v3 = useTokens()
+	end
+
+	local textDefault = v.Theme.TextDefault
+	local textStyle = props.textStyle
+	local color
+
+	if textStyle then
+		color = textStyle.Color
 	else
-		u20 = v12.StatTextSize
-		CaptionHeaderFont = v12.StatFont
+		color = textDefault.Color
+	end
 
-		if t1.isTeamEntry then
-			CaptionHeaderFont = v12.TeamStatFont
+	local transparency
+
+	if textStyle then
+		transparency = textStyle.Transparency
+	else
+		transparency = textDefault.Transparency
+	end
+
+	local strokeColor
+
+	if textStyle then
+		strokeColor = textStyle.StrokeColor
+	else
+		strokeColor = nil
+	end
+
+	local strokeTransparency
+
+	if textStyle and textStyle.StrokeTransparency then
+		strokeTransparency = textStyle.StrokeTransparency
+	else
+		strokeTransparency = nil
+	end
+
+	local textSize, v4
+
+	if v2.IsTenFoot then
+		textSize = v2.StatTextSize
+
+		if foundationFontFaceMigration then
+			v4 = normalizeFontFace(v2.StatFont)
+		else
+			v4 = v2.StatFont
+		end
+
+		if props.isTeamEntry then
+			if foundationFontFaceMigration then
+				v4 = normalizeFontFace(v2.TeamStatFont)
+			else
+				v4 = v2.TeamStatFont
+			end
+		end
+	else
+		if foundationFontFaceMigration then
+			v4 = normalizeFontFace(v3.Typography.CaptionLarge.Font)
+		else
+			v4 = v.Font.CaptionHeader.Font
+		end
+
+		if FFlagEnableMobilePlayerListOnConsole then
+			textSize = v2.StatTextSize
+		else
+			textSize = v.Font.CaptionHeader.RelativeSize * v.Font.BaseSize
 		end
 	end
 
-	local v21 = React.useMemo(function() -- line: 63
-		-- upvalues: t1 (copy), FormatStatString (copy), CaptionHeaderFont (ref), u20 (ref), v15 (copy), v16 (copy), v17 (copy), v18 (copy)
-		return {
-			BackgroundTransparency = 1,
-			Text = t1.statValue:map(function(p1) -- line: 65
-				-- upvalues: FormatStatString (copy)
-				return FormatStatString(p1)
+	local v5 = React.useMemo(function()
+		local v5 = {
+			Text = props.statValue:map(function(p)
+				return FormatStatString(p)
 			end),
-			Size = t1.showStatTitle and UDim2.fromScale(1, 0.5) or UDim2.fromScale(1, 1),
-			Position = t1.showStatTitle and UDim2.fromScale(0, 0.5) or UDim2.fromScale(0, 0),
-			Font = CaptionHeaderFont,
-			TextSize = u20,
-			TextColor3 = v15,
-			TextTransparency = v16,
-			TextStrokeColor3 = v17,
-			TextStrokeTransparency = v18,
-			TextTruncate = Enum.TextTruncate.AtEnd
+			Size = props.showStatTitle and UDim2.fromScale(1, 0.5) or UDim2.fromScale(1, 1),
+			Position = props.showStatTitle and UDim2.fromScale(0, 0.5) or UDim2.fromScale(0, 0),
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			TextColor3 = 0,
+			TextTransparency = 0,
+			TextStrokeColor3 = 0,
+			TextStrokeTransparency = 0,
+			TextTruncate = 0,
+			BackgroundTransparency = 1
 		}
-	end, {
-		t1.showStatTitle,
-		CaptionHeaderFont,
-		u20,
-		v15,
-		v16,
-		v17,
-		v18
-	})
+		local font
 
-	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		Size = UDim2.new(0, v12.StatEntrySizeX, 1, 0),
+		if not foundationFontFaceMigration then
+			font = v4
+		end
+
+		v5.Font = font
+		local fontFace
+
+		if foundationFontFaceMigration then
+			fontFace = v4
+		end
+
+		v5.FontFace = fontFace
+		v5.TextSize = textSize
+		v5.TextColor3 = color
+		v5.TextTransparency = transparency
+		v5.TextStrokeColor3 = strokeColor
+		v5.TextStrokeTransparency = strokeTransparency
+		v5.TextTruncate = Enum.TextTruncate.AtEnd
+		return v5
+	end, { props.showStatTitle, v4, textSize, color, transparency, strokeColor, strokeTransparency })
+
+	local createElement = React.createElement
+	local v6 = {
+		Size = UDim2.new(0, v2.StatEntrySizeX, 1, 0),
 		Position = UDim2.new(0, 0, 0, 0),
-		LayoutOrder = t1.layoutOrder,
-		BackgroundTransparency = not t1.backgroundStyle and 1 or t1.backgroundStyle.Transparency,
-		BackgroundColor3 = if not t1.backgroundStyle then nil else t1.backgroundStyle.Color
-	}, {
-		PlayerStatDisplay = if not t1.showStatTitle or not t1.statName then React.createElement("TextLabel", v21) else React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 1, 0)
-		}, {
-			StatTitle = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				Text = t1.statName,
-				Size = UDim2.fromScale(1, 0.5),
-				Position = UDim2.fromScale(0, 0),
-				Font = v12.TitleStatFont,
-				TextSize = u20,
-				TextColor3 = v15,
-				TextTransparency = v16,
-				TextStrokeColor3 = v17,
-				TextStrokeTransparency = v18,
-				TextTruncate = Enum.TextTruncate.AtEnd
-			}),
-			StatText = React.createElement("TextLabel", v21)
-		}),
-		DoubleOverLay = if FFlagRemoveNewPlayerListOverlay or (not t1.doubleOverlay or not t1.overlayStyle) then nil else React.createElement("Frame", {
-			ZIndex = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = t1.overlayStyle.Transparency,
-			BackgroundColor3 = t1.overlayStyle.Color
-		}),
-		OverlayFrame = if FFlagRemoveNewPlayerListOverlay or not t1.overlayStyle then nil else React.createElement("Frame", {
-			ZIndex = 2,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundTransparency = t1.overlayStyle.Transparency,
-			BackgroundColor3 = t1.overlayStyle.Color
+		BorderSizePixel = 0,
+		LayoutOrder = props.layoutOrder,
+		BackgroundTransparency = not props.backgroundStyle and 1 or props.backgroundStyle.Transparency,
+		BackgroundColor3 = 0
+	}
+	local backgroundColor
+
+	if props.backgroundStyle then
+		backgroundColor = props.backgroundStyle.Color
+	end
+
+	v6.BackgroundColor3 = backgroundColor
+	local playerStatDisplay
+
+	if props.showStatTitle and props.statName then
+		local createElement2 = React.createElement
+		local v7 = { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, BorderSizePixel = 0 }
+
+		local createElement3 = React.createElement
+		local v8 = {
+			Text = props.statName,
+			Size = UDim2.fromScale(1, 0.5),
+			Position = UDim2.fromScale(0, 0),
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			TextColor3 = 0,
+			TextTransparency = 0,
+			TextStrokeColor3 = 0,
+			TextStrokeTransparency = 0,
+			TextTruncate = 0,
+			BackgroundTransparency = 1
+		}
+		local font
+
+		if not foundationFontFaceMigration then
+			font = v2.TitleStatFont
+		end
+
+		v8.Font = font
+		local fontFace
+
+		if foundationFontFaceMigration then
+			fontFace = normalizeFontFace(v2.TitleStatFont)
+		end
+
+		v8.FontFace = fontFace
+		v8.TextSize = textSize
+		v8.TextColor3 = color
+		v8.TextTransparency = transparency
+		v8.TextStrokeColor3 = strokeColor
+		v8.TextStrokeTransparency = strokeTransparency
+		v8.TextTruncate = Enum.TextTruncate.AtEnd
+		playerStatDisplay = createElement2("Frame", v7, {
+			StatTitle = createElement3("TextLabel", v8),
+			StatText = React.createElement("TextLabel", v5)
 		})
+	else
+		playerStatDisplay = React.createElement("TextLabel", v5)
+	end
+
+	local doubleOverLay
+
+	if not (FFlagRemoveNewPlayerListOverlay or not (props.doubleOverlay and props.overlayStyle)) then
+		doubleOverLay = React.createElement("Frame", {
+			ZIndex = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = props.overlayStyle.Transparency,
+			BackgroundColor3 = props.overlayStyle.Color,
+			BorderSizePixel = 0
+		})
+	end
+
+	local overlayFrame
+
+	if not (FFlagRemoveNewPlayerListOverlay or not props.overlayStyle) then
+		overlayFrame = React.createElement("Frame", {
+			ZIndex = 2,
+			Size = UDim2.new(1, 0, 1, 0),
+			BorderSizePixel = 0,
+			BackgroundTransparency = props.overlayStyle.Transparency,
+			BackgroundColor3 = props.overlayStyle.Color
+		})
+	end
+
+	return createElement("Frame", v6, {
+		PlayerStatDisplay = playerStatDisplay,
+		DoubleOverLay = doubleOverLay,
+		OverlayFrame = overlayFrame
 	})
 end)

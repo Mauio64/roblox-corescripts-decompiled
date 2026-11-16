@@ -1,133 +1,138 @@
-local scriptParent = script.Parent
-local isArray = require(scriptParent.Array.isArray)
-local fromString = require(scriptParent.Array.from.fromString)
-local forEach = require(scriptParent.Array.forEach)
+local parent = script.Parent
 
-require(scriptParent.types)
+local isArray = require(parent.Array.isArray)
+local fromString = require(parent.Array.from.fromString)
+local forEach = require(parent.Array.forEach)
+require(parent.types)
 
-local inspect = require(scriptParent.util.inspect)
-local t1 = {
-	__iter = function(p1) -- line: 22
-		return next, p1._array
+local inspect = require(parent.util.inspect)
+
+local Set = {
+	__iter = function(p)
+		return next, p._array
 	end,
-	__tostring = function(p2) -- line: 25
-		-- upvalues: inspect (copy)
-		local s1 = "Set "
+	__tostring = function(p)
+		local v = "Set "
 
-		if #p2._array > 0 then
-			s1 ..= "(" .. tostring(#p2._array) .. ") "
+		if #p._array > 0 then
+			v ..= "(" .. tostring(#p._array) .. ") "
 		end
 
-		return s1 .. inspect(p2._array)
+		return v .. inspect(p._array)
 	end
 }
 
-t1.__index = t1
+Set.__index = Set
 
-function t1.new(p3) -- line: 37
-	-- upvalues: isArray (copy), fromString (copy), t1 (copy)
-	local t2 = {}
-	local t3
+function Set.new(value)
+	local set = {}
+	local array
 
-	if p3 ~= nil then
-		local v12 = nil
+	if value == nil then
+		array = {}
+	else
+		local v = nil
 
-		if typeof(p3) == "table" then
-			if isArray(p3) then
-				v12 = table.clone(p3)
+		if typeof(value) == "table" then
+			if isArray(value) then
+				v = table.clone(value)
 			else
-				local mt = getmetatable(p3)
+				local metatable = getmetatable(value)
 
-				if mt and rawget(mt, "__iter") then
-					v12 = p3
+				if metatable and rawget(metatable, "__iter") then
+					v = value
 				elseif _G.__DEV__ then
 					error("cannot create array from an object-like table")
 				end
 			end
-		elseif typeof(p3) == "string" then
-			v12 = fromString(p3)
+		elseif typeof(value) == "string" then
+			v = fromString(value)
 		else
-			error(("cannot create array from value of type `%s`"):format((typeof(p3))))
+			error(("cannot create array from value of type `%s`"):format((typeof(value))))
 		end
 
-		if v12 then
-			t3 = table.create(#v12)
+		if v then
+			array = table.create(#v)
 
-			for _, v16 in v12 do
-				if not t2[v16] then
-					t2[v16] = true
-					table.insert(t3, v16)
+			for _, v2 in v do
+				if set[v2] then
+					continue
 				end
+
+				set[v2] = true
+				table.insert(array, v2)
 			end
 		else
-			t3 = {}
+			array = {}
 		end
-	else
-		t3 = {}
 	end
 
 	return (setmetatable({
-		size = #t3,
-		_map = t2,
-		_array = t3
-	}, t1))
+		size = #array,
+		_map = set,
+		_array = array
+	}, Set))
 end
-function t1.add(p4, p5) -- line: 83
-	if not p4._map[p5] then
-		p4.size = p4.size + 1
-		p4._map[p5] = true
-		table.insert(p4._array, p5)
+
+function Set:add(p)
+	if not self._map[p] then
+		self.size += 1
+		self._map[p] = true
+		table.insert(self._array, p)
 	end
 
-	return p4
+	return self
 end
-function t1.clear(p6) -- line: 93
-	p6.size = 0
-	table.clear(p6._map)
-	table.clear(p6._array)
+
+function Set:clear()
+	self.size = 0
+	table.clear(self._map)
+	table.clear(self._array)
 end
-function t1.delete(p7, p8) -- line: 99
-	if not p7._map[p8] then
+
+function Set:delete(p): boolean
+	if not self._map[p] then
 		return false
 	end
 
-	p7.size = p7.size - 1
-	p7._map[p8] = nil
+	self.size -= 1
+	self._map[p] = nil
+	local index = table.find(self._array, p)
 
-	local v22 = table.find(p7._array, p8)
-
-	if v22 then
-		table.remove(p7._array, v22)
+	if index then
+		table.remove(self._array, index)
 	end
 
 	return true
 end
-function t1.forEach(p9, p10, p11) -- line: 115
-	-- upvalues: forEach (copy)
-	if typeof(p10) ~= "function" then
+
+function Set:forEach(callback, p)
+	if typeof(callback) ~= "function" then
 		error("callback is not a function")
 	end
 
-	forEach(p9._array, function(p12) -- line: 121
-		-- upvalues: p11 (copy), p10 (copy), p9 (copy)
-		if p11 ~= nil then
-			p10(p11, p12, p12, p9)
-
-			return
+	forEach(self._array, function(p2)
+		if p == nil then
+			callback(p2, p2, self)
+		else
+			callback(p, p2, p2, self)
 		end
-
-		p10(p12, p12, p9)
 	end)
 end
-function t1.has(p13, p14) -- line: 130
-	return p13._map[p14] ~= nil
+
+function Set:has(p): boolean
+	return self._map[p] ~= nil
 end
-function t1.ipairs(p15) -- line: 134
+
+function Set:ipairs()
 	if _G.__DEV__ then
-		warn(debug.traceback("`for _,_ in mySet:ipairs() do` is deprecated and will be removed in a future release, please use `for _,_ in mySet do` instead\n", 2))
+		warn(debug.traceback(
+			"`for _,_ in mySet:ipairs() do` is deprecated and will be removed in a future release, please use `for _,_ in mySet do` instead\n",
+			2
+		))
 	end
 
-	return ipairs(p15._array)
+	return ipairs(self._array)
 end
 
-return t1
+return Set

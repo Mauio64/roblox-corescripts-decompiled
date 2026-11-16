@@ -1,9 +1,9 @@
-local ParentParent = script.Parent.Parent
-local GuiService = game:GetService("GuiService")
-local Properties = require(ParentParent.Properties)
+local parent = script.Parent.Parent
 
-local function getMaxSpeed() -- line: 8
-	-- upvalues: GuiService (copy), Properties (copy)
+local GuiService = game:GetService("GuiService")
+local Properties = require(parent.Properties)
+
+local function getMaxSpeed()
 	return GuiService:GetScreenResolution().Magnitude * Properties.MaxSpeedRelative
 end
 

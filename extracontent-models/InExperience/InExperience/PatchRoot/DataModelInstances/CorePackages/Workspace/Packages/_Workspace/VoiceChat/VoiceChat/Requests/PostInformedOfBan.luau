@@ -1,12 +1,14 @@
-local Parent = script:FindFirstAncestor("VoiceChat").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("VoiceChat").Parent
+local Http = require(parent.Http)
+local Url = Http.Url
 local HttpService = game:GetService("HttpService")
 
-return function(p1, p2) -- line: 11
-	-- upvalues: Url (copy), HttpService (copy)
-	assert(type(p2) == "boolean", "PostInformedOfBan request expects informedOfBan to be a boolean")
+return function(callback, informedOfBan)
+	assert(type(informedOfBan) == "boolean", "PostInformedOfBan request expects informedOfBan to be a boolean")
 
-	return p1(string.format("%sv1/moderation/informed-of-ban", Url.VOICE_URL), "POST", (HttpService:JSONEncode({
-		informedOfBan = p2
-	})))
+	return callback(
+		string.format("%sv1/moderation/informed-of-ban", Url.VOICE_URL),
+		"POST",
+		(HttpService:JSONEncode({ informedOfBan = informedOfBan }))
+	)
 end

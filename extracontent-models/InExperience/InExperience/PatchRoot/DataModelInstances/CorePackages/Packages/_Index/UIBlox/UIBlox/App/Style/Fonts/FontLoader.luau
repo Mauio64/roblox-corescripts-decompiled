@@ -1,84 +1,111 @@
-local ParentParent = script.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent.Parent
-local Cryo = require(ParentParent2.Cryo)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent.Parent.Parent
+local Cryo = require(parent2.Cryo)
+local Foundation = require(parent2.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local Constants = require(parent.Constants)
+require(parent.StyleTypes)
 
-require(ParentParent.StyleTypes)
+local _ = { BASE_SIZE = 16, FACTOR = 1.26 }
 
-local _ = {
-	BASE_SIZE = 16,
-	FACTOR = 1.26
-}
-local t1 = {}
+local function getOverrideFontFace(font, fontFace) -- 1 equivalent call inferred from this helper
+	if typeof(font) == "Font" then
+		return font
+	end
 
-t1.__index = t1
+	if font == Enum.Font.Cartoon then
+		return Font.new(Constants.ComicNeueFontFamily, fontFace.Weight, fontFace.Style)
+	end
 
-function t1.new(p1) -- line: 17
-	-- upvalues: t1 (copy)
-	local t2 = {
-		_tokens = p1
-	}
-
-	setmetatable(t2, t1)
-
-	return t2
+	return Font.fromEnum(font)
 end
-function t1.loadFont(p2) -- line: 25
-	-- upvalues: Cryo (copy)
-	local _tokens = p2._tokens
-	local t3 = {
+
+local FontLoader = {}
+FontLoader.__index = FontLoader
+
+function FontLoader.new(tokens)
+	local v = { _tokens = tokens }
+
+	setmetatable(v, FontLoader)
+	return v
+end
+
+function FontLoader:loadFont(font)
+	local tokens = self._tokens
+
+	local v = {
 		BaseSize = 20.16,
 		HeadingLarge = {
 			Font = Enum.Font.BuilderSansBold,
-			RelativeSize = _tokens.Global.Size_350 / 16,
-			RelativeMinSize = _tokens.Global.Size_300 / 16
+			FontFace = normalizeFontFace(tokens.Typography.HeadingLarge.Font),
+			RelativeSize = tokens.Size.Size_700 / 16,
+			RelativeMinSize = tokens.Size.Size_600 / 16
 		},
 		HeadingSmall = {
 			Font = Enum.Font.BuilderSansBold,
-			RelativeSize = _tokens.Global.Size_250 / 16,
-			RelativeMinSize = _tokens.Global.Size_200 / 16
+			FontFace = normalizeFontFace(tokens.Typography.HeadingSmall.Font),
+			RelativeSize = tokens.Size.Size_500 / 16,
+			RelativeMinSize = tokens.Size.Size_400 / 16
 		},
 		TitleLarge = {
 			Font = Enum.Font.BuilderSansBold,
-			RelativeSize = _tokens.Global.Size_200 / 16,
-			RelativeMinSize = _tokens.Global.Size_150 / 16
+			FontFace = normalizeFontFace(tokens.Typography.TitleLarge.Font),
+			RelativeSize = tokens.Size.Size_400 / 16,
+			RelativeMinSize = tokens.Size.Size_300 / 16
 		},
 		BodyLarge = {
 			Font = Enum.Font.BuilderSans,
-			RelativeSize = _tokens.Global.Size_200 / 16,
-			RelativeMinSize = _tokens.Global.Size_150 / 16
+			FontFace = normalizeFontFace(tokens.Typography.BodyLarge.Font),
+			RelativeSize = tokens.Size.Size_400 / 16,
+			RelativeMinSize = tokens.Size.Size_300 / 16
 		},
 		CaptionLarge = {
 			Font = Enum.Font.BuilderSansMedium,
-			RelativeSize = _tokens.Global.Size_150 / 16,
-			RelativeMinSize = _tokens.Global.Size_100 / 16
+			FontFace = normalizeFontFace(tokens.Typography.CaptionLarge.Font),
+			RelativeSize = tokens.Size.Size_300 / 16,
+			RelativeMinSize = tokens.Size.Size_200 / 16
 		},
 		BodySmall = {
 			Font = Enum.Font.BuilderSans,
-			RelativeSize = _tokens.Global.Size_150 / 16,
-			RelativeMinSize = _tokens.Global.Size_100 / 16
+			FontFace = normalizeFontFace(tokens.Typography.BodySmall.Font),
+			RelativeSize = tokens.Size.Size_300 / 16,
+			RelativeMinSize = tokens.Size.Size_200 / 16
 		},
 		CaptionSmall = {
 			Font = Enum.Font.BuilderSansMedium,
-			RelativeSize = _tokens.Global.Size_125 / 16,
-			RelativeMinSize = _tokens.Global.Size_100 / 16
+			FontFace = normalizeFontFace(tokens.Typography.CaptionSmall.Font),
+			RelativeSize = tokens.Size.Size_250 / 16,
+			RelativeMinSize = tokens.Size.Size_200 / 16
 		}
 	}
-	local v11 = p2:mapLegacyFont(t3, 16)
 
-	return Cryo.Dictionary.join(v11, t3)
+	if font ~= nil then
+		for _, v2 in v do
+			if not (type(v2) == "table" and v2.Font ~= nil) then
+				continue
+			end
+
+			v2.Font = font
+			v2.FontFace = getOverrideFontFace(font, v2.FontFace) -- inferred equivalent call
+		end
+	end
+
+	local mapLegacyFont = self:mapLegacyFont(v, 16)
+	return Cryo.Dictionary.join(mapLegacyFont, v)
 end
-function t1.mapLegacyFont(_, p4, _) -- line: 78
+
+function FontLoader:mapLegacyFont(data, _)
 	return {
-		Title = p4.HeadingLarge,
-		Header1 = p4.HeadingSmall,
-		Header2 = p4.TitleLarge,
-		SubHeader1 = p4.TitleLarge,
-		Body = p4.BodyLarge,
-		CaptionHeader = p4.CaptionLarge,
-		CaptionSubHeader = p4.CaptionLarge,
-		CaptionBody = p4.BodySmall,
-		Footer = p4.CaptionSmall
+		Title = data.HeadingLarge,
+		Header1 = data.HeadingSmall,
+		Header2 = data.TitleLarge,
+		SubHeader1 = data.TitleLarge,
+		Body = data.BodyLarge,
+		CaptionHeader = data.CaptionLarge,
+		CaptionSubHeader = data.CaptionLarge,
+		CaptionBody = data.BodySmall,
+		Footer = data.CaptionSmall
 	}
 end
 
-return t1
+return FontLoader

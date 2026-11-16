@@ -1,10 +1,10 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local CommunicationChannelsTypes = require(Parent.AppChat.CommunicationChannelsTypes)
-local t1 = {
-	kind = "ignore",
-	channelId = nil
-}
-local t2 = {
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+
+local CommunicationChannelsTypes = require(parent.AppChat.CommunicationChannelsTypes)
+
+local v = { kind = "ignore", channelId = nil }
+
+local v2 = {
 	MessageCreated = "fetchMessage",
 	SystemMessageCreated = "fetchMessage",
 	ChannelDeleted = "removeConversation",
@@ -20,36 +20,27 @@ local t2 = {
 	ChannelMarkedRead = "fetchConversationDetails"
 }
 
-local function classifyCommunicationChannelsEvent(p1) -- line: 66
-	-- upvalues: t1 (copy), CommunicationChannelsTypes (copy), t2 (copy)
-	if p1 == nil then
-		return t1
+local function classifyCommunicationChannelsEvent(data)
+	if not (data ~= nil and data.ChannelVertical == "PlatformChat" and table.find(
+		CommunicationChannelsTypes.ChannelTypeAllowlist,
+		data.ChannelType
+	) ~= nil) then
+		return v
 	end
 
-	if p1.ChannelVertical ~= "PlatformChat" then
-		return t1
+	local kind = v2[data.Type]
+
+	if kind == nil then
+		return v
 	end
 
-	if table.find(CommunicationChannelsTypes.ChannelTypeAllowlist, p1.ChannelType) == nil then
-		return t1
+	local channelId = data.ChannelId
+
+	if channelId == nil or channelId == "" then
+		return v
 	end
 
-	local v7 = t2[p1.Type]
-
-	if v7 == nil then
-		return t1
-	end
-
-	local ChannelId = p1.ChannelId
-
-	if ChannelId == nil or ChannelId == "" then
-		return t1
-	end
-
-	return {
-		kind = v7,
-		channelId = ChannelId
-	}
+	return { kind = kind, channelId = channelId }
 end
 
 return classifyCommunicationChannelsEvent

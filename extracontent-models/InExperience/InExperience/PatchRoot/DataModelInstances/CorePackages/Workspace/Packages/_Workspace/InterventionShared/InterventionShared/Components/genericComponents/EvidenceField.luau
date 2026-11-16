@@ -1,26 +1,27 @@
-local Parent = script:FindFirstAncestor("InterventionShared").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local View = Foundation.View
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("InterventionShared").Parent
 
-local function EvidenceField(t1: {[any]: any}) -- line: 26
-	-- upvalues: React (copy), View (copy), FoundationText (copy)
-	local v8 = t1.hasColon ~= nil and not t1.hasColon and "" or ":"
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local Text = Foundation.Text
+
+local function EvidenceField(props)
+	local v = (props.hasColon == nil or props.hasColon) and ":" or ""
 
 	return React.createElement(View, {
 		tag = "size-full-0 auto-y col",
-		LayoutOrder = t1.layoutOrder
+		LayoutOrder = props.layoutOrder
 	}, {
-		Label = React.createElement(FoundationText, {
+		Label = React.createElement(Text, {
 			tag = "auto-xy text-title-medium text-align-x-left text-wrap content-emphasis",
-			LayoutOrder = 1,
-			Text = `{ t1.fieldLabel }{ v8 }`
+			Text = `{props.fieldLabel}{v}`,
+			LayoutOrder = 1
 		}),
-		Value = React.createElement(FoundationText, {
+		Value = React.createElement(Text, {
 			tag = "auto-xy text-body-medium text-align-x-left text-wrap",
-			LayoutOrder = 2,
-			Text = t1.fieldValue
+			Text = props.fieldValue,
+			LayoutOrder = 2
 		})
 	})
 end

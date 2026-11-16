@@ -1,92 +1,79 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local parent = GenericAbuseReporting.Parent
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local Promise = require(GenericAbuseReportingParent.Promise)
-local FFlagAbuseReportInExpPlayerListV3 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3
+
+local Foundation = require(parent.Foundation)
+local Promise = require(parent.Promise)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAbuseReportInExpPlayerListV3 = SharedFlags.FFlagAbuseReportInExpPlayerListV3
 local recentlyLeftSignals = require(GenericAbuseReporting.BeduiV2.Utils.Signals.recentlyLeftSignals)
+
 local AccessoryType = Foundation.Enums.AccessoryType
 
-local function appendRecentlyLeftItems(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 23
-	-- upvalues: AccessoryType (copy)
-	local v15 = table.clone(t3)
-
-	table.sort(v15, function(p1, p2) -- line: 29
-		return p1.username:lower() < p2.username:lower()
+local function appendRecentlyLeftItems(list, userIdSet, p)
+	local clone = table.clone(p)
+	table.sort(clone, function(a, b): boolean
+		return a.username:lower() < b.username:lower()
 	end)
 
-	for _, v in ipairs(v15) do
-		if not t2[tostring(v.userId)] then
-			table.insert(t1, {
-				leading = {
-					type = AccessoryType.Avatar,
-					userId = v.userId
-				},
+	for _, v in ipairs(clone) do
+		if not userIdSet[tostring(v.userId)] then
+			table.insert(list, {
+				leading = { type = AccessoryType.Avatar, userId = v.userId },
 				id = tostring(v.userId),
 				label = v.displayName,
 				description = v.username,
-				meta = {
-					username = v.username,
-					displayName = v.displayName
-				}
+				meta = { username = v.username, displayName = v.displayName }
 			})
 		end
 	end
 
-	return t1
+	return list
 end
-local function getUsers() -- line: 59
-	-- upvalues: Promise (copy), Players (copy), LocalPlayer (copy), FFlagAbuseReportInExpPlayerListV3 (copy), AccessoryType (copy), appendRecentlyLeftItems (copy), recentlyLeftSignals (copy)
-	return Promise.new(function(resolve, reject) -- line: 60
-		-- upvalues: Players (copy), LocalPlayer (copy), FFlagAbuseReportInExpPlayerListV3 (copy), AccessoryType (copy), appendRecentlyLeftItems (copy), recentlyLeftSignals (copy)
-		local ok, result = pcall(function() -- line: 61
-			-- upvalues: Players (copy), LocalPlayer (copy), FFlagAbuseReportInExpPlayerListV3 (copy), AccessoryType (copy), appendRecentlyLeftItems (copy), recentlyLeftSignals (copy)
-			local players = Players:GetPlayers()
 
-			table.sort(players, function(p3, p4) -- line: 63
-				return p3.Name:lower() < p4.Name:lower()
+local function getUsers()
+	return Promise.new(function(callback, callback2)
+		local success, result = pcall(function()
+			local players = Players:GetPlayers()
+			table.sort(players, function(a, b): boolean
+				return a.Name:lower() < b.Name:lower()
 			end)
 
-			local t4 = {}
-			local t5 = {}
+			local userIdSet = {}
+			local result = {}
 
-			for _, v in ipairs(players) do
-				if not LocalPlayer or v.UserId ~= LocalPlayer.UserId then
-					if FFlagAbuseReportInExpPlayerListV3 then
-						t5[tostring(v.UserId)] = true
-					end
-
-					table.insert(t4, {
-						leading = {
-							type = AccessoryType.Avatar,
-							userId = v.UserId
-						},
-						id = tostring(v.UserId),
-						label = v.DisplayName,
-						description = v.Name,
-						meta = {
-							username = v.Name,
-							displayName = v.DisplayName
-						}
-					})
+			for _, player in ipairs(players) do
+				if not (not LocalPlayer or player.UserId ~= LocalPlayer.UserId) then
+					continue
 				end
+
+				if FFlagAbuseReportInExpPlayerListV3 then
+					userIdSet[tostring(player.UserId)] = true
+				end
+
+				table.insert(result, {
+					leading = { type = AccessoryType.Avatar, userId = player.UserId },
+					id = tostring(player.UserId),
+					label = player.DisplayName,
+					description = player.Name,
+					meta = { username = player.Name, displayName = player.DisplayName }
+				})
 			end
 
 			if FFlagAbuseReportInExpPlayerListV3 then
-				appendRecentlyLeftItems(t4, t5, recentlyLeftSignals.getRecentlyLeft())
+				appendRecentlyLeftItems(result, userIdSet, recentlyLeftSignals.getRecentlyLeft())
 			end
 
-			return t4
+			return result
 		end)
 
-		if ok then
-			resolve(result)
-
-			return
+		if success then
+			callback(result)
+		else
+			callback2(result)
 		end
-
-		reject(result)
 	end)
 end
 

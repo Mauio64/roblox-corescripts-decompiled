@@ -1,13 +1,14 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local enumerate = require(PurchasePromptParent.PurchasePromptDeps).enumerate
+local parent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local enumerate = PurchasePromptDeps.enumerate
+
 local addRawValueMethodToEnum = require(PurchasePrompt.Utils.addRawValueMethodToEnum)
-local t1 = {
-	None = "None",
-	EnablePurchase = "EnablePurchase"
-}
-local v6 = enumerate(script.Name, t1)
 
-addRawValueMethodToEnum(v6, t1)
+local v = { None = "None", EnablePurchase = "EnablePurchase" }
 
-return v6
+local v2 = enumerate(script.Name, v)
+
+addRawValueMethodToEnum(v2, v)
+
+return v2

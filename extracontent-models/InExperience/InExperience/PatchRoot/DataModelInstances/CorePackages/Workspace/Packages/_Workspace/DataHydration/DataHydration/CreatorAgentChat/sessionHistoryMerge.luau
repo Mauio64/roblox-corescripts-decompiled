@@ -1,7 +1,7 @@
 require(script.Parent.types)
 
-local function getSequenceId(p1) -- line: 7
-	local sequenceId = p1.sequenceId
+local function getSequenceId(p) -- 3 equivalent calls inferred from this helper
+	local sequenceId = p.sequenceId
 
 	if typeof(sequenceId) == "number" and sequenceId >= 0 then
 		return sequenceId
@@ -10,50 +10,47 @@ local function getSequenceId(p1) -- line: 7
 	return nil
 end
 
-return {
-	mergeHistoryIntoMap = function(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 12
-		for _, v8 in t2 do
-			local sequenceId = v8.sequenceId
-			local v10 = if typeof(sequenceId) ~= "number" or not (sequenceId >= 0) then nil else sequenceId
+local SessionHistoryMerge = {}
 
-			if v10 ~= nil and t3[v10] == nil then
-				t1[v10] = v8
-			end
+function SessionHistoryMerge.mergeHistoryIntoMap(p, items, p2)
+	for _, item in items do
+		local sequenceId = getSequenceId(item) -- inferred equivalent call
+
+		if sequenceId ~= nil and p2[sequenceId] == nil then
+			p[sequenceId] = item
 		end
-	end,
-	orderMergedHistoryItems = function(t4: {[any]: any}, t5: {[any]: any}) -- line: 25
-		local v13 = table.clone(t4)
-
-		for v14, v15 in t5 do
-			v13[v14] = v15
-		end
-
-		local t6 = {}
-
-		for _, v18 in v13 do
-			table.insert(t6, v18)
-		end
-
-		table.sort(t6, function(p2, p3) -- line: 39
-			local sequenceId = p2.sequenceId
-			local v27 = ((if typeof(sequenceId) ~= "number" or not (sequenceId >= 0) then nil else sequenceId)) or -1
-			local sequenceId2 = p3.sequenceId
-
-			return v27 < (((if typeof(sequenceId2) ~= "number" or not (sequenceId2 >= 0) then nil else sequenceId2)) or -1)
-		end)
-
-		return t6
-	end,
-	ingestOverlayUpdate = function(t7: {[any]: any}, _: {[any]: any}, p4, n1: number) -- line: 48
-		if typeof(n1) ~= "number" or n1 < 0 then
-			return false
-		end
-
-		local v23 = table.clone(p4)
-
-		v23.sequenceId = n1
-		t7[n1] = v23
-
-		return true
 	end
-}
+end
+
+function SessionHistoryMerge.orderMergedHistoryItems(p, items)
+	local clone = table.clone(p)
+
+	for k, item in items do
+		clone[k] = item
+	end
+
+	local result = {}
+
+	for _, v in clone do
+		table.insert(result, v)
+	end
+
+	table.sort(result, function(a, b): boolean
+		return (getSequenceId(a) or -1) < (getSequenceId(b) or -1) -- inferred equivalent call
+	end)
+
+	return result
+end
+
+function SessionHistoryMerge.ingestOverlayUpdate(clonesBySequenceId, _, p, sequenceId: number): boolean
+	if typeof(sequenceId) ~= "number" or sequenceId < 0 then
+		return false
+	end
+
+	local clone = table.clone(p)
+	clone.sequenceId = sequenceId
+	clonesBySequenceId[sequenceId] = clone
+	return true
+end
+
+return SessionHistoryMerge

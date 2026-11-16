@@ -1,6 +1,8 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+
 local InputMode = require(Foundation.Utility.Input.InputMode)
-local t1 = {
+
+local v = {
 	[Enum.UserInputType.MouseButton1] = InputMode.Pointer,
 	[Enum.UserInputType.MouseButton2] = InputMode.Pointer,
 	[Enum.UserInputType.MouseButton3] = InputMode.Pointer,
@@ -20,9 +22,8 @@ local t1 = {
 	[Enum.UserInputType.Touch] = InputMode.Touch
 }
 
-local function getInputMode(p1) -- line: 28
-	-- upvalues: t1 (copy)
-	return t1[p1]
+local function getInputMode(p)
+	return v[p]
 end
 
 return getInputMode

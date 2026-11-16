@@ -1,3 +1,3 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
 
-return require(_Workspace.ProfilePlatform.ProfilePlatform.Components.UserProfileHeader.AvatarHeadshotComponent)
+return require(Workspace.ProfilePlatform.ProfilePlatform.Components.UserProfileHeader.AvatarHeadshotComponent)

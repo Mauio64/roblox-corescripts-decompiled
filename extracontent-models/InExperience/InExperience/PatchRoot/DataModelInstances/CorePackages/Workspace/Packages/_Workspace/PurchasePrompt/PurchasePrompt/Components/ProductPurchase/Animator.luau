@@ -1,91 +1,81 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
-local PurchasePromptDeps = require(Parent.PurchasePromptDeps)
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
 local Roact = PurchasePromptDeps.Roact
 local Otter = PurchasePromptDeps.Otter
 local t = PurchasePromptDeps.t
-local FFlagEnableUnifiedProductPurchaseFlow = require(Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
-local v7 = Roact.Component:extend(script.Name)
-local t1 = {
-	dampingRatio = 1,
-	frequency = 1.6
-}
 
-v7.validateProps = t.interface({
+local extended = Roact.Component:extend(script.Name)
+
+local v = { dampingRatio = 1, frequency = 1.6 }
+
+extended.validateProps = t.interface({
 	shouldShow = t.boolean,
 	skipAnimation = t.optional(t.boolean),
 	onShown = t.optional(t.callback),
 	onHidden = t.optional(t.callback)
 })
 
-function v7.init(p1) -- line: 26
-	-- upvalues: Roact (copy), Otter (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), t1 (copy)
-	local v10, v11 = Roact.createBinding(1)
+function extended:init()
+	local binding, setProgress = Roact.createBinding(1)
 
-	p1.motor = Otter.createSingleMotor(1)
-	p1.motor:start()
-	p1.motor:onStep(v11)
-	p1.animationProgress = v10
-	p1.setProgress = v11
+	self.motor = Otter.createSingleMotor(1)
+	self.motor:start()
 
-	function p1.onComplete() -- line: 36
-		-- upvalues: p1 (copy)
-		if p1.props.shouldShow then
-			if p1.props.onShown then
-				p1.props.onShown()
+	self.motor:onStep(setProgress)
+	self.animationProgress = binding
+	self.setProgress = setProgress
 
-				return
+	function self.onComplete()
+		if self.props.shouldShow then
+			if self.props.onShown then
+				self.props.onShown()
 			end
-		elseif p1.props.onHidden then
-			p1.props.onHidden()
+		elseif self.props.onHidden then
+			self.props.onHidden()
 		end
 	end
+	self.motor:onComplete(self.onComplete)
 
-	p1.motor:onComplete(p1.onComplete)
+	local v2 = self.props.shouldShow and 0 or 1
 
-	local v12 = not p1.props.shouldShow and 1 or 0
-
-	if FFlagEnableUnifiedProductPurchaseFlow and p1.props.skipAnimation then
-		p1.motor:stop()
-		v11(v12)
-		task.defer(function() -- line: 54
-			-- upvalues: p1 (copy)
-			p1.onComplete()
-		end)
+	if not self.props.skipAnimation then
+		self.motor:setGoal(Otter.spring(v2, v))
 
 		return
 	end
 
-	p1.motor:setGoal(Otter.spring(v12, t1))
+	self.motor:stop()
+	setProgress(v2)
+	task.defer(function()
+		self.onComplete()
+	end)
 end
-function v7.didUpdate(p2, p3, _) -- line: 62
-	-- upvalues: FFlagEnableUnifiedProductPurchaseFlow (copy), Otter (copy), t1 (copy)
-	if p3.shouldShow ~= p2.props.shouldShow or FFlagEnableUnifiedProductPurchaseFlow and p3.skipAnimation ~= p2.props.skipAnimation then
-		local v16 = not p2.props.shouldShow and 1 or 0
 
-		if FFlagEnableUnifiedProductPurchaseFlow and p2.props.skipAnimation then
-			p2.motor:stop()
-			p2.setProgress(v16)
-			task.defer(function() -- line: 72
-				-- upvalues: p2 (copy)
-				p2.onComplete()
+function extended.didUpdate(data, p, _)
+	if p.shouldShow ~= data.props.shouldShow or p.skipAnimation ~= data.props.skipAnimation then
+		local v2 = data.props.shouldShow and 0 or 1
+
+		if data.props.skipAnimation then
+			data.motor:stop()
+			data.setProgress(v2)
+			task.defer(function()
+				data.onComplete()
 			end)
-
-			return
+		else
+			data.motor:setGoal(Otter.spring(v2, v))
 		end
-
-		p2.motor:setGoal(Otter.spring(v16, t1))
 	end
 end
-function v7.render(p5) -- line: 81
-	-- upvalues: Roact (copy)
+
+function extended.render(p)
 	return Roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		Position = p5.animationProgress:map(function(p6) -- line: 86
-			return UDim2.new(0, 0, -1 * p6, 0)
+		Position = p.animationProgress:map(function(p2)
+			return UDim2.new(0, 0, -1 * p2, 0)
 		end)
-	}, p5.props[Roact.Children])
+	}, p.props[Roact.Children])
 end
 
-return v7
+return extended

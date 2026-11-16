@@ -1,4 +1,7 @@
 local VirtualEventsState = script:FindFirstAncestor("VirtualEventsState")
-local NetworkingGames = require(VirtualEventsState.network).NetworkingGames
 
-return require(script.Parent["experienceDetails.impl"])(NetworkingGames)
+local network = require(VirtualEventsState.network)
+local networkingGames = network.NetworkingGames
+local experienceDetailsimpl = require(script.Parent["experienceDetails.impl"])
+
+return experienceDetailsimpl(networkingGames)

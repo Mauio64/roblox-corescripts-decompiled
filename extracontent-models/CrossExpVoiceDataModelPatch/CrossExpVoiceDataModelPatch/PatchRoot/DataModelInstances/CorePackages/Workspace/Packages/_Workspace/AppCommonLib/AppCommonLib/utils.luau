@@ -1,7 +1,4 @@
-local PromiseUtilities = require(script.PromiseUtilities)
-local AppStorageJsonCacheUtils = require(script.AppStorageJsonCacheUtils)
-
 return {
-	PromiseUtilities = PromiseUtilities,
-	AppStorageJsonCacheUtils = AppStorageJsonCacheUtils
+	PromiseUtilities = require(script.PromiseUtilities),
+	AppStorageJsonCacheUtils = require(script.AppStorageJsonCacheUtils)
 }

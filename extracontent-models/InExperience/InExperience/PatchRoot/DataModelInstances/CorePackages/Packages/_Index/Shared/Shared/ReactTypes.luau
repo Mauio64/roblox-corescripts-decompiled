@@ -1,10 +1,6 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
 require(script.Parent["flowtypes.roblox"])
 
-return {
-	DiscreteEvent = 0,
-	UserBlockingEvent = 1,
-	ContinuousEvent = 2
-}
+return { DiscreteEvent = 0, UserBlockingEvent = 1, ContinuousEvent = 2 }

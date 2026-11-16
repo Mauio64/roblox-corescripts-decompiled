@@ -1,7 +1,16 @@
-local ParentParent = script.Parent.Parent
-local Number = require(ParentParent.Number)
+local parent = script.Parent.Parent
+local Number = require(parent.Number)
 
-return function(p1) -- line: 20
-	-- upvalues: Number (copy)
-	return not not p1 and (p1 ~= 0 and (p1 ~= "" and not Number.isNaN(p1)))
+return function(p)
+	local v = p and true or false
+
+	if v then
+		if p == 0 or p == "" then
+			return false
+		end
+
+		return not Number.isNaN(p)
+	end
+
+	return v
 end

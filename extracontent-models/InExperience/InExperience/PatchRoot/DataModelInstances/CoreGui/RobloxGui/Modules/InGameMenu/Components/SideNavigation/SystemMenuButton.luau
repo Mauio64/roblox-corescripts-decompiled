@@ -1,13 +1,16 @@
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local t = InGameMenuDependencies.t
 local Roact = InGameMenuDependencies.Roact
+
 local CloseMenuButton = require(script.Parent.CloseMenuButton)
 local GameIconButton = require(script.Parent.GameIconButton)
-local v8 = Roact.PureComponent:extend("SystemMenuButton")
 
-v8.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("SystemMenuButton")
+
+extended.validateProps = t.strictInterface({
 	on = t.optional(t.boolean),
 	anchorPoint = t.optional(t.Vector2),
 	position = t.optional(t.UDim2),
@@ -16,68 +19,62 @@ v8.validateProps = t.strictInterface({
 	onClose = t.callback,
 	canCaptureFocus = t.optional(t.boolean)
 })
-v8.defaultProps = {
-	on = false,
-	canCaptureFocus = false
-}
 
-function v8.tryCaptureFocus(p1, p2) -- line: 28
-	-- upvalues: GuiService (copy)
-	if p1.props.canCaptureFocus and not p2.canCaptureFocus or p1.props.canCaptureFocus and p1.props.on ~= p2.on and p1.state.isIconFocused then
-		GuiService.SelectedCoreObject = p1.iconRef:getValue()
-	end
-end
-function v8.init(p3) -- line: 37
-	-- upvalues: Roact (copy)
-	p3.iconRef = Roact.createRef()
-	p3:setState({
-		isIconFocused = false
-	})
+extended.defaultProps = { on = false, canCaptureFocus = false }
 
-	function p3.onIconSelectionGained() -- line: 44
-		-- upvalues: p3 (copy)
-		p3:setState({
-			isIconFocused = true
-		})
-	end
-	function p3.onIconSelectionLost() -- line: 50
-		-- upvalues: p3 (copy)
-		p3:setState({
-			isIconFocused = false
-		})
+function extended:tryCaptureFocus(p)
+	if
+		self.props.canCaptureFocus and not p.canCaptureFocus
+		or self.props.canCaptureFocus and self.props.on ~= p.on and self.state.isIconFocused
+	then
+		GuiService.SelectedCoreObject = self.iconRef:getValue()
 	end
 end
-function v8.didMount(p4) -- line: 57
-	p4:tryCaptureFocus({
-		canCaptureFocus = false
-	})
+
+function extended:init()
+	self.iconRef = Roact.createRef()
+
+	self:setState({ isIconFocused = false })
+
+	function self.onIconSelectionGained()
+		self:setState({ isIconFocused = true })
+	end
+
+	function self.onIconSelectionLost()
+		self:setState({ isIconFocused = false })
+	end
 end
-function v8.didUpdate(p5, p6) -- line: 62
-	p5:tryCaptureFocus(p6)
+
+function extended:didMount()
+	self:tryCaptureFocus({ canCaptureFocus = false })
 end
-function v8.render(p7) -- line: 66
-	-- upvalues: Roact (copy), CloseMenuButton (copy), GameIconButton (copy)
-	if p7.props.on then
+
+function extended:didUpdate(p)
+	self:tryCaptureFocus(p)
+end
+
+function extended.render(props)
+	if props.props.on then
 		return Roact.createElement(CloseMenuButton, {
-			onActivated = p7.props.onClose,
-			layoutOrder = p7.props.layoutOrder,
-			AnchorPoint = p7.props.anchorPoint,
-			Position = p7.props.position,
-			onSelectionGained = p7.onIconSelectionGained,
-			onSelectionLost = p7.onIconSelectionLost,
-			[Roact.Ref] = p7.iconRef
+			onActivated = props.props.onClose,
+			layoutOrder = props.props.layoutOrder,
+			AnchorPoint = props.props.anchorPoint,
+			Position = props.props.position,
+			onSelectionGained = props.onIconSelectionGained,
+			onSelectionLost = props.onIconSelectionLost,
+			[Roact.Ref] = props.iconRef
 		})
 	end
 
 	return Roact.createElement(GameIconButton, {
-		onActivated = p7.props.onActivated,
-		layoutOrder = p7.props.layoutOrder,
-		anchorPoint = p7.props.anchorPoint,
-		position = p7.props.position,
-		onSelectionGained = p7.onIconSelectionGained,
-		onSelectionLost = p7.onIconSelectionLost,
-		[Roact.Ref] = p7.iconRef
+		onActivated = props.props.onActivated,
+		layoutOrder = props.props.layoutOrder,
+		anchorPoint = props.props.anchorPoint,
+		position = props.props.position,
+		onSelectionGained = props.onIconSelectionGained,
+		onSelectionLost = props.onIconSelectionLost,
+		[Roact.Ref] = props.iconRef
 	})
 end
 
-return v8
+return extended

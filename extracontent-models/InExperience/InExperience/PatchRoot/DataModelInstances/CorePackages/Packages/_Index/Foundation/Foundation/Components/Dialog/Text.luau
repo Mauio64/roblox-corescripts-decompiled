@@ -1,1 +1,3 @@
-return (require(script.DialogText))
+local DialogText = require(script.DialogText)
+
+return DialogText

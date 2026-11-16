@@ -1,54 +1,50 @@
-local t1 = {
+local v = {
 	[Enum.KeyCode.Up] = "VerticalPagerPrevious",
 	[Enum.KeyCode.PageUp] = "VerticalPagerPrevious",
 	[Enum.KeyCode.Down] = "VerticalPagerNext",
 	[Enum.KeyCode.PageDown] = "VerticalPagerNext"
 }
-local t2 = {
+
+local v2 = {
 	[Enum.KeyCode.DPadUp] = "VerticalPagerPrevious",
 	[Enum.KeyCode.DPadDown] = "VerticalPagerNext"
 }
+local PagerNavigation = {}
+PagerNavigation.PREVIOUS_EVENT = "VerticalPagerPrevious"
+PagerNavigation.NEXT_EVENT = "VerticalPagerNext"
+PagerNavigation.KEYBOARD_KEY_EVENTS = v
+PagerNavigation.DPAD_KEY_EVENTS = v2
 
-return {
-	PREVIOUS_EVENT = "VerticalPagerPrevious",
-	NEXT_EVENT = "VerticalPagerNext",
-	KEYBOARD_KEY_EVENTS = t1,
-	DPAD_KEY_EVENTS = t2,
-	buildEventMap = function(b1: boolean, s1: string) -- line: 40
-		-- upvalues: t2 (copy), t1 (copy)
-		if not b1 then
-			return {}
-		end
-
-		local v5 = table.clone(t2)
-
-		if s1 == "focused" then
-			for v6, v7 in t1 do
-				v5[v6] = v7
-			end
-		end
-
-		return v5
-	end,
-	thumbstickDirection = function(n1: number, n2: number) -- line: 59
-		if n2 > math.abs(n1) then
-			return nil
-		end
-
-		if n2 <= n1 then
-			return "previous"
-		end
-
-		return "next"
-	end,
-	shouldTrackDrag = function(b2: boolean, b3: boolean) -- line: 77
-		if not b2 then
-			return true
-		end
-
-		return b3
-	end,
-	resolveWheelGesture = function(n3: number, n4: number, n5: number) -- line: 99
-		return n5 <= n3 - n4, n3
+function PagerNavigation.buildEventMap(flag: boolean, p: string)
+	if not flag then
+		return {}
 	end
-}
+
+	local clone = table.clone(v2)
+
+	if p == "focused" then
+		for k, v3 in v do
+			clone[k] = v3
+		end
+	end
+
+	return clone
+end
+
+function PagerNavigation.thumbstickDirection(p: number, p2: number): nil | string
+	if math.abs(p) < p2 then
+		return nil
+	end
+
+	return if p2 <= p then "previous" else "next"
+end
+
+function PagerNavigation.shouldTrackDrag(flag: boolean, flag2: boolean)
+	return not flag or flag2
+end
+
+function PagerNavigation.resolveWheelGesture(p: number, p2: number, p3: number)
+	return p3 <= p - p2, p
+end
+
+return PagerNavigation

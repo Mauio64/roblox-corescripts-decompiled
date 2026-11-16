@@ -1,59 +1,82 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
-local PeekView = require(Parent.PeekView)
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+
+local PeekView = require(parent.PeekView)
 local PeekViewState = PeekView.PeekViewState
-local PeekView2 = PeekView.PeekView
+local peekView = PeekView.PeekView
+
 local useStyle = UIBlox.Core.Style.useStyle
 
-return function(t1: {[any]: any}) -- line: 25
-	-- upvalues: useStyle (copy), React (copy), PeekViewState (copy), PeekView2 (copy)
-	local v9 = useStyle()
-	local v10, v11 = React.useState(0)
-	local v12 = React.useCallback(function(n1: number) -- line: 29
-		-- upvalues: v11 (copy)
-		v11(n1)
-	end, {})
-	local v13 = React.useCallback(function(p1, _) -- line: 33
-		-- upvalues: t1 (copy), PeekViewState (copy)
-		local onPeekViewClosed = t1.onPeekViewClosed
+return function(props)
+	local v = useStyle()
+	local state, setState = React.useState(0)
 
-		if p1 == PeekViewState.Closed and onPeekViewClosed then
+	local briefToFullTransitionPercent = React.useCallback(function(p: number)
+		setState(p)
+	end, {})
+
+	local viewStateChanged = React.useCallback(function(p, _)
+		local onPeekViewClosed = props.onPeekViewClosed
+
+		if p == PeekViewState.Closed and onPeekViewClosed then
 			onPeekViewClosed()
 		end
-	end, { t1.onPeekViewClosed })
-	local viewWidth = t1.viewWidth
-	local uDim2 = UDim2.new(0, viewWidth, 1, 0)
-	local topBarHeight = t1.topBarHeight
-	local v17 = v10 > 0.95
-	local v18 = v10 > 0 and not v17
+	end, { props.onPeekViewClosed })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
+	local viewWidth = props.viewWidth
+	local udim = UDim2.new(0, viewWidth, 1, 0)
+	local topBarHeight = props.topBarHeight
+	local v2 = state > 0.95
+	local v3
+
+	if state > 0 then
+		v3 = not v2
+	else
+		v3 = false
+	end
+
+	local createElement = React.createElement
+	local v4 = {
 		Position = UDim2.fromOffset(0, 0),
-		Size = uDim2
-	}, {
-		PeekViewTopBar = if not v17 then nil else t1.renderTopBar(),
-		PeekViewTopBarEffectHolder = if not v18 then nil else React.createElement("Frame", {
-			BorderSizePixel = 0,
+		Size = udim,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0
+	}
+	local peekViewTopBar
+
+	if v2 then
+		peekViewTopBar = props.renderTopBar()
+	end
+
+	local peekViewTopBarEffectHolder
+
+	if v3 then
+		peekViewTopBarEffectHolder = React.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, topBarHeight),
 			Position = UDim2.new(0, 0, 0, 0),
-			BackgroundColor3 = v9.Theme.BackgroundDefault.Color,
-			BackgroundTransparency = 1 - v10
-		}),
+			BackgroundColor3 = v.Theme.BackgroundDefault.Color,
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1 - state
+		})
+	end
+
+	return createElement("Frame", v4, {
+		PeekViewTopBar = peekViewTopBar,
+		PeekViewTopBarEffectHolder = peekViewTopBarEffectHolder,
 		PeekViewContainer = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ClipsDescendants = true,
 			Size = UDim2.new(1, 0, 1, -topBarHeight + 6),
-			Position = UDim2.new(0, 0, 0, topBarHeight - 6)
+			Position = UDim2.new(0, 0, 0, topBarHeight - 6),
+			BackgroundTransparency = 1,
+			ClipsDescendants = true
 		}, {
-			PeekView = React.createElement(PeekView2, {
+			PeekView = React.createElement(peekView, {
+				briefViewContentHeight = props.briefViewContentHeight,
 				bottomDockedContainerHeight = 0,
-				briefViewContentHeight = t1.briefViewContentHeight,
-				mountAsFullView = t1.mountAsFullView,
-				viewStateChanged = v13,
-				briefToFullTransitionPercent = v12
+				mountAsFullView = props.mountAsFullView,
+				viewStateChanged = viewStateChanged,
+				briefToFullTransitionPercent = briefToFullTransitionPercent
 			}, {
 				UIListLayout = React.createElement("UIListLayout", {
 					Padding = UDim.new(0, 0),
@@ -61,7 +84,7 @@ return function(t1: {[any]: any}) -- line: 25
 					HorizontalAlignment = Enum.HorizontalAlignment.Left,
 					VerticalAlignment = Enum.VerticalAlignment.Top
 				}),
-				Content = t1.renderContent()
+				Content = props.renderContent()
 			})
 		})
 	})

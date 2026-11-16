@@ -1,17 +1,16 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
+local parent = ProfilePlatform.Parent
 
 require(ProfilePlatform.Common.AssetInfo)
-require(ProfilePlatformParent.CatalogNetworking)
-
-local AvatarExperienceInspectAndBuy = require(ProfilePlatformParent.AvatarExperienceInspectAndBuy)
+require(parent.CatalogNetworking)
+local AvatarExperienceInspectAndBuy = require(parent.AvatarExperienceInspectAndBuy)
 local getPriceStatusInShop = AvatarExperienceInspectAndBuy.Utils.getPriceStatusInShop
 local PriceStatus = AvatarExperienceInspectAndBuy.Enums.PriceStatus
-
 require(ProfilePlatform.Common.Types)
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local SalesLocationType = AvatarExperienceCommon.Enums.SalesLocationType
 
-local SalesLocationType = require(ProfilePlatformParent.AvatarExperienceCommon).Enums.SalesLocationType
-local t1 = {
+local v = {
 	[61] = true,
 	[60] = true,
 	[55] = true,
@@ -22,278 +21,322 @@ local t1 = {
 	[48] = true,
 	[9] = true
 }
-local t2 = {}
 
-for _, v10 in Enum.AvatarAssetType:GetEnumItems() do
-	if not t1[v10.Value] then
-		t2[v10.Value] = true
+local set = {}
+
+for _, v2 in Enum.AvatarAssetType:GetEnumItems() do
+	if not v[v2.Value] then
+		set[v2.Value] = true
 	end
 end
 
-local function getPriceStatusForProfile(p1) -- line: 45
-	-- upvalues: getPriceStatusInShop (copy)
-	return getPriceStatusInShop(p1)
+local function getPriceStatusForProfile(p) -- 3 equivalent calls inferred from this helper
+	return getPriceStatusInShop(p)
 end
-local function normalizeSaleLocationType(p2) -- line: 113
-	-- upvalues: SalesLocationType (copy)
-	if p2.saleLocationType == SalesLocationType.ShopOnly then
+
+local function isWearableAssetType(assetType: number): boolean -- 2 equivalent calls inferred from this helper
+	return set[assetType] == true
+end
+
+local function isPurchasableStatus(p: string): boolean -- 4 equivalent calls inferred from this helper
+	return p == PriceStatus.Free or p == PriceStatus.PurchaseFromRoblox or p == PriceStatus.PurchaseFromResale
+end
+
+local function normalizeSaleLocationType(data) -- 1 equivalent call inferred from this helper
+	if data.saleLocationType == SalesLocationType.ShopOnly then
 		return SalesLocationType.ShopAndAllExperiences
 	end
 
-	return p2.saleLocationType
+	return data.saleLocationType
 end
-local function resolveIsOwned(p3, p4, b1: boolean?) -- line: 122
-	if p4 and p4.quantityOwned ~= nil then
-		return p4.quantityOwned > 0
+
+local function resolveIsOwned(data, p, isOwned: boolean?) -- 1 equivalent call inferred from this helper
+	if p and p.quantityOwned ~= nil then
+		return p.quantityOwned > 0
 	end
 
-	if b1 ~= nil then
-		return b1
+	if isOwned == nil then
+		return data.owned == true
 	end
 
-	return p3.owned == true
+	return isOwned
 end
-local function buildItemRestrictions(p5) -- line: 135
-	local itemRestrictions = p5.itemRestrictions
+
+local function buildItemRestrictions(data) -- 1 equivalent call inferred from this helper
+	local itemRestrictions = data.itemRestrictions
 
 	if not itemRestrictions or #itemRestrictions == 0 then
 		return nil
 	end
 
-	local t3 = {}
+	local itemRestrictionSet = {}
 
-	for _, v45 in itemRestrictions do
-		t3[v45] = true
+	for _, itemRestriction in itemRestrictions do
+		itemRestrictionSet[itemRestriction] = true
 	end
 
-	return t3
+	return itemRestrictionSet
 end
-local function buildCollectibleItemDetails(p6, p7, s1: string?) -- line: 147
-	local t4 = nil
 
-	if p6.hasResellers or (p6.unitsAvailableForConsumption or (p6.totalQuantity or (p6.lowestResalePrice or p7 and p7.quantityOwned))) then
-		t4 = {
-			hasResellers = p6.hasResellers,
-			unitsAvailableForConsumption = p6.unitsAvailableForConsumption,
-			totalQuantity = p6.totalQuantity,
-			lowestResalePrice = p6.lowestResalePrice,
-			resellableCount = if not p7 then nil else p7.quantityOwned,
-			collectibleLowestAvailableResaleProductId = s1
+local function buildCollectibleItemDetails(data, p, collectibleLowestAvailableResaleProductId: string?)
+	local collectibleItemDetails
+
+	if
+		data.hasResellers
+		or data.unitsAvailableForConsumption
+		or data.totalQuantity
+		or data.lowestResalePrice
+		or p and p.quantityOwned
+	then
+		collectibleItemDetails = {
+			hasResellers = data.hasResellers,
+			unitsAvailableForConsumption = data.unitsAvailableForConsumption,
+			totalQuantity = data.totalQuantity,
+			lowestResalePrice = data.lowestResalePrice,
+			resellableCount = 0,
+			collectibleLowestAvailableResaleProductId = 0
 		}
+		local resellableCount
+
+		if p then
+			resellableCount = p.quantityOwned
+		end
+
+		collectibleItemDetails.resellableCount = resellableCount
+		collectibleItemDetails.collectibleLowestAvailableResaleProductId = collectibleLowestAvailableResaleProductId
 	end
 
-	return t4
+	return collectibleItemDetails
 end
-local function buildAssetsInBundle(p8, p9) -- line: 173
-	local v52 = nil
 
-	if p9 and p9.assetsInBundle then
-		local t5 = {}
+local function buildAssetsInBundle(data, p)
+	local v2 = nil
 
-		for _, v55 in p9.assetsInBundle do
-			table.insert(t5, {
-				id = tostring(v55.id),
-				assetType = tostring(v55.assetType),
-				isIncluded = v55.isIncluded
+	if p and p.assetsInBundle then
+		local result = {}
+
+		for _, v3 in p.assetsInBundle do
+			table.insert(result, {
+				id = tostring(v3.id),
+				assetType = tostring(v3.assetType),
+				isIncluded = v3.isIncluded
 			})
 		end
 
-		return t5
-	end
+		return result
+	else
+		if not data.bundledItems then
+			return v2
+		end
 
-	if p8.bundledItems then
-		local t6 = {}
+		local v3 = {}
 
-		for _, v58 in p8.bundledItems do
-			if v58.type == "Asset" and v58.assetType then
-				table.insert(t6, {
-					id = tostring(v58.id),
-					assetType = tostring(v58.assetType)
+		for _, bundledItem in data.bundledItems do
+			if bundledItem.type == "Asset" and bundledItem.assetType then
+				table.insert(v3, {
+					id = tostring(bundledItem.id),
+					assetType = tostring(bundledItem.assetType)
 				})
 			end
 		end
 
-		if #t6 > 0 then
-			v52 = t6
-		end
+		return if #v3 > 0 then v3 else v2
 	end
-
-	return v52
 end
-local function computeBundleParts(p10, p11, t7: {[any]: any}) -- line: 204
-	-- upvalues: t2 (copy)
-	local n1 = 0
-	local t8 = {}
 
-	if p11 and p11.assetsInBundle then
-		for _, v65 in p11.assetsInBundle do
-			if t7[tostring(v65.id)] then
-				n1 += 1
+local function computeBundleParts(data, p, p2)
+	local count = 0
+	local ids = {}
 
-				if t2[v65.assetType] == true then
-					table.insert(t8, v65.id)
-				end
+	if p and p.assetsInBundle then
+		for _, v2 in p.assetsInBundle do
+			if not p2[tostring(v2.id)] then
+				continue
+			end
+
+			count += 1
+
+			if isWearableAssetType(v2.assetType) then -- inferred equivalent call
+				table.insert(ids, v2.id)
 			end
 		end
+	elseif data.bundledItems then
+		for _, bundledItem in data.bundledItems do
+			if bundledItem.type ~= "Asset" then
+				continue
+			end
 
-		return n1, t8
-	end
+			count += 1
 
-	if p10.bundledItems then
-		for _, v67 in p10.bundledItems do
-			if v67.type == "Asset" then
-				n1 += 1
-
-				if v67.assetType and t2[v67.assetType] == true then
-					table.insert(t8, v67.id)
-				end
+			if bundledItem.assetType and isWearableAssetType(bundledItem.assetType) then -- inferred equivalent call
+				table.insert(ids, bundledItem.id)
 			end
 		end
 	end
 
-	return n1, t8
+	return count, ids
 end
-local function extractTaxonomyName(p12) -- line: 233
-	if p12.taxonomy and #p12.taxonomy > 0 then
-		return p12.taxonomy[1].taxonomyName
+
+local function extractTaxonomyName(data) -- 1 equivalent call inferred from this helper
+	if data.taxonomy and #data.taxonomy > 0 then
+		return data.taxonomy[1].taxonomyName
 	end
 
 	return nil
 end
 
-return {
-	isWearableAssetType = function(n2: number) -- line: 49
-		-- upvalues: t2 (copy)
-		return t2[n2] == true
-	end,
-	expandBundleToAssetIds = function(p13) -- line: 53
-		local t9 = {}
+local InspectAvatarUtils = {}
+InspectAvatarUtils.isWearableAssetType = isWearableAssetType
 
-		if p13.bundledItems then
-			for _, v24 in p13.bundledItems do
-				if v24.type == "Asset" then
-					table.insert(t9, v24.id)
-				end
+function InspectAvatarUtils.expandBundleToAssetIds(p)
+	local ids = {}
+
+	if p.bundledItems then
+		for _, bundledItem in p.bundledItems do
+			if bundledItem.type == "Asset" then
+				table.insert(ids, bundledItem.id)
 			end
 		end
+	end
 
-		return t9
-	end,
-	collectBundleComponentIds = function(t10: {[any]: any}, t11: {[any]: any}) -- line: 69
-		local t12 = {}
+	return ids
+end
 
-		for _, v29 in t10 do
-			local v30 = t11[v29]
+function InspectAvatarUtils.collectBundleComponentIds(items, p)
+	local idSet = {}
 
-			if v30 and v30.assetsInBundle then
-				for _, v32 in v30.assetsInBundle do
-					t12[tostring(v32.id)] = true
-				end
-			end
+	for _, item in items do
+		local v2 = p[item]
+
+		if not (v2 and v2.assetsInBundle) then
+			continue
 		end
 
-		return t12
-	end,
-	buildItemData = function(p14, p15, t13: {[any]: any}, s2: string?, b2: boolean?, s3: string?) -- line: 240
-		-- upvalues: computeBundleParts (copy), SalesLocationType (copy), buildCollectibleItemDetails (copy), buildAssetsInBundle (copy)
-		local v75 = p14.assetType or p14.bundleType
-		local v76, v77 = computeBundleParts(p14, p15, t13)
-		local v78 = p14.itemType or "Asset"
-		local t14 = {
-			id = tostring(p14.id),
-			name = p14.name,
-			itemType = v78,
-			itemSubType = if not v75 then nil else tostring(v75),
-			priceInRobux = p14.price,
-			creator = {
-				creatorId = tostring(p14.creatorTargetId or ""),
-				creatorName = p14.creatorName,
-				creatorHasVerifiedBadge = p14.creatorHasVerifiedBadge
-			},
-			saleLocationType = if p14.saleLocationType ~= SalesLocationType.ShopOnly then p14.saleLocationType else SalesLocationType.ShopAndAllExperiences,
-			isOffSale = p14.isOffSale,
-			isOwned = if not p15 or p15.quantityOwned == nil then if b2 == nil then p14.owned == true else b2 else p15.quantityOwned > 0,
-			noPriceStatus = if not p15 then nil else p15.noPriceStatus,
-			catalogPriceStatus = p14.priceStatus,
-			collectibleItemId = p14.collectibleItemId
-		}
-		local itemRestrictions = p14.itemRestrictions
-		local v81
+		for _, v3 in v2.assetsInBundle do
+			idSet[tostring(v3.id)] = true
+		end
+	end
 
-		if not itemRestrictions or #itemRestrictions == 0 then
-			v81 = nil
-		else
-			v81 = {}
+	return idSet
+end
 
-			for _, v83 in itemRestrictions do
-				v81[v83] = true
+function InspectAvatarUtils.buildItemData(data, p, p2, collectibleProductId: string?, isOwned: boolean?, collectibleLowestAvailableResaleProductId: string?)
+	local assetType = data.assetType or data.bundleType
+	local bundlePartsCount, bundleAssetIds = computeBundleParts(data, p, p2)
+	local itemType = data.itemType or "Asset"
+
+	local itemData = {
+		id = tostring(data.id),
+		name = data.name,
+		itemType = itemType,
+		itemSubType = 0,
+		priceInRobux = 0,
+		creator = 0,
+		saleLocationType = 0,
+		isOffSale = 0,
+		isOwned = 0,
+		noPriceStatus = 0,
+		catalogPriceStatus = 0,
+		collectibleItemId = 0,
+		itemRestrictions = 0,
+		collectibleItemDetails = 0,
+		assetsInBundle = 0,
+		collectibleProductId = 0,
+		bundlePartsCount = 0,
+		bundleAssetIds = 0,
+		taxonomyName = 0
+	}
+	local itemSubType
+
+	if assetType then
+		itemSubType = tostring(assetType)
+	end
+
+	itemData.itemSubType = itemSubType
+	itemData.priceInRobux = data.price
+	itemData.creator = {
+		creatorId = tostring(data.creatorTargetId or ""),
+		creatorName = data.creatorName,
+		creatorHasVerifiedBadge = data.creatorHasVerifiedBadge
+	}
+	itemData.saleLocationType = normalizeSaleLocationType(data) -- inferred equivalent call
+	itemData.isOffSale = data.isOffSale
+	isOwned = resolveIsOwned(data, p, isOwned) -- inferred equivalent call
+	itemData.isOwned = isOwned
+	local noPriceStatus
+
+	if p then
+		noPriceStatus = p.noPriceStatus
+	end
+
+	itemData.noPriceStatus = noPriceStatus
+	itemData.catalogPriceStatus = data.priceStatus
+	itemData.collectibleItemId = data.collectibleItemId
+	itemData.itemRestrictions = buildItemRestrictions(data) -- inferred equivalent call
+	itemData.collectibleItemDetails = buildCollectibleItemDetails(data, p, collectibleLowestAvailableResaleProductId)
+	itemData.assetsInBundle = buildAssetsInBundle(data, p)
+
+	if p then
+		collectibleProductId = p.collectibleProductId
+	end
+
+	itemData.collectibleProductId = collectibleProductId
+	itemData.bundlePartsCount = bundlePartsCount
+	itemData.bundleAssetIds = bundleAssetIds
+	itemData.taxonomyName = extractTaxonomyName(data) -- inferred equivalent call
+	return itemData
+end
+
+InspectAvatarUtils.isPurchasableStatus = isPurchasableStatus
+
+function InspectAvatarUtils.isItemPurchasable(p)
+	return not p.isOwned and isPurchasableStatus(getPriceStatusForProfile(p)) and p.collectibleProductId ~= nil -- inferred equivalent call
+end
+
+function InspectAvatarUtils.getEffectivePrice(p)
+	if getPriceStatusForProfile(p) ~= PriceStatus.PurchaseFromResale then -- inferred equivalent call
+		return p.priceInRobux or 0
+	end
+
+	if p.collectibleItemDetails then
+		return p.collectibleItemDetails.lowestResalePrice or 0
+	end
+
+	return 0
+end
+
+function InspectAvatarUtils.sortDisplayItems(list)
+	table.sort(list, function(a, b): boolean
+		local function sortKey(p): number
+			local priceStatusForProfile = getPriceStatusForProfile(p) -- inferred equivalent call
+
+			if isPurchasableStatus(priceStatusForProfile) then -- inferred equivalent call
+				return 0
 			end
+
+			if
+				priceStatusForProfile == PriceStatus.Owned
+				or priceStatusForProfile == PriceStatus.QuantityLimitReached
+			then
+				return 1
+			end
+
+			return 2
 		end
 
-		t14.itemRestrictions = v81
-		t14.collectibleItemDetails = buildCollectibleItemDetails(p14, p15, s3)
-		t14.assetsInBundle = buildAssetsInBundle(p14, p15)
-		t14.collectibleProductId = if not p15 then s2 else p15.collectibleProductId
-		t14.bundlePartsCount = v76
-		t14.bundleAssetIds = v77
-		t14.taxonomyName = if not p14.taxonomy or not (#p14.taxonomy > 0) then nil else p14.taxonomy[1].taxonomyName
+		local priceStatusInShop = getPriceStatusInShop(a)
 
-		return t14
-	end,
-	isPurchasableStatus = function(s4: string) -- line: 85
-		-- upvalues: PriceStatus (copy)
-		return s4 == PriceStatus.Free or (s4 == PriceStatus.PurchaseFromRoblox or s4 == PriceStatus.PurchaseFromResale)
-	end,
-	isItemPurchasable = function(p16) -- line: 91
-		-- upvalues: getPriceStatusInShop (copy), PriceStatus (copy)
-		if p16.isOwned then
-			return false
-		end
+		local v2 = isPurchasableStatus(priceStatusInShop) and 0 -- inferred equivalent call
+			or (priceStatusInShop == PriceStatus.Owned or priceStatusInShop == PriceStatus.QuantityLimitReached) and 1
+			or 2
+		local priceStatusInShop2 = getPriceStatusInShop(b)
 
-		local v35 = getPriceStatusInShop(p16)
+		return v2 < (isPurchasableStatus(priceStatusInShop2) and 0 or (priceStatusInShop2 == PriceStatus.Owned or priceStatusInShop2 == PriceStatus.QuantityLimitReached) and 1 or 2) -- inferred equivalent call
+	end)
 
-		return (v35 == PriceStatus.Free or (v35 == PriceStatus.PurchaseFromRoblox or v35 == PriceStatus.PurchaseFromResale)) and p16.collectibleProductId ~= nil
-	end,
-	getEffectivePrice = function(p17) -- line: 98
-		-- upvalues: getPriceStatusInShop (copy), PriceStatus (copy)
-		if getPriceStatusInShop(p17) == PriceStatus.PurchaseFromResale then
-			if p17.collectibleItemDetails then
-				return p17.collectibleItemDetails.lowestResalePrice or 0
-			end
+	return list
+end
 
-			return 0
-		end
-
-		return p17.priceInRobux or 0
-	end,
-	sortDisplayItems = function(t15: {[any]: any}) -- line: 279
-		-- upvalues: getPriceStatusInShop (copy), PriceStatus (copy)
-		table.sort(t15, function(p18, p19) -- line: 280
-			-- upvalues: getPriceStatusInShop (copy), PriceStatus (copy)
-			local function sortKey(p20) -- line: 281
-				-- upvalues: getPriceStatusInShop (copy), PriceStatus (copy)
-				local v92 = getPriceStatusInShop(p20)
-
-				if v92 == PriceStatus.Free or (v92 == PriceStatus.PurchaseFromRoblox or v92 == PriceStatus.PurchaseFromResale) then
-					return 0
-				end
-
-				if v92 == PriceStatus.Owned or v92 == PriceStatus.QuantityLimitReached then
-					return 1
-				end
-
-				return 2
-			end
-
-			local v88 = getPriceStatusInShop(p18)
-			local v89 = if not (v88 == PriceStatus.Free or (v88 == PriceStatus.PurchaseFromRoblox or v88 == PriceStatus.PurchaseFromResale)) then v88 ~= PriceStatus.Owned and v88 ~= PriceStatus.QuantityLimitReached and 2 or 1 else 0
-			local v90 = getPriceStatusInShop(p19)
-
-			return v89 < if not (v90 == PriceStatus.Free or (v90 == PriceStatus.PurchaseFromRoblox or v90 == PriceStatus.PurchaseFromResale)) then v90 ~= PriceStatus.Owned and v90 ~= PriceStatus.QuantityLimitReached and 2 or 1 else 0
-		end)
-
-		return t15
-	end,
-	getPriceStatus = getPriceStatusForProfile,
-	PriceStatusEnum = PriceStatus
-}
+InspectAvatarUtils.getPriceStatus = getPriceStatusForProfile
+InspectAvatarUtils.PriceStatusEnum = PriceStatus
+return InspectAvatarUtils

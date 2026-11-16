@@ -1,9 +1,10 @@
-local function withFlag(p1, p2) -- line: 18
-	local v4 = game:SetFastFlagForTesting(p1, true)
-	local ok, result = pcall(p2)
+local function withFlag(p, callback)
+	local v = game:SetFastFlagForTesting(p, true)
+	local success, result = pcall(callback)
 
-	game:SetFastFlagForTesting(p1, v4)
-	assert(ok, (tostring(result)))
+	game:SetFastFlagForTesting(p, v)
+
+	assert(success, (tostring(result)))
 end
 
 return withFlag

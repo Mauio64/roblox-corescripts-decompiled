@@ -1,28 +1,36 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
-local InGameAssetReportingParent = InGameAssetReporting.Parent
-local Localization = require(InGameAssetReportingParent.Localization)
-local React = require(InGameAssetReportingParent.React)
-local View = require(InGameAssetReportingParent.Foundation).View
-local DsaIllegalContentReporting = require(InGameAssetReportingParent.DsaIllegalContentReporting)
+local parent = InGameAssetReporting.Parent
+
+local Localization = require(parent.Localization)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local DsaIllegalContentReporting = require(parent.DsaIllegalContentReporting)
 local isShowUKOSAIllegalContentReportingLink = DsaIllegalContentReporting.isShowUKOSAIllegalContentReportingLink
 local OSAReportLink = DsaIllegalContentReporting.OSAReportLink
+
 local useLocalization = Localization.Hooks.useLocalization
-local DefaultDualDropdownDialog = require(InGameAssetReportingParent.GenericAbuseReporting.DefaultDualDropdownDialog)
-local DefaultDualDropdownDialogV2 = require(InGameAssetReportingParent.GenericAbuseReporting.DefaultDualDropdownDialogV2)
+
+local DefaultDualDropdownDialog = require(parent.GenericAbuseReporting.DefaultDualDropdownDialog)
+local DefaultDualDropdownDialogV2 = require(parent.GenericAbuseReporting.DefaultDualDropdownDialogV2)
+
 local Constants = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants)
 local getPreselectedSurfaceValue = require(InGameAssetReporting.Utility.getPreselectedSurfaceValue)
-
 require(InGameAssetReporting.Analysis.SceneAnalysis)
 
-local FFlagPrefillPreciseSelectionChoices = require(InGameAssetReportingParent.SharedFlags).FFlagPrefillPreciseSelectionChoices
-local FFlagGenericAbuseReportingGranularExports = require(InGameAssetReportingParent.SharedFlags).FFlagGenericAbuseReportingGranularExports
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPrefillPreciseSelectionChoices = SharedFlags.FFlagPrefillPreciseSelectionChoices
 
-local function InGameAssetReportSubmitDialog(t1: {[any]: any}) -- line: 36
-	-- upvalues: FFlagPrefillPreciseSelectionChoices (copy), useLocalization (copy), getPreselectedSurfaceValue (copy), React (copy), Constants (copy), DefaultDualDropdownDialogV2 (copy), DefaultDualDropdownDialog (copy), FFlagGenericAbuseReportingGranularExports (copy), isShowUKOSAIllegalContentReportingLink (copy), View (copy), OSAReportLink (copy)
-	local u18 = nil
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagGenericAbuseReportingGranularExports = SharedFlags2.FFlagGenericAbuseReportingGranularExports
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagDropUnroutableMultiReportOptions = SharedFlags3.FFlagDropUnroutableMultiReportOptions
+
+local function InGameAssetReportSubmitDialog(props)
+	local v
 
 	if FFlagPrefillPreciseSelectionChoices then
-		u18 = useLocalization({
+		v = useLocalization({
 			title = "Feature.ReportAbuse.Title.SelectInSceneFinishYourReport",
 			problemBullying = "Feature.ReportAbuse.Problem.Bullying",
 			problemBullyingDesc = "Feature.ReportAbuse.ProblemDescription.Bullying",
@@ -53,219 +61,264 @@ local function InGameAssetReportSubmitDialog(t1: {[any]: any}) -- line: 36
 			problemIPInfringement = "Feature.ReportAbuse.Problem.IpInfringement",
 			problemIPInfringementDesc = "Feature.ReportAbuse.ProblemDescription.IpInfringement"
 		})
+	else
+		v = nil
 	end
 
 	if FFlagPrefillPreciseSelectionChoices then
-		local v19 = getPreselectedSurfaceValue(t1.extractionResult)
-		local v20 = if v19 ~= "avatar" then if v19 ~= "item" then if v19 ~= "text" then nil else u18.surfaceTextChat else u18.surfaceItem else u18.surfaceAvatar
+		local preselectedSurfaceValue = getPreselectedSurfaceValue(props.extractionResult)
+		local prefilled_surface_selection
 
-		React.useEffect(function() -- line: 80
-			-- upvalues: v20 (copy), t1 (copy), Constants (copy)
-			if v20 then
-				t1.analyticsDispatch({
+		if preselectedSurfaceValue == "avatar" then
+			prefilled_surface_selection = v.surfaceAvatar
+		elseif preselectedSurfaceValue == "item" then
+			prefilled_surface_selection = v.surfaceItem
+		elseif preselectedSurfaceValue == "text" then
+			prefilled_surface_selection = v.surfaceTextChat
+		else
+			prefilled_surface_selection = nil
+		end
+
+		React.useEffect(function()
+			if prefilled_surface_selection then
+				props.analyticsDispatch({
 					type = Constants.AnalyticsActions.SetPrefilledSurfaceSelection,
-					prefilled_surface_selection = v20
+					prefilled_surface_selection = prefilled_surface_selection
 				})
 			end
-		end, { v20 })
+		end, { prefilled_surface_selection })
 
-		local v21 = React.useMemo(function() -- line: 89
-			-- upvalues: u18 (ref)
+		local problems = React.useMemo(function()
+			if FFlagDropUnroutableMultiReportOptions then
+				return {
+					{
+						value = "bullying",
+						label = v.problemBullying,
+						description = v.problemBullyingDesc
+					},
+					{ value = "dating", label = v.problemDating, description = v.problemDatingDesc },
+					{ value = "hate", label = v.problemHate, description = v.problemHateDesc },
+					{
+						value = "offsite links",
+						label = v.problemLinks,
+						description = v.problemLinksDesc
+					},
+					{
+						value = "personal question",
+						label = v.problemPersonal,
+						description = v.problemPersonalDesc
+					},
+					{
+						value = "swearing",
+						label = v.problemSwearing,
+						description = v.problemSwearingDesc
+					},
+					{
+						value = "violence",
+						label = v.problemViolence,
+						description = v.problemViolenceDesc
+					},
+					{
+						value = "ip infringement",
+						label = v.problemIPInfringement,
+						description = v.problemIPInfringementDesc
+					}
+				}
+			end
+
 			return {
 				{
 					value = "bullying",
-					label = u18.problemBullying,
-					description = u18.problemBullyingDesc
+					label = v.problemBullying,
+					description = v.problemBullyingDesc
 				},
 				{
 					value = "exploiting",
-					label = u18.problemCheating,
-					description = u18.problemCheatingDesc
+					label = v.problemCheating,
+					description = v.problemCheatingDesc
 				},
-				{
-					value = "dating",
-					label = u18.problemDating,
-					description = u18.problemDatingDesc
-				},
-				{
-					value = "hate",
-					label = u18.problemHate,
-					description = u18.problemHateDesc
-				},
+				{ value = "dating", label = v.problemDating, description = v.problemDatingDesc },
+				{ value = "hate", label = v.problemHate, description = v.problemHateDesc },
 				{
 					value = "offsite links",
-					label = u18.problemLinks,
-					description = u18.problemLinksDesc
+					label = v.problemLinks,
+					description = v.problemLinksDesc
 				},
 				{
 					value = "personal question",
-					label = u18.problemPersonal,
-					description = u18.problemPersonalDesc
+					label = v.problemPersonal,
+					description = v.problemPersonalDesc
 				},
 				{
 					value = "scamming",
-					label = u18.problemScamming,
-					description = u18.problemScammingDesc
+					label = v.problemScamming,
+					description = v.problemScammingDesc
 				},
 				{
 					value = "swearing",
-					label = u18.problemSwearing,
-					description = u18.problemSwearingDesc
+					label = v.problemSwearing,
+					description = v.problemSwearingDesc
 				},
 				{
 					value = "violence",
-					label = u18.problemViolence,
-					description = u18.problemViolenceDesc
+					label = v.problemViolence,
+					description = v.problemViolenceDesc
 				},
 				{
 					value = "ip infringement",
-					label = u18.problemIPInfringement,
-					description = u18.problemIPInfringementDesc
+					label = v.problemIPInfringement,
+					description = v.problemIPInfringementDesc
 				}
 			}
 		end, {
-			u18.problemBullying,
-			u18.problemBullyingDesc,
-			u18.problemCheating,
-			u18.problemCheatingDesc,
-			u18.problemDating,
-			u18.problemDatingDesc,
-			u18.problemHate,
-			u18.problemHateDesc,
-			u18.problemLinks,
-			u18.problemLinksDesc,
-			u18.problemPersonal,
-			u18.problemPersonalDesc,
-			u18.problemScamming,
-			u18.problemScammingDesc,
-			u18.problemSwearing,
-			u18.problemSwearingDesc,
-			u18.problemViolence,
-			u18.problemViolenceDesc,
-			u18.problemIPInfringement,
-			u18.problemIPInfringementDesc
+			v.problemBullying,
+			v.problemBullyingDesc,
+			v.problemCheating,
+			v.problemCheatingDesc,
+			v.problemDating,
+			v.problemDatingDesc,
+			v.problemHate,
+			v.problemHateDesc,
+			v.problemLinks,
+			v.problemLinksDesc,
+			v.problemPersonal,
+			v.problemPersonalDesc,
+			v.problemScamming,
+			v.problemScammingDesc,
+			v.problemSwearing,
+			v.problemSwearingDesc,
+			v.problemViolence,
+			v.problemViolenceDesc,
+			v.problemIPInfringement,
+			v.problemIPInfringementDesc
 		})
-		local v22 = React.useMemo(function() -- line: 141
-			-- upvalues: u18 (ref)
+
+		local surfaces = React.useMemo(function()
+			if FFlagDropUnroutableMultiReportOptions then
+				return {
+					{ value = "avatar", label = v.surfaceAvatar },
+					{ value = "drawing", label = v.surfaceDrawing },
+					{ value = "experience", label = v.surfaceExperience },
+					{ value = "item", label = v.surfaceItem },
+					{ value = "text", label = v.surfaceTextChat }
+				}
+			end
+
 			return {
-				{
-					value = "avatar",
-					label = u18.surfaceAvatar
-				},
-				{
-					value = "drawing",
-					label = u18.surfaceDrawing
-				},
-				{
-					value = "experience",
-					label = u18.surfaceExperience
-				},
-				{
-					value = "item",
-					label = u18.surfaceItem
-				},
-				{
-					value = "movement",
-					label = u18.surfaceMovement
-				},
-				{
-					value = "music",
-					label = u18.surfaceMusic
-				},
-				{
-					value = "text",
-					label = u18.surfaceTextChat
-				},
-				{
-					value = "username",
-					label = u18.surfaceUsername
-				}
+				{ value = "avatar", label = v.surfaceAvatar },
+				{ value = "drawing", label = v.surfaceDrawing },
+				{ value = "experience", label = v.surfaceExperience },
+				{ value = "item", label = v.surfaceItem },
+				{ value = "movement", label = v.surfaceMovement },
+				{ value = "music", label = v.surfaceMusic },
+				{ value = "text", label = v.surfaceTextChat },
+				{ value = "username", label = v.surfaceUsername }
 			}
 		end, {
-			u18.surfaceAvatar,
-			u18.surfaceDrawing,
-			u18.surfaceExperience,
-			u18.surfaceItem,
-			u18.surfaceMovement,
-			u18.surfaceMusic,
-			u18.surfaceTextChat,
-			u18.surfaceUsername
+			v.surfaceAvatar,
+			v.surfaceDrawing,
+			v.surfaceExperience,
+			v.surfaceItem,
+			v.surfaceMovement,
+			v.surfaceMusic,
+			v.surfaceTextChat,
+			v.surfaceUsername
 		})
-		local v23 = React.useMemo(function() -- line: 163
-			-- upvalues: v19 (copy), v22 (copy)
-			local v24 = nil
 
-			if v19 ~= nil and v22 ~= nil then
-				for i = 1, #v22 do
-					local v26 = v22[i]
+		local preselected = React.useMemo(function()
+			local surface = nil
 
-					if v26 and v26.value == v19 then
-						v24 = v26
+			if preselectedSurfaceValue ~= nil and surfaces ~= nil then
+				for i = 1, #surfaces do
+					local v2 = surfaces[i]
 
-						return {
-							surface = v24
-						}
+					if v2 and v2.value == preselectedSurfaceValue then
+						surface = v2
+						break
 					end
 				end
 			end
 
-			return {
-				surface = v24
-			}
-		end, {
-			v19,
-			v22
-		})
+			return { surface = surface }
+		end, { preselectedSurfaceValue, surfaces })
 
 		return React.createElement(DefaultDualDropdownDialogV2, {
-			title = u18.title,
-			problems = v21,
-			surfaces = v22,
-			preselected = v23,
-			onClose = t1.onBack,
-			onSubmit = t1.onSubmit
+			title = v.title,
+			problems = problems,
+			surfaces = surfaces,
+			preselected = preselected,
+			onClose = props.onBack,
+			onSubmit = props.onSubmit
 		})
 	end
 
 	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		ZIndex = 10,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.fromScale(0.5, 0.5),
-		AnchorPoint = Vector2.new(0.5, 0.5)
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		ZIndex = 10
 	}, {
 		SubmitReportDialog = React.createElement(DefaultDualDropdownDialog, {
 			analyticsContext = "Test",
 			localizationKeys = {
 				formTitle = "Feature.ReportAbuse.Title.SelectInSceneFinishYourReport",
-				formSubmit = "Feature.ReportAbuse.Action.Submit"
+				formSubmit = "Feature.ReportAbuse.Label.Report"
 			},
 			onSubmitProps = {
 				hasNextSteps = true,
-				onProceedToNextStep = if not FFlagGenericAbuseReportingGranularExports then t1.onSubmit else function(s1: string, s2: string, s3: string) -- line: 202
-					-- upvalues: t1 (copy)
-					t1.onSubmit(s1, s2, s3)
-
+				onProceedToNextStep = FFlagGenericAbuseReportingGranularExports and function(p: string, p2: string, p3: string): boolean
+					props.onSubmit(p, p2, p3)
 					return true
-				end
+				end or props.onSubmit
 			},
-			onCloseProps = {
-				hasPreviousSteps = false,
-				onAbandon = t1.onBack
-			},
-			footerContent = function() -- line: 212
-				-- upvalues: isShowUKOSAIllegalContentReportingLink (copy), React (copy), View (copy), OSAReportLink (copy)
+			onCloseProps = { hasPreviousSteps = false, onAbandon = props.onBack },
+			footerContent = function()
 				if isShowUKOSAIllegalContentReportingLink() then
-					return React.createElement(View, {
-						tag = "size-full-0 auto-y"
-					}, {
+					return React.createElement(View, { tag = "size-full-0 auto-y" }, {
 						OSALink = React.createElement(OSAReportLink)
 					})
 				end
 
 				return nil
 			end,
-			reportProblems = {
+			reportProblems = FFlagDropUnroutableMultiReportOptions and {
+				{
+					localizationKey = "Feature.ReportAbuse.Problem.Bullying",
+					value = "bullying",
+					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Bullying"
+				},
+				{
+					localizationKey = "Feature.ReportAbuse.Problem.Dating",
+					value = "dating",
+					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Dating"
+				},
+				{
+					localizationKey = "Feature.ReportAbuse.Problem.Hate",
+					value = "hate",
+					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Hate"
+				},
+				{
+					localizationKey = "Feature.ReportAbuse.Problem.Links",
+					value = "offsite links",
+					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Links"
+				},
+				{
+					localizationKey = "Feature.ReportAbuse.Problem.Personal",
+					value = "personal question",
+					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Personal"
+				},
+				{
+					localizationKey = "Feature.ReportAbuse.Problem.Swearing",
+					value = "swearing",
+					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Swearing"
+				},
+				{
+					localizationKey = "Feature.ReportAbuse.Problem.Violence",
+					value = "violence",
+					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Violence"
+				}
+			} or {
 				{
 					localizationKey = "Feature.ReportAbuse.Problem.Bullying",
 					value = "bullying",
@@ -312,11 +365,23 @@ local function InGameAssetReportSubmitDialog(t1: {[any]: any}) -- line: 36
 					descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Violence"
 				}
 			},
-			reportSurfaces = {
+			reportSurfaces = FFlagDropUnroutableMultiReportOptions and {
+				{ localizationKey = "Feature.ReportAbuse.ProblemSurface.Avatar", value = "avatar" },
 				{
-					localizationKey = "Feature.ReportAbuse.ProblemSurface.Avatar",
-					value = "avatar"
+					localizationKey = "Feature.ReportAbuse.ProblemSurface.DrawingOrCreation",
+					value = "drawing"
 				},
+				{
+					localizationKey = "Feature.ReportAbuse.ProblemSurface.Experience",
+					value = "experience"
+				},
+				{
+					localizationKey = "Feature.ReportAbuse.ProblemSurface.ItemOrAsset",
+					value = "item"
+				},
+				{ localizationKey = "Feature.ReportAbuse.ProblemSurface.TextChat", value = "text" }
+			} or {
+				{ localizationKey = "Feature.ReportAbuse.ProblemSurface.Avatar", value = "avatar" },
 				{
 					localizationKey = "Feature.ReportAbuse.ProblemSurface.DrawingOrCreation",
 					value = "drawing"
@@ -337,10 +402,7 @@ local function InGameAssetReportSubmitDialog(t1: {[any]: any}) -- line: 36
 					localizationKey = "Feature.ReportAbuse.ProblemSurface.MusicOrSoundEffect",
 					value = "music"
 				},
-				{
-					localizationKey = "Feature.ReportAbuse.ProblemSurface.TextChat",
-					value = "text"
-				},
+				{ localizationKey = "Feature.ReportAbuse.ProblemSurface.TextChat", value = "text" },
 				{
 					localizationKey = "Feature.ReportAbuse.ProblemSurface.Username",
 					value = "username"

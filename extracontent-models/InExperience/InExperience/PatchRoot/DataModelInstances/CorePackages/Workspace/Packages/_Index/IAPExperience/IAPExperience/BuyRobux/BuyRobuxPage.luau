@@ -1,12 +1,16 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+
 local LocalizationService = game:GetService("LocalizationService")
 local GuiService = game:GetService("GuiService")
-local Roact = require(scriptParentParentParent.Roact)
-local RoactGamepad = require(scriptParentParentParent.RoactGamepad)
-local Cryo = require(scriptParentParentParent.Cryo)
-local UIBlox = require(scriptParentParentParent.UIBlox)
+
+local Roact = require(parent3.Roact)
+
+local RoactGamepad = require(parent3.RoactGamepad)
+local Cryo = require(parent3.Cryo)
+
+local UIBlox = require(parent3.UIBlox)
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local Images = UIBlox.App.ImageSet.Images
@@ -14,22 +18,33 @@ local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local withStyle = UIBlox.Core.Style.withStyle
 local useStyleMetadata = UIBlox.Core.Style.useStyleMetadata
-local Constants = UIBlox.App.Style.Constants
-local RoactFitComponents = require(scriptParentParentParent.RoactFitComponents)
+local Foundation = require(parent3.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
+local RoactFitComponents = require(parent3.RoactFitComponents)
 local FitFrameHorizontal = RoactFitComponents.FitFrameHorizontal
 local FitTextLabel = RoactFitComponents.FitTextLabel
-local FullscreenFrame = require(scriptParentParentParent.AppBlox).FullscreenFrame
-local MultiTextLocalizer = require(scriptParentParent.Locale.MultiTextLocalizer)
-local formatNumber = require(scriptParentParent.Utility.formatNumber)
-local Animator = require(scriptParentParent.Generic.Animator)
-local getEnableCompensatingScrollingFrame = require(scriptParentParent.Flags.getEnableCompensatingScrollingFrame)
-local getUserInputEventData = require(scriptParentParent.Utility.getUserInputEventData)
-local RobuxPackage = require(scriptParent.RobuxPackage)
-local FFlagEnableLeftNavOnConsole = require(scriptParentParentParent.SharedFlags).FFlagEnableLeftNavOnConsole
-local v29 = Roact.Component:extend(script.Name)
-local v30 = Images["icons/common/goldrobux"]
-local v31 = Images["icons/logo/block"]
-local t1 = {
+local AppBlox = require(parent3.AppBlox)
+local FullscreenFrame = AppBlox.FullscreenFrame
+
+local MultiTextLocalizer = require(parent2.Locale.MultiTextLocalizer)
+local formatNumber = require(parent2.Utility.formatNumber)
+local Animator = require(parent2.Generic.Animator)
+
+local getEnableCompensatingScrollingFrame = require(parent2.Flags.getEnableCompensatingScrollingFrame)
+
+local getUserInputEventData = require(parent2.Utility.getUserInputEventData)
+
+local RobuxPackage = require(parent.RobuxPackage)
+local FFlagBuyRobuxPageFitToViewport = require(parent2.Flags.FFlagBuyRobuxPageFitToViewport)
+
+local extended = Roact.Component:extend(script.Name)
+
+local iconscommongoldrobux = Images["icons/common/goldrobux"]
+local iconslogoblock = Images["icons/logo/block"]
+local v = {
 	Images["icons/graphic/robuxcoin1_xxlarge"],
 	Images["icons/graphic/robuxcoin2_xxlarge"],
 	Images["icons/graphic/robuxcoin3_xxlarge"],
@@ -37,384 +52,704 @@ local t1 = {
 	Images["icons/graphic/robuxcoin5_xxlarge"],
 	Images["icons/graphic/robuxcoin6_xxlarge"]
 }
-local v33 = Images["icons/navigation/close"]
 
-function v29.init(p1) -- line: 81
-	-- upvalues: RoactGamepad (copy), Roact (copy), GuiService (copy)
-	p1.state = {
-		selectedPackage = nil,
-		showMessageBanner = false
-	}
-	p1.buttonRefs = RoactGamepad.createRefCache()
-	p1.scrollingFrameRef = Roact.createRef()
+local iconsnavigationclose = Images["icons/navigation/close"]
 
-	function p1.getGamepadNextSelectionLeft(p2) -- line: 90
-		-- upvalues: p1 (copy)
-		return p2 > 1 and p1.buttonRefs[p2 - 1] or nil
+function extended:init()
+	self.state = { selectedPackage = nil, showMessageBanner = false }
+
+	self.buttonRefs = RoactGamepad.createRefCache()
+	self.scrollingFrameRef = Roact.createRef()
+
+	if FFlagBuyRobuxPageFitToViewport then
+		self.packageLayoutRef = Roact.createRef()
+		local binding, setCanvasSize = Roact.createBinding(UDim2.new())
+		self.canvasSize = binding
+		self.setCanvasSize = setCanvasSize
+		function self.updateCanvasSize()
+			local current = self.scrollingFrameRef.current
+			local current2 = self.packageLayoutRef.current
+
+			if current and current2 and current.AbsoluteSize.X > 0 then
+				self.setCanvasSize(UDim2.fromScale(current2.AbsoluteContentSize.X / current.AbsoluteSize.X, 0))
+			end
+		end
 	end
-	function p1.getGamepadNextSelectionRight(p3) -- line: 94
-		-- upvalues: p1 (copy)
-		return p3 < #p1.buttonRefs and p1.buttonRefs[p3 + 1] or nil
+
+	function self.getGamepadNextSelectionLeft(p)
+		return p > 1 and self.buttonRefs[p - 1] or nil
 	end
-	function p1.initSelectionChangedListener() -- line: 98
-		-- upvalues: p1 (copy), GuiService (copy)
-		if p1.selectionListener ~= nil then
-			p1.selectionListener:Disconnect()
-			p1.selectionListener = nil
+
+	function self.getGamepadNextSelectionRight(p)
+		return p < #self.buttonRefs and self.buttonRefs[p + 1] or nil
+	end
+
+	function self.initSelectionChangedListener()
+		if self.selectionListener ~= nil then
+			self.selectionListener:Disconnect()
+			self.selectionListener = nil
 		end
 
-		if p1.selectionListener ~= nil then
-			p1.selectionListener:Disconnect()
-			p1.selectionListener = nil
+		if self.selectionListener ~= nil then
+			self.selectionListener:Disconnect()
+			self.selectionListener = nil
 		end
 
-		p1.selectionListener = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 109
-			-- upvalues: p1 (copy), GuiService (copy)
-			if p1.state.selectedPackage == nil or (GuiService.SelectedCoreObject == nil or p1.state.selectedPackage ~= GuiService.SelectedCoreObject) then
-				p1:setState({
-					selectedPackage = GuiService.SelectedCoreObject
-				})
+		self.selectionListener = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function()
+			if
+				self.state.selectedPackage == nil
+				or GuiService.SelectedCoreObject == nil
+				or self.state.selectedPackage ~= GuiService.SelectedCoreObject
+			then
+				self:setState({ selectedPackage = GuiService.SelectedCoreObject })
 			end
 		end)
 	end
 end
-function v29.didMount(p4) -- line: 121
-	p4.initSelectionChangedListener()
-end
-function v29.didUpdate(t2: {[any]: any}, t3: {[any]: any}, _: {[any]: any}) -- line: 125
-	local props = t2.props
 
-	if t3.hasNativePurchaseSucceeded ~= props.hasNativePurchaseSucceeded and props.hasNativePurchaseSucceeded then
-		t2:setState({
-			showMessageBanner = true
-		})
-		task.delay(3, function() -- line: 131
-			-- upvalues: t2 (copy)
-			t2:setState({
-				showMessageBanner = false
-			})
+function extended.didMount(data)
+	data.initSelectionChangedListener()
+
+	if FFlagBuyRobuxPageFitToViewport and data.props.isConsoleSize then
+		data.updateCanvasSize()
+	end
+end
+
+function extended.didUpdate(object, p, _)
+	local props = object.props
+
+	if p.hasNativePurchaseSucceeded ~= props.hasNativePurchaseSucceeded and props.hasNativePurchaseSucceeded then
+		object:setState({ showMessageBanner = true })
+		task.delay(3, function()
+			object:setState({ showMessageBanner = false })
 		end)
 	end
 end
-function v29.willUnmount(p5) -- line: 138
-	if p5.selectionListener ~= nil then
-		p5.selectionListener:Disconnect()
-		p5.selectionListener = nil
-	end
-end
-function v29.getScale(p6) -- line: 146
-	if p6.props.isConsoleSize then
-		return 1
-	end
 
-	return 0.65
+function extended:willUnmount()
+	if self.selectionListener ~= nil then
+		self.selectionListener:Disconnect()
+		self.selectionListener = nil
+	end
 end
-function v29.render(p7) -- line: 156
-	-- upvalues: Roact (copy), MultiTextLocalizer (copy), withSelectionCursorProvider (copy)
+
+function extended:getScale(): number
+	return if self.props.isConsoleSize then 1 else 0.65
+end
+
+function extended:render()
 	return Roact.createElement(MultiTextLocalizer, {
 		keys = {
-			BannerText = {
-				key = "IAPExperience.BuyRobux.Banner.Text"
-			},
-			BannerTitle = {
-				key = "IAPExperience.BuyRobux.Banner.Title"
-			},
-			SuccessfulMessage = {
-				key = "IAPExperience.BuyRobux.Alert.SuccessfulMessage"
-			}
+			BannerText = { key = "IAPExperience.BuyRobux.Banner.Text" },
+			BannerTitle = { key = "IAPExperience.BuyRobux.Banner.Title" },
+			SuccessfulMessage = { key = "IAPExperience.BuyRobux.Alert.SuccessfulMessage" }
 		},
-		render = function(t5: {[any]: any}) -- line: 169
-			-- upvalues: withSelectionCursorProvider (copy), p7 (copy)
-			return withSelectionCursorProvider(function(p8) -- line: 170
-				-- upvalues: p7 (copy), t5 (copy)
-				return p7:renderWithLocale(t5, p8)
+		render = function(p)
+			return withSelectionCursorProvider(function(p2)
+				return self:renderWithLocale(p, p2)
 			end)
 		end
 	})
 end
-function v29.movePackageToAttentionArea(t6: {[any]: any}, p9) -- line: 178
-	-- upvalues: getEnableCompensatingScrollingFrame (copy)
+
+function extended:movePackageToAttentionArea(p)
 	if not getEnableCompensatingScrollingFrame() then
 		return
 	end
 
-	local current = t6.scrollingFrameRef.current
+	local current = self.scrollingFrameRef.current
 
-	if current == nil or p9 == nil then
+	if current == nil or p == nil then
 		return
 	end
 
-	local AbsoluteSizeX = current.AbsoluteSize.X
-	local v47 = 48 * t6:getScale()
-	local v48 = p9.AbsolutePosition.X - v47
+	local x = current.AbsoluteSize.X
+	local v2 = 48 * self:getScale()
 
-	if v48 < 0 then
-		current.CanvasPosition = Vector2.new(v48, 0)
-		t6:reportScrollingFrameCompensationHappened()
+	if FFlagBuyRobuxPageFitToViewport and self.props.isConsoleSize then
+		local v3 = p.AbsolutePosition.X - current.AbsolutePosition.X - v2
+		local v4 = v3 + p.AbsoluteSize.X + 2 * v2
+		local x2 = current.CanvasPosition.X
 
-		return
-	end
+		if v3 < 0 then
+			current.CanvasPosition = Vector2.new(x2 + v3, 0)
+			self:reportScrollingFrameCompensationHappened()
+		elseif x < v4 then
+			current.CanvasPosition = Vector2.new(x2 + v4 - x, 0)
+			self:reportScrollingFrameCompensationHappened()
+		end
+	else
+		local v3 = p.AbsolutePosition.X - v2
 
-	if AbsoluteSizeX < p9.AbsolutePosition.X + p9.AbsoluteSize.X + v47 then
-		current.CanvasPosition = Vector2.new(v48, 0)
-		t6:reportScrollingFrameCompensationHappened()
-
-		return
+		if v3 < 0 then
+			current.CanvasPosition = Vector2.new(v3, 0)
+			self:reportScrollingFrameCompensationHappened()
+		elseif x < p.AbsolutePosition.X + p.AbsoluteSize.X + v2 then
+			current.CanvasPosition = Vector2.new(v3, 0)
+			self:reportScrollingFrameCompensationHappened()
+		end
 	end
 end
-function v29.reportScrollingFrameCompensationHappened(p10) -- line: 207
-	-- upvalues: getUserInputEventData (copy)
-	local props = p10.props
+
+function extended:reportScrollingFrameCompensationHappened()
+	local props = self.props
 
 	if not props.onAnalyticEvent then
 		return
 	end
 
-	local v51 = getUserInputEventData(props.analyticId, "", "BuyRobux", "ScrollingFrame", "Compensated")
+	local userInputEventData = getUserInputEventData(props.analyticId, "", "BuyRobux", "ScrollingFrame", "Compensated")
 
-	props.onAnalyticEvent("UserPurchaseFlow", v51)
+	props.onAnalyticEvent("UserPurchaseFlow", userInputEventData)
 end
-function v29.renderWithLocale(t7: {[any]: any}, t8: {[any]: any}, p11) -- line: 218
-	-- upvalues: withStyle (copy), Roact (copy), RobuxPackage (copy), t1 (copy), FFlagEnableLeftNavOnConsole (copy), FullscreenFrame (copy), RoactGamepad (copy), Constants (copy), ImageSetButton (copy), v33 (copy), CursorKind (copy), Animator (copy), ImageSetLabel (copy), v31 (copy), FitTextLabel (copy), FitFrameHorizontal (copy), v30 (copy), formatNumber (copy), LocalizationService (copy)
-	local props = t7.props
 
-	return withStyle(function(p12) -- line: 221
-		-- upvalues: props (copy), t7 (copy), Roact (copy), RobuxPackage (copy), t1 (copy), FFlagEnableLeftNavOnConsole (copy), FullscreenFrame (copy), RoactGamepad (copy), Constants (copy), ImageSetButton (copy), v33 (copy), p11 (copy), CursorKind (copy), Animator (copy), ImageSetLabel (copy), v31 (copy), FitTextLabel (copy), t8 (copy), FitFrameHorizontal (copy), v30 (copy), formatNumber (copy), LocalizationService (copy)
-		local Theme = p12.Theme
-		local p12Font = p12.Font
-		local v64 = props.robuxPackages ~= nil
-		local v65 = props.robuxPackages == nil and 6 or #props.robuxPackages
-		local v66 = 32 * t7:getScale()
-		local t9 = {
-			LeadingPadding = Roact.createElement("Frame", {
+function extended:renderWithLocale(data, callback)
+	local props = self.props
+	local isConsoleSize = FFlagBuyRobuxPageFitToViewport and props.isConsoleSize
+
+	return withStyle(function(props2)
+		local theme = props2.Theme
+		local font = props2.Font
+
+		local scrollingEnabled = props.robuxPackages ~= nil
+		local v2 = props.robuxPackages == nil and 6 or #props.robuxPackages
+
+		local textSize = 32 * self:getScale()
+
+		local children = {
+			LeadingPadding = not isConsoleSize and Roact.createElement("Frame", {
 				BorderSizePixel = 0,
 				BackgroundTransparency = 1,
 				LayoutOrder = 0,
-				Size = UDim2.new(0, 80 * t7:getScale(), 0, 1)
+				Size = UDim2.new(0, 80 * self:getScale(), 0, 1)
 			}),
-			RobuxPackageChildren = Roact.createElement("UIListLayout", {
-				HorizontalAlignment = Enum.HorizontalAlignment.Left,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 16 * t7:getScale())
-			}),
-			TrailingPadding = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				BackgroundTransparency = 1,
-				LayoutOrder = v65 + 1,
-				Size = UDim2.new(0, 80 * t7:getScale(), 0, 1)
-			})
+			RobuxPackageChildren = 0,
+			TrailingPadding = 0
 		}
 
-		for i = 1, v65 do
-			t9[i + 1] = Roact.createElement(RobuxPackage, {
-				layoutOrder = i,
-				scale = t7:getScale(),
-				selected = t7.state.selectedPackage ~= nil and t7.state.selectedPackage == t7.buttonRefs[i]:getValue(),
-				packageId = if not v64 then tostring(i) else props.robuxPackages[i].packageId,
-				robuxAmount = if not v64 then nil else props.robuxPackages[i].robuxAmount,
-				currencyAmountStr = if not v64 then nil else props.robuxPackages[i].currencyAmountStr,
-				robuxMoreAmount = if not v64 then nil else props.robuxPackages[i].robuxMoreAmount,
-				robuxImage = t1[i],
-				forwardRef = t7.buttonRefs[i],
-				nextSelectionLeft = t7.getGamepadNextSelectionLeft(i),
-				nextSelectionRight = t7.getGamepadNextSelectionRight(i),
-				onActivated = function(s1: string?) -- line: 271
-					-- upvalues: props (copy)
-					props.robuxPackageActivated(s1)
-				end,
-				onSelect = function(p13) -- line: 274
-					-- upvalues: t7 (copy)
-					t7:movePackageToAttentionArea(p13:getValue())
-				end,
-				onHover = function(p14, b1: boolean) -- line: 277
-					-- upvalues: t7 (copy)
-					if b1 then
-						if t7.state.selectedPackage ~= p14:getValue() then
-							t7:setState({
-								selectedPackage = p14:getValue()
-							})
+		local createElement = Roact.createElement
+		local ref = Roact.Ref
+		local v3
 
-							return
-						end
-					else
-						t7:setState({
-							selectedPackage = ""
-						})
-					end
-				end
-			})
+		if isConsoleSize then
+			v3 = self.packageLayoutRef
 		end
 
-		return Roact.createElement(if not FFlagEnableLeftNavOnConsole then RoactGamepad.Focusable.Frame else FullscreenFrame, {
-			BackgroundColor3 = Theme.BackgroundDefault.Color,
-			BackgroundTransparency = not FFlagEnableLeftNavOnConsole and 0.8 or 0,
-			Size = if not FFlagEnableLeftNavOnConsole then UDim2.new(1, 0, 1, 0) else nil
-		}, {
+		local v4 = { [ref] = v3 }
+
+		local absoluteContentSize = Roact.Change.AbsoluteContentSize
+		local v5
+
+		if isConsoleSize then
+			v5 = self.updateCanvasSize
+		end
+
+		v4[absoluteContentSize] = v5
+		v4.HorizontalAlignment = Enum.HorizontalAlignment.Left
+		local verticalAlignment
+
+		if isConsoleSize then
+			verticalAlignment = Enum.VerticalAlignment.Top
+		else
+			verticalAlignment = Enum.VerticalAlignment.Center
+		end
+
+		v4.VerticalAlignment = verticalAlignment
+		v4.FillDirection = Enum.FillDirection.Horizontal
+		v4.SortOrder = Enum.SortOrder.LayoutOrder
+		v4.Padding = UDim.new(0, 16 * self:getScale())
+		children.RobuxPackageChildren = createElement("UIListLayout", v4)
+
+		children.TrailingPadding = not isConsoleSize and Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = v2 + 1,
+			Size = UDim2.new(0, 80 * self:getScale(), 0, 1)
+		})
+
+		for i = 1, v2 do
+			local v6 = i + 1
+			local createElement2 = Roact.createElement
+			local v7 = {
+				layoutOrder = i,
+				scale = self:getScale(),
+				fitToViewport = isConsoleSize and true or nil,
+				selected = self.state.selectedPackage ~= nil and self.state.selectedPackage == self.buttonRefs[i]:getValue(),
+				packageId = 0,
+				robuxAmount = 0,
+				currencyAmountStr = 0,
+				robuxMoreAmount = 0,
+				robuxImage = 0,
+				forwardRef = 0,
+				nextSelectionLeft = 0,
+				nextSelectionRight = 0,
+				onActivated = 0,
+				onSelect = 0,
+				onHover = 0
+			}
+			local packageId
+
+			if scrollingEnabled then
+				packageId = props.robuxPackages[i].packageId
+			else
+				packageId = tostring(i)
+			end
+
+			v7.packageId = packageId
+			local robuxAmount
+
+			if scrollingEnabled then
+				robuxAmount = props.robuxPackages[i].robuxAmount
+			end
+
+			v7.robuxAmount = robuxAmount
+			local currencyAmountStr
+
+			if scrollingEnabled then
+				currencyAmountStr = props.robuxPackages[i].currencyAmountStr
+			end
+
+			v7.currencyAmountStr = currencyAmountStr
+			local robuxMoreAmount
+
+			if scrollingEnabled then
+				robuxMoreAmount = props.robuxPackages[i].robuxMoreAmount
+			end
+
+			v7.robuxMoreAmount = robuxMoreAmount
+			v7.robuxImage = v[i]
+
+			v7.forwardRef = self.buttonRefs[i]
+
+			v7.nextSelectionLeft = self.getGamepadNextSelectionLeft(i)
+			v7.nextSelectionRight = self.getGamepadNextSelectionRight(i)
+
+			function v7.onActivated(p: string?)
+				props.robuxPackageActivated(p)
+			end
+			function v7.onSelect(object)
+				self:movePackageToAttentionArea(object:getValue())
+			end
+			function v7.onHover(object, flag: boolean)
+				if flag then
+					if self.state.selectedPackage ~= object:getValue() then
+						self:setState({ selectedPackage = object:getValue() })
+					end
+				else
+					self:setState({ selectedPackage = "" })
+				end
+			end
+
+			children[v6] = createElement2(RobuxPackage, v7)
+		end
+
+		local children2 = {
 			BuyRobuxPageBackground = Roact.createElement("Frame", {
 				BackgroundTransparency = 0,
-				ZIndex = 0,
 				Position = UDim2.new(0, 0, 0, 0),
 				Size = UDim2.new(1, 0, 1, 0),
-				Visible = t7.props.showBackground
+				Visible = self.props.showBackground,
+				ZIndex = 0
 			}, {
 				BackgroundImage = Roact.createElement("ImageLabel", {
 					BackgroundTransparency = 1,
 					ImageTransparency = 0,
-					Image = props.themeName ~= Constants.ThemeName.Dark and "rbxasset://textures/AvatarEditorImages/AvatarEditor_LightTheme.png" or "rbxasset://textures/AvatarEditorImages/AvatarEditor.png",
+					Image = props.themeName == ColorMode.Dark and "rbxasset://textures/AvatarEditorImages/AvatarEditor.png" or "rbxasset://textures/AvatarEditorImages/AvatarEditor_LightTheme.png",
 					Size = UDim2.new(1, 0, 1, 0)
 				}),
 				Backdrop = Roact.createElement("Frame", {
-					BackgroundTransparency = props.themeName ~= Constants.ThemeName.Dark and 0.7 or 0.5,
+					BackgroundTransparency = props.themeName == ColorMode.Dark and 0.5 or 0.7,
 					BackgroundColor3 = Color3.new(0, 0, 0),
 					Size = UDim2.new(1, 0, 1, 0)
 				})
 			}),
-			CloseButton = Roact.createElement(ImageSetButton, {
-				Position = UDim2.new(0, 48 * t7:getScale(), 0, 48 * t7:getScale()),
-				AnchorPoint = Vector2.new(0, 0),
-				Size = UDim2.new(0, 36, 0, 36),
-				Image = v33,
-				BackgroundColor3 = Color3.new(0, 0, 0),
-				BackgroundTransparency = 0.7,
-				BorderSizePixel = 0,
-				SelectionImageObject = p11(CursorKind.RoundedRect),
-				Visible = t7.props.showCloseButton,
-				[Roact.Event.Activated] = props.onPageClose
-			}, {
-				UICorner = Roact.createElement("UICorner", {
-					CornerRadius = UDim.new(0, 16 * t7:getScale())
-				})
-			}),
-			MessageBannerAnimator = Roact.createElement(Animator, {
-				animateDown = true,
-				ZIndex = 10,
-				shouldAnimate = props.shouldAnimate,
-				shouldShow = t7.state.showMessageBanner,
-				renderChildren = function() -- line: 344
-					-- upvalues: Roact (copy), props (copy), Constants (copy), t7 (copy), v66 (copy), ImageSetLabel (copy), v31 (copy), Theme (copy), FitTextLabel (copy), t8 (copy), p12Font (copy)
-					return Roact.createElement("Frame", {
-						BackgroundTransparency = 0,
-						AnchorPoint = Vector2.new(0, 0),
-						BackgroundColor3 = if props.themeName ~= Constants.ThemeName.Dark then Color3.fromRGB(198, 203, 206) else Color3.fromRGB(17, 18, 20),
-						Position = UDim2.fromOffset(48 * t7:getScale(), 40 * t7:getScale()),
-						Size = UDim2.new(1, -96 * t7:getScale(), 0, v66 * 2)
-					}, {
-						UICorner = Roact.createElement("UICorner", {
-							CornerRadius = UDim.new(0, 16 * t7:getScale())
-						}),
-						Icon = Roact.createElement(ImageSetLabel, {
-							BackgroundTransparency = 1,
-							LayoutOrder = 1,
-							ImageTransparency = 0,
-							AnchorPoint = Vector2.new(0, 0.5),
-							Image = v31,
-							ImageColor3 = Theme.TextEmphasis.Color,
-							Position = UDim2.fromOffset(24 * t7:getScale(), v66),
-							Size = UDim2.fromOffset(36 * t7:getScale(), 36 * t7:getScale())
-						}),
-						AlertMessage = Roact.createElement(FitTextLabel, {
-							LayoutOrder = 2,
-							BackgroundTransparency = 1,
-							AnchorPoint = Vector2.new(0, 0.5),
-							Position = UDim2.fromOffset(80 * t7:getScale(), v66),
-							width = FitTextLabel.Width.FitToText,
-							Text = t8.SuccessfulMessage,
-							Font = p12Font.Header1.Font,
-							TextColor3 = Theme.TextEmphasis.Color,
-							TextTransparency = Theme.TextEmphasis.Transparency,
-							TextSize = v66,
-							TextXAlignment = Enum.TextXAlignment.Left
-						})
-					})
-				end
-			}),
-			RobuxBalanceFrame = Roact.createElement(FitFrameHorizontal, {
-				BackgroundTransparency = 1,
-				Position = UDim2.new(1, -96 * t7:getScale(), 0, 48 * t7:getScale()),
-				AnchorPoint = Vector2.new(1, 0),
-				height = UDim.new(0, v66),
-				contentPadding = UDim.new(0, 4),
-				FillDirection = Enum.FillDirection.Horizontal,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}, {
-				Icon = Roact.createElement(ImageSetLabel, {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					ImageTransparency = 0,
-					Size = UDim2.fromOffset(v66 + 15 * t7:getScale(), v66 + 15 * t7:getScale()),
-					Image = v30
-				}),
-				BalanceText = Roact.createElement(FitTextLabel, {
-					LayoutOrder = 2,
-					BackgroundTransparency = 1,
-					width = FitTextLabel.Width.FitToText,
-					Text = not props.robuxBalance and "" or formatNumber(LocalizationService.RobloxLocaleId, props.robuxBalance),
-					Font = p12Font.Header1.Font,
-					TextColor3 = if not props.showBackground then Theme.TextEmphasis.Color else Color3.new(255, 255, 255),
-					TextTransparency = Theme.TextEmphasis.Transparency,
-					TextSize = v66
-				})
-			}),
-			BannerFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Position = UDim2.new(0, 96 * t7:getScale(), 0, 146 * t7:getScale()),
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				Roact.createElement("UIListLayout", {
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					FillDirection = Enum.FillDirection.Vertical,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 36 * t7:getScale())
-				}),
-				BannerTitle = Roact.createElement("TextLabel", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Font = p12Font.Title.Font,
-					Text = t8.BannerTitle,
-					TextSize = 46 * t7:getScale(),
-					TextColor3 = if not props.showBackground then Theme.TextEmphasis.Color else Color3.new(255, 255, 255)
-				}),
-				BannerText = Roact.createElement("TextLabel", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, 0),
-					AutomaticSize = Enum.AutomaticSize.Y,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Font = p12Font.Header1.Font,
-					Text = t8.BannerText,
-					TextSize = 38 * t7:getScale(),
-					TextColor3 = if not props.showBackground then Theme.TextEmphasis.Color else Color3.new(255, 255, 255)
-				})
-			}),
-			RobuxPackageTilesFrame = Roact.createElement("ScrollingFrame", {
-				Position = UDim2.new(0, 0, 0, 310 * t7:getScale()),
-				Size = UDim2.new(1, 0, 0, 615 * t7:getScale()),
-				AutomaticSize = Enum.AutomaticSize.None,
-				CanvasSize = UDim2.new(0, 0, 0, 0),
-				AutomaticCanvasSize = Enum.AutomaticSize.X,
-				ScrollingEnabled = v64,
-				ScrollingDirection = Enum.ScrollingDirection.X,
-				ScrollBarImageTransparency = 1,
-				ScrollBarThickness = 0,
-				Selectable = false,
-				BackgroundTransparency = 1,
-				[Roact.Ref] = t7.scrollingFrameRef
-			}, t9)
+			CloseButton = 0,
+			MessageBannerAnimator = 0,
+			RobuxBalanceFrame = 0,
+			BannerFrame = 0,
+			RobuxPackageTilesFrame = 0
+		}
+
+		local createElement2 = Roact.createElement
+		local position
+
+		if isConsoleSize then
+			position = UDim2.new(0, 48, 1, -36)
+		else
+			position = UDim2.new(0, 48 * self:getScale(), 0, 48 * self:getScale())
+		end
+
+		children2.CloseButton = createElement2(ImageSetButton, {
+			Position = position,
+			AnchorPoint = Vector2.new(0, 0),
+			Size = UDim2.new(0, 36, 0, 36),
+			Image = iconsnavigationclose,
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			BackgroundTransparency = 0.7,
+			BorderSizePixel = 0,
+			SelectionImageObject = callback(CursorKind.RoundedRect),
+			Visible = self.props.showCloseButton,
+			[Roact.Event.Activated] = props.onPageClose
+		}, {
+			UICorner = Roact.createElement("UICorner", {
+				CornerRadius = UDim.new(0, 16 * self:getScale())
+			})
 		})
+
+		children2.MessageBannerAnimator = Roact.createElement(Animator, {
+			shouldAnimate = props.shouldAnimate,
+			shouldShow = self.state.showMessageBanner,
+			animateDown = true,
+			ZIndex = 10,
+			renderChildren = function()
+				local createElement3 = Roact.createElement
+				local v6 = {
+					AnchorPoint = Vector2.new(0, 0),
+					BackgroundTransparency = 0,
+					BackgroundColor3 = 0,
+					Position = 0,
+					Size = 0
+				}
+				local backgroundColor
+
+				if props.themeName == ColorMode.Dark then
+					backgroundColor = Color3.fromRGB(17, 18, 20)
+				else
+					backgroundColor = Color3.fromRGB(198, 203, 206)
+				end
+
+				v6.BackgroundColor3 = backgroundColor
+
+				v6.Position = UDim2.fromOffset(48 * self:getScale(), 40 * self:getScale())
+				v6.Size = UDim2.new(1, -96 * self:getScale(), 0, textSize * 2)
+				return createElement3("Frame", v6, {
+					UICorner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 16 * self:getScale())
+					}),
+					Icon = Roact.createElement(ImageSetLabel, {
+						AnchorPoint = Vector2.new(0, 0.5),
+						BackgroundTransparency = 1,
+						LayoutOrder = 1,
+						Image = iconslogoblock,
+						ImageColor3 = theme.TextEmphasis.Color,
+						ImageTransparency = 0,
+						Position = UDim2.fromOffset(24 * self:getScale(), textSize),
+						Size = UDim2.fromOffset(36 * self:getScale(), 36 * self:getScale())
+					}),
+					AlertMessage = Roact.createElement(FitTextLabel, {
+						AnchorPoint = Vector2.new(0, 0.5),
+						Position = UDim2.fromOffset(80 * self:getScale(), textSize),
+						LayoutOrder = 2,
+						width = FitTextLabel.Width.FitToText,
+						Text = data.SuccessfulMessage,
+						Font = font.Header1.Font,
+						TextColor3 = theme.TextEmphasis.Color,
+						TextTransparency = theme.TextEmphasis.Transparency,
+						TextSize = textSize,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						BackgroundTransparency = 1
+					})
+				})
+			end
+		})
+
+		local createElement3 = Roact.createElement
+		local position2
+
+		if isConsoleSize then
+			position2 = UDim2.new(0.95, 0, 1, -textSize)
+		else
+			position2 = UDim2.new(1, -96 * self:getScale(), 0, 48 * self:getScale())
+		end
+
+		local v6 = {
+			Position = position2,
+			AnchorPoint = Vector2.new(1, 0),
+			height = UDim.new(0, textSize),
+			contentPadding = UDim.new(0, 4),
+			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			BackgroundTransparency = 1
+		}
+
+		local v7 = {
+			Icon = Roact.createElement(ImageSetLabel, {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(textSize + 15 * self:getScale(), textSize + 15 * self:getScale()),
+				Image = iconscommongoldrobux,
+				ImageTransparency = 0
+			}),
+			BalanceText = 0
+		}
+
+		local createElement4 = Roact.createElement
+		local v8 = {
+			LayoutOrder = 2,
+			width = FitTextLabel.Width.FitToText,
+			Text = not props.robuxBalance and "" or formatNumber(LocalizationService.RobloxLocaleId, props.robuxBalance),
+			Font = font.Header1.Font,
+			TextColor3 = 0,
+			TextTransparency = 0,
+			TextSize = 0,
+			BackgroundTransparency = 1
+		}
+		local textColor
+
+		if props.showBackground then
+			textColor = Color3.new(255, 255, 255)
+		else
+			textColor = theme.TextEmphasis.Color
+		end
+
+		v8.TextColor3 = textColor
+		v8.TextTransparency = theme.TextEmphasis.Transparency
+		v8.TextSize = textSize
+		v7.BalanceText = createElement4(FitTextLabel, v8)
+		children2.RobuxBalanceFrame = createElement3(FitFrameHorizontal, v6, v7)
+
+		local createElement5 = Roact.createElement
+		local position3
+
+		if not isConsoleSize then
+			position3 = UDim2.fromOffset(96 * self:getScale(), 146 * self:getScale())
+		end
+
+		local v9 = {
+			Position = position3,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = isConsoleSize and 1 or nil,
+			BackgroundTransparency = 1
+		}
+
+		local children3 = {
+			[1] = nil,
+			[1] = nil,
+			UIPadding = isConsoleSize and Roact.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0.05, 0),
+				PaddingRight = UDim.new(0.05, 0)
+			}),
+			(Roact.createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 36 * self:getScale())
+			}))
+		}
+
+		local createElement6 = Roact.createElement
+		local v10 = {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Font = 0,
+			FontFace = 0,
+			Text = 0,
+			TextSize = 0,
+			TextColor3 = 0
+		}
+		local font2
+
+		if not FoundationFontFaceMigration then
+			font2 = font.Title.Font
+		end
+
+		v10.Font = font2
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(props2.Tokens.Typography.HeadingLarge.Font)
+		end
+
+		v10.FontFace = fontFace
+
+		v10.Text = data.BannerTitle
+		v10.TextSize = 46 * self:getScale()
+		local textColor2
+
+		if props.showBackground then
+			textColor2 = Color3.new(255, 255, 255)
+		else
+			textColor2 = theme.TextEmphasis.Color
+		end
+
+		v10.TextColor3 = textColor2
+		children3.BannerTitle = createElement6("TextLabel", v10)
+
+		local createElement7 = Roact.createElement
+		local v11 = {
+			LayoutOrder = isConsoleSize and 2 or 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextWrapped = isConsoleSize and true or nil,
+			Font = 0,
+			FontFace = 0,
+			Text = 0,
+			TextSize = 0,
+			TextColor3 = 0
+		}
+		local font3
+
+		if not FoundationFontFaceMigration then
+			font3 = font.Header1.Font
+		end
+
+		v11.Font = font3
+		local fontFace2
+
+		if FoundationFontFaceMigration then
+			fontFace2 = normalizeFontFace(props2.Tokens.Typography.HeadingSmall.Font)
+		end
+
+		v11.FontFace = fontFace2
+
+		v11.Text = data.BannerText
+		v11.TextSize = 38 * self:getScale()
+		local textColor3
+
+		if props.showBackground then
+			textColor3 = Color3.new(255, 255, 255)
+		else
+			textColor3 = theme.TextEmphasis.Color
+		end
+
+		v11.TextColor3 = textColor3
+		children3.BannerText = createElement7("TextLabel", v11)
+		children2.BannerFrame = createElement5("Frame", v9, children3)
+
+		local createElement8 = Roact.createElement
+		local position4
+
+		if not isConsoleSize then
+			position4 = UDim2.new(0, 0, 0, 310 * self:getScale())
+		end
+
+		local size
+
+		if isConsoleSize then
+			size = UDim2.fromScale(1, 0.85)
+		else
+			size = UDim2.new(1, 0, 0, 615 * self:getScale())
+		end
+
+		local v12 = {}
+		v12.Position = position4
+		v12.Size = size
+		v12.LayoutOrder = isConsoleSize and 1 or nil
+		v12.AutomaticSize = Enum.AutomaticSize.None
+		local canvasSize
+
+		if isConsoleSize then
+			canvasSize = self.canvasSize
+		else
+			canvasSize = UDim2.new(0, 0, 0, 0)
+		end
+
+		v12.CanvasSize = canvasSize
+		local automaticCanvasSize
+
+		if isConsoleSize then
+			automaticCanvasSize = Enum.AutomaticSize.None
+		else
+			automaticCanvasSize = Enum.AutomaticSize.X
+		end
+
+		v12.AutomaticCanvasSize = automaticCanvasSize
+		v12.ScrollingEnabled = scrollingEnabled
+		v12.ScrollingDirection = Enum.ScrollingDirection.X
+		v12.ScrollBarImageTransparency = 1
+		v12.ScrollBarThickness = 0
+		v12.Selectable = false
+		v12.BackgroundTransparency = 1
+
+		v12[Roact.Ref] = self.scrollingFrameRef
+		local absoluteSize = Roact.Change.AbsoluteSize
+		local v13
+
+		if isConsoleSize then
+			v13 = self.updateCanvasSize
+		end
+
+		v12[absoluteSize] = v13
+		children2.RobuxPackageTilesFrame = createElement8("ScrollingFrame", v12, children)
+
+		if isConsoleSize then
+			children2.Content = Roact.createElement(
+				"Frame",
+				{ Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 },
+				{
+					BottomPadding = Roact.createElement("UIPadding", {
+						PaddingBottom = UDim.new(0.07, 0)
+					}),
+					UIListLayout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 10)
+					}),
+					TopBar = Roact.createElement(
+						"Frame",
+						{
+							Size = UDim2.fromScale(1, 0.1),
+							BackgroundTransparency = 1,
+							LayoutOrder = 0
+						},
+						{
+							CloseButton = children2.CloseButton,
+							RobuxBalanceFrame = children2.RobuxBalanceFrame
+						}
+					),
+					BannerFrame = children2.BannerFrame,
+					RobuxList = Roact.createElement(
+						"Frame",
+						{
+							Size = UDim2.fromScale(1, 0),
+							LayoutOrder = 3,
+							BackgroundTransparency = 1
+						},
+						{
+							UIFlexItem = Roact.createElement("UIFlexItem", {
+								FlexMode = Enum.UIFlexMode.Fill
+							}),
+							UIListLayout = Roact.createElement("UIListLayout", {
+								FillDirection = Enum.FillDirection.Vertical,
+								SortOrder = Enum.SortOrder.LayoutOrder
+							}),
+							UIPadding = Roact.createElement("UIPadding", {
+								PaddingLeft = UDim.new(0.05, 0),
+								PaddingRight = UDim.new(0.05, 0)
+							}),
+							TopPadding = Roact.createElement("Frame", {
+								Size = UDim2.fromScale(0, 0.1),
+								LayoutOrder = 0,
+								BackgroundTransparency = 1
+							}),
+							RobuxPackageTilesFrame = children2.RobuxPackageTilesFrame
+						}
+					)
+				}
+			)
+
+			children2.CloseButton = nil
+			children2.RobuxBalanceFrame = nil
+			children2.BannerFrame = nil
+			children2.RobuxPackageTilesFrame = nil
+		end
+
+		return Roact.createElement(
+			FullscreenFrame,
+			{ BackgroundColor3 = theme.BackgroundDefault.Color, BackgroundTransparency = 0 },
+			children2
+		)
 	end)
 end
 
-return function(p15) -- line: 498
-	-- upvalues: useStyleMetadata (copy), Roact (copy), v29 (copy), Cryo (copy)
-	local ThemeName = useStyleMetadata().ThemeName
+return function(p)
+	local themeName = useStyleMetadata().ThemeName
 
-	return Roact.createElement(v29, Cryo.Dictionary.join(p15, {
-		themeName = ThemeName
-	}))
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { themeName = themeName }))
 end

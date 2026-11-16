@@ -1,121 +1,128 @@
 local Squads = script:FindFirstAncestor("Squads")
-local SquadsParent = Squads.Parent
-local Cryo = require(SquadsParent.Cryo)
-local FriendsMenu = require(SquadsParent.FriendsMenu)
-local SquadExternalContractProvider = require(SquadsParent.SquadsCore.SquadExternalContractProvider)
-local UIBlox = require(SquadsParent.UIBlox)
-local UserModel = require(SquadsParent.UserLib).Models.UserModel
-local UniversalAppPolicy = require(SquadsParent.UniversalAppPolicy)
+local parent = Squads.Parent
+local Cryo = require(parent.Cryo)
+local FriendsMenu = require(parent.FriendsMenu)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local UIBlox = require(parent.UIBlox)
+local UserLib = require(parent.UserLib)
+local UserModel = UserLib.Models.UserModel
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
 local dependencies = require(Squads.dependencies)
 local useIsInviteButtonDisabled = require(Squads.Hooks.useIsInviteButtonDisabled)
-local React = dependencies.React
+
+local react = dependencies.React
 local useLocalization = dependencies.Hooks.useLocalization
+
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local FriendsListContext = FriendsMenu.FriendsListContext
 local InviteCallbackContext = FriendsMenu.InviteCallbackContext
 local SelectedUsersContext = FriendsMenu.SelectedUsersContext
-local FFlagEnablePartyQuickStartButton = require(SquadsParent.SharedFlags).FFlagEnablePartyQuickStartButton
-local encodeUserIds = require(SquadsParent.SquadsCore.encodeUserIds)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnablePartyQuickStartButton = SharedFlags.FFlagEnablePartyQuickStartButton
+
+local encodeUserIds = require(parent.SquadsCore.encodeUserIds)
 local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
-local EventNames = require(SquadsParent.SquadsCore.EventNames)
-local SquadRootViewType = require(SquadsParent.SquadsCore.Enums).SquadRootViewType
-local t1 = {
+local EventNames = require(parent.SquadsCore.EventNames)
+
+local Enums = require(parent.SquadsCore.Enums)
+local SquadRootViewType = Enums.SquadRootViewType
+
+local v = {
 	[UserModel.PresenceType.OFFLINE] = 0,
 	[UserModel.PresenceType.ONLINE] = 1,
 	[UserModel.PresenceType.IN_GAME] = 2,
 	[UserModel.PresenceType.IN_STUDIO] = 3
 }
 
-local function getFFlagRenameFriendsToConnectionsPartyLobby() -- line: 46
-	-- upvalues: UniversalAppPolicy (copy)
+local function getFFlagRenameFriendsToConnectionsPartyLobby() -- 1 equivalent call inferred from this helper
 	return UniversalAppPolicy.getAppFeaturePolicies().getRenameFriendsToConnections()
 end
-local function SquadInviteFriendsButton(t2: {[any]: any}) -- line: 50
-	-- upvalues: React (copy), SelectedUsersContext (copy), InviteCallbackContext (copy), FriendsListContext (copy), SquadExternalContractContext (copy), useIsInviteButtonDisabled (copy), useLocalization (copy), FFlagEnablePartyQuickStartButton (copy), UserModel (copy), t1 (copy), Cryo (copy), encodeUserIds (copy), EventNames (copy), SquadRootViewType (copy), Button (copy), ButtonType (copy), UniversalAppPolicy (copy)
-	local v27 = React.useContext(SelectedUsersContext)
-	local v28 = React.useContext(InviteCallbackContext)
-	local v29 = React.useContext(FriendsListContext)
-	local v30 = React.useContext(SquadExternalContractContext)
-	local selectedFriendsSize = v27.selectedFriendsSize
-	local v32 = useIsInviteButtonDisabled(selectedFriendsSize, v27.selectedFriends or {}, v27.preselectedUsers or {})
-	local v33 = useLocalization({
+
+local function SquadInviteFriendsButton(props)
+	local v2 = react.useContext(SelectedUsersContext)
+	local v3 = react.useContext(InviteCallbackContext)
+	local v4 = react.useContext(FriendsListContext)
+	local v5 = react.useContext(SquadExternalContractContext)
+
+	local isDisabled = useIsInviteButtonDisabled(
+		v2.selectedFriendsSize,
+		v2.selectedFriends or {},
+		v2.preselectedUsers or {}
+	)
+
+	local v6 = useLocalization({
 		addFriendsText = "Feature.Chat.Label.AddFriends",
 		addConnectionsText = "CommonUI.Features.Label.AddConnections"
 	})
-	local v39
+	local onActivated
 
 	if FFlagEnablePartyQuickStartButton then
-		local v34 = v30.useSquadRootView()
-		local v35 = React.useRef({})
-		local v36 = React.useCallback(function() -- line: 77
-			-- upvalues: v29 (copy), UserModel (copy), t1 (copy)
-			if v29.isFetchingFriends then
+		local v7 = v5.useSquadRootView()
+
+		local ref = react.useRef({})
+
+		local v8 = react.useCallback(function()
+			if v4.isFetchingFriends then
 				return {}, {}
 			end
 
-			local t3 = {}
-			local t4 = {}
+			local ids = {}
+			local result = {}
 
-			for _, v in pairs(v29.friends) do
-				if v.presence ~= UserModel.PresenceType.OFFLINE then
-					table.insert(t3, (tonumber(v.id)))
-					table.insert(t4, t1[v.presence])
+			for _, friend in pairs(v4.friends) do
+				if friend.presence == UserModel.PresenceType.OFFLINE then
+					continue
 				end
+
+				table.insert(ids, (tonumber(friend.id)))
+				table.insert(result, v[friend.presence])
 			end
 
-			return t3, t4
-		end, {
-			v29.isFetchingFriends,
-			v29.friends
-		})
-		local v37 = React.useCallback(function() -- line: 94
-			-- upvalues: v27 (copy), v29 (copy), t1 (copy)
-			local t5 = {}
-			local t6 = {}
-			local t7 = {}
+			return ids, result
+		end, { v4.isFetchingFriends, v4.friends })
 
-			for k, _ in pairs(v27.selectedFriends) do
-				t7[k] = true
+		local v9 = react.useCallback(function()
+			local set = {}
+			local ids = {}
+			local result = {}
+
+			for k, _ in pairs(v2.selectedFriends) do
+				set[k] = true
 			end
 
-			for _, v in ipairs(v29.friends) do
-				if t7[v.id] then
-					table.insert(t5, (tonumber(v.id)))
-					table.insert(t6, t1[v.presence])
+			for _, friend in ipairs(v4.friends) do
+				if not set[friend.id] then
+					continue
 				end
+
+				table.insert(ids, (tonumber(friend.id)))
+				table.insert(result, v[friend.presence])
 			end
 
-			return t5, t6
-		end, {
-			v27.selectedFriends,
-			v29.friends
-		})
+			return ids, result
+		end, { v2.selectedFriends, v4.friends })
 
-		React.useEffect(function() -- line: 113
-			-- upvalues: v36 (copy), v37 (copy), v35 (copy)
-			local v51, v52 = v36()
-			local v53, v54 = v37()
-
-			v35.current = {
-				onlineFriendsIds = v51,
-				onlineFriendsPresence = v52,
-				selectedFriendsIds = v53,
-				selectedFriendsPresence = v54,
-				numActiveFriends = #v51,
-				numSelectedFriends = #v53
+		react.useEffect(function()
+			local onlineFriendsIds, onlineFriendsPresence = v8()
+			local selectedFriendsIds, selectedFriendsPresence = v9()
+			ref.current = {
+				onlineFriendsIds = onlineFriendsIds,
+				onlineFriendsPresence = onlineFriendsPresence,
+				selectedFriendsIds = selectedFriendsIds,
+				selectedFriendsPresence = selectedFriendsPresence,
+				numActiveFriends = #onlineFriendsIds,
+				numSelectedFriends = #selectedFriendsIds
 			}
-		end, {
-			v36,
-			v37
-		})
+		end, { v8, v9 })
 
-		local v38 = React.useCallback(function(p1) -- line: 127
-			-- upvalues: v35 (copy), Cryo (copy), t2 (copy), v30 (copy), encodeUserIds (copy), EventNames (copy)
-			local current = v35.current
-			local v57 = Cryo.Dictionary.join(t2.analyticsInfo, {
-				actionLocation = v30.squadLocation,
-				actionType = p1,
+		local v10 = react.useCallback(function(actionType)
+			local current = ref.current
+
+			local joined = Cryo.Dictionary.join(props.analyticsInfo, {
+				actionLocation = v5.squadLocation,
+				actionType = actionType,
 				activeFriendsUserIds = encodeUserIds(current.onlineFriendsIds),
 				activeFriendsPresences = encodeUserIds(current.onlineFriendsPresence),
 				selectedFriendsUserIds = encodeUserIds(current.selectedFriendsIds),
@@ -125,64 +132,58 @@ local function SquadInviteFriendsButton(t2: {[any]: any}) -- line: 50
 				clientTimeStamp = os.time()
 			})
 
-			v30.fireSquadAnalytics(EventNames.MultiInviteMenuActionStatus, v57)
-		end, {
-			v30.squadLocation,
-			v30.fireSquadAnalytics,
-			t2.analyticsInfo
-		})
+			v5.fireSquadAnalytics(EventNames.MultiInviteMenuActionStatus, joined)
+		end, { v5.squadLocation, v5.fireSquadAnalytics, props.analyticsInfo })
 
-		React.useEffect(function() -- line: 146
-			-- upvalues: t2 (copy), v38 (copy)
-			return function() -- line: 147
-				-- upvalues: t2 (copy), v38 (copy)
-				if not t2.partyStartedRef.current then
-					v38("leave_page")
-
-					return
+		react.useEffect(function()
+			return function()
+				if props.partyStartedRef.current then
+					v10("multi_invite_attempted")
+				else
+					v10("leave_page")
 				end
-
-				v38("multi_invite_attempted")
 			end
 		end, {})
-		React.useEffect(function() -- line: 158
-			-- upvalues: v34 (copy), SquadRootViewType (copy), v38 (copy)
-			if v34 == SquadRootViewType.None then
-				v38("leave_page")
+
+		react.useEffect(function()
+			if v7 == SquadRootViewType.None then
+				v10("leave_page")
 			end
-		end, {
-			v34,
-			v38
-		})
-		v39 = React.useCallback(function() -- line: 165
-			-- upvalues: v38 (copy), v28 (copy), v27 (copy)
-			v38("multi_invite_button_clicked")
-			v28.inviteMultiFriends(v27.selectedFriends)
-		end, {
-			v38,
-			v28.inviteMultiFriends,
-			v27.selectedFriends
-		})
+		end, { v7, v10 })
+
+		onActivated = react.useCallback(function()
+			v10("multi_invite_button_clicked")
+			v3.inviteMultiFriends(v2.selectedFriends)
+		end, { v10, v3.inviteMultiFriends, v2.selectedFriends })
 	else
-		v39 = React.useCallback(function() -- line: 174
-			-- upvalues: v28 (copy), v27 (copy)
-			v28.inviteMultiFriends(v27.selectedFriends)
-		end, {
-			v28.inviteMultiFriends,
-			v27.selectedFriends
-		})
+		onActivated = react.useCallback(function()
+			v3.inviteMultiFriends(v2.selectedFriends)
+		end, { v3.inviteMultiFriends, v2.selectedFriends })
 	end
 
-	return React.createElement(Button, {
-		onActivated = v39,
-		buttonTextOverride = {
-			TextWrapped = false
-		},
+	local createElement = react.createElement
+	local v7 = {
+		onActivated = onActivated,
+		buttonTextOverride = { TextWrapped = false },
 		buttonType = ButtonType.PrimarySystem,
 		size = UDim2.new(1, 0, 0, 36),
-		text = if not FFlagEnablePartyQuickStartButton then if not UniversalAppPolicy.getAppFeaturePolicies().getRenameFriendsToConnections() then v33.addFriendsText else v33.addConnectionsText else t2.buttonText,
-		isDisabled = v32
-	})
+		text = 0,
+		isDisabled = 0
+	}
+	local text
+
+	if FFlagEnablePartyQuickStartButton then
+		text = props.buttonText
+	elseif getFFlagRenameFriendsToConnectionsPartyLobby() then -- inferred equivalent call
+		text = v6.addConnectionsText
+	else
+		text = v6.addFriendsText
+	end
+
+	v7.text = text
+
+	v7.isDisabled = isDisabled
+	return createElement(Button, v7)
 end
 
 return SquadInviteFriendsButton

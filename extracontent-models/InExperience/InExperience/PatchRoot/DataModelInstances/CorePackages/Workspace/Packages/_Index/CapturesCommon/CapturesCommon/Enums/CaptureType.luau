@@ -1,5 +1,1 @@
-return {
-	Screenshot = "Screenshot",
-	Video = "Video",
-	Temporary = "Temporary"
-}
+return { Screenshot = "Screenshot", Video = "Video", Temporary = "Temporary" }

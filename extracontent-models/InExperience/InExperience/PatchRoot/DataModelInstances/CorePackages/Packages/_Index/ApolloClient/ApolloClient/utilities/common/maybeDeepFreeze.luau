@@ -1,43 +1,45 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local MaybeDeepFreeze = {}
+
+local parent = script.Parent.Parent.Parent.Parent
+
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Object = LuauPolyfill.Object
 local Set = LuauPolyfill.Set
 local Array = LuauPolyfill.Array
 
 require(script.Parent.Parent.globals)
 
-local isNonNullObject = require(script.Parent.objects).isNonNullObject
+local objects = require(script.Parent.objects)
+local isNonNullObject = objects.isNonNullObject
 
-local function deepFreeze(p1) -- line: 22
-	-- upvalues: Set (copy), isNonNullObject (copy), Object (copy), Array (copy)
-	local v10 = Set.new({ p1 })
+local function deepFreeze(p)
+	local v = Set.new({ p })
 
-	for _, v12 in v10 do
-		if isNonNullObject(v12) then
-			if not table.isfrozen(v12) then
-				Object.freeze(v12)
-			end
-
-			Array.forEach(Object.keys(v12), function(p2) -- line: 30
-				-- upvalues: isNonNullObject (copy), v12 (copy), v10 (copy)
-				if isNonNullObject(v12[p2]) then
-					v10:add(v12[p2])
-				end
-			end)
+	for _, list in v do
+		if not isNonNullObject(list) then
+			continue
 		end
+
+		if not table.isfrozen(list) then
+			Object.freeze(list)
+		end
+
+		Array.forEach(Object.keys(list), function(p2)
+			if isNonNullObject(list[p2]) then
+				v:add(list[p2])
+			end
+		end)
 	end
 
-	return p1
+	return p
 end
 
-function t1.maybeDeepFreeze(p3) -- line: 41
-	-- upvalues: deepFreeze (copy)
+function MaybeDeepFreeze.maybeDeepFreeze(p)
 	if _G.__DEV__ then
-		deepFreeze(p3)
+		deepFreeze(p)
 	end
 
-	return p3
+	return p
 end
 
-return t1
+return MaybeDeepFreeze

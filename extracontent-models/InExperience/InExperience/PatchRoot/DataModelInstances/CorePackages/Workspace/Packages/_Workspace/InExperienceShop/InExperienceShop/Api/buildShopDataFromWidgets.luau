@@ -1,15 +1,14 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local Promise = require(InExperienceShopParent.Promise)
-local SharedFlags = require(InExperienceShopParent.SharedFlags)
+local parent = InExperienceShop.Parent
+
+local Promise = require(parent.Promise)
+local SharedFlags = require(parent.SharedFlags)
 local Constants = require(InExperienceShop.Constants)
-
 require(InExperienceShop.Types)
-
 local FFlagEnableRobuxInExperienceShop = SharedFlags.FFlagEnableRobuxInExperienceShop
-
+local FFlagEnableBonusJwtInShop = SharedFlags.FFlagEnableBonusJwtInShop
 require(script.Parent.multiGetProductInfo)
-
+local parseGamePassTrialAvailabilities = require(script.Parent.parseGamePassTrialAvailabilities)
 local shopItemMapping = require(script.Parent.shopItemMapping)
 local robuxWidgetMapping = require(script.Parent.robuxWidgetMapping)
 local hydrateRobuxBonusItems = require(script.Parent.hydrateRobuxBonusItems)
@@ -20,203 +19,258 @@ local makeRequestKey = shopItemMapping.makeRequestKey
 local toShopItem = shopItemMapping.toShopItem
 local logCounter = require(InExperienceShop.Internal.logCounter)
 local ProductInfoFailedItemsCounter = require(InExperienceShop.Events.ProductInfoFailedItemsCounter)
+
 local FFlagEnableExperienceShopGlobalIcon = require(InExperienceShop.Flags.FFlagEnableExperienceShopGlobalIcon)
-local t1 = {
-	name = "CommonUI.Features.Label.Home",
-	id = Constants.HOME_CATEGORY_ID
-}
+local FFlagIdentifyTopPicksByCategoryType = require(InExperienceShop.Flags.FFlagIdentifyTopPicksByCategoryType)
+local FFlagParseStableCategoryId = require(InExperienceShop.Flags.FFlagParseStableCategoryId)
+local FFlagLuaAppEnableGamePassFreeTrials = require(InExperienceShop.Flags.FFlagLuaAppEnableGamePassFreeTrials)
 
-local function buildShopDataFromWidgets(p1, p2: ((...any) -> ...any)?) -- line: 89
-	-- upvalues: t1 (copy), Constants (copy), FFlagEnableRobuxInExperienceShop (copy), toRobuxPackageItem (copy), Promise (copy), FFlagEnableExperienceShopGlobalIcon (copy), appendBonusItemRequests (copy), makeRequestKey (copy), toShopItem (copy), logCounter (copy), ProductInfoFailedItemsCounter (copy), mergeBonusItemDetailsIntoSections (copy)
-	local t2 = { t1 }
-	local t3 = {}
-	local t4 = {}
-	local t5 = {}
-	local t6 = {}
-	local g38 = nil
-	local Product = nil
+local defineFastString = game:DefineFastString("FreeTrialTopBarChipSettingName", "FreeTrialTopBarChip")
 
-	for _, v in ipairs(p1.categories) do
-		if not Constants.BLACKLISTED_CATEGORY_NAMES[string.lower(v.name)] then
-			local str = tostring(v.id)
+local function isNotificationSettingEnabled(isEnabled) -- 1 equivalent call inferred from this helper
+	if typeof(isEnabled) == "boolean" then
+		return isEnabled
+	end
 
-			table.insert(t2, {
-				id = str,
-				name = v.name
-			})
+	return typeof(isEnabled) == "string" and isEnabled == "true"
+end
 
-			local v30 = #t3 + 1
-			local t7 = {
-				id = str,
-				name = v.name,
-				items = {}
-			}
-			local metadata = v.metadata
+local function readFreeTrialTopBarChipFromNotificationSettings(data)
+	local notificationSettings = data.notificationSettings
 
-			if FFlagEnableRobuxInExperienceShop and metadata ~= nil and metadata.paymentSessionId ~= nil then
-				t7.paymentSessionId = metadata.paymentSessionId
-			end
+	if notificationSettings == nil then
+		return false
+	end
 
-			t3[v30] = t7
+	for _, notificationSetting in ipairs(notificationSettings) do
+		if notificationSetting.name == defineFastString then
+			return isNotificationSettingEnabled(notificationSetting.isEnabled) -- inferred equivalent call
+		end
+	end
 
-			local n1 = 0
+	return false
+end
 
-			for _, v2 in ipairs(v.items) do
-				local type = v2.type
+local v = { id = Constants.HOME_CATEGORY_ID, name = "CommonUI.Features.Label.Home" }
 
-				if type == "Product" then
-					Product = Enum.InfoType.Product
-					g38 = true
-				end
+local function buildShopDataFromWidgets(data, callback)
+	local v2 = { v }
+	local v3 = {}
+	local v4 = {}
 
-				if g38 or type == "GamePass" then
-					if not g38 then
-						Product = Enum.InfoType.GamePass
-					end
+	local v5 = {}
 
-					g38 = false
-					n1 += 1
-					t6[v30] = true
-					table.insert(t4, {
-						id = v2.id,
-						infoType = Product
-					})
-					table.insert(t5, {
-						categoryIndex = v30,
-						sectionId = str,
-						itemType = type,
-						sectionItemIndex = n1
-					})
+	local set = {}
+	local gamePassTrialAvailabilities
 
+	if FFlagLuaAppEnableGamePassFreeTrials and typeof(data.gamePassTrialAvailabilities) == "table" then
+		gamePassTrialAvailabilities = parseGamePassTrialAvailabilities(data.gamePassTrialAvailabilities)
+	else
+		gamePassTrialAvailabilities = nil
+	end
+
+	for _, category in ipairs(data.categories) do
+		if Constants.BLACKLISTED_CATEGORY_NAMES[string.lower(category.name)] then
+			continue
+		end
+
+		local id = tostring(category.id)
+		table.insert(v2, { id = id, name = category.name })
+
+		local categoryIndex = #v3 + 1
+		local v6 = { id = id, name = category.name, items = {} }
+
+		local metadata = category.metadata
+
+		if FFlagIdentifyTopPicksByCategoryType and metadata ~= nil and metadata.categoryType ~= nil then
+			v6.categoryType = metadata.categoryType
+		end
+
+		if FFlagParseStableCategoryId and metadata ~= nil and metadata.categoryId ~= nil then
+			v6.stableCategoryId = metadata.categoryId
+		end
+
+		if FFlagParseStableCategoryId and metadata ~= nil and metadata.categoryGroup ~= nil then
+			v6.categoryGroup = metadata.categoryGroup
+		end
+
+		if FFlagEnableRobuxInExperienceShop and metadata ~= nil and metadata.paymentSessionId ~= nil then
+			v6.paymentSessionId = metadata.paymentSessionId
+		end
+
+		if FFlagEnableBonusJwtInShop and metadata ~= nil and metadata.bonusJwt ~= nil then
+			v6.bonusJwt = metadata.bonusJwt
+		end
+
+		v3[categoryIndex] = v6
+		local count = 0
+
+		for _, item in ipairs(category.items) do
+			local kind = item.type
+			local infoType
+
+			if kind == "Product" then
+				infoType = Enum.InfoType.Product
+			elseif kind == "GamePass" then
+				infoType = Enum.InfoType.GamePass
+			else
+				if kind ~= "Robux" or not FFlagEnableRobuxInExperienceShop then
 					continue
 				end
 
-				if type == "Robux" and FFlagEnableRobuxInExperienceShop then
-					local v39 = toRobuxPackageItem(v2)
+				local v7 = toRobuxPackageItem(item)
 
-					if v39 ~= nil then
-						if t7.robuxPackages == nil then
-							t7.robuxPackages = {}
-						end
-
-						local robuxPackages = t7.robuxPackages
-
-						if #robuxPackages == 0 then
-							v39.isPrimaryRobuxPackage = true
-						end
-
-						table.insert(robuxPackages, v39)
-					end
+				if v7 == nil then
+					continue
 				end
+
+				if v6.robuxPackages == nil then
+					v6.robuxPackages = {}
+				end
+
+				local robuxPackages = v6.robuxPackages
+
+				if #robuxPackages == 0 then
+					v7.isPrimaryRobuxPackage = true
+				end
+
+				table.insert(robuxPackages, v7)
+				continue
 			end
+
+			count += 1
+			set[categoryIndex] = true
+			table.insert(v4, { id = item.id, infoType = infoType })
+
+			table.insert(v5, {
+				categoryIndex = categoryIndex,
+				sectionId = id,
+				itemType = kind,
+				sectionItemIndex = count
+			})
 		end
 	end
 
-	local function filterOutput(t8: {[any]: any}) -- line: 200
-		-- upvalues: t6 (copy), t2 (copy), Constants (copy)
-		local t9 = {}
-		local t10 = {}
+	local function filterOutput(list)
+		local result = {}
+		local idSet = {}
 
-		for i, v in ipairs(t8) do
-			if t6[i] or v.robuxPackages ~= nil and #v.robuxPackages > 0 then
-				table.insert(t9, v)
-				t10[v.id] = true
+		for i, item in ipairs(list) do
+			if not (set[i] or item.robuxPackages ~= nil and #item.robuxPackages > 0) then
+				continue
+			end
+
+			table.insert(result, item)
+			idSet[item.id] = true
+		end
+
+		local result2 = {}
+
+		for _, v6 in ipairs(v2) do
+			if v6.id == Constants.HOME_CATEGORY_ID or idSet[v6.id] then
+				table.insert(result2, v6)
 			end
 		end
 
-		local t11 = {}
-
-		for _, v in ipairs(t2) do
-			if v.id == Constants.HOME_CATEGORY_ID or t10[v.id] then
-				table.insert(t11, v)
-			end
-		end
-
-		return t11, t9
+		return result2, result
 	end
 
-	if p2 == nil then
-		local t12 = table.create(#t4)
+	if callback == nil then
+		local failedItems = table.create(#v4)
 
-		for i, v in ipairs(t4) do
-			local v45 = t5[i]
-
-			t12[i] = {
-				id = v.id,
-				infoType = v.infoType,
-				itemType = v45.itemType,
-				sectionId = v45.sectionId,
-				originalIndex = v45.sectionItemIndex
+		for i, v6 in ipairs(v4) do
+			local v7 = v5[i]
+			failedItems[i] = {
+				id = v6.id,
+				infoType = v6.infoType,
+				itemType = v7.itemType,
+				sectionId = v7.sectionId,
+				originalIndex = v7.sectionItemIndex
 			}
 		end
 
-		local v46, v47 = filterOutput(t3)
+		local categories, sections = filterOutput(v3)
+		local resolve = Promise.resolve
+		local metadata
 
-		return Promise.resolve({
-			categories = v46,
-			sections = v47,
-			failedItems = t12,
-			metadata = if not FFlagEnableExperienceShopGlobalIcon then nil else p1.metadata
+		if FFlagEnableExperienceShopGlobalIcon then
+			metadata = data.metadata
+		end
+
+		return resolve({
+			categories = categories,
+			sections = sections,
+			failedItems = failedItems,
+			metadata = metadata,
+			notificationFreeTrialTopBarChip = readFreeTrialTopBarChipFromNotificationSettings(data),
+			gamePassTrialAvailabilities = gamePassTrialAvailabilities
 		})
-	end
-
-	local v48 = #t4
-
-	if FFlagEnableRobuxInExperienceShop then
-		appendBonusItemRequests(t4, t3)
-	end
-
-	return p2(t4):andThen(function(t13: {[any]: any}) -- line: 245
-		-- upvalues: makeRequestKey (copy), v48 (copy), t4 (copy), t5 (copy), t3 (copy), toShopItem (copy), logCounter (copy), ProductInfoFailedItemsCounter (copy), FFlagEnableRobuxInExperienceShop (copy), mergeBonusItemDetailsIntoSections (copy), filterOutput (copy), FFlagEnableExperienceShopGlobalIcon (copy), p1 (copy)
-		local t14 = {}
-
-		for _, v in ipairs(t13) do
-			t14[makeRequestKey(v.request.id, v.request.infoType)] = v
-		end
-
-		local t15 = {}
-
-		for i = 1, v48 do
-			local v63 = t4[i]
-			local v64 = t5[i]
-			local v65 = t14[makeRequestKey(v63.id, v63.infoType)]
-
-			if v65 == nil or not v65.ok then
-				table.insert(t15, {
-					id = v63.id,
-					infoType = v63.infoType,
-					itemType = v64.itemType,
-					sectionId = v64.sectionId,
-					originalIndex = v64.sectionItemIndex
-				})
-			else
-				local v66 = t3[v64.categoryIndex]
-				local v67 = toShopItem(v65.value, v64.itemType, v63.id)
-
-				v67.originalIndex = v64.sectionItemIndex
-				table.insert(v66.items, v67)
-			end
-		end
-
-		if #t15 > 0 then
-			logCounter(ProductInfoFailedItemsCounter, #t15)
-		end
-
-		local v68 = t3
+	else
+		local count = #v4
 
 		if FFlagEnableRobuxInExperienceShop then
-			v68 = mergeBonusItemDetailsIntoSections(t3, t13)
+			appendBonusItemRequests(v4, v3)
 		end
 
-		local v69, v70 = filterOutput(v68)
+		return callback(v4):andThen(function(list)
+			local v6 = {}
 
-		return {
-			categories = v69,
-			sections = v70,
-			failedItems = t15,
-			metadata = if not FFlagEnableExperienceShopGlobalIcon then nil else p1.metadata
-		}
-	end)
+			for _, item in ipairs(list) do
+				v6[makeRequestKey(item.request.id, item.request.infoType)] = item
+			end
+
+			local failedItems = {}
+
+			for i = 1, count do
+				local v7 = v4[i]
+
+				local v8 = v5[i]
+				local v9 = v6[makeRequestKey(v7.id, v7.infoType)]
+
+				if v9 == nil or not v9.ok then
+					table.insert(failedItems, {
+						id = v7.id,
+						infoType = v7.infoType,
+						itemType = v8.itemType,
+						sectionId = v8.sectionId,
+						originalIndex = v8.sectionItemIndex
+					})
+				else
+					local v10 = v3[v8.categoryIndex]
+
+					local v11 = toShopItem(v9.value, v8.itemType, v7.id)
+					v11.originalIndex = v8.sectionItemIndex
+					table.insert(v10.items, v11)
+				end
+			end
+
+			if #failedItems > 0 then
+				logCounter(ProductInfoFailedItemsCounter, #failedItems)
+			end
+
+			local v7 = v3
+
+			if FFlagEnableRobuxInExperienceShop then
+				v7 = mergeBonusItemDetailsIntoSections(v3, list)
+			end
+
+			local categories, sections = filterOutput(v7)
+			local metadata
+
+			if FFlagEnableExperienceShopGlobalIcon then
+				metadata = data.metadata
+			end
+
+			return {
+				categories = categories,
+				sections = sections,
+				failedItems = failedItems,
+				metadata = metadata,
+				notificationFreeTrialTopBarChip = readFreeTrialTopBarChipFromNotificationSettings(data),
+				gamePassTrialAvailabilities = gamePassTrialAvailabilities
+			}
+		end)
+	end
 end
 
 return buildShopDataFromWidgets

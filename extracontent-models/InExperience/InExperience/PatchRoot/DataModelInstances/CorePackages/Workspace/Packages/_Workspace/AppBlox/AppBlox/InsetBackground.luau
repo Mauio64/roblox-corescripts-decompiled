@@ -1,52 +1,82 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
-local Display = require(Parent.Display)
-local useSignalState = require(Parent.SignalsReact).useSignalState
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("AppBlox").Parent
 
-local function InsetBackground(t1: {[any]: any}) -- line: 30
-	-- upvalues: useSignalState (copy), Display (copy), useTokens (copy), Cryo (copy), React (copy)
-	local v9 = useSignalState(Display.GetDisplayStore().getGuiInset)
-	local v10 = if not t1.excludeGlobalGuiInset then v9 else {
-		left = 0,
-		top = 0,
-		right = 0,
-		bottom = 0
-	}
-	local v11 = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
-	local v12 = useTokens()
-	local v13 = Cryo.Dictionary.join({
-		BorderSizePixel = 0,
-		BackgroundTransparency = v12.Color.Surface.Surface_0.Transparency,
-		BackgroundColor3 = v12.Color.Surface.Surface_0.Color3
-	}, t1.frameProps or {})
-	local v14 = v10.left + v11.left
-	local v15 = v10.right + v11.right
-	local v16 = v10.top + v11.top
-	local v17 = v10.bottom + v11.bottom
-	local v18 = Cryo.Dictionary.join({
-		Position = UDim2.new(0, not t1.directions.left and 0 or -v14, 0, -v16),
-		Size = UDim2.new(1, (not t1.directions.left and 0 or v14) + (not t1.directions.right and 0 or v15), 0, v16)
-	}, Cryo.Dictionary.join(v13, t1.topFrameProps or {}))
-	local v19 = Cryo.Dictionary.join({
-		Position = UDim2.new(0, not t1.directions.left and 0 or -v14, 1, 0),
-		Size = UDim2.new(1, (not t1.directions.left and 0 or v14) + (not t1.directions.right and 0 or v15), 0, v17)
-	}, Cryo.Dictionary.join(v13, t1.bottomFrameProps or {}))
-	local v20 = Cryo.Dictionary.join({
-		Position = UDim2.new(0, -v14, 0, not t1.directions.top and 0 or -v16),
-		Size = UDim2.new(0, v14, 1, (not t1.directions.top and 0 or v16) + (not t1.directions.bottom and 0 or v17))
-	}, Cryo.Dictionary.join(v13, t1.leftFrameProps or {}))
-	local v21 = Cryo.Dictionary.join({
-		Position = UDim2.new(1, 0, 0, not t1.directions.top and 0 or -v16),
-		Size = UDim2.new(0, v15, 1, (not t1.directions.top and 0 or v16) + (not t1.directions.bottom and 0 or v17))
-	}, Cryo.Dictionary.join(v13, t1.rightFrameProps or {}))
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local Display = require(parent.Display)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
 
-	return React.createElement(React.Fragment, nil, {
-		InsetBackgroundTop = if not t1.directions.top or not (v16 > 0) then nil else React.createElement("Frame", v18),
-		InsetBackgroundBottom = if not t1.directions.bottom or not (v17 > 0) then nil else React.createElement("Frame", v19),
-		InsetBackgroundLeft = if not t1.directions.left or not (v14 > 0) then nil else React.createElement("Frame", v20),
-		InsetBackgroundRight = if not t1.directions.right or not (v15 > 0) then nil else React.createElement("Frame", v21)
+local function InsetBackground(props)
+	local v = useSignalState(Display.GetDisplayStore().getGuiInset)
+	local v2 = props.excludeGlobalGuiInset and { left = 0, top = 0, right = 0, bottom = 0 } or v
+
+	local v3 = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
+	local v4 = useTokens()
+
+	local joined = Cryo.Dictionary.join(
+		{
+			BackgroundTransparency = v4.Color.Surface.Surface_0.Transparency,
+			BackgroundColor3 = v4.Color.Surface.Surface_0.Color3,
+			BorderSizePixel = 0
+		},
+		props.frameProps or {}
+	)
+
+	local v5 = v2.left + v3.left
+	local v6 = v2.right + v3.right
+	local v7 = v2.top + v3.top
+	local v8 = v2.bottom + v3.bottom
+
+	local joined2 = Cryo.Dictionary.join({
+		Position = UDim2.new(0, not props.directions.left and 0 or -v5, 0, -v7),
+		Size = UDim2.new(1, (not props.directions.left and 0 or v5) + (not props.directions.right and 0 or v6), 0, v7)
+	}, Cryo.Dictionary.join(joined, props.topFrameProps or {}))
+	local joined3 = Cryo.Dictionary.join({
+		Position = UDim2.new(0, not props.directions.left and 0 or -v5, 1, 0),
+		Size = UDim2.new(1, (not props.directions.left and 0 or v5) + (not props.directions.right and 0 or v6), 0, v8)
+	}, Cryo.Dictionary.join(joined, props.bottomFrameProps or {}))
+	local joined4 = Cryo.Dictionary.join({
+		Position = UDim2.new(0, -v5, 0, not props.directions.top and 0 or -v7),
+		Size = UDim2.new(0, v5, 1, (not props.directions.top and 0 or v7) + (not props.directions.bottom and 0 or v8))
+	}, Cryo.Dictionary.join(joined, props.leftFrameProps or {}))
+	local joined5 = Cryo.Dictionary.join({
+		Position = UDim2.new(1, 0, 0, not props.directions.top and 0 or -v7),
+		Size = UDim2.new(0, v6, 1, (not props.directions.top and 0 or v7) + (not props.directions.bottom and 0 or v8))
+	}, Cryo.Dictionary.join(joined, props.rightFrameProps or {}))
+
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local insetBackgroundTop
+
+	if props.directions.top and v7 > 0 then
+		insetBackgroundTop = React.createElement("Frame", joined2)
+	end
+
+	local insetBackgroundBottom
+
+	if props.directions.bottom and v8 > 0 then
+		insetBackgroundBottom = React.createElement("Frame", joined3)
+	end
+
+	local insetBackgroundLeft
+
+	if props.directions.left and v5 > 0 then
+		insetBackgroundLeft = React.createElement("Frame", joined4)
+	end
+
+	local insetBackgroundRight
+
+	if props.directions.right and v6 > 0 then
+		insetBackgroundRight = React.createElement("Frame", joined5)
+	end
+
+	return createElement(fragment, nil, {
+		InsetBackgroundTop = insetBackgroundTop,
+		InsetBackgroundBottom = insetBackgroundBottom,
+		InsetBackgroundLeft = insetBackgroundLeft,
+		InsetBackgroundRight = insetBackgroundRight
 	})
 end
 

@@ -1,54 +1,43 @@
 local EventIngestService = game:GetService("EventIngestService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local SessionService = game:GetService("SessionService")
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local default = require(Parent.LoggingProtocol).default
-local Analytics = require(Parent.Analytics)
-local v7 = Analytics.Analytics.new(RbxAnalyticsService)
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
+local default = LoggingProtocol.default
+local Analytics = require(parent.Analytics)
+local analytics = Analytics.Analytics.new(RbxAnalyticsService)
 local getPlatformTarget = Analytics.getPlatformTarget
-local v9 = game:DefineFastFlag("AXSendSessionForEvents", false)
+
+local defineFastFlag = game:DefineFastFlag("AXSendSessionForEvents", false)
 
 return {
-	Diag = v7.Diag,
+	Diag = analytics.Diag,
 	EventStream = {
-		setRBXEventStream = function(_, s1: string, s2: string, t1: {[any]: any}?) -- line: 17
-			-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
-			local v14 = t1 or {}
-
-			EventIngestService:SetRBXEventStream(getPlatformTarget(), s1, s2, v14)
+		setRBXEventStream = function(_, p: string, p2: string, options)
+			EventIngestService:SetRBXEventStream(getPlatformTarget(), p, p2, options or {})
 		end,
-		sendEventDeferred = function(_, s3: string, s4: string, t2: {[any]: any}?) -- line: 22
-			-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
-			local v19 = t2 or {}
-
-			EventIngestService:SendEventDeferred(getPlatformTarget(), s3, s4, v19)
+		sendEventDeferred = function(_, p: string, p2: string, options)
+			EventIngestService:SendEventDeferred(getPlatformTarget(), p, p2, options or {})
 		end,
-		sendEventImmediately = function(_, s5: string, s6: string, t3: {[any]: any}?) -- line: 27
-			-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
-			local v24 = t3 or {}
-
-			EventIngestService:SendEventImmediately(getPlatformTarget(), s5, s6, v24)
+		sendEventImmediately = function(_, p: string, p2: string, options)
+			EventIngestService:SendEventImmediately(getPlatformTarget(), p, p2, options or {})
 		end,
-		sendTelemetryEvent = function(_, s7: string, s8: string, t4: {[any]: any}?) -- line: 32
-			-- upvalues: default (copy), v9 (copy), SessionService (copy)
+		sendTelemetryEvent = function(_, p: string, p2: string, p3)
 			default:logRobloxTelemetryEvent({
-				throttlingPercentage = 10000,
-				eventName = s8,
-				backends = { default.TelemetryBackends.EventIngest }
-			}, {
-				"addSessionId",
-				"addSessionInfo"
-			}, t4, s7)
+				eventName = p2,
+				backends = { default.TelemetryBackends.EventIngest },
+				throttlingPercentage = 10000
+			}, { "addSessionId", "addSessionInfo" }, p3, p)
 
-			if v9 then
+			if defineFastFlag then
 				default:logRobloxTelemetryEvent({
 					eventName = "sessionIdDebugEvent",
-					throttlingPercentage = 10000,
-					backends = { default.TelemetryBackends.EventIngest }
+					backends = { default.TelemetryBackends.EventIngest },
+					throttlingPercentage = 10000
 				}, { "addSessionInfo" }, {
-					testEventName = s8,
+					testEventName = p2,
 					sessionTagL2a = SessionService:GetSessionTag("level2a")
-				}, s7)
+				}, p)
 			end
 		end
 	}

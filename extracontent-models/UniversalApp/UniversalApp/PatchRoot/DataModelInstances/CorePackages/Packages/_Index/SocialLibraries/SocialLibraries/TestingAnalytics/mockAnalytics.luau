@@ -1,10 +1,6 @@
-return function(p1) -- line: 1
+return function(p)
 	return {
-		Diag = {
-			reportCounter = p1.fn()
-		},
-		EventStream = {
-			setRBXEventStream = p1.fn()
-		}
+		Diag = { reportCounter = p.fn() },
+		EventStream = { setRBXEventStream = p.fn() }
 	}
 end

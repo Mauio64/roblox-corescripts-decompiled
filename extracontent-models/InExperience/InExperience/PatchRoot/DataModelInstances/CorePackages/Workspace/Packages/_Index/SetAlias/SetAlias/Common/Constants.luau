@@ -1,5 +1,1 @@
-return {
-	RODUX_KEY = "SetAlias",
-	PROFILE_USER_ID = "profileUserId",
-	ORIGIN = "origin"
-}
+return { RODUX_KEY = "SetAlias", PROFILE_USER_ID = "profileUserId", ORIGIN = "origin" }

@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.App.Style.StyleTypes)
+require(parent.App.Style.StyleTypes)
+local parent2 = parent.Parent
+local Roact = require(parent2.Roact)
 
-local ParentParentParent = ParentParent.Parent
-
-return require(ParentParentParent.Roact).createContext(nil)
+return Roact.createContext(nil)

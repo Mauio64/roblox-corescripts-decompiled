@@ -1,180 +1,129 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
-local Promise = require(Parent.Promise)
-local getAssetUserAuthStore = require(Parent.DataHydration.AssetUserAuth).getAssetUserAuthStore
-local debug = require(Parent.DataHydration.CreatorAgentChat).debug
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function formatError(p1) -- line: 32
-	if typeof(p1) == "string" then
-		return p1
-	end
+local React = require(parent.React)
+local Promise = require(parent.Promise)
 
-	if typeof(p1) == "table" and p1.errorMessage then
-		return `HTTP { tostring(p1.responseCode) }: { p1.errorMessage }`
-	end
+local AssetUserAuth = require(parent.DataHydration.AssetUserAuth)
+local getAssetUserAuthStore = AssetUserAuth.getAssetUserAuthStore
 
-	return (tostring(p1))
-end
-local function useMediaUpdater(t1: {[any]: any}?) -- line: 41
-	-- upvalues: React (copy), Promise (copy), debug (copy), getAssetUserAuthStore (copy)
-	local v10 = React.useRef(Promise.resolve())
-	local v11 = t1 and t1.onSuccess
-	local v12 = t1 and t1.onError
-	local v13 = React.useCallback(function(p2: ((...any) -> ...any), s1: string) -- line: 46
-		-- upvalues: debug (copy), v10 (copy), getAssetUserAuthStore (copy), Promise (copy), v11 (copy), v12 (copy)
-		debug.log("info", `media_updater { s1 } enqueued`)
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local Debug = CreatorAgentChat.debug
 
-		local v20 = v10.current:catch(function() -- line: 49
+local formatError = require(script.Parent.formatError)
+
+local function useMediaUpdater(p)
+	local ref = React.useRef(Promise.resolve())
+	local onSuccess = p and p.onSuccess
+	local onError = p and p.onError
+
+	local v = React.useCallback(function(callback, p2: string)
+		Debug.log("info", `media_updater {p2} enqueued`)
+		local v = ref.current:catch(function(): nil
 			return nil
-		end):andThen(p2):andThen(function(p3) -- line: 53
-			-- upvalues: getAssetUserAuthStore (copy)
+		end):andThen(callback):andThen(function(p3)
 			return getAssetUserAuthStore().pollUntilDone(p3)
-		end):andThen(function(p4) -- line: 56
-			-- upvalues: Promise (copy)
-			if typeof(p4) == "table" and p4.status == "timed_out" then
+		end):andThen(function(p3)
+			if typeof(p3) == "table" and p3.status == "timed_out" then
 				return Promise.reject("Operation did not complete in time")
 			end
 
-			if p4.status == "done" then
-				return p4.operation
-			end
-
-			return p4
+			return if p3.status == "done" then p3.operation else p3
 		end)
 
-		v10.current = v20:catch(function() -- line: 63
+		ref.current = v:catch(function(): nil
 			return nil
 		end)
 
-		return v20:andThen(function(p5) -- line: 68
-			-- upvalues: debug (copy), s1 (copy), v11 (copy)
-			debug.log("info", `media_updater { s1 } succeeded`)
+		return v:andThen(function(p3)
+			Debug.log("info", `media_updater {p2} succeeded`)
 
-			if v11 then
-				v11()
+			if onSuccess then
+				onSuccess()
 			end
 
-			return p5
-		end):catch(function(p6) -- line: 75
-			-- upvalues: debug (copy), s1 (copy), v12 (copy), Promise (copy)
-			local v34 = if typeof(p6) ~= "string" then if typeof(p6) ~= "table" or not p6.errorMessage then tostring(p6) else `HTTP { tostring(p6.responseCode) }: { p6.errorMessage }` else p6
+			return p3
+		end):catch(function(p3)
+			local err = formatError(p3)
+			Debug.log("warn", `media_updater {p2} failed`, { error = err })
 
-			debug.log("warn", `media_updater { s1 } failed`, {
-				error = v34
-			})
-
-			if v12 then
-				v12(v34)
+			if onError then
+				onError(err)
 			end
 
-			return Promise.reject(p6)
+			return Promise.reject(p3)
 		end)
-	end, {
-		v11,
-		v12
-	})
-	local v14 = React.useCallback(function(s2: string, p7) -- line: 85
-		-- upvalues: v13 (copy), Promise (copy), getAssetUserAuthStore (copy)
-		return v13(function() -- line: 86
-			-- upvalues: Promise (copy), p7 (copy), getAssetUserAuthStore (copy), s2 (copy)
-			return Promise.resolve(p7):andThen(function(s3: string) -- line: 87
-				-- upvalues: getAssetUserAuthStore (copy), s2 (copy)
-				return getAssetUserAuthStore().updateIcon(s2, s3)
-			end)
-		end, "setIcon")
-	end, { v13 })
-	local v15 = React.useCallback(function(s4: string, p8) -- line: 94
-		-- upvalues: v13 (copy), getAssetUserAuthStore (copy), Promise (copy)
-		return v13(function() -- line: 95
-			-- upvalues: getAssetUserAuthStore (copy), Promise (copy), p8 (copy), s4 (copy)
-			local v35 = getAssetUserAuthStore()
+	end, { onSuccess, onError })
 
-			return Promise.resolve(p8):andThen(function(s5: string) -- line: 97
-				-- upvalues: v35 (copy), s4 (copy)
-				return v35.getPreviews(s4):andThen(function(t2: {[any]: any}) -- line: 98
-					-- upvalues: s5 (copy), v35 (copy), s4 (copy)
-					local v47 = table.clone(t2)
-
-					table.insert(v47, {
-						asset = `assets/{ s5 }`
-					})
-
-					return v35.updatePreviews(s4, v47)
+	return {
+		setIcon = React.useCallback(function(p2: string, p3)
+			return v(function()
+				return Promise.resolve(p3):andThen(function(p4: string)
+					return getAssetUserAuthStore().updateIcon(p2, p4)
 				end)
-			end)
-		end, "addPreview")
-	end, { v13 })
-	local v16 = React.useCallback(function(s6: string, p9, s7: string) -- line: 110
-		-- upvalues: v13 (copy), getAssetUserAuthStore (copy), Promise (copy)
-		return v13(function() -- line: 111
-			-- upvalues: getAssetUserAuthStore (copy), Promise (copy), p9 (copy), s6 (copy), s7 (copy)
-			local v36 = getAssetUserAuthStore()
+			end, "setIcon")
+		end, { v }),
+		addPreview = React.useCallback(function(p2: string, p3)
+			return v(function()
+				local assetUserAuthStore = getAssetUserAuthStore()
+				return Promise.resolve(p3):andThen(function(p4: string)
+					return assetUserAuthStore.getPreviews(p2):andThen(function(p5)
+						local clone = table.clone(p5)
+						table.insert(clone, { asset = `assets/{p4}` })
+						return assetUserAuthStore.updatePreviews(p2, clone)
+					end)
+				end)
+			end, "addPreview")
+		end, { v }),
+		replacePreview = React.useCallback(function(p2: string, p3, p4: string)
+			return v(function()
+				local assetUserAuthStore = getAssetUserAuthStore()
+				return Promise.resolve(p3):andThen(function(p5: string)
+					return assetUserAuthStore.getPreviews(p2):andThen(function(items)
+						local v2 = nil
 
-			return Promise.resolve(p9):andThen(function(s8: string) -- line: 113
-				-- upvalues: v36 (copy), s6 (copy), s7 (copy), Promise (copy)
-				return v36.getPreviews(s6):andThen(function(t3: {[any]: any}) -- line: 114
-					-- upvalues: s7 (copy), Promise (copy), s8 (copy), v36 (copy), s6 (copy)
-					local v49 = nil
+						for k, item in items do
+							if item.asset == p4 then
+								v2 = k
+								break
+							end
+						end
 
-					for v50, v51 in t3 do
-						if v51.asset == s7 then
-							v49 = v50
+						if v2 == nil then
+							return Promise.reject(`Preview "{p4}" not found`)
+						end
 
+						local clone = table.clone(items)
+						local clone2 = table.clone(items[v2])
+						clone2.asset = `assets/{p5}`
+						clone[v2] = clone2
+						return assetUserAuthStore.updatePreviews(p2, clone)
+					end)
+				end)
+			end, "replacePreview")
+		end, { v }),
+		removePreview = React.useCallback(function(p2: string, p3: string)
+			return v(function()
+				local assetUserAuthStore = getAssetUserAuthStore()
+				return assetUserAuthStore.getPreviews(p2):andThen(function(items)
+					local v2 = nil
+
+					for k, item in items do
+						if item.asset == p3 then
+							v2 = k
 							break
 						end
 					end
 
-					if v49 == nil then
-						return Promise.reject(`Preview "{ s7 }" not found`)
+					if v2 == nil then
+						return Promise.reject(`Preview "{p3}" not found`)
 					end
 
-					local v52 = table.clone(t3)
-					local v53 = table.clone(t3[v49])
-
-					v53.asset = `assets/{ s8 }`
-					v52[v49] = v53
-
-					return v36.updatePreviews(s6, v52)
+					local clone = table.clone(items)
+					table.remove(clone, v2)
+					return assetUserAuthStore.updatePreviews(p2, clone)
 				end)
-			end)
-		end, "replacePreview")
-	end, { v13 })
-	local v17 = React.useCallback(function(s9: string, s10: string) -- line: 137
-		-- upvalues: v13 (copy), getAssetUserAuthStore (copy), Promise (copy)
-		return v13(function() -- line: 138
-			-- upvalues: getAssetUserAuthStore (copy), s9 (copy), s10 (copy), Promise (copy)
-			local v37 = getAssetUserAuthStore()
-
-			return v37.getPreviews(s9):andThen(function(t4: {[any]: any}) -- line: 140
-				-- upvalues: s10 (copy), Promise (copy), v37 (copy), s9 (copy)
-				local v42 = nil
-
-				for v43, v44 in t4 do
-					if v44.asset == s10 then
-						v42 = v43
-
-						break
-					end
-				end
-
-				if v42 == nil then
-					return Promise.reject(`Preview "{ s10 }" not found`)
-				end
-
-				local v45 = table.clone(t4)
-
-				table.remove(v45, v42)
-
-				return v37.updatePreviews(s9, v45)
-			end)
-		end, "removePreview")
-	end, { v13 })
-
-	return {
-		setIcon = v14,
-		addPreview = v15,
-		replacePreview = v16,
-		removePreview = v17
+			end, "removePreview")
+		end, { v })
 	}
 end
 

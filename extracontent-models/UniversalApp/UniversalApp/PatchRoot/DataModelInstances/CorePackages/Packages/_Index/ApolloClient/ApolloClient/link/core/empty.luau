@@ -1,3 +1,2 @@
-return {
-	empty = require(script.Parent.ApolloLink).ApolloLink.empty
-}
+local ApolloLink = require(script.Parent.ApolloLink)
+return { empty = ApolloLink.ApolloLink.empty }

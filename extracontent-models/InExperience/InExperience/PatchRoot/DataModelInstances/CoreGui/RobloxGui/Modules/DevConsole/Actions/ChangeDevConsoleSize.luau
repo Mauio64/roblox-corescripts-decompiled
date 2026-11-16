@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)("ChangeDevConsoleSize", function(p1) -- line: 4
-	return {
-		newSize = p1
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action("ChangeDevConsoleSize", function(newSize)
+	return { newSize = newSize }
 end)

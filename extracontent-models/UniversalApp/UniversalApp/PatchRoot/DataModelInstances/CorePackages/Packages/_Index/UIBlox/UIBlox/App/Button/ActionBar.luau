@@ -1,71 +1,71 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local Roact = require(scriptParentParentParentParent.Roact)
-local React = require(scriptParentParentParentParent.React)
-local Cryo = require(scriptParentParentParentParent.Cryo)
-local RoactGamepad = require(scriptParentParentParentParent.RoactGamepad)
-local t = require(scriptParentParentParentParent.t)
-local FitFrameOnAxis = require(scriptParentParentParentParent.FitFrame).FitFrameOnAxis
-local Button = require(scriptParent.Button)
-local ComboButton = require(scriptParent.ComboButton)
-local IconButton = require(scriptParent.IconButton)
-local TextButton = require(scriptParent.TextButton)
-local ButtonType = require(scriptParent.Enum.ButtonType)
-local withStyle = require(scriptParentParentParent.Core.Style.withStyle)
-local IconSize = require(scriptParentParent.ImageSet.Enum.IconSize)
-local getPageMargin = require(scriptParentParent.Container.getPageMargin)
-local Constants = require(scriptParentParent.Style.Constants)
-local UIBloxConfig = require(scriptParentParentParent.UIBloxConfig)
-local v21 = Roact.PureComponent:extend("ActionBar")
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-function v21.init(p1) -- line: 33
-	-- upvalues: RoactGamepad (copy), Roact (copy)
-	p1.buttonRefs = p1.props.isRoactGamepadEnabled and RoactGamepad.createRefCache() or {}
-	p1.state = {
-		frameWidth = 0
-	}
-	p1.frameRef = p1.props.frameRef or Roact.createRef()
+local Roact = require(parent4.Roact)
+local React = require(parent4.React)
+local Cryo = require(parent4.Cryo)
+local RoactGamepad = require(parent4.RoactGamepad)
+local t = require(parent4.t)
 
-	function p1.updateFrameSize(p2) -- line: 42
-		-- upvalues: p1 (copy)
-		local AbsoluteSizeX = p2.AbsoluteSize.X
+local FitFrame = require(parent4.FitFrame)
+local FitFrameOnAxis = FitFrame.FitFrameOnAxis
 
-		if AbsoluteSizeX ~= p1.state.frameWidth then
-			p1:setState({
-				frameWidth = AbsoluteSizeX
-			})
+local Button = require(parent.Button)
+local ComboButton = require(parent.ComboButton)
+local IconButton = require(parent.IconButton)
+local TextButton = require(parent.TextButton)
+local ButtonType = require(parent.Enum.ButtonType)
+
+local withStyle = require(parent3.Core.Style.withStyle)
+local IconSize = require(parent2.ImageSet.Enum.IconSize)
+local getPageMargin = require(parent2.Container.getPageMargin)
+local Constants = require(parent2.Style.Constants)
+
+local UIBloxConfig = require(parent3.UIBloxConfig)
+
+local extended = Roact.PureComponent:extend("ActionBar")
+
+function extended:init()
+	self.buttonRefs = self.props.isRoactGamepadEnabled and RoactGamepad.createRefCache() or {}
+
+	self.state = { frameWidth = 0 }
+
+	self.frameRef = self.props.frameRef or Roact.createRef()
+
+	function self.updateFrameSize(p)
+		local x = p.AbsoluteSize.X
+
+		if x ~= self.state.frameWidth then
+			self:setState({ frameWidth = x })
 		end
 
-		if p1.props.onAbsoluteSizeChanged then
-			p1.props.onAbsoluteSizeChanged(p2.AbsoluteSize)
+		if self.props.onAbsoluteSizeChanged then
+			self.props.onAbsoluteSizeChanged(p.AbsoluteSize)
 		end
 	end
-	function p1.getGamepadNextSelectionLeft(p3, _) -- line: 55
-		-- upvalues: p1 (copy)
-		return p3 > 1 and p1.buttonRefs[p3 - 1] or nil
+
+	function self.getGamepadNextSelectionLeft(p, _)
+		return p > 1 and self.buttonRefs[p - 1] or nil
 	end
-	function p1.getGamepadNextSelectionRight(p5, p6) -- line: 59
-		-- upvalues: p1 (copy)
-		return p5 < p6 and p1.buttonRefs[p5 + 1] or nil
+
+	function self.getGamepadNextSelectionRight(p, p2)
+		return p < p2 and self.buttonRefs[p + 1] or nil
 	end
 end
 
-v21.validateProps = t.strictInterface({
-	button = t.optional(t.union(t.strictInterface({
-		props = Button.validateProps
-	}), t.strictInterface({
-		props = ComboButton.validateProps
-	}))),
+extended.validateProps = t.strictInterface({
+	button = t.optional(t.union(
+		t.strictInterface({ props = Button.validateProps }),
+		t.strictInterface({ props = ComboButton.validateProps })
+	)),
 	buttonOverride = t.optional(t.table),
 	iconSize = t.optional(t.number),
 	buttonHeight = t.optional(t.number),
 	buttonPadding = t.optional(t.number),
 	enableButtonAtStart = t.optional(t.boolean),
-	icons = t.optional(t.array(t.strictInterface({
-		props = IconButton.validateProps
-	}))),
+	icons = t.optional(t.array(t.strictInterface({ props = IconButton.validateProps }))),
 	marginOverride = t.optional(t.strictInterface({
 		left = t.number,
 		right = t.number,
@@ -80,193 +80,279 @@ v21.validateProps = t.strictInterface({
 	NextSelectionUp = t.optional(t.table),
 	NextSelectionDown = t.optional(t.table),
 	frameRef = t.optional(t.table),
-	textButtons = t.optional(t.array(t.strictInterface({
-		props = TextButton.validateProps
-	}))),
+	textButtons = t.optional(t.array(t.strictInterface({ props = TextButton.validateProps }))),
 	isRoactGamepadEnabled = t.optional(t.boolean),
 	testId = t.optional(t.string)
 })
-v21.defaultProps = {
+
+extended.defaultProps = {
+	horizontalAlignment = Enum.HorizontalAlignment.Center,
 	iconSize = 36,
 	buttonHeight = 48,
 	buttonPadding = 12,
 	isRoactGamepadEnabled = true,
-	testId = "--uiblox-action-bar",
-	horizontalAlignment = Enum.HorizontalAlignment.Center
+	testId = "--uiblox-action-bar"
 }
 
-function v21.render(p7) -- line: 136
-	-- upvalues: withStyle (copy), getPageMargin (copy), IconSize (copy), Constants (copy), UIBloxConfig (copy), Cryo (copy), Roact (copy), RoactGamepad (copy), React (copy), IconButton (copy), TextButton (copy), ComboButton (copy), ButtonType (copy), Button (copy), FitFrameOnAxis (copy)
-	return withStyle(function(_) -- line: 137
-		-- upvalues: getPageMargin (copy), p7 (copy), IconSize (copy), Constants (copy), UIBloxConfig (copy), Cryo (copy), Roact (copy), RoactGamepad (copy), React (copy), IconButton (copy), TextButton (copy), ComboButton (copy), ButtonType (copy), Button (copy), FitFrameOnAxis (copy)
-		local v35 = getPageMargin(p7.state.frameWidth)
-		local v36 = p7.state.frameWidth - v35 * 2
-		local Medium = IconSize.Medium
-		local v38 = if not p7.props.marginOverride then {
-			top = 0,
-			left = v35,
-			right = v35,
-			bottom = Constants.Layout.ActionBar.PositionOffset
-		} else p7.props.marginOverride
-		local n1 = 0
+function extended.render(data)
+	return withStyle(function(_)
+		local pageMargin = getPageMargin(data.state.frameWidth)
+		local v = data.state.frameWidth - pageMargin * 2
+		local medium = IconSize.Medium
+		local margin
 
-		if p7.props.icons and #p7.props.icons then
-			n1 = #p7.props.icons
+		if data.props.marginOverride then
+			margin = data.props.marginOverride
+		else
+			margin = {
+				left = pageMargin,
+				right = pageMargin,
+				top = 0,
+				bottom = Constants.Layout.ActionBar.PositionOffset
+			}
 		end
 
-		local n2 = 0
+		local v2 = 0
+		v2 = data.props.icons and #data.props.icons and #data.props.icons or v2
 
-		if p7.props.textButtons and #p7.props.textButtons then
-			n2 = #p7.props.textButtons
+		local v3 = 0
+		v3 = data.props.textButtons and #data.props.textButtons and #data.props.textButtons or v3
+
+		local v4 = data.props.button == nil
+			and (not UIBloxConfig.enableActionBarButtonOverride or data.props.buttonOverride == nil)
+			and 0
+			or 1
+		local v5
+
+		if data.props.enableButtonAtStart == true then
+			v5 = v4 ~= 0
+		else
+			v5 = false
 		end
 
-		local v41 = p7.props.button == nil and (not UIBloxConfig.enableActionBarButtonOverride or p7.props.buttonOverride == nil) and 0 or 1
-		local v42 = p7.props.enableButtonAtStart == true and v41 ~= 0
-		local v43 = n2 + n1 + v41
-		local t1 = {}
+		local v6 = v3 + v2 + v4
+		local children = {}
 
-		if n1 ~= 0 then
-			for i, v in ipairs(p7.props.icons) do
-				local v47 = v42 and i + v41 or i
-				local t2 = {
-					layoutOrder = v47,
-					iconSize = Medium
-				}
-				local v49 = Cryo.Dictionary.join(t2, v.props)
+		if v2 ~= 0 then
+			for i, icon in ipairs(data.props.icons) do
+				i = v5 and i + v4 or i
+				local joined = Cryo.Dictionary.join({ layoutOrder = i, iconSize = medium }, icon.props)
 
-				if not p7.props.isRoactGamepadEnabled then
-					p7.buttonRefs[v47] = p7.buttonRefs[v47] or Roact.createRef()
+				if not data.props.isRoactGamepadEnabled then
+					data.buttonRefs[i] = data.buttonRefs[i] or Roact.createRef()
 				end
 
-				table.insert(t1, Roact.createElement(not p7.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame, {
-					key = "Button" .. tostring(v47),
-					Size = UDim2.fromOffset(p7.props.iconSize, p7.props.iconSize),
+				local createElement = Roact.createElement
+				local v7 = not data.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame
+				local v8 = {
+					["key"] = nil,
+					key = "Button" .. tostring(i),
+					Size = UDim2.fromOffset(data.props.iconSize, data.props.iconSize),
 					BackgroundTransparency = 1,
-					[Roact.Ref] = p7.buttonRefs[v47],
+					[Roact.Ref] = data.buttonRefs[i],
 					NextSelectionUp = nil,
 					NextSelectionDown = nil,
-					NextSelectionLeft = p7.getGamepadNextSelectionLeft(v47, v43),
-					NextSelectionRight = p7.getGamepadNextSelectionRight(v47, v43),
-					inputBindings = if not p7.props.isRoactGamepadEnabled then nil else {
-						Activated = v49.onActivated and RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, v49.onActivated) or nil
-					},
-					[React.Tag] = if not p7.props.testId then nil else `data-testid={ p7.props.testId }--icon-button`
-				}, {
-					Icon = Roact.createElement(IconButton, v49)
+					NextSelectionLeft = data.getGamepadNextSelectionLeft(i, v6),
+					NextSelectionRight = data.getGamepadNextSelectionRight(i, v6)
+				}
+				local inputBindings
+
+				if data.props.isRoactGamepadEnabled then
+					inputBindings = { Activated = 0 }
+					local activated
+
+					if joined.onActivated then
+						activated = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, joined.onActivated) or nil
+					end
+
+					inputBindings.Activated = activated
+				end
+
+				v8.inputBindings = inputBindings
+
+				local tag = React.Tag
+				local v9
+
+				if data.props.testId then
+					v9 = `data-testid={data.props.testId}--icon-button`
+				end
+
+				v8[tag] = v9
+				table.insert(children, createElement(v7, v8, {
+					Icon = Roact.createElement(IconButton, joined)
 				}))
 			end
 		end
 
-		if n2 ~= 0 then
-			for i, v in ipairs(p7.props.textButtons) do
-				local v52 = ((if not v42 then i else i + v41)) + n1
-				local t3 = {
-					layoutOrder = v52
-				}
-				local v54 = Cryo.Dictionary.join(t3, v.props)
-
-				if not p7.props.isRoactGamepadEnabled then
-					p7.buttonRefs[v52] = p7.buttonRefs[v52] or Roact.createRef()
+		if v3 ~= 0 then
+			for total, textButton in ipairs(data.props.textButtons) do
+				if v5 then
+					total += v4
 				end
 
-				table.insert(t1, Roact.createElement(not p7.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame, {
-					key = "Button" .. tostring(v52),
-					Size = UDim2.fromOffset(0, p7.props.iconSize),
+				local layoutOrder = total + v2
+
+				local joined = Cryo.Dictionary.join({ layoutOrder = layoutOrder }, textButton.props)
+
+				if not data.props.isRoactGamepadEnabled then
+					data.buttonRefs[layoutOrder] = data.buttonRefs[layoutOrder] or Roact.createRef()
+				end
+
+				local createElement = Roact.createElement
+				local v7 = not data.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame
+				local v8 = {
+					key = "Button" .. tostring(layoutOrder),
+					Size = UDim2.fromOffset(0, data.props.iconSize),
 					AutomaticSize = Enum.AutomaticSize.X,
 					BackgroundTransparency = 1,
-					[Roact.Ref] = p7.buttonRefs[v52],
+					[Roact.Ref] = data.buttonRefs[layoutOrder],
 					NextSelectionUp = nil,
 					NextSelectionDown = nil,
-					NextSelectionLeft = p7.getGamepadNextSelectionLeft(v52, v43),
-					NextSelectionRight = p7.getGamepadNextSelectionRight(v52, v43),
-					inputBindings = if not p7.props.isRoactGamepadEnabled then nil else {
-						Activated = v54.onActivated and RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, v54.onActivated) or nil
-					}
-				}, {
-					TextButton = Roact.createElement(TextButton, v54)
+					NextSelectionLeft = data.getGamepadNextSelectionLeft(layoutOrder, v6),
+					NextSelectionRight = data.getGamepadNextSelectionRight(layoutOrder, v6)
+				}
+				local inputBindings
+
+				if data.props.isRoactGamepadEnabled then
+					inputBindings = { Activated = 0 }
+					local activated
+
+					if joined.onActivated then
+						activated = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, joined.onActivated) or nil
+					end
+
+					inputBindings.Activated = activated
+				end
+
+				v8.inputBindings = inputBindings
+				table.insert(children, createElement(v7, v8, {
+					TextButton = Roact.createElement(TextButton, joined)
 				}))
 			end
 		end
 
-		if v41 ~= 0 then
-			local uDim2 = UDim2.fromOffset(v36 - n1 * (p7.props.iconSize + p7.props.buttonPadding), p7.props.buttonHeight)
-			local v56 = if not v42 then n1 + 1 else 1
-			local v57 = nil
-			local v58 = nil
+		if v4 ~= 0 then
+			local udim = UDim2.fromOffset(
+				v - v2 * (data.props.iconSize + data.props.buttonPadding),
+				data.props.buttonHeight
+			)
 
-			if not UIBloxConfig.enableActionBarButtonOverride or not p7.props.buttonOverride then
-				v57 = ComboButton.validateProps(p7.props.button.props)
+			local layoutOrder = v5 and 1 or v2 + 1
+			local v7, joined
 
-				local t4 = {
-					layoutOrder = v56,
-					size = uDim2
-				}
+			if not (UIBloxConfig.enableActionBarButtonOverride and data.props.buttonOverride) then
+				v7 = ComboButton.validateProps(data.props.button.props)
+				joined = Cryo.Dictionary.join({ layoutOrder = layoutOrder, size = udim }, data.props.button.props)
 
-				v58 = Cryo.Dictionary.join(t4, p7.props.button.props)
+				if not v7 and joined.buttonType == nil then
+					local buttonType
 
-				if not v57 and v58.buttonType == nil then
-					v58.buttonType = if n1 ~= 0 then ButtonType.PrimaryContextual else ButtonType.PrimarySystem
+					if v2 == 0 then
+						buttonType = ButtonType.PrimarySystem
+					else
+						buttonType = ButtonType.PrimaryContextual
+					end
+
+					joined.buttonType = buttonType
 				end
 			end
 
-			if not p7.props.isRoactGamepadEnabled then
-				p7.buttonRefs[v56] = p7.buttonRefs[v56] or Roact.createRef()
+			if not data.props.isRoactGamepadEnabled then
+				data.buttonRefs[layoutOrder] = data.buttonRefs[layoutOrder] or Roact.createRef()
 			end
 
-			table.insert(t1, if not v42 then v43 else 1, Roact.createElement(not p7.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame, {
-				key = "Button" .. v56,
-				Size = uDim2,
+			local createElement = Roact.createElement
+			local v8 = not data.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame
+			local v9 = {
+				["key"] = nil,
+				key = "Button" .. layoutOrder,
+				Size = udim,
 				BackgroundTransparency = 1,
-				[Roact.Ref] = p7.buttonRefs[v56],
+				[Roact.Ref] = data.buttonRefs[layoutOrder],
 				NextSelectionUp = nil,
 				NextSelectionDown = nil,
-				NextSelectionLeft = p7.getGamepadNextSelectionLeft(v56, v43),
-				NextSelectionRight = p7.getGamepadNextSelectionRight(v56, v43),
-				inputBindings = if not p7.props.isRoactGamepadEnabled then nil else {
-					Activated = if v57 or not not UIBloxConfig.enableActionBarButtonOverride and p7.props.buttonOverride then nil else RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, v58.onActivated)
-				},
-				[React.Tag] = if not p7.props.testId then nil else `data-testid={ p7.props.testId }--primary-button`
-			}, {
-				Icon = if not UIBloxConfig.enableActionBarButtonOverride or not p7.props.buttonOverride then Roact.createElement(if not v57 then Button else ComboButton, v58) else p7.props.buttonOverride
-			}))
+				NextSelectionLeft = data.getGamepadNextSelectionLeft(layoutOrder, v6),
+				NextSelectionRight = data.getGamepadNextSelectionRight(layoutOrder, v6)
+			}
+			local inputBindings
+
+			if data.props.isRoactGamepadEnabled then
+				inputBindings = { Activated = 0 }
+				local activated
+
+				if not (v7 or UIBloxConfig.enableActionBarButtonOverride and data.props.buttonOverride) then
+					activated = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, joined.onActivated)
+				end
+
+				inputBindings.Activated = activated
+			end
+
+			v9.inputBindings = inputBindings
+
+			local tag = React.Tag
+			local v10
+
+			if data.props.testId then
+				v10 = `data-testid={data.props.testId}--primary-button`
+			end
+
+			v9[tag] = v10
+			local icon
+
+			if UIBloxConfig.enableActionBarButtonOverride and data.props.buttonOverride then
+				icon = data.props.buttonOverride
+			else
+				local createElement2 = Roact.createElement
+				local v11 = if v7 then ComboButton else Button
+				icon = createElement2(v11, joined)
+			end
+
+			table.insert(children, v5 and 1 or v6, createElement(v8, v9, { Icon = icon }))
 		end
 
-		if p7.props[Roact.Children] then
-			t1 = p7.props[Roact.Children]
+		if data.props[Roact.Children] then
+			children = data.props[Roact.Children]
 		end
 
-		return Roact.createElement(if not p7.props.isRoactGamepadEnabled then FitFrameOnAxis else RoactGamepad.Focusable[FitFrameOnAxis], {
+		local createElement = Roact.createElement
+		local v7
+
+		if data.props.isRoactGamepadEnabled then
+			v7 = RoactGamepad.Focusable[FitFrameOnAxis]
+		else
+			v7 = FitFrameOnAxis
+		end
+
+		return createElement(v7, {
 			BackgroundTransparency = 1,
-			minimumSize = UDim2.new(1, 0, 0, p7.props.buttonHeight),
+			minimumSize = UDim2.new(1, 0, 0, data.props.buttonHeight),
 			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = p7.props.horizontalAlignment,
+			HorizontalAlignment = data.props.horizontalAlignment,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			Position = UDim2.new(0, 0, 1, 0),
 			AnchorPoint = Vector2.new(0, 1),
 			contentPadding = UDim.new(0, 12),
-			[Roact.Ref] = p7.frameRef,
-			[Roact.Change.AbsoluteSize] = p7.updateFrameSize,
-			margin = v38,
-			NextSelectionLeft = p7.props.NextSelectionLeft,
-			NextSelectionRight = p7.props.NextSelectionRight,
-			NextSelectionUp = p7.props.NextSelectionUp,
-			NextSelectionDown = p7.props.NextSelectionDown
-		}, t1)
+			[Roact.Ref] = data.frameRef,
+			[Roact.Change.AbsoluteSize] = data.updateFrameSize,
+			margin = margin,
+			NextSelectionLeft = data.props.NextSelectionLeft,
+			NextSelectionRight = data.props.NextSelectionRight,
+			NextSelectionUp = data.props.NextSelectionUp,
+			NextSelectionDown = data.props.NextSelectionDown
+		}, children)
 	end)
 end
-function v21.didMount(p9) -- line: 352
-	if p9.frameRef.current then
-		p9.updateFrameSize(p9.frameRef.current)
+
+function extended.didMount(p)
+	if p.frameRef.current then
+		p.updateFrameSize(p.frameRef.current)
 	end
 end
 
-local v22 = Roact.forwardRef(function(p10, p11) -- line: 358
-	-- upvalues: Roact (copy), v21 (copy), Cryo (copy)
-	return Roact.createElement(v21, Cryo.Dictionary.join(p10, {
-		frameRef = p11
-	}))
+local forwardRef = Roact.forwardRef(function(p, frameRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { frameRef = frameRef }))
 end)
 
-v22.validateProps = v21.validateProps
+forwardRef.validateProps = extended.validateProps
 
-return v22
+return forwardRef

@@ -1,179 +1,202 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local memoize = require(ParentParentParent.AppCommonLib).memoize
-local Images = require(ParentParentParent.UIBlox).App.ImageSet.Images
-local Foundation = require(ParentParentParent.Foundation)
-local FFlagPlayerListFoundationSubscriptionIcon = require(ParentParent.Flags.FFlagPlayerListFoundationSubscriptionIcon)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-return (memoize(function(p1, p2) -- line: 165
-	-- upvalues: Images (copy), FFlagPlayerListFoundationSubscriptionIcon (copy), Foundation (copy)
-	local t1 = {
-		IsTenFoot = p1
-	}
+local AppCommonLib = require(parent2.AppCommonLib)
+local memoize = AppCommonLib.memoize
+local UIBlox = require(parent2.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local Foundation = require(parent2.Foundation)
 
-	if p1 then
-		t1.ContainerPosition = UDim2.new(0.5, 0, 0.5, 0)
-		t1.ContainerSize = UDim2.new(0, 350, 0, 720)
-		t1.AnchorPoint = Vector2.new(0.5, 0.5)
-		t1.PlayerDropDownSizeX = 0
-		t1.PlayerScrollListPosition = UDim2.new(0, 0, 0, 105)
-		t1.PlayerScrollListSize = UDim2.new(1, 19, 1, 0)
-		t1.PlayerScrollListInnerFramePosition = UDim2.new(0, 0, 0, 0)
-		t1.PlayerScrollListInnerFrameSize = UDim2.new(1, 0, 1, 0)
-		t1.EntrySizeX = 350
-		t1.PlayerEntrySizeY = 100
-		t1.EntryPadding = 5
-		t1.TeamEntrySizeY = 32
-		t1.StatEntrySizeX = 250
-		t1.EntryXOffset = -20
-		t1.BackgroundStyle = {
-			Selected = nil,
-			Default = {
-				Transparency = 0.25,
-				Color = Color3.fromRGB(60, 60, 60)
-			},
-			Hovered = {
-				Transparency = 0.25,
-				Color = Color3.fromRGB(50, 181, 255)
-			},
-			HoveredTitle = {
-				Transparency = 0,
-				Color = Color3.fromRGB(50, 181, 255)
-			},
-			Title = {
-				Transparency = 0,
-				Color = Color3.fromRGB(25, 25, 25)
-			}
+local FFlagPlayerListFoundationSubscriptionIcon = require(parent.Flags.FFlagPlayerListFoundationSubscriptionIcon)
+
+return (memoize(function(isTenFoot, p)
+	local v = {}
+	v.IsTenFoot = isTenFoot
+
+	if isTenFoot then
+		v.ContainerPosition = UDim2.new(0.5, 0, 0.5, 0)
+		v.ContainerSize = UDim2.new(0, 350, 0, 720)
+		v.AnchorPoint = Vector2.new(0.5, 0.5)
+
+		v.PlayerDropDownSizeX = 0
+
+		v.PlayerScrollListPosition = UDim2.new(0, 0, 0, 105)
+		v.PlayerScrollListSize = UDim2.new(1, 19, 1, 0)
+		v.PlayerScrollListInnerFramePosition = UDim2.new(0, 0, 0, 0)
+		v.PlayerScrollListInnerFrameSize = UDim2.new(1, 0, 1, 0)
+
+		v.EntrySizeX = 350
+		v.PlayerEntrySizeY = 100
+		v.EntryPadding = 5
+		v.TeamEntrySizeY = 32
+		v.StatEntrySizeX = 250
+		v.EntryXOffset = -20
+
+		v.BackgroundStyle = {
+			Default = { Color = Color3.fromRGB(60, 60, 60), Transparency = 0.25 },
+			Hovered = { Color = Color3.fromRGB(50, 181, 255), Transparency = 0.25 },
+			HoveredTitle = { Color = Color3.fromRGB(50, 181, 255), Transparency = 0 },
+			Title = { Color = Color3.fromRGB(25, 25, 25), Transparency = 0 },
+			Selected = nil
 		}
-		t1.TeamEntryBackgroundTransparency = 0.25
-		t1.DefaultTextStyle = {
-			Transparency = 0,
-			StrokeTransparency = 0.75,
+
+		v.TeamEntryBackgroundTransparency = 0.25
+
+		v.DefaultTextStyle = {
 			Color = Color3.fromRGB(255, 255, 243),
-			StrokeColor = Color3.fromRGB(34, 34, 34)
-		}
-		t1.HoveredTextStyle = {
 			Transparency = 0,
 			StrokeTransparency = 0.75,
-			Color = Color3.fromRGB(19, 19, 19),
 			StrokeColor = Color3.fromRGB(34, 34, 34)
 		}
-		t1.PlayerIconSize = UDim2.new(0, 64, 0, 64)
-		t1.InitalPlayerEntryPadding = 18
-		t1.PlayerEntryPadding = 8
-		t1.PlayerEntryNamePadding = 8
-		t1.TeamEntryTextPadding = 5
-		t1.StatTextPadding = 0
-		t1.PlayerNameSize = UDim2.new(1, -88, 1, 0)
-		t1.PlayerNameTextSize = 32
-		t1.StatTextSize = 32
-		t1.ScrollImageColor = Color3.fromRGB(31, 31, 31)
-		t1.ScrollImageTransparency = 0.5
+
+		v.HoveredTextStyle = {
+			Color = Color3.fromRGB(19, 19, 19),
+			Transparency = 0,
+			StrokeTransparency = 0.75,
+			StrokeColor = Color3.fromRGB(34, 34, 34)
+		}
+
+		v.PlayerIconSize = UDim2.new(0, 64, 0, 64)
+		v.InitalPlayerEntryPadding = 18
+		v.PlayerEntryPadding = 8
+		v.PlayerEntryNamePadding = 8
+		v.TeamEntryTextPadding = 5
+		v.StatTextPadding = 0
+
+		v.PlayerNameSize = UDim2.new(1, -88, 1, 0)
+		v.PlayerNameTextSize = 32
+		v.StatTextSize = 32
+
+		v.ScrollImageColor = Color3.fromRGB(31, 31, 31)
+		v.ScrollImageTransparency = 0.5
 	else
-		t1.ContainerPadding = 4
-		t1.ContainerPosition = UDim2.new(1, -4, 0, 4)
-		t1.ContainerSize = UDim2.new(0, 0, 0.5, 0)
-		t1.ExtraContainerPadding = 16
-		t1.AnchorPoint = Vector2.new(1, 0)
-		t1.PlayerDropDownSizeX = 300
-		t1.PlayerDropDownOffset = 4
-		t1.PlayerScrollListPosition = UDim2.new(0, 0, 0, 0)
-		t1.PlayerScrollListSize = UDim2.new(1, -1, 1, 0)
-		t1.EntryBaseSizeX = 150
-		t1.EntrySizeIncreasePerStat = 11
-		t1.PlayerEntrySizeY = 40
-		t1.EntryPadding = 0
-		t1.TeamEntrySizeY = 24
-		t1.StatEntrySizeX = 66
-		t1.TitleBarSizeY = 20
-		t1.EntryXOffset = 0
-		t1.TeamEntryBackgroundTransparency = 0.5
-		t1.IconButtonBackgroundTransparency = 0.3
-		t1.DropDownHeaderBackgroundTransparency = 0.1
-		t1.OverrideBackgroundTransparency = 0.3
-		t1.FadedBackgroundTransparency = 0.65
-		t1.FadedBackgroundScaleDelta = 0.05
-		t1.PlayerIconSize = UDim2.new(0, 16, 0, 16)
-		t1.InitalPlayerEntryPadding = 12
-		t1.PlayerEntryPadding = 12
-		t1.PlayerEntryNamePadding = 4
-		t1.TeamEntryTextPadding = 15
-		t1.StatTextPadding = 4
-		t1.PlayerNameSize = UDim2.new(1, -34, 1, 0)
-		t1.PlayerNameTextSize = 14
-		t1.StatTextSize = 14
-		t1.ScrollImageColor = Color3.fromRGB(216, 216, 216)
-		t1.ScrollImageTransparency = 0.5
-		t1.ScrollBarOffset = 4
-		t1.ScrollBarSize = 8
+		v.ContainerPadding = 4
+		v.ContainerPosition = UDim2.new(1, -4, 0, 4)
+		v.ContainerSize = UDim2.new(0, 0, 0.5, 0)
+		v.ExtraContainerPadding = 16
+		v.AnchorPoint = Vector2.new(1, 0)
+
+		v.PlayerDropDownSizeX = 300
+		v.PlayerDropDownOffset = 4
+
+		v.PlayerScrollListPosition = UDim2.new(0, 0, 0, 0)
+		v.PlayerScrollListSize = UDim2.new(1, -1, 1, 0)
+
+		v.EntryBaseSizeX = 150
+		v.EntrySizeIncreasePerStat = 11
+		v.PlayerEntrySizeY = 40
+		v.EntryPadding = 0
+		v.TeamEntrySizeY = 24
+		v.StatEntrySizeX = 66
+		v.TitleBarSizeY = 20
+		v.EntryXOffset = 0
+
+		v.TeamEntryBackgroundTransparency = 0.5
+		v.IconButtonBackgroundTransparency = 0.3
+		v.DropDownHeaderBackgroundTransparency = 0.1
+		v.OverrideBackgroundTransparency = 0.3
+		v.FadedBackgroundTransparency = 0.65
+		v.FadedBackgroundScaleDelta = 0.05
+
+		v.PlayerIconSize = UDim2.new(0, 16, 0, 16)
+		v.InitalPlayerEntryPadding = 12
+		v.PlayerEntryPadding = 12
+		v.PlayerEntryNamePadding = 4
+		v.TeamEntryTextPadding = 15
+		v.StatTextPadding = 4
+
+		v.PlayerNameSize = UDim2.new(1, -34, 1, 0)
+		v.PlayerNameTextSize = 14
+		v.StatTextSize = 14
+
+		v.ScrollImageColor = Color3.fromRGB(216, 216, 216)
+		v.ScrollImageTransparency = 0.5
+		v.ScrollBarOffset = 4
+		v.ScrollBarSize = 8
 	end
 
-	t1.TopBarOffset = p2.TopBarHeight
-	t1.PlayerDropDownSizeXMobile = 327
-	t1.ScrollBarSizeMobile = 2
-	t1.PlayerNameSizeXMobile = 194
-	t1.PlayerIconSizeMobile = UDim2.fromOffset(20, 20)
-	t1.PlayerNameTextSizeMobile = 16
-	t1.StatTextSizeMobile = 16
-	t1.PlayerNamePaddingXMobile = 14
-	t1.TeamEntryTextPadding = 15
-	t1.TeamEntryTextPaddingMobile = 14
-	t1.RowHoverColor = Color3.fromRGB(0, 0, 0)
-	t1.RowDefaultColor = Color3.fromRGB(84, 84, 84)
-	t1.MaxLeaderstats = 4
-	t1.MaxLeaderstatsSmallScreen = 1
-	t1.PlayerEntryFont = Enum.Font.SourceSans
-	t1.TitlePlayerEntryFont = Enum.Font.SourceSansBold
-	t1.TeamEntryFont = Enum.Font.SourceSans
-	t1.StatFont = Enum.Font.SourceSans
-	t1.TitleStatFont = Enum.Font.SourceSansBold
-	t1.TeamStatFont = Enum.Font.SourceSansBold
-	t1.StatNameFont = Enum.Font.SourceSans
-	t1.PlayerIconBackgroundSize = UDim2.new(0, 66, 0, 66)
-	t1.PlayerBackgroundImage = "rbxasset://textures/ui/PlayerList/CharacterImageBackground.png"
-	t1.RobloxIconImage = "rbxasset://textures/ui/Shell/Icons/RobloxIcon24.png"
-	t1.IconSelectedColor = Color3.fromRGB(19, 19, 19)
-	t1.IconUnSelectedColor = Color3.fromRGB(255, 255, 255)
-	t1.SelectedEntryColor = Color3.fromRGB(0, 255, 255)
-	t1.ShadowImage = "rbxasset://textures/ui/PlayerList/TileShadowMissingTop.png"
-	t1.ShadowSize = 5
-	t1.ShadowSliceRect = Rect.new(6, 6, 9, 9)
-	t1.DefaultThumbnail = "rbxasset://textures/ui/Shell/Icons/DefaultProfileIcon.png"
-	t1.BlockedIcon = Images["icons/status/unavailable_small"]
-	t1.FriendIcons = {
+	v.TopBarOffset = p.TopBarHeight
+
+	v.PlayerDropDownSizeXMobile = 327
+	v.ScrollBarSizeMobile = 2
+	v.PlayerNameSizeXMobile = 194
+	v.PlayerIconSizeMobile = UDim2.fromOffset(20, 20)
+	v.PlayerNameTextSizeMobile = 16
+	v.StatTextSizeMobile = 16
+	v.PlayerNamePaddingXMobile = 14
+	v.TeamEntryTextPadding = 15
+	v.TeamEntryTextPaddingMobile = 14
+	v.RowHoverColor = Color3.fromRGB(0, 0, 0)
+	v.RowDefaultColor = Color3.fromRGB(84, 84, 84)
+
+	v.MaxLeaderstats = 4
+	v.MaxLeaderstatsSmallScreen = 1
+
+	v.PlayerEntryFont = Enum.Font.SourceSans
+	v.TitlePlayerEntryFont = Enum.Font.SourceSansBold
+	v.TeamEntryFont = Enum.Font.SourceSans
+
+	v.StatFont = Enum.Font.SourceSans
+	v.TitleStatFont = Enum.Font.SourceSansBold
+	v.TeamStatFont = Enum.Font.SourceSansBold
+	v.StatNameFont = Enum.Font.SourceSans
+
+	v.PlayerIconBackgroundSize = UDim2.new(0, 66, 0, 66)
+	v.PlayerBackgroundImage = "rbxasset://textures/ui/PlayerList/CharacterImageBackground.png"
+
+	v.RobloxIconImage = "rbxasset://textures/ui/Shell/Icons/RobloxIcon24.png"
+	v.IconSelectedColor = Color3.fromRGB(19, 19, 19)
+	v.IconUnSelectedColor = Color3.fromRGB(255, 255, 255)
+
+	v.SelectedEntryColor = Color3.fromRGB(0, 255, 255)
+
+	v.ShadowImage = "rbxasset://textures/ui/PlayerList/TileShadowMissingTop.png"
+	v.ShadowSize = 5
+	v.ShadowSliceRect = Rect.new(6, 6, 9, 9)
+
+	v.DefaultThumbnail = "rbxasset://textures/ui/Shell/Icons/DefaultProfileIcon.png"
+
+	v.BlockedIcon = Images["icons/status/unavailable_small"]
+
+	v.FriendIcons = {
 		[Enum.FriendStatus.Friend] = Images["icons/status/player/friend"],
 		[Enum.FriendStatus.FriendRequestReceived] = Images["icons/status/player/pending"]
 	}
-	t1.FollowingIcon = Images["icons/status/player/following"]
-	t1.PlaceOwnerIcon = Images["icons/status/player/developer"]
-	t1.MembershipIcons = {
+
+	v.FollowingIcon = Images["icons/status/player/following"]
+	v.PlaceOwnerIcon = Images["icons/status/player/developer"]
+
+	local iconsstatuspremium_smallsByPremium = {
 		[Enum.MembershipType.Premium] = Images["icons/status/premium_small"]
 	}
+	v.MembershipIcons = iconsstatuspremium_smallsByPremium
 
 	if FFlagPlayerListFoundationSubscriptionIcon then
-		t1.SubscriptionIcon = {
+		v.SubscriptionIcon = {
 			isFoundationIcon = true,
 			name = Foundation.Enums.IconName.RobloxPlus
 		}
 	else
-		t1.SubscriptionIcon = Images["icons/menu/gem_small"]
+		v.SubscriptionIcon = Images["icons/menu/gem_small"]
 	end
 
-	t1.CustomPlayerIcons = {
+	v.CustomPlayerIcons = {
 		[7210880] = "rbxassetid://134032333",
 		[13268404] = "rbxassetid://113059239",
 		[261] = "rbxassetid://105897927"
 	}
-	t1.NeutralTeamColor = BrickColor.new("White")
-	t1.NeutralTeamName = "Neutral"
-	t1.DropDownButtonSizeY = 56
-	t1.DropDownButtonPadding = 0
-	t1.DropDownPadding = 10
-	t1.DropDownRightOptionSize = 55
-	t1.DropDownIconSize = 36
-	t1.DropDownHeaderSizeY = 80
-	t1.DropDownHeaderBackgroundSize = 65
-	t1.DropDownScreenSidePadding = 4
 
-	return t1
+	v.NeutralTeamColor = BrickColor.new("White")
+	v.NeutralTeamName = "Neutral"
+
+	v.DropDownButtonSizeY = 56
+	v.DropDownButtonPadding = 0
+	v.DropDownPadding = 10
+	v.DropDownRightOptionSize = 55
+	v.DropDownIconSize = 36
+	v.DropDownHeaderSizeY = 80
+	v.DropDownHeaderBackgroundSize = 65
+	v.DropDownScreenSidePadding = 4
+
+	return v
 end))

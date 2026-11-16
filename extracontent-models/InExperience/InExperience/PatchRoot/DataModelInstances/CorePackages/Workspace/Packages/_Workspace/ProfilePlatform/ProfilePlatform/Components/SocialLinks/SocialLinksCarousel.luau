@@ -1,91 +1,92 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
 local TelemetryService = game:GetService("TelemetryService")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local CollectionViews = require(ProfilePlatformParent.CollectionViews)
-local useRoactService = require(ProfilePlatformParent.RobloxAppHooks).useRoactService
-local AppLinking = require(ProfilePlatformParent.RoactServiceTags).AppLinking
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+local CollectionViews = require(parent.CollectionViews)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppLinking = RoactServiceTags.AppLinking
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local SocialLinkTile = require(ProfilePlatform.Components.SocialLinks.SocialLinkTile)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
 local useDynamicSizeMargin = require(ProfilePlatform.Hooks.useDynamicSizeMargin)
-local sendSocialLinkClickEvent = require(ProfilePlatformParent.DiscoveryAnalytics).Events.sendSocialLinkClickEvent
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local sendSocialLinkClickEvent = DiscoveryAnalytics.Events.sendSocialLinkClickEvent
+
 local CollectionCarousel = CollectionViews.CollectionCarousel
 local CollectionViewTypes = CollectionViews.CollectionViewTypes
 local useCollectionLayoutParams = CollectionViews.useCollectionLayoutParams
 local CollectionItemSize = CollectionViewTypes.CollectionItemSize
-local FFlagLuaAppAddSocialLinkClickTelemetryToEdp = require(ProfilePlatformParent.SharedFlags).FFlagLuaAppAddSocialLinkClickTelemetryToEdp
-local v19 = if not FFlagLuaAppAddSocialLinkClickTelemetryToEdp then game:DefineFastInt("SocialLinkClickTelemetryThrottlePermyriad", 0) else nil
 
-return function(t1: {[any]: any}) -- line: 42
-	-- upvalues: useProfileWrapperContext (copy), useRoactService (copy), AppLinking (copy), React (copy), useLocalization (copy), TextKeys (copy), useDynamicSizeMargin (copy), useCollectionLayoutParams (copy), CollectionItemSize (copy), FFlagLuaAppAddSocialLinkClickTelemetryToEdp (copy), sendSocialLinkClickEvent (copy), v19 (copy), TelemetryService (copy), SocialLinkTile (copy), CollectionCarousel (copy)
-	local v21 = useProfileWrapperContext()
-	local openLeaveRobloxAlertUIBlox = v21.navigateTo.openLeaveRobloxAlertUIBlox
-	local closeLeaveRobloxAlert = v21.navigateTo.closeLeaveRobloxAlert
-	local v24 = useRoactService(AppLinking)
-	local v25, v26 = React.useState(nil)
-	local v27 = React.useRef(nil)
-	local v28 = useLocalization({
-		title = TextKeys.SocialMedia
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppAddSocialLinkClickTelemetryToEdp = SharedFlags.FFlagLuaAppAddSocialLinkClickTelemetryToEdp
+local throttlingPercentage
+
+if FFlagLuaAppAddSocialLinkClickTelemetryToEdp then
+	throttlingPercentage = nil
+else
+	throttlingPercentage = game:DefineFastInt("SocialLinkClickTelemetryThrottlePermyriad", 0)
+end
+
+return function(p)
+	local v = useProfileWrapperContext()
+	local openLeaveRobloxAlertUIBlox = v.navigateTo.openLeaveRobloxAlertUIBlox
+	local closeLeaveRobloxAlert = v.navigateTo.closeLeaveRobloxAlert
+	local v2 = useRoactService(AppLinking)
+	local state, setState = React.useState(nil)
+	local ref = React.useRef(nil)
+	local v3 = useLocalization({ title = TextKeys.SocialMedia })
+
+	local sideMargin, v4 = useDynamicSizeMargin()
+	local v5 = useCollectionLayoutParams(CollectionItemSize.XSmall, state, true, {
+		sideMargin = sideMargin
 	})
-	local v29, v30 = useDynamicSizeMargin()
-	local t2 = {
-		sideMargin = v29
-	}
-	local v32 = useCollectionLayoutParams(CollectionItemSize.XSmall, v25, true, t2)
-	local v33 = React.useCallback(function(n1: number) -- line: 58
-		return n1 + 36
-	end, {})
-	local v34 = React.useCallback(function(p1) -- line: 106
-		-- upvalues: openLeaveRobloxAlertUIBlox (copy), v24 (copy), FFlagLuaAppAddSocialLinkClickTelemetryToEdp (copy), sendSocialLinkClickEvent (copy), v21 (copy), v19 (copy), TelemetryService (copy), closeLeaveRobloxAlert (copy)
-		return function() -- line: 107
-			-- upvalues: openLeaveRobloxAlertUIBlox (copy), v24 (copy), p1 (copy), FFlagLuaAppAddSocialLinkClickTelemetryToEdp (copy), sendSocialLinkClickEvent (copy), v21 (copy), v19 (copy), TelemetryService (copy), closeLeaveRobloxAlert (copy)
-			if openLeaveRobloxAlertUIBlox and (v24 and p1.url) then
-				local key = p1.key
-				local url = p1.url
 
-				openLeaveRobloxAlertUIBlox(function() -- line: 63
-					-- upvalues: FFlagLuaAppAddSocialLinkClickTelemetryToEdp (copy), sendSocialLinkClickEvent (copy), v21 (copy), key (copy), url (copy), v19 (copy), TelemetryService (copy), v24 (copy), closeLeaveRobloxAlert (copy)
+	local getItemHeight = React.useCallback(function(p2: number)
+		return p2 + 36
+	end, {})
+
+	local v6 = React.useCallback(function(p2)
+		return function()
+			if openLeaveRobloxAlertUIBlox and v2 and p2.url then
+				local key = p2.key
+				local url = p2.url
+				openLeaveRobloxAlertUIBlox(function()
 					if FFlagLuaAppAddSocialLinkClickTelemetryToEdp then
 						sendSocialLinkClickEvent({
+							assignment_id = v.profileId,
 							assignment_type = "group",
-							social_link_display_type = "badge",
-							assignment_id = v21.profileId,
 							social_link_type = key,
-							social_link_url = url
+							social_link_url = url,
+							social_link_display_type = "badge"
 						})
 					else
-						local t3 = {
+						TelemetryService:LogEvent({
 							eventName = "socialLinkClickEvent",
-							description = "Event fired from the client every time a social link is clicked",
-							links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/usercommunities/social_link_click_event.proto",
 							backends = { "EventIngest" },
-							throttlingPercentage = v19,
-							lastUpdated = {
-								25,
-								5,
-								20
+							throttlingPercentage = throttlingPercentage,
+							lastUpdated = { 25, 5, 20 },
+							description = "Event fired from the client every time a social link is clicked",
+							links = "https://github.rbx.com/Roblox/proto-schemas/blob/master/production/eventstream/usercommunities/social_link_click_event.proto"
+						}, {
+							customFields = {
+								assignment_id = v.profileId,
+								assignment_type = "group",
+								social_link_type = key,
+								social_link_url = url,
+								social_link_display_type = "badge"
 							}
-						}
-						local t4 = {
-							assignment_type = "group",
-							social_link_display_type = "badge",
-							assignment_id = v21.profileId,
-							social_link_type = key,
-							social_link_url = url
-						}
-
-						TelemetryService:LogEvent(t3, {
-							customFields = t4
 						})
 					end
 
-					if v24 then
-						v24:openURL(url):andThen(function(p2) -- line: 93
-							-- upvalues: v24 (copy), url (copy)
-							if p2 == false then
-								v24:openURL(url)
+					if v2 then
+						v2:openURL(url):andThen(function(p3)
+							if p3 == false then
+								v2:openURL(url)
 							end
 						end)
 					end
@@ -96,46 +97,43 @@ return function(t1: {[any]: any}) -- line: 42
 				end)
 			end
 		end
-	end, {
-		openLeaveRobloxAlertUIBlox,
-		v24
-	})
-	local v35 = React.useCallback(function(p3, p4, _) -- line: 115
-		-- upvalues: React (copy), SocialLinkTile (copy), v34 (copy)
+	end, { openLeaveRobloxAlertUIBlox, v2 })
+
+	local renderItem = React.useCallback(function(props, layoutOrder, _)
 		return React.createElement(SocialLinkTile, {
+			name = props.name,
+			icon = props.logo,
 			tileSize = 80,
-			name = p3.name,
-			icon = p3.logo,
-			onActivated = v34(p3),
-			layoutOrder = p4
-		}), p3.key
-	end, { v34 })
+			onActivated = v6(props),
+			layoutOrder = layoutOrder
+		}), props.key
+	end, { v6 })
 
 	return React.createElement("Frame", {
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.new(1, 0, 0, 0),
 		BackgroundTransparency = 1,
-		LayoutOrder = t1.layoutOrder,
-		[React.Change.AbsoluteSize] = v30
+		LayoutOrder = p.layoutOrder,
+		[React.Change.AbsoluteSize] = v4
 	}, {
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, 0),
 			PaddingRight = UDim.new(0, 0)
 		}),
 		CollectionCarousel = React.createElement(CollectionCarousel, {
+			containerRef = setState,
+			scrollingFrameRef = ref,
 			LayoutOrder = 1,
-			containerRef = v26,
-			scrollingFrameRef = v27,
-			title = v28.title,
-			items = t1.items,
-			renderItem = v35,
-			getItemHeight = v33,
-			numColumns = v32.numColumns,
-			fractionalItemAmount = v32.fractionalItemAmount,
-			columnGap = v32.columnGap,
-			sideMargin = v32.sideMargin,
-			maxItemsToShow = v32.maxTilesToShow,
-			thresholdFromEnd = v32.loadMoreThreshold
+			title = v3.title,
+			items = p.items,
+			renderItem = renderItem,
+			getItemHeight = getItemHeight,
+			numColumns = v5.numColumns,
+			fractionalItemAmount = v5.fractionalItemAmount,
+			columnGap = v5.columnGap,
+			sideMargin = v5.sideMargin,
+			maxItemsToShow = v5.maxTilesToShow,
+			thresholdFromEnd = v5.loadMoreThreshold
 		})
 	})
 end

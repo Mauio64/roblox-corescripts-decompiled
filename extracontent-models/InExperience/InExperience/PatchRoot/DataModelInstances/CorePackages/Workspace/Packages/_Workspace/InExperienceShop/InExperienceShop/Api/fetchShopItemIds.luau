@@ -1,177 +1,152 @@
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local HttpService = game:GetService("HttpService")
+
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local Promise = require(InExperienceShopParent.Promise)
-local Http = require(InExperienceShopParent.Http)
+local parent = InExperienceShop.Parent
+
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
 local Url = Http.Url
 local requestInternalWrapper = Http.NetworkLayers.requestInternalWrapper
-
 require(InExperienceShop.Types)
-
 local Errors = require(script.Parent.Errors)
 local ShopDebugLogger = require(InExperienceShop.Internal.ShopDebugLogger)
 local FFlagUseShopRequestImpl = require(InExperienceShop.Flags.FFlagUseShopRequestImpl)
 local FIntExperienceShopWidgetRequestPriority = require(InExperienceShop.Flags.FIntExperienceShopWidgetRequestPriority)
-local v13 = Url.APIS_URL .. "marketplace-widgets/v1/widgets/shop-widgets"
+local FFlagSkipShopWidgetsCallInUnpublishedStudio = require(InExperienceShop.Flags.FFlagSkipShopWidgetsCallInUnpublishedStudio)
+local RunService = game:GetService("RunService")
 
-local function buildShopWidgetsUrl(s1: string) -- line: 26
-	-- upvalues: Url (copy), v13 (copy)
-	local v21 = Url:makeQueryString({
-		requestId = s1,
-		universeId = game.GameId
-	})
+local v = Url.APIS_URL .. "marketplace-widgets/v1/widgets/shop-widgets"
 
-	return `{ v13 }?{ v21 }`
+local function buildShopWidgetsUrl(requestId: string) -- 2 equivalent calls inferred from this helper
+	return `{v}?{Url:makeQueryString({ requestId = requestId, universeId = game.GameId })}`
 end
-local function logSuccess(p1) -- line: 34
-	-- upvalues: ShopDebugLogger (copy)
-	ShopDebugLogger.logLazy(function() -- line: 35
-		-- upvalues: p1 (copy)
-		return "fetchShopItemIds: success categories=" .. (typeof(p1.categories) == "table" and #p1.categories or 0)
+
+local function logSuccess(p) -- 1 equivalent call inferred from this helper
+	ShopDebugLogger.logLazy(function()
+		return "fetchShopItemIds: success categories=" .. (typeof(p.categories) == "table" and #p.categories or 0)
 	end)
 end
-local function validateAndResolve(p2, p3: ((...any) -> ...any), p4: ((...any) -> ...any)) -- line: 41
-	-- upvalues: ShopDebugLogger (copy), Errors (copy)
-	if typeof(p2) ~= "table" or p2.categories == nil then
-		ShopDebugLogger.log("fetchShopItemIds: schema error, missing categories field")
-		p4((Errors.schemaError("fetchShopItemIds: malformed response, expected { categories = ... }", p2)))
 
-		return false
+local function validateAndResolve(p, callback, callback2): boolean
+	if typeof(p) == "table" and p.categories ~= nil then
+		logSuccess(p) -- inferred equivalent call
+		callback(p)
+		return true
 	end
 
-	ShopDebugLogger.logLazy(function() -- line: 35
-		-- upvalues: p2 (copy)
-		return "fetchShopItemIds: success categories=" .. (typeof(p2.categories) == "table" and #p2.categories or 0)
-	end)
-	p3(p2)
+	ShopDebugLogger.log("fetchShopItemIds: schema error, missing categories field")
+	callback2((Errors.schemaError("fetchShopItemIds: malformed response, expected { categories = ... }", p)))
 
-	return true
+	return false
 end
-local function fetchShopItemIdsViaGetAsyncFullUrl(s2: string) -- line: 68
-	-- upvalues: Promise (copy), Url (copy), v13 (copy), ShopDebugLogger (copy), HttpRbxApiService (copy), Errors (copy), HttpService (copy), validateAndResolve (copy)
-	return Promise.new(function(resolve, reject) -- line: 69
-		-- upvalues: s2 (copy), Url (copy), v13 (copy), ShopDebugLogger (copy), HttpRbxApiService (copy), Errors (copy), HttpService (copy), validateAndResolve (copy)
-		task.spawn(function() -- line: 70
-			-- upvalues: s2 (copy), Url (copy), v13 (copy), ShopDebugLogger (copy), HttpRbxApiService (copy), reject (copy), Errors (copy), HttpService (copy), validateAndResolve (copy), resolve (copy)
-			local v37 = s2
-			local v38 = Url:makeQueryString({
-				requestId = v37,
-				universeId = game.GameId
-			})
-			local v39 = `{ v13 }?{ v38 }`
 
-			ShopDebugLogger.logLazy(function() -- line: 73
-				-- upvalues: v39 (copy)
-				return "fetchShopItemIds: GET " .. v39
+local function fetchShopItemIdsViaGetAsyncFullUrl(p: string)
+	return Promise.new(function(p2, callback)
+		task.spawn(function()
+			local shopWidgetsUrl = buildShopWidgetsUrl(p) -- inferred equivalent call
+			ShopDebugLogger.logLazy(function()
+				return "fetchShopItemIds: GET " .. shopWidgetsUrl
 			end)
 
-			local v40 = ShopDebugLogger.startTimer()
-			local ok, result = pcall(function() -- line: 83
-				-- upvalues: HttpRbxApiService (copy), v39 (copy)
-				return HttpRbxApiService:GetAsyncFullUrl(v39)
+			local v2 = ShopDebugLogger.startTimer()
+
+			local success, result = pcall(function()
+				return HttpRbxApiService:GetAsyncFullUrl(shopWidgetsUrl)
 			end)
 
-			if not ok then
-				ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP error", v40)
-				ShopDebugLogger.logLazy(function() -- line: 88
-					-- upvalues: result (copy)
-					return "fetchShopItemIds: HTTP error detail=" .. tostring(result)
+			if success then
+				ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP response received", v2)
+
+				local success2, result2 = pcall(function()
+					return HttpService:JSONDecode(result)
 				end)
-				reject((Errors.networkError("fetchShopItemIds: HTTP request failed", result)))
 
-				return
-			end
+				if success2 then
+					validateAndResolve(result2, p2, callback)
+					return
+				end
 
-			ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP response received", v40)
-
-			local ok2, result2 = pcall(function() -- line: 97
-				-- upvalues: HttpService (copy), result (copy)
-				return HttpService:JSONDecode(result)
-			end)
-
-			if not ok2 then
-				ShopDebugLogger.logLazy(function() -- line: 101
-					-- upvalues: result2 (copy)
+				ShopDebugLogger.logLazy(function()
 					return "fetchShopItemIds: JSON parse error=" .. tostring(result2)
 				end)
-				reject((Errors.parseError("fetchShopItemIds: response body is not valid JSON", result2)))
 
-				return
+				callback((Errors.parseError("fetchShopItemIds: response body is not valid JSON", result2)))
+			else
+				ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP error", v2)
+				ShopDebugLogger.logLazy(function()
+					return "fetchShopItemIds: HTTP error detail=" .. tostring(result)
+				end)
+
+				callback((Errors.networkError("fetchShopItemIds: HTTP request failed", result)))
 			end
-
-			validateAndResolve(result2, resolve, reject)
 		end)
 	end)
 end
-local function fetchShopItemIdsViaRequestImpl(s3: string) -- line: 113
-	-- upvalues: Url (copy), v13 (copy), ShopDebugLogger (copy), requestInternalWrapper (copy), HttpService (copy), FIntExperienceShopWidgetRequestPriority (copy), Promise (copy), validateAndResolve (copy), Errors (copy)
-	local v28 = Url:makeQueryString({
-		requestId = s3,
-		universeId = game.GameId
-	})
-	local v29 = `{ v13 }?{ v28 }`
 
-	ShopDebugLogger.logLazy(function() -- line: 116
-		-- upvalues: v29 (copy)
-		return "fetchShopItemIds: GET " .. v29
+local function fetchShopItemIdsViaRequestImpl(requestId: string)
+	local shopWidgetsUrl = buildShopWidgetsUrl(requestId) -- inferred equivalent call
+	ShopDebugLogger.logLazy(function()
+		return "fetchShopItemIds: GET " .. shopWidgetsUrl
 	end)
 
-	local v30 = ShopDebugLogger.startTimer()
+	local v2 = ShopDebugLogger.startTimer()
 
-	return requestInternalWrapper(HttpService)(v29, "GET", (if FIntExperienceShopWidgetRequestPriority == 0 then nil else {
-		priority = FIntExperienceShopWidgetRequestPriority
-	})):andThen(function(p5) -- line: 128
-		-- upvalues: ShopDebugLogger (copy), v30 (copy), Promise (copy), validateAndResolve (copy)
-		ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP response received", v30)
-
-		return Promise.new(function(resolve, reject) -- line: 130
-			-- upvalues: validateAndResolve (copy), p5 (copy)
-			validateAndResolve(p5.responseBody, resolve, reject)
+	return requestInternalWrapper(HttpService)(
+		shopWidgetsUrl,
+		"GET",
+		FIntExperienceShopWidgetRequestPriority ~= 0 and {
+			priority = FIntExperienceShopWidgetRequestPriority
+		} or nil
+	):andThen(function(p)
+		ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP response received", v2)
+		return Promise.new(function(p2, p3)
+			validateAndResolve(p.responseBody, p2, p3)
 		end)
-	end):catch(function(p6) -- line: 134
-		-- upvalues: Promise (copy), ShopDebugLogger (copy), Errors (copy), v30 (copy)
-		if typeof(p6) == "table" and p6.kind ~= nil then
-			return Promise.reject(p6)
+	end):catch(function(p)
+		if typeof(p) == "table" and p.kind ~= nil then
+			return Promise.reject(p)
 		end
 
-		if typeof(p6) == "table" and p6.isJSONValid == false then
-			ShopDebugLogger.logLazy(function() -- line: 140
-				-- upvalues: p6 (copy)
-				return "fetchShopItemIds: JSON parse error=" .. tostring(p6)
+		if typeof(p) == "table" and p.isJSONValid == false then
+			ShopDebugLogger.logLazy(function()
+				return "fetchShopItemIds: JSON parse error=" .. tostring(p)
 			end)
 
-			return Promise.reject((Errors.parseError("fetchShopItemIds: response body is not valid JSON", p6)))
+			return Promise.reject((Errors.parseError("fetchShopItemIds: response body is not valid JSON", p)))
 		end
 
-		ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP error", v30)
-		ShopDebugLogger.logLazy(function() -- line: 149
-			-- upvalues: p6 (copy)
-			return "fetchShopItemIds: HTTP error detail=" .. tostring(p6)
+		ShopDebugLogger.logElapsed("fetchShopItemIds: HTTP error", v2)
+		ShopDebugLogger.logLazy(function()
+			return "fetchShopItemIds: HTTP error detail=" .. tostring(p)
 		end)
 
-		return Promise.reject((Errors.networkError("fetchShopItemIds: HTTP request failed", p6)))
+		return Promise.reject((Errors.networkError("fetchShopItemIds: HTTP request failed", p)))
 	end)
 end
-local function fetchShopItemIds(s4: string) -- line: 156
-	-- upvalues: FFlagUseShopRequestImpl (copy), ShopDebugLogger (copy), FIntExperienceShopWidgetRequestPriority (copy), fetchShopItemIdsViaRequestImpl (copy), fetchShopItemIdsViaGetAsyncFullUrl (copy)
-	if FFlagUseShopRequestImpl then
-		ShopDebugLogger.logLazy(function() -- line: 158
-			-- upvalues: FIntExperienceShopWidgetRequestPriority (copy), s4 (copy)
-			local v36 = FIntExperienceShopWidgetRequestPriority == 0 and "" or ` priority={ FIntExperienceShopWidgetRequestPriority }`
 
-			return `fetchShopItemIds: transport=requestInternalWrapper requestId={ s4 }{ v36 }`
+local function fetchShopItemIds(requestId: string)
+	if FFlagSkipShopWidgetsCallInUnpublishedStudio and RunService:IsStudio() and game.GameId == 0 then
+		ShopDebugLogger.logLazy(function()
+			return "fetchShopItemIds: skipped unpublished Studio experience requestId=" .. requestId
 		end)
 
-		return fetchShopItemIdsViaRequestImpl(s4)
+		return Promise.resolve({ categories = {} })
 	end
 
-	ShopDebugLogger.logLazy(function() -- line: 167
-		-- upvalues: s4 (copy)
-		return `fetchShopItemIds: transport=GetAsyncFullUrl requestId={ s4 }`
+	if FFlagUseShopRequestImpl then
+		ShopDebugLogger.logLazy(function()
+			return `fetchShopItemIds: transport=requestInternalWrapper requestId={requestId}{FIntExperienceShopWidgetRequestPriority == 0 and "" or ` priority={FIntExperienceShopWidgetRequestPriority}`}`
+		end)
+
+		return fetchShopItemIdsViaRequestImpl(requestId)
+	end
+
+	ShopDebugLogger.logLazy(function()
+		return `fetchShopItemIds: transport=GetAsyncFullUrl requestId={requestId}`
 	end)
 
-	return fetchShopItemIdsViaGetAsyncFullUrl(s4)
+	return fetchShopItemIdsViaGetAsyncFullUrl(requestId)
 end
 
 return fetchShopItemIds

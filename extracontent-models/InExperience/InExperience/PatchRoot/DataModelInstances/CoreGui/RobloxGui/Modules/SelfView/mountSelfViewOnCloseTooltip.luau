@@ -4,47 +4,47 @@ local CoreGui = game:GetService("CoreGui")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local Constants = require(RobloxGui.Modules.TopBar.Constants)
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
-local Dark = UIBlox.App.Style.Constants.ThemeName.Dark
+local Dark = ColorMode.Dark
+
 local Promise = require(CorePackages.Packages.Promise)
+
 local SelfViewTooltipFTUX = require(script.Parent.SelfViewTooltipFTUX)
 
-return function(p1) -- line: 15
-	-- upvalues: CoreGui (copy), Constants (copy), Roact (copy), AppStyleProvider (copy), Dark (copy), SelfViewTooltipFTUX (copy), Promise (copy)
-	local ScreenGui = Instance.new("ScreenGui")
+return function(props)
+	local selfViewTooltipOnCloseGui = Instance.new("ScreenGui")
+	selfViewTooltipOnCloseGui.Name = "SelfViewTooltipOnCloseGui"
+	selfViewTooltipOnCloseGui.DisplayOrder = -1
+	selfViewTooltipOnCloseGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	selfViewTooltipOnCloseGui.Parent = CoreGui
 
-	ScreenGui.Name = "SelfViewTooltipOnCloseGui"
-	ScreenGui.DisplayOrder = -1
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	ScreenGui.Parent = CoreGui
+	local v = Constants.useDisplayScaleState(Constants.TopBarButtonHeight)
+	local v2 = Constants.useDisplayScaleState(Constants.ScreenSideOffset)
 
-	local v13 = Constants.useDisplayScaleState(Constants.TopBarButtonHeight)
-	local v14 = Constants.useDisplayScaleState(Constants.ScreenSideOffset)
-	local v15 = Roact.createElement(AppStyleProvider, {
-		style = {
-			themeName = Dark
-		}
+	local element = Roact.createElement(AppStyleProvider, {
+		style = { themeName = Dark }
 	}, {
 		frame = Roact.createElement("Frame", {
+			Position = UDim2.fromOffset(v2, -v),
+			Size = UDim2.fromOffset(v, v),
 			BackgroundTransparency = 0,
-			Visible = false,
-			Position = UDim2.fromOffset(v14, -v13),
-			Size = UDim2.fromOffset(v13, v13)
+			Visible = false
 		}, {
 			tooltip = Roact.createElement(SelfViewTooltipFTUX, {
-				fallbackText = p1.fallbackText,
-				translationKey = p1.translationKey,
-				tooltipLifetime = p1.tooltipLifetime
+				fallbackText = props.fallbackText,
+				translationKey = props.translationKey,
+				tooltipLifetime = props.tooltipLifetime
 			})
 		})
 	})
-	local v16 = Roact.mount(v15, ScreenGui, "SelfViewTooltipOnClose")
 
-	Promise.delay(p1.tooltipLifetime + 5):andThen(function() -- line: 46
-		-- upvalues: Roact (copy), v16 (copy)
-		pcall(function() -- line: 47
-			-- upvalues: Roact (copy), v16 (copy)
-			Roact.unmount(v16)
+	local v3 = Roact.mount(element, selfViewTooltipOnCloseGui, "SelfViewTooltipOnClose")
+
+	Promise.delay(props.tooltipLifetime + 5):andThen(function()
+		pcall(function()
+			Roact.unmount(v3)
 		end)
 	end)
 end

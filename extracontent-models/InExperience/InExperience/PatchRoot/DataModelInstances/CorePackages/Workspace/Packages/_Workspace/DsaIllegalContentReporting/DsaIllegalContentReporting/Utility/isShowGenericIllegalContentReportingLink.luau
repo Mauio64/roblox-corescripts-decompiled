@@ -1,40 +1,46 @@
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
-local v3 = game:DefineFastFlag("EnableGenericIllegalContentReporting3", false)
-local v4 = game:DefineFastString("CountriesWithGenericIllegalContentReporting2", "AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GR,HR,HU,IE,IT,LT,LU,LV,MT,NL,PL,PT,RO,SE,SI,SK,GB,AU")
-local u5 = false
 
-if v3 then
-	task.spawn(function() -- line: 18
-		-- upvalues: Players (copy), LocalizationService (copy), v4 (copy), u5 (ref)
-		local LocalPlayer = Players.LocalPlayer
+local defineFastFlag = game:DefineFastFlag("EnableGenericIllegalContentReporting3", false)
+local defineFastString = game:DefineFastString(
+	"CountriesWithGenericIllegalContentReporting2",
+	"AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GR,HR,HU,IE,IT,LT,LU,LV,MT,NL,PL,PT,RO,SE,SI,SK,GB,AU"
+)
 
-		while not LocalPlayer do
+local v = false
+
+if defineFastFlag then
+	task.spawn(function()
+		local localPlayer = Players.LocalPlayer
+
+		while not localPlayer do
 			Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-			LocalPlayer = Players.LocalPlayer
+			localPlayer = Players.LocalPlayer
 		end
 
-		local ok, result = pcall(LocalizationService.GetCountryRegionForPlayerAsync, LocalizationService, LocalPlayer)
+		local success, countryRegionForPlayerAsync = pcall(
+			LocalizationService.GetCountryRegionForPlayerAsync,
+			LocalizationService,
+			localPlayer
+		)
 
-		if not ok then
+		if not success then
 			return
 		end
 
-		local parts = v4:split(",")
+		local parts = defineFastString:split(",")
 
-		for _, v in ipairs(parts) do
-			if result == v then
-				u5 = true
-
-				return
+		for _, part in ipairs(parts) do
+			if countryRegionForPlayerAsync == part then
+				v = true
+				break
 			end
 		end
 	end)
 end
 
-local function isShowGenericIllegalContentReportingLink() -- line: 42
-	-- upvalues: v3 (copy), u5 (ref)
-	return v3 and u5
+local function isShowGenericIllegalContentReportingLink()
+	return defineFastFlag and v
 end
 
 return isShowGenericIllegalContentReportingLink

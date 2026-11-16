@@ -1,7 +1,7 @@
-return function(p1) -- line: 1
-	while p1 and p1.index and p1.routes do
-		p1 = p1.routes[p1.index]
+return function(p)
+	while p and p.index and p.routes do
+		p = p.routes[p.index]
 	end
 
-	return p1
+	return p
 end

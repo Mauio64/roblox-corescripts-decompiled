@@ -1,41 +1,50 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent
 
-local pcallDeferred = require(ParentParent.util.pcallDeferred)
-local Analytics = require(ParentParent.Analytics)
-local Constants = require(ParentParent.Constants)
+require(parent.util.Types)
+local pcallDeferred = require(parent.util.pcallDeferred)
 
-local function validateMeshTriangles(p1, n1: number?, p2) -- line: 12
-	-- upvalues: pcallDeferred (copy), UGCValidationService (copy), Constants (copy), Analytics (copy)
-	local isServer = p2.isServer
-	local v11, v12 = pcallDeferred(function() -- line: 19
-		-- upvalues: UGCValidationService (copy), p1 (copy)
-		return UGCValidationService:GetEditableMeshTriCount(p1.editableMesh)
-	end, p2)
+local Analytics = require(parent.Analytics)
+local Constants = require(parent.Constants)
 
-	if n1 == nil then
-		n1 = Constants.MAX_HAT_TRIANGLES
+local function validateMeshTriangles(p, p2: number?, p3)
+	local isServer = p3.isServer
+
+	local v, v2 = pcallDeferred(function()
+		return UGCValidationService:GetEditableMeshTriCount(p.editableMesh)
+	end, p3)
+
+	if p2 == nil then
+		p2 = Constants.MAX_HAT_TRIANGLES
 	end
 
-	if not v11 then
-		Analytics.reportFailure(Analytics.ErrorType.validateMeshTriangles_FailedToLoadMesh, nil, p2)
+	if v then
+		if p2 < v2 then
+			Analytics.reportFailure(Analytics.ErrorType.validateMeshTriangles_TooManyTriangles, nil, p3)
 
-		if isServer ~= nil and isServer then
-			error(string.format("Failed to load model mesh %s. Make sure the mesh exists and try again.", p1.fullName))
+			return
+				false,
+				{ string.format(
+						"Model mesh %s resolution of %d is higher than max support value of %d. You need to retopologize your model and try again.",
+						p.fullName,
+						v2,
+						p2
+					) }
 		end
 
-		return false, { string.format("Failed to load model mesh %s. Make sure the mesh exists and try again.", p1.fullName) }
+		return true
 	end
 
-	if n1 < v12 then
-		Analytics.reportFailure(Analytics.ErrorType.validateMeshTriangles_TooManyTriangles, nil, p2)
+	Analytics.reportFailure(Analytics.ErrorType.validateMeshTriangles_FailedToLoadMesh, nil, p3)
 
-		return false, { string.format("Model mesh %s resolution of %d is higher than max support value of %d. You need to retopologize your model and try again.", p1.fullName, v12, n1) }
+	if isServer ~= nil and isServer then
+		error(string.format("Failed to load model mesh %s. Make sure the mesh exists and try again.", p.fullName))
 	end
 
-	return true
+	return
+		false,
+		{ string.format("Failed to load model mesh %s. Make sure the mesh exists and try again.", p.fullName) }
 end
 
 return validateMeshTriangles

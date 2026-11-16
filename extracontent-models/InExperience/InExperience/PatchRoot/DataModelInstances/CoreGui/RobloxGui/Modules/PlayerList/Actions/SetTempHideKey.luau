@@ -1,6 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetTempHideKey", function(p1, p2) -- line: 5
-	return {
-		tempHideKey = p1,
-		tempHideValue = p2
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetTempHideKey", function(tempHideKey, tempHideValue)
+	return { tempHideKey = tempHideKey, tempHideValue = tempHideValue }
 end)

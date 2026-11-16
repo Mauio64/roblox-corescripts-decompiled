@@ -1,7 +1,8 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent.Parent
-local t = require(ParentParent.t)
-local validateBinding = require(scriptParent.validateBinding)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent.Parent
+
+local t = require(parent2.t)
+local validateBinding = require(parent.validateBinding)
 
 return t.strictInterface({
 	Color3 = t.Color3,

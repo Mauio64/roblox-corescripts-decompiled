@@ -1,5 +1,7 @@
 return {
 	Source = {
-		ItemSelected = "item_selected"
+		AccountUpsell = "account_upsell",
+		ItemSelected = "item_selected",
+		RobuxWidget = "robux_widget"
 	}
 }

@@ -1,37 +1,38 @@
-local ParentParent = script.Parent.Parent
-local ChatConstants = require(ParentParent:WaitForChild("ChatConstants"))
-local t1 = {}
-local t2 = {}
+local parent = script.Parent.Parent
+local ChatConstants = require(parent:WaitForChild("ChatConstants"))
 
-t2.__index = t2
+local v = {}
+local class = {}
+class.__index = class
 
-function t2.SendSystemMessageToSelf(_, p2, p3, p4) -- line: 31
-	-- upvalues: ChatConstants (copy)
-	p3:AddMessageToChannel({
+function class.SendSystemMessageToSelf(_, message, object, extraData)
+	object:AddMessageToChannel({
 		ID = -1,
 		FromSpeaker = nil,
 		SpeakerUserId = 0,
+		OriginalChannel = object.Name,
 		IsFiltered = true,
-		OriginalChannel = p3.Name,
-		MessageLength = string.len(p2),
-		MessageLengthUtf8 = utf8.len(utf8.nfcnormalize(p2)),
-		Message = p2,
+		MessageLength = string.len(message),
+		MessageLengthUtf8 = utf8.len(utf8.nfcnormalize(message)),
+		Message = message,
 		MessageType = ChatConstants.MessageTypeSystem,
 		Time = os.time(),
-		ExtraData = p4
+		ExtraData = extraData
 	})
 end
-function t1.new() -- line: 50
-	-- upvalues: t2 (copy)
-	local self = setmetatable({}, t2)
+
+function v.new()
+	local self = setmetatable({}, class)
 
 	self.COMMAND_MODULES_VERSION = 1
+
 	self.KEY_COMMAND_PROCESSOR_TYPE = "ProcessorType"
 	self.KEY_PROCESSOR_FUNCTION = "ProcessorFunction"
+
 	self.IN_PROGRESS_MESSAGE_PROCESSOR = 0
 	self.COMPLETED_MESSAGE_PROCESSOR = 1
 
 	return self
 end
 
-return t1.new()
+return v.new()

@@ -1,12 +1,14 @@
-local ParentParent = script.Parent.Parent.Parent
-local Core = ParentParent.Core
-local ParentParentParent = ParentParent.Parent
-local t = require(ParentParentParent.t)
-local Roact = require(ParentParentParent.Roact)
-local withStyle = require(Core.Style.withStyle)
-local v7 = Roact.PureComponent:extend("ListTable")
+local parent = script.Parent.Parent.Parent
+local core = parent.Core
+local parent2 = parent.Parent
 
-v7.validateProps = t.strictInterface({
+local t = require(parent2.t)
+local Roact = require(parent2.Roact)
+local withStyle = require(core.Style.withStyle)
+
+local extended = Roact.PureComponent:extend("ListTable")
+
+extended.validateProps = t.strictInterface({
 	layoutOrder = t.optional(t.integer),
 	size = t.optional(t.UDim2),
 	showDividers = t.optional(t.boolean),
@@ -16,62 +18,75 @@ v7.validateProps = t.strictInterface({
 	automaticSize = t.optional(t.enum(Enum.AutomaticSize)),
 	cells = t.array(t.table)
 })
-v7.defaultProps = {
-	showDividers = true,
-	dividerStartOffset = 24
-}
 
-function v7.render(p1) -- line: 49
-	-- upvalues: withStyle (copy), Roact (copy)
-	return withStyle(function(p2) -- line: 50
-		-- upvalues: p1 (copy), Roact (copy)
-		local size = p1.props.size
-		local automaticSize = p1.props.automaticSize
+extended.defaultProps = { showDividers = true, dividerStartOffset = 24 }
+
+function extended.render(p)
+	return withStyle(function(p2)
+		local size = p.props.size
+		local automaticSize = p.props.automaticSize
 
 		if not size then
-			size = if not automaticSize then UDim2.fromScale(1, 1) else if automaticSize ~= Enum.AutomaticSize.X then if automaticSize ~= Enum.AutomaticSize.Y then if automaticSize ~= Enum.AutomaticSize.XY then UDim2.fromScale(1, 1) else UDim2.fromScale(0, 0) else UDim2.fromScale(1, 0) else UDim2.fromScale(0, 1)
+			if automaticSize then
+				if automaticSize == Enum.AutomaticSize.X then
+					size = UDim2.fromScale(0, 1)
+				elseif automaticSize == Enum.AutomaticSize.Y then
+					size = UDim2.fromScale(1, 0)
+				elseif automaticSize == Enum.AutomaticSize.XY then
+					size = UDim2.fromScale(0, 0)
+				else
+					size = UDim2.fromScale(1, 1)
+				end
+			else
+				size = UDim2.fromScale(1, 1)
+			end
 		end
 
-		local t1 = {
+		local children = {
 			ListLayout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Vertical
 			})
 		}
-		local cells = p1.props.cells
 
-		for i, v in ipairs(cells) do
-			local v16 = "Cell " .. i
-			local v17 = p1.props.showDividers and i < #cells
+		local cells = p.props.cells
 
-			t1[v16] = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
+		for i, cell in ipairs(cells) do
+			local v = "Cell " .. i
+			local v2 = p.props.showDividers and i < #cells
+			local createElement = Roact.createElement
+			local v3 = {
 				LayoutOrder = i,
 				Size = UDim2.fromScale(1, 0),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
 				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				Content = v,
-				Divider = v17 and Roact.createElement("Frame", {
+			}
+			local divider
+
+			if v2 then
+				divider = Roact.createElement("Frame", {
+					Size = UDim2.new(1, -p.props.dividerStartOffset, 0, 1),
+					Position = UDim2.new(0, p.props.dividerStartOffset, 1, -1),
 					BorderSizePixel = 0,
-					ZIndex = 100,
-					Size = UDim2.new(1, -p1.props.dividerStartOffset, 0, 1),
-					Position = UDim2.new(0, p1.props.dividerStartOffset, 1, -1),
 					BackgroundColor3 = p2.Theme.Divider.Color,
-					BackgroundTransparency = p2.Theme.Divider.Transparency
+					BackgroundTransparency = p2.Theme.Divider.Transparency,
+					ZIndex = 100
 				}) or nil
-			})
+			end
+
+			children[v] = createElement("Frame", v3, { Content = cell, Divider = divider })
 		end
 
 		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = p1.props.layoutOrder,
+			LayoutOrder = p.props.layoutOrder,
 			Size = size,
 			AutomaticSize = automaticSize,
-			AnchorPoint = p1.props.anchorPoint,
-			Position = p1.props.position
-		}, t1)
+			AnchorPoint = p.props.anchorPoint,
+			Position = p.props.position,
+			BackgroundTransparency = 1
+		}, children)
 	end)
 end
 
-return v7
+return extended

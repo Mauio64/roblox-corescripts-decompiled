@@ -3,56 +3,83 @@ local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
 local Otter = InGameMenuDependencies.Otter
-local FocusHandler = require(script.Parent.Connection.FocusHandler)
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local Foundation = require(CorePackages.Packages.Foundation)
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local v15 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
-local v16 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
-local ParentParent = script.Parent.Parent
-local divideTransparency = require(ParentParent.Utility.divideTransparency)
-local AssetImage = require(script.Parent.AssetImage)
-local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
-local t1 = {
-	frequency = 5
-}
 
-local function isGamepad(p1) -- line: 50
-	return p1 == Enum.UserInputType.Gamepad1 or (p1 == Enum.UserInputType.Gamepad2 or (p1 == Enum.UserInputType.Gamepad3 or (p1 == Enum.UserInputType.Gamepad4 or (p1 == Enum.UserInputType.Gamepad5 or (p1 == Enum.UserInputType.Gamepad6 or (p1 == Enum.UserInputType.Gamepad7 or p1 == Enum.UserInputType.Gamepad8))))))
+local FocusHandler = require(script.Parent.Connection.FocusHandler)
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
+local Foundation = require(CorePackages.Packages.Foundation)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+local v
+
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v = Foundation.UNSTABLE.withCursorMigration
+else
+	v = UIBlox.App.SelectionImage.withSelectionCursorProvider
 end
 
-local t2 = {}
+local v2
 
-local function getInputObjects() -- line: 63
-	-- upvalues: UserInputService (copy), isGamepad (copy), t2 (copy)
-	local LastInputType = UserInputService:GetLastInputType()
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v2 = Foundation.Enums.CursorType
+else
+	v2 = UIBlox.App.SelectionImage.CursorKind
+end
 
-	if not isGamepad(LastInputType) then
+local parent = script.Parent.Parent
+
+local divideTransparency = require(parent.Utility.divideTransparency)
+
+local AssetImage = require(script.Parent.AssetImage)
+
+local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
+
+local v3 = { frequency = 5 }
+
+local function isGamepad(lastInputType): boolean
+	return lastInputType == Enum.UserInputType.Gamepad1
+		or lastInputType == Enum.UserInputType.Gamepad2
+		or lastInputType == Enum.UserInputType.Gamepad3
+		or lastInputType == Enum.UserInputType.Gamepad4
+		or lastInputType == Enum.UserInputType.Gamepad5
+		or lastInputType == Enum.UserInputType.Gamepad6
+		or lastInputType == Enum.UserInputType.Gamepad7
+		or lastInputType == Enum.UserInputType.Gamepad8
+end
+
+local v4 = {}
+local function getInputObjects()
+	local lastInputType = UserInputService:GetLastInputType()
+
+	if not isGamepad(lastInputType) then
 		return nil
 	end
 
-	if t2[LastInputType] == nil then
-		local GamepadState = UserInputService:GetGamepadState(LastInputType)
-		local t3 = {}
-
-		for _, v in ipairs(GamepadState) do
-			t3[v.KeyCode] = v
-		end
-
-		t2[LastInputType] = t3
+	if v4[lastInputType] ~= nil then
+		return v4[lastInputType]
 	end
 
-	return t2[LastInputType]
+	local gamepadState = UserInputService:GetGamepadState(lastInputType)
+	local v5 = {}
+
+	for _, v6 in ipairs(gamepadState) do
+		v5[v6.KeyCode] = v6
+	end
+
+	v4[lastInputType] = v5
+
+	return v4[lastInputType]
 end
 
-local v25 = Roact.PureComponent:extend("Slider")
-
-v25.validateProps = t.intersection(t.strictInterface({
+local extended = Roact.PureComponent:extend("Slider")
+extended.validateProps = t.intersection(t.strictInterface({
 	min = t.number,
 	max = t.number,
 	stepInterval = t.numberPositive,
@@ -69,450 +96,419 @@ v25.validateProps = t.intersection(t.strictInterface({
 	onSelectionGained = t.optional(t.callback),
 	NextSelectionRight = t.optional(t.table),
 	sliderDotRef = t.optional(t.union(t.callback, t.table))
-}), function(p2) -- line: 122
-	if p2.min > p2.max then
+}), function(data)
+	if data.min > data.max then
 		return false, "min must be less than or equal to max"
 	end
 
-	if p2.value > p2.max or p2.value < p2.min then
+	if data.value > data.max or data.value < data.min then
 		return false, "value must be within min and max"
 	end
 
 	return true
 end)
-v25.defaultProps = {
-	disabled = false,
-	width = UDim.new(1, 0)
-}
 
-function v25.init(p3) -- line: 140
-	-- upvalues: Roact (copy), Otter (copy)
-	p3.state = {
-		dragging = false,
-		hovering = false,
-		entryMode = false
-	}
-	p3.totalMoveTime = 0
-	p3.isFirstMove = true
-	p3.unhandledTime = 0
-	p3.rootButtonRef = Roact.createRef()
-	p3.hoverRef = Roact.createRef()
-	p3.hoverMotor = Otter.createSingleMotor(0)
-	p3.hoverMotor:onStep(function(p4) -- line: 155
-		-- upvalues: p3 (copy)
-		local current = p3.hoverRef.current
+extended.defaultProps = { width = UDim.new(1, 0), disabled = false }
+
+function extended:init()
+	self.state = { dragging = false, hovering = false, entryMode = false }
+
+	self.totalMoveTime = 0
+	self.isFirstMove = true
+	self.unhandledTime = 0
+
+	self.rootButtonRef = Roact.createRef()
+	self.hoverRef = Roact.createRef()
+
+	self.hoverMotor = Otter.createSingleMotor(0)
+	self.hoverMotor:onStep(function(p)
+		local current = self.hoverRef.current
 
 		if current ~= nil then
-			current.Size = UDim2.new(0, p4, 0, p4)
+			current.Size = UDim2.new(0, p, 0, p)
 		end
 	end)
 
-	function p3.onInputBegan(_, p6) -- line: 163
-		-- upvalues: p3 (copy)
-		if p3.props.disabled then
+	function self.onInputBegan(_, p)
+		if self.props.disabled then
 			return
 		end
 
-		local UserInputType = p6.UserInputType
+		local userInputType = p.UserInputType
 
-		if UserInputType ~= Enum.UserInputType.MouseButton1 and UserInputType ~= Enum.UserInputType.Touch then
+		if userInputType ~= Enum.UserInputType.MouseButton1 and userInputType ~= Enum.UserInputType.Touch then
 			return
 		end
 
-		local PositionX = p6.Position.X
-
-		p3:processDrag(PositionX)
-		p3:startListeningForDrag()
+		self:processDrag(p.Position.X)
+		self:startListeningForDrag()
 	end
 end
-function v25.renderFocusHandler(p7) -- line: 180
-	-- upvalues: Roact (copy), FocusHandler (copy), GuiService (copy), RunService (copy), getInputObjects (copy), ContextActionService (copy)
+
+function extended:renderFocusHandler()
 	return Roact.createElement(FocusHandler, {
-		isFocused = p7.state.entryMode and p7.props.canCaptureFocus,
-		didFocus = function() -- line: 184
-			-- upvalues: GuiService (copy), p7 (copy), RunService (copy), getInputObjects (copy), ContextActionService (copy)
+		isFocused = self.state.entryMode and self.props.canCaptureFocus,
+		didFocus = function()
 			GuiService.CoreGuiNavigationEnabled = false
-			p7.joystickListener = RunService.Heartbeat:Connect(function(dt) -- line: 188
-				-- upvalues: p7 (copy), getInputObjects (copy)
-				p7:onMoveStep(dt, (getInputObjects()))
+
+			self.joystickListener = RunService.Heartbeat:Connect(function(dt)
+				self:onMoveStep(dt, getInputObjects())
 			end)
 
-			local value = p7.props.value
+			local value = self.props.value
 
-			ContextActionService:BindCoreAction("LeaveEntryMode", function(_, p9) -- line: 197
-				-- upvalues: p7 (copy), value (copy)
-				if p9 == Enum.UserInputState.End then
-					p7:setState({
-						entryMode = false
-					})
-					p7.props.valueChanged(value)
-
-					return Enum.ContextActionResult.Sink
+			ContextActionService:BindCoreAction("LeaveEntryMode", function(_, p)
+				if p ~= Enum.UserInputState.End then
+					return Enum.ContextActionResult.Pass
 				end
 
-				return Enum.ContextActionResult.Pass
+				self:setState({ entryMode = false })
+				self.props.valueChanged(value)
+				return Enum.ContextActionResult.Sink
 			end, false, Enum.KeyCode.ButtonB)
 		end,
-		didBlur = function() -- line: 207
-			-- upvalues: p7 (copy), GuiService (copy), ContextActionService (copy)
-			p7.joystickListener:Disconnect()
+		didBlur = function()
+			self.joystickListener:Disconnect()
 			GuiService.CoreGuiNavigationEnabled = true
 			ContextActionService:UnbindCoreAction("LeaveEntryMode")
-			p7:setState({
-				entryMode = false
-			})
+			self:setState({ entryMode = false })
 		end
 	}) or nil
 end
-function v25.renderWithSelectionCursor(p10, p11) -- line: 216
-	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), ImageSetButton (copy), AssetImage (copy), divideTransparency (copy), v16 (copy)
-	local min = p10.props.min
-	local v38 = p10.props.max - min
-	local v39 = (p10.props.value - min) / v38
-	local v40 = math.abs(v39)
-	local v41 = v39 / 2
-	local v42 = p10.state.entryMode and p10.props.canCaptureFocus
 
-	return withFoundationOrUIBloxStyle(function(p12) -- line: 227
+function extended:renderWithSelectionCursor(callback)
+	local min = self.props.min
+	local v5 = self.props.max - min
+	local v6 = (self.props.value - min) / v5
+	local v7 = math.abs(v6)
+	local v8 = v6 / 2
+
+	local canCaptureFocus = self.state.entryMode and self.props.canCaptureFocus
+
+	return withFoundationOrUIBloxStyle(function(p)
 		return {
 			Theme = {
 				UIMuted = {
-					Color = p12.Color.Shift.Shift_100.Color3,
-					Transparency = p12.Color.Shift.Shift_100.Transparency
+					Color = p.Color.Shift.Shift_100.Color3,
+					Transparency = p.Color.Shift.Shift_100.Transparency
 				},
 				ContextualPrimaryDefault = {
-					Color = p12.Color.ActionEmphasis.Background.Color3,
-					Transparency = p12.Color.ActionEmphasis.Background.Transparency
+					Color = p.Color.ActionEmphasis.Background.Color3,
+					Transparency = p.Color.ActionEmphasis.Background.Transparency
 				}
 			}
 		}
-	end, function(p13) -- line: 234
-		-- upvalues: Roact (copy), ImageSetButton (copy), p10 (copy), AssetImage (copy), divideTransparency (copy), v41 (copy), v40 (copy), v39 (copy), p11 (copy), v42 (copy), v16 (copy)
+	end, function(p)
 		return Roact.createElement(ImageSetButton, {
-			AnchorPoint = p10.props.AnchorPoint,
+			AnchorPoint = self.props.AnchorPoint,
 			BackgroundTransparency = 1,
 			Image = "",
-			LayoutOrder = p10.props.LayoutOrder,
-			Position = p10.props.Position,
-			Size = UDim2.new(p10.props.width.Scale, p10.props.width.Offset, 0, 36),
-			[Roact.Ref] = p10.rootButtonRef,
-			[Roact.Event.InputBegan] = p10.onInputBegan,
+			LayoutOrder = self.props.LayoutOrder,
+			Position = self.props.Position,
+			Size = UDim2.new(self.props.width.Scale, self.props.width.Offset, 0, 36),
+			[Roact.Ref] = self.rootButtonRef,
+			[Roact.Event.InputBegan] = self.onInputBegan,
 			Selectable = false
 		}, {
-			FocusHandler = p10:renderFocusHandler(),
+			FocusHandler = self:renderFocusHandler(),
 			Gutter = Roact.createElement(AssetImage.Label, {
+				AnchorPoint = Vector2.new(0.5, 0.5),
 				BackgroundTransparency = 1,
 				imageKey = "SliderCircle",
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				ImageColor3 = p13.Theme.UIMuted.Color,
-				ImageTransparency = p13.Theme.UIMuted.Transparency,
+				ImageColor3 = p.Theme.UIMuted.Color,
+				ImageTransparency = p.Theme.UIMuted.Transparency,
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				Size = UDim2.new(1, 0, 0, 4)
 			}, {
 				FilledGutter = Roact.createElement(AssetImage.Label, {
+					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
 					imageKey = "SliderCircle",
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					ImageColor3 = p13.Theme.ContextualPrimaryDefault.Color,
-					ImageTransparency = divideTransparency(p13.Theme.ContextualPrimaryDefault.Transparency, not p10.props.disabled and 1 or 2),
-					Position = UDim2.new(v41, 0, 0.5, 0),
-					Size = UDim2.new(v40, 0, 1, 0)
+					ImageColor3 = p.Theme.ContextualPrimaryDefault.Color,
+					ImageTransparency = divideTransparency(
+						p.Theme.ContextualPrimaryDefault.Transparency,
+						self.props.disabled and 2 or 1
+					),
+					Position = UDim2.new(v8, 0, 0.5, 0),
+					Size = UDim2.new(v7, 0, 1, 0)
 				})
 			}),
 			DotTrack = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				ZIndex = 4,
-				Selectable = false,
 				Size = UDim2.new(1, -12, 1, 0),
+				BackgroundTransparency = 1,
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.new(0.5, 0, 0.5, 0)
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				ZIndex = 4,
+				Selectable = false
 			}, {
 				Dot = Roact.createElement(AssetImage.Button, {
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
 					imageKey = "SliderButton",
-					Position = UDim2.new(v39, 0, 0.5, 0),
+					Position = UDim2.new(v6, 0, 0.5, 0),
 					Size = UDim2.new(0, 42, 0, 42),
-					ImageTransparency = not p10.props.disabled and 0 or 0.5,
+					ImageTransparency = self.props.disabled and 0.5 or 0,
 					ZIndex = 2,
-					SelectionImageObject = p11(v42 and v16.SelectedKnob or v16.UnselectedKnob),
-					[Roact.Event.Activated] = function(_, p15) -- line: 288
-						-- upvalues: p10 (copy)
-						if p15.KeyCode == Enum.KeyCode.ButtonA then
-							p10:setState({
-								entryMode = not p10.state.entryMode
+					SelectionImageObject = callback(canCaptureFocus and v2.SelectedKnob or v2.UnselectedKnob),
+					[Roact.Event.Activated] = function(_, p2)
+						if p2.KeyCode == Enum.KeyCode.ButtonA then
+							self:setState({
+								entryMode = not self.state.entryMode
 							})
 						end
 					end,
-					[Roact.Event.InputBegan] = function(p16, p17) -- line: 295
-						-- upvalues: p10 (copy)
-						if p10.props.disabled then
+					[Roact.Event.InputBegan] = function(p2, p3)
+						if self.props.disabled then
 							return
 						end
 
-						if p17.UserInputType == Enum.UserInputType.MouseMovement then
-							p10:setState({
-								hovering = true
-							})
-
-							return
-						end
-
-						p10.onInputBegan(p16, p17)
-					end,
-					[Roact.Event.InputEnded] = function(_, p19) -- line: 308
-						-- upvalues: p10 (copy)
-						if p10.props.disabled then
-							return
-						end
-
-						if p19.UserInputType == Enum.UserInputType.MouseMovement then
-							p10:setState({
-								hovering = false
-							})
+						if p3.UserInputType == Enum.UserInputType.MouseMovement then
+							self:setState({ hovering = true })
+						else
+							self.onInputBegan(p2, p3)
 						end
 					end,
-					[Roact.Ref] = p10.props.sliderDotRef,
-					[Roact.Event.SelectionLost] = p10.props.onSelectionLost,
-					[Roact.Event.SelectionGained] = p10.props.onSelectionGained,
-					NextSelectionRight = p10.props.NextSelectionRight
+					[Roact.Event.InputEnded] = function(_, p2)
+						if self.props.disabled then
+							return
+						end
+
+						if p2.UserInputType == Enum.UserInputType.MouseMovement then
+							self:setState({ hovering = false })
+						end
+					end,
+					[Roact.Ref] = self.props.sliderDotRef,
+					[Roact.Event.SelectionLost] = self.props.onSelectionLost,
+					[Roact.Event.SelectionGained] = self.props.onSelectionGained,
+					NextSelectionRight = self.props.NextSelectionRight
 				}),
 				HoverOverlay = Roact.createElement(AssetImage.Label, {
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
 					imageKey = "SliderHover",
-					Position = UDim2.new(v39, 0, 0.5, 0),
+					Position = UDim2.new(v6, 0, 0.5, 0),
 					Size = UDim2.new(0, 0, 0, 0),
-					[Roact.Ref] = p10.hoverRef
+					[Roact.Ref] = self.hoverRef
 				})
 			})
 		})
 	end)
 end
-function v25.render(p20) -- line: 337
-	-- upvalues: v15 (copy)
-	return v15(function(p21) -- line: 338
-		-- upvalues: p20 (copy)
-		return p20:renderWithSelectionCursor(p21)
+
+function extended:render()
+	return v(function(p)
+		return self:renderWithSelectionCursor(p)
 	end)
 end
-function v25.didMount(p22) -- line: 343
-	local current = p22.rootButtonRef.current
-	local connection = nil
 
-	connection = current.AncestryChanged:Connect(function() -- line: 351
-		-- upvalues: current (copy), connection (ref), p22 (copy)
+function extended:didMount()
+	local current = self.rootButtonRef.current
+
+	local ancestryChangedConnection = nil
+	ancestryChangedConnection = current.AncestryChanged:Connect(function()
 		if not current:IsDescendantOf(game) then
 			return
 		end
 
-		connection:Disconnect()
-		p22.canUseUserInputService = current:FindFirstAncestorWhichIsA("PluginGui") == nil
+		ancestryChangedConnection:Disconnect()
+
+		self.canUseUserInputService = current:FindFirstAncestorWhichIsA("PluginGui") == nil
 	end)
-	p22.hoverMotor:start()
+
+	self.hoverMotor:start()
 end
-function v25.didUpdate(p23) -- line: 366
-	-- upvalues: Otter (copy), t1 (copy)
-	if p23.props.disabled then
-		p23:stopListeningForDrag()
+
+function extended:didUpdate()
+	if self.props.disabled then
+		self:stopListeningForDrag()
 	end
 
-	local n1 = 0
+	local v5 = (self.props.disabled or not (self.state.dragging or self.state.hovering)) and 0 or 42
 
-	if not p23.props.disabled and (p23.state.dragging or p23.state.hovering) then
-		n1 = 42
+	self.hoverMotor:setGoal(Otter.spring(v5, v3))
+end
+
+function extended:willUnmount()
+	self.hoverMotor:stop()
+	self:disconnectDragEvents()
+end
+
+function extended:startListeningForDrag()
+	local current = self.rootButtonRef.current
+
+	if current == nil or self.state.dragging then
+		return
 	end
 
-	p23.hoverMotor:setGoal(Otter.spring(n1, t1))
+	if self.canUseUserInputService then
+		self.moveConnection = UserInputService.InputChanged:Connect(function(input)
+			if not self.state.dragging then
+				return
+			end
+
+			local userInputType = input.UserInputType
+
+			if
+				userInputType ~= Enum.UserInputType.MouseMovement and userInputType ~= Enum.UserInputType.Touch
+				or input.UserInputState ~= Enum.UserInputState.Change
+			then
+				return
+			end
+
+			self:processDrag(input.Position.X)
+		end)
+
+		self.releaseConnection = UserInputService.InputEnded:Connect(function(input)
+			local userInputType = input.UserInputType
+
+			if userInputType ~= Enum.UserInputType.MouseButton1 and userInputType ~= Enum.UserInputType.Touch then
+				return
+			end
+
+			self:stopListeningForDrag()
+			self:processDrag(input.Position.X)
+		end)
+
+		self.focusLostConnection = UserInputService.WindowFocusReleased:Connect(function()
+			self:stopListeningForDrag()
+		end)
+	else
+		local pluginGui = current:FindFirstAncestorWhichIsA("PluginGui")
+
+		local sliderPluginGuiInputCapturer = Instance.new("ImageButton")
+		sliderPluginGuiInputCapturer.BackgroundTransparency = 1
+		sliderPluginGuiInputCapturer.Image = ""
+		sliderPluginGuiInputCapturer.Name = "SliderPluginGuiInputCapturer"
+		sliderPluginGuiInputCapturer.Size = UDim2.new(1, 0, 1, 0)
+		sliderPluginGuiInputCapturer.ZIndex = 100000
+		self.moveConnection = sliderPluginGuiInputCapturer.MouseMoved:Connect(function(p)
+			self:processDrag(p)
+		end)
+
+		self.releaseConnection = sliderPluginGuiInputCapturer.MouseButton1Up:Connect(function(p)
+			self:stopListeningForDrag()
+			self:processDrag(p)
+		end)
+
+		self.focusLostConnection = sliderPluginGuiInputCapturer.MouseLeave:Connect(function(p)
+			self:stopListeningForDrag()
+			self:processDrag(p)
+		end)
+
+		sliderPluginGuiInputCapturer.Parent = pluginGui
+		self.inputCapturerButton = sliderPluginGuiInputCapturer
+	end
+
+	self:setState({ dragging = true })
 end
-function v25.willUnmount(p24) -- line: 379
-	p24.hoverMotor:stop()
-	p24:disconnectDragEvents()
-end
-function v25.startListeningForDrag(p25) -- line: 384
-	-- upvalues: UserInputService (copy)
-	local current = p25.rootButtonRef.current
+
+function extended:processDrag(p)
+	local current = self.rootButtonRef.current
 
 	if current == nil then
 		return
 	end
 
-	if p25.state.dragging then
+	local min = self.props.min
+	local max = self.props.max
+	local stepInterval = self.props.stepInterval
+
+	local x = current.AbsoluteSize.X
+	local v5 = math.floor((math.clamp(p - current.AbsolutePosition.X, 0, x) / x * (max - min) + min) / stepInterval + 0.5) * stepInterval
+
+	if v5 ~= self.props.value then
+		self.props.valueChanged(v5)
+	end
+end
+
+function extended:disconnectDragEvents()
+	if self.moveConnection ~= nil then
+		self.moveConnection:Disconnect()
+		self.moveConnection = nil
+	end
+
+	if self.releaseConnection ~= nil then
+		self.releaseConnection:Disconnect()
+		self.releaseConnection = nil
+	end
+
+	if self.focusLostConnection ~= nil then
+		self.focusLostConnection:Disconnect()
+		self.focusLostConnection = nil
+	end
+
+	if self.inputCapturerButton ~= nil then
+		self.inputCapturerButton:Destroy()
+		self.inputCapturerButton = nil
+	end
+end
+
+function extended:stopListeningForDrag()
+	if not self.state.dragging then
 		return
 	end
 
-	if p25.canUseUserInputService then
-		p25.moveConnection = UserInputService.InputChanged:Connect(function(input) -- line: 397
-			-- upvalues: p25 (copy)
-			if not p25.state.dragging then
-				return
-			end
+	self:disconnectDragEvents()
 
-			local UserInputType = input.UserInputType
+	self:setState({ dragging = false })
+end
 
-			if UserInputType ~= Enum.UserInputType.MouseMovement and UserInputType ~= Enum.UserInputType.Touch then
-				return
-			end
+function extended:processGamepadInput(p, p2)
+	local v5 = self.props.stepInterval * p
+	local v6 = math.max(math.min(self.props.value + v5 * p2, self.props.max), self.props.min)
 
-			if input.UserInputState ~= Enum.UserInputState.Change then
-				return
-			end
+	if v6 ~= self.props.value then
+		self.props.valueChanged(v6)
+	end
+end
 
-			p25:processDrag(input.Position.X)
-		end)
-		p25.releaseConnection = UserInputService.InputEnded:Connect(function(input) -- line: 419
-			-- upvalues: p25 (copy)
-			local UserInputType = input.UserInputType
+function extended:onMoveStep(p, p2)
+	local position = p2[Enum.KeyCode.Thumbstick1].Position
+	local v5 = position.Magnitude > 0.2
+	local v6 = 0
 
-			if UserInputType ~= Enum.UserInputType.MouseButton1 and UserInputType ~= Enum.UserInputType.Touch then
-				return
-			end
+	self.totalMoveTime += p
+	local v7, v8, v9
 
-			p25:stopListeningForDrag()
-			p25:processDrag(input.Position.X)
-		end)
-		p25.focusLostConnection = UserInputService.WindowFocusReleased:Connect(function() -- line: 434
-			-- upvalues: p25 (copy)
-			p25:stopListeningForDrag()
-		end)
+	if v5 then
+		v7 = position.x > 0 and 1 or -1
+		v8 = 0.2
+		v9 = 12
 	else
-		local PluginGui = current:FindFirstAncestorWhichIsA("PluginGui")
-		local ImageButton = Instance.new("ImageButton")
-
-		ImageButton.BackgroundTransparency = 1
-		ImageButton.Image = ""
-		ImageButton.Name = "SliderPluginGuiInputCapturer"
-		ImageButton.Size = UDim2.new(1, 0, 1, 0)
-		ImageButton.ZIndex = 100000
-		p25.moveConnection = ImageButton.MouseMoved:Connect(function(p26) -- line: 454
-			-- upvalues: p25 (copy)
-			p25:processDrag(p26)
-		end)
-		p25.releaseConnection = ImageButton.MouseButton1Up:Connect(function(p27) -- line: 458
-			-- upvalues: p25 (copy)
-			p25:stopListeningForDrag()
-			p25:processDrag(p27)
-		end)
-		p25.focusLostConnection = ImageButton.MouseLeave:Connect(function(x) -- line: 463
-			-- upvalues: p25 (copy)
-			p25:stopListeningForDrag()
-			p25:processDrag(x)
-		end)
-		ImageButton.Parent = PluginGui
-		p25.inputCapturerButton = ImageButton
+		v7 = (p2[Enum.KeyCode.DPadLeft].UserInputState == Enum.UserInputState.Begin and -1 or 0) + (p2[Enum.KeyCode.DPadRight].UserInputState == Enum.UserInputState.Begin and 1 or 0)
+		v8 = 0.5
+		v9 = 8
 	end
 
-	p25:setState({
-		dragging = true
-	})
-end
-function v25.processDrag(p28, p29) -- line: 477
-	local current = p28.rootButtonRef.current
+	if v7 == 0 then
+		self.totalMoveTime = 0
+		self.isFirstMove = true
+	elseif self.isFirstMove then
+		self.isFirstMove = false
+		self.totalMoveTime = 0
+		self.unhandledTime = 0
+		v6 = 1
+	elseif v8 < self.totalMoveTime then
+		local v10 = p - math.max(v8 - self.totalMoveTime - p, 0) + self.unhandledTime
+		v6 = math.floor(v9 * v10)
 
-	if current == nil then
-		return
-	end
-
-	local min = p28.props.min
-	local max = p28.props.max
-	local stepInterval = p28.props.stepInterval
-	local AbsoluteSizeX = current.AbsoluteSize.X
-	local v61 = math.floor((math.clamp(p29 - current.AbsolutePosition.X, 0, AbsoluteSizeX) / AbsoluteSizeX * (max - min) + min) / stepInterval + 0.5) * stepInterval
-
-	if v61 ~= p28.props.value then
-		p28.props.valueChanged(v61)
-	end
-end
-function v25.disconnectDragEvents(p30) -- line: 500
-	if p30.moveConnection ~= nil then
-		p30.moveConnection:Disconnect()
-		p30.moveConnection = nil
-	end
-
-	if p30.releaseConnection ~= nil then
-		p30.releaseConnection:Disconnect()
-		p30.releaseConnection = nil
-	end
-
-	if p30.focusLostConnection ~= nil then
-		p30.focusLostConnection:Disconnect()
-		p30.focusLostConnection = nil
-	end
-
-	if p30.inputCapturerButton ~= nil then
-		p30.inputCapturerButton:Destroy()
-		p30.inputCapturerButton = nil
-	end
-end
-function v25.stopListeningForDrag(p31) -- line: 522
-	if not p31.state.dragging then
-		return
-	end
-
-	p31:disconnectDragEvents()
-	p31:setState({
-		dragging = false
-	})
-end
-function v25.processGamepadInput(p32, p33, p34) -- line: 534
-	local v67 = p32.props.stepInterval * p33
-	local v68 = math.max(math.min(p32.props.value + v67 * p34, p32.props.max), p32.props.min)
-
-	if v68 ~= p32.props.value then
-		p32.props.valueChanged(v68)
-	end
-end
-function v25.onMoveStep(p35, p36, p37) -- line: 545
-	local Position = p37[Enum.KeyCode.Thumbstick1].Position
-	local v73 = Position.Magnitude > 0.2
-	local n2 = 0
-
-	p35.totalMoveTime = p35.totalMoveTime + p36
-
-	local v75, n3, n4
-
-	if v73 then
-		v75 = not (Position.x > 0) and -1 or 1
-		n3 = 0.2
-		n4 = 12
+		self.unhandledTime = v10 - v6 / v9
 	else
-		v75 = (p37[Enum.KeyCode.DPadLeft].UserInputState ~= Enum.UserInputState.Begin and 0 or -1) + (p37[Enum.KeyCode.DPadRight].UserInputState ~= Enum.UserInputState.Begin and 0 or 1)
-		n3 = 0.5
-		n4 = 8
+		self.unhandledTime = 0
+		v6 = 0
 	end
 
-	if v75 ~= 0 then
-		if p35.isFirstMove then
-			p35.isFirstMove = false
-			p35.totalMoveTime = 0
-			p35.unhandledTime = 0
-			n2 = 1
-		elseif n3 < p35.totalMoveTime then
-			local v78 = p36 - math.max(n3 - p35.totalMoveTime - p36, 0) + p35.unhandledTime
-
-			n2 = math.floor(n4 * v78)
-			p35.unhandledTime = v78 - n2 / n4
-		else
-			n2 = 0
-			p35.unhandledTime = 0
-		end
-	else
-		p35.totalMoveTime = 0
-		p35.isFirstMove = true
-	end
-
-	if n2 > 0 then
-		p35:processGamepadInput(v75, n2)
+	if v6 > 0 then
+		self:processGamepadInput(v7, v6)
 	end
 end
-function v25.getDerivedStateFromProps(p38) -- line: 595
-	if not p38.isMenuOpen then
-		return {
-			entryMode = false
-		}
+
+function extended.getDerivedStateFromProps(p)
+	if p.isMenuOpen then
+		return nil
 	end
 
-	return nil
+	return { entryMode = false }
 end
 
-return v25
+return extended

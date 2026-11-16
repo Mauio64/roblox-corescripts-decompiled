@@ -1,94 +1,190 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local SetCurrentToastMessage = require(ProfilePlatformParent.ToastRodux).Actions.SetCurrentToastMessage
-local CatalogNetworking = require(ProfilePlatformParent.CatalogNetworking)
+local parent = ProfilePlatform.Parent
+
+local ToastRodux = require(parent.ToastRodux)
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+
+local CatalogNetworking = require(parent.CatalogNetworking)
 local PurchaseDetailsStore = CatalogNetworking.PurchaseDetailsStore
 local BundleOwnershipStore = CatalogNetworking.BundleOwnershipStore
 
 require(ProfilePlatform.Contexts.ProfileWrapperContext)
 
-local function buildEquippableAssets(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 57
-	local t4 = {}
-	local t5 = {}
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
+local MarketplaceUnifiedAction = AvatarExperienceAnalytics.UnifiedEventLogEnums.MarketplaceUnifiedAction
 
-	local function append(t6: {[any]: any}) -- line: 65
-		-- upvalues: t5 (copy), t3 (copy), t4 (copy)
-		for _, v33 in t6 do
-			if not t5[v33] then
-				local v34 = t3[v33]
+local Enums = require(ProfilePlatform.Common.Enums)
+local sendProfilePurchaseEvents = require(ProfilePlatform.Analytics.sendProfilePurchaseEvents)
 
-				if v34 then
-					t5[v33] = true
-					table.insert(t4, {
-						assetTypeId = tostring(v34),
-						assetId = tostring(v33)
-					})
-				end
+local FFlagProfileInspectAndBuyRefreshBalanceAfterPurchase = require(ProfilePlatform.Flags.FFlagProfileInspectAndBuyRefreshBalanceAfterPurchase)
+local FFlagProfileUnifiedPurchaseLogging = require(ProfilePlatform.Flags.FFlagProfileUnifiedPurchaseLogging)
+
+local function buildEquippableAssets(purchasedWearIds, ownedAssetIds, wearTypeMap)
+	local equippableAssets = {}
+	local set = {}
+
+	local function append(items)
+		for _, item in items do
+			if set[item] then
+				continue
 			end
+
+			local v = wearTypeMap[item]
+
+			if not v then
+				continue
+			end
+
+			set[item] = true
+			table.insert(equippableAssets, { assetTypeId = tostring(v), assetId = tostring(item) })
 		end
 	end
 
-	append(t1)
-	append(t2)
+	append(purchasedWearIds)
+	append(ownedAssetIds)
 
-	return t4
+	return equippableAssets
 end
-local function parseLineItems(t7: {[any]: any}) -- line: 88
-	local t8 = {}
-	local t9 = {}
-	local n1 = 0
 
-	for _, v21 in t7 do
-		if v21.status == "SUCCEEDED" then
-			if v21.bundleId then
-				table.insert(t9, (tostring(v21.bundleId)))
-				table.insert(t8, (tostring(v21.bundleId)))
-			elseif v21.assetId then
-				table.insert(t8, (tostring(v21.assetId)))
+local function parseLineItems(lineItems)
+	local count = 0
+	local bundleIds = {}
+	local result = {}
+
+	for _, item in lineItems do
+		if item.status == "SUCCEEDED" then
+			if item.bundleId then
+				table.insert(bundleIds, (tostring(item.bundleId)))
+				table.insert(result, (tostring(item.bundleId)))
+			elseif item.assetId then
+				table.insert(result, (tostring(item.assetId)))
 			end
 		else
-			n1 += 1
+			count += 1
 		end
 	end
 
-	return t8, t9, n1
+	return result, bundleIds, count
 end
-local function HandlePurchaseItemsSuccess(t10: {[any]: any}) -- line: 109
-	-- upvalues: parseLineItems (copy), PurchaseDetailsStore (copy), BundleOwnershipStore (copy), buildEquippableAssets (copy), SetCurrentToastMessage (copy)
-	local v23 = t10.result and t10.result.responseBody
-	local v24 = v23 and v23.fulfillmentGroups
-	local v25 = v24 and (not not v24[1] and v24[1].lineItems) or {}
-	local v26, v27, v28 = parseLineItems(v25)
 
-	PurchaseDetailsStore.markItemsOwned(v26)
+local function buildPurchasedItems(lineItems, purchasedItems)
+	local itemSubTypesByItemId = {}
 
-	if #v27 > 0 then
-		BundleOwnershipStore.markOwned(v27)
+	if purchasedItems then
+		for _, item in purchasedItems do
+			if item.itemSubType then
+				itemSubTypesByItemId[item.itemId] = item.itemSubType
+			end
+		end
 	end
 
-	if t10.isWearAfterPurchaseChecked and t10.profileWrapperContext.postPurchase then
-		local v29 = buildEquippableAssets(t10.purchasedWearIds, t10.ownedAssetIds, t10.wearTypeMap)
+	local purchasedItems2 = {}
 
-		if #v29 > 0 then
-			if t10.avatarSaveContext and t10.avatarSaveContext.autoSaveNextNewSaveData then
-				t10.avatarSaveContext.autoSaveNextNewSaveData()
+	for _, item in lineItems do
+		if item.status ~= "SUCCEEDED" then
+			continue
+		end
+
+		local itemId
+
+		if item.bundleId then
+			itemId = tostring(item.bundleId)
+		elseif item.assetId then
+			itemId = tostring(item.assetId)
+		end
+
+		if not itemId then
+			continue
+		end
+
+		local itemType
+
+		if item.bundleId then
+			itemType = Enums.ItemTypes.Bundle
+		else
+			itemType = Enums.ItemTypes.Asset
+		end
+
+		local v = {
+			itemId = itemId,
+			itemType = itemType,
+			itemSubType = itemSubTypesByItemId[itemId],
+			priceInRobux = item.agreedPriceRobux
+		}
+		table.insert(purchasedItems2, v)
+	end
+
+	return purchasedItems2
+end
+
+local function HandlePurchaseItemsSuccess(data)
+	local responseBody = data.result and data.result.responseBody
+	local fulfillmentGroups = responseBody and responseBody.fulfillmentGroups
+
+	local lineItems = fulfillmentGroups and fulfillmentGroups[1] and fulfillmentGroups[1].lineItems or {}
+
+	local v, v2, v3 = parseLineItems(lineItems)
+
+	if FFlagProfileUnifiedPurchaseLogging then
+		sendProfilePurchaseEvents(
+			MarketplaceUnifiedAction.PURCHASE_SUCCESS,
+			buildPurchasedItems(lineItems, data.purchasedItems),
+			data.profileWrapperContext.profileType
+		)
+	end
+
+	PurchaseDetailsStore.markItemsOwned(v)
+
+	if #v2 > 0 then
+		BundleOwnershipStore.markOwned(v2)
+	end
+
+	if data.isWearAfterPurchaseChecked and data.profileWrapperContext.postPurchase then
+		local equippableAssets = buildEquippableAssets(
+			data.purchasedWearIds or {},
+			data.ownedAssetIds or {},
+			data.wearTypeMap or {}
+		)
+
+		if #equippableAssets > 0 then
+			if data.avatarSaveContext and data.avatarSaveContext.autoSaveNextNewSaveData then
+				data.avatarSaveContext.autoSaveNextNewSaveData()
 			end
 
-			t10.profileWrapperContext.postPurchase.wearAfterPurchase(v29)
+			data.profileWrapperContext.postPurchase.wearAfterPurchase(equippableAssets)
 		end
 	end
 
-	local v30 = if v28 ~= 0 then {
-		isLocalized = true,
-		toastType = "PurchaseMessage",
-		toastMessage = t10.localized.purchasePartialFailure
-	} else {
-		isLocalized = true,
-		toastType = "PurchaseMessage",
-		toastMessage = if #v26 ~= 1 then t10.localized.purchaseSuccessPlural else t10.localized.purchaseSuccessSingular
-	}
+	if FFlagProfileInspectAndBuyRefreshBalanceAfterPurchase and #v > 0 then
+		local postPurchase = data.profileWrapperContext.postPurchase
 
-	t10.dispatch(SetCurrentToastMessage(v30))
+		if postPurchase and postPurchase.refreshRobuxBalance then
+			postPurchase.refreshRobuxBalance()
+		end
+	end
+
+	local v4
+
+	if v3 == 0 then
+		v4 = { toastMessage = 0, isLocalized = true, toastType = "PurchaseMessage" }
+		local toastMessage
+
+		if #v == 1 then
+			toastMessage = data.localized.purchaseSuccessSingular
+		else
+			toastMessage = data.localized.purchaseSuccessPlural
+		end
+
+		v4.toastMessage = toastMessage
+	else
+		v4 = {
+			toastMessage = data.localized.purchasePartialFailure,
+			isLocalized = true,
+			toastType = "PurchaseMessage"
+		}
+	end
+
+	data.dispatch(SetCurrentToastMessage(v4))
 end
 
 return HandlePurchaseItemsSuccess

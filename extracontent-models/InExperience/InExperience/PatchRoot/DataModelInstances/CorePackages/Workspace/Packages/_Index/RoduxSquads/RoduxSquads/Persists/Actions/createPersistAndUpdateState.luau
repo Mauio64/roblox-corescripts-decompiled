@@ -1,15 +1,12 @@
-local Parent = script:FindFirstAncestor("RoduxSquads").Parent
-local Rodux = require(Parent.Rodux)
+local parent = script:FindFirstAncestor("RoduxSquads").Parent
+local Rodux = require(parent.Rodux)
 
-return function(p1) -- line: 5
-	-- upvalues: Rodux (copy)
-	local storage = p1.storage
-
+return function(p)
+	local storage = p.storage
 	assert(storage ~= nil, "Persist storage is required")
 
-	local v5 = storage.memStorageKey or ""
-
-	return Rodux.makeActionCreator(v5 .. "PersistAndUpdateState", function() -- line: 10
+	local memStorageKey = storage.memStorageKey or ""
+	return Rodux.makeActionCreator(memStorageKey .. "PersistAndUpdateState", function()
 		return {}
 	end)
 end

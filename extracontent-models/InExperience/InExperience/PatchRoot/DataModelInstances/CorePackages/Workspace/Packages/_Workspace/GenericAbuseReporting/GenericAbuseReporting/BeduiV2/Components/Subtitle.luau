@@ -1,41 +1,40 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local getIconRichText = Foundation.Utility.getIconRichText
 local IconName = Foundation.Enums.IconName
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 
 require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
+local arTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation)
+local useArTranslation = arTranslation.useArTranslation
 
-local useArTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation).useArTranslation
-
-local function Subtitle(t1: {[any]: any}) -- line: 25
-	-- upvalues: useArTranslation (copy), React (copy), IconName (copy), getIconRichText (copy), FoundationText (copy)
+local function Subtitle(p)
 	local translateIntoString = useArTranslation().translateIntoString
-	local v12 = React.useMemo(function() -- line: 28
-		-- upvalues: t1 (copy), IconName (copy), getIconRichText (copy)
-		if t1.subtitle and t1.subtitle.leading then
-			local v13 = IconName[t1.subtitle.leading]
 
-			if v13 then
-				return getIconRichText(v13)
-			end
+	local v = React.useMemo(function()
+		local v = p.subtitle and p.subtitle.leading and IconName[p.subtitle.leading]
+
+		if v then
+			return getIconRichText(v)
 		end
 
 		return ""
-	end, { t1.subtitle })
+	end, { p.subtitle })
 
-	if not t1.subtitle then
-		return nil
+	if p.subtitle then
+		return React.createElement(Text, {
+			Text = `{v} {translateIntoString(p.subtitle.text)}`,
+			RichText = true,
+			tag = "auto-xy text-body-medium content-default",
+			LayoutOrder = p.layoutOrder
+		})
 	end
 
-	return React.createElement(FoundationText, {
-		RichText = true,
-		tag = "auto-xy text-body-medium content-default",
-		Text = `{ v12 } { translateIntoString(t1.subtitle.text) }`,
-		LayoutOrder = t1.layoutOrder
-	})
+	return nil
 end
 
 return React.memo(Subtitle)

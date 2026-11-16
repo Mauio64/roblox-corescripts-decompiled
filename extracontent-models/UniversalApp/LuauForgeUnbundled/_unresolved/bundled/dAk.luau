@@ -1,0 +1,19 @@
+local url = require("@luauforge/bundled/dAg").Url
+
+return function(callback, p2, p3)
+	if p2 == "" then
+		error("GetArtistSongs: songId cannot be an empty string")
+	end
+
+	local v5 = not (p3 and p3 >= 0 and p3 <= 100) and 20 or p3
+
+	return callback(
+		string.format(
+			"%smusic-discovery/v1/songs-by-criteria?by_artist.reference_audio_asset_id=%s&limit=%s",
+			url.APIS_URL,
+			tostring(p2),
+			(tostring(v5))
+		),
+		"GET"
+	)
+end

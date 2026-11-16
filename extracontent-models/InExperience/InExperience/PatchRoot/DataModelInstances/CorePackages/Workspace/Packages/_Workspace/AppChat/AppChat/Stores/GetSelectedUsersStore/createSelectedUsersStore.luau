@@ -1,164 +1,142 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Signals = require(AppChatParent.Signals)
-local Signal = require(AppChatParent.AppCommonLib).Signal
-local ArraySet = require(AppChat.DataStructures).ArraySet
+local parent = AppChat.Parent
 
-local function createSelectedUsersStore() -- line: 35
-	-- upvalues: Signals (copy), ArraySet (copy), Signal (copy)
-	local v7, v8 = Signals.createSignal(0)
-	local v9, v10 = Signals.createSignal(ArraySet.new({}))
-	local v11 = Signals.createComputed(function(p1) -- line: 43
-		-- upvalues: v9 (copy), v7 (copy)
-		local v20 = v9(p1)
+local Signals = require(parent.Signals)
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
-		return v7(p1) > v20:size()
-	end)
-	local v12 = Signals.createComputed(function(p2) -- line: 49
-		-- upvalues: v9 (copy)
-		return v9(p2):size()
-	end)
-	local v13 = Signals.createComputed(function(p3) -- line: 54
-		-- upvalues: v9 (copy)
-		return v9(p3):toArray()
-	end)
-	local u14 = Signal.new()
-	local t1 = {}
-	local t2 = {}
+local DataStructures = require(AppChat.DataStructures)
+local ArraySet = DataStructures.ArraySet
 
-	local function emitMaxSizeExceeded() -- line: 66
-		-- upvalues: u14 (ref)
-		u14:fire()
+local function createSelectedUsersStore()
+	local signal, v = Signals.createSignal(0)
+
+	local signal2, v2 = Signals.createSignal(ArraySet.new({}))
+
+	local computed = Signals.createComputed(function(p): boolean
+		local v3 = signal2(p)
+		return signal(p) > v3:size()
+	end)
+
+	local computed2 = Signals.createComputed(function(p)
+		return signal2(p):size()
+	end)
+
+	local computed3 = Signals.createComputed(function(p)
+		return signal2(p):toArray()
+	end)
+
+	local v3 = Signal.new()
+
+	local v4 = {}
+
+	local v5 = {}
+
+	local function emitMaxSizeExceeded() -- 1 equivalent call inferred from this helper
+		v3:fire()
 	end
-	local function addUserId(s1: string) -- line: 116
-		-- upvalues: v9 (copy), v11 (copy), u14 (ref), v10 (copy)
-		if v9(false):has(s1) then
+
+	local function addUserId(p: string): boolean
+		if signal2(false):has(p) then
 			return true
 		end
 
-		if not v11(false) then
-			u14:fire()
+		if computed(false) then
+			v2(function(object)
+				local clone = object:clone()
+				clone:add(p)
+				return clone
+			end)
 
-			return false
+			return true
 		end
 
-		v10(function(p4) -- line: 130
-			-- upvalues: s1 (copy)
-			local v36 = p4:clone()
-
-			v36:add(s1)
-
-			return v36
-		end)
-
-		return true
+		emitMaxSizeExceeded() -- inferred equivalent call
+		return false
 	end
 
 	return {
-		setMaxSize = function(n1: number) -- line: 70
-			-- upvalues: v8 (copy)
-			v8(function(_) -- line: 71
-				-- upvalues: n1 (copy)
-				return n1
+		setMaxSize = function(p: number)
+			v(function(_)
+				return p
 			end)
 		end,
-		getSelectedUserIdsCount = function() -- line: 84
-			-- upvalues: v12 (copy)
-			return v12
+		getSelectedUserIdsCount = function()
+			return computed2
 		end,
-		getSelectedUserIdAtIndex = function(n2: number) -- line: 88
-			-- upvalues: t1 (ref), Signals (copy), v9 (copy)
-			if not t1[n2] then
-				t1[n2] = Signals.createComputed(function(p6) -- line: 90
-					-- upvalues: v9 (copy), n2 (copy)
-					return v9(p6):at(n2)
+		getSelectedUserIdAtIndex = function(p: number)
+			if not v4[p] then
+				v4[p] = Signals.createComputed(function(p2)
+					return signal2(p2):at(p)
 				end)
 			end
 
-			return t1[n2]
+			return v4[p]
 		end,
-		getIsUserSelected = function(s2: string) -- line: 98
-			-- upvalues: t2 (ref), Signals (copy), v9 (copy)
-			if not t2[s2] then
-				t2[s2] = Signals.createComputed(function(p7) -- line: 100
-					-- upvalues: v9 (copy), s2 (copy)
-					return v9(p7):has(s2)
+		getIsUserSelected = function(p: string)
+			if not v5[p] then
+				v5[p] = Signals.createComputed(function(p2)
+					return signal2(p2):has(p)
 				end)
 			end
 
-			return t2[s2]
+			return v5[p]
 		end,
-		getMaxSize = function() -- line: 108
-			-- upvalues: v7 (copy)
-			return v7
+		getMaxSize = function()
+			return signal
 		end,
-		getSelectedUserIdsArray = function() -- line: 112
-			-- upvalues: v13 (copy)
-			return v13
+		getSelectedUserIdsArray = function()
+			return computed3
 		end,
 		addUserId = addUserId,
-		removeUserId = function(s3: string) -- line: 139
-			-- upvalues: v10 (copy)
-			v10(function(p8) -- line: 140
-				-- upvalues: s3 (copy)
-				if p8:has(s3) then
-					local v38 = p8:clone()
-
-					v38:remove(s3)
-
-					return v38
+		removeUserId = function(p: string)
+			v2(function(object)
+				if not object:has(p) then
+					return object
 				end
 
-				return p8
+				local clone = object:clone()
+				clone:remove(p)
+				return clone
 			end)
 		end,
-		toggleUserId = function(s4: string) -- line: 150
-			-- upvalues: v9 (copy), v10 (copy), addUserId (copy)
-			if v9(false):has(s4) then
-				v10(function(p9) -- line: 140
-					-- upvalues: s4 (copy)
-					if p9:has(s4) then
-						local v40 = p9:clone()
-
-						v40:remove(s4)
-
-						return v40
-					end
-
-					return p9
-				end)
-
-				return true
+		toggleUserId = function(p: string)
+			if not signal2(false):has(p) then
+				return addUserId(p)
 			end
 
-			return (addUserId(s4))
+			v2(function(object)
+				if not object:has(p) then
+					return object
+				end
+
+				local clone = object:clone()
+				clone:remove(p)
+				return clone
+			end)
+
+			return true
 		end,
-		clearStore = function() -- line: 161
-			-- upvalues: u14 (ref), Signal (copy), t1 (ref), t2 (ref), v10 (copy), ArraySet (copy)
-			u14 = Signal.new()
-			t1 = {}
-			t2 = {}
-			v10(function(_) -- line: 165
-				-- upvalues: ArraySet (copy)
+		clearStore = function()
+			v3 = Signal.new()
+			v4 = {}
+			v5 = {}
+			v2(function(_)
 				return ArraySet.new({})
 			end)
 		end,
-		onMaxSizeExceeded = function(p11: ((...any) -> ...any)) -- line: 76
-			-- upvalues: u14 (ref)
-			local v25 = u14:connect(p11)
+		onMaxSizeExceeded = function(callback)
+			local connection = v3:connect(callback)
 
-			return function() -- line: 79
-				-- upvalues: v25 (copy)
-				v25:disconnect()
+			return function()
+				connection:disconnect()
 			end
 		end,
-		hasUserId = function(s5: string) -- line: 170
-			-- upvalues: v9 (copy)
-			return v9(false):has(s5)
+		hasUserId = function(p: string)
+			return signal2(false):has(p)
 		end,
-		getCount = function() -- line: 175
-			-- upvalues: v9 (copy)
-			return v9(false):size()
+		getCount = function()
+			return signal2(false):size()
 		end
 	}
 end

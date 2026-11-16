@@ -1,12 +1,11 @@
-return function(p1) -- line: 4
-	assert(type(p1) == "string", "Symbols must be created using a string name!")
+return function(value)
+	assert(type(value) == "string", "Symbols must be created using a string name!")
 
-	local v2 = newproxy(true)
+	local v = newproxy(true)
 
-	getmetatable(v2).__tostring = function() -- line: 10
-		-- upvalues: p1 (copy)
-		return p1
+	getmetatable(v).__tostring = function()
+		return value
 	end
 
-	return v2
+	return v
 end

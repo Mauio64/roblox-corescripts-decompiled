@@ -1,80 +1,94 @@
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local CorePackages = game:GetService("CorePackages")
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local React = require(CorePackages.Packages.React)
+
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
 local Images = UIBlox.App.ImageSet.Images
 
-local function ScreenshotHighlighter(t1: {[any]: any}) -- line: 25
-	-- upvalues: RobloxGui (copy), React (copy), ImageSetButton (copy), Images (copy)
-	local AbsoluteSize = RobloxGui.AbsoluteSize
-	local v10 = (AbsoluteSize.Y > AbsoluteSize.X and AbsoluteSize.X or AbsoluteSize.Y) / 5
-	local v11, v12 = React.useState(false)
+local function ScreenshotHighlighter(props)
+	local absoluteSize = RobloxGui.AbsoluteSize
+	local v = (absoluteSize.Y > absoluteSize.X and absoluteSize.X or absoluteSize.Y) / 5
 
-	local function v13(p1, vector3: Vector3) -- line: 35
-		-- upvalues: t1 (copy), v10 (copy)
-		local v19 = (Vector2.new(vector3.X, vector3.Y) - p1.AbsolutePosition) / p1.AbsoluteSize
+	local state, setState = React.useState(false)
 
-		table.insert(t1.annotationPoints, v19)
+	local function fn(p, position: Vector3)
+		local v2 = (Vector2.new(position.X, position.Y) - p.AbsolutePosition) / p.AbsoluteSize
+		table.insert(props.annotationPoints, v2)
+		local v3
 
-		local v20 = if not (p1.AbsoluteSize.X > p1.AbsoluteSize.Y) then p1.AbsoluteSize.Y else p1.AbsoluteSize.X
+		if p.AbsoluteSize.X > p.AbsoluteSize.Y then
+			v3 = p.AbsoluteSize.X
+		else
+			v3 = p.AbsoluteSize.Y
+		end
 
-		t1.setAnnotationCircleRadius(v10 * 0.5 / v20)
-		t1.setAnnotationAreaDimensions(p1.AbsoluteSize.X, p1.AbsoluteSize.Y)
-		t1.handleAnnotationPoints(t1.annotationPoints)
+		props.setAnnotationCircleRadius(v * 0.5 / v3)
+		props.setAnnotationAreaDimensions(p.AbsoluteSize.X, p.AbsoluteSize.Y)
+		props.handleAnnotationPoints(props.annotationPoints)
 	end
 
-	local t2 = {}
+	local children = {}
 
-	for i, v in ipairs(t1.annotationPoints) do
-		t2["point" .. i] = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Position = UDim2.fromScale(v.X, v.Y),
-			Size = UDim2.fromOffset(v10, v10)
-		}, {
-			Border = React.createElement(ImageSetButton, {
-				ImageTransparency = 0,
+	local function fn2(p, data)
+		local v2 = data.UserInputState == Enum.UserInputState.Begin
+		local v3 = data.UserInputType == Enum.UserInputType.Touch
+		local v4 = data.UserInputType == Enum.UserInputType.MouseButton1
+
+		if v2 and (v3 or v4) and #props.annotationPoints < 25 then
+			setState(true)
+			fn(p, data.Position)
+		end
+	end
+
+	local function fn3(_, _) end
+
+	local function fn4(_, _)
+		if state then
+			setState(false)
+		end
+	end
+
+	for i, annotationPoint in ipairs(props.annotationPoints) do
+		children["point" .. i] = React.createElement(
+			"Frame",
+			{
+				Position = UDim2.fromScale(annotationPoint.X, annotationPoint.Y),
 				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(v10, v10),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Image = Images["component_assets/circle_49_stroke_1"],
-				ImageColor3 = Color3.fromHex("#3CF3E9")
-			}),
-			Background = React.createElement(ImageSetButton, {
-				ImageTransparency = 0.6,
-				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(v10, v10),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Image = Images["component_assets/circle_49"],
-				ImageColor3 = Color3.fromHex("#3CF3E9")
-			})
-		})
+				Size = UDim2.fromOffset(v, v)
+			},
+			{
+				Border = React.createElement(ImageSetButton, {
+					Size = UDim2.fromOffset(v, v),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Image = Images["component_assets/circle_49_stroke_1"],
+					ImageColor3 = Color3.fromHex("#3CF3E9"),
+					ImageTransparency = 0,
+					BackgroundTransparency = 1
+				}),
+				Background = React.createElement(ImageSetButton, {
+					Size = UDim2.fromOffset(v, v),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Image = Images["component_assets/circle_49"],
+					ImageColor3 = Color3.fromHex("#3CF3E9"),
+					ImageTransparency = 0.6,
+					BackgroundTransparency = 1
+				})
+			}
+		)
 	end
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
-		[React.Event.InputBegan] = function(p2, p3) -- line: 47
-			-- upvalues: t1 (copy), v12 (copy), v13 (copy)
-			local v23 = p3.UserInputState == Enum.UserInputState.Begin
-			local v24 = p3.UserInputType == Enum.UserInputType.Touch
-			local v25 = p3.UserInputType == Enum.UserInputType.MouseButton1
-
-			if v23 and ((v24 or v25) and #t1.annotationPoints < 25) then
-				v12(true)
-				v13(p2, p3.Position)
-			end
-		end,
-		[React.Event.InputChanged] = function(_, _) -- line: 57
-		end,
-		[React.Event.InputEnded] = function(_, _) -- line: 69
-			-- upvalues: v11 (copy), v12 (copy)
-			if v11 then
-				v12(false)
-			end
-		end,
+		[React.Event.InputBegan] = fn2,
+		[React.Event.InputChanged] = fn3,
+		[React.Event.InputEnded] = fn4,
 		ZIndex = 3
-	}, t2)
+	}, children)
 end
 
 return ScreenshotHighlighter

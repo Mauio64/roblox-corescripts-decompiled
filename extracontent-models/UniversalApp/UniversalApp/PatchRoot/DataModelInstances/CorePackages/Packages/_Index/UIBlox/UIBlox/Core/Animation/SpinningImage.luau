@@ -1,71 +1,75 @@
 local RunService = game:GetService("RunService")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParent.Parent.t)
-local Label = require(ParentParent.Core.ImageSet.ImageSetComponent).Label
-local v7 = Roact.PureComponent:extend("SpinningImage")
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Roact = require(parent2.Roact)
+local t = require(parent.Parent.t)
 
-v7.validateProps = t.strictInterface({
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
+local Label = ImageSetComponent.Label
+
+local extended = Roact.PureComponent:extend("SpinningImage")
+
+extended.validateProps = t.strictInterface({
 	image = t.table,
 	size = t.optional(t.UDim2),
 	anchorPoint = t.optional(t.Vector2),
 	position = t.optional(t.union(t.UDim2, t.table)),
 	rotationRate = t.optional(t.number)
 })
-v7.defaultProps = {
-	rotationRate = 360
-}
 
-function v7.init(p1) -- line: 25
-	-- upvalues: Roact (copy)
-	local v9, v10 = Roact.createBinding(0)
+extended.defaultProps = { rotationRate = 360 }
 
-	p1.angle = v9
-	p1.updateAngle = v10
+function extended:init()
+	local binding, updateAngle = Roact.createBinding(0)
+	self.angle = binding
+	self.updateAngle = updateAngle
 end
-function v7.didMount(p2) -- line: 29
-	-- upvalues: RunService (copy)
-	p2.heartbeatConnection = RunService.Heartbeat:Connect(function(dt) -- line: 30
-		-- upvalues: p2 (copy)
-		local v18 = p2.angle:getValue() + p2.props.rotationRate * dt
 
-		if v18 > 360 then
-			v18 -= 360
-		elseif v18 < 0 then
-			v18 += 360
+function extended:didMount()
+	self.heartbeatConnection = RunService.Heartbeat:Connect(function(dt)
+		local v = self.angle:getValue() + self.props.rotationRate * dt
+
+		if v > 360 then
+			v -= 360
+		elseif v < 0 then
+			v += 360
 		end
 
-		p2.updateAngle(v18)
+		self.updateAngle(v)
 	end)
 end
-function v7.willUnmount(p3) -- line: 41
-	p3.heartbeatConnection:Disconnect()
-end
-function v7.getDerivedStateFromProps(p4, _) -- line: 45
-	local ImageRectSize = p4.image.ImageRectSize
 
+function extended.willUnmount(p)
+	p.heartbeatConnection:Disconnect()
+end
+
+function extended.getDerivedStateFromProps(p, _)
+	local imageRectSize = p.image.ImageRectSize
 	return {
-		size = p4.size or UDim2.fromOffset(ImageRectSize.X, ImageRectSize.Y)
+		size = p.size or UDim2.fromOffset(imageRectSize.X, imageRectSize.Y)
 	}
 end
-function v7.render(p6) -- line: 52
-	-- upvalues: Roact (copy), Label (copy)
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = p6.state.size,
-		AnchorPoint = p6.props.anchorPoint,
-		Position = p6.props.position
-	}, {
-		inner = Roact.createElement(Label, {
-			BackgroundTransparency = 1,
-			Size = p6.state.size,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5),
-			Image = p6.props.image,
-			Rotation = p6.angle
-		})
-	})
+
+function extended.render(props)
+	return Roact.createElement(
+		"Frame",
+		{
+			Size = props.state.size,
+			AnchorPoint = props.props.anchorPoint,
+			Position = props.props.position,
+			BackgroundTransparency = 1
+		},
+		{
+			inner = Roact.createElement(Label, {
+				Size = props.state.size,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5),
+				Image = props.props.image,
+				Rotation = props.angle,
+				BackgroundTransparency = 1
+			})
+		}
+	)
 end
 
-return v7
+return extended

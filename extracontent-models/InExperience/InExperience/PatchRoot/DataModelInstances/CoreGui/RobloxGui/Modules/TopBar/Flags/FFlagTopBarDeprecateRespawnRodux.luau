@@ -1,5 +1,9 @@
 local CorePackages = game:GetService("CorePackages")
-local FFlagEnableConsoleExpControls = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
-local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
 
-return game:DefineFastFlag("TopBarDeprecateRespawnRodux2", false) and (FFlagEnableConsoleExpControls and Enabled())
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local Enabled = Chrome.Enabled
+
+return game:DefineFastFlag("TopBarDeprecateRespawnRodux2", false) and FFlagEnableConsoleExpControls and Enabled()

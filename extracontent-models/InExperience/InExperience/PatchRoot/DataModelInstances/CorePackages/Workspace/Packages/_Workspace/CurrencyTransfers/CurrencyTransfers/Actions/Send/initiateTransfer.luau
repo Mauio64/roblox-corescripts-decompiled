@@ -1,16 +1,15 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local SharedFlags = require(CurrencyTransfersParent.SharedFlags)
+local parent = CurrencyTransfers.Parent
+local SharedFlags = require(parent.SharedFlags)
+
 local GetFFlagCurrencyTransferUseBackendTransferLimits = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferUseBackendTransferLimits)
+local FFlagShowRemainingTransfersForNonPlus = require(CurrencyTransfers.Flags.FFlagShowRemainingTransfersForNonPlus)
 
 require(CurrencyTransfers.Stores.createTransferStore)
-
 local initiateTransferRequest = require(CurrencyTransfers.NetworkRequests.initiateTransferRequest)
 local PromptState = require(CurrencyTransfers.Enums.PromptState)
-
 require(CurrencyTransfers.Models.InitiateTransferModel)
 require(CurrencyTransfers.Models.ErrorTransferModel)
-
 local FailureReason = require(CurrencyTransfers.Enums.FailureReason)
 local handleTransferError = require(CurrencyTransfers.Actions.Send.handleTransferError)
 local handleTransferBlock = require(CurrencyTransfers.Actions.Send.handleTransferBlock)
@@ -21,85 +20,90 @@ local RobuxTransferFlowEventName = require(CurrencyTransfers.Enums.RobuxTransfer
 local logCurrencyTransferCounter = require(CurrencyTransfers.Utils.logCurrencyTransferCounter)
 local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransferFlowEvent)
 
-local function initiateTransfer(p1) -- line: 26
-	-- upvalues: PromptState (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), initiateTransferRequest (copy), setTransferPromptState (copy), GetFFlagCurrencyTransferUseBackendTransferLimits (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), FailureReason (copy), handleTransferBlock (copy), TransferRetryOrigin (copy), handleTransferError (copy)
-	local v18 = p1.getNetworkImpl()
-	local setPromptState = p1.setPromptState
-	local setTransferRequestId = p1.setTransferRequestId
-	local setRobuxBalanceAmount = p1.setRobuxBalanceAmount
-	local setBalanceReceivedFromApi = p1.setBalanceReceivedFromApi
-	local setUserRelationshipDetail = p1.setUserRelationshipDetail
-	local setRecipient = p1.setRecipient
-	local setSender = p1.setSender
-	local setMinimumTransferAmount = p1.setMinimumTransferAmount
-	local setMaximumTransferAmount = p1.setMaximumTransferAmount
-	local v28 = p1.getRecipientUserId(false)
-
+local function initiateTransfer(data)
+	local networkImpl = data.getNetworkImpl()
+	local setPromptState = data.setPromptState
+	local setTransferRequestId = data.setTransferRequestId
+	local setRobuxBalanceAmount = data.setRobuxBalanceAmount
+	local setBalanceReceivedFromApi = data.setBalanceReceivedFromApi
+	local setUserRelationshipDetail = data.setUserRelationshipDetail
+	local setRecipient = data.setRecipient
+	local setSender = data.setSender
+	local setMinimumTransferAmount = data.setMinimumTransferAmount
+	local setMaximumTransferAmount = data.setMaximumTransferAmount
+	local setTransferBenefitSource = data.setTransferBenefitSource
+	local setNumFreeTransfersRemaining = data.setNumFreeTransfersRemaining
+	local recipientUserId = data.getRecipientUserId(false)
 	setPromptState(PromptState.TransferRequested)
 
 	if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-		logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.initiate_attempted)
+		logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.initiate_attempted)
 	end
 
-	local t1 = {
-		recipientId = v28
-	}
-	local v30 = p1.getTransferOrigination()
+	local v = { recipientId = recipientUserId }
 
-	if v30 then
-		t1.transferOrigination = v30
+	local transferOrigination = data.getTransferOrigination()
+
+	if transferOrigination then
+		v.transferOrigination = transferOrigination
 	end
 
-	initiateTransferRequest(t1, nil, v18):andThen(function(p2) -- line: 51
-		-- upvalues: setTransferPromptState (copy), p1 (copy), PromptState (copy), setTransferRequestId (copy), setRobuxBalanceAmount (copy), setBalanceReceivedFromApi (copy), setUserRelationshipDetail (copy), setRecipient (copy), setSender (copy), GetFFlagCurrencyTransferUseBackendTransferLimits (copy), setMinimumTransferAmount (copy), setMaximumTransferAmount (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy)
-		setTransferPromptState(p1, PromptState.TransferStarted)
+	initiateTransferRequest(v, nil, networkImpl):andThen(function(data2)
+		setTransferPromptState(data, PromptState.TransferStarted)
 
-		if p2 and (p2.transferRequestId and p2.robuxTransfer) then
-			setTransferRequestId(p2.transferRequestId)
-			setRobuxBalanceAmount(p2.senderRobuxBalance)
+		if data2 and data2.transferRequestId and data2.robuxTransfer then
+			setTransferRequestId(data2.transferRequestId)
+			setRobuxBalanceAmount(data2.senderRobuxBalance)
 			setBalanceReceivedFromApi(true)
-			setUserRelationshipDetail(p2.userRelationshipDetail)
-			setRecipient(p2.robuxTransfer.recipient)
-			setSender(p2.robuxTransfer.sender)
+			setUserRelationshipDetail(data2.userRelationshipDetail)
+			setRecipient(data2.robuxTransfer.recipient)
+			setSender(data2.robuxTransfer.sender)
 
 			if GetFFlagCurrencyTransferUseBackendTransferLimits() then
-				if p2.minimumTransferAmount then
-					setMinimumTransferAmount(p2.minimumTransferAmount)
+				if data2.minimumTransferAmount then
+					setMinimumTransferAmount(data2.minimumTransferAmount)
 				end
 
-				if p2.maximumTransferAmount then
-					setMaximumTransferAmount(p2.maximumTransferAmount)
+				if data2.maximumTransferAmount then
+					setMaximumTransferAmount(data2.maximumTransferAmount)
 				end
 			end
 
-			setTransferPromptState(p1, PromptState.TransferInput)
-			logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferInitiateSucceededCounter)
+			if FFlagShowRemainingTransfersForNonPlus then
+				setTransferBenefitSource(data2.transferBenefitSource)
+				setNumFreeTransfersRemaining(data2.numFreeTransfersRemaining)
+			end
+
+			setTransferPromptState(data, PromptState.TransferInput)
+			logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferInitiateSucceededCounter)
 
 			if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-				logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.initiate_succeeded)
+				logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.initiate_succeeded)
 			end
 		end
-	end):catch(function(p3) -- line: 79
-		-- upvalues: logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), FailureReason (copy), handleTransferBlock (copy), TransferRetryOrigin (copy), handleTransferError (copy)
-		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferInitiateFailedCounter)
+	end):catch(function(data2)
+		logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferInitiateFailedCounter)
 
 		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-			logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.initiate_failed)
+			logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.initiate_failed)
 		end
 
-		if typeof(p3) == "table" and p3.errorMessage then
-			if p3.failureReason == FailureReason.AmpRecourseAvailable and p3.ampRecourseActions and p3.ampFeatureCheck then
-				handleTransferBlock(p1, p3.ampRecourseActions, p3.ampFeatureCheck, TransferRetryOrigin.InitiateTransfer)
-
-				return
-			end
-
-			handleTransferError(p1, p3)
-
-			return
+		if typeof(data2) ~= "table" or not data2.errorMessage then
+			handleTransferError(data, nil)
+		elseif
+			data2.failureReason == FailureReason.AmpRecourseAvailable
+			and data2.ampRecourseActions
+			and data2.ampFeatureCheck
+		then
+			handleTransferBlock(
+				data,
+				data2.ampRecourseActions,
+				data2.ampFeatureCheck,
+				TransferRetryOrigin.InitiateTransfer
+			)
+		else
+			handleTransferError(data, data2)
 		end
-
-		handleTransferError(p1, nil)
 	end)
 end
 

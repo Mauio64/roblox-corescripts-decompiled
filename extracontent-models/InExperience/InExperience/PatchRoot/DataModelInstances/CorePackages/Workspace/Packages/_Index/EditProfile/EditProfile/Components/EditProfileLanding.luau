@@ -1,1 +1,3 @@
-return (require(script.EditProfileLandingContainer))
+local EditProfileLandingContainer = require(script.EditProfileLandingContainer)
+
+return EditProfileLandingContainer

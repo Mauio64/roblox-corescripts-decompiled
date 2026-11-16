@@ -1,29 +1,38 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.types)
 
-require(ParentParent.types)
-
-return function(p1, p2: ((...any) -> ...any), p3) -- line: 11
+return function(list, callback, p): boolean
 	if _G.__DEV__ then
-		if typeof(p1) ~= "table" then
-			error(string.format("Array.every called on %s", (typeof(p1))))
+		if typeof(list) ~= "table" then
+			error(string.format("Array.every called on %s", (typeof(list))))
 		end
 
-		if typeof(p2) ~= "function" then
+		if typeof(callback) ~= "function" then
 			error("callback is not a function")
 		end
 	end
 
-	local v5 = #p1
-	local n1 = 1
+	local v = #list
+	local v2 = 1
 
-	while n1 <= v5 do
-		local v7 = p1[n1]
+	while v2 <= v do
+		local item = list[v2]
 
-		if v7 ~= nil and not if p3 == nil then p2(v7, n1, p1) else p2(p3, v7, n1, p1) then
-			return false
+		if item ~= nil then
+			local v3
+
+			if p == nil then
+				v3 = callback(item, v2, list)
+			else
+				v3 = callback(p, item, v2, list)
+			end
+
+			if not v3 then
+				return false
+			end
 		end
 
-		n1 += 1
+		v2 += 1
 	end
 
 	return true

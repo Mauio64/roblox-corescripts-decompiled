@@ -1,40 +1,43 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+
 local PaginationSize = require(Foundation.Enums.PaginationSize)
 
 require(Foundation.Providers.Style.Tokens)
 
-local t1 = {
+local v = {
 	[PaginationSize.Small] = "row align-x-center align-y-center radius-circle size-600-600",
 	[PaginationSize.Medium] = "row align-x-center align-y-center radius-circle size-800-800"
 }
-local t2 = {
+
+local v2 = {
 	[PaginationSize.Small] = "text-label-small",
 	[PaginationSize.Medium] = "text-label-medium"
 }
+local PaginationUtils = {}
 
-return {
-	getCircularSlotTag = function(p1) -- line: 21
-		-- upvalues: t1 (copy)
-		return t1[p1]
-	end,
-	getPageLabelTag = function(p2) -- line: 25
-		-- upvalues: t2 (copy)
-		return `auto-xy { t2[p2] } content-default text-align-x-center text-align-y-center`
-	end,
-	getPageLabelTextTag = function(p3) -- line: 29
-		-- upvalues: t2 (copy)
-		return `auto-xy { t2[p3] } text-align-x-center text-align-y-center`
-	end,
-	getSlotCursor = function(p4) -- line: 37
-		local v10 = math.floor(p4.Stroke.Thicker)
+function PaginationUtils.getCircularSlotTag(p)
+	return v[p]
+end
 
-		return {
-			radius = UDim.new(0, p4.Radius.Circle),
-			offset = p4.Size.Size_150,
-			borderWidth = v10
-		}
-	end,
-	needsWidePageSlot = function(n1: number) -- line: 33
-		return n1 > 999
-	end
-}
+function PaginationUtils.getPageLabelTag(p)
+	return `auto-xy {v2[p]} content-default text-align-x-center text-align-y-center`
+end
+
+function PaginationUtils.getPageLabelTextTag(p)
+	return `auto-xy {v2[p]} text-align-x-center text-align-y-center`
+end
+
+function PaginationUtils.getSlotCursor(data)
+	local thicker = math.floor(data.Stroke.Thicker)
+	return {
+		radius = UDim.new(0, data.Radius.Circle),
+		offset = data.Size.Size_150,
+		borderWidth = thicker
+	}
+end
+
+function PaginationUtils.needsWidePageSlot(p: number): boolean
+	return p > 999
+end
+
+return PaginationUtils

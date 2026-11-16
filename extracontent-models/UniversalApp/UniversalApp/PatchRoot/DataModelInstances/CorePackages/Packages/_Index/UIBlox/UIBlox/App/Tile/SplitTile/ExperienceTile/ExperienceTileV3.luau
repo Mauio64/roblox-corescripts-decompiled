@@ -1,232 +1,261 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local ParentParent = scriptParentParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParentParent.Core
-local ParentParentParentParent = ParentParentParent.Parent
-local Cryo = require(ParentParentParentParent.Cryo)
-local React = require(ParentParentParentParent.React)
-local Roact = require(ParentParentParentParent.Roact)
-local getControlStateColor = require(ParentParentParent.Utility.getControlStateColor)
-local setDefault = require(ParentParentParent.Utility.setDefault)
-local useStyle = require(Core.Style.useStyle)
-local Interactable = require(Core.Control.Interactable)
-local useControlState = require(Core.Control.useControlState)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent.Parent
+local parent4 = parent3.Parent
+local core = parent4.Core
+local parent5 = parent4.Parent
 
-require(ParentParent.Style.StyleTypes)
-require(ParentParent.Style.Fonts)
+local Cryo = require(parent5.Cryo)
+local React = require(parent5.React)
+local Roact = require(parent5.Roact)
+local getControlStateColor = require(parent4.Utility.getControlStateColor)
+local setDefault = require(parent4.Utility.setDefault)
 
-local useCursor = require(ParentParent.SelectionCursor.useCursor)
-local Constants = require(scriptParent.Constants)
-local ExperienceActionRow = require(scriptParent.ExperienceActionRow)
-local AspectRatioMode = require(scriptParent.Enum.AspectRatioMode)
-local getAspectRatio = require(scriptParent.getAspectRatio)
-local VerticalTile = require(scriptParentParent.VerticalTile.VerticalTile)
-local TileContentPanel = require(scriptParentParent.TileContentPanel)
-local VerticalTileThumbnail = require(scriptParentParent.VerticalTile.VerticalTileThumbnail)
+local useStyle = require(core.Style.useStyle)
+local Interactable = require(core.Control.Interactable)
+local useControlState = require(core.Control.useControlState)
+require(parent3.Style.StyleTypes)
+require(parent3.Style.Fonts)
+local useCursor = require(parent3.SelectionCursor.useCursor)
 
-local function renderContentWithPadding(p1, p2, t1: {[any]: any}, t2: {[any]: any}) -- line: 82
-	-- upvalues: React (copy), Cryo (copy), Roact (copy)
-	return React.createElement(p1, Cryo.Dictionary.join({
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, t1), {
-		Padding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, p2.Left),
-			PaddingRight = UDim.new(0, p2.Right),
-			PaddingTop = UDim.new(0, p2.Top),
-			PaddingBottom = UDim.new(0, p2.Bottom)
-		}),
-		Content = Roact.createFragment(t2)
-	})
+local Constants = require(parent.Constants)
+local ExperienceActionRow = require(parent.ExperienceActionRow)
+local AspectRatioMode = require(parent.Enum.AspectRatioMode)
+local getAspectRatio = require(parent.getAspectRatio)
+local VerticalTile = require(parent2.VerticalTile.VerticalTile)
+local TileContentPanel = require(parent2.TileContentPanel)
+local VerticalTileThumbnail = require(parent2.VerticalTile.VerticalTileThumbnail)
+
+local function renderContentWithPadding(p, props, p2, p3)
+	return React.createElement(
+		p,
+		Cryo.Dictionary.join({ Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }, p2),
+		{
+			Padding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, props.Left),
+				PaddingRight = UDim.new(0, props.Right),
+				PaddingTop = UDim.new(0, props.Top),
+				PaddingBottom = UDim.new(0, props.Bottom)
+			}),
+			Content = Roact.createFragment(p3)
+		}
+	)
 end
-local function getFinalAspectRatioMode(p3, b1: boolean) -- line: 106
-	-- upvalues: AspectRatioMode (copy)
-	if p3 ~= nil then
-		if b1 then
+
+local function getFinalAspectRatioMode(thumbnailAspectRatioOverride, flag: boolean) -- 1 equivalent call inferred from this helper
+	if thumbnailAspectRatioOverride == nil then
+		if flag then
 			return AspectRatioMode.Wide
 		end
 
-		return p3
-	end
-
-	if b1 then
+		return AspectRatioMode.Square
+	elseif flag then
 		return AspectRatioMode.Wide
+	else
+		return thumbnailAspectRatioOverride
 	end
-
-	return AspectRatioMode.Square
 end
-local function ExperienceTileV3(t3: {[any]: any}) -- line: 122
-	-- upvalues: useStyle (copy), setDefault (copy), Constants (copy), Cryo (copy), React (copy), AspectRatioMode (copy), getAspectRatio (copy), renderContentWithPadding (copy), VerticalTileThumbnail (copy), Roact (copy), TileContentPanel (copy), ExperienceActionRow (copy), useControlState (copy), useCursor (copy), getControlStateColor (copy), Interactable (copy), VerticalTile (copy)
-	local v33 = useStyle()
-	local v34 = setDefault(t3.footerHeight, Constants.DEFAULT_FOOTER_HEIGHT)
-	local v35 = setDefault(t3.isHoverEnabled, false)
-	local v36 = setDefault(t3.hasBackground, true)
-	local v37 = Constants.getDefaultStyleProps(v33)
-	local v38 = Cryo.Dictionary.join(v37, t3.styleProps or {})
-	local backgroundColor = v38.backgroundColor
-	local border = v38.border
-	local dropShadow = v38.dropShadow
-	local topContentPadding = v38.topContentPadding
-	local bottomContentPadding = v38.bottomContentPadding
-	local overlayColors = v38.overlayColors
-	local selectionCursorPadding = v38.selectionCursorPadding
-	local contentTitlePadding = v38.contentTitlePadding
-	local contentTitleFont = v38.contentTitleFont
-	local v48 = setDefault(t3.contentTextLineCount, Constants.DEFAULT_TEXT_LINE_COUNT)
-	local v49 = React.useCallback(function(b2: boolean) -- line: 140
-		-- upvalues: v33 (copy), t3 (copy), AspectRatioMode (copy), getAspectRatio (copy), renderContentWithPadding (copy), topContentPadding (copy), React (copy), VerticalTileThumbnail (copy), border (copy), v36 (copy), Roact (copy)
-		local v59 = b2 and not v33.Settings.ReducedMotion
-		local thumbnailAspectRatioOverride = t3.thumbnailAspectRatioOverride
-		local v61 = if thumbnailAspectRatioOverride == nil then if not v59 then AspectRatioMode.Square else AspectRatioMode.Wide else if not v59 then thumbnailAspectRatioOverride else AspectRatioMode.Wide
-		local v62 = getAspectRatio(v61)
-		local v63 = if v61 ~= AspectRatioMode.Wide then t3.thumbnail else t3.wideThumbnail
 
-		return renderContentWithPadding("Frame", topContentPadding, {
-			ZIndex = 3,
-			Size = UDim2.new(1, 0, v62, 0),
-			SizeConstraint = Enum.SizeConstraint.RelativeXX
-		}, {
+local function ExperienceTileV3(props)
+	local v = useStyle()
+	local v2 = setDefault(props.footerHeight, Constants.DEFAULT_FOOTER_HEIGHT)
+	local isHoverEnabled = setDefault(props.isHoverEnabled, false)
+	local hasBackground = setDefault(props.hasBackground, true)
+	local defaultStyleProps = Constants.getDefaultStyleProps(v)
+	local joined = Cryo.Dictionary.join(defaultStyleProps, props.styleProps or {})
+	local backgroundColor = joined.backgroundColor
+	local border = joined.border
+	local dropShadow = joined.dropShadow
+	local topContentPadding = joined.topContentPadding
+	local bottomContentPadding = joined.bottomContentPadding
+	local overlayColors = joined.overlayColors
+	local selectionCursorPadding = joined.selectionCursorPadding
+	local contentTitlePadding = joined.contentTitlePadding
+	local contentTitleFont = joined.contentTitleFont
+	local textLineCount = setDefault(props.contentTextLineCount, Constants.DEFAULT_TEXT_LINE_COUNT)
+
+	local renderTopContent = React.useCallback(function(flag: boolean)
+		local v3 = flag and not v.Settings.ReducedMotion
+
+		local finalAspectRatioMode = getFinalAspectRatioMode(props.thumbnailAspectRatioOverride, v3) -- inferred equivalent call
+		local aspectRatio = getAspectRatio(finalAspectRatioMode)
+		local thumbnail
+
+		if finalAspectRatioMode == AspectRatioMode.Wide then
+			thumbnail = props.wideThumbnail
+		else
+			thumbnail = props.thumbnail
+		end
+
+		local v4 = {
+			Size = UDim2.new(1, 0, aspectRatio, 0),
+			SizeConstraint = Enum.SizeConstraint.RelativeXX,
+			ZIndex = 3
+		}
+
+		local v5 = {
 			Thumbnail = React.createElement(VerticalTileThumbnail, {
-				isTopRounded = true,
-				aspectRatio = v62,
+				aspectRatio = aspectRatio,
 				border = border,
-				isBottomRounded = not v36,
-				thumbnail = v63
+				isTopRounded = true,
+				isBottomRounded = not hasBackground,
+				thumbnail = thumbnail
 			}),
-			TopContentOverlay = if t3.renderTopContentOverlay == nil then nil else Roact.createFragment((t3.renderTopContentOverlay(v59, border)))
-		})
+			TopContentOverlay = 0
+		}
+		local topContentOverlay
+
+		if props.renderTopContentOverlay ~= nil then
+			topContentOverlay = Roact.createFragment((props.renderTopContentOverlay(v3, border)))
+		end
+
+		v5.TopContentOverlay = topContentOverlay
+		return renderContentWithPadding("Frame", topContentPadding, v4, v5)
 	end, {
-		t3.renderTopContentOverlay,
-		t3.wideThumbnail,
-		t3.thumbnail,
-		t3.thumbnailAspectRatioOverride,
+		props.renderTopContentOverlay,
+		props.wideThumbnail,
+		props.thumbnail,
+		props.thumbnailAspectRatioOverride,
 		topContentPadding,
 		border,
-		v36
+		hasBackground
 	})
-	local v50 = React.useCallback(function(b3: boolean) -- line: 174
-		-- upvalues: v48 (copy), contentTitleFont (copy), v33 (copy), contentTitlePadding (copy), v34 (copy), bottomContentPadding (copy), t3 (copy), renderContentWithPadding (copy), border (copy), React (copy), TileContentPanel (copy)
-		local v65 = math.floor(v48 * contentTitleFont.RelativeSize * v33.Font.BaseSize + contentTitlePadding) + v34 + bottomContentPadding.Top + bottomContentPadding.Bottom
 
-		if t3.renderBottomContent ~= nil then
+	local renderBottomContent = React.useCallback(function(flag: boolean)
+		local v3 = math.floor(textLineCount * contentTitleFont.RelativeSize * v.Font.BaseSize + contentTitlePadding) + v2 + bottomContentPadding.Top + bottomContentPadding.Bottom
+
+		if props.renderBottomContent ~= nil then
 			return renderContentWithPadding("Frame", bottomContentPadding, {
-				Size = UDim2.new(1, 0, 0, v65)
+				Size = UDim2.new(1, 0, 0, v3)
 			}, {
-				BottomContent = t3.renderBottomContent(b3, border)
+				BottomContent = props.renderBottomContent(flag, border)
 			})
 		end
 
-		return React.createElement(TileContentPanel, {
-			hasSidePadding = true,
-			contentTitle = t3.experienceName,
-			panelHeight = UDim.new(0, v65),
+		local createElement = React.createElement
+		local v4 = {
+			contentTitle = props.experienceName,
+			panelHeight = UDim.new(0, v3),
 			outerPadding = bottomContentPadding,
-			footerHeight = UDim.new(0, v34),
-			textLineCount = v48,
+			footerHeight = UDim.new(0, v2),
+			textLineCount = textLineCount,
 			titleFont = contentTitleFont,
 			titlePadding = contentTitlePadding,
-			contentFooter = if not b3 then nil else t3.footer
-		})
+			contentFooter = 0,
+			hasSidePadding = true
+		}
+		local contentFooter
+
+		if flag then
+			contentFooter = props.footer
+		end
+
+		v4.contentFooter = contentFooter
+		return createElement(TileContentPanel, v4)
 	end, {
-		t3.experienceName,
-		t3.renderBottomContent,
-		t3.footer,
-		v48,
+		props.experienceName,
+		props.renderBottomContent,
+		props.footer,
+		textLineCount,
 		contentTitlePadding,
 		bottomContentPadding,
-		v34,
+		v2,
 		contentTitleFont,
 		border,
-		v33
+		v
 	})
-	local v51 = React.useCallback(function(b4: boolean?) -- line: 213
-		-- upvalues: t3 (copy), React (copy), ExperienceActionRow (copy), v34 (copy), bottomContentPadding (copy), renderContentWithPadding (copy)
-		if t3.renderBottomContent ~= nil then
+
+	local renderFooterRow = React.useCallback(function(flag: boolean?)
+		if props.renderBottomContent ~= nil then
 			return nil
 		end
 
-		if b4 then
-			if t3.renderActionRow ~= nil then
-				return t3.renderActionRow()
-			end
-
-			return React.createElement(ExperienceActionRow, t3.actionRowProps)
+		if not flag then
+			local v3 = v2 + bottomContentPadding.Top + bottomContentPadding.Bottom
+			return renderContentWithPadding(
+				"Frame",
+				bottomContentPadding,
+				{
+					Size = UDim2.new(1, 0, 0, v3),
+					Position = UDim2.new(0, 0, 1, 0),
+					AnchorPoint = Vector2.new(0, 1)
+				},
+				{
+					FooterContent = React.createElement("Frame", {
+						Size = UDim2.new(1, 0, 0, 0),
+						Position = UDim2.new(0, 0, 1, 0),
+						AnchorPoint = Vector2.new(0, 1),
+						BackgroundTransparency = 1,
+						AutomaticSize = Enum.AutomaticSize.Y
+					}, { Footer = props.footer })
+				}
+			)
 		end
 
-		local v67 = v34 + bottomContentPadding.Top + bottomContentPadding.Bottom
+		if props.renderActionRow == nil then
+			return React.createElement(ExperienceActionRow, props.actionRowProps)
+		end
 
-		return renderContentWithPadding("Frame", bottomContentPadding, {
-			Size = UDim2.new(1, 0, 0, v67),
-			Position = UDim2.new(0, 0, 1, 0),
-			AnchorPoint = Vector2.new(0, 1)
-		}, {
-			FooterContent = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, 0),
-				Position = UDim2.new(0, 0, 1, 0),
-				AnchorPoint = Vector2.new(0, 1),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				Footer = t3.footer
-			})
-		})
+		return props.renderActionRow()
 	end, {
-		t3.footer,
-		t3.actionRowProps,
-		t3.renderBottomContent,
-		t3.renderActionRow,
+		props.footer,
+		props.actionRowProps,
+		props.renderBottomContent,
+		props.renderActionRow,
 		bottomContentPadding,
-		v34
+		v2
 	})
-	local v52, v53 = useControlState()
-	local v54 = useCursor(border.CornerRadius)
-	local v55 = getControlStateColor(v52, overlayColors)
-	local Color, Transparency
 
-	if v55 ~= nil then
-		Color = v55.Color
-		Transparency = v55.Transparency
+	local v3, onStateChanged = useControlState()
+
+	local selectionImageObject = useCursor(border.CornerRadius)
+	local controlStateColor = getControlStateColor(v3, overlayColors)
+	local color, backgroundTransparency
+
+	if controlStateColor == nil then
+		backgroundTransparency = 1
 	else
-		Color = nil
-		Transparency = 1
+		color = controlStateColor.Color
+		backgroundTransparency = controlStateColor.Transparency
 	end
 
 	return renderContentWithPadding(Interactable, selectionCursorPadding, {
 		Size = UDim2.new(1, 0, 1, 0),
-		SelectionImageObject = v54,
-		onStateChanged = v53,
-		isDisabled = t3.isDisabled,
-		[React.Event.Activated] = t3.onActivated,
-		[React.Event.SelectionGained] = t3.onSelectionGained,
-		[React.Event.SelectionLost] = t3.onSelectionLost
+		SelectionImageObject = selectionImageObject,
+		onStateChanged = onStateChanged,
+		isDisabled = props.isDisabled,
+		[React.Event.Activated] = props.onActivated,
+		[React.Event.SelectionGained] = props.onSelectionGained,
+		[React.Event.SelectionLost] = props.onSelectionLost
 	}, {
 		VerticalTile = React.createElement(VerticalTile, {
+			hasBackground = hasBackground,
+			hasOutline = setDefault(props.hasOutline, true),
+			isHoverEnabled = isHoverEnabled,
+			hoverDelay = props.hoverDelay,
+			onHoverChanged = props.onHoverChanged,
 			isOverlayVisible = false,
 			isActive = false,
+			renderTopContent = renderTopContent,
+			renderBottomContent = renderBottomContent,
+			renderFooterRow = renderFooterRow,
 			reservedBottomHeight = 0,
-			hasBackground = v36,
-			hasOutline = setDefault(t3.hasOutline, true),
-			isHoverEnabled = v35,
-			hoverDelay = t3.hoverDelay,
-			onHoverChanged = t3.onHoverChanged,
-			renderTopContent = v49,
-			renderBottomContent = v50,
-			renderFooterRow = v51,
 			backgroundColor = backgroundColor,
 			border = border,
 			dropShadow = dropShadow
 		}),
-		OverlayColor = React.createElement("Frame", {
-			ZIndex = 10,
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundColor3 = Color,
-			BackgroundTransparency = Transparency
-		}, {
-			Corner = React.createElement("UICorner", {
-				CornerRadius = border.CornerRadius
-			})
-		})
+		OverlayColor = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundColor3 = color,
+				ZIndex = 10,
+				BackgroundTransparency = backgroundTransparency
+			},
+			{
+				Corner = React.createElement("UICorner", { CornerRadius = border.CornerRadius })
+			}
+		)
 	})
 end
 

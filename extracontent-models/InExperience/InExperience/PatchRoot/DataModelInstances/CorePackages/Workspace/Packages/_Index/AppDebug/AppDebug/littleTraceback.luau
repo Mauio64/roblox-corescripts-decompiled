@@ -1,24 +1,24 @@
-local function littleTraceback(n1: number?) -- line: 7
-	local v3 = 1 + (n1 or 5)
-	local trace = debug.traceback()
-	local v5 = nil
-	local n2 = 1
+local function littleTraceback(value: number?)
+	local v = 1 + (value or 5)
+	local traceback = debug.traceback()
+	local v2 = 1
+	local v3 = nil
 
-	for _ = 1, v3 do
-		local _, stop = trace:find("\n", n2, true)
+	for _ = 1, v do
+		local _, v4 = traceback:find("\n", v2, true)
 
-		if not stop then
-			return trace:sub(v5 or 1)
+		if not v4 then
+			return traceback:sub(v3 or 1)
 		end
 
-		n2 = stop + 1
+		v2 = v4 + 1
 
-		if not v5 then
-			v5 = n2
+		if not v3 then
+			v3 = v2
 		end
 	end
 
-	return trace:sub(v5 or 1, n2 - 1)
+	return traceback:sub(v3 or 1, v2 - 1)
 end
 
 return littleTraceback

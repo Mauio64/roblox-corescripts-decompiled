@@ -1,34 +1,48 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Roact = require(Parent.Roact)
-local v3 = Roact.PureComponent:extend("AppCarousel")
+local parent = script:FindFirstAncestor("AppBlox").Parent
+local Roact = require(parent.Roact)
 
-function v3.render(p1) -- line: 9
-	-- upvalues: Roact (copy)
-	local carouselHeight = p1.props.carouselHeight
-	local canvasWidth = p1.props.canvasWidth
-	local items = p1.props.items
-	local onChangeCanvasPosition = p1.props.onChangeCanvasPosition
-	local onRefCallback = p1.props.onRefCallback
-	local canvasPosition = p1.props.canvasPosition
-	local scrollingAnimationActive = p1.props.scrollingAnimationActive
-	local shouldExpandToFitContentHeight = p1.props.shouldExpandToFitContentHeight
+local extended = Roact.PureComponent:extend("AppCarousel")
 
-	return Roact.createElement("ScrollingFrame", {
-		Size = UDim2.new(1, 0, 0, carouselHeight),
-		AutomaticSize = if not shouldExpandToFitContentHeight then nil else Enum.AutomaticSize.Y,
-		ScrollBarThickness = 0,
-		BackgroundTransparency = 1,
-		ClipsDescendants = false,
-		CanvasSize = UDim2.new(0, canvasWidth, 0, carouselHeight),
-		AutomaticCanvasSize = if not shouldExpandToFitContentHeight then nil else Enum.AutomaticSize.Y,
-		CanvasPosition = canvasPosition,
-		ScrollingEnabled = not scrollingAnimationActive,
-		ScrollingDirection = Enum.ScrollingDirection.X,
-		ElasticBehavior = Enum.ElasticBehavior.Always,
-		Selectable = false,
-		[Roact.Change.CanvasPosition] = onChangeCanvasPosition,
-		[Roact.Ref] = onRefCallback
-	}, items)
+function extended.render(p)
+	local carouselHeight = p.props.carouselHeight
+	local canvasWidth = p.props.canvasWidth
+	local items = p.props.items
+	local onChangeCanvasPosition = p.props.onChangeCanvasPosition
+	local onRefCallback = p.props.onRefCallback
+
+	local canvasPosition = p.props.canvasPosition
+	local scrollingEnabled = not p.props.scrollingAnimationActive
+	local shouldExpandToFitContentHeight = p.props.shouldExpandToFitContentHeight
+
+	local createElement = Roact.createElement
+	local v = {}
+	v.Size = UDim2.new(1, 0, 0, carouselHeight)
+	local automaticSize
+
+	if shouldExpandToFitContentHeight then
+		automaticSize = Enum.AutomaticSize.Y
+	end
+
+	v.AutomaticSize = automaticSize
+	v.ScrollBarThickness = 0
+	v.BackgroundTransparency = 1
+	v.ClipsDescendants = false
+	v.CanvasSize = UDim2.new(0, canvasWidth, 0, carouselHeight)
+	local automaticCanvasSize
+
+	if shouldExpandToFitContentHeight then
+		automaticCanvasSize = Enum.AutomaticSize.Y
+	end
+
+	v.AutomaticCanvasSize = automaticCanvasSize
+	v.CanvasPosition = canvasPosition
+	v.ScrollingEnabled = scrollingEnabled
+	v.ScrollingDirection = Enum.ScrollingDirection.X
+	v.ElasticBehavior = Enum.ElasticBehavior.Always
+	v.Selectable = false
+	v[Roact.Change.CanvasPosition] = onChangeCanvasPosition
+	v[Roact.Ref] = onRefCallback
+	return createElement("ScrollingFrame", v, items)
 end
 
-return v3
+return extended

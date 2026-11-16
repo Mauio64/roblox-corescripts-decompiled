@@ -1,23 +1,47 @@
-local ParentParent = script:FindFirstAncestor("CatalogNetworking").Parent.Parent
+local parent = script:FindFirstAncestor("CatalogNetworking").Parent.Parent
+
 local networkRequests = script.networkRequests
 local createGetItemAndBundleDetails = require(networkRequests.createGetItemAndBundleDetails)
 
 require(script.Types)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSocialEnableProfileInspectAndBuy = SharedFlags.FFlagSocialEnableProfileInspectAndBuy
 
-local FFlagSocialEnableProfileInspectAndBuy = require(ParentParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuy
-
-local function createRequestThunks(p1) -- line: 21
-	-- upvalues: createGetItemAndBundleDetails (copy)
+local function createRequestThunks(p)
 	return {
-		GetItemAndBundleDetails = createGetItemAndBundleDetails(p1)
+		GetItemAndBundleDetails = createGetItemAndBundleDetails(p)
 	}
+end
+
+local purchaseDetailsStore
+
+if FFlagSocialEnableProfileInspectAndBuy then
+	purchaseDetailsStore = require(script.stores.PurchaseDetailsStore)
+end
+
+local collectibleProductIdStore
+
+if FFlagSocialEnableProfileInspectAndBuy then
+	collectibleProductIdStore = require(script.stores.CollectibleProductIdStore)
+end
+
+local bundleOwnershipStore
+
+if FFlagSocialEnableProfileInspectAndBuy then
+	bundleOwnershipStore = require(script.stores.BundleOwnershipStore)
+end
+
+local itemDetailsStore
+
+if FFlagSocialEnableProfileInspectAndBuy then
+	itemDetailsStore = require(script.stores.ItemDetailsStore)
 end
 
 return {
 	config = createRequestThunks,
-	PurchaseDetailsStore = if not FFlagSocialEnableProfileInspectAndBuy then nil else require(script.stores.PurchaseDetailsStore),
-	CollectibleProductIdStore = if not FFlagSocialEnableProfileInspectAndBuy then nil else require(script.stores.CollectibleProductIdStore),
-	BundleOwnershipStore = if not FFlagSocialEnableProfileInspectAndBuy then nil else require(script.stores.BundleOwnershipStore),
-	ItemDetailsStore = if not FFlagSocialEnableProfileInspectAndBuy then nil else require(script.stores.ItemDetailsStore),
+	PurchaseDetailsStore = purchaseDetailsStore,
+	CollectibleProductIdStore = collectibleProductIdStore,
+	BundleOwnershipStore = bundleOwnershipStore,
+	ItemDetailsStore = itemDetailsStore,
 	["jest.config"] = script["jest.config"]
 }

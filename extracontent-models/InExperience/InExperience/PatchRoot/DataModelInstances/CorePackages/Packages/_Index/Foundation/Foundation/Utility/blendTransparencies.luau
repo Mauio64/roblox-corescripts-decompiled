@@ -1,13 +1,13 @@
-local function blendTransparencies(n1: number?, n2: number?) -- line: 1
-	if n1 == nil then
-		return n2 or 0
+local function blendTransparencies(value: number?, value2: number?)
+	if value == nil then
+		return value2 or 0
 	end
 
-	if n2 == nil then
-		return n1 or 0
+	if value2 == nil then
+		return value or 0
 	end
 
-	return 1 - (1 - n1) * (1 - n2)
+	return 1 - (1 - value) * (1 - value2)
 end
 
 return blendTransparencies

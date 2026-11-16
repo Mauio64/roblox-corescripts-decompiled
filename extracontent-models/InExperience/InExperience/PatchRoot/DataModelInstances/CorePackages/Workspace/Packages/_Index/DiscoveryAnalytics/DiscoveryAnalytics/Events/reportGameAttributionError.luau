@@ -1,10 +1,15 @@
 local DiscoveryAnalytics = script:FindFirstAncestor("DiscoveryAnalytics")
-local DiscoveryAnalyticsParent = DiscoveryAnalytics.Parent
-local LoggingProtocol = require(DiscoveryAnalyticsParent.LoggingProtocol)
-local t = require(DiscoveryAnalyticsParent.t)
+
+local parent = DiscoveryAnalytics.Parent
+local LoggingProtocol = require(parent.LoggingProtocol)
+
+local t = require(parent.t)
+
 local reportWarning = require(DiscoveryAnalytics.Points.reportWarning)
-local v6 = game:DefineFastInt("LuaAppGameAttributionErrorEventThrottleHundrethsPercent", 0)
-local v7 = t.strictInterface({
+
+local defineFastInt = game:DefineFastInt("LuaAppGameAttributionErrorEventThrottleHundrethsPercent", 0)
+
+local strictInterface = t.strictInterface({
 	errorType = t.string,
 	clickedUniverseId = t.string,
 	universeId = t.optional(t.string),
@@ -13,33 +18,28 @@ local v7 = t.strictInterface({
 	sortIndex = t.number,
 	sortEntryIndex = t.optional(t.number)
 })
-local t1 = {
+
+local v = {
 	eventName = "GameAttributionError",
-	description = "Tracks failures to resolve game attribution errors",
-	backends = {
-		LoggingProtocol.TelemetryBackends.Points,
-		LoggingProtocol.TelemetryBackends.EventIngest
-	},
-	throttlingPercentage = v6,
-	lastUpdated = {
-		25,
-		7,
-		30
-	}
+	backends = { LoggingProtocol.TelemetryBackends.Points, LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 25, 7, 30 },
+	description = "Tracks failures to resolve game attribution errors"
 }
 
-local function reportGameAttributionError(p1, p2) -- line: 36
-	-- upvalues: v7 (copy), reportWarning (copy), LoggingProtocol (copy), t1 (copy)
-	local v12, v13 = v7(p2)
+local function reportGameAttributionError(p, p2)
+	local v2, v3 = strictInterface(p2)
 
-	if not v12 then
-		reportWarning(LoggingProtocol.default, "EventLogging", v13)
+	if not v2 then
+		reportWarning(LoggingProtocol.default, "EventLogging", v3)
 	end
 
-	LoggingProtocol.default:logRobloxTelemetryEvent(t1, {
-		"addSessionInfo",
-		LoggingProtocol.StandardizedFields.addOsInfo
-	}, p2, p1)
+	LoggingProtocol.default:logRobloxTelemetryEvent(
+		v,
+		{ "addSessionInfo", LoggingProtocol.StandardizedFields.addOsInfo },
+		p2,
+		p
+	)
 end
 
 return reportGameAttributionError

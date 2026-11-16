@@ -1,153 +1,170 @@
-local t1 = {}
+local CharacterUtility = {}
 
-local function getHeadAttachments(p1) -- line: 11
-	local t2 = {}
-	local Head = p1:FindFirstChild("Head")
+local function getHeadAttachments(instance)
+	local nameSet = {}
+	local head = instance:FindFirstChild("Head")
 
-	if Head then
-		for _, child in pairs(Head:GetChildren()) do
-			if child:IsA("Attachment") then
-				t2[child.Name] = true
+	if head then
+		for _, attachment in pairs(head:GetChildren()) do
+			if attachment:IsA("Attachment") then
+				nameSet[attachment.Name] = true
 			end
 		end
 	end
 
-	return t2
+	return nameSet
 end
-local function makeRotatedCorner(n1: number, n2: number, n3: number, vector3: Vector3, cFrame: CFrame) -- line: 32
-	return cFrame * Vector3.new(n1 * vector3.X, n2 * vector3.Y, n3 * vector3.Z)
+
+local function makeRotatedCorner(i: number, i2: number, i3: number, vector3: Vector3, cframe: CFrame) -- 1 equivalent call inferred from this helper
+	return cframe * Vector3.new(i * vector3.X, i2 * vector3.Y, i3 * vector3.Z)
 end
-local function growExtentsToIncludePoint(vector3: Vector3, vector3_2: Vector3, vector3_3: Vector3) -- line: 41
-	return Vector3.new(math.min(vector3_3.X, vector3.X), math.min(vector3_3.Y, vector3.Y), (math.min(vector3_3.Z, vector3.Z))), (Vector3.new(math.max(vector3_3.X, vector3_2.X), math.max(vector3_3.Y, vector3_2.Y), (math.max(vector3_3.Z, vector3_2.Z))))
+
+local function growExtentsToIncludePoint(vector3: Vector3, vector3_2: Vector3, vector3_3: Vector3)
+	return
+		Vector3.new(
+			math.min(vector3_3.X, vector3.X),
+			math.min(vector3_3.Y, vector3.Y),
+			(math.min(vector3_3.Z, vector3.Z))
+		),
+		(Vector3.new(
+			math.max(vector3_3.X, vector3_2.X),
+			math.max(vector3_3.Y, vector3_2.Y),
+			(math.max(vector3_3.Z, vector3_2.Z))
+		))
 end
-local function growExtentsToInclude(vector3: Vector3, vector3_4: Vector3, p2, cFrame: CFrame, cFrame2: CFrame?, n4: number?) -- line: 68
-	-- upvalues: growExtentsToIncludePoint (copy)
-	local v27 = p2.Size / 2
+
+local function growExtentsToInclude(vector3: Vector3, vector3_2: Vector3, instance, cframe: CFrame, cframe2: CFrame?, p: number?)
+	local halfSize = instance.Size / 2
 
 	for i = -1, 1, 2 do
 		for j = -1, 1, 2 do
 			for k = -1, 1, 2 do
-				local v31 = p2.CFrame * Vector3.new(i * v27.X, j * v27.Y, k * v27.Z)
+				local rotatedCorner = makeRotatedCorner(i, j, k, halfSize, instance.CFrame) -- inferred equivalent call
 
-				if cFrame2 and n4 then
-					local v32 = cFrame2:Inverse() * v31
+				if cframe2 and p then
+					local v = cframe2:Inverse() * rotatedCorner
 
-					v31 = cFrame2 * Vector3.new(v32.X, math.max(n4, v32.Y), v32.Z)
+					rotatedCorner = cframe2 * Vector3.new(v.X, math.max(p, v.Y), v.Z)
 				end
 
-				local v33 = cFrame * v31
-
-				vector3, vector3_4 = growExtentsToIncludePoint(vector3, vector3_4, v33)
+				vector3, vector3_2 = growExtentsToIncludePoint(vector3, vector3_2, cframe * rotatedCorner)
 			end
 		end
 	end
 
-	return vector3, vector3_4
+	return vector3, vector3_2
 end
-local function initExtents() -- line: 103
-	return Vector3.new(1e999, 1e999, 1e999), (Vector3.new(-1e999, -1e999, -1e999))
+
+local function initExtents() -- 2 equivalent calls inferred from this helper
+	return Vector3.new(1e999, 1e999, 1e999), Vector3.new(-1e999, -1e999, -1e999)
 end
-local function recursiveCalculateExtents(vector3: Vector3, vector3_5: Vector3, p3, cFrame: CFrame, s1: string?) -- line: 118
-	-- upvalues: growExtentsToInclude (copy), recursiveCalculateExtents (copy)
-	if not s1 then
-		s1 = ""
-	end
 
-	assert(s1, "indent is non-nil. Silence type checker.")
+local function recursiveCalculateExtents(vector3: Vector3, vector3_2: Vector3, instance, cframe: CFrame, value: string?)
+	value = value or ""
+	assert(value, "indent is non-nil. Silence type checker.")
+	local v = value .. "  "
 
-	local v39 = s1 .. "  "
-
-	for _, child in pairs(p3:GetChildren()) do
-		if child:IsA("BasePart") then
-			vector3, vector3_5 = growExtentsToInclude(vector3, vector3_5, child, cFrame)
+	for _, part in pairs(instance:GetChildren()) do
+		if part:IsA("BasePart") then
+			vector3, vector3_2 = growExtentsToInclude(vector3, vector3_2, part, cframe)
 		end
 
-		vector3, vector3_5 = recursiveCalculateExtents(vector3, vector3_5, child, cFrame, v39)
+		vector3, vector3_2 = recursiveCalculateExtents(vector3, vector3_2, part, cframe, v)
 	end
 
-	return vector3, vector3_5
+	return vector3, vector3_2
 end
 
-function t1.CalculateModelExtents(p4, cFrame: CFrame) -- line: 145
-	-- upvalues: recursiveCalculateExtents (copy)
-	local vector3 = Vector3.new(1e999, 1e999, 1e999)
-	local vector3_6 = Vector3.new(-1e999, -1e999, -1e999)
-	local v46 = cFrame:Inverse()
-	local v47, v48 = recursiveCalculateExtents(vector3, vector3_6, p4, v46, "  ")
-
-	return v47, v48
+function CharacterUtility.CalculateModelExtents(p, cframe: CFrame)
+	local v, v2 = recursiveCalculateExtents(
+		Vector3.new(1e999, 1e999, 1e999),
+		Vector3.new(-1e999, -1e999, -1e999),
+		p,
+		cframe:Inverse(),
+		"  "
+	)
+	return v, v2
 end
-function t1.CalculateHeadExtents(p5, cFrame: CFrame) -- line: 160
-	-- upvalues: growExtentsToInclude (copy), getHeadAttachments (copy)
-	local vector3 = Vector3.new(1e999, 1e999, 1e999)
-	local vector3_7 = Vector3.new(-1e999, -1e999, -1e999)
-	local Head = p5:FindFirstChild("Head")
 
-	if not Head then
-		return vector3, vector3_7
+function CharacterUtility.CalculateHeadExtents(instance, cframe: CFrame)
+	local v, v2 = initExtents() -- inferred equivalent call
+	local head = instance:FindFirstChild("Head")
+
+	if not head then
+		return v, v2
 	end
 
-	local v54 = cFrame:Inverse()
-	local v55 = -Head.Size.Y / 2
-	local v56, v57 = growExtentsToInclude(vector3, vector3_7, Head, v54)
-	local v58 = getHeadAttachments(p5)
+	local inverse = cframe:Inverse()
 
-	for _, child in pairs(p5:GetChildren()) do
-		if child:IsA("Accoutrement") then
-			local Handle = child:FindFirstChild("Handle")
+	local v3 = -head.Size.Y / 2
 
-			if Handle then
-				local Attachment = Handle:FindFirstChildWhichIsA("Attachment")
+	local v4, v5 = growExtentsToInclude(v, v2, head, inverse)
 
-				if not Attachment or v58[Attachment.Name] then
-					v56, v57 = growExtentsToInclude(v56, v57, Handle, v54, Head.CFrame, v55)
-				end
-			end
+	local headAttachments = getHeadAttachments(instance)
+
+	for _, accoutrement in pairs(instance:GetChildren()) do
+		if not accoutrement:IsA("Accoutrement") then
+			continue
+		end
+
+		local handle = accoutrement:FindFirstChild("Handle")
+
+		if not handle then
+			continue
+		end
+
+		local attachment = handle:FindFirstChildWhichIsA("Attachment")
+
+		if not attachment or headAttachments[attachment.Name] then
+			v4, v5 = growExtentsToInclude(v4, v5, handle, inverse, head.CFrame, v3)
 		end
 	end
 
-	return v56, v57
+	return v4, v5
 end
-function t1.CalculateBodyPartsExtents(cFrame: CFrame, t3: {[any]: any}) -- line: 201
-	-- upvalues: growExtentsToInclude (copy)
-	local vector3 = Vector3.new(1e999, 1e999, 1e999)
-	local vector3_8 = Vector3.new(-1e999, -1e999, -1e999)
-	local v67 = cFrame:Inverse()
 
-	for _, v in pairs(t3) do
-		vector3, vector3_8 = growExtentsToInclude(vector3, vector3_8, v, v67, cFrame)
+function CharacterUtility.CalculateBodyPartsExtents(cframe: CFrame, items)
+	local inverse = cframe:Inverse()
+	local v, v2 = initExtents() -- inferred equivalent call
+
+	for _, item in pairs(items) do
+		v, v2 = growExtentsToInclude(v, v2, item, inverse, cframe)
 	end
 
-	return vector3, vector3_8
+	return v, v2
 end
-function t1.AllocateDebugExtentParts() -- line: 217
-	local t4 = {}
+
+function CharacterUtility.AllocateDebugExtentParts()
+	local result = {}
 
 	for i = 1, 8 do
-		local Part = Instance.new("Part")
-
-		Part.Parent = workspace
-		Part.Name = "DebugExtentPart" .. tostring(i)
-		Part.Shape = Enum.PartType.Ball
-		Part.Size = Vector3.new(0.25, 0.25, 0.25)
-		Part.Anchored = true
-		Part.CanCollide = false
-		t4[#t4 + 1] = Part
+		local part = Instance.new("Part")
+		part.Parent = workspace
+		part.Name = "DebugExtentPart" .. tostring(i)
+		part.Shape = Enum.PartType.Ball
+		part.Size = Vector3.new(0.25, 0.25, 0.25)
+		part.Anchored = true
+		part.CanCollide = false
+		result[#result + 1] = part
 	end
 
-	return t4
+	return result
 end
-function t1.PositionDebugExtentParts(t5: {[any]: any}, vector3: Vector3, vector3_9: Vector3, cFrame: CFrame) -- line: 237
+
+function CharacterUtility.PositionDebugExtentParts(p, vector3: Vector3, vector3_2: Vector3, cframe: CFrame)
 	for i = 0, 1 do
 		for j = 0, 1 do
 			for k = 0, 1 do
-				local v80 = i + j * 2 + k * 4 + 1
-				local vector3_10 = Vector3.new(i == 0 and vector3.X or vector3_9.X, j == 0 and vector3.Y or vector3_9.Y, k == 0 and vector3.Z or vector3_9.Z)
-
-				t5[v80].Position = cFrame * vector3_10
+				local v = i + j * 2 + k * 4 + 1
+				local vector3_3 = Vector3.new(
+					i == 0 and vector3.X or vector3_2.X,
+					j == 0 and vector3.Y or vector3_2.Y,
+					k == 0 and vector3.Z or vector3_2.Z
+				)
+				p[v].Position = cframe * vector3_3
 			end
 		end
 	end
 end
 
-return t1
+return CharacterUtility

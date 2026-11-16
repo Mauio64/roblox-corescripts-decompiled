@@ -1,29 +1,30 @@
-return {
-	substituteAmount = function(s1: string, s2: string) -- line: 5
-		local result, _ = string.gsub(s1, "{amount}", (tostring(s2)))
+local TransferLocaleFormat = {}
 
-		return result
-	end,
-	substituteReceiverNotAllowed = function(s3: string, s4: string) -- line: 10
-		local str = tostring(s4)
-		local result, _ = string.gsub(s3, "{userName}", str)
-		local result2, _ = string.gsub(result, "{username}", str)
+function TransferLocaleFormat.substituteAmount(value: string, p: string)
+	local v, _ = string.gsub(value, "{amount}", (tostring(p)))
+	return v
+end
 
-		return result2
-	end,
-	substituteUsername = function(s5: string, s6: string) -- line: 17
-		local result, _ = string.gsub(s5, "{username}", (tostring(s6)))
+function TransferLocaleFormat.substituteReceiverNotAllowed(value: string, p: string)
+	local v = tostring(p)
+	local v2, _ = string.gsub(value, "{userName}", v)
+	local v3, _ = string.gsub(v2, "{username}", v)
+	return v3
+end
 
-		return result
-	end,
-	substituteMinAmount = function(s7: string, s8: string) -- line: 22
-		local result, _ = string.gsub(s7, "{minAmount}", (tostring(s8)))
+function TransferLocaleFormat.substituteUsername(value: string, p: string)
+	local v, _ = string.gsub(value, "{username}", (tostring(p)))
+	return v
+end
 
-		return result
-	end,
-	substituteMaxAmount = function(s9: string, s10: string) -- line: 27
-		local result, _ = string.gsub(s9, "{maxAmount}", (tostring(s10)))
+function TransferLocaleFormat.substituteMinAmount(value: string, p: string)
+	local v, _ = string.gsub(value, "{minAmount}", (tostring(p)))
+	return v
+end
 
-		return result
-	end
-}
+function TransferLocaleFormat.substituteMaxAmount(value: string, p: string)
+	local v, _ = string.gsub(value, "{maxAmount}", (tostring(p)))
+	return v
+end
+
+return TransferLocaleFormat

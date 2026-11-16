@@ -1,15 +1,22 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local t = require(CorePackages.Packages.t)
-local InteractiveAlert = require(CorePackages.Packages.UIBlox).App.Dialog.Alert.InteractiveAlert
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local HumanoidViewport = require(ParentParent.HumanoidViewport)
-local GetConformedHumanoidDescription = require(ParentParentParent.GetConformedHumanoidDescription)
-local v10 = Roact.PureComponent:extend("PromptWithAvatarViewport")
+local UIBlox = require(CorePackages.Packages.UIBlox)
 
-v10.validateProps = t.strictInterface({
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local HumanoidViewport = require(parent.HumanoidViewport)
+
+local GetConformedHumanoidDescription = require(parent2.GetConformedHumanoidDescription)
+
+local extended = Roact.PureComponent:extend("PromptWithAvatarViewport")
+
+extended.validateProps = t.strictInterface({
 	humanoidDescription = t.instanceOf("HumanoidDescription"),
 	rigType = t.enum(Enum.HumanoidRigType),
 	title = t.string,
@@ -18,127 +25,117 @@ v10.validateProps = t.strictInterface({
 	screenSize = t.Vector2
 })
 
-function v10.init(p1) -- line: 41
-	-- upvalues: Roact (copy)
-	p1.mounted = false
-	p1.middleContentRef = Roact.createRef()
+function extended:init()
+	self.mounted = false
 
-	local v13, v14 = Roact.createBinding(UDim2.new(1, 0, 0, 200))
+	self.middleContentRef = Roact.createRef()
+	local binding, updateContentSize = Roact.createBinding(UDim2.new(1, 0, 0, 200))
+	self.contentSize = binding
+	self.updateContentSize = updateContentSize
 
-	p1.contentSize = v13
-	p1.updateContentSize = v14
-	p1:setState({
-		conformedHumanoidDescription = nil,
-		getConformedDescriptionFailed = false
-	})
+	self:setState({ conformedHumanoidDescription = nil, getConformedDescriptionFailed = false })
 
-	function p1.onAlertSizeChanged(p2) -- line: 52
-		-- upvalues: p1 (copy)
-		local AbsoluteSize = p2.AbsoluteSize
+	function self.onAlertSizeChanged(p)
+		local absoluteSize = p.AbsoluteSize
 
-		if not p1.middleContentRef:getValue() then
+		if not self.middleContentRef:getValue() then
 			return
 		end
 
-		local AbsoluteSizeY = p1.middleContentRef:getValue().AbsoluteSize.Y
-		local v30 = AbsoluteSize.Y - AbsoluteSizeY
-		local v31 = p1.props.screenSize.Y - 60 - v30
-		local v32 = p1.middleContentRef:getValue().AbsoluteSize.X - 20
+		local y = self.middleContentRef:getValue().AbsoluteSize.Y
+		local v = absoluteSize.Y - y
+		local v2 = self.props.screenSize.Y - 60 - v
 
-		if v32 < v31 then
-			v31 = v32
+		local v3 = self.middleContentRef:getValue().AbsoluteSize.X - 20
+
+		if v3 < v2 then
+			v2 = v3
 		end
 
-		if AbsoluteSizeY ~= v31 then
-			p1.updateContentSize(UDim2.new(1, 0, 0, v31))
+		if y ~= v2 then
+			self.updateContentSize(UDim2.new(1, 0, 0, v2))
 		end
 	end
-	function p1.retryLoadDescription() -- line: 74
-		-- upvalues: p1 (copy)
-		p1:setState({
-			getConformedDescriptionFailed = false
-		})
-		p1:getConformedHumanoidDescription()
+
+	function self.retryLoadDescription()
+		self:setState({ getConformedDescriptionFailed = false })
+
+		self:getConformedHumanoidDescription()
 	end
 end
-function v10.renderAlertMiddleContent(p3) -- line: 83
-	-- upvalues: Roact (copy), HumanoidViewport (copy)
-	local conformedHumanoidDescription = p3.state.conformedHumanoidDescription
-	local getConformedDescriptionFailed = p3.state.getConformedDescriptionFailed
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = p3.contentSize,
-		[Roact.Ref] = p3.middleContentRef
-	}, {
-		HumanoidViewport = Roact.createElement(HumanoidViewport, {
-			humanoidDescription = conformedHumanoidDescription,
-			loadingFailed = getConformedDescriptionFailed,
-			retryLoadDescription = p3.retryLoadDescription,
-			rigType = p3.props.rigType
-		})
-	})
+function extended:renderAlertMiddleContent()
+	local conformedHumanoidDescription = self.state.conformedHumanoidDescription
+	local getConformedDescriptionFailed = self.state.getConformedDescriptionFailed
+
+	return Roact.createElement(
+		"Frame",
+		{ BackgroundTransparency = 1, Size = self.contentSize, [Roact.Ref] = self.middleContentRef },
+		{
+			HumanoidViewport = Roact.createElement(HumanoidViewport, {
+				humanoidDescription = conformedHumanoidDescription,
+				loadingFailed = getConformedDescriptionFailed,
+				retryLoadDescription = self.retryLoadDescription,
+				rigType = self.props.rigType
+			})
+		}
+	)
 end
-function v10.render(p4) -- line: 102
-	-- upvalues: Roact (copy), InteractiveAlert (copy)
+
+function extended:render()
 	return Roact.createElement(InteractiveAlert, {
-		isMiddleContentFocusable = false,
-		title = p4.props.title,
-		bodyText = p4.props.bodyText,
-		buttonStackInfo = p4.props.buttonStackInfo,
+		title = self.props.title,
+		bodyText = self.props.bodyText,
+		buttonStackInfo = self.props.buttonStackInfo,
 		position = UDim2.fromScale(0.5, 0.5),
-		screenSize = p4.props.screenSize,
-		middleContent = function() -- line: 109
-			-- upvalues: p4 (copy)
-			return p4:renderAlertMiddleContent()
+		screenSize = self.props.screenSize,
+		middleContent = function()
+			return self:renderAlertMiddleContent()
 		end,
-		onAbsoluteSizeChanged = p4.onAlertSizeChanged
+		onAbsoluteSizeChanged = self.onAlertSizeChanged,
+		isMiddleContentFocusable = false
 	})
 end
-function v10.getConformedHumanoidDescription(p5, p6) -- line: 117
-	-- upvalues: GetConformedHumanoidDescription (copy)
-	GetConformedHumanoidDescription(p6, true):andThen(function(p7) -- line: 119
-		-- upvalues: p5 (copy)
-		if not p5.mounted then
+
+function extended:getConformedHumanoidDescription(p)
+	GetConformedHumanoidDescription(p, true):andThen(function(conformedHumanoidDescription)
+		if not self.mounted then
 			return
 		end
 
-		p5:setState({
-			conformedHumanoidDescription = p7
-		})
-	end, function(_) -- line: 127
-		-- upvalues: p5 (copy)
-		if not p5.mounted then
+		self:setState({ conformedHumanoidDescription = conformedHumanoidDescription })
+	end, function(_)
+		if not self.mounted then
 			return
 		end
 
-		p5:setState({
-			getConformedDescriptionFailed = true
-		})
+		self:setState({ getConformedDescriptionFailed = true })
 	end)
 end
-function v10.didMount(p9) -- line: 138
-	p9.mounted = true
-	p9:getConformedHumanoidDescription(p9.props.humanoidDescription)
+
+function extended:didMount()
+	self.mounted = true
+
+	self:getConformedHumanoidDescription(self.props.humanoidDescription)
 end
-function v10.didUpdate(p10, p11, _) -- line: 144
-	-- upvalues: Roact (copy)
-	if p11.humanoidDescription ~= p10.props.humanoidDescription then
-		p10:setState({
-			getConformedDescriptionFailed = false,
-			conformedHumanoidDescription = Roact.None
+
+function extended:didUpdate(p, _)
+	if p.humanoidDescription ~= self.props.humanoidDescription then
+		self:setState({
+			conformedHumanoidDescription = Roact.None,
+			getConformedDescriptionFailed = false
 		})
-		p10:getConformedHumanoidDescription(p10.props.humanoidDescription)
+
+		self:getConformedHumanoidDescription(self.props.humanoidDescription)
 	end
 end
-function v10.willUnmount(p13) -- line: 155
-	p13.mounted = false
+
+function extended:willUnmount()
+	self.mounted = false
 end
 
-local function mapStateToProps(p14) -- line: 159
-	return {
-		screenSize = p14.screenSize
-	}
+local function mapStateToProps(p)
+	return { screenSize = p.screenSize }
 end
 
-return (RoactRodux.connect(mapStateToProps, nil)(v10))
+return (RoactRodux.connect(mapStateToProps, nil)(extended))

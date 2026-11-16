@@ -1,3 +1,1 @@
-return {
-	CardsHelper = require(script.CardsHelper)
-}
+return { CardsHelper = require(script.CardsHelper) }

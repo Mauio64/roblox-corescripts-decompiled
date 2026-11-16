@@ -1,131 +1,143 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
-local ConstantsInterface = require(ParentParent.ConstantsInterface)
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local FetchAllDesiredData = require(ParentParent.validationSystem.dataFetchModules.FetchAllDesiredData)
-local getFFlagUGCValidateMigrateTextureTransparency = require(ParentParent.flags.getFFlagUGCValidateMigrateTextureTransparency)
-local getFFlagUGCValidateAllowEmissives = require(ParentParent.flags.getFFlagUGCValidateAllowEmissives)
-local t1 = {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
-		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
-		ValidationEnums.UploadCategory.RIGID_ACCESSORY
-	},
-	requiredData = {},
-	conditionalData = { ValidationEnums.SharedDataMember.meshTextures },
-	fflag = getFFlagUGCValidateMigrateTextureTransparency,
-	expectedFailures = {}
+local ConstantsInterface = require(parent.ConstantsInterface)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local FetchAllDesiredData = require(parent.validationSystem.dataFetchModules.FetchAllDesiredData)
+
+local TextureSizeBounded = {}
+
+TextureSizeBounded.categories = {
+	ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
+	ValidationEnums.UploadCategory.DYNAMIC_HEAD,
+	ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+	ValidationEnums.UploadCategory.EYEBROW_EYELASH,
+	ValidationEnums.UploadCategory.RIGID_ACCESSORY
 }
 
-local function checkEditableImageSize(p1, n1: number, s1: string, s2: string, p2, p3, p4) -- line: 32
-	-- upvalues: UGCValidationService (copy), ValidationEnums (copy), ErrorSourceStrings (copy)
-	local ok, result = pcall(function() -- line: 41
-		-- upvalues: UGCValidationService (copy), p1 (copy)
-		return UGCValidationService:GetEditableImageSize(p1)
+TextureSizeBounded.requiredData = {}
+TextureSizeBounded.conditionalData = { ValidationEnums.SharedDataMember.meshTextures }
+
+TextureSizeBounded.expectedFailures = {}
+
+local function checkEditableImageSize(editable, textureLimit: number, fullName: string, fieldName: string, object, p, consumerConfig)
+	local success, result = pcall(function()
+		return UGCValidationService:GetEditableImageSize(editable)
 	end)
 
-	if not ok then
-		if p4 and p4.consumerEnv == ValidationEnums.ConsumerEnv.Backend then
-			p2:fetchError(string.format("Failed to get texture size for '%s'. Make sure the texture exists and try again.", s1))
+	if success then
+		if textureLimit < result.X or textureLimit < result.Y then
+			object:fail(ErrorSourceStrings.Keys.TextureSize_TooBig, {
+				Width = tostring(result.X),
+				Height = tostring(result.Y),
+				FullName = fullName,
+				MaxSize = tostring(textureLimit),
+				FieldName = fieldName
+			}, p)
+		end
+	else
+		if consumerConfig and consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend then
+			object:fetchError(string.format(
+				"Failed to get texture size for '%s'. Make sure the texture exists and try again.",
+				fullName
+			))
 		end
 
-		p2:fail(ErrorSourceStrings.Keys.TextureSize_FailedToLoad, {
-			FullName = s1
-		}, p3)
-
-		return
-	end
-
-	if n1 < result.X or n1 < result.Y then
-		p2:fail(ErrorSourceStrings.Keys.TextureSize_TooBig, {
-			Width = tostring(result.X),
-			Height = tostring(result.Y),
-			FullName = s1,
-			MaxSize = tostring(n1),
-			FieldName = s2
-		}, p3)
+		object:fail(ErrorSourceStrings.Keys.TextureSize_FailedToLoad, { FullName = fullName }, p)
 	end
 end
 
-function t1.run(p5, p6) -- line: 71
-	-- upvalues: FetchAllDesiredData (copy), ValidationEnums (copy), getFFlagUGCValidateAllowEmissives (copy), ConstantsInterface (copy), checkEditableImageSize (copy)
-	local rootInstance = p6.rootInstance
-	local assetType = p6.uploadEnum.assetType
-	local meshTextures = p6.meshTextures
-	local consumerConfig = p6.consumerConfig
-	local uploadCategory = p6.uploadCategory
+function TextureSizeBounded.run(object, data)
+	local rootInstance = data.rootInstance
+	local assetType = data.uploadEnum.assetType
+	local meshTextures = data.meshTextures
+	local consumerConfig = data.consumerConfig
+	local uploadCategory = data.uploadCategory
 
 	if not meshTextures or meshTextures == FetchAllDesiredData.DATA_FETCH_FAILURE then
-		p5:fetchError("Failed to load texture data for texture size check")
-
+		object:fetchError("Failed to load texture data for texture size check")
 		return
 	end
 
 	local descendants = rootInstance:GetDescendants()
-
 	table.insert(descendants, rootInstance)
 
-	for _, v29 in descendants do
-		local v30 = nil
-		local s3 = ""
+	for _, part in descendants do
+		local part2 = nil
+		local v = ""
 
-		if v29:IsA("MeshPart") then
-			v30 = v29
-			s3 = v29.Name
-		elseif v29:IsA("Part") then
-			local SpecialMesh = v29:FindFirstChildOfClass("SpecialMesh")
+		if part:IsA("MeshPart") then
+			v = part.Name
+			part2 = part
+		elseif part:IsA("Part") then
+			local specialMesh = part:FindFirstChildOfClass("SpecialMesh")
 
-			if SpecialMesh then
-				v30 = SpecialMesh
-				s3 = v29.Name
+			if specialMesh then
+				v = part.Name
+				part2 = specialMesh
 			end
 		end
 
-		if v30 then
-			local v33 = meshTextures[s3]
+		if not part2 then
+			continue
+		end
 
-			if v33 then
-				local v34 = uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS or uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD
+		local meshTexture = meshTextures[v]
 
-				if v33.isPBR and v34 then
-					local SurfaceAppearance = v30:FindFirstChildWhichIsA("SurfaceAppearance")
+		if not meshTexture then
+			continue
+		end
 
-					if SurfaceAppearance then
-						local t2 = {
-							"ColorMap",
-							"MetalnessMap",
-							"NormalMap",
-							"RoughnessMap"
-						}
+		local v2 = uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS
+			or uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD
 
-						if getFFlagUGCValidateAllowEmissives() then
-							table.insert(t2, "EmissiveMask")
-						end
+		if meshTexture.isPBR and v2 then
+			local surfaceAppearance = part2:FindFirstChildWhichIsA("SurfaceAppearance")
 
-						for _, v38 in t2 do
-							local v39 = v33[v38]
+			if surfaceAppearance then
+				for _, v3 in {
+					"ColorMap",
+					"MetalnessMap",
+					"NormalMap",
+					"RoughnessMap",
+					"EmissiveMask"
+				} do
+					local v4 = meshTexture[v3]
 
-							if v39 and v39.editable then
-								local v40 = ConstantsInterface.getTextureLimit(assetType, SurfaceAppearance, v38)
-
-								checkEditableImageSize(v39.editable, v40, SurfaceAppearance:GetFullName() .. "." .. v38, v38, p5, SurfaceAppearance, consumerConfig)
-							end
-						end
+					if not (v4 and v4.editable) then
+						continue
 					end
-				elseif not v33.isPBR and v33.Texture and v33.Texture.editable then
-					local v41 = not v30:IsA("MeshPart") and "TextureId" or "TextureID"
-					local v42 = ConstantsInterface.getTextureLimit(assetType, v30, v41)
 
-					checkEditableImageSize(v33.Texture.editable, v42, v30:GetFullName(), v41, p5, v30, consumerConfig)
+					local textureLimit = ConstantsInterface.getTextureLimit(assetType, surfaceAppearance, v3)
+					checkEditableImageSize(
+						v4.editable,
+						textureLimit,
+						surfaceAppearance:GetFullName() .. "." .. v3,
+						v3,
+						object,
+						surfaceAppearance,
+						consumerConfig
+					)
 				end
 			end
+		elseif not meshTexture.isPBR and meshTexture.Texture and meshTexture.Texture.editable then
+			local fieldName = part2:IsA("MeshPart") and "TextureID" or "TextureId"
+
+			local textureLimit = ConstantsInterface.getTextureLimit(assetType, part2, fieldName)
+			checkEditableImageSize(
+				meshTexture.Texture.editable,
+				textureLimit,
+				part2:GetFullName(),
+				fieldName,
+				object,
+				part2,
+				consumerConfig
+			)
 		end
 	end
 end
 
-return t1
+return TextureSizeBounded

@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("CommercePurchaseApp").Parent
+local parent = script:FindFirstAncestor("CommercePurchaseApp").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator("CommercePurchaseStarted", function(s1: string) -- line: 10
-	return {
-		commerceProductId = s1
-	}
+return Rodux.makeActionCreator("CommercePurchaseStarted", function(commerceProductId: string)
+	return { commerceProductId = commerceProductId }
 end)

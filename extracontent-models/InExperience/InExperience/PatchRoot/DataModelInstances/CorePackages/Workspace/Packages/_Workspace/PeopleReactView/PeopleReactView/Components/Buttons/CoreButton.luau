@@ -1,66 +1,67 @@
-local Parent = script:FindFirstAncestor("PeopleReactView").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("PeopleReactView").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Signals = require(parent.Signals)
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
 local useSignalState = SignalsReact.useSignalState
 
-local function CoreButton(t1: {[any]: any}) -- line: 30
-	-- upvalues: useTokens (copy), useSignalState (copy), Signals (copy), React (copy), View (copy), Icon (copy), IconSize (copy), FoundationText (copy)
-	local v14 = useTokens()
-	local v15 = useSignalState(t1.animatedIcon or Signals.createSignal(""))
-	local v16 = useSignalState(t1.buttonState or Signals.createSignal(false))
-	local v17 = React.useMemo(function() -- line: 36
-		-- upvalues: t1 (copy), v16 (copy)
-		if t1.icon.off and t1.buttonState then
-			return v16 and t1.icon.off or t1.icon.on
+local function CoreButton(props)
+	local v = useTokens()
+
+	local v2 = useSignalState(props.animatedIcon or Signals.createSignal(""))
+	local v3 = useSignalState(props.buttonState or Signals.createSignal(false))
+
+	local v4 = React.useMemo(function()
+		if props.icon.off and props.buttonState then
+			return v3 and props.icon.off or props.icon.on
 		end
 
-		return t1.icon.on
-	end, {
-		v16,
-		t1.icon
-	})
-	local v18 = React.useMemo(function() -- line: 46
-		-- upvalues: t1 (copy), v15 (copy), v17 (copy)
-		if t1.animatedIcon then
-			return v15
-		end
+		return props.icon.on
+	end, { v3, props.icon })
 
-		return v17
-	end, {
-		v15,
-		v17
-	})
+	local name = React.useMemo(function()
+		return if props.animatedIcon then v2 else v4
+	end, { v2, v4 })
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v5 = {
 		tag = "size-0-1200 flex-x-fill grow radius-medium padding-x-small align-y-center row gap-xsmall bg-surface-200",
-		onActivated = t1.onActivated,
-		LayoutOrder = t1.LayoutOrder,
-		ref = t1.onMount
-	}, {
-		IconContainer = React.createElement(View, {
+		onActivated = props.onActivated,
+		LayoutOrder = props.LayoutOrder,
+		ref = props.onMount
+	}
+
+	local createElement2 = React.createElement
+
+	local createElement3 = React.createElement
+	local size
+
+	if props.isNewIcon then
+		size = IconSize.Large
+	else
+		size = IconSize.Medium
+	end
+
+	return createElement(View, v5, {
+		IconContainer = createElement2(View, {
 			tag = "size-1100 align-y-center align-x-center row",
 			LayoutOrder = 1
 		}, {
-			Icon = React.createElement(Icon, {
-				name = v18,
-				size = if not t1.isNewIcon then IconSize.Medium else IconSize.Large
-			})
+			Icon = createElement3(Icon, { name = name, size = size })
 		}),
-		Text = React.createElement(FoundationText, {
+		Text = React.createElement(Text, {
+			Text = props.text,
+			textStyle = { Color3 = v.Color.Content.Default.Color3 },
+			TextTruncate = Enum.TextTruncate.SplitWord,
 			tag = "text-label-medium size-full text-align-x-left",
-			LayoutOrder = 2,
-			Text = t1.text,
-			textStyle = {
-				Color3 = v14.Color.Content.Default.Color3
-			},
-			TextTruncate = Enum.TextTruncate.SplitWord
+			LayoutOrder = 2
 		})
 	})
 end

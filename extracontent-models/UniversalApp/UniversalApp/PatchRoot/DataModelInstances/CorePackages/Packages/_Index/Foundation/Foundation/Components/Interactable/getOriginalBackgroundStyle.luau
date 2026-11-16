@@ -1,43 +1,29 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactIs = require(FoundationParent.ReactIs)
+
+local parent = Foundation.Parent
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
 
 require(Foundation.Components.Types)
 
-local function getOriginalBackgroundStyle(p1, p2) -- line: 11
-	-- upvalues: ReactIs (copy), React (copy)
-	if ReactIs.isBinding(p1) and ReactIs.isBinding(p2) then
-		return React.joinBindings({
-			Color3 = p1,
-			Transparency = p2
-		})
+local function getOriginalBackgroundStyle(color, object)
+	if ReactIs.isBinding(color) and ReactIs.isBinding(object) then
+		return React.joinBindings({ Color3 = color, Transparency = object })
 	end
 
-	if ReactIs.isBinding(p1) then
-		return p1:map(function(p3) -- line: 21
-			-- upvalues: p2 (copy)
-			return {
-				Color3 = p3,
-				Transparency = p2
-			}
+	if ReactIs.isBinding(color) then
+		return color:map(function(color2)
+			return { Color3 = color2, Transparency = object }
 		end)
 	end
 
-	if ReactIs.isBinding(p2) then
-		return p2:map(function(p4) -- line: 25
-			-- upvalues: p1 (copy)
-			return {
-				Color3 = p1,
-				Transparency = p4
-			}
+	if ReactIs.isBinding(object) then
+		return object:map(function(transparency)
+			return { Color3 = color, Transparency = transparency }
 		end)
 	end
 
-	return {
-		Color3 = p1,
-		Transparency = p2
-	}
+	return { Color3 = color, Transparency = object }
 end
 
 return getOriginalBackgroundStyle

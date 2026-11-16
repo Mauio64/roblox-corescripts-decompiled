@@ -1,24 +1,26 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local FriendsNetworking = require(FriendsLanding.dependencies).FriendsNetworking
+local dependencies = require(FriendsLanding.dependencies)
 
-return function(p1) -- line: 6
-	-- upvalues: FriendsNetworking (copy)
+local friendsNetworking = dependencies.FriendsNetworking
+
+local parent = FriendsLanding.Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMigrateFriendshipStatusesRemainingActions = SharedFlags.FFlagMigrateFriendshipStatusesRemainingActions
+
+return function(callback)
 	return {
-		fetchFriends = function(p2) -- line: 8
-			-- upvalues: p1 (copy), FriendsNetworking (copy)
-			return p1(FriendsNetworking.GetFriendsFromUserId.API(p2))
+		fetchFriends = function(p)
+			return callback(friendsNetworking.GetFriendsFromUserId.API(p))
 		end,
-		getFriendRequestsCount = function() -- line: 11
-			-- upvalues: p1 (copy), FriendsNetworking (copy)
-			return p1(FriendsNetworking.GetFriendRequestsCount.API())
+		getFriendRequestsCount = function()
+			return callback(friendsNetworking.GetFriendRequestsCount.API())
 		end,
-		getInactiveFriends = function(p3) -- line: 14
-			-- upvalues: p1 (copy), FriendsNetworking (copy)
-			return p1(FriendsNetworking.GetInactiveFriends.API(p3))
+		getInactiveFriends = function(p)
+			return callback(friendsNetworking.GetInactiveFriends.API(p))
 		end,
-		unfriendTargetUser = function(p4) -- line: 17
-			-- upvalues: p1 (copy), FriendsNetworking (copy)
-			return p1(FriendsNetworking.UnfriendTargetUserId.API(p4))
-		end
+		unfriendTargetUser = not FFlagMigrateFriendshipStatusesRemainingActions and function(p)
+			return callback(friendsNetworking.UnfriendTargetUserId.API(p))
+		end or nil
 	}
 end

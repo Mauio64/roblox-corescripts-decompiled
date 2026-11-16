@@ -1,121 +1,146 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Cryo = require(ParentParentParent.Cryo)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
+
 local useState = React.useState
-local PromptConnections = require(ParentParent.Components.CoreUI.PromptConnections)
-local GroupJoinPrompt = require(ParentParent.Components.CoreUI.GroupJoinPrompt)
-local FocusNavigationUtils = require(ParentParentParent.FocusNavigationUtils)
+
+local PromptConnections = require(parent.Components.CoreUI.PromptConnections)
+local GroupJoinPrompt = require(parent.Components.CoreUI.GroupJoinPrompt)
+
+local FocusNavigationUtils = require(parent2.FocusNavigationUtils)
 local FocusRoot = FocusNavigationUtils.FocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 
-require(ParentParent.Common.Types)
+require(parent.Common.Types)
 
-local _ = {
-	PromptJoinGroup = "PromptJoinGroup"
-}
-local t1 = {
-	PromptJoinGroup = GroupJoinPrompt
-}
+local _ = { PromptJoinGroup = "PromptJoinGroup" }
 
-return function(t2: {[any]: any}) -- line: 54
-	-- upvalues: useState (copy), React (copy), Cryo (copy), t1 (copy), PromptConnections (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v14, v15 = useState({
+local v = { PromptJoinGroup = GroupJoinPrompt }
+
+return function(p)
+	local state, setState = useState({
 		promptType = nil,
 		promptData = nil,
 		data = nil,
 		callbacks = nil,
 		promptQueue = {}
 	})
-	local promptData = v14.promptData
-	local promptType = v14.promptType
-	local data = v14.data
-	local callbacks = v14.callbacks
-	local v20 = React.useCallback(function() -- line: 68
-		-- upvalues: Cryo (copy), v14 (copy), v15 (copy)
-		if not Cryo.isEmpty(v14.promptQueue) then
-			v15(Cryo.Dictionary.join(v14, {
-				promptType = v14.promptQueue[1].promptType,
-				promptData = v14.promptQueue[1].promptData,
-				data = v14.promptQueue[1].data,
-				callbacks = v14.promptQueue[1].callbacks,
-				promptQueue = Cryo.List.removeIndex(v14.promptQueue, 1)
-			}))
 
-			return
-		end
+	local promptData = state.promptData
+	local promptType = state.promptType
+	local data = state.data
+	local callbacks = state.callbacks
 
-		v15({
-			promptType = nil,
-			promptData = nil,
-			data = nil,
-			callbacks = nil,
-			promptQueue = {}
-		})
-	end, {
-		v14,
-		v15
-	})
-	local v21 = nil
-
-	if promptType then
-		local v22 = t1[promptType]
-
-		if v22 then
-			v21 = React.createElement(v22, {
-				enableInputDelayed = t2.enableInputDelayed,
-				groupId = if not promptData then nil else promptData.groupId,
-				data = data,
-				onJoin = if not callbacks then nil else callbacks.onJoin,
-				onClose = if not callbacks then nil else callbacks.onClose
+	local closePrompt = React.useCallback(function()
+		if Cryo.isEmpty(state.promptQueue) then
+			setState({
+				promptType = nil,
+				promptData = nil,
+				data = nil,
+				callbacks = nil,
+				promptQueue = {}
 			})
 		else
-			error(`Unexpected prompt type: { promptType }!`)
+			setState(Cryo.Dictionary.join(state, {
+				promptType = state.promptQueue[1].promptType,
+				promptData = state.promptQueue[1].promptData,
+				data = state.promptQueue[1].data,
+				callbacks = state.promptQueue[1].callbacks,
+				promptQueue = Cryo.List.removeIndex(state.promptQueue, 1)
+			}))
+		end
+	end, { state, setState })
+
+	local prompt = nil
+
+	if promptType then
+		local v2 = v[promptType]
+
+		if v2 then
+			local createElement = React.createElement
+			local v3 = {
+				enableInputDelayed = p.enableInputDelayed,
+				groupId = 0,
+				data = 0,
+				onJoin = 0,
+				onClose = 0
+			}
+			local groupId
+
+			if promptData then
+				groupId = promptData.groupId
+			end
+
+			v3.groupId = groupId
+			v3.data = data
+			local onJoin
+
+			if callbacks then
+				onJoin = callbacks.onJoin
+			end
+
+			v3.onJoin = onJoin
+			local onClose
+
+			if callbacks then
+				onClose = callbacks.onClose
+			end
+
+			v3.onClose = onClose
+			prompt = createElement(v2, v3)
+		else
+			error(`Unexpected prompt type: {promptType}!`)
 		end
 	end
 
-	local v23 = React.useCallback(function(n1: number, p1, p2) -- line: 105
-		-- upvalues: v14 (copy), v15 (copy), Cryo (copy)
-		if v14.promptType ~= nil then
-			v15(Cryo.Dictionary.join(v14, {
-				promptQueue = Cryo.List.join(v14.promptQueue, {{
-					promptType = "PromptJoinGroup",
-					promptData = {
-						groupId = n1
-					},
-					data = p1,
-					callbacks = p2
-				}})
+	local openGroupJoinPrompt = React.useCallback(function(groupId: number, p2, callbacks2)
+		if state.promptType == nil then
+			setState({
+				promptType = "PromptJoinGroup",
+				promptData = { groupId = groupId },
+				data = p2,
+				callbacks = callbacks2,
+				promptQueue = {}
+			})
+		else
+			setState(Cryo.Dictionary.join(state, {
+				promptQueue = Cryo.List.join(state.promptQueue, {
+					{
+						promptType = "PromptJoinGroup",
+						promptData = { groupId = groupId },
+						data = p2,
+						callbacks = callbacks2
+					}
+				})
 			}))
-
-			return
 		end
+	end, { state, setState })
 
-		v15({
-			promptType = "PromptJoinGroup",
-			promptData = {
-				groupId = n1
-			},
-			data = p1,
-			callbacks = p2,
-			promptQueue = {}
-		})
-	end, {
-		v14,
-		v15
-	})
-
-	return React.createElement(React.Fragment, {}, {
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local v2 = {
 		PromptConnections = React.createElement(PromptConnections, {
-			openGroupJoinPrompt = v23,
-			closePrompt = v20
+			openGroupJoinPrompt = openGroupJoinPrompt,
+			closePrompt = closePrompt
 		}),
-		FocusNavigationCoreScriptsWrapper = if not v21 then nil else React.createElement(FocusRoot, {
-			isIsolated = true,
-			isAutoFocusRoot = true,
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
-		}, {
-			Prompt = v21
-		})
-	})
+		FocusNavigationCoreScriptsWrapper = 0
+	}
+	local focusNavigationCoreScriptsWrapper
+
+	if prompt then
+		focusNavigationCoreScriptsWrapper = React.createElement(
+			FocusRoot,
+			{
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+				isIsolated = true,
+				isAutoFocusRoot = true
+			},
+			{ Prompt = prompt }
+		)
+	end
+
+	v2.FocusNavigationCoreScriptsWrapper = focusNavigationCoreScriptsWrapper
+	return createElement(fragment, {}, v2)
 end

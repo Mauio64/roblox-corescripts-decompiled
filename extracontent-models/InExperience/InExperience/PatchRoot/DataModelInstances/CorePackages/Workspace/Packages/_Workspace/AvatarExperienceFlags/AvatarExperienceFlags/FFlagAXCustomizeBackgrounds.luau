@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagAXBackgroundsRoot) and game:DefineFastFlag("AXCustomizeBackgrounds", false)
+local FFlagAXBackgroundsRoot = require(script.Parent.FFlagAXBackgroundsRoot)
+
+return FFlagAXBackgroundsRoot and game:DefineFastFlag("AXCustomizeBackgrounds", false)

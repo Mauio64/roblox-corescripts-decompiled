@@ -1,3 +1,1 @@
-return {
-	Contact = "Contact"
-}
+return { Contact = "Contact" }

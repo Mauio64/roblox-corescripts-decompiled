@@ -1,98 +1,109 @@
 local GameTile = script:FindFirstAncestor("GameTile")
-local GameTileParent = GameTile.Parent
-local flaggedMutedError = require(GameTileParent.Loggers).flaggedMutedError
-local useTokens = require(GameTileParent.Foundation).Hooks.useTokens
-local React = require(GameTileParent.React)
+
+local parent = GameTile.Parent
+local Loggers = require(parent.Loggers)
+local flaggedMutedError = Loggers.flaggedMutedError
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local React = require(parent.React)
+
 local GameTileConstants = require(GameTile.GameTileConstants)
 local GameTileOverlayBadge = require(GameTile.Overlays.GameTileOverlayBadge)
-
 require(GameTile.GameTileTypes)
-
 local TileBadgeIconNamesByType = GameTileConstants.TileBadgeIconNamesByType
 local TileBadgeComponentTypeValues = GameTileConstants.TileBadgeComponentTypeValues
 
-local function getBadgeStyleOptions(p1, p2) -- line: 19
-	-- upvalues: TileBadgeComponentTypeValues (copy), flaggedMutedError (copy)
-	local t1 = {
+local function getBadgeStyleOptions(data, tileBadgeComponentType)
+	local v = {
 		[TileBadgeComponentTypeValues.Pill] = {
-			backgroundColorStyle = p1.Color.Extended.White.White_90,
-			contentColorStyle = p1.LightMode.Content.Emphasis,
+			backgroundColorStyle = data.Color.Extended.White.White_90,
+			contentColorStyle = data.LightMode.Content.Emphasis,
 			cornerRadius = UDim.new(1, 0),
-			verticalPadding = p1.Size.Size_150
+			verticalPadding = data.Size.Size_150
 		},
 		[TileBadgeComponentTypeValues.RoundedRectangle] = {
-			backgroundColorStyle = p1.Color.Extended.Black.Black_90,
-			contentColorStyle = p1.DarkMode.Content.Emphasis,
+			backgroundColorStyle = data.Color.Extended.Black.Black_90,
+			contentColorStyle = data.DarkMode.Content.Emphasis,
 			cornerRadius = UDim.new(0.2, 0),
-			verticalPadding = p1.Size.Size_100
+			verticalPadding = data.Size.Size_100
 		}
 	}
-	local v15 = p2 and t1[p2]
 
-	if p2 ~= nil and not v15 then
-		flaggedMutedError("GameTileOverlayBadgeInvalidComponentTypeError", `Unsupported game tile badge component type: { p2 }`)
+	local v2 = tileBadgeComponentType and v[tileBadgeComponentType]
+
+	if tileBadgeComponentType ~= nil and not v2 then
+		flaggedMutedError(
+			"GameTileOverlayBadgeInvalidComponentTypeError",
+			`Unsupported game tile badge component type: {tileBadgeComponentType}`
+		)
 	end
 
-	return v15 or t1[TileBadgeComponentTypeValues.Pill]
+	return v2 or v[TileBadgeComponentTypeValues.Pill]
 end
-local function GameTileThumbnailBadges(t2: {[any]: any}) -- line: 47
-	-- upvalues: useTokens (copy), React (copy), GameTileConstants (copy), flaggedMutedError (copy), TileBadgeIconNamesByType (copy), GameTileOverlayBadge (copy), getBadgeStyleOptions (copy)
-	local v17 = useTokens()
-	local Medium = v17.Padding.Medium
-	local v19, v20 = React.useBinding(0)
-	local v21 = React.useCallback(function(p3) -- line: 55
-		-- upvalues: v20 (copy), Medium (ref)
-		local AbsoluteSizeX = p3.AbsoluteSize.X
 
-		v20(AbsoluteSizeX - Medium * 2)
-	end, { Medium })
-	local t3 = {}
+local function GameTileThumbnailBadges(p)
+	local v = useTokens()
+	local padding = p.padding or v.Padding.Medium
 
-	for v23, v24 in t2.tileBadgesByPosition do
-		local v25 = nil
-		local v26 = nil
-		local v27 = GameTileConstants.TileBadgePositionCalculators[v23]
+	local maxWidthBinding, v2 = React.useBinding(0)
 
-		if v27 then
-			v25, v26 = v27(Medium)
+	local v3 = React.useCallback(function(p2)
+		v2(p2.AbsoluteSize.X - padding * 2)
+	end, { padding })
+
+	local children = {}
+
+	for k, tileBadge in p.tileBadgesByPosition do
+		local position = nil
+		local anchorPoint = nil
+		local tileBadgePositionCalculator = GameTileConstants.TileBadgePositionCalculators[k]
+
+		if tileBadgePositionCalculator then
+			position, anchorPoint = tileBadgePositionCalculator(padding)
 		else
-			flaggedMutedError("GameTileOverlayBadgeInvalidPositionError", `Unsupported game tile badge position: { v23 }`)
+			flaggedMutedError("GameTileOverlayBadgeInvalidPositionError", `Unsupported game tile badge position: {k}`)
 		end
 
-		if #v24 > 0 then
-			local v28 = v24[1]
-			local t4 = nil
+		if not (#tileBadge > 0) then
+			continue
+		end
 
-			if v28.icons and #v28.icons > 0 then
-				t4 = {}
+		local v4 = tileBadge[1]
+		local tileBadgeIconNames
 
-				for _, v31 in v28.icons do
-					local v32 = TileBadgeIconNamesByType[v31]
+		if v4.icons and #v4.icons > 0 then
+			tileBadgeIconNames = {}
 
-					if v32 then
-						table.insert(t4, v32)
-					else
-						warn(`Unsupported game tile badge icon type: { v31 }`)
-					end
+			for _, icon in v4.icons do
+				local tileBadgeIconName = TileBadgeIconNamesByType[icon]
+
+				if tileBadgeIconName then
+					table.insert(tileBadgeIconNames, tileBadgeIconName)
+				else
+					warn(`Unsupported game tile badge icon type: {icon}`)
 				end
 			end
-
-			t3[v23 .. "TileBadge"] = React.createElement(GameTileOverlayBadge, {
-				Position = v25,
-				AnchorPoint = v26,
-				maxWidthBinding = v19,
-				icons = t4,
-				text = v28.text,
-				styleOptions = getBadgeStyleOptions(v17, v28.tileBadgeComponentType)
-			})
 		end
+
+		children[k .. "TileBadge"] = React.createElement(GameTileOverlayBadge, {
+			Position = position,
+			AnchorPoint = anchorPoint,
+			maxWidthBinding = maxWidthBinding,
+			icons = tileBadgeIconNames,
+			text = v4.text,
+			styleOptions = getBadgeStyleOptions(v, v4.tileBadgeComponentType)
+		})
 	end
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0),
-		[React.Change.AbsoluteSize] = v21
-	}, t3)
+	return React.createElement(
+		"Frame",
+		{
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			[React.Change.AbsoluteSize] = v3
+		},
+		children
+	)
 end
 
 return React.memo(GameTileThumbnailBadges)

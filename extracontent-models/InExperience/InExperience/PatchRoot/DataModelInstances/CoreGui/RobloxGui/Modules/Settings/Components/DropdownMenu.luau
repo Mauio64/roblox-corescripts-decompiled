@@ -2,14 +2,20 @@ local CorePackages = game:GetService("CorePackages")
 local React = require(CorePackages.Packages.React)
 local Roact = require(CorePackages.Packages.Roact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local t = require(CorePackages.Packages.t)
 local ArgCheck = require(CorePackages.Workspace.Packages.ArgCheck)
+
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local useStyle = UIBlox.Core.Style.useStyle
 local BaseMenu = UIBlox.App.Menu.BaseMenu
-local v11 = Images["icons/actions/truncationExpand_small"]
-local v12 = ArgCheck.wrap(t.strictInterface({
+
+local iconsactionstruncationExpand_small = Images["icons/actions/truncationExpand_small"]
+
+local wrapped = ArgCheck.wrap(t.strictInterface({
 	buttonSize = t.UDim2,
 	dropdownList = t.table,
 	selectedIndex = t.number,
@@ -17,96 +23,106 @@ local v12 = ArgCheck.wrap(t.strictInterface({
 	layoutOrder = t.number
 }))
 
-local function DropdownMenu(t1: {[any]: any}) -- line: 45
-	-- upvalues: v12 (copy), useStyle (copy), React (copy), Roact (copy), ImageSetLabel (copy), v11 (copy), BaseMenu (copy)
-	assert(v12(t1))
+local function DropdownMenu(props)
+	assert(wrapped(props))
 
-	local v15 = useStyle()
-	local CaptionHeader = v15.Font.CaptionHeader
-	local v17 = CaptionHeader.RelativeSize * v15.Font.BaseSize
-	local v18 = if not v15.UIBloxThemeEnabled then Color3.fromRGB(79, 84, 95) else v15.color("ControlInputBackground")
-	local v19, v20 = React.useState(false)
-	local v21, v22 = React.useState({})
-	local v23 = React.useCallback(function() -- line: 58
-		-- upvalues: v20 (copy), v19 (copy)
-		v20(not v19)
+	local v = useStyle()
+	local captionHeader = v.Font.CaptionHeader
+	local textSize = captionHeader.RelativeSize * v.Font.BaseSize
+	local v2
+
+	if v.UIBloxThemeEnabled then
+		v2 = v.color("ControlInputBackground")
+	else
+		v2 = Color3.fromRGB(79, 84, 95)
+	end
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState({})
+
+	local v3 = React.useCallback(function()
+		setState(not state)
 	end)
 
-	React.useEffect(function() -- line: 62
-		-- upvalues: t1 (copy), CaptionHeader (copy), v20 (copy), v22 (copy)
-		local t2 = {}
+	React.useEffect(function()
+		local v4 = {}
 
-		for k, v in pairs(t1.dropdownList) do
-			t2[k] = {
-				leftPaddingOffset = -12,
-				selectedIconPaddingRight = 12,
-				text = v,
-				fontStyle = {
-					Font = CaptionHeader.Font,
-					RelativeSize = CaptionHeader.RelativeSize
-				},
-				onActivated = function() -- line: 71
-					-- upvalues: t1 (copy), k (copy), v20 (copy)
-					t1.onSelection(k)
-					v20(false)
+		for k, dropdown in pairs(props.dropdownList) do
+			v4[k] = {
+				text = dropdown,
+				fontStyle = { Font = captionHeader.Font, RelativeSize = captionHeader.RelativeSize },
+				onActivated = function()
+					props.onSelection(k)
+					setState(false)
 				end,
-				selected = k == t1.selectedIndex
+				leftPaddingOffset = -12,
+				selected = k == props.selectedIndex,
+				selectedIconPaddingRight = 12
 			}
 		end
 
-		v22(t2)
-	end, {
-		t1.dropdownList,
-		t1.selectedIndex
-	})
+		setState2(v4)
+	end, { props.dropdownList, props.selectedIndex })
 
-	return Roact.createElement("Frame", {
+	local createElement = Roact.createElement
+	local v4 = {
+		Size = props.buttonSize,
+		LayoutOrder = props.layoutOrder,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		ZIndex = 3,
-		Size = t1.buttonSize,
-		LayoutOrder = t1.layoutOrder
-	}, {
-		SpawnButton = Roact.createElement("TextButton", {
-			Size = UDim2.new(1, 0, 1, 0),
-			Text = t1.dropdownList[t1.selectedIndex],
-			TextColor3 = Color3.new(1, 1, 1),
-			TextSize = v17,
-			Font = CaptionHeader.Font,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			BackgroundColor3 = v18,
-			BackgroundTransparency = 0,
-			LayoutOrder = t1.layoutOrder,
-			[Roact.Event.Activated] = v23
-		}, {
-			UICorner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 4)
-			}),
-			UIPadding = Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, 12)
-			}),
+		ZIndex = 3
+	}
+
+	local createElement2 = Roact.createElement
+	local v5 = {}
+	v5.Size = UDim2.new(1, 0, 1, 0)
+	v5.Text = props.dropdownList[props.selectedIndex]
+	v5.TextColor3 = Color3.new(1, 1, 1)
+	v5.TextSize = textSize
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = captionHeader.Font
+	end
+
+	v5.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v.Tokens.Typography.CaptionLarge.Font)
+	end
+
+	v5.FontFace = fontFace
+
+	v5.TextXAlignment = Enum.TextXAlignment.Left
+	v5.BackgroundColor3 = v2
+	v5.BackgroundTransparency = 0
+	v5.LayoutOrder = props.layoutOrder
+	v5[Roact.Event.Activated] = v3
+	return createElement("Frame", v4, {
+		SpawnButton = createElement2("TextButton", v5, {
+			UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 4) }),
+			UIPadding = Roact.createElement("UIPadding", { PaddingLeft = UDim.new(0, 12) }),
 			UIStroke = Roact.createElement("UIStroke", {
-				Thickness = 1,
-				Transparency = 0.8,
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-				Color = Color3.new(1, 1, 1)
+				Color = Color3.new(1, 1, 1),
+				Thickness = 1,
+				Transparency = 0.8
 			}),
 			Arrow = Roact.createElement(ImageSetLabel, {
+				Image = iconsactionstruncationExpand_small,
 				BackgroundTransparency = 1,
-				Image = v11,
 				Size = UDim2.new(0, 16, 0, 16),
 				Position = UDim2.new(1, -28, 0.5, -8)
 			})
 		}),
-		Dropdown = v19 and Roact.createElement(BaseMenu, {
+		Dropdown = state and Roact.createElement(BaseMenu, {
+			buttonProps = state2,
+			position = UDim2.new(0, 0, 1, 6),
 			layoutOrder = 2,
 			elementHeight = 40,
-			showDropShadow = true,
-			buttonProps = v21,
-			position = UDim2.new(0, 0, 1, 6),
-			background = {
-				Color = v18
-			}
+			background = { Color = v2 },
+			showDropShadow = true
 		})
 	})
 end

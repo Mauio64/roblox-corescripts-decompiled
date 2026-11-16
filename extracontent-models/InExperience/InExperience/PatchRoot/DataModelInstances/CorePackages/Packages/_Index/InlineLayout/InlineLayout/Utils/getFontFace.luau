@@ -1,11 +1,11 @@
-local function getFontFace(t1: {[any]: any}?) -- line: 9
-	local v3 = t1 and t1.Font
+local function getFontFace(p)
+	local font = p and p.Font
 
-	if typeof(v3) == "EnumItem" and v3:IsA("Font") then
-		return Font.fromEnum(v3)
+	if typeof(font) == "EnumItem" and font:IsA("Font") then
+		return Font.fromEnum(font)
 	end
 
-	return v3
+	return font
 end
 
 return getFontFace

@@ -1,3 +1,5 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
 
-return (require(VirtualEvents.Parent.RobloxAppLoggers).Logger:new("VirtualEvents"))
+local RobloxAppLoggers = require(VirtualEvents.Parent.RobloxAppLoggers)
+
+return (RobloxAppLoggers.Logger:new("VirtualEvents"))

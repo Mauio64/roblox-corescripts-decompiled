@@ -1,19 +1,17 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-local function createReplyingToStore() -- line: 24
-	-- upvalues: Signals (copy)
-	local v4, v5 = Signals.createSignal(nil)
+local Signals = require(parent.Signals)
+
+local function createReplyingToStore()
+	local signal, v = Signals.createSignal(nil)
 
 	return {
-		getMessageId = v4,
-		setReplyingTo = function(s1: string) -- line: 27
-			-- upvalues: v5 (copy)
-			v5(s1)
+		getMessageId = signal,
+		setReplyingTo = function(p: string)
+			v(p)
 		end,
-		clear = function() -- line: 31
-			-- upvalues: v5 (copy)
-			v5(nil)
+		clear = function()
+			v(nil)
 		end
 	}
 end

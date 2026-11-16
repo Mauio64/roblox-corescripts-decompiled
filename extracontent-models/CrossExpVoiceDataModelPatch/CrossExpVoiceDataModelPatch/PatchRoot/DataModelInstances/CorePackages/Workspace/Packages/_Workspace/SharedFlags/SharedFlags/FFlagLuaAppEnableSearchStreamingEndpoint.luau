@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagLuaAppSduiStreamingChunkedResponses) and game:DefineFastFlag("LuaAppEnableSearchStreamingEndpoint", false)
+local FFlagLuaAppSduiStreamingChunkedResponses = require(script.Parent.FFlagLuaAppSduiStreamingChunkedResponses)
+
+return FFlagLuaAppSduiStreamingChunkedResponses and game:DefineFastFlag("LuaAppEnableSearchStreamingEndpoint", false)

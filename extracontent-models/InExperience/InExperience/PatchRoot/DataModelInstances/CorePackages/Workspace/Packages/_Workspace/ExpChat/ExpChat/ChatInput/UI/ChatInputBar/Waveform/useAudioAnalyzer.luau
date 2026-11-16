@@ -1,38 +1,34 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ExpChat").Parent
 
-local function useAudioAnalyzer(p1) -- line: 10
-	-- upvalues: React (copy)
-	local v5 = React.useRef(nil)
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 13
-		-- upvalues: p1 (copy), v5 (copy)
-		if not p1 then
+local function useAudioAnalyzer(sourceInstance)
+	local ref = React.useRef(nil)
+
+	React.useEffect(function()
+		if not sourceInstance then
 			return
 		end
 
-		local AudioAnalyzer = Instance.new("AudioAnalyzer")
+		local waveformAnalyzer = Instance.new("AudioAnalyzer")
+		waveformAnalyzer.SpectrumEnabled = false
+		waveformAnalyzer.Name = "WaveformAnalyzer"
+		waveformAnalyzer.Parent = sourceInstance.Parent
+		ref.current = waveformAnalyzer
 
-		AudioAnalyzer.SpectrumEnabled = false
-		AudioAnalyzer.Name = "WaveformAnalyzer"
-		AudioAnalyzer.Parent = p1.Parent
-		v5.current = AudioAnalyzer
+		local wire = Instance.new("Wire")
+		wire.SourceInstance = sourceInstance
+		wire.TargetInstance = waveformAnalyzer
+		wire.Parent = sourceInstance.Parent
 
-		local Wire = Instance.new("Wire")
-
-		Wire.SourceInstance = p1
-		Wire.TargetInstance = AudioAnalyzer
-		Wire.Parent = p1.Parent
-
-		return function() -- line: 29
-			-- upvalues: Wire (copy), AudioAnalyzer (copy), v5 (copy)
-			Wire:Destroy()
-			AudioAnalyzer:Destroy()
-			v5.current = nil
+		return function()
+			wire:Destroy()
+			waveformAnalyzer:Destroy()
+			ref.current = nil
 		end
-	end, { p1 })
+	end, { sourceInstance })
 
-	return v5
+	return ref
 end
 
 return useAudioAnalyzer

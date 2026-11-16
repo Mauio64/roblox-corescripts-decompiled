@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("InputUi").Parent
+local parent = script:FindFirstAncestor("InputUi").Parent
+require(parent.Style)
 
-require(Parent.Style)
-
-return function(_, _) -- line: 18
+return function(_, _)
 	return {
 		designWidth = 1920,
 		imageWidth = 580,

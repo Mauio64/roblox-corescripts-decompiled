@@ -1,16 +1,16 @@
-local function removeIndex(p1, p2) -- line: 4
-	local t1 = {}
-	local n1 = 0
+local function removeIndex(list, p)
+	local v = 0
+	local result = {}
 
-	for i = 1, #p1 do
-		if i == p2 then
-			n1 = 1
+	for i = 1, #list do
+		if i == p then
+			v = 1
 		else
-			t1[i - n1] = p1[i]
+			result[i - v] = list[i]
 		end
 	end
 
-	return t1
+	return result
 end
 
 return removeIndex

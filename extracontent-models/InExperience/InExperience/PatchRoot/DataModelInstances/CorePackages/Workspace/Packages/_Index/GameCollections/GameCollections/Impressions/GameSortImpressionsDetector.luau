@@ -1,121 +1,122 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local React = require(Parent.React)
-local Signal = require(Parent.AppCommonLib).Signal
-local useRouteName = require(Parent.Navigation).useRouteName
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local Cryo = require(Parent.Cryo)
-local Impressions = require(Parent.Impressions)
+local parent = script:FindFirstAncestor("GameCollections").Parent
+local React = require(parent.React)
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
+local Navigation = require(parent.Navigation)
+local useRouteName = Navigation.useRouteName
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local Cryo = require(parent.Cryo)
+local Impressions = require(parent.Impressions)
 local ScreenSizeImpressionsDetector = Impressions.ScreenSizeImpressionsDetector
 local ImpressionsVisualizer = Impressions.ImpressionsVisualizer
 
-return function(t1: {[any]: any}) -- line: 23
-	-- upvalues: React (copy), Signal (copy), ImpressionsVisualizer (copy), useRouteName (copy), useSelector (copy), Cryo (copy), ScreenSizeImpressionsDetector (copy)
-	local v11 = React.useRef({})
-	local v12 = React.useRef(Signal.new())
-	local u13 = React.useRef(nil)
+return function(props)
+	local ref = React.useRef({})
+	local ref2 = React.useRef(Signal.new())
 
-	if u13.current == nil then
-		u13.current = ImpressionsVisualizer.new(t1.impressionsTag)
+	local ref3 = React.useRef(nil)
+
+	if ref3.current == nil then
+		ref3.current = ImpressionsVisualizer.new(props.impressionsTag)
 	end
 
-	assert(u13.current, "impressionsVisualizer should always be truthy; check needed for lint")
+	assert(ref3.current, "impressionsVisualizer should always be truthy; check needed for lint")
+	local state, setState = React.useState({})
+	local state2, setState2 = React.useState(props.dataUpdatedTimestamp)
 
-	local v14, v15 = React.useState({})
-	local v16, v17 = React.useState(t1.dataUpdatedTimestamp)
-	local v18 = useRouteName()
-	local v19 = useSelector(function(p1) -- line: 36
-		return p1.ScreenSize
+	local v = useRouteName()
+	local v2 = useSelector(function(p)
+		return p.ScreenSize
 	end)
-	local v20 = React.useRef(t1.impressionsTag)
 
-	React.useEffect(function() -- line: 42
-		-- upvalues: v20 (copy), t1 (copy), v17 (copy), v11 (copy), u13 (ref)
-		if v20.current ~= t1.impressionsTag then
-			v20.current = t1.impressionsTag
-			v17(t1.dataUpdatedTimestamp)
-			v11.current = {}
-			u13.current:onClearAllImpressions()
-			u13.current:setImpressionsTag(t1.impressionsTag)
+	local ref4 = React.useRef(props.impressionsTag)
+
+	React.useEffect(function()
+		if ref4.current ~= props.impressionsTag then
+			ref4.current = props.impressionsTag
+			setState2(props.dataUpdatedTimestamp)
+			ref.current = {}
+			ref3.current:onClearAllImpressions()
+			ref3.current:setImpressionsTag(props.impressionsTag)
 		end
-	end, { t1.impressionsTag })
-	React.useEffect(function() -- line: 52
-		-- upvalues: v12 (copy), t1 (copy)
-		v12.current:fire()
+	end, { props.impressionsTag })
 
-		local u24 = nil
+	React.useEffect(function()
+		ref2.current:fire()
+		local scrollViewPositionChangedSignalConnection
 
-		if t1.scrollViewPositionChangedSignal then
-			u24 = t1.scrollViewPositionChangedSignal:connect(function() -- line: 59
-				-- upvalues: v12 (copy)
-				v12.current:fire()
+		if props.scrollViewPositionChangedSignal then
+			scrollViewPositionChangedSignalConnection = props.scrollViewPositionChangedSignal:connect(function()
+				ref2.current:fire()
 			end)
+		else
+			scrollViewPositionChangedSignalConnection = nil
 		end
 
-		return function() -- line: 64
-			-- upvalues: u24 (ref)
-			if u24 ~= nil then
-				u24:disconnect()
+		return function()
+			if scrollViewPositionChangedSignalConnection ~= nil then
+				scrollViewPositionChangedSignalConnection:disconnect()
 			end
 		end
-	end, { t1.scrollViewPositionChangedSignal })
-	React.useEffect(function() -- line: 71
-		-- upvalues: t1 (copy), Cryo (copy), v18 (copy), v12 (copy), v16 (copy), v17 (copy), v11 (copy), u13 (ref)
-		if if type(t1.pageContext) ~= "table" then v18 == t1.pageContext else Cryo.List.find(t1.pageContext, v18) ~= nil then
-			v12.current:fire()
+	end, { props.scrollViewPositionChangedSignal })
 
-			if t1.dataUpdatedTimestamp ~= v16 then
-				v17(t1.dataUpdatedTimestamp)
-				v11.current = {}
-				u13.current:onClearAllImpressions()
+	React.useEffect(function()
+		local v3
+
+		if type(props.pageContext) == "table" then
+			v3 = Cryo.List.find(props.pageContext, v) ~= nil
+		else
+			v3 = v == props.pageContext
+		end
+
+		if v3 then
+			ref2.current:fire()
+
+			if props.dataUpdatedTimestamp ~= state2 then
+				setState2(props.dataUpdatedTimestamp)
+				ref.current = {}
+				ref3.current:onClearAllImpressions()
 			end
 		end
-	end, {
-		v18,
-		t1.pageContext,
-		t1.dataUpdatedTimestamp,
-		v16,
-		v19
-	})
-	React.useEffect(function() -- line: 90
-		-- upvalues: v14 (copy), t1 (copy), u13 (ref), v15 (copy)
-		if v14 ~= nil and #v14 > 0 then
-			t1.sendGameImpressions(v14)
-			u13.current:onSendImpressions(v14)
-			v15({})
+	end, { v, props.pageContext, props.dataUpdatedTimestamp, state2, v2 })
+
+	React.useEffect(function()
+		if state ~= nil and #state > 0 then
+			props.sendGameImpressions(state)
+			ref3.current:onSendImpressions(state)
+			setState({})
 		end
-	end, { v14 })
-	React.useEffect(function() -- line: 98
-		-- upvalues: u13 (ref)
-		return function() -- line: 99
-			-- upvalues: u13 (ref)
-			u13.current:destroy()
+	end, { state })
+
+	React.useEffect(function()
+		return function()
+			ref3.current:destroy()
 		end
 	end, {})
 
-	local v21 = React.useCallback(function(p2) -- line: 104
-		-- upvalues: v11 (copy)
-		if v11.current[p2] ~= nil then
+	local filterImpressionFunc = React.useCallback(function(p): boolean
+		if ref.current[p] ~= nil then
 			return false
 		end
 
-		v11.current[p2] = true
-
+		ref.current[p] = true
 		return true
 	end, {})
-	local v22 = React.useCallback(function(p3) -- line: 113
-		-- upvalues: v15 (copy)
-		if not p3 or #p3 == 0 then
+
+	local onImpressionsDetected = React.useCallback(function(list)
+		if not list or #list == 0 then
 			return
 		end
 
-		v15(p3)
+		setState(list)
 	end, {})
 
 	return React.createElement(ScreenSizeImpressionsDetector, {
-		onRequestImpressionsSignal = v12.current,
-		parentRef = t1.parentRef,
-		filterImpressionFunc = v21,
-		onImpressionsDetected = v22,
-		impressionsTag = t1.impressionsTag
+		onRequestImpressionsSignal = ref2.current,
+		parentRef = props.parentRef,
+		filterImpressionFunc = filterImpressionFunc,
+		onImpressionsDetected = onImpressionsDetected,
+		impressionsTag = props.impressionsTag
 	})
 end

@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
 local UserLib = script:FindFirstAncestor("UserLib")
-local UserLibParent = UserLib.Parent
-local mutedError = require(UserLibParent.Loggers).mutedError
+local parent = UserLib.Parent
+
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
 local isPlayerVerified = require(UserLib.Utils.isPlayerVerified)
 local Actions = require(UserLib.Actions)
 local AddUser = Actions.AddUser
@@ -9,53 +11,58 @@ local SetLocalUserId = Actions.SetLocalUserId
 local SetUserMembershipType = Actions.SetUserMembershipType
 local SetUserHasRobloxSubscription = Actions.SetUserHasRobloxSubscription
 local SetLocalUserUnder13 = Actions.SetLocalUserUnder13
-local UserModel = require(UserLib.Models).UserModel
-local FFlagEnableBlackbirdCheck = require(UserLibParent.SharedFlags).FFlagEnableBlackbirdCheck
+local Models = require(UserLib.Models)
+local UserModel = Models.UserModel
 
-local function getHasRobloxSubscription(p1) -- line: 19
-	-- upvalues: FFlagEnableBlackbirdCheck (copy), mutedError (copy)
-	if not FFlagEnableBlackbirdCheck then
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+local FFlagUseSignalsForIsLocalUserUnder13 = SharedFlags.FFlagUseSignalsForIsLocalUserUnder13
+local GetIsLocalUserUnder13Store
+
+if FFlagUseSignalsForIsLocalUserUnder13 then
+	GetIsLocalUserUnder13Store = require(UserLib.Stores.GetIsLocalUserUnder13Store)
+else
+	GetIsLocalUserUnder13Store = nil
+end
+
+local function getHasRobloxSubscription(localPlayer)
+	if not (FFlagEnableBlackbirdCheck and game:GetEngineFeature("ReadHasRobloxSubscriptionLua")) then
 		return false
 	end
 
-	if not game:GetEngineFeature("ReadHasRobloxSubscriptionLua") then
-		return false
-	end
-
-	local ok, result = pcall(function() -- line: 26
-		-- upvalues: p1 (copy)
-		return p1.HasRobloxSubscription
+	local success, result = pcall(function()
+		return localPlayer.HasRobloxSubscription
 	end)
 
-	if not ok then
+	if not success then
 		mutedError("[GetLocalUser] Failed to read HasRobloxSubscription: " .. tostring(result))
 	end
 
-	return ok and result == true
+	return success and result == true
 end
 
-return function() -- line: 35
-	-- upvalues: Players (copy), UserModel (copy), isPlayerVerified (copy), AddUser (copy), SetLocalUserId (copy), SetUserMembershipType (copy), FFlagEnableBlackbirdCheck (copy), SetUserHasRobloxSubscription (copy), getHasRobloxSubscription (copy), SetLocalUserUnder13 (copy)
-	return function(p2) -- line: 36
-		-- upvalues: Players (copy), UserModel (copy), isPlayerVerified (copy), AddUser (copy), SetLocalUserId (copy), SetUserMembershipType (copy), FFlagEnableBlackbirdCheck (copy), SetUserHasRobloxSubscription (copy), getHasRobloxSubscription (copy), SetLocalUserUnder13 (copy)
-		local LocalPlayer = Players.LocalPlayer
-		local str = tostring(LocalPlayer.UserId)
-		local v21 = UserModel.fromDataTable({
+return function()
+	return function(object)
+		local localPlayer = Players.LocalPlayer
+		local userId = tostring(localPlayer.UserId)
+		object:dispatch(AddUser((UserModel.fromDataTable({
+			id = userId,
+			name = localPlayer.Name,
+			displayName = localPlayer.displayName,
 			isFriend = false,
-			id = str,
-			name = LocalPlayer.Name,
-			displayName = LocalPlayer.displayName,
-			hasVerifiedBadge = isPlayerVerified(LocalPlayer)
-		})
-
-		p2:dispatch(AddUser(v21))
-		p2:dispatch(SetLocalUserId(str))
-		p2:dispatch(SetUserMembershipType(str, LocalPlayer.MembershipType))
+			hasVerifiedBadge = isPlayerVerified(localPlayer)
+		}))))
+		object:dispatch(SetLocalUserId(userId))
+		object:dispatch(SetUserMembershipType(userId, localPlayer.MembershipType))
 
 		if FFlagEnableBlackbirdCheck then
-			p2:dispatch(SetUserHasRobloxSubscription(str, (getHasRobloxSubscription(LocalPlayer))))
+			object:dispatch(SetUserHasRobloxSubscription(userId, getHasRobloxSubscription(localPlayer)))
 		end
 
-		p2:dispatch(SetLocalUserUnder13(LocalPlayer:GetUnder13()))
+		if FFlagUseSignalsForIsLocalUserUnder13 then
+			GetIsLocalUserUnder13Store(false).setIsLocalUserUnder13(localPlayer:GetUnder13())
+		else
+			object:dispatch(SetLocalUserUnder13(localPlayer:GetUnder13()))
+		end
 	end
 end

@@ -1,52 +1,50 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
 local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
-local AuthCommonParent = AuthCommon.Parent
-local Cryo = require(AuthCommonParent.Cryo)
-local v5 = game:DefineFastInt("DefaultMaxPruneAccounts", 50)
-
+local parent = AuthCommon.Parent
+local Cryo = require(parent.Cryo)
+local defineFastInt = game:DefineFastInt("DefaultMaxPruneAccounts", 50)
 require(AuthCommon.Utils.PreviousAccountEntry)
 
-local function prunePreviousAccountsList() -- line: 10
-	-- upvalues: AppStorageUtilities (copy), Cryo (copy), v5 (copy)
-	local v7 = AppStorageUtilities.getPreviousAccountsList()
-	local v8 = Cryo.Dictionary.values(v7)
-	local v9 = Cryo.List.filter(v8, function(p1) -- line: 13
-		return p1.signOutTimestamp == nil
-	end)
-	local v10 = Cryo.List.filter(v8, function(p2) -- line: 16
-		return p2.signOutTimestamp ~= nil
+local function prunePreviousAccountsList(): boolean
+	local previousAccountsList = AppStorageUtilities.getPreviousAccountsList()
+	local values = Cryo.Dictionary.values(previousAccountsList)
+	local filtered = Cryo.List.filter(values, function(p): boolean
+		return p.signOutTimestamp == nil
 	end)
 
-	if #v10 <= v5 then
+	local filtered2 = Cryo.List.filter(values, function(p): boolean
+		return p.signOutTimestamp ~= nil
+	end)
+
+	if #filtered2 <= defineFastInt then
 		return true
 	end
 
-	local v11 = Cryo.List.sort(v10, function(p3, p4) -- line: 28
-		return p3.signOutTimestamp > p4.signOutTimestamp
+	local sorted = Cryo.List.sort(filtered2, function(p, p2): boolean
+		return p.signOutTimestamp > p2.signOutTimestamp
 	end)
-	local t1 = {}
-	local n1 = 0
+	local count = 0
+	local v = {}
 
-	for _, v in ipairs(v11) do
-		if n1 >= v5 then
+	for _, v2 in ipairs(sorted) do
+		if defineFastInt <= count then
 			break
 		end
 
-		if v.userId then
-			t1[v.userId] = v
+		if v2.userId then
+			v[v2.userId] = v2
 		end
 
-		n1 += 1
+		count += 1
 	end
 
-	for _, v in ipairs(v9) do
-		if v.userId then
-			t1[v.userId] = v
+	for _, v2 in ipairs(filtered) do
+		if v2.userId then
+			v[v2.userId] = v2
 		end
 	end
 
-	AppStorageUtilities.setPreviousAccountsList(t1)
-
+	AppStorageUtilities.setPreviousAccountsList(v)
 	return true
 end
 

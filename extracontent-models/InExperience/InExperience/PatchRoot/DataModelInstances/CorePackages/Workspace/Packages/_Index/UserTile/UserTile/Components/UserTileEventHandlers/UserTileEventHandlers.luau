@@ -1,98 +1,151 @@
-local Parent = script:FindFirstAncestor("UserTile").Parent
-local React = require(Parent.React)
-local HoldDetector = require(Parent.HoldToPlay).HoldDetector
-local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
-local InputHandlers = require(Parent.InputHandlers)
+local parent = script:FindFirstAncestor("UserTile").Parent
 
-require(Parent.FocusNavigationUtils)
+local React = require(parent.React)
+local HoldToPlay = require(parent.HoldToPlay)
+local HoldDetector = HoldToPlay.HoldDetector
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local InputHandlers = require(parent.InputHandlers)
+require(parent.FocusNavigationUtils)
 
-local t1 = {
-	primary = Enum.KeyCode.ButtonA,
-	secondary = Enum.KeyCode.ButtonX
-}
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserSearchCancelTileActivationOnHoldIntent = SharedFlags.FFlagUserSearchCancelTileActivationOnHoldIntent
 
-local function UserTileEventHandlers(t2: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), t1 (copy), InputHandlers (copy), ReactFocusNavigation (copy), HoldDetector (copy)
-	local tileRef = t2.tileRef
-	local buttons = t2.buttons
-	local onTileActivated = t2.onTileActivated
-	local v12 = React.useRef(false)
-	local v13 = React.useCallback(function(b1: boolean) -- line: 36
-		-- upvalues: v12 (copy)
-		v12.current = b1
-	end, {})
-	local v14, v15 = React.useMemo(function() -- line: 40
-		-- upvalues: buttons (copy)
+local v = { primary = Enum.KeyCode.ButtonA, secondary = Enum.KeyCode.ButtonX }
+
+local function UserTileEventHandlers(props)
+	local tileRef = props.tileRef
+	local buttons = props.buttons
+	local onTileActivated = props.onTileActivated
+
+	local ref = React.useRef(false)
+
+	local setDisabledForHold = React.useCallback(function(current: boolean)
+		ref.current = current
+
+		if FFlagUserSearchCancelTileActivationOnHoldIntent and props.setDisabledForHold then
+			props.setDisabledForHold(current)
+		end
+	end, FFlagUserSearchCancelTileActivationOnHoldIntent and { props.setDisabledForHold } or {})
+
+	local v2, v3 = React.useMemo(function()
 		if buttons then
 			return buttons[#buttons], buttons[#buttons - 1]
 		end
 
 		return nil, nil
 	end, { buttons })
-	local v16 = React.useCallback(function() -- line: 47
-		-- upvalues: v12 (copy), onTileActivated (copy)
-		if v12.current then
+
+	local onRegularActivated = React.useCallback(function()
+		if ref.current then
 			return
 		end
 
 		onTileActivated()
 	end, { onTileActivated })
-	local v17 = React.useCallback(function() -- line: 54
-		-- upvalues: v14 (copy)
-		if v14 and v14.onActivated then
-			v14.onActivated()
-		end
-	end, { v14 })
-	local v18 = React.useCallback(function() -- line: 60
-		-- upvalues: v15 (copy)
-		if v15 and v15.onActivated then
-			v15.onActivated()
-		end
-	end, { v15 })
-	local v19, v20 = React.useMemo(function() -- line: 66
-		-- upvalues: v15 (copy), t1 (copy), InputHandlers (copy), v18 (copy)
-		local v25 = if not v15 then nil else v15.focusEventName
 
-		if v25 then
-			return {
-				[t1.secondary] = v25
-			}, {
-				[v25] = {
-					handler = InputHandlers.onRelease(v18)
-				}
-			}
+	local onHoldDetected = React.useCallback(function()
+		if v2 and v2.onActivated then
+			v2.onActivated()
+		end
+	end, { v2 })
+
+	local v4 = React.useCallback(function()
+		if v3 and v3.onActivated then
+			v3.onActivated()
+		end
+	end, { v3 })
+
+	local v5, v6 = React.useMemo(function()
+		local focusEventName
+
+		if v3 then
+			focusEventName = v3.focusEventName
 		end
 
-		return {}, {}
-	end, {
-		v15,
-		v18
-	})
-	local v21 = ReactFocusNavigation.useEventMap(v19)
-	local v22 = ReactFocusNavigation.useEventHandlerMap(v20, v21)
-
-	React.useEffect(function() -- line: 87
-		-- upvalues: v22 (copy), tileRef (copy)
-		if v22 and tileRef then
-			v22(tileRef.current)
+		if not focusEventName then
+			return {}, {}
 		end
 
-		return function() -- line: 91
-			-- upvalues: v22 (copy)
-			v22(nil)
+		return { [v.secondary] = focusEventName }, {
+			[focusEventName] = { handler = InputHandlers.onRelease(v4) }
+		}
+	end, { v3, v4 })
+
+	local v7 = ReactFocusNavigation.useEventMap(v5)
+
+	local v8 = ReactFocusNavigation.useEventHandlerMap(v6, v7)
+
+	local useEffect = React.useEffect
+	local function fn()
+		if v8 and tileRef then
+			v8(tileRef.current)
 		end
-	end, { v22 })
 
-	local v23 = v14 and v14.focusEventName or nil
+		return function()
+			v8(nil)
+		end
+	end
 
-	if tileRef.current and v23 then
+	local v9
+
+	if FFlagUserSearchCancelTileActivationOnHoldIntent then
+		v9 = tileRef
+	end
+
+	useEffect(fn, { v8, v9 })
+
+	if FFlagUserSearchCancelTileActivationOnHoldIntent then
+		React.useEffect(function()
+			if not tileRef then
+				return
+			end
+
+			local current = tileRef.current
+
+			if not current then
+				return
+			end
+
+			local function clearHoldGuard() -- 1 equivalent call inferred from this helper
+				if not ref.current then
+					return
+				end
+
+				ref.current = false
+
+				if props.setDisabledForHold then
+					props.setDisabledForHold(false)
+				end
+			end
+			local selectionLostConnection = current.SelectionLost:Connect(clearHoldGuard)
+			local inputBeganConnection = current.InputBegan:Connect(function(input)
+				local userInputType = input.UserInputType
+				local v10 = userInputType == Enum.UserInputType.MouseButton1
+					or userInputType == Enum.UserInputType.Touch
+				local v11 = input.KeyCode == v.primary
+
+				if input.UserInputState == Enum.UserInputState.Begin and (v10 or v11) then
+					clearHoldGuard() -- inferred equivalent call
+				end
+			end)
+			return function()
+				selectionLostConnection:Disconnect()
+				inputBeganConnection:Disconnect()
+			end
+		end, { props.setDisabledForHold, tileRef })
+	end
+
+	local focusEventName = v2 and v2.focusEventName or nil
+
+	if tileRef.current and focusEventName then
 		return (React.createElement(HoldDetector, {
 			guiObject = tileRef.current,
-			onHoldDetected = v17,
-			onRegularActivated = v16,
-			setDisabledForHold = v13,
-			keyCode = t1.primary,
-			focusNavigationEventName = v23
+			onHoldDetected = onHoldDetected,
+			onRegularActivated = onRegularActivated,
+			setDisabledForHold = setDisabledForHold,
+			keyCode = v.primary,
+			focusNavigationEventName = focusEventName,
+			disableRegularActionOnHoldIntent = props.disableRegularActionOnHoldIntent
 		}))
 	end
 

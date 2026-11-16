@@ -1,6 +1,6 @@
-local function findIndex(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 10
-	for i, v in ipairs(t1) do
-		if p1(v, i) then
+local function findIndex(list, callback)
+	for i, item in ipairs(list) do
+		if callback(item, i) then
 			return i
 		end
 	end

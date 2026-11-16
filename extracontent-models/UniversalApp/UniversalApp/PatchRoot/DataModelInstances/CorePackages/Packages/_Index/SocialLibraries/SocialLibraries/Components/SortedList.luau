@@ -1,55 +1,65 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-local Roact = require(SocialLibraries.dependencies).Roact
-local v3 = Roact.PureComponent:extend("SortedList")
+local dependencies = require(SocialLibraries.dependencies)
 
-v3.defaultProps = {
+local roact = dependencies.Roact
+
+local extended = roact.PureComponent:extend("SortedList")
+extended.defaultProps = {
+	entries = {},
 	renderEntry = nil,
 	entryHeight = 48,
-	LayoutOrder = 0,
-	entries = {},
-	sortComparator = function(_, _) -- line: 12
+	sortComparator = function(_, _): boolean
 		return true
-	end
+	end,
+	LayoutOrder = 0
 }
 
-function v3.sortEntries(p3) -- line: 19
-	local t1 = {}
+function extended:sortEntries()
+	local entries = {}
 
-	for _, v in pairs(p3.props.entries) do
-		table.insert(t1, v)
+	for _, entry in pairs(self.props.entries) do
+		table.insert(entries, entry)
 	end
 
-	table.sort(t1, p3.props.sortComparator)
+	table.sort(entries, self.props.sortComparator)
 
-	return t1
+	return entries
 end
-function v3.render(p4) -- line: 31
-	-- upvalues: Roact (copy)
-	local v11 = p4:sortEntries()
-	local t2 = {
-		layout = Roact.createElement("UIListLayout", {
+
+function extended:render()
+	local sortEntries = self:sortEntries()
+
+	local children = {
+		layout = roact.createElement("UIListLayout", {
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		})
 	}
 
-	for k, v in pairs(v11) do
-		local v15 = k == #v11
+	for k, sortEntry in pairs(sortEntries) do
+		local v = k == #sortEntries
 
-		table.insert(t2, Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, p4.props.entryHeight),
-			LayoutOrder = k
-		}, {
-			entry = p4.props.renderEntry(v, v15)
-		}))
+		table.insert(
+			children,
+			roact.createElement(
+				"Frame",
+				{
+					Size = UDim2.new(1, 0, 0, self.props.entryHeight),
+					BackgroundTransparency = 1,
+					LayoutOrder = k
+				},
+				{
+					entry = self.props.renderEntry(sortEntry, v)
+				}
+			)
+		)
 	end
 
-	return Roact.createElement("Frame", {
+	return roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, #self.props.entries * self.props.entryHeight),
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, #p4.props.entries * p4.props.entryHeight),
-		LayoutOrder = p4.props.LayoutOrder
-	}, t2)
+		LayoutOrder = self.props.LayoutOrder
+	}, children)
 end
 
-return v3
+return extended

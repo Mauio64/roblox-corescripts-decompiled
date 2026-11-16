@@ -1,8 +1,9 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
 
-require(scriptParentParent.CapturesCommon)
-require(scriptParent.Enums.CaptureType)
-require(scriptParent.Enums.PromptType)
+require(parent2.CapturesCommon)
+
+require(parent.Enums.CaptureType)
+require(parent.Enums.PromptType)
 
 return {}

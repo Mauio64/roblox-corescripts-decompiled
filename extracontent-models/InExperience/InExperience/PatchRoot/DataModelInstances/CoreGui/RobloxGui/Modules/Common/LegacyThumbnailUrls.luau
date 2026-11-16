@@ -1,10 +1,10 @@
-local v1 = game:GetService("ContentProvider").BaseUrl:lower()
-local v2 = string.gsub(v1, "/m.", "/www.")
-local v3 = string.gsub(v2, "/www.", "/thumbnails.")
-local v4 = string.gsub(v3, "http:", "https:")
+local ContentProvider = game:GetService("ContentProvider")
 
+local baseUrl = ContentProvider.BaseUrl:lower()
+local v = string.gsub(baseUrl, "/m.", "/www.")
+local v2 = string.gsub(v, "/www.", "/thumbnails.")
 return {
 	Headshot = "rbxthumb://type=AvatarHeadShot&id=%d&w=%d&h=%d",
-	Thumbnail = "rbxthumb://type=Avatar&id=%d&w=%d&h=%d",
-	Bust = v4 .. "v1/users/avatar-bust?userIds=%d&size=%dx%d&format=Png&isCircular=false"
+	Bust = string.gsub(v2, "http:", "https:") .. "v1/users/avatar-bust?userIds=%d&size=%dx%d&format=Png&isCircular=false",
+	Thumbnail = "rbxthumb://type=Avatar&id=%d&w=%d&h=%d"
 }

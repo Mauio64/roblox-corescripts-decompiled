@@ -1,16 +1,20 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Array = require(ParentParentParent.LuauPolyfill).Array
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Array = LuauPolyfill.Array
+
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
 
 return {
-	SingleFieldSubscriptionsRule = function(p1) -- line: 23
-		-- upvalues: GraphQLError (copy), Array (copy)
+	SingleFieldSubscriptionsRule = function(object)
 		return {
-			OperationDefinition = function(_, p3) -- line: 25
-				-- upvalues: p1 (copy), GraphQLError (copy), Array (copy)
-				if p3.operation == "subscription" and #p3.selectionSet.selections ~= 1 then
-					p1:reportError(GraphQLError.new(p3.name and ("Subscription \"%s\" must select only one top level field."):format(p3.name.value) or "Anonymous Subscription must select only one top level field.", Array.slice(p3.selectionSet.selections, 2)))
+			OperationDefinition = function(_, data)
+				if data.operation == "subscription" and #data.selectionSet.selections ~= 1 then
+					object:reportError(graphQLError.new(
+						data.name and ("Subscription \"%s\" must select only one top level field."):format(data.name.value) or "Anonymous Subscription must select only one top level field.",
+						Array.slice(data.selectionSet.selections, 2)
+					))
 				end
 			end
 		}

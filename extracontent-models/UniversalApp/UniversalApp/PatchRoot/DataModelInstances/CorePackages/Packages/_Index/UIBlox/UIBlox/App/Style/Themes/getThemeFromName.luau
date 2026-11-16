@@ -1,25 +1,28 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Constants = require(scriptParentParent.Constants)
-local validateTheme = require(scriptParentParent.Validator.validateTheme)
-local t1 = {
-	[Constants.ThemeName.Dark:lower()] = require(scriptParent.DarkTheme),
-	[Constants.ThemeName.Light:lower()] = require(scriptParent.LightTheme)
-}
+local parent = script.Parent
+local parent2 = parent.Parent
 
-return function(s1: string) -- line: 15
-	-- upvalues: t1 (copy), Constants (copy), validateTheme (copy)
-	local v7 = nil
+local Constants = require(parent2.Constants)
+local validateTheme = require(parent2.Validator.validateTheme)
 
-	if s1 ~= nil and #s1 > 0 then
-		v7 = t1[s1:lower()]
+local v = {}
+local dark = Constants.ThemeName.Dark:lower()
+local DarkTheme = require(parent.DarkTheme)
+v[dark] = DarkTheme
+local light = Constants.ThemeName.Light:lower()
+local LightTheme = require(parent.LightTheme)
+v[light] = LightTheme
+
+return function(value: string)
+	local selected
+
+	if not (value == nil or not (#value > 0)) then
+		selected = v[value:lower()]
 	end
 
-	if v7 == nil then
-		v7 = t1[Constants.DefaultThemeName:lower()]
+	if selected == nil then
+		selected = v[Constants.DefaultThemeName:lower()]
 	end
 
-	assert(validateTheme(v7))
-
-	return v7
+	assert(validateTheme(selected))
+	return selected
 end

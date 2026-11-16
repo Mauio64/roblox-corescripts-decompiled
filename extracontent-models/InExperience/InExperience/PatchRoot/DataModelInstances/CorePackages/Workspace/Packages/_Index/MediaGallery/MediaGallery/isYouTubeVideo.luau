@@ -1,5 +1,5 @@
-local function isYouTubeVideo(n1: number?) -- line: 3
-	return n1 == 33
+local function isYouTubeVideo(p: number?): boolean
+	return p == 33
 end
 
 return isYouTubeVideo

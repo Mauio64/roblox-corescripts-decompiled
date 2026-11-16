@@ -1,6 +1,6 @@
-local Parent = script:FindFirstAncestor("HttpClient").Parent
+local parent = script:FindFirstAncestor("HttpClient").Parent
 
-require(Parent.Signals)
-require(Parent.Resources)
+require(parent.Signals)
+require(parent.Resources)
 
 return {}

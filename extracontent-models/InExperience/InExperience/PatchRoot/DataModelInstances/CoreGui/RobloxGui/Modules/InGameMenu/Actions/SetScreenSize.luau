@@ -1,7 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator("SET_SCREEN_SIZE", function(p1) -- line: 5
-	return {
-		newScreenSize = p1
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("SET_SCREEN_SIZE", function(newScreenSize)
+	return { newScreenSize = newScreenSize }
 end)

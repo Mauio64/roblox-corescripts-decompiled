@@ -1,116 +1,116 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local parent = FriendsLanding.Parent
 local dependencies = require(FriendsLanding.dependencies)
-local Roact = dependencies.Roact
-local UIBlox = dependencies.UIBlox
-local withStyle = UIBlox.Style.withStyle
+
+local roact = dependencies.Roact
+local uiBlox = dependencies.UIBlox
+local withStyle = uiBlox.Style.withStyle
 local withLocalization = dependencies.withLocalization
-local ContextualMenu = UIBlox.App.Menu.ContextualMenu
-local MenuDirection = UIBlox.App.Menu.MenuDirection
+local contextualMenu = uiBlox.App.Menu.ContextualMenu
+local menuDirection = uiBlox.App.Menu.MenuDirection
 local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
-local Images = UIBlox.App.ImageSet.Images
+local images = uiBlox.App.ImageSet.Images
 local mapStateToProps = require(FriendsLanding.Components.FriendsLandingContainer.mapStateToProps)
-local RoactRodux = dependencies.RoactRodux
+local roactRodux = dependencies.RoactRodux
 local compose = dependencies.SocialLibraries.RoduxTools.compose
-local FriendsNetworking = dependencies.FriendsNetworking
+local friendsNetworking = dependencies.FriendsNetworking
 local EnumScreens = require(FriendsLanding.EnumScreens)
 local memoize = dependencies.memoize
-local Otter = dependencies.Otter
-local v18 = Roact.PureComponent:extend("FriendsLandingContextualMenu")
-local t1 = {
-	motorCallback = Otter.instant,
-	open = {
-		targetValue = 1
-	},
-	close = {
-		targetValue = 0
-	}
+local otter = dependencies.Otter
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMigrateFriendshipStatusesRemainingActions = SharedFlags.FFlagMigrateFriendshipStatusesRemainingActions
+local DataHydration = require(parent.DataHydration)
+local v = DataHydration.Friends.FriendsStore.get()
+
+local extended = roact.PureComponent:extend("FriendsLandingContextualMenu")
+
+local motorOverrideOptions = {
+	motorCallback = otter.instant,
+	open = { targetValue = 1 },
+	close = { targetValue = 0 }
 }
 
-function v18.init(p1) -- line: 35
-	-- upvalues: memoize (copy), EnumScreens (copy), Images (copy)
-	function p1.onClose() -- line: 36
-		-- upvalues: p1 (copy)
-		if p1.props.navigation then
-			p1.props.navigation.goBack()
+function extended:init()
+	function self.onClose()
+		if self.props.navigation then
+			self.props.navigation.goBack()
 		end
 	end
 
-	p1.onUnfriend = memoize(function(p2, p3) -- line: 42
-		-- upvalues: p1 (copy), EnumScreens (copy)
-		p1.props.navigation.navigate(EnumScreens.GenericToast, {
+	self.onUnfriend = memoize(function(toastTitle, iconImage)
+		self.props.navigation.navigate(EnumScreens.GenericToast, {
 			toastProps = {
-				toastContent = {
-					toastTitle = p2,
-					iconImage = p3
-				}
+				toastContent = { toastTitle = toastTitle, iconImage = iconImage }
 			}
 		})
 	end)
-	p1.onActivated = memoize(function(p4, p5) -- line: 53
-		-- upvalues: p1 (copy), Images (copy)
-		return function() -- line: 54
-			-- upvalues: p1 (copy), p4 (copy), Images (copy), p5 (copy)
-			local userId = p1.props.navigation.state.params.userId
+
+	self.onActivated = memoize(function(p, p2)
+		return function()
+			local userId = self.props.navigation.state.params.userId
 
 			if userId ~= nil then
-				p1.props.unfriendTargetUserId({
-					targetUserId = userId,
-					currentUserId = p1.props.localUserId
-				}):andThen(function() -- line: 59
-					-- upvalues: p1 (copy), p4 (copy), Images (copy)
-					p1.onUnfriend(p4, Images["icons/actions/friends/friendRemove"])
-				end):catch(function() -- line: 62
-					-- upvalues: p1 (copy), p5 (copy)
-					p1.onUnfriend(p5)
+				local v2
+
+				if FFlagMigrateFriendshipStatusesRemainingActions then
+					v2 = v.Unfriend(userId)
+				else
+					v2 = self.props.unfriendTargetUserId({
+						targetUserId = userId,
+						currentUserId = self.props.localUserId
+					})
+				end
+
+				v2:andThen(function()
+					self.onUnfriend(p, images["icons/actions/friends/friendRemove"])
+				end):catch(function()
+					self.onUnfriend(p2)
 				end)
 			end
 
-			p1.onClose()
+			self.onClose()
 		end
 	end)
 end
-function v18.render(p6) -- line: 71
-	-- upvalues: withStyle (copy), withLocalization (copy), Roact (copy), ContextualMenu (copy), Images (copy), MenuDirection (copy), t1 (copy)
-	return withStyle(function(_) -- line: 72
-		-- upvalues: withLocalization (copy), Roact (copy), ContextualMenu (copy), Images (copy), p6 (copy), MenuDirection (copy), t1 (copy)
+
+function extended.render(data)
+	return withStyle(function(_)
 		return withLocalization({
 			unfriend = "Feature.Friends.Action.Unfriend",
 			error = "Feature.Toast.NetworkingError.SomethingIsWrong",
 			success = "Feature.Friends.Action.FriendRemoved"
-		})(function(p8) -- line: 77
-			-- upvalues: Roact (copy), ContextualMenu (copy), Images (copy), p6 (copy), MenuDirection (copy), t1 (copy)
-			local unfriend = p8.unfriend
-			local success = p8.success
-			local error = p8.error
+		})(function(props)
+			local unfriend = props.unfriend
+			local success = props.success
+			local err = props.error
 
-			return Roact.createElement(ContextualMenu, {
+			return roact.createElement(contextualMenu, {
+				buttonProps = {
+					{
+						icon = images["icons/actions/friends/friendRemove"],
+						text = unfriend,
+						onActivated = data.onActivated(success, err)
+					}
+				},
 				open = true,
-				closeBackgroundVisible = false,
-				buttonProps = {{
-					icon = Images["icons/actions/friends/friendRemove"],
-					text = unfriend,
-					onActivated = p6.onActivated(success, error)
-				}},
-				menuDirection = MenuDirection.Up,
+				menuDirection = menuDirection.Up,
 				openPositionY = UDim.new(1, -24),
-				screenSize = p6.props.screenSize,
-				onDismiss = p6.onClose,
-				motorOverrideOptions = t1
+				screenSize = data.props.screenSize,
+				onDismiss = data.onClose,
+				closeBackgroundVisible = false,
+				motorOverrideOptions = motorOverrideOptions
 			})
 		end)
 	end)
 end
 
-return compose(RoactRodux.connect(mapStateToProps, function(p9) -- line: 103
-	-- upvalues: FriendsNetworking (copy)
+return compose(roactRodux.connect(mapStateToProps, function(callback)
 	return {
-		unfriendTargetUserId = function(p10) -- line: 105
-			-- upvalues: p9 (copy), FriendsNetworking (copy)
-			return p9(FriendsNetworking.UnfriendTargetUserId.API(p10))
+		unfriendTargetUserId = function(p)
+			return callback(friendsNetworking.UnfriendTargetUserId.API(p))
 		end
 	}
-end), FriendsLandingContext.connect(function(p11, _) -- line: 110
-	return {
-		screenSize = p11.screenSize
-	}
-end))(v18)
+end), FriendsLandingContext.connect(function(p, _)
+	return { screenSize = p.screenSize }
+end))(extended)

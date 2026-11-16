@@ -1,13 +1,13 @@
-return function(p1, t1: {[any]: any}) -- line: 8
-	if not p1 or p1 == "" then
+return function(value, p): boolean
+	if not value or value == "" then
 		return true
 	end
 
-	local displayName = t1.displayName
+	local v = p.displayName
 
-	if t1.alias ~= nil then
-		displayName ..= t1.alias
+	if p.alias ~= nil then
+		v ..= p.alias
 	end
 
-	return string.find(string.lower(displayName), string.lower(p1), 1, true) ~= nil
+	return string.find(string.lower(v), string.lower(value), 1, true) ~= nil
 end

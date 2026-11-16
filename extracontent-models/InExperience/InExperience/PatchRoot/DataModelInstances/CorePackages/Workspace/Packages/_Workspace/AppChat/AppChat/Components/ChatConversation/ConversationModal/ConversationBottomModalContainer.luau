@@ -1,45 +1,47 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Foundation = require(AppChatParent.Foundation)
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
 
+local Foundation = require(parent.Foundation)
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 require(AppChat.types)
 
-local ConversationBottomModal = require(AppChatParent.AppChatNetworking).Constants.ConversationBottomModal
+local AppChatNetworking = require(parent.AppChatNetworking)
+local ConversationBottomModal = AppChatNetworking.Constants.ConversationBottomModal
 local ModalConfiguration = require(AppChat.Models.ModalConfiguration)
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
-local SocialExperiments = require(AppChatParent.SocialExperiments)
+local SocialExperiments = require(parent.SocialExperiments)
 local FFlagTestDeviceForFAEUpsell = SocialExperiments.FFlagTestDeviceForFAEUpsell
 local deviceMeetsRequirementsForFAE = SocialExperiments.deviceMeetsRequirementsForFAE
-local FFlagEnableAEGIS2AppChatConversationBanner = require(AppChatParent.SharedFlags).FFlagEnableAEGIS2AppChatConversationBanner
-local FFlagAppChatNudgeToChatUpsellEnabled = require(AppChat.Flags.FFlagAppChatNudgeToChatUpsellEnabled)
+
 local ConversationModal = require(script.Parent.ConversationModal)
 local AppChatFAEBanner = require(AppChat.Components.FaeBanner.AppChatFAEBanner)
-local t1 = {
+
+local v = {
 	shouldShowLegacyBottomModal = false,
-	onHeightChanged = function(_) -- line: 38
-	end
+	onHeightChanged = function(_) end
 }
 
-local function ConversationBottomModalContainer(t2: {[any]: any}) -- line: 41
-	-- upvalues: Cryo (copy), t1 (copy), useSelector (copy), getDeepValue2 (copy), ModalConfiguration (copy), React (copy), FFlagEnableAEGIS2AppChatConversationBanner (copy), FFlagAppChatNudgeToChatUpsellEnabled (copy), ConversationBottomModal (copy), AppChatFAEBanner (copy), FFlagTestDeviceForFAEUpsell (copy), deviceMeetsRequirementsForFAE (copy), ConversationModal (copy), Foundation (copy)
-	local v21 = Cryo.Dictionary.union(t1, t2)
-	local v22 = useSelector(function(p2) -- line: 45
-		-- upvalues: getDeepValue2 (copy), v21 (copy), ModalConfiguration (copy)
-		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationBottomModals.{ v21.conversationId }`) or ModalConfiguration.default
-	end)
-	local v23 = React.useCallback(function(p3) -- line: 50
-		-- upvalues: v21 (copy)
-		v21.onHeightChanged(p3.AbsoluteSize.Y)
-	end, { v21.onHeightChanged })
-	local v24 = nil
+local function ConversationBottomModalContainer(p)
+	local union = Cryo.Dictionary.union(v, p)
 
-	if (FFlagEnableAEGIS2AppChatConversationBanner or FFlagAppChatNudgeToChatUpsellEnabled) and (not v21.shouldShowChatInputBar and v22 and v22.modal_variant ~= nil and v22.modal_variant ~= ConversationBottomModal.None) then
-		v24 = React.createElement(AppChatFAEBanner, {
-			modalConfiguration = v22,
-			conversationId = v21.conversationId
+	local modalConfiguration = useSelector(function(p2)
+		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationBottomModals.{union.conversationId}`)
+			or ModalConfiguration.default
+	end)
+
+	local onAbsoluteSizeChanged = React.useCallback(function(p2)
+		union.onHeightChanged(p2.AbsoluteSize.Y)
+	end, { union.onHeightChanged })
+	local conversationBottomModal
+
+	if not (union.shouldShowChatInputBar or not modalConfiguration or modalConfiguration.modal_variant == nil or modalConfiguration.modal_variant == ConversationBottomModal.None) then
+		conversationBottomModal = React.createElement(AppChatFAEBanner, {
+			modalConfiguration = modalConfiguration,
+			conversationId = union.conversationId
 		})
 	end
 
@@ -47,19 +49,21 @@ local function ConversationBottomModalContainer(t2: {[any]: any}) -- line: 41
 		return nil
 	end
 
-	if not v24 and v21.shouldShowLegacyBottomModal then
-		v24 = React.createElement(ConversationModal, {
-			bodyText = v21.legacyBottomModalText
+	if not conversationBottomModal and union.shouldShowLegacyBottomModal then
+		conversationBottomModal = React.createElement(ConversationModal, {
+			bodyText = union.legacyBottomModalText
 		})
 	end
 
-	return React.createElement(Foundation.View, {
-		tag = "auto-y size-full-0",
-		LayoutOrder = v21.layoutOrder,
-		onAbsoluteSizeChanged = v23
-	}, {
-		ConversationBottomModal = v24
-	})
+	return React.createElement(
+		Foundation.View,
+		{
+			LayoutOrder = union.layoutOrder,
+			onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+			tag = "auto-y size-full-0"
+		},
+		{ ConversationBottomModal = conversationBottomModal }
+	)
 end
 
 return React.memo(ConversationBottomModalContainer)

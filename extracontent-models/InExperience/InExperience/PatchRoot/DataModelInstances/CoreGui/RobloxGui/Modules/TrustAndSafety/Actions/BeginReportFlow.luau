@@ -1,8 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 5
-	return {
-		reportType = p1,
-		targetPlayer = p2
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator(script.Name, function(reportType, targetPlayer)
+	return { reportType = reportType, targetPlayer = targetPlayer }
 end)

@@ -1,3 +1,1 @@
-return {
-	FilterSelections = "filterSelections"
-}
+return { FilterSelections = "filterSelections" }

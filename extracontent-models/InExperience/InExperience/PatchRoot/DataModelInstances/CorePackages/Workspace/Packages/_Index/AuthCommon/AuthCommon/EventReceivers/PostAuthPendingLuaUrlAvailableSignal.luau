@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-return require(Parent.AppCommonLib).Signal.new()
+local AppCommonLib = require(parent.AppCommonLib)
+return AppCommonLib.Signal.new()

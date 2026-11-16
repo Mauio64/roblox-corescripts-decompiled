@@ -1,12 +1,12 @@
-local function decodeLuauUnicodeEscapes(s1: string) -- line: 7
-	return (s1:gsub("\\u{(%x+)}", function(p1) -- line: 9
-		local num = tonumber(p1, 16)
+local function decodeLuauUnicodeEscapes(value: string)
+	return (value:gsub("\\u{(%x+)}", function(p)
+		local v = tonumber(p, 16)
 
-		if num == nil or num < 0 or num > 1114111 then
+		if v == nil or v < 0 or v > 1114111 then
 			return ""
 		end
 
-		return utf8.char(num)
+		return utf8.char(v)
 	end))
 end
 

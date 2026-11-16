@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 
-return require(Parent.enumerate)(script.Name, {
+local enumerate = require(parent.enumerate)
+
+return enumerate(script.Name, {
 	All = 1,
 	Characters = 2,
 	Accessories = 11,

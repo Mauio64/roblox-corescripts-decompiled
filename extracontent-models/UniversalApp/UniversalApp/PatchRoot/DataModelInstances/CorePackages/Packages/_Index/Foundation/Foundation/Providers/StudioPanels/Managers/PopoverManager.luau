@@ -1,370 +1,362 @@
 local HttpService = game:GetService("HttpService")
+
 local Foundation = script:FindFirstAncestor("Foundation")
 local Flags = require(Foundation.Utility.Flags)
 local StudioUri = require(Foundation.Utility.Plugin.StudioUri)
-
 require(script.Parent.Parent.Types)
 
-local function bindToClose(p1, p2: ((...any) -> ...any)) -- line: 19
-	if p1:IsA("PluginGui") then
-		p1:BindToClose(p2)
+local function bindToClose(pluginGui, fn) -- 1 equivalent call inferred from this helper
+	if pluginGui:IsA("PluginGui") then
+		pluginGui:BindToClose(fn)
 	end
 end
-local function isStrictDescendantOf(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 37
-	local parentPopoverId = t3.parentPopoverId
+
+local function isStrictDescendantOf(p, p2, p3): boolean
+	local parentPopoverId = p3.parentPopoverId
 
 	while parentPopoverId do
-		if parentPopoverId == t2.id then
+		if parentPopoverId == p2.id then
 			return true
 		end
 
-		local v14 = t1[parentPopoverId]
+		local v = p[parentPopoverId]
 
-		if not v14 then
-			return false
+		if not v then
+			break
 		end
 
-		parentPopoverId = v14.parentPopoverId
+		parentPopoverId = v.parentPopoverId
 	end
 
 	return false
 end
 
-local t4 = {}
+local PopoverManager = {}
+PopoverManager.__index = PopoverManager
 
-t4.__index = t4
+function PopoverManager.new(Plugin, uriScope: string?)
+	local self = setmetatable({}, PopoverManager)
+	self._uriScope = uriScope
 
-function t4.new(p3, s1: string?) -- line: 70
-	-- upvalues: t4 (copy), StudioUri (copy)
-	local self = setmetatable({}, t4)
+	self._plugin = Plugin
+	self._panels = Plugin:GetPluginComponent("Panels")
+	self._pluginUri = StudioUri.wrap(Plugin:GetUri())
 
-	self._uriScope = s1
-	self._plugin = p3
-	self._panels = p3:GetPluginComponent("Panels")
-	self._pluginUri = StudioUri.wrap(p3:GetUri())
 	self._active = {}
 	self._pool = {}
 	self._didPrewarm = false
 
 	return self
 end
-function t4.openAtAsync(p4, p5, p6: ((...any) -> ...any)?, n1: number?, s2: string?) -- line: 100
-	-- upvalues: Flags (copy)
-	local v23 = p4:_acquirePanelAsync(p6, if n1 ~= nil then n1 else 0, s2)
 
-	v23.panel.Enabled = false
-	p4._panels:SetAttachmentAsync(v23.uri, {
-		TargetWidgetUri = p5.targetWidgetUri,
-		TargetAnchorPoint = p5.targetAnchorPoint,
-		SubjectAnchorPoint = p5.subjectAnchorPoint,
-		Offset = p5.offset
+function PopoverManager:openAtAsync(data, callback, p: number?, p2: string?, flag: boolean?)
+	local v = p == nil and 0 or p
+	local v2
+
+	if Flags.FoundationPopoverPluginFocusable then
+		v2 = flag == true
+	else
+		v2 = false
+	end
+
+	local panelAsync = self:_acquirePanelAsync(callback, v, p2, v2)
+
+	panelAsync.panel.Enabled = false
+
+	self._panels:SetAttachmentAsync(panelAsync.uri, {
+		TargetWidgetUri = data.targetWidgetUri,
+		TargetAnchorPoint = data.targetAnchorPoint,
+		SubjectAnchorPoint = data.subjectAnchorPoint,
+		Offset = data.offset
 	})
-	p4._panels:SetSizeAsync(v23.uri, Vector2.new(0, 0))
-	v23.panel.Enabled = true
-	v23.open = true
 
-	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		local generation = v23.generation
+	self._panels:SetSizeAsync(panelAsync.uri, Vector2.new(0, 0))
 
+	panelAsync.panel.Enabled = true
+	panelAsync.open = true
+
+	if not Flags.FoundationPopoverPluginOverlayMeasurement then
 		return {
-			container = v23.panel,
-			popoverId = v23.id,
-			setSizeAsync = function(vector2: Vector2) -- line: 130
-				-- upvalues: v23 (copy), generation (copy), p4 (copy)
-				if v23.generation ~= generation or not v23.open then
-					return
-				end
-
-				local v88 = math.ceil((math.min(3000, vector2.X)))
-				local v89 = math.ceil((math.min(3000, vector2.Y)))
-
-				p4._panels:SetSizeAsync(v23.uri, Vector2.new(v88, v89))
+			container = panelAsync.panel,
+			popoverId = panelAsync.id,
+			setSizeAsync = function(vector2: Vector2)
+				local v3 = math.ceil((math.min(3000, vector2.X)))
+				local v4 = math.ceil((math.min(3000, vector2.Y)))
+				self._panels:SetSizeAsync(panelAsync.uri, Vector2.new(v3, v4))
 			end,
-			updateAsync = function(p7) -- line: 138
-				-- upvalues: v23 (copy), generation (copy), p4 (copy)
-				if v23.generation ~= generation or (not v23.open or not v23.uri) then
+			updateAsync = function(data2)
+				if not panelAsync.uri then
 					return
 				end
 
-				p4._panels:SetAttachmentAsync(v23.uri, {
-					TargetWidgetUri = p7.targetWidgetUri,
-					TargetAnchorPoint = p7.targetAnchorPoint,
-					SubjectAnchorPoint = p7.subjectAnchorPoint,
-					Offset = p7.offset
+				self._panels:SetAttachmentAsync(panelAsync.uri, {
+					TargetWidgetUri = data2.targetWidgetUri,
+					TargetAnchorPoint = data2.targetAnchorPoint,
+					SubjectAnchorPoint = data2.subjectAnchorPoint,
+					Offset = data2.offset
 				})
 			end,
-			close = function() -- line: 150
-				-- upvalues: p4 (copy), v23 (copy), generation (copy)
-				p4:_closePopover(v23, true, generation)
+			close = function()
+				self:_closePopover(panelAsync, true)
 			end
 		}
 	end
 
+	local generation = panelAsync.generation
 	return {
-		container = v23.panel,
-		popoverId = v23.id,
-		setSizeAsync = function(vector2: Vector2) -- line: 158
-			-- upvalues: p4 (copy), v23 (copy)
-			local v92 = math.ceil((math.min(3000, vector2.X)))
-			local v93 = math.ceil((math.min(3000, vector2.Y)))
-
-			p4._panels:SetSizeAsync(v23.uri, Vector2.new(v92, v93))
-		end,
-		updateAsync = function(p8) -- line: 163
-			-- upvalues: v23 (copy), p4 (copy)
-			if not v23.uri then
+		container = panelAsync.panel,
+		popoverId = panelAsync.id,
+		setSizeAsync = function(vector2: Vector2)
+			if panelAsync.generation ~= generation or not panelAsync.open then
 				return
 			end
 
-			p4._panels:SetAttachmentAsync(v23.uri, {
-				TargetWidgetUri = p8.targetWidgetUri,
-				TargetAnchorPoint = p8.targetAnchorPoint,
-				SubjectAnchorPoint = p8.subjectAnchorPoint,
-				Offset = p8.offset
+			local v3 = math.ceil((math.min(3000, vector2.X)))
+			local v4 = math.ceil((math.min(3000, vector2.Y)))
+			self._panels:SetSizeAsync(panelAsync.uri, Vector2.new(v3, v4))
+		end,
+		updateAsync = function(data2)
+			if panelAsync.generation ~= generation or not (panelAsync.open and panelAsync.uri) then
+				return
+			end
+
+			self._panels:SetAttachmentAsync(panelAsync.uri, {
+				TargetWidgetUri = data2.targetWidgetUri,
+				TargetAnchorPoint = data2.targetAnchorPoint,
+				SubjectAnchorPoint = data2.subjectAnchorPoint,
+				Offset = data2.offset
 			})
 		end,
-		close = function() -- line: 175
-			-- upvalues: p4 (copy), v23 (copy)
-			p4:_closePopover(v23, true)
+		close = function()
+			self:_closePopover(panelAsync, true, generation)
 		end
 	}
 end
-function t4._createPanelAsync(p9, s3: string, n2: number) -- line: 189
-	-- upvalues: StudioUri (copy)
-	local v28 = p9._plugin:CreateQWidgetPluginGui(s3, {
+
+function PopoverManager:_createPanelAsync(title: string, p: number, focusable: boolean)
+	local Plugin = self._plugin
+
+	if not Flags.FoundationPopoverPluginFocusable then
+		focusable = nil
+	end
+
+	local qWidgetPluginGui = Plugin:CreateQWidgetPluginGui(title, {
+		Id = title,
 		InitialEnabled = true,
 		Tooltip = true,
+		Focusable = focusable,
 		Transparent = true,
 		Resizable = true,
-		Id = s3,
-		Title = s3,
-		ZIndex = n2 + 200
+		Title = title,
+		ZIndex = p + 200
 	})
 
-	v28.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	qWidgetPluginGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-	return v28, StudioUri.join(p9._pluginUri, {
-		Category = "Panels",
-		ItemId = s3
-	})
+	return qWidgetPluginGui, StudioUri.join(self._pluginUri, { Category = "Panels", ItemId = title })
 end
-function t4._makePopoverId(p10) -- line: 210
-	-- upvalues: HttpService (copy)
-	return `Popovers{ not p10._uriScope and "" or `/{ p10._uriScope }` }/{ HttpService:GenerateGUID(false) }`
+
+function PopoverManager:_makePopoverId()
+	return `Popovers{not self._uriScope and "" or `/{self._uriScope}`}/{HttpService:GenerateGUID(false)}`
 end
-function t4._createPopoverAsync(p11, s4: string, n3: number) -- line: 215
-	-- upvalues: Flags (copy)
-	local v33, v34 = p11:_createPanelAsync(s4, n3)
-	local t5 = {
+
+function PopoverManager:_createPopoverAsync(id: string, depth: number, isFocusable: boolean)
+	local pluginGui, uri = self:_createPanelAsync(id, depth, isFocusable)
+	local popoverAsync = {
+		id = id,
+		uri = uri,
+		panel = pluginGui,
 		open = false,
+		depth = depth,
+		isFocusable = isFocusable,
 		generation = 0,
 		parentPopoverId = nil,
-		onClose = nil,
-		id = s4,
-		uri = v34,
-		panel = v33,
-		depth = n3
+		onClose = nil
 	}
 
-	if v33:IsA("PluginGui") then
-		v33:BindToClose(function() -- line: 228
-			-- upvalues: Flags (copy), p11 (copy), t5 (copy)
-			if Flags.FoundationPopoverPluginOverlayMeasurement then
-				p11:_closePopover(t5, false, t5.generation)
+	local function fn()
+		if Flags.FoundationPopoverPluginOverlayMeasurement then
+			self:_closePopover(popoverAsync, false, popoverAsync.generation)
+		else
+			self:_closePopover(popoverAsync)
+		end
+	end
 
-				return
+	bindToClose(pluginGui, fn) -- inferred equivalent call
+
+	if pluginGui:IsA("PluginGui") then
+		pluginGui.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 and popoverAsync.open then
+				self:_closeChildPopovers(popoverAsync)
 			end
-
-			p11:_closePopover(t5)
 		end)
 	end
 
-	v33.InputBegan:Connect(function(input) -- line: 241
-		-- upvalues: t5 (copy), p11 (copy)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 and t5.open then
-			p11:_closeChildPopovers(t5)
-		end
-	end)
-
-	return t5
+	return popoverAsync
 end
-function t4._activatePopover(p12, t6: {[any]: any}, p13: ((...any) -> ...any)?, s5: string?) -- line: 250
-	-- upvalues: Flags (copy)
+
+function PopoverManager:_activatePopover(state, onClose, parentPopoverId: string?)
 	if Flags.FoundationPopoverPluginOverlayMeasurement then
-		t6.generation = t6.generation + 1
+		state.generation += 1
 	end
 
-	t6.onClose = p13
-	t6.parentPopoverId = s5
-	t6.open = false
-	p12._active[t6.id] = t6
+	state.onClose = onClose
+	state.parentPopoverId = parentPopoverId
+	state.open = false
+	self._active[state.id] = state
 end
-function t4._tryAcquireFromPool(p14, p15: ((...any) -> ...any)?, n4: number, s6: string?) -- line: 269
-	local v44 = p14._pool[n4]
-	local v45 = if not v44 then nil else table.remove(v44)
 
-	if not v45 then
+function PopoverManager:_tryAcquireFromPool(callback, p: number, p2: string?, flag: boolean)
+	local v = self._pool[p]
+	local v2 = nil
+
+	if Flags.FoundationPopoverPluginFocusable then
+		if v then
+			for i = #v, 1, -1 do
+				if v[i].isFocusable == flag then
+					v2 = table.remove(v, i)
+					break
+				end
+			end
+		end
+	elseif v then
+		v2 = table.remove(v)
+	end
+
+	if not v2 then
 		return nil
 	end
 
-	p14:_activatePopover(v45, p15, s6)
-
-	return v45
+	self:_activatePopover(v2, callback, p2)
+	return v2
 end
-function t4._acquirePanelAsync(p16, p17: ((...any) -> ...any)?, n5: number, s7: string?) -- line: 289
-	local v50 = p16:_tryAcquireFromPool(p17, n5, s7)
 
-	if v50 then
-		return v50
+function PopoverManager:_acquirePanelAsync(callback, p: number, p2: string?, flag: boolean)
+	local v = self:_tryAcquireFromPool(callback, p, p2, flag)
+
+	if v then
+		return v
 	end
 
-	local v51 = p16:_createPopoverAsync(p16:_makePopoverId(), n5)
-
-	p16:_activatePopover(v51, p17, s7)
-
-	return v51
+	local popoverAsync = self:_createPopoverAsync(self:_makePopoverId(), p, flag)
+	self:_activatePopover(popoverAsync, callback, p2)
+	return popoverAsync
 end
-function t4.prewarmPoolAsync(p18, n6: number) -- line: 310
-	if p18._didPrewarm then
+
+function PopoverManager:prewarmPoolAsync(p: number)
+	if self._didPrewarm then
 		return
 	end
 
-	for i = 0, math.max(0, n6) do
-		if p18._pool[i] == nil then
-			p18._pool[i] = {}
+	for i = 0, math.max(0, p) do
+		if self._pool[i] == nil then
+			self._pool[i] = {}
 		end
 
-		local v55 = p18._pool[i]
+		local popoverAsyncs = self._pool[i]
 
-		if #v55 == 0 then
-			local v56 = p18:_createPopoverAsync(p18:_makePopoverId(), i)
-
-			v56.panel.Enabled = false
-			table.insert(v55, v56)
-		end
-	end
-
-	p18._didPrewarm = true
-end
-function t4._closeChildPopovers(p19, t7: {[any]: any}) -- line: 336
-	local t8 = {}
-	local g64 = nil
-	local g66 = nil
-	local g67 = nil
-	local v68 = nil
-	local v65 = nil
-
-	for _, v61 in p19._active do
-		if not v61.open or v61.id == t7.id then
+		if #popoverAsyncs ~= 0 then
 			continue
 		end
 
-		local _active = p19._active
-		local parentPopoverId = v61.parentPopoverId
+		local popoverAsync = self:_createPopoverAsync(self:_makePopoverId(), i, false)
+		popoverAsync.panel.Enabled = false
+		table.insert(popoverAsyncs, popoverAsync)
+	end
+
+	self._didPrewarm = true
+end
+
+function PopoverManager:_closeChildPopovers(p)
+	local v = {}
+
+	for _, v2 in self._active do
+		if not (v2.open and v2.id ~= p.id) then
+			continue
+		end
+
+		local active = self._active
+		local parentPopoverId = v2.parentPopoverId
+		local flag
 
 		while true do
-			repeat
-				if g64 or not parentPopoverId then
-					g64 = false
-					v65 = false
-					g66 = true
-				end
-
-				if g66 then
-					break
-				end
-
-				if parentPopoverId == t7.id then
-					g67 = true
-
-					break
-				end
-
-				v68 = _active[parentPopoverId]
-
-				if not v68 then
-					g64 = true
-				end
-			until not g64
-
-			if g66 then
+			if not parentPopoverId then
+				flag = false
 				break
 			end
 
-			if g67 then
-				g67 = false
-
+			if parentPopoverId == p.id then
+				flag = true
 				break
 			end
 
-			parentPopoverId = v68.parentPopoverId
+			local v3 = active[parentPopoverId]
+
+			if v3 then
+				parentPopoverId = v3.parentPopoverId
+			else
+				flag = false
+				break
+			end
 		end
 
-		if not g66 then
-			v65 = true
-		end
-
-		g66 = false
-
-		if v65 then
-			table.insert(t8, v61)
+		if flag then
+			table.insert(v, v2)
 		end
 	end
 
-	for _, v70 in t8 do
-		p19:_closePopover(v70)
+	for _, v2 in v do
+		self:_closePopover(v2)
 	end
 end
-function t4._closePopover(p20, t9: {[any]: any}, b1: boolean?, n7: number?) -- line: 362
-	-- upvalues: Flags (copy)
-	if Flags.FoundationPopoverPluginOverlayMeasurement and (n7 ~= nil and n7 ~= t9.generation) then
+
+function PopoverManager:_closePopover(state, flag: boolean?, p: number?)
+	if Flags.FoundationPopoverPluginOverlayMeasurement and p ~= nil and state.generation ~= p or not state.open then
 		return
 	end
 
-	if not t9.open then
-		return
+	state.open = false
+	state.panel.Enabled = false
+
+	if not flag and state.onClose then
+		state.onClose()
 	end
 
-	t9.open = false
-	t9.panel.Enabled = false
+	self._active[state.id] = nil
 
-	if not b1 and t9.onClose then
-		t9.onClose()
+	local depth = state.depth
+
+	if not self._pool[depth] then
+		self._pool[depth] = {}
 	end
 
-	p20._active[t9.id] = nil
-
-	local depth = t9.depth
-
-	if not p20._pool[depth] then
-		p20._pool[depth] = {}
-	end
-
-	table.insert(p20._pool[depth], t9)
+	table.insert(self._pool[depth], state)
 end
-function t4.closeAll(p21) -- line: 396
-	local t10 = {}
 
-	for _, v79 in p21._active do
-		table.insert(t10, v79)
+function PopoverManager:closeAll()
+	local v = {}
+
+	for _, v2 in self._active do
+		table.insert(v, v2)
 	end
 
-	for _, v81 in t10 do
-		p21:_closePopover(v81)
+	for _, v2 in v do
+		self:_closePopover(v2)
 	end
 end
-function t4.destroy(p22) -- line: 410
-	p22:closeAll()
 
-	for _, v84 in p22._pool do
-		for _, v86 in v84 do
-			if v86.panel then
-				v86.panel:Destroy()
+function PopoverManager:destroy()
+	self:closeAll()
+
+	for _, v in self._pool do
+		for _, v2 in v do
+			if v2.panel then
+				v2.panel:Destroy()
 			end
 		end
 	end
 
-	p22._pool = {}
+	self._pool = {}
 end
 
-return t4
+return PopoverManager

@@ -1,31 +1,30 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Array = require(ParentParentParent.LuauPolyfill).Array
-local isObjectLike = require(ParentParent.jsutils.isObjectLike).isObjectLike
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-local function toJSONDeep(p1) -- line: 18
-	-- upvalues: isObjectLike (copy), Array (copy), toJSONDeep (copy)
-	if not isObjectLike(p1) then
-		return p1
+local isObjectLike = require(parent.jsutils.isObjectLike)
+local isObjectLike2 = isObjectLike.isObjectLike
+local function toJSONDeep(p)
+	if not isObjectLike2(p) then
+		return p
 	end
 
-	if type(p1.toJSON) == "function" then
-		return p1:toJSON()
+	if type(p.toJSON) == "function" then
+		return p:toJSON()
 	end
 
-	if Array.isArray(p1) then
-		return Array.map(p1, toJSONDeep)
+	if Array.isArray(p) then
+		return Array.map(p, toJSONDeep)
 	end
 
-	local t1 = {}
+	local result = {}
 
-	for k, v in pairs(p1) do
-		t1[k] = toJSONDeep(v)
+	for k, v in pairs(p) do
+		result[k] = toJSONDeep(v)
 	end
 
-	return t1
+	return result
 end
 
-return {
-	toJSONDeep = toJSONDeep
-}
+return { toJSONDeep = toJSONDeep }

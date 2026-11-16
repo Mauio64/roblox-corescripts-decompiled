@@ -1,238 +1,310 @@
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("SocialCards").Parent
-local Cryo = require(Parent.Cryo)
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local SquadExternalContractProvider = require(Parent.SquadsCore.SquadExternalContractProvider)
 
-require(Parent.SquadsCore.Types)
+local parent = script:FindFirstAncestor("SocialCards").Parent
 
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useNavigation = require(Parent.Navigation).useNavigation
-local UserProfileStore = require(Parent.UserProfiles).Stores.UserProfileStore
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+require(parent.SquadsCore.Types)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local UserProfiles = require(parent.UserProfiles)
+
+local UserProfileStore = UserProfiles.Stores.UserProfileStore
+
 local AvatarGroup = Foundation.AvatarGroup
 local AvatarGroupType = Foundation.Enums.AvatarGroupType
 local InputSize = Foundation.Enums.InputSize
 local useTokens = Foundation.Hooks.useTokens
-local ScheduledSquadActionEnum = require(Parent.Squads.Enums).ScheduledSquadActionEnum
-local ScheduledSquadActionSourceEnum = require(Parent.Squads.Enums).ScheduledSquadActionSourceEnum
-local ScheduledSquadsMoreInfoSheet = require(Parent.Squads.Components).ScheduledSquadsMoreInfoSheet
-local SquadButtonSourceEnum = require(Parent.Squads.Enums).SquadButtonSourceEnum
-local SquadComponentAccessWrapper = require(Parent.Squads.Components).SquadComponentAccessWrapper
-local SquadJoinButton = require(Parent.Squads.Components).SquadJoinButton
-local GetScheduledSquadsStore = require(Parent.SquadsCore.Stores).GetScheduledSquadsStore
-local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
-local EventNames = require(Parent.SquadsCore.EventNames)
-local useCurrentSquadId = require(Parent.SquadsCore.Hooks).useCurrentSquadId
-local useScheduledSquad = require(Parent.SquadsCore.Hooks).useScheduledSquad
-local v25 = game:DefineFastInt("ScheduledSquadJustStartedThreshold", 300)
 
-return function(p1) -- line: 40
-	-- upvalues: useTokens (copy), useNavigation (copy), React (copy), SquadExternalContractContext (copy), useCurrentSquadId (copy), useScheduledSquad (copy), v25 (copy), Cryo (copy), GetScheduledSquadsStore (copy), UserProfileStore (copy), useLocalization (copy), LocalizationService (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), Foundation (copy), AvatarGroup (copy), InputSize (copy), AvatarGroupType (copy), SquadComponentAccessWrapper (copy), SquadJoinButton (copy), SquadButtonSourceEnum (copy), ScheduledSquadsMoreInfoSheet (copy)
-	local v27 = useTokens()
-	local v28 = useNavigation()
-	local v29 = React.useContext(SquadExternalContractContext)
-	local v30 = useCurrentSquadId()
-	local v31 = p1.startTime == nil
-	local v32, v33 = React.useState(false)
-	local v34, v35 = React.useState(true)
-	local v36, v37 = React.useState(true)
-	local v38, v39 = React.useState("")
-	local v40 = useScheduledSquad(p1.scheduledGroupUpId)
-	local v41 = v34 or v36
-	local v42 = React.useMemo(function() -- line: 59
-		-- upvalues: p1 (copy)
-		if p1.startTime then
-			return (DateTime.fromIsoDate(p1.startTime))
+local Enums = require(parent.Squads.Enums)
+local ScheduledSquadActionEnum = Enums.ScheduledSquadActionEnum
+local Enums2 = require(parent.Squads.Enums)
+local ScheduledSquadActionSourceEnum = Enums2.ScheduledSquadActionSourceEnum
+local Components = require(parent.Squads.Components)
+local ScheduledSquadsMoreInfoSheet = Components.ScheduledSquadsMoreInfoSheet
+local Enums3 = require(parent.Squads.Enums)
+local SquadButtonSourceEnum = Enums3.SquadButtonSourceEnum
+local Components2 = require(parent.Squads.Components)
+local SquadComponentAccessWrapper = Components2.SquadComponentAccessWrapper
+local Components3 = require(parent.Squads.Components)
+local SquadJoinButton = Components3.SquadJoinButton
+
+local Stores = require(parent.SquadsCore.Stores)
+local GetScheduledSquadsStore = Stores.GetScheduledSquadsStore
+local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
+local EventNames = require(parent.SquadsCore.EventNames)
+local Hooks = require(parent.SquadsCore.Hooks)
+local useCurrentSquadId = Hooks.useCurrentSquadId
+local Hooks2 = require(parent.SquadsCore.Hooks)
+local useScheduledSquad = Hooks2.useScheduledSquad
+
+local defineFastInt = game:DefineFastInt("ScheduledSquadJustStartedThreshold", 300)
+
+return function(props)
+	local v = useTokens()
+	local v2 = useNavigation()
+	local v3 = React.useContext(SquadExternalContractContext)
+	local squadId = useCurrentSquadId()
+
+	local v4 = props.startTime == nil
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(true)
+	local state3, setState3 = React.useState(true)
+	local state4, setState4 = React.useState("")
+	local v5 = useScheduledSquad(props.scheduledGroupUpId)
+
+	local v6 = React.useMemo(function()
+		if props.startTime then
+			return (DateTime.fromIsoDate(props.startTime))
 		end
 
 		return nil
-	end, { p1.startTime })
-	local v43 = React.useMemo(function() -- line: 62
-		-- upvalues: v42 (copy)
-		return v42 and v42.UnixTimestamp < DateTime.now().UnixTimestamp
-	end, { v42 })
-	local v44 = React.useMemo(function() -- line: 65
-		-- upvalues: v42 (copy), v25 (copy)
-		return v42 and (v42.UnixTimestamp <= DateTime.now().UnixTimestamp and DateTime.now().UnixTimestamp - v42.UnixTimestamp < v25)
-	end, { v42 })
-	local v45 = React.useMemo(function() -- line: 71
-		-- upvalues: v40 (copy), p1 (copy), Cryo (copy)
-		local v51 = v40 or p1
+	end, { props.startTime })
+	local v7 = React.useMemo(function()
+		return v6 and v6.UnixTimestamp < DateTime.now().UnixTimestamp
+	end, { v6 })
+	local v8 = React.useMemo(function()
+		local v8 = v6
 
-		return Cryo.List.map(v51.subscribers, function(p2) -- line: 73
-			return p2.userId
+		if v8 then
+			if v6.UnixTimestamp <= DateTime.now().UnixTimestamp then
+				return DateTime.now().UnixTimestamp - v6.UnixTimestamp < defineFastInt
+			end
+
+			return false
+		end
+
+		return v8
+	end, { v6 })
+
+	local avatars = React.useMemo(function()
+		return Cryo.List.map((v5 or props).subscribers, function(p)
+			return p.userId
 		end)
-	end, {
-		v40,
-		p1
-	})
+	end, { v5, props })
 
-	React.useEffect(function() -- line: 79
-		-- upvalues: v31 (copy), v43 (copy), GetScheduledSquadsStore (copy), p1 (copy), v37 (copy)
-		if not v31 and not v43 then
-			GetScheduledSquadsStore(false).fetchAndCacheScheduledSquadStatus(p1.scheduledGroupUpId, function() -- line: 81
-				-- upvalues: v37 (copy)
-				v37(false)
+	React.useEffect(function()
+		if v4 or v7 then
+			setState3(false)
+		else
+			GetScheduledSquadsStore(false).fetchAndCacheScheduledSquadStatus(props.scheduledGroupUpId, function()
+				setState3(false)
 			end)
+		end
+	end, { v4, v7, props.scheduledGroupUpId })
 
+	React.useEffect(function()
+		if v4 or v7 then
+			setState2(false)
 			return
 		end
 
-		v37(false)
-	end, {
-		v31,
-		v43,
-		p1.scheduledGroupUpId
-	})
-	React.useEffect(function() -- line: 90
-		-- upvalues: v31 (copy), v43 (copy), v35 (copy), UserProfileStore (copy), v40 (copy), p1 (copy), v39 (copy)
-		if v31 or v43 then
-			v35(false)
-
-			return
-		end
-
-		UserProfileStore.get().fetchNamesByUserIds({ (tostring(if not v40 then p1.initiatorId else v40.initiatorId)) }, function(p3) -- line: 96
-			-- upvalues: v39 (copy), v35 (copy)
-			local status = p3.status
-			local data = p3.data
+		local fetchNamesByUserIds = UserProfileStore.get().fetchNamesByUserIds
+		local v9 = if v5 then v5.initiatorId else props.initiatorId
+		fetchNamesByUserIds({ (tostring(v9)) }, function(p)
+			local status = p.status
+			local data = p.data
 
 			if status == "success" then
-				v39(data[1].names.getDisplayName(false))
-				v35(false)
-
-				return
-			end
-
-			if status == "failed" then
-				v35(false)
+				setState4(data[1].names.getDisplayName(false))
+				setState2(false)
+			elseif status == "failed" then
+				setState2(false)
 			end
 		end)
 	end, {
-		p1 and p1.initiatorId,
-		v31,
-		v43,
-		v40 and v40.initiatorId
+		props and props.initiatorId,
+		v4,
+		v7,
+		v5 and v5.initiatorId
 	})
 
-	local v46 = useLocalization({
+	local v9 = useLocalization({
 		deletedScheduledPartyText = "Feature.Squads.Label.DeletedScheduledParty",
 		goingText = "Feature.Squads.Description.Going",
 		partyText = "Feature.Squads.Label.Party",
 		scheduledPartyText = "Feature.Squads.Label.ScheduledParty",
 		usersPartyText = {
 			"Feature.Squads.Label.UsersParty",
-			displayName = v38
+			displayName = state4
 		}
 	})
-	local v47 = not v42 and "" or v42:FormatLocalTime("llll", LocalizationService.RobloxLocaleId)
-	local v48 = React.useCallback(function() -- line: 128
-		-- upvalues: v33 (copy), v29 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), p1 (copy), v40 (copy), p1 (copy), ScheduledSquadActionSourceEnum (copy), v30 (copy)
-		v33(true)
-		v29.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
+
+	local text2 = not v6 and "" or v6:FormatLocalTime("llll", LocalizationService.RobloxLocaleId)
+
+	local onActivated = React.useCallback(function()
+		setState(true)
+
+		local fireSquadAnalytics = v3.fireSquadAnalytics
+		local scheduledSquadAction = EventNames.ScheduledSquadAction
+		local v10 = {
 			actionType = ScheduledSquadActionEnum.SeeMoreDetails,
-			conversationId = p1.parentChannelId,
-			scheduledSquadId = if not v40 then p1.scheduledGroupUpId else v40.scheduledGroupUpId,
-			source = ScheduledSquadActionSourceEnum.ScheduledSquadCard,
-			squadId = v30,
-			squadLocation = v29.squadLocation
-		})
+			conversationId = props.parentChannelId,
+			scheduledSquadId = 0,
+			source = 0,
+			squadId = 0,
+			squadLocation = 0
+		}
+		local scheduledSquadId
+
+		if v5 then
+			scheduledSquadId = v5.scheduledGroupUpId
+		else
+			scheduledSquadId = props.scheduledGroupUpId
+		end
+
+		v10.scheduledSquadId = scheduledSquadId
+
+		v10.source = ScheduledSquadActionSourceEnum.ScheduledSquadCard
+		v10.squadId = squadId
+		v10.squadLocation = v3.squadLocation
+		fireSquadAnalytics(scheduledSquadAction, v10)
 	end, {
-		v30,
-		p1 and p1.scheduledGroupUpId,
-		p1.parentChannelId,
-		v40 and v40.scheduledGroupUpId,
-		v33,
-		v29.fireSquadAnalytics,
-		v29.squadLocation
-	})
-	local v49 = React.useCallback(function() -- line: 153
-		-- upvalues: v33 (copy)
-		v33(false)
-	end, { v33 })
-	local v50 = React.useCallback(function() -- line: 157
-		-- upvalues: v28 (copy), p1 (copy)
-		v28.navigate("SquadLobby", {
-			conversationId = p1.parentChannelId,
-			extraParams = {
-				scheduledGroupUpId = tostring(p1.scheduledGroupUpId)
-			}
-		})
-	end, {
-		v28.navigate,
-		p1.parentChannelId,
-		p1.scheduledGroupUpId
+		squadId,
+		props and props.scheduledGroupUpId,
+		props.parentChannelId,
+		v5 and v5.scheduledGroupUpId,
+		setState,
+		v3.fireSquadAnalytics,
+		v3.squadLocation
 	})
 
-	if v41 then
-		return React.createElement(Foundation.View, {
-			tag = "size-full-800"
-		}, {
+	local onClose = React.useCallback(function()
+		setState(false)
+	end, { setState })
+
+	local onActivated2 = React.useCallback(function()
+		v2.navigate("SquadLobby", {
+			conversationId = props.parentChannelId,
+			extraParams = {
+				scheduledGroupUpId = tostring(props.scheduledGroupUpId)
+			}
+		})
+	end, { v2.navigate, props.parentChannelId, props.scheduledGroupUpId })
+
+	if state2 or state3 then
+		return React.createElement(Foundation.View, { tag = "size-full-800" }, {
 			Skeleton = React.createElement(Foundation.Skeleton, {
-				Size = UDim2.new(0, 280, 0, v27.Size.Size_2500),
+				Size = UDim2.new(0, 280, 0, v.Size.Size_2500),
 				radius = Foundation.Enums.Radius.Large
 			})
 		})
 	end
 
-	return React.createElement(Foundation.View, {
-		tag = "auto-y bg-shift-200 radius-large col padding-y-medium padding-x-large align-x-center gap-medium flex-fill",
-		onActivated = v48,
-		Size = UDim2.new(0, 280, 0, 0)
-	}, {
-		TextContainer = React.createElement(Foundation.View, {
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v10 = {
+		onActivated = onActivated,
+		Size = UDim2.new(0, 280, 0, 0),
+		tag = "auto-y bg-shift-200 radius-large col padding-y-medium padding-x-large align-x-center gap-medium flex-fill"
+	}
+
+	local createElement2 = React.createElement
+	local view2 = Foundation.View
+
+	local createElement3 = React.createElement
+	local text = Foundation.Text
+	local text3
+
+	if v4 then
+		text3 = v9.deletedScheduledPartyText
+	else
+		text3 = if v7 then v9.partyText else v9.usersPartyText
+	end
+
+	local v11 = {
+		Title = createElement3(text, {
+			LayoutOrder = 1,
+			tag = "auto-y size-full-0 text-title-large text-align-x-left content-emphasis text-wrap",
+			Text = text3
+		}),
+		Date = 0
+	}
+	local date
+
+	if not v4 then
+		date = React.createElement(Foundation.Text, {
+			LayoutOrder = 2,
+			tag = "auto-y size-full-0 text-body-medium text-align-x-left content-default text-wrap",
+			Text = text2
+		})
+	end
+
+	v11.Date = date
+	local v12 = {
+		TextContainer = createElement2(view2, {
 			LayoutOrder = 1,
 			tag = "auto-y size-full-0 col gap-xsmall"
-		}, {
-			Title = React.createElement(Foundation.Text, {
-				LayoutOrder = 1,
-				tag = "auto-y size-full-0 text-title-large text-align-x-left content-emphasis text-wrap",
-				Text = if not v31 then if not v43 then v46.usersPartyText else v46.partyText else v46.deletedScheduledPartyText
-			}),
-			Date = if v31 then nil else React.createElement(Foundation.Text, {
+		}, v11),
+		Interested = 0,
+		JoinButton = 0,
+		Sheet = 0
+	}
+	local interested
+
+	if not v4 then
+		interested = React.createElement(
+			Foundation.View,
+			{
 				LayoutOrder = 2,
-				tag = "auto-y size-full-0 text-body-medium text-align-x-left content-default text-wrap",
-				Text = v47
-			})
-		}),
-		Interested = if v31 then nil else React.createElement(Foundation.View, {
-			LayoutOrder = 2,
-			tag = "row size-full-0 auto-y gap-small align-x-left align-y-center"
+				tag = "row size-full-0 auto-y gap-small align-x-left align-y-center"
+			},
+			{
+				AvatarGroup = React.createElement(AvatarGroup, {
+					avatars = avatars,
+					backplateStyle = {
+						Color3 = v.Color.Shift.Shift_200.Color3,
+						Transparency = v.Color.Shift.Shift_200.Transparency
+					},
+					LayoutOrder = 1,
+					max = 4,
+					size = InputSize.XSmall,
+					type = AvatarGroupType.Stacked
+				}),
+				InterestedCount = React.createElement(Foundation.Text, {
+					LayoutOrder = 2,
+					tag = "auto-xy text-body-medium content-default",
+					Text = `{v9.goingText}`
+				})
+			}
+		)
+	end
+
+	v12.Interested = interested
+	local joinButton
+
+	if v8 then
+		joinButton = React.createElement(SquadComponentAccessWrapper, {
+			parentChannelId = props.parentChannelId
 		}, {
-			AvatarGroup = React.createElement(AvatarGroup, {
-				LayoutOrder = 1,
-				max = 4,
-				avatars = v45,
-				backplateStyle = {
-					Color3 = v27.Color.Shift.Shift_200.Color3,
-					Transparency = v27.Color.Shift.Shift_200.Transparency
-				},
-				size = InputSize.XSmall,
-				type = AvatarGroupType.Stacked
-			}),
-			InterestedCount = React.createElement(Foundation.Text, {
-				LayoutOrder = 2,
-				tag = "auto-xy text-body-medium content-default",
-				Text = `{ v46.goingText }`
+			React.createElement(SquadJoinButton, {
+				conversationId = props.parentChannelId,
+				isFullWidth = true,
+				isInCard = true,
+				layoutOrder = 3,
+				onActivated = onActivated2,
+				shouldAnimate = false,
+				squadButtonSource = SquadButtonSourceEnum.ScheduledSquadCard,
+				squadLocation = v3.squadLocation
 			})
-		}),
-		JoinButton = if not v44 then nil else React.createElement(SquadComponentAccessWrapper, {
-			parentChannelId = p1.parentChannelId
-		}, { React.createElement(SquadJoinButton, {
-			isFullWidth = true,
-			isInCard = true,
-			layoutOrder = 3,
-			shouldAnimate = false,
-			conversationId = p1.parentChannelId,
-			onActivated = v50,
-			squadButtonSource = SquadButtonSourceEnum.ScheduledSquadCard,
-			squadLocation = v29.squadLocation
-		}) }),
-		Sheet = if v31 then nil else React.createElement(ScheduledSquadsMoreInfoSheet, {
-			isOpen = v32,
-			onClose = v49,
-			scheduledSquad = v40 or p1
 		})
-	})
+	end
+
+	v12.JoinButton = joinButton
+	local sheet
+
+	if not v4 then
+		sheet = React.createElement(ScheduledSquadsMoreInfoSheet, {
+			isOpen = state,
+			onClose = onClose,
+			scheduledSquad = v5 or props
+		})
+	end
+
+	v12.Sheet = sheet
+	return createElement(view, v10, v12)
 end

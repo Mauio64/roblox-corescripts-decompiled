@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Roact = require(parent.Roact)
 
-return require(Parent.Roact).createContext({
-	preferredTransparency = 1
-})
+return Roact.createContext({ preferredTransparency = 1 })

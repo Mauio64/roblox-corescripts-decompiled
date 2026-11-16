@@ -1,75 +1,125 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Cryo = require(AppChatParent.Cryo)
-local DateTime = require(AppChatParent.Time).DateTime
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local Time = require(parent.Time)
+local DateTime = Time.DateTime
+
 local Constants = require(AppChat.Constants)
 local Conversation = require(AppChat.Models.Conversation)
-local v8 = require(AppChat.Logger):new(script.Name)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 local useGetConversationFromId = require(AppChat.Hooks.useGetConversationFromId)
 local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
+local GetConversationStore = require(AppChat.Stores.GetConversationStore)
+local ReceivedConversation = require(AppChat.Conversations.Actions.ReceivedConversation)
+local ConversationRoduxSeed = require(AppChat.Utils.ConversationRoduxSeed)
+
 local useRecordModalSequenceResponseForConversation = require(AppChat.Hooks.useRecordModalSequenceResponseForConversation)
-local Foundation = require(AppChatParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local BadgeVariant = Foundation.Enums.BadgeVariant
-local EnumsOrientation = Foundation.Enums.Orientation
+local Orientation = Foundation.Enums.Orientation
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 local useTokens = Foundation.Hooks.useTokens
-local UserRow = require(AppChatParent.UserList).UserRow
-local UserProfiles = require(AppChatParent.UserProfiles)
+
+local InputHandlers = require(parent.InputHandlers)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local useFocusRoot = FocusNavigationUtils.useFocusRoot
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local useDefaultFocusBehavior = ReactFocusNavigation.useDefaultFocusBehavior
+
+local navigateBacks = {
+	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
+	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack
+}
+
+local Responsive = require(parent.Responsive)
+local useLastInput = Responsive.useLastInput
+
+local UserList = require(parent.UserList)
+local UserRow = UserList.UserRow
+
+local UserProfiles = require(parent.UserProfiles)
 local useUserProfilesFetch = UserProfiles.Hooks.useUserProfilesFetch
 local getCombinedNameFromId = UserProfiles.Selectors.getCombinedNameFromId
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useStore = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useStore
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactUtils2 = require(parent.RoactUtils)
+local useStore = RoactUtils2.Hooks.RoactRodux.useStore
 local useEffect = React.useEffect
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local API = AppChatNetworking.rodux.GetConversationDetails.API
-local API2 = AppChatNetworking.rodux.RemoveUserFromConversation.API
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local RoactUtils3 = require(parent.RoactUtils)
+local useSelector = RoactUtils3.Hooks.RoactRodux.useSelector
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local api = AppChatNetworking.rodux.GetConversationDetails.API
+local api2 = AppChatNetworking.rodux.RemoveUserFromConversation.API
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local AppTelemetryLayer = require(AppChat.Telemetry.Layers.AppTelemetryLayer)
+
 local ConversationListOverlayTelemetry = require(AppChat.Components.OSA.ConversationListOverlayTelemetry)
 local ModalTelemetry = require(AppChat.Components.ModalTelemetry)
-local SquadExternalContractContext = require(AppChatParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
-local SquadPromptType = require(AppChatParent.SquadsCore.Enums).SquadPromptType
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
+local Enums = require(parent.SquadsCore.Enums)
+local SquadPromptType = Enums.SquadPromptType
+
 local shouldShowU13ChatOptInForConversation = require(AppChat.Utils.shouldShowU13ChatOptInForConversation)
-local FFlagAppChatEnableU13ChatOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableU13ChatOptIn
-local FFlagSupportViewingUserProfileOnOSA = require(AppChat.Flags.FFlagSupportViewingUserProfileOnOSA)
-local v43 = game:DefineFastString("AppChatGroupOsaViewDetailsUrl", "https://en.help.roblox.com/hc/en-us/articles/360000432483-Party-chat-In-App")
-local InlineRichText = require(AppChatParent.InlineRichText)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatEnableU13ChatOptIn = SharedFlags.FFlagAppChatEnableU13ChatOptIn
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagFriendsChatEnableConversationConsent = SharedFlags2.FFlagFriendsChatEnableConversationConsent
+local FFlagAppChatUseUserProfileHydration = require(AppChat.Flags.FFlagAppChatUseUserProfileHydration)
+local useProfileName = require(AppChat.Hooks.useProfileName)
+local DataHydration = require(parent.DataHydration)
+local DataStatus = DataHydration.DataStatus
+local defineFastString = game:DefineFastString(
+	"AppChatGroupOsaViewDetailsUrl",
+	"https://en.help.roblox.com/hc/en-us/articles/360000432483-Party-chat-In-App"
+)
+
+local InlineRichText = require(parent.InlineRichText)
 local Renderer = InlineRichText.Renderer
 local LinkBehavior = InlineRichText.Enums.LinkBehavior
 local useAppPolicy = require(AppChat.Hooks.useAppPolicy)
-local v48 = game.PlaceId > 0
-local t1 = {
-	source = nil,
-	createdAt = nil,
-	title = ""
-}
+
+local v2 = game.PlaceId > 0
+
+local v3 = { source = nil, createdAt = nil, title = "" }
+
 local ConversationListOverlay = Constants.ModalSequence.ConversationListOverlay
 local OsaContextCard = Constants.OptInVariant.OsaContextCard
 local Accept = Constants.ModalAction.Accept
-local t2 = {
+
+local v4 = {
+	dialogSize = DialogSize.Medium,
 	disablePortal = false,
 	hasBackdrop = true,
-	dialogSize = DialogSize.Medium,
-	onClose = function() -- line: 99
-	end,
-	onJoin = function() -- line: 100
-	end,
-	onDecline = function() -- line: 101
-	end
+	onClose = function() end,
+	onJoin = function() end,
+	onDecline = function() end
 }
 
-local function resolveModalVariant(p1, p2) -- line: 104
-	-- upvalues: shouldShowU13ChatOptInForConversation (copy), Constants (copy), OsaContextCard (copy)
-	if p1 then
-		return p1
+local function resolveModalVariant(p, p2)
+	if p then
+		return p
 	end
 
 	if shouldShowU13ChatOptInForConversation(p2) then
@@ -78,469 +128,559 @@ local function resolveModalVariant(p1, p2) -- line: 104
 
 	return OsaContextCard
 end
-local function GroupOSADialog(t3: {[any]: any}) -- line: 118
-	-- upvalues: Cryo (copy), t2 (copy), FFlagAppChatEnableU13ChatOptIn (copy), OsaContextCard (copy), useDispatch (copy), useStore (copy), useLocalUserId (copy), useTokens (copy), useAppPolicy (copy), React (copy), v48 (copy), LinkBehavior (copy), useEffect (copy), useTelemetry (copy), AppTelemetryLayer (copy), ConversationListOverlayTelemetry (copy), SquadExternalContractContext (copy), useGetConversationFromId (copy), t1 (copy), shouldShowU13ChatOptInForConversation (copy), Constants (copy), API (copy), v8 (copy), useSelector (copy), getDeepValue2 (copy), AppChatNetworking (copy), useUserProfilesFetch (copy), UserProfiles (copy), DateTime (copy), getCombinedNameFromId (copy), Conversation (copy), useLocalization (copy), v43 (copy), UserRow (copy), Foundation (copy), BadgeVariant (copy), FFlagSupportViewingUserProfileOnOSA (copy), ModalTelemetry (copy), SquadPromptType (copy), useRecordModalSequenceResponseForConversation (copy), Accept (copy), ConversationListOverlay (copy), API2 (copy), Skeleton (copy), EnumsRadius (copy), Dialog (copy), Renderer (copy), EnumsOrientation (copy), ButtonVariant (copy)
-	local v59 = Cryo.Dictionary.union(t2, t3)
-	local u60 = if not FFlagAppChatEnableU13ChatOptIn then OsaContextCard else v59.modalVariant
-	local v61 = useDispatch()
-	local v62 = useStore()
-	local v63 = useLocalUserId()
-	local v64 = useTokens()
-	local v65 = useAppPolicy(function(p3) -- line: 129
-		return p3.getWebViewSupport()
+
+local function GroupOSADialog(p)
+	local union = Cryo.Dictionary.union(v4, p)
+	local modalVariant
+
+	if FFlagAppChatEnableU13ChatOptIn then
+		modalVariant = union.modalVariant
+	else
+		modalVariant = OsaContextCard
+	end
+
+	local v5 = useDispatch()
+	local v6 = useStore()
+	local v7 = useLocalUserId()
+	local v8 = useTokens()
+
+	local v9 = useAppPolicy(function(p2)
+		return p2.getWebViewSupport()
 	end)
-	local v66 = React.useMemo(function() -- line: 132
-		-- upvalues: v65 (copy), v48 (copy), LinkBehavior (copy)
+
+	local linkerOptions = React.useMemo(function()
 		return {
-			evaluateLinkBehavior = function(_, _) -- line: 134
-				-- upvalues: v65 (copy), v48 (copy), LinkBehavior (copy)
-				if v65 and not v48 then
+			evaluateLinkBehavior = function(_, _)
+				if v9 and not v2 then
 					return LinkBehavior.Webview
 				end
 
 				return LinkBehavior.Hide
 			end
 		}
-	end, { v65 })
-	local v67, v68 = React.useState(false)
+	end, { v9 })
 
-	useEffect(function() -- line: 145
-		-- upvalues: v68 (copy)
-		return function() -- line: 146
-			-- upvalues: v68 (copy)
-			v68(false)
+	local state, setState = React.useState(false)
+	useEffect(function()
+		return function()
+			setState(false)
 		end
 	end, {})
 
-	local v69 = useTelemetry(AppTelemetryLayer.Context)
-
-	useEffect(function() -- line: 152
-		-- upvalues: v69 (copy), ConversationListOverlayTelemetry (copy), u60 (ref), v59 (copy)
-		v69.emit(ConversationListOverlayTelemetry.Events.ModalRendered, {
-			modalVariant = u60,
-			conversationId = v59.conversationId,
-			impressionId = v59.impressionId
+	local v10 = useTelemetry(AppTelemetryLayer.Context)
+	useEffect(function()
+		v10.emit(ConversationListOverlayTelemetry.Events.ModalRendered, {
+			modalVariant = modalVariant,
+			conversationId = union.conversationId,
+			impressionId = union.impressionId
 		})
-	end, {
-		v69,
-		v59.impressionId,
-		v59.conversationId,
-		u60
-	})
+	end, { v10, union.impressionId, union.conversationId, modalVariant })
+	local v11 = React.useContext(SquadExternalContractContext)
 
-	local v70 = React.useContext(SquadExternalContractContext)
-	local v71 = useGetConversationFromId(v59.conversationId)
-	local v72 = v71 or t1
+	local v12 = useGetConversationFromId(union.conversationId)
+	local v13 = v12 or v3
 
 	if FFlagAppChatEnableU13ChatOptIn then
-		local v73 = u60
-
-		if v73 then
-			u60 = v73
-		elseif shouldShowU13ChatOptInForConversation(v72) then
-			u60 = Constants
-			u60 = u60.OptInVariant
-			u60 = u60.ChatOptInInfoCard
+		if modalVariant then
+			modalVariant = modalVariant
+		elseif shouldShowU13ChatOptInForConversation(v13) then
+			modalVariant = Constants
+			modalVariant = modalVariant.OptInVariant
+			modalVariant = modalVariant.ChatOptInInfoCard
 		else
-			u60 = OsaContextCard
+			modalVariant = OsaContextCard
 		end
 	end
 
-	useEffect(function() -- line: 167
-		-- upvalues: v59 (copy), v71 (copy), v61 (copy), API (copy), v8 (copy)
-		if v59.conversationId and not v71 then
-			v61(API(v59.conversationId)):catch(function(p6) -- line: 169
-				-- upvalues: v8 (copy), v59 (copy)
-				v8:warning("Error fetching conversation in GroupOSADialog: " .. tostring(p6))
-				v59.onClose()
-			end)
-		end
-	end, {
-		v61,
-		v59.conversationId,
-		v71,
-		v59.onClose
-	})
-
-	local source = v72.source
-	local u75 = useSelector(function(p7) -- line: 179
-		-- upvalues: getDeepValue2 (copy), v59 (copy)
-		return getDeepValue2(p7, `ChatAppReducer.ParticipantMetadata.{ v59.conversationId or "" }`)
-	end)
-
-	useEffect(function() -- line: 183
-		-- upvalues: source (copy), v59 (copy), v61 (copy), AppChatNetworking (copy), v8 (copy)
-		if source ~= "channels" or v59.conversationId == nil then
+	useEffect(function()
+		if not union.conversationId or v12 then
 			return
 		end
 
-		v61(AppChatNetworking.rodux.GetConversationsParticipantsMetadata.API({ v59.conversationId })):catch(function() -- line: 189
-			-- upvalues: v8 (copy)
-			v8:warning("Error in GroupOSADialog -> GetConversationsParticipantsMetadata")
-		end)
-	end, {
-		v61,
-		v59.conversationId,
-		source
-	})
+		if not FFlagFriendsChatEnableConversationConsent then
+			v5(api(union.conversationId)):catch(function(p2)
+				v:warning("Error fetching conversation in GroupOSADialog: " .. tostring(p2))
+				union.onClose()
+			end)
+			return
+		end
 
-	local v76 = React.useMemo(function() -- line: 194
-		-- upvalues: u75 (ref)
-		if not u75 then
+		local conversation = GetConversationStore(false).getConversation(union.conversationId, false)
+
+		if conversation then
+			v5(ReceivedConversation(ConversationRoduxSeed.normalizeStoreConversationForRodux(conversation)))
+		end
+
+		if not ConversationRoduxSeed.isFriendsPlaceholderConversationId(union.conversationId) then
+			v5(api(union.conversationId)):catch(function(p2)
+				v:warning("Error fetching conversation in GroupOSADialog: " .. tostring(p2))
+
+				if conversation == nil then
+					union.onClose()
+				end
+			end)
+		end
+	end, { v5, union.conversationId, v12, union.onClose })
+
+	local source = v13.source
+
+	local v14 = useSelector(function(p2)
+		return getDeepValue2(p2, `ChatAppReducer.ParticipantMetadata.{union.conversationId or ""}`)
+	end)
+
+	useEffect(function()
+		if source ~= "channels" or union.conversationId == nil then
+			return
+		end
+
+		v5(AppChatNetworking.rodux.GetConversationsParticipantsMetadata.API({ union.conversationId })):catch(function()
+			v:warning("Error in GroupOSADialog -> GetConversationsParticipantsMetadata")
+		end)
+	end, { v5, union.conversationId, source })
+
+	local v15 = React.useMemo(function()
+		if not v14 then
 			return nil
 		end
 
-		for v99, v100 in u75 do
-			if v100.isInviter then
-				return v99
+		for k, v15 in v14 do
+			if v15.isInviter then
+				return k
 			end
 		end
 
 		return nil
-	end, { u75 })
-	local v77 = useUserProfilesFetch({
-		userIds = if not v76 then {} else { v76 },
-		query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
-	})
-	local v78 = React.useMemo(function() -- line: 213
-		-- upvalues: v72 (copy), Cryo (copy), v63 (copy)
-		if not v72 or not v72.participants then
-			return {}
+	end, { v14 })
+
+	local v16 = nil
+	local v17 = nil
+
+	if FFlagAppChatUseUserProfileHydration then
+		v17 = useProfileName(v15)
+	else
+		v16 = useUserProfilesFetch({
+			userIds = v15 and { v15 } or {},
+			query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
+		})
+	end
+
+	local v18 = React.useMemo(function()
+		if v13 and v13.participants then
+			return Cryo.List.filter(v13.participants, function(p2): boolean
+				return tostring(p2) ~= v7
+			end)
 		end
 
-		return Cryo.List.filter(v72.participants, function(p8) -- line: 217
-			-- upvalues: v63 (copy)
-			return tostring(p8) ~= v63
-		end)
-	end, {
-		v72,
-		v63
-	})
-	local v79 = React.useMemo(function() -- line: 223
-		-- upvalues: v72 (copy), DateTime (copy), v8 (copy), v59 (copy)
-		if v72.createdAt then
-			return DateTime.fromIsoDate(v72.createdAt):Format("MMM DD, YYYY")
+		return {}
+	end, { v13, v7 })
+
+	local creation_date = React.useMemo(function()
+		if v13.createdAt then
+			return DateTime.fromIsoDate(v13.createdAt):Format("MMM DD, YYYY")
 		end
 
-		v8:warning("Conversation createdAt not found for conversationId: " .. tostring(v59.conversationId))
-
+		v:warning("Conversation createdAt not found for conversationId: " .. tostring(union.conversationId))
 		return " - "
-	end, {
-		v72,
-		v59.conversationId
-	})
-	local v80 = if not v77 then nil else v77.data
-	local v81 = not not v77 and v77.loading
-	local v82 = React.useMemo(function() -- line: 233
-		-- upvalues: v76 (copy), v80 (copy), getCombinedNameFromId (copy)
-		if not v76 or not v80 then
-			return nil
+	end, { v13, union.conversationId })
+	local data
+
+	if v16 then
+		data = v16.data
+	else
+		data = nil
+	end
+
+	local combinedName
+
+	if FFlagAppChatUseUserProfileHydration then
+		combinedName = v17.combinedName
+	else
+		combinedName = nil
+	end
+
+	local v19
+
+	if FFlagAppChatUseUserProfileHydration then
+		if v17.status == DataStatus.NotReady then
+			v19 = combinedName == nil
+		else
+			v19 = false
+		end
+	else
+		v19 = if v16 then v16.loading else false
+	end
+
+	local v20 = React.useMemo(function()
+		if FFlagAppChatUseUserProfileHydration then
+			return combinedName
 		end
 
-		return getCombinedNameFromId(v80, v76)
-	end, {
-		v76,
-		v80
-	})
-	local v83 = v72.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
-	local v84 = useLocalization({
+		if v15 and data then
+			return getCombinedNameFromId(data, v15)
+		end
+
+		return nil
+	end, { v15, data, combinedName })
+
+	local v21 = v13.conversationType == Conversation.Type.MULTI_USER_CONVERSATION
+
+	local v22 = useLocalization({
 		titleText = "Feature.Chat.Heading.YouWereInvitedToGroup",
-		joinButtonText = "Feature.Chat.Action.GroupOSAJoin",
-		declineButtonText = "Feature.Chat.Action.GroupOSADoNotJoin",
-		blockedText = "Feature.Chat.Label.Blocked",
 		inviterTitleText = {
 			"Feature.Chat.Heading.UserInvitedYouToJoinAGroup",
-			combinedName = v82 or ""
+			combinedName = v20 or ""
 		},
 		inviterTitleTextOneToOne = {
 			"Feature.Chat.Heading.UserInvitedYouToJoin",
-			combinedName = v82 or ""
+			combinedName = v20 or ""
 		},
 		subtitleText = {
 			"Feature.Chat.Description.ConversationInviteGroupCreatedOn",
-			creation_date = v79
+			creation_date = creation_date
 		},
 		footerText = {
 			"Feature.Chat.Description.OSAGroupDescriptionWithLinker",
-			osaViewDetailsUrl = v43
-		}
+			osaViewDetailsUrl = defineFastString
+		},
+		joinButtonText = "Feature.Chat.Action.GroupOSAJoin",
+		declineButtonText = "Feature.Chat.Action.GroupOSADoNotJoin",
+		blockedText = "Feature.Chat.Label.Blocked"
 	})
-	local v85 = React.useMemo(function() -- line: 266
-		-- upvalues: v78 (copy), u75 (ref), v8 (copy), React (copy), UserRow (copy), v59 (copy), Foundation (copy), v84 (copy), BadgeVariant (copy)
-		local t4 = {}
 
-		for v102, v103 in v78 do
-			local str = tostring(v103)
-			local v105 = u75 and u75[str]
+	local v23 = React.useMemo(function()
+		local children = {}
 
-			if not v105 then
-				v8:debug("Metadata not found for participant: " .. str)
+		for k, v23 in v18 do
+			local entityId = tostring(v23)
+
+			local v24 = v14 and v14[entityId]
+
+			if not v24 then
+				v:debug("Metadata not found for participant: " .. entityId)
 			end
 
-			local v106 = v105 and v105.isBlocked
-			local v107 = React.createElement(UserRow, {
+			local isBlocked = v24 and v24.isBlocked
+
+			local element = React.createElement(UserRow, {
+				entityId = entityId,
 				layoutMode = "wide",
-				entityId = str,
-				onActivated = if v59.onViewUserProfile == nil then nil else function() -- line: 284
-					-- upvalues: v59 (copy), str (copy)
-					v59.onClose()
-					v59.onViewUserProfile(str, {})
-				end
+				onActivated = union.onViewUserProfile ~= nil and function()
+					union.onClose()
+					union.onViewUserProfile(entityId, {})
+				end or nil
 			})
 
-			t4["Participant_" .. str] = React.createElement(Foundation.View, {
-				tag = "size-full-0 auto-y",
-				LayoutOrder = v102
-			}, {
-				Row = v107,
-				Badge = v106 and React.createElement(Foundation.View, {
-					tag = "position-center-right anchor-center-right auto-xy",
-					ZIndex = 2
-				}, {
-					BadgeContent = React.createElement(Foundation.Badge, {
-						text = v84.blockedText,
-						variant = BadgeVariant.Warning
-					})
-				}) or nil
-			})
+			children["Participant_" .. entityId] = React.createElement(
+				Foundation.View,
+				{ tag = "size-full-0 auto-y", LayoutOrder = k },
+				{
+					Row = element,
+					Badge = isBlocked and React.createElement(
+						Foundation.View,
+						{ tag = "position-center-right anchor-center-right auto-xy", ZIndex = 2 },
+						{
+							BadgeContent = React.createElement(Foundation.Badge, {
+								text = v22.blockedText,
+								variant = BadgeVariant.Warning
+							})
+						}
+					) or nil
+				}
+			)
 		end
 
-		return t4
-	end, {
-		v78,
-		u75,
-		v84.blockedText,
-		if not FFlagSupportViewingUserProfileOnOSA then nil else v59.onViewUserProfile,
-		if not FFlagSupportViewingUserProfileOnOSA then nil else v59.onClose
-	})
-	local v86 = React.useCallback(function() -- line: 318
-		-- upvalues: v69 (copy), ConversationListOverlayTelemetry (copy), u60 (ref), ModalTelemetry (copy), v59 (copy)
-		v69.emit(ConversationListOverlayTelemetry.Events.ModalAction, {
-			modalVariant = u60,
+		return children
+	end, { v18, v14, v22.blockedText, union.onViewUserProfile, union.onClose })
+
+	local v24 = React.useCallback(function()
+		v10.emit(ConversationListOverlayTelemetry.Events.ModalAction, {
+			modalVariant = modalVariant,
 			action = ModalTelemetry.Enums.ModalActions.Dismiss,
-			conversationId = v59.conversationId,
-			impressionId = v59.impressionId
+			conversationId = union.conversationId,
+			impressionId = union.impressionId
 		})
-		v59.onClose()
-	end, {
-		v59.onClose,
-		v69,
-		v59.impressionId,
-		v59.conversationId,
-		u60
-	})
-	local v87 = React.useCallback(function() -- line: 327
-		-- upvalues: v70 (copy), v62 (copy), SquadPromptType (copy)
-		v70.setSquadPrompt(v62, {
-			hideCancelButton = true,
-			promptType = SquadPromptType.Error
-		})
-	end, {
-		v70.setSquadPrompt,
-		v62
-	})
-	local v88 = useRecordModalSequenceResponseForConversation(v59.conversationId)
-	local v89 = React.useCallback(function() -- line: 336
-		-- upvalues: v67 (copy), v68 (copy), u60 (ref), ModalTelemetry (copy), v59 (copy), v69 (copy), ConversationListOverlayTelemetry (copy), v88 (copy), Accept (copy), ConversationListOverlay (copy), Cryo (copy), v8 (copy), v87 (copy)
-		if v67 then
+
+		union.onClose()
+	end, { union.onClose, v10, union.impressionId, union.conversationId, modalVariant })
+
+	local eventHandlers = React.useMemo(function()
+		return {
+			[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(function(object)
+					v24()
+					object:cancel()
+				end)
+			}
+		}
+	end, { v24 })
+
+	local ref, ref2 = useDefaultFocusBehavior((useFocusRoot({
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+		isAutoFocusRoot = true,
+		shouldRestoreFocus = false,
+		eventHandlers = eventHandlers,
+		eventMap = navigateBacks
+	})))
+
+	local v25 = useLastInput() == Responsive.Input.Directional
+
+	local v26 = React.useCallback(function()
+		v11.setSquadPrompt(v6, { hideCancelButton = true, promptType = SquadPromptType.Error })
+	end, { v11.setSquadPrompt, v6 })
+
+	local v27 = useRecordModalSequenceResponseForConversation(union.conversationId)
+	local onActivated = React.useCallback(function()
+		if state then
 			return
 		end
 
-		v68(true)
+		setState(true)
 
-		local t5 = {
-			modalVariant = u60,
+		local v28 = {
+			modalVariant = modalVariant,
 			action = ModalTelemetry.Enums.ModalActions.PrimaryCta,
-			conversationId = v59.conversationId,
-			impressionId = v59.impressionId
+			conversationId = union.conversationId,
+			impressionId = union.impressionId
 		}
 
-		v69.emit(ConversationListOverlayTelemetry.Events.ModalAction, t5)
-		v88(Accept, ConversationListOverlay, nil, u60):andThen(function() -- line: 350
-			-- upvalues: v69 (copy), ConversationListOverlayTelemetry (copy), Cryo (copy), t5 (copy), ModalTelemetry (copy), v59 (copy)
-			v69.emit(ConversationListOverlayTelemetry.Events.ModalActionResult, Cryo.Dictionary.union(t5, {
-				actionResult = ModalTelemetry.Enums.ModalActionResults.Success
-			}))
-			v59.onJoin()
-		end):catch(function(p9) -- line: 359
-			-- upvalues: v69 (copy), ConversationListOverlayTelemetry (copy), Cryo (copy), t5 (copy), ModalTelemetry (copy), v8 (copy), v87 (copy), v59 (copy)
-			v69.emit(ConversationListOverlayTelemetry.Events.ModalActionResult, Cryo.Dictionary.union(t5, {
-				actionResult = ModalTelemetry.Enums.ModalActionResults.Failure
-			}))
-			v8:warning(`Error in GroupOSADialog Join-> RecordModalSequenceResponse: { tostring(p9) }`)
-			v87()
-			v59.onClose()
+		v10.emit(ConversationListOverlayTelemetry.Events.ModalAction, v28)
+		v27(Accept, ConversationListOverlay, nil, modalVariant):andThen(function()
+			v10.emit(
+				ConversationListOverlayTelemetry.Events.ModalActionResult,
+				Cryo.Dictionary.union(v28, {
+					actionResult = ModalTelemetry.Enums.ModalActionResults.Success
+				})
+			)
+
+			union.onJoin()
+		end):catch(function(p2)
+			v10.emit(
+				ConversationListOverlayTelemetry.Events.ModalActionResult,
+				Cryo.Dictionary.union(v28, {
+					actionResult = ModalTelemetry.Enums.ModalActionResults.Failure
+				})
+			)
+
+			v:warning(`Error in GroupOSADialog Join-> RecordModalSequenceResponse: {tostring(p2)}`)
+			v26()
+			union.onClose()
 		end)
 	end, {
-		v59.onJoin,
-		v59.onClose,
-		v87,
-		v88,
-		v61,
-		v59.conversationId,
-		u60,
-		v69,
-		v59.impressionId,
-		v67
+		union.onJoin,
+		union.onClose,
+		v26,
+		v27,
+		v5,
+		union.conversationId,
+		modalVariant,
+		v10,
+		union.impressionId,
+		state
 	})
-	local v90 = React.useCallback(function() -- line: 385
-		-- upvalues: v67 (copy), v68 (copy), u60 (ref), ModalTelemetry (copy), v59 (copy), v69 (copy), ConversationListOverlayTelemetry (copy), v72 (copy), Conversation (copy), v61 (copy), API2 (copy), v63 (copy), Cryo (copy), v8 (copy), v87 (copy)
-		if v67 then
+
+	local onActivated2 = React.useCallback(function()
+		if state then
 			return
 		end
 
-		v68(true)
+		setState(true)
 
-		local t6 = {
-			modalVariant = u60,
+		local v28 = {
+			modalVariant = modalVariant,
 			action = ModalTelemetry.Enums.ModalActions.SecondaryCta,
-			conversationId = v59.conversationId,
-			impressionId = v59.impressionId
+			conversationId = union.conversationId,
+			impressionId = union.impressionId
 		}
 
-		v69.emit(ConversationListOverlayTelemetry.Events.ModalAction, t6)
+		v10.emit(ConversationListOverlayTelemetry.Events.ModalAction, v28)
 
-		if v59.conversationId then
-			if v72.conversationType == Conversation.Type.MULTI_USER_CONVERSATION then
-				v61(API2(v59.conversationId, v63)):andThen(function() -- line: 402
-					-- upvalues: v69 (copy), ConversationListOverlayTelemetry (copy), Cryo (copy), t6 (copy), ModalTelemetry (copy), v59 (copy)
-					v69.emit(ConversationListOverlayTelemetry.Events.ModalActionResult, Cryo.Dictionary.union(t6, {
-						actionResult = ModalTelemetry.Enums.ModalActionResults.Success
-					}))
-					v59.onDecline()
-				end):catch(function(p10) -- line: 411
-					-- upvalues: v69 (copy), ConversationListOverlayTelemetry (copy), Cryo (copy), t6 (copy), ModalTelemetry (copy), v8 (copy), v87 (copy), v59 (copy)
-					v69.emit(ConversationListOverlayTelemetry.Events.ModalActionResult, Cryo.Dictionary.union(t6, {
-						actionResult = ModalTelemetry.Enums.ModalActionResults.Failure
-					}))
-					v8:warning(`Error in GroupOSADialog Decline -> RemoveUserFromConversation: { tostring(p10) }`)
-					v87()
-					v59.onClose()
+		if union.conversationId then
+			if v13.conversationType == Conversation.Type.MULTI_USER_CONVERSATION then
+				v5(api2(union.conversationId, v7)):andThen(function()
+					v10.emit(
+						ConversationListOverlayTelemetry.Events.ModalActionResult,
+						Cryo.Dictionary.union(v28, {
+							actionResult = ModalTelemetry.Enums.ModalActionResults.Success
+						})
+					)
+
+					union.onDecline()
+				end):catch(function(p2)
+					v10.emit(
+						ConversationListOverlayTelemetry.Events.ModalActionResult,
+						Cryo.Dictionary.union(v28, {
+							actionResult = ModalTelemetry.Enums.ModalActionResults.Failure
+						})
+					)
+
+					v:warning(`Error in GroupOSADialog Decline -> RemoveUserFromConversation: {tostring(p2)}`)
+
+					v26()
+					union.onClose()
 				end)
+			else
+				v10.emit(
+					ConversationListOverlayTelemetry.Events.ModalActionResult,
+					Cryo.Dictionary.union(v28, {
+						actionResult = ModalTelemetry.Enums.ModalActionResults.Success
+					})
+				)
 
-				return
+				union.onDecline()
 			end
-
-			v69.emit(ConversationListOverlayTelemetry.Events.ModalActionResult, Cryo.Dictionary.union(t6, {
-				actionResult = ModalTelemetry.Enums.ModalActionResults.Success
-			}))
-			v59.onDecline()
 		end
 	end, {
-		v59.onDecline,
-		v59.onClose,
-		v87,
-		v61,
-		v59.conversationId,
-		u60,
-		v72,
-		v63,
-		v69,
-		v59.impressionId,
-		v67,
-		v63
+		union.onDecline,
+		union.onClose,
+		v26,
+		v5,
+		union.conversationId,
+		modalVariant,
+		v13,
+		v7,
+		v10,
+		union.impressionId,
+		state,
+		v7
 	})
-	local v91 = v72.source == "channels" and u75 == nil
-	local v92 = v76 ~= nil and v81
-	local v93 = not v71 or (v91 or v92)
-	local v94 = if not v82 then v84.titleText else if not v83 then v84.inviterTitleTextOneToOne else v84.inviterTitleText
-	local v95 = React.useMemo(function() -- line: 465
-		-- upvalues: React (copy), Foundation (copy), Skeleton (copy), v64 (copy), EnumsRadius (copy)
+	local v28
+
+	if v13.source == "channels" then
+		v28 = v14 == nil
+	else
+		v28 = false
+	end
+
+	if v15 == nil then
+		v19 = false
+	end
+
+	local v29 = not v12 or v28 or v19
+	local text
+
+	if v20 then
+		if v21 then
+			text = v22.inviterTitleText
+		else
+			text = v22.inviterTitleTextOneToOne
+		end
+	else
+		text = v22.titleText
+	end
+
+	local v30 = React.useMemo(function()
 		return React.createElement(Foundation.View, {
 			tag = "col gap-medium size-full-0 auto-y margin-top-small"
 		}, {
 			Heading = React.createElement(Skeleton, {
-				LayoutOrder = 1,
-				Size = UDim2.new(0.6, 0, 0, v64.Size.Size_1100),
-				radius = EnumsRadius.Medium
+				Size = UDim2.new(0.6, 0, 0, v8.Size.Size_1100),
+				radius = Radius.Medium,
+				LayoutOrder = 1
 			}),
 			Row1 = React.createElement(Skeleton, {
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v64.Size.Size_1200),
-				radius = EnumsRadius.Medium
+				Size = UDim2.new(1, 0, 0, v8.Size.Size_1200),
+				radius = Radius.Medium,
+				LayoutOrder = 2
 			}),
 			Row2 = React.createElement(Skeleton, {
-				LayoutOrder = 3,
-				Size = UDim2.new(1, 0, 0, v64.Size.Size_1200),
-				radius = EnumsRadius.Medium
+				Size = UDim2.new(1, 0, 0, v8.Size.Size_1200),
+				radius = Radius.Medium,
+				LayoutOrder = 3
 			}),
 			Row3 = React.createElement(Skeleton, {
-				LayoutOrder = 4,
-				Size = UDim2.new(1, 0, 0, v64.Size.Size_1200),
-				radius = EnumsRadius.Medium
+				Size = UDim2.new(1, 0, 0, v8.Size.Size_1200),
+				radius = Radius.Medium,
+				LayoutOrder = 4
 			}),
 			Footer = React.createElement(Skeleton, {
-				LayoutOrder = 5,
-				Size = UDim2.new(1, 0, 0, v64.Size.Size_800),
-				radius = EnumsRadius.Medium
+				Size = UDim2.new(1, 0, 0, v8.Size.Size_800),
+				radius = Radius.Medium,
+				LayoutOrder = 5
 			})
 		})
-	end, { v64 })
-	local v96 = React.useMemo(function() -- line: 498
-		-- upvalues: React (copy), Foundation (copy), Dialog (copy), v84 (copy), v85 (copy), Renderer (copy), v64 (copy), v66 (copy)
-		return React.createElement(Foundation.View, {
-			tag = "col gap-medium size-full-0 auto-y"
-		}, {
+	end, { v8 })
+
+	local v31 = React.useMemo(function()
+		return React.createElement(Foundation.View, { tag = "col gap-medium size-full-0 auto-y" }, {
 			DialogContentHeader = React.createElement(Dialog.Text, {
-				LayoutOrder = 1,
-				Text = v84.subtitleText
+				Text = v22.subtitleText,
+				LayoutOrder = 1
 			}),
-			GroupMemberList = React.createElement(Foundation.View, {
-				tag = "col size-full-0 auto-y",
-				LayoutOrder = 2
-			}, v85),
+			GroupMemberList = React.createElement(
+				Foundation.View,
+				{ tag = "col size-full-0 auto-y", LayoutOrder = 2 },
+				v23
+			),
 			DialogContentFooter = React.createElement(Renderer, {
-				text = v84.footerText,
-				textStyle = v64.Color.Content.Default,
-				fontStyle = v64.Typography.BodyMedium,
-				linkerOptions = v66,
-				wrapperProps = {
-					tag = "size-full-0 auto-y",
-					LayoutOrder = 3
-				}
+				text = v22.footerText,
+				textStyle = v8.Color.Content.Default,
+				fontStyle = v8.Typography.BodyMedium,
+				linkerOptions = linkerOptions,
+				wrapperProps = { tag = "size-full-0 auto-y", LayoutOrder = 3 }
 			})
 		})
 	end, {
-		v84.subtitleText,
-		v84.footerText,
-		v85,
-		v64.Color.Content.Default,
-		v64.Typography.BodyMedium,
-		v66
+		v22.subtitleText,
+		v22.footerText,
+		v23,
+		v8.Color.Content.Default,
+		v8.Typography.BodyMedium,
+		linkerOptions
 	})
 
-	return React.createElement(Dialog.Root, {
-		size = v59.dialogSize,
-		onClose = v86,
-		hasBackdrop = v59.hasBackdrop,
-		disablePortal = v59.disablePortal
-	}, {
-		DialogTitle = not v93 and React.createElement(Dialog.Title, {
-			LayoutOrder = 1,
-			text = v94
-		}),
-		DialogContent = React.createElement(Dialog.Content, {
-			LayoutOrder = 2
-		}, if not v93 then v96 else v95),
-		DialogActions = not v93 and React.createElement(Dialog.Actions, {
-			LayoutOrder = 3,
-			orientation = EnumsOrientation.Vertical,
-			actions = {
-				{
-					text = v84.joinButtonText,
-					variant = ButtonVariant.Emphasis,
-					onActivated = v89,
-					isDisabled = v67
-				},
-				{
-					text = v84.declineButtonText,
-					variant = ButtonVariant.Standard,
-					onActivated = v90,
-					isDisabled = v67
-				}
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v32 = {
+		ref = ref2,
+		size = union.dialogSize,
+		onClose = 0,
+		hasBackdrop = 0,
+		disablePortal = 0
+	}
+	local onClose
+
+	if not v25 then
+		onClose = v24
+	end
+
+	v32.onClose = onClose
+	v32.hasBackdrop = union.hasBackdrop
+	v32.disablePortal = union.disablePortal
+	local v44 = {
+		DialogTitle = not v29 and React.createElement(Dialog.Title, { text = text, LayoutOrder = 1 }),
+		DialogContent = 0,
+		DialogActions = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Dialog.Content
+
+	if not v29 then
+		v30 = v31
+	end
+
+	v44.DialogContent = createElement2(content, { LayoutOrder = 2 }, v30)
+
+	v44.DialogActions = not v29 and React.createElement(Dialog.Actions, {
+		LayoutOrder = 3,
+		orientation = Orientation.Vertical,
+		actions = {
+			{
+				text = v22.joinButtonText,
+				variant = ButtonVariant.Emphasis,
+				ref = ref,
+				onActivated = onActivated,
+				isDisabled = state
+			},
+			{
+				text = v22.declineButtonText,
+				variant = ButtonVariant.Standard,
+				onActivated = onActivated2,
+				isDisabled = state
 			}
-		})
+		}
 	})
+	return createElement(root, v32, v44)
 end
 
 return GroupOSADialog

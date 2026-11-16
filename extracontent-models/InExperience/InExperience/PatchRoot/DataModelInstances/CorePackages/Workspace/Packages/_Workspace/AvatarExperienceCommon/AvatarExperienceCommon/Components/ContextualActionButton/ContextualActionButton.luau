@@ -1,78 +1,86 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local t1 = {
-	affordance = Foundation.Enums.StateLayerAffordance.None
-}
 
-local function getHoverTransparency(p1) -- line: 13
-	if p1 then
-		return 0
-	end
+local stateLayer = { affordance = Foundation.Enums.StateLayerAffordance.None }
 
-	return 0.2
+local function getHoverTransparency(p): number
+	return if p then 0 else 0.2
 end
-local function useHoverBinding() -- line: 17
-	-- upvalues: React (copy), Foundation (copy)
-	local v10, v11 = React.useBinding(false)
 
-	return v10, (React.useCallback(function(p2) -- line: 21
-		-- upvalues: Foundation (copy), v11 (copy)
-		if p2 == Foundation.Enums.ControlState.Default then
-			v11(false)
+local function useHoverBinding()
+	local v, v2 = React.useBinding(false)
 
-			return
-		end
-
-		if p2 == Foundation.Enums.ControlState.Hover then
-			v11(true)
+	return v, (React.useCallback(function(p)
+		if p == Foundation.Enums.ControlState.Default then
+			v2(false)
+		elseif p == Foundation.Enums.ControlState.Hover then
+			v2(true)
 		end
 	end, {}))
 end
-local function ContextualActionButton(t2: {[any]: any}, p3) -- line: 45
-	-- upvalues: useTokens (copy), useHoverBinding (copy), React (copy), Foundation (copy), t1 (copy), getHoverTransparency (copy)
-	local v14 = useTokens()
-	local v15, v16 = useHoverBinding()
-	local v17 = React.useCallback(function(p4) -- line: 50
-		-- upvalues: v14 (copy), t2 (copy)
-		if p4 then
-			return v14.Color.Shift.Shift_200
+
+local function ContextualActionButton(props, ref)
+	local v = useTokens()
+
+	local v2, onStateChanged = useHoverBinding()
+
+	local v3 = React.useCallback(function(p)
+		if p then
+			return v.Color.Shift.Shift_200
 		end
 
-		if t2.isActive then
-			return v14.Color.Shift.Shift_400
+		if props.isActive then
+			return v.Color.Shift.Shift_400
 		end
 
-		return {
-			Transparency = 1,
-			Color3 = v14.Color.Shift.Shift_200.Color3
-		}
-	end, {
-		t2.isActive,
-		v14
-	})
+		return { Color3 = v.Color.Shift.Shift_200.Color3, Transparency = 1 }
+	end, { props.isActive, v })
 
-	return React.createElement(Foundation.View, {
-		tag = "radius-circle clip auto-xy",
-		ref = p3,
-		backgroundStyle = v14.Color.OverMedia.OverMedia_0,
-		LayoutOrder = t2.LayoutOrder,
-		stateLayer = t1,
-		onStateChanged = if not t2.disabled then v16 else nil,
-		onActivated = t2.onActivated,
-		disabled = t2.disabled,
-		selection = {
-			Selectable = t2.Selectable or false
-		}
-	}, {
-		HoverHandler = React.createElement(Foundation.View, {
-			tag = "padding-small radius-circle clip auto-xy",
-			Size = if not t2.size then UDim2.fromScale(1, 1) else UDim2.new(t2.size, t2.size),
-			GroupTransparency = t2.GroupTransparencyOverwrite or v15:map(getHoverTransparency),
-			backgroundStyle = v15:map(v17)
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v4 = {
+		ref = ref,
+		backgroundStyle = v.Color.OverMedia.OverMedia_0,
+		LayoutOrder = props.LayoutOrder,
+		stateLayer = stateLayer,
+		onStateChanged = 0,
+		onActivated = 0,
+		disabled = 0,
+		selection = 0,
+		tag = "radius-circle clip auto-xy"
+	}
+
+	if props.disabled then
+		onStateChanged = nil
+	end
+
+	v4.onStateChanged = onStateChanged
+	v4.onActivated = props.onActivated
+	v4.disabled = props.disabled
+	v4.selection = {
+		Selectable = props.Selectable or false
+	}
+
+	local createElement2 = React.createElement
+	local view2 = Foundation.View
+	local size
+
+	if props.size then
+		size = UDim2.new(props.size, props.size)
+	else
+		size = UDim2.fromScale(1, 1)
+	end
+
+	return createElement(view, v4, {
+		HoverHandler = createElement2(view2, {
+			Size = size,
+			GroupTransparency = props.GroupTransparencyOverwrite or v2:map(getHoverTransparency),
+			backgroundStyle = v2:map(v3),
+			tag = "padding-small radius-circle clip auto-xy"
 		}, {
-			Children = React.createElement(React.Fragment, nil, t2.children)
+			Children = React.createElement(React.Fragment, nil, props.children)
 		})
 	})
 end

@@ -1,8 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 5
-	return {
-		respawnEnabled = p1,
-		customCallback = p2
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator(script.Name, function(respawnEnabled, customCallback)
+	return { respawnEnabled = respawnEnabled, customCallback = customCallback }
 end)

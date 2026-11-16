@@ -1,35 +1,36 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent.Parent
 
-local function useViewportSize() -- line: 6
-	-- upvalues: React (copy)
-	local CurrentCamera = workspace.CurrentCamera
-	local v5 = if not CurrentCamera then Vector2.new(1280, 720) else CurrentCamera.ViewportSize
-	local v6, v7 = React.useState(v5)
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 11
-		-- upvalues: v7 (copy)
-		local CurrentCamera2 = workspace.CurrentCamera
+local function useViewportSize()
+	local currentCamera = workspace.CurrentCamera
+	local v
 
-		if not CurrentCamera2 then
-			return function() -- line: 14
-			end
+	if currentCamera then
+		v = currentCamera.ViewportSize
+	else
+		v = Vector2.new(1280, 720)
+	end
+
+	local state, setState = React.useState(v)
+
+	React.useEffect(function()
+		local currentCamera2 = workspace.CurrentCamera
+
+		if not currentCamera2 then
+			return function() end
 		end
 
-		v7(CurrentCamera2.ViewportSize)
-
-		local connection = CurrentCamera2:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 17
-			-- upvalues: v7 (copy), CurrentCamera2 (copy)
-			v7(CurrentCamera2.ViewportSize)
+		setState(currentCamera2.ViewportSize)
+		local viewportSizeChangedConnection = currentCamera2:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+			setState(currentCamera2.ViewportSize)
 		end)
-
-		return function() -- line: 20
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			viewportSizeChangedConnection:Disconnect()
 		end
 	end, {})
 
-	return v6
+	return state
 end
 
 return useViewportSize

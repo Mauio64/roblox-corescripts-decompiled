@@ -1,9 +1,12 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+local parent = Foundation.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
 local Icon = require(Foundation.Components.Icon)
-local React = require(FoundationParent.React)
+local React = require(parent.React)
+
 local InputSize = require(Foundation.Enums.InputSize)
+
 local IconVariant = BuilderIcons.IconVariant
 
 require(Foundation.Enums.IconSize)
@@ -13,67 +16,75 @@ local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
 require(Foundation.Enums.Radius)
 
 local useTokens = require(Foundation.Providers.Style.useTokens)
-local usePresentationContext = require(Foundation.Providers.Style.PresentationContext).usePresentationContext
+local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
+local usePresentationContext = PresentationContext.usePresentationContext
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local Constants = require(Foundation.Constants)
 
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
+
 local useCloseAffordanceVariants = require(script.Parent.useCloseAffordanceVariants)
-local t1 = {
+
+local v = {
 	isDisabled = false,
+	size = InputSize.Medium,
+	variant = CloseAffordanceVariant.OverMedia,
 	isCircular = false,
 	hasPadding = true,
-	testId = "--foundation-close-affordance",
-	size = InputSize.Medium,
-	variant = CloseAffordanceVariant.OverMedia
+	testId = "--foundation-close-affordance"
 }
 
-local function CloseAffordance(p1, p2) -- line: 53
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePresentationContext (copy), useCloseAffordanceVariants (copy), React (copy), View (copy), withCommonProps (copy), Constants (copy), Icon (copy), BuilderIcons (copy), IconVariant (copy)
-	local v20 = withDefaults(p1, t1)
-	local v21 = useTokens()
-	local v22 = usePresentationContext()
-	local v23 = useCloseAffordanceVariants(v21, v20.size, v20.variant, v22.colorNamespace, v20.hasPadding, v20.isCircular)
-	local uDim = UDim.new(0, v23.container.radius)
-	local v25 = React.useMemo(function() -- line: 68
-		-- upvalues: uDim (copy), v21 (copy)
-		return {
-			radius = uDim,
-			offset = v21.Size.Size_150,
-			borderWidth = v21.Stroke.Thicker
-		}
-	end, {
-		v21,
-		uDim
-	})
+local function CloseAffordance(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local v4 = usePresentationContext()
 
-	return React.createElement(View, withCommonProps(v20, {
-		Size = v23.container.size,
-		onActivated = v20.onActivated,
+	local v5 = useCloseAffordanceVariants(v3, v2.size, v2.variant, v4.colorNamespace, v2.hasPadding, v2.isCircular)
+
+	local udim = UDim.new(0, v5.container.radius)
+
+	local cursor = React.useMemo(function()
+		return { radius = udim, offset = v3.Size.Size_150, borderWidth = v3.Stroke.Thicker }
+	end, { v3, udim })
+
+	local createElement = React.createElement
+
+	local v6 = {
+		Size = v5.container.size,
+		onActivated = v2.onActivated,
 		selection = {
-			Selectable = not v20.isDisabled and v20.Selectable,
-			NextSelectionUp = v20.NextSelectionUp,
-			NextSelectionDown = v20.NextSelectionDown,
-			NextSelectionLeft = v20.NextSelectionLeft,
-			NextSelectionRight = v20.NextSelectionRight
+			Selectable = not v2.isDisabled and v2.Selectable,
+			NextSelectionUp = v2.NextSelectionUp,
+			NextSelectionDown = v2.NextSelectionDown,
+			NextSelectionLeft = v2.NextSelectionLeft,
+			NextSelectionRight = v2.NextSelectionRight
 		},
-		isDisabled = v20.isDisabled,
-		padding = v23.container.padding,
-		cornerRadius = uDim,
-		stateLayer = v23.container.stateLayer,
-		cursor = v25,
-		tag = v23.container.tag,
-		GroupTransparency = if not v20.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
-		ref = p2
-	}), {
+		isDisabled = v2.isDisabled,
+		padding = v5.container.padding,
+		cornerRadius = udim,
+		stateLayer = v5.container.stateLayer,
+		cursor = cursor,
+		tag = v5.container.tag,
+		GroupTransparency = 0,
+		ref = 0
+	}
+	local groupTransparency
+
+	if v2.isDisabled then
+		groupTransparency = Constants.DISABLED_TRANSPARENCY
+	end
+
+	v6.GroupTransparency = groupTransparency
+	v6.ref = ref
+	return createElement(View, withCommonProps(v2, v6), {
 		Icon = React.createElement(Icon, {
 			name = BuilderIcons.Icon.X,
 			variant = IconVariant.Regular,
-			size = v23.content.iconSize,
-			style = v23.content.style
+			size = v5.content.iconSize,
+			style = v5.content.style
 		})
 	})
 end

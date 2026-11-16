@@ -1,0 +1,4 @@
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local showFeatureRestrictionDirect = require(Workspace.UniversalFeatureRestrictions.UniversalFeatureRestrictions.Utils.showFeatureRestrictionDirect)
+
+return showFeatureRestrictionDirect

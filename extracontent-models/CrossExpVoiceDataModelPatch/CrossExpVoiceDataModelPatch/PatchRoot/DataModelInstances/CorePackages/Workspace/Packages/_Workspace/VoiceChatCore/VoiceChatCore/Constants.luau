@@ -1,115 +1,84 @@
 local ContentProvider = game:GetService("ContentProvider")
-local t1 = {
-	PlaceNotAvailable = -1,
-	UserNotAvailable = 0,
-	Checking = 1,
-	Available = 2
-}
-local t2 = {
-	VoiceNotifications = true,
-	VoiceModeration = true
-}
-local t3 = {
-	IDLE = "Idle",
-	VOICE_DISABLED = "Voice Disabled",
-	LISTEN_AND_TALK = "Listen and Talk",
-	LISTEN_ONLY = "Listen Only",
-	PENDING_MIC = "Pending Mic"
-}
-local t4 = {
-	Idle = "Idle",
-	Joining = "Joining",
-	Suspended = "Suspended",
-	Joined = "Joined",
-	Left = "Left"
-}
-local t5 = {
-	ALL = "all",
-	FRIENDS = "friends",
-	NONFRIENDS = "nonfriends"
-}
 
-local function parseBaseUrlInformation() -- line: 54
-	-- upvalues: ContentProvider (copy)
-	local BaseUrl = ContentProvider.BaseUrl
+local function parseBaseUrlInformation()
+	local selected = ContentProvider.BaseUrl
 
-	if BaseUrl:sub(#BaseUrl) ~= "/" then
-		BaseUrl ..= "/"
+	if selected:sub(#selected) ~= "/" then
+		selected ..= "/"
 	end
 
-	local _, stop = BaseUrl:find("://")
-	local start, stop2 = BaseUrl:find("%.", stop + 1)
+	local _, v = selected:find("://")
 
-	return BaseUrl, BaseUrl:sub(stop + 1, start - 1), (BaseUrl:sub(stop2 + 1))
+	local v2, v3 = selected:find("%.", v + 1)
+	return selected, selected:sub(v + 1, v2 - 1), (selected:sub(v3 + 1))
 end
 
-local _, _, v10 = parseBaseUrlInformation()
-local v11 = string.format("https://voice.%s", v10)
-local v12 = string.format("https://apis.%supsellcard", v10)
-local t6 = {
-	CONTROL = "control",
-	VARIANT1 = "variant1",
-	VARIANT2 = "variant2",
-	VARIANT3 = "variant3"
-}
-local t7 = {
-	None = 0,
-	VoiceChat = 1,
-	AccountSecurity = 2
-}
-local t8 = {
-	Invalid = 0,
-	Disabled = 1,
-	EnabledExistingUser = 2,
-	EnabledNewUser = 3
-}
-local t9 = {
-	Control = "Control",
-	OnlyConnectDisconnect = "V2-Variant-1",
-	HearingWithoutMicPermissions = "V2-Variant-2"
-}
-local t10 = {
-	Control = "Control",
-	ConnectDisconnect = "ConnectDisconnect",
-	HearingWithoutMicPermissions = "HearingWithoutMicPermissions",
-	JoinVoiceIsMutedMic = "JoinVoiceIsMutedMic",
-	JoinVoiceTooltip = "JoinVoiceTooltip",
-	InitialJoinVoice = "InitialJoinVoice",
-	DeferConnection = "DeferConnection",
-	HideJoinToastSubtitle = "HideJoinToastSubtitle"
-}
-
+local _, _, v = parseBaseUrlInformation()
 return {
 	MIN_VOICE_CHAT_API_VERSION = 3,
+	VOICE_JOIN_PROGRESS = {
+		Idle = "Idle",
+		Joining = "Joining",
+		Suspended = "Suspended",
+		Joined = "Joined",
+		Left = "Left"
+	},
 	MIN_VOICE_CHAT_API_VERSION_LOCAL_MIC_ACTIVITY = 9,
 	MIN_VOICE_CHAT_API_VERSION_IS_CONTEXT_ENABLED = 10,
-	IN_EXP_PHONE_UPSELL_IXP_LAYER = "InExperience.UpsellCard",
-	EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER = "ExitConfirmation.UpsellCard",
-	VOICE_CONNECT_DISCONNECT_KEY = "InExpVoiceUIVisibility",
-	VOICE_CONNECT_DISCONNECT_KEY_V2 = "SeamlessConnectToVoice",
-	VOICE_CONNECT_DISCONNECT_KEY_V3 = "ConnectToVoice",
-	SEAMLESS_VOICE_FTUX_KEY = "SeamlessVoiceFTUX",
-	VOICE_REWARM_KEY = "VoiceRewarmOffered",
-	REWARDED_VIDEO_AD_STARTED = "RewardedVideoAdStarted",
-	REWARDED_VIDEO_AD_ENDED = "RewardedVideoAdEnded",
-	FAE_ENABLED = "Enabled",
-	FAE_SETTINGS_TOAST = "SettingsToast",
-	VOICE_JOIN_PROGRESS = t4,
-	VOICE_CHAT_AVAILABILITY = t1,
-	WATCHED_NAMESPACES = t2,
-	VOICE_GROUP_TYPE = t5,
+	VOICE_CHAT_AVAILABILITY = {
+		PlaceNotAvailable = -1,
+		UserNotAvailable = 0,
+		Checking = 1,
+		Available = 2
+	},
+	WATCHED_NAMESPACES = { VoiceNotifications = true, VoiceModeration = true },
+	VOICE_GROUP_TYPE = { ALL = "all", FRIENDS = "friends", NONFRIENDS = "nonfriends" },
 	WATCHED_MESSAGE_TYPES = {
 		"ParticipantModeratedFromVoice",
 		"VoiceToxicityModal",
 		"VoiceToxicityToast",
 		"VoiceReverseNudgeIconColorChange"
 	},
-	PERMISSION_STATE = t3,
-	VOICE_URL = v11,
-	UPSELL_CARD_URL = v12,
-	IN_EXP_UPSELL_VARIANT = t6,
-	PHONE_UPSELL_VOICE_CHAT_PROP = t7,
-	SeamlessVoiceStatus = t8,
-	SeamlessVoiceVariants = t9,
-	SeamlessVoiceFeatures = t10
+	PERMISSION_STATE = {
+		IDLE = "Idle",
+		VOICE_DISABLED = "Voice Disabled",
+		LISTEN_AND_TALK = "Listen and Talk",
+		LISTEN_ONLY = "Listen Only",
+		PENDING_MIC = "Pending Mic"
+	},
+	VOICE_URL = string.format("https://voice.%s", v),
+	UPSELL_CARD_URL = string.format("https://apis.%supsellcard", v),
+	IN_EXP_UPSELL_VARIANT = {
+		CONTROL = "control",
+		VARIANT1 = "variant1",
+		VARIANT2 = "variant2",
+		VARIANT3 = "variant3"
+	},
+	IN_EXP_PHONE_UPSELL_IXP_LAYER = "InExperience.UpsellCard",
+	EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER = "ExitConfirmation.UpsellCard",
+	PHONE_UPSELL_VOICE_CHAT_PROP = { None = 0, VoiceChat = 1, AccountSecurity = 2 },
+	VOICE_CONNECT_DISCONNECT_KEY_V2 = "SeamlessConnectToVoice",
+	VOICE_CONNECT_DISCONNECT_KEY_V3 = "ConnectToVoice",
+	SEAMLESS_VOICE_FTUX_KEY = "SeamlessVoiceFTUX",
+	VOICE_REWARM_KEY = "VoiceRewarmOffered",
+	SeamlessVoiceStatus = { Invalid = 0, Disabled = 1, EnabledExistingUser = 2, EnabledNewUser = 3 },
+	SeamlessVoiceVariants = {
+		Control = "Control",
+		OnlyConnectDisconnect = "V2-Variant-1",
+		HearingWithoutMicPermissions = "V2-Variant-2"
+	},
+	SeamlessVoiceFeatures = {
+		Control = "Control",
+		ConnectDisconnect = "ConnectDisconnect",
+		HearingWithoutMicPermissions = "HearingWithoutMicPermissions",
+		JoinVoiceIsMutedMic = "JoinVoiceIsMutedMic",
+		JoinVoiceTooltip = "JoinVoiceTooltip",
+		InitialJoinVoice = "InitialJoinVoice",
+		DeferConnection = "DeferConnection",
+		HideJoinToastSubtitle = "HideJoinToastSubtitle"
+	},
+	REWARDED_VIDEO_AD_STARTED = "RewardedVideoAdStarted",
+	REWARDED_VIDEO_AD_ENDED = "RewardedVideoAdEnded",
+	FAE_ENABLED = "Enabled",
+	FAE_SETTINGS_TOAST = "SettingsToast"
 }

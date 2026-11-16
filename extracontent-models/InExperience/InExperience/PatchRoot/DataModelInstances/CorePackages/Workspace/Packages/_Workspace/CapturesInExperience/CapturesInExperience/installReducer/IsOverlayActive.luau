@@ -1,14 +1,16 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local OverlayActivated = require(ParentParent.Actions.OverlayActivated)
-local OverlayDeactivated = require(ParentParent.Actions.OverlayDeactivated)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local Rodux = require(parent2.Rodux)
+
+local OverlayActivated = require(parent.Actions.OverlayActivated)
+local OverlayDeactivated = require(parent.Actions.OverlayDeactivated)
 
 return Rodux.createReducer(false, {
-	[OverlayActivated.name] = function(_: boolean, _: {[any]: any}) -- line: 14
+	[OverlayActivated.name] = function(_: boolean, _): boolean
 		return true
 	end,
-	[OverlayDeactivated.name] = function(_: boolean, _: {[any]: any}) -- line: 18
+	[OverlayDeactivated.name] = function(_: boolean, _): boolean
 		return false
 	end
 })

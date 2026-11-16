@@ -1,12 +1,21 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local getDeepValue = require(AppChat.Utils.getDeepValue)
+local parent = AppChat.Parent
 
-return function() -- line: 7
-	-- upvalues: useSelector (copy), getDeepValue (copy)
-	return useSelector(function(p1) -- line: 8
-		-- upvalues: getDeepValue (copy)
-		return getDeepValue(p1, "ChatAppReducer.AppLoaded") or false
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local getDeepValue = require(AppChat.Utils.getDeepValue)
+local GetAppLoadedStore = require(AppChat.Stores.GetAppLoadedStore)
+
+local FFlagAppChatUseSignalsForAppLoaded = require(AppChat.Flags.FFlagAppChatUseSignalsForAppLoaded)
+
+return function()
+	if FFlagAppChatUseSignalsForAppLoaded then
+		return useSignalState(GetAppLoadedStore(false).getAppLoaded)
+	end
+
+	return useSelector(function(p)
+		return getDeepValue(p, "ChatAppReducer.AppLoaded") or false
 	end)
 end

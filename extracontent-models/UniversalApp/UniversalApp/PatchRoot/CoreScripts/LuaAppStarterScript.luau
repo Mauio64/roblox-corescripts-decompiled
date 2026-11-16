@@ -1,145 +1,365 @@
 _G.LUAUFORGE_SENTRY_DEBUG_IDS = _G.LUAUFORGE_SENTRY_DEBUG_IDS or {}
+local v = debug.info(1, "s")
 
-local v1 = debug.info(1, "s")
-
-if v1 and type(v1) == "string" then
-	_G.LUAUFORGE_SENTRY_DEBUG_IDS[v1] = "88877336-86b9-58e9-9c2b-1044656acec3"
+if v and type(v) == "string" then
+	_G.LUAUFORGE_SENTRY_DEBUG_IDS[v] = "7b0e8c3d-1bed-5787-ada9-f13f0435e64f"
 end
 
-local __ = _G.LUAUFORGE_SENTRY_DEBUG_IDS
+local LUAUFORGE_SENTRY_DEBUG_IDS = _G.LUAUFORGE_SENTRY_DEBUG_IDS
 
-_G.IS_PRODUCTION = true
+_G.ENVIRONMENT = "PRODUCTION"
+
 _ = "apps/UniversalApp/build/app/bootstrap.luau"
-
-local t1 = nil
-
-t1 = {
+local v2 = nil
+v2 = {
 	cache = {},
-	load = function(p1) -- line: 11
-		-- upvalues: t1 (ref)
-		if not t1.cache[p1] then
-			t1.cache[p1] = {
-				c = t1[p1]()
-			}
+	load = function(p)
+		if not v2.cache[p] then
+			v2.cache[p] = { c = v2[p]() }
 		end
 
-		return t1.cache[p1].c
+		return v2.cache[p].c
 	end
 }
 
-local function createModuleLoader(__) -- line: 21
-	local t2 = {}
+function v2.b()
+	return {}
+end
 
-	local function loadModule(p3, p4) -- line: 23
-		-- upvalues: t2 (copy)
-		local v27 = t2[p3]
-
-		if v27 ~= nil then
-			return v27.c
+function v2.c()
+	return {
+		chunkMounted = function(callback, chunkName, loadingMs)
+			if callback ~= nil then
+				pcall(callback, table.freeze({ chunkName = chunkName, loadingMs = loadingMs }))
+			end
+		end,
+		chunkError = function(callback, chunkName, err, loadingMs)
+			if callback ~= nil then
+				pcall(callback, table.freeze({
+					chunkName = chunkName,
+					loadingMs = loadingMs,
+					error = err
+				}))
+			end
+		end,
+		moduleLoaded = function(callback, chunkName, moduleId, loadingMs)
+			if callback ~= nil then
+				pcall(callback, table.freeze({
+					chunkName = chunkName,
+					moduleId = moduleId,
+					loadingMs = loadingMs
+				}))
+			end
+		end,
+		moduleError = function(callback, chunkName, moduleId, err, loadingMs)
+			if callback ~= nil then
+				pcall(
+					callback,
+					table.freeze({
+						chunkName = chunkName,
+						moduleId = moduleId,
+						loadingMs = loadingMs,
+						error = err
+					})
+				)
+			end
 		end
+	}
+end
 
-		local v28 = p4()
+function v2.a()
+	v2.load("b")
+	local loaded = v2.load("c")
 
-		t2[p3] = {
-			c = v28
+	local function newSlot()
+		return {
+			state = "loading",
+			value = nil,
+			error = nil,
+			waiters = {},
+			loadingThread = coroutine.running()
 		}
-
-		return v28
 	end
 
-	return loadModule
-end
-local function createChunkLoader(p5) -- line: 35
-	local t3 = {}
+	local frozen = table.freeze({})
 
-	local function resolveChunk(p6) -- line: 37
-		-- upvalues: t3 (copy), p5 (copy), resolveChunk (copy)
-		local v30 = t3[p6]
+	local function wakeWaiters(list)
+		local waiters = table.freeze(list.waiters)
 
-		if v30 then
-			return v30
+		list.waiters = frozen
+		table.freeze(list)
+
+		for k, waiter in waiters do
+			coroutine.resume(waiter)
+		end
+	end
+
+	local function waitForSlot(data, p)
+		if data.state == "ready" then
+			return data.value
 		end
 
-		local mount = p5(p6).mount
-		local freeze = table.freeze
-		local t4 = {
-			resolveChunk = resolveChunk
-		}
-		local t5 = {}
+		if data.state == "errored" then
+			error(data.error)
+		elseif data.loadingThread == coroutine.running() then
+			error(`circular require: {p}`)
+		elseif not coroutine.isyieldable() then
+			error("cannot yield from non-yieldable coroutine")
+		end
 
-		local function loadModule(p7, p8) -- line: 23
-			-- upvalues: t5 (copy)
-			local v43 = t5[p7]
+		table.insert(data.waiters, coroutine.running())
+		coroutine.yield()
 
-			if v43 ~= nil then
-				return v43.c
+		if data.state == "ready" then
+			return data.value
+		end
+
+		if data.state == "errored" then
+			error(data.error)
+		end
+
+		error(`unexpected slot state: {data.state}`)
+	end
+
+	local function fillSlot(p, callback)
+		local lastTime = os.clock()
+		local success, result = pcall(callback)
+		local v3 = os.clock() - lastTime
+		p.loadingThread = nil
+
+		if success then
+			p.state = "ready"
+			p.value = result
+		else
+			p.state = "errored"
+			p.error = result
+		end
+
+		wakeWaiters(p)
+		return success, result, v3 * 1000
+	end
+
+	return {
+		createContainer = function(data)
+			local v3 = {}
+
+			local function makeChunkLoadModule(p) -- 1 equivalent call inferred from this helper
+				local v4 = {}
+				return function(p2, p3)
+					local v5 = v4[p2]
+
+					if v5 then
+						return waitForSlot(v5, `{p}:{p2}`)
+					end
+
+					local v6 = newSlot()
+					v4[p2] = v6
+					local v7, v8, v9 = fillSlot(v6, p3)
+
+					if v7 then
+						loaded.moduleLoaded(data.onModuleLoaded, p, p2, v9)
+						return v8
+					end
+
+					loaded.moduleError(data.onModuleError, p, p2, v8, v9)
+					error(v8)
+				end
 			end
 
-			local v44 = p8()
+			local function resolveChunk(p)
+				local v4 = v3[p]
 
-			t5[p7] = {
-				c = v44
-			}
+				if v4 then
+					return waitForSlot(v4, `chunk {p}`)
+				end
 
-			return v44
+				local v5 = newSlot()
+				v3[p] = v5
+				local v6, v7, v8 = fillSlot(v5, function()
+					return data.loadChunk(p).mount(table.freeze({
+						resolveChunk = resolveChunk,
+						loadModule = makeChunkLoadModule(p) -- inferred equivalent call
+					}))
+				end)
+
+				if v6 then
+					loaded.chunkMounted(data.onChunkMounted, p, v8)
+					return v7
+				end
+
+				loaded.chunkError(data.onChunkError, p, v7, v8)
+				error(v7)
+			end
+
+			return table.freeze({
+				resolveChunk = resolveChunk,
+				preloadChunk = function(p, p2)
+					local thread = coroutine.create(function()
+						local chunk = resolveChunk(p)
+
+						if p2 then
+							chunk.loadModule(p2)
+						end
+					end)
+					coroutine.resume(thread)
+				end
+			})
 		end
-
-		t4.loadModule = loadModule
-
-		local v36 = mount(freeze(t4))
-
-		t3[p6] = v36
-
-		return v36
-	end
-
-	return resolveChunk
-end
-local function requireChunk(p9) -- line: 53
-	return require(`@game/CorePackages/LuauForgeChunks/{ p9 }`)
-end
-
-local t6 = {}
-
-local function resolveChunk(p10) -- line: 37
-	-- upvalues: t6 (copy), requireChunk (copy), resolveChunk (copy)
-	local v18 = t6[p10]
-
-	if v18 then
-		return v18
-	end
-
-	local mount = requireChunk(p10).mount
-	local freeze = table.freeze
-	local t7 = {
-		resolveChunk = resolveChunk
 	}
-	local t8 = {}
-
-	local function loadModule(p11, p12) -- line: 23
-		-- upvalues: t8 (copy)
-		local v39 = t8[p11]
-
-		if v39 ~= nil then
-			return v39.c
-		end
-
-		local v40 = p12()
-
-		t8[p11] = {
-			c = v40
-		}
-
-		return v40
-	end
-
-	t7.loadModule = loadModule
-
-	local v24 = mount(freeze(t7))
-
-	t6[p10] = v24
-
-	return v24
 end
 
-resolveChunk("bundled").loadModule("LUAUFORGE_MAIN")
+local defineFastFlag = game:DefineFastFlag("LuaAppLoadChunksFromManifest", false)
+local defineFastFlag2 = game:DefineFastFlag("LuaAppLoadChunksFallbackToEmbedded", false)
+
+if defineFastFlag then
+	local loaded = v2.load("a")
+
+	local InsertService = game:GetService("InsertService")
+	local TelemetryService = game:GetService("TelemetryService")
+
+	local frozen = table.freeze({
+		eventName = "LuauForgeChunkError",
+		backends = { "EventIngest" },
+		throttlingPercentage = 10000,
+		lastUpdated = { 2026, 8, 24 },
+		description = "Fired when a LuauForge container chunk fails to mount."
+	})
+
+	local frozen2 = table.freeze({
+		eventName = "LuauForgeModuleError",
+		backends = { "EventIngest" },
+		throttlingPercentage = 10000,
+		lastUpdated = { 2026, 8, 24 },
+		description = "Fired when a module factory inside a LuauForge chunk errors."
+	})
+
+	local function onChunkError(data)
+		TelemetryService:LogEvent(frozen, {
+			customFields = {
+				chunkName = data.chunkName,
+				loadingMs = data.loadingMs,
+				error = tostring(data.error)
+			}
+		})
+	end
+
+	local function getContentManifest() -- 1 equivalent call inferred from this helper
+		return require("@game/CorePackages/LuauForgeContentManifest")
+	end
+
+	local function resolveEmbeddedChunk(p)
+		return require(`@game/CorePackages/LuauForgeChunks/{p}`)
+	end
+
+	local function unpackChunk(instance)
+		local bundle = instance:FindFirstChild("bundle")
+
+		if bundle ~= nil and bundle:IsA("ModuleScript") then
+			return require(bundle)
+		end
+
+		error("Chunk is not a ModuleScript named bundle")
+	end
+
+	local function resolveContentChunk(p)
+		return unpackChunk(InsertService:LoadAssetWithBytecodeAsync(p))
+	end
+
+	loaded.createContainer(table.freeze({
+		loadChunk = function(chunkName)
+			print(`Loading chunk {chunkName}`)
+			local v3 = getContentManifest()[chunkName] -- inferred equivalent call
+
+			if v3 ~= nil then
+				print(`Loading content chunk {v3}`)
+
+				if not defineFastFlag2 then
+					return resolveContentChunk(v3)
+				end
+
+				local lastTime = os.clock()
+				local success, result = pcall(resolveContentChunk, v3)
+
+				if success then
+					return result
+				end
+
+				onChunkError({
+					chunkName = chunkName,
+					loadingMs = (os.clock() - lastTime) * 1000,
+					error = result
+				})
+			end
+
+			print(`Loading embedded chunk {chunkName}`)
+			return resolveEmbeddedChunk(chunkName)
+		end,
+		onChunkError = onChunkError,
+		onModuleError = function(data)
+			TelemetryService:LogEvent(frozen2, {
+				customFields = {
+					chunkName = data.chunkName,
+					moduleId = data.moduleId,
+					loadingMs = data.loadingMs,
+					error = tostring(data.error)
+				}
+			})
+		end
+	})).resolveChunk("bundled").loadModule("LUAUFORGE_MAIN")
+else
+	local function createModuleLoader(p)
+		local v3 = {}
+		local function loadModule(p2, callback)
+			local v4 = v3[p2]
+
+			if v4 ~= nil then
+				return v4.c
+			end
+
+			local v5 = callback()
+			v3[p2] = { c = v5 }
+			return v5
+		end
+
+		return loadModule
+	end
+
+	local function createChunkLoader(requireChunk) -- 1 equivalent call inferred from this helper
+		local v3 = {}
+		local function resolveChunk(p)
+			local v4 = v3[p]
+
+			if v4 then
+				return v4
+			end
+
+			local mount = requireChunk(p).mount
+			local v5 = { resolveChunk = resolveChunk, loadModule = 0 }
+			local v6 = {}
+			function v5.loadModule(p2, callback)
+				local v7 = v6[p2]
+
+				if v7 ~= nil then
+					return v7.c
+				end
+
+				local v8 = callback()
+				v6[p2] = { c = v8 }
+				return v8
+			end
+
+			local v7 = mount(table.freeze(v5))
+
+			v3[p] = v7
+			return v7
+		end
+
+		return resolveChunk
+	end
+
+	local function requireChunk(p)
+		return require(`@game/CorePackages/LuauForgeChunks/{p}`)
+	end
+
+	createChunkLoader(requireChunk)("bundled").loadModule("LUAUFORGE_MAIN") -- inferred equivalent call
+end

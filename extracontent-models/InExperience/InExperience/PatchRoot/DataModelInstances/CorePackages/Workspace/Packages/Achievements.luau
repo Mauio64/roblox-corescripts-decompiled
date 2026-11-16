@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.Achievements.Achievements))
+local Achievements = require(Workspace.Achievements.Achievements)
+
+return Achievements

@@ -1,52 +1,44 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-
+require(Foundation.Enums.ColorMode)
 require(Foundation.Enums.Device)
-
-local Flags = require(Foundation.Utility.Flags)
-
-require(Foundation.Enums.Theme)
-
+require(Foundation.Enums.ThemeName)
 local TokenProcessingUtilities = require(Foundation.Providers.Style.Tokens.TokenProcessingUtilities)
 local Tokens = require(Foundation.Providers.Style.Tokens)
 
-local function tokenPathToAttributeBase(s1: string) -- line: 14
-	return s1:gsub("%.", ""):gsub("_", "")
+local function tokenPathToAttributeBase(value: string) -- 1 equivalent call inferred from this helper
+	return value:gsub("%.", ""):gsub("_", "")
 end
-local function emitLeafAttributes(t1: {[any]: any}, s2: string, p1) -- line: 19
-	-- upvalues: emitLeafAttributes (copy)
-	if type(p1) == "table" then
-		for v12, v13 in p1 do
-			emitLeafAttributes(t1, s2 .. tostring(v12), v13)
-		end
+
+local function emitLeafAttributes(overrideAttributes, p: string, tokenOverride)
+	if type(tokenOverride) ~= "table" then
+		overrideAttributes[p] = tokenOverride
 
 		return
 	end
 
-	t1[s2] = p1
+	for k, item in tokenOverride do
+		emitLeafAttributes(overrideAttributes, p .. tostring(k), item)
+	end
 end
-local function getOverrideAttributes(p2, p3, p4) -- line: 37
-	-- upvalues: Flags (copy), Tokens (copy), TokenProcessingUtilities (copy), emitLeafAttributes (copy)
-	local t2 = {}
 
-	if not Flags.FoundationTokenOverrides then
-		return t2
+local function getOverrideAttributes(p, p2, p3, items)
+	local overrideAttributes = {}
+
+	if not (items and next(items)) then
+		return overrideAttributes
 	end
 
-	if not p4 or not next(p4) then
-		return t2
-	end
+	local tokens = Tokens.getTokens(p2, p3, 1, nil, p)
 
-	local v18 = Tokens.getTokens(p2, p3, 1)
+	for k, item in items do
+		local tokenOverride = TokenProcessingUtilities.resolveTokenOverride(tokens, k, item)
 
-	for v19, v20 in p4 do
-		local v21 = TokenProcessingUtilities.resolveTokenOverride(v18, v19, v20)
-
-		if v21 ~= nil then
-			emitLeafAttributes(t2, v19:gsub("%.", ""):gsub("_", ""), v21)
+		if tokenOverride ~= nil then
+			emitLeafAttributes(overrideAttributes, tokenPathToAttributeBase(k), tokenOverride) -- inferred equivalent call
 		end
 	end
 
-	return t2
+	return overrideAttributes
 end
 
 return getOverrideAttributes

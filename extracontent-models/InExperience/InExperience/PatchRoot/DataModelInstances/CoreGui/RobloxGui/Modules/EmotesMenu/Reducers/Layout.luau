@@ -1,12 +1,16 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local Actions = ParentParent.Actions
-local SetLayout = require(Actions.SetLayout)
-local Constants = require(ParentParent.Constants)
+
+local parent = script.Parent.Parent
+
+local actions = parent.Actions
+
+local SetLayout = require(actions.SetLayout)
+local Constants = require(parent.Constants)
 
 return Rodux.createReducer(Constants.Layout.Large, {
-	[SetLayout.name] = function(_, p2) -- line: 14
-		return p2.layout
+	[SetLayout.name] = function(_, p)
+		return p.layout
 	end
 })

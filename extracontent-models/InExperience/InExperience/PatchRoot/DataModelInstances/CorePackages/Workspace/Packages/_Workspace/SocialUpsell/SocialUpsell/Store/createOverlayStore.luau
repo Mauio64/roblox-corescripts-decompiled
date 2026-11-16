@@ -1,35 +1,25 @@
 local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
-local SocialUpsellParent = SocialUpsell.Parent
-local Signals = require(SocialUpsellParent.Signals)
+
+local parent = SocialUpsell.Parent
+
+local Signals = require(parent.Signals)
 
 require(SocialUpsell.Types)
 
-local t1 = {
-	overlayType = nil,
-	overlayProps = {}
-}
+local v = { overlayType = nil, overlayProps = {} }
 
-return function() -- line: 19
-	-- upvalues: Signals (copy), t1 (copy)
-	local v5, v6 = Signals.createSignal(table.clone(t1))
-	local v7 = Signals.createComputed(function(p1) -- line: 21
-		-- upvalues: v5 (copy)
-		return v5(p1).overlayType
-	end)
-
+return function()
+	local signal, v2 = Signals.createSignal(table.clone(v))
 	return {
-		getCurrentOverlay = v5,
-		setCurrentOverlay = function(p2, p3) -- line: 27
-			-- upvalues: v6 (copy)
-			v6({
-				overlayType = p2,
-				overlayProps = p3
-			})
+		getCurrentOverlay = signal,
+		setCurrentOverlay = function(overlayType, overlayProps)
+			v2({ overlayType = overlayType, overlayProps = overlayProps })
 		end,
-		getCurrentOverlayType = v7,
-		dismissCurrentOverlay = function() -- line: 34
-			-- upvalues: v6 (copy), t1 (copy)
-			v6(table.clone(t1))
+		getCurrentOverlayType = Signals.createComputed(function(p)
+			return signal(p).overlayType
+		end),
+		dismissCurrentOverlay = function()
+			v2(table.clone(v))
 		end
 	}
 end

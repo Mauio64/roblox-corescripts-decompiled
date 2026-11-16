@@ -1,4 +1,1 @@
-return {
-	Fae = "fae",
-	FaeDetails = "faeDetails"
-}
+return { Fae = "fae", FaeDetails = "faeDetails" }

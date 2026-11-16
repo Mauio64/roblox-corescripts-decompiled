@@ -1,24 +1,31 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Signals = require(ParentParentParent.Signals)
-local AppCommonLib = require(ParentParentParent.AppCommonLib)
-local VrCompatibility = require(ParentParentParent.VrCompatibility)
-local getGlobalGuiInset = require(ParentParent.getGlobalGuiInset)
-local FIntLuaAppSmallScreenDesignWidth = require(ParentParent.Flags.FIntLuaAppSmallScreenDesignWidth)
-local EngineFeature = game:GetEngineFeature("EnableDisplaySize")
-local v10 = game:DefineFastFlag("FFlagLuaAppEnableWindowsHandheldScale", false)
-local v11 = game:DefineFastFlag("DebugLuaAppEnableScale", false)
-local v12 = v11 or v10 and EngineFeature
-local FFlagDebugForceConsoleSafeInsets = require(ParentParentParent.SharedFlags).FFlagDebugForceConsoleSafeInsets
-local v14 = GuiService:IsTenFootInterface()
 
-local function forceConsoleSafeInsets(vector2: Vector2) -- line: 42
-	-- upvalues: ParentParentParent (copy)
-	local MessageBus = require(ParentParentParent.MessageBus).MessageBus
-	local t = require(ParentParentParent.t)
-	local t1 = {
-		mid = MessageBus.getMessageId("Screen", "safeAreaInsets"),
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Signals = require(parent2.Signals)
+local AppCommonLib = require(parent2.AppCommonLib)
+local VRConstants = require(parent2.VrCompatibility.VRConstants)
+
+local getGlobalGuiInset = require(parent.getGlobalGuiInset)
+
+local FIntLuaAppSmallScreenDesignWidth = require(parent.Flags.FIntLuaAppSmallScreenDesignWidth)
+local FFlagDisableLuaAppConsoleScale = require(parent.Flags.FFlagDisableLuaAppConsoleScale)
+local engineFeature = game:GetEngineFeature("EnableDisplaySize")
+local defineFastFlag = game:DefineFastFlag("FFlagLuaAppEnableWindowsHandheldScale", false)
+local defineFastFlag2 = game:DefineFastFlag("DebugLuaAppEnableScale", false)
+local v = defineFastFlag2 or defineFastFlag and engineFeature
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagDebugForceConsoleSafeInsets = SharedFlags.FFlagDebugForceConsoleSafeInsets
+local v2 = FFlagDisableLuaAppConsoleScale and 1 or 1.5
+local tenFootInterface = AppCommonLib.isTenFootInterface()
+
+local function forceConsoleSafeInsets(vector2: Vector2)
+	local MessageBus = require(parent2.MessageBus)
+	local messageBus = MessageBus.MessageBus
+	local t = require(parent2.t)
+
+	local v3 = {
+		mid = messageBus.getMessageId("Screen", "safeAreaInsets"),
 		validateParams = t.strictInterface({
 			left = t.number,
 			top = t.number,
@@ -26,158 +33,151 @@ local function forceConsoleSafeInsets(vector2: Vector2) -- line: 42
 			bottom = t.number
 		})
 	}
-	local t2 = {
-		left = vector2.X * 0.05 / 1.5,
-		top = vector2.Y * 0.05 / 1.5,
-		right = vector2.X * 0.05 / 1.5,
-		bottom = vector2.Y * 0.05 / 1.5
+
+	local v4 = {
+		left = vector2.X * 0.05 / v2,
+		top = vector2.Y * 0.05 / v2,
+		right = vector2.X * 0.05 / v2,
+		bottom = vector2.Y * 0.05 / v2
 	}
 
-	MessageBus.publish(t1, t2)
+	messageBus.publish(v3, v4)
 end
 
-return function() -- line: 66
-	-- upvalues: Signals (copy), AppCommonLib (copy), GuiService (copy), VrCompatibility (copy), FFlagDebugForceConsoleSafeInsets (copy), forceConsoleSafeInsets (copy), EngineFeature (copy), getGlobalGuiInset (copy), v11 (copy), FIntLuaAppSmallScreenDesignWidth (copy), v12 (copy), v14 (copy)
-	local v21, v22 = Signals.createSignal(workspace.CurrentCamera)
-	local connection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() -- line: 69
-		-- upvalues: v22 (copy)
-		v22(workspace.CurrentCamera)
-	end)
-	local v24, v25 = Signals.createSignal(AppCommonLib.isSpatial())
-	local u26 = AppCommonLib.connectToIsSpatialChanged(function(b1: boolean) -- line: 75
-		-- upvalues: v25 (copy)
-		v25(b1)
+return function()
+	local signal, v3 = Signals.createSignal(workspace.CurrentCamera)
+	local currentCameraChangedConnection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+		v3(workspace.CurrentCamera)
 	end)
 
-	local function calculateDeviceSafePadding() -- line: 79
-		-- upvalues: GuiService (copy)
-		local InsetArea = GuiService:GetInsetArea(Enum.ScreenInsets.None)
-		local InsetArea2 = GuiService:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets)
+	local signal2, v4 = Signals.createSignal(AppCommonLib.isSpatial())
+	local connection = AppCommonLib.connectToIsSpatialChanged(function(flag: boolean)
+		v4(flag)
+	end)
 
+	local function calculateDeviceSafePadding()
+		local insetArea = GuiService:GetInsetArea(Enum.ScreenInsets.None)
+		local insetArea2 = GuiService:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets)
 		return {
-			left = InsetArea2.Min.X - InsetArea.Min.X,
-			top = InsetArea2.Min.Y - InsetArea.Min.Y,
-			right = InsetArea.Max.X - InsetArea2.Max.X,
-			bottom = InsetArea.Max.Y - InsetArea2.Max.Y
+			left = insetArea2.Min.X - insetArea.Min.X,
+			top = insetArea2.Min.Y - insetArea.Min.Y,
+			right = insetArea.Max.X - insetArea2.Max.X,
+			bottom = insetArea.Max.Y - insetArea2.Max.Y
 		}
 	end
 
-	local v28, v29 = Signals.createSignal((calculateDeviceSafePadding()))
-	local vector2 = Vector2.new(1, 1)
-	local v31 = v21(false)
+	local signal3, v5 = Signals.createSignal(calculateDeviceSafePadding())
 
-	if v31 then
-		vector2 = v31.ViewportSize
+	local v6 = Vector2.new(1, 1)
+	local v7 = signal(false)
+
+	if v7 then
+		v6 = v7.ViewportSize
 	end
 
-	local v32, v33 = Signals.createSignal(vector2)
-	local u34 = nil
-	local v35 = Signals.createEffect(function(p1) -- line: 99
-		-- upvalues: v21 (copy), u34 (ref), v24 (copy), v33 (copy), VrCompatibility (copy), v29 (copy), calculateDeviceSafePadding (copy), FFlagDebugForceConsoleSafeInsets (copy), forceConsoleSafeInsets (copy), v32 (copy)
-		local v52 = v21(p1)
+	local signal4, v8 = Signals.createSignal(v6)
+	local viewportSizeChangedConnection = nil
+	local effect = Signals.createEffect(function(p)
+		local v9 = signal(p)
 
-		if v52 then
-			if u34 then
-				u34:Disconnect()
-				u34 = nil
+		if v9 then
+			if viewportSizeChangedConnection then
+				viewportSizeChangedConnection:Disconnect()
+				viewportSizeChangedConnection = nil
 			end
 
-			if v24(p1) then
-				v33(VrCompatibility.VRConstants.MainScreenResolution)
+			if signal2(p) then
+				v8(VRConstants.MainScreenResolution)
+			else
+				viewportSizeChangedConnection = v9:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+					v8(v9.ViewportSize)
+					v5(calculateDeviceSafePadding())
 
-				return
+					if FFlagDebugForceConsoleSafeInsets then
+						forceConsoleSafeInsets(signal4(p))
+					end
+				end)
 			end
-
-			u34 = v52:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 110
-				-- upvalues: v33 (copy), v52 (copy), v29 (copy), calculateDeviceSafePadding (copy), FFlagDebugForceConsoleSafeInsets (copy), forceConsoleSafeInsets (copy), v32 (copy), p1 (copy)
-				v33(v52.ViewportSize)
-				v29((calculateDeviceSafePadding()))
-
-				if FFlagDebugForceConsoleSafeInsets then
-					forceConsoleSafeInsets(v32(p1))
-				end
-			end)
 		end
 	end)
-	local ViewportDisplaySize = nil
+	local v9
 
-	if EngineFeature then
-		ViewportDisplaySize = GuiService.ViewportDisplaySize
+	if engineFeature then
+		v9 = GuiService.ViewportDisplaySize
 	end
 
-	local v37, v38 = Signals.createSignal(ViewportDisplaySize)
-	local connection2 = nil
+	local signal5, v10 = Signals.createSignal(v9)
+	local viewportDisplaySizeChangedConnection
 
-	if EngineFeature then
-		connection2 = GuiService:GetPropertyChangedSignal("ViewportDisplaySize"):Connect(function() -- line: 129
-			-- upvalues: v38 (copy), GuiService (copy)
-			v38(GuiService.ViewportDisplaySize)
+	if engineFeature then
+		viewportDisplaySizeChangedConnection = GuiService:GetPropertyChangedSignal("ViewportDisplaySize"):Connect(function()
+			v10(GuiService.ViewportDisplaySize)
 		end)
+	else
+		viewportDisplaySizeChangedConnection = nil
 	end
 
-	local v40 = getGlobalGuiInset()
-	local v41, v42 = Signals.createSignal(v40)
-	local v43, v44 = Signals.createSignal(v40.top)
-	local v45 = Signals.createComputed(function(p2) -- line: 138
-		-- upvalues: v37 (copy), v32 (copy), v11 (copy), FIntLuaAppSmallScreenDesignWidth (copy), v12 (copy)
-		local v54 = v37(p2)
-		local v55 = v32(p2)
+	local globalGuiInset = getGlobalGuiInset()
+	local signal6, setGuiInset = Signals.createSignal(globalGuiInset)
+	local signal7, setTopBarHeight = Signals.createSignal(globalGuiInset.top)
 
-		if v54 == nil or v55.X == 0 then
+	local getUIScale = Signals.createComputed(function(p)
+		local v11 = signal5(p)
+		local v12 = signal4(p)
+
+		if v11 == nil or v12.X == 0 then
 			return 1
 		end
 
-		local v56 = v54 == Enum.DisplaySize.Small or v11
-		local v57 = v55.X > FIntLuaAppSmallScreenDesignWidth
+		local v13 = v11 == Enum.DisplaySize.Small or defineFastFlag2
+		local v14 = FIntLuaAppSmallScreenDesignWidth < v12.X
 
-		if v12 and v56 and v57 then
-			return v55.X / FIntLuaAppSmallScreenDesignWidth
+		if v and v13 and v14 then
+			return v12.X / FIntLuaAppSmallScreenDesignWidth
 		end
 
 		return 1
 	end)
-	local v46 = Signals.createComputed(function(p3) -- line: 156
-		-- upvalues: v14 (copy), v45 (copy)
-		if v14 then
-			return 1.5
+
+	local getPlatformScale = Signals.createComputed(function(p)
+		if tenFootInterface then
+			return v2
 		end
 
-		return v45(p3)
-	end)
-	local v47 = Signals.createComputed(function(p4) -- line: 165
-		-- upvalues: v32 (copy), v46 (copy)
-		local v60 = v32(p4)
-		local v61 = v46(p4)
-
-		if not v61 or v61 == 0 then
-			v61 = 1
-		end
-
-		return v60.X / v61
+		return getUIScale(p)
 	end)
 
 	return {
-		getViewportSize = v32,
-		getDisplaySize = v37,
-		getGuiInset = v41,
-		getTopBarHeight = v43,
-		getUIScale = v45,
-		getPlatformScale = v46,
-		getDesignSpaceViewportWidth = v47,
-		getIsSpatial = v24,
-		setGuiInset = v42,
-		setTopBarHeight = v44,
-		getDeviceSafePadding = v28,
-		cleanUp = function() -- line: 186
-			-- upvalues: connection2 (ref), u34 (ref), connection (ref), u26 (ref), v35 (copy)
-			if connection2 then
-				connection2:Disconnect()
-				connection2 = nil
+		getViewportSize = signal4,
+		getDisplaySize = signal5,
+		getGuiInset = signal6,
+		getTopBarHeight = signal7,
+		getUIScale = getUIScale,
+		getPlatformScale = getPlatformScale,
+		getDesignSpaceViewportWidth = Signals.createComputed(function(p)
+			local v11 = signal4(p)
+			local v12 = getPlatformScale(p)
+			local v13 = (not v12 or v12 == 0) and 1 or v12
+			return v11.X / v13
+		end),
+		getIsSpatial = signal2,
+		setGuiInset = setGuiInset,
+		setTopBarHeight = setTopBarHeight,
+		getDeviceSafePadding = signal3,
+		cleanUp = function()
+			if viewportDisplaySizeChangedConnection then
+				viewportDisplaySizeChangedConnection:Disconnect()
+				viewportDisplaySizeChangedConnection = nil
 			end
 
-			if u34 then
-				u34:Disconnect()
-				u34 = nil
+			if viewportSizeChangedConnection then
+				viewportSizeChangedConnection:Disconnect()
+				viewportSizeChangedConnection = nil
+			end
+
+			if currentCameraChangedConnection then
+				currentCameraChangedConnection:Disconnect()
+				currentCameraChangedConnection = nil
 			end
 
 			if connection then
@@ -185,18 +185,12 @@ return function() -- line: 66
 				connection = nil
 			end
 
-			if u26 then
-				u26:Disconnect()
-				u26 = nil
-			end
-
-			if v35 then
-				v35()
+			if effect then
+				effect()
 			end
 		end,
-		forceConsoleSafeInsets = if not FFlagDebugForceConsoleSafeInsets then nil else function() -- line: 208
-			-- upvalues: forceConsoleSafeInsets (copy), v32 (copy)
-			forceConsoleSafeInsets(v32())
-		end
+		forceConsoleSafeInsets = FFlagDebugForceConsoleSafeInsets and function()
+			forceConsoleSafeInsets(signal4())
+		end or nil
 	}
 end

@@ -1,22 +1,19 @@
 local NavigationRodux = script:FindFirstAncestor("NavigationRodux")
-local NavigationRoduxParent = NavigationRodux.Parent
-local ArgCheck = require(NavigationRoduxParent.ArgCheck)
-local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
-local AppPage = require(NavigationRoduxParent.RobloxAppEnums).AppPage
+local parent = NavigationRodux.Parent
 
-return function(p1, p2) -- line: 10
-	-- upvalues: ArgCheck (copy), NavigateDown (copy), AppPage (copy)
-	ArgCheck.isInTypes(p1, {
-		"string",
-		"number"
-	}, "userId")
-	ArgCheck.isTypeOrNil(p2, "function", "onClose")
+local ArgCheck = require(parent.ArgCheck)
+local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+
+local AppPage = RobloxAppEnums.AppPage
+
+return function(detail, onClose)
+	ArgCheck.isInTypes(detail, { "string", "number" }, "userId")
+	ArgCheck.isTypeOrNil(onClose, "function", "onClose")
 
 	return NavigateDown({
 		name = AppPage.ViewUserProfile,
-		detail = p1,
-		extraProps = {
-			onClose = p2
-		}
+		detail = detail,
+		extraProps = { onClose = onClose }
 	})
 end

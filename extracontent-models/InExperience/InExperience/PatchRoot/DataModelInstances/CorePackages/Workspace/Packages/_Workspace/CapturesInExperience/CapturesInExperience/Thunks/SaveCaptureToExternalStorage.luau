@@ -1,28 +1,29 @@
-local ParentParent = script.Parent.Parent
-local CaptureService = require(ParentParent.Services.CaptureService)
-local CaptureType = require(ParentParent.Enums.CaptureType)
-local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
-local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
+local parent = script.Parent.Parent
 
-require(ParentParent.Types)
+local CaptureService = require(parent.Services.CaptureService)
 
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+local CaptureType = require(parent.Enums.CaptureType)
+local CapturesToastType = require(parent.Enums.CapturesToastType)
+local ToastTriggered = require(parent.Actions.ToastTriggered)
 
-return function(p1) -- line: 15
-	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureService (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), ToastTriggered (copy), CapturesToastType (copy)
-	return function(p2) -- line: 16
-		-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureService (copy), p1 (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), ToastTriggered (copy), CapturesToastType (copy)
+require(parent.Types)
+
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
+
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
+return function(captureInfo)
+	return function(object)
 		if FFlagEnableCapturesGalleryRetrievalCoreScript then
-			CaptureService:SaveCapturesToExternalStorageAsync({ p1 })
-		elseif FFlagUseRbxstorageInGallery and p1.type == CaptureType.Video then
-			CaptureService:SaveVideoCaptureToExternalStorage(p1.videoCapture)
+			CaptureService:SaveCapturesToExternalStorageAsync({ captureInfo })
+		elseif FFlagUseRbxstorageInGallery and captureInfo.type == CaptureType.Video then
+			CaptureService:SaveVideoCaptureToExternalStorage(captureInfo.videoCapture)
 		else
-			CaptureService:SaveCaptureToExternalStorage(p1.filePath)
+			CaptureService:SaveCaptureToExternalStorage(captureInfo.filePath)
 		end
 
-		p2:dispatch(ToastTriggered(CapturesToastType.CaptureSavedToDevice, {
-			captureInfo = p1
+		object:dispatch(ToastTriggered(CapturesToastType.CaptureSavedToDevice, {
+			captureInfo = captureInfo
 		}))
 	end
 end

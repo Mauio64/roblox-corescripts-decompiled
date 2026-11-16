@@ -1,19 +1,14 @@
 local Players = game:GetService("Players")
 
-local function getDefaultAuthHeaders() -- line: 9
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
+local function getDefaultAuthHeaders()
+	local localPlayer = Players.LocalPlayer
 
-	if LocalPlayer == nil then
+	if localPlayer == nil then
 		return {}
 	end
 
-	local str = tostring(LocalPlayer.UserId)
-
-	return {
-		["X-Roblox-User-Id"] = str,
-		["Robloxctx-authenticated-userid"] = str
-	}
+	local userId = tostring(localPlayer.UserId)
+	return { ["X-Roblox-User-Id"] = userId, ["Robloxctx-authenticated-userid"] = userId }
 end
 
 return getDefaultAuthHeaders

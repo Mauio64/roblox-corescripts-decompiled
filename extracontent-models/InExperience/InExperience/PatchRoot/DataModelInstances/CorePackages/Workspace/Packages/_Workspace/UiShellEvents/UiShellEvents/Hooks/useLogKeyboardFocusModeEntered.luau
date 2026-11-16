@@ -1,52 +1,43 @@
-local Parent = script:FindFirstAncestor("UiShellEvents").Parent
-local React = require(Parent.React)
-local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local parent = script:FindFirstAncestor("UiShellEvents").Parent
+local React = require(parent.React)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local TelemetryService = game:GetService("TelemetryService")
-local t1 = {
+
+local v = {
 	eventName = "KeyboardFocusModeEnteredCounter",
+	backends = { "RobloxTelemetryCounter" },
 	lastUpdated = "2026-06-22",
-	description = "Counts # of sessions that use keyboard mode.",
-	backends = { "RobloxTelemetryCounter" }
+	description = "Counts # of sessions that use keyboard mode."
 }
-local t2 = {
+
+local v2 = {
 	eventName = "KeyboardFocusModeEnteredEvent",
+	backends = { "EventIngest" },
 	throttlingPercentage = 10000,
 	lastUpdated = "2026-06-22",
-	description = "Tracks % of DAUs that use keyboard mode.",
-	backends = { "EventIngest" }
+	description = "Tracks % of DAUs that use keyboard mode."
 }
 
-local function useLogKeyboardFocusModeEntered() -- line: 22
-	-- upvalues: FocusNavigationUtils (copy), React (copy), TelemetryService (copy), t2 (copy), t1 (copy)
-	local v8 = FocusNavigationUtils.useLastInputMode()
-	local v9 = FocusNavigationUtils.useLastInputMethod()
-	local v10 = React.useRef(false)
+local function useLogKeyboardFocusModeEntered()
+	local v3 = FocusNavigationUtils.useLastInputMode()
+	local v4 = FocusNavigationUtils.useLastInputMethod()
+	local ref = React.useRef(false)
 
-	React.useEffect(function() -- line: 27
-		-- upvalues: v10 (copy), v8 (copy), v9 (copy), TelemetryService (copy), t2 (copy), t1 (copy)
-		if not v10.current and (v8 == "Focus" and v9 == "Keyboard") then
-			v10.current = true
-			TelemetryService:LogEvent(t2, {
+	React.useEffect(function()
+		if not ref.current and v3 == "Focus" and v4 == "Keyboard" then
+			ref.current = true
+
+			TelemetryService:LogEvent(v2, {
 				customFields = {},
-				standardizedFields = {
-					"addSessionId",
-					"addOSInfo",
-					"addSessionInfo"
-				}
+				standardizedFields = { "addSessionId", "addOSInfo", "addSessionInfo" }
 			})
-			TelemetryService:LogCounter(t1, {
+
+			TelemetryService:LogCounter(v, {
 				customFields = {},
-				standardizedFields = {
-					"addSessionId",
-					"addOSInfo",
-					"addSessionInfo"
-				}
+				standardizedFields = { "addSessionId", "addOSInfo", "addSessionInfo" }
 			})
 		end
-	end, {
-		v8,
-		v9
-	})
+	end, { v3, v4 })
 end
 
 return useLogKeyboardFocusModeEntered

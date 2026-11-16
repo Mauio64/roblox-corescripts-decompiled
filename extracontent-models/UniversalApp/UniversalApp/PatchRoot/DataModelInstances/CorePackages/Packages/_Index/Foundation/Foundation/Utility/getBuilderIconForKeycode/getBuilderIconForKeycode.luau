@@ -1,16 +1,12 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local getBuilderIconForKeycode = require(Parent.BuilderIcons).getBuilderIconForKeycode
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-return function(p1) -- line: 8
-	-- upvalues: getBuilderIconForKeycode (copy)
-	local ok, result = pcall(function() -- line: 9
-		-- upvalues: getBuilderIconForKeycode (copy), p1 (copy)
-		return getBuilderIconForKeycode(p1)
+local BuilderIcons = require(parent.BuilderIcons)
+
+local getBuilderIconForKeycode = BuilderIcons.getBuilderIconForKeycode
+
+return function(p)
+	local success, result = pcall(function()
+		return getBuilderIconForKeycode(p)
 	end)
-
-	if ok then
-		return result
-	end
-
-	return nil
+	return if success then result else nil
 end

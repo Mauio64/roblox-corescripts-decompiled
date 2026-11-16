@@ -1,36 +1,38 @@
-local Parent = script:FindFirstAncestor("AmpUpsell").Parent
-local React = require(Parent.React)
-local QRDeepLinkDialog = require(Parent.IdentityVerification).QRDeepLinkDialog
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local authButtonClick = require(Parent.AuthAnalytics).Events.authButtonClick
+local parent = script:FindFirstAncestor("AmpUpsell").Parent
 
-local function FAEWithQRCodeUpsell(t1: {[any]: any}) -- line: 19
-	-- upvalues: useLocalization (copy), React (copy), authButtonClick (copy), QRDeepLinkDialog (copy)
-	local appsFlyerLink = t1.appsFlyerLink
-	local onCancel = t1.onCancel
-	local sessionId = t1.sessionId
-	local entryPointEventCtx = t1.entryPointEventCtx
-	local v12 = useLocalization({
+local React = require(parent.React)
+
+local IdentityVerification = require(parent.IdentityVerification)
+local QRDeepLinkDialog = IdentityVerification.QRDeepLinkDialog
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local AuthAnalytics = require(parent.AuthAnalytics)
+local authButtonClick = AuthAnalytics.Events.authButtonClick
+
+local function FAEWithQRCodeUpsell(props)
+	local appsFlyerLink = props.appsFlyerLink
+	local onCancel = props.onCancel
+	local sessionId = props.sessionId
+	local entryPointEventCtx = props.entryPointEventCtx
+
+	local v = useLocalization({
 		title = "Amp.FAEUpsell.Modal.QRCode.Title",
 		description = "Amp.FAEUpsell.Modal.QRCode.Description",
 		footer = "Amp.FAEUpsell.Modal.QRCode.Footer"
 	})
-	local v13 = React.useCallback(function() -- line: 31
-		-- upvalues: authButtonClick (copy), entryPointEventCtx (copy), sessionId (copy), onCancel (copy)
+
+	local onClose = React.useCallback(function()
 		authButtonClick(entryPointEventCtx, "closeFaeQR", sessionId)
 		onCancel()
-	end, {
-		onCancel,
-		sessionId,
-		entryPointEventCtx
-	})
+	end, { onCancel, sessionId, entryPointEventCtx })
 
 	return React.createElement(QRDeepLinkDialog, {
 		deeplink = appsFlyerLink,
-		title = v12.title,
-		description = v12.description,
-		footer = v12.footer,
-		onClose = v13
+		title = v.title,
+		description = v.description,
+		footer = v.footer,
+		onClose = onClose
 	})
 end
 

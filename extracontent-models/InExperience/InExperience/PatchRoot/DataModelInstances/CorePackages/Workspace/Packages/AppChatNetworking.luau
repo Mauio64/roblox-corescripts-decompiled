@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.AppChatNetworking.AppChatNetworking))
+local AppChatNetworking = require(Workspace.AppChatNetworking.AppChatNetworking)
+
+return AppChatNetworking

@@ -1,70 +1,75 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Number = LuauPolyfill.Number
 local String = LuauPolyfill.String
 local isNaN = Number.isNaN
-local u6 = nil
-local n1 = nil
+local fn
+local v = nil
 
-n1 = 48
+local function naturalCompare(list: string, list2: string)
+	local v2 = 1
+	local v3 = 1
 
-local n2 = 57
+	while v2 <= #list and v3 <= #list2 do
+		local v4 = String.charCodeAt(list, v2)
+		local v5 = String.charCodeAt(list2, v3)
 
-function u6(n3: number) -- line: 71
-	-- upvalues: isNaN (copy), n1 (ref), n2 (ref)
-	return not isNaN(n3) and (n3 >= n1 and n3 <= n2)
-end
+		if fn(v4) and fn(v5) then
+			local v6 = 0
 
-return {
-	naturalCompare = function(s1: string, s2: string) -- line: 23
-		-- upvalues: String (copy), u6 (ref), n1 (ref)
-		local n4 = 1
-		local n5 = 1
+			repeat
+				v2 += 1
+				v6 = v6 * 10 + v4 - v
+				v4 = String.charCodeAt(list, v2)
+			until not (fn(v4) and v6 > 0)
 
-		while n4 <= #s1 and n5 <= #s2 do
-			local v13 = String.charCodeAt(s1, n4)
-			local v14 = String.charCodeAt(s2, n5)
+			local v7 = 0
 
-			if u6(v13) and u6(v14) then
-				local n6 = 0
+			repeat
+				v3 += 1
+				v7 = v7 * 10 + v5 - v
+				v5 = String.charCodeAt(list2, v3)
+			until not (fn(v5) and v7 > 0)
 
-				repeat
-					n4 += 1
-					n6 = n6 * 10 + v13 - n1
-					v13 = String.charCodeAt(s1, n4)
-				until not u6(v13) or not (n6 > 0)
-
-				local n7 = 0
-
-				repeat
-					n5 += 1
-					n7 = n7 * 10 + v14 - n1
-					v14 = String.charCodeAt(s2, n5)
-				until not u6(v14) or not (n7 > 0)
-
-				if n6 < n7 then
-					return -1
-				end
-
-				if not (n7 < n6) then
-					continue
-				end
-
-				return 1
-			end
-
-			if v13 < v14 then
+			if v6 < v7 then
 				return -1
 			end
 
-			if v14 < v13 then
+			if v7 < v6 then
+				return 1
+			end
+		else
+			if v4 < v5 then
+				return -1
+			end
+
+			if v5 < v4 then
 				return 1
 			end
 
-			n4 += 1
-			n5 += 1
+			v2 += 1
+			v3 += 1
+		end
+	end
+
+	return #list - #list2
+end
+
+v = 48
+local v2 = 57
+
+fn = function(p: number)
+	local v3 = not isNaN(p)
+
+	if v3 then
+		if v <= p then
+			return p <= v2
 		end
 
-		return #s1 - #s2
+		return false
 	end
-}
+
+	return v3
+end
+
+return { naturalCompare = naturalCompare }

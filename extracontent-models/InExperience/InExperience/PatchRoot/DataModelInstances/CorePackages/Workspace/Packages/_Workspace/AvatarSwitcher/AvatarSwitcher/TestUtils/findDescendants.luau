@@ -1,22 +1,25 @@
-return {
-	findFirstDescendant = function(p1, s1: string, p2: ((...any) -> ...any)?) -- line: 1
-		for _, descendant in p1:GetDescendants() do
-			if descendant:IsA(s1) and (p2 == nil or p2(descendant)) then
-				return descendant
-			end
+local FindDescendants = {}
+
+function FindDescendants.findFirstDescendant(folder, className: string, callback)
+	for _, descendant in folder:GetDescendants() do
+		if descendant:IsA(className) and (callback == nil or callback(descendant)) then
+			return descendant
 		end
-
-		return nil
-	end,
-	findAllDescendants = function(p3, s2: string) -- line: 14
-		local t1 = {}
-
-		for _, descendant in p3:GetDescendants() do
-			if descendant:IsA(s2) then
-				table.insert(t1, descendant)
-			end
-		end
-
-		return t1
 	end
-}
+
+	return nil
+end
+
+function FindDescendants.findAllDescendants(folder, className: string)
+	local descendants = {}
+
+	for _, descendant in folder:GetDescendants() do
+		if descendant:IsA(className) then
+			table.insert(descendants, descendant)
+		end
+	end
+
+	return descendants
+end
+
+return FindDescendants

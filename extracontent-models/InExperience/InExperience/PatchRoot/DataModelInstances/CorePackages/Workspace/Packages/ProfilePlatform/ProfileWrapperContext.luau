@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local ProfileWrapperContext = require(Workspace.ProfilePlatform.ProfilePlatform.Contexts.ProfileWrapperContext)
 
-return (require(_Workspace.ProfilePlatform.ProfilePlatform.Contexts.ProfileWrapperContext))
+return ProfileWrapperContext

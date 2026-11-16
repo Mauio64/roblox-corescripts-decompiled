@@ -1,5 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator("OPEN_REPORT_SENT_DIALOG", function() -- line: 5
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("OPEN_REPORT_SENT_DIALOG", function()
 	return {}
 end)

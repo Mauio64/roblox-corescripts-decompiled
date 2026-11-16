@@ -1,46 +1,29 @@
-local Parent = script:FindFirstAncestor("DiscoveryUtils").Parent
-local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
-local v3 = game:DefineFastString("LuaAppVerticalEfficiencyExpLayer", "PlayerApp.HomePage.UX")
+local parent = script:FindFirstAncestor("DiscoveryUtils").Parent
+local ExperimentCacheManager = require(parent.ExperimentCacheManager)
+local experimentCacheManager = ExperimentCacheManager.ExperimentCacheManager
 
-local function getIsUserInTreatmentAndSendExposureLog(s1: string) -- line: 12
-	-- upvalues: v3 (copy), ExperimentCacheManager (copy)
-	local v6 = v3
-	local v7 = ExperimentCacheManager.default:getLayerVariables(v6, true)
+local defineFastString = game:DefineFastString("LuaAppVerticalEfficiencyExpLayer", "PlayerApp.HomePage.UX")
 
-	if v7 and v7[s1] ~= nil then
-		ExperimentCacheManager.default:sendCustomExposureLog(v6)
+local function getIsUserInTreatmentAndSendExposureLog(p: string) -- 2 equivalent calls inferred from this helper
+	local v = defineFastString
+	local layerVariables = experimentCacheManager.default:getLayerVariables(v, true)
 
-		return v7[s1]
+	if not layerVariables or layerVariables[p] == nil then
+		return false
 	end
 
-	return false
+	experimentCacheManager.default:sendCustomExposureLog(v)
+	return layerVariables[p]
 end
 
-return {
-	getIsProfileMovedToTopBar = function() -- line: 24
-		-- upvalues: v3 (copy), ExperimentCacheManager (copy)
-		local v8 = v3
-		local v9 = ExperimentCacheManager.default:getLayerVariables(v8, true)
+local VerticalEfficiencyExperimentation = {}
 
-		if v9 and v9.IsProfileMovedToTopBar ~= nil then
-			ExperimentCacheManager.default:sendCustomExposureLog(v8)
+function VerticalEfficiencyExperimentation.getIsProfileMovedToTopBar()
+	return getIsUserInTreatmentAndSendExposureLog("IsProfileMovedToTopBar") -- inferred equivalent call
+end
 
-			return v9.IsProfileMovedToTopBar
-		end
+function VerticalEfficiencyExperimentation.getIsRobloxLogoHeaderEnabled()
+	return getIsUserInTreatmentAndSendExposureLog("IsRobloxLogoHeaderEnabled") -- inferred equivalent call
+end
 
-		return false
-	end,
-	getIsRobloxLogoHeaderEnabled = function() -- line: 28
-		-- upvalues: v3 (copy), ExperimentCacheManager (copy)
-		local v10 = v3
-		local v11 = ExperimentCacheManager.default:getLayerVariables(v10, true)
-
-		if v11 and v11.IsRobloxLogoHeaderEnabled ~= nil then
-			ExperimentCacheManager.default:sendCustomExposureLog(v10)
-
-			return v11.IsRobloxLogoHeaderEnabled
-		end
-
-		return false
-	end
-}
+return VerticalEfficiencyExperimentation

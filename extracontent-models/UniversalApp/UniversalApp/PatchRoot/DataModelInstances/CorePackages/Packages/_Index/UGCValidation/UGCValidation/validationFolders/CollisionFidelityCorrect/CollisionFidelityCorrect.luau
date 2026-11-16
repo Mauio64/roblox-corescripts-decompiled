@@ -1,39 +1,32 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local v5 = game:DefineFastString("UGCValidationBodyPartCollisionFidelity", "Default")
+local defineFastString = game:DefineFastString("UGCValidationBodyPartCollisionFidelity", "Default")
 
 return {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
-	},
+	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS, ValidationEnums.UploadCategory.DYNAMIC_HEAD },
 	requiredData = { ValidationEnums.SharedDataMember.rootInstance },
-	fflag = getFFlagUGCValidateMigrateSchemaProperties,
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 24
-		-- upvalues: v5 (copy), ErrorSourceStrings (copy)
-		local rootInstance = p2.rootInstance
-		local Default = Enum.CollisionFidelity.Default
+	run = function(object, p)
+		local rootInstance = p.rootInstance
 
-		pcall(function() -- line: 32
-			-- upvalues: Default (ref), v5 (copy)
-			Default = Enum.CollisionFidelity[v5]
+		local v = Enum.CollisionFidelity.Default
+
+		pcall(function()
+			v = Enum.CollisionFidelity[defineFastString]
 		end)
 
 		local descendants = rootInstance:GetDescendants()
-
 		table.insert(descendants, 1, rootInstance)
 
-		for _, v12 in descendants do
-			if v12:IsA("MeshPart") and v12.CollisionFidelity ~= Default then
-				p1:fail(ErrorSourceStrings.Keys.CollisionFidelityWrong, {
-					InstancePath = v12:GetFullName(),
-					ExpectedFidelity = Default.Name
+		for _, part in descendants do
+			if part:IsA("MeshPart") and part.CollisionFidelity ~= v then
+				object:fail(ErrorSourceStrings.Keys.CollisionFidelityWrong, {
+					InstancePath = part:GetFullName(),
+					ExpectedFidelity = v.Name
 				})
 			end
 		end

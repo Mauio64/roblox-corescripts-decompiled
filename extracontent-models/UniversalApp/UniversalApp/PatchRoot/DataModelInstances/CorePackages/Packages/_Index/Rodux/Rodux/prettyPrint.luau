@@ -1,32 +1,32 @@
-local function prettyPrint(p1, p2) -- line: 3
-	-- upvalues: prettyPrint (copy)
-	local v4 = p2 or 0
-	local t1 = {}
+local function prettyPrint(item, count)
+	local v = count or 0
+	local v2 = {}
 
-	if typeof(p1) == "table" then
-		table.insert(t1, "{\n")
+	if typeof(item) == "table" then
+		table.insert(v2, "{\n")
 
-		for k, v in pairs(p1) do
-			table.insert(t1, ("    "):rep(v4 + 1))
-			table.insert(t1, (tostring(k)))
-			table.insert(t1, " = ")
-			table.insert(t1, prettyPrint(v, v4 + 1))
-			table.insert(t1, "\n")
+		for k, item2 in pairs(item) do
+			table.insert(v2, ("    "):rep(v + 1))
+			table.insert(v2, (tostring(k)))
+			table.insert(v2, " = ")
+
+			table.insert(v2, prettyPrint(item2, v + 1))
+			table.insert(v2, "\n")
 		end
 
-		table.insert(t1, ("    "):rep(v4))
-		table.insert(t1, "}")
-	elseif typeof(p1) == "string" then
-		table.insert(t1, string.format("%q", p1))
-		table.insert(t1, " (string)")
+		table.insert(v2, ("    "):rep(v))
+		table.insert(v2, "}")
+	elseif typeof(item) == "string" then
+		table.insert(v2, string.format("%q", item))
+		table.insert(v2, " (string)")
 	else
-		table.insert(t1, (tostring(p1)))
-		table.insert(t1, " (")
-		table.insert(t1, (typeof(p1)))
-		table.insert(t1, ")")
+		table.insert(v2, (tostring(item)))
+		table.insert(v2, " (")
+		table.insert(v2, (typeof(item)))
+		table.insert(v2, ")")
 	end
 
-	return table.concat(t1, "")
+	return table.concat(v2, "")
 end
 
 return prettyPrint

@@ -1,99 +1,102 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
-local useDesignTokens = require(Parent.Style).useDesignTokens
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local useStyle = UIBlox.Core.Style.useStyle
 local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
+
 local Images = UIBlox.App.ImageSet.Images
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 
-local function v11(p1, p2, p3) -- line: 40
-	if p1 == Enum.FillDirection.Horizontal then
+local function fn(fillDirection, size_1400, size_300)
+	if fillDirection == Enum.FillDirection.Horizontal then
 		return {
-			CellSize = UDim2.new(0.5, -p3, 0, p2)
+			CellSize = UDim2.new(0.5, -size_300, 0, size_1400)
 		}
 	end
 
-	return {
-		CellSize = UDim2.new(1, 0, 0, p2)
-	}
+	return { CellSize = UDim2.new(1, 0, 0, size_1400) }
 end
-local function v12(t1: {[any]: any}) -- line: 52
-	-- upvalues: useStyle (copy), useDesignTokens (copy), useSelectionCursor (copy), CursorKind (copy), React (copy), StyledTextLabel (copy), ImageSetLabel (copy), Images (copy)
-	local v17 = useStyle()
-	local v18 = useDesignTokens()
-	local v19 = useSelectionCursor(CursorKind.RoundedRect)
-	local v20 = v18.Size.Size_1400 or 80
-	local v21 = v18.Size.Size_700 or 42
+
+local function fn2(props)
+	local v = useStyle()
+	local v2 = useDesignTokens()
+	local selectionImageObject = useSelectionCursor(CursorKind.RoundedRect)
+
+	local size_1400 = v2.Size.Size_1400 or 80
+	local size_700 = v2.Size.Size_700 or 42
 
 	return React.createElement("ImageButton", {
 		AutoButtonColor = false,
-		Size = UDim2.new(1, 0, 0, v20),
+		Size = UDim2.new(1, 0, 0, size_1400),
 		BackgroundTransparency = 1,
-		LayoutOrder = t1.layoutOrder,
-		[React.Event.Activated] = t1.activated,
-		SelectionImageObject = v19
+		LayoutOrder = props.layoutOrder,
+		[React.Event.Activated] = props.activated,
+		SelectionImageObject = selectionImageObject
 	}, {
 		padding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, 36),
 			PaddingRight = UDim.new(0, 36)
 		}),
 		ButtonText = React.createElement(StyledTextLabel, {
-			layoutOrder = 1,
-			text = t1.text,
+			text = props.text,
 			automaticSize = Enum.AutomaticSize.X,
-			size = UDim2.new(1, 0, 0, v20),
+			size = UDim2.new(1, 0, 0, size_1400),
 			textXAlignment = Enum.TextXAlignment.Left,
-			fontStyle = v17.Font.Header1,
-			colorStyle = v17.Theme.TextDefault
+			fontStyle = v.Font.Header1,
+			colorStyle = v.Theme.TextDefault,
+			layoutOrder = 1
 		}),
 		LinkIconImage = React.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			ImageTransparency = 0,
-			Size = UDim2.new(0, v21, 0, v21),
+			Size = UDim2.new(0, size_700, 0, size_700),
 			Position = UDim2.new(1, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(1, 0.5),
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
 			ScaleType = Enum.ScaleType.Fit,
 			Image = Images["icons/navigation/externallink_medium"],
-			ImageColor3 = v17.Theme.UIEmphasis.Color
+			ImageColor3 = v.Theme.UIEmphasis.Color,
+			ImageTransparency = 0
 		})
 	})
 end
 
-return function(t2: {[any]: any}) -- line: 95
-	-- upvalues: useDesignTokens (copy), v11 (copy), React (copy), v12 (copy)
-	local v23 = useDesignTokens()
-	local v24 = v23.Size.Size_1400 or 80
-	local v25 = v23.Size.Size_300 or 18
-	local v26 = t2.fillDirection or Enum.FillDirection.Vertical
-	local v27 = v11(v26, v24, v25)
-
+return function(props)
+	local v = useDesignTokens()
+	local size_1400 = v.Size.Size_1400 or 80
+	local size_300 = v.Size.Size_300 or 18
+	local fillDirection = props.fillDirection or Enum.FillDirection.Vertical
+	local v2 = fn(fillDirection, size_1400, size_300)
 	return React.createElement("Frame", {
+		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Selectable = false,
-		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.fromScale(1, 0),
-		LayoutOrder = t2.layoutOrder
+		Selectable = false,
+		LayoutOrder = props.layoutOrder
 	}, {
 		gridlayout = React.createElement("UIGridLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = v26,
-			CellPadding = UDim2.new(0, v25, 0, v25),
-			CellSize = v27.CellSize
+			FillDirection = fillDirection,
+			CellPadding = UDim2.new(0, size_300, 0, size_300),
+			CellSize = v2.CellSize
 		}),
-		ButtonTos = React.createElement(v12, {
-			layoutOrder = 1,
-			text = t2.textTos,
-			activated = t2.activatedTos
+		ButtonTos = React.createElement(fn2, {
+			text = props.textTos,
+			activated = props.activatedTos,
+			layoutOrder = 1
 		}),
-		ButtonPrivacy = React.createElement(v12, {
-			layoutOrder = 2,
-			text = t2.textPrivacy,
-			activated = t2.activatedPrivacy
+		ButtonPrivacy = React.createElement(fn2, {
+			text = props.textPrivacy,
+			activated = props.activatedPrivacy,
+			layoutOrder = 2
 		})
 	})
 end

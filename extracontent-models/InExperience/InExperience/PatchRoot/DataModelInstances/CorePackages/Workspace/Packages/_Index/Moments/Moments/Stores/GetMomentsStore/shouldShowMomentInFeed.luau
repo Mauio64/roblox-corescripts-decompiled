@@ -1,17 +1,11 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local MomentStatus = require(Parent.MomentsTypes).Enums.MomentStatus
+local parent = script:FindFirstAncestor("Moments").Parent
 
-local function shouldShowMomentInFeed(p1) -- line: 11
-	-- upvalues: MomentStatus (copy)
-	if p1.status == MomentStatus.Deleted then
-		return false
-	end
+local MomentsTypes = require(parent.MomentsTypes)
 
-	if p1.isModerated == true then
-		return false
-	end
+local MomentStatus = MomentsTypes.Enums.MomentStatus
 
-	return true
+local function shouldShowMomentInFeed(p): boolean
+	return p.status ~= MomentStatus.Deleted and p.isModerated ~= true
 end
 
 return shouldShowMomentInFeed

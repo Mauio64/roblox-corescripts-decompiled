@@ -2,4 +2,6 @@ local FFlagMarketplaceOffersOptOutRootLowSpender = require(script.Parent.FFlagMa
 local FFlagMarketplaceOffersOptOutRootNoSpender = require(script.Parent.FFlagMarketplaceOffersOptOutRootNoSpender)
 local FFlagMarketplaceOffersOptOutRootRandom = require(script.Parent.FFlagMarketplaceOffersOptOutRootRandom)
 
-return FFlagMarketplaceOffersOptOutRootLowSpender or (FFlagMarketplaceOffersOptOutRootNoSpender or FFlagMarketplaceOffersOptOutRootRandom)
+return FFlagMarketplaceOffersOptOutRootLowSpender
+	or FFlagMarketplaceOffersOptOutRootNoSpender
+	or FFlagMarketplaceOffersOptOutRootRandom

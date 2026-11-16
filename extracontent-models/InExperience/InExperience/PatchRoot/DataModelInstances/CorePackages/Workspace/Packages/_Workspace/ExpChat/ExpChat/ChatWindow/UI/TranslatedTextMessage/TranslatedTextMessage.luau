@@ -1,36 +1,62 @@
 local IXPService = game:GetService("IXPService")
 local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
+
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local ExpChatParent2 = ExpChat.Parent
-local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnableFocusNavigation)
-local UserProfileStore = require(ExpChatParent.UserProfiles).Stores.UserProfileStore
-local SignalsReact = require(ExpChatParent.SignalsReact)
-local React = require(ExpChatParent2.React)
-local RoactRodux = require(ExpChatParent.RoactRodux)
-local SharedFlags = require(ExpChatParent.SharedFlags)
-local DataHydration = require(ExpChatParent.DataHydration)
-local Signals = require(ExpChatParent.Signals)
-local Foundation = require(ExpChatParent.Foundation)
-local Dictionary = require(ExpChatParent.llama).Dictionary
+local parent = ExpChat.Parent
+local parent2 = ExpChat.Parent
+local UserProfiles = require(parent.UserProfiles)
+local UserProfileStore = UserProfiles.Stores.UserProfileStore
+local SignalsReact = require(parent.SignalsReact)
+local React = require(parent2.React)
+local RoactRodux = require(parent.RoactRodux)
+local SharedFlags = require(parent.SharedFlags)
+local DataHydration = require(parent.DataHydration)
+local Signals = require(parent.Signals)
+local Foundation = require(parent.Foundation)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
 local Localization = require(ExpChat.Localization)
+
 local isChatRegionLocked = require(ExpChat.isChatRegionLocked)
 local showChatEnabledUI = require(ExpChat.showChatEnabledUI)
+
 local GetMessagesStore = require(ExpChat.Stores.GetMessagesStore)
 local GetChatStatusStore = require(ExpChat.Stores.GetChatStatusStore)
 local GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
-local UIBlox = require(ExpChatParent.UIBlox)
-local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
+
+local UIBlox = require(parent.UIBlox)
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
-local useStore = require(ExpChatParent.RoactUtils).Hooks.RoactRodux.useStore
+local FFlagExpChatReportHistoricalRenders = SharedFlags.FFlagExpChatReportHistoricalRenders
+local RoactUtils = require(parent.RoactUtils)
+local useStore = RoactUtils.Hooks.RoactRodux.useStore
 local shouldSendHighFrequencyTelemetry = require(ExpChat.shouldSendHighFrequencyTelemetry)
-local ExpChatPerfTracker = require(ExpChatParent.ChatUIPrimitives).Telemetry.ExpChatPerfTracker
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+local ExpChatPerfTracker = ChatUIPrimitives.Telemetry.ExpChatPerfTracker
+local applyChatWindowMessageEffects = require(ExpChat.MessageEffects.applyChatWindowMessageEffects)
+local getMessageEffects = require(ExpChat.MessageEffects.getMessageEffects)
+local getChatWindowMessageEffects = require(ExpChat.MessageEffects.getChatWindowMessageEffects)
+local getChatWindowPrefixOffset = require(ExpChat.MessageEffects.getChatWindowPrefixOffset)
+local getChatWindowMessageLineHeight = require(ExpChat.MessageEffects.getChatWindowMessageLineHeight)
+local MessageEffect = require(ExpChat.MessageEffects.MessageEffect)
 local TextChatMessageChatActionType = require(ExpChat.TextChatMessageChatActionType)
+local isChatWindowEnlargeEnabled = require(ExpChat.isChatWindowEnlargeEnabled)
+
+local FFlagExpChatMessageEffectChatWindowEnlargePadding = require(ExpChat.Flags.FFlagExpChatMessageEffectChatWindowEnlargePadding)
+
+local FFlagExpChatMessageEffectChatWindowEnlargeLineHeight = require(ExpChat.Flags.FFlagExpChatMessageEffectChatWindowEnlargeLineHeight)
+
+local FIntExpChatMessageEffectChatWindowEnlargePaddingPixels = require(ExpChat.Flags.FIntExpChatMessageEffectChatWindowEnlargePaddingPixels)
+
+local EngineFeatureTextChatReportEmojiTelemetryEnabled = require(ExpChat.Flags.EngineFeatureTextChatReportEmojiTelemetryEnabled)
+
 local FFlagDebugMessageProfiling = require(ExpChat.Flags.FFlagDebugMessageProfiling)
-local v31 = game:DefineFastFlag("ExpChatTranslationToggleSpacingFix", false)
+local defineFastFlag = game:DefineFastFlag("ExpChatTranslationToggleSpacingFix", false)
 local getFFlagExpChatUseUpdatedMessageRendered = require(ExpChat.Flags.getFFlagExpChatUseUpdatedMessageRendered)
-local v33 = require(ExpChat.Flags.getFIntExpChatMessageRenderUserThrottlePermyriad)()
+local shouldReportMessageRender = require(ExpChat.shouldReportMessageRender)
+
+local getFIntExpChatMessageRenderUserThrottlePermyriad = require(ExpChat.Flags.getFIntExpChatMessageRenderUserThrottlePermyriad)
+local fIntExpChatMessageRenderUserThrottlePermyriad = getFIntExpChatMessageRenderUserThrottlePermyriad()
 local getFFlagExpChatExcludeFOMORenders = require(ExpChat.Flags.getFFlagExpChatExcludeFOMORenders)
 local FFlagEnableInExpChatRewrite = require(ExpChat.Flags.FFlagEnableInExpChatRewrite)
 local FStringInExpChatRewriteLabelKey = require(ExpChat.Flags.FStringInExpChatRewriteLabelKey)
@@ -39,511 +65,625 @@ local FFlagExpChatRewriteInline = require(ExpChat.Flags.FFlagExpChatRewriteInlin
 local FFlagExpChatRewriteInlineIxpEnabled = require(ExpChat.Flags.FFlagExpChatRewriteInlineIxpEnabled)
 local FFlagExpChatRewriteToggleAnalytics = require(ExpChat.Flags.FFlagExpChatRewriteToggleAnalytics)
 local FStringExpChatRewriteInlineIxpLayer = require(ExpChat.Flags.FStringExpChatRewriteInlineIxpLayer)
+
 local FIntExpChatWindowTransparencyRewriteInteractableThreshold = require(ExpChat.Flags.FIntExpChatWindowTransparencyRewriteInteractableThreshold)
 local FFlagEnableInExpChatSummaryOnLua = require(ExpChat.Flags.FFlagEnableInExpChatSummaryOnLua)
 local FFlagExpChatPolishSummaryMessageUI = require(ExpChat.Flags.FFlagExpChatPolishSummaryMessageUI)
+
 local EngineFeatureExpChatGlobalChatEngineTelemetryEnabled = require(ExpChat.Flags.EngineFeatureExpChatGlobalChatEngineTelemetryEnabled)
 local summaryMessageRichText = require(ExpChat.summaryMessageRichText)
+
 local useCursor = UIBlox.App.SelectionCursor.useCursor
+
 local Config = require(ExpChat.Config)
+
 local Helpers = ExpChat.ChatWindow.Helpers
 local getMessageSettings = require(Helpers.getMessageSettings)
+local FFlagExpChatGlobalTabDefault = require(ExpChat.Flags.FFlagExpChatGlobalTabDefault)
 local duplicateInvisibleText = require(Helpers.duplicateInvisibleText)
+
 local Flags = ExpChat.Flags
 local isExperienceChatUserProfileApiEnabled = require(Flags.isExperienceChatUserProfileApiEnabled)
 local FIntExpChatVisibleARButtonPadding = require(Flags.FIntExpChatVisibleARButtonPadding)
 local FIntExpChatDefaultARButtonPadding = require(Flags.FIntExpChatDefaultARButtonPadding)
-local FFlagAEGIS2EnableGatesForExpChat = require(Flags.FFlagAEGIS2EnableGatesForExpChat)
-local FFlagExpChatPerfTracking = require(ExpChatParent.SharedFlags).FFlagExpChatPerfTracking
 local FFlagExpChatTopBannerForPresetChatAccess = require(Flags.FFlagExpChatTopBannerForPresetChatAccess)
 local FFlagExpChatFixLocalUserVerifiedBadge = require(Flags.FFlagExpChatFixLocalUserVerifiedBadge)
-local ExpChatShared = require(ExpChatParent2.ExpChatShared)
+local FFlagExpChatUnconditionalCombinedNameHook = require(Flags.FFlagExpChatUnconditionalCombinedNameHook)
+local ExpChatShared = require(parent2.ExpChatShared)
 local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
 local getPresetIconRichText = ExpChatShared.getPresetIconRichText
 local useIsARButtonVisible = require(ExpChat.useIsARButtonVisible)
 local isPresetMessage = ExpChatShared.isPresetMessage
 
-function appendVerifiedBadge(s1: string) -- line: 81
-	-- upvalues: Config (copy)
-	return string.gsub(s1, ":(%S-)$", Config.VERIFIED_EMOJI .. ":%1")
+function appendVerifiedBadge(value: string)
+	return string.gsub(value, ":(%S-)$", Config.VERIFIED_EMOJI .. ":%1")
 end
 
-local function v66(p1) -- line: 85
-	-- upvalues: UserProfileStore (copy), SignalsReact (copy)
-	local str = tostring(p1.userId)
-	local v81 = UserProfileStore.get().fetchNamesByUserIds({ str })(false).data[1]
-	local v82 = SignalsReact.useSignalBinding(v81.names.getDisplayName)
-	local v83 = SignalsReact.useSignalBinding(v81.names.getInExperienceCombinedName)
+local function getNilName(_): nil
+	return nil
+end
+
+local function fn(message)
+	local v = getNilName
+	local v2 = getNilName
+
+	if
+		(not GetFFlagTextChatEnableUniverseChatTabs() or message.textChannel ~= nil)
+		and isExperienceChatUserProfileApiEnabled()
+		and message.userId
+	then
+		local v3 = { (tostring(message.userId)) }
+		local v4 = UserProfileStore.get().fetchNamesByUserIds(v3)(false).data[1]
+		v = v4.names.getDisplayName
+		v2 = v4.names.getInExperienceCombinedName
+	end
 
 	return {
-		displayName = v82,
-		inExperienceCombinedName = v83
+		displayName = SignalsReact.useSignalBinding(v),
+		inExperienceCombinedName = SignalsReact.useSignalBinding(v2)
 	}
 end
 
-function trim(p2) -- line: 94
-	if p2:match("^()%s*$") then
+function trim(value)
+	if value:match("^()%s*$") then
 		return ""
 	end
 
-	return (p2:match("^%s*(.*%S)"))
+	return (value:match("^%s*(.*%S)"))
 end
-function getMessageText(b1: boolean?, s2: string?, s3: string?) -- line: 98
-	if s2 == nil or s2 == "" then
-		return s3 or ""
+
+function getMessageText(flag: boolean?, value: string?, value2: string?)
+	if value == nil or value == "" then
+		return value2 or ""
 	end
 
-	if b1 then
-		return s2 or ""
+	if flag then
+		return value or ""
 	end
 
-	return s3 or ""
+	return value2 or ""
 end
 
-local function calculateTransparency(p3, p4) -- line: 108
-	return p3 + p4 * (1 - p3)
+local function calculateTransparency(p, p2) -- 3 equivalent calls inferred from this helper
+	return p + p2 * (1 - p)
 end
-local function setTransparency(p5, p6) -- line: 112
-	return p6:map(function(p7) -- line: 113
-		-- upvalues: p5 (copy)
-		if p5 == nil then
+
+local function setTransparency(p, object) -- 12 equivalent calls inferred from this helper
+	return object:map(function(p2)
+		if p == nil then
 			return 1
 		end
 
-		local v235 = p5
-
-		return v235 + p7 * (1 - v235)
+		return calculateTransparency(p, p2) -- inferred equivalent call
 	end)
 end
-local function useARButtonRightPadding() -- line: 118
-	-- upvalues: FFlagExpChatPresetChatEnabled (copy), FFlagExpChatTopBannerForPresetChatAccess (copy), useIsARButtonVisible (copy), FIntExpChatVisibleARButtonPadding (copy), FIntExpChatDefaultARButtonPadding (copy), FFlagAEGIS2EnableGatesForExpChat (copy), GetChatStatusStore (copy), SignalsReact (copy), showChatEnabledUI (copy), isChatRegionLocked (copy)
+
+local function useARButtonRightPadding() -- 2 equivalent calls inferred from this helper
 	if FFlagExpChatPresetChatEnabled and FFlagExpChatTopBannerForPresetChatAccess then
 		if useIsARButtonVisible() then
 			return FIntExpChatVisibleARButtonPadding
 		end
 
 		return FIntExpChatDefaultARButtonPadding
+	else
+		local chatStatusStore = GetChatStatusStore(false)
+		local v = showChatEnabledUI((SignalsReact.useSignalState(chatStatusStore.getChatStatus)))
+
+		if not isChatRegionLocked() and v then
+			return FIntExpChatVisibleARButtonPadding
+		end
+
+		return FIntExpChatDefaultARButtonPadding
 	end
-
-	local v92 = true
-
-	if FFlagAEGIS2EnableGatesForExpChat then
-		local v93 = GetChatStatusStore(false)
-		local v94 = SignalsReact.useSignalState(v93.getChatStatus)
-
-		v92 = showChatEnabledUI(v94)
-	end
-
-	if not isChatRegionLocked() and v92 then
-		return FIntExpChatVisibleARButtonPadding
-	end
-
-	return FIntExpChatDefaultARButtonPadding
-end
-local function appendTrustedIndicator(s4: string, s5: string, n1: number, n2: number, p8) -- line: 143
-	local v100 = p8.Color.Shift.Shift_300.Color3:ToHex()
-	local Shift_300Transparency = p8.Color.Shift.Shift_300.Transparency
-	local v102 = Shift_300Transparency + n1 * (1 - Shift_300Transparency)
-	local v103 = p8.Color.Content.Emphasis.Color3:ToHex()
-	local EmphasisTransparency = p8.Color.Content.Emphasis.Transparency
-	local v105 = EmphasisTransparency + n1 * (1 - EmphasisTransparency)
-	local v106 = n2 - 4
-	local v107 = `{ `{ `{ `{ `<mark color='#{ v100 }' transparency='{ v102 }'>` }<font transparency='1' weight='{ 600 }' size='{ v106 }'><stroke transparency='1'>_` }<font color='#{ v103 }' transparency='{ v105 }'>{ s5 }</font>` }_</stroke></font>` }</mark>`
-
-	if string.find(s4, ":([%S:]-)$") then
-		return string.gsub(s4, ":([%S:]-)$", ` { v107 } :%1`)
-	end
-
-	return `{ s4 } { v107 }`
 end
 
-local v71 = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+local function appendTrustedIndicator(value: string, trustedLabelText: string, p: number, textSize: number, p2)
+	local hex = p2.Color.Shift.Shift_300.Color3:ToHex()
+	local transparency = calculateTransparency(p2.Color.Shift.Shift_300.Transparency, p) -- inferred equivalent call
 
-local function applyStyleToText(p9, p10, p11, n3: number?) -- line: 180
-	-- upvalues: TextChatMessageChatActionType (copy), summaryMessageRichText (copy)
-	local v112 = p10 or ""
+	local hex2 = p2.Color.Content.Emphasis.Color3:ToHex()
+	local transparency2 = calculateTransparency(p2.Color.Content.Emphasis.Transparency, p) -- inferred equivalent call
 
-	if p11.chatActionType == TextChatMessageChatActionType.Summary then
-		v112 = summaryMessageRichText.wrapInSummaryMutedStyle(summaryMessageRichText.getSummaryIconPrefix(n3) .. " " .. v112, p9.Color.Content.Muted.Color3:ToHex(), n3)
+	local v = textSize - 4
+
+	local formatted = `{`{`{`{`<mark color='#{hex}' transparency='{transparency}'>`}<font transparency='1' weight='{600}' size='{v}'><stroke transparency='1'>_`}<font color='#{hex2}' transparency='{transparency2}'>{trustedLabelText}</font>`}_</stroke></font>`}</mark>`
+
+	if string.find(value, ":([%S:]-)$") then
+		return string.gsub(value, ":([%S:]-)$", ` {formatted} :%1`)
 	end
 
-	return v112
+	return `{value} {formatted}`
 end
-local function v73(p12) -- line: 193
-	-- upvalues: FFlagDebugMessageProfiling (copy), FFlagExpChatPerfTracking (copy), React (copy), ExpChatPerfTracker (copy), Localization (copy), FFlagExpChatRewriteInline (copy), FStringInExpChatRewriteLabelKey (copy), Foundation (copy), getMessageSettings (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), isExperienceChatUserProfileApiEnabled (copy), v66 (copy), getFFlagExpChatExcludeFOMORenders (copy), Signals (copy), Players (copy), v71 (copy), SignalsReact (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), FFlagExpChatUseChannelTabsStore (copy), useStore (copy), getFFlagExpChatUseUpdatedMessageRendered (copy), shouldSendHighFrequencyTelemetry (copy), v33 (copy), GetChannelTabsStore (copy), TextChatService (copy), appendTrustedIndicator (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatPolishSummaryMessageUI (copy), TextChatMessageChatActionType (copy), summaryMessageRichText (copy), FFlagExpChatPresetChatEnabled (copy), isPresetMessage (copy), getPresetIconRichText (copy), v31 (copy), duplicateInvisibleText (copy), FFlagExpChatEnableFocusNavigation (copy), useCursor (copy), FFlagEnableInExpChatRewrite (copy), useARButtonRightPadding (copy), FFlagAEGIS2EnableGatesForExpChat (copy), GetChatStatusStore (copy), showChatEnabledUI (copy), isChatRegionLocked (copy), FIntExpChatVisibleARButtonPadding (copy), FIntExpChatDefaultARButtonPadding (copy), FIntExpChatWindowTransparencyRewriteInteractableThreshold (copy)
+
+local v = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+
+local function applyStyleToText(p, value, p2, p3: number?)
+	local v2 = value or ""
+
+	if p2.chatActionType == TextChatMessageChatActionType.Summary then
+		return (summaryMessageRichText.wrapInSummaryMutedStyle(
+			summaryMessageRichText.getSummaryIconPrefix(p3) .. " " .. v2,
+			p.Color.Content.Muted.Color3:ToHex(),
+			p3
+		))
+	end
+
+	return v2
+end
+
+local function fn2(props)
 	if FFlagDebugMessageProfiling then
 		debug.profilebegin("TranslatedTextMessage")
 	end
 
-	if FFlagExpChatPerfTracking then
-		local v114 = p12.message.messageId or "UNKNOWN_MESSAGE_ID"
+	local messageId = props.message.messageId or "UNKNOWN_MESSAGE_ID"
+	React.useEffect(function()
+		ExpChatPerfTracker.finish(ExpChatPerfTracker.Events.MessageReceiveToWindowRenderInterval, {
+			messageId = messageId
+		})
 
-		React.useEffect(function() -- line: 199
-			-- upvalues: ExpChatPerfTracker (copy), v114 (copy)
-			ExpChatPerfTracker.finish(ExpChatPerfTracker.Events.MessageReceiveToWindowRenderInterval, {
-				messageId = v114
-			})
-			ExpChatPerfTracker.finish(ExpChatPerfTracker.Events.MessageSendToWindowRenderInterval, {
-				messageId = v114
-			})
-		end, { v114 })
+		ExpChatPerfTracker.finish(ExpChatPerfTracker.Events.MessageSendToWindowRenderInterval, {
+			messageId = messageId
+		})
+	end, { messageId })
+	local isSpatialUIEnabled = props.isSpatialUIEnabled
+	local textSize
+
+	if isSpatialUIEnabled then
+		textSize = props.chatWindowSettings.SpatialPanelTextSize
+	else
+		textSize = props.chatWindowSettings.TextSize
 	end
 
-	local isSpatialUIEnabled = p12.isSpatialUIEnabled
-	local v116 = if not isSpatialUIEnabled then p12.chatWindowSettings.TextSize else p12.chatWindowSettings.SpatialPanelTextSize
-	local v117 = Localization.useLocalization({
+	local useLocalization = Localization.useLocalization
+	local v2 = {
 		trustedLabelText = "CoreScripts.TextChat.ChatWindow.TrustedLabel",
-		rewrittenLabelText = if not FFlagExpChatRewriteInline then nil else FStringInExpChatRewriteLabelKey,
-		defaultRewrittenLabelText = if not FFlagExpChatRewriteInline then nil else "CoreScripts.TextChat.ChatWindow.RewrittenLabel"
-	})
-	local u118 = nil
+		hereLabel = FFlagExpChatGlobalTabDefault and "CoreScripts.TextChat.ChannelTabs.Here" or nil,
+		rewrittenLabelText = nil,
+		defaultRewrittenLabelText = nil
+	}
+	local rewrittenLabelText
 
 	if FFlagExpChatRewriteInline then
-		u118 = if not v117.rewrittenLabelText or v117.rewrittenLabelText == "" then v117.defaultRewrittenLabelText else v117.rewrittenLabelText
+		rewrittenLabelText = FStringInExpChatRewriteLabelKey
 	end
 
-	local v119 = Foundation.Hooks.useTokens()
-	local v120 = getMessageSettings(p12.message, p12.chatWindowSettings)
-	local showTranslationButton = p12.showTranslationButton
-	local useTranslation = v120.useTranslation
-	local v123 = getMessageText(useTranslation, v120.translation, v120.text)
-	local v124 = v120.prefixText or ""
-	local v125 = nil
+	v2.rewrittenLabelText = rewrittenLabelText
+	v2.defaultRewrittenLabelText = FFlagExpChatRewriteInline and "CoreScripts.TextChat.ChatWindow.RewrittenLabel" or nil
+	local v3 = useLocalization(v2)
+	local v4
 
-	if GetFFlagTextChatEnableUniverseChatTabs() and p12.message.textChannel == nil then
-		v125 = nil
-	elseif isExperienceChatUserProfileApiEnabled() and p12.message.userId then
-		if FFlagDebugMessageProfiling then
-			debug.profilebegin("useCombinedName")
+	if FFlagExpChatRewriteInline then
+		if v3.rewrittenLabelText and v3.rewrittenLabelText ~= "" then
+			v4 = v3.rewrittenLabelText
+		else
+			v4 = v3.defaultRewrittenLabelText
 		end
+	else
+		v4 = nil
+	end
 
-		v125 = v66(p12.message)
+	local v5 = Foundation.Hooks.useTokens()
 
-		if FFlagDebugMessageProfiling then
-			debug.profileend()
+	local message = props.message
+	local chatWindowSettings = props.chatWindowSettings
+	local v6
+
+	if FFlagExpChatGlobalTabDefault then
+		v6 = v3.hereLabel
+	end
+
+	local messageSettings = getMessageSettings(message, chatWindowSettings, v6)
+
+	local showTranslationButton = props.showTranslationButton
+	local useTranslation = messageSettings.useTranslation
+	local messageText = getMessageText(useTranslation, messageSettings.translation, messageSettings.text)
+	local v7
+
+	if isChatWindowEnlargeEnabled() then
+		v7 = getMessageEffects(messageText)
+		messageText = applyChatWindowMessageEffects(messageText, v7)
+	else
+		v7 = nil
+	end
+
+	local prefixText = messageSettings.prefixText or ""
+
+	local v8 = nil
+
+	if FFlagExpChatUnconditionalCombinedNameHook then
+		v8 = fn(props.message)
+	elseif not (GetFFlagTextChatEnableUniverseChatTabs() and props.message.textChannel == nil) then
+		if isExperienceChatUserProfileApiEnabled() and props.message.userId then
+			if FFlagDebugMessageProfiling then
+				debug.profilebegin("useCombinedName")
+			end
+
+			v8 = fn(props.message)
+
+			if FFlagDebugMessageProfiling then
+				debug.profileend()
+			end
 		end
 	end
 
-	local v126 = p12.message.userId and tostring(p12.message.userId)
-	local v127 = if not getFFlagExpChatExcludeFOMORenders() then nil else p12.message.isHiddenMessage
-	local v128 = React.useMemo(function() -- line: 252
-		-- upvalues: Signals (copy), v126 (copy), Players (copy), v127 (copy), v71 (copy)
-		return Signals.createComputed(function(p13) -- line: 253
-			-- upvalues: v126 (copy), Players (copy), v127 (copy), v71 (copy)
-			local v289 = v126 and v126 ~= ""
-			local v290 = Players.LocalPlayer and (Players.LocalPlayer.UserId and tostring(Players.LocalPlayer.UserId))
-			local v291 = v290 and v290 == v126
+	local userId = props.message.userId and tostring(props.message.userId)
+	local isHiddenMessage
 
-			if v289 and (not v291 and not v127) then
-				return (v71.getIsTrustedConnection(v126).data(p13))
+	if getFFlagExpChatExcludeFOMORenders() then
+		isHiddenMessage = props.message.isHiddenMessage
+	else
+		isHiddenMessage = nil
+	end
+
+	local v9 = React.useMemo(function()
+		return Signals.createComputed(function(p)
+			local v9 = userId and userId ~= ""
+			local userId2 = Players.LocalPlayer and Players.LocalPlayer.UserId and tostring(Players.LocalPlayer.UserId)
+			local v10 = userId2 and userId2 == userId
+
+			if v9 and not (v10 or isHiddenMessage) then
+				return (v.getIsTrustedConnection(userId).data(p))
 			end
 
 			return nil
 		end)
-	end, {
-		v126,
-		v127
-	})
-	local v129 = SignalsReact.useSignalBinding(v128)
-	local v130 = if not EngineFeatureExpChatGlobalChatEngineTelemetryEnabled or FFlagExpChatUseChannelTabsStore then nil else useStore()
+	end, { userId, isHiddenMessage })
+
+	local v10 = SignalsReact.useSignalBinding(v9)
+	local v11
+
+	if EngineFeatureExpChatGlobalChatEngineTelemetryEnabled and not FFlagExpChatUseChannelTabsStore then
+		v11 = useStore()
+	else
+		v11 = nil
+	end
 
 	if getFFlagExpChatUseUpdatedMessageRendered() then
-		React.useEffect(function() -- line: 274
-			-- upvalues: p12 (copy), shouldSendHighFrequencyTelemetry (copy), v33 (copy), getFFlagExpChatExcludeFOMORenders (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy), v130 (copy), TextChatService (copy)
-			if p12.message.textChatMessageInstance and shouldSendHighFrequencyTelemetry(v33) and (not getFFlagExpChatExcludeFOMORenders() or not p12.message.isHiddenMessage) then
-				if EngineFeatureExpChatGlobalChatEngineTelemetryEnabled then
-					local n4 = -1
+		React.useEffect(function()
+			if
+				props.message.textChatMessageInstance
+				and shouldSendHighFrequencyTelemetry(fIntExpChatMessageRenderUserThrottlePermyriad)
+				and not (getFFlagExpChatExcludeFOMORenders() and props.message.isHiddenMessage)
+			then
+				local v12
 
-					if FFlagExpChatUseChannelTabsStore then
-						local v237 = GetChannelTabsStore(false)
-						local v238 = v237.getChannelTabsState(false)
-						local v239 = v237.getSelectedTabName(false)
-
-						if v239 and v238.allChannelTabs[v239] then
-							n4 = v238.allChannelTabs[v239].tabIndex
-						end
-					else
-						local ChannelTabs = v130:getState().ChannelTabs
-						local v241 = ChannelTabs and ChannelTabs.selectedTabName
-
-						if v241 and ChannelTabs.allChannelTabs[v241] then
-							n4 = ChannelTabs.allChannelTabs[v241].TabIndex
-						end
-					end
-
-					TextChatService:SendExpChatMessageClientRendered(p12.message.textChatMessageInstance, "chat_window", n4)
-
-					return
+				if FFlagExpChatReportHistoricalRenders then
+					v12 = shouldReportMessageRender(props.message)
+				else
+					v12 = not props.message.isHistorical
 				end
 
-				TextChatService:SendExpChatMessageClientRendered(p12.message.textChatMessageInstance, "chat_window")
+				if v12 then
+					if EngineFeatureExpChatGlobalChatEngineTelemetryEnabled then
+						local v13 = -1
+
+						if FFlagExpChatUseChannelTabsStore then
+							local channelTabsStore = GetChannelTabsStore(false)
+							local channelTabsState = channelTabsStore.getChannelTabsState(false)
+							local selectedTabName = channelTabsStore.getSelectedTabName(false)
+
+							if selectedTabName and channelTabsState.allChannelTabs[selectedTabName] then
+								v13 = channelTabsState.allChannelTabs[selectedTabName].tabIndex
+							end
+						else
+							local channelTabs = v11:getState().ChannelTabs
+							local selectedTabName = channelTabs and channelTabs.selectedTabName
+
+							if selectedTabName and channelTabs.allChannelTabs[selectedTabName] then
+								v13 = channelTabs.allChannelTabs[selectedTabName].TabIndex
+							end
+						end
+
+						if not EngineFeatureTextChatReportEmojiTelemetryEnabled then
+							TextChatService:SendExpChatMessageClientRendered(
+								props.message.textChatMessageInstance,
+								"chat_window",
+								v13
+							)
+							return
+						end
+
+						local v14 = not isChatWindowEnlargeEnabled() and {} or getChatWindowMessageEffects(v7)
+						TextChatService:SendExpChatMessageClientRendered(
+							props.message.textChatMessageInstance,
+							"chat_window",
+							v13,
+							"",
+							v14
+						)
+					else
+						TextChatService:SendExpChatMessageClientRendered(
+							props.message.textChatMessageInstance,
+							"chat_window"
+						)
+					end
+				end
 			end
 		end, {})
 	end
 
-	local bodyTextProperties = v120.bodyTextProperties
-	local prefixTextProperties = v120.prefixTextProperties
-	local v133 = if not isSpatialUIEnabled then bodyTextProperties.TextSize else v116
-	local v134 = v133 - 2
-	local v135 = React.joinBindings((if v125 == nil then {} else {
-		v125.displayName,
-		v125.inExperienceCombinedName
-	})):map(function(p14) -- line: 319
-		-- upvalues: v124 (copy), p12 (copy)
-		local v243 = p14[1] or ""
-		local v244 = p14[2] or ""
-		local v245 = v124
+	local bodyTextProperties = messageSettings.bodyTextProperties
+	local prefixTextProperties = messageSettings.prefixTextProperties
 
-		if string.len(v243) > 0 and (string.len(v244) > 0 and v243 ~= v244) then
-			v245 = string.gsub(v245, v243, v244)
+	if not isSpatialUIEnabled then
+		textSize = bodyTextProperties.TextSize
+	end
+
+	local v12 = textSize - 2
+	local udim
+
+	if isChatWindowEnlargeEnabled() then
+		udim = UDim2.fromOffset(0, getChatWindowPrefixOffset(v7, prefixTextProperties.TextSize))
+	end
+
+	local lineHeight
+
+	if FFlagExpChatMessageEffectChatWindowEnlargeLineHeight and isChatWindowEnlargeEnabled() then
+		lineHeight = getChatWindowMessageLineHeight(v7, textSize, prefixTextProperties.TextSize)
+	end
+
+	local mapped = React.joinBindings(v8 == nil and {} or { v8.displayName, v8.inExperienceCombinedName }):map(function(list)
+		local v13 = list[1] or ""
+		local v14 = list[2] or ""
+
+		local v15 = prefixText
+
+		if string.len(v13) > 0 and string.len(v14) > 0 and v13 ~= v14 then
+			v15 = string.gsub(v15, v13, v14)
 		end
 
-		if string.len(v124) > 0 and p12.isUserVerified then
-			v245 = appendVerifiedBadge(v245)
+		if string.len(prefixText) > 0 and props.isUserVerified then
+			return (appendVerifiedBadge(v15))
 		end
 
-		return v245
+		return v15
 	end)
-	local v136 = React.joinBindings({
-		v135,
-		v129,
-		p12.textTransparency
-	}):map(function(p15) -- line: 340
-		-- upvalues: v124 (copy), appendTrustedIndicator (copy), v117 (copy), prefixTextProperties (copy), v119 (copy)
-		local v247 = p15[1] or ""
-		local v248 = p15[2] or false
-		local v249 = p15[3]
 
-		if v249 == nil then
-			v249 = 1
+	local mapped2 = React.joinBindings({ mapped, v10, props.textTransparency }):map(function(list)
+		local v13 = list[1] or ""
+		local v14 = list[2] or false
+		local item = list[3]
+		local v15 = item == nil and 1 or item
+
+		if string.len(prefixText) == 0 then
+			return v13
 		end
 
-		if string.len(v124) == 0 then
-			return v247
+		if v14 then
+			return (appendTrustedIndicator(v13, v3.trustedLabelText, v15, prefixTextProperties.TextSize, v5))
 		end
 
-		if v248 then
-			v247 = appendTrustedIndicator(v247, v117.trustedLabelText, v249, prefixTextProperties.TextSize, v119)
-		end
-
-		return v247
+		return v13
 	end)
-	local v137 = v136:map(function(p16) -- line: 361
-		-- upvalues: v124 (copy)
-		if string.len(v124) == 0 then
-			return p16
+
+	local mapped3 = mapped2:map(function(p)
+		if string.len(prefixText) == 0 then
+			return p
 		end
 
-		return trim(p16)
+		return trim(p)
 	end)
-	local v138 = v136:map(function(p17) -- line: 368
-		-- upvalues: v123 (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatPolishSummaryMessageUI (copy), v133 (copy), v119 (copy), p12 (copy), TextChatMessageChatActionType (copy), summaryMessageRichText (copy), FFlagExpChatPresetChatEnabled (copy), isPresetMessage (copy), getPresetIconRichText (copy), v124 (copy), showTranslationButton (copy), v31 (copy), duplicateInvisibleText (copy), prefixTextProperties (copy)
-		local v252 = v123
+
+	local text = mapped2:map(function(p)
+		local v13 = messageText
 
 		if FFlagEnableInExpChatSummaryOnLua then
-			local v253 = if not FFlagExpChatPolishSummaryMessageUI then nil else v133
-			local v254 = v119
-			local v255 = v123
-			local message = p12.message
+			local v14
 
-			v252 = v255 or ""
+			if FFlagExpChatPolishSummaryMessageUI then
+				v14 = textSize
+			end
 
-			if message.chatActionType == TextChatMessageChatActionType.Summary then
-				v252 = summaryMessageRichText.wrapInSummaryMutedStyle(summaryMessageRichText.getSummaryIconPrefix(v253) .. " " .. v252, v254.Color.Content.Muted.Color3:ToHex(), v253)
+			v13 = messageText or ""
+
+			if props.message.chatActionType == TextChatMessageChatActionType.Summary then
+				v13 = summaryMessageRichText.wrapInSummaryMutedStyle(
+					summaryMessageRichText.getSummaryIconPrefix(v14) .. " " .. v13,
+					v5.Color.Content.Muted.Color3:ToHex(),
+					v14
+				)
 			end
 		end
 
-		if FFlagExpChatPresetChatEnabled and isPresetMessage(p12.message) then
-			v252 ..= (" %*"):format((getPresetIconRichText(v133)))
+		if FFlagExpChatPresetChatEnabled and isPresetMessage(props.message) then
+			v13 ..= ` {getPresetIconRichText(textSize)}`
 		end
 
-		if string.len(v124) == 0 then
+		if string.len(prefixText) == 0 then
 			if FFlagEnableInExpChatSummaryOnLua then
-				return v252
+				return v13
 			end
 
-			return v123
+			return messageText
 		end
 
 		if showTranslationButton then
-			v252 = if not v31 then "   " .. v252 else "     " .. v252
+			if defineFastFlag then
+				v13 = "     " .. v13
+			else
+				v13 = "   " .. v13
+			end
 		end
 
-		return duplicateInvisibleText(p17, prefixTextProperties.FontFace, prefixTextProperties.TextSize) .. " " .. v252
+		return duplicateInvisibleText(p, prefixTextProperties.FontFace, prefixTextProperties.TextSize) .. " " .. v13
 	end)
 
 	if FFlagExpChatRewriteInline then
-		v138 = React.joinBindings({ v138 }):map(function(p18) -- line: 393
-			-- upvalues: p12 (copy), Foundation (copy), prefixTextProperties (copy), v119 (copy), u118 (ref)
-			local v258 = p18[1] or ""
+		text = React.joinBindings({ text }):map(function(list)
+			local v13 = list[1] or ""
 
-			if not p12.wasRewritten then
-				return v258
+			if not props.wasRewritten then
+				return v13
 			end
 
-			local v259 = if not p12.isRewriteMenuOpen then Foundation.Enums.IconName.ChevronLargeDown else Foundation.Enums.IconName.ChevronLargeUp
+			local v14
 
-			return `{ v258 } <font size='{ prefixTextProperties.TextSize - 4 }' color='#{ v119.Color.Content.Muted.Color3:ToHex() }'>{ `({ u118 })` }<font transparency='1'><stroke transparency='1'>_</stroke></font>{ `<font weight='600' family='rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json'>{ v259 }</font>` }</font>`
+			if props.isRewriteMenuOpen then
+				v14 = Foundation.Enums.IconName.ChevronLargeUp
+			else
+				v14 = Foundation.Enums.IconName.ChevronLargeDown
+			end
+
+			return `{v13} <font size='{prefixTextProperties.TextSize - 4}' color='#{v5.Color.Content.Muted.Color3:ToHex()}'>{`({v4})`}<font transparency='1'><stroke transparency='1'>_</stroke></font>{`<font weight='600' family='rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json'>{v14}</font>`}</font>`
 		end)
 	end
 
-	local v139 = if not FFlagExpChatEnableFocusNavigation then nil else useCursor()
-	local v141
+	local selectionImageObject = useCursor()
+	local udim2
 
-	if FFlagEnableInExpChatRewrite then
-		local v140 = useARButtonRightPadding()
+	if FFlagExpChatMessageEffectChatWindowEnlargePadding and isChatWindowEnlargeEnabled() then
+		local v13
 
-		v141 = React.createElement("UIPadding", {
-			PaddingRight = UDim.new(0, v140)
-		})
-	else
-		local v142 = true
-
-		if FFlagAEGIS2EnableGatesForExpChat then
-			local v143 = GetChatStatusStore(false)
-			local v144 = SignalsReact.useSignalState(v143.getChatStatus)
-
-			v142 = showChatEnabledUI(v144)
+		if v7 then
+			v13 = not table.find(v7, MessageEffect.ChatWindowEnlarge) and 0
+				or FIntExpChatMessageEffectChatWindowEnlargePaddingPixels
+		else
+			v13 = 0
 		end
 
-		local v145 = not isChatRegionLocked() and v142
+		udim2 = UDim.new(0, v13)
+	end
 
-		v141 = React.createElement("UIPadding", {
-			PaddingRight = UDim.new(0, if not v145 then FIntExpChatDefaultARButtonPadding else FIntExpChatVisibleARButtonPadding)
+	local uiPadding
+
+	if FFlagEnableInExpChatRewrite then
+		local v13 = useARButtonRightPadding() -- inferred equivalent call
+		uiPadding = React.createElement("UIPadding", {
+			PaddingRight = UDim.new(0, v13),
+			PaddingTop = udim2,
+			PaddingBottom = udim2
+		})
+	else
+		local chatStatusStore = GetChatStatusStore(false)
+		local v13 = showChatEnabledUI((SignalsReact.useSignalState(chatStatusStore.getChatStatus)))
+		local v14 = not isChatRegionLocked() and v13
+
+		local createElement = React.createElement
+		local v15
+
+		if v14 then
+			v15 = FIntExpChatVisibleARButtonPadding
+		else
+			v15 = FIntExpChatDefaultARButtonPadding
+		end
+
+		uiPadding = createElement("UIPadding", {
+			PaddingRight = UDim.new(0, v15),
+			PaddingTop = udim2,
+			PaddingBottom = udim2
 		})
 	end
 
-	local v146 = nil
+	local interactable
 
-	if FFlagExpChatRewriteInline and p12.wasRewritten then
-		v146 = p12.chatWindowTransparencyBindable == nil or if typeof(p12.chatWindowTransparencyBindable) ~= "number" then p12.chatWindowTransparencyBindable:map(function(p19) -- line: 451
-			-- upvalues: FIntExpChatWindowTransparencyRewriteInteractableThreshold (copy)
-			return p19 < FIntExpChatWindowTransparencyRewriteInteractableThreshold
-		end) else p12.chatWindowTransparencyBindable < FIntExpChatWindowTransparencyRewriteInteractableThreshold
+	if FFlagExpChatRewriteInline and props.wasRewritten then
+		if props.chatWindowTransparencyBindable == nil then
+			interactable = true
+		elseif typeof(props.chatWindowTransparencyBindable) == "number" then
+			interactable = props.chatWindowTransparencyBindable < FIntExpChatWindowTransparencyRewriteInteractableThreshold
+		else
+			interactable = props.chatWindowTransparencyBindable:map(function(p): boolean
+				return p < FIntExpChatWindowTransparencyRewriteInteractableThreshold
+			end)
+		end
 	end
 
 	local createElement = React.createElement
-	local t1 = {
+	local v13 = {
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		Size = UDim2.new(1, 0, 0, 0),
-		LayoutOrder = p12.LayoutOrder
+		LayoutOrder = props.LayoutOrder
 	}
-	local t2 = {
-		UIPadding = v141
-	}
-	local createElement2 = React.createElement
-	local t3 = {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY,
-		Size = UDim2.new(1, 0, 0, 0)
-	}
-	local t4 = {}
-	local v153 = false
 
-	if string.len(v124) > 0 then
-		local createElement3 = React.createElement
-		local t5 = {
-			BackgroundTransparency = 1,
-			RichText = true,
-			TextWrapped = true,
+	local createElement2 = React.createElement
+	local v14 = {
+		AutomaticSize = Enum.AutomaticSize.XY,
+		Size = UDim2.new(1, 0, 0, 0),
+		BackgroundTransparency = 1
+	}
+	local prefixText2
+
+	if string.len(prefixText) > 0 then
+		prefixText2 = React.createElement("TextLabel", {
 			AutomaticSize = Enum.AutomaticSize.XY,
+			BackgroundTransparency = 1,
 			FontFace = prefixTextProperties.FontFace,
-			Text = v136,
+			LineHeight = lineHeight,
+			Position = udim,
+			RichText = true,
+			Text = mapped2,
 			TextColor3 = prefixTextProperties.TextColor3,
 			TextSize = prefixTextProperties.TextSize,
-			TextStrokeColor3 = prefixTextProperties.TextStrokeColor3
-		}
-		local TextStrokeTransparency = prefixTextProperties.TextStrokeTransparency
-
-		t5.TextStrokeTransparency = p12.textTransparency:map(function(p20) -- line: 113
-			-- upvalues: TextStrokeTransparency (copy)
-			if TextStrokeTransparency == nil then
-				return 1
-			end
-
-			local v262 = TextStrokeTransparency
-
-			return v262 + p20 * (1 - v262)
-		end)
-
-		local n5 = 0
-
-		t5.TextTransparency = p12.textTransparency:map(function(p21) -- line: 113
-			-- upvalues: n5 (copy)
-			if n5 == nil then
-				return 1
-			end
-
-			local v264 = n5
-
-			return v264 + p21 * (1 - v264)
-		end)
-		t5.TextXAlignment = Enum.TextXAlignment.Left
-		t5.TextYAlignment = Enum.TextYAlignment.Top
-		v153 = createElement3("TextLabel", t5, {
-			UIGradient = prefixTextProperties.UIGradient ~= nil and React.createElement("UIGradient", prefixTextProperties.UIGradient)
+			TextStrokeColor3 = prefixTextProperties.TextStrokeColor3,
+			TextStrokeTransparency = setTransparency( -- inferred equivalent call
+				prefixTextProperties.TextStrokeTransparency,
+				props.textTransparency
+			),
+			TextTransparency = setTransparency(0, props.textTransparency), -- inferred equivalent call
+			TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top
+		}, {
+			UIGradient = prefixTextProperties.UIGradient ~= nil and React.createElement(
+				"UIGradient",
+				prefixTextProperties.UIGradient
+			)
 		})
+	else
+		prefixText2 = false
 	end
 
-	t4.PrefixText = v153
-
-	local createElement4 = React.createElement
-	local v159 = (not FFlagExpChatRewriteInline or not p12.wasRewritten) and "TextLabel" or "TextButton"
-	local t6 = {
+	local createElement3 = React.createElement
+	local v15 = FFlagExpChatRewriteInline and props.wasRewritten and "TextButton" or "TextLabel"
+	local v16 = {
+		["AutomaticSize"] = nil,
+		["AutomaticSize"] = nil,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
 		FontFace = bodyTextProperties.FontFace,
+		LineHeight = lineHeight,
 		RichText = true,
 		Size = UDim2.new(1, 0, 0, 0),
-		Text = v138,
+		Text = text,
 		TextColor3 = bodyTextProperties.TextColor3,
-		TextSize = v133,
-		TextStrokeColor3 = bodyTextProperties.TextStrokeColor3
+		TextSize = textSize,
+		TextStrokeColor3 = bodyTextProperties.TextStrokeColor3,
+		TextStrokeTransparency = setTransparency(bodyTextProperties.TextStrokeTransparency, props.textTransparency), -- inferred equivalent call
+		TextTransparency = setTransparency(0, props.textTransparency), -- inferred equivalent call
+		TextWrapped = true,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = Enum.TextYAlignment.Top
 	}
-	local TextStrokeTransparency = bodyTextProperties.TextStrokeTransparency
 
-	t6.TextStrokeTransparency = p12.textTransparency:map(function(p22) -- line: 113
-		-- upvalues: TextStrokeTransparency (copy)
-		if TextStrokeTransparency == nil then
-			return 1
-		end
+	local activated = React.Event.Activated
+	local v17
 
-		local v266 = TextStrokeTransparency
+	if FFlagExpChatRewriteInline and props.wasRewritten then
+		v17 = props.onTextBodyActivated
+	end
 
-		return v266 + p22 * (1 - v266)
-	end)
+	v16[activated] = v17
 
-	local n6 = 0
+	v16.Interactable = interactable
+	local v18 = {
+		PrefixText = prefixText2,
+		BodyText = createElement3(v15, v16),
+		TextMessageButton = 0
+	}
+	local textMessageButton
 
-	t6.TextTransparency = p12.textTransparency:map(function(p23) -- line: 113
-		-- upvalues: n6 (copy)
-		if n6 == nil then
-			return 1
-		end
-
-		local v268 = n6
-
-		return v268 + p23 * (1 - v268)
-	end)
-	t6.TextWrapped = true
-	t6.TextXAlignment = Enum.TextXAlignment.Left
-	t6.TextYAlignment = Enum.TextYAlignment.Top
-	t6[React.Event.Activated] = if not FFlagExpChatRewriteInline or not p12.wasRewritten then nil else p12.onTextBodyActivated
-	t6.Interactable = v146
-	t4.BodyText = createElement4(v159, t6)
-
-	local v170
-
-	if string.len(v124) ~= 0 then
-		local createElement5 = React.createElement
-		local t7 = {
+	if string.len(prefixText) ~= 0 then
+		local createElement4 = React.createElement
+		local v19 = {
 			BackgroundTransparency = 1,
 			AutomaticSize = Enum.AutomaticSize.XY,
+			Position = udim,
 			Size = UDim2.new(1, 0, 0, 0)
 		}
-		local t8 = {
+		local v20 = {
 			Layout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -553,10 +693,11 @@ local function v73(p12) -- line: 193
 				AutomaticSize = Enum.AutomaticSize.XY,
 				BackgroundTransparency = 1,
 				FontFace = prefixTextProperties.FontFace,
+				LineHeight = lineHeight,
 				RichText = true,
-				SelectionImageObject = v139,
+				SelectionImageObject = selectionImageObject,
 				Size = UDim2.new(0, 0, 0, 0),
-				Text = v137,
+				Text = mapped3,
 				TextSize = prefixTextProperties.TextSize,
 				TextStrokeTransparency = 1,
 				TextTransparency = 1,
@@ -564,454 +705,390 @@ local function v73(p12) -- line: 193
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Top,
 				LayoutOrder = 1,
-				[React.Event.Activated] = function() -- line: 544
-					-- upvalues: p12 (copy)
-					p12.onTextMessageLabelButtonActivated(p12.message)
+				[React.Event.Activated] = function()
+					props.onTextMessageLabelButtonActivated(props.message)
 				end
-			})
+			}),
+			TranslationButton = 0
 		}
-		local v169
+		local translationButton
 
 		if showTranslationButton then
-			local createElement6 = React.createElement
-			local t9 = {
+			translationButton = React.createElement("ImageButton", {
 				BackgroundTransparency = 1,
 				HoverImage = "rbxasset://textures/translateIconDark.png",
-				Image = "rbxasset://textures/translateIcon.png"
-			}
-			local n7 = 0
-
-			t9.ImageTransparency = p12.textTransparency:map(function(p24) -- line: 113
-				-- upvalues: n7 (copy)
-				if n7 == nil then
-					return 1
+				Image = "rbxasset://textures/translateIcon.png",
+				ImageTransparency = setTransparency(0, props.textTransparency), -- inferred equivalent call
+				LayoutOrder = 2,
+				PressedImage = "rbxasset://textures/translateIconDark.png",
+				SelectionImageObject = selectionImageObject,
+				Size = UDim2.new(0, v12, 0, v12),
+				[React.Event.Activated] = function()
+					props.onToggle(not props.message.useTranslation, props.message.messageId)
 				end
-
-				local v270 = n7
-
-				return v270 + p24 * (1 - v270)
-			end)
-			t9.LayoutOrder = 2
-			t9.PressedImage = "rbxasset://textures/translateIconDark.png"
-			t9.SelectionImageObject = v139
-			t9.Size = UDim2.new(0, v134, 0, v134)
-			t9[React.Event.Activated] = function() -- line: 559
-				-- upvalues: p12 (copy)
-				p12.onToggle(not p12.message.useTranslation, p12.message.messageId)
-			end
-			v169 = createElement6("ImageButton", t9)
-		else
-			v169 = nil
+			})
 		end
 
-		t8.TranslationButton = v169
-		v170 = createElement5("Frame", t7, t8)
-	else
-		v170 = nil
+		v20.TranslationButton = translationButton
+		textMessageButton = createElement4("Frame", v19, v20)
 	end
 
-	t4.TextMessageButton = v170
-	t2.TextMessage = createElement2("Frame", t3, t4)
-
-	local v171 = createElement("Frame", t1, t2)
+	v18.TextMessageButton = textMessageButton
+	local element = createElement("Frame", v13, {
+		UIPadding = uiPadding,
+		TextMessage = createElement2("Frame", v14, v18)
+	})
 
 	if FFlagDebugMessageProfiling then
 		debug.profileend()
 	end
 
-	return v171
+	return element
 end
-local function TranslatedTextMessageWithToggle(_) -- line: 574
-	-- upvalues: RoactRodux (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), v73 (copy)
-	return RoactRodux.connect(function() -- line: 575
-	end, function(p26) -- line: 575
-		-- upvalues: FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy)
+
+local function TranslatedTextMessageWithToggle(_)
+	return RoactRodux.connect(function() end, function(_)
 		return {
-			onToggle = function(b2: boolean, s6: string) -- line: 577
-				-- upvalues: FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), p26 (copy)
-				if FFlagExpChatUseMessagesStore then
-					GetMessagesStore(false).toggleMessageTranslation(b2, s6)
-
-					return
-				end
-
-				p26({
-					type = "ChatTranslationMessageToggled",
-					useTranslation = b2,
-					messageId = s6
-				})
+			onToggle = function(flag: boolean, p: string)
+				GetMessagesStore(false).toggleMessageTranslation(flag, p)
 			end
 		}
-	end)(v73)
+	end)(fn2)
 end
-local function RewriteLabelWithButton(p27) -- line: 593
-	-- upvalues: Foundation (copy), Localization (copy), FStringInExpChatRewriteLabelKey (copy), React (copy)
-	local v174 = Foundation.Hooks.useTokens()
-	local v175 = Localization.useLocalization({
-		defaultRewrittenLabelText = "CoreScripts.TextChat.ChatWindow.RewrittenLabel",
-		rewrittenLabelText = FStringInExpChatRewriteLabelKey
+
+local function RewriteLabelWithButton(props)
+	local v2 = Foundation.Hooks.useTokens()
+	local v3 = Localization.useLocalization({
+		rewrittenLabelText = FStringInExpChatRewriteLabelKey,
+		defaultRewrittenLabelText = "CoreScripts.TextChat.ChatWindow.RewrittenLabel"
 	})
-	local v176 = if not v175.rewrittenLabelText or v175.rewrittenLabelText == "" then v175.defaultRewrittenLabelText else v175.rewrittenLabelText
+	local v4
+
+	if v3.rewrittenLabelText and v3.rewrittenLabelText ~= "" then
+		v4 = v3.rewrittenLabelText
+	else
+		v4 = v3.defaultRewrittenLabelText
+	end
+
 	local createElement = React.createElement
-	local View = Foundation.View
-	local t10 = {
+	local view = Foundation.View
+	local v5 = {
 		tag = "size-full-0 auto-y row align-y-center gap-xsmall",
-		LayoutOrder = p27.LayoutOrder
+		LayoutOrder = props.LayoutOrder
 	}
-	local t11 = {}
-	local createElement7 = React.createElement
-	local FoundationText = Foundation.Text
-	local t12 = {
-		tag = "size-0-0 auto-xy text-caption-small text-align-x-left",
-		LayoutOrder = 1,
-		RichText = true,
-		Text = "(" .. v176 .. ")"
+	local children = {
+		Label = React.createElement(Foundation.Text, {
+			Text = "(" .. v4 .. ")",
+			tag = "size-0-0 auto-xy text-caption-small text-align-x-left",
+			LayoutOrder = 1,
+			RichText = true,
+			textStyle = {
+				Color3 = v2.Color.Content.Muted.Color3,
+				Transparency = setTransparency(v2.Color.Content.Muted.Transparency, props.textTransparency) -- inferred equivalent call
+			},
+			stroke = {
+				Color = Color3.fromRGB(0, 0, 0),
+				Transparency = setTransparency(0.5, props.textTransparency), -- inferred equivalent call
+				Thickness = v2.Stroke.Thin
+			}
+		}),
+		IconButton = 0
 	}
-	local t13 = {
-		Color3 = v174.Color.Content.Muted.Color3
-	}
-	local MutedTransparency = v174.Color.Content.Muted.Transparency
 
-	t13.Transparency = p27.textTransparency:map(function(p28) -- line: 113
-		-- upvalues: MutedTransparency (copy)
-		if MutedTransparency == nil then
-			return 1
-		end
-
-		local v273 = MutedTransparency
-
-		return v273 + p28 * (1 - v273)
-	end)
-	t12.textStyle = t13
-
-	local t14 = {
-		Color = Color3.fromRGB(0, 0, 0)
-	}
-	local n8 = 0.5
-
-	t14.Transparency = p27.textTransparency:map(function(p29) -- line: 113
-		-- upvalues: n8 (copy)
-		if n8 == nil then
-			return 1
-		end
-
-		local v275 = n8
-
-		return v275 + p29 * (1 - v275)
-	end)
-	t14.Thickness = v174.Stroke.Thin
-	t12.stroke = t14
-	t11.Label = createElement7(FoundationText, t12)
-	t11.IconButton = React.createElement(Foundation.IconButton, {
+	local createElement2 = React.createElement
+	local iconButton = Foundation.IconButton
+	local v6 = {
+		size = Foundation.Enums.InputSize.XSmall,
+		icon = 0,
+		variant = 0,
 		isCircular = true,
 		LayoutOrder = 2,
-		size = Foundation.Enums.InputSize.XSmall,
-		icon = if not p27.isRewriteMenuOpen then Foundation.Enums.IconName.ChevronLargeDown else Foundation.Enums.IconName.ChevronLargeUp,
-		variant = Foundation.Enums.ButtonVariant.Utility,
-		Visible = p27.textTransparency:map(function(p30) -- line: 631
-			return p30 < 1
-		end),
-		onActivated = p27.onActivated
-	})
+		Visible = 0,
+		onActivated = 0
+	}
+	local icon
 
-	return createElement(View, t10, t11)
+	if props.isRewriteMenuOpen then
+		icon = Foundation.Enums.IconName.ChevronLargeUp
+	else
+		icon = Foundation.Enums.IconName.ChevronLargeDown
+	end
+
+	v6.icon = icon
+
+	v6.variant = Foundation.Enums.ButtonVariant.Utility
+
+	v6.Visible = props.textTransparency:map(function(p): boolean
+		return p < 1
+	end)
+
+	v6.onActivated = props.onActivated
+	children.IconButton = createElement2(iconButton, v6)
+	return createElement(view, v5, children)
 end
-local function TranslatedTextMessageWrapper(p31) -- line: 639
-	-- upvalues: getMessageSettings (copy), FFlagEnableInExpChatRewrite (copy), useARButtonRightPadding (copy), FIntExpChatDefaultARButtonPadding (copy), Localization (copy), FStringInExpChatRewriteReasonKey (copy), Foundation (copy), React (copy), FFlagExpChatRewriteToggleAnalytics (copy), ExpChatShared (copy), FFlagExpChatRewriteInlineIxpEnabled (copy), IXPService (copy), FStringExpChatRewriteInlineIxpLayer (copy), FFlagExpChatRewriteInline (copy), Dictionary (copy), TranslatedTextMessageWithToggle (copy), v73 (copy), RewriteLabelWithButton (copy)
-	local v189 = getMessageSettings(p31.message, p31.chatWindowSettings)
-	local showTranslationButton = p31.showTranslationButton
-	local v191 = nil
-	local u192 = nil
-	local u193 = nil
-	local v194 = nil
-	local originalText = nil
-	local u196 = false
-	local u197 = false
-	local n9 = 0
-	local s7 = ""
+
+local function TranslatedTextMessageWrapper(props)
+	local messageSettings = getMessageSettings(props.message, props.chatWindowSettings)
+	local showTranslationButton = props.showTranslationButton
+
+	local v2 = nil
+
+	local state = nil
+	local setState = nil
+	local v3, text, wasRewritten, originalText, v4, v5
 
 	if FFlagEnableInExpChatRewrite then
-		n9 = math.max(useARButtonRightPadding() - FIntExpChatDefaultARButtonPadding, 0)
-
-		local v200 = Localization.useLocalization({
-			defaultRewrittenReasonLabelText = "CoreScripts.TextChat.ChatWindows.RewrittenReasonLabel",
-			rewrittenReasonLabelText = FStringInExpChatRewriteReasonKey
+		v3 = math.max(useARButtonRightPadding() - FIntExpChatDefaultARButtonPadding, 0) -- inferred equivalent call
+		local v6 = Localization.useLocalization({
+			rewrittenReasonLabelText = FStringInExpChatRewriteReasonKey,
+			defaultRewrittenReasonLabelText = "CoreScripts.TextChat.ChatWindows.RewrittenReasonLabel"
 		})
 
-		s7 = if not v200.rewrittenReasonLabelText or v200.rewrittenReasonLabelText == "" then v200.defaultRewrittenReasonLabelText else v200.rewrittenReasonLabelText
-		v191 = Foundation.Hooks.useTokens()
+		if v6.rewrittenReasonLabelText and v6.rewrittenReasonLabelText ~= "" then
+			text = v6.rewrittenReasonLabelText
+		else
+			text = v6.defaultRewrittenReasonLabelText
+		end
 
-		local v201, v202 = React.useState(false)
+		v2 = Foundation.Hooks.useTokens()
+		state, setState = React.useState(false)
 
-		u192 = v201
-		u193 = v202
-		u197 = v189.wasRewritten
-		originalText = v189.originalText
-		u196 = u197 and (originalText ~= nil and originalText ~= "")
-		v194 = React.useCallback(function() -- line: 670
-			-- upvalues: FFlagExpChatRewriteToggleAnalytics (copy), ExpChatShared (copy), p31 (copy), u192 (ref), u196 (ref), u193 (ref)
+		wasRewritten = messageSettings.wasRewritten
+		originalText = messageSettings.originalText
+		local v7 = wasRewritten
+
+		if v7 then
+			if originalText == nil then
+				v7 = false
+			else
+				v7 = originalText ~= ""
+			end
+		end
+
+		v4 = v7
+
+		v5 = React.useCallback(function()
 			if FFlagExpChatRewriteToggleAnalytics then
-				ExpChatShared.Analytics:TelemetryLogEvent(ExpChatShared.Analytics.RewriteDropdownToggledConfig, {
-					messageId = p31.message.messageId,
-					isDropdownOpen = tostring(u192),
-					showOriginalText = tostring(u196)
-				}, ExpChatShared.Analytics.DefaultStandardizedFields)
+				ExpChatShared.Analytics:TelemetryLogEvent(
+					ExpChatShared.Analytics.RewriteDropdownToggledConfig,
+					{
+						messageId = props.message.messageId,
+						isDropdownOpen = tostring(state),
+						showOriginalText = tostring(v4)
+					},
+					ExpChatShared.Analytics.DefaultStandardizedFields
+				)
 			end
 
-			u193(function(p32) -- line: 678
-				return not p32
+			setState(function(p): boolean
+				return not p
 			end)
-		end, {
-			u192,
-			u196,
-			p31.message.messageId
-		})
+		end, { state, v4, props.message.messageId })
 
 		if FFlagExpChatRewriteInlineIxpEnabled then
-			React.useEffect(function() -- line: 684
-				-- upvalues: u197 (ref), IXPService (copy), FStringExpChatRewriteInlineIxpLayer (copy)
-				if u197 then
+			React.useEffect(function()
+				if wasRewritten then
 					IXPService:LogFlagLinkedUserLayerExposure(FStringExpChatRewriteInlineIxpLayer)
 				end
-			end, { u197 })
+			end, { wasRewritten })
 		end
+	else
+		wasRewritten = false
+		v4 = false
+		v3 = 0
+		text = ""
 	end
 
-	local v203 = p31
+	local v6
 
-	if FFlagExpChatRewriteInline and u197 then
-		v203 = Dictionary.join(v203, {
-			LayoutOrder = 1,
-			isRewriteMenuOpen = u192,
-			wasRewritten = u197,
-			onTextBodyActivated = v194
-		})
-	elseif FFlagEnableInExpChatRewrite and u197 then
-		v203 = Dictionary.join(v203, {
+	if FFlagExpChatRewriteInline and wasRewritten then
+		v6 = dictionary.join(props, {
+			isRewriteMenuOpen = state,
+			wasRewritten = wasRewritten,
+			onTextBodyActivated = v5,
 			LayoutOrder = 1
 		})
+	elseif FFlagEnableInExpChatRewrite and wasRewritten then
+		v6 = dictionary.join(props, { LayoutOrder = 1 })
+	else
+		v6 = props
 	end
 
-	local v204 = if not showTranslationButton then React.createElement(v73, v203) else React.createElement(TranslatedTextMessageWithToggle, v203)
+	local translatedTextMessage
 
-	if FFlagEnableInExpChatRewrite and u197 then
-		local createElement = React.createElement
-		local View = Foundation.View
-		local t15 = {
-			tag = `size-full-0 auto-y align-y-top col{ not FFlagExpChatRewriteInline and "" or " gap-xsmall" }`,
-			LayoutOrder = p31.LayoutOrder
-		}
-		local t16 = {
-			UIPadding = if not u192 then nil else React.createElement("UIPadding", {
-				PaddingBottom = UDim.new(0, 4)
-			}),
-			TranslatedTextMessage = v204,
-			RewriteLabelWithButton = if not u197 or FFlagExpChatRewriteInline then nil else React.createElement(RewriteLabelWithButton, {
-				LayoutOrder = 2,
-				onActivated = v194,
-				isRewriteMenuOpen = u192,
-				transparencyValue = p31.transparencyValue,
-				textTransparency = p31.textTransparency
-			})
-		}
-		local v230
+	if showTranslationButton then
+		translatedTextMessage = React.createElement(TranslatedTextMessageWithToggle, v6)
+	else
+		translatedTextMessage = React.createElement(fn2, v6)
+	end
 
-		if u192 then
-			local createElement8 = React.createElement
-			local View2 = Foundation.View
-			local t17 = {
-				tag = "align-x-left col radius-medium gap-xxsmall padding-small",
-				LayoutOrder = 3,
+	if not (FFlagEnableInExpChatRewrite and wasRewritten) then
+		return translatedTextMessage
+	end
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v7 = {
+		tag = `size-full-0 auto-y align-y-top col{FFlagExpChatRewriteInline and " gap-xsmall" or ""}`,
+		LayoutOrder = props.LayoutOrder
+	}
+	local uiPadding
+
+	if state then
+		uiPadding = React.createElement("UIPadding", { PaddingBottom = UDim.new(0, 4) })
+	end
+
+	local rewriteLabelWithButton
+
+	if wasRewritten and not FFlagExpChatRewriteInline then
+		rewriteLabelWithButton = React.createElement(RewriteLabelWithButton, {
+			onActivated = v5,
+			isRewriteMenuOpen = state,
+			transparencyValue = props.transparencyValue,
+			textTransparency = props.textTransparency,
+			LayoutOrder = 2
+		})
+	end
+
+	local dropdownMenu
+
+	if state then
+		local createElement2 = React.createElement
+		local view2 = Foundation.View
+		local v8 = {
+			tag = "align-x-left col radius-medium gap-xxsmall padding-small",
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, -FIntExpChatDefaultARButtonPadding, 0, 0),
+			LayoutOrder = 3,
+			backgroundStyle = {
+				Color3 = v2.Color.Common.Scrim.Color3,
+				Transparency = setTransparency(0.7, props.transparencyValue) -- inferred equivalent call
+			}
+		}
+		local originalText2
+
+		if v4 then
+			originalText2 = React.createElement(Foundation.Text, {
+				Text = originalText,
+				tag = "text-body-small text-align-x-left",
 				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, -FIntExpChatDefaultARButtonPadding, 0, 0)
-			}
-			local t18 = {
-				Color3 = v191.Color.Common.Scrim.Color3
-			}
-			local n10 = 0.7
-
-			t18.Transparency = p31.transparencyValue:map(function(p33) -- line: 113
-				-- upvalues: n10 (copy)
-				if n10 == nil then
-					return 1
-				end
-
-				local v278 = n10
-
-				return v278 + p33 * (1 - v278)
-			end)
-			t17.backgroundStyle = t18
-
-			local t19 = {}
-			local v222
-
-			if u196 then
-				local createElement9 = React.createElement
-				local FoundationText = Foundation.Text
-				local t20 = {
-					tag = "text-body-small text-align-x-left",
-					LayoutOrder = 1,
-					RichText = true,
-					TextWrapped = true,
-					Text = originalText,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(1, -n9, 0, 0)
+				Size = UDim2.new(1, -v3, 0, 0),
+				LayoutOrder = 1,
+				RichText = true,
+				TextWrapped = true,
+				textStyle = {
+					Color3 = v2.Color.Content.Muted.Color3,
+					Transparency = setTransparency(v2.Color.Content.Muted.Transparency, props.textTransparency) -- inferred equivalent call
+				},
+				stroke = {
+					Color = Color3.fromRGB(0, 0, 0),
+					Transparency = setTransparency(0.5, props.textTransparency), -- inferred equivalent call
+					Thickness = v2.Stroke.Thin
 				}
-				local t21 = {
-					Color3 = v191.Color.Content.Muted.Color3
-				}
-				local MutedTransparency = v191.Color.Content.Muted.Transparency
+			})
+		end
 
-				t21.Transparency = p31.textTransparency:map(function(p34) -- line: 113
-					-- upvalues: MutedTransparency (copy)
-					if MutedTransparency == nil then
-						return 1
-					end
+		local divider
 
-					local v280 = MutedTransparency
-
-					return v280 + p34 * (1 - v280)
-				end)
-				t20.textStyle = t21
-
-				local t22 = {
-					Color = Color3.fromRGB(0, 0, 0)
-				}
-				local n11 = 0.5
-
-				t22.Transparency = p31.textTransparency:map(function(p35) -- line: 113
-					-- upvalues: n11 (copy)
-					if n11 == nil then
-						return 1
-					end
-
-					local v282 = n11
-
-					return v282 + p35 * (1 - v282)
-				end)
-				t22.Thickness = v191.Stroke.Thin
-				t20.stroke = t22
-				v222 = createElement9(FoundationText, t20)
-			else
-				v222 = nil
-			end
-
-			t19.OriginalText = v222
-			t19.Divider = if not u196 then nil else React.createElement(Foundation.Divider, {
-				LayoutOrder = 2,
+		if v4 then
+			divider = React.createElement(Foundation.Divider, {
 				orientation = Foundation.Enums.Orientation.Horizontal,
-				Visible = p31.textTransparency:map(function(p36) -- line: 772
-					return p36 < 1
+				LayoutOrder = 2,
+				Visible = props.textTransparency:map(function(p): boolean
+					return p < 1
 				end),
 				DividerVariant = Foundation.Enums.DividerVariant.Default
 			})
+		end
 
-			local createElement10 = React.createElement
-			local FoundationText = Foundation.Text
-			local t23 = {
+		dropdownMenu = createElement2(view2, v8, {
+			OriginalText = originalText2,
+			Divider = divider,
+			ReasoningText = React.createElement(Foundation.Text, {
+				Text = text,
 				tag = "text-body-small text-align-x-left",
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, -v3, 0, 0),
 				LayoutOrder = 3,
 				RichText = true,
 				TextWrapped = true,
-				Text = s7,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, -n9, 0, 0)
-			}
-			local t24 = {
-				Color3 = v191.Color.Content.Default.Color3
-			}
-			local DefaultTransparency = v191.Color.Content.Default.Transparency
-
-			t24.Transparency = p31.textTransparency:map(function(p37) -- line: 113
-				-- upvalues: DefaultTransparency (copy)
-				if DefaultTransparency == nil then
-					return 1
-				end
-
-				local v285 = DefaultTransparency
-
-				return v285 + p37 * (1 - v285)
-			end)
-			t23.textStyle = t24
-
-			local t25 = {
-				Color = Color3.fromRGB(0, 0, 0)
-			}
-			local n12 = 0.5
-
-			t25.Transparency = p31.textTransparency:map(function(p38) -- line: 113
-				-- upvalues: n12 (copy)
-				if n12 == nil then
-					return 1
-				end
-
-				local v287 = n12
-
-				return v287 + p38 * (1 - v287)
-			end)
-			t25.Thickness = v191.Stroke.Thin
-			t23.stroke = t25
-			t19.ReasoningText = createElement10(FoundationText, t23)
-			v230 = createElement8(View2, t17, t19)
-		else
-			v230 = nil
-		end
-
-		t16.DropdownMenu = v230
-		v204 = createElement(View, t15, t16)
+				textStyle = {
+					Color3 = v2.Color.Content.Default.Color3,
+					Transparency = setTransparency(v2.Color.Content.Default.Transparency, props.textTransparency) -- inferred equivalent call
+				},
+				stroke = {
+					Color = Color3.fromRGB(0, 0, 0),
+					Transparency = setTransparency(0.5, props.textTransparency), -- inferred equivalent call
+					Thickness = v2.Stroke.Thin
+				}
+			})
+		})
 	end
 
-	return v204
+	return (createElement(view, v7, {
+		UIPadding = uiPadding,
+		TranslatedTextMessage = translatedTextMessage,
+		RewriteLabelWithButton = rewriteLabelWithButton,
+		DropdownMenu = dropdownMenu
+	}))
 end
-local function areEqual(p39, p40) -- line: 812
-	-- upvalues: FFlagExpChatFixLocalUserVerifiedBadge (copy), FFlagEnableInExpChatRewrite (copy), FFlagExpChatRewriteInline (copy), FFlagEnableInExpChatSummaryOnLua (copy), FFlagExpChatPresetChatEnabled (copy)
-	local v233 = false
 
-	if p39.message.text == p40.message.text then
-		v233 = false
+local function areEqual(data, data2)
+	local v2
 
-		if p39.message.prefixText == p40.message.prefixText then
-			v233 = false
-
-			if p39.message.translation == p40.message.translation then
-				v233 = false
-
-				if p39.message.useTranslation == p40.message.useTranslation then
-					v233 = false
-
-					if p39.message.messageId == p40.message.messageId then
-						v233 = not FFlagExpChatFixLocalUserVerifiedBadge or p39.message.userId == p40.message.userId and p39.isUserVerified == p40.isUserVerified
-
-						if v233 then
-							v233 = false
-
-							if p39.chatWindowSettings == p40.chatWindowSettings then
-								v233 = not FFlagEnableInExpChatRewrite or p39.message.wasRewritten == p40.message.wasRewritten and p39.message.originalText == p40.message.originalText
-
-								if v233 then
-									v233 = not FFlagExpChatRewriteInline or p39.chatWindowTransparencyBindable == p40.chatWindowTransparencyBindable
-
-									if v233 then
-										v233 = not FFlagEnableInExpChatSummaryOnLua or p39.message.chatActionType == p40.message.chatActionType
-
-										if v233 then
-											if FFlagExpChatPresetChatEnabled then
-												return p39.message.presetId == p40.message.presetId
-											end
-
-											v233 = true
-										end
-									end
-								end
-							end
-						end
-					end
-				end
+	if
+		data.message.text == data2.message.text
+		and data.message.prefixText == data2.message.prefixText
+		and data.message.translation == data2.message.translation
+		and data.message.useTranslation == data2.message.useTranslation
+		and data.message.messageId == data2.message.messageId
+	then
+		if FFlagExpChatFixLocalUserVerifiedBadge then
+			if data.message.userId == data2.message.userId then
+				v2 = data.isUserVerified == data2.isUserVerified
+			else
+				v2 = false
 			end
+		else
+			v2 = true
+		end
+
+		if not v2 then
+			return v2
+		end
+
+		if data.chatWindowSettings == data2.chatWindowSettings then
+			local v3
+
+			if FFlagEnableInExpChatRewrite then
+				if data.message.wasRewritten == data2.message.wasRewritten then
+					v3 = data.message.originalText == data2.message.originalText
+				else
+					v3 = false
+				end
+			else
+				v3 = true
+			end
+
+			v2 = v3
+				and (not FFlagExpChatRewriteInline or data.chatWindowTransparencyBindable == data2.chatWindowTransparencyBindable)
+				and (not FFlagEnableInExpChatSummaryOnLua or data.message.chatActionType == data2.message.chatActionType)
+
+			if not v2 then
+				return v2
+			end
+
+			if FFlagExpChatPresetChatEnabled then
+				return data.message.presetId == data2.message.presetId
+			end
+
+			v2 = true
+			return true
 		end
 	end
 
-	return v233
+	v2 = false
+	return false
 end
 
 return React.memo(TranslatedTextMessageWrapper, areEqual)

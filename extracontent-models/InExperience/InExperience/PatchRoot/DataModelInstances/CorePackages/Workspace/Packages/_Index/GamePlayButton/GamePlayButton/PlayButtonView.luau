@@ -1,293 +1,569 @@
-local Parent = script:FindFirstAncestor("GamePlayButton").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("GamePlayButton").Parent
+
+local CollectionService = game:GetService("CollectionService")
+
+local React = require(parent.React)
+
+local UIBlox = require(parent.UIBlox)
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local ComboButton = UIBlox.App.Button.ComboButton
 local Images = UIBlox.App.ImageSet.Images
 local MenuDirection = UIBlox.App.Menu.MenuDirection
-local Foundation = require(Parent.Foundation)
-local Button2 = Foundation.Button
+
+local Foundation = require(parent.Foundation)
+local button = Foundation.Button
 local IconButton = Foundation.IconButton
 local Skeleton = Foundation.Skeleton
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 local InputSize = Foundation.Enums.InputSize
-local EnumsRadius = Foundation.Enums.Radius
+local Radius = Foundation.Enums.Radius
 
-require(Parent.GameProductInfoRodux)
-
+require(parent.GameProductInfoRodux)
 local PlayButtonStates = require(script.Parent.PlayButtonStates)
-local SharedFlags = require(Parent.SharedFlags)
+local EarlyAccessPlusTooltip = require(script.Parent.EarlyAccess.EarlyAccessPlusTooltip)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppPlayButtonPrivatePT = SharedFlags.FFlagLuaAppPlayButtonPrivatePT
 local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local FFlagLuaAppUnifyPlayButtonAllSurfacesIxp = SharedFlags.FFlagLuaAppUnifyPlayButtonAllSurfacesIxp
 local FFlagLuaAppJoinTextPlayableButton = SharedFlags.FFlagLuaAppJoinTextPlayableButton
 local FFlagLuaAppIconPlayButton = SharedFlags.FFlagLuaAppIconPlayButton
 local FFlagLuaAppPlayButtonLoadingSkeleton = SharedFlags.FFlagLuaAppPlayButtonLoadingSkeleton
-local FFlagUpdateActionNeededPlayButtonUi = SharedFlags.FFlagUpdateActionNeededPlayButtonUi
 local FFlagLuaAppUnifiedPlayButtonSquadMenuDirection = SharedFlags.FFlagLuaAppUnifiedPlayButtonSquadMenuDirection
 local GetFFlagUIBloxUseFoundationButton = SharedFlags.UIBlox.GetFFlagUIBloxUseFoundationButton
 local FFlagLuaAppPlayButtonOptOutFoundationButton = SharedFlags.FFlagLuaAppPlayButtonOptOutFoundationButton
-local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
+local FFlagLuaAppMediaGalleryGamepadSupport = SharedFlags.FFlagLuaAppMediaGalleryGamepadSupport
 local FFlagLuaAppTextOnlyPlayButton = SharedFlags.FFlagLuaAppTextOnlyPlayButton
 local FFlagLuaAppIconTextPlayButton = SharedFlags.FFlagLuaAppIconTextPlayButton
 local FFlagLuaAppUpdatePlayButtonText = SharedFlags.FFlagLuaAppUpdatePlayButtonText
 local FFlagLuaAppUseTokenHeightForPlayButton = SharedFlags.FFlagLuaAppUseTokenHeightForPlayButton
-local FFlagLuaAppDemoModePlayButton = SharedFlags.FFlagLuaAppDemoModePlayButton
-local v34 = if not FFlagLuaAppIconPlayButton then nil else "play-xlarge"
-local v35 = Images["icons/common/play"]
-local v36 = Images["icons/actions/truncationCollapse"]
-local v37 = Images["icons/actions/truncationExpand"]
+local FFlagEnableGameJoinEarlyAccess = SharedFlags.FFlagEnableGameJoinEarlyAccess
+local v = FFlagLuaAppIconPlayButton and "play-xlarge" or nil
+local iconscommonplay = Images["icons/common/play"]
+local iconsactionstruncationCollapse = Images["icons/actions/truncationCollapse"]
+local iconsactionstruncationExpand = Images["icons/actions/truncationExpand"]
 
-local function v38() -- line: 56
-end
+local function fn() end
 
-local v39 = if not FFlagLuaAppDemoModePlayButton then {
-	[InputSize.XSmall] = "Size_600",
-	[InputSize.Small] = "Size_800",
-	[InputSize.Medium] = "Size_1000",
-	[InputSize.Large] = "Size_1200"
-} else require(script.Parent.ButtonHeightSizeKeyByInputSize)
+local ButtonHeightSizeKeyByInputSize = require(script.Parent.ButtonHeightSizeKeyByInputSize)
 
-local function PlayButtonView(t1: {[any]: any}) -- line: 112
-	-- upvalues: InputSize (copy), FFlagLuaAppUseTokenHeightForPlayButton (copy), v39 (copy), FillBehavior (copy), PlayButtonStates (copy), FFlagLuaAppPlayButtonLoadingSkeleton (copy), FFlagLuaAppUnifyPlayButtonAllSurfacesIxp (copy), React (copy), Skeleton (copy), EnumsRadius (copy), ButtonVariant (copy), FFlagLuaAppIconTextPlayButton (copy), FFlagLuaAppTextOnlyPlayButton (copy), FFlagLuaAppJoinTextPlayableButton (copy), FFlagLuaAppUpdatePlayButtonText (copy), v34 (copy), FFlagLuaAppIconPlayButton (copy), GetFFlagIsSquadEnabled (copy), v35 (copy), FFlagLuaAppDemoModePlayButton (copy), FFlagUpdateActionNeededPlayButtonUi (copy), ComboButton (copy), FFlagLuaAppUnifiedPlayButtonSquadMenuDirection (copy), MenuDirection (copy), v37 (copy), v36 (copy), ButtonType (copy), Images (copy), Button (copy), v38 (copy), GetFFlagUIBloxUseFoundationButton (copy), FFlagLuaAppPlayButtonOptOutFoundationButton (copy), IconButton (copy), Button2 (copy), FFlagSduiExperienceDetailsSupport (copy)
-	local tokens = t1.tokens
-	local playButtonState = t1.playButtonState
-	local localized = t1.localized
-	local v45 = false
-	local v46 = false
-	local v47 = false
-	local v48 = t1.buttonSize or InputSize.Medium
-	local v49 = nil
+local function PlayButtonView(props)
+	local tokens = props.tokens
+	local playButtonState = props.playButtonState
+	local localized = props.localized
 
-	if FFlagLuaAppUseTokenHeightForPlayButton then
-		local v50 = v39[v48] or "Size_1000"
+	local earlyAccessTooltip = nil
 
-		v49 = (not tokens or not tokens.Size[v50]) and 40 or tokens.Size[v50]
+	local onActivated = props.onPlayButtonActivated
+	local v2, ref
+
+	if FFlagEnableGameJoinEarlyAccess then
+		v2 = props.showEarlyAccessTooltip == true
+		local state, setState = React.useState(v2)
+		ref = React.useRef(nil)
+
+		if v2 then
+			earlyAccessTooltip = React.createElement(EarlyAccessPlusTooltip, {
+				isOpen = state,
+				onRequestClose = function()
+					setState(false)
+				end,
+				anchorRef = ref
+			})
+
+			onActivated = function()
+				setState(false)
+				props.onPlayButtonActivated()
+			end
+		end
+	else
+		v2 = false
 	end
 
-	local v51 = if not t1.width then t1.fillBehavior else FillBehavior.Fill
-	local Emphasis = nil
-	local v53 = nil
-	local v54 = nil
-	local v55 = nil
-	local v56 = nil
+	local ref3
+
+	if FFlagLuaAppMediaGalleryGamepadSupport then
+		local tag = props.tag
+		local playButtonCaptureRef = props.playButtonCaptureRef
+		local ref2 = React.useRef(nil)
+		ref3 = React.useCallback(function(current)
+			local current2 = ref2.current
+
+			if current2 ~= nil and current2 ~= current and tag ~= nil then
+				CollectionService:RemoveTag(current2, tag)
+			end
+
+			ref2.current = current
+
+			if tag ~= nil and current ~= nil then
+				CollectionService:AddTag(current, tag)
+			end
+
+			if type(playButtonCaptureRef) == "function" then
+				playButtonCaptureRef(current)
+			elseif playButtonCaptureRef ~= nil then
+				playButtonCaptureRef.current = current
+			end
+		end, { tag, playButtonCaptureRef })
+	end
+
+	local flag = false
+	local isDisabled = false
+	local flag2 = false
+	local buttonSize = props.buttonSize or InputSize.Medium
+	local v3
+
+	if FFlagLuaAppUseTokenHeightForPlayButton then
+		local v4 = ButtonHeightSizeKeyByInputSize[buttonSize] or "Size_1000"
+		v3 = not (tokens and tokens.Size[v4]) and 40 or tokens.Size[v4]
+	end
+
+	local fillBehavior
+
+	if props.width then
+		fillBehavior = FillBehavior.Fill
+	else
+		fillBehavior = props.fillBehavior
+	end
+
+	local variant = nil
+	local icon = nil
+	local text = nil
+	local v4 = nil
+	local udim = nil
+
+	local v5 = FFlagEnableGameJoinEarlyAccess
+
+	if v5 then
+		if playButtonState == PlayButtonStates.EarlyAccessLocked then
+			v5 = props.earlyAccessPending == true
+		else
+			v5 = false
+		end
+	end
 
 	if playButtonState == PlayButtonStates.Loading then
-		if t1.hideIfLoading then
+		if props.hideIfLoading then
 			return nil
 		end
 
-		if FFlagLuaAppPlayButtonLoadingSkeleton and (not t1.useUIBloxButton and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or t1.hasPlayButtonLoadingSkeletonIxp)) then
-			local v57
+		if
+			FFlagLuaAppPlayButtonLoadingSkeleton
+			and not props.useUIBloxButton
+			and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or props.hasPlayButtonLoadingSkeletonIxp)
+		then
+			local v6
 
 			if FFlagLuaAppUseTokenHeightForPlayButton then
-				v57 = v49
+				v6 = v3
 			else
-				local v58 = v39[v48] or "Size_1000"
-
-				v57 = tokens and tokens.Size[v58]
+				local v7 = ButtonHeightSizeKeyByInputSize[buttonSize] or "Size_1000"
+				v6 = tokens and tokens.Size[v7]
 			end
 
-			v56 = if v51 ~= "Fill" then UDim.new(0, v57) else UDim.new(1, 0)
+			if fillBehavior == "Fill" then
+				udim = UDim.new(1, 0)
+			else
+				udim = UDim.new(0, v6)
+			end
 
-			local uDim2 = UDim2.new(v56, UDim.new(0, v57))
-			local v60 = FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or (t1.shouldLaunchWhenLoading or t1.shouldLaunchOnReleaseAfterUnmount)
-			local v61 = React.createElement(Skeleton, {
-				ZIndex = 2,
-				Size = if not v60 then uDim2 else UDim2.fromScale(1, 1),
-				radius = EnumsRadius.Medium
-			})
+			local udim2 = UDim2.new(udim, UDim.new(0, v6))
 
-			v55 = if not v60 then v61 else React.createElement("TextButton", {
-				Size = uDim2,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Text = "",
-				AutoButtonColor = false,
-				ZIndex = 2,
-				ref = t1.loadingCaptureRef,
-				[React.Event.Activated] = t1.onPlayButtonActivated
-			}, {
-				Skeleton = v61
-			})
-			v47 = true
+			local v7 = FFlagLuaAppUnifyPlayButtonAllSurfacesIxp
+				or props.shouldLaunchWhenLoading
+				or props.shouldLaunchOnReleaseAfterUnmount
+
+			local createElement = React.createElement
+			local size
+
+			if v7 then
+				size = UDim2.fromScale(1, 1)
+			else
+				size = udim2
+			end
+
+			v4 = createElement(Skeleton, { Size = size, radius = Radius.Medium, ZIndex = 2 })
+
+			if v7 then
+				v4 = React.createElement("TextButton", {
+					Size = udim2,
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Text = "",
+					AutoButtonColor = false,
+					ZIndex = 2,
+					ref = props.loadingCaptureRef,
+					[React.Event.Activated] = props.onPlayButtonActivated
+				}, { Skeleton = v4 })
+			end
+
+			flag2 = true
 		end
 
-		Emphasis = ButtonVariant.Emphasis
+		variant = ButtonVariant.Emphasis
 	elseif playButtonState == PlayButtonStates.Playable then
-		Emphasis = ButtonVariant.Emphasis
+		variant = ButtonVariant.Emphasis
 
-		if FFlagLuaAppIconTextPlayButton or (FFlagLuaAppTextOnlyPlayButton or FFlagLuaAppJoinTextPlayableButton and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or t1.hasJoinTextPlayableButtonIxp)) then
-			v54 = t1.playableText or if not FFlagLuaAppUpdatePlayButtonText then localized.join else localized.play
+		if
+			FFlagLuaAppIconTextPlayButton
+			or FFlagLuaAppTextOnlyPlayButton
+			or FFlagLuaAppJoinTextPlayableButton
+			and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or props.hasJoinTextPlayableButtonIxp)
+		then
+			text = props.playableText
 
-			if FFlagLuaAppIconTextPlayButton and not t1.hidePlayableIcon then
-				v53 = v34
+			if not text then
+				if FFlagLuaAppUpdatePlayButtonText then
+					text = localized.play
+				else
+					text = localized.join
+				end
+			end
+
+			if FFlagLuaAppIconTextPlayButton and not props.hidePlayableIcon then
+				icon = v
 			end
 		else
-			if not FFlagLuaAppIconPlayButton and not t1.hidePlayableIcon then
-				v53 = "icons/common/play"
-			end
+			icon = not (FFlagLuaAppIconPlayButton or props.hidePlayableIcon) and "icons/common/play" or icon
 
-			v54 = t1.playableText
+			text = props.playableText
 
-			if FFlagLuaAppIconPlayButton and not t1.hidePlayableIcon then
-				v53 = if not v54 or v54 == "" then v34 else "icons/common/play"
+			if FFlagLuaAppIconPlayButton and not props.hidePlayableIcon then
+				if text and text ~= "" then
+					icon = "icons/common/play"
+				else
+					icon = v
+				end
 			end
 		end
 	elseif GetFFlagIsSquadEnabled() and playButtonState == PlayButtonStates.PlayableWithParty then
-		v53 = v35
-		v54 = if not t1.hideOptionalText then localized.joinWithParty else nil
-		v45 = true
-	elseif GetFFlagIsSquadEnabled() and playButtonState == PlayButtonStates.WaitingForParty then
-		v53 = v35
-		v54 = if not t1.hideOptionalText then localized.waitingForParty else nil
-		v47 = true
-		v46 = true
-		v45 = true
-	elseif playButtonState == PlayButtonStates.PaidAccess then
-		v54 = tostring(t1.gameProductInfo and t1.gameProductInfo.price or 0)
-		Emphasis = ButtonVariant.Emphasis
-		v53 = "icons/common/robux"
-	elseif playButtonState == PlayButtonStates.FiatPaidAccess then
-		Emphasis = ButtonVariant.Emphasis
+		icon = iconscommonplay
 
-		local v62 = t1.gameProductInfo and t1.gameProductInfo.localizedFiatPrice or ""
-
-		v54 = t1.fiatText or v62
-	elseif FFlagLuaAppDemoModePlayButton and playButtonState == PlayButtonStates.DemoMode then
-		Emphasis = ButtonVariant.SubEmphasis
-		v54 = localized.playDemo
-	elseif playButtonState == PlayButtonStates.ActionNeeded then
-		if FFlagUpdateActionNeededPlayButtonUi then
-			Emphasis = ButtonVariant.Emphasis
-			v54 = localized.unlock
-		else
-			Emphasis = ButtonVariant.SubEmphasis
-			v53 = "icons/status/private"
-			v54 = if not t1.hideOptionalText then localized.join else nil
+		if not props.hideOptionalText then
+			text = localized.joinWithParty
 		end
+
+		flag = true
+	elseif GetFFlagIsSquadEnabled() and playButtonState == PlayButtonStates.WaitingForParty then
+		icon = iconscommonplay
+
+		if not props.hideOptionalText then
+			text = localized.waitingForParty
+		end
+
+		flag = true
+		flag2 = true
+		isDisabled = true
+	elseif playButtonState == PlayButtonStates.PaidAccess then
+		text = tostring(props.gameProductInfo and props.gameProductInfo.price or 0)
+		variant = ButtonVariant.Emphasis
+		icon = "icons/common/robux"
+	elseif playButtonState == PlayButtonStates.FiatPaidAccess then
+		variant = ButtonVariant.Emphasis
+		local localizedFiatPrice = props.gameProductInfo and props.gameProductInfo.localizedFiatPrice or ""
+		text = props.fiatText or localizedFiatPrice
+	elseif playButtonState == PlayButtonStates.DemoMode then
+		variant = ButtonVariant.SubEmphasis
+		text = localized.playDemo
+	elseif FFlagLuaAppPlayButtonPrivatePT and playButtonState == PlayButtonStates.Playtest then
+		variant = ButtonVariant.SubEmphasis
+		text = localized.playtest
+	elseif playButtonState == PlayButtonStates.ActionNeeded then
+		variant = ButtonVariant.Emphasis
+		text = localized.unlock
 	elseif playButtonState == PlayButtonStates.UnplayableOther then
-		if t1.hideIfUnplayable then
+		if props.hideIfUnplayable then
 			return nil
 		end
 
-		Emphasis = ButtonVariant.Subtle
-		v53 = "icons/status/unavailable"
-		v54 = if not t1.hideOptionalText then localized.unavailable else nil
-		v47 = true
+		variant = ButtonVariant.Subtle
+		icon = "icons/status/unavailable"
+
+		if not props.hideOptionalText then
+			text = localized.unavailable
+		end
+
+		flag2 = true
+	elseif FFlagEnableGameJoinEarlyAccess and playButtonState == PlayButtonStates.EarlyAccessLocked then
+		variant = ButtonVariant.Subtle
+
+		if not v5 then
+			text = props.earlyAccessCaption or localized.earlyAccess
+		end
+
+		flag2 = true
 	else
 		error("invalid play button state!")
 	end
 
-	local v64
+	local playButton
 
-	if v45 then
+	if flag then
 		if not FFlagLuaAppUseTokenHeightForPlayButton then
-			local v63 = v39[v48] or "Size_1000"
-
-			v49 = (not tokens or not tokens.Size[v63]) and 40 or tokens.Size[v63]
+			local v6 = ButtonHeightSizeKeyByInputSize[buttonSize] or "Size_1000"
+			v3 = not (tokens and tokens.Size[v6]) and 40 or tokens.Size[v6]
 		end
 
-		v64 = React.createElement(ComboButton, {
-			size = UDim2.new(1, 0, 0, v49),
+		local createElement = React.createElement
+		local v6 = {
+			size = UDim2.new(1, 0, 0, v3),
 			button = {
-				icon = v53,
-				text = v54,
-				isDisabled = v47,
-				onActivated = v47 and function() -- line: 274
-				end or t1.onPlayButtonActivated
+				icon = icon,
+				text = text,
+				isDisabled = flag2,
+				onActivated = flag2 and function() end or onActivated
 			},
-			overflow = {
-				icon = if not FFlagLuaAppUnifiedPlayButtonSquadMenuDirection or t1.squadButtonMenuDirection ~= MenuDirection.Down then v36 else v37,
-				isDisabled = v46,
-				onActivated = v46 and function() -- line: 282
-				end or t1.onPlaySquadButtonActivated
-			},
-			testId = t1.testId
-		})
-	elseif t1.useUIBloxButton then
+			overflow = 0,
+			testId = 0
+		}
+		local icon2
+
+		if FFlagLuaAppUnifiedPlayButtonSquadMenuDirection and props.squadButtonMenuDirection == MenuDirection.Down then
+			icon2 = iconsactionstruncationExpand
+		else
+			icon2 = iconsactionstruncationCollapse
+		end
+
+		v6.overflow = {
+			icon = icon2,
+			isDisabled = isDisabled,
+			onActivated = isDisabled and function() end or props.onPlaySquadButtonActivated
+		}
+
+		v6.testId = props.testId
+		playButton = createElement(ComboButton, v6)
+	elseif props.useUIBloxButton then
 		if not FFlagLuaAppUseTokenHeightForPlayButton then
-			local v65 = v39[v48] or "Size_1000"
-
-			v49 = (not tokens or not tokens.Size[v65]) and 40 or tokens.Size[v65]
+			local v6 = ButtonHeightSizeKeyByInputSize[buttonSize] or "Size_1000"
+			v3 = not (tokens and tokens.Size[v6]) and 40 or tokens.Size[v6]
 		end
 
-		local v66 = v51 == "Fit"
-		local v67 = if not v66 then UDim2.new(1, 0, 0, v49) else UDim2.new(0, 0, 0, v49)
-		local v68 = playButtonState == PlayButtonStates.Loading
-		local v69 = if Emphasis ~= ButtonVariant.SubEmphasis then if Emphasis ~= ButtonVariant.Subtle then ButtonType.PrimaryContextual else ButtonType.Secondary else ButtonType.PrimarySystem
-		local v70 = if v53 ~= v34 then v53 else v35
+		local fitContent = fillBehavior == "Fit"
+		local udim2
 
-		if type(v70) == "string" then
-			v70 = Images[v70]
+		if fitContent then
+			udim2 = UDim2.new(0, 0, 0, v3)
+		else
+			udim2 = UDim2.new(1, 0, 0, v3)
 		end
 
-		v64 = React.createElement(Button, {
-			size = v67,
-			fitContent = v66,
-			buttonType = v69,
-			icon = v70,
-			text = v54,
-			isLoading = v68,
-			isDisabled = v47 or v68,
-			userInteractionEnabled = not (v47 or v68),
-			onActivated = if v47 or v68 then v38 else t1.onPlayButtonActivated,
-			ref = t1.playButtonCaptureRef,
-			[React.Tag] = if not t1.testId then nil else `data-testid={ t1.testId }`,
-			DO_NOT_USE_useUIBloxButton = GetFFlagUIBloxUseFoundationButton() and true or (not not FFlagLuaAppPlayButtonOptOutFoundationButton or nil)
-		})
+		local v6 = playButtonState == PlayButtonStates.Loading
+		local buttonType
 
-		if (FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or t1.shouldLaunchWhenLoading or t1.shouldLaunchOnReleaseAfterUnmount) and v68 then
-			v55 = React.createElement("TextButton", {
-				Size = v67,
+		if variant == ButtonVariant.SubEmphasis then
+			buttonType = ButtonType.PrimarySystem
+		elseif variant == ButtonVariant.Subtle then
+			buttonType = ButtonType.Secondary
+		else
+			buttonType = ButtonType.PrimaryContextual
+		end
+
+		if icon == v then
+			icon = iconscommonplay
+		end
+
+		if type(icon) == "string" then
+			icon = Images[icon]
+		end
+
+		local createElement = React.createElement
+		local v7 = {}
+		v7.size = udim2
+		v7.fitContent = fitContent
+		v7.buttonType = buttonType
+		v7.icon = icon
+		v7.text = text
+		v7.isLoading = v6 or v5
+		v7.isDisabled = flag2 or v6
+		v7.userInteractionEnabled = not (flag2 or v6)
+
+		if flag2 or v6 then
+			onActivated = fn
+		end
+
+		v7.onActivated = onActivated
+
+		if not FFlagLuaAppMediaGalleryGamepadSupport then
+			ref3 = props.playButtonCaptureRef
+		end
+
+		v7.ref = ref3
+		local tag = React.Tag
+		local v8
+
+		if props.testId then
+			v8 = `data-testid={props.testId}`
+		end
+
+		v7[tag] = v8
+		v7.DO_NOT_USE_useUIBloxButton = (GetFFlagUIBloxUseFoundationButton() or FFlagLuaAppPlayButtonOptOutFoundationButton)
+			and true
+			or nil
+		playButton = createElement(Button, v7)
+
+		if
+			(FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or props.shouldLaunchWhenLoading or props.shouldLaunchOnReleaseAfterUnmount)
+			and v6
+		then
+			v4 = React.createElement("TextButton", {
+				Size = udim2,
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Text = "",
 				AutoButtonColor = false,
 				ZIndex = 2,
-				ref = t1.loadingCaptureRef,
-				[React.Event.Activated] = t1.onPlayButtonActivated
+				ref = props.loadingCaptureRef,
+				[React.Event.Activated] = props.onPlayButtonActivated
 			})
 		end
 	else
-		local v71 = if not FFlagLuaAppIconPlayButton then nil else (v54 == nil or v54 == "") and v53 ~= nil
+		local v6
 
-		v64 = if not FFlagLuaAppIconPlayButton or (FFlagLuaAppUnifyPlayButtonAllSurfacesIxp and not t1.hasIconPlayButtonIxp or not v71) then React.createElement(Button2, {
-			icon = v53,
-			text = v54,
-			variant = Emphasis,
-			size = v48,
-			width = if not FFlagLuaAppPlayButtonLoadingSkeleton or playButtonState ~= PlayButtonStates.Loading then nil else v56,
-			fillBehavior = v51,
-			isDisabled = v47,
-			onActivated = if v47 then v38 else t1.onPlayButtonActivated,
-			ref = t1.playButtonCaptureRef,
-			testId = t1.testId
-		}) else React.createElement(IconButton, {
-			icon = v53,
-			variant = Emphasis,
-			size = v48,
-			width = if not FFlagLuaAppPlayButtonLoadingSkeleton or playButtonState ~= PlayButtonStates.Loading then nil else v56,
-			fillBehavior = v51,
-			isDisabled = v47,
-			onActivated = if v47 then v38 else t1.onPlayButtonActivated,
-			ref = t1.playButtonCaptureRef,
-			testId = t1.testId
-		})
+		if FFlagLuaAppIconPlayButton then
+			if text == nil or text == "" then
+				v6 = icon ~= nil
+			else
+				v6 = false
+			end
+		end
+
+		if
+			FFlagLuaAppIconPlayButton
+			and (not FFlagLuaAppUnifyPlayButtonAllSurfacesIxp or props.hasIconPlayButtonIxp)
+			and v6
+		then
+			local createElement = React.createElement
+
+			if not FFlagLuaAppPlayButtonLoadingSkeleton or playButtonState ~= PlayButtonStates.Loading then
+				udim = nil
+			end
+
+			if flag2 then
+				onActivated = fn
+			end
+
+			if not FFlagLuaAppMediaGalleryGamepadSupport then
+				ref3 = props.playButtonCaptureRef
+			end
+
+			playButton = createElement(IconButton, {
+				icon = icon,
+				variant = variant,
+				size = buttonSize,
+				width = udim,
+				fillBehavior = fillBehavior,
+				isDisabled = flag2,
+				onActivated = onActivated,
+				ref = ref3,
+				testId = props.testId
+			})
+		else
+			local createElement = React.createElement
+
+			if not FFlagLuaAppPlayButtonLoadingSkeleton or playButtonState ~= PlayButtonStates.Loading then
+				udim = nil
+			end
+
+			local v7 = {
+				icon = icon,
+				text = text,
+				variant = variant,
+				size = buttonSize,
+				width = udim,
+				fillBehavior = fillBehavior,
+				isLoading = v5 and true or nil,
+				isDisabled = flag2,
+				onActivated = nil,
+				ref = 0,
+				testId = 0
+			}
+
+			if flag2 then
+				onActivated = fn
+			end
+
+			v7.onActivated = onActivated
+
+			if not FFlagLuaAppMediaGalleryGamepadSupport then
+				ref3 = props.playButtonCaptureRef
+			end
+
+			v7.ref = ref3
+			v7.testId = props.testId
+			playButton = createElement(button, v7)
+		end
 	end
 
-	return React.createElement("Frame", {
-		LayoutOrder = t1.LayoutOrder,
-		Position = t1.Position,
-		Size = if not FFlagLuaAppUseTokenHeightForPlayButton then if not t1.width then if v51 ~= "Fill" then nil else UDim2.new(1, 0, 1, 0) else UDim2.new(t1.width, UDim.new(0, 0)) else UDim2.new(if not t1.width then if v51 ~= "Fill" then UDim.new(0, 0) else UDim.new(1, 0) else t1.width, UDim.new(0, v49)),
-		AutomaticSize = if not FFlagLuaAppUseTokenHeightForPlayButton then if v51 ~= "Fill" then Enum.AutomaticSize.XY else Enum.AutomaticSize.Y else if v51 ~= "Fill" then Enum.AutomaticSize.X else nil,
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		[React.Tag] = if not FFlagSduiExperienceDetailsSupport then nil else t1.tag
-	}, {
-		LoadingSkeleton = if playButtonState ~= PlayButtonStates.Loading then nil else v55,
-		PlayButton = v64
+	local createElement = React.createElement
+
+	if not (FFlagEnableGameJoinEarlyAccess and v2) then
+		ref = nil
+	end
+
+	local v6 = {}
+	v6.ref = ref
+	v6.LayoutOrder = props.LayoutOrder
+	v6.Position = props.Position
+	local udim2
+
+	if FFlagLuaAppUseTokenHeightForPlayButton then
+		local v7
+
+		if props.width then
+			v7 = props.width
+		elseif fillBehavior == "Fill" then
+			v7 = UDim.new(1, 0)
+		else
+			v7 = UDim.new(0, 0)
+		end
+
+		udim2 = UDim2.new(v7, UDim.new(0, v3))
+	elseif props.width then
+		udim2 = UDim2.new(props.width, UDim.new(0, 0))
+	elseif fillBehavior == "Fill" then
+		udim2 = UDim2.new(1, 0, 1, 0)
+	end
+
+	v6.Size = udim2
+	local automaticSize
+
+	if FFlagLuaAppUseTokenHeightForPlayButton then
+		if fillBehavior ~= "Fill" then
+			automaticSize = Enum.AutomaticSize.X
+		end
+	elseif fillBehavior == "Fill" then
+		automaticSize = Enum.AutomaticSize.Y
+	else
+		automaticSize = Enum.AutomaticSize.XY
+	end
+
+	v6.AutomaticSize = automaticSize
+
+	v6.BackgroundTransparency = 1
+	v6.BorderSizePixel = 0
+	local tag = React.Tag
+	local v7
+
+	if not FFlagLuaAppMediaGalleryGamepadSupport then
+		v7 = props.tag
+	end
+
+	v6[tag] = v7
+
+	if playButtonState ~= PlayButtonStates.Loading then
+		v4 = nil
+	end
+
+	if not FFlagEnableGameJoinEarlyAccess then
+		earlyAccessTooltip = nil
+	end
+
+	return createElement("Frame", v6, {
+		LoadingSkeleton = v4,
+		PlayButton = playButton,
+		EarlyAccessTooltip = earlyAccessTooltip
 	})
 end
 

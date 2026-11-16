@@ -1,7 +1,6 @@
-local function isPluginElevated(p1) -- line: 5
-	return (pcall(function() -- line: 6
-		-- upvalues: p1 (copy)
-		return p1:GetPluginComponent("Panels")
+local function isPluginElevated(object)
+	return (pcall(function()
+		return object:GetPluginComponent("Panels")
 	end))
 end
 

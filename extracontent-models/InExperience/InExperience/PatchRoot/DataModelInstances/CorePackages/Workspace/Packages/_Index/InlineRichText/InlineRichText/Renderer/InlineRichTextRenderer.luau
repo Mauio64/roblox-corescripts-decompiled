@@ -1,13 +1,16 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
-local v3 = require(InlineRichText.Logger):new(script.Name)
-local Cryo = require(InlineRichTextParent.Cryo)
-local Foundation = require(InlineRichTextParent.Foundation)
-local React = require(InlineRichTextParent.React)
+local parent = InlineRichText.Parent
+local Logger = require(InlineRichText.Logger)
+local v = Logger:new(script.Name)
 
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 require(InlineRichText.Types)
 
-local InlineLayout = require(InlineRichTextParent.InlineLayout).Components.InlineLayout
+local InlineLayout = require(parent.InlineLayout)
+local inlineLayout = InlineLayout.Components.InlineLayout
+
 local NodeType = require(InlineRichText.Enums.NodeType)
 local parseXml = require(InlineRichText.Parser.parseXml)
 local processChildren = require(InlineRichText.Renderer.processChildren)
@@ -20,126 +23,133 @@ local LinkType = require(InlineRichText.Enums.LinkType)
 local LinkBehavior = require(InlineRichText.Enums.LinkBehavior)
 local getLinkType = require(InlineRichText.Linker.getLinkType)
 
-local function createDefaultRootNode(s1: string) -- line: 49
-	-- upvalues: NodeType (copy)
+local function createDefaultRootNode(text: string)
 	return {
 		name = "ROOT",
 		text = "",
-		index = 0,
 		type = NodeType.Root,
-		children = {{
-			name = "TEXT",
-			text = "",
-			index = 1,
-			type = NodeType.InlineCustom,
-			children = {{
-				name = "PLAINTEXT",
-				index = 2,
-				text = s1,
-				type = NodeType.Plaintext,
-				children = {},
-				attributes = {}
-			}},
-			attributes = {}
-		}},
-		attributes = {}
+		children = {
+			{
+				name = "TEXT",
+				text = "",
+				type = NodeType.InlineCustom,
+				children = {
+					{
+						name = "PLAINTEXT",
+						text = text,
+						type = NodeType.Plaintext,
+						children = {},
+						attributes = {},
+						index = 2
+					}
+				},
+				attributes = {},
+				index = 1
+			}
+		},
+		attributes = {},
+		index = 0
 	}
 end
 
-local t1 = {
-	TEXT_SPAN = TextSpanRenderer,
+local v2 = {
+	["TEXT_SPAN"] = TextSpanRenderer,
 	LINK = LinkRenderer,
 	ICON = IconRenderer,
 	BREAK = HardbreakRenderer
 }
-local t2 = {
+
+local v3 = {
 	[LinkType.Http] = LinkBehavior.Webview,
 	[LinkType.LinkingProtocolRegistered] = LinkBehavior.LinkingProtocol,
 	[LinkType.Default] = LinkBehavior.ErrorToast
 }
-local t3 = {
+
+local v4 = {
+	evaluateLinkBehavior = function(_: string, p)
+		return v3[p] or LinkBehavior.ErrorToast
+	end,
 	errorToastText = nil,
-	evaluateLinkBehavior = function(_: string, p1) -- line: 90
-		-- upvalues: t2 (copy), LinkBehavior (copy)
-		return t2[p1] or LinkBehavior.ErrorToast
-	end
+	onActivatedSubscriber = nil
 }
 
-local function InlineRichTextRenderer(p2) -- line: 96
-	-- upvalues: React (copy), parseXml (copy), v3 (copy), createDefaultRootNode (copy), Foundation (copy), Cryo (copy), t3 (copy), useLinkerOnActivated (copy), getLinkType (copy), t1 (copy), processChildren (copy), InlineLayout (copy)
-	local ast = p2.ast
-	local text = p2.text
-	local v30 = React.useMemo(function() -- line: 99
-		-- upvalues: ast (copy), parseXml (copy), text (copy), p2 (copy), v3 (copy), createDefaultRootNode (copy)
+local function InlineRichTextRenderer(props)
+	local ast = props.ast
+	local text = props.text
+	local v5 = React.useMemo(function()
 		if ast then
 			return ast
 		end
 
-		local v39, v40 = parseXml(text, p2.parserOptions)
+		local v5, v6 = parseXml(text, props.parserOptions)
 
-		if not v39 then
-			v3:warning(`Error parsing XML input into AST: { v40 }`)
-
-			return (createDefaultRootNode(text))
+		if v5 then
+			return v6
 		end
 
-		return v40
-	end, {
-		text,
-		ast
-	})
-	local v31 = Foundation.Hooks.useTokens()
-	local Default = v31.Color.Content.Default
-	local t4 = {
+		v:warning(`Error parsing XML input into AST: {v6}`)
+		return createDefaultRootNode(text)
+	end, { text, ast })
+
+	local tokens = Foundation.Hooks.useTokens()
+	local default = tokens.Color.Content.Default
+	local v6 = {
 		Font = Enum.Font.BuilderSans,
-		FontSize = v31.FontSize.FontSize_400,
-		LineHeight = v31.LineHeight.LineHeight_140
+		FontSize = tokens.FontSize.FontSize_400,
+		LineHeight = tokens.LineHeight.LineHeight_140
 	}
-	local v34 = Cryo.Dictionary.union(t3, p2.linkerOptions or {})
-	local v35 = useLinkerOnActivated({
-		errorToastTextOverride = v34.errorToastText
-	})
-	local v36 = React.useCallback(function(s3: string) -- line: 123
-		-- upvalues: v34 (copy), getLinkType (copy)
-		return v34.evaluateLinkBehavior(s3, getLinkType(s3))
-	end, { v34.evaluateLinkBehavior })
-	local v37 = React.useMemo(function() -- line: 128
-		-- upvalues: Cryo (copy), t1 (copy), p2 (copy), processChildren (copy), Default (copy), t4 (copy), v31 (copy), v35 (copy), v36 (copy)
+
+	local union = Cryo.Dictionary.union(v4, props.linkerOptions or {})
+	local v7 = useLinkerOnActivated({ errorToastTextOverride = union.errorToastText })
+
+	local onActivated = React.useCallback(function(p)
+		v7(p)
+
+		if union.onActivatedSubscriber then
+			local success, result = pcall(function(): boolean
+				union.onActivatedSubscriber(p)
+				return true
+			end)
+
+			if not success then
+				v:warning(`Error notifying link activation subscriber: {tostring(result)}`)
+			end
+		end
+	end, { union.onActivatedSubscriber, v7 })
+	local evaluateLinkBehavior = React.useCallback(function(p: string)
+		return union.evaluateLinkBehavior(p, getLinkType(p))
+	end, { union.evaluateLinkBehavior })
+
+	local v8 = React.useMemo(function()
 		return {
-			inlineCustomRenderers = Cryo.Dictionary.join(t1, p2.renderers or {}),
+			inlineCustomRenderers = Cryo.Dictionary.join(v2, props.renderers or {}),
 			processChildren = processChildren,
-			nodeProps = p2.nodeProps or {},
+			nodeProps = props.nodeProps or {},
 			styles = {
-				textStyle = Cryo.Dictionary.union(Default, p2.textStyle or {}),
-				fontStyle = Cryo.Dictionary.union(t4, p2.fontStyle or {})
+				textStyle = Cryo.Dictionary.union(default, props.textStyle or {}),
+				fontStyle = Cryo.Dictionary.union(v6, props.fontStyle or {})
 			},
-			tokens = v31,
-			linker = {
-				onActivated = v35,
-				evaluateLinkBehavior = v36
-			}
+			tokens = tokens,
+			linker = { onActivated = onActivated, evaluateLinkBehavior = evaluateLinkBehavior }
 		}
 	end, {
-		p2.renderers,
-		p2.nodeProps,
-		p2.textStyle,
-		p2.fontStyle,
-		v35,
-		v36
-	})
-	local v38 = React.useMemo(function() -- line: 153
-		-- upvalues: processChildren (copy), v30 (copy), v37 (copy)
-		return processChildren(v30, v37)
-	end, {
-		v30 and v30.children,
-		v37
+		props.renderers,
+		props.nodeProps,
+		props.textStyle,
+		props.fontStyle,
+		onActivated,
+		evaluateLinkBehavior
 	})
 
-	return React.createElement(Foundation.View, p2.wrapperProps, {
-		RichTextRoot = React.createElement(InlineLayout, {
-			Elements = v38,
-			HorizontalAlignment = p2.HorizontalAlignment,
-			VerticalPadding = UDim.new(0, v37.styles.fontStyle.FontSize * (v37.styles.fontStyle.LineHeight - 1) / 2)
+	local elements = React.useMemo(function()
+		return processChildren(v5, v8)
+	end, { v5 and v5.children, v8 })
+
+	return React.createElement(Foundation.View, props.wrapperProps, {
+		RichTextRoot = React.createElement(inlineLayout, {
+			Elements = elements,
+			HorizontalAlignment = props.HorizontalAlignment,
+			VerticalPadding = UDim.new(0, v8.styles.fontStyle.FontSize * (v8.styles.fontStyle.LineHeight - 1) / 2)
 		})
 	})
 end

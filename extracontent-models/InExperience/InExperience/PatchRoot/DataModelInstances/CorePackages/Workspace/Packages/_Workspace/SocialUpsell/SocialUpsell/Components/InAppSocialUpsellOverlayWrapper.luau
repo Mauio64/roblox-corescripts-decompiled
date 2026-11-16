@@ -1,37 +1,36 @@
 local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
-local SocialUpsellParent = SocialUpsell.Parent
-local Cryo = require(SocialUpsellParent.Cryo)
-local React = require(SocialUpsellParent.React)
+local parent = SocialUpsell.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+
 local SocialUpsellType = require(SocialUpsell.Enum.SocialUpsellType)
 local UpsellEntrySurfaceType = require(SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType)
 local FAEUpsellOverlay = require(SocialUpsell.Components.FAEUpsellOverlay)
-local FFlagEnableAEGIS2CommsFAEUpsell = require(SocialUpsellParent.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell
-local t1 = {
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableAEGIS2CommsFAEUpsell = SharedFlags.FFlagEnableAEGIS2CommsFAEUpsell
+
+local v = {
 	isInExperience = false,
 	upsellEntrySurface = UpsellEntrySurfaceType.Unknown,
 	upsellType = SocialUpsellType.Unknown
 }
 
-return function(t2: {[any]: any}) -- line: 27
-	-- upvalues: React (copy), Cryo (copy), t1 (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), SocialUpsellType (copy), FAEUpsellOverlay (copy)
-	return (React.useMemo(function() -- line: 28
-		-- upvalues: Cryo (copy), t1 (copy), t2 (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), SocialUpsellType (copy), React (copy), FAEUpsellOverlay (copy)
-		local v11 = nil
-		local v12 = Cryo.Dictionary.union(t1, t2.data or {})
-
-		v12.containerRef = t2.containerRef
+return function(data)
+	return (React.useMemo(function()
+		local v2 = nil
+		local union = Cryo.Dictionary.union(v, data.data or {})
+		union.containerRef = data.containerRef
 
 		if not FFlagEnableAEGIS2CommsFAEUpsell then
-			v12.isInExperience = false
+			union.isInExperience = false
 		end
 
-		if t2.upsellType == SocialUpsellType.FacialAgeEstimation then
-			v11 = React.createElement(FAEUpsellOverlay, v12)
+		if data.upsellType == SocialUpsellType.FacialAgeEstimation then
+			return (React.createElement(FAEUpsellOverlay, union))
 		end
 
-		return v11
-	end, {
-		t2.upsellType,
-		t2.data
-	}))
+		return v2
+	end, { data.upsellType, data.data }))
 end

@@ -1,87 +1,65 @@
 local UserLib = script:FindFirstAncestor("UserLib")
-local UserLibParent = UserLib.Parent
-local Cryo = require(UserLibParent.Cryo)
-local PromiseUtilities = require(UserLibParent.AppCommonLib).Utils.PromiseUtilities
+local parent = UserLib.Parent
 
+local Cryo = require(parent.Cryo)
+
+local AppCommonLib = require(parent.AppCommonLib)
+local PromiseUtilities = AppCommonLib.Utils.PromiseUtilities
 require(UserLib.Utils)
 
-local Promise = require(UserLibParent.Promise)
+local Promise = require(parent.Promise)
+
 local Constants = require(UserLib.Utils.Constants)
-local getRbxthumbWithTypeSizeAndOptions = require(UserLib.Utils).getRbxthumbWithTypeSizeAndOptions
+local Utils = require(UserLib.Utils)
+local getRbxthumbWithTypeSizeAndOptions = Utils.getRbxthumbWithTypeSizeAndOptions
 
-local function subdivideEntries(p1, p2) -- line: 33
-	-- upvalues: Cryo (copy)
-	local t1 = {}
+local function subdivideEntries(list, p)
+	local result = {}
 
-	for i = 1, #p1, p2 do
-		table.insert(t1, (Cryo.List.getRange(p1, i, i + p2 - 1)))
+	for i = 1, #list, p do
+		table.insert(result, (Cryo.List.getRange(list, i, i + p - 1)))
 	end
 
-	return t1
+	return result
 end
-local function makePreloadAsyncPromise(t2: {[any]: any}, t3: {[any]: any}, p3) -- line: 42
-	-- upvalues: Promise (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy)
-	return (Promise.new(function(resolve, _) -- line: 47
-		-- upvalues: t2 (copy), t3 (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), p3 (copy)
-		local t4 = {}
-		local t5 = {}
 
-		for _, v25 in t2 do
-			t5[v25] = {}
+local function makePreloadAsyncPromise(items, items2, p) -- 1 equivalent call inferred from this helper
+	return (Promise.new(function(callback, _)
+		local v = {}
+		local rbxthumbWithTypeSizeAndOptions = {}
 
-			for _, v27 in t3 do
-				t5[v25][v27.thumbnailType] = t5[v25][v27.thumbnailType] or {}
+		for _, item in items do
+			v[item] = {}
 
-				local v28 = Constants.RbxThumbnailSizeToNumberSize[v27.thumbnailSize]
-				local v29 = Constants.RbxAvatarThumbnailTypeFromEnumToRbxthumbType[v27.thumbnailType]
-				local v30 = getRbxthumbWithTypeSizeAndOptions(v25, v29, v28)
+			for _, item2 in items2 do
+				v[item][item2.thumbnailType] = v[item][item2.thumbnailType] or {}
+				local v2 = Constants.RbxThumbnailSizeToNumberSize[item2.thumbnailSize]
 
-				t5[v25][v27.thumbnailType][v27.thumbnailSize] = v30
-				table.insert(t4, v30)
+				local rbxthumbWithTypeSizeAndOptions2 = getRbxthumbWithTypeSizeAndOptions(
+					item,
+					Constants.RbxAvatarThumbnailTypeFromEnumToRbxthumbType[item2.thumbnailType],
+					v2
+				)
+				v[item][item2.thumbnailType][item2.thumbnailSize] = rbxthumbWithTypeSizeAndOptions2
+				table.insert(rbxthumbWithTypeSizeAndOptions, rbxthumbWithTypeSizeAndOptions2)
 			end
-		end;
+		end
 
-		(p3 or game:GetService("ContentProvider")):PreloadAsync(t4)
-		resolve()
+		(p or game:GetService("ContentProvider")):PreloadAsync(rbxthumbWithTypeSizeAndOptions)
+
+		callback()
 	end))
 end
 
-return function(t6: {[any]: any}, t7: {[any]: any}, p5) -- line: 80
-	-- upvalues: subdivideEntries (copy), Promise (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), PromiseUtilities (copy)
-	return function(_) -- line: 81
-		-- upvalues: subdivideEntries (copy), t6 (copy), t7 (copy), p5 (copy), Promise (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), PromiseUtilities (copy)
-		local t8 = {}
-		local v33 = subdivideEntries(t6, 100)
+return function(p, items, p2)
+	return function(_)
+		local v = subdivideEntries(p, 100)
+		local v2 = {}
 
-		for _, v in pairs(v33) do
-			local v36 = t7
-			local v37 = p5
-
-			table.insert(t8, (Promise.new(function(resolve, _) -- line: 47
-				-- upvalues: v (copy), v36 (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), v37 (copy)
-				local t9 = {}
-				local t10 = {}
-
-				for _, v43 in v do
-					t10[v43] = {}
-
-					for _, v45 in v36 do
-						t10[v43][v45.thumbnailType] = t10[v43][v45.thumbnailType] or {}
-
-						local v46 = Constants.RbxThumbnailSizeToNumberSize[v45.thumbnailSize]
-						local v47 = Constants.RbxAvatarThumbnailTypeFromEnumToRbxthumbType[v45.thumbnailType]
-						local v48 = getRbxthumbWithTypeSizeAndOptions(v43, v47, v46)
-
-						t10[v43][v45.thumbnailType][v45.thumbnailSize] = v48
-						table.insert(t9, v48)
-					end
-				end;
-
-				(v37 or game:GetService("ContentProvider")):PreloadAsync(t9)
-				resolve()
-			end)))
+		for _, v3 in pairs(v) do
+			table.insert(v2, makePreloadAsyncPromise(v3, items, p2)) -- inferred equivalent call
 		end
 
-		return PromiseUtilities.Batch(t8)
+		return PromiseUtilities.Batch(v2)
 	end
 end

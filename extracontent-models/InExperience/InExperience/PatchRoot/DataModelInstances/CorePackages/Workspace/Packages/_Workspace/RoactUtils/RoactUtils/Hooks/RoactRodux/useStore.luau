@@ -1,14 +1,13 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local React = require(Parent.React)
-local StoreContext = require(Parent.RoactRodux).StoreContext
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+local React = require(parent.React)
 
-local function useStore() -- line: 16
-	-- upvalues: React (copy), StoreContext (copy)
-	local v5 = React.useContext(StoreContext)
+local RoactRodux = require(parent.RoactRodux)
+local StoreContext = RoactRodux.StoreContext
 
-	assert(v5, "useDispatch and useSelector can only be called from a descendant of the Rodux Store Provider")
-
-	return v5
+local function useStore()
+	local v = React.useContext(StoreContext)
+	assert(v, "useDispatch and useSelector can only be called from a descendant of the Rodux Store Provider")
+	return v
 end
 
 return useStore

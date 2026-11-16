@@ -1,36 +1,59 @@
 local Style = script:FindFirstAncestor("Style")
-local StyleParent = Style.Parent
-local React = require(StyleParent.React)
-local Cryo = require(StyleParent.Cryo)
-local UIBlox = require(StyleParent.UIBlox)
+local parent = Style.Parent
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+
+local UIBlox = require(parent.UIBlox)
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 local Constants = UIBlox.App.Style.Constants
 local UiModeStyleProvider = require(Style.UiModeStyleProvider)
-local Foundation = require(StyleParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local FoundationProvider = Foundation.FoundationProvider
-local Theme = Foundation.Enums.Theme
+local ColorMode = Foundation.Enums.ColorMode
 local useTokens = Foundation.Hooks.useTokens
-local t1 = {
-	withUiModeSupport = true,
-	withDarkTheme = true
-}
 
-return function(p1) -- line: 35
-	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), React (copy), UiModeStyleProvider (copy), AppStyleProvider (copy), Constants (copy), FoundationProvider (copy), Theme (copy)
-	local v15 = Cryo.Dictionary.join(t1, p1)
-	local v16 = useTokens().Config ~= nil
-	local v17 = React.createElement(if not p1.withUiModeSupport then AppStyleProvider else UiModeStyleProvider, {
-		style = {
-			themeName = if not v15.withDarkTheme then Constants.ThemeName.Light else Constants.ThemeName.Dark,
-			fontName = Constants.FontName.Gotham
-		}
-	}, v15.children)
+local v = { withUiModeSupport = true, withDarkTheme = true }
 
-	if not p1.withUiModeSupport and not v16 then
-		return React.createElement(FoundationProvider, {
-			theme = if not v15.withDarkTheme then Theme.Light else Theme.Dark
-		}, v17)
+return function(p)
+	local joined = Cryo.Dictionary.join(v, p)
+
+	local v2 = useTokens().Config ~= nil
+
+	local createElement = React.createElement
+	local v3
+
+	if p.withUiModeSupport then
+		v3 = UiModeStyleProvider
+	else
+		v3 = AppStyleProvider
 	end
 
-	return v17
+	local themeName
+
+	if joined.withDarkTheme then
+		themeName = ColorMode.Dark
+	else
+		themeName = ColorMode.Light
+	end
+
+	local element = createElement(v3, {
+		style = { themeName = themeName, fontName = Constants.FontName.Gotham }
+	}, joined.children)
+
+	if p.withUiModeSupport or v2 then
+		return element
+	end
+
+	local createElement2 = React.createElement
+	local colorMode
+
+	if joined.withDarkTheme then
+		colorMode = ColorMode.Dark
+	else
+		colorMode = ColorMode.Light
+	end
+
+	return createElement2(FoundationProvider, { colorMode = colorMode }, element)
 end

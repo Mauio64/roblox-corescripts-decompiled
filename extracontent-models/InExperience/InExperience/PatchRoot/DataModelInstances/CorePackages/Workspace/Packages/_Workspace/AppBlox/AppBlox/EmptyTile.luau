@@ -1,24 +1,27 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Cryo = require(Parent.Cryo)
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local View = Foundation.View
 
-local function EmptyTile(t1: {[any]: any}) -- line: 19
-	-- upvalues: React (copy), View (copy), Cryo (copy)
-	return React.createElement(View, {
-		tag = "size-full",
-		LayoutOrder = t1.layoutOrder,
-		ZIndex = t1.ZIndex
-	}, Cryo.Dictionary.union(t1.children or {}, {
-		Content = React.createElement(View, {
-			tag = "bg-surface-100 padding-y-medium padding-x-small radius-medium",
-			aspectRatio = t1.tileAspectRatio,
-			Size = t1.size
-		}, {
-			ContentOverlay = t1.contentOverlayComponent
+local function EmptyTile(props)
+	return React.createElement(
+		View,
+		{ LayoutOrder = props.layoutOrder, ZIndex = props.ZIndex, tag = "size-full" },
+		Cryo.Dictionary.union(props.children or {}, {
+			Content = React.createElement(
+				View,
+				{
+					aspectRatio = props.tileAspectRatio,
+					Size = props.size,
+					tag = "bg-surface-100 padding-y-medium padding-x-small radius-medium"
+				},
+				{ ContentOverlay = props.contentOverlayComponent }
+			)
 		})
-	}))
+	)
 end
 
 return React.memo(EmptyTile)

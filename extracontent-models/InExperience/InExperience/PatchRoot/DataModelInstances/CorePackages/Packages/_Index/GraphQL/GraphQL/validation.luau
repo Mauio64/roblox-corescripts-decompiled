@@ -1,43 +1,110 @@
-local _script = script
-local ValidationContext = require(_script.ValidationContext)
+local script = script
+local ValidationContext = require(script.ValidationContext)
 
-return {
-	validate = require(_script.validate).validate,
-	ValidationContext = ValidationContext.ValidationContext,
-	specifiedRules = require(_script.specifiedRules).specifiedRules,
-	ExecutableDefinitionsRule = require(_script.rules.ExecutableDefinitionsRule).ExecutableDefinitionsRule,
-	FieldsOnCorrectTypeRule = require(_script.rules.FieldsOnCorrectTypeRule).FieldsOnCorrectTypeRule,
-	FragmentsOnCompositeTypesRule = require(_script.rules.FragmentsOnCompositeTypesRule).FragmentsOnCompositeTypesRule,
-	KnownArgumentNamesRule = require(_script.rules.KnownArgumentNamesRule).KnownArgumentNamesRule,
-	KnownDirectivesRule = require(_script.rules.KnownDirectivesRule).KnownDirectivesRule,
-	KnownFragmentNamesRule = require(_script.rules.KnownFragmentNamesRule).KnownFragmentNamesRule,
-	KnownTypeNamesRule = require(_script.rules.KnownTypeNamesRule).KnownTypeNamesRule,
-	LoneAnonymousOperationRule = require(_script.rules.LoneAnonymousOperationRule).LoneAnonymousOperationRule,
-	NoFragmentCyclesRule = require(_script.rules.NoFragmentCyclesRule).NoFragmentCyclesRule,
-	NoUndefinedVariablesRule = require(_script.rules.NoUndefinedVariablesRule).NoUndefinedVariablesRule,
-	NoUnusedFragmentsRule = require(_script.rules.NoUnusedFragmentsRule).NoUnusedFragmentsRule,
-	NoUnusedVariablesRule = require(_script.rules.NoUnusedVariablesRule).NoUnusedVariablesRule,
-	OverlappingFieldsCanBeMergedRule = require(_script.rules.OverlappingFieldsCanBeMergedRule).OverlappingFieldsCanBeMergedRule,
-	PossibleFragmentSpreadsRule = require(_script.rules.PossibleFragmentSpreadsRule).PossibleFragmentSpreadsRule,
-	ProvidedRequiredArgumentsRule = require(_script.rules.ProvidedRequiredArgumentsRule).ProvidedRequiredArgumentsRule,
-	ScalarLeafsRule = require(_script.rules.ScalarLeafsRule).ScalarLeafsRule,
-	SingleFieldSubscriptionsRule = require(_script.rules.SingleFieldSubscriptionsRule).SingleFieldSubscriptionsRule,
-	UniqueArgumentNamesRule = require(_script.rules.UniqueArgumentNamesRule).UniqueArgumentNamesRule,
-	UniqueDirectivesPerLocationRule = require(_script.rules.UniqueDirectivesPerLocationRule).UniqueDirectivesPerLocationRule,
-	UniqueFragmentNamesRule = require(_script.rules.UniqueFragmentNamesRule).UniqueFragmentNamesRule,
-	UniqueInputFieldNamesRule = require(_script.rules.UniqueInputFieldNamesRule).UniqueInputFieldNamesRule,
-	UniqueOperationNamesRule = require(_script.rules.UniqueOperationNamesRule).UniqueOperationNamesRule,
-	UniqueVariableNamesRule = require(_script.rules.UniqueVariableNamesRule).UniqueVariableNamesRule,
-	ValuesOfCorrectTypeRule = require(_script.rules.ValuesOfCorrectTypeRule).ValuesOfCorrectTypeRule,
-	VariablesAreInputTypesRule = require(_script.rules.VariablesAreInputTypesRule).VariablesAreInputTypesRule,
-	VariablesInAllowedPositionRule = require(_script.rules.VariablesInAllowedPositionRule).VariablesInAllowedPositionRule,
-	LoneSchemaDefinitionRule = require(_script.rules.LoneSchemaDefinitionRule).LoneSchemaDefinitionRule,
-	UniqueOperationTypesRule = require(_script.rules.UniqueOperationTypesRule).UniqueOperationTypesRule,
-	UniqueTypeNamesRule = require(_script.rules.UniqueTypeNamesRule).UniqueTypeNamesRule,
-	UniqueEnumValueNamesRule = require(_script.rules.UniqueEnumValueNamesRule).UniqueEnumValueNamesRule,
-	UniqueFieldDefinitionNamesRule = require(_script.rules.UniqueFieldDefinitionNamesRule).UniqueFieldDefinitionNamesRule,
-	UniqueDirectiveNamesRule = require(_script.rules.UniqueDirectiveNamesRule).UniqueDirectiveNamesRule,
-	PossibleTypeExtensionsRule = require(_script.rules.PossibleTypeExtensionsRule).PossibleTypeExtensionsRule,
-	NoDeprecatedCustomRule = require(_script.rules.custom.NoDeprecatedCustomRule).NoDeprecatedCustomRule,
-	NoSchemaIntrospectionCustomRule = require(_script.rules.custom.NoSchemaIntrospectionCustomRule).NoSchemaIntrospectionCustomRule
-}
+local validate = require(script.validate)
+local Validation = {}
+Validation.validate = validate.validate
+
+Validation.ValidationContext = ValidationContext.ValidationContext
+
+local specifiedRules = require(script.specifiedRules)
+Validation.specifiedRules = specifiedRules.specifiedRules
+
+local ExecutableDefinitionsRule = require(script.rules.ExecutableDefinitionsRule)
+Validation.ExecutableDefinitionsRule = ExecutableDefinitionsRule.ExecutableDefinitionsRule
+
+local FieldsOnCorrectTypeRule = require(script.rules.FieldsOnCorrectTypeRule)
+Validation.FieldsOnCorrectTypeRule = FieldsOnCorrectTypeRule.FieldsOnCorrectTypeRule
+
+local FragmentsOnCompositeTypesRule = require(script.rules.FragmentsOnCompositeTypesRule)
+Validation.FragmentsOnCompositeTypesRule = FragmentsOnCompositeTypesRule.FragmentsOnCompositeTypesRule
+
+local KnownArgumentNamesRule = require(script.rules.KnownArgumentNamesRule)
+Validation.KnownArgumentNamesRule = KnownArgumentNamesRule.KnownArgumentNamesRule
+
+local KnownDirectivesRule = require(script.rules.KnownDirectivesRule)
+Validation.KnownDirectivesRule = KnownDirectivesRule.KnownDirectivesRule
+
+local KnownFragmentNamesRule = require(script.rules.KnownFragmentNamesRule)
+Validation.KnownFragmentNamesRule = KnownFragmentNamesRule.KnownFragmentNamesRule
+
+local KnownTypeNamesRule = require(script.rules.KnownTypeNamesRule)
+Validation.KnownTypeNamesRule = KnownTypeNamesRule.KnownTypeNamesRule
+
+local LoneAnonymousOperationRule = require(script.rules.LoneAnonymousOperationRule)
+Validation.LoneAnonymousOperationRule = LoneAnonymousOperationRule.LoneAnonymousOperationRule
+
+local NoFragmentCyclesRule = require(script.rules.NoFragmentCyclesRule)
+Validation.NoFragmentCyclesRule = NoFragmentCyclesRule.NoFragmentCyclesRule
+
+local NoUndefinedVariablesRule = require(script.rules.NoUndefinedVariablesRule)
+Validation.NoUndefinedVariablesRule = NoUndefinedVariablesRule.NoUndefinedVariablesRule
+
+local NoUnusedFragmentsRule = require(script.rules.NoUnusedFragmentsRule)
+Validation.NoUnusedFragmentsRule = NoUnusedFragmentsRule.NoUnusedFragmentsRule
+
+local NoUnusedVariablesRule = require(script.rules.NoUnusedVariablesRule)
+Validation.NoUnusedVariablesRule = NoUnusedVariablesRule.NoUnusedVariablesRule
+
+local OverlappingFieldsCanBeMergedRule = require(script.rules.OverlappingFieldsCanBeMergedRule)
+Validation.OverlappingFieldsCanBeMergedRule = OverlappingFieldsCanBeMergedRule.OverlappingFieldsCanBeMergedRule
+
+local PossibleFragmentSpreadsRule = require(script.rules.PossibleFragmentSpreadsRule)
+Validation.PossibleFragmentSpreadsRule = PossibleFragmentSpreadsRule.PossibleFragmentSpreadsRule
+
+local ProvidedRequiredArgumentsRule = require(script.rules.ProvidedRequiredArgumentsRule)
+Validation.ProvidedRequiredArgumentsRule = ProvidedRequiredArgumentsRule.ProvidedRequiredArgumentsRule
+
+local ScalarLeafsRule = require(script.rules.ScalarLeafsRule)
+Validation.ScalarLeafsRule = ScalarLeafsRule.ScalarLeafsRule
+
+local SingleFieldSubscriptionsRule = require(script.rules.SingleFieldSubscriptionsRule)
+Validation.SingleFieldSubscriptionsRule = SingleFieldSubscriptionsRule.SingleFieldSubscriptionsRule
+
+local UniqueArgumentNamesRule = require(script.rules.UniqueArgumentNamesRule)
+Validation.UniqueArgumentNamesRule = UniqueArgumentNamesRule.UniqueArgumentNamesRule
+
+local UniqueDirectivesPerLocationRule = require(script.rules.UniqueDirectivesPerLocationRule)
+Validation.UniqueDirectivesPerLocationRule = UniqueDirectivesPerLocationRule.UniqueDirectivesPerLocationRule
+
+local UniqueFragmentNamesRule = require(script.rules.UniqueFragmentNamesRule)
+Validation.UniqueFragmentNamesRule = UniqueFragmentNamesRule.UniqueFragmentNamesRule
+
+local UniqueInputFieldNamesRule = require(script.rules.UniqueInputFieldNamesRule)
+Validation.UniqueInputFieldNamesRule = UniqueInputFieldNamesRule.UniqueInputFieldNamesRule
+
+local UniqueOperationNamesRule = require(script.rules.UniqueOperationNamesRule)
+Validation.UniqueOperationNamesRule = UniqueOperationNamesRule.UniqueOperationNamesRule
+
+local UniqueVariableNamesRule = require(script.rules.UniqueVariableNamesRule)
+Validation.UniqueVariableNamesRule = UniqueVariableNamesRule.UniqueVariableNamesRule
+
+local ValuesOfCorrectTypeRule = require(script.rules.ValuesOfCorrectTypeRule)
+Validation.ValuesOfCorrectTypeRule = ValuesOfCorrectTypeRule.ValuesOfCorrectTypeRule
+
+local VariablesAreInputTypesRule = require(script.rules.VariablesAreInputTypesRule)
+Validation.VariablesAreInputTypesRule = VariablesAreInputTypesRule.VariablesAreInputTypesRule
+
+local VariablesInAllowedPositionRule = require(script.rules.VariablesInAllowedPositionRule)
+Validation.VariablesInAllowedPositionRule = VariablesInAllowedPositionRule.VariablesInAllowedPositionRule
+
+local LoneSchemaDefinitionRule = require(script.rules.LoneSchemaDefinitionRule)
+Validation.LoneSchemaDefinitionRule = LoneSchemaDefinitionRule.LoneSchemaDefinitionRule
+local UniqueOperationTypesRule = require(script.rules.UniqueOperationTypesRule)
+Validation.UniqueOperationTypesRule = UniqueOperationTypesRule.UniqueOperationTypesRule
+local UniqueTypeNamesRule = require(script.rules.UniqueTypeNamesRule)
+Validation.UniqueTypeNamesRule = UniqueTypeNamesRule.UniqueTypeNamesRule
+local UniqueEnumValueNamesRule = require(script.rules.UniqueEnumValueNamesRule)
+Validation.UniqueEnumValueNamesRule = UniqueEnumValueNamesRule.UniqueEnumValueNamesRule
+local UniqueFieldDefinitionNamesRule = require(script.rules.UniqueFieldDefinitionNamesRule)
+Validation.UniqueFieldDefinitionNamesRule = UniqueFieldDefinitionNamesRule.UniqueFieldDefinitionNamesRule
+local UniqueDirectiveNamesRule = require(script.rules.UniqueDirectiveNamesRule)
+Validation.UniqueDirectiveNamesRule = UniqueDirectiveNamesRule.UniqueDirectiveNamesRule
+local PossibleTypeExtensionsRule = require(script.rules.PossibleTypeExtensionsRule)
+Validation.PossibleTypeExtensionsRule = PossibleTypeExtensionsRule.PossibleTypeExtensionsRule
+
+local NoDeprecatedCustomRule = require(script.rules.custom.NoDeprecatedCustomRule)
+Validation.NoDeprecatedCustomRule = NoDeprecatedCustomRule.NoDeprecatedCustomRule
+local NoSchemaIntrospectionCustomRule = require(script.rules.custom.NoSchemaIntrospectionCustomRule)
+Validation.NoSchemaIntrospectionCustomRule = NoSchemaIntrospectionCustomRule.NoSchemaIntrospectionCustomRule
+return Validation

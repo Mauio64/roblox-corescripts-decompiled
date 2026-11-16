@@ -1,130 +1,125 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactRoblox = require(FoundationParent.ReactRoblox)
-local OverlayContext = require(Foundation.Providers.Overlay.OverlayContext)
+local parent = Foundation.Parent
 
+local React = require(parent.React)
+local ReactRoblox = require(parent.ReactRoblox)
+
+local OverlayContext = require(Foundation.Providers.Overlay.OverlayContext)
 require(Foundation.Utility.Plugin.StudioUri)
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useUniqueWidget = require(Foundation.Providers.StudioWidgets.useUniqueWidget)
 
-local function usePluginAnchor(p1, p2) -- line: 19
-	-- upvalues: React (copy), OverlayContext (copy), useUniqueWidget (copy), View (copy), ReactRoblox (copy)
-	local v11 = React.useContext(OverlayContext)
-	local v12 = p1 ~= nil and typeof(p1) ~= "Instance"
-	local v13 = React.useRef(nil)
+local function usePluginAnchor(current, p)
+	local v = React.useContext(OverlayContext)
+	local isVirtual
 
-	if not v12 and typeof(p1) == "Instance" then
-		v13.current = p1
+	if current == nil then
+		isVirtual = false
+	else
+		isVirtual = typeof(current) ~= "Instance"
 	end
 
-	local v14, v15 = React.useState(nil)
-	local v16 = React.useRef(nil)
+	local forwardRef = React.useRef(nil)
 
-	v16.current = v14
+	if not isVirtual and typeof(current) == "Instance" then
+		forwardRef.current = current
+	end
 
-	local v17 = React.useCallback(function(p3) -- line: 38
-		-- upvalues: v15 (copy)
-		v15(p3)
-	end, { v15 })
-	local v18 = useUniqueWidget({
-		forwardRef = if not v12 then v13 else v16
-	})
-	local v19, v20 = React.useState(Vector2.zero)
-	local v21, v22 = React.useState(Vector2.one)
-	local v23, v24 = React.useState(Vector2.zero)
+	local state, setState = React.useState(nil)
+	local ref = React.useRef(nil)
+	ref.current = state
 
-	React.useLayoutEffect(function() -- line: 50
-		-- upvalues: v12 (copy), p1 (copy), v20 (copy), v22 (copy)
-		if not v12 or p1 == nil then
+	local ref2 = React.useCallback(function(p2)
+		setState(p2)
+	end, { setState })
+
+	if isVirtual then
+		forwardRef = ref
+	end
+
+	local v2 = useUniqueWidget({ forwardRef = forwardRef })
+
+	local state2, setState2 = React.useState(Vector2.zero)
+	local state3, setState3 = React.useState(Vector2.one)
+	local state4, setState4 = React.useState(Vector2.zero)
+
+	React.useLayoutEffect(function()
+		if not isVirtual or current == nil then
 			return
 		end
 
-		local v29 = p1
-
-		local function updateFromAnchor() -- line: 56
-			-- upvalues: v20 (copy), v29 (copy), v22 (copy)
-			v20(v29.AbsolutePosition)
-			v22(v29.AbsoluteSize)
+		local current2 = current
+		local function updateFromAnchor() -- 1 equivalent call inferred from this helper
+			setState2(current2.AbsolutePosition)
+			setState3(current2.AbsoluteSize)
 		end
 
-		v20(v29.AbsolutePosition)
-		v22(v29.AbsoluteSize)
+		updateFromAnchor() -- inferred equivalent call
+		local absolutePositionChangedConnection = current2:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateFromAnchor)
+		local absoluteSizeChangedConnection = current2:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateFromAnchor)
 
-		local connection = v29:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateFromAnchor)
-		local connection2 = v29:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateFromAnchor)
+		return function()
+			absolutePositionChangedConnection:Disconnect()
+			absoluteSizeChangedConnection:Disconnect()
+		end
+	end, { current, isVirtual })
 
-		return function() -- line: 66
-			-- upvalues: connection (copy), connection2 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+	React.useLayoutEffect(function()
+		if isVirtual then
+			v.requestOverlay()
 		end
-	end, {
-		p1,
-		v12
-	})
-	React.useLayoutEffect(function() -- line: 72
-		-- upvalues: v12 (copy), v11 (copy)
-		if v12 then
-			v11.requestOverlay()
-		end
-	end, {
-		v11.requestOverlay,
-		v12
-	})
-	React.useLayoutEffect(function() -- line: 78
-		-- upvalues: v12 (copy), v11 (copy), v24 (copy)
-		if not v12 then
+	end, { v.requestOverlay, isVirtual })
+
+	React.useLayoutEffect(function()
+		if not isVirtual then
 			return
 		end
 
-		local instance = v11.instance
+		local instance = v.instance
 
 		if instance == nil or not instance:IsA("GuiObject") then
-			v24(Vector2.zero)
-
+			setState4(Vector2.zero)
 			return
 		end
 
-		local function updateOffset() -- line: 89
-			-- upvalues: v24 (copy), instance (copy)
-			v24(instance.AbsolutePosition)
+		local function updateOffset() -- 1 equivalent call inferred from this helper
+			setState4(instance.AbsolutePosition)
 		end
 
-		v24(instance.AbsolutePosition)
-
-		local connection = instance:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateOffset)
-
-		return function() -- line: 95
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		updateOffset() -- inferred equivalent call
+		local absolutePositionChangedConnection = instance:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateOffset)
+		return function()
+			absolutePositionChangedConnection:Disconnect()
 		end
-	end, {
-		v11.instance,
-		v12
-	})
+	end, { v.instance, isVirtual })
+	local v3
 
-	local v25 = p1 ~= nil and (not v12 or v11.instance ~= nil)
-	local v26 = nil
-
-	if v12 and v11.instance then
-		local v27 = React.createElement(View, {
-			Visible = true,
-			Position = UDim2.fromOffset(v19.X - v23.X, v19.Y - v23.Y),
-			Size = UDim2.fromOffset(v21.X, v21.Y),
-			ref = v17
-		})
-
-		v26 = ReactRoblox.createPortal(v27, v11.instance)
+	if current == nil then
+		v3 = false
+	else
+		v3 = not isVirtual or v.instance ~= nil
 	end
 
+	local element2
+
+	if isVirtual and v.instance then
+		local element = React.createElement(View, {
+			Position = UDim2.fromOffset(state2.X - state4.X, state2.Y - state4.Y),
+			Size = UDim2.fromOffset(state3.X, state3.Y),
+			Visible = true,
+			ref = ref2
+		})
+
+		element2 = ReactRoblox.createPortal(element, v.instance)
+	end
+
+	local uri = if p == nil then v2.uri else p
 	return {
-		uri = if p2 == nil then v18.uri else p2,
-		element = v26,
-		isVirtual = v12,
-		isReady = p2 ~= nil or v25
+		uri = uri,
+		element = element2,
+		isVirtual = isVirtual,
+		isReady = p ~= nil or v3
 	}
 end
 

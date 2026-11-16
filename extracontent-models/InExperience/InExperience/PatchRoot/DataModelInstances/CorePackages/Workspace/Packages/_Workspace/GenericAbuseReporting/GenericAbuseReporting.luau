@@ -1,5 +1,7 @@
 local AbuseEntrypoint = require(script.Enums.AbuseEntrypoint)
+require(script.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
 local AbuseVector = require(script.Enums.AbuseVector)
+local OpenDynamicAbuseReport = require(script.Thunks.OpenDynamicAbuseReport)
 
 return {
 	Components = {
@@ -11,9 +13,7 @@ return {
 		AbuseEntrypoint = AbuseEntrypoint,
 		AbuseVector = AbuseVector
 	},
-	Thunks = {
-		OpenDynamicAbuseReport = require(script.Thunks.OpenDynamicAbuseReport)
-	},
+	Thunks = { OpenDynamicAbuseReport = OpenDynamicAbuseReport },
 	UXFlows = {
 		DefaultTwoStepReportFlow = require(script.UXFlow.ReportWithReasonAndComment.AREntrypoint),
 		DefaultReportDialog = require(script.UXFlow.ReportWithReasonAndComment.ReportWithReasonAndComment),

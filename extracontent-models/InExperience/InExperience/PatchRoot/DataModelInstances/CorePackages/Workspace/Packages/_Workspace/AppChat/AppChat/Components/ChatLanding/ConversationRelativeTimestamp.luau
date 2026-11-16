@@ -1,24 +1,33 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-local function ConversationRelativeTimestamp(t1: {[any]: any}) -- line: 12
-	-- upvalues: React (copy), Foundation (copy)
-	local hasUnreadMessages = t1.hasUnreadMessages
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 
-	return React.createElement(Foundation.View, {
-		tag = "row auto-xy align-y-center gap-xsmall"
-	}, {
+local function ConversationRelativeTimestamp(p)
+	local hasUnreadMessages = p.hasUnreadMessages
+
+	local createElement = React.createElement
+	local view = Foundation.View
+
+	local v = {
 		timestamp = React.createElement(Foundation.Text, {
 			tag = "auto-xy text-body-small content-default",
 			LayoutOrder = 1,
-			Text = t1.timestampText
+			Text = p.timestampText
 		}),
-		unreadDot = if not hasUnreadMessages then nil else React.createElement(Foundation.View, {
+		unreadDot = 0
+	}
+	local unreadDot
+
+	if hasUnreadMessages then
+		unreadDot = React.createElement(Foundation.View, {
 			tag = "size-200-200 radius-circle bg-action-emphasis",
 			LayoutOrder = 2
 		})
-	})
+	end
+
+	v.unreadDot = unreadDot
+	return createElement(view, { tag = "row auto-xy align-y-center gap-xsmall" }, v)
 end
 
 return ConversationRelativeTimestamp

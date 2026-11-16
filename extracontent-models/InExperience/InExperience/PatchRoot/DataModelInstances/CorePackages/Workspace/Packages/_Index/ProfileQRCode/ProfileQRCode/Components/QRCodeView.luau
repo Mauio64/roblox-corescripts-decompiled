@@ -1,1 +1,3 @@
-return (require(script.QRCodeView))
+local QRCodeView = require(script.QRCodeView)
+
+return QRCodeView

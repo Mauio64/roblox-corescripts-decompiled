@@ -1,62 +1,57 @@
 require(script.Parent.Parent.Types)
 
-local function getItemSlotCost(p1, n1: number, p2: ((...any) -> ...any)) -- line: 8
-	if p2(p1, n1) then
-		return 2
-	end
-
-	return 1
+local function getItemSlotCost(item, p: number, callback): number -- 1 equivalent call inferred from this helper
+	return if callback(item, p) then 2 else 1
 end
-local function buildUniformRows(t1: {[any]: any}, n2: number) -- line: 19
-	local t2 = {}
 
-	for i = 1, #t1, n2 do
-		local t3 = {}
+local function buildUniformRows(list, p: number)
+	local uniformRows = {}
 
-		table.move(t1, i, math.min(i + n2 - 1, #t1), 1, t3)
-		table.insert(t2, t3)
+	for i = 1, #list, p do
+		local v = {}
+		table.move(list, i, math.min(i + p - 1, #list), 1, v)
+		table.insert(uniformRows, v)
 	end
 
-	return t2
+	return uniformRows
 end
 
 return {
-	ROBUX_TILE_SLOT_COST = 2,
-	buildItemGridRows = function(t4: {[any]: any}, n3: number, p3: ((...any) -> ...any)?) -- line: 33
-		-- upvalues: buildUniformRows (copy)
-		if p3 == nil then
-			return (buildUniformRows(t4, n3))
+	buildItemGridRows = function(list, p: number, callback)
+		if callback == nil then
+			return buildUniformRows(list, p)
 		end
 
-		local t5 = {}
-		local n4 = 1
+		local v = 1
+		local result = {}
 
-		while n4 <= #t4 do
-			local t6 = {}
-			local n5 = 0
-			local n6 = 1
+		while v <= #list do
+			local v2 = 1
+			local v3 = {}
+			local total = 0
 
-			while n4 <= #t4 do
-				local v19 = t4[n4]
-				local v20 = not p3(v19, n6) and 1 or 2
+			while v <= #list do
+				local item = list[v]
+				local itemSlotCost = getItemSlotCost(item, v2, callback) -- inferred equivalent call
 
-				if n3 < n5 + v20 and #t6 > 0 then
+				if p < total + itemSlotCost and #v3 > 0 then
 					break
 				end
 
-				table.insert(t6, v19)
-				n5 += v20
-				n4 += 1
-				n6 += 1
+				table.insert(v3, item)
+				total += itemSlotCost
+				v += 1
+				v2 += 1
 
-				if n3 <= n5 then
+				if p <= total then
 					break
 				end
 			end
 
-			table.insert(t5, t6)
+			table.insert(result, v3)
 		end
 
-		return t5
-	end
+		return result
+	end,
+	ROBUX_TILE_SLOT_COST = 2
 }

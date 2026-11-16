@@ -1,107 +1,101 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local AppCommonLib = require(scriptParentParent.AppCommonLib)
-local SharedFlags = require(scriptParentParent.SharedFlags)
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local AppCommonLib = require(parent2.AppCommonLib)
+local SharedFlags = require(parent2.SharedFlags)
 local Signal = AppCommonLib.Signal
 
-require(scriptParent.PlatformLeaderboardTypes)
-require(scriptParent.PlatformLeaderboardFetcher)
+require(parent.PlatformLeaderboardTypes)
+require(parent.PlatformLeaderboardFetcher)
 
-local v6 = game:DefineFastInt("PlatformLeaderboardConfigPollIntervalSeconds", 300)
-local v7 = game:DefineFastInt("PlatformLeaderboardConfigPollMaxJitterSeconds", 60)
+local defineFastInt = game:DefineFastInt("PlatformLeaderboardConfigPollIntervalSeconds", 300)
+
+local defineFastInt2 = game:DefineFastInt("PlatformLeaderboardConfigPollMaxJitterSeconds", 60)
 local FFlagPlatformLeaderboardDebugLogging = SharedFlags.FFlagPlatformLeaderboardDebugLogging
-local t1 = {}
 
-t1.__index = t1
+local PlatformLeaderboardConfigService = {}
+PlatformLeaderboardConfigService.__index = PlatformLeaderboardConfigService
 
-function t1.new(p1) -- line: 50
-	-- upvalues: Signal (copy), t1 (copy), v7 (copy), v6 (copy), FFlagPlatformLeaderboardDebugLogging (copy)
-	local v12 = setmetatable({
-		_config = nil,
-		_pollTimer = nil,
-		_fetcher = p1,
-		_configChanged = Signal.new()
-	}, t1)
-	local ok, result, v15 = pcall(p1.fetchConfig)
+function PlatformLeaderboardConfigService.new(fetcher)
+	local object = setmetatable(
+		{ _fetcher = fetcher, _config = nil, _configChanged = Signal.new(), _pollTimer = nil },
+		PlatformLeaderboardConfigService
+	)
 
-	if ok and result then
-		v12._config = v15
+	local success, result, config = pcall(fetcher.fetchConfig)
+
+	if success and result then
+		object._config = config
 	end
 
 	local thread = nil
+	local function pollLoop()
+		while object._pollTimer == thread do
+			local v = math.random() * defineFastInt2
+			task.wait(defineFastInt + v)
+			local success2, result2, v2 = pcall(object._fetcher.fetchConfig)
 
-	local function pollLoop() -- line: 64
-		-- upvalues: v12 (copy), thread (ref), v7 (copy), v6 (copy)
-		while v12._pollTimer == thread do
-			local v30 = math.random() * v7
-
-			task.wait(v6 + v30)
-
-			local ok2, result2, v33 = pcall(v12._fetcher.fetchConfig)
-
-			if ok2 and result2 then
-				v12:updateConfig(v33)
+			if success2 and result2 then
+				object:updateConfig(v2)
 			end
 		end
 	end
 
-	thread = task.defer(function() -- line: 75
-		-- upvalues: pollLoop (copy), v12 (copy), thread (ref), FFlagPlatformLeaderboardDebugLogging (copy)
-		if not pcall(pollLoop) and v12._pollTimer == thread then
+	thread = task.defer(function()
+		if not pcall(pollLoop) and object._pollTimer == thread then
 			if FFlagPlatformLeaderboardDebugLogging then
 				warn("[PlatformLeaderboard] ConfigService poll loop terminated unexpectedly")
 			end
 
-			v12._pollTimer = nil
+			object._pollTimer = nil
 		end
 	end)
-	v12._pollTimer = thread
+	object._pollTimer = thread
 
-	return v12
+	return object
 end
 
-local function configsEqual(p2, p3) -- line: 89
-	if p2 == p3 then
+local function configsEqual(config, config2): boolean -- 1 equivalent call inferred from this helper
+	if config == config2 then
 		return true
 	end
 
-	if p2 == nil or p3 == nil then
+	if config == nil or config2 == nil then
 		return false
 	end
 
-	return p2.leaderboardId == p3.leaderboardId and p2.unit == p3.unit
+	return config.leaderboardId == config2.leaderboardId and config.unit == config2.unit
 end
 
-function t1.updateConfig(p4, p5) -- line: 99
-	local _config = p4._config
-
-	if _config == p5 or _config ~= nil and (p5 ~= nil and (_config.leaderboardId == p5.leaderboardId and _config.unit == p5.unit)) then
+function PlatformLeaderboardConfigService:updateConfig(config)
+	if configsEqual(self._config, config) then -- inferred equivalent call
 		return
 	end
 
-	local _config2 = p4._config
+	local _config = self._config
+	self._config = config
+	self._configChanged:fire(_config, self._config)
+end
 
-	p4._config = p5
-	p4._configChanged:fire(_config2, p4._config)
+function PlatformLeaderboardConfigService:getConfig()
+	return self._config
 end
-function t1.getConfig(p6) -- line: 108
-	return p6._config
-end
-function t1.hasActiveConfig(p7) -- line: 112
-	return p7._config ~= nil
-end
-function t1.onConfigChanged(t2: {[any]: any}, p8: ((...any) -> ...any)) -- line: 116
-	return t2._configChanged:connect(p8)
-end
-function t1.teardown(p9) -- line: 122
-	-- upvalues: FFlagPlatformLeaderboardDebugLogging (copy)
-	local _pollTimer = p9._pollTimer
 
-	p9._pollTimer = nil
+function PlatformLeaderboardConfigService:hasActiveConfig(): boolean
+	return self._config ~= nil
+end
 
-	if _pollTimer and (not pcall(task.cancel, _pollTimer) and FFlagPlatformLeaderboardDebugLogging) then
+function PlatformLeaderboardConfigService:onConfigChanged(callback)
+	return self._configChanged:connect(callback)
+end
+
+function PlatformLeaderboardConfigService:teardown()
+	local pollTimer = self._pollTimer
+	self._pollTimer = nil
+
+	if pollTimer and not pcall(task.cancel, pollTimer) and FFlagPlatformLeaderboardDebugLogging then
 		warn("[PlatformLeaderboard] ConfigService teardown: failed to cancel poll timer")
 	end
 end
 
-return t1
+return PlatformLeaderboardConfigService

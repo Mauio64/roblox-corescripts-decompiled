@@ -1,6 +1,8 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local parent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local Rodux = PurchasePromptDeps.Rodux
+
 local SetPromptState = require(PurchasePrompt.Actions.SetPromptState)
 local CompleteRequest = require(PurchasePrompt.Actions.CompleteRequest)
 local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
@@ -11,31 +13,26 @@ local WindowState = require(PurchasePrompt.Enums.WindowState)
 local PromptState = require(PurchasePrompt.Enums.PromptState)
 
 return Rodux.createReducer(WindowState.Hidden, {
-	[SetPromptState.name] = function(_, p2) -- line: 18
-		-- upvalues: PromptState (copy), WindowState (copy)
-		if p2.promptState == PromptState.None then
+	[SetPromptState.name] = function(_, p)
+		if p.promptState == PromptState.None then
 			return WindowState.Hidden
 		end
 
 		return WindowState.Shown
 	end,
-	[SetWindowState.name] = function(_, p4) -- line: 25
-		return p4.state
+	[SetWindowState.name] = function(_, p)
+		return p.state
 	end,
-	[ErrorOccurred.name] = function(_, _) -- line: 28
-		-- upvalues: WindowState (copy)
+	[ErrorOccurred.name] = function(_, _)
 		return WindowState.Shown
 	end,
-	[StartPurchase.name] = function(_, _) -- line: 31
-		-- upvalues: WindowState (copy)
+	[StartPurchase.name] = function(_, _)
 		return WindowState.Shown
 	end,
-	[PromptNativeUpsellSuggestions.name] = function(_, _) -- line: 34
-		-- upvalues: WindowState (copy)
+	[PromptNativeUpsellSuggestions.name] = function(_, _)
 		return WindowState.Shown
 	end,
-	[CompleteRequest.name] = function(_, _) -- line: 37
-		-- upvalues: WindowState (copy)
+	[CompleteRequest.name] = function(_, _)
 		return WindowState.Hidden
 	end
 })

@@ -1,20 +1,24 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
+local parent = AuthCommon.Parent
 local dependencies = require(AuthCommon.dependencies)
 local EventIngestService = game:GetService("EventIngestService")
-local v5 = dependencies.Analytics.AnalyticsReporters.EventIngest.new(EventIngestService)
-local EventStreamConstants = require(AuthCommonParent.AuthAnalytics).EventStreamConstants
+local eventIngest = dependencies.Analytics.AnalyticsReporters.EventIngest.new(EventIngestService)
+local AuthAnalytics = require(parent.AuthAnalytics)
+local EventStreamConstants = AuthAnalytics.EventStreamConstants
 
 return {
-	sendImmediatelyPageLoadEvent = function(s1: string, s2: string?) -- line: 10
-		-- upvalues: EventStreamConstants (copy), v5 (copy)
-		local t1 = {
-			origin = s1,
-			state = s2 or "",
-			[EventStreamConstants.EventTimingKeys.OsClock] = tostring(os.clock()),
-			[EventStreamConstants.EventTimingKeys.OsTime] = tostring(os.time())
+	sendImmediatelyPageLoadEvent = function(origin: string, value: string?)
+		local nows = {
+			origin = origin,
+			state = value or ""
 		}
+		nows[EventStreamConstants.EventTimingKeys.OsClock] = tostring(os.clock())
+		nows[EventStreamConstants.EventTimingKeys.OsTime] = tostring(os.time())
 
-		v5:sendEventImmediately(EventStreamConstants.Context.InvoluntaryLogout, EventStreamConstants.AuthEventName.AuthPageLoad, t1)
+		eventIngest:sendEventImmediately(
+			EventStreamConstants.Context.InvoluntaryLogout,
+			EventStreamConstants.AuthEventName.AuthPageLoad,
+			nows
+		)
 	end
 }

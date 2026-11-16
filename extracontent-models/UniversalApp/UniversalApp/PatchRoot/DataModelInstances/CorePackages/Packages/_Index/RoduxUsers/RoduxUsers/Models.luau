@@ -1,3 +1,1 @@
-return {
-	User = require(script.UserModel)
-}
+return { User = require(script.UserModel) }

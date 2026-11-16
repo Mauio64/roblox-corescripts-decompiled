@@ -1,91 +1,77 @@
 local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
 
 require(GraphQLServer.Parent.LuauPolyfill)
+
 require(GraphQLServer.graphql.generatedTypes)
 
 local Promise = require(GraphQLServer.Parent.Promise)
-local GraphQLError = require(GraphQLServer.Parent.GraphQL).GraphQLError
+local GraphQL = require(GraphQLServer.Parent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
 local Fetch = require(GraphQLServer.Parent.Fetch)
 local fetch = Fetch.fetch
+
 local Response = Fetch.Response
-local UrlBuilder = require(GraphQLServer.Parent.UrlBuilder).UrlBuilder
-local UrlBase = require(GraphQLServer.Parent.UrlBuilder).UrlBase
-local t1 = {}
-local v10 = UrlBuilder.fromString("games:games?universeIds={universeIds}")
-local v11 = UrlBuilder.new({
-	path = "games/{universeId}/media",
-	base = UrlBase.new("games", 2)
-})
+local UrlBuilder = require(GraphQLServer.Parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local UrlBuilder2 = require(GraphQLServer.Parent.UrlBuilder)
+local UrlBase = UrlBuilder2.UrlBase
 
-function t1.findExperienceDetailsByUniverseId(s1: string, p1) -- line: 27
-	-- upvalues: fetch (copy), Promise (copy), v10 (copy), Response (copy), GraphQLError (copy)
-	local v14 = p1 or fetch
+local v = urlBuilder.fromString("games:games?universeIds={universeIds}")
+local v2 = urlBuilder.new({ base = UrlBase.new("games", 2), path = "games/{universeId}/media" })
+local ExperienceConnector = {}
 
-	return Promise.new(function(resolve, reject) -- line: 30
-		-- upvalues: v10 (copy), s1 (copy), v14 (copy), Response (copy), GraphQLError (copy)
-		local v20 = v10({
-			universeIds = s1
-		})
-		local v21 = v14(v20, {
-			method = "GET"
-		}):catch(function() -- line: 33
-			-- upvalues: Response (copy)
+function ExperienceConnector.findExperienceDetailsByUniverseId(universeIds: string, p)
+	local v3 = p or fetch
+	return Promise.new(function(callback, callback2)
+		local expect = v3(v({ universeIds = universeIds }), { method = "GET" }):catch(function()
 			return Response.error()
 		end):expect()
 
-		if not v21.ok then
-			reject(GraphQLError.new(string.format("Failed to find experience for universeId: %s.", s1)))
-
+		if not expect.ok then
+			callback2(GraphQLError.new(string.format("Failed to find experience for universeId: %s.", universeIds)))
 			return
 		end
 
-		local v22 = v21:json():catch(function() -- line: 44
+		local expect2 = expect:json():catch(function(): nil
 			return nil
 		end):expect()
 
-		if not v22 then
-			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for experience with universeId: %s.", s1)))
-
-			return
+		if expect2 then
+			callback(expect2.data[1])
+		else
+			callback2(GraphQLError.new(string.format(
+				"Failed to decode HTTP response as JSON for experience with universeId: %s.",
+				universeIds
+			)))
 		end
-
-		resolve(v22.data[1])
 	end)
 end
-function t1.findExperienceMediaByUniverseId(s2: string, p2) -- line: 67
-	-- upvalues: fetch (copy), Promise (copy), v11 (copy), Response (copy), GraphQLError (copy)
-	local v17 = p2 or fetch
 
-	return Promise.new(function(resolve, reject) -- line: 70
-		-- upvalues: v11 (copy), s2 (copy), v17 (copy), Response (copy), GraphQLError (copy)
-		local v25 = v11({
-			universeId = s2
-		})
-		local v26 = v17(v25, {
-			method = "GET"
-		}):catch(function() -- line: 73
-			-- upvalues: Response (copy)
+function ExperienceConnector.findExperienceMediaByUniverseId(universeId: string, p)
+	local v3 = p or fetch
+	return Promise.new(function(callback, callback2)
+		local expect = v3(v2({ universeId = universeId }), { method = "GET" }):catch(function()
 			return Response.error()
 		end):expect()
 
-		if not v26.ok then
-			reject(GraphQLError.new(string.format("Failed to find experience media for universeId: %s.", s2)))
-
+		if not expect.ok then
+			callback2(GraphQLError.new(string.format("Failed to find experience media for universeId: %s.", universeId)))
 			return
 		end
 
-		local v27 = v26:json():catch(function() -- line: 84
+		local expect2 = expect:json():catch(function(): nil
 			return nil
 		end):expect()
 
-		if not v27 then
-			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for experience media for universeId: %s.", s2)))
-
-			return
+		if expect2 then
+			callback(expect2.data)
+		else
+			callback2(GraphQLError.new(string.format(
+				"Failed to decode HTTP response as JSON for experience media for universeId: %s.",
+				universeId
+			)))
 		end
-
-		resolve(v27.data)
 	end)
 end
 
-return t1
+return ExperienceConnector

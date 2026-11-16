@@ -1,301 +1,212 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Promise = require(Parent.Promise)
-local isStudio = require(Parent.MomentsCommon.isStudio)
-local t1 = {}
+local Moments = script:FindFirstAncestor("Moments")
+local parent = Moments.Parent
 
-local function log(s1: string, ...) -- line: 48
-	print(`[moments-gen] { string.format(s1, ...) }`)
+local Promise = require(parent.Promise)
+local MomentsCommon = require(parent.MomentsCommon)
+local isStudio = require(parent.MomentsCommon.isStudio)
+local GetFFlagEnableMomentTextGeneration = MomentsCommon.Flags.GetFFlagEnableMomentTextGeneration
+local GetFFlagMomentTextGenerationDisableCache = require(Moments.Flags.GetFFlagMomentTextGenerationDisableCache)
+local FFlagMomentTextGenerationFilteredSignal = MomentsCommon.Flags.FFlagMomentTextGenerationFilteredSignal
+
+local v = {}
+
+local function log(formatString: string, ...)
+	if _G.__MOMENTS_DISABLE_GEN_TEXT_LOG__ then
+		return
+	end
+
+	print(`[moments-gen] {string.format(formatString, ...)}`)
 end
-local function mockResult() -- line: 52
+
+local function mockResult() -- 2 equivalent calls inferred from this helper
 	return {
 		summary = "insane save",
 		description = "no way i pulled this off — clutch save on the last second, everyone was screaming lol",
 		error = nil
 	}
 end
-local function captureKey(p1) -- line: 60
-	local LocalId = nil
 
-	pcall(function() -- line: 62
-		-- upvalues: LocalId (ref), p1 (copy)
-		LocalId = p1.LocalId
+local function captureKey(p)
+	local localId = nil
+	pcall(function()
+		localId = p.LocalId
 	end)
 
-	if LocalId ~= nil then
-		return `local:{ LocalId }`
+	if localId ~= nil then
+		return `local:{localId}`
 	end
 
-	if typeof(p1) == "table" and p1.assetId ~= nil then
-		return `asset:{ p1.assetId }`
+	if typeof(p) == "table" and p.assetId ~= nil then
+		return `asset:{p.assetId}`
 	end
 
-	return `capture:{ tostring(p1) }`
+	return `capture:{tostring(p)}`
 end
-local function resultName(p2) -- line: 77
-	if p2 == nil then
+
+local function resultName(p)
+	if p == nil then
 		return nil
 	end
 
-	local ok, result = pcall(function() -- line: 81
-		-- upvalues: p2 (copy)
-		return p2.Name
+	local success, result = pcall(function()
+		return p.Name
 	end)
 
-	if ok and typeof(result) == "string" then
+	if success and typeof(result) == "string" then
 		return result
 	end
 
 	return nil
 end
-local function runGeneration(p3, s2: string, t2: {[any]: any}) -- line: 90
-	-- upvalues: Promise (copy), log (copy), isStudio (copy)
-	local v20 = t2.captureService or game:GetService("CaptureService")
-	local v21 = t2.pollIntervalSeconds or 1
-	local v22 = t2.maxPollAttempts or 30
 
-	return Promise.new(function(resolve) -- line: 95
-		-- upvalues: v20 (copy), p3 (copy), log (copy), s2 (copy), isStudio (copy), v22 (copy), v21 (copy)
-		task.spawn(function() -- line: 96
-			-- upvalues: v20 (copy), p3 (copy), log (copy), s2 (copy), isStudio (copy), resolve (copy), v22 (copy), v21 (copy)
-			local ok, result, v36 = pcall(function() -- line: 97
-				-- upvalues: v20 (copy), p3 (copy)
-				return v20:GenerateMomentTextAsync(p3)
+local function runGeneration(p, p2: string, p3: string?, data) -- 1 equivalent call inferred from this helper
+	local captureService = data.captureService or game:GetService("CaptureService")
+	local pollIntervalSeconds = data.pollIntervalSeconds or 1
+	local maxPollAttempts = data.maxPollAttempts or 30
+
+	return Promise.new(function(callback, _, callback2)
+		local thread = task.spawn(function()
+			local success, result, generationToken = pcall(function()
+				if p3 == nil then
+					return captureService:GenerateMomentTextAsync(p)
+				end
+
+				return captureService:GenerateMomentTextAsync(p, p3)
 			end)
 
-			if ok then
-				local v37
+			if success then
+				local result2
 
-				if result == nil then
-					v37 = nil
-				else
-					local ok2, result2 = pcall(function() -- line: 81
-						-- upvalues: result (copy)
+				if result ~= nil then
+					local success2
+					success2, result2 = pcall(function()
 						return result.Name
 					end)
 
-					v37 = if not ok2 or typeof(result2) ~= "string" then nil else result2
+					if not success2 or typeof(result2) ~= "string" then
+						result2 = nil
+					end
 				end
 
-				if v37 == "Success" and typeof(v36) == "string" and #v36 ~= 0 then
-					log("generation started for %s → token=%s, polling", s2, v36)
+				if result2 == "Success" and typeof(generationToken) == "string" and #generationToken ~= 0 then
+					log("generation started for %s", p2)
 
-					for _ = 1, v22 do
-						task.wait(v21)
+					for _ = 1, maxPollAttempts do
+						task.wait(pollIntervalSeconds)
 
-						local ok3, result3, v43, v44 = pcall(function() -- line: 118
-							-- upvalues: v20 (copy), v36 (copy)
-							return v20:CheckMomentTextStatusAsync(v36)
+						local success2, result3, summary, description = pcall(function()
+							return captureService:CheckMomentTextStatusAsync(generationToken)
 						end)
 
-						if not ok3 then
+						if not success2 then
 							continue
 						end
 
-						local v45
+						local result4
 
-						if result3 == nil then
-							v45 = nil
-						else
-							local ok4, result4 = pcall(function() -- line: 81
-								-- upvalues: result3 (copy)
+						if result3 ~= nil then
+							local success3
+							success3, result4 = pcall(function()
 								return result3.Name
 							end)
 
-							v45 = if not ok4 or typeof(result4) ~= "string" then nil else result4
+							if not success3 or typeof(result4) ~= "string" then
+								result4 = nil
+							end
 						end
 
-						if v45 == "Success" then
-							log("generation complete for %s", s2)
-							resolve({
-								summary = v43,
-								description = v44
+						if result4 == "Success" then
+							log("generation succeeded for %s", p2)
+							callback({
+								summary = summary,
+								description = description,
+								generationToken = generationToken
 							})
 
 							return
 						end
 
-						if v45 == "Failed" then
-							log("generation failed for %s", s2)
-							resolve({
-								error = "GENERATION_FAILED"
-							})
+						if FFlagMomentTextGenerationFilteredSignal and result4 == "Filtered" then
+							callback({ error = "CONTENT_FILTERED" })
+							return
+						end
 
+						if result4 == "Failed" then
+							callback({ error = "GENERATION_FAILED" })
 							return
 						end
 					end
 
-					log("generation timed out for %s", s2)
-					resolve({
-						error = "TIMEOUT"
-					})
-
+					callback({ error = "TIMEOUT" })
 					return
 				end
 			end
 
-			log("generation start failed for %s", s2)
-
-			if isStudio() then
-				log("resolving with mock result (Studio, backend unreachable)")
-				resolve({
-					summary = "insane save",
-					description = "no way i pulled this off — clutch save on the last second, everyone was screaming lol",
-					error = nil
-				})
-
-				return
+			if not success then
+				log("generation start failed for %s", p2)
 			end
 
-			resolve({
-				error = "REQUEST_FAILED"
-			})
+			if isStudio() then
+				callback(mockResult()) -- inferred equivalent call
+			else
+				callback({ error = "REQUEST_FAILED" })
+			end
 		end)
+
+		if GetFFlagEnableMomentTextGeneration() then
+			callback2(function()
+				log("generation cancelled for %s", p2)
+				task.cancel(thread)
+			end)
+		end
 	end)
 end
-local function generateMomentText(p4, t3: {[any]: any}?) -- line: 144
-	-- upvalues: log (copy), isStudio (copy), Promise (copy), captureKey (copy), t1 (copy)
-	local v25 = t3 or {}
 
-	if not (v25.isEngineEnabled or function() -- line: 147
+local function generateMomentText(p, p2: string?, options)
+	local v2 = options or {}
+
+	if (v2.isEngineEnabled or function()
 		return game:GetEngineFeature("CaptureServiceGenerateMomentText")
 	end)() then
-		log("engine feature %s unavailable", "CaptureServiceGenerateMomentText")
+		local v3 = captureKey(p)
 
-		if isStudio() then
-			return Promise.resolve({
-				summary = "insane save",
-				description = "no way i pulled this off — clutch save on the last second, everyone was screaming lol",
-				error = nil
-			})
+		if p2 ~= nil and p2 ~= "" then
+			v3 = `{v3}|tone:{p2}`
 		end
 
-		return Promise.resolve({
-			error = "ENGINE_UNSUPPORTED"
-		})
-	end
+		if GetFFlagMomentTextGenerationDisableCache() then
+			return runGeneration(p, v3, p2, v2)
+		end
 
-	local v26 = captureKey(p4)
+		if v[v3] ~= nil then
+			return v[v3]
+		end
 
-	if t1[v26] ~= nil then
-		log("reusing cached generation for %s (no re-send)", v26)
+		local v4 = runGeneration(p, v3, p2, v2) -- inferred equivalent call
+		v[v3] = v4
 
-		return t1[v26]
-	end
-
-	local v27 = v25.captureService or game:GetService("CaptureService")
-	local v28 = v25.pollIntervalSeconds or 1
-	local v29 = v25.maxPollAttempts or 30
-	local v30 = Promise.new(function(resolve) -- line: 95
-		-- upvalues: v27 (copy), p4 (copy), log (copy), v26 (copy), isStudio (copy), v29 (copy), v28 (copy)
-		task.spawn(function() -- line: 96
-			-- upvalues: v27 (copy), p4 (copy), log (copy), v26 (copy), isStudio (copy), resolve (copy), v29 (copy), v28 (copy)
-			local ok, result, v50 = pcall(function() -- line: 97
-				-- upvalues: v27 (copy), p4 (copy)
-				return v27:GenerateMomentTextAsync(p4)
-			end)
-
-			if ok then
-				local v51
-
-				if result == nil then
-					v51 = nil
-				else
-					local ok5, result5 = pcall(function() -- line: 81
-						-- upvalues: result (copy)
-						return result.Name
-					end)
-
-					v51 = if not ok5 or typeof(result5) ~= "string" then nil else result5
-				end
-
-				if v51 == "Success" and typeof(v50) == "string" and #v50 ~= 0 then
-					log("generation started for %s → token=%s, polling", v26, v50)
-
-					for _ = 1, v29 do
-						task.wait(v28)
-
-						local ok6, result6, v57, v58 = pcall(function() -- line: 118
-							-- upvalues: v27 (copy), v50 (copy)
-							return v27:CheckMomentTextStatusAsync(v50)
-						end)
-
-						if not ok6 then
-							continue
-						end
-
-						local v59
-
-						if result6 == nil then
-							v59 = nil
-						else
-							local ok7, result7 = pcall(function() -- line: 81
-								-- upvalues: result6 (copy)
-								return result6.Name
-							end)
-
-							v59 = if not ok7 or typeof(result7) ~= "string" then nil else result7
-						end
-
-						if v59 == "Success" then
-							log("generation complete for %s", v26)
-							resolve({
-								summary = v57,
-								description = v58
-							})
-
-							return
-						end
-
-						if v59 == "Failed" then
-							log("generation failed for %s", v26)
-							resolve({
-								error = "GENERATION_FAILED"
-							})
-
-							return
-						end
-					end
-
-					log("generation timed out for %s", v26)
-					resolve({
-						error = "TIMEOUT"
-					})
-
-					return
-				end
+		v4:andThen(function(p3)
+			if p3 == nil or p3.error ~= nil then
+				v[v3] = nil
 			end
-
-			log("generation start failed for %s", v26)
-
-			if isStudio() then
-				log("resolving with mock result (Studio, backend unreachable)")
-				resolve({
-					summary = "insane save",
-					description = "no way i pulled this off — clutch save on the last second, everyone was screaming lol",
-					error = nil
-				})
-
-				return
-			end
-
-			resolve({
-				error = "REQUEST_FAILED"
-			})
+		end, function()
+			v[v3] = nil
 		end)
-	end)
 
-	t1[v26] = v30
-	v30:andThen(function(t4: {[any]: any}) -- line: 171
-		-- upvalues: t1 (copy), v26 (copy)
-		if t4 == nil or t4.error ~= nil then
-			t1[v26] = nil
+		if GetFFlagEnableMomentTextGeneration() then
+			v4:finally(function(p3)
+				if p3 == Promise.Status.Cancelled then
+					v[v3] = nil
+				end
+			end)
 		end
-	end, function() -- line: 175
-		-- upvalues: t1 (copy), v26 (copy)
-		t1[v26] = nil
-	end)
 
-	return v30
+		return v4
+	elseif isStudio() then
+		return Promise.resolve(mockResult()) -- inferred equivalent call
+	else
+		return Promise.resolve({ error = "ENGINE_UNSUPPORTED" })
+	end
 end
 
 return generateMomentText

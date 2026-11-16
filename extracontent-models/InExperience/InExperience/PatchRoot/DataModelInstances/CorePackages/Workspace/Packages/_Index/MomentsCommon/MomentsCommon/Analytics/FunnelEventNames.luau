@@ -1,144 +1,171 @@
-local t1 = {
+local funnelTypes = {
 	AppNavigation = "App Navigation",
 	CreationFlow = "Creation Flow",
 	MusicEnhancement = "Music Enhancement",
 	TextOverlayEnhancement = "Text Enhancement",
 	StickerOverlayEnhancement = "Sticker Enhancement",
-	TrimEnhancement = "Trim Enhancement"
+	TrimEnhancement = "Trim Enhancement",
+	VoiceEnhancement = "Voice Enhancement",
+	DraftRecovery = "Draft Recovery"
 }
-local t2 = {
+
+local appNavigationSteps = {
 	AppLaunched = "AppLaunched",
 	TrendingScreenView = "TrendingScreenView",
 	MyMomentsScreenView = "MyMomentsScreenView",
 	UserProfileScreenView = "UserProfileScreenView"
 }
-local t3 = {
-	TopBar = "TopBar"
-}
-local t4 = {
+
+local creationFlowSteps = {
 	CreateIntent = "CreateIntent",
 	GalleryItemSelected = "GalleryItemSelected",
 	GalleryItemSelectedContinuePressed = "GalleryItemSelectedContinuePressed",
 	EditingScreenContinuePressed = "EditingScreenContinuePressed",
 	Published = "Published"
 }
-local t5 = {
+
+local musicEnhancementSteps = {
 	MusicButtonPressed = "MusicButtonPressed",
 	MusicSelected = "MusicSelected",
 	MusicApplied = "MusicApplied"
 }
-local t6 = {
+
+local textOverlayEnhancementSteps = {
 	TextOverlayButtonPressed = "TextOverlayButtonPressed",
 	TextOverlayCompleted = "TextOverlayCompleted"
 }
-local t7 = {
+
+local stickerOverlayEnhancementSteps = {
 	StickerOverlayButtonPressed = "StickerOverlayButtonPressed",
 	StickerOverlaySelected = "StickerOverlaySelected",
 	StickerOverlayCompleted = "StickerOverlayCompleted"
 }
-local t8 = {
+
+local trimEnhancementSteps = {
 	TrimButtonPressed = "TrimButtonPressed",
 	TrimCompleted = "TrimCompleted"
 }
-local t9 = {
-	[t1.AppNavigation] = {
-		[t2.AppLaunched] = {
-			stepNumber = 1,
-			stepName = "App Launched"
-		},
-		[t2.TrendingScreenView] = {
+
+local voiceEnhancementSteps = {
+	VoiceButtonPressed = "VoiceButtonPressed",
+	VoiceTextEntered = "VoiceTextEntered",
+	VoiceGeneratePressed = "VoiceGeneratePressed",
+	VoiceGenerateSucceeded = "VoiceGenerateSucceeded",
+	VoiceApplied = "VoiceApplied"
+}
+
+local draftRecoverySteps = { DraftRestored = "DraftRestored", DraftPublished = "DraftPublished" }
+
+local funnelSteps = {
+	[funnelTypes.AppNavigation] = {
+		[appNavigationSteps.AppLaunched] = { stepNumber = 1, stepName = "App Launched" },
+		[appNavigationSteps.TrendingScreenView] = {
 			stepNumber = 2,
 			stepName = "Trending Screen View"
 		},
-		[t2.MyMomentsScreenView] = {
+		[appNavigationSteps.MyMomentsScreenView] = {
 			stepNumber = 3,
 			stepName = "My Moments Screen View"
 		},
-		[t2.UserProfileScreenView] = {
+		[appNavigationSteps.UserProfileScreenView] = {
 			stepNumber = 4,
 			stepName = "User Profile Screen View"
-		}
-	},
-	[t1.CreationFlow] = {
-		[t4.CreateIntent] = {
-			stepNumber = 1,
-			stepName = "Create Intent"
-		},
-		[t4.GalleryItemSelected] = {
-			stepNumber = 2,
-			stepName = "Gallery Item Selected"
-		},
-		[t4.GalleryItemSelectedContinuePressed] = {
-			stepNumber = 3,
-			stepName = "Gallery Item Selected Continue Pressed"
-		},
-		[t4.EditingScreenContinuePressed] = {
-			stepNumber = 4,
-			stepName = "Editing Screen Continue Pressed"
-		},
-		[t4.Published] = {
-			stepNumber = 5,
-			stepName = "Published"
-		}
-	},
-	[t1.MusicEnhancement] = {
-		[t5.MusicButtonPressed] = {
-			stepNumber = 1,
-			stepName = "Music Button Pressed"
-		},
-		[t5.MusicSelected] = {
-			stepNumber = 2,
-			stepName = "Music Selected"
-		},
-		[t5.MusicApplied] = {
-			stepNumber = 3,
-			stepName = "Music Applied"
-		}
-	},
-	[t1.TrimEnhancement] = {
-		[t8.TrimButtonPressed] = {
-			stepNumber = 1,
-			stepName = "Trim Button Pressed"
-		},
-		[t8.TrimCompleted] = {
-			stepNumber = 2,
-			stepName = "Trim Completed"
-		}
-	},
-	[t1.TextOverlayEnhancement] = {
-		[t6.TextOverlayButtonPressed] = {
-			stepNumber = 1,
-			stepName = "Text Overlay Button Pressed"
-		},
-		[t6.TextOverlayCompleted] = {
-			stepNumber = 2,
-			stepName = "Text Overlay Completed"
-		}
-	},
-	[t1.StickerOverlayEnhancement] = {
-		[t7.StickerOverlayButtonPressed] = {
-			stepNumber = 1,
-			stepName = "Sticker Overlay Button Pressed"
-		},
-		[t7.StickerOverlaySelected] = {
-			stepNumber = 2,
-			stepName = "Sticker Overlay Selected"
-		},
-		[t7.StickerOverlayCompleted] = {
-			stepNumber = 3,
-			stepName = "Sticker Overlay Completed"
 		}
 	}
 }
 
+local creationFlow = funnelTypes.CreationFlow
+funnelSteps[creationFlow] = {
+	[creationFlowSteps.CreateIntent] = { stepNumber = 1, stepName = "Create Intent" },
+	[creationFlowSteps.GalleryItemSelected] = { stepNumber = 2, stepName = "Gallery Item Selected" },
+	[creationFlowSteps.GalleryItemSelectedContinuePressed] = {
+		stepNumber = 3,
+		stepName = "Gallery Item Selected Continue Pressed"
+	},
+	[creationFlowSteps.EditingScreenContinuePressed] = {
+		stepNumber = 4,
+		stepName = "Editing Screen Continue Pressed"
+	},
+	[creationFlowSteps.Published] = { stepNumber = 5, stepName = "Published" }
+}
+
+local musicEnhancement = funnelTypes.MusicEnhancement
+funnelSteps[musicEnhancement] = {
+	[musicEnhancementSteps.MusicButtonPressed] = {
+		stepNumber = 1,
+		stepName = "Music Button Pressed"
+	},
+	[musicEnhancementSteps.MusicSelected] = { stepNumber = 2, stepName = "Music Selected" },
+	[musicEnhancementSteps.MusicApplied] = { stepNumber = 3, stepName = "Music Applied" }
+}
+
+local trimEnhancement = funnelTypes.TrimEnhancement
+funnelSteps[trimEnhancement] = {
+	[trimEnhancementSteps.TrimButtonPressed] = { stepNumber = 1, stepName = "Trim Button Pressed" },
+	[trimEnhancementSteps.TrimCompleted] = { stepNumber = 2, stepName = "Trim Completed" }
+}
+
+local textOverlayEnhancement = funnelTypes.TextOverlayEnhancement
+funnelSteps[textOverlayEnhancement] = {
+	[textOverlayEnhancementSteps.TextOverlayButtonPressed] = {
+		stepNumber = 1,
+		stepName = "Text Overlay Button Pressed"
+	},
+	[textOverlayEnhancementSteps.TextOverlayCompleted] = {
+		stepNumber = 2,
+		stepName = "Text Overlay Completed"
+	}
+}
+
+local stickerOverlayEnhancement = funnelTypes.StickerOverlayEnhancement
+funnelSteps[stickerOverlayEnhancement] = {
+	[stickerOverlayEnhancementSteps.StickerOverlayButtonPressed] = {
+		stepNumber = 1,
+		stepName = "Sticker Overlay Button Pressed"
+	},
+	[stickerOverlayEnhancementSteps.StickerOverlaySelected] = {
+		stepNumber = 2,
+		stepName = "Sticker Overlay Selected"
+	},
+	[stickerOverlayEnhancementSteps.StickerOverlayCompleted] = {
+		stepNumber = 3,
+		stepName = "Sticker Overlay Completed"
+	}
+}
+
+local voiceEnhancement = funnelTypes.VoiceEnhancement
+funnelSteps[voiceEnhancement] = {
+	[voiceEnhancementSteps.VoiceButtonPressed] = {
+		stepNumber = 1,
+		stepName = "Voice Button Pressed"
+	},
+	[voiceEnhancementSteps.VoiceTextEntered] = { stepNumber = 2, stepName = "Voice Text Entered" },
+	[voiceEnhancementSteps.VoiceGeneratePressed] = {
+		stepNumber = 3,
+		stepName = "Voice Generate Pressed"
+	},
+	[voiceEnhancementSteps.VoiceGenerateSucceeded] = {
+		stepNumber = 4,
+		stepName = "Voice Generate Succeeded"
+	},
+	[voiceEnhancementSteps.VoiceApplied] = { stepNumber = 5, stepName = "Voice Applied" }
+}
+
+local draftRecovery = funnelTypes.DraftRecovery
+funnelSteps[draftRecovery] = {
+	[draftRecoverySteps.DraftRestored] = { stepNumber = 1, stepName = "Draft Restored" },
+	[draftRecoverySteps.DraftPublished] = { stepNumber = 2, stepName = "Draft Published" }
+}
 return {
-	FunnelTypes = t1,
-	FunnelSteps = t9,
-	CreationIntentSource = t3,
-	AppNavigationSteps = t2,
-	CreationFlowSteps = t4,
-	MusicEnhancementSteps = t5,
-	TrimEnhancementSteps = t8,
-	TextOverlayEnhancementSteps = t6,
-	StickerOverlayEnhancementSteps = t7
+	FunnelTypes = funnelTypes,
+	FunnelSteps = funnelSteps,
+	CreationIntentSource = { Captures = "Captures", TopBar = "TopBar" },
+	AppNavigationSteps = appNavigationSteps,
+	CreationFlowSteps = creationFlowSteps,
+	MusicEnhancementSteps = musicEnhancementSteps,
+	TrimEnhancementSteps = trimEnhancementSteps,
+	TextOverlayEnhancementSteps = textOverlayEnhancementSteps,
+	StickerOverlayEnhancementSteps = stickerOverlayEnhancementSteps,
+	VoiceEnhancementSteps = voiceEnhancementSteps,
+	DraftRecoverySteps = draftRecoverySteps
 }

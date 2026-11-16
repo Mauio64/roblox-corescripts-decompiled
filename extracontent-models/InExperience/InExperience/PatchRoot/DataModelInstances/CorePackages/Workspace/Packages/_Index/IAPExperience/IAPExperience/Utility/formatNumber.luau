@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	["en-us"] = ",",
 	["en-gb"] = ",",
 	["es-mx"] = ",",
@@ -19,21 +19,17 @@ local t1 = {
 	["tr-tr"] = "."
 }
 
-local function addGroupDelimiters(s1: string, s2: string) -- line: 35
-	local v5 = string.format("%%1%s%%2", s2)
+local function addGroupDelimiters(value: string, p: string)
+	local v2 = string.format("%%1%s%%2", p)
 
 	repeat
-		local count
+		local v3
+		value, v3 = string.gsub(value, "^(-?%d+)(%d%d%d)", v2)
+	until v3 == 0
 
-		s1, count = string.gsub(s1, "^(-?%d+)(%d%d%d)", v5)
-	until count == 0
-
-	return s1
+	return value
 end
 
-return function(s3: string, n1: number) -- line: 47
-	-- upvalues: t1 (copy), addGroupDelimiters (copy)
-	local v9 = t1[s3] or ","
-
-	return (addGroupDelimiters(n1, v9))
+return function(p: string, p2: number)
+	return addGroupDelimiters(p2, v[p] or ",")
 end

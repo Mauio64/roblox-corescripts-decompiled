@@ -1,1 +1,3 @@
-return require(script.Parent.makeAppOneKnobSlider)("SystemPrimaryDefault")
+local makeAppOneKnobSlider = require(script.Parent.makeAppOneKnobSlider)
+
+return makeAppOneKnobSlider("SystemPrimaryDefault")

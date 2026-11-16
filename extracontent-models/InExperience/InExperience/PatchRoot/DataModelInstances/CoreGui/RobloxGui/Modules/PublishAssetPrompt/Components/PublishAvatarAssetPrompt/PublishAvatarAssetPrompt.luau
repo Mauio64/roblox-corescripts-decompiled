@@ -1,271 +1,284 @@
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
+
 local React = require(CorePackages.Packages.React)
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
-local mutedError = require(CorePackages.Workspace.Packages.Loggers).mutedError
-local ParentParent = script.Parent.Parent
-local BasePublishPrompt = require(ParentParent.BasePublishPrompt)
-local ObjectViewport = require(ParentParent.Common.ObjectViewport)
-local LabeledTextBox = require(ParentParent.Common.LabeledTextBox)
-local PublishInfoList = require(ParentParent.Common.PublishInfoList)
+local Loggers = require(CorePackages.Workspace.Packages.Loggers)
+local mutedError = Loggers.mutedError
+
+local parent = script.Parent.Parent
+local BasePublishPrompt = require(parent.BasePublishPrompt)
+local ObjectViewport = require(parent.Common.ObjectViewport)
+local LabeledTextBox = require(parent.Common.LabeledTextBox)
+local PublishInfoList = require(parent.Common.PublishInfoList)
 local PurchasePrompt = require(CorePackages.Workspace.Packages.PurchasePrompt)
 local PublishAssetAnalytics = PurchasePrompt.PublishAssetAnalytics
-local ParentParentParent = ParentParent.Parent
-local Actions = ParentParentParent.Actions
-local SetPromptVisibility = require(Actions.SetPromptVisibility)
+
+local parent2 = parent.Parent
+
+local actions = parent2.Actions
+local SetPromptVisibility = require(actions.SetPromptVisibility)
+
 local RoactUtils = require(CorePackages.Workspace.Packages.RoactUtils)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local Constants = require(ParentParentParent.Constants)
-local MakeupPreviewUtils = require(ParentParentParent.MakeupPreviewUtils)
-local MakeupPartGrid = require(ParentParent.Common.MakeupPartGrid)
-local GetFFlagSingleUploadMakeupSupport = require(ParentParentParent.Flags.GetFFlagSingleUploadMakeupSupport)
-local uDim = UDim.new(0, 20)
 
-local function PublishAvatarAssetPrompt(t1: {[any]: any}) -- line: 47
-	-- upvalues: Players (copy), useSelector (copy), useDispatch (copy), Constants (copy), React (copy), GetFFlagSingleUploadMakeupSupport (copy), MakeupPreviewUtils (copy), PublishAssetAnalytics (copy), PurchasePrompt (copy), mutedError (copy), SetPromptVisibility (copy), RobloxTranslator (copy), uDim (copy), ObjectViewport (copy), LabeledTextBox (copy), PublishInfoList (copy), MakeupPartGrid (copy), BasePublishPrompt (copy)
-	local LocalPlayer = Players.LocalPlayer
+local Constants = require(parent2.Constants)
+local MakeupPreviewUtils = require(parent2.MakeupPreviewUtils)
+local MakeupPartGrid = require(parent.Common.MakeupPartGrid)
 
-	assert(LocalPlayer, "LocalPlayer must not be nil")
+local GetFFlagSingleUploadMakeupSupport = require(parent2.Flags.GetFFlagSingleUploadMakeupSupport)
 
-	local v27 = useSelector(function(p1) -- line: 52
-		return p1.promptRequest.promptInfo
+local udim = UDim.new(0, 20)
+
+local function PublishAvatarAssetPrompt(p)
+	local localPlayer = Players.LocalPlayer
+	assert(localPlayer, "LocalPlayer must not be nil")
+
+	local v = useSelector(function(p2)
+		return p2.promptRequest.promptInfo
 	end)
-	local v28 = useDispatch()
-	local v29 = Constants.AvatarAssetTypeDefaultName[v27.accessoryType]
-	local v30 = LocalPlayer.Name .. "'s " .. v29
-	local v31, v32 = React.useState(false)
-	local v33, v34 = React.useState(v30)
-	local v35, v36 = React.useState(true)
-	local v37, v38 = React.useState(v30)
-	local v39, v40 = React.useState(true)
-	local v41, v42 = React.useState(false)
-	local v43, v44 = React.useState(true)
-	local v45 = not not GetFFlagSingleUploadMakeupSupport() and MakeupPreviewUtils.isMakeupAssetType(v27.accessoryType)
-	local v46, v47 = React.useState(nil)
 
-	React.useEffect(function() -- line: 77
-		-- upvalues: v45 (copy), v27 (copy), MakeupPreviewUtils (copy), v47 (copy)
-		if not v45 or not v27.accessoryInstance then
-			return function() -- line: 79
+	local v2 = useDispatch()
+
+	local v3 = Constants.AvatarAssetTypeDefaultName[v.accessoryType]
+	local v4 = localPlayer.Name .. "'s " .. v3
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(v4)
+	local state3, setState3 = React.useState(true)
+	local state4, setState4 = React.useState(v4)
+	local state5, setState5 = React.useState(true)
+	local state6, setState6 = React.useState(false)
+	local state7, setState7 = React.useState(true)
+	local isMakeupPreview
+
+	if GetFFlagSingleUploadMakeupSupport() then
+		isMakeupPreview = MakeupPreviewUtils.isMakeupAssetType(v.accessoryType)
+	else
+		isMakeupPreview = false
+	end
+
+	local state8, setState8 = React.useState(nil)
+
+	React.useEffect(function()
+		if isMakeupPreview and v.accessoryInstance then
+			local makeupHeadPreview = MakeupPreviewUtils.createMakeupHeadPreview(v.accessoryInstance, v.accessoryType)
+			setState8(makeupHeadPreview)
+
+			return function()
+				if makeupHeadPreview then
+					makeupHeadPreview:Destroy()
+				end
 			end
 		end
 
-		local v64 = MakeupPreviewUtils.createMakeupHeadPreview(v27.accessoryInstance, v27.accessoryType)
+		return function() end
+	end, { v.accessoryInstance, isMakeupPreview, v.accessoryType })
 
-		v47(v64)
+	if not isMakeupPreview then
+		state8 = v.accessoryInstance
+	end
 
-		return function() -- line: 86
-			-- upvalues: v64 (copy)
-			if v64 then
-				v64:Destroy()
-			end
+	local ref = React.useRef(false)
+	local ref2 = React.useRef(false)
+	local ref3 = React.useRef(nil)
+	local ref4 = React.useRef(nil)
+
+	local openPreviewView = React.useCallback(function()
+		PublishAssetAnalytics.sendButtonClicked(
+			PublishAssetAnalytics.Section.BuyCreationPage,
+			PublishAssetAnalytics.Element.Expand
+		)
+		setState(true)
+	end, {})
+
+	local closePreviewView = React.useCallback(function()
+		setState(false)
+	end, {})
+
+	local canSubmit = React.useCallback(function()
+		local v5 = state3 and state5
+
+		if v5 then
+			return not (v.accessoryInstance == nil) and state7
 		end
-	end, {
-		v27.accessoryInstance,
-		v45,
-		v27.accessoryType
-	})
 
-	local v48 = if not v45 then v27.accessoryInstance else v46
-	local v49 = React.useRef(false)
-	local v50 = React.useRef(false)
-	local v51 = React.useRef(nil)
-	local v52 = React.useRef(nil)
-	local v53 = React.useCallback(function() -- line: 102
-		-- upvalues: PublishAssetAnalytics (copy), v32 (copy)
-		PublishAssetAnalytics.sendButtonClicked(PublishAssetAnalytics.Section.BuyCreationPage, PublishAssetAnalytics.Element.Expand)
-		v32(true)
-	end, {})
-	local v54 = React.useCallback(function() -- line: 107
-		-- upvalues: v32 (copy)
-		v32(false)
-	end, {})
-	local v55 = React.useCallback(function() -- line: 111
-		-- upvalues: v35 (copy), v39 (copy), v27 (copy), v43 (copy)
-		return v35 and (v39 and (v27.accessoryInstance ~= nil and v43))
-	end, {
-		v35,
-		v39,
-		v27.accessoryInstance,
-		v43
-	})
-	local v56 = React.useCallback(function() -- line: 116
-		-- upvalues: PublishAssetAnalytics (copy), v33 (copy), v37 (copy), PurchasePrompt (copy), v27 (copy), v48 (copy), mutedError (copy)
-		PublishAssetAnalytics.sendButtonClicked(PublishAssetAnalytics.Section.BuyCreationPage, PublishAssetAnalytics.Element.Buy)
+		return v5
+	end, { state3, state5, v.accessoryInstance, state7 })
 
-		local t2 = {
-			name = v33,
-			description = v37
-		}
+	local onSubmit = React.useCallback(function()
+		PublishAssetAnalytics.sendButtonClicked(
+			PublishAssetAnalytics.Section.BuyCreationPage,
+			PublishAssetAnalytics.Element.Buy
+		)
+
+		local v5 = { name = state2, description = state4 }
 
 		if PurchasePrompt.initiateAvatarCreationFeePurchase then
-			PurchasePrompt.initiateAvatarCreationFeePurchase(t2, v27.guid, v48, v27.priceInRobux)
-
-			return
+			PurchasePrompt.initiateAvatarCreationFeePurchase(v5, v.guid, state8, v.priceInRobux)
+		else
+			mutedError("PurchasePrompt.initiateAvatarCreationFeePurchase is not available")
 		end
+	end, { state2, state4, v.guid, v.accessoryInstance, v.priceInRobux, state8 })
 
-		mutedError("PurchasePrompt.initiateAvatarCreationFeePurchase is not available")
-	end, {
-		v33,
-		v37,
-		v27.guid,
-		v27.accessoryInstance,
-		v27.priceInRobux,
-		v48
-	})
-	local v57 = React.useCallback(function(p2, p3) -- line: 138
-		-- upvalues: v34 (copy), v36 (copy), v49 (copy), PublishAssetAnalytics (copy)
-		v34(p2)
-		v36(p3)
+	local onNameUpdated = React.useCallback(function(p2, p3)
+		setState2(p2)
+		setState3(p3)
 
-		if not v49.current then
-			v49.current = true
-			PublishAssetAnalytics.sendFieldTouched(PublishAssetAnalytics.Section.BuyCreationPage, PublishAssetAnalytics.Element.Name)
-		end
-	end, {})
-	local v58 = React.useCallback(function(p4, p5) -- line: 148
-		-- upvalues: v38 (copy), v40 (copy), v50 (copy), PublishAssetAnalytics (copy)
-		v38(p4)
-		v40(p5)
-
-		if not v50.current then
-			v50.current = true
-			PublishAssetAnalytics.sendFieldTouched(PublishAssetAnalytics.Section.BuyCreationPage, PublishAssetAnalytics.Element.Description)
+		if not ref.current then
+			ref.current = true
+			PublishAssetAnalytics.sendFieldTouched(
+				PublishAssetAnalytics.Section.BuyCreationPage,
+				PublishAssetAnalytics.Element.Name
+			)
 		end
 	end, {})
 
-	local function v59(p6) -- line: 158
-		-- upvalues: v28 (copy), SetPromptVisibility (copy), v42 (copy), v44 (copy)
-		local hasCompletedPurchase = p6.hasCompletedPurchase
-		local isShown = p6.isShown
+	local onTextUpdated = React.useCallback(function(p2, p3)
+		setState4(p2)
+		setState5(p3)
+
+		if not ref2.current then
+			ref2.current = true
+			PublishAssetAnalytics.sendFieldTouched(
+				PublishAssetAnalytics.Section.BuyCreationPage,
+				PublishAssetAnalytics.Element.Description
+			)
+		end
+	end, {})
+
+	local function fn(p2)
+		local hasCompletedPurchase = p2.hasCompletedPurchase
+		local isShown = p2.isShown
 
 		if hasCompletedPurchase and not isShown then
-			v28(SetPromptVisibility(false))
-
+			v2(SetPromptVisibility(false))
 			return
 		end
 
-		v42(isShown)
+		setState6(isShown)
 
 		if isShown then
-			v44(false)
+			setState7(false)
 		end
 	end
-	local function v60() -- line: 172
-		-- upvalues: v44 (copy)
-		v44(true)
+
+	local function fn2()
+		setState7(true)
 	end
 
-	React.useEffect(function() -- line: 177
-		-- upvalues: PurchasePrompt (copy), v51 (copy), v59 (copy), v52 (copy), v60 (copy), mutedError (copy), PublishAssetAnalytics (copy)
+	React.useEffect(function()
 		local windowStateChangedEvent = PurchasePrompt.windowStateChangedEvent
 		local promptStateSetToNoneEvent = PurchasePrompt.promptStateSetToNoneEvent
 
 		if windowStateChangedEvent and promptStateSetToNoneEvent then
-			v51.current = windowStateChangedEvent:Connect(v59)
-			v52.current = promptStateSetToNoneEvent:Connect(v60)
+			ref3.current = windowStateChangedEvent:Connect(fn)
+			ref4.current = promptStateSetToNoneEvent:Connect(fn2)
 		else
 			mutedError("PurchasePrompt.windowStateChangedEvent or PurchasePrompt.promptStateSetToNoneEvent is not available")
 		end
 
 		PublishAssetAnalytics.sendPageLoad(PublishAssetAnalytics.Section.BuyCreationPage)
 
-		return function() -- line: 191
-			-- upvalues: v51 (copy), mutedError (copy), v52 (copy)
-			if v51.current then
-				v51.current:Disconnect()
-				v51.current = nil
+		return function()
+			if ref3.current then
+				ref3.current:Disconnect()
+				ref3.current = nil
 			else
 				mutedError("windowStateChangedConnection was not established")
 			end
 
-			if v52.current then
-				v52.current:Disconnect()
-				v52.current = nil
+			if not ref4.current then
+				mutedError("promptStateSetToNoneConnection was not established")
 
 				return
 			end
 
-			mutedError("promptStateSetToNoneConnection was not established")
+			ref4.current:Disconnect()
+			ref4.current = nil
 		end
 	end, {})
+	local v5
 
-	local v61 = ((if not v45 then RobloxTranslator:FormatByKey("Feature.Avatar.Label.Accessory") else RobloxTranslator:FormatByKey("Feature.Catalog.Label.Makeup"))) .. " | " .. RobloxTranslator:FormatByKey(Constants.AvatarAssetTypeLocalized[v27.accessoryType])
-	local v62 = React.useCallback(function() -- line: 215
-		-- upvalues: v48 (copy), React (copy), uDim (copy), ObjectViewport (copy), v53 (copy), GetFFlagSingleUploadMakeupSupport (copy), v45 (copy), LabeledTextBox (copy), RobloxTranslator (copy), v37 (copy), v58 (copy), PublishInfoList (copy), v61 (copy), MakeupPartGrid (copy), v27 (copy), v33 (copy), t1 (copy)
-		local v75 = v48 == nil
+	if isMakeupPreview then
+		v5 = RobloxTranslator:FormatByKey("Feature.Catalog.Label.Makeup")
+	else
+		v5 = RobloxTranslator:FormatByKey("Feature.Avatar.Label.Accessory")
+	end
 
+	local typeName = v5 .. " | " .. RobloxTranslator:FormatByKey(Constants.AvatarAssetTypeLocalized[v.accessoryType])
+
+	local useCallback = React.useCallback
+	local function fn3()
+		local isLoading = state8 == nil
 		return React.createElement(React.Fragment, nil, {
 			UIListLayout = React.createElement("UIListLayout", {
-				Padding = uDim,
+				Padding = udim,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Vertical
 			}),
-			UIPadding = React.createElement("UIPadding", {
-				PaddingBottom = uDim,
-				PaddingTop = uDim
-			}),
+			UIPadding = React.createElement("UIPadding", { PaddingBottom = udim, PaddingTop = udim }),
 			EmbeddedPreview = React.createElement(ObjectViewport, {
+				openPreviewView = openPreviewView,
+				model = state8,
+				isLoading = isLoading,
+				useFullBodyCameraSettings = not GetFFlagSingleUploadMakeupSupport() or not isMakeupPreview,
 				fieldOfView = 30,
 				LayoutOrder = 1,
-				openPreviewView = v53,
-				model = v48,
-				isLoading = v75,
-				useFullBodyCameraSettings = not GetFFlagSingleUploadMakeupSupport() or not v45
+				isMakeupPreview = isMakeupPreview
 			}),
 			DescriptionInput = React.createElement(LabeledTextBox, {
 				LayoutOrder = 2,
-				centerText = false,
-				maxLength = 1000,
-				textBoxHeight = 104,
 				labelText = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.Description"),
-				defaultText = v37,
-				onTextUpdated = v58,
+				centerText = false,
+				defaultText = state4,
+				maxLength = 1000,
+				onTextUpdated = onTextUpdated,
+				textBoxHeight = 104,
 				invalidInputText = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.InvalidDescription")
 			}),
-			InfoList = React.createElement(PublishInfoList, {
-				LayoutOrder = 3,
-				typeName = v61
-			}),
-			MakeupGrid = v45 and React.createElement(MakeupPartGrid, {
+			InfoList = React.createElement(PublishInfoList, { typeName = typeName, LayoutOrder = 3 }),
+			MakeupGrid = isMakeupPreview and React.createElement(MakeupPartGrid, {
+				singleDecal = v.accessoryInstance,
+				singleAssetType = v.accessoryType,
+				makeupEntries = {
+					{ assetType = v.accessoryType, sortOrder = 1 }
+				},
 				showAssetTypeInLabel = false,
+				name = state2,
 				LayoutOrder = 4,
-				singleDecal = v27.accessoryInstance,
-				singleAssetType = v27.accessoryType,
-				makeupEntries = {{
-					sortOrder = 1,
-					assetType = v27.accessoryType
-				}},
-				name = v33,
-				screenSize = t1.screenSize
+				screenSize = p.screenSize
 			}) or nil
 		})
-	end, {
-		v48,
-		v27.accessoryType,
-		v37,
-		if not v45 then nil else v33,
-		v45,
-		v61
-	})
+	end
+
+	local accessoryType = v.accessoryType
+	local v6
+
+	if isMakeupPreview then
+		v6 = state2
+	end
+
+	local v7 = useCallback(fn3, { state8, accessoryType, state4, v6, isMakeupPreview, typeName })
 
 	return React.createElement(BasePublishPrompt, {
-		delayInputSeconds = 3,
-		promptBody = v62(),
-		screenSize = t1.screenSize,
-		showingPreviewView = v31,
-		closePreviewView = v54,
-		asset = v48,
+		promptBody = v7(),
+		screenSize = p.screenSize,
+		showingPreviewView = state,
+		closePreviewView = closePreviewView,
+		isMakeupPreview = isMakeupPreview,
+		asset = state8,
 		nameLabel = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.Name"),
-		defaultName = v33,
+		defaultName = state2,
 		titleText = RobloxTranslator:FormatByKey("CoreScripts.PublishAvatarPrompt.BuyCreation"),
-		onNameUpdated = v57,
-		canSubmit = v55,
-		onSubmit = v56,
-		priceInRobux = v27.priceInRobux,
-		showTopScrim = v41
+		onNameUpdated = onNameUpdated,
+		canSubmit = canSubmit,
+		onSubmit = onSubmit,
+		delayInputSeconds = 3,
+		priceInRobux = v.priceInRobux,
+		showTopScrim = state6
 	})
 end
 

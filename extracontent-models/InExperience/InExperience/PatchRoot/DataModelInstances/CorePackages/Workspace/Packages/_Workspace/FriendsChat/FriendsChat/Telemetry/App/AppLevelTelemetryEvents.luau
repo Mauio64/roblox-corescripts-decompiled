@@ -1,47 +1,36 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local Telemetry = require(Parent.AppChat.Telemetry)
-local DefaultTelemetryEvents = require(Parent.AppChat.DefaultTelemetryEvents)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+
+local Telemetry = require(parent.AppChat.Telemetry)
+local DefaultTelemetryEvents = require(parent.AppChat.DefaultTelemetryEvents)
 
 return {
 	AppChatVisible = Telemetry.new({
 		name = "appChatVisible",
 		description = "",
-		lastUpdated = {
-			2026,
-			7,
-			7
-		},
+		lastUpdated = { 2026, 10, 7 },
 		backendsList = {
-			DefaultTelemetryEvents.namedCounterConfigurationAndFormat("AppChat.Navigation.Visible", function(t1: {[any]: any}) -- line: 27
+			DefaultTelemetryEvents.namedCounterConfigurationAndFormat("AppChat.Navigation.Visible", function(data)
 				return {
-					isChatEnabled = t1.isChatEnabled
+					isChatEnabled = data.isChatEnabled,
+					isChatLoading = data.isChatLoading,
+					isInConversation = data.isInConversation
 				}
 			end),
-			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t2: {[any]: any}) -- line: 33
-				return {
-					isChatEnabled = t2.isChatEnabled
-				}
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(p)
+				return { isChatEnabled = p.isChatEnabled, isChatLoading = p.isChatLoading }
 			end)
 		}
 	}),
 	AppChatClosed = Telemetry.new({
 		name = "appChatClosed",
 		description = "",
-		lastUpdated = {
-			2026,
-			7,
-			7
-		},
+		lastUpdated = { 2026, 7, 7 },
 		backendsList = {
-			DefaultTelemetryEvents.namedCounterConfigurationAndFormat("AppChat.Navigation.Closed", function(t3: {[any]: any}) -- line: 47
-				return {
-					isChatEnabled = t3.isChatEnabled
-				}
+			DefaultTelemetryEvents.namedCounterConfigurationAndFormat("AppChat.Navigation.Closed", function(p)
+				return { isChatEnabled = p.isChatEnabled, isChatLoading = p.isChatLoading }
 			end),
-			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t4: {[any]: any}) -- line: 53
-				return {
-					isChatEnabled = t4.isChatEnabled
-				}
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(p)
+				return { isChatEnabled = p.isChatEnabled, isChatLoading = p.isChatLoading }
 			end)
 		}
 	})

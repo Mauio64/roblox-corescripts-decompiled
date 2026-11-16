@@ -1,17 +1,17 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 
 return {
-	Roact = require(scriptParent.Roact),
-	Rodux = require(scriptParent.Rodux),
-	RoactRodux = require(scriptParent.RoactRodux),
-	Otter = require(scriptParent.Otter),
-	Cryo = require(scriptParent.Cryo),
-	t = require(scriptParent.t),
-	UIBlox = require(scriptParent.UIBlox),
-	FitFrame = require(scriptParent.FitFrame),
-	PolicyProvider = require(scriptParent.PolicyProvider),
-	IAPExperience = require(scriptParent.IAPExperience),
-	enumerate = require(scriptParent.enumerate),
-	Promise = require(scriptParent.Promise),
-	UrlBuilder = require(scriptParent.UrlBuilder)
+	Roact = require(parent.Roact),
+	Rodux = require(parent.Rodux),
+	RoactRodux = require(parent.RoactRodux),
+	Otter = require(parent.Otter),
+	Cryo = require(parent.Cryo),
+	t = require(parent.t),
+	UIBlox = require(parent.UIBlox),
+	FitFrame = require(parent.FitFrame),
+	PolicyProvider = require(parent.PolicyProvider),
+	IAPExperience = require(parent.IAPExperience),
+	enumerate = require(parent.enumerate),
+	Promise = require(parent.Promise),
+	UrlBuilder = require(parent.UrlBuilder)
 }

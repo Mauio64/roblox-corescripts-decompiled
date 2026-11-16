@@ -1,0 +1,3 @@
+local StickyShortcutBarExposureLogger = require(script.StickyShortcutBarExposureLogger)
+
+return StickyShortcutBarExposureLogger

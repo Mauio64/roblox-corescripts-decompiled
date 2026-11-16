@@ -1,18 +1,21 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Signals = require(AppChatParent.Signals)
-local Cryo = require(AppChatParent.Cryo)
-local PresenceType = require(AppChat.Http.RoduxPresence).Enums.PresenceType
-local t1 = {
+local parent = AppChat.Parent
+
+local Signals = require(parent.Signals)
+local Cryo = require(parent.Cryo)
+local RoduxPresence = require(AppChat.Http.RoduxPresence)
+local PresenceType = RoduxPresence.Enums.PresenceType
+
+local users = {
 	["1"] = {
 		id = "1",
 		username = "username1",
 		displayName = "displayName1",
 		combinedName = "combinedName1",
 		alias = "alias1",
+		presenceType = PresenceType.Online,
 		presenceText = "Online",
-		lastLocation = "TestLocation",
-		presenceType = PresenceType.Online
+		lastLocation = "TestLocation"
 	},
 	["2"] = {
 		id = "2",
@@ -20,9 +23,9 @@ local t1 = {
 		displayName = "displayName2",
 		combinedName = "combinedName2",
 		alias = "alias2",
+		presenceType = PresenceType.InGame,
 		presenceText = "Studio - Testing",
-		lastLocation = "Studio - Testing",
-		presenceType = PresenceType.InGame
+		lastLocation = "Studio - Testing"
 	},
 	["3"] = {
 		id = "3",
@@ -30,9 +33,9 @@ local t1 = {
 		displayName = "displayName3",
 		combinedName = "combinedName3",
 		alias = "alias3",
+		presenceType = PresenceType.Offline,
 		presenceText = "Offline",
-		lastLocation = nil,
-		presenceType = PresenceType.Offline
+		lastLocation = nil
 	},
 	["4"] = {
 		id = "4",
@@ -40,9 +43,9 @@ local t1 = {
 		displayName = "displayName4",
 		combinedName = "combinedName4",
 		alias = "alias4",
+		presenceType = PresenceType.Online,
 		presenceText = "Online",
-		lastLocation = "TestLocation",
-		presenceType = PresenceType.Online
+		lastLocation = "TestLocation"
 	},
 	["1989"] = {
 		id = "1989",
@@ -50,9 +53,9 @@ local t1 = {
 		displayName = "Test Display Name",
 		combinedName = "Test Primary Name",
 		alias = "Test Primary Name",
+		presenceType = PresenceType.Online,
 		presenceText = "Online",
-		lastLocation = "TestLocation",
-		presenceType = PresenceType.Online
+		lastLocation = "TestLocation"
 	},
 	["1969"] = {
 		id = "1969",
@@ -60,9 +63,9 @@ local t1 = {
 		displayName = "ClementOrange",
 		combinedName = "OrangeClement",
 		alias = "OrangeClement",
+		presenceType = PresenceType.InGame,
 		presenceText = "Studio - Testing",
-		lastLocation = "Studio - Testing",
-		presenceType = PresenceType.InGame
+		lastLocation = "Studio - Testing"
 	},
 	["1949"] = {
 		id = "1949",
@@ -70,9 +73,9 @@ local t1 = {
 		displayName = "PineAzure",
 		combinedName = "AzurePine",
 		alias = "AzurePine",
+		presenceType = PresenceType.Offline,
 		presenceText = "Offline",
-		lastLocation = nil,
-		presenceType = PresenceType.Offline
+		lastLocation = nil
 	},
 	["422502"] = {
 		id = "422502",
@@ -80,88 +83,101 @@ local t1 = {
 		displayName = "TestUserB",
 		combinedName = "TestUserB",
 		alias = "(alias)",
+		presenceType = PresenceType.InGame,
 		presenceText = "Studio - Testing",
-		lastLocation = "Studio - Testing",
-		presenceType = PresenceType.InGame
+		lastLocation = "Studio - Testing"
 	}
 }
 
-function createMockUserProfile(p1) -- line: 107
-	-- upvalues: Signals (copy)
+function createMockUserProfile(data)
 	local createSignal = Signals.createSignal
-	local v9, _ = createSignal(p1.username or "")
-	local v11, _ = createSignal(p1.displayName or "")
-	local v13, _ = createSignal(p1.combinedName or "")
-	local v15, _ = createSignal(p1.combinedName or "")
-	local v17, _ = createSignal(p1.combinedName or "")
-	local v19, _ = createSignal(p1.alias or "")
-	local v21, _ = createSignal("")
+
+	local signal, _ = createSignal(data.username or "")
+	local signal2, _ = createSignal(data.displayName or "")
+	local signal3, _ = createSignal(data.combinedName or "")
+	local signal4, _ = createSignal(data.combinedName or "")
+	local signal5, _ = createSignal(data.combinedName or "")
+	local signal6, _ = createSignal(data.alias or "")
+	local signal7, _ = createSignal("")
 
 	return {
-		userId = p1.id,
+		userId = data.id,
 		names = {
-			getUsername = v9,
-			getDisplayName = v11,
-			getCombinedName = v13,
-			getInExperienceCombinedName = v15,
-			getPlatformName = v17,
-			getAlias = v19
+			getUsername = signal,
+			getDisplayName = signal2,
+			getCombinedName = signal3,
+			getInExperienceCombinedName = signal4,
+			getPlatformName = signal5,
+			getAlias = signal6
 		},
-		getPlatformProfileId = v21
+		getPlatformProfileId = signal7
 	}
 end
-function createMockUserProfileStore() -- line: 133
-	-- upvalues: t1 (copy), Cryo (copy), Signals (copy)
-	local t2 = {}
 
-	for k, v in pairs(t1) do
-		t2[k] = createMockUserProfile(v)
+function createMockUserProfileStore()
+	local v = {}
+
+	for k, v2 in pairs(users) do
+		v[k] = createMockUserProfile(v2)
 	end
 
 	return {
-		fetchNamesByUserIds = function(p2) -- line: 141
-			-- upvalues: Cryo (copy), t2 (copy), t1 (copy), Signals (copy)
-			local v33 = Cryo.List.filterMap(p2, function(p3) -- line: 142
-				-- upvalues: t2 (copy), t1 (copy)
-				local v37 = t2[p3]
-
-				if not v37 and t1[p3] then
-					v37 = createMockUserProfile(t1[p3])
-					t2[p3] = v37
-				end
-
-				return v37
-			end)
-			local t3 = {
+		fetchNamesByUserIds = function(p)
+			local v2 = {
 				status = "success",
-				data = v33
+				data = Cryo.List.filterMap(p, function(p2)
+					local v2 = v[p2]
+
+					if not v2 and users[p2] then
+						v2 = createMockUserProfile(users[p2])
+						v[p2] = v2
+					end
+
+					return v2
+				end)
 			}
 
-			return Signals.createSignal(t3)
+			return Signals.createSignal(v2)
 		end,
-		invalidateCachedNamesForUserIds = function() -- line: 164
-		end
+		invalidateCachedNamesForUserIds = function() end
 	}
 end
-function createMockPresenceData() -- line: 169
-	-- upvalues: t1 (copy)
-	local t4 = {}
 
-	for k, v in pairs(t1) do
-		t4[k] = {
-			userPresenceType = v.presenceType,
-			lastLocation = v.lastLocation
-		}
+function useMockProfileNames(items)
+	local namesByUserId = {}
+	local v = false
+
+	for _, item in items do
+		local v2 = users[tostring(item)]
+
+		if v2 then
+			namesByUserId[v2.id] = { combinedName = v2.combinedName, username = v2.username }
+		else
+			v = true
+		end
 	end
 
-	return t4
+	return {
+		status = v and "Failed" or "Ready",
+		namesByUserId = namesByUserId
+	}
 end
-function createMockApolloProfiles() -- line: 183
-	-- upvalues: t1 (copy)
-	local t5 = {}
 
-	for k, v in pairs(t1) do
-		t5[k] = {
+function createMockPresenceData()
+	local mockPresenceData = {}
+
+	for k, v in pairs(users) do
+		mockPresenceData[k] = { userPresenceType = v.presenceType, lastLocation = v.lastLocation }
+	end
+
+	return mockPresenceData
+end
+
+function createMockApolloProfiles()
+	local mockApolloProfiles = {}
+
+	for k, v in pairs(users) do
+		mockApolloProfiles[k] = {
 			combinedName = v.combinedName,
 			alias = v.alias,
 			displayName = v.displayName,
@@ -170,19 +186,20 @@ function createMockApolloProfiles() -- line: 183
 		}
 	end
 
-	return t5
+	return mockApolloProfiles
 end
-function getUserProfilesFetchData() -- line: 200
-	-- upvalues: Cryo (copy), t1 (copy)
-	return Cryo.List.map(t1, function(p4) -- line: 201
-		return p4
+
+function getUserProfilesFetchData()
+	return Cryo.List.map(users, function(p)
+		return p
 	end)
 end
 
 return {
-	USERS = t1,
+	USERS = users,
 	createMockUserProfile = createMockUserProfile,
 	createMockUserProfileStore = createMockUserProfileStore,
+	useMockProfileNames = useMockProfileNames,
 	createMockPresenceData = createMockPresenceData,
 	createMockApolloProfiles = createMockApolloProfiles,
 	getUserProfilesFetchData = getUserProfilesFetchData

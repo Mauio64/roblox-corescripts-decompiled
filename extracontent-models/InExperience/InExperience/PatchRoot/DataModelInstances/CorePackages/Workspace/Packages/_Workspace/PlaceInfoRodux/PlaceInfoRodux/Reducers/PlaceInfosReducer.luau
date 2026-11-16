@@ -1,21 +1,24 @@
 local PlaceInfoRodux = script:FindFirstAncestor("PlaceInfoRodux")
-local PlaceInfoRoduxParent = PlaceInfoRodux.Parent
-local ReceivedMultiplePlaceInfos = require(PlaceInfoRodux.Actions).ReceivedMultiplePlaceInfos
-local Immutable = require(PlaceInfoRoduxParent.AppCommonLib).Immutable
+local parent = PlaceInfoRodux.Parent
 
-return function(p1, p2) -- line: 9
-	-- upvalues: ReceivedMultiplePlaceInfos (copy), Immutable (copy)
-	local v7 = p1 or {}
+local Actions = require(PlaceInfoRodux.Actions)
+local ReceivedMultiplePlaceInfos = Actions.ReceivedMultiplePlaceInfos
 
-	if p2.type == ReceivedMultiplePlaceInfos.name then
-		local t1 = {}
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
 
-		for _, v in ipairs(p2.placeInfos) do
-			t1[v.placeId] = v
-		end
+return function(options, p)
+	local v = options or {}
 
-		v7 = Immutable.JoinDictionaries(v7, t1)
+	if p.type ~= ReceivedMultiplePlaceInfos.name then
+		return v
 	end
 
-	return v7
+	local placeInfosByPlaceId = {}
+
+	for _, placeInfo in ipairs(p.placeInfos) do
+		placeInfosByPlaceId[placeInfo.placeId] = placeInfo
+	end
+
+	return (Immutable.JoinDictionaries(v, placeInfosByPlaceId))
 end

@@ -1,14 +1,18 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local TooltipContainer = require(scriptParent.TooltipContainer)
-local TooltipOrientation = require(scriptParent.Enum.TooltipOrientation)
-local v9 = Roact.PureComponent:extend("Tooltip")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent
+local parent3 = parent2.Parent
 
-v9.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+local withStyle = require(parent2.Core.Style.withStyle)
+
+local TooltipContainer = require(parent.TooltipContainer)
+
+local TooltipOrientation = require(parent.Enum.TooltipOrientation)
+
+local extended = Roact.PureComponent:extend("Tooltip")
+
+extended.validateProps = t.strictInterface({
 	triggerPosition = t.Vector2,
 	triggerSize = t.Vector2,
 	bodyText = t.string,
@@ -25,76 +29,92 @@ v9.validateProps = t.strictInterface({
 	isDirectChild = t.optional(t.boolean),
 	minContentWidth = t.optional(t.number)
 })
-v9.defaultProps = {
+
+extended.defaultProps = {
+	screenSize = Vector2.new(10000, 10000),
+	orientation = TooltipOrientation.Bottom,
 	triggerOnHover = false,
 	forceClickTriggerPoint = false,
-	isDirectChild = false,
-	screenSize = Vector2.new(10000, 10000),
-	orientation = TooltipOrientation.Bottom
+	isDirectChild = false
 }
 
-function v9.init(p1) -- line: 67
-	function p1.onDismissDefault() -- line: 68
-		-- upvalues: p1 (copy)
-		if p1.props.forceClickTriggerPoint or p1.props.triggerOnHover then
+function extended:init()
+	function self.onDismissDefault()
+		if self.props.forceClickTriggerPoint or self.props.triggerOnHover then
 			return
 		end
 
-		if p1.props.onDismiss then
-			p1.props.onDismiss()
+		if self.props.onDismiss then
+			self.props.onDismiss()
 		end
 	end
 end
-function v9.render(p2) -- line: 78
-	-- upvalues: withStyle (copy), Roact (copy), TooltipContainer (copy)
-	local v12 = p2.props.forceClickTriggerPoint or p2.props.triggerOnHover
-	local isDirectChild = p2.props.isDirectChild
 
-	return withStyle(function(p3) -- line: 81
-		-- upvalues: p2 (copy), Roact (copy), isDirectChild (copy), v12 (copy), TooltipContainer (copy)
-		local Theme = p3.Theme
-		local t1 = {
-			Background = not p2.props.forceClickTriggerPoint and Roact.createElement("TextButton", {
+function extended.render(p)
+	local forceClickTriggerPoint = p.props.forceClickTriggerPoint or p.props.triggerOnHover
+	local isDirectChild = p.props.isDirectChild
+	return withStyle(function(p2)
+		local theme = p2.Theme
+
+		local background = not p.props.forceClickTriggerPoint
+
+		if background then
+			background = Roact.createElement("TextButton", {
 				ZIndex = 0,
 				AutoButtonColor = false,
-				BackgroundColor3 = Theme.Overlay.Color,
+				BackgroundColor3 = theme.Overlay.Color,
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				Position = isDirectChild and UDim2.fromOffset(-p2.props.triggerPosition.X, -p2.props.triggerPosition.Y) or UDim2.fromOffset(0, 0),
-				Size = UDim2.fromOffset(p2.props.screenSize.X, p2.props.screenSize.Y),
+				Position = isDirectChild and UDim2.fromOffset(-p.props.triggerPosition.X, -p.props.triggerPosition.Y) or UDim2.fromOffset(0, 0),
+				Size = UDim2.fromOffset(p.props.screenSize.X, p.props.screenSize.Y),
 				Text = "",
-				[Roact.Event.Activated] = p2.onDismissDefault,
-				[Roact.Event.TouchSwipe] = p2.onDismissDefault,
-				[Roact.Event.MouseWheelForward] = p2.onDismissDefault,
-				[Roact.Event.MouseWheelBackward] = p2.onDismissDefault
-			}),
-			TriggerPointMask = v12 and Roact.createElement("TextButton", {
+				[Roact.Event.Activated] = p.onDismissDefault,
+				[Roact.Event.TouchSwipe] = p.onDismissDefault,
+				[Roact.Event.MouseWheelForward] = p.onDismissDefault,
+				[Roact.Event.MouseWheelBackward] = p.onDismissDefault
+			})
+		end
+
+		local triggerPointMask = forceClickTriggerPoint
+
+		if triggerPointMask then
+			triggerPointMask = Roact.createElement("TextButton", {
 				Text = "",
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				Selectable = false,
-				Size = UDim2.fromOffset(p2.props.triggerSize.X, p2.props.triggerSize.Y),
-				Position = isDirectChild and UDim2.fromOffset(0, 0) or UDim2.fromOffset(p2.props.triggerPosition.X, p2.props.triggerPosition.Y),
-				[Roact.Event.Activated] = p2.props.onDismiss
-			}),
+				Size = UDim2.fromOffset(p.props.triggerSize.X, p.props.triggerSize.Y),
+				Position = isDirectChild and UDim2.fromOffset(0, 0) or UDim2.fromOffset(
+					p.props.triggerPosition.X,
+					p.props.triggerPosition.Y
+				),
+				[Roact.Event.Activated] = p.props.onDismiss
+			})
+		end
+
+		local v = {
+			Background = background,
+			TriggerPointMask = triggerPointMask,
 			TooltipContainer = Roact.createElement(TooltipContainer, {
-				triggerPosition = p2.props.triggerPosition,
-				triggerSize = p2.props.triggerSize,
-				bodyText = p2.props.bodyText,
-				headerText = p2.props.headerText,
-				screenSize = p2.props.screenSize,
-				position = p2.props.position,
-				orientation = p2.props.orientation,
+				triggerPosition = p.props.triggerPosition,
+				triggerSize = p.props.triggerSize,
+				bodyText = p.props.bodyText,
+				headerText = p.props.headerText,
+				screenSize = p.props.screenSize,
+				position = p.props.position,
+				orientation = p.props.orientation,
 				isDirectChild = isDirectChild
 			})
 		}
 
-		return isDirectChild and Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, 1)
-		}, t1) or Roact.createFragment(t1)
+		return isDirectChild
+			and Roact.createElement(
+				"Frame",
+				{ Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0 },
+				v
+			)
+			or Roact.createFragment(v)
 	end)
 end
 
-return v9
+return extended

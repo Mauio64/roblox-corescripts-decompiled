@@ -1,12 +1,8 @@
-local v1 = require(script.Parent.pageLogger):new()
+local pageLogger = require(script.Parent.pageLogger)
+local v = pageLogger:new()
+v:setContext({ bar = "bar" })
 
-v1:setContext({
-	bar = "bar"
-})
-
-return function() -- line: 4
-	-- upvalues: v1 (copy)
-	v1:info("calling {root} {foo} {bar}")
-
+return function(): string
+	v:info("calling {root} {foo} {bar}")
 	return "done"
 end

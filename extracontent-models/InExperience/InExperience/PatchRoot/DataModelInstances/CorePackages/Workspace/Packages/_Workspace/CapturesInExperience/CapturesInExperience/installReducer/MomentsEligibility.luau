@@ -1,19 +1,15 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Cryo = require(ParentParentParent.Cryo)
-local Rodux = require(ParentParentParent.Rodux)
-local MomentsEligibilityReceived = require(ParentParent.Actions.MomentsEligibilityReceived)
-local t1 = {
-	byUniverseId = {}
-}
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-return Rodux.createReducer(t1, {
-	[MomentsEligibilityReceived.name] = function(t2: {[any]: any}, p1) -- line: 18
-		-- upvalues: Cryo (copy)
+local Cryo = require(parent2.Cryo)
+local Rodux = require(parent2.Rodux)
+
+local MomentsEligibilityReceived = require(parent.Actions.MomentsEligibilityReceived)
+
+return Rodux.createReducer({ byUniverseId = {} }, {
+	[MomentsEligibilityReceived.name] = function(p, p2)
 		return {
-			byUniverseId = Cryo.Dictionary.join(t2.byUniverseId, {
-				[p1.universeId] = p1.isEligible
-			})
+			byUniverseId = Cryo.Dictionary.join(p.byUniverseId, { [p2.universeId] = p2.isEligible })
 		}
 	end
 })

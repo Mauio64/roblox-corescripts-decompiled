@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	"ClimbAnimation",
 	"Face",
 	"FallAnimation",
@@ -18,46 +18,49 @@ local t1 = {
 	"WalkAnimation"
 }
 
-return function(p1) -- line: 23
-	-- upvalues: t1 (copy)
-	local t2 = {}
+return function(instance)
+	local result = {}
 
-	for _, v in ipairs(t1) do
-		local v6 = p1[v]
+	for _, v2 in ipairs(v) do
+		local v3 = instance[v2]
 
-		if typeof(v6) == "number" and v6 > 0 then
-			table.insert(t2, v6)
-		elseif typeof(v6) == "string" and v6 ~= "" then
-			for match in v6:gmatch("([%d]+),?") do
-				table.insert(t2, (tonumber(match)))
+		if typeof(v3) == "number" and v3 > 0 then
+			table.insert(result, v3)
+		elseif typeof(v3) == "string" and v3 ~= "" then
+			for k in v3:gmatch("([%d]+),?") do
+				table.insert(result, (tonumber(k)))
 			end
 		end
 	end
 
-	local Accessories = p1:GetAccessories(true)
+	local accessories = instance:GetAccessories(true)
 
-	for _, v in ipairs(Accessories) do
-		table.insert(t2, v.AssetId)
+	for _, accessory in ipairs(accessories) do
+		table.insert(result, accessory.AssetId)
 	end
 
-	for _, child in (p1:GetChildren()) do
-		if child:IsA("MakeupDescription") and child.AssetId > 0 then
-			table.insert(t2, child.AssetId)
+	local children = instance:GetChildren()
+
+	for _, makeupDescription in children do
+		if makeupDescription:IsA("MakeupDescription") and makeupDescription.AssetId > 0 then
+			table.insert(result, makeupDescription.AssetId)
 		end
 	end
 
-	local Emotes = p1:GetEmotes()
-	local EquippedEmotes = p1:GetEquippedEmotes()
+	local emotes = instance:GetEmotes()
+	local equippedEmotes = instance:GetEquippedEmotes()
 
-	for _, v in ipairs(EquippedEmotes) do
-		local v17 = Emotes[v.Name]
+	for _, equippedEmote in ipairs(equippedEmotes) do
+		local emote = emotes[equippedEmote.Name]
 
-		if v17 then
-			for _, v2 in ipairs(v17) do
-				table.insert(t2, v2)
-			end
+		if not emote then
+			continue
+		end
+
+		for _, v2 in ipairs(emote) do
+			table.insert(result, v2)
 		end
 	end
 
-	return t2
+	return result
 end

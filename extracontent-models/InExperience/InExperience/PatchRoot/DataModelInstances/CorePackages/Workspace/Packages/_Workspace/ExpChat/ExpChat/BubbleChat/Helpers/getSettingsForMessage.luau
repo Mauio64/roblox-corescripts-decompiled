@@ -1,19 +1,19 @@
-local function getSettingsForMessage(p1, p2) -- line: 3
-	local v4 = p1 and p1.UserSpecificSettings
+local function getSettingsForMessage(p, p2)
+	local userSpecificSettings = p and p.UserSpecificSettings
 
-	if not p2 or not v4 then
-		return p1
+	if not (p2 and userSpecificSettings) then
+		return p
 	end
 
-	if v4[p2.userId] then
-		return v4[p2.userId]
+	if userSpecificSettings[p2.userId] then
+		return userSpecificSettings[p2.userId]
 	end
 
-	if p2.partOrModel and v4[p2.partOrModel:GetFullName()] then
-		return v4[p2.partOrModel:GetFullName()]
+	if p2.partOrModel and userSpecificSettings[p2.partOrModel:GetFullName()] then
+		return userSpecificSettings[p2.partOrModel:GetFullName()]
 	end
 
-	return p1
+	return p
 end
 
 return getSettingsForMessage

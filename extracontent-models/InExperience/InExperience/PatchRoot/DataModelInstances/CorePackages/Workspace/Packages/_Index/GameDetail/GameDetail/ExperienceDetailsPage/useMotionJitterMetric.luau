@@ -1,163 +1,134 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
+local parent = script:FindFirstAncestor("GameDetail").Parent
+
 local RunService = game:GetService("RunService")
 local TelemetryService = game:GetService("TelemetryService")
-local React = require(Parent.React)
-local Logger = require(Parent.Loggers).Logger
-local v6 = game:DefineFastInt("ExperienceDetailsMotionJitterHundredthsPercent", 0)
-local t1 = {
+
+local React = require(parent.React)
+local Loggers = require(parent.Loggers)
+local Logger = Loggers.Logger
+
+local defineFastInt = game:DefineFastInt("ExperienceDetailsMotionJitterHundredthsPercent", 0)
+
+local v = {
 	eventName = "ExperienceDetailsMotionJitterPercent",
-	description = "Reverse movement as a percentage of total experience details surface motion",
 	backends = { "RobloxTelemetryStat" },
-	throttlingPercentage = v6,
-	lastUpdated = {
-		2026,
-		6,
-		18
-	}
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 2026, 6, 18 },
+	description = "Reverse movement as a percentage of total experience details surface motion"
 }
 
-local function readPositionY(p1, s1: string) -- line: 32
-	return p1[s1].Y
+local function readPositionY(current, p: string) -- 1 equivalent call inferred from this helper
+	return current[p].Y
 end
-local function logMotionJitter(t2: {[any]: any}, s2: string, s3: string) -- line: 36
-	-- upvalues: Logger (copy), TelemetryService (copy), t1 (copy)
+
+local function logMotionJitter(p, surface: string, p2: string)
 	Logger:info("[useMotionJitterMetric] Logging motion jitter")
 
-	if s3 ~= "settled" then
+	if p2 == "settled" then
+		TelemetryService:LogStat(v, {
+			standardizedFields = { "addOSInfo" },
+			customFields = { surface = surface }
+		}, p.jitterPx * 100 / p.travelPx)
+	else
 		Logger:warning("[useMotionJitterMetric] Should only log motion jitter for reason: settled")
-
-		return
 	end
-
-	TelemetryService:LogStat(t1, {
-		standardizedFields = { "addOSInfo" },
-		customFields = {
-			surface = s2
-		}
-	}, t2.jitterPx * 100 / t2.travelPx)
 end
-local function useMotionJitterMetric(p2, s4: string, b1: boolean, s5: string) -- line: 52
-	-- upvalues: React (copy), v6 (copy), Logger (copy), logMotionJitter (copy), RunService (copy)
-	React.useEffect(function() -- line: 58
-		-- upvalues: v6 (copy), Logger (copy), logMotionJitter (copy), s4 (copy), RunService (copy), p2 (copy), s5 (copy), b1 (copy)
-		if v6 <= 0 then
+
+local function useMotionJitterMetric(p, p2: string, flag: boolean, p3: string)
+	React.useEffect(function()
+		if defineFastInt <= 0 then
 			return
 		end
 
-		local u20 = nil
-		local u21 = nil
+		local v2 = nil
+		local v3 = nil
 
-		local function flushMotion(s6: string) -- line: 66
-			-- upvalues: Logger (copy), u21 (ref), logMotionJitter (copy), s4 (copy)
-			Logger:info("[useMotionJitterMetric] Flushing motion metric for reason: " .. s6)
+		local function flushMotion(p4: string)
+			Logger:info("[useMotionJitterMetric] Flushing motion metric for reason: " .. p4)
 
-			if u21 then
-				logMotionJitter(u21, s4, s6)
-				u21 = nil
+			if v3 then
+				logMotionJitter(v3, p2, p4)
+				v3 = nil
 			end
 		end
 
-		local connection = nil
+		local renderSteppedConnection = nil
+		renderSteppedConnection = RunService.RenderStepped:Connect(function()
+			local current = p.current
 
-		connection = RunService.RenderStepped:Connect(function() -- line: 75
-			-- upvalues: p2 (copy), Logger (copy), u21 (ref), s4 (copy), u20 (ref), s5 (copy), logMotionJitter (copy), connection (ref), b1 (copy)
-			local current = p2.current
+			if current then
+				local positionY = readPositionY(current, p3) -- inferred equivalent call
 
-			if not current then
-				Logger:info("[useMotionJitterMetric] Flushing motion metric for reason: missingContent")
+				if v2 == nil then
+					if positionY >= 0 then
+						v2 = positionY
+					end
+				else
+					local v4 = positionY - v2
+					v2 = positionY
 
-				if u21 then
-					local _ = u21
-					local _ = s4
+					if math.abs(v4) <= 0.5 then
+						if v3 then
+							v3.settledFrames += 1
 
-					Logger:info("[useMotionJitterMetric] Logging motion jitter")
-					Logger:warning("[useMotionJitterMetric] Should only log motion jitter for reason: settled")
-					u21 = nil
-				end
+							if v3.settledFrames >= 6 then
+								Logger:info("[useMotionJitterMetric] Flushing motion metric for reason: settled")
 
-				u20 = nil
+								if v3 then
+									logMotionJitter(v3, p2, "settled")
+									v3 = nil
+								end
 
-				return
-			end
-
-			local Y = current[s5].Y
-
-			if u20 == nil then
-				if Y >= 0 then
-					u20 = Y
-				end
-
-				return
-			end
-
-			local v29 = Y - u20
-
-			u20 = Y
-
-			if math.abs(v29) <= 0.5 then
-				if u21 then
-					local v30 = u21
-
-					v30.settledFrames = v30.settledFrames + 1
-
-					if u21.settledFrames >= 6 then
-						Logger:info("[useMotionJitterMetric] Flushing motion metric for reason: settled")
-
-						if u21 then
-							logMotionJitter(u21, s4, "settled")
-							u21 = nil
+								if renderSteppedConnection then
+									renderSteppedConnection:Disconnect()
+								end
+							end
+						end
+					else
+						if not v3 then
+							v3 = { jitterPx = 0, travelPx = 0, settledFrames = 0 }
 						end
 
-						if connection then
-							connection:Disconnect()
+						local v5 = v3
+						v5.travelPx += math.abs(v4)
+						v5.settledFrames = 0
+
+						if v4 * (flag and 1 or -1) < -0.5 then
+							v5.jitterPx += math.abs(v4)
 						end
 					end
 				end
+			else
+				Logger:info("[useMotionJitterMetric] Flushing motion metric for reason: missingContent")
 
-				return
-			end
+				if v3 then
+					Logger:info("[useMotionJitterMetric] Logging motion jitter")
 
-			if not u21 then
-				u21 = {
-					jitterPx = 0,
-					travelPx = 0,
-					settledFrames = 0
-				}
-			end
+					Logger:warning("[useMotionJitterMetric] Should only log motion jitter for reason: settled")
 
-			local v31 = u21
+					v3 = nil
+				end
 
-			v31.travelPx = v31.travelPx + math.abs(v29)
-			v31.settledFrames = 0
-
-			if v29 * (not b1 and -1 or 1) < -0.5 then
-				v31.jitterPx = v31.jitterPx + math.abs(v29)
+				v2 = nil
 			end
 		end)
 
-		return function() -- line: 122
-			-- upvalues: Logger (copy), u21 (ref), s4 (copy), connection (ref)
+		return function()
 			Logger:info("[useMotionJitterMetric] Flushing motion metric for reason: unmount")
 
-			if u21 then
-				local _ = u21
-				local _ = s4
-
+			if v3 then
 				Logger:info("[useMotionJitterMetric] Logging motion jitter")
+
 				Logger:warning("[useMotionJitterMetric] Should only log motion jitter for reason: settled")
-				u21 = nil
+
+				v3 = nil
 			end
 
-			if connection then
-				connection:Disconnect()
+			if renderSteppedConnection then
+				renderSteppedConnection:Disconnect()
 			end
 		end
-	end, {
-		p2,
-		s4,
-		b1,
-		s5
-	})
+	end, { p, p2, flag, p3 })
 end
 
 return useMotionJitterMetric

@@ -1,6 +1,5 @@
 local VerticalPager = require(script.VerticalPager)
 local createPagerStore = require(script.createPagerStore)
-
 require(script.Types)
 
 local VerticalPagerContext = require(script.VerticalPagerContext)

@@ -1,16 +1,8 @@
 return {
-	Behavior = {
-		VirtualCursor = "VirtualCursor",
-		SelectionPreview = "SelectionPreview"
-	},
+	Behavior = { VirtualCursor = "VirtualCursor", SelectionPreview = "SelectionPreview" },
 	Action = {
-		Activate = "VirtualCursorActivate",
+		DirectionalMove = "VirtualCursorDirectionalMovement",
 		Move = "VirtualCursorMovement",
 		Scroll = "VirtualCursorScroll"
-	},
-	SnapAssistMethod = {
-		Friction = "Friction",
-		Tracking = "Tracking",
-		Centering = "Centering"
 	}
 }

@@ -1,8 +1,13 @@
 local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
+local parent = script.Parent.Parent
+local FFlagAXIaBSinglePurchaseUnifiedEvents = require(parent.Flags.FFlagAXIaBSinglePurchaseUnifiedEvents)
 
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 4
-	return {
-		itemId = p1,
-		itemType = p2
-	}
+return makeActionCreator(script.Name, function(itemId, itemType, resalePrice)
+	if not FFlagAXIaBSinglePurchaseUnifiedEvents then
+		resalePrice = nil
+	end
+
+	return { itemId = itemId, itemType = itemType, resalePrice = resalePrice }
 end)

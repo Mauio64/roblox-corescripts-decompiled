@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent
-local Symbol = require(ParentParent.AppCommonLib).Symbol
+local parent = script.Parent.Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local Symbol = AppCommonLib.Symbol
 
 return {
 	Hidden = Symbol.named("Hidden"),

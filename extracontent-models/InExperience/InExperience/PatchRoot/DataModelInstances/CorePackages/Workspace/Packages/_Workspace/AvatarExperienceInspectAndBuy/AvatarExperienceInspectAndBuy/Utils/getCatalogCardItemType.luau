@@ -1,19 +1,18 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
-local AXCommon = require(Parent.AXCommon)
+local parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
+local AXCommon = require(parent.AXCommon)
 local ItemRestrictions = AXCommon.Enums.ItemRestrictions
 local CatalogItemCardItemTypeEnum = AXCommon.Components.CatalogItemCard.CatalogItemCardItemTypeEnum
 
-local function getCatalogCardItemType(t1: {[any]: any}?) -- line: 13
-	-- upvalues: ItemRestrictions (copy), CatalogItemCardItemTypeEnum (copy)
-	if not t1 then
+local function getCatalogCardItemType(p)
+	if not p then
 		return nil
 	end
 
-	if t1[ItemRestrictions.Limited] then
+	if p[ItemRestrictions.Limited] then
 		return CatalogItemCardItemTypeEnum.Limited
 	end
 
-	if t1[ItemRestrictions.Collectible] or t1[ItemRestrictions.LimitedUnique] then
+	if p[ItemRestrictions.Collectible] or p[ItemRestrictions.LimitedUnique] then
 		return CatalogItemCardItemTypeEnum.Collectible
 	end
 

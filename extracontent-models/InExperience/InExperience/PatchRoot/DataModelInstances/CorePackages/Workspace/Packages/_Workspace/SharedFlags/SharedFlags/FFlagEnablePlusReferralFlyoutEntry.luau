@@ -1,0 +1,2 @@
+local FFlagEnablePlusReferralDashboard = require(script.Parent.FFlagEnablePlusReferralDashboard)
+return game:DefineFastFlag("EnablePlusReferralFlyoutEntry3", false) and FFlagEnablePlusReferralDashboard

@@ -1,1 +1,3 @@
-return (require(script.SystemBanner))
+local SystemBanner = require(script.SystemBanner)
+
+return SystemBanner

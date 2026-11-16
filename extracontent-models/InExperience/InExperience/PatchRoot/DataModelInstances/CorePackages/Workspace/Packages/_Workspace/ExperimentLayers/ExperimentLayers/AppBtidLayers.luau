@@ -6,20 +6,20 @@ game:DefineFastString("LuaAppIosPasswordSavingLayer", "PlayerApp.PasswordSaving.
 game:DefineFastString("LuaAppAuthenticationStylingLayer", "PlayerApp.Authentication.Styling")
 game:DefineFastString("AccountRecoveryUILayer", "AccountSecurity.SelfRecovery.RecoveryUI")
 game:DefineFastString("ConsumerPlatformsIOSUIRefactor", "ConsumerPlatforms.IOSUIRefactor")
+game:DefineFastString("LuaAppUniversalAppAuthEntryLayer", "PlayerApp.UniversalAppAuthEntry")
 
 return {
-	LoginLayer = "PlayerApp.Login",
-	WidgetLayer = "ConsumerPlatforms.Widgets",
-	LockScreenWidgetLayer = "ConsumerPlatforms.Widgets.LockScreen",
-	DefaultThemeLayer = "ConsumerPlatforms.Themes",
-	AndroidWidgetLayer = "ConsumerPlatforms.AndroidWidgets",
-	DeferredDeeplinkResolutionLayer = "Ads.OffPlatform.DeferredDeeplinkResolution",
 	SignupLayer = game:GetFastString("LuaAppSignupLayer"),
+	LoginLayer = "PlayerApp.Login",
 	LandingLayer = game:GetFastString("LuaAppLandingLayer"),
 	AccountSwitcherLayer = game:GetFastString("AccountSwitcherLayer"),
 	ConsoleSignUpLayer = game:GetFastString("ConsoleSignUpLayer"),
 	IosPasswordSavingLayer = game:GetFastString("LuaAppIosPasswordSavingLayer"),
+	DefaultThemeLayer = "ConsumerPlatforms.Themes",
 	AuthenticationStylingLayer = game:GetFastString("LuaAppAuthenticationStylingLayer"),
 	AccountRecoveryUILayer = game:GetFastString("AccountRecoveryUILayer"),
-	ConsumerPlatformsIOSUIRefactor = game:GetFastString("ConsumerPlatformsIOSUIRefactor")
+	ConsumerPlatformsIOSUIRefactor = game:GetFastString("ConsumerPlatformsIOSUIRefactor"),
+	AndroidWidgetLayer = "ConsumerPlatforms.AndroidWidgets",
+	DeferredDeeplinkResolutionLayer = "Ads.OffPlatform.DeferredDeeplinkResolution",
+	UniversalAppAuthEntryLayer = game:GetFastString("LuaAppUniversalAppAuthEntryLayer")
 }

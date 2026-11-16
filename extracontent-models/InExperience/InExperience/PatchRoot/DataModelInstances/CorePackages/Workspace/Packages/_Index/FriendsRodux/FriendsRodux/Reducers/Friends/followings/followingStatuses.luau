@@ -1,41 +1,30 @@
 local FriendsRodux = script:FindFirstAncestor("FriendsRodux")
-local FriendsRoduxParent = FriendsRodux.Parent
-
+local parent = FriendsRodux.Parent
 require(FriendsRodux.roduxFriendsTypes)
 
-local Rodux = require(FriendsRoduxParent.Rodux)
-local Dash = require(FriendsRoduxParent.Dash)
-local t1 = {}
+local Rodux = require(parent.Rodux)
+local Dash = require(parent.Dash)
 
-return function(p1) -- line: 20
-	-- upvalues: Rodux (copy), t1 (copy), Dash (copy)
-	local friendsNetworking = p1.friendsNetworking
-	local userBlockingNetworking = p1.userBlockingNetworking
+local v = {}
+return function(p)
+	local friendsNetworking = p.friendsNetworking
+	local userBlockingNetworking = p.userBlockingNetworking
 
-	return Rodux.createReducer(t1, {
-		[friendsNetworking.GetFollowingExists.Succeeded.name] = function(p2, p3) -- line: 25
-			-- upvalues: Dash (copy)
-			local t2 = {}
-
-			Dash.forEach(p3.responseBody.followings, function(p4) -- line: 27
-				-- upvalues: t2 (copy)
-				t2[tostring(p4.userId)] = {
-					isFollowed = p4.isFollowed,
-					isFollowing = p4.isFollowing
+	return Rodux.createReducer(v, {
+		[friendsNetworking.GetFollowingExists.Succeeded.name] = function(p2, p3)
+			local v2 = {}
+			Dash.forEach(p3.responseBody.followings, function(data)
+				v2[tostring(data.userId)] = {
+					isFollowed = data.isFollowed,
+					isFollowing = data.isFollowing
 				}
 			end)
-
-			return Dash.join(p2, t2)
+			return Dash.join(p2, v2)
 		end,
-		[userBlockingNetworking.BlockUserById.Succeeded.name] = function(p5, p6) -- line: 36
-			-- upvalues: Dash (copy)
-			local str = tostring(p6.namedIds.users)
-
-			return Dash.join(p5, {
-				[str] = {
-					isFollowed = false,
-					isFollowing = false
-				}
+		[userBlockingNetworking.BlockUserById.Succeeded.name] = function(p2, p3)
+			local users = tostring(p3.namedIds.users)
+			return Dash.join(p2, {
+				[users] = { isFollowed = false, isFollowing = false }
 			})
 		end
 	})

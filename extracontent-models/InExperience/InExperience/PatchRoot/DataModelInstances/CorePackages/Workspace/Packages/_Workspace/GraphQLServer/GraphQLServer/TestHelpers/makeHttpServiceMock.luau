@@ -1,11 +1,9 @@
-local function makeHttpServiceMock(p1, p2) -- line: 1
+local function makeHttpServiceMock(p, p2)
 	return {
-		RequestInternal = function(_) -- line: 3
-			-- upvalues: p1 (copy), p2 (copy)
+		RequestInternal = function(_)
 			return {
-				Start = function(_, p5) -- line: 5
-					-- upvalues: p1 (copy), p2 (copy)
-					p5(p1, p2)
+				Start = function(_, callback)
+					callback(p, p2)
 				end
 			}
 		end

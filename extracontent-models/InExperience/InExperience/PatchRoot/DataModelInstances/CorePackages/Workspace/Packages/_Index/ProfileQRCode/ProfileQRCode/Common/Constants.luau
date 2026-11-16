@@ -1,3 +1,1 @@
-return {
-	RODUX_KEY = "ProfileQRCode"
-}
+return { RODUX_KEY = "ProfileQRCode" }

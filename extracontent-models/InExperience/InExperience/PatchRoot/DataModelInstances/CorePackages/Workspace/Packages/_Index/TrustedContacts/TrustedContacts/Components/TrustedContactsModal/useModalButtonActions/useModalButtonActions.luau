@@ -1,139 +1,109 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedContactsParent = TrustedContacts.Parent
-local React = require(TrustedContactsParent.React)
-local Foundation = require(TrustedContactsParent.Foundation)
-local useLocalization = require(TrustedContactsParent.Localization).Hooks.useLocalization
-local TFActionsEnum = require(TrustedContacts.TrustedFriendActions.TFActionsEnum)
-local useGetTFActionsCallbacks = require(script.Parent.useGetTFActionsCallbacks)
-local useGetTFActionsEnum_legacy = require(script.Parent.useGetTFActionsEnum_legacy)
-local FFlagTrustedFriendsLinkVPC = require(TrustedContacts.Flags.FFlagTrustedFriendsLinkVPC)
-local FFlagTFWithActionsCheck = require(TrustedContactsParent.SharedFlags).FFlagTFWithActionsCheck
+local parent = TrustedContacts.Parent
 
-local function useModalButtonActions(s1: string, _: string?, p1, p2) -- line: 27
-	-- upvalues: FFlagTFWithActionsCheck (copy), useGetTFActionsEnum_legacy (copy), useGetTFActionsCallbacks (copy), useLocalization (copy), React (copy), TFActionsEnum (copy), Foundation (copy), FFlagTrustedFriendsLinkVPC (copy)
-	local v16 = if not FFlagTFWithActionsCheck then useGetTFActionsEnum_legacy(s1, {
-		modalVariant = p1,
-		tokens = p2.tokens,
-		isShareLinkSender = p2.isShareLinkSender
-	}) else p1
-	local v17 = useGetTFActionsCallbacks(s1, p2)
-	local v18 = useLocalization({
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local TFActionsEnum = require(TrustedContacts.TrustedFriendActions.TFActionsEnum)
+
+local useGetTFActionsCallbacks = require(script.Parent.useGetTFActionsCallbacks)
+
+local FFlagTrustedFriendsLinkVPC = require(TrustedContacts.Flags.FFlagTrustedFriendsLinkVPC)
+
+local function useModalButtonActions(p: string, _: string?, p2, p3)
+	local v = useGetTFActionsCallbacks(p, p3)
+
+	local v2 = useLocalization({
 		cancel = "CommonUI.Controls.Action.Cancel",
 		add = "Feature.Friends.Action.Add",
 		addViaLink = "Feature.Friends.Button.AddViaLink",
 		ok = "CommonUI.Controls.Action.OK",
 		accept = "CommonUI.Controls.Action.Accept"
 	})
-	local v19 = React.useMemo(function() -- line: 52
-		-- upvalues: v18 (copy), v17 (copy), TFActionsEnum (copy), FFlagTFWithActionsCheck (copy), Foundation (copy), FFlagTrustedFriendsLinkVPC (copy)
-		local t1 = {
+
+	local v3 = React.useMemo(function()
+		local v3 = {
+			text = v2.cancel,
+			onActivated = v.onCancelButtonPress,
 			icon = nil,
-			isLoading = false,
-			text = v18.cancel,
-			onActivated = v17.onCancelButtonPress
+			isLoading = false
 		}
 
 		return {
-			[TFActionsEnum.Loading] = if not FFlagTFWithActionsCheck then {
-				{
-					isLoading = true,
-					onActivated = function() -- line: 66
-					end
-				},
-				t1
-			} else nil,
-			[TFActionsEnum.RemoveTrustedConnection] = {{
-				text = v18.ok,
-				onActivated = v17.onOkButtonPress
-			}},
+			[TFActionsEnum.RemoveTrustedConnection] = {
+				{ text = v2.ok, onActivated = v.onOkButtonPress }
+			},
 			[TFActionsEnum.AddTrustedConnectionViaLink] = {
-				{
-					text = v18.addViaLink,
-					onActivated = v17.onAddViaLinkButtonPress
-				},
-				t1
+				{ text = v2.addViaLink, onActivated = v.onAddViaLinkButtonPress },
+				v3
 			},
 			[TFActionsEnum.AddTrustedFriendDoubleOptin] = {
-				{
-					text = v18.add,
-					onActivated = v17.onSendTrustedConnectionRequest
-				},
-				t1
+				{ text = v2.add, onActivated = v.onSendTrustedConnectionRequest },
+				v3
 			},
 			[TFActionsEnum.AddTrustedFriendWithVpc] = {
 				{
-					text = v18.add,
+					text = v2.add,
 					icon = Foundation.Enums.IconName.LockClosed,
-					onActivated = v17.onOpenVPCProloguePress
+					onActivated = v.onOpenVPCProloguePress
 				},
-				t1
+				v3
 			},
 			[TFActionsEnum.AcceptTrustedFriendWithVpcRecipient] = {
 				{
-					text = v18.accept,
+					text = v2.accept,
 					icon = Foundation.Enums.IconName.LockClosed,
-					onActivated = v17.onOpenVPCProloguePress
+					onActivated = v.onOpenVPCProloguePress
 				},
-				t1
+				v3
 			},
 			[TFActionsEnum.AcceptTrustedFriendViaLink] = {
-				{
-					text = v18.accept,
-					onActivated = v17.onAddTrustedFriendFromLink
-				},
-				t1
+				{ text = v2.accept, onActivated = v.onAddTrustedFriendFromLink },
+				v3
 			},
 			[TFActionsEnum.AcceptTrustedFriend] = {
-				{
-					text = v18.accept,
-					onActivated = v17.onAcceptRequestReceived
-				},
-				t1
+				{ text = v2.accept, onActivated = v.onAcceptRequestReceived },
+				v3
 			},
-			[TFActionsEnum.AcceptTrustedFriendViaLinkWithVpcRecipient] = if not FFlagTrustedFriendsLinkVPC then nil else {
+			[TFActionsEnum.AcceptTrustedFriendViaLinkWithVpcRecipient] = FFlagTrustedFriendsLinkVPC and {
 				{
-					text = v18.accept,
+					text = v2.accept,
 					icon = Foundation.Enums.IconName.LockClosed,
-					onActivated = v17.onAddTrustedFriendFromLinkWithVPC
+					onActivated = v.onAddTrustedFriendFromLinkWithVPC
 				},
-				t1
-			},
+				v3
+			} or nil,
 			[TFActionsEnum.AcceptTrustedFriendInvalid] = {
 				{
-					isDisabled = true,
-					text = v18.accept,
-					onActivated = function() -- line: 121
-					end
+					text = v2.accept,
+					onActivated = function() end,
+					isDisabled = true
 				},
-				t1
+				v3
 			},
 			[TFActionsEnum.PendingTrustedConnection] = {
 				{
-					isDisabled = true,
-					text = v18.add,
-					onActivated = function() -- line: 129
-					end
+					text = v2.add,
+					onActivated = function() end,
+					isDisabled = true
 				},
-				t1
+				v3
 			},
 			[TFActionsEnum.PendingIncomingTrustedConnection] = {
 				{
-					isDisabled = true,
-					text = v18.accept,
-					onActivated = function() -- line: 137
-					end
+					text = v2.accept,
+					onActivated = function() end,
+					isDisabled = true
 				},
-				t1
+				v3
 			}
 		}
-	end, {
-		v16,
-		v18,
-		v17
-	})
+	end, { p2, v2, v })
 
-	if v16 then
-		return v19[v16]
+	if p2 then
+		return v3[p2]
 	end
 
 	return nil

@@ -1,22 +1,26 @@
-return function(p1, p2) -- line: 7
-	if p1.order and p2.order then
-		return p1.order < p2.order
+local function fn(data): boolean -- 3 equivalent calls inferred from this helper
+	return data.order ~= nil and not (data.moderated or data.failed)
+end
+
+return function(data, data2)
+	if data.order and data2.order then
+		return data.order < data2.order
 	end
 
-	if p1.order ~= nil and (not p1.moderated and not p1.failed) or p2.order ~= nil and (not p2.moderated and not p2.failed) then
-		return p2.order ~= nil and (not p2.moderated and not p2.failed)
+	if not fn(data) and not fn(data2) then -- inferred equivalent call
+		local unixTimestamp = data.sent and data.sent:GetUnixTimestamp()
+		local unixTimestamp2 = data2.sent and data2.sent:GetUnixTimestamp()
+
+		if unixTimestamp and unixTimestamp2 and unixTimestamp ~= unixTimestamp2 then
+			return unixTimestamp < unixTimestamp2
+		end
+
+		if data.id and data2.id and data.id ~= data2.id then
+			return data.id > data2.id
+		end
+
+		return data2.moderated == true or data2.failed == true
 	end
 
-	local v4 = p1.sent and p1.sent:GetUnixTimestamp()
-	local v5 = p2.sent and p2.sent:GetUnixTimestamp()
-
-	if v4 and v5 and v4 ~= v5 then
-		return v4 < v5
-	end
-
-	if p1.id and p2.id and p1.id ~= p2.id then
-		return p1.id > p2.id
-	end
-
-	return p2.moderated == true or p2.failed == true
+	return fn(data2) -- inferred equivalent call
 end

@@ -1,57 +1,63 @@
-local _script = script
-local getEngineFeatureUGCValidationWithContextEntrypoint = require(_script.flags.getEngineFeatureUGCValidationWithContextEntrypoint)
-local Analytics = require(_script.Analytics)
-local Constants = require(_script.Constants)
-local BundlesMetadata = require(_script.util.BundlesMetadata)
-local canUploadBundlesAsync = require(_script.util.canUploadBundlesAsync)
-local createUGCBodyPartFolders = require(_script.util.createUGCBodyPartFolders)
-local isLayeredClothing = require(_script.util.isLayeredClothing)
-local RigidOrLayeredAllowed = require(_script.util.RigidOrLayeredAllowed)
+local script2 = script
 
-require(_script.util.Types)
+local getEngineFeatureUGCValidationWithContextEntrypoint = require(script2.flags.getEngineFeatureUGCValidationWithContextEntrypoint)
 
-local createEditableInstancesForContext = require(_script.util.createEditableInstancesForContext)
-local destroyEditableInstances = require(_script.util.destroyEditableInstances)
-local ValidationHints = require(_script.util.ValidationHints)
-local validateInternal = require(_script.validation.validateInternal)
-local validateLayeredClothingAccessoryMeshPartAssetFormat = require(_script.validation.validateLayeredClothingAccessoryMeshPartAssetFormat)
-local validateLegacyAccessoryMeshPartAssetFormat = require(_script.validation.validateLegacyAccessoryMeshPartAssetFormat)
-local validateFullBody = require(_script.validation.validateFullBody)
-local validateShoes = require(_script.validation.validateShoes)
-local validateBundleReadyForUpload = require(_script.validation.validateBundleReadyForUpload)
-local validateShoesBundleReadyForUpload = require(_script.validation.validateShoesBundleReadyForUpload)
-local validateAnimationBundleReadyForUpload = require(_script.validation.validateAnimationBundleReadyForUpload)
-local validateDynamicHeadMeshPartFormat = require(_script.validation.validateDynamicHeadMeshPartFormat)
-local ValidationManager = require(_script.validationSystem.ValidationManager)
-local getFFlagUGCValidationEnableFolderStructure = require(_script.flags.getFFlagUGCValidationEnableFolderStructure)
-local getFFlagUGCValidationCombineEntrypointResults = require(_script.flags.getFFlagUGCValidationCombineEntrypointResults)
-local getFFlagDebugUGCDisableAssetQualityChecks = require(_script.flags.getFFlagDebugUGCDisableAssetQualityChecks)
-local getFFlagUGCValidateBackendInExperienceViaCanPublish = require(_script.flags.getFFlagUGCValidateBackendInExperienceViaCanPublish)
-local LegacyValidationAdapter = require(_script.util.LegacyValidationAdapter)
-local SplitHumanoidRigDescriptionForUpload = require(_script.util.SplitHumanoidRigDescriptionForUpload)
-local t1 = {
-	ValidateAsset = ValidationManager.ValidateAsset,
-	ValidateFinalizedBundle = ValidationManager.ValidateFinalizedBundle,
-	combineResultsIntoLegacy = LegacyValidationAdapter.combineResultsIntoLegacy,
-	mergeLegacyIntoModern = LegacyValidationAdapter.mergeLegacyIntoModern,
-	isFolderStructureEnabled = getFFlagUGCValidationEnableFolderStructure,
-	isEntrypointMergingEnabled = getFFlagUGCValidationCombineEntrypointResults,
-	isBackendInExperienceViaCanPublishEnabled = getFFlagUGCValidateBackendInExperienceViaCanPublish,
-	shouldSkipAssetQualityChecks = getFFlagDebugUGCDisableAssetQualityChecks,
-	SplitHrdInUpload = SplitHumanoidRigDescriptionForUpload.fixUploadInstance
-}
+local Analytics = require(script2.Analytics)
+local Constants = require(script2.Constants)
+
+local BundlesMetadata = require(script2.util.BundlesMetadata)
+local canUploadBundlesAsync = require(script2.util.canUploadBundlesAsync)
+local createUGCBodyPartFolders = require(script2.util.createUGCBodyPartFolders)
+local isLayeredClothing = require(script2.util.isLayeredClothing)
+local RigidOrLayeredAllowed = require(script2.util.RigidOrLayeredAllowed)
+require(script2.util.Types)
+local createEditableInstancesForContext = require(script2.util.createEditableInstancesForContext)
+local destroyEditableInstances = require(script2.util.destroyEditableInstances)
+local ValidationHints = require(script2.util.ValidationHints)
+
+local validateInternal = require(script2.validation.validateInternal)
+
+local validateLayeredClothingAccessoryMeshPartAssetFormat = require(script2.validation.validateLayeredClothingAccessoryMeshPartAssetFormat)
+local validateLegacyAccessoryMeshPartAssetFormat = require(script2.validation.validateLegacyAccessoryMeshPartAssetFormat)
+local validateFullBody = require(script2.validation.validateFullBody)
+local validateShoes = require(script2.validation.validateShoes)
+
+local validateBundleReadyForUpload = require(script2.validation.validateBundleReadyForUpload)
+local validateShoesBundleReadyForUpload = require(script2.validation.validateShoesBundleReadyForUpload)
+local validateAnimationBundleReadyForUpload = require(script2.validation.validateAnimationBundleReadyForUpload)
+local validateDynamicHeadMeshPartFormat = require(script2.validation.validateDynamicHeadMeshPartFormat)
+local ValidationManager = require(script2.validationSystem.ValidationManager)
+local getFFlagDebugUGCDisableAssetQualityChecks = require(script2.flags.getFFlagDebugUGCDisableAssetQualityChecks)
+
+local getFFlagUGCValidateBackendInExperienceViaCanPublish = require(script2.flags.getFFlagUGCValidateBackendInExperienceViaCanPublish)
+local getFFlagUGCValidationAllowFullVaas = require(script2.flags.getFFlagUGCValidationAllowFullVaas)
+local LegacyValidationAdapter = require(script2.util.LegacyValidationAdapter)
+local AssetQualityValidationClient = require(script2.util.AssetQualityValidationClient)
+local SplitHumanoidRigDescriptionForUpload = require(script2.util.SplitHumanoidRigDescriptionForUpload)
+local UnpublishedDependencies = require(script2.util.UnpublishedDependencies)
+local UGCValidation = {}
+
+UGCValidation.ValidateAsset = ValidationManager.ValidateAsset
+UGCValidation.ValidateFinalizedBundle = ValidationManager.ValidateFinalizedBundle
+UGCValidation.combineResultsIntoLegacy = LegacyValidationAdapter.combineResultsIntoLegacy
+UGCValidation.mergeLegacyIntoModern = LegacyValidationAdapter.mergeLegacyIntoModern
+UGCValidation.isBackendInExperienceViaCanPublishEnabled = getFFlagUGCValidateBackendInExperienceViaCanPublish
+UGCValidation.shouldSkipAssetQualityChecks = getFFlagDebugUGCDisableAssetQualityChecks
+UGCValidation.isFullVaasEnabled = getFFlagUGCValidationAllowFullVaas
+UGCValidation.SplitHrdInUpload = SplitHumanoidRigDescriptionForUpload.fixUploadInstance
+UGCValidation.AssetQualityValidationClient = AssetQualityValidationClient
 
 if getEngineFeatureUGCValidationWithContextEntrypoint() then
-	function t1.validateWithContext(p1) -- line: 54
-		-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateInternal (copy), destroyEditableInstances (copy)
-		assert(p1.instances ~= nil, "instances required in validationContext for validateWithContext")
-		assert(p1.assetTypeEnum ~= nil, "assetTypeEnum required in validationContext for validateWithContext")
+	function UGCValidation:validateWithContext()
+		assert(self.instances ~= nil, "instances required in validationContext for validateWithContext")
+		assert(self.assetTypeEnum ~= nil, "assetTypeEnum required in validationContext for validateWithContext")
 
-		local instances = p1.instances
-		local isServer = p1.isServer
-		local assetTypeEnum = p1.assetTypeEnum
-		local allowEditableInstances = p1.allowEditableInstances
-		local timestamp = tick()
+		local instances = self.instances
+		local isServer = self.isServer
+		local assetTypeEnum = self.assetTypeEnum
+		local allowEditableInstances = self.allowEditableInstances
+
+		local now = tick()
 
 		Analytics.setMetadata({
 			entrypoint = "validate",
@@ -59,209 +65,220 @@ if getEngineFeatureUGCValidationWithContextEntrypoint() then
 			isServer = isServer
 		})
 
-		local v36, v37 = createEditableInstancesForContext.processAll(instances, allowEditableInstances)
+		local v, v2 = createEditableInstancesForContext.processAll(instances, allowEditableInstances)
 
-		if not v36 then
+		if not v then
 			if not isServer then
-				return v36, v37
+				return v, v2
 			end
 
-			error(v37[1])
+			if UnpublishedDependencies.shouldReturnOnLoadFailure(self) then
+				return false, {}
+			end
+
+			error(v2[1])
 		end
 
-		p1.editableMeshes = v37.editableMeshes
-		p1.editableImages = v37.editableImages
-		p1.lastTickSeconds = tick()
+		self.editableMeshes = v2.editableMeshes
+		self.editableImages = v2.editableImages
+		self.lastTickSeconds = tick()
 
-		if p1.requireAllFolders == nil then
-			p1.requireAllFolders = true
+		if self.requireAllFolders == nil then
+			self.requireAllFolders = true
 		end
 
-		local v38, v39 = validateInternal(p1)
+		local v3, v4 = validateInternal(self)
 
-		destroyEditableInstances(p1.editableMeshes, p1.editableImages)
+		destroyEditableInstances(self.editableMeshes, self.editableImages)
 
-		if v38 then
-			Analytics.recordScriptTime(script.Name, timestamp, p1)
-			Analytics.reportScriptTimes(p1)
+		if v3 then
+			Analytics.recordScriptTime(script.Name, now, self)
+			Analytics.reportScriptTimes(self)
 		end
 
-		Analytics.reportCounter(v38, assetTypeEnum ~= Enum.AssetType.DynamicHead and "BodyPart" or "Head", p1)
+		Analytics.reportCounter(v3, assetTypeEnum == Enum.AssetType.DynamicHead and "Head" or "BodyPart", self)
 
-		return v38, v39
+		return v3, v4
 	end
 end
 
-function t1.validate(t2: {[any]: any}, p2, b1: boolean?, b2: boolean?, p3, s1: string?, n1: number?, b3: boolean?, p4, b4: boolean?, b5: boolean?, b6: boolean?) -- line: 114
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateInternal (copy), destroyEditableInstances (copy)
-	local timestamp = tick()
+function UGCValidation.validate(instances, assetTypeEnum, isServer: boolean?, allowUnreviewedAssets: boolean?, restrictedUserIds, token: string?, universeId: number?, allowEditableInstances: boolean?, bypassFlags, shouldYield: boolean?, flag: boolean?, flag2: boolean?)
+	local now = tick()
 
 	Analytics.setMetadata({
 		entrypoint = "validate",
-		assetType = p2.Name,
-		isServer = b1
+		assetType = assetTypeEnum.Name,
+		isServer = isServer
 	})
 
-	local v53, v54 = createEditableInstancesForContext.processAll(t2, b3)
+	local v, v2 = createEditableInstancesForContext.processAll(instances, allowEditableInstances)
 
-	if not v53 then
-		if not b1 then
-			return v53, v54
+	if not v then
+		if not isServer then
+			return v, v2
 		end
 
-		error(v54[1])
+		error(v2[1])
 	end
 
-	local t3 = {
+	local v3 = {
+		instances = instances,
+		assetTypeEnum = assetTypeEnum,
+		allowUnreviewedAssets = allowUnreviewedAssets,
+		restrictedUserIds = restrictedUserIds,
+		isServer = isServer,
+		token = token,
+		universeId = universeId,
 		isAsync = false,
-		instances = t2,
-		assetTypeEnum = p2,
-		allowUnreviewedAssets = b2,
-		restrictedUserIds = p3,
-		isServer = b1,
-		token = s1,
-		universeId = n1,
-		allowEditableInstances = b3,
-		bypassFlags = p4,
-		validateMeshPartAccessories = b5 == nil or b5,
+		allowEditableInstances = allowEditableInstances,
+		bypassFlags = bypassFlags,
+		validateMeshPartAccessories = flag == nil or flag,
 		lastTickSeconds = tick(),
-		shouldYield = b4,
-		editableMeshes = v54.editableMeshes,
-		editableImages = v54.editableImages,
-		requireAllFolders = b6 == nil or b6
+		shouldYield = shouldYield,
+		editableMeshes = v2.editableMeshes,
+		editableImages = v2.editableImages,
+		requireAllFolders = flag2 == nil or flag2
 	}
-	local v56, v57 = validateInternal(t3)
 
-	destroyEditableInstances(t3.editableMeshes, t3.editableImages)
+	local v4, v5 = validateInternal(v3)
 
-	if v56 then
-		Analytics.recordScriptTime(script.Name, timestamp, t3)
-		Analytics.reportScriptTimes(t3)
+	destroyEditableInstances(v3.editableMeshes, v3.editableImages)
+
+	if v4 then
+		Analytics.recordScriptTime(script.Name, now, v3)
+		Analytics.reportScriptTimes(v3)
 	end
 
-	Analytics.reportCounter(v56, p2 ~= Enum.AssetType.DynamicHead and "BodyPart" or "Head", t3)
+	Analytics.reportCounter(v4, assetTypeEnum == Enum.AssetType.DynamicHead and "Head" or "BodyPart", v3)
 
-	return v56, v57
+	return v4, v5
 end
-function t1.validateAsync(t4: {[any]: any}, p5, p6: ((...any) -> ...any), b7: boolean?, b8: boolean?, p7) -- line: 185
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateInternal (copy), destroyEditableInstances (copy)
+
+function UGCValidation.validateAsync(instances, assetTypeEnum, callback, isServer: boolean?, allowUnreviewedAssets: boolean?, restrictedUserIds)
 	Analytics.setMetadata({
 		entrypoint = "validateAsync",
-		assetType = p5.Name,
-		isServer = b7
+		assetType = assetTypeEnum.Name,
+		isServer = isServer
 	})
 
-	local v64, v65 = createEditableInstancesForContext.processAll(t4)
+	local v, v2 = createEditableInstancesForContext.processAll(instances)
 
-	if not v64 then
-		if b7 then
-			error(v65[1])
+	if not v then
+		if isServer then
+			error(v2[1])
 		else
-			p6(v64, v65)
+			callback(v, v2)
 		end
 	end
 
-	local t5 = {
+	local v3 = {
+		instances = instances,
+		assetTypeEnum = assetTypeEnum,
+		allowUnreviewedAssets = allowUnreviewedAssets,
+		restrictedUserIds = restrictedUserIds,
+		isServer = isServer,
 		token = "",
 		isAsync = true,
 		validateMeshPartAccessories = false,
-		instances = t4,
-		assetTypeEnum = p5,
-		allowUnreviewedAssets = b8,
-		restrictedUserIds = p7,
-		isServer = b7,
-		editableMeshes = v65.editableMeshes,
-		editableImages = v65.editableImages
+		editableMeshes = v2.editableMeshes,
+		editableImages = v2.editableImages
 	}
 
-	coroutine.wrap(function() -- line: 221
-		-- upvalues: p6 (copy), validateInternal (copy), t5 (copy), destroyEditableInstances (copy)
-		p6(validateInternal(t5))
-		destroyEditableInstances(t5.editableMeshes, t5.editableImages)
+	coroutine.wrap(function()
+		callback(validateInternal(v3))
+		destroyEditableInstances(v3.editableMeshes, v3.editableImages)
 	end)()
 end
-function t1.validateMeshPartFormat(t6: {[any]: any}, p8, b9: boolean?, b10: boolean?, p9) -- line: 231
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateDynamicHeadMeshPartFormat (copy), destroyEditableInstances (copy)
+
+function UGCValidation.validateMeshPartFormat(instances, assetTypeEnum, isServer: boolean?, allowUnreviewedAssets: boolean?, restrictedUserIds)
 	Analytics.setMetadata({
 		entrypoint = "validateMeshPartFormat",
-		assetType = p8.Name,
-		isServer = b9
+		assetType = assetTypeEnum.Name,
+		isServer = isServer
 	})
-	assert(p8 == Enum.AssetType.DynamicHead)
 
-	local v72, v73 = createEditableInstancesForContext.processAll(t6)
+	assert(Enum.AssetType.DynamicHead == assetTypeEnum)
 
-	if not v72 then
-		if not b9 then
-			return v72, v73
+	local v, v2 = createEditableInstancesForContext.processAll(instances)
+
+	if not v then
+		if not isServer then
+			return v, v2
 		end
 
-		error(v73[1])
+		error(v2[1])
 	end
 
-	local t7 = {
+	local v3 = {
+		instances = instances,
+		assetTypeEnum = assetTypeEnum,
+		allowUnreviewedAssets = allowUnreviewedAssets,
+		restrictedUserIds = restrictedUserIds,
+		isServer = isServer,
 		validateMeshPartAccessories = false,
-		instances = t6,
-		assetTypeEnum = p8,
-		allowUnreviewedAssets = b10,
-		restrictedUserIds = p9,
-		isServer = b9,
-		editableMeshes = v73.editableMeshes,
-		editableImages = v73.editableImages
+		editableMeshes = v2.editableMeshes,
+		editableImages = v2.editableImages
 	}
-	local v75, v76 = validateDynamicHeadMeshPartFormat(t7)
 
-	destroyEditableInstances(t7.editableMeshes, t7.editableImages)
+	local v4, v5 = validateDynamicHeadMeshPartFormat(v3)
 
-	return v75, v76
+	destroyEditableInstances(v3.editableMeshes, v3.editableImages)
+
+	return v4, v5
 end
-function t1.validateAsyncMeshPartFormat(t8: {[any]: any}, p10, p11: ((...any) -> ...any), b11: boolean?, b12: boolean?, p12) -- line: 278
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateDynamicHeadMeshPartFormat (copy), destroyEditableInstances (copy)
+
+function UGCValidation.validateAsyncMeshPartFormat(instances, assetTypeEnum, callback, isServer: boolean?, allowUnreviewedAssets: boolean?, restrictedUserIds)
 	Analytics.setMetadata({
 		entrypoint = "validateAsyncMeshPartFormat",
-		assetType = p10.Name,
-		isServer = b11
+		assetType = assetTypeEnum.Name,
+		isServer = isServer
 	})
-	assert(p10 == Enum.AssetType.DynamicHead)
 
-	local v83, v84 = createEditableInstancesForContext.processAll(t8)
+	assert(Enum.AssetType.DynamicHead == assetTypeEnum)
 
-	if not v83 then
-		if b11 then
-			error(v84[1])
+	local v, v2 = createEditableInstancesForContext.processAll(instances)
+
+	if not v then
+		if isServer then
+			error(v2[1])
 		else
-			p11(v83, v84)
+			callback(v, v2)
 		end
 	end
 
-	local t9 = {
+	local v3 = {
+		instances = instances,
+		assetTypeEnum = assetTypeEnum,
+		allowUnreviewedAssets = allowUnreviewedAssets,
+		restrictedUserIds = restrictedUserIds,
+		isServer = isServer,
 		validateMeshPartAccessories = false,
-		instances = t8,
-		assetTypeEnum = p10,
-		allowUnreviewedAssets = b12,
-		restrictedUserIds = p12,
-		isServer = b11,
-		editableMeshes = v84.editableMeshes,
-		editableImages = v84.editableImages
+		editableMeshes = v2.editableMeshes,
+		editableImages = v2.editableImages
 	}
 
-	coroutine.wrap(function() -- line: 316
-		-- upvalues: p11 (copy), validateDynamicHeadMeshPartFormat (copy), t9 (copy), destroyEditableInstances (copy)
-		p11(validateDynamicHeadMeshPartFormat(t9))
-		destroyEditableInstances(t9.editableMeshes, t9.editableImages)
+	coroutine.wrap(function()
+		callback(validateDynamicHeadMeshPartFormat(v3))
+		destroyEditableInstances(v3.editableMeshes, v3.editableImages)
 	end)()
 end
 
 if getEngineFeatureUGCValidationWithContextEntrypoint() then
-	function t1.validateMeshPartAssetFormatWithContext(p13) -- line: 326
-		-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), isLayeredClothing (copy), validateLayeredClothingAccessoryMeshPartAssetFormat (copy), validateLegacyAccessoryMeshPartAssetFormat (copy), destroyEditableInstances (copy)
-		assert(p13.assetTypeEnum ~= nil, "assetTypeEnum required in validationContext for validateMeshPartAssetFormatWithContext")
-		assert(p13.instances ~= nil, "instances required in validationContext for validateMeshPartAssetFormatWithContext")
+	function UGCValidation:validateMeshPartAssetFormatWithContext()
+		assert(
+			self.assetTypeEnum ~= nil,
+			"assetTypeEnum required in validationContext for validateMeshPartAssetFormatWithContext"
+		)
 
-		local instances = p13.instances
-		local assetTypeEnum = p13.assetTypeEnum
-		local isServer = p13.isServer
-		local specialMeshAccessory = p13.specialMeshAccessory
+		assert(
+			self.instances ~= nil,
+			"instances required in validationContext for validateMeshPartAssetFormatWithContext"
+		)
+
+		local instances = self.instances
+		local assetTypeEnum = self.assetTypeEnum
+		local isServer = self.isServer
+		local specialMeshAccessory = self.specialMeshAccessory
 
 		Analytics.setMetadata({
 			entrypoint = "validateMeshPartAssetFormat2",
@@ -269,93 +286,92 @@ if getEngineFeatureUGCValidationWithContextEntrypoint() then
 			isServer = isServer
 		})
 
-		local v91, v92 = createEditableInstancesForContext.processAll(instances)
+		local v, v2 = createEditableInstancesForContext.processAll(instances)
 
-		if not v91 then
+		if not v then
 			if not isServer then
-				return v91, v92
+				return v, v2
 			end
 
-			error(v92[1])
+			error(v2[1])
 		end
 
-		p13.editableMeshes = v92.editableMeshes
-		p13.editableImages = v92.editableImages
-		p13.validateMeshPartAccessories = false
-
-		local v93, v94
+		self.editableMeshes = v2.editableMeshes
+		self.editableImages = v2.editableImages
+		self.validateMeshPartAccessories = false
+		local v3, v4
 
 		if isLayeredClothing(instances[1]) then
-			v93, v94 = validateLayeredClothingAccessoryMeshPartAssetFormat(specialMeshAccessory, p13)
+			v3, v4 = validateLayeredClothingAccessoryMeshPartAssetFormat(specialMeshAccessory, self)
 		else
-			v93, v94 = validateLegacyAccessoryMeshPartAssetFormat(specialMeshAccessory, p13)
+			v3, v4 = validateLegacyAccessoryMeshPartAssetFormat(specialMeshAccessory, self)
 		end
 
-		destroyEditableInstances(p13.editableMeshes, p13.editableImages)
+		destroyEditableInstances(self.editableMeshes, self.editableImages)
 
-		return v93, v94
+		return v3, v4
 	end
 end
 
-function t1.validateMeshPartAssetFormat2(t10: {[any]: any}, p14, p15, b13: boolean?, b14: boolean?, _) -- line: 380
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), isLayeredClothing (copy), validateLayeredClothingAccessoryMeshPartAssetFormat (copy), validateLegacyAccessoryMeshPartAssetFormat (copy), destroyEditableInstances (copy)
+function UGCValidation.validateMeshPartAssetFormat2(instances, p, assetTypeEnum, isServer: boolean?, allowUnreviewedAssets: boolean?, _)
 	Analytics.setMetadata({
 		entrypoint = "validateMeshPartAssetFormat2",
-		assetType = p15.Name,
-		isServer = b13
+		assetType = assetTypeEnum.Name,
+		isServer = isServer
 	})
 
-	local v101, v102 = createEditableInstancesForContext.processAll(t10)
+	local v, v2 = createEditableInstancesForContext.processAll(instances)
 
-	if not v101 then
-		if not b13 then
-			return v101, v102
+	if not v then
+		if not isServer then
+			return v, v2
 		end
 
-		error(v102[1])
+		error(v2[1])
 	end
 
-	local t11 = {
+	local v3 = {
+		instances = instances,
+		assetTypeEnum = assetTypeEnum,
+		allowUnreviewedAssets = allowUnreviewedAssets,
+		isServer = isServer,
 		validateMeshPartAccessories = false,
-		instances = t10,
-		assetTypeEnum = p15,
-		allowUnreviewedAssets = b14,
-		isServer = b13,
-		editableMeshes = v102.editableMeshes,
-		editableImages = v102.editableImages
+		editableMeshes = v2.editableMeshes,
+		editableImages = v2.editableImages
 	}
-	local v104, v105
+	local v4, v5
 
-	if isLayeredClothing(t10[1]) then
-		v104, v105 = validateLayeredClothingAccessoryMeshPartAssetFormat(p14, t11)
+	if isLayeredClothing(instances[1]) then
+		v4, v5 = validateLayeredClothingAccessoryMeshPartAssetFormat(p, v3)
 	else
-		v104, v105 = validateLegacyAccessoryMeshPartAssetFormat(p14, t11)
+		v4, v5 = validateLegacyAccessoryMeshPartAssetFormat(p, v3)
 	end
 
-	destroyEditableInstances(t11.editableMeshes, t11.editableImages)
+	destroyEditableInstances(v3.editableMeshes, v3.editableImages)
 
-	return v104, v105
+	return v4, v5
 end
 
-t1.validateBundleReadyForUpload = validateBundleReadyForUpload
-t1.validateShoesBundleReadyForUpload = validateShoesBundleReadyForUpload
-t1.validateAnimationBundleReadyForUpload = validateAnimationBundleReadyForUpload
-t1.util = {
+UGCValidation.validateBundleReadyForUpload = validateBundleReadyForUpload
+UGCValidation.validateShoesBundleReadyForUpload = validateShoesBundleReadyForUpload
+UGCValidation.validateAnimationBundleReadyForUpload = validateAnimationBundleReadyForUpload
+
+UGCValidation.util = {
 	BundlesMetadata = BundlesMetadata,
 	createUGCBodyPartFolders = createUGCBodyPartFolders,
 	canUploadBundlesAsync = canUploadBundlesAsync
 }
-t1.util.isLayeredClothingAllowed = RigidOrLayeredAllowed.isLayeredClothingAllowed
-t1.util.isRigidAccessoryAllowed = RigidOrLayeredAllowed.isRigidAccessoryAllowed
+
+UGCValidation.util.isLayeredClothingAllowed = RigidOrLayeredAllowed.isLayeredClothingAllowed
+UGCValidation.util.isRigidAccessoryAllowed = RigidOrLayeredAllowed.isRigidAccessoryAllowed
 
 if getEngineFeatureUGCValidationWithContextEntrypoint() then
-	function t1.validateFullBodyWithContext(p17) -- line: 485
-		-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateFullBody (copy), destroyEditableInstances (copy)
-		assert(p17.fullBodyData ~= nil, "fullBodyData required in validationContext for validateFullBodyWithContext")
+	function UGCValidation:validateFullBodyWithContext()
+		assert(self.fullBodyData ~= nil, "fullBodyData required in validationContext for validateFullBodyWithContext")
 
-		local isServer = p17.isServer
-		local fullBodyData = p17.fullBodyData
-		local allowEditableInstances = p17.allowEditableInstances
+		local isServer = self.isServer
+		local fullBodyData = self.fullBodyData
+		local allowEditableInstances = self.allowEditableInstances
 
 		Analytics.setMetadata({
 			entrypoint = "validateFullBody",
@@ -363,280 +379,278 @@ if getEngineFeatureUGCValidationWithContextEntrypoint() then
 			isServer = isServer
 		})
 
-		local timestamp = tick()
-		local t12 = {}
+		local now = tick()
 
-		for _, v113 in fullBodyData do
-			for _, v115 in v113.allSelectedInstances do
-				table.insert(t12, v115)
+		local allSelectedInstances = {}
+
+		for _, v in fullBodyData do
+			for _, allSelectedInstance in v.allSelectedInstances do
+				table.insert(allSelectedInstances, allSelectedInstance)
 			end
 		end
 
-		local v116, v117 = createEditableInstancesForContext.processAll(t12, allowEditableInstances)
+		local v, v2 = createEditableInstancesForContext.processAll(allSelectedInstances, allowEditableInstances)
 
-		if not v116 then
+		if not v then
 			if not isServer then
-				return v116, v117
+				return v, v2
 			end
 
-			error(v117[1])
+			if UnpublishedDependencies.shouldReturnOnLoadFailure(self) then
+				return false, {}
+			end
+
+			error(v2[1])
 		end
 
-		p17.editableMeshes = v117.editableMeshes
-		p17.editableImages = v117.editableImages
-		p17.lastTickSeconds = tick()
+		self.editableMeshes = v2.editableMeshes
+		self.editableImages = v2.editableImages
+		self.lastTickSeconds = tick()
 
-		if p17.requireAllFolders == nil then
-			p17.requireAllFolders = true
+		if self.requireAllFolders == nil then
+			self.requireAllFolders = true
 		end
 
-		local v118, v119 = validateFullBody(p17)
+		local v3, v4 = validateFullBody(self)
 
-		destroyEditableInstances(p17.editableMeshes, p17.editableImages)
+		destroyEditableInstances(self.editableMeshes, self.editableImages)
 
-		if v118 then
-			Analytics.recordScriptTime(script.Name, timestamp, p17)
-			Analytics.reportScriptTimes(p17)
+		if v3 then
+			Analytics.recordScriptTime(script.Name, now, self)
+			Analytics.reportScriptTimes(self)
 		end
 
-		Analytics.reportCounter(v118, "FullBody", p17)
+		Analytics.reportCounter(v3, "FullBody", self)
 
-		return v118, v119
+		return v3, v4
 	end
 end
 
-function t1.validateFullBody(p18, b15: boolean?, b16: boolean?, p19, b17: boolean?, b18: boolean?) -- line: 548
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateFullBody (copy), destroyEditableInstances (copy)
-	Analytics.setMetadata({
-		entrypoint = "validateFullBody",
-		assetType = "",
-		isServer = b15
-	})
+function UGCValidation.validateFullBody(fullBodyData, isServer: boolean?, allowEditableInstances: boolean?, bypassFlags, shouldYield: boolean?, flag: boolean?)
+	Analytics.setMetadata({ entrypoint = "validateFullBody", assetType = "", isServer = isServer })
 
-	local timestamp = tick()
-	local t13 = {}
+	local now = tick()
 
-	for _, v129 in p18 do
-		for _, v131 in v129.allSelectedInstances do
-			table.insert(t13, v131)
+	local allSelectedInstances = {}
+
+	for _, item in fullBodyData do
+		for _, allSelectedInstance in item.allSelectedInstances do
+			table.insert(allSelectedInstances, allSelectedInstance)
 		end
 	end
 
-	local v132, v133 = createEditableInstancesForContext.processAll(t13, b16)
+	local v, v2 = createEditableInstancesForContext.processAll(allSelectedInstances, allowEditableInstances)
 
-	if not v132 then
-		if not b15 then
-			return v132, v133
+	if not v then
+		if not isServer then
+			return v, v2
 		end
 
-		error(v133[1])
+		error(v2[1])
 	end
 
-	local t14 = {
+	local v3 = {
+		fullBodyData = fullBodyData,
+		isServer = isServer,
+		allowEditableInstances = allowEditableInstances,
+		bypassFlags = bypassFlags,
 		validateMeshPartAccessories = false,
-		fullBodyData = p18,
-		isServer = b15,
-		allowEditableInstances = b16,
-		bypassFlags = p19,
 		lastTickSeconds = tick(),
-		shouldYield = b17,
-		editableMeshes = v133.editableMeshes,
-		editableImages = v133.editableImages,
-		requireAllFolders = b18 == nil or b18
+		shouldYield = shouldYield,
+		editableMeshes = v2.editableMeshes,
+		editableImages = v2.editableImages,
+		requireAllFolders = flag == nil or flag
 	}
-	local v135, v136 = validateFullBody(t14)
 
-	destroyEditableInstances(t14.editableMeshes, t14.editableImages)
+	local v4, v5 = validateFullBody(v3)
 
-	if v135 then
-		Analytics.recordScriptTime(script.Name, timestamp, t14)
-		Analytics.reportScriptTimes(t14)
+	destroyEditableInstances(v3.editableMeshes, v3.editableImages)
+
+	if v4 then
+		Analytics.recordScriptTime(script.Name, now, v3)
+		Analytics.reportScriptTimes(v3)
 	end
 
-	Analytics.reportCounter(v135, "FullBody", t14)
+	Analytics.reportCounter(v4, "FullBody", v3)
 
-	return v135, v136
+	return v4, v5
 end
-function t1.validateShoesWithContext(p20) -- line: 610
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), validateShoes (copy), destroyEditableInstances (copy)
-	assert(p20.fullBodyData ~= nil, "fullBodyData required in validationContext for validateShoes")
 
-	local isServer = p20.isServer
-	local fullBodyData = p20.fullBodyData
-	local allowEditableInstances = p20.allowEditableInstances
+function UGCValidation:validateShoesWithContext()
+	assert(self.fullBodyData ~= nil, "fullBodyData required in validationContext for validateShoes")
 
+	local isServer = self.isServer
+	local fullBodyData = self.fullBodyData
+	local allowEditableInstances = self.allowEditableInstances
+
+	Analytics.setMetadata({ entrypoint = "validateShoes", assetType = "", isServer = isServer })
+
+	local now = tick()
+
+	local allSelectedInstances = {}
+
+	for _, v in fullBodyData do
+		for _, allSelectedInstance in v.allSelectedInstances do
+			table.insert(allSelectedInstances, allSelectedInstance)
+		end
+	end
+
+	local v, v2 = createEditableInstancesForContext.processAll(allSelectedInstances, allowEditableInstances)
+
+	if not v then
+		if not isServer then
+			return v, v2
+		end
+
+		if UnpublishedDependencies.shouldReturnOnLoadFailure(self) then
+			return false, {}
+		end
+
+		error(v2[1])
+	end
+
+	self.editableMeshes = v2.editableMeshes
+	self.editableImages = v2.editableImages
+	self.lastTickSeconds = tick()
+
+	local v3, v4 = validateShoes(self)
+
+	destroyEditableInstances(self.editableMeshes, self.editableImages)
+
+	if v3 then
+		Analytics.recordScriptTime(script.Name, now, self)
+		Analytics.reportScriptTimes(self)
+	end
+
+	Analytics.reportCounter(v3, "Shoes", self)
+
+	return v3, v4
+end
+
+function UGCValidation.preprocessDataAsync(items, isServer: boolean?, allowEditableInstances: boolean?, bypassFlags, shouldYield: boolean?)
 	Analytics.setMetadata({
-		entrypoint = "validateShoes",
+		entrypoint = "preprocessDataAsync",
 		assetType = "",
 		isServer = isServer
 	})
 
-	local timestamp = tick()
-	local t15 = {}
+	local now = tick()
 
-	for _, v144 in fullBodyData do
-		for _, v146 in v144.allSelectedInstances do
-			table.insert(t15, v146)
-		end
+	local v = {}
+
+	for _, item in items do
+		table.insert(v, item)
 	end
 
-	local v147, v148 = createEditableInstancesForContext.processAll(t15, allowEditableInstances)
+	local v2, errors = createEditableInstancesForContext.processAll(v, allowEditableInstances)
 
-	if not v147 then
+	if not v2 then
 		if not isServer then
-			return v147, v148
+			return { ok = false, errors = errors }
 		end
 
-		error(v148[1])
+		error(errors[1])
 	end
 
-	p20.editableMeshes = v148.editableMeshes
-	p20.editableImages = v148.editableImages
-	p20.lastTickSeconds = tick()
-
-	local v149, v150 = validateShoes(p20)
-
-	destroyEditableInstances(p20.editableMeshes, p20.editableImages)
-
-	if v149 then
-		Analytics.recordScriptTime(script.Name, timestamp, p20)
-		Analytics.reportScriptTimes(p20)
-	end
-
-	Analytics.reportCounter(v149, "Shoes", p20)
-
-	return v149, v150
-end
-function t1.preprocessDataAsync(p21, b19: boolean?, b20: boolean?, p22, b21: boolean?) -- line: 662
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), ValidationHints (copy), destroyEditableInstances (copy)
-	Analytics.setMetadata({
-		entrypoint = "preprocessDataAsync",
-		assetType = "",
-		isServer = b19
-	})
-
-	local timestamp = tick()
-	local t16 = {}
-
-	for _, v159 in p21 do
-		table.insert(t16, v159)
-	end
-
-	local v160, v161 = createEditableInstancesForContext.processAll(t16, b20)
-
-	if not v160 then
-		if not b19 then
-			return {
-				ok = false,
-				errors = v161
-			}
-		end
-
-		error(v161[1])
-	end
-
-	local t17 = {
+	local v3 = {
+		isServer = isServer,
+		allowEditableInstances = allowEditableInstances,
+		bypassFlags = bypassFlags,
 		validateMeshPartAccessories = false,
-		isServer = b19,
-		allowEditableInstances = b20,
-		bypassFlags = p22,
 		lastTickSeconds = tick(),
-		shouldYield = b21,
-		editableMeshes = v161.editableMeshes,
-		editableImages = v161.editableImages
+		shouldYield = shouldYield,
+		editableMeshes = errors.editableMeshes,
+		editableImages = errors.editableImages
 	}
-	local v163 = ValidationHints.preprocessDataAsync(p21, t17)
 
-	destroyEditableInstances(t17.editableMeshes, t17.editableImages)
+	local preprocessDataAsync = ValidationHints.preprocessDataAsync(items, v3)
 
-	if v163.ok then
-		Analytics.recordScriptTime("preprocessDataAsync", timestamp, t17)
-		Analytics.reportScriptTimes(t17)
+	destroyEditableInstances(v3.editableMeshes, v3.editableImages)
+
+	if preprocessDataAsync.ok then
+		Analytics.recordScriptTime("preprocessDataAsync", now, v3)
+		Analytics.reportScriptTimes(v3)
 	end
 
-	return v163
+	return preprocessDataAsync
 end
-function t1.isPreprocessDataCached(p23, p24, b22: boolean?) -- line: 721
-	-- upvalues: Analytics (copy), ValidationHints (copy)
+
+function UGCValidation.isPreprocessDataCached(p, p2, isServer: boolean?)
 	Analytics.setMetadata({
 		entrypoint = "isPreprocessDataCached",
 		assetType = "",
-		isServer = b22
+		isServer = isServer
 	})
 
-	local timestamp = tick()
-	local v168 = ValidationHints.isPreprocessDataCached(p23, p24)
-	local t18 = {
-		isServer = b22
-	}
+	local now = tick()
 
-	Analytics.recordScriptTime("isPreprocessDataCached", timestamp, t18)
-	Analytics.reportScriptTimes(t18)
+	local preprocessDataCached = ValidationHints.isPreprocessDataCached(p, p2)
 
-	return v168
+	local v = { isServer = isServer }
+
+	Analytics.recordScriptTime("isPreprocessDataCached", now, v)
+	Analytics.reportScriptTimes(v)
+
+	return preprocessDataCached
 end
-function t1.calculateScaleToValidateBoundsAsync(p25, b23: boolean?, b24: boolean?, p26, b25: boolean?, p27) -- line: 746
-	-- upvalues: Analytics (copy), createEditableInstancesForContext (copy), ValidationHints (copy), destroyEditableInstances (copy)
+
+function UGCValidation.calculateScaleToValidateBoundsAsync(items, isServer: boolean?, allowEditableInstances: boolean?, bypassFlags, shouldYield: boolean?, p)
 	Analytics.setMetadata({
 		entrypoint = "calculateScaleToValidateBoundsAsync",
 		assetType = "",
-		isServer = b23
+		isServer = isServer
 	})
 
-	local timestamp = tick()
-	local v177 = nil
+	local now = tick()
+	local errors
 
-	if not p27 then
-		local t19 = {}
+	if not p then
+		local v = {}
 
-		for _, v180 in p25 do
-			table.insert(t19, v180)
+		for _, item in items do
+			table.insert(v, item)
 		end
 
-		local v181
+		local v2
+		v2, errors = createEditableInstancesForContext.processAll(v, allowEditableInstances)
 
-		v181, v177 = createEditableInstancesForContext.processAll(t19, b24)
-
-		if not v181 then
-			if not b23 then
-				return {
-					ok = false,
-					errors = v177
-				}
+		if not v2 then
+			if not isServer then
+				return { ok = false, errors = errors }
 			end
 
-			error(v177[1])
+			error(errors[1])
 		end
 	end
 
-	local t20 = {
+	local v = {
+		isServer = isServer,
+		allowEditableInstances = allowEditableInstances,
+		bypassFlags = bypassFlags,
 		validateMeshPartAccessories = false,
-		isServer = b23,
-		allowEditableInstances = b24,
-		bypassFlags = p26,
 		lastTickSeconds = tick(),
-		shouldYield = b25
+		shouldYield = shouldYield
 	}
 
-	if not p27 then
-		t20.editableMeshes = v177.editableMeshes
-		t20.editableImages = v177.editableImages
+	if not p then
+		v.editableMeshes = errors.editableMeshes
+		v.editableImages = errors.editableImages
 	end
 
-	local v183 = ValidationHints.calculateScaleToValidateBoundsAsync(p25, t20, p27)
+	local scaleToValidateBoundsAsync = ValidationHints.calculateScaleToValidateBoundsAsync(items, v, p)
 
-	if not p27 then
-		destroyEditableInstances(t20.editableMeshes, t20.editableImages)
+	if not p then
+		destroyEditableInstances(v.editableMeshes, v.editableImages)
 	end
 
-	if v183.ok then
-		Analytics.recordScriptTime("calculateScaleToValidateBoundsAsync", timestamp, t20)
-		Analytics.reportScriptTimes(t20)
+	if scaleToValidateBoundsAsync.ok then
+		Analytics.recordScriptTime("calculateScaleToValidateBoundsAsync", now, v)
+		Analytics.reportScriptTimes(v)
 	end
 
-	return v183
+	return scaleToValidateBoundsAsync
 end
 
-t1.GUIDAttributeName = Constants.GUIDAttributeName
+UGCValidation.GUIDAttributeName = Constants.GUIDAttributeName
 
-return t1
+return UGCValidation

@@ -1,5 +1,6 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
-local VirtualEventsParent = VirtualEvents.Parent
+local parent = VirtualEvents.Parent
+
 local IXPService = game:GetService("IXPService")
 local fireEventDetailsPageVisit = require(VirtualEvents.Analytics.fireEventDetailsPageVisit)
 local fetchEventDetailsPage = require(script.Parent.fetchEventDetailsPage)
@@ -7,152 +8,197 @@ local getEventDetailsPageKey = require(script.Parent.getEventDetailsPageKey)
 local EventDetailsFeedSkeleton = require(script.Parent.EventDetailsFeedSkeleton)
 local EventDetailsFullBleedSkeleton = require(script.Parent.EventDetailsFullBleedSkeleton)
 local EventDetailsActionBarSkeleton = require(script.Parent.EventDetailsActionBarSkeleton)
-
-require(VirtualEventsParent.Navigation)
-
-local Foundation = require(VirtualEventsParent.Foundation)
+require(parent.Navigation)
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
-local React = require(VirtualEventsParent.React)
-local useNavigation = require(VirtualEventsParent.Navigation).useNavigation
-local useRouteName = require(VirtualEventsParent.Navigation).useRouteName
-local useNavigationFocus = require(VirtualEventsParent.Navigation).useNavigationFocus
-local useDeviceType = require(VirtualEventsParent.RobloxAppHooks).useDeviceType
-local SduiSharedUtilities = require(VirtualEventsParent.SduiSharedUtilities)
+local React = require(parent.React)
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local Navigation2 = require(parent.Navigation)
+local useRouteName = Navigation2.useRouteName
+local Navigation3 = require(parent.Navigation)
+local useNavigationFocus = Navigation3.useNavigationFocus
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useDeviceType = RobloxAppHooks.useDeviceType
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
 local SduiPageEntryPoint = SduiSharedUtilities.SduiPageEntryPoint
 local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
 local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
-local RobloxAppEnums = require(VirtualEventsParent.RobloxAppEnums)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
 local AppPage = RobloxAppEnums.AppPage
 local DeviceType = RobloxAppEnums.DeviceType
-local FFlagLuaAppSduiEventDetailsLogExposure = require(VirtualEventsParent.SharedFlags).FFlagLuaAppSduiEventDetailsLogExposure
-local FFlagLuaAppSduiEventDetailsCenterSheet = require(VirtualEventsParent.SharedFlags).FFlagLuaAppSduiEventDetailsCenterSheet
-local FFlagLuaAppSduiEventDetailsLoadingSlot = require(VirtualEventsParent.SharedFlags).FFlagLuaAppSduiEventDetailsLoadingSlot
-local FFlagLuaAppSduiEventDetailsActionBarInFeed = require(VirtualEventsParent.SharedFlags).FFlagLuaAppSduiEventDetailsActionBarInFeed
-local FStringLuaAppSduiEventDetailsIxpLayer = require(VirtualEventsParent.SharedFlags).FStringLuaAppSduiEventDetailsIxpLayer
-local FFlagSduiPageEntryUseSharedHooks = require(VirtualEventsParent.SharedFlags).FFlagSduiPageEntryUseSharedHooks
-local FoundationSheetFullBleed = Foundation.Utility.Flags.FoundationSheetFullBleed
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppSduiEventDetailsLogExposure = SharedFlags.FFlagLuaAppSduiEventDetailsLogExposure
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppSduiEventDetailsCenterSheet = SharedFlags2.FFlagLuaAppSduiEventDetailsCenterSheet
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppSduiEventDetailsLoadingSlot = SharedFlags3.FFlagLuaAppSduiEventDetailsLoadingSlot
 
-local function getFromPropsOrNavigationParams(t1: {[any]: any}, s1: string) -- line: 49
-	local v35 = t1.navigation and t1.navigation.getParam("extraProps")
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppSduiEventDetailsActionBarInFeed = SharedFlags4.FFlagLuaAppSduiEventDetailsActionBarInFeed
+local SharedFlags5 = require(parent.SharedFlags)
+local FStringLuaAppSduiEventDetailsIxpLayer = SharedFlags5.FStringLuaAppSduiEventDetailsIxpLayer
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagSduiPageEntryUseSharedHooks = SharedFlags6.FFlagSduiPageEntryUseSharedHooks
 
-	return t1[s1] or v35 and v35[s1]
+local function getFromPropsOrNavigationParams(p, p2: string) -- 4 equivalent calls inferred from this helper
+	local v = p.navigation and p.navigation.getParam("extraProps")
+	return p[p2] or v and v[p2]
 end
-local function SduiEventDetailsPage(t2: {[any]: any}) -- line: 66
-	-- upvalues: useTokens (copy), getEventDetailsPageKey (copy), React (copy), SduiLoadTimer (copy), AppPage (copy), useNavigation (copy), useRouteName (copy), useNavigationFocus (copy), FFlagLuaAppSduiEventDetailsCenterSheet (copy), useDeviceType (copy), DeviceType (copy), fetchEventDetailsPage (copy), FFlagLuaAppSduiEventDetailsLogExposure (copy), IXPService (copy), FStringLuaAppSduiEventDetailsIxpLayer (copy), fireEventDetailsPageVisit (copy), Foundation (copy), FoundationSheetFullBleed (copy), SduiFeatureEntryPoint (copy), FFlagLuaAppSduiEventDetailsLoadingSlot (copy), EventDetailsFullBleedSkeleton (copy), SduiPageEntryPoint (copy), FFlagSduiPageEntryUseSharedHooks (copy), EventDetailsFeedSkeleton (copy), FFlagLuaAppSduiEventDetailsActionBarInFeed (copy), EventDetailsActionBarSkeleton (copy)
-	local v39 = useTokens()
-	local v40 = t2.navigation and t2.navigation.getParam("extraProps")
-	local v41 = t2.eventId or v40 and v40.eventId or t2.navigation and t2.navigation.getParam("detail")
-	local v42 = t2.navigation and t2.navigation.getParam("extraProps")
-	local v43 = t2.universeId or v42 and v42.universeId
-	local v44 = t2.navigation and t2.navigation.getParam("extraProps")
-	local v45 = t2.referralSource or v44 and v44.referralSource
-	local v46 = getEventDetailsPageKey(v41)
-	local v47 = React.useMemo(function() -- line: 76
-		-- upvalues: t2 (copy), SduiLoadTimer (copy), AppPage (copy)
-		local v55 = t2
-		local v56 = v55.navigation and v55.navigation.getParam("extraProps")
 
-		return v55.pageTimer or v56 and v56.pageTimer or SduiLoadTimer.createLoadTimer(AppPage.EventDetails)
+local function SduiEventDetailsPage(p)
+	local v = useTokens()
+
+	local virtualEventId = getFromPropsOrNavigationParams(p, "eventId") -- inferred equivalent call
+		or p.navigation and p.navigation.getParam("detail")
+	local v2 = getFromPropsOrNavigationParams(p, "universeId") -- inferred equivalent call
+	local v3 = getFromPropsOrNavigationParams(p, "referralSource") -- inferred equivalent call
+	local eventDetailsPageKey = getEventDetailsPageKey(virtualEventId)
+
+	local pageTimer = React.useMemo(function()
+		return getFromPropsOrNavigationParams(p, "pageTimer") or SduiLoadTimer.createLoadTimer(AppPage.EventDetails) -- inferred equivalent call
 	end, {})
-	local v48 = useNavigation()
-	local v49 = useRouteName()
-	local v50 = useNavigationFocus()
-	local v51 = nil
+
+	local v4 = useNavigation()
+	local v5 = useRouteName()
+	local isOpen = useNavigationFocus()
+	local preferCenterSheet
 
 	if FFlagLuaAppSduiEventDetailsCenterSheet then
-		local v52 = useDeviceType()
-
-		v51 = v52 == DeviceType.Desktop or v52 == DeviceType.Tablet
+		local v6 = useDeviceType()
+		preferCenterSheet = v6 == DeviceType.Desktop or v6 == DeviceType.Tablet
 	end
 
-	local v53 = React.useCallback(function() -- line: 89
-		-- upvalues: v49 (copy), AppPage (copy), v50 (copy), v48 (copy)
-		if v49 == AppPage.EventDetails and v50 then
-			v48.goBack()
+	local onClose = React.useCallback(function()
+		if v5 == AppPage.EventDetails and isOpen then
+			v4.goBack()
 		end
-	end, {
-		v48,
-		v49,
-		v50
-	})
+	end, { v4, v5, isOpen })
 
-	React.useEffect(function() -- line: 95
-		-- upvalues: v41 (copy), fetchEventDetailsPage (copy), v47 (copy)
-		if v41 then
-			fetchEventDetailsPage(v41, v47)
+	React.useEffect(function()
+		if virtualEventId then
+			fetchEventDetailsPage(virtualEventId, pageTimer)
 		end
-	end, {
-		v41,
-		v47
-	})
-	React.useEffect(function() -- line: 101
-		-- upvalues: v41 (copy), FFlagLuaAppSduiEventDetailsLogExposure (copy), IXPService (copy), FStringLuaAppSduiEventDetailsIxpLayer (copy)
-		if v41 and FFlagLuaAppSduiEventDetailsLogExposure then
+	end, { virtualEventId, pageTimer })
+
+	React.useEffect(function()
+		if virtualEventId and FFlagLuaAppSduiEventDetailsLogExposure then
 			IXPService:LogFlagLinkedUserLayerExposure(FStringLuaAppSduiEventDetailsIxpLayer)
 		end
-	end, { v41 })
-	React.useEffect(function() -- line: 107
-		-- upvalues: v41 (copy), fireEventDetailsPageVisit (copy), v43 (copy), v45 (copy)
-		if v41 then
+	end, { virtualEventId })
+
+	React.useEffect(function()
+		if virtualEventId then
 			fireEventDetailsPageVisit({
-				virtualEventId = v41,
-				universeId = tostring(v43 or ""),
-				channel = v45 or "link"
+				virtualEventId = virtualEventId,
+				universeId = tostring(v2 or ""),
+				channel = v3 or "link"
 			})
 		end
-	end, { v41 })
+	end, { virtualEventId })
 
-	local v54 = React.useRef(nil)
+	local ref = React.useRef(nil)
 
-	if v41 == nil then
+	if virtualEventId == nil then
 		return nil
 	end
 
-	return React.createElement(Foundation.Sheet.Root, {
-		isOpen = v50,
+	local createElement = React.createElement
+	local root = Foundation.Sheet.Root
+	local v6 = {
+		isOpen = isOpen,
 		snapPoints = { 1 },
 		displaySize = Foundation.Enums.DialogSize.Large,
-		preferCenterSheet = v51,
-		centerSheetHeight = if not FFlagLuaAppSduiEventDetailsCenterSheet then nil else 1,
-		onClose = v53
-	}, {
-		FullBleed = if not FoundationSheetFullBleed then nil else React.createElement(Foundation.Sheet.FullBleed, {
-			aspectRatio = 1.7777777777777777
+		preferCenterSheet = preferCenterSheet,
+		centerSheetHeight = FFlagLuaAppSduiEventDetailsCenterSheet and 1 or nil,
+		onClose = onClose
+	}
+
+	local createElement2 = React.createElement
+	local fullBleed = Foundation.Sheet.FullBleed
+
+	local createElement3 = React.createElement
+	local v7 = {
+		appPage = AppPage.EventDetails,
+		configKey = eventDetailsPageKey,
+		identifier = "event_details_sheet_full_bleed",
+		shouldDisplayLoading = FFlagLuaAppSduiEventDetailsLoadingSlot,
+		loadingSlot = 0,
+		shouldDisplayError = false,
+		Size = 0,
+		AutomaticSize = 0
+	}
+	local loadingSlot
+
+	if FFlagLuaAppSduiEventDetailsLoadingSlot then
+		loadingSlot = React.createElement(EventDetailsFullBleedSkeleton)
+	end
+
+	v7.loadingSlot = loadingSlot
+
+	v7.Size = UDim2.fromScale(1, 1)
+	v7.AutomaticSize = Enum.AutomaticSize.None
+	local children = {
+		FullBleed = createElement2(fullBleed, {
+			aspectRatio = 16 / 9
 		}, {
-			FullBleedContent = React.createElement(SduiFeatureEntryPoint, {
-				identifier = "event_details_sheet_full_bleed",
-				shouldDisplayError = false,
-				appPage = AppPage.EventDetails,
-				configKey = v46,
-				shouldDisplayLoading = FFlagLuaAppSduiEventDetailsLoadingSlot,
-				loadingSlot = if not FFlagLuaAppSduiEventDetailsLoadingSlot then nil else React.createElement(EventDetailsFullBleedSkeleton),
-				Size = UDim2.fromScale(1, 1),
-				AutomaticSize = Enum.AutomaticSize.None
-			})
+			FullBleedContent = createElement3(SduiFeatureEntryPoint, v7)
 		}),
-		Content = React.createElement(Foundation.Sheet.Content, {
-			scrollingFrameRef = v54
-		}, React.createElement(SduiPageEntryPoint, {
-			includeNavigationHeaderBar = false,
-			disableRootPadding = true,
-			snackbarPortalLayoutOrder = 2147483647,
+		Content = 0,
+		Actions = 0
+	}
+
+	local createElement4 = React.createElement
+	local content = Foundation.Sheet.Content
+
+	local createElement5 = React.createElement
+	local v8 = {
+		appPage = AppPage.EventDetails,
+		configKey = eventDetailsPageKey,
+		identifier = FFlagSduiPageEntryUseSharedHooks and "event_details_feed" or eventDetailsPageKey .. "_event_details_feed",
+		pageTimer = pageTimer,
+		includeNavigationHeaderBar = false,
+		backgroundStyle = v.Color.None,
+		disableRootPadding = true,
+		scrollingFrameRef = ref,
+		snackbarPortalLayoutOrder = 2147483647,
+		loadingSlot = 0
+	}
+	local loadingSlot2
+
+	if FFlagLuaAppSduiEventDetailsLoadingSlot then
+		loadingSlot2 = React.createElement(EventDetailsFeedSkeleton)
+	end
+
+	v8.loadingSlot = loadingSlot2
+	children.Content = createElement4(content, { scrollingFrameRef = ref }, createElement5(SduiPageEntryPoint, v8))
+	local actions2
+
+	if not FFlagLuaAppSduiEventDetailsActionBarInFeed then
+		local createElement6 = React.createElement
+		local actions = Foundation.Sheet.Actions
+
+		local createElement7 = React.createElement
+		local v9 = {
 			appPage = AppPage.EventDetails,
-			configKey = v46,
-			identifier = if not FFlagSduiPageEntryUseSharedHooks then v46 .. "_" .. "event_details_feed" else "event_details_feed",
-			pageTimer = v47,
-			backgroundStyle = v39.Color.None,
-			scrollingFrameRef = v54,
-			loadingSlot = if not FFlagLuaAppSduiEventDetailsLoadingSlot then nil else React.createElement(EventDetailsFeedSkeleton)
-		})),
-		Actions = if not FFlagLuaAppSduiEventDetailsActionBarInFeed then React.createElement(Foundation.Sheet.Actions, nil, React.createElement(SduiFeatureEntryPoint, {
+			configKey = eventDetailsPageKey,
 			identifier = "event_details_action_bar",
-			shouldDisplayError = false,
-			appPage = AppPage.EventDetails,
-			configKey = v46,
 			shouldDisplayLoading = FFlagLuaAppSduiEventDetailsLoadingSlot,
-			loadingSlot = if not FFlagLuaAppSduiEventDetailsLoadingSlot then nil else React.createElement(EventDetailsActionBarSkeleton)
-		})) else nil
-	})
+			loadingSlot = 0,
+			shouldDisplayError = false
+		}
+		local loadingSlot3
+
+		if FFlagLuaAppSduiEventDetailsLoadingSlot then
+			loadingSlot3 = React.createElement(EventDetailsActionBarSkeleton)
+		end
+
+		v9.loadingSlot = loadingSlot3
+		actions2 = createElement6(actions, nil, createElement7(SduiFeatureEntryPoint, v9))
+	end
+
+	children.Actions = actions2
+	return createElement(root, v6, children)
 end
 
 return React.memo(SduiEventDetailsPage)

@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local t1 = {}
+
+local v = {}
+
 local DefaultSoundEvents = ReplicatedStorage:FindFirstChild("DefaultSoundEvents")
 
 if not DefaultSoundEvents then
@@ -10,70 +12,39 @@ if not DefaultSoundEvents then
 	DefaultSoundEvents.Parent = ReplicatedStorage
 end
 
-local function createEvent(p1, p2) -- line: 27
-	-- upvalues: DefaultSoundEvents (ref)
-	local p1_2 = DefaultSoundEvents:FindFirstChild(p1)
+local function createEvent(name, className) -- 4 equivalent calls inferred from this helper
+	local event = DefaultSoundEvents:FindFirstChild(name)
 
-	if not p1_2 then
-		p1_2 = Instance.new(p2)
-		p1_2.Name = p1
-		p1_2.Parent = DefaultSoundEvents
+	if not event then
+		event = Instance.new(className)
+		event.Name = name
+		event.Parent = DefaultSoundEvents
 	end
 
-	return p1_2
+	return event
 end
 
-local DefaultServerSoundEvent = DefaultSoundEvents:FindFirstChild("DefaultServerSoundEvent")
+local event = createEvent("DefaultServerSoundEvent", "RemoteEvent") -- inferred equivalent call
+local event2 = createEvent("AddCharacterLoadedEvent", "RemoteEvent") -- inferred equivalent call
+local event3 = createEvent("RemoveCharacterEvent", "RemoteEvent") -- inferred equivalent call
 
-if not DefaultServerSoundEvent then
-	DefaultServerSoundEvent = Instance.new("RemoteEvent")
-	DefaultServerSoundEvent.Name = "DefaultServerSoundEvent"
-	DefaultServerSoundEvent.Parent = DefaultSoundEvents
-end
-
-local v7 = DefaultServerSoundEvent
-local AddCharacterLoadedEvent = DefaultSoundEvents:FindFirstChild("AddCharacterLoadedEvent")
-
-if not AddCharacterLoadedEvent then
-	AddCharacterLoadedEvent = Instance.new("RemoteEvent")
-	AddCharacterLoadedEvent.Name = "AddCharacterLoadedEvent"
-	AddCharacterLoadedEvent.Parent = DefaultSoundEvents
-end
-
-local RemoveCharacterEvent = DefaultSoundEvents:FindFirstChild("RemoveCharacterEvent")
-
-if not RemoveCharacterEvent then
-	RemoveCharacterEvent = Instance.new("RemoteEvent")
-	RemoveCharacterEvent.Name = "RemoveCharacterEvent"
-	RemoveCharacterEvent.Parent = DefaultSoundEvents
-end
-
-local function fireDefaultServerSoundEventToClient(p3, p4, p5, p6) -- line: 43
-	-- upvalues: t1 (copy), v7 (copy)
-	if t1[p3] then
-		v7:FireClient(p3, p4, p5, p6)
+local function fireDefaultServerSoundEventToClient(player, p, p2, p3)
+	if v[player] then
+		event:FireClient(player, p, p2, p3)
 	end
 end
-local function addCharacterLoaded(p7) -- line: 50
-	-- upvalues: t1 (copy)
-	t1[p7] = true
-end
-local function removeCharacter(p8) -- line: 55
-	-- upvalues: t1 (copy)
-	t1[p8] = nil
+
+local function addCharacterLoaded(p)
+	v[p] = true
 end
 
-local SoundDispatcher = DefaultSoundEvents:FindFirstChild("SoundDispatcher")
-
-if not SoundDispatcher then
-	SoundDispatcher = Instance.new("BindableEvent")
-	SoundDispatcher.Name = "SoundDispatcher"
-	SoundDispatcher.Parent = DefaultSoundEvents
+local function removeCharacter(p)
+	v[p] = nil
 end
 
-SoundDispatcher.Event:Connect(fireDefaultServerSoundEventToClient)
-v7.OnServerEvent:Connect(function() -- line: 63
-end)
-AddCharacterLoadedEvent.OnServerEvent:Connect(addCharacterLoaded)
-RemoveCharacterEvent.OnServerEvent:Connect(removeCharacter)
+createEvent("SoundDispatcher", "BindableEvent").Event:Connect(fireDefaultServerSoundEventToClient) -- inferred equivalent call
+
+event.OnServerEvent:Connect(function() end)
+event2.OnServerEvent:Connect(addCharacterLoaded)
+event3.OnServerEvent:Connect(removeCharacter)
 Players.PlayerRemoving:Connect(removeCharacter)

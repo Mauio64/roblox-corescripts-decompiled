@@ -1,7 +1,7 @@
-local Parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
-local HttpRequest = require(Parent.HttpRequest)
+local parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
+local HttpRequest = require(parent.HttpRequest)
 
 return HttpRequest.config({
-	maxRetryCount = 0,
-	requestFunction = HttpRequest.requestFunctions.HttpRbxApi
+	requestFunction = HttpRequest.requestFunctions.HttpRbxApi,
+	maxRetryCount = 0
 })

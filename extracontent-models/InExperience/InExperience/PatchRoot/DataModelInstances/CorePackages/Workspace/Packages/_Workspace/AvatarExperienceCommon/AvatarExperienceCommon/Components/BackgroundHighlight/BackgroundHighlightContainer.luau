@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local React = require(parent.React)
+
 local BackgroundHighlight = require(script.Parent.BackgroundHighlight)
 local useBackgroundHighlightProps = require(script.Parent.useBackgroundHighlightProps)
 
-local function BackgroundHighlightContainer(p1) -- line: 11
-	-- upvalues: useBackgroundHighlightProps (copy), React (copy), BackgroundHighlight (copy)
-	local v7 = useBackgroundHighlightProps(p1)
-
-	return React.createElement(BackgroundHighlight, v7)
+local function BackgroundHighlightContainer(p)
+	local v = useBackgroundHighlightProps(p)
+	return React.createElement(BackgroundHighlight, v)
 end
 
 return BackgroundHighlightContainer

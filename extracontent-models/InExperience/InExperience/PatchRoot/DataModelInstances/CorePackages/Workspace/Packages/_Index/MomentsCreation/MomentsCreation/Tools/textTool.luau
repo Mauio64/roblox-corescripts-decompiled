@@ -1,59 +1,73 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local BuilderIcons = require(MomentsCreationParent.BuilderIcons)
-local MomentsCommon = require(MomentsCreationParent.MomentsCommon)
-local React = require(MomentsCreationParent.React)
+local parent = MomentsCreation.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
+local MomentsCommon = require(parent.MomentsCommon)
+local React = require(parent.React)
+
 local CreationFlowState = require(MomentsCreation.Enums.CreationFlowState)
-
+local MomentType = require(MomentsCreation.Enums.MomentType)
 require(MomentsCreation.Types.CreationFlowTypes)
-
 local createEditSession = require(MomentsCreation.Stores.createEditSession)
 local TextOverlayControls = require(MomentsCreation.Components.TextOverlay.TextOverlayControls)
 local TextOverlayLayer = require(MomentsCreation.Components.TextOverlay.TextOverlayLayer)
+local FFlagMomentsTextOverlayOnPhotos = require(MomentsCreation.Flags.FFlagMomentsTextOverlayOnPhotos)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsCreateAvatarPosts = SharedFlags.FFlagMomentsCreateAvatarPosts
+
 local EventNames = MomentsCommon.Analytics.EventNames
 
-return {
+local TextTool = {
 	kind = "text",
 	presentation = "Step",
-	zIndex = 3,
 	step = CreationFlowState.TextOverlay,
+	zIndex = 3,
 	cta = {
-		localizationKey = "Feature.Moments.Action.AddText",
-		order = 3,
 		icon = BuilderIcons.Icon.TextUppercaseALowercaseA,
+		localizationKey = "Feature.Moments.Action.AddText",
 		analyticsEvent = EventNames.EditingFlowTextOverlayButtonPressed,
 		commitAnalyticsEvent = EventNames.EditingFlowTextOverlayDoneButtonPressed,
-		cancelAnalyticsEvent = EventNames.EditingFlowTextOverlayBackButtonPressed
+		cancelAnalyticsEvent = EventNames.EditingFlowTextOverlayBackButtonPressed,
+		order = 3
 	},
-	supportedCaptureTypes = { Enum.CaptureType.Video },
-	createSession = function() -- line: 40
-		-- upvalues: createEditSession (copy)
-		return createEditSession()
-	end,
-	renderEditor = function(p1) -- line: 43
-		-- upvalues: React (copy), TextOverlayControls (copy)
-		return React.createElement(TextOverlayControls, {
-			layoutOrder = 2,
-			controller = p1
-		})
-	end,
-	renderPreviewLayer = function(p2, p3) -- line: 48
-		-- upvalues: React (copy), TextOverlayLayer (copy)
-		return React.createElement(TextOverlayLayer, {
-			zIndex = 3,
-			controller = p2,
-			ctx = p3
-		})
-	end,
-	toEdits = function(p4) -- line: 51
-		local v15 = p4 and p4[1]
-
-		if v15 == nil or v15.text == "" then
-			return {}
-		end
-
-		return {
-			textOverlays = p4
-		}
-	end
+	supportedCaptureTypes = 0,
+	supportedMomentTypes = 0,
+	createSession = 0,
+	renderEditor = 0,
+	renderPreviewLayer = 0,
+	toEdits = 0
 }
+local supportedCaptureTypes
+
+if FFlagMomentsTextOverlayOnPhotos then
+	supportedCaptureTypes = { Enum.CaptureType.Video, Enum.CaptureType.Screenshot }
+else
+	supportedCaptureTypes = { Enum.CaptureType.Video }
+end
+
+TextTool.supportedCaptureTypes = supportedCaptureTypes
+
+TextTool.supportedMomentTypes = FFlagMomentsCreateAvatarPosts and { MomentType.Avatar } or nil
+function TextTool.createSession()
+	return createEditSession()
+end
+
+function TextTool.renderEditor(controller)
+	return React.createElement(TextOverlayControls, { controller = controller, layoutOrder = 2 })
+end
+
+function TextTool.renderPreviewLayer(controller, ctx)
+	return React.createElement(TextOverlayLayer, { controller = controller, ctx = ctx, zIndex = 3 })
+end
+
+function TextTool.toEdits(textOverlays)
+	local v = textOverlays and textOverlays[1]
+
+	if v == nil or v.text == "" then
+		return {}
+	end
+
+	return { textOverlays = textOverlays }
+end
+
+return TextTool

@@ -1,26 +1,25 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Promise = require(AuthCommonParent.Promise)
+local parent = AuthCommon.Parent
+
+local Promise = require(parent.Promise)
+
 local AuthPlatformDisconnect = require(AuthCommon.Http.Requests.AuthPlatformDisconnect)
-local v5 = game:DefineFastFlag("EnableConsoleDisconnectNetworkingErrorToast", false)
-local SetNetworkingErrorToast = require(AuthCommonParent.RobloxAppToastsRodux).Thunks.SetNetworkingErrorToast
 
-local function ConsoleDisconnect(p1, p2, p3) -- line: 12
-	-- upvalues: AuthPlatformDisconnect (copy), Promise (copy), v5 (copy), SetNetworkingErrorToast (copy)
-	return function(p4) -- line: 13
-		-- upvalues: AuthPlatformDisconnect (copy), p1 (copy), p3 (copy), p2 (copy), Promise (copy), v5 (copy), SetNetworkingErrorToast (copy)
-		return AuthPlatformDisconnect(p1):andThen(function() -- line: 14
-			-- upvalues: p4 (copy), p3 (copy), p1 (copy), p2 (copy), Promise (copy)
-			p4:dispatch(p3(p1, p2))
+local defineFastFlag = game:DefineFastFlag("EnableConsoleDisconnectNetworkingErrorToast", false)
+local RobloxAppToastsRodux = require(parent.RobloxAppToastsRodux)
+local SetNetworkingErrorToast = RobloxAppToastsRodux.Thunks.SetNetworkingErrorToast
 
+local function ConsoleDisconnect(p, p2, callback)
+	return function(object)
+		return AuthPlatformDisconnect(p):andThen(function()
+			object:dispatch(callback(p, p2))
 			return Promise.resolve()
-		end, function(p5) -- line: 19
-			-- upvalues: v5 (copy), p4 (copy), SetNetworkingErrorToast (copy), Promise (copy)
-			if v5 then
-				p4:dispatch(SetNetworkingErrorToast(p5))
+		end, function(p3)
+			if defineFastFlag then
+				object:dispatch(SetNetworkingErrorToast(p3))
 			end
 
-			return Promise.reject(p5)
+			return Promise.reject(p3)
 		end)
 	end
 end

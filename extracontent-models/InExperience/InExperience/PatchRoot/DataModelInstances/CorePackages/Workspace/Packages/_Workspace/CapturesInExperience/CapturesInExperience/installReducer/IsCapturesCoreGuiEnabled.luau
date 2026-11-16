@@ -1,14 +1,16 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local CapturesCoreGuiDisabled = require(ParentParent.Actions.CapturesCoreGuiDisabled)
-local CapturesCoreGuiEnabled = require(ParentParent.Actions.CapturesCoreGuiEnabled)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local Rodux = require(parent2.Rodux)
+
+local CapturesCoreGuiDisabled = require(parent.Actions.CapturesCoreGuiDisabled)
+local CapturesCoreGuiEnabled = require(parent.Actions.CapturesCoreGuiEnabled)
 
 return Rodux.createReducer(true, {
-	[CapturesCoreGuiDisabled.name] = function(_: boolean, _: {[any]: any}) -- line: 14
+	[CapturesCoreGuiDisabled.name] = function(_: boolean, _): boolean
 		return false
 	end,
-	[CapturesCoreGuiEnabled.name] = function(_: boolean, _: {[any]: any}) -- line: 18
+	[CapturesCoreGuiEnabled.name] = function(_: boolean, _): boolean
 		return true
 	end
 })

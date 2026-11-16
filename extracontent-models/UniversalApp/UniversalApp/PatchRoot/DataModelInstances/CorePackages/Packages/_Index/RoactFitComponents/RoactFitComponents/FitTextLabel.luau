@@ -1,122 +1,203 @@
-local ParentParent = script.Parent.Parent
-local Cryo = require(ParentParent.Cryo)
-local Roact = require(ParentParent.Roact)
-local ok, result = pcall(function() -- line: 8
+local parent = script.Parent.Parent
+
+local Cryo = require(parent.Cryo)
+local Roact = require(parent.Roact)
+
+local success, result = pcall(function()
 	return game:GetEngineFeature("TextBoundsRoundUp")
 end)
-local u6 = ok and result
+
+local v = success and result
+
 local TextService = game:GetService("TextService")
-
-local function getTextHeight(p1, p2, p3, p4) -- line: 16
-	-- upvalues: u6 (ref), TextService (copy)
-	if u6 then
-		return TextService:GetTextSize(p1, p2, p3, Vector2.new(p4, 10000)).Y
+local function getTextHeight(text, textSize, font, p)
+	if v then
+		return TextService:GetTextSize(text, textSize, font, Vector2.new(p, 10000)).Y
 	end
 
-	return TextService:GetTextSize(p1, p2, p3, Vector2.new(p4, 10000)).Y + 2
+	return TextService:GetTextSize(text, textSize, font, Vector2.new(p, 10000)).Y + 2
 end
-local function getTextWidth(p5, p6, p7) -- line: 24
-	-- upvalues: u6 (ref), TextService (copy)
-	if u6 then
-		return TextService:GetTextSize(p5, p6, p7, Vector2.new(10000, 10000)).X
+
+local function getTextWidth(text, textSize, font)
+	if v then
+		return TextService:GetTextSize(text, textSize, font, Vector2.new(10000, 10000)).X
 	end
 
-	return TextService:GetTextSize(p5, p6, p7, Vector2.new(10000, 10000)).X + 2
+	return TextService:GetTextSize(text, textSize, font, Vector2.new(10000, 10000)).X + 2
 end
 
-local t1 = {
-	FitToText = {}
-}
-local v11 = Roact.PureComponent:extend("FitTextLabel")
+local function getFontTextBoundsAsync(text, textSize, font, width)
+	local getTextBoundsParams = Instance.new("GetTextBoundsParams")
+	getTextBoundsParams.Text = text
+	getTextBoundsParams.Font = font
+	getTextBoundsParams.Size = textSize
+	getTextBoundsParams.Width = width
 
-v11.defaultProps = {
+	local success2, result2 = pcall(function()
+		return TextService:GetTextBoundsAsync(getTextBoundsParams)
+	end)
+
+	getTextBoundsParams:Destroy()
+
+	if success2 and typeof(result2) == "Vector2" then
+		return result2
+	end
+
+	return nil
+end
+
+local width2 = { FitToText = {} }
+
+local extended = Roact.PureComponent:extend("FitTextLabel")
+
+extended.defaultProps = {
+	Font = Enum.Font.SourceSans,
 	Text = "Label",
 	TextSize = 12,
 	TextWrapped = true,
-	maximumWidth = 1e999,
-	Font = Enum.Font.SourceSans
+	maximumWidth = 1e999
 }
 
-function v11.init(p8) -- line: 47
-	-- upvalues: Roact (copy)
+function extended:init()
+	self.measurementId = 0
+	self.mounted = false
+
 	if Roact.Ref == "ref" then
-		p8.frameRef = p8.props.forwardedRef or Roact.createRef()
+		self.frameRef = self.props.forwardedRef or Roact.createRef()
 	else
-		p8.frameRef = p8.props[Roact.Ref] or Roact.createRef()
+		self.frameRef = self.props[Roact.Ref] or Roact.createRef()
 	end
 
-	function p8.onResize() -- line: 54
-		-- upvalues: p8 (copy)
-		if not p8.frameRef.current then
+	function self.onResize()
+		if not self.frameRef.current then
 			return
 		end
 
-		p8.frameRef.current.Size = p8:__getSize(p8.frameRef.current)
+		if typeof(self.props.Font) == "Font" then
+			self:__resizeForFont(self.frameRef.current)
+			return
+		end
+
+		self.measurementId += 1
+		self.frameRef.current.Size = self:__getSize(self.frameRef.current)
 	end
 end
-function v11.render(p9) -- line: 63
-	-- upvalues: Roact (copy)
-	local v22 = not p9.props.onActivated and "TextLabel" or "TextButton"
 
-	return Roact.createElement(v22, p9:__getFilteredProps())
+function extended:render()
+	local v2 = self.props.onActivated and "TextButton" or "TextLabel"
+	return Roact.createElement(v2, self:__getFilteredProps())
 end
-function v11.didMount(p10) -- line: 68
-	p10.onResize()
+
+function extended:didMount()
+	self.mounted = true
+	self.onResize()
 end
-function v11.didUpdate(p11) -- line: 72
-	p11.onResize()
+
+function extended.didUpdate(p)
+	p.onResize()
 end
-function v11.__getFilteredProps(p12) -- line: 76
-	-- upvalues: Cryo (copy), Roact (copy)
-	local t2 = {
+
+function extended:willUnmount()
+	self.mounted = false
+	self.measurementId += 1
+end
+
+function extended:__getFilteredProps()
+	local width = typeof(self.props.width) == "UDim" and self.props.width or UDim.new(0, 0)
+	local v2 = {
+		["width"] = nil,
+		["width"] = nil,
+		["width"] = nil,
 		width = Cryo.None,
 		maximumWidth = Cryo.None,
 		onActivated = Cryo.None,
 		forwardedRef = Cryo.None,
-		Size = UDim2.new(p12.props.width, UDim.new(0, 0)),
-		[Roact.Ref] = p12.frameRef,
-		[Roact.Children] = Cryo.Dictionary.join(p12.props[Roact.Children] or {}, {
-			sizeConstraint = p12.props.maximumWidth < 1e999 and Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(p12.props.maximumWidth, 1e999)
-			})
-		}),
-		[Roact.Event.Activated] = p12.props.onActivated,
-		[Roact.Change.AbsoluteSize] = function(p13) -- line: 97
-			-- upvalues: p12 (copy), Roact (copy)
-			if p12.props[Roact.Change.AbsoluteSize] then
-				p12.props[Roact.Change.AbsoluteSize](p13)
-			end
-
-			p12.onResize()
-		end
+		Size = UDim2.new(width, UDim.new(0, 0)),
+		[Roact.Ref] = self.frameRef
 	}
 
-	return Cryo.Dictionary.join(p12.props, t2)
-end
-function v11.__getSize(p14, p15) -- line: 108
-	-- upvalues: t1 (copy), getTextWidth (copy), getTextHeight (copy)
-	local maximumWidth = p14.props.maximumWidth
-	local width = p14.props.width
+	local children = Roact.Children
+	v2[children] = Cryo.Dictionary.join(self.props[Roact.Children] or {}, {
+		sizeConstraint = self.props.maximumWidth < 1e999 and Roact.createElement("UISizeConstraint", {
+			MaxSize = Vector2.new(self.props.maximumWidth, 1e999)
+		})
+	})
 
-	if width == t1.FitToText then
-		local v31 = getTextWidth(p14.props.Text, p14.props.TextSize, p14.props.Font)
+	v2[Roact.Event.Activated] = self.props.onActivated
 
-		width = UDim.new(0, (math.min(v31, maximumWidth)))
+	v2[Roact.Change.AbsoluteSize] = function(p)
+		if self.props[Roact.Change.AbsoluteSize] then
+			self.props[Roact.Change.AbsoluteSize](p)
+		end
+
+		self.onResize()
 	end
 
-	local v32 = math.max(maximumWidth < 1e999 and maximumWidth or 0, p15.AbsoluteSize.X)
-	local v33 = getTextHeight(p14.props.Text, p14.props.TextSize, p14.props.Font, v32)
+	if typeof(self.props.Font) == "Font" then
+		v2.Font = Cryo.None
+		v2.FontFace = self.props.Font
+	end
 
-	return UDim2.new(width, UDim.new(0, v33))
+	return Cryo.Dictionary.join(self.props, v2)
 end
 
-local v12 = if Roact.Ref ~= "ref" then v11 else Roact.forwardRef(function(p16, p17) -- line: 129
-	-- upvalues: Roact (copy), v11 (copy), Cryo (copy)
-	return Roact.createElement(v11, Cryo.Dictionary.join(p16, {
-		forwardedRef = p17
-	}))
-end)
+function extended:__resizeForFont(p)
+	self.measurementId += 1
+	local measurementId = self.measurementId
 
-v12.Width = t1
+	local text = self.props.Text
+	local textSize = self.props.TextSize
+	local font = self.props.Font
+	local maximumWidth = self.props.maximumWidth
+	local v2 = self.props.width
+	local width = math.max(maximumWidth < 1e999 and maximumWidth or 0, p.AbsoluteSize.X)
 
-return v12
+	task.spawn(function()
+		if v2 == width2.FitToText then
+			local fontTextBoundsAsync = getFontTextBoundsAsync(text, textSize, font, 10000)
+			v2 = UDim.new(0, fontTextBoundsAsync and math.min(math.ceil(fontTextBoundsAsync.X), maximumWidth) or 0)
+		end
+
+		if not self.mounted or self.measurementId ~= measurementId then
+			return
+		end
+
+		local fontTextBoundsAsync = getFontTextBoundsAsync(text, textSize, font, width)
+		local y = fontTextBoundsAsync and math.ceil(fontTextBoundsAsync.Y) or textSize
+
+		if not self.mounted or self.measurementId ~= measurementId or not self.frameRef.current then
+			return
+		end
+
+		self.frameRef.current.Size = UDim2.new(v2, UDim.new(0, y))
+	end)
+end
+
+function extended:__getSize(p)
+	local maximumWidth = self.props.maximumWidth
+	local v2 = self.props.width
+
+	if v2 == width2.FitToText then
+		local textWidth = getTextWidth(self.props.Text, self.props.TextSize, self.props.Font)
+		v2 = UDim.new(0, (math.min(textWidth, maximumWidth)))
+	end
+
+	local v3 = math.max(maximumWidth < 1e999 and maximumWidth or 0, p.AbsoluteSize.X)
+	local textHeight = getTextHeight(self.props.Text, self.props.TextSize, self.props.Font, v3)
+
+	return UDim2.new(v2, UDim.new(0, textHeight))
+end
+
+local selected
+
+if Roact.Ref == "ref" then
+	selected = Roact.forwardRef(function(p, forwardedRef)
+		return Roact.createElement(extended, Cryo.Dictionary.join(p, { forwardedRef = forwardedRef }))
+	end)
+else
+	selected = extended
+end
+
+selected.Width = width2
+
+return selected

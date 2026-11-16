@@ -6,25 +6,29 @@ local Element = Rhodium.Element
 local XPath = Rhodium.XPath
 local mockStyle = require(script.Parent.Parent.UnitTestHelpers.mockStyle)
 
-return function(p1) -- line: 11
-	-- upvalues: Roact (copy), mockStyle (copy), CoreGui (copy), XPath (copy), Element (copy)
-	local u9 = false
-	local v10 = Roact.createElement("ScreenGui", {}, {
-		buttonElement = Roact.createElement(p1, {
-			onActivated = function() -- line: 16
-				-- upvalues: u9 (ref)
-				u9 = true
+return function(p)
+	local v = false
+
+	local v2 = mockStyle((Roact.createElement("ScreenGui", {}, {
+		buttonElement = Roact.createElement(p, {
+			onActivated = function()
+				v = true
 			end
 		})
-	})
-	local v11 = mockStyle(v10)
-	local v12 = Roact.mount(v11, CoreGui, "TestRoot")
-	local v13 = XPath.new("game.CoreGui.Children.buttonElement")
-	local v14 = Element.new(v13)
+	})))
 
-	assert(v14:getRbxInstance() ~= nil, "button was nil")
-	v14:click()
+	local v3 = Roact.mount(v2, CoreGui, "TestRoot")
+	local gameCoreGuiChildrenbuttonElement = XPath.new("game.CoreGui.Children.buttonElement")
+
+	local v4 = Element.new(gameCoreGuiChildrenbuttonElement)
+
+	assert(v4:getRbxInstance() ~= nil, "button was nil")
+
+	v4:click()
+
 	wait(0)
-	assert(u9 == true, "button was not activated")
-	Roact.unmount(v12)
+
+	assert(v == true, "button was not activated")
+
+	Roact.unmount(v3)
 end

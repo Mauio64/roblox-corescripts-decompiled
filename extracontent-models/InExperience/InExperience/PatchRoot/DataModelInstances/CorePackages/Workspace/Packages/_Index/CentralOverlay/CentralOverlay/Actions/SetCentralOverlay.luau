@@ -1,9 +1,6 @@
-local Parent = script:FindFirstAncestor("CentralOverlay").Parent
+local parent = script:FindFirstAncestor("CentralOverlay").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2, p3) -- line: 5
-	return {
-		overlayType = p1,
-		arguments = p2,
-		configs = p3
-	}
+return Rodux.makeActionCreator(script.Name, function(overlayType, arguments, configs)
+	return { overlayType = overlayType, arguments = arguments, configs = configs }
 end)

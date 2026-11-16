@@ -1,11 +1,11 @@
 return {
 	TweenDuration = 0.35,
-	Breakpoint = {
-		HeightSmall = 600
-	},
+	MenuScreenMargin = 20,
+	NominalSideSheetWidth = 320,
 	LocalizationKeys = {
-		LogoutButton = "Application.Logout.Action.Logout",
-		LogoutConfirmation = "Application.Logout.Message.Confirmation",
-		Cancel = "Feature.SettingsHub.Action.Cancel"
-	}
+		QuitButton = "Feature.SettingsHub.Label.QuitButton",
+		QuitConfirmation = "Feature.SettingsHub.Label.QuitConfirmation",
+		Resume = "InGame.HelpMenu.Resume"
+	},
+	SessionActionButtonNames = { SwitchServer = "SwitchServerButton" }
 }

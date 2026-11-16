@@ -1,41 +1,38 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
 local EventIngestService = game:GetService("EventIngestService")
-local v4 = dependencies.Analytics.AnalyticsReporters.EventIngest.new(EventIngestService)
-local Logging = dependencies.Logging
-local ParentParentParent = ParentParent.Parent
-local SharedFlags = require(ParentParentParent.SharedFlags)
-local EventStreamConstants = require(ParentParent.Constants.EventStreamConstants)
+local eventIngest = dependencies.Analytics.AnalyticsReporters.EventIngest.new(EventIngestService)
+local logging = dependencies.Logging
+local parent2 = parent.Parent
+local SharedFlags = require(parent2.SharedFlags)
+local EventStreamConstants = require(parent.Constants.EventStreamConstants)
 local FFlagEnableAuthAnalyticsPrintDebuggingDev = SharedFlags.FFlagEnableAuthAnalyticsPrintDebuggingDev
 
-return function(s1: string, s2: string, t1: {[any]: any}) -- line: 11
-	-- upvalues: EventStreamConstants (copy), Logging (copy), FFlagEnableAuthAnalyticsPrintDebuggingDev (copy), v4 (copy)
-	local t2 = {}
+return function(p: string, p2: string, nows)
+	nows[EventStreamConstants.EventTimingKeys.OsClock] = tostring(os.clock())
+	nows[EventStreamConstants.EventTimingKeys.OsTime] = tostring(os.time())
+	local v = {}
 
-	t1[EventStreamConstants.EventTimingKeys.OsClock] = tostring(os.clock())
-	t1[EventStreamConstants.EventTimingKeys.OsTime] = tostring(os.time())
-
-	for k, v in pairs(t1) do
-		if type(k) ~= "string" then
-			Logging.warn("Failure logging " .. s2 .. ": Expected " .. k .. " to be a string key but got " .. type(k))
+	for k, item in pairs(nows) do
+		if type(k) == "string" then
+			v[k] = item
+		else
+			logging.warn("Failure logging " .. p2 .. ": Expected " .. k .. " to be a string key but got " .. type(k))
 
 			return
 		end
-
-		t2[k] = v
 	end
 
 	if FFlagEnableAuthAnalyticsPrintDebuggingDev then
-		local s3 = ""
+		local v2 = ""
 
-		for k, v in pairs(t2) do
-			s3 ..= k .. ": " .. tostring(v) .. ", "
+		for k, v3 in pairs(v) do
+			v2 ..= k .. ": " .. tostring(v3) .. ", "
 		end
 
-		local v19 = string.sub(s3, 1, -3)
-
-		print("Emitting EventIngest " .. s2 .. ", context " .. s1 .. " with args: " .. v19)
+		local v3 = string.sub(v2, 1, -3)
+		print("Emitting EventIngest " .. p2 .. ", context " .. p .. " with args: " .. v3)
 	end
 
-	v4:sendEventDeferred(s1, s2, t2)
+	eventIngest:sendEventDeferred(p, p2, v)
 end

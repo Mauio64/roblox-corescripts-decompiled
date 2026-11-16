@@ -1,5 +1,4 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return require(Parent.LuaSocialLibrariesDeps).RoduxPresence.config({
-	keyPath = "ChatAppReducer.Presence"
-})
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+return LuaSocialLibrariesDeps.RoduxPresence.config({ keyPath = "ChatAppReducer.Presence" })

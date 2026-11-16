@@ -1,66 +1,86 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 
-game:DefineFastFlag("AppChatChannelsGetNewerMessagesWithPrevCursor", false)
+local AppChatNetworking = require(parent.AppChatNetworking)
+local Promise = require(parent.Promise)
 
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local Promise = require(AppChatParent.Promise)
 local Constants = require(AppChat.Constants)
 local reportToDiagByCountryCode = require(AppChat.Utils.reportToDiagByCountryCode)
-local v7 = require(AppChat.Logger):new(script.Name)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 
-return function(s1: string, b1: boolean, n1: number) -- line: 25
-	-- upvalues: v7 (copy), AppChatNetworking (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), reportToDiagByCountryCode (copy), Constants (copy), Promise (copy)
-	v7:info("Getting new messages for {}", s1)
+local function fn(p) -- 1 equivalent call inferred from this helper
+	local v2 = tick() - p
+	reportToDiagByCountryCode(Constants.PerformanceMeasurement.LUA_CHAT_RECEIVE_MESSAGE, "MessageReceivedTime", v2)
+end
 
-	return function(p1) -- line: 27
-		-- upvalues: s1 (copy), AppChatNetworking (copy), v7 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), b1 (copy), AppChatPerfTracker (copy), n1 (copy), reportToDiagByCountryCode (copy), Constants (copy), Promise (copy)
-		local t1 = {}
-		local v18 = p1:getState().ChatAppReducer.Conversations[s1]
+return function(conversationId: string, flag: boolean, p: number)
+	v:info("Getting new messages for {}", conversationId)
+	return function(object)
+		local v2 = {}
 
-		if not v18 then
-			table.insert(t1, p1:dispatch(AppChatNetworking.rodux.GetConversationDetails.API(s1)):catch(function(p2) -- line: 34
-				-- upvalues: v7 (copy)
-				v7:error(`AppChatNetworking failure in GetConversationDetails: { tostring(p2) }`)
-			end))
+		if not object:getState().ChatAppReducer.Conversations[conversationId] then
+			table.insert(
+				v2,
+				object:dispatch(AppChatNetworking.rodux.GetConversationDetails.API(conversationId)):catch(function(p2)
+					v:error(`AppChatNetworking failure in GetConversationDetails: {tostring(p2)}`)
+				end)
+			)
 		end
 
-		local v19 = if not game:GetFastFlag("AppChatChannelsGetNewerMessagesWithPrevCursor") then nil else v18 and v18.previousCursor or nil
-		local v20 = FFlagAppChatPerfTracking and (FFlagAppChatMessageTTIMilestones and not b1)
+		local v3 = FFlagAppChatPerfTracking and FFlagAppChatMessageTTIMilestones and not flag
 
-		if v20 then
-			local t2 = {
-				conversationId = s1
-			}
+		if v3 then
+			local v4 = { conversationId = conversationId }
+			AppChatPerfTracker.trackMilestone(
+				AppChatPerfTracker.Events.MessageReceiveTTI,
+				AppChatPerfTracker.Milestone.PrimaryDataStarted.Name,
+				v4
+			)
 
-			AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, t2)
-			AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, AppChatPerfTracker.Milestone.PrimaryDataStarted.Subphase.NetworkFetch, t2)
-			AppChatPerfTracker.trackRequest(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, "GetNewerMessages", t2)
+			AppChatPerfTracker.trackSubphase(
+				AppChatPerfTracker.Events.MessageReceiveTTI,
+				AppChatPerfTracker.Milestone.PrimaryDataStarted.Name,
+				AppChatPerfTracker.Milestone.PrimaryDataStarted.Subphase.NetworkFetch,
+				v4
+			)
+
+			AppChatPerfTracker.trackRequest(
+				AppChatPerfTracker.Events.MessageReceiveTTI,
+				AppChatPerfTracker.Milestone.PrimaryDataStarted.Name,
+				"GetNewerMessages",
+				v4
+			)
 		end
 
-		table.insert(t1, p1:dispatch(AppChatNetworking.rodux.GetNewerMessages.API(s1, v19)):andThen(function() -- line: 74
-			-- upvalues: n1 (copy), reportToDiagByCountryCode (copy), Constants (copy), v20 (copy), s1 (copy), AppChatPerfTracker (copy)
-			local v23 = n1
-			local v24 = tick() - v23
+		table.insert(
+			v2,
+			object:dispatch(AppChatNetworking.rodux.GetNewerMessages.API(conversationId)):andThen(function()
+				fn(p) -- inferred equivalent call
 
-			reportToDiagByCountryCode(Constants.PerformanceMeasurement.LUA_CHAT_RECEIVE_MESSAGE, "MessageReceivedTime", v24)
+				if v3 then
+					local v4 = { conversationId = conversationId }
+					AppChatPerfTracker.trackMilestone(
+						AppChatPerfTracker.Events.MessageReceiveTTI,
+						AppChatPerfTracker.Milestone.PrimaryDataReady.Name,
+						v4
+					)
 
-			if v20 then
-				local t3 = {
-					conversationId = s1
-				}
+					AppChatPerfTracker.trackSubphase(
+						AppChatPerfTracker.Events.MessageReceiveTTI,
+						AppChatPerfTracker.Milestone.PrimaryDataReady.Name,
+						AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived,
+						v4
+					)
+				end
+			end):catch(function(p2)
+				v:error(`AppChatNetworking failure in GetNewerMessages: {tostring(p2)}`)
+			end)
+		)
 
-				AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, t3)
-				AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived, t3)
-			end
-		end):catch(function(p3) -- line: 91
-			-- upvalues: v7 (copy)
-			v7:error(`AppChatNetworking failure in GetNewerMessages: { tostring(p3) }`)
-		end))
-
-		return Promise.allSettled(t1)
+		return Promise.allSettled(v2)
 	end
 end

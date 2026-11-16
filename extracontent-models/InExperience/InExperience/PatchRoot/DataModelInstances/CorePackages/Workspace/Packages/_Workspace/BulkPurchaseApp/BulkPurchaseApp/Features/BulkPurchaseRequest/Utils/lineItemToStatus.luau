@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	INSUFFICIENT_ROBUX = Enum.MarketplaceItemPurchaseStatus.InsufficientRobux,
 	QUOTA_EXCEEDED = Enum.MarketplaceItemPurchaseStatus.QuotaExceeded,
 	NOT_FOR_SALE = Enum.MarketplaceItemPurchaseStatus.NotForSale,
@@ -12,19 +12,14 @@ local t1 = {
 	PURCHASE_PLACE_INVALID = Enum.MarketplaceItemPurchaseStatus.PlaceInvalid
 }
 
-local function lineItemToStatus(t2: {[any]: any}) -- line: 20
-	-- upvalues: t1 (copy)
-	local v4 = t1[t2.errorReason]
+local function lineItemToStatus(p)
+	local v2 = v[p.errorReason]
 
-	if t2.status == "SUCCEEDED" then
+	if p.status == "SUCCEEDED" then
 		return Enum.MarketplaceItemPurchaseStatus.Success
 	end
 
-	if v4 then
-		return v4
-	end
-
-	return Enum.MarketplaceItemPurchaseStatus.SystemError
+	return v2 or Enum.MarketplaceItemPurchaseStatus.SystemError
 end
 
 return lineItemToStatus

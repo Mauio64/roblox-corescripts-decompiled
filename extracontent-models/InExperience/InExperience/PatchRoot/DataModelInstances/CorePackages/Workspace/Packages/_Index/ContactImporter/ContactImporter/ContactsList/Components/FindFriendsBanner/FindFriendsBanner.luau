@@ -1,93 +1,137 @@
 local ContactImporter = script:FindFirstAncestor("ContactImporter")
 local dependencies = require(ContactImporter.dependencies)
-local React = dependencies.React
-local UIBlox = dependencies.UIBlox
+local react = dependencies.React
+local uiBlox = dependencies.UIBlox
 local useLocalization = dependencies.useLocalization
 local useStyle = dependencies.useStyle
-local Button = UIBlox.App.Button.Button
-local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local IconSize = UIBlox.App.Constant.IconSize
-local StandardButtonSize = UIBlox.App.Button.Enum.StandardButtonSize
-local Images = UIBlox.App.ImageSet.Images
-local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local button = uiBlox.App.Button.Button
+local buttonType = uiBlox.App.Button.Enum.ButtonType
+local iconSize = uiBlox.App.Constant.IconSize
+local standardButtonSize = uiBlox.App.Button.Enum.StandardButtonSize
+local images = uiBlox.App.ImageSet.Images
+local imageSetLabel = uiBlox.Core.ImageSet.ImageSetLabel
+local styledTextLabel = uiBlox.App.Text.StyledTextLabel
 local TextKeys = require(ContactImporter.Common.TextKeys)
-local v15 = Images["icons/graphic/contacts_large"]
 
-local function FindFriendsBanner(t1: {[any]: any}) -- line: 29
-	-- upvalues: useLocalization (copy), TextKeys (copy), useStyle (copy), React (copy), ImageSetLabel (copy), IconSize (copy), v15 (copy), StyledTextLabel (copy), Button (copy), ButtonType (copy), StandardButtonSize (copy)
-	local openAmpUpsell = t1.openAmpUpsell
-	local v19 = not t1.showMatchedContacts
-	local v20 = not v19 and 0 or 122
-	local isUserInGreenFindFriendsButtonExperiment = t1.isUserInGreenFindFriendsButtonExperiment
-	local v22 = useLocalization({
+local iconsgraphiccontacts_large = images["icons/graphic/contacts_large"]
+
+local function FindFriendsBanner(props)
+	local openAmpUpsell = props.openAmpUpsell
+	local v = not props.showMatchedContacts
+
+	local isUserInGreenFindFriendsButtonExperiment = props.isUserInGreenFindFriendsButtonExperiment
+
+	local v2 = useLocalization({
 		findFriendsButton = TextKeys.CONTACTS_FIND_FRIENDS_BUTTON,
 		findFriendsDescription = TextKeys.CONTACTS_FIND_FRIENDS_DESCRIPTION,
 		findFriendsDescriptionPV = TextKeys.CONTACTS_FIND_FRIENDS_DESCRIPTION_PV
 	})
-	local v23 = useStyle()
 
-	return React.createElement("Frame", {
+	local v3 = useStyle()
+
+	local createElement = react.createElement
+	local v4 = {
+		Size = UDim2.new(1, 0, 0, 48),
 		BorderSizePixel = 0,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 48),
-		LayoutOrder = t1.layoutOrder
-	}, {
-		UIListLayout = React.createElement("UIListLayout", {
+		LayoutOrder = props.layoutOrder
+	}
+	local v5 = {
+		UIListLayout = react.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			Padding = UDim.new(0, 12)
 		}),
-		ImageIcon = React.createElement(ImageSetLabel, {
+		ImageIcon = react.createElement(imageSetLabel, {
+			AnchorPoint = Vector2.new(0, 0.5),
+			Size = UDim2.new(0, iconSize.Large, 0, iconSize.Large),
+			ScaleType = Enum.ScaleType.Fit,
 			LayoutOrder = 1,
 			BackgroundTransparency = 1,
-			AnchorPoint = Vector2.new(0, 0.5),
-			Size = UDim2.new(0, IconSize.Large, 0, IconSize.Large),
-			ScaleType = Enum.ScaleType.Fit,
-			Image = v15,
-			ImageTransparency = v23.Theme.SystemPrimaryDefault.Transparency
+			Image = iconsgraphiccontacts_large,
+			ImageTransparency = v3.Theme.SystemPrimaryDefault.Transparency
 		}),
-		TextFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, -(v20 + 48 + 12), 0, 48)
-		}, {
-			textLayout = React.createElement("UIListLayout", {
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}),
-			Description = React.createElement(StyledTextLabel, {
-				lineHeight = 1,
-				text = if not v19 then v22.findFriendsDescriptionPV else v22.findFriendsDescription,
-				fontStyle = v23.Font.CaptionBody,
-				colorStyle = v23.Theme.TextDefault,
-				size = UDim2.new(1, 0, 1, 0),
-				textTruncate = Enum.TextTruncate.AtEnd,
-				textXAlignment = Enum.TextXAlignment.Left,
-				textYAlignment = Enum.TextYAlignment.Center
-			})
+		TextFrame = 0,
+		ButtonFrame = 0
+	}
+
+	local createElement2 = react.createElement
+	local v6 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, -((v and 122 or 0) + 48 + 12), 0, 48),
+		LayoutOrder = 2
+	}
+
+	local v7 = {
+		textLayout = react.createElement("UIListLayout", {
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
-		ButtonFrame = if not v19 then nil else React.createElement("Frame", {
+		Description = 0
+	}
+
+	local createElement3 = react.createElement
+	local text
+
+	if v then
+		text = v2.findFriendsDescription
+	else
+		text = v2.findFriendsDescriptionPV
+	end
+
+	v7.Description = createElement3(styledTextLabel, {
+		text = text,
+		fontStyle = v3.Font.CaptionBody,
+		colorStyle = v3.Theme.TextDefault,
+		size = UDim2.new(1, 0, 1, 0),
+		lineHeight = 1,
+		textTruncate = Enum.TextTruncate.AtEnd,
+		textXAlignment = Enum.TextXAlignment.Left,
+		textYAlignment = Enum.TextYAlignment.Center
+	})
+	v5.TextFrame = createElement2("Frame", v6, v7)
+	local buttonFrame
+
+	if v then
+		local createElement4 = react.createElement
+		local v8 = {
 			BackgroundTransparency = 1,
-			LayoutOrder = 3,
 			Size = UDim2.new(0, 110, 0, 48),
-			AnchorPoint = Vector2.new(1, 0.5)
-		}, {
-			ButtonLayout = React.createElement("UIListLayout", {
+			AnchorPoint = Vector2.new(1, 0.5),
+			LayoutOrder = 3
+		}
+
+		local v9 = {
+			ButtonLayout = react.createElement("UIListLayout", {
 				HorizontalAlignment = Enum.HorizontalAlignment.Right,
 				VerticalAlignment = Enum.VerticalAlignment.Center
 			}),
-			FindFriendsButton = React.createElement(Button, {
-				fitContent = false,
-				buttonType = if not isUserInGreenFindFriendsButtonExperiment then ButtonType.PrimarySystem else ButtonType.PrimaryContextual,
-				standardSize = StandardButtonSize.XSmall,
-				text = v22.findFriendsButton,
-				onActivated = openAmpUpsell
-			})
+			FindFriendsButton = 0
+		}
+
+		local createElement5 = react.createElement
+		local buttonType2
+
+		if isUserInGreenFindFriendsButtonExperiment then
+			buttonType2 = buttonType.PrimaryContextual
+		else
+			buttonType2 = buttonType.PrimarySystem
+		end
+
+		v9.FindFriendsButton = createElement5(button, {
+			buttonType = buttonType2,
+			standardSize = standardButtonSize.XSmall,
+			fitContent = false,
+			text = v2.findFriendsButton,
+			onActivated = openAmpUpsell
 		})
-	})
+		buttonFrame = createElement4("Frame", v8, v9)
+	end
+
+	v5.ButtonFrame = buttonFrame
+	return createElement("Frame", v4, v5)
 end
 
 return FindFriendsBanner

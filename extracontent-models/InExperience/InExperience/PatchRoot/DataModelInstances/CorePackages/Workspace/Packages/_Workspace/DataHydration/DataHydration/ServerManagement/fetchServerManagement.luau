@@ -1,76 +1,65 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local HttpClient = require(DataHydrationParent.HttpClient)
-local UrlBase = require(DataHydrationParent.UrlBuilder).UrlBase
-local withCsrfRetry = require(DataHydration.withCsrfRetry)
+local parent = DataHydration.Parent
 
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
+
+local withCsrfRetry = require(DataHydration.withCsrfRetry)
 require(script.Parent.ServerManagementStoreTypes)
 
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function resolveBase(t1: {[any]: any}?) -- line: 20
-	-- upvalues: UrlBase (copy)
-	local v11 = t1 or {}
-
-	return v11.network, v11.baseUrl or UrlBase.APIS
-end
-local function resolveMutatingNetwork(t2: {[any]: any}?) -- line: 25
-	-- upvalues: withCsrfRetry (copy), HttpClient (copy)
-	return (t2 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
+local function resolveBase(options) -- 1 equivalent call inferred from this helper
+	local v = options or {}
+	return v.network, v.baseUrl or UrlBase.APIS
 end
 
-return {
-	fetchListRestartStatuses = function(n1: number, t3: {[any]: any}?) -- line: 32
-		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
-		local v15 = t3 or {}
-		local network = v15.network
-		local v17 = v15.baseUrl or UrlBase.APIS
-		local v18 = fetch({
-			method = "GET",
-			analyticsKey = "server-management.list-restart-statuses",
-			network = network,
-			url = ("%s%s/universes/%d/restarts"):format(v17, "/server-management/v1", n1),
-			decode = function(p1) -- line: 42
-				return p1
-			end
-		})
+local function resolveMutatingNetwork(options) -- 1 equivalent call inferred from this helper
+	return (options or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork())
+end
 
-		return asPromise(v18)
-	end,
-	fetchForecastRestart = function(n2: number, t4: {[any]: any}?) -- line: 49
-		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
-		local v21 = t4 or {}
-		local network = v21.network
-		local v23 = v21.baseUrl or UrlBase.APIS
-		local v24 = fetch({
-			method = "GET",
-			analyticsKey = "server-management.forecast-restart",
-			network = network,
-			url = ("%s%s/universes/%d/restarts:forecast"):format(v23, "/server-management/v1", n2),
-			decode = function(p2) -- line: 59
-				return p2
-			end
-		})
+local FetchServerManagement = {}
 
-		return asPromise(v24)
-	end,
-	launchRestart = function(n3: number, p3, t5: {[any]: any}?) -- line: 66
-		-- upvalues: UrlBase (copy), fetch (copy), withCsrfRetry (copy), HttpClient (copy), asPromise (copy)
-		local v28 = t5 or {}
-		local _ = v28.network
-		local v30 = v28.baseUrl or UrlBase.APIS
-		local v31 = fetch({
-			method = "POST",
-			analyticsKey = "server-management.launch-restart",
-			network = (t5 or {}).network or withCsrfRetry(HttpClient.createRequestInternalNetwork()),
-			url = ("%s%s/universes/%d/restarts"):format(v30, "/server-management/v1", n3),
-			body = p3 or {},
-			decode = function(p4) -- line: 78
-				return p4
-			end
-		})
+function FetchServerManagement.fetchListRestartStatuses(p: number, options)
+	local v = options or {}
+	return asPromise((fetch({
+		network = v.network,
+		method = "GET",
+		url = ("%s%s/universes/%d/restarts"):format(v.baseUrl or UrlBase.APIS, "/server-management/v1", p),
+		analyticsKey = "server-management.list-restart-statuses",
+		decode = function(p2)
+			return p2
+		end
+	})))
+end
 
-		return asPromise(v31)
-	end
-}
+function FetchServerManagement.fetchForecastRestart(p: number, options)
+	local v = options or {}
+	return asPromise((fetch({
+		network = v.network,
+		method = "GET",
+		url = ("%s%s/universes/%d/restarts:forecast"):format(v.baseUrl or UrlBase.APIS, "/server-management/v1", p),
+		analyticsKey = "server-management.forecast-restart",
+		decode = function(p2)
+			return p2
+		end
+	})))
+end
+
+function FetchServerManagement.launchRestart(p: number, options, options2)
+	local _, v = resolveBase(options2) -- inferred equivalent call
+	return asPromise((fetch({
+		network = resolveMutatingNetwork(options2), -- inferred equivalent call
+		method = "POST",
+		url = ("%s%s/universes/%d/restarts"):format(v, "/server-management/v1", p),
+		body = options or {},
+		analyticsKey = "server-management.launch-restart",
+		decode = function(p2)
+			return p2
+		end
+	})))
+end
+
+return FetchServerManagement

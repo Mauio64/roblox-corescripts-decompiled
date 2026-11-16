@@ -1,32 +1,58 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-
-require(Parent.AppChatNetworking)
+local parent = script:FindFirstAncestor("AppChat").Parent
+require(parent.AppChatNetworking)
 
 local MessageModel = require(script.Parent.MessageModel)
-local DateTime = require(Parent.Time).DateTime
+local Time = require(parent.Time)
+local DateTime = Time.DateTime
+local MessageChannels = {}
 
-return {
-	responseUser = function(t1: {[any]: any}) -- line: 13
-		-- upvalues: MessageModel (copy), DateTime (copy)
-		return {
-			id = not t1.id and "message-id" or t1.id,
-			type = MessageModel.SenderTypes.User,
-			sender_user_id = not t1.sender_user_id and 1 or t1.sender_user_id,
-			sent = if not t1.sent then DateTime.fromIsoDate("2021-01-01T00:00:00Z") else t1.sent,
-			content = not t1.content and "message-content" or t1.content,
-			created_at = if not t1.created_at then DateTime.fromIsoDate("2021-01-01T00:00:00Z") else t1.created_at,
-			moderation_type = not t1.moderation_type and "trusted_comms" or t1.moderation_type,
-			is_previewable = t1.is_previewable ~= nil and t1.is_previewable,
-			is_badgeable = t1.is_badgeable ~= nil and t1.is_badgeable
-		}
-	end,
-	responseSystem = function(t2: {[any]: any}) -- line: 40
-		return {
-			type = "system",
-			id = not t2.id and "message-id" or t2.id,
-			sent = not t2.sent and "2021-01-01T00:00:00Z" or t2.sent,
-			content = not t2.content and "message-content" or t2.content,
-			created_at = not t2.created_at and "2021-01-01T00:00:00Z" or t2.created_at
-		}
+function MessageChannels.responseUser(data)
+	local v = {
+		id = not data.id and "message-id" or data.id,
+		type = MessageModel.SenderTypes.User,
+		sender_user_id = not data.sender_user_id and 1 or data.sender_user_id,
+		sent = 0,
+		content = 0,
+		created_at = 0,
+		moderation_type = 0,
+		is_previewable = 0,
+		is_badgeable = 0
+	}
+	local sent
+
+	if data.sent then
+		sent = data.sent
+	else
+		sent = DateTime.fromIsoDate("2021-01-01T00:00:00Z")
 	end
-}
+
+	v.sent = sent
+	v.content = not data.content and "message-content" or data.content
+	local created_at
+
+	if data.created_at then
+		created_at = data.created_at
+	else
+		created_at = DateTime.fromIsoDate("2021-01-01T00:00:00Z")
+	end
+
+	v.created_at = created_at
+
+	v.moderation_type = not data.moderation_type and "trusted_comms" or data.moderation_type
+
+	v.is_previewable = data.is_previewable ~= nil and data.is_previewable
+	v.is_badgeable = data.is_badgeable ~= nil and data.is_badgeable
+	return v
+end
+
+function MessageChannels.responseSystem(data)
+	return {
+		id = not data.id and "message-id" or data.id,
+		type = "system",
+		sent = not data.sent and "2021-01-01T00:00:00Z" or data.sent,
+		content = not data.content and "message-content" or data.content,
+		created_at = not data.created_at and "2021-01-01T00:00:00Z" or data.created_at
+	}
+end
+
+return MessageChannels

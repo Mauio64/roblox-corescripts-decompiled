@@ -1,44 +1,32 @@
-local v1 = newproxy(false)
+local v = newproxy(false)
 
-return function(p1) -- line: 23
-	-- upvalues: v1 (copy)
+return function(callback)
 	return {
-		setInterval = function(p2, n1: number, ...) -- line: 24
-			-- upvalues: v1 (copy), p1 (copy)
-			local t1 = { ... }
-			local t2 = {
-				[v1] = 1
-			}
+		setInterval = function(callback2, p: number, ...)
+			local v2 = { ... }
+			local v3 = { [v] = 1 }
 
-			if n1 == nil then
-				n1 = 0
-			end
-
-			local v7 = n1 / 1000
-
-			local function u8() -- line: 38
-				-- upvalues: p1 (copy), v7 (copy), t2 (copy), v1 (copy), p2 (copy), t1 (copy), u8 (ref)
-				p1(v7, function() -- line: 39
-					-- upvalues: t2 (copy), v1 (copy), p2 (copy), t1 (copy), u8 (ref)
-					if t2[v1] == 1 then
-						p2(unpack(t1))
-						u8()
+			local v4 = (p == nil and 0 or p) / 1000
+			local function fn()
+				callback(v4, function()
+					if v3[v] == 1 then
+						callback2(unpack(v2))
+						fn()
 					end
 				end)
 			end
 
-			u8()
+			fn()
 
-			return t2
+			return v3
 		end,
-		clearInterval = function(t3: {[any]: any}) -- line: 52
-			-- upvalues: v1 (copy)
-			if t3 == nil then
+		clearInterval = function(p)
+			if p == nil then
 				return
 			end
 
-			if t3[v1] == 1 then
-				t3[v1] = 3
+			if p[v] == 1 then
+				p[v] = 3
 			end
 		end
 	}

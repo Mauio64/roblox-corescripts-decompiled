@@ -1,26 +1,21 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.ES7Types)
 
-require(ParentParent.ES7Types)
-
-return function(p1, p2: ((...any) -> ...any), p3) -- line: 28
-	if typeof(p1) ~= "table" then
-		error(string.format("Array.some called on %s", (typeof(p1))))
+return function(items, callback, p): boolean
+	if typeof(items) ~= "table" then
+		error(string.format("Array.some called on %s", (typeof(items))))
 	end
 
-	if typeof(p2) ~= "function" then
+	if typeof(callback) ~= "function" then
 		error("callback is not a function")
 	end
 
-	for v5, v6 in p1 do
-		if p3 == nil then
-			if v6 == nil or not p2(v6, v5, p1) then
-				continue
+	for k, item in items do
+		if p == nil then
+			if item ~= nil and callback(item, k, items) then
+				return true
 			end
-
-			return true
-		end
-
-		if v6 ~= nil and p2(p3, v6, v5, p1) then
+		elseif item ~= nil and callback(p, item, k, items) then
 			return true
 		end
 	end

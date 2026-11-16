@@ -1,34 +1,35 @@
 local copy = require(script.Parent.copy)
 
-local function noUpdate(p1, p2) -- line: 4
-	return p1, p2
+local function noUpdate(p, p2)
+	return p, p2
 end
-local function call(p3, ...) -- line: 8
-	if type(p3) == "function" then
-		return p3(...)
+
+local function call(callback, ...)
+	if type(callback) == "function" then
+		return callback(...)
 	end
 end
-local function update(p4, p5, p6, p7) -- line: 14
-	-- upvalues: copy (copy), noUpdate (copy), call (copy)
-	local v12 = type(p4)
 
-	assert(v12 == "table", "expected a table for first argument, got " .. v12)
-	assert(p5 ~= nil, "expected second argument to be anything but nil, got nil")
+local function update(p, p2, p3, p4)
+	local typeName = type(p)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	local v13 = copy(p4)
-	local v14 = p6 or noUpdate
-	local v15, v16
+	assert(p2 ~= nil, "expected second argument to be anything but nil, got nil")
 
-	if v13[p5] ~= nil then
-		v15, v16 = v14(v13[p5], p5)
-		call(p7, true, v15, v16 or p5)
+	local v = copy(p)
+	local v2 = p3 or noUpdate
+	local v3, v4
+
+	if v[p2] == nil then
+		v3, v4 = call(p4, false, p2)
 	else
-		v15, v16 = call(p7, false, p5)
+		v3, v4 = v2(v[p2], p2)
+		call(p4, true, v3, v4 or p2)
 	end
 
-	v13[v16 or p5] = v15
+	v[v4 or p2] = v3
 
-	return v13
+	return v
 end
 
 return update

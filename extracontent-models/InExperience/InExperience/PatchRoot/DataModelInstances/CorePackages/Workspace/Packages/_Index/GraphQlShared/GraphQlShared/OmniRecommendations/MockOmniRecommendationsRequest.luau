@@ -1,20 +1,16 @@
-local Parent = script:FindFirstAncestor("GraphQlShared").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("GraphQlShared").Parent
+local Promise = require(parent.Promise)
 
 return {
-	SuccessfulRequest = function(p1) -- line: 5
-		-- upvalues: Promise (copy)
-		return function(_, _, _, _, _) -- line: 6
-			-- upvalues: p1 (copy), Promise (copy)
-			local t1 = {
+	SuccessfulRequest = function(responseBody)
+		return function(_, _, _, _, _)
+			return Promise.resolve({
 				responseCode = 200,
 				responseTimeMs = 480,
 				isJSONValid = true,
-				p1,
-				responseBody = p1
-			}
-
-			return Promise.resolve(t1)
+				responseBody,
+				responseBody = responseBody
+			})
 		end
 	end
 }

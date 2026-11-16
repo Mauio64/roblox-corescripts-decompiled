@@ -1,119 +1,185 @@
-local Foundation = game:GetService("CorePackages").Packages._Index.Foundation.Foundation
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local useTokens = require(Foundation.Providers.Style.useTokens)
-local Constants = require(Foundation.Constants)
+local CorePackages = game:GetService("CorePackages")
+local foundation = CorePackages.Packages._Index.Foundation.Foundation
+local parent = foundation.Parent
+local React = require(parent.React)
+local useTokens = require(foundation.Providers.Style.useTokens)
+
+local Constants = require(foundation.Constants)
+
 local Sheet = script:FindFirstAncestor("Sheet")
 local SheetContext = require(Sheet.SheetContext)
 local SheetType = require(Sheet.SheetType)
-local ScrollView = require(Foundation.Components.ScrollView)
 
-require(Foundation.Components.Types)
+local ScrollView = require(foundation.Components.ScrollView)
+require(foundation.Components.Types)
+local View = require(foundation.Components.View)
+local isScrollingFrameOverflowingY = require(foundation.Utility.isScrollingFrameOverflowingY)
 
-local View = require(Foundation.Components.View)
-local isScrollingFrameOverflowingY = require(Foundation.Utility.isScrollingFrameOverflowingY)
+local function SheetContent(props, ref)
+	local v = useTokens()
+	local v2 = React.useContext(SheetContext)
 
-local function SheetContent(p1, p2) -- line: 22
-	-- upvalues: useTokens (copy), React (copy), SheetContext (copy), isScrollingFrameOverflowingY (copy), SheetType (copy), ScrollView (copy), View (copy), Constants (copy)
-	local v15 = useTokens()
-	local v16 = React.useContext(SheetContext)
-	local innerScrollingEnabled = v16.innerScrollingEnabled
-	local setInnerScrollY = v16.setInnerScrollY
-	local actionsHeight = v16.actionsHeight
-	local sheetContentHeight = v16.sheetContentHeight
-	local setHasActionsDivider = v16.setHasActionsDivider
-	local bottomPadding = v16.bottomPadding
-	local hasHeader = v16.hasHeader
-	local hasFullBleed = v16.hasFullBleed
-	local fullBleedHeight = v16.fullBleedHeight
-	local sheetType = v16.sheetType
-	local testId = v16.testId
+	local innerScrollingEnabled = v2.innerScrollingEnabled
+	local setInnerScrollY = v2.setInnerScrollY
+	local actionsHeight = v2.actionsHeight
+	local sheetContentHeight = v2.sheetContentHeight
+	local setHasActionsDivider = v2.setHasActionsDivider
+	local bottomPadding = v2.bottomPadding
+	local hasHeader = v2.hasHeader
+	local hasFullBleed = v2.hasFullBleed
+	local fullBleedHeight = v2.fullBleedHeight
+	local sheetType = v2.sheetType
+	local testId = v2.testId
+	assert(
+		innerScrollingEnabled and setInnerScrollY and actionsHeight and setHasActionsDivider and bottomPadding and hasHeader and testId,
+		"SheetContent must be used within a Sheet"
+	)
 
-	assert(innerScrollingEnabled and (setInnerScrollY and (actionsHeight and (setHasActionsDivider and (bottomPadding and (hasHeader and testId))))), "SheetContent must be used within a Sheet")
+	local v3, v4 = React.useBinding(false)
 
-	local v28, v29 = React.useBinding(false)
-	local v30 = React.useCallback(function(p3) -- line: 50
-		-- upvalues: setInnerScrollY (copy), isScrollingFrameOverflowingY (copy), setHasActionsDivider (copy), v29 (copy)
-		setInnerScrollY(p3.CanvasPosition.Y)
+	local v5 = React.useCallback(function(p)
+		setInnerScrollY(p.CanvasPosition.Y)
 
-		local v38 = isScrollingFrameOverflowingY(p3, 1)
+		local scrollingFrameOverflowingY = isScrollingFrameOverflowingY(p, 1)
 
-		setHasActionsDivider(v38)
-		v29(v38)
-	end, {
-		setHasActionsDivider,
-		setInnerScrollY
-	})
-	local v31, v32 = React.useBinding(0)
-	local v33 = React.useCallback(function(p4) -- line: 60
-		-- upvalues: v32 (copy)
-		v32(p4.AbsoluteSize.Y)
+		setHasActionsDivider(scrollingFrameOverflowingY)
+		v4(scrollingFrameOverflowingY)
+	end, { setHasActionsDivider, setInnerScrollY })
+
+	local v6, v7 = React.useBinding(0)
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		v7(p.AbsoluteSize.Y)
 	end, {})
-	local v34 = sheetType == SheetType.Bottom
-	local v35 = p1.Selectable == nil or p1.Selectable
-	local v36 = if not v28 then nil else v28:map(function(b1: boolean) -- line: 68
-		-- upvalues: v35 (copy)
-		return v35 and b1
-	end)
 
-	return React.createElement(ScrollView, {
+	local v8 = sheetType == SheetType.Bottom
+
+	local v9 = props.Selectable == nil or props.Selectable
+	local selectable
+
+	if v3 then
+		selectable = v3:map(function(flag: boolean)
+			return v9 and flag
+		end)
+	end
+
+	local createElement = React.createElement
+
+	local v10 = {
+		scrollingFrameRef = props.scrollingFrameRef,
 		ZIndex = 1,
-		tag = "fill size-full-0 auto-y",
-		scrollingFrameRef = p1.scrollingFrameRef,
 		selection = {
-			Selectable = v36,
-			NextSelectionUp = p1.NextSelectionUp,
-			NextSelectionDown = p1.NextSelectionDown,
-			NextSelectionLeft = p1.NextSelectionLeft,
-			NextSelectionRight = p1.NextSelectionRight
+			Selectable = selectable,
+			NextSelectionUp = props.NextSelectionUp,
+			NextSelectionDown = props.NextSelectionDown,
+			NextSelectionLeft = props.NextSelectionLeft,
+			NextSelectionRight = props.NextSelectionRight
 		},
-		scroll = {
-			ScrollingEnabled = innerScrollingEnabled,
-			AutomaticCanvasSize = Enum.AutomaticSize.Y,
-			CanvasSize = if not sheetContentHeight then UDim2.fromScale(1, 0) else v31:map(function(n1: number) -- line: 89
-				return UDim2.new(1, 0, 0, n1)
-			end),
-			ScrollingDirection = Enum.ScrollingDirection.Y
-		},
-		Size = if not sheetContentHeight then nil else UDim2.fromScale(1, 1),
-		padding = {
-			top = hasHeader:map(function(b2: boolean) -- line: 97
-				-- upvalues: hasFullBleed (copy), v34 (copy), v15 (copy)
-				if b2 or hasFullBleed then
-					return (UDim.new(0, 0))
-				end
+		scroll = 0,
+		Size = 0,
+		padding = 0,
+		ClipsDescendants = 0,
+		onCanvasPositionChanged = 0,
+		onAbsoluteCanvasSizeChanged = 0,
+		onAbsoluteWindowSizeChanged = 0,
+		testId = 0,
+		tag = "fill size-full-0 auto-y",
+		ref = 0
+	}
 
-				return (UDim.new(0, if not v34 then v15.Margin.Small else v15.Padding.Small))
-			end),
-			bottom = if not v34 then UDim.new(0, v15.Padding.Small) else actionsHeight:map(function(n2: number) -- line: 103
-				-- upvalues: bottomPadding (copy), v15 (copy)
-				return UDim.new(0, n2 + bottomPadding + v15.Margin.Small)
-			end),
-			left = UDim.new(0, v15.Padding.Small),
-			right = UDim.new(0, v15.Padding.Small)
-		},
-		ClipsDescendants = not v34 or hasHeader,
-		onCanvasPositionChanged = function(p5) -- line: 111
-			-- upvalues: setInnerScrollY (copy)
-			setInnerScrollY(p5.CanvasPosition.Y)
-		end,
-		onAbsoluteCanvasSizeChanged = v30,
-		onAbsoluteWindowSizeChanged = v30,
-		testId = `{ testId }--content`,
-		ref = p2
-	}, React.createElement(View, {
-		tag = "col align-x-center gap-medium size-full-0 auto-y padding-x-medium",
-		onAbsoluteSizeChanged = v33
-	}, {
-		FullBleedSpacer = if not hasFullBleed or not fullBleedHeight then nil else React.createElement(View, {
-			Size = fullBleedHeight:map(function(n3: number) -- line: 126
-				return UDim2.new(1, 0, 0, (math.max(0, n3)))
+	local scroll = {
+		ScrollingEnabled = innerScrollingEnabled,
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = 0,
+		ScrollingDirection = 0
+	}
+	local canvasSize
+
+	if sheetContentHeight then
+		canvasSize = v6:map(function(p: number)
+			return UDim2.new(1, 0, 0, p)
+		end)
+	else
+		canvasSize = UDim2.fromScale(1, 0)
+	end
+
+	scroll.CanvasSize = canvasSize
+
+	scroll.ScrollingDirection = Enum.ScrollingDirection.Y
+	v10.scroll = scroll
+	local size
+
+	if sheetContentHeight then
+		size = UDim2.fromScale(1, 1)
+	end
+
+	v10.Size = size
+	local padding = {
+		top = hasHeader:map(function(flag: boolean)
+			if flag or hasFullBleed then
+				return (UDim.new(0, 0))
+			end
+
+			local v11 = if v8 then v.Padding.Small else v.Margin.Small
+			return (UDim.new(0, v11))
+		end),
+		bottom = 0,
+		left = 0,
+		right = 0
+	}
+	local bottom
+
+	if v8 then
+		bottom = actionsHeight:map(function(p: number)
+			return UDim.new(0, p + bottomPadding + v.Margin.Small)
+		end)
+	else
+		bottom = UDim.new(0, v.Padding.Small)
+	end
+
+	padding.bottom = bottom
+
+	padding.left = UDim.new(0, v.Padding.Small)
+	padding.right = UDim.new(0, v.Padding.Small)
+	v10.padding = padding
+
+	v10.ClipsDescendants = not v8 or hasHeader
+	function v10.onCanvasPositionChanged(p)
+		setInnerScrollY(p.CanvasPosition.Y)
+	end
+	v10.onAbsoluteCanvasSizeChanged = v5
+	v10.onAbsoluteWindowSizeChanged = v5
+	v10.testId = `{testId}--content`
+
+	v10.ref = ref
+
+	local createElement2 = React.createElement
+	local fullBleedSpacer
+
+	if hasFullBleed and fullBleedHeight then
+		fullBleedSpacer = React.createElement(View, {
+			Size = fullBleedHeight:map(function(p: number)
+				return UDim2.new(1, 0, 0, (math.max(0, p)))
 			end),
 			LayoutOrder = Constants.MIN_LAYOUT_ORDER,
-			testId = `{ testId }--content--full-bleed-spacer`
-		}),
-		Children = React.createElement(React.Fragment, nil, p1.children)
-	}))
+			testId = `{testId}--content--full-bleed-spacer`
+		})
+	end
+
+	return createElement(
+		ScrollView,
+		v10,
+		createElement2(
+			View,
+			{
+				onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+				tag = "col align-x-center gap-medium size-full-0 auto-y padding-x-medium"
+			},
+			{
+				FullBleedSpacer = fullBleedSpacer,
+				Children = React.createElement(React.Fragment, nil, props.children)
+			}
+		)
+	)
 end
 
 return React.memo(React.forwardRef(SheetContent))

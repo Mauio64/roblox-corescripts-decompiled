@@ -1,64 +1,67 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local Foundation = require(AppChatParent.Foundation)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
 
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 require(AppChat.types)
-
 local useTokens = Foundation.Hooks.useTokens
+
 local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
-local t1 = {
+
+local v = {
 	actionText = "PLACEHOLDER Action",
 	bodyText = "PLACEHOLDER Body",
-	onActivated = function() -- line: 24
-	end,
-	onDismissed = function() -- line: 25
-	end
+	onActivated = function() end,
+	onDismissed = function() end
 }
 
-local function ConversationBanner(t2: {[any]: any}) -- line: 28
-	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), useChatPagePadding (copy), React (copy), Foundation (copy)
-	local v11 = Cryo.Dictionary.union(t1, t2)
-	local Medium = useTokens().Padding.Medium
-	local v13 = useChatPagePadding()
+local function ConversationBanner(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local medium = useTokens().Padding.Medium
+	local v2 = useChatPagePadding()
 
 	return React.createElement(Foundation.View, {
-		tag = "row gap-medium align-y-center size-full-0 auto-y bg-shift-200",
 		padding = {
-			left = UDim.new(0, v13.left),
-			right = UDim.new(0, v13.right),
-			top = UDim.new(0, Medium),
-			bottom = UDim.new(0, Medium)
+			left = UDim.new(0, v2.left),
+			right = UDim.new(0, v2.right),
+			top = UDim.new(0, medium),
+			bottom = UDim.new(0, medium)
 		},
-		LayoutOrder = v11.layoutOrder
+		tag = "row gap-medium align-y-center size-full-0 auto-y bg-shift-200",
+		LayoutOrder = union.layoutOrder
 	}, {
 		BodyText = React.createElement(Foundation.Text, {
 			tag = "text-title-medium text-align-x-left text-truncate-end content-emphasis auto-y fill",
 			LayoutOrder = 1,
-			Text = v11.bodyText
+			Text = union.bodyText
 		}),
-		ActionContainer = React.createElement(Foundation.View, {
-			LayoutOrder = 2,
-			tag = "row gap-small align-y-center auto-xy"
-		}, {
-			ActionButton = React.createElement(Foundation.Button, {
-				LayoutOrder = 1,
-				text = v11.actionText,
-				onActivated = v11.onActivated,
-				size = Foundation.Enums.InputSize.Small
-			}),
-			CloseButton = React.createElement(Foundation.View, {
-				LayoutOrder = 2,
-				tag = "auto-xy x-default-transparent radius-small padding-xsmall",
-				onActivated = v11.onDismissed
-			}, {
-				Icon = React.createElement(Foundation.Icon, {
-					size = Foundation.Enums.IconSize.Large,
-					name = Foundation.Enums.IconName.X
-				})
-			})
-		})
+		ActionContainer = React.createElement(
+			Foundation.View,
+			{ LayoutOrder = 2, tag = "row gap-small align-y-center auto-xy" },
+			{
+				ActionButton = React.createElement(Foundation.Button, {
+					text = union.actionText,
+					onActivated = union.onActivated,
+					size = Foundation.Enums.InputSize.Small,
+					LayoutOrder = 1
+				}),
+				CloseButton = React.createElement(
+					Foundation.View,
+					{
+						onActivated = union.onDismissed,
+						LayoutOrder = 2,
+						tag = "auto-xy x-default-transparent radius-small padding-xsmall"
+					},
+					{
+						Icon = React.createElement(Foundation.Icon, {
+							size = Foundation.Enums.IconSize.Large,
+							name = Foundation.Enums.IconName.X
+						})
+					}
+				)
+			}
+		)
 	})
 end
 

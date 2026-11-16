@@ -1,6 +1,1 @@
-return {
-	None = "None",
-	Active = "Active",
-	Away = "Away",
-	InExperience = "InExperience"
-}
+return { None = "None", Active = "Active", Away = "Away", InExperience = "InExperience" }

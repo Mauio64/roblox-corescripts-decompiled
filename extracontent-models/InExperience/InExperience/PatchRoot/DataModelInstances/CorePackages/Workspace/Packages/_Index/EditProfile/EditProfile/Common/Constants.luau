@@ -1,20 +1,13 @@
 return {
 	RODUX_KEY = "EditProfile",
-	ProfileScreens = "profileScreens",
 	CloseUpdateUsernameModal = "CloseUpdateUsernameModal",
 	UpdateUsernameModalSuccess = "UpdateUsernameModalSuccess",
-	EditProfilePage = "EditProfilePage",
-	EditDisplayNameModal = "EditDisplayNameModal",
 	EditProfileBackground = "EditProfileBackground",
 	EditUserNameWebView = "navigateToEditUsername",
 	ChangeUsernamePrice = 1000,
 	JavascriptHybrid = {
-		Module = {
-			Navigation = "Navigation"
-		},
-		Function = {
-			navigateToFeature = "navigateToFeature"
-		},
+		Module = { Navigation = "Navigation" },
+		Function = { navigateToFeature = "navigateToFeature" },
 		Feature = {
 			CloseUpdateUsernameModal = "CloseUpdateUsernameModal",
 			UpdateUsernameModalSuccess = "UpdateUsernameModalSuccess"
@@ -29,13 +22,7 @@ return {
 		InvalidCharacterSetCombination = 8,
 		NameNotAvailable = 9
 	},
-	SocialMediaOrder = {
-		"facebook",
-		"twitter",
-		"youtube",
-		"twitch",
-		"guilded"
-	},
+	SocialMediaOrder = { "facebook", "twitter", "youtube", "twitch", "guilded" },
 	SocialMediaIcons = {
 		twitter = "icons/brands/x",
 		facebook = "icons/brands/facebook",
@@ -50,10 +37,7 @@ return {
 		Twitch = 14,
 		Guilded = 15
 	},
-	DescriptionErrorCodes = {
-		Throttled = 0,
-		PinLocked = 2
-	},
+	DescriptionErrorCodes = { Throttled = 0, PinLocked = 2 },
 	VisibilitySettings = {
 		AllUsers = "AllUsers",
 		FriendsFollowingAndFollowers = "FriendsFollowingAndFollowers",

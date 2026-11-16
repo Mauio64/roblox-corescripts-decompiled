@@ -1,10 +1,10 @@
 local RobloxAppHooks = script:FindFirstAncestor("RobloxAppHooks")
-local RobloxAppHooksParent = RobloxAppHooks.Parent
-local AppSystemInfo = require(RobloxAppHooksParent.RoactServiceTags).AppSystemInfo
+local parent = RobloxAppHooks.Parent
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppSystemInfo = RoactServiceTags.AppSystemInfo
 local useRoactService = require(RobloxAppHooks.useRoactService)
 
-local function useSystemInfo() -- line: 6
-	-- upvalues: useRoactService (copy), AppSystemInfo (copy)
+local function useSystemInfo()
 	return useRoactService(AppSystemInfo)
 end
 

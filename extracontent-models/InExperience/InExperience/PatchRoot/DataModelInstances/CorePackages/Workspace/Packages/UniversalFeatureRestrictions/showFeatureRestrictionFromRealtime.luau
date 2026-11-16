@@ -1,0 +1,4 @@
+local Workspace = script.Parent.Parent._Workspace
+local showFeatureRestrictionFromRealtime = require(Workspace.UniversalFeatureRestrictions.UniversalFeatureRestrictions.Utils.showFeatureRestrictionFromRealtime)
+
+return showFeatureRestrictionFromRealtime

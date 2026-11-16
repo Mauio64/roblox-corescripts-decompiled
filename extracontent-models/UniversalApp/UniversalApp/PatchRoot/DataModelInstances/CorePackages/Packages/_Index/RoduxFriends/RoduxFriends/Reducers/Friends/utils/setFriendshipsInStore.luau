@@ -1,61 +1,64 @@
-local Parent = script:FindFirstAncestor("RoduxFriends").Parent
-local llama = require(Parent.llama)
+local parent = script:FindFirstAncestor("RoduxFriends").Parent
+local llama = require(parent.llama)
 local addUser = require(script.Parent.addUser)
 local removeUser = require(script.Parent.removeUser)
 
-function difference(p1, p2) -- line: 8
-	local t1 = {}
+function difference(items, items2)
+	local v = {}
 
-	for _, v in pairs(p1) do
-		t1[v] = true
+	for _, item in pairs(items) do
+		v[item] = true
 	end
 
-	for _, v in pairs(p2) do
-		t1[v] = nil
+	for _, item in pairs(items2) do
+		v[item] = nil
 	end
 
-	local t2 = {}
-	local n1 = 0
+	local count = 0
+	local result = {}
 
-	for _, v in pairs(p1) do
-		if t1[v] then
-			n1 += 1
-			t2[n1] = v
+	for _, item in pairs(items) do
+		if not v[item] then
+			continue
 		end
+
+		count += 1
+		result[count] = item
 	end
 
-	return t2
+	return result
 end
 
-return function(p3, p4) -- line: 33
-	-- upvalues: llama (copy), addUser (copy), removeUser (copy)
-	local str = tostring(p4.namedIds.users)
-	local v19 = p3[str] or {}
-	local v20 = llama.List.map(llama.Dictionary.values(p4.responseBody.data), function(p5) -- line: 37
-		return (tostring(p5.id))
+return function(items, p)
+	local users = tostring(p.namedIds.users)
+	local v = items[users] or {}
+
+	local mapped = llama.List.map(llama.Dictionary.values(p.responseBody.data), function(p2)
+		return (tostring(p2.id))
 	end)
-	local v21 = difference(v20, v19)
-	local v22 = difference(v19, v20)
 
-	for _, v in pairs(v21) do
-		p3 = llama.Dictionary.join(p3, {
-			[str] = addUser(p3[str], v),
-			[v] = addUser(p3[v], str)
+	local v2 = difference(mapped, v)
+	local v3 = difference(v, mapped)
+
+	for _, v4 in pairs(v2) do
+		items = llama.Dictionary.join(items, {
+			[users] = addUser(items[users], v4),
+			[v4] = addUser(items[v4], users)
 		})
 	end
 
-	for _, v in pairs(v22) do
-		p3 = llama.Dictionary.join(p3, {
-			[str] = removeUser(p3[str], v),
-			[v] = removeUser(p3[v], str)
+	for _, v4 in pairs(v3) do
+		items = llama.Dictionary.join(items, {
+			[users] = removeUser(items[users], v4),
+			[v4] = removeUser(items[v4], users)
 		})
 	end
 
-	for k, v in pairs(p3) do
-		if llama.isEmpty(v) then
-			p3[k] = nil
+	for k, item in pairs(items) do
+		if llama.isEmpty(item) then
+			items[k] = nil
 		end
 	end
 
-	return p3
+	return items
 end

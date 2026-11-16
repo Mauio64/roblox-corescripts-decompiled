@@ -1,13 +1,13 @@
-local function reverse(p1) -- line: 5
-	local t1 = {}
-	local v4 = #p1
-	local v5 = v4 + 1
+local function reverse(list)
+	local count = #list
+	local v = count + 1
+	local result = {}
 
-	for i = 1, v4 do
-		t1[i] = p1[v5 - i]
+	for i = 1, count do
+		result[i] = list[v - i]
 	end
 
-	return t1
+	return result
 end
 
 return reverse

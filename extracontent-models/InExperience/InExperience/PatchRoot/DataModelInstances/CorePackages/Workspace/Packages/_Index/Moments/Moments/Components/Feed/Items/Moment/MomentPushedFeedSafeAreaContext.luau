@@ -1,11 +1,12 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local React = require(Parent.React)
-local v3 = React.createContext(nil)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local React = require(parent.React)
+
+local context = React.createContext(nil)
 
 return {
-	Context = v3,
-	useMomentPushedFeedSafeArea = function() -- line: 16
-		-- upvalues: React (copy), v3 (copy)
-		return React.useContext(v3)
+	Context = context,
+	useMomentPushedFeedSafeArea = function()
+		return React.useContext(context)
 	end
 }

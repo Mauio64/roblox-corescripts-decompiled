@@ -1,17 +1,29 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
-local BuilderIcons = require(Parent.BuilderIcons)
-local FFlagEnableFlyoutUncheckedBadge = require(Parent.SharedFlags).FFlagEnableFlyoutUncheckedBadge
+local BuilderIcons = require(parent.BuilderIcons)
 
-local function ChevronSmallDownButton(t1: {[any]: any}) -- line: 16
-	-- upvalues: React (copy), Foundation (copy), FFlagEnableFlyoutUncheckedBadge (copy), BuilderIcons (copy), IconSize (copy)
-	return React.createElement(Foundation.View, {
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableFlyoutUncheckedBadge = SharedFlags.FFlagEnableFlyoutUncheckedBadge
+
+local function ChevronSmallDownButton(p)
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v = {
 		tag = "position-center-right anchor-center-right auto-xy radius-circle bg-action-standard padding-xsmall",
-		onActivated = t1.onActivated,
-		LayoutOrder = if not FFlagEnableFlyoutUncheckedBadge then nil else t1.layoutOrder
-	}, {
+		onActivated = p.onActivated,
+		testId = "--core-ui-flyout-switch-account-chevron",
+		LayoutOrder = 0
+	}
+	local layoutOrder
+
+	if FFlagEnableFlyoutUncheckedBadge then
+		layoutOrder = p.layoutOrder
+	end
+
+	v.LayoutOrder = layoutOrder
+	return createElement(view, v, {
 		Icon = React.createElement(Foundation.Icon, {
 			tag = "position-center-center anchor-center-center auto-xy content-emphasis",
 			name = BuilderIcons.Icon.ChevronSmallDown,

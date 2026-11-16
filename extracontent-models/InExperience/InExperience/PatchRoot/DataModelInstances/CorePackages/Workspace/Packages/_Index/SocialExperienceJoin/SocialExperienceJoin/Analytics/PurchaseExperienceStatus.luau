@@ -1,5 +1,1 @@
-return {
-	Success = "Success",
-	PurchaseError = "PurchaseError",
-	NetworkError = "NetworkError"
-}
+return { Success = "Success", PurchaseError = "PurchaseError", NetworkError = "NetworkError" }

@@ -1,67 +1,65 @@
 local SocialExperiments = script:FindFirstAncestor("SocialExperiments")
-local SocialExperimentsParent = SocialExperiments.Parent
-local SystemInfoProtocol = require(SocialExperimentsParent.SystemInfoProtocol).SystemInfoProtocol
+local parent = SocialExperiments.Parent
+
+local SystemInfoProtocol = require(parent.SystemInfoProtocol)
+local systemInfoProtocol = SystemInfoProtocol.SystemInfoProtocol
 
 require(SocialExperiments.DeviceGateFeature)
 
-local t1 = {}
-local t2 = {}
+local enabledsByFeatureName = {}
+local v = {}
 
-return function(t3: {[any]: any}) -- line: 18
-	-- upvalues: t1 (copy), t2 (copy), SystemInfoProtocol (copy)
-	if t1[t3.featureName] == nil then
-		t1[t3.featureName] = t3.enabled
+return function(data)
+	if enabledsByFeatureName[data.featureName] == nil then
+		enabledsByFeatureName[data.featureName] = data.enabled
 	end
 
-	if t1[t3.featureName] then
-		if t2[t3.featureName] == nil then
-			local _, _ = pcall(function() -- line: 25
-				-- upvalues: SystemInfoProtocol (copy), t3 (copy), t2 (copy)
-				local t4 = {
-					SystemInfoProtocol.InfoNames.DEVICE_NAME,
-					SystemInfoProtocol.InfoNames.SYSTEM_VERSION,
-					SystemInfoProtocol.InfoNames.BASE_OS
+	if enabledsByFeatureName[data.featureName] then
+		if v[data.featureName] == nil then
+			local _, _ = pcall(function()
+				local v2 = {
+					systemInfoProtocol.InfoNames.DEVICE_NAME,
+					systemInfoProtocol.InfoNames.SYSTEM_VERSION,
+					systemInfoProtocol.InfoNames.BASE_OS
 				}
-				local v10 = SystemInfoProtocol.default:getSystemInfo(t4)
-				local v11 = v10.deviceName or "UnknownDeviceName"
 
-				if typeof(v11) == "string" then
-					for match in t3.deviceNameBlackListString:gmatch("([^|]+)") do
-						if v11:lower():find(match:lower()) then
-							t2[t3.featureName] = true
+				local systemInfo = systemInfoProtocol.default:getSystemInfo(v2)
+				local deviceName = systemInfo.deviceName or "UnknownDeviceName"
 
-							return t2[t3.featureName]
+				if typeof(deviceName) == "string" then
+					for k in data.deviceNameBlackListString:gmatch("([^|]+)") do
+						if deviceName:lower():find(k:lower()) then
+							v[data.featureName] = true
+							return v[data.featureName]
 						end
 					end
 				end
 
-				local v13 = v10.baseOs or "UnknownOS"
-				local v14 = v10.systemVersion or "UnknownVersion"
+				local baseOs = systemInfo.baseOs or "UnknownOS"
+				local systemVersion = systemInfo.systemVersion or "UnknownVersion"
 
-				if typeof(v13) == "string" and typeof(v14) == "string" then
-					local v15 = v13 .. ":" .. v14
+				if typeof(baseOs) == "string" and typeof(systemVersion) == "string" then
+					local v3 = baseOs .. ":" .. systemVersion
 
-					for match in t3.osVersionBlackListString:gmatch("([^|]+)") do
-						if v15:lower():find(match:lower()) then
-							t2[t3.featureName] = true
-
-							return t2[t3.featureName]
+					for k in data.osVersionBlackListString:gmatch("([^|]+)") do
+						if v3:lower():find(k:lower()) then
+							v[data.featureName] = true
+							return v[data.featureName]
 						end
 					end
 				end
 
-				t2[t3.featureName] = false
-
-				return t2[t3.featureName]
+				v[data.featureName] = false
+				return v[data.featureName]
 			end)
 
-			if t2[t3.featureName] == nil then
-				t2[t3.featureName] = false
+			if v[data.featureName] == nil then
+				v[data.featureName] = false
 			end
 		end
 	else
-		t2[t3.featureName] = false
+		v[data.featureName] = false
 	end
 
-	return t2[t3.featureName]
+	return v[data.featureName]
 end

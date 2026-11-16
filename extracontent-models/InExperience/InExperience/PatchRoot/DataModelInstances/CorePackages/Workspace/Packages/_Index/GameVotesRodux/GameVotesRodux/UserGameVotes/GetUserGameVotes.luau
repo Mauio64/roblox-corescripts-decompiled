@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("GameVotesRodux").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("GameVotesRodux").Parent
+local Http = require(parent.Http)
+local Url = Http.Url
 
-return function(p1, p2) -- line: 19
-	-- upvalues: Url (copy)
-	assert(type(p2) == "string", "GetUserGameVotes request expects universeId to be a string")
+return function(callback, value)
+	assert(type(value) == "string", "GetUserGameVotes request expects universeId to be a string")
 
-	return p1(string.format("%sv1/games/%s/votes/user", Url.GAME_URL, p2), "GET")
+	return callback(string.format("%sv1/games/%s/votes/user", Url.GAME_URL, value), "GET")
 end

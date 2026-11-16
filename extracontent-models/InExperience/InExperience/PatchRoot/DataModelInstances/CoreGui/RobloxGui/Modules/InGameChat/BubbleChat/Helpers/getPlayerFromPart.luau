@@ -1,16 +1,15 @@
 local Players = game:GetService("Players")
 
-local function getPlayerFromPart(p1) -- line: 4
-	-- upvalues: Players (copy)
-	if not p1 then
+local function getPlayerFromPart(instance)
+	if not instance then
 		return nil
 	end
 
-	for _, player in pairs(Players:GetPlayers()) do
-		local Character = player.Character
+	for _, v in pairs(Players:GetPlayers()) do
+		local character = v.Character
 
-		if Character and p1:IsDescendantOf(Character) then
-			return player
+		if character and instance:IsDescendantOf(character) then
+			return v
 		end
 	end
 

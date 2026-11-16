@@ -1,44 +1,44 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local ParentParent = scriptParent.Parent.Parent
-local Set = require(scriptParentParent.Set)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent.Parent.Parent
 
-require(ParentParent.ES7Types)
+local Set = require(parent2.Set)
+require(parent3.ES7Types)
+local InstanceOf = require(parent3.InstanceOf)
 
-local InstanceOf = require(ParentParent.InstanceOf)
-
-return function(p1) -- line: 26
-	-- upvalues: InstanceOf (copy), Set (copy)
-	if p1 == nil then
+return function(value)
+	if value == nil then
 		error("cannot extract keys from a nil value")
 	end
 
-	local v7 = typeof(p1)
-	local t2 = nil
+	local typeName = typeof(value)
 
-	if v7 == "table" then
-		local t1 = {}
+	local result = nil
 
-		if InstanceOf(p1, Set) then
-			return t1
+	if typeName == "table" then
+		local result2 = {}
+
+		if InstanceOf(value, Set) then
+			return result2
 		end
 
-		for k in pairs(p1) do
-			table.insert(t1, k)
+		for k in pairs(value) do
+			table.insert(result2, k)
 		end
 
-		return t1
+		return result2
+	else
+		if typeName ~= "string" then
+			return result
+		end
+
+		local v = value:len()
+		result = table.create(v)
+
+		for i = 1, v do
+			result[i] = tostring(i)
+		end
+
+		return result
 	end
-
-	if v7 == "string" then
-		local v11 = p1:len()
-
-		t2 = table.create(v11)
-
-		for i = 1, v11 do
-			t2[i] = tostring(i)
-		end
-	end
-
-	return t2
 end

@@ -1,8 +1,9 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
 
-require(scriptParent.AppFeaturePolicies)
-require(scriptParentParent.AvatarPolicies)
-require(scriptParentParent.SocialPolicies)
+require(parent.AppFeaturePolicies)
+
+require(parent2.AvatarPolicies)
+require(parent2.SocialPolicies)
 
 return {}

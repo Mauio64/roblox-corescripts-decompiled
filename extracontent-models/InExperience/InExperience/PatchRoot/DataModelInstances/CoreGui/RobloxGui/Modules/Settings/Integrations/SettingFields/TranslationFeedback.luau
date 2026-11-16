@@ -1,24 +1,30 @@
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local CorePackages = game:GetService("CorePackages")
 local RunService = game:GetService("RunService")
 local Settings = script:FindFirstAncestor("Settings")
 local ExperienceStateCaptureService = game:GetService("ExperienceStateCaptureService")
 local SafetyService = game:GetService("SafetyService")
+
 local Constants = require(Settings.Integrations.Constants)
 local SettingsService = require(CorePackages.Workspace.Packages.SettingsService)
 local ValueChangedSignal = SettingsService.ValueChangedSignal
 local AvailabilitySignal = SettingsService.AvailabilitySignal
 local SettingEnum = SettingsService.SettingEnum
-local v12 = require(RobloxGui.Modules.TenFootInterface):IsEnabled()
+
+local TenFootInterface = require(RobloxGui.Modules.TenFootInterface)
+local isEnabled = TenFootInterface:IsEnabled()
+
 local LAYOUT_ORDER = Constants.GAMESETTINGS.LAYOUT_ORDER
 
-local function TranslationFeedbackValue() -- line: 24
-	-- upvalues: ValueChangedSignal (copy), ExperienceStateCaptureService (copy), SafetyService (copy)
-	local v18 = ValueChangedSignal.new()
+local function TranslationFeedbackValue()
+	local v = ValueChangedSignal.new()
 
-	v18:connect(function() -- line: 27
-		-- upvalues: ExperienceStateCaptureService (copy), SafetyService (copy)
-		if game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled") and not ExperienceStateCaptureService:CanEnterCaptureMode() then
+	v:connect(function()
+		if
+			game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled")
+			and not ExperienceStateCaptureService:CanEnterCaptureMode()
+		then
 			return
 		end
 
@@ -37,24 +43,26 @@ local function TranslationFeedbackValue() -- line: 24
 		end
 	end)
 
-	return v18
+	return v
 end
-local function TranslationFeedbackAvailability() -- line: 53
-	-- upvalues: AvailabilitySignal (copy), RunService (copy), v12 (copy)
-	local v19 = AvailabilitySignal.new(true)
 
-	if RunService:IsStudio() or (game:GetEngineFeature("CaptureModeEnabled") == false or v12) then
-		v19:set(false)
+local function TranslationFeedbackAvailability() -- 1 equivalent call inferred from this helper
+	local v = AvailabilitySignal.new(true)
+
+	if RunService:IsStudio() or game:GetEngineFeature("CaptureModeEnabled") == false or isEnabled then
+		v:set(false)
 	end
 
-	return v19
+	return v
 end
 
-local v16 = ValueChangedSignal.new()
+local onActivated = ValueChangedSignal.new()
 
-v16:connect(function() -- line: 27
-	-- upvalues: ExperienceStateCaptureService (copy), SafetyService (copy)
-	if game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled") and not ExperienceStateCaptureService:CanEnterCaptureMode() then
+onActivated:connect(function()
+	if
+		game:GetEngineFeature("ExperienceStateCaptureMinMemEnabled")
+		and not ExperienceStateCaptureService:CanEnterCaptureMode()
+	then
 		return
 	end
 
@@ -72,20 +80,14 @@ v16:connect(function() -- line: 27
 		ExperienceStateCaptureService:ToggleCaptureMode()
 	end
 end)
-
-local v17 = AvailabilitySignal.new(true)
-
-if RunService:IsStudio() or (game:GetEngineFeature("CaptureModeEnabled") == false or v12) then
-	v17:set(false)
-end
-
+local availability = TranslationFeedbackAvailability() -- inferred equivalent call
 return {
+	field_type = SettingEnum.TextButton,
 	id = "translation-feedback",
+	onActivated = onActivated,
 	label = "CoreScripts.InGameMenu.GameSettings.GiveTranslationFeedback",
 	text = "CoreScripts.InGameMenu.GameSettings.GiveFeedback",
-	alreadyLocalized = false,
-	field_type = SettingEnum.TextButton,
-	onActivated = v16,
 	layoutOrder = LAYOUT_ORDER.FeedbackModeButton,
-	availability = v17
+	alreadyLocalized = false,
+	availability = availability
 }

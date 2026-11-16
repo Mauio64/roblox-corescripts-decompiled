@@ -1,10 +1,13 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+require(parent2.LuauPolyfill)
 
-require(ParentParentParent.LuauPolyfill)
-require(ParentParentParent.GraphQL)
+require(parent2.GraphQL)
+
 require(script.Parent.Parent.cache)
+
 require(script.Parent.Parent.link.core)
-require(ParentParent.jsutils.typedDocumentNode)
+
+require(parent.jsutils.typedDocumentNode)
 
 return {}

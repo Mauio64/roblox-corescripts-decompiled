@@ -1,44 +1,29 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local Cryo = require(ParentParentParent.Cryo)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Types)
+local Rodux = require(parent2.Rodux)
+local Cryo = require(parent2.Cryo)
+require(parent.Types)
 
-local CapturesRetrieved = require(ParentParent.Actions.CapturesRetrieved)
-local CaptureManagerClosed = require(ParentParent.Actions.CaptureManagerClosed)
-local CaptureManagerOpened = require(ParentParent.Actions.CaptureManagerOpened)
-local UpdateSelectedCaptures = require(ParentParent.Actions.UpdateSelectedCaptures)
-local t1 = {
-	IsOpen = false,
-	SelectedCaptures = {}
-}
+local CapturesRetrieved = require(parent.Actions.CapturesRetrieved)
+local CaptureManagerClosed = require(parent.Actions.CaptureManagerClosed)
+local CaptureManagerOpened = require(parent.Actions.CaptureManagerOpened)
+local UpdateSelectedCaptures = require(parent.Actions.UpdateSelectedCaptures)
 
-return Rodux.createReducer(t1, {
-	[CaptureManagerClosed.name] = function(t2: {[any]: any}, _: {[any]: any}) -- line: 24
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t2, {
-			IsOpen = false,
+return Rodux.createReducer({ IsOpen = false, SelectedCaptures = {} }, {
+	[CaptureManagerClosed.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { IsOpen = false, SelectedCaptures = {} })
+	end,
+	[CaptureManagerOpened.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { IsOpen = true })
+	end,
+	[CapturesRetrieved.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, {
+			IsOpen = p.IsOpen and #p2.captures > 0,
 			SelectedCaptures = {}
 		})
 	end,
-	[CaptureManagerOpened.name] = function(t4: {[any]: any}, _: {[any]: any}) -- line: 31
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t4, {
-			IsOpen = true
-		})
-	end,
-	[CapturesRetrieved.name] = function(t6: {[any]: any}, p1) -- line: 37
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t6, {
-			IsOpen = t6.IsOpen and #p1.captures > 0,
-			SelectedCaptures = {}
-		})
-	end,
-	[UpdateSelectedCaptures.name] = function(t7: {[any]: any}, p2) -- line: 44
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t7, {
-			SelectedCaptures = p2.selectedCaptures
-		})
+	[UpdateSelectedCaptures.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { SelectedCaptures = p2.selectedCaptures })
 	end
 })

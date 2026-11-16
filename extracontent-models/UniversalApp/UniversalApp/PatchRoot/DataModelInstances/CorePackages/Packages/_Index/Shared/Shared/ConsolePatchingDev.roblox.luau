@@ -1,61 +1,64 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+
 local console = require(script.Parent.console)
-local n1 = 0
+
+local v = 0
 local log = nil
 local info = nil
-local warn = nil
-local error = nil
+local Warn = nil
+local err = nil
 local group = nil
 local groupCollapsed = nil
 local groupEnd = nil
 
-local function v12() -- line: 34
+local function fn() end
+
+local Roblox = {}
+Roblox.disabledLog = fn
+
+function Roblox.disableLogs()
+	if ReactGlobals.__DEV__ then
+		if v == 0 then
+			log = console.log
+			info = console.info
+			Warn = console.warn
+			err = console.error
+			group = console.group
+			groupCollapsed = console.groupCollapsed
+			groupEnd = console.groupEnd
+
+			console.info = fn
+			console.log = fn
+			console.warn = fn
+			console.error = fn
+			console.group = fn
+			console.groupCollapsed = fn
+			console.groupEnd = fn
+		end
+
+		v += 1
+	end
 end
 
-return {
-	disabledLog = v12,
-	disableLogs = function() -- line: 43
-		-- upvalues: ReactGlobals (copy), n1 (ref), log (ref), console (copy), info (ref), warn (ref), error (ref), group (ref), groupCollapsed (ref), groupEnd (ref), v12 (copy)
-		if ReactGlobals.__DEV__ then
-			if n1 == 0 then
-				log = console.log
-				info = console.info
-				warn = console.warn
-				error = console.error
-				group = console.group
-				groupCollapsed = console.groupCollapsed
-				groupEnd = console.groupEnd
-				console.info = v12
-				console.log = v12
-				console.warn = v12
-				console.error = v12
-				console.group = v12
-				console.groupCollapsed = v12
-				console.groupEnd = v12
-			end
+function Roblox.reenableLogs()
+	if ReactGlobals.__DEV__ then
+		v -= 1
 
-			n1 += 1
+		if v == 0 then
+			console.log = log
+			console.info = info
+			console.warn = Warn
+			console.error = err
+			console.group = group
+			console.groupCollapsed = groupCollapsed
+			console.groupEnd = groupEnd
 		end
-	end,
-	reenableLogs = function() -- line: 67
-		-- upvalues: ReactGlobals (copy), n1 (ref), console (copy), log (ref), info (ref), warn (ref), error (ref), group (ref), groupCollapsed (ref), groupEnd (ref)
-		if ReactGlobals.__DEV__ then
-			n1 -= 1
 
-			if n1 == 0 then
-				console.log = log
-				console.info = info
-				console.warn = warn
-				console.error = error
-				console.group = group
-				console.groupCollapsed = groupCollapsed
-				console.groupEnd = groupEnd
-			end
-
-			if n1 < 0 then
-				console.error("disabledDepth fell below zero. This is a bug in React. Please file an issue.")
-			end
+		if v < 0 then
+			console.error("disabledDepth fell below zero. This is a bug in React. Please file an issue.")
 		end
 	end
-}
+end
+
+return Roblox

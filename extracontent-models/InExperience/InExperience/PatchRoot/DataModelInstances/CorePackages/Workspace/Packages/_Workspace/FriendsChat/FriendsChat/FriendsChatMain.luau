@@ -1,212 +1,288 @@
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
-local Foundation = require(Parent.Foundation)
-local EnumScreens = require(Parent.AppChat.EnumScreens)
-local GetChatModerationStatusDataHydration = require(Parent.AppChat.GetChatModerationStatusDataHydration)
-local InExperienceAppChatModal = require(Parent.AppChat.InExperienceAppChatModal)
-local getFFlagAppChatEnableRootedNavigation = require(Parent.AppChat.getFFlagAppChatEnableRootedNavigation)
-local LocalizationProvider = require(Parent.Localization).LocalizationProvider
-local Localization = require(Parent.RobloxAppLocales).Localization
-local useChatWindowSettings = require(Parent.ExpChatIntegration.useChatWindowSettings)
-local AppTelemetryLayer = require(Parent.AppChat.AppTelemetryLayer)
-local ChatPlacementContext = require(Parent.AppChat.ChatPlacementContext)
-local ChatSessionRefCount = require(Parent.AppChat.ChatSessionRefCount)
-local useAppChatUpdateSession = require(Parent.AppChat.useAppChatUpdateSession)
-local useGetAndSetRef = require(Parent.AppChat.useGetAndSetRef)
-local SocialCommon = require(Parent.SocialCommon)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local Foundation = require(parent.Foundation)
+local EnumScreens = require(parent.AppChat.EnumScreens)
+local GetChatModerationStatusDataHydration = require(parent.AppChat.GetChatModerationStatusDataHydration)
+local InExperienceAppChatModal = require(parent.AppChat.InExperienceAppChatModal)
+local IXPNavigationUtils = require(parent.AppChat.IXPNavigationUtils)
+local getFFlagAppChatEnableRootedNavigation = require(parent.AppChat.getFFlagAppChatEnableRootedNavigation)
+
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local localization = RobloxAppLocales.Localization
+
+local useChatWindowSettings = require(parent.ExpChatIntegration.useChatWindowSettings)
+
+local AppTelemetryLayer = require(parent.AppChat.AppTelemetryLayer)
+local ChatPlacementContext = require(parent.AppChat.ChatPlacementContext)
+local ChatSessionRefCount = require(parent.AppChat.ChatSessionRefCount)
+local useAppChatUpdateSession = require(parent.AppChat.useAppChatUpdateSession)
+local useGetAndSetRef = require(parent.AppChat.useGetAndSetRef)
+local usePartyChatReactiveFeatureRestriction = require(parent.AppChat.usePartyChatReactiveFeatureRestriction)
+local SocialCommon = require(parent.SocialCommon)
+
+local FriendsChatTabName = require(script.Parent.FriendsChatTabName)
 local ConversationList = require(script.Parent.ConversationList)
 local FriendsChatConversationWindow = require(script.Parent.ConversationWindow.FriendsChatConversationWindow)
 local GetFriendsChatNavigationStore = require(script.Parent.Stores.GetFriendsChatNavigationStore)
 local GetFriendsChatRealtimeStore = require(script.Parent.Stores.GetFriendsChatRealtimeStore)
 local useFriendsChatVisibilityTelemetry = require(script.Parent.Telemetry.App.useFriendsChatVisibilityTelemetry)
-local FriendsChatLandingTelemetryProviders = require(script.Parent.Telemetry.ChatLanding.FriendsChatLandingTelemetryProviders)
-local FriendsChatConversationTelemetryProviders = require(script.Parent.Telemetry.ChatConversation.FriendsChatConversationTelemetryProviders)
-local ExpChatPerfTracker = require(Parent.ChatUIPrimitives).Telemetry.ExpChatPerfTracker
-local FFlagExpChatEnableFriendsTab = require(Parent.SharedFlags).FFlagExpChatEnableFriendsTab
 
-local function FriendsChatMainContent(t1: {[any]: any}) -- line: 59
-	-- upvalues: useFriendsChatVisibilityTelemetry (copy), useChatWindowSettings (copy), React (copy), GetChatModerationStatusDataHydration (copy), GetFriendsChatNavigationStore (copy), GetFriendsChatRealtimeStore (copy), FFlagExpChatEnableFriendsTab (copy), ExpChatPerfTracker (copy), SignalsReact (copy), Players (copy), Localization (copy), LocalizationService (copy), ChatSessionRefCount (copy), InExperienceAppChatModal (copy), EnumScreens (copy), SocialCommon (copy), FriendsChatLandingTelemetryProviders (copy), ConversationList (copy), FriendsChatConversationTelemetryProviders (copy), FriendsChatConversationWindow (copy), getFFlagAppChatEnableRootedNavigation (copy), LocalizationProvider (copy), Foundation (copy)
+local FriendsChatLandingTelemetryProviders = require(script.Parent.Telemetry.ChatLanding.FriendsChatLandingTelemetryProviders)
+
+local FriendsChatConversationTelemetryProviders = require(script.Parent.Telemetry.ChatConversation.FriendsChatConversationTelemetryProviders)
+
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+local ExpChatPerfTracker = ChatUIPrimitives.Telemetry.ExpChatPerfTracker
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local FFlagFriendsChatConversationListFocusNav = SharedFlags.FFlagFriendsChatConversationListFocusNav
+
+local FFlagFriendsChatFocusInputOnConversationActivated = require(script.Parent.Flags.FFlagFriendsChatFocusInputOnConversationActivated)
+local FFlagFriendsChatIxpScreenExposure = require(script.Parent.Flags.FFlagFriendsChatIxpScreenExposure)
+local FStringFriendsChatLandingPageIxpLayer = require(script.Parent.Flags.FStringFriendsChatLandingPageIxpLayer)
+
+local FStringFriendsChatConversationPageIxpLayer = require(script.Parent.Flags.FStringFriendsChatConversationPageIxpLayer)
+
+local exposureHandler = IXPNavigationUtils.createExposureHandler(FStringFriendsChatLandingPageIxpLayer)
+local exposureHandler2 = IXPNavigationUtils.createExposureHandler(FStringFriendsChatConversationPageIxpLayer)
+
+local function FriendsChatMainContent(props)
 	useFriendsChatVisibilityTelemetry()
 
-	local v33 = useChatWindowSettings()
-	local v34 = React.useMemo(function() -- line: 63
-		-- upvalues: v33 (copy)
+	local v = useChatWindowSettings()
+	local v2 = React.useMemo(function()
 		return {
-			BackgroundColor3 = v33.ChatWindowBackgroundColor3,
-			BackgroundTransparency = v33.ChatWindowBackgroundTransparency
+			BackgroundColor3 = v.ChatWindowBackgroundColor3,
+			BackgroundTransparency = v.ChatWindowBackgroundTransparency
 		}
-	end, { v33 })
-	local v35 = GetChatModerationStatusDataHydration(false)
-	local v36 = GetFriendsChatNavigationStore(false)
-	local v37 = GetFriendsChatRealtimeStore(false)
+	end, { v })
 
-	React.useEffect(function() -- line: 79
-		-- upvalues: v37 (copy)
-		v37.markFriendsTabEntered()
-	end, { v37 })
-	React.useEffect(function() -- line: 82
-		-- upvalues: FFlagExpChatEnableFriendsTab (copy), v35 (copy)
-		if FFlagExpChatEnableFriendsTab then
-			v35.getUserStatus()
+	local chatModerationStatusDataHydration = GetChatModerationStatusDataHydration(false)
+	local friendsChatNavigationStore = GetFriendsChatNavigationStore(false)
+	local friendsChatRealtimeStore = GetFriendsChatRealtimeStore(false)
+	local v3
+
+	if FFlagFriendsChatConversationListFocusNav then
+		v3 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+	else
+		v3 = nil
+	end
+
+	if FFlagAppChatReactiveFeatureRestrictions then
+		usePartyChatReactiveFeatureRestriction(true)
+	end
+
+	React.useEffect(function()
+		friendsChatRealtimeStore.markFriendsTabEntered()
+	end, { friendsChatRealtimeStore })
+	React.useEffect(function()
+		if FFlagExpChatEnableFriendsTab and not FFlagAppChatReactiveFeatureRestrictions then
+			chatModerationStatusDataHydration.getUserStatus()
 		end
-	end, { v35 })
-	React.useEffect(function() -- line: 89
-		-- upvalues: ExpChatPerfTracker (copy)
-		ExpChatPerfTracker.finish(ExpChatPerfTracker.Events.ChatWindowMountTTI, {}, {
-			tabName = "FriendsChat"
-		})
+	end, { chatModerationStatusDataHydration })
 
-		return function() -- line: 91
-			-- upvalues: ExpChatPerfTracker (copy)
+	React.useEffect(function()
+		ExpChatPerfTracker.finish(ExpChatPerfTracker.Events.ChatWindowMountTTI, {}, {
+			tabName = FriendsChatTabName
+		})
+		return function()
 			ExpChatPerfTracker.cancelAll()
 		end
 	end, {})
-	React.useEffect(function() -- line: 95
-		-- upvalues: ExpChatPerfTracker (copy)
+	React.useEffect(function()
 		ExpChatPerfTracker.finish(ExpChatPerfTracker.Events.ChatWindowTabSwitchTTI, {
-			tabId = "FriendsChat"
+			tabId = FriendsChatTabName
 		}, {
-			tabName = "FriendsChat"
+			tabName = FriendsChatTabName
 		})
 	end, {})
 
-	local v38 = SignalsReact.useSignalState(v36.getSelectedConversationId)
-	local v39 = t1.chatWindowSettings or v34
-	local v40 = t1.parentLayoutOrder or 1
-	local LocalPlayer = Players.LocalPlayer
-	local v42 = if not LocalPlayer then nil else tostring(LocalPlayer.UserId)
-	local v43 = React.useMemo(function() -- line: 106
-		-- upvalues: Localization (copy), LocalizationService (copy)
-		return Localization.new(LocalizationService.RobloxLocaleId)
+	local conversationId = SignalsReact.useSignalState(friendsChatNavigationStore.getEffectiveConversationId)
+
+	if FFlagFriendsChatIxpScreenExposure then
+		local current = conversationId ~= nil
+		local ref = React.useRef(nil)
+
+		if ref.current ~= current then
+			ref.current = current
+			local v4
+
+			if current then
+				v4 = exposureHandler2
+			else
+				v4 = exposureHandler
+			end
+
+			pcall(v4)
+		end
+	end
+
+	local chatWindowSettings = props.chatWindowSettings or v2
+	local parentLayoutOrder = props.parentLayoutOrder or 1
+	local localPlayer = Players.LocalPlayer
+	local userId
+
+	if localPlayer then
+		userId = tostring(localPlayer.UserId)
+	end
+
+	local localization2 = React.useMemo(function()
+		return localization.new(LocalizationService.RobloxLocaleId)
 	end, {})
 
-	React.useEffect(function() -- line: 110
-		-- upvalues: v37 (copy), v38 (copy)
-		v37.setActiveConversationId(v38)
-
-		return function() -- line: 112
-			-- upvalues: v37 (copy)
-			v37.setActiveConversationId(nil)
+	React.useEffect(function()
+		friendsChatRealtimeStore.setActiveConversationId(conversationId)
+		return function()
+			friendsChatRealtimeStore.setActiveConversationId(nil)
 		end
-	end, {
-		v37,
-		v38
-	})
+	end, { friendsChatRealtimeStore, conversationId })
+	local v4
 
-	local v44 = React.useCallback(function(s1: string) -- line: 117
-		-- upvalues: v36 (copy)
-		v36.setSelectedConversationId(s1)
-	end, { v36 })
-	local v45 = React.useCallback(function() -- line: 121
-		-- upvalues: v36 (copy)
-		v36.setSelectedConversationId(nil)
-	end, { v36 })
-	local v46 = React.useCallback(function(s2: string) -- line: 125
-		-- upvalues: ChatSessionRefCount (copy), InExperienceAppChatModal (copy), EnumScreens (copy), SocialCommon (copy)
+	if FFlagFriendsChatConversationListFocusNav then
+		v4 = React.useCallback(function(): boolean
+			return v3 ~= nil and v3.focusedGuiObject:getValue() ~= nil
+		end, { v3 })
+	else
+		v4 = nil
+	end
+
+	local onConversationActivated = React.useCallback(function(p: string)
+		if FFlagFriendsChatConversationListFocusNav and v4() or FFlagFriendsChatFocusInputOnConversationActivated then
+			friendsChatNavigationStore.requestFocusInputBar()
+		end
+
+		friendsChatNavigationStore.setSelectedConversationId(p)
+	end, { friendsChatNavigationStore, v4 })
+
+	local onBack = React.useCallback(function()
+		if FFlagFriendsChatConversationListFocusNav and v4() then
+			friendsChatNavigationStore.requestFocusConversationList()
+		end
+
+		friendsChatNavigationStore.setSelectedConversationId(nil)
+	end, { friendsChatNavigationStore, v4 })
+
+	local onOpenDetails = React.useCallback(function(conversationId2: string)
 		ChatSessionRefCount.reserve()
 		InExperienceAppChatModal.default:openToScreen({
 			screen = EnumScreens.ChatDetails,
 			params = {
+				conversationId = conversationId2,
 				rooted = true,
-				conversationId = s2,
 				entryPoint = SocialCommon.Enums.ChatEntryPointNames.ExperienceChatTabBar
 			}
 		})
 	end, {})
-	local v47 = React.useCallback(function(s3: string) -- line: 137
-		-- upvalues: v36 (copy)
-		v36.setSelectedConversationId(s3)
-	end, { v36 })
-	local v48 = if v38 ~= nil then React.createElement(FriendsChatConversationTelemetryProviders, {
-		conversationId = v38
-	}, {
-		ConversationWindow = React.createElement(FriendsChatConversationWindow, {
-			conversationId = v38,
-			parentLayoutOrder = v40,
-			chatWindowSettings = v39,
-			transparencyValue = t1.transparencyValue,
-			textTransparency = t1.textTransparency,
-			isSpatialUIEnabled = t1.isSpatialUIEnabled,
-			isChannelBarVisible = t1.isChannelBarVisible,
-			onHovered = t1.onHovered,
-			onUnhovered = t1.onUnhovered,
-			onAbsoluteSizeChanged = t1.onAbsoluteSizeChanged,
-			onAbsolutePositionChanged = t1.onAbsolutePositionChanged,
-			onBack = v45,
-			onOpenDetails = if not getFFlagAppChatEnableRootedNavigation() then nil else v46,
-			onFriendPlaceholderConversationCreated = v47
-		})
-	}) else React.createElement(FriendsChatLandingTelemetryProviders, nil, {
-		ConversationList = React.createElement(ConversationList, {
-			LayoutOrder = v40,
-			chatWindowSettings = v39,
-			transparencyValue = t1.transparencyValue,
-			textTransparency = t1.textTransparency,
-			isSpatialUIEnabled = t1.isSpatialUIEnabled,
-			onHovered = t1.onHovered,
-			onUnhovered = t1.onUnhovered,
-			onAbsoluteSizeChanged = t1.onAbsoluteSizeChanged,
-			onAbsolutePositionChanged = t1.onAbsolutePositionChanged,
-			onConversationActivated = v44,
-			localUserId = v42
-		})
-	})
 
-	return React.createElement(LocalizationProvider, {
-		localization = v43
-	}, {
-		Content = React.createElement(Foundation.FoundationProvider, {
-			theme = Foundation.Enums.Theme.Dark
+	local onFriendPlaceholderConversationCreated = React.useCallback(function(p: string)
+		friendsChatNavigationStore.setSelectedConversationId(p)
+	end, { friendsChatNavigationStore })
+	local content
+
+	if conversationId == nil then
+		content = React.createElement(FriendsChatLandingTelemetryProviders, nil, {
+			ConversationList = React.createElement(ConversationList, {
+				LayoutOrder = parentLayoutOrder,
+				chatWindowSettings = chatWindowSettings,
+				transparencyValue = props.transparencyValue,
+				textTransparency = props.textTransparency,
+				isSpatialUIEnabled = props.isSpatialUIEnabled,
+				onHovered = props.onHovered,
+				onUnhovered = props.onUnhovered,
+				onAbsoluteSizeChanged = props.onAbsoluteSizeChanged,
+				onAbsolutePositionChanged = props.onAbsolutePositionChanged,
+				onConversationActivated = onConversationActivated,
+				localUserId = userId
+			})
+		})
+	else
+		local createElement = React.createElement
+
+		local createElement2 = React.createElement
+		local v5 = {
+			conversationId = conversationId,
+			parentLayoutOrder = parentLayoutOrder,
+			chatWindowSettings = chatWindowSettings,
+			transparencyValue = props.transparencyValue,
+			textTransparency = props.textTransparency,
+			isSpatialUIEnabled = props.isSpatialUIEnabled,
+			isChannelBarVisible = props.isChannelBarVisible,
+			onHovered = props.onHovered,
+			onUnhovered = props.onUnhovered,
+			onAbsoluteSizeChanged = props.onAbsoluteSizeChanged,
+			onAbsolutePositionChanged = props.onAbsolutePositionChanged,
+			onBack = onBack,
+			onOpenDetails = 0,
+			onFriendPlaceholderConversationCreated = 0
+		}
+
+		if not getFFlagAppChatEnableRootedNavigation() then
+			onOpenDetails = nil
+		end
+
+		v5.onOpenDetails = onOpenDetails
+		v5.onFriendPlaceholderConversationCreated = onFriendPlaceholderConversationCreated
+		content = createElement(FriendsChatConversationTelemetryProviders, {
+			conversationId = conversationId
 		}, {
-			Content = v48
+			ConversationWindow = createElement2(FriendsChatConversationWindow, v5)
+		})
+	end
+
+	return React.createElement(LocalizationProvider, { localization = localization2 }, {
+		Content = React.createElement(Foundation.FoundationProvider, {
+			colorMode = Foundation.Enums.ColorMode.Dark
+		}, {
+			Content = content
 		})
 	})
 end
-local function FriendsChatMain(t2: {[any]: any}) -- line: 192
-	-- upvalues: Players (copy), LocalizationService (copy), RbxAnalyticsService (copy), useAppChatUpdateSession (copy), React (copy), FFlagExpChatEnableFriendsTab (copy), ChatPlacementContext (copy), SocialCommon (copy), useGetAndSetRef (copy), AppTelemetryLayer (copy), FriendsChatMainContent (copy)
-	local LocalPlayer = Players.LocalPlayer
-	local v51 = not LocalPlayer and "unknown" or tostring(LocalPlayer.UserId)
-	local RobloxLocaleId = LocalizationService.RobloxLocaleId
-	local PlaySessionId = RbxAnalyticsService:GetPlaySessionId()
+
+local function FriendsChatMain(p)
+	local localPlayer = Players.LocalPlayer
+	local userId = not localPlayer and "unknown" or tostring(localPlayer.UserId)
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
+	local playSessionId = RbxAnalyticsService:GetPlaySessionId()
 
 	useAppChatUpdateSession()
 
-	local v54 = React.useMemo(function() -- line: 200
-		-- upvalues: FFlagExpChatEnableFriendsTab (copy), ChatPlacementContext (copy), RobloxLocaleId (copy), SocialCommon (copy), v51 (copy), PlaySessionId (copy)
-		local v60 = if not FFlagExpChatEnableFriendsTab then ChatPlacementContext.Enum.InExperienceDefault else ChatPlacementContext.Enum.InExperienceFriendsTab
+	local v = React.useMemo(function()
+		local placement
+
+		if FFlagExpChatEnableFriendsTab then
+			placement = ChatPlacementContext.Enum.InExperienceFriendsTab
+		else
+			placement = ChatPlacementContext.Enum.InExperienceDefault
+		end
 
 		return {
 			context = "platformChat",
-			currentSquadId = nil,
-			locale = RobloxLocaleId,
+			locale = robloxLocaleId,
 			entryPoint = SocialCommon.Enums.ChatEntryPointNames.ExperienceChatTabBar,
-			userId = v51,
-			placement = v60,
-			playSessionId = PlaySessionId
+			userId = userId,
+			placement = placement,
+			playSessionId = playSessionId,
+			currentSquadId = nil
 		}
-	end, {
-		RobloxLocaleId,
-		v51,
-		PlaySessionId
-	})
-	local v55, v56 = useGetAndSetRef(v54)
+	end, { robloxLocaleId, userId, playSessionId })
 
-	React.useEffect(function() -- line: 217
-		-- upvalues: v56 (copy), v54 (copy)
-		v56(v54)
-	end, {
-		v54,
-		v56
-	})
+	local v2, v3 = useGetAndSetRef(v)
+	React.useEffect(function()
+		v3(v)
+	end, { v, v3 })
 
-	return React.createElement(AppTelemetryLayer.Provider, {
-		value = v55
-	}, {
-		Content = React.createElement(FriendsChatMainContent, t2)
+	return React.createElement(AppTelemetryLayer.Provider, { value = v2 }, {
+		Content = React.createElement(FriendsChatMainContent, p)
 	})
 end
 

@@ -1,7 +1,6 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.types)
 
-require(ParentParent.types)
-
-return function(p1) -- line: 7
-	return (table.freeze(p1))
+return function(list)
+	return (table.freeze(list))
 end

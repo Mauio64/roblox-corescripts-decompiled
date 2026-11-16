@@ -1,5 +1,4 @@
 game:GetService("RunService")
-
 local GuiService = game:GetService("GuiService")
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
@@ -7,196 +6,150 @@ local RobloxGui = CoreGui.RobloxGui
 local NotificationService = game:GetService("NotificationService")
 local HttpService = game:GetService("HttpService")
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
-local ErrorPrompt = require(RobloxGui.Modules.ErrorPrompt)
-local Url = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Url
 
-local function leaveGame() -- line: 18
-	-- upvalues: GuiService (copy)
+local ErrorPrompt = require(RobloxGui.Modules.ErrorPrompt)
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local Url = CoreScriptsCommon.Url
+
+local function leaveGame() -- 2 equivalent calls inferred from this helper
 	GuiService.SelectedCoreObject = nil
 	game:Shutdown()
 end
 
-local t1 = {
-	Warning = 1,
-	Lockout = 2
-}
+local v = { Warning = 1, Lockout = 2 }
 
-local function parseResponse(p1) -- line: 28
-	local type = p1.response.state.type
-	local messages = p1.response.state.messages
-
-	return {
-		State = type,
-		Messages = messages
-	}
-end
-local function markRead(p2) -- line: 37
-	-- upvalues: Url (copy), HttpRbxApiService (copy)
-	local v31 = "mesasgeId=" .. p2
-	local v32 = Url.RCS_URL .. "screen-time-api/v1/messages/mark-read" .. "?" .. v31
-	local _, _ = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v32)
+local function parseResponse(p) -- 2 equivalent calls inferred from this helper
+	return { State = p.response.state.type, Messages = p.response.state.messages }
 end
 
-local t3 = {
-	displaying = nil,
-	displayMessageCallback = nil,
+local function markRead(id) -- 1 equivalent call inferred from this helper
+	local v2 = "mesasgeId=" .. id
+	local v3 = Url.RCS_URL .. "screen-time-api/v1/messages/mark-read" .. "?" .. v2
+	local _, _ = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v3)
+end
+
+local v2 = {
 	pendingResolveMessage = {},
+	displaying = nil,
 	resolvedMessage = {},
-	update = function(p3, p4) -- line: 57
-		for _, v in pairs(p4) do
-			local t2 = {
-				id = v.id,
-				message = v.text
-			}
+	displayMessageCallback = nil,
+	update = function(self, items)
+		for _, item in pairs(items) do
+			local v2 = { id = item.id, message = item.text }
 
-			table.insert(p3.pendingResolveMessage, t2)
+			table.insert(self.pendingResolveMessage, v2)
 		end
 
-		p3:processNext()
+		self:processNext()
 	end,
-	processNext = function(p5) -- line: 68
-		-- upvalues: Url (copy), HttpRbxApiService (copy)
-		if p5.displaying then
+	processNext = function(self)
+		if self.displaying then
 			return
 		end
 
-		local v41 = table.remove(p5.pendingResolveMessage, 1)
+		local displaying = table.remove(self.pendingResolveMessage, 1)
 
-		if not v41 then
+		if not displaying then
 			return
 		end
 
-		if p5.resolvedMessage[v41.id] then
-			p5:processNext()
-
+		if self.resolvedMessage[displaying.id] then
+			self:processNext()
 			return
 		end
 
-		p5.displaying = v41
+		self.displaying = displaying
 
-		if p5.displayMessageCallback then
-			p5.displayMessageCallback(v41.message)
+		if self.displayMessageCallback then
+			self.displayMessageCallback(displaying.message)
 		end
 
-		spawn(function() -- line: 88
-			-- upvalues: v41 (copy), Url (copy), HttpRbxApiService (copy)
-			local v55 = "mesasgeId=" .. v41.id
-			local v56 = Url.RCS_URL .. "screen-time-api/v1/messages/mark-read" .. "?" .. v55
-			local _, _ = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v56)
+		spawn(function()
+			markRead(displaying.id) -- inferred equivalent call
 		end)
 	end,
-	resolve = function(p6) -- line: 94
-		p6.resolvedMessage[p6.displaying.id] = p6.displaying.message
-		p6.displaying = nil
-		p6:processNext()
+	resolve = function(self)
+		self.resolvedMessage[self.displaying.id] = self.displaying.message
+		self.displaying = nil
+		self:processNext()
 	end
 }
-local t4 = {
+
+local default = ErrorPrompt.new("Default", {
 	MessageTextScaled = true,
 	HideErrorCode = true,
 	MenuIsOpenKey = "AnitAddictionPrompt"
-}
-local v16 = ErrorPrompt.new("Default", t4)
+})
+default:setParent(RobloxGui)
 
-v16:setParent(RobloxGui)
-
-local function displayMessage(p7) -- line: 110
-	-- upvalues: v16 (copy)
-	v16:_open(p7)
-end
-local function resolveMessage() -- line: 114
-	-- upvalues: v16 (copy), t3 (copy)
-	v16:_close()
-	t3:resolve()
+local function displayMessage(p)
+	default:_open(p)
 end
 
-local t5 = {{
-	Text = "OK",
-	LocalizationKey = "InGame.CommonUI.Button.Ok",
-	LayoutOrder = 1,
-	Primary = true,
-	Callback = resolveMessage
-}}
+local function resolveMessage()
+	default:_close()
+	v2:resolve()
+end
 
-t3.displayMessageCallback = displayMessage
-v16:updateButtons(t5)
-v16:setErrorTitle("Warning", "InGame.CommonUI.Title.Warning")
+v2.displayMessageCallback = displayMessage
+default:updateButtons({
+	{
+		Text = "OK",
+		LocalizationKey = "InGame.CommonUI.Button.Ok",
+		LayoutOrder = 1,
+		Callback = resolveMessage,
+		Primary = true
+	}
+})
+default:setErrorTitle("Warning", "InGame.CommonUI.Title.Warning")
 
-local AbsoluteSizeX = RobloxGui.AbsoluteSize.X
-local AbsoluteSizeY = RobloxGui.AbsoluteSize.Y
+local v3 = RobloxGui.AbsoluteSize.X
+local v4 = RobloxGui.AbsoluteSize.Y
 
-local function onScreenSizeChanged() -- line: 136
-	-- upvalues: v16 (copy), RobloxGui (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref)
-	if not v16 then
+local function onScreenSizeChanged() -- 1 equivalent call inferred from this helper
+	if not default then
 		return
 	end
 
-	local AbsoluteSizeX2 = RobloxGui.AbsoluteSize.X
-	local AbsoluteSizeY2 = RobloxGui.AbsoluteSize.Y
+	local x = RobloxGui.AbsoluteSize.X
+	local y = RobloxGui.AbsoluteSize.Y
 
-	if AbsoluteSizeX2 ~= AbsoluteSizeX or AbsoluteSizeY2 ~= AbsoluteSizeY then
-		AbsoluteSizeX = AbsoluteSizeX2
-		AbsoluteSizeY = AbsoluteSizeY2
-		v16:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+	if v3 ~= x or v4 ~= y then
+		v3 = x
+		v4 = y
+		default:resizeWidthAndHeight(v3, v4)
 	end
 end
 
 RobloxGui:GetPropertyChangedSignal("AbsoluteSize"):connect(onScreenSizeChanged)
+onScreenSizeChanged() -- inferred equivalent call
+local robloxEventReceivedConnection = nil
+local function antiAddictionStatesUpdated(p)
+	local response = parseResponse(p) -- inferred equivalent call
 
-if v16 then
-	local AbsoluteSizeX3 = RobloxGui.AbsoluteSize.X
-	local AbsoluteSizeY3 = RobloxGui.AbsoluteSize.Y
-
-	if AbsoluteSizeX3 ~= AbsoluteSizeX or AbsoluteSizeY3 ~= AbsoluteSizeY then
-		AbsoluteSizeX = AbsoluteSizeX3
-		AbsoluteSizeY = AbsoluteSizeY3
-		v16:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
-	end
-end
-
-local connection = nil
-
-local function antiAddictionStatesUpdated(p8) -- line: 154
-	-- upvalues: connection (ref), GuiService (copy), t3 (copy)
-	local type = p8.response.state.type
-	local messages = p8.response.state.messages
-	local t6 = {
-		State = type,
-		Messages = messages
-	}
-
-	if t6.State == 2 then
-		if connection then
-			connection:Disconnect()
+	if response.State == 2 then
+		if robloxEventReceivedConnection then
+			robloxEventReceivedConnection:Disconnect()
 		end
 
-		GuiService.SelectedCoreObject = nil
-		game:Shutdown()
+		leaveGame() -- inferred equivalent call
 	end
 
-	t3:update(t6.Messages)
+	v2:update(response.Messages)
 end
 
-connection = NotificationService.RobloxEventReceived:Connect(function(p9) -- line: 168
-	-- upvalues: HttpService (copy), t1 (copy), connection (ref), GuiService (copy), t3 (copy)
-	if p9.namespace == "AntiAddictionNotifications" then
-		local data = HttpService:JSONDecode(p9.detail)
-		local type = data.response.state.type
-		local messages = data.response.state.messages
-		local t7 = {
-			State = type,
-			Messages = messages
-		}
+robloxEventReceivedConnection = NotificationService.RobloxEventReceived:Connect(function(p)
+	if p.namespace == "AntiAddictionNotifications" then
+		local response = parseResponse(HttpService:JSONDecode(p.detail)) -- inferred equivalent call
 
-		if t7.State == t1.Lockout then
-			if connection then
-				connection:Disconnect()
+		if response.State == v.Lockout then
+			if robloxEventReceivedConnection then
+				robloxEventReceivedConnection:Disconnect()
 			end
 
-			GuiService.SelectedCoreObject = nil
-			game:Shutdown()
+			leaveGame() -- inferred equivalent call
 		end
 
-		t3:update(t7.Messages)
+		v2:update(response.Messages)
 	end
 end)

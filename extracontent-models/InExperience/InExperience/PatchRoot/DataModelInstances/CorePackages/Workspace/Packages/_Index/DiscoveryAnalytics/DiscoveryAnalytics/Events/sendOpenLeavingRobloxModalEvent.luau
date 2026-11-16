@@ -1,36 +1,35 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("OpenLeavingRobloxModalThrottleHundrethsPercent", 0)
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local defineFastInt = game:DefineFastInt("OpenLeavingRobloxModalThrottleHundrethsPercent", 0)
+
+local strictInterface = t.strictInterface({
 	assignment_id = t.number,
 	assignment_type = t.string,
 	social_link_type = t.string,
 	social_link_display_type = t.string
 })
-local t1 = {
+
+local v = {
 	eventName = "openLeavingRobloxModal",
-	description = "Event fired when a prompt is opened to confirm that the user wants to leave roblox",
 	backends = { "EventIngest" },
-	throttlingPercentage = v5,
-	lastUpdated = {
-		25,
-		12,
-		9
-	}
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 25, 12, 9 },
+	description = "Event fired when a prompt is opened to confirm that the user wants to leave roblox"
 }
 
-return function(p1) -- line: 27
-	-- upvalues: v6 (copy), DiscoveryEventErrorLogger (copy), TelemetryService (copy), t1 (copy)
-	local v9, v10 = v6(p1)
+return function(customFields)
+	local v2, v3 = strictInterface(customFields)
 
-	if not v9 then
-		DiscoveryEventErrorLogger.reportError("OpenLeavingRobloxModalInterface", v10)
+	if not v2 then
+		DiscoveryEventErrorLogger.reportError("OpenLeavingRobloxModalInterface", v3)
 	end
 
-	TelemetryService:LogEvent(t1, {
+	TelemetryService:LogEvent(v, {
 		standardizedFields = { "addSessionInfo" },
-		customFields = p1
+		customFields = customFields
 	})
 end

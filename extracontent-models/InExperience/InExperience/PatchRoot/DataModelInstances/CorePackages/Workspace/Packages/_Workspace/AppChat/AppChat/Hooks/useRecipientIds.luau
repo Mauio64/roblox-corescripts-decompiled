@@ -1,20 +1,22 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function(p1) -- line: 6
-	-- upvalues: useSelector (copy)
-	local v4 = useSelector(function(p2) -- line: 7
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+return function(p)
+	local v = useSelector(function(p2)
 		return (tonumber(p2.LocalUserId))
 	end)
-	local t1 = {}
 
-	for _, v7 in p1 and p1.participants or {} do
-		local num = tonumber(v7)
+	local result = {}
 
-		if num and num ~= v4 then
-			table.insert(t1, num)
+	for _, v2 in p and p.participants or {} do
+		local v3 = tonumber(v2)
+
+		if v3 and v3 ~= v then
+			table.insert(result, v3)
 		end
 	end
 
-	return t1
+	return result
 end

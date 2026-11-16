@@ -1,10 +1,14 @@
-local Parent = script:FindFirstAncestor("ApolloLocalState").Parent
-local gql = require(Parent.ApolloClient).gql
-local v3 = gql(require(script.Parent.schema.UserProfilesAllNamesByUserIdsNew))
-local v4 = gql(require(script.Parent.schema.UserProfilesAllNamesByUserIds))
+local parent = script:FindFirstAncestor("ApolloLocalState").Parent
+
+local ApolloClient = require(parent.ApolloClient)
+local gql = ApolloClient.gql
+
+local v = gql(require(script.Parent.schema.UserProfilesAllNamesByUserIdsNew))
+
+local v2 = gql(require(script.Parent.schema.UserProfilesAllNamesByUserIds))
 
 if game:GetEngineFeature("PlatformFriendsService") and game:GetEngineFeature("PlatformFriendsProfile") then
-	return v3
+	return v
 end
 
-return v4
+return v2

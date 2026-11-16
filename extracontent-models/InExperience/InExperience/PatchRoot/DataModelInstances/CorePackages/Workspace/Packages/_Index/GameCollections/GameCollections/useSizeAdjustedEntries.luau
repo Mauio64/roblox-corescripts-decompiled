@@ -1,39 +1,33 @@
-local Parent = script:FindFirstAncestor("GameCollections").Parent
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GameCollections").Parent
 
-return function(t1: {[any]: any}, n1: number?, n2: number?) -- line: 7
-	-- upvalues: React (copy), Cryo (copy)
-	return React.useMemo(function() -- line: 8
-		-- upvalues: t1 (copy), Cryo (copy), n1 (copy), n2 (copy)
-		local t2 = {}
-		local v8 = false
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 
-		for _, v10 in t1 do
-			local spanOverride = v10.spanOverride
+return function(items, value: number?, value2: number?)
+	return React.useMemo(function()
+		local result = {}
+		local flag = false
 
-			if not spanOverride then
-				table.insert(t2, v10)
-			else
-				v8 = true
+		for _, item in items do
+			local spanOverride = item.spanOverride
 
-				local v12 = spanOverride.colSpan or 1
-				local v13 = spanOverride.rowSpan or 1
-
-				table.insert(t2, Cryo.Dictionary.join(v10, {
-					sizeOverride = UDim2.new(v12, (n1 or 0) * (v12 - 1), v13, (n2 or 0) * (v13 - 1))
+			if spanOverride then
+				local colSpan = spanOverride.colSpan or 1
+				local rowSpan = spanOverride.rowSpan or 1
+				table.insert(result, Cryo.Dictionary.join(item, {
+					sizeOverride = UDim2.new(
+						colSpan,
+						(value or 0) * (colSpan - 1),
+						rowSpan,
+						(value2 or 0) * (rowSpan - 1)
+					)
 				}))
+				flag = true
+			else
+				table.insert(result, item)
 			end
 		end
 
-		if not v8 then
-			return t1
-		end
-
-		return t2
-	end, {
-		t1,
-		n1,
-		n2
-	})
+		return if flag then result else items
+	end, { items, value, value2 })
 end

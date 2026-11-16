@@ -1,34 +1,32 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local useOverlay = require(Parent.Foundation).Hooks.useOverlay
-local useFocusGuiObject = require(Parent.ReactFocusNavigation).useFocusGuiObject
-local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useOverlay = Foundation.Hooks.useOverlay
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local useFocusNavigableSurfaceRegistryConnection = FocusNavigationUtils.useFocusNavigableSurfaceRegistryConnection
-local wasLastInputGamepad = require(Parent.RoactUtils).wasLastInputGamepad
+local RoactUtils = require(parent.RoactUtils)
+local wasLastInputGamepad = RoactUtils.wasLastInputGamepad
 
-return function(p1) -- line: 14
-	-- upvalues: useOverlay (copy), useFocusNavigableSurfaceRegistryConnection (copy), FocusNavigableSurfaceIdentifierEnum (copy), useFocusGuiObject (copy), wasLastInputGamepad (copy), React (copy)
-	local v10 = useOverlay()
+return function(p)
+	local v = useOverlay()
 
-	useFocusNavigableSurfaceRegistryConnection(p1.current, FocusNavigableSurfaceIdentifierEnum.CentralOverlay)
+	useFocusNavigableSurfaceRegistryConnection(p.current, FocusNavigableSurfaceIdentifierEnum.CentralOverlay)
 
-	local v11 = useFocusGuiObject()
-	local v12 = wasLastInputGamepad()
+	local v2 = useFocusGuiObject()
+	local v3 = wasLastInputGamepad()
 
-	React.useEffect(function() -- line: 22
-		-- upvalues: p1 (copy), v10 (copy), v12 (copy), v11 (copy)
-		if p1.current and (v10 == nil and v12) then
-			task.delay(0.1, function() -- line: 24
-				-- upvalues: v11 (copy), p1 (copy)
-				v11(p1.current)
+	React.useEffect(function()
+		if p.current and v == nil and v3 then
+			task.delay(0.1, function()
+				v2(p.current)
 			end)
 		end
-	end, {
-		v11,
-		v10,
-		v12
-	})
+	end, { v2, v, v3 })
 
-	return v10
+	return v
 end

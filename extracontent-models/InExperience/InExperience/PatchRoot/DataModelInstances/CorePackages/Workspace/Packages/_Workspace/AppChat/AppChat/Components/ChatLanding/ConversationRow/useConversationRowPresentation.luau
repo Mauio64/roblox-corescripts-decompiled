@@ -1,176 +1,213 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local ReactFocusNavigation = require(AppChatParent.ReactFocusNavigation)
-local Signals = require(AppChatParent.Signals)
-local SignalsReact = require(AppChatParent.SignalsReact)
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
 local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+local ThemeBackground = require(parent.ThemeBackground)
+local useThemeBackground = ThemeBackground.useThemeBackground
+local FFlagAppThemeHalloween2026ChatBackground = require(AppChat.Flags.FFlagAppThemeHalloween2026ChatBackground)
 local useRelativeTimestampBinding = require(AppChat.Hooks.useRelativeTimestampBinding)
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local ChatLandingTelemetryLayer = require(AppChat.Telemetry.Layers.ChatLandingTelemetryLayer)
 local GetConversationStore = require(AppChat.Stores.GetConversationStore)
 local GetConversationViewModelStore = require(AppChat.Stores.GetConversationViewModelStore)
-local FFlagEnableBlackbirdCheck = require(AppChatParent.SharedFlags).FFlagEnableBlackbirdCheck
-local useIsRobloxSubscriber = require(AppChatParent.UserProfiles).Hooks.useIsRobloxSubscriber
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAppChatUseActivationOnFocus = SharedFlags2.FFlagAppChatUseActivationOnFocus
+local conversationFocusActivationDelaySeconds = require(AppChat.Flags.conversationFocusActivationDelaySeconds)
+local UserProfiles = require(parent.UserProfiles)
+local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
+
 local useGetOneToOneFriendIdFromConversationId = require(AppChat.Hooks.useGetOneToOneFriendIdFromConversationId)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local useActivationOnFocus = FocusNavigationUtils.useActivationOnFocus
 local useConversationRowActivation = require(script.Parent.useConversationRowActivation)
 local normalizeConversationForTelemetry = require(script.Parent.normalizeConversationForTelemetry)
 
-local function isShowingSquadButton(b1: boolean, b2: boolean, b3: boolean?) -- line: 60
-	return b3 == true and (b1 and b2)
+local function isShowingSquadButton(flag: boolean, flag2: boolean, isSquadEnabled: boolean?) -- 1 equivalent call inferred from this helper
+	return isSquadEnabled == true and flag and flag2
 end
-local function useConversationRowPresentation(t1: {[any]: any}) -- line: 64
-	-- upvalues: GetConversationStore (copy), GetConversationViewModelStore (copy), React (copy), Signals (copy), SignalsReact (copy), useChatPagePadding (copy), ChatPlacementContext (copy), useTelemetry (copy), ChatLandingTelemetryLayer (copy), useRelativeTimestampBinding (copy), useLocalization (copy), useGetOneToOneFriendIdFromConversationId (copy), useIsRobloxSubscriber (copy), FFlagEnableBlackbirdCheck (copy), useConversationRowActivation (copy), ReactFocusNavigation (copy), normalizeConversationForTelemetry (copy)
-	local v26 = GetConversationStore(false)
-	local v27 = GetConversationViewModelStore(false)
-	local v28 = React.useMemo(function() -- line: 67
-		-- upvalues: v27 (copy), t1 (copy)
+
+local function useConversationRowPresentation(data)
+	local conversationStore = GetConversationStore(false)
+	local conversationViewModelStore = GetConversationViewModelStore(false)
+	local v = React.useMemo(function()
 		return {
-			title = v27.getTitle(t1.conversationId),
-			subtitle = v27.getSubtitle(t1.conversationId),
-			isSubtitlePending = v27.getIsSubtitlePending(t1.conversationId),
-			hasUnreadMessages = v27.getHasUnreadMessages(t1.conversationId),
-			hasGroupUp = v27.getHasGroupUp(t1.conversationId),
-			shouldShowOSA = v27.getShouldShowOSA(t1.conversationId),
-			shouldShowU13ChatOptIn = v27.getShouldShowU13ChatOptIn(t1.conversationId),
-			conversationType = v27.getConversationType(t1.conversationId),
-			unixTime = v27.getUnixTime(t1.conversationId),
-			testId = v27.getTestId(t1.conversationId),
-			locatorTitle = v27.getLocatorTitle(t1.conversationId)
+			title = conversationViewModelStore.getTitle(data.conversationId),
+			subtitle = conversationViewModelStore.getSubtitle(data.conversationId),
+			isSubtitlePending = conversationViewModelStore.getIsSubtitlePending(data.conversationId),
+			hasUnreadMessages = conversationViewModelStore.getHasUnreadMessages(data.conversationId),
+			hasGroupUp = conversationViewModelStore.getHasGroupUp(data.conversationId),
+			shouldShowOSA = conversationViewModelStore.getShouldShowOSA(data.conversationId),
+			shouldShowU13ChatOptIn = conversationViewModelStore.getShouldShowU13ChatOptIn(data.conversationId),
+			conversationType = conversationViewModelStore.getConversationType(data.conversationId),
+			unixTime = conversationViewModelStore.getUnixTime(data.conversationId),
+			testId = conversationViewModelStore.getTestId(data.conversationId),
+			locatorTitle = conversationViewModelStore.getLocatorTitle(data.conversationId)
 		}
-	end, {
-		v27,
-		t1.conversationId
-	})
-	local v29 = React.useMemo(function() -- line: 82
-		-- upvalues: Signals (copy), v26 (copy), t1 (copy)
-		return Signals.createComputed(function(p1) -- line: 83
-			-- upvalues: v26 (copy), t1 (copy)
-			return v26.getConversation(t1.conversationId, p1)
+	end, { conversationViewModelStore, data.conversationId })
+	local v2 = React.useMemo(function()
+		return Signals.createComputed(function(p)
+			return conversationStore.getConversation(data.conversationId, p)
 		end)
-	end, {
-		v26,
-		t1.conversationId
-	})
-	local v30 = SignalsReact.useSignalState(v29)
-	local v31 = SignalsReact.useSignalState(v28.title)
-	local v32 = SignalsReact.useSignalState(v28.subtitle)
-	local v33 = SignalsReact.useSignalState(v28.isSubtitlePending)
-	local v34 = SignalsReact.useSignalState(v28.hasUnreadMessages)
-	local v35 = SignalsReact.useSignalState(v28.hasGroupUp)
-	local v36 = SignalsReact.useSignalState(v28.shouldShowOSA)
-	local v37 = SignalsReact.useSignalState(v28.shouldShowU13ChatOptIn)
-	local v38 = SignalsReact.useSignalState(v28.conversationType)
-	local v39 = SignalsReact.useSignalState(v28.unixTime)
-	local v40 = SignalsReact.useSignalState(v28.testId)
-	local v41 = SignalsReact.useSignalState(v28.locatorTitle)
-	local v42 = v31 ~= nil
-	local v43 = useChatPagePadding()
-	local v44 = ChatPlacementContext.useChatPlacementContext()
-	local v45 = useTelemetry(ChatLandingTelemetryLayer.Context)
-	local v46 = useRelativeTimestampBinding(v39)
-	local v47 = useLocalization({
-		pendingSubtitleText = "Feature.Chat.Message.MessageUnavailable"
-	})
-	local v48 = useGetOneToOneFriendIdFromConversationId(t1.conversationId)
-	local v49 = useIsRobloxSubscriber(if not FFlagEnableBlackbirdCheck then nil else v48)
-	local v50 = useConversationRowActivation({
-		conversationId = t1.conversationId,
-		hasConversation = v42,
-		shouldShowOSA = v36,
-		shouldShowU13ChatOptIn = v37,
-		conversationType = v38,
-		onActivated = t1.onActivated,
-		onSquadJoinButtonActivated = t1.onSquadJoinButtonActivated,
-		fireClickEvent = t1.fireClickEvent,
-		telemetry = v45
-	})
-	local v51 = t1.isSquadEnabled == true and (v42 and v35)
-	local v52 = v42 and (v34 and not v33)
-	local v53 = if not v42 or not v33 then not v42 and "" or v32 else v47.pendingSubtitleText
-	local v54 = React.useRef(nil)
-	local v55 = React.useCallback(function() -- line: 131
-		-- upvalues: v50 (copy)
-		v50.onActivated()
-	end, { v50.onActivated })
-	local v56 = t1.isWideMode == true
-	local v57 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+	end, { conversationStore, data.conversationId })
+	local v3 = SignalsReact.useSignalState(v2)
+	local v4 = SignalsReact.useSignalState(v.title)
+	local v5 = SignalsReact.useSignalState(v.subtitle)
+	local v6 = SignalsReact.useSignalState(v.isSubtitlePending)
+	local v7 = SignalsReact.useSignalState(v.hasUnreadMessages)
+	local v8 = SignalsReact.useSignalState(v.hasGroupUp)
+	local shouldShowOSA = SignalsReact.useSignalState(v.shouldShowOSA)
+	local shouldShowU13ChatOptIn = SignalsReact.useSignalState(v.shouldShowU13ChatOptIn)
+	local conversationType = SignalsReact.useSignalState(v.conversationType)
+	local v9 = SignalsReact.useSignalState(v.unixTime)
+	local testId = SignalsReact.useSignalState(v.testId)
+	local locatorTitle = SignalsReact.useSignalState(v.locatorTitle)
+	local hasConversation = v4 ~= nil
+	local v10 = useChatPagePadding()
+	local v11 = ChatPlacementContext.useChatPlacementContext()
+	local v12
 
-	React.useEffect(function() -- line: 138
-		-- upvalues: v56 (copy), v57 (copy), v54 (copy), v55 (copy)
-		if not v56 or not v57 then
-			return function() -- line: 140
+	if FFlagAppThemeHalloween2026ChatBackground then
+		v12 = useThemeBackground() ~= nil
+	else
+		v12 = false
+	end
+
+	local telemetry = useTelemetry(ChatLandingTelemetryLayer.Context)
+	local timestampText = useRelativeTimestampBinding(v9)
+	local v13 = useLocalization({ pendingSubtitleText = "Feature.Chat.Message.MessageUnavailable" })
+
+	local v14 = useGetOneToOneFriendIdFromConversationId(data.conversationId)
+
+	if not FFlagEnableBlackbirdCheck then
+		v14 = nil
+	end
+
+	local showSubscriptionBadge = useIsRobloxSubscriber(v14)
+
+	local v15 = useConversationRowActivation({
+		conversationId = data.conversationId,
+		hasConversation = hasConversation,
+		shouldShowOSA = shouldShowOSA,
+		shouldShowU13ChatOptIn = shouldShowU13ChatOptIn,
+		conversationType = conversationType,
+		onActivated = data.onActivated,
+		onSquadJoinButtonActivated = data.onSquadJoinButtonActivated,
+		fireClickEvent = data.fireClickEvent,
+		telemetry = telemetry
+	})
+
+	local showingSquadButton = isShowingSquadButton(hasConversation, v8, data.isSquadEnabled) -- inferred equivalent call
+	local subtitleText
+
+	if hasConversation and v6 then
+		subtitleText = v13.pendingSubtitleText
+	else
+		subtitleText = not hasConversation and "" or v5
+	end
+
+	local ref = React.useRef(nil)
+	local onRowActivated = React.useCallback(function()
+		v15.onActivated()
+	end, { v15.onActivated })
+
+	local isWideMode = data.isWideMode == true
+
+	if FFlagAppChatUseActivationOnFocus then
+		useActivationOnFocus(isWideMode, ref, onRowActivated, nil, React.useCallback(function()
+			return data.conversationId
+		end, { data.conversationId }), nil, conversationFocusActivationDelaySeconds)
+	else
+		local v16 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+		React.useEffect(function()
+			if isWideMode and v16 then
+				local v17 = v16.focusedGuiObject:subscribe(function(p)
+					if ref.current and p == ref.current then
+						onRowActivated()
+					end
+				end)
+				return function()
+					v17:unsubscribe()
+				end
 			end
-		end
 
-		local v60 = v57.focusedGuiObject:subscribe(function(p2) -- line: 142
-			-- upvalues: v54 (copy), v55 (copy)
-			if v54.current and p2 == v54.current then
-				v55()
-			end
-		end)
+			return function() end
+		end, { onRowActivated, isWideMode, v16 })
+	end
 
-		return function() -- line: 147
-			-- upvalues: v60 (copy)
-			v60:unsubscribe()
-		end
-	end, {
-		v55,
-		v56,
-		v57
-	})
+	local ref2 = React.useRef(data.fireImpressionEvent)
+	local ref3 = React.useRef(nil)
+	ref2.current = data.fireImpressionEvent
 
-	local v58 = React.useRef(t1.fireImpressionEvent)
-	local v59 = React.useRef(nil)
-
-	v58.current = t1.fireImpressionEvent
-	React.useEffect(function() -- line: 156
-		-- upvalues: v58 (copy), v42 (copy), v59 (copy), t1 (copy), v26 (copy), normalizeConversationForTelemetry (copy)
-		if v58.current == nil or not v42 then
+	React.useEffect(function()
+		if ref2.current == nil or not hasConversation or ref3.current == data.conversationId then
 			return
 		end
 
-		if v59.current == t1.conversationId then
+		local conversation = conversationStore.getConversation(data.conversationId, false)
+
+		if conversation == nil then
 			return
 		end
 
-		local v61 = v26.getConversation(t1.conversationId, false)
+		ref3.current = data.conversationId
+		ref2.current(normalizeConversationForTelemetry(conversation))
+	end, { data.conversationId, hasConversation, conversationStore })
 
-		if v61 == nil then
-			return
-		end
-
-		v59.current = t1.conversationId
-		v58.current(normalizeConversationForTelemetry(v61))
-	end, {
-		t1.conversationId,
-		v42,
-		v26
-	})
-
-	return {
-		hasConversation = v42,
-		conversationId = t1.conversationId,
-		title = v31 or "",
-		testId = v40,
-		locatorTitle = v41,
-		entryHeight = t1.entryHeight or 64,
-		pagePaddingLeft = v43.left,
-		pagePaddingRight = v43.right,
-		timestampText = v46,
-		subtitleText = v53,
-		showSubscriptionBadge = v49,
-		showSquadButton = v51,
-		showTimestamp = not v51,
-		showUnread = v52,
-		squadLocation = v44.chatPlacement,
-		participants = if v30 == nil then nil else v30.participants,
-		rowRef = v54,
-		onRowActivated = v55,
-		onSquadActivated = v50.onSquadActivated
+	local v16 = {
+		hasConversation = hasConversation,
+		conversationId = data.conversationId,
+		title = v4 or "",
+		testId = testId,
+		locatorTitle = locatorTitle,
+		entryHeight = data.entryHeight or 64,
+		pagePaddingLeft = v10.left,
+		pagePaddingRight = v10.right,
+		timestampText = timestampText,
+		subtitleText = subtitleText,
+		showSubscriptionBadge = showSubscriptionBadge,
+		showSquadButton = showingSquadButton,
+		showTimestamp = not showingSquadButton,
+		showUnread = hasConversation and v7 and not v6,
+		showBackground = 0,
+		squadLocation = 0,
+		participants = 0,
+		rowRef = 0,
+		onRowActivated = 0,
+		onSquadActivated = 0
 	}
+	local showBackground
+
+	if data.showBackground == nil then
+		showBackground = not (ChatPlacementContext.isPlacementInExperience(v11.chatPlacement) or v12)
+	else
+		showBackground = data.showBackground
+	end
+
+	v16.showBackground = showBackground
+
+	v16.squadLocation = v11.chatPlacement
+	local participants
+
+	if v3 ~= nil then
+		participants = v3.participants
+	end
+
+	v16.participants = participants
+	v16.rowRef = ref
+	v16.onRowActivated = onRowActivated
+	v16.onSquadActivated = v15.onSquadActivated
+	return v16
 end
 
 return useConversationRowPresentation

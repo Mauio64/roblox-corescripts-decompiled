@@ -1,209 +1,237 @@
 local Groups = script:FindFirstAncestor("Groups")
-local GroupsParent = Groups.Parent
-local React = require(GroupsParent.React)
-local Foundation = require(GroupsParent.Foundation)
-local useLocalization = require(GroupsParent.Localization).Hooks.useLocalization
+local parent = Groups.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local ScrollView = Foundation.ScrollView
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
+
 local TextKeys = require(Groups.Common.TextKeys)
-
 require(Groups.Common.Types)
-
 local GroupsListToolbar = require(script.Parent.GroupsListToolbar)
 local GroupsListSection = require(script.Parent.GroupsListSection)
 local GroupsListHeader = require(script.Parent.GroupsListHeader)
 local GroupListItemSkeleton = require(script.Parent.GroupListItemSkeleton)
-local v15 = table.freeze({})
 
-local function renderSkeletons() -- line: 33
-	-- upvalues: React (copy), GroupListItemSkeleton (copy)
-	local t1 = {}
+local frozen = table.freeze({})
+
+local function renderSkeletons()
+	local children = {}
 
 	for i = 1, 3 do
-		t1[`Skeleton_{ i }`] = React.createElement(GroupListItemSkeleton, {
-			layoutOrder = i
-		})
+		children[`Skeleton_{i}`] = React.createElement(GroupListItemSkeleton, { layoutOrder = i })
 	end
 
-	return t1
+	return children
 end
-local function GroupsList(t2: {[any]: any}) -- line: 43
-	-- upvalues: useLocalization (copy), TextKeys (copy), v15 (copy), React (copy), View (copy), renderSkeletons (copy), ScrollView (copy), ScrollBarVisibility (copy), GroupsListSection (copy), GroupsListHeader (copy), GroupsListToolbar (copy), FoundationText (copy)
-	local v21 = useLocalization({
+
+local function GroupsList(props)
+	local v = useLocalization({
 		primaryHeading = TextKeys.HeadingPrimary,
 		myGroupsHeading = TextKeys.HeadingMyGroups,
 		loadFailure = TextKeys.MessageLoadGroupListError,
 		notInGroups = TextKeys.MessageNotInAnyGroups,
 		noResults = TextKeys.MessageNoGroupsFound
 	})
-	local v22 = t2.groupsList or v15
-	local v23, v24 = React.useState("")
-	local v25 = React.useRef(nil)
-	local v26 = React.useMemo(function() -- line: 56
-		-- upvalues: v22 (copy)
-		for _, v in ipairs(v22) do
-			if v.isPrimary then
-				return v
+
+	local groupsList = props.groupsList or frozen
+	local state, setState = React.useState("")
+	local ref = React.useRef(nil)
+
+	local v2 = React.useMemo(function()
+		for _, group in ipairs(groupsList) do
+			if group.isPrimary then
+				return group
 			end
 		end
 
 		return nil
-	end, { v22 })
-	local v27 = React.useMemo(function() -- line: 65
-		-- upvalues: v26 (copy), v22 (copy)
-		if not v26 then
-			return v22
+	end, { groupsList })
+
+	local groups = React.useMemo(function()
+		if not v2 then
+			return groupsList
 		end
 
-		local t3 = {}
+		local groups = {}
 
-		for _, v in ipairs(v22) do
-			if v ~= v26 then
-				table.insert(t3, v)
+		for _, group in ipairs(groupsList) do
+			if group ~= v2 then
+				table.insert(groups, group)
 			end
 		end
 
-		return t3
-	end, {
-		v22,
-		v26
-	})
-	local v28 = React.useMemo(function() -- line: 79
-		-- upvalues: v26 (copy)
-		if v26 then
-			return { v26 }
+		return groups
+	end, { groupsList, v2 })
+
+	local groups2 = React.useMemo(function()
+		if v2 then
+			return { v2 }
 		end
 
 		return {}
-	end, { v26 })
+	end, { v2 })
 
-	React.useEffect(function() -- line: 86
-		-- upvalues: v23 (copy), v25 (copy)
-		if v23 ~= "" and v25.current then
-			v25.current.CanvasPosition = Vector2.new(0, 0)
+	React.useEffect(function()
+		if state ~= "" and ref.current then
+			ref.current.CanvasPosition = Vector2.new(0, 0)
 		end
-	end, { v23 })
-
-	local v29 = v23 ~= ""
-	local v30 = React.useMemo(function() -- line: 94
-		-- upvalues: v29 (copy), v23 (copy), v22 (copy)
-		if not v29 then
+	end, { state })
+	local v3 = state ~= ""
+	local visibleIds = React.useMemo(function()
+		if not v3 then
 			return nil
 		end
 
-		local v41 = string.lower(v23)
-		local t4 = {}
+		local v4 = string.lower(state)
+		local idSet = {}
 
-		for _, v in ipairs(v22) do
-			local v45 = string.lower(v.name or "")
+		for _, group in ipairs(groupsList) do
+			local name = string.lower(group.name or "")
 
-			if string.find(v45, v41, 1, true) then
-				t4[v.id] = true
+			if string.find(name, v4, 1, true) then
+				idSet[group.id] = true
 			end
 		end
 
-		return t4
-	end, {
-		v22,
-		v23
-	})
-	local v31 = v29 and (v30 ~= nil and next(v30) == nil)
-	local v32 = React.useMemo(function() -- line: 111
-		-- upvalues: t2 (copy), v21 (copy), v22 (copy), v31 (copy)
-		if t2.isLoading or not t2.groupsList then
+		return idSet
+	end, { groupsList, state })
+	local v4
+
+	if v3 then
+		if visibleIds == nil then
+			v4 = false
+		else
+			v4 = next(visibleIds) == nil
+		end
+	else
+		v4 = v3
+	end
+
+	local text = React.useMemo(function()
+		if props.isLoading or not props.groupsList then
 			return nil
 		end
 
-		if t2.loadFailure then
-			return v21.loadFailure
+		if props.loadFailure then
+			return v.loadFailure
 		end
 
-		if #v22 == 0 then
-			return v21.notInGroups
+		if #groupsList == 0 then
+			return v.notInGroups
 		end
 
-		if v31 then
-			return v21.noResults
-		end
+		return if v4 then v.noResults else nil
+	end, { props.isLoading, props.groupsList, props.loadFailure, v, groupsList, v4 })
 
-		return nil
-	end, {
-		t2.isLoading,
-		t2.groupsList,
-		t2.loadFailure,
-		v21,
-		v22,
-		v31
-	})
-	local v33 = t2.isLoading and #v22 == 0
-	local v34 = #v28 > 0 or #v27 > 0
-	local v35 = if not v33 then if not v34 then nil else React.createElement(ScrollView, {
-		scroll = {
-			AutomaticCanvasSize = Enum.AutomaticSize.Y,
-			CanvasSize = UDim2.new(1, 0, 0, 0),
-			ScrollingDirection = Enum.ScrollingDirection.Y,
-			scrollBarVisibility = ScrollBarVisibility.Auto,
-			VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
-		},
-		scrollingFrameRef = v25,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
-		ListWrapper = React.createElement(View, {
+	local v5 = props.isLoading and #groupsList == 0
+
+	local v6 = #groups2 > 0 or #groups > 0
+	local listContent
+
+	if v5 then
+		listContent = React.createElement(
+			View,
+			{
+				tag = "col padding-small gap-small",
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			},
+			renderSkeletons()
+		)
+	elseif v6 then
+		local createElement = React.createElement
+		local v7 = {
+			scroll = {
+				AutomaticCanvasSize = Enum.AutomaticSize.Y,
+				CanvasSize = UDim2.new(1, 0, 0, 0),
+				ScrollingDirection = Enum.ScrollingDirection.Y,
+				scrollBarVisibility = ScrollBarVisibility.Auto,
+				VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+			},
+			scrollingFrameRef = ref,
+			Size = UDim2.new(1, 0, 1, 0)
+		}
+
+		local createElement2 = React.createElement
+		local v8 = {
 			tag = "col gap-xlarge",
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y
-		}, {
-			PrimarySection = React.createElement(GroupsListSection, {
-				layoutOrder = 1,
-				showRank = true,
-				showMemberCount = true,
-				heading = v21.primaryHeading,
-				groups = v28,
-				visibleIds = if not v29 then nil else v30
-			}),
-			OtherGroupsSection = React.createElement(GroupsListSection, {
-				layoutOrder = 2,
-				showRank = true,
-				showMemberCount = true,
-				heading = if not (#v28 > 0) then nil else v21.myGroupsHeading,
-				groups = v27,
-				visibleIds = if not v29 then nil else v30
-			})
-		})
-	}) else React.createElement(View, {
-		tag = "col padding-small gap-small",
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, (renderSkeletons()))
+		}
 
-	return React.createElement(View, {
-		tag = "col gap-xlarge",
-		LayoutOrder = t2.layoutOrder,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
-		Header = React.createElement(GroupsListHeader, {
-			layoutOrder = 1
-		}),
-		Toolbar = React.createElement(GroupsListToolbar, {
+		local createElement3 = React.createElement
+		local v9 = {
+			layoutOrder = 1,
+			heading = v.primaryHeading,
+			groups = groups2,
+			showRank = true,
+			showMemberCount = true,
+			visibleIds = 0
+		}
+		local visibleIds2
+
+		if v3 then
+			visibleIds2 = visibleIds
+		end
+
+		v9.visibleIds = visibleIds2
+		local children = {
+			PrimarySection = createElement3(GroupsListSection, v9),
+			OtherGroupsSection = 0
+		}
+
+		local createElement4 = React.createElement
+		local heading
+
+		if #groups2 > 0 then
+			heading = v.myGroupsHeading
+		end
+
+		if not v3 then
+			visibleIds = nil
+		end
+
+		children.OtherGroupsSection = createElement4(GroupsListSection, {
 			layoutOrder = 2,
-			canCreateGroup = t2.canCreateGroup,
-			onSearchTextChanged = v24
-		}),
-		Disclaimer = v32 and React.createElement(FoundationText, {
-			LayoutOrder = 3,
-			tag = "content-muted text-align-x-left text-body-medium",
-			Text = v32
-		}) or nil,
-		List = v35 and React.createElement(View, {
-			LayoutOrder = 4,
-			tag = "fill",
-			Size = UDim2.new(1, 0, 1, 0)
-		}, {
-			ListContent = v35
-		}) or nil
-	})
+			heading = heading,
+			groups = groups,
+			showRank = true,
+			showMemberCount = true,
+			visibleIds = visibleIds
+		})
+		listContent = createElement(ScrollView, v7, {
+			ListWrapper = createElement2(View, v8, children)
+		})
+	end
+
+	return React.createElement(
+		View,
+		{ LayoutOrder = props.layoutOrder, tag = "col gap-xlarge", Size = UDim2.new(1, 0, 1, 0) },
+		{
+			Header = React.createElement(GroupsListHeader, { layoutOrder = 1 }),
+			Toolbar = React.createElement(GroupsListToolbar, {
+				layoutOrder = 2,
+				canCreateGroup = props.canCreateGroup,
+				onSearchTextChanged = setState
+			}),
+			Disclaimer = text and React.createElement(Text, {
+				LayoutOrder = 3,
+				Text = text,
+				tag = "content-muted text-align-x-left text-body-medium"
+			}) or nil,
+			List = listContent and React.createElement(
+				View,
+				{ LayoutOrder = 4, tag = "fill", Size = UDim2.new(1, 0, 1, 0) },
+				{ ListContent = listContent }
+			) or nil
+		}
+	)
 end
 
 return GroupsList

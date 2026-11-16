@@ -1,39 +1,41 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
-local React = require(AvatarSwitcherParent.React)
-local Foundation = require(AvatarSwitcherParent.Foundation)
-local useLocalization = require(AvatarSwitcherParent.Localization).Hooks.useLocalization
-local useSignalState = require(AvatarSwitcherParent.SignalsReact).useSignalState
+local parent = AvatarSwitcher.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
 local MessageCard = require(AvatarSwitcher.Components.Messages.MessageCard)
 local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
 
-local function PendingAvatarSwitchMessage(t1: {[any]: any}) -- line: 18
-	-- upvalues: useSignalState (copy), getAvatarSwitcherStore (copy), useLocalization (copy), React (copy), Foundation (copy), MessageCard (copy)
-	local v11 = useSignalState(getAvatarSwitcherStore)
-	local v12 = useSignalState(v11.getPendingAvatarName)
-	local v13 = useLocalization({
-		messageContent = "Feature.AvatarSwitcher.Message.SwitchingDeferred",
+local function PendingAvatarSwitchMessage(p)
+	local v = useSignalState(getAvatarSwitcherStore)
+	local avatarName = useSignalState(v.getPendingAvatarName)
+
+	local v2 = useLocalization({
 		messageHeader = {
 			"Feature.AvatarSwitcher.Heading.AvatarSwitchedConfirmation",
-			avatarName = v12
-		}
+			avatarName = avatarName
+		},
+		messageContent = "Feature.AvatarSwitcher.Message.SwitchingDeferred"
 	})
 
-	if v12 == nil then
+	if avatarName == nil then
 		return nil
 	end
 
-	return (React.createElement(Foundation.View, {
-		tag = "size-full-0 auto-y"
-	}, {
+	return (React.createElement(Foundation.View, { tag = "size-full-0 auto-y" }, {
 		WarningMessage = React.createElement(MessageCard, {
 			icon = "Info",
-			headerText = v13.messageHeader,
-			contentText = v13.messageContent,
-			onClose = v11.clearPendingAvatarName,
+			headerText = v2.messageHeader,
+			contentText = v2.messageContent,
+			onClose = v.clearPendingAvatarName,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = t1.LayoutOrder
+			LayoutOrder = p.LayoutOrder
 		})
 	}))
 end

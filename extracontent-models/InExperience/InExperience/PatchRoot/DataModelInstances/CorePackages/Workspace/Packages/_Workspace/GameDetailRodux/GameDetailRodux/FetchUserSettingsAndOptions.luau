@@ -1,12 +1,11 @@
 local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
 local GetUserSettingsAndOptions = require(GameDetailRodux.GameDetails.GetUserSettingsAndOptions)
-local GameDetailRoduxParent = GameDetailRodux.Parent
-local Promise = require(GameDetailRoduxParent.Promise)
 
-return function(p1) -- line: 7
-	-- upvalues: GetUserSettingsAndOptions (copy), Promise (copy)
-	return GetUserSettingsAndOptions(p1):andThen(function(p2) -- line: 8
-		-- upvalues: Promise (copy)
+local parent = GameDetailRodux.Parent
+local Promise = require(parent.Promise)
+
+return function(p)
+	return GetUserSettingsAndOptions(p):andThen(function(p2)
 		local responseBody = p2.responseBody
 
 		if not responseBody then
@@ -14,8 +13,7 @@ return function(p1) -- line: 7
 		end
 
 		return Promise.resolve(responseBody)
-	end, function(p3) -- line: 16
-		-- upvalues: Promise (copy)
-		return Promise.reject(p3)
+	end, function(p2)
+		return Promise.reject(p2)
 	end)
 end

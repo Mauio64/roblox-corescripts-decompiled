@@ -1,3 +1,1 @@
-return {
-	System = true
-}
+return { System = true }

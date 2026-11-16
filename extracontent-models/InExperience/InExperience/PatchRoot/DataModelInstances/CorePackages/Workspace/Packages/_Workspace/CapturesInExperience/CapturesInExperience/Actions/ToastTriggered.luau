@@ -1,13 +1,11 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Enums.CapturesToastType)
-require(ParentParent.Types)
+local Rodux = require(parent2.Rodux)
 
-return Rodux.makeActionCreator(script.Name, function(p1, p2) -- line: 16
-	return {
-		toastType = p1,
-		toastConfig = p2
-	}
+require(parent.Enums.CapturesToastType)
+require(parent.Types)
+
+return Rodux.makeActionCreator(script.Name, function(toastType, toastConfig)
+	return { toastType = toastType, toastConfig = toastConfig }
 end)

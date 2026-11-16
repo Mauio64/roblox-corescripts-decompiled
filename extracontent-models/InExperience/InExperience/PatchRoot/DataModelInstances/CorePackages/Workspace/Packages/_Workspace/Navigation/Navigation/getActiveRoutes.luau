@@ -1,43 +1,42 @@
 local Navigation = script:FindFirstAncestor("Navigation")
-
 require(script.Parent.types)
+local parent = Navigation.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Array = LuauPolyfill.Array
 
-local NavigationParent = Navigation.Parent
-local Array = require(NavigationParent.LuauPolyfill).Array
-
-local function isStackRoute(p1) -- line: 15
-	return p1.index ~= nil and (p1.routes ~= nil and p1.isTransitioning ~= nil)
+local function isStackRoute(data): boolean -- 1 equivalent call inferred from this helper
+	return data.index ~= nil and data.routes ~= nil and data.isTransitioning ~= nil
 end
-local function getActiveRoutes(p2) -- line: 29
-	-- upvalues: Array (copy), getActiveRoutes (copy)
-	local t1 = {}
 
-	if p2 == nil then
-		return t1
+local function getActiveRoutes(route)
+	local joined = {}
+
+	if route == nil then
+		return joined
 	end
 
-	if p2.key or p2.routeName then
-		table.insert(t1, p2)
+	if route.key or route.routeName then
+		table.insert(joined, route)
 	end
 
-	if p2.routes and p2.index ~= nil then
-		local routes = p2.routes
-		local index = p2.index
+	if not route.routes or route.index == nil then
+		return joined
+	end
 
-		if p2.index ~= nil and (p2.routes ~= nil and p2.isTransitioning ~= nil) then
-			for i = 1, index - 1 do
-				local v12 = routes[i]
+	local routes = route.routes
+	local index = route.index
 
-				t1 = Array.concat(t1, getActiveRoutes(v12))
-			end
+	if isStackRoute(route) then -- inferred equivalent call
+		for i = 1, index - 1 do
+			local route2 = routes[i]
+			joined = Array.concat(joined, getActiveRoutes(route2))
 		end
-
-		local v13 = routes[index]
-
-		t1 = Array.concat(t1, getActiveRoutes(v13))
 	end
 
-	return t1
+	local route2 = routes[index]
+	joined = Array.concat(joined, getActiveRoutes(route2))
+
+	return joined
 end
 
 return getActiveRoutes

@@ -1,0 +1,5 @@
+local Workspace = script.Parent.Parent.Parent._Workspace
+
+local RobloxAppInteractionFeedbackConfig = require(Workspace.RobloxAppInteractionFeedbackConfig.RobloxAppInteractionFeedbackConfig)
+
+return RobloxAppInteractionFeedbackConfig

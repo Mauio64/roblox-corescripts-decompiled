@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Index.SduiSharedUtilities.SduiSharedUtilities))
+local SduiSharedUtilities = require(Workspace.SduiSharedUtilities.SduiSharedUtilities)
+
+return SduiSharedUtilities

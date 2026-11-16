@@ -1,9 +1,9 @@
-return function(p1) -- line: 3
-	local t1 = {}
+return function(items)
+	local result = {}
 
-	for k, v in pairs(p1) do
-		t1[k] = #v
+	for k, item in pairs(items) do
+		result[k] = #item
 	end
 
-	return t1
+	return result
 end

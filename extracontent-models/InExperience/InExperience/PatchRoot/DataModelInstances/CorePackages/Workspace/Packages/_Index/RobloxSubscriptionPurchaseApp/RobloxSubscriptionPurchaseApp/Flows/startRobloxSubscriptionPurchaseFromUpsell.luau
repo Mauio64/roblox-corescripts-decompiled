@@ -1,13 +1,10 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
-local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local parent = RobloxSubscriptionPurchaseApp.Parent
+
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
-
 require(RobloxSubscriptionPurchaseApp.Models.GetRobloxSubscriptionProductsModel)
-
 local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
-
 require(RobloxSubscriptionPurchaseApp.types)
-
 local createPaymentSession = require(RobloxSubscriptionPurchaseApp.Network.createPaymentSession)
 local performRobloxSubscriptionPurchase = require(RobloxSubscriptionPurchaseApp.Actions.performRobloxSubscriptionPurchase)
 local RobloxSubscriptionHeadlessOverlayController = require(RobloxSubscriptionPurchaseApp.Flows.RobloxSubscriptionHeadlessOverlayController)
@@ -16,50 +13,82 @@ local ErrorReason = require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
 local logRobloxSubscriptionUpsellCounter = require(RobloxSubscriptionPurchaseApp.Utils.logRobloxSubscriptionUpsellCounter)
 local RobloxSubscriptionUpsellTelemetry = require(RobloxSubscriptionPurchaseApp.Events.RobloxSubscriptionUpsellTelemetry)
 local logSubscriptionPurchaseFlowEvent = require(RobloxSubscriptionPurchaseApp.Utils.logSubscriptionPurchaseFlowEvent)
+
 local FFlagEnableSubscriptionPurchaseFlowEventIngest = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnableSubscriptionPurchaseFlowEventIngest)
-local getAppFeaturePolicies = require(RobloxSubscriptionPurchaseAppParent.UniversalAppPolicy).getAppFeaturePolicies
-
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBuyRobuxSdui = SharedFlags.FFlagEnableBuyRobuxSdui
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
 require(RobloxSubscriptionPurchaseApp.Enums.RobloxSubscriptionFlowCompleteReason)
+local Constants = require(RobloxSubscriptionPurchaseApp.Constants)
 
-local function startRobloxSubscriptionPurchaseFromUpsell(t1: {[any]: any}) -- line: 40
-	-- upvalues: RobloxSubscriptionStore (copy), logRobloxSubscriptionUpsellCounter (copy), RobloxSubscriptionUpsellTelemetry (copy), getAppFeaturePolicies (copy), RobloxSubscriptionHeadlessOverlayController (copy), transitionToError (copy), ErrorReason (copy), PromptState (copy), FFlagEnableSubscriptionPurchaseFlowEventIngest (copy), logSubscriptionPurchaseFlowEvent (copy), createPaymentSession (copy), performRobloxSubscriptionPurchase (copy)
-	local v17 = RobloxSubscriptionStore.get()
-	local entryContext = t1.entryContext
+local function createProductFromParams(data)
+	return {
+		EligibleOffers = data.isFreeTrial and {
+			{ Duration = 0, OfferType = "FreeTrial", PeriodType = "" }
+		} or {},
+		LocalizedPrice = { CurrencyCode = "", Nanos = 0, Units = 0 },
+		LocalizedPriceDisplayString = data.displayPrice,
+		PeriodType = "",
+		ProductKey = {
+			Id = data.subscriptionProductId,
+			Type = Constants.ROBLOX_SUBSCRIPTION_PRODUCT_TYPE
+		},
+		ProductTypeDetails = {
+			RobloxSubscriptionProductDetails = {
+				FeatureConfig = {
+					IsRobuxTransferEnabled = false,
+					IsTradingEnabled = false,
+					IsUgcPublishingEnabled = false
+				}
+			}
+		}
+	}
+end
 
-	v17.setRobloxSubscriptionProduct(t1.productDetails)
-	v17.setOnFlowComplete(t1.onFlowComplete)
-	v17.setPurchaseFlowOptions({
-		skipWaitingForPurchaseResult = t1.skipWaitingForPurchaseResult == true
+local function startRobloxSubscriptionPurchaseFromUpsell(data)
+	local v = RobloxSubscriptionStore.get()
+	local entryContext = data.entryContext
+
+	v.setRobloxSubscriptionProduct(data.productDetails or createProductFromParams(data))
+	v.setOnFlowComplete(data.onFlowComplete)
+	v.setPurchaseFlowOptions({
+		skipWaitingForPurchaseResult = data.skipWaitingForPurchaseResult == true
 	})
 
 	if entryContext then
-		v17.setEntryContext(entryContext)
+		v.setEntryContext(entryContext)
 	end
 
 	logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionUpsellModalInitiatedCounter)
 
-	local v19 = getAppFeaturePolicies().getDisableBlackbirdEntrypoints()
-	local v20 = RobloxSubscriptionHeadlessOverlayController.render()
+	local disableBlackbirdEntrypoints = getAppFeaturePolicies().getDisableBlackbirdEntrypoints()
 
-	if v19 then
+	local v2 = RobloxSubscriptionHeadlessOverlayController.render()
+
+	if disableBlackbirdEntrypoints then
 		transitionToError(ErrorReason.UnsupportedPlatform, "startRobloxSubscriptionPurchaseFromUpsell")
-
-		return v20
+		return v2
 	end
 
-	v17.setPromptState(PromptState.SubscriptionPurchaseRequested)
+	v.setPromptState(PromptState.SubscriptionPurchaseRequested)
 
 	if FFlagEnableSubscriptionPurchaseFlowEventIngest then
 		logSubscriptionPurchaseFlowEvent("SubscriptionUpsellModalOpen")
 	end
 
-	createPaymentSession(entryContext):andThen(function(s1: string) -- line: 76
-		-- upvalues: v17 (copy), performRobloxSubscriptionPurchase (copy)
-		v17.setPaymentSessionId(s1)
-		performRobloxSubscriptionPurchase()
-	end)
+	if not FFlagEnableBuyRobuxSdui or data.paymentSessionId == nil then
+		createPaymentSession(entryContext):andThen(function(p: string)
+			v.setPaymentSessionId(p)
+			performRobloxSubscriptionPurchase()
+		end)
 
-	return v20
+		return v2
+	end
+
+	v.setPaymentSessionId(data.paymentSessionId)
+	performRobloxSubscriptionPurchase()
+	return v2
 end
 
 return startRobloxSubscriptionPurchaseFromUpsell

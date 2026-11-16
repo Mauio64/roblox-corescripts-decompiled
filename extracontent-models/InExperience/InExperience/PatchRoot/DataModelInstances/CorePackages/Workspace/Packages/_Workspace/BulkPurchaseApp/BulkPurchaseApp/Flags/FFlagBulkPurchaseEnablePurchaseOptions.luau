@@ -1,1 +1,2 @@
-return game:DefineFastFlag("BulkPurchaseEnablePurchaseOptions", false) and game:GetEngineFeature("EconomyBulkPurchaseOptionsEnabled")
+return game:DefineFastFlag("BulkPurchaseEnablePurchaseOptions", false)
+	and game:GetEngineFeature("EconomyBulkPurchaseOptionsEnabled")

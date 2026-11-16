@@ -1,60 +1,49 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local Actions = ParentParent.Actions
-local FriendRequestCreated = require(Actions.FriendRequestCreated)
-local FriendRequestDeclined = require(Actions.FriendRequestDeclined)
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Rodux = require(parent2.Rodux)
 
-require(ParentParent.roduxFriendsTypes)
+local actions = parent.Actions
+local FriendRequestCreated = require(actions.FriendRequestCreated)
+local FriendRequestDeclined = require(actions.FriendRequestDeclined)
 
-local removeIdsFromRequestsStore = require(ParentParent.Reducers.Friends.utils.removeIdsFromRequestsStore)
-local llama = require(ParentParentParent.llama)
-local t1 = {}
+require(parent.roduxFriendsTypes)
+local removeIdsFromRequestsStore = require(parent.Reducers.Friends.utils.removeIdsFromRequestsStore)
 
-return function(p1) -- line: 18
-	-- upvalues: Rodux (copy), t1 (copy), removeIdsFromRequestsStore (copy), llama (copy), FriendRequestCreated (copy), FriendRequestDeclined (copy)
-	local friendsNetworking = p1.friendsNetworking
+local llama = require(parent2.llama)
 
-	return Rodux.createReducer(t1, {
-		[friendsNetworking.AcceptFriendRequestFromUserId.Succeeded.name] = function(t2: {[any]: any}, p2) -- line: 22
-			-- upvalues: removeIdsFromRequestsStore (copy)
-			local ids = p2.ids
+local v = {}
 
-			return removeIdsFromRequestsStore(t2, ids)
+return function(p)
+	local friendsNetworking = p.friendsNetworking
+
+	return Rodux.createReducer(v, {
+		[friendsNetworking.AcceptFriendRequestFromUserId.Succeeded.name] = function(p2, p3)
+			return removeIdsFromRequestsStore(p2, p3.ids)
 		end,
-		[friendsNetworking.DeclineFriendRequestFromUserId.Succeeded.name] = function(t3: {[any]: any}, p3) -- line: 27
-			-- upvalues: removeIdsFromRequestsStore (copy)
-			local ids = p3.ids
-
-			return removeIdsFromRequestsStore(t3, ids)
+		[friendsNetworking.DeclineFriendRequestFromUserId.Succeeded.name] = function(p2, p3)
+			return removeIdsFromRequestsStore(p2, p3.ids)
 		end,
-		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(t4: {[any]: any}, p4) -- line: 32
-			-- upvalues: llama (copy)
-			local data = p4.responseBody.data
-			local t5 = {}
+		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(p2, p3)
+			local data = p3.responseBody.data
 
-			for _, v in pairs(data) do
-				t5[tostring(v.id)] = v.friendRequest.sourceUniverseId
+			local sourceUniverseIdsById = {}
+
+			for _, v2 in pairs(data) do
+				sourceUniverseIdsById[tostring(v2.id)] = v2.friendRequest.sourceUniverseId
 			end
 
-			return (llama.Dictionary.join(t4, t5))
+			return (llama.Dictionary.join(p2, sourceUniverseIdsById))
 		end,
-		[FriendRequestCreated.name] = function(t6: {[any]: any}, p5) -- line: 44
-			-- upvalues: llama (copy)
-			local requesteeId = p5.requesteeId
-			local sourceUniverseId = p5.sourceUniverseId
+		[FriendRequestCreated.name] = function(p2, p3)
+			local requesteeId = p3.requesteeId
+			local sourceUniverseId = p3.sourceUniverseId
 
-			return llama.Dictionary.join(t6, {
-				[tostring(requesteeId)] = sourceUniverseId
-			})
+			return llama.Dictionary.join(p2, { [tostring(requesteeId)] = sourceUniverseId })
 		end,
-		[FriendRequestDeclined.name] = function(t7: {[any]: any}, p6) -- line: 52
-			-- upvalues: removeIdsFromRequestsStore (copy)
-			local ids = p6.ids
-
-			return removeIdsFromRequestsStore(t7, ids)
+		[FriendRequestDeclined.name] = function(p2, p3)
+			return removeIdsFromRequestsStore(p2, p3.ids)
 		end,
-		[friendsNetworking.DeclineAllFriendRequests.Succeeded.name] = function() -- line: 57
+		[friendsNetworking.DeclineAllFriendRequests.Succeeded.name] = function()
 			return {}
 		end
 	})

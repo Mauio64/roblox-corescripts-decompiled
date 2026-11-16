@@ -1,46 +1,51 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local HttpClient = require(Parent.HttpClient)
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("DataHydration").Parent
 
-require(Parent.MomentsTypes)
+local HttpClient = require(parent.HttpClient)
+local Promise = require(parent.Promise)
+require(parent.MomentsTypes)
 require(script.Parent.MomentsStoreTypes)
-
 local reactToFeedItem = require(script.Parent.Requests.reactToFeedItem)
 local reactToFeedItemV2 = require(script.Parent.Requests.reactToFeedItemV2)
 local createMomentsEmojiSetsStore = require(script.Parent.createMomentsEmojiSetsStore)
 local FFlagMomentsEmojiSetsApi = require(script.Parent.FFlagMomentsEmojiSetsApi)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsComments = SharedFlags.FFlagMomentsComments
 
-local function createMomentsReactionsStore(p1) -- line: 19
-	-- upvalues: HttpClient (copy), reactToFeedItem (copy), reactToFeedItemV2 (copy), Promise (copy), FFlagMomentsEmojiSetsApi (copy), createMomentsEmojiSetsStore (copy)
-	local v10 = p1 or {}
+local function createMomentsReactionsStore(options)
+	local v = options or {}
 
-	local function reactToFeedItem2(p2) -- line: 22
-		-- upvalues: HttpClient (copy), reactToFeedItem (copy), v10 (copy)
-		return HttpClient.asPromise(reactToFeedItem(p2, v10.network))
+	local function reactToFeedItem2(p)
+		return HttpClient.asPromise(reactToFeedItem(p, v.network))
+	end
+
+	local function reactToFeedItemV2_2(p)
+		return HttpClient.asPromise(reactToFeedItemV2(p, v.network)):catch(function(p2)
+			warn(`[Moments] Failed to react to feed item (v2): {tostring(p2)}`)
+			return Promise.reject(p2)
+		end)
+	end
+
+	if not (FFlagMomentsEmojiSetsApi or FFlagMomentsComments) then
+		return { reactToFeedItem = reactToFeedItem2 }
+	end
+
+	local momentsEmojiSetsStore = createMomentsEmojiSetsStore(v)
+	local v2 = {
+		reactToFeedItem = reactToFeedItem2,
+		getAndFetchEmojiSets = momentsEmojiSetsStore.getAndFetchEmojiSets
+	}
+
+	if FFlagMomentsComments then
+		v2.getCachedEmojiCatalog = momentsEmojiSetsStore.getCachedEmojiCatalog
 	end
 
 	if FFlagMomentsEmojiSetsApi then
-		local v12 = createMomentsEmojiSetsStore(v10)
+		v2.reactToFeedItemV2 = reactToFeedItemV2_2
 
-		return {
-			reactToFeedItem = reactToFeedItem2,
-			reactToFeedItemV2 = function(p3) -- line: 26
-				-- upvalues: HttpClient (copy), reactToFeedItemV2 (copy), v10 (copy), Promise (copy)
-				return HttpClient.asPromise(reactToFeedItemV2(p3, v10.network)):catch(function(p4) -- line: 27
-					-- upvalues: Promise (copy)
-					warn(`[Moments] Failed to react to feed item (v2): { tostring(p4) }`)
-
-					return Promise.reject(p4)
-				end)
-			end,
-			getAndFetchEmojiSets = v12.getAndFetchEmojiSets,
-			getEmojis = v12.getEmojis
-		}
+		v2.getEmojis = momentsEmojiSetsStore.getEmojis
 	end
 
-	return {
-		reactToFeedItem = reactToFeedItem2
-	}
+	return v2
 end
 
 return createMomentsReactionsStore

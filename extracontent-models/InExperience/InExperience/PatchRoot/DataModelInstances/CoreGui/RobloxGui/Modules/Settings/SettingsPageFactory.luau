@@ -1,158 +1,150 @@
 local GuiService = game:GetService("GuiService")
-local HttpService = game:GetService("HttpService")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 local CorePackages = game:GetService("CorePackages")
+
 local CoreGui = game:GetService("CoreGui")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local TweenService = game:GetService("TweenService")
+
 local Utility = require(RobloxGui.Modules.Settings.Utility)
 local Theme = require(RobloxGui.Modules.Settings.Theme)
 local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
 local Create = AppCommonLib.Create
 local Signal = AppCommonLib.Signal
 
-RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 
-local v13 = require(RobloxGui.Modules.TenFootInterface):IsEnabled()
+RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
+local FFlagResponsiveUnitsDeprecateTenFoot = SharedFlags.FFlagResponsiveUnitsDeprecateTenFoot
+local TenFootInterface = require(RobloxGui.Modules.TenFootInterface)
+local v = TenFootInterface:IsEnabled() and not FFlagResponsiveUnitsDeprecateTenFoot
+
 local GetFFlagFixIGMTabTransitions = require(script.Parent.Flags.GetFFlagFixIGMTabTransitions)
 local FFlagIEMSettingsGroups = require(script.Parent.Flags.FFlagIEMSettingsGroups)
 local FFlagIEMFocusNavSupportNewButtons = require(script.Parent.Flags.FFlagIEMFocusNavSupportNewButtons)
-local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
-local FFlagIEMFocusNavToButtons = SharedFlags.FFlagIEMFocusNavToButtons
+
 local FFlagIEMTabFocusNav = SharedFlags.FFlagIEMTabFocusNav
-local FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet
-local FFlagIEMFocusNavPeoplePageToButtons = SharedFlags.FFlagIEMFocusNavPeoplePageToButtons
-local FFlagIEMSettingsPageDisplaying = SharedFlags.FFlagIEMSettingsPageDisplaying
+local isSideSheetEnabled = require(CorePackages.Workspace.Packages.InExperienceSideSheetUtils.isSideSheetEnabled)
 
-local function Initialize() -- line: 46
-	-- upvalues: FFlagEnableSideSheet (copy), FFlagIEMFocusNavToButtons (copy), Signal (copy), FFlagIEMTabFocusNav (copy), Create (copy), Utility (copy), v13 (copy), Theme (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), GuiService (copy), HttpService (copy), FFlagIEMSettingsGroups (copy), FFlagIEMFocusNavSupportNewButtons (copy), CoreGui (copy), FFlagIEMSettingsPageDisplaying (copy), UserGameSettings (copy), GetFFlagFixIGMTabTransitions (copy), TweenService (copy)
-	local t1 = {
-		HubRef = nil,
-		LastSelectedObject = nil,
-		TabPosition = 0,
-		Active = false,
-		OpenStateChangedCount = 0,
-		ShouldShowBottomBar = not FFlagEnableSideSheet,
-		ShouldShowHubBar = true,
-		ShouldDisableDefaultScroll = false,
-		IsPageClipped = true,
-		SelectARow = nil
-	}
-
-	if FFlagIEMFocusNavToButtons then
-		t1.LastSelectableObjectsUpdated = Signal.new()
-		t1.LastSelectableObjects = {}
-		t1.PageNextSelectionDown = nil
-	end
+local function Initialize()
+	local v2 = {}
+	v2.HubRef = nil
+	v2.LastSelectedObject = nil
+	v2.TabPosition = 0
+	v2.Active = false
+	v2.OpenStateChangedCount = 0
+	v2.ShouldShowBottomBar = not isSideSheetEnabled
+	v2.ShouldShowHubBar = true
+	v2.ShouldDisableDefaultScroll = false
+	v2.IsPageClipped = true
+	v2.SelectARow = nil
+	v2.LastSelectableObjectsUpdated = Signal.new()
+	v2.LastSelectableObjects = {}
+	v2.PageNextSelectionDown = nil
 
 	if FFlagIEMTabFocusNav then
-		t1.FirstSelectableObjectsUpdated = Signal.new()
-		t1.FirstSelectableObjects = {}
+		v2.FirstSelectableObjectsUpdated = Signal.new()
+		v2.FirstSelectableObjects = {}
 	end
 
-	local t2 = {}
-	local u26 = false
+	local rows = {}
+	local displayed = false
 
-	t1.TabHeader = Create("TextButton")({
+	v2.TabHeader = Create("TextButton")({
 		Name = "Header",
 		Text = "",
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0.2, 0, 1, 0),
 		Position = UDim2.new(0, 0, 0, 0),
-		Selectable = not not FFlagIEMTabFocusNav or not FFlagIEMFocusNavToButtons and nil
+		Selectable = FFlagIEMTabFocusNav and true or false
 	})
 
 	if Utility:IsSmallTouchScreen() then
-		t1.TabHeader.Size = UDim2.new(0, 84, 1, 0)
-	elseif v13 then
-		t1.TabHeader.Size = UDim2.new(0, 220, 1, 0)
+		v2.TabHeader.Size = UDim2.new(0, 84, 1, 0)
+	elseif v then
+		v2.TabHeader.Size = UDim2.new(0, 220, 1, 0)
 	end
 
 	if FFlagIEMTabFocusNav then
-		local function switchToPage() -- line: 85
-			-- upvalues: t1 (copy)
-			if t1.HubRef and t1.HubRef.Pages.CurrentPage ~= t1 then
-				t1.HubRef:SwitchToPage(t1, true)
+		local function switchToPage()
+			if v2.HubRef and v2.HubRef.Pages.CurrentPage ~= v2 then
+				v2.HubRef:SwitchToPage(v2, true)
 			end
 		end
-
-		t1.TabHeader.Activated:connect(switchToPage)
-		t1.TabHeader.SelectionGained:connect(switchToPage)
+		v2.TabHeader.Activated:connect(switchToPage)
+		v2.TabHeader.SelectionGained:connect(switchToPage)
 	else
-		t1.TabHeader.MouseButton1Click:connect(function() -- line: 93
-			-- upvalues: t1 (copy)
-			if t1.HubRef then
-				t1.HubRef:SwitchToPage(t1, true)
+		v2.TabHeader.MouseButton1Click:connect(function()
+			if v2.HubRef then
+				v2.HubRef:SwitchToPage(v2, true)
 			end
 		end)
 	end
 
-	local v28 = Create("TextLabel")({
+	local parent2 = Create("TextLabel")({
 		Name = "Icon",
 		BackgroundTransparency = 1,
-		Text = "",
-		TextScaled = true,
-		TextTransparency = 0.5,
 		Size = UDim2.new(0.5, 0, 0.5, 0),
 		Position = UDim2.new(0, 10, 0.5, -18),
+		Text = "",
 		TextColor3 = Color3.new(1, 1, 1),
-		Parent = t1.TabHeader
+		TextScaled = true,
+		TextTransparency = 0.5,
+		Parent = v2.TabHeader
 	})
 
 	Create("UIAspectRatioConstraint")({
 		Name = "AspectRatioConstraint",
 		AspectRatio = 1,
-		Parent = v28
+		Parent = parent2
 	})
 
-	local v29 = Create("TextLabel")({
+	local parent3 = Create("TextLabel")({
 		Name = "Title",
 		Text = "",
-		BackgroundTransparency = 1,
-		TextTransparency = 0.5,
 		Font = Theme.font(Enum.Font.SourceSansBold, "Button"),
 		TextColor3 = Color3.new(1, 1, 1),
+		BackgroundTransparency = 1,
 		Size = UDim2.new(1.05, 0, 1, 0),
 		Position = UDim2.new(1.2, Theme.TabHeaderIconPadding, 0, -2),
-		TextXAlignment = Enum.TextXAlignment.Left
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTransparency = 0.5
 	})
 
-	v29.TextSize = Theme.textSize(24)
-
-	local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
-
-	UITextSizeConstraint.MaxTextSize = Theme.textSize(24)
-	v29.Parent = v28
+	parent3.TextSize = Theme.textSize(24)
+	local uiTextSizeConstraint = Instance.new("UITextSizeConstraint")
+	uiTextSizeConstraint.MaxTextSize = Theme.textSize(24)
+	parent3.Parent = parent2
 
 	if Utility:IsPortrait() and Utility:IsSmallTouchScreen() then
-		UITextSizeConstraint.Parent = v29
+		uiTextSizeConstraint.Parent = parent3
 	end
 
 	if Utility:IsSmallTouchScreen() then
-		v29.TextSize = Theme.textSize(18)
-		UITextSizeConstraint.MaxTextSize = Theme.textSize(18)
-	elseif v13 then
-		v29.TextSize = Theme.textSize(48)
-		UITextSizeConstraint.MaxTextSize = Theme.textSize(48)
+		parent3.TextSize = Theme.textSize(18)
+		uiTextSizeConstraint.MaxTextSize = Theme.textSize(18)
+	elseif v then
+		parent3.TextSize = Theme.textSize(48)
+		uiTextSizeConstraint.MaxTextSize = Theme.textSize(48)
 	end
 
 	Create("ImageLabel")({
 		Name = "TabSelection",
 		Visible = false,
-		BorderSizePixel = 0,
 		BackgroundColor3 = Theme.color("TabSelection"),
 		BackgroundTransparency = Theme.transparency("TabSelection"),
 		Size = UDim2.new(1, -2, 0, 2),
 		Position = UDim2.new(0, 3, 1, -2),
-		Parent = t1.TabHeader
+		BorderSizePixel = 0,
+		Parent = v2.TabHeader
 	})
 
-	local v31 = Create("Frame")({
+	local parent4 = Create("Frame")({
 		Name = "TabLabel",
+		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Size = UDim2.new(1, 0, 1, 0),
-		Parent = t1.TabHeader
+		Parent = v2.TabHeader
 	})
 
 	Create("UIListLayout")({
@@ -162,403 +154,334 @@ local function Initialize() -- line: 46
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		Padding = UDim.new(0, 10),
-		Parent = v31
+		Parent = parent4
 	})
-	v28.Parent = v31
-	v29.Parent = v31
-	v29.Size = UDim2.new(0, 0, 0, 0)
-	v29.AutomaticSize = Enum.AutomaticSize.XY
 
-	local function onResized() -- line: 178
-		-- upvalues: t1 (copy), Utility (copy), v28 (copy), v13 (copy), Theme (copy), v31 (copy), v29 (copy)
-		if not t1.TabHeader then
+	parent2.Parent = parent4
+	parent3.Parent = parent4
+	parent3.Size = UDim2.new(0, 0, 0, 0)
+	parent3.AutomaticSize = Enum.AutomaticSize.XY
+
+	local function onResized()
+		if not v2.TabHeader then
 			return
 		end
 
 		if Utility:IsSmallTouchScreen() then
-			v28.Size = UDim2.new(0, 34, 0, 28)
-		elseif v13 then
-			v28.Size = UDim2.new(0, 88, 0, 74)
+			parent2.Size = UDim2.new(0, 34, 0, 28)
+		elseif v then
+			parent2.Size = UDim2.new(0, 88, 0, 74)
 		else
-			local v34 = Theme.getIconSize(Theme.IconSize.Medium)
-
-			v28.Size = UDim2.fromOffset(v34, v34)
+			local iconSize = Theme.getIconSize(Theme.IconSize.Medium)
+			parent2.Size = UDim2.fromOffset(iconSize, iconSize)
 		end
 
-		local v35 = Utility:IsPortrait()
-		local Layout = v31.Layout
+		local isPortrait = Utility:IsPortrait()
+		local layout = parent4.Layout
 
-		if v35 then
+		if isPortrait then
 			if Utility:IsSmallTouchScreen() then
-				v29.FontSize = Theme.fontSize(Enum.FontSize.Size14)
+				parent3.FontSize = Theme.fontSize(Enum.FontSize.Size14)
 			end
 
-			v28.Size = UDim2.new(0, 22, 0, 22)
-			Layout.FillDirection = Enum.FillDirection.Vertical
-			Layout.Padding = UDim.new(0, 0)
+			parent2.Size = UDim2.new(0, 22, 0, 22)
+			layout.FillDirection = Enum.FillDirection.Vertical
+			layout.Padding = UDim.new(0, 0)
 		else
 			if Utility:IsSmallTouchScreen() then
-				v29.FontSize = Theme.fontSize(Enum.FontSize.Size18)
+				parent3.FontSize = Theme.fontSize(Enum.FontSize.Size18)
 			end
 
-			Layout.FillDirection = Enum.FillDirection.Horizontal
-			Layout.Padding = UDim.new(0, 10)
+			layout.FillDirection = Enum.FillDirection.Horizontal
+			layout.Padding = UDim.new(0, 10)
 		end
 
-		v28.Size = UDim2.fromOffset(v28.Size.X.Offset * 0.6666666666666666, v28.Size.Y.Offset * 0.6666666666666666)
+		parent2.Size = UDim2.fromOffset(parent2.Size.X.Offset * (2 / 3), parent2.Size.Y.Offset * (2 / 3))
 	end
 
-	Utility:OnResized(t1.TabHeader, onResized)
-	t1.Page = Create("Frame")({
+	Utility:OnResized(v2.TabHeader, onResized)
+
+	v2.Page = Create("Frame")({
 		Name = "Page",
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y
 	})
+
 	Create("UIPadding")({
 		PaddingLeft = UDim.new(0, 12),
 		PaddingRight = UDim.new(0, 11),
-		Parent = t1.Page
+		Parent = v2.Page
 	})
-	t1.PageListLayout = Create("UIListLayout")({
+
+	v2.PageListLayout = Create("UIListLayout")({
 		Name = "RowListLayout",
 		FillDirection = Enum.FillDirection.Vertical,
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		VerticalAlignment = Enum.VerticalAlignment.Top,
 		Padding = UDim.new(0, 8),
 		SortOrder = Enum.SortOrder.LayoutOrder,
-		Parent = t1.Page
+		Parent = v2.Page
 	})
 
-	if FFlagIEMFocusNavPeoplePageToButtons then
-		t1.Page.SelectionGroup = true
-	else
-		GuiService:AddSelectionParent(HttpService:GenerateGUID(false), t1.Page)
-	end
+	v2.Page.SelectionGroup = true
 
-	t1.Displaying = Instance.new("BindableEvent")
-	t1.Displaying.Name = "Displaying"
-	t1.Displayed = Instance.new("BindableEvent")
-	t1.Displayed.Name = "Displayed"
-	t1.Displayed.Event:connect(function() -- line: 255
-		-- upvalues: t1 (copy)
-		if not t1.HubRef.Shield.Visible then
+	v2.Displaying = Instance.new("BindableEvent")
+	v2.Displaying.Name = "Displaying"
+
+	v2.Displayed = Instance.new("BindableEvent")
+	v2.Displayed.Name = "Displayed"
+
+	v2.Displayed.Event:connect(function()
+		if not v2.HubRef.Shield.Visible then
 			return
 		end
 
-		t1:SelectARow()
+		v2:SelectARow()
 	end)
-	t1.Hidden = Instance.new("BindableEvent")
-	t1.Hidden.Event:connect(function() -- line: 263
-		-- upvalues: GuiService (copy), t1 (copy)
-		if GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(t1.Page) then
+
+	v2.Hidden = Instance.new("BindableEvent")
+	v2.Hidden.Event:connect(function()
+		if GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(v2.Page) then
 			GuiService.SelectedCoreObject = nil
 		end
 	end)
-	t1.Hidden.Name = "Hidden"
+	v2.Hidden.Name = "Hidden"
 
-	function t1.getValueChangerFrame(_, p2) -- line: 271
-		if type(p2) ~= "table" then
-			return p2
+	function v2:getValueChangerFrame(data)
+		if type(data) == "table" then
+			return data.SliderFrame and data.SliderFrame or data.SelectorFrame or data.DropDownFrame
 		end
 
-		return p2.SliderFrame and p2.SliderFrame or (p2.SelectorFrame or p2.DropDownFrame)
+		return data
 	end
-	function t1.SelectARow(_, p4) -- line: 285
-		-- upvalues: FFlagIEMTabFocusNav (copy), GuiService (copy), t1 (copy), t2 (copy), FFlagIEMSettingsGroups (copy), FFlagIEMFocusNavToButtons (copy), FFlagIEMFocusNavSupportNewButtons (copy), CoreGui (copy)
-		if FFlagIEMTabFocusNav and (not p4 and GuiService.SelectedCoreObject == t1.TabHeader) then
+
+	function v2:SelectARow(p)
+		if FFlagIEMTabFocusNav and not p and GuiService.SelectedCoreObject == v2.TabHeader then
 			return
 		end
 
-		if p4 or not GuiService.SelectedCoreObject or not GuiService.SelectedCoreObject:IsDescendantOf(t1.Page) then
-			if t1.LastSelectedObject then
-				GuiService.SelectedCoreObject = t1.LastSelectedObject
-
-				return
-			end
-
-			if t2 and #t2 > 0 then
-				local v45
+		if p or not (GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(v2.Page)) then
+			if v2.LastSelectedObject then
+				GuiService.SelectedCoreObject = v2.LastSelectedObject
+			elseif rows and #rows > 0 then
+				local selectedCoreObject
 
 				if FFlagIEMSettingsGroups then
-					local n1 = 1e999
-					local ValueChanger = t2[1].ValueChanger
+					local v3 = rows[1].ValueChanger
+					local v4 = 1e999
 
-					for _, v44 in t2 do
-						if v44.SelectionFrame and n1 > v44.SelectionFrame.LayoutOrder then
-							n1 = v44.SelectionFrame.LayoutOrder
-							ValueChanger = v44
+					for _, v5 in rows do
+						if not (v5.SelectionFrame and v5.SelectionFrame.LayoutOrder < v4) then
+							continue
 						end
+
+						v4 = v5.SelectionFrame.LayoutOrder
+						v3 = v5
 					end
 
-					v45 = t1:getValueChangerFrame(ValueChanger.ValueChanger)
+					selectedCoreObject = v2:getValueChangerFrame(v3.ValueChanger)
 				else
-					v45 = t1:getValueChangerFrame(t2[1].ValueChanger)
+					selectedCoreObject = v2:getValueChangerFrame(rows[1].ValueChanger)
 				end
 
-				GuiService.SelectedCoreObject = v45
-
-				return
-			end
-
-			if FFlagIEMFocusNavToButtons and t1.PageNextSelectionDown and (not FFlagIEMFocusNavSupportNewButtons or t1.PageNextSelectionDown:IsDescendantOf(CoreGui)) then
-				GuiService.SelectedCoreObject = t1.PageNextSelectionDown
+				GuiService.SelectedCoreObject = selectedCoreObject
+			elseif
+				v2.PageNextSelectionDown
+				and (not FFlagIEMFocusNavSupportNewButtons or v2.PageNextSelectionDown:IsDescendantOf(CoreGui))
+			then
+				GuiService.SelectedCoreObject = v2.PageNextSelectionDown
 			end
 		end
 	end
-	function t1.Display(_, p6, p7) -- line: 324
-		-- upvalues: t1 (copy), v28 (copy), v29 (copy), FFlagIEMSettingsPageDisplaying (copy), UserGameSettings (copy), GetFFlagFixIGMTabTransitions (copy), u26 (ref), TweenService (copy)
-		t1.OpenStateChangedCount = t1.OpenStateChangedCount + 1
 
-		if t1.TabHeader then
-			t1.TabHeader.TabSelection.Visible = true
-			v28.TextTransparency = 0
-			v29.TextTransparency = 0
+	function v2.Display(_, parent, p)
+		v2.OpenStateChangedCount += 1
+
+		if v2.TabHeader then
+			v2.TabHeader.TabSelection.Visible = true
+			parent2.TextTransparency = 0
+			parent3.TextTransparency = 0
 		end
 
-		t1.Page.Parent = p6
-		t1.Page.Visible = true
+		v2.Page.Parent = parent
+		v2.Page.Visible = true
 
-		if FFlagIEMSettingsPageDisplaying then
-			t1.Displaying:Fire()
-		end
+		v2.Displaying:Fire()
 
-		local uDim2 = UDim2.new(0, 0, 0, 0)
-
-		if p7 then
-			t1.Page.Position = uDim2
-
+		local udim = UDim2.new(0, 0, 0, 0)
+		local function fn() -- 2 equivalent calls inferred from this helper
 			if UserGameSettings.ReducedMotion then
-				p6.InnerCanvasGroupShow.Visible = false
+				parent.InnerCanvasGroupShow.Visible = false
 			end
 
 			if GetFFlagFixIGMTabTransitions() then
 				if UserGameSettings.ReducedMotion then
-					p6.InnerCanvasGroupShow.GroupTransparency = 0
+					parent.InnerCanvasGroupShow.GroupTransparency = 0
 				end
 
-				t1.Page.Position = uDim2
+				v2.Page.Position = udim
 			end
 
-			t1.Page.Visible = true
-			u26 = true
-			t1.Displayed:Fire()
-
-			return
+			v2.Page.Visible = true
+			displayed = true
+			v2.Displayed:Fire()
 		end
 
-		if UserGameSettings.ReducedMotion then
-			t1.Page.Position = uDim2
-			p6.InnerCanvasGroupShow.GroupTransparency = 1
-			p6.InnerCanvasGroupShow.Visible = true
-			t1.Page.Parent = p6.InnerCanvasGroupShow
-			t1.Page.Visible = true
+		if p then
+			v2.Page.Position = udim
+			fn() -- inferred equivalent call
+		else
+			if not UserGameSettings.ReducedMotion then
+				v2.Page:TweenPositionInternal(udim, Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.1, true, fn)
+
+				return
+			end
+
+			v2.Page.Position = udim
+			parent.InnerCanvasGroupShow.GroupTransparency = 1
+			parent.InnerCanvasGroupShow.Visible = true
+			v2.Page.Parent = parent.InnerCanvasGroupShow
+			v2.Page.Visible = true
 
 			local tweenInfo = TweenInfo.new(0.25)
-			local t3 = {
+			local tween = TweenService:Create(parent.InnerCanvasGroupShow, tweenInfo, {
 				GroupTransparency = 0
-			}
-			local tween = TweenService:Create(p6.InnerCanvasGroupShow, tweenInfo, t3)
-
+			})
 			tween:Play()
-			tween.Completed:Connect(function() -- line: 372
-				-- upvalues: t1 (copy), p6 (copy), UserGameSettings (copy), GetFFlagFixIGMTabTransitions (copy), uDim2 (copy), u26 (ref)
-				t1.Page.Parent = p6
 
-				if UserGameSettings.ReducedMotion then
-					p6.InnerCanvasGroupShow.Visible = false
-				end
-
-				if GetFFlagFixIGMTabTransitions() then
-					if UserGameSettings.ReducedMotion then
-						p6.InnerCanvasGroupShow.GroupTransparency = 0
-					end
-
-					t1.Page.Position = uDim2
-				end
-
-				t1.Page.Visible = true
-				u26 = true
-				t1.Displayed:Fire()
+			tween.Completed:Connect(function()
+				v2.Page.Parent = parent
+				fn() -- inferred equivalent call
 			end)
-
-			return
 		end
-
-		t1.Page:TweenPositionInternal(uDim2, Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.1, true, function() -- line: 341
-			-- upvalues: UserGameSettings (copy), p6 (copy), GetFFlagFixIGMTabTransitions (copy), t1 (copy), uDim2 (copy), u26 (ref)
-			if UserGameSettings.ReducedMotion then
-				p6.InnerCanvasGroupShow.Visible = false
-			end
-
-			if GetFFlagFixIGMTabTransitions() then
-				if UserGameSettings.ReducedMotion then
-					p6.InnerCanvasGroupShow.GroupTransparency = 0
-				end
-
-				t1.Page.Position = uDim2
-			end
-
-			t1.Page.Visible = true
-			u26 = true
-			t1.Displayed:Fire()
-		end)
 	end
-	function t1.Hide(_, p9, p10, p11, p12, p13, p14) -- line: 387
-		-- upvalues: t1 (copy), v28 (copy), v29 (copy), UserGameSettings (copy), u26 (ref), TweenService (copy)
-		t1.OpenStateChangedCount = t1.OpenStateChangedCount + 1
+	function v2.Hide(_, p, p2, p3, p4, parent, p5)
+		v2.OpenStateChangedCount += 1
 
-		if t1.TabHeader then
-			t1.TabHeader.TabSelection.Visible = false
-			v28.TextTransparency = 0.5
-			v29.TextTransparency = 0.5
+		if v2.TabHeader then
+			v2.TabHeader.TabSelection.Visible = false
+			parent2.TextTransparency = 0.5
+			parent3.TextTransparency = 0.5
 		end
 
-		if t1.Page.Parent then
-			local uDim2 = UDim2.new(1 * p9, 0, 0, 0)
-
-			local function v61() -- line: 398
-				-- upvalues: UserGameSettings (copy), p14 (copy), p13 (copy), t1 (copy), p10 (copy), u26 (ref)
-				if UserGameSettings.ReducedMotion and p14 then
-					p13.InnerCanvasGroupHide.Visible = false
+		if v2.Page.Parent then
+			local udim = UDim2.new(1 * p, 0, 0, 0)
+			local function fn() -- 2 equivalent calls inferred from this helper
+				if UserGameSettings.ReducedMotion and p5 then
+					parent.InnerCanvasGroupHide.Visible = false
 				end
 
-				t1.Page.Visible = false
-				t1.Page.Position = UDim2.new(t1.TabPosition - p10, 0, 0, 0)
-				u26 = false
-				t1.Hidden:Fire()
+				v2.Page.Visible = false
+				v2.Page.Position = UDim2.new(v2.TabPosition - p2, 0, 0, 0)
+				displayed = false
+				v2.Hidden:Fire()
 			end
-			local function v62() -- line: 408
-				-- upvalues: p11 (copy), t1 (copy), uDim2 (copy), UserGameSettings (copy), p14 (copy), p13 (copy), p10 (copy), u26 (ref), TweenService (copy), v61 (copy)
-				if p11 then
-					t1.Page.Position = uDim2
 
-					if UserGameSettings.ReducedMotion and p14 then
-						p13.InnerCanvasGroupHide.Visible = false
+			local function fn2()
+				if p3 then
+					v2.Page.Position = udim
+					fn() -- inferred equivalent call
+				else
+					if not (UserGameSettings.ReducedMotion and p5) then
+						v2.Page:TweenPositionInternal(
+							udim,
+							Enum.EasingDirection.Out,
+							Enum.EasingStyle.Quad,
+							0.1,
+							true,
+							fn
+						)
+
+						return
 					end
 
-					t1.Page.Visible = false
-					t1.Page.Position = UDim2.new(t1.TabPosition - p10, 0, 0, 0)
-					u26 = false
-					t1.Hidden:Fire()
-
-					return
-				end
-
-				if UserGameSettings.ReducedMotion and p14 then
-					p13.InnerCanvasGroupHide.GroupTransparency = 0
-					p13.InnerCanvasGroupHide.Visible = true
-					t1.Page.Parent = p13.InnerCanvasGroupHide
+					parent.InnerCanvasGroupHide.GroupTransparency = 0
+					parent.InnerCanvasGroupHide.Visible = true
+					v2.Page.Parent = parent.InnerCanvasGroupHide
 
 					local tweenInfo = TweenInfo.new(0.25)
-					local t4 = {
+					local tween = TweenService:Create(parent.InnerCanvasGroupHide, tweenInfo, {
 						GroupTransparency = 1
-					}
-					local tween = TweenService:Create(p13.InnerCanvasGroupHide, tweenInfo, t4)
-
+					})
 					tween:Play()
-					tween.Completed:Connect(function() -- line: 424
-						-- upvalues: t1 (copy), p13 (copy), uDim2 (copy), UserGameSettings (copy), p14 (copy), p10 (copy), u26 (ref)
-						t1.Page.Parent = p13
-						t1.Page.Position = uDim2
 
-						if UserGameSettings.ReducedMotion and p14 then
-							p13.InnerCanvasGroupHide.Visible = false
-						end
-
-						t1.Page.Visible = false
-						t1.Page.Position = UDim2.new(t1.TabPosition - p10, 0, 0, 0)
-						u26 = false
-						t1.Hidden:Fire()
+					tween.Completed:Connect(function()
+						v2.Page.Parent = parent
+						v2.Page.Position = udim
+						fn() -- inferred equivalent call
 					end)
-
-					return
 				end
-
-				t1.Page:TweenPositionInternal(uDim2, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true, v61)
 			end
 
-			if p12 then
-				local OpenStateChangedCount = t1.OpenStateChangedCount
-
-				delay(p12, function() -- line: 443
-					-- upvalues: OpenStateChangedCount (copy), t1 (copy), v62 (copy)
-					if OpenStateChangedCount == t1.OpenStateChangedCount then
-						v62()
+			if p4 then
+				local openStateChangedCount = v2.OpenStateChangedCount
+				delay(p4, function()
+					if openStateChangedCount == v2.OpenStateChangedCount then
+						fn2()
 					end
 				end)
-
-				return
-			end
-
-			v62()
-		end
-	end
-	function t1.GetDisplayed(_) -- line: 454
-		-- upvalues: u26 (ref)
-		return u26
-	end
-	function t1.GetVisibility(_) -- line: 458
-		-- upvalues: t1 (copy)
-		return t1.Page.Parent
-	end
-	function t1.GetTabHeader(_) -- line: 462
-		-- upvalues: t1 (copy)
-		return t1.TabHeader
-	end
-	function t1.GetRows(_) -- line: 466
-		-- upvalues: FFlagIEMFocusNavToButtons (copy), t2 (copy)
-		if not FFlagIEMFocusNavToButtons then
-			return
-		end
-
-		return t2
-	end
-	function t1.SetHub(_, p20) -- line: 474
-		-- upvalues: t1 (copy), t2 (copy)
-		t1.HubRef = p20
-
-		for _, v in next, t2 do
-			if type(v.ValueChanger) == "table" then
-				v.ValueChanger.HubRef = t1.HubRef
+			else
+				fn2()
 			end
 		end
 	end
-	function t1.GetSize(_) -- line: 484
-		-- upvalues: t1 (copy)
-		return t1.Page.AbsoluteSize
+
+	function v2.GetDisplayed(_)
+		return displayed
 	end
-	function t1.AddRow(_, p23, p24, p25, p26) -- line: 488
-		-- upvalues: t2 (copy), t1 (copy)
-		t2[#t2 + 1] = {
-			SelectionFrame = p23,
-			Label = p24,
-			ValueChanger = p25
+
+	function v2.GetVisibility(_)
+		return v2.Page.Parent
+	end
+
+	function v2.GetTabHeader(_)
+		return v2.TabHeader
+	end
+
+	function v2.GetRows(_)
+		return rows
+	end
+
+	function v2.SetHub(_, hubRef)
+		v2.HubRef = hubRef
+
+		for _, row in next, rows do
+			if type(row.ValueChanger) == "table" then
+				row.ValueChanger.HubRef = v2.HubRef
+			end
+		end
+	end
+
+	function v2.GetSize(_)
+		return v2.Page.AbsoluteSize
+	end
+
+	function v2.AddRow(_, selectionFrame, label, valueChanger, p)
+		rows[#rows + 1] = {
+			SelectionFrame = selectionFrame,
+			Label = label,
+			ValueChanger = valueChanger
 		}
 
-		local n2 = 0
+		local v3 = not selectionFrame and 0 or selectionFrame.Size.Y.Offset
 
-		if p23 then
-			n2 = p23.Size.Y.Offset
-		end
-
-		if p26 then
-			t1.Page.Size = UDim2.new(1, 0, 0, t1.Page.Size.Y.Offset + n2 + p26)
+		if p then
+			v2.Page.Size = UDim2.new(1, 0, 0, v2.Page.Size.Y.Offset + v3 + p)
 		else
-			t1.Page.Size = UDim2.new(1, 0, 0, t1.Page.Size.Y.Offset + n2)
+			v2.Page.Size = UDim2.new(1, 0, 0, v2.Page.Size.Y.Offset + v3)
 		end
 
-		if t1.HubRef and type(p25) == "table" then
-			p25.HubRef = t1.HubRef
+		if v2.HubRef and type(valueChanger) == "table" then
+			valueChanger.HubRef = v2.HubRef
 		end
 	end
 
-	return t1
+	return v2
 end
 
 return {
-	CreateNewPage = function(_) -- line: 513
-		-- upvalues: Initialize (copy)
-		return (Initialize())
+	CreateNewPage = function(_)
+		return Initialize()
 	end
 }

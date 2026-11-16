@@ -1,37 +1,40 @@
-local Shell = game:GetService("CoreGui"):FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell")
-local Utility = require(Shell:FindFirstChild("Utility"))
-local t1 = {
+local CoreGui = game:GetService("CoreGui")
+local shell = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell")
+
+local Utility = require(shell:FindFirstChild("Utility"))
+
+local GlobalSettings = {
 	WhiteTextColor = Color3.new(1, 1, 1),
 	GreyTextColor = Color3.new(0.5, 0.5, 0.5),
-	LightGreyTextColor = Color3.new(0.7215686274509804, 0.7215686274509804, 0.7215686274509804),
-	BlueTextColor = Color3.new(0, 0.4549019607843137, 0.7411764705882353),
+	LightGreyTextColor = Color3.new(184 / 255, 184 / 255, 184 / 255),
+	BlueTextColor = Color3.new(0, 116 / 255, 189 / 255),
 	BlackTextColor = Color3.new(0, 0, 0),
-	GreenTextColor = Color3.new(0.00784313725490196, 0.7176470588235294, 0.3411764705882353),
-	RedTextColor = Color3.new(0.8470588235294118, 0.40784313725490196, 0.40784313725490196),
-	OrangeTextColor = Color3.new(0.9647058823529412, 0.5333333333333333, 0.00784313725490196),
-	TextSelectedColor = Color3.new(0.09803921568627451, 0.09803921568627451, 0.09803921568627451),
-	LineBreakColor = Color3.new(0.3058823529411765, 0.3058823529411765, 0.3058823529411765),
-	PageDivideColor = Color3.new(0.592156862745098, 0.592156862745098, 0.592156862745098),
-	BadgeOwnedColor = Color3.new(0.17647058823529413, 0.3764705882352941, 0.5019607843137255),
-	BadgeOverlayColor = Color3.new(0.050980392156862744, 0.10980392156862745, 0.14901960784313725),
-	OverlayColor = Color3.new(0.10196078431372549, 0.2235294117647059, 0.2980392156862745),
-	BadgeFrameColor = Color3.new(0.41568627450980394, 0.47058823529411764, 0.5058823529411764),
-	RobuxOverlayImageColor = Color3.new(0.16470588235294117, 0.2, 0.2235294117647059),
+	GreenTextColor = Color3.new(2 / 255, 183 / 255, 87 / 255),
+	RedTextColor = Color3.new(216 / 255, 104 / 255, 104 / 255),
+	OrangeTextColor = Color3.new(246 / 255, 136 / 255, 2 / 255),
+	TextSelectedColor = Color3.new(25 / 255, 25 / 255, 25 / 255),
+	LineBreakColor = Color3.new(78 / 255, 78 / 255, 78 / 255),
+	PageDivideColor = Color3.new(151 / 255, 151 / 255, 151 / 255),
+	BadgeOwnedColor = Color3.new(45 / 255, 96 / 255, 128 / 255),
+	BadgeOverlayColor = Color3.new(13 / 255, 28 / 255, 38 / 255),
+	OverlayColor = Color3.new(26 / 255, 57 / 255, 76 / 255),
+	BadgeFrameColor = Color3.new(106 / 255, 120 / 255, 129 / 255),
+	RobuxOverlayImageColor = Color3.new(42 / 255, 0.2, 57 / 255),
 	BlueButtonColor = Color3.fromRGB(0, 162, 255),
-	GreySelectionColor = Color3.new(0.32941176470588235, 0.38823529411764707, 0.42745098039215684),
-	GreenButtonColor = Color3.new(0.00784313725490196, 0.6392156862745098, 0.30196078431372547),
-	GreenSelectedButtonColor = Color3.new(0.24705882352941178, 0.7764705882352941, 0.4745098039215686),
-	GreyButtonColor = Color3.new(0.3058823529411765, 0.32941176470588235, 0.3764705882352941),
-	GreySelectedButtonColor = Color3.new(0.19607843137254902, 0.7098039215686275, 1),
-	CharacterBackgroundColor = Color3.new(0.15294117647058825, 0.27058823529411763, 0.3215686274509804),
-	ForegroundGreyColor = Color3.new(0.22745098039215686, 0.23529411764705882, 0.25098039215686274),
-	BackgroundGreyColor = Color3.new(0.3058823529411765, 0.32941176470588235, 0.3764705882352941),
+	GreySelectionColor = Color3.new(84 / 255, 99 / 255, 109 / 255),
+	GreenButtonColor = Color3.new(2 / 255, 163 / 255, 77 / 255),
+	GreenSelectedButtonColor = Color3.new(63 / 255, 198 / 255, 121 / 255),
+	GreyButtonColor = Color3.new(78 / 255, 84 / 255, 96 / 255),
+	GreySelectedButtonColor = Color3.new(50 / 255, 181 / 255, 1),
+	CharacterBackgroundColor = Color3.new(39 / 255, 69 / 255, 82 / 255),
+	ForegroundGreyColor = Color3.new(58 / 255, 60 / 255, 64 / 255),
+	BackgroundGreyColor = Color3.new(78 / 255, 84 / 255, 96 / 255),
 	ModalBackgroundColor = Color3.new(0, 0, 0),
 	AvatarBoxBackgroundColor = Color3.new(1, 1, 1),
-	TabUnderlineColor = Color3.new(0.19607843137254902, 0.7098039215686275, 1),
-	PriceLabelColor = Color3.new(0.9450980392156862, 0.4549019607843137, 0.0392156862745098),
+	TabUnderlineColor = Color3.new(50 / 255, 181 / 255, 1),
+	PriceLabelColor = Color3.new(241 / 255, 116 / 255, 10 / 255),
 	PromoLabelColor = Color3.new(1, 0, 0),
-	StatusIconEnabledColor = Color3.new(0.00784313725490196, 0.7176470588235294, 0.3411764705882353),
+	StatusIconEnabledColor = Color3.new(2 / 255, 183 / 255, 87 / 255),
 	StatusIconDisabledColor = Color3.new(1, 0, 0),
 	StatusIconUnknownColor = Color3.new(0.5, 0.5, 0.5),
 	TextBoxColor = Color3.new(1, 1, 1),
@@ -141,18 +144,12 @@ local t1 = {
 	}
 }
 
-for k in pairs(t1.Images) do
-	t1.Images[k] = table.concat({
-		"rbxasset://textures/ui/Shell/",
-		t1.Images[k]
-	})
+for k in pairs(GlobalSettings.Images) do
+	GlobalSettings.Images[k] = table.concat({ "rbxasset://textures/ui/Shell/", GlobalSettings.Images[k] })
 end
 
-for k in pairs(t1.Sounds) do
-	t1.Sounds[k] = table.concat({
-		"rbxasset://sounds/ui/Shell/",
-		t1.Sounds[k]
-	})
+for k in pairs(GlobalSettings.Sounds) do
+	GlobalSettings.Sounds[k] = table.concat({ "rbxasset://sounds/ui/Shell/", GlobalSettings.Sounds[k] })
 end
 
-return t1
+return GlobalSettings

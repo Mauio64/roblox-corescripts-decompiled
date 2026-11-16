@@ -1,80 +1,80 @@
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local GetProductInfo = require(ParentParent.Thunks.GetProductInfo)
-local GetVersionInfo = require(ParentParent.Thunks.GetVersionInfo)
-local AssetInfo = require(ParentParent.Models.AssetInfo)
-local SetAssets = require(ParentParent.Actions.SetAssets)
-local SetEquippedAssets = require(ParentParent.Actions.SetEquippedAssets)
-local Constants = require(ParentParent.Constants)
-local GetAssetBundles = require(ParentParent.Thunks.GetAssetBundles)
-local BatchGetAssets = require(ParentParent.Thunks.BatchGetAssets)
-local FFlagAXEnableRegionalFilteringofAssets = require(ParentParent.Flags.FFlagAXEnableRegionalFilteringofAssets)
-local t1 = {}
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local GetProductInfo = require(parent.Thunks.GetProductInfo)
+local GetVersionInfo = require(parent.Thunks.GetVersionInfo)
+local AssetInfo = require(parent.Models.AssetInfo)
+local SetAssets = require(parent.Actions.SetAssets)
+local SetEquippedAssets = require(parent.Actions.SetEquippedAssets)
+local Constants = require(parent.Constants)
+local GetAssetBundles = require(parent.Thunks.GetAssetBundles)
+local BatchGetAssets = require(parent.Thunks.BatchGetAssets)
 
-local function getAssetIds(p1) -- line: 18
-	-- upvalues: Constants (copy), AssetInfo (copy)
-	local t2 = {}
+local FFlagAXEnableRegionalFilteringofAssets = require(parent.Flags.FFlagAXEnableRegionalFilteringofAssets)
 
-	for k, v in pairs(Constants.AssetTypeIdStringToHumanoidDescriptionProp) do
-		if Constants.AssetTypeIdToAccessoryTypeEnum[k] == nil then
-			local v19 = p1[v] or ""
+local v = {}
 
-			for _, v2 in pairs(string.split(v19)) do
-				if tonumber(v2) and v2 ~= "0" then
-					table.insert(t2, AssetInfo.fromHumanoidDescription(v2))
-				end
+local function getAssetIds(object)
+	local assetIds = {}
+
+	for k, v2 in pairs(Constants.AssetTypeIdStringToHumanoidDescriptionProp) do
+		if Constants.AssetTypeIdToAccessoryTypeEnum[k] ~= nil then
+			continue
+		end
+
+		local v3 = object[v2] or ""
+
+		for _, v4 in pairs(string.split(v3)) do
+			if tonumber(v4) and v4 ~= "0" then
+				table.insert(assetIds, AssetInfo.fromHumanoidDescription(v4))
 			end
 		end
 	end
 
-	local Accessories = p1:GetAccessories(true)
+	local accessories = object:GetAccessories(true)
 
-	for _, v in pairs(Accessories) do
-		t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(v.AssetId)
+	for _, accessory in pairs(accessories) do
+		assetIds[#assetIds + 1] = AssetInfo.fromHumanoidDescription(accessory.AssetId)
 	end
 
-	local Emotes = p1:GetEmotes()
+	local emotes = object:GetEmotes()
 
-	for _, v in pairs(Emotes) do
-		for _, v3 in pairs(v) do
-			t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(v3)
+	for _, emote in pairs(emotes) do
+		for _, v2 in pairs(emote) do
+			assetIds[#assetIds + 1] = AssetInfo.fromHumanoidDescription(v2)
 		end
 	end
 
-	return t2
+	return assetIds
 end
-local function GetAssetsFromHumanoidDescription(p2, p3) -- line: 52
-	-- upvalues: Thunk (copy), t1 (copy), getAssetIds (copy), FFlagAXEnableRegionalFilteringofAssets (copy), BatchGetAssets (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SetEquippedAssets (copy)
-	return Thunk.new(script.Name, t1, function(p4, _) -- line: 53
-		-- upvalues: getAssetIds (copy), p2 (copy), p3 (copy), FFlagAXEnableRegionalFilteringofAssets (copy), BatchGetAssets (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SetEquippedAssets (copy)
-		local v34 = getAssetIds(p2)
 
-		if not p3 then
-			if FFlagAXEnableRegionalFilteringofAssets then
-				p4:dispatch(BatchGetAssets(v34))
+local function GetAssetsFromHumanoidDescription(p, p2)
+	return Thunk.new(script.Name, v, function(object, _)
+		local assetIds = getAssetIds(p)
 
-				return
-			end
-
-			for _, v in ipairs(v34) do
-				coroutine.wrap(function() -- line: 61
-					-- upvalues: p4 (copy), GetProductInfo (copy), v (copy), GetAssetBundles (copy), GetVersionInfo (copy)
-					p4:dispatch(GetProductInfo(v.assetId))
-
-					if v.parentBundleId == nil then
-						p4:dispatch(GetAssetBundles(v.assetId))
-					end
-
-					p4:dispatch(GetVersionInfo(v.assetId))
-				end)()
-			end
-
-			p4:dispatch(SetAssets(v34))
+		if p2 then
+			object:dispatch(SetEquippedAssets(assetIds))
 
 			return
 		end
 
-		p4:dispatch(SetEquippedAssets(v34))
+		if FFlagAXEnableRegionalFilteringofAssets then
+			object:dispatch(BatchGetAssets(assetIds))
+			return
+		end
+
+		for _, assetId in ipairs(assetIds) do
+			coroutine.wrap(function()
+				object:dispatch(GetProductInfo(assetId.assetId))
+
+				if assetId.parentBundleId == nil then
+					object:dispatch(GetAssetBundles(assetId.assetId))
+				end
+
+				object:dispatch(GetVersionInfo(assetId.assetId))
+			end)()
+		end
+
+		object:dispatch(SetAssets(assetIds))
 	end)
 end
 

@@ -1,0 +1,3 @@
+local FFlagSocialEnableProfileInspectAndBuy = require(script.Parent.FFlagSocialEnableProfileInspectAndBuy)
+
+return game:DefineFastFlag("ProfileInspectAvatarShopChip", false) and FFlagSocialEnableProfileInspectAndBuy

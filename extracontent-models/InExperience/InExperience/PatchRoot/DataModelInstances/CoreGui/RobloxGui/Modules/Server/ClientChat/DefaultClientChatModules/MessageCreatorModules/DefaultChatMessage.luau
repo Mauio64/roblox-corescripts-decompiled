@@ -1,352 +1,237 @@
-local ok, result = pcall(function() -- line: 8
+local success, result = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserIsChatTranslationEnabled2")
 end)
-local u3 = ok and result
+
+local v = success and result
+
 local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
-local ChatSettings = require(ParentParent:WaitForChild("ChatSettings"))
-local ChatConstants = require(ParentParent:WaitForChild("ChatConstants"))
+
+local parent = script.Parent.Parent
+local ChatSettings = require(parent:WaitForChild("ChatSettings"))
+local ChatConstants = require(parent:WaitForChild("ChatConstants"))
 local Util = require(script.Parent:WaitForChild("Util"))
-local v9 = utf8.char(57344)
 
-function IsPlayerVerified(p1) -- line: 23
-	-- upvalues: Players (copy)
-	local PlayerByUserId = Players:GetPlayerByUserId(p1)
+local v2 = utf8.char(57344)
 
-	if not PlayerByUserId then
+function IsPlayerVerified(p)
+	local playerByUserId = Players:GetPlayerByUserId(p)
+
+	if not playerByUserId then
 		return false
 	end
 
-	local ok2, result2 = pcall(function() -- line: 30
-		-- upvalues: PlayerByUserId (copy)
-		return PlayerByUserId.HasVerifiedBadge
+	local success2, result2 = pcall(function()
+		return playerByUserId.HasVerifiedBadge
 	end)
-
-	if ok2 then
-		return result2
-	end
-
-	return false
+	return if success2 then result2 else false
 end
-function AppendVerifiedBadge(p2) -- line: 37
-	-- upvalues: v9 (copy)
-	return p2 .. v9
+
+function AppendVerifiedBadge(p)
+	return p .. v2
 end
-function CreateMessageLabel(p3, p4, p5) -- line: 41
-	-- upvalues: ChatSettings (copy), Util (copy), u3 (ref)
-	local FromSpeaker = p3.FromSpeaker
-	local v19 = if not ChatSettings.PlayerDisplayNamesEnabled or not p3.SpeakerDisplayName then FromSpeaker else p3.SpeakerDisplayName
-	local SpeakerUserId = p3.SpeakerUserId
 
-	if IsPlayerVerified(SpeakerUserId) then
-		v19 = AppendVerifiedBadge(v19)
+function CreateMessageLabel(state, p, callback)
+	local fromSpeaker = state.FromSpeaker
+	local v3
+
+	if ChatSettings.PlayerDisplayNamesEnabled and state.SpeakerDisplayName then
+		v3 = state.SpeakerDisplayName
+	else
+		v3 = fromSpeaker
 	end
 
-	local _ = p3.Message
-	local v22 = p3.ExtraData or {}
-	local v23 = v22.Font or ChatSettings.DefaultFont
-	local v24 = v22.TextSize or ChatSettings.ChatWindowTextSize
-	local v25 = v22.NameColor or ChatSettings.DefaultNameColor
-	local v26 = v22.ChatColor or ChatSettings.DefaultMessageColor
-	local v27 = v22.ChannelColor or v26
-	local v28 = v22.Tags or {}
-	local v29 = string.format("[%s]:", v19)
+	local speakerUserId = state.SpeakerUserId
 
-	Util:GetStringTextBounds(v29, v23, v24)
-
-	local u30 = Util:GetNumberOfSpaces(v29, v23, v24) + 1
-	local v31, v32 = Util:CreateBaseMessage("", v23, v24, v26)
-	local v33 = Util:AddNameButtonToBaseMessage(v32, v25, v29, FromSpeaker)
-	local v34 = nil
-	local uDim2 = UDim2.new(0, 0, 0, 0)
-
-	if p4 ~= p3.OriginalChannel then
-		local v36 = string.format("{%s}", p3.OriginalChannel)
-
-		v34 = Util:AddChannelButtonToBaseMessage(v32, v27, v36, p3.OriginalChannel)
-		uDim2 = UDim2.new(0, v34.Size.X.Offset + Util:GetStringTextBounds(" ", v23, v24).X, 0, 0)
-		u30 = u30 + Util:GetNumberOfSpaces(v36, v23, v24) + 1
+	if IsPlayerVerified(speakerUserId) then
+		v3 = AppendVerifiedBadge(v3)
 	end
 
-	local t1 = {}
+	local _message = state.Message
 
-	for _, v in pairs(v28) do
-		local v40 = v.TagColor or Color3.fromRGB(255, 0, 255)
-		local v41 = v.TagText or "???"
-		local v42 = string.format("[%s] ", v41)
-		local v43 = Util:AddTagLabelToBaseMessage(v32, v40, v42)
+	local extraData = state.ExtraData or {}
+	local font = extraData.Font or ChatSettings.DefaultFont
+	local textSize = extraData.TextSize or ChatSettings.ChatWindowTextSize
+	local nameColor = extraData.NameColor or ChatSettings.DefaultNameColor
+	local chatColor = extraData.ChatColor or ChatSettings.DefaultMessageColor
+	local channelColor = extraData.ChannelColor or chatColor
+	local tags = extraData.Tags or {}
 
-		v43.Position = uDim2
-		u30 += Util:GetNumberOfSpaces(v42, v23, v24)
-		uDim2 += UDim2.new(0, v43.Size.X.Offset, 0, 0)
-		table.insert(t1, v43)
+	local v4 = string.format("[%s]:", v3)
+	Util:GetStringTextBounds(v4, font, textSize)
+	local v5 = Util:GetNumberOfSpaces(v4, font, textSize) + 1
+
+	local baseMessage, v6 = Util:CreateBaseMessage("", font, textSize, chatColor)
+	local v7 = Util:AddNameButtonToBaseMessage(v6, nameColor, v4, fromSpeaker)
+
+	local udim = UDim2.new(0, 0, 0, 0)
+	local v8
+
+	if p ~= state.OriginalChannel then
+		local v9 = string.format("{%s}", state.OriginalChannel)
+		v8 = Util:AddChannelButtonToBaseMessage(v6, channelColor, v9, state.OriginalChannel)
+		udim = UDim2.new(0, v8.Size.X.Offset + Util:GetStringTextBounds(" ", font, textSize).X, 0, 0)
+		v5 = v5 + Util:GetNumberOfSpaces(v9, font, textSize) + 1
 	end
 
-	v33.Position = uDim2
+	local v9 = {}
 
-	local u44 = false
-	local u45 = nil
+	for _, tag in pairs(tags) do
+		local tagColor = tag.TagColor or Color3.fromRGB(255, 0, 255)
+		local tagText = tag.TagText or "???"
+		local v10 = string.format("[%s] ", tagText)
+		local v11 = Util:AddTagLabelToBaseMessage(v6, tagColor, v10)
+		v11.Position = udim
 
-	if u3 then
-		pcall(function() -- line: 105
-			-- upvalues: u45 (ref), Util (copy), v32 (copy), uDim2 (ref), v33 (copy)
-			u45 = Util:AddTranslationButtonToBaseMessage(v32)
-			uDim2 += UDim2.new(0, v33.Size.X.Offset + 2, 0, 0)
-			u45.Position = uDim2
+		v5 += Util:GetNumberOfSpaces(v10, font, textSize)
+		udim += UDim2.new(0, v11.Size.X.Offset, 0, 0)
+
+		table.insert(v9, v11)
+	end
+
+	v7.Position = udim
+
+	local v10 = false
+	local v11 = nil
+
+	if v then
+		pcall(function()
+			v11 = Util:AddTranslationButtonToBaseMessage(v6)
+			udim += UDim2.new(0, v7.Size.X.Offset + 2, 0, 0)
+			v11.Position = udim
 		end)
 	end
 
-	local function useOriginalText(p6) -- line: 112
-		-- upvalues: u44 (ref), p3 (copy), v32 (copy), Util (copy), u30 (ref)
-		u44 = false
+	local function useOriginalText(data)
+		v10 = false
 
-		if p3.IsFiltered then
-			v32.Text = Util:CreateLeadingSpaces(u30) .. Util:SanitizeForRichText(p6.Message)
-
+		if state.IsFiltered then
+			v6.Text = Util:CreateLeadingSpaces(v5) .. Util:SanitizeForRichText(data.Message)
 			return
 		end
 
-		local v61 = p6.MessageLengthUtf8 or p6.MessageLength
-
-		v32.Text = Util:CreateLeadingSpaces(u30) .. string.rep("_", v61)
+		local messageLengthUtf8 = data.MessageLengthUtf8 or data.MessageLength
+		v6.Text = Util:CreateLeadingSpaces(v5) .. string.rep("_", messageLengthUtf8)
 	end
-	local function useTranslatedText(p7) -- line: 122
-		-- upvalues: u45 (ref), u30 (ref), u44 (ref), useOriginalText (copy), v32 (copy), Util (copy)
-		if u45 == nil then
+
+	local function useTranslatedText(p2) -- 2 equivalent calls inferred from this helper
+		if v11 == nil then
 			return
 		end
 
-		if u45.Visible == false then
-			u30 += 6
+		if v11.Visible == false then
+			v5 += 6
 		end
 
-		u45.Visible = true
-		u44 = true
+		v11.Visible = true
+		v10 = true
 
-		if p7.TranslatedMessage == "" then
-			useOriginalText(p7)
-
-			return
-		end
-
-		v32.Text = Util:CreateLeadingSpaces(u30) .. Util:SanitizeForRichText(p7.TranslatedMessage)
-	end
-	local function UpdateTextFunction_Chat(p8) -- line: 142
-		-- upvalues: p3 (copy), u45 (ref), u30 (ref), u44 (ref), useOriginalText (copy), v32 (copy), Util (copy)
-		p3.TranslatedMessage = p8.TranslatedMessage
-
-		if p8.TranslatedMessage then
-			if u45 == nil then
-				return
-			end
-
-			if u45.Visible == false then
-				u30 += 6
-			end
-
-			u45.Visible = true
-			u44 = true
-
-			if p8.TranslatedMessage == "" then
-				useOriginalText(p8)
-
-				return
-			end
-
-			v32.Text = Util:CreateLeadingSpaces(u30) .. Util:SanitizeForRichText(p8.TranslatedMessage)
-
-			return
-		end
-
-		useOriginalText(p8)
-	end
-	local function UpdateTextFunction(p9) -- line: 151
-		-- upvalues: u3 (ref), p3 (copy), u45 (ref), u30 (ref), u44 (ref), useOriginalText (copy), v32 (copy), Util (copy)
-		if u3 then
-			p3.TranslatedMessage = p9.TranslatedMessage
-
-			if p9.TranslatedMessage then
-				if u45 == nil then
-					return
-				end
-
-				if u45.Visible == false then
-					u30 += 6
-				end
-
-				u45.Visible = true
-				u44 = true
-
-				if p9.TranslatedMessage == "" then
-					useOriginalText(p9)
-
-					return
-				end
-
-				v32.Text = Util:CreateLeadingSpaces(u30) .. Util:SanitizeForRichText(p9.TranslatedMessage)
-
-				return
-			end
-
-			useOriginalText(p9)
-
-			return
-		end
-
-		if p3.IsFiltered then
-			v32.Text = Util:CreateLeadingSpaces(u30) .. Util:SanitizeForRichText(p9.Message)
-
-			return
-		end
-
-		local v65 = p9.MessageLengthUtf8 or p9.MessageLength
-
-		v32.Text = Util:CreateLeadingSpaces(u30) .. string.rep("_", v65)
-	end
-	local function toggleTranslation() -- line: 164
-		-- upvalues: u44 (ref), p3 (copy), u45 (ref), u30 (ref), useOriginalText (copy), v32 (copy), Util (copy), p5 (copy)
-		if not u44 and p3.TranslatedMessage then
-			local v66 = p3
-
-			if u45 ~= nil then
-				if u45.Visible == false then
-					u30 += 6
-				end
-
-				u45.Visible = true
-				u44 = true
-
-				if v66.TranslatedMessage == "" then
-					useOriginalText(v66)
-				else
-					v32.Text = Util:CreateLeadingSpaces(u30) .. Util:SanitizeForRichText(v66.TranslatedMessage)
-				end
-			end
+		if p2.TranslatedMessage == "" then
+			useOriginalText(p2)
 		else
-			useOriginalText(p3)
-		end
-
-		if p5 then
-			p5()
+			v6.Text = Util:CreateLeadingSpaces(v5) .. Util:SanitizeForRichText(p2.TranslatedMessage)
 		end
 	end
 
-	if u3 and u45 ~= nil then
-		local v51 = u45.MouseButton1Click:connect(function() -- line: 176
-			-- upvalues: u44 (ref), p3 (copy), u45 (ref), u30 (ref), useOriginalText (copy), v32 (copy), Util (copy), p5 (copy)
-			if not u44 and p3.TranslatedMessage then
-				local v67 = p3
+	local function UpdateTextFunction_Chat(data) -- 1 equivalent call inferred from this helper
+		state.TranslatedMessage = data.TranslatedMessage
 
-				if u45 ~= nil then
-					if u45.Visible == false then
-						u30 += 6
-					end
+		if not data.TranslatedMessage then
+			useOriginalText(data)
 
-					u45.Visible = true
-					u44 = true
+			return
+		end
 
-					if v67.TranslatedMessage == "" then
-						useOriginalText(v67)
-					else
-						v32.Text = Util:CreateLeadingSpaces(u30) .. Util:SanitizeForRichText(v67.TranslatedMessage)
-					end
-				end
-			else
-				useOriginalText(p3)
+		useTranslatedText(data) -- inferred equivalent call
+	end
+
+	local function UpdateTextFunction(data)
+		if v then
+			UpdateTextFunction_Chat(data) -- inferred equivalent call
+		else
+			if state.IsFiltered then
+				v6.Text = Util:CreateLeadingSpaces(v5) .. Util:SanitizeForRichText(data.Message)
+				return
 			end
 
-			if p5 then
-				p5()
+			local messageLengthUtf8 = data.MessageLengthUtf8 or data.MessageLength
+			v6.Text = Util:CreateLeadingSpaces(v5) .. string.rep("_", messageLengthUtf8)
+		end
+	end
+
+	local function toggleTranslation() -- 1 equivalent call inferred from this helper
+		if v10 or not state.TranslatedMessage then
+			useOriginalText(state)
+		else
+			useTranslatedText(state) -- inferred equivalent call
+		end
+
+		if callback then
+			callback()
+		end
+	end
+
+	if v and v11 ~= nil then
+		local mouseButton1ClickConnection = v11.MouseButton1Click:connect(function()
+			toggleTranslation() -- inferred equivalent call
+		end)
+
+		local changedConnection = nil
+		changedConnection = v11.Changed:connect(function(p2)
+			if p2 == "Parent" then
+				mouseButton1ClickConnection:Disconnect()
+				changedConnection:Disconnect()
 			end
 		end)
-		local u52 = nil
-
-		u52 = u45.Changed:connect(function(p10) -- line: 181
-			-- upvalues: v51 (copy), u52 (ref)
-			if p10 == "Parent" then
-				v51:Disconnect()
-				u52:Disconnect()
-			end
-		end)
 	end
 
-	UpdateTextFunction(p3)
+	UpdateTextFunction(state)
 
-	local function GetHeightFunction(p11) -- line: 191
-		-- upvalues: Util (copy), v32 (copy), v31 (copy)
-		return Util:GetMessageHeight(v32, v31, p11)
+	local function GetHeightFunction(p2)
+		return Util:GetMessageHeight(v6, baseMessage, p2)
 	end
 
-	local t2 = {
-		[v33] = {
-			TextTransparency = {
-				FadedIn = 0,
-				FadedOut = 1
-			},
-			TextStrokeTransparency = {
-				FadedIn = 0.75,
-				FadedOut = 1
-			}
-		}
+	local v12 = {}
+	v12[v7] = {
+		TextTransparency = { FadedIn = 0, FadedOut = 1 },
+		TextStrokeTransparency = { FadedIn = 0.75, FadedOut = 1 }
 	}
 
-	if u3 and u45 ~= nil then
-		t2[u45] = {
-			ImageTransparency = {
-				FadedIn = 0,
-				FadedOut = 1
-			}
+	if v and v11 ~= nil then
+		v12[v11] = {
+			ImageTransparency = { FadedIn = 0, FadedOut = 1 }
 		}
 	end
 
-	t2[v32] = {
-		TextTransparency = {
-			FadedIn = 0,
-			FadedOut = 1
-		},
-		TextStrokeTransparency = {
-			FadedIn = 0.75,
-			FadedOut = 1
-		}
+	v12[v6] = {
+		TextTransparency = { FadedIn = 0, FadedOut = 1 },
+		TextStrokeTransparency = { FadedIn = 0.75, FadedOut = 1 }
 	}
 
-	for k, v in pairs(t1) do
+	for k, v13 in pairs(v9) do
 		string.format("Tag%d", k)
-		t2[v] = {
-			TextTransparency = {
-				FadedIn = 0,
-				FadedOut = 1
-			},
-			TextStrokeTransparency = {
-				FadedIn = 0.75,
-				FadedOut = 1
-			}
+		v12[v13] = {
+			TextTransparency = { FadedIn = 0, FadedOut = 1 },
+			TextStrokeTransparency = { FadedIn = 0.75, FadedOut = 1 }
 		}
 	end
 
-	if v34 then
-		t2[v34] = {
-			TextTransparency = {
-				FadedIn = 0,
-				FadedOut = 1
-			},
-			TextStrokeTransparency = {
-				FadedIn = 0.75,
-				FadedOut = 1
-			}
+	if v8 then
+		v12[v8] = {
+			TextTransparency = { FadedIn = 0, FadedOut = 1 },
+			TextStrokeTransparency = { FadedIn = 0.75, FadedOut = 1 }
 		}
 	end
 
-	local v57, v58, v59 = Util:CreateFadeFunctions(t2)
+	local fadeFunctions, v13, v14 = Util:CreateFadeFunctions(v12)
 
 	return {
-		[Util.KEY_BASE_FRAME] = v31,
-		[Util.KEY_BASE_MESSAGE] = v32,
+		[Util.KEY_BASE_FRAME] = baseMessage,
+		[Util.KEY_BASE_MESSAGE] = v6,
 		[Util.KEY_UPDATE_TEXT_FUNC] = UpdateTextFunction,
 		[Util.KEY_GET_HEIGHT] = GetHeightFunction,
-		[Util.KEY_FADE_IN] = v57,
-		[Util.KEY_FADE_OUT] = v58,
-		[Util.KEY_UPDATE_ANIMATION] = v59
+		[Util.KEY_FADE_IN] = fadeFunctions,
+		[Util.KEY_FADE_OUT] = v13,
+		[Util.KEY_UPDATE_ANIMATION] = v14
 	}
 end
 

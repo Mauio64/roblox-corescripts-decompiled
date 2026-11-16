@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.Signals.Signals))
+local Signals = require(index.Signals.Signals)
+
+return Signals

@@ -1,4 +1,1 @@
-return {
-	Increment = "Increment",
-	Decrement = "Decrement"
-}
+return { Increment = "Increment", Decrement = "Decrement" }

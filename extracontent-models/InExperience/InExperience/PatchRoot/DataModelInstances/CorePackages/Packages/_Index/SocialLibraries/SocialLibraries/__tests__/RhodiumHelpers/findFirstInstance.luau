@@ -1,29 +1,24 @@
-local function getProperty(p1, p2) -- line: 6
-	local ok, result = pcall(function() -- line: 7
-		-- upvalues: p1 (copy), p2 (copy)
-		return p1[p2]
+local function getProperty(p, k) -- 1 equivalent call inferred from this helper
+	local success, result = pcall(function()
+		return p[k]
 	end)
 
-	return ok == true and result or nil
+	return success == true and result or nil
 end
-local function propertyMatch(p3, p4) -- line: 14
-	for k, v in pairs(p4) do
-		local ok, result = pcall(function() -- line: 7
-			-- upvalues: p3 (copy), k (copy)
-			return p3[k]
-		end)
 
-		if v ~= (ok == true and result or nil) then
+local function propertyMatch(descendant, items): boolean
+	for k, item in pairs(items) do
+		if getProperty(descendant, k) ~= item then -- inferred equivalent call
 			return false
 		end
 	end
 
 	return true
 end
-local function findFirstInstance(p5, p6) -- line: 24
-	-- upvalues: propertyMatch (copy)
-	for _, descendant in ipairs(p5:GetDescendants()) do
-		if propertyMatch(descendant, p6) then
+
+local function findFirstInstance(folder, p)
+	for _, descendant in ipairs(folder:GetDescendants()) do
+		if propertyMatch(descendant, p) then
 			return descendant
 		end
 	end

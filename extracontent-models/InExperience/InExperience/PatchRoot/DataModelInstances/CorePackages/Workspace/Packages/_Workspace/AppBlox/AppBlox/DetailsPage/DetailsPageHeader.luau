@@ -1,28 +1,45 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local withStyle = UIBlox.Core.Style.withStyle
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+
 local Images = UIBlox.App.ImageSet.Images
 local LoadableImage = UIBlox.App.Loading.LoadableImage
 local ActionBar = UIBlox.App.Button.ActionBar
-local DeviceType = require(Parent.RobloxAppEnums).DeviceType
-local Roact = require(Parent.Roact)
-local t = require(Parent.t)
-local DetailsPageTitleContent = require(script.Parent.DetailsPageTitleContent)
-local FFlagLuaAppFixDetailsPageThumbnailRenderInPhone = require(Parent.SharedFlags).FFlagLuaAppFixDetailsPageThumbnailRenderInPhone
-local v13 = game:DefineFastFlag("LuaAppBottomAlignDetailsHeaderInfoFrame", false)
-local FFlagUIBloxEnableActionBarButtonOverride = require(Parent.SharedFlags).UIBlox.FFlagUIBloxEnableActionBarButtonOverride
-local FFlagUIBloxAddTestIdToActionBar = require(Parent.SharedFlags).UIBlox.FFlagUIBloxAddTestIdToActionBar
-local v16 = game:DefineFastFlag("FFlagFixDetailsPageIconShadowSlicing", false)
-local v17 = Roact.PureComponent:extend("DetailsPageHeader")
 
-v17.defaultProps = {
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local DeviceType = RobloxAppEnums.DeviceType
+
+local Roact = require(parent.Roact)
+local t = require(parent.t)
+
+local DetailsPageTitleContent = require(script.Parent.DetailsPageTitleContent)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppFixDetailsPageThumbnailRenderInPhone = SharedFlags.FFlagLuaAppFixDetailsPageThumbnailRenderInPhone
+
+local defineFastFlag = game:DefineFastFlag("LuaAppBottomAlignDetailsHeaderInfoFrame", false)
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUIBloxEnableActionBarButtonOverride = SharedFlags2.UIBlox.FFlagUIBloxEnableActionBarButtonOverride
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagUIBloxAddTestIdToActionBar = SharedFlags3.UIBlox.FFlagUIBloxAddTestIdToActionBar
+local defineFastFlag2 = game:DefineFastFlag("FFlagFixDetailsPageIconShadowSlicing", false)
+
+local extended = Roact.PureComponent:extend("DetailsPageHeader")
+
+extended.defaultProps = {
 	thumbnailHeight = 200,
+	thumbnailAspectRatio = Vector2.new(1, 1),
 	actionBarHeight = 48,
-	actionBarWidth = 380,
-	thumbnailAspectRatio = Vector2.new(1, 1)
+	actionBarWidth = 380
 }
-v17.validateProps = t.strictInterface({
+
+extended.validateProps = t.strictInterface({
 	thumbnailImageUrl = t.optional(t.string),
 	thumbnailAspectRatio = t.optional(t.Vector2),
 	thumbnailHeight = t.optional(t.number),
@@ -46,190 +63,320 @@ v17.validateProps = t.strictInterface({
 	deviceType = t.optional(t.string)
 })
 
-function v17.init(p1) -- line: 80
-	-- upvalues: Roact (copy)
-	p1.actionBarLabelRef = Roact.createRef()
+function extended:init()
+	self.actionBarLabelRef = Roact.createRef()
 end
-function v17.renderThumbnail(p2, p3, p4, p5, p6) -- line: 84
-	-- upvalues: Roact (copy), LoadableImage (copy), ImageSetLabel (copy), Images (copy), v16 (copy)
-	return Roact.createElement("Frame", {
+
+function extended:renderThumbnail(p, p2, p3, p4)
+	local createElement = Roact.createElement
+	local v = {
+		Size = UDim2.fromOffset(p3, p4),
 		LayoutOrder = 1,
-		BackgroundTransparency = 1,
-		Size = UDim2.fromOffset(p5, p6),
 		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, 0, 1, 0)
-	}, {
+		Position = UDim2.new(0, 0, 1, 0),
+		BackgroundTransparency = 1
+	}
+
+	local v2 = {
 		ThumbnailTile = Roact.createElement(LoadableImage, {
 			cornerRadius = UDim.new(0, 8),
 			Size = UDim2.fromScale(1, 1),
-			Image = p2.props.thumbnailImageUrl
+			Image = self.props.thumbnailImageUrl
 		}),
-		DropShadow = if not (p4 > 0) then nil else Roact.createElement(ImageSetLabel, {
-			BackgroundTransparency = 1,
+		DropShadow = 0
+	}
+	local dropShadow
+
+	if p2 > 0 then
+		local createElement2 = Roact.createElement
+		local v3 = {
 			Size = UDim2.new(1, 0, 0, 28),
 			Position = UDim2.fromScale(0, 1),
+			BackgroundTransparency = 1,
 			Image = Images["component_assets/dropshadow_thumbnail_28"],
-			ImageColor3 = p3.Theme.DropShadow.Color,
-			ImageTransparency = p3.Theme.DropShadow.Transparency,
+			ImageColor3 = p.Theme.DropShadow.Color,
+			ImageTransparency = p.Theme.DropShadow.Transparency,
 			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = if not v16 then Rect.new(32, 0, 33, 28) else Rect.new(32, 0, 33, 1)
-		})
-	})
-end
-function v17.renderDesktopMode(p7, p8) -- line: 114
-	-- upvalues: Roact (copy), v13 (copy), DetailsPageTitleContent (copy), ActionBar (copy), FFlagUIBloxEnableActionBarButtonOverride (copy), FFlagUIBloxAddTestIdToActionBar (copy)
-	local thumbnailHeight = p7.props.thumbnailHeight
-	local v27 = thumbnailHeight * (p7.props.thumbnailAspectRatio.X / p7.props.thumbnailAspectRatio.Y)
-	local v28 = p7.props.sideMargin or 48
-	local v29 = p7.props.itemPadding or 24
-	local n1 = 28
+			SliceCenter = 0
+		}
+		local sliceCenter
 
-	if p7.props.thumbnailShadowHeight ~= nil then
-		n1 = p7.props.thumbnailShadowHeight
+		if defineFastFlag2 then
+			sliceCenter = Rect.new(32, 0, 33, 1)
+		else
+			sliceCenter = Rect.new(32, 0, 33, 28)
+		end
+
+		v3.SliceCenter = sliceCenter
+		dropShadow = createElement2(ImageSetLabel, v3)
 	end
 
-	local v31 = Roact.createElement("Frame", {
+	v2.DropShadow = dropShadow
+	return createElement("Frame", v, v2)
+end
+
+function extended:renderDesktopMode(p)
+	local thumbnailHeight = self.props.thumbnailHeight
+	local v = thumbnailHeight * (self.props.thumbnailAspectRatio.X / self.props.thumbnailAspectRatio.Y)
+	local sideMargin = self.props.sideMargin or 48
+	local itemPadding = self.props.itemPadding or 24
+
+	local v2 = self.props.thumbnailShadowHeight == nil and 28 or self.props.thumbnailShadowHeight
+
+	local createElement = Roact.createElement
+
+	local v3 = {
+		Size = UDim2.new(1, -(v + sideMargin * 2), 1, 0),
 		BackgroundTransparency = 1,
-		LayoutOrder = 2,
-		Size = UDim2.new(1, -(v27 + v28 * 2), 1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, if not p7.props.renderCustomHeader then {
-		Layout = Roact.createElement("UIListLayout", {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = 2
+	}
+	local children
+
+	if self.props.renderCustomHeader then
+		children = self.props.renderCustomHeader()
+	else
+		children = {
+			Layout = 0,
+			TitleInfo = 0,
+			ActonBarFrame = 0,
+			ActionBarLabel = 0,
+			ActionBarLabelImpressionsDetector = 0
+		}
+		local createElement2 = Roact.createElement
+		local v4 = {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical,
-			VerticalAlignment = if not v13 then Enum.VerticalAlignment.Top else Enum.VerticalAlignment.Bottom,
-			Padding = UDim.new(0, 16)
-		}),
-		TitleInfo = Roact.createElement(DetailsPageTitleContent, {
-			layoutOrder = 1,
-			titleText = p7.props.titleText,
-			subTitleText = p7.props.subTitleText,
-			renderInfoContent = p7.props.renderInfoContent,
-			verticalAlignment = Enum.VerticalAlignment.Top
-		}),
-		ActonBarFrame = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.fromOffset(p7.props.actionBarWidth, p7.props.actionBarHeight)
-		}, {
-			ActionBar = p7.props.actionBarProps and Roact.createElement(ActionBar, {
-				enableButtonAtStart = true,
-				button = p7.props.actionBarProps.button,
-				buttonOverride = if not FFlagUIBloxEnableActionBarButtonOverride then nil else p7.props.actionBarProps.buttonOverride,
-				icons = p7.props.actionBarProps.icons,
-				iconSize = p7.props.actionBarProps.iconSize,
-				buttonHeight = p7.props.actionBarProps.buttonHeight,
-				buttonPadding = p7.props.actionBarProps.buttonPadding,
-				textButtons = p7.props.actionBarProps.textButtons,
-				marginOverride = {
-					left = 0,
-					right = 0,
-					top = 0,
-					bottom = 0
-				},
-				horizontalAlignment = Enum.HorizontalAlignment.Left,
-				testId = if not FFlagUIBloxAddTestIdToActionBar then nil else "--experience-details"
-			}) or nil
-		}),
-		ActionBarLabel = if not p7.props.actionBarLabelText then nil else Roact.createElement("TextLabel", {
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Text = p7.props.actionBarLabelText,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
-			BackgroundTransparency = 1,
-			Font = p8.Tokens.Typography.BodyLarge.Font,
-			TextSize = p8.Tokens.FontSize.FontSize_350,
-			TextColor3 = p8.Tokens.Color.Content.Emphasis.Color3,
-			TextTransparency = p8.Tokens.Color.Content.Emphasis.Transparency,
-			LayoutOrder = 3,
-			[Roact.Ref] = p7.actionBarLabelRef
-		}),
-		ActionBarLabelImpressionsDetector = if not p7.props.actionBarLabelText or not p7.props.renderActionBarLabelImpressionsDetector then nil else p7.props.renderActionBarLabelImpressionsDetector(p7.actionBarLabelRef, p7.props.scrollViewPositionChangedSignal)
-	} else p7.props.renderCustomHeader())
+			VerticalAlignment = 0,
+			Padding = 0
+		}
+		local verticalAlignment
 
-	return {
+		if defineFastFlag then
+			verticalAlignment = Enum.VerticalAlignment.Bottom
+		else
+			verticalAlignment = Enum.VerticalAlignment.Top
+		end
+
+		v4.VerticalAlignment = verticalAlignment
+
+		v4.Padding = UDim.new(0, 16)
+		children.Layout = createElement2("UIListLayout", v4)
+
+		children.TitleInfo = Roact.createElement(DetailsPageTitleContent, {
+			titleText = self.props.titleText,
+			subTitleText = self.props.subTitleText,
+			renderInfoContent = self.props.renderInfoContent,
+			verticalAlignment = Enum.VerticalAlignment.Top,
+			layoutOrder = 1
+		})
+
+		local createElement3 = Roact.createElement
+		local v5 = {
+			Size = UDim2.fromOffset(self.props.actionBarWidth, self.props.actionBarHeight),
+			BackgroundTransparency = 1,
+			LayoutOrder = 2
+		}
+		local actionBar
+
+		if self.props.actionBarProps then
+			local createElement4 = Roact.createElement
+			local v6 = {
+				button = self.props.actionBarProps.button,
+				buttonOverride = 0,
+				icons = 0,
+				iconSize = 0,
+				buttonHeight = 0,
+				buttonPadding = 0,
+				textButtons = 0,
+				enableButtonAtStart = true,
+				marginOverride = 0,
+				horizontalAlignment = 0,
+				testId = 0
+			}
+			local buttonOverride
+
+			if FFlagUIBloxEnableActionBarButtonOverride then
+				buttonOverride = self.props.actionBarProps.buttonOverride
+			end
+
+			v6.buttonOverride = buttonOverride
+
+			v6.icons = self.props.actionBarProps.icons
+			v6.iconSize = self.props.actionBarProps.iconSize
+			v6.buttonHeight = self.props.actionBarProps.buttonHeight
+			v6.buttonPadding = self.props.actionBarProps.buttonPadding
+			v6.textButtons = self.props.actionBarProps.textButtons
+
+			v6.marginOverride = { left = 0, right = 0, top = 0, bottom = 0 }
+
+			v6.horizontalAlignment = Enum.HorizontalAlignment.Left
+			v6.testId = FFlagUIBloxAddTestIdToActionBar and "--experience-details" or nil
+			actionBar = createElement4(ActionBar, v6) or nil
+		end
+
+		children.ActonBarFrame = createElement3("Frame", v5, { ActionBar = actionBar })
+		local actionBarLabel
+
+		if self.props.actionBarLabelText then
+			local createElement4 = Roact.createElement
+			local actionBarLabelRefsByRef = {}
+			actionBarLabelRefsByRef.Size = UDim2.new(1, 0, 0, 0)
+			actionBarLabelRefsByRef.AutomaticSize = Enum.AutomaticSize.Y
+			actionBarLabelRefsByRef.Text = self.props.actionBarLabelText
+			actionBarLabelRefsByRef.TextXAlignment = Enum.TextXAlignment.Left
+			actionBarLabelRefsByRef.TextWrapped = true
+			actionBarLabelRefsByRef.BackgroundTransparency = 1
+			local font
+
+			if not FoundationFontFaceMigration then
+				font = p.Tokens.Typography.BodyLarge.Font
+			end
+
+			actionBarLabelRefsByRef.Font = font
+			local fontFace
+
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(p.Tokens.Typography.BodyLarge.Font)
+			end
+
+			actionBarLabelRefsByRef.FontFace = fontFace
+
+			actionBarLabelRefsByRef.TextSize = p.Tokens.FontSize.FontSize_350
+			actionBarLabelRefsByRef.TextColor3 = p.Tokens.Color.Content.Emphasis.Color3
+			actionBarLabelRefsByRef.TextTransparency = p.Tokens.Color.Content.Emphasis.Transparency
+			actionBarLabelRefsByRef.LayoutOrder = 3
+			actionBarLabelRefsByRef[Roact.Ref] = self.actionBarLabelRef
+			actionBarLabel = createElement4("TextLabel", actionBarLabelRefsByRef)
+		end
+
+		children.ActionBarLabel = actionBarLabel
+		local actionBarLabelImpressionsDetector
+
+		if self.props.actionBarLabelText and self.props.renderActionBarLabelImpressionsDetector then
+			actionBarLabelImpressionsDetector = self.props.renderActionBarLabelImpressionsDetector(
+				self.actionBarLabelRef,
+				self.props.scrollViewPositionChangedSignal
+			)
+		end
+
+		children.ActionBarLabelImpressionsDetector = actionBarLabelImpressionsDetector
+	end
+
+	local element = createElement("Frame", v3, children)
+
+	local desktopMode = {
 		Padding = Roact.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, v28),
-			PaddingRight = UDim.new(0, v28),
+			PaddingLeft = UDim.new(0, sideMargin),
+			PaddingRight = UDim.new(0, sideMargin),
 			PaddingBottom = UDim.new(0, 16)
 		}),
-		ContentFrame = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Position = UDim2.fromScale(0.5, 1),
-			AnchorPoint = Vector2.new(0.5, 1)
-		}, if not p7.props.renderCustomHeader then {
+		ContentFrame = 0
+	}
+
+	local createElement2 = Roact.createElement
+
+	local v4 = {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Position = UDim2.fromScale(0.5, 1),
+		AnchorPoint = Vector2.new(0.5, 1),
+		BackgroundTransparency = 1
+	}
+	local v5
+
+	if self.props.renderCustomHeader then
+		v5 = {
+			CustomHeader = self.props.renderCustomHeader(),
+			UISizeConstraint = 0
+		}
+	else
+		v5 = {
 			Layout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
 				VerticalAlignment = Enum.VerticalAlignment.Bottom,
-				Padding = UDim.new(0, v29)
+				Padding = UDim.new(0, itemPadding)
 			}),
-			ThumbnailTileFrame = p7:renderThumbnail(p8, n1, v27, thumbnailHeight),
-			InfoFrame = v31,
-			UISizeConstraint = if not p7.props.maxContentWidth then nil else Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(p7.props.maxContentWidth, 1e999)
-			})
-		} else {
-			CustomHeader = p7.props.renderCustomHeader(),
-			UISizeConstraint = if not p7.props.maxContentWidth then nil else Roact.createElement("UISizeConstraint", {
-				MaxSize = Vector2.new(p7.props.maxContentWidth, 1e999)
-			})
-		})
-	}
-end
-function v17.renderisPhone(p9, p10) -- line: 251
-	-- upvalues: Roact (copy), FFlagLuaAppFixDetailsPageThumbnailRenderInPhone (copy)
-	local thumbnailHeight = p9.props.thumbnailHeight
-	local v35 = thumbnailHeight * (p9.props.thumbnailAspectRatio.X / p9.props.thumbnailAspectRatio.Y)
-	local v36 = p9.props.sideMargin or 24
+			ThumbnailTileFrame = self:renderThumbnail(p, v2, v, thumbnailHeight),
+			InfoFrame = element,
+			UISizeConstraint = 0
+		}
+	end
 
-	if p9.props.renderCustomHeader then
+	local uiSizeConstraint
+
+	if self.props.maxContentWidth then
+		uiSizeConstraint = Roact.createElement("UISizeConstraint", {
+			MaxSize = Vector2.new(self.props.maxContentWidth, 1e999)
+		})
+	end
+
+	v5.UISizeConstraint = uiSizeConstraint
+	desktopMode.ContentFrame = createElement2("Frame", v4, v5)
+	return desktopMode
+end
+
+function extended:renderisPhone(p)
+	local thumbnailHeight = self.props.thumbnailHeight
+	local v = thumbnailHeight * (self.props.thumbnailAspectRatio.X / self.props.thumbnailAspectRatio.Y)
+	local sideMargin = self.props.sideMargin or 24
+
+	if self.props.renderCustomHeader then
 		return {
 			Padding = Roact.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v36),
-				PaddingRight = UDim.new(0, v36),
+				PaddingLeft = UDim.new(0, sideMargin),
+				PaddingRight = UDim.new(0, sideMargin),
 				PaddingBottom = UDim.new(0, 16)
 			}),
 			ContentFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
 				AnchorPoint = Vector2.new(0, 1),
-				Position = UDim2.fromScale(0, 1)
+				Position = UDim2.fromScale(0, 1),
+				BackgroundTransparency = 1
 			}, {
-				Content = p9.props.renderCustomHeader()
+				Content = self.props.renderCustomHeader()
 			})
 		}
 	end
 
-	return {
+	local v2 = {
 		Padding = Roact.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, v36),
-			PaddingRight = UDim.new(0, v36),
+			PaddingLeft = UDim.new(0, sideMargin),
+			PaddingRight = UDim.new(0, sideMargin),
 			PaddingBottom = UDim.new(0, 16)
 		}),
-		ThumbnailTileFrame = if not FFlagLuaAppFixDetailsPageThumbnailRenderInPhone then p9:renderThumbnail(p10, v35, thumbnailHeight) else p9:renderThumbnail(p10, 0, v35, thumbnailHeight)
+		ThumbnailTileFrame = 0
 	}
+	local thumbnailTileFrame
+
+	if FFlagLuaAppFixDetailsPageThumbnailRenderInPhone then
+		thumbnailTileFrame = self:renderThumbnail(p, 0, v, thumbnailHeight)
+	else
+		thumbnailTileFrame = self:renderThumbnail(p, v, thumbnailHeight)
+	end
+
+	v2.ThumbnailTileFrame = thumbnailTileFrame
+	return v2
 end
-function v17.render(p11) -- line: 289
-	-- upvalues: DeviceType (copy), withStyle (copy), Roact (copy)
-	local v38 = p11.props.deviceType == DeviceType.Phone
-	local thumbnailHeight = p11.props.thumbnailHeight
-	local v40 = p11.props.headerBarBackgroundHeight or 80
-	local v41 = p11.props.gradientHeight or thumbnailHeight + 16 - v40 + 44
-	local bottomMargin = p11.props.bottomMargin
 
-	return withStyle(function(p12) -- line: 299
-		-- upvalues: Roact (copy), v41 (copy), v40 (copy), v38 (copy), p11 (copy), thumbnailHeight (copy), bottomMargin (copy)
-		local Theme = p12.Theme
+function extended:render()
+	local v = self.props.deviceType == DeviceType.Phone
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 1)
-		}, {
+	local thumbnailHeight = self.props.thumbnailHeight
+	local headerBarBackgroundHeight = self.props.headerBarBackgroundHeight or 80
+
+	local gradientHeight = self.props.gradientHeight or thumbnailHeight + 16 - headerBarBackgroundHeight + 44
+	local bottomMargin = self.props.bottomMargin
+
+	return withStyle(function(p)
+		local theme = p.Theme
+
+		local createElement = Roact.createElement
+		local v2 = { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }
+
+		local v3 = {
 			Layout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Vertical,
@@ -237,11 +384,11 @@ function v17.render(p11) -- line: 289
 				HorizontalAlignment = Enum.HorizontalAlignment.Left
 			}),
 			GradientBar = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, gradientHeight),
+				BackgroundColor3 = theme.BackgroundDefault.Color,
+				AnchorPoint = Vector2.new(0, 1),
 				BorderSizePixel = 0,
-				LayoutOrder = 1,
-				Size = UDim2.new(1, 0, 0, v41),
-				BackgroundColor3 = Theme.BackgroundDefault.Color,
-				AnchorPoint = Vector2.new(0, 1)
+				LayoutOrder = 1
 			}, {
 				Gradient = Roact.createElement("UIGradient", {
 					Rotation = 270,
@@ -253,21 +400,29 @@ function v17.render(p11) -- line: 289
 				})
 			}),
 			BackgroundBar = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v40),
+				Size = UDim2.new(1, 0, 0, headerBarBackgroundHeight),
 				Position = UDim2.fromScale(0, 1),
 				AnchorPoint = Vector2.new(0, 1),
-				BackgroundColor3 = Theme.BackgroundDefault.Color,
-				BackgroundTransparency = Theme.BackgroundDefault.Transparency
-			}, v38 and p11:renderisPhone(p12, thumbnailHeight) or p11:renderDesktopMode(p12, thumbnailHeight)),
-			Padding = if not bottomMargin then nil else Roact.createElement("Frame", {
+				BackgroundColor3 = theme.BackgroundDefault.Color,
+				BackgroundTransparency = theme.BackgroundDefault.Transparency,
+				BorderSizePixel = 0,
+				LayoutOrder = 2
+			}, v and self:renderisPhone(p, thumbnailHeight) or self:renderDesktopMode(p, thumbnailHeight)),
+			Padding = 0
+		}
+		local padding
+
+		if bottomMargin then
+			padding = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, bottomMargin),
 				BackgroundTransparency = 1,
-				LayoutOrder = 3,
-				Size = UDim2.new(1, 0, 0, bottomMargin)
+				LayoutOrder = 3
 			})
-		})
+		end
+
+		v3.Padding = padding
+		return createElement("Frame", v2, v3)
 	end)
 end
 
-return v17
+return extended

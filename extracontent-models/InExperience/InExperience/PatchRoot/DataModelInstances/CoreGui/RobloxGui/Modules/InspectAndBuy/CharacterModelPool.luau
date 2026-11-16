@@ -1,177 +1,176 @@
 local Players = game:GetService("Players")
 local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
 local CorePackages = game:GetService("CorePackages")
+
 local Promise = require(CorePackages.Packages.Promise)
-local cFrame = CFrame.new((Vector3.new(0, 150, 0)))
-local v6 = game:DefineFastInt("InspectAndBuyClusterCompositionTimeoutMs", 3000)
-local t1 = {}
 
-t1.__index = t1
+local cframe = CFrame.new(Vector3.new(0, 150, 0))
 
-local function setupCharacterModels(p1) -- line: 25
-	-- upvalues: Players (copy), RobloxReplicatedStorage (copy)
-	local v14, v15
+local defineFastInt = game:DefineFastInt("InspectAndBuyClusterCompositionTimeoutMs", 3000)
 
-	if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-		v14 = Players:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R6)
-		v15 = Players:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
-	else
-		v14 = Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R6)
-		v15 = Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
-	end
+local CharacterModelPool = {}
+CharacterModelPool.__index = CharacterModelPool
 
-	v14.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-	v15.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-	v14.HumanoidRootPart.Anchored = true
-	v15.HumanoidRootPart.Anchored = true
-	v14.Parent = RobloxReplicatedStorage
-	v15.Parent = RobloxReplicatedStorage
-	v14.HumanoidRootPart.CFrame = CFrame.new(p1)
-	v15:SetPrimaryPartCFrame(v14.HumanoidRootPart.CFrame)
+local function setupCharacterModels(position)
+	local humanoidModelFromDescriptionAsync = Players:CreateHumanoidModelFromDescriptionAsync(
+		Instance.new("HumanoidDescription"),
+		Enum.HumanoidRigType.R6
+	)
 
-	return v14, v15
+	local humanoidModelFromDescriptionAsync2 = Players:CreateHumanoidModelFromDescriptionAsync(
+		Instance.new("HumanoidDescription"),
+		Enum.HumanoidRigType.R15
+	)
+
+	humanoidModelFromDescriptionAsync.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	humanoidModelFromDescriptionAsync2.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	humanoidModelFromDescriptionAsync.HumanoidRootPart.Anchored = true
+	humanoidModelFromDescriptionAsync2.HumanoidRootPart.Anchored = true
+	humanoidModelFromDescriptionAsync.Parent = RobloxReplicatedStorage
+	humanoidModelFromDescriptionAsync2.Parent = RobloxReplicatedStorage
+
+	humanoidModelFromDescriptionAsync.HumanoidRootPart.CFrame = CFrame.new(position)
+
+	humanoidModelFromDescriptionAsync2:SetPrimaryPartCFrame(humanoidModelFromDescriptionAsync.HumanoidRootPart.CFrame)
+
+	return humanoidModelFromDescriptionAsync, humanoidModelFromDescriptionAsync2
 end
 
-function t1.new(p2, p3, p4, p5) -- line: 60
-	-- upvalues: t1 (copy), setupCharacterModels (copy), RobloxReplicatedStorage (copy)
-	local t2 = {}
+function CharacterModelPool.new(worldModelRef, p, avatarType, mockApplyDescription)
+	local v = {}
+	setmetatable(v, CharacterModelPool)
 
-	setmetatable(t2, t1)
-	t2.mockApplyDescription = p5
+	v.mockApplyDescription = mockApplyDescription
 
-	local v21, v22 = setupCharacterModels(p3)
+	local r6, r15current = setupCharacterModels(p)
 
-	t2.r6 = v21
-	t2.r15current = v22
-	t2.r15offScreen = v22:Clone()
-	t2.r15offScreen.Parent = RobloxReplicatedStorage
-	t2.avatarType = p4
-	t2.worldModelRef = p2
-	t2.inProgressPromise = nil
-	t2.waitingPromise = nil
-	t2.r6Promise = nil
-	t2.destroyed = false
+	v.r6 = r6
+	v.r15current = r15current
+	v.r15offScreen = r15current:Clone()
+	v.r15offScreen.Parent = RobloxReplicatedStorage
 
-	return t2
+	v.avatarType = avatarType
+	v.worldModelRef = worldModelRef
+
+	v.inProgressPromise = nil
+
+	v.waitingPromise = nil
+
+	v.r6Promise = nil
+
+	v.destroyed = false
+
+	return v
 end
-function t1.setupAnimations(p6, p7, p8) -- line: 92
-	p7.Parent = p6.r6
-	p8.Parent = p6.r15current
-	p8.Archivable = true
 
-	local clone = p8:Clone()
-
-	clone.Parent = p6.r15offScreen
+function CharacterModelPool.setupAnimations(data, p, instance)
+	p.Parent = data.r6
+	instance.Parent = data.r15current
+	instance.Archivable = true
+	local clone = instance:Clone()
+	clone.Parent = data.r15offScreen
 	clone.Archivable = false
-	p8.Archivable = false
+	instance.Archivable = false
 end
-function t1.getCurrentCharacter(p9) -- line: 102
-	if p9.avatarType == Enum.HumanoidRigType.R15 then
-		return p9.r15current
+
+function CharacterModelPool:getCurrentCharacter()
+	if self.avatarType == Enum.HumanoidRigType.R15 then
+		return self.r15current
 	end
 
-	return p9.r6
-end
-function t1.isR15(p10) -- line: 110
-	return p10.avatarType == Enum.HumanoidRigType.R15
-end
-function t1.syncRotation(_, p12, p13) -- line: 114
-	local _, _, _, v35, v36, v37, v38, v39, v40, v41, v42, v43 = p12.HumanoidRootPart.CFrame:components()
-	local p = p13.HumanoidRootPart.CFrame.p
-
-	p13.HumanoidRootPart.CFrame = CFrame.new(p.X, p.Y, p.Z, v35, v36, v37, v38, v39, v40, v41, v42, v43)
+	return self.r6
 end
 
-local function hasLayeredAccessoryUpdates(p14, p15) -- line: 122
-	local Accessories = p14:GetAccessories(false)
-	local Accessories2 = p15:GetAccessories(false)
+function CharacterModelPool.isR15(p): boolean
+	return p.avatarType == Enum.HumanoidRigType.R15
+end
 
-	if #Accessories2 == 0 then
+function CharacterModelPool:syncRotation(p, p2)
+	local _, _, _, v, v2, v3, v4, v5, v6, v7, v8, v9 = p.HumanoidRootPart.CFrame:components()
+	local p3 = p2.HumanoidRootPart.CFrame.p
+	p2.HumanoidRootPart.CFrame = CFrame.new(p3.X, p3.Y, p3.Z, v, v2, v3, v4, v5, v6, v7, v8, v9)
+end
+
+local function hasLayeredAccessoryUpdates(appliedDescription, object): boolean
+	local accessories = appliedDescription:GetAccessories(false)
+	local accessories2 = object:GetAccessories(false)
+
+	if #accessories2 == 0 then
 		return false
 	end
 
-	if #Accessories ~= #Accessories2 then
+	if #accessories ~= #accessories2 then
 		return true
 	end
 
-	local t3 = {}
+	local assetIdSet = {}
 
-	for _, v in ipairs(Accessories) do
-		t3[v.AssetId] = true
+	for _, accessory in ipairs(accessories) do
+		assetIdSet[accessory.AssetId] = true
 	end
 
-	for _, v in ipairs(Accessories2) do
-		if not t3[v.AssetId] then
+	for _, accessory in ipairs(accessories2) do
+		if not assetIdSet[accessory.AssetId] then
 			return true
 		end
 	end
 
 	return false
 end
-local function hasWrapLayer(p16) -- line: 148
-	return p16:FindFirstChildWhichIsA("WrapLayer", true) ~= nil
+
+local function hasWrapLayer(instance): boolean -- 1 equivalent call inferred from this helper
+	return instance:FindFirstChildWhichIsA("WrapLayer", true) ~= nil
 end
 
-function t1._doUpdateR6(p17, p18) -- line: 152
-	-- upvalues: Promise (copy)
-	return Promise.new(function(resolve, _) -- line: 153
-		-- upvalues: p17 (copy), p18 (copy)
-		p17.r6.Parent = p17.worldModelRef:getValue()
+function CharacterModelPool:_doUpdateR6(p)
+	return Promise.new(function(callback, _)
+		self.r6.Parent = self.worldModelRef:getValue()
 
-		if p17.mockApplyDescription then
-			p17.mockApplyDescription(p17.r6, p18)
-		elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-			p17.r6.Humanoid:ApplyDescriptionAsync(p18)
+		if self.mockApplyDescription then
+			self.mockApplyDescription(self.r6, p)
 		else
-			p17.r6.Humanoid:ApplyDescription(p18)
+			self.r6.Humanoid:ApplyDescriptionAsync(p)
 		end
 
-		resolve(p17:getCurrentCharacter())
-	end)
-end
-function t1._doSimpleUpdateR15(p20, p21) -- line: 169
-	-- upvalues: Promise (copy)
-	return Promise.new(function(resolve, _) -- line: 170
-		-- upvalues: p20 (copy), p21 (copy)
-		p20.r15current.Parent = p20.worldModelRef:getValue()
-
-		if p20.mockApplyDescription then
-			p20.mockApplyDescription(p20.r15current, p21)
-		elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-			p20.r15current.Humanoid:ApplyDescriptionAsync(p21)
-		else
-			p20.r15current.Humanoid:ApplyDescription(p21)
-		end
-
-		resolve(p20.r15current)
-	end)
-end
-function t1._updateOffscreenR15(p23, p24) -- line: 186
-	-- upvalues: Promise (copy), cFrame (copy)
-	return Promise.new(function(resolve, _) -- line: 187
-		-- upvalues: p23 (copy), cFrame (copy), p24 (copy)
-		p23.r15offScreen.HumanoidRootPart.CFrame = cFrame
-		p23.r15offScreen.Parent = p23.worldModelRef:getValue()
-
-		if p23.mockApplyDescription then
-			p23.mockApplyDescription(p23.r15offScreen, p24)
-		elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-			p23.r15offScreen.Humanoid:ApplyDescriptionAsync(p24)
-		else
-			p23.r15offScreen.Humanoid:ApplyDescription(p24)
-		end
-
-		resolve(p23.r15offScreen)
+		callback(self:getCurrentCharacter())
 	end)
 end
 
-local function waitForClusterCompositionFinished(p26) -- line: 207
-	-- upvalues: Promise (copy), v6 (copy)
-	if p26:FindFirstChildWhichIsA("WrapLayer", true) ~= nil then
+function CharacterModelPool:_doSimpleUpdateR15(p)
+	return Promise.new(function(callback, _)
+		self.r15current.Parent = self.worldModelRef:getValue()
+
+		if self.mockApplyDescription then
+			self.mockApplyDescription(self.r15current, p)
+		else
+			self.r15current.Humanoid:ApplyDescriptionAsync(p)
+		end
+
+		callback(self.r15current)
+	end)
+end
+
+function CharacterModelPool:_updateOffscreenR15(p)
+	return Promise.new(function(callback, _)
+		self.r15offScreen.HumanoidRootPart.CFrame = cframe
+		self.r15offScreen.Parent = self.worldModelRef:getValue()
+
+		if self.mockApplyDescription then
+			self.mockApplyDescription(self.r15offScreen, p)
+		else
+			self.r15offScreen.Humanoid:ApplyDescriptionAsync(p)
+		end
+
+		callback(self.r15offScreen)
+	end)
+end
+
+local function waitForClusterCompositionFinished(instance)
+	if hasWrapLayer(instance) then -- inferred equivalent call
 		return Promise.race({
-			Promise.fromEvent(p26.Humanoid.ClusterCompositionFinished),
-			Promise.delay(v6 * 0.001)
-		}):andThen(function() -- line: 214
+			Promise.fromEvent(instance.Humanoid.ClusterCompositionFinished),
+			Promise.delay(defineFastInt * 0.001)
+		}):andThen(function(): boolean
 			return true
 		end)
 	end
@@ -179,131 +178,113 @@ local function waitForClusterCompositionFinished(p26) -- line: 207
 	return Promise.resolve(false)
 end
 
-function t1._completeUpdate(p27) -- line: 222
-	-- upvalues: cFrame (copy), RobloxReplicatedStorage (copy)
-	local HumanoidRootPartCFrame = p27.r15current.HumanoidRootPart.CFrame
+function CharacterModelPool:_completeUpdate()
+	local cframe2 = self.r15current.HumanoidRootPart.CFrame
+	self.r15offScreen.HumanoidRootPart.CFrame = cframe2
 
-	p27.r15offScreen.HumanoidRootPart.CFrame = HumanoidRootPartCFrame
-	p27.r15current.HumanoidRootPart.CFrame = cFrame
-	p27.r15current.Parent = RobloxReplicatedStorage
+	self.r15current.HumanoidRootPart.CFrame = cframe
+	self.r15current.Parent = RobloxReplicatedStorage
 
-	local r15current = p27.r15current
-	local r15offScreen = p27.r15offScreen
+	local r15current = self.r15current
+	local r15offScreen = self.r15offScreen
+	self.r15offScreen = r15current
+	self.r15current = r15offScreen
 
-	p27.r15offScreen = r15current
-	p27.r15current = r15offScreen
-
-	return p27.r15current
+	return self.r15current
 end
-function t1._doUpdateR15(p28, p29) -- line: 234
-	-- upvalues: hasLayeredAccessoryUpdates (copy), waitForClusterCompositionFinished (copy)
-	local AppliedDescription = p28.r15current.Humanoid:GetAppliedDescription()
 
-	if not hasLayeredAccessoryUpdates(AppliedDescription, p29) then
-		return p28:_doSimpleUpdateR15(p29)
+function CharacterModelPool:_doUpdateR15(p)
+	if not hasLayeredAccessoryUpdates(self.r15current.Humanoid:GetAppliedDescription(), p) then
+		return self:_doSimpleUpdateR15(p)
 	end
 
-	p28.inProgressPromise = p28:_updateOffscreenR15(p29):andThen(waitForClusterCompositionFinished):andThen(function() -- line: 242
-		-- upvalues: p28 (copy)
-		return p28:_completeUpdate()
+	self.inProgressPromise = self:_updateOffscreenR15(p):andThen(waitForClusterCompositionFinished):andThen(function()
+		return self:_completeUpdate()
 	end)
 
-	return p28.inProgressPromise
-end
-function t1.maybeUpdateCharacter(p30, p31) -- line: 255
-	-- upvalues: Promise (copy)
-	if p30.avatarType == Enum.HumanoidRigType.R6 then
-		p30.r6Promise = p30:_doUpdateR6(p31)
-
-		return p30.r6Promise
-	end
-
-	if p30.inProgressPromise and p30.inProgressPromise:getStatus() == Promise.Status.Started then
-		local waitingPromise = p30.waitingPromise
-
-		p30.waitingPromise = p30.inProgressPromise:andThen(function() -- line: 266
-			-- upvalues: p30 (copy), p31 (copy)
-			return p30:_doUpdateR15(p31)
-		end)
-
-		if waitingPromise then
-			waitingPromise:cancel()
-		end
-
-		return p30.waitingPromise
-	end
-
-	return p30:_doUpdateR15(p31)
-end
-function t1.switchAvatarType(p32, p33) -- line: 281
-	-- upvalues: RobloxReplicatedStorage (copy)
-	if p33 == p32.avatarType then
-		return p32:getCurrentCharacter()
-	end
-
-	p32:_cancelPromises()
-	p32.avatarType = p33
-
-	local r6, r15current
-
-	if p33 == Enum.HumanoidRigType.R6 then
-		r6 = p32.r6
-		r15current = p32.r15current
-	else
-		r6 = p32.r15current
-		r15current = p32.r6
-	end
-
-	r15current.Parent = RobloxReplicatedStorage
-	r15current.Humanoid:UnequipTools()
-	p32:syncRotation(r15current, r6)
-
-	return r6
-end
-function t1.start(_) -- line: 307
+	return self.inProgressPromise
 end
 
-local function cancelPromise(p35) -- line: 309
-	if p35 then
-		p35:cancel()
-	end
-end
-
-function t1._cancelPromises(p36) -- line: 315
-	local inProgressPromise = p36.inProgressPromise
-
-	if inProgressPromise then
-		inProgressPromise:cancel()
+function CharacterModelPool:maybeUpdateCharacter(p)
+	if self.avatarType == Enum.HumanoidRigType.R6 then
+		self.r6Promise = self:_doUpdateR6(p)
+		return self.r6Promise
 	end
 
-	local waitingPromise = p36.waitingPromise
+	if not self.inProgressPromise or self.inProgressPromise:getStatus() ~= Promise.Status.Started then
+		return self:_doUpdateR15(p)
+	end
+
+	local waitingPromise = self.waitingPromise
+
+	self.waitingPromise = self.inProgressPromise:andThen(function()
+		return self:_doUpdateR15(p)
+	end)
 
 	if waitingPromise then
 		waitingPromise:cancel()
 	end
 
-	local r6Promise = p36.r6Promise
+	return self.waitingPromise
+end
 
-	if r6Promise then
-		r6Promise:cancel()
+function CharacterModelPool:switchAvatarType(avatarType)
+	if avatarType == self.avatarType then
+		return self:getCurrentCharacter()
 	end
 
-	p36.inProgressPromise = nil
-	p36.waitingPromise = nil
-	p36.r6Promise = nil
-end
-function t1.stop(p37) -- line: 324
-	-- upvalues: RobloxReplicatedStorage (copy)
-	p37.r6.Parent = RobloxReplicatedStorage
-	p37.r15current.Parent = RobloxReplicatedStorage
-	p37.r15offScreen.Parent = RobloxReplicatedStorage
-	p37:_cancelPromises()
-end
-function t1.onDestroy(p38) -- line: 332
-	p38:_cancelPromises()
-	p38.r6:Destroy()
-	p38.r15current:Destroy()
-	p38.r15offScreen:Destroy()
+	self:_cancelPromises()
+
+	self.avatarType = avatarType
+	local selected, v
+
+	if avatarType == Enum.HumanoidRigType.R6 then
+		selected = self.r6
+		v = self.r15current
+	else
+		selected = self.r15current
+		v = self.r6
+	end
+
+	v.Parent = RobloxReplicatedStorage
+	v.Humanoid:UnequipTools()
+
+	self:syncRotation(v, selected)
+
+	return selected
 end
 
-return t1
+function CharacterModelPool.start(_) end
+
+local function cancelPromise(object) -- 3 equivalent calls inferred from this helper
+	if object then
+		object:cancel()
+	end
+end
+
+function CharacterModelPool:_cancelPromises()
+	cancelPromise(self.inProgressPromise) -- inferred equivalent call
+	cancelPromise(self.waitingPromise) -- inferred equivalent call
+	cancelPromise(self.r6Promise) -- inferred equivalent call
+	self.inProgressPromise = nil
+	self.waitingPromise = nil
+	self.r6Promise = nil
+end
+
+function CharacterModelPool:stop()
+	self.r6.Parent = RobloxReplicatedStorage
+	self.r15current.Parent = RobloxReplicatedStorage
+	self.r15offScreen.Parent = RobloxReplicatedStorage
+
+	self:_cancelPromises()
+end
+
+function CharacterModelPool:onDestroy()
+	self:_cancelPromises()
+
+	self.r6:Destroy()
+	self.r15current:Destroy()
+	self.r15offScreen:Destroy()
+end
+
+return CharacterModelPool

@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+local React = require(parent.React)
 
 require(script.Parent.types)
 

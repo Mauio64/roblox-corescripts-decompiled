@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagAXCategoryPillPositionAnimation) and game:DefineFastFlag("AXDisableHiddenCatalogCategoryPills", false)
+local FFlagAXCategoryPillPositionAnimation = require(script.Parent.FFlagAXCategoryPillPositionAnimation)
+
+return FFlagAXCategoryPillPositionAnimation and game:DefineFastFlag("AXDisableHiddenCatalogCategoryPills", false)

@@ -1,50 +1,53 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Signals = require(Parent.Signals)
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local Signals = require(parent.Signals)
+local Cryo = require(parent.Cryo)
+
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
 
-local function createModeratedItemsStore() -- line: 18
-	-- upvalues: createSignal (copy), createComputed (copy), Cryo (copy)
-	local v7, v8 = createSignal({})
-	local t1 = {}
+local function createModeratedItemsStore()
+	local signal, v = createSignal({})
+	local v2 = {}
 
-	return {
-		getItems = v7,
-		getIsModerated = function(s1: string) -- line: 22
-			-- upvalues: t1 (copy), createComputed (copy), v7 (copy)
-			if t1[s1] == nil then
-				t1[s1] = createComputed(function(p1) -- line: 24
-					-- upvalues: v7 (copy), s1 (copy)
-					return table.find(v7(p1), s1) ~= nil
-				end)
-			end
+	local function getIsModerated(p: string)
+		if v2[p] == nil then
+			v2[p] = createComputed(function(p2): boolean
+				return table.find(signal(p2), p) ~= nil
+			end)
+		end
 
-			return t1[s1]
-		end,
-		markReported = function(s2: string) -- line: 31
-			-- upvalues: v7 (copy), v8 (copy), Cryo (copy)
-			local v12 = v7(false)
+		return v2[p]
+	end
 
-			if not table.find(v12, s2) then
-				v8((Cryo.List.join(v12, { s2 })))
-			end
-		end,
-		addModeratedItems = function(t2: {[any]: any}) -- line: 38
-			-- upvalues: v7 (copy), v8 (copy), Cryo (copy)
-			local v14 = v7(false)
-			local t3 = {}
+	local function markReported(p: string)
+		local v3 = signal(false)
 
-			for _, v17 in t2 do
-				if not table.find(v14, v17) then
-					table.insert(t3, v17)
-				end
-			end
+		if not table.find(v3, p) then
+			v((Cryo.List.join(v3, { p })))
+		end
+	end
 
-			if #t3 > 0 then
-				v8((Cryo.List.join(v14, t3)))
+	local function addModeratedItems(items)
+		local v3 = signal(false)
+		local v4 = {}
+
+		for _, item in items do
+			if not table.find(v3, item) then
+				table.insert(v4, item)
 			end
 		end
+
+		if #v4 > 0 then
+			v((Cryo.List.join(v3, v4)))
+		end
+	end
+
+	return {
+		getItems = signal,
+		getIsModerated = getIsModerated,
+		markReported = markReported,
+		addModeratedItems = addModeratedItems
 	}
 end
 

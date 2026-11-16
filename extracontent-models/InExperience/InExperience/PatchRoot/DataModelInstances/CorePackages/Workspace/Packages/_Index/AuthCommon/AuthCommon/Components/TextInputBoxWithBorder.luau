@@ -1,143 +1,241 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Roact = require(AuthCommonParent.Roact)
-local withStyle = require(AuthCommonParent.UIBlox).Style.withStyle
+local parent = AuthCommon.Parent
+
+local Roact = require(parent.Roact)
+
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local withStyle = UIBlox.Style.withStyle
+
 local PasswordBox = require(AuthCommon.Components.PasswordBox)
 local GenericTextBox = require(AuthCommon.Components.GenericTextBox)
 local AuthStatefulRoundCornerBorder = require(AuthCommon.Components.AuthStatefulRoundCornerBorder)
-local GetFFlagEnableAuthStatefulTextInputUpdates = require(AuthCommonParent.SharedFlags).GetFFlagEnableAuthStatefulTextInputUpdates
-local v9 = Roact.PureComponent:extend(script.Name)
 
-v9.defaultProps = {
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnableAuthStatefulTextInputUpdates = SharedFlags.GetFFlagEnableAuthStatefulTextInputUpdates
+
+local extended = Roact.PureComponent:extend(script.Name)
+
+extended.defaultProps = {
 	text = "",
+	textInputType = Enum.TextInputType.NoSuggestions,
 	textInputHeight = 30,
 	textInputListPadding = 12,
-	textInputType = Enum.TextInputType.NoSuggestions,
 	borderState = AuthStatefulRoundCornerBorder.BorderState.Default
 }
 
-function v9.render(p1) -- line: 29
-	-- upvalues: GetFFlagEnableAuthStatefulTextInputUpdates (copy), withStyle (copy), Roact (copy), AuthStatefulRoundCornerBorder (copy), PasswordBox (copy), GenericTextBox (copy)
-	local text = p1.props.text
-	local textInputType = p1.props.textInputType
-	local textInputHeight = p1.props.textInputHeight
-	local v14 = not GetFFlagEnableAuthStatefulTextInputUpdates() and 12 or p1.props.textInputListPadding
-	local layoutOrder = p1.props.layoutOrder
-	local borderState = p1.props.borderState
-	local placeholderText = p1.props.placeholderText
-	local onChangeTextCallback = p1.props.onChangeTextCallback
-	local onFocused = p1.props.onFocused
-	local onFocusLost = p1.props.onFocusLost
-	local labelText = p1.props.labelText
-	local errorText = p1.props.errorText
-	local maxLength = p1.props.maxLength
-	local v24 = p1.props.textInputType == Enum.TextInputType.Password
+function extended.render(p)
+	local text = p.props.text
+	local textInputType = p.props.textInputType
+	local textInputHeight = p.props.textInputHeight
+	local v = not GetFFlagEnableAuthStatefulTextInputUpdates() and 12 or p.props.textInputListPadding
 
-	return withStyle(function(p2) -- line: 48
-		-- upvalues: p1 (copy), Roact (copy), layoutOrder (copy), v14 (copy), labelText (copy), AuthStatefulRoundCornerBorder (copy), textInputHeight (copy), GetFFlagEnableAuthStatefulTextInputUpdates (copy), borderState (copy), v24 (copy), PasswordBox (copy), text (copy), placeholderText (copy), onChangeTextCallback (copy), GenericTextBox (copy), textInputType (copy), onFocused (copy), onFocusLost (copy), maxLength (copy), errorText (copy)
-		local BodyFont = p2.Font.Body.Font
-		local v27 = p2.Font.BaseSize * p2.Font.Body.RelativeSize
-		local TextDefaultColor = p2.Theme.TextDefault.Color
-		local TextDefaultTransparency = p2.Theme.TextDefault.Transparency
-		local BackgroundUIContrastColor = p2.Theme.BackgroundUIContrast.Color
-		local BackgroundUIContrastTransparency = p2.Theme.BackgroundUIContrast.Transparency
-		local UIDefaultColor = p2.Theme.UIDefault.Color
-		local TextEmphasisColor = p2.Theme.TextEmphasis.Color
+	local layoutOrder = p.props.layoutOrder
+	local borderState = p.props.borderState
+	local placeholderText = p.props.placeholderText
+	local onChangeTextCallback = p.props.onChangeTextCallback
+	local onFocused = p.props.onFocused
+	local onFocusLost = p.props.onFocusLost
+	local labelText = p.props.labelText
+	local errorText = p.props.errorText
 
-		if p1.props.placeholderTextColor then
-			UIDefaultColor = p1.props.placeholderTextColor
+	local maxLength = p.props.maxLength
+	local v2 = p.props.textInputType == Enum.TextInputType.Password
+
+	return withStyle(function(props)
+		local font = props.Font.Body.Font
+		local textSize = props.Font.BaseSize * props.Font.Body.RelativeSize
+		local color = props.Theme.TextDefault.Color
+		local transparency = props.Theme.TextDefault.Transparency
+		local color2 = props.Theme.BackgroundUIContrast.Color
+		local transparency2 = props.Theme.BackgroundUIContrast.Transparency
+		local placeholderColor = props.Theme.UIDefault.Color
+		local textColor = props.Theme.TextEmphasis.Color
+
+		if p.props.placeholderTextColor then
+			placeholderColor = p.props.placeholderTextColor
 		end
 
-		if p1.props.labelTextColor then
-			TextEmphasisColor = p1.props.labelTextColor
+		if p.props.labelTextColor then
+			textColor = p.props.labelTextColor
 		end
 
-		if p1.props.textBarColor then
-			BackgroundUIContrastColor = p1.props.textBarColor
+		if p.props.textBarColor then
+			color2 = p.props.textBarColor
 		end
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
+		local createElement = Roact.createElement
+		local v3 = {
 			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
 			LayoutOrder = layoutOrder,
 			Size = UDim2.new(1, 0, 0, 0)
-		}, {
+		}
+		local v4 = {
 			ListLayout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				Padding = UDim.new(0, v14)
+				Padding = UDim.new(0, v)
 			}),
-			TextBoxLabel = labelText and Roact.createElement("TextLabel", {
+			TextBoxLabel = 0,
+			TextBox = 0,
+			ErrorText = 0
+		}
+
+		local textBoxLabel = labelText
+
+		if textBoxLabel then
+			local createElement2 = Roact.createElement
+			local v5 = {
 				LayoutOrder = 1,
-				BackgroundTransparency = 1,
-				TextWrapped = true,
 				Size = UDim2.new(1, 0, 0, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
 				Text = labelText,
-				Font = p2.Font.CaptionHeader.Font,
-				TextSize = p2.Font.BaseSize * p2.Font.CaptionHeader.RelativeSize,
-				TextColor3 = TextEmphasisColor,
-				TextTransparency = p2.Theme.TextEmphasis.Transparency,
-				TextXAlignment = Enum.TextXAlignment.Left
+				TextWrapped = true,
+				Font = 0,
+				FontFace = 0,
+				TextSize = 0,
+				TextColor3 = 0,
+				TextTransparency = 0,
+				TextXAlignment = 0
+			}
+			local font2
+
+			if not FoundationFontFaceMigration then
+				font2 = props.Font.CaptionHeader.Font
+			end
+
+			v5.Font = font2
+			local fontFace
+
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(props.Tokens.Typography.CaptionLarge.Font)
+			end
+
+			v5.FontFace = fontFace
+
+			v5.TextSize = props.Font.BaseSize * props.Font.CaptionHeader.RelativeSize
+			v5.TextColor3 = textColor
+			v5.TextTransparency = props.Theme.TextEmphasis.Transparency
+			v5.TextXAlignment = Enum.TextXAlignment.Left
+			textBoxLabel = createElement2("TextLabel", v5)
+		end
+
+		v4.TextBoxLabel = textBoxLabel
+
+		local createElement2 = Roact.createElement
+		local v5 = {
+			size = UDim2.new(1, 0, 0, textInputHeight),
+			layoutOrder = GetFFlagEnableAuthStatefulTextInputUpdates() and 2 or layoutOrder,
+			borderState = borderState
+		}
+
+		local v6 = {
+			PasswordBox = v2 and Roact.createElement(PasswordBox, {
+				LayoutOrder = not GetFFlagEnableAuthStatefulTextInputUpdates() and 2 or nil,
+				Size = UDim2.new(1, 0, 1, 0),
+				Color = color2,
+				Transparency = transparency2,
+				TextSize = textSize,
+				TextColor = color,
+				TextTransparency = transparency,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Text = text,
+				PlaceholderText = placeholderText,
+				PlaceholderColor3 = placeholderColor,
+				ManualFocusRelease = false,
+				CaptureFocusOnTapStart = true,
+				onChangeText = onChangeTextCallback
 			}),
-			TextBox = Roact.createElement(AuthStatefulRoundCornerBorder, {
-				size = UDim2.new(1, 0, 0, textInputHeight),
-				layoutOrder = if not GetFFlagEnableAuthStatefulTextInputUpdates() then layoutOrder else 2,
-				borderState = borderState
-			}, {
-				PasswordBox = v24 and Roact.createElement(PasswordBox, {
-					ManualFocusRelease = false,
-					CaptureFocusOnTapStart = true,
-					LayoutOrder = if GetFFlagEnableAuthStatefulTextInputUpdates() then nil else 2,
-					Size = UDim2.new(1, 0, 1, 0),
-					Color = BackgroundUIContrastColor,
-					Transparency = BackgroundUIContrastTransparency,
-					TextSize = v27,
-					TextColor = TextDefaultColor,
-					TextTransparency = TextDefaultTransparency,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Text = text,
-					PlaceholderText = placeholderText,
-					PlaceholderColor3 = UIDefaultColor,
-					onChangeText = onChangeTextCallback
-				}),
-				GenericTextBox = not v24 and Roact.createElement(GenericTextBox, {
-					ClearTextOnFocus = false,
-					PaddingX = 12,
-					LayoutOrder = if GetFFlagEnableAuthStatefulTextInputUpdates() then nil else 2,
-					Size = UDim2.new(1, 0, 1, 0),
-					Text = text,
-					Font = BodyFont,
-					TextSize = v27,
-					TextColor = TextDefaultColor,
-					TextTransparency = TextDefaultTransparency,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Color = BackgroundUIContrastColor,
-					Transparency = BackgroundUIContrastTransparency,
-					TextInputType = textInputType,
-					onChangeText = onChangeTextCallback,
-					PlaceholderText = placeholderText,
-					PlaceholderColor = UIDefaultColor,
-					onFocused = onFocused,
-					onFocusLost = onFocusLost,
-					TextBoxRef = if not GetFFlagEnableAuthStatefulTextInputUpdates then nil else p1.props.textBoxRef,
-					maxLength = maxLength
-				})
-			}),
-			ErrorText = errorText and Roact.createElement("TextLabel", {
+			GenericTextBox = 0
+		}
+
+		local genericTextBox = not v2
+
+		if genericTextBox then
+			local createElement3 = Roact.createElement
+			local v7 = {
+				LayoutOrder = not GetFFlagEnableAuthStatefulTextInputUpdates() and 2 or nil,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = text,
+				Font = font,
+				TextSize = textSize,
+				TextColor = color,
+				TextTransparency = transparency,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				ClearTextOnFocus = false,
+				Color = color2,
+				Transparency = transparency2,
+				TextInputType = textInputType,
+				onChangeText = onChangeTextCallback,
+				PlaceholderText = placeholderText,
+				PlaceholderColor = placeholderColor,
+				PaddingX = 12,
+				onFocused = onFocused,
+				onFocusLost = onFocusLost,
+				TextBoxRef = 0,
+				maxLength = 0
+			}
+			local textBoxRef
+
+			if GetFFlagEnableAuthStatefulTextInputUpdates then
+				textBoxRef = p.props.textBoxRef
+			end
+
+			v7.TextBoxRef = textBoxRef
+			v7.maxLength = maxLength
+			genericTextBox = createElement3(GenericTextBox, v7)
+		end
+
+		v6.GenericTextBox = genericTextBox
+		v4.TextBox = createElement2(AuthStatefulRoundCornerBorder, v5, v6)
+
+		local errorText2 = errorText
+
+		if errorText2 then
+			local createElement3 = Roact.createElement
+			local v7 = {
 				LayoutOrder = 3,
 				BackgroundTransparency = 1,
-				TextWrapped = true,
 				Text = errorText,
-				TextSize = p2.Font.CaptionBody.RelativeSize * p2.Font.BaseSize,
-				Font = p2.Font.SubHeader1.Font,
-				TextColor3 = p2.Theme.Alert.Color,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(1, 0, 0, 0)
-			})
-		})
+				TextSize = props.Font.CaptionBody.RelativeSize * props.Font.BaseSize,
+				Font = 0,
+				FontFace = 0,
+				TextColor3 = 0,
+				TextXAlignment = 0,
+				AutomaticSize = 0,
+				TextWrapped = true,
+				Size = 0
+			}
+			local font2
+
+			if not FoundationFontFaceMigration then
+				font2 = props.Font.SubHeader1.Font
+			end
+
+			v7.Font = font2
+			local fontFace
+
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(props.Tokens.Typography.TitleLarge.Font)
+			end
+
+			v7.FontFace = fontFace
+
+			v7.TextColor3 = props.Theme.Alert.Color
+			v7.TextXAlignment = Enum.TextXAlignment.Left
+			v7.AutomaticSize = Enum.AutomaticSize.Y
+
+			v7.Size = UDim2.new(1, 0, 0, 0)
+			errorText2 = createElement3("TextLabel", v7)
+		end
+
+		v4.ErrorText = errorText2
+		return createElement("Frame", v3, v4)
 	end)
 end
 
-return v9
+return extended

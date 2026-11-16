@@ -1,6 +1,5 @@
-return require(script.Parent.Parent.Action)("ClientScriptsUpdateSearchFilter", function(p1, p2) -- line: 4
-	return {
-		searchTerm = p1,
-		filterTypes = p2
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action("ClientScriptsUpdateSearchFilter", function(searchTerm, filterTypes)
+	return { searchTerm = searchTerm, filterTypes = filterTypes }
 end)

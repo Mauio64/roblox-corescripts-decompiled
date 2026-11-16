@@ -1,68 +1,67 @@
-local ancestor = script:FindFirstAncestor("ultimate-list")
+local ultimatelist = script:FindFirstAncestor("ultimate-list")
 
-require(ancestor.Dimensions)
+require(ultimatelist.Dimensions)
+local DimensionsMethods = require(ultimatelist.Dimensions.DimensionsMethods)
+local React = require(ultimatelist.Parent.React)
+require(ultimatelist.Renderers)
+local adjustPositionToScrollAxis = require(ultimatelist.Dimensions.adjustPositionToScrollAxis)
+require(ultimatelist.createVirtualizedListController)
+local joinAndMapBindings = require(ultimatelist.Util.joinAndMapBindings)
 
-local DimensionsMethods = require(ancestor.Dimensions.DimensionsMethods)
-local React = require(ancestor.Parent.React)
-
-require(ancestor.Renderers)
-
-local adjustPositionToScrollAxis = require(ancestor.Dimensions.adjustPositionToScrollAxis)
-
-require(ancestor.createVirtualizedListController)
-
-local joinAndMapBindings = require(ancestor.Util.joinAndMapBindings)
 local createElement = React.createElement
 
-local function getKeyDefault(_, n1: number) -- line: 13
-	return (tostring(n1))
+local function getKeyDefault(_, p: number)
+	return (tostring(p))
 end
-local function ReactStateRenderer(t1: {[any]: any}) -- line: 23
-	-- upvalues: React (copy), getKeyDefault (copy), DimensionsMethods (copy), createElement (copy), joinAndMapBindings (copy), adjustPositionToScrollAxis (copy)
-	local v12, v13 = React.useState(t1.virtualizedListController.get)
-	local v14, v15 = React.useBinding(nil)
 
-	React.useEffect(function() -- line: 39
-		-- upvalues: v12 (copy), t1 (copy), v15 (copy), v13 (copy)
-		local u23 = v12
+local function ReactStateRenderer(props)
+	local state, setState = React.useState(props.virtualizedListController.get)
+	local v, v2 = React.useBinding(nil)
 
-		return t1.virtualizedListController.bindToUpdate(function() -- line: 42
-			-- upvalues: v15 (copy), u23 (ref), t1 (copy), v13 (copy)
-			v15({
-				lockedTo = u23,
-				scrollAxis = t1.scrollAxisBinding:getValue()
+	React.useEffect(function()
+		local lockedTo = props.virtualizedListController.get()
+		setState(lockedTo)
+
+		return props.virtualizedListController.bindToUpdate(function()
+			v2({
+				lockedTo = lockedTo,
+				scrollAxis = props.scrollAxisBinding:getValue()
 			})
-			u23 = t1.virtualizedListController.get()
-			v13(u23)
+
+			lockedTo = props.virtualizedListController.get()
+			setState(lockedTo)
 		end)
-	end, {
-		t1.virtualizedListController,
-		t1.scrollAxisBinding
-	})
+	end, { props.virtualizedListController, props.scrollAxisBinding })
 
-	local t2 = {}
-	local v17 = t1.getKey or getKeyDefault
-	local v18 = t1.virtualizedListController.getRange()
+	local getKey = props.getKey or getKeyDefault
+	local range = props.virtualizedListController.getRange()
+	local children = {}
 
-	for v19, v20 in v12 do
-		local v21 = v18.X + (v19 - 1)
-		local v22 = DimensionsMethods.getUDimRect(t1.dimensions, v20, v21, t1.virtualizedListController.getWindowSize(), t1.direction)
+	for k, v3 in state do
+		local v4 = range.X + (k - 1)
 
-		t2[v17(v20, v21)] = createElement("Frame", {
+		local udimRect = DimensionsMethods.getUDimRect(
+			props.dimensions,
+			v3,
+			v4,
+			props.virtualizedListController.getWindowSize(),
+			props.direction
+		)
+
+		children[getKey(v3, v4)] = createElement("Frame", {
 			BackgroundTransparency = 1,
-			Position = joinAndMapBindings(function(n2: number, t3: {[any]: any}?) -- line: 70
-				-- upvalues: t1 (copy), v12 (copy), adjustPositionToScrollAxis (copy), v22 (copy)
-				if t1.config.freezeViewWhileScrolling ~= false and (t3 ~= nil and t3.lockedTo == v12) then
-					return adjustPositionToScrollAxis(v22.position, t3.scrollAxis, t1.direction)
+			Position = joinAndMapBindings(function(p: number, p2)
+				if props.config.freezeViewWhileScrolling == false or p2 == nil or p2.lockedTo ~= state then
+					return adjustPositionToScrollAxis(udimRect.position, p, props.direction)
 				end
 
-				return adjustPositionToScrollAxis(v22.position, n2, t1.direction)
-			end, t1.scrollAxisBinding, v14),
-			Size = v22.size
-		}, t1.callback(v20))
+				return adjustPositionToScrollAxis(udimRect.position, p2.scrollAxis, props.direction)
+			end, props.scrollAxisBinding, v),
+			Size = udimRect.size
+		}, props.callback(v3))
 	end
 
-	return createElement(React.Fragment, nil, t2)
+	return createElement(React.Fragment, nil, children)
 end
 
 return ReactStateRenderer

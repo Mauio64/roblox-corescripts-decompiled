@@ -1,11 +1,11 @@
-local function findLocalTextSource(p1, s1: string?) -- line: 3
-	if p1 == nil or s1 == nil then
+local function findLocalTextSource(instance, p: string?)
+	if instance == nil or p == nil then
 		return nil
 	end
 
-	for _, child in p1:GetChildren() do
-		if child:IsA("TextSource") and s1 == tostring(child.UserId) then
-			return child
+	for _, textSource in instance:GetChildren() do
+		if textSource:IsA("TextSource") and tostring(textSource.UserId) == p then
+			return textSource
 		end
 	end
 

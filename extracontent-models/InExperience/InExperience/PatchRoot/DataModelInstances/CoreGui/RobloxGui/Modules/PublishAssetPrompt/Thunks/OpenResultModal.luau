@@ -1,10 +1,8 @@
-local ParentParent = script.Parent.Parent
-local OpenResultModal = require(ParentParent.Actions.OpenResultModal)
+local parent = script.Parent.Parent
+local OpenResultModal = require(parent.Actions.OpenResultModal)
 
-return function(p1) -- line: 11
-	-- upvalues: OpenResultModal (copy)
-	return function(p2) -- line: 12
-		-- upvalues: OpenResultModal (copy), p1 (copy)
-		p2:dispatch(OpenResultModal(p1))
+return function(p)
+	return function(object)
+		object:dispatch(OpenResultModal(p))
 	end
 end

@@ -1,9 +1,8 @@
-local BindableEvent = Instance.new("BindableEvent")
+local bindableEvent = Instance.new("BindableEvent")
 
 return {
-	purchaseCompletedEvent = BindableEvent.Event,
-	firePurchaseCompleted = function() -- line: 15
-		-- upvalues: BindableEvent (copy)
-		BindableEvent:Fire()
+	purchaseCompletedEvent = bindableEvent.Event,
+	firePurchaseCompleted = function()
+		bindableEvent:Fire()
 	end
 }

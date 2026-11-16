@@ -3,9 +3,7 @@ local Immutable = require(script.Immutable)
 local Color = require(script.Color)
 local Functional = require(script.Functional)
 local AsyncQueue = require(script.AsyncQueue.AsyncQueue)
-
 require(script.AsyncQueue.AsyncQueueTypes)
-
 local IsVRAppBuild = require(script.IsVRAppBuild)
 local GetDefaultQualityLevel = require(script.GetDefaultQualityLevel)
 local isRunningInStudio = require(script.isRunningInStudio)
@@ -22,6 +20,7 @@ local Create = require(script.Create)
 local Logging = require(script.Logging)
 local GenerateStringId = require(script.GenerateStringId)
 local isSpatial = require(script.isSpatial)
+local isTenFootInterface = require(script.isTenFootInterface)
 local connectToIsSpatialChanged = require(script.connectToIsSpatialChanged)
 
 return {
@@ -30,6 +29,7 @@ return {
 	Immutable = Immutable,
 	IsVRAppBuild = IsVRAppBuild,
 	isSpatial = isSpatial,
+	isTenFootInterface = isTenFootInterface,
 	connectToIsSpatialChanged = connectToIsSpatialChanged,
 	GetDefaultQualityLevel = GetDefaultQualityLevel,
 	Color = Color,
@@ -47,5 +47,8 @@ return {
 	getDeviceType = getDeviceType,
 	Create = Create,
 	Logging = Logging,
-	GenerateStringId = GenerateStringId
+	GenerateStringId = GenerateStringId,
+	isPlatformSingleSignOnSupported = function(object)
+		return object and object.IsSingleSignOnSupported and object:IsSingleSignOnSupported() and true or false
+	end
 }

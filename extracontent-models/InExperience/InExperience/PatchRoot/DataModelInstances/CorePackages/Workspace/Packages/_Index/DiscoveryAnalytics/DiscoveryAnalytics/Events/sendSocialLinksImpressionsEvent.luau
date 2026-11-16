@@ -1,9 +1,12 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("SocialLinksImpressionsEventHundredthsPercent", 10000)
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local defineFastInt = game:DefineFastInt("SocialLinksImpressionsEventHundredthsPercent", 10000)
+
+local strictInterface = t.strictInterface({
 	item_positions = t.string,
 	social_link_urls = t.string,
 	social_link_types = t.string,
@@ -12,28 +15,24 @@ local v6 = t.strictInterface({
 	assignment_type = t.string,
 	page = t.string
 })
-local t1 = {
+
+local v = {
 	eventName = "EdpSocialLinksImpressions",
 	description = "Impressions for social links on EDP",
-	lastUpdated = {
-		25,
-		12,
-		10
-	},
+	lastUpdated = { 25, 12, 10 },
 	backends = { "EventIngest" },
-	throttlingPercentage = v5
+	throttlingPercentage = defineFastInt
 }
 
-return function(t2: {[any]: any}) -- line: 40
-	-- upvalues: v6 (copy), DiscoveryEventErrorLogger (copy), TelemetryService (copy), t1 (copy)
-	local v9, v10 = v6(t2)
+return function(customFields)
+	local v2, v3 = strictInterface(customFields)
 
-	if not v9 then
-		DiscoveryEventErrorLogger.reportError("SocialLinksImpressionsEventInterface", v10)
+	if not v2 then
+		DiscoveryEventErrorLogger.reportError("SocialLinksImpressionsEventInterface", v3)
 	end
 
-	TelemetryService:LogEvent(t1, {
-		customFields = t2,
+	TelemetryService:LogEvent(v, {
+		customFields = customFields,
 		standardizedFields = { "addSessionInfo" }
 	})
 end

@@ -1,12 +1,12 @@
-local function getCaptureVideoContent(p1) -- line: 12
-	if typeof(p1) == "table" and p1.assetId ~= nil then
-		return Content.fromUri(`rbxassetid://{ p1.assetId }`)
+local function getCaptureVideoContent(p)
+	if typeof(p) == "table" and p.assetId ~= nil then
+		return Content.fromUri(`rbxassetid://{p.assetId}`)
 	end
 
-	if typeof(p1) ~= "table" then
-		local ok, result = pcall(Content.fromObject, p1)
+	if typeof(p) ~= "table" then
+		local success, result = pcall(Content.fromObject, p)
 
-		if ok then
+		if success then
 			return result
 		end
 	end

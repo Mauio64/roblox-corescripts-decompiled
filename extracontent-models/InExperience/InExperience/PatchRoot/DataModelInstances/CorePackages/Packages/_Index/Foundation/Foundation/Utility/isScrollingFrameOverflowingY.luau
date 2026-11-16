@@ -1,7 +1,7 @@
-local function isScrollingFrameOverflowingY(p1, n1: number?) -- line: 1
-	local v4 = n1 == nil and 1 or n1
+local function isScrollingFrameOverflowingY(p, p2: number?): boolean
+	local v = p2 == nil and 1 or p2
 
-	return p1.AbsoluteCanvasSize.Y > p1.AbsoluteWindowSize.Y + v4
+	return p.AbsoluteCanvasSize.Y > p.AbsoluteWindowSize.Y + v
 end
 
 return isScrollingFrameOverflowingY

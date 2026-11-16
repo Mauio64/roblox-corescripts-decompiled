@@ -1,146 +1,172 @@
 local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
-local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
-local DeepLink = require(ServerTriggeredModalsParent.DeepLink)
-local UrlBuilder = require(ServerTriggeredModalsParent.UrlBuilder).UrlBuilder
-local UrlBase = require(ServerTriggeredModalsParent.UrlBuilder).UrlBase
-local Promise = require(ServerTriggeredModalsParent.Promise)
-local SharedFlags = require(ServerTriggeredModalsParent.SharedFlags)
-local t = require(ServerTriggeredModalsParent.t)
-local validateSduiComponentConfig = require(ServerTriggeredModalsParent.ServerDrivenUi).validateSduiComponentConfig
+local parent = ServerTriggeredModals.Parent
+
+local DeepLink = require(parent.DeepLink)
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local UrlBuilder2 = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder2.UrlBase
+local Promise = require(parent.Promise)
+local SharedFlags = require(parent.SharedFlags)
+local t = require(parent.t)
+local ServerDrivenUi = require(parent.ServerDrivenUi)
+local validateSduiComponentConfig = ServerDrivenUi.validateSduiComponentConfig
 
 require(ServerTriggeredModals.EntryPoint)
-
 local logResponseStatus = require(ServerTriggeredModals.logResponseStatus)
 local logResponseLatency = require(ServerTriggeredModals.logResponseLatency)
-
 require(ServerTriggeredModals.SignalStores.createModalSignalStore)
-
 local getModalSignalStore = require(ServerTriggeredModals.SignalStores.getModalSignalStore)
+
 local FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals = SharedFlags.FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals
 local FFlagEnableDeepLinkHistoryWithModalAPI = SharedFlags.FFlagEnableDeepLinkHistoryWithModalAPI
-local v15 = t.interface({
-	modalId = t.string,
-	modalType = t.string,
-	sdui = if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then t.table else t.optional(t.table),
-	isCustomHandler = if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then nil else t.optional(t.boolean)
-})
-local t1 = {}
 
-local function getModalMetadataUrl(p1) -- line: 37
-	-- upvalues: FFlagEnableDeepLinkHistoryWithModalAPI (copy), DeepLink (copy), UrlBuilder (copy), UrlBase (copy)
-	local v20 = nil
+local interface = t.interface
+local v = { modalId = t.string, modalType = t.string, sdui = 0, isCustomHandler = 0 }
+local sdui
+
+if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+	sdui = t.optional(t.table)
+else
+	sdui = t.table
+end
+
+v.sdui = sdui
+local isCustomHandler
+
+if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+	isCustomHandler = t.optional(t.boolean)
+end
+
+v.isCustomHandler = isCustomHandler
+local v2 = interface(v)
+
+local v3 = {}
+
+local function getModalMetadataUrl(entryPoint)
+	local v4
 
 	if FFlagEnableDeepLinkHistoryWithModalAPI then
-		local v21 = DeepLink.DeepLinkLuaReceiverStatusStore(false).getLastDetectedPostAuthUrl(false)
+		local lastDetectedPostAuthUrl = DeepLink.DeepLinkLuaReceiverStatusStore(false).getLastDetectedPostAuthUrl(false)
 
-		v20 = v21 ~= nil and v21 ~= ""
+		if lastDetectedPostAuthUrl == nil then
+			v4 = false
+		else
+			v4 = lastDetectedPostAuthUrl ~= ""
+		end
 	end
 
-	return UrlBuilder.new({
-		path = "modals-api/v1/modal",
-		base = UrlBase.APIS,
-		query = {
-			entryPoint = p1,
-			hasDetectedDeepLink = if not FFlagEnableDeepLinkHistoryWithModalAPI then nil else tostring(v20)
-		}
-	})()
+	local new = urlBuilder.new
+	local v5 = { base = UrlBase.APIS, path = "modals-api/v1/modal", query = 0 }
+	local hasDetectedDeepLink
+
+	if FFlagEnableDeepLinkHistoryWithModalAPI then
+		hasDetectedDeepLink = tostring(v4)
+	end
+
+	v5.query = { entryPoint = entryPoint, hasDetectedDeepLink = hasDetectedDeepLink }
+	return new(v5)()
 end
-local function parseResponseToMetadata(p2) -- line: 56
-	-- upvalues: v15 (copy), FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals (copy), validateSduiComponentConfig (copy)
-	local v23, v24 = v15(p2)
 
-	if not v23 then
-		return {
-			metadata = nil,
-			errorMessage = v24
-		}
+local function parseResponseToMetadata(responseBody)
+	local v4, errorMessage = v2(responseBody)
+
+	if not v4 then
+		return { metadata = nil, errorMessage = errorMessage }
 	end
 
-	local v25 = not not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals and (p2 and p2.isCustomHandler)
+	local v5
 
-	if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals or not v25 then
-		local v26, v27 = validateSduiComponentConfig(p2.sdui)
+	if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+		v5 = responseBody and responseBody.isCustomHandler
+	else
+		v5 = false
+	end
 
-		if not v26 then
-			local v28 = (not v27 or not v27.message) and "Invalid sdui config" or v27.message
+	if not (FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals and v5) then
+		local v6, v7 = validateSduiComponentConfig(responseBody.sdui)
 
+		if not v6 then
 			return {
 				metadata = nil,
-				errorMessage = v28
+				errorMessage = not (v7 and v7.message) and "Invalid sdui config" or v7.message
 			}
 		end
 	end
 
-	return {
-		errorMessage = nil,
-		metadata = {
-			modalId = p2.modalId,
-			modalType = p2.modalType,
-			sduiConfig = p2.sdui,
-			isCustomHandler = if not FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then nil else p2.isCustomHandler
-		}
+	local metadata = {
+		modalId = responseBody.modalId,
+		modalType = responseBody.modalType,
+		sduiConfig = responseBody.sdui,
+		isCustomHandler = 0
 	}
+	local isCustomHandler2
+
+	if FFlagLuaAppSupportNonSduiTypeForServerTriggeredModals then
+		isCustomHandler2 = responseBody.isCustomHandler
+	end
+
+	metadata.isCustomHandler = isCustomHandler2
+	return { metadata = metadata, errorMessage = nil }
 end
 
-return function(p3, p4) -- line: 90
-	-- upvalues: getModalSignalStore (copy), Promise (copy), t1 (copy), getModalMetadataUrl (copy), logResponseLatency (copy), parseResponseToMetadata (copy), logResponseStatus (copy)
-	local v31 = getModalSignalStore(false)
-	local v32 = v31.getMetadataGetter(p4)(false)
+return function(callback, p)
+	local modalSignalStore = getModalSignalStore(false)
+	local v4 = modalSignalStore.getMetadataGetter(p)(false)
 
-	if v32 ~= nil then
-		return Promise.resolve(v32)
+	if v4 ~= nil then
+		return Promise.resolve(v4)
 	end
 
-	local v33 = t1[p4]
+	local v5 = v3[p]
 
-	if v33 then
-		return v33
+	if v5 then
+		return v5
 	end
 
-	local v34 = getModalMetadataUrl(p4)
-	local u35 = Promise.new(function(resolve, reject, onCancel) -- line: 105
-		-- upvalues: p3 (copy), v34 (copy), logResponseLatency (copy), parseResponseToMetadata (copy), v31 (copy), p4 (copy), logResponseStatus (copy)
-		local v39 = p3(v34, "GET")
+	local modalMetadataUrl = getModalMetadataUrl(p)
 
-		v39:andThen(function(p5) -- line: 108
-			-- upvalues: logResponseLatency (copy), reject (copy), parseResponseToMetadata (copy), v31 (copy), p4 (copy), resolve (copy)
-			local v41 = p5 and p5.responseCode or nil
+	local v6 = Promise.new(function(callback2, callback3, callback4)
+		local v6 = callback(modalMetadataUrl, "GET")
 
-			logResponseLatency("modals-api/v1/modal", p5.responseTimeMs, v41)
+		v6:andThen(function(data)
+			local responseCode
 
-			if v41 ~= 200 then
-				reject(`Unexpected responseCode when fetching metadata: { v41 }`)
+			if data then
+				responseCode = data.responseCode or nil
+			end
 
+			logResponseLatency("modals-api/v1/modal", data.responseTimeMs, responseCode)
+
+			if responseCode ~= 200 then
+				callback3(`Unexpected responseCode when fetching metadata: {responseCode}`)
 				return
 			end
 
-			local v42 = parseResponseToMetadata(p5.responseBody)
+			local v7 = parseResponseToMetadata(data.responseBody)
 
-			if not v42.metadata then
-				reject(`Failed to parse modal metadata response: { v42.errorMessage }`)
-
+			if not v7.metadata then
+				callback3(`Failed to parse modal metadata response: {v7.errorMessage}`)
 				return
 			end
 
-			v31.setMetadata(p4, v42.metadata)
-			resolve(v42)
-		end):catch(function(p6) -- line: 125
-			-- upvalues: logResponseStatus (copy), reject (copy)
-			logResponseStatus("modals-api/v1/modal", p6.StatusCode)
-			reject(`Failed to fetch modal metadata: { p6 }`)
+			modalSignalStore.setMetadata(p, v7.metadata)
+			callback2(v7)
+		end):catch(function(p2)
+			logResponseStatus("modals-api/v1/modal", p2.StatusCode)
+			callback3(`Failed to fetch modal metadata: {p2}`)
 		end)
-		onCancel(function() -- line: 130
-			-- upvalues: v39 (copy)
-			v39:cancel()
+
+		callback4(function()
+			v6:cancel()
 		end)
 	end)
+	v3[p] = v6
 
-	t1[p4] = u35
-	u35:finally(function() -- line: 136
-		-- upvalues: t1 (copy), p4 (copy), u35 (ref)
-		assert(t1[p4] == u35, "In-flight request promise mismatch")
-		t1[p4] = nil
+	v6:finally(function()
+		assert(v3[p] == v6, "In-flight request promise mismatch")
+		v3[p] = nil
 	end)
 
-	return u35
+	return v6
 end

@@ -1,44 +1,19 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(parent.React)
 
-local function forwardRefValue(p1, p2) -- line: 9
-	if type(p1) == "function" then
-		p1(p2)
-
-		return
-	end
-
-	if type(p1) == "table" then
-		p1.current = p2
+local function forwardRefValue(callback, current) -- 2 equivalent calls inferred from this helper
+	if type(callback) == "function" then
+		callback(current)
+	elseif type(callback) == "table" then
+		callback.current = current
 	end
 end
-local function useComposedRef(p3, p4) -- line: 22
-	-- upvalues: React (copy)
-	return (React.useCallback(function(p5) -- line: 23
-		-- upvalues: p3 (copy), p4 (copy)
-		local v10 = p3
 
-		if type(v10) == "function" then
-			v10(p5)
-		elseif type(v10) == "table" then
-			v10.current = p5
-		end
-
-		local v11 = p4
-
-		if type(v11) == "function" then
-			v11(p5)
-
-			return
-		end
-
-		if type(v11) == "table" then
-			v11.current = p5
-		end
-	end, {
-		p3,
-		p4
-	}))
+local function useComposedRef(callback, callback2)
+	return (React.useCallback(function(current)
+		forwardRefValue(callback, current) -- inferred equivalent call
+		forwardRefValue(callback2, current) -- inferred equivalent call
+	end, { callback, callback2 }))
 end
 
 return useComposedRef

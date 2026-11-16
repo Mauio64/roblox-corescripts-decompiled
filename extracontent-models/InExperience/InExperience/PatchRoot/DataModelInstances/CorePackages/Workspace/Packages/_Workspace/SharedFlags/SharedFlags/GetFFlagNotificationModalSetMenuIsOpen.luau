@@ -2,7 +2,6 @@ local GetFFlagPackagifySettingsShowSignal = require(script.Parent.GetFFlagPackag
 
 game:DefineFastFlag("NotificationModalSetMenuIsOpen", false)
 
-return function() -- line: 5
-	-- upvalues: GetFFlagPackagifySettingsShowSignal (copy)
+return function()
 	return GetFFlagPackagifySettingsShowSignal() and game:GetFastFlag("NotificationModalSetMenuIsOpen")
 end

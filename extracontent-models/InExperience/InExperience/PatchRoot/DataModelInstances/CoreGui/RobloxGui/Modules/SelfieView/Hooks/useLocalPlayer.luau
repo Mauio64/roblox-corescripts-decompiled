@@ -1,21 +1,20 @@
-local Packages = game:GetService("CorePackages").Packages
+local CorePackages = game:GetService("CorePackages")
+local Packages = CorePackages.Packages
 local React = require(Packages.React)
+
 local Players = game:GetService("Players")
 
-local function useLocalPlayer() -- line: 8
-	-- upvalues: React (copy), Players (copy)
-	return React.useMemo(function() -- line: 9
-		-- upvalues: Players (copy)
-		local LocalPlayer = Players.LocalPlayer
+local function useLocalPlayer()
+	return React.useMemo(function()
+		local localPlayer = Players.LocalPlayer
 
-		while not LocalPlayer do
+		while not localPlayer do
 			Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-			LocalPlayer = Players.LocalPlayer
+			localPlayer = Players.LocalPlayer
 		end
 
-		assert(LocalPlayer ~= nil)
-
-		return LocalPlayer
+		assert(localPlayer ~= nil)
+		return localPlayer
 	end)
 end
 

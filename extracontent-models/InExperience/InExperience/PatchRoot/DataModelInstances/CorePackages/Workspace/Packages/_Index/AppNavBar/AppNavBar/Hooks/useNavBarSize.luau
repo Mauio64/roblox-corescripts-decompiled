@@ -1,9 +1,20 @@
-local ParentParent = script.Parent.Parent.Parent
-local useStyle = require(ParentParent.UIBlox).Core.Style.useStyle
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local function useNavBarSize() -- line: 8
-	-- upvalues: useStyle (copy)
-	return useStyle().Tokens.Size.Size_1600
+local UIBlox = require(parent2.UIBlox)
+
+local useStyle = UIBlox.Core.Style.useStyle
+
+local FFlagIncreaseAppNavbarWidth = require(parent.Flags.FFlagIncreaseAppNavbarWidth)
+
+local function useNavBarSize()
+	local tokens = useStyle().Tokens
+
+	if FFlagIncreaseAppNavbarWidth then
+		return tokens.Size.Size_1800
+	end
+
+	return tokens.Size.Size_1600
 end
 
 return useNavBarSize

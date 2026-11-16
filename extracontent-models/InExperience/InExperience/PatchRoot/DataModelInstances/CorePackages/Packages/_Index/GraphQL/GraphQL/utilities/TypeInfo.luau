@@ -1,20 +1,28 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Array = require(ParentParentParent.LuauPolyfill).Array
-local luaUtils = ParentParent.luaUtils
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Array = LuauPolyfill.Array
+
+local luaUtils = parent.luaUtils
 local null = require(luaUtils.null)
-local language = ParentParent.language
-local type = ParentParent.type
+
+local language = parent.language
+local kind = parent.type
+
 local visitor = require(language.visitor)
 local ast = require(language.ast)
-local Kind = require(language.kinds).Kind
+
+local kinds = require(language.kinds)
+local kind2 = kinds.Kind
 local isNode = ast.isNode
 local getVisitFn = visitor.getVisitFn
 
-require(type.schema)
-require(type.directives)
+require(kind.schema)
 
-local definition = require(type.definition)
+require(kind.directives)
+
+local definition = require(kind.definition)
+
 local isObjectType = definition.isObjectType
 local isInterfaceType = definition.isInterfaceType
 local isEnumType = definition.isEnumType
@@ -25,32 +33,26 @@ local isInputType = definition.isInputType
 local isOutputType = definition.isOutputType
 local getNullableType = definition.getNullableType
 local getNamedType = definition.getNamedType
-local introspection = require(type.introspection)
-local SchemaMetaFieldDef = introspection.SchemaMetaFieldDef
-local TypeMetaFieldDef = introspection.TypeMetaFieldDef
-local TypeNameMetaFieldDef = introspection.TypeNameMetaFieldDef
-local typeFromAST = require(ParentParent.utilities.typeFromAST).typeFromAST
+local introspection = require(kind.introspection)
+local schemaMetaFieldDef = introspection.SchemaMetaFieldDef
+local typeMetaFieldDef = introspection.TypeMetaFieldDef
+local typeNameMetaFieldDef = introspection.TypeNameMetaFieldDef
 
-local function unwrapNull(p1) -- line: 79
-	-- upvalues: null (copy)
-	if p1 == null then
-		return nil
-	end
+local typeFromAST = require(parent.utilities.typeFromAST)
+local typeFromAST2 = typeFromAST.typeFromAST
 
-	return p1
+local function unwrapNull(p) -- 6 equivalent calls inferred from this helper
+	return if p ~= null then p else nil
 end
 
-local t1 = {}
-local t2 = {
-	__index = t1
-}
-local getFieldDef = nil
+local typeInfo = {}
+local v = { __index = typeInfo }
 
-function t1.new(p2, p3: ((...any) -> ...any)?, p4) -- line: 132
-	-- upvalues: t2 (copy), getFieldDef (ref), isInputType (copy), isCompositeType (copy), isOutputType (copy)
-	local self = setmetatable({}, t2)
+local getFieldDef
 
-	self._schema = p2
+function typeInfo.new(schema, callback, p)
+	local self = setmetatable({}, v)
+	self._schema = schema
 	self._typeStack = {}
 	self._parentTypeStack = {}
 	self._inputTypeStack = {}
@@ -59,370 +61,353 @@ function t1.new(p2, p3: ((...any) -> ...any)?, p4) -- line: 132
 	self._directive = nil
 	self._argument = nil
 	self._enumValue = nil
-	self._getFieldDef = p3 or getFieldDef
+	self._getFieldDef = callback or getFieldDef
 
-	if p4 then
-		if isInputType(p4) then
-			table.insert(self._inputTypeStack, p4)
-		end
+	if not p then
+		return self
+	end
 
-		if isCompositeType(p4) then
-			table.insert(self._parentTypeStack, p4)
-		end
+	if isInputType(p) then
+		table.insert(self._inputTypeStack, p)
+	end
 
-		if isOutputType(p4) then
-			table.insert(self._typeStack, p4)
-		end
+	if isCompositeType(p) then
+		table.insert(self._parentTypeStack, p)
+	end
+
+	if isOutputType(p) then
+		table.insert(self._typeStack, p)
 	end
 
 	return self
 end
-function t1.getType(p5) -- line: 169
-	-- upvalues: null (copy)
-	if #p5._typeStack > 0 then
-		local v39 = p5._typeStack[#p5._typeStack]
 
-		if v39 == null then
-			return nil
+function typeInfo:getType()
+	if not (#self._typeStack > 0) then
+		return nil
+	end
+
+	return unwrapNull(self._typeStack[#self._typeStack]) -- inferred equivalent call
+end
+
+function typeInfo:getParentType()
+	if not (#self._parentTypeStack > 0) then
+		return nil
+	end
+
+	return unwrapNull(self._parentTypeStack[#self._parentTypeStack]) -- inferred equivalent call
+end
+
+function typeInfo:getInputType()
+	if not (#self._inputTypeStack > 0) then
+		return nil
+	end
+
+	return unwrapNull(self._inputTypeStack[#self._inputTypeStack]) -- inferred equivalent call
+end
+
+function typeInfo:getParentInputType()
+	if not (#self._inputTypeStack > 1) then
+		return nil
+	end
+
+	return unwrapNull(self._inputTypeStack[#self._inputTypeStack - 1]) -- inferred equivalent call
+end
+
+function typeInfo:getFieldDef()
+	if not (#self._fieldDefStack > 0) then
+		return nil
+	end
+
+	return unwrapNull(self._fieldDefStack[#self._fieldDefStack]) -- inferred equivalent call
+end
+
+function typeInfo:getDefaultValue()
+	if not (#self._defaultValueStack > 0) then
+		return nil
+	end
+
+	return unwrapNull(self._defaultValueStack[#self._defaultValueStack]) -- inferred equivalent call
+end
+
+function typeInfo:getDirective()
+	return self._directive
+end
+
+function typeInfo:getArgument()
+	return self._argument
+end
+
+function typeInfo:getEnumValue()
+	return self._enumValue
+end
+
+function typeInfo:enter(data)
+	local schema = self._schema
+
+	local kind3 = data.kind
+
+	if kind3 == kind2.SELECTION_SET then
+		local v2 = getNamedType(self:getType())
+		local parentTypeStack = self._parentTypeStack
+
+		if not isCompositeType(v2) then
+			v2 = null
 		end
 
-		return v39
-	end
+		table.insert(parentTypeStack, v2)
+	elseif kind3 == kind2.FIELD then
+		local parentType = self:getParentType()
 
-	return nil
-end
-function t1.getParentType(p6) -- line: 176
-	-- upvalues: null (copy)
-	if #p6._parentTypeStack > 0 then
-		local v41 = p6._parentTypeStack[#p6._parentTypeStack]
+		local v2 = nil
+		local v3
 
-		if v41 == null then
-			return nil
-		end
+		if parentType then
+			v3 = self._getFieldDef(schema, parentType, data)
 
-		return v41
-	end
-
-	return nil
-end
-function t1.getInputType(p7) -- line: 183
-	-- upvalues: null (copy)
-	if #p7._inputTypeStack > 0 then
-		local v43 = p7._inputTypeStack[#p7._inputTypeStack]
-
-		if v43 == null then
-			return nil
-		end
-
-		return v43
-	end
-
-	return nil
-end
-function t1.getParentInputType(p8) -- line: 190
-	-- upvalues: null (copy)
-	if #p8._inputTypeStack > 1 then
-		local v45 = p8._inputTypeStack[#p8._inputTypeStack - 1]
-
-		if v45 == null then
-			return nil
-		end
-
-		return v45
-	end
-
-	return nil
-end
-function t1.getFieldDef(p9) -- line: 197
-	-- upvalues: null (copy)
-	if #p9._fieldDefStack > 0 then
-		local v47 = p9._fieldDefStack[#p9._fieldDefStack]
-
-		if v47 == null then
-			return nil
-		end
-
-		return v47
-	end
-
-	return nil
-end
-function t1.getDefaultValue(p10) -- line: 204
-	-- upvalues: null (copy)
-	if #p10._defaultValueStack > 0 then
-		local v49 = p10._defaultValueStack[#p10._defaultValueStack]
-
-		if v49 == null then
-			return nil
-		end
-
-		return v49
-	end
-
-	return nil
-end
-function t1.getDirective(p11) -- line: 211
-	return p11._directive
-end
-function t1.getArgument(p12) -- line: 215
-	return p12._argument
-end
-function t1.getEnumValue(p13) -- line: 219
-	return p13._enumValue
-end
-function t1.enter(p14, p15) -- line: 223
-	-- upvalues: Kind (copy), getNamedType (copy), isCompositeType (copy), null (copy), isOutputType (copy), isObjectType (copy), typeFromAST (copy), isInputType (copy), Array (copy), getNullableType (copy), isListType (copy), isInputObjectType (copy), isEnumType (copy)
-	local _schema = p14._schema
-	local kind = p15.kind
-
-	if kind == Kind.SELECTION_SET then
-		local v57 = getNamedType(p14:getType())
-
-		table.insert(p14._parentTypeStack, if not isCompositeType(v57) then null else v57)
-
-		return
-	end
-
-	if kind == Kind.FIELD then
-		local v58 = p14:getParentType()
-		local v59 = nil
-		local type2 = nil
-
-		if v58 then
-			v59 = p14._getFieldDef(_schema, v58, p15)
-
-			if v59 then
-				type2 = v59.type
+			if v3 then
+				v2 = v3.type
 			end
 		end
 
-		table.insert(p14._fieldDefStack, v59 or null)
-		table.insert(p14._typeStack, if not isOutputType(type2) then null else type2)
+		table.insert(self._fieldDefStack, v3 or null)
 
-		return
-	end
+		local typeStack = self._typeStack
 
-	if kind == Kind.DIRECTIVE then
-		p14._directive = _schema:getDirective(p15.name.value)
+		if not isOutputType(v2) then
+			v2 = null
+		end
 
-		return
-	end
-
-	if kind == Kind.OPERATION_DEFINITION then
-		local v61 = nil
-		local operation = p15.operation
+		table.insert(typeStack, v2)
+	elseif kind3 == kind2.DIRECTIVE then
+		self._directive = schema:getDirective(data.name.value)
+	elseif kind3 == kind2.OPERATION_DEFINITION then
+		local v2 = nil
+		local operation = data.operation
 
 		if operation == "query" then
-			v61 = _schema:getQueryType()
+			v2 = schema:getQueryType()
 		elseif operation == "mutation" then
-			v61 = _schema:getMutationType()
+			v2 = schema:getMutationType()
 		elseif operation == "subscription" then
-			v61 = _schema:getSubscriptionType()
+			v2 = schema:getSubscriptionType()
 		end
 
-		table.insert(p14._typeStack, if not isObjectType(v61) then null else v61)
+		local typeStack = self._typeStack
 
-		return
-	end
+		if not isObjectType(v2) then
+			v2 = null
+		end
 
-	if kind == Kind.INLINE_FRAGMENT or kind == Kind.FRAGMENT_DEFINITION then
-		local typeCondition = p15.typeCondition
-		local v64 = if not typeCondition then getNamedType(p14:getType()) else typeFromAST(_schema, typeCondition)
+		table.insert(typeStack, v2)
+	elseif kind3 == kind2.INLINE_FRAGMENT or kind3 == kind2.FRAGMENT_DEFINITION then
+		local typeCondition = data.typeCondition
+		local v2
 
-		table.insert(p14._typeStack, if not isOutputType(v64) then null else v64)
+		if typeCondition then
+			v2 = typeFromAST2(schema, typeCondition)
+		else
+			v2 = getNamedType(self:getType())
+		end
 
-		return
-	end
+		local typeStack = self._typeStack
 
-	if kind == Kind.VARIABLE_DEFINITION then
-		local v65 = typeFromAST(_schema, p15.type)
+		if not isOutputType(v2) then
+			v2 = null
+		end
 
-		table.insert(p14._inputTypeStack, if not isInputType(v65) then null else v65)
+		table.insert(typeStack, v2)
+	elseif kind3 == kind2.VARIABLE_DEFINITION then
+		local v2 = typeFromAST2(schema, data.type)
 
-		return
-	end
+		local inputTypeStack = self._inputTypeStack
 
-	if kind == Kind.ARGUMENT then
-		local v66 = nil
-		local type3 = nil
-		local v68 = p14:getDirective() or p14:getFieldDef()
+		if not isInputType(v2) then
+			v2 = null
+		end
 
-		if v68 then
-			v66 = Array.find(v68.args, function(p16) -- line: 297
-				-- upvalues: p15 (copy)
-				return p16.name == p15.name.value
+		table.insert(inputTypeStack, v2)
+	elseif kind3 == kind2.ARGUMENT then
+		local v2 = nil
+		local v3 = self:getDirective() or self:getFieldDef()
+		local argument
+
+		if v3 then
+			argument = Array.find(v3.args, function(p): boolean
+				return p.name == data.name.value
 			end)
 
-			if v66 then
-				type3 = v66.type
+			if argument then
+				v2 = argument.type
 			end
 		end
 
-		p14._argument = v66
-		table.insert(p14._defaultValueStack, if not v66 then null else v66.defaultValue)
-		table.insert(p14._inputTypeStack, if not isInputType(type3) then null else type3)
+		self._argument = argument
+		local defaultValueStack = self._defaultValueStack
+		local v4
 
-		return
-	end
+		if argument then
+			v4 = argument.defaultValue
+		else
+			v4 = null
+		end
 
-	if kind == Kind.LIST then
-		local v69 = getNullableType(p14:getInputType())
-		local v70 = if not isListType(v69) then v69 else v69.ofType
+		table.insert(defaultValueStack, v4)
+		local inputTypeStack = self._inputTypeStack
 
-		table.insert(p14._defaultValueStack, null)
-		table.insert(p14._inputTypeStack, if not isInputType(v70) then null else v70)
+		if not isInputType(v2) then
+			v2 = null
+		end
 
-		return
-	end
+		table.insert(inputTypeStack, v2)
+	elseif kind3 == kind2.LIST then
+		local v2 = getNullableType(self:getInputType())
 
-	if kind == Kind.OBJECT_FIELD then
-		local v71 = getNamedType(p14:getInputType())
-		local type4 = nil
-		local v73 = nil
+		if isListType(v2) then
+			v2 = v2.ofType
+		end
 
-		if isInputObjectType(v71) then
-			v73 = v71:getFields():get(p15.name.value)
+		table.insert(self._defaultValueStack, null)
+		local inputTypeStack = self._inputTypeStack
 
-			if v73 then
-				type4 = v73.type
+		if not isInputType(v2) then
+			v2 = null
+		end
+
+		table.insert(inputTypeStack, v2)
+	elseif kind3 == kind2.OBJECT_FIELD then
+		local namedType = getNamedType(self:getInputType())
+		local v2 = nil
+		local v3
+
+		if isInputObjectType(namedType) then
+			v3 = namedType:getFields():get(data.name.value)
+
+			if v3 then
+				v2 = v3.type
 			end
 		end
 
-		table.insert(p14._defaultValueStack, if not v73 then null else v73.defaultValue)
-		table.insert(p14._inputTypeStack, if not isInputType(type4) then null else type4)
+		local defaultValueStack = self._defaultValueStack
+		local v4
 
-		return
-	end
-
-	if kind == Kind.ENUM then
-		local v74 = getNamedType(p14:getInputType())
-		local v75 = nil
-
-		if isEnumType(v74) then
-			v75 = v74:getValue(p15.value)
+		if v3 then
+			v4 = v3.defaultValue
+		else
+			v4 = null
 		end
 
-		p14._enumValue = v75
+		table.insert(defaultValueStack, v4)
 
-		return
+		local inputTypeStack = self._inputTypeStack
+
+		if not isInputType(v2) then
+			v2 = null
+		end
+
+		table.insert(inputTypeStack, v2)
+	else
+		if kind3 ~= kind2.ENUM then
+			return
+		end
+
+		local namedType = getNamedType(self:getInputType())
+		local enumValue
+
+		if isEnumType(namedType) then
+			enumValue = namedType:getValue(data.value)
+		end
+
+		self._enumValue = enumValue
 	end
 end
-function t1.leave(p17, p18) -- line: 343
-	-- upvalues: Kind (copy)
-	local kind = p18.kind
 
-	if kind == Kind.SELECTION_SET then
-		table.remove(p17._parentTypeStack)
+function typeInfo:leave(p)
+	local kind3 = p.kind
 
-		return
-	end
-
-	if kind == Kind.FIELD then
-		table.remove(p17._fieldDefStack)
-		table.remove(p17._typeStack)
-
-		return
-	end
-
-	if kind == Kind.DIRECTIVE then
-		p17._directive = nil
-
-		return
-	end
-
-	if kind == Kind.OPERATION_DEFINITION or kind == Kind.INLINE_FRAGMENT or kind == Kind.FRAGMENT_DEFINITION then
-		table.remove(p17._typeStack)
-
-		return
-	end
-
-	if kind == Kind.VARIABLE_DEFINITION then
-		table.remove(p17._inputTypeStack)
-
-		return
-	end
-
-	if kind == Kind.ARGUMENT then
-		p17._argument = nil
-		table.remove(p17._defaultValueStack)
-		table.remove(p17._inputTypeStack)
-
-		return
-	end
-
-	if kind == Kind.LIST or kind == Kind.OBJECT_FIELD then
-		table.remove(p17._defaultValueStack)
-		table.remove(p17._inputTypeStack)
-
-		return
-	end
-
-	if kind == Kind.ENUM then
-		p17._enumValue = nil
+	if kind3 == kind2.SELECTION_SET then
+		table.remove(self._parentTypeStack)
+	elseif kind3 == kind2.FIELD then
+		table.remove(self._fieldDefStack)
+		table.remove(self._typeStack)
+	elseif kind3 == kind2.DIRECTIVE then
+		self._directive = nil
+	elseif
+		kind3 == kind2.OPERATION_DEFINITION
+		or kind3 == kind2.INLINE_FRAGMENT
+		or kind3 == kind2.FRAGMENT_DEFINITION
+	then
+		table.remove(self._typeStack)
+	elseif kind3 == kind2.VARIABLE_DEFINITION then
+		table.remove(self._inputTypeStack)
+	elseif kind3 == kind2.ARGUMENT then
+		self._argument = nil
+		table.remove(self._defaultValueStack)
+		table.remove(self._inputTypeStack)
+	elseif kind3 == kind2.LIST or kind3 == kind2.OBJECT_FIELD then
+		table.remove(self._defaultValueStack)
+		table.remove(self._inputTypeStack)
+	elseif kind3 == kind2.ENUM then
+		self._enumValue = nil
 	end
 end
-function getFieldDef(p19, p20, p21) -- line: 377
-	-- upvalues: SchemaMetaFieldDef (copy), TypeMetaFieldDef (copy), TypeNameMetaFieldDef (copy), isCompositeType (copy), isObjectType (copy), isInterfaceType (copy)
-	local value = p21.name.value
 
-	if value == SchemaMetaFieldDef.name and p20 == p19:getQueryType() then
-		return SchemaMetaFieldDef
+getFieldDef = function(object, object2, p)
+	local value = p.name.value
+
+	if value == schemaMetaFieldDef.name and object:getQueryType() == object2 then
+		return schemaMetaFieldDef
 	end
 
-	if value == TypeMetaFieldDef.name and p20 == p19:getQueryType() then
-		return TypeMetaFieldDef
+	if value == typeMetaFieldDef.name and object:getQueryType() == object2 then
+		return typeMetaFieldDef
 	end
 
-	if value == TypeNameMetaFieldDef.name and isCompositeType(p20) then
-		return TypeNameMetaFieldDef
+	if value == typeNameMetaFieldDef.name and isCompositeType(object2) then
+		return typeNameMetaFieldDef
 	end
 
-	if isObjectType(p20) or isInterfaceType(p20) then
-		return p20:getFields():get(value)
+	if isObjectType(object2) or isInterfaceType(object2) then
+		return object2:getFields():get(value)
 	end
 
 	return nil
 end
 
 return {
-	TypeInfo = t1,
-	visitWithTypeInfo = function(t3: {[any]: any}, p22) -- line: 404
-		-- upvalues: getVisitFn (copy), isNode (copy)
+	TypeInfo = typeInfo,
+	visitWithTypeInfo = function(object, p)
 		return {
-			enter = function(_, p24, ...) -- line: 409
-				-- upvalues: t3 (copy), getVisitFn (copy), p22 (copy), isNode (copy)
-				t3:enter(p24)
+			enter = function(self, p2, ...)
+				object:enter(p2)
+				local visitFn = getVisitFn(p, p2.kind, false)
 
-				local v88 = getVisitFn(p22, p24.kind, false)
+				if not visitFn then
+					return nil
+				end
 
-				if v88 then
-					local v89 = v88(p22, p24, ...)
+				local v2 = visitFn(p, p2, ...)
 
-					if v89 ~= nil then
-						t3:leave(p24)
+				if v2 ~= nil then
+					object:leave(p2)
 
-						if isNode(v89) then
-							t3:enter(v89)
-						end
+					if isNode(v2) then
+						object:enter(v2)
 					end
-
-					return v89
 				end
 
-				return nil
+				return v2
 			end,
-			leave = function(_, p26, ...) -- line: 428
-				-- upvalues: getVisitFn (copy), p22 (copy), t3 (copy)
-				local v92 = getVisitFn(p22, p26.kind, true)
-				local v93 = nil
+			leave = function(self, p2, ...)
+				local visitFn = getVisitFn(p, p2.kind, true)
+				local v2
 
-				if v92 then
-					v93 = v92(p22, p26, ...)
+				if visitFn then
+					v2 = visitFn(p, p2, ...)
 				end
 
-				t3:leave(p26)
-
-				return v93
+				object:leave(p2)
+				return v2
 			end
 		}
 	end

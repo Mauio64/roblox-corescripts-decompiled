@@ -1,5 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
-local Rodux = require(ParentParent.Rodux)
+local parent = script.Parent.Parent.Parent
+
+local Rodux = require(parent.Rodux)
+
 local CaptureManager = require(script.Parent.CaptureManager)
 local Captures = require(script.Parent.Captures)
 local Carousel = require(script.Parent.Carousel)
@@ -14,8 +16,7 @@ local MomentsCreationFlow = require(script.Parent.MomentsCreationFlow)
 local Prompts = require(script.Parent.Prompts)
 local Toast = require(script.Parent.Toast)
 
-return function() -- line: 36
-	-- upvalues: Rodux (copy), CaptureManager (copy), Captures (copy), Carousel (copy), IsActive (copy), IsCapturesCoreGuiEnabled (copy), IsMenuOpen (copy), IsOverlayActive (copy), IsOverlayFlashActive (copy), IsVideoCaptureActive (copy), MomentsEligibility (copy), MomentsCreationFlow (copy), Prompts (copy), Toast (copy)
+return function()
 	return Rodux.combineReducers({
 		CaptureManager = CaptureManager,
 		Captures = Captures,

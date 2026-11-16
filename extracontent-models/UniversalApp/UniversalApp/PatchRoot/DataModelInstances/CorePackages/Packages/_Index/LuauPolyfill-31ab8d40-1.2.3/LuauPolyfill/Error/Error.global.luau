@@ -1,97 +1,89 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.ES7Types)
+require(parent.ES7Types)
 
-local t1 = {}
+local class = {}
 
-t1.__index = t1
-
-function t1.__tostring(p1) -- line: 29
-	-- upvalues: t1 (copy)
-	return getmetatable(t1).__tostring(p1)
+class.__index = class
+function class.__tostring(p)
+	return getmetatable(class).__tostring(p)
 end
 
-local function __createError(s1: string?) -- line: 35
-	-- upvalues: t1 (copy)
-	local v6 = setmetatable({
+local function __createError(value: string?)
+	local self = setmetatable({
 		name = "Error",
-		message = s1 or ""
-	}, t1)
+		message = value or ""
+	}, class)
 
-	t1.__captureStackTrace(v6, 4)
-
-	return v6
+	class.__captureStackTrace(self, 4)
+	return self
 end
 
-function t1.new(s2: string?) -- line: 44
-	-- upvalues: t1 (copy)
-	local v8 = setmetatable({
+function class.new(value: string?)
+	local self = setmetatable({
 		name = "Error",
-		message = s2 or ""
-	}, t1)
+		message = value or ""
+	}, class)
 
-	t1.__captureStackTrace(v8, 4)
-
-	return v8
+	class.__captureStackTrace(self, 4)
+	return self
 end
-function t1.captureStackTrace(t2: {[any]: any}, p2) -- line: 48
-	-- upvalues: t1 (copy)
-	t1.__captureStackTrace(t2, 3, p2)
+
+function class.captureStackTrace(p, p2)
+	class.__captureStackTrace(p, 3, p2)
 end
-function t1.__captureStackTrace(t3: {[any]: any}, n1: number, p3) -- line: 52
-	-- upvalues: t1 (copy)
-	if typeof(p3) == "function" then
-		local trace = debug.traceback(nil, n1)
-		local v15 = debug.info(p3, "n")
-		local v16 = debug.info(p3, "s")
-		local v17 = string.gsub(v16, "([%(%)%.%%%+%-%*%?%[%^%$])", "%%%1") .. ":%d* function " .. v15
-		local v18 = string.find(trace, v17)
-		local stop = nil
 
-		if v18 ~= nil then
-			local start
+function class:__captureStackTrace(p: number, callback)
+	if typeof(callback) == "function" then
+		local traceback = debug.traceback(nil, p)
+		local v = debug.info(callback, "n")
+		local v2 = debug.info(callback, "s")
 
-			start, stop = string.find(trace, "\n", v18 + 1)
+		local v3 = string.gsub(v2, "([%(%)%.%%%+%-%*%?%[%^%$])", "%%%1") .. ":%d* function " .. v
+		local v4 = string.find(traceback, v3)
+		local v5
+
+		if v4 ~= nil then
+			local _
+			_, v5 = string.find(traceback, "\n", v4 + 1)
 		end
 
-		if stop ~= nil then
-			trace = string.sub(trace, stop + 1)
+		if v5 ~= nil then
+			traceback = string.sub(traceback, v5 + 1)
 		end
 
-		t3.__stack = trace
+		self.__stack = traceback
 	else
-		t3.__stack = debug.traceback(nil, n1)
+		self.__stack = debug.traceback(nil, p)
 	end
 
-	t1.__recalculateStacktrace(t3)
-end
-function t1.__recalculateStacktrace(t4: {[any]: any}) -- line: 76
-	local message = t4.message
-
-	t4.stack = ((t4.name or "Error") .. ((message == nil or message == "") and "" or ": " .. message)) .. "\n" .. (not t4.__stack and "" or t4.__stack)
+	class.__recalculateStacktrace(self)
 end
 
-return (setmetatable(t1, {
-	__call = function(_, ...) -- line: 88
-		-- upvalues: t1 (copy)
-		local v24 = setmetatable({
+function class:__recalculateStacktrace()
+	local message = self.message
+	self.stack = ((self.name or "Error") .. ((message == nil or message == "") and "" or ": " .. message)) .. "\n" .. (not self.__stack and "" or self.__stack)
+end
+
+return (setmetatable(class, {
+	__call = function(_, ...)
+		local self = setmetatable({
 			name = "Error",
 			message = ... or ""
-		}, t1)
+		}, class)
 
-		t1.__captureStackTrace(v24, 4)
-
-		return v24
+		class.__captureStackTrace(self, 4)
+		return self
 	end,
-	__tostring = function(p5) -- line: 91
-		if p5.name ~= nil then
-			if p5.message and p5.message ~= "" then
-				return string.format("%s: %s", tostring(p5.name), (tostring(p5.message)))
-			end
-
-			return (tostring(p5.name))
+	__tostring = function(p)
+		if p.name == nil then
+			return (tostring("Error"))
 		end
 
-		return (tostring("Error"))
+		if p.message and p.message ~= "" then
+			return string.format("%s: %s", tostring(p.name), (tostring(p.message)))
+		end
+
+		return (tostring(p.name))
 	end
 }))

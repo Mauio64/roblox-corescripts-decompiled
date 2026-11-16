@@ -1,60 +1,98 @@
 local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
-local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
-local React = require(RobloxSubscriptionPurchaseAppParent.React)
-local Foundation = require(RobloxSubscriptionPurchaseAppParent.Foundation)
+local parent = RobloxSubscriptionPurchaseApp.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
-local SignalsReact = require(RobloxSubscriptionPurchaseAppParent.SignalsReact)
-
+local SignalsReact = require(parent.SignalsReact)
 require(RobloxSubscriptionPurchaseApp.Models.GetRobloxSubscriptionProductsModel)
-
 local View = Foundation.View
-local FoundationText = Foundation.Text
-local useLocalization = require(RobloxSubscriptionPurchaseAppParent.Localization).Hooks.useLocalization
-local getPeriodTypeDisplayLabel = require(RobloxSubscriptionPurchaseApp.Utils.getPeriodTypeDisplayLabel)
-local FFlagSupportFreeTrialPriceRow = require(RobloxSubscriptionPurchaseApp.Flags.FFlagSupportFreeTrialPriceRow)
+local Text = Foundation.Text
 
-local function RobloxSubscriptionPriceRow(t1: {[any]: any}) -- line: 22
-	-- upvalues: RobloxSubscriptionStore (copy), SignalsReact (copy), FFlagSupportFreeTrialPriceRow (copy), getPeriodTypeDisplayLabel (copy), useLocalization (copy), React (copy), View (copy), FoundationText (copy)
-	local v14 = RobloxSubscriptionStore.get()
-	local v15 = SignalsReact.useSignalState(v14.getRobloxSubscriptionProduct)
-	local v16 = v15 and v15.LocalizedPriceDisplayString
-	local v17 = v15 and v15.PeriodType
-	local v18 = not not FFlagSupportFreeTrialPriceRow and t1.isFreeTrial == true
-	local v19 = getPeriodTypeDisplayLabel(v17 or "", false)
-	local v20 = useLocalization({
-		periodType = v19
-	})
-	local v21 = useLocalization({
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local getPeriodTypeDisplayLabel = require(RobloxSubscriptionPurchaseApp.Utils.getPeriodTypeDisplayLabel)
+local getFreeTrialOffer = require(RobloxSubscriptionPurchaseApp.Utils.getFreeTrialOffer)
+local isSupportedTrialPeriodType = require(RobloxSubscriptionPurchaseApp.Utils.isSupportedTrialPeriodType)
+local FFlagRobloxPlusDynamicFreeTrialLength = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusDynamicFreeTrialLength)
+
+local function RobloxSubscriptionPriceRow(p)
+	local v = RobloxSubscriptionStore.get()
+
+	local v2 = SignalsReact.useSignalState(v.getRobloxSubscriptionProduct)
+
+	local localizedPriceDisplayString = v2 and v2.LocalizedPriceDisplayString
+	local periodType = v2 and v2.PeriodType
+	local isFreeTrial = p.isFreeTrial == true
+	local periodTypeDisplayLabel = getPeriodTypeDisplayLabel(periodType or "", false)
+	local v3
+
+	if FFlagRobloxPlusDynamicFreeTrialLength and isFreeTrial then
+		v3 = getFreeTrialOffer(v2)
+	end
+
+	if v3 == nil or not isSupportedTrialPeriodType(v3.PeriodType) then
+		v3 = nil
+	end
+
+	local trialDuration = not v3 and 1 or v3.Duration
+
+	local v4 = { periodType = periodTypeDisplayLabel }
+
+	if v3 then
+		v4.trialPeriodLabel = getPeriodTypeDisplayLabel(v3.PeriodType, trialDuration > 1)
+	end
+
+	local v5 = useLocalization(v4)
+
+	local v6 = useLocalization({
 		price = {
 			"Feature.RobloxSubscription.Label.BlackbirdPriceTag",
-			price = v16 or "",
-			periodType = v20.periodType
+			price = localizedPriceDisplayString or "",
+			periodType = v5.periodType
 		},
-		freeTrialPrice = if not FFlagSupportFreeTrialPriceRow then nil else {
+		freeTrialPrice = {
 			"Feature.RobloxSubscription.Label.RobloxPlusPriceRowV2",
 			boldStart = "<b>",
 			boldEnd = "</b>",
-			price = v16 or "",
-			periodType = v20.periodType
-		}
+			price = localizedPriceDisplayString or "",
+			periodType = v5.periodType
+		},
+		freeTrialPriceV3 = v3 and {
+			"Feature.RobloxSubscription.Label.RobloxPlusPriceRowV3",
+			boldStart = "<b>",
+			boldEnd = "</b>",
+			price = localizedPriceDisplayString or "",
+			periodType = v5.periodType,
+			trialDuration = trialDuration,
+			trialPeriodLabel = v5.trialPeriodLabel
+		} or nil
 	})
 
-	if not v16 or not v17 then
+	if not (localizedPriceDisplayString and periodType) then
 		return nil
 	end
 
-	local v22 = if not FFlagSupportFreeTrialPriceRow or not v18 then v21.price else v21.freeTrialPrice
+	local text = if v3 then v6.freeTrialPriceV3 else v6.freeTrialPrice
 
-	return React.createElement(View, {
-		tag = "row auto-y size-full-0 align-y-center align-x-left gap-small",
-		LayoutOrder = t1.layoutOrder
-	}, {
-		Price = React.createElement(FoundationText, {
-			tag = "size-full-0 auto-y text-title-medium content-emphasis text-align-x-left",
-			Text = v22,
-			RichText = FFlagSupportFreeTrialPriceRow and not not v18 or nil
-		})
-	})
+	if not isFreeTrial then
+		text = v6.price
+	end
+
+	return React.createElement(
+		View,
+		{
+			tag = "row auto-y size-full-0 align-y-center align-x-left gap-small",
+			LayoutOrder = p.layoutOrder
+		},
+		{
+			Price = React.createElement(Text, {
+				Text = text,
+				tag = "size-full-0 auto-y text-title-medium content-emphasis text-align-x-left",
+				RichText = isFreeTrial and true or nil
+			})
+		}
+	)
 end
 
 return RobloxSubscriptionPriceRow

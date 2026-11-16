@@ -1,64 +1,108 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local v3 = require(AppChat.Logger):new(script.Name)
+local parent = AppChat.Parent
+
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-
+local AppChatNetworking = require(parent.AppChatNetworking)
 require(AppChat.Models.ConversationChannels)
-
 local getOtherParticipants = require(AppChat.Conversations.getOtherParticipants)
 
-return function(s1: string, b1: boolean?) -- line: 15
-	-- upvalues: getDeepValue2 (copy), v3 (copy), getOtherParticipants (copy), AppChatNetworking (copy)
-	return function(p1) -- line: 16
-		-- upvalues: getDeepValue2 (copy), s1 (copy), v3 (copy), getOtherParticipants (copy), AppChatNetworking (copy), b1 (copy)
-		local v10 = p1:getState()
-		local v11 = getDeepValue2(v10, `ChatAppReducer.Conversations.{ s1 }`)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatConversationTrustedFriendUpsellBanner = SharedFlags.FFlagAppChatConversationTrustedFriendUpsellBanner
+local seedConversationTopModalFromRequest
 
-		if not v11 then
-			v3:warning(`refreshConversationUnfilteredThreadsDetails: Conversation { s1 } not found`)
+if FFlagAppChatConversationTrustedFriendUpsellBanner then
+	seedConversationTopModalFromRequest = require(AppChat.Sdui.seedConversationTopModalFromRequest)
+else
+	seedConversationTopModalFromRequest = nil
+end
 
+return function(p: string, isInExperience: boolean?)
+	return function(object)
+		local state = object:getState()
+
+		local deepValue2 = getDeepValue2(state, `ChatAppReducer.Conversations.{p}`)
+
+		if not deepValue2 then
+			v:warning(`refreshConversationUnfilteredThreadsDetails: Conversation {p} not found`)
 			return
 		end
 
-		local v12 = s1
-		local LocalUserId = v10.LocalUserId
+		local friendId = p
+		local localUserId = state.LocalUserId
 
-		if v11.source == "friends" then
-			local v14 = getOtherParticipants(v11, LocalUserId)
+		if deepValue2.source == "friends" then
+			local otherParticipants = getOtherParticipants(deepValue2, localUserId)
 
-			if #v14 ~= 1 then
-				v3:warning(`refreshConversationUnfilteredThreadsDetails: Friends Conversation { s1 } has invalid number of participants { #v14 }`)
+			if #otherParticipants == 1 then
+				friendId = otherParticipants[1]
+			else
+				v:warning(`refreshConversationUnfilteredThreadsDetails: Friends Conversation {p} has invalid number of participants {#otherParticipants}`)
 
 				return
 			end
-
-			v12 = v14[1]
 		end
 
-		if v11.source == "channels" or v11.source == "friends" then
-			p1:dispatch(AppChatNetworking.rodux.GetModalSequence.API({
-				modalSequence = AppChatNetworking.Constants.ModalSequence.ConversationTopModal,
-				isInExperience = b1,
-				conversationId = if v11.source ~= "channels" then nil else v12,
-				friendId = if v11.source ~= "friends" then nil else v12
-			})):catch(function(p2) -- line: 45
-				-- upvalues: v3 (copy)
-				v3:warning(`refreshConversationUnfilteredThreadsDetails: Error in GetModalSequence -> conversationTopModal request. Error: { tostring(p2) }`)
-			end)
-			p1:dispatch(AppChatNetworking.rodux.GetModalSequence.API({
-				modalSequence = AppChatNetworking.Constants.ModalSequence.ConversationOverlay,
-				isInExperience = b1,
-				conversationId = if v11.source ~= "channels" then nil else v12,
-				friendId = if v11.source ~= "friends" then nil else v12
-			})):catch(function(p3) -- line: 59
-				-- upvalues: v3 (copy)
-				v3:warning(`refreshConversationUnfilteredThreadsDetails: Error in GetModalSequence -> conversationOverlay request. Error: { tostring(p3) }`)
-			end)
+		if deepValue2.source ~= "channels" and deepValue2.source ~= "friends" then
+			v:warning(`refreshConversationUnfilteredThreadsDetails: Conversation {p} has invalid source {deepValue2.source}`)
 
 			return
 		end
 
-		v3:warning(`refreshConversationUnfilteredThreadsDetails: Conversation { s1 } has invalid source { v11.source }`)
+		local api = AppChatNetworking.rodux.GetModalSequence.API
+		local v2 = {
+			modalSequence = AppChatNetworking.Constants.ModalSequence.ConversationTopModal,
+			isInExperience = isInExperience,
+			conversationId = 0,
+			friendId = 0
+		}
+		local conversationId
+
+		if deepValue2.source == "channels" then
+			conversationId = friendId
+		end
+
+		v2.conversationId = conversationId
+		local friendId2
+
+		if deepValue2.source == "friends" then
+			friendId2 = friendId
+		end
+
+		v2.friendId = friendId2
+		local v3 = object:dispatch(api(v2))
+
+		if FFlagAppChatConversationTrustedFriendUpsellBanner then
+			v3 = seedConversationTopModalFromRequest(v3, p)
+		end
+
+		v3:catch(function(p2)
+			v:warning(`refreshConversationUnfilteredThreadsDetails: Error in GetModalSequence -> conversationTopModal request. Error: {tostring(p2)}`)
+		end)
+
+		local api2 = AppChatNetworking.rodux.GetModalSequence.API
+		local v4 = {
+			modalSequence = AppChatNetworking.Constants.ModalSequence.ConversationOverlay,
+			isInExperience = isInExperience,
+			conversationId = 0,
+			friendId = 0
+		}
+		local conversationId2
+
+		if deepValue2.source == "channels" then
+			conversationId2 = friendId
+		end
+
+		v4.conversationId = conversationId2
+
+		if deepValue2.source ~= "friends" then
+			friendId = nil
+		end
+
+		v4.friendId = friendId
+		object:dispatch(api2(v4)):catch(function(p2)
+			v:warning(`refreshConversationUnfilteredThreadsDetails: Error in GetModalSequence -> conversationOverlay request. Error: {tostring(p2)}`)
+		end)
 	end
 end

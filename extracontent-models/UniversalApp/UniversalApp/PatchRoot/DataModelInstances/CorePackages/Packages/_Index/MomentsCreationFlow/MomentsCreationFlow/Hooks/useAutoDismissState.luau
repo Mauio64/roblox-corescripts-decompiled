@@ -1,44 +1,39 @@
-local Parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
+
+local React = require(parent.React)
+
 local useCallback = React.useCallback
 local useEffect = React.useEffect
 local useRef = React.useRef
 local useState = React.useState
 
-local function useAutoDismissState(b1: boolean?, n1: number?) -- line: 13
-	-- upvalues: useRef (copy), useState (copy), useCallback (copy), useEffect (copy)
-	local v10 = useRef(nil)
-	local v11, v12 = useState(b1 or true)
-	local v13 = useCallback(function() -- line: 17
-		-- upvalues: v10 (copy), v12 (copy), n1 (copy)
-		if v10.current then
-			task.cancel(v10.current)
+local function useAutoDismissState(flag: boolean?, value: number?)
+	local v = useRef(nil)
+	local state, setState = useState(flag or true)
+
+	local v2 = useCallback(function()
+		if v.current then
+			task.cancel(v.current)
 		end
 
-		v12(true)
-		v10.current = task.delay(n1 or 5, function() -- line: 23
-			-- upvalues: v12 (copy)
-			v12(false)
+		setState(true)
+		v.current = task.delay(value or 5, function()
+			setState(false)
 		end)
-	end, {
-		n1,
-		v11
-	})
+	end, { value, state })
 
-	useEffect(function() -- line: 28
-		-- upvalues: v13 (copy), v10 (copy)
-		v13()
+	useEffect(function()
+		v2()
 
-		return function() -- line: 31
-			-- upvalues: v10 (copy)
-			if v10.current then
-				task.cancel(v10.current)
-				v10.current = nil
+		return function()
+			if v.current then
+				task.cancel(v.current)
+				v.current = nil
 			end
 		end
-	end, { n1 })
+	end, { value })
 
-	return v11, v13
+	return state, v2
 end
 
 return useAutoDismissState

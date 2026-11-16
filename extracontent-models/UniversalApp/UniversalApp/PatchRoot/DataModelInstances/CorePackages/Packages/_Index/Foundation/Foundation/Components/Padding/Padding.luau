@@ -1,79 +1,80 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactIs = require(FoundationParent.ReactIs)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+
 local getTestIdTag = require(Foundation.Utility.getTestIdTag)
 
 require(Foundation.Components.Types)
 
-local function getPadding(p1) -- line: 14
-	-- upvalues: ReactIs (copy)
-	if ReactIs.isBinding(p1) then
+local function getPadding(value)
+	if ReactIs.isBinding(value) then
 		return {
-			PaddingTop = p1,
-			PaddingBottom = p1,
-			PaddingLeft = p1,
-			PaddingRight = p1
+			PaddingTop = value,
+			PaddingBottom = value,
+			PaddingLeft = value,
+			PaddingRight = value
 		}
 	end
 
-	if typeof(p1) == "table" then
+	if typeof(value) == "table" then
 		return {
-			PaddingTop = p1.top,
-			PaddingBottom = p1.bottom,
-			PaddingLeft = p1.left,
-			PaddingRight = p1.right
+			PaddingTop = value.top,
+			PaddingBottom = value.bottom,
+			PaddingLeft = value.left,
+			PaddingRight = value.right
 		}
 	end
 
-	if typeof(p1) == "number" then
+	if typeof(value) == "number" then
 		return {
-			PaddingTop = UDim.new(0, p1),
-			PaddingBottom = UDim.new(0, p1),
-			PaddingLeft = UDim.new(0, p1),
-			PaddingRight = UDim.new(0, p1)
+			PaddingTop = UDim.new(0, value),
+			PaddingBottom = UDim.new(0, value),
+			PaddingLeft = UDim.new(0, value),
+			PaddingRight = UDim.new(0, value)
 		}
 	end
 
-	if typeof(p1) == "Vector2" then
+	if typeof(value) == "Vector2" then
 		return {
-			PaddingTop = UDim.new(0, p1.Y),
-			PaddingBottom = UDim.new(0, p1.Y),
-			PaddingLeft = UDim.new(0, p1.X),
-			PaddingRight = UDim.new(0, p1.X)
+			PaddingTop = UDim.new(0, value.Y),
+			PaddingBottom = UDim.new(0, value.Y),
+			PaddingLeft = UDim.new(0, value.X),
+			PaddingRight = UDim.new(0, value.X)
 		}
 	end
 
-	if typeof(p1) == "UDim" then
+	if typeof(value) == "UDim" then
 		return {
-			PaddingTop = p1,
-			PaddingBottom = p1,
-			PaddingLeft = p1,
-			PaddingRight = p1
+			PaddingTop = value,
+			PaddingBottom = value,
+			PaddingLeft = value,
+			PaddingRight = value
 		}
 	end
 
-	if typeof(p1) == "UDim2" then
+	if typeof(value) == "UDim2" then
 		return {
-			PaddingTop = p1.Y,
-			PaddingBottom = p1.Y,
-			PaddingLeft = p1.X,
-			PaddingRight = p1.X
+			PaddingTop = value.Y,
+			PaddingBottom = value.Y,
+			PaddingLeft = value.X,
+			PaddingRight = value.X
 		}
 	end
 
 	return {}
 end
-local function Padding(t1: {[any]: any}) -- line: 73
-	-- upvalues: getPadding (copy), React (copy), getTestIdTag (copy)
-	local v10 = getPadding(t1.value)
+
+local function Padding(p)
+	local padding = getPadding(p.value)
 
 	return React.createElement("UIPadding", {
-		PaddingTop = v10.PaddingTop,
-		PaddingBottom = v10.PaddingBottom,
-		PaddingLeft = v10.PaddingLeft,
-		PaddingRight = v10.PaddingRight,
-		[React.Tag] = getTestIdTag(t1.testId)
+		PaddingTop = padding.PaddingTop,
+		PaddingBottom = padding.PaddingBottom,
+		PaddingLeft = padding.PaddingLeft,
+		PaddingRight = padding.PaddingRight,
+		[React.Tag] = getTestIdTag(p.testId)
 	})
 end
 

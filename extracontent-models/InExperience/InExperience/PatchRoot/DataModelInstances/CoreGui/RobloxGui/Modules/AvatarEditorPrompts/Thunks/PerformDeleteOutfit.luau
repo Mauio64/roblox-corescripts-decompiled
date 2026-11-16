@@ -1,9 +1,10 @@
 local AvatarEditorService = game:GetService("AvatarEditorService")
-local ParentParent = script.Parent.Parent
-local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
 
-return function(p1) -- line: 10
-	-- upvalues: AvatarEditorService (copy), CloseOpenPrompt (copy)
+local parent = script.Parent.Parent
+local CloseOpenPrompt = require(parent.Actions.CloseOpenPrompt)
+
+return function(object)
 	AvatarEditorService:PerformDeleteOutfit()
-	p1:dispatch(CloseOpenPrompt())
+
+	object:dispatch(CloseOpenPrompt())
 end

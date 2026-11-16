@@ -1,14 +1,16 @@
 local deepEqual = require(script.Parent.Parent.luaUtils.deepEqual)
 
-local function toEqual(p1, p2) -- line: 17
-	-- upvalues: deepEqual (copy)
-	local v5, v6 = deepEqual(p1, p2)
-	local v7 = if v5 then ("expected: not %s\nreceived:     %s"):format(tostring(p2), (tostring(p1))) else v6:gsub("{1}", "received"):gsub("{2}", "expected")
+local function toEqual(p, p2)
+	local pass, v = deepEqual(p, p2)
+	local message
 
-	return {
-		pass = v5,
-		message = v7
-	}
+	if pass then
+		message = ("expected: not %s\nreceived:     %s"):format(tostring(p2), (tostring(p)))
+	else
+		message = v:gsub("{1}", "received"):gsub("{2}", "expected")
+	end
+
+	return { pass = pass, message = message }
 end
 
 return toEqual

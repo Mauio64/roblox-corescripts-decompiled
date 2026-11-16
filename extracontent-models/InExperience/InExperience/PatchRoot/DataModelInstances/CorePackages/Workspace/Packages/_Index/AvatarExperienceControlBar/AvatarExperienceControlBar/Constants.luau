@@ -1,6 +1,9 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceControlBar").Parent
-local FFlagAXResetAvatarButton = require(Parent.AvatarExperienceFlags).FFlagAXResetAvatarButton
-local v3 = if not FFlagAXResetAvatarButton then nil else {
+local parent = script:FindFirstAncestor("AvatarExperienceControlBar").Parent
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXResetAvatarButton = AvatarExperienceFlags.FFlagAXResetAvatarButton
+
+local assetTypesToKeep = FFlagAXResetAvatarButton and {
 	Enum.AssetType.Head,
 	Enum.AssetType.Face,
 	Enum.AssetType.Torso,
@@ -21,16 +24,14 @@ local v3 = if not FFlagAXResetAvatarButton then nil else {
 	Enum.AssetType.EyelashAccessory,
 	Enum.AssetType.MoodAnimation,
 	Enum.AssetType.DynamicHead
-}
-local t1 = {}
+} or nil
+
+local assetTypeStringsToKeep = {}
 
 if FFlagAXResetAvatarButton then
-	for _, v6 in v3 do
-		table.insert(t1, (tostring(v6.Value)))
+	for _, v in assetTypesToKeep do
+		table.insert(assetTypeStringsToKeep, (tostring(v.Value)))
 	end
 end
 
-return {
-	AssetTypesToKeep = v3,
-	AssetTypeStringsToKeep = t1
-}
+return { AssetTypesToKeep = assetTypesToKeep, AssetTypeStringsToKeep = assetTypeStringsToKeep }

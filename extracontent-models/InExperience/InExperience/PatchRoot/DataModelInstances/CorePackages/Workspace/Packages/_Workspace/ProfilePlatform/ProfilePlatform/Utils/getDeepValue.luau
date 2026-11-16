@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
 
-return require(Parent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+return LuaSocialLibrariesDeps.SocialLibraries.config({}).Dictionary.getDeepValue

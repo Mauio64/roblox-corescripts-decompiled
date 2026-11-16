@@ -1,55 +1,51 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local deriveCartPricingView = require(PurchasePromptParent.IAPExperience).deriveCartPricingView
-local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
+local parent = PurchasePrompt.Parent
 
-local function isCartPricingKind(t1: {[any]: any}?) -- line: 38
-	-- upvalues: ProductTypeEnum (copy)
-	if type(t1) ~= "table" then
-		return false
-	end
+local IAPExperience = require(parent.IAPExperience)
 
-	local kind = t1.kind
+local deriveCartPricingView = IAPExperience.deriveCartPricingView
 
-	return kind == ProductTypeEnum.Asset or (kind == ProductTypeEnum.Bundle or kind == ProductTypeEnum.Look)
-end
-local function selectCartPricingOverride(t2: {[any]: any}?) -- line: 46
-	-- upvalues: ProductTypeEnum (copy), deriveCartPricingView (copy)
-	if t2 == nil then
-		return nil
-	end
+local types = require(PurchasePrompt.types)
+local productTypeEnum = types.ProductTypeEnum
+local RequestType = require(PurchasePrompt.Enums.RequestType)
 
-	local productPayload = t2.productPayload
-	local v11
-
-	if type(productPayload) ~= "table" then
-		v11 = false
-	else
+local function isCartPricingKind(productPayload, requestType: string?): boolean -- 1 equivalent call inferred from this helper
+	if type(productPayload) == "table" then
 		local kind = productPayload.kind
 
-		v11 = kind == ProductTypeEnum.Asset or (kind == ProductTypeEnum.Bundle or kind == ProductTypeEnum.Look)
+		if kind == productTypeEnum.Asset or kind == productTypeEnum.Bundle or kind == productTypeEnum.Look then
+			return true
+		end
 	end
 
-	if not v11 then
+	return requestType == RequestType.GamePass or requestType == RequestType.Product
+end
+
+local function selectCartPricingOverride(data)
+	if data == nil then
 		return nil
 	end
 
-	local cartPricing = t2.cartPricing
+	local productPayload = data.productPayload
+	local requestType = data.promptRequest and data.promptRequest.requestType
+
+	if not isCartPricingKind(productPayload, requestType) then -- inferred equivalent call
+		return nil
+	end
+
+	local cartPricing = data.cartPricing
 
 	if cartPricing == nil then
 		return nil
 	end
 
-	local v14 = deriveCartPricingView(cartPricing.response)
+	local v = deriveCartPricingView(cartPricing.response)
 
-	if v14 == nil then
+	if v == nil then
 		return nil
 	end
 
-	return {
-		priceInRobux = v14.priceAfterDiscount,
-		basePriceInRobux = v14.originalPrice
-	}
+	return { priceInRobux = v.priceAfterDiscount, basePriceInRobux = v.originalPrice }
 end
 
 return selectCartPricingOverride

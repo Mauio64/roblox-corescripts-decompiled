@@ -1,21 +1,20 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.types)
 
-require(ParentParent.types)
-
-return function(p1, p2: ((...any) -> ...any)?, p3) -- line: 11
-	if p2 then
-		local t1 = {}
-
-		for v6, v7 in p1 do
-			if p3 ~= nil then
-				t1[v6] = p2(p3, v7, v6)
-			else
-				t1[v6] = p2(v7, v6)
-			end
-		end
-
-		return t1
+return function(p, callback, p2)
+	if not callback then
+		return (table.clone(p._array))
 	end
 
-	return (table.clone(p1._array))
+	local result = {}
+
+	for k, v in p do
+		if p2 == nil then
+			result[k] = callback(v, k)
+		else
+			result[k] = callback(p2, v, k)
+		end
+	end
+
+	return result
 end

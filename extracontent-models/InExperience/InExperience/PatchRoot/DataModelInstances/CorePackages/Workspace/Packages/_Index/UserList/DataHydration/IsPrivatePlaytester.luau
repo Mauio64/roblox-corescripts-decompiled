@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local IsPrivatePlaytester = require(Workspace.DataHydration.DataHydration.PrivatePlaytesters.IsPrivatePlaytester)
 
-return (require(_Workspace.DataHydration.DataHydration.PrivatePlaytesters.IsPrivatePlaytester))
+return IsPrivatePlaytester

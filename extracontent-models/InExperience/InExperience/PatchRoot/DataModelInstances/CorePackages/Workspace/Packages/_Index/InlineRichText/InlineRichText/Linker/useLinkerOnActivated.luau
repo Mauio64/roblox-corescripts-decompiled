@@ -1,39 +1,37 @@
 local InlineRichText = script:FindFirstAncestor("InlineRichText")
-local InlineRichTextParent = InlineRichText.Parent
-local React = require(InlineRichTextParent.React)
+local parent = InlineRichText.Parent
+
+local React = require(parent.React)
+
 local useNavigateToWebview = require(InlineRichText.Linker.Behaviors.useNavigateToWebview)
 local useInvokeLinkingProtocol = require(InlineRichText.Linker.Behaviors.useInvokeLinkingProtocol)
 local useShowErrorToast = require(InlineRichText.Linker.Behaviors.useShowErrorToast)
 local LinkBehavior = require(InlineRichText.Enums.LinkBehavior)
-local v8 = require(InlineRichText.Logger):new(script.Name)
+local Logger = require(InlineRichText.Logger)
+local v = Logger:new(script.Name)
 
 require(InlineRichText.Types)
 
-local function useLinkerOnActivated(t1: {[any]: any}) -- line: 18
-	-- upvalues: useNavigateToWebview (copy), useInvokeLinkingProtocol (copy), useShowErrorToast (copy), LinkBehavior (copy), React (copy), v8 (copy)
-	local v11 = useNavigateToWebview()
-	local v12 = useInvokeLinkingProtocol()
-	local v13 = useShowErrorToast({
-		errorToastTextOverride = t1.errorToastTextOverride
-	})
-	local t2 = {
-		[LinkBehavior.Webview] = v11,
-		[LinkBehavior.LinkingProtocol] = v12,
-		[LinkBehavior.ErrorToast] = v13
+local function useLinkerOnActivated(p)
+	local v2 = useNavigateToWebview()
+	local v3 = useInvokeLinkingProtocol()
+	local v4 = useShowErrorToast({ errorToastTextOverride = p.errorToastTextOverride })
+
+	local v5 = {
+		[LinkBehavior.Webview] = v2,
+		[LinkBehavior.LinkingProtocol] = v3,
+		[LinkBehavior.ErrorToast] = v4
 	}
 
-	return (React.useCallback(function(p1) -- line: 31
-		-- upvalues: t2 (copy), v8 (copy)
-		local v16 = t2[p1.linkBehavior]
+	return (React.useCallback(function(p2)
+		local v6 = v5[p2.linkBehavior]
 
-		if v16 then
-			v16(p1.url)
-
-			return
+		if v6 then
+			v6(p2.url)
+		else
+			v:error(`Link activation failed with invalid link behavior: {p2.linkBehavior}. This behavior is either invalid or doesn't support activation.`)
 		end
-
-		v8:error(`Link activation failed with invalid link behavior: { p1.linkBehavior }. This behavior is either invalid or doesn't support activation.`)
-	end, { t2 }))
+	end, { v5 }))
 end
 
 return useLinkerOnActivated

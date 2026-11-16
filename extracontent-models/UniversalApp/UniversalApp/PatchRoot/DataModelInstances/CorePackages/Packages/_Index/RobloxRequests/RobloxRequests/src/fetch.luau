@@ -1,32 +1,23 @@
-local ParentParent = script.Parent.Parent.Parent
-local Promise = require(ParentParent.Promise)
+local parent = script.Parent.Parent.Parent
 
-function createFetch(p1) -- line: 9
-	-- upvalues: Promise (copy)
-	local function fetch(p2, p3) -- line: 10
-		-- upvalues: p1 (copy), Promise (copy)
-		if p3 == nil then
-			p3 = {}
-		end
+local Promise = require(parent.Promise)
 
-		local v7 = p3.method or "GET"
+function createFetch(callback)
+	local function fetch(p, p2)
+		local v = p2 == nil and {} or p2
 
-		p3.method = nil
-		p3.data = p3.body
-		p3.body = nil
-
-		return p1(v7, p2, p3):andThen(function(p4) -- line: 19
-			-- upvalues: Promise (copy)
-			local text = p4.text
-
-			function p4.text() -- line: 21
-				-- upvalues: Promise (copy), text (copy)
+		local method = v.method or "GET"
+		v.method = nil
+		v.data = v.body
+		v.body = nil
+		return callback(method, p, v):andThen(function(state)
+			local text = state.text
+			function state.text()
 				return Promise.resolve(text)
 			end
 
-			p4.status = p4.code
-
-			return p4
+			state.status = state.code
+			return state
 		end)
 	end
 

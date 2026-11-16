@@ -1,23 +1,23 @@
 local toSet = require(script.Parent.Parent.List.toSet)
 
-local function removeValue(p1, ...) -- line: 4
-	-- upvalues: toSet (copy)
-	local v4 = type(p1)
+local function removeValue(list, ...)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+	local v = toSet({ ... })
+	local result = {}
+	local v2 = 1
 
-	local v5 = toSet({ ... })
-	local t1 = {}
-	local n1 = 1
-
-	for i = 1, #p1 do
-		if not v5[p1[i]] then
-			t1[n1] = p1[i]
-			n1 += 1
+	for i = 1, #list do
+		if v[list[i]] then
+			continue
 		end
+
+		result[v2] = list[i]
+		v2 += 1
 	end
 
-	return t1
+	return result
 end
 
 return removeValue

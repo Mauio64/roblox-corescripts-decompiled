@@ -1,47 +1,42 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local SharedFlags = require(CurrencyTransfersParent.SharedFlags)
+local parent = CurrencyTransfers.Parent
+local SharedFlags = require(parent.SharedFlags)
 
 require(CurrencyTransfers.Stores.createTransferStore)
-
 local getTransferRequestByIdRequest = require(CurrencyTransfers.NetworkRequests.getTransferRequestByIdRequest)
 local PromptState = require(CurrencyTransfers.Enums.PromptState)
-
 require(CurrencyTransfers.Enums.TransferRetryOrigin)
-
 local CurrencyTransferTelemetry = require(CurrencyTransfers.Events.CurrencyTransferTelemetry)
 local RobuxTransferFlowEventName = require(CurrencyTransfers.Enums.RobuxTransferFlowEventName)
 local logCurrencyTransferCounter = require(CurrencyTransfers.Utils.logCurrencyTransferCounter)
 local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransferFlowEvent)
 
-local function handleReceiveBlock(p1, t1: {[any]: any}?, s1: string?, p2) -- line: 17
-	-- upvalues: logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), PromptState (copy), getTransferRequestByIdRequest (copy)
-	local setPromptState = p1.setPromptState
-	local setAmpRecourseActions = p1.setAmpRecourseActions
-	local setAmpFeatureCheck = p1.setAmpFeatureCheck
-	local setTransferRetryOrigin = p1.setTransferRetryOrigin
-	local setSender = p1.setSender
-	local getSender = p1.getSender
-	local getTransferRequestId = p1.getTransferRequestId
+local function handleReceiveBlock(data, p, p2: string?, p3)
+	local setPromptState = data.setPromptState
+	local setAmpRecourseActions = data.setAmpRecourseActions
+	local setAmpFeatureCheck = data.setAmpFeatureCheck
+	local setTransferRetryOrigin = data.setTransferRetryOrigin
+	local setSender = data.setSender
+	local getSender = data.getSender
+	local getTransferRequestId = data.getTransferRequestId
 
-	local function applyBlockState() -- line: 31
-		-- upvalues: logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), t1 (copy), setAmpRecourseActions (copy), s1 (copy), setAmpFeatureCheck (copy), p2 (copy), setTransferRetryOrigin (copy), setPromptState (copy), PromptState (copy)
-		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAmpRecourseRequiredCounter)
+	local function applyBlockState()
+		logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferAmpRecourseRequiredCounter)
 
 		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-			logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.amp_recourse_required)
+			logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.amp_recourse_required)
 		end
 
-		if t1 then
-			setAmpRecourseActions(t1)
-		end
-
-		if s1 then
-			setAmpFeatureCheck(s1)
+		if p then
+			setAmpRecourseActions(p)
 		end
 
 		if p2 then
-			setTransferRetryOrigin(p2)
+			setAmpFeatureCheck(p2)
+		end
+
+		if p3 then
+			setTransferRetryOrigin(p3)
 		end
 
 		setPromptState(PromptState.ReceiveBlocked)
@@ -49,31 +44,24 @@ local function handleReceiveBlock(p1, t1: {[any]: any}?, s1: string?, p2) -- lin
 
 	if getSender(false) then
 		applyBlockState()
-
 		return
 	end
 
-	local v23 = getTransferRequestId(false)
+	local transferRequestId = getTransferRequestId(false)
 
-	if not v23 then
+	if transferRequestId then
+		getTransferRequestByIdRequest({ transferRequestId = transferRequestId }, nil, data.getNetworkImpl()):andThen(function(p4)
+			if p4 and p4.transfer and p4.transfer.sender then
+				setSender(p4.transfer.sender)
+			end
+
+			applyBlockState()
+		end):catch(function()
+			applyBlockState()
+		end)
+	else
 		applyBlockState()
-
-		return
 	end
-
-	getTransferRequestByIdRequest({
-		transferRequestId = v23
-	}, nil, p1.getNetworkImpl()):andThen(function(p3) -- line: 60
-		-- upvalues: setSender (copy), applyBlockState (copy)
-		if p3 and (p3.transfer and p3.transfer.sender) then
-			setSender(p3.transfer.sender)
-		end
-
-		applyBlockState()
-	end):catch(function() -- line: 66
-		-- upvalues: applyBlockState (copy)
-		applyBlockState()
-	end)
 end
 
 return handleReceiveBlock

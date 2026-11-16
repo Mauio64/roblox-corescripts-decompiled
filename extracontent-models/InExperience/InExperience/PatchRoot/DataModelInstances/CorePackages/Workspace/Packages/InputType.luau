@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.InputType.InputType))
+local InputType = require(Workspace.InputType.InputType)
+
+return InputType

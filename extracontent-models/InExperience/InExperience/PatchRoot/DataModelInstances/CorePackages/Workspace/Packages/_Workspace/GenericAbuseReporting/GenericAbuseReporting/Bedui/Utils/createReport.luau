@@ -1,68 +1,68 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local parent = GenericAbuseReporting.Parent
 
 require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
-
 local AbuseVector = require(GenericAbuseReporting.Enums.AbuseVector)
-local v4 = game:DefineFastFlag("UpdateAbuseReportRevampItemAbuseVector", false)
-local FFlagLuaAppEnableReportBadge = require(GenericAbuseReportingParent.SharedFlags).FFlagLuaAppEnableReportBadge
-local FFlagEnableReportingFlowForDevSubs = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableReportingFlowForDevSubs
-local FFlagEnableReportingFlowForExperienceShop = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableReportingFlowForExperienceShop
 
-return function(t1: {[any]: any}) -- line: 29
-	-- upvalues: AbuseVector (copy), FFlagEnableReportingFlowForDevSubs (copy), FFlagEnableReportingFlowForExperienceShop (copy), FFlagLuaAppEnableReportBadge (copy), v4 (copy)
-	local t2 = {}
+local defineFastFlag = game:DefineFastFlag("UpdateAbuseReportRevampItemAbuseVector", false)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEnableReportBadge = SharedFlags.FFlagLuaAppEnableReportBadge
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnableReportingFlowForDevSubs = SharedFlags2.FFlagEnableReportingFlowForDevSubs
 
-	if t1.abuseVector == AbuseVector.Looks then
-		local targetId = t1.targetId
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableReportingFlowForExperienceShop = SharedFlags3.FFlagEnableReportingFlowForExperienceShop
 
-		t2.REPORT_TARGET_LOOK_ID = targetId.lookId
-		t2.REPORT_TARGET_LOOK_INCLUDED_ASSET_IDS = targetId.lookAssetsIds
-	elseif t1.abuseVector == AbuseVector.UgcBundle then
-		t2.UGC_BUNDLE_ID = t1.targetId
-	elseif t1.abuseVector == AbuseVector.ContentPostScreenshot then
-		t2.CONTENT_POST_ID = t1.targetId
-	elseif t1.abuseVector == AbuseVector.UserProfile then
-		t2.REPORT_TARGET_USER_ID = t1.targetId
-	elseif t1.abuseVector == AbuseVector.Accessory then
-		t2.REPORT_TARGET_ASSET_ID = t1.targetId
-	elseif t1.abuseVector == AbuseVector.Place then
-		t2.REPORT_TARGET_ASSET_ID = t1.targetId
-	elseif FFlagEnableReportingFlowForDevSubs and t1.abuseVector == AbuseVector.Subscription then
-		local targetId = t1.targetId
+return function(data)
+	local v = {}
 
-		t2.REPORT_TARGET_SUBSCRIPTION_TARGET_KEY = targetId.subscriptionTargetKey
-		t2.REPORT_TARGET_ASSET_ID = targetId.imageAssetId
-	elseif FFlagEnableReportingFlowForExperienceShop and t1.abuseVector == AbuseVector.DeveloperProduct then
-		t2.REPORT_TARGET_DEVELOPER_PRODUCT_ID = t1.targetId
-	elseif FFlagEnableReportingFlowForExperienceShop and t1.abuseVector == AbuseVector.GamePass then
-		t2.REPORT_TARGET_GAME_PASS_ID = t1.targetId
-	elseif FFlagEnableReportingFlowForExperienceShop and t1.abuseVector == AbuseVector.InExperienceShop then
-		t2.PLACE_ID = t1.targetId
-	elseif t1.abuseVector == AbuseVector.Group then
-		t2.REPORT_TARGET_GROUP_ID = t1.targetId
-	elseif t1.abuseVector == AbuseVector.Notifications then
-		t2.NOTIFICATION_ID = t1.targetId
-	elseif FFlagLuaAppEnableReportBadge and t1.abuseVector == AbuseVector.Badge then
-		t2.REPORT_TARGET_BADGE_ID = t1.targetId
+	if data.abuseVector == AbuseVector.Looks then
+		local targetId = data.targetId
+		v.REPORT_TARGET_LOOK_ID = targetId.lookId
+		v.REPORT_TARGET_LOOK_INCLUDED_ASSET_IDS = targetId.lookAssetsIds
+	elseif data.abuseVector == AbuseVector.UgcBundle then
+		v.UGC_BUNDLE_ID = data.targetId
+	elseif data.abuseVector == AbuseVector.ContentPostScreenshot then
+		v.CONTENT_POST_ID = data.targetId
+	elseif data.abuseVector == AbuseVector.UserProfile then
+		v.REPORT_TARGET_USER_ID = data.targetId
+	elseif data.abuseVector == AbuseVector.Accessory then
+		v.REPORT_TARGET_ASSET_ID = data.targetId
+	elseif data.abuseVector == AbuseVector.Place then
+		v.REPORT_TARGET_ASSET_ID = data.targetId
+	elseif FFlagEnableReportingFlowForDevSubs and data.abuseVector == AbuseVector.Subscription then
+		local targetId = data.targetId
+		v.REPORT_TARGET_SUBSCRIPTION_TARGET_KEY = targetId.subscriptionTargetKey
+		v.REPORT_TARGET_ASSET_ID = targetId.imageAssetId
+	elseif FFlagEnableReportingFlowForExperienceShop and data.abuseVector == AbuseVector.DeveloperProduct then
+		v.REPORT_TARGET_DEVELOPER_PRODUCT_ID = data.targetId
+	elseif FFlagEnableReportingFlowForExperienceShop and data.abuseVector == AbuseVector.GamePass then
+		v.REPORT_TARGET_GAME_PASS_ID = data.targetId
+	elseif FFlagEnableReportingFlowForExperienceShop and data.abuseVector == AbuseVector.InExperienceShop then
+		v.PLACE_ID = data.targetId
+	elseif data.abuseVector == AbuseVector.Group then
+		v.REPORT_TARGET_GROUP_ID = data.targetId
+	elseif data.abuseVector == AbuseVector.Notifications then
+		v.NOTIFICATION_ID = data.targetId
+	elseif FFlagLuaAppEnableReportBadge and data.abuseVector == AbuseVector.Badge then
+		v.REPORT_TARGET_BADGE_ID = data.targetId
 	end
 
-	t2.ENTRY_POINT = "in-app"
-	t2.SUBMITTER_USER_ID = t1.submitterId
-	t2.REPORTED_ABUSE_CATEGORY = t1.abuseCategory
-	t2.REPORTER_COMMENT = t1.comment or ""
+	v.ENTRY_POINT = "in-app"
+	v.SUBMITTER_USER_ID = data.submitterId
+	v.REPORTED_ABUSE_CATEGORY = data.abuseCategory
+	v.REPORTER_COMMENT = data.comment or ""
 
-	if v4 and t1.abuseVector == AbuseVector.Accessory then
-		t2.REPORTED_ABUSE_VECTOR = t1.custom and t1.custom.assetTypeName or AbuseVector.Accessory
+	if defineFastFlag and data.abuseVector == AbuseVector.Accessory then
+		v.REPORTED_ABUSE_VECTOR = data.custom and data.custom.assetTypeName or AbuseVector.Accessory
 
-		if t2.REPORTED_ABUSE_VECTOR == "EmoteAnimation" then
-			t2.REPORTED_ABUSE_VECTOR = AbuseVector.Accessory
-
-			return t2
+		if v.REPORTED_ABUSE_VECTOR == "EmoteAnimation" then
+			v.REPORTED_ABUSE_VECTOR = AbuseVector.Accessory
+			return v
 		end
 	else
-		t2.REPORTED_ABUSE_VECTOR = t1.abuseVector
+		v.REPORTED_ABUSE_VECTOR = data.abuseVector
 	end
 
-	return t2
+	return v
 end

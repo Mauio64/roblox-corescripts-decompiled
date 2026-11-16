@@ -1,13 +1,14 @@
-local Parent = script:FindFirstAncestor("VirtualEvents").Parent
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local parent = script:FindFirstAncestor("VirtualEvents").Parent
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 
-return function(p1, p2) -- line: 5
-	-- upvalues: UrlBuilder (copy)
-	return p1(UrlBuilder.fromString("apis:virtual-events/v1/virtual-events/{id}")({
-		id = p2
-	}), "GET"):andThen(function(p3) -- line: 8
-		return p3.responseBody and p3.responseBody.thumbnails or {}
-	end, function() -- line: 10
-		return {}
-	end)
+return function(callback, id)
+	return callback(urlBuilder.fromString("apis:virtual-events/v1/virtual-events/{id}")({ id = id }), "GET"):andThen(
+		function(p)
+			return p.responseBody and p.responseBody.thumbnails or {}
+		end,
+		function()
+			return {}
+		end
+	)
 end

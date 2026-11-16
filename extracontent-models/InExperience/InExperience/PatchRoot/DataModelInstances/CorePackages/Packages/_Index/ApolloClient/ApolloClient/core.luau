@@ -1,76 +1,79 @@
-local t1 = {}
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Object = require(scriptParentParent.LuauPolyfill).Object
-local DEV = require(scriptParent.utilities).DEV
-local ApolloClient = require(script.ApolloClient)
+local parent = script.Parent
+local parent2 = parent.Parent
 
-t1.ApolloClient = ApolloClient.ApolloClient
-t1.mergeOptions = ApolloClient.mergeOptions
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Object = LuauPolyfill.Object
+
+local utilities = require(parent.utilities)
+local dev = utilities.DEV
+
+local ApolloClient = require(script.ApolloClient)
+local Core = {}
+
+Core.ApolloClient = ApolloClient.ApolloClient
+
+Core.mergeOptions = ApolloClient.mergeOptions
 
 local ObservableQuery = require(script.ObservableQuery)
+Core.applyNextFetchPolicy = ObservableQuery.applyNextFetchPolicy
+Core.ObservableQuery = ObservableQuery.ObservableQuery
 
-t1.applyNextFetchPolicy = ObservableQuery.applyNextFetchPolicy
-t1.ObservableQuery = ObservableQuery.ObservableQuery
 require(script.watchQueryOptions)
-t1.NetworkStatus = require(script.networkStatus).NetworkStatus
+
+local networkStatus = require(script.networkStatus)
+Core.NetworkStatus = networkStatus.NetworkStatus
 
 local types = require(script.types)
+Object.assign(Core, types)
 
-Object.assign(t1, types)
 require(script.LocalState)
 
 local errors = require(script.Parent.errors)
-
-t1.isApolloError = errors.isApolloError
-t1.ApolloError = errors.ApolloError
+Core.isApolloError = errors.isApolloError
+Core.ApolloError = errors.ApolloError
 
 local cache = require(script.Parent.cache)
+Core.ApolloCache = cache.ApolloCache
+Core.defaultDataIdFromObject = cache.defaultDataIdFromObject
+Core.InMemoryCache = cache.InMemoryCache
+Core.MissingFieldError = cache.MissingFieldError
+Core.makeVar = cache.makeVar
 
-t1.ApolloCache = cache.ApolloCache
-t1.defaultDataIdFromObject = cache.defaultDataIdFromObject
-t1.InMemoryCache = cache.InMemoryCache
-t1.MissingFieldError = cache.MissingFieldError
-t1.makeVar = cache.makeVar
-t1.None = cache.None
+Core.None = cache.None
 
 local types2 = require(script.Parent.cache.inmemory.types)
-
-Object.assign(t1, types2)
+Object.assign(Core, types2)
 
 local core = require(script.Parent.link.core)
-
-Object.assign(t1, core)
+Object.assign(Core, core)
 
 local http = require(script.Parent.link.http)
-
-Object.assign(t1, http)
+Object.assign(Core, http)
 
 local utils = require(script.Parent.link.utils)
+Core.fromError = utils.fromError
+Core.toPromise = utils.toPromise
+Core.fromPromise = utils.fromPromise
+Core.throwServerError = utils.throwServerError
 
-t1.fromError = utils.fromError
-t1.toPromise = utils.toPromise
-t1.fromPromise = utils.fromPromise
-t1.throwServerError = utils.throwServerError
+local utilities2 = require(script.Parent.utilities)
+Core.Observable = utilities2.Observable
 
-local utilities = require(script.Parent.utilities)
+Core.isReference = utilities2.isReference
+Core.makeReference = utilities2.makeReference
+Core.NULL = utilities2.NULL
 
-t1.Observable = utilities.Observable
-t1.isReference = utilities.isReference
-t1.makeReference = utilities.makeReference
-t1.NULL = utilities.NULL
+local invariant = require(parent.jsutils.invariant)
+local setVerbosity = invariant.setVerbosity
+Core.setLogVerbosity = setVerbosity
 
-local setVerbosity = require(scriptParent.jsutils.invariant).setVerbosity
+setVerbosity(dev and "log" or "silent")
 
-t1.setLogVerbosity = setVerbosity
-setVerbosity(not DEV and "silent" or "log")
+local GraphQLTag = require(parent2.GraphQLTag)
+Core.gql = GraphQLTag.default
+Core.resetCaches = GraphQLTag.resetCaches
+Core.disableFragmentWarnings = GraphQLTag.disableFragmentWarnings
+Core.enableExperimentalFragmentVariables = GraphQLTag.enableExperimentalFragmentVariables
+Core.disableExperimentalFragmentVariables = GraphQLTag.disableExperimentalFragmentVariables
 
-local GraphQLTag = require(scriptParentParent.GraphQLTag)
-
-t1.gql = GraphQLTag.default
-t1.resetCaches = GraphQLTag.resetCaches
-t1.disableFragmentWarnings = GraphQLTag.disableFragmentWarnings
-t1.enableExperimentalFragmentVariables = GraphQLTag.enableExperimentalFragmentVariables
-t1.disableExperimentalFragmentVariables = GraphQLTag.disableExperimentalFragmentVariables
-
-return t1
+return Core

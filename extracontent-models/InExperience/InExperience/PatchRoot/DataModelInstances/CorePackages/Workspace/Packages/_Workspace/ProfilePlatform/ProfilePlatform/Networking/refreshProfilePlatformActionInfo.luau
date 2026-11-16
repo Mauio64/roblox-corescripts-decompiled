@@ -1,37 +1,37 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
 local Enums = require(ProfilePlatform.Common.Enums)
-local getProfilePlatform = require(ProfilePlatform.Networking.getProfilePlatform)
 
+local getProfilePlatform = require(ProfilePlatform.Networking.getProfilePlatform)
 require(ProfilePlatform.Types.Component)
 
 local FFlagProfilePlatformAddCurrentlyPlaying = require(ProfilePlatform.Flags.FFlagProfilePlatformAddCurrentlyPlaying)
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
-local FFlagProfilePlatformRefreshActionsRespectPolicies = require(ProfilePlatform.Flags.FFlagProfilePlatformRefreshActionsRespectPolicies)
 
-function GetProfilePlatform(s1: string, p1) -- line: 16
-	-- upvalues: FFlagProfilePlatformRefreshActionsRespectPolicies (copy), Enums (copy), FFlagProfilePlatformCTAsRefactor (copy), FFlagProfilePlatformAddCurrentlyPlaying (copy), getProfilePlatform (copy)
-	local v9 = if not FFlagProfilePlatformRefreshActionsRespectPolicies or p1 == nil then {
-		component = Enums.Components.Actions,
-		isActionsV2Supported = not not FFlagProfilePlatformCTAsRefactor or nil
-	} else p1
-	local t1 = {
-		{
-			component = Enums.Components.UserProfileHeader
-		},
-		v9
+local FFlagProfilePlatformRefreshActionsRespectPolicies = require(ProfilePlatform.Flags.FFlagProfilePlatformRefreshActionsRespectPolicies)
+local FFlagProfilePlatformGracefulVisibility = require(ProfilePlatform.Flags.FFlagProfilePlatformGracefulVisibility)
+
+function GetProfilePlatform(profileId: string, p)
+	local v = (not FFlagProfilePlatformRefreshActionsRespectPolicies or p == nil)
+		and { component = Enums.Components.Actions, isActionsV2Supported = true }
+		or p
+
+	local components = {
+		{ component = Enums.Components.UserProfileHeader },
+		v
 	}
 
 	if FFlagProfilePlatformAddCurrentlyPlaying then
-		table.insert(t1, {
-			component = Enums.Components.CurrentlyPlaying
-		})
+		table.insert(components, { component = Enums.Components.CurrentlyPlaying })
+	end
+
+	if FFlagProfilePlatformGracefulVisibility then
+		table.insert(components, { component = Enums.Components.Friends })
 	end
 
 	return getProfilePlatform.API({
-		includeComponentOrdering = false,
-		profileId = s1,
+		profileId = profileId,
 		profileType = Enums.ProfileTypes.User,
-		components = t1
+		components = components,
+		includeComponentOrdering = false
 	})
 end
 

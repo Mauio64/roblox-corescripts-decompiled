@@ -1,37 +1,36 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
+
 local perUserAppStorage = require(ExpChat.Utils.perUserAppStorage)
+local DictationFTUXStorage = {}
 
-return {
-	hasBeenDismissed = function() -- line: 16
-		-- upvalues: perUserAppStorage (copy)
-		return perUserAppStorage.getEntry("ExpChatDictationFtux").dismissed == true
-	end,
-	markDismissed = function() -- line: 21
-		-- upvalues: perUserAppStorage (copy)
-		perUserAppStorage.updateEntry("ExpChatDictationFtux", function(t1: {[any]: any}) -- line: 22
-			if t1.dismissed == true then
-				return nil
-			end
+function DictationFTUXStorage.hasBeenDismissed(): boolean
+	return perUserAppStorage.getEntry("ExpChatDictationFtux").dismissed == true
+end
 
-			t1.dismissed = true
+function DictationFTUXStorage.markDismissed()
+	perUserAppStorage.updateEntry("ExpChatDictationFtux", function(p)
+		if p.dismissed == true then
+			return nil
+		end
 
-			return t1
-		end)
-	end,
-	hasBeenUsed = function() -- line: 31
-		-- upvalues: perUserAppStorage (copy)
-		return perUserAppStorage.getEntry("ExpChatDictationFtux").used == true
-	end,
-	markUsed = function() -- line: 36
-		-- upvalues: perUserAppStorage (copy)
-		perUserAppStorage.updateEntry("ExpChatDictationFtux", function(t2: {[any]: any}) -- line: 37
-			if t2.used == true then
-				return nil
-			end
+		p.dismissed = true
+		return p
+	end)
+end
 
-			t2.used = true
+function DictationFTUXStorage.hasBeenUsed(): boolean
+	return perUserAppStorage.getEntry("ExpChatDictationFtux").used == true
+end
 
-			return t2
-		end)
-	end
-}
+function DictationFTUXStorage.markUsed()
+	perUserAppStorage.updateEntry("ExpChatDictationFtux", function(p)
+		if p.used == true then
+			return nil
+		end
+
+		p.used = true
+		return p
+	end)
+end
+
+return DictationFTUXStorage

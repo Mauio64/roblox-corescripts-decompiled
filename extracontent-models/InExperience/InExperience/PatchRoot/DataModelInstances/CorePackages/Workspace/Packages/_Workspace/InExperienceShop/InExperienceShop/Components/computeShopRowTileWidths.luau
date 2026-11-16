@@ -1,32 +1,37 @@
-return {
-	SHOP_ITEM_MEDIA_HEIGHT_SCALE = 0.85,
-	MEDIA_HEIGHT_SCALE_FALLBACK = 0.425,
-	computeShopRowTileWidths = function(n1: number, n2: number, n3: number, b1: boolean) -- line: 21
-		if n1 <= 0 or n3 <= 0 then
-			return {
-				shopWidth = 0,
-				featuredRobuxWidth = if not b1 then nil else 0
-			}
-		end
+local ComputeShopRowTileWidths = {}
+ComputeShopRowTileWidths.SHOP_ITEM_MEDIA_HEIGHT_SCALE = 0.85
+ComputeShopRowTileWidths.MEDIA_HEIGHT_SCALE_FALLBACK = 0.425
 
-		local v5 = (n1 - (n3 - 1) * n2) / n3
-
+function ComputeShopRowTileWidths.computeShopRowTileWidths(p: number, p2: number, p3: number, flag: boolean)
+	if p <= 0 or p3 <= 0 then
 		return {
-			shopWidth = v5,
-			featuredRobuxWidth = if not b1 then nil else v5 * 2 + n2
+			shopWidth = 0,
+			featuredRobuxWidth = flag and 0 or nil
 		}
-	end,
-	computeRobuxPackageMediaHeightScale = function(n4: number, n5: number) -- line: 44
-		if n4 <= 0 then
-			return 0.425
-		end
-
-		local v8 = n4 * 2 + n5
-
-		if v8 <= 0 then
-			return 0.425
-		end
-
-		return n4 * 0.85 / v8
 	end
-}
+
+	local shopWidth = (p - (p3 - 1) * p2) / p3
+	local featuredRobuxWidth
+
+	if flag then
+		featuredRobuxWidth = shopWidth * 2 + p2
+	end
+
+	return { shopWidth = shopWidth, featuredRobuxWidth = featuredRobuxWidth }
+end
+
+function ComputeShopRowTileWidths.computeRobuxPackageMediaHeightScale(p: number, p2: number)
+	if p <= 0 then
+		return 0.425
+	end
+
+	local v = p * 2 + p2
+
+	if v <= 0 then
+		return 0.425
+	end
+
+	return p * 0.85 / v
+end
+
+return ComputeShopRowTileWidths

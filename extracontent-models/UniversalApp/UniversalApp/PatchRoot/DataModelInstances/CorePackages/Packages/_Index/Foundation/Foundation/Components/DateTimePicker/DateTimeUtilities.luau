@@ -1,32 +1,11 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local LocalizationService = require(Foundation.Utility.Wrappers).Services.LocalizationService
-local Translator = require(Foundation.Utility.Localization.Translator)
-local t1 = {
-	[1] = Translator:FormatByKey("CommonUI.Controls.Label.January"),
-	[2] = Translator:FormatByKey("CommonUI.Controls.Label.February"),
-	[3] = Translator:FormatByKey("CommonUI.Controls.Label.March"),
-	[4] = Translator:FormatByKey("CommonUI.Controls.Label.April"),
-	[5] = Translator:FormatByKey("CommonUI.Controls.Label.May"),
-	[6] = Translator:FormatByKey("CommonUI.Controls.Label.June"),
-	[7] = Translator:FormatByKey("CommonUI.Controls.Label.July"),
-	[8] = Translator:FormatByKey("CommonUI.Controls.Label.August"),
-	[9] = Translator:FormatByKey("CommonUI.Controls.Label.September"),
-	[10] = Translator:FormatByKey("CommonUI.Controls.Label.October"),
-	[11] = Translator:FormatByKey("CommonUI.Controls.Label.November"),
-	[12] = Translator:FormatByKey("CommonUI.Controls.Label.December")
-}
-local t2 = {
-	[1] = Translator:FormatByKey("CommonUI.Controls.Label.SundayAbbreviated"),
-	[2] = Translator:FormatByKey("CommonUI.Controls.Label.MondayAbbreviated"),
-	[3] = Translator:FormatByKey("CommonUI.Controls.Label.TuesdayAbbreviated"),
-	[4] = Translator:FormatByKey("CommonUI.Controls.Label.WednesdayAbbreviated"),
-	[5] = Translator:FormatByKey("CommonUI.Controls.Label.ThursdayAbbreviated"),
-	[6] = Translator:FormatByKey("CommonUI.Controls.Label.FridayAbbreviated"),
-	[7] = Translator:FormatByKey("CommonUI.Controls.Label.SaturdayAbbreviated")
-}
 
-local function getDaysInMonth(n1: number, n2: number) -- line: 34
-	if n1 == 2 and (n2 % 4 == 0 and n2 % 100 ~= 0 or n2 % 400 == 0) then
+local Wrappers = require(Foundation.Utility.Wrappers)
+local LocalizationService = Wrappers.Services.LocalizationService
+local Translator = require(Foundation.Utility.Localization.Translator)
+
+local function getDaysInMonth(p: number, p2: number)
+	if p == 2 and (p2 % 4 == 0 and p2 % 100 ~= 0 or p2 % 400 == 0) then
 		return 29
 	end
 
@@ -43,164 +22,194 @@ local function getDaysInMonth(n1: number, n2: number) -- line: 34
 		31,
 		30,
 		31
-	})[n1]
+	})[p]
 end
-local function getHoursAndMinutesFromString(s1: string) -- line: 104
-	local v29 = s1:gsub("%s+", "")
-	local match = string.match(v29, "^%d%d:%d%d$")
-	local match2 = string.match(v29, "^%d%d?:%d%d[AP]M$")
 
-	if not match and not match2 then
+local function toLocalTime(object) -- 2 equivalent calls inferred from this helper
+	return (object:ToLocalTime())
+end
+
+local function roundToStartOfDay(object) -- 3 equivalent calls inferred from this helper
+	local localTime = toLocalTime(object) -- inferred equivalent call
+	return DateTime.fromLocalTime(localTime.Year, localTime.Month, localTime.Day).UnixTimestamp
+end
+
+local function getHoursAndMinutesFromString(value: string)
+	local v = value:gsub("%s+", "")
+
+	local v2 = string.match(v, "^%d%d:%d%d$")
+	local v3 = string.match(v, "^%d%d?:%d%d[AP]M$")
+
+	if not (v2 or v3) then
 		return nil
 	end
 
-	if match2 then
-		local v32, v33 = string.match(v29, "^(%d%d?):(%d%d)[AP]M$")
-		local num = tonumber(v32)
-		local num2 = tonumber(v33)
+	if v3 then
+		local v4, v5 = string.match(v, "^(%d%d?):(%d%d)[AP]M$")
+		local v6 = tonumber(v4)
+		local v7 = tonumber(v5)
 
-		if not num or not num2 or num < 1 or num > 12 or num2 < 0 or num2 > 59 then
+		if not v6 or not v7 or v6 < 1 or v6 > 12 or v7 < 0 or v7 > 59 then
 			return nil
 		end
 
-		if string.sub(v29, -2) == "PM" and num ~= 12 then
-			return num + 12, num2
+		if string.sub(v, -2) == "PM" and v6 ~= 12 then
+			return v6 + 12, v7
 		end
 
-		if string.sub(v29, -2) == "AM" and num == 12 then
-			return 0, num2
+		if string.sub(v, -2) == "AM" and v6 == 12 then
+			return 0, v7
 		end
 
-		return num, num2
-	end
+		return v6, v7
+	else
+		local v4, v5 = string.match(v, "^(%d%d?):(%d%d)$")
+		local v6 = tonumber(v4)
+		local v7 = tonumber(v5)
 
-	local v36, v37 = string.match(v29, "^(%d%d?):(%d%d)$")
-	local num = tonumber(v36)
-	local num3 = tonumber(v37)
+		if v6 and v7 and not (v6 < 0 or v6 > 23 or v7 < 0 or v7 > 59) then
+			return v6, v7
+		end
 
-	if not num or not num3 or num < 0 or num > 23 or num3 < 0 or num3 > 59 then
 		return nil
 	end
-
-	return num, num3
 end
 
-return {
-	DATE_COMPOSITE_TOKEN = "L",
-	TIME_COMPOSITE_TOKEN = "LT",
-	formatLocalTime = function(p1, b1: boolean?) -- line: 229
-		-- upvalues: LocalizationService (copy)
-		local v55 = p1:FormatLocalTime("L", LocalizationService.RobloxLocaleId)
+local DateTimeUtilities = {}
 
-		if b1 then
-			v55 ..= ", " .. p1:FormatLocalTime("LT", LocalizationService.RobloxLocaleId)
-		end
+function DateTimeUtilities.formatLocalTime(object, flag: boolean?)
+	local v = object:FormatLocalTime("L", LocalizationService.RobloxLocaleId)
 
-		return v55
-	end,
-	getDaysInMonth = getDaysInMonth,
-	getFirstDayOfWeek = function(n3: number, n4: number) -- line: 48
-		local dateTime = DateTime.fromLocalTime(n4, n3, 1)
+	if flag then
+		return v .. ", " .. object:FormatLocalTime("LT", LocalizationService.RobloxLocaleId)
+	end
 
-		if dateTime then
-			return tonumber((dateTime:FormatLocalTime("d", "en-us"))) or 0
-		end
+	return v
+end
 
-		return 0
-	end,
-	getLastDayOfWeek = function(n5: number, n6: number) -- line: 60
-		-- upvalues: getDaysInMonth (copy)
-		local dateTime = DateTime.fromLocalTime(n6, n5, (getDaysInMonth(n5, n6)))
+function DateTimeUtilities.getDateTimeFromText(value: string)
+	local v
 
-		if dateTime then
-			return tonumber((dateTime:FormatLocalTime("d", "en-us"))) or 0
-		end
+	if string.find(value, ",") then
+		value, v = value:match("^([^,]+),%s*(.+)$")
+	else
+		v = "00:00"
+	end
 
-		return 0
-	end,
-	getNextMonthInfo = function(n7: number, n8: number) -- line: 222
-		if n7 == 12 then
-			return 1, n8 + 1
-		end
-
-		return n7 + 1, n8
-	end,
-	getPrevMonthInfo = function(n9: number, n10: number) -- line: 215
-		if n9 == 1 then
-			return 12, n10 - 1
-		end
-
-		return n9 - 1, n10
-	end,
-	isDateWithinRange = function(p2, t3: {[any]: any}) -- line: 84
-		local v22 = t3.startDate:ToLocalTime()
-		local UnixTimestamp = DateTime.fromLocalTime(v22.Year, v22.Month, v22.Day).UnixTimestamp
-		local v24 = t3.endDate:ToLocalTime()
-		local UnixTimestamp2 = DateTime.fromLocalTime(v24.Year, v24.Month, v24.Day).UnixTimestamp
-		local v26 = p2:ToLocalTime()
-		local UnixTimestamp3 = DateTime.fromLocalTime(v26.Year, v26.Month, v26.Day).UnixTimestamp
-
-		return UnixTimestamp <= UnixTimestamp3 and UnixTimestamp3 <= UnixTimestamp2
-	end,
-	getDateTimeFromText = function(s2: string) -- line: 159
-		-- upvalues: getHoursAndMinutesFromString (copy)
-		local v41
-
-		if string.find(s2, ",") then
-			s2, v41 = s2:match("^([^,]+),%s*(.+)$")
-		else
-			v41 = "00:00"
-		end
-
-		if not s2 or not v41 then
-			return nil
-		end
-
-		local v42 = s2:gsub("%s+", "")
-		local v43, v44 = getHoursAndMinutesFromString(v41)
-
-		if s2 then
-			local v45 = v42:find("[/%.%-]")
-			local ok, result = pcall(function() -- line: 183
-				-- upvalues: v45 (copy), v42 (copy), v43 (copy), v44 (copy)
-				if v45 == 3 then
-					local v56, v57, v58 = v42:match("^(%d%d)[/%.%-](%d%d)[/%.%-](%d%d%d%d)$")
-
-					return DateTime.fromLocalTime(tonumber(v58), tonumber(v56), tonumber(v57), v43, v44, 0)
-				end
-
-				if v45 == 5 then
-					local v59, v60, v61 = v42:match("^(%d%d%d%d)[/%.%-](%d%d)[/%.%-](%d%d)$")
-
-					return DateTime.fromLocalTime(tonumber(v59), tonumber(v60), tonumber(v61), v43, v44, 0)
-				end
-
-				error("Invalid date format: " .. v42)
-			end)
-
-			if ok and result then
-				if os.date("*t", result.UnixTimestamp).isdst then
-					local UnixTimestamp = result.UnixTimestamp
-
-					result = DateTime.fromUnixTimestamp(UnixTimestamp - 3600)
-				end
-
-				return result
-			end
-		end
-
+	if not (value and v) then
 		return nil
-	end,
-	monthMap = t1,
-	roundDownToNearestMinute = function(p3) -- line: 78
-		local v19 = p3:ToLocalTime()
+	end
 
-		return DateTime.fromLocalTime(v19.Year, v19.Month, v19.Day, v19.Hour, v19.Minute, 0)
-	end,
-	roundToStartOfDay = function(p4) -- line: 72
-		local v17 = p4:ToLocalTime()
+	local v2 = value:gsub("%s+", "")
 
-		return DateTime.fromLocalTime(v17.Year, v17.Month, v17.Day).UnixTimestamp
-	end,
-	weekdays = t2
+	local hoursAndMinutesFromString, v3 = getHoursAndMinutesFromString(v)
+
+	if not value then
+		return nil
+	end
+
+	local v4 = v2:find("[/%.%-]")
+
+	local success, result = pcall(function()
+		if v4 == 3 then
+			local match, v5, v6 = v2:match("^(%d%d)[/%.%-](%d%d)[/%.%-](%d%d%d%d)$")
+			return DateTime.fromLocalTime(tonumber(v6), tonumber(match), tonumber(v5), hoursAndMinutesFromString, v3, 0)
+		end
+
+		if v4 == 5 then
+			local match, v5, v6 = v2:match("^(%d%d%d%d)[/%.%-](%d%d)[/%.%-](%d%d)$")
+			return DateTime.fromLocalTime(tonumber(match), tonumber(v5), tonumber(v6), hoursAndMinutesFromString, v3, 0)
+		end
+
+		error("Invalid date format: " .. v2)
+	end)
+
+	if success and result then
+		if os.date("*t", result.UnixTimestamp).isdst then
+			local unixTimestamp = result.UnixTimestamp
+			result = DateTime.fromUnixTimestamp(unixTimestamp - 3600)
+		end
+
+		return result
+	end
+
+	return nil
+end
+
+DateTimeUtilities.getDaysInMonth = getDaysInMonth
+
+function DateTimeUtilities.getFirstDayOfWeek(p: number, p2: number)
+	local dateTime = DateTime.fromLocalTime(p2, p, 1)
+
+	if dateTime then
+		return tonumber((dateTime:FormatLocalTime("d", "en-us"))) or 0
+	end
+
+	return 0
+end
+
+function DateTimeUtilities.getLastDayOfWeek(p: number, p2: number)
+	local dateTime = DateTime.fromLocalTime(p2, p, getDaysInMonth(p, p2))
+
+	if dateTime then
+		return tonumber((dateTime:FormatLocalTime("d", "en-us"))) or 0
+	end
+
+	return 0
+end
+
+function DateTimeUtilities.getNextMonthInfo(p: number, p2: number)
+	if p == 12 then
+		return 1, p2 + 1
+	end
+
+	return p + 1, p2
+end
+
+function DateTimeUtilities.getPrevMonthInfo(p: number, p2: number)
+	if p == 1 then
+		return 12, p2 - 1
+	end
+
+	return p - 1, p2
+end
+
+function DateTimeUtilities.isDateWithinRange(p, p2): boolean
+	local unixTimestamp = roundToStartOfDay(p2.startDate) -- inferred equivalent call
+	local unixTimestamp2 = roundToStartOfDay(p2.endDate) -- inferred equivalent call
+	local unixTimestamp3 = roundToStartOfDay(p) -- inferred equivalent call
+	return unixTimestamp <= unixTimestamp3 and unixTimestamp3 <= unixTimestamp2
+end
+
+DateTimeUtilities.monthMap = {
+	Translator:FormatByKey("CommonUI.Controls.Label.January"),
+	Translator:FormatByKey("CommonUI.Controls.Label.February"),
+	Translator:FormatByKey("CommonUI.Controls.Label.March"),
+	Translator:FormatByKey("CommonUI.Controls.Label.April"),
+	Translator:FormatByKey("CommonUI.Controls.Label.May"),
+	Translator:FormatByKey("CommonUI.Controls.Label.June"),
+	Translator:FormatByKey("CommonUI.Controls.Label.July"),
+	Translator:FormatByKey("CommonUI.Controls.Label.August"),
+	Translator:FormatByKey("CommonUI.Controls.Label.September"),
+	Translator:FormatByKey("CommonUI.Controls.Label.October"),
+	Translator:FormatByKey("CommonUI.Controls.Label.November"),
+	(Translator:FormatByKey("CommonUI.Controls.Label.December"))
 }
+
+function DateTimeUtilities.roundDownToNearestMinute(object)
+	local localTime = toLocalTime(object) -- inferred equivalent call
+	return DateTime.fromLocalTime(localTime.Year, localTime.Month, localTime.Day, localTime.Hour, localTime.Minute, 0)
+end
+
+DateTimeUtilities.roundToStartOfDay = roundToStartOfDay
+DateTimeUtilities.toLocalTime = toLocalTime
+DateTimeUtilities.weekdays = {
+	Translator:FormatByKey("CommonUI.Controls.Label.SundayAbbreviated"),
+	Translator:FormatByKey("CommonUI.Controls.Label.MondayAbbreviated"),
+	Translator:FormatByKey("CommonUI.Controls.Label.TuesdayAbbreviated"),
+	Translator:FormatByKey("CommonUI.Controls.Label.WednesdayAbbreviated"),
+	Translator:FormatByKey("CommonUI.Controls.Label.ThursdayAbbreviated"),
+	Translator:FormatByKey("CommonUI.Controls.Label.FridayAbbreviated"),
+	(Translator:FormatByKey("CommonUI.Controls.Label.SaturdayAbbreviated"))
+}
+return DateTimeUtilities

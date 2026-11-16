@@ -1,66 +1,54 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent
+local parent3 = parent2.Parent
 
-require(scriptParent.Types)
+local React = require(parent3.React)
+local LuauPolyfill = require(parent3.LuauPolyfill)
 
-local Constants = require(scriptParent.Constants)
-local TooltipController = require(scriptParent.TooltipController)
-local ControlState = require(ParentParent.Core.Control.Enum.ControlState)
-local UIBloxConfig = require(ParentParent.UIBloxConfig)
+require(parent.Types)
+local Constants = require(parent.Constants)
+local TooltipController = require(parent.TooltipController)
+local ControlState = require(parent2.Core.Control.Enum.ControlState)
 
-local function HoverController(p1) -- line: 17
-	-- upvalues: React (copy), UIBloxConfig (copy), Constants (copy), ControlState (copy), LuauPolyfill (copy), TooltipController (copy)
-	local v12, v13 = React.useState(false)
-	local v14 = React.useRef(tick())
+local UIBloxConfig = require(parent2.UIBloxConfig)
 
-	React.useEffect(function() -- line: 21
-		-- upvalues: v14 (copy)
-		return function() -- line: 22
-			-- upvalues: v14 (copy)
-			v14.current = tick()
+local function HoverController(props)
+	local state, setState = React.useState(false)
+	local ref = React.useRef(tick())
+
+	React.useEffect(function()
+		return function()
+			ref.current = tick()
 		end
-	end, if not UIBloxConfig.enableTooltipV2HoverControllerReRenderFix then nil else {})
+	end, UIBloxConfig.enableTooltipV2HoverControllerReRenderFix and {} or nil)
 
-	local v15 = p1.delayTime or Constants.DEFAULT_DELAY_TIME
-	local v16 = React.useCallback(function(p2, p3) -- line: 30
-		-- upvalues: p1 (copy), v13 (copy), ControlState (copy), v14 (copy), v15 (copy)
-		if p1.disabled then
-			v13(false)
+	local delayTime = props.delayTime or Constants.DEFAULT_DELAY_TIME
 
-			return
-		end
-
-		if p3 == ControlState.Hover or p3 == ControlState.Selected then
-			local current = v14.current
-
-			delay(v15, function() -- line: 37
-				-- upvalues: v14 (copy), current (copy), v13 (copy)
-				if v14.current == current then
-					v13(true)
+	local v = React.useCallback(function(p, p2)
+		if props.disabled then
+			setState(false)
+		elseif p2 == ControlState.Hover or p2 == ControlState.Selected then
+			local current = ref.current
+			delay(delayTime, function()
+				if ref.current == current then
+					setState(true)
 				end
 			end)
-
-			return
+		elseif p == ControlState.Hover or p == ControlState.Selected then
+			ref.current = tick()
+			setState(false)
 		end
+	end, { delayTime })
 
-		if p2 == ControlState.Hover or p2 == ControlState.Selected then
-			v14.current = tick()
-			v13(false)
-		end
-	end, { v15 })
-	local v17 = LuauPolyfill.Object.assign({}, p1, {
+	local v2 = LuauPolyfill.Object.assign({}, props, {
 		delayTime = LuauPolyfill.Object.None,
-		active = v12,
-		renderTriggerPoint = function(p4) -- line: 52
-			-- upvalues: p1 (copy), v16 (copy)
-			return p1.renderTriggerPoint(p4, v16)
+		active = state,
+		renderTriggerPoint = function(p)
+			return props.renderTriggerPoint(p, v)
 		end
 	})
 
-	return React.createElement(TooltipController, v17)
+	return React.createElement(TooltipController, v2)
 end
 
 return HoverController

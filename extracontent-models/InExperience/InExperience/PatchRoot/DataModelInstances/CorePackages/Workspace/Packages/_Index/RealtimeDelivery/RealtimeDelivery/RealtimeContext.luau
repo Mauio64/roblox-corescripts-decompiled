@@ -1,6 +1,9 @@
-local Parent = script:FindFirstAncestor("RealtimeDelivery").Parent
-local React = require(Parent.React)
-local NotificationService = game:GetService("NotificationService")
-local v4 = require(script.Parent.RobloxEventReceiver).new(NotificationService)
+local parent = script:FindFirstAncestor("RealtimeDelivery").Parent
+local React = require(parent.React)
 
-return React.createContext(v4)
+local NotificationService = game:GetService("NotificationService")
+local RobloxEventReceiver = require(script.Parent.RobloxEventReceiver)
+
+local v = RobloxEventReceiver.new(NotificationService)
+
+return React.createContext(v)

@@ -1,107 +1,87 @@
 local GuiService = game:GetService("GuiService")
+
 local AdGuiInteractivity = script:FindFirstAncestor("AdGuiInteractivity")
-local AdGuiInteractivityParent = AdGuiInteractivity.Parent
-local React = require(AdGuiInteractivityParent.React)
-local Foundation = require(AdGuiInteractivityParent.Foundation)
-local Localization = require(AdGuiInteractivityParent.Localization)
+local parent = AdGuiInteractivity.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+
 local ImmersiveBrandedAdWhyThisAdDialog = require(AdGuiInteractivity.ImmersiveBrandedAdWhyThisAdDialog)
 local ImmersiveBrandedAdReportAdDialog = require(AdGuiInteractivity.ImmersiveBrandedAdReportAdDialog)
 local AdsInteractivityTelemetry = require(AdGuiInteractivity.AdsInteractivityTelemetry)
+
 local Menu = Foundation.Menu
 local InputSize = Foundation.Enums.InputSize
 local PopoverSide = Foundation.Enums.PopoverSide
 local useLocalization = Localization.Hooks.useLocalization
 local useMeasurableRef = Foundation.Hooks.useMeasurableRef
-local _ = {
-	WhyThisAd = "whyThisAd",
-	ReportAd = "reportAd"
-}
 
-return function(t1: {[any]: any}) -- line: 34
-	-- upvalues: useLocalization (copy), React (copy), useMeasurableRef (copy), GuiService (copy), AdsInteractivityTelemetry (copy), ImmersiveBrandedAdWhyThisAdDialog (copy), ImmersiveBrandedAdReportAdDialog (copy), Menu (copy), InputSize (copy), PopoverSide (copy)
-	local screenPosition = t1.screenPosition
-	local v18 = useLocalization({
+local _ = { WhyThisAd = "whyThisAd", ReportAd = "reportAd" }
+
+return function(props)
+	local screenPosition = props.screenPosition
+	local v = useLocalization({
 		WhyThisAdText = "CoreScripts.Ads.Label.WhyThisAd",
 		ReportAdText = "CoreScripts.Ads.Label.ReportAd"
 	})
-	local v19, v20 = React.useState(nil)
-	local v21 = useMeasurableRef(screenPosition)
 
-	React.useEffect(function() -- line: 44
-		-- upvalues: GuiService (copy), t1 (copy)
-		local connection = GuiService.MenuOpened:Connect(function() -- line: 45
-			-- upvalues: t1 (copy)
-			t1.onDismiss()
+	local state, setState = React.useState(nil)
+	local anchorRef = useMeasurableRef(screenPosition)
+
+	React.useEffect(function()
+		local menuOpenedConnection = GuiService.MenuOpened:Connect(function()
+			props.onDismiss()
 		end)
 
-		return function() -- line: 49
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			menuOpenedConnection:Disconnect()
 		end
-	end, { t1.onDismiss })
+	end, { props.onDismiss })
 
-	local v22 = React.useMemo(function() -- line: 54
-		-- upvalues: v18 (copy)
+	local items = React.useMemo(function()
 		return {
-			{
-				id = "whyThisAd",
-				icon = "icons/actions/info_small",
-				text = v18.WhyThisAdText
-			},
-			{
-				id = "reportAd",
-				icon = "icons/actions/feedback",
-				text = v18.ReportAdText
-			}
+			{ id = "whyThisAd", icon = "icons/actions/info_small", text = v.WhyThisAdText },
+			{ id = "reportAd", icon = "icons/actions/feedback", text = v.ReportAdText }
 		}
-	end, {
-		v18.WhyThisAdText,
-		v18.ReportAdText
-	})
-	local v23 = React.useCallback(function(s1: string) -- line: 69
-		-- upvalues: AdsInteractivityTelemetry (copy), v20 (copy)
-		if s1 == "whyThisAd" then
+	end, { v.WhyThisAdText, v.ReportAdText })
+
+	local onActivated = React.useCallback(function(p: string)
+		if p == "whyThisAd" then
 			AdsInteractivityTelemetry.logImmersiveBrandedAdButtonClickCounter("whyThisAd")
-			v20("whyThisAd")
-
-			return
-		end
-
-		if s1 == "reportAd" then
+			setState("whyThisAd")
+		elseif p == "reportAd" then
 			AdsInteractivityTelemetry.logImmersiveBrandedAdButtonClickCounter("reportAd")
-			v20("reportAd")
+			setState("reportAd")
 		end
 	end, {})
 
-	if v19 == "whyThisAd" then
+	if state == "whyThisAd" then
 		return React.createElement(ImmersiveBrandedAdWhyThisAdDialog, {
-			advertiserName = t1.advertiserName,
-			onDismiss = t1.onDismiss
+			advertiserName = props.advertiserName,
+			onDismiss = props.onDismiss
 		})
-	end
-
-	if v19 == "reportAd" then
+	elseif state == "reportAd" then
 		return React.createElement(ImmersiveBrandedAdReportAdDialog, {
-			immersiveBrandedAdId = t1.immersiveBrandedAdId,
-			onDismiss = t1.onDismiss
+			immersiveBrandedAdId = props.immersiveBrandedAdId,
+			onDismiss = props.onDismiss
 		})
 	end
 
 	return React.createElement(React.Fragment, nil, {
 		menu = React.createElement(Menu, {
 			isOpen = true,
-			items = v22,
+			items = items,
 			size = InputSize.Small,
 			side = PopoverSide.Right,
-			onActivated = v23,
-			onPressedOutside = t1.onDismiss,
-			anchorRef = v21
+			onActivated = onActivated,
+			onPressedOutside = props.onDismiss,
+			anchorRef = anchorRef
 		}),
 		modal = React.createElement("TextButton", {
 			Text = "",
 			BackgroundTransparency = 1,
-			Modal = true,
-			Size = UDim2.new(0, 0, 0, 0)
+			Size = UDim2.new(0, 0, 0, 0),
+			Modal = true
 		})
 	})
 end

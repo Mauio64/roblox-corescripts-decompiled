@@ -1,8 +1,11 @@
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
+local parent = SquadsCore.Parent
+
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
-local ExperienceService = require(SquadsCoreParent.ExperienceService).ExperienceService
+local ExperienceService = require(parent.ExperienceService)
+local experienceService = ExperienceService.ExperienceService
+
 local SquadAppChatEventReceiver = require(script.Parent.SquadAppChatEventReceiver)
 local SquadExperienceInviteEventReceiver = require(script.Parent.SquadExperienceInviteEventReceiver)
 local SquadLifecycleEventReceiver = require(script.Parent.SquadLifecycleEventReceiver)
@@ -14,8 +17,11 @@ local SquadNudgeEventReceiver = require(script.Parent.SquadNudgeEventReceiver)
 local SquadMemberStatusEventReceiver = require(script.Parent.SquadMemberStatusEventReceiver)
 local SquadNudgeEventReceiver_NudgeV1Exp = require(script.Parent.SquadNudgeEventReceiver_NudgeV1Exp)
 local SquadRegroupPromptEventReceiver = require(script.Parent.SquadRegroupPromptEventReceiver)
-local CurrentSquadUpdated = require(SquadsCore.RoduxSquads).Actions.CurrentSquadUpdated
+
+local RoduxSquads = require(SquadsCore.RoduxSquads)
+local CurrentSquadUpdated = RoduxSquads.Actions.CurrentSquadUpdated
 local EventNames = require(SquadsCore.Analytics.EventNames)
+
 local SquadExternalContractContext = require(SquadsCore.Components.SquadExternalContractProvider.SquadExternalContractContext)
 local SquadCoplayJoin = require(SquadsCore.Enums.SquadCoplayJoin)
 local SquadLocationEnum = require(SquadsCore.Enums.SquadLocationEnum)
@@ -28,27 +34,35 @@ local logInExpCoplayTelemetry = require(SquadsCore.Analytics.logInExpCoplayTelem
 local useOnSquadEnded = require(SquadsCore.Hooks.useOnSquadEnded)
 local useCrossExperienceVoiceConnector = require(SquadsCore.Hooks.useCrossExperienceVoiceConnector)
 local RegroupPromptNotificationState = require(SquadsCore.Utils.RegroupPromptNotificationState)
-local CrossExperienceVoice = require(SquadsCoreParent.CrossExperienceVoice)
+
+local CrossExperienceVoice = require(parent.CrossExperienceVoice)
 local CrossExperienceVoiceManager = CrossExperienceVoice.CrossExperienceVoiceManager
-local React = require(SquadsCoreParent.React)
-local RoduxSquads = require(SquadsCoreParent.RoduxSquads)
-local SharedFlags = require(SquadsCoreParent.SharedFlags)
-local SoundManager = require(SquadsCoreParent.SoundManager)
-local ToastNotification = require(SquadsCoreParent.ToastNotification)
-local ToastNotificationsProtocol = require(SquadsCoreParent.ToastNotificationsProtocol)
+local React = require(parent.React)
+local RoduxSquads2 = require(parent.RoduxSquads)
+local SharedFlags = require(parent.SharedFlags)
+local SoundManager = require(parent.SoundManager)
+local ToastNotification = require(parent.ToastNotification)
+local ToastNotificationsProtocol = require(parent.ToastNotificationsProtocol)
 local useCrossExperienceVoice = CrossExperienceVoice.Hooks.useCrossExperienceVoice
-local useDispatch = require(SquadsCoreParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useEffectOnce = require(SquadsCoreParent.RoactUtils).Hooks.useEffectOnce
-local useLocalUserId = require(SquadsCoreParent.RobloxAppHooks).useLocalUserId
-local useSelector = require(SquadsCoreParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useCurrentSquadSelector = RoduxSquads.Hooks.useCurrentSquadSelector
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactUtils2 = require(parent.RoactUtils)
+local useEffectOnce = RoactUtils2.Hooks.useEffectOnce
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local RoactUtils3 = require(parent.RoactUtils)
+local useSelector = RoactUtils3.Hooks.RoactRodux.useSelector
+
+local useCurrentSquadSelector = RoduxSquads2.Hooks.useCurrentSquadSelector
+
 local Sounds = SoundManager.Sounds
-local SoundManager2 = SoundManager.SoundManager
+local soundManager = SoundManager.SoundManager
+
 local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
 local FFlagPartyVoiceBlockSync = SharedFlags.FFlagPartyVoiceBlockSync
 local FFlagSquadAppChatRTNFix = SharedFlags.FFlagSquadAppChatRTNFix
-local FFlagEnableSquadCoplayAnalytic = SharedFlags.FFlagEnableSquadCoplayAnalytic
 local FIntPartyVoiceJoinRequestPulseCheckTimeout = SharedFlags.FIntPartyVoiceJoinRequestPulseCheckTimeout
+
 local FFlagPartyDevAPIToRespectThirdPartySettingsEnabled = SharedFlags.FFlagPartyDevAPIToRespectThirdPartySettingsEnabled
 local FFlagReadAppChatFetchingVariable = SharedFlags.FFlagReadAppChatFetchingVariable
 local FFlagEnablePartyNudgeV1_DEV = SharedFlags.FFlagEnablePartyNudgeV1_DEV
@@ -56,382 +70,510 @@ local FFlagAppChatNavigateBackIfOSAUnacknowledged = SharedFlags.FFlagAppChatNavi
 local FFlagAppChatShowOSAOnPageEntry = SharedFlags.FFlagAppChatShowOSAOnPageEntry
 local FFlagEnableSquadRegroupExperimentation = SharedFlags.FFlagEnableSquadRegroupExperimentation
 local FFlagEnableSquadRegroupServerCapacityCheck = SharedFlags.FFlagEnableSquadRegroupServerCapacityCheck
-local FFlagEnableDialogAfterSquadJoin = SharedFlags.FFlagEnableDialogAfterSquadJoin
 local default = ToastNotificationsProtocol.ToastNotificationProtocol.default
+
 local LifecycleEvents = ToastNotification.LifecycleEvents
 local NotificationTypeEnum = ToastNotification.ToastNotificationTypeModule.NotificationTypeEnum
 local default2 = ToastNotification.ToastNotificationSnoozeManager.default
-local SquadUnifyCoplayExperimentation = require(SquadsCoreParent.SocialExperiments).SquadUnifyCoplayExperimentation
-local v65 = game:DefineFastFlag("LeaveSquadIfChatDisabled", false)
+local SocialExperiments = require(parent.SocialExperiments)
+local SquadUnifyCoplayExperimentation = SocialExperiments.SquadUnifyCoplayExperimentation
 
-return function() -- line: 80
-	-- upvalues: useDispatch (copy), useLocalUserId (copy), React (copy), SquadExternalContractContext (copy), useCurrentSquadSelector (copy), FFlagEnableSquadCoplayAnalytic (copy), useEffectOnce (copy), logInExpCoplayTelemetry (copy), SquadCoplayJoin (copy), LifecycleEvents (copy), NotificationTypeEnum (copy), EventNames (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), HttpService (copy), default (copy), joinSquad (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), FFlagEnableDialogAfterSquadJoin (copy), default2 (copy), SoundManager2 (copy), Sounds (copy), GetFFlagEnableCrossExpVoice (copy), FFlagPartyVoiceBlockSync (copy), useSelector (copy), CrossExperienceVoiceManager (copy), FIntPartyVoiceJoinRequestPulseCheckTimeout (copy), useCrossExperienceVoice (copy), useCrossExperienceVoiceConnector (copy), useOnSquadEnded (copy), FFlagReadAppChatFetchingVariable (copy), v65 (copy), leaveSquad (copy), CurrentSquadUpdated (copy), FFlagAppChatNavigateBackIfOSAUnacknowledged (copy), FFlagAppChatShowOSAOnPageEntry (copy), FFlagEnableSquadRegroupServerCapacityCheck (copy), Players (copy), FFlagEnableSquadRegroupExperimentation (copy), SquadLocationEnum (copy), ExperienceService (copy), RegroupPromptNotificationState (copy), SquadLifecycleEventReceiver (copy), SquadParentChannelEventReceiver (copy), SquadUnifyCoplayExperimentation (copy), SquadMemberStatusEventReceiver (copy), FFlagSquadAppChatRTNFix (copy), SquadRootViewType (copy), SquadAppChatEventReceiver (copy), SquadExperienceInviteEventReceiver (copy), SquadRccEventReceiver (copy), SquadStorageEventReceiver (copy), FFlagEnablePartyNudgeV1_DEV (copy), SquadNudgeEventReceiver_NudgeV1Exp (copy), SquadNudgeEventReceiver (copy), ScheduledSquadEventReceiver (copy), SquadRegroupPromptEventReceiver (copy)
-	local v66 = useDispatch()
-	local v67 = tonumber(useLocalUserId()) or 0
-	local v68 = React.useContext(SquadExternalContractContext)
-	local v69 = v68.useSquadRootView()
-	local v70 = v68.useIsChatEnabled()
-	local v71 = v68.useIsLoadingChatSettings()
-	local v72 = useCurrentSquadSelector()
-	local v73 = (not v72 or not v72.squadId) and "" or v72.squadId
-	local v74 = (not v72 or not v72.parentChannelId) and "" or v72.parentChannelId
+local defineFastFlag = game:DefineFastFlag("LeaveSquadIfChatDisabled", false)
 
-	if FFlagEnableSquadCoplayAnalytic then
-		useEffectOnce(function() -- line: 97
-			-- upvalues: v72 (copy), logInExpCoplayTelemetry (copy), v73 (copy), v68 (copy), SquadCoplayJoin (copy)
-			if v72 then
-				logInExpCoplayTelemetry(v73, v72.members, v68.squadLocation, SquadCoplayJoin.ExperienceJoin, v68.fireSquadAnalytics)
+return function()
+	local v = useDispatch()
+	local v2 = tonumber(useLocalUserId()) or 0
+	local v3 = React.useContext(SquadExternalContractContext)
+
+	local v4 = v3.useSquadRootView()
+	local v5 = v3.useIsChatEnabled()
+
+	local v6 = v3.useIsLoadingChatSettings()
+
+	local v7 = useCurrentSquadSelector()
+	local currentSquadId = not (v7 and v7.squadId) and "" or v7.squadId
+	local v8 = not (v7 and v7.parentChannelId) and "" or v7.parentChannelId
+
+	useEffectOnce(function()
+		if v7 then
+			logInExpCoplayTelemetry(
+				currentSquadId,
+				v7.members,
+				v3.squadLocation,
+				SquadCoplayJoin.ExperienceJoin,
+				v3.fireSquadAnalytics
+			)
+		end
+	end, {})
+
+	local useEffect = React.useEffect
+	local function fn()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.UserAction,
+			NotificationTypeEnum.SquadInvitation,
+			function(data)
+				if
+					data
+					and data.userActionType == "click"
+					and data.notificationData
+					and data.visualItem
+					and data.visualItem.eventName == "JoinSquad"
+					and data.visualItem.actionEventParams
+				then
+					v3.fireSquadAnalytics(EventNames.SquadToastActions, {
+						parentChannelId = v8,
+						toastAction = SquadToastActionsAndStates.SquadInviteAccept,
+						toastType = SquadToastType.SquadInvite
+					})
+
+					local jsonDecode = HttpService:JSONDecode(data.visualItem.actionEventParams)
+					default:dismissNotification(data.notificationData.id)
+
+					v(joinSquad(
+						jsonDecode.squadId,
+						v3.setSquadPrompt,
+						v3.fireSquadAnalytics,
+						v3.squadLocation,
+						not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v5
+					))
+				end
 			end
-		end, {})
+		)
+
+		return function()
+			callback()
+		end
 	end
 
-	React.useEffect(function() -- line: 117
-		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), v68 (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), HttpService (copy), default (copy), v66 (copy), joinSquad (copy), FFlagEnableSquadCoplayAnalytic (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), v70 (copy)
-		local v83 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.SquadInvitation, function(p1) -- line: 121
-			-- upvalues: v68 (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), HttpService (copy), default (copy), v66 (copy), joinSquad (copy), FFlagEnableSquadCoplayAnalytic (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), v70 (copy)
-			if p1 and (p1.userActionType == "click" and p1.notificationData and p1.visualItem and p1.visualItem.eventName == "JoinSquad" and p1.visualItem.actionEventParams) then
-				v68.fireSquadAnalytics(EventNames.SquadToastActions, {
-					parentChannelId = v74,
-					toastAction = SquadToastActionsAndStates.SquadInviteAccept,
-					toastType = SquadToastType.SquadInvite
-				})
+	local fireSquadAnalytics = v3.fireSquadAnalytics
+	local setSquadPrompt = v3.setSquadPrompt
+	local squadLocation = v3.squadLocation
+	local v9
 
-				local data = HttpService:JSONDecode(p1.visualItem.actionEventParams)
+	if FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then
+		v9 = v5
+	end
 
-				default:dismissNotification(p1.notificationData.id)
-				v66(joinSquad(data.squadId, v68.setSquadPrompt, if not FFlagEnableSquadCoplayAnalytic then nil else v68.fireSquadAnalytics, if not FFlagEnableSquadCoplayAnalytic then nil else v68.squadLocation, not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v70))
-			end
-		end)
+	useEffect(fn, { v8, v, joinSquad, fireSquadAnalytics, setSquadPrompt, squadLocation, v9 })
 
-		return function() -- line: 151
-			-- upvalues: v83 (copy)
-			v83()
-		end
-	end, {
-		v74,
-		v66,
-		joinSquad,
-		v68.fireSquadAnalytics,
-		v68.setSquadPrompt,
-		v68.squadLocation,
-		if not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then nil else v70
-	})
+	local useEffect2 = React.useEffect
+	local function fn2()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.UserAction,
+			NotificationTypeEnum.SquadInvitationV2,
+			function(data)
+				if
+					data
+					and data.userActionType == "click"
+					and data.notificationData
+					and data.visualItem
+					and data.visualItem.actionEventParams
+				then
+					local jsonDecode = HttpService:JSONDecode(data.visualItem.actionEventParams)
 
-	if FFlagEnableDialogAfterSquadJoin then
-		React.useEffect(function() -- line: 166
-			-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), HttpService (copy), v68 (copy), default (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), v66 (copy), joinSquad (copy), FFlagEnableSquadCoplayAnalytic (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), v70 (copy)
-			local v84 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.SquadInvitationV2, function(p2) -- line: 170
-				-- upvalues: HttpService (copy), v68 (copy), default (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), v66 (copy), joinSquad (copy), FFlagEnableSquadCoplayAnalytic (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), v70 (copy)
-				if p2 and (p2.userActionType == "click" and p2.notificationData and p2.visualItem and p2.visualItem.actionEventParams) then
-					local data = HttpService:JSONDecode(p2.visualItem.actionEventParams)
-
-					if p2.visualItem.visualItemName == "view" and v68.showGroupOSADialog then
-						default:dismissNotification(p2.notificationData.id)
-						v68.fireSquadAnalytics(EventNames.SquadToastActions, {
-							parentChannelId = v74,
+					if data.visualItem.visualItemName == "view" and v3.showGroupOSADialog then
+						default:dismissNotification(data.notificationData.id)
+						v3.fireSquadAnalytics(EventNames.SquadToastActions, {
+							parentChannelId = v8,
 							toastAction = SquadToastActionsAndStates.SquadInviteViewOsa,
 							toastType = SquadToastType.SquadInviteV2
 						})
-						v68.showGroupOSADialog(data.chatId, function() -- line: 188
-							-- upvalues: v66 (copy), joinSquad (copy), data (copy), v68 (copy), FFlagEnableSquadCoplayAnalytic (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), v70 (copy)
-							v66(joinSquad(data.squadId, v68.setSquadPrompt, if not FFlagEnableSquadCoplayAnalytic then nil else v68.fireSquadAnalytics, if not FFlagEnableSquadCoplayAnalytic then nil else v68.squadLocation, not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v70))
-						end, function() -- line: 204
-						end)
 
-						return
-					end
-
-					if p2.visualItem.visualItemName == "join" then
-						default:dismissNotification(p2.notificationData.id)
-						v68.fireSquadAnalytics(EventNames.SquadToastActions, {
-							parentChannelId = v74,
+						v3.showGroupOSADialog(jsonDecode.chatId, function()
+							v(joinSquad(
+								jsonDecode.squadId,
+								v3.setSquadPrompt,
+								v3.fireSquadAnalytics,
+								v3.squadLocation,
+								not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v5
+							))
+						end, function() end)
+					elseif data.visualItem.visualItemName == "join" then
+						default:dismissNotification(data.notificationData.id)
+						v3.fireSquadAnalytics(EventNames.SquadToastActions, {
+							parentChannelId = v8,
 							toastAction = SquadToastActionsAndStates.SquadInviteAccept,
 							toastType = SquadToastType.SquadInviteV2
 						})
-						v66(joinSquad(data.squadId, v68.setSquadPrompt, if not FFlagEnableSquadCoplayAnalytic then nil else v68.fireSquadAnalytics, if not FFlagEnableSquadCoplayAnalytic then nil else v68.squadLocation, not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v70))
+
+						v(joinSquad(
+							jsonDecode.squadId,
+							v3.setSquadPrompt,
+							v3.fireSquadAnalytics,
+							v3.squadLocation,
+							not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v5
+						))
 					end
 				end
-			end)
-
-			return function() -- line: 229
-				-- upvalues: v84 (copy)
-				v84()
 			end
-		end, {
-			v74,
-			v66,
-			joinSquad,
-			v68.fireSquadAnalytics,
-			v68.setSquadPrompt,
-			v68.showGroupOSADialog,
-			v68.squadLocation,
-			if not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then nil else v70
-		})
+		)
+
+		return function()
+			callback()
+		end
 	end
 
-	React.useEffect(function() -- line: 245
-		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), v70 (copy), default2 (copy), SoundManager2 (copy), Sounds (copy)
-		local v85 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.Display, NotificationTypeEnum.SquadInvitation, function(p3) -- line: 249
-			-- upvalues: v70 (copy), default2 (copy), SoundManager2 (copy), Sounds (copy)
-			if v70 and not default2:isSnoozedNotificationType(p3.notificationType) then
-				SoundManager2:PlaySound(Sounds.PartyToast.Name)
-			end
-		end)
+	local fireSquadAnalytics2 = v3.fireSquadAnalytics
+	local setSquadPrompt2 = v3.setSquadPrompt
+	local showGroupOSADialog = v3.showGroupOSADialog
+	local squadLocation2 = v3.squadLocation
+	local v10
 
-		return function() -- line: 259
-			-- upvalues: v85 (copy)
-			if v85 then
-				v85()
-			end
-		end
-	end, { v70 })
-
-	if FFlagEnableDialogAfterSquadJoin then
-		React.useEffect(function() -- line: 268
-			-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), v70 (copy), default2 (copy), SoundManager2 (copy), Sounds (copy)
-			local v86 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.Display, NotificationTypeEnum.SquadInvitationV2, function(p4) -- line: 272
-				-- upvalues: v70 (copy), default2 (copy), SoundManager2 (copy), Sounds (copy)
-				if v70 and not default2:isSnoozedNotificationType(p4.notificationType) then
-					SoundManager2:PlaySound(Sounds.PartyToast.Name)
-				end
-			end)
-
-			return function() -- line: 282
-				-- upvalues: v86 (copy)
-				if v86 then
-					v86()
-				end
-			end
-		end, { v70 })
+	if FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then
+		v10 = v5
 	end
 
-	React.useEffect(function() -- line: 291
-		-- upvalues: default (copy), NotificationTypeEnum (copy), FFlagEnableDialogAfterSquadJoin (copy), v70 (copy), v67 (copy), HttpService (copy), v73 (copy)
-		local v87 = default:listenToDisplayNotification(function(p5) -- line: 293
-			-- upvalues: NotificationTypeEnum (copy), FFlagEnableDialogAfterSquadJoin (copy), v70 (copy), default (copy), v67 (copy), HttpService (copy), v73 (copy)
-			if not p5 then
-				return
-			end
+	useEffect2(fn2, {
+		v8,
+		v,
+		joinSquad,
+		fireSquadAnalytics2,
+		setSquadPrompt2,
+		showGroupOSADialog,
+		squadLocation2,
+		v10
+	})
 
-			if (p5.notificationType == NotificationTypeEnum.SquadInvitation or (FFlagEnableDialogAfterSquadJoin and p5.notificationType == NotificationTypeEnum.SquadInvitationV2 or p5.notificationType == NotificationTypeEnum.SquadExperienceInvitation or p5.notificationType == NotificationTypeEnum.SquadJoinRequestPrompt or p5.notificationType == NotificationTypeEnum.SquadAcceptJoinRequest)) and not v70 then
-				default:dismissNotification(p5.notificationId)
-
-				return
-			end
-
-			if v67 <= 0 then
-				if p5.notificationId and (p5.notificationType == NotificationTypeEnum.SquadInvitation or (FFlagEnableDialogAfterSquadJoin and p5.notificationType == NotificationTypeEnum.SquadInvitationV2 or p5.notificationType == NotificationTypeEnum.SquadExperienceInvitation)) then
-					default:dismissNotification(p5.notificationId)
-				end
-
-				return
-			end
-
-			if p5.notificationType == NotificationTypeEnum.SquadInvitation or FFlagEnableDialogAfterSquadJoin and p5.notificationType == NotificationTypeEnum.SquadInvitationV2 then
-				local data = HttpService:JSONDecode(p5.lifecycleData)
-
-				if v73 == data.squadId then
-					default:dismissNotification(p5.notificationId)
+	React.useEffect(function()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.Display,
+			NotificationTypeEnum.SquadInvitation,
+			function(p)
+				if v5 and not default2:isSnoozedNotificationType(p.notificationType) then
+					soundManager:PlaySound(Sounds.PartyToast.Name)
 				end
 			end
-		end)
+		)
 
-		return function() -- line: 346
-			-- upvalues: v87 (copy)
-			v87:Disconnect()
+		return function()
+			if callback then
+				callback()
+			end
 		end
-	end, {
-		v73,
-		v67,
-		v70
-	})
-	React.useEffect(function() -- line: 352
-		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), v68 (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), default (copy)
-		local v88 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.SquadJoinRequestPrompt, function(p6) -- line: 356
-			-- upvalues: v68 (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), default (copy)
-			if p6 and (p6.userActionType == "click" and p6.notificationData and p6.visualItem and p6.visualItem.eventName == "RequestToJoinParty" and p6.visualItem.actionEventParams) then
-				v68.fireSquadAnalytics(EventNames.SquadToastActions, {
-					parentChannelId = v74,
-					toastAction = SquadToastActionsAndStates.RequestToJoinPartyAccept,
-					toastType = SquadToastType.RequestToJoinParty
-				})
-				default:dismissNotification(p6.notificationData.id)
+	end, { v5 })
+	React.useEffect(function()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.Display,
+			NotificationTypeEnum.SquadInvitationV2,
+			function(p)
+				if v5 and not default2:isSnoozedNotificationType(p.notificationType) then
+					soundManager:PlaySound(Sounds.PartyToast.Name)
+				end
+			end
+		)
+
+		return function()
+			if callback then
+				callback()
+			end
+		end
+	end, { v5 })
+
+	React.useEffect(function()
+		local connection = default:listenToDisplayNotification(function(data)
+			if not data then
+				return
+			end
+
+			if
+				(data.notificationType == NotificationTypeEnum.SquadInvitation or data.notificationType == NotificationTypeEnum.SquadInvitationV2 or data.notificationType == NotificationTypeEnum.SquadExperienceInvitation or data.notificationType == NotificationTypeEnum.SquadJoinRequestPrompt or data.notificationType == NotificationTypeEnum.SquadAcceptJoinRequest)
+				and not v5
+			then
+				default:dismissNotification(data.notificationId)
+			elseif v2 <= 0 then
+				if
+					data.notificationId
+					and (data.notificationType == NotificationTypeEnum.SquadInvitation or data.notificationType == NotificationTypeEnum.SquadInvitationV2 or data.notificationType == NotificationTypeEnum.SquadExperienceInvitation)
+				then
+					default:dismissNotification(data.notificationId)
+				end
+			elseif
+				(data.notificationType == NotificationTypeEnum.SquadInvitation or data.notificationType == NotificationTypeEnum.SquadInvitationV2)
+				and currentSquadId == HttpService:JSONDecode(data.lifecycleData).squadId
+			then
+				default:dismissNotification(data.notificationId)
 			end
 		end)
 
-		return function() -- line: 380
-			-- upvalues: v88 (copy)
-			v88()
+		return function()
+			connection:Disconnect()
 		end
-	end, {
-		v74,
-		v68.fireSquadAnalytics
-	})
-	React.useEffect(function() -- line: 386
-		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), v68 (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), default (copy)
-		local v89 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.SquadAcceptJoinRequest, function(p7) -- line: 390
-			-- upvalues: v68 (copy), EventNames (copy), v74 (copy), SquadToastActionsAndStates (copy), SquadToastType (copy), default (copy)
-			if p7 and (p7.userActionType == "click" and p7.notificationData and p7.visualItem and p7.visualItem.eventName == "AcceptPartyJoinRequest" and p7.visualItem.actionEventParams) then
-				v68.fireSquadAnalytics(EventNames.SquadToastActions, {
-					parentChannelId = v74,
-					toastAction = SquadToastActionsAndStates.AcceptPartyJoinRequestAccept,
-					toastType = SquadToastType.AcceptPartyJoinRequest
-				})
-				default:dismissNotification(p7.notificationData.id)
-			end
-		end)
+	end, { currentSquadId, v2, v5 })
 
-		return function() -- line: 414
-			-- upvalues: v89 (copy)
-			v89()
+	React.useEffect(function()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.UserAction,
+			NotificationTypeEnum.SquadJoinRequestPrompt,
+			function(data)
+				if
+					data
+					and data.userActionType == "click"
+					and data.notificationData
+					and data.visualItem
+					and data.visualItem.eventName == "RequestToJoinParty"
+					and data.visualItem.actionEventParams
+				then
+					v3.fireSquadAnalytics(EventNames.SquadToastActions, {
+						parentChannelId = v8,
+						toastAction = SquadToastActionsAndStates.RequestToJoinPartyAccept,
+						toastType = SquadToastType.RequestToJoinParty
+					})
+
+					default:dismissNotification(data.notificationData.id)
+				end
+			end
+		)
+
+		return function()
+			callback()
 		end
-	end, {
-		v74,
-		v68.fireSquadAnalytics
-	})
+	end, { v8, v3.fireSquadAnalytics })
+
+	React.useEffect(function()
+		local callback = LifecycleEvents:RegisterCallback(
+			LifecycleEvents.ToastEvents.UserAction,
+			NotificationTypeEnum.SquadAcceptJoinRequest,
+			function(data)
+				if
+					data
+					and data.userActionType == "click"
+					and data.notificationData
+					and data.visualItem
+					and data.visualItem.eventName == "AcceptPartyJoinRequest"
+					and data.visualItem.actionEventParams
+				then
+					v3.fireSquadAnalytics(EventNames.SquadToastActions, {
+						parentChannelId = v8,
+						toastAction = SquadToastActionsAndStates.AcceptPartyJoinRequestAccept,
+						toastType = SquadToastType.AcceptPartyJoinRequest
+					})
+
+					default:dismissNotification(data.notificationData.id)
+				end
+			end
+		)
+
+		return function()
+			callback()
+		end
+	end, { v8, v3.fireSquadAnalytics })
 
 	if GetFFlagEnableCrossExpVoice() and FFlagPartyVoiceBlockSync then
-		local v75 = React.useCallback(function(p8) -- line: 422
-			return p8.Squad.UserBlocking.isBlockedByMe
-		end, {})
-		local v76 = useSelector(v75)
-		local v77 = React.useRef({})
+		local current = useSelector((React.useCallback(function(p)
+			return p.Squad.UserBlocking.isBlockedByMe
+		end, {})))
 
-		React.useEffect(function() -- line: 429
-			-- upvalues: v77 (copy), v76 (copy), CrossExperienceVoiceManager (copy)
-			if v77.current == v76 then
+		local ref = React.useRef({})
+		React.useEffect(function()
+			if ref.current == current then
 				return
 			end
 
-			for k, v in pairs(v76) do
-				local v93 = v77.current[k] or false
+			for k, v11 in pairs(current) do
+				local v12 = ref.current[k] or false
 
-				if v and not v93 then
+				if v11 and not v12 then
 					CrossExperienceVoiceManager.default:blockVoiceParticipant(k)
-				elseif not v and v93 then
+				elseif not v11 and v12 then
 					CrossExperienceVoiceManager.default:unblockVoiceParticipant(k)
 				end
 			end
 
-			v77.current = v76
-		end, { v76 })
+			ref.current = current
+		end, { current })
 	end
 
 	if GetFFlagEnableCrossExpVoice() then
 		if FIntPartyVoiceJoinRequestPulseCheckTimeout > 0 then
-			useCrossExperienceVoice({
-				handleRCCConnectionTimeout = true
-			})
+			useCrossExperienceVoice({ handleRCCConnectionTimeout = true })
 		else
 			useCrossExperienceVoice()
 		end
 
-		local v78 = useCrossExperienceVoiceConnector()
-
-		useOnSquadEnded(function() -- line: 458
-			-- upvalues: v78 (copy)
-			v78()
+		local v11 = useCrossExperienceVoiceConnector()
+		useOnSquadEnded(function()
+			v11()
 		end)
 	end
 
-	React.useEffect(function() -- line: 463
-		-- upvalues: FFlagReadAppChatFetchingVariable (copy), v71 (copy), v70 (copy), v73 (copy), v65 (copy), v66 (copy), leaveSquad (copy), v68 (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), CurrentSquadUpdated (copy)
-		if (not FFlagReadAppChatFetchingVariable or not v71) and (not v70 and v73 ~= "") then
-			if v65 then
-				v66(leaveSquad(nil, v68.setSquadPrompt, nil, v68.squadLocation, not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v70))
-
-				return
+	local useEffect3 = React.useEffect
+	local function fn3()
+		if not (FFlagReadAppChatFetchingVariable and v6) and not v5 and currentSquadId ~= "" then
+			if defineFastFlag then
+				v(leaveSquad(
+					nil,
+					v3.setSquadPrompt,
+					nil,
+					v3.squadLocation,
+					not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v5
+				))
+			else
+				v(CurrentSquadUpdated(nil))
 			end
-
-			v66(CurrentSquadUpdated(nil))
 		end
-	end, {
-		v70,
-		v73,
-		if not FFlagReadAppChatFetchingVariable then nil else v71,
-		if not v65 then nil else v68.setSquadPrompt,
-		if not v65 then nil else v68.squadLocation
-	})
+	end
+
+	local v11
+
+	if FFlagReadAppChatFetchingVariable then
+		v11 = v6
+	end
+
+	local setSquadPrompt3
+
+	if defineFastFlag then
+		setSquadPrompt3 = v3.setSquadPrompt
+	end
+
+	local v12
+
+	if defineFastFlag then
+		v12 = v3.squadLocation
+	end
+
+	useEffect3(fn3, { v5, currentSquadId, v11, setSquadPrompt3, v12 })
 
 	if FFlagAppChatNavigateBackIfOSAUnacknowledged and not FFlagAppChatShowOSAOnPageEntry then
-		local v79 = v68.useGetConversationFromId(v74)
-		local v80 = v68.shouldShowOSAForConversation(v79)
+		local v13 = v3.useGetConversationFromId(v8)
+		local shouldShowOSAForConversation = v3.shouldShowOSAForConversation(v13)
 
-		React.useEffect(function() -- line: 496
-			-- upvalues: v80 (copy), v73 (copy), v66 (copy), leaveSquad (copy), v68 (copy)
-			if v80 and v73 ~= "" then
-				v66(leaveSquad(nil, v68.setSquadPrompt, nil, v68.squadLocation, true))
+		React.useEffect(function()
+			if shouldShowOSAForConversation and currentSquadId ~= "" then
+				v(leaveSquad(nil, v3.setSquadPrompt, nil, v3.squadLocation, true))
 			end
-		end, {
-			v80,
-			v73,
-			v68.setSquadPrompt,
-			v68.squadLocation
-		})
+		end, { shouldShowOSAForConversation, currentSquadId, v3.setSquadPrompt, v3.squadLocation })
 	end
 
-	local v81 = not FFlagEnableSquadRegroupServerCapacityCheck or Players.MaxPlayers > 1
-	local v82 = FFlagEnableSquadRegroupExperimentation and (v68.squadLocation == SquadLocationEnum.InExperience and (v81 and (v72 and (v72.selfPermissions and (v72.selfPermissions.canSeeRegroupPromptToast and #v72.members > 1)))))
+	local v13 = not FFlagEnableSquadRegroupServerCapacityCheck or Players.MaxPlayers > 1
 
-	React.useEffect(function() -- line: 520
-		-- upvalues: FFlagEnableSquadRegroupExperimentation (copy), ExperienceService (copy), RegroupPromptNotificationState (copy)
+	local v14 = FFlagEnableSquadRegroupExperimentation
+
+	if v14 then
+		if v3.squadLocation == SquadLocationEnum.InExperience then
+			v14 = v13 and v7 and v7.selfPermissions and v7.selfPermissions.canSeeRegroupPromptToast and #v7.members > 1
+		else
+			v14 = false
+		end
+	end
+
+	React.useEffect(function()
 		if not FFlagEnableSquadRegroupExperimentation then
-			return function() -- line: 522
-			end
+			return function() end
 		end
 
-		local v94 = ExperienceService:RegisterForExperienceLeave(function() -- line: 525
-			-- upvalues: RegroupPromptNotificationState (copy)
-			local v107 = RegroupPromptNotificationState.getActiveNotifId()
-
-			RegroupPromptNotificationState.dismissNotification(v107)
+		local connection = experienceService:RegisterForExperienceLeave(function()
+			local activeNotifId = RegroupPromptNotificationState.getActiveNotifId()
+			RegroupPromptNotificationState.dismissNotification(activeNotifId)
 		end)
 
-		return function() -- line: 530
-			-- upvalues: v94 (copy)
-			if v94 and v94.Disconnect then
-				v94:Disconnect()
+		return function()
+			if connection and connection.Disconnect then
+				connection:Disconnect()
 			end
 		end
 	end, {})
-	React.useEffect(function() -- line: 537
-		-- upvalues: FFlagEnableSquadRegroupExperimentation (copy), RegroupPromptNotificationState (copy), v73 (copy)
-		if FFlagEnableSquadRegroupExperimentation then
-			local v95 = RegroupPromptNotificationState.getActiveNotifId()
-			local v96 = RegroupPromptNotificationState.getActiveSquadId()
 
-			if v95 ~= nil and v96 ~= v73 then
-				RegroupPromptNotificationState.dismissNotification(v95)
+	React.useEffect(function()
+		if FFlagEnableSquadRegroupExperimentation then
+			local activeNotifId = RegroupPromptNotificationState.getActiveNotifId()
+			local activeSquadId = RegroupPromptNotificationState.getActiveSquadId()
+
+			if activeNotifId ~= nil and currentSquadId ~= activeSquadId then
+				RegroupPromptNotificationState.dismissNotification(activeNotifId)
 			end
 		end
-	end, { v73 })
+	end, { currentSquadId })
 
-	return React.createElement(React.Fragment, nil, {
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local children = {
 		SquadLifecycleEventReceiver = React.createElement(SquadLifecycleEventReceiver, {
-			currentSquadId = v73
+			currentSquadId = currentSquadId
 		}),
-		SquadParentChannelEventReceiver = if not v72 then nil else React.createElement(SquadParentChannelEventReceiver, {
-			currentParentChannelId = v72.parentChannelId
-		}),
-		SquadMemberStatusEventReceiver = if not SquadUnifyCoplayExperimentation.getOneOnOnePartyCreationEnabled() and not SquadUnifyCoplayExperimentation.getMultiInvitePartyCreationEnabled() or v68.squadLocation ~= SquadLocationEnum.InExperience then nil else React.createElement(SquadMemberStatusEventReceiver),
-		SquadAppChatEventReceiver = if FFlagSquadAppChatRTNFix or v69 == SquadRootViewType.None then nil else React.createElement(SquadAppChatEventReceiver, {
-			conversationId = if not v72 then nil else v72.parentChannelId
-		}),
-		SquadExperienceInviteEventReceiver = React.createElement(SquadExperienceInviteEventReceiver, {
-			currentSquadId = v73
-		}),
-		SquadRccEventReceiver = if v68.squadLocation ~= SquadLocationEnum.InExperience then nil else React.createElement(SquadRccEventReceiver, {
-			currentSquadId = v73
-		}),
-		SquadStorageEventReceiver = React.createElement(SquadStorageEventReceiver),
-		SquadNudgeEventReceiver = React.createElement(if not FFlagEnablePartyNudgeV1_DEV then SquadNudgeEventReceiver else SquadNudgeEventReceiver_NudgeV1Exp, {
-			currentSquadId = v73,
-			currentParentChannelId = v74
-		}),
-		ScheduledSquadEventReceiver = React.createElement(ScheduledSquadEventReceiver),
-		SquadRegroupPromptEventReceiver = if not v82 then nil else React.createElement(SquadRegroupPromptEventReceiver, {
-			currentSquadMembers = v72 and v72.members or {},
-			currentSquadId = v73
+		SquadParentChannelEventReceiver = 0,
+		SquadMemberStatusEventReceiver = 0,
+		SquadAppChatEventReceiver = 0,
+		SquadExperienceInviteEventReceiver = 0,
+		SquadRccEventReceiver = 0,
+		SquadStorageEventReceiver = 0,
+		SquadNudgeEventReceiver = 0,
+		ScheduledSquadEventReceiver = 0,
+		SquadRegroupPromptEventReceiver = 0
+	}
+	local squadParentChannelEventReceiver
+
+	if v7 then
+		squadParentChannelEventReceiver = React.createElement(SquadParentChannelEventReceiver, {
+			currentParentChannelId = v7.parentChannelId
 		})
+	end
+
+	children.SquadParentChannelEventReceiver = squadParentChannelEventReceiver
+	local squadMemberStatusEventReceiver
+
+	if
+		(SquadUnifyCoplayExperimentation.getOneOnOnePartyCreationEnabled() or SquadUnifyCoplayExperimentation.getMultiInvitePartyCreationEnabled())
+		and v3.squadLocation == SquadLocationEnum.InExperience
+	then
+		squadMemberStatusEventReceiver = React.createElement(SquadMemberStatusEventReceiver)
+	end
+
+	children.SquadMemberStatusEventReceiver = squadMemberStatusEventReceiver
+	local squadAppChatEventReceiver
+
+	if not (FFlagSquadAppChatRTNFix or v4 == SquadRootViewType.None) then
+		local createElement2 = React.createElement
+		local conversationId
+
+		if v7 then
+			conversationId = v7.parentChannelId
+		end
+
+		squadAppChatEventReceiver = createElement2(SquadAppChatEventReceiver, {
+			conversationId = conversationId
+		})
+	end
+
+	children.SquadAppChatEventReceiver = squadAppChatEventReceiver
+
+	children.SquadExperienceInviteEventReceiver = React.createElement(SquadExperienceInviteEventReceiver, {
+		currentSquadId = currentSquadId
 	})
+	local squadRccEventReceiver
+
+	if v3.squadLocation == SquadLocationEnum.InExperience then
+		squadRccEventReceiver = React.createElement(SquadRccEventReceiver, {
+			currentSquadId = currentSquadId
+		})
+	end
+
+	children.SquadRccEventReceiver = squadRccEventReceiver
+
+	children.SquadStorageEventReceiver = React.createElement(SquadStorageEventReceiver)
+	local createElement2 = React.createElement
+	local v15
+
+	if FFlagEnablePartyNudgeV1_DEV then
+		v15 = SquadNudgeEventReceiver_NudgeV1Exp
+	else
+		v15 = SquadNudgeEventReceiver
+	end
+
+	children.SquadNudgeEventReceiver = createElement2(v15, {
+		currentSquadId = currentSquadId,
+		currentParentChannelId = v8
+	})
+
+	children.ScheduledSquadEventReceiver = React.createElement(ScheduledSquadEventReceiver)
+	local squadRegroupPromptEventReceiver
+
+	if v14 then
+		squadRegroupPromptEventReceiver = React.createElement(SquadRegroupPromptEventReceiver, {
+			currentSquadMembers = v7 and v7.members or {},
+			currentSquadId = currentSquadId
+		})
+	end
+
+	children.SquadRegroupPromptEventReceiver = squadRegroupPromptEventReceiver
+	return createElement(fragment, nil, children)
 end

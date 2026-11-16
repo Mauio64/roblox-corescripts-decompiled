@@ -1,8 +1,9 @@
-local t1 = {
-	Query = require(script.Query).Query,
-	Mutation = require(script.Mutation).Mutation
-}
+local Query = require(script.Query)
+local Components = {}
+Components.Query = Query.Query
+local Mutation = require(script.Mutation)
+Components.Mutation = Mutation.Mutation
 
 require(script.types)
 
-return t1
+return Components

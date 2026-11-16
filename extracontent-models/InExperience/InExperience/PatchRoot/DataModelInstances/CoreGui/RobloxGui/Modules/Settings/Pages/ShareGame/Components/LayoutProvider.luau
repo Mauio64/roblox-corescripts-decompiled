@@ -1,104 +1,124 @@
 local CorePackages = game:GetService("CorePackages")
-local Modules = game:GetService("CoreGui").RobloxGui.Modules
+
+local CoreGui = game:GetService("CoreGui")
+local Modules = CoreGui.RobloxGui.Modules
 local UserInputService = game:GetService("UserInputService")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local ShareGame = Modules.Settings.Pages.ShareGame
 local Constants = require(ShareGame.Constants)
-local SetDeviceOrientation = require(CorePackages.Workspace.Packages.DeviceOrientationRodux).Actions.SetDeviceOrientation
+
+local DeviceOrientationRodux = require(CorePackages.Workspace.Packages.DeviceOrientationRodux)
+local SetDeviceOrientation = DeviceOrientationRodux.Actions.SetDeviceOrientation
 local SetIsSmallTouchScreen = require(ShareGame.Actions.SetIsSmallTouchScreen)
 local SetDeviceLayout = require(ShareGame.Actions.SetDeviceLayout)
-local v11 = Roact.Component:extend("LayoutProvider")
 
-function v11.didMount(p1) -- line: 22
+local extended = Roact.Component:extend("LayoutProvider")
+
+function extended:didMount()
 	if workspace.CurrentCamera then
-		p1:setObservedCamera(workspace.CurrentCamera)
+		self:setObservedCamera(workspace.CurrentCamera)
 	end
 
-	p1.cameraChangedListener = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() -- line: 27
-		-- upvalues: p1 (copy)
+	self.cameraChangedListener = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 		if workspace.CurrentCamera then
-			p1:setObservedCamera(workspace.CurrentCamera)
+			self:setObservedCamera(workspace.CurrentCamera)
 		end
 	end)
 end
-function v11.willUnmount(p2) -- line: 34
-	if p2.cameraChangedListener then
-		p2.cameraChangedListener:Disconnect()
+
+function extended.willUnmount(p)
+	if p.cameraChangedListener then
+		p.cameraChangedListener:Disconnect()
 	end
 
-	if p2.viewportSizeListener then
-		p2.viewportSizeListener:Disconnect()
+	if p.viewportSizeListener then
+		p.viewportSizeListener:Disconnect()
 	end
 end
-function v11.setObservedCamera(p3, p4) -- line: 44
-	if p3.viewportSizeListener then
-		p3.viewportSizeListener:Disconnect()
+
+function extended:setObservedCamera(instance)
+	if self.viewportSizeListener then
+		self.viewportSizeListener:Disconnect()
 	end
 
-	p3:checkAllDeviceInfo(p4.ViewportSize)
-	p3.viewportSizeListener = p4:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 51
-		-- upvalues: p4 (copy), p3 (copy)
-		local ViewportSize = p4.ViewportSize
+	self:checkAllDeviceInfo(instance.ViewportSize)
+	self.viewportSizeListener = instance:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+		local viewportSize = instance.ViewportSize
 
-		if ViewportSize.X <= 1 or ViewportSize.Y <= 1 then
+		if viewportSize.X <= 1 or viewportSize.Y <= 1 then
 			return
 		end
 
-		p3:checkAllDeviceInfo(ViewportSize)
+		self:checkAllDeviceInfo(viewportSize)
 	end)
 end
-function v11.checkDeviceOrientation(p5, p6) -- line: 63
-	-- upvalues: Constants (copy)
-	local v18 = p6.X > p6.Y and Constants.DeviceOrientation.LANDSCAPE or Constants.DeviceOrientation.PORTRAIT
 
-	if v18 ~= p5._deviceOrientation then
-		p5._deviceOrientation = v18
-		p5.props.setDeviceOrientation(v18)
+function extended:checkDeviceOrientation(p)
+	local landscape = p.X > p.Y and Constants.DeviceOrientation.LANDSCAPE or Constants.DeviceOrientation.PORTRAIT
+
+	if self._deviceOrientation ~= landscape then
+		self._deviceOrientation = landscape
+		self.props.setDeviceOrientation(landscape)
 	end
 end
-function v11.checkDeviceIsSmallTouchScreen(p7, p8) -- line: 73
-	-- upvalues: UserInputService (copy)
-	local v21 = UserInputService.TouchEnabled and (p8.X < 700 or p8.Y < 500)
 
-	if v21 ~= p7._isSmallTouchScreen then
-		p7._isSmallTouchScreen = v21
-		p7.props.setIsSmallTouchScreen(p7._isSmallTouchScreen)
+function extended:checkDeviceIsSmallTouchScreen(p)
+	local isSmallTouchScreen = UserInputService.TouchEnabled and (p.X < 700 or p.Y < 500)
+
+	if self._isSmallTouchScreen ~= isSmallTouchScreen then
+		self._isSmallTouchScreen = isSmallTouchScreen
+		self.props.setIsSmallTouchScreen(self._isSmallTouchScreen)
 	end
 end
-function v11.checkDeviceLayout(p9) -- line: 83
-	-- upvalues: Constants (copy), UserInputService (copy)
-	local v23 = if not p9._isSmallTouchScreen then if not UserInputService.TouchEnabled then Constants.DeviceLayout.DESKTOP else if p9._deviceOrientation ~= Constants.DeviceOrientation.LANDSCAPE then Constants.DeviceLayout.TABLET_PORTRAIT else Constants.DeviceLayout.TABLET_LANDSCAPE else if p9._deviceOrientation ~= Constants.DeviceOrientation.LANDSCAPE then Constants.DeviceLayout.PHONE_PORTRAIT else Constants.DeviceLayout.PHONE_LANDSCAPE
 
-	if v23 ~= p9._deviceLayout then
-		p9._deviceLayout = v23
-		p9.props.setDeviceLayout(p9._deviceLayout)
+function extended:checkDeviceLayout()
+	local deviceLayout
+
+	if self._isSmallTouchScreen then
+		if self._deviceOrientation == Constants.DeviceOrientation.LANDSCAPE then
+			deviceLayout = Constants.DeviceLayout.PHONE_LANDSCAPE
+		else
+			deviceLayout = Constants.DeviceLayout.PHONE_PORTRAIT
+		end
+	elseif UserInputService.TouchEnabled then
+		if self._deviceOrientation == Constants.DeviceOrientation.LANDSCAPE then
+			deviceLayout = Constants.DeviceLayout.TABLET_LANDSCAPE
+		else
+			deviceLayout = Constants.DeviceLayout.TABLET_PORTRAIT
+		end
+	else
+		deviceLayout = Constants.DeviceLayout.DESKTOP
+	end
+
+	if self._deviceLayout ~= deviceLayout then
+		self._deviceLayout = deviceLayout
+		self.props.setDeviceLayout(self._deviceLayout)
 	end
 end
-function v11.checkAllDeviceInfo(p10, p11) -- line: 108
-	p10:checkDeviceOrientation(p11)
-	p10:checkDeviceIsSmallTouchScreen(p11)
-	p10:checkDeviceLayout()
-end
-function v11.render(p12) -- line: 114
-	-- upvalues: Roact (copy)
-	return Roact.oneChild(p12.props[Roact.Children])
+
+function extended:checkAllDeviceInfo(p)
+	self:checkDeviceOrientation(p)
+	self:checkDeviceIsSmallTouchScreen(p)
+	self:checkDeviceLayout()
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, function(p13) -- line: 118
-	-- upvalues: SetDeviceOrientation (copy), SetIsSmallTouchScreen (copy), SetDeviceLayout (copy)
+function extended.render(p)
+	return Roact.oneChild(p.props[Roact.Children])
+end
+
+return RoactRodux.UNSTABLE_connect2(nil, function(callback)
 	return {
-		setDeviceOrientation = function(p14) -- line: 120
-			-- upvalues: p13 (copy), SetDeviceOrientation (copy)
-			return p13(SetDeviceOrientation(p14))
+		setDeviceOrientation = function(p)
+			return callback(SetDeviceOrientation(p))
 		end,
-		setIsSmallTouchScreen = function(p15) -- line: 123
-			-- upvalues: p13 (copy), SetIsSmallTouchScreen (copy)
-			return p13(SetIsSmallTouchScreen(p15))
+		setIsSmallTouchScreen = function(p)
+			return callback(SetIsSmallTouchScreen(p))
 		end,
-		setDeviceLayout = function(p16) -- line: 126
-			-- upvalues: p13 (copy), SetDeviceLayout (copy)
-			return p13(SetDeviceLayout(p16))
+		setDeviceLayout = function(p)
+			return callback(SetDeviceLayout(p))
 		end
 	}
-end)(v11)
+end)(extended)

@@ -1,0 +1,12 @@
+local FFlagAXBackgroundsCustomizeHydration = require(script.Parent.FFlagAXBackgroundsCustomizeHydration)
+local FFlagAXCatalogBackgroundsSupport = require(script.Parent.FFlagAXCatalogBackgroundsSupport)
+local FFlagAXBackgroundsEndTryOnOnSelect = require(script.Parent.FFlagAXBackgroundsEndTryOnOnSelect)
+local FFlagAXSlotsScrollAwayOnlyWithSlots = require(script.Parent.FFlagAXSlotsScrollAwayOnlyWithSlots)
+
+local defineFastFlag = game:DefineFastFlag("AXBackgroundsYouMayAlsoLike", false)
+
+return FFlagAXBackgroundsCustomizeHydration
+	and FFlagAXCatalogBackgroundsSupport
+	and FFlagAXBackgroundsEndTryOnOnSelect
+	and FFlagAXSlotsScrollAwayOnlyWithSlots
+	and defineFastFlag

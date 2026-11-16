@@ -1,7 +1,6 @@
 local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
-local SocialCarouselParent = SocialCarousel.Parent
-
-require(SocialCarouselParent.SocialCommon)
+local parent = SocialCarousel.Parent
+require(parent.SocialCommon)
 require(SocialCarousel.Common.Enums)
 
 return {}

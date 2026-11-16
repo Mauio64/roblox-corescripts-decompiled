@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local InlineEventType = require(Workspace.OnPlatformSurveys.OnPlatformSurveys.Enums.InlineEventType)
 
-return (require(_Workspace.OnPlatformSurveys.OnPlatformSurveys.Enums.InlineEventType))
+return InlineEventType

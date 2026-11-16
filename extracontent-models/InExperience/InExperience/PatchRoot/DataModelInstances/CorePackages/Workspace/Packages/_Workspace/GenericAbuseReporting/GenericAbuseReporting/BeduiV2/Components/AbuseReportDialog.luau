@@ -1,85 +1,111 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local FocusNavigationUtils = require(GenericAbuseReportingParent.FocusNavigationUtils)
-local Foundation = require(GenericAbuseReportingParent.Foundation)
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local IconButton = Foundation.IconButton
 local InputSize = Foundation.Enums.InputSize
 local Sheet = Foundation.Sheet
 local View = Foundation.View
-local AbuseReportTooltip = require(GenericAbuseReporting.BeduiV2.Components.AbuseReportTooltip)
 
+local AbuseReportTooltip = require(GenericAbuseReporting.BeduiV2.Components.AbuseReportTooltip)
 require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
 require(GenericAbuseReporting.Enums.AbuseVector)
-
 local useFocusNavigationRefs = require(GenericAbuseReporting.BeduiV2.Hooks.FocusNavigation.useFocusNavigationRefs)
 
-return React.memo(function(t1: {[any]: any}) -- line: 35
-	-- upvalues: React (copy), useFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), Sheet (copy), View (copy), IconButton (copy), InputSize (copy), Foundation (copy), ButtonVariant (copy), AbuseReportTooltip (copy)
-	local abuseReportFlow = t1.abuseReportFlow
+return React.memo(function(p)
+	local abuseReportFlow = p.abuseReportFlow
 	local config = abuseReportFlow.config
 	local currentPageElement = abuseReportFlow.currentPageElement
 	local canGoBack = abuseReportFlow.canGoBack
-	local v19, v20 = React.useState(not not config.display.titleDisclosure and (config.display.titleDisclosure.openByDefault or false))
-	local v21 = useFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, function() -- line: 44
-		-- upvalues: v20 (copy)
-		v20(false)
+
+	local useState = React.useState
+	local v
+
+	if config.display.titleDisclosure then
+		v = config.display.titleDisclosure.openByDefault or false
+	else
+		v = false
+	end
+
+	local state, setState = useState(v)
+
+	local ref = useFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, function()
+		setState(false)
 	end)
 
-	React.useEffect(function() -- line: 48
-		-- upvalues: v19 (copy), t1 (copy)
-		if v19 then
-			t1.takeoverFocus(true)
-
-			return
+	React.useEffect(function()
+		if state then
+			p.takeoverFocus(true)
+		else
+			p.takeoverFocus(false)
 		end
+	end, { p.takeoverFocus, state })
 
-		t1.takeoverFocus(false)
-	end, {
-		t1.takeoverFocus,
-		v19
-	})
-
-	local v22 = React.useCallback(function() -- line: 56
-		-- upvalues: v20 (copy)
-		v20(function(p1) -- line: 57
-			return not p1
+	local v2 = React.useCallback(function()
+		setState(function(p2): boolean
+			return not p2
 		end)
 	end, {})
 
-	return React.createElement(React.Fragment, nil, {
-		Header = React.createElement(Sheet.Header, nil, React.createElement(View, {
-			tag = "size-full-0 auto-y row align-y-center gap-small flex-between"
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local createElement2 = React.createElement
+	local header = Sheet.Header
+
+	local createElement3 = React.createElement
+
+	local createElement4 = React.createElement
+	local backIcon
+
+	if canGoBack then
+		backIcon = React.createElement(IconButton, {
+			size = InputSize.Medium,
+			icon = Foundation.Enums.IconName.ChevronLargeLeft,
+			variant = ButtonVariant.Utility,
+			onActivated = abuseReportFlow.goBack,
+			LayoutOrder = 1
+		})
+	end
+
+	local v3 = { [1] = nil, (createElement4(View, {
+			tag = "row align-y-center gap-small auto-xy"
 		}, {
-			React.createElement(View, {
-				tag = "auto-xy row align-y-center gap-small"
-			}, {
-				BackIcon = if not canGoBack then nil else React.createElement(IconButton, {
-					LayoutOrder = 1,
-					size = InputSize.Medium,
-					icon = Foundation.Enums.IconName.ChevronLargeLeft,
-					variant = ButtonVariant.Utility,
-					onActivated = abuseReportFlow.goBack
-				})
-			}),
-			AbuseReportTooltip = if not config.display.titleDisclosure then nil else React.createElement(AbuseReportTooltip, {
-				layoutOrder = 3,
-				tooltipTitle = config.display.titleDisclosure.tooltipTitle,
-				tooltipText = config.display.titleDisclosure.tooltipText,
-				buttonLabel = config.display.titleDisclosure.buttonLabel,
-				isOpen = v19,
-				onClose = v22,
-				ref = v21
-			}, React.createElement(IconButton, {
-				LayoutOrder = 3,
-				size = InputSize.Medium,
-				icon = Foundation.Enums.IconName.CircleI,
-				variant = ButtonVariant.Utility,
-				onActivated = v22
-			}))
-		})),
+			BackIcon = backIcon
+		})) }
+	local abuseReportTooltip
+
+	if config.display.titleDisclosure then
+		abuseReportTooltip = React.createElement(AbuseReportTooltip, {
+			tooltipTitle = config.display.titleDisclosure.tooltipTitle,
+			tooltipText = config.display.titleDisclosure.tooltipText,
+			buttonLabel = config.display.titleDisclosure.buttonLabel,
+			layoutOrder = 3,
+			isOpen = state,
+			onClose = v2,
+			ref = ref
+		}, React.createElement(IconButton, {
+			size = InputSize.Medium,
+			icon = Foundation.Enums.IconName.CircleI,
+			variant = ButtonVariant.Utility,
+			onActivated = v2,
+			LayoutOrder = 3
+		}))
+	end
+
+	v3.AbuseReportTooltip = abuseReportTooltip
+	return createElement(fragment, nil, {
+		Header = createElement2(
+			header,
+			nil,
+			createElement3(View, {
+				tag = "row flex-between align-y-center gap-small size-full-0 auto-y"
+			}, v3)
+		),
 		Content = currentPageElement
 	})
 end)

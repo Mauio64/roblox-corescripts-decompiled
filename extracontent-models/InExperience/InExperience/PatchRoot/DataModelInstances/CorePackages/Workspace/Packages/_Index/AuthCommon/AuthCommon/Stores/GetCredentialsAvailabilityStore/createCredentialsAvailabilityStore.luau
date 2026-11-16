@@ -1,21 +1,21 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("AuthCommon").Parent
 
-return function() -- line: 17
-	-- upvalues: Signals (copy)
-	local v3, v4 = Signals.createSignal(false)
-	local v5, v6 = Signals.createSignal(false)
-	local v7, v8 = Signals.createSignal(false)
-	local v9, v10 = Signals.createSignal(false)
+local Signals = require(parent.Signals)
+
+return function()
+	local signal, setFido2Available = Signals.createSignal(false)
+	local signal2, setFido2SupportsDeviceBoundOnly = Signals.createSignal(false)
+	local signal3, setPasswordsAvailable = Signals.createSignal(false)
+	local signal4, setV2InterfaceSupported = Signals.createSignal(false)
 
 	return {
-		getFido2Available = v3,
-		setFido2Available = v4,
-		getFido2SupportsDeviceBoundOnly = v5,
-		setFido2SupportsDeviceBoundOnly = v6,
-		getPasswordsAvailable = v7,
-		setPasswordsAvailable = v8,
-		getV2InterfaceSupported = v9,
-		setV2InterfaceSupported = v10
+		getFido2Available = signal,
+		setFido2Available = setFido2Available,
+		getFido2SupportsDeviceBoundOnly = signal2,
+		setFido2SupportsDeviceBoundOnly = setFido2SupportsDeviceBoundOnly,
+		getPasswordsAvailable = signal3,
+		setPasswordsAvailable = setPasswordsAvailable,
+		getV2InterfaceSupported = signal4,
+		setV2InterfaceSupported = setV2InterfaceSupported
 	}
 end

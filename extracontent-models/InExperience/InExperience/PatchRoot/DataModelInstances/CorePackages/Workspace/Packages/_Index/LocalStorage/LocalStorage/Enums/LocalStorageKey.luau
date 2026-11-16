@@ -13,8 +13,6 @@ return {
 	CountryCode = "CountryCode",
 	ExperienceMenuVersion = "ExperienceMenuVersion",
 	AndroidRecentlyPlayedWidgetVariant = "AndroidRecentlyPlayedWidgetVariant",
-	EnableWidgetExtension = "EnableWidgetExtension",
-	EnableLockScreenWidgetExperiment = "EnableLockScreenWidgetExperiment",
 	HasAgreedRequiredPermissions = "HasAgreedRequiredPermissions",
 	AppInstallationId = "AppInstallationId",
 	ShareInviteLinkExperimentEnabled = "ShareInviteLinkExperimentEnabled",
@@ -33,5 +31,11 @@ return {
 	MinimizeToTray = "MinimizeToTray",
 	ExpChatFOMOUpsellImpressionsCount = "ExpChatFOMOUpsellImpressionsCount",
 	IosAuthServiceEnabled = "IosAuthServiceEnabled",
-	ScheduledSquadTooltipSeen = "ScheduledSquadTooltipSeen"
+	ScheduledSquadTooltipSeen = "ScheduledSquadTooltipSeen",
+	MeTabBadgeDismissed = "MeTabBadgeDismissed",
+	MeTabBadgeSessionCount = "MeTabBadgeSessionCount",
+	AppFirstLaunchTimestamps = "AppFirstLaunchTimestamps",
+	LuaAppRootUnmountRecord = "LuaAppRootUnmountRecord",
+	LuaAppRootErrorLastAutoRestart = "LuaAppRootErrorLastAutoRestart",
+	FirstTimePurchaseConsentAcknowledged = "FirstTimePurchaseConsentAcknowledged"
 }

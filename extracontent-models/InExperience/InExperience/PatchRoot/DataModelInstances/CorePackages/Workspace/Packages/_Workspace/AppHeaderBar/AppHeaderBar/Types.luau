@@ -1,6 +1,6 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.React)
-require(ParentParent.UIBlox)
+require(parent.React)
+require(parent.UIBlox)
 
 return {}

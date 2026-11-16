@@ -1,57 +1,72 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-
+local parent = AvatarExperienceInspectAndBuy.Parent
 require(AvatarExperienceInspectAndBuy.Types)
+local AvatarExperienceModel = require(AvatarExperienceInspectAndBuy.Parent.AvatarExperienceModel)
+local tutils = require(parent.tutils)
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
 
-local AXCommon = require(AvatarExperienceInspectAndBuy.Parent.AXCommon)
-local tutils = require(AvatarExperienceInspectAndBuyParent.tutils)
-local ItemTypeEnum = AXCommon.Enums.ItemTypeEnum
-local FFlagAXEnableIaBTimedOptionsBulkPurchase = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags).FFlagAXEnableIaBTimedOptionsBulkPurchase
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMarketplaceLicensingItemCards = AvatarExperienceFlags.FFlagAXMarketplaceLicensingItemCards
 
-return function(p1, t1: {[any]: any}?) -- line: 22
-	-- upvalues: tutils (copy), ItemTypeEnum (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy)
-	local n1 = 0
+return function(data, p)
+	local v = not p and 0 or tutils.fieldCount(p)
 
-	if t1 then
-		n1 = tutils.fieldCount(t1)
+	local v2 = {
+		id = data.assetId,
+		name = data.name,
+		meta = data.meta,
+		description = data.description,
+		itemType = ItemTypeEnum.Asset,
+		itemSubType = data.assetTypeId,
+		creator = {
+			creatorId = data.creatorId or "",
+			creatorName = data.creatorName or "",
+			creatorHasVerifiedBadge = data.creatorHasVerifiedBadge or false
+		},
+		itemLicensingInfo = 0,
+		saleLocationType = 0,
+		itemRestrictions = 0,
+		priceInRobux = 0,
+		noPriceStatus = 0,
+		catalogPriceStatus = 0,
+		isOwned = 0,
+		isOffSale = 0,
+		collectibleItemId = 0,
+		creatingUniverseId = 0,
+		collectibleItemDetails = 0,
+		favoritesDetails = 0,
+		timedOptions = 0
+	}
+	local itemLicensingInfo
+
+	if FFlagAXMarketplaceLicensingItemCards then
+		itemLicensingInfo = data.itemLicensingInfo
 	end
 
-	return {
-		id = p1.assetId,
-		name = p1.name,
-		meta = p1.meta,
-		description = p1.description,
-		itemType = ItemTypeEnum.Asset,
-		itemSubType = p1.assetTypeId,
-		creator = {
-			creatorId = p1.creatorId or "",
-			creatorName = p1.creatorName or "",
-			creatorHasVerifiedBadge = p1.creatorHasVerifiedBadge or false
-		},
-		saleLocationType = p1.saleLocationType,
-		itemRestrictions = p1.itemRestrictions or {},
-		priceInRobux = p1.price,
-		noPriceStatus = p1.noPriceStatus,
-		catalogPriceStatus = p1.catalogPriceStatus,
-		isOwned = p1.owned,
-		isOffSale = p1.isOffSale,
-		collectibleItemId = p1.collectibleItemId,
-		creatingUniverseId = p1.creatingUniverseId,
-		collectibleItemDetails = {
-			quantityLimitPerUser = p1.collectibleQuantityLimitPerUser,
-			resellableCount = p1.resellableCount or n1,
-			collectibleLowestAvailableResaleProductId = p1.collectibleLowestAvailableResaleProductId,
-			collectibleLowestAvailableResaleItemInstanceId = p1.collectibleLowestAvailableResaleItemInstanceId,
-			unitsAvailableForConsumption = p1.remaining,
-			hasResellers = p1.hasResellers or p1.collectibleLowestAvailableResaleProductId ~= nil and (p1.collectibleLowestAvailableResaleProductId ~= "" or false),
-			lowestResalePrice = p1.collectibleLowestResalePrice or 0,
-			totalQuantity = p1.collectibleTotalQuantity or 0,
-			experiences = p1 and (not not p1.saleLocation and p1.saleLocation.UniverseIds) or {}
-		},
-		favoritesDetails = {
-			numFavorites = p1.numFavorites,
-			isFavorited = p1.isFavorited
-		},
-		timedOptions = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else p1.timedOptions
+	v2.itemLicensingInfo = itemLicensingInfo
+	v2.saleLocationType = data.saleLocationType
+	v2.itemRestrictions = data.itemRestrictions or {}
+	v2.priceInRobux = data.price
+	v2.noPriceStatus = data.noPriceStatus
+	v2.catalogPriceStatus = data.catalogPriceStatus
+	v2.isOwned = data.owned
+	v2.isOffSale = data.isOffSale
+	v2.collectibleItemId = data.collectibleItemId
+	v2.creatingUniverseId = data.creatingUniverseId
+	v2.collectibleItemDetails = {
+		quantityLimitPerUser = data.collectibleQuantityLimitPerUser,
+		resellableCount = data.resellableCount or v,
+		collectibleLowestAvailableResaleProductId = data.collectibleLowestAvailableResaleProductId,
+		collectibleLowestAvailableResaleItemInstanceId = data.collectibleLowestAvailableResaleItemInstanceId,
+		unitsAvailableForConsumption = data.remaining,
+		hasResellers = data.hasResellers or data.collectibleLowestAvailableResaleProductId ~= nil and data.collectibleLowestAvailableResaleProductId ~= "",
+		lowestResalePrice = data.collectibleLowestResalePrice or 0,
+		totalQuantity = data.collectibleTotalQuantity or 0,
+		experiences = data and data.saleLocation and data.saleLocation.UniverseIds or {}
 	}
+
+	v2.favoritesDetails = { numFavorites = data.numFavorites, isFavorited = data.isFavorited }
+
+	v2.timedOptions = data.timedOptions
+	return v2
 end

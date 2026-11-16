@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.AvatarContextMenuWhisperSelected)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local AvatarContextMenuWhisperSelected = require(actions.AvatarContextMenuWhisperSelected)
+
+return event(AvatarContextMenuWhisperSelected)

@@ -1,48 +1,59 @@
-local Parent = script:FindFirstAncestor("SocialExperiments").Parent
-local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
-local v3 = game:DefineFastString("ExpChatNewSystemMessagesExperimentLayer", "ExperienceChat.SystemMessages")
-local v4 = game:DefineFastString("ExpChatNewSystemMessagesVariant", "enableNewSystemMessages")
-local v5 = game:DefineFastFlag("ForceEnableExpChatNewSystemMessages", false)
-local v6 = game:DefineFastFlag("EnableExpChatNewSystemMessagesExperimentation", false)
+local parent = script:FindFirstAncestor("SocialExperiments").Parent
 
-local function getIsUserInTreatment(s1: string) -- line: 14
-	-- upvalues: ExperimentCacheManager (copy), v3 (copy)
-	local v9 = ExperimentCacheManager.default:getLayerVariables(v3)
+local ExperimentCacheManager = require(parent.ExperimentCacheManager)
+local experimentCacheManager = ExperimentCacheManager.ExperimentCacheManager
 
-	if v9 and v9[s1] ~= nil then
-		return v9[s1]
+local defineFastString = game:DefineFastString(
+	"ExpChatNewSystemMessagesExperimentLayer",
+	"ExperienceChat.SystemMessages"
+)
+
+local defineFastString2 = game:DefineFastString("ExpChatNewSystemMessagesVariant", "enableNewSystemMessages")
+local defineFastFlag = game:DefineFastFlag("ForceEnableExpChatNewSystemMessages", false)
+
+local defineFastFlag2 = game:DefineFastFlag("EnableExpChatNewSystemMessagesExperimentation", false)
+
+local function getIsUserInTreatment(p: string)
+	local layerVariables = experimentCacheManager.default:getLayerVariables(defineFastString)
+
+	if layerVariables and layerVariables[p] ~= nil then
+		return layerVariables[p]
 	end
 
 	return false
 end
 
-return {
-	getNewSystemMessagesEnabled = function() -- line: 25
-		-- upvalues: v5 (copy), v6 (copy), v4 (copy), ExperimentCacheManager (copy), v3 (copy)
-		local v10 = v5
+local ExpChatNewSystemMessagesExperimentation = {}
 
-		if not v10 then
-			v10 = v6
+function ExpChatNewSystemMessagesExperimentation.getNewSystemMessagesEnabled()
+	local v = defineFastFlag
 
-			if v10 then
-				local v11 = v4
-				local v12 = ExperimentCacheManager.default:getLayerVariables(v3)
+	if v then
+		return v
+	end
 
-				if v12 and v12[v11] ~= nil then
-					return v12[v11]
-				end
+	v = defineFastFlag2
 
-				v10 = false
-			end
-		end
+	if not v then
+		return v
+	end
 
-		return v10
-	end,
-	logExposure = function() -- line: 33
-		-- upvalues: v6 (copy), ExperimentCacheManager (copy), v3 (copy)
-		if v6 and ExperimentCacheManager.default:getLayerVariables(v3) ~= nil then
-			ExperimentCacheManager.default:logLayerExposure(v3)
-		end
-	end,
-	isExperimentEnabled = v6
-}
+	local v2 = defineFastString2
+	local layerVariables = experimentCacheManager.default:getLayerVariables(defineFastString)
+
+	if layerVariables and layerVariables[v2] ~= nil then
+		return layerVariables[v2]
+	end
+
+	v = false
+	return false
+end
+
+function ExpChatNewSystemMessagesExperimentation.logExposure()
+	if defineFastFlag2 and experimentCacheManager.default:getLayerVariables(defineFastString) ~= nil then
+		experimentCacheManager.default:logLayerExposure(defineFastString)
+	end
+end
+
+ExpChatNewSystemMessagesExperimentation.isExperimentEnabled = defineFastFlag2
+return ExpChatNewSystemMessagesExperimentation

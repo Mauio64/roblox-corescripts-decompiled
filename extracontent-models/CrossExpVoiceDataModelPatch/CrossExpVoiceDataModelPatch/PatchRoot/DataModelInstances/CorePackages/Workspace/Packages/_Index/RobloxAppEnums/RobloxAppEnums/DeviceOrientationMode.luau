@@ -1,4 +1,1 @@
-return {
-	Portrait = "Portrait",
-	Landscape = "Landscape"
-}
+return { Portrait = "Portrait", Landscape = "Landscape" }

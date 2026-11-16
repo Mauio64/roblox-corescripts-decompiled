@@ -1,63 +1,58 @@
 local CorePackages = game:GetService("CorePackages")
-local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local Network = require(ParentParent.Services.Network)
-local SendCounter = require(ParentParent.Thunks.SendCounter)
-local Constants = require(ParentParent.Constants)
-local SetAssets = require(ParentParent.Actions.SetAssets)
-local GetProductInfo = require(ParentParent.Thunks.GetProductInfo)
-local GetAssetBundles = require(ParentParent.Thunks.GetAssetBundles)
-local GetVersionInfo = require(ParentParent.Thunks.GetVersionInfo)
-local t1 = { Network }
+local Http = require(CorePackages.Workspace.Packages.Http)
+local PerformFetch = Http.PerformFetch
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local Network = require(parent.Services.Network)
+local SendCounter = require(parent.Thunks.SendCounter)
+local Constants = require(parent.Constants)
+local SetAssets = require(parent.Actions.SetAssets)
+local GetProductInfo = require(parent.Thunks.GetProductInfo)
+local GetAssetBundles = require(parent.Thunks.GetAssetBundles)
+local GetVersionInfo = require(parent.Thunks.GetVersionInfo)
 
-local function BatchGetAssets(p1) -- line: 19
-	-- upvalues: Thunk (copy), t1 (copy), Network (copy), PerformFetch (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SendCounter (copy), Constants (copy)
-	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 20
-		-- upvalues: Network (copy), p1 (copy), PerformFetch (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SendCounter (copy), Constants (copy)
-		local v17 = p3[Network]
-		local t2 = {}
+local v = { Network }
 
-		if p1 then
-			for _, v20 in p1 do
-				table.insert(t2, (tonumber(v20.assetId)))
+local function BatchGetAssets(items)
+	return Thunk.new(script.Name, v, function(object, p)
+		local v2 = p[Network]
+
+		local assetIds = {}
+
+		if items then
+			for _, item in items do
+				table.insert(assetIds, (tonumber(item.assetId)))
 			end
 		end
 
-		return PerformFetch.Single("BatchGetAssets", function() -- line: 30
-			-- upvalues: v17 (copy), t2 (copy), p2 (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SendCounter (copy), Constants (copy)
-			return v17.getBatchItemDetails(t2, Enum.AvatarItemType.Asset):andThen(function(p4) -- line: 31
-				-- upvalues: p2 (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SendCounter (copy), Constants (copy)
-				local t3 = {}
+		return PerformFetch.Single("BatchGetAssets", function()
+			return v2.getBatchItemDetails(assetIds, Enum.AvatarItemType.Asset):andThen(function(items2)
+				local v3 = {}
 
-				for _, v25 in p4 do
-					table.insert(t3, {
-						assetId = tostring(v25.Id)
-					})
+				for _, item in items2 do
+					table.insert(v3, { assetId = tostring(item.Id) })
 				end
 
-				for _, v27 in t3 do
-					coroutine.wrap(function() -- line: 38
-						-- upvalues: p2 (copy), GetProductInfo (copy), v27 (copy), GetAssetBundles (copy), GetVersionInfo (copy)
-						p2:dispatch(GetProductInfo(v27.assetId))
+				for _, v4 in v3 do
+					coroutine.wrap(function()
+						object:dispatch(GetProductInfo(v4.assetId))
 
-						if v27.parentBundleId == nil then
-							p2:dispatch(GetAssetBundles(v27.assetId))
+						if v4.parentBundleId == nil then
+							object:dispatch(GetAssetBundles(v4.assetId))
 						end
 
-						p2:dispatch(GetVersionInfo(v27.assetId))
+						object:dispatch(GetVersionInfo(v4.assetId))
 					end)()
 				end
 
-				p2:dispatch(SetAssets(t3))
-				p2:dispatch(SendCounter(Constants.Counters.BatchGetAssets .. Constants.CounterSuffix.RequestSucceeded))
-			end, function(_) -- line: 60
-				-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
-				p2:dispatch(SendCounter(Constants.Counters.BatchGetAssets .. Constants.CounterSuffix.RequestRejected))
+				object:dispatch(SetAssets(v3))
+
+				object:dispatch(SendCounter(Constants.Counters.BatchGetAssets .. Constants.CounterSuffix.RequestSucceeded))
+			end, function(_)
+				object:dispatch(SendCounter(Constants.Counters.BatchGetAssets .. Constants.CounterSuffix.RequestRejected))
 			end)
-		end)(p2):catch(function(_) -- line: 65
-			-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
-			p2:dispatch(SendCounter(Constants.Counters.BatchGetAssets .. Constants.CounterSuffix.RequestFailed))
+		end)(object):catch(function(_)
+			object:dispatch(SendCounter(Constants.Counters.BatchGetAssets .. Constants.CounterSuffix.RequestFailed))
 		end)
 	end)
 end

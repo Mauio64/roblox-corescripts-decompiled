@@ -1,94 +1,133 @@
+local TextChatService = game:GetService("TextChatService")
+local UserInputService = game:GetService("UserInputService")
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local React = require(ExpChatParent.React)
-local Roact = require(ExpChatParent.Roact)
-local RoactRodux = require(ExpChatParent.RoactRodux)
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local parent = ExpChat.Parent
+local React = require(parent.React)
+local Roact = require(parent.Roact)
+local RoactRodux = require(parent.RoactRodux)
+local Cryo = require(parent.Cryo)
+local SignalsReact = require(parent.SignalsReact)
+local ExpChatShared = require(parent.ExpChatShared)
+
 local Analytics = ExpChatShared.Analytics
 local Config = require(ExpChat.Config)
-local TargetTextChannelPropertyChanged = ExpChatShared.Actions.TargetTextChannelPropertyChanged
-local UniverseChatChannelSelected = ExpChatShared.Actions.UniverseChatChannelSelected
-local FriendsChatChannelSelected = ExpChatShared.Actions.FriendsChatChannelSelected
-local getFFlagExpChatEnableChannelTabsUI = require(ExpChat.Flags.getFFlagExpChatEnableChannelTabsUI)
-local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
-local SharedFlags = require(ExpChatParent.SharedFlags)
+local SharedFlags = require(parent.SharedFlags)
 local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
-local FFlagExpChatChannelTabRefactor = SharedFlags.FFlagExpChatChannelTabRefactor
-local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+
 local FFlagExpChatUseChatConfigStore = SharedFlags.FFlagExpChatUseChatConfigStore
 local FFlagExpChatLogGlobalChatTabClicked = require(ExpChat.Flags.FFlagExpChatLogGlobalChatTabClicked)
-local v20 = game:DefineFastFlag("GlobalTextChatAddPlaySessionField", false)
+local FFlagGlobalTextChatAddPlaySessionField = require(ExpChat.Flags.FFlagGlobalTextChatAddPlaySessionField)
 local GetChatConfigurationStore = require(ExpChat.Stores.GetChatConfigurationStore)
+
+local selectTabByType = require(ExpChat.TabNavigation.selectTabByType)
+
+local FFlagDebugFriendsChat = require(parent.FriendsChat.FFlagDebugFriendsChat)
+local LocalTextChannelParticipantAdded = require(ExpChat.Actions.LocalTextChannelParticipantAdded)
+local ChannelTabsConfigurationEnabled = require(ExpChat.Actions.ChannelTabsConfigurationEnabled)
 local GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
-local createEffect = require(ExpChatParent.Signals).createEffect
+
+local Signals = require(parent.Signals)
+local createEffect = Signals.createEffect
+
 local ChannelBar = require(script.Parent.UI.ChannelBar)
-local v25 = Roact.Component:extend("ChannelBarApp")
+
+local extended = Roact.Component:extend("ChannelBarApp")
 
 if FFlagExpChatUseChatConfigStore then
-	function v25.init(p1) -- line: 34
-		-- upvalues: GetChatConfigurationStore (copy)
-		p1.chatConfigStore = GetChatConfigurationStore(false)
-		p1.state = {
-			channelTabsSettings = p1.chatConfigStore.getChannelTabsSettings(false)
+	function extended:init()
+		self.chatConfigStore = GetChatConfigurationStore(false)
+		self.state = {
+			channelTabsSettings = self.chatConfigStore.getChannelTabsSettings(false)
 		}
 	end
-	function v25.didMount(p2) -- line: 41
-		-- upvalues: createEffect (copy)
-		p2.updateChannelTabsSettingsEffect = createEffect(function(p3) -- line: 43
-			-- upvalues: p2 (copy)
-			local v34 = p2.chatConfigStore.getChannelTabsSettings(p3)
+end
 
-			p2:setState({
-				channelTabsSettings = v34
+function extended:didMount()
+	if FFlagExpChatUseChatConfigStore then
+		self.updateChannelTabsSettingsEffect = createEffect(function(p)
+			self:setState({
+				channelTabsSettings = self.chatConfigStore.getChannelTabsSettings(p)
 			})
 		end)
 	end
-	function v25.willUnmount(p4) -- line: 51
-		p4.updateChannelTabsSettingsEffect()
-		p4.updateChannelTabsSettingsEffect = nil
+
+	if FFlagDebugFriendsChat then
+		self.debugAddTabsConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+			if gameProcessed then
+				return
+			end
+
+			if
+				input.KeyCode == Enum.KeyCode.J
+				and input:IsModifierKeyDown(Enum.ModifierKey.Ctrl)
+				and self.props.debugAddFakeTabs
+			then
+				self.props.debugAddFakeTabs(3)
+			end
+		end)
 	end
 end
 
-function v25.render(p5) -- line: 57
-	-- upvalues: FFlagExpChatUseChatConfigStore (copy), React (copy), ChannelBar (copy), FFlagExpChatChannelTabRefactor (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatLogGlobalChatTabClicked (copy), Analytics (copy), v20 (copy)
-	local v30 = if not FFlagExpChatUseChatConfigStore then p5.props.channelTabsSettings else p5.state.channelTabsSettings
+function extended:willUnmount()
+	if self.updateChannelTabsSettingsEffect then
+		self.updateChannelTabsSettingsEffect()
+		self.updateChannelTabsSettingsEffect = nil
+	end
+
+	if self.debugAddTabsConnection then
+		self.debugAddTabsConnection:Disconnect()
+		self.debugAddTabsConnection = nil
+	end
+end
+
+function extended.render(p)
+	local channelTabsSettings
+
+	if FFlagExpChatUseChatConfigStore then
+		channelTabsSettings = p.state.channelTabsSettings
+	else
+		channelTabsSettings = p.props.channelTabsSettings
+	end
 
 	return React.createElement(ChannelBar, {
-		channelTabsSettings = v30,
-		chatWindowSettings = p5.props.chatWindowSettings,
-		allChannelTabs = p5.props.allChannelTabs,
-		allTextChannels = p5.props.allTextChannels,
-		selectedTabName = p5.props.selectedTabName,
-		onTabSelected = function(p6, p7, p8, p9) -- line: 73
-			-- upvalues: FFlagExpChatChannelTabRefactor (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatLogGlobalChatTabClicked (copy), p5 (copy), Analytics (copy), v20 (copy)
-			if ((if not FFlagExpChatChannelTabRefactor then not not GetFFlagTextChatEnableUniverseChatTabs() and not p6 else p9 == "UniverseChat")) and (FFlagExpChatLogGlobalChatTabClicked and p8 ~= p5.props.selectedTabName) then
-				local v39 = table.clone(Analytics.DefaultStandardizedFields)
+		channelTabsSettings = channelTabsSettings,
+		chatWindowSettings = p.props.chatWindowSettings,
+		allChannelTabs = p.props.allChannelTabs,
+		allTextChannels = p.props.allTextChannels,
+		selectedTabName = p.props.selectedTabName,
+		onTabSelected = function(p2, p3, channelName, p4)
+			if
+				p4 == "UniverseChat"
+				and FFlagExpChatLogGlobalChatTabClicked
+				and channelName ~= p.props.selectedTabName
+			then
+				local clone = table.clone(Analytics.DefaultStandardizedFields)
+				table.insert(clone, "addPlaceInstanceId")
 
-				table.insert(v39, "addPlaceInstanceId")
-
-				if v20 then
-					table.insert(v39, "addPlaySessionId")
+				if FFlagGlobalTextChatAddPlaySessionField then
+					table.insert(clone, "addPlaySessionId")
 				end
 
-				Analytics:TelemetryLogEvent(Analytics.ExpChatGlobalChatTabClickedConfig, {
-					channelName = p8
-				}, v39)
+				Analytics:TelemetryLogEvent(
+					Analytics.ExpChatGlobalChatTabClickedConfig,
+					{ channelName = channelName },
+					clone
+				)
 			end
 
-			p5.props.onTabSelected(p6, p7, p8, p9)
+			p.props.onTabSelected(p2, p3, channelName, p4)
 		end,
-		onHovered = p5.props.onHovered,
-		onUnhovered = p5.props.onUnhovered,
-		visible = p5.props.visible,
-		transparencyValue = p5.props.transparencyValue,
-		topBorderRef = p5.props.topBorderRef
+		onHovered = p.props.onHovered,
+		onUnhovered = p.props.onUnhovered,
+		visible = p.props.visible,
+		transparencyValue = p.props.transparencyValue,
+		topBorderRef = p.props.topBorderRef
 	})
 end
 
-return RoactRodux.connect(function(p10) -- line: 104
-	-- upvalues: FFlagExpChatUseChatConfigStore (copy), getFFlagExpChatEnableChannelTabsUI (copy), Config (copy)
+local v = RoactRodux.connect(function(data)
 	return {
-		channelTabsSettings = if not FFlagExpChatUseChatConfigStore then getFFlagExpChatEnableChannelTabsUI() and p10.ChatLayout.ChannelTabsSettings or {
+		channelTabsSettings = not FFlagExpChatUseChatConfigStore and (data.ChatLayout.ChannelTabsSettings or {
 			BackgroundTransparency = Config.ChannelTabsSettings.BackgroundTransparency,
 			BackgroundColor3 = Config.ChannelTabsSettings.BackgroundColor3,
 			HoverBackgroundColor3 = Config.ChannelTabsSettings.HoverBackgroundColor3,
@@ -98,54 +137,87 @@ return RoactRodux.connect(function(p10) -- line: 104
 			SelectedTabTextColor3 = Config.ChannelTabsSettings.SelectedTabTextColor3,
 			TextStrokeColor3 = Config.ChannelTabsSettings.TextStrokeColor3,
 			TextStrokeTransparency = Config.ChannelTabsSettings.TextStrokeTransparency
-		} else nil,
-		allChannelTabs = getFFlagExpChatEnableChannelTabsUI() and p10.ChannelTabs.allChannelTabs or {},
-		selectedTabName = getFFlagExpChatEnableChannelTabsUI() and p10.ChannelTabs.selectedTabName or "",
-		allTextChannels = p10.TextChannels.allTextChannels
+		}) or nil,
+		allChannelTabs = not FFlagExpChatUseChannelTabsStore and (data.ChannelTabs.allChannelTabs or {}) or nil,
+		selectedTabName = not FFlagExpChatUseChannelTabsStore and (data.ChannelTabs.selectedTabName or "") or nil,
+		allTextChannels = data.TextChannels.allTextChannels
 	}
-end, function(p11) -- line: 123
-	-- upvalues: FFlagExpChatChannelTabRefactor (copy), UniverseChatChannelSelected (copy), FFlagExpChatEnableFriendsTab (copy), FriendsChatChannelSelected (copy), TargetTextChannelPropertyChanged (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), getFFlagExpChatEnableChannelTabsUI (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy)
+end, function(callback)
 	return {
-		onTabSelected = function(p12, p13, p14, p15) -- line: 126
-			-- upvalues: FFlagExpChatChannelTabRefactor (copy), p11 (copy), UniverseChatChannelSelected (copy), FFlagExpChatEnableFriendsTab (copy), FriendsChatChannelSelected (copy), TargetTextChannelPropertyChanged (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), getFFlagExpChatEnableChannelTabsUI (copy), FFlagExpChatUseChannelTabsStore (copy), GetChannelTabsStore (copy)
-			if FFlagExpChatChannelTabRefactor then
-				if p15 == "UniverseChat" then
-					p11(UniverseChatChannelSelected(p14))
-				elseif FFlagExpChatEnableFriendsTab and p15 == "FriendsChat" then
-					p11(FriendsChatChannelSelected(p14))
-				elseif p12 then
-					p11(TargetTextChannelPropertyChanged(p12, p13))
-				end
-			elseif GetFFlagTextChatEnableUniverseChatTabs() then
-				if p12 then
-					p11(TargetTextChannelPropertyChanged(p12, p13))
-				else
-					p11(UniverseChatChannelSelected(p14))
-				end
-			elseif getFFlagExpChatEnableChannelTabsUI() then
-				p11(TargetTextChannelPropertyChanged(p12, p13))
+		onTabSelected = function(textChannel, shouldReorderTabs, channelName, tabType)
+			selectTabByType(callback, {
+				channelName = channelName,
+				tabType = tabType,
+				shouldReorderTabs = shouldReorderTabs,
+				textChannel = textChannel
+			})
+		end,
+		debugAddFakeTabs = FFlagDebugFriendsChat and function(p: number)
+			callback(ChannelTabsConfigurationEnabled(true))
+			local channelTabsStore = GetChannelTabsStore(false)
+			channelTabsStore.setChannelTabsConfigurationEnabled(true)
+
+			for i = 1, p do
+				local name = "D" .. tostring(i)
+				local textChannel = Instance.new("TextChannel")
+				textChannel.Name = name
+
+				textChannel.Parent = TextChatService:FindFirstChild("TextChannels") or TextChatService
+				callback(LocalTextChannelParticipantAdded(textChannel))
+				channelTabsStore.addChannelTab({ type = "TextChat", name = name }, nil)
 			end
-
-			if FFlagExpChatUseChannelTabsStore then
-				if FFlagExpChatChannelTabRefactor then
-					GetChannelTabsStore(false).setTargetChannel(p14, p13)
-
-					return
-				end
-
-				if GetFFlagTextChatEnableUniverseChatTabs() then
-					local v44 = GetChannelTabsStore(false)
-					local v45 = p14 or p12 and p12.Name
-
-					v44.setTargetChannel(v45, p13)
-
-					return
-				end
-
-				if getFFlagExpChatEnableChannelTabsUI() then
-					GetChannelTabsStore(false).setTargetChannel(p12 and p12.Name, p13)
-				end
-			end
-		end
+		end or nil
 	}
-end)(v25)
+end)(extended)
+
+local function areChannelTabsEqual(allChannelTabs, allChannelTabs2): boolean
+	if allChannelTabs == allChannelTabs2 then
+		return true
+	end
+
+	for k, item in allChannelTabs do
+		local item2 = allChannelTabs2[k]
+
+		if
+			item2 == nil
+			or item2.tabIndex ~= item.tabIndex
+			or item2.type ~= item.type
+			or item2.HasUnreadMessages ~= item.HasUnreadMessages
+		then
+			return false
+		end
+	end
+
+	for k in allChannelTabs2 do
+		if allChannelTabs[k] == nil then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function ChannelBarAppWithSignals(p)
+	local v2 = React.useMemo(function()
+		return Signals.createComputed(function(p2)
+			local channelTabsState = GetChannelTabsStore(false).getChannelTabsState(p2)
+
+			return {
+				allChannelTabs = channelTabsState.allChannelTabs,
+				selectedTabName = channelTabsState.selectedTabName or ""
+			}
+		end, function(p2, p3)
+			return p2.selectedTabName == p3.selectedTabName
+				and areChannelTabsEqual(p2.allChannelTabs, p3.allChannelTabs)
+		end)
+	end, {})
+	local v3 = SignalsReact.useSignalState(v2)
+
+	return React.createElement(v, Cryo.Dictionary.union(p, v3))
+end
+
+if FFlagExpChatUseChannelTabsStore then
+	return React.memo(ChannelBarAppWithSignals)
+end
+
+return v

@@ -1,7 +1,5 @@
 return {
-	Context = {
-		GamePlayerFeedback = "GamePlayerFeedback"
-	},
+	Context = { GamePlayerFeedback = "GamePlayerFeedback" },
 	EventNames = {
 		ClickPlayerFeedbackPromptCta = "clickPlayerFeedbackPromptCta",
 		PlayerFeedbackPromptMounted = "playerFeedbackPromptMounted",

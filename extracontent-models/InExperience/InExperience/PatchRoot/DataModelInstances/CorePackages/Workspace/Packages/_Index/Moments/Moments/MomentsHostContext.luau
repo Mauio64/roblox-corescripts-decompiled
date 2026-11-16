@@ -1,17 +1,18 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local React = require(Parent.React)
-local v3 = React.createContext(nil)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local React = require(parent.React)
+
+local context = React.createContext(nil)
 
 return {
-	MomentsHostContext = v3,
-	useMomentsHost = function() -- line: 21
-		-- upvalues: React (copy), v3 (copy)
-		local v4 = React.useContext(v3)
+	MomentsHostContext = context,
+	useMomentsHost = function()
+		local v = React.useContext(context)
 
-		if v4 == nil then
+		if v == nil then
 			return {}
 		end
 
-		return v4
+		return v
 	end
 }

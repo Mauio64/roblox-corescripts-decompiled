@@ -1,42 +1,66 @@
 local Songbird = script:FindFirstAncestor("Songbird")
+
 local Foundation = require(Songbird.Parent.Foundation)
 local React = require(Songbird.Parent.React)
-local createNextOrder = require(Songbird.Parent.ReactUtils).createNextOrder
+
+local ReactUtils = require(Songbird.Parent.ReactUtils)
+local createNextOrder = ReactUtils.createNextOrder
+
 local getFFlagSongbirdMusicIconThumbnail = require(Songbird.Flags.getFFlagSongbirdMusicIconThumbnail)
 
-local function MusicIcon(t1: {[any]: any}) -- line: 17
-	-- upvalues: createNextOrder (copy), Foundation (copy), getFFlagSongbirdMusicIconThumbnail (copy), React (copy)
-	local v8 = createNextOrder()
-	local v9 = Foundation.Hooks.useTokens()
-	local Size_900 = v9.Size.Size_900
-	local v11 = getFFlagSongbirdMusicIconThumbnail() and t1.thumbnailUrl
+local function MusicIcon(p)
+	local nextOrder = createNextOrder()
+	local v = Foundation.Hooks.useTokens()
+	local size_900 = v.Size.Size_900
 
-	return React.createElement(Foundation.View, {
-		Size = UDim2.fromOffset(Size_900, Size_900),
+	local thumbnailUrl = getFFlagSongbirdMusicIconThumbnail() and p.thumbnailUrl
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v2 = {
+		Size = UDim2.fromOffset(size_900, size_900),
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		ClipsDescendants = not not v11 or nil,
-		backgroundStyle = if v11 then nil else {
-			Transparency = 0,
-			Color3 = Color3.fromRGB(43, 45, 50)
-		},
-		cornerRadius = UDim.new(0, v9.Radius.Medium),
-		LayoutOrder = if not getFFlagSongbirdMusicIconThumbnail() then nil else t1.layoutOrder,
-		ZIndex = v8()
-	}, {
-		Thumbnail = if not v11 then nil else React.createElement(Foundation.Image, {
+		ClipsDescendants = thumbnailUrl and true or nil,
+		backgroundStyle = not thumbnailUrl and {
+			Color3 = Color3.fromRGB(43, 45, 50),
+			Transparency = 0
+		} or nil,
+		cornerRadius = UDim.new(0, v.Radius.Medium),
+		LayoutOrder = 0,
+		ZIndex = 0
+	}
+	local layoutOrder
+
+	if getFFlagSongbirdMusicIconThumbnail() then
+		layoutOrder = p.layoutOrder
+	end
+
+	v2.LayoutOrder = layoutOrder
+	v2.ZIndex = nextOrder()
+	local thumbnail
+
+	if thumbnailUrl then
+		thumbnail = React.createElement(Foundation.Image, {
 			tag = "size-full",
-			Image = t1.thumbnailUrl,
-			ZIndex = v8()
-		}),
-		Icon = if v11 then nil else React.createElement(Foundation.Icon, {
+			Image = p.thumbnailUrl,
+			ZIndex = nextOrder()
+		})
+	end
+
+	local icon
+
+	if not thumbnailUrl then
+		icon = React.createElement(Foundation.Icon, {
 			name = "icons/common/music",
 			size = Foundation.Enums.IconSize.Medium,
 			Position = UDim2.new(0.5, -1, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			ZIndex = v8()
+			ZIndex = nextOrder()
 		})
-	})
+	end
+
+	return createElement(view, v2, { Thumbnail = thumbnail, Icon = icon })
 end
 
 return MusicIcon

@@ -1,12 +1,10 @@
-local Parent = script:FindFirstAncestor("ShareSheet").Parent
-local default = require(Parent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
+local parent = script:FindFirstAncestor("ShareSheet").Parent
 
-local function copyLink(t1: {[any]: any}) -- line: 12
-	-- upvalues: default (copy)
-	default:setClipboardText({
-		context = t1.context,
-		text = t1.url
-	})
+local ExternalContentSharingProtocol = require(parent.ExternalContentSharingProtocol)
+local default = ExternalContentSharingProtocol.ExternalContentSharingProtocol.default
+
+local function copyLink(p)
+	default:setClipboardText({ context = p.context, text = p.url })
 end
 
 return copyLink

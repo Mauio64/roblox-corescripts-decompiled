@@ -1,51 +1,77 @@
 local GuiService = game:GetService("GuiService")
-local CancelSubscriptionApp = script:FindFirstAncestor("CancelSubscriptionApp")
-local CancelSubscriptionAppParent = CancelSubscriptionApp.Parent
-local React = require(CancelSubscriptionAppParent.React)
-local useSelector = require(CancelSubscriptionAppParent.RoactUtils).Hooks.RoactRodux.useSelector
-local CancelUserSubscriptionRequestContainer = require(CancelSubscriptionApp.Features.CancelSubscriptionRequest.CancelUserSubscriptionRequestContainer)
-local CancelUserSubscriptionErrorContainer = require(CancelSubscriptionApp.Features.CancelSubscriptionError.CancelUserSubscriptionErrorContainer)
-local CancelUserSubscriptionSuccessContainer = require(CancelSubscriptionApp.Features.CancelSubscriptionSuccess.CancelUserSubscriptionSuccessContainer)
-local ScreenSizeContext = require(CancelSubscriptionAppParent.EconomyCommonCoreScriptHooks).ScreenSizeContext
-local useCancelSubscriptionRequestedListenerEffect = require(CancelSubscriptionApp.Hooks.useCancelSubscriptionRequestedListenerEffect)
-local selectPromptState = require(CancelSubscriptionApp.Store.Selectors.selectPromptState)
-local CancelUserSubscriptionAsyncPromptStateEnum = require(CancelSubscriptionApp.Enums.CancelUserSubscriptionAsyncPromptStateEnum)
-local FocusNavigationModalSurface = require(CancelSubscriptionAppParent.EconomyCommonCoreScriptHooks).FocusNavigationModalSurface
 
-local function CancelSubscriptionApp2() -- line: 20
-	-- upvalues: React (copy), useSelector (copy), selectPromptState (copy), useCancelSubscriptionRequestedListenerEffect (copy), CancelUserSubscriptionAsyncPromptStateEnum (copy), GuiService (copy), ScreenSizeContext (copy), FocusNavigationModalSurface (copy), CancelUserSubscriptionErrorContainer (copy), CancelUserSubscriptionSuccessContainer (copy), CancelUserSubscriptionRequestContainer (copy)
-	local v15, v16 = React.useState(Vector2.new(0, 0))
-	local v17 = useSelector(selectPromptState)
+local cancelSubscriptionApp = script:FindFirstAncestor("CancelSubscriptionApp")
+local parent = cancelSubscriptionApp.Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-	useCancelSubscriptionRequestedListenerEffect(v17)
-	React.useEffect(function() -- line: 26
-		-- upvalues: v17 (copy), CancelUserSubscriptionAsyncPromptStateEnum (copy), GuiService (copy)
-		if v17 == CancelUserSubscriptionAsyncPromptStateEnum.None then
+local CancelUserSubscriptionRequestContainer = require(cancelSubscriptionApp.Features.CancelSubscriptionRequest.CancelUserSubscriptionRequestContainer)
+
+local CancelUserSubscriptionErrorContainer = require(cancelSubscriptionApp.Features.CancelSubscriptionError.CancelUserSubscriptionErrorContainer)
+
+local CancelUserSubscriptionSuccessContainer = require(cancelSubscriptionApp.Features.CancelSubscriptionSuccess.CancelUserSubscriptionSuccessContainer)
+local EconomyCommonCoreScriptHooks = require(parent.EconomyCommonCoreScriptHooks)
+local ScreenSizeContext = EconomyCommonCoreScriptHooks.ScreenSizeContext
+local useCancelSubscriptionRequestedListenerEffect = require(cancelSubscriptionApp.Hooks.useCancelSubscriptionRequestedListenerEffect)
+local selectPromptState = require(cancelSubscriptionApp.Store.Selectors.selectPromptState)
+local CancelUserSubscriptionAsyncPromptStateEnum = require(cancelSubscriptionApp.Enums.CancelUserSubscriptionAsyncPromptStateEnum)
+local EconomyCommonCoreScriptHooks2 = require(parent.EconomyCommonCoreScriptHooks)
+local FocusNavigationModalSurface = EconomyCommonCoreScriptHooks2.FocusNavigationModalSurface
+
+local function CancelSubscriptionApp()
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local v = useSelector(selectPromptState)
+
+	useCancelSubscriptionRequestedListenerEffect(v)
+
+	React.useEffect(function()
+		if v == CancelUserSubscriptionAsyncPromptStateEnum.None then
 			GuiService.SelectedCoreObject = nil
 		end
-	end, { v17 })
+	end, { v })
 
-	if v17 == CancelUserSubscriptionAsyncPromptStateEnum.None then
+	if v == CancelUserSubscriptionAsyncPromptStateEnum.None then
 		return nil
 	end
 
-	return (React.createElement(ScreenSizeContext.Provider, {
-		value = v15
-	}, React.createElement("ScreenGui", {
-		[React.Change.AbsoluteSize] = function(p1) -- line: 37
-			-- upvalues: v16 (copy)
-			v16(p1.AbsoluteSize)
+	local createElement = React.createElement
+	local provider = ScreenSizeContext.Provider
+
+	local createElement2 = React.createElement
+	local v2 = {
+		[React.Change.AbsoluteSize] = function(p)
+			setState(p.AbsoluteSize)
 		end,
 		ScreenInsets = Enum.ScreenInsets.None
-	}, {
-		FocusNavigationEffects = React.createElement(FocusNavigationModalSurface, {
-			selectionGroupName = "CancelSubscriptionApp"
-		}, {
-			Error = if v17 ~= CancelUserSubscriptionAsyncPromptStateEnum.Error then nil else React.createElement(CancelUserSubscriptionErrorContainer),
-			Success = if v17 ~= CancelUserSubscriptionAsyncPromptStateEnum.Success then nil else React.createElement(CancelUserSubscriptionSuccessContainer),
-			Request = if v17 ~= CancelUserSubscriptionAsyncPromptStateEnum.Request then nil else React.createElement(CancelUserSubscriptionRequestContainer)
-		})
+	}
+
+	local createElement3 = React.createElement
+	local err
+
+	if v == CancelUserSubscriptionAsyncPromptStateEnum.Error then
+		err = React.createElement(CancelUserSubscriptionErrorContainer)
+	end
+
+	local success
+
+	if v == CancelUserSubscriptionAsyncPromptStateEnum.Success then
+		success = React.createElement(CancelUserSubscriptionSuccessContainer)
+	end
+
+	local request
+
+	if v == CancelUserSubscriptionAsyncPromptStateEnum.Request then
+		request = React.createElement(CancelUserSubscriptionRequestContainer)
+	end
+
+	return (createElement(provider, { value = state }, createElement2("ScreenGui", v2, {
+		FocusNavigationEffects = createElement3(
+			FocusNavigationModalSurface,
+			{ selectionGroupName = "CancelSubscriptionApp" },
+			{ Error = err, Success = success, Request = request }
+		)
 	})))
 end
 
-return CancelSubscriptionApp2
+return CancelSubscriptionApp

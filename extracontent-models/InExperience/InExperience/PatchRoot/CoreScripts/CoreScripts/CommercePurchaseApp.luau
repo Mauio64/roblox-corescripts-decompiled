@@ -1,3 +1,3 @@
 local CorePackages = game:GetService("CorePackages")
-
-require(CorePackages.Workspace.Packages.CommercePurchaseApp).renderCommercePurchaseApp()
+local CommercePurchaseApp = require(CorePackages.Workspace.Packages.CommercePurchaseApp)
+CommercePurchaseApp.renderCommercePurchaseApp()

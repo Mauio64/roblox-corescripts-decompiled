@@ -1,8 +1,10 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerFollowRelationship", function(p1, p2, p3) -- line: 4
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetPlayerFollowRelationship", function(player, isFollower, isFollowing)
 	return {
-		player = p1,
-		userId = p1.UserId,
-		isFollower = p2,
-		isFollowing = p3
+		player = player,
+		userId = player.UserId,
+		isFollower = isFollower,
+		isFollowing = isFollowing
 	}
 end)

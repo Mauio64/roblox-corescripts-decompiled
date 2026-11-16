@@ -2,11 +2,11 @@ local GetFFlagLuaAppEnableAndroidPushUpsell = require(script.Parent.GetFFlagLuaA
 
 game:DefineFastFlag("LuaEnableShowUpsellMethod2", false)
 
-return function() -- line: 5
-	-- upvalues: GetFFlagLuaAppEnableAndroidPushUpsell (copy)
+return function()
 	if GetFFlagLuaAppEnableAndroidPushUpsell() then
 		return game:GetFastFlag("LuaEnableShowUpsellMethod2")
 	end
 
-	return game:GetFastFlag("LuaEnableShowUpsellMethod2") and game:GetEngineFeature("PermissionsProtocolShouldShowUpsellIOSEnabled")
+	return game:GetFastFlag("LuaEnableShowUpsellMethod2")
+		and game:GetEngineFeature("PermissionsProtocolShouldShowUpsellIOSEnabled")
 end

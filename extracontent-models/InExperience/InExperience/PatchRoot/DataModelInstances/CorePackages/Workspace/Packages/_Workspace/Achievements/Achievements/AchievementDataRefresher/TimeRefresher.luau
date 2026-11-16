@@ -1,39 +1,41 @@
 local Achievements = script:FindFirstAncestor("Achievements")
-local AchievementsParent = Achievements.Parent
-local LuauPolyfill = require(AchievementsParent.LuauPolyfill)
+local parent = Achievements.Parent
+
+local LuauPolyfill = require(parent.LuauPolyfill)
 local clearInterval = LuauPolyfill.clearInterval
 local setInterval = LuauPolyfill.setInterval
+
 local Logger = require(Achievements.Logger)
+require(parent.Signal)
 
-require(AchievementsParent.Signal)
+local TimeRefresher = {}
 
-return {
-	init = function(t1: {[any]: any}, p1, n1: number) -- line: 25
-		t1.fireDataChanged = p1
-		t1.intervalInSec = n1
-	end,
-	start = function(p2) -- line: 30
-		-- upvalues: setInterval (copy)
-		p2.timerId = setInterval(p2.check, p2.intervalInSec * 1000, p2)
-		p2.startTime = os.time()
-	end,
-	check = function(p3) -- line: 35
-		-- upvalues: Logger (copy)
-		if p3.startTime then
-			local v12 = os.time() - p3.startTime
+function TimeRefresher:init(fireDataChanged, intervalInSec: number)
+	self.fireDataChanged = fireDataChanged
+	self.intervalInSec = intervalInSec
+end
 
-			p3.fireDataChanged(v12)
+function TimeRefresher:start()
+	self.timerId = setInterval(self.check, self.intervalInSec * 1000, self)
+	self.startTime = os.time()
+end
 
-			return
-		end
-
+function TimeRefresher.check(p)
+	if not p.startTime then
 		Logger:error("No recorded start time")
-	end,
-	stop = function(p4) -- line: 44
-		-- upvalues: clearInterval (copy)
-		if p4.timerId then
-			clearInterval(p4.timerId)
-			p4.startTime = nil
-		end
+
+		return
 	end
-}
+
+	local v = os.time() - p.startTime
+	p.fireDataChanged(v)
+end
+
+function TimeRefresher:stop()
+	if self.timerId then
+		clearInterval(self.timerId)
+		self.startTime = nil
+	end
+end
+
+return TimeRefresher

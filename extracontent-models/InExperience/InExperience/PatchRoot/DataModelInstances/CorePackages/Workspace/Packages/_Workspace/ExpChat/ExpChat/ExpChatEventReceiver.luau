@@ -1,19 +1,20 @@
 local Chat = game:GetService("Chat")
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local React = require(Parent.React)
-local SocialUpsellEventReceiver = require(Parent.SocialUpsell).SocialUpsellEventReceiver
+local parent = script:FindFirstAncestor("ExpChat").Parent
 
-local function ExpChatEventReceiver() -- line: 10
-	-- upvalues: React (copy), Chat (copy), SocialUpsellEventReceiver (copy)
-	local v6 = React.useCallback(function() -- line: 11
-		-- upvalues: Chat (copy)
+local React = require(parent.React)
+local SocialUpsell = require(parent.SocialUpsell)
+
+local SocialUpsellEventReceiver = SocialUpsell.SocialUpsellEventReceiver
+
+local function ExpChatEventReceiver()
+	local onAgeVerifiedChange = React.useCallback(function()
 		if game:GetEngineFeature("ChatReconcileAccess") then
 			Chat:ReconcileCommunicationAccess()
 		end
 	end, {})
 
 	return React.createElement(SocialUpsellEventReceiver, {
-		onAgeVerifiedChange = v6
+		onAgeVerifiedChange = onAgeVerifiedChange
 	})
 end
 

@@ -1,4 +1,1 @@
-return {
-	Favorite = Enum.KeyCode.ButtonX,
-	TryOn = Enum.KeyCode.ButtonY
-}
+return { Favorite = Enum.KeyCode.ButtonX, TryOn = Enum.KeyCode.ButtonY }

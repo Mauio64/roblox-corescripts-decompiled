@@ -1,75 +1,70 @@
-local t1 = {}
+local LuaResult = {}
+LuaResult.__index = LuaResult
 
-t1.__index = t1
+local v = newproxy(true)
 
-local v2 = newproxy(true)
+function LuaResult.new(status, p)
+	assert(typeof(status) == "boolean")
 
-function t1.new(p1, p2) -- line: 6
-	-- upvalues: v2 (copy), t1 (copy)
-	assert(typeof(p1) == "boolean")
+	local v2 = { _source = debug.traceback(), [v] = true, _status = status, _value = p }
 
-	local t2 = {
-		_source = debug.traceback(),
-		[v2] = true,
-		_status = p1,
-		_value = p2
-	}
+	setmetatable(v2, LuaResult)
 
-	setmetatable(t2, t1)
-
-	return t2
+	return v2
 end
-function t1.success(p3) -- line: 27
-	-- upvalues: t1 (copy)
-	return t1.new(true, p3)
-end
-function t1.error(p4) -- line: 31
-	-- upvalues: t1 (copy)
-	return t1.new(false, p4)
-end
-function t1.is(p5) -- line: 38
-	-- upvalues: v2 (copy)
-	if typeof(p5) ~= "table" then
-		return false
-	end
 
-	return p5[v2]
+function LuaResult.success(p)
+	return LuaResult.new(true, p)
 end
-function t1.match(p6, p7, p8) -- line: 51
-	-- upvalues: t1 (copy)
-	assert(typeof(p7) == "function" or typeof(p7) == "nil", string.format("Result:match expects successHandler to be a function or nil, got %s", (typeof(p7))))
-	assert(typeof(p8) == "function" or typeof(p8) == "nil", string.format("Result:match expects errorHandler to be a function or nil, got %s", (typeof(p8))))
 
-	local v12
+function LuaResult.error(p)
+	return LuaResult.new(false, p)
+end
 
-	if p6._status then
-		if p7 == nil then
-			return p6
+function LuaResult.is(p)
+	return typeof(p) == "table" and p[v]
+end
+
+function LuaResult:match(callback, callback2)
+	assert(
+		typeof(callback) == "function" or typeof(callback) == "nil",
+		string.format("Result:match expects successHandler to be a function or nil, got %s", (typeof(callback)))
+	)
+	assert(
+		typeof(callback2) == "function" or typeof(callback2) == "nil",
+		string.format("Result:match expects errorHandler to be a function or nil, got %s", (typeof(callback2)))
+	)
+	local v2
+
+	if self._status then
+		if callback == nil then
+			return self
 		end
 
-		v12 = p7(p6._value)
+		v2 = callback(self._value)
+	elseif callback2 == nil then
+		return self
 	else
-		if p8 == nil then
-			return p6
-		end
-
-		v12 = p8(p6._value)
+		v2 = callback2(self._value)
 	end
 
-	if t1.is(v12) then
-		return v12
+	if LuaResult.is(v2) then
+		return v2
 	end
 
-	return t1.success(v12)
-end
-function t1.matchSuccess(p9, p10) -- line: 83
-	return p9:match(p10, nil)
-end
-function t1.matchError(p11, p12) -- line: 92
-	return p11:match(nil, p12)
-end
-function t1.unwrap(p13) -- line: 96
-	return p13._status, p13._value
+	return LuaResult.success(v2)
 end
 
-return t1
+function LuaResult:matchSuccess(p)
+	return self:match(p, nil)
+end
+
+function LuaResult:matchError(p)
+	return self:match(nil, p)
+end
+
+function LuaResult:unwrap()
+	return self._status, self._value
+end
+
+return LuaResult

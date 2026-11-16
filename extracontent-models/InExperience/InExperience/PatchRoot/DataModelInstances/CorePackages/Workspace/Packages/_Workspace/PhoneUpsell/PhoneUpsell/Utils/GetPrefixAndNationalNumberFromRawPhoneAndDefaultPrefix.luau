@@ -1,10 +1,10 @@
-return function(s1: string, s2: string) -- line: 1
-	local v3 = s1:gsub("%D", "")
-	local v4 = s2:gsub("%D", "")
+return function(value: string, value2: string)
+	local v = value:gsub("%D", "")
+	local v2 = value2:gsub("%D", "")
 
-	if string.find(v3, v4) == 1 then
-		return s2, (string.sub(v3, string.len(v4) + 1))
+	if string.find(v, v2) == 1 then
+		return value2, (string.sub(v, string.len(v2) + 1))
 	end
 
-	return s2, v3
+	return value2, v
 end

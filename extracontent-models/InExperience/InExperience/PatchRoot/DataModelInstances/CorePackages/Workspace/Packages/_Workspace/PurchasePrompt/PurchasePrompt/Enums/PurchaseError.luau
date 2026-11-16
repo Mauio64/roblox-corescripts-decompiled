@@ -1,9 +1,8 @@
-return (require(script.Parent.createEnum)("PurchaseError", {
+local createEnum = require(script.Parent.createEnum)
+
+return (createEnum("PurchaseError", {
 	"CannotGetBalance",
 	"CannotGetItemPrice",
-	"AlreadyPremium",
-	"PremiumUnavailable",
-	"PremiumUnavailablePlatform",
 	"NotForSale",
 	"NotForSaleHere",
 	"AlreadyOwn",
@@ -33,5 +32,7 @@ return (require(script.Parent.createEnum)("PurchaseError", {
 	"VpcRequired",
 	"ExceedParentalSpendLimit",
 	"EconomicRestriction",
-	"PendingProductsLimitExceeded"
+	"PendingProductsLimitExceeded",
+	"UnsupportedInStudio",
+	"VIPServerUnavailable"
 }))

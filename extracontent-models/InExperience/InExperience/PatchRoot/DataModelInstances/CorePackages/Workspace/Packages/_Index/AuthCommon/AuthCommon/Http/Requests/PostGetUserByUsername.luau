@@ -1,20 +1,18 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+
 local HttpService = game:GetService("HttpService")
-local Url = require(Parent.Http).Url
 
-require(Parent.Http)
+local Http = require(parent.Http)
+local Url = Http.Url
+require(parent.Http)
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder.new({ base = Url.USERS_URL, path = "usernames/users" })
 
-local v4 = require(Parent.UrlBuilder).UrlBuilder.new({
-	path = "usernames/users",
-	base = Url.USERS_URL
-})
-
-return function(p1, s1: string, b1: boolean?) -- line: 40
-	-- upvalues: v4 (copy), HttpService (copy)
-	return p1(v4(), "POST", {
+return function(callback, p: string, flag: boolean?)
+	return callback(urlBuilder(), "POST", {
 		postBody = HttpService:JSONEncode({
-			usernames = { s1 },
-			excludeBannedUsers = b1 or false
+			usernames = { p },
+			excludeBannedUsers = flag or false
 		})
 	})
 end

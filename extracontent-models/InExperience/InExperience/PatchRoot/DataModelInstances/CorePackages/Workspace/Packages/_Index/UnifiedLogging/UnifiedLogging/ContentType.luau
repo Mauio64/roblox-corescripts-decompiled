@@ -6,5 +6,5 @@ return {
 	User = "User",
 	Game = "Game",
 	Song = "Song",
-	Dialog = if not FFlagLuaAppUnifiedLoggingDialogContentType then nil else "Dialog"
+	Dialog = FFlagLuaAppUnifiedLoggingDialogContentType and "Dialog" or nil
 }

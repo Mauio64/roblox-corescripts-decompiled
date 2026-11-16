@@ -1,30 +1,32 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local Platform = game:GetService("UserInputService"):GetPlatform()
-local FStringLuaAppEphemeralCounterPrefix = require(Parent.SharedFlags).FStringLuaAppEphemeralCounterPrefix
+local UserInputService = game:GetService("UserInputService")
+local platform = UserInputService:GetPlatform()
+local SharedFlags = require(parent.SharedFlags)
+local FStringLuaAppEphemeralCounterPrefix = SharedFlags.FStringLuaAppEphemeralCounterPrefix
 
-return function(p1, p2) -- line: 13
-	-- upvalues: Platform (copy), FStringLuaAppEphemeralCounterPrefix (copy), RbxAnalyticsService (copy)
-	pcall(function() -- line: 14
-		-- upvalues: p1 (ref), p2 (ref), Platform (copy), FStringLuaAppEphemeralCounterPrefix (copy), RbxAnalyticsService (copy)
-		assert(type(p1) == "string", "Expected counterName to be a string")
-		p1 = p1 or ""
-		p2 = p2 or 1
+return function(value, value2)
+	pcall(function()
+		assert(type(value) == "string", "Expected counterName to be a string")
 
-		if Platform == Enum.Platform.Android then
-			p1 = "Android-" .. tostring(p1)
-		elseif Platform == Enum.Platform.IOS then
-			p1 = "iOS-" .. tostring(p1)
-		elseif Platform == Enum.Platform.Windows then
-			p1 = "Win32-" .. tostring(p1)
-		elseif Platform == Enum.Platform.UWP then
-			p1 = "UWP-" .. tostring(p1)
-		elseif Platform == Enum.Platform.OSX then
-			p1 = "Mac-" .. tostring(p1)
+		value = value or ""
+		value2 = value2 or 1
+
+		if platform == Enum.Platform.Android then
+			value = "Android-" .. tostring(value)
+		elseif platform == Enum.Platform.IOS then
+			value = "iOS-" .. tostring(value)
+		elseif platform == Enum.Platform.Windows then
+			value = "Win32-" .. tostring(value)
+		elseif platform == Enum.Platform.UWP then
+			value = "UWP-" .. tostring(value)
+		elseif platform == Enum.Platform.OSX then
+			value = "Mac-" .. tostring(value)
 		elseif FStringLuaAppEphemeralCounterPrefix ~= "" then
-			p1 = FStringLuaAppEphemeralCounterPrefix .. tostring(p1)
+			value = FStringLuaAppEphemeralCounterPrefix .. tostring(value)
 		end
 
-		RbxAnalyticsService:ReportCounter(p1, p2)
+		RbxAnalyticsService:ReportCounter(value, value2)
 	end)
 end

@@ -5,14 +5,16 @@ local rad = math.rad
 local sign = math.sign
 local sqrt = math.sqrt
 local tan = math.tan
+
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
-local GameSettings = UserSettings().GameSettings
+local gameSettings = UserSettings().GameSettings
 local Lighting = game:GetService("Lighting")
+
 local LocalPlayer = Players.LocalPlayer
 
 if not LocalPlayer then
@@ -20,184 +22,212 @@ if not LocalPlayer then
 	LocalPlayer = Players.LocalPlayer
 end
 
-local PlayerGui = nil
-local Freecam = nil
-local CurrentCamera = Workspace.CurrentCamera
+local playerGui = nil
+local freecam = nil
 
-Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() -- line: 67
-	-- upvalues: Workspace (copy), CurrentCamera (ref)
-	local CurrentCamera2 = Workspace.CurrentCamera
+local parent = Workspace.CurrentCamera
+Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+	local currentCamera = Workspace.CurrentCamera
 
-	if CurrentCamera2 then
-		CurrentCamera = CurrentCamera2
+	if currentCamera then
+		parent = currentCamera
 	end
 end)
 
-local DepthOfFieldEffect = nil
-local TextLabel = nil
-local t19 = nil
-local ok, result = pcall(function() -- line: 80
+local freecamDepthOfField = nil
+local freecamCustomGui = nil
+local v = nil
+
+local success, result = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserExitFreecamBreaksWithShiftlock")
 end)
-local u25 = ok and result
-local ok2, result2 = pcall(function() -- line: 88
+
+local v2 = success and result
+
+local success2, result2 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserShowGuiHideToggles")
 end)
-local u28 = ok2 and result2
-local ok3, result3 = pcall(function() -- line: 96
+
+local v3 = success2 and result2
+
+local success3, result3 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFixFreecamDeltaTimeCalculation")
 end)
-local u31 = ok3 and result3
-local ok4, result4 = pcall(function() -- line: 104
+
+local v4 = success3 and result3
+
+local success4, result4 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFixFreecamGuiChangeVisibility2")
 end)
-local u34 = ok4 and result4
-local ok5, result5 = pcall(function() -- line: 112
+
+local v5 = success4 and result4
+
+local success5, result5 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamControlSpeed")
 end)
-local u37 = ok5 and result5
-local ok6, result6 = pcall(function() -- line: 120
+
+local v6 = success5 and result5
+
+local success6, result6 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamTiltControl")
 end)
-local u40 = ok6 and result6
-local ok7, result7 = pcall(function() -- line: 128
+
+local v7 = success6 and result6
+
+local success7, result7 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamSmoothnessControl")
 end)
-local u43 = ok7 and result7
-local ok8, result8 = pcall(function() -- line: 136
+
+local v8 = success7 and result7
+
+local success8, result8 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamGuiDestabilization")
 end)
-local u46 = ok8 and result8
-local ok9, result9 = pcall(function() -- line: 144
+
+local v9 = success8 and result8
+
+local success9, result9 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamDepthOfFieldEffect3")
 end)
-local u49 = ok9 and result9
-local ok10, result10 = pcall(function() -- line: 152
+
+local v10 = success9 and result9
+
+local success10, result10 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamPlayerLock2")
 end)
-local u52 = ok10 and result10
-local ok11, result11 = pcall(function() -- line: 160
+
+local v11 = success10 and result10
+
+local success11, result11 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamPlayerLockResetHeight")
 end)
-local u55 = ok11 and result11
-local ok12, result12 = pcall(function() -- line: 168
+
+local v12 = success11 and result11
+
+local success12, result12 = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserFreecamCustomGui")
 end)
-local u58 = ok12 and result12
-local LowValue = Enum.ContextActionPriority.Low.Value
-local HighValue = Enum.ContextActionPriority.High.Value
-local t1 = {
-	Enum.KeyCode.LeftShift,
-	Enum.KeyCode.P
-}
-local t2 = {
-	[Enum.KeyCode.Z] = true,
-	[Enum.KeyCode.C] = true
-}
-local t3 = {
-	[Enum.KeyCode.ButtonL1] = true,
-	[Enum.KeyCode.ButtonR1] = true
-}
-local t4 = {
-	[Enum.KeyCode.BackSlash] = true
-}
-local t5 = {
-	[Enum.KeyCode.Slash] = true
-}
-local t6 = {
-	[Enum.KeyCode.R] = true,
-	[Enum.KeyCode.T] = true
-}
-local t7 = {
-	[Enum.KeyCode.G] = true
-}
-local t8 = {
-	[Enum.KeyCode.X] = true
-}
-local t9 = {
-	[Enum.KeyCode.L] = true
-}
-local v70 = Vector2.new(0.75, 1) * 8
-local n1 = 1.5
-local n2 = 1
-local n3 = 4
-local n4 = 1
-local t10 = {}
-local n5 = 0
-local t11 = {}
-local connection = nil
-local connection2 = nil
-local connection3 = nil
-local connection4 = nil
-local connection5 = nil
-local u83 = false
-local n6 = 20
-local n7 = 0
-local t12 = {}
-local n8 = 1
-local u88 = nil
-local u89 = false
-local u90 = false
-local t13 = {}
 
-t13.__index = t13
+local v13 = success12 and result12
 
-function t13.new(p1, p2) -- line: 267
-	-- upvalues: t13 (copy)
-	local self = setmetatable({}, t13)
+local value = Enum.ContextActionPriority.Low.Value
+local value2 = Enum.ContextActionPriority.High.Value
+local v14 = { Enum.KeyCode.LeftShift, Enum.KeyCode.P }
+local set = { [Enum.KeyCode.Z] = true, [Enum.KeyCode.C] = true }
 
-	self.f = p1
+local set2 = { [Enum.KeyCode.ButtonL1] = true, [Enum.KeyCode.ButtonR1] = true }
+
+local backSlashSet = { [Enum.KeyCode.BackSlash] = true }
+
+local slashSet = { [Enum.KeyCode.Slash] = true }
+local set3 = { [Enum.KeyCode.R] = true, [Enum.KeyCode.T] = true }
+
+local gSet = { [Enum.KeyCode.G] = true }
+
+local set4 = { [Enum.KeyCode.X] = true }
+
+local lSet = { [Enum.KeyCode.L] = true }
+
+local v15 = Vector2.new(0.75, 1) * 8
+
+local v16 = 1.5
+local v17 = 1
+local v18 = 4
+local v19 = 1
+
+local nows = {}
+local v20 = 0
+
+local depthOfFieldEffects = {}
+
+local childAddedConnection = nil
+local childAddedConnection2 = nil
+local childAddedConnection3 = nil
+local playerAddedConnection = nil
+local playerRemovingConnection = nil
+
+local v21 = false
+local v22 = 20
+local v23 = 0
+local players = {}
+local v24 = 1
+local v25 = nil
+
+local enabled = false
+local v26 = false
+
+local class = {}
+class.__index = class
+
+function class.new(p, p2)
+	local self = setmetatable({}, class)
+	self.f = p
 	self.p = p2
 	self.v = p2 * 0
-
 	return self
 end
-function t13.Update(p3, p4, p5) -- line: 275
-	-- upvalues: exp (copy)
-	local v149 = p3.f * 2 * 3.141592653589793
-	local p = p3.p
-	local v = p3.v
-	local v152 = p5 - p
-	local v153 = exp(-v149 * p4)
-	local v154 = p5 + (v * p4 - v152 * (v149 * p4 + 1)) * v153
-	local v155 = (v149 * p4 * (v152 * v149 - v) + v) * v153
 
-	p3.p = v154
-	p3.v = v155
+function class:Update(p, p2)
+	local v27 = self.f * 2 * 3.141592653589793
+	local p3 = self.p
+	local v28 = self.v
 
-	return v154
-end
-function t13.SetFreq(p6, p7) -- line: 292
-	p6.f = p7
-end
-function t13.Reset(p8, p9) -- line: 296
-	p8.p = p9
-	p8.v = p9 * 0
+	local v29 = p2 - p3
+	local v30 = exp(-v27 * p)
+
+	local v31 = p2 + (v28 * p - v29 * (v27 * p + 1)) * v30
+	local v32 = (v27 * p * (v29 * v27 - v28) + v28) * v30
+
+	self.p = v31
+	self.v = v32
+
+	return v31
 end
 
-local vector3 = Vector3.new()
-local u93 = if not u40 then Vector2.new() else Vector3.new()
-local n9 = 0
-local v95 = t13.new(n1, (Vector3.new()))
-local v96 = t13.new(n2, Vector2.new())
-local v97 = t13.new(n3, 0)
-local v98 = t13.new(n4, 0)
-local t14 = {}
-
-local function fCurve(p10) -- line: 325
-	-- upvalues: exp (copy)
-	return (exp(2 * p10) - 1) / 6.38905609893065
-end
-local function fDeadzone(p11) -- line: 329
-	-- upvalues: exp (copy)
-	return (exp(2 * ((p11 - 0.15) / 0.85)) - 1) / 6.38905609893065
-end
-local function thumbstickCurve(p12) -- line: 333
-	-- upvalues: sign (copy), abs (copy), exp (copy), clamp (copy)
-	return sign(p12) * clamp((exp(2 * ((abs(p12) - 0.15) / 0.85)) - 1) / 6.38905609893065, 0, 1)
+function class:SetFreq(p)
+	self.f = p
 end
 
-local t15 = {
+function class:Reset(p)
+	self.p = p
+	self.v = p * 0
+end
+
+local v27 = Vector3.new()
+local v28
+
+if v7 then
+	v28 = Vector3.new()
+else
+	v28 = Vector2.new()
+end
+
+local fieldOfView2 = 0
+
+local new = class.new
+local v29 = v16
+local v30 = new(v29, (Vector3.new()))
+local new2 = class.new
+local v31 = v17
+local v32 = new2(v31, Vector2.new())
+local v36 = class.new(v18, 0)
+local v37 = class.new(v19, 0)
+
+local v38 = {}
+
+local function fCurve(p) -- 1 equivalent call inferred from this helper
+	return (exp(2 * p) - 1) / 6.38905609893065
+end
+
+local function fDeadzone(p) -- 1 equivalent call inferred from this helper
+	return fCurve((p - 0.15) / 0.85) -- inferred equivalent call
+end
+
+local function thumbstickCurve(p)
+	return sign(p) * clamp(fDeadzone(abs(p)), 0, 1) -- inferred equivalent call
+end
+
+local v39 = {
 	ButtonX = 0,
 	ButtonY = 0,
 	DPadDown = 0,
@@ -211,7 +241,8 @@ local t15 = {
 	Thumbstick1 = Vector2.new(),
 	Thumbstick2 = Vector2.new()
 }
-local t16 = {
+
+local v40 = {
 	W = 0,
 	A = 0,
 	S = 0,
@@ -252,524 +283,627 @@ local t16 = {
 	X = 0,
 	L = 0
 }
-local t17 = {
-	MouseWheel = 0,
-	Delta = Vector2.new()
-}
-local v106 = Vector2.new(1, 1) * 0.04908738521234052
-local v107 = v106 / 60
-local v108 = Vector2.new(1, 1) * 0.39269908169872414
-local t18 = {
-	FarIntensity = {
-		ADJ = 0.1,
-		MIN = 0,
-		MAX = 1
-	},
-	NearIntensity = {
-		ADJ = 0.1,
-		MIN = 0,
-		MAX = 1
-	},
-	FocusDistance = {
-		ADJ = 20,
-		MIN = 0,
-		MAX = 200
-	},
-	FocusRadius = {
-		ADJ = 5,
-		MIN = 0,
-		MAX = 50
-	}
-}
-local n10 = 1
-local n11 = 1
-local n12 = 1
 
-function t14.Vel(p13) -- line: 448
-	-- upvalues: u37 (ref), n10 (ref), t16 (copy), t15 (copy), clamp (copy), thumbstickCurve (ref), UserInputService (copy)
-	if u37 then
-		n10 = clamp(n10 + p13 * (t16.Up - t16.Down + t15.DPadUp - t15.DPadDown) * 0.75, 0.01, 4)
+local v41 = { Delta = Vector2.new(), MouseWheel = 0 }
+
+local v42 = Vector2.new(1, 1) * 0.04908738521234052
+local v43 = v42 / 60
+local v44 = Vector2.new(1, 1) * 0.39269908169872414
+
+local v45 = {
+	FarIntensity = { ADJ = 0.1, MIN = 0, MAX = 1 },
+	NearIntensity = { ADJ = 0.1, MIN = 0, MAX = 1 },
+	FocusDistance = { ADJ = 20, MIN = 0, MAX = 200 },
+	FocusRadius = { ADJ = 5, MIN = 0, MAX = 50 }
+}
+
+local navSpeed = 1
+local rollSpeed = 1
+local fovSpeed = 1
+
+function v38.Vel(p)
+	if v6 then
+		navSpeed = clamp(navSpeed + p * (v40.Up - v40.Down + v39.DPadUp - v39.DPadDown) * 0.75, 0.01, 4)
 	else
-		n10 = clamp(n10 + p13 * (t16.Up - t16.Down) * 0.75, 0.01, 4)
+		navSpeed = clamp(navSpeed + p * (v40.Up - v40.Down) * 0.75, 0.01, 4)
 	end
 
-	local v164 = Vector3.new(thumbstickCurve(t15.Thumbstick1.X), thumbstickCurve(t15.ButtonR2) - thumbstickCurve(t15.ButtonL2), thumbstickCurve(-t15.Thumbstick1.Y)) * Vector3.new(1, 1, 1)
-	local v165 = Vector3.new(t16.D - t16.A + t16.K - t16.H, t16.E - t16.Q + t16.I - t16.Y, t16.S - t16.W + t16.J - t16.U) * Vector3.new(1, 1, 1)
-	local v166 = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
+	local v46 = Vector3.new(
+		thumbstickCurve(v39.Thumbstick1.X),
+		thumbstickCurve(v39.ButtonR2) - thumbstickCurve(v39.ButtonL2),
+		thumbstickCurve(-v39.Thumbstick1.Y)
+	) * Vector3.new(1, 1, 1)
 
-	return (v164 + v165) * (n10 * (not v166 and 1 or 0.25))
+	local v47 = Vector3.new(v40.D - v40.A + v40.K - v40.H, v40.E - v40.Q + v40.I - v40.Y, v40.S - v40.W + v40.J - v40.U) * Vector3.new(1, 1, 1)
+
+	local v48 = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+		or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
+
+	return (v46 + v47) * (navSpeed * (v48 and 0.25 or 1))
 end
-function t14.Pan(p14) -- line: 471
-	-- upvalues: thumbstickCurve (ref), t15 (copy), v108 (copy), t17 (copy), v106 (copy), u31 (ref), v107 (copy)
-	local v168 = Vector2.new(thumbstickCurve(t15.Thumbstick2.Y), thumbstickCurve(-t15.Thumbstick2.X)) * v108
-	local v169 = t17.Delta * v106
 
-	if u31 and p14 > 0 then
-		v169 = t17.Delta / p14 * v107
+function v38.Pan(p)
+	local v46 = Vector2.new(thumbstickCurve(v39.Thumbstick2.Y), thumbstickCurve(-v39.Thumbstick2.X)) * v44
+	local v47 = v41.Delta * v42
+
+	if v4 and p > 0 then
+		v47 = v41.Delta / p * v43
 	end
 
-	t17.Delta = Vector2.new()
-
-	return v168 + v169
+	v41.Delta = Vector2.new()
+	return v46 + v47
 end
-function t14.Fov(p15) -- line: 486
-	-- upvalues: u37 (ref), n12 (ref), t16 (copy), t15 (copy), clamp (copy), t17 (copy), u31 (ref)
-	if u37 then
-		n12 = clamp(n12 + p15 * (t16.Right - t16.Left + t15.DPadRight - t15.DPadLeft) * 0.75, 0.01, 4)
+
+function v38.Fov(p)
+	if v6 then
+		fovSpeed = clamp(fovSpeed + p * (v40.Right - v40.Left + v39.DPadRight - v39.DPadLeft) * 0.75, 0.01, 4)
 	end
 
-	local v171 = (t15.ButtonX - t15.ButtonY) * 0.25
-	local v172 = t17.MouseWheel * 1
+	local v46 = (v39.ButtonX - v39.ButtonY) * 0.25
+	local v47 = v41.MouseWheel * 1
 
-	if u31 and p15 > 0 then
-		v172 = t17.MouseWheel / p15 * 0.016666666666666666
+	if v4 and p > 0 then
+		v47 = v41.MouseWheel / p * (1 / 60)
 	end
 
-	t17.MouseWheel = 0
+	v41.MouseWheel = 0
 
-	if u37 then
-		return (v171 + v172) * n12
+	if v6 then
+		return (v46 + v47) * fovSpeed
 	end
 
-	return v171 + v172
+	return v46 + v47
 end
-function t14.Roll(p16) -- line: 505
-	-- upvalues: n11 (ref), t16 (copy), clamp (copy), t15 (copy)
-	n11 = clamp(n11 + p16 * (t16.Period - t16.Comma) * 0.75, 0.01, 4)
 
-	return ((t15.ButtonR1 - t15.ButtonL1) * 1 + (t16.C - t16.Z) * 1) * n11
+function v38.Roll(p)
+	rollSpeed = clamp(rollSpeed + p * (v40.Period - v40.Comma) * 0.75, 0.01, 4)
+
+	return ((v39.ButtonR1 - v39.ButtonL1) * 1 + (v40.C - v40.Z) * 1) * rollSpeed
 end
-function t14.SpringControl(p17) -- line: 514
-	-- upvalues: u49 (ref), UserInputService (copy), n1 (ref), t16 (copy), clamp (copy), v95 (copy), n2 (ref), v96 (copy), n3 (ref), v97 (copy), n4 (ref), v98 (copy)
-	if u49 then
-		local v175 = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
-		local v176 = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
 
-		if v175 or v176 then
+function v38.SpringControl(p)
+	if v10 then
+		local v46 = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+			or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
+		local v47 = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl)
+			or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+
+		if v46 or v47 then
 			return
 		end
 	end
 
-	n1 = clamp(n1 + p17 * (t16.RightBracket - t16.LeftBracket) * 0.75, 0.01, 10)
-	v95:SetFreq(n1)
-	n2 = clamp(n2 + p17 * (t16.Quote - t16.Semicolon) * 0.75, 0.01, 10)
-	v96:SetFreq(n2)
-	n3 = clamp(n3 + p17 * (t16.B - t16.V) * 0.75, 0.01, 10)
-	v97:SetFreq(n3)
-	n4 = clamp(n4 + p17 * (t16.M - t16.N) * 0.75, 0.01, 10)
-	v98:SetFreq(n4)
-end
-function t14.DoF(p18) -- line: 537
-	-- upvalues: UserInputService (copy), DepthOfFieldEffect (ref), t16 (copy), t18 (copy), clamp (copy)
-	local v178 = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
-	local v179 = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+	v16 = clamp(v16 + p * (v40.RightBracket - v40.LeftBracket) * 0.75, 0.01, 10)
+	v30:SetFreq(v16)
 
-	if v178 then
-		DepthOfFieldEffect.FarIntensity = clamp(DepthOfFieldEffect.FarIntensity + p18 * (t16.RightBracket - t16.LeftBracket) * t18.FarIntensity.ADJ, t18.FarIntensity.MIN, t18.FarIntensity.MAX)
-		DepthOfFieldEffect.InFocusRadius = clamp(DepthOfFieldEffect.InFocusRadius + p18 * (t16.Equals - t16.Minus) * t18.FocusRadius.ADJ, t18.FocusRadius.MIN, t18.FocusRadius.MAX)
+	v17 = clamp(v17 + p * (v40.Quote - v40.Semicolon) * 0.75, 0.01, 10)
+	v32:SetFreq(v17)
 
-		return
-	end
+	v18 = clamp(v18 + p * (v40.B - v40.V) * 0.75, 0.01, 10)
+	v36:SetFreq(v18)
 
-	if v179 then
-		DepthOfFieldEffect.NearIntensity = clamp(DepthOfFieldEffect.NearIntensity + p18 * (t16.RightBracket - t16.LeftBracket) * t18.NearIntensity.ADJ, t18.NearIntensity.MIN, t18.NearIntensity.MAX)
-
-		return
-	end
-
-	DepthOfFieldEffect.FocusDistance = clamp(DepthOfFieldEffect.FocusDistance + p18 * (t16.Equals - t16.Minus) * t18.FocusDistance.ADJ, t18.FocusDistance.MIN, t18.FocusDistance.MAX)
+	v19 = clamp(v19 + p * (v40.M - v40.N) * 0.75, 0.01, 10)
+	v37:SetFreq(v19)
 end
 
-local function resetKeys(p19, p20) -- line: 568
-	for k, _ in pairs(p19) do
-		if p20[k.Name] then
-			p20[k.Name] = 0
+function v38.DoF(p)
+	local v46 = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+		or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
+	local v47 = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl)
+		or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+
+	if v46 then
+		freecamDepthOfField.FarIntensity = clamp(
+			freecamDepthOfField.FarIntensity + p * (v40.RightBracket - v40.LeftBracket) * v45.FarIntensity.ADJ,
+			v45.FarIntensity.MIN,
+			v45.FarIntensity.MAX
+		)
+
+		freecamDepthOfField.InFocusRadius = clamp(
+			freecamDepthOfField.InFocusRadius + p * (v40.Equals - v40.Minus) * v45.FocusRadius.ADJ,
+			v45.FocusRadius.MIN,
+			v45.FocusRadius.MAX
+		)
+	elseif v47 then
+		freecamDepthOfField.NearIntensity = clamp(
+			freecamDepthOfField.NearIntensity + p * (v40.RightBracket - v40.LeftBracket) * v45.NearIntensity.ADJ,
+			v45.NearIntensity.MIN,
+			v45.NearIntensity.MAX
+		)
+	else
+		freecamDepthOfField.FocusDistance = clamp(
+			freecamDepthOfField.FocusDistance + p * (v40.Equals - v40.Minus) * v45.FocusDistance.ADJ,
+			v45.FocusDistance.MIN,
+			v45.FocusDistance.MAX
+		)
+	end
+end
+
+local function resetKeys(items, p) -- 8 equivalent calls inferred from this helper
+	for k, _ in pairs(items) do
+		if p[k.Name] then
+			p[k.Name] = 0
 		end
 	end
 end
-local function handleDoubleTapReset(p21) -- line: 576
-	-- upvalues: t10 (copy), n5 (ref), u93 (ref), v98 (copy), u49 (ref), t3 (copy), t15 (copy), t2 (copy), t16 (copy)
-	local elapsed = os.clock()
-	local v186 = t10[p21]
-	local v187 = v186 and elapsed - v186 or -1
 
-	if v186 and (v187 <= 0.25 and elapsed - n5 >= 0.1) then
-		u93 = Vector3.new(u93.x, u93.y, 0)
-		v98:Reset(0)
+local function handleDoubleTapReset(keyCode)
+	local now = os.clock()
 
-		if u49 then
-			local v188 = t3
-			local v189 = t15
+	local v46 = nows[keyCode]
+	local v47 = v46 and now - v46 or -1
 
-			for k, _ in pairs(v188) do
-				if v189[k.Name] then
-					v189[k.Name] = 0
-				end
-			end
+	if v46 and v47 <= 0.25 and now - v20 >= 0.1 then
+		v28 = Vector3.new(v28.x, v28.y, 0)
+		v37:Reset(0)
 
-			local v192 = t2
-			local v193 = t16
-
-			for k, _ in pairs(v192) do
-				if v193[k.Name] then
-					v193[k.Name] = 0
-				end
-			end
+		if v10 then
+			resetKeys(set2, v39) -- inferred equivalent call
+			resetKeys(set, v40) -- inferred equivalent call
 		else
-			t15.ButtonL1 = 0
-			t15.ButtonR1 = 0
-			t16.C = 0
-			t16.Z = 0
+			v39.ButtonL1 = 0
+			v39.ButtonR1 = 0
+			v40.C = 0
+			v40.Z = 0
 		end
 
-		n5 = elapsed
+		v20 = now
 	end
 
-	t10[p21] = elapsed
+	nows[keyCode] = now
 end
-local function findPlayerLockRootPart(p22) -- line: 601
-	-- upvalues: t12 (ref), n8 (ref), u83 (ref)
-	if not t12 or #t12 < 1 then
+
+local function findPlayerLockRootPart(p)
+	if not players or #players < 1 then
 		return nil
 	end
 
-	for _ = 1, #t12 do
-		n8 = (n8 - 1 + p22) % #t12 + 1
+	for _ = 1, #players do
+		v24 = (v24 - 1 + p) % #players + 1
 
-		local v198 = t12[n8]
-		local v199 = v198 and v198.Character
+		local v46 = players[v24]
+		local character = v46 and v46.Character
 
-		if v199 then
-			local Humanoid = v199:FindFirstChildOfClass("Humanoid")
+		if character then
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-			if Humanoid and Humanoid.RootPart then
-				return Humanoid.RootPart
+			if humanoid and humanoid.RootPart then
+				return humanoid.RootPart
 			end
 		end
 
-		if p22 == 0 then
-			p22 = 1
+		if p == 0 then
+			p = 1
 		end
 	end
 
-	u83 = false
-
+	v21 = false
 	return nil
 end
-local function Keypress(_, p24, p25) -- line: 628
-	-- upvalues: t16 (copy), u40 (ref), t2 (copy), handleDoubleTapReset (copy), u49 (ref), t4 (copy), DepthOfFieldEffect (ref), t11 (ref), CurrentCamera (ref), Lighting (copy), connection2 (ref), connection3 (ref), u52 (ref), t5 (copy), u83 (ref), n6 (ref), u55 (ref), n7 (ref), u88 (ref), findPlayerLockRootPart (copy), t6 (copy), t12 (ref), u58 (ref), t7 (copy), Freecam (ref), t8 (copy), u89 (ref), t19 (ref), t9 (copy), u90 (ref), StarterGui (copy)
-	t16[p25.KeyCode.Name] = p24 ~= Enum.UserInputState.Begin and 0 or 1
 
-	if u40 and (t2[p25.KeyCode] and p25.UserInputState == Enum.UserInputState.Begin) then
-		handleDoubleTapReset(p25.KeyCode)
+local function Keypress(_, p, data)
+	v40[data.KeyCode.Name] = p == Enum.UserInputState.Begin and 1 or 0
+
+	if v7 and set[data.KeyCode] and data.UserInputState == Enum.UserInputState.Begin then
+		handleDoubleTapReset(data.KeyCode)
 	end
 
-	if u49 and t4[p25.KeyCode] and p25.UserInputState == Enum.UserInputState.Begin then
-		if not DepthOfFieldEffect.Enabled then
-			t11 = {}
-
-			for _, child in ipairs(CurrentCamera:GetChildren()) do
-				if child:IsA("DepthOfFieldEffect") and child.Enabled then
-					t11[#t11 + 1] = child
-					child.Enabled = false
+	if v10 and backSlashSet[data.KeyCode] and data.UserInputState == Enum.UserInputState.Begin then
+		if freecamDepthOfField.Enabled then
+			for _, v46 in ipairs(depthOfFieldEffects) do
+				if v46.Parent then
+					v46.Enabled = true
 				end
 			end
 
-			for _, child in ipairs(Lighting:GetChildren()) do
-				if child:IsA("DepthOfFieldEffect") and child.Enabled then
-					t11[#t11 + 1] = child
-					child.Enabled = false
-				end
+			if childAddedConnection2 then
+				childAddedConnection2:Disconnect()
+				childAddedConnection2 = nil
 			end
 
-			connection2 = CurrentCamera.ChildAdded:Connect(function(child) -- line: 654
-				-- upvalues: t11 (ref)
-				if child:IsA("DepthOfFieldEffect") and child.Enabled then
-					t11[#t11 + 1] = child
-					child.Enabled = false
-				end
-			end)
-			connection3 = Lighting.ChildAdded:Connect(function(child) -- line: 660
-				-- upvalues: t11 (ref)
-				if child:IsA("DepthOfFieldEffect") and child.Enabled then
-					t11[#t11 + 1] = child
-					child.Enabled = false
-				end
-			end)
+			if childAddedConnection3 then
+				childAddedConnection3:Disconnect()
+				childAddedConnection3 = nil
+			end
+
+			depthOfFieldEffects = {}
 		else
-			for _, v in ipairs(t11) do
-				if v.Parent then
-					v.Enabled = true
+			depthOfFieldEffects = {}
+
+			for _, depthOfFieldEffect in ipairs(parent:GetChildren()) do
+				if not (depthOfFieldEffect:IsA("DepthOfFieldEffect") and depthOfFieldEffect.Enabled) then
+					continue
 				end
+
+				depthOfFieldEffects[#depthOfFieldEffects + 1] = depthOfFieldEffect
+				depthOfFieldEffect.Enabled = false
 			end
 
-			if connection2 then
-				connection2:Disconnect()
-				connection2 = nil
+			for _, depthOfFieldEffect in ipairs(Lighting:GetChildren()) do
+				if not (depthOfFieldEffect:IsA("DepthOfFieldEffect") and depthOfFieldEffect.Enabled) then
+					continue
+				end
+
+				depthOfFieldEffects[#depthOfFieldEffects + 1] = depthOfFieldEffect
+				depthOfFieldEffect.Enabled = false
 			end
 
-			if connection3 then
-				connection3:Disconnect()
-				connection3 = nil
-			end
-
-			t11 = {}
+			childAddedConnection2 = parent.ChildAdded:Connect(function(depthOfFieldEffect)
+				if depthOfFieldEffect:IsA("DepthOfFieldEffect") and depthOfFieldEffect.Enabled then
+					depthOfFieldEffects[#depthOfFieldEffects + 1] = depthOfFieldEffect
+					depthOfFieldEffect.Enabled = false
+				end
+			end)
+			childAddedConnection3 = Lighting.ChildAdded:Connect(function(depthOfFieldEffect)
+				if depthOfFieldEffect:IsA("DepthOfFieldEffect") and depthOfFieldEffect.Enabled then
+					depthOfFieldEffects[#depthOfFieldEffects + 1] = depthOfFieldEffect
+					depthOfFieldEffect.Enabled = false
+				end
+			end)
 		end
 
-		DepthOfFieldEffect.Enabled = not DepthOfFieldEffect.Enabled
+		freecamDepthOfField.Enabled = not freecamDepthOfField.Enabled
+		resetKeys(backSlashSet, v40) -- inferred equivalent call
+	end
 
-		local v210 = t4
-		local v211 = t16
+	if v11 then
+		if slashSet[data.KeyCode] and data.UserInputState == Enum.UserInputState.Begin then
+			v21 = not v21
 
-		for k, _ in pairs(v210) do
-			if v211[k.Name] then
-				v211[k.Name] = 0
+			if v21 then
+				v22 = 20
+
+				if v12 then
+					v23 = 0
+				end
+
+				v25 = findPlayerLockRootPart(0)
 			end
+
+			resetKeys(slashSet, v40) -- inferred equivalent call
+		end
+
+		if set3[data.KeyCode] and data.UserInputState == Enum.UserInputState.Begin then
+			if v21 and #players > 0 then
+				v25 = findPlayerLockRootPart(v40.T - v40.R)
+			end
+
+			resetKeys(set3, v40) -- inferred equivalent call
 		end
 	end
 
-	if u52 then
-		if t5[p25.KeyCode] and p25.UserInputState == Enum.UserInputState.Begin then
-			u83 = not u83
-
-			if u83 then
-				n6 = 20
-
-				if u55 then
-					n7 = 0
-				end
-
-				u88 = findPlayerLockRootPart(0)
-			end
-
-			local v214 = t5
-			local v215 = t16
-
-			for k, _ in pairs(v214) do
-				if v215[k.Name] then
-					v215[k.Name] = 0
-				end
-			end
-		end
-
-		if t6[p25.KeyCode] and p25.UserInputState == Enum.UserInputState.Begin then
-			if u83 and #t12 > 0 then
-				local v218 = t16.T - t16.R
-
-				u88 = findPlayerLockRootPart(v218)
-			end
-
-			local v219 = t6
-			local v220 = t16
-
-			for k, _ in pairs(v219) do
-				if v220[k.Name] then
-					v220[k.Name] = 0
-				end
-			end
-		end
+	if not v13 then
+		return Enum.ContextActionResult.Sink
 	end
 
-	if u58 then
-		if t7[p25.keyCode] and p25.UserInputState == Enum.UserInputState.Begin then
-			if Freecam and Freecam.Parent then
-				Freecam.Enabled = not Freecam.Enabled
-			end
+	if gSet[data.keyCode] and data.UserInputState == Enum.UserInputState.Begin then
+		if freecam and freecam.Parent then
+			freecam.Enabled = not freecam.Enabled
+		end
 
-			local v223 = t7
-			local v224 = t16
+		resetKeys(gSet, v40) -- inferred equivalent call
+	end
 
-			for k, _ in pairs(v223) do
-				if v224[k.Name] then
-					v224[k.Name] = 0
+	if set4[data.keyCode] and data.UserInputState == Enum.UserInputState.Begin then
+		enabled = not enabled
+
+		if v then
+			local screenGuis = v.getScreenGuis()
+
+			for _, v46 in pairs(screenGuis) do
+				if v46.Parent and v46 ~= freecam then
+					v46.Enabled = enabled
 				end
 			end
 		end
 
-		if t8[p25.keyCode] and p25.UserInputState == Enum.UserInputState.Begin then
-			u89 = not u89
+		resetKeys(set4, v40) -- inferred equivalent call
+	end
 
-			if t19 then
-				local v227 = t19.getScreenGuis()
-
-				for _, v in pairs(v227) do
-					if v.Parent and v ~= Freecam then
-						v.Enabled = u89
-					end
-				end
-			end
-
-			local v230 = t8
-			local v231 = t16
-
-			for k, _ in pairs(v230) do
-				if v231[k.Name] then
-					v231[k.Name] = 0
-				end
-			end
-		end
-
-		if t9[p25.keyCode] and p25.UserInputState == Enum.UserInputState.Begin then
-			u90 = not u90
-			StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, u90)
-
-			local v234 = t9
-			local v235 = t16
-
-			for k, _ in pairs(v234) do
-				if v235[k.Name] then
-					v235[k.Name] = 0
-				end
-			end
-		end
+	if lSet[data.keyCode] and data.UserInputState == Enum.UserInputState.Begin then
+		v26 = not v26
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, v26)
+		resetKeys(lSet, v40) -- inferred equivalent call
 	end
 
 	return Enum.ContextActionResult.Sink
 end
-local function GpButton(_, p27, p28) -- line: 741
-	-- upvalues: t15 (copy), u40 (ref), t3 (copy), handleDoubleTapReset (copy)
-	t15[p28.KeyCode.Name] = p27 ~= Enum.UserInputState.Begin and 0 or 1
 
-	if u40 and (t3[p28.KeyCode] and p28.UserInputState == Enum.UserInputState.Begin) then
-		handleDoubleTapReset(p28.KeyCode)
+local function GpButton(_, p, p2)
+	v39[p2.KeyCode.Name] = p == Enum.UserInputState.Begin and 1 or 0
+
+	if v7 and set2[p2.KeyCode] and p2.UserInputState == Enum.UserInputState.Begin then
+		handleDoubleTapReset(p2.KeyCode)
 	end
 
 	return Enum.ContextActionResult.Sink
 end
-local function MousePan(_, _, p31) -- line: 753
-	-- upvalues: t17 (copy)
-	local Delta = p31.Delta
 
-	t17.Delta = Vector2.new(-Delta.y, -Delta.x)
-
+local function MousePan(_, _, p)
+	local delta = p.Delta
+	v41.Delta = Vector2.new(-delta.y, -delta.x)
 	return Enum.ContextActionResult.Sink
 end
-local function Thumb(_, _, p34) -- line: 759
-	-- upvalues: t15 (copy)
-	t15[p34.KeyCode.Name] = p34.Position
 
+local function Thumb(_, _, p)
+	v39[p.KeyCode.Name] = p.Position
 	return Enum.ContextActionResult.Sink
 end
-local function Trigger(_, _, p37) -- line: 764
-	-- upvalues: t15 (copy)
-	t15[p37.KeyCode.Name] = p37.Position.z
 
+local function Trigger(_, _, p)
+	v39[p.KeyCode.Name] = p.Position.z
 	return Enum.ContextActionResult.Sink
 end
-local function MouseWheel(_, _, p40) -- line: 769
-	-- upvalues: t17 (copy)
-	t17[p40.UserInputType.Name] = -p40.Position.z
 
+local function MouseWheel(_, _, p)
+	v41[p.UserInputType.Name] = -p.Position.z
 	return Enum.ContextActionResult.Sink
 end
-local function Zero(p41) -- line: 774
-	for k, v in pairs(p41) do
-		p41[k] = v * 0
+
+local function Zero(items) -- 3 equivalent calls inferred from this helper
+	for k, item in pairs(items) do
+		items[k] = item * 0
 	end
 end
 
-function t14.StartCapture() -- line: 780
-	-- upvalues: u37 (ref), ContextActionService (copy), Keypress (copy), HighValue (copy), GpButton (copy), u40 (ref), u43 (ref), u49 (ref), u52 (ref), u58 (ref), MousePan (copy), MouseWheel (copy), Trigger (copy), Thumb (copy)
-	if u37 then
-		ContextActionService:BindActionAtPriority("FreecamKeyboard", Keypress, false, HighValue, Enum.KeyCode.W, Enum.KeyCode.U, Enum.KeyCode.A, Enum.KeyCode.H, Enum.KeyCode.S, Enum.KeyCode.J, Enum.KeyCode.D, Enum.KeyCode.K, Enum.KeyCode.E, Enum.KeyCode.I, Enum.KeyCode.Q, Enum.KeyCode.Y)
-		ContextActionService:BindActionAtPriority("FreecamKeyboardControlSpeed", Keypress, false, HighValue, Enum.KeyCode.Up, Enum.KeyCode.Down, Enum.KeyCode.Left, Enum.KeyCode.Right)
-		ContextActionService:BindActionAtPriority("FreecamGamepadControlSpeed", GpButton, false, HighValue, Enum.KeyCode.DPadUp, Enum.KeyCode.DPadDown, Enum.KeyCode.DPadLeft, Enum.KeyCode.DPadRight)
+function v38.StartCapture()
+	if v6 then
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboard",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.W,
+			Enum.KeyCode.U,
+			Enum.KeyCode.A,
+			Enum.KeyCode.H,
+			Enum.KeyCode.S,
+			Enum.KeyCode.J,
+			Enum.KeyCode.D,
+			Enum.KeyCode.K,
+			Enum.KeyCode.E,
+			Enum.KeyCode.I,
+			Enum.KeyCode.Q,
+			Enum.KeyCode.Y
+		)
+
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardControlSpeed",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.Up,
+			Enum.KeyCode.Down,
+			Enum.KeyCode.Left,
+			Enum.KeyCode.Right
+		)
+
+		ContextActionService:BindActionAtPriority(
+			"FreecamGamepadControlSpeed",
+			GpButton,
+			false,
+			value2,
+			Enum.KeyCode.DPadUp,
+			Enum.KeyCode.DPadDown,
+			Enum.KeyCode.DPadLeft,
+			Enum.KeyCode.DPadRight
+		)
 	else
-		ContextActionService:BindActionAtPriority("FreecamKeyboard", Keypress, false, HighValue, Enum.KeyCode.W, Enum.KeyCode.U, Enum.KeyCode.A, Enum.KeyCode.H, Enum.KeyCode.S, Enum.KeyCode.J, Enum.KeyCode.D, Enum.KeyCode.K, Enum.KeyCode.E, Enum.KeyCode.I, Enum.KeyCode.Q, Enum.KeyCode.Y, Enum.KeyCode.Up, Enum.KeyCode.Down)
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboard",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.W,
+			Enum.KeyCode.U,
+			Enum.KeyCode.A,
+			Enum.KeyCode.H,
+			Enum.KeyCode.S,
+			Enum.KeyCode.J,
+			Enum.KeyCode.D,
+			Enum.KeyCode.K,
+			Enum.KeyCode.E,
+			Enum.KeyCode.I,
+			Enum.KeyCode.Q,
+			Enum.KeyCode.Y,
+			Enum.KeyCode.Up,
+			Enum.KeyCode.Down
+		)
 	end
 
-	if u40 then
-		ContextActionService:BindActionAtPriority("FreecamKeyboardTiltControl", Keypress, false, HighValue, Enum.KeyCode.Z, Enum.KeyCode.C)
-		ContextActionService:BindActionAtPriority("FreecamGamepadTiltControl", GpButton, false, HighValue, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
-		ContextActionService:BindActionAtPriority("FreecamKeyboardTiltControlSpeed", Keypress, false, HighValue, Enum.KeyCode.Comma, Enum.KeyCode.Period)
+	if v7 then
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardTiltControl",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.Z,
+			Enum.KeyCode.C
+		)
 
-		if u43 then
-			ContextActionService:BindActionAtPriority("FreecamKeyboardSmoothnessControl", Keypress, false, HighValue, Enum.KeyCode.LeftBracket, Enum.KeyCode.RightBracket, Enum.KeyCode.Semicolon, Enum.KeyCode.Quote, Enum.KeyCode.V, Enum.KeyCode.B, Enum.KeyCode.N, Enum.KeyCode.M)
+		ContextActionService:BindActionAtPriority(
+			"FreecamGamepadTiltControl",
+			GpButton,
+			false,
+			value2,
+			Enum.KeyCode.ButtonL1,
+			Enum.KeyCode.ButtonR1
+		)
+
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardTiltControlSpeed",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.Comma,
+			Enum.KeyCode.Period
+		)
+
+		if v8 then
+			ContextActionService:BindActionAtPriority(
+				"FreecamKeyboardSmoothnessControl",
+				Keypress,
+				false,
+				value2,
+				Enum.KeyCode.LeftBracket,
+				Enum.KeyCode.RightBracket,
+				Enum.KeyCode.Semicolon,
+				Enum.KeyCode.Quote,
+				Enum.KeyCode.V,
+				Enum.KeyCode.B,
+				Enum.KeyCode.N,
+				Enum.KeyCode.M
+			)
 		end
 	end
 
-	if u49 then
-		ContextActionService:BindActionAtPriority("FreecamKeyboardDoFToggle", Keypress, false, HighValue, Enum.KeyCode.BackSlash)
-		ContextActionService:BindActionAtPriority("FreecamKeyboardDoFControls", Keypress, false, HighValue, Enum.KeyCode.Minus, Enum.KeyCode.Equals)
+	if v10 then
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardDoFToggle",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.BackSlash
+		)
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardDoFControls",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.Minus,
+			Enum.KeyCode.Equals
+		)
 	end
 
-	if u52 then
-		ContextActionService:BindActionAtPriority("FreecamKeyboardPlayerLockToggle", Keypress, false, HighValue, Enum.KeyCode.Slash)
-		ContextActionService:BindActionAtPriority("FreecamKeyboardPlayerLockSwitch", Keypress, false, HighValue, Enum.KeyCode.R, Enum.KeyCode.T)
+	if v11 then
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardPlayerLockToggle",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.Slash
+		)
+
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardPlayerLockSwitch",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.R,
+			Enum.KeyCode.T
+		)
 	end
 
-	if u58 then
-		ContextActionService:BindActionAtPriority("FreecamKeyboardCustomGuiToggle", Keypress, false, HighValue, Enum.KeyCode.G)
-		ContextActionService:BindActionAtPriority("FreecamKeyboardPlayerGuiToggle", Keypress, false, HighValue, Enum.KeyCode.X)
-		ContextActionService:BindActionAtPriority("FreecamKeyboardLeaderboardToggle", Keypress, false, HighValue, Enum.KeyCode.L)
+	if v13 then
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardCustomGuiToggle",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.G
+		)
+
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardPlayerGuiToggle",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.X
+		)
+
+		ContextActionService:BindActionAtPriority(
+			"FreecamKeyboardLeaderboardToggle",
+			Keypress,
+			false,
+			value2,
+			Enum.KeyCode.L
+		)
 	end
 
-	ContextActionService:BindActionAtPriority("FreecamMousePan", MousePan, false, HighValue, Enum.UserInputType.MouseMovement)
-	ContextActionService:BindActionAtPriority("FreecamMouseWheel", MouseWheel, false, HighValue, Enum.UserInputType.MouseWheel)
-	ContextActionService:BindActionAtPriority("FreecamGamepadButton", GpButton, false, HighValue, Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY)
-	ContextActionService:BindActionAtPriority("FreecamGamepadTrigger", Trigger, false, HighValue, Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonL2)
-	ContextActionService:BindActionAtPriority("FreecamGamepadThumbstick", Thumb, false, HighValue, Enum.KeyCode.Thumbstick1, Enum.KeyCode.Thumbstick2)
+	ContextActionService:BindActionAtPriority(
+		"FreecamMousePan",
+		MousePan,
+		false,
+		value2,
+		Enum.UserInputType.MouseMovement
+	)
+	ContextActionService:BindActionAtPriority(
+		"FreecamMouseWheel",
+		MouseWheel,
+		false,
+		value2,
+		Enum.UserInputType.MouseWheel
+	)
+	ContextActionService:BindActionAtPriority(
+		"FreecamGamepadButton",
+		GpButton,
+		false,
+		value2,
+		Enum.KeyCode.ButtonX,
+		Enum.KeyCode.ButtonY
+	)
+	ContextActionService:BindActionAtPriority(
+		"FreecamGamepadTrigger",
+		Trigger,
+		false,
+		value2,
+		Enum.KeyCode.ButtonR2,
+		Enum.KeyCode.ButtonL2
+	)
+	ContextActionService:BindActionAtPriority(
+		"FreecamGamepadThumbstick",
+		Thumb,
+		false,
+		value2,
+		Enum.KeyCode.Thumbstick1,
+		Enum.KeyCode.Thumbstick2
+	)
 end
-function t14.StopCapture() -- line: 860
-	-- upvalues: u58 (ref), n10 (ref), u37 (ref), n12 (ref), u40 (ref), n11 (ref), t15 (copy), t16 (copy), t17 (copy), ContextActionService (copy), u43 (ref), u49 (ref), u52 (ref)
-	if not u58 then
-		n10 = 1
 
-		if u37 then
-			n12 = 1
+function v38.StopCapture()
+	if not v13 then
+		navSpeed = 1
+
+		if v6 then
+			fovSpeed = 1
 		end
 
-		if u40 then
-			n11 = 1
+		if v7 then
+			rollSpeed = 1
 		end
 	end
 
-	local v257 = t15
-
-	for k, v in pairs(v257) do
-		v257[k] = v * 0
-	end
-
-	local v260 = t16
-
-	for k, v in pairs(v260) do
-		v260[k] = v * 0
-	end
-
-	local v263 = t17
-
-	for k, v in pairs(v263) do
-		v263[k] = v * 0
-	end
-
+	Zero(v39) -- inferred equivalent call
+	Zero(v40) -- inferred equivalent call
+	Zero(v41) -- inferred equivalent call
 	ContextActionService:UnbindAction("FreecamKeyboard")
 
-	if u37 then
+	if v6 then
 		ContextActionService:UnbindAction("FreecamKeyboardControlSpeed")
 		ContextActionService:UnbindAction("FreecamGamepadControlSpeed")
 	end
 
-	if u40 then
+	if v7 then
 		ContextActionService:UnbindAction("FreecamKeyboardTiltControl")
 		ContextActionService:UnbindAction("FreecamGamepadTiltControl")
 		ContextActionService:UnbindAction("FreecamKeyboardTiltControlSpeed")
 
-		if u43 then
+		if v8 then
 			ContextActionService:UnbindAction("FreecamKeyboardSmoothnessControl")
 		end
 	end
 
-	if u49 then
+	if v10 then
 		ContextActionService:UnbindAction("FreecamKeyboardDoFToggle")
 		ContextActionService:UnbindAction("FreecamKeyboardDoFControls")
 	end
 
-	if u52 then
+	if v11 then
 		ContextActionService:UnbindAction("FreecamKeyboardPlayerLockToggle")
 		ContextActionService:UnbindAction("FreecamKeyboardPlayerLockSwitch")
 	end
 
-	if u58 then
+	if v13 then
 		ContextActionService:UnbindAction("FreecamKeyboardCustomGuiToggle")
 		ContextActionService:UnbindAction("FreecamKeyboardPlayerGuiToggle")
 		ContextActionService:UnbindAction("FreecamKeyboardLeaderboardToggle")
@@ -781,508 +915,490 @@ function t14.StopCapture() -- line: 860
 	ContextActionService:UnbindAction("FreecamGamepadTrigger")
 	ContextActionService:UnbindAction("FreecamGamepadThumbstick")
 end
-function t14.getNavSpeed() -- line: 906
-	-- upvalues: n10 (ref)
-	return n10
-end
-function t14.getFovSpeed() -- line: 910
-	-- upvalues: n12 (ref)
-	return n12
-end
-function t14.getRollSpeed() -- line: 914
-	-- upvalues: n11 (ref)
-	return n11
+
+function v38.getNavSpeed()
+	return navSpeed
 end
 
-local function StepFreecam(p42) -- line: 922
-	-- upvalues: u43 (ref), t14 (copy), u49 (ref), DepthOfFieldEffect (ref), v95 (copy), v96 (copy), v97 (copy), u40 (ref), v98 (copy), n9 (ref), rad (copy), tan (copy), sqrt (copy), clamp (copy), v70 (copy), u93 (ref), vector3 (ref), u52 (ref), u83 (ref), u88 (ref), n6 (ref), n7 (ref), u58 (ref), TextLabel (ref), Freecam (ref), n1 (ref), n2 (ref), n3 (ref), n4 (ref), u37 (ref), t12 (ref), n8 (ref), CurrentCamera (ref)
-	if u43 then
-		t14.SpringControl(p42)
+function v38.getFovSpeed()
+	return fovSpeed
+end
+
+function v38.getRollSpeed()
+	return rollSpeed
+end
+
+local function StepFreecam(p)
+	if v8 then
+		v38.SpringControl(p)
 	end
 
-	if u49 and DepthOfFieldEffect and DepthOfFieldEffect.Parent then
-		t14.DoF(p42)
+	if v10 and freecamDepthOfField and freecamDepthOfField.Parent then
+		v38.DoF(p)
 	end
 
-	local v267 = v95:Update(p42, t14.Vel(p42))
-	local v268 = v96:Update(p42, t14.Pan(p42))
-	local v269 = v97:Update(p42, t14.Fov(p42))
-	local v270 = nil
+	local v46 = v30:Update(p, v38.Vel(p))
+	local v47 = v32:Update(p, v38.Pan(p))
+	local v48 = v36:Update(p, v38.Fov(p))
+	local v49
 
-	if u40 then
-		v270 = v98:Update(p42, t14.Roll(p42))
+	if v7 then
+		v49 = v37:Update(p, v38.Roll(p))
 	end
 
-	local v271 = sqrt(0.7002075382097097 / tan((rad(n9 / 2))))
+	local v50 = sqrt(0.7002075382097097 / tan((rad(fieldOfView2 / 2))))
 
-	n9 = clamp(n9 + v269 * 300 * (p42 / v271), 1, 120)
+	fieldOfView2 = clamp(fieldOfView2 + v48 * 300 * (p / v50), 1, 120)
+	local v51
 
-	local v273
+	if v7 then
+		local v52 = v47 * v15 * (p / v50)
+		v28 += Vector3.new(v52.X, v52.Y, v49 * -1.5707963267948966 * (p / v50))
 
-	if u40 then
-		local v272 = v268 * v70 * (p42 / v271)
-
-		u93 += Vector3.new(v272.X, v272.Y, v270 * -1.5707963267948966 * (p42 / v271))
-
-		if u43 then
-			u93 = Vector3.new(u93.x % 6.283185307179586, u93.y % 6.283185307179586, u93.z % 6.283185307179586)
+		if v8 then
+			v28 = Vector3.new(v28.x % 6.283185307179586, v28.y % 6.283185307179586, v28.z % 6.283185307179586)
 		else
-			u93 = Vector3.new(clamp(u93.x, -1.5707963267948966, 1.5707963267948966), u93.y % 6.283185307179586, u93.z)
+			v28 = Vector3.new(clamp(v28.x, -1.5707963267948966, 1.5707963267948966), v28.y % 6.283185307179586, v28.z)
 		end
 
-		v273 = CFrame.new(vector3) * CFrame.fromOrientation(u93.x, u93.y, u93.z) * CFrame.new(v267 * Vector3.new(64, 64, 64) * p42)
+		v51 = CFrame.new(v27) * CFrame.fromOrientation(v28.x, v28.y, v28.z) * CFrame.new(v46 * Vector3.new(64, 64, 64) * p)
 	else
-		u93 += v268 * v70 * (p42 / v271)
-		u93 = Vector2.new(clamp(u93.x, -1.5707963267948966, 1.5707963267948966), u93.y % 6.283185307179586)
-		v273 = CFrame.new(vector3) * CFrame.fromOrientation(u93.x, u93.y, 0) * CFrame.new(v267 * Vector3.new(64, 64, 64) * p42)
+		v28 += v47 * v15 * (p / v50)
+		v28 = Vector2.new(clamp(v28.x, -1.5707963267948966, 1.5707963267948966), v28.y % 6.283185307179586)
+
+		v51 = CFrame.new(v27) * CFrame.fromOrientation(v28.x, v28.y, 0) * CFrame.new(v46 * Vector3.new(64, 64, 64) * p)
 	end
 
-	if u52 and u83 and u88 then
-		local v274 = v267.Z * 64 * p42
-		local v275 = v267.Y * 64 * p42
+	if v11 and v21 and v25 then
+		local v52 = v46.Z * 64 * p
+		local v53 = v46.Y * 64 * p
+		v22 = clamp(v22 + v52, 5, 50)
+		v23 = clamp(v23 + v53, -10, 10)
+		local cframe = CFrame.new(v25.Position + Vector3.new(0, v23, 0))
+		local v54
 
-		n6 = clamp(n6 + v274, 5, 50)
-		n7 = clamp(n7 + v275, -10, 10)
-		v273 = CFrame.new(u88.Position + Vector3.new(0, n7, 0)) * (if not u40 then CFrame.fromOrientation(u93.x, u93.y, 0) else CFrame.fromOrientation(u93.x, u93.y, u93.z)) * CFrame.new(0, 0, n6)
+		if v7 then
+			v54 = CFrame.fromOrientation(v28.x, v28.y, v28.z)
+		else
+			v54 = CFrame.fromOrientation(v28.x, v28.y, 0)
+		end
+
+		v51 = cframe * v54 * CFrame.new(0, 0, v22)
 	end
 
-	if u58 and TextLabel and TextLabel.Parent and Freecam and Freecam.Parent and Freecam.Enabled then
-		local s1 = ""
+	if v13 and freecamCustomGui and freecamCustomGui.Parent and freecam and freecam.Parent and freecam.Enabled then
+		local v52 = ""
 
-		if p42 > 0 then
-			local v277 = (v273.p - vector3) / p42
-
-			s1 ..= string.format("Velocity: (%.1f, %.1f, %.1f)\n", v277.X, v277.Y, v277.Z)
+		if p > 0 then
+			local v53 = (v51.p - v27) / p
+			v52 ..= string.format("Velocity: (%.1f, %.1f, %.1f)\n", v53.X, v53.Y, v53.Z)
 		end
 
-		local v278 = s1 .. string.format("FOV: %.1f\n", n9)
+		local text = v52 .. string.format("FOV: %.1f\n", fieldOfView2)
 
-		if u40 then
-			v278 ..= string.format("Tilt: %.1f°\n", (math.deg(u93.z)))
+		if v7 then
+			text ..= string.format("Tilt: %.1f°\n", (math.deg(v28.z)))
 		end
 
-		if u43 then
-			v278 = (((v278 .. string.format("Stiffness (Vel): %.1f\n", n1)) .. string.format("Stiffness (Pan): %.1f\n", n2)) .. string.format("Stiffness (FOV): %.1f\n", n3)) .. string.format("Stiffness (Roll): %.1f\n", n4)
+		if v8 then
+			text = (((text .. string.format("Stiffness (Vel): %.1f\n", v16)) .. string.format("Stiffness (Pan): %.1f\n", v17)) .. string.format("Stiffness (FOV): %.1f\n", v18)) .. string.format("Stiffness (Roll): %.1f\n", v19)
 		end
 
-		if u37 then
-			v278 = ((v278 .. string.format("Movement Speed: %.1f\n", t14.getNavSpeed())) .. string.format("Zoom Speed: %.1f\n", t14.getFovSpeed())) .. string.format("Tilt Speed: %.1f\n", t14.getRollSpeed())
+		if v6 then
+			text = ((text .. string.format("Movement Speed: %.1f\n", v38.getNavSpeed())) .. string.format("Zoom Speed: %.1f\n", v38.getFovSpeed())) .. string.format("Tilt Speed: %.1f\n", v38.getRollSpeed())
 		end
 
-		if u49 then
-			v278 = if not DepthOfFieldEffect or (not DepthOfFieldEffect.Parent or not DepthOfFieldEffect.Enabled) then v278 .. string.format("Custom Depth Of Field: Off\n") else ((((v278 .. string.format("Custom Depth Of Field: On\n")) .. string.format("Custom Depth Of Field Near Intensity: %.1f\n", DepthOfFieldEffect.NearIntensity)) .. string.format("Custom Depth Of Field Far Intensity: %.1f\n", DepthOfFieldEffect.FarIntensity)) .. string.format("Custom Depth Of Field Focus Distance: %.1f\n", DepthOfFieldEffect.FocusDistance)) .. string.format("Custom Depth Of Field Focus Radius: %.1f\n", DepthOfFieldEffect.InFocusRadius)
-		end
-
-		if u52 then
-			v278 = if not u83 or not (#t12 > 0) then v278 .. string.format("Player Lock: Off\n") else v278 .. string.format("Player Lock: %s\n", t12[n8].Name)
-		end
-
-		TextLabel.Text = v278
-	end
-
-	vector3 = v273.p
-	CurrentCamera.CFrame = v273
-	CurrentCamera.Focus = v273
-	CurrentCamera.FieldOfView = n9
-end
-local function CheckMouseLockAvailability() -- line: 1038
-	-- upvalues: Players (copy), GameSettings (copy)
-	local DevEnableMouseLock = Players.LocalPlayer.DevEnableMouseLock
-	local v280 = Players.LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.Scriptable
-	local v281 = GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch
-	local v282 = GameSettings.ComputerMovementMode == Enum.ComputerMovementMode.ClickToMove
-
-	return DevEnableMouseLock and (v281 and (not v282 and not v280))
-end
-
-t19 = {}
-
-local Default = nil
-local MouseIconEnabled = nil
-local CameraType = nil
-local Focus = nil
-local CurrentCameraCFrame = nil
-local FieldOfView = nil
-local t20 = {}
-local t21 = {
-	Backpack = true,
-	Chat = true,
-	Health = true,
-	PlayerList = true
-}
-local t22 = {
-	BadgesNotificationsActive = true,
-	PointsNotificationsActive = true
-}
-
-function t19.Push() -- line: 1071
-	-- upvalues: t21 (copy), StarterGui (copy), t22 (copy), LocalPlayer (ref), t20 (ref), u34 (ref), connection (ref), u58 (ref), u89 (ref), FieldOfView (ref), CurrentCamera (ref), CameraType (ref), CurrentCameraCFrame (ref), Focus (ref), MouseIconEnabled (ref), UserInputService (copy), u25 (ref), Players (copy), GameSettings (copy), Default (ref)
-	local g288 = nil
-	local DevEnableMouseLock = nil
-	local v291 = nil
-	local v292 = nil
-	local v290 = nil
-
-	for k in pairs(t21) do
-		t21[k] = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType[k])
-		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[k], false)
-	end
-
-	for k in pairs(t22) do
-		t22[k] = StarterGui:GetCore(k)
-		StarterGui:SetCore(k, false)
-	end
-
-	local PlayerGui2 = LocalPlayer:FindFirstChildOfClass("PlayerGui")
-
-	if PlayerGui2 then
-		for _, child in pairs(PlayerGui2:GetChildren()) do
-			if child:IsA("ScreenGui") and child.Enabled then
-				t20[#t20 + 1] = child
-				child.Enabled = false
+		if v10 then
+			if freecamDepthOfField and freecamDepthOfField.Parent and freecamDepthOfField.Enabled then
+				text = ((((text .. string.format("Custom Depth Of Field: On\n")) .. string.format(
+					"Custom Depth Of Field Near Intensity: %.1f\n",
+					freecamDepthOfField.NearIntensity
+				)) .. string.format("Custom Depth Of Field Far Intensity: %.1f\n", freecamDepthOfField.FarIntensity)) .. string.format(
+					"Custom Depth Of Field Focus Distance: %.1f\n",
+					freecamDepthOfField.FocusDistance
+				)) .. string.format("Custom Depth Of Field Focus Radius: %.1f\n", freecamDepthOfField.InFocusRadius)
+			else
+				text ..= string.format("Custom Depth Of Field: Off\n")
 			end
 		end
 
-		if u34 then
-			connection = PlayerGui2.ChildAdded:Connect(function(child) -- line: 1089
-				-- upvalues: t20 (ref), u58 (ref), u89 (ref)
-				if child:IsA("ScreenGui") and child.Enabled then
-					t20[#t20 + 1] = child
+		if v11 then
+			if v21 and #players > 0 then
+				text ..= string.format("Player Lock: %s\n", players[v24].Name)
+			else
+				text ..= string.format("Player Lock: Off\n")
+			end
+		end
 
-					if u58 then
-						child.Enabled = u89
+		freecamCustomGui.Text = text
+	end
 
-						return
+	v27 = v51.p
+
+	parent.CFrame = v51
+	parent.Focus = v51
+	parent.FieldOfView = fieldOfView2
+end
+
+local function CheckMouseLockAvailability() -- 1 equivalent call inferred from this helper
+	local devEnableMouseLock = Players.LocalPlayer.DevEnableMouseLock
+	local v46 = Players.LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.Scriptable
+	local v47 = gameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch
+	local v48 = gameSettings.ComputerMovementMode == Enum.ComputerMovementMode.ClickToMove
+
+	return devEnableMouseLock and v47 and not v48 and not v46
+end
+
+v = {}
+
+local mouseBehavior = nil
+local mouseIconEnabled = nil
+local cameraType = nil
+local focus = nil
+local cframe = nil
+local fieldOfView = nil
+local screenGuis = {}
+local coreGuiEnableds = { Backpack = true, Chat = true, Health = true, PlayerList = true }
+
+local cores = { BadgesNotificationsActive = true, PointsNotificationsActive = true }
+
+function v.Push()
+	for k in pairs(coreGuiEnableds) do
+		coreGuiEnableds[k] = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType[k])
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[k], false)
+	end
+
+	for k in pairs(cores) do
+		cores[k] = StarterGui:GetCore(k)
+		StarterGui:SetCore(k, false)
+	end
+
+	local playerGui2 = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+
+	if playerGui2 then
+		for _, screenGui in pairs(playerGui2:GetChildren()) do
+			if not (screenGui:IsA("ScreenGui") and screenGui.Enabled) then
+				continue
+			end
+
+			screenGuis[#screenGuis + 1] = screenGui
+			screenGui.Enabled = false
+		end
+
+		if v5 then
+			childAddedConnection = playerGui2.ChildAdded:Connect(function(screenGui)
+				if screenGui:IsA("ScreenGui") and screenGui.Enabled then
+					screenGuis[#screenGuis + 1] = screenGui
+
+					if v13 then
+						screenGui.Enabled = enabled
+					else
+						screenGui.Enabled = false
 					end
-
-					child.Enabled = false
 				end
 			end)
 		end
 	end
 
-	FieldOfView = CurrentCamera.FieldOfView
-	CurrentCamera.FieldOfView = 70
-	CameraType = CurrentCamera.CameraType
-	CurrentCamera.CameraType = Enum.CameraType.Custom
-	CurrentCameraCFrame = CurrentCamera.CFrame
-	Focus = CurrentCamera.Focus
-	MouseIconEnabled = UserInputService.MouseIconEnabled
+	fieldOfView = parent.FieldOfView
+	parent.FieldOfView = 70
+
+	cameraType = parent.CameraType
+	parent.CameraType = Enum.CameraType.Custom
+
+	cframe = parent.CFrame
+	focus = parent.Focus
+
+	mouseIconEnabled = UserInputService.MouseIconEnabled
 	UserInputService.MouseIconEnabled = false
 
-	repeat
-		if g288 or u25 then
-			if not g288 then
-				DevEnableMouseLock = Players.LocalPlayer.DevEnableMouseLock
-				v290 = Players.LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.Scriptable
-				v291 = GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch
-				v292 = GameSettings.ComputerMovementMode == Enum.ComputerMovementMode.ClickToMove
-			end
-
-			if g288 or DevEnableMouseLock and (v291 and (not v292 and not v290)) then
-				if not g288 then
-					Default = Enum.MouseBehavior.Default
-				end
-
-				g288 = false
-				UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-
-				return
-			end
+	if v2 then
+		if CheckMouseLockAvailability() then -- inferred equivalent call
+			mouseBehavior = Enum.MouseBehavior.Default
+		else
+			mouseBehavior = UserInputService.MouseBehavior
 		end
+	else
+		mouseBehavior = UserInputService.MouseBehavior
+	end
 
-		Default = UserInputService.MouseBehavior
-		g288 = true
-	until not g288
+	UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 end
-function t19.Pop() -- line: 1123
-	-- upvalues: t21 (copy), StarterGui (copy), t22 (copy), t20 (ref), u58 (ref), Freecam (ref), u34 (ref), connection (ref), CurrentCamera (ref), FieldOfView (ref), CameraType (ref), CurrentCameraCFrame (ref), Focus (ref), UserInputService (copy), MouseIconEnabled (ref), Default (ref)
-	for k, v in pairs(t21) do
-		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[k], v)
+
+function v.Pop()
+	for k, v47 in pairs(coreGuiEnableds) do
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType[k], v47)
 	end
 
-	for k, v in pairs(t22) do
-		StarterGui:SetCore(k, v)
+	for k, v47 in pairs(cores) do
+		StarterGui:SetCore(k, v47)
 	end
 
-	for _, v in pairs(t20) do
-		if u58 then
-			if v.Parent and v ~= Freecam then
-				v.Enabled = true
+	for _, v47 in pairs(screenGuis) do
+		if v13 then
+			if v47.Parent and v47 ~= freecam then
+				v47.Enabled = true
 			end
-		elseif v.Parent then
-			v.Enabled = true
+		elseif v47.Parent then
+			v47.Enabled = true
 		end
 	end
 
-	if u34 then
-		if connection then
-			connection:Disconnect()
-			connection = nil
+	if v5 then
+		if childAddedConnection then
+			childAddedConnection:Disconnect()
+			childAddedConnection = nil
 		end
 
-		t20 = {}
+		screenGuis = {}
 	end
 
-	CurrentCamera.FieldOfView = FieldOfView
-	FieldOfView = nil
-	CurrentCamera.CameraType = CameraType
-	CameraType = nil
-	CurrentCamera.CFrame = CurrentCameraCFrame
-	CurrentCameraCFrame = nil
-	CurrentCamera.Focus = Focus
-	Focus = nil
-	UserInputService.MouseIconEnabled = MouseIconEnabled
-	MouseIconEnabled = nil
-	UserInputService.MouseBehavior = Default
-	Default = nil
+	parent.FieldOfView = fieldOfView
+	fieldOfView = nil
+
+	parent.CameraType = cameraType
+	cameraType = nil
+
+	parent.CFrame = cframe
+	cframe = nil
+
+	parent.Focus = focus
+	focus = nil
+
+	UserInputService.MouseIconEnabled = mouseIconEnabled
+	mouseIconEnabled = nil
+
+	UserInputService.MouseBehavior = mouseBehavior
+	mouseBehavior = nil
 end
-function t19.getScreenGuis() -- line: 1169
-	-- upvalues: t20 (ref)
-	return t20
+
+function v.getScreenGuis()
+	return screenGuis
 end
 
-local function removePlayerFromList(p43) -- line: 1174
-	-- upvalues: t12 (ref), n8 (ref), u83 (ref)
-	for i, v in ipairs(t12) do
-		if v == p43 then
-			table.remove(t12, i)
-
-			if i == n8 and u83 then
-				u83 = false
-				n8 = 1
-			end
-
-			if i < n8 then
-				n8 -= 1
-			end
-
-			if not (n8 > #t12) and not (n8 < 1) then
-				return
-			end
-
-			n8 = 1
-
-			return
+local function removePlayerFromList(p)
+	for i, v47 in ipairs(players) do
+		if v47 ~= p then
+			continue
 		end
+
+		table.remove(players, i)
+
+		if v24 == i and v21 then
+			v21 = false
+			v24 = 1
+		end
+
+		if i < v24 then
+			v24 -= 1
+		end
+
+		if v24 > #players or v24 < 1 then
+			v24 = 1
+			break
+		end
+
+		break
 	end
 end
-local function initializePlayerList() -- line: 1198
-	-- upvalues: t12 (ref), Players (copy), LocalPlayer (ref), n8 (ref), connection4 (ref), connection5 (ref), removePlayerFromList (copy)
-	t12 = Players:GetPlayers()
 
-	for i, v in ipairs(t12) do
-		if v == LocalPlayer then
-			n8 = i
+local function initializePlayerList()
+	players = Players:GetPlayers()
 
+	for i, v47 in ipairs(players) do
+		if v47 == LocalPlayer then
+			v24 = i
 			break
 		end
 	end
 
-	connection4 = Players.PlayerAdded:Connect(function(player) -- line: 1208
-		-- upvalues: t12 (ref)
-		table.insert(t12, player)
+	playerAddedConnection = Players.PlayerAdded:Connect(function(player)
+		table.insert(players, player)
 	end)
-	connection5 = Players.PlayerRemoving:Connect(removePlayerFromList)
+
+	playerRemovingConnection = Players.PlayerRemoving:Connect(removePlayerFromList)
 end
-local function StartFreecam() -- line: 1215
-	-- upvalues: u52 (ref), initializePlayerList (copy), u46 (ref), u28 (ref), CurrentCamera (ref), u40 (ref), u93 (ref), vector3 (ref), n9 (ref), v95 (copy), v96 (copy), v97 (copy), v98 (copy), u58 (ref), u43 (ref), n1 (ref), n2 (ref), n3 (ref), n4 (ref), PlayerGui (ref), LocalPlayer (ref), Freecam (ref), TextLabel (ref), t19 (ref), u49 (ref), DepthOfFieldEffect (ref), RunService (copy), StepFreecam (copy), t14 (copy)
-	if u52 then
+
+local function StartFreecam()
+	if v11 then
 		initializePlayerList()
 	end
 
-	if not u46 and u28 then
+	if not v9 and v3 then
 		script:SetAttribute("FreecamEnabled", true)
 	end
 
-	local CurrentCameraCFrame2 = CurrentCamera.CFrame
+	local cframe2 = parent.CFrame
 
-	if u40 then
-		u93 = Vector3.new(CurrentCameraCFrame2:toEulerAnglesYXZ())
+	if v7 then
+		v28 = Vector3.new(cframe2:toEulerAnglesYXZ())
 	else
-		u93 = Vector2.new(CurrentCameraCFrame2:toEulerAnglesYXZ())
+		v28 = Vector2.new(cframe2:toEulerAnglesYXZ())
 	end
 
-	vector3 = CurrentCameraCFrame2.p
-	n9 = CurrentCamera.FieldOfView
-	v95:Reset((Vector3.new()))
-	v96:Reset(Vector2.new())
-	v97:Reset(0)
+	v27 = cframe2.p
+	fieldOfView2 = parent.FieldOfView
 
-	if u40 then
-		v98:Reset(0)
+	v30:Reset((Vector3.new()))
+	v32:Reset(Vector2.new())
+	v36:Reset(0)
+
+	if v7 then
+		v37:Reset(0)
 	end
 
-	if not u58 and u43 then
-		n1 = 1.5
-		n2 = 1
-		n3 = 4
-		n4 = 1
+	if not v13 and v8 then
+		v16 = 1.5
+		v17 = 1
+		v18 = 4
+		v19 = 1
 	end
 
-	if u58 then
-		PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-		Freecam = PlayerGui:WaitForChild("Freecam")
+	if v13 then
+		playerGui = LocalPlayer:WaitForChild("PlayerGui")
+		freecam = playerGui:WaitForChild("Freecam")
 
-		if not TextLabel or not TextLabel.Parent then
-			TextLabel = Instance.new("TextLabel")
-			TextLabel.Name = "FreecamCustomGui"
-			TextLabel.TextColor3 = Color3.new(1, 1, 1)
-			TextLabel.Font = Enum.Font.SourceSansBold
-			TextLabel.TextSize = 20
-			TextLabel.TextStrokeTransparency = 0
-			TextLabel.BackgroundTransparency = 1
-			TextLabel.TextWrapped = true
-			TextLabel.TextXAlignment = Enum.TextXAlignment.Right
-			TextLabel.AutomaticSize = Enum.AutomaticSize.Y
-			TextLabel.AnchorPoint = Vector2.new(1, 1)
-			TextLabel.Position = UDim2.new(1, -10, 1, -10)
-			TextLabel.Size = UDim2.new(0, 400, 0, 0)
-			TextLabel.Parent = Freecam
+		if not (freecamCustomGui and freecamCustomGui.Parent) then
+			freecamCustomGui = Instance.new("TextLabel")
+			freecamCustomGui.Name = "FreecamCustomGui"
+			freecamCustomGui.TextColor3 = Color3.new(1, 1, 1)
+			freecamCustomGui.Font = Enum.Font.SourceSansBold
+			freecamCustomGui.TextSize = 20
+			freecamCustomGui.TextStrokeTransparency = 0
+			freecamCustomGui.BackgroundTransparency = 1
+			freecamCustomGui.TextWrapped = true
+			freecamCustomGui.TextXAlignment = Enum.TextXAlignment.Right
+			freecamCustomGui.AutomaticSize = Enum.AutomaticSize.Y
+			freecamCustomGui.AnchorPoint = Vector2.new(1, 1)
+			freecamCustomGui.Position = UDim2.new(1, -10, 1, -10)
+			freecamCustomGui.Size = UDim2.new(0, 400, 0, 0)
+			freecamCustomGui.Parent = freecam
 		end
 	end
 
-	t19.Push()
+	v.Push()
 
-	if u49 and (not DepthOfFieldEffect or not DepthOfFieldEffect.Parent) then
-		DepthOfFieldEffect = Instance.new("DepthOfFieldEffect")
-		DepthOfFieldEffect.Enabled = false
-		DepthOfFieldEffect.Name = "FreecamDepthOfField"
-		DepthOfFieldEffect.Parent = CurrentCamera
+	if v10 and not (freecamDepthOfField and freecamDepthOfField.Parent) then
+		freecamDepthOfField = Instance.new("DepthOfFieldEffect")
+		freecamDepthOfField.Enabled = false
+		freecamDepthOfField.Name = "FreecamDepthOfField"
+		freecamDepthOfField.Parent = parent
 	end
 
 	RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, StepFreecam)
-	t14.StartCapture()
+	v38.StartCapture()
 end
-local function StopFreecam() -- line: 1287
-	-- upvalues: u46 (ref), u28 (ref), u52 (ref), connection4 (ref), connection5 (ref), u83 (ref), n8 (ref), t12 (ref), u49 (ref), DepthOfFieldEffect (ref), t11 (ref), connection2 (ref), connection3 (ref), u58 (ref), Freecam (ref), u89 (ref), u90 (ref), t14 (copy), RunService (copy), t19 (ref)
-	if not u46 and u28 then
+
+local function StopFreecam()
+	if not v9 and v3 then
 		script:SetAttribute("FreecamEnabled", false)
 	end
 
-	if u52 then
-		if connection4 then
-			connection4:Disconnect()
-			connection4 = nil
+	if v11 then
+		if playerAddedConnection then
+			playerAddedConnection:Disconnect()
+			playerAddedConnection = nil
 		end
 
-		if connection5 then
-			connection5:Disconnect()
-			connection5 = nil
+		if playerRemovingConnection then
+			playerRemovingConnection:Disconnect()
+			playerRemovingConnection = nil
 		end
 
-		u83 = false
-		n8 = 1
-		t12 = {}
+		v21 = false
+		v24 = 1
+		players = {}
 	end
 
-	if u49 and DepthOfFieldEffect and DepthOfFieldEffect.Parent then
-		if DepthOfFieldEffect.Enabled then
-			for _, v in ipairs(t11) do
-				if v.Parent then
-					v.Enabled = true
+	if v10 and freecamDepthOfField and freecamDepthOfField.Parent then
+		if freecamDepthOfField.Enabled then
+			for _, v47 in ipairs(depthOfFieldEffects) do
+				if v47.Parent then
+					v47.Enabled = true
 				end
 			end
 
-			if connection2 then
-				connection2:Disconnect()
-				connection2 = nil
+			if childAddedConnection2 then
+				childAddedConnection2:Disconnect()
+				childAddedConnection2 = nil
 			end
 
-			if connection3 then
-				connection3:Disconnect()
-				connection3 = nil
+			if childAddedConnection3 then
+				childAddedConnection3:Disconnect()
+				childAddedConnection3 = nil
 			end
 
-			t11 = {}
+			depthOfFieldEffects = {}
 		end
 
-		DepthOfFieldEffect.Enabled = false
+		freecamDepthOfField.Enabled = false
 	end
 
-	if u58 then
-		if Freecam and Freecam.Parent then
-			Freecam.Enabled = false
+	if v13 then
+		if freecam and freecam.Parent then
+			freecam.Enabled = false
 		end
 
-		u89 = false
-		u90 = false
+		enabled = false
+		v26 = false
 	end
 
-	t14.StopCapture()
+	v38.StopCapture()
 	RunService:UnbindFromRenderStep("Freecam")
-	t19.Pop()
+	v.Pop()
 end
 
-local u138 = false
+local v47 = false
 
-local function ToggleFreecam() -- line: 1348
-	-- upvalues: u138 (ref), StopFreecam (copy), StartFreecam (copy), u46 (ref)
-	if u138 then
+local function ToggleFreecam() -- 1 equivalent call inferred from this helper
+	if v47 then
 		StopFreecam()
 	else
 		StartFreecam()
 	end
 
-	u138 = not u138
+	v47 = not v47
 
-	if u46 then
-		script:SetAttribute("FreecamEnabled", u138)
+	if v9 then
+		script:SetAttribute("FreecamEnabled", v47)
 	end
 end
-local function CheckMacro(p44) -- line: 1360
-	-- upvalues: UserInputService (copy), u138 (ref), StopFreecam (copy), StartFreecam (copy), u46 (ref)
-	for i = 1, #p44 - 1 do
-		if not UserInputService:IsKeyDown(p44[i]) then
+
+local function CheckMacro(list)
+	for i = 1, #list - 1 do
+		if not UserInputService:IsKeyDown(list[i]) then
 			return
 		end
 	end
 
-	if u138 then
-		StopFreecam()
-	else
-		StartFreecam()
-	end
-
-	u138 = not u138
-
-	if u46 then
-		script:SetAttribute("FreecamEnabled", u138)
-	end
+	ToggleFreecam() -- inferred equivalent call
 end
-local function HandleActivationInput(_, p46, p47) -- line: 1369
-	-- upvalues: t1 (copy), CheckMacro (copy)
-	if p46 == Enum.UserInputState.Begin and p47.KeyCode == t1[#t1] then
-		CheckMacro(t1)
+
+local function HandleActivationInput(_, p, p2)
+	if p == Enum.UserInputState.Begin and p2.KeyCode == v14[#v14] then
+		CheckMacro(v14)
 	end
 
 	return Enum.ContextActionResult.Pass
 end
 
-ContextActionService:BindActionAtPriority("FreecamToggle", HandleActivationInput, false, LowValue, t1[#t1])
+ContextActionService:BindActionAtPriority("FreecamToggle", HandleActivationInput, false, value, v14[#v14])
 
-if u46 or u28 then
-	script:SetAttribute("FreecamEnabled", u138)
-	script:GetAttributeChangedSignal("FreecamEnabled"):Connect(function() -- line: 1382
-		-- upvalues: u138 (ref), StartFreecam (copy), StopFreecam (copy)
-		local FreecamEnabled = script:GetAttribute("FreecamEnabled")
+if v9 or v3 then
+	script:SetAttribute("FreecamEnabled", v47)
+	script:GetAttributeChangedSignal("FreecamEnabled"):Connect(function()
+		local freecamEnabled = script:GetAttribute("FreecamEnabled")
 
-		if typeof(FreecamEnabled) ~= "boolean" then
-			script:SetAttribute("FreecamEnabled", u138)
-
-			return
-		end
-
-		if FreecamEnabled ~= u138 then
-			if FreecamEnabled then
+		if typeof(freecamEnabled) ~= "boolean" then
+			script:SetAttribute("FreecamEnabled", v47)
+		elseif freecamEnabled ~= v47 then
+			if freecamEnabled then
 				StartFreecam()
-				u138 = true
-
-				return
+				v47 = true
+			else
+				StopFreecam()
+				v47 = false
 			end
-
-			StopFreecam()
-			u138 = false
 		end
 	end)
 end

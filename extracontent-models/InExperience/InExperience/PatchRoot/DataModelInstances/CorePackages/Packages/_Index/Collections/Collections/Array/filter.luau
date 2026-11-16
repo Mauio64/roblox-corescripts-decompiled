@@ -1,45 +1,45 @@
 local __DEV__ = _G.__DEV__
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.ES7Types)
 
-require(ParentParent.ES7Types)
-
-return function(p1, p2: ((...any) -> ...any), p3) -- line: 27
-	-- upvalues: __DEV__ (copy)
+return function(list, callback, p)
 	if __DEV__ then
-		if typeof(p1) ~= "table" then
-			error(string.format("Array.filter called on %s", (typeof(p1))))
+		if typeof(list) ~= "table" then
+			error(string.format("Array.filter called on %s", (typeof(list))))
 		end
 
-		if typeof(p2) ~= "function" then
+		if typeof(callback) ~= "function" then
 			error("callback is not a function")
 		end
 	end
 
-	local v6 = #p1
-	local t1 = {}
-	local n1 = 1
+	local count = #list
+	local result = {}
+	local v = 1
 
-	if p3 == nil then
-		for i = 1, v6 do
-			local v10 = p1[i]
+	if p == nil then
+		for i = 1, count do
+			local item = list[i]
 
-			if v10 ~= nil and p2(v10, i, p1) then
-				t1[n1] = v10
-				n1 += 1
+			if not (item ~= nil and callback(item, i, list)) then
+				continue
 			end
-		end
 
-		return t1
+			result[v] = item
+			v += 1
+		end
+	else
+		for i = 1, count do
+			local item = list[i]
+
+			if not (item ~= nil and callback(p, item, i, list)) then
+				continue
+			end
+
+			result[v] = item
+			v += 1
+		end
 	end
 
-	for i = 1, v6 do
-		local v12 = p1[i]
-
-		if v12 ~= nil and p2(p3, v12, i, p1) then
-			t1[n1] = v12
-			n1 += 1
-		end
-	end
-
-	return t1
+	return result
 end

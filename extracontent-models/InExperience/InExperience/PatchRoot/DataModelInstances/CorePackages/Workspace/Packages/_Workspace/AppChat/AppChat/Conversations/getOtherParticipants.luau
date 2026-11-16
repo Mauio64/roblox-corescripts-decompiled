@@ -1,12 +1,11 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function(t1: {[any]: any}?, p1) -- line: 6
-	-- upvalues: Cryo (copy)
-	if t1 and t1.participants then
-		return Cryo.List.filter(t1.participants, function(p2) -- line: 8
-			-- upvalues: p1 (copy)
-			return tostring(p2) ~= tostring(p1)
+local Cryo = require(parent.Cryo)
+
+return function(p, p2)
+	if p and p.participants then
+		return Cryo.List.filter(p.participants, function(p3): boolean
+			return tostring(p3) ~= tostring(p2)
 		end)
 	end
 

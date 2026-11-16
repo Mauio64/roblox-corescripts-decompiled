@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)("UpdateAveragePing", function(p1) -- line: 4
-	return {
-		AveragePing = p1
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action("UpdateAveragePing", function(averagePing)
+	return { AveragePing = averagePing }
 end)

@@ -1,155 +1,164 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+
+local Flags = require(Foundation.Utility.Flags)
 local PopoverAlign = require(Foundation.Enums.PopoverAlign)
 local PopoverSide = require(Foundation.Enums.PopoverSide)
+local Positioning = {}
 
-return {
-	adjustForOnScreenKeyboard = function(rect: Rect, vector2: Vector2, vector2_2: Vector2) -- line: 93
-		local v23 = vector2 - vector2_2
-		local v24 = math.min(rect.Max.Y, v23.Y)
+function Positioning.adjustForOnScreenKeyboard(rect: Rect, vector2: Vector2, vector2_2: Vector2)
+	local v = vector2 - vector2_2
 
-		return Rect.new(rect.Min, Vector2.new(rect.Max.X, v24))
-	end,
-	isOnScreen = function(rect: Rect, rect2: Rect) -- line: 25
-		if rect.Min.X > rect2.Max.X or (rect.Max.X < rect2.Min.X or rect.Min.Y > rect2.Max.Y or rect.Max.Y < rect2.Min.Y) then
-			return false
+	local v2 = math.min(rect.Max.Y, v.Y)
+	return Rect.new(rect.Min, Vector2.new(rect.Max.X, v2))
+end
+
+function Positioning.isOnScreen(rect: Rect, rect2: Rect): boolean
+	return not (rect.Min.X > rect2.Max.X or rect.Max.X < rect2.Min.X or rect.Min.Y > rect2.Max.Y or rect.Max.Y < rect2.Min.Y)
+end
+
+function Positioning.calculateSide(p, rect: Rect, rect2: Rect, vector2: Vector2)
+	if p == PopoverSide.Top then
+		if rect.Min.Y - vector2.Y < rect2.Min.Y and rect.Max.Y + vector2.Y < rect2.Max.Y then
+			return PopoverSide.Bottom
 		end
-
-		return true
-	end,
-	calculateSide = function(p1, rect: Rect, rect3: Rect, vector2: Vector2) -- line: 38
-		-- upvalues: PopoverSide (copy)
-		if p1 == PopoverSide.Top then
-			if rect.Min.Y - vector2.Y < rect3.Min.Y and rect.Max.Y + vector2.Y < rect3.Max.Y then
-				return PopoverSide.Bottom
-			end
-		elseif p1 == PopoverSide.Bottom then
-			if rect.Max.Y + vector2.Y > rect3.Max.Y and rect.Min.Y - vector2.Y > rect3.Min.Y then
-				return PopoverSide.Top
-			end
-		elseif p1 == PopoverSide.Left then
-			if rect.Min.X - vector2.X < rect3.Min.X and rect.Max.X + vector2.X < rect3.Max.X then
-				return PopoverSide.Right
-			end
-		elseif p1 == PopoverSide.Right and rect.Max.X + vector2.X > rect3.Max.X and rect.Min.X - vector2.X > rect3.Min.X then
-			return PopoverSide.Left
+	elseif p == PopoverSide.Bottom then
+		if rect.Max.Y + vector2.Y > rect2.Max.Y and rect.Min.Y - vector2.Y > rect2.Min.Y then
+			return PopoverSide.Top
 		end
-
-		return p1
-	end,
-	calculatePositions = function(p2, n1: number, p3, n2: number, rect: Rect, rect4: Rect, n3: number, vector2: Vector2) -- line: 102
-		-- upvalues: PopoverSide (copy), PopoverAlign (copy)
-		local t1 = {
-			X = 0,
-			Y = 0
-		}
-		local t2 = {
-			X = 0,
-			Y = 0
-		}
-		local t3 = {
-			X = 0,
-			Y = 0
-		}
-		local v36 = p2 == PopoverSide.Top or p2 == PopoverSide.Bottom
-		local v37 = p2 == PopoverSide.Top or p2 == PopoverSide.Left
-		local s1 = "X"
-		local s2 = "Y"
-		local rectHeight = rect.Height
-		local MinX = rect.Min.X
-		local MinY = rect.Min.Y
-		local vector2Y = vector2.Y
-		local vector2X = vector2.X
-		local MaxX = rect.Max.X
-		local MaxY = rect.Max.Y
-		local MinY2 = rect4.Min.Y
-		local MaxY2 = rect4.Max.Y
-		local MinX2 = rect4.Min.X
-		local MaxX2 = rect4.Max.X
-
-		if v36 then
-			s1 = "Y"
-			s2 = "X"
-			rectHeight = rect.Width
-			MinX = rect.Min.Y
-			MinY = rect.Min.X
-			vector2Y = vector2.X
-			vector2X = vector2.Y
-			MaxX = rect.Max.Y
-			MaxY = rect.Max.X
-			MinY2 = rect4.Min.X
-			MaxY2 = rect4.Max.X
-			MinX2 = rect4.Min.Y
-			MaxX2 = rect4.Max.Y
+	elseif p == PopoverSide.Left then
+		if rect.Min.X - vector2.X < rect2.Min.X and rect.Max.X + vector2.X < rect2.Max.X then
+			return PopoverSide.Right
 		end
+	elseif p == PopoverSide.Right and rect.Max.X + vector2.X > rect2.Max.X and rect.Min.X - vector2.X > rect2.Min.X then
+		return PopoverSide.Left
+	end
 
-		local v51 = n1 + n3
+	return p
+end
 
-		if v37 then
-			t1[s1] = MinX - v51 - vector2X
-			t2[s1] = vector2X
-		else
-			t1[s1] = MaxX + v51
-			t2[s1] = 0
-		end
+function Positioning.calculatePositions(p, p2: number, p3, p4: number, rect: Rect, rect2: Rect, p5: number, vector2: Vector2)
+	local v = { X = 0, Y = 0 }
+	local v2 = { X = 0, Y = 0 }
+	local v3 = { X = 0, Y = 0 }
 
-		if p3 == PopoverAlign.Start then
-			t1[s2] = MinY + n2
-		elseif p3 == PopoverAlign.Center then
-			t1[s2] = MinY + rectHeight / 2 - vector2Y / 2 + n2
-		else
-			t1[s2] = MaxY + -n2
-			t3[s2] = 1
-		end
+	local v4 = p == PopoverSide.Top or p == PopoverSide.Bottom
 
-		local v52 = t1[s2] - t3[s2] * vector2Y
-		local v53 = v52 + vector2Y
+	local v5 = p == PopoverSide.Top or p == PopoverSide.Left
 
-		if v52 < MinY2 then
-			t3[s2] = 0
-			t1[s2] = MinY2
-		elseif MaxY2 < v53 then
-			t3[s2] = 1
-			t1[s2] = MaxY2
-		end
+	local v6 = rect.Height
+	local v7 = rect.Min.X
+	local v8 = rect.Min.Y
+	local v9 = vector2.Y
+	local v10 = vector2.X
+	local v11 = rect.Max.X
+	local v12 = rect.Max.Y
+	local v13 = rect2.Min.Y
+	local v14 = rect2.Max.Y
+	local v15 = rect2.Min.X
+	local v16 = rect2.Max.X
+	local v17, v18
 
-		local v54 = t1[s2] - t3[s2] * vector2Y
-		local v55 = v54 + vector2Y
-		local v56 = math.max(MinY, v54)
-		local v57 = math.min(MaxY, v55)
+	if v4 then
+		v6 = rect.Width
+		v7 = rect.Min.Y
+		v8 = rect.Min.X
+		v9 = vector2.X
+		v10 = vector2.Y
+		v11 = rect.Max.Y
+		v12 = rect.Max.X
+		v13 = rect2.Min.X
+		v14 = rect2.Max.X
+		v15 = rect2.Min.Y
+		v16 = rect2.Max.Y
+		v17 = "Y"
+		v18 = "X"
+	else
+		v17 = "X"
+		v18 = "Y"
+	end
 
-		t2[s2] = ((if not (v56 <= v57) then (if not (v55 < MinY) then v54 + n3 else v55 - n3) else (v56 + v57) / 2)) - t1[s2]
-		t1[s1] = math.clamp(t1[s1], MinX2, (math.max(MaxX2 - vector2X - v51, 0)))
-		t1.X = t1.X - rect4.Min.X
-		t1.Y = t1.Y - rect4.Min.Y
+	local v19 = p2 + p5
 
-		return Vector2.new(t1.X, t1.Y), Vector2.new(t2.X, t2.Y), Vector2.new(t3.X, t3.Y)
-	end,
-	calculatePopoverBounds = function(p4, n4: number, n5: number, n6: number, vector2: Vector2) -- line: 9
-		-- upvalues: PopoverSide (copy)
-		if p4 == PopoverSide.Top or p4 == PopoverSide.Bottom then
-			return vector2 + Vector2.new(n5, n4 + n6)
-		end
+	if v5 then
+		v[v17] = v7 - v19 - v10
+		v2[v17] = v10
+	else
+		v[v17] = v11 + v19
+		v2[v17] = 0
+	end
 
-		return vector2 + Vector2.new(n4 + n6, n5)
-	end,
-	calculateAlign = function(p5, p6, rect: Rect, rect5: Rect, vector2: Vector2) -- line: 59
-		-- upvalues: PopoverSide (copy), PopoverAlign (copy)
-		if p5 == PopoverSide.Top or p5 == PopoverSide.Bottom then
-			if p6 == PopoverAlign.Start then
-				if rect.Min.X + vector2.X > rect5.Max.X then
-					return PopoverAlign.End
-				end
-			elseif p6 == PopoverAlign.End and rect.Max.X - vector2.X < rect5.Min.X then
-				return PopoverAlign.Start
-			end
-		elseif p6 == PopoverAlign.Start then
-			if rect.Min.Y + vector2.Y > rect5.Max.Y then
+	if p3 == PopoverAlign.Start then
+		v[v18] = v8 + p4
+	elseif p3 == PopoverAlign.Center then
+		v[v18] = v8 + v6 / 2 - v9 / 2 + p4
+	else
+		v[v18] = v12 + -p4
+		v3[v18] = 1
+	end
+
+	local v20 = v[v18] - v3[v18] * v9
+
+	local v21 = v20 + v9
+
+	if v20 < v13 then
+		v3[v18] = 0
+		v[v18] = v13
+	elseif v14 < v21 then
+		v3[v18] = 1
+		v[v18] = v14
+	end
+
+	local v22 = v[v18] - v3[v18] * v9
+	local v23 = v22 + v9
+
+	local v24 = math.max(v8, v22)
+	local v25 = math.min(v12, v23)
+	local v26
+
+	if v24 <= v25 then
+		v26 = (v24 + v25) / 2
+	elseif v23 < v8 then
+		v26 = v23 - p5
+	else
+		v26 = v22 + p5
+	end
+
+	v2[v18] = v26 - v[v18]
+
+	v[v17] = math.clamp(v[v17], v15, (math.max(v16 - v10 - v19, not Flags.FoundationPopoverClampMinBound and 0 or v15)))
+
+	v.X -= rect2.Min.X
+	v.Y -= rect2.Min.Y
+
+	return Vector2.new(v.X, v.Y), Vector2.new(v2.X, v2.Y), Vector2.new(v3.X, v3.Y)
+end
+
+function Positioning.calculatePopoverBounds(p, p2: number, p3: number, p4: number, vector2: Vector2)
+	if p == PopoverSide.Top or p == PopoverSide.Bottom then
+		return vector2 + Vector2.new(p3, p2 + p4)
+	end
+
+	return vector2 + Vector2.new(p2 + p4, p3)
+end
+
+function Positioning.calculateAlign(p, p2, rect: Rect, rect2: Rect, vector2: Vector2)
+	if p == PopoverSide.Top or p == PopoverSide.Bottom then
+		if p2 == PopoverAlign.Start then
+			if rect.Min.X + vector2.X > rect2.Max.X then
 				return PopoverAlign.End
 			end
-		elseif p6 == PopoverAlign.End and rect.Max.Y - vector2.Y < rect5.Min.Y then
+		elseif p2 == PopoverAlign.End and rect.Max.X - vector2.X < rect2.Min.X then
 			return PopoverAlign.Start
 		end
-
-		return p6
+	elseif p2 == PopoverAlign.Start then
+		if rect.Min.Y + vector2.Y > rect2.Max.Y then
+			return PopoverAlign.End
+		end
+	elseif p2 == PopoverAlign.End and rect.Max.Y - vector2.Y < rect2.Min.Y then
+		return PopoverAlign.Start
 	end
-}
+
+	return p2
+end
+
+return Positioning

@@ -1,32 +1,33 @@
-local Parent = script:FindFirstAncestor("UserLib").Parent
+local parent = script:FindFirstAncestor("UserLib").Parent
+
 local Constants = require(script.Parent.Constants)
-local SharedFlags = require(Parent.SharedFlags)
-local t1 = {
+local SharedFlags = require(parent.SharedFlags)
+
+local v = {
 	[Constants.RbxthumbTypes.Avatar] = SharedFlags.FFlagAXBackgroundsInAvatarThumbnails,
 	[Constants.RbxthumbTypes.AvatarBust] = SharedFlags.FFlagAXBackgroundsInAvatarBustThumbnails,
 	[Constants.RbxthumbTypes.AvatarHeadShot] = SharedFlags.FFlagAXBackgroundsInHeadshotThumbnails,
 	[Constants.RbxthumbTypes.Outfit] = SharedFlags.FFlagAXBackgroundsInOutfitThumbnails
 }
 
-return function(s1: string, p1, n1: number, b1: boolean?, b2: boolean?, b3: boolean?) -- line: 14
-	-- upvalues: t1 (copy), Constants (copy)
-	local v11 = string.format("rbxthumb://type=%s&id=%s&w=%d&h=%d", p1, tostring(s1), n1, n1)
+return function(p: string, p2, p3: number, flag: boolean?, flag2: boolean?, flag3: boolean?)
+	local v2 = string.format("rbxthumb://type=%s&id=%s&w=%d&h=%d", p2, tostring(p), p3, p3)
 
-	if b1 then
-		v11 ..= "&filters=circular"
+	if flag then
+		v2 ..= "&filters=circular"
 	end
 
-	if b2 then
-		v11 ..= "&timestamp=" .. os.time()
+	if flag2 then
+		v2 ..= "&timestamp=" .. os.time()
 	end
 
-	if t1[p1] then
-		v11 ..= "&includeBackground=true"
+	if v[p2] then
+		v2 ..= "&includeBackground=true"
 	end
 
-	if b3 and p1 == Constants.RbxthumbTypes.AvatarHeadShot then
-		v11 ..= "&includeprofileframe=true"
+	if flag3 and p2 == Constants.RbxthumbTypes.AvatarHeadShot then
+		return v2 .. "&includeprofileframe=true"
 	end
 
-	return v11
+	return v2
 end

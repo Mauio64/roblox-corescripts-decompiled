@@ -1,28 +1,22 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-local function useUncontrolledState(b1: boolean?, p1: ((...any) -> ...any)) -- line: 6
-	-- upvalues: React (copy)
-	local v6, v7 = React.useState(b1 or false)
+local React = require(parent.React)
 
-	React.useEffect(function() -- line: 8
-		-- upvalues: b1 (copy), v7 (copy)
-		if b1 ~= nil then
-			v7(b1)
+local function useUncontrolledState(flag: boolean?, callback)
+	local state, setState = React.useState(flag or false)
+	React.useEffect(function()
+		if flag ~= nil then
+			setState(flag)
 		end
-	end, { b1 })
+	end, { flag })
 
-	return v6, (React.useCallback(function(b2: boolean) -- line: 14
-		-- upvalues: b1 (copy), v7 (copy), p1 (copy)
-		if b1 == nil then
-			v7(b2)
+	return state, (React.useCallback(function(flag2: boolean)
+		if flag == nil then
+			setState(flag2)
 		end
 
-		p1(b2)
-	end, {
-		b1,
-		p1
-	}))
+		callback(flag2)
+	end, { flag, callback }))
 end
 
 return useUncontrolledState

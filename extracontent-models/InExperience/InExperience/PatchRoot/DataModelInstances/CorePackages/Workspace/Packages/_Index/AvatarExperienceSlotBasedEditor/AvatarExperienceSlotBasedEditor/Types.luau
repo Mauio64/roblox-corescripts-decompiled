@@ -1,8 +1,8 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+require(parent.Foundation)
+require(parent.AXCommon)
+require(parent.AvatarExperienceModel)
 
-require(Parent.Foundation)
-require(Parent.AXCommon)
-require(script.Parent.Enums.AvatarEditorSubcategories)
 require(script.Parent.Enums.InventoryItemAvailability)
 require(script.Parent.Enums.InventoryItemType)
 

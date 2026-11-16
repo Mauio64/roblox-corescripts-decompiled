@@ -1,3 +1,1 @@
-return {
-	ItemIndex = "ITEMINDEX"
-}
+return { ItemIndex = "ITEMINDEX" }

@@ -1,23 +1,26 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Core = ParentParentParent.Core
-local ParentParentParentParent = ParentParentParent.Parent
-local t = require(ParentParentParentParent.t)
-local validateColorInfo = require(Core.Style.Validator.validateColorInfo)
-local validateFontInfo = require(Core.Style.Validator.validateFontInfo)
-local validateTypographyInfo = require(Core.Style.Validator.validateTypographyInfo)
-local Roact = require(ParentParentParentParent.Roact)
-local React = require(ParentParentParentParent.React)
-local withStyle = require(Core.Style.withStyle)
-local GenericTextLabel = require(ParentParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
-local IconSize = require(ParentParent.ImageSet.Enum.IconSize)
-local getIconSize = require(ParentParent.ImageSet.getIconSize)
-local Images = require(ParentParent.ImageSet.Images)
-local UIBloxConfig = require(ParentParentParent.UIBloxConfig)
-local v18 = Roact.PureComponent:extend("CellTailDescription")
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local core = parent2.Core
+local parent3 = parent2.Parent
 
-v18.validateProps = t.strictInterface({
+local t = require(parent3.t)
+local validateColorInfo = require(core.Style.Validator.validateColorInfo)
+local validateFontInfo = require(core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(core.Style.Validator.validateTypographyInfo)
+
+local Roact = require(parent3.Roact)
+local React = require(parent3.React)
+local withStyle = require(core.Style.withStyle)
+local GenericTextLabel = require(parent2.Core.Text.GenericTextLabel.GenericTextLabel)
+local ImageSetComponent = require(core.ImageSet.ImageSetComponent)
+local IconSize = require(parent.ImageSet.Enum.IconSize)
+local getIconSize = require(parent.ImageSet.getIconSize)
+local Images = require(parent.ImageSet.Images)
+local UIBloxConfig = require(parent2.UIBloxConfig)
+
+local extended = Roact.PureComponent:extend("CellTailDescription")
+
+extended.validateProps = t.strictInterface({
 	text = t.optional(t.string),
 	textColor = t.optional(validateColorInfo),
 	textFont = t.optional(t.union(validateFontInfo, validateTypographyInfo)),
@@ -26,86 +29,126 @@ v18.validateProps = t.strictInterface({
 	infoIcon = t.optional(t.string),
 	testId = t.optional(t.string)
 })
-v18.defaultProps = {
+
+extended.defaultProps = {
 	showArrow = false,
 	infoIcon = nil,
 	testId = "--uiblox-cell-tail-description"
 }
 
-function v18.init(p1) -- line: 44
-	-- upvalues: Roact (copy), GenericTextLabel (copy)
-	function p1.getDescription(p2, p3, p4, p5, p6) -- line: 45
-		-- upvalues: Roact (copy), GenericTextLabel (copy)
-		local v30 = nil
+function extended:init()
+	function self.getDescription(text, colorStyle, fontStyle, layoutOrder, callback)
+		local v = nil
 
-		if p2 then
-			if p6 then
-				v30 = p6()
+		if text then
+			if callback then
+				v = callback()
 			end
 
-			if not v30 then
-				v30 = Roact.createElement(GenericTextLabel, {
-					BackgroundTransparency = 1,
-					LayoutOrder = p5,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Text = p2,
-					colorStyle = p3,
-					fontStyle = p4
-				})
-			end
+			return v or Roact.createElement(GenericTextLabel, {
+				LayoutOrder = layoutOrder,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Text = text,
+				colorStyle = colorStyle,
+				fontStyle = fontStyle,
+				BackgroundTransparency = 1
+			})
 		end
 
-		return v30
+		return v
 	end
 end
-function v18.render(p7) -- line: 69
-	-- upvalues: withStyle (copy), Roact (copy), React (copy), ImageSetComponent (copy), UIBloxConfig (copy), getIconSize (copy), IconSize (copy), Images (copy)
-	local text = p7.props.text
-	local renderTextOverride = p7.props.renderTextOverride
-	local showArrow = p7.props.showArrow
-	local v24 = p7.props.infoIcon ~= nil
 
-	if not text and (not showArrow and not v24) then
-		return nil
-	end
+function extended.render(p)
+	local text = p.props.text
+	local renderTextOverride = p.props.renderTextOverride
+	local showArrow = p.props.showArrow
+	local v = p.props.infoIcon ~= nil
 
-	return withStyle(function(p8) -- line: 79
-		-- upvalues: p7 (copy), Roact (copy), React (copy), text (copy), renderTextOverride (copy), showArrow (copy), ImageSetComponent (copy), UIBloxConfig (copy), getIconSize (copy), IconSize (copy), Images (copy), v24 (copy)
-		local v32 = p7.props.textColor or p8.Theme.TextDefault
-		local v33 = p7.props.textFont or p8.Font.Body
+	if text or showArrow or v then
+		return withStyle(function(p2)
+			local textColor = p.props.textColor or p2.Theme.TextDefault
+			local textFont = p.props.textFont or p2.Font.Body
 
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			[React.Tag] = if not p7.props.testId then nil else `data-testid={ p7.props.testId }`
-		}, {
-			ListLayout = Roact.createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				FillDirection = Enum.FillDirection.Horizontal,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				Padding = UDim.new(0, 8)
-			}),
-			Description = p7.getDescription(text, v32, v33, 1, renderTextOverride),
-			RightArrow = showArrow and Roact.createElement(ImageSetComponent.Label, {
-				LayoutOrder = 2,
+			local createElement = Roact.createElement
+			local v2 = {
 				BackgroundTransparency = 1,
-				Size = if not UIBloxConfig.enableScalingForSomeEdpIcons then UDim2.fromOffset(getIconSize(IconSize.Small), getIconSize(IconSize.Small)) else UDim2.fromOffset(getIconSize(IconSize.Small, p8), getIconSize(IconSize.Small, p8)),
-				Image = Images["icons/navigation/pushRight_small"],
-				ImageColor3 = p8.Theme.TextEmphasis.Color,
-				ImageTransparency = p8.Theme.TextEmphasis.Transparency
-			}) or nil,
-			InfoIcon = v24 and Roact.createElement(ImageSetComponent.Label, {
-				LayoutOrder = 2,
 				BorderSizePixel = 0,
-				BackgroundTransparency = 1,
-				Size = if not UIBloxConfig.enableScalingForSomeEdpIcons then UDim2.fromOffset(getIconSize(IconSize.Small), getIconSize(IconSize.Small)) else UDim2.fromOffset(getIconSize(IconSize.Small, p8), getIconSize(IconSize.Small, p8)),
-				Image = p7.props.infoIcon,
-				ImageColor3 = p8.Theme.IconEmphasis.Color,
-				ImageTransparency = p8.Theme.IconEmphasis.Transparency
-			}) or nil
-		})
-	end)
+				AutomaticSize = Enum.AutomaticSize.XY
+			}
+			local tag = React.Tag
+			local v3
+
+			if p.props.testId then
+				v3 = `data-testid={p.props.testId}`
+			end
+
+			v2[tag] = v3
+			local v4 = {
+				ListLayout = Roact.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					Padding = UDim.new(0, 8)
+				}),
+				Description = p.getDescription(text, textColor, textFont, 1, renderTextOverride),
+				RightArrow = 0,
+				InfoIcon = 0
+			}
+			local rightArrow
+
+			if showArrow then
+				local createElement2 = Roact.createElement
+				local label = ImageSetComponent.Label
+				local size
+
+				if UIBloxConfig.enableScalingForSomeEdpIcons then
+					size = UDim2.fromOffset(getIconSize(IconSize.Small, p2), getIconSize(IconSize.Small, p2))
+				else
+					size = UDim2.fromOffset(getIconSize(IconSize.Small), getIconSize(IconSize.Small))
+				end
+
+				rightArrow = createElement2(label, {
+					LayoutOrder = 2,
+					Size = size,
+					BackgroundTransparency = 1,
+					Image = Images["icons/navigation/pushRight_small"],
+					ImageColor3 = p2.Theme.TextEmphasis.Color,
+					ImageTransparency = p2.Theme.TextEmphasis.Transparency
+				}) or nil
+			end
+
+			v4.RightArrow = rightArrow
+			local infoIcon
+
+			if v then
+				local createElement2 = Roact.createElement
+				local label = ImageSetComponent.Label
+				local size
+
+				if UIBloxConfig.enableScalingForSomeEdpIcons then
+					size = UDim2.fromOffset(getIconSize(IconSize.Small, p2), getIconSize(IconSize.Small, p2))
+				else
+					size = UDim2.fromOffset(getIconSize(IconSize.Small), getIconSize(IconSize.Small))
+				end
+
+				infoIcon = createElement2(label, {
+					LayoutOrder = 2,
+					Size = size,
+					Image = p.props.infoIcon,
+					ImageColor3 = p2.Theme.IconEmphasis.Color,
+					ImageTransparency = p2.Theme.IconEmphasis.Transparency,
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1
+				}) or nil
+			end
+
+			v4.InfoIcon = infoIcon
+			return createElement("Frame", v2, v4)
+		end)
+	end
+
+	return nil
 end
 
-return v18
+return extended

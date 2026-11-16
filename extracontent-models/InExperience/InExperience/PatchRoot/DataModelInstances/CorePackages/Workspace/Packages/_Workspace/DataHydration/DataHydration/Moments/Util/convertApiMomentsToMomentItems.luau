@@ -1,276 +1,511 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local MomentsTypes = require(DataHydrationParent.MomentsTypes)
+local parent = DataHydration.Parent
 
+local MomentsTypes = require(parent.MomentsTypes)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
+local GetFFlagMomentsRenderPostAssets = require(parent.MomentsCommon.GetFFlagMomentsRenderPostAssets)
 require(DataHydration.Moments.MomentsStoreTypes)
+local convertApiMomentComments = require(DataHydration.Moments.Util.convertApiMomentComments)
 
 local FFlagMomentsStickerOverlayNormalization = require(DataHydration.Moments.FFlagMomentsStickerOverlayNormalization)
-local FFlagMomentsRequireApiFeedItemId = require(DataHydration.Moments.FFlagMomentsRequireApiFeedItemId)
-local MomentStatus = MomentsTypes.Enums.MomentStatus
-local BuilderSansMedium = Enum.Font.BuilderSansMedium
-local color3 = Color3.new(0, 0, 0)
-local Center = Enum.TextXAlignment.Center
-local uDim2 = UDim2.fromScale(0.5, 0.5)
 
-local function toCaptureType(s1: string?) -- line: 26
-	if s1 == "Screenshot" then
+local FFlagMomentsComments = SharedFlags.FFlagMomentsComments
+local FFlagMomentsCommentsIxpEnabled = SharedFlags.FFlagMomentsCommentsIxpEnabled
+local FFlagProfileMomentSceneOutfitPoster = SharedFlags.FFlagProfileMomentSceneOutfitPoster
+local FFlagEnableMomentsCommentReporting = SharedFlags.FFlagEnableMomentsCommentReporting
+local FFlagMomentsRenderAvatarPostsInFeed = SharedFlags.FFlagMomentsRenderAvatarPostsInFeed
+local MomentStatus = MomentsTypes.Enums.MomentStatus
+
+local BuilderSansMedium = Enum.Font.BuilderSansMedium
+local color = Color3.new(0, 0, 0)
+
+local Center = Enum.TextXAlignment.Center
+
+local udim = UDim2.fromScale(0.5, 0.5)
+
+local function toCaptureType(captureType: string?) -- 1 equivalent call inferred from this helper
+	if captureType == "Screenshot" then
 		return Enum.CaptureType.Screenshot
 	end
 
 	return Enum.CaptureType.Video
 end
-local function toMomentStatus(s2: string?) -- line: 34
-	-- upvalues: MomentStatus (copy)
-	if s2 == MomentStatus.Deleted then
+
+local function toMomentStatus(status: string?) -- 1 equivalent call inferred from this helper
+	if status == MomentStatus.Deleted then
 		return MomentStatus.Deleted
 	end
 
 	return MomentStatus.Public
 end
-local function toEnumItem(p1, p2, p3) -- line: 42
-	if typeof(p2) == "EnumItem" then
+
+local function toMomentEntityType(entityType: string?) -- 1 equivalent call inferred from this helper
+	if entityType == "experience" or entityType == "ad" then
+		return entityType
+	end
+
+	if FFlagMomentsServeEDPVideos and entityType == "edpVideo" then
+		return "edpVideo"
+	end
+
+	return nil
+end
+
+local function toEnumItem(p, value, p2)
+	if typeof(value) == "EnumItem" then
+		return value
+	end
+
+	if type(value) ~= "string" then
 		return p2
 	end
 
-	if type(p2) ~= "string" then
-		return p3
+	local v = string.match(value, "([^%.]+)$") or value
+	local success, result = pcall(function()
+		return p[v]
+	end)
+	return if success and result ~= nil then result else p2
+end
+
+local function toColor3(fontColor)
+	if typeof(fontColor) == "Color3" then
+		return fontColor
 	end
 
-	local v27 = string.match(p2, "([^%.]+)$") or p2
-	local ok, result = pcall(function() -- line: 51
-		-- upvalues: p1 (copy), v27 (copy)
-		return p1[v27]
-	end)
+	if type(fontColor) ~= "table" then
+		return color
+	end
 
-	if ok and result ~= nil then
+	local r = fontColor.R or fontColor.r or fontColor.Red or fontColor.red or fontColor[1]
+	local g = fontColor.G or fontColor.g or fontColor.Green or fontColor.green or fontColor[2]
+	local b = fontColor.B or fontColor.b or fontColor.Blue or fontColor.blue or fontColor[3]
+
+	if type(r) ~= "number" or type(g) ~= "number" or type(b) ~= "number" then
+		return color
+	end
+
+	if r > 1 or g > 1 or b > 1 then
+		return Color3.fromRGB(r, g, b)
+	end
+
+	return Color3.new(r, g, b)
+end
+
+local function toUDim2(position)
+	if typeof(position) == "UDim2" then
+		return position
+	end
+
+	if type(position) ~= "table" then
+		return udim
+	end
+
+	if type(position[1]) == "number" and type(position[2]) == "number" then
+		return UDim2.fromScale(position[1], position[2])
+	end
+
+	local x = position.X or position.x
+	local y = position.Y or position.y
+
+	if type(x) == "table" and type(y) == "table" then
+		return UDim2.new(
+			x.Scale or x.scale or 0,
+			x.Offset or x.offset or 0,
+			y.Scale or y.scale or 0,
+			y.Offset or y.offset or 0
+		)
+	end
+
+	return UDim2.new(
+		position.XScale or position.xScale or position.scaleX or position[1] or 0.5,
+		position.XOffset or position.xOffset or position.offsetX or position[2] or 0,
+		position.YScale or position.yScale or position.scaleY or position[3] or 0.5,
+		position.YOffset or position.yOffset or position.offsetY or position[4] or 0
+	)
+end
+
+local function normalizeTextOverlayEdit(textOverlay)
+	if type(textOverlay) ~= "table" then
+		return nil
+	end
+
+	local textOverlayStyle = textOverlay.textOverlayStyle or {}
+	return {
+		position = toUDim2(textOverlay.position),
+		rotation = type(textOverlay.rotation) ~= "number" and 0 or textOverlay.rotation,
+		scale = type(textOverlay.scale) ~= "number" and 1 or textOverlay.scale,
+		text = type(textOverlay.text) ~= "string" and "" or textOverlay.text,
+		textOverlayStyle = {
+			font = toEnumItem(Enum.Font, textOverlayStyle.font, BuilderSansMedium),
+			fontColor = toColor3(textOverlayStyle.fontColor),
+			fontSize = type(textOverlayStyle.fontSize) ~= "number" and 16 or textOverlayStyle.fontSize,
+			textXAlignment = toEnumItem(Enum.TextXAlignment, textOverlayStyle.textXAlignment, Center)
+		},
+		zIndex = type(textOverlay.zIndex) ~= "number" and 1 or textOverlay.zIndex
+	}
+end
+
+local function normalizeStickerOverlayEdit(stickerOverlay)
+	if type(stickerOverlay) ~= "table" then
+		return nil
+	end
+
+	if type(stickerOverlay.stickerURI) == "string" and stickerOverlay.stickerURI ~= "" then
+		return {
+			position = toUDim2(stickerOverlay.position),
+			rotation = type(stickerOverlay.rotation) ~= "number" and 0 or stickerOverlay.rotation,
+			scale = type(stickerOverlay.scale) ~= "number" and 1 or stickerOverlay.scale,
+			stickerSize = type(stickerOverlay.stickerSize) ~= "number" and 1 or stickerOverlay.stickerSize,
+			stickerURI = type(stickerOverlay.stickerURI) ~= "string" and "" or stickerOverlay.stickerURI,
+			zIndex = type(stickerOverlay.zIndex) ~= "number" and 1 or stickerOverlay.zIndex
+		}
+	end
+
+	return nil
+end
+
+local function normalizeTtsEdit(ttsAudio)
+	if type(ttsAudio) ~= "table" then
+		return nil
+	end
+
+	local assetId = tonumber(ttsAudio.assetId)
+
+	if assetId == nil or assetId <= 0 then
+		return nil
+	end
+
+	local v = {
+		text = type(ttsAudio.text) ~= "string" and "" or ttsAudio.text,
+		voiceId = type(ttsAudio.voiceId) ~= "number" and 0 or ttsAudio.voiceId,
+		startTime = type(ttsAudio.startTime) ~= "number" and 0 or ttsAudio.startTime,
+		assetId = assetId,
+		assetAccessContext = 0
+	}
+	local assetAccessContext
+
+	if type(ttsAudio.assetAccessContext) == "string" then
+		assetAccessContext = ttsAudio.assetAccessContext
+	end
+
+	v.assetAccessContext = assetAccessContext
+	return v
+end
+
+local function normalizeCaptureEdits(data)
+	if data == nil then
+		return nil
+	end
+
+	local textOverlays = nil
+
+	if type(data.textOverlays) == "table" then
+		local textOverlayEdits = {}
+
+		for _, textOverlay in data.textOverlays do
+			local textOverlayEdit = normalizeTextOverlayEdit(textOverlay)
+
+			if textOverlayEdit ~= nil then
+				table.insert(textOverlayEdits, textOverlayEdit)
+			end
+		end
+
+		if #textOverlayEdits > 0 then
+			textOverlays = textOverlayEdits
+		end
+	end
+
+	local stickerOverlays = nil
+
+	if FFlagMomentsStickerOverlayNormalization() and type(data.stickerOverlays) == "table" then
+		local stickerOverlayEdits = {}
+
+		for _, stickerOverlay in data.stickerOverlays do
+			local stickerOverlayEdit = normalizeStickerOverlayEdit(stickerOverlay)
+
+			if stickerOverlayEdit ~= nil then
+				table.insert(stickerOverlayEdits, stickerOverlayEdit)
+			end
+		end
+
+		if #stickerOverlayEdits > 0 then
+			stickerOverlays = stickerOverlayEdits
+		end
+	end
+
+	local ttsAudios = nil
+
+	if type(data.ttsAudios) == "table" then
+		local ttsEdits = {}
+
+		for _, ttsAudio in data.ttsAudios do
+			local ttsEdit = normalizeTtsEdit(ttsAudio)
+
+			if ttsEdit ~= nil then
+				table.insert(ttsEdits, ttsEdit)
+			end
+		end
+
+		if #ttsEdits > 0 then
+			ttsAudios = ttsEdits
+		end
+	end
+
+	return {
+		trim = data.trim,
+		music = data.music,
+		ttsAudios = ttsAudios,
+		textOverlays = textOverlays,
+		stickerOverlays = stickerOverlays
+	}
+end
+
+local function reactionTotal(p)
+	if p == nil or p.counts == nil then
+		return nil
+	end
+
+	local total = 0
+
+	for _, count in p.counts do
+		total += count
+	end
+
+	return total
+end
+
+local function convertApiMomentToMomentItem(data)
+	local captionedAssetMoment = data.captionedAssetMoment
+	local postAssetId
+
+	if FFlagMomentsRenderAvatarPostsInFeed and data.postAsset ~= nil then
+		postAssetId = data.postAsset.postAssetId
+	end
+
+	local v = FFlagMomentsRenderAvatarPostsInFeed
+
+	if v then
+		if
+			(captionedAssetMoment == nil or captionedAssetMoment.captureType ~= "Avatar")
+			and data.entityType ~= "avatar"
+			or typeof(postAssetId) ~= "number"
+		then
+			v = false
+		else
+			v = postAssetId > 0
+		end
+	end
+
+	local v2 = FFlagMomentsRenderAvatarPostsInFeed
+		and captionedAssetMoment == nil
+		and v
+		and { assetId = 0, captureType = "Avatar" }
+		or captionedAssetMoment
+
+	local owner = data.owner
+	local v3
+
+	if FFlagMomentsServeEDPVideos then
+		v3 = data.entityType == "edpVideo"
+	end
+
+	local momentId
+
+	if FFlagMomentsServeEDPVideos and v3 then
+		momentId = data.id
+
+		if not momentId then
+			if v2 == nil or v2.assetId == nil then
+				momentId = nil
+			else
+				momentId = tostring(v2.assetId)
+			end
+		end
+	else
+		momentId = data.entityId or data.id
+	end
+
+	local feedItemId = data.feedItemId
+
+	if
+		v2 == nil
+		or v2.assetId == nil
+		or not (FFlagMomentsServeEDPVideos and v3) and (owner == nil or owner.id == nil)
+		or momentId == nil
+		or feedItemId == nil
+		or feedItemId == ""
+	then
+		return nil
+	end
+
+	local experienceCta
+
+	if data.primaryCta ~= nil then
+		experienceCta = data.primaryCta.experienceCta
+	end
+
+	local universeId
+
+	if FFlagMomentsServeEDPVideos then
+		if experienceCta == nil then
+			if v3 then
+				universeId = tonumber(data.entityId)
+			end
+		else
+			universeId = experienceCta.experienceId
+		end
+	end
+
+	local v4
+
+	if v2.captureType == "Screenshot" then
+		v4 = v2.screenshotCaptureEdits
+	else
+		v4 = v2.videoCaptureEdits
+	end
+
+	local captureEdits = normalizeCaptureEdits(v4)
+	local status = toMomentStatus(v2.status or data.status) -- inferred equivalent call
+
+	local v5 = {
+		assetId = v2.assetId,
+		channelId = 0,
+		creatorId = 0,
+		isModerated = 0,
+		metadata = 0,
+		entityType = 0,
+		momentId = 0,
+		postAsset = 0,
+		recommendationMetadata = 0,
+		status = 0
+	}
+	local channelId
+
+	if FFlagEnableMomentsCommentReporting and type(data.channelId) == "string" and data.channelId ~= "" then
+		channelId = data.channelId
+	end
+
+	v5.channelId = channelId
+
+	v5.creatorId = FFlagMomentsServeEDPVideos and (owner == nil or owner.id == nil) and 0 or owner.id
+	v5.isModerated = v2.isModerated
+	local metadata = {
+		assetToken = v2.assetToken,
+		assetTotalDuration = v2.assetTotalDuration,
+		assetAccessContext = v2.assetAccessContext,
+		captureType = toCaptureType(v2.captureType), -- inferred equivalent call
+		description = v2.caption,
+		edits = captureEdits,
+		experienceName = 0,
+		likeCount = 0,
+		partnerUploadType = 0,
+		placeId = 0,
+		universeId = 0
+	}
+	local experienceName
+
+	if experienceCta ~= nil then
+		experienceName = experienceCta.experienceName
+	end
+
+	metadata.experienceName = experienceName
+	local reactions = data.reactions
+	local likeCount
+
+	if not (reactions == nil or reactions.counts == nil) then
+		likeCount = 0
+
+		for _, count in reactions.counts do
+			likeCount += count
+		end
+	end
+
+	metadata.likeCount = likeCount
+	metadata.partnerUploadType = v2.partnerUploadType
+	local placeId
+
+	if experienceCta ~= nil then
+		placeId = experienceCta.placeId
+	end
+
+	metadata.placeId = placeId
+
+	if not FFlagMomentsServeEDPVideos then
+		if experienceCta == nil then
+			universeId = nil
+		else
+			universeId = experienceCta.experienceId
+		end
+	end
+
+	metadata.universeId = universeId
+	v5.metadata = metadata
+	local entityType
+
+	if FFlagMomentsServeEDPVideos then
+		entityType = data.entityType
+		entityType = toMomentEntityType(entityType) -- inferred equivalent call
+	end
+
+	v5.entityType = entityType
+	v5.momentId = momentId
+	v5.postAsset = FFlagMomentsRenderAvatarPostsInFeed and v and {
+			postAssetId = postAssetId,
+			isAvatar = true
+		}
+		or GetFFlagMomentsRenderPostAssets()
+		and data.postAsset ~= nil
+		and data.postAsset.postAssetId ~= nil
+		and { postAssetId = data.postAsset.postAssetId }
+		or nil
+
+	v5.recommendationMetadata = { feedItemId = feedItemId, tracingId = data.feedSessionId }
+
+	v5.status = status
+
+	if type(data.feedCreatedTime) == "string" and data.feedCreatedTime ~= "" then
+		v5.createdAt = data.feedCreatedTime
+	end
+
+	if FFlagMomentsComments or FFlagMomentsCommentsIxpEnabled then
+		local comments = convertApiMomentComments(data.comments)
+
+		if comments ~= nil then
+			v5.comments = comments
+		end
+	end
+
+	if not FFlagProfileMomentSceneOutfitPoster or v2.captureType ~= "Avatar" then
+		return v5
+	end
+
+	v5.metadata.isMomentScene = true
+	local postAsset = data.postAsset
+
+	if v5.postAsset == nil and postAsset ~= nil and postAsset.postAssetId ~= nil then
+		v5.postAsset = { postAssetId = postAsset.postAssetId }
+	end
+
+	return v5
+end
+
+local function convertApiMomentsToMomentItems(list)
+	local result = {}
+
+	if list == nil then
 		return result
 	end
 
-	return p3
-end
-local function toColor3(p4) -- line: 60
-	-- upvalues: color3 (copy)
-	if typeof(p4) == "Color3" then
-		return p4
-	end
+	for _, item in ipairs(list) do
+		local v = convertApiMomentToMomentItem(item)
 
-	if type(p4) ~= "table" then
-		return color3
-	end
-
-	local v31 = p4.R or (p4.r or (p4.Red or (p4.red or p4[1])))
-	local v32 = p4.G or (p4.g or (p4.Green or (p4.green or p4[2])))
-	local v33 = p4.B or (p4.b or (p4.Blue or (p4.blue or p4[3])))
-
-	if type(v31) ~= "number" or type(v32) ~= "number" or type(v33) ~= "number" then
-		return color3
-	end
-
-	if v31 > 1 or v32 > 1 or v33 > 1 then
-		return Color3.fromRGB(v31, v32, v33)
-	end
-
-	return Color3.new(v31, v32, v33)
-end
-local function toUDim2(p5) -- line: 81
-	-- upvalues: uDim2 (copy)
-	if typeof(p5) == "UDim2" then
-		return p5
-	end
-
-	if type(p5) ~= "table" then
-		return uDim2
-	end
-
-	if type(p5[1]) == "number" and type(p5[2]) == "number" then
-		return UDim2.fromScale(p5[1], p5[2])
-	end
-
-	local v35 = p5.X or p5.x
-	local v36 = p5.Y or p5.y
-
-	if type(v35) == "table" and type(v36) == "table" then
-		return UDim2.new(v35.Scale or (v35.scale or 0), v35.Offset or (v35.offset or 0), v36.Scale or (v36.scale or 0), v36.Offset or (v36.offset or 0))
-	end
-
-	return UDim2.new(p5.XScale or (p5.xScale or (p5.scaleX or (p5[1] or 0.5))), p5.XOffset or (p5.xOffset or (p5.offsetX or (p5[2] or 0))), p5.YScale or (p5.yScale or (p5.scaleY or (p5[3] or 0.5))), p5.YOffset or (p5.yOffset or (p5.offsetY or (p5[4] or 0))))
-end
-local function normalizeTextOverlayEdit(p6) -- line: 112
-	-- upvalues: toUDim2 (copy), toEnumItem (copy), BuilderSansMedium (copy), toColor3 (copy), Center (copy)
-	if type(p6) ~= "table" then
-		return nil
-	end
-
-	local v38 = p6.textOverlayStyle or {}
-
-	return {
-		position = toUDim2(p6.position),
-		rotation = type(p6.rotation) ~= "number" and 0 or p6.rotation,
-		scale = type(p6.scale) ~= "number" and 1 or p6.scale,
-		text = type(p6.text) ~= "string" and "" or p6.text,
-		textOverlayStyle = {
-			font = toEnumItem(Enum.Font, v38.font, BuilderSansMedium),
-			fontColor = toColor3(v38.fontColor),
-			fontSize = type(v38.fontSize) ~= "number" and 16 or v38.fontSize,
-			textXAlignment = toEnumItem(Enum.TextXAlignment, v38.textXAlignment, Center)
-		},
-		zIndex = type(p6.zIndex) ~= "number" and 1 or p6.zIndex
-	}
-end
-local function normalizeStickerOverlayEdit(p7) -- line: 135
-	-- upvalues: toUDim2 (copy)
-	if type(p7) ~= "table" then
-		return nil
-	end
-
-	if type(p7.stickerURI) ~= "string" or p7.stickerURI == "" then
-		return nil
-	end
-
-	return {
-		position = toUDim2(p7.position),
-		rotation = type(p7.rotation) ~= "number" and 0 or p7.rotation,
-		scale = type(p7.scale) ~= "number" and 1 or p7.scale,
-		stickerSize = type(p7.stickerSize) ~= "number" and 1 or p7.stickerSize,
-		stickerURI = type(p7.stickerURI) ~= "string" and "" or p7.stickerURI,
-		zIndex = type(p7.zIndex) ~= "number" and 1 or p7.zIndex
-	}
-end
-local function normalizeCaptureEdits(p8) -- line: 154
-	-- upvalues: normalizeTextOverlayEdit (copy), FFlagMomentsStickerOverlayNormalization (copy), normalizeStickerOverlayEdit (copy)
-	if p8 == nil then
-		return nil
-	end
-
-	local v41 = nil
-
-	if type(p8.textOverlays) == "table" then
-		local t1 = {}
-
-		for _, v44 in p8.textOverlays do
-			local v45 = normalizeTextOverlayEdit(v44)
-
-			if v45 ~= nil then
-				table.insert(t1, v45)
-			end
-		end
-
-		if #t1 > 0 then
-			v41 = t1
+		if v ~= nil then
+			table.insert(result, v)
 		end
 	end
 
-	local v46 = nil
-
-	if FFlagMomentsStickerOverlayNormalization() and type(p8.stickerOverlays) == "table" then
-		local t2 = {}
-
-		for _, v49 in p8.stickerOverlays do
-			local v50 = normalizeStickerOverlayEdit(v49)
-
-			if v50 ~= nil then
-				table.insert(t2, v50)
-			end
-		end
-
-		if #t2 > 0 then
-			v46 = t2
-		end
-	end
-
-	return {
-		trim = p8.trim,
-		music = p8.music,
-		textOverlays = v41,
-		stickerOverlays = v46
-	}
-end
-local function reactionTotal(p9) -- line: 195
-	if p9 == nil or p9.counts == nil then
-		return nil
-	end
-
-	local n1 = 0
-
-	for _, v54 in p9.counts do
-		n1 += v54
-	end
-
-	return n1
-end
-local function convertApiMomentToMomentItem(p10) -- line: 208
-	-- upvalues: FFlagMomentsRequireApiFeedItemId (copy), normalizeCaptureEdits (copy), MomentStatus (copy)
-	local captionedAssetMoment = p10.captionedAssetMoment
-	local owner = p10.owner
-	local v58 = p10.entityId or p10.id
-	local feedItemId = p10.feedItemId
-
-	if captionedAssetMoment == nil or (captionedAssetMoment.assetId == nil or owner == nil or owner.id == nil or v58 == nil) or FFlagMomentsRequireApiFeedItemId and (feedItemId == nil or feedItemId == "") then
-		return nil
-	end
-
-	local v60 = if p10.primaryCta == nil then nil else p10.primaryCta.experienceCta
-	local v61 = if captionedAssetMoment.captureType ~= "Screenshot" then captionedAssetMoment.videoCaptureEdits else captionedAssetMoment.screenshotCaptureEdits
-	local v62 = normalizeCaptureEdits(v61)
-	local v63 = if (captionedAssetMoment.status or p10.status) ~= MomentStatus.Deleted then MomentStatus.Public else MomentStatus.Deleted
-	local t3 = {
-		assetId = captionedAssetMoment.assetId,
-		creatorId = owner.id,
-		isModerated = captionedAssetMoment.isModerated
-	}
-	local t4 = {
-		assetToken = captionedAssetMoment.assetToken,
-		assetTotalDuration = captionedAssetMoment.assetTotalDuration,
-		assetAccessContext = captionedAssetMoment.assetAccessContext,
-		captureType = if captionedAssetMoment.captureType ~= "Screenshot" then Enum.CaptureType.Video else Enum.CaptureType.Screenshot,
-		description = captionedAssetMoment.caption,
-		edits = v62,
-		experienceName = if v60 == nil then nil else v60.experienceName
-	}
-	local reactions = p10.reactions
-	local v67
-
-	if reactions == nil or reactions.counts == nil then
-		v67 = nil
-	else
-		v67 = 0
-
-		for _, v69 in reactions.counts do
-			v67 += v69
-		end
-	end
-
-	t4.likeCount = v67
-	t4.partnerUploadType = captionedAssetMoment.partnerUploadType
-	t4.placeId = if v60 == nil then nil else v60.placeId
-	t4.universeId = if v60 == nil then nil else v60.experienceId
-	t3.metadata = t4
-	t3.momentId = v58
-	t3.recommendationMetadata = {
-		feedItemId = feedItemId,
-		tracingId = p10.feedSessionId
-	}
-	t3.status = v63
-
-	return t3
-end
-local function convertApiMomentsToMomentItems(t5: {[any]: any}?) -- line: 261
-	-- upvalues: convertApiMomentToMomentItem (copy)
-	local t6 = {}
-
-	if t5 == nil then
-		return t6
-	end
-
-	for _, v in ipairs(t5) do
-		local v74 = convertApiMomentToMomentItem(v)
-
-		if v74 ~= nil then
-			table.insert(t6, v74)
-		end
-	end
-
-	return t6
+	return result
 end
 
 return convertApiMomentsToMomentItems

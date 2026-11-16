@@ -1,20 +1,15 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 
-local function connectTelemetry(p1) -- line: 8
-	-- upvalues: useTelemetry (copy), React (copy), Cryo (copy)
-	return function(p2) -- line: 9
-		-- upvalues: useTelemetry (copy), p1 (copy), React (copy), Cryo (copy)
-		return function(p3) -- line: 10
-			-- upvalues: useTelemetry (copy), p1 (copy), React (copy), p2 (copy), Cryo (copy)
-			local v10 = useTelemetry(p1)
-
-			return React.createElement(p2, Cryo.Dictionary.union(p3, {
-				telemetry = v10
-			}))
+local function connectTelemetry(p)
+	return function(p2)
+		return function(p3)
+			local telemetry = useTelemetry(p)
+			return React.createElement(p2, Cryo.Dictionary.union(p3, { telemetry = telemetry }))
 		end
 	end
 end

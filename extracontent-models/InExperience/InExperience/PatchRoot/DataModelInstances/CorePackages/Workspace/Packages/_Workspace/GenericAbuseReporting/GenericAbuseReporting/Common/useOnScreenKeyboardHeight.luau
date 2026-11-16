@@ -1,57 +1,48 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+local React = require(parent.React)
+
 local UserInputService = game:GetService("UserInputService")
 
-return function() -- line: 14
-	-- upvalues: React (copy), UserInputService (copy)
-	local v4, v5 = React.useState(false)
-	local v6, v7 = React.useState(0)
-	local v8, v9 = React.useState(0)
+return function()
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(0)
+	local state3, setState3 = React.useState(0)
 
-	React.useEffect(function() -- line: 19
-		-- upvalues: UserInputService (copy), v5 (copy), v7 (copy), v9 (copy)
-		local function updateKeyboardState() -- line: 20
-			-- upvalues: UserInputService (copy), v5 (copy), v7 (copy), v9 (copy)
-			local OnScreenKeyboardVisible = UserInputService.OnScreenKeyboardVisible
-			local OnScreenKeyboardSizeY = UserInputService.OnScreenKeyboardSize.Y
-			local OnScreenKeyboardPositionY = UserInputService.OnScreenKeyboardPosition.Y
+	React.useEffect(function()
+		local function updateKeyboardState() -- 1 equivalent call inferred from this helper
+			local onScreenKeyboardVisible = UserInputService.OnScreenKeyboardVisible
+			local y = UserInputService.OnScreenKeyboardSize.Y
+			local y2 = UserInputService.OnScreenKeyboardPosition.Y
 
-			v5(OnScreenKeyboardVisible)
-			v7(not OnScreenKeyboardVisible and 0 or OnScreenKeyboardSizeY)
-			v9(not OnScreenKeyboardVisible and 0 or OnScreenKeyboardPositionY)
+			setState(onScreenKeyboardVisible)
+			setState2(not onScreenKeyboardVisible and 0 or y)
+			setState3(not onScreenKeyboardVisible and 0 or y2)
 		end
 
-		local OnScreenKeyboardVisible = UserInputService.OnScreenKeyboardVisible
-		local OnScreenKeyboardSizeY = UserInputService.OnScreenKeyboardSize.Y
-		local OnScreenKeyboardPositionY = UserInputService.OnScreenKeyboardPosition.Y
+		updateKeyboardState() -- inferred equivalent call
+		local onScreenKeyboardVisibleChangedConnection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(updateKeyboardState)
+		local onScreenKeyboardSizeChangedConnection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(updateKeyboardState)
+		local onScreenKeyboardPositionChangedConnection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(updateKeyboardState)
 
-		v5(OnScreenKeyboardVisible)
-		v7(not OnScreenKeyboardVisible and 0 or OnScreenKeyboardSizeY)
-		v9(not OnScreenKeyboardVisible and 0 or OnScreenKeyboardPositionY)
-
-		local connection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(updateKeyboardState)
-		local connection2 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(updateKeyboardState)
-		local connection3 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(updateKeyboardState)
-
-		return function() -- line: 38
-			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if onScreenKeyboardVisibleChangedConnection then
+				onScreenKeyboardVisibleChangedConnection:Disconnect()
 			end
 
-			if connection2 then
-				connection2:Disconnect()
+			if onScreenKeyboardSizeChangedConnection then
+				onScreenKeyboardSizeChangedConnection:Disconnect()
 			end
 
-			if connection3 then
-				connection3:Disconnect()
+			if onScreenKeyboardPositionChangedConnection then
+				onScreenKeyboardPositionChangedConnection:Disconnect()
 			end
 		end
 	end, {})
 
 	return {
-		isKeyboardShowing = v4,
-		onScreenKeyboardHeight = v6,
-		keyboardPositionY = v8
+		isKeyboardShowing = state,
+		onScreenKeyboardHeight = state2,
+		keyboardPositionY = state3
 	}
 end

@@ -1,28 +1,21 @@
-local scriptParent = script.Parent
-local UIManager = require(scriptParent.UIManager)
-local Constants = require(scriptParent.Constants)
+local parent = script.Parent
+local UIManager = require(parent.UIManager)
+local Constants = require(parent.Constants)
 
-return function(t1: {[any]: any}, p1) -- line: 7
-	-- upvalues: Constants (copy), UIManager (copy)
-	local t2 = nil
-	local v7 = Constants.ROACT_PANEL_UIGROUP_MAP[p1]
+return function(p, panelType)
+	local uiGroup = Constants.ROACT_PANEL_UIGROUP_MAP[panelType]
 
-	if v7 then
-		t2 = {
-			uiGroupElementOffset = Constants.ROACT_PANEL_UIGROUP_ELEMENT_OFFSET_MAP[p1]
-		}
-	end
+	local cameraFixedPanelProp = uiGroup
+		and { uiGroupElementOffset = Constants.ROACT_PANEL_UIGROUP_ELEMENT_OFFSET_MAP[panelType] }
+		or nil
 
-	local t3 = {
-		headScale = 1,
-		panelObject = t1.current,
+	local v = {
+		panelObject = p.current,
 		uiType = Constants.SpatialUIType.SpatialUIRoact,
-		panelType = p1,
-		panelPositionProps = {
-			uiGroup = v7,
-			cameraFixedPanelProp = t2
-		}
+		panelType = panelType,
+		headScale = 1,
+		panelPositionProps = { uiGroup = uiGroup, cameraFixedPanelProp = cameraFixedPanelProp }
 	}
 
-	UIManager.getInstance():registerRoactPanel(p1, t3)
+	UIManager.getInstance():registerRoactPanel(panelType, v)
 end

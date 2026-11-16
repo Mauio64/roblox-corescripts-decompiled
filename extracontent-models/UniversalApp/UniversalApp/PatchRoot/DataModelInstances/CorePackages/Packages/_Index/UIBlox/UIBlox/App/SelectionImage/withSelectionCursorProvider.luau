@@ -1,9 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local withCursorMigration = require(ParentParent.Foundation).UNSTABLE.withCursorMigration
+local parent = script.Parent.Parent.Parent.Parent
 
-local function SelectionCursorConsumer(p1) -- line: 7
-	-- upvalues: withCursorMigration (copy)
-	return withCursorMigration(p1)
+local Foundation = require(parent.Foundation)
+
+local withCursorMigration = Foundation.UNSTABLE.withCursorMigration
+
+local function SelectionCursorConsumer(p)
+	return withCursorMigration(p)
 end
 
 return SelectionCursorConsumer

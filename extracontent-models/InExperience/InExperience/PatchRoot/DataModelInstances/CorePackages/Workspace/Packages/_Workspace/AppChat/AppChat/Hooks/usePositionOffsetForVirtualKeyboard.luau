@@ -3,13 +3,10 @@ local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
 local useChatPlacementContext = ChatPlacementContext.useChatPlacementContext
 local isPlacementInExperience = ChatPlacementContext.isPlacementInExperience
 
-return function(_: {[any]: any}) -- line: 12
-	-- upvalues: useChatPlacementContext (copy), isPlacementInExperience (copy)
-	local chatPlacement = useChatPlacementContext().chatPlacement
-
-	if not isPlacementInExperience(chatPlacement) then
-		return nil
+return function(_): nil | number
+	if isPlacementInExperience(useChatPlacementContext().chatPlacement) then
+		return 0
 	end
 
-	return 0
+	return nil
 end

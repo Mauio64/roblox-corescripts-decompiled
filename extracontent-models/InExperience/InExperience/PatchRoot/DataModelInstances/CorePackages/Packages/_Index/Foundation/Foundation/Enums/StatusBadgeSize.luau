@@ -1,4 +1,1 @@
-return {
-	XSmall = "XSmall",
-	Small = "Small"
-}
+return { XSmall = "XSmall", Small = "Small" }

@@ -1,3 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableInspectAndBuyV2RootFlag and game:DefineFastFlag("AXEnableNewInspectAndBuyContainer21", false)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+return SharedFlags.FFlagEnableInspectAndBuyV2RootFlag
+	and game:DefineFastFlag("AXEnableNewInspectAndBuyContainer21", false)

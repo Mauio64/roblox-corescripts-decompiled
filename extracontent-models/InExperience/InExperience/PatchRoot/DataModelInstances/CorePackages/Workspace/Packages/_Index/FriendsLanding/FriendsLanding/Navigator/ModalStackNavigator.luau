@@ -1,57 +1,55 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
 local dependencies = require(FriendsLanding.dependencies)
-local _ = FriendsLanding.Parent
-local RoactNavigation = dependencies.RoactNavigation
+local parent = FriendsLanding.Parent
+
+local roactNavigation = dependencies.RoactNavigation
 local EnumScreens = require(FriendsLanding.EnumScreens)
 local MainStackNavigatorConnector = require(FriendsLanding.Navigator.MainStackNavigatorConnector)
 local FriendsLandingFilter = require(FriendsLanding.Components.FriendsLandingFilter)
 local FriendsLandingContextualMenu = require(FriendsLanding.Components.FriendsLandingContextualMenu)
-local DiscoverabilityOverlay = dependencies.DiscoverabilityOverlay
-local Roact = dependencies.Roact
-
+local discoverabilityOverlay = dependencies.DiscoverabilityOverlay
+local roact = dependencies.Roact
 require(FriendsLanding.Parent.React)
-
 local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
 local ProfileQRCodePageWrapper = require(FriendsLanding.Navigator.ProfileQRCodePageWrapper)
 
-Roact.PureComponent:extend("DiscoverabilityWrapped").render = function(p1) -- line: 18
-	-- upvalues: FriendsLandingContext (copy), Roact (copy), DiscoverabilityOverlay (copy)
-	return FriendsLandingContext.with(function(p2) -- line: 19
-		-- upvalues: Roact (copy), DiscoverabilityOverlay (copy), p1 (copy)
-		return Roact.createElement(DiscoverabilityOverlay, {
-			navigation = p1.props.navigation,
-			context = p2
+local extend = roact.PureComponent:extend("DiscoverabilityWrapped")
+
+function extend.render(p)
+	return FriendsLandingContext.with(function(context)
+		return roact.createElement(discoverabilityOverlay, {
+			navigation = p.props.navigation,
+			context = context
 		})
 	end)
 end
 
-local t1 = {
+local v = {
+	[EnumScreens.FilterByModal] = { screen = FriendsLandingFilter }
+}
+
+local FriendsLandingContextualMenusByContextualMenu = {
+	[EnumScreens.ContextualMenu] = FriendsLandingContextualMenu
+}
+
+local ProfileQRCodePageWrappersByProfileQRCodePage = {
+	[EnumScreens.ProfileQRCodePage] = ProfileQRCodePageWrapper
+}
+return (roactNavigation.createRobloxStackNavigator({
 	{
 		MainStackNavigator = {
 			screen = MainStackNavigatorConnector,
-			navigationOptions = {
-				overlayTransparency = 1
-			}
+			navigationOptions = { overlayTransparency = 1 }
 		}
 	},
-	{
-		[EnumScreens.FilterByModal] = {
-			screen = FriendsLandingFilter
-		}
-	},
-	{
-		[EnumScreens.ContextualMenu] = FriendsLandingContextualMenu
-	},
-	{
-		[EnumScreens.ProfileQRCodePage] = ProfileQRCodePageWrapper
-	}
-}
-
-return (RoactNavigation.createRobloxStackNavigator(t1, {
+	v,
+	FriendsLandingContextualMenusByContextualMenu,
+	ProfileQRCodePageWrappersByProfileQRCodePage
+}, {
 	defaultNavigationOptions = {
 		overlayEnabled = true,
 		absorbInput = true,
 		absorbInputSelectable = false
 	},
-	mode = RoactNavigation.StackPresentationStyle.Overlay
+	mode = roactNavigation.StackPresentationStyle.Overlay
 }))

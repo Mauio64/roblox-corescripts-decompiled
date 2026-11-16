@@ -1,103 +1,78 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactIs = require(FoundationParent.ReactIs)
-local ContentProvider = require(Foundation.Utility.Wrappers).Services.ContentProvider
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+
+local Wrappers = require(Foundation.Utility.Wrappers)
+local ContentProvider = Wrappers.Services.ContentProvider
 
 require(Foundation.Components.Types)
 
-local function isFinalAssetFetchStatus(p1) -- line: 21
-	return p1 == Enum.AssetFetchStatus.Success or (p1 == Enum.AssetFetchStatus.Failure or p1 == Enum.AssetFetchStatus.TimedOut)
+local function isFinalAssetFetchStatus(p): boolean -- 2 equivalent calls inferred from this helper
+	return p == Enum.AssetFetchStatus.Success
+		or p == Enum.AssetFetchStatus.Failure
+		or p == Enum.AssetFetchStatus.TimedOut
 end
-local function attachOnLoaded(s1: string?, p2: ((...any) -> ...any)) -- line: 27
-	-- upvalues: ContentProvider (copy)
-	if s1 == nil then
+
+local function attachOnLoaded(p: string?, handleFinalStatus)
+	if p == nil then
 		return
 	end
 
-	local AssetFetchStatus = ContentProvider:GetAssetFetchStatus(s1)
+	local assetFetchStatus = ContentProvider:GetAssetFetchStatus(p)
 
-	if AssetFetchStatus == Enum.AssetFetchStatus.Success or (AssetFetchStatus == Enum.AssetFetchStatus.Failure or AssetFetchStatus == Enum.AssetFetchStatus.TimedOut) then
-		p2(AssetFetchStatus)
-
-		return
+	if not isFinalAssetFetchStatus(assetFetchStatus) then -- inferred equivalent call
+		return ContentProvider:GetAssetFetchStatusChangedSignal(p):Connect(function(p2)
+			if isFinalAssetFetchStatus(p2) then -- inferred equivalent call
+				handleFinalStatus(p2)
+			end
+		end)
 	end
 
-	return ContentProvider:GetAssetFetchStatusChangedSignal(s1):Connect(function(p3) -- line: 41
-		-- upvalues: p2 (copy)
-		if p3 == Enum.AssetFetchStatus.Success or (p3 == Enum.AssetFetchStatus.Failure or p3 == Enum.AssetFetchStatus.TimedOut) then
-			p2(p3)
-		end
-	end)
+	handleFinalStatus(assetFetchStatus)
 end
-local function useOnLoaded(p4, p5: ((...any) -> ...any)?) -- line: 48
-	-- upvalues: React (copy), ReactIs (copy), attachOnLoaded (copy)
-	React.useEffect(function() -- line: 49
-		-- upvalues: p5 (copy), ReactIs (copy), p4 (copy), attachOnLoaded (copy), React (copy)
-		if not p5 then
+
+local function useOnLoaded(p, callback)
+	React.useEffect(function()
+		if not callback then
 			return
 		end
 
-		local u16 = nil
-
-		local function disconnectConnection() -- line: 55
-			-- upvalues: u16 (ref)
-			if u16 then
-				u16:Disconnect()
-				u16 = nil
-			end
-		end
-		local function handleFinalStatus(p6) -- line: 62
-			-- upvalues: u16 (ref), p5 (copy)
-			if u16 then
-				u16:Disconnect()
-				u16 = nil
-			end
-
-			p5(p6)
-		end
-
-		if ReactIs.isBinding(p4) then
-			local v19 = p4
-
-			u16 = attachOnLoaded(v19:getValue(), handleFinalStatus)
-
-			local v20 = React.__subscribeToBinding(v19, function(s2: string) -- line: 71
-				-- upvalues: u16 (ref), attachOnLoaded (copy), handleFinalStatus (copy)
-				if u16 then
-					u16:Disconnect()
-					u16 = nil
-				end
-
-				u16 = attachOnLoaded(s2, handleFinalStatus)
-			end)
-
-			return function() -- line: 76
-				-- upvalues: v20 (copy), u16 (ref)
-				v20()
-
-				if u16 then
-					u16:Disconnect()
-					u16 = nil
-				end
+		local connection = nil
+		local function disconnectConnection() -- 4 equivalent calls inferred from this helper
+			if connection then
+				connection:Disconnect()
+				connection = nil
 			end
 		end
 
-		local v21 = p4
+		local function handleFinalStatus(p2)
+			disconnectConnection() -- inferred equivalent call
+			callback(p2)
+		end
 
-		u16 = attachOnLoaded(v21, handleFinalStatus)
+		if not ReactIs.isBinding(p) then
+			connection = attachOnLoaded(p, handleFinalStatus)
 
-		return function() -- line: 84
-			-- upvalues: u16 (ref)
-			if u16 then
-				u16:Disconnect()
-				u16 = nil
+			return function()
+				disconnectConnection() -- inferred equivalent call
 			end
 		end
-	end, {
-		p4,
-		p5
-	})
+
+		local v = p
+		connection = attachOnLoaded(v:getValue(), handleFinalStatus)
+
+		local __subscribeToBinding = React.__subscribeToBinding(v, function(p2: string)
+			disconnectConnection() -- inferred equivalent call
+			connection = attachOnLoaded(p2, handleFinalStatus)
+		end)
+
+		return function()
+			__subscribeToBinding()
+			disconnectConnection() -- inferred equivalent call
+		end
+	end, { p, callback })
 end
 
 return useOnLoaded

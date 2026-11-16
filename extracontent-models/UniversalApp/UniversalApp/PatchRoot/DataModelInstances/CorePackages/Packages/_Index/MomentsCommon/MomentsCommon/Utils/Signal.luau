@@ -1,42 +1,37 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
 local Immutable = require(MomentsCommon.Utils.Immutable)
-local t1 = {}
 
-t1.__index = t1
+local Signal = {}
 
-function t1.new() -- line: 32
-	-- upvalues: t1 (copy)
-	local t2 = {
-		_listeners = {}
-	}
+Signal.__index = Signal
 
-	setmetatable(t2, t1)
+function Signal.new()
+	local v = { _listeners = {} }
 
-	return t2
+	setmetatable(v, Signal)
+
+	return v
 end
-function t1.connect(p1, p2) -- line: 42
-	-- upvalues: Immutable (copy)
-	local t3 = {
-		isConnected = true,
-		callback = p2
-	}
 
-	p1._listeners = Immutable.Append(p1._listeners, t3)
+function Signal:connect(callback)
+	local v = { callback = callback, isConnected = true }
+
+	self._listeners = Immutable.Append(self._listeners, v)
 
 	return {
-		disconnect = function() -- line: 49
-			-- upvalues: t3 (copy), p1 (copy), Immutable (copy)
-			t3.isConnected = false
-			p1._listeners = Immutable.RemoveValueFromList(p1._listeners, t3)
+		disconnect = function()
+			v.isConnected = false
+			self._listeners = Immutable.RemoveValueFromList(self._listeners, v)
 		end
 	}
 end
-function t1.fire(p3, ...) -- line: 59
-	for _, v in ipairs(p3._listeners) do
-		if v.isConnected then
-			v.callback(...)
+
+function Signal:fire(...)
+	for _, listener in ipairs(self._listeners) do
+		if listener.isConnected then
+			listener.callback(...)
 		end
 	end
 end
 
-return t1
+return Signal

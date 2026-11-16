@@ -3,10 +3,7 @@ return {
 		GET_NEW_MESSAGES = 4,
 		GET_CONVERSATIONS = game:DefineFastInt("ChatGetConversationsPageSize", 20)
 	},
-	ResponseStatus = {
-		SUCCESS = "success",
-		MODERATED = "moderated"
-	},
+	ResponseStatus = { SUCCESS = "success", MODERATED = "moderated" },
 	OsaAcknowledgementStatusResponse = {
 		NotApplicable = "not_applicable",
 		Unacknowledged = "unacknowledged",
@@ -25,11 +22,7 @@ return {
 		ConversationOverlay = "conversation_overlay",
 		ConversationBottomModal = "conversation_bottom_modal"
 	},
-	ModalContentType = {
-		Link = "link",
-		Text = "text",
-		Countdown = "countdown"
-	},
+	ModalContentType = { Link = "link", Text = "text", Countdown = "countdown" },
 	ChatLandingModalVariant = {
 		PhoneVerify = "phone_verify",
 		PartyOnlyFtux = "party_only_ftux",

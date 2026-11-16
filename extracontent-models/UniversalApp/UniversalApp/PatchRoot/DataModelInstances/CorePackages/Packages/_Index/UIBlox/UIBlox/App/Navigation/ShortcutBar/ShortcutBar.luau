@@ -1,132 +1,122 @@
 local UserInputService = game:GetService("UserInputService")
-local ParentParent = script.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
-local ParentParent2Parent = ParentParent2.Parent
-local UIBloxConfig = require(ParentParent2.UIBloxConfig)
-local React = require(ParentParent2Parent.React)
-local ReactOtter = require(ParentParent2Parent.ReactOtter)
-local Foundation = require(ParentParent2Parent.Foundation)
-local ReactUtils = require(ParentParent2Parent.ReactUtils)
+
+local parent = script.Parent.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local UIBloxConfig = require(parent2.UIBloxConfig)
+
+local React = require(parent3.React)
+local ReactOtter = require(parent3.ReactOtter)
+local Foundation = require(parent3.Foundation)
+
+local ReactUtils = require(parent3.ReactUtils)
 local useDelayedActionHandler = ReactUtils.useDelayedActionHandler
 local useEventConnection = ReactUtils.useEventConnection
-local Object = require(ParentParent2Parent.LuauPolyfill).Object
-local useStyle = require(ParentParent2.Core.Style.useStyle)
+
+local LuauPolyfill = require(parent3.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local useStyle = require(parent2.Core.Style.useStyle)
 
 require(script.Parent.Types)
-
 local Shortcut = require(script.Parent.Shortcut)
-local useInputType = require(ParentParent2.Utility.useInputType)
-local Utilities = require(ParentParent.Utilities)
 
-require(ParentParent2.Enums.InputType)
+local useInputType = require(parent2.Utility.useInputType)
+local Utilities = require(parent.Utilities)
+require(parent2.Enums.InputType)
 
-local t1 = {
-	dampingRatio = 2,
-	frequency = 3
-}
-local t2 = {
+local v = { dampingRatio = 2, frequency = 3 }
+
+local v2 = {
+	items = {},
 	spacingTop = 12,
 	spacingTrailing = 30,
 	spacingBottom = 12,
 	spacingLeading = 18,
 	itemsGap = 24,
 	itemIconLabelGap = 6,
-	actionTextSpacingLeading = 12,
-	items = {}
+	actionTextSpacingLeading = 12
 }
 
-local function ShortcutBar(t3: {[any]: any}) -- line: 71
-	-- upvalues: Object (copy), t2 (copy), useStyle (copy), Foundation (copy), UIBloxConfig (copy), React (copy), useInputType (copy), ReactOtter (copy), useDelayedActionHandler (copy), t1 (copy), Utilities (copy), useEventConnection (copy), UserInputService (copy), Shortcut (copy)
-	local v21 = Object.assign({}, t2, t3)
-	local v22 = useStyle()
-	local v23 = Foundation.Hooks.useTokens()
-	local v24 = nil
-	local v25 = nil
-	local v26 = nil
-	local v27 = nil
-	local v28 = nil
-	local v29 = nil
-	local v30 = nil
+local function ShortcutBar(props)
+	local v3 = Object.assign({}, v2, props)
+	local v4 = useStyle()
+
+	local v5 = Foundation.Hooks.useTokens()
+	local spacingTop, spacingTrailing, spacingBottom, spacingLeading, itemsGap, itemIconLabelGap, actionTextSpacingLeading
 
 	if UIBloxConfig.useTokenizedShortcutBar then
-		v24 = t3.spacingTop or v23.Padding.Small
-		v25 = t3.spacingTrailing or v23.Padding.XLarge
-		v26 = t3.spacingBottom or v23.Padding.Small
-		v27 = t3.spacingLeading or v23.Padding.Medium
-		v28 = t3.itemsGap or v23.Gap.Large
-		v29 = t3.itemIconLabelGap or v23.Gap.XSmall
-		v30 = t3.actionTextSpacingLeading or v23.Padding.Small
+		spacingTop = props.spacingTop or v5.Padding.Small
+		spacingTrailing = props.spacingTrailing or v5.Padding.XLarge
+		spacingBottom = props.spacingBottom or v5.Padding.Small
+		spacingLeading = props.spacingLeading or v5.Padding.Medium
+		itemsGap = props.itemsGap or v5.Gap.Large
+		itemIconLabelGap = props.itemIconLabelGap or v5.Gap.XSmall
+		actionTextSpacingLeading = props.actionTextSpacingLeading or v5.Padding.Small
 	end
 
-	local t4 = {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0.5, 0)
-		}),
+	local children = {
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0.5, 0) }),
 		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v24 or v21.spacingTop),
-			PaddingRight = UDim.new(0, v25 or v21.spacingTrailing),
-			PaddingBottom = UDim.new(0, v26 or v21.spacingBottom),
-			PaddingLeft = UDim.new(0, v27 or v21.spacingLeading)
+			PaddingTop = UDim.new(0, spacingTop or v3.spacingTop),
+			PaddingRight = UDim.new(0, spacingTrailing or v3.spacingTrailing),
+			PaddingBottom = UDim.new(0, spacingBottom or v3.spacingBottom),
+			PaddingLeft = UDim.new(0, spacingLeading or v3.spacingLeading)
 		}),
 		ListLayout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v28 or v21.itemsGap)
+			Padding = UDim.new(0, itemsGap or v3.itemsGap)
 		})
 	}
-	local v32 = useInputType()
-	local v33, v34 = ReactOtter.useAnimatedBinding(0)
-	local v35 = useDelayedActionHandler(not v21.transitionDelaySeconds and 0 or v21.transitionDelaySeconds, 0.1, function() -- line: 114
-		-- upvalues: v34 (copy), ReactOtter (copy), t1 (copy)
-		v34(ReactOtter.spring(0, t1))
+
+	local v6 = useInputType()
+
+	local v7, v8 = ReactOtter.useAnimatedBinding(0)
+
+	local v9 = useDelayedActionHandler(not v3.transitionDelaySeconds and 0 or v3.transitionDelaySeconds, 0.1, function()
+		v8(ReactOtter.spring(0, v))
 	end)
 
-	local function onInputChanged() -- line: 119
-		-- upvalues: v21 (copy), v34 (copy), ReactOtter (copy), t1 (copy), v35 (copy)
-		if v21.transitionDelaySeconds then
-			v34(ReactOtter.spring(1, t1))
-			v35()
+	local function onInputChanged()
+		if v3.transitionDelaySeconds then
+			v8(ReactOtter.spring(1, v))
+			v9()
 		end
 	end
 
-	local v37, v38 = React.useState(Utilities.filterItems(v21.items, v32))
+	local state, setState = React.useState(Utilities.filterItems(v3.items, v6))
 
 	useEventConnection(UserInputService.InputChanged, onInputChanged)
-	React.useEffect(function() -- line: 129
-		-- upvalues: v38 (copy), Utilities (copy), v21 (copy), v32 (copy)
-		v38(Utilities.filterItems(v21.items, v32))
-	end, {
-		v32,
-		v21.items
-	})
+	React.useEffect(function()
+		setState(Utilities.filterItems(v3.items, v6))
+	end, { v6, v3.items })
 
-	for i, v in ipairs(v37) do
-		t4["Item" .. tostring(i)] = React.createElement(Shortcut, {
+	for i, publicProps in ipairs(state) do
+		children["Item" .. tostring(i)] = React.createElement(Shortcut, {
 			index = i,
-			iconLabelGap = v29 or v21.itemIconLabelGap,
-			actionTextSpacingLeading = v30 or v21.actionTextSpacingLeading,
-			publicProps = v
+			iconLabelGap = itemIconLabelGap or v3.itemIconLabelGap,
+			actionTextSpacingLeading = actionTextSpacingLeading or v3.actionTextSpacingLeading,
+			publicProps = publicProps
 		})
 	end
 
-	if #v37 > 0 then
-		local Contrast = v22.Tokens.Semantic.Color.BackgroundUi.Contrast
-
+	if #state > 0 then
+		local overMedia_0 = v4.Tokens.Color.OverMedia.OverMedia_0
 		return React.createElement("CanvasGroup", {
+			Position = v3.position,
+			AnchorPoint = v3.anchorPoint,
 			BackgroundTransparency = 1,
-			Position = v21.position,
-			AnchorPoint = v21.anchorPoint,
-			GroupTransparency = not v21.transitionDelaySeconds and 0 or v33,
+			GroupTransparency = not v3.transitionDelaySeconds and 0 or v7,
 			AutomaticSize = Enum.AutomaticSize.XY
 		}, {
 			ShortcutBarComponent = React.createElement("Frame", {
-				BorderSizePixel = 0,
 				Size = UDim2.fromOffset(0, 0),
-				BackgroundColor3 = Contrast.Color3,
-				BackgroundTransparency = Contrast.Transparency,
+				BorderSizePixel = 0,
+				BackgroundColor3 = overMedia_0.Color3,
+				BackgroundTransparency = overMedia_0.Transparency,
 				AutomaticSize = Enum.AutomaticSize.XY
-			}, t4)
+			}, children)
 		})
 	end
 

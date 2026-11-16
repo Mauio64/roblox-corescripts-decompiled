@@ -1,57 +1,70 @@
-local Parent = script:FindFirstAncestor("UserRelationshipModals").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("UserRelationshipModals").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local UserTile = require(Parent.UserTile)
-local UserTile2 = UserTile.UserTile
-local LayoutMode = UserTile.LayoutMode
-local FFlagConnectionsToFriendsRename = require(Parent.SharedFlags).FFlagConnectionsToFriendsRename
-local v12 = game:DefineFastFlag("PromptFriendRequestModalRevampFriendsRename", false)
-local v13 = FFlagConnectionsToFriendsRename and v12
-local v14 = game:DefineFastInt("PromptFriendRequestModalInputDelayMs", 1000)
 
-local function PromptFriendRequestModal(t1: {[any]: any}) -- line: 34
-	-- upvalues: useLocalization (copy), v13 (copy), React (copy), Dialog (copy), DialogSize (copy), Foundation (copy), UserTile2 (copy), LayoutMode (copy), ButtonVariant (copy), v14 (copy)
-	local v17 = useLocalization({
-		sendText = "InGame.FriendPlayerPrompt.Action.Send",
-		titleText = not v13 and "InGame.FriendPlayerPrompt.Title.SendFriendRequest" or "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename"
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local UserTile = require(parent.UserTile)
+local userTile = UserTile.UserTile
+local LayoutMode = UserTile.LayoutMode
+
+local defineFastFlag = game:DefineFastFlag("PromptFriendRequestModalRevampFriendsRename", false)
+local defineFastInt = game:DefineFastInt("PromptFriendRequestModalInputDelayMs", 1000)
+
+local function PromptFriendRequestModal(props)
+	local v = useLocalization({
+		titleText = defineFastFlag and "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename" or "InGame.FriendPlayerPrompt.Title.SendFriendRequest",
+		sendText = "InGame.FriendPlayerPrompt.Action.Send"
 	})
 
-	return React.createElement(Dialog.Root, {
-		size = DialogSize.Medium,
-		onClose = t1.onClose
-	}, {
-		DialogTitle = React.createElement(Dialog.Title, {
-			text = v17.titleText
-		}),
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v2 = { size = DialogSize.Medium, onClose = props.onClose }
+	local v3 = {
+		DialogTitle = React.createElement(Dialog.Title, { text = v.titleText }),
 		Avatar = React.createElement(Foundation.View, {
 			tag = "row align-x-center size-full-3000",
 			LayoutOrder = 2
 		}, {
-			UserTile = React.createElement(UserTile2, {
-				userId = t1.userId,
-				title = t1.displayName,
-				subtitle = "@" .. t1.username,
+			UserTile = React.createElement(userTile, {
+				userId = props.userId,
+				title = props.displayName,
+				subtitle = "@" .. props.username,
 				layoutMode = LayoutMode.compact
 			})
 		}),
-		Buffer = React.createElement(Foundation.View, {
-			tag = "size-full-500",
-			LayoutOrder = 3
-		}),
-		DialogActions = React.createElement(Dialog.Actions, {
-			LayoutOrder = 4,
-			actions = {{
-				text = v17.sendText,
-				variant = ButtonVariant.Emphasis,
-				onActivated = t1.onSendClicked,
-				inputDelay = if t1.inputDelay ~= nil then t1.inputDelay else v14 / 1000
-			}}
-		})
+		Buffer = React.createElement(Foundation.View, { tag = "size-full-500", LayoutOrder = 3 }),
+		DialogActions = 0
+	}
+
+	local createElement2 = React.createElement
+	local actions = Dialog.Actions
+
+	local v4 = {
+		text = v.sendText,
+		variant = ButtonVariant.Emphasis,
+		onActivated = props.onSendClicked,
+		inputDelay = 0
+	}
+	local inputDelay
+
+	if props.inputDelay == nil then
+		inputDelay = defineFastInt / 1000
+	else
+		inputDelay = props.inputDelay
+	end
+
+	v4.inputDelay = inputDelay
+	v3.DialogActions = createElement2(actions, {
+		LayoutOrder = 4,
+		actions = { v4 }
 	})
+	return createElement(root, v2, v3)
 end
 
 return PromptFriendRequestModal

@@ -1,28 +1,44 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Http = require(Parent.Http)
-local HttpClient = require(Parent.HttpClient)
+local AppChat = script:FindFirstAncestor("AppChat")
+local parent = AppChat.Parent
 
-require(Parent.ShareLinksNetworking)
+local Http = require(parent.Http)
+local HttpClient = require(parent.HttpClient)
+require(parent.ShareLinksNetworking)
 
-local v4 = Http.Url.APIS_URL .. "deeplinks/v2/resolve"
+local FFlagAppChatPlusReferralAssetCard = require(AppChat.Flags.FFlagAppChatPlusReferralAssetCard)
 
-local function decodeResolvedShareLink(p1) -- line: 14
-	if type(p1) ~= "table" or (type(p1.linkType) ~= "string" or type(p1.targetId) ~= "string" or type(p1.customData) ~= "string" or type(p1.status) ~= "string") then
+local url = Http.Url.APIS_URL .. "deeplinks/v2/resolve"
+
+local function decodeResolvedShareLink(state)
+	if
+		type(state) ~= "table"
+		or type(state.linkType) ~= "string"
+		or type(state.targetId) ~= "string"
+		or type(state.status) ~= "string"
+	then
 		error("Malformed deeplinks/v2/resolve response")
 	end
 
-	return p1
+	if FFlagAppChatPlusReferralAssetCard then
+		if state.customData ~= nil and type(state.customData) ~= "string" then
+			error("Malformed deeplinks/v2/resolve response")
+		end
+
+		state.customData = state.customData or ""
+	elseif type(state.customData) ~= "string" then
+		error("Malformed deeplinks/v2/resolve response")
+	end
+
+	return state
 end
-local function fetchResolvedShareLink(s1: string, p2) -- line: 28
-	-- upvalues: HttpClient (copy), v4 (copy), decodeResolvedShareLink (copy)
+
+local function fetchResolvedShareLink(linkId: string, network)
 	return HttpClient.fetch({
 		method = "POST",
+		url = url,
+		body = { linkId = linkId },
 		analyticsKey = "app-chat.resolve-share-link-v2",
-		url = v4,
-		body = {
-			linkId = s1
-		},
-		network = p2,
+		network = network,
 		decode = decodeResolvedShareLink
 	})
 end

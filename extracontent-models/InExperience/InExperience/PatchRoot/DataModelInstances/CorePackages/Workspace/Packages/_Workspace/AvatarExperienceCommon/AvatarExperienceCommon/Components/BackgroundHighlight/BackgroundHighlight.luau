@@ -1,12 +1,16 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+
 local numberSequence = NumberSequence.new({
 	NumberSequenceKeypoint.new(0, 0),
 	NumberSequenceKeypoint.new(0.1, 1),
 	NumberSequenceKeypoint.new(0.9, 1),
 	NumberSequenceKeypoint.new(1, 0)
 })
+
 local numberSequence2 = NumberSequence.new({
 	NumberSequenceKeypoint.new(0, 1),
 	NumberSequenceKeypoint.new(0.6, 1),
@@ -14,32 +18,35 @@ local numberSequence2 = NumberSequence.new({
 	NumberSequenceKeypoint.new(1, 0)
 })
 
-local function Gradient(t1: {[any]: any}) -- line: 32
-	-- upvalues: useTokens (copy), React (copy)
-	local v9 = useTokens()
+local function Gradient(p)
+	local v = useTokens()
 
-	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		ZIndex = 1,
-		BackgroundColor3 = v9.Color.Surface.Surface_0.Color3,
-		Size = UDim2.fromScale(1, 1)
-	}, {
-		UIGradient = React.createElement("UIGradient", {
-			Rotation = t1.Rotation,
-			Transparency = t1.Transparency
-		})
-	})
+	return React.createElement(
+		"Frame",
+		{
+			BackgroundColor3 = v.Color.Surface.Surface_0.Color3,
+			Size = UDim2.fromScale(1, 1),
+			BorderSizePixel = 0,
+			ZIndex = 1
+		},
+		{
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = p.Rotation,
+				Transparency = p.Transparency
+			})
+		}
+	)
 end
-local function BackgroundHighlight(t2: {[any]: any}) -- line: 48
-	-- upvalues: React (copy), Gradient (copy), numberSequence2 (copy), numberSequence (copy)
+
+local function BackgroundHighlight(p)
 	return React.createElement("Frame", {
-		BorderSizePixel = 0,
 		Size = UDim2.fromScale(1.2, 1.2),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
-		BackgroundTransparency = t2.highlightColor.Transparency,
-		BackgroundColor3 = t2.highlightColor.Color3,
-		ZIndex = t2.ZIndex or 0
+		BackgroundTransparency = p.highlightColor.Transparency,
+		BackgroundColor3 = p.highlightColor.Color3,
+		BorderSizePixel = 0,
+		ZIndex = p.ZIndex or 0
 	}, {
 		TriangleGradientBottom = React.createElement(Gradient, {
 			Rotation = 90,

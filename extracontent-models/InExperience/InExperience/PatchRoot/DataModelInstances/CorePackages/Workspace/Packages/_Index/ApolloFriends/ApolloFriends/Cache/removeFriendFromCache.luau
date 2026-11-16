@@ -1,14 +1,12 @@
-local function removeFriendFromCache(p1, t1: {[any]: any}) -- line: 6
-	local v4 = p1.cache:identify({
+local function removeFriendFromCache(p, p2)
+	local identify = p.cache:identify({
 		__typename = "Friend",
-		id = t1.userId,
-		targetUserId = t1.targetUserId
+		id = p2.userId,
+		targetUserId = p2.targetUserId
 	})
 
-	p1.cache:evict({
-		id = v4
-	})
-	p1.cache:gc()
+	p.cache:evict({ id = identify })
+	p.cache:gc()
 end
 
 return removeFriendFromCache

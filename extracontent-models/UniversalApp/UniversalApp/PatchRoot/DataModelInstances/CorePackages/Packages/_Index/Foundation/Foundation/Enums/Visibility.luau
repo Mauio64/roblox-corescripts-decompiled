@@ -1,5 +1,1 @@
-return {
-	None = "None",
-	Always = "Always",
-	Auto = "Auto"
-}
+return { None = "None", Always = "Always", Auto = "Auto" }

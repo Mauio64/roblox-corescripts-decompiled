@@ -1,43 +1,47 @@
-local ParentParent = script.Parent.Parent
-local CaptureService = game:GetService("CaptureService")
-local CaptureType = require(ParentParent.Enums.CaptureType)
-local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
-local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
+local parent = script.Parent.Parent
 
-require(ParentParent.Types)
+local CaptureService = require(parent.Services.CaptureService)
 
-local FFlagCapturesVideoBulkManagerStopGap = require(ParentParent.Flags.FFlagCapturesVideoBulkManagerStopGap)
-local v7 = game:DefineFastFlag("CapturesVideoSupportLegacyVideos", false)
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+local CaptureType = require(parent.Enums.CaptureType)
+local CapturesToastType = require(parent.Enums.CapturesToastType)
+local ToastTriggered = require(parent.Actions.ToastTriggered)
 
-return function(t1: {[any]: any}) -- line: 17
-	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), FFlagCapturesVideoBulkManagerStopGap (copy), CaptureService (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), v7 (copy), ToastTriggered (copy), CapturesToastType (copy)
-	local t2 = {}
+require(parent.Types)
 
-	for _, v in ipairs(t1) do
-		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+local FFlagCapturesVideoBulkManagerStopGap = require(parent.Flags.FFlagCapturesVideoBulkManagerStopGap)
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
+
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
+local FFlagCapturesInExpMomentsToastDownloadButton = require(parent.Flags.FFlagCapturesInExpMomentsToastDownloadButton)
+
+return function(list)
+	local v = {}
+
+	for _, item in ipairs(list) do
+		if
+			FFlagCapturesInExpMomentsToastDownloadButton
+			and not FFlagEnableCapturesGalleryRetrievalCoreScript
+			and typeof(item) ~= "table"
+		then
+			table.insert(v, item)
+		elseif FFlagEnableCapturesGalleryRetrievalCoreScript then
 			if FFlagCapturesVideoBulkManagerStopGap then
-				table.insert(t2, (CaptureService:PreCaptureShared(v)))
+				table.insert(v, (CaptureService:PreCaptureShared(item)))
 			else
-				table.insert(t2, v)
+				table.insert(v, item)
 			end
-		elseif FFlagUseRbxstorageInGallery and v.type == CaptureType.Video then
-			if v7 then
-				table.insert(t2, (CaptureService:PreVideoCaptureShared(v.videoCapture)))
-			else
-				table.insert(t2, v.videoCapture)
-			end
-		elseif v.type == CaptureType.Screenshot then
-			table.insert(t2, v.filePath)
+		elseif FFlagUseRbxstorageInGallery and item.type == CaptureType.Video then
+			table.insert(v, (CaptureService:PreVideoCaptureShared(item.videoCapture)))
+		elseif item.type == CaptureType.Screenshot then
+			table.insert(v, item.filePath)
 		end
 	end
 
-	return function(p1) -- line: 39
-		-- upvalues: CaptureService (copy), t2 (copy), ToastTriggered (copy), CapturesToastType (copy), t1 (copy)
-		CaptureService:SaveCapturesToExternalStorageAsync(t2)
-		p1:dispatch(ToastTriggered(CapturesToastType.CaptureSavedToDevice, {
-			captureInfo = t1[1]
+	return function(object)
+		CaptureService:SaveCapturesToExternalStorageAsync(v)
+		object:dispatch(ToastTriggered(CapturesToastType.CaptureSavedToDevice, {
+			captureInfo = list[1]
 		}))
 	end
 end

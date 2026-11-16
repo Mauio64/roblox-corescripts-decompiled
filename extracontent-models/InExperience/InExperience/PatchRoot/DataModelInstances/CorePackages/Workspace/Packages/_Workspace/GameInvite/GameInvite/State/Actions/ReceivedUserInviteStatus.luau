@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("GameInvite").Parent
+local parent = script:FindFirstAncestor("GameInvite").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 6
-	return {
-		userId = tostring(p1),
-		inviteStatus = p2
-	}
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(p, inviteStatus)
+	return { userId = tostring(p), inviteStatus = inviteStatus }
 end)

@@ -1,33 +1,38 @@
-local Parent = script:FindFirstAncestor("GameTile").Parent
-local RobloxAppEnums = require(Parent.RobloxAppEnums)
+local parent = script:FindFirstAncestor("GameTile").Parent
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
 local CentralOverlayType = RobloxAppEnums.CentralOverlayType
 local AppPage = RobloxAppEnums.AppPage
-local SetCentralOverlay = require(Parent.CentralOverlay).Actions.SetCentralOverlay
-local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
-local Responsive = require(Parent.Responsive)
-local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v9 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local CentralOverlay = require(parent.CentralOverlay)
+local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local Responsive = require(parent.Responsive)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
 
-return function(p1) -- line: 16
-	-- upvalues: Responsive (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateDown (copy), SetCentralOverlay (copy), CentralOverlayType (copy)
-	return function(p2) -- line: 17
-		-- upvalues: p1 (copy), Responsive (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateDown (copy), SetCentralOverlay (copy), CentralOverlayType (copy)
-		if p1 == Responsive.Input.Touch then
-			local t1 = {
-				name = AppPage.SponsoredTooltipPeekView
-			}
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
 
-			if FFlagSignalsNavP3Dispatch then
-				v9.down(v9.fromLegacyPage(t1))
-
-				return
-			end
-
-			p2:dispatch(NavigateDown(t1))
+return function(p)
+	return function(object)
+		if p ~= Responsive.Input.Touch then
+			object:dispatch(SetCentralOverlay(CentralOverlayType.SponsoredTooltip))
 
 			return
 		end
 
-		p2:dispatch(SetCentralOverlay(CentralOverlayType.SponsoredTooltip))
+		local v = { name = AppPage.SponsoredTooltipPeekView }
+
+		if FFlagSignalsNavP3Dispatch then
+			navigationCommands.down(navigationCommands.fromLegacyPage(v))
+		else
+			object:dispatch(NavigateDown(v))
+		end
 	end
 end

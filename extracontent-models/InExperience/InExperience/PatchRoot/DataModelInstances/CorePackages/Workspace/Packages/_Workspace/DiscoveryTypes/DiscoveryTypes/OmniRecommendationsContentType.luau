@@ -1,6 +1,5 @@
-local Parent = script:FindFirstAncestor("DiscoveryTypes").Parent
-local FFlagLuaAppEnableHomepageOneByTwoTile = require(Parent.SharedFlags).FFlagLuaAppEnableHomepageOneByTwoTile
-
+local parent = script:FindFirstAncestor("DiscoveryTypes").Parent
+local SharedFlags = require(parent.SharedFlags)
 return {
 	Game = "Game",
 	CatalogAsset = "CatalogAsset",
@@ -9,5 +8,5 @@ return {
 	GameCoPlay = "GameCoPlay",
 	TrendingSearches = "TrendingSearches",
 	Song = "Song",
-	AdLink = if not FFlagLuaAppEnableHomepageOneByTwoTile then nil else "AdLink"
+	AdLink = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile and "AdLink" or nil
 }

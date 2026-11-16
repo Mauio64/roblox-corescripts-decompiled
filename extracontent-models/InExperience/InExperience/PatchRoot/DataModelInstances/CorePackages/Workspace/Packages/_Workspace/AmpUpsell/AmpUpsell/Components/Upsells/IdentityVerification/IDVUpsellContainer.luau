@@ -1,301 +1,275 @@
 local AmpUpsell = script:FindFirstAncestor("AmpUpsell")
-local AmpUpsellParent = AmpUpsell.Parent
-local React = require(AmpUpsellParent.React)
-local Promise = require(AmpUpsellParent.Promise)
-local Foundation = require(AmpUpsellParent.Foundation)
+local parent = AmpUpsell.Parent
+local React = require(parent.React)
+local Promise = require(parent.Promise)
+local Foundation = require(parent.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
-local useLocalization = require(AmpUpsellParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local AppScreens = require(AmpUpsell.Common.AppScreens)
 local IDVWithQRCodeUpsell = require(script.Parent.IDVWithQRCodeUpsell)
-local IDVApiProvider = require(AmpUpsellParent.IdentityVerification).IDVApiProvider
+local IdentityVerification = require(parent.IdentityVerification)
+local IDVApiProvider = IdentityVerification.IDVApiProvider
 local GetFStringBiometricPrivacyPolicyLink = require(AmpUpsell.Flags.GetFStringBiometricPrivacyPolicyLink)
-local GetFIntIDVPollDelay = require(AmpUpsellParent.IdentityVerification).GetFIntIDVPollDelay
-local GetFIntIDVMaxRetries = require(AmpUpsellParent.IdentityVerification).GetFIntIDVMaxRetries
-local useNavigation = require(AmpUpsellParent.Navigation).useNavigation
+local IdentityVerification2 = require(parent.IdentityVerification)
+local GetFIntIDVPollDelay = IdentityVerification2.GetFIntIDVPollDelay
+local IdentityVerification3 = require(parent.IdentityVerification)
+local GetFIntIDVMaxRetries = IdentityVerification3.GetFIntIDVMaxRetries
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
 local Enums = require(AmpUpsell.Common.Enums)
 local IDVStep = Enums.IDVStep
-local IDVSessionStatusEnum = require(AmpUpsellParent.IdentityVerification).Enums.IDVSessionStatusEnum
+local IdentityVerification4 = require(parent.IdentityVerification)
+local IDVSessionStatusEnum = IdentityVerification4.Enums.IDVSessionStatusEnum
 local ActionStatusEnum = Enums.ActionStatusEnum
 local IDVErrorScreen = require(script.Parent.IDVErrorScreen)
 local LocalizationStrings = require(AmpUpsell.Common.LocalizationStrings)
 local idvErrorScreenStrings = LocalizationStrings.idvErrorScreenStrings
 local idvWithQRCodeUpsellStrings = LocalizationStrings.idvWithQRCodeUpsellStrings
 local IDVDirectLinkUpsell = require(script.Parent.IDVDirectLinkUpsell)
-local RobloxAppHooks = require(AmpUpsellParent.RobloxAppHooks)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
 local useDeviceType = RobloxAppHooks.useDeviceType
 local useRoactService = RobloxAppHooks.useRoactService
-local AppLinking = require(AmpUpsellParent.RoactServiceTags).AppLinking
-local DeviceType = require(AmpUpsellParent.RobloxAppEnums).DeviceType
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppLinking = RoactServiceTags.AppLinking
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local DeviceType = RobloxAppEnums.DeviceType
 local GetFFlagEnableDirectLinkForTablets = require(AmpUpsell.Flags.GetFFlagEnableDirectLinkForTablets)
-local RoactNetworking = require(AmpUpsellParent.RoactServiceTags).RoactNetworking
+
+local RoactServiceTags2 = require(parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags2.RoactNetworking
+
 local GetFFlagEnableRoactNetworkingForChallengeInteception = require(AmpUpsell.Flags.GetFFlagEnableRoactNetworkingForChallengeInteception)
+
 local GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell = require(AmpUpsell.Flags.GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell)
 local GetFFlagEnableAmpIDVUpsellAnalytics = require(AmpUpsell.Flags.GetFFlagEnableAmpIDVUpsellAnalytics)
+
 local FacialAgeEstimationServiceWrapper = require(script.Parent.Parent.FacialAgeEstimation.FacialAgeEstimationServiceWrapper)
-local AuthAnalytics = require(AmpUpsellParent.AuthAnalytics)
+
+local AuthAnalytics = require(parent.AuthAnalytics)
 local authMsgShown = AuthAnalytics.Events.authMsgShown
 local authModalShown = AuthAnalytics.Events.authModalShown
 local authFormInteraction = AuthAnalytics.Events.authFormInteraction
-local v40 = GetFIntIDVPollDelay()
-local v41 = GetFIntIDVMaxRetries()
 
-local function isFailure(p1) -- line: 65
-	-- upvalues: IDVSessionStatusEnum (copy)
-	return p1 == IDVSessionStatusEnum.Failure or (p1 == IDVSessionStatusEnum.RequiresManualReview or (p1 == IDVSessionStatusEnum.RequiresRetry or p1 == IDVSessionStatusEnum.Expired))
+local fIntIDVPollDelay = GetFIntIDVPollDelay()
+local fIntIDVMaxRetries = GetFIntIDVMaxRetries()
+
+local function isFailure(sessionStatus): boolean -- 1 equivalent call inferred from this helper
+	return sessionStatus == IDVSessionStatusEnum.Failure
+		or sessionStatus == IDVSessionStatusEnum.RequiresManualReview
+		or sessionStatus == IDVSessionStatusEnum.RequiresRetry
+		or sessionStatus == IDVSessionStatusEnum.Expired
 end
-local function getErrorDescription(p2, p3) -- line: 72
-	-- upvalues: IDVSessionStatusEnum (copy)
-	if p2 == IDVSessionStatusEnum.Failure or p2 == IDVSessionStatusEnum.RequiresManualReview then
-		return p3.declined
+
+local function getErrorDescription(sessionStatus, data) -- 1 equivalent call inferred from this helper
+	if sessionStatus == IDVSessionStatusEnum.Failure or sessionStatus == IDVSessionStatusEnum.RequiresManualReview then
+		return data.declined
 	end
 
-	if p2 == IDVSessionStatusEnum.RequiresRetry then
-		return p3.retry
+	if sessionStatus == IDVSessionStatusEnum.RequiresRetry then
+		return data.retry
 	end
 
-	if p2 == IDVSessionStatusEnum.Expired then
-		return p3.timeout
+	if sessionStatus == IDVSessionStatusEnum.Expired then
+		return data.timeout
 	end
 
-	return p3.retry
+	return data.retry
 end
-local function IDVUpsellContainer(t1: {[any]: any}) -- line: 84
-	-- upvalues: IDVApiProvider (copy), useDeviceType (copy), useNavigation (copy), useLocalization (copy), idvErrorScreenStrings (copy), idvWithQRCodeUpsellStrings (copy), React (copy), ActionStatusEnum (copy), GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell (copy), FacialAgeEstimationServiceWrapper (copy), GetFFlagEnableDirectLinkForTablets (copy), DeviceType (copy), useRoactService (copy), AppLinking (copy), RoactNetworking (copy), AppScreens (copy), GetFStringBiometricPrivacyPolicyLink (copy), IDVSessionStatusEnum (copy), IDVStep (copy), GetFFlagEnableAmpIDVUpsellAnalytics (copy), authModalShown (copy), authMsgShown (copy), v40 (copy), v41 (copy), Promise (copy), GetFFlagEnableRoactNetworkingForChallengeInteception (copy), authFormInteraction (copy), IDVErrorScreen (copy), Loading (copy), IconSize (copy), IDVDirectLinkUpsell (copy), IDVWithQRCodeUpsell (copy)
-	local featureName = t1.featureName
-	local onSuccess = t1.onSuccess
-	local onFailure = t1.onFailure
-	local onCancelled = t1.onCancelled
-	local v53 = if not t1.idvApiProvider then IDVApiProvider else t1.idvApiProvider
-	local v54 = t1.deviceType or useDeviceType()
-	local v55 = useNavigation()
-	local v56 = useLocalization(idvErrorScreenStrings)
-	local v57 = useLocalization(idvWithQRCodeUpsellStrings)
-	local v58 = t1.entryPointEventCtx or ""
-	local v59 = t1.metadata and t1.metadata.sessionId or ""
-	local v60, v61 = React.useState(nil)
-	local v62 = React.useRef(true)
-	local v63, v64 = React.useState(ActionStatusEnum.Unknown)
-	local v65, v66 = React.useState(false)
-	local v67, v68 = React.useState(v56.retry)
-	local v69, v70 = React.useState(0)
-	local v71 = GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell() and FacialAgeEstimationServiceWrapper.isAvailable()
-	local v72 = GetFFlagEnableDirectLinkForTablets() and v54 == DeviceType.Tablet or v54 == DeviceType.Phone
-	local v73 = useRoactService(AppLinking)
-	local v74 = useRoactService(RoactNetworking)
-	local v75 = t1.schedulePoll or function(p4: ((...any) -> ...any), n1: number) -- line: 111
-		spawn(function() -- line: 112
-			-- upvalues: n1 (copy), p4 (copy)
-			wait(n1)
-			p4()
+
+local function IDVUpsellContainer(props)
+	local featureName = props.featureName
+	local onSuccess = props.onSuccess
+	local onFailure = props.onFailure
+	local onCancelled = props.onCancelled
+	local v
+
+	if props.idvApiProvider then
+		v = props.idvApiProvider
+	else
+		v = IDVApiProvider
+	end
+
+	local deviceType = props.deviceType or useDeviceType()
+	local v2 = useNavigation()
+	local v3 = useLocalization(idvErrorScreenStrings)
+	local v4 = useLocalization(idvWithQRCodeUpsellStrings)
+
+	local entryPointEventCtx = props.entryPointEventCtx or ""
+	local sessionId = props.metadata and props.metadata.sessionId or ""
+
+	local state, setState = React.useState(nil)
+	local ref = React.useRef(true)
+	local state2, setState2 = React.useState(ActionStatusEnum.Unknown)
+	local state3, setState3 = React.useState(false)
+	local state4, setState4 = React.useState(v3.retry)
+	local state5, setState5 = React.useState(0)
+	local v5 = GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell() and FacialAgeEstimationServiceWrapper.isAvailable()
+	local v6 = GetFFlagEnableDirectLinkForTablets() and deviceType == DeviceType.Tablet and true
+		or deviceType == DeviceType.Phone
+	local v7 = useRoactService(AppLinking)
+	local v8 = useRoactService(RoactNetworking)
+	local schedulePoll = props.schedulePoll or function(callback, p: number)
+		spawn(function()
+			wait(p)
+			callback()
 		end)
 	end
-	local v76 = t1.openIdvLink or function(p5) -- line: 118
-		-- upvalues: v73 (copy)
-		v73:openURL(p5)
+
+	local openIdvLink = props.openIdvLink or function(p)
+		v7:openURL(p)
 	end
 
-	local function v77() -- line: 122
-		-- upvalues: v55 (copy), AppScreens (copy), GetFStringBiometricPrivacyPolicyLink (copy), v57 (copy)
-		v55.navigate(AppScreens.GenericWebPage, {
+	local function fn()
+		v2.navigate(AppScreens.GenericWebPage, {
 			detail = GetFStringBiometricPrivacyPolicyLink(),
-			extraProps = {
-				transitionAnimation = "SlideInFromBottom",
-				title = v57.privacyPageHeader
-			}
+			extraProps = { title = v4.privacyPageHeader, transitionAnimation = "SlideInFromBottom" }
 		})
 	end
-	local function updateChecklist(p6) -- line: 132
-		-- upvalues: IDVSessionStatusEnum (copy), v70 (copy), IDVStep (copy)
-		if p6 == IDVSessionStatusEnum.Stored then
-			v70(IDVStep.UpdatedRobloxProfile)
 
-			return
-		end
-
-		if p6 == IDVSessionStatusEnum.Success then
-			v70(IDVStep.Verified)
-
-			return
-		end
-
-		if p6 == IDVSessionStatusEnum.Submitted then
-			v70(IDVStep.GotResults)
-
-			return
-		end
-
-		if p6 == IDVSessionStatusEnum.Started then
-			v70(IDVStep.ConnectedMobile)
+	local function updateChecklist(sessionStatus)
+		if sessionStatus == IDVSessionStatusEnum.Stored then
+			setState5(IDVStep.UpdatedRobloxProfile)
+		elseif sessionStatus == IDVSessionStatusEnum.Success then
+			setState5(IDVStep.Verified)
+		elseif sessionStatus == IDVSessionStatusEnum.Submitted then
+			setState5(IDVStep.GotResults)
+		elseif sessionStatus == IDVSessionStatusEnum.Started then
+			setState5(IDVStep.ConnectedMobile)
 		end
 	end
-	local function reportErrorShown(s1: string) -- line: 146
-		-- upvalues: GetFFlagEnableAmpIDVUpsellAnalytics (copy), authModalShown (copy), v58 (copy)
+
+	local function reportErrorShown(p: string) -- 3 equivalent calls inferred from this helper
 		if GetFFlagEnableAmpIDVUpsellAnalytics() then
-			authModalShown(v58, s1, "idvFailed")
+			authModalShown(entryPointEventCtx, p, "idvFailed")
 		end
 	end
-	local function pollIDVStatus(s2: string, n2: number, s3: string) -- line: 152
-		-- upvalues: v66 (copy), v68 (copy), v56 (copy), GetFFlagEnableAmpIDVUpsellAnalytics (copy), authModalShown (copy), v58 (copy), v53 (copy), updateChecklist (copy), IDVSessionStatusEnum (copy), authMsgShown (copy), v64 (copy), ActionStatusEnum (copy), v75 (copy), v62 (copy), pollIDVStatus (copy), v40 (copy)
-		if n2 == 0 then
-			v66(true)
-			v68(v56.timeout)
 
-			if GetFFlagEnableAmpIDVUpsellAnalytics() then
-				authModalShown(v58, s3, "idvFailed")
-
-				return
-			end
+	local function pollIDVStatus(sessionIdentifier: string, fIntIDVMaxRetries2: number, p: string)
+		if fIntIDVMaxRetries2 == 0 then
+			setState3(true)
+			setState4(v3.timeout)
+			reportErrorShown(p) -- inferred equivalent call
 		else
-			v53.getVerifiedStatus(s2):andThen(function(p7) -- line: 160
-				-- upvalues: updateChecklist (copy), IDVSessionStatusEnum (copy), GetFFlagEnableAmpIDVUpsellAnalytics (copy), authMsgShown (copy), v58 (copy), s3 (copy), v64 (copy), ActionStatusEnum (copy), v66 (copy), v68 (copy), v56 (copy), authModalShown (copy), v75 (copy), v62 (copy), pollIDVStatus (copy), s2 (copy), n2 (copy), v40 (copy)
-				local isVerified = p7.isVerified
-				local sessionStatus = p7.sessionStatus
-
+			v.getVerifiedStatus(sessionIdentifier):andThen(function(p2)
+				local isVerified = p2.isVerified
+				local sessionStatus = p2.sessionStatus
 				updateChecklist(sessionStatus)
 
 				if isVerified and sessionStatus == IDVSessionStatusEnum.Stored then
 					if GetFFlagEnableAmpIDVUpsellAnalytics() then
-						authMsgShown(v58, s3, "idvSuccess")
+						authMsgShown(entryPointEventCtx, p, "idvSuccess")
 					end
 
-					v64(ActionStatusEnum.Success)
-
-					return
-				end
-
-				if sessionStatus == IDVSessionStatusEnum.Failure or (sessionStatus == IDVSessionStatusEnum.RequiresManualReview or (sessionStatus == IDVSessionStatusEnum.RequiresRetry or sessionStatus == IDVSessionStatusEnum.Expired)) then
-					v66(true)
-					v64(ActionStatusEnum.Failure)
-
-					local v96 = v68
-					local v97 = v56
-
-					v96(if sessionStatus ~= IDVSessionStatusEnum.Failure and sessionStatus ~= IDVSessionStatusEnum.RequiresManualReview then if sessionStatus ~= IDVSessionStatusEnum.RequiresRetry then if sessionStatus ~= IDVSessionStatusEnum.Expired then v97.retry else v97.timeout else v97.retry else v97.declined)
-
-					local v98 = s3
-
-					if GetFFlagEnableAmpIDVUpsellAnalytics() then
-						authModalShown(v58, v98, "idvFailed")
-
-						return
-					end
+					setState2(ActionStatusEnum.Success)
+				elseif isFailure(sessionStatus) then -- inferred equivalent call
+					setState3(true)
+					setState2(ActionStatusEnum.Failure)
+					setState4(getErrorDescription(sessionStatus, v3)) -- inferred equivalent call
+					reportErrorShown(p) -- inferred equivalent call
 				else
-					v75(function() -- line: 176
-						-- upvalues: v62 (copy), pollIDVStatus (copy), s2 (copy), n2 (copy), s3 (copy)
-						if v62.current then
-							pollIDVStatus(s2, n2 - 1, s3)
+					schedulePoll(function()
+						if ref.current then
+							pollIDVStatus(sessionIdentifier, fIntIDVMaxRetries2 - 1, p)
 						end
-					end, v40)
+					end, fIntIDVPollDelay)
 				end
-			end):catch(function(_) -- line: 183
-				-- upvalues: v66 (copy), v68 (copy), v56 (copy), s3 (copy), GetFFlagEnableAmpIDVUpsellAnalytics (copy), authModalShown (copy), v58 (copy)
-				v66(true)
-				v68(v56.retry)
-
-				local v100 = s3
-
-				if GetFFlagEnableAmpIDVUpsellAnalytics() then
-					authModalShown(v58, v100, "idvFailed")
-				end
+			end):catch(function(_)
+				setState3(true)
+				setState4(v3.retry)
+				reportErrorShown(p) -- inferred equivalent call
 			end)
 		end
 	end
 
-	React.useEffect(function() -- line: 191
-		-- upvalues: v62 (copy), GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell (copy), FacialAgeEstimationServiceWrapper (copy), GetFFlagEnableAmpIDVUpsellAnalytics (copy), v59 (copy), authModalShown (copy), v58 (copy), pollIDVStatus (copy), v41 (copy), v72 (copy), v61 (copy), Promise (copy), GetFFlagEnableRoactNetworkingForChallengeInteception (copy), v53 (copy), v74 (copy), authFormInteraction (copy), v64 (copy), ActionStatusEnum (copy), v66 (copy), v68 (copy), v56 (copy)
-		v62.current = true
+	React.useEffect(function()
+		ref.current = true
+		local v9 = GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell()
+			and FacialAgeEstimationServiceWrapper.isAvailable()
+		local fFlagEnableAmpIDVUpsellAnalytics = GetFFlagEnableAmpIDVUpsellAnalytics()
+		local v10 = sessionId
 
-		local v89 = GetFFlagEnableNativePersonaInquiryForAmpIDVUpsell() and FacialAgeEstimationServiceWrapper.isAvailable()
-		local v90 = GetFFlagEnableAmpIDVUpsellAnalytics()
-		local u91 = v59
+		local function afterStartVerification(data)
+			local sessionIdentifier = data.sessionIdentifier
 
-		local function afterStartVerification(p9) -- line: 198
-			-- upvalues: v90 (copy), u91 (ref), v59 (copy), v89 (copy), authModalShown (copy), v58 (copy), FacialAgeEstimationServiceWrapper (copy), pollIDVStatus (copy), v41 (copy), v72 (copy), v61 (copy), Promise (copy)
-			local sessionIdentifier = p9.sessionIdentifier
-
-			if v90 then
-				u91 = `{ v59 }_{ sessionIdentifier }`
+			if fFlagEnableAmpIDVUpsellAnalytics then
+				v10 = `{sessionId}_{sessionIdentifier}`
 			end
 
-			if v89 then
-				if v90 then
-					authModalShown(v58, u91, "nativeIDV")
+			if v9 then
+				if fFlagEnableAmpIDVUpsellAnalytics then
+					authModalShown(entryPointEventCtx, v10, "nativeIDV")
 				end
 
-				return FacialAgeEstimationServiceWrapper.startFlow(sessionIdentifier, p9.sessionToken):andThen(function() -- line: 209
-					-- upvalues: pollIDVStatus (copy), sessionIdentifier (copy), v41 (copy), u91 (ref)
-					pollIDVStatus(sessionIdentifier, v41, u91)
+				return FacialAgeEstimationServiceWrapper.startFlow(sessionIdentifier, data.sessionToken):andThen(function()
+					pollIDVStatus(sessionIdentifier, fIntIDVMaxRetries, v10)
 				end)
 			end
 
-			if v90 then
-				local v103 = not v72 and "idvQRCode" or "idvDirectLink"
-
-				authModalShown(v58, u91, v103)
+			if fFlagEnableAmpIDVUpsellAnalytics then
+				authModalShown(entryPointEventCtx, v10, v6 and "idvDirectLink" or "idvQRCode")
 			end
 
-			pollIDVStatus(sessionIdentifier, v41, u91)
-			v61(p9.verificationLink)
-
+			pollIDVStatus(sessionIdentifier, fIntIDVMaxRetries, v10)
+			setState(data.verificationLink)
 			return Promise.resolve()
-		end;
+		end
 
-		((if not GetFFlagEnableRoactNetworkingForChallengeInteception() then v53.startVerification() else v53.startVerificationWithWrappedNetworking(v74))):andThen(afterStartVerification):catch(function(p10) -- line: 227
-			-- upvalues: v89 (copy), v90 (copy), authFormInteraction (copy), v58 (copy), u91 (ref), v64 (copy), ActionStatusEnum (copy), v66 (copy), v68 (copy), v56 (copy), authModalShown (copy)
-			if v89 and (p10 and p10.resultType == Enum.FacialAgeEstimationResultType.Cancel) then
-				if v90 then
-					authFormInteraction(v58, u91, "idvCancelled")
+		local v11
+
+		if GetFFlagEnableRoactNetworkingForChallengeInteception() then
+			v11 = v.startVerificationWithWrappedNetworking(v8)
+		else
+			v11 = v.startVerification()
+		end
+
+		v11:andThen(afterStartVerification):catch(function(p)
+			if v9 and p and p.resultType == Enum.FacialAgeEstimationResultType.Cancel then
+				if fFlagEnableAmpIDVUpsellAnalytics then
+					authFormInteraction(entryPointEventCtx, v10, "idvCancelled")
 				end
 
-				v64(ActionStatusEnum.Cancelled)
+				setState2(ActionStatusEnum.Cancelled)
+			else
+				setState3(true)
+				setState4(v3.retry)
 
-				return
-			end
-
-			v66(true)
-			v68(v56.retry)
-
-			if v90 then
-				authModalShown(v58, u91, "idvFailed")
+				if fFlagEnableAmpIDVUpsellAnalytics then
+					authModalShown(entryPointEventCtx, v10, "idvFailed")
+				end
 			end
 		end)
 
-		return function() -- line: 242
-			-- upvalues: v62 (copy)
-			v62.current = false
+		return function()
+			ref.current = false
 		end
 	end, {})
-	React.useEffect(function() -- line: 248
-		-- upvalues: v63 (copy), ActionStatusEnum (copy), onSuccess (copy), onCancelled (copy)
-		if v63 == ActionStatusEnum.Success then
+
+	React.useEffect(function()
+		if state2 == ActionStatusEnum.Success then
 			onSuccess()
-
-			return
-		end
-
-		if v63 == ActionStatusEnum.Cancelled then
+		elseif state2 == ActionStatusEnum.Cancelled then
 			onCancelled()
 		end
-	end, { v63 })
+	end, { state2 })
 
-	if v65 then
+	if state3 then
 		return React.createElement(IDVErrorScreen, {
-			errorTitle = v56.title,
-			errorDescription = v67,
-			buttonText = v56.close,
-			onClose = function() -- line: 261
-				-- upvalues: onFailure (copy)
+			errorTitle = v3.title,
+			errorDescription = state4,
+			buttonText = v3.close,
+			onClose = function()
 				onFailure()
 			end
 		})
 	end
 
-	if v71 and v63 == ActionStatusEnum.Cancelled then
+	if v5 and state2 == ActionStatusEnum.Cancelled then
 		return nil
 	end
 
-	if v71 and not v65 and (v63 == ActionStatusEnum.Unknown or v63 == ActionStatusEnum.Success) then
+	if v5 and not state3 and (state2 == ActionStatusEnum.Unknown or state2 == ActionStatusEnum.Success) then
 		return React.createElement(Loading, {
 			size = IconSize.Large,
 			Position = UDim2.fromScale(0.5, 0.5),
@@ -303,36 +277,34 @@ local function IDVUpsellContainer(t1: {[any]: any}) -- line: 84
 		})
 	end
 
-	if v72 then
+	if v6 then
 		return React.createElement(IDVDirectLinkUpsell, {
 			featureName = featureName,
-			idvLink = v60,
-			openIdvLink = v76,
-			onClose = function() -- line: 283
-				-- upvalues: GetFFlagEnableAmpIDVUpsellAnalytics (copy), authFormInteraction (copy), v58 (copy), v59 (copy), v64 (copy), ActionStatusEnum (copy)
+			idvLink = state,
+			openIdvLink = openIdvLink,
+			onClose = function()
 				if GetFFlagEnableAmpIDVUpsellAnalytics() then
-					authFormInteraction(v58, v59, "idvCancelled")
+					authFormInteraction(entryPointEventCtx, sessionId, "idvCancelled")
 				end
 
-				v64(ActionStatusEnum.Cancelled)
+				setState2(ActionStatusEnum.Cancelled)
 			end,
-			openPrivacyPolicyLink = v77,
-			latestStepCompleted = v69
+			openPrivacyPolicyLink = fn,
+			latestStepCompleted = state5
 		})
 	end
 
 	return React.createElement(IDVWithQRCodeUpsell, {
-		qrCodeLink = v60,
+		qrCodeLink = state,
 		featureName = featureName,
-		openPrivacyPolicyLink = v77,
-		latestStepCompleted = v69,
-		onClose = function() -- line: 298
-			-- upvalues: GetFFlagEnableAmpIDVUpsellAnalytics (copy), authFormInteraction (copy), v58 (copy), v59 (copy), v64 (copy), ActionStatusEnum (copy)
+		openPrivacyPolicyLink = fn,
+		latestStepCompleted = state5,
+		onClose = function()
 			if GetFFlagEnableAmpIDVUpsellAnalytics() then
-				authFormInteraction(v58, v59, "idvCancelled")
+				authFormInteraction(entryPointEventCtx, sessionId, "idvCancelled")
 			end
 
-			v64(ActionStatusEnum.Cancelled)
+			setState2(ActionStatusEnum.Cancelled)
 		end
 	})
 end

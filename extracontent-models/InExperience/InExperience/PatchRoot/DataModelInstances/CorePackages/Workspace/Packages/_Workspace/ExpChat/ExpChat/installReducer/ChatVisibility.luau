@@ -1,6 +1,7 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).combineReducers({
+return Rodux.combineReducers({
 	isChatInputBarEnabled = require(script.isChatInputBarEnabled),
 	isChatWindowEnabled = require(script.isChatWindowEnabled),
 	isChatHotkeyEnabled = require(script.isChatHotkeyEnabled),

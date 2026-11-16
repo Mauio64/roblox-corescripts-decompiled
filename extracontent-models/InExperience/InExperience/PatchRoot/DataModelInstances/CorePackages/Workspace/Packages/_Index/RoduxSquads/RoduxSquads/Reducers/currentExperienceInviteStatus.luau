@@ -1,15 +1,15 @@
 local RoduxSquads = script:FindFirstAncestor("RoduxSquads")
-local RoduxSquadsParent = RoduxSquads.Parent
-local Rodux = require(RoduxSquadsParent.Rodux)
-local CurrentExperienceInviteStatusUpdated = require(RoduxSquads.Actions).CurrentExperienceInviteStatusUpdated
+local parent = RoduxSquads.Parent
+local Rodux = require(parent.Rodux)
+local Actions = require(RoduxSquads.Actions)
+local CurrentExperienceInviteStatusUpdated = Actions.CurrentExperienceInviteStatusUpdated
 
 require(script.Parent.Parent.RoduxSquadsTypes)
 
-return function() -- line: 12
-	-- upvalues: Rodux (copy), CurrentExperienceInviteStatusUpdated (copy)
+return function()
 	return Rodux.createReducer(false, {
-		[CurrentExperienceInviteStatusUpdated.name] = function(_: boolean, p1) -- line: 14
-			return p1.payload.isExperienceInvitePending
+		[CurrentExperienceInviteStatusUpdated.name] = function(_: boolean, p)
+			return p.payload.isExperienceInvitePending
 		end
 	})
 end

@@ -1,9 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local t = require(ParentParentParent.t)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local validateSelectionCursorInfo = require(ParentParent.Core.Style.Validator.validateSelectionCursorInfo)
-local validateThemedBackgroundImageInfo = require(ParentParent.Core.Style.Validator.validateThemedBackgroundImageInfo)
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local t = require(parent2.t)
+
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+local validateSelectionCursorInfo = require(parent.Core.Style.Validator.validateSelectionCursorInfo)
+local validateThemedBackgroundImageInfo = require(parent.Core.Style.Validator.validateThemedBackgroundImageInfo)
 
 return (t.strictInterface({
 	BackgroundDefault = validateColorInfo,

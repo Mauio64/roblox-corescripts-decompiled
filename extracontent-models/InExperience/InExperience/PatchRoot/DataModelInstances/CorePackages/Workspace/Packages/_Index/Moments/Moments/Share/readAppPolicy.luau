@@ -1,7 +1,9 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local v2 = require(Parent.PolicyProvider).GetPolicyImplementations.MemStorageService("app-policy")
+local parent = script:FindFirstAncestor("Moments").Parent
 
-return function() -- line: 9
-	-- upvalues: v2 (copy)
-	return v2.read()
+local PolicyProvider = require(parent.PolicyProvider)
+
+local memStorageService = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+
+return function()
+	return memStorageService.read()
 end

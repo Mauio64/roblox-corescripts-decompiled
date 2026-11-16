@@ -1,7 +1,11 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local uiblox = require(FoundationParent.BuilderIcons).Migration.uiblox
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
+local BuilderIcons = require(parent.BuilderIcons)
+local uiblox = BuilderIcons.Migration.uiblox
+
 local Icon = require(Foundation.Components.Icon)
 local Image = require(Foundation.Components.Image)
 local View = require(Foundation.Components.View)
@@ -14,58 +18,89 @@ local AvatarGroup = require(Foundation.Components.AvatarGroup)
 
 require(Foundation.Enums.AvatarGroupType)
 
-local useBackgroundStyle = require(Foundation.Providers.Style.BackgroundStyleContext).useBackgroundStyle
+local BackgroundStyleContext = require(Foundation.Providers.Style.BackgroundStyleContext)
+local useBackgroundStyle = BackgroundStyleContext.useBackgroundStyle
 
 require(Foundation.Components.Types)
 
+local Flags = require(Foundation.Utility.Flags)
 local useAccessoryVariants = require(script.Parent.useAccessoryVariants)
 
 require(Foundation.Enums.ChipSize)
 
-local function AvatarGroupWrapper(t1: {[any]: any}) -- line: 66
-	-- upvalues: useBackgroundStyle (copy), useCumulativeBackground (copy), React (copy), AvatarGroup (copy)
-	local v19 = useBackgroundStyle()
-	local v20 = table.clone(t1.config.props)
-
-	v20.size = t1.size
-	v20.backplateStyle = useCumulativeBackground(v19, t1.chipBackgroundStyle)
-
-	return React.createElement(AvatarGroup, v20)
+local function AvatarGroupWrapper(props)
+	local v = useBackgroundStyle()
+	local clone = table.clone(props.config.props)
+	clone.size = props.size
+	clone.backplateStyle = useCumulativeBackground(v, props.chipBackgroundStyle)
+	return React.createElement(AvatarGroup, clone)
 end
-local function Accessory(t2: {[any]: any}) -- line: 74
-	-- upvalues: useTokens (copy), React (copy), useAccessoryVariants (copy), AvatarGroupWrapper (copy), isBuilderOrMigratedIcon (copy), Icon (copy), isMigrated (copy), uiblox (copy), Image (copy), View (copy)
-	local v22 = useTokens()
-	local v23 = React.useMemo(function() -- line: 76
-		-- upvalues: t2 (copy)
-		if type(t2.config) == "string" then
-			return {
-				isCircular = false,
-				iconName = t2.config
-			}
+
+local function Accessory(props)
+	local v = useTokens()
+	local v2 = React.useMemo(function()
+		if type(props.config) == "string" then
+			return { iconName = props.config, isCircular = false }
 		end
 
-		return t2.config
-	end, { t2.config })
-	local v24 = useAccessoryVariants(v22, t2.size, t2.isLeading, v23.type == "AvatarGroup" or (v23.isCircular or false))
-	local v25 = if v23.type ~= "AvatarGroup" then if not isBuilderOrMigratedIcon(v23.iconName) then React.createElement(Image, {
-		Image = v23.iconName,
-		Size = v24.accessory.Size,
-		imageStyle = t2.contentStyle
-	}) else React.createElement(Icon, {
-		name = if not isMigrated(v23.iconName) then v23.iconName else uiblox[v23.iconName].name,
-		variant = if not isMigrated(v23.iconName) then v23.iconVariant else uiblox[v23.iconName].variant,
-		size = v24.accessory.Size.Y.Offset,
-		style = t2.contentStyle
-	}) else React.createElement(AvatarGroupWrapper, t2)
+		return props.config
+	end, { props.config })
+
+	local size = props.size
+	local isLeading = props.isLeading
+	local v3
+
+	if Flags.FoundationFixChipAccessoryLayout then
+		v3 = v2.type == "AvatarGroup"
+	else
+		v3 = v2.type == "AvatarGroup" or (v2.isCircular or false)
+	end
+
+	local v4 = useAccessoryVariants(v, size, isLeading, v3, props.isIconOnly)
+	local v5
+
+	if v2.type == "AvatarGroup" then
+		v5 = React.createElement(AvatarGroupWrapper, props)
+	elseif isBuilderOrMigratedIcon(v2.iconName) then
+		local createElement = React.createElement
+		local name
+
+		if isMigrated(v2.iconName) then
+			name = uiblox[v2.iconName].name
+		else
+			name = v2.iconName
+		end
+
+		local variant
+
+		if isMigrated(v2.iconName) then
+			variant = uiblox[v2.iconName].variant
+		else
+			variant = v2.iconVariant
+		end
+
+		v5 = createElement(Icon, {
+			name = name,
+			variant = variant,
+			size = v4.accessory.Size.Y.Offset,
+			style = props.contentStyle
+		})
+	else
+		v5 = React.createElement(Image, {
+			Image = v2.iconName,
+			Size = v4.accessory.Size,
+			imageStyle = props.contentStyle
+		})
+	end
 
 	return React.createElement(View, {
 		tag = "auto-xy",
-		padding = v24.accessory.padding,
-		onActivated = v23.onActivated,
-		isDisabled = t2.isDisabled,
-		LayoutOrder = not t2.isLeading and 3 or 1,
-		testId = t2.testId
-	}, v25)
+		padding = v4.accessory.padding,
+		onActivated = v2.onActivated,
+		isDisabled = props.isDisabled,
+		LayoutOrder = props.isLeading and 1 or 3,
+		testId = props.testId
+	}, v5)
 end
 
 return React.memo(Accessory)

@@ -4,128 +4,123 @@ local OpenCloudService = game:GetService("OpenCloudService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-function returnInvalidArgumentError(s1: string) -- line: 23
-	-- upvalues: HttpService (copy)
+function returnInvalidArgumentError(message: string)
 	return {
 		StatusCode = 400,
-		Body = HttpService:JSONEncode({
-			code = "INVALID_ARGUMENT",
-			message = s1
-		})
+		Body = HttpService:JSONEncode({ code = "INVALID_ARGUMENT", message = message })
 	}
 end
-function verifyPlayerOnServer(p1) -- line: 33
-	-- upvalues: Players (copy)
-	local v8 = verifyPlayer(p1)
 
-	if v8 ~= nil then
-		return v8
+function verifyPlayerOnServer(p)
+	local v = verifyPlayer(p)
+
+	if v ~= nil then
+		return v
 	end
 
 	local players = Players:GetPlayers()
 
-	for _, v in ipairs(players) do
-		if v.UserId == p1.UserId then
+	for _, player in ipairs(players) do
+		if player.UserId == p.UserId then
 			return nil
 		end
 	end
 
 	return returnInvalidArgumentError("Player not found on server.")
 end
-function verifyPlayer(p2) -- line: 49
-	if typeof(p2) ~= "Instance" or p2.ClassName ~= "Player" then
-		return returnInvalidArgumentError("user argument not a Player instance.")
+
+function verifyPlayer(instance)
+	if typeof(instance) == "Instance" and instance.ClassName == "Player" then
+		return nil
 	end
 
-	return nil
+	return returnInvalidArgumentError("user argument not a Player instance.")
 end
-function verifyString(p3) -- line: 56
-	if typeof(p3) ~= "string" then
-		return returnInvalidArgumentError("Argument not a string.")
+
+function verifyString(value)
+	if typeof(value) == "string" then
+		return nil
 	end
 
-	return nil
+	return returnInvalidArgumentError("Argument not a string.")
 end
-function verifyNumber(p4) -- line: 63
-	if typeof(p4) ~= "number" then
-		return returnInvalidArgumentError("Argument not a number.")
+
+function verifyNumber(value)
+	if typeof(value) == "number" then
+		return nil
 	end
 
-	return nil
+	return returnInvalidArgumentError("Argument not a number.")
 end
-function getUrlPrefix() -- line: 70
-	-- upvalues: RunService (copy)
-	if RunService:IsStudio() then
-		return "user"
-	end
 
-	return "rcc"
+function getUrlPrefix(): string
+	return if RunService:IsStudio() then "user" else "rcc"
 end
-function createListInventoryItemsUrl(n1: number, n2: number?, s2: string?, s3: string?) -- line: 77
-	-- upvalues: ContentProvider (copy)
-	local v19 = ContentProvider.BaseUrl:lower()
-	local v20 = string.gsub(v19, "http:", "https:")
-	local v21 = string.gsub(v20, "www", "apis")
-	local v22 = string.format("%s%s/cloud/v2/users/%d/inventory-items", v21, getUrlPrefix(), n1)
 
-	if n2 == nil and (s2 == nil and s3 == nil) then
-		return v22
+function createListInventoryItemsUrl(p: number, p2: number?, p3: string?, p4: string?)
+	local baseUrl = ContentProvider.BaseUrl:lower()
+	local v = string.gsub(baseUrl, "http:", "https:")
+	local v2 = string.gsub(v, "www", "apis")
+	local v3 = string.format("%s%s/cloud/v2/users/%d/inventory-items", v2, getUrlPrefix(), p)
+
+	if p2 == nil and p3 == nil and p4 == nil then
+		return v3
 	end
 
-	local t1 = {}
+	local v4 = {}
 
-	if n2 ~= nil then
-		table.insert(t1, string.format("maxPageSize=%d", n2))
+	if p2 ~= nil then
+		table.insert(v4, string.format("maxPageSize=%d", p2))
 	end
 
-	if s2 ~= nil then
-		table.insert(t1, string.format("pageToken=%s", s2))
+	if p3 ~= nil then
+		table.insert(v4, string.format("pageToken=%s", p3))
 	end
 
-	if s3 ~= nil then
-		table.insert(t1, string.format("filter=%s", s3))
+	if p4 ~= nil then
+		table.insert(v4, string.format("filter=%s", p4))
 	end
 
-	return (string.format("%s?%s", v22, table.concat(t1, "&")))
+	return (string.format("%s?%s", v3, table.concat(v4, "&")))
 end
-function listInventoryItems(p5) -- line: 102
-	-- upvalues: OpenCloudService (copy)
-	if p5.user == nil then
+
+function listInventoryItems(data)
+	if data.user == nil then
 		return returnInvalidArgumentError("user argument was not provided.")
 	end
 
-	local v25 = verifyPlayerOnServer(p5.user)
+	local v = verifyPlayerOnServer(data.user)
 
-	if v25 ~= nil then
-		return v25
+	if v ~= nil then
+		return v
 	end
 
-	if p5.maxPageSize ~= nil then
-		local v26 = verifyNumber(p5.maxPageSize)
+	if data.maxPageSize ~= nil then
+		local v2 = verifyNumber(data.maxPageSize)
 
-		if v26 ~= nil then
-			return v26
+		if v2 ~= nil then
+			return v2
 		end
 	end
 
-	if p5.pageToken ~= nil then
-		local v27 = verifyString(p5.pageToken)
+	if data.pageToken ~= nil then
+		local v2 = verifyString(data.pageToken)
 
-		if v27 ~= nil then
-			return v27
+		if v2 ~= nil then
+			return v2
 		end
 	end
 
-	if p5.filter ~= nil then
-		local v28 = verifyString(p5.filter)
+	if data.filter ~= nil then
+		local v2 = verifyString(data.filter)
 
-		if v28 ~= nil then
-			return v28
+		if v2 ~= nil then
+			return v2
 		end
 	end
 
 	return OpenCloudService:HttpRequestAsync({
-		Url = createListInventoryItemsUrl(p5.user.UserId, p5.maxPageSize, p5.pageToken, p5.filter),
+		["Url"] = createListInventoryItemsUrl(data.user.UserId, data.maxPageSize, data.pageToken, data.filter),
 		Request_Type = "GET"
 	})
 end

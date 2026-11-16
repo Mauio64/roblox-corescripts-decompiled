@@ -1,12 +1,6 @@
 return {
-	["pictograms/ads"] = {
-		assetId = "rbxassetid://78173993127341",
-		size = Vector2.new(960, 540)
-	},
-	["pictograms/alert"] = {
-		assetId = "rbxassetid://97628760291739",
-		size = Vector2.new(300, 300)
-	},
+	["pictograms/ads"] = { assetId = "rbxassetid://78173993127341", size = Vector2.new(960, 540) },
+	["pictograms/alert"] = { assetId = "rbxassetid://97628760291739", size = Vector2.new(300, 300) },
 	["pictograms/alert_lg"] = {
 		assetId = "rbxassetid://118048071626044",
 		size = Vector2.new(960, 540)
@@ -15,10 +9,7 @@ return {
 		assetId = "rbxassetid://86891131681367",
 		size = Vector2.new(960, 540)
 	},
-	["pictograms/audio"] = {
-		assetId = "rbxassetid://86296775732265",
-		size = Vector2.new(960, 540)
-	},
+	["pictograms/audio"] = { assetId = "rbxassetid://86296775732265", size = Vector2.new(960, 540) },
 	["pictograms/avatar"] = {
 		assetId = "rbxassetid://105161717715713",
 		size = Vector2.new(960, 540)
@@ -51,10 +42,7 @@ return {
 		assetId = "rbxassetid://79470525818005",
 		size = Vector2.new(960, 540)
 	},
-	["pictograms/chat"] = {
-		assetId = "rbxassetid://72457785120997",
-		size = Vector2.new(960, 540)
-	},
+	["pictograms/chat"] = { assetId = "rbxassetid://72457785120997", size = Vector2.new(960, 540) },
 	["pictograms/chat_security"] = {
 		assetId = "rbxassetid://94532826819081",
 		size = Vector2.new(960, 540)
@@ -87,10 +75,7 @@ return {
 		assetId = "rbxassetid://135252817961495",
 		size = Vector2.new(960, 540)
 	},
-	["pictograms/gift"] = {
-		assetId = "rbxassetid://92546076747282",
-		size = Vector2.new(960, 540)
-	},
+	["pictograms/gift"] = { assetId = "rbxassetid://92546076747282", size = Vector2.new(960, 540) },
 	["pictograms/group_exp"] = {
 		assetId = "rbxassetid://112049075204369",
 		size = Vector2.new(960, 540)
@@ -123,10 +108,7 @@ return {
 		assetId = "rbxassetid://90454816739386",
 		size = Vector2.new(960, 540)
 	},
-	["pictograms/logo"] = {
-		assetId = "rbxassetid://80325486497687",
-		size = Vector2.new(960, 540)
-	},
+	["pictograms/logo"] = { assetId = "rbxassetid://80325486497687", size = Vector2.new(960, 540) },
 	["pictograms/makeup_look"] = {
 		assetId = "rbxassetid://107245665197852",
 		size = Vector2.new(960, 540)
@@ -143,10 +125,7 @@ return {
 		assetId = "rbxassetid://112114657870611",
 		size = Vector2.new(960, 540)
 	},
-	["pictograms/nexus"] = {
-		assetId = "rbxassetid://84583067251237",
-		size = Vector2.new(960, 540)
-	},
+	["pictograms/nexus"] = { assetId = "rbxassetid://84583067251237", size = Vector2.new(960, 540) },
 	["pictograms/notifications"] = {
 		assetId = "rbxassetid://95594417429233",
 		size = Vector2.new(960, 540)
@@ -195,10 +174,7 @@ return {
 		assetId = "rbxassetid://105922646125917",
 		size = Vector2.new(960, 540)
 	},
-	["pictograms/run"] = {
-		assetId = "rbxassetid://85254501760808",
-		size = Vector2.new(960, 540)
-	},
+	["pictograms/run"] = { assetId = "rbxassetid://85254501760808", size = Vector2.new(960, 540) },
 	["pictograms/share_links"] = {
 		assetId = "rbxassetid://100521638291530",
 		size = Vector2.new(960, 540)

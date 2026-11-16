@@ -1,100 +1,219 @@
-local UserTile = script:FindFirstAncestor("UserTile")
-local UserTileParent = UserTile.Parent
-local React = require(UserTileParent.React)
-local Foundation = require(UserTileParent.Foundation)
-local TitleStack = require(UserTile.Components.TitleStack)
-local Avatar = require(UserTile.Components.Avatar)
-local AvatarPile = require(UserTile.Components.AvatarPile)
+local userTile = script:FindFirstAncestor("UserTile")
+local parent = userTile.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local TitleStack = require(userTile.Components.TitleStack)
+local Avatar = require(userTile.Components.Avatar)
+local AvatarPile = require(userTile.Components.AvatarPile)
 local View = Foundation.View
 local ControlState = Foundation.Enums.ControlState
 local Enums = Foundation.Enums
+
 local LayoutMode = require(script.Parent.Parent.Enums.LayoutMode)
-local FFlagProfilePlatformNewProfileHeader = require(UserTileParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
-local FFlagUserTileShowShimmerWhenLoading = require(UserTile.Flags.FFlagUserTileShowShimmerWhenLoading)
-local FFlagUserTileTextTCIndicator = require(UserTileParent.SharedFlags).FFlagUserTileTextTCIndicator
-local FFlagEnableBlackbirdCheck = require(UserTileParent.SharedFlags).FFlagEnableBlackbirdCheck
-local FFlagUserTileShowBadges = require(UserTileParent.SharedFlags).FFlagUserTileShowBadges
-local FFlagEnableMobileGameJoinCard = require(UserTileParent.SharedFlags).FFlagEnableMobileGameJoinCard
-local FFlagUserTileAddContextualInfoIcon = require(UserTileParent.SharedFlags).FFlagUserTileAddContextualInfoIcon
 
-local function UserTile2(t1: {[any]: any}) -- line: 55
-	-- upvalues: React (copy), ControlState (copy), View (copy), LayoutMode (copy), Enums (copy), AvatarPile (copy), Avatar (copy), FFlagUserTileShowShimmerWhenLoading (copy), TitleStack (copy), FFlagUserTileShowBadges (copy), FFlagUserTileAddContextualInfoIcon (copy), FFlagProfilePlatformNewProfileHeader (copy), FFlagEnableMobileGameJoinCard (copy), FFlagUserTileTextTCIndicator (copy), FFlagEnableBlackbirdCheck (copy)
-	local v21, v22 = React.useState(false)
-	local v23 = t1.onActivated ~= nil
-	local v24 = React.useCallback(function(p1) -- line: 58
-		-- upvalues: v22 (copy), v23 (copy), ControlState (copy), t1 (copy)
-		v22(v23 and (p1 == ControlState.Hover or p1 == ControlState.Pressed))
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformNewProfileHeader = SharedFlags.FFlagProfilePlatformNewProfileHeader
+local FFlagUserTileShowShimmerWhenLoading = require(userTile.Flags.FFlagUserTileShowShimmerWhenLoading)
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags2.FFlagEnableBlackbirdCheck
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagUserTileShowBadges = SharedFlags3.FFlagUserTileShowBadges
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagEnableMobileGameJoinCard = SharedFlags4.FFlagEnableMobileGameJoinCard
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagUserTileAddContextualInfoIcon = SharedFlags5.FFlagUserTileAddContextualInfoIcon
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagUserTileTitleStackAddExtraInfo = SharedFlags6.FFlagUserTileTitleStackAddExtraInfo
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagUserTileUnfilteredChatIndicator = SharedFlags7.FFlagUserTileUnfilteredChatIndicator
 
-		if t1.onStateChanged then
-			t1.onStateChanged(p1)
+local function UserTile(props)
+	local state, setState = React.useState(false)
+	local v = props.onActivated ~= nil
+	local onStateChanged = React.useCallback(function(p)
+		setState(v and (p == ControlState.Hover or p == ControlState.Pressed))
+
+		if props.onStateChanged then
+			props.onStateChanged(p)
 		end
-	end, {
-		t1.onActivated,
-		t1.onStateChanged
-	})
+	end, { props.onActivated, props.onStateChanged })
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v2 = {
 		tag = {
 			["size-full"] = true,
-			["col align-x-center gap-small"] = t1.layoutMode == LayoutMode.compact,
-			["row align-y-center gap-medium"] = t1.layoutMode == LayoutMode.wide
+			["col align-x-center gap-small"] = props.layoutMode == LayoutMode.compact,
+			["row align-y-center gap-medium"] = props.layoutMode == LayoutMode.wide
 		},
-		selection = {
-			Selectable = t1.selectable
-		},
-		onStateChanged = v24,
-		onActivated = t1.onActivated,
-		stateLayer = {
-			affordance = Enums.StateLayerAffordance.None
-		}
-	}, {
-		AvatarThumbnail = React.createElement(View, {
-			tag = "size-full aspect-1-1",
-			LayoutOrder = 1,
-			Size = t1.avatarSize
-		}, {
-			AvatarComponent = if not t1.facePileSecondUserId then React.createElement(Avatar, {
-				layoutOrder = 1,
-				ZIndex = 2,
-				avatarThumbnailUrl = if not FFlagUserTileShowShimmerWhenLoading then nil else t1.avatarThumbnailUrl,
-				userId = t1.userId,
-				userPresenceType = t1.userPresenceType,
-				hover = v21,
-				backplateStyle = t1.backplateStyle
-			}) else React.createElement(AvatarPile, {
-				layoutOrder = 1,
-				ZIndex = 2,
-				primaryUserId = t1.userId,
-				secondUserId = t1.facePileSecondUserId,
-				userPresenceType = t1.userPresenceType,
-				hover = v21
-			})
-		}),
-		TitleStack = React.createElement(TitleStack, {
-			layoutOrder = 2,
-			ZIndex = 1,
-			title = t1.title,
-			isVerified = if not FFlagUserTileShowBadges then nil else t1.isVerified,
-			isPremium = if not FFlagUserTileShowBadges then nil else t1.isPremium,
-			isRobloxAdmin = if not FFlagUserTileShowBadges then nil else t1.isRobloxAdmin,
-			subtitle = t1.subtitle,
-			contextualInfo = t1.contextualInfo,
-			contextualInfoIcon = if not FFlagUserTileAddContextualInfoIcon then nil else t1.contextualInfoIcon,
-			layoutMode = t1.layoutMode,
-			titleStyle = t1.titleStyle,
-			subtitleStyle = t1.subtitleStyle,
-			contextualInfoStyle = t1.contextualInfoStyle,
-			titleIcon = t1.titleIcon,
-			onSubtitleClicked = if not FFlagProfilePlatformNewProfileHeader and not FFlagEnableMobileGameJoinCard then nil else t1.onSubtitleClicked,
-			isTitleLoading = if not FFlagUserTileShowShimmerWhenLoading then nil else t1.isTitleLoading,
-			isSubtitleLoading = if not FFlagUserTileShowShimmerWhenLoading then nil else t1.isSubtitleLoading,
-			isContextualInfoLoading = if not FFlagUserTileShowShimmerWhenLoading then nil else t1.isContextualInfoLoading,
-			customTextTruncation = t1.customTextTruncation,
-			isTrustedConnection = if not FFlagUserTileTextTCIndicator then nil else t1.isTrustedConnection,
-			trustedConnectionIndicatorEnabled = if not FFlagUserTileTextTCIndicator then nil else t1.trustedConnectionIndicatorEnabled,
-			isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else t1.isRobloxSubscriber
+		selection = { Selectable = props.selectable },
+		onStateChanged = onStateChanged,
+		onActivated = props.onActivated,
+		stateLayer = { affordance = Enums.StateLayerAffordance.None }
+	}
+
+	local createElement2 = React.createElement
+	local v3 = { tag = "size-full aspect-1-1", Size = props.avatarSize, LayoutOrder = 1 }
+	local avatarComponent
+
+	if props.facePileSecondUserId then
+		avatarComponent = React.createElement(AvatarPile, {
+			layoutOrder = 1,
+			primaryUserId = props.userId,
+			secondUserId = props.facePileSecondUserId,
+			userPresenceType = props.userPresenceType,
+			ZIndex = 2,
+			hover = state
 		})
-	})
+	else
+		local createElement3 = React.createElement
+		local avatarThumbnailUrl
+
+		if FFlagUserTileShowShimmerWhenLoading then
+			avatarThumbnailUrl = props.avatarThumbnailUrl
+		end
+
+		avatarComponent = createElement3(Avatar, {
+			avatarThumbnailUrl = avatarThumbnailUrl,
+			layoutOrder = 1,
+			userId = props.userId,
+			userPresenceType = props.userPresenceType,
+			ZIndex = 2,
+			hover = state,
+			backplateStyle = props.backplateStyle,
+			includeProfileFrame = props.includeProfileFrame,
+			overlayIcon = props.overlayIcon
+		})
+	end
+
+	local children = {
+		AvatarThumbnail = createElement2(View, v3, { AvatarComponent = avatarComponent }),
+		TitleStack = 0
+	}
+
+	local createElement3 = React.createElement
+	local v4 = {
+		layoutOrder = 2,
+		title = props.title,
+		isVerified = 0,
+		isPremium = 0,
+		isRobloxAdmin = 0,
+		subtitle = 0,
+		contextualInfo = 0,
+		contextualInfoIcon = 0,
+		layoutMode = 0,
+		titleStyle = 0,
+		subtitleStyle = 0,
+		contextualInfoStyle = 0,
+		ZIndex = 1,
+		titleIcon = 0,
+		onSubtitleClicked = 0,
+		isTitleLoading = 0,
+		isSubtitleLoading = 0,
+		isContextualInfoLoading = 0,
+		customTextTruncation = 0,
+		isTrustedConnection = 0,
+		trustedConnectionIndicatorEnabled = 0,
+		shouldShowUnfilteredChatIndicator = 0,
+		isRobloxSubscriber = 0,
+		extraInfo = 0,
+		isExtraInfoLoading = 0,
+		extraInfoStyle = 0,
+		onExtraInfoClicked = 0
+	}
+	local isVerified
+
+	if FFlagUserTileShowBadges then
+		isVerified = props.isVerified
+	end
+
+	v4.isVerified = isVerified
+	local isPremium
+
+	if FFlagUserTileShowBadges then
+		isPremium = props.isPremium
+	end
+
+	v4.isPremium = isPremium
+	local isRobloxAdmin
+
+	if FFlagUserTileShowBadges then
+		isRobloxAdmin = props.isRobloxAdmin
+	end
+
+	v4.isRobloxAdmin = isRobloxAdmin
+	v4.subtitle = props.subtitle
+	v4.contextualInfo = props.contextualInfo
+	local contextualInfoIcon
+
+	if FFlagUserTileAddContextualInfoIcon then
+		contextualInfoIcon = props.contextualInfoIcon
+	end
+
+	v4.contextualInfoIcon = contextualInfoIcon
+	v4.layoutMode = props.layoutMode
+	v4.titleStyle = props.titleStyle
+	v4.subtitleStyle = props.subtitleStyle
+	v4.contextualInfoStyle = props.contextualInfoStyle
+
+	v4.titleIcon = props.titleIcon
+	local onSubtitleClicked
+
+	if FFlagProfilePlatformNewProfileHeader or FFlagEnableMobileGameJoinCard then
+		onSubtitleClicked = props.onSubtitleClicked
+	end
+
+	v4.onSubtitleClicked = onSubtitleClicked
+	local isTitleLoading
+
+	if FFlagUserTileShowShimmerWhenLoading then
+		isTitleLoading = props.isTitleLoading
+	end
+
+	v4.isTitleLoading = isTitleLoading
+	local isSubtitleLoading
+
+	if FFlagUserTileShowShimmerWhenLoading then
+		isSubtitleLoading = props.isSubtitleLoading
+	end
+
+	v4.isSubtitleLoading = isSubtitleLoading
+	local isContextualInfoLoading
+
+	if FFlagUserTileShowShimmerWhenLoading then
+		isContextualInfoLoading = props.isContextualInfoLoading
+	end
+
+	v4.isContextualInfoLoading = isContextualInfoLoading
+
+	v4.customTextTruncation = props.customTextTruncation
+	v4.isTrustedConnection = props.isTrustedConnection
+	v4.trustedConnectionIndicatorEnabled = props.trustedConnectionIndicatorEnabled
+	local shouldShowUnfilteredChatIndicator
+
+	if FFlagUserTileUnfilteredChatIndicator then
+		shouldShowUnfilteredChatIndicator = props.shouldShowUnfilteredChatIndicator
+	end
+
+	v4.shouldShowUnfilteredChatIndicator = shouldShowUnfilteredChatIndicator
+	local isRobloxSubscriber
+
+	if FFlagEnableBlackbirdCheck then
+		isRobloxSubscriber = props.isRobloxSubscriber
+	end
+
+	v4.isRobloxSubscriber = isRobloxSubscriber
+	v4.extraInfo = props.extraInfo
+	local isExtraInfoLoading
+
+	if FFlagUserTileTitleStackAddExtraInfo then
+		isExtraInfoLoading = props.isExtraInfoLoading
+	end
+
+	v4.isExtraInfoLoading = isExtraInfoLoading
+	v4.extraInfoStyle = props.extraInfoStyle
+	v4.onExtraInfoClicked = props.onExtraInfoClicked
+	children.TitleStack = createElement3(TitleStack, v4)
+	return createElement(View, v2, children)
 end
 
-return UserTile2
+return UserTile

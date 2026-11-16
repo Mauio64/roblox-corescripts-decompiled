@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagEnablePlayWithRewardComponent) and game:DefineFastFlag("EnablePlayWithRewardNonPeekviewEdp2", false)
+local FFlagEnablePlayWithRewardComponent = require(script.Parent.FFlagEnablePlayWithRewardComponent)
+
+return FFlagEnablePlayWithRewardComponent and game:DefineFastFlag("EnablePlayWithRewardNonPeekviewEdp2", false)

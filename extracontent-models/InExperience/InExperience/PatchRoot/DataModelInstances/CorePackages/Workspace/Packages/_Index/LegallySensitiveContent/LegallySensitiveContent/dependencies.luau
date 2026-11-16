@@ -1,10 +1,18 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-return {
-	Localization = require(ParentParent.Localization),
-	Promise = require(ParentParent.Promise),
-	UrlBuilder = require(ParentParent.UrlBuilder).UrlBuilder,
-	UrlBase = require(ParentParent.UrlBuilder).UrlBase,
-	Fetch = require(ParentParent.Fetch),
-	Base64 = require(ParentParent.AuthCommon).Utils.Base64
+local Dependencies = {
+	Localization = require(parent.Localization),
+	Promise = require(parent.Promise),
+	UrlBuilder = 0,
+	UrlBase = 0,
+	Fetch = 0,
+	Base64 = 0
 }
+local UrlBuilder = require(parent.UrlBuilder)
+Dependencies.UrlBuilder = UrlBuilder.UrlBuilder
+local UrlBuilder2 = require(parent.UrlBuilder)
+Dependencies.UrlBase = UrlBuilder2.UrlBase
+Dependencies.Fetch = require(parent.Fetch)
+local AuthCommon = require(parent.AuthCommon)
+Dependencies.Base64 = AuthCommon.Utils.Base64
+return Dependencies

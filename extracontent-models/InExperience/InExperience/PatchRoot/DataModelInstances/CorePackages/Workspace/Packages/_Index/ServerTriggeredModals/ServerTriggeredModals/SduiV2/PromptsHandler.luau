@@ -1,3 +1,1 @@
-return {
-	PromptsHandler = require(script.PromptsHandler)
-}
+return { PromptsHandler = require(script.PromptsHandler) }

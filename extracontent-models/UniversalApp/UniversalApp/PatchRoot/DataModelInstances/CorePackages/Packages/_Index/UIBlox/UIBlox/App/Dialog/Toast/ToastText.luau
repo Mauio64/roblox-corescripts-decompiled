@@ -1,13 +1,16 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local validateFontInfo = require(ParentParent.Core.Style.Validator.validateFontInfo)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
-local GenericTextLabel = require(ParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local v8 = Roact.PureComponent:extend("ToastText")
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-v8.validateProps = t.interface({
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+
+local validateFontInfo = require(parent.Core.Style.Validator.validateFontInfo)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+local GenericTextLabel = require(parent.Core.Text.GenericTextLabel.GenericTextLabel)
+
+local extended = Roact.PureComponent:extend("ToastText")
+
+extended.validateProps = t.interface({
 	colorStyle = validateColorInfo,
 	fontStyle = validateFontInfo,
 	Size = t.UDim2,
@@ -21,14 +24,14 @@ v8.validateProps = t.interface({
 	TextXAlignment = t.optional(t.EnumItem),
 	TextYAlignment = t.optional(t.EnumItem)
 })
-v8.defaultProps = {
+
+extended.defaultProps = {
 	TextXAlignment = Enum.TextXAlignment.Left,
 	TextYAlignment = Enum.TextYAlignment.Center
 }
 
-function v8.render(p1) -- line: 39
-	-- upvalues: Roact (copy), GenericTextLabel (copy)
-	return Roact.createElement(GenericTextLabel, p1.props)
+function extended.render(p)
+	return Roact.createElement(GenericTextLabel, p.props)
 end
 
-return v8
+return extended

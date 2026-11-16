@@ -1,44 +1,54 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local React = require(Parent.React)
-local BuilderIcons = require(Parent.BuilderIcons)
-local Foundation = require(Parent.Foundation)
-local useTokens = Foundation.Hooks.useTokens
-local LoadableImage = require(Parent.UIBlox).App.Loading.LoadableImage
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
-local getStandardSizeAvatarHeadShotRbxthumb = require(Parent.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb
+local FlyoutSidePanel = script:FindFirstAncestor("FlyoutSidePanel")
+local parent = FlyoutSidePanel.Parent
+local React = require(parent.React)
+local BuilderIcons = require(parent.BuilderIcons)
+local Foundation = require(parent.Foundation)
 
-local function FlyoutAlternateEntryPoint() -- line: 14
-	-- upvalues: useTokens (copy), useSelector (copy), React (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), Foundation (copy), BuilderIcons (copy), LoadableImage (copy)
-	local v10 = useTokens()
-	local v11 = useSelector(function(p1) -- line: 16
-		return p1.Users[p1.LocalUserId]
+local useTokens = Foundation.Hooks.useTokens
+local UIBlox = require(parent.UIBlox)
+local LoadableImage = UIBlox.App.Loading.LoadableImage
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local UserLib = require(parent.UserLib)
+local getStandardSizeAvatarHeadShotRbxthumb = UserLib.Utils.getStandardSizeAvatarHeadShotRbxthumb
+
+local FFlagFlyoutAlternateEntryPointUseProfileFrameThumbnail = require(FlyoutSidePanel.Flags.FFlagFlyoutAlternateEntryPointUseProfileFrameThumbnail)
+
+local function FlyoutAlternateEntryPoint()
+	local v = useTokens()
+	local v2 = useSelector(function(p)
+		return p.Users[p.LocalUserId]
 	end)
-	local v12 = React.useMemo(function() -- line: 19
-		-- upvalues: v11 (copy), getStandardSizeAvatarHeadShotRbxthumb (copy)
-		if v11 and v11.id then
-			return getStandardSizeAvatarHeadShotRbxthumb(v11.id)
+
+	local image = React.useMemo(function()
+		if v2 and v2.id then
+			return getStandardSizeAvatarHeadShotRbxthumb(v2.id, FFlagFlyoutAlternateEntryPointUseProfileFrameThumbnail)
 		end
 
 		return nil
-	end, { v11 })
+	end, { v2 })
 
-	return React.createElement(Foundation.Icon, {
-		tag = "position-center-center anchor-center-center content-emphasis align-y-center",
-		name = BuilderIcons.Icon.ThreeHorizontalBarsWrappingRight,
-		size = v10.Size.Size_800
-	}, {
-		UserAvatar = React.createElement(LoadableImage, {
-			useShimmerAnimationWhileLoading = true,
-			shouldHandleReloads = true,
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, v10.Size.Size_50, 0.5, 0),
-			Size = UDim2.new(0, v10.Size.Size_400, 0, v10.Size.Size_400),
-			BackgroundColor3 = v10.Color.Common.Shimmer.Color3,
-			BackgroundTransparency = v10.Color.Common.Shimmer.Transparency,
-			Image = v12,
-			cornerRadius = UDim.new(0.5, 0)
-		})
-	})
+	return React.createElement(
+		Foundation.Icon,
+		{
+			tag = "position-center-center anchor-center-center content-emphasis align-y-center",
+			name = BuilderIcons.Icon.ThreeHorizontalBarsWrappingRight,
+			size = v.Size.Size_800
+		},
+		{
+			UserAvatar = React.createElement(LoadableImage, {
+				AnchorPoint = Vector2.new(0, 0.5),
+				Position = UDim2.new(0, v.Size.Size_50, 0.5, 0),
+				Size = UDim2.new(0, v.Size.Size_400, 0, v.Size.Size_400),
+				BackgroundColor3 = v.Color.Common.Shimmer.Color3,
+				BackgroundTransparency = v.Color.Common.Shimmer.Transparency,
+				Image = image,
+				useShimmerAnimationWhileLoading = true,
+				cornerRadius = UDim.new(0.5, 0),
+				shouldHandleReloads = true
+			})
+		}
+	)
 end
 
 return FlyoutAlternateEntryPoint

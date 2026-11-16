@@ -1,263 +1,254 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Pagination = {}
+
+local parent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Boolean = LuauPolyfill.Boolean
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
 
-local function __rest(p1, p2) -- line: 21
-	-- upvalues: Array (copy), Object (copy)
-	local t2 = {}
-
-	Array.forEach(p2, function(p3) -- line: 23
-		-- upvalues: t2 (copy), Object (copy)
-		t2[p3] = Object.None
+local function __rest(p, p2)
+	local nones = {}
+	Array.forEach(p2, function(p3)
+		nones[p3] = Object.None
 	end)
-
-	return Object.assign({}, p1, t2)
+	return Object.assign({}, p, nones)
 end
 
 require(script.Parent.Parent.Parent.cache.inmemory.policies_types)
+
 require(script.Parent.Parent.graphql.storeUtils)
 
-local mergeDeep = require(script.Parent.Parent.common.mergeDeep).mergeDeep
-local getExtras = nil
-local makeEmptyData = nil
-local t6 = nil
+local mergeDeep = require(script.Parent.Parent.common.mergeDeep)
+local mergeDeep2 = mergeDeep.mergeDeep
 
-function t1.concatPagination(p4) -- line: 47
-	-- upvalues: Array (copy)
-	if p4 == nil then
-		p4 = false
+local getExtras
+local makeEmptyData
+local v = nil
+
+function Pagination.concatPagination(keyArgs)
+	if keyArgs == nil then
+		keyArgs = false
 	end
 
 	return {
-		keyArgs = p4,
-		merge = function(_, p6, p7) -- line: 53
-			-- upvalues: Array (copy)
-			if p6 then
-				return (Array.concat(p6, p7))
+		keyArgs = keyArgs,
+		merge = function(_, p, p2)
+			if p then
+				return (Array.concat(p, p2))
 			end
 
-			return p7
+			return p2
 		end
 	}
 end
-function t1.offsetLimitPagination(p8) -- line: 65
-	-- upvalues: Array (copy)
-	if p8 == nil then
-		p8 = false
+
+function Pagination.offsetLimitPagination(keyArgs)
+	if keyArgs == nil then
+		keyArgs = false
 	end
 
 	return {
-		keyArgs = p8,
-		merge = function(_, p10, p11, p12) -- line: 72
-			-- upvalues: Array (copy)
-			local args = p12.args
-			local v28 = if p10 == nil then {} else Array.slice(p10, 1)
+		keyArgs = keyArgs,
+		merge = function(_, p, list, p2)
+			local args = p2.args
 
-			if args ~= nil then
-				local v29 = if args.offset ~= nil then args.offset else 0
+			local result = p == nil and {} or Array.slice(p, 1)
 
-				for i = 1, #p11 do
-					v28[v29 + i] = p11[i]
-				end
-
-				return v28
+			if args == nil then
+				return (Array.concat(result, list))
 			end
 
-			return (Array.concat(v28, p11))
+			local v2 = args.offset == nil and 0 or args.offset
+
+			for i = 1, #list do
+				result[v2 + i] = list[i]
+			end
+
+			return result
 		end
 	}
 end
-function t1.relayStylePagination(p13) -- line: 139
-	-- upvalues: Array (copy), Boolean (copy), Object (copy), getExtras (ref), makeEmptyData (ref), mergeDeep (copy)
-	if p13 == nil then
-		p13 = false
+
+function Pagination.relayStylePagination(keyArgs)
+	if keyArgs == nil then
+		keyArgs = false
 	end
 
 	return {
-		keyArgs = p13,
-		read = function(_, p15, p16) -- line: 146
-			-- upvalues: Array (copy), Boolean (copy), Object (copy), getExtras (ref)
-			if not p15 then
+		keyArgs = keyArgs,
+		read = function(_, p, object)
+			if not p then
 				return
 			end
 
-			local t3 = {}
-			local s1 = ""
-			local s2 = ""
+			local edges = {}
+			local v2 = ""
+			local v3 = ""
 
-			Array.forEach(p15.edges, function(p17) -- line: 158
-				-- upvalues: p16 (copy), t3 (copy), s1 (ref), Boolean (copy), s2 (ref)
-				if p16:canRead(p16:readField("node", p17)) then
-					table.insert(t3, p17)
+			Array.forEach(p.edges, function(p2)
+				if object:canRead(object:readField("node", p2)) then
+					table.insert(edges, p2)
 
-					if p17.cursor then
-						s1 = Boolean.toJSBoolean(s1) and s1 or (p17.cursor or "")
-						s2 = Boolean.toJSBoolean(p17.cursor) and p17.cursor or s2
+					if p2.cursor then
+						v2 = Boolean.toJSBoolean(v2) and v2 or p2.cursor or ""
+
+						v3 = Boolean.toJSBoolean(p2.cursor) and p2.cursor or v3
 					end
 				end
 			end)
 
-			local pageInfo = p15.pageInfo
-			local v38 = pageInfo and pageInfo.startCursor
-			local v39 = pageInfo and pageInfo.endCursor
+			local pageInfo = p.pageInfo
+			local startCursor = pageInfo and pageInfo.startCursor
+			local endCursor = pageInfo and pageInfo.endCursor
 
-			return Object.assign({}, getExtras(p15), {
-				edges = t3,
-				pageInfo = Object.assign({}, p15.pageInfo, {
-					startCursor = Boolean.toJSBoolean(v38) and v38 or s1,
-					endCursor = Boolean.toJSBoolean(v39) and v39 or s2
+			return Object.assign({}, getExtras(p), {
+				edges = edges,
+				pageInfo = Object.assign({}, p.pageInfo, {
+					startCursor = Boolean.toJSBoolean(startCursor) and startCursor or v2,
+					endCursor = Boolean.toJSBoolean(endCursor) and endCursor or v3
 				})
 			})
 		end,
-		merge = function(_, p19, p20, p21) -- line: 199
-			-- upvalues: makeEmptyData (ref), Array (copy), Object (copy), mergeDeep (copy), Boolean (copy), getExtras (ref)
-			if p19 == nil then
-				p19 = makeEmptyData()
+		merge = function(_, p, p2, object)
+			if p == nil then
+				p = makeEmptyData()
 			end
 
-			local args = p21.args
-			local v45 = if not p20.edges then {} else Array.map(p20.edges, function(p22) -- line: 210
-				-- upvalues: Object (copy), p21 (copy)
-				local v67 = Object.assign({
-					cursor = ""
-				}, p22)
+			local args = object.args
 
-				if p21:isReference(v67) then
-					v67.cursor = p21:readField("cursor", v67)
+			local v2 = not p2.edges and {} or Array.map(p2.edges, function(p3)
+				local v2 = Object.assign({ cursor = "" }, p3)
+
+				if object:isReference(v2) then
+					v2.cursor = object:readField("cursor", v2)
 				end
 
-				return v67
+				return v2
 			end)
 
-			if p20.pageInfo then
-				local pageInfo = p20.pageInfo
+			if p2.pageInfo then
+				local pageInfo = p2.pageInfo
 				local startCursor = pageInfo.startCursor
 				local endCursor = pageInfo.endCursor
-				local v49 = v45[1]
-				local v50 = v45[#v45]
+				local v3 = v2[1]
+				local v4 = v2[#v2]
 
-				if v49 and startCursor then
-					v49.cursor = startCursor
+				if v3 and startCursor then
+					v3.cursor = startCursor
 				end
 
-				if v50 and endCursor then
-					v50.cursor = endCursor
+				if v4 and endCursor then
+					v4.cursor = endCursor
 				end
 
-				local v51 = v49 and v49.cursor
+				local cursor = v3 and v3.cursor
 
-				if v51 and not startCursor then
-					p20 = mergeDeep(p20, {
-						pageInfo = {
-							startCursor = v51
-						}
+				if cursor and not startCursor then
+					p2 = mergeDeep2(p2, {
+						pageInfo = { startCursor = cursor }
 					})
 				end
 
-				local v52 = v50 and v50.cursor
+				local cursor2 = v4 and v4.cursor
 
-				if v52 and not endCursor then
-					p20 = mergeDeep(p20, {
-						pageInfo = {
-							endCursor = v52
-						}
+				if cursor2 and not endCursor then
+					p2 = mergeDeep2(p2, {
+						pageInfo = { endCursor = cursor2 }
 					})
 				end
 			end
 
-			local edges = p19.edges
-			local t4 = {}
+			local v3 = p.edges
+			local v4 = {}
 
-			if args ~= nil and args.after then
-				local v55 = Array.findIndex(edges, function(p23) -- line: 262
-					-- upvalues: args (copy)
-					return p23.cursor == args.after
-				end)
+			if args == nil or not args.after then
+				if args == nil or not Boolean.toJSBoolean(args.before) then
+					if Boolean.toJSBoolean(p2.edges) then
+						v3 = {}
+					end
+				else
+					local index = Array.findIndex(v3, function(p3): boolean
+						return p3.cursor == args.before
+					end)
 
-				if v55 >= 1 then
-					edges = Array.slice(edges, 1, v55 + 1)
+					if index < 0 then
+						v4 = v3
+					else
+						v4 = Array.slice(v3, index)
+					end
+
+					v3 = {}
 				end
-			elseif args ~= nil and Boolean.toJSBoolean(args.before) then
-				local v56 = Array.findIndex(edges, function(p24) -- line: 273
-					-- upvalues: args (copy)
-					return p24.cursor == args.before
+			else
+				local index = Array.findIndex(v3, function(p3): boolean
+					return p3.cursor == args.after
 				end)
 
-				t4 = if not (v56 < 0) then Array.slice(edges, v56) else edges
-				edges = {}
-			elseif Boolean.toJSBoolean(p20.edges) then
-				edges = {}
+				if index >= 1 then
+					v3 = Array.slice(v3, 1, index + 1)
+				end
 			end
 
-			local v57 = Array.concat(edges, v45, t4)
-			local v58 = Object.assign({}, p20.pageInfo, p19.pageInfo)
+			local joined = Array.concat(v3, v2, v4)
 
-			if p20.pageInfo then
-				local pageInfo = p20.pageInfo
+			local pageInfo2 = Object.assign({}, p2.pageInfo, p.pageInfo)
+
+			if p2.pageInfo then
+				local pageInfo = p2.pageInfo
+
 				local hasPreviousPage = pageInfo.hasPreviousPage
 				local hasNextPage = pageInfo.hasNextPage
 				local startCursor = pageInfo.startCursor
 				local endCursor = pageInfo.endCursor
-				local v64 = Object.assign({}, pageInfo, {
+				local v5 = Object.assign({}, pageInfo, {
 					hasPreviousPage = Object.None,
 					hasNextPage = Object.None,
 					startCursor = Object.None,
 					endCursor = Object.None
 				})
 
-				Object.assign(v58, v64)
+				Object.assign(pageInfo2, v5)
 
-				if not Boolean.toJSBoolean(#edges) then
+				if not Boolean.toJSBoolean(#v3) then
 					if hasPreviousPage ~= nil then
-						v58.hasPreviousPage = hasPreviousPage
+						pageInfo2.hasPreviousPage = hasPreviousPage
 					end
 
 					if startCursor ~= nil then
-						v58.startCursor = startCursor
+						pageInfo2.startCursor = startCursor
 					end
 				end
 
-				if not Boolean.toJSBoolean(#t4) then
+				if not Boolean.toJSBoolean(#v4) then
 					if hasNextPage ~= nil then
-						v58.hasNextPage = hasNextPage
+						pageInfo2.hasNextPage = hasNextPage
 					end
 
 					if endCursor ~= nil then
-						v58.endCursor = endCursor
+						pageInfo2.endCursor = endCursor
 					end
 				end
 			end
 
-			return Object.assign({}, getExtras(p19), getExtras(p20), {
-				edges = v57,
-				pageInfo = v58
+			return Object.assign({}, getExtras(p), getExtras(p2), {
+				edges = joined,
+				pageInfo = pageInfo2
 			})
 		end
 	}
 end
-function getExtras(t5: {[any]: any}) -- line: 358
-	-- upvalues: __rest (copy), t6 (ref)
-	return __rest(t5, t6)
+
+getExtras = function(p)
+	return __rest(p, v)
 end
 
-t6 = {
-	"edges",
-	"pageInfo"
-}
+v = { "edges", "pageInfo" }
 
-function makeEmptyData() -- line: 363
+makeEmptyData = function()
 	return {
 		edges = {},
-		pageInfo = {
-			hasPreviousPage = false,
-			hasNextPage = true,
-			startCursor = "",
-			endCursor = ""
-		}
+		pageInfo = { hasPreviousPage = false, hasNextPage = true, startCursor = "", endCursor = "" }
 	}
 end
 
-return t1
+return Pagination

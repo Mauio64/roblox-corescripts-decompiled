@@ -1,21 +1,24 @@
 local CrossExperience = script:FindFirstAncestor("CrossExperience")
-local Cryo = require(CrossExperience.dependencies).Cryo
+local dependencies = require(CrossExperience.dependencies)
 
-return function(p1) -- line: 6
-	-- upvalues: Cryo (copy)
-	local t1 = {}
+local cryo = dependencies.Cryo
 
-	if p1 ~= nil then
-		local v5 = Cryo.Dictionary.keys(p1)
+return function(p)
+	local result = {}
 
-		for _, v in ipairs(v5) do
-			local num = tonumber(v)
+	if p == nil then
+		return result
+	end
 
-			if num then
-				t1[num] = p1[v]
-			end
+	local keys = cryo.Dictionary.keys(p)
+
+	for _, key in ipairs(keys) do
+		local v = tonumber(key)
+
+		if v then
+			result[v] = p[key]
 		end
 	end
 
-	return t1
+	return result
 end

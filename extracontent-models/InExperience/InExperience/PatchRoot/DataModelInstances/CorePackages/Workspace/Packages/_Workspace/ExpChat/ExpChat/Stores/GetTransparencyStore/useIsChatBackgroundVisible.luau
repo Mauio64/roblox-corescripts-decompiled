@@ -1,51 +1,43 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local React = require(ExpChatParent.React)
-local SignalsReact = require(ExpChatParent.SignalsReact)
+local parent = ExpChat.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local Config = require(ExpChat.Config)
-local Parent = require(script.Parent)
+local parentModule = require(script.Parent)
 
-local function useIsChatBackgroundVisible() -- line: 12
-	-- upvalues: Parent (copy), SignalsReact (copy), React (copy), Config (copy)
-	local v8 = Parent(false)
-	local v9 = v8.getIsFocused or v8.getIsTextBoxFocused
-	local v10 = SignalsReact.useSignalState(v9)
-	local v11 = SignalsReact.useSignalState(v8.getLastActivity)
-	local v12, v13 = React.useState(true)
+local function useIsChatBackgroundVisible()
+	local v = parentModule(false)
 
-	React.useEffect(function() -- line: 20
-		-- upvalues: v10 (copy), v13 (copy), Config (copy), v11 (copy)
-		if v10 then
-			v13(true)
+	local getIsFocused = v.getIsFocused or v.getIsTextBoxFocused
+	local v2 = SignalsReact.useSignalState(getIsFocused)
+	local v3 = SignalsReact.useSignalState(v.getLastActivity)
 
+	local state, setState = React.useState(true)
+	React.useEffect(function()
+		if v2 then
+			setState(true)
 			return nil
 		end
 
-		local v14 = Config.ChatWindowBackgroundFadeOutTime - (os.clock() - v11)
+		local v4 = Config.ChatWindowBackgroundFadeOutTime - (os.clock() - v3)
 
-		if v14 <= 0 then
-			v13(false)
-
+		if v4 <= 0 then
+			setState(false)
 			return nil
 		end
 
-		v13(true)
-
-		local thread = task.delay(v14, function() -- line: 32
-			-- upvalues: v13 (copy)
-			v13(false)
+		setState(true)
+		local thread = task.delay(v4, function()
+			setState(false)
 		end)
-
-		return function() -- line: 35
-			-- upvalues: thread (copy)
+		return function()
 			pcall(task.cancel, thread)
 		end
-	end, {
-		v11,
-		v10
-	})
+	end, { v3, v2 })
 
-	return v12
+	return state
 end
 
 return useIsChatBackgroundVisible

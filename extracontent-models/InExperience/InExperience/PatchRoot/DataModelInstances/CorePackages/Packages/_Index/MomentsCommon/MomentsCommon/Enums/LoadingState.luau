@@ -1,5 +1,1 @@
-return {
-	Failed = "Failed",
-	Finished = "Finished",
-	Loading = "Loading"
-}
+return { Failed = "Failed", Finished = "Finished", Loading = "Loading" }

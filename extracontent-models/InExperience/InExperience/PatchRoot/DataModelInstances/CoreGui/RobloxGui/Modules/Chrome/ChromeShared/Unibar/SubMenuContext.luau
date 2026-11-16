@@ -1,3 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
 
-return (require(CorePackages.Packages.React).createContext(nil))
+return (React.createContext(nil))

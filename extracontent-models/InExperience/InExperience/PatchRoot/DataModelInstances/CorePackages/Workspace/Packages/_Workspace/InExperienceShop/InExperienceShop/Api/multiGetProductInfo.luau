@@ -1,55 +1,42 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local Promise = require(InExperienceShopParent.Promise)
+local parent = InExperienceShop.Parent
+
+local Promise = require(parent.Promise)
 local getProductInfo = require(script.Parent.getProductInfo)
 local ShopDebugLogger = require(InExperienceShop.Internal.ShopDebugLogger)
 
-local function multiGetProductInfo(t1: {[any]: any}) -- line: 39
-	-- upvalues: ShopDebugLogger (copy), getProductInfo (copy), Promise (copy)
-	ShopDebugLogger.logLazy(function() -- line: 42
-		-- upvalues: t1 (copy)
-		return "multiGetProductInfo: start batchSize=" .. #t1
+local function multiGetProductInfo(list)
+	ShopDebugLogger.logLazy(function()
+		return "multiGetProductInfo: start batchSize=" .. #list
 	end)
 
-	local v8 = ShopDebugLogger.startTimer()
-	local t2 = table.create(#t1)
+	local v = ShopDebugLogger.startTimer()
+	local v2 = table.create(#list)
 
-	for i, v in ipairs(t1) do
-		t2[i] = getProductInfo(v.id, v.infoType):andThen(function(p1) -- line: 49
-			-- upvalues: v (copy)
-			return {
-				ok = true,
-				request = v,
-				value = p1
-			}
-		end):catch(function(p2) -- line: 52
-			-- upvalues: v (copy)
-			return {
-				ok = false,
-				request = v,
-				err = p2
-			}
+	for i, item in ipairs(list) do
+		v2[i] = getProductInfo(item.id, item.infoType):andThen(function(p)
+			return { request = item, ok = true, value = p }
+		end):catch(function(err)
+			return { request = item, ok = false, err = err }
 		end)
 	end
 
-	return ShopDebugLogger.tracePromise(Promise.all(t2), {
-		onSuccess = function(t3: {[any]: any}) -- line: 57
-			-- upvalues: ShopDebugLogger (copy), v8 (copy)
-			local n1 = 0
-			local n2 = 0
+	return ShopDebugLogger.tracePromise(Promise.all(v2), {
+		onSuccess = function(list2)
+			local count = 0
+			local count2 = 0
 
-			for _, v in ipairs(t3) do
-				if v.ok then
-					n1 += 1
+			for _, item in ipairs(list2) do
+				if item.ok then
+					count += 1
 				else
-					n2 += 1
+					count2 += 1
 				end
 			end
 
-			ShopDebugLogger.logElapsedLazy(function() -- line: 66
-				-- upvalues: n1 (ref), n2 (ref)
-				return "multiGetProductInfo: done succeeded=" .. n1 .. " failed=" .. n2
-			end, v8)
+			ShopDebugLogger.logElapsedLazy(function()
+				return "multiGetProductInfo: done succeeded=" .. count .. " failed=" .. count2
+			end, v)
 		end
 	})
 end

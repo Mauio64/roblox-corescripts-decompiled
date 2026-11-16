@@ -1,7 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
 
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1) -- line: 4
-	return {
-		Created = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(created)
+	return { Created = created }
 end)

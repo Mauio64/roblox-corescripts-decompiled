@@ -1,0 +1,6 @@
+local FFlagAXMarketplaceLicensing = require(script.Parent.FFlagAXMarketplaceLicensing)
+local FFlagAXMarketplaceItemCardIndicatorStack = require(script.Parent.FFlagAXMarketplaceItemCardIndicatorStack)
+
+return game:DefineFastFlag("AXMarketplaceLicensingItemCards2", false)
+	and FFlagAXMarketplaceLicensing
+	and FFlagAXMarketplaceItemCardIndicatorStack

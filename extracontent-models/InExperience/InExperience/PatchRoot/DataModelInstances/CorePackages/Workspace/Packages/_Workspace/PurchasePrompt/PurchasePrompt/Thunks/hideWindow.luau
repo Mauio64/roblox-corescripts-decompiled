@@ -1,13 +1,12 @@
-local ParentParent = script.Parent.Parent
-local SetWindowState = require(ParentParent.Actions.SetWindowState)
-local WindowState = require(ParentParent.Enums.WindowState)
-local Thunk = require(ParentParent.Thunk)
+local parent = script.Parent.Parent
 
-local function hideWindow() -- line: 7
-	-- upvalues: Thunk (copy), SetWindowState (copy), WindowState (copy)
-	return Thunk.new(script.Name, {}, function(p1, _) -- line: 8
-		-- upvalues: SetWindowState (copy), WindowState (copy)
-		return p1:dispatch(SetWindowState(WindowState.Hidden))
+local SetWindowState = require(parent.Actions.SetWindowState)
+local WindowState = require(parent.Enums.WindowState)
+local Thunk = require(parent.Thunk)
+
+local function hideWindow()
+	return Thunk.new(script.Name, {}, function(object, _)
+		return object:dispatch(SetWindowState(WindowState.Hidden))
 	end)
 end
 

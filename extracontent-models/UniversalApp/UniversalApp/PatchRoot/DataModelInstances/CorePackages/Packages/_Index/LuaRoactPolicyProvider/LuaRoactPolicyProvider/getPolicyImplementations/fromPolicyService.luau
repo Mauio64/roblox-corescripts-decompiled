@@ -1,70 +1,60 @@
 local PolicyService = game:GetService("PolicyService")
 local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Promise = require(ParentParentParent.Promise)
-local Logger = require(ParentParent.Logger)
 
-return function(p1) -- line: 10
-	-- upvalues: PolicyService (copy), Players (copy), Promise (copy), Logger (copy)
-	local v8 = p1 or {}
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local Promise = require(parent2.Promise)
 
-	v8.PolicyService = v8.PolicyService or PolicyService
-	v8.PlayersService = v8.PlayersService or Players
-	assert(v8.PolicyService, "expected dependencies.PolicyService")
-	assert(v8.PlayersService, "expected dependencies.PlayersService")
+local Logger = require(parent.Logger)
 
-	local PolicyService2 = v8.PolicyService
-	local PlayersService = v8.PlayersService
+return function(options)
+	local v = options or {}
+	v.PolicyService = v.PolicyService or PolicyService
+	v.PlayersService = v.PlayersService or Players
 
-	return function() -- line: 21
-		-- upvalues: Promise (copy), PlayersService (copy), PolicyService2 (copy), Logger (copy)
+	assert(v.PolicyService, "expected dependencies.PolicyService")
+	assert(v.PlayersService, "expected dependencies.PlayersService")
+
+	local policyService = v.PolicyService
+	local playersService = v.PlayersService
+
+	return function()
 		return {
-			read = function() -- line: 23
+			read = function(): nil
 				return nil
 			end,
-			onPolicyChanged = function(p2) -- line: 27
-				-- upvalues: Promise (copy), PlayersService (copy), PolicyService2 (copy), Logger (copy)
-				local BindableEvent = Instance.new("BindableEvent")
-				local connection = BindableEvent.Event:Connect(p2)
+			onPolicyChanged = function(onEvent)
+				local bindableEvent = Instance.new("BindableEvent")
 
-				Promise.new(function(resolve, reject) -- line: 33
-					-- upvalues: PlayersService (copy), PolicyService2 (copy)
-					local LocalPlayer = PlayersService.LocalPlayer
+				local eventConnection = bindableEvent.Event:Connect(onEvent)
 
-					if LocalPlayer then
-						local ok, result = pcall(function() -- line: 36
-							-- upvalues: PolicyService2 (copy), LocalPlayer (copy)
-							return PolicyService2:GetPolicyInfoForPlayerAsync(LocalPlayer)
-						end)
+				Promise.new(function(callback, callback2)
+					local localPlayer = playersService.LocalPlayer
 
-						if ok then
-							if result then
-								resolve(result)
-
-								return
-							end
-
-							reject("GetPolicyInfoForPlayerAsync return nil value")
-
-							return
-						end
-
-						reject("GetPolicyInfoForPlayerAsync had an error when calling")
+					if not localPlayer then
+						callback2("LocalPlayer not found")
 
 						return
 					end
 
-					reject("LocalPlayer not found")
-				end):andThen(function(p3) -- line: 52
-					-- upvalues: BindableEvent (copy)
-					BindableEvent:Fire(p3)
-				end):catch(function(p4) -- line: 55
-					-- upvalues: Logger (copy)
-					Logger:warning("Could not fetch from PolicyService due to error: {}", p4)
+					local success, result = pcall(function()
+						return policyService:GetPolicyInfoForPlayerAsync(localPlayer)
+					end)
+
+					if not success then
+						callback2("GetPolicyInfoForPlayerAsync had an error when calling")
+					elseif result then
+						callback(result)
+					else
+						callback2("GetPolicyInfoForPlayerAsync return nil value")
+					end
+				end):andThen(function(p)
+					bindableEvent:Fire(p)
+				end):catch(function(p)
+					Logger:warning("Could not fetch from PolicyService due to error: {}", p)
 				end)
 
-				return connection
+				return eventConnection
 			end
 		}
 	end

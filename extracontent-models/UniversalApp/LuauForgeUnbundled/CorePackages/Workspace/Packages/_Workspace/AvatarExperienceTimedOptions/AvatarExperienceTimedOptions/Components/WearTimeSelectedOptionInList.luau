@@ -1,0 +1,10 @@
+local useWearTimeSelectedOptionViewModel = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceTimedOptions/AvatarExperienceTimedOptions/Components/useWearTimeSelectedOptionViewModel")
+local WearTimeSelectedOptionInListView = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceTimedOptions/AvatarExperienceTimedOptions/Components/WearTimeSelectedOptionInListView")
+
+require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceTimedOptions/AvatarExperienceCommon")
+
+local function WearTimeSelectedOptionContainer(p2)
+	return WearTimeSelectedOptionInListView((useWearTimeSelectedOptionViewModel(p2)))
+end
+
+return WearTimeSelectedOptionContainer

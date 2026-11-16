@@ -1,35 +1,33 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local Signals = require(Parent.Signals)
-local InspectAvatarTooltipImpressionCache = require(script.Parent.InspectAvatarTooltipImpressionCache)
-local v4 = game:DefineFastInt("ProfilePlatformInspectAvatarTooltipMaxImpressions", 3)
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
 
-local function createInspectAvatarTooltipStore() -- line: 17
-	-- upvalues: Signals (copy), InspectAvatarTooltipImpressionCache (copy), v4 (copy)
-	local v6, v7 = Signals.createSignal(false)
+local Signals = require(parent.Signals)
+
+local InspectAvatarTooltipImpressionCache = require(script.Parent.InspectAvatarTooltipImpressionCache)
+
+local defineFastInt = game:DefineFastInt("ProfilePlatformInspectAvatarTooltipMaxImpressions", 3)
+
+local function createInspectAvatarTooltipStore()
+	local signal, v = Signals.createSignal(false)
 
 	return {
-		getIsOpen = v6,
-		tryShow = function() -- line: 20
-			-- upvalues: InspectAvatarTooltipImpressionCache (copy), v4 (copy), v7 (copy)
-			local v8 = InspectAvatarTooltipImpressionCache.getValue()
+		getIsOpen = signal,
+		tryShow = function()
+			local value = InspectAvatarTooltipImpressionCache.getValue()
 
-			if v8 < 0 or v8 >= v4 then
-				v7(false)
-
+			if value < 0 or defineFastInt <= value then
+				v(false)
 				return
 			end
 
 			InspectAvatarTooltipImpressionCache.incrementValue()
-			v7(true)
+			v(true)
 		end,
-		hide = function() -- line: 32
-			-- upvalues: v7 (copy)
-			v7(false)
+		hide = function()
+			v(false)
 		end,
-		permanentlyDismiss = function() -- line: 36
-			-- upvalues: InspectAvatarTooltipImpressionCache (copy), v7 (copy)
+		permanentlyDismiss = function()
 			InspectAvatarTooltipImpressionCache.dismissValue()
-			v7(false)
+			v(false)
 		end
 	}
 end

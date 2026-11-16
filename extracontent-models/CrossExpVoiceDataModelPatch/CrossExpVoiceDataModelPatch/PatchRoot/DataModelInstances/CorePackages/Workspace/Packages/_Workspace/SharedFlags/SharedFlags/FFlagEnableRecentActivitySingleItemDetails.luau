@@ -1,0 +1,3 @@
+local FFlagEnableRecentActivityInspectAndBuy = require(script.Parent.FFlagEnableRecentActivityInspectAndBuy)
+
+return game:DefineFastFlag("EnableRecentActivitySingleItemDetails", false) and FFlagEnableRecentActivityInspectAndBuy

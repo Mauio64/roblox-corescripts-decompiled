@@ -2,73 +2,70 @@ local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
 local CoreGui = game:GetService("CoreGui")
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local ColorMode = Foundation.Enums.ColorMode
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
-local Dark = UIBlox.App.Style.Constants.ThemeName.Dark
+local Dark = ColorMode.Dark
+
 local Promise = require(CorePackages.Packages.Promise)
+
 local SelfViewTooltipFTUX = require(script.Parent.SelfViewTooltipFTUX)
 
-return function(p1) -- line: 13
-	-- upvalues: CoreGui (copy), Roact (copy), AppStyleProvider (copy), Dark (copy), SelfViewTooltipFTUX (copy), Promise (copy)
-	local ScreenGui = Instance.new("ScreenGui")
+return function(props)
+	local selfViewTooltipOnOpenGui = Instance.new("ScreenGui")
+	selfViewTooltipOnOpenGui.Name = "SelfViewTooltipOnOpenGui"
+	selfViewTooltipOnOpenGui.DisplayOrder = -1
+	selfViewTooltipOnOpenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	selfViewTooltipOnOpenGui.Parent = CoreGui
 
-	ScreenGui.Name = "SelfViewTooltipOnOpenGui"
-	ScreenGui.DisplayOrder = -1
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	ScreenGui.Parent = CoreGui
-
-	local v11 = Roact.createElement(AppStyleProvider, {
-		style = {
-			themeName = Dark
-		}
+	local element = Roact.createElement(AppStyleProvider, {
+		style = { themeName = Dark }
 	}, {
 		frame = Roact.createElement("Frame", {
+			Position = props.position,
+			Size = props.size,
 			BackgroundTransparency = 0,
-			Visible = false,
-			Position = p1.position,
-			Size = p1.size,
-			AnchorPoint = p1.anchorPoint
+			AnchorPoint = props.anchorPoint,
+			Visible = false
 		}, {
 			aspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+				AspectRatio = props.aspectRatio,
 				AspectType = "ScaleWithParentSize",
-				DominantAxis = "Width",
-				AspectRatio = p1.aspectRatio
+				DominantAxis = "Width"
 			}),
 			sizeConstraint = Roact.createElement("UISizeConstraint", {
-				MaxSize = p1.maxSize,
-				MinSize = p1.minSize
+				MaxSize = props.maxSize,
+				MinSize = props.minSize
 			}),
-			bottomButtonsMock = Roact.createElement("Frame", {
-				Visible = false,
-				BackgroundTransparency = 0,
-				Position = p1.bottomButtonsFramePosition,
-				Size = p1.bottomButtonsFrameSize
-			}, {
-				tooltip = Roact.createElement(SelfViewTooltipFTUX, {
-					fallbackText = p1.fallbackText,
-					translationKey = p1.translationKey,
-					tooltipLifetime = p1.tooltipLifetime
-				})
-			})
+			bottomButtonsMock = Roact.createElement(
+				"Frame",
+				{
+					Position = props.bottomButtonsFramePosition,
+					Size = props.bottomButtonsFrameSize,
+					Visible = false,
+					BackgroundTransparency = 0
+				},
+				{
+					tooltip = Roact.createElement(SelfViewTooltipFTUX, {
+						fallbackText = props.fallbackText,
+						translationKey = props.translationKey,
+						tooltipLifetime = props.tooltipLifetime
+					})
+				}
+			)
 		})
 	})
-	local v12 = Roact.mount(v11, ScreenGui, "SelfViewTooltipOnOpenGui")
 
-	Promise.delay(p1.tooltipLifetime + 5):andThen(function() -- line: 62
-		-- upvalues: Roact (copy), v12 (copy)
-		pcall(function() -- line: 58
-			-- upvalues: Roact (copy), v12 (copy)
-			Roact.unmount(v12)
+	local instance = Roact.mount(element, selfViewTooltipOnOpenGui, "SelfViewTooltipOnOpenGui")
+
+	local function fn() -- 1 equivalent call inferred from this helper
+		pcall(function()
+			Roact.unmount(instance)
 		end)
+	end
+	Promise.delay(props.tooltipLifetime + 5):andThen(function()
+		fn() -- inferred equivalent call
 	end)
 
-	return {
-		instance = v12,
-		unmount = function() -- line: 57
-			-- upvalues: Roact (copy), v12 (copy)
-			pcall(function() -- line: 58
-				-- upvalues: Roact (copy), v12 (copy)
-				Roact.unmount(v12)
-			end)
-		end
-	}
+	return { instance = instance, unmount = fn }
 end

@@ -1,15 +1,14 @@
-local ParentParent = script.Parent.Parent.Parent
-local ReactRoblox = require(ParentParent.Dev.ReactRoblox)
+local parent = script.Parent.Parent.Parent
 
-return function(p1, p2) -- line: 6
-	-- upvalues: ReactRoblox (copy)
-	local v5 = p2 or 1
-	local n1 = 0
+local ReactRoblox = require(parent.Dev.ReactRoblox)
 
-	while v5 > n1 and not p1() do
-		ReactRoblox.act(function() -- line: 10
-			-- upvalues: n1 (ref)
-			n1 += task.wait()
+return function(callback, value)
+	local total = 0
+	local v = value or 1
+
+	while total < v and not callback() do
+		ReactRoblox.act(function()
+			total += task.wait()
 		end)
 	end
 end

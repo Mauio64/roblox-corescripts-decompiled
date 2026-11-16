@@ -1,10 +1,11 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local PlatformLeaderboardStoreContext = require(ParentParent.Common.PlatformLeaderboardStoreContext)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local function usePlatformLeaderboard() -- line: 8
-	-- upvalues: React (copy), PlatformLeaderboardStoreContext (copy)
+local React = require(parent2.React)
+
+local PlatformLeaderboardStoreContext = require(parent.Common.PlatformLeaderboardStoreContext)
+
+local function usePlatformLeaderboard()
 	return (React.useContext(PlatformLeaderboardStoreContext))
 end
 

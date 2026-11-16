@@ -1,0 +1,3 @@
+local FFlagMomentsFlushDwellBeforeNavigation = require(script.Parent.FFlagMomentsFlushDwellBeforeNavigation)
+
+return game:DefineFastFlag("MomentsNavigationEvent", false) and FFlagMomentsFlushDwellBeforeNavigation

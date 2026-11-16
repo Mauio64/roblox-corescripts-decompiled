@@ -1,35 +1,50 @@
-local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
-local React = require(Parent.React)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Foundation = require(parent.Foundation)
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local ButtonSize = Foundation.Enums.ButtonSize
-local FFlagCTAChangeMorePageFlyoutButtonText = require(Parent.SharedFlags).FFlagCTAChangeMorePageFlyoutButtonText
 
-local function FlyoutSwitchAccountButton(p1) -- line: 19
-	-- upvalues: React (copy), useLocalization (copy), FFlagCTAChangeMorePageFlyoutButtonText (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy)
-	local v11 = React.useCallback(function() -- line: 20
-		-- upvalues: p1 (copy)
-		p1.closeDrawer()
+local SharedExperimentDefinition = require(parent.SharedExperimentDefinition)
+local FlyoutAccountSwitcherIXP = SharedExperimentDefinition.FlyoutAccountSwitcherIXP
 
-		if p1.onSwitchAccountActivated then
-			p1.onSwitchAccountActivated()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagCTAChangeMorePageFlyoutButtonText = SharedFlags.FFlagCTAChangeMorePageFlyoutButtonText
+
+local function FlyoutSwitchAccountButton(props)
+	local useCallback = React.useCallback
+	local function fn()
+		if not FlyoutAccountSwitcherIXP.isUsernameAccountSwitcherEnabled() then
+			props.closeDrawer()
 		end
-	end, {
-		p1.onSwitchAccountActivated,
-		p1.closeDrawer
-	})
-	local v12 = useLocalization({
-		title = not FFlagCTAChangeMorePageFlyoutButtonText and "Authentication.AccountSwitch.Action.SwitchAccount" or "Authentication.AccountSwitch.Header.SwitchAccountSentenceCase"
+
+		if props.onSwitchAccountActivated then
+			props.onSwitchAccountActivated()
+		end
+	end
+
+	local onSwitchAccountActivated = props.onSwitchAccountActivated
+	local v
+
+	if not FlyoutAccountSwitcherIXP.isUsernameAccountSwitcherEnabled() then
+		v = props.closeDrawer
+	end
+
+	local onActivated = useCallback(fn, { onSwitchAccountActivated, v })
+
+	local v2 = useLocalization({
+		title = FFlagCTAChangeMorePageFlyoutButtonText and "Authentication.AccountSwitch.Header.SwitchAccountSentenceCase" or "Authentication.AccountSwitch.Action.SwitchAccount"
 	})
 
 	return React.createElement(Button, {
-		isDisabled = false,
-		text = v12.title,
+		testId = "--core-ui-flyout-button-switch-account",
+		text = v2.title,
 		variant = ButtonVariant.Standard,
-		LayoutOrder = p1.layoutOrder,
-		onActivated = v11,
+		LayoutOrder = props.layoutOrder,
+		onActivated = onActivated,
+		isDisabled = false,
 		size = ButtonSize.Large,
 		width = UDim.new(1, 0)
 	})

@@ -1,19 +1,18 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
+local parent = script:FindFirstAncestor("GameFilters").Parent
+require(parent.DiscoveryTypes)
 
-require(Parent.DiscoveryTypes)
-
-return function(p1, s1: string?) -- line: 6
-	if s1 == nil then
+return function(p, p2: string?)
+	if p2 == nil then
 		return nil
 	end
 
-	for _, v5 in p1.filterOptions do
-		if s1 == v5.optionId then
-			if not v5.optionContextTag or v5.optionContextTag == "" then
-				return nil
+	for _, filterOption in p.filterOptions do
+		if filterOption.optionId == p2 then
+			if filterOption.optionContextTag and filterOption.optionContextTag ~= "" then
+				return filterOption.optionContextTag
 			end
 
-			return v5.optionContextTag
+			return nil
 		end
 	end
 

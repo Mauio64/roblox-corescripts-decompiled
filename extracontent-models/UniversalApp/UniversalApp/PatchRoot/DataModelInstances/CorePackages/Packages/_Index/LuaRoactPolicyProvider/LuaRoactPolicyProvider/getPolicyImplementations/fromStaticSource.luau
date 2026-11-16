@@ -1,22 +1,15 @@
-local function noOpt() -- line: 1
-end
+local function noOpt() end
 
-return function() -- line: 3
-	-- upvalues: noOpt (copy)
-	return function(p1) -- line: 4
-		-- upvalues: noOpt (copy)
-		assert(p1, "expected externalPolicy")
+return function()
+	return function(p)
+		assert(p, "expected externalPolicy")
 
 		return {
-			read = function() -- line: 8
-				-- upvalues: p1 (copy)
-				return p1
+			read = function()
+				return p
 			end,
-			onPolicyChanged = function(p2) -- line: 12
-				-- upvalues: noOpt (copy)
-				local v4 = p2 or noOpt
-
-				return Instance.new("BindableEvent").Event:Connect(v4)
+			onPolicyChanged = function(p2)
+				return Instance.new("BindableEvent").Event:Connect(p2 or noOpt)
 			end
 		}
 	end

@@ -1,1 +1,3 @@
-return (require(script.Empty))
+local Empty = require(script.Empty)
+
+return Empty

@@ -1,36 +1,35 @@
-local Parent = script:FindFirstAncestor("VideoUtils").Parent
-local React = require(Parent.React)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("VideoUtils").Parent
 
-local function VideoProgressBar(t1: {[any]: any}) -- line: 17
-	-- upvalues: useTokens (copy), React (copy)
-	local v6 = useTokens()
-	local Muted = v6.DarkMode.Content.Muted
-	local Emphasis = v6.Color.Content.Emphasis
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+
+local function VideoProgressBar(props)
+	local v = useTokens()
+
+	local muted = v.DarkMode.Content.Muted
+	local emphasis = v.Color.Content.Emphasis
 
 	return React.createElement("Frame", {
+		AnchorPoint = props.AnchorPoint,
+		Position = props.Position,
+		Size = props.Size,
+		BackgroundColor3 = muted.Color3,
+		BackgroundTransparency = muted.Transparency,
 		BorderSizePixel = 0,
-		AnchorPoint = t1.AnchorPoint,
-		Position = t1.Position,
-		Size = t1.Size,
-		BackgroundColor3 = Muted.Color3,
-		BackgroundTransparency = Muted.Transparency,
-		LayoutOrder = t1.LayoutOrder
+		LayoutOrder = props.LayoutOrder
 	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(1, 0)
-		}),
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
 		ProgressFill = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = t1.progressBinding:map(function(n1: number) -- line: 37
-				return UDim2.fromScale(n1, 1)
+			Size = props.progressBinding:map(function(p: number)
+				return UDim2.fromScale(p, 1)
 			end),
-			BackgroundColor3 = Emphasis.Color3,
-			BackgroundTransparency = Emphasis.Transparency
+			BackgroundColor3 = emphasis.Color3,
+			BackgroundTransparency = emphasis.Transparency,
+			BorderSizePixel = 0
 		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			})
+			UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
 		})
 	})
 end

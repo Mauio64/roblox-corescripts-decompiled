@@ -1,25 +1,24 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent
-local SetMenuOpen = require(ParentParent.Actions.SetMenuOpen)
-local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
-local Constants = require(ParentParent.Resources.Constants)
-local SetCurrentPage = require(ParentParent.Actions.SetCurrentPage)
-local SetMenuIconTooltipOpen = require(ParentParent.Actions.SetMenuIconTooltipOpen)
 
-return function(p1) -- line: 10
-	-- upvalues: GuiService (copy), SetMenuOpen (copy), SetCurrentPage (copy), Constants (copy), SetMenuIconTooltipOpen (copy), SendAnalytics (copy)
-	return function(p2) -- line: 11
-		-- upvalues: GuiService (copy), SetMenuOpen (copy), SetCurrentPage (copy), Constants (copy), SetMenuIconTooltipOpen (copy), SendAnalytics (copy), p1 (copy)
+local parent = script.Parent.Parent
+local SetMenuOpen = require(parent.Actions.SetMenuOpen)
+local SendAnalytics = require(parent.Utility.SendAnalytics)
+local Constants = require(parent.Resources.Constants)
+local SetCurrentPage = require(parent.Actions.SetCurrentPage)
+local SetMenuIconTooltipOpen = require(parent.Actions.SetMenuIconTooltipOpen)
+
+return function(source)
+	return function(object)
 		GuiService:SetMenuIsOpen(true, "InGameMenu")
-		p2:dispatch(SetMenuOpen(true))
-		p2:dispatch(SetCurrentPage(Constants.MainPagePageKey))
+		object:dispatch(SetMenuOpen(true))
+		object:dispatch(SetCurrentPage(Constants.MainPagePageKey))
 
-		if p2:getState().nativeClosePrompt.menuIconTooltipOpen then
-			p2:dispatch(SetMenuIconTooltipOpen(false))
+		if object:getState().nativeClosePrompt.menuIconTooltipOpen then
+			object:dispatch(SetMenuIconTooltipOpen(false))
 		end
 
 		SendAnalytics(Constants.AnalyticsMenuOpenName, Constants.AnalyticsMenuActionName, {
-			source = p1
+			source = source
 		})
 	end
 end

@@ -1,28 +1,27 @@
 local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
-local PeopleReactViewParent = PeopleReactView.Parent
-local React = require(PeopleReactViewParent.React)
-local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local parent = PeopleReactView.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local GetScrollingFrameStore = require(PeopleReactView.Stores.GetScrollingFrameStore)
 
-local function useScrollingFrameStore(p1) -- line: 9
-	-- upvalues: SignalsReact (copy), GetScrollingFrameStore (copy), React (copy)
-	local v8 = SignalsReact.useSignalState(GetScrollingFrameStore)
-	local v9 = React.useRef(false)
+local function useScrollingFrameStore(p)
+	local v = SignalsReact.useSignalState(GetScrollingFrameStore)
+	local ref = React.useRef(false)
 
-	if not v9.current and p1 then
-		v8.setScrollingFrame(p1)
-		v9.current = true
+	if not ref.current and p then
+		v.setScrollingFrame(p)
+		ref.current = true
 	end
 
-	React.useEffect(function() -- line: 18
-		-- upvalues: v8 (copy)
-		return function() -- line: 19
-			-- upvalues: v8 (copy)
-			v8.cleanUp()
+	React.useEffect(function()
+		return function()
+			v.cleanUp()
 		end
-	end, { v8 })
+	end, { v })
 
-	return v8
+	return v
 end
 
 return useScrollingFrameStore

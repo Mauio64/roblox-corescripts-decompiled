@@ -1,11 +1,22 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local Roact = require(Parent.Roact)
-local RoactRodux = require(Parent.RoactRodux)
-local t = require(Parent.t)
-local AvatarExperienceImpressionsDetector = require(script.Parent.AvatarExperienceImpressionsDetector)
-local v6 = Roact.PureComponent:extend("AvatarExperienceScreenSizeImpressionsDetector")
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
 
-v6.validateProps = t.strictInterface({
+local Roact = require(parent.Roact)
+local RoactRodux = require(parent.RoactRodux)
+local t = require(parent.t)
+local Cryo = require(parent.Cryo)
+local SignalsReact = require(parent.SignalsReact)
+local AppShortcutBarStore = require(parent.AppShortcutBarStore)
+local GetShortcutBarStatusStore = AppShortcutBarStore.GetShortcutBarStatusStore
+local SharedFlags = require(parent.SharedFlags)
+
+local FFlagUnifyShortcutBarFixImpressions = SharedFlags.FFlagUnifyShortcutBarFixImpressions
+
+local AvatarExperienceImpressionsDetector = require(script.Parent.AvatarExperienceImpressionsDetector)
+
+local extended = Roact.PureComponent:extend("AvatarExperienceScreenSizeImpressionsDetector")
+
+local strictInterface = t.strictInterface
+local v = {
 	parentRef = t.table,
 	onRequestImpressionsSignal = t.table,
 	appPage = t.optional(t.string),
@@ -15,34 +26,55 @@ v6.validateProps = t.strictInterface({
 	onImpressionsDetected = t.callback,
 	screenSize = t.Vector2,
 	globalGuiInset = t.table,
-	topBarHeight = t.number
-})
+	topBarHeight = t.number,
+	shortcutBarHeight = 0
+}
+local shortcutBarHeight2
 
-function v6.render(p1) -- line: 28
-	-- upvalues: Roact (copy), AvatarExperienceImpressionsDetector (copy)
-	local screenSize = p1.props.screenSize
-	local topBarHeight = p1.props.topBarHeight
-	local globalGuiInset = p1.props.globalGuiInset
+if FFlagUnifyShortcutBarFixImpressions then
+	shortcutBarHeight2 = t.optional(t.number)
+end
+
+v.shortcutBarHeight = shortcutBarHeight2
+extended.validateProps = strictInterface(v)
+
+function extended.render(p)
+	local screenSize = p.props.screenSize
+	local topBarHeight = p.props.topBarHeight
+	local globalGuiInset = p.props.globalGuiInset
+	local shortcutBarHeight = FFlagUnifyShortcutBarFixImpressions and p.props.shortcutBarHeight or 0
 
 	return Roact.createElement(AvatarExperienceImpressionsDetector, {
-		parentRef = p1.props.parentRef,
-		onRequestImpressionsSignal = p1.props.onRequestImpressionsSignal,
+		parentRef = p.props.parentRef,
+		onRequestImpressionsSignal = p.props.onRequestImpressionsSignal,
 		viewPortBounds = {
 			min = Vector2.new(0, topBarHeight),
-			max = Vector2.new(screenSize.X, screenSize.Y - globalGuiInset.bottom)
+			max = Vector2.new(screenSize.X, screenSize.Y - globalGuiInset.bottom - shortcutBarHeight)
 		},
-		appPage = p1.props.appPage,
-		pageFilter = p1.props.pageFilter,
-		collectObjectsFunc = p1.props.collectObjectsFunc,
-		filterImpressionFunc = p1.props.filterImpressionFunc,
-		onImpressionsDetected = p1.props.onImpressionsDetected
+		appPage = p.props.appPage,
+		pageFilter = p.props.pageFilter,
+		collectObjectsFunc = p.props.collectObjectsFunc,
+		filterImpressionFunc = p.props.filterImpressionFunc,
+		onImpressionsDetected = p.props.onImpressionsDetected
 	})
 end
 
-return (RoactRodux.connect(function(p2, _) -- line: 48
+local v2 = RoactRodux.connect(function(data, _)
 	return {
-		topBarHeight = p2.TopBar.topBarHeight,
-		globalGuiInset = p2.GlobalGuiInset,
-		screenSize = p2.ScreenSize
+		topBarHeight = data.TopBar.topBarHeight,
+		globalGuiInset = data.GlobalGuiInset,
+		screenSize = data.ScreenSize
 	}
-end)(v6))
+end)(extended)
+
+if FFlagUnifyShortcutBarFixImpressions then
+	return function(p)
+		local shortcutBarHeight = SignalsReact.useSignalState(GetShortcutBarStatusStore(false).getShortcutBarReservedHeight)
+
+		return Roact.createElement(v2, Cryo.Dictionary.join(p, {
+			shortcutBarHeight = shortcutBarHeight
+		}))
+	end
+end
+
+return v2

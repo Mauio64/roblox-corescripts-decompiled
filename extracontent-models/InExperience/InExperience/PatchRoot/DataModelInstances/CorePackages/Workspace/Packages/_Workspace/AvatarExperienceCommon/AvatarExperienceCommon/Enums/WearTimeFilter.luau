@@ -1,4 +1,1 @@
-return {
-	All = "All",
-	TimedOptionsOnly = "TimedOptionsOnly"
-}
+return { All = "All", TimedOptionsOnly = "TimedOptionsOnly" }

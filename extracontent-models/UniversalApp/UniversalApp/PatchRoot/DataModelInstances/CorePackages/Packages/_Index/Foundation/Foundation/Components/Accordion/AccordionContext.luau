@@ -1,9 +1,14 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local InputSize = require(Foundation.Enums.InputSize)
+local parent = Foundation.Parent
 
-return require(FoundationParent.React).createContext({
+local InputPlacement = require(Foundation.Enums.InputPlacement)
+local InputSize = require(Foundation.Enums.InputSize)
+local React = require(parent.React)
+
+return React.createContext({
 	onAccordionItemActivated = nil,
-	testId = "",
-	itemSize = InputSize.Medium
+	itemSize = InputSize.Medium,
+	isContained = false,
+	chevronPosition = InputPlacement.End,
+	testId = ""
 })

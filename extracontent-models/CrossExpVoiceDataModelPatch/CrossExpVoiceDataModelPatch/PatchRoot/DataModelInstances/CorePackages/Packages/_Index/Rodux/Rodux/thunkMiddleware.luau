@@ -1,1 +1,3 @@
-return require(script.Parent.makeThunkMiddleware)(nil)
+local makeThunkMiddleware = require(script.Parent.makeThunkMiddleware)
+
+return makeThunkMiddleware(nil)

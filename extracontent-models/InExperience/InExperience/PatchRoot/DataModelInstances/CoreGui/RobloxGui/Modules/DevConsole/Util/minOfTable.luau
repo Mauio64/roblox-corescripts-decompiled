@@ -1,15 +1,14 @@
-return function(p1, p2) -- line: 2
-	local t1 = {}
+return function(items, p)
+	local result = {}
 
-	for k, v in pairs(p1) do
-		if not p2[k] then
+	for k, item in pairs(items) do
+		if p[k] then
+			result[k] = item < p[k] and item or p[k]
+		else
 			error("tables did not have matching indices")
-
 			return
 		end
-
-		t1[k] = v < p2[k] and v or p2[k]
 	end
 
-	return t1
+	return result
 end

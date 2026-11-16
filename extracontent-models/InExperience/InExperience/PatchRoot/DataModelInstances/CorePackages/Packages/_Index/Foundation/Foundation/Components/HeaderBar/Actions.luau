@@ -1,1 +1,3 @@
-return (require(script.HeaderBarActions))
+local HeaderBarActions = require(script.HeaderBarActions)
+
+return HeaderBarActions

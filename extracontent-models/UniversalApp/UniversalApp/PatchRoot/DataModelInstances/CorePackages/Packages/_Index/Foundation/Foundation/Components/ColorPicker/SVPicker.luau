@@ -1,6 +1,7 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+local React = require(parent.React)
+
 local InputSize = require(Foundation.Enums.InputSize)
 local Knob = require(Foundation.Components.Knob)
 local View = require(Foundation.Components.View)
@@ -11,131 +12,141 @@ local withDefaults = require(Foundation.Utility.withDefaults)
 
 require(Foundation.Components.Types)
 
-local t1 = {
-	showSelectionKnob = true
-}
+local v = { showSelectionKnob = true }
 
-local function SVPicker(p1) -- line: 31
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), colorUtils (copy), View (copy), withCommonProps (copy), Knob (copy), InputSize (copy)
-	local v14 = withDefaults(p1, t1)
-	local hue = v14.hue
-	local saturation = v14.saturation
-	local value = v14.value
-	local onChanged = v14.onChanged
-	local onDragStarted = v14.onDragStarted
-	local onDragEnded = v14.onDragEnded
-	local v21 = useTokens()
-	local v22 = hue:map(function(p2) -- line: 40
+local function SVPicker(p)
+	local v2 = withDefaults(p, v)
+	local hue = v2.hue
+	local saturation = v2.saturation
+	local value = v2.value
+	local onChanged = v2.onChanged
+	local onDragStarted = v2.onDragStarted
+	local onDragEnded = v2.onDragEnded
+	local v3 = useTokens()
+
+	local mapped = hue:map(function(p2)
 		return Color3.fromHSV(p2, 1, 1)
 	end)
-	local v23 = React.useRef(nil)
-	local v24 = React.useCallback(function(vector2: Vector2) -- line: 45
-		-- upvalues: v23 (copy), colorUtils (copy), onChanged (copy)
-		local current = v23.current
+
+	local ref = React.useRef(nil)
+	local v4 = React.useCallback(function(vector2: Vector2)
+		local current = ref.current
 
 		if not current then
 			return
 		end
 
-		local v30, v31 = colorUtils.calculateSVFromPosition(vector2, current.AbsolutePosition, current.AbsoluteSize)
+		local svFromPosition, v4 = colorUtils.calculateSVFromPosition(
+			vector2,
+			current.AbsolutePosition,
+			current.AbsoluteSize
+		)
 
-		onChanged(v30, v31)
+		onChanged(svFromPosition, v4)
 	end, { onChanged })
-	local v25 = React.useCallback(function(_, vector2: Vector2) -- line: 57
-		-- upvalues: onDragStarted (copy), v24 (copy)
+
+	local v5 = React.useCallback(function(_, vector2: Vector2)
 		if onDragStarted then
 			onDragStarted()
 		end
 
-		v24(vector2)
-	end, {
-		v24,
-		onDragStarted
-	})
-	local v26 = React.useCallback(function(_, vector2: Vector2) -- line: 64
-		-- upvalues: v24 (copy)
-		v24(vector2)
-	end, { v24 })
+		v4(vector2)
+	end, { v4, onDragStarted })
 
-	return React.createElement(View, withCommonProps(v14, {
+	local v6 = React.useCallback(function(_, vector2: Vector2)
+		v4(vector2)
+	end, { v4 })
+
+	local createElement = React.createElement
+
+	local v7 = withCommonProps(v2, {
 		tag = "size-full radius-small",
-		ClipsDescendants = true,
-		ref = v23
-	}), {
+		ref = ref,
+		ClipsDescendants = true
+	})
+
+	local children = {
 		DragDetector = React.createElement("UIDragDetector", {
 			DragStyle = Enum.UIDragDetectorDragStyle.Scriptable,
-			[React.Event.DragStart] = v25,
-			[React.Event.DragContinue] = v26,
+			[React.Event.DragStart] = v5,
+			[React.Event.DragContinue] = v6,
 			[React.Event.DragEnd] = onDragEnded
 		}),
 		Base = React.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundColor3 = v3.Color.Extended.White.White_100.Color3,
 			ZIndex = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = v21.Color.Extended.White.White_100.Color3
+			BorderSizePixel = 0
 		}),
-		Saturation = React.createElement("Frame", {
-			ZIndex = 2,
-			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = v22
-		}, {
-			Gradient = React.createElement("UIGradient", {
-				Transparency = NumberSequence.new({
-					NumberSequenceKeypoint.new(0, 1),
-					NumberSequenceKeypoint.new(1, 0)
+		Saturation = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.fromScale(1, 1),
+				BackgroundColor3 = mapped,
+				ZIndex = 2,
+				BorderSizePixel = 0
+			},
+			{
+				Gradient = React.createElement("UIGradient", {
+					Transparency = NumberSequence.new({
+						NumberSequenceKeypoint.new(0, 1),
+						NumberSequenceKeypoint.new(1, 0)
+					})
 				})
-			})
-		}),
-		Value = React.createElement("Frame", {
-			ZIndex = 3,
-			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = v21.Color.Extended.Black.Black_100.Color3
-		}, {
-			Gradient = React.createElement("UIGradient", {
-				Rotation = 90,
-				Transparency = NumberSequence.new({
-					NumberSequenceKeypoint.new(0, 1),
-					NumberSequenceKeypoint.new(1, 0)
+			}
+		),
+		Value = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.fromScale(1, 1),
+				BackgroundColor3 = v3.Color.Extended.Black.Black_100.Color3,
+				ZIndex = 3,
+				BorderSizePixel = 0
+			},
+			{
+				Gradient = React.createElement("UIGradient", {
+					Rotation = 90,
+					Transparency = NumberSequence.new({
+						NumberSequenceKeypoint.new(0, 1),
+						NumberSequenceKeypoint.new(1, 0)
+					})
 				})
-			})
-		}),
-		Knob = if not v14.showSelectionKnob then nil else React.createElement(Knob, {
-			hasShadow = true,
-			ZIndex = 4,
+			}
+		),
+		Knob = 0
+	}
+	local knob
+
+	if v2.showSelectionKnob then
+		knob = React.createElement(Knob, {
 			size = InputSize.Medium,
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = React.joinBindings({
-				saturation,
-				value
-			}):map(function(p5) -- line: 119
-				local v37 = p5[1]
-				local v38 = p5[2]
-
-				return UDim2.fromScale(v37, 1 - v38)
+			Position = React.joinBindings({ saturation, value }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+				return UDim2.fromScale(item, 1 - item2)
 			end),
-			style = React.joinBindings({
-				hue,
-				saturation,
-				value
-			}):map(function(p6) -- line: 124
-				local v40 = p6[1]
-				local v41 = p6[2]
-				local v42 = p6[3]
-
+			style = React.joinBindings({ hue, saturation, value }):map(function(list)
+				local item = list[1]
+				local item2 = list[2]
+				local item3 = list[3]
 				return {
-					Transparency = 0,
-					Color3 = Color3.fromHSV(v40, v41, v42)
+					Color3 = Color3.fromHSV(item, item2, item3),
+					Transparency = 0
 				}
 			end),
 			stroke = {
-				Color = v21.Color.System.Contrast.Color3,
-				Thickness = v21.Stroke.Thicker,
-				Transparency = v21.Color.System.Contrast.Transparency
-			}
+				Color = v3.Color.System.Contrast.Color3,
+				Thickness = v3.Stroke.Thicker,
+				Transparency = v3.Color.System.Contrast.Transparency
+			},
+			hasShadow = true,
+			ZIndex = 4
 		})
-	})
+	end
+
+	children.Knob = knob
+	return createElement(View, v7, children)
 end
 
 return SVPicker

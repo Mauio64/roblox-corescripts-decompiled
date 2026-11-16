@@ -1,7 +1,5 @@
-local proto = require(script.proto)
-local apppageplatform = require(script.roblox.apppageplatform)
-
 return {
-	proto = proto,
-	apppageplatform = apppageplatform
+	proto = require(script.proto),
+	apppageplatform = require(script.roblox.apppageplatform),
+	posts = require(script.roblox.posts)
 }

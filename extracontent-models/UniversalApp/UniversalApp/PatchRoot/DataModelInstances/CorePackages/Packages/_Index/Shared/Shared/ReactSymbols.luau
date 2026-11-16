@@ -1,4 +1,4 @@
-local t1 = {
+local ReactSymbols = {
 	REACT_ELEMENT_TYPE = 60103,
 	REACT_PORTAL_TYPE = 60106,
 	REACT_FRAGMENT_TYPE = 60107,
@@ -22,37 +22,25 @@ local t1 = {
 	REACT_BINDING_TYPE = 60132
 }
 
-function t1.getIteratorFn(p1) -- line: 84
-	-- upvalues: t1 (copy)
-	if typeof(p1) == "table" then
-		if p1["$$typeof"] == t1.REACT_PORTAL_TYPE then
-			return nil
-		end
-
-		return function() -- line: 91
-			-- upvalues: p1 (copy)
-			local u3 = nil
-			local u4 = nil
-
-			return {
-				next = function() -- line: 94
-					-- upvalues: u3 (ref), u4 (ref), p1 (copy)
-					local v5, v6 = next(p1, u3)
-
-					u3 = v5
-					u4 = v6
-
-					return {
-						done = u4 == nil,
-						key = u3,
-						value = u4
-					}
-				end
-			}
-		end
+function ReactSymbols.getIteratorFn(p)
+	if not (typeof(p) == "table" and p["$$typeof"] ~= ReactSymbols.REACT_PORTAL_TYPE) then
+		return nil
 	end
 
-	return nil
+	return function()
+		local v = nil
+		local v2 = nil
+		return {
+			next = function()
+				v, v2 = next(p, v)
+				return {
+					done = v2 == nil,
+					key = v,
+					value = v2
+				}
+			end
+		}
+	end
 end
 
-return t1
+return ReactSymbols

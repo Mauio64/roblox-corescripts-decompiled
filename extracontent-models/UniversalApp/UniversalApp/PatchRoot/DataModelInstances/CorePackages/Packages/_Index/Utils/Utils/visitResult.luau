@@ -1,348 +1,389 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Map = LuauPolyfill.Map
 local Object = LuauPolyfill.Object
 local Set = LuauPolyfill.Set
-local t1 = {}
-local getOperationASTFromRequest = require(script.Parent.getOperationASTFromRequest).getOperationASTFromRequest
-local GraphQL = require(ParentParent.GraphQL)
+
+local getOperationASTFromRequest = require(script.Parent.getOperationASTFromRequest)
+local getOperationASTFromRequest2 = getOperationASTFromRequest.getOperationASTFromRequest
+
+local GraphQL = require(parent.GraphQL)
+
 local Kind = GraphQL.Kind
+
 local isListType = GraphQL.isListType
 local getNullableType = GraphQL.getNullableType
 local isAbstractType = GraphQL.isAbstractType
 local isObjectType = GraphQL.isObjectType
+
 local TypeNameMetaFieldDef = GraphQL.TypeNameMetaFieldDef
+
 local SchemaMetaFieldDef = GraphQL.SchemaMetaFieldDef
+
 local collectFields = require(script.Parent.collectFields)
+
 local collectFields2 = collectFields.collectFields
 local collectSubFields = collectFields.collectSubFields
 
 require(script.Parent.Interfaces)
+
 require(script.Parent.types)
 
-local NULL = GraphQL.NULL
-local visitRoot = nil
-local visitErrorsByType = nil
-local visitObjectValue = nil
-local sortErrorsByPathSegment = nil
-local updateObject = nil
-local addPathSegmentInfo = nil
-local visitFieldValue = nil
+local null = GraphQL.NULL
 
-local function visitData(p1, p2: ((...any) -> ...any)?, p3: ((...any) -> ...any)?) -- line: 101
-	-- upvalues: Boolean (copy), Array (copy), visitData (copy)
-	if Boolean.toJSBoolean(Array.isArray(p1)) then
-		return Array.map(p1, function(p4) -- line: 103
-			-- upvalues: visitData (copy), p2 (copy), p3 (copy)
-			return visitData(p4, p2, p3)
+local visitRoot
+local visitErrorsByType
+local visitObjectValue
+local sortErrorsByPathSegment
+local updateObject
+local addPathSegmentInfo
+local visitFieldValue
+local function visitData(items, callback, callback2)
+	if Boolean.toJSBoolean(Array.isArray(items)) then
+		return Array.map(items, function(p)
+			return visitData(p, callback, callback2)
 		end)
 	end
 
-	if typeof(p1) == "table" then
-		local v35 = if p2 == nil then p1 else p2(p1)
-
-		if v35 ~= nil then
-			for v36 in v35 do
-				local v37 = v35[tostring(v36)]
-
-				v35[v36] = visitData(v37, p2, p3)
-			end
-		end
-
-		if p3 ~= nil then
-			return (p3(v35))
-		end
-
-		return v35
+	if typeof(items) ~= "table" then
+		return items
 	end
 
-	return p1
+	if callback ~= nil then
+		items = callback(items)
+	end
+
+	if items ~= nil then
+		for k in items do
+			items[k] = visitData(items[tostring(k)], callback, callback2)
+		end
+	end
+
+	if callback2 == nil then
+		return items
+	end
+
+	return (callback2(items))
 end
 
-t1.visitData = visitData
+local VisitResult = {
+	["visitData"] = visitData,
+	visitErrors = function(p, callback)
+		return Array.map(p, function(p2)
+			return callback(p2)
+		end)
+	end,
+	visitResult = function(self, p, p2, p3, p4)
+		local reduced = Array.reduce(p.document.definitions, function(p5, p6)
+			if p6.kind == Kind.FRAGMENT_DEFINITION then
+				p5[tostring(p6.name.value)] = p6
+			end
 
-function t1.visitErrors(p5, p6: ((...any) -> ...any)) -- line: 128
-	-- upvalues: Array (copy)
-	return Array.map(p5, function(p7) -- line: 132
-		-- upvalues: p6 (copy)
-		return p6(p7)
+			return p5
+		end, {})
+
+		local v = not Boolean.toJSBoolean(p.variables) and {} or p.variables
+
+		local v2 = { segmentInfoMap = Map.new(), unpathedErrors = Set.new() }
+		local data = self.data
+		local errors = self.errors
+		local v3
+
+		if errors == nil then
+			v3 = false
+		else
+			v3 = p4 ~= nil
+		end
+
+		local operationASTFromRequest = getOperationASTFromRequest2(p)
+
+		if data ~= nil and operationASTFromRequest ~= nil then
+			local v4 = visitRoot
+			local v5
+
+			if Boolean.toJSBoolean(v3) then
+				v5 = errors
+			end
+
+			self.data = v4(data, operationASTFromRequest, p2, reduced, v, p3, v5, v2)
+		end
+
+		local toJSBoolean = Boolean.toJSBoolean
+		local v4 = not (errors == nil) and p4
+
+		if toJSBoolean(v4) then
+			self.errors = visitErrorsByType(errors, p4, v2)
+		end
+
+		return self
+	end
+}
+
+visitErrorsByType = function(errors, p, p2)
+	local segmentInfoMap = p2.segmentInfoMap
+	local unpathedErrors = p2.unpathedErrors
+
+	local __unpathed = p.__unpathed
+
+	return Array.map(errors, function(p3)
+		local v = segmentInfoMap:get(p3)
+		local v2
+
+		if v == nil then
+			v2 = p3
+		else
+			v2 = Array.reduce(Array.reverse(Array.concat({}, v)), function(p4, data)
+				local v3 = p[data.type.name]
+
+				if v3 == nil then
+					return p4
+				end
+
+				local v4 = v3[tostring(data.fieldName)]
+
+				if v4 == nil then
+					return p4
+				end
+
+				return (v4(p4, data.pathIndex))
+			end, p3)
+		end
+
+		local toJSBoolean = Boolean.toJSBoolean
+		local v3
+
+		if Boolean.toJSBoolean(__unpathed) then
+			v3 = unpathedErrors:has(p3)
+		else
+			v3 = __unpathed
+		end
+
+		if toJSBoolean(v3) then
+			return __unpathed(v2)
+		end
+
+		return v2
 	end)
 end
-function t1.visitResult(p8, p9, p10, p11, p12) -- line: 137
-	-- upvalues: Array (copy), Kind (copy), Boolean (copy), Map (copy), Set (copy), getOperationASTFromRequest (copy), visitRoot (ref), visitErrorsByType (ref)
-	local v45 = Array.reduce(p9.document.definitions, function(p13, p14) -- line: 144
-		-- upvalues: Kind (copy)
-		if p14.kind == Kind.FRAGMENT_DEFINITION then
-			p13[tostring(p14.name.value)] = p14
-		end
 
-		return p13
-	end, {})
-	local v46 = if not Boolean.toJSBoolean(p9.variables) then {} else p9.variables
-	local t2 = {
-		segmentInfoMap = Map.new(),
-		unpathedErrors = Set.new()
-	}
-	local data = p8.data
-	local errors = p8.errors
-	local v50 = errors ~= nil and p12 ~= nil
-	local v51 = getOperationASTFromRequest(p9)
-
-	if data ~= nil and v51 ~= nil then
-		p8.data = visitRoot(data, v51, p10, v45, v46, p11, if not Boolean.toJSBoolean(v50) then nil else errors, t2)
-	end
-
-	if Boolean.toJSBoolean(errors ~= nil and p12) then
-		p8.errors = visitErrorsByType(errors, p12, t2)
-	end
-
-	return p8
-end
-function visitErrorsByType(p15, p16, t3: {[any]: any}) -- line: 190
-	-- upvalues: Array (copy), Boolean (copy)
-	local segmentInfoMap = t3.segmentInfoMap
-	local unpathedErrors = t3.unpathedErrors
-	local __unpathed = p16.__unpathed
-
-	return Array.map(p15, function(p17) -- line: 202
-		-- upvalues: segmentInfoMap (copy), Array (copy), p16 (copy), Boolean (copy), __unpathed (copy), unpathedErrors (copy)
-		local v159 = segmentInfoMap:get(p17)
-		local v160 = if v159 ~= nil then Array.reduce(Array.reverse(Array.concat({}, v159)), function(p18, p19) -- line: 222
-			-- upvalues: p16 (copy)
-			local v164 = p16[p19.type.name]
-
-			if v164 == nil then
-				return p18
-			end
-
-			local v165 = v164[tostring(p19.fieldName)]
-
-			if v165 == nil then
-				return p18
-			end
-
-			return (v165(p18, p19.pathIndex))
-		end, p17) else p17
-
-		if Boolean.toJSBoolean(if not Boolean.toJSBoolean(__unpathed) then __unpathed else unpathedErrors:has(p17)) then
-			return __unpathed(v160)
-		end
-
-		return v160
-	end)
-end
-
-local function getOperationRootType(p20, p21) -- line: 250
-	local operation = p21.operation
+local function getOperationRootType(object, p) -- 1 equivalent call inferred from this helper
+	local operation = p.operation
 
 	if operation == "query" then
-		return p20:getQueryType()
-	end
-
-	if operation == "mutation" then
-		return p20:getMutationType()
-	end
-
-	if operation == "subscription" then
-		return p20:getSubscriptionType()
+		return object:getQueryType()
+	elseif operation == "mutation" then
+		return object:getMutationType()
+	elseif operation == "subscription" then
+		return object:getSubscriptionType()
 	end
 
 	return nil
 end
 
-function visitRoot(p22, p23, p24, t4: {[any]: any}, t5: {[any]: any}, p25, p26, t6: {[any]: any}) -- line: 269
-	-- upvalues: collectFields2 (copy), Map (copy), Set (copy), visitObjectValue (ref)
-	local operation = p23.operation
-	local v70 = if operation ~= "query" then if operation ~= "mutation" then if operation ~= "subscription" then nil else p24:getSubscriptionType() else p24:getMutationType() else p24:getQueryType()
-	local v71 = collectFields2(p24, t4, t5, v70, p23.selectionSet, Map.new(), Set.new())
+visitRoot = function(p, p2, object, p3, p4, p5, p6, p7)
+	local operationRootType = getOperationRootType(object, p2) -- inferred equivalent call
+	local v = collectFields2(object, p3, p4, operationRootType, p2.selectionSet, Map.new(), Set.new())
 
-	return visitObjectValue(p22, v70, v71, p24, t4, t5, p25, 1, p26, t6)
+	return visitObjectValue(p, operationRootType, v, object, p3, p4, p5, 1, p6, p7)
 end
-function visitObjectValue(t7: {[any]: any}, p27, p28, p29, t8: {[any]: any}, t9: {[any]: any}, p30, n1: number, p31, t10: {[any]: any}) -- line: 308
-	-- upvalues: sortErrorsByPathSegment (ref), TypeNameMetaFieldDef (copy), SchemaMetaFieldDef (copy), addPathSegmentInfo (ref), visitFieldValue (ref), updateObject (ref)
-	local v82 = p27:getFields()
-	local v83 = if typeof(p30) ~= "table" then nil else p30[p27.name]
-	local v84 = if typeof(v83) ~= "table" then nil else v83.__enter
-	local v85 = if v84 == nil then t7 else v84(t7)
-	local errorMap = nil
 
-	if p31 ~= nil then
-		local v87 = sortErrorsByPathSegment(p31, n1)
+visitObjectValue = function(p, object, items, object2, p2, p3, p4, p5: number, p6, p7)
+	local fields = object:getFields()
+	local v
 
-		errorMap = v87.errorMap
+	if typeof(p4) == "table" then
+		v = p4[object.name]
+	end
 
-		for _, v89 in v87.unpathedErrors do
-			t10.unpathedErrors:add(v89)
+	local __enter
+
+	if typeof(v) == "table" then
+		__enter = v.__enter
+	end
+
+	local v2
+
+	if __enter == nil then
+		v2 = p
+	else
+		v2 = __enter(p)
+	end
+
+	local errorMap
+
+	if p6 ~= nil then
+		local v3 = sortErrorsByPathSegment(p6, p5)
+		errorMap = v3.errorMap
+
+		for _, unpathedError in v3.unpathedErrors do
+			p7.unpathedErrors:add(unpathedError)
 		end
 	end
 
-	for _, v91 in p28 do
-		local v92, v93 = table.unpack(v91, 1, 2)
-		local value = v93[1].name.value
-		local v95 = if typeof(v82:get(value)) ~= "table" then nil else v82:get(value).type
+	for _, list in items do
+		local v3, v4 = table.unpack(list, 1, 2)
 
-		if v95 == nil then
+		local value = v4[1].name.value
+		local kind
+
+		if typeof(fields:get(value)) == "table" then
+			kind = fields:get(value).type
+		end
+
+		if kind == nil then
 			if value == "__typename" then
-				v95 = TypeNameMetaFieldDef.type
+				kind = TypeNameMetaFieldDef.type
 			elseif value == "__schema" then
-				v95 = SchemaMetaFieldDef.type
+				kind = SchemaMetaFieldDef.type
 			end
 		end
 
-		local v96 = n1 + 1
-		local v97 = nil
+		local v5 = p5 + 1
+		local v6
 
 		if errorMap then
-			v97 = errorMap[tostring(v92)]
+			v6 = errorMap[tostring(v3)]
 
-			if v97 ~= nil then
-				errorMap[tostring(v92)] = nil
+			if v6 ~= nil then
+				errorMap[tostring(v3)] = nil
 			end
 
-			addPathSegmentInfo(p27, value, v96, v97, t10)
+			addPathSegmentInfo(object, value, v5, v6, p7)
 		end
 
-		local v98 = visitFieldValue(t7[tostring(v92)], v95, v93, p29, t8, t9, p30, v96, v97, t10)
+		local v7 = visitFieldValue(p[tostring(v3)], kind, v4, object2, p2, p3, p4, v5, v6, p7)
 
-		updateObject(v85, v92, v98, v83, value)
+		updateObject(v2, v3, v7, v, value)
 	end
 
-	local __typename = v85.__typename
+	local __typename = v2.__typename
 
 	if __typename ~= nil then
-		updateObject(v85, "__typename", __typename, v83, "__typename")
+		updateObject(v2, "__typename", __typename, v, "__typename")
 	end
 
 	if errorMap then
-		for v100 in errorMap do
-			for _, v102 in errorMap[v100] do
-				t10.unpathedErrors:add(v102)
+		for k in errorMap do
+			for _, v3 in errorMap[k] do
+				p7.unpathedErrors:add(v3)
 			end
 		end
 	end
 
-	local v103 = if typeof(v83) ~= "table" then nil else v83.__leave
+	local __leave
 
-	if v103 ~= nil then
-		return (v103(v85))
+	if typeof(v) == "table" then
+		__leave = v.__leave
 	end
 
-	return v85
-end
-function updateObject(t11: {[any]: any}, s1: string, p32, p33, s2: string) -- line: 438
-	if p33 == nil then
-		t11[tostring(s1)] = p32
-
-		return
+	if __leave == nil then
+		return v2
 	end
 
-	local v109 = p33[s2]
-
-	if v109 == nil then
-		t11[tostring(s1)] = p32
-
-		return
-	end
-
-	local v110 = v109(p32)
-
-	if v110 == nil then
-		t11[tostring(s1)] = nil
-
-		return
-	end
-
-	t11[tostring(s1)] = v110
+	return (__leave(v2))
 end
 
-local function visitListValue(p34, p35, p36, p37, t12: {[any]: any}, t13: {[any]: any}, p38, n2: number, p39, t14: {[any]: any}) -- line: 469
-	-- upvalues: Array (copy), visitFieldValue (ref)
-	return Array.map(p34, function(p40) -- line: 481
-		-- upvalues: visitFieldValue (ref), p35 (copy), p36 (copy), p37 (copy), t12 (copy), t13 (copy), p38 (copy), n2 (copy), p39 (copy), t14 (copy)
-		return visitFieldValue(p40, p35, p36, p37, t12, t13, p38, n2 + 1, p39, t14)
+updateObject = function(p, p2: string, p3, p4, p5: string)
+	if p4 == nil then
+		p[tostring(p2)] = p3
+		return
+	end
+
+	local v = p4[p5]
+
+	if v == nil then
+		p[tostring(p2)] = p3
+		return
+	end
+
+	local v2 = v(p3)
+
+	if v2 == nil then
+		p[tostring(p2)] = nil
+	else
+		p[tostring(p2)] = v2
+	end
+end
+local function visitListValue(p, ofType, p2, object, p3, p4, p5, p6: number, p7, p8)
+	return Array.map(p, function(p9)
+		return visitFieldValue(p9, ofType, p2, object, p3, p4, p5, p6 + 1, p7, p8)
 	end)
 end
 
-function visitFieldValue(p41, p42, p43, p44, t15: {[any]: any}, t16: {[any]: any}, p45, n3: number, p46, t17: {[any]: any}) -- line: 498
-	-- upvalues: NULL (copy), getNullableType (copy), Boolean (copy), isListType (copy), visitListValue (copy), isAbstractType (copy), collectSubFields (copy), visitObjectValue (ref), isObjectType (copy)
-	local v131 = if p46 == nil then {} else p46
+visitFieldValue = function(p, p2, p3, object, p4, p5, p6, p7: number, p8, p9)
+	local v = p8 == nil and {} or p8
 
-	if p41 == nil or p41 == NULL then
-		return p41
+	if p == nil or p == null then
+		return p
 	end
 
-	local v132 = getNullableType(p42)
+	local nullableType = getNullableType(p2)
 
-	if Boolean.toJSBoolean(isListType(v132)) then
-		return visitListValue(p41, v132.ofType, p43, p44, t15, t16, p45, n3, v131, t17)
+	if Boolean.toJSBoolean(isListType(nullableType)) then
+		return visitListValue(p, nullableType.ofType, p3, object, p4, p5, p6, p7, v, p9)
 	end
 
-	if Boolean.toJSBoolean(isAbstractType(v132)) then
-		local v133 = p44:getType(p41.__typename)
-		local v134 = collectSubFields(p44, t15, t16, v133, p43)
+	if Boolean.toJSBoolean(isAbstractType(nullableType)) then
+		local kind = object:getType(p.__typename)
+		local v2 = collectSubFields(object, p4, p5, kind, p3)
+		return visitObjectValue(p, kind, v2, object, p4, p5, p6, p7, v, p9)
+	else
+		if Boolean.toJSBoolean(isObjectType(nullableType)) then
+			local v2 = collectSubFields(object, p4, p5, nullableType, p3)
+			return visitObjectValue(p, nullableType, v2, object, p4, p5, p6, p7, v, p9)
+		end
 
-		return visitObjectValue(p41, v133, v134, p44, t15, t16, p45, n3, v131, t17)
+		local v2
+
+		if typeof(p6) == "table" then
+			v2 = p6[nullableType.name]
+		end
+
+		if v2 == nil then
+			return p
+		end
+
+		local v3 = v2(p)
+
+		return if v3 == nil then p else v3
 	end
-
-	if Boolean.toJSBoolean(isObjectType(v132)) then
-		local v135 = collectSubFields(p44, t15, t16, v132, p43)
-
-		return visitObjectValue(p41, v132, v135, p44, t15, t16, p45, n3, v131, t17)
-	end
-
-	local v136 = if typeof(p45) ~= "table" then nil else p45[v132.name]
-
-	if v136 == nil then
-		return p41
-	end
-
-	local v137 = v136(p41)
-
-	if v137 == nil then
-		return p41
-	end
-
-	return v137
 end
-function sortErrorsByPathSegment(p47, n4: number) -- line: 589
-	-- upvalues: Set (copy), Array (copy), Object (copy)
-	local t18 = {}
-	local v141 = Set.new()
 
-	for _, v143 in p47 do
-		local v144 = if typeof(v143.path) ~= "table" then nil else v143.path[n4]
+sortErrorsByPathSegment = function(items, p: number)
+	local unpathedErrors = Set.new()
+	local errorMap = {}
 
-		if v144 == nil then
-			v141:add(v143)
-		elseif Array.indexOf(Object.keys(t18), (tostring(v144))) ~= -1 then
-			table.insert(t18[tostring(v144)], v143)
+	for _, item in items do
+		local v
+
+		if typeof(item.path) == "table" then
+			v = item.path[p]
+		end
+
+		if v == nil then
+			unpathedErrors:add(item)
+		elseif Array.indexOf(Object.keys(errorMap), (tostring(v))) == -1 then
+			errorMap[tostring(v)] = { item }
 		else
-			t18[tostring(v144)] = { v143 }
+			table.insert(errorMap[tostring(v)], item)
 		end
 	end
 
-	return {
-		errorMap = t18,
-		unpathedErrors = v141
-	}
+	return { errorMap = errorMap, unpathedErrors = unpathedErrors }
 end
-function addPathSegmentInfo(p48, s3: string, n5: number, p49, t19: {[any]: any}) -- line: 614
-	for _, v151 in if p49 == nil then {} else p49 do
-		local t20 = {
-			type = p48,
-			fieldName = s3,
-			pathIndex = n5
-		}
-		local v153 = t19.segmentInfoMap:get(v151)
 
-		if v153 == nil then
-			t19.segmentInfoMap:set(v151, { t20 })
+addPathSegmentInfo = function(object, fieldName: string, pathIndex: number, p, p2)
+	for _, v in p == nil and {} or p do
+		local v2 = { type = object, fieldName = fieldName, pathIndex = pathIndex }
+		local v3 = p2.segmentInfoMap:get(v)
+
+		if v3 == nil then
+			p2.segmentInfoMap:set(v, { v2 })
 		else
-			table.insert(v153, t20)
+			table.insert(v3, v2)
 		end
 	end
 end
-
-return t1
+return VisitResult

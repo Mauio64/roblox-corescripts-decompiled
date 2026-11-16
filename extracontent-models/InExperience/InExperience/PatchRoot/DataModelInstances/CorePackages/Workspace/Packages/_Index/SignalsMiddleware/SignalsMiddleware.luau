@@ -1,5 +1,4 @@
 local ActionHandlers = require(script.ActionHandlers)
-
 return {
 	createSignalsMiddleware = require(script.SignalsMiddleware),
 	ActionHandlers = ActionHandlers,

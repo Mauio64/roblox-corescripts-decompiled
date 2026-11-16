@@ -1,155 +1,122 @@
 local ScrollIntervalTracker = script:FindFirstAncestor("ScrollIntervalTracker")
-local ScrollIntervalTrackerParent = ScrollIntervalTracker.Parent
+local parent = ScrollIntervalTracker.Parent
+
 local Logger = require(ScrollIntervalTracker.Logger)
-local Cryo = require(ScrollIntervalTrackerParent.Cryo)
+local Cryo = require(parent.Cryo)
+
 local RunService = game:GetService("RunService")
-local t1 = {
-	minDistancePx = 50,
-	stableFramesRequired = 5
-}
 
-local function createScrollIntervalTracker(p1: ((...any) -> ...any), p2: ((...any) -> ...any), p3, p4, t2: {[any]: any}?) -- line: 49
-	-- upvalues: Cryo (copy), t1 (copy), Logger (copy), RunService (copy)
-	local v13 = Cryo.Dictionary.join(t1, t2 or {})
-	local u14 = false
-	local u15 = nil
-	local n1 = 0
-	local n2 = 0
-	local u18 = nil
+local v = { minDistancePx = 50, stableFramesRequired = 5 }
 
-	local function resetStopDetection() -- line: 68
-		-- upvalues: n2 (ref), u18 (ref)
-		n2 = 0
-		u18 = nil
+local function createScrollIntervalTracker(callback, callback2, p, p2, options)
+	local joined = Cryo.Dictionary.join(v, options or {})
+
+	local flag = false
+
+	local v2 = nil
+	local total = 0
+
+	local count = 0
+	local v3 = nil
+
+	local function resetStopDetection() -- 1 equivalent call inferred from this helper
+		count = 0
+		v3 = nil
 	end
-	local function resetStartDetection() -- line: 73
-		-- upvalues: u15 (ref), n1 (ref)
-		u15 = nil
-		n1 = 0
+
+	local function resetStartDetection() -- 3 equivalent calls inferred from this helper
+		v2 = nil
+		total = 0
 	end
-	local function stopInterval(s1: string) -- line: 78
-		-- upvalues: Logger (copy), v13 (copy), p2 (copy), p4 (copy), u14 (ref), n2 (ref), u18 (ref), u15 (ref), n1 (ref)
-		Logger:debug("Scroll {} stopping (reason={})", v13.debugName, s1)
-		p2(p4)
-		u14 = false
-		n2 = 0
-		u18 = nil
-		u15 = nil
-		n1 = 0
+
+	local function stopInterval(p3: string) -- 2 equivalent calls inferred from this helper
+		Logger:debug("Scroll {} stopping (reason={})", joined.debugName, p3)
+		callback2(p2)
+		flag = false
+		resetStopDetection() -- inferred equivalent call
+		resetStartDetection() -- inferred equivalent call
 	end
-	local function recordCanvasPositionChanged(n3: number) -- line: 86
-		-- upvalues: n2 (ref), u18 (ref)
-		n2 = 0
-		u18 = n3
+
+	local function recordCanvasPositionChanged(p3: number) -- 2 equivalent calls inferred from this helper
+		count = 0
+		v3 = p3
 	end
-	local function isPastMinScrollDistance(n4: number) -- line: 92
-		-- upvalues: u15 (ref), n1 (ref), v13 (copy)
-		if u15 ~= nil then
-			n1 += math.abs(n4 - u15)
+
+	local function isPastMinScrollDistance(y: number): boolean -- 1 equivalent call inferred from this helper
+		if v2 ~= nil then
+			total += math.abs(y - v2)
 		end
 
-		u15 = n4
-
-		return n1 >= v13.minDistancePx
+		v2 = y
+		return total >= joined.minDistancePx
 	end
-	local function tryStartInterval(n5: number) -- line: 100
-		-- upvalues: Logger (copy), v13 (copy), p1 (copy), p4 (copy), u14 (ref), u15 (ref), n1 (ref), n2 (ref), u18 (ref)
-		Logger:debug("Scroll {} starting", v13.debugName)
 
-		if not p1(p4) then
+	local function tryStartInterval(p3: number)
+		Logger:debug("Scroll {} starting", joined.debugName)
+
+		if not callback(p2) then
 			return
 		end
 
-		u14 = true
-		u15 = nil
-		n1 = 0
-		n2 = 0
-		u18 = n5
+		flag = true
+		resetStartDetection() -- inferred equivalent call
+		recordCanvasPositionChanged(p3) -- inferred equivalent call
 	end
 
-	local connection = RunService.RenderStepped:Connect(function() -- line: 116
-		-- upvalues: u14 (ref), p3 (copy), u18 (ref), n2 (ref), v13 (copy), Logger (copy), p2 (copy), p4 (copy), u15 (ref), n1 (ref)
-		if not u14 then
+	local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+		if not flag then
 			return
 		end
 
-		local CanvasPositionY = p3.CanvasPosition.Y
+		local y = p.CanvasPosition.Y
 
-		if u18 == nil then
-			u18 = CanvasPositionY
-			n2 = 0
-
-			return
-		end
-
-		if math.abs(CanvasPositionY - u18) <= 0.5 then
-			n2 += 1
+		if v3 == nil then
+			v3 = y
+			count = 0
 		else
-			n2 = 0
-		end
+			if math.abs(y - v3) <= 0.5 then
+				count += 1
+			else
+				count = 0
+			end
 
-		u18 = CanvasPositionY
+			v3 = y
 
-		if n2 >= v13.stableFramesRequired then
-			Logger:debug("Scroll {} stopping (reason={})", v13.debugName, "stableFrames")
-			p2(p4)
-			u14 = false
-			n2 = 0
-			u18 = nil
-			u15 = nil
-			n1 = 0
+			if count >= joined.stableFramesRequired then
+				stopInterval("stableFrames") -- inferred equivalent call
+			end
 		end
 	end)
 
 	return {
-		onScrollTick = function() -- line: 141
-			-- upvalues: p3 (copy), u14 (ref), u15 (ref), n1 (ref), v13 (copy), Logger (copy), p1 (copy), p4 (copy), n2 (ref), u18 (ref)
-			local CanvasPositionY = p3.CanvasPosition.Y
+		onScrollTick = function()
+			local y = p.CanvasPosition.Y
 
-			if not u14 then
-				if u15 ~= nil then
-					n1 += math.abs(CanvasPositionY - u15)
-				end
-
-				u15 = CanvasPositionY
-
-				if not (n1 >= v13.minDistancePx) then
+			if not flag then
+				if not isPastMinScrollDistance(y) then -- inferred equivalent call
 					return
 				end
 
-				Logger:debug("Scroll {} starting", v13.debugName)
+				Logger:debug("Scroll {} starting", joined.debugName)
 
-				if not p1(p4) then
+				if not callback(p2) then
 					return
 				end
 
-				u14 = true
-				u15 = nil
-				n1 = 0
-				n2 = 0
-				u18 = CanvasPositionY
-
-				return
+				flag = true
+				resetStartDetection() -- inferred equivalent call
 			end
 
-			n2 = 0
-			u18 = CanvasPositionY
+			recordCanvasPositionChanged(y) -- inferred equivalent call
 		end,
-		cleanup = function() -- line: 156
-			-- upvalues: connection (copy), u14 (ref), Logger (copy), v13 (copy), p2 (copy), p4 (copy), n2 (ref), u18 (ref), u15 (ref), n1 (ref)
-			if connection then
-				connection:Disconnect()
+		cleanup = function()
+			if renderSteppedConnection then
+				renderSteppedConnection:Disconnect()
 			end
 
-			if u14 then
-				Logger:debug("Scroll {} cleanup/unmount", v13.debugName)
-				Logger:debug("Scroll {} stopping (reason={})", v13.debugName, "cleanup")
-				p2(p4)
-				u14 = false
-				n2 = 0
-				u18 = nil
-				u15 = nil
-				n1 = 0
+			if flag then
+				Logger:debug("Scroll {} cleanup/unmount", joined.debugName)
+				stopInterval("cleanup") -- inferred equivalent call
 			end
 		end
 	}

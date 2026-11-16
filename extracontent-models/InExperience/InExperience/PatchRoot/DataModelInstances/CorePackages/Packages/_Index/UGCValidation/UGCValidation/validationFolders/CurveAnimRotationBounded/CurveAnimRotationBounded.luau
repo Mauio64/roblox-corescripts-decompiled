@@ -1,69 +1,60 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local getFFlagUGCValidateCurveAnimRotationSpeed = require(ParentParent.flags.getFFlagUGCValidateCurveAnimRotationSpeed)
-local getFIntUGCValidateMaxAnimationFPS = require(ParentParent.flags.getFIntUGCValidateMaxAnimationFPS)
-local getFIntUGCValidationMaxAnimationRotationSpeedPerSecond = require(ParentParent.flags.getFIntUGCValidationMaxAnimationRotationSpeedPerSecond)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
-}
+local getFFlagUGCValidateCurveAnimRotationSpeed = require(parent.flags.getFFlagUGCValidateCurveAnimRotationSpeed)
+local getFIntUGCValidateMaxAnimationFPS = require(parent.flags.getFIntUGCValidateMaxAnimationFPS)
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
-
-t1.requiredData = {
-	ValidationEnums.SharedDataMember.curveAnimations,
-	ValidationEnums.SharedDataMember.curveAnimComputedFrames
-}
-t1.fflag = getFFlagUGCValidateMigrateCurveAnim
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
-
-function t1.run(p1, p2) -- line: 28
-	-- upvalues: getFFlagUGCValidateCurveAnimRotationSpeed (copy), getFIntUGCValidateMaxAnimationFPS (copy), getFIntUGCValidationMaxAnimationRotationSpeedPerSecond (copy), ErrorSourceStrings (copy)
-	if not getFFlagUGCValidateCurveAnimRotationSpeed() then
-		return
-	end
-
-	local animFrames = p2.curveAnimComputedFrames.animFrames
-	local v13 = 1 / getFIntUGCValidateMaxAnimationFPS()
-	local v14 = getFIntUGCValidationMaxAnimationRotationSpeedPerSecond()
-	local v15 = v14 / getFIntUGCValidateMaxAnimationFPS()
-	local t2 = {}
-
-	for v17, v18 in animFrames do
-		for v19, v20 in v18 do
-			local v21 = t2[v19]
-
-			if not v21 then
-				continue
-			end
-
-			local v22 = math.deg((math.abs((v20:AngleBetween(v21)))))
-
-			if v15 < v22 then
-				local v23 = (v17 - 1) * v13
-				local v24 = v22 * getFIntUGCValidateMaxAnimationFPS()
-
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_RotationTooFast, {
-					time = string.format("%.2f", v23),
-					bodyPart = v19,
-					speed = string.format("%.2f", v24),
-					maxSpeed = tostring(v14)
-				})
-
-				return
-			end
+local getFIntUGCValidationMaxAnimationRotationSpeedPerSecond = require(parent.flags.getFIntUGCValidationMaxAnimationRotationSpeedPerSecond)
+return {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = {
+		ValidationEnums.SharedDataMember.curveAnimations,
+		ValidationEnums.SharedDataMember.curveAnimComputedFrames
+	},
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
+	run = function(object, p)
+		if not getFFlagUGCValidateCurveAnimRotationSpeed() then
+			return
 		end
 
-		t2 = v18
-	end
-end
+		local animFrames = p.curveAnimComputedFrames.animFrames
+		local v = 1 / getFIntUGCValidateMaxAnimationFPS()
 
-return t1
+		local fIntUGCValidationMaxAnimationRotationSpeedPerSecond = getFIntUGCValidationMaxAnimationRotationSpeedPerSecond()
+		local v2 = fIntUGCValidationMaxAnimationRotationSpeedPerSecond / getFIntUGCValidateMaxAnimationFPS()
+
+		local v3 = {}
+
+		for k, animFrame in animFrames do
+			for k2, v4 in animFrame do
+				local v5 = v3[k2]
+
+				if not v5 then
+					continue
+				end
+
+				local v6 = math.deg((math.abs((v4:AngleBetween(v5)))))
+
+				if v2 < v6 then
+					local v7 = (k - 1) * v
+					local v8 = v6 * getFIntUGCValidateMaxAnimationFPS()
+
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_RotationTooFast, {
+						time = string.format("%.2f", v7),
+						bodyPart = k2,
+						speed = string.format("%.2f", v8),
+						maxSpeed = tostring(fIntUGCValidationMaxAnimationRotationSpeedPerSecond)
+					})
+
+					return
+				end
+			end
+
+			v3 = animFrame
+		end
+	end
+}

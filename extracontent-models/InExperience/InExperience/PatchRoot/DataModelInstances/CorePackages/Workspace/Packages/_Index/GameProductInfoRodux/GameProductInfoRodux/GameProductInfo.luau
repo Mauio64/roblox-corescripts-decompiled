@@ -1,47 +1,61 @@
-local Parent = script:FindFirstAncestor("GameProductInfoRodux").Parent
-local Result = require(Parent.Result)
-local v3 = game:DefineFastFlag("FixFiatPaidAccessPlayButton", false)
-local t1 = {
-	new = function() -- line: 20
-		return {}
-	end
-}
+local parent = script:FindFirstAncestor("GameProductInfoRodux").Parent
+local Result = require(parent.Result)
 
-function t1.mock(p1) -- line: 25
-	-- upvalues: t1 (copy)
-	local v6 = t1.new()
+local GameProductInfo = {}
 
-	v6.universeId = p1
-	v6.isForSale = true
-	v6.productId = 12345
-	v6.price = 5
-	v6.sellerId = 6789
-
-	return v6
+function GameProductInfo.new()
+	return {}
 end
-function t1.fromJsonData(p2) -- line: 35
-	-- upvalues: v3 (copy), Result (copy), t1 (copy)
-	local v8 = type(p2.universeId) == "number" and (type(p2.isForSale) == "boolean" and (type(p2.productId) == "number" and (type(p2.price) == "number" and type(p2.sellerId) == "number")))
-	local v9 = if not v3 then nil else p2.fiatPurchaseData ~= nil and (type(p2.universeId) == "number" and type(p2.isForSale) == "boolean")
 
-	if not v8 and not v9 then
+function GameProductInfo.mock(universeId)
+	local v = GameProductInfo.new()
+	v.universeId = universeId
+	v.isForSale = true
+	v.productId = 12345
+	v.price = 5
+	v.sellerId = 6789
+	return v
+end
+
+function GameProductInfo.fromJsonData(data)
+	local v
+
+	if
+		type(data.universeId) == "number"
+		and type(data.isForSale) == "boolean"
+		and type(data.productId) == "number"
+		and type(data.price) == "number"
+	then
+		v = type(data.sellerId) == "number"
+	else
+		v = false
+	end
+
+	local v2
+
+	if data.fiatPurchaseData == nil or type(data.universeId) ~= "number" then
+		v2 = false
+	else
+		v2 = type(data.isForSale) == "boolean"
+	end
+
+	if not (v or v2) then
 		return Result.error("invalid data type")
 	end
 
-	local v10 = t1.new()
+	local v3 = GameProductInfo.new()
+	v3.universeId = tostring(data.universeId)
+	v3.isForSale = data.isForSale
+	v3.productId = data.productId
+	v3.price = data.price
+	v3.sellerId = data.sellerId
 
-	v10.universeId = tostring(p2.universeId)
-	v10.isForSale = p2.isForSale
-	v10.productId = p2.productId
-	v10.price = p2.price
-	v10.sellerId = p2.sellerId
-
-	if p2.fiatPurchaseData then
-		v10.localizedFiatPrice = p2.fiatPurchaseData.localizedFiatPrice
-		v10.fiatBasePriceId = p2.fiatPurchaseData.basePriceId
+	if data.fiatPurchaseData then
+		v3.localizedFiatPrice = data.fiatPurchaseData.localizedFiatPrice
+		v3.fiatBasePriceId = data.fiatPurchaseData.basePriceId
 	end
 
-	return Result.success(v10)
+	return Result.success(v3)
 end
 
-return t1
+return GameProductInfo

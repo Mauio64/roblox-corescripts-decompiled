@@ -1,132 +1,66 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local createEffect = require(Parent.Signals).createEffect
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Signals = require(parent.Signals)
+local createEffect = Signals.createEffect
 
 require(script.Parent.types)
 
-local t1 = {}
+local v = {}
 
-local function onTerminal(p1, p2: ((...any) -> ...any)?, p3: ((...any) -> ...any)?) -- line: 25
-	-- upvalues: t1 (copy), createEffect (copy)
-	local t2 = {}
-	local u9 = false
-	local u10 = false
+local function onTerminal(callback, callback2, callback3)
+	local v2 = {}
+	local flag = false
+	local flag2 = false
 
-	local function cleanupEffect() -- line: 34
-		-- upvalues: u10 (ref), t1 (copy), t2 (copy)
-		if u10 then
+	local function cleanupEffect() -- 1 equivalent call inferred from this helper
+		if flag2 then
 			return
 		end
 
-		u10 = true
+		flag2 = true
+		local v3 = v[v2]
+		v[v2] = nil
 
-		local v16 = t1[t2]
-
-		t1[t2] = nil
-
-		if v16 ~= nil then
-			v16()
-		end
-	end
-	local function settle(p4) -- line: 46
-		-- upvalues: u9 (ref), u10 (ref), t1 (copy), t2 (copy), p2 (copy), p3 (copy)
-		if u9 then
-			return
-		end
-
-		u9 = true
-
-		if not u10 then
-			u10 = true
-
-			local v18 = t1[t2]
-
-			t1[t2] = nil
-
-			if v18 ~= nil then
-				v18()
-			end
-		end
-
-		if p4.status == "succeeded" and p2 then
-			p2(p4.result)
-
-			return
-		end
-
-		if p4.status == "failed" and p3 then
-			p3(p4.error or "request failed", p4.errorCode)
+		if v3 ~= nil then
+			v3()
 		end
 	end
 
-	local v13 = p1(false)
-
-	if v13.status ~= "pending" then
-		if not u9 then
-			u9 = true
-
-			if not u10 then
-				u10 = true
-
-				local v14 = t1[t2]
-
-				t1[t2] = nil
-
-				if v14 ~= nil then
-					v14()
-				end
-			end
-
-			if v13.status == "succeeded" and p2 then
-				p2(v13.result)
-			elseif v13.status == "failed" and p3 then
-				p3(v13.error or "request failed", v13.errorCode)
-			end
+	local function settle(data) -- 2 equivalent calls inferred from this helper
+		if flag then
+			return
 		end
 
-		return
+		flag = true
+		cleanupEffect() -- inferred equivalent call
+
+		if data.status == "succeeded" and callback2 then
+			callback2(data.result)
+		elseif data.status == "failed" and callback3 then
+			callback3(data.error or "request failed", data.errorCode)
+		end
 	end
 
-	local v15 = createEffect(function(p5) -- line: 67
-		-- upvalues: p1 (copy), u9 (ref), u10 (ref), t1 (copy), t2 (copy), p2 (copy), p3 (copy)
-		local v20 = p1(p5)
+	local v3 = callback(false)
 
-		if v20.status == "pending" then
-			return
-		end
+	if v3.status == "pending" then
+		local effect = createEffect(function(p)
+			local v4 = callback(p)
 
-		if u9 then
-			return
-		end
-
-		u9 = true
-
-		if not u10 then
-			u10 = true
-
-			local v21 = t1[t2]
-
-			t1[t2] = nil
-
-			if v21 ~= nil then
-				v21()
+			if v4.status == "pending" then
+				return
 			end
+
+			settle(v4) -- inferred equivalent call
+		end)
+
+		if flag2 then
+			effect()
+		else
+			v[v2] = effect
 		end
-
-		if v20.status == "succeeded" and p2 then
-			p2(v20.result)
-
-			return
-		end
-
-		if v20.status == "failed" and p3 then
-			p3(v20.error or "request failed", v20.errorCode)
-		end
-	end)
-
-	if u10 then
-		v15()
 	else
-		t1[t2] = v15
+		settle(v3) -- inferred equivalent call
 	end
 end
 

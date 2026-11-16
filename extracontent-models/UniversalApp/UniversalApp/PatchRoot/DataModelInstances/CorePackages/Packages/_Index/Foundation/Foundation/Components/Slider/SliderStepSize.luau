@@ -1,4 +1,1 @@
-return {
-	Step = "Step",
-	Page = "Page"
-}
+return { Step = "Step", Page = "Page" }

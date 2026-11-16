@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.FocusBehaviors.FocusBehaviors))
+local FocusBehaviors = require(index.FocusBehaviors.FocusBehaviors)
+
+return FocusBehaviors

@@ -1,31 +1,42 @@
-local Parent = script:FindFirstAncestor("Squads").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local SquadExternalContractProvider = require(Parent.SquadsCore.SquadExternalContractProvider)
+local Squads = script:FindFirstAncestor("Squads")
+local parent = Squads.Parent
 
-require(Parent.SquadsCore.Types)
+local FFlagSquadsEnableFoundationTestIds = require(Squads.Flags.FFlagSquadsEnableFoundationTestIds)
 
-local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalUserId = require(Parent.RobloxAppHooks).useLocalUserId
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useStore = require(Parent.RoactUtils).Hooks.RoactRodux.useStore
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+require(parent.SquadsCore.Types)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils2 = require(parent.RoactUtils)
+local useStore = RoactUtils2.Hooks.RoactRodux.useStore
+
 local Sheet = Foundation.Sheet
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local createScheduledSquad = require(Parent.SquadsCore.Thunks).createScheduledSquad
-local EventNames = require(Parent.SquadsCore.EventNames)
-local SquadPromptResponse = require(Parent.SquadsCore.Enums).SquadPromptResponse
-local SquadPromptType = require(Parent.SquadsCore.Enums).SquadPromptType
-local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
-local updateScheduledSquad = require(Parent.SquadsCore.NetworkRequests).updateScheduledSquad
 
-return function(t1: {[any]: any}) -- line: 36
-	-- upvalues: React (copy), SquadExternalContractContext (copy), useDispatch (copy), useLocalUserId (copy), useStore (copy), useLocalization (copy), SquadPromptType (copy), updateScheduledSquad (copy), EventNames (copy), SquadPromptResponse (copy), createScheduledSquad (copy), Sheet (copy), FoundationText (copy), Foundation (copy), View (copy)
-	local v19 = React.useContext(SquadExternalContractContext)
-	local v20 = useDispatch()
-	local v21 = useLocalUserId()
-	local v22 = useStore()
-	local v23 = useLocalization({
+local Thunks = require(parent.SquadsCore.Thunks)
+local createScheduledSquad = Thunks.createScheduledSquad
+local EventNames = require(parent.SquadsCore.EventNames)
+local Enums = require(parent.SquadsCore.Enums)
+local SquadPromptResponse = Enums.SquadPromptResponse
+local Enums2 = require(parent.SquadsCore.Enums)
+local SquadPromptType = Enums2.SquadPromptType
+local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
+local NetworkRequests = require(parent.SquadsCore.NetworkRequests)
+local updateScheduledSquad = NetworkRequests.updateScheduledSquad
+
+return function(props)
+	local v = React.useContext(SquadExternalContractContext)
+	local v2 = useDispatch()
+	local v3 = useLocalUserId()
+	local v4 = useStore()
+	local v5 = useLocalization({
 		cancelText = "CommonUI.Controls.Action.Cancel",
 		deleteText = "Feature.Chat.Action.Delete",
 		fieldIsRequiredText = "Feature.Squads.Label.ThisFieldIsRequired",
@@ -35,56 +46,57 @@ return function(t1: {[any]: any}) -- line: 36
 		startTimeText = "Feature.Squads.Label.StartTime",
 		titleText = "Feature.Squads.Description.Title"
 	})
-	local v24, v25 = React.useState(if not t1.scheduledSquad or not t1.scheduledSquad.startTime then nil else t1.scheduledSquad.startTime)
-	local v26, v27 = React.useState(false)
-	local v28, v29 = React.useState(not t1.scheduledSquad and "" or t1.scheduledSquad.title)
-	local v30, v31 = React.useState(false)
 
-	if v30 then
-		local _ = v23.fieldIsRequiredText
+	local useState = React.useState
+	local v6
+
+	if props.scheduledSquad and props.scheduledSquad.startTime then
+		v6 = props.scheduledSquad.startTime
 	end
 
-	React.useEffect(function() -- line: 62
-		-- upvalues: v25 (copy), t1 (copy), v27 (copy), v31 (copy)
-		v25(if not t1.scheduledSquad or not t1.scheduledSquad.startTime then nil else t1.scheduledSquad.startTime)
-		v27(false)
-		v31(false)
-	end, {
-		t1.isOpen,
-		t1.scheduledSquad and t1.scheduledSquad.startTime
-	})
+	local state, setState = useState(v6)
 
-	local v33 = t1.scheduledSquad and tostring(t1.scheduledSquad.initiatorId) == tostring(v21)
-	local dateTime = DateTime.now()
-	local v35 = dateTime:ToLocalTime()
-	local v36 = React.useCallback(function() -- line: 78
-		-- upvalues: t1 (copy), v19 (copy), v22 (copy), SquadPromptType (copy)
-		t1.onClose()
-		v19.setSquadPrompt(v22, {
-			hideCancelButton = true,
-			promptType = SquadPromptType.Error
-		})
-	end, {
-		t1.onClose,
-		v19.setSquadPrompt,
-		v22
-	})
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(not props.scheduledSquad and "" or props.scheduledSquad.title)
+	local state4, setState4 = React.useState(false)
 
-	React.useCallback(function(p1) -- line: 86
-		-- upvalues: v30 (copy), v31 (copy), v29 (copy)
-		if v30 then
-			v31(false)
+	if state4 then
+		local _fieldIsRequiredText = v5.fieldIsRequiredText
+	end
+
+	React.useEffect(function()
+		local v7
+
+		if props.scheduledSquad and props.scheduledSquad.startTime then
+			v7 = props.scheduledSquad.startTime
 		end
 
-		v29(p1)
-	end, {
-		v30,
-		v31,
-		v29
-	})
+		setState(v7)
 
-	local v37 = React.useCallback(function(n1: number, n2: number) -- line: 94
-		if n1 == 2 and (n2 % 4 == 0 and n2 % 100 ~= 0 or n2 % 400 == 0) then
+		setState2(false)
+		setState4(false)
+	end, { props.isOpen, props.scheduledSquad and props.scheduledSquad.startTime })
+
+	local v7 = props.scheduledSquad and tostring(props.scheduledSquad.initiatorId) == tostring(v3)
+
+	local now = DateTime.now()
+	local localTime = now:ToLocalTime()
+
+	local v8 = React.useCallback(function()
+		props.onClose()
+		v.setSquadPrompt(v4, { hideCancelButton = true, promptType = SquadPromptType.Error })
+	end, { props.onClose, v.setSquadPrompt, v4 })
+
+	React.useCallback(function(p)
+		if state4 then
+			setState4(false)
+		end
+
+		setState3(p)
+	end, { state4, setState4, setState3 })
+
+	local v9 = React.useCallback(function(p: number, p2: number)
+		if p == 2 and (p2 % 4 == 0 and p2 % 100 ~= 0 or p2 % 400 == 0) then
 			return 29
 		end
 
@@ -101,162 +113,210 @@ return function(t1: {[any]: any}) -- line: 36
 			31,
 			30,
 			31
-		})[n1]
+		})[p]
 	end, {})
-	local v38 = React.useCallback(function(p2, _) -- line: 107
-		-- upvalues: v26 (copy), v27 (copy), v25 (copy)
-		if p2 and v26 then
-			v27(false)
+
+	local onChanged = React.useCallback(function(object, _)
+		if object and state2 then
+			setState2(false)
 		end
 
-		v25(if not p2 then nil else p2:ToIsoDate())
-	end, {
-		v27,
-		v25,
-		v26
-	})
-	local v39 = React.useCallback(function() -- line: 116
-		-- upvalues: v24 (copy), v27 (copy), v33 (copy), t1 (copy), updateScheduledSquad (copy), v28 (copy), v36 (copy), v19 (copy), EventNames (copy), SquadPromptType (copy), SquadPromptResponse (copy), v20 (copy), createScheduledSquad (copy)
-		local v47 = false
+		local v10
 
-		if not v24 then
-			v27(true)
-			v47 = true
-		else
-			local dateTime2 = DateTime.fromIsoDate(v24)
+		if object then
+			v10 = object:ToIsoDate()
+		end
 
-			if dateTime2 and dateTime2.UnixTimestampMillis < DateTime.now().UnixTimestampMillis then
-				v27(true)
-				v47 = true
+		setState(v10)
+	end, { setState2, setState, state2 })
+
+	local onActivated = React.useCallback(function()
+		local v10 = false
+
+		if state then
+			local dateTime = DateTime.fromIsoDate(state)
+
+			if dateTime and dateTime.UnixTimestampMillis < DateTime.now().UnixTimestampMillis then
+				setState2(true)
+				v10 = true
 			end
+		else
+			setState2(true)
+			v10 = true
 		end
 
-		if not v47 then
-			if v33 and t1.scheduledSquad then
+		if not v10 then
+			if v7 and props.scheduledSquad then
 				updateScheduledSquad({
-					scheduledGroupUpId = t1.scheduledSquad and t1.scheduledSquad.scheduledGroupUpId,
-					title = v28,
-					startTime = v24
-				}, t1.onClose, v36)
-				v19.fireSquadAnalytics(EventNames.SquadPromptResponded, {
+					scheduledGroupUpId = props.scheduledSquad and props.scheduledSquad.scheduledGroupUpId,
+					title = state3,
+					startTime = state
+				}, props.onClose, v8)
+
+				v.fireSquadAnalytics(EventNames.SquadPromptResponded, {
 					promptType = SquadPromptType.ScheduleSquad,
-					scheduledSquadId = t1.scheduledSquad and t1.scheduledSquad.scheduledGroupUpId,
-					squadLocation = v19.squadLocation,
+					scheduledSquadId = props.scheduledSquad and props.scheduledSquad.scheduledGroupUpId,
+					squadLocation = v.squadLocation,
 					responseType = SquadPromptResponse.Update
 				})
+			else
+				props.onClose()
+				v2(createScheduledSquad({
+					parentChannelId = props.conversationId or "",
+					title = state3,
+					startTime = state
+				}, v.setSquadPrompt))
 
-				return
+				v.fireSquadAnalytics(EventNames.SquadPromptResponded, {
+					promptType = SquadPromptType.ScheduleSquad,
+					squadLocation = v.squadLocation,
+					responseType = SquadPromptResponse.Create
+				})
 			end
-
-			t1.onClose()
-			v20(createScheduledSquad({
-				parentChannelId = t1.conversationId or "",
-				title = v28,
-				startTime = v24
-			}, v19.setSquadPrompt))
-			v19.fireSquadAnalytics(EventNames.SquadPromptResponded, {
-				promptType = SquadPromptType.ScheduleSquad,
-				squadLocation = v19.squadLocation,
-				responseType = SquadPromptResponse.Create
-			})
 		end
 	end, {
-		v36,
+		v8,
 		false,
-		v33,
-		t1.conversationId,
-		t1.scheduledSquad,
-		t1.onClose,
-		v24,
-		v27,
-		v31,
-		v30,
-		v28,
-		v19.setSquadPrompt,
-		v19.fireSquadAnalytics,
-		v19.squadLocation
+		v7,
+		props.conversationId,
+		props.scheduledSquad,
+		props.onClose,
+		state,
+		setState2,
+		setState4,
+		state4,
+		state3,
+		v.setSquadPrompt,
+		v.fireSquadAnalytics,
+		v.squadLocation
 	})
-	local v40 = React.useCallback(function() -- line: 187
-		-- upvalues: v35 (copy), v37 (copy)
-		local Day = v35.Day
-		local v50 = if not (v35.Month + 6 > 12) then v35.Month + 6 else (v35.Month + 6) % 12
-		local v51 = if not (v35.Month + 6 > 12) then v35.Year else v35.Year + 1
-		local v52 = v37(v50, v51)
 
-		if v52 < Day then
-			return DateTime.fromLocalTime(v51, v50, v52)
+	local v10 = React.useCallback(function()
+		local day = localTime.Day
+		local v10
+
+		if localTime.Month + 6 > 12 then
+			v10 = (localTime.Month + 6) % 12
+		else
+			v10 = localTime.Month + 6
 		end
 
-		return DateTime.fromLocalTime(v51, v50, Day)
-	end, {
-		v35,
-		v37
-	})
-	local v41 = React.useCallback(function() -- line: 204
-		-- upvalues: t1 (copy), v19 (copy), EventNames (copy), SquadPromptType (copy), SquadPromptResponse (copy)
-		t1.onClose()
-		v19.fireSquadAnalytics(EventNames.SquadPromptResponded, {
+		local v11
+
+		if localTime.Month + 6 > 12 then
+			v11 = localTime.Year + 1
+		else
+			v11 = localTime.Year
+		end
+
+		local v12 = v9(v10, v11)
+
+		if v12 < day then
+			return DateTime.fromLocalTime(v11, v10, v12)
+		end
+
+		return DateTime.fromLocalTime(v11, v10, day)
+	end, { localTime, v9 })
+
+	local onActivated2 = React.useCallback(function()
+		props.onClose()
+
+		v.fireSquadAnalytics(EventNames.SquadPromptResponded, {
 			promptType = SquadPromptType.ScheduleSquad,
-			scheduledSquadId = t1.scheduledSquad and t1.scheduledSquad.scheduledGroupUpId,
-			squadLocation = v19.squadLocation,
+			scheduledSquadId = props.scheduledSquad and props.scheduledSquad.scheduledGroupUpId,
+			squadLocation = v.squadLocation,
 			responseType = SquadPromptResponse.Cancel
 		})
 	end, {
-		t1.scheduledSquad and t1.scheduledSquad.scheduledGroupUpId,
-		v19.fireSquadAnalytics,
-		t1.onClose,
-		v19.squadLocation
+		props.scheduledSquad and props.scheduledSquad.scheduledGroupUpId,
+		v.fireSquadAnalytics,
+		props.onClose,
+		v.squadLocation
 	})
 
-	return React.createElement(Sheet.Root, {
+	local createElement = React.createElement
+	local root = Sheet.Root
+	local v11 = {
+		onClose = props.onClose,
+		isOpen = props.isOpen,
 		preferCenterSheet = true,
-		onClose = t1.onClose,
-		isOpen = t1.isOpen
-	}, {
+		testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-sheet" or nil
+	}
+
+	local children = {
 		Header = React.createElement(Sheet.Header, {}, {
-			Title = React.createElement(FoundationText, {
+			Title = React.createElement(Text, {
 				LayoutOrder = 1,
+				Text = v5.scheduleAPartyText,
 				tag = "size-full-0 auto-y text-wrap text-heading-medium text-align-x-left",
-				Text = v23.scheduleAPartyText
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-sheet--title" or nil
 			})
 		}),
-		Content = React.createElement(Sheet.Content, {}, {
-			TitleInput = nil,
-			DateTimePicker = React.createElement(Foundation.DateTimePicker, {
+		Content = 0,
+		Action = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Sheet.Content
+
+	local createElement3 = React.createElement
+	local dateTimePicker = Foundation.DateTimePicker
+	local defaultDates
+
+	if v7 and props.scheduledSquad then
+		defaultDates = DateTime.fromIsoDate(props.scheduledSquad.startTime)
+	end
+
+	children.Content = createElement2(content, {}, {
+		TitleInput = nil,
+		DateTimePicker = createElement3(dateTimePicker, {
+			defaultDates = defaultDates,
+			hasError = state2,
+			LayoutOrder = 2,
+			isRequired = true,
+			label = v5.startTimeText,
+			onChanged = onChanged,
+			selectableDateRange = { endDate = v10(), startDate = now },
+			variant = Foundation.Enums.DateTimePickerVariant.SingleWithTime,
+			width = UDim.new(1, 0),
+			testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-sheet--start-time-picker" or nil
+		})
+	})
+
+	local createElement4 = React.createElement
+	local actions = Sheet.Actions
+	local createElement5 = React.createElement
+
+	local createElement6 = React.createElement
+	local button = Foundation.Button
+	local isDisabled
+
+	if v7 and props.scheduledSquad and props.scheduledSquad.startTime == state then
+		isDisabled = props.scheduledSquad.title == state3
+	else
+		isDisabled = false
+	end
+
+	children.Action = createElement4(actions, {}, {
+		ActionList = createElement5(View, { tag = "col auto-y gap-small size-full-0" }, {
+			ConfirmButton = createElement6(button, {
+				LayoutOrder = 1,
+				isDisabled = isDisabled,
+				onActivated = onActivated,
+				text = v5.saveText,
+				variant = Foundation.Enums.ButtonVariant.Emphasis,
+				width = UDim.new(1, 0),
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-sheet--save-button" or nil
+			}),
+			CancelButton = React.createElement(Foundation.Button, {
 				LayoutOrder = 2,
-				isRequired = true,
-				defaultDates = if not v33 or not t1.scheduledSquad then nil else DateTime.fromIsoDate(t1.scheduledSquad.startTime),
-				hasError = v26,
-				label = v23.startTimeText,
-				onChanged = v38,
-				selectableDateRange = {
-					endDate = v40(),
-					startDate = dateTime
-				},
-				variant = Foundation.Enums.DateTimePickerVariant.SingleWithTime,
-				width = UDim.new(1, 0)
-			})
-		}),
-		Action = React.createElement(Sheet.Actions, {}, {
-			ActionList = React.createElement(View, {
-				tag = "col auto-y gap-small size-full-0"
-			}, {
-				ConfirmButton = React.createElement(Foundation.Button, {
-					LayoutOrder = 1,
-					isDisabled = not not v33 and (not not t1.scheduledSquad and (v24 == t1.scheduledSquad.startTime and v28 == t1.scheduledSquad.title)),
-					onActivated = v39,
-					text = v23.saveText,
-					variant = Foundation.Enums.ButtonVariant.Emphasis,
-					width = UDim.new(1, 0)
-				}),
-				CancelButton = React.createElement(Foundation.Button, {
-					LayoutOrder = 2,
-					onActivated = v41,
-					text = v23.cancelText,
-					variant = Foundation.Enums.ButtonVariant.Standard,
-					width = UDim.new(1, 0)
-				})
+				onActivated = onActivated2,
+				text = v5.cancelText,
+				variant = Foundation.Enums.ButtonVariant.Standard,
+				width = UDim.new(1, 0),
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-sheet--cancel-button" or nil
 			})
 		})
 	})
+	return createElement(root, v11, children)
 end

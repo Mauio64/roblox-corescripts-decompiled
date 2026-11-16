@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.React.React))
+local React = require(index.React.React)
+
+return React

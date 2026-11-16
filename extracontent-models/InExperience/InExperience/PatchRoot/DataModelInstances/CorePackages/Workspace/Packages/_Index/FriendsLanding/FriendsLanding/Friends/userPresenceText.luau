@@ -1,9 +1,11 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local PresenceType = require(FriendsLanding.dependencies).RoduxPresence.Enums.PresenceType
+local dependencies = require(FriendsLanding.dependencies)
+
+local presenceType = dependencies.RoduxPresence.Enums.PresenceType
 
 return {
-	[PresenceType.Offline] = "Common.Presence.Label.Offline",
-	[PresenceType.Online] = "Common.Presence.Label.Online",
-	[PresenceType.InGame] = "Common.Presence.Label.Online",
-	[PresenceType.InStudio] = "Common.Presence.Label.Online"
+	[presenceType.Offline] = "Common.Presence.Label.Offline",
+	[presenceType.Online] = "Common.Presence.Label.Online",
+	[presenceType.InGame] = "Common.Presence.Label.Online",
+	[presenceType.InStudio] = "Common.Presence.Label.Online"
 }

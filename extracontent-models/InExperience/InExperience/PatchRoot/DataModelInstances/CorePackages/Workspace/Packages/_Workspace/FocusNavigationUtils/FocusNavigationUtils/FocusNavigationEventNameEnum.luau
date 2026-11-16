@@ -2,6 +2,8 @@ return {
 	Search = "Search",
 	TabForward = "TabForward",
 	TabBackward = "TabBackward",
+	PageForward = "PageForward",
+	PageBackward = "PageBackward",
 	HoldToPlay = "HoldToPlay",
 	HoldToJoinFriend = "HoldToJoinFriend",
 	NavigateBack = "NavigateBack",
@@ -73,6 +75,12 @@ return {
 	ExitFullscreen = "ExitFullscreen",
 	Mute = "Mute",
 	Unmute = "Unmute",
+	PlayVideo = "PlayVideo",
+	PauseVideo = "PauseVideo",
 	SquadJoin = "SquadJoin",
-	ViewProfile = "ViewProfile"
+	ViewProfile = "ViewProfile",
+	ExpandAvatar = "ExpandAvatar",
+	CollapseAvatar = "CollapseAvatar",
+	SwitchOutfitPrevious = "SwitchOutfitPrevious",
+	SwitchOutfitNext = "SwitchOutfitNext"
 }

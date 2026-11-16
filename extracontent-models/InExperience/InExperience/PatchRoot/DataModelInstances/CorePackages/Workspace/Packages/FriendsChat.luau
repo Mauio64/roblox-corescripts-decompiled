@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.FriendsChat.FriendsChat))
+local FriendsChat = require(Workspace.FriendsChat.FriendsChat)
+
+return FriendsChat

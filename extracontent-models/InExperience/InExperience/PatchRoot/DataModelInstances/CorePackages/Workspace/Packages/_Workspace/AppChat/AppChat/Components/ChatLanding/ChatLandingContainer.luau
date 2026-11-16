@@ -1,33 +1,52 @@
 local HttpService = game:GetService("HttpService")
+
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppCommonLib = require(AppChatParent.AppCommonLib)
-local AppNavBar = require(AppChatParent.AppNavBar)
+local parent = AppChat.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local AppChatNetworking = require(parent.AppChatNetworking)
+local AppNavBar = require(parent.AppNavBar)
 local VisibilityControl = AppNavBar.VisibilityControl
-local Cryo = require(AppChatParent.Cryo)
-local Components = require(AppChatParent.FriendsLanding.Components)
-local React = require(AppChatParent.React)
-local RoactRodux = require(AppChatParent.RoactRodux)
-local SharedFlags = require(AppChatParent.SharedFlags)
-local UIBlox = require(AppChatParent.UIBlox)
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMount
-local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
-local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
-local useNavigation = require(AppChatParent.Navigation).useNavigation
-local usePrevious = require(AppChatParent.RoactUtils).Hooks.usePrevious
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local AppPage = require(AppChatParent.RobloxAppEnums).AppPage
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local Components = require(parent.FriendsLanding.Components)
+local React = require(parent.React)
+local RoactRodux = require(parent.RoactRodux)
+local SharedFlags = require(parent.SharedFlags)
+local ThemeBackground = require(parent.ThemeBackground)
+local useThemeBackground = ThemeBackground.useThemeBackground
+local FFlagAppThemeHalloween2026ChatBackground = require(AppChat.Flags.FFlagAppThemeHalloween2026ChatBackground)
+local UIBlox = require(parent.UIBlox)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactUtils2 = require(parent.RoactUtils)
+local useEffectOnMount = RoactUtils2.Hooks.useEffectOnMount
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local RoactUtils3 = require(parent.RoactUtils)
+local usePrevious = RoactUtils3.Hooks.usePrevious
+local RoactUtils4 = require(parent.RoactUtils)
+local useSelector = RoactUtils4.Hooks.RoactRodux.useSelector
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
 local ChatLoadingContainer = require(script.Parent.ChatLoading.ChatLoadingContainer)
 local ChatLandingTelemetryEvents = require(script.Parent.ChatLandingTelemetryEvents)
 local ConversationGroupsEntryContainer = require(script.Parent.ConversationGroupsEntryContainer)
 local ConversationListWithTopBar = require(script.Parent.ConversationListWithTopBar)
-local v25 = require(script.Parent.Logger):new(script.Name)
+local Logger = require(script.Parent.Logger)
+local v = Logger:new(script.Name)
 local NoConversationsLanding = require(script.Parent.NoConversationsLanding)
 local mapDispatchToProps = require(script.Parent.mapDispatchToProps)
+
 local ChatLandingTelemetryLayer = require(AppChat.Telemetry.Layers.ChatLandingTelemetryLayer)
 local ChatLandingTelemetryState = require(AppChat.Contexts.TelemetryState.ChatLandingTelemetryState)
-local compose = require(AppChat.SocialLibraries).RoduxTools.compose
+local SocialLibraries = require(AppChat.SocialLibraries)
+local compose = SocialLibraries.RoduxTools.compose
 local ConversationChannels = require(AppChat.Models.ConversationChannels)
 local createConversation = require(AppChat.Conversations.Thunks.createConversation)
 local CreateConversationError = require(AppChat.Analytics.Enums.CreateConversationError)
@@ -38,9 +57,11 @@ local fetchConversationsByPage = require(AppChat.Conversations.Thunks.fetchConve
 local getConversationTitle = require(AppChat.Conversations.getConversationTitle)
 local getOtherParticipants = require(AppChat.Conversations.getOtherParticipants)
 local parseCreateConversationErrors = require(AppChat.Conversations.Thunks.parseCreateConversationErrors)
-local RoactPaginator = require(AppChat.SocialLibraries).RoactPaginator
+local SocialLibraries2 = require(AppChat.SocialLibraries)
+local RoactPaginator = SocialLibraries2.RoactPaginator
 local useAnalytics = require(AppChat.Analytics.useAnalytics)
-local useChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext).useChatPlacementContext
+local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+local useChatPlacementContext = ChatPlacementContext.useChatPlacementContext
 local useGetConversations = require(AppChat.Hooks.useGetConversations)
 local useAreConversationsFetching = require(AppChat.Hooks.useAreConversationsFetching)
 local useChatIsVisible = require(AppChat.Hooks.useChatIsVisible)
@@ -48,6 +69,7 @@ local useHasConversations = require(AppChat.Hooks.useHasConversations)
 local useAppChatIsWideMode = require(AppChat.Hooks.useAppChatIsWideMode)
 local useIsAppLoaded = require(AppChat.Hooks.useIsAppLoaded)
 local useIsChatEnabled = require(AppChat.Hooks.useIsChatEnabled)
+local useChatSettingsRetrievalStatus = require(AppChat.Hooks.useChatSettingsRetrievalStatus)
 local useIsExternalNavigationAvailable = require(AppChat.Hooks.useIsExternalNavigationAvailable)
 local useIsGroupChatEnabled = require(AppChat.Hooks.useIsGroupChatEnabled)
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
@@ -57,592 +79,783 @@ local useIsChatEnabledFromReason = require(AppChat.Hooks.useIsChatEnabledFromRea
 local useAnalytics2 = require(AppChat.Analytics.useAnalytics)
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local getConversationIds = require(AppChat.Utils.getConversationIds)
+
 local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
 local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
-local FFlagAppChatUseNewConversationRow = require(AppChat.Flags.FFlagAppChatUseNewConversationRow)
+local SignalsMigrationConfig = require(AppChat.Flags.SignalsMigrationConfig)
 local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+local FFlagAppChatConsoleFocusFixes = require(AppChat.Flags.FFlagAppChatConsoleFocusFixes)
+local FFlagAppChatServerSideConversationSearch = require(AppChat.Flags.FFlagAppChatServerSideConversationSearch)
+local FFlagAppChatSkipSearchWhenChatDisabled = require(AppChat.Flags.FFlagAppChatSkipSearchWhenChatDisabled)
+
 local useCallback = React.useCallback
 local useEffect = React.useEffect
+
 local IsVRAppBuild = AppCommonLib.IsVRAppBuild
+
+local useTokens = Foundation.Hooks.useTokens
 local useStyle = UIBlox.Core.Style.useStyle
 local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
+
 local NoFriendsView = Components.NoFriendsView
+
 local FFlagAppIaScrollAway = SharedFlags.FFlagAppIaScrollAway
 local FFlagEnableScrollAwayContentScrollableFix = SharedFlags.FFlagEnableScrollAwayContentScrollableFix
 local FFlagSignalsNavP3hMisc = SharedFlags.FFlagSignalsNavP3hMisc
-local FFlagAppChatConversationStore = require(AppChat.Flags.FFlagAppChatConversationStore)
-local FFlagAppChatSignalsMessageStore = require(AppChat.Flags.FFlagAppChatSignalsMessageStore)
 local getFFlagChatTabHideGroupsLinkOnVR = require(AppChat.Flags.getFFlagChatTabHideGroupsLinkOnVR)
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
-local FFlagAppChatTopBarSignalsStore = require(AppChat.Flags.FFlagAppChatTopBarSignalsStore)
-local PartyPageCarouselExperimentation = require(AppChatParent.SocialExperiments).PartyPageCarouselExperimentation
-local FFlagCreateConnectionsHub = require(AppChatParent.SharedFlags).FFlagCreateConnectionsHub
-local FFlagConnectionsToFriendsRename = require(AppChatParent.SharedFlags).FFlagConnectionsToFriendsRename
-local SquadQuickStartExperimentation = require(AppChatParent.SocialExperiments).SquadQuickStartExperimentation
-local useCanAccessParty = require(AppChatParent.Squads.useCanAccessParty)
+local SocialExperiments = require(parent.SocialExperiments)
+local PartyPageCarouselExperimentation = SocialExperiments.PartyPageCarouselExperimentation
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagCreateConnectionsHub = SharedFlags2.FFlagCreateConnectionsHub
+local SocialExperiments2 = require(parent.SocialExperiments)
+local SquadQuickStartExperimentation = SocialExperiments2.SquadQuickStartExperimentation
+local useCanAccessParty = require(parent.Squads.useCanAccessParty)
 local useConversationList = require(AppChat.Hooks.useConversationList)
-local v84 = FFlagAppChatUseNewConversationRow and (FFlagAppChatConversationStore and FFlagAppChatSignalsMessageStore)
-local v85 = if not (game.PlaceId > 0) then nil else tostring(game.PlaceId)
-local v86 = if not (game.GameId > 0) then nil else tostring(game.GameId)
-local t1 = {
+local useConversationSearchListProps = require(AppChat.Hooks.useConversationSearchListProps)
+local useChatSearchSession = require(AppChat.Hooks.useChatSearchSession)
+local FFlagAppChatSearchSessionTelemetry = require(AppChat.Flags.FFlagAppChatSearchSessionTelemetry)
+local FFlagAppChatVisibleIsInConversation = require(AppChat.Flags.FFlagAppChatVisibleIsInConversation)
+local getIsInConversationForTelemetry = require(script.Parent.Utils.getIsInConversationForTelemetry)
+local FFlagAppChatConversationLoadRetry = require(AppChat.Flags.FFlagAppChatConversationLoadRetry)
+local RoduxNetworking = require(AppChat.Http.RoduxNetworking)
+
+local shouldReadConversationListFromSignalsStore = SignalsMigrationConfig.shouldReadConversationListFromSignalsStore
+local placeId
+
+if game.PlaceId > 0 then
+	placeId = tostring(game.PlaceId)
+else
+	placeId = nil
+end
+
+local gameId
+
+if game.GameId > 0 then
+	gameId = tostring(game.GameId)
+else
+	gameId = nil
+end
+
+local v2 = {
 	topBarHeight = 0,
 	isShowingFilterBox = false,
-	navigateToSquadLobby = function() -- line: 118
-	end
+	navigateToSquadLobby = function() end
 }
 
-local function areConversationIdsEqual(t2: {[any]: any}, t3: {[any]: any}) -- line: 121
-	if #t2 ~= #t3 then
+local function areConversationIdsEqual(conversationIds, conversationIds2): boolean -- 1 equivalent call inferred from this helper
+	if #conversationIds ~= #conversationIds2 then
 		return false
 	end
 
-	for v92, v93 in t2 do
-		if v93 ~= t3[v92] then
+	for k, item in conversationIds do
+		if item ~= conversationIds2[k] then
 			return false
 		end
 	end
 
 	return true
 end
-local function encodeConversationIds(t4: {[any]: any}) -- line: 135
-	-- upvalues: HttpService (copy)
-	local ok, result = pcall(function() -- line: 136
-		-- upvalues: HttpService (copy), t4 (copy)
-		return HttpService:JSONEncode(t4)
+
+local function encodeConversationIds(conversationIds) -- 2 equivalent calls inferred from this helper
+	local success, result = pcall(function()
+		return HttpService:JSONEncode(conversationIds)
 	end)
-
-	if ok then
-		return result
-	end
-
-	return "[]"
+	return if success then result else "[]"
 end
 
-function ChatLandingContainer(t5: {[any]: any}) -- line: 142
-	-- upvalues: Cryo (copy), t1 (copy), useAnalytics (copy), useChatPlacementContext (copy), useDispatch (copy), useIsChatEnabled (copy), useIsGroupChatEnabled (copy), useIsChatEnabledFromReason (copy), useIsInExperience (copy), useAppChatIsWideMode (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), useIsAppLoaded (copy), useAreConversationsFetching (copy), useHasConversations (copy), useIsOldestConversationFetched (copy), useLocalUserId (copy), useNavigation (copy), useStyle (copy), useTextSizeOffset (copy), useAnalytics2 (copy), FFlagCreateConnectionsHub (copy), useGetConversations (copy), v84 (copy), useConversationList (copy), useEffect (copy), getConversationIds (copy), v25 (copy), HttpService (copy), usePrevious (copy), fetchConversationsByPage (copy), React (copy), getOtherParticipants (copy), useIsUserPending (copy), ConversationChannels (copy), getConversationTitle (copy), useTelemetry (copy), ChatLandingTelemetryLayer (copy), ChatLandingTelemetryState (copy), useEffectOnMount (copy), ChatLandingTelemetryEvents (copy), useLocalization (copy), useCallback (copy), PartyPageCarouselExperimentation (copy), EventNames (copy), v85 (copy), v86 (copy), EnumScreens (copy), createConversation (copy), parseCreateConversationErrors (copy), CreateConversationError (copy), useSelector (copy), useIsExternalNavigationAvailable (copy), FFlagAppIaScrollAway (copy), AppNavBar (copy), useCanAccessParty (copy), SquadQuickStartExperimentation (copy), ChatLoadingContainer (copy), NoFriendsView (copy), EmptyStateType (copy), AppPage (copy), FFlagConnectionsToFriendsRename (copy), NoConversationsLanding (copy), ConversationListWithTopBar (copy), FFlagAppChatUseNewConversationRow (copy), FFlagEnableScrollAwayContentScrollableFix (copy), VisibilityControl (copy), getFFlagChatTabHideGroupsLinkOnVR (copy), IsVRAppBuild (copy), FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), ConversationGroupsEntryContainer (copy), useChatIsVisible (copy), FFlagSignalsNavP3hMisc (copy)
-	local v98 = Cryo.Dictionary.join(t1, t5)
-	local v99 = useAnalytics()
-	local v100 = useChatPlacementContext()
-	local v101 = useDispatch()
-	local v102 = useIsChatEnabled()
-	local v103 = useIsGroupChatEnabled()
-	local v104 = useIsChatEnabledFromReason("privacySettingsEnabled")
-	local v105 = useIsChatEnabledFromReason("globalRulesEnabled")
-	local v106 = useIsChatEnabledFromReason("thirdPartyPrivacySettingsEnabled")
-	local v107 = useIsInExperience()
-	local v108 = useAppChatIsWideMode(v107)
+function ChatLandingContainer(p)
+	local joined = Cryo.Dictionary.join(v2, p)
 
-	if FFlagAppChatPerfTracking and (FFlagAppChatMessageTTIMilestones and AppChatPerfTracker.Hooks) then
-		local v109 = AppChatPerfTracker.getEventName(AppChatPerfTracker.Events.ChatLandingTTI) or ""
+	local v3 = useAnalytics()
+	local v4 = useChatPlacementContext()
+	local v5 = useDispatch()
+	local v6 = useIsChatEnabled()
+	local v7 = useIsGroupChatEnabled()
+	local privacySettingsEnabled = useIsChatEnabledFromReason("privacySettingsEnabled")
+	local globalRulesEnabled = useIsChatEnabledFromReason("globalRulesEnabled")
+	local thirdPartyPrivacySettingsEnabled = useIsChatEnabledFromReason("thirdPartyPrivacySettingsEnabled")
+	local isInExperience = useIsInExperience()
+	local isWideMode = useAppChatIsWideMode(isInExperience)
 
-		AppChatPerfTracker.Hooks.useTTIRenderAndMountedTracking(v109)
+	if FFlagAppChatPerfTracking and FFlagAppChatMessageTTIMilestones and AppChatPerfTracker.Hooks then
+		local v8 = AppChatPerfTracker.getEventName(AppChatPerfTracker.Events.ChatLandingTTI) or ""
+
+		AppChatPerfTracker.Hooks.useTTIRenderAndMountedTracking(v8)
 	end
 
-	local v110 = useIsAppLoaded()
-	local v111 = useAreConversationsFetching()
-	local v112 = useHasConversations()
-	local v113 = useIsOldestConversationFetched()
-	local v114 = useLocalUserId()
-	local v115 = useNavigation()
-	local v116 = useStyle()
-	local v117 = useTextSizeOffset()
-	local v118 = useAnalytics2()
-	local v119 = 64 + 2 * v117
-	local v120 = if not FFlagCreateConnectionsHub then nil else v115.getScreenProps("navigateToLuaAppPages", {})
-	local v121 = useGetConversations()
-	local t6 = {}
-	local t7 = {}
+	local appLoaded = useIsAppLoaded()
+	local conversationsIsFetching = useAreConversationsFetching()
+	local v8 = useHasConversations()
+	local oldestConversationIsFetched = useIsOldestConversationFetched()
+	local localUserId = useLocalUserId()
+	local v9 = useNavigation()
+	local v10
 
-	if v84 then
-		local v124 = useConversationList(true)
-
-		t6 = v124.items
-		t7 = v124.listStatus
+	if FFlagAppThemeHalloween2026ChatBackground then
+		v10 = useThemeBackground() ~= nil
+	else
+		v10 = false
 	end
 
-	local v125 = if not v84 then v121 else t6
-	local v126 = if not v84 then v111 else t7.isFetchingConversations == true
-	local v127 = if not v84 then v112 else #t6 > 0
-	local v128 = if not v84 then v113 else t7.oldestConversationIsFetched == true
+	local v11 = useStyle()
+	local v12 = useTextSizeOffset()
+	local v13 = useAnalytics2()
+	local v14
 
-	if v84 then
-		useEffect(function() -- line: 197
-			-- upvalues: v121 (copy), t6 (ref), getConversationIds (copy), v25 (copy), HttpService (copy)
-			if #v121 == 0 and #t6 == 0 then
+	if FFlagAppChatConsoleFocusFixes then
+		v14 = useTokens()
+	end
+
+	local v15
+
+	if FFlagAppChatConsoleFocusFixes then
+		v15 = v14.Size.Size_1600 + 2 * v12
+	else
+		v15 = 64 + 2 * v12
+	end
+
+	local v16
+
+	if FFlagCreateConnectionsHub then
+		v16 = v9.getScreenProps("navigateToLuaAppPages", {})
+	else
+		v16 = nil
+	end
+
+	local v17 = useGetConversations()
+	local v18, v19
+
+	if shouldReadConversationListFromSignalsStore then
+		local v20 = useConversationList(true)
+		v18 = v20.items
+		v19 = v20.listStatus
+	else
+		v18 = {}
+		v19 = {}
+	end
+
+	local v20
+
+	if shouldReadConversationListFromSignalsStore then
+		v20 = v18
+	else
+		v20 = v17
+	end
+
+	if shouldReadConversationListFromSignalsStore then
+		conversationsIsFetching = v19.isFetchingConversations == true
+	end
+
+	if shouldReadConversationListFromSignalsStore then
+		v8 = #v18 > 0
+	end
+
+	if shouldReadConversationListFromSignalsStore then
+		oldestConversationIsFetched = v19.oldestConversationIsFetched == true
+	end
+
+	local v21, v22
+
+	if FFlagAppChatConversationLoadRetry then
+		if shouldReadConversationListFromSignalsStore then
+			local isFetchingNextPage = v19.isFetchingNextPage == true
+
+			if v19.isFetchingConversations == true then
+				v21 = not isFetchingNextPage
+			else
+				v21 = false
+			end
+
+			if v19.error == nil or v19.hasFetchedInitialPage == true then
+				v22 = false
+			else
+				v22 = not v21
+			end
+		else
+			local v23 = useSelector(function(p2)
+				return AppChatNetworking.rodux.GetUserConversations.getStatus(p2)
+			end)
+
+			v21 = v23 == RoduxNetworking.Enum.NetworkStatus.Fetching
+			v22 = v23 == RoduxNetworking.Enum.NetworkStatus.Failed
+		end
+	else
+		v22 = false
+		v21 = false
+	end
+
+	local v23, v24
+
+	if FFlagAppChatServerSideConversationSearch then
+		local v25 = joined.isShowingFilterBox == true
+
+		if FFlagAppChatSkipSearchWhenChatDisabled then
+			v25 = v25 and v6
+		end
+
+		v23, v24 = useConversationSearchListProps(
+			joined.filterText,
+			v25,
+			localUserId,
+			v7,
+			joined.navigateToConversation
+		)
+	else
+		v23 = false
+		v24 = {}
+	end
+
+	if FFlagAppChatSearchSessionTelemetry then
+		local v25
+
+		if joined.isShowingFilterBox == true and joined.filterText ~= nil then
+			v25 = joined.filterText:match("%S") ~= nil
+		else
+			v25 = false
+		end
+
+		if FFlagAppChatServerSideConversationSearch and FFlagAppChatSkipSearchWhenChatDisabled then
+			v25 = v25 and v6
+		end
+
+		useChatSearchSession(v25, FFlagAppChatServerSideConversationSearch)
+	end
+
+	if shouldReadConversationListFromSignalsStore then
+		useEffect(function()
+			if #v17 == 0 and #v18 == 0 then
 				return
 			end
 
-			local v156 = getConversationIds(v121)
-			local v157 = getConversationIds(t6)
-			local v158, g161
+			local conversationIds = getConversationIds(v17)
+			local conversationIds2 = getConversationIds(v18)
 
-			if #v156 ~= #v157 then
-				v158 = false
-			else
-				g161 = nil
-				v158 = nil
-
-				for v159, v160 in v156 do
-					if v160 ~= v157[v159] then
-						v158 = false
-						g161 = true
-					end
-
-					if g161 then
-						break
-					end
-				end
-
-				if not g161 then
-					v158 = true
-				end
+			if not areConversationIdsEqual(conversationIds, conversationIds2) then -- inferred equivalent call
+				v:warning(
+					"Conversation list parity mismatch. Rodux ids: {}, Signals ids: {}",
+					encodeConversationIds(conversationIds), -- inferred equivalent call
+					encodeConversationIds(conversationIds2) -- inferred equivalent call
+				)
 			end
-
-			g161 = false
-
-			if not v158 then
-				local v162 = v25
-				local ok, result = pcall(function() -- line: 136
-					-- upvalues: HttpService (copy), v156 (copy)
-					return HttpService:JSONEncode(v156)
-				end)
-				local v165 = not ok and "[]" or result
-				local ok2, result2 = pcall(function() -- line: 136
-					-- upvalues: HttpService (copy), v157 (copy)
-					return HttpService:JSONEncode(v157)
-				end)
-
-				v162:warning("Conversation list parity mismatch. Rodux ids: {}, Signals ids: {}", v165, not ok2 and "[]" or result2)
-			end
-		end, {
-			v121,
-			t6
-		})
+		end, { v17, v18 })
 	end
 
-	local v129 = usePrevious(v102)
+	local v25 = usePrevious(v6)
+	useEffect(function()
+		v:debug("Comparing previousIsChatEnabled ({}) --> isChatEnabled ({})", v25, v6)
 
-	useEffect(function() -- line: 215
-		-- upvalues: v25 (copy), v129 (copy), v102 (copy), v101 (copy), fetchConversationsByPage (copy)
-		v25:debug("Comparing previousIsChatEnabled ({}) --> isChatEnabled ({})", v129, v102)
-
-		if v129 ~= nil and (v129 ~= v102 and v102) then
-			v25:info("Chat has become enabled, fetching conversations")
-			v101(fetchConversationsByPage())
+		if v25 ~= nil and v25 ~= v6 and v6 then
+			v:info("Chat has become enabled, fetching conversations")
+			v5(fetchConversationsByPage())
 		end
-	end, {
-		v101,
-		v102,
-		v129
-	})
+	end, { v5, v6, v25 })
 
-	local v130, v131, v132 = React.useMemo(function() -- line: 231
-		-- upvalues: v125 (copy), v84 (copy), Cryo (copy), getOtherParticipants (copy), v114 (copy), useIsUserPending (copy), ConversationChannels (copy), getConversationTitle (copy), v103 (copy)
-		local n1 = 0
-		local n2 = 0
-		local t8 = {}
+	local useMemo = React.useMemo
+	local function fn()
+		local count = 0
+		local count2 = 0
+		local result = {}
 
-		for _, v172 in v125 do
-			local v173 = if not v84 or v172.otherParticipants ~= nil then v172 else Cryo.Dictionary.join(v172, {
-				otherParticipants = getOtherParticipants(v172, v114)
-			})
-
-			if useIsUserPending(v173) then
-				n1 += 1
+		for _, joined2 in v20 do
+			if shouldReadConversationListFromSignalsStore and joined2.otherParticipants == nil then
+				joined2 = Cryo.Dictionary.join(joined2, {
+					otherParticipants = getOtherParticipants(joined2, localUserId)
+				})
 			end
 
-			if v173.moderationType == ConversationChannels.ModerationType.TrustedComms then
-				n2 += 1
+			if useIsUserPending(joined2) then
+				count += 1
 			end
 
-			local v174 = getConversationTitle(v173)
+			if joined2.moderationType == ConversationChannels.ModerationType.TrustedComms then
+				count2 += 1
+			end
 
-			if v103 or v173.conversationType ~= "MultiUserConversation" then
-				table.insert(t8, Cryo.Dictionary.join(v173, {
-					title = v174
-				}))
+			local conversationTitle = getConversationTitle(joined2)
+
+			if v7 or joined2.conversationType ~= "MultiUserConversation" then
+				table.insert(result, Cryo.Dictionary.join(joined2, { title = conversationTitle }))
 			end
 		end
 
-		return t8, n1, n2
-	end, {
-		v125,
-		v103,
-		if not v84 then nil else v114
-	})
-	local v133 = useTelemetry(ChatLandingTelemetryLayer.Context)
-	local emit = v133.emit
+		return result, count, count2
+	end
 
-	if v84 then
-		local v135 = React.useRef(v133.emit)
+	local v26
 
-		v135.current = v133.emit
+	if shouldReadConversationListFromSignalsStore then
+		v26 = localUserId
+	end
 
-		function emit(...) -- line: 274
-			-- upvalues: v135 (copy)
-			v135.current(...)
+	local itemList, pendingConversationCount, unfilteredConversationCount = useMemo(fn, { v20, v7, v26 })
+
+	local v27 = useTelemetry(ChatLandingTelemetryLayer.Context)
+	local v28 = v27.emit
+
+	if shouldReadConversationListFromSignalsStore then
+		local ref = React.useRef(v27.emit)
+		ref.current = v27.emit
+		v28 = function(...)
+			ref.current(...)
 		end
 	end
 
-	local v136 = ChatLandingTelemetryState.useSetState()
+	local v29 = ChatLandingTelemetryState.useSetState()
 
-	useEffect(function() -- line: 280
-		-- upvalues: v136 (copy), Cryo (copy), v130 (copy), v131 (copy), v132 (copy)
-		v136(function(p1) -- line: 281
-			-- upvalues: Cryo (copy), v130 (copy), v131 (copy), v132 (copy)
-			return Cryo.Dictionary.join(p1, {
-				chatLandingListCount = #v130,
-				pendingConversationCount = v131,
-				unfilteredConversationCount = v132
+	useEffect(function()
+		v29(function(p2)
+			return Cryo.Dictionary.join(p2, {
+				chatLandingListCount = #itemList,
+				pendingConversationCount = pendingConversationCount,
+				unfilteredConversationCount = unfilteredConversationCount
 			})
 		end)
 	end, {
-		#v130,
-		v131,
-		v132,
-		v136
+		#itemList,
+		pendingConversationCount,
+		unfilteredConversationCount,
+		v29
 	})
-	useEffectOnMount(function() -- line: 290
-		-- upvalues: v133 (copy), ChatLandingTelemetryEvents (copy), v102 (copy)
-		v133.emit(ChatLandingTelemetryEvents.ScreenRendered, {
-			isChatEnabled = v102
-		})
+
+	useEffectOnMount(function()
+		v27.emit(ChatLandingTelemetryEvents.ScreenRendered, { isChatEnabled = v6 })
 	end)
 
-	local v137 = useLocalization({
-		partyUnavailableWithUser = "Feature.Chat.Message.PartyUnavailableWithUser",
-		networkErrorText = "Feature.Toast.NetworkingError.SomethingIsWrong"
+	local v30 = useLocalization({
+		chatUnavailableWithUser = "Feature.Chat.Message.ChatUnavailableWithUser",
+		networkErrorText = "Feature.Toast.NetworkingError.SomethingIsWrong",
+		conversationLoadError = FFlagAppChatConversationLoadRetry and "CommonUI.Messages.Response.PageError" or nil,
+		refresh = FFlagAppChatConversationLoadRetry and "CommonUI.Controls.Action.Refresh" or nil
 	})
-	local v138 = useCallback(function() -- line: 301
-		-- upvalues: PartyPageCarouselExperimentation (copy), HttpService (copy), v99 (copy), EventNames (copy), v100 (copy), v85 (copy), v86 (copy), v115 (copy), EnumScreens (copy)
+
+	local navigateToQuickStartSquadInviteFriends = useCallback(function()
 		if PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then
 			local guid = HttpService:GenerateGUID(false)
 
-			v99.fireAnalyticsEvent(EventNames.ChatLandingPartyQuickStartButtonClicked, {
-				clickLocation = v100.chatPlacement,
+			v3.fireAnalyticsEvent(EventNames.ChatLandingPartyQuickStartButtonClicked, {
+				clickLocation = v4.chatPlacement,
 				partyAttemptId = guid,
-				placeId = v85,
-				universeId = v86
+				placeId = placeId,
+				universeId = gameId
 			})
-			v115.navigate(EnumScreens.QuickStartSquadInviteFriends, {
-				uuid = guid
-			})
+
+			v9.navigate(EnumScreens.QuickStartSquadInviteFriends, { uuid = guid })
 		end
-	end, {
-		v99,
-		v100,
-		v115,
-		v85,
-		v86
-	})
-	local v139 = useCallback(function(p2) -- line: 318
-		-- upvalues: PartyPageCarouselExperimentation (copy), v101 (copy), createConversation (copy), v118 (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v115 (copy), EnumScreens (copy), parseCreateConversationErrors (copy), v137 (copy), EventNames (copy), CreateConversationError (copy)
+	end, { v3, v4, v9, placeId, gameId })
+
+	local navigateToConversationFromUserId = useCallback(function(p2)
 		if PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then
-			v101(createConversation("one_to_one", { p2 }, v118, "navigateToConversationFromSocialCarousel")):andThen(function(p3) -- line: 332
-				-- upvalues: FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), v115 (copy), EnumScreens (copy)
+			v5(createConversation("one_to_one", { p2 }, v13, "navigateToConversationFromSocialCarousel")):andThen(function(p3)
 				if FFlagAppChatPerfTracking then
 					AppChatPerfTracker.start(AppChatPerfTracker.Events.ChatConversationTTI, {
 						conversationId = p3.id
 					})
 				end
 
-				v115.navigate(EnumScreens.ChatConversation, {
-					conversationId = p3.id
-				})
-			end):catch(function(p4) -- line: 342
-				-- upvalues: parseCreateConversationErrors (copy), v137 (copy), v115 (copy), EnumScreens (copy), v118 (copy), EventNames (copy), CreateConversationError (copy)
-				local v185 = if parseCreateConversationErrors(p4) ~= "participant_chat_disabled" then v137.networkErrorText else v137.partyUnavailableWithUser
+				v9.navigate(EnumScreens.ChatConversation, { conversationId = p3.id })
+			end):catch(function(p3)
+				local toastTitle
 
-				v115.navigate(EnumScreens.RoactChatToast, {
+				if parseCreateConversationErrors(p3) == "participant_chat_disabled" then
+					toastTitle = v30.chatUnavailableWithUser
+				else
+					toastTitle = v30.networkErrorText
+				end
+
+				v9.navigate(EnumScreens.RoactChatToast, {
 					toastProps = {
-						toastContent = {
-							toastTitle = v185
-						}
+						toastContent = { toastTitle = toastTitle }
 					}
 				})
 
-				if v118 then
-					v118.fireAnalyticsEvent(EventNames.NewConversationCreated, {
+				if v13 then
+					v13.fireAnalyticsEvent(EventNames.NewConversationCreated, {
 						createConversationResult = CreateConversationError.FetchConversationError
 					})
 				end
 			end)
 		end
-	end, {
-		v101,
-		v137,
-		parseCreateConversationErrors,
-		v115,
-		v118
-	})
-	local v140 = Cryo.isEmpty(v130)
-	local v141 = useSelector(function(p5) -- line: 365
-		return p5.ChatAppReducer.ChatSettings.retrievalStatus ~= "Done"
-	end) or (v140 and v126 or v140 and v127)
-	local v142 = false
-	local u143 = false
-	local u144 = false
-	local v145 = useIsExternalNavigationAvailable({
+	end, { v5, v30, parseCreateConversationErrors, v9, v13 })
+
+	local empty = Cryo.isEmpty(itemList)
+	local isChatLoading = useChatSettingsRetrievalStatus() ~= "Done"
+		or empty and conversationsIsFetching
+		or empty and v8
+
+	local v31 = false
+	local v32 = false
+	local v49 = false
+	local v50 = useIsExternalNavigationAvailable({
 		EnumScreens.AddFriends,
 		EnumScreens.PrivacySettings,
 		EnumScreens.Groups
 	})
-	local v146 = FFlagAppIaScrollAway and (not v107 and AppNavBar.getScrollAwayEnabled())
-	local v147 = useCanAccessParty()
-	local v148 = SquadQuickStartExperimentation.getPartyQuickStartChangesEnabled() and v147
-	local v149
 
-	if v141 then
-		v149 = React.createElement(ChatLoadingContainer, {
+	local v51 = FFlagAppIaScrollAway and not isInExperience and AppNavBar.getScrollAwayEnabled()
+
+	local canAccessParty = useCanAccessParty()
+	local isPartyQuickStartEnabled = SquadQuickStartExperimentation.getPartyQuickStartChangesEnabled()
+		and canAccessParty
+
+	local v54 = isChatLoading
+
+	if FFlagAppChatConversationLoadRetry and v6 and not v23 and empty then
+		v54 = v54 or v21
+	end
+
+	local v55
+
+	if v54 then
+		local createElement = React.createElement
+		local v56 = {
+			topBarHeight = joined.topBarHeight,
+			pageHeaderText = joined.pageHeaderText,
+			cellHeight = v15,
 			cellWidth = 375,
-			topBarHeight = v98.topBarHeight,
-			pageHeaderText = v98.pageHeaderText,
-			cellHeight = v119,
-			topPadding = if not FFlagAppIaScrollAway or not v146 then nil else v98.topBarHeight
+			topPadding = 0,
+			pageBackgroundTransparency = 0
+		}
+		local topPadding
+
+		if FFlagAppIaScrollAway and v51 then
+			topPadding = joined.topBarHeight
+		end
+
+		v56.topPadding = topPadding
+		v56.pageBackgroundTransparency = v10 and 1 or nil
+		v55 = createElement(ChatLoadingContainer, v56)
+		v31 = true
+	elseif
+		FFlagAppChatConversationLoadRetry
+		and v6
+		and not v23
+		and empty
+		and appLoaded
+		and not conversationsIsFetching
+		and v22
+	then
+		v55 = React.createElement(Foundation.Empty, {
+			text = v30.conversationLoadError,
+			button = { text = v30.refresh, onActivated = joined.onRetryConversations }
 		})
-		v142 = true
-	elseif not v102 or v140 and v110 and not v126 then
-		if v102 then
-			v149 = React.createElement("Frame", {
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 1, 0),
-				BackgroundColor3 = v116.Theme.BackgroundDefault.Color,
-				BackgroundTransparency = v116.Tokens.Color.None.Transparency
-			}, {
-				NoFriendsView = React.createElement(NoFriendsView, {
-					pageRenderReport = function() -- line: 411
-						-- upvalues: v133 (copy), ChatLandingTelemetryEvents (copy), EmptyStateType (copy)
-						v133.emit(ChatLandingTelemetryEvents.ChatEmptyStateScreenRendered, {
-							emptyStateType = EmptyStateType.NoFriendsView
-						})
-					end,
-					openAddFriendsPage = function() -- line: 416
-						-- upvalues: v133 (copy), ChatLandingTelemetryEvents (copy), FFlagCreateConnectionsHub (copy), v120 (copy), AppPage (copy), v98 (copy)
-						v133.emit(ChatLandingTelemetryEvents.ChatAddFriendsBtnClicked, {})
+		v31 = true
+	elseif v6 and (v23 or not empty or not appLoaded or conversationsIsFetching) then
+		local formatted = `conversationListWithTopBar{joined.filterText}`
 
-						if FFlagCreateConnectionsHub then
-							v120[AppPage.CoHubAddConnections]()
+		v31 = true
+		v32 = true
+		v49 = true
 
-							return
-						end
+		local createElement = React.createElement
 
-						v98.navigateToAddFriends()
-					end,
-					noFriendsHeaderKey = not FFlagConnectionsToFriendsRename and "Feature.Chat.Label.AddConnections" or "Feature.Chat.Label.AddFriends",
-					noFriendsTextLabelKey = not FFlagConnectionsToFriendsRename and "Feature.Chat.Text.NoConnections" or "Feature.Chat.Text.NoFriends",
-					addFriendsBtnLabelKey = not FFlagConnectionsToFriendsRename and "Feature.Chat.Label.AddConnections" or "Feature.Chat.Label.AddFriends",
-					addFriendsBtnEnabled = v145[EnumScreens.AddFriends]
-				})
-			})
-			v142 = true
-		else
-			v149 = React.createElement(NoConversationsLanding, {
-				chatEnabled = v102,
-				privacySettingsEnabled = v104,
-				globalRulesEnabled = v105,
-				thirdPartyPrivacySettingsEnabled = v106,
-				canNavigateToPrivacySettings = v145[EnumScreens.PrivacySettings],
-				canNavigateToAddFriends = v145[EnumScreens.AddFriends],
-				onCallToAction = function(p6) -- line: 446
-					-- upvalues: v98 (copy), v133 (copy), ChatLandingTelemetryEvents (copy), FFlagCreateConnectionsHub (copy), v120 (copy), AppPage (copy)
-					if p6 == "privacy" then
-						v98.navigateToPrivacy()
+		local join = Cryo.Dictionary.join
+		local filterText
 
-						return
-					end
+		if joined.isShowingFilterBox then
+			filterText = joined.filterText or nil
+		end
 
-					if p6 == "friends" then
-						v133.emit(ChatLandingTelemetryEvents.ChatAddFriendsBtnClicked, {})
+		local v56 = {
+			filterText = filterText,
+			key = formatted,
+			itemList = itemList,
+			appLoaded = appLoaded,
+			localUserId = localUserId,
+			conversationsIsFetching = conversationsIsFetching,
+			oldestConversationIsFetched = oldestConversationIsFetched,
+			entryHeight = v15,
+			isInExperience = isInExperience,
+			isWideMode = 0,
+			navigateToConversationFromUserId = 0,
+			navigateToQuickStartSquadInviteFriends = 0,
+			showGroupsLink = 0,
+			canvasTopPadding = 0,
+			pageBackgroundTransparency = 0,
+			canAccessParty = 0,
+			isPartyQuickStartEnabled = 0
+		}
 
-						if FFlagCreateConnectionsHub then
-							v120[AppPage.CoHubAddConnections]()
+		if not (PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() or SignalsMigrationConfig.shouldUseFoundationConversationRow) then
+			isWideMode = nil
+		end
 
-							return
-						end
+		v56.isWideMode = isWideMode
 
-						v98.navigateToAddFriends()
+		if not PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then
+			navigateToConversationFromUserId = nil
+		end
+
+		v56.navigateToConversationFromUserId = navigateToConversationFromUserId
+
+		if not PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then
+			navigateToQuickStartSquadInviteFriends = nil
+		end
+
+		v56.navigateToQuickStartSquadInviteFriends = navigateToQuickStartSquadInviteFriends
+
+		v56.showGroupsLink = v50[EnumScreens.Groups]
+		local canvasTopPadding
+
+		if FFlagAppIaScrollAway and v51 then
+			canvasTopPadding = joined.topBarHeight
+		end
+
+		v56.canvasTopPadding = canvasTopPadding
+		v56.pageBackgroundTransparency = v10 and 1 or nil
+		v56.canAccessParty = canAccessParty
+		v56.isPartyQuickStartEnabled = isPartyQuickStartEnabled
+		v55 = createElement(ConversationListWithTopBar, join(joined, v56, v24))
+	elseif v6 then
+		v55 = React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundColor3 = v11.Theme.BackgroundDefault.Color,
+			BackgroundTransparency = v10 and 1 or v11.Tokens.Color.None.Transparency,
+			BorderSizePixel = 0
+		}, {
+			NoFriendsView = React.createElement(NoFriendsView, {
+				pageRenderReport = function()
+					v27.emit(ChatLandingTelemetryEvents.ChatEmptyStateScreenRendered, {
+						emptyStateType = EmptyStateType.NoFriendsView
+					})
+				end,
+				openAddFriendsPage = function()
+					v27.emit(ChatLandingTelemetryEvents.ChatAddFriendsBtnClicked, {})
+
+					if FFlagCreateConnectionsHub then
+						v16[AppPage.CoHubAddConnections]()
+					else
+						joined.navigateToAddFriends()
 					end
 				end,
-				fireRenderEvent = function(p7) -- line: 458
-					-- upvalues: EmptyStateType (copy), v133 (copy), ChatLandingTelemetryEvents (copy)
-					local v180 = if p7 ~= "friends" then if p7 ~= "privacy" then if p7 ~= "regional" then EmptyStateType.EmptyConversationList else EmptyStateType.ChatUnavailableRegionView else EmptyStateType.ChatSettingsDisabledView else EmptyStateType.NoFriendsView
-
-					v133.emit(ChatLandingTelemetryEvents.ChatEmptyStateScreenRendered, {
-						emptyStateType = v180
-					})
-				end
+				noFriendsHeaderKey = "Feature.Chat.Label.AddFriends",
+				noFriendsTextLabelKey = "Feature.Chat.Text.NoFriends",
+				addFriendsBtnLabelKey = "Feature.Chat.Label.AddFriends",
+				addFriendsBtnEnabled = v50[EnumScreens.AddFriends]
 			})
-		end
+		})
+		v31 = true
 	else
-		local v150 = `conversationListWithTopBar{ v98.filterText }`
+		v55 = React.createElement(NoConversationsLanding, {
+			chatEnabled = v6,
+			privacySettingsEnabled = privacySettingsEnabled,
+			globalRulesEnabled = globalRulesEnabled,
+			thirdPartyPrivacySettingsEnabled = thirdPartyPrivacySettingsEnabled,
+			canNavigateToPrivacySettings = v50[EnumScreens.PrivacySettings],
+			canNavigateToAddFriends = v50[EnumScreens.AddFriends],
+			onCallToAction = function(p2)
+				if p2 == "privacy" then
+					joined.navigateToPrivacy()
+				elseif p2 == "friends" then
+					v27.emit(ChatLandingTelemetryEvents.ChatAddFriendsBtnClicked, {})
 
-		v142 = true
-		u143 = true
-		u144 = true
-		v149 = React.createElement(ConversationListWithTopBar, Cryo.Dictionary.join(v98, {
-			filterText = v98.isShowingFilterBox and v98.filterText or nil,
-			key = v150,
-			itemList = v130,
-			appLoaded = v110,
-			localUserId = v114,
-			conversationsIsFetching = v126,
-			oldestConversationIsFetched = v128,
-			entryHeight = v119,
-			isInExperience = v107,
-			isWideMode = if not PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() and not FFlagAppChatUseNewConversationRow then nil else v108,
-			navigateToConversationFromUserId = if not PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then nil else v139,
-			navigateToQuickStartSquadInviteFriends = if not PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then nil else v138,
-			showGroupsLink = v145[EnumScreens.Groups],
-			canvasTopPadding = if not FFlagAppIaScrollAway or not v146 then nil else v98.topBarHeight,
-			canAccessParty = v147,
-			isPartyQuickStartEnabled = v148
-		}))
+					if FFlagCreateConnectionsHub then
+						v16[AppPage.CoHubAddConnections]()
+					else
+						joined.navigateToAddFriends()
+					end
+				end
+			end,
+			fireRenderEvent = function(p2)
+				local emptyStateType
+
+				if p2 == "friends" then
+					emptyStateType = EmptyStateType.NoFriendsView
+				elseif p2 == "privacy" then
+					emptyStateType = EmptyStateType.ChatSettingsDisabledView
+				elseif p2 == "regional" then
+					emptyStateType = EmptyStateType.ChatUnavailableRegionView
+				else
+					emptyStateType = EmptyStateType.EmptyConversationList
+				end
+
+				v27.emit(ChatLandingTelemetryEvents.ChatEmptyStateScreenRendered, {
+					emptyStateType = emptyStateType
+				})
+			end
+		})
 	end
 
 	if FFlagAppIaScrollAway and FFlagEnableScrollAwayContentScrollableFix then
-		useEffect(function() -- line: 513
-			-- upvalues: v146 (copy), VisibilityControl (copy), u144 (ref)
-			if not v146 then
+		useEffect(function()
+			if not v51 then
 				return
 			end
 
-			VisibilityControl.setContentScrollable(u144)
-		end, {
-			u144,
-			v146
-		})
+			VisibilityControl.setContentScrollable(v49)
+		end, { v49, v51 })
 	end
 
-	if getFFlagChatTabHideGroupsLinkOnVR() and IsVRAppBuild() then
-		v142 = true
-	end
+	local v56 = getFFlagChatTabHideGroupsLinkOnVR() and IsVRAppBuild() and true or v31
 
-	if FFlagAppChatTopBarSignalsStore then
-		useEffect(function() -- line: 527
-			-- upvalues: v107 (copy), GetTopBarStore (copy), EnumScreens (copy), u143 (ref)
-			if v107 then
-				GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatLanding, {
-					rightHidden = not u143
-				})
-			end
-		end, {
-			u143,
-			v107
-		})
-	else
-		local v151 = v115.getScreenProps("setScreenTopBar", function() -- line: 535
-		end)
-
-		useEffect(function() -- line: 536
-			-- upvalues: v107 (copy), v151 (copy), EnumScreens (copy), u143 (ref)
-			if v107 then
-				v151(EnumScreens.ChatLanding, {
-					rightHidden = not u143
-				})
-			end
-		end, {
-			u143,
-			v151,
-			v107
-		})
-	end
-
-	local v152 = if not (not v142 and v145[EnumScreens.Groups]) then v149 else React.createElement(React.Fragment, nil, {
-		UIPadding = if not FFlagAppIaScrollAway or not v146 then nil else React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v98.topBarHeight)
-		}),
-		groupsLink = React.createElement(ConversationGroupsEntryContainer, {
-			entryHeight = v119
-		}),
-		chatFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 1, -v119),
-			Position = UDim2.new(0, 0, 0, v119)
-		}, {
-			chatContainer = v149
-		})
-	})
-	local v153 = useChatIsVisible()
-
-	React.useEffect(function() -- line: 577
-		-- upvalues: v153 (copy), emit (ref), ChatLandingTelemetryEvents (copy), v102 (copy), v141 (copy)
-		if v153 then
-			emit(ChatLandingTelemetryEvents.AppChatVisible, {
-				isChatEnabled = v102,
-				isChatLoading = v141
+	useEffect(function()
+		if isInExperience then
+			GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatLanding, {
+				rightHidden = not v32
 			})
 		end
-	end, {
-		v153,
-		v102,
-		v141
-	})
+	end, { v32, isInExperience })
 
-	if FFlagAppChatPerfTracking then
-		React.useEffect(function() -- line: 587
-			-- upvalues: v153 (copy), v141 (copy), v102 (copy), v25 (copy), v130 (copy), AppChatPerfTracker (copy)
-			if not v153 then
-				return
-			end
+	if not v56 and v50[EnumScreens.Groups] then
+		local createElement = React.createElement
+		local fragment = React.Fragment
+		local uiPadding
 
-			local v181 = not v141 and v102
+		if FFlagAppIaScrollAway and v51 then
+			uiPadding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, joined.topBarHeight)
+			})
+		end
 
-			v25:debug("TTI Ready Check (ChatLanding): isLoading={}, isChatEnabled={}, itemCount={}, ready={}", v141, v102, #v130, v181)
-
-			if v181 and AppChatPerfTracker.isActive(AppChatPerfTracker.Events.ChatLandingTTI) then
-				AppChatPerfTracker.finish(AppChatPerfTracker.Events.ChatLandingTTI, {
-					numElementsRendered = #v130
-				})
-			end
-		end, {
-			v153,
-			v141,
-			v102,
-			#v130
+		v55 = createElement(fragment, nil, {
+			UIPadding = uiPadding,
+			groupsLink = React.createElement(ConversationGroupsEntryContainer, { entryHeight = v15 }),
+			chatFrame = React.createElement("Frame", {
+				Size = UDim2.new(1, 0, 1, -v15),
+				Position = UDim2.new(0, 0, 0, v15),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0
+			}, { chatContainer = v55 })
 		})
 	end
 
-	local v154 = React.useRef({
-		isChatEnabled = v102,
-		isChatLoading = v141
-	})
+	local v57 = useChatIsVisible()
 
-	React.useEffect(function() -- line: 611
-		-- upvalues: v154 (copy), v102 (copy), v141 (copy)
-		v154.current = {
-			isChatEnabled = v102,
-			isChatLoading = v141
-		}
-	end, {
-		v102,
-		v141
-	})
-	useEffect(function() -- line: 620
-		-- upvalues: v153 (copy), emit (ref), ChatLandingTelemetryEvents (copy), v154 (copy)
-		return function() -- line: 621
-			-- upvalues: v153 (copy), emit (ref), ChatLandingTelemetryEvents (copy), v154 (copy)
-			if v153 then
-				emit(ChatLandingTelemetryEvents.AppChatClosed, v154.current)
+	React.useEffect(function()
+		if v57 then
+			local appChatVisible = ChatLandingTelemetryEvents.AppChatVisible
+			local v59 = { isChatEnabled = v6, isChatLoading = isChatLoading, isInConversation = 0 }
+			local isInConversation
+
+			if FFlagAppChatVisibleIsInConversation then
+				isInConversation = getIsInConversationForTelemetry(v9)
 			end
+
+			v59.isInConversation = isInConversation
+			v28(appChatVisible, v59)
 		end
-	end, { v153 })
+	end, { v57, v6, isChatLoading })
 
-	if FFlagSignalsNavP3hMisc then
-		local v155 = React.useRef(nil)
+	if FFlagAppChatPerfTracking then
+		React.useEffect(function()
+			if not v57 then
+				return
+			end
 
-		if v153 or v155.current == nil then
-			v155.current = v152
-		end
+			local v58 = not v54 and v6
+			v:debug(
+				"TTI Ready Check (ChatLanding): isLoading={}, isChatEnabled={}, itemCount={}, ready={}",
+				v54,
+				v6,
+				#itemList,
+				v58
+			)
 
-		return v155.current
+			if v58 and AppChatPerfTracker.isActive(AppChatPerfTracker.Events.ChatLandingTTI) then
+				AppChatPerfTracker.finish(AppChatPerfTracker.Events.ChatLandingTTI, {
+					numElementsRendered = #itemList
+				})
+			end
+		end, {
+			v57,
+			v54,
+			v6,
+			#itemList
+		})
 	end
 
-	return v152
+	local ref = React.useRef({ isChatEnabled = v6, isChatLoading = isChatLoading })
+
+	React.useEffect(function()
+		ref.current = { isChatEnabled = v6, isChatLoading = isChatLoading }
+	end, { v6, isChatLoading })
+
+	useEffect(function()
+		return function()
+			if v57 then
+				v28(ChatLandingTelemetryEvents.AppChatClosed, ref.current)
+			end
+		end
+	end, { v57 })
+
+	if not FFlagSignalsNavP3hMisc then
+		return v55
+	end
+
+	local ref2 = React.useRef(nil)
+
+	if v57 or ref2.current == nil then
+		ref2.current = v55
+	end
+
+	return ref2.current
 end
 
-return compose(RoactRodux.connect(nil, mapDispatchToProps), RoactPaginator.connect(function() -- line: 645
-	return {
-		pageSize = 30
-	}
-end))(ChatLandingContainer)
+local function paginatorParameters()
+	return { pageSize = 30 }
+end
+
+local v3 = compose(RoactRodux.connect(nil, mapDispatchToProps), RoactPaginator.connect(paginatorParameters))(ChatLandingContainer)
+
+local function PaginatorPropsBridge(p): nil
+	local v4 = p[RoactPaginator.loadNext]
+	local v5 = p[RoactPaginator.loadPrevious]
+	local onPaginatorReady = p.onPaginatorReady
+	React.useLayoutEffect(function()
+		onPaginatorReady({ [RoactPaginator.loadNext] = v4, [RoactPaginator.loadPrevious] = v5 })
+	end, { v4, v5, onPaginatorReady })
+	return nil
+end
+
+local v4 = compose(RoactRodux.connect(nil, mapDispatchToProps), RoactPaginator.connect(paginatorParameters))(PaginatorPropsBridge)
+
+local v5 = RoactRodux.connect(nil, mapDispatchToProps)(ChatLandingContainer)
+
+local function ChatLandingContainerWithRetry(p)
+	local state, setState = React.useState(0)
+	local ref = React.useRef({})
+	local onRetryConversations = useCallback(function()
+		setState(function(p2)
+			return p2 + 1
+		end)
+	end, {})
+	local onPaginatorReady = useCallback(function(current)
+		ref.current = current
+	end, {})
+	local v6 = useCallback(function(...)
+		local v6 = ref.current[RoactPaginator.loadNext]
+
+		if v6 then
+			return v6(...)
+		end
+
+		return nil
+	end, {})
+	local v7 = useCallback(function(...)
+		local v7 = ref.current[RoactPaginator.loadPrevious]
+
+		if v7 then
+			return v7(...)
+		end
+
+		return nil
+	end, {})
+
+	return React.createElement(React.Fragment, nil, {
+		Paginator = React.createElement(v4, { key = state, onPaginatorReady = onPaginatorReady }),
+		Landing = React.createElement(
+			v5,
+			Cryo.Dictionary.join(p, {
+				[RoactPaginator.loadNext] = v6,
+				[RoactPaginator.loadPrevious] = v7,
+				onRetryConversations = onRetryConversations
+			})
+		)
+	})
+end
+
+if FFlagAppChatConversationLoadRetry then
+	return ChatLandingContainerWithRetry
+end
+
+return v3

@@ -1,36 +1,39 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local EnumsRadius = require(ParentParent.Foundation).Enums.Radius
+local parent = script.Parent.Parent.Parent.Parent
 
-local function getClosestRadius(p1, uDim: UDim?) -- line: 9
-	-- upvalues: EnumsRadius (copy)
-	if not uDim or uDim == UDim.new(0, 0) then
-		return EnumsRadius.None
+local Foundation = require(parent.Foundation)
+local Radius = Foundation.Enums.Radius
+
+local function getClosestRadius(data, udim: UDim?)
+	if not udim or udim == UDim.new(0, 0) then
+		return Radius.None
 	end
 
-	if uDim.Scale >= 0.5 then
-		return EnumsRadius.Circle
+	if udim.Scale >= 0.5 then
+		return Radius.Circle
 	end
 
-	local v6 = nil
-	local n1 = 1e999
+	local v = 1e999
+	local v2 = nil
 
-	for v8, v9 in {
-		[EnumsRadius.None] = 0,
-		[EnumsRadius.XSmall] = 2,
-		[EnumsRadius.Small] = p1.Small,
-		[EnumsRadius.Medium] = p1.Medium,
-		[EnumsRadius.Large] = p1.XLarge,
-		[EnumsRadius.Circle] = p1.Circle
+	for k, v3 in {
+		[Radius.None] = 0,
+		[Radius.XSmall] = 2,
+		[Radius.Small] = data.Small,
+		[Radius.Medium] = data.Medium,
+		[Radius.Large] = data.XLarge,
+		[Radius.Circle] = data.Circle
 	} do
-		local v10 = math.abs(uDim.Offset - v9)
+		local v4 = math.abs(udim.Offset - v3)
 
-		if v10 < n1 then
-			n1 = v10
-			v6 = v8
+		if not (v4 < v) then
+			continue
 		end
+
+		v2 = k
+		v = v4
 	end
 
-	return v6
+	return v2
 end
 
 return getClosestRadius

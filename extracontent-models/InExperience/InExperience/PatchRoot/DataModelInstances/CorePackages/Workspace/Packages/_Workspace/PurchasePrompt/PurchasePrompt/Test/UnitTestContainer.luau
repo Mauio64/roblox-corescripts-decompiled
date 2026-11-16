@@ -1,51 +1,53 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
+local parent = PurchasePrompt.Parent
 local LocalizationService = game:GetService("LocalizationService")
-local PurchasePromptDeps = require(PurchasePromptParent.PurchasePromptDeps)
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
 local Roact = PurchasePromptDeps.Roact
 local Rodux = PurchasePromptDeps.Rodux
 local RoactRodux = PurchasePromptDeps.RoactRodux
-local LocaleProvider = require(PurchasePromptParent.IAPExperience).Locale.LocaleProvider
+local IAPExperience = require(parent.IAPExperience)
+local LocaleProvider = IAPExperience.Locale.LocaleProvider
+
 local LayoutValuesProvider = require(PurchasePrompt.Components.Connection.LayoutValuesProvider)
 local LocalizationContextProvider = require(PurchasePrompt.Components.Connection.LocalizationContextProvider)
 local Reducer = require(PurchasePrompt.Reducers.Reducer)
 local LayoutValues = require(PurchasePrompt.Services.LayoutValues)
-local StyleProviderWithDefaultTheme = require(PurchasePromptParent.Style).StyleProviderWithDefaultTheme
-local Localization = require(PurchasePromptParent.RobloxAppLocales).Localization
-local v15 = Roact.Component:extend("UnitTestContainer")
+local Style = require(parent.Style)
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
 
-function v15.init(p1) -- line: 26
-	-- upvalues: LayoutValues (copy), Rodux (copy), Reducer (copy), LocalizationService (copy), Localization (copy)
-	p1.layoutValues = LayoutValues.new(false).layout
-	p1.store = p1.props.overrideStore or Rodux.Store.new(Reducer, {})
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
 
-	local v17 = p1.props.overrideLocale or LocalizationService.RobloxLocaleId
+local extended = Roact.Component:extend("UnitTestContainer")
 
-	p1.localizationContext = Localization.new(v17)
+function extended:init()
+	self.layoutValues = LayoutValues.new(false).layout
+	self.store = self.props.overrideStore or Rodux.Store.new(Reducer, {})
+
+	local overrideLocale = self.props.overrideLocale or LocalizationService.RobloxLocaleId
+	self.localizationContext = Localization.new(overrideLocale)
 end
-function v15.render(p2) -- line: 34
-	-- upvalues: Roact (copy), RoactRodux (copy), LocaleProvider (copy), LocalizationService (copy), StyleProviderWithDefaultTheme (copy), LocalizationContextProvider (copy), LayoutValuesProvider (copy)
-	assert(p2.props[Roact.Children] ~= nil and #p2.props[Roact.Children] > 0, "UnitTestContainer: no children provided, nothing will be tested")
 
-	return Roact.createElement(RoactRodux.StoreProvider, {
-		store = p2.store
-	}, {
+function extended.render(props)
+	local v = props.props[Roact.Children] ~= nil and #props.props[Roact.Children] > 0
+	assert(v, "UnitTestContainer: no children provided, nothing will be tested")
+
+	return Roact.createElement(RoactRodux.StoreProvider, { store = props.store }, {
 		LocaleProvider = Roact.createElement(LocaleProvider, {
 			locale = LocalizationService.RobloxLocaleId
 		}, {
 			StyleProvider = Roact.createElement(StyleProviderWithDefaultTheme, {
 				LocalizationContextProvider = Roact.createElement(LocalizationContextProvider, {
-					localizationContext = p2.localizationContext,
-					render = function() -- line: 49
-						-- upvalues: Roact (copy), LayoutValuesProvider (copy), p2 (copy)
+					localizationContext = props.localizationContext,
+					render = function()
 						return Roact.createElement(LayoutValuesProvider, {
 							isTenFootInterface = false,
-							render = function() -- line: 52
-								-- upvalues: Roact (copy), p2 (copy)
-								return Roact.createElement("ScreenGui", {
-									AutoLocalize = false,
-									IgnoreGuiInset = true
-								}, p2.props[Roact.Children])
+							render = function()
+								return Roact.createElement(
+									"ScreenGui",
+									{ AutoLocalize = false, IgnoreGuiInset = true },
+									props.props[Roact.Children]
+								)
 							end
 						})
 					end
@@ -55,4 +57,4 @@ function v15.render(p2) -- line: 34
 	})
 end
 
-return v15
+return extended

@@ -1,75 +1,71 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 local React = require(AppChat.Parent.React)
-local t1 = {
-	[Enum.HorizontalAlignment.Center] = {
-		[Enum.VerticalAlignment.Center] = {
-			anchor = Vector2.new(0.5, 0.5),
-			position = UDim2.fromScale(0.5, 0.5)
-		},
-		[Enum.VerticalAlignment.Top] = {
-			anchor = Vector2.new(0.5, 0),
-			position = UDim2.fromScale(0.5, 0)
-		},
-		[Enum.VerticalAlignment.Bottom] = {
-			anchor = Vector2.new(0.5, 1),
-			position = UDim2.fromScale(0.5, 1)
-		}
+
+local v = {}
+local Center = Enum.HorizontalAlignment.Center
+v[Center] = {
+	[Enum.VerticalAlignment.Center] = {
+		anchor = Vector2.new(0.5, 0.5),
+		position = UDim2.fromScale(0.5, 0.5)
 	},
-	[Enum.HorizontalAlignment.Left] = {
-		[Enum.VerticalAlignment.Center] = {
-			anchor = Vector2.new(0, 0.5),
-			position = UDim2.fromScale(0, 0.5)
-		},
-		[Enum.VerticalAlignment.Top] = {
-			anchor = Vector2.new(0, 0),
-			position = UDim2.fromScale(0, 0)
-		},
-		[Enum.VerticalAlignment.Bottom] = {
-			anchor = Vector2.new(0, 1),
-			position = UDim2.fromScale(0, 1)
-		}
+	[Enum.VerticalAlignment.Top] = {
+		anchor = Vector2.new(0.5, 0),
+		position = UDim2.fromScale(0.5, 0)
 	},
-	[Enum.HorizontalAlignment.Right] = {
-		[Enum.VerticalAlignment.Center] = {
-			anchor = Vector2.new(1, 0.5),
-			position = UDim2.fromScale(1, 0.5)
-		},
-		[Enum.VerticalAlignment.Top] = {
-			anchor = Vector2.new(1, 0),
-			position = UDim2.fromScale(1, 0)
-		},
-		[Enum.VerticalAlignment.Bottom] = {
-			anchor = Vector2.new(1, 1),
-			position = UDim2.fromScale(1, 1)
-		}
+	[Enum.VerticalAlignment.Bottom] = {
+		anchor = Vector2.new(0.5, 1),
+		position = UDim2.fromScale(0.5, 1)
 	}
 }
 
-local function Frame(t2: {[any]: any}) -- line: 36
-	-- upvalues: React (copy), t1 (copy)
-	local v6, v7 = React.useMemo(function() -- line: 37
-		-- upvalues: t2 (copy), t1 (copy)
-		if t2.horizontalAlignment and t2.verticalAlignment then
-			return t1[t2.horizontalAlignment][t2.verticalAlignment].anchor, t1[t2.horizontalAlignment][t2.verticalAlignment].position
+local Left = Enum.HorizontalAlignment.Left
+v[Left] = {
+	[Enum.VerticalAlignment.Center] = {
+		anchor = Vector2.new(0, 0.5),
+		position = UDim2.fromScale(0, 0.5)
+	},
+	[Enum.VerticalAlignment.Top] = { anchor = Vector2.new(0, 0), position = UDim2.fromScale(0, 0) },
+	[Enum.VerticalAlignment.Bottom] = {
+		anchor = Vector2.new(0, 1),
+		position = UDim2.fromScale(0, 1)
+	}
+}
+
+local Right = Enum.HorizontalAlignment.Right
+v[Right] = {
+	[Enum.VerticalAlignment.Center] = {
+		anchor = Vector2.new(1, 0.5),
+		position = UDim2.fromScale(1, 0.5)
+	},
+	[Enum.VerticalAlignment.Top] = { anchor = Vector2.new(1, 0), position = UDim2.fromScale(1, 0) },
+	[Enum.VerticalAlignment.Bottom] = {
+		anchor = Vector2.new(1, 1),
+		position = UDim2.fromScale(1, 1)
+	}
+}
+
+local function Frame(props)
+	local v2, v3 = React.useMemo(function()
+		if props.horizontalAlignment and props.verticalAlignment then
+			return
+				v[props.horizontalAlignment][props.verticalAlignment].anchor,
+				v[props.horizontalAlignment][props.verticalAlignment].position
 		end
 
 		return nil, nil
-	end, {
-		t2.horizontalAlignment,
-		t2.verticalAlignment
-	})
+	end, { props.horizontalAlignment, props.verticalAlignment })
 
 	return React.createElement("Frame", {
+		AnchorPoint = props.AnchorPoint or v2,
+		BackgroundColor3 = props.BackgroundColor3,
+		BackgroundTransparency = props.BackgroundTransparency or 1,
 		BorderSizePixel = 0,
-		AnchorPoint = t2.AnchorPoint or v6,
-		BackgroundColor3 = t2.BackgroundColor3,
-		BackgroundTransparency = t2.BackgroundTransparency or 1,
-		ClipsDescendants = t2.ClipsDescendants,
-		LayoutOrder = t2.LayoutOrder,
-		Position = t2.Position or v7,
-		Size = t2.Size or UDim2.fromScale(1, 1),
-		ZIndex = t2.ZIndex,
-		children = t2.children
+		ClipsDescendants = props.ClipsDescendants,
+		LayoutOrder = props.LayoutOrder,
+		Position = props.Position or v3,
+		Size = props.Size or UDim2.fromScale(1, 1),
+		ZIndex = props.ZIndex,
+		children = props.children
 	})
 end
 

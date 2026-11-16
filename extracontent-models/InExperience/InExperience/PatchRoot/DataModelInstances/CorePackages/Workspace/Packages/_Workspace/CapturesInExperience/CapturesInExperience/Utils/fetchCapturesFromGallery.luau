@@ -1,57 +1,54 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local CaptureService = game:GetService("CaptureService")
 
-require(ParentParent.Types)
+require(parent.Types)
 
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
-local FFlagCaptureServiceRetrieveCapturesSafeguard = require(ParentParent.Flags.FFlagCaptureServiceRetrieveCapturesSafeguard)
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
 
-local function fetchCapturesFromGallery() -- line: 12
-	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureService (copy), FFlagCaptureServiceRetrieveCapturesSafeguard (copy)
+local FFlagCaptureServiceRetrieveCapturesSafeguard = require(parent.Flags.FFlagCaptureServiceRetrieveCapturesSafeguard)
+
+local function fetchCapturesFromGallery()
 	if FFlagEnableCapturesGalleryRetrievalCoreScript then
-		local ok, result = pcall(function() -- line: 14
-			-- upvalues: CaptureService (copy)
-			local v14, v15 = CaptureService:ReadCapturesFromGalleryAsync()
+		local success, result = pcall(function()
+			local capturesFromGalleryAsync, v = CaptureService:ReadCapturesFromGalleryAsync()
 
-			if v14 == Enum.ReadCapturesFromGalleryResult.Success then
-				return v15
+			if capturesFromGalleryAsync == Enum.ReadCapturesFromGalleryResult.Success then
+				return v
 			end
 
 			return nil
 		end)
 
-		if ok and result then
-			local t1 = {}
-			local CurrentPage = result:GetCurrentPage()
-
-			for _, v in ipairs(CurrentPage) do
-				table.insert(t1, v)
-			end
-
-			return t1
+		if not (success and result) then
+			warn("Failed to retrieve captures from gallery")
+			return {}
 		end
 
-		warn("Failed to retrieve captures from gallery")
+		local currentPage = result:GetCurrentPage()
+		local result2 = {}
 
-		return {}
-	end
+		for _, v in ipairs(currentPage) do
+			table.insert(result2, v)
+		end
 
-	if FFlagCaptureServiceRetrieveCapturesSafeguard then
-		local ok, result = pcall(function() -- line: 35
-			-- upvalues: CaptureService (copy)
+		return result2
+	else
+		if not FFlagCaptureServiceRetrieveCapturesSafeguard then
+			return CaptureService:RetrieveCaptures()
+		end
+
+		local success, result = pcall(function()
 			return CaptureService:RetrieveCaptures()
 		end)
 
-		if ok then
+		if success then
 			return result
 		end
 
 		warn("Failed to retrieve captures from gallery")
-
 		return {}
 	end
-
-	return CaptureService:RetrieveCaptures()
 end
 
 return fetchCapturesFromGallery

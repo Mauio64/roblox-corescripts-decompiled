@@ -1,29 +1,32 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ReactUtils = require(ParentParentParent.ReactUtils)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local ReactUtils = require(parent2.ReactUtils)
+
 local UserInputService = game:GetService("UserInputService")
-local React = require(ParentParentParent.React)
+
+local React = require(parent2.React)
+
 local useEventConnection = ReactUtils.useEventConnection
-local InputUtilities = require(ParentParent.Utils.InputUtilities)
 
-return function() -- line: 13
-	-- upvalues: React (copy), InputUtilities (copy), useEventConnection (copy), UserInputService (copy)
-	local v8, v9 = React.useState(false)
-	local v10 = React.useCallback(function(p1) -- line: 16
-		-- upvalues: InputUtilities (copy), v9 (copy)
-		if InputUtilities.isTouchInput(p1) then
-			v9(true)
+local InputUtilities = require(parent.Utils.InputUtilities)
+
+return function()
+	local state, setState = React.useState(false)
+
+	local v = React.useCallback(function(p)
+		if InputUtilities.isTouchInput(p) then
+			setState(true)
 		end
-	end, { v9 })
-	local v11 = React.useCallback(function(p2) -- line: 22
-		-- upvalues: InputUtilities (copy), v9 (copy)
-		if InputUtilities.isTouchInput(p2) then
-			v9(false)
+	end, { setState })
+
+	local v2 = React.useCallback(function(p)
+		if InputUtilities.isTouchInput(p) then
+			setState(false)
 		end
-	end, { v9 })
+	end, { setState })
 
-	useEventConnection(UserInputService.InputBegan, v10)
-	useEventConnection(UserInputService.InputEnded, v11)
+	useEventConnection(UserInputService.InputBegan, v)
+	useEventConnection(UserInputService.InputEnded, v2)
 
-	return v8
+	return state
 end

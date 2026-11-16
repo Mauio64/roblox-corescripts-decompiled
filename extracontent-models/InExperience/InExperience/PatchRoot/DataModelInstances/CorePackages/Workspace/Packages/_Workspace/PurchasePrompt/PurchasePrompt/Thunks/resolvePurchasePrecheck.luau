@@ -1,35 +1,34 @@
-local ParentParent = script.Parent.Parent
-local SetPromptState = require(ParentParent.Actions.SetPromptState)
-local PromptState = require(ParentParent.Enums.PromptState)
-local PurchaseWarning = require(ParentParent.Enums.PurchaseWarning)
-local launchRobuxUpsell = require(ParentParent.Thunks.launchRobuxUpsell)
-local Thunk = require(ParentParent.Thunk)
+local parent = script.Parent.Parent
 
-local function resolvePurchasePrecheck(p1) -- line: 9
-	-- upvalues: Thunk (copy), PurchaseWarning (copy), SetPromptState (copy), PromptState (copy), launchRobuxUpsell (copy)
-	return Thunk.new(script.Name, {}, function(p2, _) -- line: 10
-		-- upvalues: p1 (copy), PurchaseWarning (copy), SetPromptState (copy), PromptState (copy), launchRobuxUpsell (copy)
-		if p1 == PurchaseWarning.U13PaymentModal then
-			return p2:dispatch(SetPromptState(PromptState.U13PaymentModal))
+local SetPromptState = require(parent.Actions.SetPromptState)
+local PromptState = require(parent.Enums.PromptState)
+local PurchaseWarning = require(parent.Enums.PurchaseWarning)
+local launchRobuxUpsell = require(parent.Thunks.launchRobuxUpsell)
+local Thunk = require(parent.Thunk)
+
+local function resolvePurchasePrecheck(p)
+	return Thunk.new(script.Name, {}, function(object, _)
+		if p == PurchaseWarning.U13PaymentModal then
+			return object:dispatch(SetPromptState(PromptState.U13PaymentModal))
 		end
 
-		if p1 == PurchaseWarning.U13MonthlyThreshold1Modal then
-			return p2:dispatch(SetPromptState(PromptState.U13MonthlyThreshold1Modal))
+		if p == PurchaseWarning.U13MonthlyThreshold1Modal then
+			return object:dispatch(SetPromptState(PromptState.U13MonthlyThreshold1Modal))
 		end
 
-		if p1 == PurchaseWarning.RequireEmailVerification then
-			return p2:dispatch(SetPromptState(PromptState.RequireEmailVerification))
+		if p == PurchaseWarning.RequireEmailVerification then
+			return object:dispatch(SetPromptState(PromptState.RequireEmailVerification))
 		end
 
-		if p1 == PurchaseWarning.U13MonthlyThreshold2Modal then
-			return p2:dispatch(SetPromptState(PromptState.U13MonthlyThreshold2Modal))
+		if p == PurchaseWarning.U13MonthlyThreshold2Modal then
+			return object:dispatch(SetPromptState(PromptState.U13MonthlyThreshold2Modal))
 		end
 
-		if p1 == PurchaseWarning.ParentalConsentWarningPaymentModal13To17 then
-			return p2:dispatch(SetPromptState(PromptState.ParentalConsentWarningPaymentModal13To17))
+		if p == PurchaseWarning.ParentalConsentWarningPaymentModal13To17 then
+			return object:dispatch(SetPromptState(PromptState.ParentalConsentWarningPaymentModal13To17))
 		end
 
-		return p2:dispatch(launchRobuxUpsell())
+		return object:dispatch(launchRobuxUpsell())
 	end)
 end
 

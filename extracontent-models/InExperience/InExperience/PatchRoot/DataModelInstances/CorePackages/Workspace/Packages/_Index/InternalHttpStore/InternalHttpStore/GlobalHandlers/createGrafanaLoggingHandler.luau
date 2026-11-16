@@ -1,18 +1,19 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Signals = require(ParentParentParent.Signals)
-local GreenlistedEndpointsForLogging = require(ParentParentParent.Http).Logger.GreenlistedEndpointsForLogging
+local parent = script.Parent.Parent
 
-require(ParentParent.HttpStoreTypes)
+local parent2 = parent.Parent
 
-local function createGrafanaLoggingHandler(p1) -- line: 13
-	-- upvalues: Signals (copy), GreenlistedEndpointsForLogging (copy)
-	return Signals.createEffect(function(p2) -- line: 14
-		-- upvalues: p1 (copy), GreenlistedEndpointsForLogging (copy)
-		local v8 = p1(p2)
+local Signals = require(parent2.Signals)
+local Http = require(parent2.Http)
 
-		if v8.status == "Success" then
-			GreenlistedEndpointsForLogging.sendStatusCodeCounter(v8.config.Url, v8.response.StatusCode)
+local GreenlistedEndpointsForLogging = Http.Logger.GreenlistedEndpointsForLogging
+require(parent.HttpStoreTypes)
+
+local function createGrafanaLoggingHandler(callback)
+	return Signals.createEffect(function(p)
+		local v = callback(p)
+
+		if v.status == "Success" then
+			GreenlistedEndpointsForLogging.sendStatusCodeCounter(v.config.Url, v.response.StatusCode)
 		end
 	end)
 end

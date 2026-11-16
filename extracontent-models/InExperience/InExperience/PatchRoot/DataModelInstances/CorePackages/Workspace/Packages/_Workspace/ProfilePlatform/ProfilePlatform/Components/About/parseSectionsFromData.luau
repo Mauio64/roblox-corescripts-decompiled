@@ -1,49 +1,44 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
 local Enums = require(ProfilePlatform.Common.Enums)
+
 local Sections = require(script.Parent.Sections)
-local AboutDescription = Sections.AboutDescription
-local SocialLinks = Sections.SocialLinks
-local NameHistory = Sections.NameHistory
-local JoinYear = Sections.JoinYear
+
 local _ = {
 	Description = "description",
 	SocialLinks = "socialLinks",
 	NameHistory = "nameHistory",
 	JoinDateTime = "joinDateTime"
 }
-local t1 = {
-	description = AboutDescription,
-	socialLinks = SocialLinks,
-	nameHistory = NameHistory,
-	joinDateTime = JoinYear
+local v = {
+	["description"] = Sections.AboutDescription,
+	socialLinks = Sections.SocialLinks,
+	nameHistory = Sections.NameHistory,
+	joinDateTime = Sections.JoinYear
 }
-local t2 = {
-	"description",
-	"socialLinks",
-	"nameHistory",
-	"joinDateTime"
-}
-local t3 = { "description" }
 
-return function(p1, p2, s1: string?) -- line: 37
-	-- upvalues: Enums (copy), t3 (copy), t2 (copy), t1 (copy), React (copy)
-	local v17 = if p2 ~= Enums.ProfileTypes.Contact then t2 else t3
-	local t4 = {}
+local v2 = { "description", "socialLinks", "nameHistory", "joinDateTime" }
 
-	for i, v in ipairs(v17) do
-		local v21 = t1[v]
-		local v22 = p1[v]
+local v3 = { "description" }
 
-		if v21 then
-			table.insert(t4, React.createElement(v21, {
+return function(p, p2, name: string?)
+	local v4 = if p2 == Enums.ProfileTypes.Contact then v3 else v2
+
+	local children = {}
+
+	for i, v5 in ipairs(v4) do
+		local v6 = v[v5]
+		local v7 = p[v5]
+
+		if v6 then
+			table.insert(children, React.createElement(v6, {
 				layoutOrder = i,
-				[v] = v22,
-				name = s1
+				[v5] = v7,
+				name = name
 			}))
 		end
 	end
 
-	return t4
+	return children
 end

@@ -1,15 +1,11 @@
-local ParentParent = script.Parent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
+local API_URL = require(parent.API_URL)
 
-return function(t1: {[any]: any}) -- line: 14
-	-- upvalues: API_URL (copy)
-	return t1.roduxNetworking.GET({
-		Name = "GetSocialLinks"
-	}, function(p1, t2: {[any]: any}) -- line: 17
-		-- upvalues: API_URL (copy)
-		return p1(API_URL):path("v1"):path("users"):id(t2.userId):path("promotion-channels"):queryArgs({
-			alwaysReturnUrls = t2.alwaysReturnUrls,
-			filterLink = t2.filterLink
+return function(p)
+	return p.roduxNetworking.GET("GetSocialLinks", function(callback, data)
+		return callback(API_URL):path("v1"):path("users"):id(data.userId):path("promotion-channels"):queryArgs({
+			alwaysReturnUrls = data.alwaysReturnUrls,
+			filterLink = data.filterLink
 		})
 	end)
 end

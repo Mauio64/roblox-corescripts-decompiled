@@ -1,7 +1,6 @@
 local CorePackages = game:GetService("CorePackages")
 
-return require(CorePackages.Packages.Rodux).makeActionCreator("SET_INPUT_TYPE", function(p1) -- line: 5
-	return {
-		inputType = p1
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator("SET_INPUT_TYPE", function(inputType)
+	return { inputType = inputType }
 end)

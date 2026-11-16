@@ -1,4 +1,4 @@
-local function isTextFiltered(_: string) -- line: 15
+local function isTextFiltered(_: string): boolean
 	return false
 end
 

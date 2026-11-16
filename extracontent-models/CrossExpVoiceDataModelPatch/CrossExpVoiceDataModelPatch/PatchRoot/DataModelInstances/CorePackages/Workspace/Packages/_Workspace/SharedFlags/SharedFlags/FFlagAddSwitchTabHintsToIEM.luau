@@ -1,3 +1,4 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+local FFlagEnableConsoleExpControls = require(parent:WaitForChild("FFlagEnableConsoleExpControls"))
 
-return (require(scriptParent:WaitForChild("FFlagEnableConsoleExpControls")))
+return FFlagEnableConsoleExpControls

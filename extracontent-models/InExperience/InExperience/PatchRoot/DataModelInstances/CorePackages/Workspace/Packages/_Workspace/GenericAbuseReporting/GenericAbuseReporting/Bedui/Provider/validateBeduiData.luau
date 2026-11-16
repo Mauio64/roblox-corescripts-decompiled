@@ -1,51 +1,52 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local t = require(GenericAbuseReportingParent.t)
-local BeduiDataTypeInterface = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes).BeduiDataTypeInterface
+local parent = GenericAbuseReporting.Parent
 
-local function validateInterface(p1, t1: {[any]: any}) -- line: 15
-	-- upvalues: t (copy)
-	return t.interface(t1)(p1)
+local t = require(parent.t)
+
+local AbuseReportBeduiTypes = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
+local BeduiDataTypeInterface = AbuseReportBeduiTypes.BeduiDataTypeInterface
+
+local function validateInterface(p, beduiDataTypeInterface) -- 1 equivalent call inferred from this helper
+	return t.interface(beduiDataTypeInterface)(p)
 end
-local function validateStepId(p2) -- line: 24
-	local v11 = false
-	local t2 = {}
 
-	for _, v14 in p2.nodes do
-		if v14.stepId == p2.rootStepId then
-			if v11 then
+local function validateStepId(p)
+	local flag = false
+	local stepIds = {}
+
+	for _, node in p.nodes do
+		if node.stepId == p.rootStepId then
+			if flag then
 				return false, "Bedui data contains multiple steps with the same rootStepId"
 			end
 
-			v11 = true
+			flag = true
 		end
 
-		if table.find(t2, v14.stepId) then
-			return false, "Bedui data contains duplicate stepId: " .. tostring(v14.stepId)
+		if table.find(stepIds, node.stepId) then
+			return false, "Bedui data contains duplicate stepId: " .. tostring(node.stepId)
 		end
 
-		table.insert(t2, v14.stepId)
+		table.insert(stepIds, node.stepId)
 	end
 
-	if v11 then
+	if flag then
 		return true, nil
 	end
 
 	return false, "Bedui data does not contain a step with the rootStepId"
 end
-local function validateBeduiData(t3: {[any]: any}?) -- line: 51
-	-- upvalues: BeduiDataTypeInterface (copy), t (copy), validateStepId (copy)
-	if t3 == nil then
+
+local function validateBeduiData(p)
+	if p == nil then
 		return false, "Bedui data is nil"
 	end
 
-	local v16 = BeduiDataTypeInterface
-
-	if not t.interface(v16)(t3) then
-		return false, "Bedui data does not conform to the expected structure"
+	if validateInterface(p, BeduiDataTypeInterface) then -- inferred equivalent call
+		return validateStepId(p)
 	end
 
-	return validateStepId(t3)
+	return false, "Bedui data does not conform to the expected structure"
 end
 
 return validateBeduiData

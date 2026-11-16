@@ -1,4 +1,6 @@
 local event = require(script.Parent.event)
-local Actions = script:FindFirstAncestor("ExpChat").Actions
 
-return event((require(Actions.VoiceParticipantRemoved)))
+local actions = script:FindFirstAncestor("ExpChat").Actions
+local VoiceParticipantRemoved = require(actions.VoiceParticipantRemoved)
+
+return event(VoiceParticipantRemoved)

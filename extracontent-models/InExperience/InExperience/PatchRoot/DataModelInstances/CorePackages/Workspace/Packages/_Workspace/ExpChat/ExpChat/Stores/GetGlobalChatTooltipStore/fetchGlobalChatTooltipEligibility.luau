@@ -1,108 +1,94 @@
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local UrlBuilder = require(Parent.UrlBuilder)
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+
+local parent = script:FindFirstAncestor("ExpChat").Parent
+
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 local UrlBase = UrlBuilder.UrlBase
-local v6 = require(Parent.ExpChatShared).Logger:new("ExpChat/" .. script.Name)
-local v7 = UrlBuilder2.new({
-	path = "modals-api/v1/prompts",
+
+local ExpChatShared = require(parent.ExpChatShared)
+local v = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
+
+local url = urlBuilder.new({
 	base = UrlBase.APIS,
-	query = {
-		entryPoint = "InExperienceChatWindowOpen",
-		promptStyle = "Modal"
-	}
+	path = "modals-api/v1/prompts",
+	query = { entryPoint = "InExperienceChatWindowOpen", promptStyle = "Modal" }
 })()
-local v8 = UrlBuilder2.new({
-	path = "modals-api/v1/prompts/impression",
-	base = UrlBase.APIS
-})()
-local u9 = nil
 
-local function fetchGlobalChatTooltipEligibility(p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 66
-	-- upvalues: u9 (ref), HttpService (copy), v7 (copy), v6 (copy)
-	if u9 ~= nil then
-		if p1 then
-			p1({
-				shouldShowTooltip = u9
-			})
-		end
+local url2 = urlBuilder.new({ base = UrlBase.APIS, path = "modals-api/v1/prompts/impression" })()
 
-		return
-	end
+local shouldShowTooltip = nil
 
-	HttpService:RequestInternal({
-		Method = "GET",
-		Url = v7,
-		Headers = {
-			Accept = "application/json"
-		}
-	}):Start(function(_, p4) -- line: 82
-		-- upvalues: HttpService (copy), u9 (ref), p1 (copy), v6 (copy), p2 (copy)
-		if p4.StatusCode == 200 then
-			local ok, result = pcall(function() -- line: 84
-				-- upvalues: HttpService (copy), p4 (copy)
-				return HttpService:JSONDecode(p4.Body)
-			end)
+local function fetchGlobalChatTooltipEligibility(callback, callback2)
+	if shouldShowTooltip == nil then
+		HttpService:RequestInternal({
+			Url = url,
+			Method = "GET",
+			Headers = { Accept = "application/json" }
+		}):Start(function(_, data)
+			if data.StatusCode == 200 then
+				local success, result = pcall(function()
+					return HttpService:JSONDecode(data.Body)
+				end)
 
-			if ok and result then
-				local customPrompts = result.customPrompts
-				local v21 = customPrompts ~= nil and (type(customPrompts) == "table" and customPrompts.GlobalChatTooltip ~= nil)
+				if success and result then
+					local customPrompts = result.customPrompts
+					local shouldShowTooltip2
 
-				u9 = v21
+					if customPrompts == nil or type(customPrompts) ~= "table" then
+						shouldShowTooltip2 = false
+					else
+						shouldShowTooltip2 = customPrompts.GlobalChatTooltip ~= nil
+					end
 
-				if p1 then
-					p1({
-						shouldShowTooltip = v21
-					})
+					shouldShowTooltip = shouldShowTooltip2
 
-					return
+					if callback then
+						callback({ shouldShowTooltip = shouldShowTooltip2 })
+					end
+				else
+					shouldShowTooltip = false
+					v:error("Failed to decode GlobalChatTooltip eligibility response")
+
+					if callback2 then
+						callback2()
+					end
 				end
 			else
-				u9 = false
-				v6:error("Failed to decode GlobalChatTooltip eligibility response")
+				shouldShowTooltip = false
+				v:error(
+					"GlobalChatTooltip eligibility request failed: {} {}",
+					tostring(data.StatusCode),
+					data.StatusMessage or ""
+				)
 
-				if p2 then
-					p2()
-
-					return
+				if callback2 then
+					callback2()
 				end
 			end
-		else
-			u9 = false
-			v6:error("GlobalChatTooltip eligibility request failed: {} {}", tostring(p4.StatusCode), p4.StatusMessage or "")
-
-			if p2 then
-				p2()
-			end
-		end
-	end)
+		end)
+	elseif callback then
+		callback({ shouldShowTooltip = shouldShowTooltip })
+	end
 end
 
 return {
 	fetchEligibility = fetchGlobalChatTooltipEligibility,
-	reportImpression = function() -- line: 34
-		-- upvalues: HttpService (copy), v8 (copy), v6 (copy)
-		local json = HttpService:JSONEncode({
-			promptType = "GlobalChatTooltip",
-			promptId = "GlobalChatTooltip"
-		})
-
+	reportImpression = function()
 		HttpService:RequestInternal({
+			Url = url2,
 			Method = "POST",
-			Url = v8,
-			Headers = {
-				["Content-Type"] = "application/json"
-			},
-			Body = json
-		}):Start(function(_, p6) -- line: 49
-			-- upvalues: v6 (copy)
-			if p6.StatusCode == 200 then
-				v6:debug("GlobalChatTooltip impression reported")
-
-				return
+			Headers = { ["Content-Type"] = "application/json" },
+			Body = HttpService:JSONEncode({
+				promptType = "GlobalChatTooltip",
+				promptId = "GlobalChatTooltip"
+			})
+		}):Start(function(_, p)
+			if p.StatusCode == 200 then
+				v:debug("GlobalChatTooltip impression reported")
+			else
+				v:error("GlobalChatTooltip impression failed: {} {}", tostring(p.StatusCode), p.StatusMessage or "")
 			end
-
-			v6:error("GlobalChatTooltip impression failed: {} {}", tostring(p6.StatusCode), p6.StatusMessage or "")
 		end)
 	end
 }

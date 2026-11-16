@@ -1,40 +1,26 @@
-local ParentParent = script.Parent.Parent
-local isSubjectToDesktopPolicies = require(ParentParent.SharedFlags).isSubjectToDesktopPolicies
+local parent = script.Parent.Parent
+local SharedFlags = require(parent.SharedFlags)
+local isSubjectToDesktopPolicies = SharedFlags.isSubjectToDesktopPolicies
 
-local function SharePolicies(p1) -- line: 5
-	-- upvalues: isSubjectToDesktopPolicies (copy)
+local function SharePolicies(data)
 	return {
-		getAccountProviderName = function() -- line: 7
-			-- upvalues: p1 (copy)
-			return p1.AccountProviderName or ""
+		getAccountProviderName = function()
+			return data.AccountProviderName or ""
 		end,
-		shouldShowGameDetailsShareButton = function() -- line: 10
-			-- upvalues: isSubjectToDesktopPolicies (copy), p1 (copy)
-			if isSubjectToDesktopPolicies() then
-				return false
-			end
-
-			return p1.GameDetailsShareButton or false
+		shouldShowGameDetailsShareButton = function()
+			return not isSubjectToDesktopPolicies() and (data.GameDetailsShareButton or false)
 		end,
-		shouldShowCatalogShareButton = function() -- line: 17
-			-- upvalues: isSubjectToDesktopPolicies (copy), p1 (copy)
-			if isSubjectToDesktopPolicies() then
-				return false
-			end
-
-			return p1.CatalogShareButton or false
+		shouldShowCatalogShareButton = function()
+			return not isSubjectToDesktopPolicies() and (data.CatalogShareButton or false)
 		end,
-		shouldShareToAccountProvider = function() -- line: 24
-			-- upvalues: p1 (copy)
-			return p1.ShareToAccountProvider or false
+		shouldShareToAccountProvider = function()
+			return data.ShareToAccountProvider or false
 		end,
-		shouldInviteFromAccountProvider = function() -- line: 27
-			-- upvalues: p1 (copy)
-			return p1.InviteFromAccountProvider or false
+		shouldInviteFromAccountProvider = function()
+			return data.InviteFromAccountProvider or false
 		end,
-		getShareToAccountProviderTimeout = function() -- line: 30
-			-- upvalues: p1 (copy)
-			return p1.ShareToAccountProviderTimeout or 5
+		getShareToAccountProviderTimeout = function()
+			return data.ShareToAccountProviderTimeout or 5
 		end
 	}
 end

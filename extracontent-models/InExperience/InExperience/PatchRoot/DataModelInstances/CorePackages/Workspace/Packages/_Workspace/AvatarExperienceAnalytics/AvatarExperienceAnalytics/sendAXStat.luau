@@ -1,76 +1,71 @@
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local Dash = require(Parent.Dash)
-local default = require(Parent.LoggingProtocol).default
+
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+
+local Dash = require(parent.Dash)
+local LoggingProtocol = require(parent.LoggingProtocol)
+local default = LoggingProtocol.default
+
 local AnalyticsService = require(script.Parent.AnalyticsService)
-local isSpatial = require(Parent.AppCommonLib).isSpatial
+local AppCommonLib = require(parent.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
 
-local function getAXStatMetadata(t1: {[any]: any}?) -- line: 16
-	-- upvalues: UserInputService (copy), isSpatial (copy), RunService (copy), HttpService (copy), Dash (copy)
-	local Platform = UserInputService:GetPlatform()
+local function getAXStatMetadata(items)
+	local platform = UserInputService:GetPlatform()
 
-	if isSpatial() then
-		Platform = "VR"
-	end
+	local platform2 = isSpatial() and "VR" or platform
 
-	local t2 = {
+	local v = {
 		AppVersion = RunService:GetRobloxVersion(),
 		UserAgent = HttpService:GetUserAgent(),
 		CoreScriptVersion = RunService:GetCoreScriptVersion(),
-		Platform = Platform
+		Platform = platform2
 	}
 
-	if t1 and next(t1) ~= nil then
-		t2 = Dash.assign({}, t2, t1)
+	if items and next(items) ~= nil then
+		return (Dash.assign({}, v, items))
 	end
 
-	return t2
+	return v
 end
-local function sendAXStat(t3: {[any]: any}) -- line: 46
-	-- upvalues: getAXStatMetadata (copy), default (copy), AnalyticsService (copy)
-	if not t3.excludeStat then
-		local t4 = {
-			description = "Stat to track Avatar Experience latency.",
-			links = "",
-			eventName = t3.statName,
-			backends = { "RobloxTelemetryStat" },
-			lastUpdated = {
-				2024,
-				11,
-				19
-			}
-		}
-		local v16 = getAXStatMetadata(t3.metaData)
 
-		default:logRobloxTelemetryStat(t4, t3.deltaMs, v16)
+local function sendAXStat(data)
+	if not data.excludeStat then
+		local v = {
+			eventName = data.statName,
+			backends = { "RobloxTelemetryStat" },
+			lastUpdated = { 2024, 11, 19 },
+			description = "Stat to track Avatar Experience latency.",
+			links = ""
+		}
+
+		local v2 = getAXStatMetadata(data.metaData)
+		default:logRobloxTelemetryStat(v, data.deltaMs, v2)
 	end
 
-	if not t3.excludeTelemetry then
-		local t5 = {
-			deltaMs = t3.deltaMs,
-			metricName = t3.statName
-		}
+	if not data.excludeTelemetry then
+		local v = { deltaMs = data.deltaMs, metricName = data.statName }
 
-		if t3.metaData then
-			t5.coldStart = t3.metaData.ColdStart
-			t5.category = t3.metaData.Category
-			t5.subcategory = t3.metaData.Subcategory
-			t5.page = t3.metaData.Page
-			t5.opaquePage = t3.metaData.OpaquePage
+		if data.metaData then
+			v.coldStart = data.metaData.ColdStart
+			v.category = data.metaData.Category
+			v.subcategory = data.metaData.Subcategory
+			v.page = data.metaData.Page
+			v.opaquePage = data.metaData.OpaquePage
 		end
 
-		local v18 = getAXStatMetadata()
+		local v2 = getAXStatMetadata()
+		v.appVersion = v2.AppVersion
+		v.userAgent = v2.UserAgent
+		v.coreScriptVersion = v2.CoreScriptVersion
+		v.platform = v2.Platform
 
-		t5.appVersion = v18.AppVersion
-		t5.userAgent = v18.UserAgent
-		t5.coreScriptVersion = v18.CoreScriptVersion
-		t5.platform = v18.Platform
+		local v3 = not data.customEventStreamSchemaName and "marketplacePerformanceMetric"
+			or data.customEventStreamSchemaName
 
-		local v19 = not t3.customEventStreamSchemaName and "marketplacePerformanceMetric" or t3.customEventStreamSchemaName
-
-		AnalyticsService.EventStream:sendEventDeferred(t3.statName, v19, t5)
+		AnalyticsService.EventStream:sendEventDeferred(data.statName, v3, v)
 	end
 end
 

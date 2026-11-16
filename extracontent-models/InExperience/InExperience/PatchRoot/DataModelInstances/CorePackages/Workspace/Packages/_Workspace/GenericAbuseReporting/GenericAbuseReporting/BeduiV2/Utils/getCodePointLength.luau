@@ -1,9 +1,9 @@
-local function getCodePointLength(s1: string) -- line: 1
-	if s1 == nil then
+local function getCodePointLength(value: string)
+	if value == nil then
 		return 0
 	end
 
-	return utf8.len(s1) or s1:len()
+	return utf8.len(value) or value:len()
 end
 
 return getCodePointLength

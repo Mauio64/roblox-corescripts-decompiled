@@ -1,34 +1,34 @@
-local Foundation = game:GetService("CorePackages").Packages._Index.Foundation.Foundation
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local useScreen = require(Foundation.Providers.Overlay.useScreen)
+local CorePackages = game:GetService("CorePackages")
+local foundation = CorePackages.Packages._Index.Foundation.Foundation
+local parent = foundation.Parent
+local React = require(parent.React)
 
-local function useScreenSize() -- line: 7
-	-- upvalues: useScreen (copy), React (copy)
-	local v6 = useScreen()
-	local v7, v8 = React.useState(v6 and v6.AbsoluteSize or Vector2.new(0, 0))
+local useScreen = require(foundation.Providers.Overlay.useScreen)
 
-	React.useLayoutEffect(function() -- line: 11
-		-- upvalues: v6 (copy), v8 (copy)
-		local connection = nil
+local function useScreenSize()
+	local v = useScreen()
+	local state, setState = React.useState(v and v.AbsoluteSize or Vector2.new(0, 0))
 
-		if v6 then
-			v8(v6.AbsoluteSize)
-			connection = v6:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 16
-				-- upvalues: v8 (copy), v6 (copy)
-				v8(v6.AbsoluteSize)
+	React.useLayoutEffect(function()
+		local absoluteSizeChangedConnection
+
+		if v then
+			setState(v.AbsoluteSize)
+			absoluteSizeChangedConnection = v:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				setState(v.AbsoluteSize)
 			end)
+		else
+			absoluteSizeChangedConnection = nil
 		end
 
-		return function() -- line: 21
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if absoluteSizeChangedConnection then
+				absoluteSizeChangedConnection:Disconnect()
 			end
 		end
-	end, { v6 })
+	end, { v })
 
-	return v7
+	return state
 end
 
 return useScreenSize

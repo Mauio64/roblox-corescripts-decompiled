@@ -1,109 +1,112 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local DataHydration = require(BuildExperienceParent.DataHydration)
-local React = require(BuildExperienceParent.React)
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local PlaceVersionHistory = require(BuildExperienceParent.DataHydration.PlaceVersionHistory)
-local GetVersionInformationStore = require(BuildExperience.Stores.GetVersionInformationStore)
+local parent = BuildExperience.Parent
 
+local DataHydration = require(parent.DataHydration)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local PlaceVersionHistory = require(parent.DataHydration.PlaceVersionHistory)
+
+local GetVersionInformationStore = require(BuildExperience.Stores.GetVersionInformationStore)
 require(script.Parent.VersionTitleDescriptionPageView)
 
 local DataStatus = DataHydration.DataStatus
 
-local function useVersionTitleDescriptionPageViewModel(t1: {[any]: any}) -- line: 22
-	-- upvalues: GetVersionInformationStore (copy), PlaceVersionHistory (copy), React (copy), SignalsReact (copy), DataStatus (copy)
-	local v11 = GetVersionInformationStore()
-	local v12 = PlaceVersionHistory.getPlaceVersionHistoryStore()
-	local v13 = React.useMemo(function() -- line: 25
-		-- upvalues: v12 (copy), t1 (copy)
-		return v12.getAndFetchHistory(t1.placeId)
-	end, {
-		t1.placeId,
-		v12
-	})
-	local v14 = SignalsReact.useSignalState(v13.data)
-	local v15 = SignalsReact.useSignalState(v13.status)
-	local v16 = SignalsReact.useSignalState(v11.getDraft)
-	local v17 = if v16 == nil or v16.placeId ~= t1.placeId then nil else v16
-	local v18 = if v14 == nil then nil else v14.placeVersions[1]
-	local v19 = if v18 == nil then nil else v18.title
-	local v20 = if v18 == nil then nil else v18.description
-	local v21 = if v17 == nil then v19 or "" else v17.title
-	local v22 = if v17 == nil then v20 or "" else v17.description
-	local v23 = v17 ~= nil or (v15 == DataStatus.Ready or v15 == DataStatus.Failed)
-	local v24, v25 = React.useBinding("")
-	local v26, v27 = React.useBinding("")
-	local v28 = React.useRef("")
-	local v29 = React.useRef("")
-	local v30, v31 = React.useState(nil)
+local function useVersionTitleDescriptionPageViewModel(data)
+	local versionInformationStore = GetVersionInformationStore()
+	local placeVersionHistoryStore = PlaceVersionHistory.getPlaceVersionHistoryStore()
+	local v = React.useMemo(function()
+		return placeVersionHistoryStore.fetchHistory(data.placeId)
+	end, { data.placeId, placeVersionHistoryStore })
+	local v2 = SignalsReact.useSignalState(v.data)
+	local v3 = SignalsReact.useSignalState(v.status)
+	local v4 = SignalsReact.useSignalState(versionInformationStore.getDraft)
 
-	React.useEffect(function() -- line: 48
-		-- upvalues: v23 (copy), v30 (copy), t1 (copy), v28 (copy), v21 (copy), v29 (copy), v22 (copy), v25 (copy), v27 (copy), v31 (copy)
-		if not v23 or v30 == t1.placeId then
+	if v4 == nil or v4.placeId ~= data.placeId then
+		v4 = nil
+	end
+
+	local v5
+
+	if v2 ~= nil then
+		v5 = v2.placeVersions[1]
+	end
+
+	local title
+
+	if v5 ~= nil then
+		title = v5.title
+	end
+
+	local description
+
+	if v5 ~= nil then
+		description = v5.description
+	end
+
+	local current = v4 == nil and (title or "") or v4.title
+	local current2 = v4 == nil and (description or "") or v4.description
+	local v6 = v3 == DataStatus.Ready or v3 == DataStatus.Failed
+	local v7 = v4 ~= nil or v6
+	local titleText, onTitleChanged = React.useBinding("")
+	local descriptionText, onDescriptionChanged = React.useBinding("")
+	local ref = React.useRef("")
+	local ref2 = React.useRef("")
+	local state, setState = React.useState(nil)
+
+	React.useEffect(function()
+		if not v7 then
 			return
 		end
 
-		v28.current = v21
-		v29.current = v22
-		v25(v21)
-		v27(v22)
-		v31(t1.placeId)
-	end, {
-		v22,
-		v21,
-		v30,
-		v23,
-		t1.placeId
-	})
+		local v8 = titleText:getValue() ~= ref.current or descriptionText:getValue() ~= ref2.current
 
-	local v32 = React.useCallback(function() -- line: 69
-		-- upvalues: v30 (copy), t1 (copy), v24 (copy), v26 (copy), v28 (copy), v29 (copy), v11 (copy)
-		if v30 ~= t1.placeId then
+		if state == data.placeId and v8 then
 			return
 		end
 
-		local v34 = v24:getValue()
-		local v35 = v26:getValue()
+		ref.current = current
+		ref2.current = current2
+		onTitleChanged(current)
+		onDescriptionChanged(current2)
+		setState(data.placeId)
+	end, { descriptionText, current2, current, state, v7, data.placeId, titleText })
 
-		if v34 == v28.current and v35 == v29.current then
+	local onFocusLost = React.useCallback(function()
+		if state ~= data.placeId then
 			return
 		end
 
-		v11.setDraft(t1.placeId, v34, v35)
-		v28.current = v34
-		v29.current = v35
-	end, {
-		v26,
-		v30,
-		t1.placeId,
-		v24,
-		v11
-	})
+		local current3 = titleText:getValue()
+		local current4 = descriptionText:getValue()
 
-	React.useEffect(function() -- line: 93
-		-- upvalues: v32 (copy)
-		return v32
-	end, { v32 })
+		if current3 == ref.current and current4 == ref2.current then
+			return
+		end
 
-	local v33 = React.useCallback(function() -- line: 97
-		-- upvalues: v32 (copy), t1 (copy)
-		v32()
-		t1.onBack()
-	end, {
-		t1.onBack,
-		v32
-	})
+		versionInformationStore.setDraft(data.placeId, current3, current4)
+		ref.current = current3
+		ref2.current = current4
+	end, { descriptionText, state, data.placeId, titleText, versionInformationStore })
+
+	React.useEffect(function()
+		return onFocusLost
+	end, { onFocusLost })
+
+	local onBack = React.useCallback(function()
+		onFocusLost()
+		data.onBack()
+	end, { data.onBack, onFocusLost })
 
 	return {
-		isReady = v30 == t1.placeId,
-		onBack = v33,
-		onDescriptionChanged = v27,
-		onFocusLost = v32,
-		onTitleChanged = v25,
-		titleText = v24,
-		descriptionText = v26,
-		layoutOrder = t1.layoutOrder,
-		testId = t1.testId
+		isReady = state == data.placeId,
+		onBack = onBack,
+		onDescriptionChanged = onDescriptionChanged,
+		onFocusLost = onFocusLost,
+		onTitleChanged = onTitleChanged,
+		titleText = titleText,
+		descriptionText = descriptionText,
+		layoutOrder = data.layoutOrder,
+		testId = data.testId
 	}
 end
 

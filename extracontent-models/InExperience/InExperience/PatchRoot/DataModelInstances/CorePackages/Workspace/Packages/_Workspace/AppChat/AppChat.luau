@@ -1,5 +1,4 @@
 local Analytics = require(script.Analytics)
-
 require(script.Contexts)
 
 return {

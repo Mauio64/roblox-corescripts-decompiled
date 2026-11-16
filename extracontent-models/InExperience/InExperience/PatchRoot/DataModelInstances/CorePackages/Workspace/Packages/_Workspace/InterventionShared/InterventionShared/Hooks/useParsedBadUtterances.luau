@@ -1,47 +1,67 @@
 local InterventionShared = script:FindFirstAncestor("InterventionShared")
-local InterventionSharedParent = InterventionShared.Parent
-local LocalPlayer = game:GetService("Players").LocalPlayer
-local Cryo = require(InterventionSharedParent.Cryo)
+local parent = InterventionShared.Parent
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local Cryo = require(parent.Cryo)
+
 local LocalizationService = game:GetService("LocalizationService")
-local v6 = require(InterventionSharedParent.RobloxAppLocales).Localization.new(LocalizationService.RobloxLocaleId)
-local useLocalization = require(InterventionSharedParent.Localization).Hooks.useLocalization
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local localization = RobloxAppLocales.Localization.new(LocalizationService.RobloxLocaleId)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
 require(InterventionShared.Utils.Types)
 
-local function useParsedBadUtterances(t1: {[any]: any}, s1: string?) -- line: 40
-	-- upvalues: LocalPlayer (copy), v6 (copy), useLocalization (copy), Cryo (copy)
-	local t2 = {}
-	local t3 = {}
+local function useParsedBadUtterances(items, p)
+	local labelTranslationKey
 
-	if s1 and s1 ~= "" then
-		t3[s1] = "Feature.NotApproved." .. s1
+	if p then
+		labelTranslationKey = p.labelTranslationKey
 	end
 
-	for _, v14 in t1 do
-		local utteranceText = v14.utteranceText
+	local shouldAddPlayerName
 
-		table.insert(t2, if not LocalPlayer then utteranceText else v6:Format("Feature.InExperienceIntervention.Label.Player", {
-			username = LocalPlayer.Name,
-			evidence = utteranceText
-		}))
-		t3[v14.labelTranslationKey] = "Feature.NotApproved." .. v14.labelTranslationKey
+	if p then
+		shouldAddPlayerName = p.shouldAddPlayerName
 	end
 
-	local v16 = useLocalization(t3)
-	local t4 = {}
+	local v = {}
+	local v2 = {}
 
-	for v18, _ in t3 do
-		local v20 = v16[v18]
+	if labelTranslationKey and labelTranslationKey ~= "" then
+		v2[labelTranslationKey] = "Feature.NotApproved." .. labelTranslationKey
+	end
 
-		if v20 and v20 ~= "" then
-			t4[v20] = true
+	for _, item in items do
+		local evidence = item.utteranceText
+
+		if LocalPlayer and shouldAddPlayerName then
+			evidence = localization:Format("Feature.InExperienceIntervention.Label.Player", {
+				username = LocalPlayer.Name,
+				evidence = evidence
+			})
+		end
+
+		table.insert(v, evidence)
+
+		v2[item.labelTranslationKey] = "Feature.NotApproved." .. item.labelTranslationKey
+	end
+
+	local v3 = useLocalization(v2)
+
+	local set = {}
+
+	for k, _ in v2 do
+		local v4 = v3[k]
+
+		if v4 and v4 ~= "" then
+			set[v4] = true
 		end
 	end
 
-	return {
-		textItems = Cryo.List.reverse(t2),
-		abuseTypes = Cryo.Dictionary.keys(t4)
-	}
+	return { textItems = Cryo.List.reverse(v), abuseTypes = Cryo.Dictionary.keys(set) }
 end
 
 return useParsedBadUtterances

@@ -1,14 +1,13 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
-local t = require(Parent.t)
+local parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
+local t = require(parent.t)
 local RouteInfo = require(script.Parent.RouteInfo)
-
 require(script.Parent.Types)
 
-local t1 = {}
+local AvatarRoute = {}
+AvatarRoute.__index = AvatarRoute
+AvatarRoute.maxPreviousCount = 2
 
-t1.__index = t1
-t1.maxPreviousCount = 2
-t1.Interface = t.strictInterface({
+AvatarRoute.Interface = t.strictInterface({
 	current = RouteInfo.Interface,
 	previousPages = t.optional(t.array(RouteInfo.Interface)),
 	opaque = RouteInfo.Interface,
@@ -16,41 +15,45 @@ t1.Interface = t.strictInterface({
 	isOverlayVisible = t.boolean
 })
 
-function t1.new(p1) -- line: 40
-	-- upvalues: RouteInfo (copy), t1 (copy)
-	local t2 = {
-		current = p1.current or RouteInfo.EMPTY,
-		previousPages = p1.previousPages or {},
-		opaque = p1.opaque or RouteInfo.EMPTY,
-		isVisible = p1.isVisible or false,
-		isOverlayVisible = p1.isOverlayVisible or false
+function AvatarRoute.new(data)
+	local v = {
+		current = data.current or RouteInfo.EMPTY,
+		previousPages = data.previousPages or {},
+		opaque = data.opaque or RouteInfo.EMPTY,
+		isVisible = data.isVisible or false,
+		isOverlayVisible = data.isOverlayVisible or false
 	}
 
-	setmetatable(t2, t1)
-
-	return t2
+	setmetatable(v, AvatarRoute)
+	return v
 end
-function t1.__tostring(p2) -- line: 52
-	local current = p2.current
-	local opaque = p2.opaque
-	local v10 = (("AvatarRoute[" .. (not p2.isVisible and "Not Visible" or "Visible")) .. (not p2.isOverlayVisible and "" or " *Overlay")) .. ", " .. tostring(current)
+
+function AvatarRoute.__tostring(data)
+	local current = data.current
+	local opaque = data.opaque
+
+	local v = (("AvatarRoute[" .. (data.isVisible and "Visible" or "Not Visible")) .. (data.isOverlayVisible and " *Overlay" or "")) .. ", " .. tostring(current)
 
 	if current.name ~= opaque.name then
-		v10 ..= ", opaque: " .. tostring(opaque)
+		v ..= ", opaque: " .. tostring(opaque)
 	end
 
-	return v10 .. "]"
+	return v .. "]"
 end
-function t1.__eq(p3, p4) -- line: 67
-	if not p3 or not p4 then
+
+function AvatarRoute.__eq(data, data2): boolean
+	if not (data and data2) then
 		return false
 	end
 
-	if rawequal(p3, p4) then
+	if rawequal(data, data2) then
 		return true
 	end
 
-	return p3.isVisible == p4.isVisible and (p3.isOverlayVisible == p4.isOverlayVisible and (p3.current == p4.current and p3.opaque == p4.opaque))
+	return data.isVisible == data2.isVisible
+		and data.isOverlayVisible == data2.isOverlayVisible
+		and data.current == data2.current
+		and data.opaque == data2.opaque
 end
 
-return t1
+return AvatarRoute

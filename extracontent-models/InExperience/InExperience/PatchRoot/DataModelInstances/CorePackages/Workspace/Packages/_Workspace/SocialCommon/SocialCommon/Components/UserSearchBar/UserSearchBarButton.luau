@@ -1,37 +1,48 @@
 local SocialCommon = script:FindFirstAncestor("SocialCommon")
-local SocialCommonParent = SocialCommon.Parent
-local React = require(SocialCommonParent.React)
-local UIBlox = require(SocialCommonParent.UIBlox)
-local RoactUtils = require(SocialCommonParent.RoactUtils)
-local Localization = require(SocialCommonParent.Localization)
+local parent = SocialCommon.Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local RoactUtils = require(parent.RoactUtils)
+local Localization = require(parent.Localization)
+
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local useLocalization = Localization.Hooks.useLocalization
 local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
 local getPageMargin = UIBlox.App.Container.getPageMargin
 local useIsWideMode = require(SocialCommon.Hooks.useIsWideMode)
 local UserSearchBar = require(SocialCommon.Components.UserSearchBar.UserSearchBar)
-local FFlagCreateConnectionsHub = require(SocialCommonParent.SharedFlags).FFlagCreateConnectionsHub
 
-return function(p1) -- line: 31
-	-- upvalues: useIsWideMode (copy), useSelector (copy), getPageMargin (copy), useLocalization (copy), React (copy), ImageSetButton (copy), FFlagCreateConnectionsHub (copy), UserSearchBar (copy)
-	local v15 = useIsWideMode()
-	local v16 = useSelector(function(p2) -- line: 35
+local SharedFlags = require(parent.SharedFlags)
+local FFlagCreateConnectionsHub = SharedFlags.FFlagCreateConnectionsHub
+
+return function(p)
+	local v = useIsWideMode()
+	local pageMargin = getPageMargin(useSelector(function(p2)
 		return p2.ScreenSize
-	end)
-	local v17 = getPageMargin(v16.X)
-	local v18 = useLocalization({
-		searchPlaceholderText = "Feature.AddFriends.Label.InputPlaceholder.SearchForPeople"
+	end).X)
+	local v2 = useLocalization({
+		searchPlaceholderText = "Feature.AddFriends.Label.InputPlaceholder.SearchForPeopleAltCapitalization"
 	})
 
-	return React.createElement(ImageSetButton, {
+	local createElement = React.createElement
+	local size
+
+	if v then
+		size = UDim2.fromOffset(400, 48)
+	else
+		size = UDim2.new(1, FFlagCreateConnectionsHub and 0 or -2 * pageMargin, 0, 48)
+	end
+
+	return createElement(ImageSetButton, {
 		BackgroundTransparency = 1,
-		Size = if not v15 then UDim2.new(1, if not FFlagCreateConnectionsHub then -2 * v17 else 0, 0, 48) else UDim2.fromOffset(400, 48),
-		Position = UDim2.new(0, if not FFlagCreateConnectionsHub then v17 else 0, 0, 0),
-		[React.Event.Activated] = p1.onActivated
+		Size = size,
+		Position = UDim2.new(0, FFlagCreateConnectionsHub and 0 or pageMargin, 0, 0),
+		[React.Event.Activated] = p.onActivated
 	}, {
 		SearchBar = React.createElement(UserSearchBar, {
 			isDisabled = true,
-			searchPlaceholderText = v18.searchPlaceholderText
+			searchPlaceholderText = v2.searchPlaceholderText
 		})
 	})
 end

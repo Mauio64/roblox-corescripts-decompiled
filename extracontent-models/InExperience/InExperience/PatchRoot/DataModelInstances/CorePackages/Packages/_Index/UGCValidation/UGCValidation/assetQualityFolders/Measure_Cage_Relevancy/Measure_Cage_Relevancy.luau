@@ -1,36 +1,41 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-require(ParentParent.util.Types)
+local getFFlagUGCValidateAQScoreWarnings = require(parent.flags.getFFlagUGCValidateAQScoreWarnings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateAQScoreWarnings = require(ParentParent.flags.getFFlagUGCValidateAQScoreWarnings)
-local v5 = game:DefineFastInt("UGCMinCageRelevancyThreshold", 40)
+local defineFastInt = game:DefineFastInt("UGCMinCageRelevancyThreshold", 10)
 
 return {
-	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING },
-	fflag = require(ParentParent.flags.getFFlagUGCValidateAQCageQualityLC),
-	run = function(p1, p2) -- line: 15
-		-- upvalues: v5 (copy), ErrorSourceStrings (copy), getFFlagUGCValidateAQScoreWarnings (copy)
-		local Handle_OuterCage = p2.aqsSummaryData.Measure_Cage_Relevancy.Handle_OuterCage
-		local v9 = Handle_OuterCage and tonumber(Handle_OuterCage.outer_cage_face_relevant_percent)
+	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING, ValidationEnums.UploadCategory.EYEBROW_EYELASH },
+	["fflag"] = require(parent.flags.getFFlagUGCValidateAQCageQualityLC),
+	run = function(object, p)
+		local handle_OuterCage = p.aqsSummaryData.Measure_Cage_Relevancy.Handle_OuterCage
+		local outer_cage_face_relevant_percent = handle_OuterCage
+			and tonumber(handle_OuterCage.outer_cage_face_relevant_percent)
 
-		if v9 == nil then
+		if outer_cage_face_relevant_percent == nil then
 			error("Measure_Cage_Relevancy: AQS summary missing required fields")
-
 			return
 		end
 
-		if v9 * 100 < v5 then
-			p1:fail(ErrorSourceStrings.Keys.MeasureCageRelevancy, {
-				outer_cage_face_irrelevant_percent = string.format("%.2f", 100 - v9 * 100)
+		if outer_cage_face_relevant_percent * 100 < defineFastInt then
+			object:fail(ErrorSourceStrings.Keys.MeasureCageRelevancy, {
+				outer_cage_face_irrelevant_percent = string.format("%.2f", 100 - outer_cage_face_relevant_percent * 100)
 			})
 		end
 
-		if getFFlagUGCValidateAQScoreWarnings() and Handle_OuterCage.score ~= nil and tonumber(Handle_OuterCage.score) ~= 100 then
-			p1:warn(ErrorSourceStrings.Keys.AQSWarn_CageRelevancy, {
-				score = tostring((math.floor(tonumber(Handle_OuterCage.score) or 0))),
-				irrelevant_percent = string.format("%.2f", 100 - (tonumber(Handle_OuterCage.outer_cage_face_relevant_percent) or 0) * 100)
+		if
+			getFFlagUGCValidateAQScoreWarnings()
+			and handle_OuterCage.score ~= nil
+			and tonumber(handle_OuterCage.score) ~= 100
+		then
+			object:warn(ErrorSourceStrings.Keys.AQSWarn_CageRelevancy, {
+				irrelevant_percent = string.format(
+					"%.2f",
+					100 - (tonumber(handle_OuterCage.outer_cage_face_relevant_percent) or 0) * 100
+				)
 			})
 		end
 	end

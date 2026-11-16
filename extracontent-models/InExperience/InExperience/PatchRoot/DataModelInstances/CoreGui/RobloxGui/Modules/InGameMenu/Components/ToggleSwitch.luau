@@ -1,25 +1,44 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local Otter = InGameMenuDependencies.Otter
 local t = InGameMenuDependencies.t
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
-local Foundation = require(CorePackages.Packages.Foundation)
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
-local v11 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
-local ParentParent = script.Parent.Parent
-local divideTransparency = require(ParentParent.Utility.divideTransparency)
-local AssetImage = require(script.Parent.AssetImage)
-local uDim2 = UDim2.new(0, -3, 0.5, 0)
-local uDim2_2 = UDim2.new(1, -39, 0.5, 0)
-local t1 = {
-	frequency = 4
-}
-local v18 = Roact.PureComponent:extend("ToggleSwitch")
 
-v18.validateProps = t.strictInterface({
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
+local Foundation = require(CorePackages.Packages.Foundation)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+local v
+
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v = Foundation.UNSTABLE.withCursorMigration
+else
+	v = UIBlox.App.SelectionImage.withSelectionCursorProvider
+end
+
+local v2
+
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v2 = Foundation.Enums.CursorType
+else
+	v2 = UIBlox.App.SelectionImage.CursorKind
+end
+
+local parent = script.Parent.Parent
+
+local divideTransparency = require(parent.Utility.divideTransparency)
+
+local AssetImage = require(script.Parent.AssetImage)
+
+local udim = UDim2.new(0, -3, 0.5, 0)
+local udim2 = UDim2.new(1, -39, 0.5, 0)
+local v3 = { frequency = 4 }
+
+local extended = Roact.PureComponent:extend("ToggleSwitch")
+extended.validateProps = t.strictInterface({
 	checked = t.boolean,
 	onToggled = t.callback,
 	disabled = t.optional(t.boolean),
@@ -32,91 +51,91 @@ v18.validateProps = t.strictInterface({
 	onSelectionGained = t.optional(t.callback)
 })
 
-function v18.init(p1) -- line: 49
-	-- upvalues: Roact (copy), divideTransparency (copy), uDim2 (copy), uDim2_2 (copy), Otter (copy)
-	local v20 = not p1.props.checked and 0 or 1
-	local v21, v22 = Roact.createBinding(v20)
+function extended:init()
+	local v4 = self.props.checked and 1 or 0
+	local binding, setProgress = Roact.createBinding(v4)
+	self.progress = binding
+	self.setProgress = setProgress
 
-	p1.progress = v21
-	p1.setProgress = v22
-	p1.fillTransparency = p1.progress:map(function(p2) -- line: 53
-		-- upvalues: divideTransparency (copy), p1 (copy)
-		return divideTransparency(1 - p2, not p1.props.disabled and 1 or 4)
+	self.fillTransparency = self.progress:map(function(p)
+		return divideTransparency(1 - p, self.props.disabled and 4 or 1)
 	end)
-	p1.knobPosition = p1.progress:map(function(p3) -- line: 57
-		-- upvalues: uDim2 (copy), uDim2_2 (copy)
-		return uDim2:lerp(uDim2_2, p3)
+
+	self.knobPosition = self.progress:map(function(p)
+		return udim:lerp(udim2, p)
 	end)
-	p1.motor = Otter.createSingleMotor(v20)
-	p1.motor:onStep(p1.setProgress)
+
+	self.motor = Otter.createSingleMotor(v4)
+	self.motor:onStep(self.setProgress)
 end
-function v18.renderWithSelectionCursor(p4, p5) -- line: 65
-	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), AssetImage (copy), divideTransparency (copy), v11 (copy)
-	return withFoundationOrUIBloxStyle(function(p6) -- line: 66
+
+function extended:renderWithSelectionCursor(callback)
+	return withFoundationOrUIBloxStyle(function(p)
 		return {
 			Theme = {
 				SecondaryDefault = {
-					Color = p6.Color.Extended.White.White_70.Color3,
-					Transparency = p6.Color.Extended.White.White_70.Transparency
+					Color = p.Color.Extended.White.White_70.Color3,
+					Transparency = p.Color.Extended.White.White_70.Transparency
 				},
 				Success = {
-					Color = p6.Color.System.Success.Color3,
-					Transparency = p6.Color.System.Success.Transparency
+					Color = p.Color.System.Success.Color3,
+					Transparency = p.Color.System.Success.Transparency
 				}
 			}
 		}
-	end, function(p7) -- line: 73
-		-- upvalues: Roact (copy), AssetImage (copy), p4 (copy), divideTransparency (copy), p5 (copy), v11 (copy)
+	end, function(p)
 		return Roact.createElement(AssetImage.Button, {
 			Size = UDim2.new(0, 60, 0, 36),
 			BackgroundTransparency = 1,
-			Position = p4.props.Position,
-			LayoutOrder = p4.props.LayoutOrder,
+			Position = self.props.Position,
+			LayoutOrder = self.props.LayoutOrder,
 			imageKey = "ToggleOutline",
-			AnchorPoint = p4.props.AnchorPoint,
-			ImageColor3 = p7.Theme.SecondaryDefault.Color,
-			ImageTransparency = divideTransparency(p7.Theme.SecondaryDefault.Transparency, not p4.props.disabled and 1 or 4),
-			NextSelectionUp = p4.props.NextSelectionUp,
-			[Roact.Event.Activated] = p4.props.onToggled,
-			[Roact.Ref] = p4.props.buttonRef,
-			[Roact.Event.SelectionLost] = p4.props.onSelectionLost,
-			[Roact.Event.SelectionGained] = p4.props.onSelectionGained,
-			SelectionImageObject = p5(v11.Toggle)
+			AnchorPoint = self.props.AnchorPoint,
+			ImageColor3 = p.Theme.SecondaryDefault.Color,
+			ImageTransparency = divideTransparency(
+				p.Theme.SecondaryDefault.Transparency,
+				self.props.disabled and 4 or 1
+			),
+			NextSelectionUp = self.props.NextSelectionUp,
+			[Roact.Event.Activated] = self.props.onToggled,
+			[Roact.Ref] = self.props.buttonRef,
+			[Roact.Event.SelectionLost] = self.props.onSelectionLost,
+			[Roact.Event.SelectionGained] = self.props.onSelectionGained,
+			SelectionImageObject = callback(v2.Toggle)
 		}, {
 			Fill = Roact.createElement(AssetImage.Label, {
 				BackgroundTransparency = 1,
-				imageKey = "ToggleFill",
 				Size = UDim2.new(1, 0, 1, 0),
-				ImageColor3 = p7.Theme.Success.Color,
-				ImageTransparency = p4.fillTransparency
+				imageKey = "ToggleFill",
+				ImageColor3 = p.Theme.Success.Color,
+				ImageTransparency = self.fillTransparency
 			}),
 			Knob = Roact.createElement(AssetImage.Label, {
 				BackgroundTransparency = 1,
-				imageKey = "ToggleKnob",
-				ZIndex = 2,
 				Size = UDim2.new(0, 42, 0, 42),
 				AnchorPoint = Vector2.new(0, 0.5),
-				Position = p4.knobPosition,
-				ImageTransparency = divideTransparency(0, not p4.props.disabled and 1 or 4)
+				Position = self.knobPosition,
+				imageKey = "ToggleKnob",
+				ImageTransparency = divideTransparency(0, self.props.disabled and 4 or 1),
+				ZIndex = 2
 			})
 		})
 	end)
 end
-function v18.render(p8) -- line: 113
-	-- upvalues: v10 (copy)
-	return v10(function(p9) -- line: 114
-		-- upvalues: p8 (copy)
-		return p8:renderWithSelectionCursor(p9)
+
+function extended:render()
+	return v(function(p)
+		return self:renderWithSelectionCursor(p)
 	end)
 end
-function v18.didUpdate(p10) -- line: 119
-	-- upvalues: Otter (copy), t1 (copy)
-	local v27 = not p10.props.checked and 0 or 1
 
-	p10.motor:setGoal(Otter.spring(v27, t1))
-end
-function v18.willUnmount(p11) -- line: 124
-	p11.motor:destroy()
+function extended.didUpdate(p)
+	local v4 = p.props.checked and 1 or 0
+	p.motor:setGoal(Otter.spring(v4, v3))
 end
 
-return v18
+function extended.willUnmount(p)
+	p.motor:destroy()
+end
+
+return extended

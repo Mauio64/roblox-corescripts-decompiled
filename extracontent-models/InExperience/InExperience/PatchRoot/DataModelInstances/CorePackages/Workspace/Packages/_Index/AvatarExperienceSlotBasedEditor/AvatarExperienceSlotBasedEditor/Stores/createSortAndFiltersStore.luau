@@ -1,48 +1,50 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+
+local Signals = require(parent.Signals)
+
 local InventoryFilters = require(script.Parent.Parent.Enums.InventoryFilters)
 local InventorySorts = require(script.Parent.Parent.Enums.InventorySorts)
+
 local FFlagAXInventoryDurablesExpiredFilter = AvatarExperienceFlags.FFlagAXInventoryDurablesExpiredFilter
 
-local function createSortAndFiltersStore() -- line: 36
-	-- upvalues: Signals (copy), FFlagAXInventoryDurablesExpiredFilter (copy), InventoryFilters (copy), InventorySorts (copy)
-	local v8, v9 = Signals.createSignal(if not FFlagAXInventoryDurablesExpiredFilter then {
-		sort = InventorySorts.Newest
-	} else {
-		filter = InventoryFilters.Active,
-		sort = InventorySorts.Newest
-	})
-	local v10 = Signals.createComputed(function(p1) -- line: 42
-		-- upvalues: FFlagAXInventoryDurablesExpiredFilter (copy), v8 (copy), InventorySorts (copy), InventoryFilters (copy)
-		if FFlagAXInventoryDurablesExpiredFilter then
-			local v12 = v8(p1)
-			local n1 = 0
+local function createSortAndFiltersStore()
+	local createSignal = Signals.createSignal
+	local v
 
-			if v12.sort ~= InventorySorts.Newest then
-				n1 += 1
-			end
+	if FFlagAXInventoryDurablesExpiredFilter then
+		v = { filter = InventoryFilters.Active, sort = InventorySorts.Newest }
+	else
+		v = { sort = InventorySorts.Newest }
+	end
 
-			if v12.filter ~= InventoryFilters.Active then
-				n1 += 1
-			end
-
-			return n1
-		end
-
-		if v8(p1).sort == InventorySorts.Newest then
-			return 0
-		end
-
-		return 1
-	end)
+	local signal, v2 = createSignal(v)
 
 	return {
-		getSortAndFilters = v8,
-		getFiltersCount = v10,
-		applySortAndFilters = function(t1: {[any]: any}) -- line: 58
-			-- upvalues: v9 (copy)
-			v9(t1)
+		getSortAndFilters = signal,
+		getFiltersCount = Signals.createComputed(function(p)
+			if FFlagAXInventoryDurablesExpiredFilter then
+				local v3 = signal(p)
+				local count = 0
+
+				if v3.sort ~= InventorySorts.Newest then
+					count += 1
+				end
+
+				if v3.filter ~= InventoryFilters.Active then
+					count += 1
+				end
+
+				return count
+			elseif signal(p).sort == InventorySorts.Newest then
+				return 0
+			else
+				return 1
+			end
+		end),
+		applySortAndFilters = function(p)
+			v2(p)
 		end
 	}
 end

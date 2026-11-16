@@ -2,8 +2,8 @@ local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
 
 require(BulkPurchaseApp.Store.Types)
 
-local function selectOrderRequest(p1) -- line: 8
-	return p1.orderRequest
+local function selectOrderRequest(p)
+	return p.orderRequest
 end
 
 return selectOrderRequest

@@ -1,55 +1,57 @@
 game:GetService("ScriptContext")
-
 local HttpService = game:GetService("HttpService")
+
 local Signal = require(script.Parent.Parent.Parent.Signal)
+
 local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
-local t1 = {}
 
-t1.__index = t1
+local LuauHeapData = {}
+LuauHeapData.__index = LuauHeapData
 
-function t1.new() -- line: 13
-	-- upvalues: t1 (copy), Signal (copy)
-	local t2 = {}
+function LuauHeapData.new()
+	local v = {}
+	setmetatable(v, LuauHeapData)
 
-	setmetatable(t2, t1)
-	t2._serverStatsUpdated = Signal.new()
-	t2._serverStatsData = {}
-	t2._isRunning = false
-
-	return t2
+	v._serverStatsUpdated = Signal.new()
+	v._serverStatsData = {}
+	v._isRunning = false
+	return v
 end
-function t1.Signal(p1) -- line: 23
-	return p1._serverStatsUpdated
-end
-function t1.getCurrentData(p2) -- line: 27
-	return p2._serverStatsData
-end
-function t1.isRunning(p3) -- line: 31
-	return p3._isRunning
-end
-function t1.start(p4) -- line: 35
-	-- upvalues: getClientReplicator (copy), HttpService (copy)
-	local v10 = getClientReplicator()
 
-	if v10 and not p4._statsListenerConnection then
-		p4._statsListenerConnection = v10.StatsReceived:connect(function(p5) -- line: 38
-			-- upvalues: p4 (copy), HttpService (copy)
-			if p5 and (p5.ServerLuauHeapData and #p5.ServerLuauHeapData > 0) then
-				p4._serverStatsData = HttpService:JSONDecode(p5.ServerLuauHeapData)
-				p4._serverStatsUpdated:Fire(p4._serverStatsData)
+function LuauHeapData:Signal()
+	return self._serverStatsUpdated
+end
+
+function LuauHeapData:getCurrentData()
+	return self._serverStatsData
+end
+
+function LuauHeapData:isRunning()
+	return self._isRunning
+end
+
+function LuauHeapData:start()
+	local clientReplicator = getClientReplicator()
+
+	if clientReplicator and not self._statsListenerConnection then
+		self._statsListenerConnection = clientReplicator.StatsReceived:connect(function(p)
+			if p and p.ServerLuauHeapData and #p.ServerLuauHeapData > 0 then
+				self._serverStatsData = HttpService:JSONDecode(p.ServerLuauHeapData)
+				self._serverStatsUpdated:Fire(self._serverStatsData)
 			end
 		end)
-		v10:RequestServerStats(true)
-		p4._isRunning = true
+		clientReplicator:RequestServerStats(true)
+		self._isRunning = true
 	end
 end
-function t1.stop(p6) -- line: 49
-	if p6._statsListenerConnection then
-		p6._statsListenerConnection:Disconnect()
-		p6._statsListenerConnection = nil
+
+function LuauHeapData:stop()
+	if self._statsListenerConnection then
+		self._statsListenerConnection:Disconnect()
+		self._statsListenerConnection = nil
 	end
 
-	p6._isRunning = false
+	self._isRunning = false
 end
 
-return t1
+return LuauHeapData

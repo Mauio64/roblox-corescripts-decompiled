@@ -1,5 +1,5 @@
-local function getItemCountForRow(n1: number, n2: number) -- line: 1
-	return (math.floor(n1 / math.max(1, n2)))
+local function getItemCountForRow(p: number, p2: number)
+	return (math.floor(p / math.max(1, p2)))
 end
 
 return getItemCountForRow

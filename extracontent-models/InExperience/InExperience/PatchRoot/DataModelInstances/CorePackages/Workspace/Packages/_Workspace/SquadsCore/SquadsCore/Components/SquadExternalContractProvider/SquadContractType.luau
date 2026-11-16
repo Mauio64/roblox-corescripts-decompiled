@@ -1,8 +1,9 @@
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
+local parent = SquadsCore.Parent
 
 require(SquadsCore.Enums.SquadRootViewType)
 require(SquadsCore.Enums.SquadExperienceInviteSource)
-require(SquadsCoreParent.LuauPolyfill)
+
+require(parent.LuauPolyfill)
 
 return nil

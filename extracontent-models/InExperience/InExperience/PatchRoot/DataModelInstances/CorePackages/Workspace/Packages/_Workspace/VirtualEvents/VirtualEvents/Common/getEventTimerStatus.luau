@@ -2,32 +2,25 @@ local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
 
 require(VirtualEvents.Parent.GraphQLServer)
 require(VirtualEvents.Parent.VirtualEventsState)
-
 local getVirtualEventDates = require(VirtualEvents.Common.getVirtualEventDates)
 
-local function getEventTimerStatus(p1, p2) -- line: 11
-	-- upvalues: getVirtualEventDates (copy)
-	local v6 = getVirtualEventDates(p1)
-	local v7 = v6.startDate.UnixTimestamp - p2.UnixTimestamp
-	local v8 = v6.endDate.UnixTimestamp - p2.UnixTimestamp
+local function getEventTimerStatus(p, p2): string
+	local virtualEventDates = getVirtualEventDates(p)
 
-	if p2.UnixTimestamp >= v6.startDate.UnixTimestamp then
-		if p2.UnixTimestamp < v6.endDate.UnixTimestamp then
-			if v8 <= 14400 then
-				return "ElapsedImminent"
-			end
+	local v = virtualEventDates.startDate.UnixTimestamp - p2.UnixTimestamp
+	local v2 = virtualEventDates.endDate.UnixTimestamp - p2.UnixTimestamp
 
-			return "Ongoing"
+	if p2.UnixTimestamp >= virtualEventDates.startDate.UnixTimestamp then
+		if p2.UnixTimestamp < virtualEventDates.endDate.UnixTimestamp then
+			return if v2 <= 14400 then "ElapsedImminent" else "Ongoing"
 		end
 
 		return "Elapsed"
-	end
-
-	if v7 > 0 and v7 <= 14400 then
+	elseif v > 0 and v <= 14400 then
 		return "UpcomingImminent"
+	else
+		return "Upcoming"
 	end
-
-	return "Upcoming"
 end
 
 return getEventTimerStatus

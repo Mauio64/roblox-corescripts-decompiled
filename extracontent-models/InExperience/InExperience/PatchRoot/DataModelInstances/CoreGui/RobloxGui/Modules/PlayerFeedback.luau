@@ -1,7 +1,11 @@
 local CorePackages = game:GetService("CorePackages")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
-local v3 = require(CorePackages.Workspace.Packages.CoreScriptsPlayerFeedback).createApp()
+local CoreGui = game:GetService("CoreGui")
 
-v3.instance.Parent = RobloxGui
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 
-return v3
+local CoreScriptsPlayerFeedback = require(CorePackages.Workspace.Packages.CoreScriptsPlayerFeedback)
+
+local app = CoreScriptsPlayerFeedback.createApp()
+app.instance.Parent = RobloxGui
+
+return app

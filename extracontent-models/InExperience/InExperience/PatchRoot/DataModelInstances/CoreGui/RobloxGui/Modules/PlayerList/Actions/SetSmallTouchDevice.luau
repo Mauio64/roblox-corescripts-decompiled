@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetSmallTouchDevice", function(p1) -- line: 5
-	return {
-		isSmallTouchDevice = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetSmallTouchDevice", function(isSmallTouchDevice)
+	return { isSmallTouchDevice = isSmallTouchDevice }
 end)

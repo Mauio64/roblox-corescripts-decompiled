@@ -1,26 +1,24 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local Promise = require(Parent.Promise)
-local t1 = {}
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Promise = require(parent.Promise)
 
-t1.__index = t1
+local Timer = {}
+Timer.__index = Timer
 
-function t1.new(p1) -- line: 7
-	-- upvalues: t1 (copy)
-	return (setmetatable({
-		goalTime = p1
-	}, t1))
+function Timer.new(goalTime)
+	return (setmetatable({ goalTime = goalTime }, Timer))
 end
-function t1.start(p2) -- line: 15
-	-- upvalues: Promise (copy)
-	p2:stop()
-	p2.promise = Promise.delay(p2.goalTime)
 
-	return p2.promise
+function Timer:start()
+	self:stop()
+
+	self.promise = Promise.delay(self.goalTime)
+	return self.promise
 end
-function t1.stop(p3) -- line: 24
-	if p3.promise then
-		p3.promise:cancel()
+
+function Timer:stop()
+	if self.promise then
+		self.promise:cancel()
 	end
 end
 
-return t1
+return Timer

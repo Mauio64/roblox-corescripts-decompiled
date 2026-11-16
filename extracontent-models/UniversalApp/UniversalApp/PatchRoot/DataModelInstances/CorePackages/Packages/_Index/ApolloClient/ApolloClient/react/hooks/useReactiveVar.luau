@@ -1,35 +1,31 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
+local UseReactiveVar = {}
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
 local useEffect = React.useEffect
 local useState = React.useState
 
-require(ParentParent.cache)
+require(parent.cache)
 
-local t2 = {
-	__value = "nil placeholder"
-}
+local v = { __value = "nil placeholder" }
 
-function t1.useReactiveVar(p1) -- line: 25
-	-- upvalues: useState (copy), useEffect (copy), t2 (copy)
-	local v9 = p1()
-	local _, v11 = useState(v9)
+function UseReactiveVar.useReactiveVar(callback)
+	local v2 = callback()
 
-	useEffect(function() -- line: 34
-		-- upvalues: p1 (copy), v9 (copy), v11 (copy)
-		local v12 = p1()
+	local _, setState = useState(v2)
 
-		if v12 ~= v9 then
-			v11(v12)
+	useEffect(function()
+		local v3 = callback()
 
-			return
+		if v2 == v3 then
+			return callback:onNextChange(setState)
 		end
 
-		return p1:onNextChange(v11)
-	end, { v9 or t2 })
+		setState(v3)
+	end, { v2 or v })
 
-	return v9
+	return v2
 end
 
-return t1
+return UseReactiveVar

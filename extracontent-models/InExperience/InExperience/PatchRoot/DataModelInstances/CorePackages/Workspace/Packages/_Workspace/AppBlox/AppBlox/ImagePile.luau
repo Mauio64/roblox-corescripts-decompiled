@@ -1,99 +1,102 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Cryo = require(Parent.Cryo)
-local Logger = require(Parent.Loggers).Logger
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local Cryo = require(parent.Cryo)
+local Loggers = require(parent.Loggers)
+local Logger = Loggers.Logger
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+
 local Core = UIBlox.Core
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local useStyle = Core.Style.useStyle
-local v9 = Logger:new(script.Name)
 
-local function ImagePile(t1: {[any]: any}) -- line: 22
-	-- upvalues: useStyle (copy), React (copy), Cryo (copy), v9 (copy), ImageSetLabel (copy)
-	local Tokens = useStyle().Tokens
-	local v13 = React.useMemo(function() -- line: 26
-		-- upvalues: Tokens (copy)
+local v = Logger:new(script.Name)
+
+local function ImagePile(p)
+	local tokens = useStyle().Tokens
+
+	local v2 = React.useMemo(function()
 		return {
-			imageBorderColor = Tokens.Color.Extended.White.White_100.Color3,
-			imageBorderThickness = Tokens.Size.Size_50
+			imageBorderColor = tokens.Color.Extended.White.White_100.Color3,
+			imageBorderThickness = tokens.Size.Size_50
 		}
-	end, { Tokens })
-	local v14 = Cryo.Dictionary.union(v13, t1)
-	local v15 = React.useMemo(function() -- line: 35
-		-- upvalues: Tokens (copy)
+	end, { tokens })
+	local union = Cryo.Dictionary.union(v2, p)
+
+	local v3 = React.useMemo(function()
 		return {
-			[1] = {
+			{
 				Attribute1 = {
-					ZIndex = 1,
 					AnchorPoint = Vector2.new(0, 0),
 					Position = UDim2.fromScale(0, 0),
-					Size = UDim2.fromOffset(Tokens.Size.Size_1000, Tokens.Size.Size_1000)
+					Size = UDim2.fromOffset(tokens.Size.Size_1000, tokens.Size.Size_1000),
+					ZIndex = 1
 				}
 			},
-			[2] = {
+			{
 				Attribute1 = {
-					ZIndex = 2,
 					AnchorPoint = Vector2.new(0, 1),
 					Position = UDim2.fromScale(0, 1),
-					Size = UDim2.fromOffset(Tokens.Size.Size_700, Tokens.Size.Size_700)
+					Size = UDim2.fromOffset(tokens.Size.Size_700, tokens.Size.Size_700),
+					ZIndex = 2
 				},
 				Attribute2 = {
-					ZIndex = 1,
 					AnchorPoint = Vector2.new(1, 0),
 					Position = UDim2.fromScale(1, 0),
-					Size = UDim2.fromOffset(Tokens.Size.Size_700, Tokens.Size.Size_700)
+					Size = UDim2.fromOffset(tokens.Size.Size_700, tokens.Size.Size_700),
+					ZIndex = 1
 				}
 			}
 		}
-	end, { Tokens })
-	local v16 = React.useCallback(function(n1: number, n2: number) -- line: 62
-		-- upvalues: v15 (copy)
-		return v15[math.min(n1, 2)]["Attribute" .. n2]
-	end, { v15 })
-	local v17 = React.useMemo(function() -- line: 67
-		-- upvalues: v14 (copy), v9 (copy), v16 (copy), React (copy), ImageSetLabel (copy)
-		local t2 = {}
+	end, { tokens })
 
-		for v21, v22 in v14.images do
-			if v21 > 2 then
-				v9:warning("More than 2 images provided but only the first 2 will be shown.")
+	local v4 = React.useCallback(function(p2: number, p3: number)
+		return v3[math.min(p2, 2)]["Attribute" .. p3]
+	end, { v3 })
 
-				return t2
+	local v5 = React.useMemo(function()
+		local children = {}
+
+		for k, image in union.images do
+			if k > 2 then
+				v:warning("More than 2 images provided but only the first 2 will be shown.")
+				return children
 			end
 
-			local v23 = v16(#v14.images, v21)
+			local v5 = v4(#union.images, k)
+			image.AnchorPoint = v5.AnchorPoint
+			image.Position = v5.Position
+			image.Size = v5.Size
+			image.ZIndex = v5.ZIndex
 
-			v22.AnchorPoint = v23.AnchorPoint
-			v22.Position = v23.Position
-			v22.Size = v23.Size
-			v22.ZIndex = v23.ZIndex
-			t2[tostring(v21)] = React.createElement(ImageSetLabel, v22, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(1, 0)
-				}),
+			children[tostring(k)] = React.createElement(ImageSetLabel, image, {
+				UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
 				UIStroke = React.createElement("UIStroke", {
-					Transparency = 0,
-					Color = v14.imageBorderColor,
-					Thickness = v14.imageBorderThickness
+					Color = union.imageBorderColor,
+					Thickness = union.imageBorderThickness,
+					Transparency = 0
 				})
 			})
 		end
 
-		return t2
-	end, { v14.images })
+		return children
+	end, { union.images })
 
-	if #v14.images == 0 then
-		v9:warning("Cannot have empty list of images")
-
+	if #union.images == 0 then
+		v:warning("Cannot have empty list of images")
 		return nil
 	end
 
-	return React.createElement("Frame", {
-		[React.Tag] = "data-testid=ImagePile",
-		BackgroundTransparency = 1,
-		Name = "ImagePile",
-		Size = UDim2.fromOffset(Tokens.Size.Size_1000, Tokens.Size.Size_1000)
-	}, v17)
+	return React.createElement(
+		"Frame",
+		{
+			[React.Tag] = "data-testid=ImagePile",
+			BackgroundTransparency = 1,
+			Name = "ImagePile",
+			Size = UDim2.fromOffset(tokens.Size.Size_1000, tokens.Size.Size_1000)
+		},
+		v5
+	)
 end
 
 return ImagePile

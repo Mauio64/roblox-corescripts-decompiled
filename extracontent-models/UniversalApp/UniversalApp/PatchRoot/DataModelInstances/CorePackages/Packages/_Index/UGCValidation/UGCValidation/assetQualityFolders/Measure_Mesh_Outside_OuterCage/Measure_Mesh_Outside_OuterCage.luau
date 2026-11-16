@@ -1,36 +1,36 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-require(ParentParent.util.Types)
+local getFFlagUGCValidateAQScoreWarnings = require(parent.flags.getFFlagUGCValidateAQScoreWarnings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateAQScoreWarnings = require(ParentParent.flags.getFFlagUGCValidateAQScoreWarnings)
-local v5 = game:DefineFastInt("UGCValidateRenderMeshOutsideOuterCageMeshThreshold", 65)
+local defineFastInt = game:DefineFastInt("UGCValidateRenderMeshOutsideOuterCageMeshThreshold", 65)
 
 return {
-	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING },
-	fflag = require(ParentParent.flags.getFFlagUGCValidateAQCageQualityLC),
-	run = function(p1, p2) -- line: 16
-		-- upvalues: v5 (copy), ErrorSourceStrings (copy), getFFlagUGCValidateAQScoreWarnings (copy)
-		local Handle = p2.aqsSummaryData.Measure_Mesh_Outside_OuterCage.Handle
-		local v9 = Handle and tonumber(Handle.mesh_outside_outer_cage_percent)
+	categories = { ValidationEnums.UploadCategory.LAYERED_CLOTHING, ValidationEnums.UploadCategory.EYEBROW_EYELASH },
+	["fflag"] = require(parent.flags.getFFlagUGCValidateAQCageQualityLC),
+	run = function(object, p)
+		local handle = p.aqsSummaryData.Measure_Mesh_Outside_OuterCage.Handle
+		local mesh_outside_outer_cage_percent = handle and tonumber(handle.mesh_outside_outer_cage_percent)
 
-		if v9 == nil then
+		if mesh_outside_outer_cage_percent == nil then
 			error("Measure_Mesh_Outside_OuterCage: AQS summary missing required fields")
-
 			return
 		end
 
-		if v9 * 100 > v5 then
-			p1:fail(ErrorSourceStrings.Keys.MeasureMeshOutsideOuterCage, {
-				mesh_outside_outer_cage_percent = string.format("%.2f", v9 * 100)
+		if defineFastInt < mesh_outside_outer_cage_percent * 100 then
+			object:fail(ErrorSourceStrings.Keys.MeasureMeshOutsideOuterCage, {
+				mesh_outside_outer_cage_percent = string.format("%.2f", mesh_outside_outer_cage_percent * 100)
 			})
 		end
 
-		if getFFlagUGCValidateAQScoreWarnings() and Handle.score ~= nil and tonumber(Handle.score) ~= 100 then
-			p1:warn(ErrorSourceStrings.Keys.AQSWarn_MeshOutsideOuterCage, {
-				score = tostring((math.floor(tonumber(Handle.score) or 0))),
-				mesh_outside_outer_cage_percent = string.format("%.2f", (tonumber(Handle.mesh_outside_outer_cage_percent) or 0) * 100)
+		if getFFlagUGCValidateAQScoreWarnings() and handle.score ~= nil and tonumber(handle.score) ~= 100 then
+			object:warn(ErrorSourceStrings.Keys.AQSWarn_MeshOutsideOuterCage, {
+				mesh_outside_outer_cage_percent = string.format(
+					"%.2f",
+					(tonumber(handle.mesh_outside_outer_cage_percent) or 0) * 100
+				)
 			})
 		end
 	end

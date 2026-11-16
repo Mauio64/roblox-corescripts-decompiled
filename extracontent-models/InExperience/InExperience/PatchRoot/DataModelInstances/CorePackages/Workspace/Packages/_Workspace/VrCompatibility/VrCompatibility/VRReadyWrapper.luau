@@ -1,34 +1,46 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local Roact = require(ParentParent.Roact)
-local UIBlox = require(ParentParent.UIBlox)
-local SharedFlags = require(ParentParent.SharedFlags)
-local Panel3D = UIBlox.Core.VR.Panel3D
-local useIsFPSAtTarget = require(ParentParent.SplashScreenManager).useIsFPSAtTarget
-local RoundedCornersFrame = require(script.Parent.RoundedCornersFrame)
-local Object = require(ParentParent.LuauPolyfill).Object
-local useIsSpatial = require(ParentParent.Responsive).useIsSpatial
-local GetFFlagEnableVRWrapperTransparency = SharedFlags.GetFFlagEnableVRWrapperTransparency
-local ROUNDED_CORNER_RADIUS = require(script.Parent.Constants).ROUNDED_CORNER_RADIUS
+local parent = script.Parent.Parent
 
-return function(t1: {[any]: any}) -- line: 36
-	-- upvalues: useIsFPSAtTarget (copy), Object (copy), useIsSpatial (copy), Roact (copy), RoundedCornersFrame (copy), ROUNDED_CORNER_RADIUS (copy), GetFFlagEnableVRWrapperTransparency (copy), React (copy), Panel3D (copy)
-	local v14 = useIsFPSAtTarget()
-	local v15 = Object.assign({}, t1.vrProps, {
-		hidden = t1.vrProps.hidden or not v14
+local React = require(parent.React)
+local Roact = require(parent.Roact)
+local UIBlox = require(parent.UIBlox)
+local SharedFlags = require(parent.SharedFlags)
+local Panel3D = UIBlox.Core.VR.Panel3D
+local SplashScreenManager = require(parent.SplashScreenManager)
+local useIsFPSAtTarget = SplashScreenManager.useIsFPSAtTarget
+
+local RoundedCornersFrame = require(script.Parent.RoundedCornersFrame)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local Responsive = require(parent.Responsive)
+local useIsSpatial = Responsive.useIsSpatial
+local GetFFlagEnableVRWrapperTransparency = SharedFlags.GetFFlagEnableVRWrapperTransparency
+
+local Constants = require(script.Parent.Constants)
+local ROUNDED_CORNER_RADIUS = Constants.ROUNDED_CORNER_RADIUS
+
+return function(props)
+	local v = useIsFPSAtTarget()
+	local v2 = Object.assign({}, props.vrProps, {
+		hidden = props.vrProps.hidden or not v
 	})
 
-	if useIsSpatial() then
-		local v16 = if not v15.roundedCornersFrameColor then t1[Roact.Children] else {
-			RoundedFrame = Roact.createElement(RoundedCornersFrame, {
-				cornerRadius = ROUNDED_CORNER_RADIUS / (384 / (v15.virtualScreenSize.X / v15.partSize.X)),
-				backgroundColor = v15.roundedCornersFrameColor,
-				backgroundTransparency = not GetFFlagEnableVRWrapperTransparency() and 0 or (v15.backgroundTransparency or 0)
-			}, t1[Roact.Children])
-		}
-
-		return React.createElement(Panel3D, v15, v16)
+	if not useIsSpatial() then
+		return React.createElement(props.component, props.props, props[Roact.Children])
 	end
 
-	return React.createElement(t1.component, t1.props, t1[Roact.Children])
+	local v3
+
+	if v2.roundedCornersFrameColor then
+		v3 = {
+			RoundedFrame = Roact.createElement(RoundedCornersFrame, {
+				cornerRadius = ROUNDED_CORNER_RADIUS / (384 / (v2.virtualScreenSize.X / v2.partSize.X)),
+				backgroundColor = v2.roundedCornersFrameColor,
+				backgroundTransparency = GetFFlagEnableVRWrapperTransparency() and v2.backgroundTransparency or 0
+			}, props[Roact.Children])
+		}
+	else
+		v3 = props[Roact.Children]
+	end
+
+	return React.createElement(Panel3D, v2, v3)
 end

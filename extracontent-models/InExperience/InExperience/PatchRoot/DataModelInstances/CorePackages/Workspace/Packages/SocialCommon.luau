@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.SocialCommon.SocialCommon))
+local SocialCommon = require(Workspace.SocialCommon.SocialCommon)
+
+return SocialCommon

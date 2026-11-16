@@ -3,1579 +3,2145 @@ local TextChatService = game:GetService("TextChatService")
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local FocusNavigationUtils = require(ExpChatParent.FocusNavigationUtils)
-local React = require(ExpChatParent.React)
-local ReactFocusNavigation = require(ExpChatParent.ReactFocusNavigation)
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local FocusUtils = require(ExpChatParent.Chrome).FocusUtils
+local parent = ExpChat.Parent
+
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local ExpChatShared = require(parent.ExpChatShared)
+local Chrome = require(parent.Chrome)
+local FocusUtils = Chrome.FocusUtils
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
+local useFocusInputBar = ChatUIPrimitives.Hooks.useFocusInputBar
+local ChatUIPrimitives2 = require(parent.ChatUIPrimitives)
+local useInputBarTabNavigation = ChatUIPrimitives2.Hooks.useInputBarTabNavigation
+
 local GetMessagesStore = require(ExpChat.Stores.GetMessagesStore)
-local IXPServiceWrapper = require(ExpChat.IXPServiceWrapper)
+local IxpServiceWrapper = require(parent.IxpServiceWrapper)
+local IXPServiceWrapper = IxpServiceWrapper.IXPServiceWrapper
 local GetChatTooltipStore = require(ExpChat.Stores.GetChatTooltipStore)
-local UIBlox = require(ExpChatParent.UIBlox)
-local Promise = require(ExpChatParent.Promise)
-local Signals = require(ExpChatParent.Signals)
-local SignalsReact = require(ExpChatParent.SignalsReact)
-local List = require(ExpChatParent.llama).List
+
+local UIBlox = require(parent.UIBlox)
+local Promise = require(parent.Promise)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local llama = require(parent.llama)
+local list = llama.List
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local useCursor = UIBlox.App.SelectionCursor.useCursor
+
 local useInterpolatedClientSettings = require(ExpChat.ClientSettings.useInterpolatedClientSettings)
 local Config = require(ExpChat.Config)
 local GetFocusNavigationStore = require(ExpChat.Stores.GetFocusNavigationStore)
 local GetPresetChatStore = require(ExpChat.Stores.GetPresetChatStore)
-local v27 = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
+local v = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
 local autoCastCommand = ExpChatShared.Commands.autoCastCommand
 local RBXWhisperCommand = ExpChatShared.Commands.Whisper.RBXWhisperCommand
 local RBXTeamCommand = ExpChatShared.Commands.RBXTeamCommand
+
 local Localization = require(ExpChat.Localization)
 local getOtherDisplayNameInWhisperChannel = require(ExpChat.getOtherDisplayNameInWhisperChannel)
+
 local ChannelChip = require(script.Parent.ChannelChip)
+
 local AutocompleteText = require(ExpChat.Autocomplete.AutocompleteText)
+local PresetEntryText = require(ExpChat.Autocomplete.PresetEntryText)
+local PresetSearch = require(ExpChat.Autocomplete.PresetSearch)
+local Constants = require(ExpChat.PresetChat.Constants)
+local sendPreset = require(ExpChat.PresetChat.sendPreset)
 local initializeEmojis = require(ExpChat.Autocomplete.Initializations.initializeEmojis)
 local initializeCommands = require(ExpChat.Autocomplete.Initializations.initializeCommands)
 local initializeGlobalCommands = require(ExpChat.Autocomplete.Initializations.initializeGlobalCommands)
 local initialCommands = require(ExpChat.Autocomplete.Initializations.initialCommands)
 local sortEmojiResultsCallback = require(ExpChat.Autocomplete.SortingCallbacks.sortEmojiResultsCallback)
 local sortCommandResultsCallback = require(ExpChat.Autocomplete.SortingCallbacks.sortCommandResultsCallback)
+
 local ChatInput = script:FindFirstAncestor("ChatInput")
 local AutocompleteDropdown = require(ChatInput.UI.AutocompleteDropdown)
+
 local ChatInputBarV2 = require(script.Parent.ChatInputBarV2)
 local ChatInputBarV2Dictation = require(script.Parent.ChatInputBarV2Dictation)
 local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
+
+local FFlagExpChatPresetChatAutocompleteEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatAutocompleteEnabled)
+
+local FFlagExpChatPresetChatAutocompleteAnalyticsEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatAutocompleteAnalyticsEnabled)
+local FFlagExpChatEmojiDropdownShowAnalytics = require(ExpChat.Flags.FFlagExpChatEmojiDropdownShowAnalytics)
+
+local FFlagExpChatEmojiDropdownDismissAnalytics = require(ExpChat.Flags.FFlagExpChatEmojiDropdownDismissAnalytics)
+local FFlagExpChatUniverseChatPresetEnabled = require(ExpChat.Flags.FFlagExpChatUniverseChatPresetEnabled)
 local FFlagExpChatUseUnifiedTooltipStore = ExpChatShared.Flags.FFlagExpChatUseUnifiedTooltipStore
 local FFlagExpChatNewInputBar = require(ExpChat.Flags.FFlagExpChatNewInputBar)
+local FFlagExpChatAutocompleteDropdownRedesign = require(ExpChat.Flags.FFlagExpChatAutocompleteDropdownRedesign)
 local FFlagExpChatNewInputBarDictation = require(ExpChat.Flags.FFlagExpChatNewInputBarDictation)
 local FFlagExpChatPresetChatGamepadEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatGamepadEnabled)
-local v50 = game:DefineFastFlag("ExpChatPresetChatIXPExposure", false)
-local v51 = game:DefineFastString("ExpChatPresetChatIXPLayerName", "UniverseChat.PresetChat")
-local v52 = game:DefineFastFlag("ExpChatDictationIXPExposure", false)
-local v53 = game:DefineFastString("ExpChatDictationIXPLayerName", "UniverseChat.Dictation")
+
+local defineFastFlag = game:DefineFastFlag("ExpChatPresetChatIXPExposure", false)
+local defineFastString = game:DefineFastString("ExpChatPresetChatIXPLayerName", "UniverseChat.PresetChat")
+
+local defineFastFlag2 = game:DefineFastFlag("ExpChatDictationIXPExposure", false)
+local defineFastString2 = game:DefineFastString("ExpChatDictationIXPLayerName", "UniverseChat.Dictation")
+
+local defineFastFlag3 = game:DefineFastFlag("ExpChatPresetAutocompleteIxpEnabled", false)
+local defineFastString3 = game:DefineFastString("ExpChatPresetAutocompleteIxpLayer", "")
+
+local defineFastFlag4 = game:DefineFastFlag("ExpChatPresetAutocompleteSearchVariants", false)
+
+local FFlagExpChatPresetAutocompleteIxpGated = require(ExpChat.Flags.FFlagExpChatPresetAutocompleteIxpGated)
+local fFlagExpChatPresetChatSendEnabled = FFlagExpChatPresetAutocompleteIxpGated
+	and ExpChatShared.Flags.FFlagExpChatPresetChatSendEnabled
+
+local defineFastFlag5 = game:DefineFastFlag("ExpChatMainInputBarClickAnalytics", false)
+
 local getEnableChatInputBarConfigurationAutocompleteEnabled = require(ExpChat.Flags.getEnableChatInputBarConfigurationAutocompleteEnabled)
-local SharedFlags = require(ExpChatParent.SharedFlags)
-local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagChromeChatGamepadSupportFix = SharedFlags.FFlagChromeChatGamepadSupportFix
 local FFlagConsoleChatUseChromeFocusUtils = SharedFlags.FFlagConsoleChatUseChromeFocusUtils
-local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnableFocusNavigation)
-local FFlagExpChatFocusViaLastModeFix = require(ExpChat.Flags.FFlagExpChatFocusViaLastModeFix)
-local v62 = game:DefineFastFlag("ChatOptimizeCommandProcessing", false)
-local v63 = game:DefineFastFlag("ExpChatFocusablePlaceholderText", false)
-local v64 = game:DefineFastFlag("ExpChatDoNotSetCursorPosition", false)
+local defineFastFlag6 = game:DefineFastFlag("ChatOptimizeCommandProcessing", false)
+local defineFastFlag7 = game:DefineFastFlag("ExpChatDoNotSetCursorPosition", false)
+
 local FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs = require(ExpChat.Flags.FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs)
 local FFlagExpChatFixBackspaceNilTargetChannel = ExpChatShared.Flags.FFlagExpChatFixBackspaceNilTargetChannel
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
+
 local FFlagExpChatDictation = SharedFlags.FFlagExpChatDictation
 local FFlagExpChatContinuousDictation = SharedFlags.FFlagExpChatContinuousDictation
-local v70 = FFlagExpChatDictation or FFlagExpChatContinuousDictation
+local FFlagExpChatTabShortcutNav = SharedFlags.FFlagExpChatTabShortcutNav
+local enabled = FFlagExpChatDictation or FFlagExpChatContinuousDictation
+
 local DictationInputBar = require(script.Parent.Dictation.DictationInputBar)
 local useSendTelemetry = require(script.Parent.Dictation.useSendTelemetry)
-local ActionBindableEvent = ExpChatShared.ActionBindableEvent
-local v74 = GetFocusNavigationStore(false)
+local usePresetAutocompleteAnalytics = require(script.Parent.usePresetAutocompleteAnalytics)
 
-local function setTransparency(p1, p2) -- line: 99
-	return p2:map(function(n1: number) -- line: 100
-		-- upvalues: p1 (copy)
-		return p1 + n1 * (1 - p1)
+local SocialExperiments = require(parent.SocialExperiments)
+local ExpChatPresetChatAutocompleteExperimentation = SocialExperiments.ExpChatPresetChatAutocompleteExperimentation
+
+local ActionBindableEvent = ExpChatShared.ActionBindableEvent
+local focusNavigationStore = GetFocusNavigationStore(false)
+local v2 = ExpChatShared.Flags.FIntPresetChatCooldownLuaMs / 1000
+
+local function setTransparency(p, transparencyValue) -- 8 equivalent calls inferred from this helper
+	return transparencyValue:map(function(p2: number)
+		return p + p2 * (1 - p)
 	end)
 end
 
-local u76 = nil
-local u77 = nil
-local u78 = nil
-local RBXTeamCommandname = nil
-local RBXWhisperCommandname = nil
+local v3 = nil
+local v4 = nil
+local v5 = nil
+local child = nil
+local child2 = nil
 
-local function onChatInputBarFocusLost(p3: ((...any) -> ...any)?, t1: {[any]: any}?, p4) -- line: 111
-	-- upvalues: UserInputService (copy), GuiService (copy)
-	local t2 = { Enum.KeyCode.ButtonB }
-	local v91 = t1 or t2
-	local u92 = nil
+local function onChatInputBarFocusLost(onSelectionLost, keybinds, callback)
+	local v6 = { Enum.KeyCode.ButtonB }
+	local v7 = keybinds or v6
+	local inputBeganConnection = nil
+	inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
+		local keyCode
 
-	u92 = UserInputService.InputBegan:Connect(function(input) -- line: 115
-		-- upvalues: v91 (copy), GuiService (copy), p4 (copy), p3 (copy), u92 (ref)
-		local v202 = if not input then nil else input.KeyCode
+		if input then
+			keyCode = input.KeyCode
+		end
 
-		for _, v204 in v91 do
-			if v202 == v204 then
+		for _, v8 in v7 do
+			if keyCode == v8 then
 				GuiService:SetMenuIsOpen(false, "ExperienceChat")
-				p4()
+				callback()
 
-				if p3 then
-					p3()
+				if onSelectionLost then
+					onSelectionLost()
 				else
 					GuiService.SelectedCoreObject = nil
 				end
 
-				if not u92 then
-					return
+				if not inputBeganConnection then
+					break
 				end
 
-				u92:Disconnect()
-				u92 = nil
-
-				return
+				inputBeganConnection:Disconnect()
+				inputBeganConnection = nil
+				break
 			end
 		end
 	end)
 
-	return u92
+	return inputBeganConnection
 end
-local function useEffectChatInputBarFocus(p5, p6, p7, p8, p9) -- line: 139
-	-- upvalues: FFlagConsoleChatUseChromeFocusUtils (copy), React (copy), FFlagExpChatEnableFocusNavigation (copy), Signals (copy), v74 (copy), v63 (copy), GuiService (copy), UserInputService (copy), FocusUtils (copy), FFlagChromeChatGamepadSupportFix (copy), FFlagEnableConsoleExpControls (copy), onChatInputBarFocusLost (copy), ActionBindableEvent (copy)
-	if FFlagConsoleChatUseChromeFocusUtils then
-		React.useEffect(function() -- line: 141
-			-- upvalues: FFlagExpChatEnableFocusNavigation (copy), Signals (copy), v74 (copy), p6 (copy), p5 (copy), v63 (copy), p7 (copy), GuiService (copy), p8 (copy), UserInputService (copy), FocusUtils (copy), p9 (copy)
-			local t3 = {
-				[Enum.KeyCode.DPadUp] = not FFlagExpChatEnableFocusNavigation or nil
-			}
-			local connection = nil
-			local v207 = Signals.createEffect(function(p10) -- line: 147
-				-- upvalues: v74 (copy), p6 (copy), p5 (copy), v63 (copy), p7 (copy), GuiService (copy), p8 (copy), connection (ref), UserInputService (copy), t3 (copy), FocusUtils (copy), p9 (copy)
-				local v314 = v74.getChatInputBarFocused(p10)
-				local v315 = if not p6.current then p5.current else p6.current
 
-				if v63 then
-					v315 = v315 or p7.current
+local function useEffectChatInputBarFocus(ref, ref2, ref3, callback, callback2)
+	if FFlagConsoleChatUseChromeFocusUtils then
+		React.useEffect(function()
+			local v6 = {}
+			local inputBeganConnection = nil
+
+			local effect = Signals.createEffect(function(p)
+				local chatInputBarFocused = focusNavigationStore.getChatInputBarFocused(p)
+				local v7
+
+				if ref2.current then
+					v7 = ref2.current
+				else
+					v7 = ref.current
 				end
 
-				if not v315 then
+				local selectedCoreObject = v7 or ref3.current
+
+				if not selectedCoreObject then
 					return
 				end
 
-				if v314 then
+				if chatInputBarFocused then
 					GuiService:SetMenuIsOpen(true, "ExperienceChat")
-					p8()
-					GuiService.SelectedCoreObject = v315
+					callback()
+					GuiService.SelectedCoreObject = selectedCoreObject
 
-					if not connection then
-						connection = UserInputService.InputBegan:Connect(function(input) -- line: 169
-							-- upvalues: t3 (copy), FocusUtils (copy), v74 (copy)
-							if input and t3[input.KeyCode] then
-								FocusUtils.FocusOnChrome(function() -- line: 172
-									-- upvalues: v74 (copy)
-									v74.unfocusChatInputBar()
+					if not inputBeganConnection then
+						inputBeganConnection = UserInputService.InputBegan:Connect(function(input)
+							if input and v6[input.KeyCode] then
+								FocusUtils.FocusOnChrome(function()
+									focusNavigationStore.unfocusChatInputBar()
 								end, "chat")
 							end
 						end)
-
-						return
 					end
 				elseif GuiService.MenuIsOpen then
 					GuiService:SetMenuIsOpen(false, "ExperienceChat")
-					p9()
+					callback2()
 
-					if connection then
-						connection:Disconnect()
-						connection = nil
+					if inputBeganConnection then
+						inputBeganConnection:Disconnect()
+						inputBeganConnection = nil
 					end
 				end
 			end)
 
-			return function() -- line: 188
-				-- upvalues: v207 (copy), connection (ref)
-				v207()
+			return function()
+				effect()
+
+				if inputBeganConnection then
+					inputBeganConnection:Disconnect()
+					inputBeganConnection = nil
+				end
+			end
+		end, {})
+	elseif FFlagChromeChatGamepadSupportFix then
+		React.useEffect(function()
+			local connection = nil
+			local thread = nil
+
+			local function onEvent(data)
+				local current
+
+				if ref2.current then
+					current = ref2.current
+				else
+					current = ref.current
+				end
+
+				if FFlagEnableConsoleExpControls and data.type == "ChatTopBarFocusSelect" and current then
+					GuiService:SetMenuIsOpen(true, "ExperienceChat")
+					callback()
+					GuiService.SelectedCoreObject = current
+
+					thread = task.delay(0, function()
+						thread = nil
+
+						if connection then
+							connection:Disconnect()
+						end
+
+						connection = onChatInputBarFocusLost(data.onSelectionLost, data.keybinds, callback2)
+					end)
+				end
+			end
+
+			local eventConnection = ActionBindableEvent.Event:Connect(onEvent)
+
+			return function()
+				eventConnection:disconnect()
+
+				if thread then
+					task.cancel(thread)
+					thread = nil
+				end
 
 				if connection then
 					connection:Disconnect()
 					connection = nil
 				end
 			end
-		end, {})
-
-		return
-	end
-
-	if FFlagChromeChatGamepadSupportFix then
-		React.useEffect(function() -- line: 198
-			-- upvalues: p6 (copy), p5 (copy), FFlagEnableConsoleExpControls (copy), GuiService (copy), p8 (copy), onChatInputBarFocusLost (copy), p9 (copy), ActionBindableEvent (copy)
-			local u208 = nil
-			local u209 = nil
-			local connection = ActionBindableEvent.Event:Connect(function(p11) -- line: 202
-				-- upvalues: p6 (copy), p5 (copy), FFlagEnableConsoleExpControls (copy), GuiService (copy), p8 (copy), u209 (ref), u208 (ref), onChatInputBarFocusLost (copy), p9 (copy)
-				local v317 = if not p6.current then p5.current else p6.current
-
-				if FFlagEnableConsoleExpControls and (p11.type == "ChatTopBarFocusSelect" and v317) then
-					GuiService:SetMenuIsOpen(true, "ExperienceChat")
-					p8()
-					GuiService.SelectedCoreObject = v317
-					u209 = task.delay(0, function() -- line: 214
-						-- upvalues: u209 (ref), u208 (ref), onChatInputBarFocusLost (copy), p11 (copy), p9 (copy)
-						u209 = nil
-
-						if u208 then
-							u208:Disconnect()
-						end
-
-						u208 = onChatInputBarFocusLost(p11.onSelectionLost, p11.keybinds, p9)
-					end)
-				end
-			end)
-
-			return function() -- line: 228
-				-- upvalues: connection (copy), u209 (ref), u208 (ref)
-				connection:disconnect()
-
-				if u209 then
-					task.cancel(u209)
-					u209 = nil
-				end
-
-				if u208 then
-					u208:Disconnect()
-					u208 = nil
-				end
-			end
-		end, {
-			p5.current,
-			p6.current
-		})
+		end, { ref.current, ref2.current })
 	end
 end
-local function ChatInputBar(p12) -- line: 244
-	-- upvalues: React (copy), FFlagExpChatUseUnifiedTooltipStore (copy), GetChatTooltipStore (copy), v70 (copy), useSendTelemetry (copy), FFlagExpChatEnableFocusNavigation (copy), ReactFocusNavigation (copy), FFlagExpChatFocusViaLastModeFix (copy), FocusNavigationUtils (copy), SignalsReact (copy), v74 (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), FFlagExpChatPresetChatEnabled (copy), GetPresetChatStore (copy), TextChatService (copy), u77 (ref), AutocompleteText (copy), initializeCommands (copy), getEnableChatInputBarConfigurationAutocompleteEnabled (copy), u76 (ref), initializeEmojis (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), u78 (ref), initializeGlobalCommands (copy), initialCommands (copy), v27 (copy), FFlagExpChatDictation (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy), v64 (copy), v50 (copy), IXPServiceWrapper (copy), v51 (copy), FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs (copy), FFlagExpChatFixBackspaceNilTargetChannel (copy), Config (copy), Players (copy), FFlagEnableConsoleExpControls (copy), FFlagChromeChatGamepadSupportFix (copy), onChatInputBarFocusLost (copy), ActionBindableEvent (copy), useEffectChatInputBarFocus (copy), sortCommandResultsCallback (copy), sortEmojiResultsCallback (copy), List (copy), RBXTeamCommandname (ref), RBXTeamCommand (copy), RBXWhisperCommandname (ref), RBXWhisperCommand (copy), v62 (copy), autoCastCommand (copy), Promise (copy), useCursor (copy), v52 (copy), v53 (copy), useInterpolatedClientSettings (copy), FFlagExpChatNewInputBar (copy), AutocompleteDropdown (copy), setTransparency (copy), FFlagExpChatNewInputBarDictation (copy), ChatInputBarV2Dictation (copy), ChatInputBarV2 (copy), DictationInputBar (copy), v63 (copy), ChannelChip (copy), ImageSetLabel (copy), Images (copy)
-	local v99 = React.useRef("")
+
+local function ChatInputBar(props)
+	local ref = React.useRef("")
 
 	if FFlagExpChatUseUnifiedTooltipStore then
 		local setIsChatInputBarVisible = GetChatTooltipStore(false).setIsChatInputBarVisible
 
-		React.useEffect(function() -- line: 252
-			-- upvalues: p12 (copy), setIsChatInputBarVisible (copy)
-			if p12.visible ~= nil then
-				setIsChatInputBarVisible(p12.visible)
-			else
+		React.useEffect(function()
+			if props.visible == nil then
 				setIsChatInputBarVisible(true)
+			else
+				setIsChatInputBarVisible(props.visible)
 			end
 
-			return function() -- line: 261
-				-- upvalues: setIsChatInputBarVisible (copy)
+			return function()
 				setIsChatInputBarVisible(false)
 			end
-		end, {
-			p12.visible,
-			setIsChatInputBarVisible
-		})
+		end, { props.visible, setIsChatInputBarVisible })
 	end
 
-	local v101, v102 = React.useState("")
-	local v103, v104 = React.useState(0)
-	local u105 = v103
-	local u106 = v104
-	local v107, v108 = React.useState(0)
-	local u109 = v107
-	local u110 = v108
-	local v111, v112 = React.useState(false)
-	local v113, _ = React.useState(true)
-	local v115, v116 = React.useBinding(0)
-	local v117 = React.useRef(false)
-	local v118 = React.useRef(nil)
-	local v119 = React.useRef(nil)
-	local v120 = if not v70 then nil else useSendTelemetry({
-		enabled = v70,
-		textBoxRef = v118,
-		customTextBoxRef = v119
-	})
-	local v121 = React.useRef(nil)
-	local v122 = React.useRef(nil)
-	local v123 = React.useRef(nil)
-	local v124 = React.useRef(nil)
-	local v125 = React.useRef(false)
-	local v126 = if not FFlagExpChatEnableFocusNavigation then nil else ReactFocusNavigation.useFocusGuiObject()
-	local v127 = if not FFlagExpChatEnableFocusNavigation or FFlagExpChatFocusViaLastModeFix then nil else FocusNavigationUtils.useLastInputMode()
-	local v128 = if not FFlagExpChatFocusViaLastModeFix then nil else SignalsReact.useSignalState(v74.getChatInputBarFocused)
-	local u129 = nil
+	local state, setState = React.useState("")
+	local state2, setState2 = React.useState(0)
+	local state3, setState3 = React.useState(0)
+	local ref2
 
-	if FFlagExpChatUseMessagesStore then
-		local v130 = GetMessagesStore(false)
-
-		u129 = SignalsReact.useSignalState(v130.getCanLocalUserChat)
+	if defineFastFlag5 then
+		ref2 = React.useRef(false)
+	else
+		ref2 = nil
 	end
 
-	local v131 = if not FFlagExpChatPresetChatEnabled then nil else SignalsReact.useSignalState(GetPresetChatStore(false).getIsTrayOpen)
-	local v132 = if not FFlagExpChatPresetChatEnabled then nil else SignalsReact.useSignalState(GetPresetChatStore(false).getIsEnabled)
-	local v133 = React.useRef(false)
+	local state4, setState4 = React.useState(false)
+	local state5, _ = React.useState(true)
+	local targetChannelWidth, v6 = React.useBinding(0)
+	local ref3 = React.useRef(false)
+	local ref4 = React.useRef(nil)
+	local ref5 = React.useRef(nil)
+	local v7
 
-	React.useEffect(function() -- line: 326
-		-- upvalues: v119 (copy), p12 (copy)
-		v119.current = p12.chatInputBarSettings.TextBox
-	end, { p12.chatInputBarSettings.TextBox == nil and "nil" or p12.chatInputBarSettings.TextBox })
-	React.useEffect(function() -- line: 331
-		-- upvalues: p12 (copy), TextChatService (copy), u77 (ref), AutocompleteText (copy), initializeCommands (copy), getEnableChatInputBarConfigurationAutocompleteEnabled (copy), u76 (ref), initializeEmojis (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), u78 (ref), initializeGlobalCommands (copy), initialCommands (copy)
-		if not p12.autocompleteEnabled then
+	if enabled then
+		v7 = useSendTelemetry({ enabled = enabled, textBoxRef = ref4, customTextBoxRef = ref5 })
+	else
+		v7 = nil
+	end
+
+	local ref6 = React.useRef(nil)
+	local ref7 = React.useRef(nil)
+	local ref8
+
+	if FFlagExpChatEmojiDropdownDismissAnalytics then
+		ref8 = React.useRef(nil)
+	else
+		ref8 = nil
+	end
+
+	local ref9 = React.useRef(nil)
+	local ref10 = React.useRef(nil)
+	local ref11 = React.useRef(false)
+	local v8 = ReactFocusNavigation.useFocusGuiObject()
+
+	local v9 = SignalsReact.useSignalState(focusNavigationStore.getChatInputBarFocused)
+
+	local messagesStore = GetMessagesStore(false)
+	local canLocalUserChatDerived = SignalsReact.useSignalState(messagesStore.getCanLocalUserChat)
+	local v10
+
+	if FFlagExpChatPresetChatEnabled then
+		v10 = SignalsReact.useSignalState(GetPresetChatStore(false).getIsTrayOpen)
+	else
+		v10 = nil
+	end
+
+	local shouldTruncatePlaceholder
+
+	if FFlagExpChatPresetChatEnabled then
+		shouldTruncatePlaceholder = SignalsReact.useSignalState(GetPresetChatStore(false).getIsEnabled)
+	end
+
+	local ref12 = React.useRef(false)
+
+	React.useEffect(function()
+		ref5.current = props.chatInputBarSettings.TextBox
+	end, { props.chatInputBarSettings.TextBox == nil and "nil" or props.chatInputBarSettings.TextBox })
+	local focus
+
+	if FFlagExpChatTabShortcutNav then
+		local v11
+
+		if props.chatInputBarSettings.TextBox == nil then
+			v11 = ref4
+		else
+			v11 = ref5
+		end
+
+		focus = useFocusInputBar(v11).focus
+		useInputBarTabNavigation(v11, props.userInputService)
+	else
+		focus = nil
+	end
+
+	React.useEffect(function()
+		if FFlagExpChatTabShortcutNav then
+			return Signals.createEffect(function(p)
+				local chatInputBarFocusRequestTime = focusNavigationStore.getChatInputBarFocusRequestTime(p)
+
+				if chatInputBarFocusRequestTime == nil then
+					return
+				end
+
+				if os.clock() - chatInputBarFocusRequestTime <= 5 then
+					focus()
+				end
+
+				focusNavigationStore.clearChatInputBarFocusRequest()
+			end)
+		end
+	end, { focus })
+
+	React.useEffect(function()
+		if not props.autocompleteEnabled then
 			return
 		end
 
-		local t4 = {}
-		local connection = TextChatService.DescendantAdded:Connect(function(descendant) -- line: 336
-			-- upvalues: u77 (ref), AutocompleteText (copy), initializeCommands (copy), t4 (copy)
-			if descendant:IsA("TextChatCommand") and string.sub(descendant.PrimaryAlias, 1, 1) == "/" then
-				u77 = AutocompleteText.new(initializeCommands)
+		local connections = {}
+		local descendantAddedConnection = TextChatService.DescendantAdded:Connect(function(textChatCommand)
+			if textChatCommand:IsA("TextChatCommand") and string.sub(textChatCommand.PrimaryAlias, 1, 1) == "/" then
+				v4 = AutocompleteText.new(initializeCommands)
 
-				local connection = descendant:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function() -- line: 342
-					-- upvalues: u77 (ref), AutocompleteText (copy), initializeCommands (copy)
-					u77 = AutocompleteText.new(initializeCommands)
-				end)
-
-				table.insert(t4, connection)
+				table.insert(
+					connections,
+					(textChatCommand:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function()
+						v4 = AutocompleteText.new(initializeCommands)
+					end))
+				)
 			end
 		end)
-		local connection2 = TextChatService.DescendantRemoving:Connect(function(descendant) -- line: 349
-			-- upvalues: u77 (ref), AutocompleteText (copy), initializeCommands (copy)
-			if descendant:IsA("TextChatCommand") and string.sub(descendant.PrimaryAlias, 1, 1) == "/" then
-				u77 = AutocompleteText.new(initializeCommands)
+
+		local descendantRemovingConnection = TextChatService.DescendantRemoving:Connect(function(textChatCommand)
+			if textChatCommand:IsA("TextChatCommand") and string.sub(textChatCommand.PrimaryAlias, 1, 1) == "/" then
+				v4 = AutocompleteText.new(initializeCommands)
 			end
 		end)
 
 		if getEnableChatInputBarConfigurationAutocompleteEnabled() then
-			u77 = AutocompleteText.new(initializeCommands)
-			u76 = AutocompleteText.new(initializeEmojis)
+			v4 = AutocompleteText.new(initializeCommands)
+			v3 = AutocompleteText.new(initializeEmojis)
 
 			if GetFFlagTextChatEnableUniverseChatTabs() then
-				u78 = AutocompleteText.new(initializeGlobalCommands)
+				v5 = AutocompleteText.new(initializeGlobalCommands)
 			end
 
-			local v214 = initialCommands()
+			local v11 = initialCommands()
 
-			if v214 then
-				for _, v216 in v214 do
-					table.insert(t4, (v216:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function() -- line: 366
-						-- upvalues: u77 (ref), AutocompleteText (copy), initializeCommands (copy)
-						u77 = AutocompleteText.new(initializeCommands)
+			if v11 then
+				for _, v12 in v11 do
+					table.insert(connections, (v12:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function()
+						v4 = AutocompleteText.new(initializeCommands)
 					end)))
 				end
 			end
 		end
 
-		return function() -- line: 374
-			-- upvalues: connection2 (copy), connection (copy), t4 (copy)
-			if connection2 then
-				connection2:Disconnect()
+		return function()
+			if descendantRemovingConnection then
+				descendantRemovingConnection:Disconnect()
 			end
 
-			connection:Disconnect()
+			descendantAddedConnection:Disconnect()
 
-			for _, v in ipairs(t4) do
-				v:Disconnect()
+			for _, connection in ipairs(connections) do
+				connection:Disconnect()
 			end
 
-			table.clear(t4)
+			table.clear(connections)
 		end
 	end, {})
 
-	local v134 = React.useCallback(function() -- line: 387
-		-- upvalues: v27 (copy), v101 (copy), FFlagExpChatUseMessagesStore (copy), u129 (ref), p12 (copy), v117 (copy), v118 (copy), v119 (copy), v120 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatDictation (copy), v102 (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy), v125 (copy)
-		v27:trace("onSendActivated with input text: '{}'", v101)
+	local useCallback = React.useCallback
+	local function fn()
+		v:trace("onSendActivated with input text: '{}'", state)
 
-		local v217 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u129
+		local canLocalUserChatDerived2 = canLocalUserChatDerived
 
-		if not v117.current or not v217 then
-			v27:debug("onSendActivated could not send message. isMounted: {} canLocalUserChat: {}", tostring(v117.current), v217)
+		if not (ref3.current and canLocalUserChatDerived2) then
+			v:debug(
+				"onSendActivated could not send message. isMounted: {} canLocalUserChat: {}",
+				tostring(ref3.current),
+				canLocalUserChatDerived2
+			)
+		elseif ref4.current or ref5.current then
+			local text
 
-			return
-		end
+			if ref5.current then
+				text = ref5.current.Text
+			else
+				text = ref4.current.Text
+			end
 
-		if v118.current or v119.current then
-			local v218 = if not v119.current then v118.current.Text else v119.current.Text
-			local v219 = if not v120 then nil else v120.consumeOnSend(v218)
-			local v220 = if not GetFFlagTextChatEnableUniverseChatTabs() or (not p12.isGlobalChatTabActive or not p12.onSendGlobalChat) then p12.onSendChat else p12.onSendGlobalChat
+			local v11
 
-			if v220 and string.find(v218, "%S") ~= nil then
+			if v7 then
+				v11 = v7.consumeOnSend(text)
+			end
+
+			local v12
+
+			if GetFFlagTextChatEnableUniverseChatTabs() and props.isGlobalChatTabActive and props.onSendGlobalChat then
+				v12 = props.onSendGlobalChat
+			else
+				v12 = props.onSendChat
+			end
+
+			if v12 and string.find(text, "%S") ~= nil then
 				if FFlagExpChatDictation then
-					v220(v218, v219, v219 ~= nil)
+					v12(text, v11, v11 ~= nil)
 				else
-					v220(v218)
+					v12(text)
 				end
 			else
-				v27:debug("onSendActivated could not send message. text: '{}' canLocalUserChat: {}", v218, v217)
+				v:debug(
+					"onSendActivated could not send message. text: '{}' canLocalUserChat: {}",
+					text,
+					canLocalUserChatDerived2
+				)
 			end
 
-			if v119.current then
-				v119.current.Text = ""
-				v119.current:ReleaseFocus()
+			if ref5.current then
+				ref5.current.Text = ""
+				ref5.current:ReleaseFocus()
 			end
 
-			if v118.current then
-				v118.current.Text = ""
-				v118.current:ReleaseFocus()
+			if ref4.current then
+				ref4.current.Text = ""
+				ref4.current:ReleaseFocus()
 			end
 
-			v102("")
+			setState("")
 
-			if FFlagExpChatPresetChatGamepadEnabled then
-				local v221 = v119.current or v118.current
+			local current = FFlagExpChatPresetChatGamepadEnabled and (ref5.current or ref4.current)
 
-				if v221 then
-					GuiService.SelectedCoreObject = v221
-				end
+			if current then
+				GuiService.SelectedCoreObject = current
 			end
 
-			if p12.targetTextChannel and p12.targetTextChannelDisplayName ~= "" then
-				v125.current = true
-
-				return
+			if props.targetTextChannel and props.targetTextChannelDisplayName ~= "" then
+				ref11.current = true
 			end
 		else
-			v27:debug("onSendActivated could not send message because textBoxRef.current was nil")
+			v:debug("onSendActivated could not send message because textBoxRef.current was nil")
 		end
-	end, {
-		v101,
-		v119.current,
-		u129,
-		p12.canLocalUserChat,
-		p12.isGlobalChatTabActive,
-		p12.onSendChat or false,
-		p12.onSendGlobalChat or false,
-		p12.targetTextChannel or false,
-		p12.targetTextChannelDisplayName,
-		not not v120 and v120.consumeOnSend
-	})
-	local v135 = if not v70 then nil else React.useCallback(function(t5: {[any]: any}?) -- line: 474
-		-- upvalues: FFlagExpChatUseMessagesStore (copy), u129 (ref), p12 (copy), v117 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v119 (copy), v118 (copy), v102 (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy), v125 (copy)
-		local v223 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u129
-
-		if not v117.current or not v223 then
-			return
-		end
-
-		local v224 = t5 and t5.textSent or ""
-		local v225 = if not GetFFlagTextChatEnableUniverseChatTabs() or (not p12.isGlobalChatTabActive or not p12.onSendGlobalChat) then p12.onSendChat else p12.onSendGlobalChat
-
-		if v225 and string.find(v224, "%S") ~= nil then
-			v225(v224, t5, true)
-		end
-
-		if v119.current then
-			v119.current.Text = ""
-			v119.current:ReleaseFocus()
-		end
-
-		if v118.current then
-			v118.current.Text = ""
-			v118.current:ReleaseFocus()
-		end
-
-		v102("")
-
-		if FFlagExpChatPresetChatGamepadEnabled then
-			local v226 = v119.current or v118.current
-
-			if v226 then
-				GuiService.SelectedCoreObject = v226
-			end
-		end
-
-		if p12.targetTextChannel and p12.targetTextChannelDisplayName ~= "" then
-			v125.current = true
-		end
-	end, {
-		v119.current,
-		u129,
-		p12.canLocalUserChat,
-		p12.isGlobalChatTabActive,
-		p12.onSendChat or false,
-		p12.onSendGlobalChat or false,
-		p12.targetTextChannel or false,
-		p12.targetTextChannelDisplayName
-	})
-	local v136 = React.useCallback(function(p13) -- line: 522
-		-- upvalues: p12 (copy), v119 (copy), v118 (copy), u105 (ref), v102 (copy), v117 (copy), FFlagExpChatFocusViaLastModeFix (copy), v128 (copy), v126 (copy), v127 (copy), v64 (copy), v27 (copy)
-		p12.autocompleteDropdownActivated(false)
-		p12.autocompleteDropdownResultsChanged({})
-
-		local v228 = if not v119.current then v118.current else v119.current
-
-		if v228 then
-			local Text = v228.Text
-			local v230 = string.sub(Text, 1, u105 - 1)
-			local v231 = string.sub(Text, u105, #Text)
-			local s1 = ""
-
-			if p12.autocompleteDropdownReducer.autocompleteType == "emojis" then
-				local EmojiLabelText = p13.EmojiLabel.Text
-
-				s1 = string.gsub(v230, ":[^:]*$", EmojiLabelText)
-			elseif p12.autocompleteDropdownReducer.autocompleteType == "commands" then
-				local TextLabelText = p13.TextLabel.Text
-
-				s1 = string.gsub(v230, "(/.*)", TextLabelText)
-			end
-
-			if v231 ~= "" then
-				s1 ..= v231
-			end
-
-			v228.Text = s1
-			v102(s1)
-
-			if v117.current then
-				v228:CaptureFocus()
-
-				if FFlagExpChatFocusViaLastModeFix then
-					if v128 then
-						v126(v228)
-					end
-				elseif v127 == "Focus" then
-					v126(v228)
-				end
-
-				if v231 ~= "" and not v64 then
-					v228.CursorPosition = #s1 - #v231 + 1
-				end
-			end
-
-			p12.autocompleteDropdownDeactivated()
-
-			return
-		end
-
-		v27:error("Could not find textBox")
-	end, if not FFlagExpChatEnableFocusNavigation then nil else {
-		if not FFlagExpChatFocusViaLastModeFix then nil else v128,
-		v126,
-		v113,
-		u105,
-		if not FFlagExpChatFocusViaLastModeFix then v127 else nil,
-		p12.autocompleteDropdownActivated,
-		p12.autocompleteDropdownDeactivated,
-		p12.autocompleteDropdownReducer and p12.autocompleteDropdownReducer.autocompleteType,
-		p12.autocompleteDropdownResultsChanged
-	})
-
-	React.useEffect(function() -- line: 593
-		-- upvalues: v117 (copy), v119 (copy), v118 (copy), v27 (copy)
-		if v117.current then
-			local v235 = if not v119.current then v118.current else v119.current
-
-			if v235 then
-				v235:CaptureFocus()
-
-				return
-			end
-
-			v27:error("Could not focus chat input bar because textBox not found")
-		end
-	end, {
-		p12.shouldFocusChatInputBar,
-		v119.current
-	})
-
-	if FFlagExpChatPresetChatEnabled then
-		React.useEffect(function() -- line: 605
-			-- upvalues: v131 (copy), v119 (copy), v118 (copy)
-			if not v131 then
-				return
-			end
-
-			local v236 = if not v119.current then v118.current else v119.current
-
-			if v236 and v236:IsFocused() then
-				v236:ReleaseFocus()
-			end
-		end, { v131 })
 	end
 
-	React.useEffect(function() -- line: 616
-		-- upvalues: v27 (copy), v117 (copy), v50 (copy), IXPServiceWrapper (copy), v51 (copy)
-		v27:trace("Mounted")
-		v117.current = true
+	local current = ref5.current
 
-		if v50 then
-			IXPServiceWrapper:LogUserLayerExposure(v51)
+	local canLocalUserChat = props.canLocalUserChat
+	local isGlobalChatTabActive = props.isGlobalChatTabActive
+	local onSendChat = props.onSendChat or false
+	local onSendGlobalChat = props.onSendGlobalChat or false
+	local targetTextChannel = props.targetTextChannel or false
+	local targetTextChannelDisplayName = props.targetTextChannelDisplayName
+	local v11 = if v7 then v7.consumeOnSend else false
+	local onSendActivated = useCallback(fn, {
+		state,
+		current,
+		canLocalUserChatDerived,
+		canLocalUserChat,
+		isGlobalChatTabActive,
+		onSendChat,
+		onSendGlobalChat,
+		targetTextChannel,
+		targetTextChannelDisplayName,
+		v11
+	})
+	local onSendRecordingTap
+
+	if enabled then
+		onSendRecordingTap = React.useCallback(function(p)
+			if not (ref3.current and canLocalUserChatDerived) then
+				return
+			end
+
+			local textSent = p and p.textSent or ""
+			local v12
+
+			if GetFFlagTextChatEnableUniverseChatTabs() and props.isGlobalChatTabActive and props.onSendGlobalChat then
+				v12 = props.onSendGlobalChat
+			else
+				v12 = props.onSendChat
+			end
+
+			if v12 and string.find(textSent, "%S") ~= nil then
+				v12(textSent, p, true)
+			end
+
+			if ref5.current then
+				ref5.current.Text = ""
+				ref5.current:ReleaseFocus()
+			end
+
+			if ref4.current then
+				ref4.current.Text = ""
+				ref4.current:ReleaseFocus()
+			end
+
+			setState("")
+
+			local current2 = FFlagExpChatPresetChatGamepadEnabled and (ref5.current or ref4.current)
+
+			if current2 then
+				GuiService.SelectedCoreObject = current2
+			end
+
+			if props.targetTextChannel and props.targetTextChannelDisplayName ~= "" then
+				ref11.current = true
+			end
+		end, {
+			ref5.current,
+			canLocalUserChatDerived,
+			props.canLocalUserChat,
+			props.isGlobalChatTabActive,
+			props.onSendChat or false,
+			props.onSendGlobalChat or false,
+			props.targetTextChannel or false,
+			props.targetTextChannelDisplayName
+		})
+	end
+
+	local recordPresetChosen
+
+	if FFlagExpChatPresetChatAutocompleteAnalyticsEnabled then
+		recordPresetChosen = usePresetAutocompleteAnalytics({
+			isFocused = state4,
+			autocompleteEnabled = props.autocompleteEnabled,
+			autocompleteDropdownReducer = props.autocompleteDropdownReducer
+		}).recordPresetChosen
+	else
+		recordPresetChosen = nil
+	end
+
+	local function sendSelectedPreset(p: string)
+		local presetChatStore = GetPresetChatStore(false)
+		local presetIdForValue = PresetSearch.getPresetIdForValue(presetChatStore, p)
+
+		if presetIdForValue == nil then
+			v:warning("Could not resolve a preset id for autocomplete entry '{}'; skipping send.", p)
+			return
 		end
 
-		return function() -- line: 624
-			-- upvalues: v27 (copy), v117 (copy)
-			v27:trace("Unmounting")
-			v117.current = false
+		presetChatStore.setPresetCooldownEndsAt(os.clock() + v2)
+
+		local v12 = sendPreset(presetIdForValue, props.targetTextChannel)
+
+		if v12 == "Sent" then
+			local analytics = ExpChatShared.Analytics
+			local expChatPresetActionConfig = ExpChatShared.Analytics.ExpChatPresetActionConfig
+			local v13 = {
+				event_type = Constants.Analytics.EventTypes.Click,
+				component = 0,
+				preset_id = 0
+			}
+			local component
+
+			if FFlagExpChatPresetChatAutocompleteAnalyticsEnabled then
+				component = Constants.Analytics.Components.AutocompleteDropdown
+			else
+				component = Constants.Analytics.Components.PresetAutocomplete
+			end
+
+			v13.component = component
+
+			v13.preset_id = presetIdForValue
+			local v14
+
+			if FFlagExpChatPresetChatAutocompleteAnalyticsEnabled then
+				v14 = Constants.Analytics.ExtendedStandardizedFields
+			else
+				v14 = ExpChatShared.Analytics.DefaultStandardizedFields
+			end
+
+			analytics:TelemetryLogEvent(expChatPresetActionConfig, v13, v14)
+		else
+			presetChatStore.setPresetCooldownEndsAt(nil)
+			v:warning("Could not send preset {} from autocomplete: {}", presetIdForValue, v12)
+		end
+	end
+
+	local useCallback2 = React.useCallback
+	local function fn2(data)
+		local v12
+
+		if FFlagExpChatAutocompleteDropdownRedesign then
+			v12 = props.autocompleteDropdownReducer.results[data.Parent.LayoutOrder]
+		end
+
+		local v13
+
+		if
+			FFlagExpChatPresetChatAutocompleteEnabled
+			and props.autocompleteDropdownReducer.autocompleteType == "presets"
+		then
+			if FFlagExpChatAutocompleteDropdownRedesign then
+				v13 = v12
+			else
+				v13 = PresetEntryText.undecorate(data.TextLabel.Text, props.chatInputBarSettings.TextSize)
+			end
+		end
+
+		if FFlagExpChatPresetChatAutocompleteAnalyticsEnabled and recordPresetChosen ~= nil and v13 ~= nil then
+			recordPresetChosen(v13)
+		end
+
+		if
+			FFlagExpChatEmojiDropdownDismissAnalytics
+			and ref8
+			and props.autocompleteDropdownReducer.autocompleteType == "emojis"
+		then
+			local v14 = ref8
+			local current2
+
+			if FFlagExpChatAutocompleteDropdownRedesign then
+				current2 = v12
+			else
+				current2 = data.TextLabel.Text
+			end
+
+			v14.current = current2
+		end
+
+		props.autocompleteDropdownActivated(false)
+		props.autocompleteDropdownResultsChanged({})
+		local current2
+
+		if ref5.current then
+			current2 = ref5.current
+		else
+			current2 = ref4.current
+		end
+
+		if current2 then
+			local text = current2.Text
+
+			local v14 = string.sub(text, 1, state2 - 1)
+			local v15 = string.sub(text, state2, #text)
+			local v16 = FFlagExpChatPresetChatAutocompleteEnabled and v13 ~= nil and "" or v15
+			local text3 = ""
+
+			if props.autocompleteDropdownReducer.autocompleteType == "emojis" then
+				local text2 = data.EmojiLabel.Text
+
+				text3 = string.gsub(v14, ":[^:]*$", text2)
+			elseif props.autocompleteDropdownReducer.autocompleteType == "commands" then
+				if not FFlagExpChatAutocompleteDropdownRedesign then
+					v12 = data.TextLabel.Text
+				end
+
+				text3 = string.gsub(v14, "(/.*)", v12)
+			end
+
+			if v16 ~= "" then
+				text3 ..= v16
+			end
+
+			current2.Text = text3
+			setState(text3)
+
+			if ref3.current then
+				if defineFastFlag5 and ref2 and not current2:IsFocused() then
+					ref2.current = true
+				end
+
+				current2:CaptureFocus()
+
+				if v9 then
+					v8(current2)
+				end
+
+				if v16 ~= "" and not defineFastFlag7 then
+					current2.CursorPosition = #text3 - #v16 + 1
+				end
+			end
+
+			props.autocompleteDropdownDeactivated()
+
+			if FFlagExpChatPresetChatAutocompleteEnabled and v13 ~= nil then
+				sendSelectedPreset(v13)
+			end
+		else
+			v:error("Could not find textBox")
+		end
+	end
+
+	local autocompleteDropdownActivated = props.autocompleteDropdownActivated
+	local autocompleteDropdownDeactivated = props.autocompleteDropdownDeactivated
+	local autocompleteType = props.autocompleteDropdownReducer and props.autocompleteDropdownReducer.autocompleteType
+	local autocompleteDropdownResultsChanged = props.autocompleteDropdownResultsChanged
+	local targetTextChannel2
+
+	if FFlagExpChatPresetChatAutocompleteEnabled then
+		targetTextChannel2 = props.targetTextChannel or false
+	end
+
+	local textSize
+
+	if FFlagExpChatPresetChatAutocompleteEnabled then
+		textSize = props.chatInputBarSettings.TextSize
+	end
+
+	local v12
+
+	if FFlagExpChatPresetChatAutocompleteAnalyticsEnabled then
+		v12 = recordPresetChosen
+	end
+
+	local v13
+
+	if FFlagExpChatEmojiDropdownDismissAnalytics then
+		v13 = ref8
+	end
+
+	local v14
+
+	if FFlagExpChatAutocompleteDropdownRedesign then
+		v14 = props.autocompleteDropdownReducer and props.autocompleteDropdownReducer.results
+	end
+
+	local onAutocompleteSelected = useCallback2(fn2, {
+		v9,
+		v8,
+		state5,
+		state2,
+		autocompleteDropdownActivated,
+		autocompleteDropdownDeactivated,
+		autocompleteType,
+		autocompleteDropdownResultsChanged,
+		targetTextChannel2,
+		textSize,
+		v12,
+		v13,
+		v14
+	})
+
+	React.useEffect(function()
+		if ref3.current then
+			local current2
+
+			if ref5.current then
+				current2 = ref5.current
+			else
+				current2 = ref4.current
+			end
+
+			if current2 then
+				current2:CaptureFocus()
+			else
+				v:error("Could not focus chat input bar because textBox not found")
+			end
+		end
+	end, { props.shouldFocusChatInputBar, ref5.current })
+
+	if FFlagExpChatPresetChatEnabled then
+		React.useEffect(function()
+			if not v10 then
+				return
+			end
+
+			local current2
+
+			if ref5.current then
+				current2 = ref5.current
+			else
+				current2 = ref4.current
+			end
+
+			if current2 and current2:IsFocused() then
+				current2:ReleaseFocus()
+			end
+		end, { v10 })
+	end
+
+	React.useEffect(function()
+		v:trace("Mounted")
+		ref3.current = true
+
+		if defineFastFlag then
+			IXPServiceWrapper:LogUserLayerExposure(defineFastString)
+		end
+
+		return function()
+			v:trace("Unmounting")
+			ref3.current = false
 		end
 	end, {})
-	React.useEffect(function() -- line: 630
-		-- upvalues: p12 (copy), v119 (copy), v118 (copy), u106 (ref)
-		local connection = nil
 
-		if p12.autocompleteEnabled then
-			local v238 = if not v119.current then v118.current else v119.current
+	React.useEffect(function()
+		local cursorPositionChangedConnection = nil
 
-			if v238 then
-				connection = v238:GetPropertyChangedSignal("CursorPosition"):Connect(function() -- line: 635
-					-- upvalues: v238 (copy), u106 (ref)
-					local CursorPosition = v238.CursorPosition
+		if props.autocompleteEnabled then
+			local current2
 
-					if CursorPosition and CursorPosition ~= -1 then
-						u106(CursorPosition)
+			if ref5.current then
+				current2 = ref5.current
+			else
+				current2 = ref4.current
+			end
+
+			if current2 then
+				cursorPositionChangedConnection = current2:GetPropertyChangedSignal("CursorPosition"):Connect(function()
+					local cursorPosition = current2.CursorPosition
+
+					if cursorPosition and cursorPosition ~= -1 then
+						setState2(cursorPosition)
 					end
 				end)
 			end
 		end
 
-		return function() -- line: 644
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if cursorPositionChangedConnection then
+				cursorPositionChangedConnection:Disconnect()
 			end
 		end
-	end, { v119.current })
-	React.useEffect(function() -- line: 652
-		-- upvalues: p12 (copy), v124 (copy)
-		if p12.autocompleteEnabled then
-			v124.current = p12.userInputService.InputBegan:connect(function(p14, _) -- line: 654
-				-- upvalues: p12 (copy)
-				if p12.autocompleteDropdownReducer.activated and (Enum.KeyCode.Up or Enum.KeyCode.Down) then
-					if p14 and p14.KeyCode == Enum.KeyCode.Up and p12.autocompleteDropdownReducer.selectedIndex > 1 then
-						p12.autocompleteDropdownSelectionChanged(p12.autocompleteDropdownReducer.selectedIndex - 1)
-					end
+	end, { ref5.current })
 
-					if p14 and p14.KeyCode == Enum.KeyCode.Down and p12.autocompleteDropdownReducer.selectedIndex < #p12.autocompleteDropdownReducer.results then
-						p12.autocompleteDropdownSelectionChanged(p12.autocompleteDropdownReducer.selectedIndex + 1)
-					end
-				end
-			end)
-
-			return function() -- line: 676
-				-- upvalues: v124 (copy)
-				local current = v124.current
-
-				if current and current.Connected then
-					current:Disconnect()
-				end
-
-				v124.current = nil
-			end
+	React.useEffect(function()
+		if not props.autocompleteEnabled then
+			return function() end
 		end
 
-		return function() -- line: 684
-		end
-	end, {
-		p12.userInputService,
-		p12.autocompleteDropdownReducer
-	})
-	React.useEffect(function() -- line: 688
-		-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), p12 (copy), FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs (copy), v123 (copy), v119 (copy), v118 (copy), v125 (copy), FFlagExpChatFixBackspaceNilTargetChannel (copy), v27 (copy), v101 (copy)
-		local v239 = GetFFlagTextChatEnableUniverseChatTabs() and not p12.developerChannelTabsEnabled
-		local v240 = if not FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs then not p12.isChannelBarVisible else not p12.isChannelBarVisible or v239
-
-		v123.current = p12.userInputService.InputEnded:connect(function(p16, _) -- line: 696
-			-- upvalues: v119 (copy), v118 (copy), p12 (copy), v125 (copy), v240 (copy), FFlagExpChatFixBackspaceNilTargetChannel (copy), v27 (copy), v101 (copy)
-			if if not v119.current then v118.current and (v118.current:IsFocused() and (p16 and p16.KeyCode == Enum.KeyCode.Backspace)) else v119.current and (v119.current:IsFocused() and (p16 and p16.KeyCode == Enum.KeyCode.Backspace)) then
-				local v329 = (p12.targetTextChannelDisplayName or "") ~= ""
-
-				if v125.current and v240 and (not FFlagExpChatFixBackspaceNilTargetChannel or v329) then
-					p12.resetTargetChannel(if not FFlagExpChatFixBackspaceNilTargetChannel then nil else p12.isGlobalChatTabActive)
-					v27:debug("ChatInputBar ChatInputBarResetTargetChannel()")
-					v125.current = false
-
-					return
+		ref10.current = props.userInputService.InputBegan:connect(function(p, _)
+			if props.autocompleteDropdownReducer.activated and (Enum.KeyCode.Up or Enum.KeyCode.Down) then
+				if p and p.KeyCode == Enum.KeyCode.Up and props.autocompleteDropdownReducer.selectedIndex > 1 then
+					props.autocompleteDropdownSelectionChanged(props.autocompleteDropdownReducer.selectedIndex - 1)
 				end
 
-				if v101 == "" and if not FFlagExpChatFixBackspaceNilTargetChannel then p12.targetTextChannelDisplayName ~= "" else v329 then
-					v125.current = true
+				if
+					p
+					and p.KeyCode == Enum.KeyCode.Down
+					and props.autocompleteDropdownReducer.selectedIndex < #props.autocompleteDropdownReducer.results
+				then
+					props.autocompleteDropdownSelectionChanged(props.autocompleteDropdownReducer.selectedIndex + 1)
 				end
 			end
 		end)
 
-		return function() -- line: 737
-			-- upvalues: v123 (copy)
-			local current = v123.current
+		return function()
+			local current2 = ref10.current
 
-			if current and current.Connected then
-				current:Disconnect()
+			if current2 and current2.Connected then
+				current2:Disconnect()
 			end
 
-			v123.current = nil
+			ref10.current = nil
 		end
-	end, {
-		p12.userInputService,
-		v119.current,
-		p12.isChannelBarVisible,
-		p12.targetTextChannelDisplayName,
-		p12.resetTargetChannel,
-		if not FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs then nil else p12.developerChannelTabsEnabled,
-		if not FFlagExpChatFixBackspaceNilTargetChannel then nil else p12.isGlobalChatTabActive
-	})
-	React.useEffect(function() -- line: 755
-		-- upvalues: p12 (copy), Config (copy), v119 (copy), v118 (copy), v133 (copy)
-		local function handleAction(_: string, p18, p19) -- line: 756
-			-- upvalues: p12 (copy), Config (copy), v119 (copy), v118 (copy), v133 (copy)
-			if p12.isChatHotkeyEnabled and p19 and (p19.KeyCode == Config.ChatInputBarDefaultFocusKeyCode or p19.KeyCode == p12.devDefinedFocusKeyCode) then
-				local v334 = if not v119.current then v118.current else v119.current
+	end, { props.userInputService, props.autocompleteDropdownReducer })
 
-				if v334 and p18 == Enum.UserInputState.Begin and v334 and not v334:IsFocused() then
-					task.delay(0, function() -- line: 778
-						-- upvalues: v334 (copy)
-						v334:CaptureFocus()
-					end)
-					p12.focusChatHotKeyActivated()
-					v133.current = true
+	local useEffect = React.useEffect
+	local function fn3()
+		local v15 = GetFFlagTextChatEnableUniverseChatTabs() and not props.developerChannelTabsEnabled
+		local v16
 
-					return Enum.ContextActionResult.Sink
+		if FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs then
+			v16 = not props.isChannelBarVisible or v15
+		else
+			v16 = not props.isChannelBarVisible
+		end
+
+		ref9.current = props.userInputService.InputEnded:connect(function(p, _)
+			local v17
+
+			if ref5.current then
+				v17 = ref5.current and ref5.current:IsFocused() and p and p.KeyCode == Enum.KeyCode.Backspace
+			else
+				v17 = ref4.current and ref4.current:IsFocused() and p and p.KeyCode == Enum.KeyCode.Backspace
+			end
+
+			if v17 then
+				local v18 = (props.targetTextChannelDisplayName or "") ~= ""
+
+				if ref11.current and v16 and (not FFlagExpChatFixBackspaceNilTargetChannel or v18) then
+					local resetTargetChannel = props.resetTargetChannel
+					local v19
+
+					if FFlagExpChatFixBackspaceNilTargetChannel then
+						v19 = props.isGlobalChatTabActive
+					end
+
+					resetTargetChannel(v19)
+
+					v:debug("ChatInputBar ChatInputBarResetTargetChannel()")
+					ref11.current = false
+				elseif state == "" then
+					if not FFlagExpChatFixBackspaceNilTargetChannel then
+						v18 = props.targetTextChannelDisplayName ~= ""
+					end
+
+					if v18 then
+						ref11.current = true
+					end
 				end
 			end
+		end)
 
-			return Enum.ContextActionResult.Pass
+		return function()
+			local current2 = ref9.current
+
+			if current2 and current2.Connected then
+				current2:Disconnect()
+			end
+
+			ref9.current = nil
 		end
+	end
 
-		p12.contextActionService:BindCoreAction("FocusChat", handleAction, false, Enum.UserInputType.Keyboard)
+	local userInputService = props.userInputService
+	local current2 = ref5.current
+	local isChannelBarVisible = props.isChannelBarVisible
+	local targetTextChannelDisplayName2 = props.targetTextChannelDisplayName
+	local resetTargetChannel = props.resetTargetChannel
+	local developerChannelTabsEnabled
 
-		return function() -- line: 802
-			-- upvalues: p12 (copy)
-			p12.contextActionService:UnbindCoreAction("FocusChat")
-		end
-	end, {
-		p12.isChatHotkeyEnabled,
-		p12.devDefinedFocusKeyCode,
-		v133.current,
-		v119.current
+	if FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs then
+		developerChannelTabsEnabled = props.developerChannelTabsEnabled
+	end
+
+	local v15
+
+	if FFlagExpChatFixBackspaceNilTargetChannel then
+		v15 = props.isGlobalChatTabActive
+	end
+
+	useEffect(fn3, {
+		userInputService,
+		current2,
+		isChannelBarVisible,
+		targetTextChannelDisplayName2,
+		resetTargetChannel,
+		developerChannelTabsEnabled,
+		v15
 	})
 
-	local v137 = React.useCallback(function() -- line: 816
-		-- upvalues: v112 (copy), p12 (copy), TextChatService (copy)
-		v112(true)
-		p12.onFocus()
+	React.useEffect(function()
+		local function handleAction(_: string, p, p2)
+			if
+				not props.isChatHotkeyEnabled
+				or not p2
+				or p2.KeyCode ~= Config.ChatInputBarDefaultFocusKeyCode and p2.KeyCode ~= props.devDefinedFocusKeyCode
+			then
+				return Enum.ContextActionResult.Pass
+			end
 
-		local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+			local current3
 
-		if ChatInputBarConfiguration then
-			ChatInputBarConfiguration.IsFocusedWrite = true
+			if ref5.current then
+				current3 = ref5.current
+			else
+				current3 = ref4.current
+			end
+
+			if not (current3 and p == Enum.UserInputState.Begin and current3 and not current3:IsFocused()) then
+				return Enum.ContextActionResult.Pass
+			end
+
+			task.delay(0, function()
+				current3:CaptureFocus()
+			end)
+
+			props.focusChatHotKeyActivated()
+
+			ref12.current = true
+
+			return Enum.ContextActionResult.Sink
 		end
-	end, { p12.onFocus })
-	local v138 = React.useCallback(function(_, b1: boolean, p21) -- line: 822
-		-- upvalues: v27 (copy), v122 (copy), FFlagExpChatEnableFocusNavigation (copy), p12 (copy), v136 (copy), v134 (copy), v117 (copy), v119 (copy), v118 (copy), u105 (ref), v64 (copy), v112 (copy), TextChatService (copy), v133 (copy), Players (copy)
-		v27:debug("Focus lost with enter: {}", (tostring(b1)))
 
-		local current = v122.current
+		props.contextActionService:BindCoreAction("FocusChat", handleAction, false, Enum.UserInputType.Keyboard)
 
-		if b1 or FFlagExpChatEnableFocusNavigation and p21 and (p21.KeyCode == Enum.KeyCode.Return or p21.KeyCode == Enum.KeyCode.KeypadEnter) then
-			if p12.autocompleteEnabled and current and p12.autocompleteDropdownReducer.activated and #p12.autocompleteDropdownReducer.results > 0 then
-				local OffsetFrame = current.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame
+		return function()
+			props.contextActionService:UnbindCoreAction("FocusChat")
+		end
+	end, { props.isChatHotkeyEnabled, props.devDefinedFocusKeyCode, ref12.current, ref5.current })
 
-				for _, child in ipairs(OffsetFrame:GetChildren()) do
-					if child.ClassName == "Frame" and child.LayoutOrder == p12.autocompleteDropdownReducer.selectedIndex then
-						v136(child.TextLabelButton)
+	local function fn4(isFocusedWrite: boolean) -- 2 equivalent calls inferred from this helper
+		local chatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
 
+		if chatInputBarConfiguration then
+			chatInputBarConfiguration.IsFocusedWrite = isFocusedWrite
+		end
+	end
+
+	local onFocused = React.useCallback(function()
+		setState4(true)
+		props.onFocus()
+		fn4(true) -- inferred equivalent call
+
+		if defineFastFlag5 and ref2 then
+			if ref2.current then
+				ref2.current = false
+			else
+				ExpChatShared.Analytics:TelemetryLogEvent(
+					ExpChatShared.Analytics.ExpChatPresetActionConfig,
+					{
+						event_type = Constants.Analytics.EventTypes.Click,
+						component = Constants.Analytics.Components.MainInputBar
+					},
+					Constants.Analytics.ExtendedStandardizedFields
+				)
+			end
+		end
+	end, { props.onFocus })
+
+	local onFocusLost = React.useCallback(function(_, flag: boolean, p)
+		v:debug("Focus lost with enter: {}", (tostring(flag)))
+
+		local current3 = ref7.current
+
+		if flag or p and (p.KeyCode == Enum.KeyCode.Return or p.KeyCode == Enum.KeyCode.KeypadEnter) then
+			if
+				props.autocompleteEnabled
+				and current3
+				and props.autocompleteDropdownReducer.activated
+				and #props.autocompleteDropdownReducer.results > 0
+				and (not FFlagExpChatPresetChatAutocompleteEnabled or props.autocompleteDropdownReducer.selectedIndex > 0)
+			then
+				local offsetFrame = current3.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame
+
+				for _, child3 in ipairs(offsetFrame:GetChildren()) do
+					if
+						child3.ClassName == "Frame"
+						and child3.LayoutOrder == props.autocompleteDropdownReducer.selectedIndex
+					then
+						onAutocompleteSelected(child3.TextLabelButton)
 						return
 					end
 				end
 			else
-				v134()
+				onSendActivated()
+
+				if
+					FFlagExpChatPresetChatAutocompleteEnabled
+					and props.autocompleteEnabled
+					and props.autocompleteDropdownReducer.autocompleteType == "presets"
+				then
+					props.autocompleteDropdownDeactivated()
+				end
 			end
 		end
 
-		if v117.current then
-			if p12.autocompleteEnabled and current and p12.autocompleteDropdownReducer.activated then
-				if p21 then
-					if p21.KeyCode == Enum.KeyCode.Escape then
-						p12.autocompleteDropdownActivated(false)
+		if ref3.current then
+			if props.autocompleteEnabled and current3 and props.autocompleteDropdownReducer.activated then
+				if p then
+					if p.KeyCode == Enum.KeyCode.Escape then
+						props.autocompleteDropdownActivated(false)
+						local current4
 
-						local v252 = if not v119.current then v118.current else v119.current
+						if ref5.current then
+							current4 = ref5.current
+						else
+							current4 = ref4.current
+						end
 
-						if v252 then
-							local v253 = u105
+						if current4 then
+							if defineFastFlag5 and ref2 and not current4:IsFocused() then
+								ref2.current = true
+							end
 
-							v252:CaptureFocus()
+							current4:CaptureFocus()
 
-							if not v64 then
-								v252.CursorPosition = v253
+							if not defineFastFlag7 then
+								current4.CursorPosition = state2
 							end
 
 							return
 						end
 
-						v27:error("Could not focus chat input bar because textBox not found")
+						v:error("Could not focus chat input bar because textBox not found")
 					else
-						local PositionX = p21.Position.X
-						local PositionY = p21.Position.Y
-						local AbsolutePositionX = current.AbsolutePosition.X
-						local v257 = AbsolutePositionX + current.AbsoluteSize.X
-						local AbsolutePositionY = current.AbsolutePosition.Y
-						local v259 = AbsolutePositionY + current.AbsoluteSize.Y
+						local x = p.Position.X
+						local y = p.Position.Y
+						local x2 = current3.AbsolutePosition.X
 
-						if PositionX < AbsolutePositionX or v257 < PositionX or PositionY < AbsolutePositionY or v259 < PositionY then
-							p12.autocompleteDropdownActivated(false)
+						local v16 = x2 + current3.AbsoluteSize.X
+						local y2 = current3.AbsolutePosition.Y
+
+						local v17 = y2 + current3.AbsoluteSize.Y
+
+						if x < x2 or v16 < x or y < y2 or v17 < y then
+							props.autocompleteDropdownActivated(false)
 						end
 					end
 				end
 			else
-				v112(false)
+				setState4(false)
 			end
 		end
 
-		p12.onUnfocus()
+		props.onUnfocus()
+		fn4(false) -- inferred equivalent call
 
-		local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+		if ref12.current then
+			local localPlayer = Players.LocalPlayer
 
-		if ChatInputBarConfiguration then
-			ChatInputBarConfiguration.IsFocusedWrite = false
-		end
-
-		if v133.current then
-			local LocalPlayer = Players.LocalPlayer
-
-			if LocalPlayer then
-				local TextBox = Instance.new("TextBox")
-
-				TextBox.Visible = false
-				TextBox.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui")
-				TextBox:CaptureFocus()
-				TextBox:ReleaseFocus()
-				TextBox:Destroy()
+			if localPlayer then
+				local textBox = Instance.new("TextBox")
+				textBox.Visible = false
+				textBox.Parent = localPlayer:FindFirstChildOfClass("PlayerGui")
+				textBox:CaptureFocus()
+				textBox:ReleaseFocus()
+				textBox:Destroy()
 			end
 
-			v133.current = false
+			ref12.current = false
 		end
 	end)
 
-	React.useEffect(function() -- line: 927
-		-- upvalues: FFlagEnableConsoleExpControls (copy), v119 (copy), v118 (copy), FFlagChromeChatGamepadSupportFix (copy), GuiService (copy), v137 (copy), onChatInputBarFocusLost (copy), v138 (copy), ActionBindableEvent (copy)
-		local u263 = nil
-		local u264 = nil
-		local connection = ActionBindableEvent.Event:Connect(function(p22) -- line: 931
-			-- upvalues: FFlagEnableConsoleExpControls (copy), v119 (copy), v118 (copy), FFlagChromeChatGamepadSupportFix (copy), GuiService (copy), v137 (copy), u264 (ref), u263 (ref), onChatInputBarFocusLost (copy), v138 (copy)
-			local u336 = nil
+	React.useEffect(function()
+		local connection = nil
+		local thread = nil
+
+		local function onEvent(data)
+			local current3
 
 			if FFlagEnableConsoleExpControls then
-				u336 = if not v119.current then v118.current else v119.current
-			end
-
-			if p22.type == "ChatTopBarFocusActivated" then
-				if not FFlagEnableConsoleExpControls then
-					u336 = if not v119.current then v118.current else v119.current
-				end
-
-				if u336 then
-					task.delay(0, function() -- line: 942
-						-- upvalues: u336 (ref)
-						u336:CaptureFocus()
-					end)
-				end
-			elseif not FFlagChromeChatGamepadSupportFix and FFlagEnableConsoleExpControls and p22.type == "ChatTopBarFocusSelect" and u336 then
-				GuiService:SetMenuIsOpen(true, "ExperienceChat")
-				v137()
-				GuiService.SelectedCoreObject = u336
-				u264 = task.delay(0, function() -- line: 957
-					-- upvalues: u264 (ref), u263 (ref), onChatInputBarFocusLost (copy), p22 (copy), v138 (copy)
-					u264 = nil
-
-					if u263 then
-						u263:Disconnect()
-					end
-
-					u263 = onChatInputBarFocusLost(p22.onSelectionLost, p22.keybinds, v138)
-				end)
-			end
-		end)
-
-		return function() -- line: 971
-			-- upvalues: connection (copy), u264 (ref), u263 (ref)
-			connection:disconnect()
-
-			if u264 then
-				task.cancel(u264)
-				u264 = nil
-			end
-
-			if u263 then
-				u263:Disconnect()
-				u263 = nil
-			end
-		end
-	end, {
-		v118.current,
-		v119.current
-	})
-	useEffectChatInputBarFocus(v118, v119, v121, v137, v138)
-
-	local function handleAutocomplete(p23, p24, p25) -- line: 989
-		-- upvalues: p12 (copy), u78 (ref), u77 (ref), sortCommandResultsCallback (copy), u76 (ref), sortEmojiResultsCallback (copy), u109 (ref), List (copy), v102 (copy), v64 (copy), v122 (copy), v136 (copy), u110 (ref)
-		if p25 == "/" and p23.CursorPosition == 2 or p12.autocompleteDropdownReducer.autocompleteType == "commands" and p25 ~= ":" then
-			p12.autocompleteDropdownTypeChanged("commands")
-			p12.autocompleteDropdownActivated(true)
-
-			if p25 ~= "" and p25 ~= " " then
-				local v269 = string.sub(p24, 1, p23.CursorPosition - 1):lower()
-				local v270 = ((if not p12.isGlobalChatTabActive or not u78 then u77 else u78)):getResults(v269, sortCommandResultsCallback)
-
-				p12.autocompleteDropdownResultsChanged(v270)
-
-				if v269 == v270[1] then
-					p12.autocompleteDropdownActivated(false)
-					p12.autocompleteDropdownResultsChanged({})
-
-					return
+				if ref5.current then
+					current3 = ref5.current
+				else
+					current3 = ref4.current
 				end
 			else
-				p12.autocompleteDropdownDeactivated()
+				current3 = nil
 			end
 
-			return
-		end
-
-		if (p12.autocompleteDropdownReducer.activated or #p12.autocompleteDropdownReducer.results > 0) and p12.autocompleteDropdownReducer.autocompleteType == "emojis" then
-			p12.autocompleteDropdownActivated(true)
-
-			local v271 = string.sub(p24, 1, p23.CursorPosition - 1)
-			local v272 = string.find(v271, ":[^:]*$")
-
-			if p25 ~= "" and p25 ~= ":" and p25 ~= " " and v272 then
-				local v273 = string.sub(p24, v272 + 1, p23.CursorPosition - 1):lower()
-				local t6 = {}
-
-				if v273 and string.len(v273) > 1 then
-					t6 = u76:getResults(v273, sortEmojiResultsCallback)
+			if data.type == "ChatTopBarFocusActivated" then
+				if not FFlagEnableConsoleExpControls then
+					if ref5.current then
+						current3 = ref5.current
+					else
+						current3 = ref4.current
+					end
 				end
 
-				p12.autocompleteDropdownResultsChanged(t6)
+				if current3 then
+					task.delay(0, function()
+						current3:CaptureFocus()
+					end)
+				end
+			elseif
+				not FFlagChromeChatGamepadSupportFix
+				and FFlagEnableConsoleExpControls
+				and data.type == "ChatTopBarFocusSelect"
+				and current3
+			then
+				GuiService:SetMenuIsOpen(true, "ExperienceChat")
+				onFocused()
+				GuiService.SelectedCoreObject = current3
 
-				return
-			end
+				thread = task.delay(0, function()
+					thread = nil
 
-			if p25 == ":" then
-				if v272 ~= u109 then
-					local v275 = string.sub(p24, u109 + 1, p23.CursorPosition - 2):lower()
-
-					if List.includes(p12.autocompleteDropdownReducer.results, v275) then
-						local v276 = string.sub(p24, p23.CursorPosition, #p24)
-						local v277 = string.sub(p24, 1, p23.CursorPosition - 2) .. v276
-
-						p23.Text = v277
-						v102(v277)
-
-						if not v64 then
-							p23.CursorPosition = p23.CursorPosition - 1
-						end
-
-						local current = v122.current
-
-						if current then
-							local OffsetFrame = current.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame
-
-							for _, child in ipairs(OffsetFrame:GetChildren()) do
-								if child.ClassName ~= "Frame" then
-									continue
-								end
-
-								local TextLabelButton = child:FindFirstChild("TextLabelButton")
-
-								if TextLabelButton then
-									local TextLabel = TextLabelButton:FindFirstChild("TextLabel")
-
-									if not TextLabel or not TextLabel.Text or v275 ~= TextLabel.Text then
-										continue
-									end
-
-									v136(TextLabelButton)
-
-									return
-								end
-							end
-
-							return
-						end
-					else
-						p12.autocompleteDropdownActivated(false)
-						p12.autocompleteDropdownResultsChanged({})
+					if connection then
+						connection:Disconnect()
 					end
 
-					return
-				end
+					connection = onChatInputBarFocusLost(data.onSelectionLost, data.keybinds, onFocusLost)
+				end)
+			end
+		end
 
-				p12.autocompleteDropdownResultsChanged({})
+		local eventConnection = ActionBindableEvent.Event:Connect(onEvent)
 
-				return
+		return function()
+			eventConnection:disconnect()
+
+			if thread then
+				task.cancel(thread)
+				thread = nil
 			end
 
-			if p25 == " " then
-				p12.autocompleteDropdownActivated(false)
-				p12.autocompleteDropdownResultsChanged({})
-
-				return
+			if connection then
+				connection:Disconnect()
+				connection = nil
 			end
+		end
+	end, { ref4.current, ref5.current })
 
-			p12.autocompleteDropdownDeactivated()
-			u110(0)
+	useEffectChatInputBarFocus(ref4, ref5, ref6, onFocused, onFocusLost)
 
+	local function handlePresetAutocomplete(value: string, cursorPosition: number)
+		if cursorPosition < 1 then
 			return
 		end
 
-		local v284 = string.find(p24, ":[^:]*$")
+		local v16 = string.sub(value, 1, cursorPosition - 1)
+		local v17
 
-		if p25 == ":" then
-			p12.autocompleteDropdownTypeChanged("emojis")
-			p12.autocompleteDropdownActivated(true)
-			p12.autocompleteDropdownResultsChanged({})
-			u110(v284)
+		if props.targetTextChannel == nil and not FFlagExpChatUniverseChatPresetEnabled then
+			v17 = {}
+		else
+			local findMatchingPresets = PresetSearch.findMatchingPresets
+			local presetChatStore = GetPresetChatStore(false)
+			local v18
+
+			if defineFastFlag4 then
+				v18 = ExpChatPresetChatAutocompleteExperimentation.getSearchVariant()
+			end
+
+			v17 = findMatchingPresets(presetChatStore, v16, v18)
+		end
+
+		if #v17 == 0 then
+			if props.autocompleteDropdownReducer.autocompleteType == "presets" then
+				props.autocompleteDropdownDeactivated()
+			end
+		else
+			props.autocompleteDropdownTypeChanged("presets")
+			props.autocompleteDropdownActivated(true)
+			local autocompleteDropdownResultsChanged2 = props.autocompleteDropdownResultsChanged
+
+			if not FFlagExpChatAutocompleteDropdownRedesign then
+				v16 = nil
+			end
+
+			autocompleteDropdownResultsChanged2(v17, v16)
+
+			props.autocompleteDropdownSelectionChanged(0)
 		end
 	end
 
-	React.useEffect(function() -- line: 1106
-		-- upvalues: TextChatService (copy), RBXTeamCommandname (ref), RBXTeamCommand (copy), RBXWhisperCommandname (ref), RBXWhisperCommand (copy)
+	local function handleAutocomplete(state6, text, p)
+		if
+			p == "/" and state6.CursorPosition == 2
+			or props.autocompleteDropdownReducer.autocompleteType == "commands" and p ~= ":"
+		then
+			props.autocompleteDropdownTypeChanged("commands")
+			props.autocompleteDropdownActivated(true)
+
+			if p == "" or p == " " then
+				props.autocompleteDropdownDeactivated()
+			else
+				local lower = string.sub(text, 1, state6.CursorPosition - 1):lower()
+				local v16
+				v16 = props.isGlobalChatTabActive and v5 or v4
+
+				local results = v16:getResults(lower, sortCommandResultsCallback)
+				local autocompleteDropdownResultsChanged2 = props.autocompleteDropdownResultsChanged
+				local v17
+
+				if FFlagExpChatAutocompleteDropdownRedesign then
+					v17 = lower
+				end
+
+				autocompleteDropdownResultsChanged2(results, v17)
+
+				if lower == results[1] then
+					props.autocompleteDropdownActivated(false)
+					props.autocompleteDropdownResultsChanged({})
+				end
+			end
+		elseif
+			(props.autocompleteDropdownReducer.activated or #props.autocompleteDropdownReducer.results > 0)
+			and props.autocompleteDropdownReducer.autocompleteType == "emojis"
+		then
+			props.autocompleteDropdownActivated(true)
+			local v16 = string.sub(text, 1, state6.CursorPosition - 1)
+			local v17 = string.find(v16, ":[^:]*$")
+
+			if p == "" or p == ":" or p == " " or not v17 then
+				if p == ":" then
+					if v17 == state3 then
+						props.autocompleteDropdownResultsChanged({})
+						return
+					end
+
+					local lower = string.sub(text, state3 + 1, state6.CursorPosition - 2):lower()
+
+					if list.includes(props.autocompleteDropdownReducer.results, lower) then
+						local v18 = string.sub(text, state6.CursorPosition, #text)
+						local text2 = string.sub(text, 1, state6.CursorPosition - 2) .. v18
+						state6.Text = text2
+						setState(text2)
+
+						if not defineFastFlag7 then
+							state6.CursorPosition -= 1
+						end
+
+						local current3 = ref7.current
+
+						if current3 then
+							local offsetFrame = current3.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame
+
+							for _, child3 in ipairs(offsetFrame:GetChildren()) do
+								if FFlagExpChatAutocompleteDropdownRedesign then
+									if
+										child3.ClassName == "Frame"
+										and props.autocompleteDropdownReducer.results[child3.LayoutOrder] == lower
+									then
+										local textLabelButton = child3:FindFirstChild("TextLabelButton")
+
+										if textLabelButton then
+											onAutocompleteSelected(textLabelButton)
+											return
+										end
+									end
+								elseif child3.ClassName == "Frame" then
+									local textLabelButton = child3:FindFirstChild("TextLabelButton")
+
+									if textLabelButton then
+										local textLabel = textLabelButton:FindFirstChild("TextLabel")
+
+										if textLabel and textLabel.Text and textLabel.Text == lower then
+											onAutocompleteSelected(textLabelButton)
+											return
+										end
+									end
+								end
+							end
+						end
+					else
+						props.autocompleteDropdownActivated(false)
+						props.autocompleteDropdownResultsChanged({})
+					end
+				elseif p == " " then
+					props.autocompleteDropdownActivated(false)
+					props.autocompleteDropdownResultsChanged({})
+				else
+					props.autocompleteDropdownDeactivated()
+					setState3(0)
+				end
+			else
+				local lower = string.sub(text, v17 + 1, state6.CursorPosition - 1):lower()
+				local v18 = not (lower and string.len(lower) > 1) and {}
+					or v3:getResults(lower, sortEmojiResultsCallback)
+
+				local autocompleteDropdownResultsChanged2 = props.autocompleteDropdownResultsChanged
+
+				if not FFlagExpChatAutocompleteDropdownRedesign then
+					lower = nil
+				end
+
+				autocompleteDropdownResultsChanged2(v18, lower)
+			end
+		else
+			local v16 = string.find(text, ":[^:]*$")
+
+			if p == ":" then
+				props.autocompleteDropdownTypeChanged("emojis")
+				props.autocompleteDropdownActivated(true)
+				props.autocompleteDropdownResultsChanged({})
+				setState3(v16)
+			elseif FFlagExpChatPresetChatAutocompleteEnabled then
+				handlePresetAutocomplete(text, state6.CursorPosition)
+			end
+		end
+	end
+	React.useEffect(function()
 		if TextChatService.CreateDefaultCommands then
-			RBXTeamCommandname = TextChatService:FindFirstChild(RBXTeamCommand.name, true)
-			RBXWhisperCommandname = TextChatService:FindFirstChild(RBXWhisperCommand.name, true)
+			child = TextChatService:FindFirstChild(RBXTeamCommand.name, true)
+			child2 = TextChatService:FindFirstChild(RBXWhisperCommand.name, true)
 		end
 	end, {})
 
-	local v140 = React.useCallback(function(p26) -- line: 1113
-		-- upvalues: p12 (copy), v102 (copy), v27 (copy), v101 (copy), getEnableChatInputBarConfigurationAutocompleteEnabled (copy), handleAutocomplete (copy), v125 (copy), v62 (copy), v99 (copy), RBXTeamCommandname (ref), autoCastCommand (copy), RBXTeamCommand (copy), RBXWhisperCommandname (ref), RBXWhisperCommand (copy), Promise (copy)
-		local p26Text = p26.Text
+	local onTextChanged = React.useCallback(function(state6)
+		local text = state6.Text
 
-		if p12.autocompleteEnabled then
-			local v287 = string.find(p26Text, "\r")
-			local v288 = p26.CursorPosition < #p26Text + 1
+		if props.autocompleteEnabled then
+			local v16 = string.find(text, "\r")
+			local v17 = state6.CursorPosition < #text + 1
 
-			if v287 then
-				local v289 = string.gsub(p26Text, "\r", "")
+			if v16 then
+				local text2 = string.gsub(text, "\r", "")
+				state6.Text = text2
+				setState(text2)
 
-				p26.Text = v289
-				v102(v289)
-
-				if v288 then
-					p26.CursorPosition = p26.CursorPosition - 1
+				if v17 then
+					state6.CursorPosition -= 1
 				end
 
 				return
 			end
 		end
 
-		local v290 = string.sub(p26Text, p26.CursorPosition - 1, p26.CursorPosition - 1)
+		local v16 = string.sub(text, state6.CursorPosition - 1, state6.CursorPosition - 1)
+		v:trace("Input: {}", text)
+		local v17
 
-		v27:trace("Input: {}", p26Text)
+		if utf8.len(text) then
+			v17 = utf8.len(utf8.nfcnormalize(text))
+		else
+			v17 = string.len(text)
+		end
 
-		local v291 = if not utf8.len(p26Text) then string.len(p26Text) else utf8.len(utf8.nfcnormalize(p26Text))
+		if v17 and props.messageCharacterLimit < v17 then
+			v:debug("Message is over the character limit of {}", (tostring(props.messageCharacterLimit)))
+			state6.Text = state
+		else
+			setState(text)
 
-		if v291 and v291 > p12.messageCharacterLimit then
-			v27:debug("Message is over the character limit of {}", (tostring(p12.messageCharacterLimit)))
-			p26.Text = v101
+			if getEnableChatInputBarConfigurationAutocompleteEnabled() and props.autocompleteEnabled then
+				handleAutocomplete(state6, text, v16)
+			end
 
+			ref11.current = #text == 0 and ref11.current
+
+			if defineFastFlag6 then
+				if string.sub(text, 1, 1) == "/" and props.localPlayer and text ~= ref.current then
+					ref.current = text
+
+					local userId = props.localPlayer.UserId
+					local v18 = {}
+
+					if child and child.Enabled then
+						table.insert(v18, autoCastCommand(RBXTeamCommand, userId, text))
+					end
+
+					if child2 and child2.Enabled then
+						table.insert(v18, autoCastCommand(RBXWhisperCommand, userId, text))
+					end
+
+					local v19 = #v18 == 0 and { Promise.reject() } or v18
+
+					Promise.any(v19):andThen(function()
+						state6.Text = ""
+						setState("")
+
+						ref11.current = true
+					end):catch(function(p)
+						v:trace("Could not send autoCastCommand. Error: {}", p)
+					end)
+				elseif string.sub(text, 1, 1) ~= "/" then
+					ref.current = ""
+				end
+			elseif props.localPlayer then
+				local userId = props.localPlayer.UserId
+
+				local v18 = {}
+
+				if child and child.Enabled then
+					table.insert(v18, autoCastCommand(RBXTeamCommand, userId, text))
+				end
+
+				if child2 and child2.Enabled then
+					table.insert(v18, autoCastCommand(RBXWhisperCommand, userId, text))
+				end
+
+				local v19 = #v18 == 0 and { Promise.reject() } or v18
+
+				Promise.any(v19):andThen(function()
+					state6.Text = ""
+					setState("")
+
+					ref11.current = true
+				end):catch(function(p)
+					v:trace("Could not send autoCastCommand. Error: {}", p)
+				end)
+			end
+		end
+	end)
+
+	local onReturnPressedFromOnScreenKeyboard = React.useCallback(function()
+		local current3
+
+		if ref5.current then
+			current3 = ref5.current
+		else
+			current3 = ref4.current
+		end
+
+		if current3 then
+			current3:ReleaseFocus(true)
+		end
+	end, { ref4.current, ref5.current })
+
+	local v16 = React.useCallback(function(p)
+		v6(p.Visible and p.AbsoluteSize.X or 0)
+	end)
+
+	local v17 = useCursor()
+
+	local onAutocompleteDropdownHover = React.useCallback(function(p)
+		props.autocompleteDropdownSelectionChanged(p.LayoutOrder)
+	end)
+	local hasEmptyInputText = state == ""
+	local showPlaceholderText = hasEmptyInputText and not state4
+	local chatInputBarSettings = props.chatInputBarSettings
+	local chatWindowSettings = props.chatWindowSettings
+	local canLocalUserChat2
+
+	if canLocalUserChatDerived == nil then
+		canLocalUserChat2 = props.canLocalUserChat
+	else
+		canLocalUserChat2 = canLocalUserChatDerived
+	end
+
+	React.useEffect(function()
+		if defineFastFlag2 and canLocalUserChat2 then
+			IXPServiceWrapper:LogUserLayerExposure(defineFastString2)
+		end
+	end, { canLocalUserChat2 })
+
+	React.useEffect(function()
+		if not (defineFastFlag3 and state4 and (getEnableChatInputBarConfigurationAutocompleteEnabled() and props.autocompleteEnabled)) then
 			return
 		end
 
-		v102(p26Text)
+		local presetChatStore = GetPresetChatStore(false)
 
-		if getEnableChatInputBarConfigurationAutocompleteEnabled() and p12.autocompleteEnabled then
-			handleAutocomplete(p26, p26Text, v290)
+		if
+			not presetChatStore.getIsEnabled(false)
+			or presetChatStore.getAccessLevel(false) ~= Constants.AccessLevel.Enabled
+		then
+			return
 		end
 
-		v125.current = #p26Text == 0 and v125.current
+		IXPServiceWrapper:LogFlagLinkedUserLayerExposure(defineFastString3)
+	end, { state4, props.autocompleteEnabled, shouldTruncatePlaceholder })
 
-		if v62 then
-			if string.sub(p26Text, 1, 1) == "/" and p12.localPlayer and p26Text ~= v99.current then
-				v99.current = p26Text
-
-				local UserId = p12.localPlayer.UserId
-				local t7 = {}
-
-				if RBXTeamCommandname and RBXTeamCommandname.Enabled then
-					table.insert(t7, autoCastCommand(RBXTeamCommand, UserId, p26Text))
-				end
-
-				if RBXWhisperCommandname and RBXWhisperCommandname.Enabled then
-					table.insert(t7, autoCastCommand(RBXWhisperCommand, UserId, p26Text))
-				end
-
-				if #t7 == 0 then
-					t7 = { Promise.reject() }
-				end
-
-				Promise.any(t7):andThen(function() -- line: 1169
-					-- upvalues: p26 (copy), v102 (copy), v125 (copy)
-					p26.Text = ""
-					v102("")
-					v125.current = true
-				end):catch(function(p27) -- line: 1175
-					-- upvalues: v27 (copy)
-					v27:trace("Could not send autoCastCommand. Error: {}", p27)
-				end)
-
-				return
-			end
-
-			if string.sub(p26Text, 1, 1) ~= "/" then
-				v99.current = ""
-
-				return
-			end
-		elseif p12.localPlayer then
-			local UserId = p12.localPlayer.UserId
-			local t8 = {}
-
-			if RBXTeamCommandname and RBXTeamCommandname.Enabled then
-				table.insert(t8, autoCastCommand(RBXTeamCommand, UserId, p26Text))
-			end
-
-			if RBXWhisperCommandname and RBXWhisperCommandname.Enabled then
-				table.insert(t8, autoCastCommand(RBXWhisperCommand, UserId, p26Text))
-			end
-
-			if #t8 == 0 then
-				t8 = { Promise.reject() }
-			end
-
-			Promise.any(t8):andThen(function() -- line: 1198
-				-- upvalues: p26 (copy), v102 (copy), v125 (copy)
-				p26.Text = ""
-				v102("")
-				v125.current = true
-			end):catch(function(p28) -- line: 1204
-				-- upvalues: v27 (copy)
-				v27:trace("Could not send autoCastCommand. Error: {}", p28)
-			end)
+	React.useEffect(function()
+		if not (fFlagExpChatPresetChatSendEnabled and state4 and (getEnableChatInputBarConfigurationAutocompleteEnabled() and props.autocompleteEnabled)) then
+			return
 		end
-	end)
-	local v141 = React.useCallback(function() -- line: 1211
-		-- upvalues: v119 (copy), v118 (copy)
-		local v296 = if not v119.current then v118.current else v119.current
 
-		if v296 then
-			v296:ReleaseFocus(true)
+		local presetChatStore = GetPresetChatStore(false)
+
+		if
+			not presetChatStore.getIsEnabled(false)
+			or presetChatStore.getAccessLevel(false) ~= Constants.AccessLevel.Enabled
+		then
+			return
 		end
-	end, {
-		v118.current,
-		v119.current
-	})
-	local v142 = React.useCallback(function(p29) -- line: 1218
-		-- upvalues: v116 (copy)
-		v116(p29.Visible and p29.AbsoluteSize.X or 0)
-	end)
-	local v143 = if not FFlagExpChatEnableFocusNavigation then nil else useCursor()
-	local v144 = React.useCallback(function(p30) -- line: 1225
-		-- upvalues: p12 (copy)
-		p12.autocompleteDropdownSelectionChanged(p30.LayoutOrder)
-	end)
-	local v145 = v101 == ""
-	local v146 = v145 and not v111
-	local chatInputBarSettings = p12.chatInputBarSettings
-	local chatWindowSettings = p12.chatWindowSettings
-	local v149 = if not FFlagExpChatUseMessagesStore or u129 == nil then p12.canLocalUserChat else u129
 
-	React.useEffect(function() -- line: 1240
-		-- upvalues: v52 (copy), v149 (copy), IXPServiceWrapper (copy), v53 (copy)
-		if v52 and v149 then
-			IXPServiceWrapper:LogUserLayerExposure(v53)
-		end
-	end, { v149 })
+		ExpChatPresetChatAutocompleteExperimentation.logExposure()
+	end, { state4, props.autocompleteEnabled, shouldTruncatePlaceholder })
 
-	local BackgroundTransparency = useInterpolatedClientSettings(chatInputBarSettings).BackgroundTransparency
-	local BackgroundTransparency2 = useInterpolatedClientSettings(chatWindowSettings).BackgroundTransparency
-	local BackgroundColor3 = useInterpolatedClientSettings(chatWindowSettings).BackgroundColor3
-	local isSpatialUIEnabled = p12.isSpatialUIEnabled
+	local backgroundTransparency = useInterpolatedClientSettings(chatInputBarSettings).BackgroundTransparency
+	local backgroundTransparency2 = useInterpolatedClientSettings(chatWindowSettings).BackgroundTransparency
+	local backgroundColor3 = useInterpolatedClientSettings(chatWindowSettings).BackgroundColor3
+
+	local isSpatialUIEnabled = props.isSpatialUIEnabled
+
 	local createElement = React.createElement
-	local t9 = {
+	local v18 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = BackgroundColor3,
-		BackgroundTransparency = if not FFlagExpChatNewInputBar then p12.transparencyValue:map(function(n2: number) -- line: 100
-			-- upvalues: BackgroundTransparency2 (copy)
-			return BackgroundTransparency2 + n2 * (1 - BackgroundTransparency2)
-		end) else 1,
+		BackgroundColor3 = backgroundColor3,
+		BackgroundTransparency = FFlagExpChatNewInputBar and 1 or setTransparency( -- inferred equivalent call
+			backgroundTransparency2,
+			props.transparencyValue
+		),
 		BorderSizePixel = 0,
-		LayoutOrder = p12.LayoutOrder,
-		Size = p12.size,
-		Visible = p12.visible,
+		LayoutOrder = props.LayoutOrder,
+		Size = props.size,
+		Visible = props.visible,
 		ZIndex = 2,
-		[React.Event.MouseEnter] = p12.onHovered,
-		[React.Event.MouseLeave] = p12.onUnhovered,
-		[React.Change.AbsoluteSize] = React.useCallback(function(p31) -- line: 1266
-			-- upvalues: TextChatService (copy), p12 (copy)
-			local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+		[React.Event.MouseEnter] = props.onHovered,
+		[React.Event.MouseLeave] = props.onUnhovered,
+		[React.Change.AbsoluteSize] = React.useCallback(function(p)
+			local chatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
 
-			if ChatInputBarConfiguration and p12.onAbsoluteSizeChanged then
-				p12.onAbsoluteSizeChanged(p31, ChatInputBarConfiguration)
+			if chatInputBarConfiguration and props.onAbsoluteSizeChanged then
+				props.onAbsoluteSizeChanged(p, chatInputBarConfiguration)
 			end
 		end),
-		[React.Change.AbsolutePosition] = React.useCallback(function(p32) -- line: 1272
-			-- upvalues: TextChatService (copy), p12 (copy)
-			local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+		[React.Change.AbsolutePosition] = React.useCallback(function(p)
+			local chatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
 
-			if ChatInputBarConfiguration and p12.onAbsolutePositionChanged then
-				p12.onAbsolutePositionChanged(p32, ChatInputBarConfiguration)
+			if chatInputBarConfiguration and props.onAbsolutePositionChanged then
+				props.onAbsolutePositionChanged(p, chatInputBarConfiguration)
 			end
 		end)
 	}
-	local t10 = {
-		AutocompleteDropdown = getEnableChatInputBarConfigurationAutocompleteEnabled() and (not not p12.autocompleteEnabled and React.createElement(AutocompleteDropdown, {
+	local autocompleteDropdown
+
+	if getEnableChatInputBarConfigurationAutocompleteEnabled() and props.autocompleteEnabled then
+		local createElement2 = React.createElement
+		local v19 = {
 			chatInputBarSettings = chatInputBarSettings,
 			chatWindowSettings = chatWindowSettings,
 			setTransparency = setTransparency,
-			transparencyValue = p12.transparencyValue,
-			activated = p12.autocompleteDropdownReducer.activated and v111,
-			results = p12.autocompleteDropdownReducer.results,
-			selectedIndex = p12.autocompleteDropdownReducer.selectedIndex,
-			autocompleteType = p12.autocompleteDropdownReducer.autocompleteType,
-			onAutocompleteDropdownHover = v144,
-			onAutocompleteSelected = v136,
-			autocompleteDropdownRef = v122,
-			textBoxRef = if not chatInputBarSettings.TextBox then v118 else v119
-		})) or nil,
+			transparencyValue = props.transparencyValue,
+			activated = props.autocompleteDropdownReducer.activated and state4,
+			isChatInputBarVisible = 0,
+			chosenEmojiForAnalyticsRef = 0,
+			results = 0,
+			query = 0,
+			selectedIndex = 0,
+			autocompleteType = 0,
+			onAutocompleteDropdownHover = 0,
+			onAutocompleteSelected = 0,
+			autocompleteDropdownRef = 0,
+			textBoxRef = 0
+		}
+		local isChatInputBarVisible
+
+		if FFlagExpChatEmojiDropdownShowAnalytics then
+			isChatInputBarVisible = props.visible
+		end
+
+		v19.isChatInputBarVisible = isChatInputBarVisible
+		local chosenEmojiForAnalyticsRef
+
+		if FFlagExpChatEmojiDropdownDismissAnalytics then
+			chosenEmojiForAnalyticsRef = ref8
+		end
+
+		v19.chosenEmojiForAnalyticsRef = chosenEmojiForAnalyticsRef
+
+		v19.results = props.autocompleteDropdownReducer.results
+		local query
+
+		if FFlagExpChatAutocompleteDropdownRedesign then
+			query = props.autocompleteDropdownReducer.query
+		end
+
+		v19.query = query
+
+		v19.selectedIndex = props.autocompleteDropdownReducer.selectedIndex
+		v19.autocompleteType = props.autocompleteDropdownReducer.autocompleteType
+		v19.onAutocompleteDropdownHover = onAutocompleteDropdownHover
+		v19.onAutocompleteSelected = onAutocompleteSelected
+		v19.autocompleteDropdownRef = ref7
+		local textBoxRef
+
+		if chatInputBarSettings.TextBox then
+			textBoxRef = ref5
+		else
+			textBoxRef = ref4
+		end
+
+		v19.textBoxRef = textBoxRef
+		autocompleteDropdown = createElement2(AutocompleteDropdown, v19) or nil
+	end
+
+	local children = {
+		AutocompleteDropdown = autocompleteDropdown,
 		UISizeConstraint = React.createElement("UISizeConstraint", {
 			MaxSize = Vector2.new(Config.ChatWindowMaxWidth, 1e999)
 		}),
-		UIPadding = React.createElement("UIPadding", {
-			PaddingLeft = if not FFlagExpChatNewInputBar then UDim.new(0, 8) else nil,
-			PaddingRight = if not FFlagExpChatNewInputBar then UDim.new(0, 8) else nil,
-			PaddingTop = p12.addTopPadding and UDim.new(0, 8) or UDim.new(0, 0),
-			PaddingBottom = UDim.new(0, 1)
-		}),
-		ChatInputBarV2 = if not FFlagExpChatNewInputBar then nil else if not FFlagExpChatNewInputBarDictation or (not v70 or not v149) then React.createElement(ChatInputBarV2, {
-			transparencyValue = p12.transparencyValue,
-			sendButtonContainerWidth = p12.sendButtonContainerWidth,
-			resetTargetChannel = p12.resetTargetChannel,
-			targetTextChannel = p12.targetTextChannel,
-			targetTextChannelDisplayName = p12.targetTextChannelDisplayName,
-			isChannelBarVisible = p12.isChannelBarVisible,
-			developerChannelTabsEnabled = p12.developerChannelTabsEnabled,
-			canLocalUserChat = p12.canLocalUserChat,
-			disabledChatPlaceholderText = p12.disabledChatPlaceholderText,
-			placeholderText = p12.placeholderText,
-			setTransparency = setTransparency,
-			chatInputBarSettings = chatInputBarSettings,
-			chatInputBarBackgroundTransparency = BackgroundTransparency,
-			isSpatialUIEnabled = isSpatialUIEnabled,
-			canLocalUserChatDerived = u129,
-			targetChannelWidth = v115,
-			showPlaceholderText = v146,
-			hasEmptyInputText = v145,
-			shouldTruncatePlaceholder = if not FFlagExpChatPresetChatEnabled then nil else v132,
-			cursor = v143,
-			placeholderRef = v121,
-			textBoxRef = v118,
-			customTextBoxRef = v119,
-			onAbsoluteSizeChanged = v142,
-			onFocused = v137,
-			onFocusLost = v138,
-			onTextChanged = v140,
-			onReturnPressedFromOnScreenKeyboard = v141,
-			onSendActivated = v134,
-			isGlobalChatTabActive = if not FFlagExpChatFixBackspaceNilTargetChannel then nil else p12.isGlobalChatTabActive
-		}) else React.createElement(ChatInputBarV2Dictation, {
-			transparencyValue = p12.transparencyValue,
-			sendButtonContainerWidth = p12.sendButtonContainerWidth,
-			resetTargetChannel = p12.resetTargetChannel,
-			targetTextChannel = p12.targetTextChannel,
-			targetTextChannelDisplayName = p12.targetTextChannelDisplayName,
-			isChannelBarVisible = p12.isChannelBarVisible,
-			developerChannelTabsEnabled = p12.developerChannelTabsEnabled,
-			canLocalUserChat = p12.canLocalUserChat,
-			disabledChatPlaceholderText = p12.disabledChatPlaceholderText,
-			placeholderText = p12.placeholderText,
-			setTransparency = setTransparency,
-			chatInputBarSettings = chatInputBarSettings,
-			chatInputBarBackgroundTransparency = BackgroundTransparency,
-			isSpatialUIEnabled = isSpatialUIEnabled,
-			canLocalUserChatDerived = u129,
-			targetChannelWidth = v115,
-			showPlaceholderText = v146,
-			hasEmptyInputText = v145,
-			shouldTruncatePlaceholder = if not FFlagExpChatPresetChatEnabled then nil else v132,
-			cursor = v143,
-			placeholderRef = v121,
-			textBoxRef = v118,
-			customTextBoxRef = v119,
-			onAbsoluteSizeChanged = v142,
-			onFocused = v137,
-			onFocusLost = v138,
-			onTextChanged = v140,
-			onReturnPressedFromOnScreenKeyboard = v141,
-			onSendActivated = v134,
-			onSendRecordingTap = v135,
-			onTranscriptionStaged = if not v120 then nil else v120.stageTranscription,
-			inputText = v101,
-			setInputText = v102,
-			isGlobalChatTabActive = p12.isGlobalChatTabActive,
-			onDictationActivityChanged = p12.onDictationActivityChanged
-		})
+		UIPadding = 0,
+		ChatInputBarV2 = 0,
+		Background = 0
 	}
-	local v157
+
+	local createElement2 = React.createElement
+	local paddingLeft
+
+	if not FFlagExpChatNewInputBar then
+		paddingLeft = UDim.new(0, 8)
+	end
+
+	local paddingRight
+
+	if not FFlagExpChatNewInputBar then
+		paddingRight = UDim.new(0, 8)
+	end
+
+	children.UIPadding = createElement2("UIPadding", {
+		PaddingLeft = paddingLeft,
+		PaddingRight = paddingRight,
+		PaddingTop = props.addTopPadding and UDim.new(0, 8) or UDim.new(0, 0),
+		PaddingBottom = UDim.new(0, 1)
+	})
+	local chatInputBarV
 
 	if FFlagExpChatNewInputBar then
-		v157 = nil
-	elseif v70 and v149 then
-		v157 = React.createElement(DictationInputBar, {
-			chatInputBarSettings = chatInputBarSettings,
-			transparencyValue = p12.transparencyValue,
-			chatInputBarBackgroundTransparency = BackgroundTransparency,
-			inputText = v101,
-			setInputText = v102,
-			canLocalUserChat = v149,
-			disabledChatPlaceholderText = p12.disabledChatPlaceholderText,
-			targetChannelWidth = v115,
-			showPlaceholderText = v146,
-			placeholderText = p12.placeholderText,
-			cursor = v143,
-			placeholderRef = if not v63 then nil else v121,
-			textBoxRef = v118,
-			customTextBoxRef = v119,
-			onFocused = v137,
-			onFocusLost = v138,
-			onTextChanged = v140,
-			onReturnPressedFromOnScreenKeyboard = v141,
-			onChannelChipAbsoluteSizeChanged = v142,
-			onChannelChipActivated = if not FFlagExpChatFixBackspaceNilTargetChannel then p12.resetTargetChannel else function() -- line: 1411
-				-- upvalues: p12 (copy)
-				p12.resetTargetChannel(p12.isGlobalChatTabActive)
-			end,
-			targetTextChannel = p12.targetTextChannel,
-			targetTextChannelDisplayName = p12.targetTextChannelDisplayName or "",
-			isChannelBarVisible = p12.isChannelBarVisible,
-			isGlobalChatTabActive = p12.isGlobalChatTabActive,
-			developerChannelTabsEnabled = p12.developerChannelTabsEnabled,
-			onDictationActivityChanged = p12.onDictationActivityChanged,
-			onSendActivated = v134,
-			onSendRecordingTap = v135,
-			onTranscriptionStaged = if not v120 then nil else v120.stageTranscription,
-			isSpatialUIEnabled = isSpatialUIEnabled,
-			isTextBoxSelectable = not not FFlagEnableConsoleExpControls or nil,
-			isPlaceholderSelectable = not not v63 or nil,
-			placeholderSelectionImageObject = if not v63 then nil else v143,
-			selectionBehavior = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
-			selectionGroup = FFlagEnableConsoleExpControls and not FFlagExpChatEnableFocusNavigation or nil
-		})
-	else
-		local createElement2 = React.createElement
-		local t11 = {
-			AutomaticSize = Enum.AutomaticSize.XY,
-			BackgroundColor3 = chatInputBarSettings.BackgroundColor3,
-			BackgroundTransparency = if not FFlagExpChatNewInputBar then p12.transparencyValue:map(function(n3: number) -- line: 100
-				-- upvalues: BackgroundTransparency (copy)
-				return BackgroundTransparency + n3 * (1 - BackgroundTransparency)
-			end) else 1,
-			Size = UDim2.new(1, 0, 0, 0)
-		}
-		local t12 = {}
-		local createElement3 = React.createElement
-		local t13 = {
-			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-			Color = Config.ChatInputBarBorderColor3
-		}
-		local ChatInputBarBorderTransparency = Config.ChatInputBarBorderTransparency
+		if FFlagExpChatNewInputBarDictation and enabled and canLocalUserChat2 then
+			local createElement3 = React.createElement
+			local v19 = {}
+			v19.transparencyValue = props.transparencyValue
+			v19.sendButtonContainerWidth = props.sendButtonContainerWidth
+			v19.resetTargetChannel = props.resetTargetChannel
+			v19.targetTextChannel = props.targetTextChannel
+			v19.targetTextChannelDisplayName = props.targetTextChannelDisplayName
+			v19.isChannelBarVisible = props.isChannelBarVisible
+			v19.developerChannelTabsEnabled = props.developerChannelTabsEnabled
+			v19.canLocalUserChat = props.canLocalUserChat
+			v19.disabledChatPlaceholderText = props.disabledChatPlaceholderText
+			v19.placeholderText = props.placeholderText
+			v19.setTransparency = setTransparency
+			v19.chatInputBarSettings = chatInputBarSettings
+			v19.chatInputBarBackgroundTransparency = backgroundTransparency
+			v19.isSpatialUIEnabled = isSpatialUIEnabled
+			v19.canLocalUserChatDerived = canLocalUserChatDerived
+			v19.targetChannelWidth = targetChannelWidth
+			v19.showPlaceholderText = showPlaceholderText
+			v19.hasEmptyInputText = hasEmptyInputText
 
-		t13.Transparency = p12.transparencyValue:map(function(n4: number) -- line: 100
-			-- upvalues: ChatInputBarBorderTransparency (copy)
-			return ChatInputBarBorderTransparency + n4 * (1 - ChatInputBarBorderTransparency)
-		end)
-		t12.Border = createElement3("UIStroke", t13)
-		t12.Corner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, 3)
-		})
-
-		local createElement4 = React.createElement
-		local t14 = {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.fromScale(1, 0)
-		}
-		local t15 = {}
-		local createElement5 = React.createElement
-		local t16 = {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			SelectionBehaviorDown = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorLeft = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorRight = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorUp = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
-			SelectionGroup = FFlagEnableConsoleExpControls and not FFlagExpChatEnableFocusNavigation or nil,
-			Size = UDim2.new(1, -p12.sendButtonContainerWidth, 0, 0)
-		}
-		local t17 = {}
-		local createElement6 = React.createElement
-		local v171 = ChannelChip
-		local t18 = {}
-		local n5 = 0
-
-		t18.transparency = p12.transparencyValue:map(function(n6: number) -- line: 100
-			-- upvalues: n5 (copy)
-			return n5 + n6 * (1 - n5)
-		end)
-		t18.onAbsoluteSizeChanged = v142
-		t18.onChannelChipActivated = if not FFlagExpChatFixBackspaceNilTargetChannel then p12.resetTargetChannel else function() -- line: 1485
-			-- upvalues: p12 (copy)
-			p12.resetTargetChannel(p12.isGlobalChatTabActive)
-		end
-		t18.targetTextChannelDisplayName = p12.targetTextChannelDisplayName or ""
-		t18.isChannelBarVisible = p12.isChannelBarVisible
-		t18.developerChannelTabsEnabled = p12.developerChannelTabsEnabled
-		t17.TargetChannelChip = createElement6(v171, t18)
-
-		local v174 = if not FFlagExpChatUseMessagesStore then not p12.canLocalUserChat else not u129
-
-		if v174 then
-			local createElement7 = React.createElement
-			local t19 = {
-				BackgroundTransparency = 1,
-				TextWrapped = true,
-				AnchorPoint = Vector2.new(1, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Font = Config.ChatInputBarFont,
-				Text = p12.disabledChatPlaceholderText,
-				Position = UDim2.fromScale(1, 0),
-				Size = v115:map(function(n7: number) -- line: 1502
-					return UDim2.new(1, -(n7 + 8), 0, 0)
-				end),
-				TextColor3 = v146 and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3,
-				TextSize = if not isSpatialUIEnabled then chatInputBarSettings.TextSize else chatInputBarSettings.SpatialPanelTextSize
-			}
-			local v177 = not v146 and 0 or 0.5
-
-			t19.TextTransparency = p12.transparencyValue:map(function(n8: number) -- line: 100
-				-- upvalues: v177 (copy)
-				return v177 + n8 * (1 - v177)
-			end)
-			t19.Selectable = not not v63 or nil
-			t19.SelectionImageObject = if not v63 then nil else v143
-			t19.TextXAlignment = Enum.TextXAlignment.Left
-			t19.TextYAlignment = Enum.TextYAlignment.Top
-			t19.ref = if not v63 then nil else v121
-			v174 = createElement7("TextLabel", t19)
-		end
-
-		t17.DisabledPlaceholderLabel = v174
-
-		local v178 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u129
-
-		if v178 then
-			local createElement8 = React.createElement
-			local t20 = {
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(1, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Position = UDim2.fromScale(1, 0),
-				Size = v115:map(function(n9: number) -- line: 1530
-					return UDim2.new(1, -(n9 + 8), 0, 0)
-				end)
-			}
-			local t21 = {}
-			local v182 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u129
-
-			if v182 then
-				local createElement9 = React.createElement
-				local t22 = {
-					AnchorPoint = Vector2.new(0, 0),
-					AutomaticSize = Enum.AutomaticSize.XY,
-					BackgroundTransparency = 1,
-					ClearTextOnFocus = false,
-					FontFace = chatInputBarSettings.FontFace,
-					PlaceholderText = v146 and p12.placeholderText or "",
-					Selectable = not not FFlagEnableConsoleExpControls or nil,
-					SelectionImageObject = v143,
-					Size = UDim2.fromScale(1, 0),
-					Text = "",
-					PlaceholderColor3 = chatInputBarSettings.PlaceholderColor3,
-					TextColor3 = chatInputBarSettings.TextColor3,
-					TextSize = if not isSpatialUIEnabled then chatInputBarSettings.TextSize else chatInputBarSettings.SpatialPanelTextSize
-				}
-				local v185 = not v146 and 0 or 0.5
-
-				t22.TextTransparency = p12.transparencyValue:map(function(n10: number) -- line: 100
-					-- upvalues: v185 (copy)
-					return v185 + n10 * (1 - v185)
-				end)
-
-				local TextStrokeTransparency = chatInputBarSettings.TextStrokeTransparency
-
-				t22.TextStrokeTransparency = p12.transparencyValue:map(function(n11: number) -- line: 100
-					-- upvalues: TextStrokeTransparency (copy)
-					return TextStrokeTransparency + n11 * (1 - TextStrokeTransparency)
-				end)
-				t22.TextStrokeColor3 = chatInputBarSettings.TextStrokeColor3
-				t22.TextWrapped = true
-				t22.TextXAlignment = Enum.TextXAlignment.Left
-				t22.TextYAlignment = Enum.TextYAlignment.Top
-				t22.ZIndex = 2
-				t22[React.Event.Focused] = v137
-				t22[React.Event.FocusLost] = v138
-				t22[React.Change.Text] = v140
-				t22[React.Event.ReturnPressedFromOnScreenKeyboard] = v141
-				t22.ref = if not chatInputBarSettings.TextBox then v118 else v119
-				v182 = createElement9("TextBox", t22)
+			if not FFlagExpChatPresetChatEnabled then
+				shouldTruncatePlaceholder = nil
 			end
 
-			t21.TextBox = v182
-			v178 = createElement8("Frame", t20, t21)
+			v19.shouldTruncatePlaceholder = shouldTruncatePlaceholder
+			v19.cursor = v17
+			v19.placeholderRef = ref6
+			v19.textBoxRef = ref4
+			v19.customTextBoxRef = ref5
+			v19.onAbsoluteSizeChanged = v16
+			v19.onFocused = onFocused
+			v19.onFocusLost = onFocusLost
+			v19.onTextChanged = onTextChanged
+			v19.onReturnPressedFromOnScreenKeyboard = onReturnPressedFromOnScreenKeyboard
+			v19.onSendActivated = onSendActivated
+			v19.onSendRecordingTap = onSendRecordingTap
+			local onTranscriptionStaged
+
+			if v7 then
+				onTranscriptionStaged = v7.stageTranscription
+			end
+
+			v19.onTranscriptionStaged = onTranscriptionStaged
+			v19.inputText = state
+			v19.setInputText = setState
+			v19.isGlobalChatTabActive = props.isGlobalChatTabActive
+			v19.onDictationActivityChanged = props.onDictationActivityChanged
+			v19.onDictationStateChanged = props.onDictationStateChanged
+			chatInputBarV = createElement3(ChatInputBarV2Dictation, v19)
+		else
+			local createElement3 = React.createElement
+			local v19 = {
+				transparencyValue = props.transparencyValue,
+				sendButtonContainerWidth = props.sendButtonContainerWidth,
+				resetTargetChannel = props.resetTargetChannel,
+				targetTextChannel = props.targetTextChannel,
+				targetTextChannelDisplayName = props.targetTextChannelDisplayName,
+				isChannelBarVisible = props.isChannelBarVisible,
+				developerChannelTabsEnabled = props.developerChannelTabsEnabled,
+				canLocalUserChat = props.canLocalUserChat,
+				disabledChatPlaceholderText = props.disabledChatPlaceholderText,
+				placeholderText = props.placeholderText,
+				setTransparency = setTransparency,
+				chatInputBarSettings = chatInputBarSettings,
+				chatInputBarBackgroundTransparency = backgroundTransparency,
+				isSpatialUIEnabled = isSpatialUIEnabled,
+				canLocalUserChatDerived = canLocalUserChatDerived,
+				targetChannelWidth = targetChannelWidth,
+				showPlaceholderText = showPlaceholderText,
+				hasEmptyInputText = hasEmptyInputText,
+				shouldTruncatePlaceholder = 0,
+				cursor = 0,
+				placeholderRef = 0,
+				textBoxRef = 0,
+				customTextBoxRef = 0,
+				onAbsoluteSizeChanged = 0,
+				onFocused = 0,
+				onFocusLost = 0,
+				onTextChanged = 0,
+				onReturnPressedFromOnScreenKeyboard = 0,
+				onSendActivated = 0,
+				isGlobalChatTabActive = 0
+			}
+
+			if not FFlagExpChatPresetChatEnabled then
+				shouldTruncatePlaceholder = nil
+			end
+
+			v19.shouldTruncatePlaceholder = shouldTruncatePlaceholder
+			v19.cursor = v17
+			v19.placeholderRef = ref6
+			v19.textBoxRef = ref4
+			v19.customTextBoxRef = ref5
+			v19.onAbsoluteSizeChanged = v16
+			v19.onFocused = onFocused
+			v19.onFocusLost = onFocusLost
+			v19.onTextChanged = onTextChanged
+			v19.onReturnPressedFromOnScreenKeyboard = onReturnPressedFromOnScreenKeyboard
+			v19.onSendActivated = onSendActivated
+			local isGlobalChatTabActive2
+
+			if FFlagExpChatFixBackspaceNilTargetChannel then
+				isGlobalChatTabActive2 = props.isGlobalChatTabActive
+			end
+
+			v19.isGlobalChatTabActive = isGlobalChatTabActive2
+			chatInputBarV = createElement3(ChatInputBarV2, v19)
 		end
-
-		t17.TextBoxContainer = v178
-		t17.UIPadding = React.createElement("UIPadding", {
-			PaddingBottom = UDim.new(0, 10),
-			PaddingLeft = UDim.new(0, 10),
-			PaddingRight = UDim.new(0, 10),
-			PaddingTop = UDim.new(0, 10)
-		})
-		t15.TextContainer = createElement5("Frame", t16, t17)
-
-		local createElement10 = React.createElement
-		local t23 = {
-			AnchorPoint = Vector2.new(1, 0),
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Position = UDim2.fromScale(1, 0),
-			Selectable = not FFlagExpChatEnableFocusNavigation and nil,
-			Size = UDim2.new(0, p12.sendButtonContainerWidth, 1, 0),
-			Text = "",
-			[React.Event.Activated] = v134
-		}
-		local t24 = {
-			Layout = React.createElement("UIListLayout", {
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			})
-		}
-		local createElement11 = React.createElement
-		local v191 = ImageSetLabel
-		local t25 = {
-			BackgroundTransparency = 1,
-			ZIndex = 2,
-			ImageColor3 = v145 and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3
-		}
-		local v193 = not v145 and 0 or 0.5
-
-		t25.ImageTransparency = p12.transparencyValue:map(function(n12: number) -- line: 100
-			-- upvalues: v193 (copy)
-			return v193 + n12 * (1 - v193)
-		end)
-		t25.Image = Images["icons/actions/send"]
-		t25.Size = UDim2.new(0, 30, 0, 30)
-		t24.SendIcon = createElement11(v191, t25)
-		t15.SendButton = createElement10("TextButton", t23, t24)
-		t12.Container = createElement4("Frame", t14, t15)
-		v157 = createElement2("Frame", t11, t12)
 	end
 
-	t10.Background = v157
+	children.ChatInputBarV2 = chatInputBarV
+	local background
 
-	return createElement("Frame", t9, t10)
+	if not FFlagExpChatNewInputBar then
+		if enabled and canLocalUserChat2 then
+			local createElement3 = React.createElement
+			local v19 = {}
+			v19.chatInputBarSettings = chatInputBarSettings
+			v19.transparencyValue = props.transparencyValue
+			v19.chatInputBarBackgroundTransparency = backgroundTransparency
+			v19.inputText = state
+			v19.setInputText = setState
+			v19.canLocalUserChat = canLocalUserChat2
+			v19.disabledChatPlaceholderText = props.disabledChatPlaceholderText
+			v19.targetChannelWidth = targetChannelWidth
+			v19.showPlaceholderText = showPlaceholderText
+			v19.placeholderText = props.placeholderText
+			v19.cursor = v17
+			v19.placeholderRef = ref6
+			v19.textBoxRef = ref4
+			v19.customTextBoxRef = ref5
+			v19.onFocused = onFocused
+			v19.onFocusLost = onFocusLost
+			v19.onTextChanged = onTextChanged
+			v19.onReturnPressedFromOnScreenKeyboard = onReturnPressedFromOnScreenKeyboard
+			v19.onChannelChipAbsoluteSizeChanged = v16
+			v19.onChannelChipActivated = FFlagExpChatFixBackspaceNilTargetChannel and function()
+				props.resetTargetChannel(props.isGlobalChatTabActive)
+			end or props.resetTargetChannel
+			v19.targetTextChannel = props.targetTextChannel
+			v19.targetTextChannelDisplayName = props.targetTextChannelDisplayName or ""
+			v19.isChannelBarVisible = props.isChannelBarVisible
+			v19.isGlobalChatTabActive = props.isGlobalChatTabActive
+			v19.developerChannelTabsEnabled = props.developerChannelTabsEnabled
+			v19.onDictationActivityChanged = props.onDictationActivityChanged
+			v19.onDictationStateChanged = props.onDictationStateChanged
+			v19.onSendActivated = onSendActivated
+			v19.onSendRecordingTap = onSendRecordingTap
+			local onTranscriptionStaged
+
+			if v7 then
+				onTranscriptionStaged = v7.stageTranscription
+			end
+
+			v19.onTranscriptionStaged = onTranscriptionStaged
+			v19.isSpatialUIEnabled = isSpatialUIEnabled
+			v19.isTextBoxSelectable = FFlagEnableConsoleExpControls and true or nil
+			v19.isPlaceholderSelectable = true
+			v19.placeholderSelectionImageObject = v17
+			background = createElement3(DictationInputBar, v19)
+		else
+			local createElement3 = React.createElement
+			local v19 = {
+				AutomaticSize = Enum.AutomaticSize.XY,
+				BackgroundColor3 = chatInputBarSettings.BackgroundColor3,
+				BackgroundTransparency = FFlagExpChatNewInputBar and 1 or setTransparency( -- inferred equivalent call
+					backgroundTransparency,
+					props.transparencyValue
+				),
+				Size = UDim2.new(1, 0, 0, 0)
+			}
+			local children2 = {
+				Border = React.createElement("UIStroke", {
+					ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+					Color = Config.ChatInputBarBorderColor3,
+					Transparency = setTransparency(Config.ChatInputBarBorderTransparency, props.transparencyValue) -- inferred equivalent call
+				}),
+				Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 3) }),
+				Container = 0
+			}
+
+			local createElement4 = React.createElement
+			local v20 = {
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.fromScale(1, 0),
+				BackgroundTransparency = 1
+			}
+
+			local createElement5 = React.createElement
+			local v21 = {
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -props.sendButtonContainerWidth, 0, 0)
+			}
+			local children3 = {
+				TargetChannelChip = React.createElement(ChannelChip, {
+					transparency = setTransparency(0, props.transparencyValue), -- inferred equivalent call
+					onAbsoluteSizeChanged = v16,
+					onChannelChipActivated = FFlagExpChatFixBackspaceNilTargetChannel and function()
+						props.resetTargetChannel(props.isGlobalChatTabActive)
+					end or props.resetTargetChannel,
+					targetTextChannelDisplayName = props.targetTextChannelDisplayName or "",
+					isChannelBarVisible = props.isChannelBarVisible,
+					developerChannelTabsEnabled = props.developerChannelTabsEnabled
+				}),
+				DisabledPlaceholderLabel = 0,
+				TextBoxContainer = 0,
+				UIPadding = 0
+			}
+
+			local disabledPlaceholderLabel = not canLocalUserChatDerived
+
+			if disabledPlaceholderLabel then
+				local createElement6 = React.createElement
+				local v22 = {
+					AnchorPoint = Vector2.new(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					Font = Config.ChatInputBarFont,
+					Text = props.disabledChatPlaceholderText,
+					Position = UDim2.fromScale(1, 0),
+					Size = targetChannelWidth:map(function(p: number)
+						return UDim2.new(1, -(p + 8), 0, 0)
+					end),
+					TextColor3 = showPlaceholderText and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3,
+					TextSize = 0,
+					TextTransparency = 0,
+					Selectable = true,
+					SelectionImageObject = 0,
+					TextWrapped = true,
+					TextXAlignment = 0,
+					TextYAlignment = 0,
+					ref = 0
+				}
+				local textSize2
+
+				if isSpatialUIEnabled then
+					textSize2 = chatInputBarSettings.SpatialPanelTextSize
+				else
+					textSize2 = chatInputBarSettings.TextSize
+				end
+
+				v22.TextSize = textSize2
+
+				v22.TextTransparency = setTransparency(showPlaceholderText and 0.5 or 0, props.transparencyValue) -- inferred equivalent call
+
+				v22.SelectionImageObject = v17
+
+				v22.TextXAlignment = Enum.TextXAlignment.Left
+				v22.TextYAlignment = Enum.TextYAlignment.Top
+				v22.ref = ref6
+				disabledPlaceholderLabel = createElement6("TextLabel", v22)
+			end
+
+			children3.DisabledPlaceholderLabel = disabledPlaceholderLabel
+			local textBoxContainer
+
+			if canLocalUserChatDerived then
+				local createElement6 = React.createElement
+				local v22 = {
+					AnchorPoint = Vector2.new(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					Position = UDim2.fromScale(1, 0),
+					Size = targetChannelWidth:map(function(p: number)
+						return UDim2.new(1, -(p + 8), 0, 0)
+					end)
+				}
+				local textBox
+
+				if canLocalUserChatDerived then
+					local createElement7 = React.createElement
+					local v23 = {}
+					v23.AnchorPoint = Vector2.new(0, 0)
+					v23.AutomaticSize = Enum.AutomaticSize.XY
+					v23.BackgroundTransparency = 1
+					v23.ClearTextOnFocus = false
+					v23.FontFace = chatInputBarSettings.FontFace
+					v23.PlaceholderText = showPlaceholderText and props.placeholderText or ""
+					v23.Selectable = FFlagEnableConsoleExpControls and true or nil
+					v23.SelectionImageObject = v17
+					v23.Size = UDim2.fromScale(1, 0)
+					v23.Text = ""
+					v23.PlaceholderColor3 = chatInputBarSettings.PlaceholderColor3
+					v23.TextColor3 = chatInputBarSettings.TextColor3
+					local textSize2
+
+					if isSpatialUIEnabled then
+						textSize2 = chatInputBarSettings.SpatialPanelTextSize
+					else
+						textSize2 = chatInputBarSettings.TextSize
+					end
+
+					v23.TextSize = textSize2
+
+					v23.TextTransparency = setTransparency(showPlaceholderText and 0.5 or 0, props.transparencyValue) -- inferred equivalent call
+
+					v23.TextStrokeTransparency = setTransparency( -- inferred equivalent call
+						chatInputBarSettings.TextStrokeTransparency,
+						props.transparencyValue
+					)
+
+					v23.TextStrokeColor3 = chatInputBarSettings.TextStrokeColor3
+					v23.TextWrapped = true
+					v23.TextXAlignment = Enum.TextXAlignment.Left
+					v23.TextYAlignment = Enum.TextYAlignment.Top
+					v23.ZIndex = 2
+
+					v23[React.Event.Focused] = onFocused
+					v23[React.Event.FocusLost] = onFocusLost
+					v23[React.Change.Text] = onTextChanged
+					v23[React.Event.ReturnPressedFromOnScreenKeyboard] = onReturnPressedFromOnScreenKeyboard
+					local ref13
+
+					if chatInputBarSettings.TextBox then
+						ref13 = ref5
+					else
+						ref13 = ref4
+					end
+
+					v23.ref = ref13
+					textBox = createElement7("TextBox", v23)
+				else
+					textBox = canLocalUserChatDerived
+				end
+
+				textBoxContainer = createElement6("Frame", v22, { TextBox = textBox })
+			else
+				textBoxContainer = canLocalUserChatDerived
+			end
+
+			children3.TextBoxContainer = textBoxContainer
+
+			children3.UIPadding = React.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0, 10),
+				PaddingLeft = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 10),
+				PaddingTop = UDim.new(0, 10)
+			})
+			children2.Container = createElement4("Frame", v20, {
+				TextContainer = createElement5("Frame", v21, children3),
+				SendButton = React.createElement("TextButton", {
+					AnchorPoint = Vector2.new(1, 0),
+					BackgroundTransparency = 1,
+					LayoutOrder = 2,
+					Position = UDim2.fromScale(1, 0),
+					Selectable = false,
+					Size = UDim2.new(0, props.sendButtonContainerWidth, 1, 0),
+					Text = "",
+					[React.Event.Activated] = onSendActivated
+				}, {
+					Layout = React.createElement("UIListLayout", {
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center
+					}),
+					SendIcon = React.createElement(ImageSetLabel, {
+						BackgroundTransparency = 1,
+						ImageColor3 = hasEmptyInputText and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3,
+						ImageTransparency = setTransparency(hasEmptyInputText and 0.5 or 0, props.transparencyValue), -- inferred equivalent call
+						Image = Images["icons/actions/send"],
+						Size = UDim2.new(0, 30, 0, 30),
+						ZIndex = 2
+					})
+				})
+			})
+			background = createElement3("Frame", v19, children2)
+		end
+	end
+
+	children.Background = background
+	return createElement("Frame", v18, children)
 end
 
-local v84 = Localization.connect(function(p33) -- line: 1615
-	-- upvalues: getOtherDisplayNameInWhisperChannel (copy)
-	local t27 = nil
+local v6 = Localization.connect(function(p)
+	local targetTextChannelDisplayName = nil
 
-	if p33.targetTextChannel then
-		local t26 = {
+	if p.targetTextChannel then
+		for k, v6 in pairs({
 			RBXTeam = "CoreScripts.TextChat.TeamChat.PrefixText",
 			RBXWhisper = "CoreScripts.TextChat.WhisperChat.PrefixText.Outgoing"
-		}
+		}) do
+			if not string.match(p.targetTextChannel.Name, k) then
+				continue
+			end
 
-		for k, v in pairs(t26) do
-			if string.match(p33.targetTextChannel.Name, k) then
-				if k == "RBXWhisper" then
-					local v199 = getOtherDisplayNameInWhisperChannel(p33.targetTextChannel, p33.localPlayer)
+			if k == "RBXWhisper" then
+				local otherDisplayNameInWhisperChannel = getOtherDisplayNameInWhisperChannel(
+					p.targetTextChannel,
+					p.localPlayer
+				)
 
-					if v199 then
-						t27 = {
-							v,
-							{
-								RBX_NAME = v199
-							}
-						}
-					end
-				else
-					t27 = v
+				if otherDisplayNameInWhisperChannel then
+					targetTextChannelDisplayName = {
+						v6,
+						{ RBX_NAME = otherDisplayNameInWhisperChannel }
+					}
 				end
+			else
+				targetTextChannelDisplayName = v6
 			end
 		end
 	end
 
-	return {
-		targetTextChannelDisplayName = t27
-	}
+	return { targetTextChannelDisplayName = targetTextChannelDisplayName }
 end)(ChatInputBar)
 
-return React.memo(v84)
+return React.memo(v6)

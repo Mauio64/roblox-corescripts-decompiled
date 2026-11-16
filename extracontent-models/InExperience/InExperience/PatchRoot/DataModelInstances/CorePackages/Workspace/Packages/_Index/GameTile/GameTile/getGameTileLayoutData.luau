@@ -2,19 +2,14 @@ local GameTile = script:FindFirstAncestor("GameTile")
 
 require(GameTile.GameTileTypes)
 
-local t1 = {}
+local v = {}
 
-local function getGameTileLayoutData(t2: {[any]: any}?, s1: string?) -- line: 17
-	-- upvalues: t1 (copy)
-	if t2 and (t2.layoutDataBySort and s1 and s1 ~= "" and t2.layoutDataBySort[s1]) then
-		return t2.layoutDataBySort[s1]
+local function getGameTileLayoutData(p, p2: string?)
+	if p and p.layoutDataBySort and p2 and p2 ~= "" and p.layoutDataBySort[p2] then
+		return p.layoutDataBySort[p2]
 	end
 
-	if t2 and t2.defaultLayoutData then
-		return t2.defaultLayoutData
-	end
-
-	return t1
+	return if p and p.defaultLayoutData then p.defaultLayoutData else v
 end
 
 return getGameTileLayoutData

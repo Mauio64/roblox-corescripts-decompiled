@@ -1,72 +1,73 @@
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
+
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Foundation = require(ExpChatParent.Foundation)
-local React = require(ExpChatParent.React)
-local SignalsReact = require(ExpChatParent.SignalsReact)
+local parent = ExpChat.Parent
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
+local FFlagExpChatPresetTrayDismissAnalytics = require(ExpChat.Flags.FFlagExpChatPresetTrayDismissAnalytics)
 local Config = require(ExpChat.Config)
 local GetPresetChatStore = require(ExpChat.Stores.GetPresetChatStore)
 local PresetChatButton = require(script.Parent.PresetChatButton)
 local PresetChatContainer = require(script.Parent.PresetChatContainer)
 local setIsPresetTrayOpen = require(script.Parent.Thunks.setIsPresetTrayOpen)
 local FFlagExpChatPresetChatGamepadEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatGamepadEnabled)
+local FFlagExpChatPresetFullWidthButtonFixes = require(ExpChat.Flags.FFlagExpChatPresetFullWidthButtonFixes)
 local FlyOutWidth = Config.PresetTray.FlyOutWidth
 local FlyOutHeight = Config.PresetTray.FlyOutHeight
 
-local function PresetChatFlyOut(t1: {[any]: any}) -- line: 27
-	-- upvalues: GetPresetChatStore (copy), SignalsReact (copy), React (copy), setIsPresetTrayOpen (copy), FFlagExpChatPresetChatGamepadEnabled (copy), UserInputService (copy), GuiService (copy), Foundation (copy), PresetChatButton (copy), FlyOutWidth (copy), FlyOutHeight (copy), PresetChatContainer (copy)
-	local v18 = GetPresetChatStore(false)
-	local v19 = SignalsReact.useSignalState(v18.getIsTrayOpen)
-	local v20 = React.useCallback(function() -- line: 31
-		-- upvalues: setIsPresetTrayOpen (copy), v18 (copy)
-		setIsPresetTrayOpen(v18, false)
-	end, { v18 })
+local function PresetChatFlyOut(props)
+	local presetChatStore = GetPresetChatStore(false)
+	local isOpen = SignalsReact.useSignalState(presetChatStore.getIsTrayOpen)
 
-	React.useEffect(function() -- line: 35
-		-- upvalues: v19 (copy), FFlagExpChatPresetChatGamepadEnabled (copy), UserInputService (copy), setIsPresetTrayOpen (copy), v18 (copy), GuiService (copy)
-		if not v19 then
+	local onPressedOutside = React.useCallback(function()
+		setIsPresetTrayOpen(presetChatStore, false)
+	end, { presetChatStore })
+
+	React.useEffect(function()
+		if not isOpen then
 			return
 		end
 
-		local connection = nil
+		local inputBeganConnection
 
 		if FFlagExpChatPresetChatGamepadEnabled then
-			connection = UserInputService.InputBegan:Connect(function(input, _) -- line: 42
-				-- upvalues: setIsPresetTrayOpen (copy), v18 (copy)
+			inputBeganConnection = UserInputService.InputBegan:Connect(function(input, _)
 				if input.KeyCode == Enum.KeyCode.Escape or input.KeyCode == Enum.KeyCode.ButtonB then
-					setIsPresetTrayOpen(v18, false)
+					setIsPresetTrayOpen(presetChatStore, false)
 				end
 			end)
+		else
+			inputBeganConnection = nil
 		end
 
-		local connection2 = GuiService.MenuOpened:Connect(function() -- line: 49
-			-- upvalues: v18 (copy)
-			v18.setIsTrayOpen(false)
+		local menuOpenedConnection = GuiService.MenuOpened:Connect(function()
+			if FFlagExpChatPresetTrayDismissAnalytics then
+				setIsPresetTrayOpen(presetChatStore, false)
+			else
+				presetChatStore.setIsTrayOpen(false)
+			end
 		end)
 
-		return function() -- line: 53
-			-- upvalues: connection (ref), connection2 (copy)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if inputBeganConnection then
+				inputBeganConnection:Disconnect()
 			end
 
-			connection2:Disconnect()
+			menuOpenedConnection:Disconnect()
 		end
-	end, {
-		v19,
-		v18
-	})
+	end, { isOpen, presetChatStore })
 
-	return React.createElement(Foundation.Popover.Root, {
-		isOpen = v19
-	}, {
+	local createElement = React.createElement
+	local root = Foundation.Popover.Root
+
+	local v = {
 		Anchor = React.createElement(Foundation.Popover.Anchor, nil, {
 			AnchorWrapper = React.createElement(Foundation.View, {
 				tag = "size-0-full auto-x",
-				padding = if not t1.addTopPadding then nil else {
-					top = UDim.new(0, 6)
-				},
+				padding = props.addTopPadding and { top = UDim.new(0, 6) } or nil,
 				layout = {
 					FillDirection = Enum.FillDirection.Vertical,
 					VerticalAlignment = Enum.VerticalAlignment.Bottom,
@@ -75,36 +76,48 @@ local function PresetChatFlyOut(t1: {[any]: any}) -- line: 27
 				}
 			}, {
 				Button = React.createElement(PresetChatButton, {
-					fullWidth = t1.fullWidthButton,
-					size = t1.buttonSize,
-					isCircular = t1.buttonIsCircular,
-					targetTextChannel = t1.textChannel
+					fullWidth = props.fullWidthButton,
+					size = props.buttonSize,
+					isCircular = props.buttonIsCircular,
+					targetTextChannel = props.textChannel
 				})
 			})
 		}),
-		Content = React.createElement(Foundation.Popover.Content, {
-			hasArrow = false,
-			side = {
-				offset = 7,
-				position = Foundation.Enums.PopoverSide.Right
-			},
-			align = {
-				offset = 3,
-				position = Foundation.Enums.PopoverAlign.Start
-			},
-			radius = Foundation.Enums.Radius.Medium,
-			onPressedOutside = v20
+		Content = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Foundation.Popover.Content
+	local position
+
+	if FFlagExpChatPresetFullWidthButtonFixes and props.fullWidthButton then
+		position = Foundation.Enums.PopoverSide.Bottom
+	else
+		position = Foundation.Enums.PopoverSide.Right
+	end
+
+	v.Content = createElement2(content, {
+		side = { position = position, offset = 7 },
+		align = {
+			position = Foundation.Enums.PopoverAlign.Start,
+			offset = FFlagExpChatPresetFullWidthButtonFixes and props.fullWidthButton and 0 or 3
+		},
+		hasArrow = false,
+		radius = Foundation.Enums.Radius.Medium,
+		onPressedOutside = onPressedOutside
+	}, {
+		ContentWrapper = React.createElement(Foundation.View, {
+			Size = UDim2.fromOffset(FlyOutWidth, FlyOutHeight)
 		}, {
-			ContentWrapper = React.createElement(Foundation.View, {
-				Size = UDim2.fromOffset(FlyOutWidth, FlyOutHeight)
-			}, {
-				Container = React.createElement(PresetChatContainer, {
-					compact = true,
-					textChannel = t1.textChannel
-				})
+			Container = React.createElement(PresetChatContainer, {
+				textChannel = props.textChannel,
+				compact = true,
+				onSendChat = props.onSendChat,
+				onSendGlobalChat = props.onSendGlobalChat
 			})
 		})
 	})
+	return createElement(root, { isOpen = isOpen }, v)
 end
 
 return React.memo(PresetChatFlyOut)

@@ -1,154 +1,144 @@
-local Parent = script:FindFirstAncestor("Utils").Parent
-local TextSplitBy = require(Parent.Enums.TextSplitBy)
+local parent = script:FindFirstAncestor("Utils").Parent
 
-local function isWhitespace(s1: string) -- line: 9
-	return s1:match("%s") ~= nil
+local TextSplitBy = require(parent.Enums.TextSplitBy)
+
+local function isWhitespace(value: string): boolean -- 1 equivalent call inferred from this helper
+	return value:match("%s") ~= nil
 end
-local function codepointEnd(s2: string, n1: number) -- line: 14
-	local v12 = utf8.offset(s2, n1 + 1)
 
-	if v12 ~= nil then
-		return v12 - 1
+local function codepointEnd(text: string, codepointIndex: number) -- 1 equivalent call inferred from this helper
+	local v = utf8.offset(text, codepointIndex + 1)
+
+	if v == nil then
+		return #text
 	end
 
-	return #s2
+	return v - 1
 end
 
-local t1 = {}
+local class = {}
+class.__index = class
 
-t1.__index = t1
-
-function t1.new(s3: string, n2: number, n3: number, n4: number) -- line: 32
-	-- upvalues: t1 (copy)
-	local self = setmetatable({}, t1)
-
-	self._text = s3
-	self._initialGuess = self:_guessInitialBreak(n2, n3, n4)
+function class.new(text: string, p: number, p2: number, p3: number)
+	local self = setmetatable({}, class)
+	self._text = text
+	self._initialGuess = self:_guessInitialBreak(p, p2, p3)
 	self._index = self._initialGuess
-	self:setDirection(1)
 
+	self:setDirection(1)
 	return self
 end
-function t1._guessInitialBreak(t2: {[any]: any}, _: number, n6: number, n7: number) -- line: 44
-	return (math.max(math.floor(#t2._text * n7 / n6), 1))
+
+function class:_guessInitialBreak(_: number, p: number, p2: number)
+	return (math.max(math.floor(#self._text * p2 / p), 1))
 end
-function t1.findPossibleBreak(p1) -- line: 48
-	local _index = p1._index
 
-	while p1.direction == 1 and _index <= #p1._text or p1.direction == -1 and _index > 0 do
-		if p1._text:sub(_index, _index):match("%s") ~= nil then
-			p1._index = _index + p1._step
+function class:findPossibleBreak()
+	local index = self._index
 
-			return _index - 1
+	while self.direction == 1 and index <= #self._text or self.direction == -1 and index > 0 do
+		if isWhitespace(self._text:sub(index, index)) then -- inferred equivalent call
+			self._index = index + self._step
+
+			return index - 1
 		end
 
-		_index += p1._step
+		index += self._step
 	end
 
-	return _index
+	return index
 end
-function t1.setDirection(t3: {[any]: any}, n8: number) -- line: 63
-	t3.direction = n8
 
-	if n8 ~= 1 then
-		t3._index = t3._initialGuess
+function class:setDirection(direction: number)
+	self.direction = direction
+
+	if direction ~= 1 then
+		self._index = self._initialGuess
 	end
 
-	t3._step = n8 ~= 1 and -1 or 1
+	self._step = direction == 1 and 1 or -1
 end
 
-local t4 = {}
+local class2 = {}
+class2.__index = class2
 
-t4.__index = t4
-
-function t4.new(s4: string, n9: number, n10: number, n11: number) -- line: 75
-	-- upvalues: t4 (copy)
-	local self = setmetatable({}, t4)
-
-	self._text = s4
-	self._initialGuess = self:_guessInitialBreak(n9, n10, n11)
+function class2.new(text: string, p: number, p2: number, p3: number)
+	local self = setmetatable({}, class2)
+	self._text = text
+	self._initialGuess = self:_guessInitialBreak(p, p2, p3)
 	self._codepointIndex = self._initialGuess
 	self._step = 0
-
 	return self
 end
-function t4._guessInitialBreak(_: {[any]: any}, n12: number, n13: number, n14: number) -- line: 84
-	return (math.max(math.floor(n12 * n14 / n13), 1))
-end
-function t4.findPossibleBreak(p2) -- line: 88
-	p2._codepointIndex = p2._codepointIndex + p2._step
 
-	local _text = p2._text
-	local _codepointIndex = p2._codepointIndex
-	local v38 = utf8.offset(_text, _codepointIndex + 1)
-
-	if v38 ~= nil then
-		return v38 - 1
-	end
-
-	return #_text
-end
-function t4.setDirection(p3, p4) -- line: 93
-	p3.direction = p4
-	p3._step = p4 ~= 1 and -1 or 1
+function class2:_guessInitialBreak(p: number, p2: number, p3: number)
+	return (math.max(math.floor(p * p3 / p2), 1))
 end
 
-local function splitWith(t6: {[any]: any}, p5: ((...any) -> ...any), s5: string, n15: number, n16: number, n17: number) -- line: 98
-	local v47 = t6.new(s5, n15, n16, n17)
-	local v48 = v47:findPossibleBreak()
-	local v49 = s5:sub(1, v48)
-	local v50 = not (n17 < p5(v49)) and 1 or -1
-	local v51 = v48
+function class2:findPossibleBreak()
+	self._codepointIndex += self._step
+	return codepointEnd(self._text, self._codepointIndex) -- inferred equivalent call
+end
 
-	v47:setDirection(v50)
+function class2:setDirection(direction)
+	self.direction = direction
+	self._step = direction == 1 and 1 or -1
+end
 
-	local n18 = 0
+local function splitWith(p, callback, value: string, p2: number, p3: number, p4: number)
+	local v = p.new(value, p2, p3, p4)
 
-	while n18 < n15 do
-		v48 = v47:findPossibleBreak()
-		v49 = s5:sub(1, v48)
+	local v2 = v:findPossibleBreak()
+	local v3 = value:sub(1, v2)
+	local v4 = p4 < callback(v3) and -1 or 1
 
-		local v53 = not (n17 < p5(v49)) and 1 or -1
+	v:setDirection(v4)
+	local v5 = v2
+	local count = 0
 
-		if v50 ~= v53 then
-			if v50 ~= 1 then
-				return v49, v48
-			end
+	while count < p2 do
+		v2 = v:findPossibleBreak()
 
-			return s5:sub(1, v51), v51
+		v3 = value:sub(1, v2)
+		local v6 = p4 < callback(v3) and -1 or 1
+
+		if v4 == v6 then
+			count += 1
+			v5 = v2
+			v4 = v6
+		elseif v4 == 1 then
+			return value:sub(1, v5), v5
+		else
+			break
 		end
-
-		v50 = v53
-		v51 = v48
-		n18 += 1
 	end
 
-	return v49, v48
+	return v3, v2
 end
-local function split(p6, p7: ((...any) -> ...any), s6: string, n19: number) -- line: 174
-	-- upvalues: TextSplitBy (copy), t1 (copy), t4 (copy), splitWith (copy)
-	local v58 = utf8.len(s6)
 
-	if v58 == nil then
+local function split(p, callback, value: string, p2: number)
+	local v = utf8.len(value)
+
+	if v == nil then
 		warn("Failed to get string length, it is probably malformed or non utf8")
-
-		return s6
+		return value
 	end
 
-	local v59 = p7(s6)
+	local v2 = callback(value)
 
-	if v59 <= n19 then
-		return s6
+	if v2 <= p2 then
+		return value
 	end
 
-	local v60 = if p6 ~= TextSplitBy.Word then t4 else t1
-	local v61, v62 = splitWith(v60, p7, s6, v58, v59, n19)
+	local v3 = if p == TextSplitBy.Word then class else class2
 
-	if v62 == 0 or v62 == #s6 then
-		return s6
+	local v4, v5 = splitWith(v3, callback, value, v, v2, p2)
+
+	if v5 == 0 or v5 == #value then
+		return value
 	end
 
-	return v61, (s6:sub(v62 + 1))
+	return v4, (value:sub(v5 + 1))
 end
 
 return split

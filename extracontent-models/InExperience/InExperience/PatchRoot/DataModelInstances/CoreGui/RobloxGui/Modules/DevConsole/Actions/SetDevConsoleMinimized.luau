@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)("SetDevConsoleMinimized", function(p1) -- line: 4
-	return {
-		isMinimized = p1
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action("SetDevConsoleMinimized", function(isMinimized)
+	return { isMinimized = isMinimized }
 end)

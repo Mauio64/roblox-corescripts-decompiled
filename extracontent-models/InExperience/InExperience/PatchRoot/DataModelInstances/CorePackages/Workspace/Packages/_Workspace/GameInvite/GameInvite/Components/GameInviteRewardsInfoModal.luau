@@ -1,121 +1,131 @@
-local Parent = script:FindFirstAncestor("GameInvite").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local PartialPageModal = require(Parent.UIBlox).App.Dialog.Modal.PartialPageModal
+local parent = script:FindFirstAncestor("GameInvite").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local UIBlox = require(parent.UIBlox)
+local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
 local LocalizationService = game:GetService("LocalizationService")
 local BrowserService = game:GetService("BrowserService")
 local HttpService = game:GetService("HttpService")
-local GetFStringReferralRewardsTermsURL = require(Parent.SharedFlags).GetFStringReferralRewardsTermsURL
-local v9 = game:DefineFastFlag("EnableRewardsWebViewOverlay", false)
+local SharedFlags = require(parent.SharedFlags)
+local GetFStringReferralRewardsTermsURL = SharedFlags.GetFStringReferralRewardsTermsURL
+local defineFastFlag = game:DefineFastFlag("EnableRewardsWebViewOverlay", false)
 
-local function v10(s1: string) -- line: 32
-	-- upvalues: LocalizationService (copy)
-	if not s1 or s1 == "" then
+local function fn(expiryUtc: string)
+	if not expiryUtc or expiryUtc == "" then
 		return ""
 	end
 
-	local v12 = DateTime and DateTime.fromIsoDate(s1) or nil
+	local dateTime = DateTime and DateTime.fromIsoDate(expiryUtc) or nil
 
-	if not v12 then
+	if not dateTime then
 		return ""
 	end
 
-	local RobloxLocaleId = LocalizationService.RobloxLocaleId
-
-	return `{ v12:FormatLocalTime("LL", RobloxLocaleId) } { v12:FormatLocalTime("LT", RobloxLocaleId) }`
+	local robloxLocaleId = LocalizationService.RobloxLocaleId
+	return `{dateTime:FormatLocalTime("LL", robloxLocaleId)} {dateTime:FormatLocalTime("LT", robloxLocaleId)}`
 end
 
-return function(t1: {[any]: any}) -- line: 46
-	-- upvalues: React (copy), Foundation (copy), PartialPageModal (copy), v10 (copy), v9 (copy), HttpService (copy), GetFStringReferralRewardsTermsURL (copy), BrowserService (copy)
-	return React.createElement("ScreenGui", {
-		DisplayOrder = 100,
-		IgnoreGuiInset = true,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, {
-		RewardsInfoModalContainer = React.createElement(Foundation.View, {
-			tag = "size-full-full bg-over-media-100",
-			onActivated = function() -- line: 55
-				-- upvalues: t1 (copy)
-				if t1.setModalOpen then
-					t1.setModalOpen(false)
-				end
-			end
-		}, {
-			RewardsInfoModal = React.createElement(PartialPageModal, {
-				title = t1.title,
-				screenSize = workspace.CurrentCamera.ViewportSize,
-				position = UDim2.new(0.5, 0, 0.5, 0),
-				onCloseClicked = function() -- line: 65
-					-- upvalues: t1 (copy)
-					if t1.setModalOpen then
-						t1.setModalOpen(false)
+local function fn2() -- 1 equivalent call inferred from this helper
+	return workspace.CurrentCamera.ViewportSize
+end
+
+return function(props)
+	return React.createElement(
+		"ScreenGui",
+		{ DisplayOrder = 100, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, IgnoreGuiInset = true },
+		{
+			RewardsInfoModalContainer = React.createElement(Foundation.View, {
+				tag = "size-full-full bg-over-media-100",
+				onActivated = function()
+					if props.setModalOpen then
+						props.setModalOpen(false)
 					end
 				end
 			}, {
-				RewardsInfoModalContent = React.createElement(Foundation.View, {
-					tag = "col size-full-0 auto-y gap-y-large padding-top-large",
-					Size = UDim2.new(1, 0, 0, 180)
-				}, {
-					RewardsInfoModalTitle = React.createElement(Foundation.Text, {
-						tag = "text-title-medium auto-xy text-align-x-left text-wrap",
-						LayoutOrder = 0,
-						Text = t1.rewardDetailsTitle
-					}),
-					RewardsInfoModalBody = React.createElement(Foundation.Text, {
-						tag = "text-body-medium auto-xy text-align-x-left text-wrap padding-top-small",
-						LayoutOrder = 1,
-						Text = t1.rewardDetailsBody
-					}),
-					RewardsInfoModalLimitsTitle = React.createElement(Foundation.Text, {
-						tag = "text-title-medium auto-xy text-align-x-left text-wrap padding-top-medium",
-						LayoutOrder = 2,
-						Text = t1.rewardLimitsTitle
-					}),
-					RewardInfoExpiresText = React.createElement(Foundation.Text, {
-						tag = "text-body-medium auto-xy text-align-x-left text-wrap padding-top-small",
-						LayoutOrder = 3,
-						Text = t1.rewardsExpiresText .. " " .. v10(t1.expiryUtc)
-					}),
-					RewardsInfoModalLimitsBody = React.createElement(Foundation.Text, {
-						tag = "text-body-medium auto-xy text-align-x-left text-wrap",
-						LayoutOrder = 4,
-						Text = t1.rewardLimitsBody
-					}),
-					RewardsInfoModalCreatorSupportText = React.createElement(Foundation.Text, {
-						tag = "text-caption-medium auto-xy text-align-x-left text-wrap padding-top-xlarge",
-						LayoutOrder = 5,
-						Text = t1.rewardCreatorSupportText
-					}),
-					RewardsInfoModalTermsContainer = React.createElement(Foundation.View, {
-						tag = "row grow auto-xy align-x-left padding-top-small",
-						BackgroundTransparency = 1,
-						LayoutOrder = 6,
-						onActivated = function() -- line: 109
-							-- upvalues: v9 (copy), HttpService (copy), GetFStringReferralRewardsTermsURL (copy), t1 (copy), BrowserService (copy)
-							local v15 = if not v9 then HttpService:JSONEncode({
-								command = "open",
-								url = GetFStringReferralRewardsTermsURL(),
-								title = t1.rewardsTerms
-							}) else HttpService:JSONEncode({
-								command = "open",
-								visible = true,
-								isGenericWebview = true,
-								enableOverlayReplacement = true,
-								url = GetFStringReferralRewardsTermsURL(),
-								title = t1.rewardsTerms
-							})
-
-							BrowserService:SendCommand(v15)
+				RewardsInfoModal = React.createElement(PartialPageModal, {
+					title = props.title,
+					screenSize = fn2(), -- inferred equivalent call
+					position = UDim2.new(0.5, 0, 0.5, 0),
+					onCloseClicked = function()
+						if props.setModalOpen then
+							props.setModalOpen(false)
 						end
-					}, {
-						RewardsInfoModalTermsText = React.createElement(Foundation.Text, {
-							tag = "text-label-small auto-xy text-align-x-left text-wrap",
-							RichText = true,
-							Text = `<u><b>{ t1.rewardsTerms }</b></u>`
-						})
-					})
+					end
+				}, {
+					RewardsInfoModalContent = React.createElement(
+						Foundation.View,
+						{
+							tag = "col size-full-0 auto-y gap-y-large padding-top-large",
+							Size = UDim2.new(1, 0, 0, 180)
+						},
+						{
+							RewardsInfoModalTitle = React.createElement(Foundation.Text, {
+								tag = "text-title-medium auto-xy text-align-x-left text-wrap",
+								Text = props.rewardDetailsTitle,
+								LayoutOrder = 0
+							}),
+							RewardsInfoModalBody = React.createElement(Foundation.Text, {
+								tag = "text-body-medium auto-xy text-align-x-left text-wrap padding-top-small",
+								Text = props.rewardDetailsBody,
+								LayoutOrder = 1
+							}),
+							RewardsInfoModalLimitsTitle = React.createElement(Foundation.Text, {
+								tag = "text-title-medium auto-xy text-align-x-left text-wrap padding-top-medium",
+								Text = props.rewardLimitsTitle,
+								LayoutOrder = 2
+							}),
+							RewardInfoExpiresText = React.createElement(Foundation.Text, {
+								tag = "text-body-medium auto-xy text-align-x-left text-wrap padding-top-small",
+								Text = props.rewardsExpiresText .. " " .. fn(props.expiryUtc),
+								LayoutOrder = 3
+							}),
+							RewardsInfoModalLimitsBody = React.createElement(Foundation.Text, {
+								tag = "text-body-medium auto-xy text-align-x-left text-wrap",
+								Text = props.rewardLimitsBody,
+								LayoutOrder = 4
+							}),
+							RewardsInfoModalCreatorSupportText = React.createElement(Foundation.Text, {
+								tag = "text-caption-medium auto-xy text-align-x-left text-wrap padding-top-xlarge",
+								Text = props.rewardCreatorSupportText,
+								LayoutOrder = 5
+							}),
+							RewardsInfoModalTermsContainer = React.createElement(Foundation.View, {
+								tag = "row grow auto-xy align-x-left padding-top-small",
+								BackgroundTransparency = 1,
+								LayoutOrder = 6,
+								onActivated = function()
+									local v
+
+									if defineFastFlag then
+										v = HttpService:JSONEncode({
+											url = GetFStringReferralRewardsTermsURL(),
+											title = props.rewardsTerms,
+											command = "open",
+											visible = true,
+											isGenericWebview = true,
+											enableOverlayReplacement = true
+										})
+									else
+										v = HttpService:JSONEncode({
+											url = GetFStringReferralRewardsTermsURL(),
+											title = props.rewardsTerms,
+											command = "open"
+										})
+									end
+
+									BrowserService:SendCommand(v)
+								end
+							}, {
+								RewardsInfoModalTermsText = React.createElement(Foundation.Text, {
+									tag = "text-label-small auto-xy text-align-x-left text-wrap",
+									Text = `<u><b>{props.rewardsTerms}</b></u>`,
+									RichText = true
+								})
+							})
+						}
+					)
 				})
 			})
-		})
-	})
+		}
+	)
 end

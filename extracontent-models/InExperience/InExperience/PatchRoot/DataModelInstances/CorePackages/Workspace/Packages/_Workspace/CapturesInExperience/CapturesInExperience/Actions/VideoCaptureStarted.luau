@@ -1,11 +1,10 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Enums.CaptureTriggerType)
+local Rodux = require(parent2.Rodux)
 
-return Rodux.makeActionCreator(script.Name, function(p1) -- line: 12
-	return {
-		triggerType = p1
-	}
+require(parent.Enums.CaptureTriggerType)
+
+return Rodux.makeActionCreator(script.Name, function(triggerType)
+	return { triggerType = triggerType }
 end)

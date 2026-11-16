@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-return require(ParentParent.SocialCommon).Utils.buildApiSiteUrl("apis")
+local SocialCommon = require(parent.SocialCommon)
+return SocialCommon.Utils.buildApiSiteUrl("apis")

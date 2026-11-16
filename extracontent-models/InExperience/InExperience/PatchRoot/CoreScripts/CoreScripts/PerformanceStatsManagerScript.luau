@@ -1,269 +1,262 @@
 local Players = game:GetService("Players")
-local GameSettings = UserSettings().GameSettings
+local gameSettings = UserSettings().GameSettings
 local CoreGui = game:GetService("CoreGui")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+
 local StatsAggregatorManager = require(CoreGui.RobloxGui.Modules.Stats.StatsAggregatorManager)
 local StatsButton = require(CoreGui.RobloxGui.Modules.Stats.StatsButton)
 local StatsUtils = require(CoreGui.RobloxGui.Modules.Stats.StatsUtils)
 local StatsViewer = require(CoreGui.RobloxGui.Modules.Stats.StatsViewer)
-local v9 = require(CoreGui.RobloxGui.Modules.Flags.GetFFlagLazyPerfStatsInit)()
-local Frame = nil
-local u11 = nil
-local u12 = nil
-local t1 = {}
-local u14 = nil
-local u15 = nil
 
-if not v9 then
-	Frame = Instance.new("Frame")
-	Frame.Name = "PerformanceStats"
-	u11 = StatsAggregatorManager.getSingleton()
-	u12 = StatsViewer.new()
+local GetFFlagLazyPerfStatsInit = require(CoreGui.RobloxGui.Modules.Flags.GetFFlagLazyPerfStatsInit)
+local fFlagLazyPerfStatsInit = GetFFlagLazyPerfStatsInit()
 
-	for _, v in ipairs(StatsUtils.AllStatTypes) do
-		t1[v] = StatsButton.new(v)
+local v = {}
+local v2 = nil
+
+local v3 = nil
+local performanceStats, v4, v5
+
+if fFlagLazyPerfStatsInit then
+	performanceStats = nil
+	v4 = nil
+	v5 = nil
+else
+	performanceStats = Instance.new("Frame")
+	performanceStats.Name = "PerformanceStats"
+	v5 = StatsAggregatorManager.getSingleton()
+	v4 = StatsViewer.new()
+
+	for _, allStatType in ipairs(StatsUtils.AllStatTypes) do
+		v[allStatType] = StatsButton.new(allStatType)
 	end
 end
 
-function ShowMasterFrame() -- line: 48
-	-- upvalues: Frame (ref), CoreGui (copy)
-	Frame.Visible = true
-	Frame.Parent = CoreGui.RobloxGui
+function ShowMasterFrame()
+	performanceStats.Visible = true
+	performanceStats.Parent = CoreGui.RobloxGui
 end
-function HideMasterFrame() -- line: 53
-	-- upvalues: Frame (ref)
-	Frame.Visible = false
-	Frame.Parent = nil
+
+function HideMasterFrame()
+	performanceStats.Visible = false
+	performanceStats.Parent = nil
 end
-function ConfigureMasterFrame() -- line: 59
-	-- upvalues: Frame (ref)
-	Frame.Position = UDim2.new(0, 0, 0, 0)
-	Frame.Size = UDim2.new(1, 0, 1, 0)
-	Frame.Selectable = false
-	Frame.BackgroundTransparency = 1
-	Frame.Active = false
-	Frame.ZIndex = 0
+
+function ConfigureMasterFrame()
+	performanceStats.Position = UDim2.new(0, 0, 0, 0)
+	performanceStats.Size = UDim2.new(1, 0, 1, 0)
+	performanceStats.Selectable = false
+	performanceStats.BackgroundTransparency = 1
+	performanceStats.Active = false
+	performanceStats.ZIndex = 0
+
 	HideMasterFrame()
 end
-function ConfigureStatButtonsInMasterFrame() -- line: 77
-	-- upvalues: StatsUtils (copy)
-	for i, v in ipairs(StatsUtils.AllStatTypes) do
-		AddButton(v, i)
+
+function ConfigureStatButtonsInMasterFrame()
+	for i, allStatType in ipairs(StatsUtils.AllStatTypes) do
+		AddButton(allStatType, i)
 	end
 end
-function OnButtonToggled(p1) -- line: 84
-	-- upvalues: t1 (ref), u14 (ref)
-	if not t1[p1]._isSelected then
-		u14 = p1
-	else
-		u14 = nil
-	end
+
+function OnButtonToggled(p)
+	v2 = if not v[p]._isSelected then p else nil
 
 	UpdateButtonSelectedStates()
 	UpdateViewerVisibility()
 end
-function UpdateButtonSelectedStates() -- line: 99
-	-- upvalues: StatsUtils (copy), t1 (ref), u14 (ref)
-	for _, v in ipairs(StatsUtils.AllStatTypes) do
-		t1[v]:SetIsSelected(v == u14)
+
+function UpdateButtonSelectedStates()
+	for _, allStatType in ipairs(StatsUtils.AllStatTypes) do
+		v[allStatType]:SetIsSelected(allStatType == v2)
 	end
 end
-function UpdateViewerVisibility() -- line: 106
-	-- upvalues: u14 (ref), u12 (ref), u11 (ref), RbxAnalyticsService (copy)
-	if u14 == nil then
-		if u12:GetIsVisible() then
-			u12:SetVisible(false)
-			u12:SetStatsAggregator(nil)
 
-			return
+function UpdateViewerVisibility()
+	if v2 == nil then
+		if v4:GetIsVisible() then
+			v4:SetVisible(false)
+			v4:SetStatsAggregator(nil)
 		end
 	else
-		local v23 = false
+		local flag
 
-		if not u12:GetIsVisible() then
-			v23 = true
-			u12:SetVisible(true)
+		if v4:GetIsVisible() then
+			flag = false
+		else
+			v4:SetVisible(true)
+			flag = true
 		end
 
-		if u14 ~= u12:GetStatType() then
-			u12:SetStatType(u14)
-			u12:SetStatsAggregator(u11:GetAggregator(u14))
-			v23 = true
+		if v2 ~= v4:GetStatType() then
+			v4:SetStatType(v2)
+			v4:SetStatsAggregator(v5:GetAggregator(v2))
+			flag = true
 		end
 
-		if v23 then
-			RbxAnalyticsService:TrackEvent("Game", "Enlarge PerfStat", u14, 0)
+		if flag then
+			RbxAnalyticsService:TrackEvent("Game", "Enlarge PerfStat", v2, 0)
 		end
 	end
 end
-function AddButton(p2, p3) -- line: 135
-	-- upvalues: t1 (ref), Frame (ref), u11 (ref), StatsUtils (copy)
-	local v26 = t1[p2]
 
-	v26:SetParent(Frame)
-	v26:SetStatsAggregator(u11:GetAggregator(p2))
+function AddButton(p, p2)
+	local v6 = v[p]
 
-	local v27 = 1 / StatsUtils.NumButtonTypes
+	v6:SetParent(performanceStats)
+	v6:SetStatsAggregator(v5:GetAggregator(p))
 
-	v26:SetSizeAndPosition(UDim2.new(v27, 0, 0, StatsUtils.ButtonHeight), (UDim2.new(v27 * (p3 - 1), 0, 0, 0)))
-	v26:SetToggleCallbackFunction(OnButtonToggled)
-end
-function ConfigureStatViewerInMasterFrame() -- line: 154
-	-- upvalues: u12 (ref), Frame (ref), StatsUtils (copy)
-	u12:SetParent(Frame)
+	local v7 = 1 / StatsUtils.NumButtonTypes
+	v6:SetSizeAndPosition(UDim2.new(v7, 0, 0, StatsUtils.ButtonHeight), (UDim2.new(v7 * (p2 - 1), 0, 0, 0)))
 
-	local uDim2 = UDim2.new(0, StatsUtils.ViewerWidth, 0, StatsUtils.ViewerHeight)
-	local uDim2_2 = UDim2.new(1, -StatsUtils.ViewerWidth, 0, StatsUtils.ButtonHeight + StatsUtils.ViewerTopMargin)
-
-	u12:SetSizeAndPosition(uDim2, uDim2_2)
+	v6:SetToggleCallbackFunction(OnButtonToggled)
 end
 
-if v9 then
-	function CreatePerformanceStatsUI() -- line: 166
-		-- upvalues: u11 (ref), StatsAggregatorManager (copy), Frame (ref), t1 (ref), StatsUtils (copy), StatsButton (copy), u12 (ref), StatsViewer (copy), u14 (ref)
-		u11 = StatsAggregatorManager.getSingleton()
-		u11:StartListening()
-		Frame = Instance.new("Frame")
-		Frame.Name = "PerformanceStats"
-		t1 = {}
+function ConfigureStatViewerInMasterFrame()
+	v4:SetParent(performanceStats)
 
-		for _, v31 in StatsUtils.AllStatTypes do
-			t1[v31] = StatsButton.new(v31)
+	local udim = UDim2.new(0, StatsUtils.ViewerWidth, 0, StatsUtils.ViewerHeight)
+	local udim2 = UDim2.new(1, -StatsUtils.ViewerWidth, 0, StatsUtils.ButtonHeight + StatsUtils.ViewerTopMargin)
+
+	v4:SetSizeAndPosition(udim, udim2)
+end
+
+if fFlagLazyPerfStatsInit then
+	function CreatePerformanceStatsUI()
+		v5 = StatsAggregatorManager.getSingleton()
+		v5:StartListening()
+
+		performanceStats = Instance.new("Frame")
+		performanceStats.Name = "PerformanceStats"
+
+		v = {}
+
+		for _, allStatType in StatsUtils.AllStatTypes do
+			local v6 = StatsButton.new(allStatType)
+			v[allStatType] = v6
 		end
 
-		u12 = StatsViewer.new()
-		u14 = nil
+		v4 = StatsViewer.new()
+		v2 = nil
+
 		ConfigureMasterFrame()
 		ConfigureStatButtonsInMasterFrame()
 		ConfigureStatViewerInMasterFrame()
+
 		UpdateButtonSelectedStates()
 		UpdateViewerVisibility()
+
 		ShowMasterFrame()
 	end
-	function DestroyPerformanceStatsUI() -- line: 192
-		-- upvalues: u12 (ref), StatsUtils (copy), t1 (ref), Frame (ref), u14 (ref), u11 (ref)
-		if u12 then
-			u12:OnPerformanceStatsShouldBeVisibleChanged()
+
+	function DestroyPerformanceStatsUI()
+		if v4 then
+			v4:OnPerformanceStatsShouldBeVisibleChanged()
 		end
 
-		for _, v in ipairs(StatsUtils.AllStatTypes) do
-			local v34 = t1[v]
+		for _, allStatType in ipairs(StatsUtils.AllStatTypes) do
+			local v6 = v[allStatType]
 
-			if v34 then
-				v34:OnPerformanceStatsShouldBeVisibleChanged()
+			if v6 then
+				v6:OnPerformanceStatsShouldBeVisibleChanged()
 			end
 		end
 
-		if Frame then
-			Frame:Destroy()
-			Frame = nil
+		if performanceStats then
+			performanceStats:Destroy()
+			performanceStats = nil
 		end
 
-		u12 = nil
-		t1 = {}
-		u14 = nil
+		v4 = nil
+		v = {}
+		v2 = nil
 
-		if u11 then
-			u11:StopListening()
+		if v5 then
+			v5:StopListening()
 		end
 	end
-	function UpdatePerformanceStatsVisibility() -- line: 218
-		-- upvalues: StatsUtils (copy), Frame (ref), RbxAnalyticsService (copy), u15 (ref)
-		local v35 = StatsUtils.PerformanceStatsShouldBeVisible()
 
-		if v35 == (Frame ~= nil) then
+	function UpdatePerformanceStatsVisibility()
+		local performanceStatsShouldBeVisible = StatsUtils.PerformanceStatsShouldBeVisible()
+
+		if performanceStatsShouldBeVisible == (performanceStats ~= nil) then
 			return
 		end
 
-		if v35 then
+		if performanceStatsShouldBeVisible then
 			CreatePerformanceStatsUI()
 		else
 			DestroyPerformanceStatsUI()
 		end
 
-		local s1 = "Hide PerfStats"
+		RbxAnalyticsService:TrackEvent(
+			"Game",
+			performanceStatsShouldBeVisible and "Show PerfStats" or "Hide PerfStats",
+			"",
+			0
+		)
 
-		if v35 then
-			s1 = "Show PerfStats"
-		end
-
-		RbxAnalyticsService:TrackEvent("Game", s1, "", 0)
-
-		if v35 then
-			u15 = time()
+		if performanceStatsShouldBeVisible then
+			v3 = time()
 			RbxAnalyticsService:ReportCounter("OpenPerformanceProfiler", 1)
-
-			return
-		end
-
-		if u15 then
-			local v37 = time() - u15
-
-			RbxAnalyticsService:ReportStats("TimeOpenPerformanceProfiler", v37)
+		elseif v3 then
+			RbxAnalyticsService:ReportStats("TimeOpenPerformanceProfiler", time() - v3)
 		end
 	end
 else
-	function UpdatePerformanceStatsVisibility() -- line: 251
-		-- upvalues: StatsUtils (copy), Frame (ref), u12 (ref), t1 (ref), RbxAnalyticsService (copy), u15 (ref)
-		local v38 = StatsUtils.PerformanceStatsShouldBeVisible()
+	function UpdatePerformanceStatsVisibility()
+		local performanceStatsShouldBeVisible = StatsUtils.PerformanceStatsShouldBeVisible()
 
-		if v38 == Frame.Visible then
+		if performanceStatsShouldBeVisible == performanceStats.Visible then
 			return
 		end
 
-		if v38 then
+		if performanceStatsShouldBeVisible then
 			ShowMasterFrame()
 		else
 			HideMasterFrame()
 		end
 
-		u12:OnPerformanceStatsShouldBeVisibleChanged()
+		v4:OnPerformanceStatsShouldBeVisibleChanged()
 
-		for _, v in ipairs(StatsUtils.AllStatTypes) do
-			t1[v]:OnPerformanceStatsShouldBeVisibleChanged()
+		for _, allStatType in ipairs(StatsUtils.AllStatTypes) do
+			v[allStatType]:OnPerformanceStatsShouldBeVisibleChanged()
 		end
 
-		local s2 = "Hide PerfStats"
+		RbxAnalyticsService:TrackEvent(
+			"Game",
+			performanceStatsShouldBeVisible and "Show PerfStats" or "Hide PerfStats",
+			"",
+			0
+		)
 
-		if v38 then
-			s2 = "Show PerfStats"
-		end
-
-		RbxAnalyticsService:TrackEvent("Game", s2, "", 0)
-
-		if v38 then
-			u15 = time()
+		if performanceStatsShouldBeVisible then
+			v3 = time()
 			RbxAnalyticsService:ReportCounter("OpenPerformanceProfiler", 1)
-
-			return
-		end
-
-		if u15 then
-			local v42 = time() - u15
-
-			RbxAnalyticsService:ReportStats("TimeOpenPerformanceProfiler", v42)
+		elseif v3 then
+			RbxAnalyticsService:ReportStats("TimeOpenPerformanceProfiler", time() - v3)
 		end
 	end
 end
 
-GameSettings.PerformanceStatsVisibleChanged:connect(UpdatePerformanceStatsVisibility)
+gameSettings.PerformanceStatsVisibleChanged:connect(UpdatePerformanceStatsVisibility)
 
-if not v9 then
+if not fFlagLazyPerfStatsInit then
 	ConfigureMasterFrame()
 	ConfigureStatButtonsInMasterFrame()
 	ConfigureStatViewerInMasterFrame()
+
 	UpdateButtonSelectedStates()
 	UpdateViewerVisibility()
 	UpdatePerformanceStatsVisibility()
 end
 
-spawn(function() -- line: 305
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
+spawn(function()
+	local localPlayer = Players.LocalPlayer
 
-	while not LocalPlayer do
+	while not localPlayer do
 		Players.PlayerAdded:wait()
-		LocalPlayer = Players.LocalPlayer
+		localPlayer = Players.LocalPlayer
 	end
 
 	UpdatePerformanceStatsVisibility()

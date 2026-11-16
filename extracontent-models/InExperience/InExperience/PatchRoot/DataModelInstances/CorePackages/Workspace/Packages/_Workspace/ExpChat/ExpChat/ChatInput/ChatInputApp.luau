@@ -1,38 +1,70 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+
 local ExpChat = script:FindFirstAncestor("ExpChat")
 local GetTransparencyStore = require(ExpChat.Stores.GetTransparencyStore)
 local Localization = require(ExpChat.Localization)
 local LocalizationService = game:GetService("LocalizationService")
-local ExpChatParent = ExpChat.Parent
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local Roact = require(ExpChatParent.Roact)
-local React = require(ExpChatParent.React)
-local RoactRodux = require(ExpChatParent.RoactRodux)
+
+local parent = ExpChat.Parent
+local ExpChatShared = require(parent.ExpChatShared)
+local Roact = require(parent.Roact)
+local React = require(parent.React)
+local RoactRodux = require(parent.RoactRodux)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local tutils = require(parent.tutils)
 local Config = require(ExpChat.Config)
-local InputType = require(ExpChatParent.InputType)
-local getInputGroup = require(ExpChatParent.InputType).getInputGroup
-local SharedFlags = require(ExpChatParent.SharedFlags)
+local InputType = require(parent.InputType)
+local InputType2 = require(parent.InputType)
+local getInputGroup = InputType2.getInputGroup
+local SharedFlags = require(parent.SharedFlags)
+
 local FocusChatHotKeyActivated = require(ExpChat.Actions.FocusChatHotKeyActivated)
 local AutocompleteDropdownActivated = require(ExpChat.Actions.AutocompleteDropdownActivated)
 local AutocompleteDropdownResultsChanged = require(ExpChat.Actions.AutocompleteDropdownResultsChanged)
 local AutocompleteDropdownSelectionChanged = require(ExpChat.Actions.AutocompleteDropdownSelectionChanged)
 local AutocompleteDropdownTypeChanged = require(ExpChat.Actions.AutocompleteDropdownTypeChanged)
 local AutocompleteDropdownDeactivated = require(ExpChat.Actions.AutocompleteDropdownDeactivated)
-local v22 = game:DefineFastFlag("MemoizeChatInputApp", false)
+local defineFastFlag = game:DefineFastFlag("MemoizeChatInputApp", false)
+
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local FFlagLuaSupportMicroGamepadPreferredInput = SharedFlags.FFlagLuaSupportMicroGamepadPreferredInput
+local FFlagExpChatUseChannelTabsStore = SharedFlags.FFlagExpChatUseChannelTabsStore
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
+local GetChannelTabsStore
+
+if FFlagExpChatUseChannelTabsStore then
+	GetChannelTabsStore = require(ExpChat.Stores.GetChannelTabsStore)
+else
+	GetChannelTabsStore = nil
+end
+
 local Flags = ExpChat.Flags
 local getFFlagUnreduxLastInputTypeChanged = require(Flags.getFFlagUnreduxLastInputTypeChanged)
 local FFlagExpChatDictationFadeOverride = require(Flags.FFlagExpChatDictationFadeOverride)
-local selectSelectedTabName = require(ExpChat.selectSelectedTabName)
-local UI = script.Parent.UI
-local ChatInputBar = require(UI.ChatInputBar)
-local Localization2 = require(ExpChatParent.InExperienceLocales).Localization
-local Cryo = require(ExpChatParent.Cryo)
-local v33 = ((if not getFFlagUnreduxLastInputTypeChanged() then Roact.Component else Roact.PureComponent)):extend("ChatInputBarApp")
+local FFlagExpChatContinuousDictationIdleFade = require(Flags.FFlagExpChatContinuousDictationIdleFade)
 
-v33.defaultProps = {
+local selectSelectedTabName = require(ExpChat.selectSelectedTabName)
+
+local ui = script.Parent.UI
+local ChatInputBar = require(ui.ChatInputBar)
+local DictationState = require(ui.ChatInputBar.Dictation.DictationState)
+
+local InExperienceLocales = require(parent.InExperienceLocales)
+local localization = InExperienceLocales.Localization
+local Cryo = require(parent.Cryo)
+local v
+
+if getFFlagUnreduxLastInputTypeChanged() then
+	v = Roact.PureComponent
+else
+	v = Roact.Component
+end
+
+local extended = v:extend("ChatInputBarApp")
+
+extended.defaultProps = {
 	addTopPadding = true,
 	LayoutOrder = 1,
 	onSendChat = nil,
@@ -40,210 +72,290 @@ v33.defaultProps = {
 }
 
 if getFFlagUnreduxLastInputTypeChanged() then
-	function v33.init(p1) -- line: 53
-		-- upvalues: UserInputService (copy), getInputGroup (copy), InputType (copy)
-		p1:setState({
+	function extended:init()
+		self:setState({
 			isUsingTouch = UserInputService.TouchEnabled,
-			isUsingGamepad = UserInputService.PreferredInput == Enum.PreferredInput.Gamepad
+			isUsingGamepad = UserInputService.PreferredInput == Enum.PreferredInput.Gamepad or FFlagLuaSupportMicroGamepadPreferredInput and UserInputService.PreferredInput == Enum.PreferredInput.MicroGamepad
 		})
-		p1.connection = UserInputService.LastInputTypeChanged:Connect(function(p2) -- line: 58
-			-- upvalues: getInputGroup (copy), p1 (copy), InputType (copy)
-			local v52 = getInputGroup(p2)
 
-			p1:setState({
-				isUsingTouch = v52 == InputType.InputTypeConstants.Touch,
-				isUsingGamepad = v52 == InputType.InputTypeConstants.Gamepad
+		self.connection = UserInputService.LastInputTypeChanged:Connect(function(p)
+			local inputGroup = getInputGroup(p)
+
+			self:setState({
+				isUsingTouch = inputGroup == InputType.InputTypeConstants.Touch,
+				isUsingGamepad = inputGroup == InputType.InputTypeConstants.Gamepad
 			})
 		end)
 	end
-	function v33.getPlaceholderText(p3) -- line: 68
-		if p3.state.isUsingGamepad then
-			return p3.props.placeholderGamepadText
+
+	function extended:getPlaceholderText()
+		if self.state.isUsingGamepad then
+			return self.props.placeholderGamepadText
 		end
 
-		if p3.state.isUsingTouch then
-			return p3.props.placeholderTouchText
+		if self.state.isUsingTouch then
+			return self.props.placeholderTouchText
 		end
 
-		return p3.props.placeholderKeyboardText
+		return self.props.placeholderKeyboardText
 	end
-	function v33.willUnmount(p4) -- line: 78
-		if p4.connection then
-			p4.connection:Disconnect()
+
+	function extended.willUnmount(p)
+		if p.connection then
+			p.connection:Disconnect()
 		end
 	end
 else
-	function v33.getPlaceholderText(p5) -- line: 84
-		if p5.props.isUsingGamepad then
-			return p5.props.placeholderGamepadText
+	function extended:getPlaceholderText()
+		if self.props.isUsingGamepad then
+			return self.props.placeholderGamepadText
 		end
 
-		if p5.props.isUsingTouch then
-			return p5.props.placeholderTouchText
+		if self.props.isUsingTouch then
+			return self.props.placeholderTouchText
 		end
 
-		return p5.props.placeholderKeyboardText
+		return self.props.placeholderKeyboardText
 	end
 end
 
-function v33.render(p6) -- line: 95
-	-- upvalues: React (copy), ChatInputBar (copy), UserInputService (copy), Config (copy)
+function extended:render()
 	return React.createElement(ChatInputBar, {
 		userInputService = UserInputService,
 		contextActionService = game:GetService("ContextActionService"),
 		messageCharacterLimit = Config.MessageCharacterLimit,
 		sendButtonContainerWidth = 30,
-		addTopPadding = p6.props.addTopPadding,
-		LayoutOrder = p6.props.LayoutOrder,
-		placeholderText = p6:getPlaceholderText(),
-		disabledChatPlaceholderText = p6.props.disabledChatPlaceholderText,
+		addTopPadding = self.props.addTopPadding,
+		LayoutOrder = self.props.LayoutOrder,
+		placeholderText = self:getPlaceholderText(),
+		disabledChatPlaceholderText = self.props.disabledChatPlaceholderText,
 		size = UDim2.fromScale(1, 0),
-		chatIntervention = p6.props.chatIntervention,
-		onSendChat = p6.props.onSendChat,
-		onSendGlobalChat = p6.props.onSendGlobalChat,
-		transparencyValue = p6.props.transparencyValue,
-		canLocalUserChat = p6.props.canLocalUserChat,
-		targetTextChannel = p6.props.targetTextChannel,
-		localTeam = p6.props.localTeam,
-		localPlayer = p6.props.localPlayer,
-		defaultSystemTextChannel = p6.props.defaultSystemTextChannel,
-		shouldFocusChatInputBar = p6.props.shouldFocusChatInputBar,
-		resetTargetChannel = p6.props.resetTargetChannel,
-		focusChatHotKeyActivated = p6.props.focusChatHotKeyActivated,
-		devDefinedFocusKeyCode = p6.props.devDefinedFocusKeyCode,
-		visible = p6.props.visible,
-		onFocus = p6.props.onFocus,
-		onUnfocus = p6.props.onUnfocus,
-		onHovered = p6.props.onHovered,
-		onUnhovered = p6.props.onUnhovered,
-		onAbsoluteSizeChanged = p6.props.onAbsoluteSizeChanged,
-		onAbsolutePositionChanged = p6.props.onAbsolutePositionChanged,
-		chatWindowSettings = p6.props.chatWindowSettings,
-		chatInputBarSettings = p6.props.chatInputBarSettings,
-		isChatHotkeyEnabled = p6.props.isChatHotkeyEnabled,
-		autocompleteDropdownReducer = p6.props.autocompleteDropdownReducer,
-		autocompleteDropdownActivated = p6.props.autocompleteDropdownActivated,
-		autocompleteDropdownResultsChanged = p6.props.autocompleteDropdownResultsChanged,
-		autocompleteDropdownSelectionChanged = p6.props.autocompleteDropdownSelectionChanged,
-		autocompleteDropdownTypeChanged = p6.props.autocompleteDropdownTypeChanged,
-		autocompleteDropdownDeactivated = p6.props.autocompleteDropdownDeactivated,
-		autocompleteEnabled = p6.props.autocompleteEnabled,
-		isChannelBarVisible = p6.props.isChannelBarVisible,
-		isGlobalChatTabActive = p6.props.isGlobalChatTabActive,
-		developerChannelTabsEnabled = p6.props.developerChannelTabsEnabled,
-		onDictationActivityChanged = p6.props.onDictationActivityChanged
+		chatIntervention = self.props.chatIntervention,
+		onSendChat = self.props.onSendChat,
+		onSendGlobalChat = self.props.onSendGlobalChat,
+		transparencyValue = self.props.transparencyValue,
+		canLocalUserChat = self.props.canLocalUserChat,
+		targetTextChannel = self.props.targetTextChannel,
+		localTeam = self.props.localTeam,
+		localPlayer = self.props.localPlayer,
+		defaultSystemTextChannel = self.props.defaultSystemTextChannel,
+		shouldFocusChatInputBar = self.props.shouldFocusChatInputBar,
+		resetTargetChannel = self.props.resetTargetChannel,
+		focusChatHotKeyActivated = self.props.focusChatHotKeyActivated,
+		devDefinedFocusKeyCode = self.props.devDefinedFocusKeyCode,
+		visible = self.props.visible,
+		onFocus = self.props.onFocus,
+		onUnfocus = self.props.onUnfocus,
+		onHovered = self.props.onHovered,
+		onUnhovered = self.props.onUnhovered,
+		onAbsoluteSizeChanged = self.props.onAbsoluteSizeChanged,
+		onAbsolutePositionChanged = self.props.onAbsolutePositionChanged,
+		chatWindowSettings = self.props.chatWindowSettings,
+		chatInputBarSettings = self.props.chatInputBarSettings,
+		isChatHotkeyEnabled = self.props.isChatHotkeyEnabled,
+		autocompleteDropdownReducer = self.props.autocompleteDropdownReducer,
+		autocompleteDropdownActivated = self.props.autocompleteDropdownActivated,
+		autocompleteDropdownResultsChanged = self.props.autocompleteDropdownResultsChanged,
+		autocompleteDropdownSelectionChanged = self.props.autocompleteDropdownSelectionChanged,
+		autocompleteDropdownTypeChanged = self.props.autocompleteDropdownTypeChanged,
+		autocompleteDropdownDeactivated = self.props.autocompleteDropdownDeactivated,
+		autocompleteEnabled = self.props.autocompleteEnabled,
+		isChannelBarVisible = self.props.isChannelBarVisible,
+		isGlobalChatTabActive = self.props.isGlobalChatTabActive,
+		developerChannelTabsEnabled = self.props.developerChannelTabsEnabled,
+		onDictationActivityChanged = self.props.onDictationActivityChanged,
+		onDictationStateChanged = self.props.onDictationStateChanged
 	})
 end
 
-local v34 = RoactRodux.connect(function(p7) -- line: 143
-	-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), Players (copy), getFFlagUnreduxLastInputTypeChanged (copy), selectSelectedTabName (copy)
-	local ChannelTabs = p7.ChannelTabs
-	local v43 = not not GetFFlagTextChatEnableUniverseChatTabs() and (not not ChannelTabs and ChannelTabs.channelTabsConfigurationEnabled)
+local v2 = RoactRodux.connect(function(data)
+	local isGlobalChatTabActive, developerChannelTabsEnabled
 
-	return {
-		targetTextChannel = p7.TextChannels.targetTextChannel,
-		localPlayer = Players.LocalPlayer,
-		localTeam = p7.LocalTeam,
-		isUsingTouch = if getFFlagUnreduxLastInputTypeChanged() then nil else p7.isUsingTouch,
-		isUsingGamepad = if getFFlagUnreduxLastInputTypeChanged() then nil else p7.isUsingGamepad,
-		devDefinedFocusKeyCode = p7.ChatLayout.ChatInputBarSettings.KeyboardKeyCode,
-		defaultSystemTextChannel = p7.TextChannels.allTextChannels.RBXSystem,
-		shouldFocusChatInputBar = p7.shouldFocusChatInputBar,
-		chatInputBarSettings = p7.ChatLayout.ChatInputBarSettings,
-		chatIntervention = p7.ChatIntervention,
-		isChatHotkeyEnabled = p7.ChatVisibility.isChatHotkeyEnabled.value,
-		autocompleteDropdownReducer = p7.AutocompleteDropdown,
-		autocompleteEnabled = p7.ChatLayout.ChatInputBarSettings.AutocompleteEnabled,
-		isGlobalChatTabActive = GetFFlagTextChatEnableUniverseChatTabs() and selectSelectedTabName(p7) == "RBXGlobal",
-		developerChannelTabsEnabled = v43
-	}
-end, function(p8) -- line: 167
-	-- upvalues: GetTransparencyStore (copy), FocusChatHotKeyActivated (copy), FFlagExpChatDictationFadeOverride (copy), AutocompleteDropdownActivated (copy), AutocompleteDropdownResultsChanged (copy), AutocompleteDropdownSelectionChanged (copy), AutocompleteDropdownTypeChanged (copy), AutocompleteDropdownDeactivated (copy)
-	local v45 = GetTransparencyStore(false)
+	if not FFlagExpChatUseChannelTabsStore then
+		local channelTabs = data.ChannelTabs
+		isGlobalChatTabActive = GetFFlagTextChatEnableUniverseChatTabs() and selectSelectedTabName(data) == "RBXGlobal"
 
-	return {
-		focusChatHotKeyActivated = function() -- line: 170
-			-- upvalues: p8 (copy), FocusChatHotKeyActivated (copy)
-			return p8(FocusChatHotKeyActivated())
-		end,
-		onFocus = function() -- line: 174
-			-- upvalues: v45 (copy)
-			return v45.setTextboxFocus()
-		end,
-		onUnfocus = function() -- line: 178
-			-- upvalues: v45 (copy)
-			return v45.clearTextboxFocus()
-		end,
-		onHovered = function() -- line: 182
-			-- upvalues: v45 (copy)
-			return v45.resetAllTransparency()
-		end,
-		onUnhovered = function() -- line: 186
-			-- upvalues: v45 (copy)
-			return v45.resetAllTransparency()
-		end,
-		onDictationActivityChanged = if not FFlagExpChatDictationFadeOverride then nil else function(b1: boolean) -- line: 192
-			-- upvalues: v45 (copy)
-			if b1 then
-				v45.setDictationActive()
-
-				return
-			end
-
-			v45.clearDictationActive()
-		end,
-		autocompleteDropdownActivated = function(p9) -- line: 201
-			-- upvalues: p8 (copy), AutocompleteDropdownActivated (copy)
-			return p8(AutocompleteDropdownActivated(p9))
-		end,
-		autocompleteDropdownResultsChanged = function(p10) -- line: 205
-			-- upvalues: p8 (copy), AutocompleteDropdownResultsChanged (copy)
-			return p8(AutocompleteDropdownResultsChanged(p10))
-		end,
-		autocompleteDropdownSelectionChanged = function(p11) -- line: 209
-			-- upvalues: p8 (copy), AutocompleteDropdownSelectionChanged (copy)
-			return p8(AutocompleteDropdownSelectionChanged(p11))
-		end,
-		autocompleteDropdownTypeChanged = function(p12) -- line: 213
-			-- upvalues: p8 (copy), AutocompleteDropdownTypeChanged (copy)
-			return p8(AutocompleteDropdownTypeChanged(p12))
-		end,
-		autocompleteDropdownDeactivated = function() -- line: 217
-			-- upvalues: p8 (copy), AutocompleteDropdownDeactivated (copy)
-			return p8(AutocompleteDropdownDeactivated())
+		if GetFFlagTextChatEnableUniverseChatTabs() and channelTabs then
+			developerChannelTabsEnabled = channelTabs.channelTabsConfigurationEnabled
+		else
+			developerChannelTabsEnabled = false
 		end
+	end
+
+	local v2 = {
+		targetTextChannel = data.TextChannels.targetTextChannel,
+		localPlayer = Players.LocalPlayer,
+		localTeam = data.LocalTeam,
+		isUsingTouch = 0,
+		isUsingGamepad = 0,
+		devDefinedFocusKeyCode = 0,
+		defaultSystemTextChannel = 0,
+		shouldFocusChatInputBar = 0,
+		chatInputBarSettings = 0,
+		chatIntervention = 0,
+		isChatHotkeyEnabled = 0,
+		autocompleteDropdownReducer = 0,
+		autocompleteEnabled = 0,
+		isGlobalChatTabActive = 0,
+		developerChannelTabsEnabled = 0
 	}
-end)(Localization.connect(function(p13) -- line: 221
-	-- upvalues: UserInputService (copy)
+	local isUsingTouch
+
+	if not getFFlagUnreduxLastInputTypeChanged() then
+		isUsingTouch = data.isUsingTouch
+	end
+
+	v2.isUsingTouch = isUsingTouch
+	local isUsingGamepad
+
+	if not getFFlagUnreduxLastInputTypeChanged() then
+		isUsingGamepad = data.isUsingGamepad
+	end
+
+	v2.isUsingGamepad = isUsingGamepad
+	v2.devDefinedFocusKeyCode = data.ChatLayout.ChatInputBarSettings.KeyboardKeyCode
+	v2.defaultSystemTextChannel = data.TextChannels.allTextChannels.RBXSystem
+	v2.shouldFocusChatInputBar = data.shouldFocusChatInputBar
+	v2.chatInputBarSettings = data.ChatLayout.ChatInputBarSettings
+	v2.chatIntervention = data.ChatIntervention
+	v2.isChatHotkeyEnabled = data.ChatVisibility.isChatHotkeyEnabled.value
+	v2.autocompleteDropdownReducer = data.AutocompleteDropdown
+	v2.autocompleteEnabled = data.ChatLayout.ChatInputBarSettings.AutocompleteEnabled
+	v2.isGlobalChatTabActive = isGlobalChatTabActive
+	v2.developerChannelTabsEnabled = developerChannelTabsEnabled
+	return v2
+end, function(callback)
+	local transparencyStore = GetTransparencyStore(false)
+	local v2 = FFlagExpChatDictationFadeOverride and FFlagExpChatContinuousDictationIdleFade
+
+	local function setDictationHold(flag: boolean)
+		if flag then
+			transparencyStore.setDictationActive()
+		else
+			transparencyStore.clearDictationActive()
+		end
+	end
+
+	local v3 = {
+		focusChatHotKeyActivated = function()
+			return callback(FocusChatHotKeyActivated())
+		end,
+		onFocus = function()
+			return transparencyStore.setTextboxFocus()
+		end,
+		onUnfocus = function()
+			return transparencyStore.clearTextboxFocus()
+		end,
+		onHovered = function()
+			return transparencyStore.resetAllTransparency()
+		end,
+		onUnhovered = function()
+			return transparencyStore.resetAllTransparency()
+		end,
+		onDictationActivityChanged = 0,
+		onDictationStateChanged = 0,
+		autocompleteDropdownActivated = 0,
+		autocompleteDropdownResultsChanged = 0,
+		autocompleteDropdownSelectionChanged = 0,
+		autocompleteDropdownTypeChanged = 0,
+		autocompleteDropdownDeactivated = 0
+	}
+
+	if not FFlagExpChatDictationFadeOverride or v2 then
+		setDictationHold = nil
+	end
+
+	v3.onDictationActivityChanged = setDictationHold
+
+	v3.onDictationStateChanged = v2 and function(p)
+		if p == DictationState.Recording or p == DictationState.Transcribing then
+			transparencyStore.setDictationActive()
+		else
+			transparencyStore.clearDictationActive()
+		end
+	end or nil
+
+	function v3.autocompleteDropdownActivated(p)
+		return callback(AutocompleteDropdownActivated(p))
+	end
+
+	function v3.autocompleteDropdownResultsChanged(p, p2)
+		return callback(AutocompleteDropdownResultsChanged(p, p2))
+	end
+
+	function v3.autocompleteDropdownSelectionChanged(p)
+		return callback(AutocompleteDropdownSelectionChanged(p))
+	end
+
+	function v3.autocompleteDropdownTypeChanged(p)
+		return callback(AutocompleteDropdownTypeChanged(p))
+	end
+
+	function v3.autocompleteDropdownDeactivated()
+		return callback(AutocompleteDropdownDeactivated())
+	end
+
+	return v3
+end)(Localization.connect(function(p)
 	return {
-		placeholderTouchText = "CoreScripts.TextChat.InputBar.Hint.Touch",
-		disabledChatPlaceholderText = "CoreScripts.TextChat.InputBar.Hint.PrivacySettingsDisabled",
 		placeholderKeyboardText = {
 			"CoreScripts.TextChat.InputBar.Hint.MouseKeyboard",
 			{
-				KEY = UserInputService:GetStringForKeyCode(p13.devDefinedFocusKeyCode)
+				KEY = UserInputService:GetStringForKeyCode(p.devDefinedFocusKeyCode)
 			}
-		}
+		},
+		placeholderTouchText = "CoreScripts.TextChat.InputBar.Hint.Touch",
+		disabledChatPlaceholderText = "CoreScripts.TextChat.InputBar.Hint.PrivacySettingsDisabled"
 	}
-end)(v33))
+end)(extended))
 
-local function v35(p14) -- line: 233
-	-- upvalues: Localization2 (copy), LocalizationService (copy), FFlagEnableConsoleExpControls (copy), Cryo (copy), React (copy), v34 (copy)
-	local v48 = Localization2.new(LocalizationService.RobloxLocaleId)
-	local v49 = if not FFlagEnableConsoleExpControls then v48:Format("CoreScripts.TextChat.InputBar.Hint.Gamepad", {
-		CHAT_BUTTON = v48:Format("CoreScripts.TopBar.Chat")
-	}) else v48:Format("CoreScripts.TextChat.InputBar.Hint.GamepadConnected", {
-		CONFIRM_KEY = v48:Format("CoreScripts.TextChat.InputBar.Hint.GamepadConnectedConfirm")
-	})
-	local v50 = Cryo.Dictionary.join(p14, {
-		placeholderGamepadText = v49
-	})
+local function ResultComponentWithSignals(p)
+	local v3 = React.useMemo(function()
+		return Signals.createComputed(function(p2)
+			local channelTabsState = GetChannelTabsStore(false).getChannelTabsState(p2)
+			local developerChannelTabsEnabled
 
-	return React.createElement(v34, v50)
+			if GetFFlagTextChatEnableUniverseChatTabs() then
+				developerChannelTabsEnabled = channelTabsState.channelTabsConfigurationEnabled
+			else
+				developerChannelTabsEnabled = false
+			end
+
+			return {
+				developerChannelTabsEnabled = developerChannelTabsEnabled,
+				isGlobalChatTabActive = GetFFlagTextChatEnableUniverseChatTabs() and channelTabsState.selectedTabName == "RBXGlobal"
+			}
+		end, tutils.deepEqual)
+	end, {})
+	local v4 = SignalsReact.useSignalState(v3)
+	return React.createElement(v2, Cryo.Dictionary.union(p, v4))
 end
 
-if v22 then
-	return (React.memo(v35))
+if not FFlagExpChatUseChannelTabsStore then
+	ResultComponentWithSignals = v2
 end
 
-return v35
+local function fn(p)
+	local v3 = localization.new(LocalizationService.RobloxLocaleId)
+	local placeholderGamepadText
+
+	if FFlagEnableConsoleExpControls then
+		placeholderGamepadText = v3:Format("CoreScripts.TextChat.InputBar.Hint.GamepadConnected", {
+			CONFIRM_KEY = v3:Format("CoreScripts.TextChat.InputBar.Hint.GamepadConnectedConfirm")
+		})
+	else
+		placeholderGamepadText = v3:Format("CoreScripts.TextChat.InputBar.Hint.Gamepad", {
+			CHAT_BUTTON = v3:Format("CoreScripts.TopBar.Chat")
+		})
+	end
+
+	local joined = Cryo.Dictionary.join(p, { placeholderGamepadText = placeholderGamepadText })
+
+	return React.createElement(ResultComponentWithSignals, joined)
+end
+
+if defineFastFlag then
+	return (React.memo(fn))
+end
+
+return fn

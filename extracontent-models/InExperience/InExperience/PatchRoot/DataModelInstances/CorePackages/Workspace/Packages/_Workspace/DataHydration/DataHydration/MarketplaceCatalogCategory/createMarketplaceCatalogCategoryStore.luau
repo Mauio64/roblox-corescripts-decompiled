@@ -1,59 +1,84 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Promise = require(DataHydrationParent.Promise)
-local Signals = require(DataHydrationParent.Signals)
-local SharedFlags = require(DataHydrationParent.SharedFlags)
+local parent = DataHydration.Parent
+
+local Promise = require(parent.Promise)
+local Signals = require(parent.Signals)
+
+local SharedFlags = require(parent.SharedFlags)
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
 require(script.Parent.MarketplaceCatalogCategoryStoreTypes)
 
 local FFlagMarketplaceCatalogCategoryTrackLastReceived = SharedFlags.FFlagMarketplaceCatalogCategoryTrackLastReceived
+local FFlagSduiSkipEmptyCatalogCategoryHydration = SharedFlags.FFlagSduiSkipEmptyCatalogCategoryHydration
 
-local function createMarketplaceCatalogCategoryStore() -- line: 22
-	-- upvalues: createDataCache (copy), createDataResolver (copy), Promise (copy), FFlagMarketplaceCatalogCategoryTrackLastReceived (copy), Signals (copy)
-	local v10 = createDataCache()
-	local v11 = createDataResolver({
-		cache = v10,
-		fetchFn = function(_: {[any]: any}) -- line: 26
-			-- upvalues: Promise (copy)
-			return Promise.resolve({})
-		end
-	})
-	local v12 = nil
-	local u13 = nil
+local function createMarketplaceCatalogCategoryStore()
+	local getLastReceivedCategories, v
 
 	if FFlagMarketplaceCatalogCategoryTrackLastReceived then
-		local v14
-
-		v12, v14 = Signals.createSignal({})
-		u13 = v14
+		getLastReceivedCategories, v = Signals.createSignal({})
+	else
+		v = nil
 	end
 
-	local function updateMarketplaceCatalogCategories(t2: {[any]: any}) -- line: 41
-		-- upvalues: u13 (ref), v10 (copy)
-		u13(t2)
-		v10.updateItems(t2)
-	end
-	local function clear() -- line: 51
-		-- upvalues: u13 (ref), v11 (copy)
-		if u13 then
-			u13({})
+	local dataCache = createDataCache()
+	local dataResolver = createDataResolver({
+		cache = dataCache,
+		fetchFn = function(_)
+			return Promise.resolve({})
+		end,
+		onClear = FFlagSduiSkipEmptyCatalogCategoryHydration and function()
+			if v then
+				v({})
+			end
+		end or nil
+	})
+
+	local function updateMarketplaceCatalogCategories(items)
+		if FFlagSduiSkipEmptyCatalogCategoryHydration and next(items) == nil then
+			return
 		end
 
-		v11.clear()
+		v(items)
+		dataCache.updateItems(items)
 	end
 
-	return {
-		getMarketplaceCatalogCategory = v11.getCachedItem,
-		getMarketplaceCatalogCategories = v11.getCachedItems,
-		updateMarketplaceCatalogCategories = if not FFlagMarketplaceCatalogCategoryTrackLastReceived then v10.updateItems else updateMarketplaceCatalogCategories,
-		updateMarketplaceCatalogCategory = v10.updateItem,
-		getLastReceivedCategories = v12,
-		clear = if not FFlagMarketplaceCatalogCategoryTrackLastReceived then v11.clear else clear,
-		dispose = v11.dispose
+	local function clear()
+		if v then
+			v({})
+		end
+
+		dataResolver.clear()
+	end
+
+	local marketplaceCatalogCategoryStore = {
+		getMarketplaceCatalogCategory = dataResolver.getCachedItem,
+		getMarketplaceCatalogCategories = dataResolver.getCachedItems,
+		updateMarketplaceCatalogCategories = 0,
+		updateMarketplaceCatalogCategory = 0,
+		getLastReceivedCategories = 0,
+		clear = 0,
+		dispose = 0
 	}
+
+	if not FFlagMarketplaceCatalogCategoryTrackLastReceived then
+		updateMarketplaceCatalogCategories = dataCache.updateItems
+	end
+
+	marketplaceCatalogCategoryStore.updateMarketplaceCatalogCategories = updateMarketplaceCatalogCategories
+
+	marketplaceCatalogCategoryStore.updateMarketplaceCatalogCategory = dataCache.updateItem
+	marketplaceCatalogCategoryStore.getLastReceivedCategories = getLastReceivedCategories
+
+	if not FFlagMarketplaceCatalogCategoryTrackLastReceived then
+		clear = dataResolver.clear
+	end
+
+	marketplaceCatalogCategoryStore.clear = clear
+	marketplaceCatalogCategoryStore.dispose = dataResolver.dispose
+	return marketplaceCatalogCategoryStore
 end
 
 return createMarketplaceCatalogCategoryStore

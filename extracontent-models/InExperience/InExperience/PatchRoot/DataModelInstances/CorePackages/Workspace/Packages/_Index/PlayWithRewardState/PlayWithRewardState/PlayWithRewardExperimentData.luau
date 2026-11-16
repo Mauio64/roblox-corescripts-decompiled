@@ -1,9 +1,13 @@
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("PlayWithRewardState").Parent
-local mutedError = require(Parent.Loggers).mutedError
-local t = require(Parent.t)
+local parent = script:FindFirstAncestor("PlayWithRewardState").Parent
+local Loggers = require(parent.Loggers)
+local mutedError = Loggers.mutedError
+local t = require(parent.t)
+
 local FFlagLuaAppEnableContainedRewardUi = require(script.Parent.FFlagLuaAppEnableContainedRewardUi)
-local v6 = t.interface({
+
+local interface = t.interface
+local v = {
 	titleText = t.string,
 	subtitleText = t.string,
 	buttonText = t.string,
@@ -11,10 +15,18 @@ local v6 = t.interface({
 	coachmarkSubtitleText = t.string,
 	showButton = t.boolean,
 	variantId = t.string,
-	keepRewardContained = if not FFlagLuaAppEnableContainedRewardUi then nil else t.optional(t.boolean)
-})
-local t1 = {}
-local t2 = {
+	keepRewardContained = 0
+}
+local keepRewardContained
+
+if FFlagLuaAppEnableContainedRewardUi then
+	keepRewardContained = t.optional(t.boolean)
+end
+
+v.keepRewardContained = keepRewardContained
+local v2 = interface(v)
+
+local v3 = {
 	titleText = "",
 	subtitleText = "",
 	buttonText = "",
@@ -24,38 +36,37 @@ local t2 = {
 	variantId = "",
 	keepRewardContained = not FFlagLuaAppEnableContainedRewardUi and nil
 }
+return {
+	fromJsonData = function(json: string)
+		local clone = table.clone(v3)
 
-function t1.fromJsonData(s1: string) -- line: 44
-	-- upvalues: t2 (copy), HttpService (copy), v6 (copy), mutedError (copy), FFlagLuaAppEnableContainedRewardUi (copy)
-	local v10 = table.clone(t2)
-	local ok, result = pcall(function() -- line: 47
-		-- upvalues: HttpService (copy), s1 (copy)
-		return HttpService:JSONDecode(s1)
-	end)
+		local success, result = pcall(function()
+			return HttpService:JSONDecode(json)
+		end)
 
-	if ok then
-		local v13, v14 = v6(result)
-
-		if not v13 then
-			mutedError(`PlayWithRewardExperimentData invalid: { tostring(v14) }`)
-
-			return v10
+		if not success then
+			return clone
 		end
 
-		v10.titleText = result.titleText
-		v10.subtitleText = result.subtitleText
-		v10.buttonText = result.buttonText
-		v10.coachmarkTitleText = result.coachmarkTitleText
-		v10.coachmarkSubtitleText = result.coachmarkSubtitleText
-		v10.showButton = result.showButton
-		v10.variantId = result.variantId
+		local v4, v5 = v2(result)
+
+		if not v4 then
+			mutedError(`PlayWithRewardExperimentData invalid: {tostring(v5)}`)
+			return clone
+		end
+
+		clone.titleText = result.titleText
+		clone.subtitleText = result.subtitleText
+		clone.buttonText = result.buttonText
+		clone.coachmarkTitleText = result.coachmarkTitleText
+		clone.coachmarkSubtitleText = result.coachmarkSubtitleText
+		clone.showButton = result.showButton
+		clone.variantId = result.variantId
 
 		if FFlagLuaAppEnableContainedRewardUi then
-			v10.keepRewardContained = result.keepRewardContained or false
+			clone.keepRewardContained = result.keepRewardContained or false
 		end
+
+		return clone
 	end
-
-	return v10
-end
-
-return t1
+}

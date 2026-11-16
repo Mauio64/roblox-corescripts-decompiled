@@ -1,9 +1,9 @@
-local Parent = script:FindFirstAncestor("DiscoveryTypes").Parent
-local FFlagLuaAppEdpMediaGalleryVideoPreview = require(Parent.SharedFlags).FFlagLuaAppEdpMediaGalleryVideoPreview
+local parent = script:FindFirstAncestor("DiscoveryTypes").Parent
 
+local SharedFlags = require(parent.SharedFlags)
 return {
 	Image = 1,
 	YouTubeVideo = 33,
-	GamePreviewVideo = 86,
-	Video = if not FFlagLuaAppEdpMediaGalleryVideoPreview then nil else 62
+	Video = SharedFlags.FFlagLuaAppEdpMediaGalleryVideoPreview and 62 or nil,
+	GamePreviewVideo = 86
 }

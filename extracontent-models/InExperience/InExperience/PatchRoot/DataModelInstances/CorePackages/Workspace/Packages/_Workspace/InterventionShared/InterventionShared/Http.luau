@@ -1,4 +1,6 @@
+local parent = script:FindFirstAncestor("InterventionShared").Parent
+
 return {
-	GetModerationDetail = require(script.GetModerationDetail),
+	GetModerationDetail = require(parent.UniversalFeatureRestrictions.GetModerationDetail),
 	PostDismissIntervention = require(script.PostDismissIntervention)
 }

@@ -1,68 +1,59 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local LuauPolyfill = require(Parent.LuauPolyfill)
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Error = LuauPolyfill.Error
-local t1 = {}
-local GraphQL = require(Parent.GraphQL)
-local GraphQLScalarType = GraphQL.GraphQLScalarType
-local Kind = GraphQL.Kind
-local print = GraphQL.print
-local parseLiteral = nil
 
-local function parseFloat(p1, p2) -- line: 32
-	return (tonumber(p1, p2))
+local GraphQL = require(parent.GraphQL)
+local GraphQLScalarType = GraphQL.GraphQLScalarType
+
+local Kind = GraphQL.Kind
+local Print = GraphQL.print
+
+local parseLiteral
+
+local function parseFloat(value, p) -- 1 equivalent call inferred from this helper
+	return (tonumber(value, p))
 end
-local function identity(p3) -- line: 36
-	return p3
+
+local function identity(p)
+	return p
 end
-local function ensureObject(p4) -- line: 40
-	-- upvalues: Boolean (copy), Array (copy), Error (copy)
-	if Boolean.toJSBoolean(typeof(p4) ~= "table" or (p4 == nil or Array.isArray(p4))) then
-		error(Error.new(("JSONObject cannot represent non-object value: %s"):format((tostring(p4)))))
+
+local function ensureObject(p)
+	if Boolean.toJSBoolean(typeof(p) ~= "table" or p == nil or Array.isArray(p)) then
+		error(Error.new(("JSONObject cannot represent non-object value: %s"):format((tostring(p)))))
 	end
 
-	return p4
+	return p
 end
-local function parseObject(p5, p6, p7) -- line: 47
-	-- upvalues: Array (copy), parseLiteral (ref)
-	local t2 = {}
 
-	Array.forEach(p6.fields, function(p8) -- line: 49
-		-- upvalues: t2 (copy), parseLiteral (ref), p5 (copy), p7 (copy)
-		t2[p8.name.value] = parseLiteral(p5, p8.value, p7)
+local function parseObject(p, p2, p3) -- 2 equivalent calls inferred from this helper
+	local object = {}
+	Array.forEach(p2.fields, function(p4)
+		object[p4.name.value] = parseLiteral(p, p4.value, p3)
 	end)
-
-	return t2
+	return object
 end
 
-function parseLiteral(p9, p10, p11) -- line: 56
-	-- upvalues: Kind (copy), Array (copy), parseLiteral (ref), Boolean (copy), Error (copy), print (copy)
-	local kind = p10.kind
+parseLiteral = function(p, data, p2)
+	local kind = data.kind
 
 	if kind == Kind.STRING or kind == Kind.BOOLEAN then
-		return p10.value
+		return data.value
 	end
 
 	if kind == Kind.INT or kind == Kind.FLOAT then
-		return (tonumber(p10.value, nil))
+		return parseFloat(data.value) -- inferred equivalent call
 	end
 
 	if kind == Kind.OBJECT then
-		local t3 = {}
-
-		Array.forEach(p10.fields, function(p12) -- line: 49
-			-- upvalues: t3 (copy), parseLiteral (ref), p9 (copy), p11 (copy)
-			t3[p12.name.value] = parseLiteral(p9, p12.value, p11)
-		end)
-
-		return t3
+		return parseObject(p, data, p2) -- inferred equivalent call
 	end
 
 	if kind == Kind.LIST then
-		return Array.map(p10.values, function(p13) -- line: 65
-			-- upvalues: parseLiteral (ref), p9 (copy), p11 (copy)
-			return parseLiteral(p9, p13, p11)
+		return Array.map(data.values, function(p3)
+			return parseLiteral(p, p3, p2)
 		end)
 	end
 
@@ -70,55 +61,43 @@ function parseLiteral(p9, p10, p11) -- line: 56
 		return nil
 	end
 
-	if kind == Kind.VARIABLE then
-		if Boolean.toJSBoolean(p11) then
-			return p11[p10.name.value]
-		end
-
+	if kind ~= Kind.VARIABLE then
+		error(Error.new(("%s cannot represent value: %s"):format(p, Print(data))))
 		return nil
 	end
 
-	error(Error.new(("%s cannot represent value: %s"):format(p9, print(p10))))
+	if Boolean.toJSBoolean(p2) then
+		return p2[data.name.value]
+	end
 
 	return nil
 end
 
-local v16 = GraphQLScalarType.new({
+local v = GraphQLScalarType.new({
 	name = "JSON",
 	description = "The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).",
 	specifiedByUrl = "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf",
 	serialize = identity,
 	parseValue = identity,
-	parseLiteral = function(p14, p15) -- line: 86
-		-- upvalues: parseLiteral (ref)
-		return parseLiteral("JSON", p14, p15)
+	parseLiteral = function(p, p2)
+		return parseLiteral("JSON", p, p2)
 	end
 })
+return {
+	["GraphQLJSON"] = v,
+	default = v,
+	GraphQLJSONObject = GraphQLScalarType.new({
+		name = "JSONObject",
+		description = "The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).",
+		specifiedByUrl = "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf",
+		serialize = ensureObject,
+		parseValue = ensureObject,
+		parseLiteral = function(p, p2)
+			if p.kind ~= Kind.OBJECT then
+				error(Error.new(("JSONObject cannot represent non-object value: %s"):format(Print(p))))
+			end
 
-t1.GraphQLJSON = v16
-t1.default = v16
-t1.GraphQLJSONObject = GraphQLScalarType.new({
-	name = "JSONObject",
-	description = "The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).",
-	specifiedByUrl = "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf",
-	serialize = ensureObject,
-	parseValue = ensureObject,
-	parseLiteral = function(p16, p17) -- line: 99
-		-- upvalues: Kind (copy), Error (copy), print (copy), Array (copy), parseLiteral (ref)
-		if p16.kind ~= Kind.OBJECT then
-			error(Error.new(("JSONObject cannot represent non-object value: %s"):format(print(p16))))
+			return parseObject("JSONObject", p, p2) -- inferred equivalent call
 		end
-
-		local t4 = {}
-		local s1 = "JSONObject"
-
-		Array.forEach(p16.fields, function(p18) -- line: 49
-			-- upvalues: t4 (copy), parseLiteral (ref), s1 (copy), p17 (copy)
-			t4[p18.name.value] = parseLiteral(s1, p18.value, p17)
-		end)
-
-		return t4
-	end
-})
-
-return t1
+	})
+}

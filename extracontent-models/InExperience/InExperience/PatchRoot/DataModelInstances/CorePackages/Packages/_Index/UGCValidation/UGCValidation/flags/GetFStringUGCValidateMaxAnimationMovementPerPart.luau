@@ -1,8 +1,8 @@
-local ParentParent = script.Parent.Parent
-local GetFStringUGCValidateMaxAnimationMovement = require(ParentParent.flags.GetFStringUGCValidateMaxAnimationMovement)
+local parent = script.Parent.Parent
 
-local function getFallbackValue() -- line: 25
-	-- upvalues: GetFStringUGCValidateMaxAnimationMovement (copy)
+local GetFStringUGCValidateMaxAnimationMovement = require(parent.flags.GetFStringUGCValidateMaxAnimationMovement)
+
+local function getFallbackValue()
 	return GetFStringUGCValidateMaxAnimationMovement.asString()
 end
 
@@ -21,71 +21,71 @@ game:DefineFastString("UGCValidateMaxAnimationMovementRightUpperLeg", "")
 game:DefineFastString("UGCValidateMaxAnimationMovementRightLowerLeg", "")
 game:DefineFastString("UGCValidateMaxAnimationMovementRightFoot", "")
 
-local t1 = {}
-local t2 = {
-	Head = function() -- line: 47
+local GetFStringUGCValidateMaxAnimationMovementPerPart = {}
+
+local v = {
+	Head = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementHead")
 	end,
-	UpperTorso = function() -- line: 50
+	UpperTorso = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementUpperTorso")
 	end,
-	LeftUpperLeg = function() -- line: 53
+	LeftUpperLeg = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementLeftUpperLeg")
 	end,
-	LeftLowerLeg = function() -- line: 56
+	LeftLowerLeg = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementLeftLowerLeg")
 	end,
-	LeftHand = function() -- line: 59
+	LeftHand = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementLeftHand")
 	end,
-	RightUpperArm = function() -- line: 62
+	RightUpperArm = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementRightUpperArm")
 	end,
-	RightLowerArm = function() -- line: 65
+	RightLowerArm = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementRightLowerArm")
 	end,
-	RightHand = function() -- line: 68
+	RightHand = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementRightHand")
 	end,
-	LeftUpperArm = function() -- line: 71
+	LeftUpperArm = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementLeftUpperArm")
 	end,
-	LeftLowerArm = function() -- line: 74
+	LeftLowerArm = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementLeftLowerArm")
 	end,
-	LeftFoot = function() -- line: 77
+	LeftFoot = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementLeftFoot")
 	end,
-	RightUpperLeg = function() -- line: 80
+	RightUpperLeg = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementRightUpperLeg")
 	end,
-	RightLowerLeg = function() -- line: 83
+	RightLowerLeg = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementRightLowerLeg")
 	end,
-	RightFoot = function() -- line: 86
+	RightFoot = function()
 		return game:GetFastString("UGCValidateMaxAnimationMovementRightFoot")
 	end
 }
 
-function t1.asString(s1: string) -- line: 91
-	-- upvalues: t2 (copy), getFallbackValue (copy)
-	local v7 = t2[s1]
+function GetFStringUGCValidateMaxAnimationMovementPerPart.asString(p: string)
+	local v2 = v[p]
 
-	if not v7 then
+	if not v2 then
 		return getFallbackValue()
 	end
 
-	local v8 = v7()
+	local v3 = v2()
 
-	if #v8 == 0 then
+	if #v3 == 0 then
 		return getFallbackValue()
 	end
 
-	return v8
-end
-function t1.asNumber(s2: string) -- line: 103
-	-- upvalues: t1 (copy)
-	return (tonumber(t1.asString(s2)))
+	return v3
 end
 
-return t1
+function GetFStringUGCValidateMaxAnimationMovementPerPart.asNumber(p: string)
+	return (tonumber(GetFStringUGCValidateMaxAnimationMovementPerPart.asString(p)))
+end
+
+return GetFStringUGCValidateMaxAnimationMovementPerPart

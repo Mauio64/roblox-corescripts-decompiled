@@ -1,15 +1,15 @@
-local function formatExperienceRating(n1: number, n2: number, s1: string?, b1: boolean?) -- line: 1
-	if n1 + n2 == 0 then
-		return s1 or "--"
+local function formatExperienceRating(p: number, p2: number, value: string?, flag: boolean?)
+	if p + p2 == 0 then
+		return value or "--"
 	end
 
-	local v6 = math.round(n1 / (n1 + n2) * 100)
+	local v = math.round(p / (p + p2) * 100)
 
-	if b1 then
-		return `{ v6 }%`
+	if flag then
+		return `{v}%`
 	end
 
-	return (tostring(v6))
+	return (tostring(v))
 end
 
 return formatExperienceRating

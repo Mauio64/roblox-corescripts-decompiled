@@ -1,41 +1,37 @@
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local React = require(SquadsCoreParent.React)
-local Signals = require(SquadsCoreParent.Signals)
+local parent = SquadsCore.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+
 local GetLuckyRecommendationStore = require(SquadsCore.Stores.GetLuckyRecommendationStore)
 
-local function useLuckyRecommendation() -- line: 9
-	-- upvalues: GetLuckyRecommendationStore (copy), React (copy), Signals (copy)
-	local v7 = GetLuckyRecommendationStore(false)
-	local v8, v9 = React.useState(function() -- line: 12
-		-- upvalues: v7 (copy)
-		return v7.getState(false)
+local function useLuckyRecommendation()
+	local luckyRecommendationStore = GetLuckyRecommendationStore(false)
+
+	local state, setState = React.useState(function()
+		return luckyRecommendationStore.getState(false)
 	end)
 
-	React.useLayoutEffect(function() -- line: 16
-		-- upvalues: Signals (copy), v9 (copy), v7 (copy)
-		return Signals.createEffect(function(p1) -- line: 17
-			-- upvalues: v9 (copy), v7 (copy)
-			v9(v7.getState(p1))
+	React.useLayoutEffect(function()
+		return Signals.createEffect(function(p)
+			setState(luckyRecommendationStore.getState(p))
 		end)
-	end, { v7.getState })
-
-	local v10 = React.useMemo(function() -- line: 22
-		-- upvalues: v7 (copy)
-		return {
-			startRoll = v7.startRoll,
-			endRoll = v7.endRoll,
-			cancelFetch = v7.cancelFetch
-		}
-	end, {
-		v7.startRoll,
-		v7.endRoll,
-		v7.cancelFetch
-	})
+	end, { luckyRecommendationStore.getState })
 
 	return {
-		state = v8,
-		actions = v10
+		state = state,
+		actions = React.useMemo(function()
+			return {
+				startRoll = luckyRecommendationStore.startRoll,
+				endRoll = luckyRecommendationStore.endRoll,
+				cancelFetch = luckyRecommendationStore.cancelFetch
+			}
+		end, {
+			luckyRecommendationStore.startRoll,
+			luckyRecommendationStore.endRoll,
+			luckyRecommendationStore.cancelFetch
+		})
 	}
 end
 

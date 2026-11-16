@@ -1,41 +1,39 @@
-local function makeMergeOverlappingArraysPolicy(s1: string) -- line: 1
-	local function mergeOverlappingArraysPolicy(_, p2, p3, p4) -- line: 2
-		-- upvalues: s1 (copy)
-		local v8 = p2 or {}
-		local v9 = p3 or {}
+local function makeMergeOverlappingArraysPolicy(p: string)
+	local function mergeOverlappingArraysPolicy(_, options, options2, object)
+		local v = options or {}
+		options2 = options2 or {}
 
-		if #v9 == 0 then
-			return v8
+		if #options2 == 0 then
+			return v
 		end
 
-		if #v8 == 0 then
-			return v9
+		if #v == 0 then
+			return options2
 		end
 
-		local t1 = {}
-		local v11 = table.clone(v8)
+		local clone = table.clone(v)
+		local v2 = {}
 
-		for v12, v13 in v11 do
-			local v14 = p4:readField(s1, v13)
+		for k, v3 in clone do
+			local field = object:readField(p, v3)
 
-			if v14 then
-				t1[v14] = v12
+			if field then
+				v2[field] = k
 			end
 		end
 
-		for _, v16 in v9 do
-			local v17 = p4:readField(s1, v16)
+		for _, option in options2 do
+			local field = object:readField(p, option)
 
-			if v17 and t1[v17] then
-				local v18 = t1[v17]
-
-				v11[v18] = p4:mergeObjects(v11[v18], v16)
+			if field and v2[field] then
+				local v3 = v2[field]
+				clone[v3] = object:mergeObjects(clone[v3], option)
 			else
-				table.insert(v11, v16)
+				table.insert(clone, option)
 			end
 		end
 
-		return v11
+		return clone
 	end
 
 	return mergeOverlappingArraysPolicy

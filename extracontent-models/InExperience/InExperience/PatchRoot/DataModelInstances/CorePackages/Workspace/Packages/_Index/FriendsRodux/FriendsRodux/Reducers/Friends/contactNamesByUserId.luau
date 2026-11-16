@@ -1,38 +1,35 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local llama = require(ParentParentParent.llama)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Rodux = require(parent2.Rodux)
+local llama = require(parent2.llama)
 
-require(ParentParent.roduxFriendsTypes)
+require(parent.roduxFriendsTypes)
 
-local Actions = ParentParent.Actions
-local FriendRequestCreated = require(Actions.FriendRequestCreated)
-local t1 = {}
+local actions = parent.Actions
+local FriendRequestCreated = require(actions.FriendRequestCreated)
 
-return function(p1) -- line: 15
-	-- upvalues: Rodux (copy), t1 (copy), llama (copy), FriendRequestCreated (copy)
-	local friendsNetworking = p1.friendsNetworking
+local v = {}
 
-	return Rodux.createReducer(t1, {
-		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(t2: {[any]: any}, p2) -- line: 19
-			-- upvalues: llama (copy)
-			local data = p2.responseBody.data
-			local t3 = {}
+return function(p)
+	local friendsNetworking = p.friendsNetworking
 
-			for _, v in pairs(data) do
-				t3[tostring(v.id)] = v.friendRequest.contactName
+	return Rodux.createReducer(v, {
+		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(p2, p3)
+			local data = p3.responseBody.data
+
+			local contactNamesById = {}
+
+			for _, v2 in pairs(data) do
+				contactNamesById[tostring(v2.id)] = v2.friendRequest.contactName
 			end
 
-			return llama.Dictionary.join(t2, t3)
+			return llama.Dictionary.join(p2, contactNamesById)
 		end,
-		[FriendRequestCreated.name] = function(t4: {[any]: any}, p3) -- line: 33
-			-- upvalues: llama (copy)
-			local str = tostring(p3.requesteeId)
+		[FriendRequestCreated.name] = function(p2, p3)
+			local requesteeId = tostring(p3.requesteeId)
 			local contactName = p3.contactName
 
-			return llama.Dictionary.join(t4, {
-				[str] = contactName
-			})
+			return llama.Dictionary.join(p2, { [requesteeId] = contactName })
 		end
 	})
 end

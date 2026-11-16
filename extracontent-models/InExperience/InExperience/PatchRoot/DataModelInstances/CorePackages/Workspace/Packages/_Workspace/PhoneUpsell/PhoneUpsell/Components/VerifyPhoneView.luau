@@ -1,20 +1,27 @@
 local PhoneUpsell = script:FindFirstAncestor("PhoneUpsell")
-local PhoneUpsellParent = PhoneUpsell.Parent
-local React = require(PhoneUpsellParent.React)
-local UIBlox = require(PhoneUpsellParent.UIBlox)
+local parent = PhoneUpsell.Parent
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local useStyle = UIBlox.Core.Style.useStyle
-local useLocalization = require(PhoneUpsellParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local TextInputBoxWithBorder = require(PhoneUpsellParent.AuthCommon).Components.TextInputBoxWithBorder
+local AuthCommon = require(parent.AuthCommon)
+local TextInputBoxWithBorder = AuthCommon.Components.TextInputBoxWithBorder
 local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
 local getPartialPageModalMiddleContentWidth = UIBlox.App.Dialog.Modal.getPartialPageModalMiddleContentWidth
 local LinkButton = UIBlox.App.Button.LinkButton
+
 local GetFFlagDisableVerifyPhoneViewOnSuccess = require(PhoneUpsell.Flags.GetFFlagDisableVerifyPhoneViewOnSuccess)
 
-local function VerifyPhoneView(t1: {[any]: any}) -- line: 43
-	-- upvalues: useStyle (copy), useLocalization (copy), React (copy), ButtonType (copy), GetFFlagDisableVerifyPhoneViewOnSuccess (copy), getPartialPageModalMiddleContentWidth (copy), PartialPageModal (copy), TextInputBoxWithBorder (copy), LinkButton (copy)
-	local v15 = useStyle()
-	local t2 = {
+local function VerifyPhoneView(props)
+	local v = useStyle()
+	local v2 = {
 		titleKey = "Feature.VerificationUpsell.Heading.VerifyYourPhone",
 		verificationCodeKey = "Feature.VerificationUpsell.Heading.VerificationCode",
 		placeholderKey = "Feature.VerificationUpsell.Label.SixDigitCode",
@@ -24,67 +31,60 @@ local function VerifyPhoneView(t1: {[any]: any}) -- line: 43
 		changePhoneNumberKey = "Feature.VerificationUpsell.Action.ChangePhoneNumber"
 	}
 
-	if t1.extraButtonKey and t1.extraButtonKey ~= "" then
-		t2.extraButtonKey = t1.extraButtonKey
+	if props.extraButtonKey and props.extraButtonKey ~= "" then
+		v2.extraButtonKey = props.extraButtonKey
 	end
 
-	local v17 = useLocalization(t2)
-	local v18, v19 = React.useState(false)
-	local v20, v21 = React.useState(0)
+	local v3 = useLocalization(v2)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(0)
 
-	local function getButtonStackProps(s1: string, s2: string, n1: number, p1: ((...any) -> ...any), s3: string?, p2: ((...any) -> ...any)?) -- line: 63
-		-- upvalues: v19 (copy), v21 (copy), v18 (copy), v20 (copy), ButtonType (copy), GetFFlagDisableVerifyPhoneViewOnSuccess (copy), t1 (copy)
-		local function handleButtonClick() -- line: 71
-			-- upvalues: p1 (copy), v19 (copy), v21 (copy), n1 (copy)
-			p1()
-			v19(true)
-			v21(n1)
+	local function getButtonStackProps(buttonKey: string, buttonDisabledKey: string, p: number, onResendPhoneCode, extraButtonKey: string?, onActivated)
+		local function handleButtonClick()
+			onResendPhoneCode()
+			setState(true)
+			setState2(p)
+			local lastTime = tick()
+			local function countDown()
+				local v4 = p - (tick() - lastTime)
 
-			local timestamp = tick()
-
-			local function countDown() -- line: 77
-				-- upvalues: timestamp (copy), n1 (copy), v21 (copy), countDown (copy), v19 (copy)
-				local v37 = tick() - timestamp
-				local v38 = n1 - v37
-
-				if v38 > 0 then
-					v21((math.round(v38)))
+				if v4 > 0 then
+					setState2((math.round(v4)))
 					task.delay(1, countDown)
-
-					return
+				else
+					setState2(0)
+					setState(false)
 				end
-
-				v21(0)
-				v19(false)
 			end
-
 			countDown()
 		end
-		local function getButtonText() -- line: 92
-			-- upvalues: v18 (copy), s2 (copy), v20 (copy), s1 (copy)
-			if v18 then
-				return s2 .. " (" .. v20 .. ")"
+
+		local function getButtonText() -- 1 equivalent call inferred from this helper
+			if state then
+				return buttonDisabledKey .. " (" .. state2 .. ")"
 			end
 
-			return s1
+			return buttonKey
 		end
 
-		local t3 = {{
-			buttonType = ButtonType.PrimarySystem,
-			props = {
-				onActivated = handleButtonClick,
-				text = if not v18 then s1 else s2 .. " (" .. v20 .. ")",
-				isDisabled = v18 or GetFFlagDisableVerifyPhoneViewOnSuccess() and t1.isDisabled
+		local buttons = {
+			{
+				buttonType = ButtonType.PrimarySystem,
+				props = {
+					onActivated = handleButtonClick,
+					text = getButtonText(), -- inferred equivalent call
+					isDisabled = state or GetFFlagDisableVerifyPhoneViewOnSuccess() and props.isDisabled
+				}
 			}
-		}}
+		}
 
-		if p2 and (s3 and s3 ~= "") then
-			table.insert(t3, 1, {
+		if onActivated and extraButtonKey and extraButtonKey ~= "" then
+			table.insert(buttons, 1, {
 				buttonType = ButtonType.Secondary,
 				props = {
-					onActivated = p2,
-					text = s3,
-					isDisabled = GetFFlagDisableVerifyPhoneViewOnSuccess() and t1.isDisabled
+					onActivated = onActivated,
+					text = extraButtonKey,
+					isDisabled = GetFFlagDisableVerifyPhoneViewOnSuccess() and props.isDisabled
 				}
 			})
 		end
@@ -92,72 +92,121 @@ local function VerifyPhoneView(t1: {[any]: any}) -- line: 43
 		return {
 			buttonHeight = 48,
 			forcedFillDirection = Enum.FillDirection.Vertical,
-			buttons = t3
+			buttons = buttons
 		}
 	end
-	local function getBodyText(s4: string) -- line: 131
-		-- upvalues: t1 (copy)
-		return s4:gsub("{phoneNumber}", "+" .. t1.prefix .. t1.phoneNumber)
+
+	local function getBodyText(descriptionKey: string) -- 1 equivalent call inferred from this helper
+		return descriptionKey:gsub("{phoneNumber}", "+" .. props.prefix .. props.phoneNumber)
 	end
 
-	local v24 = getPartialPageModalMiddleContentWidth(t1.screenSize.X)
+	local partialPageModalMiddleContentWidth = getPartialPageModalMiddleContentWidth(props.screenSize.X)
 
-	return React.createElement(PartialPageModal, {
-		title = v17.titleKey,
-		screenSize = t1.screenSize,
-		buttonStackProps = getButtonStackProps(v17.buttonKey, v17.buttonDisabledKey, 10, t1.onResendPhoneCode, v17.extraButtonKey, t1.onExtraButtonClick),
-		onCloseClicked = t1.onClose,
-		position = t1.isKeyboardShowing and UDim2.new(0.5, 0, 1, -t1.keyboardHeight) or nil,
-		anchorPoint = t1.isKeyboardShowing and Vector2.new(0.5, 1) or nil
-	}, {
-		Middle = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.new(1, 0, 0, 0)
-		}, {
-			ContentPadding = React.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 24),
-				PaddingBottom = UDim.new(0, 24)
-			}),
-			ListLayout = React.createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				HorizontalAlignment = Enum.HorizontalAlignment.Left,
-				Padding = UDim.new(0, 12)
-			}),
-			BodyText = React.createElement("TextLabel", {
-				LayoutOrder = 1,
-				BackgroundTransparency = 1,
-				TextWrapped = true,
-				Text = v17.descriptionKey:gsub("{phoneNumber}", "+" .. t1.prefix .. t1.phoneNumber),
-				TextSize = v15.Font.BaseSize,
-				TextColor3 = v15.Theme.TextDefault.Color,
-				TextTransparency = v15.Theme.TextDefault.Transparency,
-				Font = v15.Font.Body.Font,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.new(0, v24, 0, 0)
-			}),
-			TextBox = React.createElement(TextInputBoxWithBorder, {
-				textInputHeight = 36,
-				layoutOrder = 2,
-				maxLength = 6,
-				text = t1.code,
-				textInputType = t1.useOTPInputType and Enum.TextInputType.OneTimePassword or Enum.TextInputType.Number,
-				placeholderText = v17.placeholderKey,
-				errorText = t1.errorMessage,
-				onChangeTextCallback = t1.onCodeTextChange,
-				Size = UDim2.new(1, 0, 0, 0),
-				onFocused = t1.onCodeInputFocus
-			}),
-			ChangePhoneButton = React.createElement(LinkButton, {
-				layoutOrder = 3,
-				fontStyle = "CaptionBody",
-				minPaddingX = 0,
-				minPaddingY = 0,
-				text = v17.changePhoneNumberKey,
-				onActivated = t1.returnToAddPhone
-			})
-		})
+	local createElement = React.createElement
+	local v4 = {
+		title = v3.titleKey,
+		screenSize = props.screenSize,
+		buttonStackProps = getButtonStackProps(
+			v3.buttonKey,
+			v3.buttonDisabledKey,
+			10,
+			props.onResendPhoneCode,
+			v3.extraButtonKey,
+			props.onExtraButtonClick
+		),
+		onCloseClicked = props.onClose,
+		position = 0,
+		anchorPoint = 0
+	}
+	local position
+
+	if props.isKeyboardShowing then
+		position = UDim2.new(0.5, 0, 1, -props.keyboardHeight) or nil
+	end
+
+	v4.position = position
+	v4.anchorPoint = props.isKeyboardShowing and Vector2.new(0.5, 1) or nil
+
+	local createElement2 = React.createElement
+	local v5 = {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.new(1, 0, 0, 0)
+	}
+	local children = {
+		ContentPadding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 24),
+			PaddingBottom = UDim.new(0, 24)
+		}),
+		ListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			Padding = UDim.new(0, 12)
+		}),
+		BodyText = 0,
+		TextBox = 0,
+		ChangePhoneButton = 0
+	}
+
+	local createElement3 = React.createElement
+	local v6 = {
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		Text = getBodyText(v3.descriptionKey), -- inferred equivalent call
+		TextSize = v.Font.BaseSize,
+		TextColor3 = v.Theme.TextDefault.Color,
+		TextTransparency = v.Theme.TextDefault.Transparency,
+		Font = 0,
+		FontFace = 0,
+		TextXAlignment = 0,
+		AutomaticSize = 0,
+		TextWrapped = true,
+		Size = 0
+	}
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = v.Font.Body.Font
+	end
+
+	v6.Font = font
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
+	end
+
+	v6.FontFace = fontFace
+
+	v6.TextXAlignment = Enum.TextXAlignment.Left
+	v6.AutomaticSize = Enum.AutomaticSize.Y
+
+	v6.Size = UDim2.new(0, partialPageModalMiddleContentWidth, 0, 0)
+	children.BodyText = createElement3("TextLabel", v6)
+
+	children.TextBox = React.createElement(TextInputBoxWithBorder, {
+		text = props.code,
+		textInputType = props.useOTPInputType and Enum.TextInputType.OneTimePassword or Enum.TextInputType.Number,
+		textInputHeight = 36,
+		layoutOrder = 2,
+		placeholderText = v3.placeholderKey,
+		errorText = props.errorMessage,
+		onChangeTextCallback = props.onCodeTextChange,
+		Size = UDim2.new(1, 0, 0, 0),
+		onFocused = props.onCodeInputFocus,
+		maxLength = 6
+	})
+
+	children.ChangePhoneButton = React.createElement(LinkButton, {
+		text = v3.changePhoneNumberKey,
+		onActivated = props.returnToAddPhone,
+		layoutOrder = 3,
+		fontStyle = "CaptionBody",
+		minPaddingX = 0,
+		minPaddingY = 0
+	})
+	return createElement(PartialPageModal, v4, {
+		Middle = createElement2("Frame", v5, children)
 	})
 end
 

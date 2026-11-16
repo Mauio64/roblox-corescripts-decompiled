@@ -1,41 +1,36 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local parent = script.Parent.Parent.Parent
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
 
 return {
-	NoUnusedFragmentsRule = function(p1) -- line: 20
-		-- upvalues: GraphQLError (copy)
-		local t1 = {}
-		local t2 = {}
+	NoUnusedFragmentsRule = function(object)
+		local v = {}
+		local v2 = {}
 
 		return {
-			OperationDefinition = function(_, p3) -- line: 25
-				-- upvalues: t1 (copy)
-				table.insert(t1, p3)
-
+			OperationDefinition = function(_, p): boolean
+				table.insert(v, p)
 				return false
 			end,
-			FragmentDefinition = function(_, p5) -- line: 29
-				-- upvalues: t2 (copy)
-				table.insert(t2, p5)
-
+			FragmentDefinition = function(_, p): boolean
+				table.insert(v2, p)
 				return false
 			end,
 			Document = {
-				leave = function() -- line: 34
-					-- upvalues: t1 (copy), p1 (copy), t2 (copy), GraphQLError (copy)
-					local t3 = {}
+				leave = function()
+					local set = {}
 
-					for _, v in ipairs(t1) do
-						for _, v2 in ipairs(p1:getRecursivelyReferencedFragments(v)) do
-							t3[v2.name.value] = true
+					for _, v3 in ipairs(v) do
+						for _, v4 in ipairs(object:getRecursivelyReferencedFragments(v3)) do
+							set[v4.name.value] = true
 						end
 					end
 
-					for _, v in ipairs(t2) do
-						local value = v.name.value
+					for _, v3 in ipairs(v2) do
+						local value = v3.name.value
 
-						if t3[value] ~= true then
-							p1:reportError(GraphQLError.new(("Fragment \"%s\" is never used."):format(value), v))
+						if set[value] ~= true then
+							object:reportError(graphQLError.new(("Fragment \"%s\" is never used."):format(value), v3))
 						end
 					end
 				end

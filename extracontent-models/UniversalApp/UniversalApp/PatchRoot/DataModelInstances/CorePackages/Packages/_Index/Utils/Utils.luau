@@ -1,200 +1,118 @@
-local scriptParent = script.Parent
-local Object = require(scriptParent.LuauPolyfill).Object
-local t1 = {}
+local parent = script.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local Utils = {}
+
 local loaders = require(script.loaders)
-
-Object.assign(t1, loaders)
-
+Object.assign(Utils, loaders)
 local helpers = require(script.helpers)
+Object.assign(Utils, helpers)
+local getdirectives = require(script["get-directives"])
+Object.assign(Utils, getdirectives)
 
-Object.assign(t1, helpers)
+local getargumentswithdirectives = require(script["get-arguments-with-directives"])
+Object.assign(Utils, getargumentswithdirectives)
+local getimplementingtypes = require(script["get-implementing-types"])
+Object.assign(Utils, getimplementingtypes)
+local printschemawithdirectives = require(script["print-schema-with-directives"])
+Object.assign(Utils, printschemawithdirectives)
 
-local lib = require(script["get-directives"])
+local getfieldswithdirectives = require(script["get-fields-with-directives"])
+Object.assign(Utils, getfieldswithdirectives)
 
-Object.assign(t1, lib)
-
-local lib2 = require(script["get-arguments-with-directives"])
-
-Object.assign(t1, lib2)
-
-local lib3 = require(script["get-implementing-types"])
-
-Object.assign(t1, lib3)
-
-local lib4 = require(script["print-schema-with-directives"])
-
-Object.assign(t1, lib4)
-
-local lib5 = require(script["get-fields-with-directives"])
-
-Object.assign(t1, lib5)
-
-local lib6 = require(script["validate-documents"])
-
-Object.assign(t1, lib6)
-
-local lib7 = require(script["parse-graphql-json"])
-
-Object.assign(t1, lib7)
-
-local lib8 = require(script["parse-graphql-sdl"])
-
-Object.assign(t1, lib8)
-
-local lib9 = require(script["build-operation-for-field"])
-
-Object.assign(t1, lib9)
+local validatedocuments = require(script["validate-documents"])
+Object.assign(Utils, validatedocuments)
+local parsegraphqljson = require(script["parse-graphql-json"])
+Object.assign(Utils, parsegraphqljson)
+local parsegraphqlsdl = require(script["parse-graphql-sdl"])
+Object.assign(Utils, parsegraphqlsdl)
+local buildoperationforfield = require(script["build-operation-for-field"])
+Object.assign(Utils, buildoperationforfield)
 
 local types = require(script.types)
-
-Object.assign(t1, types)
+Object.assign(Utils, types)
 
 local filterSchema = require(script.filterSchema)
-
-Object.assign(t1, filterSchema)
-
+Object.assign(Utils, filterSchema)
 local heal = require(script.heal)
-
-Object.assign(t1, heal)
-
+Object.assign(Utils, heal)
 local getResolversFromSchema = require(script.getResolversFromSchema)
-
-Object.assign(t1, getResolversFromSchema)
-
+Object.assign(Utils, getResolversFromSchema)
 local forEachField = require(script.forEachField)
-
-Object.assign(t1, forEachField)
-
+Object.assign(Utils, forEachField)
 local forEachDefaultValue = require(script.forEachDefaultValue)
-
-Object.assign(t1, forEachDefaultValue)
-
+Object.assign(Utils, forEachDefaultValue)
 local mapSchema = require(script.mapSchema)
-
-Object.assign(t1, mapSchema)
-
+Object.assign(Utils, mapSchema)
 local addTypes = require(script.addTypes)
-
-Object.assign(t1, addTypes)
-
+Object.assign(Utils, addTypes)
 local rewire = require(script.rewire)
-
-Object.assign(t1, rewire)
-
+Object.assign(Utils, rewire)
 local prune = require(script.prune)
-
-Object.assign(t1, prune)
-
+Object.assign(Utils, prune)
 local mergeDeep = require(script.mergeDeep)
-
-Object.assign(t1, mergeDeep)
+Object.assign(Utils, mergeDeep)
 
 local Interfaces = require(script.Interfaces)
-
-Object.assign(t1, Interfaces)
+Object.assign(Utils, Interfaces)
 
 local stub = require(script.stub)
-
-Object.assign(t1, stub)
-
+Object.assign(Utils, stub)
 local selectionSets = require(script.selectionSets)
-
-Object.assign(t1, selectionSets)
-
+Object.assign(Utils, selectionSets)
 local getResponseKeyFromInfo = require(script.getResponseKeyFromInfo)
-
-Object.assign(t1, getResponseKeyFromInfo)
-
+Object.assign(Utils, getResponseKeyFromInfo)
 local fields = require(script.fields)
-
-Object.assign(t1, fields)
-
+Object.assign(Utils, fields)
 local renameType = require(script.renameType)
-
-Object.assign(t1, renameType)
-
+Object.assign(Utils, renameType)
 local transformInputValue = require(script.transformInputValue)
-
-Object.assign(t1, transformInputValue)
-
+Object.assign(Utils, transformInputValue)
 local mapAsyncIterator = require(script.mapAsyncIterator)
-
-Object.assign(t1, mapAsyncIterator)
-
+Object.assign(Utils, mapAsyncIterator)
 local updateArgument = require(script.updateArgument)
-
-Object.assign(t1, updateArgument)
-
+Object.assign(Utils, updateArgument)
 local implementsAbstractType = require(script.implementsAbstractType)
-
-Object.assign(t1, implementsAbstractType)
-
+Object.assign(Utils, implementsAbstractType)
 local errors = require(script.errors)
-
-Object.assign(t1, errors)
+Object.assign(Utils, errors)
 
 local visitResult = require(script.visitResult)
-
-Object.assign(t1, visitResult)
+Object.assign(Utils, visitResult)
 
 local getArgumentValues = require(script.getArgumentValues)
-
-Object.assign(t1, getArgumentValues)
-
+Object.assign(Utils, getArgumentValues)
 local valueMatchesCriteria = require(script.valueMatchesCriteria)
-
-Object.assign(t1, valueMatchesCriteria)
-
+Object.assign(Utils, valueMatchesCriteria)
 local isAsyncIterable = require(script.isAsyncIterable)
-
-Object.assign(t1, isAsyncIterable)
-
+Object.assign(Utils, isAsyncIterable)
 local isDocumentNode = require(script.isDocumentNode)
-
-Object.assign(t1, isDocumentNode)
-
+Object.assign(Utils, isDocumentNode)
 local astFromValueUntyped = require(script.astFromValueUntyped)
-
-Object.assign(t1, astFromValueUntyped)
+Object.assign(Utils, astFromValueUntyped)
 
 local executor = require(script.executor)
-
-Object.assign(t1, executor)
+Object.assign(Utils, executor)
 
 local AggregateError = require(script.AggregateError)
-
-Object.assign(t1, AggregateError)
-
+Object.assign(Utils, AggregateError)
 local rootTypes = require(script.rootTypes)
-
-Object.assign(t1, rootTypes)
+Object.assign(Utils, rootTypes)
 
 local comments = require(script.comments)
-
-Object.assign(t1, comments)
+Object.assign(Utils, comments)
 
 local collectFields = require(script.collectFields)
-
-Object.assign(t1, collectFields)
-
+Object.assign(Utils, collectFields)
 local inspect = require(script.inspect)
-
-Object.assign(t1, inspect)
-
+Object.assign(Utils, inspect)
 local memoize = require(script.memoize)
-
-Object.assign(t1, memoize)
-
+Object.assign(Utils, memoize)
 local fixSchemaAst = require(script.fixSchemaAst)
-
-Object.assign(t1, fixSchemaAst)
-
+Object.assign(Utils, fixSchemaAst)
 local getOperationASTFromRequest = require(script.getOperationASTFromRequest)
-
-Object.assign(t1, getOperationASTFromRequest)
-
+Object.assign(Utils, getOperationASTFromRequest)
 local extractExtensionsFromSchema = require(script.extractExtensionsFromSchema)
+Object.assign(Utils, extractExtensionsFromSchema)
 
-Object.assign(t1, extractExtensionsFromSchema)
-
-return t1
+return Utils

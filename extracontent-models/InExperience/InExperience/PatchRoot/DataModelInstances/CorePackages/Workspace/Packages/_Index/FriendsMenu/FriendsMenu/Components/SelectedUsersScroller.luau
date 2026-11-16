@@ -1,148 +1,188 @@
 local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
-local FriendsMenuParent = FriendsMenu.Parent
+local parent = FriendsMenu.Parent
 local Context = FriendsMenu.Context
-local React = require(FriendsMenuParent.React)
-local UIBlox = require(FriendsMenuParent.UIBlox)
-local useLocalization = require(FriendsMenuParent.Localization).Hooks.useLocalization
-local Responsive = require(FriendsMenuParent.Responsive)
-local SharedFlags = require(FriendsMenuParent.SharedFlags)
-local useFocusGuiObject = require(FriendsMenuParent.ReactFocusNavigation).useFocusGuiObject
-local useLastInputMode = require(FriendsMenuParent.FocusNavigationUtils).useLastInputMode
+
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Responsive = require(parent.Responsive)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local useLastInputMode = FocusNavigationUtils.useLastInputMode
+
 local useStyle = UIBlox.Core.Style.useStyle
+
 local Constants = require(FriendsMenu.Constants)
 local FriendsMenuUserCard = require(script.Parent.FriendsMenuUserCard)
 local SelectedUsersContext = require(Context.SelectedUsersContext)
-local getRenameFriendsToConnectionsEnabledFriendsMenu = require(FriendsMenu.utils.getRenameFriendsToConnectionsEnabledFriendsMenu)
-local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
 
-return function(t1: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), SelectedUsersContext (copy), Responsive (copy), useLastInputMode (copy), useFocusGuiObject (copy), useStyle (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), getRenameFriendsToConnectionsEnabledFriendsMenu (copy), FriendsMenuUserCard (copy), Constants (copy)
-	local v18 = React.useContext(SelectedUsersContext)
-	local v19 = Responsive.useBreakpointYOrLarger(Responsive.Keys.Medium)
-	local v20 = useLastInputMode()
-	local v21 = useFocusGuiObject()
-	local v22 = React.useRef({})
-	local v23 = React.useRef(nil)
-	local v24 = useStyle()
-	local Theme = v24.Theme
-	local Font = v24.Font
-	local v27 = useLocalization({
+return function(p)
+	local v = React.useContext(SelectedUsersContext)
+	local v2 = Responsive.useBreakpointYOrLarger(Responsive.Keys.Medium)
+
+	local v3 = useLastInputMode()
+	local v4 = useFocusGuiObject()
+
+	local ref = React.useRef({})
+	local ref2 = React.useRef(nil)
+
+	local v5 = useStyle()
+	local theme = v5.Theme
+	local font = v5.Font
+
+	local v6 = useLocalization({
 		selectedFriendsCountText = {
-			if not FFlagConnectionsToFriendsRename then not getRenameFriendsToConnectionsEnabledFriendsMenu() and "Feature.FriendsMenu.Label.SelectedFriendsCount" or "Feature.FriendsMenu.Label.SelectedConnectionsCount" else "Feature.FriendsMenu.Label.SelectedFriendsCount",
-			numerator = v18.selectedFriendsSize,
-			denominator = t1.selectionLimit
+			"Feature.FriendsMenu.Label.SelectedFriendsCount",
+			numerator = v.selectedFriendsSize,
+			denominator = p.selectionLimit
 		},
 		selectedFriendsCountNoLimitText = {
-			if not FFlagConnectionsToFriendsRename then not getRenameFriendsToConnectionsEnabledFriendsMenu() and "Feature.FriendsMenu.Label.SelectedFriendsCountNoLimit" or "Feature.FriendsMenu.Label.SelectedConnectionsCountNoLimit" else "Feature.FriendsMenu.Label.SelectedFriendsCountNoLimit",
-			selectedCount = v18.selectedFriendsSize
+			"Feature.FriendsMenu.Label.SelectedFriendsCountNoLimit",
+			selectedCount = v.selectedFriendsSize
 		}
 	})
-	local v28 = React.useMemo(function() -- line: 66
-		-- upvalues: v22 (copy), React (copy), v18 (copy), FriendsMenuUserCard (copy), v23 (copy)
-		v22.current = {}
 
-		local t2 = {
-			UIListLayout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, 8),
-				SortOrder = Enum.SortOrder.LayoutOrder
-			})
-		}
-		local t3 = {}
+	local v7 = React.useMemo(function()
+		ref.current = {}
+		local children = {}
+		children.UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			Padding = UDim.new(0, 8),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		})
 
-		for k, v in pairs(v18.selectedFriends) do
-			table.insert(t3, {
-				userId = k,
-				userData = v
-			})
+		local v7 = {}
+
+		for k, selectedFriend in pairs(v.selectedFriends) do
+			table.insert(v7, { userId = k, userData = selectedFriend })
 		end
 
-		table.sort(t3, function(p1, p2) -- line: 80
-			return p1.userData.layoutOrder < p2.userData.layoutOrder
+		table.sort(v7, function(a, b): boolean
+			return a.userData.layoutOrder < b.userData.layoutOrder
 		end)
 
-		for i, v in ipairs(t3) do
-			local userId = v.userId
-			local userData = v.userData
+		for i, v8 in ipairs(v7) do
+			local userId = v8.userId
+			local userData = v8.userData
 
-			t2["User-" .. tostring(userId)] = React.createElement(FriendsMenuUserCard, {
+			children["User-" .. tostring(userId)] = React.createElement(FriendsMenuUserCard, {
 				displayName = userData.displayName,
 				layoutOrder = userData.layoutOrder,
 				userId = userId,
 				unremovable = userData.unremovable,
-				onRemoved = function() -- line: 93
-					-- upvalues: v23 (copy), i (copy)
-					v23.current = i
+				onRemoved = function()
+					ref2.current = i
 				end,
-				ref = function(p3) -- line: 96
-					-- upvalues: v22 (copy), i (copy)
-					v22.current[i] = p3
+				ref = function(p2)
+					ref.current[i] = p2
 				end
 			})
 		end
 
-		return t2
-	end, { v18.selectedFriends })
+		return children
+	end, { v.selectedFriends })
 
-	React.useEffect(function() -- line: 105
-		-- upvalues: v23 (copy), v20 (copy), v22 (copy), v21 (copy)
-		if not v23.current or v20 ~= "Focus" then
+	React.useEffect(function()
+		if not ref2.current or v3 ~= "Focus" then
 			return
 		end
 
-		local current = v22.current
-		local v38 = #current
+		local current = ref.current
+		local count = #current
 
-		if v38 == 0 then
-			v23.current = nil
-
+		if count == 0 then
+			ref2.current = nil
 			return
 		end
 
-		local v39 = current[math.clamp(v23.current, 1, v38)]
+		local v8 = current[math.clamp(ref2.current, 1, count)]
 
-		if v39 and v39.Parent then
-			v21(v39)
+		if v8 and v8.Parent then
+			v4(v8)
 		end
 
-		v23.current = nil
-	end, {
-		v18.selectedFriends,
-		v21,
-		v20
-	})
+		ref2.current = nil
+	end, { v.selectedFriends, v4, v3 })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
+	local createElement = React.createElement
+	local v8 = {
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.layoutOrder
-	}, {
+		BackgroundTransparency = 1,
+		LayoutOrder = p.layoutOrder
+	}
+	local v9 = {
 		VerticalLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			Padding = UDim.new(0, 8),
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		SelectedFriendsText = React.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 0,
-			Size = UDim2.new(1, 0, 0, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Font = Font.Header2.Font,
-			Text = if not t1.selectionLimit then v27.selectedFriendsCountNoLimitText else v27.selectedFriendsCountText,
-			TextColor3 = Theme.TextEmphasis.Color,
-			TextSize = Font.BaseSize * Font.Header2.RelativeSize,
-			TextTransparency = Theme.TextEmphasis.Transparency,
-			TextXAlignment = Enum.TextXAlignment.Left
-		}),
-		SelectedUsers = if v18.selectedFriendsSize == 0 or not v19 then nil else React.createElement("ScrollingFrame", {
+		SelectedFriendsText = 0,
+		SelectedUsers = 0
+	}
+
+	local createElement2 = React.createElement
+	local v10 = {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		Font = 0,
+		FontFace = 0,
+		LayoutOrder = 0,
+		Text = 0,
+		TextColor3 = 0,
+		TextSize = 0,
+		TextTransparency = 0,
+		TextXAlignment = 0
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Header2.Font
+	end
+
+	v10.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v5.Tokens.Typography.TitleLarge.Font)
+	end
+
+	v10.FontFace = fontFace
+	local text
+
+	if p.selectionLimit then
+		text = v6.selectedFriendsCountText
+	else
+		text = v6.selectedFriendsCountNoLimitText
+	end
+
+	v10.Text = text
+
+	v10.TextColor3 = theme.TextEmphasis.Color
+	v10.TextSize = font.BaseSize * font.Header2.RelativeSize
+	v10.TextTransparency = theme.TextEmphasis.Transparency
+	v10.TextXAlignment = Enum.TextXAlignment.Left
+	v9.SelectedFriendsText = createElement2("TextLabel", v10)
+	local selectedUsers
+
+	if not (v.selectedFriendsSize == 0 or not v2) then
+		selectedUsers = React.createElement("ScrollingFrame", {
+			Size = UDim2.new(1, 0, 0, Constants.FRIEND_MENU_CARD_SIZE),
+			AutomaticCanvasSize = Enum.AutomaticSize.XY,
 			BackgroundTransparency = 1,
 			LayoutOrder = 1,
 			ScrollBarThickness = 0,
-			Selectable = false,
-			Size = UDim2.new(1, 0, 0, Constants.FRIEND_MENU_CARD_SIZE),
-			AutomaticCanvasSize = Enum.AutomaticSize.XY,
-			ScrollingDirection = Enum.ScrollingDirection.X
-		}, v28)
-	})
+			ScrollingDirection = Enum.ScrollingDirection.X,
+			Selectable = false
+		}, v7)
+	end
+
+	v9.SelectedUsers = selectedUsers
+	return createElement("Frame", v8, v9)
 end

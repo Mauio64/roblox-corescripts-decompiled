@@ -1,0 +1,6 @@
+local FFlagHomepagePromptsHandlerPassClientAttributes = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagHomepagePromptsHandlerPassClientAttributes")
+local GetFFlagEnablePushNotificationsUpsellModal = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/GetFFlagEnablePushNotificationsUpsellModal")
+
+return game:DefineFastFlag("PushNotificationsUpsellPassClientAttributesToPrompts", false)
+	and FFlagHomepagePromptsHandlerPassClientAttributes
+	and GetFFlagEnablePushNotificationsUpsellModal()

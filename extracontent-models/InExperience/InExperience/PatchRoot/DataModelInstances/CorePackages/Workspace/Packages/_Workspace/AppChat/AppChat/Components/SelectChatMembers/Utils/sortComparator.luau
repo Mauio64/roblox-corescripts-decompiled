@@ -1,3 +1,5 @@
 local AppChat = script:FindFirstAncestor("AppChat")
 
-return require(AppChat.SocialLibraries).Utils.presenceSortComparator
+local SocialLibraries = require(AppChat.SocialLibraries)
+
+return SocialLibraries.Utils.presenceSortComparator

@@ -1,25 +1,23 @@
-local t1 = {}
+local WeakMap = {}
+WeakMap.__index = WeakMap
 
-t1.__index = t1
-
-function t1.new() -- line: 23
-	-- upvalues: t1 (copy)
+function WeakMap.new()
 	return (setmetatable({
-		_weakMap = setmetatable({}, {
-			__mode = "k"
-		})
-	}, t1))
-end
-function t1.get(p1, p2) -- line: 28
-	return p1._weakMap[p2]
-end
-function t1.set(p3, p4, p5) -- line: 32
-	p3._weakMap[p4] = p5
-
-	return p3
-end
-function t1.has(p6, p7) -- line: 37
-	return p6._weakMap[p7] ~= nil
+		_weakMap = setmetatable({}, { __mode = "k" })
+	}, WeakMap))
 end
 
-return t1
+function WeakMap:get(p)
+	return self._weakMap[p]
+end
+
+function WeakMap:set(p, p2)
+	self._weakMap[p] = p2
+	return self
+end
+
+function WeakMap:has(p): boolean
+	return self._weakMap[p] ~= nil
+end
+
+return WeakMap

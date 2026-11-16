@@ -1,50 +1,46 @@
-local scriptParent = script.Parent
-local Error = require(scriptParent.Error)
-local format = require(scriptParent.format)
-local v4 = Error.new("ReadonlyKey", "Attempted to write to readonly key {key:?} of frozen object {objectName:?}")
-local v5 = Error.new("MissingKey", "Attempted to read missing key {key:?} of frozen object {objectName:?}")
+local parent = script.Parent
+local Error = require(parent.Error)
+local format = require(parent.format)
 
-local function freeze(s1: string, p1, b1: boolean?) -- line: 35
-	-- upvalues: v5 (copy), v4 (copy), format (copy)
-	local t1 = {}
+local readonlyKey = Error.new(
+	"ReadonlyKey",
+	"Attempted to write to readonly key {key:?} of frozen object {objectName:?}"
+)
+local missingKey = Error.new("MissingKey", "Attempted to read missing key {key:?} of frozen object {objectName:?}")
 
-	assert(type(p1) == "table", `Attempted to call Dash.freeze with argument #2 of type { type(p1) }, but it should be table `)
-	setmetatable(t1, {
-		__index = function(_, p3) -- line: 44
-			-- upvalues: p1 (copy), b1 (copy), v5 (copy), s1 (copy)
-			local v13 = p1[p3]
+local function freeze(objectName: string, list, flag: boolean?)
+	local v = {}
 
-			if v13 == nil and b1 then
-				v5:throw({
-					key = p3,
-					objectName = s1
-				})
+	assert(
+		type(list) == "table",
+		`Attempted to call Dash.freeze with argument #2 of type {type(list)}, but it should be table `
+	)
+
+	setmetatable(v, {
+		__index = function(_, p)
+			local item = list[p]
+
+			if item == nil and flag then
+				missingKey:throw({ key = p, objectName = objectName })
 			end
 
-			return v13
+			return item
 		end,
-		__newindex = function(_, p5) -- line: 55
-			-- upvalues: v4 (copy), s1 (copy)
-			v4:throw({
-				key = p5,
-				objectName = s1
-			})
+		__newindex = function(_, p)
+			readonlyKey:throw({ key = p, objectName = objectName })
 		end,
-		__len = function() -- line: 62
-			-- upvalues: p1 (copy)
-			return #p1
+		__len = function()
+			return #list
 		end,
-		__tostring = function() -- line: 65
-			-- upvalues: format (copy), s1 (copy)
-			return format("Frozen({})", s1)
+		__tostring = function()
+			return format("Frozen({})", objectName)
 		end,
-		__call = function(_, ...) -- line: 68
-			-- upvalues: p1 (copy)
-			return p1(...)
+		__call = function(_, ...)
+			return list(...)
 		end
 	})
 
-	return t1
+	return v
 end
 
 return freeze

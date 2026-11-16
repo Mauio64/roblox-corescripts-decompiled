@@ -2,7 +2,6 @@ local FFlagAppChatEnableAutotranslation = require(script.Parent.FFlagAppChatEnab
 
 game:DefineFastFlag("AppChatEnableManualTranslation", false)
 
-return function() -- line: 5
-	-- upvalues: FFlagAppChatEnableAutotranslation (copy)
+return function()
 	return game:GetFastFlag("AppChatEnableManualTranslation") and FFlagAppChatEnableAutotranslation
 end

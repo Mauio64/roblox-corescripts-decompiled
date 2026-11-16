@@ -1,24 +1,25 @@
 local None = require(script.Parent.Parent.None)
 
-local function join(...) -- line: 4
-	-- upvalues: None (copy)
-	local t1 = {}
+local function join(...)
+	local result = {}
 
 	for i = 1, select("#", ...) do
-		local v5 = select(i, ...)
+		local v = select(i, ...)
 
-		if v5 then
-			for k, v in pairs(v5) do
-				if v == None then
-					t1[k] = nil
-				else
-					t1[k] = v
-				end
+		if not v then
+			continue
+		end
+
+		for k, v2 in pairs(v) do
+			if v2 == None then
+				result[k] = nil
+			else
+				result[k] = v2
 			end
 		end
 	end
 
-	return t1
+	return result
 end
 
 return join

@@ -1,17 +1,17 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 
 require(script.Parent.useTimeoutBannerProps)
 
-local function TimeoutBanner(p1) -- line: 17
-	-- upvalues: React (copy), Foundation (copy)
-	if not p1.shouldShow then
+local function TimeoutBanner(props)
+	if not props.shouldShow then
 		return nil
 	end
 
-	local onBannerActivated = p1.onBannerActivated
-	local messageText = p1.messageText
+	local onBannerActivated = props.onBannerActivated
+	local messageText = props.messageText
 
 	return React.createElement(Foundation.View, {
 		tag = "auto-y size-full-0 padding-x-medium padding-y-small row align-x-center align-y-center gap-small",
@@ -24,8 +24,8 @@ local function TimeoutBanner(p1) -- line: 17
 		}),
 		Text = React.createElement(Foundation.Text, {
 			tag = "auto-xy text-title-large text-wrap content-emphasis",
-			LayoutOrder = 2,
-			Text = messageText
+			Text = messageText,
+			LayoutOrder = 2
 		})
 	})
 end

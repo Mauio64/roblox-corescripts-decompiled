@@ -1,8 +1,5 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 
 return {
-	projects = {
-		scriptParent["jest.main.config"],
-		scriptParent["jest.mockDataModel.config"]
-	}
+	projects = { parent["jest.main.config"], parent["jest.mockDataModel.config"] }
 }

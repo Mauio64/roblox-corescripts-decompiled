@@ -1,5 +1,5 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.LuauPolyfill)
+require(parent.LuauPolyfill)
 
 return {}

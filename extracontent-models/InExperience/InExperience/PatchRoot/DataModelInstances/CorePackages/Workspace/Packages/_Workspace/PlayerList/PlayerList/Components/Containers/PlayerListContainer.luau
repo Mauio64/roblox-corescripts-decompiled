@@ -1,79 +1,133 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local React = require(parent2.React)
+local Signals = require(parent2.Signals)
+local SignalsReact = require(parent2.SignalsReact)
+local ReactFocusNavigation = require(parent2.ReactFocusNavigation)
+require(parent2.LeaderboardStore)
 
-require(ParentParentParent.Signals)
+local LocalizationService = game:GetService("LocalizationService")
+local InExperienceLocales = require(parent2.InExperienceLocales)
+local Localization = require(parent2.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
 
-local SignalsReact = require(ParentParentParent.SignalsReact)
-local ReactFocusNavigation = require(ParentParentParent.ReactFocusNavigation)
+local LeaderboardStoreContext = require(parent.Common.LeaderboardStoreContext)
+local LayoutValuesContext = require(parent.Common.LayoutValuesContext)
+local GameTextTranslatorContext = require(parent.Common.GameTextTranslatorContext)
+local PlayerListVisibilityStore = require(parent.Common.PlayerListVisibilityStore)
 
-require(ParentParentParent.LeaderboardStore)
+local CreateLayoutValues = require(parent.Common.CreateLayoutValues)
+local PlatformLeaderboardContainer = require(parent.Components.Containers.PlatformLeaderboardContainer)
 
-local LeaderboardStoreContext = require(ParentParent.Common.LeaderboardStoreContext)
-local LayoutValuesContext = require(ParentParent.Common.LayoutValuesContext)
-local GameTextTranslatorContext = require(ParentParent.Common.GameTextTranslatorContext)
-local CreateLayoutValues = require(ParentParent.Common.CreateLayoutValues)
-local PlatformLeaderboardContainer = require(ParentParent.Components.Containers.PlatformLeaderboardContainer)
 local FocusNavigationContext = ReactFocusNavigation.FocusNavigationContext
 local FocusNavigationService = ReactFocusNavigation.FocusNavigationService
-local FFlagAddNewPlayerListFocusNav = require(ParentParent.Flags.FFlagAddNewPlayerListFocusNav)
-local FFlagEnablePlayerListExposureEvents = require(ParentParent.Flags.FFlagEnablePlayerListExposureEvents)
-local FFlagPlayerListLocalizeGameText = require(ParentParent.Flags.FFlagPlayerListLocalizeGameText)
-local FFlagPlayerListReskinOptimization = require(ParentParent.Flags.FFlagPlayerListReskinOptimization)
-local FFlagPlayerListTwoTabs = require(ParentParent.Flags.FFlagPlayerListTwoTabs)
-local FStringPlayerListIXPLayer = require(ParentParent.Flags.FStringPlayerListIXPLayer)
+
+local FFlagAddNewPlayerListFocusNav = require(parent.Flags.FFlagAddNewPlayerListFocusNav)
+local FFlagEnablePlayerListExposureEvents = require(parent.Flags.FFlagEnablePlayerListExposureEvents)
+local FFlagPlayerListLocalizeGameText = require(parent.Flags.FFlagPlayerListLocalizeGameText)
+local FFlagPlayerListReskin = require(parent.Flags.FFlagPlayerListReskin)
+local FStringPlayerListIXPLayer = require(parent.Flags.FStringPlayerListIXPLayer)
+
 local IXPService = game:GetService("IXPService")
 
-return React.memo(function(t1: {[any]: any}) -- line: 37
-	-- upvalues: FFlagPlayerListReskinOptimization (copy), React (copy), CreateLayoutValues (copy), FocusNavigationService (copy), ReactFocusNavigation (copy), SignalsReact (copy), FFlagEnablePlayerListExposureEvents (copy), IXPService (copy), FStringPlayerListIXPLayer (copy), FFlagPlayerListTwoTabs (copy), PlatformLeaderboardContainer (copy), LeaderboardStoreContext (copy), LayoutValuesContext (copy), FFlagAddNewPlayerListFocusNav (copy), FocusNavigationContext (copy), FFlagPlayerListLocalizeGameText (copy), GameTextTranslatorContext (copy)
-	local v21, v22
+local leaderboardViewChangeTelemetry = nil
+local function getLeaderboardViewChangeTelemetry()
+	if leaderboardViewChangeTelemetry == nil then
+		local LeaderboardViewChangeTelemetry = require(parent.Common.LeaderboardViewChangeTelemetry)
+		leaderboardViewChangeTelemetry = LeaderboardViewChangeTelemetry
+	end
 
-	if FFlagPlayerListReskinOptimization then
-		v21 = React.useMemo(function() -- line: 41
-			-- upvalues: CreateLayoutValues (copy), t1 (copy)
-			return CreateLayoutValues(t1.isTenFoot or false, t1.TopBarConstants)
-		end, {
-			t1.isTenFoot,
-			t1.TopBarConstants
-		})
-		v22 = React.useMemo(function() -- line: 44
-			-- upvalues: FocusNavigationService (copy), ReactFocusNavigation (copy)
+	return leaderboardViewChangeTelemetry
+end
+
+local function fn(props)
+	local v, v2
+
+	if FFlagPlayerListReskin then
+		v = React.useMemo(function()
+			return CreateLayoutValues(props.isTenFoot or false, props.TopBarConstants)
+		end, { props.isTenFoot, props.TopBarConstants })
+		v2 = React.useMemo(function()
 			return FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 		end, {})
 	else
-		v21 = CreateLayoutValues(t1.isTenFoot or false, t1.TopBarConstants)
-		v22 = FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+		v = CreateLayoutValues(props.isTenFoot or false, props.TopBarConstants)
+		v2 = FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
 	end
 
-	local v23 = SignalsReact.useSignalState(t1.leaderboardStore)
+	local v3 = SignalsReact.useSignalState(props.leaderboardStore)
 
 	if FFlagEnablePlayerListExposureEvents then
-		React.useEffect(function() -- line: 54
-			-- upvalues: IXPService (copy), FStringPlayerListIXPLayer (copy)
+		React.useEffect(function()
 			IXPService:LogFlagLinkedUserLayerExposure(FStringPlayerListIXPLayer)
 		end, {})
 	end
 
-	local v24 = if not FFlagPlayerListTwoTabs then t1.children else React.createElement(PlatformLeaderboardContainer, {}, t1.children)
-	local v25 = React.createElement(LeaderboardStoreContext.Provider, {
-		value = v23
-	}, {
-		LayoutValuesProvider = React.createElement(LayoutValuesContext.Provider, {
-			value = v21
-		}, if not FFlagAddNewPlayerListFocusNav then v24 else {
-			FocusNavigationProvider = React.createElement(FocusNavigationContext.Provider, {
-				value = v22
-			}, v24)
-		})
+	local localization
+
+	if FFlagPlayerListLocalizeGameText then
+		localization = React.useMemo(function()
+			return InExperienceLocales.Localization.new(LocalizationService.RobloxLocaleId)
+		end, {})
+	end
+
+	if FFlagPlayerListReskin then
+		React.useEffect(function()
+			local v4 = false
+			return Signals.createEffect(function(p)
+				local effectiveVisible = PlayerListVisibilityStore.getEffectiveVisible(p)
+
+				if not v4 then
+					v4 = true
+
+					return
+				end
+
+				if leaderboardViewChangeTelemetry == nil then
+					local LeaderboardViewChangeTelemetry = require(parent.Common.LeaderboardViewChangeTelemetry)
+					leaderboardViewChangeTelemetry = LeaderboardViewChangeTelemetry
+				end
+
+				leaderboardViewChangeTelemetry.logVisibility(effectiveVisible, true)
+			end)
+		end, {})
+	end
+
+	local v4
+
+	if FFlagPlayerListReskin then
+		v4 = React.createElement(PlatformLeaderboardContainer, {}, props.children)
+	else
+		v4 = props.children
+	end
+
+	local v5 = React.createElement(LeaderboardStoreContext.Provider, { value = v3 }, {
+		LayoutValuesProvider = React.createElement(
+			LayoutValuesContext.Provider,
+			{ value = v },
+			FFlagAddNewPlayerListFocusNav and {
+				FocusNavigationProvider = React.createElement(FocusNavigationContext.Provider, {
+					value = v2
+				}, v4)
+			} or v4
+		)
 	})
 
-	if FFlagPlayerListLocalizeGameText and t1.translateGameText then
-		return React.createElement(GameTextTranslatorContext.Provider, {
-			value = t1.translateGameText
+	if FFlagPlayerListLocalizeGameText and props.translateGameText then
+		v5 = React.createElement(GameTextTranslatorContext.Provider, {
+			value = props.translateGameText
 		}, {
-			LeaderboardStoreProvider = v25
+			LeaderboardStoreProvider = v5
 		})
 	end
 
-	return v25
-end)
+	if FFlagPlayerListLocalizeGameText then
+		return React.createElement(LocalizationProvider, { localization = localization }, {
+			LeaderboardTree = v5
+		})
+	end
+
+	return v5
+end
+
+return React.memo(fn)

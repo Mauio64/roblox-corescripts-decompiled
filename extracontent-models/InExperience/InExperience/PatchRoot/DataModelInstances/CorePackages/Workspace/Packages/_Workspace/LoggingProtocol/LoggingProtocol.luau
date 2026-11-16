@@ -1,1 +1,3 @@
-return (require(script.LoggingProtocol))
+local LoggingProtocol = require(script.LoggingProtocol)
+
+return LoggingProtocol

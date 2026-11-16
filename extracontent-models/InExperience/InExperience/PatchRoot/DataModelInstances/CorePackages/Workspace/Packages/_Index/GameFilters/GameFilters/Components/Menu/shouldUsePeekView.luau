@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
-local Responsive = require(Parent.Responsive)
+local parent = script:FindFirstAncestor("GameFilters").Parent
+local Responsive = require(parent.Responsive)
 local useBreakpointXOrSmaller = Responsive.useBreakpointXOrSmaller
 
-local function shouldUsePeekView() -- line: 7
-	-- upvalues: useBreakpointXOrSmaller (copy), Responsive (copy)
+local function shouldUsePeekView()
 	return useBreakpointXOrSmaller(Responsive.Keys.Small)
 end
 

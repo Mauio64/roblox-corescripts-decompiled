@@ -1,110 +1,105 @@
 local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
-local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
-local React = require(ServerTriggeredModalsParent.React)
-local RobloxAppEnums = require(ServerTriggeredModalsParent.RobloxAppEnums)
-local CentralOverlay = require(ServerTriggeredModalsParent.CentralOverlay)
-local useSignalState = require(ServerTriggeredModalsParent.SignalsReact).useSignalState
-local useDispatch = require(ServerTriggeredModalsParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local RoactNavigation = require(ServerTriggeredModalsParent.RoactNavigation)
-local SharedFlags = require(ServerTriggeredModalsParent.SharedFlags)
-local SduiSharedUtilities = require(ServerTriggeredModalsParent.SduiSharedUtilities)
+local parent = ServerTriggeredModals.Parent
+
+local React = require(parent.React)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local CentralOverlay = require(parent.CentralOverlay)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactNavigation = require(parent.RoactNavigation)
+local SharedFlags = require(parent.SharedFlags)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+
 local AppPage = RobloxAppEnums.AppPage
 local CentralOverlayType = RobloxAppEnums.CentralOverlayType
 local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
 local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
 local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
+
 local useModalSignalStore = require(ServerTriggeredModals.SignalStores.useModalSignalStore)
 local EntryPoint = require(ServerTriggeredModals.EntryPoint)
 local fetchPrompts = require(ServerTriggeredModals.SduiV2.fetchPrompts)
 local PromptsEntryPoint = require(ServerTriggeredModals.SduiV2.PromptsEntryPoint)
 local PromptStyle = require(ServerTriggeredModals.SduiV2.PromptStyle)
 local usePromptEntries = require(ServerTriggeredModals.SduiV2.usePromptEntries)
+
 local FFlagSduiAllowNoConfigsBuilt = SharedFlags.FFlagSduiAllowNoConfigsBuilt
 local FFlagEnableHomepagePromptsForModalsAndBanners = SharedFlags.FFlagEnableHomepagePromptsForModalsAndBanners
 local FFlagPromptsImpressionUsesTitle = SharedFlags.FFlagPromptsImpressionUsesTitle
 
-local function isValidPromptEntry(t1: {[any]: any}?) -- line: 38
-	return t1 ~= nil and (t1.config ~= nil and (t1.identifier ~= nil and (t1.robloxComponentType ~= nil and t1.title ~= nil)))
+local function isValidPromptEntry(data): boolean -- 1 equivalent call inferred from this helper
+	return data ~= nil
+		and data.config ~= nil
+		and data.identifier ~= nil
+		and data.robloxComponentType ~= nil
+		and data.title ~= nil
 end
-local function CheckForPrompts(t2: {[any]: any}) -- line: 46
-	-- upvalues: useDispatch (copy), useModalSignalStore (copy), useSignalState (copy), EntryPoint (copy), React (copy), PromptsEntryPoint (copy), FFlagSduiAllowNoConfigsBuilt (copy), SduiLoadTimer (copy), fetchPrompts (copy), FFlagEnableHomepagePromptsForModalsAndBanners (copy), usePromptEntries (copy), PromptStyle (copy), getSduiApiStore (copy), SetCentralOverlay (copy), CentralOverlayType (copy), AppPage (copy), FFlagPromptsImpressionUsesTitle (copy)
-	local v30 = useDispatch()
-	local v31 = useModalSignalStore()
-	local v32 = useSignalState(v31.getMetadataGetter(EntryPoint.HomepageLaunch))
-	local v33 = useSignalState(v31.getHasShownGetter(EntryPoint.HomepageLaunch))
-	local isFocused = t2.isFocused
-	local v35 = React.useMemo(function() -- line: 53
-		-- upvalues: PromptsEntryPoint (copy), FFlagSduiAllowNoConfigsBuilt (copy), SduiLoadTimer (copy)
+
+local function CheckForPrompts(p): nil
+	local v = useDispatch()
+	local v2 = useModalSignalStore()
+	local v3 = useSignalState(v2.getMetadataGetter(EntryPoint.HomepageLaunch))
+	local v4 = useSignalState(v2.getHasShownGetter(EntryPoint.HomepageLaunch))
+	local isFocused = p.isFocused
+
+	local v5 = React.useMemo(function()
 		return {
+			entryPoint = PromptsEntryPoint.HomepageLaunch,
 			surfaceKey = "HomepagePrompts",
 			configKey = "HomepagePrompts",
 			clearOnEmptyResponse = true,
+			allowNoConfigsBuilt = FFlagSduiAllowNoConfigsBuilt and true or nil,
+			loadTimer = SduiLoadTimer.createLoadTimer("HomepagePrompts"),
 			clientAttributes = nil,
-			entryPoint = PromptsEntryPoint.HomepageLaunch,
-			allowNoConfigsBuilt = not not FFlagSduiAllowNoConfigsBuilt or nil,
-			loadTimer = SduiLoadTimer.createLoadTimer("HomepagePrompts")
+			replaceOnFetch = nil,
+			promptStyles = nil
 		}
 	end, {})
 
-	React.useEffect(function() -- line: 65
-		-- upvalues: fetchPrompts (copy), v35 (copy)
-		fetchPrompts(v35)
-	end, { v35 })
-
-	local u36
+	React.useEffect(function()
+		fetchPrompts(v5)
+	end, { v5 })
+	local v6
 
 	if FFlagEnableHomepagePromptsForModalsAndBanners then
-		u36 = usePromptEntries("HomepagePrompts", PromptStyle.Modal)[1]
+		v6 = usePromptEntries("HomepagePrompts", PromptStyle.Modal)[1]
 	else
-		local v37 = React.useCallback(function(p1) -- line: 75
-			-- upvalues: getSduiApiStore (copy)
-			local v39 = getSduiApiStore().getData("HomepagePrompts").data(p1)
-
-			return v39 and v39.HomepagePrompts
-		end, {})
-
-		u36 = useSignalState(v37)
+		v6 = useSignalState((React.useCallback(function(p2)
+			local data = getSduiApiStore().getData("HomepagePrompts").data(p2)
+			return data and data.HomepagePrompts
+		end, {})))
 	end
 
-	React.useEffect(function() -- line: 83
-		-- upvalues: v33 (copy), v32 (copy), isFocused (copy), u36 (ref), v31 (copy), EntryPoint (copy), v30 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), AppPage (copy), FFlagPromptsImpressionUsesTitle (copy)
-		if v33 then
+	React.useEffect(function()
+		if v4 or v3 or not isFocused or not isValidPromptEntry(v6) then -- inferred equivalent call
 			return
 		end
 
-		if v32 then
-			return
-		end
-
-		if not isFocused then
-			return
-		end
-
-		local v40 = u36
-
-		if v40 == nil or (v40.config == nil or (v40.identifier == nil or (v40.robloxComponentType == nil or v40.title == nil))) then
-			return
-		end
-
-		v31.setHasShown(EntryPoint.HomepageLaunch, true)
-		v30(SetCentralOverlay(CentralOverlayType.SduiPromptModal, {
+		v2.setHasShown(EntryPoint.HomepageLaunch, true)
+		local sduiPromptModal = CentralOverlayType.SduiPromptModal
+		local v7 = {
 			configKey = "HomepagePrompts",
 			appPage = AppPage.Home,
-			modalId = u36.identifier,
-			modalType = if not FFlagPromptsImpressionUsesTitle then u36.robloxComponentType else u36.title
-		}))
-	end, {
-		v33,
-		v32,
-		isFocused,
-		v30,
-		v31,
-		u36
-	})
+			modalId = v6.identifier,
+			modalType = 0
+		}
+		local modalType
+
+		if FFlagPromptsImpressionUsesTitle then
+			modalType = v6.title
+		else
+			modalType = v6.robloxComponentType
+		end
+
+		v7.modalType = modalType
+		v(SetCentralOverlay(sduiPromptModal, v7))
+	end, { v4, v3, isFocused, v, v2, v6 })
 
 	return nil
 end
 
-local v27 = RoactNavigation.withNavigationFocus(CheckForPrompts)
+local v = RoactNavigation.withNavigationFocus(CheckForPrompts)
 
-return React.memo(v27)
+return React.memo(v)

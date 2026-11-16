@@ -1,62 +1,70 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
+local parent = script.Parent
+local parent2 = parent.Parent
+
 local GuiService = game:GetService("GuiService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local GamepadService = game:GetService("GamepadService")
+local CoreGui = game:GetService("CoreGui")
+CoreGui:WaitForChild("RobloxGui")
 
-game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local SharedFlags = require(parent2.SharedFlags)
 
-local FFlagVCWasDisabledFromMenuOpen = require(scriptParentParent.SharedFlags).FFlagVCWasDisabledFromMenuOpen
-local Input = require(scriptParent:WaitForChild("Input"))
-local Interface = require(scriptParent:WaitForChild("Interface"))
-local OnRenderStep = require(scriptParent:WaitForChild("OnRenderStep"))
-local u11 = nil
-local connection = nil
-local connection2 = nil
-local u14 = false
-local u15 = false
+local FFlagVCWasDisabledFromMenuOpen = SharedFlags.FFlagVCWasDisabledFromMenuOpen
 
-local function enableVirtualCursor(p1) -- line: 39
-	-- upvalues: u11 (ref), Interface (copy), GamepadService (copy), Input (copy), RunService (copy), connection2 (ref), GuiService (copy), FFlagVCWasDisabledFromMenuOpen (copy), u15 (ref)
-	if not u11 then
+local Input = require(parent:WaitForChild("Input"))
+local Interface = require(parent:WaitForChild("Interface"))
+local OnRenderStep = require(parent:WaitForChild("OnRenderStep"))
+
+local v = nil
+local lastInputTypeChangedConnection = nil
+local menuOpenedConnection = nil
+local v2 = false
+local v3 = false
+
+local function enableVirtualCursor(mouseLocation)
+	if not v then
 		return
 	end
 
-	local v20 = p1 or u11.CursorPosition
+	local cursorPosition = mouseLocation or v.CursorPosition
 
-	u11.Enabled = true
-	u11.CursorPosition = v20
-	Interface:EnableUI(v20)
-	GamepadService:SetGamepadCursorPosition(v20)
+	v.Enabled = true
+	v.CursorPosition = cursorPosition
+
+	Interface:EnableUI(cursorPosition)
+	GamepadService:SetGamepadCursorPosition(cursorPosition)
 	Input:EnableInput()
 	Input:DisablePreview()
-	RunService:BindToRenderStep("VirtualCursorStepped", Enum.RenderPriority.Input.Value + 1, u11.OnRenderStep)
-	connection2 = GuiService.MenuOpened:Connect(function() -- line: 59
-		-- upvalues: FFlagVCWasDisabledFromMenuOpen (copy), u15 (ref), GamepadService (copy)
+
+	RunService:BindToRenderStep("VirtualCursorStepped", Enum.RenderPriority.Input.Value + 1, v.OnRenderStep)
+
+	menuOpenedConnection = GuiService.MenuOpened:Connect(function()
 		if FFlagVCWasDisabledFromMenuOpen then
-			u15 = true
+			v3 = true
 		end
 
 		GamepadService.GamepadCursorEnabled = false
 	end)
 end
-local function disableVirtualCursor() -- line: 67
-	-- upvalues: u11 (ref), connection2 (ref), Interface (copy), Input (copy), RunService (copy), FFlagVCWasDisabledFromMenuOpen (copy), u15 (ref), GuiService (copy)
-	if not u11.Enabled then
+
+local function disableVirtualCursor()
+	if not v.Enabled then
 		return
 	end
 
-	connection2:Disconnect()
-	connection2 = nil
-	u11.PreviouslySelectedObject = nil
+	menuOpenedConnection:Disconnect()
+	menuOpenedConnection = nil
+	v.PreviouslySelectedObject = nil
+
 	Interface:DisableUI()
 	Input:DisableInput()
 	Input:EnablePreview()
+
 	RunService:UnbindFromRenderStep("VirtualCursorStepped")
 
-	if u11.SelectedObject then
-		if FFlagVCWasDisabledFromMenuOpen and not u15 then
+	if v.SelectedObject then
+		if FFlagVCWasDisabledFromMenuOpen and not v3 then
 			GuiService.SelectedCoreObject = nil
 		end
 
@@ -66,73 +74,70 @@ local function disableVirtualCursor() -- line: 67
 			GuiService.SelectedCoreObject = nil
 		end
 
-		u11.SelectedObject = nil
+		v.SelectedObject = nil
 	end
 
 	if FFlagVCWasDisabledFromMenuOpen then
-		u15 = false
+		v3 = false
 	end
 
-	u11.Enabled = false
+	v.Enabled = false
 end
 
-local t1 = {}
+local class = {}
+class.__index = class
 
-t1.__index = t1
-
-function t1.GetEnabled(p2) -- line: 104
-	return p2.Enabled
+function class.GetEnabled(p)
+	return p.Enabled
 end
-function t1.new() -- line: 108
-	-- upvalues: OnRenderStep (copy), connection (ref), UserInputService (copy), GamepadService (copy), u14 (ref), Input (copy), t1 (copy), u11 (ref)
-	local t2 = {
+
+function class.new()
+	local v4 = {
 		Enabled = false,
+		CursorPosition = Vector2.new(),
 		SelectedObject = nil,
-		PreviouslySelectedObject = nil,
-		CursorPosition = Vector2.new()
+		PreviouslySelectedObject = nil
 	}
 
-	function t2.OnRenderStep(p3) -- line: 116
-		-- upvalues: OnRenderStep (copy), t2 (copy)
-		OnRenderStep(t2, p3)
+	function v4.OnRenderStep(p)
+		OnRenderStep(v4, p)
 	end
 
-	connection = UserInputService.LastInputTypeChanged:Connect(function(p4) -- line: 120
-		-- upvalues: GamepadService (copy), u14 (ref)
-		if p4 ~= Enum.UserInputType.Gamepad1 and (p4 ~= Enum.UserInputType.Focus and GamepadService.GamepadCursorEnabled) then
+	lastInputTypeChangedConnection = UserInputService.LastInputTypeChanged:Connect(function(p)
+		if
+			p == Enum.UserInputType.Gamepad1
+			or p == Enum.UserInputType.Focus
+			or not GamepadService.GamepadCursorEnabled
+		then
+			if p == Enum.UserInputType.Gamepad1 and v2 then
+				GamepadService.GamepadCursorEnabled = true
+				v2 = false
+			end
+		else
 			GamepadService.GamepadCursorEnabled = false
-			u14 = true
-
-			return
-		end
-
-		if p4 == Enum.UserInputType.Gamepad1 and u14 then
-			GamepadService.GamepadCursorEnabled = true
-			u14 = false
+			v2 = true
 		end
 	end)
-	Input:EnablePreview()
-	setmetatable(t2, t1)
-	u11 = t2
 
-	return t2
+	Input:EnablePreview()
+
+	setmetatable(v4, class)
+
+	v = v4
+
+	return v4
 end
 
-GamepadService:GetPropertyChangedSignal("GamepadCursorEnabled"):Connect(function() -- line: 143
-	-- upvalues: GamepadService (copy), u11 (ref), UserInputService (copy), enableVirtualCursor (copy), disableVirtualCursor (copy)
-	local GamepadCursorEnabled = GamepadService.GamepadCursorEnabled
+GamepadService:GetPropertyChangedSignal("GamepadCursorEnabled"):Connect(function()
+	local gamepadCursorEnabled = GamepadService.GamepadCursorEnabled
 
-	if u11 then
-		if GamepadCursorEnabled then
-			local MouseLocation = UserInputService:GetMouseLocation()
-
-			enableVirtualCursor(MouseLocation)
-
-			return
+	if v then
+		if gamepadCursorEnabled then
+			enableVirtualCursor(UserInputService:GetMouseLocation())
+		else
+			disableVirtualCursor()
 		end
-
-		disableVirtualCursor()
 	end
 end)
 
-return t1.new()
+return class.new()

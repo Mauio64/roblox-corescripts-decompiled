@@ -1,16 +1,22 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
-local Roact = require(ParentParent2.Roact)
-local t = require(ParentParent2.t)
-local ButtonStack = require(ParentParent.Button.ButtonStack)
-local CloseButtonIcon = require(script.Parent.Enum.CloseButtonIcon)
-local FitFrameVertical = require(ParentParent2.FitFrame).FitFrameVertical
-local ModalTitle = require(scriptParent.ModalTitle)
-local ModalWindow = require(scriptParent.ModalWindow)
-local v11 = Roact.PureComponent:extend("PartialPageModal")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent.Parent
 
-v11.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local t = require(parent3.t)
+
+local ButtonStack = require(parent2.Button.ButtonStack)
+local CloseButtonIcon = require(script.Parent.Enum.CloseButtonIcon)
+
+local FitFrame = require(parent3.FitFrame)
+local FitFrameVertical = FitFrame.FitFrameVertical
+
+local ModalTitle = require(parent.ModalTitle)
+local ModalWindow = require(parent.ModalWindow)
+
+local extended = Roact.PureComponent:extend("PartialPageModal")
+
+extended.validateProps = t.strictInterface({
 	screenSize = t.Vector2,
 	[Roact.Children] = t.table,
 	position = t.optional(t.UDim2),
@@ -29,71 +35,79 @@ v11.validateProps = t.strictInterface({
 	onCloseClicked = t.optional(t.callback),
 	contentPadding = t.optional(t.UDim)
 })
-v11.defaultProps = {
-	marginSize = 24,
-	closeButtonIcon = CloseButtonIcon.Close
-}
 
-function v11.render(p1) -- line: 66
-	-- upvalues: ModalWindow (copy), Roact (copy), ModalTitle (copy), FitFrameVertical (copy), ButtonStack (copy)
-	local screenSize = p1.props.screenSize
-	local v14 = p1.props.bottomPadding or 24
+extended.defaultProps = { marginSize = 24, closeButtonIcon = CloseButtonIcon.Close }
 
-	if not ModalWindow:isFullWidth(screenSize.X) then
-		v14 = 24
-	end
+function extended.render(p)
+	local screenSize = p.props.screenSize
+	local bottomPadding = p.props.bottomPadding or 24
 
-	return Roact.createElement(ModalWindow, {
+	local bottom = not ModalWindow:isFullWidth(screenSize.X) and 24 or bottomPadding
+
+	local createElement = Roact.createElement
+	local v = {
 		isFullHeight = false,
 		screenSize = screenSize,
-		position = p1.props.position,
-		anchorPoint = p1.props.anchorPoint
-	}, {
+		position = p.props.position,
+		anchorPoint = p.props.anchorPoint
+	}
+	local v2 = {
 		TitleContainer = Roact.createElement(ModalTitle, {
-			title = p1.props.title,
-			titleBackgroundImageProps = p1.props.titleBackgroundImageProps,
-			closeButtonIcon = p1.props.closeButtonIcon,
-			onCloseClicked = p1.props.onCloseClicked
+			title = p.props.title,
+			titleBackgroundImageProps = p.props.titleBackgroundImageProps,
+			closeButtonIcon = p.props.closeButtonIcon,
+			onCloseClicked = p.props.onCloseClicked
 		}),
-		Content = Roact.createElement(FitFrameVertical, {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Position = UDim2.new(0, 0, 0, ModalTitle.TITLE_HEIGHT),
-			width = UDim.new(1, 0),
-			margin = {
-				top = 0,
-				left = 0,
-				right = 0,
-				bottom = v14
-			},
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			contentPadding = p1.props.contentPadding
-		}, {
-			MiddlContent = Roact.createElement(FitFrameVertical, {
-				BackgroundTransparency = 1,
-				width = UDim.new(1, -2 * p1.props.marginSize)
-			}, p1.props[Roact.Children]),
-			Buttons = p1.props.buttonStackProps and Roact.createElement(FitFrameVertical, {
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				width = UDim.new(1, 0)
-			}, {
+		Content = 0
+	}
+
+	local createElement2 = Roact.createElement
+	local v3 = {
+		Position = UDim2.new(0, 0, 0, ModalTitle.TITLE_HEIGHT),
+		width = UDim.new(1, 0),
+		margin = { top = 0, bottom = bottom, left = 0, right = 0 },
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		BackgroundTransparency = 1,
+		contentPadding = p.props.contentPadding,
+		LayoutOrder = 1
+	}
+
+	local v4 = {
+		MiddlContent = Roact.createElement(FitFrameVertical, {
+			width = UDim.new(1, -2 * p.props.marginSize),
+			BackgroundTransparency = 1
+		}, p.props[Roact.Children]),
+		Buttons = p.props.buttonStackProps and Roact.createElement(
+			FitFrameVertical,
+			{ BackgroundTransparency = 1, width = UDim.new(1, 0), LayoutOrder = 2 },
+			{
 				Padding = Roact.createElement("UIPadding", {
 					PaddingLeft = UDim.new(0, 24),
 					PaddingRight = UDim.new(0, 24)
 				}),
-				Roact.createElement(ButtonStack, p1.props.buttonStackProps)
-			}),
-			BottomFrame = if not p1.props.footerContent then nil else Roact.createElement("Frame", {
+				Roact.createElement(ButtonStack, p.props.buttonStackProps)
+			}
+		),
+		BottomFrame = 0
+	}
+	local bottomFrame
+
+	if p.props.footerContent then
+		bottomFrame = Roact.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 0, 0),
 				LayoutOrder = 3,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, 0),
 				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				FooterContent = p1.props.footerContent()
-			})
-		})
-	})
+			},
+			{ FooterContent = p.props.footerContent() }
+		)
+	end
+
+	v4.BottomFrame = bottomFrame
+	v2.Content = createElement2(FitFrameVertical, v3, v4)
+	return createElement(ModalWindow, v, v2)
 end
 
-return v11
+return extended

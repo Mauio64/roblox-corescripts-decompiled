@@ -1,65 +1,65 @@
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local _ = require(Parent.Time).DateTime
-local Localization = require(Parent.RobloxAppLocales).Localization
+
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local v = require(parent.Time)
+v = v.DateTime
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
+
 local RobloxLocaleId = LocalizationService.RobloxLocaleId
-local v6 = Localization.new(RobloxLocaleId)
+local v2 = Localization.new(RobloxLocaleId)
 
-return function(p1) -- line: 20
-	-- upvalues: v6 (copy)
-	local v8 = DateTime.now().UnixTimestamp - p1.dateTime.UnixTimestamp
+return function(object)
+	local v3 = DateTime.now().UnixTimestamp - object.dateTime.UnixTimestamp
 
-	if v8 < 60 then
-		return v6:Format("Feature.Chat.Label.TimestampNow")
+	if v3 < 60 then
+		return v2:Format("Feature.Chat.Label.TimestampNow")
 	end
 
-	if v8 < 3600 then
-		local v9 = math.floor(v8 / 60)
+	if v3 < 3600 then
+		local num_minutes = math.floor(v3 / 60)
 
-		if v9 == 1 then
-			return v6:Format("Feature.Chat.Label.TimestampOneMinuteAbbreviated")
+		if num_minutes == 1 then
+			return v2:Format("Feature.Chat.Label.TimestampOneMinuteAbbreviated")
 		end
 
-		return v6:Format("Feature.Chat.Label.TimestampMinutesAbbreviatedPlural", {
-			num_minutes = v9
+		return v2:Format("Feature.Chat.Label.TimestampMinutesAbbreviatedPlural", {
+			num_minutes = num_minutes
 		})
-	end
+	elseif v3 < 86400 then
+		local num_hours = math.floor(v3 / 3600)
 
-	if v8 < 86400 then
-		local v10 = math.floor(v8 / 3600)
-
-		if v10 == 1 then
-			return v6:Format("Feature.Chat.Label.TimestampOneHourAbbreviated")
+		if num_hours == 1 then
+			return v2:Format("Feature.Chat.Label.TimestampOneHourAbbreviated")
 		end
 
-		return v6:Format("Feature.Chat.Label.TimestampHoursAbbreviatedPlural", {
-			num_hours = v10
+		return v2:Format("Feature.Chat.Label.TimestampHoursAbbreviatedPlural", {
+			num_hours = num_hours
 		})
-	end
+	elseif v3 < 604800 then
+		local num_days = math.floor(v3 / 86400)
 
-	if v8 < 604800 then
-		local v11 = math.floor(v8 / 86400)
-
-		if v11 == 1 then
-			return v6:Format("Feature.Chat.Label.TimestampOneDayAbbreviated")
+		if num_days == 1 then
+			return v2:Format("Feature.Chat.Label.TimestampOneDayAbbreviated")
 		end
 
-		return v6:Format("Feature.Chat.Label.TimestampDaysAbbreviatedPlural", {
-			num_days = v11
+		return v2:Format("Feature.Chat.Label.TimestampDaysAbbreviatedPlural", {
+			num_days = num_days
 		})
-	end
-
-	if v8 < 2592000 then
-		local v12 = math.floor(v8 / 604800)
-
-		if v12 == 1 then
-			return v6:Format("Feature.Chat.Label.TimestampOneWeekAbbreviated")
+	else
+		if not (v3 < 2592000) then
+			return object:Format("ll")
 		end
 
-		return v6:Format("Feature.Chat.Label.TimestampWeeksAbbreviatedPlural", {
-			num_weeks = v12
+		local num_weeks = math.floor(v3 / 604800)
+
+		if num_weeks == 1 then
+			return v2:Format("Feature.Chat.Label.TimestampOneWeekAbbreviated")
+		end
+
+		return v2:Format("Feature.Chat.Label.TimestampWeeksAbbreviatedPlural", {
+			num_weeks = num_weeks
 		})
 	end
-
-	return p1:Format("ll")
 end

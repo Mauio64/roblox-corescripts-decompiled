@@ -1,56 +1,57 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local useIdFallback = require(script.Parent.utils).useIdFallback
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
+local utils = require(script.Parent.utils)
+local useIdFallback = utils.useIdFallback
+
 local PresenceContext = require(script.Parent.PresenceContext)
 
-local function newChildrenMap() -- line: 36
+local function newChildrenMap()
 	return {}
 end
-local function PresenceChild(t1: {[any]: any}) -- line: 40
-	-- upvalues: React (copy), useIdFallback (copy), PresenceContext (copy)
-	if not t1.children or typeof(t1.children) == "string" then
+
+local function PresenceChild(props)
+	if not props.children or typeof(props.children) == "string" then
 		error("PresenceChild: children must be a React.Element")
 	end
 
-	if not t1.children.type then
+	if not props.children.type then
 		error("PresenceChild: children must be a React.Element")
 	end
 
-	if t1.onExitComplete and typeof(t1.onExitComplete) ~= "function" and not t1.onExitComplete._isMockFunction then
+	if
+		props.onExitComplete
+		and typeof(props.onExitComplete) ~= "function"
+		and not props.onExitComplete._isMockFunction
+	then
 		error("PresenceChild: onExitComplete must be a function")
 	end
 
-	local children = t1.children
-	local isPresent = t1.isPresent
-	local onExitComplete = t1.onExitComplete
-	local passThroughData = t1.passThroughData
-	local presenceId = t1.presenceId
+	local children = props.children
+	local isPresent = props.isPresent
+	local onExitComplete = props.onExitComplete
+	local passThroughData = props.passThroughData
+	local presenceId = props.presenceId
 	local current = React.useRef({}).current
-	local v14 = presenceId or useIdFallback()
 
-	local function handleExitComplete(s1: string) -- line: 76
-		-- upvalues: current (copy), onExitComplete (copy)
-		current[s1] = true
+	local function handleExitComplete(p: string)
+		current[p] = true
+		local v = true
 
-		local v21 = true
-
-		for _, v in pairs(current) do
-			if not v then
-				v21 = false
-
+		for _, v2 in pairs(current) do
+			if not v2 then
+				v = false
 				break
 			end
 		end
 
-		if v21 and onExitComplete then
+		if v and onExitComplete then
 			onExitComplete()
 		end
 	end
 
-	local v16 = isPresent ~= false
-	local t2 = {
-		id = v14,
-		isPresent = v16,
+	local v = {
+		id = presenceId or useIdFallback(),
+		isPresent = isPresent ~= false,
 		passThroughData = passThroughData,
 		onExitComplete = handleExitComplete
 	}
@@ -61,9 +62,7 @@ local function PresenceChild(t1: {[any]: any}) -- line: 40
 		end
 	end
 
-	return React.createElement(PresenceContext.Provider, {
-		value = t2
-	}, children)
+	return React.createElement(PresenceContext.Provider, { value = v }, children)
 end
 
 return PresenceChild

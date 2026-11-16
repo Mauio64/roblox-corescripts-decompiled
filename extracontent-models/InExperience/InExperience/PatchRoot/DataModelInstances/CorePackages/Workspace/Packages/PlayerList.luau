@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.PlayerList.PlayerList))
+local PlayerList = require(Workspace.PlayerList.PlayerList)
+
+return PlayerList

@@ -1,9 +1,31 @@
-return {
-	SplitPaneStore = require(script.Stores.SplitPaneStore),
-	useSplitLayoutStatus = require(script.Hooks.useSplitLayoutStatus),
-	useSplitPaneRender = require(script.Hooks.useSplitPaneRender),
-	SplitPaneContext = require(script.Context.SplitPaneContext),
-	SplitPaneNavigationLayout = require(script.Components.SplitPaneNavigationLayout),
-	isSupportPaneScreen = require(script.Utils.isSupportPaneScreen),
-	["jest.config"] = script["jest.config"]
-}
+local AppSplitView = require(script.Parent.AppSplitView)
+
+local SplitPane = {}
+SplitPane.SplitPaneStore = require(script.Stores.SplitPaneStore)
+SplitPane.SplitPaneTelemetry = require(script.Telemetry.SplitPaneTelemetry)
+SplitPane.useSplitLayoutStatus = require(script.Hooks.useSplitLayoutStatus)
+SplitPane.useSplitPaneRender = require(script.Hooks.useSplitPaneRender)
+SplitPane.SplitPaneContext = require(script.Context.SplitPaneContext)
+SplitPane.PaneHostContext = require(script.Context.PaneHostContext)
+SplitPane.SplitPaneNavigationLayout = require(script.Components.SplitPaneNavigationLayout)
+SplitPane.isSupportPaneScreen = require(script.Utils.isSupportPaneScreen)
+SplitPane.isSupportPaneTopRoute = require(script.Utils.isSupportPaneTopRoute)
+local supportPaneInputRules = require(script.Utils.supportPaneInputRules)
+SplitPane.expandSupportPaneIfCollapsed = supportPaneInputRules.expandSupportPaneIfCollapsed
+SplitPane.routeIdentityMatches = require(script.Utils.routeIdentityMatches)
+SplitPane.SplitPaneVariant = require(script.Utils.SplitPaneVariant)
+SplitPane.getOnScreenContextValue = require(script.Utils.getOnScreenContextValue)
+SplitPane.OnScreenCardProvider = require(script.Components.OnScreenCardProvider)
+SplitPane.OnScreenStore = require(script.Stores.OnScreenStore)
+SplitPane.createNavigationHandle = require(script.Utils.createNavigationHandle)
+SplitPane.routeIdentity = require(script.Utils.routeIdentity)
+SplitPane.NavigateDownWithHandle = require(script.Thunks.NavigateDownWithHandle)
+SplitPane.SplitPaneSlot = AppSplitView.Enums.SplitPaneSlot
+SplitPane.SplitL3SessionHelper = require(script.Utils.SplitL3SessionHelper)
+SplitPane.SplitL3SessionManager = require(script.Components.SplitL3SessionManager)
+SplitPane.SupportPaneMode = AppSplitView.Enums.SupportPaneMode
+SplitPane["jest.config"] = script["jest.config"]
+SplitPane.getSplitPaneEducationalTourStore = require(script.Stores.getSplitPaneEducationalTourStore)
+SplitPane.SplitPaneEducationalTourCollapsedControl = require(script.Components.SplitPaneEducationalTourCollapsedControl)
+SplitPane.isSplitPaneTourSupported = require(script.Utils.isSplitPaneTourSupported)
+return SplitPane

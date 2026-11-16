@@ -1,8 +1,4 @@
-local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent.Parent
+local enumerate = require(parent.enumerate)
 
-return require(ParentParent.enumerate)("RetrievalStatus", {
-	"NotStarted",
-	"Fetching",
-	"Done",
-	"Failed"
-})
+return enumerate("RetrievalStatus", { "NotStarted", "Fetching", "Done", "Failed" })

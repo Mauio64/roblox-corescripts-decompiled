@@ -1,40 +1,40 @@
-local Parent = script:FindFirstAncestor("IAPExperience").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local View = Foundation.View
-local FoundationText = Foundation.Text
-local combineReactTags = require(Parent.RoactUtils).combineReactTags
-local FFlagPurchasePromptFetchCartPricing = require(Parent.SharedFlags).FFlagPurchasePromptFetchCartPricing
+local parent = script:FindFirstAncestor("IAPExperience").Parent
 
-local function PriceLineItem(t1: {[any]: any}) -- line: 26
-	-- upvalues: React (copy), combineReactTags (copy), View (copy), FoundationText (copy), FFlagPurchasePromptFetchCartPricing (copy)
-	local v10 = t1.textStyle or "text-body-small content-emphasis"
-	local v11 = React.useMemo(function() -- line: 28
-		-- upvalues: combineReactTags (copy), v10 (copy)
-		return combineReactTags("auto-y", v10, "content-emphasis", "text-align-x-left")
-	end, { v10 })
-	local v12 = React.useMemo(function() -- line: 31
-		-- upvalues: combineReactTags (copy), v10 (copy)
-		return combineReactTags("auto-y", v10, "content-emphasis", "text-align-x-right")
-	end, { v10 })
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local Text = Foundation.Text
+
+local RoactUtils = require(parent.RoactUtils)
+local combineReactTags = RoactUtils.combineReactTags
+
+local function PriceLineItem(props)
+	local textStyle = props.textStyle or "text-body-small content-emphasis"
+	local tag = React.useMemo(function()
+		return combineReactTags("auto-y", textStyle, "content-emphasis", "text-align-x-left", "text-wrap")
+	end, { textStyle })
+	local tag2 = React.useMemo(function()
+		return combineReactTags("auto-y", textStyle, "content-emphasis", "text-align-x-right")
+	end, { textStyle })
 
 	return React.createElement(View, {
-		LayoutOrder = t1.LayoutOrder,
-		tag = t1.tag or "row size-full-0 auto-y align-y-center padding-x-xsmall"
+		LayoutOrder = props.LayoutOrder,
+		tag = props.tag or "row size-full-0 auto-y align-y-top padding-x-xsmall"
 	}, {
-		Label = React.createElement(FoundationText, {
+		Label = React.createElement(Text, {
 			LayoutOrder = 1,
-			Text = t1.label,
-			Size = UDim2.new(0.5, 0, 0, 0),
-			tag = v11,
-			RichText = not not FFlagPurchasePromptFetchCartPricing or nil
+			Text = props.label,
+			Size = UDim2.new(0.8, 0, 0, 0),
+			tag = tag,
+			RichText = true
 		}),
-		Amount = React.createElement(FoundationText, {
+		Amount = React.createElement(Text, {
 			LayoutOrder = 2,
-			RichText = true,
-			Text = t1.amount,
-			Size = UDim2.new(0.5, 0, 0, 0),
-			tag = v12
+			Text = props.amount,
+			Size = UDim2.new(0.2, 0, 0, 0),
+			tag = tag2,
+			RichText = true
 		})
 	})
 end

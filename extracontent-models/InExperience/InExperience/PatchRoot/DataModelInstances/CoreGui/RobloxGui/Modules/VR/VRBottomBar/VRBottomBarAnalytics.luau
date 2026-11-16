@@ -1,42 +1,35 @@
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local TelemetryService = game:GetService("TelemetryService")
-local EngineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
+
+local engineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
 
 return {
-	sendEventToTelemetryV2 = function(t1: {[any]: any}) -- line: 12
-		-- upvalues: EngineFeature (copy), RbxAnalyticsService (copy), TelemetryService (copy)
-		local t2 = {
+	sendEventToTelemetryV2 = function(data)
+		local v = {
 			eventName = "coreui_vr_bottom_bar_action",
-			description = "Event fired from the client every time VRBottomBar buttons are clicked",
-			links = "https://github.rbx.com/Roblox/proto-schemas/pull/5803",
 			backends = { "EventIngest" },
 			throttlingPercentage = game:DefineFastInt("VRBottomBarActionEventThrottleHunderedthsPercent", 0),
-			lastUpdated = {
-				2025,
-				5,
-				12
-			}
-		}
-		local t3 = {
-			"addPlaceId",
-			"addUniverseId",
-			"addSessionInfo"
-		}
-		local t4 = {
-			integration_id = t1.integrationId,
-			is_toggle_on = tostring(t1.isToggleOn),
-			source = t1.source
+			lastUpdated = { 2025, 5, 12 },
+			description = "Event fired from the client every time VRBottomBar buttons are clicked",
+			links = "https://github.rbx.com/Roblox/proto-schemas/pull/5803"
 		}
 
-		if EngineFeature then
-			table.insert(t3, "addPlaySessionId")
+		local standardizedFields = { "addPlaceId", "addUniverseId", "addSessionInfo" }
+		local customFields = {
+			integration_id = data.integrationId,
+			is_toggle_on = tostring(data.isToggleOn),
+			source = data.source
+		}
+
+		if engineFeature then
+			table.insert(standardizedFields, "addPlaySessionId")
 		else
-			t4.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+			customFields.playsessionid = RbxAnalyticsService:GetPlaySessionId()
 		end
 
-		TelemetryService:LogEvent(t2, {
-			standardizedFields = t3,
-			customFields = t4
+		TelemetryService:LogEvent(v, {
+			standardizedFields = standardizedFields,
+			customFields = customFields
 		})
 	end
 }

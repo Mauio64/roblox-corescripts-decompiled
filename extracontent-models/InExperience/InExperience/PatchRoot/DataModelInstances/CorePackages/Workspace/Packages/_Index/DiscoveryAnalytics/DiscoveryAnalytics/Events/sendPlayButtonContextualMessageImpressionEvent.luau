@@ -1,41 +1,36 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("PlayButtonContextualMessageImpressionHundredthsPercent", 10000)
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local defineFastInt = game:DefineFastInt("PlayButtonContextualMessageImpressionHundredthsPercent", 10000)
+
+local strictInterface = t.strictInterface({
 	universeId = t.string,
 	playabilityStatus = t.optional(t.string),
 	contextualMessage = t.string
 })
-local t1 = {
+
+local v = {
 	eventName = "playButtonContextualMessageImpression",
 	description = "Impressions for play button contextual message",
 	backends = { "EventIngest" },
-	throttlingPercentage = v5,
-	lastUpdated = {
-		26,
-		5,
-		6
-	}
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 26, 5, 6 }
 }
 
-local function sendPlayButtonContextualMessageImpressionEvent(p1, s1: string?) -- line: 23
-	-- upvalues: v6 (copy), DiscoveryEventErrorLogger (copy), TelemetryService (copy), t1 (copy)
-	local v11, v12 = v6(p1)
+local function sendPlayButtonContextualMessageImpressionEvent(customFields, eventContext: string?)
+	local v2, v3 = strictInterface(customFields)
 
-	if not v11 then
-		DiscoveryEventErrorLogger.reportError("PlayButtonContextualMessageImpressionInvalidInterface", v12)
+	if not v2 then
+		DiscoveryEventErrorLogger.reportError("PlayButtonContextualMessageImpressionInvalidInterface", v3)
 	end
 
-	TelemetryService:LogEvent(t1, {
-		eventContext = s1,
-		standardizedFields = {
-			"addSessionInfo",
-			"addSessionId",
-			"addOSInfo"
-		},
-		customFields = p1
+	TelemetryService:LogEvent(v, {
+		eventContext = eventContext,
+		standardizedFields = { "addSessionInfo", "addSessionId", "addOSInfo" },
+		customFields = customFields
 	})
 end
 

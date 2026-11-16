@@ -1,27 +1,32 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local PreferencesContext = require(scriptParent.PreferencesContext)
+local parent2 = Foundation.Parent
+local React = require(parent2.React)
+
+local PreferencesContext = require(parent.PreferencesContext)
+
 local withDefaults = require(Foundation.Utility.withDefaults)
-local t1 = {
+
+local v = {
+	preferredTextSize = Enum.PreferredTextSize.Medium,
 	preferredTransparency = 1,
 	reducedMotion = false,
-	scale = 1,
-	preferredTextSize = Enum.PreferredTextSize.Medium
+	scale = 1
 }
 
-local function PreferencesProvider(p1) -- line: 30
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), PreferencesContext (copy)
-	local v10 = withDefaults({
-		preferredTextSize = p1.preferredTextSize,
-		preferredTransparency = p1.preferredTransparency,
-		reducedMotion = p1.reducedMotion
-	}, t1)
+local function PreferencesProvider(props)
+	local v2 = React.useMemo(function()
+		return withDefaults(
+			{
+				preferredTextSize = props.preferredTextSize,
+				preferredTransparency = props.preferredTransparency,
+				reducedMotion = props.reducedMotion
+			},
+			v
+		)
+	end, { props.preferredTextSize, props.preferredTransparency, props.reducedMotion })
 
-	return React.createElement(PreferencesContext.Provider, {
-		value = v10
-	}, p1.children)
+	return React.createElement(PreferencesContext.Provider, { value = v2 }, props.children)
 end
 
 return PreferencesProvider

@@ -1,35 +1,35 @@
-local ParentParent = script.Parent.Parent
-local UniversalAppPolicy = require(ParentParent.UniversalAppPolicy)
-local SharedFlags = require(ParentParent.SharedFlags)
+local parent = script.Parent.Parent
+
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagAppIaScrollAway = SharedFlags.FFlagAppIaScrollAway
 local FFlagAppIaScrollAwayGuac = SharedFlags.FFlagAppIaScrollAwayGuac
-local v6 = game:DefineFastFlag("EnableFlyoutWithScrollAway2", false)
-local FlyoutSidePanelIXP = require(ParentParent.SharedExperimentDefinition).FlyoutSidePanelIXP
+local defineFastFlag = game:DefineFastFlag("EnableFlyoutWithScrollAway2", false)
+local SharedExperimentDefinition = require(parent.SharedExperimentDefinition)
+local FlyoutSidePanelIXP = SharedExperimentDefinition.FlyoutSidePanelIXP
 
-local function getScrollAwayEnabled() -- line: 12
-	-- upvalues: FFlagAppIaScrollAway (copy), FFlagAppIaScrollAwayGuac (copy), UniversalAppPolicy (copy), v6 (copy), FlyoutSidePanelIXP (copy)
-	if not FFlagAppIaScrollAway then
+local function getScrollAwayEnabled(): boolean -- 1 equivalent call inferred from this helper
+	if
+		not FFlagAppIaScrollAway
+		or FFlagAppIaScrollAwayGuac and not UniversalAppPolicy.getAppFeaturePolicies().getAppIaScrollAwayEnabled()
+	then
 		return false
 	end
 
-	if FFlagAppIaScrollAwayGuac and not UniversalAppPolicy.getAppFeaturePolicies().getAppIaScrollAwayEnabled() then
-		return false
-	end
-
-	if v6 and FlyoutSidePanelIXP.isScrollAwayEnabled() then
+	if defineFastFlag and FlyoutSidePanelIXP.isScrollAwayEnabled() then
 		return true
 	end
 
 	return false
 end
 
-local u9 = nil
+local v = nil
 
-return function() -- line: 29
-	-- upvalues: u9 (ref), FFlagAppIaScrollAway (copy), FFlagAppIaScrollAwayGuac (copy), UniversalAppPolicy (copy), v6 (copy), FlyoutSidePanelIXP (copy)
-	if u9 == nil then
-		u9 = if FFlagAppIaScrollAway then if not FFlagAppIaScrollAwayGuac or UniversalAppPolicy.getAppFeaturePolicies().getAppIaScrollAwayEnabled() then not not v6 and not not FlyoutSidePanelIXP.isScrollAwayEnabled() else false else false
+return function()
+	if v == nil then
+		v = getScrollAwayEnabled() -- inferred equivalent call
 	end
 
-	return u9
+	return v
 end

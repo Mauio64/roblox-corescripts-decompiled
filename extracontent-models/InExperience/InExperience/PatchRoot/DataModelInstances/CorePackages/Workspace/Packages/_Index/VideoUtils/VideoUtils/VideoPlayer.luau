@@ -1,195 +1,311 @@
 local RunService = game:GetService("RunService")
-local Parent = script:FindFirstAncestor("VideoUtils").Parent
-local LoggingProtocol = require(Parent.LoggingProtocol)
-local React = require(Parent.React)
-local Responsive = require(Parent.Responsive)
 
-require(Parent.AppCommonLib)
+local parent = script:FindFirstAncestor("VideoUtils").Parent
 
+local LoggingProtocol = require(parent.LoggingProtocol)
+local React = require(parent.React)
+local Responsive = require(parent.Responsive)
+require(parent.AppCommonLib)
 local LoadableVideoFrame = require(script.Parent.LoadableVideoFrame)
 local RoundIconButton = require(script.Parent.RoundIconButton)
-local VideoActions = require(script.Parent.Analytics.Enums).VideoActions
-
+local Enums = require(script.Parent.Analytics.Enums)
+local VideoActions = Enums.VideoActions
 require(script.Parent.Analytics.VideoAnalyticsTypes)
-
 local VideoLogger = require(script.Parent.Analytics.VideoLogger)
 local VideoPlayerBottomOverlay = require(script.Parent.VideoPlayerBottomOverlay)
-local reportWarning = require(Parent.DiscoveryAnalytics).Points.reportWarning
-local FFlagLuaAppEdpMediaGalleryAutoAdvance = require(Parent.SharedFlags).FFlagLuaAppEdpMediaGalleryAutoAdvance
-local FFlagLuaAppEdpMediaGalleryFullScreen = require(Parent.SharedFlags).FFlagLuaAppEdpMediaGalleryFullScreen
-local FFlagLuaAppVideoTileDisableActivation = require(Parent.SharedFlags).FFlagLuaAppVideoTileDisableActivation
-local FFlagLuaAppVideoTileHideCenterPlayButton = require(Parent.SharedFlags).FFlagLuaAppVideoTileHideCenterPlayButton
-local FFlagLuaAppEdpConsoleMediaGalleryVideo = require(Parent.SharedFlags).FFlagLuaAppEdpConsoleMediaGalleryVideo
-local FFlagLuaAppEnableHomepageOneByTwoTile = require(Parent.SharedFlags).FFlagLuaAppEnableHomepageOneByTwoTile
-local v18 = game:DefineFastInt("VideoPlayerPlaybackEndThresholdInMs", 100) / 1000
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
 
-local function VideoPlayer(t1: {[any]: any}) -- line: 81
-	-- upvalues: FFlagLuaAppEdpMediaGalleryFullScreen (copy), React (copy), FFlagLuaAppEdpMediaGalleryAutoAdvance (copy), FFlagLuaAppEdpConsoleMediaGalleryVideo (copy), FFlagLuaAppEnableHomepageOneByTwoTile (copy), RunService (copy), reportWarning (copy), LoggingProtocol (copy), VideoLogger (copy), v18 (copy), Responsive (copy), VideoActions (copy), FFlagLuaAppVideoTileDisableActivation (copy), LoadableVideoFrame (copy), FFlagLuaAppVideoTileHideCenterPlayButton (copy), RoundIconButton (copy), VideoPlayerBottomOverlay (copy)
-	local v21 = t1.showMuteButton or FFlagLuaAppEdpMediaGalleryFullScreen and (t1.showPlayButton or t1.showProgressBar)
-	local v22, v23 = React.useState(false)
-	local v24, v25 = React.useState(t1.muted)
-	local v26 = React.useCallback(function(n1: number, n2: number) -- line: 89
-		-- upvalues: v23 (copy), t1 (copy)
-		v23(true)
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local reportWarning = DiscoveryAnalytics.Points.reportWarning
+local getVideoEdits = require(script.Parent.getVideoEdits)
 
-		if t1.onVideoLoaded then
-			t1.onVideoLoaded(n1, n2)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEdpMediaGalleryAutoAdvance = SharedFlags.FFlagLuaAppEdpMediaGalleryAutoAdvance
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppEdpMediaGalleryFullScreen = SharedFlags2.FFlagLuaAppEdpMediaGalleryFullScreen
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppVideoTileDisableActivation = SharedFlags3.FFlagLuaAppVideoTileDisableActivation
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppVideoTileHideCenterPlayButton = SharedFlags4.FFlagLuaAppVideoTileHideCenterPlayButton
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagLuaAppEdpConsoleMediaGalleryVideo = SharedFlags5.FFlagLuaAppEdpConsoleMediaGalleryVideo
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppMediaGalleryGamepadSupport = SharedFlags6.FFlagLuaAppMediaGalleryGamepadSupport
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags7.FFlagLuaAppEnableHomepageOneByTwoTile
+local SharedFlags8 = require(parent.SharedFlags)
+local FFlagLuaAppSduiVideoThumbnail = SharedFlags8.FFlagLuaAppSduiVideoThumbnail
+local SharedFlags9 = require(parent.SharedFlags)
+local FFlagLuaAppHomeMomentVideoFallback = SharedFlags9.FFlagLuaAppHomeMomentVideoFallback
+local SharedFlags10 = require(parent.SharedFlags)
+local FFlagLuaAppVideoLoadFailureFallback = SharedFlags10.FFlagLuaAppVideoLoadFailureFallback
+local SharedFlags11 = require(parent.SharedFlags)
+local FFlagLuaAppVideoPlayerTrimAndMusic = SharedFlags11.FFlagLuaAppVideoPlayerTrimAndMusic
+
+local v = game:DefineFastInt("VideoPlayerPlaybackEndThresholdInMs", 100) / 1000
+
+local function VideoPlayer(props)
+	local v2, v3
+
+	if FFlagLuaAppVideoPlayerTrimAndMusic then
+		v2, v3 = React.useMemo(function()
+			return getVideoEdits.getVideoEdits({
+				trimStartTime = props.trimStartTime,
+				trimEndTime = props.trimEndTime,
+				musicAssetId = props.musicAssetId,
+				musicStartTime = props.musicStartTime
+			})
+		end, { props.trimStartTime, props.trimEndTime, props.musicAssetId, props.musicStartTime })
+	else
+		v3 = nil
+		v2 = nil
+	end
+
+	local showMuteButton = props.showMuteButton
+		or FFlagLuaAppEdpMediaGalleryFullScreen and (props.showPlayButton or props.showProgressBar)
+
+	local state, setState = React.useState(false)
+
+	local state2, setState2 = React.useState(props.muted)
+
+	local onVideoLoaded = React.useCallback(function(p: number, p2: number)
+		setState(true)
+
+		if props.onVideoLoaded then
+			props.onVideoLoaded(p, p2)
 		end
-	end, { t1.onVideoLoaded })
+	end, { props.onVideoLoaded })
+	local v4
 
-	React.useEffect(function() -- line: 97
-		-- upvalues: t1 (copy), v24 (copy)
-		if t1.onMutedChanged then
-			t1.onMutedChanged(v24)
-		end
-	end, {
-		t1.onMutedChanged,
-		v24
-	})
+	if FFlagLuaAppVideoLoadFailureFallback then
+		v4 = React.useCallback(function(reason: string)
+			local videoAssetId = string.match(props.video, "^rbxassetid://(%d+)") or "unknown"
+			local videoAnalyticsData
 
-	local v27 = React.useCallback(function() -- line: 103
-		-- upvalues: v25 (copy), t1 (copy)
-		v25(function(p1) -- line: 104
-			-- upvalues: t1 (copy)
-			if t1.onMuteButtonActivated then
-				t1.onMuteButtonActivated(p1)
+			if props.videoAnalyticsContext then
+				videoAnalyticsData = props.videoAnalyticsContext.videoAnalyticsData
 			end
 
-			return not p1
-		end)
-	end, { t1.onMuteButtonActivated })
-	local v28 = React.useMemo(function() -- line: 112
-		-- upvalues: t1 (copy), v24 (copy), v27 (copy)
-		if t1.showMuteButton then
-			return {
-				muted = v24,
-				onMuteButtonActivated = v27
+			local formatted = `Video asset {videoAssetId} failed to load: {reason}`
+			local reportError = DiscoveryEventErrorLogger.reportError
+			local v5
+
+			if props.accessContext == nil then
+				v5 = false
+			else
+				v5 = props.accessContext ~= ""
+			end
+
+			local v6 = {
+				message = formatted,
+				videoAssetId = videoAssetId,
+				reason = reason,
+				hasAccessContext = tostring(v5),
+				source = 0,
+				sourceId = 0
 			}
+			local source
+
+			if videoAnalyticsData then
+				source = videoAnalyticsData.source
+			end
+
+			v6.source = source
+			local sourceId
+
+			if videoAnalyticsData then
+				sourceId = videoAnalyticsData.sourceId
+			end
+
+			v6.sourceId = sourceId
+			reportError("VideoLoadFailure", formatted, v6)
+
+			if props.onVideoLoadFailed then
+				props.onVideoLoadFailed(reason)
+			end
+		end, {
+			props.video,
+			props.accessContext,
+			props.videoAnalyticsContext,
+			props.onVideoLoadFailed
+		})
+	end
+
+	if FFlagLuaAppVideoPlayerTrimAndMusic then
+		local ref = React.useRef(v4)
+		ref.current = v4
+		React.useEffect(function()
+			if not v3 and props.shouldStartPlayback and ref.current then
+				ref.current("InvalidEdits")
+			end
+		end, { v3, props.shouldStartPlayback, props.video })
+	end
+
+	React.useEffect(function()
+		if props.onMutedChanged then
+			props.onMutedChanged(state2)
+		end
+	end, { props.onMutedChanged, state2 })
+
+	local onMuteButtonActivated = React.useCallback(function()
+		setState2(function(p): boolean
+			if props.onMuteButtonActivated then
+				props.onMuteButtonActivated(p)
+			end
+
+			return not p
+		end)
+	end, { props.onMuteButtonActivated })
+	local muteButtonConfig = React.useMemo(function()
+		if props.showMuteButton then
+			return { muted = state2, onMuteButtonActivated = onMuteButtonActivated }
 		end
 
 		return nil
-	end, {
-		t1.showMuteButton,
-		v24,
-		v27
-	})
-	local u29 = nil
+	end, { props.showMuteButton, state2, onMuteButtonActivated })
+	local ref
 
-	if FFlagLuaAppEdpMediaGalleryAutoAdvance or (FFlagLuaAppEdpMediaGalleryFullScreen or FFlagLuaAppEdpConsoleMediaGalleryVideo or FFlagLuaAppEnableHomepageOneByTwoTile) then
-		u29 = React.useRef(nil)
+	if
+		FFlagLuaAppEdpMediaGalleryAutoAdvance
+		or FFlagLuaAppEdpMediaGalleryFullScreen
+		or FFlagLuaAppEdpConsoleMediaGalleryVideo
+		or FFlagLuaAppEnableHomepageOneByTwoTile
+	then
+		ref = React.useRef(nil)
+	else
+		ref = nil
 	end
 
-	local u30 = nil
-	local u31 = nil
+	local progressBinding, v5
 
 	if FFlagLuaAppEdpMediaGalleryFullScreen then
-		local v32, v33 = React.useBinding(0)
-
-		u30 = v32
-		u31 = v33
+		progressBinding, v5 = React.useBinding(0)
+	else
+		v5 = nil
+		progressBinding = nil
 	end
 
 	if FFlagLuaAppEdpMediaGalleryAutoAdvance or FFlagLuaAppEdpMediaGalleryFullScreen then
-		React.useEffect(function() -- line: 139
-			-- upvalues: u29 (ref), t1 (copy), FFlagLuaAppEdpMediaGalleryAutoAdvance (copy), FFlagLuaAppEdpMediaGalleryFullScreen (copy), RunService (copy), u31 (ref)
-			local current = u29.current
+		local useEffect = React.useEffect
+		local function fn()
+			local current = ref.current
 
-			if t1.shouldStartPlayback and ((FFlagLuaAppEdpMediaGalleryAutoAdvance and t1.onVideoProgressChanged or FFlagLuaAppEdpMediaGalleryFullScreen and t1.showProgressBar) and current) then
-				local connection = RunService.RenderStepped:Connect(function() -- line: 147
-					-- upvalues: FFlagLuaAppEdpMediaGalleryAutoAdvance (copy), t1 (copy), current (copy), FFlagLuaAppEdpMediaGalleryFullScreen (copy), u31 (ref)
-					if FFlagLuaAppEdpMediaGalleryAutoAdvance and t1.onVideoProgressChanged then
-						t1.onVideoProgressChanged(not (current.TimeLength > 0) and 0 or current.TimePosition / current.TimeLength)
+			if
+				props.shouldStartPlayback
+				and (FFlagLuaAppEdpMediaGalleryAutoAdvance and props.onVideoProgressChanged or FFlagLuaAppEdpMediaGalleryFullScreen and props.showProgressBar)
+				and current
+			then
+				local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+					local v6
+
+					if FFlagLuaAppVideoPlayerTrimAndMusic and v2 and v2.trim then
+						local playbackRange, v7 = getVideoEdits.getPlaybackRange(current.TimeLength, v2.trim)
+						v6 = not (playbackRange < v7) and 0
+							or math.clamp((current.TimePosition - playbackRange) / (v7 - playbackRange), 0, 1)
 					end
 
-					if FFlagLuaAppEdpMediaGalleryFullScreen and t1.showProgressBar then
-						u31(not (current.TimeLength > 0) and 0 or current.TimePosition / current.TimeLength)
+					if FFlagLuaAppEdpMediaGalleryAutoAdvance and props.onVideoProgressChanged then
+						local onVideoProgressChanged = props.onVideoProgressChanged
+						local v7
+
+						if FFlagLuaAppVideoPlayerTrimAndMusic and v6 ~= nil then
+							v7 = v6
+						else
+							v7 = not (current.TimeLength > 0) and 0 or current.TimePosition / current.TimeLength
+						end
+
+						onVideoProgressChanged(v7)
+					end
+
+					if FFlagLuaAppEdpMediaGalleryFullScreen and props.showProgressBar then
+						if not FFlagLuaAppVideoPlayerTrimAndMusic or v6 == nil then
+							v6 = not (current.TimeLength > 0) and 0 or current.TimePosition / current.TimeLength
+						end
+
+						v5(v6)
 					end
 				end)
 
-				return function() -- line: 161
-					-- upvalues: connection (copy), FFlagLuaAppEdpMediaGalleryAutoAdvance (copy), t1 (copy), FFlagLuaAppEdpMediaGalleryFullScreen (copy), u31 (ref)
-					connection:Disconnect()
+				return function()
+					renderSteppedConnection:Disconnect()
 
-					if FFlagLuaAppEdpMediaGalleryAutoAdvance and t1.onVideoProgressChanged then
-						t1.onVideoProgressChanged(0)
+					if FFlagLuaAppEdpMediaGalleryAutoAdvance and props.onVideoProgressChanged then
+						props.onVideoProgressChanged(0)
 					end
 
-					if FFlagLuaAppEdpMediaGalleryFullScreen and t1.showProgressBar then
-						u31(0)
+					if FFlagLuaAppEdpMediaGalleryFullScreen and props.showProgressBar then
+						v5(0)
 					end
 				end
 			end
 
 			return nil
-		end, {
-			t1.shouldStartPlayback,
-			if not FFlagLuaAppEdpMediaGalleryAutoAdvance then nil else t1.onVideoProgressChanged,
-			if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else t1.showProgressBar
-		})
+		end
+
+		local shouldStartPlayback = props.shouldStartPlayback
+		local onVideoProgressChanged
+
+		if FFlagLuaAppEdpMediaGalleryAutoAdvance then
+			onVideoProgressChanged = props.onVideoProgressChanged
+		end
+
+		local showProgressBar
+
+		if FFlagLuaAppEdpMediaGalleryFullScreen then
+			showProgressBar = props.showProgressBar
+		end
+
+		local v6
+
+		if FFlagLuaAppVideoPlayerTrimAndMusic then
+			v6 = v2
+		end
+
+		useEffect(fn, { shouldStartPlayback, onVideoProgressChanged, showProgressBar, v6 })
 	end
 
 	if FFlagLuaAppEnableHomepageOneByTwoTile then
-		React.useEffect(function() -- line: 185
-			-- upvalues: t1 (copy), u29 (ref)
-			local onAspectRatioChanged = t1.onAspectRatioChanged
-			local v49 = u29 and u29.current
+		React.useEffect(function()
+			local onAspectRatioChanged = props.onAspectRatioChanged
+			local current = ref and ref.current
 
-			if not onAspectRatioChanged or not v49 then
+			if not (onAspectRatioChanged and current) then
 				return
 			end
 
-			local u50 = nil
+			local v6 = nil
+			local function report() -- 1 equivalent call inferred from this helper
+				local resolution = current.Resolution
 
-			local function report() -- line: 193
-				-- upvalues: v49 (copy), u50 (ref), onAspectRatioChanged (copy)
-				local Resolution = v49.Resolution
+				if resolution.X > 0 and resolution.Y > 0 then
+					local v7 = resolution.X / resolution.Y
 
-				if Resolution.X > 0 and Resolution.Y > 0 then
-					local v71 = Resolution.X / Resolution.Y
-
-					if v71 ~= u50 then
-						u50 = v71
-						onAspectRatioChanged(v71)
+					if v7 ~= v6 then
+						v6 = v7
+						onAspectRatioChanged(v7)
 					end
 				end
 			end
 
-			local connection = v49:GetPropertyChangedSignal("Resolution"):Connect(report)
-			local Resolution = v49.Resolution
-
-			if Resolution.X > 0 and Resolution.Y > 0 then
-				local v54 = Resolution.X / Resolution.Y
-
-				if v54 ~= u50 then
-					u50 = v54
-					onAspectRatioChanged(v54)
-				end
+			local resolutionChangedConnection = current:GetPropertyChangedSignal("Resolution"):Connect(report)
+			report() -- inferred equivalent call
+			return function()
+				resolutionChangedConnection:Disconnect()
 			end
-
-			return function() -- line: 207
-				-- upvalues: connection (copy)
-				connection:Disconnect()
-			end
-		end, { t1.onAspectRatioChanged })
+		end, { props.onAspectRatioChanged })
 	end
 
-	local u34 = nil
-	local u35 = nil
-	local u36 = nil
-	local v37 = nil
-	local v38 = nil
-	local v39 = nil
-	local v40 = nil
+	local state3 = nil
+	local setState3 = nil
+	local v6, v7, v8, playButtonConfig, progressBarConfig
 
 	if FFlagLuaAppEdpMediaGalleryFullScreen or FFlagLuaAppEdpConsoleMediaGalleryVideo then
-		local v41, v42 = React.useState(false)
+		state3, setState3 = React.useState(false)
 
-		u34 = v41
-		u35 = v42
-
-		local v43 = React.useCallback(function(p2) -- line: 223
-			-- upvalues: u29 (ref), reportWarning (copy), LoggingProtocol (copy), t1 (copy), VideoLogger (copy)
-			local current = u29.current
+		local useCallback = React.useCallback
+		local function fn(p)
+			local current = ref.current
 
 			if not current then
 				reportWarning(LoggingProtocol.default, "EventLogging", "reportVideoAction requires a valid videoFrame")
@@ -197,214 +313,363 @@ local function VideoPlayer(t1: {[any]: any}) -- line: 81
 				return
 			end
 
-			local source = nil
-			local sourceId = nil
-			local v59 = nil
+			local source, sourceId, v9
 
-			if t1.videoAnalyticsContext then
-				source = t1.videoAnalyticsContext.videoAnalyticsData.source
-				sourceId = t1.videoAnalyticsContext.videoAnalyticsData.sourceId
-				v59 = t1.videoAnalyticsContext.getPlaybackSessionId()
+			if props.videoAnalyticsContext then
+				source = props.videoAnalyticsContext.videoAnalyticsData.source
+				sourceId = props.videoAnalyticsContext.videoAnalyticsData.sourceId
+				v9 = props.videoAnalyticsContext.getPlaybackSessionId()
 
-				if not source or not sourceId or not v59 then
-					local v60 = source and "" or "source "
-					local v61 = sourceId and "" or "sourceId "
-					local v62 = v59 and "" or "playbackSessionId"
-
-					reportWarning(LoggingProtocol.default, "EventLogging", `reportVideoAction requires a valid { v60 }{ v61 }{ v62 }`)
+				if not (source and sourceId and v9) then
+					reportWarning(
+						LoggingProtocol.default,
+						"EventLogging",
+						`reportVideoAction requires a valid {source and "" or "source "}{sourceId and "" or "sourceId "}{v9 and "" or "playbackSessionId"}`
+					)
 				end
 			end
 
-			VideoLogger.reportVideoAction(p2, nil, {
-				isVisible = true,
-				videoAssetId = t1.video,
+			local videoAssetDuration
+
+			if FFlagLuaAppVideoPlayerTrimAndMusic and v2 then
+				local playbackRange, v10 = getVideoEdits.getPlaybackRange(current.TimeLength, v2.trim)
+				videoAssetDuration = v10 - playbackRange
+			end
+
+			local reportVideoAction = VideoLogger.reportVideoAction
+			local v10 = {
+				videoAssetId = props.video,
 				source = source or "",
 				sourceId = sourceId or "",
-				playbackSessionId = v59 or "",
-				videoAssetDuration = current.TimeLength,
-				isAudible = current.Volume ~= 0,
-				volumeLevel = current.Volume ~= 0 and 1 or 0
-			})
-		end, {
-			t1.video,
-			t1.videoAnalyticsContext
-		})
+				playbackSessionId = v9 or "",
+				videoAssetDuration = 0,
+				isVisible = true,
+				isAudible = 0,
+				volumeLevel = 0
+			}
 
-		u36 = React.useCallback(function() -- line: 264
-			-- upvalues: u29 (ref), u34 (ref), v18 (copy)
-			local current = u29.current
+			if not FFlagLuaAppVideoPlayerTrimAndMusic or videoAssetDuration == nil then
+				videoAssetDuration = current.TimeLength
+			end
+
+			v10.videoAssetDuration = videoAssetDuration
+			local isAudible
+
+			if FFlagLuaAppVideoPlayerTrimAndMusic then
+				isAudible = not state2
+			else
+				isAudible = current.Volume ~= 0
+			end
+
+			v10.isAudible = isAudible
+			local volumeLevel
+
+			if FFlagLuaAppVideoPlayerTrimAndMusic then
+				volumeLevel = state2 and 0 or 1
+			else
+				volumeLevel = current.Volume == 0 and 0 or 1
+			end
+
+			v10.volumeLevel = volumeLevel
+			reportVideoAction(p, nil, v10)
+		end
+
+		local video = props.video
+		local videoAnalyticsContext = props.videoAnalyticsContext
+		local v9
+
+		if FFlagLuaAppVideoPlayerTrimAndMusic then
+			v9 = v2
+		end
+
+		local v10
+
+		if FFlagLuaAppVideoPlayerTrimAndMusic then
+			v10 = state2
+		end
+
+		local v11 = useCallback(fn, { video, videoAnalyticsContext, v9, v10 })
+
+		v6 = React.useCallback(function()
+			local current = ref.current
 
 			if not current then
 				return
 			end
 
-			if u34 then
+			if state3 then
 				current:Pause()
-
 				return
 			end
 
-			if math.abs(current.TimePosition - current.TimeLength) <= v18 then
+			if math.abs(current.TimePosition - current.TimeLength) <= v then
 				current.TimePosition = 0
 			end
 
 			current:Play()
-		end, { u34 })
-		v40 = Responsive.usePreferredInput() == Responsive.Input.Directional
-		React.useEffect(function() -- line: 284
-			-- upvalues: t1 (copy), u36 (ref), v27 (copy)
-			local t2 = {}
+		end, { state3 })
 
-			if t1.toggleVideoPlaybackSignal then
-				table.insert(t2, t1.toggleVideoPlaybackSignal:connect(u36))
+		v7 = Responsive.usePreferredInput() == Responsive.Input.Directional
+		React.useEffect(function()
+			local connections = {}
+
+			if props.toggleVideoPlaybackSignal then
+				table.insert(connections, props.toggleVideoPlaybackSignal:connect(v6))
 			end
 
-			if t1.toggleMuteSignal then
-				table.insert(t2, t1.toggleMuteSignal:connect(v27))
+			if props.toggleMuteSignal then
+				table.insert(connections, props.toggleMuteSignal:connect(onMuteButtonActivated))
 			end
 
-			return function() -- line: 292
-				-- upvalues: t2 (copy)
-				for _, v73 in t2 do
-					if v73 then
-						v73:disconnect()
+			return function()
+				for _, connection in connections do
+					if connection then
+						connection:disconnect()
 					end
 				end
 			end
-		end, {
-			t1.toggleVideoPlaybackSignal,
-			t1.toggleMuteSignal,
-			u36,
-			v27
-		})
-		v37 = React.useCallback(function() -- line: 303
-			-- upvalues: t1 (copy), u36 (ref)
-			if t1.onVideoPlayerActivated then
-				t1.onVideoPlayerActivated()
+		end, { props.toggleVideoPlaybackSignal, props.toggleMuteSignal, v6, onMuteButtonActivated })
 
-				return
+		v8 = React.useCallback(function()
+			if props.onVideoPlayerActivated then
+				props.onVideoPlayerActivated()
+			else
+				v6()
 			end
+		end, { props.onVideoPlayerActivated, v6 })
 
-			u36()
-		end, {
-			t1.onVideoPlayerActivated,
-			u36
-		})
-		v38 = React.useMemo(function() -- line: 313
-			-- upvalues: t1 (copy), u34 (ref), u36 (ref)
-			if t1.showPlayButton then
-				return {
-					isVideoPlaying = u34,
-					onPlayButtonActivated = u36
-				}
+		playButtonConfig = React.useMemo(function()
+			if props.showPlayButton then
+				return { isVideoPlaying = state3, onPlayButtonActivated = v6 }
 			end
 
 			return nil
-		end, {
-			t1.showPlayButton,
-			u34,
-			u36
-		})
-		v39 = React.useMemo(function() -- line: 322
-			-- upvalues: t1 (copy), u30 (ref)
-			if t1.showProgressBar then
-				return {
-					progressBinding = u30
-				}
+		end, { props.showPlayButton, state3, v6 })
+
+		progressBarConfig = React.useMemo(function()
+			if props.showProgressBar then
+				return { progressBinding = progressBinding }
 			end
 
 			return nil
-		end, {
-			t1.showProgressBar,
-			u30
-		})
-		React.useEffect(function() -- line: 330
-			-- upvalues: u29 (ref), t1 (copy), u35 (ref), v43 (copy), VideoActions (copy)
-			local current = u29.current
+		end, { props.showProgressBar, progressBinding })
 
-			if not t1.shouldStartPlayback or not current then
+		React.useEffect(function()
+			local current = ref.current
+
+			if not (props.shouldStartPlayback and current) then
 				return nil
 			end
 
-			local connection = current.Played:Connect(function() -- line: 337
-				-- upvalues: u35 (ref), v43 (copy), VideoActions (copy)
-				u35(true)
-				v43(VideoActions.play)
-			end)
-			local connection2 = current.Paused:Connect(function() -- line: 342
-				-- upvalues: u35 (ref), v43 (copy), VideoActions (copy)
-				u35(false)
-				v43(VideoActions.pause)
-			end)
-			local connection3 = current.Ended:Connect(function() -- line: 347
-				-- upvalues: u35 (ref)
-				u35(false)
+			local playedConnection = current.Played:Connect(function()
+				setState3(true)
+				v11(VideoActions.play)
 			end)
 
-			return function() -- line: 351
-				-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
-				connection:Disconnect()
-				connection2:Disconnect()
-				connection3:Disconnect()
+			local pausedConnection = current.Paused:Connect(function()
+				setState3(false)
+				v11(VideoActions.pause)
+			end)
+
+			local endedConnection = current.Ended:Connect(function()
+				setState3(false)
+			end)
+
+			return function()
+				playedConnection:Disconnect()
+				pausedConnection:Disconnect()
+				endedConnection:Disconnect()
 			end
-		end, {
-			t1.shouldStartPlayback,
-			v43
-		})
-		React.useEffect(function() -- line: 359
-			-- upvalues: t1 (copy), v23 (copy), u35 (ref)
-			if not t1.shouldStartPlayback then
-				v23(false)
-				u35(false)
+		end, { props.shouldStartPlayback, v11 })
+
+		React.useEffect(function(): nil
+			if not props.shouldStartPlayback then
+				setState(false)
+				setState3(false)
 			end
 
 			return nil
-		end, { t1.shouldStartPlayback })
+		end, { props.shouldStartPlayback })
+
+		if FFlagLuaAppMediaGalleryGamepadSupport then
+			React.useEffect(function()
+				if props.onPlayingChanged then
+					props.onPlayingChanged(state3)
+				end
+			end, { props.onPlayingChanged, state3 })
+
+			React.useEffect(function()
+				if props.onVideoLoadedChanged then
+					props.onVideoLoadedChanged(state)
+				end
+			end, { props.onVideoLoadedChanged, state })
+		end
+	else
+		v6 = nil
 	end
 
-	return React.createElement(if not FFlagLuaAppVideoTileDisableActivation or not t1.disableActivation then not FFlagLuaAppEdpMediaGalleryFullScreen and "Frame" or "TextButton" else "Frame", {
-		Size = t1.Size,
+	local createElement = React.createElement
+	local v9 = FFlagLuaAppVideoTileDisableActivation and props.disableActivation and "Frame"
+		or FFlagLuaAppEdpMediaGalleryFullScreen and "TextButton"
+		or "Frame"
+
+	local v10 = {
+		["Size"] = props.Size,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
-		ZIndex = t1.ZIndex,
-		Text = if not FFlagLuaAppVideoTileDisableActivation or not t1.disableActivation then if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else "" else nil,
-		[React.Event.Activated] = if not FFlagLuaAppVideoTileDisableActivation or not t1.disableActivation then if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else v37 else nil,
-		Selectable = false
-	}, {
-		Corner = if not t1.cornerRadius then nil else React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, t1.cornerRadius)
-		}),
-		Video = React.createElement(LoadableVideoFrame, {
-			video = t1.video,
-			thumbnail = t1.thumbnail,
-			shouldStartPlayback = t1.shouldStartPlayback,
-			muted = v24,
-			looped = t1.looped,
-			ScaleType = t1.ScaleType,
-			cornerRadius = t1.cornerRadius,
-			onVideoLoaded = v26,
-			onVideoLooped = t1.onVideoLooped,
-			onVideoEnded = if not FFlagLuaAppEdpMediaGalleryAutoAdvance then nil else t1.onVideoEnded,
-			ref = if not FFlagLuaAppEdpMediaGalleryAutoAdvance and (not FFlagLuaAppEdpMediaGalleryFullScreen and (not FFlagLuaAppEdpConsoleMediaGalleryVideo and not FFlagLuaAppEnableHomepageOneByTwoTile)) then nil else u29
-		}),
-		PlayButton = if not FFlagLuaAppVideoTileHideCenterPlayButton and not FFlagLuaAppEnableHomepageOneByTwoTile or not t1.hideCenterPlayButton then if not FFlagLuaAppEdpMediaGalleryFullScreen or (not v22 or u34) then nil else React.createElement(RoundIconButton, {
+		ZIndex = props.ZIndex
+	}
+	local text
+
+	if not (FFlagLuaAppVideoTileDisableActivation and props.disableActivation) then
+		text = FFlagLuaAppEdpMediaGalleryFullScreen and "" or nil
+	end
+
+	v10.Text = text
+
+	local activated = React.Event.Activated
+
+	if FFlagLuaAppVideoTileDisableActivation and props.disableActivation then
+		v8 = nil
+	elseif not FFlagLuaAppEdpMediaGalleryFullScreen then
+		v8 = nil
+	end
+
+	v10[activated] = v8
+
+	v10.Selectable = false
+	local corner
+
+	if props.cornerRadius then
+		corner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, props.cornerRadius)
+		})
+	end
+
+	local createElement2 = React.createElement
+	local v11 = {
+		video = props.video,
+		accessContext = 0,
+		edits = 0,
+		thumbnail = 0,
+		thumbnailComponentOverride = 0,
+		shouldStartPlayback = 0,
+		muted = 0,
+		looped = 0,
+		ScaleType = 0,
+		cornerRadius = 0,
+		onVideoLoaded = 0,
+		onVideoLooped = 0,
+		onVideoEnded = 0,
+		onVideoLoadFailed = 0,
+		ref = 0
+	}
+	local accessContext
+
+	if FFlagLuaAppHomeMomentVideoFallback then
+		accessContext = props.accessContext
+	end
+
+	v11.accessContext = accessContext
+	local edits
+
+	if FFlagLuaAppVideoPlayerTrimAndMusic then
+		edits = v2
+	end
+
+	v11.edits = edits
+	v11.thumbnail = props.thumbnail
+	local thumbnailComponentOverride
+
+	if FFlagLuaAppSduiVideoThumbnail then
+		thumbnailComponentOverride = props.thumbnailComponentOverride
+	end
+
+	v11.thumbnailComponentOverride = thumbnailComponentOverride
+
+	v11.shouldStartPlayback = props.shouldStartPlayback and (not FFlagLuaAppVideoPlayerTrimAndMusic or v3)
+
+	v11.muted = state2
+	v11.looped = props.looped
+	v11.ScaleType = props.ScaleType
+	v11.cornerRadius = props.cornerRadius
+	v11.onVideoLoaded = onVideoLoaded
+	v11.onVideoLooped = props.onVideoLooped
+	local onVideoEnded
+
+	if FFlagLuaAppEdpMediaGalleryAutoAdvance then
+		onVideoEnded = props.onVideoEnded
+	end
+
+	v11.onVideoEnded = onVideoEnded
+
+	if not FFlagLuaAppVideoLoadFailureFallback then
+		v4 = nil
+	end
+
+	v11.onVideoLoadFailed = v4
+	local ref2
+
+	if
+		FFlagLuaAppEdpMediaGalleryAutoAdvance
+		or FFlagLuaAppEdpMediaGalleryFullScreen
+		or FFlagLuaAppEdpConsoleMediaGalleryVideo
+		or FFlagLuaAppEnableHomepageOneByTwoTile
+	then
+		ref2 = ref
+	end
+
+	v11.ref = ref2
+	local v12 = {
+		Corner = corner,
+		Video = createElement2(LoadableVideoFrame, v11),
+		PlayButton = 0,
+		BottomOverlay = 0
+	}
+	local playButton
+
+	if not ((FFlagLuaAppVideoTileHideCenterPlayButton or FFlagLuaAppEnableHomepageOneByTwoTile) and props.hideCenterPlayButton or not (FFlagLuaAppEdpMediaGalleryFullScreen or FFlagLuaAppMediaGalleryGamepadSupport) or not state or state3 or FFlagLuaAppMediaGalleryGamepadSupport and v6 == nil) then
+		playButton = React.createElement(RoundIconButton, {
 			icon = "play-large",
-			ZIndex = 2,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
-			Selectable = not v40 and nil,
-			onActivated = u36
-		}) else nil,
-		BottomOverlay = if not v21 then nil else React.createElement(VideoPlayerBottomOverlay, {
-			ZIndex = 10,
-			cornerRadius = t1.cornerRadius,
-			videoLoaded = v22,
-			muteButtonConfig = v28,
-			playButtonConfig = if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else v38,
-			progressBarConfig = if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else v39
+			ZIndex = 2,
+			Selectable = not v7 and nil,
+			onActivated = v6
 		})
-	})
+	end
+
+	v12.PlayButton = playButton
+	local bottomOverlay
+
+	if showMuteButton then
+		local createElement3 = React.createElement
+		local v13 = {
+			cornerRadius = props.cornerRadius,
+			ZIndex = 10,
+			videoLoaded = state,
+			muteButtonConfig = muteButtonConfig,
+			playButtonConfig = 0,
+			progressBarConfig = 0
+		}
+
+		if not FFlagLuaAppEdpMediaGalleryFullScreen then
+			playButtonConfig = nil
+		end
+
+		v13.playButtonConfig = playButtonConfig
+
+		if not FFlagLuaAppEdpMediaGalleryFullScreen then
+			progressBarConfig = nil
+		end
+
+		v13.progressBarConfig = progressBarConfig
+		bottomOverlay = createElement3(VideoPlayerBottomOverlay, v13)
+	end
+
+	v12.BottomOverlay = bottomOverlay
+	return createElement(v9, v10, v12)
 end
 
 return VideoPlayer

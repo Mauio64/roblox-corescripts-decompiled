@@ -1,78 +1,88 @@
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
+local parent = SquadsCore.Parent
+
 local SessionService = game:GetService("SessionService")
+
 local Logger = require(SquadsCore.Logger)
+
 local SquadExternalContractContext = require(SquadsCore.Components.SquadExternalContractProvider.SquadExternalContractContext)
 local SquadLocationEnum = require(SquadsCore.Enums.SquadLocationEnum)
 local SquadRootViewType = require(SquadsCore.Enums.SquadRootViewType)
 local SquadViewFlags = require(SquadsCore.Components.SquadExternalContractProvider.SquadViewFlags)
-local React = require(SquadsCoreParent.React)
-local SessionType = require(SquadsCoreParent.RobloxAppSessionization).SessionType
-local v11 = React.createContext({
-	updateMetadata = function() -- line: 29
-	end
+
+local React = require(parent.React)
+local RobloxAppSessionization = require(parent.RobloxAppSessionization)
+
+local SessionType = RobloxAppSessionization.SessionType
+
+local context = React.createContext({
+	updateMetadata = function() end
 })
 
 return {
-	Context = v11,
-	Provider = function(t1: {[any]: any}) -- line: 32
-		-- upvalues: React (copy), SquadExternalContractContext (copy), SquadLocationEnum (copy), SessionType (copy), SquadViewFlags (copy), SquadRootViewType (copy), SessionService (copy), Logger (copy), v11 (copy)
-		local v13 = React.useContext(SquadExternalContractContext)
-		local v14 = v13.useSquadViewFlags()
-		local v15 = v13.useSquadRootView()
-		local v16 = if v13.squadLocation ~= SquadLocationEnum.InExperience then SessionType.StructuralIdentifier.SquadLobbyPageUASessionInfo else SessionType.StructuralIdentifier.SquadLobbyPageInExpSessionInfo
-		local v17 = bit32.band(v14, SquadViewFlags.SquadLobby) ~= 0 and v15 ~= SquadRootViewType.None
-		local v18 = React.useCallback(function() -- line: 44
-			-- upvalues: SessionType (copy), SessionService (copy), v16 (copy)
-			local Level1 = SessionType.StructuralIdentifier.Level1
+	Context = context,
+	Provider = function(p)
+		local v = React.useContext(SquadExternalContractContext)
 
-			if Level1 and (SessionService:SessionExists(Level1) and not SessionService:SessionExists(v16)) then
-				SessionService:SetSession(Level1, v16, v16)
+		local v2 = v.useSquadViewFlags()
+		local v3 = v.useSquadRootView()
+		local v4
+
+		if v.squadLocation == SquadLocationEnum.InExperience then
+			v4 = SessionType.StructuralIdentifier.SquadLobbyPageInExpSessionInfo
+		else
+			v4 = SessionType.StructuralIdentifier.SquadLobbyPageUASessionInfo
+		end
+
+		local v5
+
+		if bit32.band(v2, SquadViewFlags.SquadLobby) == 0 then
+			v5 = false
+		else
+			v5 = v3 ~= SquadRootViewType.None
+		end
+
+		local v6 = React.useCallback(function()
+			local level1 = SessionType.StructuralIdentifier.Level1
+
+			if level1 and SessionService:SessionExists(level1) and not SessionService:SessionExists(v4) then
+				SessionService:SetSession(level1, v4, v4)
 			end
-		end, {
-			v16,
-			v13.squadLocation
-		})
-		local v19 = React.useCallback(function() -- line: 52
-			-- upvalues: SessionService (copy), v16 (copy)
-			if SessionService:SessionExists(v16) then
-				SessionService:RemoveSession(v16)
+		end, { v4, v.squadLocation })
+
+		local v7 = React.useCallback(function()
+			if SessionService:SessionExists(v4) then
+				SessionService:RemoveSession(v4)
 			end
-		end, { v16 })
-		local v20 = React.useCallback(function(p1, p2) -- line: 58
-			-- upvalues: SessionService (copy), v16 (copy), Logger (copy)
-			if SessionService:SessionExists(v16) then
-				SessionService:SetMetadata(v16, p1, p2)
+		end, { v4 })
 
-				return
+		local updateMetadata = React.useCallback(function(p2, p3)
+			if SessionService:SessionExists(v4) then
+				SessionService:SetMetadata(v4, p2, p3)
+			else
+				Logger:warning(
+					"Squad {} session does not exist, cannot update metadata with key {}, value {}",
+					v4,
+					p2,
+					p3
+				)
 			end
+		end, { v4 })
 
-			Logger:warning("Squad {} session does not exist, cannot update metadata with key {}, value {}", v16, p1, p2)
-		end, { v16 })
-
-		React.useEffect(function() -- line: 71
-			-- upvalues: v17 (copy), v18 (copy), v19 (copy)
-			if v17 then
-				v18()
-
-				return function() -- line: 75
-					-- upvalues: v19 (copy)
-					v19()
-				end
+		React.useEffect(function()
+			if not v5 then
+				return function() end
 			end
 
-			return function() -- line: 80
-			end
-		end, {
-			v17,
-			v18,
-			v19
-		})
+			v6()
 
-		return React.createElement(v11.Provider, {
-			value = {
-				updateMetadata = v20
-			}
-		}, t1.children)
+			return function()
+				v7()
+			end
+		end, { v5, v6, v7 })
+
+		return React.createElement(context.Provider, {
+			value = { updateMetadata = updateMetadata }
+		}, p.children)
 	end
 }

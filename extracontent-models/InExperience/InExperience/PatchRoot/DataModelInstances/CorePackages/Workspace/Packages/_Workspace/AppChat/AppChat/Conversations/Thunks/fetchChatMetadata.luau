@@ -1,40 +1,47 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
 local SetAppLoaded = require(AppChat.Actions.SetAppLoaded)
+local GetAppLoadedStore = require(AppChat.Stores.GetAppLoadedStore)
+local FFlagAppChatUseSignalsForAppLoaded = require(AppChat.Flags.FFlagAppChatUseSignalsForAppLoaded)
 local RoactChatAnalytics = require(AppChat.LegacyAnalytics.RoactChatAnalytics)
-local v5 = require(AppChat.Logger):new(script.Name)
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
+
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local v7 = require(AppChatParent.Analytics).Analytics.new(RbxAnalyticsService)
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local Analytics = require(parent.Analytics)
+local analytics = Analytics.Analytics.new(RbxAnalyticsService)
 
-return function() -- line: 13
-	-- upvalues: v5 (copy), AppChatNetworking (copy), RoactChatAnalytics (copy), v7 (copy), SetAppLoaded (copy)
-	v5:info("Fetching chat metadata...")
+local AppChatNetworking = require(parent.AppChatNetworking)
 
-	return function(p1) -- line: 16
-		-- upvalues: AppChatNetworking (copy), v5 (copy), RoactChatAnalytics (copy), v7 (copy), SetAppLoaded (copy)
-		local LocalUserId = p1:getState().LocalUserId
+return function()
+	v:info("Fetching chat metadata...")
 
-		return p1:dispatch(AppChatNetworking.rodux.GetMetadata.API()):andThen(function(p2) -- line: 20
-			-- upvalues: v5 (copy), LocalUserId (copy), RoactChatAnalytics (copy), v7 (copy), p1 (copy), SetAppLoaded (copy)
-			local isChatEnabled = p2.responseBody.isChatEnabled
+	return function(object)
+		local localUserId = object:getState().LocalUserId
+
+		return object:dispatch(AppChatNetworking.rodux.GetMetadata.API()):andThen(function(p)
+			local isChatEnabled = p.responseBody.isChatEnabled
 
 			if isChatEnabled then
-				v5:info("Chat is enabled and privacy settings allow chat")
+				v:info("Chat is enabled and privacy settings allow chat")
 
-				if LocalUserId then
-					RoactChatAnalytics.new(v7, LocalUserId):userLoadedChat()
+				if localUserId then
+					RoactChatAnalytics.new(analytics, localUserId):userLoadedChat()
 				end
 			else
-				v5:info("Chat is disabled or privacy settings do not allow chat")
+				v:info("Chat is disabled or privacy settings do not allow chat")
 			end
 
-			p1:dispatch(SetAppLoaded(isChatEnabled))
+			if FFlagAppChatUseSignalsForAppLoaded then
+				GetAppLoadedStore(false).setAppLoaded(isChatEnabled)
+				return isChatEnabled
+			end
+
+			object:dispatch(SetAppLoaded(isChatEnabled))
 
 			return isChatEnabled
-		end):catch(function(p3) -- line: 37
-			-- upvalues: v5 (copy)
-			v5:warning("FetchChatData failed with error: {}", (tostring(p3)))
+		end):catch(function(p)
+			v:warning("FetchChatData failed with error: {}", (tostring(p)))
 		end)
 	end
 end

@@ -1,10 +1,6 @@
 return {
-	Module = {
-		Navigation = "Navigation"
-	},
-	Function = {
-		navigateToFeature = "navigateToFeature"
-	},
+	Module = { Navigation = "Navigation" },
+	Function = { navigateToFeature = "navigateToFeature" },
 	Feature = {
 		CaptchaSuccess = "CaptchaSuccess",
 		CaptchaShown = "CaptchaShown",

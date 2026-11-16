@@ -1,11 +1,8 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
+local assign = require(parent.assign)
 
-require(scriptParent.Types)
-
-local assign = require(scriptParent.assign)
-
-local function join(...) -- line: 13
-	-- upvalues: assign (copy)
+local function join(...)
 	return assign({}, ...)
 end
 

@@ -1,67 +1,126 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.ChatUIPrimitives)
 
-require(ParentParent.ChatUIPrimitives)
+local _ = { Pending = "pending", Failed = "failed" }
 
-local _ = {
-	Pending = "pending",
-	Failed = "failed"
-}
 local HttpService = game:GetService("HttpService")
-local getFFlagExpChatProtectedChatInternalAPIs = require(ParentParent.SharedFlags).getFFlagExpChatProtectedChatInternalAPIs
+local SharedFlags = require(parent.SharedFlags)
+local getFFlagExpChatProtectedChatInternalAPIs = SharedFlags.getFFlagExpChatProtectedChatInternalAPIs
 local getTextAndTranslation = require(script.Parent.getTextAndTranslation)
 
-local function createUserMessage(t1: {[any]: any}) -- line: 71
+local function createUserMessage(data)
 	return {
 		messageType = "user",
-		messageId = t1.messageId,
-		senderUserId = t1.senderUserId,
-		content = t1.content,
-		prefixText = t1.prefixText,
-		timestamp = t1.timestamp,
-		isOutgoing = t1.isOutgoing,
-		status = t1.status,
-		wasRewritten = t1.wasRewritten,
-		originalText = t1.originalText,
-		textChatMessageInstance = t1.textChatMessageInstance
+		messageId = data.messageId,
+		senderUserId = data.senderUserId,
+		content = data.content,
+		prefixText = data.prefixText,
+		timestamp = data.timestamp,
+		isOutgoing = data.isOutgoing,
+		status = data.status,
+		wasRewritten = data.wasRewritten,
+		originalText = data.originalText,
+		translation = data.translation,
+		textChatMessageInstance = data.textChatMessageInstance,
+		presetId = data.presetId
 	}
 end
 
-return {
-	createSystemMessage = function(s1: string, s2: string?) -- line: 37
-		-- upvalues: HttpService (copy)
-		return {
-			messageType = "system-roblox",
-			messageId = s2 or HttpService:GenerateGUID(false),
-			content = s1,
-			timestamp = DateTime.now()
-		}
-	end,
-	createSystemMessageFromTextChatMessage = function(p1) -- line: 48
-		-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy)
-		return {
-			messageType = "system-roblox",
-			messageId = p1.MessageId,
-			content = if not getFFlagExpChatProtectedChatInternalAPIs() then p1.Text else p1.TextInternal,
-			timestamp = p1.Timestamp,
-			textChatMessageInstance = p1
-		}
-	end,
-	createUserMessage = createUserMessage,
-	createUserMessageFromTextChatMessage = function(p2, s3: string) -- line: 87
-		-- upvalues: createUserMessage (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), getTextAndTranslation (copy)
-		local TextSource = p2.TextSource
+local Message = {}
 
-		return (createUserMessage({
-			status = nil,
-			messageId = p2.MessageId,
-			senderUserId = tostring(TextSource.UserId),
-			prefixText = if not getFFlagExpChatProtectedChatInternalAPIs() then p2.PrefixText else p2.PrefixTextInternal,
-			content = getTextAndTranslation(p2),
-			wasRewritten = not not p2.WasRewritten or nil,
-			originalText = if not p2.WasRewritten then nil else p2.OriginalText,
-			timestamp = p2.Timestamp,
-			isOutgoing = s3 == tostring(TextSource.UserId),
-			textChatMessageInstance = p2
-		}))
+function Message.createSystemMessage(content: string, p: string?)
+	return {
+		messageId = p or HttpService:GenerateGUID(false),
+		messageType = "system-roblox",
+		content = content,
+		timestamp = DateTime.now()
+	}
+end
+
+function Message.createExperienceSystemMessage(content: string, p: string?, iconName: string?)
+	return {
+		messageId = p or HttpService:GenerateGUID(false),
+		messageType = "system-experience",
+		content = content,
+		iconName = iconName,
+		timestamp = DateTime.now()
+	}
+end
+
+function Message.createSystemMessageFromTextChatMessage(textChatMessageInstance)
+	local systemMessageFromTextChatMessage = {
+		messageId = textChatMessageInstance.MessageId,
+		messageType = "system-roblox",
+		content = 0,
+		timestamp = 0,
+		textChatMessageInstance = 0
+	}
+	local content
+
+	if getFFlagExpChatProtectedChatInternalAPIs() then
+		content = textChatMessageInstance.TextInternal
+	else
+		content = textChatMessageInstance.Text
 	end
-}
+
+	systemMessageFromTextChatMessage.content = content
+	systemMessageFromTextChatMessage.timestamp = textChatMessageInstance.Timestamp
+	systemMessageFromTextChatMessage.textChatMessageInstance = textChatMessageInstance
+	return systemMessageFromTextChatMessage
+end
+
+Message.createUserMessage = createUserMessage
+
+function Message.createUserMessageFromTextChatMessage(textChatMessageInstance, p: string)
+	local textSource = textChatMessageInstance.TextSource
+
+	local textAndTranslation, translation = getTextAndTranslation(textChatMessageInstance)
+	local v = {
+		messageId = textChatMessageInstance.MessageId,
+		senderUserId = tostring(textSource.UserId),
+		prefixText = 0,
+		content = 0,
+		translation = 0,
+		wasRewritten = 0,
+		originalText = 0,
+		timestamp = 0,
+		isOutgoing = 0,
+		status = nil,
+		textChatMessageInstance = 0,
+		presetId = 0
+	}
+	local prefixText
+
+	if getFFlagExpChatProtectedChatInternalAPIs() then
+		prefixText = textChatMessageInstance.PrefixTextInternal
+	else
+		prefixText = textChatMessageInstance.PrefixText
+	end
+
+	v.prefixText = prefixText
+
+	v.content = textAndTranslation
+	v.translation = translation
+	v.wasRewritten = textChatMessageInstance.WasRewritten and true or nil
+	local originalText
+
+	if textChatMessageInstance.WasRewritten then
+		originalText = textChatMessageInstance.OriginalText
+	end
+
+	v.originalText = originalText
+	v.timestamp = textChatMessageInstance.Timestamp
+	v.isOutgoing = tostring(textSource.UserId) == p
+
+	v.textChatMessageInstance = textChatMessageInstance
+	local presetId
+
+	if game:GetEngineFeature("TextChatPresetsEnabled") then
+		presetId = textChatMessageInstance.PresetId
+	end
+
+	v.presetId = presetId
+	return createUserMessage(v)
+end
+
+return Message

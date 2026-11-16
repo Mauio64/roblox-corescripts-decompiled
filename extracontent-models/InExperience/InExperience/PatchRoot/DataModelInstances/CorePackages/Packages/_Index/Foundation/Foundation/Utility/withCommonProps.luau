@@ -2,19 +2,28 @@ local Foundation = script:FindFirstAncestor("Foundation")
 
 require(Foundation.Components.Types)
 
-local function withCommonProps(p1, p2) -- line: 6
-	if type(p2) == "table" then
-		p2.AnchorPoint = p1.AnchorPoint
-		p2.LayoutOrder = p1.LayoutOrder
-		p2.Position = p1.Position
-		p2.Visible = p1.Visible
-		p2.ZIndex = p1.ZIndex
-		p2.onAbsoluteSizeChanged = p1.onAbsoluteSizeChanged
-		p2.onAbsolutePositionChanged = p1.onAbsolutePositionChanged
-		p2.testId = p1.testId
+local function withCommonProps(data, p)
+	if type(p) ~= "table" then
+		return p
 	end
 
-	return p2
+	p.AnchorPoint = data.AnchorPoint
+
+	p.LayoutOrder = data.LayoutOrder
+
+	p.Position = data.Position
+
+	p.Visible = data.Visible
+
+	p.ZIndex = data.ZIndex
+
+	p.onAbsoluteSizeChanged = data.onAbsoluteSizeChanged
+
+	p.onAbsolutePositionChanged = data.onAbsolutePositionChanged
+
+	p.testId = data.testId
+
+	return p
 end
 
 return withCommonProps

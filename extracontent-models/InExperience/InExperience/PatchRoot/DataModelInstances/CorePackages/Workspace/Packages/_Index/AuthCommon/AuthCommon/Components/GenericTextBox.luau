@@ -1,151 +1,161 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-local Roact = require(Parent.Roact)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+
+local Roact = require(parent.Roact)
+local UIBlox = require(parent.UIBlox)
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local GetImageData = require(Parent.RobloxAppAssets).GetImageData
+local RobloxAppAssets = require(parent.RobloxAppAssets)
+local GetImageData = RobloxAppAssets.GetImageData
+
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local OpenTypeSupport = UIBlox.Utility.OpenTypeSupport
-local GetFFlagLuaAppFixSelectionCursor = require(Parent.SharedFlags).GetFFlagLuaAppFixSelectionCursor
-local v10 = Roact.PureComponent:extend("GenericTextBox")
-local GetFFlagLuaAppEnableOpenTypeSupport = require(Parent.SharedFlags).GetFFlagLuaAppEnableOpenTypeSupport
-local EngineFeature = game:GetEngineFeature("EnableAndroidPasswordSuggestion")
 
-v10.defaultProps = {
-	PaddingX = 0,
-	PaddingY = 0
-}
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagLuaAppFixSelectionCursor = SharedFlags.GetFFlagLuaAppFixSelectionCursor
 
-function v10.render(p1) -- line: 27
-	-- upvalues: GetFFlagLuaAppFixSelectionCursor (copy), withSelectionCursorProvider (copy)
+local extended = Roact.PureComponent:extend("GenericTextBox")
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagLuaAppEnableOpenTypeSupport = SharedFlags2.GetFFlagLuaAppEnableOpenTypeSupport
+
+local engineFeature = game:GetEngineFeature("EnableAndroidPasswordSuggestion")
+
+extended.defaultProps = { PaddingX = 0, PaddingY = 0 }
+
+function extended:render()
 	if GetFFlagLuaAppFixSelectionCursor() then
-		return withSelectionCursorProvider(function(p2) -- line: 29
-			-- upvalues: p1 (copy)
-			return p1:renderWithSelectionCursor(p2)
+		return withSelectionCursorProvider(function(p)
+			return self:renderWithSelectionCursor(p)
 		end)
 	end
 
-	return p1:renderWithSelectionCursor(nil)
+	return self:renderWithSelectionCursor(nil)
 end
-function v10.renderWithSelectionCursor(p3, p4) -- line: 38
-	-- upvalues: GetFFlagLuaAppFixSelectionCursor (copy), CursorKind (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), EngineFeature (copy), OpenTypeSupport (copy), Roact (copy), ImageSetLabel (copy), GetImageData (copy)
-	local propsSize = p3.props.Size
-	local propsPosition = p3.props.Position
-	local propsLayoutOrder = p3.props.LayoutOrder
-	local propsText = p3.props.Text
-	local propsFont = p3.props.Font
-	local propsTextSize = p3.props.TextSize
-	local PlaceholderText = p3.props.PlaceholderText
-	local TextXAlignment = p3.props.TextXAlignment
-	local TextColor = p3.props.TextColor
-	local PlaceholderColor = p3.props.PlaceholderColor
-	local ClearTextOnFocus = p3.props.ClearTextOnFocus
-	local TextInputType = p3.props.TextInputType
-	local ReturnKeyType = p3.props.ReturnKeyType
-	local ManualFocusRelease = p3.props.ManualFocusRelease
-	local NextSelectionDown = p3.props.NextSelectionDown
-	local NextSelectionLeft = p3.props.NextSelectionLeft
-	local NextSelectionRight = p3.props.NextSelectionRight
-	local NextSelectionUp = p3.props.NextSelectionUp
-	local propsColor = p3.props.Color
-	local propsTransparency = p3.props.Transparency
-	local propsTextTransparency = p3.props.TextTransparency
-	local maxLength = p3.props.maxLength
-	local onChangeText = p3.props.onChangeText
-	local onAncestryChanged = p3.props.onAncestryChanged
-	local onReturnPressedFromOnScreenKeyboard = p3.props.onReturnPressedFromOnScreenKeyboard
-	local onFocused = p3.props.onFocused
-	local onFocusLost = p3.props.onFocusLost
-	local onMouseEnter = p3.props.onMouseEnter
-	local onMouseLeave = p3.props.onMouseLeave
-	local PaddingX = p3.props.PaddingX
-	local PaddingY = p3.props.PaddingY
-	local TextBoxRef = p3.props.TextBoxRef
-	local v48 = nil
+
+function extended:renderWithSelectionCursor(callback)
+	local size = self.props.Size
+	local position = self.props.Position
+	local layoutOrder = self.props.LayoutOrder
+	local text = self.props.Text
+	local font = self.props.Font
+	local textSize = self.props.TextSize
+	local placeholderText = self.props.PlaceholderText
+	local textXAlignment = self.props.TextXAlignment
+	local textColor = self.props.TextColor
+	local placeholderColor = self.props.PlaceholderColor
+	local clearTextOnFocus = self.props.ClearTextOnFocus
+	local textInputType = self.props.TextInputType
+	local returnKeyType = self.props.ReturnKeyType
+	local manualFocusRelease = self.props.ManualFocusRelease
+
+	local nextSelectionDown = self.props.NextSelectionDown
+	local nextSelectionLeft = self.props.NextSelectionLeft
+	local nextSelectionRight = self.props.NextSelectionRight
+	local nextSelectionUp = self.props.NextSelectionUp
+
+	local color = self.props.Color
+	local transparency = self.props.Transparency
+	local textTransparency = self.props.TextTransparency
+	local maxLength = self.props.maxLength
+	local onChangeText = self.props.onChangeText
+	local onAncestryChanged = self.props.onAncestryChanged
+	local onReturnPressedFromOnScreenKeyboard = self.props.onReturnPressedFromOnScreenKeyboard
+	local onFocused = self.props.onFocused
+	local onFocusLost = self.props.onFocusLost
+	local onMouseEnter = self.props.onMouseEnter
+	local onMouseLeave = self.props.onMouseLeave
+
+	local paddingX = self.props.PaddingX
+	local paddingY = self.props.PaddingY
+
+	local textBoxRef = self.props.TextBoxRef
+	local selectionImageObject
 
 	if GetFFlagLuaAppFixSelectionCursor() then
-		v48 = p4(CursorKind.InputButton)
+		selectionImageObject = callback(CursorKind.InputButton)
 	end
 
-	local v49 = nil
+	local v = nil
 
 	if GetFFlagLuaAppEnableOpenTypeSupport() then
-		if p3.props.openTypeFeatures == nil then
-			if TextInputType == Enum.TextInputType.Password or TextInputType == Enum.TextInputType.PasswordShown or TextInputType == Enum.TextInputType.OneTimePassword or EngineFeature and TextInputType == Enum.TextInputType.NewPassword or EngineFeature and TextInputType == Enum.TextInputType.NewPasswordShown then
-				v49 = OpenTypeSupport:getPasswordStylisticAlternative()
-			elseif TextInputType == Enum.TextInputType.Username then
-				v49 = OpenTypeSupport:getUserNameStylisticAlternative()
+		if self.props.openTypeFeatures == nil then
+			if
+				textInputType == Enum.TextInputType.Password
+				or textInputType == Enum.TextInputType.PasswordShown
+				or textInputType == Enum.TextInputType.OneTimePassword
+				or engineFeature and textInputType == Enum.TextInputType.NewPassword
+				or engineFeature and textInputType == Enum.TextInputType.NewPasswordShown
+			then
+				v = OpenTypeSupport:getPasswordStylisticAlternative()
+			elseif textInputType == Enum.TextInputType.Username then
+				v = OpenTypeSupport:getUserNameStylisticAlternative()
 			end
 		else
-			v49 = p3.props.openTypeFeatures
+			v = self.props.openTypeFeatures
 		end
-	else
-		v49 = nil
 	end
 
-	local function handleTextChanged(p5) -- line: 102
-		-- upvalues: maxLength (copy), onChangeText (copy)
+	local function handleTextChanged(p)
 		if maxLength then
-			local v53 = string.sub(p5.Text, 1, maxLength)
+			local text2 = string.sub(p.Text, 1, maxLength)
 
-			if v53 ~= p5.Text then
-				p5.Text = v53
-
+			if text2 ~= p.Text then
+				p.Text = text2
 				return
 			end
 		end
 
 		if onChangeText then
-			onChangeText(p5)
+			onChangeText(p)
 		end
 	end
 
 	return Roact.createElement(ImageSetLabel, {
+		Size = size,
+		Position = position,
+		LayoutOrder = layoutOrder,
 		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		Size = propsSize,
-		Position = propsPosition,
-		LayoutOrder = propsLayoutOrder,
 		Image = GetImageData("LuaApp/buttons/buttonFill") or "LuaApp/buttons/buttonFill",
-		ImageColor3 = propsColor,
-		ImageTransparency = propsTransparency,
+		ImageColor3 = color,
+		ImageTransparency = transparency,
+		BorderSizePixel = 0,
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(8, 8, 9, 9)
 	}, {
 		UIPadding = Roact.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, PaddingY),
-			PaddingBottom = UDim.new(0, PaddingY),
-			PaddingLeft = UDim.new(0, PaddingX),
-			PaddingRight = UDim.new(0, PaddingX)
+			PaddingTop = UDim.new(0, paddingY),
+			PaddingBottom = UDim.new(0, paddingY),
+			PaddingLeft = UDim.new(0, paddingX),
+			PaddingRight = UDim.new(0, paddingX)
 		}),
 		TextBox = Roact.createElement("TextBox", {
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Text = propsText,
-			PlaceholderText = PlaceholderText,
-			PlaceholderColor3 = PlaceholderColor,
-			Font = propsFont,
-			TextSize = propsTextSize,
-			TextColor3 = TextColor,
-			TextTransparency = propsTextTransparency,
-			TextXAlignment = TextXAlignment,
+			Text = text,
+			PlaceholderText = placeholderText,
+			PlaceholderColor3 = placeholderColor,
+			Font = font,
+			TextSize = textSize,
+			TextColor3 = textColor,
+			TextTransparency = textTransparency,
+			TextXAlignment = textXAlignment,
 			TextYAlignment = Enum.TextYAlignment.Center,
 			BackgroundTransparency = 1,
-			ClearTextOnFocus = ClearTextOnFocus,
+			ClearTextOnFocus = clearTextOnFocus,
 			OverlayNativeInput = true,
 			ClipsDescendants = true,
-			TextInputType = TextInputType,
-			ReturnKeyType = ReturnKeyType,
-			ManualFocusRelease = ManualFocusRelease,
-			NextSelectionDown = NextSelectionDown,
-			NextSelectionLeft = NextSelectionLeft,
-			NextSelectionRight = NextSelectionRight,
-			NextSelectionUp = NextSelectionUp,
-			SelectionImageObject = v48,
-			OpenTypeFeatures = v49 or nil,
-			RichText = not not v49 or nil,
-			[Roact.Ref] = TextBoxRef,
+			TextInputType = textInputType,
+			ReturnKeyType = returnKeyType,
+			ManualFocusRelease = manualFocusRelease,
+			NextSelectionDown = nextSelectionDown,
+			NextSelectionLeft = nextSelectionLeft,
+			NextSelectionRight = nextSelectionRight,
+			NextSelectionUp = nextSelectionUp,
+			SelectionImageObject = selectionImageObject,
+			OpenTypeFeatures = v or nil,
+			RichText = v and true or nil,
+			[Roact.Ref] = textBoxRef,
 			[Roact.Change.Text] = handleTextChanged,
 			[Roact.Event.AncestryChanged] = onAncestryChanged,
 			[Roact.Event.ReturnPressedFromOnScreenKeyboard] = onReturnPressedFromOnScreenKeyboard,
@@ -157,4 +167,4 @@ function v10.renderWithSelectionCursor(p3, p4) -- line: 38
 	})
 end
 
-return v10
+return extended

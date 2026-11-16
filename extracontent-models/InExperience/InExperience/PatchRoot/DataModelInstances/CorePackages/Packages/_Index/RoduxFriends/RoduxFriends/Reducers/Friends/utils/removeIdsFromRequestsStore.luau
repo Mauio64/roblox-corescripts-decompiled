@@ -1,13 +1,12 @@
-local Parent = script:FindFirstAncestor("RoduxFriends").Parent
-local llama = require(Parent.llama)
+local parent = script:FindFirstAncestor("RoduxFriends").Parent
+local llama = require(parent.llama)
 
-return function(p1, t1: {[any]: any}) -- line: 5
-	-- upvalues: llama (copy)
-	local t2 = {}
+return function(p, items)
+	local nones = {}
 
-	for _, v in pairs(t1) do
-		t2[v] = llama.None
+	for _, item in pairs(items) do
+		nones[item] = llama.None
 	end
 
-	return llama.Dictionary.join(p1, t2)
+	return llama.Dictionary.join(p, nones)
 end

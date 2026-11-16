@@ -1,27 +1,29 @@
 local AmpUpsell = script:FindFirstAncestor("AmpUpsell")
-local AmpUpsellParent = AmpUpsell.Parent
-local React = require(AmpUpsellParent.React)
+local parent = AmpUpsell.Parent
+local React = require(parent.React)
 local ProgressTile = require(script.Parent.ProgressTile)
-local useLocalization = require(AmpUpsellParent.Localization).Hooks.useLocalization
-local IDVStep = require(AmpUpsell.Common.Enums).IDVStep
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Enums = require(AmpUpsell.Common.Enums)
+local IDVStep = Enums.IDVStep
 
-local function ProgressChecklist(t1: {[any]: any}) -- line: 15
-	-- upvalues: useLocalization (copy), IDVStep (copy), React (copy), ProgressTile (copy)
-	local v9 = useLocalization({
+local function ProgressChecklist(props)
+	local v = useLocalization({
 		connectedMobile = "Verification.Identity.Label.ConnectingToMobile",
 		verifyingYou = "Verification.Identity.Label.VerifyingYou",
 		waitingForResults = "Verification.Identity.Label.VerificationWaitingForResults",
 		updatingRbxProfile = "Verification.Identity.Label.UpdatingRoblox"
 	})
-	local v10 = t1.latestStepCompleted >= IDVStep.ConnectedMobile
-	local v11 = t1.latestStepCompleted >= IDVStep.Verified
-	local v12 = t1.latestStepCompleted >= IDVStep.GotResults
-	local v13 = t1.latestStepCompleted >= IDVStep.UpdatedRobloxProfile
+
+	local finished = props.latestStepCompleted >= IDVStep.ConnectedMobile
+	local finished2 = props.latestStepCompleted >= IDVStep.Verified
+	local finished3 = props.latestStepCompleted >= IDVStep.GotResults
+	local finished4 = props.latestStepCompleted >= IDVStep.UpdatedRobloxProfile
 
 	return React.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, props.entryHeight * 4),
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, t1.entryHeight * 4),
-		LayoutOrder = t1.layoutOrder
+		LayoutOrder = props.layoutOrder
 	}, {
 		UIListLayout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -30,28 +32,28 @@ local function ProgressChecklist(t1: {[any]: any}) -- line: 15
 			VerticalAlignment = Enum.VerticalAlignment.Center
 		}),
 		MobileCheck = React.createElement(ProgressTile, {
+			frameHeight = props.entryHeight,
 			layoutOrder = 1,
-			frameHeight = t1.entryHeight,
-			finished = v10,
-			progressText = v9.connectedMobile
+			finished = finished,
+			progressText = v.connectedMobile
 		}),
 		VerifiedCheck = React.createElement(ProgressTile, {
+			frameHeight = props.entryHeight,
 			layoutOrder = 2,
-			frameHeight = t1.entryHeight,
-			finished = v11,
-			progressText = v9.verifyingYou
+			finished = finished2,
+			progressText = v.verifyingYou
 		}),
 		GotResultsCheck = React.createElement(ProgressTile, {
+			frameHeight = props.entryHeight,
 			layoutOrder = 3,
-			frameHeight = t1.entryHeight,
-			finished = v12,
-			progressText = v9.waitingForResults
+			finished = finished3,
+			progressText = v.waitingForResults
 		}),
 		UpdateProfileCheck = React.createElement(ProgressTile, {
+			frameHeight = props.entryHeight,
 			layoutOrder = 4,
-			frameHeight = t1.entryHeight,
-			finished = v13,
-			progressText = v9.updatingRbxProfile
+			finished = finished4,
+			progressText = v.updatingRbxProfile
 		})
 	})
 end

@@ -1,26 +1,24 @@
 local ContentProvider = game:GetService("ContentProvider")
 
-local function tryLoadRbxthumbAsync(s1: string, n1: number?) -- line: 3
-	-- upvalues: ContentProvider (copy)
-	local v5 = n1 or 5
+local function tryLoadRbxthumbAsync(p: string, value: number?)
+	local v = value or 5
 
-	if ContentProvider:GetAssetFetchStatus(s1) == Enum.AssetFetchStatus.Success then
-		return s1
+	if ContentProvider:GetAssetFetchStatus(p) == Enum.AssetFetchStatus.Success then
+		return p
 	end
 
-	ContentProvider:PreloadAsync({ s1 })
+	ContentProvider:PreloadAsync({ p })
+	local total = 0
 
-	local n2 = 0
+	while ContentProvider:GetAssetFetchStatus(p) ~= Enum.AssetFetchStatus.Success do
+		total += task.wait()
 
-	while ContentProvider:GetAssetFetchStatus(s1) ~= Enum.AssetFetchStatus.Success do
-		n2 += task.wait()
-
-		if v5 < n2 then
-			error(`timed out after { v5 } seconds when loading { s1 }`)
+		if v < total then
+			error(`timed out after {v} seconds when loading {p}`)
 		end
 	end
 
-	return s1
+	return p
 end
 
 return tryLoadRbxthumbAsync

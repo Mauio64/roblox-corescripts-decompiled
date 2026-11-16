@@ -4,51 +4,44 @@ require(Foundation.Providers.Style.Tokens)
 require(Foundation.Components.Types)
 
 local ColorNamespace = require(Foundation.Enums.ColorNamespace)
+
 local StateLayerMode = require(Foundation.Enums.StateLayerMode)
+
 local ControlState = require(Foundation.Enums.ControlState)
 
-function guiStateToStateLayer(p1) -- line: 15
-	-- upvalues: ControlState (copy)
-	if p1 == ControlState.Pressed then
+function guiStateToStateLayer(p): string
+	if not (p ~= ControlState.Pressed and p ~= ControlState.SelectedPressed) then
 		return "Press"
 	end
 
-	if p1 == ControlState.SelectedPressed then
-		return "Press"
-	end
-
-	if p1 == ControlState.Hover then
-		return "Hover"
-	end
-
-	return "Idle"
+	return if p == ControlState.Hover then "Hover" else "Idle"
 end
-function stateLayerModeToTokenNamespace(p2) -- line: 27
-	-- upvalues: StateLayerMode (copy), ColorNamespace (copy)
-	if p2 == StateLayerMode.Default then
+
+function stateLayerModeToTokenNamespace(p)
+	if p == StateLayerMode.Default then
 		return ColorNamespace.Color
 	end
 
-	if p2 == StateLayerMode.Inverse then
+	if p == StateLayerMode.Inverse then
 		return ColorNamespace.Inverse
 	end
 
-	if p2 == StateLayerMode.Light then
+	if p == StateLayerMode.Light then
 		return ColorNamespace.LightMode
 	end
 
-	if p2 == StateLayerMode.Dark then
+	if p == StateLayerMode.Dark then
 		return ColorNamespace.DarkMode
 	end
 
 	return ColorNamespace.Color
 end
 
-local function getStateLayerStyle(p3, p4, p5) -- line: 41
-	local v11 = stateLayerModeToTokenNamespace(p4)
-	local v12 = guiStateToStateLayer(p5)
+local function getStateLayerStyle(p, p2, p3)
+	local v = stateLayerModeToTokenNamespace(p2)
+	local v2 = guiStateToStateLayer(p3)
 
-	return p3[v11].State[v12]
+	return p[v].State[v2]
 end
 
 return getStateLayerStyle

@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.ScreenTime.ScreenTime))
+local ScreenTime = require(Workspace.ScreenTime.ScreenTime)
+
+return ScreenTime

@@ -1,7 +1,3 @@
-return (require(script.Parent.createEnum)("UpsellFlow", {
-	"Web",
-	"Mobile",
-	"Xbox",
-	"Unavailable",
-	"None"
-}))
+local createEnum = require(script.Parent.createEnum)
+
+return (createEnum("UpsellFlow", { "Web", "Mobile", "Xbox", "Unavailable", "None" }))

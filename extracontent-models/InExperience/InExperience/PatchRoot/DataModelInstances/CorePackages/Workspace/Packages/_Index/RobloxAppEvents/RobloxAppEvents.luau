@@ -1,7 +1,5 @@
-local scriptParent = script.Parent
-local Signal = require(scriptParent.AppCommonLib).Signal
+local parent = script.Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
-return {
-	ReloadPage = Signal.new(),
-	ReportMutedError = Signal.new()
-}
+return { ReloadPage = Signal.new(), ReportMutedError = Signal.new() }

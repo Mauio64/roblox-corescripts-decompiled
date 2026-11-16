@@ -1,10 +1,10 @@
-local scriptParent = script.Parent
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local TextSizeOffsetContext = require(scriptParent.TextSizeOffsetContext)
-local React = require(Parent.React)
+local parent = script.Parent
+local parent2 = script:FindFirstAncestor("Foundation").Parent
+local TextSizeOffsetContext = require(parent.TextSizeOffsetContext)
 
-local function useTextSizeOffset() -- line: 8
-	-- upvalues: React (copy), TextSizeOffsetContext (copy)
+local React = require(parent2.React)
+
+local function useTextSizeOffset()
 	return React.useContext(TextSizeOffsetContext)
 end
 

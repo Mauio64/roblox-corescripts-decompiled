@@ -1,36 +1,33 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(parent.React)
 
-local function useRefCache() -- line: 7
-	-- upvalues: React (copy)
-	local v4 = React.useRef(nil)
+local function useRefCache()
+	local ref = React.useRef(nil)
 
-	if v4.current == nil then
-		local t1 = {}
+	if ref.current == nil then
+		local refs = {}
 
-		setmetatable(t1, {
-			__index = function(_, p2) -- line: 14
-				-- upvalues: React (copy), t1 (copy)
-				local v8 = React.createRef()
-
-				t1[p2] = v8
-
-				return v8
+		setmetatable(refs, {
+			__index = function(_, p)
+				local ref2 = React.createRef()
+				refs[p] = ref2
+				return ref2
 			end,
-			__tostring = function(p3) -- line: 19
-				local s1 = "{"
+			__tostring = function(items)
+				local v = "{"
 
-				for k, v in pairs(p3) do
-					s1 = ("%s\n\t%s -> %s"):format(s1, tostring(k), (tostring(v)))
+				for k, item in pairs(items) do
+					v = ("%s\n\t%s -> %s"):format(v, tostring(k), (tostring(item)))
 				end
 
-				return s1 .. "\n}"
+				return v .. "\n}"
 			end
 		})
-		v4.current = t1
+
+		ref.current = refs
 	end
 
-	return v4.current
+	return ref.current
 end
 
 return useRefCache

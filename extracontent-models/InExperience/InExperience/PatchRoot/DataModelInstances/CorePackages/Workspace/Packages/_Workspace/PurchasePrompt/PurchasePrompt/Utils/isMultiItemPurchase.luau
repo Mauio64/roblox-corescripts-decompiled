@@ -1,9 +1,8 @@
-local ParentParent = script.Parent.Parent
-local RequestType = require(ParentParent.Enums.RequestType)
+local parent = script.Parent.Parent
+local RequestType = require(parent.Enums.RequestType)
 
-function isMultiItemPurchase(p1) -- line: 4
-	-- upvalues: RequestType (copy)
-	return p1 == RequestType.Look
+function isMultiItemPurchase(p): boolean
+	return p == RequestType.Look
 end
 
 return isMultiItemPurchase

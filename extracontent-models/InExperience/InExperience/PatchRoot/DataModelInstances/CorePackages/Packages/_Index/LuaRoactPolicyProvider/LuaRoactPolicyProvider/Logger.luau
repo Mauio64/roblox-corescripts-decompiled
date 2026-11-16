@@ -1,5 +1,5 @@
-local ParentParent = script.Parent.Parent
-local Lumberyak = require(ParentParent.Lumberyak)
+local parent = script.Parent.Parent
+local Lumberyak = require(parent.Lumberyak)
 
 if game:DefineFastFlag("RoactPolicyLoggerName", false) then
 	return (Lumberyak.Logger.new(nil, "LuaRoactPolicyProvider"))

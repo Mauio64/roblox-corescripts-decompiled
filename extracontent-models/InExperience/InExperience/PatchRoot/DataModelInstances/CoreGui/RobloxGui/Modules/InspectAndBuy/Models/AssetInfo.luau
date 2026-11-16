@@ -1,371 +1,415 @@
 local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
 local Dash = require(CorePackages.Packages.Dash)
-local FFlagAXEnableIaBTimedOptionsBulkPurchase = require(CorePackages.Workspace.Packages.AvatarExperienceFlags).FFlagAXEnableIaBTimedOptionsBulkPurchase
-local ParentParent = script.Parent.Parent
-local MockId = require(ParentParent.MockId)
-local Constants = require(ParentParent.Constants)
 
+local AvatarExperienceFlags = require(CorePackages.Workspace.Packages.AvatarExperienceFlags)
+local FFlagAXMarketplaceLicensing = AvatarExperienceFlags.FFlagAXMarketplaceLicensing
+
+local parent = script.Parent.Parent
+
+local MockId = require(parent.MockId)
+local Constants = require(parent.Constants)
 require(CorePackages.Workspace.Packages.AvatarExperienceInspectAndBuy)
+local AvatarExperienceCommon = require(CorePackages.Workspace.Packages.AvatarExperienceCommon)
+local ItemRestrictions = AvatarExperienceCommon.Enums.ItemRestrictions
+local getRawItemLicensingInfo = AvatarExperienceCommon.Utils.getRawItemLicensingInfo
+local parseItemLicensing = AvatarExperienceCommon.Utils.parseItemLicensing
 
-local ItemRestrictions = require(CorePackages.Workspace.Packages.AvatarExperienceCommon).Enums.ItemRestrictions
-local GetFFlagIBEnableCollectiblesSystemSupport = require(ParentParent.Flags.GetFFlagIBEnableCollectiblesSystemSupport)
-local t1 = {
-	new = function() -- line: 57
-		return {}
-	end
-}
+local GetFFlagIBEnableCollectiblesSystemSupport = require(parent.Flags.GetFFlagIBEnableCollectiblesSystemSupport)
 
-function t1.mock() -- line: 63
-	-- upvalues: t1 (copy), MockId (copy), GetFFlagIBEnableCollectiblesSystemSupport (copy)
-	local v11 = t1.new()
+local AssetInfo = {}
 
-	v11.name = ""
-	v11.assetId = MockId()
-	v11.assetTypeId = ""
-	v11.creatorId = ""
-	v11.creatorName = ""
-	v11.creatorHasVerifiedBadge = false
-	v11.owned = false
-	v11.isForSale = false
-	v11.description = ""
-	v11.price = ""
-	v11.productId = ""
-	v11.isLimited = false
-	v11.isLimitedUnique = not GetFFlagIBEnableCollectiblesSystemSupport() and nil
-	v11.collectibleIsLimited = not GetFFlagIBEnableCollectiblesSystemSupport() and nil
-	v11.bundlesAssetIsIn = {}
-	v11.parentBundleId = nil
-	v11.numFavorites = 0
-	v11.minimumMembershipLevel = 0
-	v11.collectibleItemId = ""
-	v11.collectibleProductId = ""
-	v11.collectibleLowestResalePrice = 0
-	v11.collectibleLowestAvailableResaleProductId = ""
-	v11.collectibleLowestAvailableResaleItemInstanceId = ""
-	v11.collectibleQuantityLimitPerUser = 0
-	v11.remaining = 0
-	v11.creatingUniverseId = nil
-
-	return v11
+function AssetInfo.new()
+	return {}
 end
-function t1.fromBulkPurchaseResult(p1, p2) -- line: 105
-	-- upvalues: t1 (copy), ItemRestrictions (copy)
-	local v14 = t1.new()
-	local v15 = if not p2 or not p2.itemRestrictions then {} else p2.itemRestrictions
 
-	v14.resellableCount = (not p2 or not p2.resellableCount) and 0 or p2.resellableCount
+function AssetInfo.mock()
+	local v = AssetInfo.new()
 
-	if p1.status == Enum.MarketplaceItemPurchaseStatus.Success and p1.type == Enum.MarketplaceProductType.AvatarAsset then
-		v14.owned = true
+	v.name = ""
+	v.assetId = MockId()
+	v.assetTypeId = ""
+	v.creatorId = ""
+	v.creatorName = ""
+	v.creatorHasVerifiedBadge = false
+	v.owned = false
+	v.isForSale = false
+	v.description = ""
+	v.price = ""
+	v.productId = ""
+	v.isLimited = false
+	v.isLimitedUnique = not GetFFlagIBEnableCollectiblesSystemSupport() and nil
+	v.collectibleIsLimited = not GetFFlagIBEnableCollectiblesSystemSupport() and nil
 
-		if v15[ItemRestrictions.Collectible] or v15[ItemRestrictions.Limited] or v15[ItemRestrictions.LimitedUnique] then
-			v14.resellableCount = v14.resellableCount + 1
+	v.bundlesAssetIsIn = {}
+
+	v.parentBundleId = nil
+	v.numFavorites = 0
+	v.minimumMembershipLevel = 0
+
+	v.collectibleItemId = ""
+	v.collectibleProductId = ""
+	v.collectibleLowestResalePrice = 0
+	v.collectibleLowestAvailableResaleProductId = ""
+	v.collectibleLowestAvailableResaleItemInstanceId = ""
+	v.collectibleQuantityLimitPerUser = 0
+	v.remaining = 0
+	v.creatingUniverseId = nil
+
+	return v
+end
+
+function AssetInfo.fromBulkPurchaseResult(p, p2)
+	local v = AssetInfo.new()
+	local v2 = not (p2 and p2.itemRestrictions) and {} or p2.itemRestrictions
+	v.resellableCount = not (p2 and p2.resellableCount) and 0 or p2.resellableCount
+
+	if p.status == Enum.MarketplaceItemPurchaseStatus.Success and p.type == Enum.MarketplaceProductType.AvatarAsset then
+		v.owned = true
+
+		if v2[ItemRestrictions.Collectible] or v2[ItemRestrictions.Limited] or v2[ItemRestrictions.LimitedUnique] then
+			v.resellableCount += 1
 		end
 	end
 
-	return v14
+	return v
 end
-function t1.fromAvatarPreviewItem(p3) -- line: 127
-	-- upvalues: t1 (copy)
-	local v17 = t1.new()
 
-	v17.name = p3.name
-	v17.description = p3.description
-	v17.price = p3.priceInRobux
-	v17.productId = tostring(p3.productId)
-	v17.collectibleItemId = p3.collectibleItemId
-	v17.owned = p3.quantityOwned > 0
-	v17.resellableCount = p3.quantityOwned
-	v17.creatorId = tostring(p3.creator.id)
-	v17.creatorName = p3.creator.name
-	v17.creatorHasVerifiedBadge = p3.creator.hasVerifiedBadge
-	v17.assetId = tostring(p3.id)
-	v17.assetTypeId = tostring(p3.assetType)
-	v17.productId = tostring(p3.productId)
-	v17.isForSale = p3.isPurchasable
-	v17.noPriceStatus = p3.noPriceStatus
-	v17.meta = p3.meta
+function AssetInfo.fromAvatarPreviewItem(data)
+	local v = AssetInfo.new()
 
-	if p3.itemRestrictions then
-		local t2 = {}
+	v.name = data.name
+	v.description = data.description
+	v.price = data.priceInRobux
+	v.productId = tostring(data.productId)
+	v.collectibleItemId = data.collectibleItemId
+	v.owned = data.quantityOwned > 0
+	v.resellableCount = data.quantityOwned
+	v.creatorId = tostring(data.creator.id)
+	v.creatorName = data.creator.name
+	v.creatorHasVerifiedBadge = data.creator.hasVerifiedBadge
+	v.assetId = tostring(data.id)
+	v.assetTypeId = tostring(data.assetType)
+	v.productId = tostring(data.productId)
+	v.isForSale = data.isPurchasable
+	v.noPriceStatus = data.noPriceStatus
+	v.meta = data.meta
 
-		for _, v20 in p3.itemRestrictions do
-			t2[v20] = true
+	if FFlagAXMarketplaceLicensing then
+		v.itemLicensingInfo = parseItemLicensing(getRawItemLicensingInfo(data))
+	end
+
+	if not data.itemRestrictions then
+		return v
+	end
+
+	local itemRestrictionSet = {}
+
+	for _, itemRestriction in data.itemRestrictions do
+		itemRestrictionSet[itemRestriction] = true
+	end
+
+	v.itemRestrictions = itemRestrictionSet
+
+	return v
+end
+
+function AssetInfo.fromGetProductInfo(data)
+	local v = AssetInfo.new()
+
+	v.name = data.Name
+	v.description = data.Description
+	v.price = data.PriceInRobux
+	v.productType = data.ProductType
+	v.remaining = data.Remaining
+	v.creatorId = tostring(data.Creator.Id)
+	v.creatorName = data.Creator.Name
+	v.assetId = tostring(data.AssetId)
+	v.assetTypeId = tostring(data.AssetTypeId)
+	v.productId = tostring(data.ProductId)
+
+	v.isForSale = data.IsForSale
+	v.canBeSoldInThisGame = data.CanBeSoldInThisGame
+	v.saleLocation = data.SaleLocation
+	v.remaining = data.Remaining or 0
+
+	if v.productType == Constants.ProductType.CollectibleItem then
+		v.collectibleItemId = data.CollectibleItemId or ""
+		v.collectibleProductId = data.CollectibleProductId or ""
+
+		if data.CollectiblesItemDetails then
+			v.collectibleLowestResalePrice = data.CollectiblesItemDetails.CollectibleLowestResalePrice or 0
+			v.collectibleLowestAvailableResaleProductId = data.CollectiblesItemDetails.CollectibleLowestAvailableResaleProductId
+				or ""
+
+			v.collectibleLowestAvailableResaleItemInstanceId = data.CollectiblesItemDetails.CollectibleLowestAvailableResaleItemInstanceId
+				or ""
+
+			v.collectibleQuantityLimitPerUser = data.CollectiblesItemDetails.CollectibleQuantityLimitPerUser or 0
+
+			v.collectibleIsLimited = data.CollectiblesItemDetails.IsLimited
+		end
+	end
+
+	v.creatorHasVerifiedBadge = data.Creator.HasVerifiedBadge
+
+	if not GetFFlagIBEnableCollectiblesSystemSupport() then
+		v.isLimited = data.IsLimited or data.IsLimitedUnique
+
+		return v
+	end
+
+	v.isLimited = data.IsLimited
+	v.isLimitedUnique = data.IsLimitedUnique
+	return v
+end
+
+function AssetInfo.fromHumanoidDescription(p)
+	local v = AssetInfo.new()
+
+	v.assetId = tostring(p)
+
+	return v
+end
+
+local function fn(p) -- 9 equivalent calls inferred from this helper
+	return math.round(p * 100) / 100
+end
+
+function AssetInfo.fromHumanoidDescriptionAccessory(data)
+	local v = AssetInfo.new()
+	v.assetId = tostring(data.AssetId)
+
+	v.meta = {}
+	v.meta.position = { x = fn(data.Position.X), y = fn(data.Position.Y), z = fn(data.Position.Z) } -- inferred equivalent call
+
+	v.meta.rotation = { x = fn(data.Rotation.X), y = fn(data.Rotation.Y), z = fn(data.Rotation.Z) } -- inferred equivalent call
+
+	v.meta.scale = { x = fn(data.Scale.X), y = fn(data.Scale.Y), z = fn(data.Scale.Z) } -- inferred equivalent call
+
+	if data.IsLayered then
+		v.meta.order = data.Order
+	end
+
+	return v
+end
+
+function AssetInfo.fromGetAssetBundles(p, bundlesAssetIsIn)
+	local v = AssetInfo.new()
+	v.assetId = tostring(p)
+	v.bundlesAssetIsIn = bundlesAssetIsIn
+	return v
+end
+
+function AssetInfo.fromGetFavoriteForAsset(p: string, isFavorited: boolean)
+	local v = AssetInfo.new()
+	v.assetId = tostring(p)
+	v.isFavorited = isFavorited
+	return v
+end
+
+function AssetInfo.fromBundleInfo(p, data)
+	local v = AssetInfo.new()
+	v.assetId = tostring(p)
+	v.parentBundleId = data.bundleId
+	v.bundlesAssetIsIn = { data.bundleId }
+	v.collectibleItemId = data.collectibleItemId
+	v.collectibleProductId = data.collectibleProductId
+	v.collectibleLowestResalePrice = data.collectibleLowestResalePrice
+	v.collectibleLowestAvailableResaleProductId = data.collectibleLowestAvailableResaleProductId
+	v.collectibleLowestAvailableResaleItemInstanceId = data.collectibleLowestAvailableResaleItemInstanceId
+	v.collectibleQuantityLimitPerUser = data.collectibleQuantityLimitPerUser
+	v.collectibleIsLimited = data.collectibleIsLimited
+
+	v.isForSale = data.isForSale
+	v.remaining = data.remaining
+
+	v.owned = data.owned
+
+	if not v.collectibleIsLimited then
+		v.isForSale = v.isForSale and not v.owned
+	end
+
+	v.description = data.description or ""
+	v.productType = Constants.ProductType.CollectibleItem
+
+	if data.price then
+		v.price = data.price
+	end
+
+	return v
+end
+
+function AssetInfo.fromGetAssetFavoriteCount(p, numFavorites)
+	local v = AssetInfo.new()
+
+	v.assetId = tostring(p)
+	v.numFavorites = numFavorites
+
+	return v
+end
+
+function AssetInfo.fromGetEconomyProductInfo(p, owned, price, isForSale, premiumPricing)
+	local v = AssetInfo.new()
+
+	v.assetId = tostring(p.assetId)
+	v.owned = owned
+
+	if price then
+		v.price = price
+	end
+
+	v.isForSale = isForSale
+	v.premiumPricing = premiumPricing
+
+	return v
+end
+
+function AssetInfo.fromGetItemDetailsV2(data)
+	local v = AssetInfo.new()
+
+	v.assetId = tostring(data.id)
+	v.isForSale = data.isPurchasable
+	v.price = data.price or 0
+	v.hasResellers = data.hasResellers
+	v.collectibleItemId = data.collectibleItemId
+
+	local itemRestrictionSet = {}
+
+	if data.itemRestrictions then
+		for _, itemRestriction in data.itemRestrictions do
+			itemRestrictionSet[itemRestriction] = true
 		end
 
-		v17.itemRestrictions = t2
+		v.itemRestrictions = itemRestrictionSet
 	end
 
-	return v17
-end
-function t1.fromGetProductInfo(p4) -- line: 158
-	-- upvalues: t1 (copy), Constants (copy), GetFFlagIBEnableCollectiblesSystemSupport (copy)
-	local v22 = t1.new()
+	v.saleLocationType = data.saleLocationType
+	v.remaining = data.unitsAvailableForConsumption
+	v.collectibleTotalQuantity = data.totalQuantity
+	v.collectibleLowestResalePrice = data.lowestResalePrice
+	v.isOffSale = data.isOffSale
+	v.saleLocationType = data.saleLocationType
+	v.numFavorites = data.favoriteCount
+	v.catalogPriceStatus = data.priceStatus
 
-	v22.name = p4.Name
-	v22.description = p4.Description
-	v22.price = p4.PriceInRobux
-	v22.productType = p4.ProductType
-	v22.remaining = p4.Remaining
-	v22.creatorId = tostring(p4.Creator.Id)
-	v22.creatorName = p4.Creator.Name
-	v22.assetId = tostring(p4.AssetId)
-	v22.assetTypeId = tostring(p4.AssetTypeId)
-	v22.productId = tostring(p4.ProductId)
-	v22.isForSale = p4.IsForSale
-	v22.canBeSoldInThisGame = p4.CanBeSoldInThisGame
-	v22.saleLocation = p4.SaleLocation
-	v22.remaining = p4.Remaining or 0
+	v.timedOptions = data.timedOptions
+	local rawItemLicensingInfo = getRawItemLicensingInfo(data)
 
-	if v22.productType == Constants.ProductType.CollectibleItem then
-		v22.collectibleItemId = p4.CollectibleItemId or ""
-		v22.collectibleProductId = p4.CollectibleProductId or ""
-
-		if p4.CollectiblesItemDetails then
-			v22.collectibleLowestResalePrice = p4.CollectiblesItemDetails.CollectibleLowestResalePrice or 0
-			v22.collectibleLowestAvailableResaleProductId = p4.CollectiblesItemDetails.CollectibleLowestAvailableResaleProductId or ""
-			v22.collectibleLowestAvailableResaleItemInstanceId = p4.CollectiblesItemDetails.CollectibleLowestAvailableResaleItemInstanceId or ""
-			v22.collectibleQuantityLimitPerUser = p4.CollectiblesItemDetails.CollectibleQuantityLimitPerUser or 0
-			v22.collectibleIsLimited = p4.CollectiblesItemDetails.IsLimited
-		end
+	if FFlagAXMarketplaceLicensing and rawItemLicensingInfo ~= nil then
+		v.itemLicensingInfo = parseItemLicensing(rawItemLicensingInfo) or Cryo.None
 	end
 
-	v22.creatorHasVerifiedBadge = p4.Creator.HasVerifiedBadge
-
-	if GetFFlagIBEnableCollectiblesSystemSupport() then
-		v22.isLimited = p4.IsLimited
-		v22.isLimitedUnique = p4.IsLimitedUnique
-
-		return v22
-	end
-
-	v22.isLimited = p4.IsLimited or p4.IsLimitedUnique
-
-	return v22
+	return v
 end
-function t1.fromHumanoidDescription(p5) -- line: 203
-	-- upvalues: t1 (copy)
-	local v24 = t1.new()
 
-	v24.assetId = tostring(p5)
+function AssetInfo.fromGetItemDetails(data)
+	local v = AssetInfo.new()
 
-	return v24
-end
-function t1.fromHumanoidDescriptionAccessory(p6) -- line: 211
-	-- upvalues: t1 (copy)
-	local v26 = t1.new()
+	v.assetId = tostring(data.Id)
+	v.owned = data.Owned
+	v.isForSale = data.IsPurchasable
+	v.price = data.Price or 0
+	v.hasResellers = data.HasResellers
+	v.collectibleItemId = data.CollectibleItemId
 
-	v26.assetId = tostring(p6.AssetId)
-	v26.meta = {}
-	v26.meta.position = {
-		x = math.round(p6.Position.X * 100) / 100,
-		y = math.round(p6.Position.Y * 100) / 100,
-		z = math.round(p6.Position.Z * 100) / 100
-	}
-	v26.meta.rotation = {
-		x = math.round(p6.Rotation.X * 100) / 100,
-		y = math.round(p6.Rotation.Y * 100) / 100,
-		z = math.round(p6.Rotation.Z * 100) / 100
-	}
-	v26.meta.scale = {
-		x = math.round(p6.Scale.X * 100) / 100,
-		y = math.round(p6.Scale.Y * 100) / 100,
-		z = math.round(p6.Scale.Z * 100) / 100
-	}
+	local itemRestrictionSet = {}
 
-	if p6.IsLayered then
-		v26.meta.order = p6.Order
-	end
-
-	return v26
-end
-function t1.fromGetAssetBundles(p7, p8) -- line: 241
-	-- upvalues: t1 (copy)
-	local v29 = t1.new()
-
-	v29.assetId = tostring(p7)
-	v29.bundlesAssetIsIn = p8
-
-	return v29
-end
-function t1.fromGetFavoriteForAsset(s1: string, b1: boolean) -- line: 251
-	-- upvalues: t1 (copy)
-	local v32 = t1.new()
-
-	v32.assetId = tostring(s1)
-	v32.isFavorited = b1
-
-	return v32
-end
-function t1.fromBundleInfo(p9, p10) -- line: 258
-	-- upvalues: t1 (copy), Constants (copy)
-	local v35 = t1.new()
-
-	v35.assetId = tostring(p9)
-	v35.parentBundleId = p10.bundleId
-	v35.bundlesAssetIsIn = { p10.bundleId }
-	v35.collectibleItemId = p10.collectibleItemId
-	v35.collectibleProductId = p10.collectibleProductId
-	v35.collectibleLowestResalePrice = p10.collectibleLowestResalePrice
-	v35.collectibleLowestAvailableResaleProductId = p10.collectibleLowestAvailableResaleProductId
-	v35.collectibleLowestAvailableResaleItemInstanceId = p10.collectibleLowestAvailableResaleItemInstanceId
-	v35.collectibleQuantityLimitPerUser = p10.collectibleQuantityLimitPerUser
-	v35.collectibleIsLimited = p10.collectibleIsLimited
-	v35.isForSale = p10.isForSale
-	v35.remaining = p10.remaining
-	v35.owned = p10.owned
-
-	if not v35.collectibleIsLimited then
-		v35.isForSale = v35.isForSale and not v35.owned
-	end
-
-	v35.description = p10.description or ""
-	v35.productType = Constants.ProductType.CollectibleItem
-
-	if p10.price then
-		v35.price = p10.price
-	end
-
-	return v35
-end
-function t1.fromGetAssetFavoriteCount(p11, p12) -- line: 300
-	-- upvalues: t1 (copy)
-	local v38 = t1.new()
-
-	v38.assetId = tostring(p11)
-	v38.numFavorites = p12
-
-	return v38
-end
-function t1.fromGetEconomyProductInfo(p13, p14, p15, p16, p17) -- line: 309
-	-- upvalues: t1 (copy)
-	local v44 = t1.new()
-
-	v44.assetId = tostring(p13.assetId)
-	v44.owned = p14
-
-	if p15 then
-		v44.price = p15
-	end
-
-	v44.isForSale = p16
-	v44.premiumPricing = p17
-
-	return v44
-end
-function t1.fromGetItemDetailsV2(p18) -- line: 323
-	-- upvalues: t1 (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy)
-	local v46 = t1.new()
-
-	v46.assetId = tostring(p18.id)
-	v46.isForSale = p18.isPurchasable
-	v46.price = p18.price or 0
-	v46.hasResellers = p18.hasResellers
-	v46.collectibleItemId = p18.collectibleItemId
-
-	local t3 = {}
-
-	if p18.itemRestrictions then
-		for _, v49 in p18.itemRestrictions do
-			t3[v49] = true
+	if data.ItemRestrictions then
+		for _, itemRestriction in data.ItemRestrictions do
+			itemRestrictionSet[itemRestriction] = true
 		end
 
-		v46.itemRestrictions = t3
+		v.itemRestrictions = itemRestrictionSet
 	end
 
-	v46.saleLocationType = p18.saleLocationType
-	v46.remaining = p18.unitsAvailableForConsumption
-	v46.collectibleTotalQuantity = p18.totalQuantity
-	v46.collectibleLowestResalePrice = p18.lowestResalePrice
-	v46.isOffSale = p18.isOffSale
-	v46.saleLocationType = p18.saleLocationType
-	v46.numFavorites = p18.favoriteCount
-	v46.catalogPriceStatus = p18.priceStatus
+	v.saleLocationType = data.SaleLocationType
+	v.remaining = data.UnitsAvailableForConsumption
+	v.collectibleTotalQuantity = data.TotalQuantity
+	v.collectibleLowestResalePrice = data.LowestResalePrice
+	v.isOffSale = data.IsOffSale
+	v.saleLocationType = data.SaleLocationType
+	v.numFavorites = data.FavoriteCount
+	v.catalogPriceStatus = data.PriceStatus
 
-	if FFlagAXEnableIaBTimedOptionsBulkPurchase then
-		v46.timedOptions = p18.timedOptions
-	end
+	v.creatingUniverseId = data.CreatingUniverseId
 
-	return v46
+	return v
 end
-function t1.fromGetItemDetails(p19) -- line: 356
-	-- upvalues: t1 (copy)
-	local v51 = t1.new()
 
-	v51.assetId = tostring(p19.Id)
-	v51.owned = p19.Owned
-	v51.isForSale = p19.IsPurchasable
-	v51.price = p19.Price or 0
-	v51.hasResellers = p19.HasResellers
-	v51.collectibleItemId = p19.CollectibleItemId
+function AssetInfo.fromPurchaseSuccess(p)
+	local v = AssetInfo.new()
+	v.assetId = tostring(p)
+	v.owned = true
+	return v
+end
 
-	local t4 = {}
+function AssetInfo.fromGetVersionInfo(p, p2)
+	local v = AssetInfo.new()
 
-	if p19.ItemRestrictions then
-		for _, v54 in p19.ItemRestrictions do
-			t4[v54] = true
+	v.assetId = tostring(p)
+	local creatingUniverseId
+
+	if p2.creatingUniverseId then
+		creatingUniverseId = tostring(p2.creatingUniverseId)
+	end
+
+	v.creatingUniverseId = creatingUniverseId
+
+	return v
+end
+
+function AssetInfo.getSaleDetailsForCollectibles(data)
+	local saleDetailsForCollectibles = Dash.joinDeep({}, data)
+	local saleLocation = data.saleLocation
+
+	if data.productType == Constants.ProductType.CollectibleItem then
+		local v = saleLocation and saleLocation.SaleLocationType ~= Constants.SaleLocationType.ShopOnly
+
+		local v2 = saleLocation and saleLocation.SaleLocationType ~= Constants.SaleLocationType.ShopAndExperiencesById
+		local v3
+
+		if saleLocation then
+			if
+				saleLocation.SaleLocationType == Constants.SaleLocationType.ShopAndExperiencesById
+				and type(saleLocation.UniverseIds) == "table"
+			then
+				v3 = table.find(saleLocation.UniverseIds, game.GameId) ~= nil
+			else
+				v3 = false
+			end
+		else
+			v3 = saleLocation
 		end
 
-		v51.itemRestrictions = t4
-	end
+		local v4 = saleLocation and saleLocation.SaleLocationType ~= Constants.SaleLocationType.ExperiencesDevApiOnly
 
-	v51.saleLocationType = p19.SaleLocationType
-	v51.remaining = p19.UnitsAvailableForConsumption
-	v51.collectibleTotalQuantity = p19.TotalQuantity
-	v51.collectibleLowestResalePrice = p19.LowestResalePrice
-	v51.isOffSale = p19.IsOffSale
-	v51.saleLocationType = p19.SaleLocationType
-	v51.numFavorites = p19.FavoriteCount
-	v51.catalogPriceStatus = p19.PriceStatus
-	v51.creatingUniverseId = p19.CreatingUniverseId
+		local isForSale = data.isForSale and data.canBeSoldInThisGame
 
-	return v51
-end
-function t1.fromPurchaseSuccess(p20) -- line: 388
-	-- upvalues: t1 (copy)
-	local v56 = t1.new()
+		if isForSale then
+			if v then
+				isForSale = if v2 or v3 then v4 else v3
+			else
+				isForSale = v
+			end
+		end
 
-	v56.assetId = tostring(p20)
-	v56.owned = true
+		saleDetailsForCollectibles.isForSale = isForSale
 
-	return v56
-end
-function t1.fromGetVersionInfo(p21, p22) -- line: 401
-	-- upvalues: t1 (copy)
-	local v59 = t1.new()
-
-	v59.assetId = tostring(p21)
-	v59.creatingUniverseId = if not p22.creatingUniverseId then nil else tostring(p22.creatingUniverseId)
-
-	return v59
-end
-function t1.getSaleDetailsForCollectibles(p23) -- line: 412
-	-- upvalues: Dash (copy), Constants (copy)
-	local v61 = Dash.joinDeep({}, p23)
-	local saleLocation = p23.saleLocation
-
-	if p23.productType == Constants.ProductType.CollectibleItem then
-		local v63 = saleLocation and saleLocation.SaleLocationType ~= Constants.SaleLocationType.ShopOnly
-		local v64 = saleLocation and saleLocation.SaleLocationType ~= Constants.SaleLocationType.ShopAndExperiencesById
-		local v65 = saleLocation and (saleLocation.SaleLocationType == Constants.SaleLocationType.ShopAndExperiencesById and (type(saleLocation.UniverseIds) == "table" and table.find(saleLocation.UniverseIds, game.GameId) ~= nil))
-		local v66 = saleLocation and saleLocation.SaleLocationType ~= Constants.SaleLocationType.ExperiencesDevApiOnly
-
-		v61.isForSale = p23.isForSale and (p23.canBeSoldInThisGame and (v63 and ((v64 or v65) and v66)))
-
-		if not p23.collectibleIsLimited then
-			v61.isForSale = v61.isForSale and not v61.owned
-
-			return v61
+		if not data.collectibleIsLimited then
+			saleDetailsForCollectibles.isForSale = saleDetailsForCollectibles.isForSale
+				and not saleDetailsForCollectibles.owned
+			return saleDetailsForCollectibles
 		end
 	else
-		v61.isForSale = p23.isForSale and p23.canBeSoldInThisGame
+		saleDetailsForCollectibles.isForSale = data.isForSale and data.canBeSoldInThisGame
 
-		if p23.canBeSoldInThisGame == nil then
-			v61.isForSale = p23.isForSale
+		if data.canBeSoldInThisGame == nil then
+			saleDetailsForCollectibles.isForSale = data.isForSale
 		end
 	end
 
-	return v61
+	return saleDetailsForCollectibles
 end
 
-return t1
+return AssetInfo

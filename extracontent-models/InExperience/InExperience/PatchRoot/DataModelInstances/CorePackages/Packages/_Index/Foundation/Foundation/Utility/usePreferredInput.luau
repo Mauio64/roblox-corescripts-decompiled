@@ -1,30 +1,28 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local UserInputService = require(Foundation.Utility.Wrappers.Services).UserInputService
+local parent = Foundation.Parent
+local React = require(parent.React)
 
-local function usePreferredInput() -- line: 7
-	-- upvalues: React (copy), UserInputService (copy)
-	local v6, v7 = React.useState(UserInputService.PreferredInput)
+local Services = require(Foundation.Utility.Wrappers.Services)
+local UserInputService = Services.UserInputService
 
-	React.useEffect(function() -- line: 10
-		-- upvalues: UserInputService (copy), v7 (copy)
-		local connection = UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function() -- line: 12
-			-- upvalues: v7 (copy), UserInputService (copy)
-			v7(UserInputService.PreferredInput)
+local function usePreferredInput()
+	local state, setState = React.useState(UserInputService.PreferredInput)
+
+	React.useEffect(function()
+		local preferredInputChangedConnection = UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function()
+			setState(UserInputService.PreferredInput)
 		end)
 
-		v7(UserInputService.PreferredInput)
+		setState(UserInputService.PreferredInput)
 
-		return function() -- line: 18
-			-- upvalues: connection (copy)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if preferredInputChangedConnection then
+				preferredInputChangedConnection:Disconnect()
 			end
 		end
 	end, {})
 
-	return v6
+	return state
 end
 
 return usePreferredInput

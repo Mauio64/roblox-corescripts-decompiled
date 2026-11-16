@@ -1,72 +1,65 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.App.Style.StyleTypes)
+require(parent.App.Style.StyleTypes)
+local StyleDefaults = {}
 
-return {
-	getBaseMenuDefaultTokens = function(p1) -- line: 27
-		assert(p1.Tokens ~= nil, "Design token support is not enabled!")
+function StyleDefaults.getBaseMenuDefaultTokens(p)
+	assert(p.Tokens ~= nil, "Design token support is not enabled!")
+	return {
+		elementHeight = p.Tokens.Size.Size_1400,
+		borderCornerRadius = p.Tokens.Radius.Medium,
+		background = {
+			Color = p.Tokens.Color.Surface.Surface_300.Color3,
+			Transparency = p.Tokens.Color.Surface.Surface_300.Transparency
+		}
+	}
+end
 
-		return {
-			elementHeight = p1.Tokens.Component.MenuCell.Base.Container.Height,
-			borderCornerRadius = p1.Tokens.Component.BaseMenu.BorderRadius,
-			background = {
-				Color = p1.Tokens.Component.BaseMenu.BackgroundColor.Color3,
-				Transparency = p1.Tokens.Component.BaseMenu.BackgroundColor.Transparency
+function StyleDefaults.getCellDefaultTokens(p)
+	assert(p.Tokens ~= nil, "Design token support is not enabled!")
+	return {
+		iconSize = p.Tokens.Size.Size_800,
+		selectedIconSize = p.Tokens.Size.Size_800,
+		iconPaddingLeft = p.Tokens.Size.Size_300,
+		textPadding = { left = p.Tokens.Size.Size_300, right = p.Tokens.Size.Size_300 },
+		fontStyle = {
+			Font = p.Tokens.Typography.TitleLarge.Font,
+			RelativeSize = p.Tokens.Typography.TitleLarge.FontSize / p.Font.BaseSize,
+			RelativeMinSize = p.Tokens.Typography.TitleLarge.FontSize / p.Font.BaseSize
+		},
+		dividerSize = p.Tokens.Stroke.Standard,
+		selectedIconPaddingRight = p.Tokens.Size.Size_300
+	}
+end
+
+function StyleDefaults.getDropdownMenuCellDefaultTokens(p)
+	return {
+		iconSize = p.Tokens.Size.Size_900,
+		containerPadding = { left = p.Tokens.Size.Size_400, right = p.Tokens.Size.Size_600 },
+		textFont = p.Tokens.Typography.TitleLarge,
+		iconTextSpacing = p.Tokens.Size.Size_400,
+		border = { cornerRadius = p.Tokens.Radius.Medium, size = p.Tokens.Stroke.Standard }
+	}
+end
+
+function StyleDefaults.getDropdownMenuDefaultTokens(p)
+	return {
+		height = UDim.new(0, p.Tokens.Size.Size_1200),
+		menuStateColors = {
+			buttonDefault = {
+				Color = p.Tokens.Color.ActionSubtle.Border.Color3,
+				Transparency = p.Tokens.Color.ActionSubtle.Border.Transparency
+			},
+			contentDefault = {
+				Color = p.Tokens.Color.Content.Default.Color3,
+				Transparency = p.Tokens.Color.Content.Default.Transparency
+			},
+			alert = {
+				Color = p.Tokens.Color.ActionAlert.Border.Color3,
+				Transparency = p.Tokens.Color.ActionAlert.Border.Transparency
 			}
 		}
-	end,
-	getCellDefaultTokens = function(p2) -- line: 7
-		assert(p2.Tokens ~= nil, "Design token support is not enabled!")
+	}
+end
 
-		return {
-			iconSize = p2.Tokens.Component.MenuCell.Base.IconFrame.Size,
-			selectedIconSize = p2.Tokens.Component.MenuCell.Base.CheckFrame.Size,
-			iconPaddingLeft = p2.Tokens.Component.MenuCell.Base.Container.Spacing.Leading,
-			textPadding = {
-				left = p2.Tokens.Component.MenuCell.Base.TextFrame.Spacing.Leading,
-				right = p2.Tokens.Component.MenuCell.Base.TextFrame.Spacing.Trailing
-			},
-			fontStyle = {
-				Font = p2.Tokens.Component.MenuCell.Base.Text.Typography.Font,
-				RelativeSize = p2.Tokens.Component.MenuCell.Base.Text.Typography.FontSize / p2.Font.BaseSize,
-				RelativeMinSize = p2.Tokens.Component.MenuCell.Base.Text.Typography.FontSize / p2.Font.BaseSize
-			},
-			dividerSize = p2.Tokens.Component.MenuCell.Divider.Container.BorderWidth,
-			selectedIconPaddingRight = p2.Tokens.Component.MenuCell.Base.Container.Spacing.Trailing
-		}
-	end,
-	getDropdownMenuCellDefaultTokens = function(p3) -- line: 39
-		return {
-			iconSize = p3.Tokens.Global.Size_450,
-			containerPadding = {
-				left = p3.Tokens.Global.Space_200,
-				right = p3.Tokens.Global.Space_300
-			},
-			textFont = p3.Tokens.Semantic.Typography.Subheader,
-			iconTextSpacing = p3.Tokens.Global.Space_200,
-			border = {
-				cornerRadius = p3.Tokens.Semantic.Radius.Medium,
-				size = p3.Tokens.Global.Stroke_100
-			}
-		}
-	end,
-	getDropdownMenuDefaultTokens = function(p4) -- line: 55
-		return {
-			height = UDim.new(0, p4.Tokens.Global.Size_600),
-			menuStateColors = {
-				buttonDefault = {
-					Color = p4.Tokens.Semantic.Color.Action.Secondary.Border.Color3,
-					Transparency = p4.Tokens.Semantic.Color.Action.Secondary.Border.Transparency
-				},
-				contentDefault = {
-					Color = p4.Tokens.Semantic.Color.Text.Default.Color3,
-					Transparency = p4.Tokens.Semantic.Color.Text.Default.Transparency
-				},
-				alert = {
-					Color = p4.Tokens.Semantic.Color.Action.Alert.Border.Color3,
-					Transparency = p4.Tokens.Semantic.Color.Action.Alert.Border.Transparency
-				}
-			}
-		}
-	end
-}
+return StyleDefaults

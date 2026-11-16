@@ -1,7 +1,11 @@
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local RODUX_KEY = require(SquadsCore.Common.Constants).RODUX_KEY
+local parent = SquadsCore.Parent
 
-return (require(SquadsCoreParent.LuaSocialLibrariesDeps).RoduxPresence.config({
+local Constants = require(SquadsCore.Common.Constants)
+local RODUX_KEY = Constants.RODUX_KEY
+
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+
+return (LuaSocialLibrariesDeps.RoduxPresence.config({
 	keyPath = RODUX_KEY .. ".Presence"
 }))

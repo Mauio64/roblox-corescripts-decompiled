@@ -1,184 +1,149 @@
-local Parent = script:FindFirstAncestor("FriendsChat").Parent
-local Foundation = require(Parent.Foundation)
-local ChatUIPrimitives = require(Parent.ChatUIPrimitives)
+local parent = script:FindFirstAncestor("FriendsChat").Parent
+
+local ChatUIPrimitives = require(parent.ChatUIPrimitives)
 local computeNameColor = ChatUIPrimitives.Utils.computeNameColor
 local formatInlineIcon = ChatUIPrimitives.Utils.formatInlineIcon
 local escapeRichText = ChatUIPrimitives.Utils.escapeRichText
-local getReplyLabelDescriptor = require(Parent.AppChat.getReplyLabelDescriptor)
 
+local NameInfo = require(script.Parent.NameInfo)
 require(script.Parent.classifyMessage)
+local rowCopy = require(script.Parent.rowCopy)
+require(script.Parent.Parent.Parent.Utils.useLocalize)
 
-local IconName = Foundation.Enums.IconName
-local color3 = Color3.fromRGB(255, 255, 255)
+local color = Color3.fromRGB(255, 255, 255)
 
-local function ceilToEven(n1: number) -- line: 82
-	local v20 = math.ceil(n1)
+local function ceilToEven(p: number)
+	local v = math.ceil(p)
 
-	if v20 % 2 == 1 then
-		v20 += 1
+	if v % 2 == 1 then
+		v += 1
 	end
 
-	return (math.max(0, v20))
+	return (math.max(0, v))
 end
-local function getSystemIconAttributes(n2: number?) -- line: 94
-	if n2 == nil then
-		return {
-			weight = "600"
-		}
+
+local function getSystemIconAttributes(systemTextSize: number?)
+	if systemTextSize == nil then
+		return { weight = "600" }
 	end
 
-	local v22 = math.ceil(n2 * 3 / 4)
+	local v = math.ceil(systemTextSize * 3 / 4)
 
-	if v22 % 2 == 1 then
-		v22 += 1
+	if v % 2 == 1 then
+		v += 1
 	end
 
-	local v23 = math.max(0, v22)
+	return { weight = "600", size = tostring((math.max(0, v))) }
+end
+
+local function makeSystemRow(data)
+	local content = escapeRichText(data.content)
+
+	if data.icon ~= nil then
+		content = `{formatInlineIcon(data.icon, getSystemIconAttributes(data.systemTextSize))} {content}`
+	end
 
 	return {
-		weight = "600",
-		size = tostring(v23)
+		content = content,
+		skeletonWidth = data.skeletonWidth or "none",
+		displayStyle = "system"
 	}
 end
-local function hashContent(s1: string) -- line: 115
-	return (string.gsub(s1, "[^%s]", "#"))
-end
-local function isNameLoading(t1: {[any]: any}) -- line: 119
-	return t1.name == nil or t1.name == ""
-end
-local function makeSystemRow(t2: {[any]: any}) -- line: 126
-	-- upvalues: escapeRichText (copy), formatInlineIcon (copy), getSystemIconAttributes (copy)
-	local v27 = escapeRichText(t2.content)
-	local v28 = if t2.icon == nil then v27 else `{ formatInlineIcon(t2.icon, (getSystemIconAttributes(t2.systemTextSize))) } { v27 }`
 
-	return {
-		displayStyle = "system",
-		content = v28,
-		skeletonWidth = t2.skeletonWidth or "none"
-	}
-end
-local function buildReplyHeader(t3: {[any]: any}, t4: {[any]: any}, t5: {[any]: any}) -- line: 138
-	-- upvalues: makeSystemRow (copy), getReplyLabelDescriptor (copy), IconName (copy)
-	local localize = t5.localize
-	local systemTextSize = t5.systemTextSize
-	local localUserId = t4.localUserId
-	local v35 = localUserId ~= nil and localUserId == t3.senderUserId
-	local v36 = localUserId ~= nil and localUserId == t3.repliedToUserId
-	local v37 = t3.senderUserId == t3.repliedToUserId
-	local v38 = t4.namesByUserId or {}
-	local v39 = v38[t3.senderUserId] or {}
-	local v40 = v38[t3.repliedToUserId] or {}
-
-	if (v39.name == nil or v39.name == "") and not v35 or (v40.name == nil or v40.name == "") and not v36 then
-		return (makeSystemRow({
-			content = "",
-			skeletonWidth = "full"
-		}))
-	end
-
-	local v41 = getReplyLabelDescriptor({
-		senderIsLocalUser = v35,
-		senderRepliedToSelf = v37,
-		senderRepliedToLocalUser = v36,
-		isGroup = t4.isGroup == true,
-		senderName = v39.name or "",
-		repliedToName = v40.name or ""
+local function buildReplyHeader(data, data2, p)
+	local replyLabelText = rowCopy.replyLabelText({
+		senderUserId = data.senderUserId,
+		repliedToUserId = data.repliedToUserId,
+		localUserId = data2.localUserId,
+		isGroup = data2.isGroup == true,
+		namesByUserId = data2.namesByUserId or {},
+		localize = p.localize
 	})
-	local v42 = not localize and "" or localize(v41)
 
-	return (makeSystemRow({
-		content = v42,
-		icon = IconName.ArrowCurlToLeft,
+	if replyLabelText == nil then
+		return makeSystemRow({ content = "", skeletonWidth = "full" })
+	end
+
+	local systemTextSize = p.systemTextSize
+	return makeSystemRow({
+		content = replyLabelText,
+		icon = rowCopy.REPLY_ICON,
 		systemTextSize = systemTextSize
-	}))
-end
-local function buildHiddenUser(t6: {[any]: any}, t7: {[any]: any}) -- line: 179
-	-- upvalues: makeSystemRow (copy), IconName (copy)
-	if t6.name == nil or t6.name == "" then
-		return (makeSystemRow({
-			content = "",
-			skeletonWidth = "full"
-		}))
-	end
-
-	local localize = t7.localize
-	local v46 = not localize and "" or localize({
-		"Feature.Chat.Message.CannotBeDisplayedThirdPerson",
-		displayName = t6.name
 	})
-
-	return (makeSystemRow({
-		content = v46,
-		icon = IconName.LockClosed,
-		systemTextSize = t7.systemTextSize
-	}))
 end
-local function buildUserText(t8: {[any]: any}, t9: {[any]: any}) -- line: 194
-	-- upvalues: escapeRichText (copy), computeNameColor (copy), color3 (copy)
-	local v50
 
-	if t8.moderated then
-		local body = t8.body
+local function buildHiddenUser(p, p2)
+	if NameInfo.isNameLoading(p) then
+		return makeSystemRow({ content = "", skeletonWidth = "full" })
+	end
 
-		v50 = string.gsub(body, "[^%s]", "#")
+	local localize = p2.localize
+	return makeSystemRow({
+		content = rowCopy.hiddenNoticeText(p.name, localize),
+		icon = rowCopy.HIDDEN_ICON,
+		systemTextSize = p2.systemTextSize
+	})
+end
+
+local function buildUserText(data, p)
+	local v
+
+	if data.moderated then
+		v = rowCopy.maskedBody(data)
 	else
-		v50 = escapeRichText(t8.body)
+		v = escapeRichText(data.body)
 	end
 
-	local name = t9.name
-
-	if name == nil or name == "" then
-		return {
-			skeletonWidth = "prefix",
-			displayStyle = "user",
-			content = `: { v50 }`
-		}
+	if NameInfo.isNameLoading(p) then
+		return { content = `: {v}`, skeletonWidth = "prefix", displayStyle = "user" }
 	end
 
-	local username = t9.username
-	local v53 = if username == nil or username == "" then color3 else computeNameColor(username)
+	local username = p.username
+	local v2
+
+	if username == nil or username == "" then
+		v2 = color
+	else
+		v2 = computeNameColor(username)
+	end
 
 	return {
+		content = string.format("<font color=\"#%s\">%s</font>: %s", v2:ToHex(), escapeRichText(p.name), v),
 		skeletonWidth = "none",
-		displayStyle = "user",
-		content = string.format("<font color=\"#%s\">%s</font>: %s", v53:ToHex(), escapeRichText(name), v50)
+		displayStyle = "user"
 	}
 end
-local function buildRowDisplay(p1, t10: {[any]: any}, t11: {[any]: any}) -- line: 227
-	-- upvalues: IconName (copy), makeSystemRow (copy), buildHiddenUser (copy), buildReplyHeader (copy), buildUserText (copy)
-	local localize = t11.localize
-	local systemTextSize = t11.systemTextSize
-	local v59 = t10.namesByUserId or {}
 
-	if p1.kind == "systemMessage" then
-		local v60 = if p1.variant ~= "party" then IconName.CircleI else IconName.TwoPeopleSpeechBubble
+local function buildRowDisplay(data, p, p2)
+	local localize = p2.localize
+	local systemTextSize = p2.systemTextSize
+	local namesByUserId = p.namesByUserId or {}
 
-		return (makeSystemRow({
-			content = p1.body,
-			icon = v60,
+	if data.kind == "systemMessage" then
+		return makeSystemRow({
+			content = data.body,
+			icon = rowCopy.systemIcon(data.variant),
 			systemTextSize = systemTextSize
-		}))
+		})
 	end
 
-	if p1.kind == "moderationNotice" then
-		local v61 = not localize and "" or localize("Feature.Chat.Message.MessageContentModerated")
-
-		return (makeSystemRow({
-			content = v61,
-			icon = IconName.TriangleExclamation,
+	if data.kind == "moderationNotice" then
+		return makeSystemRow({
+			content = rowCopy.moderatedNoticeText(localize),
+			icon = rowCopy.MODERATED_ICON,
 			systemTextSize = systemTextSize
-		}))
+		})
 	end
 
-	if p1.kind == "hiddenUser" then
-		return (buildHiddenUser(v59[p1.senderUserId] or {}, t11))
+	if data.kind == "hiddenUser" then
+		return buildHiddenUser(namesByUserId[data.senderUserId] or {}, p2)
 	end
 
-	if p1.kind == "replyHeader" then
-		return (buildReplyHeader(p1, t10, t11))
+	if data.kind == "replyHeader" then
+		return buildReplyHeader(data, p, p2)
 	end
 
-	return (buildUserText(p1, v59[p1.senderUserId] or {}))
+	return buildUserText(data, namesByUserId[data.senderUserId] or {})
 end
 
 return buildRowDisplay

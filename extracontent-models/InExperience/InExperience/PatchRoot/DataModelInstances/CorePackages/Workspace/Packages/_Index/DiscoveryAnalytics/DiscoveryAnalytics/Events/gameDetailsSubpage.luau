@@ -1,9 +1,13 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("GameDetailsSubpageThrottleHundrethsPercent", 10000)
-local v6 = t.strictInterface({
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local defineFastInt = game:DefineFastInt("GameDetailsSubpageThrottleHundrethsPercent", 10000)
+
+local strictInterface = t.strictInterface({
 	universeId = t.string,
 	placeId = t.string,
 	subpage = t.string,
@@ -12,29 +16,22 @@ local v6 = t.strictInterface({
 	ctx = t.string
 })
 
-return function(p1, s1: string) -- line: 20
-	-- upvalues: v6 (copy), DiscoveryEventErrorLogger (copy), v5 (copy), TelemetryService (copy)
-	local v9, v10 = v6(p1)
+return function(customFields, eventContext: string)
+	local v, v2 = strictInterface(customFields)
 
-	if not v9 then
-		DiscoveryEventErrorLogger.reportError("GameDetailsSubpageInvalidInterface", v10)
+	if not v then
+		DiscoveryEventErrorLogger.reportError("GameDetailsSubpageInvalidInterface", v2)
 	end
 
-	local t1 = {
+	TelemetryService:LogEvent({
 		eventName = "gameDetailsSubpage",
-		description = "User has navigated to a game details subpage",
 		backends = { "EventIngest" },
-		throttlingPercentage = v5,
-		lastUpdated = {
-			25,
-			11,
-			11
-		}
-	}
-
-	TelemetryService:LogEvent(t1, {
-		eventContext = s1,
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 25, 11, 11 },
+		description = "User has navigated to a game details subpage"
+	}, {
+		eventContext = eventContext,
 		standardizedFields = { "addSessionInfo" },
-		customFields = p1
+		customFields = customFields
 	})
 end

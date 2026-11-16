@@ -1,126 +1,150 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
 require(script.Parent["ReactRobloxHostTypes.roblox"])
-require(ParentParent.ReactReconciler)
 
-local Shared = require(ParentParent.Shared)
-local ReactWorkTags = nil
-local HostComponent = nil
-local HostComponent2 = nil
-local HostComponent3 = nil
-local HostComponent4 = nil
+require(parent.ReactReconciler)
+
+local Shared = require(parent.Shared)
+
+local reactWorkTags = nil
+local hostComponent = nil
+local v = nil
+local v2 = nil
+local v3 = nil
+
 local getParentSuspenseInstance = nil
 local invariant = Shared.invariant
-local t1 = {}
-local t2 = {}
-local t3 = {}
-local t4 = {}
-local v14 = string.sub(tostring(math.random()), 3)
-local v15 = "__reactFiber$" .. v14
-local v16 = "__reactContainer$" .. v14
 
-function t1.precacheFiberNode(p1, p2) -- line: 66
-	-- upvalues: t3 (copy)
-	t3[p2] = p1
-end
-function t1.uncacheFiberNode(p3) -- line: 73
-	-- upvalues: t3 (copy), t4 (copy)
-	t3[p3] = nil
-	t4[p3] = nil
-end
-function t1.markContainerAsRoot(p4, p5) -- line: 80
-	-- upvalues: t2 (copy)
-	t2[p5] = p4
-end
-function t1.unmarkContainerAsRoot(p6) -- line: 86
-	-- upvalues: t2 (copy)
-	t2[p6] = nil
-end
-function t1.isContainerMarkedAsRoot(p7) -- line: 92
-	-- upvalues: t2 (copy)
-	return not not t2[p7]
-end
-function t1.getClosestInstanceFromNode(p8) -- line: 106
-	-- upvalues: t3 (copy), getParentSuspenseInstance (ref)
-	local v25 = t3[p8]
+local v4 = {}
 
-	if v25 then
-		return v25
+local v5 = {}
+local v6 = {}
+
+local v7 = string.sub(tostring(math.random()), 3)
+local v8 = "__reactFiber$" .. v7
+local v9 = "__reactContainer$" .. v7
+local ReactRobloxComponentTree = {}
+
+function ReactRobloxComponentTree.precacheFiberNode(p, p2)
+	v5[p2] = p
+end
+
+function ReactRobloxComponentTree.uncacheFiberNode(p)
+	v5[p] = nil
+	v6[p] = nil
+end
+
+function ReactRobloxComponentTree.markContainerAsRoot(p, p2)
+	v4[p2] = p
+end
+
+function ReactRobloxComponentTree.unmarkContainerAsRoot(p)
+	v4[p] = nil
+end
+
+function ReactRobloxComponentTree.isContainerMarkedAsRoot(p)
+	return v4[p] and true or false
+end
+
+function ReactRobloxComponentTree.getClosestInstanceFromNode(p)
+	local v10 = v5[p]
+
+	if v10 then
+		return v10
 	end
 
-	local p8Parent = p8.Parent
+	local v11 = p.Parent
 
-	while p8Parent do
-		local v27 = t3[p8Parent]
+	while v11 do
+		local v12 = v5[v11]
 
-		if v27 then
-			local alternate = v27.alternate
+		if v12 then
+			local alternate = v12.alternate
 
-			if v27.child ~= nil or alternate ~= nil and alternate.child ~= nil then
-				if getParentSuspenseInstance == nil then
-					getParentSuspenseInstance = require(script.Parent.ReactRobloxHostConfig).getParentSuspenseInstance
-				end
-
-				local v29 = getParentSuspenseInstance(p8)
-
-				while v29 ~= nil do
-					local v30 = t3[v29]
-
-					if v30 then
-						return v30
-					end
-
-					v29 = getParentSuspenseInstance(v29)
-				end
+			if v12.child == nil and (alternate == nil or alternate.child == nil) then
+				return v12
 			end
 
-			return v27
+			if getParentSuspenseInstance == nil then
+				local ReactRobloxHostConfig = require(script.Parent.ReactRobloxHostConfig)
+				getParentSuspenseInstance = ReactRobloxHostConfig.getParentSuspenseInstance
+			end
+
+			local parentSuspenseInstance = getParentSuspenseInstance(p)
+
+			while parentSuspenseInstance ~= nil do
+				local v13 = v5[parentSuspenseInstance]
+
+				if v13 then
+					return v13
+				end
+
+				parentSuspenseInstance = getParentSuspenseInstance(parentSuspenseInstance)
+			end
+
+			return v12
 		end
 
-		p8 = p8Parent
-		p8Parent = p8.Parent
+		p = v11
+		v11 = v11.Parent
 	end
 
 	return nil
 end
-function t1.getInstanceFromNode(p9) -- line: 190
-	-- upvalues: ReactWorkTags (ref), HostComponent (ref), HostComponent2 (ref), HostComponent3 (ref), HostComponent4 (ref), v15 (copy), v16 (copy)
-	if ReactWorkTags == nil then
-		ReactWorkTags = require(script.Parent.Parent["ReactReconciler.roblox"]).ReactWorkTags
-		HostComponent = ReactWorkTags.HostComponent
-		HostComponent2 = ReactWorkTags.HostComponent
-		HostComponent3 = ReactWorkTags.HostComponent
-		HostComponent4 = ReactWorkTags.HostComponent
+
+function ReactRobloxComponentTree.getInstanceFromNode(p)
+	if reactWorkTags == nil then
+		local ReactReconcilerroblox = require(script.Parent.Parent["ReactReconciler.roblox"])
+		reactWorkTags = ReactReconcilerroblox.ReactWorkTags
+
+		hostComponent = reactWorkTags.HostComponent
+
+		if Shared.ReactFeatureFlags.fixGetInstanceFromNode then
+			v = reactWorkTags.HostText
+			v2 = reactWorkTags.HostRoot
+			v3 = reactWorkTags.SuspenseComponent
+		else
+			v = reactWorkTags.HostComponent
+			v2 = reactWorkTags.HostComponent
+			v3 = reactWorkTags.HostComponent
+		end
 	end
 
-	local v32 = p9[v15] or p9[v16]
+	local v10
 
-	if v32 then
-		if v32.tag == HostComponent or v32.tag == HostComponent2 or v32.tag == HostComponent4 or v32.tag == HostComponent3 then
-			return v32
-		end
+	if Shared.ReactFeatureFlags.fixGetInstanceFromNode then
+		v10 = v5[p] or v4[p]
+	else
+		v10 = p[v8] or p[v9]
+	end
 
+	if not v10 then
 		return nil
 	end
 
+	if v10.tag == hostComponent or v10.tag == v or v10.tag == v3 or v10.tag == v2 then
+		return v10
+	end
+
 	return nil
 end
-function t1.getNodeFromInstance(p10) -- line: 224
-	-- upvalues: HostComponent (ref), HostComponent2 (ref), invariant (copy)
-	if p10.tag == HostComponent or p10.tag == HostComponent2 then
-		return p10.stateNode
+
+function ReactRobloxComponentTree.getNodeFromInstance(p)
+	if p.tag == hostComponent or p.tag == v then
+		return p.stateNode
 	end
 
 	invariant(false, "getNodeFromInstance: Invalid argument.")
+
 	error("getNodeFromInstance: Invalid argument.")
 end
-function t1.getFiberCurrentPropsFromNode(p11) -- line: 238
-	-- upvalues: t4 (copy)
-	return t4[p11]
-end
-function t1.updateFiberProps(p12, p13) -- line: 244
-	-- upvalues: t4 (copy)
-	t4[p12] = p13
+
+function ReactRobloxComponentTree.getFiberCurrentPropsFromNode(p)
+	return v6[p]
 end
 
-return t1
+function ReactRobloxComponentTree.updateFiberProps(p, p2)
+	v6[p] = p2
+end
+
+return ReactRobloxComponentTree

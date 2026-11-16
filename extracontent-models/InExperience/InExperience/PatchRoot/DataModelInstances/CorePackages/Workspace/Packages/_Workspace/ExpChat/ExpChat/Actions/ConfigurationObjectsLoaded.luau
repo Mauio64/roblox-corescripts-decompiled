@@ -1,10 +1,11 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 13
+return Rodux.makeActionCreator(script.Name, function(data)
 	return {
-		bubbleChatSettings = p1.bubbleChatSettings or {},
-		chatWindowSettings = p1.chatWindowSettings or {},
-		chatInputBarSettings = p1.chatInputBarSettings or {},
-		channelTabsSettings = p1.channelTabsSettings or {}
+		bubbleChatSettings = data.bubbleChatSettings or {},
+		chatWindowSettings = data.chatWindowSettings or {},
+		chatInputBarSettings = data.chatInputBarSettings or {},
+		channelTabsSettings = data.channelTabsSettings or {}
 	}
 end)

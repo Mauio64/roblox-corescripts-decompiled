@@ -1,5 +1,1 @@
-return {
-	NoRecommendations = "NoRecommendations",
-	Failed = "Failed",
-	Timeout = "Timeout"
-}
+return { NoRecommendations = "NoRecommendations", Failed = "Failed", Timeout = "Timeout" }

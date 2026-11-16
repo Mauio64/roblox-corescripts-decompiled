@@ -1,35 +1,45 @@
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
-
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
 return {
 	categories = {
 		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
 		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH,
 		ValidationEnums.UploadCategory.RIGID_ACCESSORY
 	},
 	requiredData = { ValidationEnums.SharedDataMember.rootInstance },
-	fflag = getFFlagUGCValidateMigrateSchemaProperties,
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 24
-		-- upvalues: Constants (copy), ErrorSourceStrings (copy)
-		local rootInstance = p2.rootInstance
-		local descendants = rootInstance:GetDescendants()
+	run = function(object, p)
+		local rootInstance = p.rootInstance
 
+		local descendants = rootInstance:GetDescendants()
 		table.insert(descendants, rootInstance)
 
-		for _, v11 in descendants do
-			if v11:IsA("StringValue") and v11.Name == "AvatarPartScaleType" and not Constants.AvatarPartScaleTypes[v11.Value] then
-				p1:fail(ErrorSourceStrings.Keys.ScaleTypeInvalid, {
-					ParentName = if not v11.Parent then v11.Name else v11.Parent.Name
-				})
+		for _, stringValue in descendants do
+			if
+				not stringValue:IsA("StringValue")
+				or stringValue.Name ~= "AvatarPartScaleType"
+				or Constants.AvatarPartScaleTypes[stringValue.Value]
+			then
+				continue
 			end
+
+			local scaleTypeInvalid = ErrorSourceStrings.Keys.ScaleTypeInvalid
+			local parentName
+
+			if stringValue.Parent then
+				parentName = stringValue.Parent.Name
+			else
+				parentName = stringValue.Name
+			end
+
+			object:fail(scaleTypeInvalid, { ParentName = parentName })
 		end
 	end
 }

@@ -1,6 +1,1 @@
-return {
-	Down = "Down",
-	Left = "Left",
-	Right = "Right",
-	Up = "Up"
-}
+return { Down = "Down", Left = "Left", Right = "Right", Up = "Up" }

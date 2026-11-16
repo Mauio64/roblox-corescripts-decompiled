@@ -1,3 +1,1 @@
-return {
-	Logger = require(script.Logger)
-}
+return { Logger = require(script.Logger) }

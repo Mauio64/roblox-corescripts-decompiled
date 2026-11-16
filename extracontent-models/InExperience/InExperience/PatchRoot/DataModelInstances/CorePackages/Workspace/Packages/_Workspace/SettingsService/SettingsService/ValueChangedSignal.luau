@@ -1,40 +1,40 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Signal = require(scriptParentParent.AppCommonLib).Signal
+local parent = script.Parent
+local parent2 = parent.Parent
 
-require(scriptParent.Types)
+local AppCommonLib = require(parent2.AppCommonLib)
+local Signal = AppCommonLib.Signal
+require(parent.Types)
 
-local t1 = {}
+local ValueChangedSignal = {}
+ValueChangedSignal.__index = ValueChangedSignal
 
-t1.__index = t1
-
-function t1.new(p1) -- line: 29
-	-- upvalues: Signal (copy), t1 (copy)
-	return (setmetatable({
-		_value = p1,
-		_changeSignal = Signal.new()
-	}, t1))
+function ValueChangedSignal.new(p)
+	return (setmetatable({ ["_value"] = p, _changeSignal = Signal.new() }, ValueChangedSignal))
 end
-function t1.get(p2) -- line: 36
-	return p2._value
+
+function ValueChangedSignal:get()
+	return self._value
 end
-function t1.set(p3, p4) -- line: 40
-	if p4 ~= p3._value then
-		p3._value = p4
-		p3._changeSignal:fire(p4)
+
+function ValueChangedSignal:set(p)
+	if self._value ~= p then
+		self._value = p
+		self._changeSignal:fire(p)
 	end
 end
-function t1.signal(p5) -- line: 47
-	return p5._changeSignal
-end
-function t1.connect(p6, p7, p8) -- line: 51
-	local v13 = p6._changeSignal:connect(p7)
 
-	if p8 == true then
-		p7(p6._value)
+function ValueChangedSignal:signal()
+	return self._changeSignal
+end
+
+function ValueChangedSignal:connect(callback, p)
+	local connection = self._changeSignal:connect(callback)
+
+	if p == true then
+		callback(self._value)
 	end
 
-	return v13
+	return connection
 end
 
-return t1
+return ValueChangedSignal

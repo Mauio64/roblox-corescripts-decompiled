@@ -4,64 +4,65 @@ require(script.Parent.types)
 
 return {
 	name = script.Name,
-	alias = {
-		"/mute",
-		"/m"
-	},
-	clientRun = function(_, _, p3, p4) -- line: 8
-		-- upvalues: Players (copy)
-		local v6 = string.split(p3, " ")[2]
-		local v7 = v6 ~= nil and string.sub(v6, 1, 1) == "@"
-		local v8 = if not v7 then v6 else string.sub(v6, 2)
+	alias = { "/mute", "/m" },
+	clientRun = function(_, _, value, p)
+		local v = string.split(value, " ")[2]
+		local v2
 
-		if not v8 or #v8 < 3 then
+		if v == nil then
+			v2 = false
+		else
+			v2 = string.sub(v, 1, 1) == "@"
+		end
+
+		if v2 then
+			v = string.sub(v, 2)
+		end
+
+		if not v or #v < 3 then
 			return {
 				key = "CoreScripts.TextChat.Mute.Error.TargetDoesNotExist",
-				metadata = "Roblox.GlobalMute.Error.PlayerNotFound",
 				args = {
-					RBX_NAME = v8 or ""
-				}
+					RBX_NAME = v or ""
+				},
+				metadata = "Roblox.GlobalMute.Error.PlayerNotFound"
 			}
 		end
 
-		if not p4 or not p4.globalMutedUsersStore then
+		if not (p and p.globalMutedUsersStore) then
 			return {
 				key = "CoreScripts.TextChat.MessageStatus.Warning.Unknown",
-				metadata = "Roblox.GlobalMute.Error.ContextNotAvailable",
-				args = {}
+				args = {},
+				metadata = "Roblox.GlobalMute.Error.ContextNotAvailable"
 			}
 		end
 
-		if v7 then
-			local v9 = string.lower(v8)
-
-			if Players.LocalPlayer and v9 == string.lower(Players.LocalPlayer.Name) then
-				return {
-					key = "CoreScripts.TextChat.Mute.Error.CannotMuteSelf",
-					metadata = "Roblox.GlobalMute.Error.CannotMuteSelf",
-					args = {}
-				}
-			end
-
-			p4.globalMutedUsersStore.muteGlobalUsername(v9)
-
+		if not v2 then
+			p.globalMutedUsersStore.muteGlobalDisplayName(v)
 			return {
 				key = "CoreScripts.TextChat.Mute.Success",
-				metadata = "Roblox.GlobalMute.Info.Success",
-				args = {
-					RBX_NAME = "@" .. v9
-				}
+				args = { RBX_NAME = v },
+				metadata = "Roblox.GlobalMute.Info.Success"
 			}
 		end
 
-		p4.globalMutedUsersStore.muteGlobalDisplayName(v8)
+		local v3 = string.lower(v)
 
+		if Players.LocalPlayer and string.lower(Players.LocalPlayer.Name) == v3 then
+			return {
+				key = "CoreScripts.TextChat.Mute.Error.CannotMuteSelf",
+				args = {},
+				metadata = "Roblox.GlobalMute.Error.CannotMuteSelf"
+			}
+		end
+
+		p.globalMutedUsersStore.muteGlobalUsername(v3)
 		return {
 			key = "CoreScripts.TextChat.Mute.Success",
-			metadata = "Roblox.GlobalMute.Info.Success",
 			args = {
-				RBX_NAME = v8
-			}
+				RBX_NAME = "@" .. v3
+			},
+			metadata = "Roblox.GlobalMute.Info.Success"
 		}
 	end
 }

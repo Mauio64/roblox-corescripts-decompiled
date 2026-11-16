@@ -1,113 +1,118 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local AssetCalculator = require(ParentParent.util.AssetCalculator)
-local canBeNormalized = require(ParentParent.util.canBeNormalized)
-local prettyPrintVector3 = require(ParentParent.util.prettyPrintVector3)
-local getFFlagUGCValidateMigratePoseBlocking = require(ParentParent.flags.getFFlagUGCValidateMigratePoseBlocking)
-local v8 = game:DefineFastInt("UGCValidatePoseDegFromXYPlane", 20)
-local v9 = game:DefineFastInt("UGCValidatePoseArmMinDegFromXVectorOnXYPlane", -90)
-local v10 = game:DefineFastInt("UGCValidatePoseArmMaxDegFromXVectorOnXYPlane", 30)
-local v11 = game:DefineFastInt("UGCValidatePoseLegMinDegFromXVectorOnXYPlane", -93)
-local v12 = game:DefineFastInt("UGCValidatePoseLegMaxDegFromXVectorOnXYPlane", -60)
-local t1 = {
+local AssetCalculator = require(parent.util.AssetCalculator)
+local canBeNormalized = require(parent.util.canBeNormalized)
+local prettyPrintVector3 = require(parent.util.prettyPrintVector3)
+
+local defineFastInt = game:DefineFastInt("UGCValidatePoseDegFromXYPlane", 20)
+
+local defineFastInt2 = game:DefineFastInt("UGCValidatePoseArmMinDegFromXVectorOnXYPlane", -90)
+
+local defineFastInt3 = game:DefineFastInt("UGCValidatePoseArmMaxDegFromXVectorOnXYPlane", 30)
+
+local defineFastInt4 = game:DefineFastInt("UGCValidatePoseLegMinDegFromXVectorOnXYPlane", -93)
+
+local defineFastInt5 = game:DefineFastInt("UGCValidatePoseLegMaxDegFromXVectorOnXYPlane", -60)
+
+local PoseCorrect = {
 	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS },
 	requiredData = { ValidationEnums.SharedDataMember.rootInstance },
-	fflag = getFFlagUGCValidateMigratePoseBlocking,
 	expectedFailures = {}
 }
 
-local function validateAngleFromXYPlane(p1, p2, vector3: Vector3, vector3_2: Vector3) -- line: 42
-	-- upvalues: v8 (copy), ErrorSourceStrings (copy)
-	local v21 = math.deg((math.acos((vector3:Dot(vector3_2)))))
+local function validateAngleFromXYPlane(object, assetTypeFromUploadEnum, vector: Vector3, vector3: Vector3)
+	local v = math.deg((math.acos((vector:Dot(vector3)))))
 
-	if v21 > v8 then
-		p1:fail(ErrorSourceStrings.Keys.Pose_AngleFromXYPlane, {
-			assetName = p2.Name,
-			angle = string.format("%d", v21),
-			limit = string.format("%d", v8)
+	if defineFastInt < v then
+		object:fail(ErrorSourceStrings.Keys.Pose_AngleFromXYPlane, {
+			assetName = assetTypeFromUploadEnum.Name,
+			angle = string.format("%d", v),
+			limit = string.format("%d", defineFastInt)
 		})
 	end
 end
-local function validateAngleFromWorldXVectorOnXYPlane(p3, p4, vector3: Vector3, vector3_3: Vector3, n1: number, n2: number) -- line: 58
-	-- upvalues: ErrorSourceStrings (copy), prettyPrintVector3 (copy)
-	local v28 = math.deg((math.acos((vector3:Dot(vector3_3)))))
 
-	if not (vector3.Y > 0) then
-		v28 = -v28
+local function validateAngleFromWorldXVectorOnXYPlane(object, assetTypeFromUploadEnum, vector: Vector3, vector3: Vector3, p: number, p2: number)
+	local v = math.deg((math.acos((vector:Dot(vector3)))))
+
+	if not (vector.Y > 0) then
+		v = -v
 	end
 
-	if v28 < n1 or n2 < v28 then
-		p3:fail(ErrorSourceStrings.Keys.Pose_AngleOnXYPlane, {
-			assetName = p4.Name,
-			angle = string.format("%d", v28),
-			xVector = prettyPrintVector3(vector3_3),
-			minAngle = string.format("%d", n1),
-			maxAngle = string.format("%d", n2)
+	if v < p or p2 < v then
+		object:fail(ErrorSourceStrings.Keys.Pose_AngleOnXYPlane, {
+			assetName = assetTypeFromUploadEnum.Name,
+			angle = string.format("%d", v),
+			xVector = prettyPrintVector3(vector3),
+			minAngle = string.format("%d", p),
+			maxAngle = string.format("%d", p2)
 		})
 	end
 end
-local function getAssetTypeFromUploadEnum(p5) -- line: 80
-	if p5.uploadEnum and p5.uploadEnum.assetType then
-		return p5.uploadEnum.assetType
+
+local function getAssetTypeFromUploadEnum(p) -- 1 equivalent call inferred from this helper
+	if p.uploadEnum and p.uploadEnum.assetType then
+		return p.uploadEnum.assetType
 	end
 
 	return nil
 end
 
-function t1.run(p6, p7) -- line: 87
-	-- upvalues: AssetCalculator (copy), ErrorSourceStrings (copy), canBeNormalized (copy), validateAngleFromXYPlane (copy), v9 (copy), v10 (copy), v11 (copy), v12 (copy), validateAngleFromWorldXVectorOnXYPlane (copy)
-	local rootInstance = p7.rootInstance
-	local v33 = if not p7.uploadEnum or not p7.uploadEnum.assetType then nil else p7.uploadEnum.assetType
+function PoseCorrect.run(object, p)
+	local rootInstance = p.rootInstance
+	local assetTypeFromUploadEnum = getAssetTypeFromUploadEnum(p) -- inferred equivalent call
 
-	if not v33 then
+	if
+		not assetTypeFromUploadEnum
+		or assetTypeFromUploadEnum ~= Enum.AssetType.LeftArm
+		and assetTypeFromUploadEnum ~= Enum.AssetType.RightArm
+		and assetTypeFromUploadEnum ~= Enum.AssetType.LeftLeg
+		and assetTypeFromUploadEnum ~= Enum.AssetType.RightLeg
+	then
 		return
 	end
 
-	if v33 ~= Enum.AssetType.LeftArm and v33 ~= Enum.AssetType.RightArm and v33 ~= Enum.AssetType.LeftLeg and v33 ~= Enum.AssetType.RightLeg then
-		return
-	end
+	local assetCFrame = AssetCalculator.calculateAssetCFrame(assetTypeFromUploadEnum, rootInstance)
 
-	local v34 = AssetCalculator.calculateAssetCFrame(v33, rootInstance)
-
-	if not v34 then
-		p6:fail(ErrorSourceStrings.Keys.Pose_CFrameCalculationFailed, {
-			assetName = v33.Name
+	if not assetCFrame then
+		object:fail(ErrorSourceStrings.Keys.Pose_CFrameCalculationFailed, {
+			assetName = assetTypeFromUploadEnum.Name
 		})
 
 		return
 	end
 
-	local v35 = v34.YVector.Unit - Vector3.new(0, 0, 1) * v34.YVector.Unit:Dot((Vector3.new(0, 0, 1)))
+	local v = assetCFrame.YVector.Unit - Vector3.new(0, 0, 1) * assetCFrame.YVector.Unit:Dot(Vector3.new(0, 0, 1))
 
-	if not canBeNormalized(v35) then
-		p6:fail(ErrorSourceStrings.Keys.Pose_PointingAlongZVector, {
-			assetName = v33.Name
+	if not canBeNormalized(v) then
+		object:fail(ErrorSourceStrings.Keys.Pose_PointingAlongZVector, {
+			assetName = assetTypeFromUploadEnum.Name
 		})
 
 		return
 	end
 
-	local v36 = -v35.Unit
-	local v37 = -v34.YVector.Unit
+	local v2 = -v.Unit
+	validateAngleFromXYPlane(object, assetTypeFromUploadEnum, v2, -assetCFrame.YVector.Unit)
 
-	validateAngleFromXYPlane(p6, v33, v36, v37)
+	local v3 = (assetTypeFromUploadEnum == Enum.AssetType.RightArm or assetTypeFromUploadEnum == Enum.AssetType.RightLeg)
+		and Vector3.new(1, 0, 0)
+		or -Vector3.new(1, 0, 0)
+	local v4, v5
 
-	local v38 = if v33 ~= Enum.AssetType.RightArm and v33 ~= Enum.AssetType.RightLeg then Vector3.new(-1, -0, -0) else Vector3.new(1, 0, 0)
-	local v39, v40
-
-	if v33 == Enum.AssetType.RightArm or v33 == Enum.AssetType.LeftArm then
-		v39 = v9
-		v40 = v10
+	if assetTypeFromUploadEnum == Enum.AssetType.RightArm or assetTypeFromUploadEnum == Enum.AssetType.LeftArm then
+		v4 = defineFastInt2
+		v5 = defineFastInt3
 	else
-		v39 = v11
-		v40 = v12
+		v4 = defineFastInt4
+		v5 = defineFastInt5
 	end
 
-	validateAngleFromWorldXVectorOnXYPlane(p6, v33, v36, v38, v39, v40)
+	validateAngleFromWorldXVectorOnXYPlane(object, assetTypeFromUploadEnum, v2, v3, v4, v5)
 end
 
-return t1
+return PoseCorrect

@@ -1,6 +1,7 @@
-local Parent = script:FindFirstAncestor("IAPExperience").Parent
-local React = require(Parent.React)
-local t1 = {
+local parent = script:FindFirstAncestor("IAPExperience").Parent
+local React = require(parent.React)
+
+local v = {
 	["IAPExperience.PurchasePrompt.Label.BlackbirdDiscount"] = "Sit amet ({discountPercentage}% elit)",
 	["IAPExperience.PurchasePrompt.Label.BlackbirdDiscountNoPercent"] = "Sit amet",
 	["IAPExperience.PurchasePrompt.Label.GenericDiscount"] = "... ({discountPercentage}% elit)",
@@ -11,32 +12,39 @@ local t1 = {
 	["IAPExperience.PurchasePrompt.Label.Total"] = "Total"
 }
 
-local function usePlaceholderLocalization(t2: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), t1 (copy)
-	return React.useMemo(function() -- line: 25
-		-- upvalues: t2 (copy), t1 (copy)
-		local t3 = {}
+local function usePlaceholderLocalization(items)
+	return React.useMemo(function()
+		local result = {}
 
-		for k, v in pairs(t2) do
-			local v9 = if typeof(v) ~= "table" then v else v[1]
-			local v10 = t1[v9] or v9
+		for k, item in pairs(items) do
+			local v2
 
-			if typeof(v) == "table" then
-				for k2, v2 in pairs(v) do
-					if typeof(k2) == "string" then
-						v10 = string.gsub(v10, "{" .. k2 .. "}", function() -- line: 33
-							-- upvalues: v2 (copy)
-							return (tostring(v2))
-						end)
+			if typeof(item) == "table" then
+				v2 = item[1]
+			else
+				v2 = item
+			end
+
+			local v3 = v[v2] or v2
+
+			if typeof(item) == "table" then
+				for k2, v4 in pairs(item) do
+					if typeof(k2) ~= "string" then
+						continue
 					end
+
+					local v5 = v4
+					v3 = string.gsub(v3, "{" .. k2 .. "}", function()
+						return (tostring(v5))
+					end)
 				end
 			end
 
-			t3[k] = v10
+			result[k] = v3
 		end
 
-		return t3
-	end, { t2 })
+		return result
+	end, { items })
 end
 
 return usePlaceholderLocalization

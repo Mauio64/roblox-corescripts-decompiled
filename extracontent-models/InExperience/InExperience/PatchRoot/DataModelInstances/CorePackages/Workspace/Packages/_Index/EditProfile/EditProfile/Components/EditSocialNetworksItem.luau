@@ -1,1 +1,3 @@
-return (require(script.EditSocialNetworksItem))
+local EditSocialNetworksItem = require(script.EditSocialNetworksItem)
+
+return EditSocialNetworksItem

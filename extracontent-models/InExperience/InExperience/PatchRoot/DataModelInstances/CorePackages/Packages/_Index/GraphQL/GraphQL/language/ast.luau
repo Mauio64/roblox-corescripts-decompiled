@@ -1,60 +1,51 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
 require(script.Parent.source)
+
 require(script.Parent.tokenKind)
 
-local t1 = {}
+local class = {}
+class.__index = class
 
-t1.__index = t1
-
-function t1.new(t2: {[any]: any}, t3: {[any]: any}, p1) -- line: 50
-	-- upvalues: t1 (copy)
+function class.new(startToken, endToken, source)
 	return (setmetatable({
-		start = t2.start,
-		_end = t3._end,
-		startToken = t2,
-		endToken = t3,
-		source = p1
-	}, t1))
-end
-function t1.toJSON(p2) -- line: 62
-	return {
-		start = p2.start,
-		_end = p2._end
-	}
+		["start"] = startToken.start,
+		_end = endToken._end,
+		startToken = startToken,
+		endToken = endToken,
+		source = source
+	}, class))
 end
 
-local t4 = {}
+function class:toJSON()
+	return { start = self.start, _end = self._end }
+end
 
-t4.__index = t4
+local class2 = {}
+class2.__index = class2
 
-function t4.new(p3, n1: number, n2: number, n3: number, n4: number, t5: {[any]: any}?, s1: string?) -- line: 138
-	-- upvalues: t4 (copy)
+function class2.new(kind, start: number, p: number, line: number, column: number, prev, p2: string?)
 	return (setmetatable({
-		kind = p3,
-		start = n1,
-		_end = n2,
-		line = n3,
-		column = n4,
-		value = s1,
-		prev = t5,
+		["kind"] = kind,
+		start = start,
+		_end = p,
+		line = line,
+		column = column,
+		value = p2,
+		prev = prev,
 		next = nil
-	}, t4))
+	}, class2))
 end
-function t4.toJSON(p4) -- line: 161
-	return {
-		kind = p4.kind,
-		value = p4.value,
-		line = p4.line,
-		column = p4.column
-	}
+
+function class2.toJSON(data)
+	return { kind = data.kind, value = data.value, line = data.line, column = data.column }
 end
 
 return {
-	Location = t1,
-	Token = t4,
-	isNode = function(p5) -- line: 181
-		return typeof(p5) == "table" and typeof(p5.kind) == "string"
+	Location = class,
+	Token = class2,
+	isNode = function(p): boolean
+		return typeof(p) == "table" and typeof(p.kind) == "string"
 	end
 }

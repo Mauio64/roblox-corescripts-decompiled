@@ -1,32 +1,22 @@
 local NavigationRodux = script:FindFirstAncestor("NavigationRodux")
-local NavigationRoduxParent = NavigationRodux.Parent
-local ArgCheck = require(NavigationRoduxParent.ArgCheck)
-local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
-local RobloxAppEnums = require(NavigationRoduxParent.RobloxAppEnums)
-local UrlBuilder = require(NavigationRoduxParent.UrlBuilder)
-local AppPage = RobloxAppEnums.AppPage
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local parent = NavigationRodux.Parent
 
-return function(p1, p2, p3) -- line: 12
-	-- upvalues: ArgCheck (copy), NavigateDown (copy), AppPage (copy), UrlBuilder2 (copy)
-	ArgCheck.isInTypes(p1, {
-		"string",
-		"number"
-	}, "userId")
-	ArgCheck.isInTypes(p2, {
-		"string",
-		"number"
-	}, "conversationId")
-	ArgCheck.isTypeOrNil(p3, "function", "onClose")
+local ArgCheck = require(parent.ArgCheck)
+local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local UrlBuilder = require(parent.UrlBuilder)
+
+local AppPage = RobloxAppEnums.AppPage
+local urlBuilder = UrlBuilder.UrlBuilder
+
+return function(userId, conversationId, onClose)
+	ArgCheck.isInTypes(userId, { "string", "number" }, "userId")
+	ArgCheck.isInTypes(conversationId, { "string", "number" }, "conversationId")
+	ArgCheck.isTypeOrNil(onClose, "function", "onClose")
 
 	return NavigateDown({
 		name = AppPage.ReportAbuse,
-		detail = UrlBuilder2.user.report({
-			userId = p1,
-			conversationId = p2
-		}),
-		extraProps = {
-			onClose = p3
-		}
+		detail = urlBuilder.user.report({ userId = userId, conversationId = conversationId }),
+		extraProps = { onClose = onClose }
 	})
 end

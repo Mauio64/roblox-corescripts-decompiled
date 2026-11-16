@@ -1,32 +1,37 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-local UserModel = require(SocialLibraries.dependencies).UserModel
+local dependencies = require(SocialLibraries.dependencies)
 
-return function(p1, p2, p3) -- line: 7
-	-- upvalues: UserModel (copy)
-	if p1.pinnedGame and p1.pinnedGame.universeId then
-		return (tostring(p1.pinnedGame.universeId))
+local userModel = dependencies.UserModel
+
+return function(p, p2, p3)
+	if p.pinnedGame and p.pinnedGame.universeId then
+		return (tostring(p.pinnedGame.universeId))
 	end
 
-	local t1 = {}
+	local v = {}
 
-	for _, v in pairs(p1.participants or {}) do
-		local v9 = p3[v]
+	for _, v2 in pairs(p.participants or {}) do
+		local v3 = p3[v2]
 
-		if v9 ~= nil and v ~= p2 and v9.presence == UserModel.PresenceType.IN_GAME and v9.rootPlaceId then
-			t1[v9.rootPlaceId] = t1[v9.rootPlaceId] or 0
-			t1[v9.rootPlaceId] = t1[v9.rootPlaceId] + 1
+		if not (v3 ~= nil and v2 ~= p2 and v3.presence == userModel.PresenceType.IN_GAME and v3.rootPlaceId) then
+			continue
 		end
+
+		v[v3.rootPlaceId] = v[v3.rootPlaceId] or 0
+		v[v3.rootPlaceId] = v[v3.rootPlaceId] + 1
 	end
 
-	local v10 = nil
-	local n1 = 0
+	local v2 = 0
+	local v3 = nil
 
-	for k, v in pairs(t1) do
-		if n1 < v then
-			v10 = k
-			n1 = v
+	for k, v4 in pairs(v) do
+		if not (v2 < v4) then
+			continue
 		end
+
+		v3 = k
+		v2 = v4
 	end
 
-	return v10 and tostring(v10) or nil
+	return v3 and tostring(v3) or nil
 end

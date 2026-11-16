@@ -1,87 +1,92 @@
 local MomentsCreation = script:FindFirstAncestor("MomentsCreation")
-local MomentsCreationParent = MomentsCreation.Parent
-local React = require(MomentsCreationParent.React)
-local Signals = require(MomentsCreationParent.Signals)
+local parent = MomentsCreation.Parent
 
-require(MomentsCreationParent.MomentsTypes)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+require(parent.MomentsTypes)
+require(MomentsCreation.Types.CreationFlowTypes)
 
 local useAudioPlayback = require(MomentsCreation.Hooks.useAudioPlayback)
-local GetFFlagMomentsMuteVideoAudioOnly = require(MomentsCreation.Flags.GetFFlagMomentsMuteVideoAudioOnly)
+local GetFFlagMomentsTTSAudioOverlay = require(MomentsCreation.Flags.GetFFlagMomentsTTSAudioOverlay)
+local getTtsDuckScalar = require(MomentsCreation.Audio.getTtsDuckScalar)
 
-local function useCreationMusicSync(p1, n1: number) -- line: 37
-	-- upvalues: React (copy), Signals (copy), useAudioPlayback (copy), GetFFlagMomentsMuteVideoAudioOnly (copy)
-	local playback = p1.playback
-	local v11, v12 = React.useState((playback.getMusic(false)))
-	local v13, v14 = React.useState(playback.getIsMuted(false))
-	local v15, v16 = React.useState(playback.getIsPlaying(false))
+local function useCreationMusicSync(p, p2: number, p3)
+	local playback = p.playback
 
-	React.useEffect(function() -- line: 44
-		-- upvalues: Signals (copy), v12 (copy), playback (copy), v14 (copy), v16 (copy)
-		return Signals.createEffect(function(p2) -- line: 45
-			-- upvalues: v12 (copy), playback (copy), v14 (copy), v16 (copy)
-			v12(playback.getMusic(p2))
-			v14(playback.getIsMuted(p2))
-			v16(playback.getIsPlaying(p2))
+	local state, setState = React.useState((playback.getMusic(false)))
+	local state2, setState2 = React.useState(playback.getIsMuted(false))
+	local state3, setState3 = React.useState(playback.getIsPlaying(false))
+
+	local useState = React.useState
+	local v = GetFFlagMomentsTTSAudioOverlay
+
+	if v then
+		if p3 == nil then
+			v = false
+		else
+			v = p3.getState(false) == "playing"
+		end
+	end
+
+	local state4, setState4 = useState(v)
+
+	React.useEffect(function()
+		return Signals.createEffect(function(p4)
+			setState(playback.getMusic(p4))
+			setState2(playback.getIsMuted(p4))
+			setState3(playback.getIsPlaying(p4))
+
+			if GetFFlagMomentsTTSAudioOverlay then
+				setState4(p3 ~= nil and p3.getState(p4) == "playing")
+			end
 		end)
 	end, { playback })
 
-	local v17 = React.useMemo(function() -- line: 53
-		-- upvalues: v11 (copy), n1 (copy)
-		if v11 == nil then
+	local isDucking = GetFFlagMomentsTTSAudioOverlay and state4
+	local duckScalar = not isDucking and 1 or getTtsDuckScalar()
+
+	local v2 = React.useMemo(function()
+		if state == nil then
 			return nil
 		end
 
-		return NumberRange.new(v11.startTime, v11.startTime + math.max(0, n1))
-	end, {
-		v11,
-		n1
-	})
-	local v18 = useAudioPlayback(v11 ~= nil, if v11 == nil then nil else v11.assetId, {
+		return NumberRange.new(state.startTime, state.startTime + math.max(0, p2))
+	end, { state, p2 })
+	local v3 = state ~= nil
+	local v4
+
+	if state ~= nil then
+		v4 = state.assetId
+	end
+
+	local audio = useAudioPlayback(v3, v4, {
 		autoplay = true,
 		looping = true,
-		playbackRegion = v17 or NumberRange.new(0, 1e999)
+		playbackRegion = v2 or NumberRange.new(0, 1e999),
+		duckScalar = duckScalar
 	})
 
-	React.useEffect(function() -- line: 69
-		-- upvalues: v11 (copy), v15 (copy), v18 (copy)
-		if v11 == nil then
+	React.useEffect(function()
+		if state == nil then
 			return
 		end
 
-		if v15 then
-			v18.playback.play()
+		if state3 then
+			audio.playback.play()
+		else
+			audio.playback.pause()
+		end
+	end, { state, state3 })
 
+	React.useEffect(function()
+		if state == nil then
 			return
 		end
 
-		v18.playback.pause()
-	end, {
-		v11,
-		v15
-	})
-	React.useEffect(function() -- line: 85
-		-- upvalues: v11 (copy), GetFFlagMomentsMuteVideoAudioOnly (copy), v13 (copy), v18 (copy)
-		if v11 == nil then
-			return
-		end
+		audio.volume.unmute()
+	end, { state, state2 })
 
-		if not GetFFlagMomentsMuteVideoAudioOnly() and v13 then
-			v18.volume.mute()
-
-			return
-		end
-
-		v18.volume.unmute()
-	end, {
-		v11,
-		v13
-	})
-
-	return {
-		audio = v18,
-		music = v11,
-		userMuted = v13
-	}
+	return { audio = audio, music = state, userMuted = state2, isDucking = isDucking }
 end
 
 return useCreationMusicSync

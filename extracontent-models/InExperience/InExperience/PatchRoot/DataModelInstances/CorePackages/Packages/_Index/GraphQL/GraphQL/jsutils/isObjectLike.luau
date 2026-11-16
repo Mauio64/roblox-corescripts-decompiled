@@ -1,5 +1,5 @@
 return {
-	isObjectLike = function(p1) -- line: 12
-		return typeof(p1) == "table"
+	isObjectLike = function(p): boolean
+		return typeof(p) == "table"
 	end
 }

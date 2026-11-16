@@ -1,126 +1,113 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Cryo = require(ParentParentParent.Cryo)
-local Rodux = require(ParentParentParent.Rodux)
-local CapturesRetrieved = require(ParentParent.Actions.CapturesRetrieved)
-local CaptureType = require(ParentParent.Enums.CaptureType)
-local CarouselClosed = require(ParentParent.Actions.CarouselClosed)
-local CarouselIndexSelected = require(ParentParent.Actions.CarouselIndexSelected)
-local CarouselOpened = require(ParentParent.Actions.CarouselOpened)
-local DeleteWarningModalClosed = require(ParentParent.Actions.DeleteWarningModalClosed)
-local DeleteWarningModalOpened = require(ParentParent.Actions.DeleteWarningModalOpened)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Types)
+local Cryo = require(parent2.Cryo)
+local Rodux = require(parent2.Rodux)
 
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
-local t1 = {
+local CapturesRetrieved = require(parent.Actions.CapturesRetrieved)
+local CaptureType = require(parent.Enums.CaptureType)
+local CarouselClosed = require(parent.Actions.CarouselClosed)
+local CarouselIndexSelected = require(parent.Actions.CarouselIndexSelected)
+local CarouselOpened = require(parent.Actions.CarouselOpened)
+local DeleteWarningModalClosed = require(parent.Actions.DeleteWarningModalClosed)
+local DeleteWarningModalOpened = require(parent.Actions.DeleteWarningModalOpened)
+require(parent.Types)
+
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
+
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
+local function findNewSelectedCaptureIndex(captures, selectedCaptureIndex: number, selectedCapture)
+	if
+		FFlagUseRbxstorageInGallery
+		or captures[selectedCaptureIndex] == nil
+		or captures[selectedCaptureIndex].filePath ~= selectedCapture.filePath
+		or FFlagEnableCapturesGalleryRetrievalCoreScript
+	then
+		return Cryo.List.findWhere(captures, function(data): boolean
+			if FFlagEnableCapturesGalleryRetrievalCoreScript then
+				return tostring(data.CaptureTime.UnixTimestampMillis) == tostring(selectedCapture.CaptureTime.UnixTimestampMillis)
+			end
+
+			if
+				FFlagUseRbxstorageInGallery
+				and data.type == CaptureType.Video
+				and selectedCapture.type == CaptureType.Video
+			then
+				return data.thumbnailKey == selectedCapture.thumbnailKey
+			end
+
+			if
+				FFlagUseRbxstorageInGallery
+				and data.type == CaptureType.Screenshot
+				and selectedCapture.type == CaptureType.Screenshot
+			then
+				return data.filePath == selectedCapture.filePath
+			end
+
+			return not FFlagUseRbxstorageInGallery and data.filePath == selectedCapture.filePath
+		end)
+	end
+
+	return selectedCaptureIndex
+end
+
+return Rodux.createReducer({
 	IsOpen = false,
 	IsDeleteWarningModalOpen = false,
 	SelectedCaptureIndex = 0
-}
-
-local function findNewSelectedCaptureIndex(t2: {[any]: any}, n1: number, p1) -- line: 32
-	-- upvalues: FFlagUseRbxstorageInGallery (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), Cryo (copy), CaptureType (copy)
-	if not FFlagUseRbxstorageInGallery and (t2[n1] ~= nil and t2[n1].filePath == p1.filePath and not FFlagEnableCapturesGalleryRetrievalCoreScript) then
-		return n1
-	end
-
-	return Cryo.List.findWhere(t2, function(p2) -- line: 47
-		-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), p1 (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy)
-		if FFlagEnableCapturesGalleryRetrievalCoreScript then
-			return tostring(p2.CaptureTime.UnixTimestampMillis) == tostring(p1.CaptureTime.UnixTimestampMillis)
+}, {
+	[CapturesRetrieved.name] = function(p, p2)
+		if p.IsOpen == false then
+			return p
 		end
 
-		if FFlagUseRbxstorageInGallery and p2.type == CaptureType.Video and p1.type == CaptureType.Video then
-			return p2.thumbnailKey == p1.thumbnailKey
+		if #p2.captures == 0 then
+			return Cryo.Dictionary.join(p, { IsOpen = false, SelectedCaptureIndex = 0 })
 		end
 
-		if FFlagUseRbxstorageInGallery and p2.type == CaptureType.Screenshot and p1.type == CaptureType.Screenshot then
-			return p2.filePath == p1.filePath
-		end
-
-		if not FFlagUseRbxstorageInGallery then
-			return p2.filePath == p1.filePath
-		end
-
-		return false
-	end)
-end
-
-return Rodux.createReducer(t1, {
-	[CapturesRetrieved.name] = function(t3: {[any]: any}, p3) -- line: 72
-		-- upvalues: Cryo (copy), findNewSelectedCaptureIndex (copy)
-		if t3.IsOpen == false then
-			return t3
-		end
-
-		if #p3.captures == 0 then
-			return Cryo.Dictionary.join(t3, {
-				IsOpen = false,
-				SelectedCaptureIndex = 0
+		if p2.selectedCapture == nil then
+			local v = #p2.captures
+			return Cryo.Dictionary.join(p, {
+				SelectedCaptureIndex = math.min(p.SelectedCaptureIndex, v)
 			})
 		end
 
-		if p3.selectedCapture == nil then
-			local v21 = #p3.captures
+		assert(p2.selectedCapture ~= nil, "CapturesRetrieved selectedCapture should not be nil")
+		local selectedCapture = p2.selectedCapture
 
-			return Cryo.Dictionary.join(t3, {
-				SelectedCaptureIndex = math.min(t3.SelectedCaptureIndex, v21)
-			})
+		local newSelectedCaptureIndex = findNewSelectedCaptureIndex(
+			p2.captures,
+			p.SelectedCaptureIndex,
+			selectedCapture
+		)
+
+		if newSelectedCaptureIndex == p.SelectedCaptureIndex then
+			return p
 		end
 
-		assert(p3.selectedCapture ~= nil, "CapturesRetrieved selectedCapture should not be nil")
-
-		local selectedCapture = p3.selectedCapture
-		local v23 = findNewSelectedCaptureIndex(p3.captures, t3.SelectedCaptureIndex, selectedCapture)
-
-		if v23 == t3.SelectedCaptureIndex then
-			return t3
+		if newSelectedCaptureIndex ~= nil then
+			return Cryo.Dictionary.join(p, { SelectedCaptureIndex = newSelectedCaptureIndex })
 		end
 
-		if v23 ~= nil then
-			return Cryo.Dictionary.join(t3, {
-				SelectedCaptureIndex = v23
-			})
-		end
-
-		local v24 = #p3.captures
-
-		return Cryo.Dictionary.join(t3, {
-			SelectedCaptureIndex = math.clamp(t3.SelectedCaptureIndex - 1, 1, v24)
+		local v = #p2.captures
+		return Cryo.Dictionary.join(p, {
+			SelectedCaptureIndex = math.clamp(p.SelectedCaptureIndex - 1, 1, v)
 		})
 	end,
-	[CarouselClosed.name] = function(t4: {[any]: any}, _: {[any]: any}) -- line: 117
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t4, {
-			IsOpen = false,
-			SelectedCaptureIndex = 0
-		})
+	[CarouselClosed.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { IsOpen = false, SelectedCaptureIndex = 0 })
 	end,
-	[CarouselIndexSelected.name] = function(t6: {[any]: any}, t7: {[any]: any}) -- line: 124
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t6, {
-			SelectedCaptureIndex = t7.index
-		})
+	[CarouselIndexSelected.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { SelectedCaptureIndex = p2.index })
 	end,
-	[CarouselOpened.name] = function(t8: {[any]: any}, t9: {[any]: any}) -- line: 130
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t8, {
-			IsOpen = true,
-			SelectedCaptureIndex = t9.index
-		})
+	[CarouselOpened.name] = function(p, p2)
+		return Cryo.Dictionary.join(p, { IsOpen = true, SelectedCaptureIndex = p2.index })
 	end,
-	[DeleteWarningModalClosed.name] = function(t10: {[any]: any}, _: {[any]: any}) -- line: 137
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t10, {
-			IsDeleteWarningModalOpen = false
-		})
+	[DeleteWarningModalClosed.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { IsDeleteWarningModalOpen = false })
 	end,
-	[DeleteWarningModalOpened.name] = function(t12: {[any]: any}, _: {[any]: any}) -- line: 143
-		-- upvalues: Cryo (copy)
-		return Cryo.Dictionary.join(t12, {
-			IsDeleteWarningModalOpen = true
-		})
+	[DeleteWarningModalOpened.name] = function(p, _)
+		return Cryo.Dictionary.join(p, { IsDeleteWarningModalOpen = true })
 	end
 })

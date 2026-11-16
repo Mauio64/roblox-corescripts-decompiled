@@ -1,220 +1,359 @@
 local AssetService = game:GetService("AssetService")
+local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
-local scriptParent = script.Parent
-local Constants = require(scriptParent.Constants)
+
+local Thumbnailing = require(CorePackages.Packages.Thumbnailing)
+local FFlagSharedMakeupThumbnailCamera = Thumbnailing.FFlagSharedMakeupThumbnailCamera
+
+local parent = script.Parent
+local Constants = require(parent.Constants)
+
 local brickColor = BrickColor.new(194)
-local t1 = {
-	isMakeupAssetType = function(p1) -- line: 16
-		-- upvalues: Constants (copy)
-		return Constants.MakeupAssetTypes[p1] == true
-	end
+
+local function makeCameraCFrame(vector3: Vector3, vector3_2: Vector3)
+	return CFrame.lookAt(vector3, vector3 + vector3_2)
+end
+local cframe = CFrame.lookAt(Vector3.new(0, 0.0936213, -15.755899), Vector3.new(0, 0.0936213, -14.755899))
+local cframes = {
+	[Enum.AvatarAssetType.FaceMakeup] = cframe,
+	[Enum.AvatarAssetType.LipMakeup] = CFrame.lookAt(
+		Vector3.new(0, -0.2991416, -6.4134803),
+		Vector3.new(0, -0.2991416, -5.4134803)
+	),
+	[Enum.AvatarAssetType.EyeMakeup] = CFrame.lookAt(
+		Vector3.new(0, 0.10852961, -9.357428),
+		Vector3.new(0, 0.10852961, -8.357428)
+	),
+	[Enum.AvatarAssetType.EyebrowAccessory] = CFrame.lookAt(
+		Vector3.new(4.5928926, 0.37917417, -7.374273),
+		Vector3.new(4.0461125, 0.35952252, -6.537227)
+	),
+	[Enum.AvatarAssetType.EyelashAccessory] = CFrame.lookAt(
+		Vector3.new(4.593966, 0.2791934, -7.375918),
+		Vector3.new(4.047186, 0.25954175, -6.5388722)
+	)
 }
-local t2 = {
+
+local MakeupPreviewUtils = {}
+
+function MakeupPreviewUtils.getHeadPreviewCameraData(instance)
+	local head = instance:FindFirstChild("Head")
+
+	if head and head:IsA("MeshPart") and not instance:FindFirstChild("HumanoidRootPart") then
+		return head.CFrame, head.Size
+	end
+
+	return nil, nil
+end
+
+function MakeupPreviewUtils.setupMakeupThumbnailCamera(instance, p, p2): boolean
+	local head = instance:FindFirstChild("Head")
+
+	if not (head and head:IsA("MeshPart")) then
+		return false
+	end
+
+	if FFlagSharedMakeupThumbnailCamera then
+		local setupCamera = Thumbnailing.MakeupCameraUtility.SetupCamera
+		local cframe2 = head.CFrame
+		local v
+
+		if p2 then
+			v = p2.Value
+		end
+
+		setupCamera(p, cframe2, v)
+		return true
+	else
+		local v = cframe
+
+		v = p2 and cframes[p2] or v
+
+		p.CFrame = head.CFrame * v
+		p.Focus = head.CFrame
+		p.FieldOfView = 5
+		return true
+	end
+end
+
+function MakeupPreviewUtils.isMakeupAssetType(p): boolean
+	return Constants.MakeupAssetTypes[p] == true
+end
+
+local v = {
 	[Enum.AvatarAssetType.FaceMakeup] = Enum.MakeupType.Face,
 	[Enum.AvatarAssetType.LipMakeup] = Enum.MakeupType.Lip,
 	[Enum.AvatarAssetType.EyeMakeup] = Enum.MakeupType.Eye
 }
-local t3 = {
+
+local v2 = {
 	[Enum.AvatarAssetType.EyebrowAccessory] = Enum.AccessoryType.Eyebrow,
 	[Enum.AvatarAssetType.EyelashAccessory] = Enum.AccessoryType.Eyelash
 }
 
-local function addAssetToDescription(p2, p3, p4) -- line: 32
-	-- upvalues: t2 (copy), t3 (copy)
-	local v15 = p4 and t2[p4]
-	local v16 = p4 and t3[p4]
+local set = {
+	[Enum.AccessoryType.Hat] = true,
+	[Enum.AccessoryType.Hair] = true,
+	[Enum.AccessoryType.Face] = true,
+	[Enum.AccessoryType.Eyebrow] = true,
+	[Enum.AccessoryType.Eyelash] = true
+}
 
-	if v15 then
-		for _, child in ipairs(p2:GetChildren()) do
-			if child:IsA("MakeupDescription") then
-				child:Destroy()
-			end
+local function removeMatchingChildren(parent2, fn)
+	for _, child in ipairs(parent2:GetChildren()) do
+		if fn(child) then
+			child:Destroy()
 		end
+	end
+end
 
-		local MakeupDescription = Instance.new("MakeupDescription")
+local function addAssetToDescription(parent2, instance, p)
+	local makeupType = p and v[p]
+	local accessoryType = p and v2[p]
 
-		MakeupDescription.MakeupType = v15
-		MakeupDescription.Instance = p3
-		MakeupDescription.Parent = p2
+	if makeupType then
+		removeMatchingChildren(parent2, function(makeupDescription)
+			return makeupDescription:IsA("MakeupDescription")
+		end)
 
+		local makeupDescription = Instance.new("MakeupDescription")
+		makeupDescription.MakeupType = makeupType
+		makeupDescription.Instance = instance
+		makeupDescription.Parent = parent2
+	elseif accessoryType then
+		removeMatchingChildren(parent2, function(accessoryDescription)
+			return accessoryDescription:IsA("AccessoryDescription")
+				and accessoryDescription.AccessoryType == accessoryType
+		end)
+
+		local accessoryDescription = Instance.new("AccessoryDescription")
+		accessoryDescription.AccessoryType = accessoryType
+		accessoryDescription.Instance = instance
+		accessoryDescription.IsLayered = true
+		accessoryDescription.Parent = parent2
+	end
+end
+
+function MakeupPreviewUtils.stripToHead(instance)
+	local head = instance:FindFirstChild("Head")
+
+	if not head then
 		return
 	end
 
-	if v16 then
-		local AccessoryDescription = Instance.new("AccessoryDescription")
-
-		AccessoryDescription.AccessoryType = v16
-		AccessoryDescription.Instance = p3
-		AccessoryDescription.IsLayered = true
-		AccessoryDescription.Parent = p2
-	end
-end
-local function createHeadWithAsset(p5, p6, p7) -- line: 58
-	-- upvalues: addAssetToDescription (copy), Players (copy)
-	addAssetToDescription(p5, p6, p7)
-
-	local u24 = nil
-
-	if not pcall(function() -- line: 62
-		-- upvalues: u24 (ref), Players (copy), p5 (copy)
-		u24 = Players:CreateHumanoidModelFromDescriptionAsync(p5, Enum.HumanoidRigType.R15)
-	end) or not u24 then
-		return nil
-	end
-
-	local Head = u24:FindFirstChild("Head")
-
-	if Head then
-		for _, child in ipairs(u24:GetChildren()) do
-			if child:IsA("BasePart") and child ~= Head then
+	for _, child in ipairs(instance:GetChildren()) do
+		if child:IsA("BasePart") then
+			if child ~= head then
 				child:Destroy()
 			end
+		elseif child:IsA("Accessory") and not set[child.AccessoryType] then
+			child:Destroy()
+		end
+	end
+end
+
+function MakeupPreviewUtils.anchorRigidPreviewParts(folder)
+	for _, part in ipairs(folder:GetDescendants()) do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
+		local accessory = part:FindFirstAncestorWhichIsA("Accessory")
+
+		if not accessory or accessory:FindFirstChildWhichIsA("WrapLayer", true) == nil then
+			part.Anchored = true
+		end
+	end
+end
+
+function MakeupPreviewUtils.getFolderAccessories(instance, p)
+	local folderAccessories = {}
+
+	for i, accessory in ipairs(instance:GetChildren()) do
+		if not accessory:IsA("Accessory") then
+			continue
+		end
+
+		local assetType
+
+		if p and p[i] then
+			assetType = p[i].assetType
+		end
+
+		table.insert(folderAccessories, { asset = accessory, assetType = assetType })
+	end
+
+	return folderAccessories
+end
+
+local function createHeadWithAsset(parent2, instance, p, list) -- 1 equivalent call inferred from this helper
+	if instance then
+		addAssetToDescription(parent2, instance, p)
+	end
+
+	if list then
+		for _, item in ipairs(list) do
+			addAssetToDescription(parent2, item.asset, item.assetType)
 		end
 	end
 
-	return u24
+	local v3 = nil
+
+	if not (pcall(function()
+		v3 = Players:CreateHumanoidModelFromDescriptionAsync(parent2, Enum.HumanoidRigType.R15)
+	end) and v3) then
+		return nil
+	end
+
+	v3.Parent = workspace
+	v3:GetBoundingBox()
+	v3.Parent = nil
+
+	MakeupPreviewUtils.stripToHead(v3)
+
+	MakeupPreviewUtils.anchorRigidPreviewParts(v3)
+
+	return v3
 end
 
-function t1.createMakeupHeadPreview(p8, p9) -- line: 88
-	-- upvalues: Players (copy), createHeadWithAsset (copy)
-	local v30 = nil
-	local LocalPlayer = Players.LocalPlayer
+function MakeupPreviewUtils.createMakeupHeadPreview(instance, p, p2)
+	local v3 = nil
+	local localPlayer = Players.LocalPlayer
 
-	if LocalPlayer then
-		local ok, result = pcall(function() -- line: 92
-			-- upvalues: Players (copy), LocalPlayer (copy)
-			return Players:GetHumanoidDescriptionFromUserIdAsync(LocalPlayer.UserId)
+	if localPlayer then
+		local success, result = pcall(function()
+			return Players:GetHumanoidDescriptionFromUserIdAsync(localPlayer.UserId)
 		end)
+		v3 = success and result or v3
+	end
 
-		if ok and result then
-			v30 = result
+	return createHeadWithAsset(v3 or Instance.new("HumanoidDescription"), instance, p, p2)
+end
+
+function MakeupPreviewUtils.createMakeupThumbnailPreview(p, p2)
+	local humanoidDescription = Instance.new("HumanoidDescription")
+	humanoidDescription.Head = 103273511207307
+	local headWithAsset = createHeadWithAsset(humanoidDescription, p, p2) -- inferred equivalent call
+
+	if not headWithAsset then
+		return nil
+	end
+
+	local bodyColors = headWithAsset:FindFirstChildOfClass("BodyColors")
+
+	if bodyColors then
+		bodyColors.HeadColor = brickColor
+	end
+
+	local head = headWithAsset:FindFirstChild("Head")
+
+	if head then
+		head.Color = brickColor.Color
+	end
+
+	return headWithAsset
+end
+
+function MakeupPreviewUtils.compositeMakeupFolder(instance, p)
+	local decals = {}
+
+	for _, decal in ipairs(instance:GetChildren()) do
+		if decal:IsA("Decal") then
+			table.insert(decals, decal)
 		end
 	end
 
-	if not v30 then
-		v30 = Instance.new("HumanoidDescription")
-	end
-
-	return (createHeadWithAsset(v30, p8, p9))
-end
-function t1.createMakeupThumbnailPreview(p10, p11) -- line: 110
-	-- upvalues: createHeadWithAsset (copy), brickColor (copy)
-	local HumanoidDescription = Instance.new("HumanoidDescription")
-
-	HumanoidDescription.Head = 103273511207307
-
-	local v37 = createHeadWithAsset(HumanoidDescription, p10, p11)
-
-	if not v37 then
+	if #decals == 0 then
 		return nil
 	end
 
-	local BodyColors = v37:FindFirstChildOfClass("BodyColors")
+	local object = decals[1].TextureContent and decals[1].TextureContent.Object
 
-	if BodyColors then
-		BodyColors.HeadColor = brickColor
-	end
-
-	local Head = v37:FindFirstChild("Head")
-
-	if Head then
-		Head.Color = brickColor.Color
-	end
-
-	return v37
-end
-function t1.compositeMakeupFolder(p12, t4: {[any]: any}?) -- line: 138
-	-- upvalues: AssetService (copy)
-	local t5 = {}
-
-	for _, child in ipairs(p12:GetChildren()) do
-		if child:IsA("Decal") then
-			table.insert(t5, child)
-		end
-	end
-
-	if #t5 == 0 then
+	if not object then
 		return nil
 	end
 
-	local v45 = t5[1].TextureContent and t5[1].TextureContent.Object
-
-	if not v45 then
-		return nil
-	end
-
-	if t4 then
-		table.sort(t5, function(p13, p14) -- line: 156
-			-- upvalues: t4 (copy)
-			return (t4[p13.Name] or 0) < (t4[p14.Name] or 0)
+	if p then
+		table.sort(decals, function(a, b): boolean
+			return (p[a.Name] or 0) < (p[b.Name] or 0)
 		end)
 	end
 
-	local Size = v45.Size
-	local vector2 = Vector2.new(Size.X, Size.Y)
-	local Decal = Instance.new("Decal")
+	local size = object.Size
+	local vector2 = Vector2.new(size.X, size.Y)
 
-	for _, v in ipairs({
+	local decal = Instance.new("Decal")
+
+	for _, v3 in ipairs({
 		"TextureContent",
 		"RoughnessMapContent",
 		"MetalnessMapContent",
 		"NormalMapContent"
 	}) do
-		local v51 = false
+		local flag = false
 
-		for _, v2 in ipairs(t5) do
-			local v54 = v2[v]
+		for _, v4 in ipairs(decals) do
+			local v5 = v4[v3]
 
-			if v54 and (v54.Object or v54.Uri) then
-				v51 = true
-
+			if v5 and (v5.Object or v5.Uri) then
+				flag = true
 				break
 			end
 		end
 
-		if v51 then
-			local v55 = AssetService:CreateEditableImage({
-				Size = vector2
-			})
-			local v56 = false
+		if not flag then
+			continue
+		end
 
-			for _, v3 in ipairs(t5) do
-				local v59 = v3[v]
+		local editableImage = AssetService:CreateEditableImage({ Size = vector2 })
+		local flag2 = false
 
-				if v59 then
-					local Object = v59.Object
+		for _, v4 in ipairs(decals) do
+			local v5 = v4[v3]
 
-					if not Object and v59.Uri and v59.Uri ~= "" then
-						local ok, result = pcall(function() -- line: 195
-							-- upvalues: AssetService (copy), v59 (copy)
-							return AssetService:CreateEditableImageAsync(v59)
-						end)
+			if not v5 then
+				continue
+			end
 
-						if ok then
-							Object = result
-						end
-					end
+			local v6 = v5.Object
 
-					if Object then
-						local v63 = if v56 then Enum.ImageCombineType.AlphaBlend else Enum.ImageCombineType.Overwrite
+			if not v6 and v5.Uri and v5.Uri ~= "" then
+				local success, result = pcall(function()
+					return AssetService:CreateEditableImageAsync(v5)
+				end)
 
-						v55:DrawImage(Vector2.new(0, 0), Object, v63)
-						v56 = true
-					end
+				if success then
+					v6 = result
 				end
 			end
 
-			Decal[v] = Content.fromObject(v55)
+			if not v6 then
+				continue
+			end
+
+			local v7
+
+			if flag2 then
+				v7 = Enum.ImageCombineType.AlphaBlend
+			else
+				v7 = Enum.ImageCombineType.Overwrite
+			end
+
+			editableImage:DrawImage(Vector2.new(0, 0), v6, v7)
+			flag2 = true
 		end
+
+		decal[v3] = Content.fromObject(editableImage)
 	end
 
-	local WrapTextureTransfer = t5[1]:FindFirstChildWhichIsA("WrapTextureTransfer")
+	local wrapTextureTransfer = decals[1]:FindFirstChildWhichIsA("WrapTextureTransfer")
 
-	if WrapTextureTransfer then
-		WrapTextureTransfer:Clone().Parent = Decal
+	if wrapTextureTransfer then
+		local clone = wrapTextureTransfer:Clone()
+		clone.Parent = decal
 	end
 
-	return Decal
+	return decal
 end
 
-return t1
+return MakeupPreviewUtils

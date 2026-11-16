@@ -1,40 +1,39 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local RoactUtils = require(VirtualEvents.Parent.RoactUtils)
 local LuaSocialLibrariesDeps = require(VirtualEvents.Parent.LuaSocialLibrariesDeps)
-local useLocalization = require(VirtualEvents.Parent.Localization).Hooks.useLocalization
+local Localization = require(VirtualEvents.Parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local getDeepValue = LuaSocialLibrariesDeps.SocialLibraries.config({}).Dictionary.getDeepValue
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local function useExperienceSubtitle(s1: string) -- line: 9
-	-- upvalues: useSelector (copy), getDeepValue (copy), useLocalization (copy)
-	local v9 = useSelector(function(p1) -- line: 10
-		-- upvalues: getDeepValue (copy), s1 (copy)
-		local v13 = getDeepValue(p1, "GameVotes." .. s1 .. ".upVotes")
-		local v14 = getDeepValue(p1, "GameVotes." .. s1 .. ".downVotes")
+local function useExperienceSubtitle(p: string)
+	local v = useSelector(function(p2)
+		local deepValue = getDeepValue(p2, "GameVotes." .. p .. ".upVotes")
+		local deepValue2 = getDeepValue(p2, "GameVotes." .. p .. ".downVotes")
 
-		if not v13 or not v14 then
-			return nil
+		if deepValue and deepValue2 then
+			return (math.round(100 * deepValue / (deepValue + deepValue2)))
 		end
 
-		return (math.round(100 * v13 / (v13 + v14)))
+		return nil
 	end)
 
-	if v9 ~= v9 or not v9 then
-		local v10 = useSelector(function(p2) -- line: 24
-			-- upvalues: s1 (copy)
-			return p2.AgeRecommendations and p2.AgeRecommendations[s1]
-		end)
-		local v11 = v10 and (v10.summary and v10.summary.ageRecommendation)
-
-		return v11 and v11.displayNameWithHeaderShort
+	if v == v and v then
+		return useLocalization({
+			ratingPercentage = {
+				"Feature.VirtualEvents.Label.Rating",
+				rating = tostring(v)
+			}
+		}).ratingPercentage
 	end
 
-	return useLocalization({
-		ratingPercentage = {
-			"Feature.VirtualEvents.Label.Rating",
-			rating = tostring(v9)
-		}
-	}).ratingPercentage
+	local v2 = useSelector(function(p2)
+		return p2.AgeRecommendations and p2.AgeRecommendations[p]
+	end)
+
+	local ageRecommendation = v2 and v2.summary and v2.summary.ageRecommendation
+	return ageRecommendation and ageRecommendation.displayNameWithHeaderShort
 end
 
 return useExperienceSubtitle

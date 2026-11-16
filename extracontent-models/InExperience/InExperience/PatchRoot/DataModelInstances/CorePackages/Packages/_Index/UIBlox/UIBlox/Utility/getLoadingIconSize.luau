@@ -1,49 +1,41 @@
-local ParentParent = script.Parent.Parent.Parent
-local IconSize = require(ParentParent.Foundation).Enums.IconSize
+local parent = script.Parent.Parent.Parent
 
-local function getLoadingIconSize(uDim2: UDim2?, p1) -- line: 15
-	-- upvalues: IconSize (copy)
-	if uDim2 == nil then
+local Foundation = require(parent.Foundation)
+local IconSize = Foundation.Enums.IconSize
+
+local function getLoadingIconSize(udim: UDim2?, p)
+	if udim == nil then
 		return nil
 	end
 
-	local YOffset = uDim2.Y.Offset
+	local offset = udim.Y.Offset
 
-	if uDim2.Y.Scale > 0 and YOffset <= 0 then
+	if udim.Y.Scale > 0 and offset <= 0 then
 		return IconSize.Large
 	end
 
-	local t1 = {
-		{
-			IconSize.XSmall,
-			p1.Size.Size_200
-		},
-		{
-			IconSize.Small,
-			p1.Size.Size_400
-		},
-		{
-			IconSize.Medium,
-			p1.Size.Size_900
-		},
-		{
-			IconSize.Large,
-			p1.Size.Size_1200
-		}
+	local v = {
+		{ IconSize.XSmall, p.Size.Size_200 },
+		{ IconSize.Small, p.Size.Size_400 },
+		{ IconSize.Medium, p.Size.Size_900 },
+		{ IconSize.Large, p.Size.Size_1200 }
 	}
-	local v8 = t1[1][1]
-	local v9 = math.abs(YOffset - t1[1][2])
 
-	for i = 2, #t1 do
-		local v11 = math.abs(YOffset - t1[i][2])
+	local v2 = v[1][1]
+	local v3 = math.abs(offset - v[1][2])
 
-		if v11 < v9 then
-			v8 = t1[i][1]
-			v9 = v11
+	for i = 2, #v do
+		local v4 = math.abs(offset - v[i][2])
+
+		if not (v4 < v3) then
+			continue
 		end
+
+		v2 = v[i][1]
+		v3 = v4
 	end
 
-	return v8
+	return v2
 end
 
 return getLoadingIconSize

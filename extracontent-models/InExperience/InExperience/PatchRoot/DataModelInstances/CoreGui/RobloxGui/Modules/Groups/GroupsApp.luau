@@ -1,8 +1,12 @@
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
+
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
-local v4 = require(CorePackages.Workspace.Packages.Groups).GroupsInExperienceApp.createApp()
 
-v4.mountCoreUI(RobloxGui)
+local Groups = require(CorePackages.Workspace.Packages.Groups)
 
-return v4
+local app = Groups.GroupsInExperienceApp.createApp()
+
+app.mountCoreUI(RobloxGui)
+
+return app

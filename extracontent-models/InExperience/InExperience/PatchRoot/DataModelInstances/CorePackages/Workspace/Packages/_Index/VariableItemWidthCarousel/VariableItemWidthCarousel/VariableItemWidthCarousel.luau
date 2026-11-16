@@ -1,128 +1,162 @@
-local VariableItemWidthCarousel2 = script:FindFirstAncestor("VariableItemWidthCarousel")
-local VariableItemWidthCarousel2Parent = VariableItemWidthCarousel2.Parent
-local CollectionViews = require(VariableItemWidthCarousel2Parent.CollectionViews)
-local React = require(VariableItemWidthCarousel2Parent.React)
+local variableItemWidthCarousel = script:FindFirstAncestor("VariableItemWidthCarousel")
+local parent = variableItemWidthCarousel.Parent
+
+local CollectionViews = require(parent.CollectionViews)
+local React = require(parent.React)
+
 local CarouselScrollButtons = CollectionViews.CarouselScrollButtons
 local CollectionHeader = CollectionViews.CollectionHeader
-local useDesignTokens = require(VariableItemWidthCarousel2Parent.Style).useDesignTokens
-local Responsive = require(VariableItemWidthCarousel2Parent.Responsive)
+local Style = require(parent.Style)
+local useDesignTokens = Style.useDesignTokens
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local Responsive = require(parent.Responsive)
 local useLastInput = Responsive.useLastInput
 local usePreferredInput = Responsive.usePreferredInput
 local useIsSpatial = Responsive.useIsSpatial
-local useVariableItemWidthScrollHandlers = require(VariableItemWidthCarousel2.useVariableItemWidthScrollHandlers)
-local FFlagLuaAppEnableVRCarouselScrolling = require(VariableItemWidthCarousel2Parent.SharedFlags).FFlagLuaAppEnableVRCarouselScrolling
-local FFlagLuaAppHideEmptyCarouselHeader = require(VariableItemWidthCarousel2Parent.SharedFlags).FFlagLuaAppHideEmptyCarouselHeader
+local useVariableItemWidthScrollHandlers = require(variableItemWidthCarousel.useVariableItemWidthScrollHandlers)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiOptionSelectorHeaderComponent = SharedFlags.FFlagSduiOptionSelectorHeaderComponent
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSduiComponentsUseFoundationTokens = SharedFlags2.FFlagSduiComponentsUseFoundationTokens
 
-local function areScrollButtonsEnabled(s1: string, s2: string, b1: boolean, b2: boolean) -- line: 50
-	-- upvalues: Responsive (copy), FFlagLuaAppEnableVRCarouselScrolling (copy)
-	if not b1 then
+local function areScrollButtonsEnabled(p: string, p2: string, flag: boolean, flag2: boolean)
+	if not flag then
 		return false
 	end
 
-	return s1 == Responsive.Input.Pointer and s2 ~= Responsive.Input.Directional or FFlagLuaAppEnableVRCarouselScrolling and b2
+	return p == Responsive.Input.Pointer and p2 ~= Responsive.Input.Directional or flag2
 end
 
-function VariableItemWidthCarousel(t1: {[any]: any}, p1) -- line: 68
-	-- upvalues: useDesignTokens (copy), useLastInput (copy), usePreferredInput (copy), useIsSpatial (copy), FFlagLuaAppHideEmptyCarouselHeader (copy), FFlagLuaAppEnableVRCarouselScrolling (copy), Responsive (copy), React (copy), useVariableItemWidthScrollHandlers (copy), CollectionHeader (copy), CarouselScrollButtons (copy)
-	local v22 = useDesignTokens()
-	local v23 = useLastInput()
-	local v24 = usePreferredInput()
-	local v25 = useIsSpatial()
-	local items = t1.items
-	local renderItem = t1.renderItem
-	local itemPadding = t1.itemPadding
-	local itemHeight = t1.itemHeight
-	local v30 = t1.sideMargin or 0
-	local calculateItemWidth = t1.calculateItemWidth
-	local scrollingFrameRef = t1.scrollingFrameRef
-	local v33 = t1.title and t1.title ~= ""
-	local v34 = not FFlagLuaAppHideEmptyCarouselHeader or (v33 or (t1.subtitle ~= nil or t1.tooltipInfoText ~= nil))
-	local scrollButtonsEnabled = t1.scrollButtonsEnabled
+function VariableItemWidthCarousel(props, ref)
+	local v
 
-	if scrollButtonsEnabled then
-		local v36 = not not FFlagLuaAppEnableVRCarouselScrolling or not v25
-		local v37 = if not FFlagLuaAppEnableVRCarouselScrolling then nil else v25
-
-		scrollButtonsEnabled = if v36 then v23 == Responsive.Input.Pointer and v24 ~= Responsive.Input.Directional or FFlagLuaAppEnableVRCarouselScrolling and v37 else false
+	if FFlagSduiComponentsUseFoundationTokens then
+		v = useTokens()
+	else
+		v = useDesignTokens()
 	end
 
-	local v38 = React.useMemo(function() -- line: 93
-		-- upvalues: items (copy), renderItem (copy)
-		local t2 = {}
+	local v2 = useLastInput()
+	local v3 = usePreferredInput()
+	local v4 = useIsSpatial()
 
-		for i, v in ipairs(items) do
-			t2[i] = renderItem(v, i)
+	local items = props.items
+	local renderItem = props.renderItem
+	local itemPadding = props.itemPadding
+	local itemHeight = props.itemHeight
+	local sideMargin = props.sideMargin or 0
+	local calculateItemWidth = props.calculateItemWidth
+	local scrollingFrameRef = props.scrollingFrameRef
+	local v5 = props.title and props.title ~= ""
+	local v6 = v5 or props.subtitle ~= nil or props.tooltipInfoText ~= nil
+	local v7 = props.scrollButtonsEnabled
+
+	if v7 then
+		if v2 == Responsive.Input.Pointer then
+			v7 = v3 ~= Responsive.Input.Directional or v4
+		else
+			v7 = v4
+		end
+	end
+
+	local v8 = React.useMemo(function()
+		local result = {}
+
+		for i, item in ipairs(items) do
+			result[i] = renderItem(item, i)
 		end
 
-		return t2
-	end, {
+		return result
+	end, { items, renderItem })
+
+	local handleScrollLeft, handleScrollRight, leftScrollingEnabled, rightScrollingEnabled, v9 = useVariableItemWidthScrollHandlers(
 		items,
-		renderItem
-	})
-	local v39, v40, v41, v42, v43 = useVariableItemWidthScrollHandlers(items, itemPadding, calculateItemWidth, scrollingFrameRef, t1.scrollSpeed)
-	local v44 = React.useCallback(function(p2) -- line: 105
-		-- upvalues: v43 (copy), t1 (copy)
-		v43()
+		itemPadding,
+		calculateItemWidth,
+		scrollingFrameRef,
+		props.scrollSpeed
+	)
 
-		if t1.onCanvasPositionChanged and p2 then
-			t1.onCanvasPositionChanged(p2.CanvasPosition)
+	local v10 = React.useCallback(function(p)
+		v9()
+
+		if props.onCanvasPositionChanged and p then
+			props.onCanvasPositionChanged(p.CanvasPosition)
 		end
-	end, {
-		v43,
-		t1.onCanvasPositionChanged
-	})
+	end, { v9, props.onCanvasPositionChanged })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
+	local createElement = React.createElement
+	local v11 = {
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		Position = t1.Position,
-		LayoutOrder = t1.LayoutOrder,
-		ref = p1
-	}, {
+		Position = props.Position,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = props.LayoutOrder,
+		ref = ref
+	}
+
+	local v12 = {
 		UIPadding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, v30),
-			PaddingRight = UDim.new(0, v30)
+			PaddingLeft = UDim.new(0, sideMargin),
+			PaddingRight = UDim.new(0, sideMargin)
 		}),
 		UIListLayout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, not (if not FFlagLuaAppHideEmptyCarouselHeader then v33 else v34) and 0 or (t1.headerContentPadding or v22.Size.Size_400))
+			Padding = UDim.new(
+				0,
+				not v6 and (not FFlagSduiOptionSelectorHeaderComponent or props.headerComponent == nil) and 0 or props.headerContentPadding or v.Size.Size_400
+			)
 		}),
-		Header = if not v34 then nil else React.createElement(CollectionHeader, {
+		Header = 0,
+		ContentFrame = 0
+	}
+	local header
+
+	if FFlagSduiOptionSelectorHeaderComponent and props.headerComponent then
+		header = props.headerComponent
+	elseif v6 then
+		header = React.createElement(CollectionHeader, {
 			LayoutOrder = 1,
-			title = t1.title,
-			subtitle = t1.subtitle,
-			tooltipInfoText = t1.tooltipInfoText,
-			onActivateInfoIcon = t1.onActivateInfoIcon,
-			tooltipSupportsVR = t1.tooltipSupportsVR,
-			tooltipSupportsTenFootUi = t1.tooltipSupportsTenFootUi,
-			hideButton = #items < 1 or (t1.hideHeaderButton or not v33),
-			onActivate = t1.onActivateHeader,
-			buttonText = t1.headerButtonText
-		}),
-		ContentFrame = React.createElement("Frame", {
+			title = props.title,
+			subtitle = props.subtitle,
+			tooltipInfoText = props.tooltipInfoText,
+			onActivateInfoIcon = props.onActivateInfoIcon,
+			tooltipSupportsVR = props.tooltipSupportsVR,
+			tooltipSupportsTenFootUi = props.tooltipSupportsTenFootUi,
+			hideButton = #items < 1 or (props.hideHeaderButton or not v5),
+			onActivate = props.onActivateHeader,
+			buttonText = props.headerButtonText
+		})
+	end
+
+	v12.Header = header
+
+	local createElement2 = React.createElement
+	local v13 = {
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Size = UDim2.new(1, 0, 0, itemHeight)
+	}
+	local v14 = {
+		DynamicScrollingFrame = React.createElement("ScrollingFrame", {
+			AutomaticCanvasSize = Enum.AutomaticSize.X,
 			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, itemHeight)
-		}, {
-			DynamicScrollingFrame = React.createElement("ScrollingFrame", {
-				AutomaticCanvasSize = Enum.AutomaticSize.X,
-				BackgroundTransparency = 1,
-				CanvasSize = UDim2.new(0, 0, 0, itemHeight),
-				ClipsDescendants = false,
-				ElasticBehavior = Enum.ElasticBehavior.Always,
-				ScrollBarThickness = 0,
-				ScrollingDirection = Enum.ScrollingDirection.X,
-				Selectable = false,
-				Size = UDim2.new(1, 0, 0, itemHeight),
-				ZIndex = 1,
-				ref = scrollingFrameRef,
-				[React.Change.AbsoluteSize] = v43,
-				[React.Change.CanvasPosition] = v44
-			}, { React.createElement(React.Fragment, nil, {
+			CanvasSize = UDim2.new(0, 0, 0, itemHeight),
+			ClipsDescendants = false,
+			ElasticBehavior = Enum.ElasticBehavior.Always,
+			ScrollBarThickness = 0,
+			ScrollingDirection = Enum.ScrollingDirection.X,
+			Selectable = false,
+			Size = UDim2.new(1, 0, 0, itemHeight),
+			ZIndex = 1,
+			ref = scrollingFrameRef,
+			[React.Change.AbsoluteSize] = v9,
+			[React.Change.CanvasPosition] = v10
+		}, { React.createElement(React.Fragment, nil, {
 				React.createElement("UIListLayout", {
 					FillDirection = Enum.FillDirection.Horizontal,
 					HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -130,21 +164,29 @@ function VariableItemWidthCarousel(t1: {[any]: any}, p1) -- line: 68
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					VerticalAlignment = Enum.VerticalAlignment.Center
 				}),
-				React.createElement(React.Fragment, nil, v38)
+				React.createElement(React.Fragment, nil, v8)
 			}) }),
-			ScrollButtons = if not scrollButtonsEnabled then nil else React.createElement(CarouselScrollButtons, {
-				ZIndex = 2,
-				AnchorPoint = Vector2.new(0.5, 0),
-				Position = UDim2.new(0.5, 0, 0, 0),
-				Size = UDim2.new(1, 2 * v30, 0, itemHeight),
-				buttonOffsetFromEdge = v22.Size.Size_200,
-				handleScrollLeft = v39,
-				handleScrollRight = v40,
-				leftScrollingEnabled = v41,
-				rightScrollingEnabled = v42
-			})
+		ScrollButtons = 0
+	}
+	local scrollButtons
+
+	if v7 then
+		scrollButtons = React.createElement(CarouselScrollButtons, {
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.new(0.5, 0, 0, 0),
+			Size = UDim2.new(1, 2 * sideMargin, 0, itemHeight),
+			ZIndex = 2,
+			buttonOffsetFromEdge = v.Size.Size_200,
+			handleScrollLeft = handleScrollLeft,
+			handleScrollRight = handleScrollRight,
+			leftScrollingEnabled = leftScrollingEnabled,
+			rightScrollingEnabled = rightScrollingEnabled
 		})
-	})
+	end
+
+	v14.ScrollButtons = scrollButtons
+	v12.ContentFrame = createElement2("Frame", v13, v14)
+	return createElement("Frame", v11, v12)
 end
 
 return React.forwardRef(VariableItemWidthCarousel)

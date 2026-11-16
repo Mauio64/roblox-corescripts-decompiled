@@ -1,10 +1,10 @@
-local ParentParent = script.Parent.Parent.Parent
-local Error = require(ParentParent.LuauPolyfill).Error
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Error = LuauPolyfill.Error
 
-local function invariant(p1, p2, ...) -- line: 24
-	-- upvalues: Error (copy)
-	if not p1 then
-		error(Error(string.format(p2, ...)))
+local function invariant(p, formatString, ...)
+	if not p then
+		error(Error(string.format(formatString, ...)))
 	end
 end
 

@@ -1,23 +1,35 @@
 local CorePackages = game:GetService("CorePackages")
 local TextService = game:GetService("TextService")
+
 local React = require(CorePackages.Packages.React)
 local t = require(CorePackages.Packages.t)
 local ArgCheck = require(CorePackages.Workspace.Packages.ArgCheck)
 local VoiceChat = require(CorePackages.Workspace.Packages.VoiceChat)
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local Style = require(CorePackages.Workspace.Packages.Style)
+local GetTextSize = Style.GetTextSize
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Images = UIBlox.App.ImageSet.Images
 local Assets = require(script.Parent.Parent.Parent.InGameMenu.Resources.Assets)
+
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+
 local getMicDeeplinkDirections = require(script.Parent.Parent.Helpers.getMicDeeplinkDirections)
 local getPrimingText = require(script.Parent.Parent.Helpers.getPrimingText)
+
 local GetFFlagSupportGamepadNavInVoiceModals = VoiceChat.Flags.GetFFlagSupportGamepadNavInVoiceModals
-local v16 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.OpenSettings")
-local v17 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Ok")
-local v18 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.NotNow")
-local v19 = Images["icons/controls/microphone"]
-local v20 = ArgCheck.wrap(t.strictInterface({
+
+local formatByKey = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.OpenSettings")
+local formatByKey2 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Ok")
+local formatByKey3 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.NotNow")
+
+local iconscontrolsmicrophone = Images["icons/controls/microphone"]
+
+local wrapped = ArgCheck.wrap(t.strictInterface({
 	titleText = t.string,
 	bodyText = t.string,
 	handlePrimaryActivated = t.callback,
@@ -29,227 +41,337 @@ local v20 = ArgCheck.wrap(t.strictInterface({
 	UserInputService = t.table
 }))
 
-local function DevicePermissionsModal(t1: {[any]: any}, p1) -- line: 65
-	-- upvalues: v20 (copy), getMicDeeplinkDirections (copy), getPrimingText (copy), TextService (copy), GetFFlagSupportGamepadNavInVoiceModals (copy), React (copy), UIBlox (copy), Assets (copy), v19 (copy), Button (copy), ButtonType (copy), v18 (copy), v16 (copy), v17 (copy)
-	assert(v20(t1))
+local function DevicePermissionsModal(props, ref)
+	assert(wrapped(props))
 
-	local v24 = getMicDeeplinkDirections(t1.settingsAppAvailable, t1.UserInputService)
-	local v25 = getPrimingText(t1.UserInputService)
-	local Header1Font = t1.promptStyle.Font.Header1.Font
-	local v27 = t1.promptStyle.Font.Header1.RelativeSize * t1.promptStyle.Font.BaseSize
-	local v28 = 20 + TextService:GetTextSize(t1.titleText, v27, Header1Font, Vector2.new(325, 1e999)).Y
-	local BodyFont = t1.promptStyle.Font.Body.Font
-	local v30 = t1.promptStyle.Font.Body.RelativeSize * t1.promptStyle.Font.BaseSize
-	local v31 = 20 + TextService:GetTextSize(t1.bodyText, v30, BodyFont, Vector2.new(325, 1e999)).Y
-	local n1 = 0
+	local micDeeplinkDirections = getMicDeeplinkDirections(props.settingsAppAvailable, props.UserInputService)
+	local primingText = getPrimingText(props.UserInputService)
 
-	if v25 then
-		local CaptionHeaderFont = t1.promptStyle.Font.CaptionHeader.Font
-		local v34 = t1.promptStyle.Font.CaptionHeader.RelativeSize * t1.promptStyle.Font.BaseSize
+	local font = props.promptStyle.Font.Header1.Font
+	local v = props.promptStyle.Font.Header1.RelativeSize * props.promptStyle.Font.BaseSize
+	local v2
 
-		n1 = 10 + TextService:GetTextSize(v25, v34, CaptionHeaderFont, Vector2.new(325, 1e999)).Y
+	if FoundationFontFaceMigration then
+		v2 = GetTextSize(props.titleText, v, font, Vector2.new(325, 1e999), {
+			addTemporaryPadding = false
+		}).Y
+	else
+		v2 = TextService:GetTextSize(props.titleText, v, font, Vector2.new(325, 1e999)).Y
 	end
 
-	local n2 = 0
+	local v3 = 20 + v2
 
-	if v24 then
-		local BodyFont2 = t1.promptStyle.Font.Body.Font
-		local v37 = t1.promptStyle.Font.Body.RelativeSize * t1.promptStyle.Font.BaseSize
-		local Y = TextService:GetTextSize(v24, v37, BodyFont2, Vector2.new(325, 1e999)).Y
+	local font2 = props.promptStyle.Font.Body.Font
+	local v4 = props.promptStyle.Font.Body.RelativeSize * props.promptStyle.Font.BaseSize
+	local v5
 
-		n2 = (not v25 and 20 or 10) + Y
+	if FoundationFontFaceMigration then
+		v5 = GetTextSize(props.bodyText, v4, font2, Vector2.new(325, 1e999), {
+			addTemporaryPadding = false
+		}).Y
+	else
+		v5 = TextService:GetTextSize(props.bodyText, v4, font2, Vector2.new(325, 1e999)).Y
 	end
 
-	local n3 = 4
+	local v6 = 20 + v5
+	local v7
 
-	if v24 then
-		n3 = 4.5
+	if primingText then
+		local font3 = props.promptStyle.Font.CaptionHeader.Font
+		local v8 = props.promptStyle.Font.CaptionHeader.RelativeSize * props.promptStyle.Font.BaseSize
+		local v9
+
+		if FoundationFontFaceMigration then
+			v9 = GetTextSize(primingText, v8, font3, Vector2.new(325, 1e999), {
+				addTemporaryPadding = false
+			}).Y
+		else
+			v9 = TextService:GetTextSize(primingText, v8, font3, Vector2.new(325, 1e999)).Y
+		end
+
+		v7 = 10 + v9
+	else
+		v7 = 0
 	end
 
-	if v25 then
-		n3 = 5.5
+	local v8
+
+	if micDeeplinkDirections then
+		local font3 = props.promptStyle.Font.Body.Font
+		local v9 = props.promptStyle.Font.Body.RelativeSize * props.promptStyle.Font.BaseSize
+		local v10
+
+		if FoundationFontFaceMigration then
+			v10 = GetTextSize(micDeeplinkDirections, v9, font3, Vector2.new(325, 1e999), {
+				addTemporaryPadding = false
+			}).Y
+		else
+			v10 = TextService:GetTextSize(micDeeplinkDirections, v9, font3, Vector2.new(325, 1e999)).Y
+		end
+
+		v8 = (primingText and 10 or 20) + v10
+	else
+		v8 = 0
 	end
 
-	local v40 = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else Enum.SelectionBehavior.Stop
-	local v41 = not not GetFFlagSupportGamepadNavInVoiceModals() or nil
+	local stop
 
-	return React.createElement("ScreenGui", {
+	if GetFFlagSupportGamepadNavInVoiceModals() then
+		stop = Enum.SelectionBehavior.Stop
+	end
+
+	local v9 = GetFFlagSupportGamepadNavInVoiceModals() and true or nil
+
+	local createElement = React.createElement
+	local v10 = {
 		DisplayOrder = 8,
 		IgnoreGuiInset = true,
 		OnTopOfCoreBlur = true,
-		Enabled = t1.showPrompt,
+		Enabled = props.showPrompt,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	}, {
+	}
+	local v11 = {
 		Overlay = React.createElement("TextButton", {
 			AutoButtonColor = false,
+			BackgroundColor3 = props.promptStyle.Theme.Overlay.Color,
+			BackgroundTransparency = props.promptStyle.Theme.Overlay.Transparency,
 			BorderSizePixel = 0,
-			Text = "",
-			BackgroundColor3 = t1.promptStyle.Theme.Overlay.Color,
-			BackgroundTransparency = t1.promptStyle.Theme.Overlay.Transparency,
-			Size = UDim2.new(1, 0, 1, 0)
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = ""
 		}),
-		DialogMainFrame = React.createElement(UIBlox.Core.ImageSet.ImageSetLabel, {
-			BackgroundTransparency = 1,
+		DialogMainFrame = 0
+	}
+
+	local createElement2 = React.createElement
+	local imageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+	local v12 = {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		Image = Assets.Images.RoundedRect.Image,
+		ImageColor3 = props.promptStyle.Theme.BackgroundUIDefault.Color,
+		ImageTransparency = props.promptStyle.Theme.BackgroundUIDefault.Transparency,
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		ScaleType = Assets.Images.RoundedRect.ScaleType,
+		Size = UDim2.new(
+			0,
+			365,
+			0,
+			v3 + 5 + v6 + 36 + (primingText and 5.5 or micDeeplinkDirections and 4.5 or 4) * 20 + v8 + 55 + v7
+		),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		SliceCenter = Assets.Images.RoundedRect.SliceCenter,
+		SelectionBehaviorDown = stop,
+		SelectionBehaviorLeft = stop,
+		SelectionBehaviorRight = stop,
+		SelectionBehaviorUp = stop,
+		SelectionGroup = v9,
+		ref = 0
+	}
+
+	if not GetFFlagSupportGamepadNavInVoiceModals() then
+		ref = nil
+	end
+
+	v12.ref = ref
+	local v13 = {
+		Padding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 15),
+			PaddingBottom = UDim.new(0, 20),
+			PaddingLeft = UDim.new(0, 20),
+			PaddingRight = UDim.new(0, 20)
+		}),
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		Icon = React.createElement(UIBlox.Core.ImageSet.ImageSetLabel, {
+			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Image = Assets.Images.RoundedRect.Image,
-			ImageColor3 = t1.promptStyle.Theme.BackgroundUIDefault.Color,
-			ImageTransparency = t1.promptStyle.Theme.BackgroundUIDefault.Transparency,
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			ScaleType = Assets.Images.RoundedRect.ScaleType,
-			Size = UDim2.new(0, 365, 0, v28 + 5 + v31 + 36 + n3 * 20 + n2 + 55 + n1),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			SliceCenter = Assets.Images.RoundedRect.SliceCenter,
-			SelectionBehaviorDown = v40,
-			SelectionBehaviorLeft = v40,
-			SelectionBehaviorRight = v40,
-			SelectionBehaviorUp = v40,
-			SelectionGroup = v41,
-			ref = if not GetFFlagSupportGamepadNavInVoiceModals() then nil else p1
-		}, {
-			Padding = React.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 15),
-				PaddingBottom = UDim.new(0, 20),
-				PaddingLeft = UDim.new(0, 20),
-				PaddingRight = UDim.new(0, 20)
-			}),
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				SortOrder = Enum.SortOrder.LayoutOrder
-			}),
-			Icon = React.createElement(UIBlox.Core.ImageSet.ImageSetLabel, {
-				LayoutOrder = 1,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Position = UDim2.fromScale(0.5, 0.5),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Image = v19,
-				Size = UDim2.new(0, 55, 0, 55)
-			}),
-			TitleTextContainer = React.createElement("Frame", {
+			Image = iconscontrolsmicrophone,
+			Size = UDim2.new(0, 55, 0, 55),
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0
+		}),
+		TitleTextContainer = React.createElement(
+			"Frame",
+			{
 				BackgroundTransparency = 1,
 				LayoutOrder = 2,
-				Size = UDim2.new(1, 0, 0, v28),
+				Size = UDim2.new(1, 0, 0, v3),
 				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				Padding = React.createElement("UIPadding", {
-					PaddingBottom = UDim.new(0, 7)
-				}),
+			},
+			{
+				Padding = React.createElement("UIPadding", { PaddingBottom = UDim.new(0, 7) }),
 				TitleText = React.createElement(UIBlox.App.Text.StyledTextLabel, {
-					fontStyle = t1.promptStyle.Font.Header1,
-					colorStyle = t1.promptStyle.Theme.SystemPrimaryDefault,
+					fontStyle = props.promptStyle.Font.Header1,
+					colorStyle = props.promptStyle.Theme.SystemPrimaryDefault,
 					textXAlignment = Enum.TextXAlignment.Center,
 					size = UDim2.new(1, 0, 1, 0),
-					text = t1.titleText
+					text = props.titleText
 				})
-			}),
-			Divider = React.createElement("Frame", {
-				BorderSizePixel = 0,
-				LayoutOrder = 3,
-				BackgroundColor3 = t1.promptStyle.Theme.Divider.Color,
-				BackgroundTransparency = t1.promptStyle.Theme.Divider.Transparency,
-				Size = UDim2.new(1, 0, 0, 1)
-			}),
-			DividerSpaceContainer = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 4,
-				Size = UDim2.new(1, 0, 0, 15)
-			}),
-			BodyTextContainer = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 5,
-				Size = UDim2.new(1, 0, 0, v31)
-			}, {
+			}
+		),
+		Divider = React.createElement("Frame", {
+			BackgroundColor3 = props.promptStyle.Theme.Divider.Color,
+			BackgroundTransparency = props.promptStyle.Theme.Divider.Transparency,
+			BorderSizePixel = 0,
+			LayoutOrder = 3,
+			Size = UDim2.new(1, 0, 0, 1)
+		}),
+		DividerSpaceContainer = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 4,
+			Size = UDim2.new(1, 0, 0, 15)
+		}),
+		BodyTextContainer = React.createElement(
+			"Frame",
+			{ BackgroundTransparency = 1, LayoutOrder = 5, Size = UDim2.new(1, 0, 0, v6) },
+			{
 				BodyText = React.createElement(UIBlox.App.Text.StyledTextLabel, {
-					lineHeight = 1.2,
-					fontStyle = t1.promptStyle.Font.Body,
-					colorStyle = t1.promptStyle.Theme.TextDefault,
+					fontStyle = props.promptStyle.Font.Body,
+					colorStyle = props.promptStyle.Theme.TextDefault,
 					textXAlignment = Enum.TextXAlignment.Left,
 					size = UDim2.new(1, 0, 1, 0),
-					text = t1.bodyText
+					text = props.bodyText,
+					lineHeight = 1.2
 				})
+			}
+		),
+		InfoTextContainer = 0,
+		SpaceContainer = 0,
+		PrimingTextContainer = 0,
+		SpaceContainerTemp = 0,
+		ButtonContainer = 0
+	}
+	local infoTextContainer
+
+	if micDeeplinkDirections then
+		infoTextContainer = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 6,
+			Size = UDim2.new(1, 0, 0, v8 + 20)
+		}, {
+			Padding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, primingText and 8 or 15),
+				PaddingLeft = UDim.new(0, 8)
 			}),
-			InfoTextContainer = if not v24 then nil else React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 6,
-				Size = UDim2.new(1, 0, 0, n2 + 20)
-			}, {
-				Padding = React.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, not v25 and 15 or 8),
-					PaddingLeft = UDim.new(0, 8)
-				}),
-				TextContainer = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					Size = UDim2.new(1, 0, 0, n2)
-				}, {
+			TextContainer = React.createElement(
+				"Frame",
+				{ BackgroundTransparency = 1, LayoutOrder = 2, Size = UDim2.new(1, 0, 0, v8) },
+				{
 					InfoText = React.createElement(UIBlox.App.Text.StyledTextLabel, {
-						lineHeight = 1.25,
-						fontStyle = t1.promptStyle.Font.Body,
-						colorStyle = t1.promptStyle.Theme.TextEmphasis,
+						fontStyle = props.promptStyle.Font.Body,
+						colorStyle = props.promptStyle.Theme.TextEmphasis,
 						textXAlignment = Enum.TextXAlignment.Left,
 						textYAlignment = Enum.TextYAlignment.Top,
 						size = UDim2.new(1, 0, 1, 0),
-						text = v24
+						text = micDeeplinkDirections,
+						lineHeight = 1.25
 					})
-				})
-			}),
-			SpaceContainer = if v25 then nil else React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 7,
-				Size = UDim2.new(1, 0, 0, not v24 and 20 or 40)
-			}),
-			PrimingTextContainer = if not v25 then nil else React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 8,
-				Size = UDim2.new(1, 0, 0, n1)
-			}, {
+				}
+			)
+		})
+	end
+
+	v13.InfoTextContainer = infoTextContainer
+	local spaceContainer
+
+	if not primingText then
+		spaceContainer = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 7,
+			Size = UDim2.new(1, 0, 0, micDeeplinkDirections and 40 or 20)
+		})
+	end
+
+	v13.SpaceContainer = spaceContainer
+	local primingTextContainer
+
+	if primingText then
+		primingTextContainer = React.createElement(
+			"Frame",
+			{ BackgroundTransparency = 1, LayoutOrder = 8, Size = UDim2.new(1, 0, 0, v7) },
+			{
 				PrimingText = React.createElement(UIBlox.App.Text.StyledTextLabel, {
-					lineHeight = 1.25,
-					fontStyle = t1.promptStyle.Font.Body,
-					colorStyle = t1.promptStyle.Theme.TextDefault,
+					fontStyle = props.promptStyle.Font.Body,
+					colorStyle = props.promptStyle.Theme.TextDefault,
 					textXAlignment = Enum.TextXAlignment.Left,
 					textYAlignment = Enum.TextYAlignment.Top,
 					size = UDim2.new(1, 0, 1, 0),
-					text = v25
+					text = primingText,
+					lineHeight = 1.25
 				})
-			}),
-			SpaceContainerTemp = if not v25 then nil else React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 9,
-				Size = UDim2.new(1, 0, 0, 30)
-			}),
-			ButtonContainer = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 10,
-				Size = UDim2.new(1, 0, 0, 36)
-			}, {
-				Layout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					Padding = UDim.new(0, 12),
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}),
-				SecondaryButton = if not t1.settingsAppAvailable then nil else React.createElement(Button, {
-					layoutOrder = 1,
-					buttonType = ButtonType.Secondary,
-					size = UDim2.new(0.5, -5, 0, 36),
-					text = v18,
-					onActivated = t1.handleSecondaryActivated,
-					Selectable = v41
-				}),
-				ConfirmButton = React.createElement(Button, {
-					layoutOrder = 2,
-					buttonType = ButtonType.PrimarySystem,
-					size = UDim2.new(not t1.settingsAppAvailable and 1 or 0.5, -5, 0, 36),
-					text = if not t1.settingsAppAvailable then v17 else v16,
-					onActivated = t1.handlePrimaryActivated,
-					Selectable = v41
-				})
-			})
+			}
+		)
+	end
+
+	v13.PrimingTextContainer = primingTextContainer
+	local spaceContainerTemp
+
+	if primingText then
+		spaceContainerTemp = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 9,
+			Size = UDim2.new(1, 0, 0, 30)
 		})
-	})
+	end
+
+	v13.SpaceContainerTemp = spaceContainerTemp
+
+	local createElement3 = React.createElement
+	local v14 = { BackgroundTransparency = 1, LayoutOrder = 10, Size = UDim2.new(1, 0, 0, 36) }
+	local v15 = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			Padding = UDim.new(0, 12),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		SecondaryButton = 0,
+		ConfirmButton = 0
+	}
+	local secondaryButton
+
+	if props.settingsAppAvailable then
+		secondaryButton = React.createElement(Button, {
+			buttonType = ButtonType.Secondary,
+			layoutOrder = 1,
+			size = UDim2.new(0.5, -5, 0, 36),
+			text = formatByKey3,
+			onActivated = props.handleSecondaryActivated,
+			Selectable = v9
+		})
+	end
+
+	v15.SecondaryButton = secondaryButton
+
+	local createElement4 = React.createElement
+	local v16 = {
+		buttonType = ButtonType.PrimarySystem,
+		layoutOrder = 2,
+		size = UDim2.new(props.settingsAppAvailable and 0.5 or 1, -5, 0, 36),
+		text = 0,
+		onActivated = 0,
+		Selectable = 0
+	}
+	local text
+
+	if props.settingsAppAvailable then
+		text = formatByKey
+	else
+		text = formatByKey2
+	end
+
+	v16.text = text
+	v16.onActivated = props.handlePrimaryActivated
+	v16.Selectable = v9
+	v15.ConfirmButton = createElement4(Button, v16)
+	v13.ButtonContainer = createElement3("Frame", v14, v15)
+	v11.DialogMainFrame = createElement2(imageSetLabel, v12, v13)
+	return createElement("ScreenGui", v10, v11)
 end
 
 if GetFFlagSupportGamepadNavInVoiceModals() then

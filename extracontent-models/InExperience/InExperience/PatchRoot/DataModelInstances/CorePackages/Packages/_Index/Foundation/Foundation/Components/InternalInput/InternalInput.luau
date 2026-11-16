@@ -1,172 +1,217 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Flags = require(Foundation.Utility.Flags)
-local useMotion = require(FoundationParent.Motion).useMotion
-local Dash = require(FoundationParent.Dash)
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local Motion = require(parent.Motion)
+local useMotion = Motion.useMotion
+
+local Dash = require(parent.Dash)
+local React = require(parent.React)
+
 local Components = Foundation.Components
 local InputLabel = require(Components.InputLabel)
-
 require(Components.Types)
-
 local View = require(Components.View)
+
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
+
+local InputHint = require(script.Parent.InputHint)
 local useInputMotionStates = require(script.Parent.useInputMotionStates)
 local useInputVariants = require(script.Parent.useInputVariants)
+
 local getInputTextSize = require(Foundation.Utility.getInputTextSize)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local Constants = require(Foundation.Constants)
-local ControlState = require(Foundation.Enums.ControlState)
+
 local InputSize = require(Foundation.Enums.InputSize)
 
 require(Foundation.Enums.CursorType)
+
 require(Foundation.Providers.Style.Tokens)
 
-local t1 = {
-	Selectable = true,
-	testId = "--foundation-internal-input",
-	size = InputSize.Medium
-}
+local v = { size = InputSize.Medium, Selectable = true, testId = "--foundation-internal-input" }
 
-local function InternalInput(p1, p2) -- line: 83
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), useTokens (copy), useInputVariants (copy), useInputMotionStates (copy), Flags (copy), useMotion (copy), ControlState (copy), Constants (copy), StateLayerAffordance (copy), View (copy), withCommonProps (copy), Dash (copy), InputLabel (copy), getInputTextSize (copy)
-	local v24 = withDefaults(p1, t1)
-	local text = v24.label.text
-	local v26 = v24.label.position or Enum.HorizontalAlignment.Right
-	local v27 = if typeof(text) ~= "string" then text ~= nil else #text > 0
-	local v28, v29 = React.useState(false)
-	local v30 = useTokens()
-	local v31 = v24.isChecked or v24.isIndeterminate
-	local v32 = useInputVariants(v30, v24.size, v26)
-	local v33 = React.useMemo(function() -- line: 96
-		-- upvalues: v24 (copy), v30 (copy)
+local function InternalInput(p, ref)
+	local v2 = withDefaults(p, v)
+
+	local v3 = v2.label.text
+	local position = v2.label.position or Enum.HorizontalAlignment.Right
+	local v4
+
+	if typeof(v3) == "string" then
+		v4 = #v3 > 0
+	else
+		v4 = v3 ~= nil
+	end
+
+	local v5 = useTokens()
+
+	local isChecked = v2.isChecked or v2.isIndeterminate
+
+	local v6 = useInputVariants(v5, v2.size, position)
+
+	local cursor = React.useMemo(function()
 		return {
-			radius = v24.customVariantProps.cursorRadius or UDim.new(0, 0),
-			offset = v30.Size.Size_200,
-			borderWidth = v30.Stroke.Thicker
+			radius = v2.customVariantProps.cursorRadius or UDim.new(0, 0),
+			offset = v5.Size.Size_200,
+			borderWidth = v5.Stroke.Thicker
 		}
-	end, {
-		v30,
-		v27,
-		v24.customVariantProps.cursorRadius
-	})
-	local v34 = useInputMotionStates(v30, if not Flags.FoundationToggleVisualUpdate then v24.customVariantProps.checkedStyle else v24.customVariantProps.colors)
-	local v35, v36 = useMotion(v34.Default)
+	end, { v5, v4, v2.customVariantProps.cursorRadius })
 
-	React.useEffect(function() -- line: 113
-		-- upvalues: v31 (copy), v36 (copy), v34 (copy), v28 (copy)
-		if v31 then
-			v36(v34.Checked)
+	local v7 = useInputMotionStates(v5, v2.customVariantProps.colors)
 
+	local v8, v9 = useMotion(v7.Default)
+
+	React.useEffect(function()
+		if isChecked then
+			v9(v7.Checked)
+		else
+			v9(v7.Default)
+		end
+	end, { isChecked, v7 })
+
+	local onActivated = React.useCallback(function()
+		if v2.isDisabled then
 			return
 		end
 
-		if v28 then
-			v36(v34.Hover)
+		v2.onActivated(not v2.isChecked)
+	end, { v2.isDisabled, v2.isChecked, v2.onActivated })
 
-			return
-		end
+	local selection = {
+		Selectable = not v2.isDisabled and v2.Selectable,
+		NextSelectionUp = v2.NextSelectionUp,
+		NextSelectionDown = v2.NextSelectionDown,
+		NextSelectionLeft = v2.NextSelectionLeft,
+		NextSelectionRight = v2.NextSelectionRight
+	}
 
-		v36(v34.Default)
-	end, {
-		v31,
-		v28,
-		v34
-	})
+	local v10 = {
+		Active = not v2.isDisabled,
+		GroupTransparency = not v2.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY,
+		onActivated = onActivated,
+		stateLayer = { affordance = StateLayerAffordance.None },
+		selection = v4 and { Selectable = false } or selection,
+		cursor = 0,
+		isDisabled = 0,
+		ref = 0
+	}
+	local cursor2
 
-	local v37 = React.useCallback(function(p3) -- line: 123
-		-- upvalues: v29 (copy), ControlState (copy)
-		v29(p3 == ControlState.Hover)
+	if not v4 then
+		cursor2 = cursor
+	end
+
+	v10.cursor = cursor2
+	v10.isDisabled = v2.isDisabled
+	v10.ref = ref
+	local thickness
+
+	if v2.customVariantProps.stroke and v2.customVariantProps.stroke.thickness ~= nil then
+		thickness = v2.customVariantProps.stroke.thickness
+	else
+		thickness = v6.input.stroke.thickness
+	end
+
+	local stateLayer = React.useMemo(function()
+		return { affordance = StateLayerAffordance.None, inset = nil, mode = nil }
 	end, {})
-	local v38 = React.useCallback(function() -- line: 127
-		-- upvalues: v24 (copy)
-		if v24.isDisabled then
-			return
-		end
 
-		v24.onActivated(not v24.isChecked)
-	end, {
-		v24.isDisabled,
-		v24.isChecked,
-		v24.onActivated
-	})
-	local t2 = {
-		Selectable = not v24.isDisabled and v24.Selectable,
-		NextSelectionUp = v24.NextSelectionUp,
-		NextSelectionDown = v24.NextSelectionDown,
-		NextSelectionLeft = v24.NextSelectionLeft,
-		NextSelectionRight = v24.NextSelectionRight
-	}
-	local t3 = {
-		Active = not v24.isDisabled,
-		GroupTransparency = not v24.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY,
-		onActivated = v38,
-		onStateChanged = v37,
-		stateLayer = {
-			affordance = StateLayerAffordance.None
-		},
-		selection = if not v27 then t2 else {
-			Selectable = false
-		},
-		cursor = if not v27 then v33 else nil,
-		isDisabled = v24.isDisabled,
-		ref = p2
-	}
-	local v41 = if not Flags.FoundationToggleVisualUpdate or (not v24.customVariantProps.stroke or v24.customVariantProps.stroke.thickness == nil) then v32.input.stroke.thickness else v24.customVariantProps.stroke.thickness
-	local t4 = {
-		tag = v24.customVariantProps.tag,
-		Size = v24.customVariantProps.size - UDim2.fromOffset(v41, v41),
-		backgroundStyle = v35.backgroundStyle,
-		onActivated = v38,
-		stateLayer = {
-			affordance = StateLayerAffordance.Background
-		},
+	local v11 = {
+		tag = v2.customVariantProps.tag,
+		Size = v2.customVariantProps.size - UDim2.fromOffset(thickness, thickness),
+		backgroundStyle = v8.backgroundStyle,
+		onActivated = onActivated,
+		stateLayer = stateLayer,
 		stroke = {
-			Color = v35.strokeStyle:map(function(p4) -- line: 168
-				return p4.Color3
+			Color = v8.strokeStyle:map(function(p2)
+				return p2.Color3
 			end),
-			Transparency = v35.strokeStyle:map(function(p5) -- line: 171
-				-- upvalues: v24 (copy), v27 (copy), Constants (copy)
-				if v24.isDisabled and not v27 then
+			Transparency = v8.strokeStyle:map(function(p2)
+				if v2.isDisabled and not v4 then
 					return Constants.DISABLED_TRANSPARENCY
 				end
 
-				return p5.Transparency
+				return p2.Transparency
 			end),
-			Thickness = v41,
+			Thickness = thickness,
 			BorderStrokePosition = Enum.BorderStrokePosition.Inner
 		},
-		selection = t2,
-		cursor = if not v27 then nil else v33,
-		LayoutOrder = if not v27 then nil else v26 ~= Enum.HorizontalAlignment.Left and -1 or 1,
-		testId = `{ v24.testId }--container`
+		selection = selection,
+		cursor = 0,
+		LayoutOrder = 0,
+		testId = 0
 	}
 
-	if not v27 then
-		return React.createElement(View, withCommonProps(v24, Dash.union(t3, t4)), v24.children)
+	if not v4 then
+		cursor = nil
 	end
 
-	local t5 = {
-		tag = v32.container.tag,
-		padding = {
-			top = v32.container.padding,
-			bottom = v32.container.padding,
-			left = if v26 ~= Enum.HorizontalAlignment.Right then nil else v32.container.padding,
-			right = if v26 ~= Enum.HorizontalAlignment.Left then nil else v32.container.padding
-		}
+	v11.cursor = cursor
+
+	v11.LayoutOrder = v4 and (position == Enum.HorizontalAlignment.Left and 1 or -1) or nil
+	v11.testId = `{v2.testId}--container`
+
+	if not v4 then
+		return React.createElement(View, withCommonProps(v2, Dash.union(v10, v11)), v2.children)
+	end
+
+	local v12 = { tag = v6.container.tag, padding = 0 }
+
+	local padding = {
+		top = v6.container.padding,
+		bottom = v6.container.padding,
+		left = 0,
+		right = 0
+	}
+	local left
+
+	if position == Enum.HorizontalAlignment.Right then
+		left = v6.container.padding
+	end
+
+	padding.left = left
+	local right
+
+	if position == Enum.HorizontalAlignment.Left then
+		right = v6.container.padding
+	end
+
+	padding.right = right
+	v12.padding = padding
+
+	if typeof(v3) == "string" then
+		v3 = React.createElement(InputLabel, {
+			Text = v3,
+			textStyle = v8.labelStyle,
+			size = getInputTextSize(v2.size),
+			testId = `{v2.testId}--label`
+		})
+	end
+
+	local createElement = React.createElement
+	local v13 = withCommonProps(v2, Dash.union(v12, v10))
+	local v14 = {
+		Input = React.createElement(View, v11, v2.children),
+		InputLabel = 0
 	}
 
-	return React.createElement(View, withCommonProps(v24, Dash.union(t5, t3)), {
-		Input = React.createElement(View, t4, v24.children),
-		InputLabel = if typeof(text) ~= "string" then text else React.createElement(InputLabel, {
-			Text = text,
-			textStyle = v35.labelStyle,
-			size = getInputTextSize(v24.size),
-			testId = `{ v24.testId }--label`
+	if v2.label.hint ~= nil and v2.label.hint ~= "" then
+		v3 = React.createElement(View, { tag = "col gap-xxsmall auto-xy" }, {
+			InputLabel = v3,
+			Hint = React.createElement(InputHint, {
+				text = v2.label.hint,
+				size = getInputTextSize(v2.size),
+				testId = `{v2.testId}--hint`,
+				LayoutOrder = 2
+			})
 		})
-	})
+	end
+
+	v14.InputLabel = v3
+	return createElement(View, v13, v14)
 end
 
 return React.memo(React.forwardRef(InternalInput))

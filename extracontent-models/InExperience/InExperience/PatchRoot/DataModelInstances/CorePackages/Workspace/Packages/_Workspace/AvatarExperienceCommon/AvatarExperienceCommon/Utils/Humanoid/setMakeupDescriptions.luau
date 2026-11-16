@@ -1,23 +1,25 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE = require(AvatarExperienceCommon.Constants).ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE
+
+local Constants = require(AvatarExperienceCommon.Constants)
+local ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE = Constants.ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE
 local destroyMakeupDescriptions = require(AvatarExperienceCommon.Utils.Humanoid.destroyMakeupDescriptions)
 
-local function setMakeupDescriptions(p1, t1: {[any]: any}) -- line: 17
-	-- upvalues: destroyMakeupDescriptions (copy), ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE (copy)
-	destroyMakeupDescriptions(p1)
+local function setMakeupDescriptions(parent, items)
+	destroyMakeupDescriptions(parent)
 
-	for v7, v8 in t1 do
-		if ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE[v7] then
-			for v9, v10 in v8 do
-				local MakeupDescription = Instance.new("MakeupDescription")
+	for k, item in items do
+		if not ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE[k] then
+			continue
+		end
 
-				MakeupDescription.MakeupType = ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE[v7]
-				MakeupDescription.AssetId = tonumber(v9) or 0
-				MakeupDescription.Parent = p1
+		for k2, v in item do
+			local makeupDescription = Instance.new("MakeupDescription")
+			makeupDescription.MakeupType = ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE[k]
+			makeupDescription.AssetId = tonumber(k2) or 0
+			makeupDescription.Parent = parent
 
-				if v10.order then
-					MakeupDescription.Order = v10.order
-				end
+			if v.order then
+				makeupDescription.Order = v.order
 			end
 		end
 	end

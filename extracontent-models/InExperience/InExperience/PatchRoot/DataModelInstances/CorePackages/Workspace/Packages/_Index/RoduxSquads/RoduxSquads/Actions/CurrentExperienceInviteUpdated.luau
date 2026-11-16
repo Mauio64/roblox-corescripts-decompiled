@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("RoduxSquads").Parent
+local parent = script:FindFirstAncestor("RoduxSquads").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
+return Rodux.makeActionCreator(script.Name, function(experienceInvite)
 	return {
-		payload = {
-			experienceInvite = p1
-		}
+		payload = { experienceInvite = experienceInvite }
 	}
 end)

@@ -1,54 +1,66 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local CatalogItemCard = require(ProfilePlatformParent.AvatarExperienceCommon).Components.CatalogItemCard.CatalogItemCard
-local ItemCardThumbnail = require(ProfilePlatformParent.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail
-local UserLib = require(ProfilePlatformParent.UserLib)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+
+local AvatarExperienceCommon = require(parent.AvatarExperienceCommon)
+local CatalogItemCard = AvatarExperienceCommon.Components.CatalogItemCard.CatalogItemCard
+local AvatarExperienceUIKit = require(parent.AvatarExperienceUIKit)
+local ItemCardThumbnail = AvatarExperienceUIKit.ItemCardComponents.ItemCardThumbnail
+
+local UserLib = require(parent.UserLib)
 local Constants = UserLib.Utils.Constants
 local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+
 local Enums = require(ProfilePlatform.Common.Enums)
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local FFlagProfilePlatformFixResaleLimitedPrice = require(ProfilePlatform.Flags.FFlagProfilePlatformFixResaleLimitedPrice)
 
-local function MarketplaceAssetTile(t1: {[any]: any}) -- line: 46
-	-- upvalues: useLocalization (copy), TextKeys (copy), Enums (copy), Constants (copy), FFlagProfilePlatformFixResaleLimitedPrice (copy), React (copy), CatalogItemCard (copy), ItemCardThumbnail (copy), getRbxthumbWithTypeSizeAndOptions (copy)
-	local v15 = useLocalization({
+local function MarketplaceAssetTile(props)
+	local v = useLocalization({
 		free = TextKeys.CatalogLabelFree,
 		offSale = TextKeys.CatalogLabelOffSale
 	})
-	local v16 = if t1.itemType ~= Enums.ItemTypes.Bundle then Constants.RbxthumbTypes.Asset else Constants.RbxthumbTypes.BundleThumbnail
-	local v17 = nil
+	local v2
 
-	if t1.isOffSale then
-		v17 = if not FFlagProfilePlatformFixResaleLimitedPrice or (not t1.lowestResalePrice or not (t1.lowestResalePrice > 0)) then {
-			type = Enums.PriceLineContentType.Text,
-			text = v15.offSale
-		} else {
+	if props.itemType == Enums.ItemTypes.Bundle then
+		v2 = Constants.RbxthumbTypes.BundleThumbnail
+	else
+		v2 = Constants.RbxthumbTypes.Asset
+	end
+
+	local v3 = nil
+	local priceLineContent
+
+	if props.isOffSale then
+		if FFlagProfilePlatformFixResaleLimitedPrice and props.lowestResalePrice and props.lowestResalePrice > 0 then
+			priceLineContent = {
+				type = Enums.PriceLineContentType.Price,
+				price = props.lowestResalePrice
+			}
+		else
+			priceLineContent = { type = Enums.PriceLineContentType.Text, text = v.offSale }
+		end
+	elseif props.price == 0 then
+		priceLineContent = { type = Enums.PriceLineContentType.Text, text = v.free }
+	else
+		priceLineContent = props.price and {
 			type = Enums.PriceLineContentType.Price,
-			price = t1.lowestResalePrice
-		}
-	elseif t1.price == 0 then
-		v17 = {
-			type = Enums.PriceLineContentType.Text,
-			text = v15.free
-		}
-	elseif t1.price then
-		v17 = {
-			type = Enums.PriceLineContentType.Price,
-			price = t1.price
-		}
+			price = props.price
+		} or v3
 	end
 
 	return React.createElement(CatalogItemCard, {
-		Selectable = true,
-		title = t1.name,
+		title = props.name,
 		presentationSlot = React.createElement(ItemCardThumbnail, {
-			url = getRbxthumbWithTypeSizeAndOptions(t1.assetId, v16, 150)
+			url = getRbxthumbWithTypeSizeAndOptions(props.assetId, v2, 150)
 		}),
-		onActivated = t1.onActivated,
-		priceLineContent = v17,
-		Size = UDim2.fromScale(1, 1)
+		onActivated = props.onActivated,
+		priceLineContent = priceLineContent,
+		Size = UDim2.fromScale(1, 1),
+		Selectable = true
 	})
 end
 

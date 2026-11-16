@@ -1,7 +1,6 @@
 local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
-local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
-local v3 = require(TimeToInteractiveTracker.Logger):new(script.Name)
-local FFlagLuaAppPerfTrackerUseLogger = require(TimeToInteractiveTrackerParent.SharedFlags).FFlagLuaAppPerfTrackerUseLogger
+local Logger = require(TimeToInteractiveTracker.Logger)
+local v = Logger:new(script.Name)
 
 require(script.Parent.Parent.types)
 
@@ -12,97 +11,109 @@ local Util = require(TimeToInteractiveTracker.Utils.Util)
 local getMemoryMb = require(TimeToInteractiveTracker.Utils.getMemoryMb)
 local FFlagTTITrackerMemoryTracking = require(TimeToInteractiveTracker.Utils.FFlagTTITrackerMemoryTracking)
 
-return function(p1) -- line: 24
-	-- upvalues: FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), now (copy), mergeTTIEventMetadata (copy), Util (copy), FFlagTTITrackerMemoryTracking (copy), getMemoryMb (copy), sendTTIStat (copy)
-	return function(s1: string, p2) -- line: 25
-		-- upvalues: p1 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), now (copy), mergeTTIEventMetadata (copy), Util (copy), FFlagTTITrackerMemoryTracking (copy), getMemoryMb (copy), sendTTIStat (copy)
-		local u14 = nil
-		local u15 = nil
+return function(callback)
+	return function(statName: string, p)
+		local deltaMs = nil
+		local metaData = nil
 		local milestones = nil
-		local u17 = false
-		local v18 = not p2 or (p2.cleanupAfterSend == nil or p2.cleanupAfterSend)
-		local v19 = if not p2 then nil else p2.samplingRateOverride
+		local v2 = false
+		local v3 = not p or p.cleanupAfterSend == nil or p.cleanupAfterSend
+		local samplingRateOverride
 
-		p1(function(p3) -- line: 35
-			-- upvalues: s1 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), now (copy), u14 (ref), u17 (ref), u15 (ref), mergeTTIEventMetadata (copy), milestones (ref), v18 (copy), Util (copy)
-			local v22 = p3[s1]
+		if p then
+			samplingRateOverride = p.samplingRateOverride
+		end
 
-			if v22 == nil then
-				if FFlagLuaAppPerfTrackerUseLogger then
-					v3:warning(`called before trackStart for eventName={ s1 }`)
+		callback(function(p2)
+			local v4 = p2[statName]
 
-					return p3
-				end
-
-				warn(`TimeToInteractiveTracker.trackEnd called before trackStart for eventName={ s1 }`)
-
-				return p3
+			if v4 == nil then
+				v:warning(`called before trackStart for eventName={statName}`)
+				return p2
 			end
 
-			if v22.startTime == nil then
-				if FFlagLuaAppPerfTrackerUseLogger then
-					v3:warning(`called before trackStart for eventName={ s1 }`)
-
-					return p3
-				end
-
-				warn(`TimeToInteractiveTracker.trackEnd called before trackStart for eventName={ s1 }`)
-
-				return p3
+			if v4.startTime == nil then
+				v:warning(`called before trackStart for eventName={statName}`)
+				return p2
 			end
 
-			local v23 = now()
+			local endTime = now()
 
-			u14 = (v23 - v22.startTime) * 1000
-			u17 = v22.sent ~= true
+			deltaMs = (endTime - v4.startTime) * 1000
+			v2 = v4.sent ~= true
 
-			if u17 then
-				local startTime = v22.startTime
-				local v25 = u14
-
-				u15 = mergeTTIEventMetadata(v22.metadata, {
+			if v2 then
+				local startTime = v4.startTime
+				local deltaMs2 = deltaMs
+				metaData = mergeTTIEventMetadata(v4.metadata, {
 					startTime = startTime,
-					endTime = v23,
-					deltaMs = v25
+					endTime = endTime,
+					deltaMs = deltaMs2
 				})
 
-				if v22.milestones then
-					milestones = v22.milestones
+				if v4.milestones then
+					milestones = v4.milestones
 				end
 			end
 
-			local v26 = table.clone(p3)
+			local clone = table.clone(p2)
 
-			if u17 and v18 then
-				v26[s1] = nil
-
-				return v26
+			if v2 and v3 then
+				clone[statName] = nil
+				return clone
 			end
 
-			v26[s1] = {
+			local v5 = {
+				startTime = v4.startTime,
+				endTime = endTime,
+				deltaMs = deltaMs,
 				sent = true,
-				startTime = v22.startTime,
-				endTime = v23,
-				deltaMs = u14,
-				metadata = table.clone(v22.metadata),
-				milestones = if not v22.milestones then nil else Util.deepCloneMilestones(v22.milestones)
+				metadata = table.clone(v4.metadata),
+				milestones = 0
 			}
+			local milestones2
 
-			return v26
+			if v4.milestones then
+				milestones2 = Util.deepCloneMilestones(v4.milestones)
+			end
+
+			v5.milestones = milestones2
+			clone[statName] = v5
+
+			return clone
 		end)
 
-		if u17 and (u14 ~= nil and u15 ~= nil) then
-			local v20 = if not FFlagTTITrackerMemoryTracking then nil else getMemoryMb()
+		if v2 and deltaMs ~= nil and metaData ~= nil then
+			local v4
 
-			sendTTIStat({
-				statName = s1,
-				deltaMs = u14,
-				metaData = u15,
-				samplingRateOverride = v19,
+			if FFlagTTITrackerMemoryTracking then
+				v4 = getMemoryMb()
+			end
+
+			local v5 = {
+				statName = statName,
+				deltaMs = deltaMs,
+				metaData = metaData,
+				samplingRateOverride = samplingRateOverride,
 				milestones = milestones,
-				totalMemoryMB = if not v20 then nil else v20.totalMemoryMB,
-				luaHeapMB = if not v20 then nil else v20.luaHeapMB
-			})
+				totalMemoryMB = 0,
+				luaHeapMB = 0
+			}
+			local totalMemoryMB
+
+			if v4 then
+				totalMemoryMB = v4.totalMemoryMB
+			end
+
+			v5.totalMemoryMB = totalMemoryMB
+			local luaHeapMB
+
+			if v4 then
+				luaHeapMB = v4.luaHeapMB
+			end
+
+			v5.luaHeapMB = luaHeapMB
+			sendTTIStat(v5)
 		end
 	end
 end

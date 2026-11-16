@@ -1,17 +1,10 @@
 local CorePackages = game:GetService("CorePackages")
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local SetDetailsInformation = require(ParentParent.Actions.SetDetailsInformation)
-local t1 = {
-	viewingDetails = false,
-	assetId = nil
-}
+local parent = script.Parent.Parent
+local SetDetailsInformation = require(parent.Actions.SetDetailsInformation)
 
-return Rodux.createReducer(t1, {
-	[SetDetailsInformation.name] = function(_, p2) -- line: 12
-		return {
-			viewingDetails = p2.viewingDetails,
-			assetId = p2.assetId
-		}
+return Rodux.createReducer({ viewingDetails = false, assetId = nil }, {
+	[SetDetailsInformation.name] = function(_, p)
+		return { viewingDetails = p.viewingDetails, assetId = p.assetId }
 	end
 })

@@ -1,37 +1,55 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
+local parent = UserList.Parent
 
+local React = require(parent.React)
 require(UserList.Common.Types)
 require(UserList.Common.Enums)
-
 local BaseRow = require(script.Parent.BaseRow)
 local useContactsData = require(UserList.Hooks.useContactsData)
 
-local function ContactRow(t1: {[any]: any}) -- line: 34
-	-- upvalues: useContactsData (copy), React (copy), BaseRow (copy)
-	local v8 = useContactsData(t1.entityId)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListSurfaceExtensions = SharedFlags.FFlagUserListSurfaceExtensions
 
-	if v8 == nil then
+local function ContactRow(props)
+	local v = useContactsData(props.entityId)
+
+	if v == nil then
 		return nil
 	end
 
-	local v9 = if not t1.loadingState or t1.loadingState.title == nil then v8.isLoading else t1.loadingState.title
-	local v10 = t1.loadingState and t1.loadingState.contextualInfo
+	local isTitleLoading
 
-	return React.createElement(BaseRow, {
-		avatarThumbnailUrl = v8.avatarThumbnailUrl,
-		title = v8.name,
-		layoutMode = t1.layoutMode,
-		onActivated = t1.onActivated,
-		isTitleLoading = v9,
-		isContextualInfoLoading = v10,
-		contextualInfo = t1.contextualInfo,
-		primaryCta = t1.primaryCta,
-		secondaryCta = t1.secondaryCta,
-		trailingContent = t1.trailingContent,
-		layoutOrder = t1.layoutOrder
-	})
+	if props.loadingState and props.loadingState.title ~= nil then
+		isTitleLoading = props.loadingState.title
+	else
+		isTitleLoading = v.isLoading
+	end
+
+	local contextualInfo = props.loadingState and props.loadingState.contextualInfo
+
+	local createElement = React.createElement
+	local v2 = {
+		avatarThumbnailUrl = v.avatarThumbnailUrl,
+		title = v.name,
+		layoutMode = props.layoutMode,
+		onActivated = props.onActivated,
+		isTitleLoading = isTitleLoading,
+		isContextualInfoLoading = contextualInfo,
+		contextualInfo = props.contextualInfo,
+		primaryCta = props.primaryCta,
+		secondaryCta = props.secondaryCta,
+		trailingContent = props.trailingContent,
+		layoutOrder = props.layoutOrder,
+		disableRowActivation = 0
+	}
+	local disableRowActivation
+
+	if FFlagUserListSurfaceExtensions and props.configs then
+		disableRowActivation = props.configs.disableRowActivation
+	end
+
+	v2.disableRowActivation = disableRowActivation
+	return createElement(BaseRow, v2)
 end
 
 return React.memo(ContactRow)

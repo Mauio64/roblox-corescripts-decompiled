@@ -1,17 +1,13 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent
-local StyleContext = require(scriptParent.StyleContext)
-local React = require(ParentParent.React)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent
 
-local function useStyleMetadata() -- line: 13
-	-- upvalues: React (copy), StyleContext (copy)
-	local v6 = React.useContext(StyleContext)
+local StyleContext = require(parent.StyleContext)
+local React = require(parent2.React)
 
-	if not v6 then
-		return nil
-	end
+local function useStyleMetadata()
+	local v = React.useContext(StyleContext)
 
-	return v6.styleMetadata
+	return if v then v.styleMetadata else nil
 end
 
 return useStyleMetadata

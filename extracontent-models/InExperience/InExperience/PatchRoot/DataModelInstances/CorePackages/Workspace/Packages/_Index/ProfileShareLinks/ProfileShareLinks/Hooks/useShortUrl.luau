@@ -1,13 +1,13 @@
 local ProfileShareLinks = script:FindFirstAncestor("ProfileShareLinks")
-local ProfileShareLinksParent = ProfileShareLinks.Parent
-local useSelector = require(ProfileShareLinksParent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = ProfileShareLinks.Parent
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
 local Constants = require(ProfileShareLinks.Common.Constants)
 local getDeepValue = require(ProfileShareLinks.Common.getDeepValue)
 
-return function() -- line: 9
-	-- upvalues: useSelector (copy), getDeepValue (copy), Constants (copy)
-	return useSelector(function(p1) -- line: 10
-		-- upvalues: getDeepValue (copy), Constants (copy)
-		return getDeepValue(p1, `{ Constants.RODUX_KEY }.ProfileShareLinks.shortUrl`)
+return function()
+	return useSelector(function(p)
+		return getDeepValue(p, `{Constants.RODUX_KEY}.ProfileShareLinks.shortUrl`)
 	end)
 end

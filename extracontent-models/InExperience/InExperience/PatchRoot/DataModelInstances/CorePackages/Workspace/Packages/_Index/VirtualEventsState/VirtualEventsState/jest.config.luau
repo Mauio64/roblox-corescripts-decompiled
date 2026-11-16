@@ -1,4 +1,5 @@
 local VirtualEventsState = script:FindFirstAncestor("VirtualEventsState")
+
 local JestConfigs = require(VirtualEventsState.Parent.Dev.JestConfigs)
 
 return {

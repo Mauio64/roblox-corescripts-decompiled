@@ -1,20 +1,18 @@
-local function copyDeep(p1) -- line: 2
-	-- upvalues: copyDeep (copy)
-	local v3 = type(p1)
+local function copyDeep(item)
+	local typeName = type(item)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+	local result = {}
 
-	local t1 = {}
-
-	for k, v in pairs(p1) do
-		if type(v) == "table" then
-			t1[k] = copyDeep(v)
+	for k, item2 in pairs(item) do
+		if type(item2) == "table" then
+			result[k] = copyDeep(item2)
 		else
-			t1[k] = v
+			result[k] = item2
 		end
 	end
 
-	return t1
+	return result
 end
 
 return copyDeep

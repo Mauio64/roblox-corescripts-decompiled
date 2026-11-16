@@ -1,151 +1,168 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-require(ParentParent.util.Types)
+local getAllInstancesIsA = require(parent.util.getAllInstancesIsA)
+local R15plusUtils = require(parent.util.R15plusUtils)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getAllInstancesIsA = require(ParentParent.util.getAllInstancesIsA)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local t1 = {
-	categories = {
-		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
-		ValidationEnums.UploadCategory.DYNAMIC_HEAD
+local getEngineFeatureEngineUGCValidateInstanceTreesEquivalent = require(parent.flags.getEngineFeatureEngineUGCValidateInstanceTreesEquivalent)
+local shouldValidateR15LegacyDuplicate = require(parent.util.shouldValidateR15LegacyDuplicate)
+local HrdBonesFollowSchema = {
+	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS, ValidationEnums.UploadCategory.DYNAMIC_HEAD },
+	requiredData = {
+		ValidationEnums.SharedDataMember.rootInstance,
+		ValidationEnums.SharedDataMember.uploadEnum,
+		ValidationEnums.SharedDataMember.consumerConfig
 	},
-	requiredData = { ValidationEnums.SharedDataMember.rootInstance },
 	fflag = R15plusUtils.checkFlagEnabledForAllowHrd
 }
-local v7 = game:DefineFastFlag("UGCValidationRemoveHRDBlocker", false)
+local defineFastFlag = game:DefineFastFlag("UGCValidationRemoveHRDBlocker", false)
+local function fillBoneTreeFlatList(folder, flag: boolean, bones)
+	for _, bone in folder:GetChildren() do
+		local v = bone:IsA("Bone") and true or flag
 
-local function fillBoneTreeFlatList(p1, b1: boolean, t2: {[any]: any}) -- line: 16
-	-- upvalues: fillBoneTreeFlatList (copy)
-	for _, child in p1:GetChildren() do
-		local v15 = b1
-
-		if child:IsA("Bone") then
-			v15 = true
+		if v then
+			table.insert(bones, bone)
 		end
 
-		if v15 then
-			table.insert(t2, child)
-		end
-
-		fillBoneTreeFlatList(child, v15, t2)
+		fillBoneTreeFlatList(bone, v, bones)
 	end
 end
-local function nameIsMappedInRigDescriptions(p2, p3, p4) -- line: 31
-	-- upvalues: R15plusUtils (copy)
-	for _, v20 in R15plusUtils.getHrdJointLabels() do
-		if p2.Name == v20.Name then
-			local Joint = p3:GetJoint(v20)
 
-			return Joint and Joint.UniqueId == p2.UniqueId
+local function nameIsMappedInRigDescriptions(p, humanoidRigDescription, digitsRigDescription)
+	for _, v in R15plusUtils.getHrdJointLabels() do
+		if p.Name == v.Name then
+			local joint = humanoidRigDescription:GetJoint(v)
+			return joint and joint.UniqueId == p.UniqueId
 		end
 	end
 
-	if p4 then
-		for _, v23 in R15plusUtils.getDrdJointLabels() do
-			if `{ p4.Side.Name }Hand{ v23.Name }` == p2.Name then
-				local Joint = p4:GetJoint(v23)
+	if not digitsRigDescription then
+		return false
+	end
 
-				return Joint and Joint.UniqueId == p2.UniqueId
-			end
+	for _, v in R15plusUtils.getDrdJointLabels() do
+		local formatted = `{digitsRigDescription.Side.Name}Hand{v.Name}`
+
+		if p.Name == formatted then
+			local joint = digitsRigDescription:GetJoint(v)
+			return joint and joint.UniqueId == p.UniqueId
 		end
 	end
 
 	return false
 end
 
-function t1.run(p5, p6) -- line: 57
-	-- upvalues: getAllInstancesIsA (copy), v7 (copy), ErrorSourceStrings (copy), R15plusUtils (copy), fillBoneTreeFlatList (copy), nameIsMappedInRigDescriptions (copy)
-	local rootInstance = p6.rootInstance
+local function validateBonesForRoot(p, object)
+	for _, folder in getAllInstancesIsA(p, "MeshPart") do
+		local name = folder.Name
 
-	for _, v29 in getAllInstancesIsA(rootInstance, "MeshPart") do
-		local Name = v29.Name
-		local HumanoidRigDescription = v29:FindFirstChildWhichIsA("HumanoidRigDescription")
-		local DigitsRigDescription = v29:FindFirstChildWhichIsA("DigitsRigDescription")
+		local humanoidRigDescription = folder:FindFirstChildWhichIsA("HumanoidRigDescription")
+		local digitsRigDescription = folder:FindFirstChildWhichIsA("DigitsRigDescription")
 
-		if HumanoidRigDescription ~= nil and not v7 then
-			p5:fail(ErrorSourceStrings.Keys.HrdCheck_TempR15BonesUploadNotAllowed, nil, HumanoidRigDescription)
+		if humanoidRigDescription ~= nil and not defineFastFlag then
+			object:fail(ErrorSourceStrings.Keys.HrdCheck_TempR15BonesUploadNotAllowed, nil, humanoidRigDescription)
 		end
 
-		if HumanoidRigDescription == nil then
-			for _, v34 in (getAllInstancesIsA(v29, "Bone")) do
-				p5:fail(ErrorSourceStrings.Keys.HrdCheck_BoneWithoutHrd, {
-					bonePath = v34:GetFullName()
-				}, v34)
+		if humanoidRigDescription == nil then
+			local allInstancesIsA = getAllInstancesIsA(folder, "Bone")
+
+			for _, v in allInstancesIsA do
+				object:fail(ErrorSourceStrings.Keys.HrdCheck_BoneWithoutHrd, {
+					bonePath = v:GetFullName()
+				}, v)
 			end
 
-			if DigitsRigDescription ~= nil then
-				p5:fail(ErrorSourceStrings.Keys.HrdCheck_DrdWithoutHrd, nil, DigitsRigDescription)
+			if digitsRigDescription ~= nil then
+				object:fail(ErrorSourceStrings.Keys.HrdCheck_DrdWithoutHrd, nil, digitsRigDescription)
 			end
 		else
-			local v35 = R15plusUtils.getAvatarBoneSchema(Name)
-			local v36 = R15plusUtils.getSchemaFlatHierarchyList(v35, { Name })
-			local t3 = {}
+			local avatarBoneSchema = R15plusUtils.getAvatarBoneSchema(name)
 
-			fillBoneTreeFlatList(v29, false, t3)
+			local schemaFlatHierarchyList = R15plusUtils.getSchemaFlatHierarchyList(avatarBoneSchema, { name })
+			local v = {}
+			fillBoneTreeFlatList(folder, false, v)
 
-			local t4 = {
-				[Name] = true
-			}
+			local v2 = { [name] = true }
 
-			for _, v40 in t3 do
-				p5:setReportingInstance(v40)
+			for _, v3 in v do
+				object:setReportingInstance(v3)
+				local name2 = v3.Name
+				local schemaFlatHierarchy = schemaFlatHierarchyList[name2]
 
-				local Name2 = v40.Name
-				local v42 = v36[Name2]
+				if name2 == R15plusUtils.JointRotationName then
+					continue
+				end
 
-				if Name2 ~= R15plusUtils.JointRotationName then
-					if v42 == nil or v42.ClassName ~= v40.ClassName then
-						p5:fail(ErrorSourceStrings.Keys.HrdCheck_UndefinedInstanceInBoneTree, {
-							instName = Name2,
-							className = v40.ClassName
+				if schemaFlatHierarchy == nil or schemaFlatHierarchy.ClassName ~= v3.ClassName then
+					object:fail(ErrorSourceStrings.Keys.HrdCheck_UndefinedInstanceInBoneTree, {
+						instName = name2,
+						className = v3.ClassName
+					})
+				elseif v2[name2] then
+					object:fail(ErrorSourceStrings.Keys.HrdCheck_DuplicateInstance, {
+						instName = name2
+					})
+				else
+					v2[name2] = true
+
+					if
+						schemaFlatHierarchy.ClassName == "Bone"
+						and not nameIsMappedInRigDescriptions(v3, humanoidRigDescription, digitsRigDescription)
+					then
+						object:fail(ErrorSourceStrings.Keys.HrdCheck_BoneNotMappedInHRD, {
+							boneName = name2
 						})
-					elseif t4[Name2] then
-						p5:fail(ErrorSourceStrings.Keys.HrdCheck_DuplicateInstance, {
-							instName = Name2
-						})
-					else
-						t4[Name2] = true
-
-						if v42.ClassName == "Bone" and not nameIsMappedInRigDescriptions(v40, HumanoidRigDescription, DigitsRigDescription) then
-							p5:fail(ErrorSourceStrings.Keys.HrdCheck_BoneNotMappedInHRD, {
-								boneName = Name2
-							})
-						end
 					end
 				end
 			end
 
-			for _, descendant in v29:GetDescendants() do
-				p5:setReportingInstance(descendant)
+			for _, attachment in folder:GetDescendants() do
+				object:setReportingInstance(attachment)
+				local schemaFlatHierarchy = schemaFlatHierarchyList[attachment.Name]
 
-				local v45 = v36[descendant.Name]
+				if not (schemaFlatHierarchy and attachment:IsA("Attachment") and attachment.Name ~= R15plusUtils.JointRotationName) then
+					continue
+				end
 
-				if v45 and descendant:IsA("Attachment") and descendant.Name ~= R15plusUtils.JointRotationName then
-					local path = v45.path
-					local v47 = #path - 1
+				local path = schemaFlatHierarchy.path
+				local v3 = #path - 1
 
-					if descendant.ClassName == "Attachment" then
-						while v47 > 1 and not t4[path[v47]] do
-							v47 -= 1
-						end
+				if attachment.ClassName == "Attachment" then
+					while v3 > 1 and not v2[path[v3]] do
+						v3 -= 1
 					end
+				end
 
-					local v48 = v45.path[v47]
-					local ParentName = descendant.Parent.Name
+				local expectedParentName = schemaFlatHierarchy.path[v3]
+				local name2 = attachment.Parent.Name
 
-					if ParentName ~= v48 then
-						p5:fail(ErrorSourceStrings.Keys.HrdCheck_ImproperParent, {
-							instName = descendant.Name,
-							parentName = ParentName,
-							expectedParentName = v48
-						})
-					end
+				if name2 ~= expectedParentName then
+					object:fail(ErrorSourceStrings.Keys.HrdCheck_ImproperParent, {
+						instName = attachment.Name,
+						parentName = name2,
+						expectedParentName = expectedParentName
+					})
 				end
 			end
 		end
 	end
 end
 
-return t1
+function HrdBonesFollowSchema.run(object, p)
+	validateBonesForRoot(p.rootInstance, object)
+
+	if getEngineFeatureEngineUGCValidateInstanceTreesEquivalent() and shouldValidateR15LegacyDuplicate(p) then
+		if p.r15LegacyDuplicateRoot == nil then
+			object:fail(ErrorSourceStrings.Keys.FolderStructureMismatch)
+			return
+		end
+
+		object:setReportingRoot(p.r15LegacyDuplicateRoot)
+		validateBonesForRoot(p.r15LegacyDuplicateRoot, object)
+		object:setReportingRoot(p.rootInstance)
+	end
+end
+
+return HrdBonesFollowSchema

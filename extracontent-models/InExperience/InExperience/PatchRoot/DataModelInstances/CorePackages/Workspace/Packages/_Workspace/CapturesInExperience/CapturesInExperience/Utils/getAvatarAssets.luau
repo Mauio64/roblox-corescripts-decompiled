@@ -1,66 +1,68 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local Players = game:GetService("Players")
-local Constants = require(ParentParent.Constants)
 
-local function getLocalPlayerCharacter() -- line: 9
-	-- upvalues: Players (copy)
-	local LocalPlayer = Players.LocalPlayer
+local Constants = require(parent.Constants)
 
-	if not LocalPlayer then
-		return nil
-	end
+local function getLocalPlayerCharacter() -- 1 equivalent call inferred from this helper
+	local localPlayer = Players.LocalPlayer
 
-	return LocalPlayer.Character
+	return if localPlayer then localPlayer.Character else nil
 end
 
-return function(p1) -- line: 18
-	-- upvalues: Players (copy), Constants (copy)
-	local t1 = {}
-	local t2 = {}
+return function(instance)
+	local result = {}
+	local set = {}
 
-	if not p1 then
-		local LocalPlayer = Players.LocalPlayer
-
-		p1 = if LocalPlayer then LocalPlayer.Character else nil
+	if not instance then
+		instance = getLocalPlayerCharacter() -- inferred equivalent call
 	end
 
-	if not p1 then
-		return t1
+	if not instance then
+		return result
 	end
 
-	local Humanoid = p1:FindFirstChildOfClass("Humanoid")
+	local humanoid = instance:FindFirstChildOfClass("Humanoid")
 
-	if not Humanoid then
-		return t1
+	if not humanoid then
+		return result
 	end
 
-	local HumanoidDescription = Humanoid:FindFirstChildOfClass("HumanoidDescription")
+	local humanoidDescription = humanoid:FindFirstChildOfClass("HumanoidDescription")
 
-	if not HumanoidDescription then
-		return t1
+	if not humanoidDescription then
+		return result
 	end
 
-	for v12, v13 in Constants.AssetTypeIdStringToHumanoidDescriptionProp do
-		if Constants.AssetTypeIdToAccessoryTypeEnum[v12] == nil then
-			local v14 = HumanoidDescription[v13] or ""
+	for k, v in Constants.AssetTypeIdStringToHumanoidDescriptionProp do
+		if Constants.AssetTypeIdToAccessoryTypeEnum[k] ~= nil then
+			continue
+		end
 
-			for _, v16 in string.split(v14) do
-				local num = tonumber(v16)
+		local v2 = humanoidDescription[v] or ""
 
-				if num and num ~= 0 and not t2[num] then
-					t2[num] = true
-					table.insert(t1, num)
-				end
+		for _, v3 in string.split(v2) do
+			local v4 = tonumber(v3)
+
+			if not v4 or v4 == 0 or set[v4] then
+				continue
 			end
+
+			set[v4] = true
+			table.insert(result, v4)
 		end
 	end
 
-	for _, v19 in (HumanoidDescription:GetAccessories(true)) do
-		if v19.AssetId and v19.AssetId ~= 0 and not t2[v19.AssetId] then
-			t2[v19.AssetId] = true
-			table.insert(t1, v19.AssetId)
+	local accessories = humanoidDescription:GetAccessories(true)
+
+	for _, accessory in accessories do
+		if not accessory.AssetId or accessory.AssetId == 0 or set[accessory.AssetId] then
+			continue
 		end
+
+		set[accessory.AssetId] = true
+		table.insert(result, accessory.AssetId)
 	end
 
-	return t1
+	return result
 end

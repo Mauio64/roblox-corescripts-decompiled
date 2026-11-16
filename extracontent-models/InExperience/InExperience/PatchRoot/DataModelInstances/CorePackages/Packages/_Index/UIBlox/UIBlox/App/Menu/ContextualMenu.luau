@@ -1,36 +1,34 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local Otter = require(ParentParentParent.Otter)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
+
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+local Otter = require(parent2.Otter)
+
+local withStyle = require(parent.Core.Style.withStyle)
+local validateColorInfo = require(parent.Core.Style.Validator.validateColorInfo)
+
 local BaseMenu = require(script.Parent.BaseMenu)
 local MenuDirection = require(script.Parent.MenuDirection)
 local validateButtonProps = require(script.Parent.validateButtonProps)
 local validateMotorOptionProps = require(script.Parent.validateMotorOptionProps)
-local t1 = {
-	frequency = 4,
-	dampingRatio = 1
-}
-local t2 = {
-	frequency = 2.6,
-	dampingRatio = 1
-}
-local t3 = {
+
+local motorOptions = {
 	open = {
 		targetValue = 1,
-		springParams = t1
+		springParams = { frequency = 4, dampingRatio = 1 }
 	},
 	close = {
 		targetValue = 0,
-		springParams = t2
+		springParams = { frequency = 2.6, dampingRatio = 1 }
 	}
 }
-local v16 = Roact.PureComponent:extend("ContextualMenu")
 
-v16.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("ContextualMenu")
+
+extended.validateProps = t.strictInterface({
 	buttonProps = validateButtonProps,
 	zIndex = t.optional(t.integer),
 	open = t.boolean,
@@ -64,190 +62,183 @@ v16.validateProps = t.strictInterface({
 	showDropShadow = t.optional(t.boolean),
 	isRoactGamepadEnabled = t.optional(t.boolean)
 })
-v16.defaultProps = {
+
+extended.defaultProps = {
+	menuDirection = MenuDirection.Up,
 	zIndex = 2,
 	closeBackgroundVisible = true,
-	menuDirection = MenuDirection.Up,
 	horizontalAlignment = Enum.HorizontalAlignment.Center,
 	openPositionX = UDim.new(0, 0)
 }
 
-function v16.init(p1) -- line: 118
-	-- upvalues: Roact (copy), Otter (copy), t3 (copy)
-	p1.wasDismissed = false
+function extended:init()
+	self.wasDismissed = false
 
-	local v18, v19 = Roact.createBinding(0)
+	local binding, positionPercentBindingUpdate = Roact.createBinding(0)
+	self.positionPercentBinding = binding
+	self.positionPercentBindingUpdate = positionPercentBindingUpdate
 
-	p1.positionPercentBinding = v18
-	p1.positionPercentBindingUpdate = v19
-	p1.motor = Otter.createSingleMotor(0)
-	p1.motor:onStep(p1.positionPercentBindingUpdate)
-	p1.motor:onComplete(function() -- line: 125
-		-- upvalues: p1 (copy)
-		if p1.wasDismissed then
-			p1.wasDismissed = false
+	self.motor = Otter.createSingleMotor(0)
+	self.motor:onStep(self.positionPercentBindingUpdate)
+	self.motor:onComplete(function()
+		if self.wasDismissed then
+			self.wasDismissed = false
 
-			if p1.props.onDismiss then
-				p1.props.onDismiss()
+			if self.props.onDismiss then
+				self.props.onDismiss()
 			end
 		end
 	end)
-	p1.motorType = Otter.spring
-	p1.motorOptions = t3
+	self.motorType = Otter.spring
+	self.motorOptions = motorOptions
 
-	if p1.props.motorOverrideOptions then
-		p1.motorType = p1.props.motorOverrideOptions.motorCallback
-		p1.motorOptions = p1.props.motorOverrideOptions
+	if self.props.motorOverrideOptions then
+		self.motorType = self.props.motorOverrideOptions.motorCallback
+		self.motorOptions = self.props.motorOverrideOptions
 	end
 
-	p1.state = {
-		absoluteSize = Vector2.new(0, 0),
-		absolutePosition = Vector2.new(0, 0)
-	}
-	p1.visibleBinding = p1.positionPercentBinding:map(function(p2) -- line: 145
-		return p2 ~= 0
+	self.state = { absoluteSize = Vector2.new(0, 0), absolutePosition = Vector2.new(0, 0) }
+
+	self.visibleBinding = self.positionPercentBinding:map(function(p): boolean
+		return p ~= 0
 	end)
 end
-function v16.render(p3) -- line: 150
-	-- upvalues: withStyle (copy), MenuDirection (copy), GuiService (copy), Roact (copy), BaseMenu (copy)
-	return withStyle(function(p4) -- line: 151
-		-- upvalues: p3 (copy), MenuDirection (copy), GuiService (copy), Roact (copy), BaseMenu (copy)
-		local n1 = 0.5
-		local uDim = UDim.new(1, -24)
-		local uDim2 = UDim.new(0, 0)
-		local v31 = p3.state.absoluteSize.X > 640
 
-		if v31 then
-			uDim = UDim.new(0, 300)
-			uDim2 = p3.props.openPositionX
+function extended:render()
+	return withStyle(function(p)
+		local v = 0.5
+		local udim = UDim.new(1, -24)
+		local v2 = UDim.new(0, 0)
+		local v3 = self.state.absoluteSize.X > 640
 
-			if p3.props.horizontalAlignment == Enum.HorizontalAlignment.Left then
-				n1 = 0
-			elseif p3.props.horizontalAlignment == Enum.HorizontalAlignment.Right then
-				n1 = 1
+		if v3 then
+			udim = UDim.new(0, 300)
+			v2 = self.props.openPositionX
+
+			if self.props.horizontalAlignment == Enum.HorizontalAlignment.Left then
+				v = 0
+			elseif self.props.horizontalAlignment == Enum.HorizontalAlignment.Right then
+				v = 1
 			end
 		end
 
-		local n2 = 0
+		local v4 = self.props.menuDirection == MenuDirection.Up and 1 or 0
 
-		if p3.props.menuDirection == MenuDirection.Up then
-			n2 = 1
-		end
+		local transparency = p.Theme.Overlay.Transparency
+		local backgroundTransparency = not self.props.closeBackgroundVisible and 1 or transparency
 
-		local OverlayTransparency = p4.Theme.Overlay.Transparency
+		local contextMenuWidthOverride = self.props.contextMenuWidthOverride or udim
+		local anchorPointOverride = self.props.anchorPointOverride or Vector2.new(v, v4)
 
-		if not p3.props.closeBackgroundVisible then
-			OverlayTransparency = 1
-		end
-
-		local v34 = p3.props.contextMenuWidthOverride or uDim
-		local v35 = p3.props.anchorPointOverride or Vector2.new(n1, n2)
-		local v36, _ = GuiService:GetGuiInset()
-		local v38 = p3.state.absolutePosition + v36
+		local guiInset, _ = GuiService:GetGuiInset()
+		local v5 = self.state.absolutePosition + guiInset
 
 		return Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
-			Visible = p3.visibleBinding,
-			ZIndex = p3.props.zIndex,
-			[Roact.Change.AbsoluteSize] = function(p5) -- line: 192
-				-- upvalues: p3 (copy)
-				p3:setState({
-					absoluteSize = p5.AbsoluteSize
-				})
+			Visible = self.visibleBinding,
+			ZIndex = self.props.zIndex,
+			[Roact.Change.AbsoluteSize] = function(p2)
+				self:setState({ absoluteSize = p2.AbsoluteSize })
 			end,
-			[Roact.Change.AbsolutePosition] = function(p6) -- line: 198
-				-- upvalues: p3 (copy)
-				p3:setState({
-					absolutePosition = p6.AbsolutePosition
-				})
+			[Roact.Change.AbsolutePosition] = function(p2)
+				self:setState({ absolutePosition = p2.AbsolutePosition })
 			end
 		}, {
 			Background = Roact.createElement("TextButton", {
 				ZIndex = 1,
 				Text = "",
 				BorderSizePixel = 0,
-				BackgroundColor3 = p4.Theme.Overlay.Color,
-				BackgroundTransparency = OverlayTransparency,
+				BackgroundColor3 = p.Theme.Overlay.Color,
+				BackgroundTransparency = backgroundTransparency,
 				AutoButtonColor = false,
 				Selectable = false,
-				Position = UDim2.fromOffset(-v38.X, -v38.Y),
-				Size = UDim2.fromOffset(p3.props.screenSize.X, p3.props.screenSize.Y),
-				[Roact.Event.Activated] = function() -- line: 216
-					-- upvalues: p3 (copy)
-					if not p3.wasDismissed then
-						p3.wasDismissed = true
-						p3.motor:setGoal(p3.motorType(p3.motorOptions.close.targetValue, p3.motorOptions.close.springParams))
+				Position = UDim2.fromOffset(-v5.X, -v5.Y),
+				Size = UDim2.fromOffset(self.props.screenSize.X, self.props.screenSize.Y),
+				[Roact.Event.Activated] = function()
+					if not self.wasDismissed then
+						self.wasDismissed = true
+						self.motor:setGoal(self.motorType(
+							self.motorOptions.close.targetValue,
+							self.motorOptions.close.springParams
+						))
 					end
 				end
 			}),
-			PositionFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				ZIndex = 2,
-				Size = UDim2.fromScale(1, 1),
-				Position = UDim2.new(uDim2.Scale, uDim2.Offset, p3.props.openPositionY.Scale, p3.props.openPositionY.Offset)
-			}, {
-				BaseMenu = Roact.createElement(BaseMenu, {
-					buttonProps = p3.props.buttonProps,
-					setFirstItemRef = p3.props.setFirstItemRef,
-					setFrameRef = p3.props.setFrameRef,
-					width = v34,
-					position = p3.positionPercentBinding:map(function(p7) -- line: 243
-						-- upvalues: v31 (copy), p3 (copy), MenuDirection (copy)
-						local n3 = 0.5
+			PositionFrame = Roact.createElement(
+				"Frame",
+				{
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 1),
+					Position = UDim2.new(
+						v2.Scale,
+						v2.Offset,
+						self.props.openPositionY.Scale,
+						self.props.openPositionY.Offset
+					),
+					ZIndex = 2
+				},
+				{
+					BaseMenu = Roact.createElement(BaseMenu, {
+						buttonProps = self.props.buttonProps,
+						setFirstItemRef = self.props.setFirstItemRef,
+						setFrameRef = self.props.setFrameRef,
+						width = contextMenuWidthOverride,
+						position = self.positionPercentBinding:map(function(p2)
+							local v6 = 0.5
 
-						if v31 or p3.props.anchorPointOverride then
-							if p3.props.horizontalAlignment == Enum.HorizontalAlignment.Left then
-								n3 = 0
-							elseif p3.props.horizontalAlignment == Enum.HorizontalAlignment.Right then
-								n3 = 1
+							if v3 or self.props.anchorPointOverride then
+								v6 = self.props.horizontalAlignment == Enum.HorizontalAlignment.Left and 0
+									or self.props.horizontalAlignment == Enum.HorizontalAlignment.Right and 1
+									or v6
 							end
-						end
 
-						if p3.props.menuDirection == MenuDirection.Down then
-							return UDim2.fromScale(n3, p7 - 1)
-						end
+							if self.props.menuDirection == MenuDirection.Down then
+								return UDim2.fromScale(v6, p2 - 1)
+							end
 
-						return UDim2.fromScale(n3, 1 - p7)
-					end),
-					anchorPoint = v35,
-					topElementRounded = p3.props.topElementRounded,
-					bottomElementRounded = p3.props.bottomElementRounded,
-					isElementBackgroundVisible = p3.props.isElementBackgroundVisible,
-					isElementDividerVisible = p3.props.isElementDividerVisible,
-					elementHeight = p3.props.elementHeight,
-					borderCornerRadius = p3.props.borderCornerRadius,
-					background = p3.props.background,
-					enableTokenOverride = p3.props.enableTokenOverride,
-					renderHeader = p3.props.renderHeader,
-					headerHeight = p3.props.headerHeight,
-					showDropShadow = p3.props.showDropShadow,
-					isRoactGamepadEnabled = p3.props.isRoactGamepadEnabled
-				})
-			})
+							return UDim2.fromScale(v6, 1 - p2)
+						end),
+						anchorPoint = anchorPointOverride,
+						topElementRounded = self.props.topElementRounded,
+						bottomElementRounded = self.props.bottomElementRounded,
+						isElementBackgroundVisible = self.props.isElementBackgroundVisible,
+						isElementDividerVisible = self.props.isElementDividerVisible,
+						elementHeight = self.props.elementHeight,
+						borderCornerRadius = self.props.borderCornerRadius,
+						background = self.props.background,
+						enableTokenOverride = self.props.enableTokenOverride,
+						renderHeader = self.props.renderHeader,
+						headerHeight = self.props.headerHeight,
+						showDropShadow = self.props.showDropShadow,
+						isRoactGamepadEnabled = self.props.isRoactGamepadEnabled
+					})
+				}
+			)
 		})
 	end)
 end
-function v16.didMount(p8) -- line: 278
-	if p8.props.open then
-		p8.wasDismissed = false
-		p8.motor:setGoal(p8.motorType(p8.motorOptions.open.targetValue, p8.motorOptions.open.springParams))
+
+function extended:didMount()
+	if self.props.open then
+		self.wasDismissed = false
+		self.motor:setGoal(self.motorType(self.motorOptions.open.targetValue, self.motorOptions.open.springParams))
 	end
 end
-function v16.didUpdate(p9, p10, _) -- line: 285
-	if p9.props.open ~= p10.open then
-		if p9.props.open then
-			p9.wasDismissed = false
-			p9.motor:setGoal(p9.motorType(p9.motorOptions.open.targetValue, p9.motorOptions.open.springParams))
 
-			return
+function extended:didUpdate(p, _)
+	if self.props.open ~= p.open then
+		if self.props.open then
+			self.wasDismissed = false
+			self.motor:setGoal(self.motorType(self.motorOptions.open.targetValue, self.motorOptions.open.springParams))
+		else
+			self.motor:setGoal(self.motorType(self.motorOptions.close.targetValue, self.motorOptions.close.springParams))
 		end
-
-		p9.motor:setGoal(p9.motorType(p9.motorOptions.close.targetValue, p9.motorOptions.close.springParams))
 	end
 end
-function v16.willUnmount(p12) -- line: 298
-	p12.motor:destroy()
+
+function extended.willUnmount(p)
+	p.motor:destroy()
 end
 
-return v16
+return extended

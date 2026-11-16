@@ -1,76 +1,68 @@
 local GameCollections = script:FindFirstAncestor("GameCollections")
 local useNavigateToSeeAll = require(GameCollections.useNavigateToSeeAll)
 local useNavigateToSortLinkWebView = require(GameCollections.useNavigateToSortLinkWebView)
-local GameCollectionsParent = GameCollections.Parent
-local React = require(GameCollectionsParent.React)
-local useLocalization = require(GameCollectionsParent.Localization).Hooks.useLocalization
 
-require(GameCollectionsParent.DiscoveryTypes)
+local parent = GameCollections.Parent
 
-local FFlagLuaAppHeaderButtonText = require(GameCollectionsParent.SharedFlags).FFlagLuaAppHeaderButtonText
-local FFlagLuaAppGameCarouselAmpUpsellAction = require(GameCollectionsParent.SharedFlags).FFlagLuaAppGameCarouselAmpUpsellAction
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+require(parent.DiscoveryTypes)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppHeaderButtonText = SharedFlags.FFlagLuaAppHeaderButtonText
 
-local function useGameSortHeaderButtonParams(p1: ((...any) -> ...any), p2, b1: boolean, n1: number?, s1: string?, s2: string?, s3: string, s4: string?, s5: string?, s6: string?, p3: ((...any) -> ...any)?) -- line: 16
-	-- upvalues: useNavigateToSeeAll (copy), React (copy), useNavigateToSortLinkWebView (copy), useLocalization (copy), FFlagLuaAppHeaderButtonText (copy), FFlagLuaAppGameCarouselAmpUpsellAction (copy)
-	local v21 = useNavigateToSeeAll(p2, b1, n1, s1, s2, s3)
-	local v22 = React.useCallback(function() -- line: 30
-		-- upvalues: v21 (copy), p1 (copy)
-		v21()
-		p1()
-	end, {
-		v21,
-		p1
-	})
-	local v23 = useNavigateToSortLinkWebView()
-	local v24 = React.useCallback(function() -- line: 36
-		-- upvalues: p2 (copy), b1 (copy), s4 (copy), v23 (copy), s3 (copy)
-		local v27 = nil
+local function useGameSortHeaderButtonParams(callback, data, flag: boolean, p: number?, p2: string?, p3: string?, p4: string, p5: string?, p6: string?, p7: string?, callback2)
+	local v = useNavigateToSeeAll(data, flag, p, p2, p3, p4)
+	local v2 = React.useCallback(function()
+		v()
+		callback()
+	end, { v, callback })
 
-		if p2 then
-			v27 = if not b1 then p2.gameSetTypeId else p2.topicId
+	local v3 = useNavigateToSortLinkWebView()
+	local v4 = React.useCallback(function()
+		local v4
+
+		if data then
+			v4 = if flag then data.topicId else data.gameSetTypeId
 		end
 
-		if s4 then
-			v23(s4, s3, p2 and p2.displayName or "", v27)
+		if p5 then
+			v3(p5, p4, data and data.displayName or "", v4)
 		end
-	end, {
-		v23,
-		s4,
-		s3,
-		p2,
-		b1
-	})
-	local v25 = if not s4 then v22 else v24
-	local v26 = useLocalization({
-		learnMore = "Feature.GameDetails.Label.LearnMore"
-	})
+	end, { v3, p5, p4, data, flag })
 
-	return v25, if not FFlagLuaAppHeaderButtonText or not s6 then if not s4 then nil else v26.learnMore else s6, (React.useCallback(function() -- line: 58
-		-- upvalues: FFlagLuaAppGameCarouselAmpUpsellAction (copy), p3 (copy), p2 (copy), s5 (copy), b1 (copy), v23 (copy), s3 (copy), v25 (copy)
-		if FFlagLuaAppGameCarouselAmpUpsellAction and p3 then
-			p3()
+	if not p5 then
+		v4 = v2
+	end
+
+	local v5 = useLocalization({ learnMore = "Feature.GameDetails.Label.LearnMore" })
+
+	if not (FFlagLuaAppHeaderButtonText and p7) then
+		p7 = if p5 then v5.learnMore else nil
+	end
+
+	return v4, p7, (React.useCallback(function()
+		if callback2 then
+			callback2()
+			return
+		end
+
+		if not (data and p6) then
+			v4()
 
 			return
 		end
 
-		if p2 and s5 then
-			local v28 = if not b1 then p2.gameSetTypeId else p2.topicId
+		local v6
 
-			v23(s5, s3, p2 and p2.displayName or "", v28)
-
-			return
+		if flag then
+			v6 = data.topicId
+		else
+			v6 = data.gameSetTypeId
 		end
 
-		v25()
-	end, {
-		v23,
-		s5,
-		s3,
-		p2,
-		b1,
-		v25,
-		if not FFlagLuaAppGameCarouselAmpUpsellAction then nil else p3
-	}))
+		v3(p6, p4, data and data.displayName or "", v6)
+	end, { v3, p6, p4, data, flag, v4, callback2 }))
 end
 
 return useGameSortHeaderButtonParams

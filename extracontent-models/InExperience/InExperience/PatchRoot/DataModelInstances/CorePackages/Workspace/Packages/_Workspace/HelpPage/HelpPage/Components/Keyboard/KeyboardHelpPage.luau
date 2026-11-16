@@ -1,69 +1,68 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
-local useKeybinds = require(ParentParent.Hooks.useKeybinds)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local useKeybinds = require(parent.Hooks.useKeybinds)
 local KeyboardGroup = require(script.Parent.KeyboardGroup)
-
-require(ParentParent.Configs.ConfigTypes)
-
+require(parent.Configs.ConfigTypes)
+local FFlagHelpPageCCL = require(parent.Flags.FFlagHelpPageCCL)
 local View = Foundation.View
 
-local function KeyboardHelpPage() -- line: 18
-	-- upvalues: useKeybinds (copy), React (copy), View (copy), KeyboardGroup (copy)
-	local controls = useKeybinds().controls
-	local groups = useKeybinds().groups
-	local v11 = React.useMemo(function() -- line: 22
-		-- upvalues: controls (copy), groups (copy), React (copy), View (copy), KeyboardGroup (copy)
+local function KeyboardHelpPage()
+	local v = useKeybinds()
+	local controls = v.controls
+	local groups = v.groups
+
+	local v2 = React.useMemo(function()
 		if controls == nil or groups == nil then
 			return nil
 		end
 
-		local t1 = {}
+		local v2 = {}
 
-		for _, v14 in groups do
-			t1[v14.id] = {
-				controls = {},
-				group = v14
-			}
+		for _, group in groups do
+			v2[group.id] = { controls = {}, group = group }
 		end
 
-		for v15, v16 in controls do
-			if v16.keyboardInput ~= nil then
-				local group = v16.keyboardInput.group
+		for k, control in controls do
+			if control.keyboardInput == nil then
+				continue
+			end
 
-				if t1[group.id] ~= nil then
-					t1[group.id].controls[v15] = v16
-				end
+			local group = control.keyboardInput.group
+
+			if v2[group.id] ~= nil then
+				v2[group.id].controls[k] = control
 			end
 		end
 
-		local t2 = {}
+		local children = {}
 
-		for _, v20 in t1 do
-			if next(v20.controls) ~= nil then
-				table.insert(t2, React.createElement(View, {
+		for _, v3 in v2 do
+			if next(v3.controls) ~= nil then
+				table.insert(children, React.createElement(View, {
 					tag = "auto-y padding-xxsmall",
-					LayoutOrder = v20.group.layoutOrder,
-					Size = UDim2.new(0.3333333333333333, -1, 0, 0),
-					key = v20.group.id
-				}, React.createElement(KeyboardGroup, v20)))
+					LayoutOrder = v3.group.layoutOrder,
+					Size = UDim2.new(1 / 3, -1, 0, 0),
+					key = v3.group.id
+				}, React.createElement(KeyboardGroup, v3)))
 			end
 		end
 
-		return t2
-	end, {
-		controls,
-		groups
-	})
+		return children
+	end, { controls, groups })
 
-	if v11 == nil then
+	if v2 == nil then
 		return nil
 	end
 
 	return React.createElement(View, {
-		tag = "row size-full-0 auto-y wrap align-x-left align-y-top"
-	}, v11)
+		tag = {
+			["col wrap align-x-left align-y-top size-full-0 auto-y"] = FFlagHelpPageCCL,
+			["row wrap align-x-left align-y-top size-full-0 auto-y"] = not FFlagHelpPageCCL
+		}
+	}, v2)
 end
 
 return React.memo(KeyboardHelpPage)

@@ -1,4 +1,1 @@
-return {
-	Utility = "Utility",
-	OverMedia = "OverMedia"
-}
+return { Utility = "Utility", OverMedia = "OverMedia" }

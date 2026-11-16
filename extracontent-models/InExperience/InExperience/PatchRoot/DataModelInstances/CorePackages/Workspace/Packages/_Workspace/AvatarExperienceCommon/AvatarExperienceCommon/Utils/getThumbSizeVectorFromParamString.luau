@@ -1,13 +1,15 @@
-local function getThumbSizeVectorFromParamString(s1: string) -- line: 9
-	local parts = string.split(s1, "&")
+local function getThumbSizeVectorFromParamString(value: string)
+	local v = string.split(value, "&")
 
-	if #parts == 2 then
-		local match = string.match(parts[1], "%d[%d.]*")
-		local match2 = string.match(parts[2], "%d[%d.]*")
+	if #v ~= 2 then
+		return nil
+	end
 
-		if match and match2 then
-			return Vector2.new(tonumber(match), (tonumber(match2)))
-		end
+	local v2 = string.match(v[1], "%d[%d.]*")
+	local v3 = string.match(v[2], "%d[%d.]*")
+
+	if v2 and v3 then
+		return Vector2.new(tonumber(v2), (tonumber(v3)))
 	end
 
 	return nil

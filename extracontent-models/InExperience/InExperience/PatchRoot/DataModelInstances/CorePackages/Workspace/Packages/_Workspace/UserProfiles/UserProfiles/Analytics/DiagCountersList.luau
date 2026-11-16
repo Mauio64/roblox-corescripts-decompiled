@@ -1,6 +1,8 @@
 local EventNames = require(script.Parent.EventNames)
-local Parent = script:FindFirstAncestor("UserProfiles").Parent
-local DiagEventTypes = require(Parent.SocialLuaAnalytics).Analytics.Enums.DiagEventTypes
+
+local parent = script:FindFirstAncestor("UserProfiles").Parent
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local DiagEventTypes = SocialLuaAnalytics.Analytics.Enums.DiagEventTypes
 local ErrorCodesForLogging = require(script.Parent.ErrorCodesForLogging)
 
 return {
@@ -21,16 +23,15 @@ return {
 	},
 	[EventNames.UserProfilesErrorCode] = {
 		type = DiagEventTypes.Counter,
-		name = function(p1) -- line: 31
-			-- upvalues: EventNames (copy), ErrorCodesForLogging (copy)
-			local str = tostring(p1.status)
-			local UserProfilesErrorCode = EventNames.UserProfilesErrorCode
+		name = function(p)
+			local status = tostring(p.status)
+			local userProfilesErrorCode = EventNames.UserProfilesErrorCode
 
-			if ErrorCodesForLogging[str] then
-				return UserProfilesErrorCode .. str
+			if ErrorCodesForLogging[status] then
+				return userProfilesErrorCode .. status
 			end
 
-			return UserProfilesErrorCode .. "Other"
+			return userProfilesErrorCode .. "Other"
 		end
 	},
 	[EventNames.UserProfilesUnmountEarly] = {

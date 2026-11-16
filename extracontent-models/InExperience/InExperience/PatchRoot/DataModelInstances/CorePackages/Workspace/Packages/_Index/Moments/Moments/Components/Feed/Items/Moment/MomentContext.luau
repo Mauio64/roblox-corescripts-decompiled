@@ -1,91 +1,86 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local React = require(Parent.React)
-local MomentsCommon = require(Parent.MomentsCommon)
-local ReactOtter = require(Parent.ReactOtter)
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local React = require(parent.React)
+local MomentsCommon = require(parent.MomentsCommon)
+local ReactOtter = require(parent.ReactOtter)
+local Signals = require(parent.Signals)
+local GetFFlagMomentsRenderPostAssets = require(parent.MomentsCommon.GetFFlagMomentsRenderPostAssets)
+
 local createMomentStore = require(script.Parent.createMomentStore)
+
 local MediaPreloadProvider = MomentsCommon.Media.MediaPreloadProvider
-local t1 = {
-	duration = 0.08,
-	easingStyle = Enum.EasingStyle.Quad
-}
-local v9 = React.createContext(nil)
 
-local function MomentProvider(t2: {[any]: any}) -- line: 52
-	-- upvalues: React (copy), createMomentStore (copy), MediaPreloadProvider (copy), Signals (copy), ReactOtter (copy), t1 (copy), v9 (copy)
-	local data = t2.data
-	local v13 = React.useMemo(function() -- line: 59
-		-- upvalues: createMomentStore (copy), data (copy)
+local v = { duration = 0.08, easingStyle = Enum.EasingStyle.Quad }
+
+local context = React.createContext(nil)
+
+local function MomentProvider(props)
+	local data = props.data
+
+	local useMemo = React.useMemo
+	local function fn()
 		return createMomentStore(data)
-	end, {})
-	local v14 = MediaPreloadProvider.useMediaControllerProvider()
-	local v15, v16 = React.useState(nil)
+	end
 
-	React.useEffect(function() -- line: 66
-		-- upvalues: Signals (copy), v14 (copy), data (copy), v16 (copy)
-		return (Signals.createEffect(function(p1) -- line: 67
-			-- upvalues: v14 (copy), data (copy), v16 (copy)
-			if v14 == nil then
+	local v2
+
+	if GetFFlagMomentsRenderPostAssets() then
+		v2 = props.dataVersion or false
+	end
+
+	local store = useMemo(fn, { v2 })
+
+	local v3 = MediaPreloadProvider.useMediaControllerProvider()
+	local state, setState = React.useState(nil)
+
+	React.useEffect(function()
+		return (Signals.createEffect(function(p)
+			if v3 == nil then
 				return
 			end
 
-			local v22 = v14.getControllerMap(p1)[data.momentId]
+			local v4 = v3.getControllerMap(p)[data.momentId]
 
-			if v22 == nil then
+			if v4 == nil then
 				return
 			end
 
-			v16(v22)
+			setState(v4)
 		end))
-	end, {
-		data.momentId,
-		v14
-	})
+	end, { data.momentId, v3 })
 
-	local v17, v18 = ReactOtter.useAnimatedBinding(0)
+	local animationRatio, v4 = ReactOtter.useAnimatedBinding(0)
 
-	React.useEffect(function() -- line: 85
-		-- upvalues: Signals (copy), v13 (copy), v18 (copy), ReactOtter (copy), t1 (copy)
-		return (Signals.createEffect(function(p2) -- line: 86
-			-- upvalues: v13 (copy), v18 (copy), ReactOtter (copy), t1 (copy)
-			local v24 = v13.getIsScrubbing(p2)
-
-			v18(ReactOtter.ease(not v24 and 0 or 1, t1))
+	React.useEffect(function()
+		return (Signals.createEffect(function(p)
+			local isScrubbing = store.getIsScrubbing(p)
+			v4(ReactOtter.ease(isScrubbing and 1 or 0, v))
 		end))
-	end, { v13 })
+	end, { store })
 
-	local v19 = React.useMemo(function() -- line: 94
-		-- upvalues: data (copy), v15 (copy), v13 (copy), v17 (copy)
+	local v5 = React.useMemo(function()
 		return {
 			momentId = data.momentId,
-			controller = v15,
-			store = v13,
-			animationRatio = v17
+			controller = state,
+			store = store,
+			animationRatio = animationRatio
 		}
-	end, {
-		data.momentId,
-		v15,
-		v13,
-		v17
-	})
+	end, { data.momentId, state, store, animationRatio })
 
-	return React.createElement(v9.Provider, {
-		value = v19
-	}, t2.children)
+	return React.createElement(context.Provider, { value = v5 }, props.children)
 end
 
 return table.freeze({
-	Context = v9,
+	Context = context,
 	Provider = MomentProvider,
-	useMoment = function() -- line: 113
-		-- upvalues: React (copy), v9 (copy)
-		local v20 = React.useContext(v9)
+	useMoment = function()
+		local v2 = React.useContext(context)
 
-		if v20 == nil then
+		if v2 == nil then
 			error("useMoment must be used within a MomentProvider")
 		end
 
-		return v20
+		return v2
 	end,
-	SCRUB_FADE_SECONDS = t1.duration
+	SCRUB_FADE_SECONDS = v.duration
 })

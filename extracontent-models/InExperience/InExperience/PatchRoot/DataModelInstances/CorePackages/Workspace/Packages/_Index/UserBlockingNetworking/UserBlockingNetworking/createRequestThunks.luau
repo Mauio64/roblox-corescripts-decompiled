@@ -4,12 +4,11 @@ local createBlockUserById = require(networkRequests.createBlockUserById)
 local createUnblockUserById = require(networkRequests.createUnblockUserById)
 local createIsBlockedById = require(networkRequests.createIsBlockedById)
 
-return function(t1: {[any]: any}) -- line: 8
-	-- upvalues: createGetBlockedUsers (copy), createBlockUserById (copy), createUnblockUserById (copy), createIsBlockedById (copy)
+return function(p)
 	return {
-		GetBlockedUsers = createGetBlockedUsers(t1),
-		BlockUserById = createBlockUserById(t1),
-		UnblockUserById = createUnblockUserById(t1),
-		IsBlockedById = createIsBlockedById(t1)
+		GetBlockedUsers = createGetBlockedUsers(p),
+		BlockUserById = createBlockUserById(p),
+		UnblockUserById = createUnblockUserById(p),
+		IsBlockedById = createIsBlockedById(p)
 	}
 end

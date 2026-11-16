@@ -1,14 +1,14 @@
-return function(s1: string, s2: string?, s3: string, s4: string, s5: string, s6: string?) -- line: 1
-	if s2 then
-		s3 = s2 .. s3
+return function(purchase_flow_uuid: string, p: string?, purchase_flow: string, view_name: string, input_type: string, event_metadata: string?)
+	if p then
+		purchase_flow = p .. purchase_flow
 	end
 
 	return {
+		purchase_flow_uuid = purchase_flow_uuid,
+		purchase_flow = purchase_flow,
+		view_name = view_name,
 		purchase_event_type = "UserInput",
-		purchase_flow_uuid = s1,
-		purchase_flow = s3,
-		view_name = s4,
-		input_type = s5,
-		event_metadata = s6
+		input_type = input_type,
+		event_metadata = event_metadata
 	}
 end

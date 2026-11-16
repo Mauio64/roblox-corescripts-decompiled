@@ -1,77 +1,89 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local jsutils = ParentParent.jsutils
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local jsutils = parent.jsutils
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Map = LuauPolyfill.Map
 local Object = LuauPolyfill.Object
-local didYouMean = require(jsutils.didYouMean).didYouMean
-local suggestionList = require(jsutils.suggestionList).suggestionList
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local language = ParentParent.language
+
+local didYouMean = require(jsutils.didYouMean)
+local didYouMean2 = didYouMean.didYouMean
+local suggestionList = require(jsutils.suggestionList)
+local suggestionList2 = suggestionList.suggestionList
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local language = parent.language
 local predicates = require(language.predicates)
 local isTypeDefinitionNode = predicates.isTypeDefinitionNode
 local isTypeSystemDefinitionNode = predicates.isTypeSystemDefinitionNode
 local isTypeSystemExtensionNode = predicates.isTypeSystemExtensionNode
-local type = ParentParent.type
-local specifiedScalarTypes = require(type.scalars).specifiedScalarTypes
-local introspectionTypes = require(type.introspection).introspectionTypes
-local t1 = {}
-local u20 = nil
-local isStandardTypeName = nil
-local isSDLNode = nil
+local kind = parent.type
+local scalars = require(kind.scalars)
+local specifiedScalarTypes = scalars.specifiedScalarTypes
+local introspection = require(kind.introspection)
+local introspectionTypes = introspection.introspectionTypes
 
-function t1.KnownTypeNamesRule(p1) -- line: 43
-	-- upvalues: Map (copy), isTypeDefinitionNode (copy), Array (copy), Object (copy), isSDLNode (ref), isStandardTypeName (ref), suggestionList (copy), u20 (ref), GraphQLError (copy), didYouMean (copy)
-	local v24 = p1:getSchema()
-	local u25 = Map.new()
+local mapped = nil
+local isStandardTypeName
+local isSDLNode
+local KnownTypeNamesRule = {
+	KnownTypeNamesRule = function(object)
+		local schema = object:getSchema()
 
-	if v24 then
-		u25 = v24:getTypeMap()
-	end
+		local v = Map.new()
 
-	local t2 = {}
-
-	for _, v in ipairs(p1:getDocument().definitions) do
-		if isTypeDefinitionNode(v) then
-			t2[v.name.value] = true
+		if schema then
+			v = schema:getTypeMap()
 		end
-	end
 
-	local v29 = Array.concat(u25:keys(), Object.keys(t2))
+		local set = {}
 
-	return {
-		NamedType = function(_, p3, _, p5, _, p7) -- line: 65
-			-- upvalues: u25 (ref), t2 (copy), isSDLNode (ref), isStandardTypeName (ref), suggestionList (copy), Array (copy), u20 (ref), v29 (copy), p1 (copy), GraphQLError (copy), didYouMean (copy)
-			local value = p3.name.value
-
-			if not u25:get(value) and not t2[value] then
-				local v40 = p7[3] or p5
-				local v41 = v40 ~= nil and isSDLNode(v40)
-
-				if v41 and isStandardTypeName(value) then
-					return
-				end
-
-				local v42 = suggestionList(value, v41 and Array.concat(u20, v29) or v29)
-
-				p1:reportError(GraphQLError.new(("Unknown type \"%s\"."):format(value) .. didYouMean(v42), p3))
+		for _, definition in ipairs(object:getDocument().definitions) do
+			if isTypeDefinitionNode(definition) then
+				set[definition.name.value] = true
 			end
 		end
-	}
-end
 
-u20 = Array.map(Array.concat(specifiedScalarTypes, introspectionTypes), function(p8) -- line: 93
-	return p8.name
+		local joined = Array.concat(v:keys(), Object.keys(set))
+
+		return {
+			NamedType = function(_, p, _, p2, _, list)
+				local value = p.name.value
+
+				if not (v:get(value) or set[value]) then
+					local v2 = list[3] or p2
+					local v3
+
+					if v2 == nil then
+						v3 = false
+					else
+						v3 = isSDLNode(v2)
+					end
+
+					if v3 and isStandardTypeName(value) then
+						return
+					end
+
+					local v4 = suggestionList2(value, v3 and Array.concat(mapped, joined) or joined)
+
+					object:reportError(graphQLError.new(("Unknown type \"%s\"."):format(value) .. didYouMean2(v4), p))
+				end
+			end
+		}
+	end
+}
+
+mapped = Array.map(Array.concat(specifiedScalarTypes, introspectionTypes), function(p)
+	return p.name
 end)
 
-function isStandardTypeName(s1: string) -- line: 98
-	-- upvalues: Array (copy), u20 (ref)
-	return Array.indexOf(u20, s1) ~= -1
-end
-function isSDLNode(p9) -- line: 102
-	-- upvalues: Array (copy), isTypeSystemDefinitionNode (copy), isTypeSystemExtensionNode (copy)
-	return not Array.isArray(p9) and (isTypeSystemDefinitionNode(p9) or isTypeSystemExtensionNode(p9))
+isStandardTypeName = function(value: string): boolean
+	return Array.indexOf(mapped, value) ~= -1
 end
 
-return t1
+isSDLNode = function(p)
+	return not Array.isArray(p) and (isTypeSystemDefinitionNode(p) or isTypeSystemExtensionNode(p))
+end
+
+return KnownTypeNamesRule

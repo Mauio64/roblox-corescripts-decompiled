@@ -1,37 +1,50 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
-local React = require(EditProfileParent.React)
-local View = require(EditProfileParent.Foundation).View
+local parent = EditProfile.Parent
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
 local EditProfileHeaderBar = require(EditProfile.BaseComponents.EditProfileHeaderBar)
-local useProfileCardWidth = require(EditProfileParent.ProfilePlatformCommon).Hooks.useProfileCardWidth
-local useLocalization = require(EditProfileParent.Localization).Hooks.useLocalization
-local FFlagAXEnableProfileTab = require(EditProfileParent.SharedFlags).FFlagAXEnableProfileTab
+local ProfilePlatformCommon = require(parent.ProfilePlatformCommon)
+local useProfileCardWidth = ProfilePlatformCommon.Hooks.useProfileCardWidth
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAXEnableProfileTab = SharedFlags.FFlagAXEnableProfileTab
 
-return function(t1: {[any]: any}) -- line: 24
-	-- upvalues: useProfileCardWidth (copy), useLocalization (copy), FFlagAXEnableProfileTab (copy), React (copy), View (copy), EditProfileHeaderBar (copy)
-	local v10 = useProfileCardWidth()
-	local v11 = useLocalization({
-		title = t1.titleKey
-	})
-	local v12 = FFlagAXEnableProfileTab and t1.fullBleed == true
+return function(props)
+	local v = useProfileCardWidth()
+	local v2 = useLocalization({ title = props.titleKey })
 
-	return React.createElement(View, {
-		tag = not FFlagAXEnableProfileTab and "col bg-surface-0 anchor-top-right position-top-right items-start" or {
+	local sizefullfull = FFlagAXEnableProfileTab and props.fullBleed == true
+	local createElement = React.createElement
+	local v3 = {
+		tag = FFlagAXEnableProfileTab and {
 			["col items-start bg-surface-0"] = true,
-			["position-top-right anchor-top-right"] = not v12,
-			["size-full-full"] = v12
-		},
-		Size = if not v12 then UDim2.new(0, v10, 1, 0) else nil
-	}, {
+			["position-top-right anchor-top-right"] = not sizefullfull,
+			["size-full-full"] = sizefullfull
+		} or "col bg-surface-0 anchor-top-right position-top-right items-start",
+		Size = 0
+	}
+	local size
+
+	if not sizefullfull then
+		size = UDim2.new(0, v, 1, 0)
+	end
+
+	v3.Size = size
+	return createElement(View, v3, {
 		TopBar = React.createElement(EditProfileHeaderBar, {
-			onClose = t1.onClose,
-			headerText = v11.title,
-			onSave = t1.onSave,
-			isLoading = t1.isLoading,
-			isDisabled = t1.isDisabled
+			onClose = props.onClose,
+			headerText = v2.title,
+			onSave = props.onSave,
+			isLoading = props.isLoading,
+			isDisabled = props.isDisabled
 		}),
-		Content = React.createElement(View, {
-			tag = "col padding-xlarge gap-xxlarge size-full-0 auto-y"
-		}, t1.component)
+		Content = React.createElement(
+			View,
+			{ tag = "col padding-xlarge gap-xxlarge size-full-0 auto-y" },
+			props.component
+		)
 	})
 end

@@ -1,11 +1,16 @@
-local function getCurrentExperienceProject() -- line: 9
-	local GameId = game.GameId
-	local PlaceId = game.PlaceId
+local function getCurrentExperienceProject()
+	local gameId = game.GameId
+	local placeId = game.PlaceId
 
-	return {
-		universeId = if GameId ~= 0 then GameId else nil,
-		placeId = if PlaceId ~= 0 then PlaceId else nil
-	}
+	if gameId == 0 then
+		gameId = nil
+	end
+
+	if placeId == 0 then
+		placeId = nil
+	end
+
+	return { universeId = gameId, placeId = placeId }
 end
 
 return getCurrentExperienceProject

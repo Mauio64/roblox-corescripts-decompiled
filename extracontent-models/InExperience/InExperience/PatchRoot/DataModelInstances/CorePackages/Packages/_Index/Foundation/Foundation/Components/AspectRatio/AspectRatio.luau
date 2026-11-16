@@ -1,36 +1,32 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactIs = require(FoundationParent.ReactIs)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+
 local getTestIdTag = require(Foundation.Utility.getTestIdTag)
 
 require(Foundation.Components.Types)
 
-local function getAspectRatio(p1) -- line: 14
-	-- upvalues: ReactIs (copy)
-	if ReactIs.isBinding(p1) or typeof(p1) == "number" then
-		return {
-			AspectType = nil,
-			DominantAxis = nil,
-			AspectRatio = p1
-		}
+local function getAspectRatio(aspectRatio)
+	if ReactIs.isBinding(aspectRatio) or typeof(aspectRatio) == "number" then
+		return { AspectRatio = aspectRatio, AspectType = nil, DominantAxis = nil }
 	end
 
 	return {
-		AspectRatio = p1.AspectRatio,
-		AspectType = p1.AspectType,
-		DominantAxis = p1.DominantAxis
+		AspectRatio = aspectRatio.AspectRatio,
+		AspectType = aspectRatio.AspectType,
+		DominantAxis = aspectRatio.DominantAxis
 	}
 end
-local function AspectRatio(t1: {[any]: any}) -- line: 41
-	-- upvalues: getAspectRatio (copy), React (copy), getTestIdTag (copy)
-	local v10 = getAspectRatio(t1.value)
 
+local function AspectRatio(p)
+	local aspectRatio = getAspectRatio(p.value)
 	return React.createElement("UIAspectRatioConstraint", {
-		AspectRatio = v10.AspectRatio,
-		AspectType = v10.AspectType,
-		DominantAxis = v10.DominantAxis,
-		[React.Tag] = getTestIdTag(t1.testId)
+		AspectRatio = aspectRatio.AspectRatio,
+		AspectType = aspectRatio.AspectType,
+		DominantAxis = aspectRatio.DominantAxis,
+		[React.Tag] = getTestIdTag(p.testId)
 	})
 end
 

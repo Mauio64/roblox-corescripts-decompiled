@@ -4,15 +4,18 @@ local useEffectOnce = require(script.useEffectOnce)
 local useEffectOnMount = require(script.useEffectOnMount)
 local useExternalEvent = require(script.useExternalEvent)
 local useIsGamepad = require(script.useIsGamepad)
+local useGamepadSupports = require(script.useGamepadSupports)
 local useDidUpdate = require(script.useDidUpdate)
 local usePrevious = require(script.usePrevious)
 local useSelectedTheme = require(script.useSelectedTheme)
 local useThrottledCallback = require(script.useThrottledCallback)
 local useInputType = require(script.useInputType)
 local useIsTvRemoteDevice = require(script.useIsTvRemoteDevice)
+local useIsRealGamepadConnected = require(script.useIsRealGamepadConnected)
 local useLaserPointerHand = require(script.useLaserPointerHand)
 local useIOSStatusBarStyler = require(script.useIOSStatusBarStyler)
 local useAssetFetchStatus = require(script.useAssetFetchStatus)
+local useTableWrappedCallbackRef = require(script.useTableWrappedCallbackRef)
 
 return {
 	RoactRodux = require(script.RoactRodux),
@@ -22,7 +25,9 @@ return {
 	useExternalEvent = useExternalEvent,
 	useInputType = useInputType,
 	useIsGamepad = useIsGamepad,
+	useGamepadSupports = useGamepadSupports,
 	useIsTvRemoteDevice = useIsTvRemoteDevice,
+	useIsRealGamepadConnected = useIsRealGamepadConnected,
 	useEffectOnMount = useEffectOnMount,
 	useDidUpdate = useDidUpdate,
 	usePrevious = usePrevious,
@@ -30,5 +35,6 @@ return {
 	useThrottledCallback = useThrottledCallback,
 	useLaserPointerHand = useLaserPointerHand,
 	useIOSStatusBarStyler = useIOSStatusBarStyler,
-	useAssetFetchStatus = useAssetFetchStatus
+	useAssetFetchStatus = useAssetFetchStatus,
+	useTableWrappedCallbackRef = useTableWrappedCallbackRef
 }

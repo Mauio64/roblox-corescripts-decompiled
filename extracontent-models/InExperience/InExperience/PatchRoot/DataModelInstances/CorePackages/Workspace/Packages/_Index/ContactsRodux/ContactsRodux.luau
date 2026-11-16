@@ -1,26 +1,27 @@
-local scriptParent = script.Parent
-local Dash = require(scriptParent.Dash)
-local RoduxNetworking = require(scriptParent.LuaSocialLibrariesDeps).RoduxNetworking
-local NetworkingContacts = require(scriptParent.LuaSocialLibrariesDeps).NetworkingContacts
+local parent = script.Parent
+local Dash = require(parent.Dash)
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local RoduxNetworking = LuaSocialLibrariesDeps.RoduxNetworking
+local LuaSocialLibrariesDeps2 = require(parent.LuaSocialLibrariesDeps)
+local NetworkingContacts = LuaSocialLibrariesDeps2.NetworkingContacts
+
 local ContactsReducer = require(script.Reducers.ContactsReducer)
 local Selectors = require(script.Selectors)
 
 return {
 	["jest.config"] = script["jest.config"],
-	config = function(p1) -- line: 11
-		-- upvalues: Dash (copy), NetworkingContacts (copy), RoduxNetworking (copy), ContactsReducer (copy), Selectors (copy)
-		local u8 = Dash.join(p1, {
+	config = function(p)
+		local joined = Dash.join(p, {
 			networkingContacts = NetworkingContacts.config({
 				roduxNetworking = RoduxNetworking.mock()
 			})
 		})
 
 		return {
-			installReducer = function() -- line: 19
-				-- upvalues: ContactsReducer (copy), u8 (ref)
-				return ContactsReducer(u8)
+			installReducer = function()
+				return ContactsReducer(joined)
 			end,
-			Selectors = Selectors(u8),
+			Selectors = Selectors(joined),
 			Models = require(script.Models),
 			Actions = require(script.Actions)
 		}

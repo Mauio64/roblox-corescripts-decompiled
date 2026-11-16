@@ -1,217 +1,278 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Logger = require(AppChatParent.Loggers).Logger
-local React = require(AppChatParent.React)
-local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local Foundation = require(AppChatParent.Foundation)
-local FFlagEnableBlackbirdCheck = require(AppChatParent.SharedFlags).FFlagEnableBlackbirdCheck
-local FFlagAppChatSanitizeConversationTitleRichText = require(AppChatParent.SharedFlags).FFlagAppChatSanitizeConversationTitleRichText
-local escapeRichFormatting = require(AppChatParent.InlineRichText).escapeRichFormatting
-local useIsRobloxSubscriber = require(AppChatParent.UserProfiles).Hooks.useIsRobloxSubscriber
-local UserTile = require(AppChatParent.UserTile).UserTile
-local LayoutMode = require(AppChatParent.UserTile).LayoutMode
+local parent = AppChat.Parent
+
+local Loggers = require(parent.Loggers)
+local Logger = Loggers.Logger
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local Foundation = require(parent.Foundation)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagUserTileUnfilteredChatIndicator = SharedFlags2.FFlagUserTileUnfilteredChatIndicator
+local InlineRichText = require(parent.InlineRichText)
+local escapeRichFormatting = InlineRichText.escapeRichFormatting
+local UserProfiles = require(parent.UserProfiles)
+local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
+local UserTile = require(parent.UserTile)
+local userTile = UserTile.UserTile
+local UserTile2 = require(parent.UserTile)
+local LayoutMode = UserTile2.LayoutMode
 local RoduxPresence = require(AppChat.Http.RoduxPresence)
 local FFlagAppChatPresenceStoreMigration = require(AppChat.Flags.FFlagAppChatPresenceStoreMigration)
-local DataHydration = require(AppChatParent.DataHydration)
-local Signals = require(AppChatParent.Signals)
-local SignalsReact = require(AppChatParent.SignalsReact)
-local v19 = Logger:new(script.Name)
+local DataHydration = require(parent.DataHydration)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local v = Logger:new(script.Name)
+
 local useFoundationPresence = require(AppChat.Hooks.useFoundationPresence)
+
 local PresenceType = RoduxPresence.Enums.PresenceType
 local UserPresence = Foundation.Enums.UserPresence
-local v23 = if not FFlagAppChatPresenceStoreMigration then nil else DataHydration.Presence.PresenceEnums.PresenceType
-local v24 = if not FFlagAppChatPresenceStoreMigration then nil else DataHydration.Presence.PresenceStore.get()
+local presenceType
 
-local function groupPresenceAggregateEquals(t1: {[any]: any}, t2: {[any]: any}) -- line: 44
-	return t1.hasInExperienceUser == t2.hasInExperienceUser and t1.hasOnlineUser == t2.hasOnlineUser
+if FFlagAppChatPresenceStoreMigration then
+	presenceType = DataHydration.Presence.PresenceEnums.PresenceType
+else
+	presenceType = nil
 end
-local function getParticipantId(p1) -- line: 75
-	if type(p1) == "table" then
-		local v33 = p1.id or p1.userId
 
-		if v33 ~= nil then
-			return (tostring(v33))
+local v2
+
+if FFlagAppChatPresenceStoreMigration then
+	v2 = DataHydration.Presence.PresenceStore.get()
+else
+	v2 = nil
+end
+
+local function groupPresenceAggregateEquals(p, p2): boolean
+	return p.hasInExperienceUser == p2.hasInExperienceUser and p.hasOnlineUser == p2.hasOnlineUser
+end
+
+local function getParticipantId(participant) -- 2 equivalent calls inferred from this helper
+	if type(participant) == "table" then
+		local id = participant.id or participant.userId
+
+		if id == nil then
+			return nil
 		end
 
+		return (tostring(id))
+	elseif participant == nil then
 		return nil
-	end
-
-	if p1 ~= nil then
-		return (tostring(p1))
-	end
-
-	return nil
-end
-local function getNonEmptyLocalUserId(p2) -- line: 84
-	if p2 == nil or p2 == "" then
-		return nil
-	end
-
-	return (tostring(p2))
-end
-local function ConversationFacePileInner(t3: {[any]: any}) -- line: 92
-	-- upvalues: useLocalUserId (copy), React (copy), useSelector (copy), FFlagAppChatPresenceStoreMigration (copy), Signals (copy), v24 (copy), v23 (copy), groupPresenceAggregateEquals (copy), SignalsReact (copy), useFoundationPresence (copy), UserPresence (copy), PresenceType (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), UserTile (copy), LayoutMode (copy), FFlagAppChatSanitizeConversationTitleRichText (copy), escapeRichFormatting (copy)
-	local conversationId = t3.conversationId
-	local v37 = useLocalUserId()
-	local localUserId = t3.localUserId
-	local v39 = ((if localUserId ~= nil and localUserId ~= "" then tostring(localUserId) else nil)) or (((if v37 ~= nil and v37 ~= "" then tostring(v37) else nil)) or "")
-	local v40 = React.useCallback(function(p3) -- line: 97
-		-- upvalues: conversationId (copy)
-		if p3 and (p3.ChatAppReducer and p3.ChatAppReducer.Conversations) then
-			return p3.ChatAppReducer.Conversations[conversationId]
-		end
-
-		return nil
-	end, { conversationId })
-	local v41 = useSelector(v40)
-	local v42 = if FFlagAppChatPresenceStoreMigration then nil else useSelector(function(p4) -- line: 106
-		if p4 and (p4.ChatAppReducer and p4.ChatAppReducer.Presence) then
-			return p4.ChatAppReducer.Presence.byUserId
-		end
-
-		return nil
-	end)
-	local v43 = t3.participants or if not v41 or not v41.participants then {} else v41.participants
-	local t4 = {}
-
-	if #v43 == 1 then
-		table.insert(t4, v39)
 	else
-		for _, v46 in v43 do
-			local v48
+		return (tostring(participant))
+	end
+end
 
-			if type(v46) == "table" then
-				local v47 = v46.id or v46.userId
+local function getNonEmptyLocalUserId(p) -- 2 equivalent calls inferred from this helper
+	if p == nil or p == "" then
+		return nil
+	end
 
-				v48 = if v47 == nil then nil else tostring(v47)
-			else
-				v48 = if v46 == nil then nil else tostring(v46)
+	return (tostring(p))
+end
+
+local function ConversationFacePileInner(props)
+	local conversationId = props.conversationId
+	local v3 = useLocalUserId()
+	local v4 = getNonEmptyLocalUserId(props.localUserId) or getNonEmptyLocalUserId(v3) or "" -- inferred equivalent call
+
+	local v5 = useSelector((React.useCallback(function(p)
+		if p and p.ChatAppReducer and p.ChatAppReducer.Conversations then
+			return p.ChatAppReducer.Conversations[conversationId]
+		end
+
+		return nil
+	end, { conversationId })))
+	local v6
+
+	if not FFlagAppChatPresenceStoreMigration then
+		v6 = useSelector(function(p)
+			if p and p.ChatAppReducer and p.ChatAppReducer.Presence then
+				return p.ChatAppReducer.Presence.byUserId
 			end
 
-			if v48 and tostring(v48) ~= tostring(v39) then
-				table.insert(t4, v48)
+			return nil
+		end)
+	end
+
+	local participants = props.participants or not (v5 and v5.participants) and {} or v5.participants
+
+	local v7 = {}
+
+	if #participants == 1 then
+		table.insert(v7, v4)
+	else
+		for _, participant in participants do
+			local participantId = getParticipantId(participant) -- inferred equivalent call
+
+			if participantId and tostring(participantId) ~= tostring(v4) then
+				table.insert(v7, participantId)
 			end
 		end
 	end
 
-	local v49 = if not FFlagAppChatPresenceStoreMigration then nil else React.useMemo(function() -- line: 130
-		-- upvalues: Signals (copy), t4 (copy), v24 (copy), v23 (copy), groupPresenceAggregateEquals (copy)
-		return Signals.createComputed(function(p5) -- line: 131
-			-- upvalues: t4 (copy), v24 (copy), v23 (copy)
-			local v71 = false
-			local v72 = false
+	local v8
 
-			for _, v74 in t4 do
-				local v75 = v24.GetPresenceByUserId(v74).data(p5)
+	if FFlagAppChatPresenceStoreMigration then
+		v8 = React.useMemo(function()
+			return Signals.createComputed(function(p)
+				local hasInExperienceUser = false
+				local hasOnlineUser = false
 
-				if v75 then
-					local userPresenceType = v75.userPresenceType
+				for _, v9 in v7 do
+					local data = v2.GetPresenceByUserId(v9).data(p)
 
-					if userPresenceType == v23.InGame or userPresenceType == v23.InStudio then
-						v71 = true
-					elseif userPresenceType == v23.Online then
-						v72 = true
+					if not data then
+						continue
+					end
+
+					local userPresenceType = data.userPresenceType
+
+					if userPresenceType == presenceType.InGame or userPresenceType == presenceType.InStudio then
+						hasInExperienceUser = true
+					elseif userPresenceType == presenceType.Online then
+						hasOnlineUser = true
 					end
 				end
-			end
 
-			return {
-				hasInExperienceUser = v71,
-				hasOnlineUser = v72
-			}
-		end, groupPresenceAggregateEquals)
-	end, { table.concat(t4, ",") })
-	local v50 = if not FFlagAppChatPresenceStoreMigration then nil else SignalsReact.useSignalState(v49)
-	local v51 = t4[1] or v39
-	local v52 = useFoundationPresence(v51)
-	local None = UserPresence.None
+				return { hasInExperienceUser = hasInExperienceUser, hasOnlineUser = hasOnlineUser }
+			end, groupPresenceAggregateEquals)
+		end, { table.concat(v7, ",") })
+	end
 
-	if #t4 >= 2 then
-		local v54 = false
-		local v55 = false
+	local v9
+
+	if FFlagAppChatPresenceStoreMigration then
+		v9 = SignalsReact.useSignalState(v8)
+	end
+
+	local userId = v7[1] or v4
+	local v10 = useFoundationPresence(userId)
+
+	local userPresenceType2 = UserPresence.None
+
+	if #v7 >= 2 then
+		local v11 = false
+		local v12 = false
 
 		if FFlagAppChatPresenceStoreMigration then
-			v54 = not not v50 and v50.hasInExperienceUser
-			v55 = not not v50 and v50.hasOnlineUser
+			v11 = if v9 then v9.hasInExperienceUser else false
+			v12 = if v9 then v9.hasOnlineUser else false
 		else
-			for _, v57 in t4 do
-				if v42 and v42[v57] then
-					local userPresenceType = v42[v57].userPresenceType
+			for _, v13 in v7 do
+				if not (v6 and v6[v13]) then
+					continue
+				end
 
-					if userPresenceType == PresenceType.InGame or userPresenceType == PresenceType.InStudio then
-						v54 = true
-					elseif userPresenceType == PresenceType.Online then
-						v55 = true
-					end
+				local userPresenceType = v6[v13].userPresenceType
+
+				if userPresenceType == PresenceType.InGame or userPresenceType == PresenceType.InStudio then
+					v11 = true
+				elseif userPresenceType == PresenceType.Online then
+					v12 = true
 				end
 			end
 		end
 
-		if v54 then
-			None = UserPresence.InExperience
-		elseif v55 then
-			None = UserPresence.Active
+		if v11 then
+			userPresenceType2 = UserPresence.InExperience
+		elseif v12 then
+			userPresenceType2 = UserPresence.Active
 		end
 	else
-		None = v52.presence
+		userPresenceType2 = v10.presence
 	end
 
-	local str = nil
+	local v11 = nil
 
-	if FFlagEnableBlackbirdCheck and #v43 == 2 then
-		for _, v61 in v43 do
-			local v63
+	if FFlagEnableBlackbirdCheck and #participants == 2 then
+		for _, participant in participants do
+			local participantId = getParticipantId(participant) -- inferred equivalent call
 
-			if type(v61) == "table" then
-				local v62 = v61.id or v61.userId
-
-				v63 = if v62 == nil then nil else tostring(v62)
-			else
-				v63 = if v61 == nil then nil else tostring(v61)
-			end
-
-			if v63 and tostring(v63) ~= tostring(v39) then
-				str = tostring(v63)
-
+			if participantId and tostring(participantId) ~= tostring(v4) then
+				v11 = tostring(participantId)
 				break
 			end
 		end
 	end
 
-	local v64 = useIsRobloxSubscriber(str)
+	local isRobloxSubscriber = useIsRobloxSubscriber(v11)
 
-	return React.createElement(UserTile, {
-		userId = v51,
-		facePileSecondUserId = t4[2] or nil,
+	local createElement = React.createElement
+	local v12 = {
+		userId = userId,
+		facePileSecondUserId = v7[2] or nil,
 		layoutMode = LayoutMode.wide,
-		title = if not FFlagAppChatSanitizeConversationTitleRichText or not t3.titleText then t3.titleText else escapeRichFormatting(t3.titleText),
-		subtitle = if not FFlagAppChatSanitizeConversationTitleRichText or not t3.subtitleText then t3.subtitleText else escapeRichFormatting(t3.subtitleText),
-		titleStyle = t3.titleStyle,
-		subtitleStyle = t3.subtitleStyle,
-		userPresenceType = None,
-		onActivated = t3.onActivated,
-		selectable = t3.selectable,
-		customTextTruncation = Enum.TextTruncate.SplitWord,
-		trustedConnectionIndicatorEnabled = t3.trustedConnectionIndicatorEnabled,
-		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v64
-	})
+		title = 0,
+		subtitle = 0,
+		titleStyle = 0,
+		subtitleStyle = 0,
+		userPresenceType = 0,
+		onActivated = 0,
+		selectable = 0,
+		customTextTruncation = 0,
+		trustedConnectionIndicatorEnabled = 0,
+		isRobloxSubscriber = 0,
+		shouldShowUnfilteredChatIndicator = 0
+	}
+	local title
+
+	if props.titleText then
+		title = escapeRichFormatting(props.titleText)
+	else
+		title = props.titleText
+	end
+
+	v12.title = title
+	local subtitle
+
+	if props.subtitleText then
+		subtitle = escapeRichFormatting(props.subtitleText)
+	else
+		subtitle = props.subtitleText
+	end
+
+	v12.subtitle = subtitle
+	v12.titleStyle = props.titleStyle
+	v12.subtitleStyle = props.subtitleStyle
+	v12.userPresenceType = userPresenceType2
+	v12.onActivated = props.onActivated
+	v12.selectable = props.selectable
+	v12.customTextTruncation = Enum.TextTruncate.SplitWord
+	v12.trustedConnectionIndicatorEnabled = props.trustedConnectionIndicatorEnabled
+
+	if not FFlagEnableBlackbirdCheck then
+		isRobloxSubscriber = nil
+	end
+
+	v12.isRobloxSubscriber = isRobloxSubscriber
+	local shouldShowUnfilteredChatIndicator
+
+	if FFlagUserTileUnfilteredChatIndicator then
+		shouldShowUnfilteredChatIndicator = props.shouldShowUnfilteredChatIndicator
+	end
+
+	v12.shouldShowUnfilteredChatIndicator = shouldShowUnfilteredChatIndicator
+	return createElement(userTile, v12)
 end
-local function ConversationFacePile(t5: {[any]: any}) -- line: 231
-	-- upvalues: v19 (copy), React (copy), ConversationFacePileInner (copy)
-	local conversationId = t5.conversationId
+
+local function ConversationFacePile(p)
+	local conversationId = p.conversationId
 
 	if not conversationId or conversationId == "" then
-		v19:warning("conversationId cannot be nil nor an empty string")
-
+		v:warning("conversationId cannot be nil nor an empty string")
 		return nil
 	end
 
-	local v67 = table.clone(t5)
-
-	v67.conversationId = conversationId
-
-	return React.createElement(ConversationFacePileInner, v67)
+	local clone = table.clone(p)
+	clone.conversationId = conversationId
+	return React.createElement(ConversationFacePileInner, clone)
 end
 
 return ConversationFacePile

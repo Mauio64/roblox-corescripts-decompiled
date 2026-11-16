@@ -1,103 +1,89 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
-local v4 = React.createContext(nil)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 
-local function createVoiceSpeakingStore() -- line: 17
-	-- upvalues: Signals (copy)
-	local v7, v8 = Signals.createSignal({})
-	local t1 = {}
-	local t2 = {}
+local React = require(parent.React)
+local Signals = require(parent.Signals)
 
-	local function pruneCache() -- line: 22
-		-- upvalues: t2 (copy), t1 (copy)
-		local elapsed = os.clock()
+local context = React.createContext(nil)
 
-		for v20, v21 in t2 do
-			if elapsed - v21 > 300 then
-				t1[v20] = nil
-				t2[v20] = nil
+local function createVoiceSpeakingStore()
+	local signal, v = Signals.createSignal({})
+	local v2 = {}
+	local v3 = {}
+
+	local function pruneCache() -- 1 equivalent call inferred from this helper
+		local now = os.clock()
+
+		for k, v4 in v3 do
+			if not (now - v4 > 300) then
+				continue
 			end
+
+			v2[k] = nil
+			v3[k] = nil
 		end
 	end
 
 	return {
-		getIsSpeaking = function(s1: string) -- line: 32
-			-- upvalues: t2 (copy), t1 (copy), Signals (copy), v7 (copy)
-			t2[s1] = os.clock()
+		getIsSpeaking = function(p: string)
+			v3[p] = os.clock()
 
-			if not t1[s1] then
-				t1[s1] = Signals.createComputed(function(p1) -- line: 35
-					-- upvalues: v7 (copy), s1 (copy)
-					return v7(p1)[s1] == true
+			if not v2[p] then
+				v2[p] = Signals.createComputed(function(p2): boolean
+					return signal(p2)[p] == true
 				end)
 			end
 
-			return t1[s1]
+			return v2[p]
 		end,
-		setParticipants = function(t3: {[any]: any}) -- line: 43
-			-- upvalues: t2 (copy), t1 (copy), v8 (copy)
-			local elapsed = os.clock()
-
-			for v25, v26 in t2 do
-				if elapsed - v26 > 300 then
-					t1[v25] = nil
-					t2[v25] = nil
-				end
-			end
-
-			v8(t3)
+		setParticipants = function(p)
+			pruneCache() -- inferred equivalent call
+			v(p)
 		end
 	}
 end
-local function buildParticipantsMap(p2) -- line: 54
-	local t4 = {}
 
-	for k, v in pairs(p2) do
-		t4[tostring(k)] = v.isSignalActive == true
+local function buildParticipantsMap(items)
+	local participantsMap = {}
+
+	for k, item in pairs(items) do
+		participantsMap[tostring(k)] = item.isSignalActive == true
 	end
 
-	return t4
+	return participantsMap
 end
 
 return {
-	useVoiceSpeakingStore = function() -- line: 62
-		-- upvalues: React (copy), v4 (copy), createVoiceSpeakingStore (copy), buildParticipantsMap (copy)
-		local v16 = React.useContext(v4)
-		local v17 = React.useRef(nil)
+	useVoiceSpeakingStore = function()
+		local v = React.useContext(context)
 
-		if not v17.current then
-			v17.current = createVoiceSpeakingStore()
+		local ref = React.useRef(nil)
+
+		if not ref.current then
+			ref.current = createVoiceSpeakingStore()
 		end
 
-		local current = v17.current
+		local current = ref.current
 
-		React.useEffect(function() -- line: 71
-			-- upvalues: v16 (copy), current (copy), buildParticipantsMap (copy)
-			if not v16 then
+		React.useEffect(function()
+			if not v then
 				return
 			end
 
-			if v16.participants then
-				current.setParticipants((buildParticipantsMap(v16.participants)))
+			if v.participants then
+				current.setParticipants(buildParticipantsMap(v.participants))
 			end
 
-			local connection = v16.participantsUpdate.Event:Connect(function(p3) -- line: 80
-				-- upvalues: current (copy), buildParticipantsMap (copy)
-				current.setParticipants((buildParticipantsMap(p3)))
+			local eventConnection = v.participantsUpdate.Event:Connect(function(p)
+				current.setParticipants(buildParticipantsMap(p))
 			end)
 
-			return function() -- line: 84
-				-- upvalues: connection (copy)
-				connection:Disconnect()
+			return function()
+				eventConnection:Disconnect()
 			end
-		end, {
-			v16,
-			current.setParticipants
-		})
+		end, { v, current.setParticipants })
 
 		return current
 	end,
 	createVoiceSpeakingStore = createVoiceSpeakingStore,
-	VoiceChatServiceManagerContext = v4
+	VoiceChatServiceManagerContext = context
 }

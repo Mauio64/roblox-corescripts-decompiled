@@ -1,29 +1,32 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Core = ParentParentParent.Core
-local React = require(ParentParentParentParent.React)
-local t = require(ParentParentParentParent.t)
-local Otter = require(ParentParentParentParent.Otter)
-local Cryo = require(ParentParentParentParent.Cryo)
-local RoactGamepad = require(ParentParentParentParent.RoactGamepad)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local core = parent2.Core
+
+local React = require(parent3.React)
+local t = require(parent3.t)
+local Otter = require(parent3.Otter)
+local Cryo = require(parent3.Cryo)
+
+local RoactGamepad = require(parent3.RoactGamepad)
 local Focusable = RoactGamepad.Focusable
+
 local TileSlot = require(script.Parent.TileSlot)
-local useStyle = require(Core.Style.useStyle)
-local CursorKind = require(ParentParent.SelectionImage.CursorKind)
-local useSelectionCursor = require(ParentParent.SelectionImage.useSelectionCursor)
-local t1 = {
-	dampingRatio = 1,
-	frequency = 10
-}
-local v16 = t.strictInterface({
+local useStyle = require(core.Style.useStyle)
+local CursorKind = require(parent.SelectionImage.CursorKind)
+local useSelectionCursor = require(parent.SelectionImage.useSelectionCursor)
+
+local v = { dampingRatio = 1, frequency = 10 }
+
+local strictInterface = t.strictInterface({
 	displayText = t.optional(t.string),
 	thumbnail = t.optional(t.string),
 	isDisabled = t.optional(t.boolean),
 	isLoading = t.optional(t.boolean)
 })
-local v17 = t.strictInterface({
-	slots = t.array(v16),
+
+local strictInterface2 = t.strictInterface({
+	slots = t.array(strictInterface),
 	defaultSelectedSlotIndex = t.optional(t.integer),
 	onChange = t.callback,
 	width = t.optional(t.integer),
@@ -40,134 +43,148 @@ local v17 = t.strictInterface({
 	isRoactGamepadEnabled = t.optional(t.boolean)
 })
 
-local function useScrollingFrameMotor(p1, n1: number?) -- line: 117
-	-- upvalues: React (copy), Otter (copy)
-	local v22 = React.useRef(nil)
+local function useScrollingFrameMotor(p, value: number?)
+	local ref = React.useRef(nil)
 
-	if v22.current == nil then
-		v22.current = Otter.createSingleMotor(n1 or 0)
+	if ref.current == nil then
+		ref.current = Otter.createSingleMotor(value or 0)
 	end
 
-	local current = v22.current
-
-	React.useEffect(function() -- line: 123
-		-- upvalues: current (copy), p1 (copy)
-		current:onStep(function(p2) -- line: 124
-			-- upvalues: p1 (copy)
-			if p1.current ~= nil then
-				p1.current.CanvasPosition = Vector2.new(p2, 0)
+	local current = ref.current
+	React.useEffect(function()
+		current:onStep(function(p2)
+			if p.current ~= nil then
+				p.current.CanvasPosition = Vector2.new(p2, 0)
 			end
 		end)
 
-		return function() -- line: 130
-			-- upvalues: current (copy)
+		return function()
 			current:destroy()
 		end
 	end, {})
 
 	return current
 end
-local function SlotTray(t2: {[any]: any}) -- line: 138
-	-- upvalues: React (copy), RoactGamepad (copy), useScrollingFrameMotor (copy), Otter (copy), t1 (copy), useStyle (copy), useSelectionCursor (copy), CursorKind (copy), v17 (copy), Cryo (copy), Focusable (copy), TileSlot (copy)
-	local v25 = t2.isRoactGamepadEnabled == nil or t2.isRoactGamepadEnabled
-	local v26 = React.useRef({})
-	local v27 = if not v25 then v26.current else RoactGamepad.useRefCache()
-	local u28 = React.useRef(nil)
 
-	if t2.scrollingFrameRef then
-		u28 = t2.scrollingFrameRef
+local function SlotTray(props)
+	local v2 = props.isRoactGamepadEnabled == nil or props.isRoactGamepadEnabled
+	local ref = React.useRef({})
+	local v3
+
+	if v2 then
+		v3 = RoactGamepad.useRefCache()
+	else
+		v3 = ref.current
 	end
 
-	local v29 = t2.width or 360
-	local v30 = useScrollingFrameMotor(u28, 0)
-	local v31, v32 = React.useState(t2.defaultSelectedSlotIndex or 1)
+	local ref2 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 155
-		-- upvalues: u28 (ref), v31 (copy), v27 (copy), v29 (copy), v30 (copy), Otter (copy), t1 (copy)
-		local current = u28.current
+	if props.scrollingFrameRef then
+		ref2 = props.scrollingFrameRef
+	end
 
-		if v31 == 0 or not current then
+	local width = props.width or 360
+
+	local v4 = useScrollingFrameMotor(ref2, 0)
+
+	local state, setState = React.useState(props.defaultSelectedSlotIndex or 1)
+
+	React.useEffect(function()
+		local current = ref2.current
+
+		if state == 0 or not current then
 			return
 		end
 
-		local v40 = v27[v31] and v27[v31].current
+		local current2 = v3[state] and v3[state].current
 
-		if not v40 then
+		if not current2 then
 			return
 		end
 
-		local CanvasPositionX = current.CanvasPosition.X
-		local AbsolutePositionX = current.AbsolutePosition.X
-		local v43 = AbsolutePositionX + v29
-		local AbsolutePositionX2 = v40.AbsolutePosition.X
-		local v45 = AbsolutePositionX2 + 48 + 24 - v43
-		local v46 = AbsolutePositionX2 - 24 - AbsolutePositionX
-		local v47 = CanvasPositionX + v45
-		local v48 = CanvasPositionX + v46
+		local x = current.CanvasPosition.X
+		local x2 = current.AbsolutePosition.X
+		local v5 = x2 + width
 
-		if CanvasPositionX < v47 then
-			v30:setGoal(Otter.spring(v47, t1))
+		local x3 = current2.AbsolutePosition.X
+		local v6 = x3 + 48 + 24 - v5
+		local v7 = x3 - 24 - x2
 
-			return
+		local v8 = x + v6
+		local v9 = x + v7
+
+		if x < v8 then
+			v4:setGoal(Otter.spring(v8, v))
+		elseif v9 < x then
+			v4:setGoal(Otter.spring(v9, v))
+		end
+	end, { state, width, v3, ref2, v4 })
+
+	local onActivated = React.useCallback(function(p)
+		setState(p)
+		props.onChange(p)
+	end, { props.onChange })
+
+	local v5 = #props.slots * 48 + (#props.slots - 1) * 12 + 48
+
+	local v6 = useStyle()
+	local selectionImageObject = useSelectionCursor(CursorKind.RoundedSlot)
+
+	assert(strictInterface2(props))
+	local theme = v6.Theme
+
+	local mapped = Cryo.List.map(props.slots, function(props2, layoutOrder)
+		if not v2 then
+			v3[layoutOrder] = v3[layoutOrder] or React.createRef()
 		end
 
-		if v48 < CanvasPositionX then
-			v30:setGoal(Otter.spring(v48, t1))
-		end
-	end, {
-		v31,
-		v29,
-		v27,
-		u28,
-		v30
-	})
-
-	local v33 = React.useCallback(function(p3) -- line: 187
-		-- upvalues: v32 (copy), t2 (copy)
-		v32(p3)
-		t2.onChange(p3)
-	end, { t2.onChange })
-	local v34 = #t2.slots * 48 + (#t2.slots - 1) * 12 + 48
-	local v35 = useStyle()
-	local v36 = useSelectionCursor(CursorKind.RoundedSlot)
-
-	assert(v17(t2))
-
-	local Theme = v35.Theme
-	local v38 = Cryo.List.map(t2.slots, function(p4, p5) -- line: 200
-		-- upvalues: v25 (copy), v27 (copy), React (copy), Focusable (copy), t2 (copy), v33 (copy), v36 (copy), TileSlot (copy), v31 (copy)
-		if not v25 then
-			v27[p5] = v27[p5] or React.createRef()
-		end
-
-		return React.createElement(not v25 and "Frame" or Focusable.Frame, {
+		local createElement = React.createElement
+		local v7 = not v2 and "Frame" or Focusable.Frame
+		local v8 = {
+			key = "Slot" .. tostring(layoutOrder),
+			LayoutOrder = layoutOrder,
+			Size = UDim2.fromOffset(48, 48),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 2,
-			key = "Slot" .. tostring(p5),
-			LayoutOrder = p5,
-			Size = UDim2.fromOffset(48, 48),
-			ref = v27[p5],
-			NextSelectionRight = p5 < #t2.slots and v27[p5 + 1] or nil,
-			NextSelectionLeft = p5 > 1 and v27[p5 - 1] or nil,
-			onFocusGained = if not v25 then nil else function() -- line: 215
-				-- upvalues: v33 (copy), p5 (copy)
-				v33(p5)
-			end,
-			SelectionImageObject = v36
-		}, {
+			ref = v3[layoutOrder],
+			NextSelectionRight = 0,
+			NextSelectionLeft = 0,
+			onFocusGained = 0,
+			SelectionImageObject = 0
+		}
+		local nextSelectionRight
+
+		if layoutOrder < #props.slots then
+			nextSelectionRight = v3[layoutOrder + 1] or nil
+		end
+
+		v8.NextSelectionRight = nextSelectionRight
+		local nextSelectionLeft
+
+		if layoutOrder > 1 then
+			nextSelectionLeft = v3[layoutOrder - 1] or nil
+		end
+
+		v8.NextSelectionLeft = nextSelectionLeft
+		v8.onFocusGained = v2 and function()
+			onActivated(layoutOrder)
+		end or nil
+
+		v8.SelectionImageObject = selectionImageObject
+		return createElement(v7, v8, {
 			Slot = React.createElement(TileSlot, {
-				isSelected = p5 == v31,
-				displayText = p4.displayText,
-				thumbnail = p4.thumbnail,
-				isLoading = p4.isLoading,
-				isDisabled = p4.isDisabled,
-				index = p5,
-				onActivated = v33
+				isSelected = state == layoutOrder,
+				displayText = props2.displayText,
+				thumbnail = props2.thumbnail,
+				isLoading = props2.isLoading,
+				isDisabled = props2.isDisabled,
+				index = layoutOrder,
+				onActivated = onActivated
 			})
 		})
 	end)
 
-	table.insert(v38, (React.createElement("UIListLayout", {
+	table.insert(mapped, (React.createElement("UIListLayout", {
 		key = "Layout",
 		VerticalAlignment = Enum.VerticalAlignment.Center,
 		FillDirection = Enum.FillDirection.Horizontal,
@@ -176,34 +193,76 @@ local function SlotTray(t2: {[any]: any}) -- line: 138
 		Padding = UDim.new(0, 12)
 	})))
 
-	return React.createElement(not v25 and "ScrollingFrame" or Focusable.ScrollingFrame, {
-		Size = UDim2.fromOffset(v29, 72),
-		CanvasSize = UDim2.new(0, v34, 0, 72),
+	local createElement = React.createElement
+	local v7 = not v2 and "ScrollingFrame" or Focusable.ScrollingFrame
+	local v8 = {
+		["Size"] = nil,
+		["Size"] = nil,
+		["Size"] = nil,
+		["Size"] = nil,
+		Size = UDim2.fromOffset(width, 72),
+		CanvasSize = UDim2.new(0, v5, 0, 72),
 		BackgroundTransparency = 1,
-		ScrollBarImageColor3 = Theme.PlaceHolder.Color,
-		ScrollBarImageTransparency = Theme.PlaceHolder.Transparency,
+		ScrollBarImageColor3 = theme.PlaceHolder.Color,
+		ScrollBarImageTransparency = theme.PlaceHolder.Transparency,
 		ScrollBarThickness = 0,
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
 		ElasticBehavior = Enum.ElasticBehavior.Always,
 		ScrollingDirection = Enum.ScrollingDirection.X,
-		ref = u28,
-		[React.Event.InputBegan] = t2.onInputBegan,
-		[React.Event.InputEnded] = t2.onInputEnded,
-		onFocusChanged = if not v25 then nil else t2.onFocusChanged,
-		inputBindings = if not v25 then nil else t2.inputBindings,
-		NextSelectionDown = t2.NextSelectionDown,
-		NextSelectionUp = t2.NextSelectionUp,
-		NextSelectionLeft = t2.NextSelectionLeft,
-		NextSelectionRight = t2.NextSelectionRight,
-		defaultChild = if not v25 then nil else v27[1],
-		restorePreviousChildFocus = not not v25 or nil
-	}, {
-		SlotContainer = React.createElement("Frame", {
-			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = if not t2.darken then Theme.PlaceHolder.Color else Theme.Overlay.Color,
-			BackgroundTransparency = if not t2.darken then Theme.PlaceHolder.Transparency else Theme.Overlay.Transparency
-		}, v38)
+		ref = ref2,
+		[React.Event.InputBegan] = props.onInputBegan,
+		[React.Event.InputEnded] = props.onInputEnded
+	}
+	local onFocusChanged
+
+	if v2 then
+		onFocusChanged = props.onFocusChanged
+	end
+
+	v8.onFocusChanged = onFocusChanged
+	local inputBindings
+
+	if v2 then
+		inputBindings = props.inputBindings
+	end
+
+	v8.inputBindings = inputBindings
+	v8.NextSelectionDown = props.NextSelectionDown
+	v8.NextSelectionUp = props.NextSelectionUp
+	v8.NextSelectionLeft = props.NextSelectionLeft
+	v8.NextSelectionRight = props.NextSelectionRight
+	local defaultChild
+
+	if v2 then
+		defaultChild = v3[1]
+	end
+
+	v8.defaultChild = defaultChild
+	v8.restorePreviousChildFocus = v2 and true or nil
+
+	local createElement2 = React.createElement
+	local v9 = { Size = UDim2.fromScale(1, 1), BackgroundColor3 = 0, BackgroundTransparency = 0 }
+	local backgroundColor
+
+	if props.darken then
+		backgroundColor = theme.Overlay.Color
+	else
+		backgroundColor = theme.PlaceHolder.Color
+	end
+
+	v9.BackgroundColor3 = backgroundColor
+	local backgroundTransparency
+
+	if props.darken then
+		backgroundTransparency = theme.Overlay.Transparency
+	else
+		backgroundTransparency = theme.PlaceHolder.Transparency
+	end
+
+	v9.BackgroundTransparency = backgroundTransparency
+	return createElement(v7, v8, {
+		SlotContainer = createElement2("Frame", v9, mapped)
 	})
 end
 

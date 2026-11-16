@@ -1,385 +1,601 @@
-local TextChatService = game:GetService("TextChatService")
 local FriendsChat = script:FindFirstAncestor("FriendsChat")
-local FriendsChatParent = FriendsChat.Parent
-local React = require(FriendsChatParent.React)
-local ReactIs = require(FriendsChatParent.ReactIs)
-local Foundation = require(FriendsChatParent.Foundation)
-local Localization = require(FriendsChatParent.Localization)
-local Promise = require(FriendsChatParent.Promise)
+local parent = FriendsChat.Parent
+
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+local ReactOtter = require(parent.ReactOtter)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local Promise = require(parent.Promise)
 local useLocalization = Localization.Hooks.useLocalization
-local AppChat = require(FriendsChatParent.AppChat)
-local FFlagAppChatUseUltimateListConversationList = require(FriendsChatParent.AppChat.FFlagAppChatUseUltimateListConversationList)
-local BidirectionalFlatList = require(FriendsChatParent.VirtualizedList).BidirectionalFlatList
-local useChatPlatform = require(FriendsChatParent.ExpChatIntegration.useChatPlatform)
-local useChatInputBarSettings = require(FriendsChatParent.ExpChatIntegration.useChatInputBarSettings)
-local useInterpolatedClientSettings = require(FriendsChatParent.ExpChatIntegration.useInterpolatedClientSettings)
-local useChatWindowSettings = require(FriendsChatParent.ExpChatIntegration.useChatWindowSettings)
+
+local AppChat = require(parent.AppChat)
+
+local FFlagAppChatUseUltimateListConversationList = require(parent.AppChat.FFlagAppChatUseUltimateListConversationList)
+local useConversationSearch = require(parent.AppChat.useConversationSearch)
+local searchIntroducedConversationIds = require(parent.AppChat.searchIntroducedConversationIds)
+
+local FFlagFriendsChatServerSideConversationSearch = require(FriendsChat.Flags.FFlagFriendsChatServerSideConversationSearch)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFriendsChatConversationListFocusNav = SharedFlags.FFlagFriendsChatConversationListFocusNav
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagExpChatTabShortcutNav = SharedFlags2.FFlagExpChatTabShortcutNav
+local VirtualizedList = require(parent.VirtualizedList)
+local BidirectionalFlatList = VirtualizedList.BidirectionalFlatList
+local useChatPlatform = require(parent.ExpChatIntegration.useChatPlatform)
+local useChatInputBarSettings = require(parent.ExpChatIntegration.useChatInputBarSettings)
+local useInterpolatedClientSettings = require(parent.ExpChatIntegration.useInterpolatedClientSettings)
+local useChatWindowSettings = require(parent.ExpChatIntegration.useChatWindowSettings)
+
 local ExpChatConversationListAdapter = require(script.Parent.ExpChatConversationListAdapter)
+local useFocusConversationList = require(script.Parent.useFocusConversationList)
+local getConversationRowHeight = require(script.Parent.getConversationRowHeight)
+local resolveListState = require(script.Parent.resolveListState)
 local useConversationListPagination = require(script.Parent.useConversationListPagination)
+local useChatWindowReport = require(script.Parent.Parent.Utils.useChatWindowReport)
 local LayoutConstants = require(FriendsChat.LayoutConstants)
+local useChatSearchSession = require(parent.AppChat.useChatSearchSession)
+local useChatSearchResultsTelemetry = require(parent.AppChat.useChatSearchResultsTelemetry)
+local FFlagAppChatSearchSessionTelemetry = require(parent.AppChat.FFlagAppChatSearchSessionTelemetry)
+
 local useFriendsChatLandingTelemetry = require(script.Parent.Parent.Telemetry.ChatLanding.useFriendsChatLandingTelemetry)
-local Button = Foundation.Button
+local getLandingEmptyStateType = require(script.Parent.Parent.Telemetry.ChatLanding.getLandingEmptyStateType)
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
-local FillBehavior = Foundation.Enums.FillBehavior
 local Icon = Foundation.Icon
+local IconButton = Foundation.IconButton
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local InputSize = Foundation.Enums.InputSize
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
 local useTokens = Foundation.Hooks.useTokens
+
 local ConversationListUltimate = AppChat.Components.ChatLanding.ConversationListUltimate
 local ConversationRow = AppChat.Components.ChatLanding.ConversationRow
 local getConversationTitle = ExpChatConversationListAdapter.getConversationTitle
 local useConversationList = AppChat.Hooks.useConversationList
-local v35 = game:DefineFastInt("FriendsChatConversationListAutoscrollToTopThreshold", 33)
-local v36 = game:DefineFastInt("FriendsChatConversationListInitialNumToRender", 8)
-local v37 = game:DefineFastInt("FriendsChatConversationListPaginationThresholdRows", 10)
-local v38 = game:DefineFastInt("FriendsChatConversationListScrollbarThickness", 8)
-local v39 = game:DefineFastInt("FriendsChatConversationListWindowSize", 2)
-local t1 = {
-	NoFriends = "Feature.Chat.Text.NoFriends",
-	SearchPlaceholder = "CommonUI.Controls.Action.Search",
-	Retry = "InGame.CommonUI.Button.Retry",
-	Loading = "Feature.Chat.Label.Loading",
-	TryAgain = "Feature.Chat.Label.TryAgain",
-	NoChatFound = "Feature.Chat.Label.NoChatFound"
+
+local defineFastInt = game:DefineFastInt("FriendsChatConversationListAutoscrollToTopThreshold", 33)
+
+local defineFastInt2 = game:DefineFastInt("FriendsChatConversationListInitialNumToRender", 8)
+
+local defineFastInt3 = game:DefineFastInt("FriendsChatConversationListPaginationThresholdRows", 10)
+
+local defineFastInt4 = game:DefineFastInt("FriendsChatConversationListScrollbarIdleHideMs", 1500)
+
+local defineFastInt5 = game:DefineFastInt("FriendsChatConversationListScrollbarThickness", 8)
+local defineFastInt6 = game:DefineFastInt("FriendsChatConversationListWindowSize", 2)
+local FFlagFriendsChatScaleConversationRowHeight = require(FriendsChat.Flags.FFlagFriendsChatScaleConversationRowHeight)
+local FFlagFriendsChatLandingTelemetryFields = require(FriendsChat.Flags.FFlagFriendsChatLandingTelemetryFields)
+
+local v = not FFlagAppChatUseUltimateListConversationList
+local v2 = defineFastInt4 / 1000
+local v3 = {
+	dampingRatio = 1,
+	frequency = 2,
+	restingVelocityLimit = 0.1,
+	restingPositionLimit = 0.1
 }
 
-local function getColorStyle(p1, p2) -- line: 85
-	return {
-		Color3 = p1,
-		Transparency = p2
-	}
+local v4 = {
+	NoFriends = "Feature.Chat.Text.NoFriends",
+	SearchPlaceholder = "CommonUI.Controls.Action.Search",
+	Loading = "Feature.Chat.Label.Loading",
+	NoChatFound = "Feature.Chat.Label.NoChatFound",
+	SomethingWentWrong = "CommonUI.Messages.Response.SomethingWentWrong"
+}
+
+local function getColorStyle(color3, transparency) -- 3 equivalent calls inferred from this helper
+	return { Color3 = color3, Transparency = transparency }
 end
-local function getTransparencyOrBindingValue(n1: number, p3) -- line: 92
-	-- upvalues: ReactIs (copy)
-	if ReactIs.isBinding(p3) then
-		return p3:map(function(n2: number) -- line: 94
-			-- upvalues: n1 (copy)
-			return n1 + n2 * (1 - n1)
+
+local function getTransparencyOrBindingValue(backgroundTransparency: number, transparencyValue) -- 1 equivalent call inferred from this helper
+	if ReactIs.isBinding(transparencyValue) then
+		return transparencyValue:map(function(p: number)
+			return backgroundTransparency + p * (1 - backgroundTransparency)
 		end)
 	end
 
-	return p3
+	return transparencyValue
 end
-local function getTextTransparency(p4, n3: number) -- line: 102
-	-- upvalues: ReactIs (copy)
-	if ReactIs.isBinding(p4) then
-		return p4:map(function(n4: number) -- line: 104
-			-- upvalues: n3 (copy)
-			return n3 + n4 * (1 - n3)
+
+local function getTextTransparency(textTransparency, transparency: number) -- 1 equivalent call inferred from this helper
+	if ReactIs.isBinding(textTransparency) then
+		return textTransparency:map(function(p: number)
+			return transparency + p * (1 - transparency)
 		end)
 	end
 
-	return n3
+	return transparency
 end
-local function mergeTransparency(n5: number, t2: {[any]: any}) -- line: 112
-	-- upvalues: ReactIs (copy), React (copy)
-	local t3 = {}
-	local u57 = n5
 
-	for _, v59 in t2 do
-		if ReactIs.isBinding(v59) then
-			table.insert(t3, v59)
+local function mergeTransparency(transparency: number, items)
+	local v5 = {}
+
+	for _, item in items do
+		if ReactIs.isBinding(item) then
+			table.insert(v5, item)
 		else
-			u57 += (v59 or 0) * (1 - u57)
+			transparency += (item or 0) * (1 - transparency)
 		end
 	end
 
-	if #t3 == 0 then
-		return u57
+	if #v5 == 0 then
+		return transparency
 	end
 
-	return React.joinBindings(t3):map(function(p5) -- line: 128
-		-- upvalues: u57 (ref)
-		local v141 = u57
+	return React.joinBindings(v5):map(function(items2)
+		local v6 = transparency
 
-		for _, v143 in p5 do
-			v141 += v143 * (1 - v141)
+		for _, item in items2 do
+			v6 += item * (1 - v6)
 		end
 
-		return v141
+		return v6
 	end)
 end
-local function normalizeSearchText(s1: string?) -- line: 137
-	return string.lower(s1 or "")
+
+local function normalizeSearchText(state: string?) -- 1 equivalent call inferred from this helper
+	return string.lower(state or "")
 end
-local function containsSearchText(s2: string?, s3: string) -- line: 141
-	if s3 == "" then
-		return true
+
+local function containsSearchText(value: string?, p: string): boolean
+	return p == "" or string.find(string.lower(value or ""), p, 1, true) ~= nil
+end
+
+local function FriendsChatConversationList(props)
+	local v5 = useTokens()
+	local v6
+
+	if FFlagFriendsChatScaleConversationRowHeight then
+		v6 = useTextSizeOffset()
 	end
 
-	return string.find(string.lower(s2 or ""), s3, 1, true) ~= nil
-end
-local function FriendsChatConversationList(t4: {[any]: any}) -- line: 148
-	-- upvalues: useTokens (copy), useChatPlatform (copy), useChatWindowSettings (copy), React (copy), useLocalization (copy), t1 (copy), useInterpolatedClientSettings (copy), ReactIs (copy), mergeTransparency (copy), useChatInputBarSettings (copy), LayoutConstants (copy), useConversationList (copy), useConversationListPagination (copy), getConversationTitle (copy), useFriendsChatLandingTelemetry (copy), TextChatService (copy), ConversationRow (copy), Promise (copy), FFlagAppChatUseUltimateListConversationList (copy), ConversationListUltimate (copy), BidirectionalFlatList (copy), v38 (copy), v39 (copy), v36 (copy), v37 (copy), v35 (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy), Button (copy), FillBehavior (copy), InputSize (copy), ButtonVariant (copy)
-	local v64 = useTokens()
 	local getTransparencyStore = useChatPlatform().getTransparencyStore
-	local v66 = useChatWindowSettings()
-	local v67 = React.useMemo(function() -- line: 152
-		-- upvalues: v66 (copy)
+	local v7 = useChatWindowSettings()
+	local v8 = React.useMemo(function()
 		return {
-			BackgroundColor3 = v66.ChatWindowBackgroundColor3,
-			BackgroundTransparency = v66.ChatWindowBackgroundTransparency
+			BackgroundColor3 = v7.ChatWindowBackgroundColor3,
+			BackgroundTransparency = v7.ChatWindowBackgroundTransparency
 		}
-	end, { v66 })
-	local v68 = t4.chatWindowSettings or v67
-	local v69 = useLocalization(t1)
-	local v70 = useInterpolatedClientSettings(v68)
-	local BackgroundTransparency = v70.BackgroundTransparency
-	local v72 = v70.BackgroundColor3 or (v70.BackgroundColor or v68.BackgroundColor3)
-	local v73 = t4.transparencyValue or v66.ChatWindowBackgroundTransparency
-	local g137 = nil
-	local v136 = nil
-	local n6
+	end, { v7 })
+	local chatWindowSettings = props.chatWindowSettings or v8
+	local v9 = useLocalization(v4)
+	local v10 = useInterpolatedClientSettings(chatWindowSettings)
+	local backgroundTransparency = v10.BackgroundTransparency
+	local backgroundColor3 = v10.BackgroundColor3 or v10.BackgroundColor or chatWindowSettings.BackgroundColor3
+	local transparencyValue = props.transparencyValue or v7.ChatWindowBackgroundTransparency
+	local groupTransparency
 
-	if t4.transparencyValue == nil then
-		n6 = 0
-	elseif ReactIs.isBinding(v73) then
-		local n7 = 0
-
-		n6 = v73:map(function(n8: number) -- line: 94
-			-- upvalues: n7 (copy)
-			return n7 + n8 * (1 - n7)
+	if props.transparencyValue == nil then
+		groupTransparency = 0
+	elseif ReactIs.isBinding(transparencyValue) then
+		local v11
+		v11 = 0
+		groupTransparency = transparencyValue:map(function(p: number)
+			return v11 + p * (1 - v11)
 		end)
 	else
-		n6 = v73
+		groupTransparency = transparencyValue
 	end
 
-	local v76 = t4.textTransparency or React.createBinding(0)
-	local v77 = mergeTransparency(v64.Color.Content.Default.Transparency, {
-		v76,
-		n6
-	})
-	local v78 = mergeTransparency(v64.Color.Content.Emphasis.Transparency, {
-		v76,
-		n6
-	})
-	local v79 = mergeTransparency(v64.Color.Stroke.Default.Transparency, { n6 })
-	local Size_1200 = v64.Size.Size_1200
-	local Size_1400 = v64.Size.Size_1400
-	local v82 = useChatInputBarSettings()
-	local v83 = ((if not t4.isSpatialUIEnabled or (not v82 or not v82.SpatialPanelTextSize) then (if not v82 then v64.Typography.CaptionMedium.FontSize else v82.TextSize) else v82.SpatialPanelTextSize)) or v64.Typography.CaptionMedium.FontSize
-	local v84 = LayoutConstants.InputBarTopPadding + LayoutConstants.InputBarBottomPadding + LayoutConstants.InputBarTextVerticalPadding + v83
-	local v85, v86 = React.useState("")
-	local v87 = React.useRef(nil)
-	local v88 = t4.visible ~= false
-	local v89 = useConversationList(v88)
-	local v90 = useConversationListPagination(v88, v89.listStatus)
-	local listStatus = v89.listStatus
-	local items = v89.items
-	local v93 = React.useMemo(function() -- line: 199
-		-- upvalues: v85 (copy), items (copy), getConversationTitle (copy)
-		local v145 = v85
-		local v146 = string.lower(v145 or "")
-		local t5 = {}
+	local textTransparency = props.textTransparency or React.createBinding(0)
 
-		for _, v149 in items do
-			local v150 = getConversationTitle(v149) or (v149.title or v149.titleForViewer)
-			local previewContent = v149.previewContent
+	local transparency = mergeTransparency(v5.Color.Content.Default.Transparency, {
+		textTransparency,
+		groupTransparency
+	})
 
-			if v146 == "" or string.find(string.lower(v150 or ""), v146, 1, true) ~= nil or (v146 == "" or string.find(string.lower(previewContent or ""), v146, 1, true) ~= nil) then
-				table.insert(t5, v149)
-			end
+	local textTransparency2 = mergeTransparency(v5.Color.Content.Emphasis.Transparency, {
+		textTransparency,
+		groupTransparency
+	})
+
+	local transparency2 = mergeTransparency(v5.Color.Stroke.Default.Transparency, { groupTransparency })
+	local size_1200 = v5.Size.Size_1200
+
+	local conversationRowHeight = getConversationRowHeight(
+		v5.Size.Size_1400,
+		v6 or 0,
+		FFlagFriendsChatScaleConversationRowHeight
+	)
+
+	local v11 = useChatInputBarSettings()
+	local v12
+
+	if props.isSpatialUIEnabled and v11 and v11.SpatialPanelTextSize then
+		v12 = v11.SpatialPanelTextSize
+	elseif v11 then
+		v12 = v11.TextSize
+	else
+		v12 = v5.Typography.CaptionMedium.FontSize
+	end
+
+	local v13 = v12 or v5.Typography.CaptionMedium.FontSize
+	local v14 = LayoutConstants.InputBarTopPadding + LayoutConstants.InputBarBottomPadding + LayoutConstants.InputBarTextVerticalPadding + v13
+
+	local state, setState = React.useState("")
+	local selectionImageObject
+
+	if FFlagExpChatTabShortcutNav then
+		selectionImageObject = Foundation.Hooks.useCursor(Foundation.Enums.CursorType.RoundedRect)
+	end
+
+	local ref = React.useRef(nil)
+
+	local ref3, v15 = useFocusConversationList(getTransparencyStore)
+
+	local visible = props.visible ~= false
+	local v16 = useConversationList(visible)
+	local v17 = useConversationListPagination(visible, v16.listStatus)
+	local listStatus = v16.listStatus
+	local items = v16.items
+	local items3 = React.useMemo(function()
+		if FFlagFriendsChatServerSideConversationSearch then
+			return items
 		end
 
-		return t5
-	end, {
-		items,
-		v85
-	})
-	local v94 = #items == 0
-	local v95 = listStatus.isFetchingConversations == true and v94
-	local v96 = listStatus.error ~= nil
-	local v97 = v85 ~= ""
-	local v98 = useFriendsChatLandingTelemetry({
+		local searchText = normalizeSearchText(state) -- inferred equivalent call
+		local result = {}
+
+		for _, item in items do
+			local v18 = getConversationTitle(item) or item.title or item.titleForViewer
+			local previewContent = item.previewContent
+
+			if not (searchText == "" or string.find(string.lower(v18 or ""), searchText, 1, true) ~= nil or searchText == "" or string.find(
+				string.lower(previewContent or ""),
+				searchText,
+				1,
+				true
+			) ~= nil) then
+				continue
+			end
+
+			table.insert(result, item)
+		end
+
+		return result
+	end, { items, state })
+	local v18
+
+	if FFlagFriendsChatServerSideConversationSearch then
+		v18 = useConversationSearch(state, visible)
+
+		if FFlagAppChatSearchSessionTelemetry then
+			useChatSearchResultsTelemetry(v18)
+		end
+	end
+
+	if v18 == nil or not v18.isActive then
+		v18 = nil
+	end
+
+	if FFlagFriendsChatServerSideConversationSearch then
+		items3 = items
+	end
+
+	local listState = resolveListState({
+		items = items3,
+		totalCount = #items,
+		isFetching = listStatus.isFetchingConversations == true,
+		hasError = listStatus.error ~= nil,
+		hasFetchedInitialPage = listStatus.hasFetchedInitialPage == true,
+		isFetchingNextPage = listStatus.isFetchingNextPage == true,
+		oldestConversationIsFetched = listStatus.oldestConversationIsFetched == true or listStatus.isExhausted == true,
+		loadNext = v17.loadNext
+	}, v18)
+
+	local items2 = listState.items
+	local shouldOfferRetry = listState.shouldOfferRetry
+	local v19 = state ~= ""
+	local isFiltered
+
+	if FFlagFriendsChatServerSideConversationSearch then
+		isFiltered = v18 ~= nil
+	else
+		isFiltered = v19
+	end
+
+	local emptyStateType
+
+	if FFlagFriendsChatLandingTelemetryFields then
+		emptyStateType = getLandingEmptyStateType(listState, v19)
+	end
+
+	if FFlagAppChatSearchSessionTelemetry then
+		useChatSearchSession(isFiltered and props.visible ~= false, FFlagFriendsChatServerSideConversationSearch)
+	end
+
+	local v20 = useFriendsChatLandingTelemetry({
 		conversations = items,
-		displayedConversations = v93,
-		isFiltered = v97
+		displayedConversations = items2,
+		isFiltered = isFiltered,
+		emptyStateType = emptyStateType
 	})
-	local v99 = v96 and v94
-	local v100 = #v93 == 0 and (listStatus.isFetchingConversations ~= true and (not v94 or (listStatus.hasFetchedInitialPage == true or v99)))
-	local t6 = {
-		searchPlaceholder = v69.SearchPlaceholder,
-		loadingConversations = v69.Loading,
-		loadConversationsError = v69.TryAgain,
-		noLoadedConversationsFound = v69.NoChatFound,
-		noFriends = v69.NoFriends,
-		retry = v69.Retry
+
+	local v21 = {
+		searchPlaceholder = v9.SearchPlaceholder,
+		loadingConversations = v9.Loading,
+		loadConversationsError = v9.SomethingWentWrong,
+		noLoadedConversationsFound = v9.NoChatFound,
+		noFriends = v9.NoFriends
 	}
-	local v102 = if not v95 then if not v99 then if not v100 then nil else if not v94 then t6.noLoadedConversationsFound else t6.noFriends else t6.loadConversationsError else t6.loadingConversations
-	local v103 = React.useCallback(function(p6) -- line: 248
-		-- upvalues: t4 (copy)
-		if t4.onConversationActivated == nil or (p6 == nil or p6.id == nil) then
+	local text
+
+	if listState.isInitialLoading then
+		text = v21.loadingConversations
+	elseif listState.shouldShowBlockingError then
+		text = v21.loadConversationsError
+	elseif listState.shouldShowEmptyState then
+		if listState.hasNoFriends then
+			text = v21.noFriends
+		else
+			text = v21.noLoadedConversationsFound
+		end
+	end
+
+	local onActivated = React.useCallback(function(p)
+		if props.onConversationActivated == nil or p == nil or p.id == nil then
 			return
 		end
 
-		t4.onConversationActivated(p6.id)
-	end, { t4.onConversationActivated })
-	local v104 = React.useCallback(function(p7) -- line: 256
-		-- upvalues: TextChatService (copy), t4 (copy)
-		local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
-
-		if ChatWindowConfiguration and t4.onAbsoluteSizeChanged then
-			t4.onAbsoluteSizeChanged(p7, ChatWindowConfiguration)
+		if FFlagFriendsChatServerSideConversationSearch then
+			searchIntroducedConversationIds.remove(p.id)
 		end
-	end, { t4.onAbsoluteSizeChanged })
-	local v105 = React.useCallback(function(p8) -- line: 263
-		-- upvalues: TextChatService (copy), t4 (copy)
-		local ChatWindowConfiguration = TextChatService:FindFirstChildOfClass("ChatWindowConfiguration")
 
-		if ChatWindowConfiguration and t4.onAbsolutePositionChanged then
-			t4.onAbsolutePositionChanged(p8, ChatWindowConfiguration)
-		end
-	end, { t4.onAbsolutePositionChanged })
-	local v106 = React.useCallback(function() -- line: 270
-		-- upvalues: v98 (copy), getTransparencyStore (copy)
-		v98.fireSearchActivatedEvent()
+		props.onConversationActivated(p.id)
+	end, { props.onConversationActivated })
+
+	local v22 = useChatWindowReport(props.onAbsoluteSizeChanged)
+	local v23 = useChatWindowReport(props.onAbsolutePositionChanged)
+
+	local v24 = React.useCallback(function()
+		v20.fireSearchActivatedEvent()
 		getTransparencyStore(false).setTextboxFocus()
-	end, {
-		getTransparencyStore,
-		v98.fireSearchActivatedEvent
-	})
-	local v107 = React.useCallback(function() -- line: 275
-		-- upvalues: getTransparencyStore (copy)
+	end, { getTransparencyStore, v20.fireSearchActivatedEvent })
+
+	local v25 = React.useCallback(function()
 		getTransparencyStore(false).clearTextboxFocus()
 	end, { getTransparencyStore })
 
-	React.useEffect(function() -- line: 279
-		-- upvalues: getTransparencyStore (copy)
-		return function() -- line: 280
-			-- upvalues: getTransparencyStore (copy)
+	React.useEffect(function()
+		return function()
 			getTransparencyStore(false).clearTextboxFocus()
 		end
 	end, { getTransparencyStore })
+	local scrollBarImageTransparency, v26
 
-	local v108 = React.useCallback(function(_) -- line: 285
-		-- upvalues: getTransparencyStore (copy)
-		getTransparencyStore(false).resetAllTransparency()
-	end, { getTransparencyStore })
-	local v109 = React.useCallback(function(p10) -- line: 290
-		-- upvalues: React (copy), ConversationRow (copy), Size_1400 (copy), v103 (copy), v98 (copy), t4 (copy)
-		local item = p10.item
+	if v then
+		local ref2 = React.useRef(nil)
+		local v27
+		scrollBarImageTransparency, v27 = ReactOtter.useAnimatedBinding(1)
 
-		return React.createElement(ConversationRow, {
-			isWideMode = false,
-			showBackground = false,
-			conversationId = tostring(item.id),
-			entryHeight = Size_1400,
-			onActivated = v103,
-			fireClickEvent = v98.fireConversationClickedEvent,
-			fireImpressionEvent = v98.fireConversationImpressionEvent,
-			localUserId = t4.localUserId
-		})
-	end, {
-		Size_1400,
-		v98.fireConversationClickedEvent,
-		v98.fireConversationImpressionEvent,
-		v103,
-		t4.localUserId
-	})
-	local v110 = React.useCallback(function(_: {[any]: any}?, n9: number) -- line: 312
-		-- upvalues: Size_1400 (copy)
-		return {
-			length = Size_1400,
-			offset = Size_1400 * (n9 - 1),
-			index = n9
-		}
-	end, { Size_1400 })
-	local v111 = React.useCallback(function(_: number, n11: number) -- line: 320
-		-- upvalues: v87 (copy), v90 (copy)
-		local current = v87.current
+		v26 = React.useCallback(function()
+			if ref2.current ~= nil then
+				pcall(task.cancel, ref2.current)
+				ref2.current = nil
+			end
 
-		if current ~= nil and n11 <= current.AbsoluteSize.Y then
-			v90.loadNext()
+			v27(ReactOtter.instant(0))
+
+			ref2.current = task.delay(v2, function()
+				ref2.current = nil
+				v27((ReactOtter.spring(1, v3)))
+			end)
+		end, { v27 })
+
+		React.useEffect(function()
+			return function()
+				if ref2.current ~= nil then
+					pcall(task.cancel, ref2.current)
+					ref2.current = nil
+				end
+			end
+		end, {})
+	else
+		v26 = nil
+	end
+
+	local useCallback = React.useCallback
+	local function fn(_)
+		if v then
+			v26()
 		end
-	end, { v90.loadNext })
-	local v112 = React.useCallback(function() -- line: 327
-		-- upvalues: v90 (copy), Promise (copy)
-		v90.loadNext()
 
+		getTransparencyStore(false).resetAllTransparency()
+	end
+
+	local v27
+
+	if v then
+		v27 = v26
+	end
+
+	local v28 = useCallback(fn, { getTransparencyStore, v27 })
+	local id
+
+	if FFlagFriendsChatConversationListFocusNav and items2[1] ~= nil then
+		id = tostring(items2[1].id)
+	else
+		id = nil
+	end
+
+	local renderItem = React.useCallback(function(p)
+		local id2 = tostring(p.item.id)
+		local createElement = React.createElement
+		local v29 = {
+			conversationId = id2,
+			entryHeight = conversationRowHeight,
+			isWideMode = false,
+			onActivated = onActivated,
+			fireClickEvent = v20.fireConversationClickedEvent,
+			fireImpressionEvent = v20.fireConversationImpressionEvent,
+			showBackground = false,
+			localUserId = props.localUserId,
+			ref = 0
+		}
+		local ref2
+
+		if FFlagFriendsChatConversationListFocusNav and id2 == id then
+			ref2 = v15
+		end
+
+		v29.ref = ref2
+		return createElement(ConversationRow, v29)
+	end, {
+		conversationRowHeight,
+		v20.fireConversationClickedEvent,
+		v20.fireConversationImpressionEvent,
+		onActivated,
+		props.localUserId,
+		id,
+		v15
+	})
+
+	local getItemLayout = React.useCallback(function(_, p: number)
+		return {
+			length = conversationRowHeight,
+			offset = conversationRowHeight * (p - 1),
+			index = p
+		}
+	end, { conversationRowHeight })
+
+	local loadNext = React.useCallback(function()
+		listState.loadNext()
+	end, { listState.loadNext })
+
+	local onContentSizeChange = React.useCallback(function(_: number, p: number)
+		local current = ref.current
+
+		if current ~= nil and p <= current.AbsoluteSize.Y then
+			loadNext()
+		end
+	end, { loadNext })
+
+	local onEndReached = React.useCallback(function()
+		loadNext()
 		return Promise.resolve()
-	end, { v90.loadNext })
-	local v113 = React.useCallback(function(p11) -- line: 332
-		-- upvalues: v86 (copy)
-		v86(p11.Text)
+	end, { loadNext })
+
+	local v29 = React.useCallback(function(p)
+		setState(p.Text)
 	end, {})
-	local v114 = React.useCallback(function() -- line: 336
-		-- upvalues: v86 (copy)
-		v86("")
+
+	local onActivated2 = React.useCallback(function()
+		setState("")
 	end, {})
-	local v115 = if not FFlagAppChatUseUltimateListConversationList then React.createElement(BidirectionalFlatList, {
-		enableAutoscrollToTop = true,
-		data = v93,
-		renderItem = v109,
-		getItemLayout = v110,
-		keyExtractor = function(p12) -- line: 367
-			return (tostring(p12.id))
-		end,
-		compareItemData = function(p13, p14) -- line: 370
-			return p13.id == p14.id
-		end,
-		style = {
+
+	local isLoadingNextPage = listState.isLoadingNextPage
+	local oldestConversationIsFetched = listState.oldestConversationIsFetched
+	local listKey
+
+	if FFlagFriendsChatServerSideConversationSearch then
+		listKey = listState.listKey
+	end
+
+	local list
+
+	if FFlagAppChatUseUltimateListConversationList then
+		list = React.createElement(ConversationListUltimate, {
+			key = listKey,
+			Size = UDim2.fromScale(1, 1),
+			entryHeight = conversationRowHeight,
+			itemList = items2,
+			loadNext = loadNext,
+			isLoadingNext = isLoadingNextPage,
+			oldestConversationIsFetched = oldestConversationIsFetched,
+			isWideMode = false,
+			showScrollbarOnScroll = true,
+			onScrollUpdate = v28,
+			rowProps = { showBackground = false, localUserId = props.localUserId },
+			localUserId = props.localUserId,
+			showHeaderEntries = false,
+			shouldLogHeaderEntryExposures = false,
+			onActivated = onActivated,
+			fireConversationClickedEvent = v20.fireConversationClickedEvent,
+			fireConversationImpressionEvent = v20.fireConversationImpressionEvent
+		})
+	else
+		local createElement = React.createElement
+		local v30 = {
+			key = listKey,
+			data = items2,
+			renderItem = renderItem,
+			getItemLayout = getItemLayout,
+			keyExtractor = function(p)
+				return (tostring(p.id))
+			end,
+			compareItemData = function(p, p2): boolean
+				return p.id == p2.id
+			end,
+			style = 0,
+			contentContainerStyle = 0,
+			windowSize = 0,
+			initialNumToRender = 0,
+			onScroll = 0,
+			onContentSizeChange = 0,
+			onEndReached = 0,
+			onEndReachedThreshold = 0,
+			AutomaticCanvasSize = 0,
+			CanvasSize = 0,
+			autoscrollToTopThreshold = 0,
+			enableAutoscrollToTop = true
+		}
+
+		if not v then
+			scrollBarImageTransparency = nil
+		end
+
+		v30.style = {
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Selectable = false,
-			ScrollBarThickness = v38
-		},
-		contentContainerStyle = {
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0
-		},
-		windowSize = v39,
-		initialNumToRender = v36,
-		onScroll = v108,
-		onContentSizeChange = v111,
-		onEndReached = v112,
-		onEndReachedThreshold = Size_1400 * v37,
-		AutomaticCanvasSize = Enum.AutomaticSize.XY,
-		CanvasSize = UDim2.fromScale(0, 0),
-		autoscrollToTopThreshold = v35
-	}) else React.createElement(ConversationListUltimate, {
-		isWideMode = false,
-		showScrollbarOnScroll = true,
-		showHeaderEntries = false,
-		shouldLogHeaderEntryExposures = false,
-		Size = UDim2.fromScale(1, 1),
-		entryHeight = Size_1400,
-		itemList = v93,
-		loadNext = v90.loadNext,
-		isLoadingNext = listStatus.isFetchingNextPage == true,
-		oldestConversationIsFetched = listStatus.oldestConversationIsFetched == true or listStatus.isExhausted == true,
-		onScrollUpdate = v108,
-		rowProps = {
-			showBackground = false,
-			localUserId = t4.localUserId
-		},
-		localUserId = t4.localUserId,
-		onActivated = v103,
-		fireConversationClickedEvent = v98.fireConversationClickedEvent,
-		fireConversationImpressionEvent = v98.fireConversationImpressionEvent
-	})
+			ScrollBarImageTransparency = scrollBarImageTransparency,
+			ScrollBarThickness = defineFastInt5,
+			Selectable = false
+		}
+
+		v30.contentContainerStyle = { BackgroundTransparency = 1, BorderSizePixel = 0 }
+
+		v30.windowSize = defineFastInt6
+		v30.initialNumToRender = defineFastInt2
+		v30.onScroll = v28
+		v30.onContentSizeChange = onContentSizeChange
+		v30.onEndReached = onEndReached
+		v30.onEndReachedThreshold = conversationRowHeight * defineFastInt3
+		v30.AutomaticCanvasSize = Enum.AutomaticSize.XY
+		v30.CanvasSize = UDim2.fromScale(0, 0)
+		v30.autoscrollToTopThreshold = defineFastInt
+		list = createElement(BidirectionalFlatList, v30)
+	end
+
 	local createElement = React.createElement
-	local t8 = {
+	transparencyValue = getTransparencyOrBindingValue(backgroundTransparency, transparencyValue) -- inferred equivalent call
+	local v30 = {
 		Name = "chatWindow",
 		Active = true,
-		BackgroundColor3 = v72,
-		BackgroundTransparency = if not ReactIs.isBinding(v73) then v73 else v73:map(function(n12: number) -- line: 94
-			-- upvalues: BackgroundTransparency (copy)
-			return BackgroundTransparency + n12 * (1 - BackgroundTransparency)
-		end),
+		BackgroundColor3 = backgroundColor3,
+		BackgroundTransparency = transparencyValue,
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
-		LayoutOrder = t4.LayoutOrder or 1,
-		Size = t4.size or UDim2.new(1, 0, 1, LayoutConstants.PanelTopSpacerHeight + v84 + LayoutConstants.PanelBottomCornerRadius),
-		Visible = v88,
-		[React.Change.AbsoluteSize] = v104,
-		[React.Change.AbsolutePosition] = v105,
-		[React.Event.MouseEnter] = t4.onHovered,
-		[React.Event.MouseLeave] = t4.onUnhovered
+		LayoutOrder = props.LayoutOrder or 1,
+		Size = props.size or UDim2.new(
+			1,
+			0,
+			1,
+			LayoutConstants.PanelTopSpacerHeight + v14 + LayoutConstants.PanelBottomCornerRadius
+		),
+		Visible = visible,
+		ref = ref3,
+		[React.Change.AbsoluteSize] = v22,
+		[React.Change.AbsolutePosition] = v23,
+		[React.Event.MouseEnter] = props.onHovered,
+		[React.Event.MouseLeave] = props.onUnhovered
 	}
-	local t9 = {
+	local children = {
 		bottomCorner = React.createElement("UICorner", {
 			BottomLeftRadius = UDim.new(0, LayoutConstants.PanelBottomCornerRadius),
 			BottomRightRadius = UDim.new(0, LayoutConstants.PanelBottomCornerRadius),
@@ -391,166 +607,181 @@ local function FriendsChatConversationList(t4: {[any]: any}) -- line: 148
 			Padding = UDim.new(0, 0),
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		SearchContainer = React.createElement(View, {
-			Name = "SearchContainer",
-			tag = "padding-small",
-			BorderSizePixel = 0,
-			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, Size_1200)
-		}, {
-			SearchContent = React.createElement("Frame", {
-				Name = "SearchContent",
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Position = UDim2.fromOffset(-1, -1),
-				Size = UDim2.new(1, 2, 1, 2)
-			}, {
-				SearchField = React.createElement(View, {
-					Name = "SearchField",
-					tag = "row align-y-center items-center gap-small padding-x-medium radius-circle clip",
-					BackgroundTransparency = 1,
-					Position = UDim2.fromOffset(1, 1),
-					Size = UDim2.new(1, -2, 0, v64.Size.Size_800),
-					stroke = {
-						Color = v64.Color.Stroke.Default.Color3,
-						Transparency = v79,
-						Thickness = v64.Stroke.Standard
-					}
-				}, {
-					SearchIcon = React.createElement(Icon, {
-						LayoutOrder = 1,
-						name = IconName.MagnifyingGlass,
-						size = IconSize.Small,
-						style = {
-							Color3 = v64.Color.Content.Default.Color3,
-							Transparency = v77
-						}
-					}),
-					SearchBox = React.createElement("TextBox", {
-						Name = "FriendsChatConversationListSearchBox",
-						BackgroundTransparency = 1,
-						ClearTextOnFocus = false,
-						ClipsDescendants = true,
-						Font = v64.Typography.BodySmall.Font,
-						LineHeight = v64.Typography.BodySmall.LineHeight,
-						LayoutOrder = 2,
-						PlaceholderColor3 = v64.Color.Content.Muted.Color3,
-						PlaceholderText = t6.searchPlaceholder,
-						Size = UDim2.new(0, 0, 1, 0),
-						Text = v85,
-						TextColor3 = v64.Color.Content.Emphasis.Color3,
-						TextSize = v64.Typography.BodySmall.FontSize,
-						TextTransparency = v78,
-						TextXAlignment = Enum.TextXAlignment.Left,
-						TextYAlignment = Enum.TextYAlignment.Center,
-						[React.Event.Focused] = v106,
-						[React.Event.FocusLost] = v107,
-						[React.Change.Text] = v113
-					}, {
-						Flex = React.createElement("UIFlexItem", {
-							FlexMode = Enum.UIFlexMode.Fill
-						})
-					}),
-					ClearButton = if not v97 then nil else React.createElement(View, {
-						Name = "FriendsChatConversationListSearchClear",
-						LayoutOrder = 3,
-						tag = "auto-xy",
-						onActivated = v114
-					}, {
-						Icon = React.createElement(Icon, {
-							name = IconName.CircleX,
-							size = IconSize.Small,
-							style = {
-								Color3 = v64.Color.Content.Default.Color3,
-								Transparency = v77
-							}
-						})
-					})
-				})
-			})
-		})
+		SearchContainer = 0,
+		ListArea = 0
 	}
+
 	local createElement2 = React.createElement
-	local v120 = View
-	local t10 = {
+	local v31 = {
+		Name = "SearchContainer",
+		tag = "padding-small",
+		BorderSizePixel = 0,
+		LayoutOrder = 1,
+		Size = UDim2.new(1, 0, 0, size_1200)
+	}
+
+	local createElement3 = React.createElement
+	local v32 = {
+		Name = "SearchContent",
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Position = UDim2.fromOffset(-1, -1),
+		Size = UDim2.new(1, 2, 1, 2)
+	}
+
+	local createElement4 = React.createElement
+	local v58 = {
+		Name = "SearchField",
+		tag = "row align-y-center items-center gap-small padding-x-medium radius-circle clip",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(1, 1),
+		Size = UDim2.new(1, -2, 0, v5.Size.Size_800),
+		stroke = {
+			Color = v5.Color.Stroke.Default.Color3,
+			Transparency = transparency2,
+			Thickness = v5.Stroke.Standard
+		}
+	}
+
+	local v59 = {
+		SearchIcon = React.createElement(Icon, {
+			LayoutOrder = 1,
+			name = IconName.MagnifyingGlass,
+			size = IconSize.Small,
+			style = getColorStyle(v5.Color.Content.Default.Color3, transparency) -- inferred equivalent call
+		}),
+		SearchBox = 0,
+		ClearButton = 0
+	}
+
+	local createElement5 = React.createElement
+	local font
+
+	if not FoundationFontFaceMigration then
+		font = v5.Typography.BodySmall.Font
+	end
+
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v5.Typography.BodySmall.Font)
+	end
+
+	v59.SearchBox = createElement5("TextBox", {
+		Name = "FriendsChatConversationListSearchBox",
+		BackgroundTransparency = 1,
+		SelectionImageObject = selectionImageObject,
+		ClearTextOnFocus = false,
+		ClipsDescendants = true,
+		Font = font,
+		FontFace = fontFace,
+		LineHeight = v5.Typography.BodySmall.LineHeight,
+		LayoutOrder = 2,
+		PlaceholderColor3 = v5.Color.Content.Muted.Color3,
+		PlaceholderText = v21.searchPlaceholder,
+		Size = UDim2.new(0, 0, 1, 0),
+		Text = state,
+		TextColor3 = v5.Color.Content.Emphasis.Color3,
+		TextSize = v5.Typography.BodySmall.FontSize,
+		TextTransparency = textTransparency2,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = Enum.TextYAlignment.Center,
+		[React.Event.Focused] = v24,
+		[React.Event.FocusLost] = v25,
+		[React.Change.Text] = v29
+	}, {
+		Flex = React.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
+	})
+	local clearButton
+
+	if v19 then
+		clearButton = React.createElement(
+			View,
+			{
+				Name = "FriendsChatConversationListSearchClear",
+				LayoutOrder = 3,
+				tag = "auto-xy",
+				onActivated = onActivated2
+			},
+			{
+				Icon = React.createElement(Icon, {
+					name = IconName.CircleX,
+					size = IconSize.Small,
+					style = getColorStyle(v5.Color.Content.Default.Color3, transparency) -- inferred equivalent call
+				})
+			}
+		)
+	end
+
+	v59.ClearButton = clearButton
+	children.SearchContainer = createElement2(View, v31, {
+		SearchContent = createElement3("Frame", v32, {
+			SearchField = createElement4(View, v58, v59)
+		})
+	})
+
+	local createElement6 = React.createElement
+	local v65 = {
 		Name = "ListArea",
 		BorderSizePixel = 0,
 		LayoutOrder = 2,
-		Size = UDim2.new(1, 0, 1, -Size_1200)
+		Size = UDim2.new(1, 0, 1, -size_1200)
 	}
-	local t11 = {}
-	local createElement3 = React.createElement
-	local t12 = {
+
+	local createElement7 = React.createElement
+	local v68 = {
 		Name = "ListContent",
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		GroupTransparency = n6,
+		GroupTransparency = groupTransparency,
 		Size = UDim2.fromScale(1, 1)
 	}
-	local t13 = {
+	local v69 = {
 		ListWrapper = React.createElement("Frame", {
 			Name = "FriendsChatConversationListWrapper",
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 1,
 			Size = UDim2.fromScale(1, 1),
-			ref = v87
-		}, {
-			List = v115
-		})
+			ref = ref
+		}, { List = list }),
+		Status = 0
 	}
+	local status
 
-	if v102 ~= nil then
-		local createElement4 = React.createElement
-		local v127 = View
-		local t14 = {
-			tag = "col align-x-center align-y-center gap-small size-full padding-large",
-			BorderSizePixel = 0,
-			LayoutOrder = 2
-		}
-		local t15 = {}
-		local createElement5 = React.createElement
-		local v131 = FoundationText
-		local t16 = {
-			tag = "size-full-0 auto-y text-wrap text-body-medium text-align-x-center content-default",
-			Text = v102
-		}
-		local DefaultColor3 = v64.Color.Content.Default.Color3
-		local DefaultTransparency = v64.Color.Content.Default.Transparency
-		local v135 = if not ReactIs.isBinding(v76) then DefaultTransparency else v76:map(function(n13: number) -- line: 104
-			-- upvalues: DefaultTransparency (copy)
-			return DefaultTransparency + n13 * (1 - DefaultTransparency)
-		end)
-
-		t16.textStyle = {
-			Color3 = DefaultColor3,
-			Transparency = v135
-		}
-		t15.Message = createElement5(v131, t16)
-		t15.Retry = v99 and React.createElement(Button, {
-			fillBehavior = FillBehavior.Fit,
-			onActivated = v90.retryInitialFetch,
-			size = InputSize.Small,
-			text = t6.retry,
-			variant = ButtonVariant.Standard
-		}) or nil
-		v136 = createElement4(v127, t14, t15)
-
-		if v136 then
-			g137 = true
-		end
+	if text ~= nil then
+		status = React.createElement(
+				View,
+				{
+					tag = "col align-x-center align-y-center gap-small size-full padding-large",
+					BorderSizePixel = 0,
+					LayoutOrder = 2
+				},
+				{
+					Message = React.createElement(Text, {
+						tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-center content-default",
+						Text = text,
+						textStyle = getColorStyle( -- inferred equivalent call
+							v5.Color.Content.Default.Color3,
+							getTextTransparency(textTransparency, v5.Color.Content.Default.Transparency) -- inferred equivalent call
+						)
+					}),
+					Retry = shouldOfferRetry and React.createElement(IconButton, {
+						icon = IconName.ArrowSpinClockwise,
+						onActivated = v17.retryInitialFetch,
+						size = InputSize.Small,
+						variant = ButtonVariant.Standard
+					}) or nil
+				}
+			)
+			or nil
 	end
 
-	if not g137 then
-		v136 = nil
-	end
-
-	g137 = false
-	t13.Status = v136
-	t11.ListContent = createElement3("CanvasGroup", t12, t13)
-	t9.ListArea = createElement2(v120, t10, t11)
-
-	return (createElement("Frame", t8, t9))
+	v69.Status = status
+	children.ListArea = createElement6(View, v65, {
+		ListContent = createElement7("CanvasGroup", v68, v69)
+	})
+	return (createElement("Frame", v30, children))
 end
 
 return React.memo(FriendsChatConversationList)

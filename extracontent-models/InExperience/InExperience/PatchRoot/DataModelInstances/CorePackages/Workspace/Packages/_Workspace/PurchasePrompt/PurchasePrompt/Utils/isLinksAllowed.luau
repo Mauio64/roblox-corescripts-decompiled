@@ -1,19 +1,19 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local UserInputService = game:GetService("UserInputService")
-local UpsellFlow = require(ParentParent.Enums.UpsellFlow)
-local getUpsellFlow = require(ParentParent.NativeUpsell.getUpsellFlow)
-local getAppFeaturePolicies = require(ParentParentParent.UniversalAppPolicy).getAppFeaturePolicies
-local FFlagEnableUnifiedProductPurchaseFlow = require(ParentParentParent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
 
-return function() -- line: 12
-	-- upvalues: UserInputService (copy), getUpsellFlow (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), getAppFeaturePolicies (copy), UpsellFlow (copy)
-	local Platform = UserInputService:GetPlatform()
-	local v9 = getUpsellFlow(Platform)
+local UpsellFlow = require(parent.Enums.UpsellFlow)
+local getUpsellFlow = require(parent.NativeUpsell.getUpsellFlow)
+local UniversalAppPolicy = require(parent2.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
 
-	if FFlagEnableUnifiedProductPurchaseFlow and getAppFeaturePolicies().getShouldUseDMCCALegalDisclosureInApp() then
+return function(): boolean
+	local upsellFlow = getUpsellFlow((UserInputService:GetPlatform()))
+
+	if getAppFeaturePolicies().getShouldUseDMCCALegalDisclosureInApp() then
 		return true
 	end
 
-	return v9 == UpsellFlow.Web
+	return upsellFlow == UpsellFlow.Web
 end

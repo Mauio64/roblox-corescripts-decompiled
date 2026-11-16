@@ -1,3 +1,1 @@
-return {
-	installReducer = require(script.installReducer)
-}
+return { installReducer = require(script.installReducer) }

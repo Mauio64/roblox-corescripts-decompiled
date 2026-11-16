@@ -1,143 +1,142 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
-local React = require(EditProfileParent.React)
-local Foundation = require(EditProfileParent.Foundation)
+local parent = EditProfile.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local TextInput = Foundation.TextInput
 local IconName = Foundation.Enums.IconName
+
 local TextKeys = require(EditProfile.Common.TextKeys)
-local useLocalization = require(EditProfileParent.Localization).Hooks.useLocalization
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local Constants = require(EditProfile.Common.Constants)
 local useDisplayNameText = require(EditProfile.Hooks.useDisplayNameText)
-local LuauPolyfill = require(EditProfileParent.LuauPolyfill)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local clearTimeout = LuauPolyfill.clearTimeout
 local setTimeout = LuauPolyfill.setTimeout
 local AnalyticsServiceV2 = require(EditProfile.Analytics.AnalyticsServiceV2)
-local v17 = game:DefineFastInt("MaxDisplayNameCharacters", 20)
-local v18 = game:DefineFastInt("MinDisplayNameCharacters", 3)
-local v19 = game:DefineFastInt("DisplayNameValidationNetworkDelay", 500)
 
-return function(t1: {[any]: any}) -- line: 33
-	-- upvalues: useLocalization (copy), TextKeys (copy), useDisplayNameText (copy), React (copy), setTimeout (copy), v19 (copy), Constants (copy), clearTimeout (copy), v18 (copy), AnalyticsServiceV2 (copy), v17 (copy), View (copy), FoundationText (copy), TextInput (copy), IconName (copy)
-	local v21 = useLocalization({
-		DisplayNameCaption = TextKeys.DisplayNameCaption
-	})
-	local v22 = useDisplayNameText()
-	local v23, v24 = React.useState(t1.initialDisplayName)
-	local v25, v26 = React.useState(false)
-	local v27, v28 = React.useState(v22.displayNameChangeError)
-	local v29, v30 = React.useState(false)
-	local v31 = React.useRef(setTimeout(function() -- line: 42
-	end, v19))
+local defineFastInt = game:DefineFastInt("MaxDisplayNameCharacters", 20)
+local defineFastInt2 = game:DefineFastInt("MinDisplayNameCharacters", 3)
+local defineFastInt3 = game:DefineFastInt("DisplayNameValidationNetworkDelay", 500)
 
-	React.useEffect(function() -- line: 44
-		-- upvalues: t1 (copy), v25 (copy), v29 (copy)
-		if t1.updateErrorState then
-			t1.updateErrorState(v25 or v29)
+return function(props)
+	local v = useLocalization({ DisplayNameCaption = TextKeys.DisplayNameCaption })
+
+	local v2 = useDisplayNameText()
+	local state, setState = React.useState(props.initialDisplayName)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(v2.displayNameChangeError)
+	local state4, setState4 = React.useState(false)
+	local ref = React.useRef(setTimeout(function() end, defineFastInt3))
+
+	React.useEffect(function()
+		if props.updateErrorState then
+			props.updateErrorState(state2 or state4)
 		end
-	end, {
-		v25,
-		v29
-	})
-	React.useEffect(function() -- line: 50
-		-- upvalues: v24 (copy), t1 (copy)
-		v24(t1.initialDisplayName)
-	end, { t1.initialDisplayName })
+	end, { state2, state4 })
 
-	local function getErrorMessage(n1: number) -- line: 54
-		-- upvalues: Constants (copy), v22 (copy)
+	React.useEffect(function()
+		setState(props.initialDisplayName)
+	end, { props.initialDisplayName })
+
+	local function getErrorMessage(p: number)
 		return ({
-			[Constants.DisplayNameValidationErrorCodes.TooShort] = v22.nameTooShortError,
-			[Constants.DisplayNameValidationErrorCodes.TooLong] = v22.nameTooLongError,
-			[Constants.DisplayNameValidationErrorCodes.InvalidCharacters] = v22.nameUnsupportedCharsError,
-			[Constants.DisplayNameValidationErrorCodes.Moderated] = v22.nameInappropriateError,
-			[Constants.DisplayNameValidationErrorCodes.Throttled] = v22.nameHasChangedError,
-			[Constants.DisplayNameValidationErrorCodes.InvalidCharacterSetCombination] = v22.displayNameChangeMixedCharactersError,
-			[Constants.DisplayNameValidationErrorCodes.NameNotAvailable] = v22.nameNotAvailableError
-		})[n1] or v22.displayNameChangeError
-	end
-	local function textChanged(s1: string) -- line: 67
-		-- upvalues: clearTimeout (copy), v31 (copy), v24 (copy), v26 (copy), v30 (copy), v18 (copy), AnalyticsServiceV2 (copy), v28 (copy), v22 (copy), v17 (copy), setTimeout (copy), t1 (copy), getErrorMessage (copy), v19 (copy)
-		clearTimeout(v31.current)
-
-		local u36 = s1 or ""
-		local v37 = utf8.len(u36) or 0
-
-		v24(u36)
-		v26(false)
-		v30(false)
-
-		if v37 < v18 then
-			AnalyticsServiceV2.sendDisplayNameTooShort(u36)
-			v28(v22.nameTooShortError)
-			v26(true)
-
-			return
-		end
-
-		if v37 > v17 then
-			v28(v22.nameTooLongError)
-			v26(true)
-
-			return
-		end
-
-		v30(true)
-		v31.current = setTimeout(function() -- line: 88
-			-- upvalues: t1 (copy), u36 (ref), v26 (copy), v30 (copy), AnalyticsServiceV2 (copy), v28 (copy), getErrorMessage (copy)
-			t1.validateDisplayName(u36):andThen(function(_) -- line: 91
-				-- upvalues: v26 (copy), v30 (copy), t1 (copy), u36 (ref)
-				v26(false)
-				v30(false)
-				t1.onDataChange(u36)
-			end):catch(function(p2) -- line: 96
-				-- upvalues: AnalyticsServiceV2 (copy), u36 (ref), v28 (copy), getErrorMessage (copy), v26 (copy), v30 (copy)
-				local n2 = -1
-
-				if p2 and (p2.errors and p2.errors[1]) then
-					n2 = p2.errors[1].code or -1
-				end
-
-				AnalyticsServiceV2.sendFilteredDisplayName(u36)
-				v28((getErrorMessage(n2)))
-				v26(true)
-				v30(false)
-			end)
-		end, v19)
+			[Constants.DisplayNameValidationErrorCodes.TooShort] = v2.nameTooShortError,
+			[Constants.DisplayNameValidationErrorCodes.TooLong] = v2.nameTooLongError,
+			[Constants.DisplayNameValidationErrorCodes.InvalidCharacters] = v2.nameUnsupportedCharsError,
+			[Constants.DisplayNameValidationErrorCodes.Moderated] = v2.nameInappropriateError,
+			[Constants.DisplayNameValidationErrorCodes.Throttled] = v2.nameHasChangedError,
+			[Constants.DisplayNameValidationErrorCodes.InvalidCharacterSetCombination] = v2.displayNameChangeMixedCharactersError,
+			[Constants.DisplayNameValidationErrorCodes.NameNotAvailable] = v2.nameNotAvailableError
+		})[p] or v2.displayNameChangeError
 	end
 
-	return React.createElement(View, {
+	local function textChanged(value: string)
+		clearTimeout(ref.current)
+		local v3 = value or ""
+		local v4 = utf8.len(v3) or 0
+
+		setState(v3)
+		setState2(false)
+		setState4(false)
+
+		if v4 < defineFastInt2 then
+			AnalyticsServiceV2.sendDisplayNameTooShort(v3)
+			setState3(v2.nameTooShortError)
+			setState2(true)
+		elseif defineFastInt < v4 then
+			setState3(v2.nameTooLongError)
+			setState2(true)
+		else
+			setState4(true)
+			ref.current = setTimeout(function()
+				props.validateDisplayName(v3):andThen(function(_)
+					setState2(false)
+					setState4(false)
+					props.onDataChange(v3)
+				end):catch(function(p)
+					local v5 = -1
+					v5 = p and p.errors and p.errors[1] and (p.errors[1].code or -1) or v5
+
+					AnalyticsServiceV2.sendFilteredDisplayName(v3)
+					setState3(getErrorMessage(v5))
+					setState2(true)
+					setState4(false)
+				end)
+			end, defineFastInt3)
+		end
+	end
+
+	local createElement = React.createElement
+	local v3 = {
 		tag = "auto-y col gap-medium bg-transparent",
 		LayoutOrder = 1,
 		Size = UDim2.new(1, 0, 0, 0)
-	}, {
-		Caption = React.createElement(FoundationText, {
+	}
+	local v4 = {
+		Caption = React.createElement(Text, {
 			LayoutOrder = 1,
-			tag = "text-body-medium text-wrap size-full-0 auto-y text-align-x-left",
-			Text = v21.DisplayNameCaption
+			Text = v.DisplayNameCaption,
+			tag = "text-body-medium text-wrap size-full-0 auto-y text-align-x-left"
 		}),
-		DisplayNameInput = React.createElement(TextInput, {
-			LayoutOrder = 2,
-			label = "",
-			tag = "text-body-medium text-wrap size-full-0 auto-y text-align-x-left",
-			text = v23,
-			width = UDim.new(1, 0),
-			placeholder = t1.initialDisplayName,
-			hint = if not v25 then string.format("%d/%d", utf8.len(v23 or "") or 0, v17) else v27,
-			onChanged = function(s2: string) -- line: 131
-				-- upvalues: textChanged (copy)
-				textChanged(s2)
-			end,
-			hasError = v25,
-			iconTrailing = if not v23 or not (#v23 > 0) then nil else {
-				name = IconName.CircleX,
-				onActivated = function() -- line: 138
-					-- upvalues: textChanged (copy)
-					textChanged("")
-				end
-			},
-			textBoxRef = t1.textBoxRef
-		})
-	})
+		DisplayNameInput = 0
+	}
+
+	local createElement2 = React.createElement
+	local v5 = {
+		text = state,
+		LayoutOrder = 2,
+		label = "",
+		tag = "text-body-medium text-wrap size-full-0 auto-y text-align-x-left",
+		width = UDim.new(1, 0),
+		placeholder = props.initialDisplayName,
+		hint = 0,
+		onChanged = 0,
+		hasError = 0,
+		iconTrailing = 0,
+		textBoxRef = 0
+	}
+
+	if not state2 then
+		state3 = string.format("%d/%d", utf8.len(state or "") or 0, defineFastInt)
+	end
+
+	v5.hint = state3
+
+	function v5.onChanged(p: string)
+		textChanged(p)
+	end
+	v5.hasError = state2
+	v5.iconTrailing = state and #state > 0 and {
+		name = IconName.CircleX,
+		onActivated = function()
+			textChanged("")
+		end
+	} or nil
+
+	v5.textBoxRef = props.textBoxRef
+	v4.DisplayNameInput = createElement2(TextInput, v5)
+	return createElement(View, v3, v4)
 end

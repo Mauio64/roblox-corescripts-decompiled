@@ -1,139 +1,230 @@
 local LocalizationService = game:GetService("LocalizationService")
 local AppStorageService = game:GetService("AppStorageService")
-local ParentParent = script.Parent.Parent
-local NotificationModalsManager = require(ParentParent.NotificationModalsManager)
-local default = require(ParentParent.PermissionsProtocol).PermissionsProtocol.default
-local default2 = require(ParentParent.LoggingProtocol).default
-local Localization = require(ParentParent.RobloxAppLocales).Localization
-local sendEventDeferred = require(ParentParent.NotificationsCommon).sendEventDeferred
+
+local parent = script.Parent.Parent
+local NotificationModalsManager = require(parent.NotificationModalsManager)
+local PermissionsProtocol = require(parent.PermissionsProtocol)
+local default = PermissionsProtocol.PermissionsProtocol.default
+local LoggingProtocol = require(parent.LoggingProtocol)
+local default2 = LoggingProtocol.default
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local Localization = RobloxAppLocales.Localization
+local NotificationsCommon = require(parent.NotificationsCommon)
+local sendEventDeferred = NotificationsCommon.sendEventDeferred
+
 local PushNotificationsUpsellModal = require(script.Parent.Components.PushNotificationsUpsellModal)
 local NotificationsUpsellConstants = require(script.Parent.NotificationsUpsellConstants)
 local ModalEventConstants = require(script.Parent.Analytics.ModalEventConstants)
 local PushUpsellEventName = require(script.Parent.Analytics.RobloxTelemetryConfigs.PushUpsellEventName)
+
 local PushNotificationsUpsellUtils = require(script.Parent.Util.PushNotificationsUpsellUtils)
-local Promise = require(ParentParent.Promise)
-local getAppFeaturePolicies = require(ParentParent.UniversalAppPolicy).getAppFeaturePolicies
+local Promise = require(parent.Promise)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local getAppFeaturePolicies = UniversalAppPolicy.getAppFeaturePolicies
+
 local FIntPushUpsellCooldownPeriod = require(script.Parent.Flags.FIntPushUpsellCooldownPeriod)
 local FIntPushUpsellMaxPromptCount = require(script.Parent.Flags.FIntPushUpsellMaxPromptCount)
 local FIntPushUpsellChatCooldownPeriod = require(script.Parent.Flags.FIntPushUpsellChatCooldownPeriod)
 local FIntPushUpsellChatMaxPromptCount = require(script.Parent.Flags.FIntPushUpsellChatMaxPromptCount)
-local GetFFlagEnablePushNotificationsUpsellModal = require(ParentParent.SharedFlags).GetFFlagEnablePushNotificationsUpsellModal
-local GetFFlagLuaAppPushUpsellDeprecateOldEvents = require(ParentParent.SharedFlags).GetFFlagLuaAppPushUpsellDeprecateOldEvents
-local v22 = game:DefineFastFlag("CacheShouldShowPushUpsellHideResponse", false)
-local v23 = game:DefineFastInt("ShouldShowPushUpsellHideResponseCacheExpirationTime", 6)
-local u24 = false
-local n1 = 0
 
-local function shouldShowUpsellHome(b1: boolean?) -- line: 40
-	-- upvalues: v22 (copy), n1 (ref), v23 (copy), u24 (ref), Promise (copy), PushNotificationsUpsellUtils (copy), AppStorageService (copy), NotificationsUpsellConstants (copy), FIntPushUpsellMaxPromptCount (copy), FIntPushUpsellCooldownPeriod (copy), default (copy)
-	if v22 and ((os.time() - n1) / 3600 < v23 and u24) then
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagEnablePushNotificationsUpsellModal = SharedFlags.GetFFlagEnablePushNotificationsUpsellModal
+
+local SharedFlags2 = require(parent.SharedFlags)
+local GetFFlagLuaAppPushUpsellDeprecateOldEvents = SharedFlags2.GetFFlagLuaAppPushUpsellDeprecateOldEvents
+
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagNotificationsUpsellUseRequestPushPermissionHelper = SharedFlags3.FFlagNotificationsUpsellUseRequestPushPermissionHelper
+local requestPushNotificationPermission
+
+if FFlagNotificationsUpsellUseRequestPushPermissionHelper then
+	requestPushNotificationPermission = require(script.Parent.requestPushNotificationPermission)
+else
+	requestPushNotificationPermission = nil
+end
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagPushNotificationsUpsellPassClientAttributesToPrompts = SharedFlags4.FFlagPushNotificationsUpsellPassClientAttributesToPrompts
+local defineFastFlag = game:DefineFastFlag("CacheShouldShowPushUpsellHideResponse", false)
+
+local defineFastInt = game:DefineFastInt("ShouldShowPushUpsellHideResponseCacheExpirationTime", 6)
+
+local v = false
+local lastTime = 0
+local v2 = nil
+
+local function getPushNotificationPermissionUpsellStatus()
+	if v2 ~= nil then
+		return v2
+	end
+
+	local v3 = default:shouldShowUpsell({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(p)
+		return p.upsellStatus or "UNKNOWN"
+	end, function(): string
+		return "ERROR"
+	end)
+
+	v2 = v3
+	v3:finally(function()
+		if v2 == v3 then
+			v2 = nil
+		end
+	end)
+
+	return v3
+end
+
+local function shouldShowUpsellHome(flag: boolean?)
+	if defineFastFlag and (os.time() - lastTime) / 3600 < defineFastInt and v then
 		return Promise.resolve(false)
 	end
 
-	local v35 = PushNotificationsUpsellUtils.getPushUpsellPromptedCount(AppStorageService, NotificationsUpsellConstants.LocalStorageKeys.PromptShownCount)
-	local v36 = if not b1 then PushNotificationsUpsellUtils.getPushSysUpsellPromptTimestamp(AppStorageService) else PushNotificationsUpsellUtils.getPushEduUpsellResponseTimestamp(AppStorageService)
-	local v37 = false
+	local pushUpsellPromptedCount = PushNotificationsUpsellUtils.getPushUpsellPromptedCount(
+		AppStorageService,
+		NotificationsUpsellConstants.LocalStorageKeys.PromptShownCount
+	)
+	local v3
 
-	if v35 >= 0 and v36 >= 0 then
-		local v38 = (os.time() - v36) / 86400
-
-		v37 = v35 < FIntPushUpsellMaxPromptCount and (v38 >= FIntPushUpsellCooldownPeriod or v36 == 0)
+	if flag then
+		v3 = PushNotificationsUpsellUtils.getPushEduUpsellResponseTimestamp(AppStorageService)
+	else
+		v3 = PushNotificationsUpsellUtils.getPushSysUpsellPromptTimestamp(AppStorageService)
 	end
 
-	if v37 then
-		return default:shouldShowUpsell({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(p1) -- line: 70
-			-- upvalues: default (copy), Promise (copy), v22 (copy), u24 (ref), n1 (ref)
-			if p1.upsellStatus and p1.upsellStatus == default.UpsellStatus.SHOW then
-				return Promise.resolve(true)
+	local v4
+
+	if pushUpsellPromptedCount >= 0 and v3 >= 0 then
+		local v5 = (os.time() - v3) / 86400
+
+		if pushUpsellPromptedCount < FIntPushUpsellMaxPromptCount then
+			v4 = FIntPushUpsellCooldownPeriod <= v5 or v3 == 0
+		else
+			v4 = false
+		end
+	else
+		v4 = false
+	end
+
+	if not v4 then
+		return Promise.resolve(false)
+	end
+
+	if FFlagPushNotificationsUpsellPassClientAttributesToPrompts then
+		return getPushNotificationPermissionUpsellStatus():andThen(function(p)
+			return Promise.resolve(p == default.UpsellStatus.SHOW)
+		end)
+	end
+
+	return default:shouldShowUpsell({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(p)
+		if p.upsellStatus and p.upsellStatus == default.UpsellStatus.SHOW then
+			return Promise.resolve(true)
+		end
+
+		if defineFastFlag then
+			v = true
+			lastTime = os.time()
+		end
+
+		return Promise.resolve(false)
+	end, function(_)
+		return Promise.resolve(false)
+	end)
+end
+
+local function userHasRespondedToPushUpsellChat(): boolean
+	local pushUpsellPromptedCount = PushNotificationsUpsellUtils.getPushUpsellPromptedCount(
+		AppStorageService,
+		NotificationsUpsellConstants.LocalStorageKeys.ChatPromptShownCount
+	)
+
+	return pushUpsellPromptedCount < 0 or FIntPushUpsellChatMaxPromptCount <= pushUpsellPromptedCount
+end
+
+local function userHasRespondedToUpsellPromptLessThanCooldownPeriod(): boolean -- 1 equivalent call inferred from this helper
+	local pushSysUpsellPromptTimestamp = PushNotificationsUpsellUtils.getPushSysUpsellPromptTimestamp(AppStorageService)
+
+	return pushSysUpsellPromptTimestamp >= 0
+		and (os.time() - pushSysUpsellPromptTimestamp) / 86400 < FIntPushUpsellChatCooldownPeriod
+end
+
+local function shouldShowRationale()
+	return default:shouldShowRationale({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(p)
+		return Promise.resolve(p.upsellStatus == default.UpsellStatus.SHOW)
+	end):catch(function(_)
+		return Promise.resolve(false)
+	end)
+end
+
+local function shouldShowUpsellChat(_: boolean?)
+	local pushUpsellPromptedCount = PushNotificationsUpsellUtils.getPushUpsellPromptedCount(
+		AppStorageService,
+		NotificationsUpsellConstants.LocalStorageKeys.ChatPromptShownCount
+	)
+
+	if
+		not (pushUpsellPromptedCount < 0 or FIntPushUpsellChatMaxPromptCount <= pushUpsellPromptedCount)
+		and not userHasRespondedToUpsellPromptLessThanCooldownPeriod() -- inferred equivalent call
+	then
+		return shouldShowRationale():andThen(function(p)
+			if p then
+				return (Promise.resolve(true))
 			end
 
-			if v22 then
-				u24 = true
-				n1 = os.time()
-			end
-
-			return Promise.resolve(false)
-		end, function(_) -- line: 82
-			-- upvalues: Promise (copy)
+			return (Promise.resolve(false))
+		end):catch(function(_)
 			return Promise.resolve(false)
 		end)
 	end
 
 	return Promise.resolve(false)
 end
-local function userHasRespondedToPushUpsellChat() -- line: 95
-	-- upvalues: PushNotificationsUpsellUtils (copy), AppStorageService (copy), NotificationsUpsellConstants (copy), FIntPushUpsellChatMaxPromptCount (copy)
-	local v39 = PushNotificationsUpsellUtils.getPushUpsellPromptedCount(AppStorageService, NotificationsUpsellConstants.LocalStorageKeys.ChatPromptShownCount)
 
-	return v39 < 0 or v39 >= FIntPushUpsellChatMaxPromptCount
-end
-local function userHasRespondedToUpsellPromptLessThanCooldownPeriod() -- line: 103
-	-- upvalues: PushNotificationsUpsellUtils (copy), AppStorageService (copy), FIntPushUpsellChatCooldownPeriod (copy)
-	local v40 = PushNotificationsUpsellUtils.getPushSysUpsellPromptTimestamp(AppStorageService)
-
-	return v40 >= 0 and (os.time() - v40) / 86400 < FIntPushUpsellChatCooldownPeriod
-end
-local function shouldShowRationale() -- line: 109
-	-- upvalues: default (copy), Promise (copy)
-	return default:shouldShowRationale({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(p3) -- line: 113
-		-- upvalues: Promise (copy), default (copy)
-		return Promise.resolve(p3.upsellStatus == default.UpsellStatus.SHOW)
-	end):catch(function(_) -- line: 116
-		-- upvalues: Promise (copy)
-		return Promise.resolve(false)
-	end)
-end
-local function shouldShowUpsellChat(_: boolean?) -- line: 121
-	-- upvalues: PushNotificationsUpsellUtils (copy), AppStorageService (copy), NotificationsUpsellConstants (copy), FIntPushUpsellChatMaxPromptCount (copy), FIntPushUpsellChatCooldownPeriod (copy), Promise (copy), shouldShowRationale (copy)
-	local v42 = PushNotificationsUpsellUtils.getPushUpsellPromptedCount(AppStorageService, NotificationsUpsellConstants.LocalStorageKeys.ChatPromptShownCount)
-
-	if not (v42 < 0) and not (v42 >= FIntPushUpsellChatMaxPromptCount) then
-		local v43 = PushNotificationsUpsellUtils.getPushSysUpsellPromptTimestamp(AppStorageService)
-
-		if not (v43 >= 0 and (os.time() - v43) / 86400 < FIntPushUpsellChatCooldownPeriod) then
-			return shouldShowRationale():andThen(function(p5) -- line: 127
-				-- upvalues: Promise (copy)
-				if p5 then
-					return (Promise.resolve(true))
-				end
-
-				return (Promise.resolve(false))
-			end):catch(function(_) -- line: 130
-				-- upvalues: Promise (copy)
-				return Promise.resolve(false)
-			end)
-		end
-	end
-
-	return Promise.resolve(false)
-end
-local function shouldShowUpsell(s1: string, b3: boolean?) -- line: 135
-	-- upvalues: GetFFlagEnablePushNotificationsUpsellModal (copy), Promise (copy), getAppFeaturePolicies (copy), NotificationsUpsellConstants (copy), shouldShowUpsellHome (copy), shouldShowUpsellChat (copy)
+local function shouldShowUpsell(p: string, flag: boolean?)
 	if not GetFFlagEnablePushNotificationsUpsellModal() then
 		return Promise.resolve(false)
 	end
 
-	local v46 = getAppFeaturePolicies()
+	local appFeaturePolicies = getAppFeaturePolicies()
 
-	if not v46.getNotificationsCanReceivePush() or not v46.getPushNotificationsUpsell() then
+	if not (appFeaturePolicies.getNotificationsCanReceivePush() and appFeaturePolicies.getPushNotificationsUpsell()) then
 		return Promise.resolve(false)
 	end
 
-	if s1 == NotificationsUpsellConstants.ModalKey.PushUpsellHome then
-		return shouldShowUpsellHome(b3)
+	if p == NotificationsUpsellConstants.ModalKey.PushUpsellHome then
+		return shouldShowUpsellHome(flag)
 	end
 
-	if s1 == NotificationsUpsellConstants.ModalKey.PushUpsellChat then
-		return shouldShowUpsellChat(b3)
+	if p == NotificationsUpsellConstants.ModalKey.PushUpsellChat then
+		return shouldShowUpsellChat(flag)
 	end
 end
-local function openModal(s2: string, b4: boolean?, s3: string?) -- line: 152
-	-- upvalues: GetFFlagEnablePushNotificationsUpsellModal (copy), GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy), NotificationModalsManager (copy), NotificationsUpsellConstants (copy), PushNotificationsUpsellUtils (copy), AppStorageService (copy), PushNotificationsUpsellModal (copy), Localization (copy), LocalizationService (copy), default (copy)
+
+local function openModal(p: string, flag: boolean?, value: string?)
 	if not GetFFlagEnablePushNotificationsUpsellModal() then
 		return
 	end
 
-	if b4 then
+	if flag then
+		local function fn()
+			if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+				sendEventDeferred(
+					ModalEventConstants.ModalContextPushEduUpsell,
+					ModalEventConstants.OptInPushEventName,
+					{ [ModalEventConstants.ActionType] = ModalEventConstants.Closed }
+				)
+			end
+
+			default2:logRobloxTelemetryEvent(
+				PushUpsellEventName,
+				{},
+				{ [ModalEventConstants.ActionType] = ModalEventConstants.Closed },
+				ModalEventConstants.ModalContextPushEduUpsell
+			)
+		end
+		local function fn2()
+			NotificationModalsManager.CloseModal(p)
+		end
+
 		if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
 			sendEventDeferred(ModalEventConstants.ModalContextPushEduUpsell, ModalEventConstants.OptInPushEventName, {
 				[ModalEventConstants.ActionType] = ModalEventConstants.Opened
@@ -142,87 +233,130 @@ local function openModal(s2: string, b4: boolean?, s3: string?) -- line: 152
 
 		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
 			[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
-			[ModalEventConstants.EntryPoint] = s3 or ""
+			[ModalEventConstants.EntryPoint] = value or ""
 		}, ModalEventConstants.ModalContextPushEduUpsell)
 
-		if s2 == NotificationsUpsellConstants.ModalKey.PushUpsellHome then
-			PushNotificationsUpsellUtils.incrementPushUpsellPromptedCount(AppStorageService, NotificationsUpsellConstants.LocalStorageKeys.PromptShownCount)
-		elseif s2 == NotificationsUpsellConstants.ModalKey.PushUpsellChat then
-			PushNotificationsUpsellUtils.incrementPushUpsellPromptedCount(AppStorageService, NotificationsUpsellConstants.LocalStorageKeys.ChatPromptShownCount)
+		if p == NotificationsUpsellConstants.ModalKey.PushUpsellHome then
+			PushNotificationsUpsellUtils.incrementPushUpsellPromptedCount(
+				AppStorageService,
+				NotificationsUpsellConstants.LocalStorageKeys.PromptShownCount
+			)
+		elseif p == NotificationsUpsellConstants.ModalKey.PushUpsellChat then
+			PushNotificationsUpsellUtils.incrementPushUpsellPromptedCount(
+				AppStorageService,
+				NotificationsUpsellConstants.LocalStorageKeys.ChatPromptShownCount
+			)
 		end
 
-		NotificationModalsManager.OpenModal(s2, PushNotificationsUpsellModal, {
+		NotificationModalsManager.OpenModal(p, PushNotificationsUpsellModal, {
+			CloseCallback = fn,
+			Props = {
+				CloseModal = fn2,
+				TranslationKeys = NotificationsUpsellConstants.TranslationKeys[p]
+			},
 			DisableBackgroundDismiss = true,
 			DisplayOrder = 2,
-			CloseCallback = function() -- line: 158
-				-- upvalues: GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy)
-				if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
-					sendEventDeferred(ModalEventConstants.ModalContextPushEduUpsell, ModalEventConstants.OptInPushEventName, {
-						[ModalEventConstants.ActionType] = ModalEventConstants.Closed
-					})
-				end
-
-				default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
-					[ModalEventConstants.ActionType] = ModalEventConstants.Closed
-				}, ModalEventConstants.ModalContextPushEduUpsell)
-			end,
-			Props = {
-				CloseModal = function() -- line: 175
-					-- upvalues: NotificationModalsManager (copy), s2 (copy)
-					NotificationModalsManager.CloseModal(s2)
-				end,
-				TranslationKeys = NotificationsUpsellConstants.TranslationKeys[s2]
-			},
 			Localization = Localization.new(LocalizationService.RobloxLocaleId)
 		})
-
-		return
-	end
-
-	if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
-		sendEventDeferred(ModalEventConstants.ModalContextSysUpsell, ModalEventConstants.OptInPushEventName, {
-			[ModalEventConstants.ActionType] = ModalEventConstants.Opened
-		})
-	end
-
-	default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
-		[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
-		[ModalEventConstants.EntryPoint] = s3 or ""
-	}, ModalEventConstants.ModalContextSysUpsell)
-	default:requestPermissions({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(_) -- line: 227
-		-- upvalues: PushNotificationsUpsellUtils (copy), AppStorageService (copy), NotificationsUpsellConstants (copy), GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy)
-		PushNotificationsUpsellUtils.setPushSysUpsellPromptTimestamp(AppStorageService, os.time())
-		PushNotificationsUpsellUtils.incrementPushUpsellPromptedCount(AppStorageService, NotificationsUpsellConstants.LocalStorageKeys.PromptShownCount)
-
+	else
 		if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
 			sendEventDeferred(ModalEventConstants.ModalContextSysUpsell, ModalEventConstants.OptInPushEventName, {
-				[ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess
+				[ModalEventConstants.ActionType] = ModalEventConstants.Opened
 			})
 		end
 
 		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
-			[ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess
+			[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
+			[ModalEventConstants.EntryPoint] = value or ""
 		}, ModalEventConstants.ModalContextSysUpsell)
-	end, function(_) -- line: 244
-		-- upvalues: GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy)
-		if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
-			sendEventDeferred(ModalEventConstants.ModalContextSysUpsell, ModalEventConstants.OptInPushEventName, {
-				[ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed
-			})
-		end
 
-		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
-			[ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed
-		}, ModalEventConstants.ModalContextSysUpsell)
-	end)
+		if FFlagNotificationsUpsellUseRequestPushPermissionHelper then
+			requestPushNotificationPermission():andThen(function()
+				if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+					sendEventDeferred(
+						ModalEventConstants.ModalContextSysUpsell,
+						ModalEventConstants.OptInPushEventName,
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess }
+					)
+				end
+
+				default2:logRobloxTelemetryEvent(
+					PushUpsellEventName,
+					{},
+					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+					ModalEventConstants.ModalContextSysUpsell
+				)
+			end, function()
+				if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+					sendEventDeferred(
+						ModalEventConstants.ModalContextSysUpsell,
+						ModalEventConstants.OptInPushEventName,
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed }
+					)
+				end
+
+				default2:logRobloxTelemetryEvent(
+					PushUpsellEventName,
+					{},
+					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+					ModalEventConstants.ModalContextSysUpsell
+				)
+			end)
+		else
+			default:requestPermissions({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(_)
+				PushNotificationsUpsellUtils.setPushSysUpsellPromptTimestamp(AppStorageService, os.time())
+				PushNotificationsUpsellUtils.incrementPushUpsellPromptedCount(
+					AppStorageService,
+					NotificationsUpsellConstants.LocalStorageKeys.PromptShownCount
+				)
+
+				if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+					sendEventDeferred(
+						ModalEventConstants.ModalContextSysUpsell,
+						ModalEventConstants.OptInPushEventName,
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess }
+					)
+				end
+
+				default2:logRobloxTelemetryEvent(
+					PushUpsellEventName,
+					{},
+					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess },
+					ModalEventConstants.ModalContextSysUpsell
+				)
+			end, function(_)
+				if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+					sendEventDeferred(
+						ModalEventConstants.ModalContextSysUpsell,
+						ModalEventConstants.OptInPushEventName,
+						{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed }
+					)
+				end
+
+				default2:logRobloxTelemetryEvent(
+					PushUpsellEventName,
+					{},
+					{ [ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed },
+					ModalEventConstants.ModalContextSysUpsell
+				)
+			end)
+		end
+	end
 end
-local function closeModal(s4: string) -- line: 260
-	-- upvalues: NotificationModalsManager (copy)
-	NotificationModalsManager.CloseModal(s4)
+
+local function closeModal(p: string)
+	NotificationModalsManager.CloseModal(p)
+end
+
+local getPushNotificationPermissionUpsellStatus2
+
+if FFlagPushNotificationsUpsellPassClientAttributesToPrompts then
+	getPushNotificationPermissionUpsellStatus2 = getPushNotificationPermissionUpsellStatus
 end
 
 return {
 	OpenModal = openModal,
 	CloseModal = closeModal,
-	ShouldShowUpsell = shouldShowUpsell
+	ShouldShowUpsell = shouldShowUpsell,
+	GetPushNotificationPermissionUpsellStatus = getPushNotificationPermissionUpsellStatus2
 }

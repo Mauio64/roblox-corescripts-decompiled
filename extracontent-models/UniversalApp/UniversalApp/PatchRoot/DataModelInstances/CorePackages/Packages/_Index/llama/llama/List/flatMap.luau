@@ -1,35 +1,32 @@
-local function flatMap(p1, p2) -- line: 2
-	-- upvalues: flatMap (copy)
-	local v4 = type(p1)
+local function flatMap(list, callback)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+	local typeName2 = type(callback)
+	assert(typeName2 == "function", "expected a function for second argument, got " .. typeName2)
 
-	local v5 = type(p2)
+	local result = {}
+	local v = 1
 
-	assert(v5 == "function", "expected a function for second argument, got " .. v5)
+	for i = 1, #list do
+		if type(list[i]) == "table" then
+			local v2 = flatMap(list[i], callback)
 
-	local t1 = {}
-	local n1 = 1
-
-	for i = 1, #p1 do
-		if type(p1[i]) == "table" then
-			local v9 = flatMap(p1[i], p2)
-
-			for j = 1, #v9 do
-				t1[n1] = v9[j]
-				n1 += 1
+			for j = 1, #v2 do
+				result[v] = v2[j]
+				v += 1
 			end
 		else
-			local v11 = p2(p1[i], i)
+			local v2 = callback(list[i], i)
 
-			if v11 ~= nil then
-				t1[n1] = v11
-				n1 += 1
+			if v2 ~= nil then
+				result[v] = v2
+				v += 1
 			end
 		end
 	end
 
-	return t1
+	return result
 end
 
 return flatMap

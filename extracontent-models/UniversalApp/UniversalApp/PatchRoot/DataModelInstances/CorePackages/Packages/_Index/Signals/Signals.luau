@@ -1,1 +1,3 @@
-return (require(script.Signals))
+local Signals = require(script.Signals)
+
+return Signals

@@ -1,3 +1,0 @@
-return {
-	CreateTooltipSeen = "createTooltipSeen"
-}

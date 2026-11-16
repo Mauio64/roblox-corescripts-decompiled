@@ -1,83 +1,87 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Error = require(scriptParentParent.LuauPolyfill).Error
-local Promise = require(scriptParentParent.Promise)
+local parent = script.Parent
 
-require(scriptParent.jsutils.PromiseOrValue)
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Error = LuauPolyfill.Error
+local Promise = require(parent2.Promise)
 
-local isPromise = require(scriptParent.jsutils.isPromise).isPromise
+require(parent.jsutils.PromiseOrValue)
 
-require(scriptParent.language.source)
+local isPromise = require(parent.jsutils.isPromise)
+local isPromise2 = isPromise.isPromise
 
-local parse = require(scriptParent.language.parser).parse
+require(parent.language.source)
 
-require(scriptParent.type.definition)
-require(scriptParent.type.schema)
+local parser = require(parent.language.parser)
+local parse = parser.parse
 
-local validate = require(scriptParent.validation.validate).validate
-local validateSchema = require(scriptParent.type.validate).validateSchema
-local execute = require(scriptParent.execution.execute).execute
-local t1 = {}
-local graphqlImpl = nil
+require(parent.type.definition)
 
-function t1.graphql(t2: {[any]: any}) -- line: 93
-	-- upvalues: Promise (copy), graphqlImpl (ref)
-	return Promise.new(function(resolve) -- line: 95
-		-- upvalues: graphqlImpl (ref), t2 (copy)
-		return resolve(graphqlImpl(t2))
-	end)
-end
-function t1.graphqlSync(t3: {[any]: any}) -- line: 106
-	-- upvalues: graphqlImpl (ref), isPromise (copy), Error (copy)
-	local v14 = graphqlImpl(t3)
+require(parent.type.schema)
 
-	if isPromise(v14) then
-		error(Error.new("GraphQL execution failed to complete synchronously."))
+local validate = require(parent.validation.validate)
+local validate2 = validate.validate
+
+local validate3 = require(parent.type.validate)
+local validateSchema = validate3.validateSchema
+
+local execute = require(parent.execution.execute)
+local execute2 = execute.execute
+
+local graphqlImpl
+local Graphql = {
+	graphql = function(p)
+		return Promise.new(function(callback)
+			return callback(graphqlImpl(p))
+		end)
+	end,
+	graphqlSync = function(p)
+		local v = graphqlImpl(p)
+
+		if isPromise2(v) then
+			error(Error.new("GraphQL execution failed to complete synchronously."))
+		end
+
+		return v
+	end
+}
+
+graphqlImpl = function(data)
+	local schema = data.schema
+	local source = data.source
+	local rootValue = data.rootValue
+	local contextValue = data.contextValue
+	local variableValues = data.variableValues
+	local operationName = data.operationName
+	local fieldResolver = data.fieldResolver
+	local typeResolver = data.typeResolver
+
+	local errors = validateSchema(schema)
+
+	if #errors > 0 then
+		return { errors = errors }
 	end
 
-	return v14
-end
-function graphqlImpl(t4: {[any]: any}) -- line: 119
-	-- upvalues: validateSchema (copy), parse (copy), validate (copy), execute (copy)
-	local schema = t4.schema
-	local source = t4.source
-	local rootValue = t4.rootValue
-	local contextValue = t4.contextValue
-	local variableValues = t4.variableValues
-	local operationName = t4.operationName
-	local fieldResolver = t4.fieldResolver
-	local typeResolver = t4.typeResolver
-	local v24 = validateSchema(schema)
-
-	if #v24 > 0 then
-		return {
-			errors = v24
-		}
-	end
-
-	local u25 = nil
-	local ok, result = pcall(function() -- line: 138
-		-- upvalues: u25 (ref), parse (copy), source (copy)
-		u25 = parse(source)
+	local parsed = nil
+	local success, result = pcall(function()
+		parsed = parse(source)
 	end)
 
-	if not ok then
+	if not success then
 		return {
 			errors = { result }
 		}
 	end
 
-	local v28 = validate(schema, u25)
+	local errors2 = validate2(schema, parsed)
 
-	if #v28 > 0 then
-		return {
-			errors = v28
-		}
+	if #errors2 > 0 then
+		return { errors = errors2 }
 	end
 
-	return execute({
+	return execute2({
 		schema = schema,
-		document = u25,
+		document = parsed,
 		rootValue = rootValue,
 		contextValue = contextValue,
 		variableValues = variableValues,
@@ -87,4 +91,4 @@ function graphqlImpl(t4: {[any]: any}) -- line: 119
 	})
 end
 
-return t1
+return Graphql

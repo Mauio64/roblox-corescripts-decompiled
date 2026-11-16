@@ -1,5 +1,5 @@
-local function isSinkingGuiObject(p1) -- line: 3
-	return p1.Visible and (p1.Active and p1.Interactable)
+local function isSinkingGuiObject(data)
+	return data.Visible and data.Active and data.Interactable
 end
 
 return isSinkingGuiObject

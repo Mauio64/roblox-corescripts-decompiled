@@ -1,6 +1,8 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
 local Components = script.Parent.Parent.Parent.Components
 local HeaderButton = require(Components.HeaderButton)
 local BannerButton = require(Components.BannerButton)
@@ -9,17 +11,19 @@ local BoxButton = require(Components.BoxButton)
 local LuauHeapViewEntry = require(script.Parent.LuauHeapViewEntry)
 local LuauHeapViewStatEntry = require(script.Parent.LuauHeapViewStatEntry)
 local LuauHeapViewRefEntry = require(script.Parent.LuauHeapViewRefEntry)
-
 require(script.Parent.LuauHeapTypes)
 
 local Actions = script.Parent.Parent.Parent.Actions
 local SetLuauHeapActiveSnapshot = require(Actions.SetLuauHeapActiveSnapshot)
 local SetLuauHeapCompareSnapshot = require(Actions.SetLuauHeapCompareSnapshot)
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
+
 local LineWidth = Constants.GeneralFormatting.LineWidth
 local LineColor = Constants.GeneralFormatting.LineColor
 local HeaderFrameHeight = Constants.GeneralFormatting.HeaderFrameHeight
 local EntryFrameHeight = Constants.GeneralFormatting.EntryFrameHeight
+
 local ValueCellWidth = Constants.LuauHeapFormatting.ValueCellWidth
 local CellPadding = Constants.LuauHeapFormatting.CellPadding
 local ValuePadding = Constants.LuauHeapFormatting.ValuePadding
@@ -28,260 +32,291 @@ local SnapshotHighlightSize = Constants.LuauHeapFormatting.SnapshotHighlightSize
 local TabsHeight = Constants.LuauHeapFormatting.TabsHeight
 local TabButtonWidth = Constants.LuauHeapFormatting.TabButtonWidth
 local TabButtonHeight = Constants.LuauHeapFormatting.TabButtonHeight
-local _ = Constants.LuauHeapFormatting.TabButtonPad
+local TabButtonPad = Constants.LuauHeapFormatting.TabButtonPad
 local TabHighlightHeight = Constants.LuauHeapFormatting.TabHighlightHeight
 local TableHintHeight = Constants.LuauHeapFormatting.TableHintHeight
-local t1 = {
+
+local v = {
 	graph = {
 		hint = "Graph displays the size of the objects in Luau VM aggregated by the shortest path from the root Engine references to them.\n\t\tMost important root references are ModuleScript tables and functions connected to signals or the task scheduler.",
-		headers = {
-			"Name",
-			"Size",
-			"Self"
-		},
-		initFragmentSource = function(p1) -- line: 47
-			return p1:renderChildren()
+		headers = { "Name", "Size", "Self" },
+		initFragmentSource = function(object)
+			return object:renderChildren()
 		end
 	},
 	tag = {
 		hint = "This memory breakdown displays how much memory is used by Luau VM types.",
-		headers = {
-			"Name",
-			"Size",
-			"Count"
-		},
-		initFragmentSource = function(p2) -- line: 55
-			return p2:renderChildrenStats("TagBreakdown")
+		headers = { "Name", "Size", "Count" },
+		initFragmentSource = function(object)
+			return object:renderChildrenStats("TagBreakdown")
 		end
 	},
 	memcat = {
-		hint = "Memory separated by the category at the time of allocation.\n\t\tMemory category is assigned to the thread performing the allocation, not the script.\n\t\tDefault value is based on the script name. Custom value can be assigned using 'debug.setmemorycategory' API.",
-		headers = {
-			"Name",
-			"Size",
-			"Count"
-		},
-		initFragmentSource = function(p3) -- line: 65
-			return p3:renderChildrenStats("MemcatBreakdown")
+		hint = [[
+Memory separated by the category at the time of allocation.
+		Memory category is assigned to the thread performing the allocation, not the script.
+		Default value is based on the script name. Custom value can be assigned using 'debug.setmemorycategory' API.]],
+		headers = { "Name", "Size", "Count" },
+		initFragmentSource = function(object)
+			return object:renderChildrenStats("MemcatBreakdown")
 		end
 	},
 	userdata = {
 		hint = "This breakdown shows how much memory inside Luau VM is taken by custom Roblox engine classes.\n\t\tFor DataModel classes like 'Part' this does not include the memory taken inside the engine itself.",
-		headers = {
-			"Name",
-			"Size",
-			"Count"
-		},
-		initFragmentSource = function(p4) -- line: 74
-			return p4:renderChildrenStats("UserdataBreakdown")
+		headers = { "Name", "Size", "Count" },
+		initFragmentSource = function(object)
+			return object:renderChildrenStats("UserdataBreakdown")
 		end
 	},
-	[not game:GetEngineFeature("UnparentedInstances") and "refs" or "UniqueRefs"] = {
-		hint = "This view shows engine DataModel instances that are only referenced by Luau VM and are not directly parented to the DataModel.\n\t\tFor each instance, it will show the set of paths that make it accessible and prevent garbage collection.\n\t\tMost often, engine Luau references come from ModuleScript tables, active signal connections and active coroutines in the task scheduler.",
-		headers = {
-			"Name",
-			"Count",
-			"Total Instances"
-		},
-		initFragmentSource = function(p5) -- line: 84
-			return p5:renderChildrenRefs()
+	[game:GetEngineFeature("UnparentedInstances") and "UniqueRefs" or "refs"] = {
+		hint = [[
+This view shows engine DataModel instances that are only referenced by Luau VM and are not directly parented to the DataModel.
+		For each instance, it will show the set of paths that make it accessible and prevent garbage collection.
+		Most often, engine Luau references come from ModuleScript tables, active signal connections and active coroutines in the task scheduler.]],
+		headers = { "Name", "Count", "Total Instances" },
+		initFragmentSource = function(object)
+			return object:renderChildrenRefs()
 		end
 	}
 }
 
 if game:GetEngineFeature("UnparentedInstances") then
-	t1.UnparentedRefs = {
-		hint = "This view shows engine DataModel instances that are not parented to any instance (and are also not unique references).\n\t\tFor each instance, it will show the set of paths that make it accessible and prevent garbage collection.\n\t\t",
-		headers = {
-			"Name",
-			"Count",
-			"Total Instances"
-		},
-		initFragmentSource = function(p6) -- line: 97
-			return p6:renderUnparentedRefs()
+	v.UnparentedRefs = {
+		hint = [[
+This view shows engine DataModel instances that are not parented to any instance (and are also not unique references).
+		For each instance, it will show the set of paths that make it accessible and prevent garbage collection.
+		]],
+		headers = { "Name", "Count", "Total Instances" },
+		initFragmentSource = function(object)
+			return object:renderUnparentedRefs()
 		end
 	}
 end
 
-local v32 = Roact.PureComponent:extend("LuauHeapView")
+local extended = Roact.PureComponent:extend("LuauHeapView")
 
-function v32.renderSnapshotList(p7) -- line: 105
-	-- upvalues: Roact (copy), BannerButton (copy), EntryFrameHeight (copy), CellLabel (copy), CellPadding (copy), SnapshotHighlightSize (copy), LineColor (copy), BoxButton (copy)
-	local t2 = {}
+function extended:renderSnapshotList()
+	local children = {}
 
-	for v42, _ in p7.props.data do
-		t2[v42] = Roact.createElement(BannerButton, {
+	for k, _ in self.props.data do
+		local createElement = Roact.createElement
+		local v2 = {
+			size = UDim2.new(1, 0, 0, EntryFrameHeight),
 			inset = 0,
 			isExpanded = false,
 			isExpandable = false,
-			size = UDim2.new(1, 0, 0, EntryFrameHeight),
-			layoutOrder = v42,
-			onButtonPress = function() -- line: 117
-				-- upvalues: p7 (copy), v42 (copy)
-				p7.props.dispatchSetLuauHeapActiveSnapshot(v42)
+			layoutOrder = k,
+			onButtonPress = function()
+				self.props.dispatchSetLuauHeapActiveSnapshot(k)
 			end
-		}, {
+		}
+		local v3 = {
 			name = Roact.createElement(CellLabel, {
-				text = `Snapshot #{ v42 }`,
+				text = `Snapshot #{k}`,
 				size = UDim2.new(UDim.new(1, 0), UDim.new(1, 0)),
 				pos = UDim2.new(0, CellPadding, 0, 0)
 			}),
-			HorizontalHighlightTop = if v42 ~= p7.props.activeSnapshot then nil else Roact.createElement("Frame", {
+			HorizontalHighlightTop = 0,
+			HorizontalHighlightBottom = 0,
+			HorizontalHighlightLeft = 0,
+			HorizontalHighlightRight = 0,
+			Compare = 0
+		}
+		local horizontalHighlightTop
+
+		if self.props.activeSnapshot == k then
+			horizontalHighlightTop = Roact.createElement("Frame", {
 				Size = UDim2.new(1, 0, 0, SnapshotHighlightSize),
 				BackgroundColor3 = LineColor
-			}),
-			HorizontalHighlightBottom = if v42 ~= p7.props.activeSnapshot then nil else Roact.createElement("Frame", {
+			})
+		end
+
+		v3.HorizontalHighlightTop = horizontalHighlightTop
+		local horizontalHighlightBottom
+
+		if self.props.activeSnapshot == k then
+			horizontalHighlightBottom = Roact.createElement("Frame", {
 				Size = UDim2.new(1, 0, 0, SnapshotHighlightSize),
 				Position = UDim2.new(0, 0, 1, -SnapshotHighlightSize),
 				BackgroundColor3 = LineColor
-			}),
-			HorizontalHighlightLeft = if v42 ~= p7.props.activeSnapshot then nil else Roact.createElement("Frame", {
+			})
+		end
+
+		v3.HorizontalHighlightBottom = horizontalHighlightBottom
+		local horizontalHighlightLeft
+
+		if self.props.activeSnapshot == k then
+			horizontalHighlightLeft = Roact.createElement("Frame", {
 				Size = UDim2.new(0, SnapshotHighlightSize, 1, 0),
 				BackgroundColor3 = LineColor
-			}),
-			HorizontalHighlightRight = if v42 ~= p7.props.activeSnapshot then nil else Roact.createElement("Frame", {
+			})
+		end
+
+		v3.HorizontalHighlightLeft = horizontalHighlightLeft
+		local horizontalHighlightRight
+
+		if self.props.activeSnapshot == k then
+			horizontalHighlightRight = Roact.createElement("Frame", {
 				Size = UDim2.new(0, SnapshotHighlightSize, 1, 0),
 				Position = UDim2.new(1, -SnapshotHighlightSize, 0, 0),
 				BackgroundColor3 = LineColor
-			}),
-			Compare = if v42 == p7.props.activeSnapshot then nil else Roact.createElement(BoxButton, {
+			})
+		end
+
+		v3.HorizontalHighlightRight = horizontalHighlightRight
+		local compare
+
+		if self.props.activeSnapshot ~= k then
+			compare = Roact.createElement(BoxButton, {
 				text = "Compare",
 				size = UDim2.new(0.3, -6, 1, -6),
 				pos = UDim2.new(0.7, 3, 0, 3),
-				onClicked = function() -- line: 162
-					-- upvalues: p7 (copy), v42 (copy)
-					p7.props.dispatchSetLuauHeapCompareSnapshot(v42)
+				onClicked = function()
+					self.props.dispatchSetLuauHeapCompareSnapshot(k)
 				end
 			})
-		})
+		end
+
+		v3.Compare = compare
+		children[k] = createElement(BannerButton, v2, v3)
 	end
 
-	return t2
+	return children
 end
-function v32.renderChildren(p8) -- line: 173
-	-- upvalues: Roact (copy), LuauHeapViewEntry (copy)
-	local v45 = p8.props.data[p8.props.activeSnapshot]
-	local v46 = p8.props.data[p8.props.compareSnapshot]
 
-	return Roact.createElement(LuauHeapViewEntry, {
+function extended:renderChildren()
+	local v2 = self.props.data[self.props.activeSnapshot]
+	local v3 = self.props.data[self.props.compareSnapshot]
+
+	local createElement = Roact.createElement
+	local v4
+
+	if v2 then
+		v4 = v2.Graph
+	end
+
+	local compare
+
+	if v3 then
+		compare = v3.Graph
+	end
+
+	return createElement(LuauHeapViewEntry, {
 		layoutOrder = 0,
 		depth = 0,
-		data = if not v45 then nil else v45.Graph,
-		compare = if not v46 then nil else v46.Graph
+		data = v4,
+		compare = compare
 	})
 end
-function v32.renderChildrenStats(p9, p10) -- line: 185
-	-- upvalues: Roact (copy), LuauHeapViewStatEntry (copy)
-	local v49 = p9.props.data[p9.props.activeSnapshot]
-	local v50 = p9.props.data[p9.props.compareSnapshot]
-	local v51 = v49[p10]
-	local v52 = if not v50 then nil else v50[p10]
-	local t3 = {}
 
-	for v54, v55 in v51 do
-		local v56 = nil
+function extended:renderChildrenStats(p)
+	local v2 = self.props.data[self.props.activeSnapshot]
+	local v3 = self.props.data[self.props.compareSnapshot]
 
-		if v52 then
-			for _, v in ipairs(v52) do
-				if v55.Name == v.Name then
-					v56 = v
+	local v4 = v2[p]
+	local v5
 
+	if v3 then
+		v5 = v3[p]
+	end
+
+	local children = {}
+
+	for k, v6 in v4 do
+		local compare = nil
+
+		if v5 then
+			for _, v7 in ipairs(v5) do
+				if v6.Name == v7.Name then
+					compare = v7
 					break
 				end
 			end
 		end
 
-		t3[v54] = Roact.createElement(LuauHeapViewStatEntry, {
+		children[k] = Roact.createElement(LuauHeapViewStatEntry, {
+			layoutOrder = -v6.Size,
 			depth = 0,
-			layoutOrder = -v55.Size,
-			data = v55,
-			compare = v56
+			data = v6,
+			compare = compare
 		})
 	end
 
-	return t3
+	return children
 end
-function v32.renderUnparentedRefs(p11) -- line: 217
-	-- upvalues: Roact (copy), LuauHeapViewRefEntry (copy)
-	local Refs = p11.props.data[p11.props.activeSnapshot].Refs
 
-	if not Refs then
+function extended:renderUnparentedRefs()
+	local refs = self.props.data[self.props.activeSnapshot].Refs
+
+	if not refs then
 		return {}
 	end
 
-	local UnparentedReferences = Refs.UnparentedReferences
+	local unparentedReferences = refs.UnparentedReferences
 
-	if not UnparentedReferences then
+	if not unparentedReferences then
 		return {}
 	end
 
-	local t4 = {}
+	local children = {}
 
-	for v63, v64 in UnparentedReferences do
-		t4[v63] = Roact.createElement(LuauHeapViewRefEntry, {
+	for k, unparentedReference in unparentedReferences do
+		children[k] = Roact.createElement(LuauHeapViewRefEntry, {
+			layoutOrder = -unparentedReference.Instances,
 			depth = 0,
-			layoutOrder = -v64.Instances,
-			data = v64
+			data = unparentedReference
 		})
 	end
 
-	return t4
+	return children
 end
-function v32.renderChildrenRefs(p12) -- line: 242
-	-- upvalues: Roact (copy), LuauHeapViewRefEntry (copy)
-	local Refs = p12.props.data[p12.props.activeSnapshot].Refs
 
-	if not Refs then
+function extended:renderChildrenRefs()
+	local refs = self.props.data[self.props.activeSnapshot].Refs
+
+	if not refs then
 		return {}
 	end
 
-	assert(Refs)
+	assert(refs)
 
-	local t5 = {}
+	local children = {}
 
-	for v68, v69 in Refs.Roots do
-		t5[v68] = Roact.createElement(LuauHeapViewRefEntry, {
+	for k, root in refs.Roots do
+		children[k] = Roact.createElement(LuauHeapViewRefEntry, {
+			layoutOrder = -root.Instances,
 			depth = 0,
-			layoutOrder = -v69.Instances,
-			data = v69
+			data = root
 		})
 	end
 
-	return t5
+	return children
 end
-function v32.createTabSelector(p13, p14, p15) -- line: 267
-	-- upvalues: Roact (copy), BoxButton (copy), TabButtonWidth (copy), TabButtonHeight (copy), TabHighlightHeight (copy), Constants (copy)
-	local function onTabSelected(p16) -- line: 268
-		-- upvalues: p13 (copy)
-		p13:setState({
-			activeTab = p16
-		})
+
+function extended:createTabSelector(size, position)
+	local function onTabSelected(activeTab) -- 1 equivalent call inferred from this helper
+		self:setState({ activeTab = activeTab })
 	end
-	local function createButton(p17, p18, p19) -- line: 274
-		-- upvalues: Roact (copy), BoxButton (copy), TabButtonWidth (copy), TabButtonHeight (copy), p13 (copy)
+
+	local function createButton(activeTab, text, p)
 		return Roact.createElement(BoxButton, {
-			text = p18,
+			text = text,
 			size = UDim2.new(0, TabButtonWidth, 0, TabButtonHeight),
-			pos = UDim2.new(0, TabButtonWidth * p19, 0, 0),
-			onClicked = function() -- line: 279
-				-- upvalues: p17 (copy), p13 (copy)
-				local v95 = p17
-
-				p13:setState({
-					activeTab = v95
-				})
+			pos = UDim2.new(0, TabButtonWidth * p, 0, 0),
+			onClicked = function()
+				onTabSelected(activeTab) -- inferred equivalent call
 			end
 		})
 	end
-	local function createHighlight(p20, p21) -- line: 285
-		-- upvalues: p13 (copy), Roact (copy), TabButtonWidth (copy), TabHighlightHeight (copy), TabButtonHeight (copy), Constants (copy)
-		if p20 == p13.state.activeTab then
+
+	local function createHighlight(p, p2)
+		if self.state.activeTab == p then
 			return (Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				ZIndex = 10,
 				Size = UDim2.new(0, TabButtonWidth, 0, TabHighlightHeight),
-				Position = UDim2.new(0, TabButtonWidth * p21, 0, TabButtonHeight - TabHighlightHeight),
-				BackgroundColor3 = Constants.Color.HighlightBlue
+				Position = UDim2.new(0, TabButtonWidth * p2, 0, TabButtonHeight - TabHighlightHeight),
+				BorderSizePixel = 0,
+				BackgroundColor3 = Constants.Color.HighlightBlue,
+				ZIndex = 10
 			}))
 		end
 
@@ -290,9 +325,9 @@ function v32.createTabSelector(p13, p14, p15) -- line: 267
 
 	if game:GetEngineFeature("UnparentedInstances") then
 		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = p14,
-			Position = p15
+			Size = size,
+			Position = position,
+			BackgroundTransparency = 1
 		}, {
 			Graph = createButton("graph", "Graph", 0),
 			GraphHighlight = createHighlight("graph", 0),
@@ -310,9 +345,9 @@ function v32.createTabSelector(p13, p14, p15) -- line: 267
 	end
 
 	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = p14,
-		Position = p15
+		Size = size,
+		Position = position,
+		BackgroundTransparency = 1
 	}, {
 		Graph = createButton("graph", "Graph", 0),
 		GraphHighlight = createHighlight("graph", 0),
@@ -328,82 +363,102 @@ function v32.createTabSelector(p13, p14, p15) -- line: 267
 		UnparentedHighlight = createHighlight("UnparentedRefs", 5)
 	})
 end
-function v32.createStatsTableHeader(p22, p23, p24, p25) -- line: 347
-	-- upvalues: Roact (copy), SnapshotWidth (copy), HeaderFrameHeight (copy), HeaderButton (copy), ValueCellWidth (copy), ValuePadding (copy), CellPadding (copy), LineColor (copy), LineWidth (copy)
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
+
+function extended:createStatsTableHeader(p, p2, list)
+	local createElement = Roact.createElement
+	local v2 = {
 		Size = UDim2.new(1 - SnapshotWidth, 0, 0, HeaderFrameHeight),
-		Position = UDim2.new(SnapshotWidth, 0, p23, p24)
-	}, {
-		First = if not p25[1] then nil else Roact.createElement(HeaderButton, {
-			text = p25[1],
+		Position = UDim2.new(SnapshotWidth, 0, p, p2),
+		BackgroundTransparency = 1
+	}
+	local first
+
+	if list[1] then
+		first = Roact.createElement(HeaderButton, {
+			text = list[1],
 			size = UDim2.new(1 - ValueCellWidth * 2, -ValuePadding - CellPadding, 0, HeaderFrameHeight),
 			pos = UDim2.new(0, CellPadding, 0, 0),
-			sortfunction = p22.onSortChanged
-		}),
-		Second = if not p25[2] then nil else Roact.createElement(HeaderButton, {
-			text = p25[2],
+			sortfunction = self.onSortChanged
+		})
+	end
+
+	local second
+
+	if list[2] then
+		second = Roact.createElement(HeaderButton, {
+			text = list[2],
 			size = UDim2.new(ValueCellWidth, -CellPadding, 0, HeaderFrameHeight),
 			pos = UDim2.new(1 - ValueCellWidth * 2, ValuePadding, 0, 0),
-			sortfunction = p22.onSortChanged
-		}),
-		Third = if not p25[3] then nil else Roact.createElement(HeaderButton, {
-			text = p25[3],
+			sortfunction = self.onSortChanged
+		})
+	end
+
+	local third
+
+	if list[3] then
+		third = Roact.createElement(HeaderButton, {
+			text = list[3],
 			size = UDim2.new(ValueCellWidth, -CellPadding, 0, HeaderFrameHeight),
 			pos = UDim2.new(1 - ValueCellWidth, ValuePadding, 0, 0),
-			sortfunction = p22.onSortChanged
-		}),
+			sortfunction = self.onSortChanged
+		})
+	end
+
+	return createElement("Frame", v2, {
+		First = first,
+		Second = second,
+		Third = third,
 		TopHorizontal = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 1),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		}),
 		LowerHorizontal = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, LineWidth),
 			Position = UDim2.new(0, 0, 1, 0),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		}),
 		Vertical1 = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
 			Size = UDim2.new(0, LineWidth, 1, 0),
 			Position = UDim2.new(1 - ValueCellWidth, 0, 0, 0),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		}),
 		Vertical2 = Roact.createElement("Frame", {
-			BorderSizePixel = 0,
 			Size = UDim2.new(0, LineWidth, 1, 0),
 			Position = UDim2.new(1 - ValueCellWidth * 2, 0, 0, 0),
-			BackgroundColor3 = LineColor
+			BackgroundColor3 = LineColor,
+			BorderSizePixel = 0
 		})
 	})
 end
-function v32.init(p26) -- line: 403
-	p26.state = {
-		activeTab = "graph"
-	}
-end
-function v32.render(p27) -- line: 409
-	-- upvalues: t1 (copy), Roact (copy), Constants (copy), HeaderButton (copy), SnapshotWidth (copy), CellPadding (copy), HeaderFrameHeight (copy), TabsHeight (copy), TableHintHeight (copy)
-	local layoutOrder = p27.props.layoutOrder
-	local size = p27.props.size
-	local v84 = nil
-	local v85 = t1[p27.state.activeTab]
 
-	if not p27.props.data or #p27.props.data == 0 then
-		v84 = Roact.createElement("TextLabel", {
-			Text = "Capture a Snapshot to view details",
-			BackgroundTransparency = 1,
+function extended:init()
+	self.state = { activeTab = "graph" }
+end
+
+function extended:render()
+	local layoutOrder = self.props.layoutOrder
+	local size = self.props.size
+
+	local v2 = v[self.state.activeTab]
+	local v3
+
+	if not (self.props.data and #self.props.data ~= 0) then
+		v3 = Roact.createElement("TextLabel", {
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0, 0, 0, 0),
+			Text = "Capture a Snapshot to view details",
 			TextColor3 = Constants.Color.Text,
+			BackgroundTransparency = 1,
 			LayoutOrder = layoutOrder
 		})
 	end
 
 	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
 		Size = size,
+		BackgroundTransparency = 1,
 		LayoutOrder = layoutOrder
 	}, {
 		SnapshotHeader = Roact.createElement(HeaderButton, {
@@ -412,11 +467,11 @@ function v32.render(p27) -- line: 409
 			pos = UDim2.new(0, CellPadding, 0, 0)
 		}),
 		Snapshots = Roact.createElement("ScrollingFrame", {
-			BackgroundTransparency = 1,
-			ScrollBarThickness = 5,
 			Size = UDim2.new(SnapshotWidth, -4, 1, -HeaderFrameHeight),
 			Position = UDim2.new(0, 2, 0, HeaderFrameHeight),
+			BackgroundTransparency = 1,
 			VerticalScrollBarInset = Enum.ScrollBarInset.None,
+			ScrollBarThickness = 5,
 			CanvasSize = UDim2.fromScale(0, 0),
 			AutomaticCanvasSize = Enum.AutomaticSize.Y
 		}, {
@@ -428,23 +483,23 @@ function v32.render(p27) -- line: 409
 				Thickness = 2,
 				Color = Color3.new(0.6, 0.6, 0.6)
 			}),
-			Children = Roact.createFragment(p27:renderSnapshotList())
+			Children = Roact.createFragment(self:renderSnapshotList())
 		}),
-		Tabs = p27:createTabSelector(UDim2.new(1 - SnapshotWidth, 0, 0, TabsHeight), UDim2.new(SnapshotWidth, 0, 0, 0)),
+		Tabs = self:createTabSelector(UDim2.new(1 - SnapshotWidth, 0, 0, TabsHeight), UDim2.new(SnapshotWidth, 0, 0, 0)),
 		Hint = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
 			Size = UDim2.new(1 - SnapshotWidth, 0, 0, TableHintHeight),
 			Position = UDim2.new(SnapshotWidth, 0, 0, TabsHeight),
-			Text = v85.hint,
-			TextColor3 = Constants.Color.Text
+			Text = v2.hint,
+			TextColor3 = Constants.Color.Text,
+			BackgroundTransparency = 1
 		}),
-		Headers = p27:createStatsTableHeader(0, TabsHeight + TableHintHeight, v85.headers),
+		Headers = self:createStatsTableHeader(0, TabsHeight + TableHintHeight, v2.headers),
 		Entries = Roact.createElement("ScrollingFrame", {
-			BackgroundTransparency = 1,
-			ScrollBarThickness = 5,
 			Size = UDim2.new(1 - SnapshotWidth, 0, 1, -(TabsHeight + TableHintHeight + HeaderFrameHeight)),
 			Position = UDim2.new(SnapshotWidth, 0, 0, TabsHeight + TableHintHeight + HeaderFrameHeight),
+			BackgroundTransparency = 1,
 			VerticalScrollBarInset = Enum.ScrollBarInset.None,
+			ScrollBarThickness = 5,
 			CanvasSize = UDim2.fromScale(0, 0),
 			AutomaticCanvasSize = Enum.AutomaticSize.Y
 		}, {
@@ -452,23 +507,20 @@ function v32.render(p27) -- line: 409
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			Children = v84 or Roact.createFragment(v85.initFragmentSource(p27))
+			Children = v3 or Roact.createFragment(v2.initFragmentSource(self))
 		})
 	})
 end
 
-local function mapDispatchToProps(p28) -- line: 491
-	-- upvalues: SetLuauHeapActiveSnapshot (copy), SetLuauHeapCompareSnapshot (copy)
+local function mapDispatchToProps(callback)
 	return {
-		dispatchSetLuauHeapActiveSnapshot = function(n1: number) -- line: 493
-			-- upvalues: p28 (copy), SetLuauHeapActiveSnapshot (copy)
-			p28(SetLuauHeapActiveSnapshot(n1))
+		dispatchSetLuauHeapActiveSnapshot = function(p: number)
+			callback(SetLuauHeapActiveSnapshot(p))
 		end,
-		dispatchSetLuauHeapCompareSnapshot = function(n2: number) -- line: 496
-			-- upvalues: p28 (copy), SetLuauHeapCompareSnapshot (copy)
-			p28(SetLuauHeapCompareSnapshot(n2))
+		dispatchSetLuauHeapCompareSnapshot = function(p: number)
+			callback(SetLuauHeapCompareSnapshot(p))
 		end
 	}
 end
 
-return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(v32)
+return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(extended)

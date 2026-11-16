@@ -1,38 +1,36 @@
 local RoduxPresence = script:FindFirstAncestor("RoduxPresence")
-local RoduxPresenceParent = RoduxPresence.Parent
-local Rodux = require(RoduxPresenceParent.Rodux)
-local Cryo = require(RoduxPresenceParent.Cryo)
+local parent = RoduxPresence.Parent
+local Rodux = require(parent.Rodux)
+local Cryo = require(parent.Cryo)
+
 local Actions = RoduxPresence.Actions
 local ReceivedUserPresence = require(Actions.ReceivedUserPresence)
+
 local PresenceModel = require(RoduxPresence.Models.PresenceModel)
-local t1 = {}
 
-return function(p1) -- line: 12
-	-- upvalues: Rodux (copy), t1 (copy), ReceivedUserPresence (copy), PresenceModel (copy), Cryo (copy)
-	local presenceNetworking = p1.presenceNetworking
+local v = {}
+return function(p)
+	local presenceNetworking = p.presenceNetworking
 
-	return Rodux.createReducer(t1, {
-		[ReceivedUserPresence.name] = function(p2, p3) -- line: 16
-			-- upvalues: PresenceModel (copy), Cryo (copy)
+	return Rodux.createReducer(v, {
+		[ReceivedUserPresence.name] = function(p2, p3)
 			local userId = p3.payload.userId
 			local payload = p3.payload
 
 			assert(PresenceModel.isValid(payload))
 
-			return Cryo.Dictionary.join(p2, {
-				[userId] = PresenceModel.format(payload)
-			})
+			return Cryo.Dictionary.join(p2, { [userId] = PresenceModel.format(payload) })
 		end,
-		[presenceNetworking.GetPresencesFromUserIds.Succeeded.name] = function(p4, p5) -- line: 27
-			-- upvalues: PresenceModel (copy), Cryo (copy)
-			local userPresences = p5.responseBody.userPresences
-			local t2 = {}
+		[presenceNetworking.GetPresencesFromUserIds.Succeeded.name] = function(p2, p3)
+			local userPresences = p3.responseBody.userPresences
 
-			for _, v in ipairs(userPresences) do
-				t2[tostring(v.userId)] = PresenceModel.format(v)
+			local values = {}
+
+			for _, userPresence in ipairs(userPresences) do
+				values[tostring(userPresence.userId)] = PresenceModel.format(userPresence)
 			end
 
-			return Cryo.Dictionary.join(p4, t2)
+			return Cryo.Dictionary.join(p2, values)
 		end
 	})
 end

@@ -1,3 +1,1 @@
-return {
-	shouldLog = false
-}
+return { shouldLog = false }

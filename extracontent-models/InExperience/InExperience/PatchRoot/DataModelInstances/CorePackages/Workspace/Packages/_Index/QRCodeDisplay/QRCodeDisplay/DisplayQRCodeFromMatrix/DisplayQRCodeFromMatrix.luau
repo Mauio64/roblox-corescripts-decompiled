@@ -1,84 +1,71 @@
 local AssetService = game:GetService("AssetService")
-local Parent = script:FindFirstAncestor("QRCodeDisplay").Parent
-local React = require(Parent.React)
-local Dash = require(Parent.Dash)
+
+local parent = script:FindFirstAncestor("QRCodeDisplay").Parent
+
+local React = require(parent.React)
+local Dash = require(parent.Dash)
+
 local drawImage = require(script.Parent.drawImage)
-local t1 = {
-	backgroundTransparency = 0,
-	pixelTransparency = 0,
-	sideLength = 200,
+
+local v = {
 	backgroundColor3 = Color3.fromRGB(255, 255, 255),
-	pixelColor3 = Color3.fromRGB(0, 0, 0)
+	backgroundTransparency = 0,
+	pixelColor3 = Color3.fromRGB(0, 0, 0),
+	pixelTransparency = 0,
+	sideLength = 200
 }
 
-local function getQrCodeImageSize(n1: number, n2: number?) -- line: 36
-	if not n2 then
-		return n1
+local function getQrCodeImageSize(sideLength: number, qrCodeRotation: number?) -- 1 equivalent call inferred from this helper
+	if not qrCodeRotation then
+		return sideLength
 	end
 
-	assert(type(n2) == "number", "rotation must be a number")
+	assert(type(qrCodeRotation) == "number", "rotation must be a number")
 
-	if n2 % 90 == 0 then
-		return n1
+	if qrCodeRotation % 90 == 0 then
+		return sideLength
 	end
 
-	local v10 = math.rad(n2)
-
-	return (math.round(n1 / (math.sin(v10) + math.cos(v10))))
+	local v2 = math.rad(qrCodeRotation)
+	return (math.round(sideLength / (math.sin(v2) + math.cos(v2))))
 end
 
-return function(t2: {[any]: any}) -- line: 51
-	-- upvalues: Dash (copy), t1 (copy), React (copy), AssetService (copy), drawImage (copy)
-	local v12 = Dash.join(t1, t2)
-	local v13, v14 = React.useState(nil)
-	local v15 = React.createRef()
-	local sideLength = v12.sideLength
-	local qrCodeRotation = v12.qrCodeRotation
+return function(p)
+	local joined = Dash.join(v, p)
 
-	if not qrCodeRotation then
-	else
-		assert(type(qrCodeRotation) == "number", "rotation must be a number")
+	local state, setState = React.useState(nil)
+	local ref = React.createRef()
+	local qrCodeImageSize = getQrCodeImageSize(joined.sideLength, joined.qrCodeRotation) -- inferred equivalent call
 
-		if qrCodeRotation % 90 == 0 then
-		else
-			local v18 = math.rad(qrCodeRotation)
-
-			sideLength = math.round(sideLength / (math.sin(v18) + math.cos(v18)))
-		end
-	end
-
-	local v19 = sideLength
-
-	React.useEffect(function() -- line: 58
-		-- upvalues: v15 (copy), v19 (copy), AssetService (copy), v14 (copy), drawImage (copy), v12 (copy)
-		if not v15.current or v15.current.Size.X ~= v19 then
-			v15.current = AssetService:CreateEditableImage({
-				Size = Vector2.new(v19, v19)
+	React.useEffect(function()
+		if not ref.current or ref.current.Size.X ~= qrCodeImageSize then
+			ref.current = AssetService:CreateEditableImage({
+				Size = Vector2.new(qrCodeImageSize, qrCodeImageSize)
 			})
-			v14(Content.fromObject(v15.current))
+
+			setState(Content.fromObject(ref.current))
 		end
 
-		drawImage(v15.current, v19, v12.qrCodeMatrix, v12.pixelColor3, v12.pixelTransparency)
-	end, {
-		v19,
-		v12.qrCodeMatrix,
-		v12.pixelColor3,
-		v12.pixelTransparency
-	})
+		drawImage(ref.current, qrCodeImageSize, joined.qrCodeMatrix, joined.pixelColor3, joined.pixelTransparency)
+	end, { qrCodeImageSize, joined.qrCodeMatrix, joined.pixelColor3, joined.pixelTransparency })
 
-	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		BackgroundColor3 = v12.backgroundColor3,
-		BackgroundTransparency = v12.backgroundTransparency,
-		Size = UDim2.fromOffset(v12.sideLength, v12.sideLength)
-	}, {
-		ImageLabel = React.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			ImageContent = v13,
-			Position = UDim2.fromScale(0.5, 0.5),
-			Rotation = v12.qrCodeRotation,
-			Size = UDim2.fromOffset(v19, v19)
-		})
-	})
+	return React.createElement(
+		"Frame",
+		{
+			BackgroundColor3 = joined.backgroundColor3,
+			BackgroundTransparency = joined.backgroundTransparency,
+			BorderSizePixel = 0,
+			Size = UDim2.fromOffset(joined.sideLength, joined.sideLength)
+		},
+		{
+			ImageLabel = React.createElement("ImageLabel", {
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				BackgroundTransparency = 1,
+				ImageContent = state,
+				Position = UDim2.fromScale(0.5, 0.5),
+				Rotation = joined.qrCodeRotation,
+				Size = UDim2.fromOffset(qrCodeImageSize, qrCodeImageSize)
+			})
+		}
+	)
 end

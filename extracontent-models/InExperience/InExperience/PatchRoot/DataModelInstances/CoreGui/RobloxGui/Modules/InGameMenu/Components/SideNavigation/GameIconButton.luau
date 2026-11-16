@@ -1,19 +1,38 @@
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local t = InGameMenuDependencies.t
 local Roact = InGameMenuDependencies.Roact
 local Cryo = InGameMenuDependencies.Cryo
 local UIBlox = InGameMenuDependencies.UIBlox
-local Foundation = require(CorePackages.Packages.Foundation)
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local v9 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
-local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
-local ParentParent = script.Parent.Parent.Parent
-local GameIcon = require(ParentParent.Components.GameIcon)
-local uDim = UDim.new(0, 8)
-local v14 = Roact.PureComponent:extend("GameIconButton")
 
-v14.validateProps = t.strictInterface({
+local Foundation = require(CorePackages.Packages.Foundation)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+local v
+
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v = Foundation.UNSTABLE.withCursorMigration
+else
+	v = UIBlox.App.SelectionImage.withSelectionCursorProvider
+end
+
+local v2
+
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v2 = Foundation.Enums.CursorType
+else
+	v2 = UIBlox.App.SelectionImage.CursorKind
+end
+
+local parent = script.Parent.Parent.Parent
+local GameIcon = require(parent.Components.GameIcon)
+
+local udim = UDim.new(0, 8)
+
+local extended = Roact.PureComponent:extend("GameIconButton")
+
+extended.validateProps = t.strictInterface({
 	anchorPoint = t.optional(t.Vector2),
 	position = t.optional(t.UDim2),
 	layoutOrder = t.optional(t.integer),
@@ -23,39 +42,34 @@ v14.validateProps = t.strictInterface({
 	forwardRef = t.optional(t.table)
 })
 
-function v14.renderWithSelectionCursor(p1, p2) -- line: 37
-	-- upvalues: Roact (copy), v10 (copy), GameIcon (copy), uDim (copy)
+function extended:renderWithSelectionCursor(callback)
 	return Roact.createElement("TextButton", {
 		Text = "",
-		AnchorPoint = p1.props.anchorPoint,
+		AnchorPoint = self.props.anchorPoint,
 		BackgroundTransparency = 1,
-		Position = p1.props.position,
+		Position = self.props.position,
 		Size = UDim2.fromOffset(32, 32),
-		LayoutOrder = p1.props.layoutOrder,
-		SelectionImageObject = p2(v10.RoundedRect),
-		[Roact.Event.Activated] = p1.props.onActivated,
-		[Roact.Event.SelectionGained] = p1.props.onSelectionGained,
-		[Roact.Event.SelectionLost] = p1.props.onSelectionLost,
-		[Roact.Ref] = p1.props.forwardRef
+		LayoutOrder = self.props.layoutOrder,
+		SelectionImageObject = callback(v2.RoundedRect),
+		[Roact.Event.Activated] = self.props.onActivated,
+		[Roact.Event.SelectionGained] = self.props.onSelectionGained,
+		[Roact.Event.SelectionLost] = self.props.onSelectionLost,
+		[Roact.Ref] = self.props.forwardRef
 	}, {
 		GameIconButton = Roact.createElement(GameIcon, {
-			iconSize = 32,
 			gameId = game.GameId,
-			cornerRadius = uDim
+			iconSize = 32,
+			cornerRadius = udim
 		})
 	})
 end
-function v14.render(p3) -- line: 60
-	-- upvalues: v9 (copy)
-	return v9(function(p4) -- line: 61
-		-- upvalues: p3 (copy)
-		return p3:renderWithSelectionCursor(p4)
+
+function extended:render()
+	return v(function(p)
+		return self:renderWithSelectionCursor(p)
 	end)
 end
 
-return Roact.forwardRef(function(p5, p6) -- line: 66
-	-- upvalues: Roact (copy), v14 (copy), Cryo (copy)
-	return Roact.createElement(v14, Cryo.Dictionary.join(p5, {
-		forwardRef = p6
-	}))
+return Roact.forwardRef(function(p, forwardRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { forwardRef = forwardRef }))
 end)

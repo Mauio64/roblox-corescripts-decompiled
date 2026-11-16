@@ -1,44 +1,48 @@
-local t1 = {}
+local ValidationEnums = {}
 
-local function createEnumMetatable(s1: string) -- line: 8
+local function createEnumMetatable(p: string)
 	return {
-		__metatable = "This metatable is protected",
-		__index = function(_, p2) -- line: 10
-			-- upvalues: s1 (copy)
-			error("Invalid ValidationEnums." .. s1 .. " enum value: " .. tostring(p2))
+		__index = function(_, p2)
+			error("Invalid ValidationEnums." .. p .. " enum value: " .. tostring(p2))
 		end,
-		__newindex = function(_, _, _) -- line: 13
+		__newindex = function(_, _, _)
 			error("Cannot add new keys to ValidationEnums")
-		end
+		end,
+		__metatable = "This metatable is protected"
 	}
 end
-local function finalizeEnumTable(s2: string) -- line: 20
-	-- upvalues: t1 (copy), createEnumMetatable (copy)
-	if t1[s2] == nil then
-		error(s2 .. " enum table is not found")
+
+local function finalizeEnumTable(p: string)
+	if ValidationEnums[p] == nil then
+		error(p .. " enum table is not found")
 	end
 
-	for v6, v7 in t1[s2] do
-		if typeof(v6) ~= "string" then
-			error(s2 .. " enum table has non string key " .. tostring(v6))
-		elseif v6 ~= v7 then
-			error(s2 .. " enum table has non-matching key and value for key " .. tostring(v6))
+	for k, v in ValidationEnums[p] do
+		if typeof(k) == "string" then
+			if k ~= v then
+				error(p .. " enum table has non-matching key and value for key " .. tostring(k))
+			end
+		else
+			error(p .. " enum table has non string key " .. tostring(k))
 		end
 	end
 
-	setmetatable(t1[s2], (createEnumMetatable(s2)))
+	setmetatable(ValidationEnums[p], createEnumMetatable(p))
 end
 
-t1.ValidationModule = {
+ValidationEnums.ValidationModule = {
 	ExpectedRootSchema = "ExpectedRootSchema",
 	SingleInstanceSelected = "SingleInstanceSelected",
+	SerializedAssetSizeBounded = "SerializedAssetSizeBounded",
 	NoExtraTags = "NoExtraTags",
 	AttributesAllowed = "AttributesAllowed",
 	MaterialsAllowed = "MaterialsAllowed",
 	PropertyRequirementsValid = "PropertyRequirementsValid",
+	ArchivableRequired = "ArchivableRequired",
 	PropertiesSensible = "PropertiesSensible",
 	InstanceTreeMatchesSchema = "InstanceTreeMatchesSchema",
 	DescendantIdsAllowed = "DescendantIdsAllowed",
+	DescendantIdsPublished = "DescendantIdsPublished",
 	ScaleTypeValid = "ScaleTypeValid",
 	CollisionFidelityCorrect = "CollisionFidelityCorrect",
 	AttachmentBoundsValid = "AttachmentBoundsValid",
@@ -47,11 +51,13 @@ t1.ValidationModule = {
 	HSRMeshIdsMatch = "HSRMeshIdsMatch",
 	ThumbnailConfigValid = "ThumbnailConfigValid",
 	DescendantIdsNotMissing = "DescendantIdsNotMissing",
+	ContentNotEditable = "ContentNotEditable",
 	NoFACSOverrideData = "NoFACSOverrideData",
 	FacsHeadConsistency = "FacsHeadConsistency",
 	DynamicHeadFacsPresent = "DynamicHeadFacsPresent",
 	DynamicHeadControlsActive = "DynamicHeadControlsActive",
 	FacsJointBoundsValid = "FacsJointBoundsValid",
+	FacsJointCountBounded = "FacsJointCountBounded",
 	HrdBonesFollowSchema = "HrdBonesFollowSchema",
 	HrdPropertiesSensible = "HrdPropertiesSensible",
 	TposeAdjustmentSensible = "TposeAdjustmentSensible",
@@ -105,6 +111,7 @@ t1.ValidationModule = {
 	CurveAnimAllowedTypes = "CurveAnimAllowedTypes",
 	CurveAnimNumericalDataValid = "CurveAnimNumericalDataValid",
 	CurveAnimTagsValid = "CurveAnimTagsValid",
+	EmoteAnimationAttributesAccurate = "EmoteAnimationAttributesAccurate",
 	CurveAnimJointsManipulated = "CurveAnimJointsManipulated",
 	CurveAnimFrameDataSensible = "CurveAnimFrameDataSensible",
 	CurveAnimJointsAnimated = "CurveAnimJointsAnimated",
@@ -115,15 +122,20 @@ t1.ValidationModule = {
 	CurveAnimRotationBounded = "CurveAnimRotationBounded",
 	CurveAnimJointRotationLimited = "CurveAnimJointRotationLimited",
 	AnimationWeightPositive = "AnimationWeightPositive",
+	AnimationPackNoDuplicateIds = "AnimationPackNoDuplicateIds",
 	CurveAnimBonesAllowed = "CurveAnimBonesAllowed",
 	CurveAnimBonesRotationOnly = "CurveAnimBonesRotationOnly",
 	CurveAnimBonesHaveValidNames = "CurveAnimBonesHaveValidNames",
 	CurveAnimBonesHaveValidParents = "CurveAnimBonesHaveValidParents",
 	CurveAnimPartsRotateOnlyIfBones = "CurveAnimPartsRotateOnlyIfBones",
 	CurveAnimBoneHierarchyValid = "CurveAnimBoneHierarchyValid",
-	CurveAnimLoopingRequired = "CurveAnimLoopingRequired"
+	CurveAnimLoopingRequired = "CurveAnimLoopingRequired",
+	CurveAnimStrictSchema = "CurveAnimStrictSchema",
+	EmissiveMapAllowed = "EmissiveMapAllowed",
+	EmissiveAreaChecks = "EmissiveAreaChecks"
 }
-t1.SharedDataMember = {
+
+ValidationEnums.SharedDataMember = {
 	jobId = "jobId",
 	entrypointInput = "entrypointInput",
 	rootInstance = "rootInstance",
@@ -131,6 +143,7 @@ t1.SharedDataMember = {
 	uploadEnum = "uploadEnum",
 	consumerConfig = "consumerConfig",
 	aqsFetchMetrics = "aqsFetchMetrics",
+	r15LegacyDuplicateRoot = "r15LegacyDuplicateRoot",
 	aqsSummaryData = "aqsSummaryData",
 	renderMeshesData = "renderMeshesData",
 	innerCagesData = "innerCagesData",
@@ -140,10 +153,13 @@ t1.SharedDataMember = {
 	curveAnimComputedFrames = "curveAnimComputedFrames",
 	contentIds = "contentIds",
 	hsrAssets = "hsrAssets",
-	curveAnimBoneData = "curveAnimBoneData"
+	curveAnimBoneData = "curveAnimBoneData",
+	fullBodyPartsMetrics = "fullBodyPartsMetrics"
 }
+
 finalizeEnumTable("SharedDataMember")
-t1.ValidationConfig = {
+
+ValidationEnums.ValidationConfig = {
 	categories = "categories",
 	fflag = "fflag",
 	shadowFlag = "shadowFlag",
@@ -154,21 +170,27 @@ t1.ValidationConfig = {
 	expectedFailures = "expectedFailures",
 	run = "run"
 }
+
 finalizeEnumTable("ValidationConfig")
-t1.AssetQualityFetchStatus = {
+
+ValidationEnums.AssetQualityFetchStatus = {
 	assetQualityFetchNA = "assetQualityFetchNA",
 	assetQualityFetchInProgress = "assetQualityFetchInProgress",
 	assetQualityFetchSuccess = "assetQualityFetchSuccess",
 	assetQualityFetchFailure = "assetQualityFetchFailure"
 }
+
 finalizeEnumTable("AssetQualityFetchStatus")
-t1.ConsumerEnv = {
-	Studio = "Studio",
-	Backend = "Backend",
-	IEC = "IEC"
-}
+
+ValidationEnums.ConsumerEnv = { Studio = "Studio", Backend = "Backend", IEC = "IEC" }
+
 finalizeEnumTable("ConsumerEnv")
-t1.Status = {
+
+ValidationEnums.ValidationEnv = { Studio = "Studio", Backend = "Backend", IEC = "IEC" }
+
+finalizeEnumTable("ValidationEnv")
+
+ValidationEnums.Status = {
 	CANNOT_START = "CANNOT_START",
 	TIMEOUT = "TIMEOUT",
 	ERROR = "ERROR",
@@ -176,8 +198,10 @@ t1.Status = {
 	PASS = "PASS",
 	IN_PROGRESS = "IN_PROGRESS"
 }
+
 finalizeEnumTable("Status")
-t1.AssetQualityCheck = {
+
+ValidationEnums.AssetQualityCheck = {
 	Measure_Dynamic_Head = "Measure_Dynamic_Head",
 	Measure_Cage_Distance_Head = "Measure_Cage_Distance_Head",
 	Measure_Cage_Mesh_Distance = "Measure_Cage_Mesh_Distance",
@@ -195,14 +219,22 @@ t1.AssetQualityCheck = {
 	Measure_Joint_Number = "Measure_Joint_Number",
 	Measure_Texture_Complexity = "Measure_Texture_Complexity",
 	Measure_Texture_Resolution = "Measure_Texture_Resolution",
-	Measure_Mesh_Island_Volume = "Measure_Mesh_Island_Volume"
+	Measure_Mesh_Island_Volume = "Measure_Mesh_Island_Volume",
+	Measure_Mesh_Island_ML = "Measure_Mesh_Island_ML",
+	Measure_Animation_Duration = "Measure_Animation_Duration",
+	Measure_Cage_Part_Placement = "Measure_Cage_Part_Placement",
+	Measure_Dynamic_Head_ML_Hybrid = "Measure_Dynamic_Head_ML_Hybrid"
 }
+
 finalizeEnumTable("AssetQualityCheck")
+
 finalizeEnumTable("ValidationModule")
-t1.UploadCategory = {
+
+ValidationEnums.UploadCategory = {
 	TORSO_AND_LIMBS = "TORSO_AND_LIMBS",
 	DYNAMIC_HEAD = "DYNAMIC_HEAD",
 	LAYERED_CLOTHING = "LAYERED_CLOTHING",
+	EYEBROW_EYELASH = "EYEBROW_EYELASH",
 	RIGID_ACCESSORY = "RIGID_ACCESSORY",
 	EMOTE_ANIMATION = "EMOTE_ANIMATION",
 	MAKEUP = "MAKEUP",
@@ -211,6 +243,7 @@ t1.UploadCategory = {
 	ANIMATION_PACK = "ANIMATION_PACK",
 	ANIMATION = "ANIMATION"
 }
+
 finalizeEnumTable("UploadCategory")
 
-return t1
+return ValidationEnums

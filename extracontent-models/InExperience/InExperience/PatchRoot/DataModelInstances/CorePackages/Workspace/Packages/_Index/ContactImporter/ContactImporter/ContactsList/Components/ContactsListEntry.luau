@@ -1,1 +1,3 @@
-return (require(script.ContactsListEntry))
+local ContactsListEntry = require(script.ContactsListEntry)
+
+return ContactsListEntry

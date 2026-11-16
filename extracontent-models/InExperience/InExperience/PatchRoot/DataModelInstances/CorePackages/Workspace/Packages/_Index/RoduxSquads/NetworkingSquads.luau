@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.NetworkingSquads.NetworkingSquads))
+local NetworkingSquads = require(index.NetworkingSquads.NetworkingSquads)
+
+return NetworkingSquads

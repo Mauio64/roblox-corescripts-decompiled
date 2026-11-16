@@ -7,12 +7,9 @@ return {
 		EditProfileToast = "EditProfileToast",
 		AvatarCatalog = "Catalog",
 		ProfilePictureEditorCamera = "ProfilePictureEditorCamera",
-		ProfilePictureEditorEmotes = "ProfilePictureEditorEmotes"
+		ProfilePictureEditorEmotes = "ProfilePictureEditorEmotes",
+		EditProfileImageProfilePlatform = "EditProfileImageProfilePlatform"
 	},
-	RequestMethods = {
-		GET = "GET",
-		POST = "POST",
-		PATCH = "PATCH",
-		DELETE = "DELETE"
-	}
+	EditProfileImageMode = { Default = "default", FramesOnly = "framesOnly" },
+	RequestMethods = { GET = "GET", POST = "POST", PATCH = "PATCH", DELETE = "DELETE" }
 }

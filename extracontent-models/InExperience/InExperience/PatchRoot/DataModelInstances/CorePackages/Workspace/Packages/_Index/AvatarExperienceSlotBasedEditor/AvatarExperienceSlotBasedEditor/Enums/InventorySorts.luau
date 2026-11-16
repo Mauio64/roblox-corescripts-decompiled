@@ -1,4 +1,1 @@
-return {
-	Newest = "Newest",
-	RecentlyWorn = "RecentlyWorn"
-}
+return { Newest = "Newest", RecentlyWorn = "RecentlyWorn" }

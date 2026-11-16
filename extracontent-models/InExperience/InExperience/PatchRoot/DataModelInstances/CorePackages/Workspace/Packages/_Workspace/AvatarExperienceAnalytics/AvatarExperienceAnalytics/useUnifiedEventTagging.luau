@@ -1,32 +1,70 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+
 local addUnifiedEventLogging = require(script.Parent.addUnifiedEventLogging)
 local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
+require(script.Parent.Generated.UnifiedEventTypes)
 
-local function useUnifiedEventTagging(t1: {[any]: any}) -- line: 28
-	-- upvalues: React (copy), Cryo (copy), UnifiedEventLogConstants (copy), addUnifiedEventLogging (copy)
-	local v8 = React.useMemo(function() -- line: 29
-		-- upvalues: Cryo (copy), UnifiedEventLogConstants (copy), t1 (copy)
-		return Cryo.Dictionary.join({
-			hasDeferredActions = true,
-			sessionTagName = UnifiedEventLogConstants.L2_SESSION_TAG_NAME
-		}, t1.options or {})
-	end, { t1.options })
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXUnifiedEventStrictPayloads = AvatarExperienceFlags.FFlagAXUnifiedEventStrictPayloads
 
-	React.useEffect(function() -- line: 36
-		-- upvalues: t1 (copy), addUnifiedEventLogging (copy), v8 (copy)
-		if t1.isReady == false then
+local v = {
+	hasDeferredActions = true,
+	sessionTagName = UnifiedEventLogConstants.L2_SESSION_TAG_NAME
+}
+
+local function useUnifiedEventTagging(data)
+	local v2 = React.useMemo(function()
+		if not FFlagAXUnifiedEventStrictPayloads then
+			return Cryo.Dictionary.join(
+				{
+					hasDeferredActions = true,
+					sessionTagName = UnifiedEventLogConstants.L2_SESSION_TAG_NAME
+				},
+				data.options or {}
+			)
+		end
+
+		local options = data.options
+
+		if options == nil then
+			return v
+		end
+
+		local hasDeferredActions
+
+		if options.hasDeferredActions == nil then
+			hasDeferredActions = v.hasDeferredActions
+		else
+			hasDeferredActions = options.hasDeferredActions
+		end
+
+		local sessionTagName
+
+		if options.sessionTagName == nil then
+			sessionTagName = v.sessionTagName
+		else
+			sessionTagName = options.sessionTagName
+		end
+
+		return {
+			hasDeferredActions = hasDeferredActions,
+			sessionTagName = sessionTagName,
+			isSelected = options.isSelected,
+			skipImpressionDetection = options.skipImpressionDetection,
+			skipTapDetection = options.skipTapDetection
+		}
+	end, { data.options })
+
+	React.useEffect(function()
+		if data.isReady == false then
 			return
 		end
 
-		addUnifiedEventLogging(t1.ref, t1.payload, v8)
-	end, {
-		t1.ref,
-		t1.payload,
-		t1.isReady,
-		v8
-	})
+		addUnifiedEventLogging(data.ref, data.payload, v2)
+	end, { data.ref, data.payload, data.isReady, v2 })
 end
 
 return useUnifiedEventTagging

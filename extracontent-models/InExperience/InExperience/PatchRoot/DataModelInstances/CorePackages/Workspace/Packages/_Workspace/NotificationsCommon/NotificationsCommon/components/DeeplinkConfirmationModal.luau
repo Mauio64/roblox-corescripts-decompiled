@@ -1,55 +1,67 @@
 local GuiService = game:GetService("GuiService")
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local UIBlox = require(ParentParent.UIBlox)
-local ReactRoblox = require(ParentParent.ReactRoblox)
+
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
+local ReactRoblox = require(parent.ReactRoblox)
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local v8 = game:DefineFastFlag("EnableToastNotificationsDeeplinkConfirmationModalHeightFix", false)
-local RobloxTranslator = require(ParentParent.RobloxTranslator)
 
-return function(t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), RobloxTranslator (copy), v8 (copy), GuiService (copy), ReactRoblox (copy), InteractiveAlert (copy), ButtonType (copy)
-	local v11, v12 = React.useState(Vector2.new(800, 600))
-	local v13 = RobloxTranslator:FormatByKey("Notifications.ToastNotifications.Title.LeavingExperience")
-	local v14 = RobloxTranslator:FormatByKey("Notifications.ToastNotifications.Label.LeaveExperienceConfirmation")
-	local v15 = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Cancel")
-	local v16 = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Confirm")
+local defineFastFlag = game:DefineFastFlag("EnableToastNotificationsDeeplinkConfirmationModalHeightFix", false)
 
-	return React.createElement("Frame", {
+local RobloxTranslator = require(parent.RobloxTranslator)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagGameInviteInExpJoinCta3 = SharedFlags.FFlagGameInviteInExpJoinCta3
+
+return function(props)
+	local state, setState = React.useState(Vector2.new(800, 600))
+
+	local formatByKey = RobloxTranslator:FormatByKey(FFlagGameInviteInExpJoinCta3 and props.titleKey or "Notifications.ToastNotifications.Title.LeavingExperience")
+
+	local formatByKey2 = RobloxTranslator:FormatByKey(FFlagGameInviteInExpJoinCta3 and props.bodyKey or "Notifications.ToastNotifications.Label.LeaveExperienceConfirmation")
+
+	local formatByKey3 = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Cancel")
+	local formatByKey4 = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Confirm")
+	local createElement = React.createElement
+	local v = {
 		Active = true,
-		BackgroundTransparency = not t1.backgroundTransparency and 0.5 or t1.backgroundTransparency,
+		BackgroundTransparency = not props.backgroundTransparency and 0.5 or props.backgroundTransparency,
 		BackgroundColor3 = Color3.new(0, 0, 0),
-		Size = UDim2.new(1, 0, 1, not v8 and 0 or GuiService.TopbarInset.Height),
-		[ReactRoblox.Change.AbsoluteSize] = function(p1) -- line: 42
-			-- upvalues: v12 (copy)
-			v12(p1.AbsoluteSize)
-		end,
-		Position = if not v8 then nil else UDim2.fromOffset(0, -GuiService.TopbarInset.Height)
-	}, {
+		Size = UDim2.new(1, 0, 1, not defineFastFlag and 0 or GuiService.TopbarInset.Height),
+		[ReactRoblox.Change.AbsoluteSize] = function(p)
+			setState(p.AbsoluteSize)
+		end
+	}
+	local position
+
+	if defineFastFlag then
+		position = UDim2.fromOffset(0, -GuiService.TopbarInset.Height)
+	end
+
+	v.Position = position
+	return createElement("Frame", v, {
 		Alert = React.createElement(InteractiveAlert, {
-			screenSize = v11,
-			title = v13,
-			bodyText = v14,
+			screenSize = state,
+			title = formatByKey,
+			bodyText = formatByKey2,
 			buttonStackInfo = {
 				buttons = {
 					{
 						props = {
-							onActivated = function() -- line: 57
-								-- upvalues: t1 (copy)
-								t1.closeCallback(false)
+							onActivated = function()
+								props.closeCallback(false)
 							end,
-							text = v15
+							text = formatByKey3
 						}
 					},
 					{
 						buttonType = ButtonType.PrimarySystem,
 						props = {
-							onActivated = function() -- line: 66
-								-- upvalues: t1 (copy)
-								t1.closeCallback(true)
+							onActivated = function()
+								props.closeCallback(true)
 							end,
-							text = v16
+							text = formatByKey4
 						}
 					}
 				}

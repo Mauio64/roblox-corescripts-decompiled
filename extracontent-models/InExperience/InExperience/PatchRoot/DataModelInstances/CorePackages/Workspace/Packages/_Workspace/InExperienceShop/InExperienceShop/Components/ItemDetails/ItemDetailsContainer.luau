@@ -1,27 +1,42 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local React = require(InExperienceShopParent.React)
-local View = require(InExperienceShopParent.Foundation).View
-local SharedFlags = require(InExperienceShopParent.SharedFlags)
+local parent = InExperienceShop.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
+local SharedFlags = require(parent.SharedFlags)
+
 local ItemDetailsView = require(script.Parent.ItemDetailsView)
 local useItemDetailsViewModel = require(script.Parent.useItemDetailsViewModel)
-local v8 = if not SharedFlags.FFlagEnableReportingFlowForExperienceShop then nil else require(InExperienceShop.Components.ShopAbuseReportOverlay)
+local ShopAbuseReportOverlay
 
-local function ItemDetailsContainer(p1) -- line: 16
-	-- upvalues: useItemDetailsViewModel (copy), React (copy), View (copy), ItemDetailsView (copy), v8 (copy)
-	local v11 = useItemDetailsViewModel(p1)
-	local reportSession = v11.reportSession
+if SharedFlags.FFlagEnableReportingFlowForExperienceShop then
+	ShopAbuseReportOverlay = require(InExperienceShop.Components.ShopAbuseReportOverlay)
+else
+	ShopAbuseReportOverlay = nil
+end
 
-	return React.createElement(View, {
-		tag = "size-full"
-	}, {
-		Details = React.createElement(ItemDetailsView, v11),
-		ReportOverlay = if not reportSession or (not v11.onReportClose or not v8) then nil else React.createElement(v8, {
+local function ItemDetailsContainer(p)
+	local v = useItemDetailsViewModel(p)
+	local reportSession = v.reportSession
+
+	local createElement = React.createElement
+
+	local v2 = {
+		Details = React.createElement(ItemDetailsView, v),
+		ReportOverlay = 0
+	}
+	local reportOverlay
+
+	if reportSession and v.onReportClose and ShopAbuseReportOverlay then
+		reportOverlay = React.createElement(ShopAbuseReportOverlay, {
 			abuseVector = reportSession.abuseVector,
 			targetId = reportSession.targetId,
-			onClose = v11.onReportClose
+			onClose = v.onReportClose
 		})
-	})
+	end
+
+	v2.ReportOverlay = reportOverlay
+	return createElement(View, { tag = "size-full" }, v2)
 end
 
 return ItemDetailsContainer

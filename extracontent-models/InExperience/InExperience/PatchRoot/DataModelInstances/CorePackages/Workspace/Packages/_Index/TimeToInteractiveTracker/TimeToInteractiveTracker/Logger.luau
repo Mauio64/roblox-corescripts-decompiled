@@ -1,3 +1,3 @@
-local Parent = script:FindFirstAncestor("TimeToInteractiveTracker").Parent
-
-return (require(Parent.Loggers).Logger:new("TimeToInteractiveTracker"))
+local parent = script:FindFirstAncestor("TimeToInteractiveTracker").Parent
+local Loggers = require(parent.Loggers)
+return (Loggers.Logger:new("TimeToInteractiveTracker"))

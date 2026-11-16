@@ -1,7 +1,5 @@
-function identityFunc(p1) -- line: 12
-	return p1
+function identityFunc(p)
+	return p
 end
 
-return {
-	identityFunc = identityFunc
-}
+return { identityFunc = identityFunc }

@@ -1,20 +1,13 @@
-local function AvatarPolicies(p1) -- line: 1
+local function AvatarPolicies(data)
 	return {
-		getAvatarHeaderIcon = function() -- line: 3
-			-- upvalues: p1 (copy)
-			return p1.AvatarHeaderIcon or "LuaApp/icons/ic-back"
+		getAvatarHeaderIcon = function()
+			return data.AvatarHeaderIcon or "LuaApp/icons/ic-back"
 		end,
-		getAvatarEditorShowBuyRobuxOnTopBar = function() -- line: 6
-			-- upvalues: p1 (copy)
-			return p1.AvatarEditorShowBuyRobuxOnTopBar or false
+		getAvatarEditorShowBuyRobuxOnTopBar = function()
+			return data.AvatarEditorShowBuyRobuxOnTopBar or false
 		end,
-		getCustomOutfitNames = function() -- line: 9
-			-- upvalues: p1 (copy)
-			if p1.CustomCostumeNames ~= nil then
-				return p1.CustomCostumeNames
-			end
-
-			return true
+		getCustomOutfitNames = function()
+			return data.CustomCostumeNames == nil or data.CustomCostumeNames
 		end
 	}
 end

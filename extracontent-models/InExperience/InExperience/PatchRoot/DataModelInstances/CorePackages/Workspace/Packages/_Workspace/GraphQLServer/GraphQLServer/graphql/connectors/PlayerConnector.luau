@@ -1,55 +1,49 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+require(parent.LuauPolyfill)
 
-require(Parent.LuauPolyfill)
+local Promise = require(parent.Promise)
+local GraphQL = require(parent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
+local Fetch = require(parent.Fetch)
 
-local Promise = require(Parent.Promise)
-local GraphQLError = require(Parent.GraphQL).GraphQLError
-local fetch = require(Parent.Fetch).fetch
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
-local UrlBase = require(Parent.UrlBuilder).UrlBase
-local t1 = {}
-local v8 = UrlBuilder.new({
-	path = "users/avatar-headshot",
+local fetch = Fetch.fetch
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local UrlBuilder2 = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder2.UrlBase
+
+local v = urlBuilder.new({
 	base = UrlBase.new("thumbnails", 1),
-	query = {
-		userIds = "{userIds}",
-		size = "48x48",
-		format = "Png",
-		isCircular = "true"
-	}
+	path = "users/avatar-headshot",
+	query = { userIds = "{userIds}", size = "48x48", format = "Png", isCircular = "true" }
 })
+return {
+	findAvatarHeadshotById = function(userIds: string, p)
+		local v2 = p or fetch
+		return Promise.new(function(callback, callback2)
+			local expect = v2(v({ userIds = userIds }), { method = "GET" }):expect()
 
-function t1.findAvatarHeadshotById(s1: string, p1) -- line: 25
-	-- upvalues: fetch (copy), Promise (copy), v8 (copy), GraphQLError (copy)
-	local v11 = p1 or fetch
+			if not expect.ok then
+				callback2(GraphQLError.new(string.format(
+					"Http error occurred while trying to fetch avatarHeadshot for user %s.",
+					userIds
+				)))
 
-	return Promise.new(function(resolve, reject) -- line: 28
-		-- upvalues: v8 (copy), s1 (copy), v11 (copy), GraphQLError (copy)
-		local v14 = v8({
-			userIds = s1
-		})
-		local v15 = v11(v14, {
-			method = "GET"
-		}):expect()
+				return
+			end
 
-		if not v15.ok then
-			reject(GraphQLError.new(string.format("Http error occurred while trying to fetch avatarHeadshot for user %s.", s1)))
+			local expect2 = expect:json():catch(function(): nil
+				return nil
+			end):expect()
 
-			return
-		end
-
-		local v16 = v15:json():catch(function() -- line: 48
-			return nil
-		end):expect()
-
-		if not v16 then
-			reject(GraphQLError.new(string.format("Failed to parse avatarHeadshot HttpResponse for user %s.", s1)))
-
-			return
-		end
-
-		resolve(v16.data[1].imageUrl)
-	end)
-end
-
-return t1
+			if expect2 then
+				callback(expect2.data[1].imageUrl)
+			else
+				callback2(GraphQLError.new(string.format(
+					"Failed to parse avatarHeadshot HttpResponse for user %s.",
+					userIds
+				)))
+			end
+		end)
+	end
+}

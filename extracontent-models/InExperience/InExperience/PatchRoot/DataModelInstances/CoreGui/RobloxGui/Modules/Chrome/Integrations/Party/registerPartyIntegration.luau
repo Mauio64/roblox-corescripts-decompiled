@@ -1,86 +1,84 @@
 local Chrome = script:FindFirstAncestor("Chrome")
+
 local CorePackages = game:GetService("CorePackages")
+
 local PartyIcon = require(script.Parent.PartyIcon)
+
 local Service = require(Chrome.Service)
 local ChromeIntegrationUtils = require(Chrome.Integrations.ChromeIntegrationUtils)
 local GetFStringConnectTooltipLocalStorageKey = require(Chrome.Flags.GetFStringConnectTooltipLocalStorageKey)
 local LocalStore = require(Chrome.ChromeShared.Service.LocalStore)
-local MappedSignal = require(Chrome.ChromeShared.Service.ChromeUtils).MappedSignal
-local FocusUtils = require(CorePackages.Workspace.Packages.Chrome).FocusUtils
+
+local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
+local MappedSignal = ChromeUtils.MappedSignal
+
 local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local FocusUtils = Chrome2.FocusUtils
+local Chrome3 = require(CorePackages.Workspace.Packages.Chrome)
 local InExperienceAppChatModal = require(CorePackages.Workspace.Packages.AppChat.InExperienceAppChatModal)
-local MouseIconOverrideService = require(CorePackages.Workspace.Packages.CoreScriptsCommon).MouseIconOverrideService
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local MouseIconOverrideService = CoreScriptsCommon.MouseIconOverrideService
 local React = require(CorePackages.Packages.React)
 local Responsive = require(CorePackages.Workspace.Packages.Responsive)
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local Symbol = AppCommonLib.Symbol
+
+local SocialCommon = require(CorePackages.Workspace.Packages.SocialCommon)
+local ChatEntryPointNames = SocialCommon.Enums.ChatEntryPointNames
+
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
-local Symbol = require(CorePackages.Workspace.Packages.AppCommonLib).Symbol
-local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
-local v18 = game:DefineFastFlag("ConnectIntegrationCheckForDirectionalInput", false)
-local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
-local v20 = if not FFlagChromeActivatedMappedSignal then nil else MappedSignal.new(InExperienceAppChatModal.default.visibilitySignal.Event, function() -- line: 31
-	-- upvalues: InExperienceAppChatModal (copy)
+local FFlagAppChatDistinctUnibarEntryPoint = SharedFlags.FFlagAppChatDistinctUnibarEntryPoint
+
+local SideSheetPlacement = Chrome3.Enums.SideSheetPlacement
+
+local isActivated = MappedSignal.new(InExperienceAppChatModal.default.visibilitySignal.Event, function()
 	return InExperienceAppChatModal:getVisible()
 end)
 
-return function(s1: string, n1: number) -- line: 36
-	-- upvalues: Service (copy), SideSheetPlacement (copy), InExperienceAppChatModal (copy), ChromeIntegrationUtils (copy), v18 (copy), Responsive (copy), FocusUtils (copy), LocalStore (copy), GetFStringConnectTooltipLocalStorageKey (copy), FFlagChromeActivatedMappedSignal (copy), v20 (copy), React (copy), PartyIcon (copy), Symbol (copy), MouseIconOverrideService (copy)
-	local v23 = Service:register({
-		label = "Feature.Squads.Label.Party",
-		id = s1,
+return function(p: string, initialAvailability: number)
+	local v = Service:register({
+		id = p,
 		sideSheetPlacement = SideSheetPlacement.None,
-		activated = function() -- line: 41
-			-- upvalues: InExperienceAppChatModal (copy), ChromeIntegrationUtils (copy), v18 (copy), Responsive (copy), FocusUtils (copy), LocalStore (copy), GetFStringConnectTooltipLocalStorageKey (copy)
+		label = "Feature.Squads.Label.Party",
+		activated = function()
 			if InExperienceAppChatModal:getVisible() then
 				InExperienceAppChatModal.default:setVisible(false)
 			else
-				ChromeIntegrationUtils.dismissRobloxMenuAndRun(function() -- line: 45
-					-- upvalues: v18 (copy), Responsive (copy), FocusUtils (copy), InExperienceAppChatModal (copy)
-					if v18 then
-						if Responsive.GetInputModeStore(false).getLastInputType(false) == Responsive.Input.Directional then
-							FocusUtils.FocusOffChrome()
-						end
-
-						InExperienceAppChatModal.default:setVisible(true)
-
-						return
+				ChromeIntegrationUtils.dismissRobloxMenuAndRun(function()
+					if Responsive.GetInputModeStore(false).getLastInputType(false) == Responsive.Input.Directional then
+						FocusUtils.FocusOffChrome()
 					end
 
-					FocusUtils.FocusOffChrome(function() -- line: 53
-						-- upvalues: InExperienceAppChatModal (copy)
+					if FFlagAppChatDistinctUnibarEntryPoint then
+						InExperienceAppChatModal.default:setVisible(true, ChatEntryPointNames.ChromeUnibar)
+					else
 						InExperienceAppChatModal.default:setVisible(true)
-					end)
+					end
 				end)
 			end
 
 			LocalStore.storeForLocalPlayer(GetFStringConnectTooltipLocalStorageKey(), true)
 		end,
-		isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 63
-			-- upvalues: InExperienceAppChatModal (copy)
-			return InExperienceAppChatModal:getVisible()
-		end or v20,
+		isActivated = isActivated,
 		components = {
-			Icon = function(p1) -- line: 67
-				-- upvalues: React (copy), PartyIcon (copy), s1 (copy)
+			Icon = function(p2)
 				return React.createElement(PartyIcon, {
-					integrationId = s1,
-					isIconVisible = p1.visible
+					integrationId = p,
+					isIconVisible = p2.visible
 				})
 			end
 		},
-		initialAvailability = n1
+		initialAvailability = initialAvailability
 	})
-	local v24 = Symbol.named("InExperienceRobloxParty")
 
-	InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p2) -- line: 79
-		-- upvalues: MouseIconOverrideService (copy), v24 (copy)
+	local named = Symbol.named("InExperienceRobloxParty")
+	InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p2)
 		if p2 then
-			MouseIconOverrideService.push(v24, Enum.OverrideMouseIconBehavior.ForceShow)
-
-			return
+			MouseIconOverrideService.push(named, Enum.OverrideMouseIconBehavior.ForceShow)
+		else
+			MouseIconOverrideService.pop(named)
 		end
-
-		MouseIconOverrideService.pop(v24)
 	end)
 
-	return v23
+	return v
 end

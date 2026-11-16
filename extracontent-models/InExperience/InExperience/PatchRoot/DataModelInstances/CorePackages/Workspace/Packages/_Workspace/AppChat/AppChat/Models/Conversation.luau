@@ -1,135 +1,146 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local GenerateStringId = require(AppChatParent.AppCommonLib).GenerateStringId
-local OrderedMap = require(AppChatParent.AppCommonLib).OrderedMap
+local parent = AppChat.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local GenerateStringId = AppCommonLib.GenerateStringId
+local AppCommonLib2 = require(parent.AppCommonLib)
+local OrderedMap = AppCommonLib2.OrderedMap
 local Constants = require(AppChat.Constants)
-local DateTime = require(AppChatParent.Time).DateTime
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local Time = require(parent.Time)
+local DateTime = Time.DateTime
+local AppChatNetworking = require(parent.AppChatNetworking)
+
 local Players = game:GetService("Players")
 
-local function getMessageId(p1) -- line: 13
-	return p1.id
-end
-local function messageSortPredicate(p2, p3) -- line: 17
-	return p2.sent:GetUnixTimestamp() < p3.sent:GetUnixTimestamp()
-end
-local function sendingMessageSortPredicate(p4, p5) -- line: 24
-	return p4.order < p5.order
+local function getMessageId(p)
+	return p.id
 end
 
-local t1 = {
-	Type = {
-		MULTI_USER_CONVERSATION = "MultiUserConversation",
-		ONE_TO_ONE_CONVERSATION = "OneToOneConversation"
-	},
-	OsaAcknowledgementStatus = AppChatNetworking.Constants.OsaAcknowledgementStatusResponse,
-	UserOptedIntoChatMessagesStatus = AppChatNetworking.Constants.UserOptedIntoChatMessagesStatusResponse
+local function messageSortPredicate(p, p2): boolean
+	return p.sent:GetUnixTimestamp() < p2.sent:GetUnixTimestamp()
+end
+
+local function sendingMessageSortPredicate(p, p2): boolean
+	return p.order < p2.order
+end
+
+local Conversation = {}
+
+Conversation.Type = {
+	MULTI_USER_CONVERSATION = "MultiUserConversation",
+	ONE_TO_ONE_CONVERSATION = "OneToOneConversation"
 }
 
-function t1.IdForFakeOneOnOne(p6) -- line: 38
-	-- upvalues: t1 (copy)
-	local ONE_TO_ONE_CONVERSATION = t1.Type.ONE_TO_ONE_CONVERSATION
+Conversation.OsaAcknowledgementStatus = AppChatNetworking.Constants.OsaAcknowledgementStatusResponse
+Conversation.UserOptedIntoChatMessagesStatus = AppChatNetworking.Constants.UserOptedIntoChatMessagesStatusResponse
 
-	table.sort(p6)
+function Conversation.IdForFakeOneOnOne(list)
+	local v = Conversation.Type.ONE_TO_ONE_CONVERSATION
+	table.sort(list)
 
-	for _, v in ipairs(p6) do
-		ONE_TO_ONE_CONVERSATION ..= "-" .. tostring(v)
+	for _, item in ipairs(list) do
+		v ..= "-" .. tostring(item)
 	end
 
-	return ONE_TO_ONE_CONVERSATION
+	return v
 end
-function t1.new() -- line: 50
+
+function Conversation.new()
 	return {}
 end
-function t1.fromUser(p7) -- line: 56
-	-- upvalues: t1 (copy), OrderedMap (copy), getMessageId (copy), messageSortPredicate (copy), sendingMessageSortPredicate (copy), GenerateStringId (copy), Players (copy), Constants (copy)
-	local v23 = t1.new()
 
-	v23.messages = OrderedMap.new(getMessageId, messageSortPredicate)
-	v23.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
-	v23.clientId = GenerateStringId()
-	v23.initiator = nil
-	v23.hasUnreadMessages = false
-	v23.conversationType = t1.Type.ONE_TO_ONE_CONVERSATION
-	v23.participants = {
-		tostring(Players.LocalPlayer.UserId),
-		p7.id
-	}
-	v23.usersTyping = {}
-	v23.isUserLeaving = false
-	v23.fetchingOlderMessages = false
-	v23.fetchedOldestMessage = false
-	v23.serverState = Constants.ServerState.NONE
-	v23.id = t1.IdForFakeOneOnOne(v23.participants)
-	v23.lastUpdated = nil
-	v23.isDefaultTitle = true
-	v23.title = p7.displayName or p7.name
+function Conversation.fromUser(data)
+	local v = Conversation.new()
 
-	return v23
+	v.messages = OrderedMap.new(getMessageId, messageSortPredicate)
+	v.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
+	v.clientId = GenerateStringId()
+	v.initiator = nil
+	v.hasUnreadMessages = false
+	v.conversationType = Conversation.Type.ONE_TO_ONE_CONVERSATION
+	v.participants = { tostring(Players.LocalPlayer.UserId), data.id }
+	v.usersTyping = {}
+	v.isUserLeaving = false
+	v.fetchingOlderMessages = false
+	v.fetchedOldestMessage = false
+	v.serverState = Constants.ServerState.NONE
+
+	v.id = Conversation.IdForFakeOneOnOne(v.participants)
+	v.lastUpdated = nil
+
+	v.isDefaultTitle = true
+
+	v.title = data.displayName or data.name
+
+	return v
 end
-function t1.empty(p8) -- line: 82
-	-- upvalues: t1 (copy), OrderedMap (copy), getMessageId (copy), messageSortPredicate (copy), sendingMessageSortPredicate (copy), Constants (copy), DateTime (copy)
-	local v25 = t1.new()
 
-	v25.id = "-1"
-	v25.messages = OrderedMap.new(getMessageId, messageSortPredicate)
-	v25.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
-	v25.title = ""
-	v25.initiator = "0"
-	v25.hasUnreadMessages = false
-	v25.conversationType = t1.Type.MULTI_USER_CONVERSATION
-	v25.participants = {}
-	v25.usersTyping = {}
-	v25.isUserLeaving = false
-	v25.fetchingOlderMessages = false
-	v25.serverState = Constants.ServerState.NONE
-	v25.pinnedGame = {}
-	v25.lastUpdated = DateTime.now()
-	v25.isDefaultTitle = true
-	v25.osaAcknowledgementStatus = t1.OsaAcknowledgementStatus.NotApplicable
-	v25.userOptedIntoChatMessages = t1.UserOptedIntoChatMessagesStatus.NotApplicable
+function Conversation.empty(items)
+	local result = Conversation.new()
 
-	if p8 ~= nil then
-		for k, v in pairs(p8) do
-			v25[k] = v
+	result.id = "-1"
+	result.messages = OrderedMap.new(getMessageId, messageSortPredicate)
+	result.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
+	result.title = ""
+	result.initiator = "0"
+	result.hasUnreadMessages = false
+	result.conversationType = Conversation.Type.MULTI_USER_CONVERSATION
+	result.participants = {}
+	result.usersTyping = {}
+	result.isUserLeaving = false
+	result.fetchingOlderMessages = false
+	result.serverState = Constants.ServerState.NONE
+	result.pinnedGame = {}
+
+	result.lastUpdated = DateTime.now()
+
+	result.isDefaultTitle = true
+
+	result.osaAcknowledgementStatus = Conversation.OsaAcknowledgementStatus.NotApplicable
+	result.userOptedIntoChatMessages = Conversation.UserOptedIntoChatMessagesStatus.NotApplicable
+
+	if items ~= nil then
+		for k, item in pairs(items) do
+			result[k] = item
 		end
 	end
 
-	return v25
-end
-function t1.fromWeb(p9, p10) -- line: 116
-	-- upvalues: t1 (copy), OrderedMap (copy), getMessageId (copy), messageSortPredicate (copy), sendingMessageSortPredicate (copy), GenerateStringId (copy), Constants (copy), DateTime (copy)
-	local v30 = t1.new()
-
-	v30.messages = OrderedMap.new(getMessageId, messageSortPredicate)
-	v30.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
-	v30.id = tostring(p9.id)
-	v30.clientId = p10 or GenerateStringId()
-	v30.title = p9.title
-	v30.initiator = tostring(p9.initiator.targetId)
-	v30.hasUnreadMessages = p9.hasUnreadMessages
-	v30.conversationType = p9.conversationType
-	v30.participants = {}
-	v30.usersTyping = {}
-	v30.isUserLeaving = false
-	v30.fetchingOlderMessages = false
-	v30.serverState = Constants.ServerState.CREATED
-	v30.pinnedGame = {}
-
-	if p9.conversationUniverse ~= nil then
-		v30.pinnedGame.universeId = tostring(p9.conversationUniverse.universeId)
-		v30.pinnedGame.rootPlaceId = tostring(p9.conversationUniverse.rootPlaceId)
-	end
-
-	v30.lastUpdated = DateTime.fromIsoDate(p9.lastUpdated)
-	v30.titleForViewer = p9.conversationTitle.titleForViewer
-	v30.isDefaultTitle = p9.conversationTitle.isDefaultTitle
-
-	for _, v in ipairs(p9.participants) do
-		table.insert(v30.participants, (tostring(v.targetId)))
-	end
-
-	return v30
+	return result
 end
 
-return t1
+function Conversation.fromWeb(data, p)
+	local v = Conversation.new()
+
+	v.messages = OrderedMap.new(getMessageId, messageSortPredicate)
+	v.sendingMessages = OrderedMap.new(getMessageId, sendingMessageSortPredicate)
+	v.id = tostring(data.id)
+	v.clientId = p or GenerateStringId()
+	v.title = data.title
+	v.initiator = tostring(data.initiator.targetId)
+	v.hasUnreadMessages = data.hasUnreadMessages
+	v.conversationType = data.conversationType
+	v.participants = {}
+	v.usersTyping = {}
+	v.isUserLeaving = false
+	v.fetchingOlderMessages = false
+	v.serverState = Constants.ServerState.CREATED
+	v.pinnedGame = {}
+
+	if data.conversationUniverse ~= nil then
+		v.pinnedGame.universeId = tostring(data.conversationUniverse.universeId)
+		v.pinnedGame.rootPlaceId = tostring(data.conversationUniverse.rootPlaceId)
+	end
+
+	v.lastUpdated = DateTime.fromIsoDate(data.lastUpdated)
+
+	v.titleForViewer = data.conversationTitle.titleForViewer
+	v.isDefaultTitle = data.conversationTitle.isDefaultTitle
+
+	for _, participant in ipairs(data.participants) do
+		table.insert(v.participants, (tostring(participant.targetId)))
+	end
+
+	return v
+end
+
+return Conversation

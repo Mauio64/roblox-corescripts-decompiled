@@ -1,209 +1,210 @@
 local HttpService = game:GetService("HttpService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local isArray = require(scriptParent.Array.isArray)
 
-require(scriptParentParent.ES7Types)
+local parent = script.Parent
+local parent2 = parent.Parent
 
-local formatValue = nil
-local formatObjectValue = nil
-local formatArray = nil
-local formatObject = nil
-local getObjectTag = nil
+local isArray = require(parent.Array.isArray)
+require(parent2.ES7Types)
 
-local function inspect(p1, t1: {[any]: any}?) -- line: 51
-	-- upvalues: formatValue (ref)
-	local v18 = t1 or {
-		depth = 2
-	}
-	local v19 = v18.depth or 2
+local formatValue
+local formatObjectValue
+local formatArray
+local formatObject
+local getObjectTag
 
-	v18.depth = not (v19 >= 0) and 2 or v19
-
-	return formatValue(p1, {}, v18)
+local function inspect(p, p2)
+	local v = p2 or { depth = 2 }
+	local depth = v.depth or 2
+	v.depth = not (depth >= 0) and 2 or depth
+	return formatValue(p, {}, v)
 end
-local function isIndexKey(p2, p3) -- line: 58
-	return type(p2) == "number" and (p2 <= p3 and (p2 >= 1 and p2 == math.floor(p2)))
-end
-local function getTableLength(p4) -- line: 65
-	local n1 = 1
-	local v24 = rawget(p4, n1)
 
-	while v24 ~= nil do
-		n1 += 1
-		v24 = rawget(p4, n1)
+local function isIndexKey(value, p): boolean
+	return type(value) == "number" and value <= p and value >= 1 and math.floor(value) == value
+end
+
+local function getTableLength(p)
+	local v = 1
+	local v2 = rawget(p, v)
+
+	while v2 ~= nil do
+		v += 1
+		v2 = rawget(p, v)
 	end
 
-	return n1 - 1
+	return v - 1
 end
-local function sortKeysForPrinting(p5, p6) -- line: 75
-	local v27 = type(p5)
-	local v28 = type(p6)
 
-	if v27 == v28 and (v27 == "number" or v27 == "string") then
-		return p5 < p6
+local function sortKeysForPrinting(p, p2): boolean
+	local typeName = type(p)
+	local typeName2 = type(p2)
+
+	if typeName == typeName2 and (typeName == "number" or typeName == "string") then
+		return p < p2
 	end
 
-	return v27 < v28
+	return typeName < typeName2
 end
-local function rawpairs(p7) -- line: 88
-	return next, p7, nil
-end
-local function getFragmentedKeys(p8) -- line: 92
-	-- upvalues: sortKeysForPrinting (copy)
-	local t2 = {}
-	local n2 = 0
-	local n3 = 1
-	local v34 = rawget(p8, n3)
 
-	while v34 ~= nil do
-		n3 += 1
-		v34 = rawget(p8, n3)
+local function rawpairs(p)
+	return next, p, nil
+end
+
+local function getFragmentedKeys(items)
+	local v = 1
+	local v2 = rawget(items, v)
+	local count = 0
+	local result = {}
+
+	while v2 ~= nil do
+		v += 1
+		v2 = rawget(items, v)
 	end
 
-	local v35 = n3 - 1
+	local v3 = v - 1
 
-	for k, _ in next, p8 do
-		if type(k) ~= "number" or (not (k <= v35) or (not (k >= 1) or k ~= math.floor(k))) then
-			n2 += 1
-			t2[n2] = k
+	for k, _ in next, items do
+		local v4
+
+		if type(k) == "number" and k <= v3 and k >= 1 then
+			v4 = math.floor(k) == k
+		else
+			v4 = false
 		end
+
+		if v4 then
+			continue
+		end
+
+		count += 1
+		result[count] = k
 	end
 
-	table.sort(t2, sortKeysForPrinting)
-
-	return t2, n2, v35
+	table.sort(result, sortKeysForPrinting)
+	return result, count, v3
 end
 
-function formatValue(p9, p10, t3: {[any]: any}) -- line: 106
-	-- upvalues: HttpService (copy), formatObjectValue (ref)
-	local v41 = typeof(p9)
+formatValue = function(p, p2, p3)
+	local typeName = typeof(p)
 
-	if v41 == "string" then
-		return HttpService:JSONEncode(p9)
+	if typeName == "string" then
+		return HttpService:JSONEncode(p)
 	end
 
-	if v41 == "number" then
-		if p9 ~= p9 then
+	if typeName == "number" then
+		if p ~= p then
 			return "NaN"
 		end
 
-		if p9 == 1e999 then
+		if p == 1e999 then
 			return "Infinity"
-		end
-
-		if p9 == -1e999 then
+		elseif p == -1e999 then
 			return "-Infinity"
 		end
 
-		return (tostring(p9))
-	end
+		return (tostring(p))
+	elseif typeName == "function" then
+		local v = "[function"
+		local v2 = debug.info(p, "n")
 
-	if v41 == "function" then
-		local s1 = "[function"
-		local v43 = debug.info(p9, "n")
-
-		if v43 ~= nil and v43 ~= "" then
-			s1 ..= " " .. v43
+		if v2 ~= nil and v2 ~= "" then
+			v ..= " " .. v2
 		end
 
-		return s1 .. "]"
+		return v .. "]"
+	elseif typeName == "table" then
+		return formatObjectValue(p, p2, p3)
+	else
+		return (tostring(p))
 	end
-
-	if v41 == "table" then
-		return formatObjectValue(p9, p10, t3)
-	end
-
-	return (tostring(p9))
 end
-function formatObjectValue(p11, p12, t4: {[any]: any}) -- line: 139
-	-- upvalues: formatValue (ref), isArray (copy), formatArray (ref), formatObject (ref)
-	if table.find(p12, p11) ~= nil then
+
+formatObjectValue = function(object, list, p)
+	if table.find(list, object) ~= nil then
 		return "[Circular]"
 	end
 
-	local t5 = { unpack(p12) }
+	local v = { unpack(list) }
+	table.insert(v, object)
 
-	table.insert(t5, p11)
+	if typeof(object.toJSON) == "function" then
+		local json = object:toJSON(object)
 
-	if typeof(p11.toJSON) == "function" then
-		local v48 = p11:toJSON(p11)
-
-		if v48 ~= p11 then
-			if typeof(v48) == "string" then
-				return v48
+		if json ~= object then
+			if typeof(json) == "string" then
+				return json
 			end
 
-			return formatValue(v48, t5, t4)
+			return formatValue(json, v, p)
 		end
-	elseif isArray(p11) then
-		return formatArray(p11, t5, t4)
+	elseif isArray(object) then
+		return formatArray(object, v, p)
 	end
 
-	return formatObject(p11, t5, t4)
+	return formatObject(object, v, p)
 end
-function formatObject(p13, p14, t6: {[any]: any}) -- line: 164
-	-- upvalues: getFragmentedKeys (copy), getObjectTag (ref), formatValue (ref)
-	local s2 = ""
-	local mt = getmetatable(p13)
 
-	if mt and rawget(mt, "__tostring") then
-		return (tostring(p13))
+formatObject = function(list, list2, p)
+	local v = ""
+	local metatable = getmetatable(list)
+
+	if metatable and rawget(metatable, "__tostring") then
+		return (tostring(list))
 	end
 
-	local v54, v55, v56 = getFragmentedKeys(p13)
+	local fragmentedKeys, v2, v3 = getFragmentedKeys(list)
 
-	if v56 == 0 and v55 == 0 then
-		return s2 .. "{}"
+	if v3 == 0 and v2 == 0 then
+		return v .. "{}"
 	end
 
-	if #p14 > t6.depth then
-		return s2 .. "[" .. getObjectTag(p13) .. "]"
+	if #list2 > p.depth then
+		return v .. "[" .. getObjectTag(list) .. "]"
 	end
 
-	local t7 = {}
+	local v4 = {}
 
-	for i = 1, v56 do
-		table.insert(t7, (formatValue(p13[i], p14, t6)))
+	for i = 1, v3 do
+		table.insert(v4, (formatValue(list[i], list2, p)))
 	end
 
-	for i = 1, v55 do
-		local v60 = v54[i]
-
-		table.insert(t7, v60 .. ": " .. formatValue(p13[v60], p14, t6))
+	for i = 1, v2 do
+		local fragmentedKey = fragmentedKeys[i]
+		table.insert(v4, fragmentedKey .. ": " .. formatValue(list[fragmentedKey], list2, p))
 	end
 
-	return s2 .. "{ " .. table.concat(t7, ", ") .. " }"
+	return v .. "{ " .. table.concat(v4, ", ") .. " }"
 end
-function formatArray(p15, p16, t8: {[any]: any}) -- line: 200
-	-- upvalues: formatValue (ref)
-	local v64 = #p15
 
-	if v64 == 0 then
+formatArray = function(list, list2, p)
+	local count = #list
+
+	if count == 0 then
 		return "[]"
 	end
 
-	if #p16 > t8.depth then
+	if #list2 > p.depth then
 		return "[Array]"
 	end
 
-	local v65 = math.min(10, v64)
-	local v66 = v64 - v65
-	local t9 = {}
+	local v = math.min(10, count)
+	local v2 = count - v
+	local v3 = {}
 
-	for i = 1, v65 do
-		t9[i] = formatValue(p15[i], p16, t8)
+	for i = 1, v do
+		v3[i] = formatValue(list[i], list2, p)
 	end
 
-	if v66 == 1 then
-		table.insert(t9, "... 1 more item")
-	elseif v66 > 1 then
-		table.insert(t9, ("... %s more items"):format((tostring(v66))))
+	if v2 == 1 then
+		table.insert(v3, "... 1 more item")
+	elseif v2 > 1 then
+		table.insert(v3, ("... %s more items"):format((tostring(v2))))
 	end
 
-	return "[" .. table.concat(t9, ", ") .. "]"
+	return "[" .. table.concat(v3, ", ") .. "]"
 end
-function getObjectTag(_) -- line: 226
+
+getObjectTag = function(_): string
 	return "Object"
 end
 

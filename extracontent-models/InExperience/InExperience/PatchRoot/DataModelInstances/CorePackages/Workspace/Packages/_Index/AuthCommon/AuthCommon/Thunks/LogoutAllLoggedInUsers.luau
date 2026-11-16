@@ -1,51 +1,48 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Promise = require(AuthCommonParent.Promise)
+local parent = AuthCommon.Parent
+
+local Promise = require(parent.Promise)
 local LogoutAllLoggedInUsersRequest = require(AuthCommon.Http.Requests.LogoutAllLoggedInUsersRequest)
 local GetLoggedInUsersMetadataRequest = require(AuthCommon.Http.Requests.GetLoggedInUsersMetadataRequest)
-local FFlagEnableLuaAccountSwitch = require(AuthCommonParent.SharedFlags).FFlagEnableLuaAccountSwitch
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableLuaAccountSwitch = SharedFlags.FFlagEnableLuaAccountSwitch
 local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
 local recordSignOut = require(AuthCommon.Utils.recordSignOut)
 
-local function recordSignOutOnLogoutAll(p1, p2) -- line: 11
-	-- upvalues: GetLoggedInUsersMetadataRequest (copy), recordSignOut (copy)
-	local v12, v13 = GetLoggedInUsersMetadataRequest(p1, p2):await()
+local function recordSignOutOnLogoutAll(p, p2)
+	local v, v2 = GetLoggedInUsersMetadataRequest(p, p2):await()
 
-	if v12 and (v13 and v13.responseBody and v13.responseBody.logged_in_users_metadata) then
-		for _, v in ipairs(v13.responseBody.logged_in_users_metadata) do
-			pcall(function() -- line: 15
-				-- upvalues: recordSignOut (copy), v (copy)
-				recordSignOut(v, true)
+	if v and v2 and v2.responseBody and v2.responseBody.logged_in_users_metadata then
+		for _, v3 in ipairs(v2.responseBody.logged_in_users_metadata) do
+			pcall(function()
+				recordSignOut(v3, true)
 			end)
 		end
 	end
 end
 
-return function(p3, _: boolean) -- line: 22
-	-- upvalues: FFlagEnableLuaAccountSwitch (copy), Promise (copy), AppStorageUtilities (copy), recordSignOutOnLogoutAll (copy), LogoutAllLoggedInUsersRequest (copy)
+return function(p, _: boolean)
 	if not FFlagEnableLuaAccountSwitch then
 		return Promise.resolve()
 	end
 
-	local v18 = AppStorageUtilities.getAccountBlob()
+	local accountBlob = AppStorageUtilities.getAccountBlob()
 
-	pcall(recordSignOutOnLogoutAll, p3, v18)
+	pcall(recordSignOutOnLogoutAll, p, accountBlob)
+
 	AppStorageUtilities.setAccountBlob("")
 	AppStorageUtilities.flush()
-
-	return LogoutAllLoggedInUsersRequest(p3, v18):andThen(function(p4) -- line: 33
-		-- upvalues: Promise (copy)
-		return Promise.resolve(p4.responseBody)
-	end):catch(function(p5) -- line: 35
-		-- upvalues: Promise (copy)
-		if p5.data then
-			return Promise.reject(p5.data.errorCode)
+	return LogoutAllLoggedInUsersRequest(p, accountBlob):andThen(function(p2)
+		return Promise.resolve(p2.responseBody)
+	end):catch(function(p2)
+		if p2.data then
+			return Promise.reject(p2.data.errorCode)
 		end
 
-		if not p5.StatusCode then
-			return Promise.reject()
+		if p2.StatusCode then
+			return Promise.reject({ p2.StatusCode })
 		end
 
-		return Promise.reject({ p5.StatusCode })
+		return Promise.reject()
 	end)
 end

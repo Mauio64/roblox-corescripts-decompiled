@@ -1,7 +1,13 @@
-return function(s1: string, n1: number, n2: number?) -- line: 16
-	if n2 and n2 <= 0 then
+return function(value: string, p: number, p2: number?)
+	if p2 and p2 <= 0 then
 		return ""
 	end
 
-	return (string.sub(s1, n1, n2 and n1 + n2 - 1 or nil))
+	local v
+
+	if p2 then
+		v = p + p2 - 1 or nil
+	end
+
+	return (string.sub(value, p, v))
 end

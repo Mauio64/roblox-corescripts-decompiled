@@ -1,3 +1,5 @@
-local Telemetry = script:FindFirstAncestor("AppChat").Telemetry
+local telemetry = script:FindFirstAncestor("AppChat").Telemetry
+local createReactTelemetryLayer = require(telemetry.createReactTelemetryLayer)
+local ChatConversationTelemetryLayer = require(telemetry.Layers.ChatConversationTelemetryLayer)
 
-return (require(Telemetry.createReactTelemetryLayer)(require(Telemetry.Layers.ChatConversationTelemetryLayer).Context, {}))
+return (createReactTelemetryLayer(ChatConversationTelemetryLayer.Context, {}))

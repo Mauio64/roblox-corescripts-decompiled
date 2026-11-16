@@ -1,76 +1,75 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local parent = AvatarExperienceInspectAndBuy.Parent
 
 require(AvatarExperienceInspectAndBuy.Types)
-
-local ItemTypeEnum = require(AvatarExperienceInspectAndBuyParent.AXCommon).Enums.ItemTypeEnum
-
+local AvatarExperienceModel = require(parent.AvatarExperienceModel)
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
 require(AvatarExperienceInspectAndBuy.Stores.createItemSelectionStore)
-
 local convertAssetInfoToItemData = require(AvatarExperienceInspectAndBuy.Utils.convertAssetInfoToItemData)
 local convertBundleInfoToItemData = require(AvatarExperienceInspectAndBuy.Utils.convertBundleInfoToItemData)
 local getPriceStatus = require(AvatarExperienceInspectAndBuy.Utils.getPriceStatus)
-
 require(AvatarExperienceInspectAndBuy.Enums.PriceStatus)
+local itemDetailsUtils = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils)
+local getPriceInRobux = itemDetailsUtils.getPriceInRobux
 
-local getPriceInRobux = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils).getPriceInRobux
+local function buildBulkPurchaseAnalyticsPayload(data)
+	local itemId = data.itemId
+	local collectibleResellableInstances = data.collectibleResellableInstances
+	local storedData = data.storedData
 
-local function buildBulkPurchaseAnalyticsPayload(t1: {[any]: any}) -- line: 47
-	-- upvalues: ItemTypeEnum (copy), convertAssetInfoToItemData (copy), getPriceStatus (copy), getPriceInRobux (copy), convertBundleInfoToItemData (copy)
-	local itemId = t1.itemId
-	local collectibleResellableInstances = t1.collectibleResellableInstances
-	local storedData = t1.storedData
 	local days = nil
-	local v18, assetTypeId
+	local price, itemSubType
 
-	if t1.itemType == ItemTypeEnum.Asset then
-		local v14 = t1.assetsMap and t1.assetsMap[itemId]
+	if data.itemType == ItemTypeEnum.Asset then
+		local v = data.assetsMap and data.assetsMap[itemId]
 
-		if not v14 then
+		if not v then
 			return nil
 		end
 
-		local v15 = if not v14.collectibleItemId or not collectibleResellableInstances then nil else collectibleResellableInstances[v14.collectibleItemId]
-		local v16 = convertAssetInfoToItemData(v14, v15)
-		local v17 = getPriceStatus(v16, true)
+		local v2
 
-		v18 = getPriceInRobux(v16, v17)
-		assetTypeId = v14.assetTypeId
+		if v.collectibleItemId and collectibleResellableInstances then
+			v2 = collectibleResellableInstances[v.collectibleItemId]
+		end
+
+		local v3 = convertAssetInfoToItemData(v, v2)
+		price = getPriceInRobux(v3, (getPriceStatus(v3, true)))
+		itemSubType = v.assetTypeId
 
 		if storedData and storedData.timedOptions then
-			for _, v21 in storedData.timedOptions do
-				if v21.selected then
-					days = v21.days
-					v18 = v21.price
-
-					return {
-						itemSubType = assetTypeId,
-						timedOptionDays = days,
-						price = v18
-					}
+			for _, timedOption in storedData.timedOptions do
+				if timedOption.selected then
+					days = timedOption.days
+					price = timedOption.price
+					break
 				end
 			end
 		end
-	else
-		local v22 = t1.bundlesMap and t1.bundlesMap[itemId]
 
-		if not v22 then
+		return { itemSubType = itemSubType, timedOptionDays = days, price = price }
+	else
+		local v = data.bundlesMap and data.bundlesMap[itemId]
+
+		if not v then
 			return nil
 		end
 
-		local v23 = if not v22.collectibleItemId or not collectibleResellableInstances then nil else collectibleResellableInstances[v22.collectibleItemId]
-		local v24 = convertBundleInfoToItemData(v22, v23)
-		local v25 = getPriceStatus(v24, true)
+		local v2
 
-		v18 = getPriceInRobux(v24, v25)
-		assetTypeId = if not v24 then nil else v24.itemSubType
+		if v.collectibleItemId and collectibleResellableInstances then
+			v2 = collectibleResellableInstances[v.collectibleItemId]
+		end
+
+		local v3 = convertBundleInfoToItemData(v, v2)
+		price = getPriceInRobux(v3, (getPriceStatus(v3, true)))
+
+		if v3 then
+			itemSubType = v3.itemSubType
+		end
+
+		return { itemSubType = itemSubType, timedOptionDays = days, price = price }
 	end
-
-	return {
-		itemSubType = assetTypeId,
-		timedOptionDays = days,
-		price = v18
-	}
 end
 
 return buildBulkPurchaseAnalyticsPayload

@@ -1,3 +1,1 @@
-return {
-	TimeTrigger = require(script.TimeTrigger)
-}
+return { TimeTrigger = require(script.TimeTrigger) }

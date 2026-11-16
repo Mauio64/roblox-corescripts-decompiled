@@ -1,48 +1,36 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFFlagUGCValidateMigrateCurveAnim = require(ParentParent.flags.getFFlagUGCValidateMigrateCurveAnim)
-local getFIntUGCValidateMaxTotalMarkerCurves = require(ParentParent.flags.getFIntUGCValidateMaxTotalMarkerCurves)
-local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
-local t1 = {
-	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION }
-}
+local getFIntUGCValidateMaxTotalMarkerCurves = require(parent.flags.getFIntUGCValidateMaxTotalMarkerCurves)
+return {
+	categories = { ValidationEnums.UploadCategory.EMOTE_ANIMATION, ValidationEnums.UploadCategory.ANIMATION },
+	requiredData = { ValidationEnums.SharedDataMember.curveAnimations },
+	expectedFailures = {},
+	prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable },
+	run = function(object, p)
+		local fIntUGCValidateMaxTotalMarkerCurves = getFIntUGCValidateMaxTotalMarkerCurves()
 
-if getFFlagUGCValidationAnimationPackSupport() then
-	table.insert(t1.categories, ValidationEnums.UploadCategory.ANIMATION)
-end
+		for _, folder in p.curveAnimations do
+			local count = 0
 
-t1.requiredData = { ValidationEnums.SharedDataMember.curveAnimations }
-t1.fflag = getFFlagUGCValidateMigrateCurveAnim
-t1.expectedFailures = {}
-t1.prereqTests = { ValidationEnums.ValidationModule.CurveAnimDataAvailable }
+			for _, markerCurve in folder:GetDescendants() do
+				if not markerCurve:IsA("MarkerCurve") then
+					continue
+				end
 
-function t1.run(p1, p2) -- line: 24
-	-- upvalues: getFIntUGCValidateMaxTotalMarkerCurves (copy), ErrorSourceStrings (copy)
-	local v10 = getFIntUGCValidateMaxTotalMarkerCurves()
+				count += 1
 
-	for _, v12 in p2.curveAnimations do
-		local n1 = 0
+				if fIntUGCValidateMaxTotalMarkerCurves < count then
+					object:fail(ErrorSourceStrings.Keys.CurveAnim_TooManyMarkerCurves, {
+						maxAllowed = tostring(fIntUGCValidateMaxTotalMarkerCurves)
+					})
 
-		for _, descendant in v12:GetDescendants() do
-			if not descendant:IsA("MarkerCurve") then
-				continue
-			end
-
-			n1 += 1
-
-			if v10 < n1 then
-				p1:fail(ErrorSourceStrings.Keys.CurveAnim_TooManyMarkerCurves, {
-					maxAllowed = tostring(v10)
-				})
-
-				return
+					return
+				end
 			end
 		end
 	end
-end
-
-return t1
+}

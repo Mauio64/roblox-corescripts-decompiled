@@ -1,61 +1,75 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
-local SocialLuaAnalytics = require(ParentParent.SocialLuaAnalytics)
+
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
 local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
 local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+
 local EventStreamActionList = require(script.Parent.EventStreamActionList)
 local DiagActionList = require(script.Parent.DiagActionList)
-local React = require(ParentParent.React)
-local GetFFlagIsSquadEnabled = require(ParentParent.SharedFlags).GetFFlagIsSquadEnabled
+
+local React = require(parent.React)
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local RoactChatAnalyticsContext = require(script.Parent.RoactChatAnalyticsContext)
 local Logger = require(script.Parent.Logger)
-local ChatEntryPointNames = require(ParentParent.SocialCommon).Enums.ChatEntryPointNames
-local useSelector = require(ParentParent.RoactUtils).Hooks.RoactRodux.useSelector
 
-return function(t1: {[any]: any}) -- line: 27
-	-- upvalues: ChatEntryPointNames (copy), Logger (copy), GetFFlagIsSquadEnabled (copy), useSelector (copy), RbxAnalyticsService (copy), React (copy), AnalyticsFactory (copy), EventStreamActionList (copy), DiagActionList (copy), DefaultAnalyticsService (copy), RoactChatAnalyticsContext (copy)
-	local entryPoint = t1.entryPoint
+local SocialCommon = require(parent.SocialCommon)
+local ChatEntryPointNames = SocialCommon.Enums.ChatEntryPointNames
 
-	if not entryPoint or not ChatEntryPointNames[entryPoint] then
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+return function(p)
+	local entryPoint = p.entryPoint
+
+	if not (entryPoint and ChatEntryPointNames[entryPoint]) then
 		Logger:warning("entryPoint=" .. tostring(entryPoint) .. " is not a reigstered value.")
 		entryPoint = ChatEntryPointNames.Unknown
 	end
 
-	local v16 = if not GetFFlagIsSquadEnabled() then nil else useSelector(function(p1) -- line: 36
-		local v20 = p1.Squad and (p1.Squad.Squad and p1.Squad.Squad.currentSquad)
+	local v
 
-		if v20 and v20.squadId then
-			return v20.squadId
-		end
+	if GetFFlagIsSquadEnabled() then
+		v = useSelector(function(p2)
+			local currentSquad = p2.Squad and p2.Squad.Squad and p2.Squad.Squad.currentSquad
 
-		return nil
-	end)
-	local PlaySessionId = RbxAnalyticsService:GetPlaySessionId()
-	local v18 = React.useMemo(function() -- line: 44
-		-- upvalues: AnalyticsFactory (copy), EventStreamActionList (copy), DiagActionList (copy), DefaultAnalyticsService (copy), GetFFlagIsSquadEnabled (copy), v16 (copy), entryPoint (ref), PlaySessionId (copy)
-		return AnalyticsFactory.setUpAnalyticsFactory({
-			eventLists = {
-				EventStream = EventStreamActionList,
-				Diag = DiagActionList
-			},
+			if currentSquad and currentSquad.squadId then
+				return currentSquad.squadId
+			end
+
+			return nil
+		end)
+	else
+		v = nil
+	end
+
+	local playSessionId = RbxAnalyticsService:GetPlaySessionId()
+
+	local v2 = React.useMemo(function()
+		local setUpAnalyticsFactory = AnalyticsFactory.setUpAnalyticsFactory
+		local v2 = {
+			eventLists = { EventStream = EventStreamActionList, Diag = DiagActionList },
 			analyticsImpl = {
 				EventStream = DefaultAnalyticsService.EventStream,
 				Diag = DefaultAnalyticsService.Diag
 			},
-			staticInfoForAllEvents = {
-				channelsApiEnabled = true,
-				squadId = if not GetFFlagIsSquadEnabled() then nil else v16,
-				entryPoint = entryPoint,
-				playSessionId = PlaySessionId
-			}
-		})()
-	end, {
-		v16,
-		entryPoint,
-		PlaySessionId
-	})
+			staticInfoForAllEvents = 0
+		}
+		local squadId
 
-	return React.createElement(RoactChatAnalyticsContext.Provider, {
-		value = v18
-	}, t1.children)
+		if GetFFlagIsSquadEnabled() then
+			squadId = v
+		end
+
+		v2.staticInfoForAllEvents = {
+			squadId = squadId,
+			entryPoint = entryPoint,
+			channelsApiEnabled = true,
+			playSessionId = playSessionId
+		}
+		return setUpAnalyticsFactory(v2)()
+	end, { v, entryPoint, playSessionId })
+
+	return React.createElement(RoactChatAnalyticsContext.Provider, { value = v2 }, p.children)
 end

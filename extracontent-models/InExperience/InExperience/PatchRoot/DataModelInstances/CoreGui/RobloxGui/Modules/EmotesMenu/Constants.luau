@@ -1,10 +1,14 @@
 local CorePackages = game:GetService("CorePackages")
+
 local enumerate = require(CorePackages.Packages.enumerate)
+
 local Layouts = script.Parent.Layouts
+
 local Small = require(Layouts.Small)
 local Large = require(Layouts.Large)
 local TenFoot = require(Layouts.TenFoot)
-local t1 = {
+
+local Constants = {
 	EmotesPerPage = 8,
 	ErrorDisplayTimeSeconds = 5,
 	FallbackLocale = "en-us",
@@ -99,53 +103,41 @@ local t1 = {
 	VirtualCursorSinkAction = "EmotesMenuVirtualCursorSinkAction",
 	ScreenAvailable = UDim2.new(0.9, 0, 0.75, 0),
 	SmallScreenMaxSize = Vector2.new(700, 500),
-	Layout = {
-		Small = 0,
-		Large = 1,
-		TenFoot = 2
-	},
-	Colors = {
-		White = Color3.new(1, 1, 1),
-		Black = Color3.new(0, 0, 0)
-	},
-	OffScreen = enumerate("OffScreen", {
-		"Top",
-		"Bottom"
-	})
+	Layout = { Small = 0, Large = 1, TenFoot = 2 },
+	Colors = { White = Color3.new(1, 1, 1), Black = Color3.new(0, 0, 0) },
+	OffScreen = enumerate("OffScreen", { "Top", "Bottom" })
 }
 
-t1.Layouts = {
-	[t1.Layout.Small] = Small,
-	[t1.Layout.Large] = Large,
-	[t1.Layout.TenFoot] = TenFoot
+Constants.Layouts = {
+	[Constants.Layout.Small] = Small,
+	[Constants.Layout.Large] = Large,
+	[Constants.Layout.TenFoot] = TenFoot
 }
 
-local function makeTableConstant(p1, p2) -- line: 168
-	setmetatable(p2, {
-		__newindex = function() -- line: 170
-		end,
-		__index = function(_, p4) -- line: 172
-			-- upvalues: p1 (copy)
-			error(p1 .. " table has no index: " .. tostring(p4), 2)
+local function makeTableConstant(k, p)
+	setmetatable(p, {
+		__newindex = function() end,
+		__index = function(_, p2)
+			error(k .. " table has no index: " .. tostring(p2), 2)
 		end
 	})
 end
 
-local t2 = {
-	Constants = t1,
-	["Constants.Colors"] = t1.Colors,
-	["Constants.Layout"] = t1.Layout,
-	["Constants.LeaveMenuNoSinkInputs"] = t1.LeaveMenuNoSinkInputs,
-	["Constants.LocalizationKeys"] = t1.LocalizationKeys,
-	["Constants.LocalizationKeys.ErrorMessages"] = t1.LocalizationKeys.ErrorMessages,
-	["Constants.Layouts"] = t1.Layouts,
-	["Constants.Layouts.Small"] = t1.Layouts[t1.Layout.Small],
-	["Constants.Layouts.Large"] = t1.Layouts[t1.Layout.Large],
-	["Constants.Layouts.TenFoot"] = t1.Layouts[t1.Layout.TenFoot]
+local v = {
+	Constants = Constants,
+	["Constants.Colors"] = Constants.Colors,
+	["Constants.Layout"] = Constants.Layout,
+	["Constants.LeaveMenuNoSinkInputs"] = Constants.LeaveMenuNoSinkInputs,
+	["Constants.LocalizationKeys"] = Constants.LocalizationKeys,
+	["Constants.LocalizationKeys.ErrorMessages"] = Constants.LocalizationKeys.ErrorMessages,
+	["Constants.Layouts"] = Constants.Layouts,
+	["Constants.Layouts.Small"] = Constants.Layouts[Constants.Layout.Small],
+	["Constants.Layouts.Large"] = Constants.Layouts[Constants.Layout.Large],
+	["Constants.Layouts.TenFoot"] = Constants.Layouts[Constants.Layout.TenFoot]
 }
 
-for k, v in pairs(t2) do
-	makeTableConstant(k, v)
+for k, v2 in pairs(v) do
+	makeTableConstant(k, v2)
 end
 
-return t1
+return Constants

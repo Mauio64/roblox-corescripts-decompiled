@@ -1,19 +1,18 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
 
-require(scriptParent.Types)
+local function collect(items, callback)
+	local result = {}
 
-local function collect(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 16
-	local t2 = {}
+	for k, item in items do
+		local v, v2 = callback(k, item)
 
-	for v6, v7 in t1 do
-		local v8, v9 = p1(v6, v7)
-
-		if v8 ~= nil then
-			t2[v8] = v9
+		if v ~= nil then
+			result[v] = v2
 		end
 	end
 
-	return t2
+	return result
 end
 
 return collect

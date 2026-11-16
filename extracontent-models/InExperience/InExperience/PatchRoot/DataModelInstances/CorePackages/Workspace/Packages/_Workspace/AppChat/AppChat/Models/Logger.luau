@@ -1,3 +1,4 @@
 local AppChat = script:FindFirstAncestor("AppChat")
+local Logger = require(AppChat.Logger)
 
-return (require(AppChat.Logger):new("RoactChat.Models"))
+return (Logger:new("RoactChat.Models"))

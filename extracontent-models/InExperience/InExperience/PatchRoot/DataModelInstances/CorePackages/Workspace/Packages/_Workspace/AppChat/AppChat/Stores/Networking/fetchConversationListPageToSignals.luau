@@ -1,13 +1,18 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Promise = require(AppChatParent.Promise)
+local parent = AppChat.Parent
+
+local Promise = require(parent.Promise)
+
 local GetConversationPageDataHydration = require(AppChat.Stores.GetConversationPageDataHydration)
 
-local function fetchConversationListPageToSignals(t1: {[any]: any}?) -- line: 12
-	-- upvalues: GetConversationPageDataHydration (copy), Promise (copy)
-	local v7 = if t1 == nil then nil else t1.cursor
+local function fetchConversationListPageToSignals(p)
+	local v
 
-	GetConversationPageDataHydration.fetchPage(v7)
+	if p ~= nil then
+		v = p.cursor
+	end
+
+	GetConversationPageDataHydration.fetchPage(v)
 
 	return Promise.resolve(nil)
 end

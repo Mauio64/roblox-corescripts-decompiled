@@ -1,49 +1,29 @@
-local function getPartNamesInHierarchyOrder(p1) -- line: 5
-	if p1 == Enum.AssetType.LeftArm then
-		return {
-			"LeftUpperArm",
-			"LeftLowerArm",
-			"LeftHand"
-		}
+local function getPartNamesInHierarchyOrder(p)
+	if Enum.AssetType.LeftArm == p then
+		return { "LeftUpperArm", "LeftLowerArm", "LeftHand" }
 	end
 
-	if p1 == Enum.AssetType.RightArm then
-		return {
-			"RightUpperArm",
-			"RightLowerArm",
-			"RightHand"
-		}
+	if Enum.AssetType.RightArm == p then
+		return { "RightUpperArm", "RightLowerArm", "RightHand" }
 	end
 
-	if p1 == Enum.AssetType.LeftLeg then
-		return {
-			"LeftUpperLeg",
-			"LeftLowerLeg",
-			"LeftFoot"
-		}
+	if Enum.AssetType.LeftLeg == p then
+		return { "LeftUpperLeg", "LeftLowerLeg", "LeftFoot" }
 	end
 
-	if p1 == Enum.AssetType.RightLeg then
-		return {
-			"RightUpperLeg",
-			"RightLowerLeg",
-			"RightFoot"
-		}
+	if Enum.AssetType.RightLeg == p then
+		return { "RightUpperLeg", "RightLowerLeg", "RightFoot" }
 	end
 
-	if p1 == Enum.AssetType.DynamicHead then
+	if Enum.AssetType.DynamicHead == p then
 		return { "Head" }
 	end
 
-	if p1 == Enum.AssetType.Torso then
-		return {
-			"LowerTorso",
-			"UpperTorso"
-		}
+	if Enum.AssetType.Torso == p then
+		return { "LowerTorso", "UpperTorso" }
 	end
 
 	assert(false, "Invalid asset type")
-
 	return {}
 end
 

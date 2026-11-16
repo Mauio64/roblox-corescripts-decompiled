@@ -1,4 +1,6 @@
-local FFlagUIBloxEnableActionBarButtonOverride = require(script.Parent.UIBlox).FFlagUIBloxEnableActionBarButtonOverride
+local UIBlox = require(script.Parent.UIBlox)
+local FFlagUIBloxEnableActionBarButtonOverride = UIBlox.FFlagUIBloxEnableActionBarButtonOverride
 local FFlagLuaAppUnifyPlayButtonAllSurfacesIxp = require(script.Parent.FFlagLuaAppUnifyPlayButtonAllSurfacesIxp)
 
-return FFlagUIBloxEnableActionBarButtonOverride and (game:DefineFastFlag("LuaAppUnifyPlayButtonNonMobileEdp3", false) or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp)
+return FFlagUIBloxEnableActionBarButtonOverride
+	and (game:DefineFastFlag("LuaAppUnifyPlayButtonNonMobileEdp3", false) or FFlagLuaAppUnifyPlayButtonAllSurfacesIxp)

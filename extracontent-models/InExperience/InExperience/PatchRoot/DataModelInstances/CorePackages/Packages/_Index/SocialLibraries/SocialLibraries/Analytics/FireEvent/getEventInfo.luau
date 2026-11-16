@@ -1,12 +1,10 @@
 require(script.Parent.Types)
 
-return function(p1) -- line: 4
-	return function(p2) -- line: 5
-		-- upvalues: p1 (copy)
-		local v3 = p1[p2]
+return function(p)
+	return function(p2)
+		local v = p[p2]
+		assert(v, "Invalid eventName used: " .. tostring(p2) .. " called")
 
-		assert(v3, "Invalid eventName used: " .. tostring(p2) .. " called")
-
-		return v3
+		return v
 	end
 end

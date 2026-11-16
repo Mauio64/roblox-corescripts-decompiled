@@ -1,15 +1,8 @@
 return {
-	maybe = function(p1: ((...any) -> ...any)) -- line: 10
-		local _, result, v4 = xpcall(function() -- line: 12
-			-- upvalues: p1 (copy)
-			return p1(), true
-		end, function() -- line: 14
-		end)
-
-		if v4 then
-			return result
-		end
-
-		return nil
+	maybe = function(callback)
+		local _, result, v = xpcall(function()
+			return callback(), true
+		end, function() end)
+		return if v then result else nil
 	end
 }

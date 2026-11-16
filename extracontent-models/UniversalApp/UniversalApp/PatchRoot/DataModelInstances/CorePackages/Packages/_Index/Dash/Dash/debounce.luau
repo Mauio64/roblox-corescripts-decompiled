@@ -1,58 +1,50 @@
-local scriptParent = script.Parent
-local assign = require(scriptParent.assign)
+local parent = script.Parent
+local assign = require(parent.assign)
 
-local function debounce(p1, n1: number, t1: {[any]: any}?) -- line: 30
-	-- upvalues: assign (copy)
-	local t2 = {
-		leading = false,
-		trailing = true
-	}
-	local v8 = assign(t2, t1)
-	local n2 = 0
-	local u10 = nil
-	local u11 = false
+local function debounce(callback, duration: number, p)
+	local v = assign({ leading = false, trailing = true }, p)
 
-	local function u12() -- line: 41
-	end
+	local count = 0
+	local thread = nil
+	local v2 = false
+	local function fn() end
 
-	if v8.trailing then
-		function u12(n3: number, b1: boolean, ...) -- line: 44
-			-- upvalues: n2 (ref), u11 (ref), p1 (copy)
-			if n3 == n2 then
-				u11 = false
+	local fn2
 
-				if not b1 then
-					p1(...)
+	if v.trailing then
+		fn2 = function(p2: number, flag: boolean, ...)
+			if count == p2 then
+				v2 = false
+
+				if not flag then
+					callback(...)
 				end
 			end
 		end
-	elseif v8.leading then
-		function u12(n4: number) -- line: 56
-			-- upvalues: n2 (ref), u11 (ref)
-			if n4 == n2 then
-				u11 = false
+	else
+		fn2 = v.leading and function(p2: number)
+			if count == p2 then
+				v2 = false
 			end
-		end
+		end or fn
 	end
 
-	return function(...) -- line: 63
-		-- upvalues: n2 (ref), v8 (copy), u11 (ref), u10 (ref), p1 (copy), n1 (copy), u12 (ref)
-		n2 += 1
+	return function(...)
+		count += 1
+		local v3 = count
+		local v4 = v.leading and not v2
 
-		local v16 = n2
-		local v17 = v8.leading and not u11
-
-		if u10 then
-			task.cancel(u10)
-			u10 = nil
+		if thread then
+			task.cancel(thread)
+			thread = nil
 		end
 
-		if v17 then
-			u11 = true
-			p1(...)
+		if v4 then
+			v2 = true
+			callback(...)
 		end
 
-		u10 = task.delay(n1, u12, v16, v17, ...)
+		thread = task.delay(duration, fn2, v3, v4, ...)
 	end
 end
 

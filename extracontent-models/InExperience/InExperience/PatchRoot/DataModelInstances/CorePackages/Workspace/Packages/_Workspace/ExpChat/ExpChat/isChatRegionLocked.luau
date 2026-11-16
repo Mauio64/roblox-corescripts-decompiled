@@ -1,16 +1,19 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local GetFFlagExpChatGuacChatDisabledReason = require(Parent.SharedFlags).GetFFlagExpChatGuacChatDisabledReason
-local UniversalAppPolicy = nil
+local parent = script:FindFirstAncestor("ExpChat").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagExpChatGuacChatDisabledReason = SharedFlags.GetFFlagExpChatGuacChatDisabledReason
+local UniversalAppPolicy
 
 if GetFFlagExpChatGuacChatDisabledReason() then
-	UniversalAppPolicy = require(Parent.UniversalAppPolicy)
+	UniversalAppPolicy = require(parent.UniversalAppPolicy)
+else
+	UniversalAppPolicy = nil
 end
 
-return function() -- line: 12
-	-- upvalues: GetFFlagExpChatGuacChatDisabledReason (copy), UniversalAppPolicy (ref)
-	if not GetFFlagExpChatGuacChatDisabledReason() then
-		return false
+return function(): boolean
+	if GetFFlagExpChatGuacChatDisabledReason() then
+		return UniversalAppPolicy.getAppFeaturePolicies().getExperienceChatAvailability() == "regionLocked"
 	end
 
-	return UniversalAppPolicy.getAppFeaturePolicies().getExperienceChatAvailability() == "regionLocked"
+	return false
 end

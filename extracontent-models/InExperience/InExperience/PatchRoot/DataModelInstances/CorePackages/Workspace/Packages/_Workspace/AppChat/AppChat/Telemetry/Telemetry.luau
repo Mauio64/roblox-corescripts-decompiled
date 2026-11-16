@@ -1,5 +1,6 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
 
 return {
 	new = SocialLuaAnalytics.Telemetry.new,

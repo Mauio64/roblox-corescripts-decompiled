@@ -1,25 +1,19 @@
-local Parent = script:FindFirstAncestor("NavigationRodux").Parent
-local Cryo = require(Parent.Cryo)
+local parent = script:FindFirstAncestor("NavigationRodux").Parent
 
-return function(p1, p2) -- line: 8
-	-- upvalues: Cryo (copy)
-	local v5 = p1 or {
-		Navigation = {
-			lockNavigationActions = nil
-		}
+local Cryo = require(parent.Cryo)
+
+return function(p, p2)
+	local selected = p or {
+		Navigation = { lockNavigationActions = nil }
 	}
 
-	if p2.type == "ApplySetNavigationLocked" then
-		if v5.Navigation.lockNavigationActions == p2.locked then
-			return v5
-		end
-
-		return {
-			Navigation = Cryo.Dictionary.join(v5.Navigation, {
-				lockNavigationActions = p2.locked or false
-			})
-		}
+	if not (p2.type == "ApplySetNavigationLocked" and selected.Navigation.lockNavigationActions ~= p2.locked) then
+		return selected
 	end
 
-	return v5
+	return {
+		Navigation = Cryo.Dictionary.join(selected.Navigation, {
+			lockNavigationActions = p2.locked or false
+		})
+	}
 end

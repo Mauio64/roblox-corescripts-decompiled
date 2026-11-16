@@ -1,56 +1,62 @@
 local CorePackages = game:GetService("CorePackages")
 local Cryo = require(CorePackages.Packages.Cryo)
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local SetAvatarPreviewDetails = require(ParentParent.Actions.SetAvatarPreviewDetails)
-local UpdateBulkPuchaseResults = require(ParentParent.Actions.UpdateBulkPuchaseResults)
-local AvatarExperienceCommon = require(CorePackages.Workspace.Packages.AvatarExperienceCommon)
-
+local parent = script.Parent.Parent
+local SetAvatarPreviewDetails = require(parent.Actions.SetAvatarPreviewDetails)
+local UpdateBulkPuchaseResults = require(parent.Actions.UpdateBulkPuchaseResults)
+local AvatarExperienceModel = require(CorePackages.Workspace.Packages.AvatarExperienceModel)
 require(CorePackages.Workspace.Packages.AvatarExperienceInspectAndBuy)
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
 
-local ItemTypeEnum = AvatarExperienceCommon.Enums.ItemTypeEnum
-local FFlagAXEnableFetchAvatarPreview = require(ParentParent.Flags.FFlagAXEnableFetchAvatarPreview)
-local FFlagAXEnableInspectAndBuyBulkPurchase = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAXEnableInspectAndBuyBulkPurchase
+local FFlagAXEnableFetchAvatarPreview = require(parent.Flags.FFlagAXEnableFetchAvatarPreview)
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagAXEnableInspectAndBuyBulkPurchase = SharedFlags.FFlagAXEnableInspectAndBuyBulkPurchase
 
 return Rodux.createReducer({}, {
-	[UpdateBulkPuchaseResults.name] = if not FFlagAXEnableInspectAndBuyBulkPurchase then nil else function(p1, p2) -- line: 31
-		-- upvalues: Cryo (copy)
-		local RobuxSpent = p2.result.RobuxSpent
-		local v14 = p1.totalPrice - RobuxSpent
+	[UpdateBulkPuchaseResults.name] = FFlagAXEnableInspectAndBuyBulkPurchase and function(p, p2)
+		local robuxSpent = p2.result.RobuxSpent
+		local totalPrice = p.totalPrice - robuxSpent
+		return Cryo.Dictionary.join(p, { totalPrice = totalPrice })
+	end or nil,
+	[SetAvatarPreviewDetails.name] = FFlagAXEnableFetchAvatarPreview and function(p, p2)
+		local items = {}
+		local totalPrice, totalValue
 
-		return Cryo.Dictionary.join(p1, {
-			totalPrice = v14
-		})
-	end,
-	[SetAvatarPreviewDetails.name] = if not FFlagAXEnableFetchAvatarPreview then nil else function(p3, p4) -- line: 41
-		-- upvalues: Cryo (copy), ItemTypeEnum (copy)
-		local t1 = {}
-		local totalPrice = nil
-		local totalValue = nil
-
-		if p4.avatarPreviewDetails and p4.avatarPreviewDetails.look then
-			local look = p4.avatarPreviewDetails.look
+		if p2.avatarPreviewDetails and p2.avatarPreviewDetails.look then
+			local look = p2.avatarPreviewDetails.look
 
 			totalPrice = look.totalPrice
 			totalValue = look.totalValue
 
 			if look.items then
-				t1 = Cryo.List.map(look.items, function(p5) -- line: 53
-					-- upvalues: ItemTypeEnum (copy)
-					return {
-						id = tostring(p5.id),
-						itemType = if p5.itemType ~= ItemTypeEnum.Asset then ItemTypeEnum.Bundle else ItemTypeEnum.Asset,
-						noPriceStatus = p5.noPriceStatus,
-						quantityOwned = p5.quantityOwned
+				items = Cryo.List.map(look.items, function(data)
+					local v = {
+						id = tostring(data.id),
+						itemType = 0,
+						noPriceStatus = 0,
+						quantityOwned = 0
 					}
+					local itemType
+
+					if data.itemType == ItemTypeEnum.Asset then
+						itemType = ItemTypeEnum.Asset
+					else
+						itemType = ItemTypeEnum.Bundle
+					end
+
+					v.itemType = itemType
+					v.noPriceStatus = data.noPriceStatus
+					v.quantityOwned = data.quantityOwned
+					return v
 				end)
 			end
 		end
 
-		return Cryo.Dictionary.join(p3, {
+		return Cryo.Dictionary.join(p, {
 			totalPrice = totalPrice,
 			totalValue = totalValue,
-			items = t1
+			items = items
 		})
-	end
+	end or nil
 })

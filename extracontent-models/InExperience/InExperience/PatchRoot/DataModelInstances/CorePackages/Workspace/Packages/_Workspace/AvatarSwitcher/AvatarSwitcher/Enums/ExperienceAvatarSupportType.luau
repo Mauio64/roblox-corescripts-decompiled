@@ -1,5 +1,1 @@
-return {
-	NoSupport = "NoSupport",
-	UnknownSupport = "UnknownSupport",
-	FullSupport = "FullSupport"
-}
+return { NoSupport = "NoSupport", UnknownSupport = "UnknownSupport", FullSupport = "FullSupport" }

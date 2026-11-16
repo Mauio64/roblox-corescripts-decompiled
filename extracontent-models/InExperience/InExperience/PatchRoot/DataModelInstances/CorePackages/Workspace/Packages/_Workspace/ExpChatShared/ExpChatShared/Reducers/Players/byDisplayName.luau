@@ -1,26 +1,25 @@
 local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
-local ExpChatSharedParent = ExpChatShared.Parent
-local Rodux = require(ExpChatSharedParent.Rodux)
-local Dictionary = require(ExpChatSharedParent.llama).Dictionary
-local List = require(ExpChatSharedParent.llama).List
+local parent = ExpChatShared.Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local llama2 = require(parent.llama)
+local list = llama2.List
+
 local Actions = ExpChatShared.Actions
 local PlayerAdded = require(Actions.PlayerAdded)
 local PlayerRemoved = require(Actions.PlayerRemoved)
 
 return Rodux.createReducer({}, {
-	[PlayerAdded.name] = function(t1: {[any]: any}, p1) -- line: 16
-		-- upvalues: Dictionary (copy), List (copy)
-		local v11 = string.lower(p1.displayName)
-
-		return Dictionary.join(t1, {
-			[v11] = List.append(t1[v11] or {}, p1.userId)
+	[PlayerAdded.name] = function(p, p2)
+		local displayName = string.lower(p2.displayName)
+		return dictionary.join(p, {
+			[displayName] = list.append(p[displayName] or {}, p2.userId)
 		})
 	end,
-	[PlayerRemoved.name] = function(t2: {[any]: any}, p2) -- line: 23
-		-- upvalues: Dictionary (copy), List (copy)
-		return Dictionary.map(t2, function(p3) -- line: 24
-			-- upvalues: List (copy), p2 (copy)
-			return List.removeValue(p3, p2.userId)
+	[PlayerRemoved.name] = function(p, p2)
+		return dictionary.map(p, function(p3)
+			return list.removeValue(p3, p2.userId)
 		end)
 	end
 })

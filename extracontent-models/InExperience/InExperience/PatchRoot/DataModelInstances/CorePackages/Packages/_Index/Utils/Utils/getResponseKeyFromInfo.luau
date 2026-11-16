@@ -1,14 +1,13 @@
-local ParentParent = script.Parent.Parent
-local t1 = {}
+local parent = script.Parent.Parent
+local GetResponseKeyFromInfo = {}
 
-require(ParentParent.GraphQL)
+require(parent.GraphQL)
 
-function t1.getResponseKeyFromInfo(p1) -- line: 14
-	if p1.fieldNodes[1] and p1.fieldNodes[1].alias ~= nil then
-		return p1.fieldNodes[1].alias.value
+function GetResponseKeyFromInfo.getResponseKeyFromInfo(p)
+	if p.fieldNodes[1] and p.fieldNodes[1].alias ~= nil then
+		return p.fieldNodes[1].alias.value
 	end
 
-	return p1.fieldName
+	return p.fieldName
 end
-
-return t1
+return GetResponseKeyFromInfo

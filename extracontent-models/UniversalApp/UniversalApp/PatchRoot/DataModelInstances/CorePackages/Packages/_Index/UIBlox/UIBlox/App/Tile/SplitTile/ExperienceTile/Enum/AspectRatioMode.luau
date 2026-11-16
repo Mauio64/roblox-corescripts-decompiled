@@ -1,4 +1,1 @@
-return {
-	Wide = "Wide",
-	Square = "Square"
-}
+return { Wide = "Wide", Square = "Square" }

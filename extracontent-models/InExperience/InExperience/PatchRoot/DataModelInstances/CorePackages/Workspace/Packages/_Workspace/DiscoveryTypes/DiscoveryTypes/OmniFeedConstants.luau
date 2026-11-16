@@ -1,26 +1,31 @@
-local Parent = script:FindFirstAncestor("DiscoveryTypes").Parent
-local FFlagLuaAppHeaderButtonText = require(Parent.SharedFlags).FFlagLuaAppHeaderButtonText
-local FFlagLuaAppGameCarouselAmpUpsellAction = require(Parent.SharedFlags).FFlagLuaAppGameCarouselAmpUpsellAction
-local FFlagLuaAppRfySignalApportioningIxp = require(Parent.SharedFlags).FFlagLuaAppRfySignalApportioningIxp
-local FFlagLuaAppEnableSponsoredReportAd = require(Parent.SharedFlags).FFlagLuaAppEnableSponsoredReportAd
-local FFlagLuaAppChartsStickyHeader = require(Parent.SharedFlags).FFlagLuaAppChartsStickyHeader
-local FFlagLuaAppUsePrevalidatedVideoGamePlayability = require(Parent.SharedFlags).FFlagLuaAppUsePrevalidatedVideoGamePlayability
-local FFlagLuaAppRfyRevealRows = require(Parent.SharedFlags).FFlagLuaAppRfyRevealRows
-local FFlagLuaAppSortHeaderAnchorTag = require(Parent.SharedFlags).FFlagLuaAppSortHeaderAnchorTag
-local FFlagSduiGenreSelector = require(Parent.SharedFlags).FFlagSduiGenreSelector
-local FFlagLuaAppSupportHomeBackToTop = require(Parent.SharedFlags).FFlagLuaAppSupportHomeBackToTop
+local parent = script:FindFirstAncestor("DiscoveryTypes").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppHeaderButtonText = SharedFlags.FFlagLuaAppHeaderButtonText
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagLuaAppRfySignalApportioningIxp = SharedFlags2.FFlagLuaAppRfySignalApportioningIxp
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagLuaAppEnableReportExperience = SharedFlags3.FFlagLuaAppEnableReportExperience
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppUsePrevalidatedVideoGamePlayability = SharedFlags4.FFlagLuaAppUsePrevalidatedVideoGamePlayability
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagLuaAppRfyRevealRows = SharedFlags5.FFlagLuaAppRfyRevealRows
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppSortHeaderAnchorTag = SharedFlags6.FFlagLuaAppSortHeaderAnchorTag
+local SharedFlags7 = require(parent.SharedFlags)
+local FFlagLuaAppContinueSortInstantPlay = SharedFlags7.FFlagLuaAppContinueSortInstantPlay
+local SharedFlags8 = require(parent.SharedFlags)
+local FFlagLuaAppSupportHomeBackToTop = SharedFlags8.FFlagLuaAppSupportHomeBackToTop
 
 require(script.Parent.RoduxTypes)
 
 return {
 	EventContext = "HomeOmniFeed",
-	OmniSortRetrievalStatus = {
-		Exception = "Exception",
-		Success = "Success"
-	},
+	OmniSortRetrievalStatus = { Exception = "Exception", Success = "Success" },
 	GlobalLayoutDataKeys = {
 		JYFRefresh = "JYFRefresh",
-		ShowBackToTop = if not FFlagLuaAppSupportHomeBackToTop then nil else "showBackToTop"
+		ShowBackToTop = FFlagLuaAppSupportHomeBackToTop and "showBackToTop" or nil
 	},
 	TopicLayoutDataKeys = {
 		PYMKFindFriendsEnabled = "PYMKFindFriendsEnabled",
@@ -37,32 +42,33 @@ return {
 		CountdownString = "countdownString",
 		PlayButtonStyle = "playButtonStyle",
 		BackgroundImageAssetId = "backgroundImageAssetId",
+		HeaderButtonText = FFlagLuaAppHeaderButtonText and "headerButtonText" or nil,
 		HideTileMetadata = "hideTileMetadata",
 		HideTileTitle = "hideTileTitle",
 		ContainedTile = "containedTile",
+		HasPrevalidatedVideoGamePlayability = FFlagLuaAppUsePrevalidatedVideoGamePlayability and "hasPrevalidatedVideoGamePlayability" or nil,
 		EnableExplicitFeedback = "enableExplicitFeedback",
+		EnableSignalApportioning = FFlagLuaAppRfySignalApportioningIxp and "enableSignalApportioning" or nil,
 		SponsoredUserCohort = "sponsoredUserCohort",
 		EnableSponsoredFeedback = "enableSponsoredFeedback",
 		EnableCollectionGrid = "enableCollectionGrid",
+		SortHeaderAnchorTag = FFlagLuaAppSortHeaderAnchorTag and "sortHeaderAnchorTag" or nil,
+		InitialFeedVisibleRows = FFlagLuaAppRfyRevealRows and "initialFeedVisibleRows" or nil,
+		VisibleRowsPerReveal = FFlagLuaAppRfyRevealRows and "visibleRowsPerReveal" or nil,
+		EnableReportAd = "enableReportAd",
+		EnableReportExperience = FFlagLuaAppEnableReportExperience and "enableReportExperience" or nil,
 		IsSponsoredRatingFooterAllowed = "isSponsoredRatingFooterAllowed",
-		HeaderButtonText = if not FFlagLuaAppHeaderButtonText then nil else "headerButtonText",
-		HasPrevalidatedVideoGamePlayability = if not FFlagLuaAppUsePrevalidatedVideoGamePlayability then nil else "hasPrevalidatedVideoGamePlayability",
-		EnableSignalApportioning = if not FFlagLuaAppRfySignalApportioningIxp then nil else "enableSignalApportioning",
-		SortHeaderAnchorTag = if not FFlagLuaAppSortHeaderAnchorTag then nil else "sortHeaderAnchorTag",
-		InitialFeedVisibleRows = if not FFlagLuaAppRfyRevealRows then nil else "initialFeedVisibleRows",
-		VisibleRowsPerReveal = if not FFlagLuaAppRfyRevealRows then nil else "visibleRowsPerReveal",
-		EnableReportAd = if not FFlagLuaAppEnableSponsoredReportAd then nil else "enableReportAd",
-		AmpUpsellFeatureName = if not FFlagLuaAppGameCarouselAmpUpsellAction then nil else "ampUpsellFeatureName",
-		AmpUpsellNamespace = if not FFlagLuaAppGameCarouselAmpUpsellAction then nil else "ampUpsellNamespace"
+		AmpUpsellFeatureName = "ampUpsellFeatureName",
+		AmpUpsellNamespace = "ampUpsellNamespace",
+		EnableInstantPlay = FFlagLuaAppContinueSortInstantPlay and "enableInstantPlay" or nil,
+		InstantPlayTreatment = FFlagLuaAppContinueSortInstantPlay and "instantPlayTreatment" or nil
 	},
 	ComponentTypeDataKeys = {
 		EventTile = "EventTile",
 		GridTile = "GridTile",
 		AppGameTileNoMetadata = "AppGameTileNoMetadata"
 	},
-	ItemLayoutDataKeys = {
-		Footer = "Footer"
-	},
+	ItemLayoutDataKeys = { Footer = "Footer" },
 	OmniRecommendationsRequestIntent = {
 		ManualRefresh = "manualRefresh",
 		AutoRefresh = "autoRefresh",
@@ -70,15 +76,9 @@ return {
 		LogIn = "logIn",
 		LoadMore = "loadMore",
 		GameExit = "gameExit",
-		AmpUpsellFeatureGranted = if not FFlagLuaAppGameCarouselAmpUpsellAction then nil else "ampUpsellFeatureGranted",
-		OptionSelector = if not FFlagSduiGenreSelector then nil else "optionSelector"
+		AmpUpsellFeatureGranted = "ampUpsellFeatureGranted",
+		OptionSelector = "optionSelector"
 	},
-	ContentGroupType = {
-		Game = "Game",
-		Text = "Text",
-		User = "User"
-	},
-	OmniFeedPageSection = if not FFlagLuaAppChartsStickyHeader then nil else {
-		Header = "Header"
-	}
+	ContentGroupType = { Game = "Game", Text = "Text", User = "User" },
+	OmniFeedPageSection = { Header = "Header" }
 }

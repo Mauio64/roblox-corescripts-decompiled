@@ -1,104 +1,143 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
 local dependencies = require(SocialLibraries.dependencies)
-local Roact = dependencies.Roact
+local roact = dependencies.Roact
 local llama = dependencies.llama
-local UIBlox = dependencies.UIBlox
-local PlayerTile = UIBlox.App.Tile.PlayerTile
-local Interactable = UIBlox.Core.Control.Interactable
+
+local uiBlox = dependencies.UIBlox
+local playerTile = uiBlox.App.Tile.PlayerTile
+local interactable = uiBlox.Core.Control.Interactable
+
 local getUserAvatarImage = require(SocialLibraries.User.getUserAvatarImage)
 local PlayerName = require(script.Parent.PlayerName)
-
 require(script.Parent.StyleTypes)
-
 local Constants = require(script.Parent.Constants)
 
-local function v11() -- line: 16
-end
+local function fn() end
 
-local t1 = {
+local v = {
 	tileSize = Constants.TILE_SIZE,
 	nameTopPadding = Constants.NAME_TOP_PADDING,
 	contextualTopPadding = Constants.CONTEXTUAL_TOP_PADDING
 }
 
-return function(t2: {[any]: any}) -- line: 49
-	-- upvalues: llama (copy), t1 (copy), Roact (copy), PlayerTile (copy), getUserAvatarImage (copy), PlayerName (copy), Interactable (copy), v11 (copy)
-	local v14 = llama.Dictionary.join(t1, t2)
-	local tileSize = v14.tileSize
+return function(p)
+	local joined = llama.Dictionary.join(v, p)
+	local tileSize = joined.tileSize
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = v14.layoutOrder,
-		Size = UDim2.fromOffset(tileSize, 0)
-	}, {
-		UIListLayout = Roact.createElement("UIListLayout", {
+	local function fn2() -- 1 equivalent call inferred from this helper
+		if joined.renderButtons then
+			return (joined.renderButtons())
+		end
+
+		return nil
+	end
+
+	local function fn3()
+		if joined.renderPlayerTile then
+			return (joined.renderPlayerTile())
+		end
+
+		return (roact.createElement(playerTile, {
+			tileSize = UDim2.fromOffset(joined.tileSize, joined.tileSize),
+			thumbnail = getUserAvatarImage(joined.userId),
+			onActivated = joined.onActivatedTile,
+			buttons = fn2() -- inferred equivalent call
+		}))
+	end
+
+	local function fn4()
+		if joined.renderPlayerName then
+			return (joined.renderPlayerName())
+		end
+
+		return joined.userName
+			and roact.createElement(PlayerName, { name = joined.userName, width = joined.tileSize })
+			or nil
+	end
+
+	local createElement = roact.createElement
+	local v2 = {
+		LayoutOrder = joined.layoutOrder,
+		Size = UDim2.fromOffset(tileSize, 0),
+		BackgroundTransparency = 1
+	}
+
+	local v3 = {
+		UIListLayout = roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
-		PlayerTileFrame = Roact.createElement("Frame", {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			Size = UDim2.fromOffset(tileSize, tileSize)
-		}, {
-			PlayerTile = (function() -- line: 59
-				-- upvalues: v14 (copy), Roact (copy), PlayerTile (copy), getUserAvatarImage (copy)
-				if v14.renderPlayerTile then
-					return (v14.renderPlayerTile())
-				end
-
-				return (Roact.createElement(PlayerTile, {
-					tileSize = UDim2.fromOffset(v14.tileSize, v14.tileSize),
-					thumbnail = getUserAvatarImage(v14.userId),
-					onActivated = v14.onActivatedTile,
-					buttons = if not v14.renderButtons then nil else v14.renderButtons()
-				}))
-			end)()
-		}),
-		NameTopPadding = if not v14.nameTopPadding then nil else Roact.createElement("Frame", {
-			LayoutOrder = 2,
-			BackgroundTransparency = 1,
-			Size = UDim2.fromOffset(0, v14.nameTopPadding)
-		}),
-		UserInfo = Roact.createElement(Interactable, {
-			LayoutOrder = 3,
-			[Roact.Event.Activated] = v14.onActivatedContextual,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			onStateChanged = v11,
-			BackgroundTransparency = 1
-		}, {
-			UIListLayout = Roact.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				SortOrder = Enum.SortOrder.LayoutOrder
-			}),
-			PlayerNameFrame = Roact.createElement("Frame", {
+		PlayerTileFrame = roact.createElement(
+			"Frame",
+			{
 				LayoutOrder = 1,
-				BackgroundTransparency = 1,
-				AutomaticSize = Enum.AutomaticSize.XY
-			}, {
-				PlayerName = (function() -- line: 76
-					-- upvalues: v14 (copy), Roact (copy), PlayerName (copy)
-					if v14.renderPlayerName then
-						return (v14.renderPlayerName())
-					end
+				Size = UDim2.fromOffset(tileSize, tileSize),
+				BackgroundTransparency = 1
+			},
+			{ PlayerTile = fn3() }
+		),
+		NameTopPadding = 0,
+		UserInfo = 0
+	}
+	local nameTopPadding
 
-					return v14.userName and Roact.createElement(PlayerName, {
-						name = v14.userName,
-						width = v14.tileSize
-					}) or nil
-				end)()
-			}),
-			ContextualTopPadding = if not v14.contextualTopPadding then nil else Roact.createElement("Frame", {
-				LayoutOrder = 2,
-				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(0, v14.contextualTopPadding)
-			}),
-			ContextualInfoFrame = Roact.createElement("Frame", {
-				LayoutOrder = 3,
-				BackgroundTransparency = 1,
-				AutomaticSize = Enum.AutomaticSize.XY
-			}, {
-				ContextualInfo = if not v14.renderContextualInfo then nil else v14.renderContextualInfo()
-			})
+	if joined.nameTopPadding then
+		nameTopPadding = roact.createElement("Frame", {
+			LayoutOrder = 2,
+			Size = UDim2.fromOffset(0, joined.nameTopPadding),
+			BackgroundTransparency = 1
 		})
-	})
+	end
+
+	v3.NameTopPadding = nameTopPadding
+
+	local createElement2 = roact.createElement
+	local onActivatedContextualsByActivated = {
+		LayoutOrder = 3,
+		[roact.Event.Activated] = joined.onActivatedContextual,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		onStateChanged = fn,
+		BackgroundTransparency = 1
+	}
+
+	local v4 = {
+		UIListLayout = roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		PlayerNameFrame = roact.createElement(
+			"Frame",
+			{ LayoutOrder = 1, BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.XY },
+			{ PlayerName = fn4() }
+		),
+		ContextualTopPadding = 0,
+		ContextualInfoFrame = 0
+	}
+	local contextualTopPadding
+
+	if joined.contextualTopPadding then
+		contextualTopPadding = roact.createElement("Frame", {
+			LayoutOrder = 2,
+			Size = UDim2.fromOffset(0, joined.contextualTopPadding),
+			BackgroundTransparency = 1
+		})
+	end
+
+	v4.ContextualTopPadding = contextualTopPadding
+
+	local function fn5() -- 1 equivalent call inferred from this helper
+		if joined.renderContextualInfo then
+			return (joined.renderContextualInfo())
+		end
+
+		return nil
+	end
+
+	v4.ContextualInfoFrame = roact.createElement(
+		"Frame",
+		{ LayoutOrder = 3, BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.XY },
+		{ ContextualInfo = fn5() } -- inferred equivalent call
+	)
+	v3.UserInfo = createElement2(interactable, onActivatedContextualsByActivated, v4)
+	return createElement("Frame", v2, v3)
 end

@@ -1,30 +1,27 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-
+local parent = CurrencyTransfers.Parent
 require(CurrencyTransfers.types)
+local t = require(parent.t)
 
-local t = require(CurrencyTransfersParent.t)
-local t1 = {}
+local AcceptTransferModel = {}
 
-function t1.new(p1) -- line: 15
-	-- upvalues: t1 (copy)
-	assert(t1.isValid(p1))
-	t1.__index = t1
-	setmetatable(p1, t1)
+function AcceptTransferModel.new(p)
+	assert(AcceptTransferModel.isValid(p))
 
-	return p1
+	AcceptTransferModel.__index = AcceptTransferModel
+
+	setmetatable(p, AcceptTransferModel)
+
+	return p
 end
-function t1.mock(p2) -- line: 27
-	-- upvalues: CurrencyTransfers (copy), t1 (copy)
-	local v7 = p2 or {}
+
+function AcceptTransferModel.mock(options)
+	local v = options or {}
 	local TransferStatus = require(CurrencyTransfers.Enums.TransferStatus)
 
-	return (t1.new({
-		robuxTransfer = v7.robuxTransfer or {
+	return (AcceptTransferModel.new({
+		robuxTransfer = v.robuxTransfer or {
 			transferId = 123456,
-			transferAmount = 100,
-			creationTime = "2025-01-01T00:00:00Z",
-			requireRecipientAction = false,
 			sender = {
 				type = 1,
 				targetId = 100,
@@ -37,49 +34,59 @@ function t1.mock(p2) -- line: 27
 				targetName = "RecipientUser",
 				targetDisplayName = "Recipient Display"
 			},
+			transferAmount = 100,
+			creationTime = "2025-01-01T00:00:00Z",
+			requireRecipientAction = false,
 			status = TransferStatus.Completed
 		},
-		isAlreadyAccepted = v7.isAlreadyAccepted ~= nil and v7.isAlreadyAccepted
+		isAlreadyAccepted = v.isAlreadyAccepted ~= nil and v.isAlreadyAccepted
 	}))
 end
-function t1.format(p3) -- line: 57
-	-- upvalues: CurrencyTransfers (copy), t1 (copy)
-	local v10 = p3.robuxTransfer or p3.RobuxTransfer
-	local v11 = if p3.isAlreadyAccepted == nil then p3.IsAlreadyAccepted == true else p3.isAlreadyAccepted
+
+function AcceptTransferModel.format(data)
+	local robuxTransfer = data.robuxTransfer or data.RobuxTransfer
+	local isAlreadyAccepted
+
+	if data.isAlreadyAccepted == nil then
+		isAlreadyAccepted = data.IsAlreadyAccepted == true
+	else
+		isAlreadyAccepted = data.isAlreadyAccepted
+	end
+
 	local TransferStatus = require(CurrencyTransfers.Enums.TransferStatus)
 
-	if not v10 then
+	if not robuxTransfer then
 		error("AcceptTransferModel.format: robuxTransfer is missing from response")
 	end
 
-	return (t1.new({
-		isAlreadyAccepted = v11,
+	return (AcceptTransferModel.new({
+		isAlreadyAccepted = isAlreadyAccepted,
 		robuxTransfer = {
-			transferId = v10.transferId or v10.TransferId,
+			transferId = robuxTransfer.transferId or robuxTransfer.TransferId,
 			sender = {
-				type = v10.sender.type or v10.Sender.Type,
-				targetId = v10.sender.targetId or v10.Sender.TargetId,
-				targetName = v10.sender.targetName or v10.Sender.TargetName,
-				targetDisplayName = v10.sender.targetDisplayName or v10.Sender.TargetDisplayName
+				type = robuxTransfer.sender.type or robuxTransfer.Sender.Type,
+				targetId = robuxTransfer.sender.targetId or robuxTransfer.Sender.TargetId,
+				targetName = robuxTransfer.sender.targetName or robuxTransfer.Sender.TargetName,
+				targetDisplayName = robuxTransfer.sender.targetDisplayName or robuxTransfer.Sender.TargetDisplayName
 			},
 			recipient = {
-				type = v10.recipient.type or v10.Recipient.Type,
-				targetId = v10.recipient.targetId or v10.Recipient.TargetId,
-				targetName = v10.recipient.targetName or v10.Recipient.TargetName,
-				targetDisplayName = v10.recipient.targetDisplayName or v10.Recipient.TargetDisplayName
+				type = robuxTransfer.recipient.type or robuxTransfer.Recipient.Type,
+				targetId = robuxTransfer.recipient.targetId or robuxTransfer.Recipient.TargetId,
+				targetName = robuxTransfer.recipient.targetName or robuxTransfer.Recipient.TargetName,
+				targetDisplayName = robuxTransfer.recipient.targetDisplayName or robuxTransfer.Recipient.TargetDisplayName
 			},
-			transferAmount = v10.transferAmount or v10.TransferAmount,
-			receivingAmount = v10.receivingAmount or v10.ReceivingAmount,
-			creationTime = v10.creationTime or v10.CreationTime,
-			requireRecipientAction = v10.requireRecipientAction or v10.RequireRecipientAction,
-			status = TransferStatus.fromValue(v10.status or v10.Status) or TransferStatus.Completed
+			transferAmount = robuxTransfer.transferAmount or robuxTransfer.TransferAmount,
+			receivingAmount = robuxTransfer.receivingAmount or robuxTransfer.ReceivingAmount,
+			creationTime = robuxTransfer.creationTime or robuxTransfer.CreationTime,
+			requireRecipientAction = robuxTransfer.requireRecipientAction or robuxTransfer.RequireRecipientAction,
+			status = TransferStatus.fromValue(robuxTransfer.status or robuxTransfer.Status) or TransferStatus.Completed
 		}
 	}))
 end
 
-t1.isValid = t.strictInterface({
+AcceptTransferModel.isValid = t.strictInterface({
 	robuxTransfer = t.table,
 	isAlreadyAccepted = t.boolean
 })
 
-return t1
+return AcceptTransferModel

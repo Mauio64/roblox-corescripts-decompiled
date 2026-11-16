@@ -1,34 +1,34 @@
-local u1 = false
-local t1 = {}
+local flag = false
 
-local function batch(p1: ((...any) -> ...any)) -- line: 7
-	-- upvalues: u1 (ref), t1 (copy)
-	if not u1 then
-		u1 = true
-		p1()
+local v = {}
 
-		for _, v6 in t1 do
-			v6()
-		end
-
-		table.clear(t1)
-		u1 = false
+local function batch(fn)
+	if flag then
+		fn()
 
 		return
 	end
 
-	p1()
+	flag = true
+	fn()
+
+	for _, v2 in v do
+		v2()
+	end
+
+	table.clear(v)
+	flag = false
 end
 
-return {
-	batch = batch,
-	flush = function() -- line: 21
-		-- upvalues: batch (copy)
-		batch(function() -- line: 22
-		end)
-	end,
-	schedule = function(p2: ((...any) -> ...any)) -- line: 25
-		-- upvalues: t1 (copy)
-		table.insert(t1, p2)
-	end
-}
+local SignalsScheduler = {}
+SignalsScheduler.batch = batch
+
+function SignalsScheduler.flush()
+	batch(function() end)
+end
+
+function SignalsScheduler.schedule(callback)
+	table.insert(v, callback)
+end
+
+return SignalsScheduler

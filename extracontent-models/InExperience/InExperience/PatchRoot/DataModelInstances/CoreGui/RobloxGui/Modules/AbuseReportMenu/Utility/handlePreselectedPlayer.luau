@@ -1,56 +1,56 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
-local CorePackages = game:GetService("CorePackages")
-local RobloxGui = game:GetService("CoreGui").RobloxGui
+
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui.RobloxGui
+
 local Constants = require(AbuseReportMenu.Components.Constants)
 local TnSIXPWrapper = require(AbuseReportMenu.IXP.TnSIXPWrapper)
-local FFlagAddPreselectedAbuseTypeAnalytics = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAddPreselectedAbuseTypeAnalytics
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
 
-function handlePreselectedPlayer(p1, b1: boolean, p2: ((...any) -> ...any), p3: ((...any) -> ...any)) -- line: 19
-	-- upvalues: default (copy), Constants (copy), FFlagAddPreselectedAbuseTypeAnalytics (copy), TnSIXPWrapper (copy)
-	if b1 and default:getRecentUsersInteractionData()[tostring(p1.UserId)] ~= nil then
-		p2({
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
+local function fn(p): boolean -- 1 equivalent call inferred from this helper
+	return default:getRecentUsersInteractionData()[tostring(p.UserId)] ~= nil
+end
+
+function handlePreselectedPlayer(player, flag: boolean, callback, callback2)
+	if flag and fn(player) then -- inferred equivalent call
+		callback({
 			type = Constants.PlayerMenuActions.UpdateMethodOfAbuse,
 			methodOfAbuse = Constants.AbuseMethods.VoiceChat
 		})
-		p3({
+
+		callback2({
 			type = Constants.AnalyticsActions.SetTypeOfAbuseSelection,
 			selection = Constants.AbuseMethods.VoiceChat
 		})
 
-		if FFlagAddPreselectedAbuseTypeAnalytics then
-			p3({
-				type = Constants.AnalyticsActions.SetPreselectedAbuseSelection,
-				selection = Constants.AbuseMethods.VoiceChat
-			})
-		end
+		callback2({
+			type = Constants.AnalyticsActions.SetPreselectedAbuseSelection,
+			selection = Constants.AbuseMethods.VoiceChat
+		})
 	elseif TnSIXPWrapper.getReportAnythingAvatarEnabled() then
-		p2({
+		callback({
 			type = Constants.PlayerMenuActions.UpdateMethodOfAbuse,
 			methodOfAbuse = Constants.AbuseMethods.TextChat
 		})
-		p3({
+
+		callback2({
 			type = Constants.AnalyticsActions.SetTypeOfAbuseSelection,
 			selection = Constants.AbuseMethods.TextChat
 		})
 
-		if FFlagAddPreselectedAbuseTypeAnalytics then
-			p3({
-				type = Constants.AnalyticsActions.SetPreselectedAbuseSelection,
-				selection = Constants.AbuseMethods.TextChat
-			})
-		end
-	elseif FFlagAddPreselectedAbuseTypeAnalytics then
-		p3({
-			selection = "None",
-			type = Constants.AnalyticsActions.SetPreselectedAbuseSelection
+		callback2({
+			type = Constants.AnalyticsActions.SetPreselectedAbuseSelection,
+			selection = Constants.AbuseMethods.TextChat
+		})
+	else
+		callback2({
+			type = Constants.AnalyticsActions.SetPreselectedAbuseSelection,
+			selection = "None"
 		})
 	end
 
-	p2({
-		type = Constants.PlayerMenuActions.SetPreselectedPlayer,
-		player = p1
-	})
+	callback({ type = Constants.PlayerMenuActions.SetPreselectedPlayer, player = player })
 end
 
 return handlePreselectedPlayer

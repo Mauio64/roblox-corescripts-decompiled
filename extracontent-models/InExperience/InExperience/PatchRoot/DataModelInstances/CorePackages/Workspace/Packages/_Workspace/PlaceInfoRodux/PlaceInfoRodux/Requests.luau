@@ -1,3 +1,1 @@
-return {
-	GetPlaceInfos = require(script.GetPlaceInfos)
-}
+return { GetPlaceInfos = require(script.GetPlaceInfos) }

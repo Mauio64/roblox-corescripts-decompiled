@@ -1,33 +1,31 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
 local GetFFlagExpChatEnableVoiceReverseNudge = require(ExpChat.Flags.GetFFlagExpChatEnableVoiceReverseNudge)
 
-return function(p1, n1: number, s1: string, b1: boolean) -- line: 4
-	-- upvalues: GetFFlagExpChatEnableVoiceReverseNudge (copy)
-	if p1 == "Connecting" then
-		return "icons/controls/voice/" .. s1 .. "_0_dark"
+return function(p, p2: number, p3: string, flag: boolean)
+	if p == "Connecting" then
+		return "icons/controls/voice/" .. p3 .. "_0_dark"
 	end
 
-	if p1 == "Muted" or p1 == "LOCAL_MUTED" then
-		return "icons/controls/voice/" .. s1 .. "_off_light"
+	if p == "Muted" or p == "LOCAL_MUTED" then
+		return "icons/controls/voice/" .. p3 .. "_off_light"
 	end
 
-	if p1 == "Inactive" or p1 == "Connecting" then
-		return "icons/controls/voice/" .. s1 .. "_0_light"
+	if p == "Inactive" or p == "Connecting" then
+		return "icons/controls/voice/" .. p3 .. "_0_light"
 	end
 
-	local v8
+	local v
 
-	if p1 == "Talking" then
-		local v7 = math.floor(n1 * 5 + 0.5) * 20
-
-		v8 = "icons/controls/voice/" .. s1 .. "_" .. tostring(v7) .. "_light"
-
-		if GetFFlagExpChatEnableVoiceReverseNudge() then
-			return "icons/controls/voice/" .. (not b1 and "" or "red_") .. s1 .. "_" .. tostring(v7) .. "_light"
-		end
-	else
-		v8 = "icons/controls/voice/" .. s1 .. "_error_light"
+	if p ~= "Talking" then
+		return "icons/controls/voice/" .. p3 .. "_error_light"
 	end
 
-	return v8
+	local v2 = math.floor(p2 * 5 + 0.5) * 20
+	v = "icons/controls/voice/" .. p3 .. "_" .. tostring(v2) .. "_light"
+
+	if GetFFlagExpChatEnableVoiceReverseNudge() then
+		return "icons/controls/voice/" .. (flag and "red_" or "") .. p3 .. "_" .. tostring(v2) .. "_light"
+	end
+
+	return v
 end

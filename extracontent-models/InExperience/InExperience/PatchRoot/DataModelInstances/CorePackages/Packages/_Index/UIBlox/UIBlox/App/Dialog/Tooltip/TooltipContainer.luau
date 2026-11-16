@@ -1,33 +1,38 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local Otter = require(ParentParentParentParent.Otter)
-local withStyle = require(ParentParentParent.Core.Style.withStyle)
-local Images = require(ParentParent.ImageSet.Images)
-local Label = require(ParentParentParent.Core.ImageSet.ImageSetComponent).Label
-local GenericTextLabel = require(ParentParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local GetTextSize = require(ParentParentParent.Core.Text.GetTextSize)
-local GetTextHeight = require(ParentParentParent.Core.Text.GetTextHeight)
-local divideTransparency = require(ParentParentParent.Utility.divideTransparency)
-local lerp = require(ParentParentParent.Utility.lerp)
-local TooltipOrientation = require(scriptParent.Enum.TooltipOrientation)
-local getPositionInfo = require(scriptParent.getPositionInfo)
-local t1 = {
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
+
+local Roact = require(parent4.Roact)
+local t = require(parent4.t)
+local Otter = require(parent4.Otter)
+
+local withStyle = require(parent3.Core.Style.withStyle)
+local Images = require(parent2.ImageSet.Images)
+local ImageSetComponent = require(parent3.Core.ImageSet.ImageSetComponent)
+local Label = ImageSetComponent.Label
+local GenericTextLabel = require(parent3.Core.Text.GenericTextLabel.GenericTextLabel)
+local GetTextSize = require(parent3.Core.Text.GetTextSize)
+local GetTextHeight = require(parent3.Core.Text.GetTextHeight)
+
+local divideTransparency = require(parent3.Utility.divideTransparency)
+local lerp = require(parent3.Utility.lerp)
+
+local TooltipOrientation = require(parent.Enum.TooltipOrientation)
+local getPositionInfo = require(parent.getPositionInfo)
+
+local v = {
 	[TooltipOrientation.Bottom] = Images["component_assets/triangleUp_16"],
 	[TooltipOrientation.Top] = Images["component_assets/triangleDown_16"],
 	[TooltipOrientation.Right] = Images["component_assets/triangleLeft_16"],
 	[TooltipOrientation.Left] = Images["component_assets/triangleRight_16"]
 }
-local t2 = {
-	frequency = 50,
-	dampingRatio = 1
-}
-local v20 = Roact.PureComponent:extend("TooltipContainer")
 
-v20.validateProps = t.strictInterface({
+local v2 = { frequency = 50, dampingRatio = 1 }
+
+local extended = Roact.PureComponent:extend("TooltipContainer")
+
+extended.validateProps = t.strictInterface({
 	triggerPosition = t.Vector2,
 	triggerSize = t.Vector2,
 	bodyText = t.string,
@@ -37,101 +42,128 @@ v20.validateProps = t.strictInterface({
 	orientation = t.optional(TooltipOrientation.isEnumValue),
 	isDirectChild = t.optional(t.boolean)
 })
-v20.defaultProps = {
-	isDirectChild = false,
+
+extended.defaultProps = {
 	screenSize = Vector2.new(10000, 10000),
-	orientation = TooltipOrientation.Bottom
+	orientation = TooltipOrientation.Bottom,
+	isDirectChild = false
 }
 
-function v20.init(p1) -- line: 61
-	-- upvalues: Roact (copy), Otter (copy), t2 (copy)
-	p1.visible = true
+function extended:init()
+	self.visible = true
 
-	local v22, v23 = Roact.createBinding(0)
+	local binding, v3 = Roact.createBinding(0)
+	self.progress = binding
 
-	p1.progress = v22
-	p1.progressMotor = Otter.createSingleMotor(0)
-	p1.progressMotor:onStep(v23)
-	p1.progressMotor:setGoal(Otter.spring(1, t2))
+	self.progressMotor = Otter.createSingleMotor(0)
+	self.progressMotor:onStep(v3)
+	self.progressMotor:setGoal(Otter.spring(1, v2))
 end
-function v20.render(p2) -- line: 72
-	-- upvalues: withStyle (copy), GetTextSize (copy), GetTextHeight (copy), getPositionInfo (copy), lerp (copy), divideTransparency (copy), Roact (copy), Label (copy), t1 (copy), GenericTextLabel (copy)
-	return withStyle(function(p3) -- line: 73
-		-- upvalues: GetTextSize (copy), p2 (copy), GetTextHeight (copy), getPositionInfo (copy), lerp (copy), divideTransparency (copy), Roact (copy), Label (copy), t1 (copy), GenericTextLabel (copy)
-		local p3Font = p3.Font
-		local Theme = p3.Theme
-		local CaptionHeader = p3Font.CaptionHeader
-		local CaptionBody = p3Font.CaptionBody
-		local v35 = p3Font.BaseSize * p3Font.CaptionBody.RelativeSize
-		local X = GetTextSize(p2.props.bodyText, v35, CaptionBody.Font, Vector2.new()).X
 
-		if p2.props.headerText then
-			X = math.max(X, GetTextSize(p2.props.headerText, p3Font.BaseSize * CaptionHeader.RelativeSize, CaptionHeader.Font, Vector2.new()).X)
+function extended.render(data)
+	return withStyle(function(p)
+		local font = p.Font
+		local theme = p.Theme
+
+		local captionHeader = font.CaptionHeader
+		local captionBody = font.CaptionBody
+
+		local v3 = font.BaseSize * font.CaptionBody.RelativeSize
+
+		local x = GetTextSize(data.props.bodyText, v3, captionBody.Font, Vector2.new()).X
+
+		if data.props.headerText then
+			x = math.max(
+				x,
+				GetTextSize(
+					data.props.headerText,
+					font.BaseSize * captionHeader.RelativeSize,
+					captionHeader.Font,
+					Vector2.new()
+				).X
+			)
 		end
 
-		local v37 = math.min(X, 216)
-		local v38 = v37 + 24
-		local v39 = GetTextHeight(p2.props.bodyText, CaptionBody.Font, v35, v37)
-		local v40 = p2.props.headerText and GetTextHeight(p2.props.headerText, CaptionHeader.Font, v35, v37) or 0
-		local v41 = p2.props.headerText and v40 + v39 + 24 + 4 or v39 + 24
-		local v42 = getPositionInfo(v38, v41, p2.props.orientation, p2.props.triggerPosition, p2.props.triggerSize, p2.props.screenSize, p2.props.position)
-		local v43 = p2.progress:map(function(p4) -- line: 113
-			-- upvalues: p2 (copy), v42 (copy)
-			local v47 = if not p2.props.position then p2.props.isDirectChild and v42.position or v42.absolutePosition else p2.props.position
+		local v4 = math.min(x, 216)
+		local v5 = v4 + 24
 
-			return v47:lerp(v47 + v42.animatedDistance, p4)
+		local textHeight = GetTextHeight(data.props.bodyText, captionBody.Font, v3, v4)
+		local v6 = data.props.headerText and GetTextHeight(data.props.headerText, captionHeader.Font, v3, v4) or 0
+
+		local v7 = data.props.headerText and v6 + textHeight + 24 + 4 or textHeight + 24
+
+		local positionInfo = getPositionInfo(
+			v5,
+			v7,
+			data.props.orientation,
+			data.props.triggerPosition,
+			data.props.triggerSize,
+			data.props.screenSize,
+			data.props.position
+		)
+
+		local mapped = data.progress:map(function(p2)
+			local position
+
+			if data.props.position then
+				position = data.props.position
+			else
+				position = data.props.isDirectChild and positionInfo.position or positionInfo.absolutePosition
+			end
+
+			return position:lerp(position + positionInfo.animatedDistance, p2)
 		end)
-		local v44 = p2.progress:map(function(p5) -- line: 124
-			-- upvalues: Theme (copy), lerp (copy), divideTransparency (copy)
-			local BackgroundMutedTransparency = Theme.BackgroundMuted.Transparency
 
-			return lerp(1, divideTransparency(BackgroundMutedTransparency, 1), p5)
+		local mapped2 = data.progress:map(function(p2)
+			return lerp(1, divideTransparency(theme.BackgroundMuted.Transparency, 1), p2)
 		end)
-		local v45 = p2.progress:map(function(p6) -- line: 130
-			-- upvalues: Theme (copy), lerp (copy), divideTransparency (copy)
-			local TextEmphasisTransparency = Theme.TextEmphasis.Transparency
 
-			return lerp(1, divideTransparency(TextEmphasisTransparency, 2), p6)
+		local mapped3 = data.progress:map(function(p2)
+			return lerp(1, divideTransparency(theme.TextEmphasis.Transparency, 2), p2)
 		end)
 
 		return Roact.createElement("Frame", {
+			Visible = data.visible,
+			Position = mapped,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Visible = p2.visible,
-			Position = v43,
-			Size = v42.fillDirection == Enum.FillDirection.Vertical and UDim2.fromOffset(v38, v41 + 8) or UDim2.fromOffset(v38 + 8, v41)
+			Size = positionInfo.fillDirection == Enum.FillDirection.Vertical and UDim2.fromOffset(v5, v7 + 8) or UDim2.fromOffset(v5 + 8, v7)
 		}, {
 			UIListLayout = Roact.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
-				FillDirection = v42.fillDirection
+				FillDirection = positionInfo.fillDirection
 			}),
-			CaretFrame = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = v42.caretFrameSize,
-				LayoutOrder = v42.caretLayoutOrder
-			}, {
-				Caret = Roact.createElement(Label, {
+			CaretFrame = Roact.createElement(
+				"Frame",
+				{
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-					Position = v42.caretPosition,
-					AnchorPoint = v42.caretAnchorPoint,
-					Size = v42.caretImageSize,
-					Image = t1[v42.updatedOrientation],
-					ImageColor3 = Theme.BackgroundMuted.Color,
-					ImageTransparency = v44,
-					[Roact.Ref] = p2.caretRef
-				})
-			}),
+					Size = positionInfo.caretFrameSize,
+					LayoutOrder = positionInfo.caretLayoutOrder
+				},
+				{
+					Caret = Roact.createElement(Label, {
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						Position = positionInfo.caretPosition,
+						AnchorPoint = positionInfo.caretAnchorPoint,
+						Size = positionInfo.caretImageSize,
+						Image = v[positionInfo.updatedOrientation],
+						ImageColor3 = theme.BackgroundMuted.Color,
+						ImageTransparency = mapped2,
+						[Roact.Ref] = data.caretRef
+					})
+				}
+			),
 			Content = Roact.createElement("TextButton", {
 				AutoButtonColor = false,
 				Text = "",
 				Selectable = false,
+				Size = UDim2.fromOffset(v5, v7),
+				BackgroundColor3 = theme.BackgroundMuted.Color,
+				BackgroundTransparency = mapped2,
 				BorderSizePixel = 0,
-				Size = UDim2.fromOffset(v38, v41),
-				BackgroundColor3 = Theme.BackgroundMuted.Color,
-				BackgroundTransparency = v44,
-				LayoutOrder = v42.contentLayoutOrder
+				LayoutOrder = positionInfo.contentLayoutOrder
 			}, {
 				VerticalLayout = Roact.createElement("UIListLayout", {
 					SortOrder = Enum.SortOrder.LayoutOrder,
@@ -145,45 +177,49 @@ function v20.render(p2) -- line: 72
 					PaddingLeft = UDim.new(0, 12),
 					PaddingRight = UDim.new(0, 12)
 				}),
-				Header = p2.props.headerText and Roact.createElement(GenericTextLabel, {
+				Header = data.props.headerText and Roact.createElement(GenericTextLabel, {
+					colorStyle = theme.TextEmphasis,
+					fontStyle = captionHeader,
 					LayoutOrder = 1,
-					colorStyle = Theme.TextEmphasis,
-					fontStyle = CaptionHeader,
-					Text = p2.props.headerText,
-					TextTransparency = v45,
+					Text = data.props.headerText,
+					TextTransparency = mapped3,
 					TextXAlignment = Enum.TextXAlignment.Left,
-					Size = UDim2.new(1, 0, 0, v40)
+					Size = UDim2.new(1, 0, 0, v6)
 				}),
 				Body = Roact.createElement(GenericTextLabel, {
+					colorStyle = theme.TextDefault,
+					fontStyle = captionBody,
 					LayoutOrder = 2,
-					colorStyle = Theme.TextDefault,
-					fontStyle = CaptionBody,
-					Text = p2.props.bodyText,
-					TextTransparency = v45,
+					Text = data.props.bodyText,
+					TextTransparency = mapped3,
 					TextXAlignment = Enum.TextXAlignment.Left,
-					Size = UDim2.new(1, 0, 0, v39)
+					Size = UDim2.new(1, 0, 0, textHeight)
 				})
 			})
 		})
 	end)
 end
-function v20.didMount(p7) -- line: 212
-	p7.progressMotor:start()
+
+function extended.didMount(p)
+	p.progressMotor:start()
 end
-function v20.didUpdate(p8, p9, _) -- line: 216
-	if p9.triggerPosition ~= p8.props.triggerPosition then
-		if p8.props.triggerPosition.Y < 0 or p8.props.triggerPosition.Y + p8.props.triggerSize.Y > p8.props.screenSize.Y then
-			p8.visible = false
 
-			return
+function extended:didUpdate(p, _)
+	if p.triggerPosition ~= self.props.triggerPosition then
+		if
+			self.props.triggerPosition.Y < 0
+			or self.props.triggerPosition.Y + self.props.triggerSize.Y > self.props.screenSize.Y
+		then
+			self.visible = false
+		else
+			self.visible = true
 		end
-
-		p8.visible = true
 	end
 end
-function v20.willUnmount(p11) -- line: 229
-	p11.progressMotor:destroy()
-	p11.progressMotor = nil
+
+function extended:willUnmount()
+	self.progressMotor:destroy()
+	self.progressMotor = nil
 end
 
-return v20
+return extended

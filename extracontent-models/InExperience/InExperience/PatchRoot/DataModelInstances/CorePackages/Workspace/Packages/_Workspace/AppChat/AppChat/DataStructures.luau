@@ -1,3 +1,1 @@
-return {
-	ArraySet = require(script.ArraySet)
-}
+return { ArraySet = require(script.ArraySet) }

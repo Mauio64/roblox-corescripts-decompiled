@@ -1,0 +1,4 @@
+local Workspace = script.Parent.Parent._Workspace
+local createPlaytestLoadingStore = require(Workspace.BuildExperiencePlaytestLaunch.BuildExperiencePlaytestLaunch.GetPlaytestLoadingStore.createPlaytestLoadingStore)
+
+return createPlaytestLoadingStore

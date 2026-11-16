@@ -1,4 +1,5 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+
 local Array = require(script.Array)
 local Map = require(script.Map)
 local Object = require(script.Object)
@@ -6,7 +7,7 @@ local Set = require(script.Set)
 local WeakMap = require(script.WeakMap)
 local inspect = require(script.inspect)
 
-require(scriptParent.ES7Types)
+require(parent.ES7Types)
 
 return {
 	Array = Array,

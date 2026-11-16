@@ -1,84 +1,149 @@
 local Markdown = script:FindFirstAncestor("Markdown")
-local MarkdownParent = Markdown.Parent
-
+local parent = Markdown.Parent
 require(Markdown.Types)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Dash = require(parent.Dash)
+local MarkdownCore = require(parent.MarkdownCore)
+local Flags = MarkdownCore.Flags
 
-local React = require(MarkdownParent.React)
-local Foundation = require(MarkdownParent.Foundation)
-local ImageElement = require(MarkdownParent.InlineLayout).Components.InlineLayoutElements.ImageElement
+local InlineLayout = require(parent.InlineLayout)
+local ImageElement = InlineLayout.Components.InlineLayoutElements.ImageElement
 local joinTags = require(Markdown.Utils.joinTags)
 local mergeContexts = require(Markdown.Utils.mergeContexts)
+local NodeType = require(Markdown.Enums.NodeType)
 
-local function renderTag(p1, p2) -- line: 12
-	-- upvalues: ImageElement (copy), React (copy), joinTags (copy), Foundation (copy), mergeContexts (copy)
-	if p1.text == "img" then
-		local size = p2.imageStyles.size
-		local v12 = if not p1.attributes or not p1.attributes.width then size.Width.Offset else p1.attributes.width
-		local v13 = if not p1.attributes or not p1.attributes.height then size.Height.Offset else p1.attributes.height
+local function bold()
+	return { bold = true }
+end
 
-		if p2.isInline then
+local function italic()
+	return { italic = true }
+end
+
+local function strike()
+	return { strike = true }
+end
+
+local function code(p)
+	return Dash.joinDeep(p.codeStyles, { selectable = true })
+end
+
+local v = {
+	b = bold,
+	strong = bold,
+	i = italic,
+	em = italic,
+	s = strike,
+	del = strike,
+	strike = strike,
+	code = code,
+	kbd = code
+}
+
+local function renderTag(props, props2)
+	if props.text == "img" then
+		local size = props2.imageStyles.size
+		local v2
+
+		if props.attributes and props.attributes.width then
+			v2 = props.attributes.width
+		else
+			v2 = size.Width.Offset
+		end
+
+		local v3
+
+		if props.attributes and props.attributes.height then
+			v3 = props.attributes.height
+		else
+			v3 = size.Height.Offset
+		end
+
+		if props2.isInline then
 			return ImageElement.new({
-				LayoutOrder = p1.index,
-				Image = (not p1.attributes or not p1.attributes.src) and "" or p1.attributes.src,
-				Size = UDim2.fromOffset(v12, v13),
+				LayoutOrder = props.index,
+				Image = not (props.attributes and props.attributes.src) and "" or props.attributes.src,
+				Size = UDim2.fromOffset(v2, v3),
 				backgroundStyle = {
-					Transparency = p2.imageStyles.backgroundTransparency,
-					Color3 = p2.imageStyles.backgroundColor3
+					Transparency = props2.imageStyles.backgroundTransparency,
+					Color3 = props2.imageStyles.backgroundColor3
 				},
-				imageStyle = {
-					Transparency = p2.imageStyles.transparency
-				},
-				ScaleType = p2.imageStyles.scaleType,
-				ResampleMode = p2.imageStyles.resampleMode,
-				tag = p2.imageStyles.tags
+				imageStyle = { Transparency = props2.imageStyles.transparency },
+				ScaleType = props2.imageStyles.scaleType,
+				ResampleMode = props2.imageStyles.resampleMode,
+				tag = props2.imageStyles.tags
 			})
 		end
 
 		return React.createElement("ImageLabel", {
-			key = tostring(p1.index),
-			LayoutOrder = p1.index,
-			Image = (not p1.attributes or not p1.attributes.src) and "" or p1.attributes.src,
-			Size = UDim2.fromOffset(v12, v13),
-			BackgroundColor3 = p2.imageStyles.backgroundColor3,
-			BackgroundTransparency = p2.imageStyles.backgroundTransparency,
-			ImageTransparency = p2.imageStyles.transparency,
-			ScaleType = p2.imageStyles.scaleType,
-			ResampleMode = p2.imageStyles.resampleMode,
-			[React.Tag] = joinTags("X-PadS X-Middle", p2.imageStyles.tags)
+			key = tostring(props.index),
+			LayoutOrder = props.index,
+			Image = not (props.attributes and props.attributes.src) and "" or props.attributes.src,
+			Size = UDim2.fromOffset(v2, v3),
+			BackgroundColor3 = props2.imageStyles.backgroundColor3,
+			BackgroundTransparency = props2.imageStyles.backgroundTransparency,
+			ImageTransparency = props2.imageStyles.transparency,
+			ScaleType = props2.imageStyles.scaleType,
+			ResampleMode = props2.imageStyles.resampleMode,
+			[React.Tag] = joinTags("X-PadS X-Middle", props2.imageStyles.tags)
 		})
-	end
+	elseif props.text == "Button" then
+		if props.attributes and props.attributes.text and props.attributes.url then
+			return React.createElement(Foundation.Button, {
+				key = tostring(props.index),
+				LayoutOrder = props.index,
+				text = props.attributes.text,
+				icon = props.attributes.icon,
+				onActivated = function()
+					props2.linkCallback(props.attributes.url)
+				end,
+				tag = "auto-xy"
+			})
+		end
 
-	if p1.text == "Button" then
-		if not p1.attributes or not p1.attributes.text or not p1.attributes.url then
-			warn("Button tag misses required text and url attributes")
+		warn("Button tag misses required text and url attributes")
+		return nil
+	elseif props.text == "font" then
+		local color
 
+		if props.attributes and props.attributes.color then
+			color = props.attributes.color
+		end
+
+		return props2.processChildren(props, mergeContexts(props2, {
+			textStyles = { color = color }
+		}))
+	else
+		if not Flags.FFlagMarkdownTagFallbacks then
 			return nil
 		end
 
-		return React.createElement(Foundation.Button, {
-			tag = "auto-xy",
-			key = tostring(p1.index),
-			LayoutOrder = p1.index,
-			text = p1.attributes.text,
-			icon = p1.attributes.icon,
-			onActivated = function() -- line: 68
-				-- upvalues: p2 (copy), p1 (copy)
-				p2.linkCallback(p1.attributes.url)
-			end
-		})
+		local href = props.attributes and props.attributes.href
+
+		if props.text == "a" and href and props2.renderers and props2.renderers.LINK then
+			return props2.renderers.LINK(Dash.join(props, {
+				attributes = Dash.join(props.attributes, { url = href })
+			}), props2)
+		end
+
+		if props.type ~= NodeType.InlineSpan then
+			return React.createElement(
+				Foundation.View,
+				{
+					key = tostring(props.index),
+					tag = "size-full-0 auto-y col",
+					LayoutOrder = props.index
+				},
+				(props2.processChildren(props, props2))
+			)
+		end
+
+		local v2 = v[props.text]
+		local textStyles = not v2 and {} or v2(props2)
+
+		return props2.processChildren(props, mergeContexts(props2, { textStyles = textStyles }))
 	end
-
-	if p1.text == "font" then
-		local v14 = if not p1.attributes or not p1.attributes.color then nil else p1.attributes.color
-
-		return p2.processChildren(p1, mergeContexts(p2, {
-			textStyles = {
-				color = v14
-			}
-		}))
-	end
-
-	return nil
 end
 
 return renderTag

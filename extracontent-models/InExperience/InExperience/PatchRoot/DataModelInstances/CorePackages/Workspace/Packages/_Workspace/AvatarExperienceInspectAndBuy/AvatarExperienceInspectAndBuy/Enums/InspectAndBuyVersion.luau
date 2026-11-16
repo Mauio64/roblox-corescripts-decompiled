@@ -1,4 +1,1 @@
-return {
-	Version1 = 1,
-	Version2 = 2
-}
+return { Version1 = 1, Version2 = 2 }

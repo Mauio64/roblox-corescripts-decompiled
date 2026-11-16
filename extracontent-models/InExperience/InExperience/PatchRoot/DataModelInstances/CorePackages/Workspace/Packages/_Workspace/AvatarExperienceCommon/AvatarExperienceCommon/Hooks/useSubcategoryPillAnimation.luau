@@ -1,53 +1,48 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local React = require(AvatarExperienceCommonParent.React)
+local parent = AvatarExperienceCommon.Parent
+
+local React = require(parent.React)
+
 local AnimationConstants = require(AvatarExperienceCommon.AnimationConstants)
 
-local function useSubcategoryPillAnimation(p1) -- line: 15
-	-- upvalues: React (copy), AnimationConstants (copy)
-	local v7, v8 = React.useState({})
-	local v9 = React.useRef(nil)
-	local v10, v11 = React.useState(false)
+local function useSubcategoryPillAnimation(p)
+	local state, setState = React.useState({})
+	local ref = React.useRef(nil)
+	local state2, setState2 = React.useState(false)
 
-	React.useEffect(function() -- line: 22
-		-- upvalues: v9 (copy)
-		return function() -- line: 23
-			-- upvalues: v9 (copy)
-			if v9.current then
-				task.cancel(v9.current)
+	React.useEffect(function()
+		return function()
+			if ref.current then
+				task.cancel(ref.current)
 			end
 		end
 	end, {})
-	React.useEffect(function() -- line: 31
-		-- upvalues: p1 (copy), v9 (copy), v8 (copy), v11 (copy), AnimationConstants (copy)
-		local v12 = if not p1 or not p1.Subcategories then {} else p1.Subcategories
 
-		if v9.current then
-			task.cancel(v9.current)
+	React.useEffect(function()
+		local v = not (p and p.Subcategories) and {} or p.Subcategories
+
+		if ref.current then
+			task.cancel(ref.current)
 		end
 
-		if next(v12) then
-			v8(v12)
-			v11(false)
+		if next(v) then
+			setState(v)
+			setState2(false)
 		else
-			v11(true)
+			setState2(true)
 		end
 
-		v9.current = task.delay(AnimationConstants.FIntAXSubcategoryPillFadeAnimationDurationMs / 1000, function() -- line: 54
-			-- upvalues: v12 (copy), v8 (copy), v11 (copy), v9 (copy)
-			if not next(v12) then
-				v8({})
+		ref.current = task.delay(AnimationConstants.FIntAXSubcategoryPillFadeAnimationDurationMs / 1000, function()
+			if not next(v) then
+				setState({})
 			end
 
-			v11(false)
-			v9.current = nil
+			setState2(false)
+			ref.current = nil
 		end)
-	end, { p1 })
+	end, { p })
 
-	return {
-		subcategoriesState = v7,
-		isFadingOut = v10
-	}
+	return { subcategoriesState = state, isFadingOut = state2 }
 end
 
 return useSubcategoryPillAnimation

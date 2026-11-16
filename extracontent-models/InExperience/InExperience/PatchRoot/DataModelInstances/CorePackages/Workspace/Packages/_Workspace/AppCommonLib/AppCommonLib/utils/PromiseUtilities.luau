@@ -1,85 +1,72 @@
-local Parent = script:FindFirstAncestor("AppCommonLib").Parent
-local Result = require(Parent.Result)
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("AppCommonLib").Parent
 
-return {
-	Batch = function(p1, p2: ((...any) -> ...any)?) -- line: 30
-		-- upvalues: Promise (copy), Result (copy)
-		assert(type(p1) == "table", "PromiseUtilities expects a list of Promises!")
+local Result = require(parent.Result)
+local Promise = require(parent.Promise)
+local PromiseUtilities = {}
 
-		local n1 = 0
+function PromiseUtilities.Batch(items, callback)
+	assert(type(items) == "table", "PromiseUtilities expects a list of Promises!")
+	local count = 0
 
-		for _, v in pairs(p1) do
-			assert(Promise.is(v), "PromiseUtilities expects a list of Promises!")
-			n1 += 1
-		end
-
-		return Promise.new(function(resolve, _) -- line: 40
-			-- upvalues: Result (copy), n1 (ref), p1 (copy), p2 (copy)
-			local n2 = 0
-			local t1 = {}
-
-			local function promiseCompleted(p4, p5, p6) -- line: 44
-				-- upvalues: t1 (copy), Result (copy), n2 (ref), n1 (ref), resolve (copy)
-				t1[p4] = Result.new(p5, p6)
-				n2 += 1
-
-				if n2 == n1 then
-					resolve(t1)
-				end
-			end
-
-			if next(p1) == nil then
-				resolve(t1)
-			end
-
-			for k, v in pairs(p1) do
-				v:andThen(function(p7, ...) -- line: 58
-					-- upvalues: k (copy), t1 (copy), Result (copy), n2 (ref), n1 (ref), resolve (copy)
-					if select("#", ...) > 0 then
-						warn("Promises in PromiseUtilities.Batch should not return tuple")
-					end
-
-					t1[k] = Result.new(true, p7)
-					n2 += 1
-
-					if n2 == n1 then
-						resolve(t1)
-					end
-				end, function(p8) -- line: 63
-					-- upvalues: k (copy), t1 (copy), Result (copy), n2 (ref), n1 (ref), resolve (copy), p2 (copy)
-					t1[k] = Result.new(false, p8)
-					n2 += 1
-
-					if n2 == n1 then
-						resolve(t1)
-					end
-
-					if p2 then
-						p2(p8)
-					end
-				end)
-			end
-		end)
-	end,
-	CountResults = function(p9) -- line: 73
-		local n3 = 0
-		local n4 = 0
-
-		for _, v in pairs(p9) do
-			local v14, _ = v:unwrap()
-
-			if not v14 then
-				n4 += 1
-			end
-
-			n3 += 1
-		end
-
-		return {
-			successCount = n3 - n4,
-			failureCount = n4,
-			totalCount = n3
-		}
+	for _, item in pairs(items) do
+		assert(Promise.is(item), "PromiseUtilities expects a list of Promises!")
+		count += 1
 	end
-}
+
+	return Promise.new(function(callback2, _)
+		local count2 = 0
+		local v = {}
+
+		local function promiseCompleted(k, p, p2) -- 2 equivalent calls inferred from this helper
+			v[k] = Result.new(p, p2)
+			count2 += 1
+
+			if count2 == count then
+				callback2(v)
+			end
+		end
+
+		if next(items) == nil then
+			callback2(v)
+		end
+
+		for k, item in pairs(items) do
+			item:andThen(function(p, ...)
+				if select("#", ...) > 0 then
+					warn("Promises in PromiseUtilities.Batch should not return tuple")
+				end
+
+				promiseCompleted(k, true, p) -- inferred equivalent call
+			end, function(p)
+				promiseCompleted(k, false, p) -- inferred equivalent call
+
+				if callback then
+					callback(p)
+				end
+			end)
+		end
+	end)
+end
+
+function PromiseUtilities.CountResults(items)
+	local count = 0
+	local count2 = 0
+
+	for _, item in pairs(items) do
+		local unwrapped, _ = item:unwrap()
+
+		if not unwrapped then
+			count2 += 1
+		end
+
+		count += 1
+	end
+
+	return {
+		successCount = count - count2,
+		failureCount = count2,
+		totalCount = count
+	}
+end
+
+return PromiseUtilities

@@ -1,22 +1,23 @@
 local Foundation = script:FindFirstAncestor("Foundation")
+
 local Tokens = require(Foundation.Providers.Style.Tokens)
 local attributeRules = require(Foundation.StyleSheet.Rules.attributeRules)
 local formatTokens = require(Foundation.StyleSheet.formatTokens)
 
-local function getLayoutTags() -- line: 8
-	-- upvalues: Tokens (copy), formatTokens (copy), attributeRules (copy)
-	local t1 = {}
+local function getLayoutTags()
 	local defaultTokens = Tokens.defaultTokens
-	local v8 = formatTokens(defaultTokens)
-	local _, v10 = attributeRules.rulesGenerator(defaultTokens, v8)
+	local v = formatTokens(defaultTokens)
 
-	for _, v12 in v10 do
-		if v12.pseudo == "UIListLayout" and v12.tag then
-			t1[v12.tag] = true
+	local _, v2 = attributeRules.rulesGenerator(defaultTokens, v)
+	local tagSet = {}
+
+	for _, v3 in v2 do
+		if v3.pseudo == "UIListLayout" and v3.tag then
+			tagSet[v3.tag] = true
 		end
 	end
 
-	return t1
+	return tagSet
 end
 
 return getLayoutTags

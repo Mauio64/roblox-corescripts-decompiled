@@ -1,76 +1,67 @@
-local ParentParent = script.Parent.Parent
-local __DEV__ = require(ParentParent.ReactGlobals).__DEV__
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+
+local __DEV__ = ReactGlobals.__DEV__
 
 require(script.Parent.ReactInternalTypes)
 
-local ReactSharedInternals = require(ParentParent.Shared).ReactSharedInternals
-local getStackByFiberInDevAndProd = require(script.Parent.ReactFiberComponentStack).getStackByFiberInDevAndProd
-local getComponentName = require(ParentParent.Shared).getComponentName
+local Shared = require(parent.Shared)
+local ReactSharedInternals = Shared.ReactSharedInternals
+local ReactFiberComponentStack = require(script.Parent.ReactFiberComponentStack)
+local getStackByFiberInDevAndProd = ReactFiberComponentStack.getStackByFiberInDevAndProd
+local Shared2 = require(parent.Shared)
+local getComponentName = Shared2.getComponentName
+
 local ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame
-local t1 = {
-	current = nil,
-	isRendering = false
-}
 
-function t1.getCurrentFiberOwnerNameInDevOrNull() -- line: 39
-	-- upvalues: __DEV__ (copy), t1 (copy), getComponentName (copy)
-	if __DEV__ then
-		if t1.current == nil then
-			return nil
-		end
+local ReactCurrentFiber = { current = nil, isRendering = false }
 
-		local _debugOwner = t1.current._debugOwner
+function ReactCurrentFiber.getCurrentFiberOwnerNameInDevOrNull()
+	if not (__DEV__ and ReactCurrentFiber.current ~= nil) then
+		return nil
+	end
 
-		if _debugOwner then
-			return getComponentName(_debugOwner.type)
-		end
+	local debugOwner = ReactCurrentFiber.current._debugOwner
+
+	if debugOwner then
+		return getComponentName(debugOwner.type)
 	end
 
 	return nil
 end
 
-local function getCurrentFiberStackInDev() -- line: 53
-	-- upvalues: __DEV__ (copy), t1 (copy), getStackByFiberInDevAndProd (copy)
-	if __DEV__ then
-		if t1.current == nil then
-			return ""
-		end
-
-		return getStackByFiberInDevAndProd(t1.current)
+local function getCurrentFiberStackInDev()
+	if not (__DEV__ and ReactCurrentFiber.current ~= nil) then
+		return ""
 	end
 
-	return ""
+	return getStackByFiberInDevAndProd(ReactCurrentFiber.current)
 end
 
-function t1.resetCurrentFiber() -- line: 66
-	-- upvalues: __DEV__ (copy), ReactDebugCurrentFrame (copy), t1 (copy)
+function ReactCurrentFiber.resetCurrentFiber()
 	if __DEV__ then
 		ReactDebugCurrentFrame.getCurrentStack = nil
-		t1.current = nil
-		t1.isRendering = false
+		ReactCurrentFiber.current = nil
+		ReactCurrentFiber.isRendering = false
 	end
 end
-function t1.setCurrentFiber(p1) -- line: 75
-	-- upvalues: __DEV__ (copy), ReactDebugCurrentFrame (copy), getCurrentFiberStackInDev (copy), t1 (copy)
+
+function ReactCurrentFiber.setCurrentFiber(current)
 	if __DEV__ then
 		ReactDebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev
-		t1.current = p1
-		t1.isRendering = false
+		ReactCurrentFiber.current = current
+		ReactCurrentFiber.isRendering = false
 	end
-end
-function t1.setIsRendering(b1: boolean) -- line: 84
-	-- upvalues: __DEV__ (copy), t1 (copy)
-	if __DEV__ then
-		t1.isRendering = b1
-	end
-end
-function t1.getIsRendering() -- line: 90
-	-- upvalues: __DEV__ (copy), t1 (copy)
-	if __DEV__ then
-		return t1.isRendering
-	end
-
-	return false
 end
 
-return t1
+function ReactCurrentFiber.setIsRendering(isRendering: boolean)
+	if __DEV__ then
+		ReactCurrentFiber.isRendering = isRendering
+	end
+end
+
+function ReactCurrentFiber.getIsRendering()
+	return if __DEV__ then ReactCurrentFiber.isRendering else false
+end
+
+return ReactCurrentFiber

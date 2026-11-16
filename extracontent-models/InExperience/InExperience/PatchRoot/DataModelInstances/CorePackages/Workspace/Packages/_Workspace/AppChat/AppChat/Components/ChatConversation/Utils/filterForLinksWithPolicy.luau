@@ -1,7 +1,10 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local ArgCheck = require(Parent.ArgCheck)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local ArgCheck = require(parent.ArgCheck)
+
 local filterForLinks = require(script.Parent.filterForLinks)
-local t1 = {
+
+local v = {
 	"roblox.com",
 	"sitetest%d%.robloxlabs.com",
 	"gametest%d%.robloxlabs.com",
@@ -10,9 +13,8 @@ local t1 = {
 	"roblox%-cn.com"
 }
 
-return function(p1) -- line: 18
-	-- upvalues: ArgCheck (copy), filterForLinks (copy), t1 (copy)
-	ArgCheck.isType(p1, "table", "filterForLinks.text")
+return function(p)
+	ArgCheck.isType(p, "table", "filterForLinks.text")
 
-	return filterForLinks(p1, t1)
+	return filterForLinks(p, v)
 end

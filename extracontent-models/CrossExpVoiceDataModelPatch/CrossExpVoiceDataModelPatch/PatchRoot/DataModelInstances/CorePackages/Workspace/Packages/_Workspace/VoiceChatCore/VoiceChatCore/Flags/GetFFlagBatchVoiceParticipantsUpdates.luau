@@ -1,24 +1,24 @@
-local Parent = script:FindFirstAncestor("VoiceChatCore").Parent
-local IXPServiceWrapper = require(Parent.IXPServiceWrapper).IXPServiceWrapper
+local parent = script:FindFirstAncestor("VoiceChatCore").Parent
 
+local IXPServiceWrapper = require(parent.IXPServiceWrapper)
+local ixpServiceWrapper = IXPServiceWrapper.IXPServiceWrapper
 game:DefineFastFlag("BatchVoiceParticipantsUpdates", false)
-
-local v3 = game:DefineFastString("ThrottleVoiceParticipantsUpdateLayerName", "Voice.Performance")
-local v4 = game:DefineFastString("ThrottleVoiceParticipantsUpdateLayerValue", "BatchVoiceParticipantsUpdates")
-local u5 = nil
-local u6 = nil
+local defineFastString = game:DefineFastString("ThrottleVoiceParticipantsUpdateLayerName", "Voice.Performance")
+local defineFastString2 = game:DefineFastString(
+	"ThrottleVoiceParticipantsUpdateLayerValue",
+	"BatchVoiceParticipantsUpdates"
+)
+local success, result
 
 if game:GetFastFlag("BatchVoiceParticipantsUpdates") then
-	local ok, result = pcall(function() -- line: 12
-		-- upvalues: IXPServiceWrapper (copy), v3 (copy)
-		return IXPServiceWrapper:GetLayerData(v3)
+	success, result = pcall(function()
+		return ixpServiceWrapper:GetLayerData(defineFastString)
 	end)
-
-	u5 = ok
-	u6 = result
+else
+	success = nil
+	result = nil
 end
 
-return function() -- line: 17
-	-- upvalues: u5 (ref), u6 (ref), v4 (copy)
-	return game:GetFastFlag("BatchVoiceParticipantsUpdates") and (u5 and (u6 and u6[v4]))
+return function()
+	return game:GetFastFlag("BatchVoiceParticipantsUpdates") and success and result and result[defineFastString2]
 end

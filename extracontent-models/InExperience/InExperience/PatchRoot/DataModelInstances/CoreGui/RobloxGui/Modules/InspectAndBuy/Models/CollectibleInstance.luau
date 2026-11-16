@@ -1,16 +1,19 @@
-return {
-	new = function() -- line: 13
-		return {}
-	end,
-	fromGetCollectibleItemInstances = function(p1) -- line: 19
-		return {
-			collectibleInstanceId = p1.collectibleInstanceId,
-			collectibleItemId = p1.collectibleItemId,
-			collectibleProductId = p1.collectibleProductId,
-			serialNumber = p1.serialNumber,
-			instanceState = p1.instanceState,
-			saleState = p1.saleState,
-			price = p1.price
-		}
-	end
-}
+local CollectibleInstance = {}
+
+function CollectibleInstance.new()
+	return {}
+end
+
+function CollectibleInstance.fromGetCollectibleItemInstances(data)
+	return {
+		["collectibleInstanceId"] = data.collectibleInstanceId,
+		collectibleItemId = data.collectibleItemId,
+		collectibleProductId = data.collectibleProductId,
+		serialNumber = data.serialNumber,
+		instanceState = data.instanceState,
+		saleState = data.saleState,
+		price = data.price
+	}
+end
+
+return CollectibleInstance

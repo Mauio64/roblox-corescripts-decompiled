@@ -1,38 +1,51 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
-
 require(AbuseReportMenu.Components.Types)
-
 local CorePackages = game:GetService("CorePackages")
 local Constants = require(AbuseReportMenu.Components.Constants)
 local ReportTypes = Constants.ReportTypes
+
 local EventIngestService = game:GetService("EventIngestService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+
 local ReportAnythingAnalytics = require(AbuseReportMenu.ReportAnything.Utility.ReportAnythingAnalytics)
-local EventIngest = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventIngest
-local v9 = require(CorePackages.Workspace.Packages.Analytics).Analytics.new(RbxAnalyticsService)
+local Analytics = require(CorePackages.Workspace.Packages.Analytics)
+local EventIngest = Analytics.AnalyticsReporters.EventIngest
+local Analytics2 = require(CorePackages.Workspace.Packages.Analytics)
+local analytics = Analytics2.Analytics.new(RbxAnalyticsService)
 local ReportAbuseAnalytics = require(AbuseReportMenu.Analytics.ReportAbuseAnalytics)
 local collectAnalyticsParameters = require(AbuseReportMenu.Analytics.collectAnalyticsParameters)
-local v12 = ReportAbuseAnalytics.new(EventIngest.new(EventIngestService), v9.Diag, ReportAbuseAnalytics.MenuContexts.NewMenu)
 
-return function(p1, p2: ((...any) -> ...any), p3: ((...any) -> ...any), s1: string) -- line: 22
-	-- upvalues: ReportTypes (copy), collectAnalyticsParameters (copy), ReportAnythingAnalytics (copy), v12 (copy), Constants (copy)
-	return function(p4, p5) -- line: 28
-		-- upvalues: p1 (copy), s1 (copy), ReportTypes (copy), collectAnalyticsParameters (copy), ReportAnythingAnalytics (copy), v12 (copy), Constants (copy), p2 (copy), p3 (copy)
-		if not p1.menuEverShown then
+local v = ReportAbuseAnalytics.new(
+	EventIngest.new(EventIngestService),
+	analytics.Diag,
+	ReportAbuseAnalytics.MenuContexts.NewMenu
+)
+
+return function(p, callback, callback2, p2: string)
+	return function(p3, callback3)
+		if not p.menuEverShown then
 			return
 		end
 
-		local v19 = if s1 ~= ReportTypes.Person then collectAnalyticsParameters.forExperienceReport(p1, p4, ReportAnythingAnalytics.getAccumulatedParameters()) else collectAnalyticsParameters.forPersonReport(p1, p4, ReportAnythingAnalytics.getAccumulatedParameters())
+		local v2
 
-		v12:reportInGameAbuseReportInteraction(v19)
-		p5({
-			type = Constants.ReportAnythingActions.ClearAnnotationFlowProperties
-		})
-		p2({
-			type = Constants.AnalyticsActions.Reset
-		})
+		if p2 == ReportTypes.Person then
+			v2 = collectAnalyticsParameters.forPersonReport(p, p3, ReportAnythingAnalytics.getAccumulatedParameters())
+		else
+			v2 = collectAnalyticsParameters.forExperienceReport(
+				p,
+				p3,
+				ReportAnythingAnalytics.getAccumulatedParameters()
+			)
+		end
+
+		v:reportInGameAbuseReportInteraction(v2)
+
+		callback3({ type = Constants.ReportAnythingActions.ClearAnnotationFlowProperties })
+
+		callback({ type = Constants.AnalyticsActions.Reset })
 		ReportAnythingAnalytics.clear()
-		p3(nil)
-		v12:endAbuseReportSession()
+		callback2(nil)
+		v:endAbuseReportSession()
 	end
 end

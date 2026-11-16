@@ -1,25 +1,26 @@
 local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
 local Packages = script:FindFirstAncestor("Packages")
 local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
-
 require(AppChatNetworking.responses.SharedTypes)
+local Loggers = require(Packages.Loggers)
+local v = Loggers.Logger:new(script.Name)
 
-local v4 = require(Packages.Loggers).Logger:new(script.Name)
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
 
-return require(script.Parent.RoduxNetworking).POST(script.Name, function(p1, p2, s1: string, s2: string, s3: string, p3, p4) -- line: 11
-	-- upvalues: v4 (copy), CHAT_PLATFORM_BASE_URL (copy)
-	if p3 and p4 then
-		v4:warn("Both conversation ID and friend ID provided to RecordModalSequenceResponse.")
+return RoduxNetworking.POST(
+	script.Name,
+	function(callback, action_type, modal_sequence: string, modal_id: string, modal_variant: string, conversation_id, friend_id)
+		if conversation_id and friend_id then
+			v:warn("Both conversation ID and friend ID provided to RecordModalSequenceResponse.")
+		end
+
+		return callback(CHAT_PLATFORM_BASE_URL):path("v1"):path("record-modal-sequence-response"):body({
+			action_type = action_type,
+			modal_sequence = modal_sequence,
+			modal_id = modal_id,
+			modal_variant = modal_variant,
+			conversation_id = conversation_id,
+			friend_id = friend_id
+		})
 	end
-
-	local t1 = {
-		action_type = p2,
-		modal_sequence = s1,
-		modal_id = s2,
-		modal_variant = s3,
-		conversation_id = p3,
-		friend_id = p4
-	}
-
-	return p1(CHAT_PLATFORM_BASE_URL):path("v1"):path("record-modal-sequence-response"):body(t1)
-end)
+)

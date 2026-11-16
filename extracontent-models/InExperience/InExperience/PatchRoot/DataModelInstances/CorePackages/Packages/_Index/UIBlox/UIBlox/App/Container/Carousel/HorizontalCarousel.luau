@@ -1,20 +1,29 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local t = require(ParentParentParentParent.t)
-local Images = require(ParentParent.ImageSet.Images)
-local ScrollButton = require(scriptParent.ScrollButton)
-local isCallable = require(ParentParentParent.Utility.isCallable)
-local BidirectionalFlatList = require(ParentParentParentParent.VirtualizedList).BidirectionalFlatList
-local Promise = require(ParentParentParentParent.Promise)
-local LuauPolyfill = require(ParentParentParentParent.LuauPolyfill)
-local v13 = Images["icons/actions/cycleLeft"]
-local v14 = Images["icons/actions/cycleRight"]
-local v15 = Roact.PureComponent:extend("HorizontalCarousel")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-v15.validateProps = t.strictInterface({
+local Roact = require(parent4.Roact)
+local t = require(parent4.t)
+
+local Images = require(parent2.ImageSet.Images)
+
+local ScrollButton = require(parent.ScrollButton)
+
+local isCallable = require(parent3.Utility.isCallable)
+
+local VirtualizedList = require(parent4.VirtualizedList)
+local BidirectionalFlatList = VirtualizedList.BidirectionalFlatList
+
+local Promise = require(parent4.Promise)
+local LuauPolyfill = require(parent4.LuauPolyfill)
+
+local iconsactionscycleLeft = Images["icons/actions/cycleLeft"]
+local iconsactionscycleRight = Images["icons/actions/cycleRight"]
+
+local extended = Roact.PureComponent:extend("HorizontalCarousel")
+
+extended.validateProps = t.strictInterface({
 	itemList = t.array(t.any),
 	renderItem = t.callback,
 	identifier = t.optional(t.callback),
@@ -37,302 +46,298 @@ v15.validateProps = t.strictInterface({
 		onViewableItemsChanged = isCallable
 	})))
 })
-v15.defaultProps = {
-	itemPadding = 12,
-	maxNumOfItemsVisible = 0,
-	itemSize = Vector2.new(1, 1)
-}
 
-local function updateScrollState(n1: number?, n2: number, n3: number?, _: number?) -- line: 119
-	if n1 == nil then
+extended.defaultProps = { itemSize = Vector2.new(1, 1), itemPadding = 12, maxNumOfItemsVisible = 0 }
+
+local function updateScrollState(p: number?, maxNumOfItemsVisible: number, numOfItems: number?, _: number?)
+	if p == nil then
 		return {}
 	end
 
-	if n3 == nil or n3 == 0 then
-		return {
-			showLeftButton = false,
-			showRightButton = false
-		}
+	if numOfItems == nil or numOfItems == 0 then
+		return { showLeftButton = false, showRightButton = false }
 	end
 
-	local v21 = true
-	local v22 = true
+	local showLeftButton = true
+	local showRightButton = true
 
-	if n1 <= 1 then
-		n1 = 1
-		v21 = false
-	elseif n3 < n1 then
-		n1 = n3
-		v22 = false
+	if p <= 1 then
+		p = 1
+		showLeftButton = false
+	elseif numOfItems < p then
+		p = numOfItems
+		showRightButton = false
 	end
 
-	if n3 < n1 + n2 then
-		v22 = false
+	if numOfItems < p + maxNumOfItemsVisible then
+		showRightButton = false
 	end
 
 	return {
-		index = n1,
-		showLeftButton = v21,
-		showRightButton = v22,
-		numOfItems = n3
+		index = p,
+		showLeftButton = showLeftButton,
+		showRightButton = showRightButton,
+		numOfItems = numOfItems
 	}
 end
 
-function v15.getDerivedStateFromProps(t1: {[any]: any}, t2: {[any]: any}) -- line: 172
-	-- upvalues: updateScrollState (copy)
-	local v26 = #t1.itemList
+function extended.getDerivedStateFromProps(p, data)
+	local count = #p.itemList
 
-	if v26 ~= t2.numOfItems then
-		return (updateScrollState(t2.index, t2.maxNumOfItemsVisible, v26))
+	if data.numOfItems == count then
+		return nil
 	end
 
-	return nil
+	return updateScrollState(data.index, data.maxNumOfItemsVisible, count)
 end
-function v15.init(p1) -- line: 180
-	-- upvalues: Roact (copy), LuauPolyfill (copy), updateScrollState (copy)
-	p1.frameRef = Roact.createRef()
-	p1.listRef = Roact.createRef()
 
-	local t3 = {
-		anchorIndex = 1
-	}
+function extended:init()
+	self.frameRef = Roact.createRef()
+	self.listRef = Roact.createRef()
 
-	p1:setState({
+	local v = { anchorIndex = 1 }
+
+	self:setState({
 		index = 1,
 		hovering = false,
 		showLeftButton = false,
 		showRightButton = false,
-		numOfItems = 0,
-		maxNumOfItemsVisible = p1.props.maxNumOfItemsVisible
+		maxNumOfItemsVisible = self.props.maxNumOfItemsVisible,
+		numOfItems = 0
 	})
 
-	function p1.onMouseEnter(_, p3) -- line: 197
-		-- upvalues: p1 (copy), t3 (ref), LuauPolyfill (copy), updateScrollState (copy)
-		if p3.UserInputType == Enum.UserInputType.MouseMovement then
-			p1:setState(function(p4) -- line: 199
-				-- upvalues: t3 (ref), LuauPolyfill (copy), updateScrollState (copy)
-				local anchorIndex = t3.anchorIndex
-
-				return LuauPolyfill.Object.assign(updateScrollState(anchorIndex, p4.maxNumOfItemsVisible, p4.numOfItems), {
-					hovering = true
-				})
+	function self.onMouseEnter(_, p)
+		if p.UserInputType == Enum.UserInputType.MouseMovement then
+			self:setState(function(p2)
+				local anchorIndex = v.anchorIndex
+				return LuauPolyfill.Object.assign(
+					updateScrollState(anchorIndex, p2.maxNumOfItemsVisible, p2.numOfItems),
+					{ hovering = true }
+				)
 			end)
 		end
 	end
-	function p1.onMouseLeave(_, p6) -- line: 209
-		-- upvalues: p1 (copy)
-		if p6.UserInputType == Enum.UserInputType.MouseMovement then
-			p1:setState({
-				hovering = false
-			})
+
+	function self.onMouseLeave(_, p)
+		if p.UserInputType == Enum.UserInputType.MouseMovement then
+			self:setState({ hovering = false })
 		end
 	end
-	function p1.onResize(p7) -- line: 217
-		-- upvalues: p1 (copy)
-		local AbsoluteSizeX = p7.AbsoluteSize.X
 
-		p1:setState(function(_, p9) -- line: 219
-			-- upvalues: AbsoluteSizeX (copy)
+	function self.onResize(p)
+		local x = p.AbsoluteSize.X
+		self:setState(function(_, p2)
 			return {
-				maxNumOfItemsVisible = math.floor(AbsoluteSizeX / (p9.itemSize.X + p9.itemPadding))
+				maxNumOfItemsVisible = math.floor(x / (p2.itemSize.X + p2.itemPadding))
 			}
 		end)
 	end
-	function p1.onScrollUpdate(p10) -- line: 225
-		-- upvalues: p1 (copy), t3 (ref)
-		local v48 = p1.props.itemSize.X + p1.props.itemPadding
-		local v49 = math.floor((p10.CanvasPosition.X > 0 and p10.CanvasPosition.X or 0) / v48) + 1
 
-		t3 = {
-			animationActive = false,
-			anchorIndex = v49
+	function self.onScrollUpdate(p)
+		local v2 = self.props.itemSize.X + self.props.itemPadding
+		v = {
+			anchorIndex = math.floor((p.CanvasPosition.X > 0 and p.CanvasPosition.X or 0) / v2) + 1,
+			animationActive = false
 		}
 	end
-	function p1.scrollLeft() -- line: 237
-		-- upvalues: t3 (ref), p1 (copy), updateScrollState (copy)
-		if t3.animationActive then
+
+	function self.scrollLeft()
+		if v.animationActive then
 			return
 		end
 
-		p1:setState(function(p11, p12) -- line: 241
-			-- upvalues: t3 (ref), p1 (copy), updateScrollState (copy)
-			local v65 = t3.anchorIndex - p11.maxNumOfItemsVisible
+		self:setState(function(p, p2)
+			local v2 = v.anchorIndex - p.maxNumOfItemsVisible
 
-			if p1.listRef then
-				p1.listRef.current:scrollToIndex({
+			if self.listRef then
+				self.listRef.current:scrollToIndex({
 					animated = true,
-					index = v65 > 1 and v65 or 1,
-					viewOffset = p12.itemSize.X + p12.itemPadding
+					index = v2 > 1 and v2 or 1,
+					viewOffset = p2.itemSize.X + p2.itemPadding
 				})
 			end
 
-			return (updateScrollState(v65, p11.maxNumOfItemsVisible, p11.numOfItems))
+			return updateScrollState(v2, p.maxNumOfItemsVisible, p.numOfItems)
 		end)
 	end
-	function p1.scrollRight() -- line: 254
-		-- upvalues: t3 (ref), p1 (copy), updateScrollState (copy)
-		if t3.animationActive then
+
+	function self.scrollRight()
+		if v.animationActive then
 			return
 		end
 
-		p1:setState(function(p13, p14) -- line: 258
-			-- upvalues: t3 (ref), p1 (copy), updateScrollState (copy)
-			local v68 = t3.anchorIndex + p13.maxNumOfItemsVisible
+		self:setState(function(p, p2)
+			local v2 = v.anchorIndex + p.maxNumOfItemsVisible
 
-			if p1.listRef then
-				p1.listRef.current:scrollToIndex({
+			if self.listRef then
+				self.listRef.current:scrollToIndex({
 					animated = true,
-					index = v68,
-					viewOffset = p14.itemSize.X + p14.itemPadding
+					index = v2,
+					viewOffset = p2.itemSize.X + p2.itemPadding
 				})
 			end
 
-			return (updateScrollState(v68, p13.maxNumOfItemsVisible, p13.numOfItems))
+			return updateScrollState(v2, p.maxNumOfItemsVisible, p.numOfItems)
 		end)
 	end
-	function p1.proxyKeyExtractor(p15, p16) -- line: 271
-		-- upvalues: p1 (copy)
-		local props = p1.props
+
+	function self.proxyKeyExtractor(p, p2)
+		local props = self.props
 
 		if props.identifier then
-			return (props.identifier(p15, p16))
+			return (props.identifier(p, p2))
 		end
 
 		return nil
 	end
-	function p1.proxyRenderItem(p17) -- line: 276
-		-- upvalues: p1 (copy)
-		return p1.props.renderItem(p17.item)
-	end
-	function p1.getItemLayout(p18, p19) -- line: 281
-		-- upvalues: p1 (copy)
-		local props = p1.props
-		local v57 = props.itemSize.X + (props.itemPadding or 0)
-		local v58 = v57 * (p19 - 1) + (props.carouselMargin or 0)
 
-		return {
-			length = if p19 ~= #p18 then v57 else props.itemSize.X,
-			offset = v58,
-			index = p19
-		}
+	function self.proxyRenderItem(p)
+		return self.props.renderItem(p.item)
+	end
+
+	function self.getItemLayout(list, p)
+		local props = self.props
+		local length = props.itemSize.X + (props.itemPadding or 0)
+		local offset = length * (p - 1) + (props.carouselMargin or 0)
+
+		if p == #list then
+			length = props.itemSize.X
+		end
+
+		return { length = length, offset = offset, index = p }
 	end
 end
-function v15.render(p20) -- line: 295
-	-- upvalues: Roact (copy), ScrollButton (copy), v13 (copy), v14 (copy), BidirectionalFlatList (copy), Promise (copy)
-	local props = p20.props
-	local state = p20.state
-	local itemList = props.itemList
-	local itemSize = props.itemSize
-	local itemPadding = props.itemPadding
-	local carouselMargin = props.carouselMargin
-	local layoutOrder = props.layoutOrder
-	local loadNext = props.loadNext
-	local loadPrevious = props.loadPrevious
-	local v39 = nil
+
+local function fn(callback) -- 2 equivalent calls inferred from this helper
+	if callback then
+		return Promise.is(callback) and callback or Promise.promisify(callback)
+	end
+
+	return nil
+end
+
+function extended.render(props)
+	local props2 = props.props
+	local state = props.state
+
+	local itemList = props2.itemList
+	local itemSize = props2.itemSize
+	local itemPadding = props2.itemPadding
+
+	local carouselMargin = props2.carouselMargin
+	local layoutOrder = props2.layoutOrder
+
+	local loadNext = props2.loadNext
+	local loadPrevious = props2.loadPrevious
+	local scrollLeftButton
 
 	if state.hovering and state.showLeftButton then
-		v39 = Roact.createElement(ScrollButton, {
-			icon = v13,
-			callback = p20.scrollLeft
+		scrollLeftButton = Roact.createElement(ScrollButton, {
+			icon = iconsactionscycleLeft,
+			callback = props.scrollLeft
 		})
 	end
 
-	local v40 = nil
+	local scrollRightButton
 
 	if state.hovering and state.showRightButton then
-		v40 = Roact.createElement(ScrollButton, {
-			icon = v14,
-			callback = p20.scrollRight
+		scrollRightButton = Roact.createElement(ScrollButton, {
+			icon = iconsactionscycleRight,
+			callback = props.scrollRight
 		})
 	end
 
-	return Roact.createElement("Frame", {
+	local createElement = Roact.createElement
+	local v = {
 		Size = UDim2.new(1, 0, 0, itemSize.Y),
 		LayoutOrder = layoutOrder,
 		BackgroundTransparency = 1,
-		[Roact.Ref] = p20.frameRef,
-		[Roact.Event.InputBegan] = p20.onMouseEnter,
-		[Roact.Event.InputEnded] = p20.onMouseLeave,
-		[Roact.Change.AbsoluteSize] = p20.onResize
-	}, {
+		[Roact.Ref] = props.frameRef,
+		[Roact.Event.InputBegan] = props.onMouseEnter,
+		[Roact.Event.InputEnded] = props.onMouseLeave,
+		[Roact.Change.AbsoluteSize] = props.onResize
+	}
+	local v2 = {
 		LeftMargin = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 2,
 			Position = UDim2.fromScale(0, 0),
 			AnchorPoint = Vector2.new(0, 0),
-			Size = UDim2.new(0, carouselMargin, 1, 0)
-		}, {
-			ScrollLeftButton = v39
-		}),
-		ScrollerCarousel = state.maxNumOfItemsVisible > 0 and Roact.createElement(BidirectionalFlatList, {
-			[Roact.Ref] = p20.listRef,
+			Size = UDim2.new(0, carouselMargin, 1, 0),
+			BackgroundTransparency = 1,
+			ZIndex = 2
+		}, { ScrollLeftButton = scrollLeftButton }),
+		ScrollerCarousel = 0,
+		RightMargin = 0
+	}
+	local scrollerCarousel
+
+	if state.maxNumOfItemsVisible > 0 then
+		local createElement2 = Roact.createElement
+		local listRefsByRef = {
+			[Roact.Ref] = props.listRef,
 			data = itemList,
-			renderItem = p20.proxyRenderItem,
-			keyExtractor = p20.proxyKeyExtractor,
+			renderItem = props.proxyRenderItem,
+			keyExtractor = props.proxyKeyExtractor,
 			horizontal = true,
 			initialScrollIndex = 1,
 			initialNumToRender = 10,
 			windowSize = 5,
-			onScroll = p20.onScrollUpdate,
+			onScroll = props.onScrollUpdate,
 			onStartReachedThreshold = 1,
-			onStartReached = if loadPrevious then Promise.is(loadPrevious) and loadPrevious or Promise.promisify(loadPrevious) else nil,
+			onStartReached = fn(loadPrevious), -- inferred equivalent call
 			onEndReachedThreshold = 1,
-			onEndReached = if loadNext then Promise.is(loadNext) and loadNext or Promise.promisify(loadNext) else nil,
+			onEndReached = fn(loadNext), -- inferred equivalent call
 			overrideAutomaticCanvasSize = true,
-			getItemLayout = p20.getItemLayout,
-			viewabilityConfigCallbackPairs = props.viewabilityConfigCallbackPairs,
-			ItemSeparatorComponent = if not itemPadding then nil else function() -- line: 368
-				-- upvalues: Roact (copy), itemPadding (copy)
+			getItemLayout = props.getItemLayout,
+			viewabilityConfigCallbackPairs = props2.viewabilityConfigCallbackPairs,
+			ItemSeparatorComponent = itemPadding and function()
 				return Roact.createFragment({
 					ItemPadding = Roact.createElement("UIPadding", {
 						PaddingRight = UDim.new(0, itemPadding)
 					})
 				})
-			end,
+			end or nil,
 			showDefaultLoadingIndicators = false,
-			ListHeaderComponent = if not carouselMargin then nil else function() -- line: 379
-				-- upvalues: Roact (copy), carouselMargin (copy)
+			ListHeaderComponent = carouselMargin and function()
 				return Roact.createFragment({
 					LeftCarouselMargin = Roact.createElement("Frame", {
-						BackgroundTransparency = 1,
 						Position = UDim2.fromScale(0, 0),
 						AnchorPoint = Vector2.new(0, 0),
+						BackgroundTransparency = 1,
 						Size = UDim2.new(0, carouselMargin, 1, 0)
 					})
 				})
-			end,
-			ListFooterComponent = if not carouselMargin then nil else function() -- line: 392
-				-- upvalues: Roact (copy), carouselMargin (copy)
+			end or nil,
+			ListFooterComponent = carouselMargin and function()
 				return Roact.createFragment({
 					RightCarouselMargin = Roact.createElement("Frame", {
-						BackgroundTransparency = 1,
 						Position = UDim2.fromScale(0, 0),
 						AnchorPoint = Vector2.new(0, 0),
+						BackgroundTransparency = 1,
 						Size = UDim2.new(0, carouselMargin, 1, 0)
 					})
 				})
-			end,
+			end or nil,
 			contentContainerStyle = {
 				BackgroundTransparency = 1,
-				ClipsDescendants = false,
-				Size = UDim2.fromScale(0, 1)
+				Size = UDim2.fromScale(0, 1),
+				ClipsDescendants = false
 			},
-			style = {
-				BackgroundTransparency = 1,
-				ScrollBarThickness = 0
-			},
-			onContentSizeChange = props.onContentSizeChange
-		}) or nil,
-		RightMargin = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 2,
-			Position = UDim2.fromScale(1, 0),
-			AnchorPoint = Vector2.new(1, 0),
-			Size = UDim2.new(0, carouselMargin, 1, 0)
-		}, {
-			ScrollRightButton = v40
-		})
-	})
+			style = { BackgroundTransparency = 1, ScrollBarThickness = 0 },
+			onContentSizeChange = props2.onContentSizeChange
+		}
+		scrollerCarousel = createElement2(BidirectionalFlatList, listRefsByRef) or nil
+	end
+
+	v2.ScrollerCarousel = scrollerCarousel
+
+	v2.RightMargin = Roact.createElement("Frame", {
+		Position = UDim2.fromScale(1, 0),
+		AnchorPoint = Vector2.new(1, 0),
+		Size = UDim2.new(0, carouselMargin, 1, 0),
+		BackgroundTransparency = 1,
+		ZIndex = 2
+	}, { ScrollRightButton = scrollRightButton })
+	return createElement("Frame", v, v2)
 end
 
-return v15
+return extended

@@ -1,13 +1,13 @@
-local Parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
-local useNavigation = require(Parent.Navigation).useNavigation
+local parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
+
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
 
 require(script.Parent.types)
 
-local function useNavigationProps(p1) -- line: 8
-	-- upvalues: useNavigation (copy)
-	local v5 = useNavigation()
-
-	return p1(v5.getParam("detail"), v5.getParam("extraProps", {}), v5)
+local function useNavigationProps(callback)
+	local v = useNavigation()
+	return callback(v.getParam("detail"), v.getParam("extraProps", {}), v)
 end
 
 return useNavigationProps

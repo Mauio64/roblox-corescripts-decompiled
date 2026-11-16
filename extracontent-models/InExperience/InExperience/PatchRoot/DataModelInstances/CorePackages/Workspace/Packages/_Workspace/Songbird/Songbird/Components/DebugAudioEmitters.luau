@@ -1,9 +1,13 @@
 local Songbird = script:FindFirstAncestor("Songbird")
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local React = require(Songbird.Parent.React)
 local getFFlagDebugMusicSampleSounds = require(Songbird.Flags.getFFlagDebugMusicSampleSounds)
+
 local useEffect = React.useEffect
-local t1 = {
+
+local v = {
 	{
 		className = "Sound",
 		title = "Beach Morning LoFi",
@@ -44,106 +48,111 @@ local t1 = {
 	}
 }
 
-local function spawnAudioEmitter(t2: {[any]: any}) -- line: 68
-	local Part = Instance.new("Part")
+local function spawnAudioEmitter(data)
+	local part = Instance.new("Part")
+	part.Position = data.position
+	part.Anchored = true
+	part.Name = data.title
 
-	Part.Position = t2.position
-	Part.Anchored = true
-	Part.Name = t2.title
-
-	if t2.className == "Sound" then
-		local Sound = Instance.new("Sound")
-
-		Sound.SoundId = t2.assetId
-		Sound.Looped = true
-		Sound.RollOffMinDistance = 10
-		Sound.RollOffMaxDistance = 40
-		Sound.Parent = Part
-		Sound:Play()
+	if data.className == "Sound" then
+		local sound = Instance.new("Sound")
+		sound.SoundId = data.assetId
+		sound.Looped = true
+		sound.RollOffMinDistance = 10
+		sound.RollOffMaxDistance = 40
+		sound.Parent = part
+		sound:Play()
 	else
-		local AudioPlayer = Instance.new("AudioPlayer")
+		local audioPlayer = Instance.new("AudioPlayer")
 
-		AudioPlayer.Asset = t2.assetId
-		AudioPlayer.Looping = true
-		AudioPlayer.Parent = Part
+		audioPlayer.Asset = data.assetId
 
-		local AudioEmitter = Instance.new("AudioEmitter")
+		audioPlayer.Looping = true
+		audioPlayer.Parent = part
 
-		AudioEmitter.Parent = Part
+		local audioEmitter = Instance.new("AudioEmitter")
+		audioEmitter.Parent = part
 
-		local Wire = Instance.new("Wire")
+		local wire = Instance.new("Wire")
+		wire.SourceInstance = audioPlayer
+		wire.TargetInstance = audioEmitter
+		wire.Parent = audioPlayer
 
-		Wire.SourceInstance = AudioPlayer
-		Wire.TargetInstance = AudioEmitter
-		Wire.Parent = AudioPlayer
-		AudioPlayer:Play()
+		audioPlayer:Play()
 	end
 
-	Part.Parent = workspace
+	part.Parent = workspace
 
-	return Part
+	return part
 end
-local function DebugAudioEmitters() -- line: 106
-	-- upvalues: getFFlagDebugMusicSampleSounds (copy), useEffect (copy), t1 (copy), spawnAudioEmitter (copy), ReplicatedStorage (copy)
+
+local function DebugAudioEmitters(): nil
 	if getFFlagDebugMusicSampleSounds() then
-		useEffect(function() -- line: 108
-			local AudioListener = Instance.new("AudioListener")
-			local AudioDeviceOutput = Instance.new("AudioDeviceOutput")
+		useEffect(function()
+			local audioListener = Instance.new("AudioListener")
 
-			AudioDeviceOutput.Parent = AudioListener
+			local audioDeviceOutput = Instance.new("AudioDeviceOutput")
+			audioDeviceOutput.Parent = audioListener
 
-			local Wire = Instance.new("Wire")
+			local wire = Instance.new("Wire")
+			wire.SourceInstance = audioListener
+			wire.TargetInstance = audioDeviceOutput
+			wire.Parent = audioListener
 
-			Wire.SourceInstance = AudioListener
-			Wire.TargetInstance = AudioDeviceOutput
-			Wire.Parent = AudioListener
-			AudioListener.Parent = workspace.CurrentCamera
+			audioListener.Parent = workspace.CurrentCamera
 		end, {})
-		useEffect(function() -- line: 122
-			-- upvalues: t1 (copy), spawnAudioEmitter (copy), ReplicatedStorage (copy)
-			local t3 = {}
 
-			for _, v20 in t1 do
-				local v21 = spawnAudioEmitter(v20)
-				local BillboardGui = Instance.new("BillboardGui")
+		useEffect(function()
+			local v2 = {}
 
-				BillboardGui.ExtentsOffsetWorldSpace = Vector3.new(0, 10, 0)
-				BillboardGui.Size = UDim2.fromScale(10, 2)
-				BillboardGui.Adornee = v21
+			for _, v3 in v do
+				local v4 = spawnAudioEmitter(v3)
 
-				local TextLabel = Instance.new("TextLabel")
+				local billboardGui = Instance.new("BillboardGui")
+				billboardGui.ExtentsOffsetWorldSpace = Vector3.new(0, 10, 0)
+				billboardGui.Size = UDim2.fromScale(10, 2)
+				billboardGui.Adornee = v4
 
-				TextLabel.Text = v20.title
-				TextLabel.Size = UDim2.fromScale(1, 1)
-				TextLabel.Font = Enum.Font.BuilderSansBold
-				TextLabel.TextScaled = true
-				TextLabel.TextColor3 = if v20.shouldSurfaceToUser ~= false then Color3.fromHex("#fff") else Color3.fromHex("#c4474f")
-				TextLabel.BackgroundTransparency = 1
-				TextLabel.Parent = BillboardGui
+				local textLabel = Instance.new("TextLabel")
+				textLabel.Text = v3.title
+				textLabel.Size = UDim2.fromScale(1, 1)
+				textLabel.Font = Enum.Font.BuilderSansBold
+				textLabel.TextScaled = true
+				local textColor
 
-				local UIStroke = Instance.new("UIStroke")
+				if v3.shouldSurfaceToUser == false then
+					textColor = Color3.fromHex("#c4474f")
+				else
+					textColor = Color3.fromHex("#fff")
+				end
 
-				UIStroke.Color = Color3.fromHex("#202020")
-				UIStroke.Thickness = 2
-				UIStroke.Parent = TextLabel
-				BillboardGui.Parent = v21
-				table.insert(t3, v21)
+				textLabel.TextColor3 = textColor
+
+				textLabel.BackgroundTransparency = 1
+				textLabel.Parent = billboardGui
+
+				local uiStroke = Instance.new("UIStroke")
+				uiStroke.Color = Color3.fromHex("#202020")
+				uiStroke.Thickness = 2
+				uiStroke.Parent = textLabel
+
+				billboardGui.Parent = v4
+
+				table.insert(v2, v4)
 			end
 
-			local Sound = Instance.new("Sound")
+			local sound = Instance.new("Sound")
+			sound.SoundId = "rbxassetid://9048375035"
+			sound.Volume = 0.05
+			sound.Looped = true
+			sound.Parent = ReplicatedStorage
+			sound:Play()
 
-			Sound.SoundId = "rbxassetid://9048375035"
-			Sound.Volume = 0.05
-			Sound.Looped = true
-			Sound.Parent = ReplicatedStorage
-			Sound:Play()
+			return function()
+				sound:Destroy()
 
-			return function() -- line: 161
-				-- upvalues: Sound (copy), t3 (copy)
-				Sound:Destroy()
-
-				for _, v27 in t3 do
-					v27:Destroy()
+				for _, v3 in v2 do
+					v3:Destroy()
 				end
 			end
 		end, {})

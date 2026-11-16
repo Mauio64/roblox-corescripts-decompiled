@@ -1,3 +1,1 @@
-return {
-	Profile = "profile"
-}
+return { Profile = "profile" }

@@ -1,1 +1,3 @@
-return (require(script.EditUsernameAnalyticsWrapper))
+local EditUsernameAnalyticsWrapper = require(script.EditUsernameAnalyticsWrapper)
+
+return EditUsernameAnalyticsWrapper

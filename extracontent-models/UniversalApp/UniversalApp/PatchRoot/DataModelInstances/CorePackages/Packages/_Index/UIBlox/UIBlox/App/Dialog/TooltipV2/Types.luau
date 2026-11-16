@@ -1,11 +1,10 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent.Parent
 
-require(ParentParent2.React)
+require(parent2.React)
 
-local KeyLabel = ParentParent.Menu.KeyLabel
-
-require(KeyLabel.Types)
-require(ParentParent.Style.StyleTypes)
+local keyLabel = parent.Menu.KeyLabel
+require(keyLabel.Types)
+require(parent.Style.StyleTypes)
 
 return {}

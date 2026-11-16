@@ -1,9 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
-local Rodux = require(ParentParent.Rodux)
+local parent = script.Parent.Parent.Parent
+local Rodux = require(parent.Rodux)
 local ActionDomain = require(script.Parent.ActionDomain)
 
-return Rodux.makeActionCreator(ActionDomain .. script.Name, function(p1) -- line: 6
-	return {
-		payload = p1
-	}
+return Rodux.makeActionCreator(ActionDomain .. script.Name, function(payload)
+	return { payload = payload }
 end)

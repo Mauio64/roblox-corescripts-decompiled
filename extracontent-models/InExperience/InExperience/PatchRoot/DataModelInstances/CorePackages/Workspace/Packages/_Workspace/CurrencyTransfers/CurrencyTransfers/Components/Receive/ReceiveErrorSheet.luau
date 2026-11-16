@@ -1,15 +1,18 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
-local SignalsReact = require(CurrencyTransfersParent.SignalsReact)
+local parent = CurrencyTransfers.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local getTransferRequestByIdRequest = require(CurrencyTransfers.NetworkRequests.getTransferRequestByIdRequest)
 local useUserNameFromUserId = require(CurrencyTransfers.Hooks.useUserNameFromUserId)
 local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
 local transferLocaleFormat = require(CurrencyTransfers.Localization.transferLocaleFormat)
-local Foundation = require(CurrencyTransfersParent.Foundation)
+
+local Foundation = require(parent.Foundation)
 local Sheet = Foundation.Sheet
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Button = Foundation.Button
 local Icon = Foundation.Icon
 local ButtonVariant = Foundation.Enums.ButtonVariant
@@ -17,131 +20,155 @@ local FillBehavior = Foundation.Enums.FillBehavior
 local useScaledValue = Foundation.Hooks.useScaledValue
 local useTokens = Foundation.Hooks.useTokens
 local Enums = Foundation.Enums
-local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local FailureReason = require(CurrencyTransfers.Enums.FailureReason)
+
 local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
 
-local function getErrorMessageAndButton(p1, t1: {[any]: any}, s1: string?) -- line: 38
-	-- upvalues: FailureReason (copy), transferLocaleFormat (copy)
-	if not p1 then
-		return t1.GenericError, t1.TryAgain
+local function getErrorMessageAndButton(p, data, p2: string?)
+	if not p then
+		return data.GenericError, data.TryAgain
 	end
 
-	local OK = t1.OK
-	local AccountDisabled
+	local v = data.OK
+	local v2
 
-	if p1 == FailureReason.TransferDisabledForUser then
-		AccountDisabled = t1.AccountDisabled
-	elseif p1 == FailureReason.TransferExpired then
-		AccountDisabled = transferLocaleFormat.substituteUsername(t1.TransferExpired, (tostring(s1)))
+	if p == FailureReason.TransferDisabledForUser then
+		v2 = data.AccountDisabled
+	elseif p == FailureReason.TransferExpired then
+		v2 = transferLocaleFormat.substituteUsername(data.TransferExpired, (tostring(p2)))
 	else
-		AccountDisabled = t1.GenericError
-		OK = t1.TryAgain
+		v2 = data.GenericError
+		v = data.TryAgain
 	end
 
-	return AccountDisabled, OK
+	return v2, v
 end
-local function ReceiveErrorSheet(_: {[any]: any}) -- line: 64
-	-- upvalues: useTransferStore (copy), useTokens (copy), SignalsReact (copy), FailureReason (copy), React (copy), getTransferRequestByIdRequest (copy), useUserNameFromUserId (copy), useLocalization (copy), TransferLocalizationKeys (copy), transferLocaleFormat (copy), Sheet (copy), useScaledValue (copy), View (copy), Icon (copy), Enums (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
-	local v31 = useTransferStore()
-	local v32 = useTokens()
-	local v33 = SignalsReact.useSignalState(v31.getErrorTransferModel)
-	local v34 = SignalsReact.useSignalState(v31.getSender)
-	local v35 = SignalsReact.useSignalState(v31.getRobuxTransfer)
-	local v36 = SignalsReact.useSignalState(v31.getTransferRequestId)
-	local triggerOnClose = v31.triggerOnClose
-	local v38 = if not v33 then nil else v33.failureReason
-	local v39 = v38 == FailureReason.TransferExpired
 
-	React.useEffect(function() -- line: 81
-		-- upvalues: v39 (copy), v34 (copy), v35 (copy), v36 (copy), getTransferRequestByIdRequest (copy), v31 (copy)
-		if not v39 or v34 or (v35 and v35.sender or not v36) then
-			return
+local GetFFlagCurrencyTransferFocusNavigation = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferFocusNavigation)
+local useTransferSheetFocus = require(CurrencyTransfers.Hooks.useTransferSheetFocus)
+
+local function ReceiveErrorSheet(_)
+	local v = useTransferStore()
+	local v2 = useTokens()
+	local v3 = SignalsReact.useSignalState(v.getErrorTransferModel)
+	local v4 = SignalsReact.useSignalState(v.getSender)
+	local v5 = SignalsReact.useSignalState(v.getRobuxTransfer)
+	local transferRequestId = SignalsReact.useSignalState(v.getTransferRequestId)
+	local triggerOnClose = v.triggerOnClose
+	local failureReason
+
+	if v3 then
+		failureReason = v3.failureReason
+	end
+
+	local v6 = failureReason == FailureReason.TransferExpired
+
+	React.useEffect(function()
+		if v6 and not (v4 or v5 and v5.sender) and transferRequestId then
+			getTransferRequestByIdRequest({ transferRequestId = transferRequestId }, nil, v.getNetworkImpl()):andThen(function(p)
+				if p and p.transfer and p.transfer.sender then
+					v.setSender(p.transfer.sender)
+				end
+			end):catch(function() end)
 		end
+	end, { v6, transferRequestId, v4, v5 })
 
-		getTransferRequestByIdRequest({
-			transferRequestId = v36
-		}, nil, v31.getNetworkImpl()):andThen(function(p2) -- line: 91
-			-- upvalues: v31 (copy)
-			if p2 and (p2.transfer and p2.transfer.sender) then
-				v31.setSender(p2.transfer.sender)
-			end
-		end):catch(function() -- line: 96
-		end)
-	end, {
-		v39,
-		v36,
-		v34,
-		v35
-	})
+	local v7 = v4 or v5 and v5.sender or nil
+	local targetId
 
-	local v40 = v34 or (v35 and v35.sender or nil)
-	local v41 = if not v40 then nil else v40.targetId
-	local v42 = useUserNameFromUserId(if not v39 or (not v41 or v41 == 0) then nil else v41)
-	local v43 = if not v40 or not v40.targetName and not v40.targetDisplayName then if not v39 or (not v42 or v42 == "") then nil else v42 else v40.targetName or v40.targetDisplayName
-	local v44 = useLocalization(TransferLocalizationKeys.Presets.ReceiveErrorSheet)
-	local GenericError, TryAgain
+	if v7 then
+		targetId = v7.targetId
+	end
 
-	if not v38 then
-		GenericError = v44.GenericError
-		TryAgain = v44.TryAgain
-	else
-		TryAgain = v44.OK
+	if not v6 or not targetId or targetId == 0 then
+		targetId = nil
+	end
 
-		if v38 == FailureReason.TransferDisabledForUser then
-			GenericError = v44.AccountDisabled
-		elseif v38 == FailureReason.TransferExpired then
-			GenericError = transferLocaleFormat.substituteUsername(v44.TransferExpired, (tostring(v43)))
+	local v8 = useUserNameFromUserId(targetId)
+
+	if v7 and (v7.targetName or v7.targetDisplayName) then
+		v8 = v7.targetName or v7.targetDisplayName
+	elseif not v6 or not v8 or v8 == "" then
+		v8 = nil
+	end
+
+	local v9 = useLocalization(TransferLocalizationKeys.Presets.ReceiveErrorSheet)
+	local text, text2
+
+	if failureReason then
+		text = v9.OK
+
+		if failureReason == FailureReason.TransferDisabledForUser then
+			text2 = v9.AccountDisabled
+		elseif failureReason == FailureReason.TransferExpired then
+			text2 = transferLocaleFormat.substituteUsername(v9.TransferExpired, (tostring(v8)))
 		else
-			GenericError = v44.GenericError
-			TryAgain = v44.TryAgain
+			text2 = v9.GenericError
+			text = v9.TryAgain
 		end
+	else
+		text2 = v9.GenericError
+		text = v9.TryAgain
+	end
+
+	local ref, ref2
+
+	if GetFFlagCurrencyTransferFocusNavigation() then
+		ref, ref2 = useTransferSheetFocus(triggerOnClose)
 	end
 
 	return React.createElement(Sheet.Root, {
 		preferCenterSheet = true,
-		snapPoints = {
-			useScaledValue(300),
-			0.5
-		},
-		onClose = triggerOnClose
+		snapPoints = { useScaledValue(300), 0.5 },
+		onClose = triggerOnClose,
+		ref = ref
 	}, {
-		Content = React.createElement(Sheet.Content, {
-			LayoutOrder = 1
-		}, {
-			SheetContentContainer = React.createElement(View, {
-				tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
-			}, {
-				ErrorIconContainer = React.createElement(View, {
-					tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
-					LayoutOrder = 1
-				}, {
-					ErrorIcon = React.createElement(Icon, {
-						tag = "content-inverse-emphasis",
-						name = Enums.IconName.TriangleExclamation,
-						size = v32.Size.Size_1200
+		Content = React.createElement(Sheet.Content, { LayoutOrder = 1 }, {
+			SheetContentContainer = React.createElement(
+				View,
+				{
+					tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
+				},
+				{
+					ErrorIconContainer = React.createElement(
+						View,
+						{
+							tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
+							LayoutOrder = 1
+						},
+						{
+							ErrorIcon = React.createElement(Icon, {
+								name = Enums.IconName.TriangleExclamation,
+								size = v2.Size.Size_1200,
+								tag = "content-inverse-emphasis"
+							})
+						}
+					),
+					ErrorMessage = React.createElement(Text, {
+						Text = text2,
+						tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
+						Size = UDim2.new(1, 0, 0, 0),
+						LayoutOrder = 2
 					})
-				}),
-				ErrorMessage = React.createElement(FoundationText, {
-					tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
-					LayoutOrder = 2,
-					Text = GenericError,
-					Size = UDim2.new(1, 0, 0, 0)
-				})
-			})
+				}
+			)
 		}),
-		Actions = React.createElement(Sheet.Actions, {
-			LayoutOrder = 2
-		}, { React.createElement(View, {
-			tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
-		}, { React.createElement(View, {
-			tag = "row auto-y size-full-0 gap-small"
-		}, { React.createElement(Button, {
-			text = TryAgain,
-			onActivated = triggerOnClose,
-			variant = ButtonVariant.Emphasis,
-			fillBehavior = FillBehavior.Fill
-		}) }) }) })
+		Actions = React.createElement(Sheet.Actions, { LayoutOrder = 2 }, {
+			React.createElement(View, {
+				tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
+			}, {
+				React.createElement(View, { tag = "row auto-y size-full-0 gap-small" }, { React.createElement(Button, {
+						ref = ref2,
+						text = text,
+						onActivated = triggerOnClose,
+						variant = ButtonVariant.Emphasis,
+						fillBehavior = FillBehavior.Fill
+					}) })
+			})
+		})
 	})
 end
 

@@ -1,4 +1,1 @@
-return {
-	AdPlayer = 10,
-	Modal = 15
-}
+return { AdPlayer = 10, Modal = 15 }

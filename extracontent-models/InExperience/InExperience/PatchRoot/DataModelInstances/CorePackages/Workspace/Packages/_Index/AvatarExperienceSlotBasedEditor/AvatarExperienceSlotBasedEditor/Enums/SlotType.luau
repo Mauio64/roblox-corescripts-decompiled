@@ -1,4 +1,1 @@
-return {
-	LayeredSlot = "LayeredSlot",
-	BaseSlot = "BaseSlot"
-}
+return { LayeredSlot = "LayeredSlot", BaseSlot = "BaseSlot" }

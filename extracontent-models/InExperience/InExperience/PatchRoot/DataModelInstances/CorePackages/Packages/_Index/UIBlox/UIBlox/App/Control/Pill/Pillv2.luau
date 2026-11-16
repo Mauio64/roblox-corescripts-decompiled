@@ -1,26 +1,31 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Core = ParentParentParent.Core
-local Cryo = require(ParentParentParentParent.Cryo)
-local React = require(ParentParentParentParent.React)
-local Foundation = require(ParentParentParentParent.Foundation)
-local Images = require(ParentParent.ImageSet.Images)
-local IconSize = require(ParentParent.ImageSet.Enum.IconSize)
-local getIconSize = require(ParentParent.ImageSet.getIconSize)
-local useSelectionCursor = require(ParentParent.SelectionImage.useSelectionCursor)
-local CursorKind = require(ParentParent.SelectionImage.CursorKind)
-local useStyle = require(Core.Style.useStyle)
-local ControlState = require(Core.Control.Enum.ControlState)
-local Interactable = require(Core.Control.Interactable)
-local useControlState = require(Core.Control.useControlState)
-local getContentStyle = require(Core.Button.getContentStyle)
-local GenericTextLabel = require(Core.Text.GenericTextLabel.GenericTextLabel)
-local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local core = parent2.Core
+
+local Cryo = require(parent3.Cryo)
+local React = require(parent3.React)
+local Foundation = require(parent3.Foundation)
+
+local Images = require(parent.ImageSet.Images)
+local IconSize = require(parent.ImageSet.Enum.IconSize)
+local getIconSize = require(parent.ImageSet.getIconSize)
+local useSelectionCursor = require(parent.SelectionImage.useSelectionCursor)
+local CursorKind = require(parent.SelectionImage.CursorKind)
+local useStyle = require(core.Style.useStyle)
+local ControlState = require(core.Control.Enum.ControlState)
+local Interactable = require(core.Control.Interactable)
+local useControlState = require(core.Control.useControlState)
+local getContentStyle = require(core.Button.getContentStyle)
+
+local GenericTextLabel = require(core.Text.GenericTextLabel.GenericTextLabel)
+local ImageSetComponent = require(parent2.Core.ImageSet.ImageSetComponent)
 local Skeleton = Foundation.Skeleton
-local EnumsRadius = Foundation.Enums.Radius
-local GetTextSize = require(ParentParentParent.Core.Text.GetTextSize)
-local t1 = {
+local Radius = Foundation.Enums.Radius
+local GetTextSize = require(parent2.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent2.Core.Text.GetFontFromFontStyle)
+
+local v = {
 	hasBorder = false,
 	isDisabled = false,
 	isLoading = false,
@@ -28,171 +33,211 @@ local t1 = {
 	layoutOrder = 1,
 	text = ""
 }
-local t2 = {
+
+local v2 = {
 	[ControlState.Default] = "SystemPrimaryContent",
 	[ControlState.Hover] = "SystemPrimaryContent"
 }
-local t3 = {
-	[ControlState.Default] = "TextDefault",
-	[ControlState.Hover] = "TextEmphasis"
-}
-local t4 = {
+
+local v3 = { [ControlState.Default] = "TextDefault", [ControlState.Hover] = "TextEmphasis" }
+
+local v4 = {
 	[ControlState.Default] = "SystemPrimaryContent",
 	[ControlState.Hover] = "SystemPrimaryContent"
 }
-local t5 = {
+
+local v5 = {
 	[ControlState.Default] = "BackgroundUIDefault",
 	[ControlState.Hover] = "BackgroundUIDefault"
 }
-local t6 = {
+
+local v6 = {
 	[ControlState.Default] = "SystemPrimaryDefault",
 	[ControlState.Hover] = "SystemPrimaryOnHover"
 }
-local t7 = {
+
+local v7 = {
 	[ControlState.Default] = "BackgroundOnHover",
 	[ControlState.Hover] = "BackgroundOnHover"
 }
 
-local function Pillv2(t8: {[any]: any}) -- line: 113
-	-- upvalues: Cryo (copy), t1 (copy), useControlState (copy), React (copy), useStyle (copy), useSelectionCursor (copy), CursorKind (copy), t4 (copy), t3 (copy), t6 (copy), t5 (copy), getContentStyle (copy), t2 (copy), t7 (copy), getIconSize (copy), IconSize (copy), GetTextSize (copy), Skeleton (copy), EnumsRadius (copy), ControlState (copy), Interactable (copy), GenericTextLabel (copy), ImageSetComponent (copy), Images (copy)
-	local v32 = Cryo.Dictionary.join(t1, t8)
-	local text = v32.text
-	local v34, v35 = useControlState()
-	local v36 = React.useCallback(function(p1, p2) -- line: 118
-		-- upvalues: v32 (copy), v35 (copy)
-		if v32.onStateChanged then
-			v32.onStateChanged(p1, p2)
+local function Pillv2(p)
+	local joined = Cryo.Dictionary.join(v, p)
+	local text = joined.text
+
+	local v8, v9 = useControlState()
+	local onStateChanged = React.useCallback(function(p2, p3)
+		if joined.onStateChanged then
+			joined.onStateChanged(p2, p3)
 		end
 
-		v35(p1, p2)
-	end, { v32.onStateChanged })
-	local v37 = useStyle()
-	local Font = v37.Font
-	local v39 = useSelectionCursor(CursorKind.SmallPill)
-	local v40 = if not v32.isSelected then t3 else t4
-	local v41 = if not v32.isSelected then t5 else t6
-	local v42 = getContentStyle(t2, v34, v37)
-	local v43 = getContentStyle(v40, v34, v37)
-	local v44 = getContentStyle(v41, v34, v37)
-	local v45 = getContentStyle(t7, v34, v37)
-	local v46 = getIconSize(IconSize.Small)
-	local BaseSize = Font.BaseSize
-	local v48 = Font.CaptionHeader.RelativeSize * BaseSize
-	local X = GetTextSize(text, v48, Font.CaptionHeader.Font, Vector2.new(10000, 10000)).X
-	local v50 = X + 24
-	local n1 = 216
+		v9(p2, p3)
+	end, { joined.onStateChanged })
 
-	if v32.isSelected then
-		local v52 = 4 + v46
+	local v10 = useStyle()
+	local font = v10.Font
 
-		v50 += v52
-		n1 -= v52
+	local selectionImageObject = useSelectionCursor(CursorKind.SmallPill)
+
+	local v11 = if joined.isSelected then v4 else v3
+	local v12 = if joined.isSelected then v6 else v5
+
+	local contentStyle = getContentStyle(v2, v8, v10)
+	local contentStyle2 = getContentStyle(v11, v8, v10)
+	local contentStyle3 = getContentStyle(v12, v8, v10)
+	local contentStyle4 = getContentStyle(v7, v8, v10)
+
+	local iconSize = getIconSize(IconSize.Small)
+	local baseSize = font.BaseSize
+	local v13 = font.CaptionHeader.RelativeSize * baseSize
+
+	local x = GetTextSize(text, v13, GetFontFromFontStyle(font.CaptionHeader), Vector2.new(10000, 10000)).X
+
+	local v14 = x + 24
+	local v15 = 216
+
+	if joined.isSelected then
+		local v16 = 4 + iconSize
+		v14 += v16
+		v15 -= v16
 	end
 
-	if v32.isLoading then
+	if joined.isLoading then
 		return React.createElement(Skeleton, {
-			LayoutOrder = v32.layoutOrder,
-			Size = UDim2.fromOffset(v50, 28),
-			radius = EnumsRadius.Circle
+			LayoutOrder = joined.layoutOrder,
+			Size = UDim2.fromOffset(v14, 28),
+			radius = Radius.Circle
 		})
 	end
 
-	local v53 = not v32.isSelected and v34 == ControlState.Hover
+	local v16 = not joined.isSelected and v8 == ControlState.Hover
 
-	return React.createElement(Interactable, {
-		Size = UDim2.new(0, v50, 0, 28),
-		BackgroundColor3 = v44.Color,
-		BackgroundTransparency = v44.Transparency,
-		ImageColor3 = v44.Color,
-		ImageTransparency = v44.Transparency,
-		AutoButtonColor = false,
-		BorderSizePixel = 0,
-		LayoutOrder = v32.layoutOrder,
-		ScaleType = Enum.ScaleType.Slice,
-		isDisabled = v32.isDisabled,
-		SelectionImageObject = v39,
-		[React.Event.Activated] = if v32.isLoading then nil else v32.onActivated,
-		onStateChanged = v36,
-		ref = v32.controlRef,
-		NextSelectionLeft = v32.NextSelectionLeft,
-		NextSelectionRight = v32.NextSelectionRight,
-		NextSelectionUp = v32.NextSelectionUp,
-		NextSelectionDown = v32.NextSelectionDown
-	}, {
-		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(1, 0)
-		}),
+	local createElement = React.createElement
+	local v17 = {}
+	v17.Size = UDim2.new(0, v14, 0, 28)
+	v17.BackgroundColor3 = contentStyle3.Color
+	v17.BackgroundTransparency = contentStyle3.Transparency
+	v17.ImageColor3 = contentStyle3.Color
+	v17.ImageTransparency = contentStyle3.Transparency
+	v17.AutoButtonColor = false
+	v17.BorderSizePixel = 0
+	v17.LayoutOrder = joined.layoutOrder
+	v17.ScaleType = Enum.ScaleType.Slice
+	v17.isDisabled = joined.isDisabled
+	v17.SelectionImageObject = selectionImageObject
+	local activated = React.Event.Activated
+	local v18
+
+	if not joined.isLoading then
+		v18 = joined.onActivated
+	end
+
+	v17[activated] = v18
+	v17.onStateChanged = onStateChanged
+
+	v17.ref = joined.controlRef
+	v17.NextSelectionLeft = joined.NextSelectionLeft
+	v17.NextSelectionRight = joined.NextSelectionRight
+	v17.NextSelectionUp = joined.NextSelectionUp
+	v17.NextSelectionDown = joined.NextSelectionDown
+	local v19 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
 		UISizeConstraint = React.createElement("UISizeConstraint", {
 			MinSize = Vector2.new(28, 28),
 			MaxSize = Vector2.new(240, 28)
 		}),
-		BackgroundLayer2 = React.createElement("Frame", {
-			BorderSizePixel = 0,
-			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = v45.Color,
-			BackgroundTransparency = not v53 and 1 or v45.Transparency
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			}),
-			UIStroke = if not v32.hasBorder then nil else React.createElement("UIStroke", {
-				Thickness = 1,
-				Color = v37.Theme.Divider.Color,
-				Transparency = v37.Theme.Divider.Transparency
-			}),
-			Content = React.createElement("Frame", {
-				ClipsDescendants = true,
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5),
-				Size = UDim2.new(0, X + 4 + v46, 1, 0)
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					Padding = UDim.new(0, 4),
-					FillDirection = Enum.FillDirection.Horizontal,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center
-				}),
-				TextArea = string.len(text) > 0 and React.createElement("Frame", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(X, v48)
-				}, {
-					PillText = React.createElement(GenericTextLabel, {
-						BackgroundTransparency = 1,
-						Text = text,
-						fontStyle = Font.CaptionHeader,
-						colorStyle = v43,
-						TextTruncate = Enum.TextTruncate.AtEnd,
-						Size = UDim2.fromOffset(n1, v48),
-						TextXAlignment = Enum.TextXAlignment.Left,
-						TextYAlignment = Enum.TextYAlignment.Center
-					}),
-					React.createElement("UISizeConstraint", {
-						MaxSize = Vector2.new(n1, 28)
-					})
-				}),
-				CloseIcon = v32.isSelected and React.createElement(ImageSetComponent.Label, {
-					LayoutOrder = 2,
-					BackgroundTransparency = 1,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Size = UDim2.fromOffset(v46, v46),
-					Image = Images["icons/navigation/close_small"],
-					ImageColor3 = v42.Color,
-					ImageTransparency = v42.Transparency
-				}),
-				UISizeConstraint = React.createElement("UISizeConstraint", {
-					MaxSize = Vector2.new(216, 28)
-				})
-			})
+		BackgroundLayer2 = 0
+	}
+
+	local createElement2 = React.createElement
+	local v20 = {
+		Size = UDim2.fromScale(1, 1),
+		BorderSizePixel = 0,
+		BackgroundColor3 = contentStyle4.Color,
+		BackgroundTransparency = not v16 and 1 or contentStyle4.Transparency
+	}
+	local v21 = {
+		UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+		UIStroke = 0,
+		Content = 0
+	}
+	local uiStroke
+
+	if joined.hasBorder then
+		uiStroke = React.createElement("UIStroke", {
+			Color = v10.Theme.Divider.Color,
+			Transparency = v10.Theme.Divider.Transparency,
+			Thickness = 1
 		})
+	end
+
+	v21.UIStroke = uiStroke
+
+	local createElement3 = React.createElement
+	local v22 = {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.new(0, x + 4 + iconSize, 1, 0),
+		ClipsDescendants = true,
+		BackgroundTransparency = 1
+	}
+
+	local v23 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			Padding = UDim.new(0, 4),
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center
+		}),
+		TextArea = 0,
+		CloseIcon = 0,
+		UISizeConstraint = 0
+	}
+	local textArea
+
+	if string.len(text) > 0 then
+		textArea = React.createElement(
+			"Frame",
+			{ Size = UDim2.fromOffset(x, v13), LayoutOrder = 1, BackgroundTransparency = 1 },
+			{
+				PillText = React.createElement(GenericTextLabel, {
+					Text = text,
+					BackgroundTransparency = 1,
+					fontStyle = font.CaptionHeader,
+					colorStyle = contentStyle2,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					Size = UDim2.fromOffset(v15, v13),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Center
+				}),
+				React.createElement("UISizeConstraint", { MaxSize = Vector2.new(v15, 28) })
+			}
+		)
+	else
+		textArea = false
+	end
+
+	v23.TextArea = textArea
+
+	v23.CloseIcon = joined.isSelected and React.createElement(ImageSetComponent.Label, {
+		LayoutOrder = 2,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Size = UDim2.fromOffset(iconSize, iconSize),
+		BackgroundTransparency = 1,
+		Image = Images["icons/navigation/close_small"],
+		ImageColor3 = contentStyle.Color,
+		ImageTransparency = contentStyle.Transparency
 	})
+
+	v23.UISizeConstraint = React.createElement("UISizeConstraint", {
+		MaxSize = Vector2.new(216, 28)
+	})
+	v21.Content = createElement3("Frame", v22, v23)
+	v19.BackgroundLayer2 = createElement2("Frame", v20, v21)
+	return createElement(Interactable, v17, v19)
 end
 
-return React.forwardRef(function(p3, p4) -- line: 256
-	-- upvalues: React (copy), Pillv2 (copy), Cryo (copy)
-	return React.createElement(Pillv2, Cryo.Dictionary.join(p3, {
-		controlRef = p4
-	}))
+return React.forwardRef(function(p, controlRef)
+	return React.createElement(Pillv2, Cryo.Dictionary.join(p, { controlRef = controlRef }))
 end)

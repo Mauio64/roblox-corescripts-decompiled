@@ -1,34 +1,29 @@
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
-local Parent = script:FindFirstAncestor("InExperienceShop").Parent
-local Promise = require(Parent.Promise)
 
-local function userOwnsGamePass(n1: number) -- line: 21
-	-- upvalues: Promise (copy), Players (copy), MarketplaceService (copy)
-	return Promise.new(function(resolve, reject) -- line: 22
-		-- upvalues: Players (copy), MarketplaceService (copy), n1 (copy)
-		task.spawn(function() -- line: 23
-			-- upvalues: Players (copy), reject (copy), MarketplaceService (copy), n1 (copy), resolve (copy)
-			local LocalPlayer = Players.LocalPlayer
+local parent = script:FindFirstAncestor("InExperienceShop").Parent
 
-			if LocalPlayer == nil then
-				reject("userOwnsGamePass: no LocalPlayer")
+local Promise = require(parent.Promise)
 
+local function userOwnsGamePass(p: number)
+	return Promise.new(function(callback, callback2)
+		task.spawn(function()
+			local localPlayer = Players.LocalPlayer
+
+			if localPlayer == nil then
+				callback2("userOwnsGamePass: no LocalPlayer")
 				return
 			end
 
-			local ok, result = pcall(function() -- line: 29
-				-- upvalues: MarketplaceService (copy), LocalPlayer (copy), n1 (copy)
-				return MarketplaceService:UserOwnsGamePassAsync(LocalPlayer.UserId, n1)
+			local success, result = pcall(function()
+				return MarketplaceService:UserOwnsGamePassAsync(localPlayer.UserId, p)
 			end)
 
-			if ok then
-				resolve(result == true)
-
-				return
+			if success then
+				callback(result == true)
+			else
+				callback2((tostring(result)))
 			end
-
-			reject((tostring(result)))
 		end)
 	end)
 end

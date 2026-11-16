@@ -1,32 +1,48 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local ReactGlobals = require(scriptParentParent.ReactGlobals)
+local parent = script.Parent
+local parent2 = parent.Parent
+local ReactGlobals = require(parent2.ReactGlobals)
+require(parent2.LuauPolyfill)
 
-require(scriptParentParent.LuauPolyfill)
+local ReactMutableSource = require(parent.ReactMutableSource)
+local Shared = require(parent2.Shared)
+local ReactSharedInternals = Shared.ReactSharedInternals
+local ReactBaseClasses = require(parent.ReactBaseClasses)
+local ReactChildren = require(parent.ReactChildren)
+local ReactElementValidator = require(parent.ReactElementValidator)
+local ReactElement = require(parent.ReactElement)
+local ReactCreateRef = require(parent.ReactCreateRef)
+local ReactForwardRef = require(parent.ReactForwardRef)
+local ReactHooks = require(parent.ReactHooks)
+local ReactMemo = require(parent.ReactMemo)
+local ReactContext = require(parent.ReactContext)
+local ReactLazy = require(parent.ReactLazy)
 
-local ReactMutableSource = require(scriptParent.ReactMutableSource)
-local ReactSharedInternals = require(scriptParentParent.Shared).ReactSharedInternals
-local ReactBaseClasses = require(scriptParent.ReactBaseClasses)
-local ReactChildren = require(scriptParent.ReactChildren)
-local ReactElementValidator = require(scriptParent.ReactElementValidator)
-local ReactElement = require(scriptParent.ReactElement)
-local ReactCreateRef = require(scriptParent.ReactCreateRef)
-local ReactForwardRef = require(scriptParent.ReactForwardRef)
-local ReactHooks = require(scriptParent.ReactHooks)
-local ReactMemo = require(scriptParent.ReactMemo)
-local ReactContext = require(scriptParent.ReactContext)
-local ReactLazy = require(scriptParent.ReactLazy)
-local lib = require(scriptParent["ReactBinding.roblox"])
-local lib2 = require(scriptParent["None.roblox"])
-local ReactSymbols = require(scriptParentParent.Shared).ReactSymbols
-local v19 = ReactGlobals.__DEV__ or ReactGlobals.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__
+local ReactBindingroblox = require(parent["ReactBinding.roblox"])
 
-require(scriptParentParent.Shared)
+local Noneroblox = require(parent["None.roblox"])
 
-local v20 = if not v19 then ReactElement.createElement else ReactElementValidator.createElementWithValidation
-local v21 = if not v19 then ReactElement.cloneElement else ReactElementValidator.cloneElementWithValidation
+local Shared2 = require(parent2.Shared)
+local ReactSymbols = Shared2.ReactSymbols
 
-return {
+local __DEV__ = ReactGlobals.__DEV__ or ReactGlobals.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__
+require(parent2.Shared)
+local createElement
+
+if __DEV__ then
+	createElement = ReactElementValidator.createElementWithValidation
+else
+	createElement = ReactElement.createElement
+end
+
+local cloneElement
+
+if __DEV__ then
+	cloneElement = ReactElementValidator.cloneElementWithValidation
+else
+	cloneElement = ReactElement.cloneElement
+end
+
+local React = {
 	Children = ReactChildren,
 	createMutableSource = ReactMutableSource,
 	createRef = ReactCreateRef.createRef,
@@ -53,17 +69,24 @@ return {
 	StrictMode = ReactSymbols.REACT_STRICT_MODE_TYPE,
 	unstable_DebugTracingMode = ReactSymbols.REACT_DEBUG_TRACING_MODE_TYPE,
 	Suspense = ReactSymbols.REACT_SUSPENSE_TYPE,
-	createElement = v20,
-	cloneElement = v21,
+	createElement = createElement,
+	cloneElement = cloneElement,
 	isValidElement = ReactElement.isValidElement,
 	__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactSharedInternals,
 	unstable_LegacyHidden = ReactSymbols.REACT_LEGACY_HIDDEN_TYPE,
-	createBinding = lib.create,
-	joinBindings = lib.join,
-	None = lib2,
-	__subscribeToBinding = lib.subscribe,
-	Event = require(scriptParentParent.Shared).Event,
-	Change = require(scriptParentParent.Shared).Change,
-	Tag = require(scriptParentParent.Shared).Tag,
-	unstable_parseReactError = require(scriptParentParent.Shared).parseReactError
+	createBinding = ReactBindingroblox.create,
+	joinBindings = ReactBindingroblox.join,
+	None = Noneroblox,
+	__subscribeToBinding = ReactBindingroblox.subscribe
 }
+
+local Shared3 = require(parent2.Shared)
+React.Event = Shared3.Event
+local Shared4 = require(parent2.Shared)
+React.Change = Shared4.Change
+local Shared5 = require(parent2.Shared)
+React.Tag = Shared5.Tag
+
+local Shared6 = require(parent2.Shared)
+React.unstable_parseReactError = Shared6.parseReactError
+return React

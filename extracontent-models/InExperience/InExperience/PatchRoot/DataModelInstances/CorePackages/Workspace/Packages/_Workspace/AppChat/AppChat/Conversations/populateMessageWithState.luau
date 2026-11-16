@@ -1,78 +1,154 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
+local parent = AppChat.Parent
+
 local getThumbnailsForUserIds = require(AppChat.Users.getThumbnailsForUserIds)
 local Conversation = require(AppChat.Models.Conversation)
 local MessageModel = require(AppChat.Models.MessageModel)
-local Cryo = require(AppChatParent.Cryo)
-local v7 = require(AppChat.Logger):new(script.Name)
 
-return function(p1, p2, p3, p4, p5, p6, p7) -- line: 31
-	-- upvalues: MessageModel (copy), getThumbnailsForUserIds (copy), Conversation (copy), v7 (copy), Cryo (copy)
-	local v15 = p2.senderTargetId ~= tostring(p1.LocalUserId)
-	local v16 = p2.repliesTo ~= nil
+local Cryo = require(parent.Cryo)
 
-	local function timeDiffExceeds(p8, p9, p10) -- line: 37
-		if not p8 or (not p9 or not p8.sent or not p9.sent) then
-			return false
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
+
+return function(p, data, messageId, data2, data3, p2, data4)
+	local isIncoming = data.senderTargetId ~= tostring(p.LocalUserId)
+	local v2 = data.repliesTo ~= nil
+
+	local function timeDiffExceeds(p3, p4, p5): boolean
+		if p3 and p4 and p3.sent and p4.sent then
+			return p5 < math.abs(p3.sent:GetUnixTimestamp() - p4.sent:GetUnixTimestamp())
 		end
 
-		return p10 < math.abs(p8.sent:GetUnixTimestamp() - p9.sent:GetUnixTimestamp())
-	end
-	local function isSystemMessage(p11) -- line: 43
-		return p11 and p11.messageType == "System"
-	end
-	local function isModerated(p12) -- line: 47
-		return p12 and p12.moderated == true
-	end
-	local function isHiddenMessage(p13) -- line: 51
-		-- upvalues: MessageModel (copy)
-		return p13 and p13.visibility == MessageModel.VisibilityTypes.Hidden
-	end
-	local function isReplyMessage(p14) -- line: 55
-		return p14 and p14.repliesTo ~= nil
-	end
-	local function hasSenderChange(p15, p16) -- line: 59
-		return p15 and (p16 and p15.senderTargetId ~= p16.senderTargetId)
-	end
-	local function hasModeratedBreak(p17, p18) -- line: 63
-		return p17 and p17.moderated == true or p18 and p18.moderated == true
+		return false
 	end
 
-	local v24 = not p5 and not not p4.fetchedOldestMessage or not not p2 and (not not p5 and not not p2.sent) and if p5.sent then math.abs(p2.sent:GetUnixTimestamp() - p5.sent:GetUnixTimestamp()) > 300 else false
-	local v25 = v24 or (not p5 or (p5 and (p2 and p5.senderTargetId ~= p2.senderTargetId) or (p5 and p5.messageType == "System" or (p2 and p2.repliesTo ~= nil or (p5 and p5.visibility == MessageModel.VisibilityTypes.Hidden or (p5 and p5.moderated == true or p2 and p2.moderated == true))))))
-	local v26 = not p7 or (p7 and p7.messageType == "System" or (p7 and (p2 and p7.senderTargetId ~= p2.senderTargetId) or (not not p7 and (not not p2 and not not p7.sent) and (if p2.sent then math.abs(p7.sent:GetUnixTimestamp() - p2.sent:GetUnixTimestamp()) > 300 else false) or (p7 and p7.repliesTo ~= nil or (p7 and p7.visibility == MessageModel.VisibilityTypes.Hidden or (p2 and p2.moderated == true or p7 and p7.moderated == true))))))
-	local Users = p1.Users
-	local v28 = (v15 and v25 or v16) and p2.senderTargetId
-	local t1 = {}
-
-	if v28 or v26 then
-		local v30 = Users[p2.senderTargetId]
-
-		t1 = {
-			id = if not v28 and (not v15 or not v26) then nil else p2.senderTargetId,
-			thumbnail = if not v15 or not v26 then nil else if not v15 or not v30 then nil else getThumbnailsForUserIds({ p2.senderTargetId })[1],
-			shouldShowName = if not v28 then nil else p4.conversationType == Conversation.Type.MULTI_USER_CONVERSATION or v16
-		}
-	elseif p2.senderType == MessageModel.SenderTypes.User and not p2.senderTargetId then
-		v7:warning(`User message with no senderTargetId: { p2.id }`)
+	local function isSystemMessage(data5) -- 2 equivalent calls inferred from this helper
+		return data5 and data5.messageType == "System"
 	end
 
-	local t2 = {
-		placeId = p2.placeId,
-		universeId = p2.gameLink and p2.gameLink.universeId,
-		senderUserId = v15 and p2.senderTargetId or nil
+	local function isModerated(p3)
+		return p3 and p3.moderated == true
+	end
+
+	local function isHiddenMessage(data5) -- 2 equivalent calls inferred from this helper
+		return data5 and data5.visibility == MessageModel.VisibilityTypes.Hidden
+	end
+
+	local function isReplyMessage(p3) -- 2 equivalent calls inferred from this helper
+		return p3 and p3.repliesTo ~= nil
+	end
+
+	local function hasSenderChange(data5, data6) -- 2 equivalent calls inferred from this helper
+		return data5 and data6 and data5.senderTargetId ~= data6.senderTargetId
+	end
+
+	local function hasModeratedBreak(p3, p4)
+		return p3 and p3.moderated == true or p4 and p4.moderated == true
+	end
+
+	local showDateTime
+
+	if data3 or not data2.fetchedOldestMessage then
+		if data and data3 and data.sent and data3.sent then
+			showDateTime = math.abs(data.sent:GetUnixTimestamp() - data3.sent:GetUnixTimestamp()) > 300
+		else
+			showDateTime = false
+		end
+	else
+		showDateTime = true
+	end
+
+	local isNewSender = showDateTime
+		or not data3
+		or hasSenderChange(data3, data) -- inferred equivalent call
+		or isSystemMessage(data3) -- inferred equivalent call
+		or isReplyMessage(data) -- inferred equivalent call
+		or isHiddenMessage(data3) -- inferred equivalent call
+		or data3 and data3.moderated == true
+		or data and data.moderated == true
+	local isLastMessageInMessageGroup = not data4 or isSystemMessage(data4) or hasSenderChange(data4, data) -- inferred equivalent call
+
+	if not isLastMessageInMessageGroup then
+		local v3
+
+		if data4 and data and data4.sent and data.sent then
+			v3 = math.abs(data4.sent:GetUnixTimestamp() - data.sent:GetUnixTimestamp()) > 300
+		else
+			v3 = false
+		end
+
+		isLastMessageInMessageGroup = v3
+			or isReplyMessage(data4) -- inferred equivalent call
+			or isHiddenMessage(data4) -- inferred equivalent call
+			or data and data.moderated == true
+			or data4 and data4.moderated == true
+	end
+
+	local users = p.Users
+	local v3
+
+	if isIncoming and isNewSender or v2 then
+		v3 = data.senderTargetId
+	else
+		v3 = v2
+	end
+
+	local sender = {}
+
+	if v3 or isLastMessageInMessageGroup then
+		local user = users[data.senderTargetId]
+
+		sender = { id = 0, thumbnail = 0, shouldShowName = 0 }
+		local id
+
+		if v3 or isIncoming and isLastMessageInMessageGroup then
+			id = data.senderTargetId
+		end
+
+		sender.id = id
+		local thumbnail
+
+		if isIncoming and isLastMessageInMessageGroup and isIncoming and user then
+			thumbnail = getThumbnailsForUserIds({ data.senderTargetId })[1]
+		end
+
+		sender.thumbnail = thumbnail
+		local shouldShowName
+
+		if v3 then
+			shouldShowName = data2.conversationType == Conversation.Type.MULTI_USER_CONVERSATION or v2
+		end
+
+		sender.shouldShowName = shouldShowName
+	elseif data.senderType == MessageModel.SenderTypes.User and not data.senderTargetId then
+		v:warning(`User message with no senderTargetId: {data.id}`)
+	end
+
+	local additionalProps = {
+		placeId = data.placeId,
+		universeId = data.gameLink and data.gameLink.universeId,
+		senderUserId = 0,
+		isEarlyTesting = 0
 	}
+	local senderUserId
 
-	return Cryo.Dictionary.join(p2, {
-		conversationId = p4.id,
-		messageId = p3,
-		position = p5 and p5.position + 1 or 1,
-		isIncoming = v15,
-		isLastMessageInMessageGroup = v26,
-		isNewSender = v25,
-		sender = t1,
-		isSending = p6 or false,
-		showDateTime = v24,
-		additionalProps = t2
+	if isIncoming then
+		senderUserId = data.senderTargetId or nil
+	end
+
+	additionalProps.senderUserId = senderUserId
+	additionalProps.isEarlyTesting = data.isEarlyTesting
+
+	return Cryo.Dictionary.join(data, {
+		conversationId = data2.id,
+		messageId = messageId,
+		position = data3 and data3.position + 1 or 1,
+		isIncoming = isIncoming,
+		isLastMessageInMessageGroup = isLastMessageInMessageGroup,
+		isNewSender = isNewSender,
+		sender = sender,
+		isSending = p2 or false,
+		showDateTime = showDateTime,
+		additionalProps = additionalProps
 	})
 end

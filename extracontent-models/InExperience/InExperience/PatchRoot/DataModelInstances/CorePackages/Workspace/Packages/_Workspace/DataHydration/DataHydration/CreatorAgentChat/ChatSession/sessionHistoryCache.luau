@@ -1,83 +1,70 @@
 require(script.Parent.Parent.types)
-
 local historyPageUtils = require(script.Parent.historyPageUtils)
+
 local constants = require(script.Parent.constants)
 
 return {
-	createSessionHistoryCache = function(n1: number?) -- line: 24
-		-- upvalues: constants (copy), historyPageUtils (copy)
-		local v4 = n1 or constants.getMaxCachedSessionHistories()
-		local t1 = {}
-		local t2 = {}
+	createSessionHistoryCache = function(p: number?)
+		local v = p or constants.getMaxCachedSessionHistories()
+		local v2 = {}
+		local v3 = {}
 
-		local function removeFromOrder(s1: string) -- line: 29
-			-- upvalues: t2 (copy)
-			for v11, v12 in t2 do
-				if v12 == s1 then
-					table.remove(t2, v11)
-
-					return
+		local function removeFromOrder(p2: string)
+			for k, v4 in v3 do
+				if v4 == p2 then
+					table.remove(v3, k)
+					break
 				end
 			end
 		end
-		local function touch(s2: string) -- line: 38
-			-- upvalues: removeFromOrder (copy), t2 (copy)
-			removeFromOrder(s2)
-			table.insert(t2, s2)
-		end
-		local function evictOldest() -- line: 43
-			-- upvalues: t2 (copy), t1 (copy)
-			local v14 = t2[1]
 
-			if v14 == nil then
+		local function touch(p2: string) -- 2 equivalent calls inferred from this helper
+			removeFromOrder(p2)
+			table.insert(v3, p2)
+		end
+
+		local function evictOldest() -- 1 equivalent call inferred from this helper
+			local v4 = v3[1]
+
+			if v4 == nil then
 				return
 			end
 
-			table.remove(t2, 1)
-			t1[v14] = nil
+			table.remove(v3, 1)
+			v2[v4] = nil
 		end
 
 		return {
-			save = function(s3: string, t3: {[any]: any}) -- line: 52
-				-- upvalues: t1 (copy), historyPageUtils (copy), removeFromOrder (copy), t2 (copy), v4 (copy)
-				t1[s3] = {
-					loadedBySequenceId = historyPageUtils.cloneHistoryBySequenceId(t3.loadedBySequenceId),
-					overlayBySequenceId = historyPageUtils.cloneHistoryBySequenceId(t3.overlayBySequenceId),
-					hasLoadedHistory = t3.hasLoadedHistory,
-					nextHistoryPageToken = t3.nextHistoryPageToken,
-					latestObservedHistorySequenceId = t3.latestObservedHistorySequenceId,
-					pendingUserMessage = t3.pendingUserMessage
+			save = function(p2: string, data)
+				v2[p2] = {
+					loadedBySequenceId = historyPageUtils.cloneHistoryBySequenceId(data.loadedBySequenceId),
+					overlayBySequenceId = historyPageUtils.cloneHistoryBySequenceId(data.overlayBySequenceId),
+					hasLoadedHistory = data.hasLoadedHistory,
+					nextHistoryPageToken = data.nextHistoryPageToken,
+					latestObservedHistorySequenceId = data.latestObservedHistorySequenceId,
+					pendingUserMessage = data.pendingUserMessage
 				}
-				removeFromOrder(s3)
-				table.insert(t2, s3)
+				touch(p2) -- inferred equivalent call
 
-				while #t2 > v4 do
-					local v17 = t2[1]
-
-					if v17 ~= nil then
-						table.remove(t2, 1)
-						t1[v17] = nil
-					end
+				while v < #v3 do
+					evictOldest() -- inferred equivalent call
 				end
 			end,
-			restore = function(s4: string) -- line: 67
-				-- upvalues: t1 (copy), removeFromOrder (copy), t2 (copy), historyPageUtils (copy)
-				local v19 = t1[s4]
+			restore = function(p2: string)
+				local v4 = v2[p2]
 
-				if v19 == nil then
+				if v4 == nil then
 					return nil
 				end
 
-				removeFromOrder(s4)
-				table.insert(t2, s4)
-
+				touch(p2) -- inferred equivalent call
 				return {
-					loadedBySequenceId = historyPageUtils.cloneHistoryBySequenceId(v19.loadedBySequenceId),
-					overlayBySequenceId = historyPageUtils.cloneHistoryBySequenceId(v19.overlayBySequenceId),
-					hasLoadedHistory = v19.hasLoadedHistory,
-					nextHistoryPageToken = v19.nextHistoryPageToken,
-					latestObservedHistorySequenceId = v19.latestObservedHistorySequenceId,
-					pendingUserMessage = v19.pendingUserMessage
+					loadedBySequenceId = historyPageUtils.cloneHistoryBySequenceId(v4.loadedBySequenceId),
+					overlayBySequenceId = historyPageUtils.cloneHistoryBySequenceId(v4.overlayBySequenceId),
+					hasLoadedHistory = v4.hasLoadedHistory,
+					nextHistoryPageToken = v4.nextHistoryPageToken,
+					latestObservedHistorySequenceId = v4.latestObservedHistorySequenceId,
+					pendingUserMessage = v4.pendingUserMessage
 				}
 			end
 		}

@@ -1,18 +1,19 @@
 local HttpService = game:GetService("HttpService")
 
-return function(p1, p2) -- line: 3
-	-- upvalues: HttpService (copy)
-	if p2 == "POST" or p2 == "PATCH" then
-		if type(p1) == "table" then
-			return HttpService:JSONEncode(p1)
-		end
-
-		if type(p1) == "string" then
-			return p1
-		end
-
-		error("Expected postBody to be a string or table")
+return function(value, p)
+	if p ~= "POST" and p ~= "PATCH" then
+		return nil
 	end
+
+	if type(value) == "table" then
+		return HttpService:JSONEncode(value)
+	end
+
+	if type(value) == "string" then
+		return value
+	end
+
+	error("Expected postBody to be a string or table")
 
 	return nil
 end

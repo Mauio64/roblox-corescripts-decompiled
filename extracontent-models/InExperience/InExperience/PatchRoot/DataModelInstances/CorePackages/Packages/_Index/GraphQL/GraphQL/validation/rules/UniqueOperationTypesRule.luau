@@ -1,43 +1,45 @@
-local ParentParent = script.Parent.Parent.Parent
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local parent = script.Parent.Parent.Parent
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
 
 return {
-	UniqueOperationTypesRule = function(p1) -- line: 19
-		-- upvalues: GraphQLError (copy)
-		local v4 = p1:getSchema()
-		local t1 = {}
-		local v6 = v4 and {
-			query = v4:getQueryType(),
-			mutation = v4:getMutationType(),
-			subscription = v4:getSubscriptionType()
-		} or {}
+	UniqueOperationTypesRule = function(object)
+		local schema = object:getSchema()
+		local operationTypesByOperation = {}
 
-		local function checkOperationTypes(_, p3) -- line: 32
-			-- upvalues: t1 (copy), v6 (copy), p1 (copy), GraphQLError (copy)
-			local v10 = p3.operationTypes or {}
+		local v = schema
+			and {
+				query = schema:getQueryType(),
+				mutation = schema:getMutationType(),
+				subscription = schema:getSubscriptionType()
+			}
+			or {}
 
-			for _, v in ipairs(v10) do
-				local operation = v.operation
-				local v14 = t1[operation]
+		local function checkOperationTypes(_, p): boolean
+			local operationTypes = p.operationTypes or {}
 
-				if v6[operation] then
-					p1:reportError(GraphQLError.new(("Type for %s already defined in the schema. It cannot be redefined."):format(operation), v))
-				elseif v14 then
-					p1:reportError(GraphQLError.new(("There can be only one %s type in schema."):format(operation), {
-						v14,
-						v
-					}))
+			for _, operationType in ipairs(operationTypes) do
+				local operation = operationType.operation
+				local v2 = operationTypesByOperation[operation]
+
+				if v[operation] then
+					object:reportError(graphQLError.new(
+						("Type for %s already defined in the schema. It cannot be redefined."):format(operation),
+						operationType
+					))
+				elseif v2 then
+					object:reportError(graphQLError.new(
+						("There can be only one %s type in schema."):format(operation),
+						{ v2, operationType }
+					))
 				else
-					t1[operation] = v
+					operationTypesByOperation[operation] = operationType
 				end
 			end
 
 			return false
 		end
 
-		return {
-			SchemaDefinition = checkOperationTypes,
-			SchemaExtension = checkOperationTypes
-		}
+		return { SchemaDefinition = checkOperationTypes, SchemaExtension = checkOperationTypes }
 	end
 }

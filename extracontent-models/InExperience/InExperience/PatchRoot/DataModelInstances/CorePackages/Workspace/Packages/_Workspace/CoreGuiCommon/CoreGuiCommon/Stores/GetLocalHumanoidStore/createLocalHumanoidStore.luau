@@ -1,86 +1,67 @@
 local Players = game:GetService("Players")
-local Parent = script:FindFirstAncestor("CoreGuiCommon").Parent
-local Signals = require(Parent.Signals)
-local Cryo = require(Parent.Cryo)
+
+local parent = script:FindFirstAncestor("CoreGuiCommon").Parent
+local Signals = require(parent.Signals)
+local Cryo = require(parent.Cryo)
 local createSignal = Signals.createSignal
 
-return function() -- line: 24
-	-- upvalues: createSignal (copy), Cryo (copy), Players (copy)
-	local v6, v7 = createSignal(nil)
-	local v8, v9 = createSignal({}, Cryo.Dictionary.equals)
-	local u10 = nil
-	local u11 = nil
-	local u12 = nil
-	local LocalPlayer = Players.LocalPlayer
+return function()
+	local signal, v = createSignal(nil)
 
-	while not LocalPlayer do
+	local signal2, v2 = createSignal({}, Cryo.Dictionary.equals)
+
+	local localPlayer = Players.LocalPlayer
+	local childAddedConnection = nil
+	local healthChangedConnection = nil
+	local diedConnection = nil
+
+	while not localPlayer do
 		Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-		LocalPlayer = Players.LocalPlayer
+		localPlayer = Players.LocalPlayer
 	end
 
-	local v14 = LocalPlayer
-
-	local function updateHealthValue() -- line: 41
-		-- upvalues: v6 (copy), v9 (copy)
-		local v20 = v6(false)
-
-		v9(if not v20 then {} else {
-			health = v20.Health,
-			maxHealth = v20.MaxHealth,
-			isDead = v20.Health <= 0
-		})
+	local function updateHealthValue()
+		local v3 = signal(false)
+		v2(v3 and {
+			health = v3.Health,
+			maxHealth = v3.MaxHealth,
+			isDead = v3.Health <= 0
+		} or {})
 	end
-	local function unobserveHumanoid() -- line: 52
-		-- upvalues: u12 (ref), u10 (ref), u11 (ref), v7 (copy)
-		if u12 then
-			u12:Disconnect()
-			u12 = nil
+
+	local function unobserveHumanoid() -- 2 equivalent calls inferred from this helper
+		if childAddedConnection then
+			childAddedConnection:Disconnect()
+			childAddedConnection = nil
 		end
 
-		if u10 then
-			u10:Disconnect()
-			u10 = nil
+		if healthChangedConnection then
+			healthChangedConnection:Disconnect()
+			healthChangedConnection = nil
 		end
 
-		if u11 then
-			u11:Disconnect()
-			u11 = nil
+		if diedConnection then
+			diedConnection:Disconnect()
+			diedConnection = nil
 		end
 
-		v7(nil)
+		v(nil)
 	end
-	local function observeHumanoid() -- line: 69
-		-- upvalues: u12 (ref), u10 (ref), u11 (ref), v7 (copy), v14 (copy), updateHealthValue (copy), observeHumanoid (copy)
-		if u12 then
-			u12:Disconnect()
-			u12 = nil
-		end
 
-		if u10 then
-			u10:Disconnect()
-			u10 = nil
-		end
+	local function observeHumanoid()
+		unobserveHumanoid() -- inferred equivalent call
+		local character = localPlayer.Character
 
-		if u11 then
-			u11:Disconnect()
-			u11 = nil
-		end
+		if character then
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-		v7(nil)
-
-		local Character = v14.Character
-
-		if Character then
-			local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-
-			if Humanoid then
-				v7(Humanoid)
-				u10 = Humanoid.HealthChanged:Connect(updateHealthValue)
-				u11 = Humanoid.Died:Connect(updateHealthValue)
+			if humanoid then
+				v(humanoid)
+				healthChangedConnection = humanoid.HealthChanged:Connect(updateHealthValue)
+				diedConnection = humanoid.Died:Connect(updateHealthValue)
 			else
-				u12 = Character.ChildAdded:Connect(function(child) -- line: 79
-					-- upvalues: observeHumanoid (copy)
-					if child:IsA("Humanoid") then
+				childAddedConnection = character.ChildAdded:Connect(function(humanoid2)
+					if humanoid2:IsA("Humanoid") then
 						observeHumanoid()
 					end
 				end)
@@ -90,35 +71,15 @@ return function() -- line: 24
 		updateHealthValue()
 	end
 
-	local connection = v14.CharacterAdded:Connect(observeHumanoid)
-	local connection2 = v14.CharacterRemoving:Connect(observeHumanoid)
-
+	local characterAddedConnection = localPlayer.CharacterAdded:Connect(observeHumanoid)
+	local characterRemovingConnection = localPlayer.CharacterRemoving:Connect(observeHumanoid)
 	observeHumanoid()
 
-	return {
-		getLocalHumanoid = v6,
-		getHealthValue = v8,
-		cleanup = function() -- line: 93
-			-- upvalues: connection (copy), connection2 (copy), u12 (ref), u10 (ref), u11 (ref), v7 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+	local function cleanup()
+		characterAddedConnection:Disconnect()
+		characterRemovingConnection:Disconnect()
+		unobserveHumanoid() -- inferred equivalent call
+	end
 
-			if u12 then
-				u12:Disconnect()
-				u12 = nil
-			end
-
-			if u10 then
-				u10:Disconnect()
-				u10 = nil
-			end
-
-			if u11 then
-				u11:Disconnect()
-				u11 = nil
-			end
-
-			v7(nil)
-		end
-	}
+	return { getLocalHumanoid = signal, getHealthValue = signal2, cleanup = cleanup }
 end

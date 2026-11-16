@@ -1,45 +1,37 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
 local useEffect = React.useEffect
 local useRef = React.useRef
+
 local StudioUri = require(Foundation.Utility.Plugin.StudioUri)
+
 local useWidgetsContext = require(script.Parent.useWidgetsContext)
 
-local function useWidgetRef(p1, p2) -- line: 13
-	-- upvalues: useWidgetsContext (copy), useRef (copy), StudioUri (copy), useEffect (copy)
-	local v11 = useWidgetsContext()
-	local v12 = useRef(nil)
-	local v13 = p2 or v12
-	local v14 = StudioUri.toString(p1)
+local function useWidgetRef(p, p2)
+	local v = useWidgetsContext()
+	local v2 = useRef(nil)
+	local v3 = p2 or v2
 
-	useEffect(function() -- line: 20
-		-- upvalues: v13 (copy), p1 (copy), v11 (copy)
-		local current = v13.current
+	useEffect(function()
+		local current = v3.current
 
 		if not current then
 			return
 		end
 
-		if p1 and typeof(current) == "Instance" then
-			v11.register(p1, current)
-
-			return function() -- line: 27
-				-- upvalues: v11 (copy), p1 (copy), current (copy)
-				v11.deregister(p1, current)
-			end
+		if not p or typeof(current) ~= "Instance" then
+			return nil
 		end
 
-		return nil
-	end, {
-		v14,
-		v13.current,
-		p1,
-		v11.register,
-		v11.deregister
-	})
+		v.register(p, current)
+		return function()
+			v.deregister(p, current)
+		end
+	end, { StudioUri.toString(p), v3.current, p, v.register, v.deregister })
 
-	return v13
+	return v3
 end
 
 return useWidgetRef

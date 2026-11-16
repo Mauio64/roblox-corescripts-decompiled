@@ -1,129 +1,129 @@
 local LocalizationService = game:GetService("LocalizationService")
+
 local Squads = script:FindFirstAncestor("Squads")
-local SquadsParent = Squads.Parent
-local Cryo = require(SquadsParent.Cryo)
-local Foundation = require(SquadsParent.Foundation)
-local React = require(SquadsParent.React)
-local SquadExternalContractProvider = require(SquadsParent.SquadsCore.SquadExternalContractProvider)
+local parent = Squads.Parent
+local FFlagSquadsUseProfileFrameThumbnail = require(Squads.Flags.FFlagSquadsUseProfileFrameThumbnail)
+local FFlagSquadsEnableFoundationTestIds = require(Squads.Flags.FFlagSquadsEnableFoundationTestIds)
 
-require(SquadsParent.SquadsCore.Types)
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+require(parent.SquadsCore.Types)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RoactUtils2 = require(parent.RoactUtils)
+local useStore = RoactUtils2.Hooks.RoactRodux.useStore
+local UserProfiles = require(parent.UserProfiles)
 
-local useDispatch = require(SquadsParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalUserId = require(SquadsParent.RobloxAppHooks).useLocalUserId
-local useLocalization = require(SquadsParent.Localization).Hooks.useLocalization
-local useStore = require(SquadsParent.RoactUtils).Hooks.RoactRodux.useStore
-local UserProfileStore = require(SquadsParent.UserProfiles).Stores.UserProfileStore
+local UserProfileStore = UserProfiles.Stores.UserProfileStore
+
 local Avatar = Foundation.Avatar
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Sheet = Foundation.Sheet
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local deleteScheduledSquad = require(SquadsParent.SquadsCore.Thunks).deleteScheduledSquad
-local EventNames = require(SquadsParent.SquadsCore.EventNames)
+
+local Thunks = require(parent.SquadsCore.Thunks)
+local deleteScheduledSquad = Thunks.deleteScheduledSquad
+local EventNames = require(parent.SquadsCore.EventNames)
 local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
-local SquadPromptType = require(SquadsParent.SquadsCore.Enums).SquadPromptType
-local subscribeToScheduledSquad = require(SquadsParent.SquadsCore.NetworkRequests).subscribeToScheduledSquad
-local unsubscribeFromScheduledSquad = require(SquadsParent.SquadsCore.NetworkRequests).unsubscribeFromScheduledSquad
-local useCurrentSquadId = require(SquadsParent.SquadsCore.Hooks).useCurrentSquadId
+local Enums = require(parent.SquadsCore.Enums)
+local SquadPromptType = Enums.SquadPromptType
+local NetworkRequests = require(parent.SquadsCore.NetworkRequests)
+local subscribeToScheduledSquad = NetworkRequests.subscribeToScheduledSquad
+local NetworkRequests2 = require(parent.SquadsCore.NetworkRequests)
+local unsubscribeFromScheduledSquad = NetworkRequests2.unsubscribeFromScheduledSquad
+local Hooks = require(parent.SquadsCore.Hooks)
+local useCurrentSquadId = Hooks.useCurrentSquadId
+
 local ScheduledSquadSheet = require(Squads.Components.ScheduledSquads.ScheduledSquadSheet)
 local ScheduledSquadActionEnum = require(Squads.Enums.ScheduledSquadActionEnum)
 local ScheduledSquadActionSourceEnum = require(Squads.Enums.ScheduledSquadActionSourceEnum)
 
-local function ScheduledSquadsMoreInfoSheet(t1: {[any]: any}) -- line: 47
-	-- upvalues: useDispatch (copy), useLocalUserId (copy), React (copy), SquadExternalContractContext (copy), useCurrentSquadId (copy), useStore (copy), Cryo (copy), SquadPromptType (copy), UserProfileStore (copy), useLocalization (copy), View (copy), Avatar (copy), FoundationText (copy), deleteScheduledSquad (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), unsubscribeFromScheduledSquad (copy), subscribeToScheduledSquad (copy), ScheduledSquadSheet (copy), Sheet (copy), LocalizationService (copy), Foundation (copy), Button (copy), ButtonVariant (copy)
-	local v31 = useDispatch()
-	local v32 = useLocalUserId()
-	local v33 = React.useContext(SquadExternalContractContext)
-	local v34 = useCurrentSquadId()
-	local v35 = useStore()
-	local v36 = v33.useGetConversationFromId(t1.scheduledSquad.parentChannelId)
-	local dateTime = DateTime.fromIsoDate(t1.scheduledSquad.startTime)
-	local v38 = dateTime and dateTime.UnixTimestamp < DateTime.now().UnixTimestamp
-	local v39, v40 = React.useState(false)
-	local v41, v42 = React.useState(t1.scheduledSquad.subscribers)
-	local v43 = React.useMemo(function() -- line: 61
-		-- upvalues: Cryo (copy), v41 (copy)
-		return Cryo.List.map(v41, function(p1) -- line: 62
-			return (tostring(p1.userId))
+local function ScheduledSquadsMoreInfoSheet(props)
+	local v = useDispatch()
+	local v2 = useLocalUserId()
+	local v3 = React.useContext(SquadExternalContractContext)
+	local squadId = useCurrentSquadId()
+	local v4 = useStore()
+	local v5 = v3.useGetConversationFromId(props.scheduledSquad.parentChannelId)
+
+	local dateTime = DateTime.fromIsoDate(props.scheduledSquad.startTime)
+	local v6 = dateTime and dateTime.UnixTimestamp < DateTime.now().UnixTimestamp
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(props.scheduledSquad.subscribers)
+
+	local v7 = React.useMemo(function()
+		return Cryo.List.map(state2, function(p)
+			return (tostring(p.userId))
 		end)
-	end, { v41 })
+	end, { state2 })
 
-	React.useEffect(function() -- line: 67
-		-- upvalues: v42 (copy), t1 (copy)
-		v42(t1.scheduledSquad.subscribers)
-	end, { t1.scheduledSquad.subscribers })
+	React.useEffect(function()
+		setState2(props.scheduledSquad.subscribers)
+	end, { props.scheduledSquad.subscribers })
 
-	local v44 = tostring(t1.scheduledSquad.initiatorId) == tostring(v32)
-	local v45 = React.useMemo(function() -- line: 72
-		-- upvalues: v44 (copy), Cryo (copy), v43 (copy), v32 (copy)
-		return v44 or Cryo.List.findWhere(v43, function(p2) -- line: 74
-			-- upvalues: v32 (copy)
-			return p2 == tostring(v32)
+	local v8 = tostring(props.scheduledSquad.initiatorId) == tostring(v2)
+	local v9 = React.useMemo(function()
+		return v8 or Cryo.List.findWhere(v7, function(p): boolean
+			return p == tostring(v2)
 		end) ~= nil
-	end, {
-		v44,
-		v32,
-		v43
-	})
-	local v46, v47 = React.useState({})
-	local v48, v49 = React.useState(true)
-	local v50 = React.useCallback(function() -- line: 83
-		-- upvalues: v40 (copy), t1 (copy)
-		v40(false)
+	end, { v8, v2, v7 })
 
-		if t1.onClose then
-			t1.onClose()
+	local state3, setState3 = React.useState({})
+	local state4, setState4 = React.useState(true)
+
+	local onClose = React.useCallback(function()
+		setState(false)
+
+		if props.onClose then
+			props.onClose()
 		end
-	end, { t1.onClose })
-	local v51 = React.useCallback(function() -- line: 90
-		-- upvalues: v50 (copy), v33 (copy), v35 (copy), SquadPromptType (copy)
-		v50()
-		v33.setSquadPrompt(v35, {
-			hideCancelButton = true,
-			promptType = SquadPromptType.Error
-		})
-	end, {
-		v50,
-		v33.setSquadPrompt,
-		v35
-	})
+	end, { props.onClose })
 
-	React.useEffect(function() -- line: 99
-		-- upvalues: v49 (copy), UserProfileStore (copy), Cryo (copy), v43 (copy), v36 (copy), v47 (copy), v50 (copy), v51 (copy)
-		v49(true)
-		UserProfileStore.get().fetchNamesByUserIds(Cryo.List.join(v43, v36 and v36.participants or {}), function(p3) -- line: 102
-			-- upvalues: v47 (copy), v49 (copy), v50 (copy), v51 (copy)
-			if p3.status == "success" then
-				local t2 = {}
+	local v10 = React.useCallback(function()
+		onClose()
+		v3.setSquadPrompt(v4, { hideCancelButton = true, promptType = SquadPromptType.Error })
+	end, { onClose, v3.setSquadPrompt, v4 })
 
-				for _, v72 in p3.data do
-					t2[v72.userId] = v72.names.getCombinedName(false)
+	local useEffect = React.useEffect
+	local function fn()
+		setState4(true)
+		UserProfileStore.get().fetchNamesByUserIds(Cryo.List.join(v7, v5 and v5.participants or {}), function(p)
+			if p.status == "success" then
+				local v11 = {}
+
+				for _, v12 in p.data do
+					v11[v12.userId] = v12.names.getCombinedName(false)
 				end
 
-				v47(t2)
-				v49(false)
-
-				return
-			end
-
-			if p3.status == "failed" then
-				v49(false)
-				v50()
-				v51()
+				setState3(v11)
+				setState4(false)
+			elseif p.status == "failed" then
+				setState4(false)
+				onClose()
+				v10()
 			end
 		end)
-	end, {
-		v50,
-		v51,
-		v49,
-		v43,
-		v33.setSquadPrompt,
-		v35,
-		v36 and v36.participants or nil
-	})
+	end
 
-	local v52 = useLocalization({
+	local setSquadPrompt = v3.setSquadPrompt
+	local v11
+
+	if v5 then
+		v11 = v5.participants or nil
+	end
+
+	useEffect(fn, { onClose, v10, setState4, v7, setSquadPrompt, v4, v11 })
+
+	local v12 = useLocalization({
 		deleteText = "Feature.Squads.Action.Delete",
 		dontJoinText = "Feature.Squads.Action.DontJoin",
 		editText = "Feature.Squads.Action.Edit",
@@ -133,253 +133,404 @@ local function ScheduledSquadsMoreInfoSheet(t1: {[any]: any}) -- line: 47
 		partyText = "Feature.Squads.Label.Party",
 		usersPartyText = {
 			"Feature.Squads.Label.UsersParty",
-			displayName = v46[tostring(t1.scheduledSquad.initiatorId)]
+			displayName = state3[tostring(props.scheduledSquad.initiatorId)]
 		},
 		willYouJoinScheduledPartyText = {
 			"Feature.Squads.Label.WillYouJoinScheduledParty",
-			displayName = v46[tostring(t1.scheduledSquad.initiatorId)]
+			displayName = state3[tostring(props.scheduledSquad.initiatorId)]
 		}
 	})
-	local v53 = React.useMemo(function() -- line: 146
-		-- upvalues: v41 (copy), React (copy), View (copy), Avatar (copy), FoundationText (copy), v46 (copy)
-		local t3 = {}
 
-		for _, v62 in v41 do
-			table.insert(t3, React.createElement(View, {
-				tag = "size-full-0 auto-y row align-x-left align-y-center gap-small"
-			}, {
-				Avatar = React.createElement(Avatar, {
-					LayoutOrder = 1,
-					userId = v62.userId
-				}),
-				DisplayName = React.createElement(FoundationText, {
-					LayoutOrder = 2,
-					tag = "auto-xy fill text-truncate-end text-title-medium text-align-x-left",
-					Text = v46[tostring(v62.userId)]
-				})
-			}))
-		end
+	local v13 = React.useMemo(function()
+		local children = {}
 
-		return t3
-	end, {
-		v46,
-		v41
-	})
-	local v54 = React.useMemo(function() -- line: 171
-		-- upvalues: v36 (copy), Cryo (copy), v43 (copy), React (copy), View (copy), Avatar (copy), FoundationText (copy), v46 (copy)
-		local t4 = {}
+		for _, v13 in state2 do
+			local formatted = `--social-squad-scheduled-party-info-sheet--going-user-{v13.userId}`
 
-		if v36 and v36.participants then
-			local v64 = Cryo.List.toSet(v43)
+			local createElement = React.createElement
+			local testId
 
-			for _, v66 in v36.participants do
-				if not v64[tostring(v66)] then
-					table.insert(t4, React.createElement(View, {
-						tag = "size-full-0 auto-y row align-x-left align-y-center gap-small padding-y-small"
-					}, {
-						Avatar = React.createElement(Avatar, {
-							LayoutOrder = 1,
-							userId = v66
-						}),
-						DisplayName = React.createElement(FoundationText, {
-							LayoutOrder = 2,
-							tag = "auto-xy fill text-truncate-end text-title-medium text-align-x-left",
-							Text = v46[tostring(v66)]
-						})
-					}))
-				end
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = formatted
 			end
+
+			local createElement2 = React.createElement
+			local v14 = {
+				LayoutOrder = 1,
+				userId = v13.userId,
+				includeProfileFrame = FFlagSquadsUseProfileFrameThumbnail,
+				testId = 0
+			}
+			local testId2
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId2 = `{formatted}--avatar`
+			end
+
+			v14.testId = testId2
+			local children2 = { Avatar = createElement2(Avatar, v14), DisplayName = 0 }
+
+			local createElement3 = React.createElement
+			local v15 = {
+				LayoutOrder = 2,
+				Text = state3[tostring(v13.userId)],
+				tag = "auto-xy fill text-truncate-end text-title-medium text-align-x-left",
+				testId = 0
+			}
+			local testId3
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId3 = `{formatted}--name`
+			end
+
+			v15.testId = testId3
+			children2.DisplayName = createElement3(Text, v15)
+			table.insert(
+				children,
+				createElement(
+					View,
+					{
+						tag = "size-full-0 auto-y row align-x-left align-y-center gap-small",
+						testId = testId
+					},
+					children2
+				)
+			)
 		end
 
-		return t4
-	end, {
-		v46,
-		v43,
-		v36 and v36.participants
-	})
-	local v55 = React.useCallback(function() -- line: 203
-		-- upvalues: v50 (copy), v31 (copy), deleteScheduledSquad (copy), t1 (copy), v33 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), v34 (copy)
-		v50()
-		v31(deleteScheduledSquad(t1.scheduledSquad.scheduledGroupUpId, v33.setSquadPrompt))
-		v33.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
+		return children
+	end, { state3, state2 })
+
+	local v14 = React.useMemo(function()
+		local children = {}
+
+		if not (v5 and v5.participants) then
+			return children
+		end
+
+		local set = Cryo.List.toSet(v7)
+
+		for _, participant in v5.participants do
+			if set[tostring(participant)] then
+				continue
+			end
+
+			local formatted = `--social-squad-scheduled-party-info-sheet--not-going-user-{participant}`
+
+			local createElement = React.createElement
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = formatted
+			end
+
+			local createElement2 = React.createElement
+			local v14 = {
+				LayoutOrder = 1,
+				userId = participant,
+				includeProfileFrame = FFlagSquadsUseProfileFrameThumbnail,
+				testId = 0
+			}
+			local testId2
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId2 = `{formatted}--avatar`
+			end
+
+			v14.testId = testId2
+			local children2 = { Avatar = createElement2(Avatar, v14), DisplayName = 0 }
+
+			local createElement3 = React.createElement
+			local v15 = {
+				LayoutOrder = 2,
+				Text = state3[tostring(participant)],
+				tag = "auto-xy fill text-truncate-end text-title-medium text-align-x-left",
+				testId = 0
+			}
+			local testId3
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId3 = `{formatted}--name`
+			end
+
+			v15.testId = testId3
+			children2.DisplayName = createElement3(Text, v15)
+			table.insert(
+				children,
+				createElement(
+					View,
+					{
+						tag = "size-full-0 auto-y row align-x-left align-y-center gap-small padding-y-small",
+						testId = testId
+					},
+					children2
+				)
+			)
+		end
+
+		return children
+	end, { state3, v7, v5 and v5.participants })
+
+	local onActivated = React.useCallback(function()
+		onClose()
+		v(deleteScheduledSquad(props.scheduledSquad.scheduledGroupUpId, v3.setSquadPrompt))
+
+		v3.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
 			actionType = ScheduledSquadActionEnum.Delete,
-			conversationId = t1.scheduledSquad.parentChannelId,
-			scheduledSquadId = t1.scheduledSquad.scheduledGroupUpId,
+			conversationId = props.scheduledSquad.parentChannelId,
+			scheduledSquadId = props.scheduledSquad.scheduledGroupUpId,
 			source = ScheduledSquadActionSourceEnum.ScheduledSquadsMoreInfoSheet,
-			squadId = v34,
-			squadLocation = v33.squadLocation
+			squadId = squadId,
+			squadLocation = v3.squadLocation
 		})
 	end, {
-		v34,
-		v50,
-		t1.scheduledSquad.parentChannelId,
-		t1.scheduledSquad.scheduledGroupUpId,
-		v33.fireSquadAnalytics,
-		v33.setSquadPrompt,
-		v33.squadLocation,
-		v35
+		squadId,
+		onClose,
+		props.scheduledSquad.parentChannelId,
+		props.scheduledSquad.scheduledGroupUpId,
+		v3.fireSquadAnalytics,
+		v3.setSquadPrompt,
+		v3.squadLocation,
+		v4
 	})
 
-	local function v56() -- line: 228
-		-- upvalues: v42 (copy), Cryo (copy), v41 (copy), v32 (copy)
-		v42(Cryo.List.filter(v41, function(p4) -- line: 229
-			-- upvalues: v32 (copy)
-			return tostring(p4.userId) ~= tostring(v32)
+	local function fn2()
+		setState2(Cryo.List.filter(state2, function(p): boolean
+			return tostring(p.userId) ~= tostring(v2)
 		end))
 	end
-	local function v57() -- line: 234
-		-- upvalues: v42 (copy), Cryo (copy), v41 (copy), v32 (copy)
-		v42(Cryo.List.join(v41, {{
-			userId = tostring(v32)
-		}}))
+
+	local function fn3()
+		setState2(Cryo.List.join(state2, {
+			{ userId = tostring(v2) }
+		}))
 	end
 
-	local v58 = React.useCallback(function() -- line: 239
-		-- upvalues: v45 (copy), unsubscribeFromScheduledSquad (copy), t1 (copy), v56 (copy), v51 (copy), subscribeToScheduledSquad (copy), v57 (copy), v50 (copy), v33 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), v34 (copy)
-		if v45 then
+	local onActivated2 = React.useCallback(function()
+		if v9 then
 			unsubscribeFromScheduledSquad({
-				scheduledGroupUpId = t1.scheduledSquad.scheduledGroupUpId
-			}, v56, v51)
+				scheduledGroupUpId = props.scheduledSquad.scheduledGroupUpId
+			}, fn2, v10)
 		else
 			subscribeToScheduledSquad({
-				scheduledGroupUpId = t1.scheduledSquad.scheduledGroupUpId
-			}, v57, v51)
+				scheduledGroupUpId = props.scheduledSquad.scheduledGroupUpId
+			}, fn3, v10)
 		end
 
-		v50()
-		v33.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
-			actionType = if not v45 then ScheduledSquadActionEnum.Subscribe else ScheduledSquadActionEnum.Unsubscribe,
-			conversationId = t1.scheduledSquad.parentChannelId,
-			scheduledSquadId = t1.scheduledSquad.scheduledGroupUpId,
+		onClose()
+		local fireSquadAnalytics = v3.fireSquadAnalytics
+		local scheduledSquadAction = EventNames.ScheduledSquadAction
+		local actionType
+
+		if v9 then
+			actionType = ScheduledSquadActionEnum.Unsubscribe
+		else
+			actionType = ScheduledSquadActionEnum.Subscribe
+		end
+
+		fireSquadAnalytics(scheduledSquadAction, {
+			actionType = actionType,
+			conversationId = props.scheduledSquad.parentChannelId,
+			scheduledSquadId = props.scheduledSquad.scheduledGroupUpId,
 			source = ScheduledSquadActionSourceEnum.ScheduledSquadsMoreInfoSheet,
-			squadId = v34,
-			squadLocation = v33.squadLocation
+			squadId = squadId,
+			squadLocation = v3.squadLocation
 		})
 	end, {
-		v45,
-		v33.squadLocation,
-		v34,
-		t1.scheduledSquad,
-		v33.fireSquadAnalytics,
-		v50,
-		v51,
-		v56,
-		v57,
-		v34
-	})
-	local v59 = React.useCallback(function() -- line: 281
-		-- upvalues: v40 (copy), v33 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), t1 (copy), ScheduledSquadActionSourceEnum (copy), v34 (copy)
-		v40(true)
-		v33.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
-			actionType = ScheduledSquadActionEnum.Edit,
-			conversationId = t1.scheduledSquad.parentChannelId,
-			scheduledSquadId = t1.scheduledSquad.scheduledGroupUpId,
-			source = ScheduledSquadActionSourceEnum.ScheduledSquadsMoreInfoSheet,
-			squadId = v34,
-			squadLocation = v33.squadLocation
-		})
-	end, {
-		v34,
-		t1.scheduledSquad,
-		v33.fireSquadAnalytics,
-		v33.squadLocation
+		v9,
+		v3.squadLocation,
+		squadId,
+		props.scheduledSquad,
+		v3.fireSquadAnalytics,
+		onClose,
+		v10,
+		fn2,
+		fn3,
+		squadId
 	})
 
-	if v39 then
+	local onActivated3 = React.useCallback(function()
+		setState(true)
+
+		v3.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
+			actionType = ScheduledSquadActionEnum.Edit,
+			conversationId = props.scheduledSquad.parentChannelId,
+			scheduledSquadId = props.scheduledSquad.scheduledGroupUpId,
+			source = ScheduledSquadActionSourceEnum.ScheduledSquadsMoreInfoSheet,
+			squadId = squadId,
+			squadLocation = v3.squadLocation
+		})
+	end, { squadId, props.scheduledSquad, v3.fireSquadAnalytics, v3.squadLocation })
+
+	if state then
 		return React.createElement(ScheduledSquadSheet, {
-			isOpen = t1.isOpen,
-			onClose = v50,
-			scheduledSquad = t1.scheduledSquad,
-			snapPoints = {
-				0.4,
-				0.7
-			}
+			isOpen = props.isOpen,
+			onClose = onClose,
+			scheduledSquad = props.scheduledSquad,
+			snapPoints = { 0.4, 0.7 }
 		})
 	end
 
-	return (React.createElement(Sheet.Root, {
+	local createElement = React.createElement
+	local root = Sheet.Root
+	local v15 = {
+		onClose = onClose,
+		isOpen = props.isOpen,
 		preferCenterSheet = true,
-		onClose = v50,
-		isOpen = t1.isOpen,
-		snapPoints = {
-			0.4,
-			0.7
-		}
-	}, {
-		Header = React.createElement(Sheet.Header, {}, {
-			View = React.createElement(View, {
-				tag = "size-full-0 auto-y col"
-			}, {
-				ScheduledSquadTitle = React.createElement(FoundationText, {
+		snapPoints = { 0.4, 0.7 },
+		testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet" or nil
+	}
+
+	local createElement2 = React.createElement
+	local header = Sheet.Header
+	local createElement3 = React.createElement
+
+	local createElement4 = React.createElement
+	local text
+
+	if v6 or not v9 then
+		if v6 or v9 then
+			text = v12.partyText
+		else
+			text = v12.willYouJoinScheduledPartyText
+		end
+	else
+		text = v12.usersPartyText
+	end
+
+	local children = {
+		Header = createElement2(header, {}, {
+			View = createElement3(View, { tag = "size-full-0 auto-y col" }, {
+				ScheduledSquadTitle = createElement4(Text, {
 					LayoutOrder = 1,
+					Text = text,
 					tag = "size-full-0 auto-y text-heading-medium text-align-x-left text-truncate-end",
-					Text = if v38 or not v45 then if v38 or v45 then v52.partyText else v52.willYouJoinScheduledPartyText else v52.usersPartyText
+					testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--title" or nil
 				}),
-				DateTime = React.createElement(FoundationText, {
+				DateTime = React.createElement(Text, {
 					LayoutOrder = 2,
+					Text = not dateTime and "" or dateTime:FormatLocalTime("LLL", LocalizationService.RobloxLocaleId),
 					tag = "size-full-0 auto-y text-body-medium text-align-x-left",
-					Text = not dateTime and "" or dateTime:FormatLocalTime("LLL", LocalizationService.RobloxLocaleId)
+					testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--date-time" or nil
 				})
 			})
 		}),
-		Content = React.createElement(Sheet.Content, {}, {
-			Loading = if not v48 then nil else React.createElement(Foundation.Loading, {}),
-			View = if v48 then nil else React.createElement(View, {
-				tag = "size-full-0 auto-y col gap-small padding-y-small"
-			}, {
-				SubscribedUsersText = React.createElement(FoundationText, {
-					LayoutOrder = 1,
-					tag = "size-full-0 auto-y content-emphasis text-align-x-left",
-					Text = `{ v52.goingText }`
-				}),
-				SubscribedUsers = React.createElement(View, {
-					LayoutOrder = 2,
-					tag = "size-full-0 auto-y col gap-small"
-				}, unpack(v53)),
-				NotSubscribedUsersText = React.createElement(FoundationText, {
-					LayoutOrder = 3,
-					tag = "size-full-0 auto-y content-emphasis text-align-x-left",
-					Text = `{ v52.notGoingText }`
-				}),
-				NotSubscribedUsers = React.createElement(View, {
-					LayoutOrder = 4,
-					tag = "size-full-0 auto-y col gap-small"
-				}, unpack(v54))
-			})
-		}),
-		Actions = if v38 then nil else React.createElement(Sheet.Actions, {}, { React.createElement(View, {
-			tag = "size-full-0 auto-y col gap-small"
+		Content = 0,
+		Actions = 0
+	}
+
+	local createElement5 = React.createElement
+	local content = Sheet.Content
+	local loading
+
+	if state4 then
+		loading = React.createElement(Foundation.Loading, {
+			testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--loading" or nil
+		})
+	end
+
+	local view
+
+	if not state4 then
+		view = React.createElement(View, {
+			tag = "size-full-0 auto-y col gap-small padding-y-small"
 		}, {
-			JoinButton = if v44 or v45 then nil else React.createElement(Button, {
+			SubscribedUsersText = React.createElement(Text, {
 				LayoutOrder = 1,
-				onActivated = v58,
-				text = v52.joinText,
-				variant = ButtonVariant.Emphasis,
-				width = UDim.new(1, 0)
+				Text = `{v12.goingText}`,
+				tag = "size-full-0 auto-y content-emphasis text-align-x-left",
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--going-label" or nil
 			}),
-			DontJoinButton = if v44 or not v45 then nil else React.createElement(Button, {
-				LayoutOrder = 2,
-				onActivated = v58,
-				text = v52.dontJoinText,
-				variant = ButtonVariant.Standard,
-				width = UDim.new(1, 0)
-			}),
-			EditButton = if not v44 then nil else React.createElement(Button, {
+			SubscribedUsers = React.createElement(
+				View,
+				{ LayoutOrder = 2, tag = "size-full-0 auto-y col gap-small" },
+				unpack(v13)
+			),
+			NotSubscribedUsersText = React.createElement(Text, {
 				LayoutOrder = 3,
-				onActivated = v59,
-				text = v52.editText,
-				variant = ButtonVariant.Standard,
-				width = UDim.new(1, 0)
+				Text = `{v12.notGoingText}`,
+				tag = "size-full-0 auto-y content-emphasis text-align-x-left",
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--not-going-label" or nil
 			}),
-			DeleteButton = if not v44 then nil else React.createElement(Button, {
-				LayoutOrder = 4,
-				onActivated = v55,
-				text = v52.deleteText,
-				variant = ButtonVariant.Alert,
-				width = UDim.new(1, 0)
+			NotSubscribedUsers = React.createElement(
+				View,
+				{ LayoutOrder = 4, tag = "size-full-0 auto-y col gap-small" },
+				unpack(v14)
+			)
+		})
+	end
+
+	children.Content = createElement5(content, {}, { Loading = loading, View = view })
+	local actions2
+
+	if not v6 then
+		local createElement6 = React.createElement
+		local actions = Sheet.Actions
+		local createElement7 = React.createElement
+		local joinButton
+
+		if not (v8 or v9) then
+			joinButton = React.createElement(Button, {
+				LayoutOrder = 1,
+				onActivated = onActivated2,
+				text = v12.joinText,
+				variant = ButtonVariant.Emphasis,
+				width = UDim.new(1, 0),
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--join-button" or nil
 			})
-		}) })
-	}))
+		end
+
+		local dontJoinButton
+
+		if not (v8 or not v9) then
+			dontJoinButton = React.createElement(Button, {
+				LayoutOrder = 2,
+				onActivated = onActivated2,
+				text = v12.dontJoinText,
+				variant = ButtonVariant.Standard,
+				width = UDim.new(1, 0),
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--dont-join-button" or nil
+			})
+		end
+
+		local editButton
+
+		if v8 then
+			editButton = React.createElement(Button, {
+				LayoutOrder = 3,
+				onActivated = onActivated3,
+				text = v12.editText,
+				variant = ButtonVariant.Standard,
+				width = UDim.new(1, 0),
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--edit-button" or nil
+			})
+		end
+
+		local deleteButton
+
+		if v8 then
+			deleteButton = React.createElement(Button, {
+				LayoutOrder = 4,
+				onActivated = onActivated,
+				text = v12.deleteText,
+				variant = ButtonVariant.Alert,
+				width = UDim.new(1, 0),
+				testId = FFlagSquadsEnableFoundationTestIds and "--social-squad-scheduled-party-info-sheet--delete-button" or nil
+			})
+		end
+
+		actions2 = createElement6(actions, {}, {
+			createElement7(View, { tag = "size-full-0 auto-y col gap-small" }, {
+				JoinButton = joinButton,
+				DontJoinButton = dontJoinButton,
+				EditButton = editButton,
+				DeleteButton = deleteButton
+			})
+		})
+	end
+
+	children.Actions = actions2
+	return (createElement(root, v15, children))
 end
 
 return ScheduledSquadsMoreInfoSheet

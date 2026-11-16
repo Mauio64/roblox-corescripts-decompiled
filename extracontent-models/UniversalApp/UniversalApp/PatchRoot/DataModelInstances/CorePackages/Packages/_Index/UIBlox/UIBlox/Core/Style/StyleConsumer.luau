@@ -1,3 +1,4 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+local StyleContext = require(parent.StyleContext)
 
-return require(scriptParent.StyleContext).Consumer
+return StyleContext.Consumer

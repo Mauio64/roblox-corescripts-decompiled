@@ -1,71 +1,71 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Signals = require(scriptParentParent.Signals)
-local HttpSessionTracker = require(scriptParent.HttpSessionTracker)
-local createFetchSignal = require(scriptParent.createFetchSignal)
-local createCancelRequestHandler = require(scriptParent.GlobalHandlers.createCancelRequestHandler)
-local createNetworkStatsHandler = require(scriptParent.GlobalHandlers.createNetworkStatsHandler)
-local createGrafanaLoggingHandler = require(scriptParent.GlobalHandlers.createGrafanaLoggingHandler)
+local parent = script.Parent
 
-require(scriptParent.HttpStoreTypes)
+local parent2 = parent.Parent
 
-local t1 = {}
+local Signals = require(parent2.Signals)
 
-local function createHTTPStore() -- line: 31
-	-- upvalues: t1 (ref), createFetchSignal (copy), createCancelRequestHandler (copy), createNetworkStatsHandler (copy), createGrafanaLoggingHandler (copy), Signals (copy), HttpSessionTracker (copy)
+local HttpSessionTracker = require(parent.HttpSessionTracker)
+local createFetchSignal = require(parent.createFetchSignal)
+local createCancelRequestHandler = require(parent.GlobalHandlers.createCancelRequestHandler)
+local createNetworkStatsHandler = require(parent.GlobalHandlers.createNetworkStatsHandler)
+local createGrafanaLoggingHandler = require(parent.GlobalHandlers.createGrafanaLoggingHandler)
+
+require(parent.HttpStoreTypes)
+
+local v = {}
+
+local function createHTTPStore()
 	return {
-		fetch = function(s1: string?, p1) -- line: 33
-			-- upvalues: t1 (ref), createFetchSignal (copy), createCancelRequestHandler (copy), createNetworkStatsHandler (copy), createGrafanaLoggingHandler (copy), Signals (copy)
-			if s1 and t1[s1] then
-				return t1[s1].getFetchSignal, t1[s1].cancelRequest
+		fetch = function(p: string?, p2)
+			if p and v[p] then
+				return v[p].getFetchSignal, v[p].cancelRequest
 			end
 
-			local v13, v14 = createFetchSignal(p1)
-			local u15 = createCancelRequestHandler(v13)
-			local v16 = createNetworkStatsHandler(u15)
-			local v17 = createGrafanaLoggingHandler(u15)
+			local fetchSignal, v2 = createFetchSignal(p2)
 
-			local function v18() -- line: 55
-				-- upvalues: v16 (copy), v17 (copy), v14 (copy)
-				v16()
-				v17()
-				v14()
-			end
+			local cancelRequestHandler = createCancelRequestHandler(fetchSignal)
 
-			if s1 then
-				local v19 = Signals.createEffect(function(p2) -- line: 62
-					-- upvalues: u15 (ref), t1 (ref), s1 (copy)
-					local v23 = u15(p2)
+			local networkStatsHandler = createNetworkStatsHandler(cancelRequestHandler)
 
-					if v23.status == "Success" or v23.status == "Failed" then
-						t1[s1] = nil
+			local grafanaLoggingHandler = createGrafanaLoggingHandler(cancelRequestHandler)
+			local fn
+
+			if p then
+				local effect = Signals.createEffect(function(p3)
+					local v3 = cancelRequestHandler(p3)
+
+					if v3.status == "Success" or v3.status == "Failed" then
+						v[p] = nil
 					end
 				end)
 
-				function v18() -- line: 69
-					-- upvalues: v19 (copy), v16 (copy), v17 (copy), v14 (copy), t1 (ref), s1 (copy)
-					v19()
-					v16()
-					v17()
-					v14()
-					t1[s1] = nil
+				fn = function()
+					effect()
+					networkStatsHandler()
+					grafanaLoggingHandler()
+					v2()
+
+					v[p] = nil
 				end
 
-				t1[s1] = {
-					getFetchSignal = u15,
-					cancelRequest = v18
-				}
+				v[p] = { getFetchSignal = cancelRequestHandler, cancelRequest = fn }
+			else
+				fn = function()
+					networkStatsHandler()
+					grafanaLoggingHandler()
+					v2()
+				end
 			end
 
-			return u15, v18
+			return cancelRequestHandler, fn
 		end,
-		cancelAll = function() -- line: 84
-			-- upvalues: t1 (ref), HttpSessionTracker (copy)
-			for _, v21 in t1 do
-				v21.cancelRequest()
+		cancelAll = function()
+			for _, v2 in v do
+				v2.cancelRequest()
 			end
 
-			t1 = {}
+			v = {}
+
 			HttpSessionTracker.cancelAll()
 		end
 	}

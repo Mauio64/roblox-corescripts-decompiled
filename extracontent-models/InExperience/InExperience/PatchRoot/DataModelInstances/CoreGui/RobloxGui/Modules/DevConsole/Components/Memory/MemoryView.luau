@@ -1,324 +1,351 @@
+local FFlagDevConsoleKeyCollisionFix = require(script.Parent.Flags.FFlagDevConsoleKeyCollisionFix)
+
 local CorePackages = game:GetService("CorePackages")
 local TweenService = game:GetService("TweenService")
 local Roact = require(CorePackages.Packages.Roact)
+
 local Components = script.Parent.Parent.Parent.Components
 local HeaderButton = require(Components.HeaderButton)
 local MemoryViewEntry = require(script.Parent.MemoryViewEntry)
+
 local Constants = require(script.Parent.Parent.Parent.Constants)
 local LineWidth = Constants.GeneralFormatting.LineWidth
 local LineColor = Constants.GeneralFormatting.LineColor
+
 local ChartHeaderNames = Constants.MemoryFormatting.ChartHeaderNames
 local HeaderFrameHeight = Constants.GeneralFormatting.HeaderFrameHeight
 local ValueCellWidth = Constants.MemoryFormatting.ValueCellWidth
 local CellPadding = Constants.MemoryFormatting.CellPadding
 local ValuePadding = Constants.MemoryFormatting.ValuePadding
+
 local EntryFrameHeight = Constants.GeneralFormatting.EntryFrameHeight
 local LineGraphHeight = Constants.GeneralFormatting.LineGraphHeight
+
 local NoResultSearchStr = Constants.GeneralFormatting.NoResultSearchStr
+
 local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0, false, 0)
-local v19 = Roact.Component:extend("MemoryView")
 
-local function getX(p1) -- line: 37
-	return p1.time
-end
-local function getY(p2) -- line: 41
-	return p2.data
-end
-local function formatValueStr(p3) -- line: 45
-	return string.format("%.3f", p3)
+local extended = Roact.Component:extend("MemoryView")
+
+local function getX(p)
+	return p.time
 end
 
-function v19.init(p4, p5) -- line: 49
-	-- upvalues: EntryFrameHeight (copy), TweenService (copy), tweenInfo (copy), Roact (copy)
-	function p4.getOnButtonPress(p6, p7) -- line: 50
-		-- upvalues: p4 (copy), EntryFrameHeight (copy), TweenService (copy), tweenInfo (copy)
-		return function(_, _) -- line: 51
-			-- upvalues: p4 (copy), p6 (copy), p7 (copy), EntryFrameHeight (copy), TweenService (copy), tweenInfo (copy)
-			if p4.state.expandIndex ~= p6 and p6 then
-				local current = p4.scrollingRef.current
+local function getY(p)
+	return p.data
+end
 
-				if current then
-					local v80 = (p7 - 2.4) * EntryFrameHeight
+local function formatValueStr(p)
+	return string.format("%.3f", p)
+end
 
-					TweenService:Create(current, tweenInfo, {
-						CanvasPosition = Vector2.new(0, v80)
-					}):Play()
-				end
+function extended:init(p)
+	function self.getOnButtonPress(p2, p3)
+		return function(_, _)
+			local current = self.state.expandIndex ~= p2 and p2 and self.scrollingRef.current
+
+			if current then
+				local v = (p3 - 2.4) * EntryFrameHeight
+				TweenService:Create(current, tweenInfo, { CanvasPosition = Vector2.new(0, v) }):Play()
 			end
 
-			p4:setState({
-				expandIndex = p4.state.expandIndex ~= p6 and p6
-			})
-		end
-	end
-	function p4.onSortChanged(p10) -- line: 71
-		-- upvalues: p5 (copy), p4 (copy)
-		if p10 == p5.targetMemoryData:getSortType() then
-			p5.targetMemoryData:setSortType(p10)
-			p4:setState({
-				reverseSort = not p4.state.reverseSort
-			})
-
-			return
-		end
-
-		p5.targetMemoryData:setSortType(p10)
-		p4:setState({
-			reverseSort = false
-		})
-	end
-	function p4.onCanvasPosChanged() -- line: 87
-		-- upvalues: p4 (copy)
-		local CanvasPosition = p4.scrollingRef.current.CanvasPosition
-
-		if CanvasPosition ~= p4.state.canvasPos then
-			p4:setState({
-				absScrollSize = p4.scrollingRef.current.AbsoluteSize,
-				canvasPos = CanvasPosition
+			self:setState({
+				expandIndex = self.state.expandIndex ~= p2 and p2
 			})
 		end
 	end
 
-	p4.scrollingRef = Roact.createRef()
-	p4.state = {
+	function self.onSortChanged(p2)
+		if p2 == p.targetMemoryData:getSortType() then
+			p.targetMemoryData:setSortType(p2)
+			self:setState({
+				reverseSort = not self.state.reverseSort
+			})
+		else
+			p.targetMemoryData:setSortType(p2)
+			self:setState({ reverseSort = false })
+		end
+	end
+
+	function self.onCanvasPosChanged()
+		local canvasPosition = self.scrollingRef.current.CanvasPosition
+
+		if self.state.canvasPos ~= canvasPosition then
+			self:setState({
+				absScrollSize = self.scrollingRef.current.AbsoluteSize,
+				canvasPos = canvasPosition
+			})
+		end
+	end
+
+	self.scrollingRef = Roact.createRef()
+
+	self.state = {
+		memoryData = p.targetMemoryData:getMemoryData(),
 		reverseSort = false,
-		expandIndex = false,
-		memoryData = p5.targetMemoryData:getMemoryData()
+		expandIndex = false
 	}
 end
-function v19.willUpdate(p11) -- line: 106
-	if p11.canvasPosConnector then
-		p11.canvasPosConnector:Disconnect()
+
+function extended.willUpdate(p)
+	if p.canvasPosConnector then
+		p.canvasPosConnector:Disconnect()
 	end
 end
-function v19.didUpdate(p12) -- line: 112
-	if p12.scrollingRef.current then
-		p12.canvasPosConnector = p12.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p12.onCanvasPosChanged)
+
+function extended:didUpdate()
+	if self.scrollingRef.current then
+		self.canvasPosConnector = self.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(self.onCanvasPosChanged)
 	end
 end
-function v19.didMount(p13) -- line: 119
-	p13.treeViewItemConnector = p13.props.targetMemoryData:treeUpdatedSignal():Connect(function(p14) -- line: 121
-		-- upvalues: p13 (copy)
-		p13:setState({
-			memoryData = p14
-		})
+
+function extended:didMount()
+	self.treeViewItemConnector = self.props.targetMemoryData:treeUpdatedSignal():Connect(function(memoryData)
+		self:setState({ memoryData = memoryData })
 	end)
 
-	if p13.scrollingRef.current then
-		p13.canvasPosConnector = p13.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p13.onCanvasPosChanged)
-		p13:setState({
-			absScrollSize = p13.scrollingRef.current.AbsoluteSize,
-			canvasPos = p13.scrollingRef.current.CanvasPosition
+	if self.scrollingRef.current then
+		self.canvasPosConnector = self.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(self.onCanvasPosChanged)
+
+		self:setState({
+			absScrollSize = self.scrollingRef.current.AbsoluteSize,
+			canvasPos = self.scrollingRef.current.CanvasPosition
 		})
 	end
 end
-function v19.willUnmount(p15) -- line: 138
-	p15.treeViewItemConnector:Disconnect()
+
+function extended.willUnmount(p)
+	p.treeViewItemConnector:Disconnect()
 end
-function v19.appendAdditionTabInformation(p16, p17, p18, p19, p20, p21) -- line: 142
-	-- upvalues: EntryFrameHeight (copy), Roact (copy), MemoryViewEntry (copy), formatValueStr (copy)
-	local CanvasPosition = p16.scrollingRef.current.CanvasPosition
-	local AbsoluteSize = p16.scrollingRef.current.AbsoluteSize
 
-	for _, v in ipairs(p18) do
-		local name = v.name
-		local value = v.value
-		local v44 = p19 .. name
+function extended:appendAdditionTabInformation(p, list, p2, depth, state)
+	local canvasPosition = self.scrollingRef.current.CanvasPosition
+	local absoluteSize = self.scrollingRef.current.AbsoluteSize
 
-		p21.layoutOrder = p21.layoutOrder + 1
+	for i, item in ipairs(list) do
+		local name = item.name
+		local value = item.value
+		local v = p2 .. name
 
-		if p21.scrollingFrameHeight + EntryFrameHeight >= CanvasPosition.Y and p21.usedFrameSpace < AbsoluteSize.Y then
-			p17[p19 .. name] = Roact.createElement(MemoryViewEntry, {
-				showGraph = false,
-				size = UDim2.new(1, 0, 0, EntryFrameHeight),
-				depth = p20,
-				name = name,
-				value = value,
-				formatValueStr = formatValueStr,
-				layoutOrder = p21.layoutOrder
-			})
-
-			if p21.paddingHeight < 0 then
-				p21.paddingHeight = p21.scrollingFrameHeight
+		if FFlagDevConsoleKeyCollisionFix then
+			if item.id then
+				v = `{p2}_{item.id}`
 			else
-				p21.usedFrameSpace = p21.usedFrameSpace + EntryFrameHeight
+				v = `{p2}_{name}_{i}`
 			end
 		end
 
-		p21.scrollingFrameHeight = p21.scrollingFrameHeight + EntryFrameHeight
+		state.layoutOrder += 1
 
-		if v.moreInfo and type(v.moreInfo) == "table" then
-			p16:appendAdditionTabInformation(p17, v.moreInfo, v44, p20 + 1, p21)
+		if
+			state.scrollingFrameHeight + EntryFrameHeight >= canvasPosition.Y
+			and state.usedFrameSpace < absoluteSize.Y
+		then
+			if not FFlagDevConsoleKeyCollisionFix then
+				v = p2 .. name
+			end
+
+			p[v] = Roact.createElement(MemoryViewEntry, {
+				size = UDim2.new(1, 0, 0, EntryFrameHeight),
+				depth = depth,
+				name = name,
+				showGraph = false,
+				value = value,
+				formatValueStr = formatValueStr,
+				layoutOrder = state.layoutOrder
+			})
+
+			if state.paddingHeight < 0 then
+				state.paddingHeight = state.scrollingFrameHeight
+			else
+				state.usedFrameSpace += EntryFrameHeight
+			end
+		end
+
+		state.scrollingFrameHeight += EntryFrameHeight
+
+		if item.moreInfo and type(item.moreInfo) == "table" then
+			self:appendAdditionTabInformation(p, item.moreInfo, v, depth + 1, state)
 		end
 	end
 end
-function v19.recursiveConstructEntries(p22, p23, p24, p25, p26) -- line: 183
-	-- upvalues: EntryFrameHeight (copy), LineGraphHeight (copy), Roact (copy), MemoryViewEntry (copy), formatValueStr (copy), getX (copy), getY (copy)
-	assert(p22.scrollingRef.current, "ScrollingFrame not initialized yet")
 
-	local expandIndex = p22.state.expandIndex
-	local v51 = p22.props.searchTerm or ""
-	local reverseSort = p22.state.reverseSort
-	local CanvasPosition = p22.scrollingRef.current.CanvasPosition
-	local AbsoluteSize = p22.scrollingRef.current.AbsoluteSize
-	local name = p24.name
+function extended:recursiveConstructEntries(p, p2, depth, state, p3)
+	assert(self.scrollingRef.current, "ScrollingFrame not initialized yet")
 
-	if string.find(name:lower(), v51:lower()) then
-		local v56 = expandIndex == name
-		local v57 = v56 and EntryFrameHeight + LineGraphHeight or EntryFrameHeight
+	local expandIndex = self.state.expandIndex
+	local searchTerm = self.props.searchTerm or ""
+	local reverseSort = self.state.reverseSort
+	local canvasPosition = self.scrollingRef.current.CanvasPosition
+	local absoluteSize = self.scrollingRef.current.AbsoluteSize
 
-		p26.layoutOrder = p26.layoutOrder + 1
+	local v = p2.name
+	local v2
 
-		if p26.scrollingFrameHeight + v57 >= CanvasPosition.Y and p26.usedFrameSpace < AbsoluteSize.Y then
-			p23[name] = Roact.createElement(MemoryViewEntry, {
-				size = UDim2.new(1, 0, 0, v57),
-				depth = p25,
-				name = p24.name,
-				showGraph = v56,
-				dataStats = p24.dataStats,
-				onButtonPress = p22.getOnButtonPress(name, p26.layoutOrder),
+	if p3 then
+		v2 = `{p3}/{v}`
+	else
+		v2 = v
+	end
+
+	if string.find(v:lower(), searchTerm:lower()) then
+		if FFlagDevConsoleKeyCollisionFix then
+			v = v2
+		end
+
+		local showGraph = expandIndex == v
+		local v3 = showGraph and EntryFrameHeight + LineGraphHeight or EntryFrameHeight
+		state.layoutOrder += 1
+
+		if state.scrollingFrameHeight + v3 >= canvasPosition.Y and state.usedFrameSpace < absoluteSize.Y then
+			p[v] = Roact.createElement(MemoryViewEntry, {
+				size = UDim2.new(1, 0, 0, v3),
+				depth = depth,
+				name = p2.name,
+				showGraph = showGraph,
+				dataStats = p2.dataStats,
+				onButtonPress = self.getOnButtonPress(v, state.layoutOrder),
 				formatValueStr = formatValueStr,
 				getX = getX,
 				getY = getY,
-				layoutOrder = p26.layoutOrder
+				layoutOrder = state.layoutOrder
 			})
 
-			if p26.paddingHeight < 0 then
-				p26.paddingHeight = p26.scrollingFrameHeight
+			if state.paddingHeight < 0 then
+				state.paddingHeight = state.scrollingFrameHeight
 			else
-				p26.usedFrameSpace = p26.usedFrameSpace + v57
+				state.usedFrameSpace += v3
 			end
 		end
 
-		p26.scrollingFrameHeight = p26.scrollingFrameHeight + v57
+		state.scrollingFrameHeight += v3
 
-		if v56 and p24.dataStats.additionalInfoFunc then
-			p22:appendAdditionTabInformation(p23, p24.dataStats.additionalInfoFunc(), p24.name, p25 + 1, p26)
+		if showGraph and p2.dataStats.additionalInfoFunc then
+			self:appendAdditionTabInformation(p, p2.dataStats.additionalInfoFunc(), v, depth + 1, state)
 		end
 	end
 
-	local sortedChildren = p24.dataStats.sortedChildren
+	local sortedChildren = p2.dataStats.sortedChildren
 
 	if sortedChildren then
 		if reverseSort then
-			local v59 = #sortedChildren
+			local count = #sortedChildren
 
-			for i = 1, v59 do
-				p22:recursiveConstructEntries(p23, sortedChildren[v59 - i + 1], p25 + 1, p26)
+			for i = 1, count do
+				self:recursiveConstructEntries(p, sortedChildren[count - i + 1], depth + 1, state, v2)
 			end
-
-			return
-		end
-
-		for _, v in ipairs(sortedChildren) do
-			p22:recursiveConstructEntries(p23, v, p25 + 1, p26)
+		else
+			for _, v3 in ipairs(sortedChildren) do
+				self:recursiveConstructEntries(p, v3, depth + 1, state, v2)
+			end
 		end
 	end
 end
-function v19.render(p27) -- line: 251
-	-- upvalues: Roact (copy), Constants (copy), NoResultSearchStr (copy), HeaderFrameHeight (copy), HeaderButton (copy), ChartHeaderNames (copy), ValueCellWidth (copy), ValuePadding (copy), CellPadding (copy), LineColor (copy), LineWidth (copy)
-	local t1 = {}
-	local layoutOrder = p27.props.layoutOrder
-	local size = p27.props.size
-	local v67 = p27.props.searchTerm or ""
-	local t2 = {
-		scrollingFrameHeight = 0,
-		paddingHeight = -1,
-		usedFrameSpace = 0,
-		layoutOrder = 1
-	}
 
-	if p27.scrollingRef.current then
-		for _, v in ipairs(p27.state.memoryData) do
-			p27:recursiveConstructEntries(t1, v, 0, t2)
+function extended:render()
+	local children = {}
+	local layoutOrder = self.props.layoutOrder
+	local size = self.props.size
+	local searchTerm = self.props.searchTerm or ""
+
+	local v = { scrollingFrameHeight = 0, paddingHeight = -1, usedFrameSpace = 0, layoutOrder = 1 }
+
+	if self.scrollingRef.current then
+		for _, v2 in ipairs(self.state.memoryData) do
+			self:recursiveConstructEntries(children, v2, 0, v)
 		end
 
-		t1.UIListLayout = Roact.createElement("UIListLayout", {
+		children.UIListLayout = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		})
-		t1.WindowingPadding = Roact.createElement("Frame", {
+
+		children.WindowingPadding = Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, v.paddingHeight),
 			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, t2.paddingHeight)
+			LayoutOrder = 1
 		})
 	end
 
-	if t2.layoutOrder == 1 then
-		if v67 == "" then
-			t1.noDataMessage = Roact.createElement("TextLabel", {
-				Text = "Awaiting Memory Stats",
-				BackgroundTransparency = 1,
+	if v.layoutOrder == 1 then
+		if searchTerm == "" then
+			children.noDataMessage = Roact.createElement("TextLabel", {
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 0, 0),
+				Text = "Awaiting Memory Stats",
 				TextColor3 = Constants.Color.Text,
+				BackgroundTransparency = 1,
 				LayoutOrder = layoutOrder
 			})
 		else
-			local v71 = string.format(NoResultSearchStr, v67)
+			local text = string.format(NoResultSearchStr, searchTerm)
 
-			t1.noDataMessage = Roact.createElement("TextLabel", {
-				BackgroundTransparency = 1,
+			children.noDataMessage = Roact.createElement("TextLabel", {
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 0, 0),
-				Text = v71,
+				Text = text,
 				TextColor3 = Constants.Color.Text,
+				BackgroundTransparency = 1,
 				LayoutOrder = layoutOrder
 			})
 		end
 	end
 
 	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
 		Size = size,
+		BackgroundTransparency = 1,
 		LayoutOrder = layoutOrder
 	}, {
-		Header = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, HeaderFrameHeight)
-		}, {
-			Name = Roact.createElement(HeaderButton, {
-				text = ChartHeaderNames[1],
-				size = UDim2.new(1 - ValueCellWidth, -ValuePadding - CellPadding, 0, HeaderFrameHeight),
-				pos = UDim2.new(0, CellPadding, 0, 0),
-				sortfunction = p27.onSortChanged
-			}),
-			ValueMB = Roact.createElement(HeaderButton, {
-				text = ChartHeaderNames[2],
-				size = UDim2.new(ValueCellWidth, -CellPadding, 0, HeaderFrameHeight),
-				pos = UDim2.new(1 - ValueCellWidth, ValuePadding, 0, 0),
-				sortfunction = p27.onSortChanged
-			}),
-			TopHorizontal = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, 1),
-				BackgroundColor3 = LineColor
-			}),
-			LowerHorizontal = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, LineWidth),
-				Position = UDim2.new(0, 0, 1, 0),
-				BackgroundColor3 = LineColor
-			}),
-			vertical = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				Size = UDim2.new(0, LineWidth, 1, 0),
-				Position = UDim2.new(1 - ValueCellWidth, 0, 0, 0),
-				BackgroundColor3 = LineColor
-			})
-		}),
+		Header = Roact.createElement(
+			"Frame",
+			{
+				Size = UDim2.new(1, 0, 0, HeaderFrameHeight),
+				BackgroundTransparency = 1
+			},
+			{
+				Name = Roact.createElement(HeaderButton, {
+					text = ChartHeaderNames[1],
+					size = UDim2.new(1 - ValueCellWidth, -ValuePadding - CellPadding, 0, HeaderFrameHeight),
+					pos = UDim2.new(0, CellPadding, 0, 0),
+					sortfunction = self.onSortChanged
+				}),
+				ValueMB = Roact.createElement(HeaderButton, {
+					text = ChartHeaderNames[2],
+					size = UDim2.new(ValueCellWidth, -CellPadding, 0, HeaderFrameHeight),
+					pos = UDim2.new(1 - ValueCellWidth, ValuePadding, 0, 0),
+					sortfunction = self.onSortChanged
+				}),
+				TopHorizontal = Roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 0, 1),
+					BackgroundColor3 = LineColor,
+					BorderSizePixel = 0
+				}),
+				LowerHorizontal = Roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 0, LineWidth),
+					Position = UDim2.new(0, 0, 1, 0),
+					BackgroundColor3 = LineColor,
+					BorderSizePixel = 0
+				}),
+				vertical = Roact.createElement("Frame", {
+					Size = UDim2.new(0, LineWidth, 1, 0),
+					Position = UDim2.new(1 - ValueCellWidth, 0, 0, 0),
+					BackgroundColor3 = LineColor,
+					BorderSizePixel = 0
+				})
+			}
+		),
 		Entries = Roact.createElement("ScrollingFrame", {
 			Size = UDim2.new(1, 0, 1, -HeaderFrameHeight),
 			Position = UDim2.new(0, 0, 0, HeaderFrameHeight),
 			BackgroundTransparency = 1,
 			VerticalScrollBarInset = 1,
 			ScrollBarThickness = 5,
-			CanvasSize = UDim2.new(1, 0, 0, t2.scrollingFrameHeight),
-			[Roact.Ref] = p27.scrollingRef
-		}, t1)
+			CanvasSize = UDim2.new(1, 0, 0, v.scrollingFrameHeight),
+			[Roact.Ref] = self.scrollingRef
+		}, children)
 	})
 end
 
-return v19
+return extended

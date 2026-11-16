@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index["ultimate-list"]["ultimate-list"]))
+local ultimatelist = require(index["ultimate-list"]["ultimate-list"])
+
+return ultimatelist

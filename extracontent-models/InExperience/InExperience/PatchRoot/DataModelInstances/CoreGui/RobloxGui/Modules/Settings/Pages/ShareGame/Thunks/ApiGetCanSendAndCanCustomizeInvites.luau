@@ -1,16 +1,19 @@
 local CorePackages = game:GetService("CorePackages")
-local GetCanSendAndCanCustomizeInvites = require(CorePackages.Workspace.Packages.GameInvite).GetCanSendAndCanCustomizeInvites
+
+local GameInvite = require(CorePackages.Workspace.Packages.GameInvite)
+local GetCanSendAndCanCustomizeInvites = GameInvite.GetCanSendAndCanCustomizeInvites
+
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local httpRequest = require(RobloxGui.Modules.Common.httpRequest)
 
-return function(s1: string, n1: number?) -- line: 12
-	-- upvalues: httpRequest (copy), HttpRbxApiService (copy), GetCanSendAndCanCustomizeInvites (copy)
-	local v8 = httpRequest(HttpRbxApiService)
-	local v9, v10 = GetCanSendAndCanCustomizeInvites(v8, s1, n1):await()
+return function(p: string, p2: number?)
+	local v, v2 = GetCanSendAndCanCustomizeInvites(httpRequest(HttpRbxApiService), p, p2):await()
 
-	if v9 and (v10 and v10.responseBody) then
-		return v10.responseBody.canPrompt, v10.responseBody.canCustomize
+	if v and v2 and v2.responseBody then
+		return v2.responseBody.canPrompt, v2.responseBody.canCustomize
 	end
 
 	return false, false

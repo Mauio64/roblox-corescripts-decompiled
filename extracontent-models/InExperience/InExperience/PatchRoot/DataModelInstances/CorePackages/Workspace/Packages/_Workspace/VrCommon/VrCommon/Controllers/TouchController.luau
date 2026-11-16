@@ -1,8 +1,12 @@
 local VrCommon = script:FindFirstAncestor("VrCommon")
-local VrCommonParent = VrCommon.Parent
-local Create = require(VrCommonParent.AppCommonLib).Create
+local parent = VrCommon.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local Create = AppCommonLib.Create
+
 local FIntVRTouchControllerTransparency = require(VrCommon.Flags.FIntVRTouchControllerTransparency)
-local t1 = {
+
+local v = {
 	[Enum.UserCFrame.RightHand] = {
 		Body = {
 			meshId = "rbxassetid://12954883737",
@@ -88,7 +92,8 @@ local t1 = {
 		}
 	}
 }
-local t2 = {
+
+local v2 = {
 	[Enum.KeyCode.ButtonL1] = "Grip",
 	[Enum.KeyCode.ButtonL2] = "Trigger",
 	[Enum.KeyCode.ButtonL3] = "Stick",
@@ -104,238 +109,261 @@ local t2 = {
 	[Enum.KeyCode.ButtonX] = "ButtonX",
 	[Enum.KeyCode.ButtonY] = "ButtonY"
 }
+
 local Granite = Enum.Material.Granite
-local t3 = {}
 
-t3.__index = t3
+local TouchController = {}
+TouchController.__index = TouchController
 
-function t3.new(p1) -- line: 119
-	-- upvalues: t3 (copy), Create (copy), t1 (copy), Granite (copy), FIntVRTouchControllerTransparency (copy)
-	local self = setmetatable({}, t3)
+function TouchController.new(userCFrame)
+	local self = setmetatable({}, TouchController)
+	self.userCFrame = userCFrame
 
-	self.userCFrame = p1
-	self.model = Create("Model")({
-		Name = "TouchController",
-		Archivable = false
-	})
+	self.model = Create("Model")({ Name = "TouchController", Archivable = false })
+
 	self.origin = Create("Part")({
+		Parent = self.model,
 		Name = "Origin",
 		Anchored = true,
 		Transparency = 1,
-		Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
+		Size = Vector3.new(0.05, 0.05, 0.05),
 		CanCollide = false,
 		CanQuery = false,
-		CanTouch = false,
-		Parent = self.model
+		CanTouch = false
 	})
+
 	self.scale = 1
 	self.parts = {}
 
-	for k, v in pairs(t1[p1]) do
-		local vector3 = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844)
+	for k, v3 in pairs(v[userCFrame]) do
+		local scale = Vector3.new(0.032, 0.032, 0.032)
 
-		if v.scale then
-			vector3 *= v.scale
+		if v3.scale then
+			scale *= v3.scale
 		end
 
-		local v14 = Create("Part")({
+		local v4 = Create("Part")({
+			Parent = self.model,
+			Name = k,
 			Anchored = true,
+			Material = Granite,
+			Size = v3.size or Vector3.new(0.05, 0.05, 0.05),
+			CFrame = self.origin.CFrame * v3.offset,
 			CanCollide = false,
 			CanQuery = false,
 			CanTouch = false,
-			Parent = self.model,
-			Name = k,
-			Material = Granite,
-			Size = v.size or Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
-			CFrame = self.origin.CFrame * v.offset,
 			Transparency = FIntVRTouchControllerTransparency / 100
 		})
 
 		Create("SpecialMesh")({
+			Parent = v4,
 			Name = "Mesh",
-			Parent = v14,
-			MeshId = v.meshId,
-			TextureId = v.textureId,
-			Scale = vector3
+			MeshId = v3.meshId,
+			TextureId = v3.textureId,
+			Scale = scale
 		})
+
 		Create("Weld")({
+			Parent = v4,
 			Name = "Weld",
-			Parent = v14,
 			Part0 = self.origin,
-			Part1 = v14,
-			C0 = v.offset
+			Part1 = v4,
+			C0 = v3.offset
 		})
-		self.parts[k] = v14
+
+		self.parts[k] = v4
 	end
 
 	self.model.PrimaryPart = self.origin
 
 	return self
 end
-function t3.setCFrame(p2, p3) -- line: 183
-	if p2.userCFrame == Enum.UserCFrame.RightHand then
-		p2.model:SetPrimaryPartCFrame(p3 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(-0.03, 0.08, -0.06))
 
-		return
+function TouchController.setCFrame(p, p2)
+	if p.userCFrame == Enum.UserCFrame.RightHand then
+		p.model:SetPrimaryPartCFrame(p2 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(-0.03, 0.08, -0.06))
+	else
+		p.model:SetPrimaryPartCFrame(p2 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0.03, 0.08, -0.06))
 	end
-
-	p2.model:SetPrimaryPartCFrame(p3 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0.03, 0.08, -0.06))
 end
-function t3.setCFrameAndScale(p4, p5, p6) -- line: 191
-	-- upvalues: t1 (copy)
-	local v20 = p4.userCFrame ~= Enum.UserCFrame.RightHand and -1 or 1
 
-	p4.model:SetPrimaryPartCFrame(p5 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(-0.03 * p6 * v20, 0.08 * p6, -0.06 * p6))
+function TouchController:setCFrameAndScale(p, scale)
+	local v3 = self.userCFrame == Enum.UserCFrame.RightHand and 1 or -1
+	self.model:SetPrimaryPartCFrame(p * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(-0.03 * scale * v3, 0.08 * scale, -0.06 * scale))
 
-	if p6 ~= p4.scale then
-		p4.scale = p6
+	if self.scale ~= scale then
+		self.scale = scale
 
-		for k, v in pairs(t1[p4.userCFrame]) do
-			local v23 = p4.parts[k]
+		for k, v4 in pairs(v[self.userCFrame]) do
+			local part = self.parts[k]
 
-			if v23 then
-				local vector3 = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844)
+			if not part then
+				continue
+			end
 
-				if v.scale then
-					vector3 *= v.scale
-				end
+			local v5 = Vector3.new(0.032, 0.032, 0.032)
 
-				local Mesh = v23:FindFirstChild("Mesh")
-				local Weld = v23:FindFirstChild("Weld")
-				local offset = v.offset
-				local v28 = CFrame.new(offset.p * p4.scale) * (offset - offset.p)
+			if v4.scale then
+				v5 *= v4.scale
+			end
 
-				v23.CFrame = p4.origin.CFrame * v28
+			local mesh = part:FindFirstChild("Mesh")
+			local weld = part:FindFirstChild("Weld")
 
-				if Mesh then
-					Mesh.Scale = vector3 * p4.scale
-				end
+			local offset = v4.offset
+			local c0 = CFrame.new(offset.p * self.scale) * (offset - offset.p)
+			part.CFrame = self.origin.CFrame * c0
 
-				if Weld then
-					Weld.C0 = v28
-				end
+			if mesh then
+				mesh.Scale = v5 * self.scale
+			end
+
+			if weld then
+				weld.C0 = c0
 			end
 		end
 	end
 end
-function t3.setButtonState(p7, p8, p9) -- line: 224
-	-- upvalues: t1 (copy)
-	local v32 = t1[p7.userCFrame][p8]
 
-	if not v32 then
+function TouchController:setButtonState(p, p2)
+	local v3 = v[self.userCFrame][p]
+
+	if not v3 then
 		return
 	end
 
-	local offset = v32.offset
-	local moveOffset = v32.moveOffset
+	local offset = v3.offset
+	local moveOffset = v3.moveOffset
 
 	if offset and moveOffset then
-		local v35 = CFrame.new(offset.p * p7.scale) * (offset - offset.p)
-		local v36 = CFrame.new(moveOffset.p * p7.scale) * (moveOffset - moveOffset.p)
-		local v37 = p7.parts[p8]
+		local c0 = CFrame.new(offset.p * self.scale) * (offset - offset.p)
+		local v4 = CFrame.new(moveOffset.p * self.scale) * (moveOffset - moveOffset.p)
 
-		if v37 then
-			local Mesh = v37:FindFirstChild("Mesh")
-			local Weld = v37:FindFirstChild("Weld")
+		local part = self.parts[p]
 
-			if Weld then
-				if p9 then
-					v37.CFrame = p7.origin.CFrame * v35 * v36
-					Weld.C0 = v35 * v36
+		if part then
+			local mesh = part:FindFirstChild("Mesh")
+			local weld = part:FindFirstChild("Weld")
+
+			if weld then
+				if p2 then
+					part.CFrame = self.origin.CFrame * c0 * v4
+					weld.C0 = c0 * v4
 				else
-					v37.CFrame = p7.origin.CFrame * v35
-					Weld.C0 = v35
+					part.CFrame = self.origin.CFrame * c0
+					weld.C0 = c0
 				end
 			end
 
-			if Mesh then
-				if p9 then
-					Mesh.VertexColor = Vector3.new(0.5, 0.5, 0.5)
-
-					return
+			if mesh then
+				if p2 then
+					mesh.VertexColor = Vector3.new(0.5, 0.5, 0.5)
+				else
+					mesh.VertexColor = Vector3.new(1, 1, 1)
 				end
-
-				Mesh.VertexColor = Vector3.new(1, 1, 1)
 			end
 		end
 	end
 end
-function t3.setTriggerState(p10, p11) -- line: 261
-	-- upvalues: t1 (copy)
-	local offset = t1[p10.userCFrame].Trigger.offset
-	local v43 = CFrame.new(offset.p * p10.scale) * (offset - offset.p)
-	local Trigger = p10.parts.Trigger
-	local Weld = Trigger:FindFirstChild("Weld")
 
-	if Weld then
-		local v46 = Vector3.new(0, 0.05000000074505806, 0.02500000037252903) * p10.scale
-		local v47 = p11 * 0.3490658503988659 + 0
-		local v48 = v43 * CFrame.new(v46) * CFrame.Angles(v47, 0, 0) * CFrame.new(-v46)
+function TouchController:setTriggerState(p)
+	local offset = v[self.userCFrame].Trigger.offset
+	local v3 = CFrame.new(offset.p * self.scale) * (offset - offset.p)
 
-		Trigger.CFrame = p10.origin.CFrame * v48
-		Weld.C0 = v48
+	local trigger = self.parts.Trigger
+	local weld = trigger:FindFirstChild("Weld")
+
+	if weld then
+		local v4 = Vector3.new(0, 0.05, 0.025) * self.scale
+
+		local v5 = p * 0.3490658503988659 + 0
+		local c0 = v3 * CFrame.new(v4) * CFrame.Angles(v5, 0, 0) * CFrame.new(-v4)
+		trigger.CFrame = self.origin.CFrame * c0
+		weld.C0 = c0
 	end
 end
-function t3.setStickState(p12, p13) -- line: 278
-	-- upvalues: t1 (copy)
-	local offset = t1[p12.userCFrame].Stick.offset
-	local v52 = CFrame.new(offset.p * p12.scale) * (offset - offset.p)
-	local Stick = p12.parts.Stick
-	local Weld = Stick:FindFirstChild("Weld")
 
-	if Weld then
-		local v55 = Vector3.new(-0.0007999999797903001, -0.026900000870227814, 0.0013000000035390258) * p12.scale
-		local v56 = p13.X * 0.3490658503988659 + 0
-		local v57 = p13.Y * 0.3490658503988659 + 0
-		local v58 = v52 * CFrame.new(v55) * CFrame.Angles(v57, 0, v56) * CFrame.new(-v55)
+function TouchController:setStickState(p)
+	local offset = v[self.userCFrame].Stick.offset
+	local v3 = CFrame.new(offset.p * self.scale) * (offset - offset.p)
 
-		Stick.CFrame = p12.origin.CFrame * v58
-		Weld.C0 = v58
+	local stick = self.parts.Stick
+	local weld = stick:FindFirstChild("Weld")
+
+	if weld then
+		local v4 = Vector3.new(-0.0008, -0.0269, 0.0013) * self.scale
+
+		local v5 = p.X * 0.3490658503988659 + 0
+		local v6 = p.Y * 0.3490658503988659 + 0
+		local c0 = v3 * CFrame.new(v4) * CFrame.Angles(v6, 0, v5) * CFrame.new(-v4)
+		stick.CFrame = self.origin.CFrame * c0
+		weld.C0 = c0
 	end
 end
-function t3.onInputPositionChanged(p14, p15) -- line: 296
-	if p14.userCFrame == Enum.UserCFrame.RightHand and p15.KeyCode == Enum.KeyCode.ButtonR2 or p14.userCFrame == Enum.UserCFrame.LeftHand and p15.KeyCode == Enum.KeyCode.ButtonL2 then
-		p14:setTriggerState(p15.Position.Z)
 
+function TouchController:onInputPositionChanged(p)
+	if
+		self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonR2
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonL2
+	then
+		self:setTriggerState(p.Position.Z)
 		return
 	end
 
-	if p14.userCFrame == Enum.UserCFrame.RightHand and p15.KeyCode == Enum.KeyCode.Thumbstick2 or p14.userCFrame == Enum.UserCFrame.LeftHand and p15.KeyCode == Enum.KeyCode.Thumbstick1 then
-		p14:setStickState(p15.Position)
-
+	if
+		(self.userCFrame ~= Enum.UserCFrame.RightHand or p.KeyCode ~= Enum.KeyCode.Thumbstick2)
+		and (self.userCFrame ~= Enum.UserCFrame.LeftHand or p.KeyCode ~= Enum.KeyCode.Thumbstick1)
+	then
 		return
 	end
+
+	self:setStickState(p.Position)
 end
-function t3.onButtonInputChanged(p16, p17, p18) -- line: 314
-	-- upvalues: t2 (copy)
-	if p16.userCFrame == Enum.UserCFrame.LeftHand and p17.KeyCode == Enum.KeyCode.ButtonL1 or p16.userCFrame == Enum.UserCFrame.RightHand and p17.KeyCode == Enum.KeyCode.ButtonR1 or p16.userCFrame == Enum.UserCFrame.LeftHand and p17.KeyCode == Enum.KeyCode.ButtonL3 or p16.userCFrame == Enum.UserCFrame.RightHand and p17.KeyCode == Enum.KeyCode.ButtonR3 or p16.userCFrame == Enum.UserCFrame.LeftHand and p17.KeyCode == Enum.KeyCode.ButtonSelect or (p16.userCFrame == Enum.UserCFrame.RightHand and p17.KeyCode == Enum.KeyCode.ButtonStart or p17.KeyCode == Enum.KeyCode.ButtonA or p17.KeyCode == Enum.KeyCode.ButtonB or p17.KeyCode == Enum.KeyCode.ButtonX or p17.KeyCode == Enum.KeyCode.ButtonY) then
-		p16:setButtonState(t2[p17.KeyCode], p18)
+
+function TouchController:onButtonInputChanged(p, p2)
+	if
+		self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonL1
+		or self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonR1
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonL3
+		or self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonR3
+		or self.userCFrame == Enum.UserCFrame.LeftHand and p.KeyCode == Enum.KeyCode.ButtonSelect
+		or self.userCFrame == Enum.UserCFrame.RightHand and p.KeyCode == Enum.KeyCode.ButtonStart
+		or p.KeyCode == Enum.KeyCode.ButtonA
+		or p.KeyCode == Enum.KeyCode.ButtonB
+		or p.KeyCode == Enum.KeyCode.ButtonX
+		or p.KeyCode == Enum.KeyCode.ButtonY
+	then
+		self:setButtonState(v2[p.KeyCode], p2)
 	end
 end
-function t3.onInputBegan(p19, p20) -- line: 335
-	p19:onButtonInputChanged(p20, true)
-end
-function t3.onInputChanged(p21, p22) -- line: 339
-	p21:onInputPositionChanged(p22)
-end
-function t3.onInputEnded(p23, p24) -- line: 343
-	p23:onInputPositionChanged(p24)
-	p23:onButtonInputChanged(p24, false)
-end
-function t3.onTouchpadModeChanged(_, _, _) -- line: 348
-end
-function t3.destroy(p28) -- line: 350
-	p28.model:Destroy()
-end
-function t3.getButtonPart(p29, p30) -- line: 354
-	-- upvalues: t2 (copy)
-	local v76 = t2[p30]
 
-	if v76 then
-		return p29.parts[v76]
+function TouchController:onInputBegan(p)
+	self:onButtonInputChanged(p, true)
+end
+
+function TouchController:onInputChanged(p)
+	self:onInputPositionChanged(p)
+end
+
+function TouchController:onInputEnded(p)
+	self:onInputPositionChanged(p)
+	self:onButtonInputChanged(p, false)
+end
+
+function TouchController.onTouchpadModeChanged(_, _, _) end
+
+function TouchController.destroy(p)
+	p.model:Destroy()
+end
+
+function TouchController.getButtonPart(p, p2)
+	local v3 = v2[p2]
+
+	if v3 then
+		return p.parts[v3]
 	end
 
 	return nil
 end
 
-return t3
+return TouchController

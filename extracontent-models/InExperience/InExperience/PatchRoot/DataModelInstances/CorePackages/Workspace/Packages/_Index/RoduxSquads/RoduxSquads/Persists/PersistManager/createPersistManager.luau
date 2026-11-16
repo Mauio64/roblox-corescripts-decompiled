@@ -2,35 +2,33 @@ local RoduxSquads = script:FindFirstAncestor("RoduxSquads")
 
 require(RoduxSquads.Persists.PersistManager.createInternalPersistManager)
 
-local createPause = require(RoduxSquads.Persists.Actions).createPause
-local createPersistAndUpdateState = require(RoduxSquads.Persists.Actions).createPersistAndUpdateState
+local Actions = require(RoduxSquads.Persists.Actions)
+local createPause = Actions.createPause
+local Actions2 = require(RoduxSquads.Persists.Actions)
+local createPersistAndUpdateState = Actions2.createPersistAndUpdateState
 
-return function(p1, p2) -- line: 15
-	-- upvalues: createPersistAndUpdateState (copy), createPause (copy)
-	if not p2 then
-		return nil
+return function(p, p2)
+	if p2 then
+		return {
+			reset = function()
+				p2.update(nil)
+			end,
+			persistAndUpdateState = function(callback)
+				local persistAndUpdateState = createPersistAndUpdateState(p)
+
+				if persistAndUpdateState then
+					callback(persistAndUpdateState())
+				end
+			end,
+			pause = function(callback)
+				local pause = createPause(p)
+
+				if pause then
+					callback(pause())
+				end
+			end
+		}
 	end
 
-	return {
-		reset = function() -- line: 21
-			-- upvalues: p2 (copy)
-			p2.update(nil)
-		end,
-		persistAndUpdateState = function(p3) -- line: 25
-			-- upvalues: createPersistAndUpdateState (copy), p1 (copy)
-			local v7 = createPersistAndUpdateState(p1)
-
-			if v7 then
-				p3(v7())
-			end
-		end,
-		pause = function(p4) -- line: 32
-			-- upvalues: createPause (copy), p1 (copy)
-			local v9 = createPause(p1)
-
-			if v9 then
-				p4(v9())
-			end
-		end
-	}
+	return nil
 end

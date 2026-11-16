@@ -1,22 +1,23 @@
-local ParentParent = script.Parent.Parent
-local SetPromptState = require(ParentParent.Actions.SetPromptState)
-local ErrorOccurred = require(ParentParent.Actions.ErrorOccurred)
-local SubscriptionPurchaseInfoReceived = require(ParentParent.Actions.SubscriptionPurchaseInfoReceived)
-local PromptState = require(ParentParent.Enums.PromptState)
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
-local Thunk = require(ParentParent.Thunk)
+local parent = script.Parent.Parent
 
-local function resolveSubscriptionPromptState(p1) -- line: 13
-	-- upvalues: Thunk (copy), SubscriptionPurchaseInfoReceived (copy), ErrorOccurred (copy), PurchaseError (copy), SetPromptState (copy), PromptState (copy)
-	return Thunk.new(script.Name, nil, function(p2, _) -- line: 14
-		-- upvalues: SubscriptionPurchaseInfoReceived (copy), p1 (copy), ErrorOccurred (copy), PurchaseError (copy), SetPromptState (copy), PromptState (copy)
-		p2:dispatch(SubscriptionPurchaseInfoReceived(p1))
+local SetPromptState = require(parent.Actions.SetPromptState)
+local ErrorOccurred = require(parent.Actions.ErrorOccurred)
+local SubscriptionPurchaseInfoReceived = require(parent.Actions.SubscriptionPurchaseInfoReceived)
 
-		if p1.CanPurchase == false then
-			return p2:dispatch(ErrorOccurred(PurchaseError.AlreadySubscribed))
+local PromptState = require(parent.Enums.PromptState)
+local PurchaseError = require(parent.Enums.PurchaseError)
+
+local Thunk = require(parent.Thunk)
+
+local function resolveSubscriptionPromptState(p)
+	return Thunk.new(script.Name, nil, function(object, _)
+		object:dispatch(SubscriptionPurchaseInfoReceived(p))
+
+		if p.CanPurchase == false then
+			return object:dispatch(ErrorOccurred(PurchaseError.AlreadySubscribed))
 		end
 
-		return p2:dispatch(SetPromptState(PromptState.PromptSubscriptionPurchase))
+		return object:dispatch(SetPromptState(PromptState.PromptSubscriptionPurchase))
 	end)
 end
 

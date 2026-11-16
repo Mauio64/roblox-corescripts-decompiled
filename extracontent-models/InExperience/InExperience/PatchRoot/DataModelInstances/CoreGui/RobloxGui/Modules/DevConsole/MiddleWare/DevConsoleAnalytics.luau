@@ -1,103 +1,103 @@
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local CorePackages = game:GetService("CorePackages")
+
 local Dash = require(CorePackages.Packages.Dash)
+
 local SetActiveTab = require(script.Parent.Parent.Actions.SetActiveTab)
 local SetDevConsoleVisibility = require(script.Parent.Parent.Actions.SetDevConsoleVisibility)
 local SetDevConsoleMinimized = require(script.Parent.Parent.Actions.SetDevConsoleMinimized)
-local v7 = game:DefineFastInt("ReportDevConsoleTabEventsThrottleHundredthsPercent", 0)
 
-function ReportDevConsoleOpenClose(p1, p2) -- line: 23
-	-- upvalues: SetDevConsoleVisibility (copy), RbxAnalyticsService (copy)
-	if p2.type == SetDevConsoleVisibility.name then
-		local isVisible = p1:getState().DisplayOptions.isVisible
-		local visibleStartTime = p1:getState().DisplayOptions.visibleStartTime
+local defineFastInt = game:DefineFastInt("ReportDevConsoleTabEventsThrottleHundredthsPercent", 0)
 
-		if isVisible ~= p2.isVisible then
-			if p2.isVisible then
+function ReportDevConsoleOpenClose(object, p)
+	if p.type == SetDevConsoleVisibility.name then
+		local isVisible = object:getState().DisplayOptions.isVisible
+		local visibleStartTime = object:getState().DisplayOptions.visibleStartTime
+
+		if p.isVisible ~= isVisible then
+			if p.isVisible then
 				RbxAnalyticsService:ReportCounter("DevConsoleStartVisible", 1)
-
-				return
+			else
+				RbxAnalyticsService:ReportStats("DevConsoleSessionTime", tick() - visibleStartTime)
 			end
-
-			local v12 = tick() - visibleStartTime
-
-			RbxAnalyticsService:ReportStats("DevConsoleSessionTime", v12)
 		end
 	end
 end
-function getTabAnalyticsKeyName(p3, p4) -- line: 39
-	if p4 ~= nil then
-		return string.format("%s_%s", p3, not p4 and "Server" or "Client")
+
+function getTabAnalyticsKeyName(p, p2)
+	if p2 == nil then
+		return string.format("%s", p)
 	end
 
-	return string.format("%s", p3)
+	return string.format("%s_%s", p, p2 and "Client" or "Server")
 end
-function dispatchTabAnalytics(p5) -- line: 47
-	-- upvalues: Dash (copy), RbxAnalyticsService (copy), v7 (copy)
-	local v16 = Dash.join({
-		calledFrom = "devConsoleTabChange",
-		placeId = game.PlaceId
-	}, p5)
 
-	RbxAnalyticsService:ReportInfluxSeries("devConsoleMetric", v16, v7)
+function dispatchTabAnalytics(p)
+	RbxAnalyticsService:ReportInfluxSeries(
+		"devConsoleMetric",
+		Dash.join({ placeId = game.PlaceId, calledFrom = "devConsoleTabChange" }, p),
+		defineFastInt
+	)
 end
-function ReportTabChange(p6, p7) -- line: 59
-	-- upvalues: SetActiveTab (copy), SetDevConsoleVisibility (copy), SetDevConsoleMinimized (copy)
-	if p7.type == SetActiveTab.name then
-		local MainView = p6:getState().MainView
-		local newTabIndex = p7.newTabIndex
-		local isClientView = p7.isClientView
 
-		if newTabIndex ~= MainView.currTabIndex or isClientView ~= nil and isClientView ~= MainView.isClientView then
-			local t1 = {
-				initTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView),
+function ReportTabChange(object, data)
+	if data.type == SetActiveTab.name then
+		local mainView = object:getState().MainView
+
+		local newTabIndex = data.newTabIndex
+		local isClientView = data.isClientView
+
+		if newTabIndex ~= mainView.currTabIndex or isClientView ~= nil and isClientView ~= mainView.isClientView then
+			local v = {
+				initTab = getTabAnalyticsKeyName(mainView.currTabIndex, mainView.isClientView),
 				endTab = getTabAnalyticsKeyName(newTabIndex, isClientView)
 			}
 
-			dispatchTabAnalytics(t1)
-
-			return
+			dispatchTabAnalytics(v)
 		end
-	else
-		if p7.type == SetDevConsoleVisibility.name then
-			local MainView = p6:getState().MainView
-			local DisplayOptions = p6:getState().DisplayOptions
-			local v25 = if not p7.isVisible then if not DisplayOptions.isMinimized then {
-				endTab = "EndVisible",
-				initTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
-			} else {
-				initTab = "Minimized",
-				endTab = "EndVisible"
-			} else {
+	elseif data.type == SetDevConsoleVisibility.name then
+		local mainView = object:getState().MainView
+		local displayOptions = object:getState().DisplayOptions
+		local v
+
+		if data.isVisible then
+			v = {
 				initTab = "StartVisible",
-				endTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
+				endTab = getTabAnalyticsKeyName(mainView.currTabIndex, mainView.isClientView)
 			}
-
-			dispatchTabAnalytics(v25)
-
-			return
+		else
+			v = displayOptions.isMinimized and { initTab = "Minimized", endTab = "EndVisible" }
+				or {
+					initTab = getTabAnalyticsKeyName(mainView.currTabIndex, mainView.isClientView),
+					endTab = "EndVisible"
+				}
 		end
 
-		if p7.type == SetDevConsoleMinimized.name then
-			local MainView = p6:getState().MainView
-			local v27 = if not p7.isMinimized then {
+		dispatchTabAnalytics(v)
+	elseif data.type == SetDevConsoleMinimized.name then
+		local mainView = object:getState().MainView
+		local v
+
+		if data.isMinimized then
+			v = {
+				initTab = getTabAnalyticsKeyName(mainView.currTabIndex, mainView.isClientView),
+				endTab = "Minimized"
+			}
+		else
+			v = {
 				initTab = "Minimized",
-				endTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
-			} else {
-				endTab = "Minimized",
-				initTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
+				endTab = getTabAnalyticsKeyName(mainView.currTabIndex, mainView.isClientView)
 			}
-
-			dispatchTabAnalytics(v27)
 		end
+
+		dispatchTabAnalytics(v)
 	end
 end
 
-return function(p8, p9) -- line: 117
-	return function(p10) -- line: 118
-		-- upvalues: p9 (copy), p8 (copy)
-		ReportTabChange(p9, p10)
-		ReportDevConsoleOpenClose(p9, p10)
-		p8(p10)
+return function(callback, p)
+	return function(p2)
+		ReportTabChange(p, p2)
+		ReportDevConsoleOpenClose(p, p2)
+		callback(p2)
 	end
 end

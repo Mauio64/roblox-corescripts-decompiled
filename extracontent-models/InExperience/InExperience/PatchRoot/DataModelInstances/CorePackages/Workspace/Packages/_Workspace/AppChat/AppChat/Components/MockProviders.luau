@@ -1,162 +1,141 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local ProviderContainer = require(AppChatParent.RoactUtils).Components.ProviderContainer
-local Style = require(AppChatParent.Style)
+local parent = AppChat.Parent
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local ProviderContainer = RoactUtils.Components.ProviderContainer
+local Style = require(parent.Style)
 local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
-local LocalizationProvider = require(AppChatParent.Localization).LocalizationProvider
-local UIBlox = require(AppChatParent.UIBlox)
-local FoundationProvider = require(AppChatParent.Foundation).FoundationProvider
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
 local LayerCollectorProvider = UIBlox.Core.Layout.LayerCollector.LayerCollectorProvider
-local Signal = require(AppChatParent.AppCommonLib).Signal
-local Cryo = require(AppChatParent.Cryo)
-local UniversalAppPolicy = require(AppChatParent.UniversalAppPolicy)
-local SocialPolicies = require(AppChatParent.SocialPolicies)
-local UserProfiles = require(AppChatParent.UserProfiles)
-local ApolloClient = require(AppChatParent.ApolloClient)
-local mockApolloClient = require(AppChatParent.GraphQLServer).ApolloClientTestUtils.mockApolloClient
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
+local Cryo = require(parent.Cryo)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local SocialPolicies = require(parent.SocialPolicies)
+
+local UserProfiles = require(parent.UserProfiles)
+local ApolloClient = require(parent.ApolloClient)
+local GraphQLServer = require(parent.GraphQLServer)
+local mockApolloClient = GraphQLServer.ApolloClientTestUtils.mockApolloClient
 local MockUserData = require(AppChat.Users.MockUserData)
-local RealtimeProvider = require(AppChatParent.RealtimeDelivery).RealtimeProvider
-local InteractionFeedback = require(AppChatParent.InteractionFeedback)
-local HapticFeedbackConfig = require(AppChat.Utils.HapticFeedback).HapticFeedbackConfig
-local Rodux = require(AppChatParent.Rodux)
-local RoactRodux = require(AppChatParent.RoactRodux)
-local RoactNavigation = require(AppChatParent.RoactNavigation)
-local t1 = {
-	withUiModeSupport = false,
-	withLayerCollector = true,
-	withApolloProvider = true
-}
+local RealtimeDelivery = require(parent.RealtimeDelivery)
+local RealtimeProvider = RealtimeDelivery.RealtimeProvider
+local InteractionFeedback = require(parent.InteractionFeedback)
+local HapticFeedback = require(AppChat.Utils.HapticFeedback)
+local HapticFeedbackConfig = HapticFeedback.HapticFeedbackConfig
 
-local function MockProviders(t2: {[any]: any}) -- line: 57
-	-- upvalues: Cryo (copy), t1 (copy), RealtimeProvider (copy), FoundationProvider (copy), StyleProviderWithDefaultTheme (copy), LocalizationProvider (copy), Signal (copy), LayerCollectorProvider (copy), RoactRodux (copy), Rodux (copy), UniversalAppPolicy (copy), SocialPolicies (copy), Style (copy), mockApolloClient (copy), MockUserData (copy), UserProfiles (copy), ApolloClient (copy), InteractionFeedback (copy), HapticFeedbackConfig (copy), RoactNavigation (copy), React (copy), ProviderContainer (copy)
-	local v28 = Cryo.Dictionary.union(t1, t2)
-	local t3 = {}
+local Rodux = require(parent.Rodux)
+local RoactRodux = require(parent.RoactRodux)
 
-	if v28.realtime then
-		table.insert(t3, {
+local RoactNavigation = require(parent.RoactNavigation)
+
+local v = { withUiModeSupport = false, withLayerCollector = true, withApolloProvider = true }
+
+local function MockProviders(p)
+	local union = Cryo.Dictionary.union(v, p)
+	local providers = {}
+
+	if union.realtime then
+		table.insert(providers, {
 			class = RealtimeProvider,
-			props = {
-				realtime = v28.realtime
-			}
+			props = { realtime = union.realtime }
 		})
 	end
 
-	table.insert(t3, {
+	table.insert(providers, {
 		class = FoundationProvider,
-		props = {
-			device = "Desktop",
-			theme = v28.themeName
-		}
+		props = { device = "Desktop", theme = union.themeName }
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = StyleProviderWithDefaultTheme,
 		props = {
-			withDarkTheme = v28.themeName ~= "Light",
-			withUiModeSupport = v28.withUiModeSupport
+			withDarkTheme = union.themeName ~= "Light",
+			withUiModeSupport = union.withUiModeSupport
 		}
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = LocalizationProvider,
 		props = {
 			localization = {
-				Format = function(_, s1: string) -- line: 90
-					return s1
+				Format = function(_, p2: string)
+					return p2
 				end,
 				changed = Signal.new()
 			}
 		}
 	})
 
-	if v28.withLayerCollector then
-		table.insert(t3, {
-			class = LayerCollectorProvider,
-			props = {}
-		})
+	if union.withLayerCollector then
+		table.insert(providers, { class = LayerCollectorProvider, props = {} })
 	end
 
-	table.insert(t3, {
+	table.insert(providers, {
 		class = RoactRodux.StoreProvider,
 		props = {
-			store = v28.rodux and v28.rodux.store or Rodux.Store.new(function() -- line: 108
-				-- upvalues: v28 (copy)
-				return v28.rodux and v28.rodux.state or {}
-			end, v28.rodux and v28.rodux.state, { Rodux.thunkMiddleware })
+			store = union.rodux and union.rodux.store or Rodux.Store.new(function()
+				return union.rodux and union.rodux.state or {}
+			end, union.rodux and union.rodux.state, { Rodux.thunkMiddleware })
 		}
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = UniversalAppPolicy.RoactAppPolicy.Provider,
 		props = {
-			policy = {
-				UniversalAppPolicy.AppFeaturePolicies,
-				SocialPolicies.ChatPolicies
-			}
+			policy = { UniversalAppPolicy.AppFeaturePolicies, SocialPolicies.ChatPolicies }
 		}
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = Style.DesignTokenProvider,
-		props = {
-			tokenMappers = {}
-		}
+		props = { tokenMappers = {} }
 	})
 
-	if v28.withApolloProvider then
-		local v30 = mockApolloClient({})
-		local v31 = MockUserData.createMockApolloProfiles()
+	if union.withApolloProvider then
+		local client = mockApolloClient({})
 
-		UserProfiles.TestUtils.writeProfileDataToCache(v30, v31)
-		table.insert(t3, {
+		local mockApolloProfiles = MockUserData.createMockApolloProfiles()
+		UserProfiles.TestUtils.writeProfileDataToCache(client, mockApolloProfiles)
+
+		table.insert(providers, {
 			class = ApolloClient.ApolloProvider,
-			props = {
-				client = v30
-			}
+			props = { client = client }
 		})
 	end
 
-	table.insert(t3, {
+	table.insert(providers, {
 		class = InteractionFeedback.InteractionFeedbackContext.Provider,
-		props = {
-			value = HapticFeedbackConfig
-		}
+		props = { value = HapticFeedbackConfig }
 	})
-	table.insert(t3, {
+
+	table.insert(providers, {
 		class = RoactNavigation.Provider,
 		props = {
 			value = {
-				state = {
-					routeName = "",
-					key = "",
-					params = {}
-				},
-				dispatch = function() -- line: 157
-				end,
-				goBack = function() -- line: 158
-				end,
-				addListener = function() -- line: 159
+				state = { params = {}, routeName = "", key = "" },
+				dispatch = function() end,
+				goBack = function() end,
+				addListener = function()
 					return {
-						remove = function() -- line: 160
-						end
+						remove = function() end
 					}
 				end,
-				isFocused = function() -- line: 162
-				end,
-				setParams = function() -- line: 163
-				end,
-				getParam = function() -- line: 164
-				end,
-				replace = function() -- line: 165
-				end,
-				push = function() -- line: 166
-				end,
-				getScreenProps = function() -- line: 167
-				end
+				isFocused = function() end,
+				setParams = function() end,
+				getParam = function() end,
+				replace = function() end,
+				push = function() end,
+				getScreenProps = function() end
 			}
 		}
 	})
 
-	return React.createElement(ProviderContainer, {
-		providers = t3
-	}, v28.children)
+	return React.createElement(ProviderContainer, { providers = providers }, union.children)
 end
 
 return MockProviders

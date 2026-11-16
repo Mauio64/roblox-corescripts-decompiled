@@ -1,138 +1,136 @@
 local HttpService = game:GetService("HttpService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local ParentParent = scriptParent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent.Parent.Parent
+local LuauPolyfill = require(parent3.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
-local null = require(scriptParentParent.luaUtils.null)
-local formatValue = nil
-local formatObjectValue = nil
-local formatArray = nil
-local formatObject = nil
-local getObjectTag = nil
 
-function formatValue(p1, p2) -- line: 37
-	-- upvalues: HttpService (copy), null (copy), formatObjectValue (ref)
-	local v17 = typeof(p1)
+local null = require(parent2.luaUtils.null)
 
-	if v17 == "string" then
-		return HttpService:JSONEncode(p1)
+local formatValue
+local formatObjectValue
+local formatArray
+local formatObject
+local getObjectTag
+
+local function inspect(p)
+	return formatValue(p, {})
+end
+
+formatValue = function(p, p2)
+	local typeName = typeof(p)
+
+	if typeName == "string" then
+		return HttpService:JSONEncode(p)
 	end
 
-	if v17 == "number" then
-		if p1 ~= p1 then
+	if typeName == "number" then
+		if p ~= p then
 			return "NaN"
 		end
 
-		if p1 == 1e999 then
+		if p == 1e999 then
 			return "Infinity"
-		end
-
-		if p1 == -1e999 then
+		elseif p == -1e999 then
 			return "-Infinity"
 		end
 
-		return (tostring(p1))
+		return (tostring(p))
 	end
 
-	if v17 == "function" then
+	if typeName == "function" then
 		return "[function]"
 	end
 
-	if v17 == "table" then
-		if p1 == null then
-			return "null"
-		end
-
-		return formatObjectValue(p1, p2)
+	if typeName ~= "table" then
+		return (tostring(p))
 	end
 
-	return (tostring(p1))
+	if p == null then
+		return "null"
+	end
+
+	return formatObjectValue(p, p2)
 end
-function formatObjectValue(p3, p4) -- line: 65
-	-- upvalues: formatValue (ref), Array (copy), formatArray (ref), formatObject (ref)
-	if table.find(p4, p3) ~= nil then
+
+formatObjectValue = function(object, list)
+	if table.find(list, object) ~= nil then
 		return "[Circular]"
 	end
 
-	local t1 = { unpack(p4) }
+	local v = { unpack(list) }
+	table.insert(v, object)
 
-	table.insert(t1, p3)
+	if typeof(object.toJSON) == "function" then
+		local json = object:toJSON(object)
 
-	if typeof(p3.toJSON) == "function" then
-		local v21 = p3:toJSON(p3)
-
-		if v21 ~= p3 then
-			if typeof(v21) == "string" then
-				return v21
+		if json ~= object then
+			if typeof(json) == "string" then
+				return json
 			end
 
-			return formatValue(v21, t1)
+			return formatValue(json, v)
 		end
-	elseif Array.isArray(p3) then
-		return formatArray(p3, t1)
+	elseif Array.isArray(object) then
+		return formatArray(object, v)
 	end
 
-	return formatObject(p3, t1)
+	return formatObject(object, v)
 end
-function formatObject(p5, p6) -- line: 90
-	-- upvalues: Object (copy), getObjectTag (ref), formatValue (ref)
-	local v24 = Object.keys(p5)
 
-	if #v24 == 0 then
+formatObject = function(object, list)
+	local keys = Object.keys(object)
+
+	if #keys == 0 then
 		return "{}"
 	end
 
-	if #p6 > 2 then
-		return "[" .. getObjectTag(p5) .. "]"
+	if #list > 2 then
+		return "[" .. getObjectTag(object) .. "]"
 	end
 
-	local t2 = {}
+	local v = {}
 
-	for i = 1, #v24 do
-		local v27 = v24[i]
-
-		t2[i] = v27 .. ": " .. formatValue(p5[v27], p6)
+	for i = 1, #keys do
+		local key = keys[i]
+		v[i] = key .. ": " .. formatValue(object[key], list)
 	end
 
-	return "{ " .. table.concat(t2, ", ") .. " }"
+	return "{ " .. table.concat(v, ", ") .. " }"
 end
-function formatArray(p7, p8) -- line: 111
-	-- upvalues: formatValue (ref)
-	local v30 = #p7
 
-	if v30 == 0 then
+formatArray = function(list, list2)
+	local count = #list
+
+	if count == 0 then
 		return "[]"
 	end
 
-	if #p8 > 2 then
+	if #list2 > 2 then
 		return "[Array]"
 	end
 
-	local v31 = math.min(10, v30)
-	local v32 = v30 - v31
-	local t3 = {}
+	local v = math.min(10, count)
+	local v2 = count - v
+	local v3 = {}
 
-	for i = 1, v31 do
-		t3[i] = formatValue(p7[i], p8)
+	for i = 1, v do
+		v3[i] = formatValue(list[i], list2)
 	end
 
-	if v32 == 1 then
-		table.insert(t3, "... 1 more item")
-	elseif v32 > 1 then
-		table.insert(t3, ("... %d more items"):format(v32))
+	if v2 == 1 then
+		table.insert(v3, "... 1 more item")
+	elseif v2 > 1 then
+		table.insert(v3, ("... %d more items"):format(v2))
 	end
 
-	return "[" .. table.concat(t3, ", ") .. "]"
+	return "[" .. table.concat(v3, ", ") .. "]"
 end
-function getObjectTag(_) -- line: 137
+
+getObjectTag = function(_): string
 	return "Object"
 end
 
-return {
-	inspect = function(p10) -- line: 33
-		-- upvalues: formatValue (ref)
-		return formatValue(p10, {})
-	end
-}
+return { inspect = inspect }

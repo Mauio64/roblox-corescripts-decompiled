@@ -1,46 +1,64 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local UGCValidationService = game:GetService("UGCValidationService")
-local Analytics = require(ParentParent.Analytics)
-local util = ParentParent.util
-local Constants = require(ParentParent.Constants)
+local Analytics = require(parent.Analytics)
 
+local util = parent.util
+local Constants = require(parent.Constants)
 require(util.Types)
-
 local pcallDeferred = require(util.pcallDeferred)
-local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
-local getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning = require(ParentParent.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning)
-local getFFlagUGCValidationEnableR15plusSkinning = require(ParentParent.flags.getFFlagUGCValidationEnableR15plusSkinning)
-local t1 = {
-	validateMeshPart = function(p1, p2) -- line: 22
-		-- upvalues: getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning (copy), getFFlagUGCValidationEnableR15plusSkinning (copy), getEditableMeshFromContext (copy), Analytics (copy), pcallDeferred (copy), UGCValidationService (copy), Constants (copy)
-		if getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning() and getFFlagUGCValidationEnableR15plusSkinning() then
+local getEditableMeshFromContext = require(parent.util.getEditableMeshFromContext)
+
+local getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning = require(parent.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning)
+local getFFlagUGCValidationEnableR15plusSkinning = require(parent.flags.getFFlagUGCValidationEnableR15plusSkinning)
+
+local ValidateMeshPartOnlySkinnedToR15 = {
+	["validateMeshPart"] = nil,
+	validateMeshPart = function(p, p2)
+		if
+			getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning()
+			and getFFlagUGCValidationEnableR15plusSkinning()
+		then
 			error("ValidateMeshPartOnlySkinnedToR15 is deprecated. Use RigidSkinnedToSchema / LCSkinnedToSchema / BodySkinnedToSchema instead.")
 		end
 
-		local v13, v14 = getEditableMeshFromContext(p1, "MeshId", p2)
+		local editableMeshFromContext, v = getEditableMeshFromContext(p, "MeshId", p2)
 
-		if not v13 then
-			Analytics.reportFailure(Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning, nil, p2)
+		if not editableMeshFromContext then
+			Analytics.reportFailure(
+				Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning,
+				nil,
+				p2
+			)
 
-			return false, { `Could not get editable mesh data for { p1 }. Please retry later or make a bug report.` }
+			return false, { `Could not get editable mesh data for {p}. Please retry later or make a bug report.` }
 		end
 
-		local v15, v16 = pcallDeferred(function() -- line: 46
-			-- upvalues: UGCValidationService (copy), v14 (copy)
-			return { UGCValidationService:GetSkinnedJointNamesFromEditableMesh(v14) }
+		local v2, v3 = pcallDeferred(function()
+			return { UGCValidationService:GetSkinnedJointNamesFromEditableMesh(v) }
 		end, p2)
 
-		if not v15 then
-			Analytics.reportFailure(Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning, nil, p2)
+		if not v2 then
+			Analytics.reportFailure(
+				Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_FailedToFetchSkinning,
+				nil,
+				p2
+			)
 
-			return false, { `Could not get skinning data for { p1 }. Please retry later or make a bug report.` }
+			return false, { `Could not get skinning data for {p}. Please retry later or make a bug report.` }
 		end
 
-		for _, v18 in v16 do
-			if Constants.R15_STANDARD_JOINT_NAMES[v18] == nil then
-				Analytics.reportFailure(Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_BodyIsSkinnedToFakeJoints, nil, p2)
+		for _, v4 in v3 do
+			if Constants.R15_STANDARD_JOINT_NAMES[v4] == nil then
+				Analytics.reportFailure(
+					Analytics.ErrorType.validateBodyPartVertsSkinnedToR15_BodyIsSkinnedToFakeJoints,
+					nil,
+					p2
+				)
 
-				return false, { `{ p1 } is skinned to a non-standard joint { v18 }. This part may only be skinned to standard R15 joints.` }
+				return
+					false,
+					{ `{p} is skinned to a non-standard joint {v4}. This part may only be skinned to standard R15 joints.` }
 			end
 		end
 
@@ -48,27 +66,29 @@ local t1 = {
 	end
 }
 
-function t1.validateBodyParts(p3, p4) -- line: 76
-	-- upvalues: getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning (copy), getFFlagUGCValidationEnableR15plusSkinning (copy), Constants (copy), t1 (copy)
-	if getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning() and getFFlagUGCValidationEnableR15plusSkinning() then
+function ValidateMeshPartOnlySkinnedToR15.validateBodyParts(instance, p)
+	if
+		getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning()
+		and getFFlagUGCValidationEnableR15plusSkinning()
+	then
 		error("ValidateMeshPartOnlySkinnedToR15 is deprecated. Use RigidSkinnedToSchema / LCSkinnedToSchema / BodySkinnedToSchema instead.")
 	end
 
-	for _, v22 in Constants.R15_BODY_PARTS do
-		local v23 = p3:FindFirstChild(v22)
+	for _, childName in Constants.R15_BODY_PARTS do
+		local child = instance:FindFirstChild(childName)
 
-		if not v23 then
+		if not child then
 			continue
 		end
 
-		local v24, v25 = t1.validateMeshPart(v23, p4)
+		local v, v2 = ValidateMeshPartOnlySkinnedToR15.validateMeshPart(child, p)
 
-		if not v24 then
-			return v24, v25
+		if not v then
+			return v, v2
 		end
 	end
 
 	return true
 end
 
-return t1
+return ValidateMeshPartOnlySkinnedToR15

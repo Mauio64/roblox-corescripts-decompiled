@@ -1,199 +1,153 @@
 local RunService = game:GetService("RunService")
+
 local AdPlayer = script:FindFirstAncestor("AdPlayer")
-local AdPlayerParent = AdPlayer.Parent
-local React = require(AdPlayerParent.React)
-local Foundation = require(AdPlayerParent.Foundation)
+local parent = AdPlayer.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
 local useTokens = Foundation.Hooks.useTokens
-local ReportAdPopup = require(AdPlayerParent.AdGuiInteractivity).ReportAdPopup
+
+local AdGuiInteractivity = require(parent.AdGuiInteractivity)
+local ReportAdPopup = AdGuiInteractivity.ReportAdPopup
 local components = AdPlayer.components
 local VideoOverlayComponent = require(components.VideoOverlayComponent)
 local ExitConfirmationModalComponent = require(components.ExitConfirmationModalComponent)
-local Flags = require(AdPlayer.Flags)
-local v14 = table.freeze({
-	Loading = 1,
-	Paused = 2,
-	Playing = 3
-})
 
-local function AdPlayerComponent(t1: {[any]: any}) -- line: 35
-	-- upvalues: Flags (copy), useTokens (copy), React (copy), v14 (copy), RunService (copy), components (copy), View (copy), StateLayerAffordance (copy), ExitConfirmationModalComponent (copy), ReportAdPopup (copy), VideoOverlayComponent (copy)
-	local v17 = Flags.GetEnableLuaRewardTimerUI()
-	local v18 = useTokens()
-	local v19, v20 = React.useState(0)
-	local v21, v22 = React.useBinding(0)
-	local u23 = nil
-	local u24 = nil
+local frozen = table.freeze({ Loading = 1, Paused = 2, Playing = 3 })
 
-	if v17 then
-		local v25, v26 = React.useBinding(0)
+local function AdPlayerComponent(props)
+	local v = useTokens()
+	local state, setState = React.useState(0)
+	local alpha, v2 = React.useBinding(0)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
+	local state4, setState4 = React.useState(frozen.Loading)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
 
-		u23 = v25
-		u24 = v26
+	local function dismissParentModals() -- 1 equivalent call inferred from this helper
+		setState2(false)
+		setState3(false)
 	end
 
-	local v27, v28 = React.useState(false)
-	local v29, v30 = React.useState(false)
-	local v31, v32 = React.useState(v14.Loading)
-	local u33, u34
+	local function dismissModals() -- 1 equivalent call inferred from this helper
+		dismissParentModals() -- inferred equivalent call
+		local value = ref:getValue()
 
-	if v17 then
-		u33 = React.createRef()
-		u34 = React.createRef()
-	else
-		u33 = React.useRef(nil)
-		u34 = React.useRef(nil)
-	end
-
-	local durationNeededForReward = t1.durationNeededForReward
-
-	local function dismissParentModals() -- line: 58
-		-- upvalues: v28 (copy), v30 (copy)
-		v28(false)
-		v30(false)
-	end
-	local function dismissModals() -- line: 63
-		-- upvalues: v28 (copy), v30 (copy), v17 (copy), u33 (ref)
-		v28(false)
-		v30(false)
-
-		local v41 = if not v17 then u33:getValue() else u33.current
-
-		if v41 then
-			v41.dismissModals()
+		if value then
+			value.dismissModals()
 		end
 	end
 
-	React.useEffect(function() -- line: 78
-		-- upvalues: v17 (copy), u34 (ref), v32 (copy), v14 (copy), v20 (copy), t1 (copy), RunService (copy), v22 (copy), durationNeededForReward (copy), u24 (ref)
-		local u42 = if not v17 then u34:getValue() else u34.current
+	React.useEffect(function()
+		local value = ref2:getValue()
 
-		if not u42.IsLoaded then
-			u42.Loaded:Wait()
+		if not value.IsLoaded then
+			value.Loaded:Wait()
 		end
 
-		v32(v14.Playing)
-		v20(u42.TimeLength)
-		u42.Ended:Connect(t1.onComplete)
+		setState4(frozen.Playing)
+		setState(value.TimeLength)
+		value.Ended:Connect(props.onComplete)
 
-		local connection = RunService.RenderStepped:Connect(function() -- line: 93
-			-- upvalues: u42 (ref), v22 (copy), v17 (copy), durationNeededForReward (copy), u24 (ref)
-			if u42.TimeLength > 0 then
-				v22(u42.TimePosition / u42.TimeLength)
-
-				if v17 and durationNeededForReward then
-					if durationNeededForReward == 0 then
-						u24(1)
-
-						return
-					end
-
-					u24((math.min(u42.TimePosition / durationNeededForReward, 1)))
-				end
+		local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+			if value.TimeLength > 0 then
+				v2(value.TimePosition / value.TimeLength)
 			end
 		end)
 
-		t1.onVideoFrameLoaded(u42)
+		props.onVideoFrameLoaded(value)
 
-		return function() -- line: 111
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			renderSteppedConnection:Disconnect()
 		end
 	end, {})
 
-	local v38 = v27 or v29
-	local v39 = v31 == v14.Playing and not v38
-	local v40 = nil
+	local parentModalOpen = state2 or state3
+	local playing
+
+	if state4 == frozen.Playing then
+		playing = not parentModalOpen
+	else
+		playing = false
+	end
+
+	local testAdDisclaimer
 
 	if RunService:IsStudio() then
-		v40 = React.createElement(require(components.TestAdDisclaimerComponent), {
-			isEligible = t1.isEligible
+		local createElement = React.createElement
+		local TestAdDisclaimerComponent = require(components.TestAdDisclaimerComponent)
+		testAdDisclaimer = createElement(TestAdDisclaimerComponent, {
+			isEligible = props.isEligible
 		})
 	end
 
 	return React.createElement(View, {
 		tag = "size-full",
-		onActivated = function() -- line: 128
-		end,
-		stateLayer = {
-			affordance = StateLayerAffordance.None
-		},
-		backgroundStyle = v18.Color.Extended.Black.Black_100
+		onActivated = function() end,
+		stateLayer = { affordance = StateLayerAffordance.None },
+		backgroundStyle = v.Color.Extended.Black.Black_100
 	}, {
 		videoFrame = React.createElement("VideoFrame", {
-			BorderSizePixel = 0,
 			Size = UDim2.fromScale(1, 1),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Video = t1.creativeAssetUrl,
-			Playing = v39,
-			Transparency = not v27 and 0 or 0.4,
-			ref = u34
+			Video = props.creativeAssetUrl,
+			Playing = playing,
+			BorderSizePixel = 0,
+			Transparency = state2 and 0.4 or 0,
+			ref = ref2
 		}, {
 			React.createElement("UIAspectRatioConstraint", {
-				AspectRatio = 1.7777777777777777,
+				AspectRatio = 16 / 9,
 				AspectType = Enum.AspectType.FitWithinMaxSize
 			}),
-			testAdDisclaimer = v40,
+			testAdDisclaimer = testAdDisclaimer,
 			confirmExitModal = React.createElement(ExitConfirmationModalComponent, {
-				Enabled = v27,
-				onCancel = function() -- line: 152
-					-- upvalues: v28 (copy)
-					v28(false)
+				Enabled = state2,
+				onCancel = function()
+					setState2(false)
 				end,
-				onConfirm = t1.onCancel
+				onConfirm = props.onCancel
 			}),
 			reportAdModal = React.createElement(ReportAdPopup, {
-				showReportAdPopup = v29,
-				onClose = function() -- line: 159
-					-- upvalues: v30 (copy)
-					v30(false)
+				showReportAdPopup = state3,
+				onClose = function()
+					setState3(false)
 				end,
-				onOpen = function() -- line: 162
-					-- upvalues: v30 (copy)
-					v30(true)
+				onOpen = function()
+					setState3(true)
 				end,
-				adInfo = t1.getReportAdInfo()
+				adInfo = props.getReportAdInfo()
 			}),
 			videoOverlay = React.createElement(VideoOverlayComponent, {
-				ref = u33,
-				alpha = v21,
-				totalDuration = v19,
-				parentModalOpen = v38,
-				rewardWaitTime = if not v17 then nil else durationNeededForReward,
-				rewardWaitAlpha = if not v17 then nil else u23,
+				ref = ref,
+				alpha = alpha,
+				totalDuration = state,
+				parentModalOpen = parentModalOpen,
 				dismissModals = dismissParentModals,
-				parentPaused = not v39,
-				showWhyThisAd = t1.showWhyThisAd,
-				setPaused = function(p1) -- line: 177
-					-- upvalues: v31 (copy), v14 (copy), v32 (copy)
-					if v31 ~= v14.Loading then
-						v32(if not p1 then v14.Playing else v14.Paused)
+				parentPaused = not playing,
+				showWhyThisAd = props.showWhyThisAd,
+				setPaused = function(p)
+					if state4 ~= frozen.Loading then
+						local v3
+
+						if p then
+							v3 = frozen.Paused
+						else
+							v3 = frozen.Playing
+						end
+
+						setState4(v3)
 					end
 				end,
-				showReportAdModal = function() -- line: 182
-					-- upvalues: v30 (copy)
-					v30(true)
+				showReportAdModal = function()
+					setState3(true)
 				end,
-				showExitConfirmationModal = function() -- line: 185
-					-- upvalues: Flags (copy), u23 (ref), t1 (copy), v28 (copy), v30 (copy), v17 (copy), u33 (ref)
-					if Flags.GetEnableLuaRewardTimerUI() and u23:getValue() >= 1 then
-						t1.onComplete()
-
-						return
-					end
-
-					v28(false)
-					v30(false)
-
-					local v45 = if not v17 then u33:getValue() else u33.current
-
-					if v45 then
-						v45.dismissModals()
-					end
-
-					v28(true)
+				showExitConfirmationModal = function()
+					dismissModals() -- inferred equivalent call
+					setState2(true)
 				end
 			})
 		})

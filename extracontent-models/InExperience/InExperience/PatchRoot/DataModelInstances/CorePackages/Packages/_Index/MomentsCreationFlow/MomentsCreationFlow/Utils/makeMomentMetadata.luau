@@ -1,15 +1,23 @@
-local Parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
-local MomentsCommon = require(Parent.MomentsCommon)
+local parent = script:FindFirstAncestor("MomentsCreationFlow").Parent
 
-local function makeMomentMetadata(p1, s1: string?, p2) -- line: 9
-	-- upvalues: MomentsCommon (copy)
+local MomentsCommon = require(parent.MomentsCommon)
+
+local function makeMomentMetadata(data, description: string?, edits)
+	local assetTotalDuration
+
+	if data.CaptureType == Enum.CaptureType.Screenshot then
+		assetTotalDuration = MomentsCommon.Constants.ScreenshotMusicDuration
+	else
+		assetTotalDuration = data.TimeLength
+	end
+
 	return {
-		assetTotalDuration = if p1.CaptureType ~= Enum.CaptureType.Screenshot then p1.TimeLength else MomentsCommon.Constants.ScreenshotMusicDuration,
-		captureType = p1.CaptureType,
-		description = s1,
-		universeId = p1.SourceUniverseId,
-		placeId = p1.SourcePlaceId,
-		edits = p2
+		assetTotalDuration = assetTotalDuration,
+		captureType = data.CaptureType,
+		description = description,
+		universeId = data.SourceUniverseId,
+		placeId = data.SourcePlaceId,
+		edits = edits
 	}
 end
 

@@ -1,19 +1,20 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local FFlagAXRemoveExpiredItemsFromInventory = require(Parent.AvatarExperienceFlags).FFlagAXRemoveExpiredItemsFromInventory
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 
-local function isDurableItemExpired(s1: string) -- line: 11
-	-- upvalues: FFlagAXRemoveExpiredItemsFromInventory (copy)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXRemoveExpiredItemsFromInventory = AvatarExperienceFlags.FFlagAXRemoveExpiredItemsFromInventory
+
+local function isDurableItemExpired(p: string): boolean
 	if not FFlagAXRemoveExpiredItemsFromInventory then
 		return false
 	end
 
-	local dateTime = DateTime.fromIsoDate(s1)
+	local dateTime = DateTime.fromIsoDate(p)
 
-	if not dateTime then
-		return false
+	if dateTime then
+		return DateTime.now().UnixTimestamp >= dateTime.UnixTimestamp
 	end
 
-	return DateTime.now().UnixTimestamp >= dateTime.UnixTimestamp
+	return false
 end
 
 return isDurableItemExpired

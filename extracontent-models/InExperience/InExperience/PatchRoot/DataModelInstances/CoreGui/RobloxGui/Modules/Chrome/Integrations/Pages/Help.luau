@@ -1,29 +1,45 @@
 local Chrome = script:FindFirstAncestor("Chrome")
 local CorePackages = game:GetService("CorePackages")
+
 local Service = require(Chrome.Service)
 local CommonIcon = require(Chrome.Integrations.CommonIcon)
-local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
-local FFlagChromeActivatedMappedSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeActivatedMappedSignal
-local InGameMenuIntegrationUtils = require(script.Parent.InGameMenuIntegrationUtils)
-local v8 = InGameMenuIntegrationUtils.createPageOpenSignal("HelpPage")
 
-return Service:register({
-	id = "help",
-	label = "CoreScripts.Feedback.Help.MainHeader",
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
+local PioneerUtils = require(CorePackages.Workspace.Packages.PioneerUtils)
+local isPioneerLaunch = PioneerUtils.isPioneerLaunch
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagRenameHelpToControls = SharedFlags.FFlagRenameHelpToControls
+
+local InGameMenuIntegrationUtils = require(script.Parent.InGameMenuIntegrationUtils)
+
+local pageOpenSignal = InGameMenuIntegrationUtils.createPageOpenSignal("HelpPage")
+
+local v = {
 	initialAvailability = Service.AvailabilitySignal.Available,
-	sideSheetPlacement = SideSheetPlacement.Page,
-	activated = function(_) -- line: 22
-		-- upvalues: InGameMenuIntegrationUtils (copy), v8 (copy)
-		InGameMenuIntegrationUtils.toggleIGMPage("HelpPage", v8:get())
-	end,
-	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 27
-		-- upvalues: v8 (copy)
-		return v8:get()
-	end or v8,
-	components = {
-		Icon = function(_) -- line: 31
-			-- upvalues: CommonIcon (copy), v8 (copy)
-			return CommonIcon("CircleQuestion", nil, v8)
-		end
-	}
-})
+	id = "help",
+	label = FFlagRenameHelpToControls and "CoreScripts.InGameMenu.Controls.ControlsPage" or "CoreScripts.Feedback.Help.MainHeader",
+	sideSheetPlacement = 0,
+	activated = 0,
+	isActivated = 0,
+	components = 0
+}
+local sideSheetPlacement
+
+if isPioneerLaunch() then
+	sideSheetPlacement = SideSheetPlacement.AboveFold
+else
+	sideSheetPlacement = SideSheetPlacement.BelowFold
+end
+
+v.sideSheetPlacement = sideSheetPlacement
+function v.activated(_)
+	InGameMenuIntegrationUtils.toggleIGMPage("HelpPage", pageOpenSignal:get())
+end
+v.isActivated = pageOpenSignal
+v.components = {
+	Icon = function(_)
+		return CommonIcon(FFlagRenameHelpToControls and "Controller" or "CircleQuestion", nil, pageOpenSignal)
+	end
+}
+return Service:register(v)

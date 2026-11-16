@@ -1,66 +1,85 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
+local parent = InExperienceIntervention.Parent
 
 require(InExperienceIntervention.Utils.Types)
-
-local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
+local InterventionShared = require(parent.InterventionShared)
+local Constants = InterventionShared.Utils.Constants
 local UIStateActions = Constants.UIStateActions
-local v5 = game:DefineFastInt("ChatInterventionUIRateLimitWindowSec", 5)
-local v6 = game:DefineFastFlag("RateLimitNudgeToast", false)
-local v7 = game:DefineFastFlag("RateLimitTimeoutToast", false)
-local v8 = game:DefineFastFlag("RateLimitNudgeDialog", false)
-local v9 = game:DefineFastFlag("RateLimitTimeoutDialog", false)
+local defineFastInt = game:DefineFastInt("ChatInterventionUIRateLimitWindowSec", 5)
+local defineFastFlag = game:DefineFastFlag("RateLimitNudgeToast", false)
+local defineFastFlag2 = game:DefineFastFlag("RateLimitTimeoutToast", false)
+local defineFastFlag3 = game:DefineFastFlag("RateLimitNudgeDialog", false)
+local defineFastFlag4 = game:DefineFastFlag("RateLimitTimeoutDialog", false)
 
-local function InExperienceInterventionUIStateReducer(p1, p2) -- line: 13
-	-- upvalues: v5 (copy), v7 (copy), Constants (copy), v6 (copy), v8 (copy), v9 (copy), UIStateActions (copy)
-	local v13 = table.clone(p1)
-	local type = p2.type
-	local v15 = DateTime.now().UnixTimestamp - p1.dispatchTimestamp < v5
-	local v16 = p2.treatmentType == p1.treatmentType
-	local v17 = false
+local function InExperienceInterventionUIStateReducer(p, data)
+	local clone = table.clone(p)
+	local kind = data.type
 
-	if v7 then
-		local v18 = p2.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt and p1.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin or p2.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin and p1.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt
-		local v19 = p2.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt or p2.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin
+	local v = DateTime.now().UnixTimestamp - p.dispatchTimestamp < defineFastInt
+	local v2 = data.treatmentType == p.treatmentType
+	local v3
 
-		v17 = v16 and v19 or v18
+	if defineFastFlag2 then
+		if
+			data.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt
+			and p.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin
+		then
+			v3 = true
+		elseif data.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin then
+			v3 = p.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt
+		else
+			v3 = false
+		end
+
+		local v4 = data.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt
+			or data.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin
+		v3 = v2 and v4 or v3
+	else
+		v3 = false
 	end
 
-	local v20 = false
+	local v4
 
-	if v6 then
-		v20 = p2.treatmentType == Constants.TreatmentType.ChatNudgeToast and v16
+	if defineFastFlag then
+		v4 = data.treatmentType == Constants.TreatmentType.ChatNudgeToast and v2
+	else
+		v4 = false
 	end
 
-	local v21 = false
+	local v5
 
-	if v8 then
-		v21 = p2.treatmentType == Constants.TreatmentType.ChatNudgeDialog and v16
+	if defineFastFlag3 then
+		v5 = data.treatmentType == Constants.TreatmentType.ChatNudgeDialog and v2
+	else
+		v5 = false
 	end
 
-	local v22 = false
+	local v6
 
-	if v9 then
-		v22 = p2.treatmentType == Constants.TreatmentType.ChatTimeoutDialog and v16
+	if defineFastFlag4 then
+		v6 = data.treatmentType == Constants.TreatmentType.ChatTimeoutDialog and v2
+	else
+		v6 = false
 	end
 
-	local v23 = (v17 or (v20 or (v21 or v22))) and v15
-
-	if type == UIStateActions.ToggleNotificationDialog and not v23 then
-		v13.isShown = p2.isShown
-		v13.treatmentType = p2.treatmentType
-		v13.detail = p2.detail or {}
-		v13.endTime = p2.endTime or 0
-		v13.dispatchTimestamp = p2.dispatchTimestamp
-
-		return v13
+	if not (v3 or v4 or v5 or v6) then
+		v = v6
 	end
 
-	if v23 then
-		print("Chat intervention UI treatment rate limited: ", p2.treatmentType)
+	if kind == UIStateActions.ToggleNotificationDialog and not v then
+		clone.isShown = data.isShown
+		clone.treatmentType = data.treatmentType
+		clone.detail = data.detail or {}
+		clone.endTime = data.endTime or 0
+		clone.dispatchTimestamp = data.dispatchTimestamp
+		return clone
 	end
 
-	return p1
+	if v then
+		print("Chat intervention UI treatment rate limited: ", data.treatmentType)
+	end
+
+	return p
 end
 
 return InExperienceInterventionUIStateReducer

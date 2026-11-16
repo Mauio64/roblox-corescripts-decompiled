@@ -1,108 +1,72 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local HttpClient = require(Parent.HttpClient)
-local Promise = require(Parent.Promise)
-local debug = require(Parent.DataHydration.CreatorAgentChat).debug
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local HttpClient = require(parent.HttpClient)
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
+local Url = Http.Url
+
+local CreatorAgentChat = require(parent.DataHydration.CreatorAgentChat)
+local Debug = CreatorAgentChat.debug
+
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function getThumbnailUrlAsync(n1: number, s1: string?) -- line: 26
-	-- upvalues: debug (copy), Promise (copy), fetch (copy), asPromise (copy)
-	local v10 = s1 or "420x420"
+local url = Url.THUMBNAILS_URL .. "v1/batch"
 
-	debug.log("info", "thumbnail_url polling", {
-		assetId = n1
-	})
+local function getThumbnailUrlAsync(p: number, value: string?)
+	local size = value or "420x420"
 
-	return Promise.new(function(resolve, reject) -- line: 31
-		-- upvalues: fetch (copy), n1 (copy), v10 (copy), asPromise (copy), debug (copy)
-		local n2 = 0
+	Debug.log("info", "thumbnail_url polling", { assetId = p })
 
-		local function poll(n3: number) -- line: 34
-			-- upvalues: fetch (copy), n1 (copy), v10 (copy), asPromise (copy), reject (copy), debug (copy), resolve (copy), n2 (ref), poll (copy)
-			local v16 = fetch({
+	return Promise.new(function(callback, callback2)
+		local count = 0
+		local function poll(p2: number)
+			asPromise((fetch({
 				method = "POST",
-				url = "https://thumbnails.roblox.com/v1/batch",
+				url = url,
+				body = {
+					{ targetId = p, type = "Asset", size = size, format = "Png" }
+				},
 				analyticsKey = "build-experience.get-thumbnail-url",
-				body = {{
-					type = "Asset",
-					format = "Png",
-					targetId = n1,
-					size = v10
-				}},
-				decode = function(p1) -- line: 47
-					return p1
+				decode = function(p3)
+					return p3
 				end
-			})
+			}))):andThen(function(p3)
+				local data = p3 and p3.data
 
-			asPromise(v16):andThen(function(p2) -- line: 53
-				-- upvalues: reject (copy), debug (copy), n1 (copy), resolve (copy), n2 (ref), poll (copy), n3 (copy)
-				local v19 = p2 and p2.data
-
-				if not v19 or #v19 == 0 then
-					reject("No thumbnail data returned")
-
+				if not data or #data == 0 then
+					callback2("No thumbnail data returned")
 					return
 				end
 
-				local v20 = v19[1]
+				local v = data[1]
 
-				if v20.state == "Completed" then
-					debug.log("info", "thumbnail_url completed", {
-						assetId = n1
-					})
-					resolve({
-						status = "completed",
-						imageUrl = v20.imageUrl
-					})
+				if v.state == "Completed" then
+					Debug.log("info", "thumbnail_url completed", { assetId = p })
+					callback({ status = "completed", imageUrl = v.imageUrl })
+				elseif v.state == "InReview" then
+					count += 1
 
-					return
-				end
-
-				if v20.state == "InReview" then
-					n2 += 1
-
-					if n2 >= 5 then
-						debug.log("warn", "thumbnail_url in_review timeout", {
-							assetId = n1
-						})
-						resolve({
-							status = "in_review",
-							assetId = n1
-						})
-
-						return
+					if count >= 5 then
+						Debug.log("warn", "thumbnail_url in_review timeout", { assetId = p })
+						callback({ status = "in_review", assetId = p })
+					else
+						task.delay(2, function()
+							poll(p2 + 1)
+						end)
 					end
-
-					task.delay(2, function() -- line: 70
-						-- upvalues: poll (copy), n3 (copy)
-						poll(n3 + 1)
+				elseif v.state ~= "Pending" then
+					callback2(`Thumbnail failed: {v.state}`)
+				elseif p2 >= 15 then
+					Debug.log("warn", "thumbnail_url timed out", { assetId = p })
+					callback2("Thumbnail generation timed out")
+				else
+					task.delay(2, function()
+						poll(p2 + 1)
 					end)
-
-					return
 				end
-
-				if v20.state == "Pending" then
-					if n3 >= 15 then
-						debug.log("warn", "thumbnail_url timed out", {
-							assetId = n1
-						})
-						reject("Thumbnail generation timed out")
-
-						return
-					end
-
-					task.delay(2, function() -- line: 79
-						-- upvalues: poll (copy), n3 (copy)
-						poll(n3 + 1)
-					end)
-
-					return
-				end
-
-				reject(`Thumbnail failed: { v20.state }`)
-			end):catch(function(p3) -- line: 87
-				-- upvalues: reject (copy)
-				reject(p3)
+			end):catch(function(p3)
+				callback2(p3)
 			end)
 		end
 

@@ -1,0 +1,3 @@
+return {
+	PageContentMode = { Scroll = "Scroll" }
+}

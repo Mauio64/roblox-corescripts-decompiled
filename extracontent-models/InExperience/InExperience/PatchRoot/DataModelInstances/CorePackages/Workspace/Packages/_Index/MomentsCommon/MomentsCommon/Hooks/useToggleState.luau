@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("MomentsCommon").Parent
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
 
-return require(Parent.ReactUtils).useToggleState
+local ReactUtils = require(parent.ReactUtils)
+
+return ReactUtils.useToggleState

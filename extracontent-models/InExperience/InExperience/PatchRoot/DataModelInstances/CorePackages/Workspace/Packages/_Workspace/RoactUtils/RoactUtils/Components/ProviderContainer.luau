@@ -1,23 +1,23 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
 
-local function ProviderContainer(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy)
-	local v5 = t1.providers or {}
-	local children = t1.children
-	local t2 = {
+local React = require(parent.React)
+
+local function ProviderContainer(p)
+	local providers = p.providers or {}
+	local children = p.children
+
+	local v = {
 		PageWrapper = React.createElement("Folder", {}, children)
 	}
 
-	for i = #v5, 1, -1 do
-		local v9 = v5[i]
-
-		t2 = {
-			ProviderChildren = React.createElement(v9.class, v9.props, t2)
+	for i = #providers, 1, -1 do
+		local provider = providers[i]
+		v = {
+			ProviderChildren = React.createElement(provider.class, provider.props, v)
 		}
 	end
 
-	return React.createElement("Folder", nil, t2)
+	return React.createElement("Folder", nil, v)
 end
 
 return ProviderContainer

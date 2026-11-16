@@ -1,1 +1,3 @@
-return (require(script.Paginator))
+local Paginator = require(script.Paginator)
+
+return Paginator

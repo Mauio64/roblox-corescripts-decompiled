@@ -1,37 +1,42 @@
 local CoreScriptSyncService = game:GetService("CoreScriptSyncService")
 
-local function getFileInfo(s1: string, s2: string?, b1: boolean?) -- line: 4
-	-- upvalues: CoreScriptSyncService (copy)
-	local _game = game
+local function getFileInfo(value: string, p: string?, flag: boolean?)
+	local game = game
 
-	for _, v8 in string.split(s1, ".") do
-		if _game == nil then
+	for _, childName in string.split(value, ".") do
+		if game == nil then
 			break
 		end
 
-		_game = _game:FindFirstChild(v8)
+		game = game:FindFirstChild(childName)
 	end
 
-	if typeof(_game) ~= "Instance" or not _game:IsA("ModuleScript") then
-		warn("path led to non-ModuleScript:", s1, _game.ClassName)
-		_game = nil
+	if typeof(game) ~= "Instance" or not game:IsA("ModuleScript") then
+		warn("path led to non-ModuleScript:", value, game.ClassName)
+		game = nil
 	end
 
-	local ScriptFilePath = nil
+	local scriptFilePath
 
-	if _game then
-		ScriptFilePath = CoreScriptSyncService:GetScriptFilePath(_game)
+	if not game then
+		return game, scriptFilePath
+	end
 
-		if s2 then
-			local start, stop = string.find(ScriptFilePath, s2, 1, true)
+	scriptFilePath = CoreScriptSyncService:GetScriptFilePath(game)
 
-			if start then
-				ScriptFilePath = string.sub(ScriptFilePath, if not b1 then stop + 1 else start)
+	if p then
+		local v, v2 = string.find(scriptFilePath, p, 1, true)
+
+		if v then
+			if not flag then
+				v = v2 + 1
 			end
+
+			scriptFilePath = string.sub(scriptFilePath, v)
 		end
 	end
 
-	return _game, ScriptFilePath
+	return game, scriptFilePath
 end
 
 return getFileInfo

@@ -1,100 +1,159 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local v3 = require(AppChat.Logger):new(script.Name)
-local Foundation = require(AppChatParent.Foundation)
+local parent = AppChat.Parent
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 
+local Foundation = require(parent.Foundation)
 require(AppChat.types)
-
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local AppChatNetworking = require(parent.AppChatNetworking)
 local ConversationTopModal = AppChatNetworking.Constants.ConversationTopModal
 local ModalConfiguration = require(AppChat.Models.ModalConfiguration)
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
 local useRecordModalSeenWithDelay = require(AppChat.Hooks.useRecordModalSeenWithDelay)
 local ModalSequence = AppChatNetworking.Constants.ModalSequence
+
 local useRecordModalSequenceResponseForConversation = require(AppChat.Hooks.useRecordModalSequenceResponseForConversation)
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local RoactUtils2 = require(parent.RoactUtils)
+local useDispatch = RoactUtils2.Hooks.RoactRodux.useDispatch
 local DismissedChatModal = require(AppChat.Conversations.Actions.DismissedChatModal)
 local useIsGuiInChatVisible = require(AppChat.Hooks.useIsGuiInChatVisible)
+
 local ConversationBannerContainer = require(script.Parent.ConversationBanner.ConversationBannerContainer)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatConversationTrustedFriendUpsellBanner = SharedFlags.FFlagAppChatConversationTrustedFriendUpsellBanner
+
+local SduiConstants = require(AppChat.Sdui.SduiConstants)
+local SduiSharedUtilities
+
+if FFlagAppChatConversationTrustedFriendUpsellBanner then
+	SduiSharedUtilities = require(parent.SduiSharedUtilities)
+end
+
+local sduiFeatureEntryPoint
+
+if FFlagAppChatConversationTrustedFriendUpsellBanner then
+	sduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
+else
+	sduiFeatureEntryPoint = nil
+end
+
+local useComponentConfig
+
+if FFlagAppChatConversationTrustedFriendUpsellBanner then
+	useComponentConfig = SduiSharedUtilities.useComponentConfig
+else
+	useComponentConfig = nil
+end
+
 local FIntAppChatModalSeenImpressionDelayMs = require(AppChat.Flags.FIntAppChatModalSeenImpressionDelayMs)
-local t1 = {
-	setModalHeight = function(_) -- line: 34
-	end
+
+local v2 = {
+	setModalHeight = function(_) end
 }
-local t2 = {
+
+local ConversationBannerContainers = {
 	[ConversationTopModal.AddTrustedConnection] = ConversationBannerContainer,
 	[ConversationTopModal.TrustedConnectionRequest] = ConversationBannerContainer
 }
 
-local function ConversationTopModalContainer(t3: {[any]: any}) -- line: 43
-	-- upvalues: Cryo (copy), t1 (copy), useSelector (copy), getDeepValue2 (copy), ModalConfiguration (copy), t2 (copy), useDispatch (copy), useRecordModalSequenceResponseForConversation (copy), React (copy), useIsGuiInChatVisible (copy), useRecordModalSeenWithDelay (copy), ModalSequence (copy), FIntAppChatModalSeenImpressionDelayMs (copy), v3 (copy), DismissedChatModal (copy), AppChatNetworking (copy), ConversationTopModal (copy), Foundation (copy)
-	local v25 = Cryo.Dictionary.union(t1, t3)
-	local v26 = useSelector(function(p2) -- line: 46
-		-- upvalues: getDeepValue2 (copy), v25 (copy), ModalConfiguration (copy)
-		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationTopModals.{ v25.conversationId }`) or ModalConfiguration.default
+local function ConversationTopModalContainer(p)
+	local union = Cryo.Dictionary.union(v2, p)
+	local v3 = useSelector(function(p2)
+		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationTopModals.{union.conversationId}`)
+			or ModalConfiguration.default
 	end)
-	local modal_layout = v26.modal_layout
-	local v28 = t2[v26.modal_variant]
-	local v29 = useDispatch()
-	local v30 = useRecordModalSequenceResponseForConversation(v25.conversationId)
-	local v31 = React.useRef(nil)
-	local v32 = useIsGuiInChatVisible(v31, {
-		v31.current,
-		v28
-	})
+
+	local modal_layout = v3.modal_layout
+	local v4 = ConversationBannerContainers[v3.modal_variant]
+	local v5 = useDispatch()
+	local v6 = useRecordModalSequenceResponseForConversation(union.conversationId)
+
+	local ref = React.useRef(nil)
+	local v7 = useIsGuiInChatVisible(ref, { ref.current, v4 })
+	local configKey
+
+	if FFlagAppChatConversationTrustedFriendUpsellBanner then
+		configKey = SduiConstants.getConversationTopModalConfigKey(union.conversationId)
+	end
+
+	local v8
+
+	if FFlagAppChatConversationTrustedFriendUpsellBanner then
+		v8 = useComponentConfig(configKey, SduiConstants.ConversationTopModalIdentifier)
+	end
+
+	local v9 = FFlagAppChatConversationTrustedFriendUpsellBanner
+
+	if v9 then
+		if v4 == nil then
+			v9 = v8 ~= nil
+		else
+			v9 = false
+		end
+	end
 
 	useRecordModalSeenWithDelay({
 		modalSequence = ModalSequence.ConversationTopModal,
-		modalVariant = v26.modal_variant,
+		modalVariant = v3.modal_variant,
 		actionToRecord = modal_layout.seen_record_action,
 		delayMs = FIntAppChatModalSeenImpressionDelayMs,
-		canRecordAction = v32 and v28 ~= nil,
-		conversationId = v25.conversationId
+		canRecordAction = v7 and v4 ~= nil,
+		conversationId = union.conversationId
 	})
 
-	local v33 = React.useCallback(function() -- line: 68
-		-- upvalues: v30 (copy), v26 (copy), ModalSequence (copy), v3 (copy), v29 (copy), DismissedChatModal (copy), AppChatNetworking (copy), v25 (copy)
-		v30(v26.modal_layout.dismissed_record_action, ModalSequence.ConversationTopModal, nil, v26.modal_variant):catch(function(p3) -- line: 74
-			-- upvalues: v3 (copy), v26 (copy)
-			v3:warning(`Error in ConversationOverlayContainer { v26.modal_layout.id } -> RecordModalSequenceResponse: { tostring(p3) }`)
+	local onDismissed = React.useCallback(function()
+		v6(v3.modal_layout.dismissed_record_action, ModalSequence.ConversationTopModal, nil, v3.modal_variant):catch(function(p2)
+			v:warning(`Error in ConversationOverlayContainer {v3.modal_layout.id} -> RecordModalSequenceResponse: {tostring(p2)}`)
 		end)
-		v29(DismissedChatModal(AppChatNetworking.Constants.ModalSequence.ConversationTopModal, v25.conversationId))
-	end, {
-		v25.conversationId,
-		v26.modal_layout.dismissed_record_action,
-		v26.modal_variant,
-		v30,
-		v29
-	})
-	local v34 = React.useCallback(function(p4) -- line: 94
-		-- upvalues: v25 (copy)
-		v25.setModalHeight(p4.AbsoluteSize.Y)
-	end, { v25.setModalHeight })
-	local v35 = nil
+		v5(DismissedChatModal(AppChatNetworking.Constants.ModalSequence.ConversationTopModal, union.conversationId))
+	end, { union.conversationId, v3.modal_layout.dismissed_record_action, v3.modal_variant, v6, v5 })
 
-	if v28 then
-		v35 = React.createElement(v28, {
-			conversationId = v25.conversationId,
-			modalVariant = v26.modal_variant,
-			onDismissed = v33,
+	local onAbsoluteSizeChanged = React.useCallback(function(p2)
+		union.setModalHeight(p2.AbsoluteSize.Y)
+	end, { union.setModalHeight })
+
+	local conversationTopModal = nil
+
+	if v4 then
+		conversationTopModal = React.createElement(v4, {
+			conversationId = union.conversationId,
+			modalVariant = v3.modal_variant,
+			onDismissed = onDismissed,
 			bodyText = modal_layout.body and modal_layout.body.text,
-			actionText = modal_layout.buttons and (modal_layout.buttons[1] and modal_layout.buttons[1].text)
+			actionText = modal_layout.buttons and modal_layout.buttons[1] and modal_layout.buttons[1].text
 		})
-	elseif v26.modal_variant ~= nil and v26.modal_variant ~= ConversationTopModal.None then
-		v3:warning(`Unsupported ConversationTopModal variant: { v26.modal_variant }`)
+	elseif v9 then
+		conversationTopModal = React.createElement(sduiFeatureEntryPoint, {
+			configKey = configKey,
+			identifier = SduiConstants.ConversationTopModalIdentifier,
+			appPage = SduiConstants.SurfaceKey,
+			shouldDisplayLoading = false,
+			shouldDisplayError = false
+		})
+	elseif v3.modal_variant ~= nil and v3.modal_variant ~= ConversationTopModal.None then
+		v:warning(`Unsupported ConversationTopModal variant: {v3.modal_variant}`)
 	end
 
-	return React.createElement(Foundation.View, {
-		tag = "gui-objects-default auto-y size-full-0",
-		LayoutOrder = v25.layoutOrder,
-		onAbsoluteSizeChanged = v34,
-		ref = v31
-	}, {
-		conversationTopModal = v35
-	})
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v10 = {
+		LayoutOrder = union.layoutOrder,
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+		ref = 0,
+		tag = "gui-objects-default auto-y size-full-0"
+	}
+
+	if v9 then
+		ref = nil
+	end
+
+	v10.ref = ref
+	return createElement(view, v10, { conversationTopModal = conversationTopModal })
 end
 
 return React.memo(ConversationTopModalContainer)

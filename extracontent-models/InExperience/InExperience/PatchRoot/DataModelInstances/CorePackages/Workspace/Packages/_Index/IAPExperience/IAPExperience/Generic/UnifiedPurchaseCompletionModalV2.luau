@@ -1,24 +1,45 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
-local ButtonVariant = require(ParentParentParent.Foundation).Enums.ButtonVariant
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+
+local Foundation = require(parent2.Foundation)
+local Foundation2 = require(parent2.Foundation)
+local ButtonVariant = Foundation2.Enums.ButtonVariant
+local IconName = Foundation.Enums.IconName
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Icon = Foundation.Icon
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
-local EnumsOrientation = Foundation.Enums.Orientation
+local Orientation = Foundation.Enums.Orientation
 local useTokens = Foundation.Hooks.useTokens
-local LoggingProtocol = require(ParentParentParent.LoggingProtocol)
-local UnifiedProductPurchaseCompletionModalShownCounter = require(ParentParent.Generic.Events.UnifiedPurchaseCompletionCounter).UnifiedProductPurchaseCompletionModalShownCounter
-local useLocalization = require(ParentParentParent.Localization).Hooks.useLocalization
-local formatTextWithParams = require(ParentParent.Utility.formatTextWithParams)
-local useFocusNavigationRefs = require(ParentParent.Generic.Hooks.useFocusNavigationRefs)
 
-local function UnifiedPurchaseCompletionModalV2(t1: {[any]: any}) -- line: 47
-	-- upvalues: useLocalization (copy), useFocusNavigationRefs (copy), useTokens (copy), React (copy), Foundation (copy), LoggingProtocol (copy), UnifiedProductPurchaseCompletionModalShownCounter (copy), formatTextWithParams (copy), Dialog (copy), DialogSize (copy), View (copy), Icon (copy), FoundationText (copy), EnumsOrientation (copy), ButtonVariant (copy)
-	local v20 = useLocalization({
+local LoggingProtocol = require(parent2.LoggingProtocol)
+local UnifiedPurchaseCompletionCounter = require(parent.Generic.Events.UnifiedPurchaseCompletionCounter)
+
+local UnifiedProductPurchaseCompletionModalShownCounter = UnifiedPurchaseCompletionCounter.UnifiedProductPurchaseCompletionModalShownCounter
+
+local Localization = require(parent2.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local formatTextWithParams = require(parent.Utility.formatTextWithParams)
+
+local useFocusNavigationRefs = require(parent.Generic.Hooks.useFocusNavigationRefs)
+
+local SharedFlags = require(parent2.SharedFlags)
+local FFlagEnableLaunchAfterPurchase = SharedFlags.FFlagEnableLaunchAfterPurchase
+
+local SharedFlags2 = require(parent2.SharedFlags)
+local icon
+
+if SharedFlags2.FFlagEnableLargerLaunchAfterPurchasePlayIcon then
+	icon = IconName.PlayXlarge
+else
+	icon = IconName.PlaySmall
+end
+
+local function UnifiedPurchaseCompletionModalV2(props)
+	local v = useLocalization({
 		PurchaseCompleteTitle = "IAPExperience.PurchasePrompt.Title.PurchaseCompleted",
 		PurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseCompleted",
 		ErrorTitle = "CoreScripts.PremiumModal.Title.Error",
@@ -26,101 +47,150 @@ local function UnifiedPurchaseCompletionModalV2(t1: {[any]: any}) -- line: 47
 		OkButtonText = "CoreScripts.PurchasePrompt.Button.OK",
 		MultiItemPurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseItemsSuccess"
 	})
-	local v21, v22 = useFocusNavigationRefs(t1.buttons.onClose or t1.buttons.onActivated, nil)
-	local v23 = useTokens()
-	local v24, v25 = React.useState(Foundation.Enums.IconName.CircleCheck)
 
-	React.useEffect(function() -- line: 61
-		-- upvalues: LoggingProtocol (copy), UnifiedProductPurchaseCompletionModalShownCounter (copy)
+	local ref2, ref3 = useFocusNavigationRefs(props.buttons.onClose or props.buttons.onActivated, nil)
+	local v2 = useTokens()
+	local state, setState = React.useState(Foundation.Enums.IconName.CircleCheck)
+
+	local v3 = FFlagEnableLaunchAfterPurchase
+
+	if v3 then
+		if props.enableLaunchAfterPurchase == true then
+			v3 = not props.isError
+		else
+			v3 = false
+		end
+	end
+
+	local ref = React.useRef(props.buttons.onShown)
+	ref.current = props.buttons.onShown
+	React.useEffect(function()
 		LoggingProtocol.default:logRobloxTelemetryCounter(UnifiedProductPurchaseCompletionModalShownCounter, 1, {})
+
+		if FFlagEnableLaunchAfterPurchase and ref.current then
+			ref.current()
+		end
 	end, {})
 
-	local v26 = React.useMemo(function() -- line: 65
-		-- upvalues: t1 (copy), v20 (copy)
-		if t1.title then
-			return t1.title
+	local text = React.useMemo(function()
+		if props.title then
+			return props.title
 		end
 
-		if t1.isError then
-			return v20.ErrorTitle
+		if props.isError then
+			return v.ErrorTitle
 		end
 
-		return v20.PurchaseCompleteTitle
-	end, {
-		t1.title,
-		t1.isError
-	})
-	local v27 = React.useMemo(function() -- line: 75
-		-- upvalues: t1 (copy), v20 (copy), formatTextWithParams (copy)
-		if t1.bodyText then
-			return t1.bodyText
+		return v.PurchaseCompleteTitle
+	end, { props.title, props.isError })
+
+	local text2 = React.useMemo(function()
+		if props.bodyText then
+			return props.bodyText
 		end
 
-		if t1.isError then
-			return v20.GenericErrorBody
+		if props.isError then
+			return v.GenericErrorBody
 		end
 
-		if t1.isMultiItem then
-			return v20.MultiItemPurchaseCompleteBody
+		if props.isMultiItem then
+			return v.MultiItemPurchaseCompleteBody
 		end
 
-		return formatTextWithParams(v20.PurchaseCompleteBody, {
-			ITEM_NAME = t1.itemName or ""
+		return formatTextWithParams(v.PurchaseCompleteBody, {
+			ITEM_NAME = props.itemName or ""
 		})
-	end, {
-		t1.bodyText,
-		t1.isError,
-		t1.isMultiItem,
-		t1.itemName
-	})
+	end, { props.bodyText, props.isError, props.isMultiItem, props.itemName })
 
-	React.useEffect(function() -- line: 89
-		-- upvalues: t1 (copy), v25 (copy), Foundation (copy)
-		if t1.isError then
-			v25(Foundation.Enums.IconName.TriangleExclamation)
-
-			return
+	React.useEffect(function()
+		if props.isError then
+			setState(Foundation.Enums.IconName.TriangleExclamation)
+		else
+			setState(Foundation.Enums.IconName.CircleCheck)
 		end
+	end, { props.isError })
 
-		v25(Foundation.Enums.IconName.CircleCheck)
-	end, { t1.isError })
-
-	return React.createElement(Dialog.Root, {
-		closeOnClickOutside = true,
-		disablePortal = false,
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v4 = {
 		size = DialogSize.Medium,
-		onClose = if not t1.buttons.onClose then t1.buttons.onActivated else t1.buttons.onClose,
-		ref = v21
-	}, {
-		DialogTitle = React.createElement(Dialog.Title, {
-			text = v26
-		}),
+		closeOnClickOutside = true,
+		onClose = 0,
+		ref = 0,
+		disablePortal = false
+	}
+	local onClose
+
+	if props.buttons.onClose then
+		onClose = props.buttons.onClose
+	else
+		onClose = props.buttons.onActivated
+	end
+
+	v4.onClose = onClose
+	v4.ref = ref2
+
+	local v5 = {
+		DialogTitle = React.createElement(Dialog.Title, { text = text }),
 		DialogContent = React.createElement(Dialog.Content, nil, {
-			Body = React.createElement(View, {
-				tag = "col gap-large auto-y size-full-0 align-x-center align-y-center padding-top-small"
-			}, {
-				DialogIcon = React.createElement(Icon, {
-					tag = "auto-xy",
-					name = v24,
-					size = v23.Size.Size_1200
-				}),
-				Message = React.createElement(FoundationText, {
-					tag = "auto-xy text-body content-default text-align-x-left text-body-medium text-wrap",
-					Text = v27
-				})
-			})
+			Body = React.createElement(
+				View,
+				{
+					tag = "col gap-large auto-y size-full-0 align-x-center align-y-center padding-top-small"
+				},
+				{
+					DialogIcon = React.createElement(Icon, {
+						name = state,
+						size = v2.Size.Size_1200,
+						tag = "auto-xy"
+					}),
+					Message = React.createElement(Text, {
+						Text = text2,
+						tag = "auto-xy text-body content-default text-align-x-left text-body-medium text-wrap"
+					})
+				}
+			)
 		}),
-		DialogActions = React.createElement(Dialog.Actions, {
-			orientation = EnumsOrientation.Horizontal,
-			actions = {{
-				isDisabled = false,
-				text = if not t1.buttons or not t1.buttons.text then v20.OkButtonText else t1.buttons.text,
+		DialogActions = 0
+	}
+
+	local createElement2 = React.createElement
+	local actions = Dialog.Actions
+	local v6 = { orientation = Orientation.Horizontal, actions = 0 }
+	local actions2
+
+	if v3 then
+		actions2 = {
+			{
+				icon = icon,
 				variant = ButtonVariant.Emphasis,
-				onActivated = t1.buttons.onActivated,
-				ref = v22
-			}}
-		})
-	})
+				onActivated = props.buttons.onActivated,
+				ref = ref3,
+				isDisabled = false
+			}
+		}
+	else
+		actions2 = { nil }
+		local text3
+
+		if props.buttons and props.buttons.text then
+			text3 = props.buttons.text
+		else
+			text3 = v.OkButtonText
+		end
+
+		actions2[1] = {
+	text = text3,
+	variant = ButtonVariant.Emphasis,
+	onActivated = props.buttons.onActivated,
+	ref = ref3,
+	isDisabled = false
+}
+	end
+
+	v6.actions = actions2
+	v5.DialogActions = createElement2(actions, v6)
+	return createElement(root, v4, v5)
 end
 
 return UnifiedPurchaseCompletionModalV2

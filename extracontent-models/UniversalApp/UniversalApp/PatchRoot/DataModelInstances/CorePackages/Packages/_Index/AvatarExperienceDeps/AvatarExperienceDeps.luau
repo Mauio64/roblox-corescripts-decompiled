@@ -1,5 +1,5 @@
-local scriptParent = script.Parent
+local parent = script.Parent
 
 return {
-	RoactFitComponents = require(scriptParent.RoactFitComponents)
+	RoactFitComponents = require(parent.RoactFitComponents)
 }

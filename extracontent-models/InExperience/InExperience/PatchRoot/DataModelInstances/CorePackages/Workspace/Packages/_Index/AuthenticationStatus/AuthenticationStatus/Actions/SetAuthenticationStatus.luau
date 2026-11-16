@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("AuthenticationStatus").Parent
+local parent = script:FindFirstAncestor("AuthenticationStatus").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
-	return {
-		status = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(status)
+	return { status = status }
 end)

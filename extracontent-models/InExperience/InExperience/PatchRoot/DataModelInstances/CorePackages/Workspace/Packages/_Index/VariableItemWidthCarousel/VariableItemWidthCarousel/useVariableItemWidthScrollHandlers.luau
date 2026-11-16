@@ -1,196 +1,154 @@
 local VariableItemWidthCarousel = script:FindFirstAncestor("VariableItemWidthCarousel")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 local TweenService = game:GetService("TweenService")
-local VariableItemWidthCarouselParent = VariableItemWidthCarousel.Parent
-local React = require(VariableItemWidthCarouselParent.React)
+local parent = VariableItemWidthCarousel.Parent
 
-local function clampTargetCanvasPosition(p1, n1: number) -- line: 8
-	return Vector2.new(math.round((math.clamp(n1, 0, p1.AbsoluteCanvasSize.X - p1.AbsoluteSize.X))), 0)
+local React = require(parent.React)
+
+local function clampTargetCanvasPosition(p, value: number) -- 1 equivalent call inferred from this helper
+	return Vector2.new(math.round((math.clamp(value, 0, p.AbsoluteCanvasSize.X - p.AbsoluteSize.X))), 0)
 end
 
-function useVariableItemWidthScrollHandlers(t1: {[any]: any}, n2: number, p2: ((...any) -> ...any), t2: {[any]: any}, n3: number?) -- line: 15
-	-- upvalues: React (copy), UserGameSettings (copy), TweenService (copy), clampTargetCanvasPosition (copy)
-	local v14 = React.useRef(nil)
-	local v15 = React.useRef(0)
-	local v16 = React.useRef(0)
-	local v17, v18 = React.useState(false)
-	local v19, v20 = React.useState(true)
-	local v21, v22 = React.useState(Vector2.zero)
-	local v23 = React.useMemo(function() -- line: 28
-		-- upvalues: t1 (copy), p2 (copy)
-		local t3 = {
-			[0] = 0
-		}
+function useVariableItemWidthScrollHandlers(list, p: number, callback, p2, value: number?)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(0)
+	local ref3 = React.useRef(0)
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(true)
+	local state3, setState3 = React.useState(Vector2.zero)
+	local v = React.useMemo(function()
+		local result = { [0] = 0 }
 
-		for i, _ in ipairs(t1) do
-			t3[i] = p2(i)
+		for i, _ in ipairs(list) do
+			result[i] = callback(i)
 		end
 
-		return t3
-	end, {
-		t1,
-		p2
-	})
+		return result
+	end, { list, callback })
 
-	React.useEffect(function() -- line: 36
-		-- upvalues: t2 (copy), v22 (copy)
-		local connection = nil
+	React.useEffect(function()
+		local absoluteSizeChangedConnection
 
-		if t2.current then
-			local current = t2.current
+		if p2.current then
+			local current = p2.current
 
-			v22(current.AbsoluteSize)
-			connection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 44
-				-- upvalues: v22 (copy), current (copy)
-				v22(current.AbsoluteSize)
+			setState3(current.AbsoluteSize)
+
+			absoluteSizeChangedConnection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				setState3(current.AbsoluteSize)
 			end)
+		else
+			absoluteSizeChangedConnection = nil
 		end
 
-		return function() -- line: 49
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if absoluteSizeChangedConnection then
+				absoluteSizeChangedConnection:Disconnect()
 			end
 		end
-	end, { t2 })
+	end, { p2 })
 
-	local v24 = React.useCallback(function(p3, vector2: Vector2) -- line: 57
-		-- upvalues: v14 (copy), v15 (copy), UserGameSettings (copy), n3 (copy), TweenService (copy)
-		if v14.current then
-			v14.current:Cancel()
+	local v2 = React.useCallback(function(instance, canvasPosition: Vector2)
+		if ref.current then
+			ref.current:Cancel()
 		end
 
-		v15.current = vector2.X
+		ref2.current = canvasPosition.X
 
 		if UserGameSettings.ReducedMotion then
-			p3.CanvasPosition = vector2
-
-			return
+			instance.CanvasPosition = canvasPosition
+		else
+			ref.current = TweenService:Create(
+				instance,
+				TweenInfo.new(value or 0.75, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut),
+				{ CanvasPosition = canvasPosition }
+			):Play()
 		end
+	end, { UserGameSettings.ReducedMotion, value })
 
-		local tweenInfo = TweenInfo.new(n3 or 0.75, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut)
-
-		v14.current = TweenService:Create(p3, tweenInfo, {
-			CanvasPosition = vector2
-		}):Play()
-	end, {
-		UserGameSettings.ReducedMotion,
-		n3
-	})
-	local v25 = React.useCallback(function() -- line: 73
-		-- upvalues: t2 (copy), v18 (copy), v15 (copy), v20 (copy), v21 (copy)
-		local current = t2.current
+	local v3 = React.useCallback(function()
+		local current = p2.current
 
 		if current then
-			v18(v15.current > 0)
-			v20(v15.current < current.AbsoluteCanvasSize.X - v21.X)
-
-			return
+			setState(ref2.current > 0)
+			setState2(ref2.current < current.AbsoluteCanvasSize.X - state3.X)
+		else
+			setState(false)
+			setState2(false)
 		end
+	end, { setState, setState2, state3 })
 
-		v18(false)
-		v20(false)
-	end, {
-		v18,
-		v20,
-		v21
-	})
-	local v26 = React.useCallback(function(_) -- line: 84
-		-- upvalues: t1 (copy), v23 (copy), n2 (copy), v21 (copy)
-		local n4 = 0
+	local v4 = React.useCallback(function(_)
+		local total = 0
 
-		for i = #t1, 1, -1 do
-			local v42 = v23[i]
+		for i = #list, 1, -1 do
+			local v4 = v[i]
+			total += v4 + (v4 > 0 and p or 0)
 
-			n4 += v42 + (v42 > 0 and n2 or 0)
-
-			if n4 >= v21.X then
+			if state3.X <= total then
 				return i
 			end
 		end
 
 		return 1
-	end, {
-		t1,
-		v23,
-		n2,
-		v21
-	})
-	local v27 = React.useCallback(function(p5, n5: number) -- line: 97
-		-- upvalues: v21 (copy), v16 (copy), t1 (copy), v23 (copy), n2 (copy), v26 (copy)
-		local X = v21.X
-		local n6 = 0
-		local current = v16.current
-		local n7 = 0
-		local n8 = 0
+	end, { list, v, p, state3 })
 
-		for i = math.max(current, 1), #t1 do
-			local v51 = v23[i]
+	local v5 = React.useCallback(function(p3, p4: number)
+		local x = state3.X
 
-			n8 += v51 + (v51 > 0 and n2 or 0)
+		local current = ref3.current
+		local count = 0
+		local total = 0
+		local total2 = 0
 
-			if X <= n8 then
+		for i = math.max(current, 1), #list do
+			local v5 = v[i]
+			total2 += v5 + (v5 > 0 and p or 0)
+
+			if x <= total2 then
 				break
 			end
 
-			n7 += 1
+			count += 1
 		end
 
-		local v52 = math.clamp(math.max(1, n7) * n5, -#t1, #t1)
+		local v5 = math.clamp(math.max(1, count) * p4, -#list, #list)
 
-		for i = 0, math.clamp(current + v52, 0, #t1) do
-			local v54 = v23[i]
-
-			n6 += v54 + (v54 > 0 and n2 or 0)
+		for i = 0, math.clamp(current + v5, 0, #list) do
+			local v6 = v[i]
+			total += v6 + (v6 > 0 and p or 0)
 		end
 
-		local v55 = math.clamp(current + v52, 0, v26(p5))
+		local v6 = math.clamp(current + v5, 0, v4(p3))
 
-		return Vector2.new(math.round((math.clamp(n6, 0, p5.AbsoluteCanvasSize.X - p5.AbsoluteSize.X))), 0), v55
-	end, {
-		t1,
-		v23,
-		n2,
-		clampTargetCanvasPosition,
-		v26,
-		v21
-	})
-	local v28 = React.useCallback(function() -- line: 132
-		-- upvalues: t2 (copy), v27 (copy), v16 (copy), v24 (copy), v25 (copy)
-		local current = t2.current
+		return clampTargetCanvasPosition(p3, total), v6 -- inferred equivalent call
+	end, { list, v, p, clampTargetCanvasPosition, v4, state3 })
+
+	local v6 = React.useCallback(function()
+		local current = p2.current
 
 		if current then
-			local v57, v58 = v27(current, -1)
-
-			v16.current = v58
-			v24(current, v57)
-			v25()
+			local v6, current2 = v5(current, -1)
+			ref3.current = current2
+			v2(current, v6)
+			v3()
 		end
-	end, {
-		v24,
-		v25,
-		v27
-	})
-	local v29 = React.useCallback(function() -- line: 149
-		-- upvalues: t2 (copy), v27 (copy), v16 (copy), v24 (copy), v25 (copy)
-		local current = t2.current
+	end, { v2, v3, v5 })
+
+	local v7 = React.useCallback(function()
+		local current = p2.current
 
 		if current then
-			local v60, v61 = v27(current, 1)
-
-			v16.current = v61
-			v24(current, v60)
-			v25()
+			local v7, current2 = v5(current, 1)
+			ref3.current = current2
+			v2(current, v7)
+			v3()
 		end
-	end, {
-		v24,
-		v25,
-		v27
-	})
+	end, { v2, v3, v5 })
 
-	React.useEffect(v25, { v25 })
+	React.useEffect(v3, { v3 })
 
-	return v28, v29, v17, v19, v25
+	return v6, v7, state, state2, v3
 end
 
 return useVariableItemWidthScrollHandlers

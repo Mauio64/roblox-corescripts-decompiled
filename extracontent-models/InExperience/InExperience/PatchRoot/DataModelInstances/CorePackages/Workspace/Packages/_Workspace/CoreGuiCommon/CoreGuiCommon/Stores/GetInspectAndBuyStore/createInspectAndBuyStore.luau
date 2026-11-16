@@ -1,12 +1,9 @@
-local Parent = script:FindFirstAncestor("CoreGuiCommon").Parent
-local createSignal = require(Parent.Signals).createSignal
+local parent = script:FindFirstAncestor("CoreGuiCommon").Parent
+local Signals = require(parent.Signals)
+local createSignal = Signals.createSignal
 
-return function() -- line: 14
-	-- upvalues: createSignal (copy)
-	local v3, v4 = createSignal(false)
+return function()
+	local signal, setInspectAndBuyOpen = createSignal(false)
 
-	return {
-		getInspectAndBuyOpen = v3,
-		setInspectAndBuyOpen = v4
-	}
+	return { getInspectAndBuyOpen = signal, setInspectAndBuyOpen = setInspectAndBuyOpen }
 end

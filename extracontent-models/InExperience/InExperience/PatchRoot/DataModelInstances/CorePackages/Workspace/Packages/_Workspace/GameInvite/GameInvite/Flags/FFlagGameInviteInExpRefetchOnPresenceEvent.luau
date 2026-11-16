@@ -1,0 +1,3 @@
+local FFlagGameInviteInExpLivePresence = require(script.Parent.FFlagGameInviteInExpLivePresence)
+
+return game:DefineFastFlag("GameInviteInExpRefetchOnPresenceEvent", false) and FFlagGameInviteInExpLivePresence

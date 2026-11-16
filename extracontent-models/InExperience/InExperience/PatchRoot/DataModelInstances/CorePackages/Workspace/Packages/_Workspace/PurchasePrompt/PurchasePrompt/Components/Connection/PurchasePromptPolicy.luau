@@ -1,10 +1,12 @@
-local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
-local PolicyProvider = require(Parent.PurchasePromptDeps).PolicyProvider
-local v3 = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
-local v4 = PolicyProvider.withGetPolicyImplementation(v3)
+local parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local PurchasePromptDeps = require(parent.PurchasePromptDeps)
+local PolicyProvider = PurchasePromptDeps.PolicyProvider
 
-function v4.Mapper(_) -- line: 9
+local memStorageService = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+local v = PolicyProvider.withGetPolicyImplementation(memStorageService)
+
+function v.Mapper(_)
 	return {}
 end
 
-return v4
+return v

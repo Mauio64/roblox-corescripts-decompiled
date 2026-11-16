@@ -1,9 +1,8 @@
-local BindableEvent = Instance.new("BindableEvent")
+local bindableEvent = Instance.new("BindableEvent")
 
 return {
-	BindableEvent = BindableEvent,
-	setAppChatVisible = function(b1: boolean) -- line: 3
-		-- upvalues: BindableEvent (copy)
-		BindableEvent:Fire(b1)
+	BindableEvent = bindableEvent,
+	setAppChatVisible = function(flag: boolean)
+		bindableEvent:Fire(flag)
 	end
 }

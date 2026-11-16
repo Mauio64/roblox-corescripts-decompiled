@@ -1,77 +1,76 @@
-local v1 = game:DefineFastFlag("ServerCoreScriptSourceCode", false)
-local t1 = {
-	getFFlagServerCoreScriptSourceCode = function() -- line: 6
-		-- upvalues: v1 (copy)
-		return v1
-	end
-}
+local fFlagServerCoreScriptSourceCode = game:DefineFastFlag("ServerCoreScriptSourceCode", false)
 
-if v1 then
-	local InsertService = game:GetService("InsertService")
-	local Modules = game:GetService("CoreGui"):WaitForChild("RobloxGui", 1e999).Modules
+local ServerUtil = {}
 
-	local function getRelativePathArray(p1, p2) -- line: 15
-		local t2 = {}
-
-		while p2 ~= p1 do
-			if p2 == nil then
-				return nil
-			end
-
-			table.insert(t2, 1, p2.Name)
-			p2 = p2.Parent
-		end
-
-		return t2
-	end
-
-	function t1.getSourceForServerScript(p3) -- line: 27
-		-- upvalues: Modules (copy), getRelativePathArray (copy)
-		if p3.Source ~= "" then
-			return p3.Source
-		end
-
-		local v11 = Modules
-		local SourceCode = Modules.SourceCode
-		local v13 = getRelativePathArray(v11, p3)
-
-		if v13 == nil then
-			error("Instance is not a descendant of the byte code root")
-		end
-
-		for i = 1, #v13 do
-			SourceCode = SourceCode:FindFirstChild(v13[i])
-		end
-
-		if SourceCode == nil then
-			error("No source found for instance")
-		end
-
-		return SourceCode.Source
-	end
-
-	local function isByteCodeMode() -- line: 52
-		return script.Source == ""
-	end
-
-	function t1.initSourceCodeFolder() -- line: 56
-		-- upvalues: InsertService (copy), Modules (copy)
-		if script.Source ~= "" then
-			return
-		end
-
-		local v15 = InsertService:LoadLocalAsset("rbxasset://models/ServerCoreScripts.rbxm")
-		local Folder = Instance.new("Folder")
-
-		Folder.Name = "SourceCode"
-		Folder.Parent = Modules
-
-		local Server = v15.Server
-		local Common = v15.Common
-
-		Server.Parent = Folder
-		Common.Parent = Folder
-	end
+function ServerUtil.getFFlagServerCoreScriptSourceCode()
+	return fFlagServerCoreScriptSourceCode
 end
 
-return t1
+if not fFlagServerCoreScriptSourceCode then
+	return ServerUtil
+end
+
+local InsertService = game:GetService("InsertService")
+local CoreGui = game:GetService("CoreGui")
+local modules = CoreGui:WaitForChild("RobloxGui", 1e999).Modules
+
+local function getRelativePathArray(modules2, instance)
+	local result = {}
+
+	while instance ~= modules2 do
+		if instance == nil then
+			return nil
+		end
+
+		table.insert(result, 1, instance.Name)
+		instance = instance.Parent
+	end
+
+	return result
+end
+
+function ServerUtil.getSourceForServerScript(p)
+	if p.Source ~= "" then
+		return p.Source
+	end
+
+	local sourceCode = modules.SourceCode
+
+	local relativePathArray = getRelativePathArray(modules, p)
+
+	if relativePathArray == nil then
+		error("Instance is not a descendant of the byte code root")
+	end
+
+	for i = 1, #relativePathArray do
+		sourceCode = sourceCode:FindFirstChild(relativePathArray[i])
+	end
+
+	if sourceCode == nil then
+		error("No source found for instance")
+	end
+
+	return sourceCode.Source
+end
+
+local function isByteCodeMode(): boolean -- 1 equivalent call inferred from this helper
+	return script.Source == ""
+end
+
+function ServerUtil.initSourceCodeFolder()
+	if not isByteCodeMode() then -- inferred equivalent call
+		return
+	end
+
+	local localAsset = InsertService:LoadLocalAsset("rbxasset://models/ServerCoreScripts.rbxm")
+	local sourceCode = Instance.new("Folder")
+	sourceCode.Name = "SourceCode"
+	sourceCode.Parent = modules
+
+	local server = localAsset.Server
+	local common = localAsset.Common
+	server.Parent = sourceCode
+	common.Parent = sourceCode
+end
+
+return ServerUtil

@@ -1,31 +1,22 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
+local parent = script.Parent.Parent
 
+local React = require(parent.React)
 require(script.Parent.Message)
 
-local v3 = React.createContext(nil)
+local context = React.createContext(nil)
+local MessageWriterContext = {}
+MessageWriterContext.Context = context
 
-return {
-	Context = v3,
-	Provider = function(t1: {[any]: any}) -- line: 19
-		-- upvalues: React (copy), v3 (copy)
-		local v5 = React.useMemo(function() -- line: 21
-			-- upvalues: t1 (copy)
-			return {
-				write = t1.upsertMessage,
-				remove = t1.removeMessage
-			}
-		end, {
-			t1.upsertMessage,
-			t1.removeMessage
-		})
+function MessageWriterContext.Provider(props)
+	local v = React.useMemo(function()
+		return { write = props.upsertMessage, remove = props.removeMessage }
+	end, { props.upsertMessage, props.removeMessage })
 
-		return React.createElement(v3.Provider, {
-			value = v5
-		}, t1.children)
-	end,
-	useMessageWriter = function() -- line: 31
-		-- upvalues: React (copy), v3 (copy)
-		return React.useContext(v3)
-	end
-}
+	return React.createElement(context.Provider, { value = v }, props.children)
+end
+
+function MessageWriterContext.useMessageWriter()
+	return React.useContext(context)
+end
+
+return MessageWriterContext

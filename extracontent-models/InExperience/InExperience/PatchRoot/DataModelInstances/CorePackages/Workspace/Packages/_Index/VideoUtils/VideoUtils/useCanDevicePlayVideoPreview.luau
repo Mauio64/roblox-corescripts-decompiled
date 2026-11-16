@@ -1,155 +1,107 @@
 local TelemetryService = game:GetService("TelemetryService")
-local VideoUtils = script:FindFirstAncestor("VideoUtils")
-local VideoUtilsParent = VideoUtils.Parent
-local React = require(VideoUtilsParent.React)
-local LoggingProtocol = require(VideoUtilsParent.LoggingProtocol)
-local reportWarning = require(VideoUtilsParent.DiscoveryAnalytics).Points.reportWarning
-local SystemInfoProtocol = require(VideoUtilsParent.SystemInfoProtocol).SystemInfoProtocol
-local VideoBlockingHelpers = require(VideoUtils.VideoBlockingHelpers)
-local FFlagLuaAppShareEdpVideoBlockingConfig = require(VideoUtilsParent.SharedFlags).FFlagLuaAppShareEdpVideoBlockingConfig
-local u10 = if not FFlagLuaAppShareEdpVideoBlockingConfig then {
-	eventName = "EdpVideoPreviewBlockingStatus",
-	description = "Telemetry about whether or not the video is blocked by manufacturer/device/max memory",
-	backends = {
-		"Points",
-		"EventIngest"
-	},
-	lastUpdated = {
-		26,
-		1,
-		19
-	},
-	throttlingPercentage = game:DefineFastInt("VideoBlockingTelemetryThrottleHundredthsPercent", 10000)
-} else VideoBlockingHelpers.VideoBlockingTelemetryConfig
-local u11 = nil
 
-local function getSystemInfoLazy() -- line: 40
-	-- upvalues: u11 (ref), SystemInfoProtocol (copy), reportWarning (copy), LoggingProtocol (copy)
-	if u11 then
-		return u11
+local VideoUtils = script:FindFirstAncestor("VideoUtils")
+local parent = VideoUtils.Parent
+
+local React = require(parent.React)
+local LoggingProtocol = require(parent.LoggingProtocol)
+local DiscoveryAnalytics = require(parent.DiscoveryAnalytics)
+local reportWarning = DiscoveryAnalytics.Points.reportWarning
+local SystemInfoProtocol = require(parent.SystemInfoProtocol)
+local systemInfoProtocol = SystemInfoProtocol.SystemInfoProtocol
+
+local VideoBlockingHelpers = require(VideoUtils.VideoBlockingHelpers)
+
+local VideoBlockingTelemetryConfig = VideoBlockingHelpers.VideoBlockingTelemetryConfig
+
+local v = nil
+
+local function getSystemInfoLazy()
+	if v then
+		return v
 	end
 
-	local t1 = {
-		manufacturer = nil,
-		deviceName = nil,
-		maxMemory = nil
-	}
-	local ok, result = pcall(function() -- line: 51
-		-- upvalues: SystemInfoProtocol (copy)
-		local v24 = SystemInfoProtocol.default:getSystemInfo({
-			SystemInfoProtocol.InfoNames.MANUFACTURER,
-			SystemInfoProtocol.InfoNames.DEVICE_NAME,
-			SystemInfoProtocol.InfoNames.MAX_MEMORY
+	local selected = { manufacturer = nil, deviceName = nil, maxMemory = nil }
+
+	local success, result = pcall(function()
+		local systemInfo = systemInfoProtocol.default:getSystemInfo({
+			systemInfoProtocol.InfoNames.MANUFACTURER,
+			systemInfoProtocol.InfoNames.DEVICE_NAME,
+			systemInfoProtocol.InfoNames.MAX_MEMORY
 		})
 
 		return {
-			manufacturer = v24.manufacturer,
-			deviceName = v24.deviceName,
-			maxMemory = v24.maxMemory
+			manufacturer = systemInfo.manufacturer,
+			deviceName = systemInfo.deviceName,
+			maxMemory = systemInfo.maxMemory
 		}
 	end)
 
-	if ok then
-		t1 = result
+	if success then
+		selected = result
 	else
-		reportWarning(LoggingProtocol.default, "EdpVideoPreviewBlocking", `Error retrieving device info for video preview blocking check: { result }`)
+		reportWarning(
+			LoggingProtocol.default,
+			"EdpVideoPreviewBlocking",
+			`Error retrieving device info for video preview blocking check: {result}`
+		)
 	end
 
-	u11 = t1
-
-	return t1
+	v = selected
+	return selected
 end
-local function useCanDevicePlayVideoPreview(t2: {[any]: any}, s1: string, s2: string) -- line: 93
-	-- upvalues: React (copy), getSystemInfoLazy (copy), FFlagLuaAppShareEdpVideoBlockingConfig (copy), VideoBlockingHelpers (copy), SystemInfoProtocol (copy), reportWarning (copy), LoggingProtocol (copy), TelemetryService (copy), u10 (ref)
-	local v20 = React.useMemo(function() -- line: 99
-		-- upvalues: getSystemInfoLazy (copy)
-		return (getSystemInfoLazy())
+
+local function useCanDevicePlayVideoPreview(data, universeId: string, pageContext: string)
+	local v2 = React.useMemo(function()
+		return getSystemInfoLazy()
 	end, {})
-	local v21 = React.useMemo(function() -- line: 103
-		-- upvalues: t2 (copy), FFlagLuaAppShareEdpVideoBlockingConfig (copy), VideoBlockingHelpers (copy), v20 (copy)
-		if not t2.enableManufacturerDeny or not t2.manufacturerDenyList then
-			return false
-		end
 
-		if FFlagLuaAppShareEdpVideoBlockingConfig then
-			return VideoBlockingHelpers.isInPipeDenyList(v20.manufacturer, t2.manufacturerDenyList)
-		end
-
-		if typeof(v20.manufacturer) == "string" then
-			for match in t2.manufacturerDenyList:gmatch("([^|]+)") do
-				if typeof(match) == "string" and string.lower(match) == string.lower(v20.manufacturer) then
-					return true
-				end
-			end
+	local v3 = React.useMemo(function()
+		if data.enableManufacturerDeny and data.manufacturerDenyList then
+			return VideoBlockingHelpers.isInPipeDenyList(v2.manufacturer, data.manufacturerDenyList)
 		end
 
 		return false
-	end, {
-		t2.enableManufacturerDeny,
-		t2.manufacturerDenyList,
-		v20.manufacturer
-	})
-	local v22 = React.useMemo(function() -- line: 123
-		-- upvalues: t2 (copy), FFlagLuaAppShareEdpVideoBlockingConfig (copy), VideoBlockingHelpers (copy), v20 (copy)
-		if not t2.enableDeviceDeny or not t2.deviceDenyList then
-			return false
-		end
+	end, { data.enableManufacturerDeny, data.manufacturerDenyList, v2.manufacturer })
 
-		if FFlagLuaAppShareEdpVideoBlockingConfig then
-			return VideoBlockingHelpers.isInPipeDenyList(v20.deviceName, t2.deviceDenyList)
-		end
-
-		if typeof(v20.deviceName) == "string" then
-			for match in t2.deviceDenyList:gmatch("([^|]+)") do
-				if typeof(match) == "string" and string.lower(match) == string.lower(v20.deviceName) then
-					return true
-				end
-			end
+	local v4 = React.useMemo(function()
+		if data.enableDeviceDeny and data.deviceDenyList then
+			return VideoBlockingHelpers.isInPipeDenyList(v2.deviceName, data.deviceDenyList)
 		end
 
 		return false
-	end, {
-		t2.enableDeviceDeny,
-		t2.deviceDenyList,
-		v20.deviceName
-	})
-	local v23 = React.useMemo(function() -- line: 143
-		-- upvalues: t2 (copy), v20 (copy)
-		if not t2.enableMaxMemoryDeny then
+	end, { data.enableDeviceDeny, data.deviceDenyList, v2.deviceName })
+
+	local v5 = React.useMemo(function(): boolean
+		if not data.enableMaxMemoryDeny then
 			return false
 		end
 
-		local v27 = t2.maxMemoryThresholdMb or -1
+		local maxMemoryThresholdMb = data.maxMemoryThresholdMb or -1
 
-		if v27 > 0 and typeof(v20.maxMemory) == "string" then
-			local num = tonumber(v20.maxMemory:match("(%d+)"))
+		if maxMemoryThresholdMb > 0 and typeof(v2.maxMemory) == "string" then
+			local v5 = tonumber(v2.maxMemory:match("(%d+)"))
 
-			if num and num < v27 then
+			if v5 and v5 < maxMemoryThresholdMb then
 				return true
 			end
 		end
 
 		return false
-	end, {
-		t2.enableMaxMemoryDeny,
-		t2.maxMemoryThresholdMb,
-		v20.maxMemory
-	})
+	end, { data.enableMaxMemoryDeny, data.maxMemoryThresholdMb, v2.maxMemory })
 
-	return (React.useCallback(function() -- line: 160
-		-- upvalues: t2 (copy), SystemInfoProtocol (copy), reportWarning (copy), LoggingProtocol (copy), TelemetryService (copy), u10 (ref), s2 (copy), s1 (copy), v21 (copy), v22 (copy), v23 (copy)
-		local v29 = false
-		local num = nil
+	return (React.useCallback(function(): boolean
+		local v6 = false
+		local availRAM = nil
 
-		if t2.enableAvailableRamDeny and (t2.availableRamThresholdMb and t2.availableRamThresholdMb > 0) then
-			local ok, result = pcall(function() -- line: 169
-				-- upvalues: SystemInfoProtocol (copy), num (ref), t2 (copy)
-				local v33 = SystemInfoProtocol.default:getSystemInfo({ SystemInfoProtocol.InfoNames.AVAIL_RAM })
+		if data.enableAvailableRamDeny and data.availableRamThresholdMb and data.availableRamThresholdMb > 0 then
+			local success, result = pcall(function(): boolean
+				local systemInfo = systemInfoProtocol.default:getSystemInfo({ systemInfoProtocol.InfoNames.AVAIL_RAM })
 
-				if typeof(v33.availRAM) == "string" then
-					num = tonumber(v33.availRAM)
+				if typeof(systemInfo.availRAM) == "string" then
+					availRAM = tonumber(systemInfo.availRAM)
 
-					if num and num < t2.availableRamThresholdMb then
+					if availRAM and availRAM < data.availableRamThresholdMb then
 						return true
 					end
 				end
@@ -157,41 +109,78 @@ local function useCanDevicePlayVideoPreview(t2: {[any]: any}, s1: string, s2: st
 				return false
 			end)
 
-			if ok then
-				v29 = result
+			if success then
+				v6 = result
 			else
-				reportWarning(LoggingProtocol.default, "EdpVideoPreviewBlocking", `Error retrieving available RAM for video preview blocking check: { result }`)
+				reportWarning(
+					LoggingProtocol.default,
+					"EdpVideoPreviewBlocking",
+					`Error retrieving available RAM for video preview blocking check: {result}`
+				)
 			end
 		end
 
-		TelemetryService:LogEvent(u10, {
-			standardizedFields = {
-				"addOSInfo",
-				"addSessionInfo"
-			},
-			customFields = {
-				pageContext = s2,
-				universeId = s1,
-				isBlockedByManufacturer = if not t2.enableManufacturerDeny then nil else v21,
-				isBlockedByDevice = if not t2.enableDeviceDeny then nil else v22,
-				isBlockedByMaxMemory = if not t2.enableMaxMemoryDeny then nil else v23,
-				isBlockedByAvailableRam = if not t2.enableAvailableRamDeny then nil else v29,
-				availableRam = if not t2.enableAvailableRamDeny then nil else num
-			}
+		local customFields = {
+			pageContext = pageContext,
+			universeId = universeId,
+			isBlockedByManufacturer = 0,
+			isBlockedByDevice = 0,
+			isBlockedByMaxMemory = 0,
+			isBlockedByAvailableRam = 0,
+			availableRam = 0
+		}
+		local isBlockedByManufacturer
+
+		if data.enableManufacturerDeny then
+			isBlockedByManufacturer = v3
+		end
+
+		customFields.isBlockedByManufacturer = isBlockedByManufacturer
+		local isBlockedByDevice
+
+		if data.enableDeviceDeny then
+			isBlockedByDevice = v4
+		end
+
+		customFields.isBlockedByDevice = isBlockedByDevice
+		local isBlockedByMaxMemory
+
+		if data.enableMaxMemoryDeny then
+			isBlockedByMaxMemory = v5
+		end
+
+		customFields.isBlockedByMaxMemory = isBlockedByMaxMemory
+		local isBlockedByAvailableRam
+
+		if data.enableAvailableRamDeny then
+			isBlockedByAvailableRam = v6
+		end
+
+		customFields.isBlockedByAvailableRam = isBlockedByAvailableRam
+		local availableRam
+
+		if data.enableAvailableRamDeny then
+			availableRam = availRAM
+		end
+
+		customFields.availableRam = availableRam
+		TelemetryService:LogEvent(VideoBlockingTelemetryConfig, {
+			standardizedFields = { "addOSInfo", "addSessionInfo" },
+			customFields = customFields
 		})
 
-		return not (t2.enableManufacturerDeny and v21 or (t2.enableDeviceDeny and v22 or (t2.enableMaxMemoryDeny and v23 or t2.enableAvailableRamDeny and v29)))
+		return not (data.enableManufacturerDeny and v3 or data.enableDeviceDeny and v4 or data.enableMaxMemoryDeny and v5 or data.enableAvailableRamDeny and v6)
 	end, {
-		t2.enableManufacturerDeny,
-		t2.enableDeviceDeny,
-		t2.enableMaxMemoryDeny,
-		t2.enableAvailableRamDeny,
-		t2.availableRamThresholdMb,
-		v21,
-		v22,
-		v23,
-		s1,
-		s2
+		data.enableManufacturerDeny,
+		data.enableDeviceDeny,
+		data.enableMaxMemoryDeny,
+		data.enableAvailableRamDeny,
+		data.availableRamThresholdMb,
+		v3,
+		v4,
+		v5,
+		universeId,
+		pageContext
 	}))
 end
 

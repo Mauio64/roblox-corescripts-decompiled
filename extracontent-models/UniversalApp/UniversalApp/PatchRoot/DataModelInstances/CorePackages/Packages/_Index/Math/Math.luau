@@ -1,3 +1,1 @@
-return {
-	clz32 = require(script.clz32)
-}
+return { clz32 = require(script.clz32) }

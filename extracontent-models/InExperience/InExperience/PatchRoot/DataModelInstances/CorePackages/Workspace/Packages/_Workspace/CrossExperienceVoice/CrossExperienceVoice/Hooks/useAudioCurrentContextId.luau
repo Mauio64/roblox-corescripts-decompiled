@@ -1,34 +1,35 @@
 local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
-local React = require(CrossExperienceVoice.dependencies).React
-local default = require(CrossExperienceVoice.CrossExperienceVoiceManager).default
-local v4 = default:getAudioFocusService()
+local dependencies = require(CrossExperienceVoice.dependencies)
 
-return function() -- line: 8
-	-- upvalues: React (copy), v4 (copy), default (copy)
-	local v5, v6 = React.useState(-1)
+local react = dependencies.React
+local CrossExperienceVoiceManager = require(CrossExperienceVoice.CrossExperienceVoiceManager)
+local default = CrossExperienceVoiceManager.default
+local audioFocusService = default:getAudioFocusService()
 
-	if v4 then
-		React.useEffect(function() -- line: 12
-			-- upvalues: v6 (copy), default (copy), v4 (copy)
-			v6(default:getCurrentAudioContext())
-			v4.OnContextRegistered:Connect(function() -- line: 15
-				-- upvalues: v6 (copy), default (copy)
-				v6(default:getCurrentAudioContext())
+return function()
+	local state, setState = react.useState(-1)
+
+	if audioFocusService then
+		react.useEffect(function()
+			setState(default:getCurrentAudioContext())
+
+			audioFocusService.OnContextRegistered:Connect(function()
+				setState(default:getCurrentAudioContext())
 			end)
-			v4.OnContextUnregistered:Connect(function() -- line: 19
-				-- upvalues: v6 (copy), default (copy)
-				v6(default:getCurrentAudioContext())
+
+			audioFocusService.OnContextUnregistered:Connect(function()
+				setState(default:getCurrentAudioContext())
 			end)
-			v4.OnDeafenVoiceAudio:Connect(function(_) -- line: 23
-				-- upvalues: v6 (copy), default (copy)
-				v6(default:getCurrentAudioContext())
+
+			audioFocusService.OnDeafenVoiceAudio:Connect(function(_)
+				setState(default:getCurrentAudioContext())
 			end)
-			v4.OnUndeafenVoiceAudio:Connect(function(_) -- line: 27
-				-- upvalues: v6 (copy), default (copy)
-				v6(default:getCurrentAudioContext())
+
+			audioFocusService.OnUndeafenVoiceAudio:Connect(function(_)
+				setState(default:getCurrentAudioContext())
 			end)
 		end, {})
 	end
 
-	return v5
+	return state
 end

@@ -1,89 +1,97 @@
 local CorePackages = game:GetService("CorePackages")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local Roact = require(CorePackages.Packages.Roact)
+
 local ShareGame = RobloxGui.Modules.Settings.Pages.ShareGame
 local Constants = require(ShareGame.Constants)
 local Theme = require(RobloxGui.Modules.Settings.Theme)
-local v7 = Theme.font(Enum.Font.SourceSans, "ConversationDetails")
-local WHITE = Constants.Color.WHITE
-local v9 = Theme.textSize(19)
-local v10 = Theme.font(Enum.Font.SourceSans, "ConversationDetails")
-local GRAY3 = Constants.Color.GRAY3
-local v12 = Theme.textSize(16, "ConversationDetails")
-local v13 = Theme.font(Enum.Font.SourceSans, "ConversationDetails")
-local v14 = Theme.textSize(16, "ConversationDetails")
-local v15 = require(ShareGame.getTranslator)()
-local v16 = Roact.PureComponent:extend("ConversationDetails")
 
-function v16.render(p1) -- line: 30
-	-- upvalues: Roact (copy), v12 (copy), v10 (copy), GRAY3 (copy), v14 (copy), v15 (copy), Constants (copy), v13 (copy), v9 (copy), v7 (copy), WHITE (copy)
-	local title = p1.props.title
-	local subtitle = p1.props.subtitle
-	local presence = p1.props.presence
-	local size = p1.props.size
-	local layoutOrder = p1.props.layoutOrder
-	local zIndex = p1.props.zIndex
-	local v24 = nil
+local font = Theme.font(Enum.Font.SourceSans, "ConversationDetails")
+local white = Constants.Color.WHITE
+local textSize = Theme.textSize(19)
+
+local font2 = Theme.font(Enum.Font.SourceSans, "ConversationDetails")
+local GRAY3 = Constants.Color.GRAY3
+local textSize2 = Theme.textSize(16, "ConversationDetails")
+
+local font3 = Theme.font(Enum.Font.SourceSans, "ConversationDetails")
+local textSize3 = Theme.textSize(16, "ConversationDetails")
+
+local getTranslator = require(ShareGame.getTranslator)
+local translator = getTranslator()
+
+local extended = Roact.PureComponent:extend("ConversationDetails")
+
+function extended.render(p)
+	local title = p.props.title
+	local subtitle = p.props.subtitle
+	local presence = p.props.presence
+	local size = p.props.size
+	local layoutOrder = p.props.layoutOrder
+	local zIndex = p.props.zIndex
+	local subtitle2
 
 	if subtitle ~= nil then
-		v24 = Roact.createElement("TextLabel", {
+		subtitle2 = Roact.createElement("TextLabel", {
 			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, textSize2),
+			Text = subtitle,
+			Font = font2,
+			TextColor3 = GRAY3,
+			TextSize = textSize2,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			TextWrapped = true,
 			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, v12),
-			Text = subtitle,
-			Font = v10,
-			TextColor3 = GRAY3,
-			TextSize = v12,
-			TextXAlignment = Enum.TextXAlignment.Left,
 			ZIndex = zIndex
 		})
 	end
 
-	local v25 = nil
+	local presence2
 
 	if presence ~= nil then
-		v25 = Roact.createElement("TextLabel", {
+		presence2 = Roact.createElement("TextLabel", {
 			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, v14),
-			Text = v15:FormatByKey(Constants.PresenceTextKey[presence]),
-			Font = v13,
+			Size = UDim2.new(1, 0, 0, textSize3),
+			Text = translator:FormatByKey(Constants.PresenceTextKey[presence]),
+			Font = font3,
 			TextColor3 = Constants.PresenceColors[presence],
-			TextSize = v14,
+			TextSize = textSize3,
 			TextXAlignment = Enum.TextXAlignment.Left,
+			LayoutOrder = 2,
 			ZIndex = zIndex
 		})
 	end
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = size,
-		LayoutOrder = layoutOrder,
-		ZIndex = zIndex
-	}, {
-		UIListLayout = Roact.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, 2)
-		}),
-		Title = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			TextWrapped = true,
-			LayoutOrder = 0,
-			Size = UDim2.new(1, 0, 0, v9),
-			Text = title or "",
-			Font = v7,
-			TextColor3 = WHITE,
-			TextSize = v9,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			ZIndex = zIndex
-		}),
-		Subtitle = v24,
-		Presence = v25
-	})
+	return Roact.createElement(
+		"Frame",
+		{ BackgroundTransparency = 1, Size = size, LayoutOrder = layoutOrder, ZIndex = zIndex },
+		{
+			UIListLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 2)
+			}),
+			Title = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, textSize),
+				Text = title or "",
+				Font = font,
+				TextColor3 = white,
+				TextSize = textSize,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextWrapped = true,
+				LayoutOrder = 0,
+				ZIndex = zIndex
+			}),
+			Subtitle = subtitle2,
+			Presence = presence2
+		}
+	)
 end
 
-return v16
+return extended

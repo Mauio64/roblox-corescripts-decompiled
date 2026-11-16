@@ -1,263 +1,294 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
+
 local LineGraphHoverDisplay = require(script.Parent.LineGraphHoverDisplay)
+
 local Constants = require(script.Parent.Parent.Constants)
-local ColorText = Constants.Color.Text
+local Text = Constants.Color.Text
 local HighlightBlue = Constants.Color.HighlightBlue
 local LineWidth = Constants.GeneralFormatting.LineWidth
 local LineColor = Constants.GeneralFormatting.LineColor
+
 local PointWidth = Constants.Graph.PointWidth
 local PointOffset = Constants.Graph.PointOffset
-local GraphPadding = Constants.Graph.Padding
-local GraphScale = Constants.Graph.Scale
+local Padding = Constants.Graph.Padding
+local Scale = Constants.Graph.Scale
 local InnerPaddingY = Constants.Graph.InnerPaddingY
 local InnerScaleY = Constants.Graph.InnerScaleY
 local TextPadding = Constants.Graph.TextPadding
-local v16 = Roact.Component:extend("LineGraph")
 
-function v16.init(p1) -- line: 24
-	-- upvalues: Roact (copy)
-	function p1.onGraphInputChanged(_, p3) -- line: 25
-		-- upvalues: p1 (copy)
-		if p3.UserInputType == Enum.UserInputType.MouseMovement and not p1.state.holdPos then
-			p1:setState({
-				inputPosition = p3.Position
-			})
+local extended = Roact.Component:extend("LineGraph")
+
+function extended:init()
+	function self.onGraphInputChanged(_, p)
+		if p.UserInputType == Enum.UserInputType.MouseMovement and not self.state.holdPos then
+			self:setState({ inputPosition = p.Position })
 		end
 	end
-	function p1.onGraphInputEnded(_, p5) -- line: 35
-		-- upvalues: p1 (copy)
-		if p5.UserInputType == Enum.UserInputType.MouseMovement then
-			if not p1.state.holdPos then
-				p1:setState({
-					inputPosition = false
-				})
 
-				return
+	function self.onGraphInputEnded(_, p)
+		if p.UserInputType == Enum.UserInputType.MouseMovement then
+			if not self.state.holdPos then
+				self:setState({ inputPosition = false })
 			end
-		elseif p5.UserInputType == Enum.UserInputType.MouseButton1 then
-			p1:setState({
-				holdPos = not p1.state.holdPos
+		elseif p.UserInputType == Enum.UserInputType.MouseButton1 then
+			self:setState({
+				holdPos = not self.state.holdPos
 			})
 		end
 	end
 
-	p1.graphRef = Roact.createRef()
-	p1.state = {
-		selectedTimeStamps = {}
-	}
+	self.graphRef = Roact.createRef()
+	self.state = { selectedTimeStamps = {} }
 end
-function v16.didUpdate(p6) -- line: 55
-	if p6.state.absGraphSize ~= p6.graphRef.current.AbsoluteSize then
-		local AbsoluteSize = p6.graphRef.current.AbsoluteSize
-		local AbsolutePosition = p6.graphRef.current.AbsolutePosition
 
-		p6:setState({
-			absGraphSize = AbsoluteSize,
-			absGraphPos = AbsolutePosition
+function extended.didUpdate(object)
+	if object.state.absGraphSize ~= object.graphRef.current.AbsoluteSize then
+		object:setState({
+			absGraphSize = object.graphRef.current.AbsoluteSize,
+			absGraphPos = object.graphRef.current.AbsolutePosition
 		})
 	end
 end
-function v16.didMount(p7) -- line: 67
-	local AbsoluteSize = p7.graphRef.current.AbsoluteSize
-	local AbsolutePosition = p7.graphRef.current.AbsolutePosition
 
-	p7:setState({
-		absGraphSize = AbsoluteSize,
-		absGraphPos = AbsolutePosition
+function extended.didMount(object)
+	object:setState({
+		absGraphSize = object.graphRef.current.AbsoluteSize,
+		absGraphPos = object.graphRef.current.AbsolutePosition
 	})
 end
-function v16.render(p8) -- line: 77
-	-- upvalues: InnerScaleY (copy), Roact (copy), LineWidth (copy), InnerPaddingY (copy), HighlightBlue (copy), PointWidth (copy), PointOffset (copy), LineGraphHoverDisplay (copy), TextPadding (copy), LineColor (copy), ColorText (copy), GraphPadding (copy), GraphScale (copy)
-	local size = p8.props.size
-	local pos = p8.props.pos
-	local graphData = p8.props.graphData
-	local getX = p8.props.getX
-	local getY = p8.props.getY
-	local stringFormatX = p8.props.stringFormatX
-	local stringFormatY = p8.props.stringFormatY
-	local axisLabelX = p8.props.axisLabelX
-	local axisLabelY = p8.props.axisLabelY
-	local layoutOrder = p8.props.layoutOrder
-	local inputPosition = p8.state.inputPosition
-	local absGraphSize = p8.state.absGraphSize
-	local absGraphPos = p8.state.absGraphPos
-	local v38 = getX(graphData:back())
-	local v39 = getX(graphData:front())
-	local maxY = p8.props.maxY
-	local minY = p8.props.minY
-	local v42 = nil
-	local t1 = {}
+
+function extended.render(props)
+	local size = props.props.size
+	local pos = props.props.pos
+
+	local graphData = props.props.graphData
+
+	local getX = props.props.getX
+	local getY = props.props.getY
+
+	local stringFormatX = props.props.stringFormatX
+	local stringFormatY = props.props.stringFormatY
+
+	local axisLabelX = props.props.axisLabelX
+	local axisLabelY = props.props.axisLabelY
+
+	local layoutOrder = props.props.layoutOrder
+
+	local inputPosition = props.state.inputPosition
+	local absGraphSize = props.state.absGraphSize
+	local absGraphPos = props.state.absGraphPos
+
+	local text = getX(graphData:back())
+	local text2 = getX(graphData:front())
+	local maxY = props.props.maxY
+	local text3 = props.props.minY
+
+	local hoverLineY = nil
+
+	local children = {}
 
 	if absGraphSize then
-		local t2 = {}
-		local v45 = graphData:iterator()
-		local v46 = v45:next()
+		local iterator = graphData:iterator()
+		local v = iterator:next()
+		local v2 = {}
 
-		while v46 do
-			local v47 = getY(v46)
-			local v48 = getX(v46)
-			local v49 = v38 - v39
-			local v50 = v49 > 0 and (v48 - v39) / v49 or 0
-			local v51 = maxY - minY
-			local v52 = v51 > 0 and (v47 - minY) / v51 or 1
+		while v do
+			local y = getY(v)
+			local x = getX(v)
 
-			table.insert(t2, {
-				X = v50,
-				Y = v52,
-				data = v46
+			local v3 = text - text2
+			local v4 = v3 > 0 and (x - text2) / v3 or 0
+
+			local v5 = maxY - text3
+			table.insert(v2, {
+				X = v4,
+				Y = v5 > 0 and (y - text3) / v5 or 1,
+				data = v
 			})
-			v46 = v45:next()
+
+			v = iterator:next()
 		end
 
-		for i = 2, #t2 do
-			local v54 = t2[i].X * absGraphSize.X
-			local v55 = t2[i].Y * absGraphSize.Y * InnerScaleY
-			local v56 = t2[i - 1].X * absGraphSize.X
-			local v57 = t2[i - 1].Y * absGraphSize.Y * InnerScaleY
+		for i = 2, #v2 do
+			local v3 = v2[i].X * absGraphSize.X
+			local v4 = v2[i].Y * absGraphSize.Y * InnerScaleY
+			local v5 = v2[i - 1].X * absGraphSize.X
+			local v6 = v2[i - 1].Y * absGraphSize.Y * InnerScaleY
 
-			if v54 ~= v56 then
-				local v58 = (v54 + v56) / 2
-				local v59 = (v55 + v57) / 2
-				local v60 = v54 - v56
-				local v61 = v55 - v57
-				local v62 = math.sqrt(v60 * v60 + v61 * v61)
-				local v63 = math.deg((math.atan2(v61, v60)))
-
-				table.insert(t1, Roact.createElement("Frame", {
-					BorderSizePixel = 0,
-					Size = UDim2.new(0, v62, 0, LineWidth),
-					Position = UDim2.new(0, v58 - v62 / 2, 1 - InnerPaddingY, -v59),
-					BackgroundColor3 = HighlightBlue,
-					Rotation = -v63
-				}))
-				table.insert(t1, Roact.createElement("Frame", {
-					BorderSizePixel = 0,
-					Size = UDim2.new(0, PointWidth, 0, PointWidth),
-					Position = UDim2.new(0, v54, 1 - InnerPaddingY, -v55 - PointOffset),
-					BackgroundColor3 = HighlightBlue
-				}))
-
-				if inputPosition then
-					local v64 = inputPosition.X - absGraphPos.X
-
-					if v64 < v54 and v56 < v64 then
-						local v65 = getX(t2[i].data)
-						local v66 = getX(t2[i - 1].data)
-						local v67 = getY(t2[i].data)
-						local v68 = getY(t2[i - 1].data)
-						local v69 = (v64 - v56) / v60
-
-						v42 = v57 + v61 * v69
-
-						local v70 = (v65 - v66) * v69 + v66
-						local v71 = (v67 - v68) * v69 + v68
-
-						t1.HoverDetails = Roact.createElement(LineGraphHoverDisplay, {
-							hoverLineX = v64,
-							hoverLineY = v42,
-							hoverValX = v70,
-							hoverValY = v71,
-							stringFormatX = stringFormatX,
-							stringFormatY = stringFormatY
-						})
-					end
-				end
-			end
-		end
-
-		if #t2 > 0 then
-			local v72 = t2[#t2].Y * absGraphSize.Y * InnerScaleY
-			local v73 = getY(t2[#t2].data)
-			local v74 = v42 and math.abs(v72 - v42) < 10
-			local v75 = v42 and math.abs(v42) < 10 or math.abs(v72) < 10
-
-			if not v74 then
-				t1.LatestEntryLine = Roact.createElement("Frame", {
-					BackgroundTransparency = 0.5,
-					BorderSizePixel = 0,
-					Size = UDim2.new(1, TextPadding, 0, LineWidth),
-					Position = UDim2.new(0, -TextPadding, 1 - InnerPaddingY, -v72),
-					BackgroundColor3 = LineColor
-				})
-				t1.LatestEntryText = Roact.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					Text = stringFormatY and stringFormatY(v73) or v73,
-					TextColor3 = ColorText,
-					TextXAlignment = Enum.TextXAlignment.Right,
-					Position = UDim2.new(0, -TextPadding - 2, 1 - InnerPaddingY, -v72)
-				})
+			if v3 == v5 then
+				continue
 			end
 
-			if not v75 then
-				t1.AxisTextY0 = Roact.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					Text = stringFormatY and stringFormatY(minY) or minY,
-					TextColor3 = ColorText,
-					TextXAlignment = Enum.TextXAlignment.Right,
-					Position = UDim2.new(0, -TextPadding - 2, 1 - InnerPaddingY, 0)
-				})
-			end
+			local midpoint = (v3 + v5) / 2
+			local midpoint2 = (v4 + v6) / 2
 
-			t1.AxisX = Roact.createElement("Frame", {
+			local v7 = v3 - v5
+			local v8 = v4 - v6
+
+			local v9 = math.sqrt(v7 * v7 + v8 * v8)
+			local v10 = math.deg((math.atan2(v8, v7)))
+
+			table.insert(children, Roact.createElement("Frame", {
+				Size = UDim2.new(0, v9, 0, LineWidth),
+				Position = UDim2.new(0, midpoint - v9 / 2, 1 - InnerPaddingY, -midpoint2),
+				BackgroundColor3 = HighlightBlue,
 				BorderSizePixel = 0,
+				Rotation = -v10
+			}))
+
+			table.insert(children, Roact.createElement("Frame", {
+				Size = UDim2.new(0, PointWidth, 0, PointWidth),
+				Position = UDim2.new(0, v3, 1 - InnerPaddingY, -v4 - PointOffset),
+				BackgroundColor3 = HighlightBlue,
+				BorderSizePixel = 0
+			}))
+
+			if not inputPosition then
+				continue
+			end
+
+			local hoverLineX = inputPosition.X - absGraphPos.X
+
+			if not (hoverLineX < v3 and v5 < hoverLineX) then
+				continue
+			end
+
+			local x = getX(v2[i].data)
+			local x2 = getX(v2[i - 1].data)
+			local y = getY(v2[i].data)
+			local y2 = getY(v2[i - 1].data)
+
+			local v11 = (hoverLineX - v5) / v7
+			hoverLineY = v6 + v8 * v11
+
+			local hoverValX = (x - x2) * v11 + x2
+			local hoverValY = (y - y2) * v11 + y2
+
+			children.HoverDetails = Roact.createElement(LineGraphHoverDisplay, {
+				hoverLineX = hoverLineX,
+				hoverLineY = hoverLineY,
+				hoverValX = hoverValX,
+				hoverValY = hoverValY,
+				stringFormatX = stringFormatX,
+				stringFormatY = stringFormatY
+			})
+		end
+
+		if #v2 > 0 then
+			local v3 = v2[#v2].Y * absGraphSize.Y * InnerScaleY
+			local text4 = getY(v2[#v2].data)
+
+			local v4 = not (hoverLineY and math.abs(v3 - hoverLineY) < 10)
+
+			local v5 = not (hoverLineY and math.abs(hoverLineY) < 10 or math.abs(v3) < 10)
+
+			if v4 then
+				children.LatestEntryLine = Roact.createElement("Frame", {
+					Size = UDim2.new(1, TextPadding, 0, LineWidth),
+					Position = UDim2.new(0, -TextPadding, 1 - InnerPaddingY, -v3),
+					BackgroundColor3 = LineColor,
+					BackgroundTransparency = 0.5,
+					BorderSizePixel = 0
+				})
+
+				local createElement = Roact.createElement
+				text4 = stringFormatY and stringFormatY(text4) or text4
+				children.LatestEntryText = createElement("TextLabel", {
+					Text = text4,
+					TextColor3 = Text,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					Position = UDim2.new(0, -TextPadding - 2, 1 - InnerPaddingY, -v3),
+					BackgroundTransparency = 1
+				})
+			end
+
+			if v5 then
+				local createElement = Roact.createElement
+				text3 = stringFormatY and stringFormatY(text3) or text3
+				children.AxisTextY0 = createElement("TextLabel", {
+					Text = text3,
+					TextColor3 = Text,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					Position = UDim2.new(0, -TextPadding - 2, 1 - InnerPaddingY, 0),
+					BackgroundTransparency = 1
+				})
+			end
+
+			children.AxisX = Roact.createElement("Frame", {
 				Size = UDim2.new(1, 0, 0, LineWidth),
 				Position = UDim2.new(0, 0, 1, 0),
-				BackgroundColor3 = LineColor
+				BackgroundColor3 = LineColor,
+				BorderSizePixel = 0
 			})
-			t1.AxisY = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
+
+			children.AxisY = Roact.createElement("Frame", {
 				Size = UDim2.new(0, LineWidth, 1, 0),
-				BackgroundColor3 = LineColor
+				BackgroundColor3 = LineColor,
+				BorderSizePixel = 0
 			})
 		end
 	end
 
-	local v76 = 2 * TextPadding + 2
+	local v = 2 * TextPadding + 2
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = size,
-		Position = pos,
-		LayoutOrder = layoutOrder
-	}, {
+	local createElement = Roact.createElement
+
+	local children2 = {
 		name = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
 			Text = axisLabelY,
-			TextColor3 = ColorText,
+			TextColor3 = Text,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Position = UDim2.new(GraphPadding, 0, GraphPadding, -TextPadding)
+			Position = UDim2.new(Padding, 0, Padding, -TextPadding),
+			BackgroundTransparency = 1
 		}),
-		minX = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			Text = stringFormatX and stringFormatX(v39) or v39,
-			TextColor3 = ColorText,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			Position = UDim2.new(GraphPadding, 0, GraphPadding + GraphScale, v76)
-		}),
-		maxX = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			Text = stringFormatX and stringFormatX(v38) or v38,
-			TextColor3 = ColorText,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			Position = UDim2.new(GraphPadding + GraphScale, 0, GraphPadding + GraphScale, v76)
-		}),
-		axisLabelX = Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			Text = axisLabelX,
-			TextColor3 = ColorText,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			Position = UDim2.new(0.5, 0, GraphPadding + GraphScale, v76)
-		}),
-		graph = Roact.createElement("Frame", {
-			Position = UDim2.new(GraphPadding, 0, GraphPadding, 0),
-			Size = UDim2.new(GraphScale, 0, GraphScale, 0),
-			BackgroundTransparency = 1,
-			[Roact.Ref] = p8.graphRef,
-			[Roact.Event.InputChanged] = p8.onGraphInputChanged,
-			[Roact.Event.InputEnded] = p8.onGraphInputEnded
-		}, t1)
+		minX = 0,
+		maxX = 0,
+		axisLabelX = 0,
+		graph = 0
+	}
+
+	local createElement2 = Roact.createElement
+	text2 = stringFormatX and stringFormatX(text2) or text2
+	children2.minX = createElement2("TextLabel", {
+		Text = text2,
+		TextColor3 = Text,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Position = UDim2.new(Padding, 0, Padding + Scale, v),
+		BackgroundTransparency = 1
 	})
+
+	local createElement3 = Roact.createElement
+	text = stringFormatX and stringFormatX(text) or text
+	children2.maxX = createElement3("TextLabel", {
+		Text = text,
+		TextColor3 = Text,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Position = UDim2.new(Padding + Scale, 0, Padding + Scale, v),
+		BackgroundTransparency = 1
+	})
+
+	children2.axisLabelX = Roact.createElement("TextLabel", {
+		Text = axisLabelX,
+		TextColor3 = Text,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Position = UDim2.new(0.5, 0, Padding + Scale, v),
+		BackgroundTransparency = 1
+	})
+
+	children2.graph = Roact.createElement("Frame", {
+		Position = UDim2.new(Padding, 0, Padding, 0),
+		Size = UDim2.new(Scale, 0, Scale, 0),
+		BackgroundTransparency = 1,
+		[Roact.Ref] = props.graphRef,
+		[Roact.Event.InputChanged] = props.onGraphInputChanged,
+		[Roact.Event.InputEnded] = props.onGraphInputEnded
+	}, children)
+	return createElement(
+		"Frame",
+		{ Size = size, Position = pos, BackgroundTransparency = 1, LayoutOrder = layoutOrder },
+		children2
+	)
 end
 
-return v16
+return extended

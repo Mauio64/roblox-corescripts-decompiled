@@ -1,53 +1,74 @@
 local InExperienceShop = script:FindFirstAncestor("InExperienceShop")
-local InExperienceShopParent = InExperienceShop.Parent
-local React = require(InExperienceShopParent.React)
-local Foundation = require(InExperienceShopParent.Foundation)
-local useLocalization = require(InExperienceShopParent.Localization).Hooks.useLocalization
+local parent = InExperienceShop.Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 
 require(InExperienceShop.Types)
 
 local initiateShopItemPurchase = require(InExperienceShop.initiateShopItemPurchase)
+local FFlagCategoryLoggingInShopPurchase = require(InExperienceShop.Flags.FFlagCategoryLoggingInShopPurchase)
+
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
-local t1 = {
+
+local FFlagLuaAppEnableGamePassFreeTrials = require(InExperienceShop.Flags.FFlagLuaAppEnableGamePassFreeTrials)
+
+local v = {
 	owned = "Feature.Catalog.Label.Owned",
-	buy = "Feature.Catalog.Action.Buy"
+	buy = "Feature.Catalog.Action.Buy",
+	try = "Feature.Catalog.Action.Try"
 }
 
-local function ShopItemFooter(t2: {[any]: any}) -- line: 31
-	-- upvalues: useLocalization (copy), t1 (copy), React (copy), initiateShopItemPurchase (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
-	local v13 = useLocalization(t1)
-	local v14 = t2.isOwned or false
-	local v15 = React.useCallback(function() -- line: 35
-		-- upvalues: initiateShopItemPurchase (copy), t2 (copy)
-		initiateShopItemPurchase(t2.itemId, t2.itemType, t2.shopPageType)
-	end, {
-		t2.itemId,
-		t2.itemType,
-		t2.shopPageType
-	})
+local function ShopItemFooter(props)
+	local v2 = useLocalization(v)
+	local isOwned = props.isOwned or false
 
-	if v14 then
+	local purchaseCategoryLocation = props.purchaseCategoryLocation
+	local onActivated = React.useCallback(function()
+		if FFlagCategoryLoggingInShopPurchase and purchaseCategoryLocation ~= nil then
+			initiateShopItemPurchase(props.itemId, props.itemType, props.shopPageType, purchaseCategoryLocation)
+		else
+			initiateShopItemPurchase(props.itemId, props.itemType, props.shopPageType)
+		end
+	end, { props.itemId, props.itemType, props.shopPageType, purchaseCategoryLocation })
+
+	if isOwned then
 		return React.createElement(Button, {
-			isDisabled = true,
-			text = v13.owned,
+			text = v2.owned,
 			variant = ButtonVariant.Standard,
 			size = InputSize.Small,
 			width = UDim.new(1, 0),
-			LayoutOrder = t2.LayoutOrder,
-			onActivated = function() -- line: 47
-			end
+			isDisabled = true,
+			LayoutOrder = props.LayoutOrder,
+			onActivated = function() end
+		})
+	end
+
+	if not (FFlagLuaAppEnableGamePassFreeTrials and props.showTry) then
+		return React.createElement(Button, {
+			text = v2.buy,
+			variant = ButtonVariant.Standard,
+			size = InputSize.Small,
+			width = UDim.new(1, 0),
+			onActivated = onActivated,
+			isDisabled = props.isActionDisabled == true,
+			LayoutOrder = props.LayoutOrder
 		})
 	end
 
 	return React.createElement(Button, {
-		text = v13.buy,
+		text = v2.try,
 		variant = ButtonVariant.Standard,
 		size = InputSize.Small,
 		width = UDim.new(1, 0),
-		onActivated = v15,
-		LayoutOrder = t2.LayoutOrder
+		onActivated = props.onTryActivated or function() end,
+		isLoading = props.isActionLoading,
+		isDisabled = props.isActionDisabled == true and props.isActionLoading ~= true,
+		LayoutOrder = props.LayoutOrder
 	})
 end
 

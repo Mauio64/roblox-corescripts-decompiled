@@ -1,8 +1,8 @@
-return function(p1, _) -- line: 1
+return function(p, _)
 	return {
-		screen = p1.ChatAppReducer.ExternalNavigationRequest.screen,
-		params = p1.ChatAppReducer.ExternalNavigationRequest.params,
-		requestId = p1.ChatAppReducer.ExternalNavigationRequest.requestId,
-		completedRequestId = p1.ChatAppReducer.ExternalNavigationRequest.completedRequestId
+		screen = p.ChatAppReducer.ExternalNavigationRequest.screen,
+		params = p.ChatAppReducer.ExternalNavigationRequest.params,
+		requestId = p.ChatAppReducer.ExternalNavigationRequest.requestId,
+		completedRequestId = p.ChatAppReducer.ExternalNavigationRequest.completedRequestId
 	}
 end

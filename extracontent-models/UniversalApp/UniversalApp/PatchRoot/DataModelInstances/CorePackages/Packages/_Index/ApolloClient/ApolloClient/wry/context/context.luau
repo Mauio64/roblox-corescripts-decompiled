@@ -1,23 +1,18 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
-local t1 = {}
-local Slot = require(script.Parent.slot).Slot
+local parent = script.Parent.Parent.Parent.Parent
 
-t1.Slot = Slot
+local LuauPolyfill = require(parent.LuauPolyfill)
 
-local bind = Slot.bind
-local noContext = Slot.noContext
+local slot = require(script.Parent.slot)
+local slot2 = slot.Slot
 
-t1.bind = bind
-t1.noContext = noContext
+local bind = slot2.bind
+local Context = { ["Slot"] = slot2, bind = bind, noContext = slot2.noContext }
 
 local setTimeout = LuauPolyfill.setTimeout
-
-local function setTimeoutWithContext(p1: ((...any) -> ...any), n1: number) -- line: 27
-	-- upvalues: setTimeout (copy), bind (copy)
-	return setTimeout(bind(p1), n1)
+local function setTimeoutWithContext(callback, p: number)
+	return setTimeout(bind(callback), p)
 end
 
-t1.setTimeout = setTimeoutWithContext
+Context.setTimeout = setTimeoutWithContext
 
-return t1
+return Context

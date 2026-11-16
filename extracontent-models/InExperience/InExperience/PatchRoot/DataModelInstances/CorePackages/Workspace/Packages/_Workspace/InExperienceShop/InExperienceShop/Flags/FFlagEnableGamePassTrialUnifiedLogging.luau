@@ -1,0 +1,6 @@
+local FFlagEnableInExperienceShopUnifiedLogging = require(script.Parent.FFlagEnableInExperienceShopUnifiedLogging)
+local FFlagLuaAppEnableGamePassFreeTrials = require(script.Parent.FFlagLuaAppEnableGamePassFreeTrials)
+
+return game:DefineFastFlag("EnableGamePassTrialUnifiedLogging", false)
+	and FFlagEnableInExperienceShopUnifiedLogging
+	and FFlagLuaAppEnableGamePassFreeTrials

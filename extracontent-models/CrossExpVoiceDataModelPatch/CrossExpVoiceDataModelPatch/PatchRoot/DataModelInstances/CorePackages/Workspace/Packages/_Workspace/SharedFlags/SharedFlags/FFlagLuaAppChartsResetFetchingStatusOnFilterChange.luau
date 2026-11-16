@@ -1,3 +1,0 @@
-local FFlagLuaAppChartsStickyHeader = require(script.Parent.FFlagLuaAppChartsStickyHeader)
-
-return game:DefineFastFlag("LuaAppChartsResetFetchingStatusOnFilterChange2", false) and FFlagLuaAppChartsStickyHeader

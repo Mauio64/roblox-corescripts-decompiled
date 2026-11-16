@@ -1,110 +1,141 @@
 local Players = game:GetService("Players")
+
 local UserRelationshipModals = script:FindFirstAncestor("UserRelationshipModals")
-local UserRelationshipModalsParent = UserRelationshipModals.Parent
-local React = require(UserRelationshipModalsParent.React)
+local parent = UserRelationshipModals.Parent
+
+local React = require(parent.React)
 local useEffect = React.useEffect
-local Signals = require(UserRelationshipModalsParent.Signals)
-local SignalsReact = require(UserRelationshipModalsParent.SignalsReact)
-local useDispatch = require(UserRelationshipModalsParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalUserId = require(UserRelationshipModalsParent.RobloxAppHooks).useLocalUserId
-local UserProfiles = require(UserRelationshipModalsParent.UserProfiles)
-local FriendsNetworking = require(UserRelationshipModalsParent.FriendsNetworking)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+
+local UserProfiles = require(parent.UserProfiles)
+
+local FriendsNetworking = require(parent.FriendsNetworking)
 local myFriendsNetworking = require(UserRelationshipModals.Networking.myFriendsNetworking)
 local FriendshipOriginSourceType = FriendsNetworking.Enums.FriendshipOriginSourceType
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMigrateFriendshipStatusesRemainingActions = SharedFlags.FFlagMigrateFriendshipStatusesRemainingActions
+local DataHydration = require(parent.DataHydration)
+local v = DataHydration.Friends.FriendsStore.get()
+local DataHydration2 = require(parent.DataHydration)
+local Enums = DataHydration2.Friends.Enums
+
 local Analytics = require(UserRelationshipModals.Analytics)
-local useLocalization = require(UserRelationshipModalsParent.Localization).Hooks.useLocalization
-local NotificationModalsManager = require(UserRelationshipModalsParent.NotificationModalsManager)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local NotificationModalsManager = require(parent.NotificationModalsManager)
+
 local PromptFriendRequestModal = require(script.Parent.PromptFriendRequestModal)
 
-function triggerToast(s1: string) -- line: 29
-	-- upvalues: NotificationModalsManager (copy)
+function triggerToast(toastTitle: string)
 	NotificationModalsManager.SetUIBloxToast({
-		toastTitle = s1,
+		toastTitle = toastTitle,
 		sequenceNumber = DateTime.now().UnixTimestamp
 	})
 end
 
-local v18 = UserProfiles.Stores.UserProfileStore.get()
+local v2 = UserProfiles.Stores.UserProfileStore.get()
 
-local function PromptFriendRequestModalContainer(t1: {[any]: any}) -- line: 44
-	-- upvalues: useDispatch (copy), useLocalUserId (copy), Analytics (copy), useEffect (copy), useLocalization (copy), React (copy), Signals (copy), v18 (copy), SignalsReact (copy), Players (copy), myFriendsNetworking (copy), FriendshipOriginSourceType (copy), PromptFriendRequestModal (copy)
-	local v22 = useDispatch()
-	local v23 = useLocalUserId()
-	local fireAnalyticsEvent = Analytics.useUserRelationshipModalAnalytics(Analytics.RelationshipTypes.Friends, tonumber(v23) or 0, t1.userId).fireAnalyticsEvent
+local function PromptFriendRequestModalContainer(props)
+	local v3 = useDispatch()
+	local currentUserId = useLocalUserId()
 
-	useEffect(function() -- line: 54
-		-- upvalues: fireAnalyticsEvent (copy), Analytics (copy)
+	local fireAnalyticsEvent = Analytics.useUserRelationshipModalAnalytics(
+		Analytics.RelationshipTypes.Friends,
+		tonumber(currentUserId) or 0,
+		props.userId
+	).fireAnalyticsEvent
+
+	useEffect(function()
 		fireAnalyticsEvent(Analytics.EventNames.ModalSeen)
 	end, { fireAnalyticsEvent })
 
-	local v25 = useLocalization({
+	local v4 = useLocalization({
 		friendRequestSent = "Feature.Friends.Action.FriendRequestSent",
 		somethingWentWrong = "CommonUI.Messages.Response.SomethingWentWrong"
 	})
-	local v26 = React.useMemo(function() -- line: 63
-		-- upvalues: Signals (copy), v18 (copy), t1 (copy)
-		return Signals.createComputed(function(p1) -- line: 64
-			-- upvalues: v18 (copy), t1 (copy)
-			local v33 = v18.fetchNamesByUserIds({ (tostring(t1.userId)) })(p1)
-			local v34 = v33 and (v33.data and v33.data[1])
-			local v35 = v34 and v34.names
 
+	local v5 = React.useMemo(function()
+		return Signals.createComputed(function(p)
+			local v5 = v2.fetchNamesByUserIds({ (tostring(props.userId)) })(p)
+			local v6 = v5 and v5.data and v5.data[1]
+			local names = v6 and v6.names
 			return {
-				combinedName = not v35 and "" or v35.getCombinedName(p1),
-				username = not v35 and "" or v35.getUsername()
+				combinedName = not names and "" or names.getCombinedName(p),
+				username = not names and "" or names.getUsername()
 			}
 		end)
-	end, { t1.userId })
-	local v27 = SignalsReact.useSignalState(v26)
-	local v28 = React.useCallback(function() -- line: 78
-		-- upvalues: fireAnalyticsEvent (copy), Analytics (copy), Players (copy), t1 (copy), v25 (copy), v22 (copy), myFriendsNetworking (copy), v23 (copy), FriendshipOriginSourceType (copy)
+	end, { props.userId })
+
+	local v6 = SignalsReact.useSignalState(v5)
+
+	local onSendClicked = React.useCallback(function()
 		fireAnalyticsEvent(Analytics.EventNames.CreateActionPressed)
 
-		local PlayerByUserId = Players:GetPlayerByUserId(t1.userId)
+		local playerByUserId = Players:GetPlayerByUserId(props.userId)
 
-		if Players.LocalPlayer ~= nil and PlayerByUserId ~= nil then
-			local ok, _ = pcall(function() -- line: 88
-				-- upvalues: Players (copy), PlayerByUserId (copy)
-				Players.LocalPlayer:RequestFriendship(PlayerByUserId)
+		if Players.LocalPlayer == nil or playerByUserId == nil then
+			local v7
+
+			if FFlagMigrateFriendshipStatusesRemainingActions then
+				v7 = v.RequestFriendship(tostring(props.userId), Enums.FriendshipOriginSourceType.InGame)
+			else
+				v7 = v3(myFriendsNetworking.RequestFriendshipFromUserId.API({
+					currentUserId = currentUserId,
+					targetUserId = tostring(props.userId),
+					friendshipOriginSourceType = FriendshipOriginSourceType.InGame.rawValue()
+				}))
+			end
+
+			v7:andThen(function()
+				triggerToast(v4.friendRequestSent)
+			end):catch(function(_)
+				triggerToast(v4.somethingWentWrong)
 			end)
-
-			triggerToast(if not ok then v25.somethingWentWrong else v25.friendRequestSent)
 		else
-			v22(myFriendsNetworking.RequestFriendshipFromUserId.API({
-				currentUserId = v23,
-				targetUserId = tostring(t1.userId),
-				friendshipOriginSourceType = FriendshipOriginSourceType.InGame.rawValue()
-			})):andThen(function() -- line: 98
-				-- upvalues: v25 (copy)
-				triggerToast(v25.friendRequestSent)
-			end):catch(function(_) -- line: 101
-				-- upvalues: v25 (copy)
-				triggerToast(v25.somethingWentWrong)
+			local success, _ = pcall(function()
+				Players.LocalPlayer:RequestFriendship(playerByUserId)
 			end)
+			local triggerToast = triggerToast
+			local v7
+
+			if success then
+				v7 = v4.friendRequestSent
+			else
+				v7 = v4.somethingWentWrong
+			end
+
+			triggerToast(v7)
 		end
 
-		t1.onClose()
+		props.onClose()
 	end, {
-		v23,
-		t1.userId,
-		v22,
-		t1.onClose,
-		v25.friendRequestSent,
-		v25.somethingWentWrong,
+		currentUserId,
+		props.userId,
+		v3,
+		props.onClose,
+		v4.friendRequestSent,
+		v4.somethingWentWrong,
 		fireAnalyticsEvent
 	})
 
 	return React.createElement(PromptFriendRequestModal, {
-		userId = t1.userId,
-		displayName = v27.combinedName,
-		username = v27.username,
-		onClose = function() -- line: 122
-			-- upvalues: fireAnalyticsEvent (copy), Analytics (copy), t1 (copy)
+		userId = props.userId,
+		displayName = v6.combinedName,
+		username = v6.username,
+		onClose = function()
 			fireAnalyticsEvent(Analytics.EventNames.ModalClosed)
-			t1.onClose()
+			props.onClose()
 		end,
-		onSendClicked = v28,
-		inputDelay = t1.inputDelay
+		onSendClicked = onSendClicked,
+		inputDelay = props.inputDelay
 	})
 end
 

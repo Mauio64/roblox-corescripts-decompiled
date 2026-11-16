@@ -1,40 +1,40 @@
 local CorePackages = game:GetService("CorePackages")
-local RetrievalStatus = require(CorePackages.Workspace.Packages.Http).Enum.RetrievalStatus
-local ParentParent = script.Parent.Parent
-local IsDetailsItemPartOfBundleAndOffsale = require(ParentParent.Selectors.IsDetailsItemPartOfBundleAndOffsale)
-local UtilityFunctions = require(ParentParent.UtilityFunctions)
-local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
-local v7 = createInspectAndBuyKeyMapper("getFavoriteForAsset")
-local v8 = createInspectAndBuyKeyMapper("getFavoriteForBundle")
+local Http = require(CorePackages.Workspace.Packages.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
+local parent = script.Parent.Parent
+local IsDetailsItemPartOfBundleAndOffsale = require(parent.Selectors.IsDetailsItemPartOfBundleAndOffsale)
+local UtilityFunctions = require(parent.UtilityFunctions)
+local createInspectAndBuyKeyMapper = require(parent.createInspectAndBuyKeyMapper)
 
-return function(p1) -- line: 14
-	-- upvalues: IsDetailsItemPartOfBundleAndOffsale (copy), UtilityFunctions (copy), v8 (copy), RetrievalStatus (copy), v7 (copy)
-	local assetId = p1.detailsInformation.assetId
+local inspectAndBuyKeyMapper = createInspectAndBuyKeyMapper("getFavoriteForAsset")
+local inspectAndBuyKeyMapper2 = createInspectAndBuyKeyMapper("getFavoriteForBundle")
+
+return function(data): boolean
+	local assetId = data.detailsInformation.assetId
 
 	if not assetId then
 		return false
 	end
 
-	local v11 = IsDetailsItemPartOfBundleAndOffsale(p1)
+	local detailsItemPartOfBundleAndOffsale = IsDetailsItemPartOfBundleAndOffsale(data)
 
-	if v11 == nil then
+	if detailsItemPartOfBundleAndOffsale == nil then
 		return false
 	end
 
-	local v12 = p1.assets[assetId]
+	local asset = data.assets[assetId]
 
-	if not v12 then
+	if not asset then
 		return false
 	end
 
-	if v11 then
-		local v13 = UtilityFunctions.getBundleId(v12)
-		local v14 = v8(p1.storeId, v13)
-
-		return p1.FetchingStatus[v14] == RetrievalStatus.Fetching or p1.FetchingStatus[v14] == RetrievalStatus.Done
+	if not detailsItemPartOfBundleAndOffsale then
+		local v = inspectAndBuyKeyMapper(data.storeId, assetId)
+		return data.FetchingStatus[v] == RetrievalStatus.Fetching or data.FetchingStatus[v] == RetrievalStatus.Done
 	end
 
-	local v15 = v7(p1.storeId, assetId)
+	local bundleId = UtilityFunctions.getBundleId(asset)
 
-	return p1.FetchingStatus[v15] == RetrievalStatus.Fetching or p1.FetchingStatus[v15] == RetrievalStatus.Done
+	local v = inspectAndBuyKeyMapper2(data.storeId, bundleId)
+	return data.FetchingStatus[v] == RetrievalStatus.Fetching or data.FetchingStatus[v] == RetrievalStatus.Done
 end

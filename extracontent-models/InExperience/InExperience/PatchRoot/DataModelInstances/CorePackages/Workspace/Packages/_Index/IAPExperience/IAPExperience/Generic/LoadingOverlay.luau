@@ -1,163 +1,204 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local Roact = require(scriptParentParentParent.Roact)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-require(scriptParentParentParent.React)
+local Roact = require(parent3.Roact)
+require(parent3.React)
+local Otter = require(parent3.Otter)
 
-local Otter = require(scriptParentParentParent.Otter)
-local UIBlox = require(scriptParentParentParent.UIBlox)
-local Foundation = require(scriptParentParentParent.Foundation)
+local UIBlox = require(parent3.UIBlox)
+local Foundation = require(parent3.Foundation)
 local IconSize = Foundation.Enums.IconSize
 local Loading = Foundation.Loading
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local withStyle = UIBlox.Core.Style.withStyle
-local MultiTextLocalizer = require(scriptParentParent.Locale.MultiTextLocalizer)
-local LoadingOverlayState = require(scriptParent.LoadingOverlayState)
-local v13 = Roact.Component:extend(script.Name)
-local t1 = {
-	dampingRatio = 1,
-	frequency = 1
-}
 
-function v13.init(p1) -- line: 36
-	-- upvalues: Roact (copy), Otter (copy), t1 (copy)
-	local v16, v17 = Roact.createBinding(0)
+local MultiTextLocalizer = require(parent2.Locale.MultiTextLocalizer)
 
-	p1.motor = Otter.createSingleMotor(0)
-	p1.motor:start()
-	p1.motor:onStep(v17)
-	p1.animationProgress = v16
-	p1.motor:setGoal(Otter.spring(p1.props.loadingState == nil and 0 or 1, t1))
+local LoadingOverlayState = require(parent.LoadingOverlayState)
+
+local extended = Roact.Component:extend(script.Name)
+
+local v = { dampingRatio = 1, frequency = 1 }
+
+function extended:init()
+	local binding, v2 = Roact.createBinding(0)
+
+	self.motor = Otter.createSingleMotor(0)
+	self.motor:start()
+
+	self.motor:onStep(v2)
+	self.animationProgress = binding
+
+	self.motor:setGoal(Otter.spring(self.props.loadingState == nil and 0 or 1, v))
 end
-function v13.getLoadingMessage(_: {[any]: any}, t3: {[any]: any}, p2) -- line: 48
-	-- upvalues: LoadingOverlayState (copy)
-	if p2 == LoadingOverlayState.PurchasingItem then
-		return t3.PurchasingItem
+
+function extended:getLoadingMessage(data, p)
+	if p == LoadingOverlayState.PurchasingItem then
+		return data.PurchasingItem
 	end
 
-	if p2 == LoadingOverlayState.PurchasingRobux then
-		return t3.PurchasingRobux
+	if p == LoadingOverlayState.PurchasingRobux then
+		return data.PurchasingRobux
 	end
 
-	if p2 == LoadingOverlayState.WaitingForPurchase then
-		return t3.WaitingForPurchase
+	if p == LoadingOverlayState.WaitingForPurchase then
+		return data.WaitingForPurchase
 	end
 
-	if p2 == LoadingOverlayState.WaitingForRobux then
-		return t3.WaitingForRobux
+	if p == LoadingOverlayState.WaitingForRobux then
+		return data.WaitingForRobux
 	end
 
 	return nil
 end
-function v13.didUpdate(t4: {[any]: any}, t5: {[any]: any}, _) -- line: 61
-	-- upvalues: Otter (copy), t1 (copy)
-	local props = t4.props
 
-	if t5.loadingState ~= props.loadingState then
-		t4.motor:setGoal(Otter.spring(props.loadingState == nil and 0 or 1, t1))
+function extended.didUpdate(p, p2, _)
+	local props = p.props
+
+	if p2.loadingState ~= props.loadingState then
+		p.motor:setGoal(Otter.spring(props.loadingState == nil and 0 or 1, v))
 	end
 end
-function v13.willUnmount(p4) -- line: 69
-	p4.motor:destroy()
+
+function extended.willUnmount(p)
+	p.motor:destroy()
 end
-function v13.render(p5) -- line: 73
-	-- upvalues: Roact (copy), MultiTextLocalizer (copy)
+
+function extended:render()
 	return Roact.createElement(MultiTextLocalizer, {
 		keys = {
-			PurchasingItem = {
-				key = "IAPExperience.Loading.Text.PurchasingItem"
-			},
-			PurchasingRobux = {
-				key = "IAPExperience.Loading.Text.PurchasingRobux"
-			},
-			WaitingForPurchase = {
-				key = "IAPExperience.Loading.Text.WaitingForPurchase"
-			},
-			WaitingForRobux = {
-				key = "IAPExperience.Loading.Text.WaitingForRobux"
-			}
+			PurchasingItem = { key = "IAPExperience.Loading.Text.PurchasingItem" },
+			PurchasingRobux = { key = "IAPExperience.Loading.Text.PurchasingRobux" },
+			WaitingForPurchase = { key = "IAPExperience.Loading.Text.WaitingForPurchase" },
+			WaitingForRobux = { key = "IAPExperience.Loading.Text.WaitingForRobux" }
 		},
-		render = function(t6: {[any]: any}) -- line: 89
-			-- upvalues: p5 (copy)
-			return p5:renderAlert(t6)
+		render = function(p)
+			return self:renderAlert(p)
 		end
 	})
 end
-function v13.renderAlert(t7: {[any]: any}, t8: {[any]: any}) -- line: 95
-	-- upvalues: LoadingOverlayState (copy), withStyle (copy), Roact (copy), Loading (copy), IconSize (copy)
-	local props = t7.props
-	local v30 = props.loadingState ~= LoadingOverlayState.None and props.loadingState ~= nil
-	local v31 = t7:getLoadingMessage(t8, props.loadingState)
 
-	return withStyle(function(p6) -- line: 101
-		-- upvalues: Roact (copy), t7 (copy), props (copy), v30 (copy), Loading (copy), IconSize (copy), v31 (copy)
-		local Theme = p6.Theme
-		local p6Font = p6.Font
+function extended:renderAlert(p)
+	local props = self.props
+	local v2
 
-		return Roact.createElement("Frame", {
-			BackgroundColor3 = Theme.BackgroundUIContrast.Color,
-			BackgroundTransparency = t7.animationProgress:map(function(p7) -- line: 106
-				-- upvalues: props (copy), Theme (copy)
-				if props.showOverlay then
-					if props.shouldAnimate then
-						return 1 - (1 - Theme.BackgroundUIContrast.Transparency) * p7
-					end
+	if props.loadingState == LoadingOverlayState.None then
+		v2 = false
+	else
+		v2 = props.loadingState ~= nil
+	end
 
-					return Theme.BackgroundUIContrast.Transparency
+	local loadingMessage = self:getLoadingMessage(p, props.loadingState)
+
+	return withStyle(function(props2)
+		local theme = props2.Theme
+		local font = props2.Font
+		local createElement = Roact.createElement
+		local v3 = {
+			BackgroundColor3 = theme.BackgroundUIContrast.Color,
+			BackgroundTransparency = self.animationProgress:map(function(p2)
+				if not props.showOverlay then
+					return 1
 				end
 
-				return 1
+				if props.shouldAnimate then
+					return 1 - (1 - theme.BackgroundUIContrast.Transparency) * p2
+				end
+
+				return theme.BackgroundUIContrast.Transparency
 			end),
 			Size = UDim2.new(1, 0, 1, 0),
 			Visible = props.showOverlay
-		}, {
+		}
+		local children = {
 			StopPropagationOverlay = Roact.createElement("TextButton", {
 				Active = false,
 				BorderSizePixel = 0,
 				BackgroundTransparency = 1,
 				Selectable = false,
+				Size = UDim2.new(1, 0, 1, 0),
 				Text = "",
-				ZIndex = 0,
-				Size = UDim2.new(1, 0, 1, 0)
+				ZIndex = 0
 			}),
-			MiddleContent = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
-				BackgroundTransparency = 1,
-				ZIndex = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				Layout = Roact.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 20),
-					[Roact.Change.AbsoluteContentSize] = t7.onListLayoutAbsoluteContentSizeChanged
-				}),
-				Spinner = v30 and Roact.createElement(Loading, {
-					size = IconSize.Large,
-					Position = UDim2.fromScale(0.5, 0.5),
-					AnchorPoint = Vector2.new(0.5, 0.5)
-				}) or nil,
-				PreText = v31 and Roact.createElement("TextLabel", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					TextWrapped = true,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Font = p6Font.Body.Font,
-					Text = v31,
-					TextSize = p6Font.BaseSize * p6Font.Body.RelativeSize,
-					TextColor3 = Theme.TextDefault.Color,
-					TextTransparency = Theme.TextDefault.Transparency
-				}) or nil
+			MiddleContent = 0,
+			Children = 0
+		}
+
+		local createElement2 = Roact.createElement
+		local v4 = {
+			Size = UDim2.new(1, 0, 1, 0),
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			ZIndex = 1
+		}
+
+		local v5 = {
+			Layout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 20),
+				[Roact.Change.AbsoluteContentSize] = self.onListLayoutAbsoluteContentSizeChanged
 			}),
-			Children = Roact.createElement("Frame", {
-				BorderSizePixel = 0,
+			Spinner = v2 and Roact.createElement(Loading, {
+				size = IconSize.Large,
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5)
+			}) or nil,
+			PreText = 0
+		}
+		local preText
+
+		if loadingMessage then
+			local createElement3 = Roact.createElement
+			local v6 = {
+				LayoutOrder = 1,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, t7.props[Roact.Children])
-		})
+				AutomaticSize = Enum.AutomaticSize.XY,
+				TextWrapped = true,
+				Font = 0,
+				FontFace = 0,
+				Text = 0,
+				TextSize = 0,
+				TextColor3 = 0,
+				TextTransparency = 0
+			}
+			local font2
+
+			if not FoundationFontFaceMigration then
+				font2 = font.Body.Font
+			end
+
+			v6.Font = font2
+			local fontFace
+
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+			end
+
+			v6.FontFace = fontFace
+
+			v6.Text = loadingMessage
+			v6.TextSize = font.BaseSize * font.Body.RelativeSize
+			v6.TextColor3 = theme.TextDefault.Color
+			v6.TextTransparency = theme.TextDefault.Transparency
+			preText = createElement3("TextLabel", v6) or nil
+		end
+
+		v5.PreText = preText
+		children.MiddleContent = createElement2("Frame", v4, v5)
+
+		children.Children = Roact.createElement(
+			"Frame",
+			{ Size = UDim2.new(1, 0, 1, 0), BorderSizePixel = 0, BackgroundTransparency = 1 },
+			self.props[Roact.Children]
+		)
+		return createElement("Frame", v3, children)
 	end)
 end
 
-return v13
+return extended

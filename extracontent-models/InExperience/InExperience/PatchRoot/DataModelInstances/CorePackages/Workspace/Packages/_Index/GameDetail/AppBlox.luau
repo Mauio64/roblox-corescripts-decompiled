@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.AppBlox.AppBlox))
+local AppBlox = require(Workspace.AppBlox.AppBlox)
+
+return AppBlox

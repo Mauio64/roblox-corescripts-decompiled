@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("ExpChatShared").Parent
+local parent = script:FindFirstAncestor("ExpChatShared").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, b1: boolean) -- line: 11
-	return {
-		textChannel = p1,
-		shouldReorderTabs = b1
-	}
+return Rodux.makeActionCreator(script.Name, function(textChannel, shouldReorderTabs: boolean)
+	return { textChannel = textChannel, shouldReorderTabs = shouldReorderTabs }
 end)

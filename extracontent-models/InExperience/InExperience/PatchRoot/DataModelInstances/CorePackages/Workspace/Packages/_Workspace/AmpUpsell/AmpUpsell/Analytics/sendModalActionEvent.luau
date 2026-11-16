@@ -1,8 +1,3 @@
-return function(p1, s1: string, s2: string, s3: string) -- line: 1
-	local t1 = {
-		aType = s3,
-		origin = s2
-	}
-
-	p1.sendEventDeferred(s1, "modalAction", t1)
+return function(p, p2: string, origin: string, aType: string)
+	p.sendEventDeferred(p2, "modalAction", { aType = aType, origin = origin })
 end

@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.AppCommonLib.AppCommonLib))
+local AppCommonLib = require(Workspace.AppCommonLib.AppCommonLib)
+
+return AppCommonLib

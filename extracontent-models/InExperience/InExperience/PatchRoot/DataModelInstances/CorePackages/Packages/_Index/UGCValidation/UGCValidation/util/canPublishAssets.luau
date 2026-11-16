@@ -1,141 +1,129 @@
-local ParentParent = script.Parent.Parent
-local Promise = require(ParentParent.Parent.Promise)
+local parent = script.Parent.Parent
+
+local Promise = require(parent.Parent.Promise)
 
 game:DefineFastInt("UGCValidationCanPublishRequestPageSize", 50)
 game:DefineFastInt("UGCValidationMaxAssetSizeAllowed", 500)
 
-local APIUtil = require(ParentParent.util.APIUtil)
-local Constants = require(ParentParent.Constants)
-local getFStringUGCValidationReferenceMeshIdWhitelistForIEC = require(ParentParent.flags.getFStringUGCValidationReferenceMeshIdWhitelistForIEC)
+local APIUtil = require(parent.util.APIUtil)
+local Constants = require(parent.Constants)
 
-require(ParentParent.util.Types)
+local getFStringUGCValidationReferenceMeshIdWhitelistForIEC = require(parent.flags.getFStringUGCValidationReferenceMeshIdWhitelistForIEC)
+require(parent.util.Types)
 
 local HttpService = game:GetService("HttpService")
-local v7 = APIUtil.getBaseDomain()
-local v8 = string.format("https://apis.%s", v7)
 
-local function getWhitelistIds() -- line: 35
-	-- upvalues: getFStringUGCValidationReferenceMeshIdWhitelistForIEC (copy)
-	local t1 = {}
-	local v13 = getFStringUGCValidationReferenceMeshIdWhitelistForIEC()
+local baseDomain = APIUtil.getBaseDomain()
+local v = string.format("https://apis.%s", baseDomain)
 
-	if #v13 == 0 then
-		return t1
+local function getWhitelistIds()
+	local whitelistIds = {}
+	local fStringUGCValidationReferenceMeshIdWhitelistForIEC = getFStringUGCValidationReferenceMeshIdWhitelistForIEC()
+
+	if #fStringUGCValidationReferenceMeshIdWhitelistForIEC == 0 then
+		return whitelistIds
 	end
 
-	for match in string.gmatch(v13, "([^,%s]+)") do
-		t1[match] = true
+	for k in string.gmatch(fStringUGCValidationReferenceMeshIdWhitelistForIEC, "([^,%s]+)") do
+		whitelistIds[k] = true
 	end
 
-	return t1
+	return whitelistIds
 end
-local function createCanPublishPromise(s1: string, t2: {[any]: any}, p1, s2: string?, n1: number?) -- line: 49
-	-- upvalues: Promise (copy), HttpService (copy), Constants (copy)
-	if #t2 == 0 then
+
+local function createCanPublishPromise(url: string, assetIds, restrictedEntities, p: string?, universeId: number?)
+	if #assetIds == 0 then
 		return Promise.resolve()
 	end
 
-	return Promise.new(function(resolve, reject) -- line: 59
-		-- upvalues: HttpService (copy), t2 (copy), p1 (copy), n1 (copy), s1 (copy), Constants (copy), s2 (copy)
-		local json = HttpService:JSONEncode({
-			assetIds = t2,
-			restrictedEntities = p1,
-			universeId = n1
-		})
-
+	return Promise.new(function(callback, callback2)
 		HttpService:RequestInternal({
+			Url = url,
 			Method = "POST",
-			Url = s1,
-			Body = json,
+			Body = HttpService:JSONEncode({
+				assetIds = assetIds,
+				restrictedEntities = restrictedEntities,
+				universeId = universeId
+			}),
 			Headers = {
-				[Constants.ExperienceAuthHeaderKey] = s2,
+				[Constants.ExperienceAuthHeaderKey] = p,
 				[Constants.ContentType] = Constants.ApplicationJson
 			}
-		}):Start(function(p2, p3) -- line: 76
-			-- upvalues: resolve (copy), HttpService (copy), reject (copy)
+		}):Start(function(p2, p3)
 			if p2 and p3.StatusCode == 200 then
-				resolve(HttpService:JSONDecode(p3.Body))
-
-				return
+				callback(HttpService:JSONDecode(p3.Body))
+			else
+				callback2()
 			end
-
-			reject()
 		end)
 	end)
 end
-local function canPublishAssets(p4, p5, s3: string?, n2: number?, b1: boolean) -- line: 86
-	-- upvalues: v8 (copy), createCanPublishPromise (copy), Promise (copy), getFStringUGCValidationReferenceMeshIdWhitelistForIEC (copy), getWhitelistIds (copy)
-	local FastInt = game:GetFastInt("UGCValidationCanPublishRequestPageSize")
-	local FastInt2 = game:GetFastInt("UGCValidationMaxAssetSizeAllowed")
-	local v27 = v8 .. (not b1 and "packages-api/v1/canPublish" or "packages-api/v1/rcc/canPublish")
-	local t3 = {}
-	local t4 = {}
 
-	for v30, _ in p4 do
-		if not t3[v30] then
-			t3[v30] = true
-			table.insert(t4, v30)
+local function canPublishAssets(items, restrictedEntities, p: string?, universeId: number?, flag: boolean)
+	local fastInt = game:GetFastInt("UGCValidationCanPublishRequestPageSize")
+	local fastInt2 = game:GetFastInt("UGCValidationMaxAssetSizeAllowed")
+
+	local url = v .. (flag and "packages-api/v1/rcc/canPublish" or "packages-api/v1/canPublish")
+	local set = {}
+	local v2 = {}
+
+	for k, _ in items do
+		if set[k] then
+			continue
 		end
+
+		set[k] = true
+		table.insert(v2, k)
 	end
 
-	if FastInt2 < #t4 then
-		return {
-			status = "tooManyAssets"
-		}
+	if fastInt2 < #v2 then
+		return { status = "tooManyAssets" }
 	end
 
-	local t5 = {}
-	local t6 = {}
+	local v3 = {}
+	local v4 = {}
 
-	for _, v35 in t4 do
-		table.insert(t6, v35)
+	for _, v5 in v2 do
+		table.insert(v3, v5)
 
-		if FastInt <= #t6 then
-			table.insert(t5, createCanPublishPromise(v27, t6, p5, s3, n2))
-			t6 = {}
+		if not (fastInt <= #v3) then
+			continue
 		end
+
+		table.insert(v4, createCanPublishPromise(url, v3, restrictedEntities, p, universeId))
+		v3 = {}
 	end
 
-	if #t6 > 0 then
-		table.insert(t5, createCanPublishPromise(v27, t6, p5, s3, n2))
+	if #v3 > 0 then
+		table.insert(v4, createCanPublishPromise(url, v3, restrictedEntities, p, universeId))
 	end
 
-	local v36, v37 = Promise.all(t5):await()
+	local v5, v6 = Promise.all(v4):await()
 
-	if not v36 then
-		return {
-			status = "loadFailed"
-		}
+	if not v5 then
+		return { status = "loadFailed" }
 	end
 
-	local v38 = getFStringUGCValidationReferenceMeshIdWhitelistForIEC() ~= ""
-	local v39 = if not v38 then {} else getWhitelistIds()
-	local t7 = {}
+	local v7 = getFStringUGCValidationReferenceMeshIdWhitelistForIEC() ~= ""
+	local v8 = not v7 and {} or getWhitelistIds()
 
-	for _, v42 in v37 do
-		for v43, v44 in v42.result do
-			local v45 = p4[v43]
+	local verdicts = {}
 
-			if v45 then
-				local v46 = v44
+	for _, v9 in v6 do
+		for k, v10 in v9.result do
+			local item = items[k]
 
-				if v38 and not v44 and v39[v43] then
-					v46 = true
-				end
-
-				table.insert(t7, {
-					assetId = v43,
-					allowed = v46,
-					entry = v45[1]
+			if item then
+				table.insert(verdicts, {
+					assetId = k,
+					allowed = v7 and not v10 and v8[k] and true or v10,
+					entry = item[1]
 				})
 			end
 		end
 	end
 
-	return {
-		status = "ok",
-		verdicts = t7
-	}
+	return { status = "ok", verdicts = verdicts }
 end
 
 return canPublishAssets

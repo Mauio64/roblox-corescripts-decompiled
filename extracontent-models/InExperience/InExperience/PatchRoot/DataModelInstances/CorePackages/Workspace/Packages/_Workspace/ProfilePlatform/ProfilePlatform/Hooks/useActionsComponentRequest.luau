@@ -1,10 +1,9 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+require(parent.SocialCommon)
 
-require(ProfilePlatformParent.SocialCommon)
 require(ProfilePlatform.Types.Component)
-
 local buildUserActionsComponent = require(ProfilePlatform.Hooks.buildUserActionsComponent)
 local getDeepValue = require(ProfilePlatform.Utils.getDeepValue)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
@@ -12,36 +11,59 @@ local useAreWebViewsSupported = require(ProfilePlatform.Hooks.useAreWebViewsSupp
 local useIsProfileQrCodeEnabled = require(ProfilePlatform.Hooks.useIsProfileQrCodeEnabled)
 local useCanRenderTransferOnProfile = require(ProfilePlatform.Hooks.useCanRenderTransferOnProfile)
 local useCanSeeChatTab = require(ProfilePlatform.Hooks.useCanSeeChatTab)
-local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
-local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
-local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 
-return function() -- line: 21
-	-- upvalues: useProfileWrapperContext (copy), getDeepValue (copy), useAreWebViewsSupported (copy), useIsProfileQrCodeEnabled (copy), useCanRenderTransferOnProfile (copy), useCanSeeChatTab (copy), FFlagProfilePlatformCTAsRefactor (copy), useLocalUserId (copy), React (copy), buildUserActionsComponent (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy)
-	local v14 = useProfileWrapperContext()
-	local v15 = getDeepValue(v14, "sourceInfo.contextualInfoType")
-	local v16 = useAreWebViewsSupported()
-	local v17 = useIsProfileQrCodeEnabled()
-	local v18 = useCanRenderTransferOnProfile()
-	local v19 = useCanSeeChatTab()
-	local v20 = if not FFlagProfilePlatformCTAsRefactor then nil else useLocalUserId()
-	local v21 = not not FFlagProfilePlatformCTAsRefactor and tostring(v14.profileId) == tostring(v20)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformEnableCurrencyTransfer = SharedFlags.FFlagProfilePlatformEnableCurrencyTransfer
 
-	return React.useMemo(function() -- line: 34
-		-- upvalues: buildUserActionsComponent (copy), v15 (copy), v16 (copy), v17 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), v18 (copy), v19 (copy), FFlagProfilePlatformCTAsRefactor (copy), v21 (copy)
-		return buildUserActionsComponent(v15, {
-			areWebViewsSupported = v16,
-			isProfileQrCodeEnabled = v17,
-			canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v18,
-			canSeeChatTab = v19,
-			isSelfView = if not FFlagProfilePlatformCTAsRefactor then nil else v21
-		})
-	end, {
-		v15,
-		v16,
-		v17,
-		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v18,
-		v19,
-		if not FFlagProfilePlatformCTAsRefactor then nil else v21
+return function()
+	local v = useProfileWrapperContext()
+
+	local deepValue = getDeepValue(v, "sourceInfo.contextualInfoType")
+	local areWebViewsSupported = useAreWebViewsSupported()
+	local isProfileQrCodeEnabled = useIsProfileQrCodeEnabled()
+	local v2 = useCanRenderTransferOnProfile()
+	local canSeeChatTab = useCanSeeChatTab()
+	local v3 = useLocalUserId()
+	local isSelfView = tostring(v.profileId) == tostring(v3)
+
+	local useMemo = React.useMemo
+	local function fn()
+		local v4 = {
+			areWebViewsSupported = areWebViewsSupported,
+			isProfileQrCodeEnabled = isProfileQrCodeEnabled,
+			canRenderTransferInProfile = nil,
+			canSeeChatTab = nil,
+			isSelfView = nil
+		}
+		local canRenderTransferInProfile
+
+		if FFlagProfilePlatformEnableCurrencyTransfer then
+			canRenderTransferInProfile = v2
+		else
+			canRenderTransferInProfile = false
+		end
+
+		v4.canRenderTransferInProfile = canRenderTransferInProfile
+
+		v4.canSeeChatTab = canSeeChatTab
+		v4.isSelfView = isSelfView
+		return buildUserActionsComponent(deepValue, v4)
+	end
+
+	local v4
+
+	if FFlagProfilePlatformEnableCurrencyTransfer then
+		v4 = v2
+	end
+
+	return useMemo(fn, {
+		deepValue,
+		areWebViewsSupported,
+		isProfileQrCodeEnabled,
+		v4,
+		canSeeChatTab,
+		isSelfView
 	})
 end

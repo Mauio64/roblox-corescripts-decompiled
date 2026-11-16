@@ -1,31 +1,37 @@
 local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
-local ProfileQRCodeParent = ProfileQRCode.Parent
+local parent = ProfileQRCode.Parent
+
 local AnalyticsService = require(ProfileQRCode.Analytics.AnalyticsService)
 local Analytics = require(ProfileQRCode.Analytics)
-local React = require(ProfileQRCodeParent.React)
-local useLocalUserId = require(ProfileQRCodeParent.RobloxAppHooks).useLocalUserId
+
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 local ProfileQRCodePage = require(ProfileQRCode.Components.ProfileQRCodePage.ProfileQRCodePage)
 
-return function(t1: {[any]: any}) -- line: 22
-	-- upvalues: Analytics (copy), AnalyticsService (copy), useLocalUserId (copy), React (copy), ProfileQRCodePage (copy)
-	local v9 = Analytics.setupFireEvent({
-		analytics = if not t1.analyticsService then AnalyticsService else t1.analyticsService,
-		infoForAllEvents = {
-			uid = useLocalUserId(),
-			source = t1.source
-		}
+return function(props)
+	local setupFireEvent = Analytics.setupFireEvent
+	local analytics
+
+	if props.analyticsService then
+		analytics = props.analyticsService
+	else
+		analytics = AnalyticsService
+	end
+
+	local fireEvent = setupFireEvent({
+		analytics = analytics,
+		infoForAllEvents = { uid = useLocalUserId(), source = props.source }
 	})
 
 	return React.createElement(Analytics.Context.Provider, {
-		value = {
-			fireEvent = v9
-		}
+		value = { fireEvent = fireEvent }
 	}, {
 		Window = React.createElement(ProfileQRCodePage, {
-			appStorageService = t1.appStorageService,
-			robloxEventReceiver = t1.robloxEventReceiver,
-			onClose = t1.onClose,
-			openQrCodeScanner = t1.openQrCodeScanner
+			appStorageService = props.appStorageService,
+			robloxEventReceiver = props.robloxEventReceiver,
+			onClose = props.onClose,
+			openQrCodeScanner = props.openQrCodeScanner
 		})
 	})
 end

@@ -1,3 +1,5 @@
-local _Workspace = script.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent._Workspace
 
-return (require(_Workspace.CoreScriptsInitializer.CoreScriptsInitializer))
+local CoreScriptsInitializer = require(Workspace.CoreScriptsInitializer.CoreScriptsInitializer)
+
+return CoreScriptsInitializer

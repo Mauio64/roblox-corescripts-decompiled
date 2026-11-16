@@ -1,8 +1,8 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.React)
+require(parent.React)
 require(script.Parent.Enums.NodeType)
-require(ParentParent.InlineLayout)
-require(ParentParent.MarkdownCore)
+require(parent.InlineLayout)
+require(parent.MarkdownCore)
 
 return {}

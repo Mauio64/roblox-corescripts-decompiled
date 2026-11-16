@@ -1,85 +1,83 @@
 local CorePackages = game:GetService("CorePackages")
 local Cryo = require(CorePackages.Packages.Cryo)
 local Rodux = require(CorePackages.Packages.Rodux)
-local ParentParent = script.Parent.Parent
-local SetBundles = require(ParentParent.Actions.SetBundles)
-local SetFavoriteBundle = require(ParentParent.Actions.SetFavoriteBundle)
-local UpdateBulkPuchaseResults = require(ParentParent.Actions.UpdateBulkPuchaseResults)
-local SetAvatarPreviewDetails = require(ParentParent.Actions.SetAvatarPreviewDetails)
-local ItemTypeEnum = require(CorePackages.Workspace.Packages.AvatarExperienceCommon).Enums.ItemTypeEnum
-local FFlagAXEnableFetchAvatarPreview = require(ParentParent.Flags.FFlagAXEnableFetchAvatarPreview)
-local FFlagAXEnableInspectAndBuyBulkPurchase = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAXEnableInspectAndBuyBulkPurchase
-local BundleInfo = require(ParentParent.Models.BundleInfo)
+local parent = script.Parent.Parent
+local SetBundles = require(parent.Actions.SetBundles)
+local SetFavoriteBundle = require(parent.Actions.SetFavoriteBundle)
+local UpdateBulkPuchaseResults = require(parent.Actions.UpdateBulkPuchaseResults)
+local SetAvatarPreviewDetails = require(parent.Actions.SetAvatarPreviewDetails)
+local AvatarExperienceModel = require(CorePackages.Workspace.Packages.AvatarExperienceModel)
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
+
+local FFlagAXEnableFetchAvatarPreview = require(parent.Flags.FFlagAXEnableFetchAvatarPreview)
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagAXEnableInspectAndBuyBulkPurchase = SharedFlags.FFlagAXEnableInspectAndBuyBulkPurchase
+
+local BundleInfo = require(parent.Models.BundleInfo)
 
 return Rodux.createReducer({}, {
-	[SetFavoriteBundle.name] = function(p1, p2) -- line: 32
-		-- upvalues: Cryo (copy), BundleInfo (copy)
-		local v15 = p1[p2.id] or {}
-		local v16 = Cryo.Dictionary.join({}, v15)
-
-		p1[p2.id] = Cryo.Dictionary.join(v16, BundleInfo.fromGetFavoriteForAsset(p2.id, p2.isFavorite))
-
-		return p1
+	[SetFavoriteBundle.name] = function(values, p)
+		local v = values[p.id] or {}
+		local joined = Cryo.Dictionary.join({}, v)
+		values[p.id] = Cryo.Dictionary.join(joined, BundleInfo.fromGetFavoriteForAsset(p.id, p.isFavorite))
+		return values
 	end,
-	[UpdateBulkPuchaseResults.name] = if not FFlagAXEnableInspectAndBuyBulkPurchase then nil else function(p3, p4) -- line: 43
-		-- upvalues: Cryo (copy), BundleInfo (copy)
-		for _, v20 in p4.result.Items do
-			if v20.type == Enum.MarketplaceProductType.AvatarBundle then
-				local v21 = Cryo.Dictionary.join({}, p3[v20.id])
-
-				p3[v20.id] = Cryo.Dictionary.join(v21, BundleInfo.fromBulkPurchaseResult(v20, v21))
+	[UpdateBulkPuchaseResults.name] = FFlagAXEnableInspectAndBuyBulkPurchase and function(values, p)
+		for _, item in p.result.Items do
+			if item.type ~= Enum.MarketplaceProductType.AvatarBundle then
+				continue
 			end
+
+			local joined = Cryo.Dictionary.join({}, values[item.id])
+			values[item.id] = Cryo.Dictionary.join(joined, BundleInfo.fromBulkPurchaseResult(item, joined))
 		end
 
-		return p3
-	end,
-	[SetAvatarPreviewDetails.name] = if not FFlagAXEnableFetchAvatarPreview then nil else function(p5, p6) -- line: 59
-		-- upvalues: ItemTypeEnum (copy), BundleInfo (copy), Cryo (copy)
-		local look = p6.avatarPreviewDetails.look
-		local t1 = {}
+		return values
+	end or nil,
+	[SetAvatarPreviewDetails.name] = FFlagAXEnableFetchAvatarPreview and function(p, p2)
+		local look = p2.avatarPreviewDetails.look
+		local v = {}
 
 		if look.items then
-			for _, v27 in look.items do
-				if v27.itemType == ItemTypeEnum.Bundle then
-					t1[tostring(v27.id)] = BundleInfo.fromAvatarPreviewItem(v27)
+			for _, item in look.items do
+				if item.itemType == ItemTypeEnum.Bundle then
+					v[tostring(item.id)] = BundleInfo.fromAvatarPreviewItem(item)
 				end
 			end
 		end
 
-		return Cryo.Dictionary.join(p5, t1)
-	end,
-	[SetBundles.name] = function(p7, p8) -- line: 76
-		-- upvalues: Cryo (copy), BundleInfo (copy)
-		local t2 = {}
+		return Cryo.Dictionary.join(p, v)
+	end or nil,
+	[SetBundles.name] = function(p, p2)
+		local v = {}
 
-		for _, v in ipairs(p8.bundles) do
-			assert(v.bundleId ~= nil, "Expected a bundle id when setting a bundle's information.")
+		for _, bundle in ipairs(p2.bundles) do
+			assert(bundle.bundleId ~= nil, "Expected a bundle id when setting a bundle's information.")
+			local v2 = p[bundle.bundleId] or {}
 
-			local v33 = p7[v.bundleId] or {}
+			if bundle.assetsInBundle then
+				local values = {}
 
-			if v.assetsInBundle then
-				local t3 = {}
-
-				for _, v36 in v.assetsInBundle do
-					for _, v38 in v33.assetsInBundle or {} do
-						if v38.id == v36.id then
-							table.insert(t3, (Cryo.Dictionary.join(v38, v36)))
-
+				for _, v3 in bundle.assetsInBundle do
+					for _, v4 in v2.assetsInBundle or {} do
+						if v4.id == v3.id then
+							table.insert(values, (Cryo.Dictionary.join(v4, v3)))
 							break
 						end
 					end
 				end
 
-				v.assetsInBundle = t3
+				bundle.assetsInBundle = values
 			end
 
-			t2[v.bundleId] = Cryo.Dictionary.join(v33, v)
+			v[bundle.bundleId] = Cryo.Dictionary.join(v2, bundle)
 
-			if t2[v.bundleId] then
-				t2[v.bundleId] = BundleInfo.getSaleDetailsForCollectibles(t2[v.bundleId])
+			if v[bundle.bundleId] then
+				v[bundle.bundleId] = BundleInfo.getSaleDetailsForCollectibles(v[bundle.bundleId])
 			end
 		end
 
-		return Cryo.Dictionary.join(p7, t2)
+		return Cryo.Dictionary.join(p, v)
 	end
 })

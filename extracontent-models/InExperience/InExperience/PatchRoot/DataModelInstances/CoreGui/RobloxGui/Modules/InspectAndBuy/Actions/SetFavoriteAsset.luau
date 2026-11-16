@@ -1,8 +1,5 @@
 local CorePackages = game:GetService("CorePackages")
-
-return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 4
-	return {
-		id = p1,
-		isFavorite = p2
-	}
+local Rodux = require(CorePackages.Packages.Rodux)
+return Rodux.makeActionCreator(script.Name, function(id, isFavorite)
+	return { id = id, isFavorite = isFavorite }
 end)

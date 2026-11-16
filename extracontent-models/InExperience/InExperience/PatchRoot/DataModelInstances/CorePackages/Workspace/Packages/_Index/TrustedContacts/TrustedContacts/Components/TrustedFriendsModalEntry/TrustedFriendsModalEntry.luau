@@ -1,53 +1,59 @@
 local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
-local TrustedContactsParent = TrustedContacts.Parent
-local React = require(TrustedContactsParent.React)
-local RoactNavigation = require(TrustedContactsParent.RoactNavigation)
+local parent = TrustedContacts.Parent
+
+local React = require(parent.React)
+local RoactNavigation = require(parent.RoactNavigation)
+
 local TrustedFriendsModalNavigator = require(script.Parent.TrustedFriendsModalNavigator)
 local useExternalNavigationSetUp = require(script.Parent.useExternalNavigationSetUp)
 
 require(TrustedContacts.Common.Types)
 
-local function TrustedFriendsModalEntry(p1) -- line: 19
-	-- upvalues: React (copy), RoactNavigation (copy), TrustedFriendsModalNavigator (copy), useExternalNavigationSetUp (copy)
-	local navigation = p1.navigation
-	local v11 = React.useMemo(function() -- line: 22
-		-- upvalues: RoactNavigation (copy), TrustedFriendsModalNavigator (copy)
+local function TrustedFriendsModalEntry(props)
+	local navigation = props.navigation
+
+	local v = React.useMemo(function()
 		return RoactNavigation.createAppContainer(TrustedFriendsModalNavigator)
 	end, {})
-	local v12 = if not navigation then p1 else navigation.getParam("props")
-	local v13 = if not navigation then v11 else TrustedFriendsModalNavigator
-	local v14 = useExternalNavigationSetUp({
+
+	if navigation then
+		props = navigation.getParam("props")
+	end
+
+	if navigation then
+		v = TrustedFriendsModalNavigator
+	end
+
+	local externalNavigation = useExternalNavigationSetUp({
 		navigation = navigation,
-		onClosed = v12.onClosed
+		onClosed = props.onClosed
 	})
 
-	return React.createElement(v13, {
+	return React.createElement(v, {
 		navigation = navigation,
 		screenProps = {
 			modalProps = {
-				onClosed = nil,
-				userId = v12.userId,
-				source = v12.source,
-				isVerticallyConstrained = v12.isVerticallyConstrained,
-				onRequestAccepted = v12.onRequestAccepted,
-				onRequestSent = v12.onRequestSent,
-				onAcknowledged = v12.onAcknowledged,
-				modalVariantOverride = v12.modalVariantOverride,
-				tokens = v12.tokens,
-				sentFromQrCode = v12.sentFromQrCode
+				userId = props.userId,
+				source = props.source,
+				isVerticallyConstrained = props.isVerticallyConstrained,
+				onRequestAccepted = props.onRequestAccepted,
+				onRequestSent = props.onRequestSent,
+				onAcknowledged = props.onAcknowledged,
+				modalVariantOverride = props.modalVariantOverride,
+				tokens = props.tokens,
+				sentFromQrCode = props.sentFromQrCode,
+				onClosed = nil
 			},
-			externalNavigation = v14
+			externalNavigation = externalNavigation
 		}
 	})
 end
 
-local v8 = React.PureComponent:extend("classWrapper")
-
-function v8.render(p2) -- line: 59
-	-- upvalues: React (copy), TrustedFriendsModalEntry (copy)
-	return React.createElement(TrustedFriendsModalEntry, p2.props)
+local extended = React.PureComponent:extend("classWrapper")
+function extended.render(p)
+	return React.createElement(TrustedFriendsModalEntry, p.props)
 end
 
-v8.router = TrustedFriendsModalNavigator.router
+extended.router = TrustedFriendsModalNavigator.router
 
-return v8
+return extended

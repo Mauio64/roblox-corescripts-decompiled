@@ -1,44 +1,48 @@
-local Parent = script:FindFirstAncestor("HoldToPlay").Parent
-local React = require(Parent.React)
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
-local RoactServiceTags = require(Parent.RoactServiceTags)
+local parent = script:FindFirstAncestor("HoldToPlay").Parent
+
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
 local RoactNetworking = RoactServiceTags.RoactNetworking
 local AppSessionService = RoactServiceTags.AppSessionService
-local GamePlayButton = require(Parent.GamePlayButton)
+
+local GamePlayButton = require(parent.GamePlayButton)
 local useOnPlayButtonCallback = GamePlayButton.useOnPlayButtonCallback
 local usePlayButtonState = GamePlayButton.usePlayButtonState
 local PlayButtonStates = GamePlayButton.PlayButtonStates
-local RobloxAppSessionization = require(Parent.RobloxAppSessionization)
+
+local RobloxAppSessionization = require(parent.RobloxAppSessionization)
 local SetGamePlaySession = RobloxAppSessionization.SetGamePlaySession
 local SessionType = RobloxAppSessionization.SessionType
-local HoldToPlayLauncher = require(Parent.ExperienceAnalytics).Constants.Context.HoldToPlayLauncher
 
-local function HoldToPlayLoader(t1: {[any]: any}) -- line: 33
-	-- upvalues: useRoactService (copy), RoactNetworking (copy), AppSessionService (copy), usePlayButtonState (copy), useOnPlayButtonCallback (copy), HoldToPlayLauncher (copy), React (copy), SetGamePlaySession (copy), SessionType (copy), PlayButtonStates (copy)
-	local v17 = useRoactService(RoactNetworking)
-	local v18 = useRoactService(AppSessionService)
-	local v19 = usePlayButtonState(v17, t1.universeId)
-	local v20 = useOnPlayButtonCallback(t1.universeId, nil, HoldToPlayLauncher, nil, nil)
+local ExperienceAnalytics = require(parent.ExperienceAnalytics)
+local HoldToPlayLauncher = ExperienceAnalytics.Constants.Context.HoldToPlayLauncher
 
-	React.useEffect(function() -- line: 40
-		-- upvalues: v19 (copy), t1 (copy), SetGamePlaySession (copy), v18 (copy), SessionType (copy), v20 (copy), PlayButtonStates (copy)
-		local playButtonState = v19.playButtonState
+local function HoldToPlayLoader(data): nil
+	local v = useRoactService(RoactNetworking)
+	local v2 = useRoactService(AppSessionService)
+	local v3 = usePlayButtonState(v, data.universeId)
+	local v4 = useOnPlayButtonCallback(data.universeId, nil, HoldToPlayLauncher, nil, nil)
 
-		if t1.shouldAttemptLaunch then
-			SetGamePlaySession(v18, SessionType.StructuralIdentifier.GamePlayFromHoldToPlay, true)
-			v20(playButtonState, t1.reportExperienceLaunched)
+	React.useEffect(function()
+		local playButtonState = v3.playButtonState
 
-			if t1.onLaunched and playButtonState == PlayButtonStates.Playable then
-				t1.onLaunched()
+		if data.shouldAttemptLaunch then
+			SetGamePlaySession(v2, SessionType.StructuralIdentifier.GamePlayFromHoldToPlay, true)
+			v4(playButtonState, data.reportExperienceLaunched)
+
+			if data.onLaunched and playButtonState == PlayButtonStates.Playable then
+				data.onLaunched()
 			end
 		end
 	end, {
-		t1.shouldAttemptLaunch,
-		t1.onLaunched,
-		v19.playButtonState,
-		v18,
-		t1.reportExperienceLaunched,
-		v20
+		data.shouldAttemptLaunch,
+		data.onLaunched,
+		v3.playButtonState,
+		v2,
+		data.reportExperienceLaunched,
+		v4
 	})
 
 	return nil

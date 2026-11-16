@@ -1,39 +1,29 @@
 local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
-local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
-local v3 = require(TimeToInteractiveTracker.Logger):new(script.Name)
-local FFlagLuaAppPerfTrackerUseLogger = require(TimeToInteractiveTrackerParent.SharedFlags).FFlagLuaAppPerfTrackerUseLogger
+
+local Logger = require(TimeToInteractiveTracker.Logger)
+local v = Logger:new(script.Name)
 
 require(script.Parent.Parent.types)
 
 local mergeTTIEventMetadata = require(script.Parent.Parent.Parent.Utils.mergeTTIEventMetadata)
 
-return function(p1) -- line: 17
-	-- upvalues: FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), mergeTTIEventMetadata (copy)
-	return function(s1: string, p2) -- line: 18
-		-- upvalues: p1 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), mergeTTIEventMetadata (copy)
-		p1(function(p3) -- line: 19
-			-- upvalues: s1 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), mergeTTIEventMetadata (copy), p2 (copy)
-			local v10 = p3[s1]
+return function(callback)
+	return function(p: string, p2)
+		callback(function(p3)
+			local v2 = p3[p]
 
-			if v10 == nil then
-				if FFlagLuaAppPerfTrackerUseLogger then
-					v3:warning(`called before trackStart for eventName={ s1 }`)
-
-					return p3
-				end
-
-				warn(`TimeToInteractiveTracker.updateMetadata called before trackStart for eventName={ s1 }`)
-
+			if v2 == nil then
+				v:warning(`called before trackStart for eventName={p}`)
 				return p3
 			end
 
-			local v11 = table.clone(p3)
-			local v12 = table.clone(v10)
+			local clone = table.clone(p3)
 
-			v12.metadata = mergeTTIEventMetadata(v10.metadata, p2)
-			v11[s1] = v12
+			local clone2 = table.clone(v2)
+			clone2.metadata = mergeTTIEventMetadata(v2.metadata, p2)
+			clone[p] = clone2
 
-			return v11
+			return clone
 		end)
 	end
 end

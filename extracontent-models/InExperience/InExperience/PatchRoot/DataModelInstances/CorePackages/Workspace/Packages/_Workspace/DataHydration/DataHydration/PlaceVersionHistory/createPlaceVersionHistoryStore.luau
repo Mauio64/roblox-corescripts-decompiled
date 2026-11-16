@@ -1,106 +1,159 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
+local parent = DataHydration.Parent
 
-require(DataHydrationParent.HttpClient)
+local Cryo = require(parent.Cryo)
+require(parent.HttpClient)
+local Promise = require(parent.Promise)
+local Signals = require(parent.Signals)
 
 local createSingleEntityResolver = require(DataHydration.createSingleEntityResolver)
-local fetchPlaceVersionHistory = require(script.Parent.fetchPlaceVersionHistory)
 
+local fetchPlaceVersionHistory = require(script.Parent.fetchPlaceVersionHistory)
 require(script.Parent.PlaceVersionHistoryStoreTypes)
 
-local function createPlaceVersionHistoryStore(t1: {[any]: any}?) -- line: 20
-	-- upvalues: createSingleEntityResolver (copy), fetchPlaceVersionHistory (copy)
-	local v7 = t1 or {}
-	local t2 = {
-		network = v7.network,
-		baseUrl = v7.baseUrl,
-		developBaseUrl = v7.developBaseUrl
-	}
-	local v9 = createSingleEntityResolver(function(n1: number) -- line: 28
-		-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy)
-		return fetchPlaceVersionHistory.fetchHistory(n1, t2)
+local function createPlaceVersionHistoryStore(options)
+	local v = options or {}
+	local v2 = { network = v.network, baseUrl = v.baseUrl, developBaseUrl = v.developBaseUrl }
+
+	local singleEntityResolver = createSingleEntityResolver(function(p: number)
+		return fetchPlaceVersionHistory.fetchHistory(p, v2)
 	end)
 
+	local singleEntityResolver2 = createSingleEntityResolver(function(p: number)
+		return fetchPlaceVersionHistory.fetchHistory(p, v2, { isPublished = true, pageSize = 1 }):andThen(function(p2)
+			return { placeVersion = p2.placeVersions[1] }
+		end)
+	end, {
+		resolver = { replaceItems = true }
+	})
+
+	local fetchingMoreHistorySignals = {}
+
+	local resolved = Promise.resolve()
+
+	local function getFetchingMoreHistorySignal(p: number) -- 2 equivalent calls inferred from this helper
+		local fetchingMoreHistorySignal = fetchingMoreHistorySignals[p]
+
+		if fetchingMoreHistorySignal == nil then
+			local signal, setIsFetching = Signals.createSignal(false)
+			fetchingMoreHistorySignal = { getIsFetching = signal, setIsFetching = setIsFetching }
+
+			fetchingMoreHistorySignals[p] = fetchingMoreHistorySignal
+		end
+
+		return fetchingMoreHistorySignal
+	end
+
 	return {
-		getHistory = v9.get,
-		fetchHistory = v9.fetch,
-		getAndFetchHistory = v9.getAndFetch,
-		updateHistory = v9.update,
-		fetchPageHistory = function(n2: number, p1) -- line: 32
-			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.fetchHistory(n2, t2, p1):andThen(function(p2) -- line: 38
-				-- upvalues: v9 (copy), n2 (copy)
-				v9.update(n2, p2)
-
-				return p2
+		getHistory = singleEntityResolver.get,
+		fetchHistory = singleEntityResolver.fetch,
+		getAndFetchHistory = singleEntityResolver.getAndFetch,
+		updateHistory = singleEntityResolver.update,
+		fetchPageHistory = function(p: number, p2)
+			return fetchPlaceVersionHistory.fetchHistory(p, v2, p2):andThen(function(p3)
+				singleEntityResolver.update(p, p3)
+				return p3
 			end)
 		end,
-		revertVersion = function(n3: number, n4: number, n5: number) -- line: 44
-			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.revertVersion(n4, n5, t2):andThen(function(_) -- line: 51
-				-- upvalues: n4 (copy), n5 (copy), v9 (copy), n3 (copy)
-				local t3 = {
-					assetId = n4,
-					assetVersionNumber = n5
-				}
+		fetchMoreHistory = function(p: number, cursor: string)
+			local data = singleEntityResolver.get(p).data(false)
+			local fetchingMoreHistorySignal = getFetchingMoreHistorySignal(p) -- inferred equivalent call
 
-				v9.fetch(n3)
+			if
+				data == nil
+				or not data.hasMore
+				or data.nextCursor ~= cursor
+				or cursor == ""
+				or fetchingMoreHistorySignal.getIsFetching(false)
+			then
+				return resolved
+			end
 
-				return t3
-			end):catch(function(p4) -- line: 60
-				error(p4)
+			fetchingMoreHistorySignal.setIsFetching(true)
+
+			local v3 = fetchPlaceVersionHistory.fetchHistory(p, v2, {
+				cursor = cursor,
+				pageSize = fetchPlaceVersionHistory.DEFAULT_HISTORY_PAGE_SIZE
+			}):andThen(function(data2)
+				if singleEntityResolver.get(p).data(false) == data then
+					singleEntityResolver.cache.replaceItem(tostring(p), {
+						hasMore = data2.hasMore and data2.nextCursor ~= cursor,
+						nextCursor = data2.nextCursor,
+						placeVersions = Cryo.List.join(data.placeVersions or {}, data2.placeVersions or {})
+					})
+				end
+			end)
+
+			v3:finally(function()
+				fetchingMoreHistorySignal.setIsFetching(false)
+			end)
+			return v3
+		end,
+		getIsFetchingMoreHistory = function(p: number)
+			return getFetchingMoreHistorySignal(p).getIsFetching -- inferred equivalent call
+		end,
+		getLiveVersion = singleEntityResolver2.get,
+		fetchLiveVersion = singleEntityResolver2.fetch,
+		getAndFetchLiveVersion = singleEntityResolver2.getAndFetch,
+		revertVersion = function(p: number, assetId: number, assetVersionNumber: number)
+			return fetchPlaceVersionHistory.revertVersion(assetId, assetVersionNumber, v2):andThen(function(_)
+				singleEntityResolver.fetch(p)
+				return { assetId = assetId, assetVersionNumber = assetVersionNumber }
+			end):catch(function(message)
+				error(message)
 			end)
 		end,
-		rollbackPlace = function(n6: number, n7: number, s1: string?, b1: boolean?) -- line: 65
-			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.rollbackPlace(n6, n7, s1, b1, t2):andThen(function(p5) -- line: 73
-				-- upvalues: v9 (copy), n6 (copy)
-				v9.fetch(n6)
-
-				return p5
-			end):catch(function(p6) -- line: 77
-				error(p6)
+		rollbackPlace = function(p: number, p2: number, p3: string?, flag: boolean?)
+			return fetchPlaceVersionHistory.rollbackPlace(p, p2, p3, flag, v2):andThen(function(p4)
+				singleEntityResolver.fetch(p)
+				return p4
+			end):catch(function(message)
+				error(message)
 			end)
 		end,
-		addVersionNote = function(n8: number, s2: string, p7) -- line: 82
-			-- upvalues: fetchPlaceVersionHistory (copy), t2 (copy), v9 (copy)
-			return fetchPlaceVersionHistory.addVersionNote(n8, s2, p7, t2):andThen(function(p8) -- line: 89
-				-- upvalues: v9 (copy), n8 (copy), s2 (copy), p7 (copy)
-				local v30 = v9.get(n8).data(false)
+		addVersionNote = function(p: number, p2: string, p3)
+			return fetchPlaceVersionHistory.addVersionNote(p, p2, p3, v2):andThen(function(p4)
+				local data = singleEntityResolver.get(p).data(false)
 
-				if v30 == nil or typeof(v30.placeVersions) ~= "table" then
-					return p8
+				if data == nil or typeof(data.placeVersions) ~= "table" then
+					return p4
 				end
 
-				local t4 = {}
+				local placeVersions = {}
 
-				for v32, v33 in v30.placeVersions do
-					if v33.version == s2 then
-						local t5 = {}
+				for k, placeVersion in data.placeVersions do
+					if placeVersion.version == p2 then
+						local v3 = {}
 
-						for v35, v36 in v33 do
-							t5[v35] = v36
+						for k2, v4 in placeVersion do
+							v3[k2] = v4
 						end
 
-						t5.title = p7.title
-						t5.description = p7.description
-						t4[v32] = t5
+						v3.title = p3.title
+						v3.description = p3.description
+						placeVersions[k] = v3
 					else
-						t4[v32] = v33
+						placeVersions[k] = placeVersion
 					end
 				end
 
-				v9.cache.replaceItem(tostring(n8), {
-					hasMore = v30.hasMore,
-					nextCursor = v30.nextCursor,
-					placeVersions = t4
+				singleEntityResolver.cache.replaceItem(tostring(p), {
+					hasMore = data.hasMore,
+					nextCursor = data.nextCursor,
+					placeVersions = placeVersions
 				})
 
-				return p8
+				return p4
 			end)
 		end,
-		clear = v9.clear,
-		dispose = v9.dispose
+		clear = function()
+			singleEntityResolver.clear()
+			singleEntityResolver2.clear()
+		end,
+		dispose = function()
+			singleEntityResolver.dispose()
+			singleEntityResolver2.dispose()
+		end
 	}
 end
 

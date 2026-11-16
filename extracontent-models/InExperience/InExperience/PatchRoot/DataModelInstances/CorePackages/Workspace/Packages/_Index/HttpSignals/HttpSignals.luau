@@ -1,6 +1,3 @@
 require(script.types)
 
-return {
-	fetch = require(script.fetch),
-	["jest.config"] = script["jest.config"]
-}
+return { fetch = require(script.fetch), ["jest.config"] = script["jest.config"] }

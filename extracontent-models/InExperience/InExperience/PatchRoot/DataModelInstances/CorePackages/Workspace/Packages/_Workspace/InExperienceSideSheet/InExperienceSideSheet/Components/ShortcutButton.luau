@@ -1,94 +1,101 @@
-local Parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
-local React = require(Parent.React)
+local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
+local parent = InExperienceSideSheet.Parent
 
-require(Parent.Signals)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
 
-local SignalsReact = require(Parent.SignalsReact)
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local Foundation = require(Parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local Foundation = require(parent.Foundation)
 local useTokens = Foundation.Hooks.useTokens
 local isBuilderIcon = Foundation.Utility.isBuilderIcon
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
 
-local function ShortcutButton(t1: {[any]: any}) -- line: 37
-	-- upvalues: useTokens (copy), useLocalization (copy), SignalsReact (copy), React (copy), IconSize (copy), isBuilderIcon (copy), View (copy), Icon (copy), FoundationText (copy)
-	local v15 = useTokens()
-	local v16 = useLocalization({
-		label = t1.label
-	})
-	local v17 = SignalsReact.useSignalState(t1.getIsEnabled)
-	local v18 = SignalsReact.useSignalState(t1.getShortcutIcon)
-	local v19 = React.useCallback(function() -- line: 48
-		-- upvalues: t1 (copy)
-		t1.getOnActivated()()
-	end, { t1.getOnActivated })
-	local Medium = IconSize.Medium
-	local XSmall = v15.Gap.XSmall
+local Enums = require(InExperienceSideSheet.Common.Enums)
 
-	if isBuilderIcon(v18) then
-		Medium = IconSize.XLarge
-		XSmall = v15.Gap.Small
+local ButtonWidth = Enums.ButtonWidth
+
+local signal = Signals.createSignal(nil)
+
+local function fn(transparency: number) -- 1 equivalent call inferred from this helper
+	return transparency + (1 - transparency) * 0.5
+end
+
+local function ShortcutButton(props)
+	local v = useTokens()
+
+	local v2 = useLocalization({ label = props.label })
+
+	local v3 = SignalsReact.useSignalState(props.getIsEnabled)
+
+	local name = SignalsReact.useSignalState(props.getShortcutIcon or signal)
+
+	local onActivated = React.useCallback(function()
+		props.getOnActivated()()
+	end, { props.getOnActivated })
+
+	local size = IconSize.Medium
+	local v4 = v.Gap.XSmall
+
+	if isBuilderIcon(name) then
+		size = IconSize.XLarge
+		v4 = v.Gap.Small
 	end
 
-	local v22 = if not t1.isEmphasis then v15.Color.ActionStandard.Background else v15.Color.ActionSoftEmphasis.Background
-	local v23 = if not t1.isEmphasis then v15.Color.ActionStandard.Foreground else v15.Color.ActionSoftEmphasis.Foreground
+	local background = v.Color.ActionStandard.Background
+	local foreground = v.Color.ActionStandard.Foreground
+
+	local sizefull = (props.width or ButtonWidth.Full) == ButtonWidth.Full
+
 	local createElement = React.createElement
-	local v25 = View
-	local t2 = {
+	local v5 = {
 		tag = {
-			["fill row gap-small align-y-center align-x-center radius-medium"] = true,
-			["size-0-1000"] = not t1.isSmall,
-			["size-0-800"] = t1.isSmall,
-			["bg-action-standard"] = not t1.isEmphasis,
-			["bg-action-soft-emphasis"] = t1.isEmphasis
+			["row align-x-center align-y-center gap-small radius-medium bg-action-standard"] = true,
+			["size-full-1000"] = sizefull,
+			["fill size-0-1000"] = not sizefull
 		},
-		layout = {
-			FillDirection = Enum.FillDirection.Horizontal,
-			Padding = UDim.new(0, XSmall)
-		},
-		isDisabled = not v17
+		layout = { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, v4) },
+		isDisabled = not v3,
+		backgroundStyle = 0,
+		onActivated = 0,
+		LayoutOrder = 0
 	}
-	local t3 = {
-		Color3 = v22.Color3
-	}
-	local Transparency
 
-	if v17 then
-		Transparency = v22.Transparency
+	local backgroundStyle = { Color3 = background.Color3, Transparency = 0 }
+	local transparency
+
+	if v3 then
+		transparency = background.Transparency
 	else
-		local Transparency2 = v22.Transparency
-
-		Transparency = Transparency2 + (1 - Transparency2) * 0.5
+		transparency = fn(background.Transparency) -- inferred equivalent call
 	end
 
-	t3.Transparency = Transparency
-	t2.backgroundStyle = t3
-	t2.onActivated = v19
-	t2.LayoutOrder = t1.layoutOrder
+	backgroundStyle.Transparency = transparency
+	v5.backgroundStyle = backgroundStyle
 
-	return createElement(v25, t2, {
-		ShortcutIcon = if not v18 then nil else React.createElement(Icon, {
-			LayoutOrder = 1,
-			name = v18,
-			size = Medium
-		}),
-		Text = React.createElement(FoundationText, {
-			LayoutOrder = 2,
-			tag = {
-				["auto-x"] = true,
-				["text-title-medium"] = not t1.isSmall,
-				["text-title-small"] = t1.isSmall,
-				["content-action-standard"] = not t1.isEmphasis,
-				["content-action-soft-emphasis"] = t1.isEmphasis
-			},
-			Text = v16.label,
+	v5.onActivated = onActivated
+	v5.LayoutOrder = props.layoutOrder
+	local shortcutIcon
+
+	if name then
+		shortcutIcon = React.createElement(Icon, { name = name, size = size, LayoutOrder = 1 })
+	end
+
+	return createElement(View, v5, {
+		ShortcutIcon = shortcutIcon,
+		Text = React.createElement(Text, {
+			tag = "auto-x text-label-medium content-action-standard",
+			Text = v2.label,
 			textStyle = {
-				Color3 = v23.Color3,
-				Transparency = not v17 and 0.5 or v23.Transparency
-			}
+				Color3 = foreground.Color3,
+				Transparency = not v3 and 0.5 or foreground.Transparency
+			},
+			LayoutOrder = 2
 		})
 	})
 end

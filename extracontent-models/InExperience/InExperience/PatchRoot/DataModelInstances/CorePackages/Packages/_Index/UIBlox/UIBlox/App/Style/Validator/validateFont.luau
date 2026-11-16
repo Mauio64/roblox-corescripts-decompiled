@@ -1,8 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local t = require(ParentParentParent.t)
-local validateFontInfo = require(ParentParent.Core.Style.Validator.validateFontInfo)
-local v5 = t.strictInterface({
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local t = require(parent2.t)
+
+local validateFontInfo = require(parent.Core.Style.Validator.validateFontInfo)
+
+local strictInterface = t.strictInterface({
 	BaseSize = t.numberMinExclusive(0),
 	Title = validateFontInfo,
 	Header1 = validateFontInfo,
@@ -14,7 +17,8 @@ local v5 = t.strictInterface({
 	CaptionBody = validateFontInfo,
 	Footer = validateFontInfo
 })
-local v6 = t.strictInterface({
+
+local strictInterface2 = t.strictInterface({
 	BaseSize = t.numberMinExclusive(0),
 	Title = validateFontInfo,
 	Header1 = validateFontInfo,
@@ -34,4 +38,4 @@ local v6 = t.strictInterface({
 	CaptionSmall = validateFontInfo
 })
 
-return t.union(v5, v6)
+return t.union(strictInterface, strictInterface2)

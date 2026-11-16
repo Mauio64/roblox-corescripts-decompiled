@@ -1,143 +1,170 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local getTextSizeOffset = require(ParentParent.Utility.getTextSizeOffset)
-local ParentParentParent = ParentParent.Parent
-local Cryo = require(ParentParentParent.Cryo)
-local React = require(ParentParentParent.React)
-local Roact = require(ParentParentParent.Roact)
-local v8 = ParentParent:FindFirstAncestor("Packages") or ParentParent:FindFirstAncestor("CorePackages")
-local v9 = not not v8 and (not not v8:FindFirstChild("Dev") and (not not v8.Dev:FindFirstChild("JestGlobals") and pcall(require, v8.Dev.JestGlobals)))
-local Foundation = require(ParentParentParent.Foundation)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local getTextSizeOffset = require(parent2.Utility.getTextSizeOffset)
+
+local parent3 = parent2.Parent
+local Cryo = require(parent3.Cryo)
+local React = require(parent3.React)
+local Roact = require(parent3.Roact)
+
+local Foundation = require(parent3.Foundation)
 local FoundationProvider = Foundation.FoundationProvider
+
 local useTokens = Foundation.Hooks.useTokens
-local Object = require(ParentParentParent.LuauPolyfill).Object
-local getThemeFromName = require(scriptParent.Themes.getThemeFromName)
-local getFontFromName = require(scriptParent.Fonts.getFontFromName)
-local Constants = require(scriptParent.Constants)
+local LuauPolyfill = require(parent3.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
+local getThemeFromName = require(parent.Themes.getThemeFromName)
+local getFontFromName = require(parent.Fonts.getFontFromName)
+local Constants = require(parent.Constants)
 require(script.Parent.StyleTypes)
-
 local Tokens = require(script.Parent.Tokens)
-local StyleContext = require(ParentParent.Core.Style.StyleContext)
-local Logger = require(ParentParent.Logger)
+local StyleContext = require(parent2.Core.Style.StyleContext)
+local Logger = require(parent2.Logger)
+
 local getTokens = Tokens.getTokens
-local validateTokens = Tokens.validateTokens
 local getFoundationTokens = Tokens.getFoundationTokens
 local Mappers = Tokens.Mappers
 local foundationSurfaceTokensDiffer = require(script.Parent.foundationSurfaceTokensDiffer)
-local t1 = {
-	dark = Foundation.Enums.Theme.Dark,
-	light = Foundation.Enums.Theme.Light
-}
-local t2 = {
+
+local v = { ["dark"] = Foundation.Enums.Theme.Dark, light = Foundation.Enums.Theme.Light }
+
+local v2 = {
 	themeName = Constants.DefaultThemeName,
 	fontName = Constants.DefaultFontName,
 	deviceType = Constants.DefaultDeviceType,
 	settings = Constants.DefaultSettings
 }
 
-local function AppStyleProvider(t3: {[any]: any}) -- line: 84
-	-- upvalues: Object (copy), t2 (copy), React (copy), getTokens (copy), getThemeFromName (copy), useTokens (copy), getFoundationTokens (copy), Cryo (copy), Mappers (copy), validateTokens (copy), getFontFromName (copy), Constants (copy), getTextSizeOffset (copy), StyleContext (copy), foundationSurfaceTokensDiffer (copy), Roact (copy), v9 (copy), Logger (copy), FoundationProvider (copy), t1 (copy)
-	local v29 = Object.assign({}, t2, t3.style)
-	local v30, v31 = React.useState(v29.themeName)
-	local v32 = v29.settings and v29.settings.scale
-	local v33 = getTokens(v29.deviceType, v30, v32)
-	local v34, v35 = React.useState(0)
-	local v36 = getThemeFromName(v30)
-	local v37 = useTokens()
-	local v38 = v37.Config ~= nil
-	local v39 = getFoundationTokens(v29.deviceType, v30)
-	local v40 = if not v38 then v39 else Cryo.Dictionary.join(v39, v37)
-	local v41 = Mappers.mapColorTokensToFoundation(v33, v40)
-	local v42 = Mappers.mapThemeToFoundation(v36, if not v38 then v39 else v37)
+local function AppStyleProvider(p)
+	local v3 = Object.assign({}, v2, p.style)
+	local state, setState = React.useState(v3.themeName)
+	local scale = v3.settings and v3.settings.scale
+	local tokens = getTokens(v3.deviceType, state, scale)
+	local state2, setState2 = React.useState(0)
+	local themeFromName = getThemeFromName(state)
+	local v4 = useTokens()
+	local v5 = v4.Config ~= nil
 
-	assert(validateTokens(v41), "Invalid tokens!")
+	local foundationTokens = getFoundationTokens(v3.deviceType, state)
+	local v6
 
-	local v43 = Mappers.addFoundationFlatKeys(v41, if not v38 then v39 else v37)
-	local t4 = {
-		Font = getFontFromName(v29.fontName, v43),
-		Theme = v42,
-		Tokens = v43,
-		Settings = if not v29.settings then Constants.DefaultSettings else {
-			PreferredTransparency = v29.settings.preferredTransparency,
-			ReducedMotion = v29.settings.reducedMotion,
-			PreferredTextSize = v29.settings.preferredTextSize,
-			Scale = v29.settings.scale
-		}
+	if v5 then
+		v6 = Cryo.Dictionary.join(foundationTokens, v4)
+	else
+		v6 = foundationTokens
+	end
+
+	local mapColorTokensToFoundation = Mappers.mapColorTokensToFoundation(tokens, v6)
+
+	local mapThemeToFoundation = Mappers.mapThemeToFoundation
+	local v7 = if v5 then v4 else foundationTokens
+	local theme = mapThemeToFoundation(themeFromName, v7)
+
+	local addFoundationFlatKeys = Mappers.addFoundationFlatKeys
+	local v8 = if v5 then v4 else foundationTokens
+	local tokens2 = addFoundationFlatKeys(mapColorTokensToFoundation, v8)
+
+	local style = {
+		Font = getFontFromName(v3.fontName, tokens2),
+		Theme = theme,
+		Tokens = tokens2,
+		Settings = 0
 	}
-	local v45 = React.useRef(false)
+	local settings
 
-	React.useEffect(function() -- line: 128
-		-- upvalues: v45 (copy), v31 (copy), v29 (copy)
-		v45.current = true
-		v31(v29.themeName)
+	if v3.settings then
+		settings = {
+			PreferredTransparency = v3.settings.preferredTransparency,
+			ReducedMotion = v3.settings.reducedMotion,
+			PreferredTextSize = v3.settings.preferredTextSize,
+			Scale = v3.settings.scale
+		}
+	else
+		settings = Constants.DefaultSettings
+	end
 
-		return function() -- line: 131
-			-- upvalues: v45 (copy)
-			v45.current = false
+	style.Settings = settings
+
+	local ref = React.useRef(false)
+	React.useEffect(function()
+		ref.current = true
+		setState(v3.themeName)
+		return function()
+			ref.current = false
 		end
-	end, {
-		v45,
-		v29.themeName,
-		v31
-	})
-	React.useEffect(function() -- line: 136
-		-- upvalues: getTextSizeOffset (copy), v43 (copy), v35 (copy)
-		local v49, v50 = getTextSizeOffset(v43.Semantic.Typography.Body.Font)
+	end, { ref, v3.themeName, setState })
 
-		if v49 then
-			v35(v50)
-		end
-	end, { v29.settings.preferredTextSize })
+	React.useEffect(function()
+		local textSizeOffset, v9 = getTextSizeOffset(tokens2.Typography.BodyLarge.Font)
 
-	local v46 = React.useCallback(function(_, p2) -- line: 143
-		-- upvalues: v45 (copy), v31 (copy)
-		if v45.current then
-			v31(p2)
+		if textSizeOffset then
+			setState2(v9)
 		end
-	end, {
-		v45,
-		v31
-	})
-	local v47 = React.useMemo(function() -- line: 149
-		-- upvalues: v30 (copy), Constants (copy)
-		if v30:lower() == Constants.ThemeName.Dark:lower() then
+	end, { v3.settings.preferredTextSize })
+
+	local updateTheme = React.useCallback(function(_, p2)
+		if ref.current then
+			setState(p2)
+		end
+	end, { ref, setState })
+
+	local themeName = React.useMemo(function()
+		if state:lower() == Constants.ThemeName.Dark:lower() then
 			return Constants.ThemeName.Dark
 		end
 
-		if v30:lower() == Constants.ThemeName.Light:lower() then
+		if state:lower() == Constants.ThemeName.Light:lower() then
 			return Constants.ThemeName.Light
 		end
 
 		return Constants.DefaultThemeName
-	end, { v30 })
-	local v48 = React.createElement(StyleContext.Provider, {
-		value = {
-			style = t4,
-			updateTheme = v46,
-			derivedValues = {
-				textSizeOffset = v34
-			},
-			styleMetadata = {
-				ThemeName = v47,
-				HasSurfaceOverrides = not not v38 and foundationSurfaceTokensDiffer(v39, v37)
-			}
-		}
-	}, Roact.oneChild(t3.children))
+	end, { state })
 
-	if not v38 then
-		if not v9 and _G.__DEV__ then
-			Logger:warning(debug.traceback("FoundationProvider not found. Please ensure that the FoundationProvider is present in the component tree."))
-		end
+	local createElement = React.createElement
+	local provider = StyleContext.Provider
+	local hasSurfaceOverrides
 
-		return React.createElement(FoundationProvider, {
-			theme = t1[v30:lower()],
-			device = v29.deviceType,
-			preferences = v29.settings
-		}, v48)
+	if v5 then
+		hasSurfaceOverrides = foundationSurfaceTokensDiffer(foundationTokens, v4)
+	else
+		hasSurfaceOverrides = false
 	end
 
-	return v48
+	local element = createElement(provider, {
+		value = {
+			style = style,
+			updateTheme = updateTheme,
+			derivedValues = { textSizeOffset = state2 },
+			styleMetadata = { ThemeName = themeName, HasSurfaceOverrides = hasSurfaceOverrides }
+		}
+	}, Roact.oneChild(p.children))
+
+	if v5 then
+		return element
+	end
+
+	if _G.ENVIRONMENT ~= "PRODUCTION" and (_G.ENVIRONMENT == "DEVELOPMENT" or _G.__DEV__) then
+		local parent4 = script.Parent.Parent.Parent
+		local packages = parent4:FindFirstAncestor("Packages") or parent4:FindFirstAncestor("CorePackages")
+		local v9
+
+		if packages and packages:FindFirstChild("Dev") and packages.Dev:FindFirstChild("JestGlobals") then
+			v9 = pcall(require, packages.Dev.JestGlobals)
+		else
+			v9 = false
+		end
+
+		if not v9 then
+			Logger:warning(debug.traceback("FoundationProvider not found. Please ensure that the FoundationProvider is present in the component tree."))
+		end
+	end
+
+	return React.createElement(
+		FoundationProvider,
+		{ theme = v[state:lower()], device = v3.deviceType, preferences = v3.settings },
+		element
+	)
 end
 
 return AppStyleProvider

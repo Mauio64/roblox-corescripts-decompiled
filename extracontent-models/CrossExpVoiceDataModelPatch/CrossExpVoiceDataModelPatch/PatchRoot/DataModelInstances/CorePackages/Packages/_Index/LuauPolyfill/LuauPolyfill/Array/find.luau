@@ -1,13 +1,12 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.types)
 
-require(ParentParent.types)
+return function(list, callback)
+	for i = 1, #list do
+		local item = list[i]
 
-return function(p1, p2: ((...any) -> ...any)) -- line: 7
-	for i = 1, #p1 do
-		local v5 = p1[i]
-
-		if p2(v5, i, p1) then
-			return v5
+		if callback(item, i, list) then
+			return item
 		end
 	end
 

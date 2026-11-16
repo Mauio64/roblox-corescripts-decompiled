@@ -1,236 +1,251 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local Roact = require(Parent.Roact)
-local RoactRodux = require(Parent.RoactRodux)
-local ArgCheck = require(Parent.ArgCheck)
-local t = require(Parent.t)
-local FFlagUseNavigationSelectors = require(Parent.SharedFlags).FFlagUseNavigationSelectors
-local Selectors = require(Parent.NavigationRodux).Selectors
-local FFlagSignalsNavP3gAvatarExperience = require(Parent.SharedFlags).FFlagSignalsNavP3gAvatarExperience
-local FFlagAXSduiCatalogScrollImpressions = require(Parent.AvatarExperienceFlags).FFlagAXSduiCatalogScrollImpressions
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
-local useSignalState = require(Parent.SignalsReact).useSignalState
-local v13 = if not FFlagSignalsNavP3gAvatarExperience then nil else require(Parent.NavigationRodux).GetLegacyNavigationStore
-local v14 = Roact.PureComponent:extend("AvatarExperienceImpressionsDetector")
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
 
-v14.validateProps = t.strictInterface({
+local Roact = require(parent.Roact)
+local RoactRodux = require(parent.RoactRodux)
+local ArgCheck = require(parent.ArgCheck)
+local t = require(parent.t)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
+local NavigationRodux = require(parent.NavigationRodux)
+local Selectors = NavigationRodux.Selectors
+
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSignalsNavP3gAvatarExperience = SharedFlags2.FFlagSignalsNavP3gAvatarExperience
+
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local getLegacyNavigationStore
+
+if FFlagSignalsNavP3gAvatarExperience then
+	local NavigationRodux2 = require(parent.NavigationRodux)
+	getLegacyNavigationStore = NavigationRodux2.GetLegacyNavigationStore
+else
+	getLegacyNavigationStore = nil
+end
+
+local extended = Roact.PureComponent:extend("AvatarExperienceImpressionsDetector")
+
+local strictInterface = t.strictInterface
+local v = {
 	scanDebounceSeconds = t.optional(t.number),
 	viewFillPercent = t.optional(t.number),
 	parentRef = t.optional(t.table),
 	onRequestImpressionsSignal = t.table,
-	viewPortBounds = t.strictInterface({
-		min = t.Vector2,
-		max = t.Vector2
-	}),
+	viewPortBounds = t.strictInterface({ min = t.Vector2, max = t.Vector2 }),
 	appPage = t.optional(t.string),
 	currentPage = t.optional(t.string),
-	pageFilter = t.optional(t.callback),
-	collectObjectsFunc = t.optional(t.callback),
-	filterImpressionFunc = t.optional(t.callback),
-	onImpressionsDetected = t.union(t.callback, t.table)
-})
-v14.defaultProps = {
-	scanDebounceSeconds = 1,
-	viewFillPercent = 0.25
+	pageEligible = 0,
+	pageFilter = 0,
+	collectObjectsFunc = 0,
+	filterImpressionFunc = 0,
+	onImpressionsDetected = 0
 }
+local pageEligible
 
-function v14.init(p1) -- line: 65
-	p1.isMounted = false
-	p1.lastImpressionTick = nil
-	p1.nextImpressionTick = nil
+if FFlagSignalsNavP3gAvatarExperience then
+	pageEligible = t.optional(t.boolean)
 end
-function v14._isInstanceVisible(p2, p3) -- line: 71
-	-- upvalues: ArgCheck (copy), FFlagAXSduiCatalogScrollImpressions (copy)
-	if not p3 then
+
+v.pageEligible = pageEligible
+v.pageFilter = t.optional(t.callback)
+v.collectObjectsFunc = t.optional(t.callback)
+v.filterImpressionFunc = t.optional(t.callback)
+v.onImpressionsDetected = t.union(t.callback, t.table)
+extended.validateProps = strictInterface(v)
+
+extended.defaultProps = { scanDebounceSeconds = 1, viewFillPercent = 0.25 }
+
+function extended:init()
+	self.isMounted = false
+	self.lastImpressionTick = nil
+	self.nextImpressionTick = nil
+end
+
+function extended:_isInstanceVisible(p): boolean
+	if not p then
 		return false
 	end
 
-	local viewPortBounds = p2.props.viewPortBounds
-
+	local viewPortBounds = self.props.viewPortBounds
 	ArgCheck.assert(viewPortBounds ~= nil)
 
 	if not viewPortBounds then
 		return false
 	end
 
-	local v23 = viewPortBounds.max - viewPortBounds.min
+	local v2 = viewPortBounds.max - viewPortBounds.min
+	ArgCheck.assert(v2.X > 0)
+	ArgCheck.assert(v2.Y > 0)
+	local v3 = v2 * self.props.viewFillPercent
 
-	ArgCheck.assert(v23.X > 0)
-	ArgCheck.assert(v23.Y > 0)
+	ArgCheck.assert(v3.X > 0 and v3.Y > 0)
 
-	local v24 = v23 * p2.props.viewFillPercent
-
-	ArgCheck.assert(v24.X > 0 and v24.Y > 0)
-
-	if v24.X <= 0 or v24.Y <= 0 then
+	if v3.X <= 0 or v3.Y <= 0 or (p.AbsoluteSize.X <= 0 or p.AbsoluteSize.Y <= 0) then
 		return false
 	end
 
-	if FFlagAXSduiCatalogScrollImpressions and (p3.AbsoluteSize.X <= 0 or p3.AbsoluteSize.Y <= 0) then
-		return false
+	local absolutePosition = p.AbsolutePosition
+	local v4 = absolutePosition + p.AbsoluteSize / 2
+	local v5 = absolutePosition + p.AbsoluteSize
+	local v6
+
+	if v4.X > viewPortBounds.min.X then
+		v6 = v4.X < viewPortBounds.max.X
+	else
+		v6 = false
 	end
 
-	local AbsolutePosition = p3.AbsolutePosition
-	local v26 = AbsolutePosition + p3.AbsoluteSize / 2
-	local v27 = AbsolutePosition + p3.AbsoluteSize
-	local v28 = v26.X > viewPortBounds.min.X and v26.X < viewPortBounds.max.X
-	local v29 = v26.Y > viewPortBounds.min.Y and v26.Y < viewPortBounds.max.Y
+	local v7
 
-	if v28 and v29 then
+	if v4.Y > viewPortBounds.min.Y then
+		v7 = v4.Y < viewPortBounds.max.Y
+	else
+		v7 = false
+	end
+
+	if v6 and v7 then
 		return true
 	end
 
-	local v30 = AbsolutePosition:Max(viewPortBounds.min)
-	local v31 = v27:Min(viewPortBounds.max) - v30
-	local v32 = v31.X >= v24.X
+	local max = absolutePosition:Max(viewPortBounds.min)
+	local v8 = v5:Min(viewPortBounds.max) - max
 
-	if v29 and v32 then
+	local v9 = v8.X >= v3.X
+
+	if v7 and v9 then
 		return true
 	end
 
-	local v33 = v31.Y >= v24.Y
-
-	if v28 and v33 then
-		return true
-	end
-
-	if v32 and v33 then
-		return true
-	end
-
-	return false
+	local v10 = v8.Y >= v3.Y
+	return if v6 and v10 or v9 and v10 then true else false
 end
-function v14._defaultObjectCollector(p4) -- line: 139
-	return p4:GetChildren()
+
+function extended._defaultObjectCollector(instance)
+	return instance:GetChildren()
 end
-function v14._calculateImpressions(p5) -- line: 143
-	-- upvalues: ArgCheck (copy)
-	if not p5.isMounted then
+
+function extended:_calculateImpressions()
+	if not self.isMounted then
 		return
 	end
 
-	if p5.props.pageFilter then
-		if not p5.props.pageFilter(p5.props.currentPage) then
+	if self.props.pageFilter then
+		if not self.props.pageFilter(self.props.currentPage) then
 			return
 		end
-	elseif p5.props.appPage ~= p5.props.currentPage then
+	elseif FFlagSignalsNavP3gAvatarExperience then
+		if not self.props.pageEligible then
+			return
+		end
+	elseif self.props.appPage ~= self.props.currentPage then
 		return
 	end
 
-	local v36 = p5.props.parentRef and p5.props.parentRef.current
+	local current = self.props.parentRef and self.props.parentRef.current
 
-	if not v36 or not p5:_isInstanceVisible(v36) then
+	if not (current and self:_isInstanceVisible(current)) then
 		return
 	end
 
-	p5.lastImpressionTick = tick()
+	self.lastImpressionTick = tick()
+	local guiObjects = {}
+	local v2 = (self.props.collectObjectsFunc or self._defaultObjectCollector)(current)
 
-	local t1 = {}
-	local v38 = (p5.props.collectObjectsFunc or p5._defaultObjectCollector)(v36)
-
-	if v38 then
-		for _, v40 in v38 do
-			if v40:IsA("GuiObject") and p5:_isInstanceVisible(v40) and (p5.props.filterImpressionFunc == nil or p5.props.filterImpressionFunc(v40)) then
-				table.insert(t1, v40)
+	if v2 then
+		for _, guiObject in v2 do
+			if not (guiObject:IsA("GuiObject") and self:_isInstanceVisible(guiObject) and (self.props.filterImpressionFunc == nil or self.props.filterImpressionFunc(guiObject))) then
+				continue
 			end
+
+			table.insert(guiObjects, guiObject)
 		end
 	end
 
-	if #t1 > 0 then
-		ArgCheck.assert(p5.props.onImpressionsDetected ~= nil)
-		p5.props.onImpressionsDetected(t1)
+	if #guiObjects > 0 then
+		ArgCheck.assert(self.props.onImpressionsDetected ~= nil)
+		self.props.onImpressionsDetected(guiObjects)
 	end
 end
-function v14._requestImpressions(p6) -- line: 183
-	-- upvalues: ArgCheck (copy)
-	if not p6.isMounted then
+
+function extended:_requestImpressions()
+	if not (self.isMounted and self.nextImpressionTick == nil and (self.props.parentRef and self.props.parentRef.current)) then
 		return
 	end
 
-	if p6.nextImpressionTick ~= nil then
-		return
+	local v2
+
+	if self.lastImpressionTick == nil then
+		v2 = 0
+	else
+		self.nextImpressionTick = self.lastImpressionTick + self.props.scanDebounceSeconds
+		v2 = self.nextImpressionTick - tick()
 	end
 
-	if not p6.props.parentRef or not p6.props.parentRef.current then
-		return
-	end
-
-	local n1 = 0
-
-	if p6.lastImpressionTick ~= nil then
-		p6.nextImpressionTick = p6.lastImpressionTick + p6.props.scanDebounceSeconds
-		n1 = p6.nextImpressionTick - tick()
-	end
-
-	if n1 > 0 then
-		task.delay(n1, function() -- line: 202
-			-- upvalues: ArgCheck (copy), p6 (copy)
-			ArgCheck.assert(p6.nextImpressionTick ~= nil and tick() > p6.nextImpressionTick)
-			p6.nextImpressionTick = nil
-			p6:_calculateImpressions()
+	if v2 > 0 then
+		task.delay(v2, function()
+			ArgCheck.assert(self.nextImpressionTick ~= nil and tick() > self.nextImpressionTick)
+			self.nextImpressionTick = nil
+			self:_calculateImpressions()
 		end)
-
 		return
 	end
 
-	p6.nextImpressionTick = nil
-	p6:_calculateImpressions()
+	self.nextImpressionTick = nil
+	self:_calculateImpressions()
 end
-function v14.render(_) -- line: 214
+
+function extended.render(_): nil
 	return nil
 end
-function v14.didMount(p8) -- line: 218
-	p8.isMounted = true
-	p8:_requestImpressions()
 
-	if p8.props.onRequestImpressionsSignal then
-		p8.onRequestImpressionsConnection = p8.props.onRequestImpressionsSignal:connect(function() -- line: 222
-			-- upvalues: p8 (copy)
-			p8:_requestImpressions()
+function extended:didMount()
+	self.isMounted = true
+	self:_requestImpressions()
+
+	if self.props.onRequestImpressionsSignal then
+		self.onRequestImpressionsConnection = self.props.onRequestImpressionsSignal:connect(function()
+			self:_requestImpressions()
 		end)
 	end
 end
-function v14.willUnmount(p9) -- line: 228
-	p9.isMounted = false
 
-	if p9.onRequestImpressionsConnection ~= nil then
-		p9.onRequestImpressionsConnection:disconnect()
-		p9.onRequestImpressionsConnection = nil
+function extended:willUnmount()
+	self.isMounted = false
+
+	if self.onRequestImpressionsConnection ~= nil then
+		self.onRequestImpressionsConnection:disconnect()
+		self.onRequestImpressionsConnection = nil
 	end
 end
-function v14.didUpdate(p10, _, _) -- line: 236
-	p10:_requestImpressions()
+
+function extended:didUpdate(_, _)
+	self:_requestImpressions()
 end
 
 if FFlagSignalsNavP3gAvatarExperience then
-	local v15 = v14
+	return function(p)
+		local currentPage = useSignalState(getLegacyNavigationStore(false).getCurrentPageName)
 
-	return function(p13) -- line: 242
-		-- upvalues: v13 (copy), useSignalState (copy), React (copy), v15 (copy), Cryo (copy)
-		local v50 = v13(false)
-		local v51 = useSignalState(v50.getCurrentPageName)
+		local v2 = p.pageFilter and { currentPage = currentPage } or {
+			pageEligible = p.appPage == currentPage
+		}
 
-		return React.createElement(v15, Cryo.Dictionary.union(p13, {
-			currentPage = v51
-		}))
+		return React.createElement(extended, Cryo.Dictionary.union(p, v2))
 	end
 end
 
-return (RoactRodux.connect(function(p14, _) -- line: 255
-	-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy)
-	local t2 = {}
-	local v55
-
+local function fn(p) -- 1 equivalent call inferred from this helper
 	if FFlagUseNavigationSelectors then
-		v55 = Selectors.selectCurrentPageName(p14)
-	else
-		local history = p14.Navigation.history
-		local v57 = history[#history]
-
-		v55 = v57[#v57].name
+		return Selectors.selectCurrentPageName(p)
 	end
 
-	t2.currentPage = v55
+	local history = p.Navigation.history
+	local v2 = history[#history]
+	return v2[#v2].name
+end
 
-	return t2
-end)(v14))
+return (RoactRodux.connect(function(p, _)
+	return { currentPage = fn(p) } -- inferred equivalent call
+end)(extended))

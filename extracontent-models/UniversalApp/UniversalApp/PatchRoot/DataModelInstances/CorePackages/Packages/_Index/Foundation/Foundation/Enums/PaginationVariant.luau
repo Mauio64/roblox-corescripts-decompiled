@@ -1,5 +1,1 @@
-return {
-	MultiPage = "MultiPage",
-	SinglePage = "SinglePage",
-	NoPage = "NoPage"
-}
+return { MultiPage = "MultiPage", SinglePage = "SinglePage", NoPage = "NoPage" }

@@ -1,3 +1,1 @@
-return {
-	SelectedSortId = "selectedSortId"
-}
+return { SelectedSortId = "selectedSortId", DesiredGenre = "desiredGenre", SafeGenre = "safeGenre" }

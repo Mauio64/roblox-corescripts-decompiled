@@ -1,13 +1,13 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local PresenceType = require(FriendsLanding.dependencies).RoduxPresence.Enums.PresenceType
+local dependencies = require(FriendsLanding.dependencies)
 
-return function(t1: {[any]: any}?) -- line: 11
-	-- upvalues: PresenceType (copy)
-	if not t1 then
+local presenceType = dependencies.RoduxPresence.Enums.PresenceType
+
+return function(p)
+	if not p then
 		return false
 	end
 
-	assert(t1, "user modal must be non-nil")
-
-	return t1.userPresenceType == PresenceType.InGame and (not not t1.lastLocation and (t1.lastLocation ~= "" or false))
+	assert(p, "user modal must be non-nil")
+	return p.userPresenceType == presenceType.InGame and p.lastLocation and p.lastLocation ~= "" and true or false
 end

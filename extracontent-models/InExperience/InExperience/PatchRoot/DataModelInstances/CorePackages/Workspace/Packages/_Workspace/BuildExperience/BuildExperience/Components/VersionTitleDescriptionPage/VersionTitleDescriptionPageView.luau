@@ -1,76 +1,99 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
 local IconButton = Foundation.IconButton
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local TextArea = Foundation.TextArea
 local TextInput = Foundation.TextInput
 local View = Foundation.View
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local IconName = Foundation.Enums.IconName
 local InputSize = Foundation.Enums.InputSize
 
-local function VersionTitleDescriptionPageView(t1: {[any]: any}) -- line: 30
-	-- upvalues: React (copy), View (copy), IconButton (copy), IconName (copy), InputSize (copy), ButtonVariant (copy), FoundationText (copy), LocalizationStrings (copy), TextInput (copy), TextArea (copy)
-	if not t1.isReady then
+local function VersionTitleDescriptionPageView(props)
+	local v = useLocalization({
+		descriptionLabel = LocalizationStrings.TITLE_DESCRIPTION_DESCRIPTION_LABEL,
+		titleLabel = LocalizationStrings.TITLE_DESCRIPTION_TITLE_LABEL,
+		versionTitleDescription = LocalizationStrings.PUBLISH_VERSION_TITLE_DESCRIPTION
+	})
+
+	local descriptionLabel = v.descriptionLabel
+	local titleLabel = v.titleLabel
+	local versionTitleDescription = v.versionTitleDescription
+
+	if not props.isReady then
 		return nil
 	end
 
-	local v16 = t1.testId or "version-title-description-page"
-
+	local testId = props.testId or "version-title-description-page"
 	return React.createElement(View, {
-		tag = "col align-x-center size-full bg-surface-0",
-		LayoutOrder = t1.layoutOrder,
-		testId = v16
+		LayoutOrder = props.layoutOrder,
+		tag = {
+			["composition-layout-detail"] = true,
+			["col align-x-center size-full bg-surface-0"] = true
+		},
+		testId = testId
 	}, {
-		Header = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "composition-content-header row align-y-center gap-small size-full-0 auto-y padding-y-medium",
-			testId = `{ v16 }-header`
-		}, {
-			Back = React.createElement(IconButton, {
+		Header = React.createElement(
+			View,
+			{
 				LayoutOrder = 1,
-				isCircular = true,
-				icon = IconName.ArrowLargeLeft,
-				onActivated = t1.onBack,
-				size = InputSize.Medium,
-				variant = ButtonVariant.Utility,
-				testId = `{ v16 }-back`
-			}),
-			Title = React.createElement(FoundationText, {
+				tag = "composition-content-header row align-y-center gap-small size-full-0 auto-y padding-y-medium",
+				testId = `{testId}-header`
+			},
+			{
+				Back = React.createElement(IconButton, {
+					LayoutOrder = 1,
+					icon = IconName.ArrowLargeLeft,
+					isCircular = true,
+					onActivated = props.onBack,
+					size = InputSize.Medium,
+					variant = ButtonVariant.Utility,
+					testId = `{testId}-back`
+				}),
+				Title = React.createElement(Text, {
+					LayoutOrder = 2,
+					Text = versionTitleDescription,
+					tag = "fill auto-y text-heading-medium text-align-x-left text-truncate-end content-emphasis",
+					testId = `{testId}-title`
+				})
+			}
+		),
+		Content = React.createElement(
+			View,
+			{
 				LayoutOrder = 2,
-				tag = "fill auto-y text-heading-medium text-align-x-left text-truncate-end content-emphasis",
-				Text = LocalizationStrings.PUBLISH_VERSION_TITLE_DESCRIPTION,
-				testId = `{ v16 }-title`
-			})
-		}),
-		Content = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = "composition-content-body col gap-xlarge size-full-0 auto-y padding-y-large",
-			testId = `{ v16 }-content-body`
-		}, {
-			TitleInput = React.createElement(TextInput, {
-				LayoutOrder = 1,
-				label = LocalizationStrings.TITLE_DESCRIPTION_TITLE_LABEL,
-				text = t1.titleText,
-				width = UDim.new(1, 0),
-				onChanged = t1.onTitleChanged,
-				onFocusLost = t1.onFocusLost,
-				testId = `{ v16 }-title-input`
-			}),
-			DescriptionInput = React.createElement(TextArea, {
-				LayoutOrder = 2,
-				numLines = 4,
-				label = LocalizationStrings.TITLE_DESCRIPTION_DESCRIPTION_LABEL,
-				text = t1.descriptionText,
-				width = UDim.new(1, 0),
-				onChanged = t1.onDescriptionChanged,
-				onFocusLost = t1.onFocusLost,
-				testId = `{ v16 }-description-input`
-			})
-		})
+				tag = "composition-content-body col gap-xlarge size-full-0 auto-y padding-y-large",
+				testId = `{testId}-content-body`
+			},
+			{
+				TitleInput = React.createElement(TextInput, {
+					LayoutOrder = 1,
+					label = titleLabel,
+					text = props.titleText,
+					width = UDim.new(1, 0),
+					onChanged = props.onTitleChanged,
+					onFocusLost = props.onFocusLost,
+					testId = `{testId}-title-input`
+				}),
+				DescriptionInput = React.createElement(TextArea, {
+					LayoutOrder = 2,
+					label = descriptionLabel,
+					text = props.descriptionText,
+					width = UDim.new(1, 0),
+					numLines = 4,
+					onChanged = props.onDescriptionChanged,
+					onFocusLost = props.onFocusLost,
+					testId = `{testId}-description-input`
+				})
+			}
+		)
 	})
 end
 

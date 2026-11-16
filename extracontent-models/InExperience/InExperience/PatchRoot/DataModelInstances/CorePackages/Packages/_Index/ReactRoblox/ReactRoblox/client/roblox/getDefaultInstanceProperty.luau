@@ -1,45 +1,47 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local v2 = require(ParentParent.Shared).Symbol.named("Nil")
-local t1 = {}
+local parent = script.Parent.Parent.Parent.Parent
+local Shared = require(parent.Shared)
+local named = Shared.Symbol.named("Nil")
+local v = {}
 
-local function tryPropertyName(p1, p2) -- line: 33
-	return p1[p2]
+local function tryPropertyName(p, p2)
+	return p[p2]
 end
-local function getDefaultInstanceProperty(p3, p4) -- line: 37
-	-- upvalues: t1 (copy), v2 (copy), tryPropertyName (copy)
-	local v10 = t1[p3]
 
-	if v10 then
-		local v11 = v10[p4]
+local function getDefaultInstanceProperty(className, p)
+	local v2 = v[className]
 
-		if v11 == v2 then
+	if v2 then
+		local v3 = v2[p]
+
+		if v3 == named then
 			return true, nil
 		end
 
-		if v11 ~= nil then
-			return true, v11
+		if v3 ~= nil then
+			return true, v3
 		end
 	else
-		v10 = {}
-		t1[p3] = v10
+		v2 = {}
+		v[className] = v2
 	end
 
-	local v12 = Instance.new(p3)
-	local ok, result = pcall(tryPropertyName, v12, p4)
+	local instance = Instance.new(className)
+	local success, result = pcall(tryPropertyName, instance, p)
 
-	v12:Destroy()
+	instance:Destroy()
 
-	if ok then
-		if result == nil then
-			v10[p4] = v2
-
-			return ok, result
-		end
-
-		v10[p4] = result
+	if not success then
+		return success, result
 	end
 
-	return ok, result
+	if result == nil then
+		v2[p] = named
+		return success, nil
+	end
+
+	v2[p] = result
+
+	return success, result
 end
 
 return getDefaultInstanceProperty

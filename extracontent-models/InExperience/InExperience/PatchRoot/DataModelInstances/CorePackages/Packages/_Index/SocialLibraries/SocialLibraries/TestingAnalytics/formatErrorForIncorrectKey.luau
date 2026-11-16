@@ -1,12 +1,11 @@
-return function(p1) -- line: 1
-	return function(p2, p3) -- line: 2
-		-- upvalues: p1 (copy)
-		local v4, v5 = p1(p2)
+return function(callback)
+	return function(p, p2)
+		local v, v2 = callback(p)
 
-		if v4 == false then
-			return v4, v5 .. ". Issue with: " .. p3
+		if v == false then
+			return false, v2 .. ". Issue with: " .. p2
 		end
 
-		return v4
+		return v
 	end
 end

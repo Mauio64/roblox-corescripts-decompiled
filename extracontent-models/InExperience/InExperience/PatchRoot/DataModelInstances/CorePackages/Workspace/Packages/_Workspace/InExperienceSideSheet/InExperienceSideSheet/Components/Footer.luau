@@ -1,27 +1,43 @@
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
-local React = require(InExperienceSideSheetParent.React)
-local Foundation = require(InExperienceSideSheetParent.Foundation)
+local parent = InExperienceSideSheet.Parent
+
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
 local Divider = Foundation.Divider
 local View = Foundation.View
+local useTokens = Foundation.Hooks.useTokens
+
 local SessionActionButtons = require(InExperienceSideSheet.Components.SessionActionButtons)
 
-local function Footer(t1: {[any]: any}) -- line: 16
-	-- upvalues: React (copy), View (copy), Divider (copy), SessionActionButtons (copy)
-	return React.createElement(View, {
-		tag = "col size-full-0 auto-y padding-right-xlarge padding-bottom-medium",
-		LayoutOrder = t1.layoutOrder
-	}, {
-		FooterDivider = React.createElement(View, {
-			tag = "size-full-0 auto-y padding-bottom-medium",
-			LayoutOrder = 1
-		}, {
-			Divider = React.createElement(Divider)
-		}),
-		SessionActionButtons = React.createElement(SessionActionButtons, {
-			layoutOrder = 2
-		})
-	})
+local function Footer(p)
+	local v = useTokens()
+
+	return React.createElement(
+		View,
+		{
+			tag = "col gap-xlarge size-full-0 auto-y padding-x-xlarge padding-bottom-xlarge",
+			LayoutOrder = p.layoutOrder
+		},
+		{
+			FooterDivider = React.createElement(
+				View,
+				{
+					Size = UDim2.new(1, 0, 0, v.Stroke.Standard),
+					testId = "side-sheet-footer-divider",
+					LayoutOrder = 1
+				},
+				{
+					DividerBleed = React.createElement(View, {
+						Position = UDim2.fromOffset(-v.Padding.XLarge, 0),
+						Size = UDim2.new(1, v.Padding.XLarge * 2, 1, 0),
+						testId = "side-sheet-footer-divider-bleed"
+					}, { Divider = React.createElement(Divider) })
+				}
+			),
+			SessionActionButtons = React.createElement(SessionActionButtons, { layoutOrder = 2 })
+		}
+	)
 end
 
 return React.memo(Footer)

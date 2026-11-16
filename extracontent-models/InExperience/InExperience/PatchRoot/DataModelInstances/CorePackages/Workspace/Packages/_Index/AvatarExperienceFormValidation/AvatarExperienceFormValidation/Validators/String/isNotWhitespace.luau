@@ -1,12 +1,11 @@
 local FormValidationErrorEnum = require(script.Parent.Parent.Parent.FormValidationErrorEnum)
 
-local function isNotWhitespace(s1: string) -- line: 4
-	-- upvalues: FormValidationErrorEnum (copy)
-	if string.match(s1, "%S") ~= nil then
-		return true
+local function isNotWhitespace(value: string)
+	if string.match(value, "%S") == nil then
+		return false, FormValidationErrorEnum.FailedIsNotWhitespace
 	end
 
-	return false, FormValidationErrorEnum.FailedIsNotWhitespace
+	return true
 end
 
 return isNotWhitespace

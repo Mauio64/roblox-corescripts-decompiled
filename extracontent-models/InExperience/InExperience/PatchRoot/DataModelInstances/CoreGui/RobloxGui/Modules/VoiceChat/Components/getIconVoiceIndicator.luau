@@ -1,7 +1,8 @@
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
 
-return function(s1: string, s2: string) -- line: 5
-	-- upvalues: default (copy)
-	return default:GetIcon(s1, s2)
+return function(p: string, p2: string)
+	return default:GetIcon(p, p2)
 end

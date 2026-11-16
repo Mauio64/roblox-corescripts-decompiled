@@ -1,54 +1,50 @@
 local HttpService = game:GetService("HttpService")
+
 local SquadsCore = script:FindFirstAncestor("SquadsCore")
-local SquadsCoreParent = SquadsCore.Parent
-local UrlBuilder = require(SquadsCoreParent.UrlBuilder)
-local t = require(SquadsCoreParent.t)
+local parent = SquadsCore.Parent
+
+local UrlBuilder = require(parent.UrlBuilder)
+local t = require(parent.t)
+
 local Logger = require(SquadsCore.Logger)
 local serializeTable = require(SquadsCore.Utils.serializeTable)
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+
+local urlBuilder = UrlBuilder.UrlBuilder
 local UrlBase = UrlBuilder.UrlBase
-local v10 = t.strictInterface({
-	scheduledGroupUpId = t.number
-})
-local v11 = UrlBuilder2.new({
-	path = "group-up/v1/subscribe-to-scheduled-group-up",
-	base = UrlBase.APIS
+
+local strictInterface = t.strictInterface({ scheduledGroupUpId = t.number })
+
+local url = urlBuilder.new({
+	base = UrlBase.APIS,
+	path = "group-up/v1/subscribe-to-scheduled-group-up"
 })()
 
-return function(t1: {[any]: any}, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 28
-	-- upvalues: v10 (copy), HttpService (copy), v11 (copy), Logger (copy), serializeTable (copy)
-	assert(v10(t1))
+return function(p, callback, callback2)
+	assert(strictInterface(p))
 
 	return HttpService:RequestInternal({
+		Body = HttpService:JSONEncode({ scheduledGroupUpId = p.scheduledGroupUpId }),
+		Headers = { ["Content-Type"] = "application/json", Accept = "application/json" },
 		Method = "POST",
-		Body = HttpService:JSONEncode({
-			scheduledGroupUpId = t1.scheduledGroupUpId
-		}),
-		Headers = {
-			["Content-Type"] = "application/json",
-			Accept = "application/json"
-		},
-		Url = v11
-	}):Start(function(_, p4) -- line: 47
-		-- upvalues: p1 (copy), HttpService (copy), Logger (copy), serializeTable (copy), p2 (copy), t1 (copy)
-		if p4.StatusCode == 200 then
-			local Body = p4.Body
+		Url = url
+	}):Start(function(_, data)
+		if data.StatusCode == 200 then
+			local body = data.Body
 
-			if p1 then
-				p1(HttpService:JSONDecode(Body))
+			if callback then
+				callback(HttpService:JSONDecode(body))
 			end
 
-			Logger:debug("Response: {}", serializeTable(Body))
-
-			return p4
+			Logger:debug("Response: {}", serializeTable(body))
+			return data
 		end
 
-		if p2 then
-			p2()
+		if callback2 then
+			callback2()
 		end
 
-		Logger:error("Error subscribing to scheduledSquadId: {}. Status: {}", t1.scheduledGroupUpId, p4.StatusMessage)
+		Logger:error("Error subscribing to scheduledSquadId: {}. Status: {}", p.scheduledGroupUpId, data.StatusMessage)
 
-		return p4
+		return data
 	end)
 end

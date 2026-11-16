@@ -1,29 +1,33 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Foundation = require(ParentParentParent.Foundation)
-local Localization = require(ParentParentParent.Localization)
-local React = require(ParentParentParent.React)
-local RoactUtils = require(ParentParentParent.RoactUtils)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Foundation = require(parent2.Foundation)
+local Localization = require(parent2.Localization)
+local React = require(parent2.React)
+local RoactUtils = require(parent2.RoactUtils)
+
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
 local InputSize = Foundation.Enums.InputSize
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local View = Foundation.View
-local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+
+local useAnalytics = require(parent.Analytics.useAnalytics)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useLocalization = Localization.Hooks.useLocalization
-local usePinInputStateWhileOpen = require(ParentParent.Hooks.usePinInputStateWhileOpen)
-local EventNames = require(ParentParent.Analytics.EventNames)
-local PermissionPromptFinished = require(ParentParent.Thunks.PermissionPromptFinished)
-local FFlagCapturePermissionsPromptFreeMouse = require(ParentParent.Flags.FFlagCapturePermissionsPromptFreeMouse)
+local usePinInputStateWhileOpen = require(parent.Hooks.usePinInputStateWhileOpen)
 
-return function(t1: {[any]: any}) -- line: 34
-	-- upvalues: useAnalytics (copy), useDispatch (copy), useLocalization (copy), usePinInputStateWhileOpen (copy), FFlagCapturePermissionsPromptFreeMouse (copy), React (copy), EventNames (copy), PermissionPromptFinished (copy), Dialog (copy), DialogSize (copy), View (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
-	local v22 = useAnalytics()
-	local v23 = useDispatch()
-	local v24 = useLocalization({
+local EventNames = require(parent.Analytics.EventNames)
+local PermissionPromptFinished = require(parent.Thunks.PermissionPromptFinished)
+
+local FFlagCapturePermissionsPromptFreeMouse = require(parent.Flags.FFlagCapturePermissionsPromptFreeMouse)
+
+return function(p)
+	local v = useAnalytics()
+	local v2 = useDispatch()
+	local v3 = useLocalization({
 		allow = "Feature.Captures.Action.Allow",
 		allowAccessToCapturesBody = "Feature.Captures.Body.AllowAccessToCaptures",
 		allowAccessToCapturesTitle = "Feature.Captures.Title.AllowAccessToCaptures",
@@ -31,67 +35,87 @@ return function(t1: {[any]: any}) -- line: 34
 	})
 
 	usePinInputStateWhileOpen(FFlagCapturePermissionsPromptFreeMouse)
-	React.useEffect(function() -- line: 50
-		-- upvalues: v22 (copy), EventNames (copy)
-		v22.fireEvent(EventNames.CapturePermissionsPromptViewed)
+
+	React.useEffect(function()
+		v.fireEvent(EventNames.CapturePermissionsPromptViewed)
 	end, {})
 
-	local v25 = React.useCallback(function() -- line: 54
-		-- upvalues: v22 (copy), EventNames (copy), v23 (copy), PermissionPromptFinished (copy), t1 (copy)
-		v22.fireEvent(EventNames.CapturePermissionsPromptAccepted)
-		v23(PermissionPromptFinished(t1.promptId, true))
-	end, { t1.promptId })
-	local v26 = React.useCallback(function() -- line: 60
-		-- upvalues: v22 (copy), EventNames (copy), v23 (copy), PermissionPromptFinished (copy), t1 (copy)
-		v22.fireEvent(EventNames.CapturePermissionsPromptRejected)
-		v23(PermissionPromptFinished(t1.promptId, false))
-	end, { t1.promptId })
+	local onActivated = React.useCallback(function()
+		v.fireEvent(EventNames.CapturePermissionsPromptAccepted)
 
-	return React.createElement(Dialog.Root, {
-		size = DialogSize.Small
-	}, {
-		ModalFix = if not FFlagCapturePermissionsPromptFreeMouse then nil else React.createElement("ImageButton", {
+		v2(PermissionPromptFinished(p.promptId, true))
+	end, { p.promptId })
+
+	local onActivated2 = React.useCallback(function()
+		v.fireEvent(EventNames.CapturePermissionsPromptRejected)
+
+		v2(PermissionPromptFinished(p.promptId, false))
+	end, { p.promptId })
+
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v4 = { size = DialogSize.Small }
+	local modalFix
+
+	if FFlagCapturePermissionsPromptFreeMouse then
+		modalFix = React.createElement("ImageButton", {
 			BackgroundTransparency = 1,
 			Modal = true,
 			Size = UDim2.new(0, 0, 0, 0)
-		}),
-		DialogTitle = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = "col align-x-center align-y-center auto-y gap-small size-full-0 margin-top-small"
-		}, {
-			DialogTitleText = React.createElement(FoundationText, {
-				tag = "auto-xy text-heading-small text-wrap",
-				Text = v24.allowAccessToCapturesTitle
-			})
-		}),
-		DialogContent = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = "col align-x-center align-y-center auto-y gap-small size-full-0 margin-none"
-		}, {
-			DialogContentText = React.createElement(FoundationText, {
-				LayoutOrder = 1,
-				tag = "auto-xy text-body-small text-wrap padding-bottom-xsmall",
-				Text = v24.allowAccessToCapturesBody
-			}),
-			Buttons = React.createElement(View, {
-				LayoutOrder = 2,
-				tag = "row align-x-center align-y-center auto-xy gap-medium"
-			}, {
-				AcceptButton = React.createElement(Button, {
-					text = v24.allow,
-					variant = ButtonVariant.Emphasis,
-					onActivated = v25,
-					size = InputSize.Small,
-					width = UDim.new(0.45, 0)
-				}),
-				RejectButton = React.createElement(Button, {
-					text = v24.dontAllow,
-					variant = ButtonVariant.Standard,
-					onActivated = v26,
-					size = InputSize.Small,
-					width = UDim.new(0.45, 0)
-				})
-			})
 		})
+	end
+
+	return createElement(root, v4, {
+		ModalFix = modalFix,
+		DialogTitle = React.createElement(
+			View,
+			{
+				LayoutOrder = 1,
+				tag = "col align-x-center align-y-center auto-y gap-small size-full-0 margin-top-small"
+			},
+			{
+				DialogTitleText = React.createElement(Text, {
+					Text = v3.allowAccessToCapturesTitle,
+					tag = "auto-xy text-heading-small text-wrap"
+				})
+			}
+		),
+		DialogContent = React.createElement(
+			View,
+			{
+				LayoutOrder = 2,
+				tag = "col align-x-center align-y-center auto-y gap-small size-full-0 margin-none"
+			},
+			{
+				DialogContentText = React.createElement(Text, {
+					LayoutOrder = 1,
+					Text = v3.allowAccessToCapturesBody,
+					tag = "auto-xy text-body-small text-wrap padding-bottom-xsmall"
+				}),
+				Buttons = React.createElement(
+					View,
+					{
+						LayoutOrder = 2,
+						tag = "row align-x-center align-y-center auto-xy gap-medium"
+					},
+					{
+						AcceptButton = React.createElement(Button, {
+							text = v3.allow,
+							variant = ButtonVariant.Emphasis,
+							onActivated = onActivated,
+							size = InputSize.Small,
+							width = UDim.new(0.45, 0)
+						}),
+						RejectButton = React.createElement(Button, {
+							text = v3.dontAllow,
+							variant = ButtonVariant.Standard,
+							onActivated = onActivated2,
+							size = InputSize.Small,
+							width = UDim.new(0.45, 0)
+						})
+					}
+				)
+			}
+		)
 	})
 end

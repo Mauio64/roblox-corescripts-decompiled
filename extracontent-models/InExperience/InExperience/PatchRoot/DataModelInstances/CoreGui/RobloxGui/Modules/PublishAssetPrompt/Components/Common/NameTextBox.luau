@@ -1,17 +1,24 @@
 local CorePackages = game:GetService("CorePackages")
+
 local Roact = require(CorePackages.Packages.Roact)
 local t = require(CorePackages.Packages.t)
 local RoactGamepad = require(CorePackages.Packages.RoactGamepad)
 local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+
 local Focusable = RoactGamepad.Focusable
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local withStyle = UIBlox.Style.withStyle
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
-local v11 = Roact.PureComponent:extend("NameTextBox")
-local v12 = game:DefineFastFlag("RemoveNameRegex", false)
 
-v11.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("NameTextBox")
+local defineFastFlag = game:DefineFastFlag("RemoveNameRegex", false)
+
+extended.validateProps = t.strictInterface({
 	Size = t.optional(t.UDim2),
 	Position = t.optional(t.UDim2),
 	centerText = t.optional(t.boolean),
@@ -23,170 +30,214 @@ v11.validateProps = t.strictInterface({
 	defaultName = t.optional(t.string),
 	invalidInputText = t.optional(t.string)
 })
-v11.defaultProps = {
+
+extended.defaultProps = {
 	maxLength = 50,
 	centerText = true,
 	invalidInputText = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.InvalidName")
 }
 
-local function isNameTooLong(s1: string, n1: number) -- line: 47
-	local v16 = utf8.len(utf8.nfcnormalize(s1))
-
-	if v16 == nil then
-		return true
-	end
-
-	return n1 < v16
+local function isNameTooLong(text: string, maxLength: number): boolean -- 1 equivalent call inferred from this helper
+	local v = utf8.len(utf8.nfcnormalize(text))
+	return v == nil or maxLength < v
 end
 
-function v11.init(p1) -- line: 56
-	p1:setState({
+function extended:init()
+	self:setState({
+		name = self.props.defaultName or "",
 		lastValidName = "",
-		isNameValid = true,
-		name = p1.props.defaultName or ""
+		isNameValid = true
 	})
-	p1.wasInitiallyFocused = false
 
-	function p1.tryFocusTextBox() -- line: 65
-		-- upvalues: p1 (copy)
-		if p1.wasInitiallyFocused then
+	self.wasInitiallyFocused = false
+
+	function self.tryFocusTextBox()
+		if self.wasInitiallyFocused then
 			return
 		end
 
-		local v29 = p1.props.nameTextBoxRef and p1.props.nameTextBoxRef:getValue()
+		local v = self.props.nameTextBoxRef and self.props.nameTextBoxRef:getValue()
 
-		if v29 and v29:IsDescendantOf(game) then
-			v29:CaptureFocus()
-			p1.wasInitiallyFocused = true
+		if v and v:IsDescendantOf(game) then
+			v:CaptureFocus()
+			self.wasInitiallyFocused = true
 		end
 	end
-	function p1.onTextChanged(p2) -- line: 77
-		-- upvalues: p1 (copy)
-		local p2Text = p2.Text
-		local maxLength = p1.props.maxLength
-		local v33 = utf8.len(utf8.nfcnormalize(p2Text))
 
-		if v33 == nil or maxLength < v33 then
-			p2Text = string.sub(p2Text, 1, utf8.offset(p2Text, maxLength + 1) - 1)
-			p2.Text = p2Text
+	function self.onTextChanged(p)
+		local text = p.Text
+
+		local maxLength = self.props.maxLength
+
+		if isNameTooLong(text, maxLength) then -- inferred equivalent call
+			text = string.sub(text, 1, utf8.offset(text, maxLength + 1) - 1)
+			p.Text = text
 		end
 
-		local v34 = p1:checkIsNameValid(p2Text)
-		local lastValidName = p1.state.lastValidName
+		local isNameValid = self:checkIsNameValid(text)
 
-		if v34 then
-			lastValidName = p2.Text
+		local lastValidName = self.state.lastValidName
+
+		if isNameValid then
+			lastValidName = p.Text
 		end
 
-		p1:setState({
-			lastValidName = lastValidName,
-			isNameValid = v34,
-			name = p2Text
-		})
-		p1.props.onNameUpdated(p2Text, v34)
+		self:setState({ lastValidName = lastValidName, isNameValid = isNameValid, name = text })
+
+		self.props.onNameUpdated(text, isNameValid)
 	end
 end
-function v11.checkIsNameValid(_, p4) -- line: 104
-	-- upvalues: v12 (copy)
-	if not v12 then
-		if not string.match(p4, "[0-9a-zA-Z_'%s]+$") then
-			return false
-		end
 
-		if string.sub(p4, 1, 1) == " " then
+function extended:checkIsNameValid(value): boolean
+	if not defineFastFlag then
+		if not (string.match(value, "[0-9a-zA-Z_'%s]+$") and string.sub(value, 1, 1) ~= " ") then
 			return false
 		end
 	end
 
-	if string.match(p4, "^%s*$") then
-		return false
-	end
-
-	return true
+	return not string.match(value, "^%s*$")
 end
-function v11.renderWithProviders(p5, p6, p7) -- line: 124
-	-- upvalues: Roact (copy), Focusable (copy), CursorKind (copy)
-	local p6Font = p6.Font
-	local Theme = p6.Theme
-	local Body = p6Font.Body
-	local isNameValid = p5.state.isNameValid
 
-	return Roact.createElement("Frame", {
+function extended:renderWithProviders(props, callback)
+	local font = props.Font
+	local theme = props.Theme
+
+	local body = font.Body
+
+	local warningText = not self.state.isNameValid
+
+	local createElement = Roact.createElement
+	local v = {
 		BackgroundTransparency = 1,
-		Size = p5.props.Size,
-		Position = p5.props.Position,
-		LayoutOrder = p5.props.LayoutOrder
-	}, {
-		TextBoxContainer = Roact.createElement("Frame", {
-			LayoutOrder = 1,
-			BackgroundColor3 = Theme.BackgroundMuted.Color,
-			Size = p5.props.Size
-		}, {
-			Textbox = Roact.createElement(Focusable.TextBox, {
-				Text = p5.state.name,
-				BackgroundTransparency = 1,
-				ClearTextOnFocus = false,
-				Font = Body.Font,
-				TextSize = p6Font.BaseSize * Body.RelativeSize,
-				PlaceholderColor3 = Theme.PlaceHolder.Color,
-				PlaceholderText = p5.props.defaultName,
-				Position = UDim2.fromOffset(6, 0),
-				Size = UDim2.new(1, -12, 1, 0),
-				TextColor3 = Theme.TextDefault.Color,
-				TextTruncate = Enum.TextTruncate.AtEnd,
-				TextWrapped = true,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = if p5.props.centerText then nil else Enum.TextYAlignment.Top,
-				OverlayNativeInput = true,
-				[Roact.Change.Text] = p5.onTextChanged,
-				SelectionImageObject = p7(CursorKind.InputFields),
-				NextSelectionDown = p5.props.NextSelectionDown,
-				[Roact.Ref] = p5.props.nameTextBoxRef,
-				[Roact.Event.AncestryChanged] = p5.tryFocusTextBox
-			}, {
-				UIPadding = Roact.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, 6),
-					PaddingRight = UDim.new(0, 6),
-					PaddingTop = if p5.props.centerText then nil else UDim.new(0, 6)
-				})
+		Size = self.props.Size,
+		Position = self.props.Position,
+		LayoutOrder = self.props.LayoutOrder
+	}
+
+	local createElement2 = Roact.createElement
+	local v2 = {
+		BackgroundColor3 = theme.BackgroundMuted.Color,
+		LayoutOrder = 1,
+		Size = self.props.Size
+	}
+
+	local createElement3 = Roact.createElement
+	local textBox = Focusable.TextBox
+	local v3 = {}
+	v3.Text = self.state.name
+	v3.BackgroundTransparency = 1
+	v3.ClearTextOnFocus = false
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = body.Font
+	end
+
+	v3.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
+	end
+
+	v3.FontFace = fontFace
+
+	v3.TextSize = font.BaseSize * body.RelativeSize
+	v3.PlaceholderColor3 = theme.PlaceHolder.Color
+	v3.PlaceholderText = self.props.defaultName
+	v3.Position = UDim2.fromOffset(6, 0)
+	v3.Size = UDim2.new(1, -12, 1, 0)
+	v3.TextColor3 = theme.TextDefault.Color
+	v3.TextTruncate = Enum.TextTruncate.AtEnd
+	v3.TextWrapped = true
+	v3.TextXAlignment = Enum.TextXAlignment.Left
+	local textYAlignment
+
+	if not self.props.centerText then
+		textYAlignment = Enum.TextYAlignment.Top
+	end
+
+	v3.TextYAlignment = textYAlignment
+	v3.OverlayNativeInput = true
+	v3[Roact.Change.Text] = self.onTextChanged
+	v3.SelectionImageObject = callback(CursorKind.InputFields)
+	v3.NextSelectionDown = self.props.NextSelectionDown
+
+	v3[Roact.Ref] = self.props.nameTextBoxRef
+	v3[Roact.Event.AncestryChanged] = self.tryFocusTextBox
+
+	local createElement4 = Roact.createElement
+	local v5 = { PaddingLeft = UDim.new(0, 6), PaddingRight = UDim.new(0, 6), PaddingTop = 0 }
+	local paddingTop
+
+	if not self.props.centerText then
+		paddingTop = UDim.new(0, 6)
+	end
+
+	v5.PaddingTop = paddingTop
+	local v4 = {
+		TextBoxContainer = createElement2("Frame", v2, {
+			Textbox = createElement3(textBox, v3, {
+				UIPadding = createElement4("UIPadding", v5)
 			}),
-			UICorner = Roact.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 8)
-			}),
+			UICorner = Roact.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 			UIStroke = Roact.createElement("UIStroke", {
 				Thickness = 0.5,
-				Transparency = Theme.Divider.Transparency,
-				Color = Theme.Divider.Color,
+				Transparency = theme.Divider.Transparency,
+				Color = theme.Divider.Color,
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			})
 		}),
-		WarningText = not isNameValid and Roact.createElement("TextLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			TextWrapped = true,
-			TextSize = 12,
+		WarningText = 0
+	}
+
+	if warningText then
+		local createElement5 = Roact.createElement
+		local v6 = {
 			Position = UDim2.new(0, 0, 1, 0),
-			Text = p5.props.invalidInputText,
+			BackgroundTransparency = 1,
+			Text = self.props.invalidInputText,
+			LayoutOrder = 2,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			Size = UDim2.new(1, 0, 0, 20),
-			TextColor3 = Theme.Alert.Color,
-			Font = p6Font.Body.Font
-		})
-	})
+			TextColor3 = theme.Alert.Color,
+			TextWrapped = true,
+			Font = 0,
+			FontFace = 0,
+			TextSize = 12
+		}
+		local font3
+
+		if not FoundationFontFaceMigration then
+			font3 = font.Body.Font
+		end
+
+		v6.Font = font3
+		local fontFace2
+
+		if FoundationFontFaceMigration then
+			fontFace2 = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
+		end
+
+		v6.FontFace = fontFace2
+		warningText = createElement5("TextLabel", v6)
+	end
+
+	v4.WarningText = warningText
+	return createElement("Frame", v, v4)
 end
-function v11.render(p8) -- line: 200
-	-- upvalues: withStyle (copy), withSelectionCursorProvider (copy)
-	return withStyle(function(p9) -- line: 201
-		-- upvalues: withSelectionCursorProvider (copy), p8 (copy)
-		return withSelectionCursorProvider(function(p10) -- line: 202
-			-- upvalues: p8 (copy), p9 (copy)
-			return p8:renderWithProviders(p9, p10)
+
+function extended:render()
+	return withStyle(function(p)
+		return withSelectionCursorProvider(function(p2)
+			return self:renderWithProviders(p, p2)
 		end)
 	end)
 end
-function v11.didMount(p11) -- line: 208
-	p11.tryFocusTextBox()
+
+function extended.didMount(p)
+	p.tryFocusTextBox()
 end
 
-return v11
+return extended

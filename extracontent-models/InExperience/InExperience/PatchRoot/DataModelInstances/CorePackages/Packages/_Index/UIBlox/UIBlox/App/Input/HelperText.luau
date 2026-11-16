@@ -1,28 +1,38 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local useStyle = require(ParentParent.Core.Style.useStyle)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-local function HelperText(t1: {[any]: any}) -- line: 18
-	-- upvalues: useStyle (copy), React (copy)
-	local HelperText2 = useStyle().Tokens.Component.HelperText
-	local Typography = HelperText2.Base.Typography
-	local v9 = if not t1.error then HelperText2.Base.ContentColor else HelperText2.Error.ContentColor
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+
+local useStyle = require(parent.Core.Style.useStyle)
+
+local function HelperText(props)
+	local v = useStyle()
+
+	local captionSmall = v.Tokens.Typography.CaptionSmall
+	local v2
+
+	if props.error then
+		v2 = v.Tokens.Color.ActionAlert.Foreground
+	else
+		v2 = v.Tokens.Color.Content.Default
+	end
 
 	return React.createElement("TextLabel", {
-		TextWrapped = true,
-		BackgroundTransparency = 1,
-		Text = t1.text,
-		TextTransparency = v9.Transparency,
+		Text = props.text,
+		TextTransparency = v2.Transparency,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Top,
-		TextColor3 = v9.Color3,
-		Font = Typography.Font,
-		TextSize = Typography.FontSize,
-		LineHeight = Typography.LineHeight,
+		TextWrapped = true,
+		BackgroundTransparency = 1,
+		TextColor3 = v2.Color3,
+		FontFace = normalizeFontFace(captionSmall.Font),
+		TextSize = captionSmall.FontSize,
+		LineHeight = captionSmall.LineHeight,
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.LayoutOrder
+		LayoutOrder = props.LayoutOrder
 	})
 end
 

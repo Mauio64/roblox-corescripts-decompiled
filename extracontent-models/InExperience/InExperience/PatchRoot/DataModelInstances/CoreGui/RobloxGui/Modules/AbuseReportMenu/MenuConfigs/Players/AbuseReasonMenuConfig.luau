@@ -1,36 +1,34 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
 local CorePackages = game:GetService("CorePackages")
 local Constants = require(AbuseReportMenu.Components.Constants)
-
 require(AbuseReportMenu.Components.Types)
-
 local Cryo = require(CorePackages.Packages.Cryo)
+local AbuseReasonMenuConfig = {}
+AbuseReasonMenuConfig.componentType = "dropdown"
 
-return {
-	componentType = "dropdown",
-	fieldLabel = "ReasonForAbuse",
-	componentName = "AbuseReason",
-	getIsVisible = function(_) -- line: 9
-		return true
-	end,
-	getMenuItems = function(p2) -- line: 12
-		-- upvalues: Constants (copy), Cryo (copy)
-		local v7 = if p2.methodOfAbuse ~= "Voice Chat" then Constants.PlayerAbuseTypes else Constants.PlayerVoiceAbuseTypes
+function AbuseReasonMenuConfig.getIsVisible(_): boolean
+	return true
+end
 
-		return Cryo.Dictionary.values(v7)
-	end,
-	onUpdateSelectedOption = function(p3, _, p5, p6) -- line: 18
-		-- upvalues: Constants (copy)
-		p6.analyticsDispatch({
-			type = Constants.AnalyticsActions.IncrementReasonChanged
-		})
-		p6.analyticsDispatch({
-			type = Constants.AnalyticsActions.SetReasonSelection,
-			selection = p3
-		})
-		p5({
-			type = Constants.PlayerMenuActions.UpdateAbuseReason,
-			abuseReason = p3
-		})
+function AbuseReasonMenuConfig.getMenuItems(p)
+	local v
+
+	if p.methodOfAbuse == "Voice Chat" then
+		v = Constants.PlayerVoiceAbuseTypes
+	else
+		v = Constants.PlayerAbuseTypes
 	end
-}
+
+	return Cryo.Dictionary.values(v)
+end
+
+function AbuseReasonMenuConfig.onUpdateSelectedOption(p, _, callback, p2)
+	p2.analyticsDispatch({ type = Constants.AnalyticsActions.IncrementReasonChanged })
+	p2.analyticsDispatch({ type = Constants.AnalyticsActions.SetReasonSelection, selection = p })
+
+	callback({ type = Constants.PlayerMenuActions.UpdateAbuseReason, abuseReason = p })
+end
+
+AbuseReasonMenuConfig.fieldLabel = "ReasonForAbuse"
+AbuseReasonMenuConfig.componentName = "AbuseReason"
+return AbuseReasonMenuConfig

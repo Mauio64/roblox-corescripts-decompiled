@@ -1,8 +1,10 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local Rodux = require(ExpChatParent.Rodux)
-local Dictionary = require(ExpChatParent.llama).Dictionary
+local parent = ExpChat.Parent
+local ExpChatShared = require(parent.ExpChatShared)
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+
 local Actions = ExpChat.Actions
 local ChatInputBarConfigurationEnabled = require(Actions.ChatInputBarConfigurationEnabled)
 local ChatTopBarButtonActivated = require(Actions.ChatTopBarButtonActivated)
@@ -10,7 +12,8 @@ local SetCoreGuiEnabledChanged = require(Actions.SetCoreGuiEnabledChanged)
 local ClientAppLoaded = ExpChatShared.Actions.ClientAppLoaded
 local UserInteraction = require(ExpChat.Actions.UserInteraction)
 local IncomingMessageReceived = require(Actions.IncomingMessageReceived)
-local t1 = {
+
+local v = {
 	textDurationUntilFadeout = 30,
 	backgroundDurationUntilFadeout = 3.5,
 	lastGeneralActivityTimestamp = 0,
@@ -18,87 +21,62 @@ local t1 = {
 	isTextBoxFocused = false
 }
 
-local function reset(p1) -- line: 31
-	-- upvalues: Dictionary (copy), t1 (copy)
-	local elapsed = os.clock()
+local function reset(p) -- 2 equivalent calls inferred from this helper
+	local now = os.clock()
 
-	return Dictionary.join(t1, {
-		isTextBoxFocused = p1.isTextBoxFocused,
-		lastGeneralActivityTimestamp = elapsed,
-		lastMessageActivityTimestamp = elapsed
-	})
-end
-local function resetTextOnly(p2) -- line: 41
-	-- upvalues: Dictionary (copy)
-	local elapsed = os.clock()
-
-	return Dictionary.join(p2, {
-		isTextBoxFocused = p2.isTextBoxFocused,
-		lastMessageActivityTimestamp = elapsed
+	return dictionary.join(v, {
+		isTextBoxFocused = p.isTextBoxFocused,
+		lastGeneralActivityTimestamp = now,
+		lastMessageActivityTimestamp = now
 	})
 end
 
-return Rodux.createReducer(t1, {
-	[ChatInputBarConfigurationEnabled.name] = function(t2: {[any]: any}, p3) -- line: 51
-		-- upvalues: reset (copy)
-		if p3.enabled then
-			return reset(t2)
+local function resetTextOnly(p)
+	local now = os.clock()
+
+	return dictionary.join(p, {
+		isTextBoxFocused = p.isTextBoxFocused,
+		lastMessageActivityTimestamp = now
+	})
+end
+
+return Rodux.createReducer(v, {
+	[ChatInputBarConfigurationEnabled.name] = function(p, p2)
+		if p2.enabled then
+			return reset(p)
 		end
 
-		return t2
+		return p
 	end,
-	[ChatTopBarButtonActivated.name] = function(t3: {[any]: any}, p4) -- line: 59
-		-- upvalues: reset (copy)
-		if p4.isVisible then
-			return reset(t3)
+	[ChatTopBarButtonActivated.name] = function(p, p2)
+		if p2.isVisible then
+			return reset(p)
 		end
 
-		return t3
+		return p
 	end,
-	[SetCoreGuiEnabledChanged.name] = function(t4: {[any]: any}, p5) -- line: 67
-		-- upvalues: reset (copy)
-		if p5.enabled then
-			return reset(t4)
+	[SetCoreGuiEnabledChanged.name] = function(p, p2)
+		if p2.enabled then
+			return reset(p)
 		end
 
-		return t4
+		return p
 	end,
-	[ClientAppLoaded.name] = function(t5: {[any]: any}, _) -- line: 75
-		-- upvalues: reset (copy)
-		return reset(t5)
+	[ClientAppLoaded.name] = function(p, _)
+		return reset(p)
 	end,
-	[UserInteraction.name] = function(t6: {[any]: any}, p7) -- line: 79
-		-- upvalues: Dictionary (copy), t1 (copy), reset (copy)
-		if p7.interaction == "focus" then
-			local join = Dictionary.join
-			local elapsed = os.clock()
-
-			return join(Dictionary.join(t1, {
-				isTextBoxFocused = t6.isTextBoxFocused,
-				lastGeneralActivityTimestamp = elapsed,
-				lastMessageActivityTimestamp = elapsed
-			}), {
-				isTextBoxFocused = true
-			})
+	[UserInteraction.name] = function(p, p2)
+		if p2.interaction == "focus" then
+			return dictionary.join(reset(p), { isTextBoxFocused = true }) -- inferred equivalent call
 		end
 
-		if p7.interaction == "unfocus" then
-			local join = Dictionary.join
-			local elapsed = os.clock()
-
-			return join(Dictionary.join(t1, {
-				isTextBoxFocused = t6.isTextBoxFocused,
-				lastGeneralActivityTimestamp = elapsed,
-				lastMessageActivityTimestamp = elapsed
-			}), {
-				isTextBoxFocused = false
-			})
+		if p2.interaction ~= "unfocus" then
+			return reset(p)
 		end
 
-		return reset(t6)
+		return dictionary.join(reset(p), { isTextBoxFocused = false }) -- inferred equivalent call
 	end,
-	[IncomingMessageReceived.name] = function(t7: {[any]: any}, _) -- line: 93
-		-- upvalues: resetTextOnly (copy)
-		return resetTextOnly(t7)
+	[IncomingMessageReceived.name] = function(p, _)
+		return resetTextOnly(p)
 	end
 })

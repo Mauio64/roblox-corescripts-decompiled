@@ -1,23 +1,24 @@
-return function(s1: string, s2: string, s3: string, s4: string?, n1: number?) -- line: 1
-	local t1 = {}
+return function(p: string, p2: string, p3: string, p4: string?, p5: number?)
+	local v = {}
 
-	if s4 ~= nil then
-		table.insert(t1, s1 .. s4 .. s2 .. s3)
+	if p4 == nil then
+		table.insert(v, p .. p2 .. p3)
 	else
-		table.insert(t1, s1 .. s2 .. s3)
+		table.insert(v, p .. p4 .. p2 .. p3)
 	end
 
-	if n1 ~= nil then
-		local str = tostring(n1)
-
-		if s4 ~= nil then
-			table.insert(t1, s1 .. s4 .. s2 .. str .. s3)
-
-			return t1
-		end
-
-		table.insert(t1, s1 .. s2 .. str .. s3)
+	if p5 == nil then
+		return v
 	end
 
-	return t1
+	local v2 = tostring(p5)
+
+	if p4 == nil then
+		table.insert(v, p .. p2 .. v2 .. p3)
+	else
+		table.insert(v, p .. p4 .. p2 .. v2 .. p3)
+		return v
+	end
+
+	return v
 end

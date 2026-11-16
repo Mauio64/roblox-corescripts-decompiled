@@ -1,66 +1,62 @@
 local Settings = script:FindFirstAncestor("Settings")
 local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
-local GameSettings = UserSettings().GameSettings
+local gameSettings = UserSettings().GameSettings
+
 local SettingsService = require(CorePackages.Workspace.Packages.SettingsService)
 local ValueChangedSignal = SettingsService.ValueChangedSignal
 local AvailabilitySignal = SettingsService.AvailabilitySignal
 local SettingEnum = SettingsService.SettingEnum
-local LAYOUT_ORDER = require(Settings.Integrations.Constants).GAMESETTINGS.LAYOUT_ORDER
+local Constants = require(Settings.Integrations.Constants)
 
-local function UINavValue() -- line: 23
-	-- upvalues: ValueChangedSignal (copy), GameSettings (copy)
-	local v15 = ValueChangedSignal.new(GameSettings.UiNavigationKeyBindEnabled)
+local LAYOUT_ORDER = Constants.GAMESETTINGS.LAYOUT_ORDER
 
-	v15:connect(function(p1) -- line: 26
-		-- upvalues: GameSettings (copy)
-		if p1 == GameSettings.UiNavigationKeyBindEnabled then
+local function UINavValue()
+	local v = ValueChangedSignal.new(gameSettings.UiNavigationKeyBindEnabled)
+
+	v:connect(function(uiNavigationKeyBindEnabled)
+		if gameSettings.UiNavigationKeyBindEnabled == uiNavigationKeyBindEnabled then
 			return
 		end
 
-		GameSettings.UiNavigationKeyBindEnabled = p1
+		gameSettings.UiNavigationKeyBindEnabled = uiNavigationKeyBindEnabled
 	end)
 
-	return v15
+	return v
 end
-local function UINavAvailability() -- line: 39
-	-- upvalues: AvailabilitySignal (copy), UserInputService (copy)
-	local v16 = AvailabilitySignal.new(UserInputService.KeyboardEnabled)
 
-	UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function() -- line: 42
-		-- upvalues: v16 (copy), UserInputService (copy)
-		v16:set(UserInputService.KeyboardEnabled)
+local function UINavAvailability() -- 1 equivalent call inferred from this helper
+	local v = AvailabilitySignal.new(UserInputService.KeyboardEnabled)
+
+	UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function()
+		v:set(UserInputService.KeyboardEnabled)
 	end)
 
-	return v16
+	return v
 end
 
-local t1 = {
+local UINavToggle = {
 	id = "ui-nav-toggle",
+	field_type = SettingEnum.Toggle,
 	label = "CoreScripts.InGameMenu.GameSettings.UINavToggle",
 	description = "CoreScripts.InGameMenu.GameSettings.UINavToggleDescription",
 	alreadyLocalized = false,
-	field_type = SettingEnum.Toggle
+	onChanged = 0,
+	availability = 0,
+	layoutOrder = 0
 }
-local v13 = ValueChangedSignal.new(GameSettings.UiNavigationKeyBindEnabled)
+local onChanged = ValueChangedSignal.new(gameSettings.UiNavigationKeyBindEnabled)
 
-v13:connect(function(p2) -- line: 26
-	-- upvalues: GameSettings (copy)
-	if p2 == GameSettings.UiNavigationKeyBindEnabled then
+onChanged:connect(function(uiNavigationKeyBindEnabled)
+	if gameSettings.UiNavigationKeyBindEnabled == uiNavigationKeyBindEnabled then
 		return
 	end
 
-	GameSettings.UiNavigationKeyBindEnabled = p2
+	gameSettings.UiNavigationKeyBindEnabled = uiNavigationKeyBindEnabled
 end)
-t1.onChanged = v13
 
-local v14 = AvailabilitySignal.new(UserInputService.KeyboardEnabled)
+UINavToggle.onChanged = onChanged
+UINavToggle.availability = UINavAvailability() -- inferred equivalent call
+UINavToggle.layoutOrder = LAYOUT_ORDER.UiNavigationKeyBindEnabledFrame
 
-UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function() -- line: 42
-	-- upvalues: v14 (copy), UserInputService (copy)
-	v14:set(UserInputService.KeyboardEnabled)
-end)
-t1.availability = v14
-t1.layoutOrder = LAYOUT_ORDER.UiNavigationKeyBindEnabledFrame
-
-return t1
+return UINavToggle

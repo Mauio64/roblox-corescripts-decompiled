@@ -1,16 +1,11 @@
 local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
 local Version = require(ExpChatShared.Version)
-
 require(script.Parent.types)
 
 return {
 	name = script.Name,
-	alias = {
-		"/version",
-		"/v"
-	},
-	clientRun = function() -- line: 8
-		-- upvalues: Version (copy)
+	alias = { "/version", "/v" },
+	clientRun = function()
 		return {
 			key = "CoreScripts.TextChat.Version.Success",
 			metadata = "Roblox.Version.Info.Success",

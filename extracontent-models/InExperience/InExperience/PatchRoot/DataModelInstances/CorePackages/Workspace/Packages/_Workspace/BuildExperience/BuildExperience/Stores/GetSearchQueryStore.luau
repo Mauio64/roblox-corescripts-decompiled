@@ -1,8 +1,8 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local Signals = require(parent.Signals)
 local createSearchQueryStore = require(script.createSearchQueryStore)
 
-return Signals.createComputed(function() -- line: 7
-	-- upvalues: createSearchQueryStore (copy)
+return Signals.createComputed(function()
 	return createSearchQueryStore()
 end)

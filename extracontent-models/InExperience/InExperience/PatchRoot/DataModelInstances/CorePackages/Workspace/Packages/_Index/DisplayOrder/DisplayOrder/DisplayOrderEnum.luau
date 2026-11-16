@@ -1,3 +1,1 @@
-return {
-	SocialContextToastContainer = 8
-}
+return { SocialContextToastContainer = 8 }

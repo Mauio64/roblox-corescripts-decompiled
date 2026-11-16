@@ -1,12 +1,9 @@
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
-local BulkPurchaseAppParent = BulkPurchaseApp.Parent
-local Rodux = require(BulkPurchaseAppParent.Rodux)
+local parent = BulkPurchaseApp.Parent
+local Rodux = require(parent.Rodux)
 
 require(BulkPurchaseApp.Enums.ErrorCodeEnum)
 
-return Rodux.makeActionCreator("BulkPurchaseFailed", function(p1, t1: {[any]: any}?) -- line: 15
-	return {
-		errorCode = p1,
-		errorMetadata = t1
-	}
+return Rodux.makeActionCreator("BulkPurchaseFailed", function(errorCode, errorMetadata)
+	return { errorCode = errorCode, errorMetadata = errorMetadata }
 end)

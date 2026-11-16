@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+local React = require(parent.React)
 
-return (require(ParentParent.React).createContext(function(s1: string) -- line: 5
-	return s1
+return (React.createContext(function(p: string)
+	return p
 end))

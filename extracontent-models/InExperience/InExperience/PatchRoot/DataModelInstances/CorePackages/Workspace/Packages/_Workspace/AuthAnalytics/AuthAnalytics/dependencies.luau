@@ -1,6 +1,6 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-return {
-	Analytics = require(ParentParent.Analytics),
-	Logging = require(ParentParent.AppCommonLib).Logging
-}
+local Dependencies = { Analytics = require(parent.Analytics), Logging = 0 }
+local AppCommonLib = require(parent.AppCommonLib)
+Dependencies.Logging = AppCommonLib.Logging
+return Dependencies

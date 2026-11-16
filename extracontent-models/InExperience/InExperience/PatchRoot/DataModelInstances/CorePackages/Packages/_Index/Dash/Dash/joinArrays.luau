@@ -1,17 +1,16 @@
-local scriptParent = script.Parent
+local parent = script.Parent
+require(parent.Types)
 
-require(scriptParent.Types)
+local function joinArrays(...)
+	local v = {}
 
-local function joinArrays(...) -- line: 10
-	local t1 = {}
-
-	for _, v5 in { ... } do
-		if v5 then
-			table.move(v5, 1, #v5, #t1 + 1, t1)
+	for _, v2 in { ... } do
+		if v2 then
+			table.move(v2, 1, #v2, #v + 1, v)
 		end
 	end
 
-	return t1
+	return v
 end
 
 return joinArrays

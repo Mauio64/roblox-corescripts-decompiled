@@ -1,57 +1,75 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Promise = require(ProfilePlatformParent.Promise)
-local Navigation = require(ProfilePlatformParent.Navigation)
-local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local parent = ProfilePlatform.Parent
+
+local React = require(parent.React)
+local Promise = require(parent.Promise)
+local Navigation = require(parent.Navigation)
+local RoactUtils = require(parent.RoactUtils)
+
 local useNavigation = Navigation.useNavigation
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 
-local function useOpenRobuxUpsell(n1: number) -- line: 13
-	-- upvalues: useDispatch (copy), useNavigation (copy), useProfileWrapperContext (copy), React (copy), ProfilePlatformParent (copy), Promise (copy)
-	local v12 = useDispatch()
-	local v13 = useNavigation()
-	local v14 = useProfileWrapperContext()
+local FFlagProfileInspectAndBuyKeepUpsellDialogOpen = require(ProfilePlatform.Flags.FFlagProfileInspectAndBuyKeepUpsellDialogOpen)
 
-	return React.useCallback(function() -- line: 18
-		-- upvalues: ProfilePlatformParent (copy), v12 (copy), v14 (copy), v13 (copy), Promise (copy), n1 (copy)
-		local PurchasePromptLite = require(ProfilePlatformParent.PurchasePromptLite)
-		local CloseCentralOverlay = require(ProfilePlatformParent.CentralOverlay).Thunks.CloseCentralOverlay
+local FFlagSocialEnableProfileInspectAndBuyAnalyticsV2 = require(ProfilePlatform.Flags.FFlagSocialEnableProfileInspectAndBuyAnalyticsV2)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableRecentActivityInspectAndBuy = SharedFlags.FFlagEnableRecentActivityInspectAndBuy
 
-		v12(PurchasePromptLite.Thunks.OpenCentralOverlayForUnifiedPurchasePrompt({
-			productPayload = {
-				kind = "RobuxUpsell"
-			},
+local function useOpenRobuxUpsell(priceInRobux: number, callback)
+	local v = useDispatch()
+	local v2 = useNavigation()
+	local v3 = useProfileWrapperContext()
+
+	local useCallback = React.useCallback
+	local function fn()
+		local PurchasePromptLite = require(parent.PurchasePromptLite)
+		local CentralOverlay = require(parent.CentralOverlay)
+		local closeCentralOverlay = CentralOverlay.Thunks.CloseCentralOverlay
+
+		v(PurchasePromptLite.Thunks.OpenCentralOverlayForUnifiedPurchasePrompt({
+			productPayload = { kind = "RobuxUpsell" },
+			purchaseAnalyticsMetadata = FFlagSocialEnableProfileInspectAndBuyAnalyticsV2 and {
+				surface = PurchasePromptLite.Enums.ProductPurchaseSurface.Profile
+			} or nil,
 			purchaseCallbacks = {
-				onFlowComplete = function() -- line: 27
-					-- upvalues: v12 (copy), CloseCentralOverlay (copy), v14 (copy), v13 (copy)
-					v12(CloseCentralOverlay())
+				onFlowComplete = function()
+					v(closeCentralOverlay())
+					local refreshRobuxBalance
 
-					local v17 = if not v14.postPurchase then nil else v14.postPurchase.refreshRobuxBalance
-
-					if v17 then
-						v17()
+					if v3.postPurchase then
+						refreshRobuxBalance = v3.postPurchase.refreshRobuxBalance
 					end
 
-					v13.goBack()
+					if refreshRobuxBalance then
+						refreshRobuxBalance()
+					end
+
+					if FFlagEnableRecentActivityInspectAndBuy and callback then
+						callback()
+					elseif not FFlagProfileInspectAndBuyKeepUpsellDialogOpen then
+						v2.goBack()
+					end
 				end,
-				fetchProductInfo = function() -- line: 37
-					-- upvalues: Promise (copy), n1 (copy)
+				fetchProductInfo = function()
 					return Promise.resolve({
+						PriceInRobux = priceInRobux,
 						IsForSale = true,
-						Name = "RobuxUpsell",
-						PriceInRobux = n1
+						Name = "RobuxUpsell"
 					})
 				end
 			}
 		}))
-	end, {
-		v12,
-		v13,
-		v14.postPurchase,
-		n1
-	})
+	end
+
+	local postPurchase = v3.postPurchase
+	local v4
+
+	if FFlagEnableRecentActivityInspectAndBuy then
+		v4 = callback
+	end
+
+	return useCallback(fn, { v, v2, postPurchase, priceInRobux, v4 })
 end
 
 return useOpenRobuxUpsell

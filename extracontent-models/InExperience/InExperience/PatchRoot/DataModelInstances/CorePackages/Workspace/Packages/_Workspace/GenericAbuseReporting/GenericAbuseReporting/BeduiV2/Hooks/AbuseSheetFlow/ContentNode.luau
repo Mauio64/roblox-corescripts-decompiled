@@ -1,180 +1,262 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Dash = require(GenericAbuseReportingParent.Dash)
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+
+local Dash = require(parent.Dash)
+local React = require(parent.React)
+
 local AbuseReportAnalyticsContext = require(GenericAbuseReporting.BeduiV2.Analytics.AbuseReportAnalyticsContext)
 local analyticsService = require(GenericAbuseReporting.BeduiV2.Analytics.analyticsService)
-
 require(script.Parent.AbuseSheetFlowTypes)
-
 local CommentNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.CommentNode)
 local ConfirmationNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.ConfirmationNode)
-local ListNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.ListNode)
 local ListNodeV2 = require(GenericAbuseReporting.BeduiV2.Components.Nodes.ListNodeV2)
 local ParagraphNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.ParagraphNode)
 local ReviewNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.ReviewNode)
-local TelemetryEventType = analyticsService.TelemetryEventType
-local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
-local FFlagSupportSubmissionOnAllReportNodes = require(GenericAbuseReportingParent.SharedFlags).FFlagSupportSubmissionOnAllReportNodes
-local FFlagAbuseReportMenuV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportMenuV2
-local FFlagAbuseReportInExpPlayerListV3 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInExpPlayerListV3
-local FFlagAbuseReportSceneSelectionSubmitTracking = require(GenericAbuseReporting.Flags.FFlagAbuseReportSceneSelectionSubmitTracking)
 
-local function ContentNode(t1: {[any]: any}) -- line: 45
-	-- upvalues: useAbuseReportAnalytics (copy), React (copy), FFlagAbuseReportMenuV2 (copy), ListNodeV2 (copy), ListNode (copy), Dash (copy), CommentNode (copy), ConfirmationNode (copy), FFlagSupportSubmissionOnAllReportNodes (copy), ParagraphNode (copy), ReviewNode (copy), GenericAbuseReporting (copy), FFlagAbuseReportSceneSelectionSubmitTracking (copy), FFlagAbuseReportInExpPlayerListV3 (copy), TelemetryEventType (copy)
+local telemetryEventType = analyticsService.TelemetryEventType
+local useAbuseReportAnalytics = AbuseReportAnalyticsContext.useAbuseReportAnalytics
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSupportSubmissionOnAllReportNodes = SharedFlags.FFlagSupportSubmissionOnAllReportNodes
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAbuseReportInExpPlayerListV3 = SharedFlags2.FFlagAbuseReportInExpPlayerListV3
+local FFlagAbuseReportImproveErrorEvents = require(GenericAbuseReporting.Flags.FFlagAbuseReportImproveErrorEvents)
+
+local function ContentNode(props)
 	local sendEvent = useAbuseReportAnalytics().sendEvent
 
-	if t1.node.type == "list" then
-		local v22 = if not t1.store then nil else t1.store[t1.node.storeAs]
-		local v23 = if type(v22) ~= "table" then nil else v22.id
+	if props.node.type == "list" then
+		local v
 
-		return React.createElement(if not FFlagAbuseReportMenuV2 then ListNode else ListNodeV2, Dash.join(t1.node, {
-			initialValue = v23,
-			isSubmitting = t1.isSubmitting,
-			onNext = function(_: string, p1) -- line: 56
-				-- upvalues: t1 (copy)
-				if t1.onNext then
-					t1.onNext({
-						store = if not t1.node.storeAs then {} else {
-							[t1.node.storeAs] = p1
-						}
-					})
+		if props.store then
+			v = props.store[props.node.storeAs]
+		end
+
+		local initialValue
+
+		if type(v) == "table" then
+			initialValue = v.id
+		end
+
+		return React.createElement(ListNodeV2, Dash.join(props.node, {
+			initialValue = initialValue,
+			isSubmitting = props.isSubmitting,
+			onNext = function(_: string, p)
+				if props.onNext then
+					local onNext = props.onNext
+					local store
+
+					if props.node.storeAs then
+						store = {}
+						store[props.node.storeAs] = p
+					else
+						store = {}
+					end
+
+					onNext({ store = store })
 				end
 			end
 		}))
-	end
+	elseif props.node.type == "comment" then
+		local initialValue
 
-	if t1.node.type == "comment" then
-		local v24 = if not t1.store then nil else t1.store[t1.node.storeAs]
+		if props.store then
+			initialValue = props.store[props.node.storeAs]
+		end
 
-		return React.createElement(CommentNode, Dash.join(t1.node, {
-			initialValue = v24,
-			isSubmitting = t1.isSubmitting,
-			onNext = function(s2: string) -- line: 74
-				-- upvalues: t1 (copy)
-				if t1.onNext then
-					t1.onNext({
-						store = if not t1.node.storeAs then {} else {
-							[t1.node.storeAs] = s2
-						}
-					})
+		return React.createElement(CommentNode, Dash.join(props.node, {
+			initialValue = initialValue,
+			isSubmitting = props.isSubmitting,
+			onNext = function(p: string)
+				if props.onNext then
+					local onNext = props.onNext
+					local store
+
+					if props.node.storeAs then
+						store = {}
+						store[props.node.storeAs] = p
+					else
+						store = {}
+					end
+
+					onNext({ store = store })
 				end
 			end
 		}))
-	end
+	elseif props.node.type == "confirmation" then
+		local createElement = React.createElement
 
-	if t1.node.type == "confirmation" then
-		return React.createElement(ConfirmationNode, Dash.join(t1.node, {
-			isSubmitting = if not FFlagSupportSubmissionOnAllReportNodes then nil else t1.isSubmitting,
-			onNext = t1.onNext and function() -- line: 88
-				-- upvalues: t1 (copy)
-				t1.onNext({})
+		local join = Dash.join
+		local node = props.node
+		local isSubmitting
+
+		if FFlagSupportSubmissionOnAllReportNodes then
+			isSubmitting = props.isSubmitting
+		end
+
+		return createElement(ConfirmationNode, join(node, {
+			isSubmitting = isSubmitting,
+			onNext = props.onNext and function()
+				props.onNext({})
 			end or nil
 		}))
-	end
+	elseif props.node.type == "paragraph" then
+		local createElement = React.createElement
 
-	if t1.node.type == "paragraph" then
-		return React.createElement(ParagraphNode, Dash.join(t1.node, {
-			isSubmitting = if not FFlagSupportSubmissionOnAllReportNodes then nil else t1.isSubmitting,
-			onNext = t1.onNext and function() -- line: 98
-				-- upvalues: t1 (copy)
-				t1.onNext({})
+		local join = Dash.join
+		local node = props.node
+		local isSubmitting
+
+		if FFlagSupportSubmissionOnAllReportNodes then
+			isSubmitting = props.isSubmitting
+		end
+
+		return createElement(ParagraphNode, join(node, {
+			isSubmitting = isSubmitting,
+			onNext = props.onNext and function()
+				props.onNext({})
 			end or nil
 		}))
-	end
+	elseif props.node.type == "review" then
+		local createElement = React.createElement
 
-	if FFlagAbuseReportMenuV2 and t1.node.type == "review" then
-		return React.createElement(ReviewNode, Dash.join(t1.node, {
-			isSubmitting = if not FFlagSupportSubmissionOnAllReportNodes then nil else t1.isSubmitting,
-			onNext = t1.onNext and function() -- line: 108
-				-- upvalues: t1 (copy)
-				t1.onNext({})
+		local join = Dash.join
+		local node = props.node
+		local isSubmitting
+
+		if FFlagSupportSubmissionOnAllReportNodes then
+			isSubmitting = props.isSubmitting
+		end
+
+		return createElement(ReviewNode, join(node, {
+			isSubmitting = isSubmitting,
+			onNext = props.onNext and function()
+				props.onNext({})
 			end or nil
 		}))
-	end
-
-	if FFlagAbuseReportMenuV2 and t1.node.type == "inExpChatSelection" then
+	elseif props.node.type == "inExpChatSelection" then
 		local InExpChatSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpChatSelectionNode)
-		local v26 = if not t1.store then nil else t1.store[t1.node.storeAs]
-		local v27 = if type(v26) ~= "table" then nil else v26.id
+		local v
 
-		return React.createElement(InExpChatSelectionNode, Dash.join(t1.node, {
-			initialValue = v27,
-			isSubmitting = t1.isSubmitting,
-			goBack = t1.goBack,
-			onNext = function(_: string?, p2) -- line: 123
-				-- upvalues: t1 (copy)
-				if t1.onNext then
-					t1.onNext({
-						store = if not t1.node.storeAs then {} else {
-							[t1.node.storeAs] = p2
-						}
-					})
+		if props.store then
+			v = props.store[props.node.storeAs]
+		end
+
+		local initialValue
+
+		if type(v) == "table" then
+			initialValue = v.id
+		end
+
+		return React.createElement(InExpChatSelectionNode, Dash.join(props.node, {
+			initialValue = initialValue,
+			isSubmitting = props.isSubmitting,
+			goBack = props.goBack,
+			onNext = function(_: string?, p)
+				if props.onNext then
+					local onNext = props.onNext
+					local store
+
+					if props.node.storeAs then
+						store = {}
+						store[props.node.storeAs] = p
+					else
+						store = {}
+					end
+
+					onNext({ store = store })
 				end
 			end
 		}))
+	else
+		if props.node.type == "inExpConfirmation" then
+			local InExpConfirmationNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpConfirmationNode)
+			return React.createElement(InExpConfirmationNode, Dash.join(props.node, {
+				isSubmitting = props.isSubmitting,
+				onNext = props.onNext and function(p)
+					local onNext = props.onNext
+					local store
+
+					if props.node.storeAs then
+						store = {}
+						store[props.node.storeAs.didBlockUser] = p.didBlockUser
+						store[props.node.storeAs.didMuteUser] = p.didMuteUser
+					else
+						store = {}
+					end
+
+					onNext({ store = store })
+				end or nil
+			}))
+		end
+
+		if props.node.type == "inExpSceneSelection" then
+			local InExpSceneSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpSceneSelectionNode)
+			return React.createElement(InExpSceneSelectionNode, Dash.join(props.node, {
+				onNext = props.onNext and function()
+					props.onNext({})
+				end or nil,
+				onFailure = props.onFailure,
+				goBack = props.goBack,
+				onExternalSubmit = props.onExternalSubmit
+			}))
+		end
+
+		if FFlagAbuseReportInExpPlayerListV3 and props.node.type == "inExpUserSelection" then
+			local InExpUserSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpUserSelectionNode)
+			local v
+
+			if props.store then
+				v = props.store[props.node.storeAs]
+			end
+
+			local initialValue
+
+			if type(v) == "table" then
+				initialValue = v.id
+			end
+
+			return React.createElement(InExpUserSelectionNode, Dash.join(props.node, {
+				initialValue = initialValue,
+				isSubmitting = props.isSubmitting,
+				onNext = props.onNext and function(_: string?, p)
+					if props.onNext then
+						local onNext = props.onNext
+						local store
+
+						if props.node.storeAs then
+							store = {}
+							store[props.node.storeAs] = p
+						else
+							store = {}
+						end
+
+						onNext({ store = store })
+					end
+				end or nil,
+				goBack = props.goBack
+			}))
+		else
+			local v = { sub_event_type = telemetryEventType.Error, error_detail = 0 }
+			local error_detail
+
+			if FFlagAbuseReportImproveErrorEvents then
+				error_detail = {
+					error_message = "Unknown node type",
+					error_metadata = { node_type = tostring(props.node.type) }
+				}
+			else
+				error_detail = {
+					error_message = `Unknown node type: {props.node.type}`
+				}
+			end
+
+			v.error_detail = error_detail
+			sendEvent(v)
+
+			return React.createElement(React.Fragment)
+		end
 	end
-
-	if FFlagAbuseReportMenuV2 and t1.node.type == "inExpConfirmation" then
-		local InExpConfirmationNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpConfirmationNode)
-
-		return React.createElement(InExpConfirmationNode, Dash.join(t1.node, {
-			isSubmitting = t1.isSubmitting,
-			onNext = t1.onNext and function(t2: {[any]: any}) -- line: 140
-				-- upvalues: t1 (copy)
-				t1.onNext({
-					store = if not t1.node.storeAs then {} else {
-						[t1.node.storeAs.didBlockUser] = t2.didBlockUser,
-						[t1.node.storeAs.didMuteUser] = t2.didMuteUser
-					}
-				})
-			end or nil
-		}))
-	end
-
-	if FFlagAbuseReportMenuV2 and t1.node.type == "inExpSceneSelection" then
-		local InExpSceneSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpSceneSelectionNode)
-
-		return React.createElement(InExpSceneSelectionNode, Dash.join(t1.node, {
-			onNext = if not t1.onNext then nil else function() -- line: 158
-				-- upvalues: t1 (copy)
-				t1.onNext({})
-			end,
-			goBack = t1.goBack,
-			onExternalSubmit = if not FFlagAbuseReportSceneSelectionSubmitTracking then nil else t1.onExternalSubmit
-		}))
-	end
-
-	if FFlagAbuseReportInExpPlayerListV3 and t1.node.type == "inExpUserSelection" then
-		local InExpUserSelectionNode = require(GenericAbuseReporting.BeduiV2.Components.Nodes.InExpUserSelectionNode)
-		local v31 = if not t1.store then nil else t1.store[t1.node.storeAs]
-		local v32 = if type(v31) ~= "table" then nil else v31.id
-
-		return React.createElement(InExpUserSelectionNode, Dash.join(t1.node, {
-			initialValue = v32,
-			isSubmitting = t1.isSubmitting,
-			onNext = if not t1.onNext then nil else function(_: string?, p3) -- line: 176
-				-- upvalues: t1 (copy)
-				if t1.onNext then
-					t1.onNext({
-						store = if not t1.node.storeAs then {} else {
-							[t1.node.storeAs] = p3
-						}
-					})
-				end
-			end,
-			goBack = t1.goBack
-		}))
-	end
-
-	sendEvent({
-		sub_event_type = TelemetryEventType.Error,
-		error_detail = {
-			error_message = `Unknown node type: { t1.node.type }`
-		}
-	})
-
-	return React.createElement(React.Fragment)
 end
 
 return React.memo(ContentNode)

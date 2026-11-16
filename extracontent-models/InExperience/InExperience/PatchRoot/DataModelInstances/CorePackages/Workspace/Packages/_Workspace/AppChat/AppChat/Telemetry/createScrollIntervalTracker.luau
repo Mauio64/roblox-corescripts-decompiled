@@ -1,185 +1,145 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 
+local parent = AppChat.Parent
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
 require(AppChat.Telemetry.AppChatPerfEvent)
 
-local v4 = require(AppChat.Logger):new("ScrollIntervalTracker")
-local Cryo = require(AppChatParent.Cryo)
-local ScrollIntervalTracker = require(AppChatParent.ScrollIntervalTracker)
+local Logger = require(AppChat.Logger)
+local v = Logger:new("ScrollIntervalTracker")
+local Cryo = require(parent.Cryo)
+local ScrollIntervalTracker = require(parent.ScrollIntervalTracker)
 local RunService = game:GetService("RunService")
-local v8 = game:DefineFastInt("AppChatScrollPerfMinDistancePx", 50)
-local v9 = game:DefineFastInt("AppChatScrollPerfMinStableFrames", 5)
-local v10 = game:DefineFastFlag("AppChatMigrateScrollIntervalTracker2", false)
-local t1 = {
-	minDistancePx = v8,
-	stableFramesRequired = v9
+
+local v2 = {
+	minDistancePx = game:DefineFastInt("AppChatScrollPerfMinDistancePx", 50),
+	stableFramesRequired = game:DefineFastInt("AppChatScrollPerfMinStableFrames", 5)
 }
 
-if v10 then
-	local function createScrollIntervalTracker(p1, p2, p3, t2: {[any]: any}?) -- line: 51
-		-- upvalues: AppChatPerfTracker (copy), Cryo (copy), t1 (copy), ScrollIntervalTracker (copy)
-		local function tryStart(p4) -- line: 57
-			-- upvalues: AppChatPerfTracker (copy), p1 (copy)
-			return AppChatPerfTracker.start(p1, p4)
-		end
-		local function finish(p5) -- line: 60
-			-- upvalues: AppChatPerfTracker (copy), p1 (copy)
-			AppChatPerfTracker.finish(p1, p5)
+if game:DefineFastFlag("AppChatMigrateScrollIntervalTracker2", false) then
+	local function createScrollIntervalTracker(debugName, p, p2, options)
+		local function tryStart(p3)
+			return AppChatPerfTracker.start(debugName, p3, p)
 		end
 
-		local v20 = Cryo.Dictionary.join(t1, {
-			debugName = p1
-		}, t2 or {})
-
-		return ScrollIntervalTracker.createScrollIntervalTracker(tryStart, finish, p2, p3, v20)
+		local function finish(p3)
+			AppChatPerfTracker.finish(debugName, p3)
+		end
+		local joined = Cryo.Dictionary.join(v2, { debugName = debugName }, options or {})
+		return ScrollIntervalTracker.createScrollIntervalTracker(tryStart, finish, p, p2, joined)
 	end
 
 	return createScrollIntervalTracker
 end
 
-local function createScrollIntervalTracker(p6, p7, p8, t3: {[any]: any}?) -- line: 72
-	-- upvalues: Cryo (copy), t1 (copy), v4 (copy), AppChatPerfTracker (copy), RunService (copy)
-	local v25 = Cryo.Dictionary.join(t1, t3 or {})
-	local u26 = false
-	local u27 = nil
-	local n1 = 0
-	local n2 = 0
-	local u30 = nil
+local function createScrollIntervalTracker(p, p2, p3, options)
+	local joined = Cryo.Dictionary.join(v2, options or {})
 
-	local function resetStopDetection() -- line: 90
-		-- upvalues: n2 (ref), u30 (ref)
-		n2 = 0
-		u30 = nil
+	local flag = false
+
+	local v3 = nil
+	local total = 0
+
+	local count = 0
+	local v4 = nil
+
+	local function resetStopDetection() -- 1 equivalent call inferred from this helper
+		count = 0
+		v4 = nil
 	end
-	local function resetStartDetection() -- line: 95
-		-- upvalues: u27 (ref), n1 (ref)
-		u27 = nil
-		n1 = 0
+
+	local function resetStartDetection() -- 3 equivalent calls inferred from this helper
+		v3 = nil
+		total = 0
 	end
-	local function stopInterval(s1: string) -- line: 100
-		-- upvalues: v4 (copy), p6 (copy), AppChatPerfTracker (copy), p8 (copy), u26 (ref), n2 (ref), u30 (ref), u27 (ref), n1 (ref)
-		v4:debug("Scroll: {} stopping (reason={})", p6, s1)
-		AppChatPerfTracker.finish(p6, p8)
-		u26 = false
-		n2 = 0
-		u30 = nil
-		u27 = nil
-		n1 = 0
+
+	local function stopInterval(p4: string) -- 2 equivalent calls inferred from this helper
+		v:debug("Scroll: {} stopping (reason={})", p, p4)
+		AppChatPerfTracker.finish(p, p3)
+		flag = false
+		resetStopDetection() -- inferred equivalent call
+		resetStartDetection() -- inferred equivalent call
 	end
-	local function recordCanvasPositionChanged(n3: number) -- line: 108
-		-- upvalues: n2 (ref), u30 (ref)
-		n2 = 0
-		u30 = n3
+
+	local function recordCanvasPositionChanged(p4: number) -- 2 equivalent calls inferred from this helper
+		count = 0
+		v4 = p4
 	end
-	local function isPastMinScrollDistance(n4: number) -- line: 114
-		-- upvalues: u27 (ref), n1 (ref), v25 (copy)
-		if u27 ~= nil then
-			n1 += math.abs(n4 - u27)
+
+	local function isPastMinScrollDistance(y: number): boolean -- 1 equivalent call inferred from this helper
+		if v3 ~= nil then
+			total += math.abs(y - v3)
 		end
 
-		u27 = n4
-
-		return n1 >= v25.minDistancePx
+		v3 = y
+		return total >= joined.minDistancePx
 	end
-	local function tryStartInterval(n5: number) -- line: 122
-		-- upvalues: v4 (copy), p6 (copy), AppChatPerfTracker (copy), p8 (copy), u26 (ref), u27 (ref), n1 (ref), n2 (ref), u30 (ref)
-		v4:debug("Scroll: {} starting", p6)
 
-		if not AppChatPerfTracker.start(p6, p8) then
+	local function tryStartInterval(p4: number)
+		v:debug("Scroll: {} starting", p)
+
+		if not AppChatPerfTracker.start(p, p3, p2) then
 			return
 		end
 
-		u26 = true
-		u27 = nil
-		n1 = 0
-		n2 = 0
-		u30 = n5
+		flag = true
+		resetStartDetection() -- inferred equivalent call
+		recordCanvasPositionChanged(p4) -- inferred equivalent call
 	end
 
-	local connection = RunService.RenderStepped:Connect(function() -- line: 138
-		-- upvalues: u26 (ref), p7 (copy), u30 (ref), n2 (ref), v25 (copy), v4 (copy), p6 (copy), AppChatPerfTracker (copy), p8 (copy), u27 (ref), n1 (ref)
-		if not u26 then
+	local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+		if not flag then
 			return
 		end
 
-		local CanvasPositionY = p7.CanvasPosition.Y
+		local y = p2.CanvasPosition.Y
 
-		if u30 == nil then
-			u30 = CanvasPositionY
-			n2 = 0
-
-			return
-		end
-
-		if math.abs(CanvasPositionY - u30) <= 0.5 then
-			n2 += 1
+		if v4 == nil then
+			v4 = y
+			count = 0
 		else
-			n2 = 0
-		end
+			if math.abs(y - v4) <= 0.5 then
+				count += 1
+			else
+				count = 0
+			end
 
-		u30 = CanvasPositionY
+			v4 = y
 
-		if n2 >= v25.stableFramesRequired then
-			v4:debug("Scroll: {} stopping (reason={})", p6, "stableFrames")
-			AppChatPerfTracker.finish(p6, p8)
-			u26 = false
-			n2 = 0
-			u30 = nil
-			u27 = nil
-			n1 = 0
+			if count >= joined.stableFramesRequired then
+				stopInterval("stableFrames") -- inferred equivalent call
+			end
 		end
 	end)
 
 	return {
-		onScrollTick = function() -- line: 163
-			-- upvalues: p7 (copy), u26 (ref), u27 (ref), n1 (ref), v25 (copy), v4 (copy), p6 (copy), AppChatPerfTracker (copy), p8 (copy), n2 (ref), u30 (ref)
-			local CanvasPositionY = p7.CanvasPosition.Y
+		onScrollTick = function()
+			local y = p2.CanvasPosition.Y
 
-			if not u26 then
-				if u27 ~= nil then
-					n1 += math.abs(CanvasPositionY - u27)
-				end
-
-				u27 = CanvasPositionY
-
-				if not (n1 >= v25.minDistancePx) then
+			if not flag then
+				if not isPastMinScrollDistance(y) then -- inferred equivalent call
 					return
 				end
 
-				v4:debug("Scroll: {} starting", p6)
+				v:debug("Scroll: {} starting", p)
 
-				if not AppChatPerfTracker.start(p6, p8) then
+				if not AppChatPerfTracker.start(p, p3, p2) then
 					return
 				end
 
-				u26 = true
-				u27 = nil
-				n1 = 0
-				n2 = 0
-				u30 = CanvasPositionY
-
-				return
+				flag = true
+				resetStartDetection() -- inferred equivalent call
 			end
 
-			n2 = 0
-			u30 = CanvasPositionY
+			recordCanvasPositionChanged(y) -- inferred equivalent call
 		end,
-		cleanup = function() -- line: 178
-			-- upvalues: connection (copy), u26 (ref), v4 (copy), p6 (copy), AppChatPerfTracker (copy), p8 (copy), n2 (ref), u30 (ref), u27 (ref), n1 (ref)
-			if connection then
-				connection:Disconnect()
+		cleanup = function()
+			if renderSteppedConnection then
+				renderSteppedConnection:Disconnect()
 			end
 
-			if u26 then
-				v4:debug("Scroll: {} cleanup/unmount", p6)
-				v4:debug("Scroll: {} stopping (reason={})", p6, "cleanup")
-				AppChatPerfTracker.finish(p6, p8)
-				u26 = false
-				n2 = 0
-				u30 = nil
-				u27 = nil
-				n1 = 0
+			if flag then
+				v:debug("Scroll: {} cleanup/unmount", p)
+				stopInterval("cleanup") -- inferred equivalent call
 			end
 		end
 	}

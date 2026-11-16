@@ -2,34 +2,33 @@ local CorePackages = game:GetService("CorePackages")
 local React = require(CorePackages.Packages.React)
 local useLocalPlayer = require(script.Parent.useLocalPlayer)
 
-local function usePlayerGui() -- line: 5
-	-- upvalues: useLocalPlayer (copy), React (copy)
-	local v5 = useLocalPlayer()
-	local v6, v7 = React.useState(nil)
+local function usePlayerGui()
+	local v = useLocalPlayer()
+	local state, setState = React.useState(nil)
 
-	React.useEffect(function() -- line: 9
-		-- upvalues: v5 (copy), v7 (copy)
-		local connection = nil
+	React.useEffect(function()
+		local childAddedConnection
 
-		if v5 then
-			v7(v5:FindFirstChildOfClass("PlayerGui"))
-			connection = v5.ChildAdded:Connect(function(child) -- line: 15
-				-- upvalues: v7 (copy)
-				if child:IsA("PlayerGui") then
-					v7(child)
+		if v then
+			setState(v:FindFirstChildOfClass("PlayerGui"))
+
+			childAddedConnection = v.ChildAdded:Connect(function(playerGui)
+				if playerGui:IsA("PlayerGui") then
+					setState(playerGui)
 				end
 			end)
+		else
+			childAddedConnection = nil
 		end
 
-		return function() -- line: 22
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if childAddedConnection then
+				childAddedConnection:Disconnect()
 			end
 		end
-	end, { v5 })
+	end, { v })
 
-	return v6
+	return state
 end
 
 return usePlayerGui

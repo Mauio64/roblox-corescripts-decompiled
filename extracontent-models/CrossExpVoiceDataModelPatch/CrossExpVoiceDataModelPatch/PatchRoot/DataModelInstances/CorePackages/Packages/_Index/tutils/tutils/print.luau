@@ -1,74 +1,69 @@
-return function(p1) -- line: 1
-	local function makeKeyString(p2) -- line: 2
-		if type(p2) == "string" then
-			return string.format("%s", p2)
+return function(callback)
+	local function makeKeyString(value) -- 2 equivalent calls inferred from this helper
+		if type(value) == "string" then
+			return string.format("%s", value)
 		end
 
-		return string.format("[%s]", (tostring(p2)))
+		return string.format("[%s]", (tostring(value)))
 	end
-	local function makeValueString(p3) -- line: 10
-		local v7 = type(p3)
 
-		if v7 == "string" then
-			return string.format("%q", p3)
+	local function makeValueString(p)
+		local typeName = type(p)
+
+		if typeName == "string" then
+			return string.format("%q", p)
 		end
 
-		if v7 == "function" or v7 == "table" then
-			return string.format("<%s>", (tostring(p3)))
+		if typeName == "function" or typeName == "table" then
+			return string.format("<%s>", (tostring(p)))
 		end
 
-		return string.format("%s", (tostring(p3)))
-	end
-	local function printKeypair(p4, p5, p6, p7) -- line: 21
-		-- upvalues: makeValueString (copy), p1 (copy)
-		local v12 = if type(p4) ~= "string" then string.format("[%s]", (tostring(p4))) else string.format("%s", p4)
-		local v13 = makeValueString(p5)
-		local v14 = p7 and string.format(" -- %s", p7) or ""
-
-		p1(string.format("%s%s = %s,%s", p6, v12, v13, v14))
+		return string.format("%s", (tostring(p)))
 	end
 
-	return function(p8, p9) -- line: 33
-		-- upvalues: p1 (copy), makeValueString (copy), printKeypair (copy)
-		local u17 = p9 or "  "
+	local function printKeypair(value, item, p, p2) -- 1 equivalent call inferred from this helper
+		local keyString = makeKeyString(value) -- inferred equivalent call
+		local valueString = makeValueString(item)
 
-		if type(p8) ~= "table" then
+		local v = p2 and string.format(" -- %s", p2) or ""
+		callback(string.format("%s%s = %s,%s", p, keyString, valueString, v))
+	end
+
+	return function(p, value)
+		local v = value or "  "
+
+		if type(p) ~= "table" then
 			error("tutils.Print must be passed a table", 2)
 		end
 
-		local t1 = {}
+		local itemsSet = {}
+		local function recurse(items, value2, p2)
+			itemsSet[items] = true
 
-		local function recurse(p10, p11, p12) -- line: 43
-			-- upvalues: t1 (copy), u17 (ref), p1 (copy), makeValueString (copy), printKeypair (copy), recurse (copy)
-			t1[p10] = true
+			local v2 = string.rep(v, p2)
+			local v3 = string.rep(v, p2 + 1)
 
-			local v23 = string.rep(u17, p12)
-			local v24 = string.rep(u17, p12 + 1)
-
-			if p11 then
-				p1(string.format("%s%s = %s {", v23, if type(p11) ~= "string" then string.format("[%s]", (tostring(p11))) else string.format("%s", p11), makeValueString(p10)))
+			if value2 then
+				callback(string.format("%s%s = %s {", v2, makeKeyString(value2), makeValueString(items))) -- inferred equivalent call
 			else
-				p1(string.format("%s%s {", v23, makeValueString(p10)))
+				callback(string.format("%s%s {", v2, makeValueString(items)))
 			end
 
-			for k, v in pairs(p10) do
-				if type(v) == "table" then
-					if t1[v] then
-						printKeypair(k, v, v24, "Possible cycle")
+			for k, item in pairs(items) do
+				if type(item) == "table" then
+					if itemsSet[item] then
+						printKeypair(k, item, v3, "Possible cycle")
 					else
-						recurse(v, k, p12 + 1)
+						recurse(item, k, p2 + 1)
 					end
 				else
-					local v27 = if type(k) ~= "string" then string.format("[%s]", (tostring(k))) else string.format("%s", k)
-					local v28 = makeValueString(v)
-
-					p1(string.format("%s%s = %s,%s", v24, v27, v28, ""))
+					printKeypair(k, item, v3) -- inferred equivalent call
 				end
 			end
 
-			p1(string.format("%s}%s", v23, not (p12 > 0) and "" or ","))
+			callback(string.format("%s}%s", v2, p2 > 0 and "," or ""))
 		end
 
-		recurse(p8, nil, 0)
+		recurse(p, nil, 0)
 	end
 end

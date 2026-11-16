@@ -1,3 +1,5 @@
-local Parent = script:FindFirstAncestor("MomentsCreation").Parent
+local parent = script:FindFirstAncestor("MomentsCreation").Parent
 
-return require(Parent.React).createContext(nil)
+local React = require(parent.React)
+
+return React.createContext(nil)

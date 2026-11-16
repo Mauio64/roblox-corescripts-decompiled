@@ -1,201 +1,141 @@
 local UserInputService = game:GetService("UserInputService")
-local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
 
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
+
+local React = require(parent.React)
 require(BuildExperience.Chat.useChatSessionCore)
 
-local function getInputPosition(p1) -- line: 15
-	return Vector2.new(p1.Position.X, p1.Position.Y)
+local function getInputPosition(p) -- 2 equivalent calls inferred from this helper
+	return Vector2.new(p.Position.X, p.Position.Y)
 end
-local function isPositionHorizontallyInsideGuiObject(vector2: Vector2, p2) -- line: 19
-	local v13 = vector2.X - p2.AbsolutePosition.X
 
-	return v13 >= 0 and v13 <= p2.AbsoluteSize.X
+local function isPositionHorizontallyInsideGuiObject(inputPosition: Vector2, current): boolean -- 1 equivalent call inferred from this helper
+	local v = inputPosition.X - current.AbsolutePosition.X
+	return v >= 0 and v <= current.AbsoluteSize.X
 end
-local function isDownSwipe(vector2: Vector2) -- line: 24
+
+local function isDownSwipe(vector2: Vector2): boolean -- 1 equivalent call inferred from this helper
 	return vector2.Y >= 24 and vector2.Y > math.abs(vector2.X)
 end
-local function didDownSwipeCrossGuiObject(vector2: Vector2, vector2_2: Vector2, p3) -- line: 28
-	local v18 = vector2_2 - vector2
 
-	if not (v18.Y >= 24) or not (v18.Y > math.abs(v18.X)) then
+local function didDownSwipeCrossGuiObject(current: Vector2, inputPosition: Vector2, current2): boolean
+	if not isDownSwipe(inputPosition - current) then -- inferred equivalent call
 		return false
 	end
 
-	local AbsolutePositionX = p3.AbsolutePosition.X
-	local v20 = AbsolutePositionX + p3.AbsoluteSize.X
-	local v21 = math.min(vector2.X, vector2_2.X)
-	local v22 = math.max(vector2.X, vector2_2.X)
-	local AbsolutePositionY = p3.AbsolutePosition.Y
-	local v24 = AbsolutePositionY + p3.AbsoluteSize.Y
+	local x = current2.AbsolutePosition.X
+	local v = x + current2.AbsoluteSize.X
+	local v2 = math.min(current.X, inputPosition.X)
+	local v3 = math.max(current.X, inputPosition.X)
+	local y = current2.AbsolutePosition.Y
+	local v4 = y + current2.AbsoluteSize.Y
 
-	return AbsolutePositionX <= v22 and (v21 <= v20 and (v24 >= vector2.Y and AbsolutePositionY <= vector2_2.Y))
+	return x <= v3 and v2 <= v and current.Y <= v4 and y <= inputPosition.Y
 end
-local function useReleaseFocusOnDownSwipe(p4, p5) -- line: 51
-	-- upvalues: React (copy), didDownSwipeCrossGuiObject (copy), UserInputService (copy)
-	local v27 = React.useRef(nil)
-	local v28 = React.useRef(nil)
-	local v29 = React.useRef(nil)
-	local v30 = React.useCallback(function() -- line: 56
-		-- upvalues: v29 (copy), v27 (copy), v28 (copy)
-		if v29.current then
-			v29.current:Disconnect()
-			v29.current = nil
+
+local function useReleaseFocusOnDownSwipe(p, p2)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local ref3 = React.useRef(nil)
+
+	local v = React.useCallback(function()
+		if ref3.current then
+			ref3.current:Disconnect()
+			ref3.current = nil
 		end
 
-		v27.current = nil
-		v28.current = nil
+		ref.current = nil
+		ref2.current = nil
 	end, {})
-	local v31 = React.useCallback(function() -- line: 65
-		-- upvalues: p5 (copy)
-		local v32 = if not p5 then nil else p5.current
 
-		if v32 then
-			v32.releaseFocus()
+	local v2 = React.useCallback(function()
+		local current
+
+		if p2 then
+			current = p2.current
 		end
-	end, { p5 })
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy), UserInputService (copy), p5 (copy), v29 (copy)
-		local function maybeReleaseFocus(p6) -- line: 73
-			-- upvalues: v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
-			local current = v28.current
+		if current then
+			current.releaseFocus()
+		end
+	end, { p2 })
 
-			if p6 ~= v27.current or current == nil then
+	React.useEffect(function()
+		local function maybeReleaseFocus(p3): boolean -- 2 equivalent calls inferred from this helper
+			local current = ref2.current
+
+			if ref.current ~= p3 or current == nil then
 				return false
 			end
 
-			local current2 = p4.current
-			local vector2 = Vector2.new(p6.Position.X, p6.Position.Y)
+			local current2 = p.current
+			local inputPosition = getInputPosition(p3) -- inferred equivalent call
 
-			if current2 ~= nil and didDownSwipeCrossGuiObject(current, vector2, current2) then
-				v30()
-				v31()
-
-				return true
+			if current2 == nil or not didDownSwipeCrossGuiObject(current, inputPosition, current2) then
+				return false
 			end
 
-			return false
+			v()
+			v2()
+			return true
 		end
-		local function handleInputChanged(p7) -- line: 91
-			-- upvalues: v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
-			local current = v28.current
-			local v43
 
-			if p7 ~= v27.current or current == nil then
-				v43 = false
-			else
-				local current3 = p4.current
-				local vector2 = Vector2.new(p7.Position.X, p7.Position.Y)
-
-				if current3 ~= nil and didDownSwipeCrossGuiObject(current, vector2, current3) then
-					v30()
-					v31()
-					v43 = true
-				else
-					v43 = false
-				end
-			end
-
-			if v43 then
+		local function handleInputChanged(current) -- 1 equivalent call inferred from this helper
+			if maybeReleaseFocus(current) then -- inferred equivalent call
 				return
 			end
 
-			if p7.UserInputState == Enum.UserInputState.End or p7.UserInputState == Enum.UserInputState.Cancel then
-				v30()
+			if
+				current.UserInputState == Enum.UserInputState.End
+				or current.UserInputState == Enum.UserInputState.Cancel
+			then
+				v()
 			end
 		end
 
-		local connection = UserInputService.TouchStarted:Connect(function(p8) -- line: 102
-			-- upvalues: v30 (copy), p4 (copy), p5 (copy), v27 (copy), v28 (copy), v29 (copy), didDownSwipeCrossGuiObject (copy), v31 (copy)
-			v30()
+		local touchStartedConnection = UserInputService.TouchStarted:Connect(function(current)
+			v()
 
-			local current = p4.current
-			local v48 = if not p5 then nil else p5.current
+			local current2 = p.current
+			local v3
 
-			if current == nil or v48 == nil then
+			if p2 then
+				v3 = p2.current
+			end
+
+			if current2 == nil or v3 == nil then
 				return
 			end
 
-			local vector2 = Vector2.new(p8.Position.X, p8.Position.Y)
-			local v50 = vector2.X - current.AbsolutePosition.X
+			local inputPosition = getInputPosition(current) -- inferred equivalent call
 
-			if not (v50 >= 0) or not (v50 <= current.AbsoluteSize.X) or vector2.Y > current.AbsolutePosition.Y + current.AbsoluteSize.Y then
+			if
+				not isPositionHorizontallyInsideGuiObject(inputPosition, current2) -- inferred equivalent call
+				or inputPosition.Y > current2.AbsolutePosition.Y + current2.AbsoluteSize.Y
+			then
 				return
 			end
 
-			v27.current = p8
-			v28.current = vector2
-			v29.current = p8.Changed:Connect(function() -- line: 121
-				-- upvalues: p8 (copy), v28 (copy), v27 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
-				local v56 = p8
-				local current4 = v28.current
-				local v58
-
-				if v56 ~= v27.current or current4 == nil then
-					v58 = false
-				else
-					local current5 = p4.current
-					local vector2_3 = Vector2.new(v56.Position.X, v56.Position.Y)
-
-					if current5 ~= nil and didDownSwipeCrossGuiObject(current4, vector2_3, current5) then
-						v30()
-						v31()
-						v58 = true
-					else
-						v58 = false
-					end
-				end
-
-				if v58 then
-					return
-				end
-
-				if v56.UserInputState == Enum.UserInputState.End or v56.UserInputState == Enum.UserInputState.Cancel then
-					v30()
-				end
+			ref.current = current
+			ref2.current = inputPosition
+			ref3.current = current.Changed:Connect(function()
+				handleInputChanged(current) -- inferred equivalent call
 			end)
 		end)
-		local connection2 = UserInputService.TouchEnded:Connect(function(part) -- line: 126
-			-- upvalues: v27 (copy), v28 (copy), p4 (copy), didDownSwipeCrossGuiObject (copy), v30 (copy), v31 (copy)
-			if part == v27.current then
-				local current = v28.current
-				local v53
 
-				if part ~= v27.current or current == nil then
-					v53 = false
-				else
-					local current6 = p4.current
-					local vector2 = Vector2.new(part.Position.X, part.Position.Y)
-
-					if current6 ~= nil and didDownSwipeCrossGuiObject(current, vector2, current6) then
-						v30()
-						v31()
-						v53 = true
-					else
-						v53 = false
-					end
-				end
-
-				if not v53 then
-					v30()
-				end
+		local touchEndedConnection = UserInputService.TouchEnded:Connect(function(otherPart)
+			if ref.current == otherPart and not maybeReleaseFocus(otherPart) then -- inferred equivalent call
+				v()
 			end
 		end)
 
-		return function() -- line: 134
-			-- upvalues: connection (copy), connection2 (copy), v30 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
-			v30()
+		return function()
+			touchStartedConnection:Disconnect()
+			touchEndedConnection:Disconnect()
+			v()
 		end
-	end, {
-		p4,
-		p5,
-		v30,
-		v31
-	})
+	end, { p, p2, v, v2 })
 end
 
 return useReleaseFocusOnDownSwipe

@@ -1,14 +1,15 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local View = Foundation.View
 
-local function AgentCardActions(t1: {[any]: any}) -- line: 13
-	-- upvalues: React (copy), View (copy)
+local function AgentCardActions(p)
 	return React.createElement(View, {
-		LayoutOrder = 3,
+		LayoutOrder = p.layoutOrder or 3,
 		tag = "row gap-small size-full-0 auto-y"
-	}, t1.children)
+	}, p.children)
 end
 
 return AgentCardActions

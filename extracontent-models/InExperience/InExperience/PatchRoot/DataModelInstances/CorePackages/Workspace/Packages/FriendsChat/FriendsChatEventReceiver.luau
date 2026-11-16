@@ -1,3 +1,3 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
 
-return require(_Workspace.FriendsChat.FriendsChat.Realtime.FriendsChatEventReceiver)
+return require(Workspace.FriendsChat.FriendsChat.Realtime.FriendsChatEventReceiver)

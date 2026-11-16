@@ -1,26 +1,21 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local AppChatNetworking = require(Parent.AppChatNetworking)
-local Constants = require(script.Parent.Constants)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
+local AppChatNetworking = require(parent.AppChatNetworking)
+
+local Constants = require(script.Parent.Constants)
 require(script.Parent.Types)
 
-local function fetchSmartSuggestions(s1: string) -- line: 11
-	-- upvalues: AppChatNetworking (copy), Constants (copy)
-	return AppChatNetworking.http.GetSuggestions(nil, s1, Constants.SUGGESTION_TYPES, Constants.MAX_SUGGESTIONS):andThen(function(p1) -- line: 14
-		local v7 = p1 and p1.responseBody
-		local suggestions
+local function fetchSmartSuggestions(p: string)
+	return AppChatNetworking.http.GetSuggestions(nil, p, Constants.SUGGESTION_TYPES, Constants.MAX_SUGGESTIONS):andThen(function(p2)
+		local responseBody = p2 and p2.responseBody
+		local v
 
-		if v7 then
-			suggestions = v7.suggestions
-
-			if not suggestions then
-				return {}
-			end
-		else
-			suggestions = {}
+		if not responseBody then
+			return {}
 		end
 
-		return suggestions
+		v = responseBody.suggestions
+		return v or {}
 	end)
 end
 

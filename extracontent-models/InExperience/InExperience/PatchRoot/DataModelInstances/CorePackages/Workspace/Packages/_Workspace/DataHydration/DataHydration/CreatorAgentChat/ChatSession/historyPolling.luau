@@ -1,468 +1,297 @@
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+
 require(script.Parent.Parent.types)
 
 local constants = require(script.Parent.constants)
 local historyPageUtils = require(script.Parent.historyPageUtils)
-
 require(script.Parent.sessionDeps)
 
+local FFlagBuildExperienceHistoryPollTelemetry = SharedFlags.FFlagBuildExperienceHistoryPollTelemetry
+
 return {
-	createHistoryPolling = function(t1: {[any]: any}) -- line: 23
-		-- upvalues: historyPageUtils (copy), constants (copy)
-		local function pollSessionHistory(s1: string, n1: number?, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)) -- line: 24
-			-- upvalues: t1 (copy), historyPageUtils (copy)
-			if p2() then
+	createHistoryPolling = function(data, callback)
+		local function pollSessionHistory(p: string, afterSequenceId: number?, onDroppedChatMessage, shouldStopPolling, pollTrigger, priorSequenceId: number?): boolean
+			if shouldStopPolling() then
 				return false
 			end
 
-			local v10 = t1.deps.sessionLoad(s1, nil)
-			local v11 = historyPageUtils.awaitRequestState(v10.state, os.clock() + t1.rpcTimeoutSeconds)
+			local v
 
-			if v11.status == "pending" then
-				v10.dispose()
+			if callback == nil then
+				local sessionLoad = data.deps.sessionLoad(p, nil)
+				v = historyPageUtils.awaitRequestState(sessionLoad.state, os.clock() + data.rpcTimeoutSeconds)
 
+				if v.status == "pending" then
+					sessionLoad.dispose()
+					return false
+				end
+			else
+				v = callback(p, nil, shouldStopPolling)
+			end
+
+			if shouldStopPolling() or v.status ~= "succeeded" then
 				return false
 			end
 
-			if p2() or v11.status ~= "succeeded" then
+			local sessionLoadHistory = historyPageUtils.getSessionLoadHistory(v.result)
+
+			if #sessionLoadHistory == 0 or shouldStopPolling() or shouldStopPolling() then
 				return false
 			end
 
-			local v12 = historyPageUtils.getSessionLoadHistory(v11.result)
+			data.mergeHistoryPage(sessionLoadHistory, data.getNextHistoryPageToken())
+			local ingestSessionHistory = data.deps.ingestSessionHistory(p, sessionLoadHistory, afterSequenceId)
 
-			if #v12 == 0 or p2() then
-				return false
-			end
+			if onDroppedChatMessage ~= nil then
+				local v2 = pollTrigger ~= nil and {
+					pollTrigger = pollTrigger,
+					appliedFromThisPoll = #ingestSessionHistory,
+					priorSequenceId = priorSequenceId
+				} or nil
 
-			if p2() then
-				return false
-			end
-
-			t1.mergeHistoryPage(v12, t1.getNextHistoryPageToken())
-
-			local v13 = t1.deps.ingestSessionHistory(s1, v12, n1)
-
-			if p1 ~= nil then
-				for _, v15 in v13 do
-					p1(v15)
+				for _, v3 in ingestSessionHistory do
+					onDroppedChatMessage(v3, v2)
 				end
 			end
 
-			if p2() then
-				return false
-			end
-
-			return #v13 > 0
+			return not shouldStopPolling() and #ingestSessionHistory > 0
 		end
-		local function startPollingTurnFromHistory(s2: string, p3, p4) -- line: 66
-			-- upvalues: historyPageUtils (copy), constants (copy), t1 (copy), pollSessionHistory (copy)
-			local v19 = p4 or {}
-			local v20 = historyPageUtils.resolveNonNegativeNumber(v19.rtnIdleFallbackSeconds, constants.getRtnIdleFallbackSeconds())
-			local v21 = historyPageUtils.resolveNonNegativeNumber(v19.rtnSequenceGapFallbackSeconds, constants.getRtnSequenceGapFallbackSeconds())
-			local v22 = historyPageUtils.resolvePositiveNumber(v19.pollMinIntervalSeconds, constants.getPollMinIntervalSeconds())
-			local u23 = historyPageUtils.resolvePositiveNumber(v19.pollMaxIntervalSeconds, constants.getPollMaxIntervalSeconds())
 
-			if v22 > u23 then
-				u23 = v22
+		local function startPollingTurnFromHistory(p: string, activeTurnHandle, options)
+			local v = options or {}
+			local nonNegativeNumber = historyPageUtils.resolveNonNegativeNumber(
+				v.rtnIdleFallbackSeconds,
+				constants.getRtnIdleFallbackSeconds()
+			)
+
+			local nonNegativeNumber2 = historyPageUtils.resolveNonNegativeNumber(
+				v.rtnSequenceGapFallbackSeconds,
+				constants.getRtnSequenceGapFallbackSeconds()
+			)
+
+			local positiveNumber = historyPageUtils.resolvePositiveNumber(
+				v.pollMinIntervalSeconds,
+				constants.getPollMinIntervalSeconds()
+			)
+
+			local v2 = historyPageUtils.resolvePositiveNumber(
+				v.pollMaxIntervalSeconds,
+				constants.getPollMaxIntervalSeconds()
+			)
+
+			if v2 < positiveNumber then
+				v2 = positiveNumber
 			end
 
-			local afterSequenceId = v19.afterSequenceId
-			local noteProcessedSequenceNumber = p3.noteProcessedSequenceNumber
+			local afterSequenceId = v.afterSequenceId
+
+			if afterSequenceId ~= nil and activeTurnHandle.setHistoryBoundary ~= nil then
+				activeTurnHandle.setHistoryBoundary(afterSequenceId)
+			end
+
+			local noteProcessedSequenceNumber = activeTurnHandle.noteProcessedSequenceNumber
 
 			if afterSequenceId ~= nil and noteProcessedSequenceNumber ~= nil then
 				noteProcessedSequenceNumber(afterSequenceId)
 			end
 
-			local u26 = false
-			local u27 = false
-			local u28 = false
-			local u29 = false
-			local u30 = false
-			local u31 = v22
-			local elapsed = os.clock()
-			local u33 = false
-			local n2 = 0
-			local n3 = 0
-			local n4 = 0
+			local v3 = false
+			local v4 = false
+			local v5 = false
+			local v6 = false
+			local v7 = false
+			local v8 = positiveNumber
+			local lastTime = os.clock()
+			local flag = false
+			local count = 0
+			local count2 = 0
+			local count3 = 0
 
-			local function shouldStopPolling() -- line: 110
-				-- upvalues: u26 (ref), p3 (copy), t1 (copy), s2 (copy)
-				return u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2)
-			end
+			local function shouldStopPolling() -- 6 equivalent calls inferred from this helper
+				local v9 = v3 or activeTurnHandle.state(false).isDone
 
-			local u38 = nil
-
-			local function stopPolling() -- line: 116
-				-- upvalues: u27 (ref), u31 (ref), v22 (copy), n4 (ref)
-				if not u27 then
-					return
+				if v9 then
+					return v9
 				end
 
-				u27 = false
-				u31 = v22
-				n4 += 1
-			end
-			local function startPolling() -- line: 125
-				-- upvalues: u27 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u31 (ref), v22 (copy), u38 (ref)
-				if u27 or (u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2)) then
-					return
-				end
-
-				u27 = true
-				u31 = v22
-				u38(0)
-			end
-			local function updatePollingState() -- line: 134
-				-- upvalues: u26 (ref), p3 (copy), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u30 (ref), u38 (ref)
-				if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-					if not u27 then
-						return
+				if data.getCasSessionId() == p then
+					if activeTurnHandle.isCurrentOwner == nil then
+						return false
 					end
 
-					u27 = false
-					u31 = v22
-					n4 += 1
+					return not activeTurnHandle.isCurrentOwner()
+				end
 
+				return true
+			end
+
+			local fn
+
+			local function stopPolling() -- 3 equivalent calls inferred from this helper
+				if not v4 then
 					return
 				end
 
-				if u28 or u30 then
-					if not u27 then
-						if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-							return
-						end
+				v4 = false
+				v8 = positiveNumber
+				count3 += 1
+			end
 
-						u27 = true
-						u31 = v22
-						u38(0)
+			local function startPolling() -- 1 equivalent call inferred from this helper
+				if not v4 and not shouldStopPolling() then -- inferred equivalent call
+					v4 = true
+					v8 = positiveNumber
+					fn(0)
+				end
+			end
 
-						return
-					end
+			local function updatePollingState() -- 5 equivalent calls inferred from this helper
+				if shouldStopPolling() then -- inferred equivalent call
+					stopPolling() -- inferred equivalent call
+				elseif v5 or v7 then
+					startPolling() -- inferred equivalent call
 				else
-					if not u27 then
-						return
-					end
-
-					u27 = false
-					u31 = v22
-					n4 += 1
+					stopPolling() -- inferred equivalent call
 				end
 			end
-			local function refreshSequenceGapState() -- line: 144
-				-- upvalues: p3 (copy), u29 (ref), u30 (ref), n3 (ref), v21 (copy), u26 (ref), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u38 (ref)
-				local hasSequenceGap = p3.hasSequenceGap
-				local v50 = hasSequenceGap ~= nil and hasSequenceGap()
 
-				if v50 == u29 then
+			local function refreshSequenceGapState()
+				local hasSequenceGap = activeTurnHandle.hasSequenceGap
+				local v9
+
+				if hasSequenceGap == nil then
+					v9 = false
+				else
+					v9 = hasSequenceGap()
+				end
+
+				if v9 == v6 then
 					return
 				end
 
-				u29 = v50
-				u30 = false
-				n3 += 1
+				v6 = v9
+				v7 = false
+				count2 += 1
+				local v10 = count2
 
-				local v51 = n3
-
-				if v50 then
-					task.delay(v21, function() -- line: 156
-						-- upvalues: v51 (copy), n3 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u29 (ref), u30 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u28 (ref), u38 (ref)
-						if v51 ~= n3 or (u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) or not u29) then
-							return
-						end
-
-						u30 = true
-
-						if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-							if not u27 then
-								return
-							end
-
-							u27 = false
-							u31 = v22
-							n4 += 1
-
-							return
-						end
-
-						if u28 or u30 then
-							if not u27 then
-								if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-									return
-								end
-
-								u27 = true
-								u31 = v22
-								u38(0)
-
-								return
-							end
-						else
-							if not u27 then
-								return
-							end
-
-							u27 = false
-							u31 = v22
-							n4 += 1
+				if v9 then
+					task.delay(nonNegativeNumber2, function()
+						if v10 == count2 and not shouldStopPolling() and v6 then -- inferred equivalent call
+							v7 = true
+							updatePollingState() -- inferred equivalent call
 						end
 					end)
 				end
 
-				if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-					if not u27 then
-						return
-					end
-
-					u27 = false
-					u31 = v22
-					n4 += 1
-
-					return
-				end
-
-				if u28 or u30 then
-					if not u27 then
-						if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-							return
-						end
-
-						u27 = true
-						u31 = v22
-						u38(0)
-
-						return
-					end
-				else
-					if not u27 then
-						return
-					end
-
-					u27 = false
-					u31 = v22
-					n4 += 1
-				end
+				updatePollingState() -- inferred equivalent call
 			end
-			local function u43(n5: number) -- line: 168
-				-- upvalues: u33 (ref), n2 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), v20 (copy), elapsed (ref), u43 (ref), u28 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref)
-				if u33 then
+
+			local function fn2(nonNegativeNumber3: number)
+				if flag then
 					return
 				end
 
-				u33 = true
+				flag = true
+				local v9 = count
+				task.delay(nonNegativeNumber3, function()
+					flag = false
 
-				local v53 = n2
+					if v9 == count and not shouldStopPolling() then -- inferred equivalent call
+						local v10 = nonNegativeNumber - (os.clock() - lastTime)
 
-				task.delay(n5, function() -- line: 174
-					-- upvalues: u33 (ref), v53 (copy), n2 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), v20 (copy), elapsed (ref), u43 (ref), u28 (ref), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref)
-					u33 = false
-
-					if v53 ~= n2 or (u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2)) then
-						return
-					end
-
-					local v56 = v20 - (os.clock() - elapsed)
-
-					if v56 > 0 then
-						u43(v56)
-
-						return
-					end
-
-					u28 = true
-
-					if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-						if not u27 then
+						if v10 > 0 then
+							fn2(v10)
 							return
 						end
 
-						u27 = false
-						u31 = v22
-						n4 += 1
-
-						return
+						v5 = true
+						updatePollingState() -- inferred equivalent call
 					end
+				end)
+			end
 
-					if u28 or u30 then
-						if not u27 then
-							if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
+			local function noteRtnActivity() -- 2 equivalent calls inferred from this helper
+				lastTime = os.clock()
+				v5 = false
+				updatePollingState() -- inferred equivalent call
+				fn2(nonNegativeNumber)
+			end
+
+			fn = function(duration: number)
+				count3 += 1
+				local v9 = count3
+				task.delay(duration, function()
+					if v9 == count3 and v4 and not shouldStopPolling() then -- inferred equivalent call
+						local v10, v11
+
+						if FFlagBuildExperienceHistoryPollTelemetry then
+							v10 = v5 and v7 and "both" or v7 and "sequence_gap" or "rtn_idle"
+							local getLatestProcessedSequenceNumber = activeTurnHandle.getLatestProcessedSequenceNumber
+
+							if getLatestProcessedSequenceNumber ~= nil then
+								v11 = getLatestProcessedSequenceNumber()
+							end
+						end
+
+						local v12 = pollSessionHistory(
+							p,
+							afterSequenceId,
+							v.onDroppedChatMessage,
+							shouldStopPolling,
+							v10,
+							v11
+						)
+
+						if shouldStopPolling() then -- inferred equivalent call
+							stopPolling() -- inferred equivalent call
+						else
+							refreshSequenceGapState()
+							updatePollingState() -- inferred equivalent call
+
+							if not v4 then
 								return
 							end
 
-							u27 = true
-							u31 = v22
-							u38(0)
+							if v12 then
+								v8 = positiveNumber
+							else
+								v8 = math.min(v2, v8 * constants.getPollBackoffMultiplier())
+							end
 
-							return
+							fn(v8)
 						end
-					else
-						if not u27 then
-							return
-						end
-
-						u27 = false
-						u31 = v22
-						n4 += 1
 					end
 				end)
 			end
-			local function noteRtnActivity() -- line: 190
-				-- upvalues: elapsed (ref), u28 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref), u43 (ref), v20 (copy)
-				elapsed = os.clock()
-				u28 = false
 
-				if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-					if u27 then
-						u27 = false
-						u31 = v22
-						n4 += 1
-					end
-				elseif u28 or u30 then
-					if not u27 and (not u26 and (not p3.state(false).isDone and t1.getCasSessionId() == s2)) then
-						u27 = true
-						u31 = v22
-						u38(0)
-					end
-				elseif u27 then
-					u27 = false
-					u31 = v22
-					n4 += 1
-				end
-
-				u43(v20)
-			end
-
-			function u38(n6: number) -- line: 197
-				-- upvalues: n4 (ref), u27 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), pollSessionHistory (copy), afterSequenceId (copy), v19 (copy), shouldStopPolling (copy), u31 (ref), v22 (copy), refreshSequenceGapState (copy), u28 (ref), u30 (ref), u38 (ref), u23 (ref), constants (copy)
-				n4 += 1
-
-				local v55 = n4
-
-				task.delay(n6, function() -- line: 200
-					-- upvalues: v55 (copy), n4 (ref), u27 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), pollSessionHistory (copy), afterSequenceId (copy), v19 (copy), shouldStopPolling (copy), u31 (ref), v22 (copy), refreshSequenceGapState (copy), u28 (ref), u30 (ref), u38 (ref), u23 (ref), constants (copy)
-					if v55 ~= n4 or (not u27 or (u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2))) then
-						return
-					end
-
-					local v57 = pollSessionHistory(s2, afterSequenceId, v19.onDroppedChatMessage, shouldStopPolling)
-
-					if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-						if not u27 then
-							return
-						end
-
-						u27 = false
-						u31 = v22
-						n4 += 1
-
-						return
-					end
-
-					refreshSequenceGapState()
-
-					if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-						if u27 then
-							u27 = false
-							u31 = v22
-							n4 += 1
-						end
-					elseif u28 or u30 then
-						if not u27 and (not u26 and (not p3.state(false).isDone and t1.getCasSessionId() == s2)) then
-							u27 = true
-							u31 = v22
-							u38(0)
-						end
-					elseif u27 then
-						u27 = false
-						u31 = v22
-						n4 += 1
-					end
-
-					if not u27 then
-						return
-					end
-
-					if v57 then
-						u31 = v22
-					else
-						u31 = math.min(u23, u31 * constants.getPollBackoffMultiplier())
-					end
-
-					u38(u31)
-				end)
-			end
-
-			local v45 = p3.onNotification(function() -- line: 232
-				-- upvalues: elapsed (ref), u28 (ref), u26 (ref), p3 (copy), t1 (copy), s2 (copy), u27 (ref), u31 (ref), v22 (copy), n4 (ref), u30 (ref), u38 (ref), u43 (ref), v20 (copy), refreshSequenceGapState (copy)
-				elapsed = os.clock()
-				u28 = false
-
-				if u26 or (p3.state(false).isDone or t1.getCasSessionId() ~= s2) then
-					if u27 then
-						u27 = false
-						u31 = v22
-						n4 += 1
-					end
-				elseif u28 or u30 then
-					if not u27 and (not u26 and (not p3.state(false).isDone and t1.getCasSessionId() == s2)) then
-						u27 = true
-						u31 = v22
-						u38(0)
-					end
-				elseif u27 then
-					u27 = false
-					u31 = v22
-					n4 += 1
-				end
-
-				u43(v20)
+			local v9 = activeTurnHandle.onNotification(function()
+				noteRtnActivity() -- inferred equivalent call
 				refreshSequenceGapState()
 			end)
 
 			refreshSequenceGapState()
-			elapsed = os.clock()
-			u28 = false
-
-			if u26 or (p3.state(false).isDone or s2 ~= t1.getCasSessionId()) then
-				if u27 then
-					u27 = false
-					u31 = v22
-					n4 += 1
-				end
-			elseif u28 or u30 then
-				if not u27 and (not u26 and (not p3.state(false).isDone and s2 == t1.getCasSessionId())) then
-					u27 = true
-					u31 = v22
-					u38(0)
-				end
-			elseif u27 then
-				u27 = false
-				u31 = v22
-				n4 += 1
-			end
-
-			u43(v20)
-
-			return function() -- line: 240
-				-- upvalues: u26 (ref), n2 (ref), n3 (ref), n4 (ref), v45 (copy)
-				u26 = true
-				n2 += 1
-				n3 += 1
-				n4 += 1
-				v45()
+			noteRtnActivity() -- inferred equivalent call
+			return function()
+				v3 = true
+				count += 1
+				count2 += 1
+				count3 += 1
+				v9()
 			end
 		end
 
 		return {
 			startPollingTurnFromHistory = startPollingTurnFromHistory,
-			startPollingActiveTurn = function(s3: string, p5) -- line: 249
-				-- upvalues: t1 (copy), startPollingTurnFromHistory (copy)
-				local v48 = t1.deps.getActiveTurnHandle(s3)
+			startPollingActiveTurn = function(p: string, p2)
+				local activeTurnHandle = data.deps.getActiveTurnHandle(p)
 
-				if v48 == nil then
-					return function() -- line: 252
-					end
+				if activeTurnHandle == nil then
+					return function() end
 				end
 
-				return (startPollingTurnFromHistory(s3, v48, p5))
+				return startPollingTurnFromHistory(p, activeTurnHandle, p2)
 			end
 		}
 	end

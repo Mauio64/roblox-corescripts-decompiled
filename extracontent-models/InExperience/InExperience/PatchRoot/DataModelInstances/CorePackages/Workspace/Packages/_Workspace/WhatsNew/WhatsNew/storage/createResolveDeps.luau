@@ -1,27 +1,25 @@
 local WhatsNew = script:FindFirstAncestor("WhatsNew")
-local EntryStorage = require(script.Parent.EntryStorage)
 
+local Constants = require(WhatsNew.Constants)
+local EntryStorage = require(script.Parent.EntryStorage)
 require(WhatsNew.Types)
 
-local function createResolveDeps(t1: {[any]: any}?) -- line: 24
-	-- upvalues: EntryStorage (copy)
-	local v5 = t1 or {}
+local Players = game:GetService("Players")
 
-	return {
-		storage = EntryStorage.getEntries(),
-		meta = EntryStorage.getMeta(),
-		currentTime = v5.currentTime or DateTime.now().UnixTimestamp
-	}
+local function getAccountAgeDays() -- 1 equivalent call inferred from this helper
+	local localPlayer = Players.LocalPlayer
+	return if localPlayer == nil then 1e999 else localPlayer.AccountAge
 end
 
 return {
-	createResolveDeps = createResolveDeps,
-	bootstrapPersistedResolveDeps = function(t2: {[any]: any}?) -- line: 33
-		-- upvalues: EntryStorage (copy), createResolveDeps (copy)
-		EntryStorage.runMigration(if not t2 then nil else t2.runMigrationOptions)
+	createResolveDeps = function(options)
+		local v = options or {}
+		local v2 = v.accountAgeDays or getAccountAgeDays() -- inferred equivalent call
 
-		return (createResolveDeps({
-			currentTime = if not t2 then nil else t2.currentTime
-		}))
+		return {
+			storage = EntryStorage.getEntries(),
+			onboardingEligible = v2 < Constants.OnboardingAccountAge,
+			currentTime = v.currentTime or DateTime.now().UnixTimestamp
+		}
 	end
 }

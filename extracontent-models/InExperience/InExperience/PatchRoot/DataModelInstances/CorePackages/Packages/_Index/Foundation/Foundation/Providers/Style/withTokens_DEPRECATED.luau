@@ -1,16 +1,13 @@
-local scriptParent = script.Parent
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script.Parent
+local parent2 = script:FindFirstAncestor("Foundation").Parent
 
-require(scriptParent.Tokens)
+local React = require(parent2.React)
 
-local TokensContext = require(scriptParent.TokensContext)
+require(parent.Tokens)
+local TokensContext = require(parent.TokensContext)
 
-local function withTokens_DEPRECATED(p1: ((...any) -> ...any)) -- line: 17
-	-- upvalues: React (copy), TokensContext (copy)
-	return React.createElement(TokensContext.Consumer, {
-		render = p1
-	})
+local function withTokens_DEPRECATED(render)
+	return React.createElement(TokensContext.Consumer, { render = render })
 end
 
 return withTokens_DEPRECATED

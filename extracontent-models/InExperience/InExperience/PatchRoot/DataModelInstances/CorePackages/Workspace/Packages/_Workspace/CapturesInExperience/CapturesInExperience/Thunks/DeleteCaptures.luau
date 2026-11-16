@@ -1,30 +1,31 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+
 local CaptureService = game:GetService("CaptureService")
-local CaptureType = require(ParentParent.Enums.CaptureType)
-local RetrieveCaptures = require(ParentParent.Thunks.RetrieveCaptures)
 
-require(ParentParent.Types)
+local CaptureType = require(parent.Enums.CaptureType)
+local RetrieveCaptures = require(parent.Thunks.RetrieveCaptures)
 
-local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
-local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+require(parent.Types)
 
-return function(t1: {[any]: any}) -- line: 14
-	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), CaptureService (copy), RetrieveCaptures (copy)
-	local t2 = {}
+local FFlagUseRbxstorageInGallery = require(parent.Flags.FFlagUseRbxstorageInGallery)
 
-	for _, v in ipairs(t1) do
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(parent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
+return function(list)
+	local v = {}
+
+	for _, item in ipairs(list) do
 		if FFlagEnableCapturesGalleryRetrievalCoreScript then
-			table.insert(t2, v)
-		elseif FFlagUseRbxstorageInGallery and v.type == CaptureType.Video then
-			table.insert(t2, v.videoCapture)
-		elseif v.type == CaptureType.Screenshot then
-			table.insert(t2, v.filePath)
+			table.insert(v, item)
+		elseif FFlagUseRbxstorageInGallery and item.type == CaptureType.Video then
+			table.insert(v, item.videoCapture)
+		elseif item.type == CaptureType.Screenshot then
+			table.insert(v, item.filePath)
 		end
 	end
 
-	return function(p1) -- line: 26
-		-- upvalues: CaptureService (copy), t2 (copy), RetrieveCaptures (copy)
-		CaptureService:DeleteCapturesAsync(t2)
-		p1:dispatch(RetrieveCaptures())
+	return function(object)
+		CaptureService:DeleteCapturesAsync(v)
+		object:dispatch(RetrieveCaptures())
 	end
 end

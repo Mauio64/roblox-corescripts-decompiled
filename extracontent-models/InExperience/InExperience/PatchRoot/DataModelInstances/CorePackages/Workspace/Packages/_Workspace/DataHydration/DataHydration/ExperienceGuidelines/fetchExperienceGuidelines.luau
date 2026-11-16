@@ -1,6 +1,8 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local HttpClient = require(Parent.HttpClient)
-local UrlBase = require(Parent.UrlBuilder).UrlBase
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local HttpClient = require(parent.HttpClient)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
 
 require(script.Parent.ExperienceGuidelinesStoreTypes)
 
@@ -8,23 +10,18 @@ local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
 return {
-	fetchDetailedGuidelines = function(n1: number, t1: {[any]: any}?) -- line: 21
-		-- upvalues: UrlBase (copy), fetch (copy), asPromise (copy)
-		local v8 = t1 or {}
-		local v9 = v8.baseUrl or UrlBase.APIS
-		local v10 = fetch({
+	fetchDetailedGuidelines = function(universeId: number, options)
+		local v = options or {}
+		local baseUrl = v.baseUrl or UrlBase.APIS
+		return asPromise((fetch({
+			network = v.network,
 			method = "POST",
+			url = baseUrl .. "/experience-guidelines-service/v1beta1/detailed-guidelines",
+			body = { universeId = universeId },
 			analyticsKey = "experience-guidelines.get",
-			network = v8.network,
-			url = v9 .. "/experience-guidelines-service/v1beta1/detailed-guidelines",
-			body = {
-				universeId = n1
-			},
-			decode = function(p1) -- line: 33
-				return p1
+			decode = function(p)
+				return p
 			end
-		})
-
-		return asPromise(v10)
+		})))
 	end
 }

@@ -1,31 +1,35 @@
 local Players = game:GetService("Players")
 local LocalizationService = game:GetService("LocalizationService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local FFlagLuaAppEdpBottomSheetPeekViewEvents = require(Parent.SharedFlags).FFlagLuaAppEdpBottomSheetPeekViewEvents
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local ArgCheck = require(parent.ArgCheck)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEdpBottomSheetPeekViewEvents = SharedFlags.FFlagLuaAppEdpBottomSheetPeekViewEvents
 
-return function(p1, p2, p3, p4, p5, s1: string?) -- line: 8
-	-- upvalues: ArgCheck (copy), FFlagLuaAppEdpBottomSheetPeekViewEvents (copy), Players (copy), LocalizationService (copy)
-	ArgCheck.isType(p2, "string", "eventName")
-	ArgCheck.isType(p3, "string", "universeId")
-	ArgCheck.isType(p4, "string", "source")
-	ArgCheck.isType(p5, "number", "index")
+return function(object, p, universeId, source, p2, surface: string?)
+	ArgCheck.isType(p, "string", "eventName")
+	ArgCheck.isType(universeId, "string", "universeId")
+	ArgCheck.isType(source, "string", "source")
+	ArgCheck.isType(p2, "number", "index")
 
-	if FFlagLuaAppEdpBottomSheetPeekViewEvents and s1 ~= nil then
-		ArgCheck.isType(s1, "string", "surface")
+	if FFlagLuaAppEdpBottomSheetPeekViewEvents and surface ~= nil then
+		ArgCheck.isType(surface, "string", "surface")
 	end
 
 	if Players.LocalPlayer then
-		local str = tostring(Players.LocalPlayer.UserId)
-		local RobloxLocaleId = LocalizationService.RobloxLocaleId
+		local v = {
+			uid = tostring(Players.LocalPlayer.UserId),
+			locale = LocalizationService.RobloxLocaleId,
+			universeId = universeId,
+			source = source,
+			index = p2,
+			surface = 0
+		}
 
-		p1:setRBXEventStream("GameDetailsPeekView", p2, {
-			uid = str,
-			locale = RobloxLocaleId,
-			universeId = p3,
-			source = p4,
-			index = p5,
-			surface = if not FFlagLuaAppEdpBottomSheetPeekViewEvents then nil else s1
-		})
+		if not FFlagLuaAppEdpBottomSheetPeekViewEvents then
+			surface = nil
+		end
+
+		v.surface = surface
+		object:setRBXEventStream("GameDetailsPeekView", p, v)
 	end
 end

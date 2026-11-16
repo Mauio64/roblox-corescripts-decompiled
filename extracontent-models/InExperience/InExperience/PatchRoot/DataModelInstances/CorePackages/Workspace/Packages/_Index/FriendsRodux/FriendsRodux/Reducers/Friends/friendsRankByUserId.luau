@@ -1,32 +1,29 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
-local llama = require(ParentParentParent.llama)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local Rodux = require(parent2.Rodux)
+local llama = require(parent2.llama)
 
-require(ParentParent.roduxFriendsTypes)
+require(parent.roduxFriendsTypes)
 
-local t1 = {}
+local v = {}
 
-return function(p1) -- line: 10
-	-- upvalues: Rodux (copy), t1 (copy), llama (copy)
-	local friendsNetworking = p1.friendsNetworking
+return function(p)
+	local friendsNetworking = p.friendsNetworking
 
-	return Rodux.createReducer(t1, {
-		[friendsNetworking.GetFriendsFromUserId.Succeeded.name] = function(p2, p3) -- line: 14
-			-- upvalues: llama (copy)
-			if not p3.queryArgs or not p3.queryArgs.userSort then
+	return Rodux.createReducer(v, {
+		[friendsNetworking.GetFriendsFromUserId.Succeeded.name] = function(p2, data)
+			if not (data.queryArgs and data.queryArgs.userSort) then
 				return p2
 			end
 
-			local str = tostring(p3.namedIds.users)
-			local v11 = p3.responseBody.data or {}
-			local v12 = llama.Dictionary.map(v11, function(p4, p5) -- line: 25
-				return p5, (tostring(p4.id))
+			local users = tostring(data.namedIds.users)
+			local data2 = data.responseBody.data or {}
+
+			local mapped = llama.Dictionary.map(data2, function(p3, p4)
+				return p4, (tostring(p3.id))
 			end)
 
-			return llama.Dictionary.join(p2, {
-				[str] = v12
-			})
+			return llama.Dictionary.join(p2, { [users] = mapped })
 		end
 	})
 end

@@ -1,1 +1,2 @@
-return require(script.mergedResolvers).default
+local mergedResolvers = require(script.mergedResolvers)
+return mergedResolvers.default

@@ -1,47 +1,60 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
-local ItemCardIcon = require(script.Parent.ItemCardIcon)
-local v7 = game:DefineFastFlag("AXItemCardBadgeCheckText", false)
 
-local function ItemCardBadge(t1: {[any]: any}) -- line: 24
-	-- upvalues: useTokens (copy), React (copy), v7 (copy), FoundationText (copy), ItemCardIcon (copy)
-	local v10 = useTokens()
-	local t2 = {
+local ItemCardIcon = require(script.Parent.ItemCardIcon)
+
+local defineFastFlag = game:DefineFastFlag("AXItemCardBadgeCheckText", false)
+
+local function ItemCardBadge(props)
+	local v = useTokens()
+
+	local children = {
 		ItemCardBadgeCornerRadius = React.createElement("UICorner", {
 			CornerRadius = UDim.new(0.5, 0)
 		}),
-		Border = if not t1.displayBorder then nil else React.createElement("UIStroke", {
-			Color = v10.Color.Stroke.Default.Color3,
-			Transparency = v10.Color.Stroke.Default.Transparency,
-			Thickness = v10.Stroke.Thick
-		}),
-		ItemCardBadgeLayout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v10.Gap.XSmall)
-		}),
-		ItemCardBadgePadding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, v10.Padding.Small),
-			PaddingRight = UDim.new(0, v10.Padding.Small),
-			PaddingTop = UDim.new(0, v10.Padding.Small),
-			PaddingBottom = UDim.new(0, v10.Padding.Small)
-		})
+		Border = 0,
+		ItemCardBadgeLayout = 0,
+		ItemCardBadgePadding = 0
 	}
+	local border
 
-	for v12, v13 in t1.content do
-		if v13.type == "text" then
-			if v7 then
-				if v13.text ~= "" then
-					t2[v13.text .. tostring(v12)] = React.createElement(FoundationText, {
-						textStyle = v10.Color.Content.Emphasis,
-						fontStyle = v10.Typography.TitleSmall,
-						LayoutOrder = v12,
-						Text = v13.text,
+	if props.displayBorder then
+		border = React.createElement("UIStroke", {
+			Color = v.Color.Stroke.Default.Color3,
+			Transparency = v.Color.Stroke.Default.Transparency,
+			Thickness = v.Stroke.Thick
+		})
+	end
+
+	children.Border = border
+
+	children.ItemCardBadgeLayout = React.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		Padding = UDim.new(0, v.Gap.XSmall)
+	})
+
+	children.ItemCardBadgePadding = React.createElement("UIPadding", {
+		PaddingLeft = UDim.new(0, v.Padding.Small),
+		PaddingRight = UDim.new(0, v.Padding.Small),
+		PaddingTop = UDim.new(0, v.Padding.Small),
+		PaddingBottom = UDim.new(0, v.Padding.Small)
+	})
+
+	for k, v2 in props.content do
+		if v2.type == "text" then
+			if defineFastFlag then
+				if v2.text ~= "" then
+					children[v2.text .. tostring(k)] = React.createElement(Text, {
+						textStyle = v.Color.Content.Emphasis,
+						fontStyle = v.Typography.TitleSmall,
+						LayoutOrder = k,
+						Text = v2.text,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						Size = UDim2.fromScale(0, 0),
 						AutomaticSize = Enum.AutomaticSize.XY,
@@ -49,11 +62,11 @@ local function ItemCardBadge(t1: {[any]: any}) -- line: 24
 					})
 				end
 			else
-				t2[v13.text .. tostring(v12)] = React.createElement(FoundationText, {
-					textStyle = v10.Color.Content.Emphasis,
-					fontStyle = v10.Typography.TitleSmall,
-					LayoutOrder = v12,
-					Text = v13.text,
+				children[v2.text .. tostring(k)] = React.createElement(Text, {
+					textStyle = v.Color.Content.Emphasis,
+					fontStyle = v.Typography.TitleSmall,
+					LayoutOrder = k,
+					Text = v2.text,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Size = UDim2.fromScale(0, 0),
 					AutomaticSize = Enum.AutomaticSize.XY,
@@ -61,21 +74,21 @@ local function ItemCardBadge(t1: {[any]: any}) -- line: 24
 				})
 			end
 		else
-			t2[v13.icon .. tostring(v12)] = React.createElement(ItemCardIcon, {
-				icon = v13.icon,
-				LayoutOrder = v12
+			children[v2.icon .. tostring(k)] = React.createElement(ItemCardIcon, {
+				icon = v2.icon,
+				LayoutOrder = k
 			})
 		end
 	end
 
 	return React.createElement("Frame", {
+		BackgroundColor3 = v.Color.OverMedia.OverMedia_100.Color3,
+		BackgroundTransparency = v.Color.OverMedia.OverMedia_100.Transparency,
 		BorderSizePixel = 0,
-		BackgroundColor3 = v10.Color.OverMedia.OverMedia_100.Color3,
-		BackgroundTransparency = v10.Color.OverMedia.OverMedia_100.Transparency,
-		LayoutOrder = t1.LayoutOrder,
+		LayoutOrder = props.LayoutOrder,
 		Size = UDim2.fromScale(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY
-	}, t2)
+	}, children)
 end
 
 return ItemCardBadge

@@ -1,43 +1,38 @@
 local Moments = script:FindFirstAncestor("Moments")
-local MomentsParent = Moments.Parent
-local Foundation = require(MomentsParent.Foundation)
-local React = require(MomentsParent.React)
+local parent = Moments.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
 
 require(script.Parent.Parent.Hooks.useMomentProgress)
-
 local getColorStyleWithTransparency = require(Moments.Utils.getColorStyleWithTransparency)
-local FoundationText = Foundation.Text
+
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 
-local function formatTime(n1: number) -- line: 13
-	local v11 = math.max(0, n1)
-	local v12 = math.floor(v11 / 60)
-	local v13 = math.floor(v11 % 60)
-
-	return string.format("%d:%02d", v12, v13)
+local function formatTime(duration: number) -- 1 equivalent call inferred from this helper
+	local v = math.max(0, duration)
+	local v2 = math.floor(v / 60)
+	local v3 = math.floor(v % 60)
+	return string.format("%d:%02d", v2, v3)
 end
-local function TimeLabel(t1: {[any]: any}) -- line: 28
-	-- upvalues: useTokens (copy), formatTime (copy), getColorStyleWithTransparency (copy), React (copy), FoundationText (copy)
-	local v15 = useTokens()
-	local v16 = t1.progress:map(function(p1) -- line: 31
-		-- upvalues: formatTime (copy)
-		local format = string.format
-		local v20 = math.max(0, p1.time)
-		local v21 = math.floor(v20 / 60)
-		local v22 = math.floor(v20 % 60)
 
-		return format("%s / %s", string.format("%d:%02d", v21, v22), formatTime(p1.duration))
-	end)
-	local v17 = t1.animationRatio:map(function(n2: number) -- line: 35
-		-- upvalues: getColorStyleWithTransparency (copy), v15 (copy)
-		return getColorStyleWithTransparency(v15.Color.Content.Emphasis, 1 - n2)
+local function TimeLabel(props)
+	local v = useTokens()
+
+	local mapped = props.progress:map(function(p)
+		return string.format("%s / %s", formatTime(p.time), formatTime(p.duration)) -- inferred equivalent call
 	end)
 
-	return React.createElement(FoundationText, {
+	local mapped2 = props.animationRatio:map(function(p: number)
+		return getColorStyleWithTransparency(v.Color.Content.Emphasis, 1 - p)
+	end)
+
+	return React.createElement(Text, {
 		tag = "auto-xy text-label-medium content-emphasis",
-		Text = v16,
-		textStyle = v17,
-		LayoutOrder = t1.LayoutOrder
+		Text = mapped,
+		textStyle = mapped2,
+		LayoutOrder = props.LayoutOrder
 	})
 end
 

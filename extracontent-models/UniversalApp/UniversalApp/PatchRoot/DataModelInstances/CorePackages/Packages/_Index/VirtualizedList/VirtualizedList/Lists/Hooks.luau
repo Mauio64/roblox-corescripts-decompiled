@@ -1,7 +1,4 @@
-local useFocusNavigationScrolling = require(script.useFocusNavigationScrolling)
-local useVirtualizedList = require(script.useVirtualizedList)
-
 return {
-	useFocusNavigationScrolling = useFocusNavigationScrolling,
-	useVirtualizedList = useVirtualizedList
+	useFocusNavigationScrolling = require(script.useFocusNavigationScrolling),
+	useVirtualizedList = require(script.useVirtualizedList)
 }

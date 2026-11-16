@@ -1,48 +1,43 @@
-local function createSignal() -- line: 11
-	local t1 = {}
-	local t2 = {}
-	local u4 = false
+local function createSignal()
+	local v = {}
+	local v2 = {}
+	local v3 = false
 
 	return {
-		subscribe = function(_, p2) -- line: 16
-			-- upvalues: u4 (ref), t1 (copy), t2 (copy)
-			assert(typeof(p2) == "function", "Can only subscribe to signals with a function.")
+		subscribe = function(_, callback)
+			assert(typeof(callback) == "function", "Can only subscribe to signals with a function.")
 
-			local t3 = {
-				disconnected = false,
-				callback = p2
-			}
+			local v4 = { callback = callback, disconnected = false }
 
-			if u4 and not t1[p2] then
-				t2[p2] = t3
+			if v3 and not v[callback] then
+				v2[callback] = v4
 			end
 
-			t1[p2] = t3
+			v[callback] = v4
 
-			local function disconnect() -- line: 32
-				-- upvalues: t3 (copy), t1 (copy), p2 (copy), t2 (copy)
-				assert(not t3.disconnected, "Listeners can only be disconnected once.")
-				t3.disconnected = true
-				t1[p2] = nil
-				t2[p2] = nil
+			local function disconnect()
+				assert(not v4.disconnected, "Listeners can only be disconnected once.")
+
+				v4.disconnected = true
+				v[callback] = nil
+				v2[callback] = nil
 			end
 
 			return disconnect
 		end,
-		fire = function(_, ...) -- line: 43
-			-- upvalues: u4 (ref), t1 (copy), t2 (copy)
-			u4 = true
+		fire = function(_, ...)
+			v3 = true
 
-			for k, v in pairs(t1) do
-				if not v.disconnected and not t2[k] then
+			for k, v4 in pairs(v) do
+				if not (v4.disconnected or v2[k]) then
 					k(...)
 				end
 			end
 
-			u4 = false
+			v3 = false
 
-			for k, _ in pairs(t2) do
-				t2[k] = nil
+			for k, _ in pairs(v2) do
+				v2[k] = nil
 			end
 		end
 	}

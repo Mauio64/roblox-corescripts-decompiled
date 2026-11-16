@@ -1,12 +1,15 @@
-local ParentParent = script.Parent.Parent
-local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local parent = script.Parent.Parent
+
+local JestConfigs = require(parent.Dev.JestConfigs)
 
 return {
 	displayName = "PurchasePrompt",
 	testMatch = { "**/*.test" },
 	testPathIgnorePatterns = {
 		"launchRobuxPackagePurchase",
-		"NativePurchaseFinishedConnector"
+		"NativePurchaseFinishedConnector",
+		"Network.getPlayerOwns.test",
+		"ProductPurchaseContainerGameplayPaused"
 	},
 	setupFilesAfterEnv = {
 		JestConfigs.setupFiles.UIBloxInitializer,

@@ -1,25 +1,23 @@
-local function TypeError(p1) -- line: 14
-	return p1
+local function TypeError(p)
+	return p
 end
-local function splitOnFirst(p2, p3) -- line: 18
-	if type(p2) ~= "string" or type(p3) ~= "string" then
+
+local function splitOnFirst(value, value2)
+	if type(value) ~= "string" or type(value2) ~= "string" then
 		error("Expected the arguments to be of type `string`")
 	end
 
-	if p3 == "" then
-		return { p2 }
+	if value2 == "" then
+		return { value }
 	end
 
-	local v6 = p2:find(p3, 1, true)
+	local v = value:find(value2, 1, true)
 
-	if v6 == nil then
-		return { p2 }
+	if v == nil then
+		return { value }
 	end
 
-	return {
-		p2:sub(1, v6 - 1),
-		p2:sub(v6 + p3:len())
-	}
+	return { value:sub(1, v - 1), value:sub(v + value2:len()) }
 end
 
 return splitOnFirst

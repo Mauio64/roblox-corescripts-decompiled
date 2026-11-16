@@ -1,24 +1,22 @@
-local t1 = {}
+local MockAppStorageService = {}
+MockAppStorageService.__index = MockAppStorageService
 
-t1.__index = t1
+function MockAppStorageService.new(options)
+	local selected = options or {}
 
-function t1.new(p1) -- line: 4
-	-- upvalues: t1 (copy)
-	local v3 = p1 or {}
+	setmetatable(selected, { __index = MockAppStorageService })
 
-	setmetatable(v3, {
-		__index = t1
-	})
-
-	return v3
-end
-function t1.GetItem(p2, p3) -- line: 13
-	return p2[p3]
-end
-function t1.SetItem(p4, p5, p6) -- line: 18
-	p4[p5] = tostring(p6)
-end
-function t1.flush(_) -- line: 22
+	return selected
 end
 
-return t1
+function MockAppStorageService.GetItem(p, p2)
+	return p[p2]
+end
+
+function MockAppStorageService:SetItem(p, p2)
+	self[p] = tostring(p2)
+end
+
+function MockAppStorageService.flush(_) end
+
+return MockAppStorageService

@@ -1,12 +1,13 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local Roact = require(ParentParent.Roact)
-local Foundation = require(ParentParent.Foundation)
+local parent = script.Parent.Parent.Parent.Parent
+
+local Roact = require(parent.Roact)
+local Foundation = require(parent.Foundation)
 local Loading = Foundation.Loading
 local IconSize = Foundation.Enums.IconSize
-local v6 = Roact.PureComponent:extend("LoadingStatePage")
 
-function v6.render(_) -- line: 13
-	-- upvalues: Roact (copy), Loading (copy), IconSize (copy)
+local extended = Roact.PureComponent:extend("LoadingStatePage")
+
+function extended.render(_)
 	return Roact.createElement(Loading, {
 		size = IconSize.Medium,
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -14,4 +15,4 @@ function v6.render(_) -- line: 13
 	})
 end
 
-return v6
+return extended

@@ -1,60 +1,68 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
-local HttpClient = require(Parent.HttpClient)
-local Promise = require(Parent.Promise)
-local UrlBase = require(Parent.UrlBuilder).UrlBase
+
+local HttpClient = require(parent.HttpClient)
+local Promise = require(parent.Promise)
+local UrlBuilder = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder.UrlBase
+
 local fetch = HttpClient.fetch
 local asPromise = HttpClient.asPromise
 
-local function searchFriendsAsync(s1: string, s2: string?, n1: number?, n2: number?) -- line: 39
-	-- upvalues: Players (copy), Promise (copy), UrlBase (copy), HttpService (copy), fetch (copy), asPromise (copy)
-	if n2 == nil then
-		local LocalPlayer = Players.LocalPlayer
+local function searchFriendsAsync(p: string, p2: string?, value: number?, p3: number?)
+	if p3 == nil then
+		local localPlayer = Players.LocalPlayer
 
-		if LocalPlayer == nil then
+		if localPlayer == nil then
 			return Promise.reject("searchFriendsAsync: no local player")
 		end
 
-		n2 = LocalPlayer.UserId
+		p3 = localPlayer.UserId
 	end
 
-	local v15 = string.format("%s/users/%d/friends/search?query=%s&limit=%d", UrlBase.FRIENDS, n2, HttpService:UrlEncode(s1), n1 or 20)
+	local url = string.format(
+		"%s/users/%d/friends/search?query=%s&limit=%d",
+		UrlBase.FRIENDS,
+		p3,
+		HttpService:UrlEncode(p),
+		value or 20
+	)
 
-	if s2 ~= nil and s2 ~= "" then
-		v15 = string.format("%s&cursor=%s", v15, HttpService:UrlEncode(s2))
+	if p2 ~= nil and p2 ~= "" then
+		url = string.format("%s&cursor=%s", url, HttpService:UrlEncode(p2))
 	end
 
-	local v16 = fetch({
+	return asPromise((fetch({
 		method = "GET",
+		url = url,
 		analyticsKey = "build-experience.friends-search",
-		url = v15,
-		decode = function(p1) -- line: 64
-			return p1
+		decode = function(p4)
+			return p4
 		end
-	})
+	}))):andThen(function(p4)
+		local ids = {}
 
-	return asPromise(v16):andThen(function(t1: {[any]: any}?) -- line: 69
-		local t2 = {}
+		for _, v in p4 and p4.PageItems or {} do
+			local id
 
-		for _, v21 in t1 and t1.PageItems or {} do
-			local v22 = if v21.id == nil then nil else tonumber(v21.id)
+			if v.id ~= nil then
+				id = tonumber(v.id)
+			end
 
-			if v22 ~= nil then
-				table.insert(t2, v22)
+			if id ~= nil then
+				table.insert(ids, id)
 			end
 		end
 
-		local v23 = t1 and t1.NextCursor
+		local nextCursor = p4 and p4.NextCursor
 
-		if v23 == "" then
-			v23 = nil
+		if nextCursor == "" then
+			nextCursor = nil
 		end
 
-		return {
-			ids = t2,
-			nextCursor = v23
-		}
+		return { ids = ids, nextCursor = nextCursor }
 	end)
 end
 

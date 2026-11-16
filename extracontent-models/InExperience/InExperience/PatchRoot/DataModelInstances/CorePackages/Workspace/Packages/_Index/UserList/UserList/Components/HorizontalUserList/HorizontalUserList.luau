@@ -1,86 +1,168 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local View = require(UserListParent.Foundation).View
+local parent = UserList.Parent
 
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local View = Foundation.View
 require(UserList.Common.Types)
-
 local Enums = require(UserList.Common.Enums)
 local useCompactTileHeight = require(UserList.Common.useCompactTileHeight)
-local Cryo = require(UserListParent.Cryo)
-local CollectionViews = require(UserListParent.CollectionViews)
+local Cryo = require(parent.Cryo)
+
+local CollectionViews = require(parent.CollectionViews)
 local CollectionCarousel = CollectionViews.CollectionCarousel
 local useCollectionLayoutParams = CollectionViews.useCollectionLayoutParams
 local usePageSideMargin = CollectionViews.usePageSideMargin
 local CollectionItemSize = CollectionViews.CollectionViewTypes.CollectionItemSize
+
 local useEntities = require(UserList.Hooks.useEntities)
 local useEntitySelectionHandler = require(UserList.Hooks.useEntitySelectionHandler)
 local useRenderEntity = require(UserList.Hooks.useRenderEntity)
-local useIsWideMode = require(UserListParent.SocialCommon).Hooks.useIsWideMode
-local v17 = game:DefineFastFlag("AdjustHorizontalUserListSizeForMobile", false)
-local FFlagLuaAppCompositionAlways = require(UserListParent.SharedFlags).FFlagLuaAppCompositionAlways
 
-local function HorizontalUserList(t1: {[any]: any}) -- line: 50
-	-- upvalues: FFlagLuaAppCompositionAlways (copy), React (copy), useIsWideMode (copy), v17 (copy), CollectionItemSize (copy), usePageSideMargin (copy), useCollectionLayoutParams (copy), useCompactTileHeight (copy), useEntities (copy), useEntitySelectionHandler (copy), useRenderEntity (copy), Enums (copy), Cryo (copy), View (copy), CollectionCarousel (copy)
-	local v21 = FFlagLuaAppCompositionAlways or t1.appCompositionEnabled
-	local v22, v23 = React.useState(nil)
-	local v24 = React.useRef(nil)
-	local v25 = t1.scrollingFrameRef or v24
-	local v26 = useIsWideMode()
-	local v27 = if not v17 then CollectionItemSize.Small else if not v26 then CollectionItemSize.Medium else CollectionItemSize.Small
-	local v28 = if FFlagLuaAppCompositionAlways then nil else usePageSideMargin(v22)
-	local v29 = useCollectionLayoutParams(v27, v22, true, {
-		sideMargin = if not v21 then v28 else nil
+local SocialCommon = require(parent.SocialCommon)
+local useIsWideMode = SocialCommon.Hooks.useIsWideMode
+
+local defineFastFlag = game:DefineFastFlag("AdjustHorizontalUserListSizeForMobile", false)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppCompositionAlways = SharedFlags.FFlagLuaAppCompositionAlways
+local FFlagUserListRowSelectionOriginSource = require(UserList.Flags.FFlagUserListRowSelectionOriginSource)
+
+local function HorizontalUserList(props)
+	local v = FFlagLuaAppCompositionAlways or props.appCompositionEnabled
+	local state, setState = React.useState(nil)
+	local ref = React.useRef(nil)
+	local scrollingFrameRef = props.scrollingFrameRef or ref
+
+	local v2 = useIsWideMode()
+	local collectionItemSize
+
+	if defineFastFlag then
+		if v2 then
+			collectionItemSize = CollectionItemSize.Small
+		else
+			collectionItemSize = CollectionItemSize.Medium
+		end
+	else
+		collectionItemSize = CollectionItemSize.Small
+	end
+
+	local sideMargin
+
+	if not FFlagLuaAppCompositionAlways then
+		sideMargin = usePageSideMargin(state)
+	end
+
+	if v then
+		sideMargin = nil
+	end
+
+	local v3 = useCollectionLayoutParams(collectionItemSize, state, true, {
+		sideMargin = sideMargin
 	})
-	local v30 = useCompactTileHeight()
-	local v31 = React.useCallback(function(_: number) -- line: 67
-		-- upvalues: v30 (copy)
-		return v30
-	end, { v30 })
-	local v32 = useEntities(t1.entities)
-	local v33 = useEntitySelectionHandler(t1.onRowSelected)
-	local v34 = useRenderEntity({
-		entitiesMap = v32.entitiesMap,
-		onActivated = v33,
-		renderRow = t1.renderRow,
+
+	local v4 = useCompactTileHeight()
+	local getItemHeight = React.useCallback(function(_: number)
+		return v4
+	end, { v4 })
+
+	local v5 = useEntities(props.entities)
+
+	local onRowSelected = props.onRowSelected
+	local v6
+
+	if FFlagUserListRowSelectionOriginSource then
+		v6 = props.rowSelectionConfig
+	end
+
+	local onActivated = useEntitySelectionHandler(onRowSelected, v6)
+
+	local v7 = useRenderEntity({
+		entitiesMap = v5.entitiesMap,
+		onActivated = onActivated,
+		renderRow = props.renderRow,
 		layoutMode = Enums.LayoutMode.Horizontal,
-		configs = t1.listConfigs
+		configs = props.listConfigs
 	})
-	local v35 = React.useCallback(function(s1: string, n2: number, uDim2: UDim2, _: number?) -- line: 82
-		-- upvalues: v34 (copy)
-		return v34(s1, n2, uDim2), s1
-	end, { v34 })
-	local v36 = React.useMemo(function() -- line: 89
-		-- upvalues: t1 (copy)
-		local t2 = {}
 
-		for _, v45 in t1.entities do
-			table.insert(t2, v45.id)
+	local renderItem = React.useCallback(function(p: string, p2: number, udim: UDim2, _: number?)
+		return v7(p, p2, udim), p
+	end, { v7 })
+
+	local items = React.useMemo(function()
+		local ids = {}
+
+		for _, entity in props.entities do
+			table.insert(ids, entity.id)
 		end
 
-		return t2
-	end, { t1.entities })
-	local v37 = Cryo.Dictionary.join({}, t1.collectionCarouselConfigs or {}, {
-		title = t1.header and t1.header.title or nil,
-		onActivateHeader = t1.header and t1.header.onTitleActivated or nil,
-		containerRef = v23,
-		scrollingFrameRef = v25,
-		items = v36,
-		renderItem = v35,
-		getItemHeight = v31,
-		collectionItemSize = if not v21 then nil else v27,
-		numColumns = if not v21 then v29.numColumns else nil,
-		fractionalItemAmount = if not v21 then v29.fractionalItemAmount else nil,
-		columnGap = if not v21 then v29.columnGap else nil,
-		sideMargin = if not v21 then v29.sideMargin else nil,
-		maxItemsToShow = v29.maxTilesToShow,
-		scrollingEnabledOverride = t1.scrollEnabled
+		return ids
+	end, { props.entities })
+
+	local join = Cryo.Dictionary.join
+	local collectionCarouselConfigs = props.collectionCarouselConfigs or {}
+	local title
+
+	if props.header then
+		title = props.header.title or nil
+	end
+
+	local onActivateHeader
+
+	if props.header then
+		onActivateHeader = props.header.onTitleActivated or nil
+	end
+
+	if not v then
+		collectionItemSize = nil
+	end
+
+	local numColumns
+
+	if not v then
+		numColumns = v3.numColumns
+	end
+
+	local fractionalItemAmount
+
+	if not v then
+		fractionalItemAmount = v3.fractionalItemAmount
+	end
+
+	local columnGap
+
+	if not v then
+		columnGap = v3.columnGap
+	end
+
+	local sideMargin2
+
+	if not v then
+		sideMargin2 = v3.sideMargin
+	end
+
+	local v8 = join({}, collectionCarouselConfigs, {
+		title = title,
+		onActivateHeader = onActivateHeader,
+		containerRef = setState,
+		scrollingFrameRef = scrollingFrameRef,
+		items = items,
+		renderItem = renderItem,
+		getItemHeight = getItemHeight,
+		collectionItemSize = collectionItemSize,
+		numColumns = numColumns,
+		fractionalItemAmount = fractionalItemAmount,
+		columnGap = columnGap,
+		sideMargin = sideMargin2,
+		maxItemsToShow = v3.maxTilesToShow,
+		scrollingEnabledOverride = props.scrollEnabled
 	})
 
 	return React.createElement(View, {
 		tag = "size-0-full auto-x row",
-		LayoutOrder = t1.layoutOrder
-	}, { React.createElement(CollectionCarousel, v37) })
+		LayoutOrder = props.layoutOrder
+	}, {
+		React.createElement(CollectionCarousel, v8)
+	})
 end
 
 return HorizontalUserList

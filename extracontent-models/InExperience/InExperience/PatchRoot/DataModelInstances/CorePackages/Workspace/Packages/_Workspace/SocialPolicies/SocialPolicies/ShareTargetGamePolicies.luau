@@ -1,14 +1,8 @@
-local function ShareTargetGamePolicies(p1) -- line: 2
+local function ShareTargetGamePolicies(p)
 	return {
-		shouldShowCreatorName = function() -- line: 4
-			-- upvalues: p1 (copy)
-			local ShowShareTargetGameCreator = p1.ShowShareTargetGameCreator
-
-			if ShowShareTargetGameCreator ~= nil then
-				return ShowShareTargetGameCreator
-			end
-
-			return false
+		shouldShowCreatorName = function()
+			local showShareTargetGameCreator = p.ShowShareTargetGameCreator
+			return showShareTargetGameCreator ~= nil and showShareTargetGameCreator
 		end
 	}
 end

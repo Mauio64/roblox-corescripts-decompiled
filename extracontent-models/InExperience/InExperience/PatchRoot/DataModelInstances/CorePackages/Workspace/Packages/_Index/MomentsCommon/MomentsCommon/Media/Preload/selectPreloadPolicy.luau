@@ -1,12 +1,15 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local preloadConstants = require(MomentsCommon.Media.Preload.preloadConstants)
 
-local function selectPreloadPolicy(_: {[any]: any}?) -- line: 28
-	-- upvalues: preloadConstants (copy)
+local preloadConstants = require(MomentsCommon.Media.Preload.preloadConstants)
+local preloadFastInts = require(MomentsCommon.Media.Preload.preloadFastInts)
+
+local function selectPreloadPolicy(_)
 	return {
-		downloadWindow = preloadConstants.downloadWindow,
-		decodeWindow = preloadConstants.decodeWindow,
-		usePoster = preloadConstants.usePoster
+		downloadWindow = preloadFastInts.getDownloadWindow(),
+		decodeWindow = preloadFastInts.getDecodeWindow(),
+		usePoster = preloadConstants.usePoster,
+		decodeRetryDelayMs = preloadFastInts.getDecodeRetryDelayMs(),
+		maxDecodeRetries = preloadFastInts.getMaxDecodeRetries()
 	}
 end
 

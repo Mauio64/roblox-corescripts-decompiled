@@ -1,12 +1,14 @@
 local CorePackages = game:GetService("CorePackages")
-local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
 
-if require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize then
+local Rodux = require(CorePackages.Packages.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+
+if CoreGuiCommon.Flags.FFlagTopBarSignalizeScreenSize then
 	return nil
 end
 
-return (makeActionCreator(script.Name, function(p1) -- line: 11
-	return {
-		screenSize = p1
-	}
+return (makeActionCreator(script.Name, function(screenSize)
+	return { screenSize = screenSize }
 end))

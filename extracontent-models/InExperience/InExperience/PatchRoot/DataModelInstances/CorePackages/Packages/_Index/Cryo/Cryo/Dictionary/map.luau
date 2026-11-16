@@ -1,16 +1,19 @@
-local function map(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 8
-	local t2 = {}
+local function map(items, callback)
+	local result = {}
 
-	for v5, v6 in t1 do
-		local v7, v8 = p1(v6, v5)
-		local v9 = if v8 ~= nil then v8 else v5
+	for k, item in items do
+		local v, v2 = callback(item, k)
 
-		if v7 ~= nil then
-			t2[v9] = v7
+		if v2 == nil then
+			v2 = k
+		end
+
+		if v ~= nil then
+			result[v2] = v
 		end
 	end
 
-	return t2
+	return result
 end
 
 return map

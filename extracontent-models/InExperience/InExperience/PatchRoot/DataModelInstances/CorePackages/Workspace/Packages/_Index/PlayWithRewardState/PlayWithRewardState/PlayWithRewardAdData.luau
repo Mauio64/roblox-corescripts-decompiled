@@ -2,14 +2,13 @@ local PlayWithRewardState = script:FindFirstAncestor("PlayWithRewardState")
 local PlayWithRewardExperimentData = require(PlayWithRewardState.PlayWithRewardExperimentData)
 
 return {
-	new = function(p1, p2, p3, p4, p5) -- line: 16
-		-- upvalues: PlayWithRewardExperimentData (copy)
+	new = function(adAvailabilityResult, productId, productName, productImageAssetId, p)
 		return {
-			adAvailabilityResult = p1,
-			productId = p2,
-			productName = p3,
-			productImageAssetId = p4,
-			experimentVariantData = PlayWithRewardExperimentData.fromJsonData(p5)
+			["adAvailabilityResult"] = adAvailabilityResult,
+			productId = productId,
+			productName = productName,
+			productImageAssetId = productImageAssetId,
+			experimentVariantData = PlayWithRewardExperimentData.fromJsonData(p)
 		}
 	end
 }

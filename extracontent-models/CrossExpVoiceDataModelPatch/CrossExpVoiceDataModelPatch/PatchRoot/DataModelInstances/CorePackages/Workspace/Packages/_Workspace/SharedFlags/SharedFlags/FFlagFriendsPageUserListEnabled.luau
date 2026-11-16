@@ -1,4 +1,1 @@
-local FFlagFriendsPageAlwaysOpenPPV = require(script.Parent.FFlagFriendsPageAlwaysOpenPPV)
-local FFlagFriendsPageUnifiedOpenProfileLogic = require(script.Parent.FFlagFriendsPageUnifiedOpenProfileLogic)
-
-return game:DefineFastFlag("FriendsPageUserListEnabled_v2", false) and (FFlagFriendsPageUnifiedOpenProfileLogic or FFlagFriendsPageAlwaysOpenPPV)
+return game:DefineFastFlag("FriendsPageUserListEnabled_v2", false)

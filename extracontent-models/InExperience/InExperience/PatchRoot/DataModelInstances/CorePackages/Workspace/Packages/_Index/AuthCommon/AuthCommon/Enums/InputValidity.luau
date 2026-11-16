@@ -1,5 +1,1 @@
-return {
-	Unvalidated = "Unvalidated",
-	Valid = "Valid",
-	Invalid = "Invalid"
-}
+return { Unvalidated = "Unvalidated", Valid = "Valid", Invalid = "Invalid" }

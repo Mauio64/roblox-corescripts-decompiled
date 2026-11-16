@@ -1,12 +1,12 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local LuaSocialLibrariesDeps = require(ProfilePlatformParent.LuaSocialLibrariesDeps)
+local parent = ProfilePlatform.Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
 local myRoduxNetworking = require(ProfilePlatform.Networking.myRoduxNetworking)
 
-if require(ProfilePlatform.Flags.FFlagProfilePlatformPresenceStoreMigration) then
+local FFlagProfilePlatformPresenceStoreMigration = require(ProfilePlatform.Flags.FFlagProfilePlatformPresenceStoreMigration)
+
+if FFlagProfilePlatformPresenceStoreMigration then
 	return nil
 end
 
-return (LuaSocialLibrariesDeps.NetworkingPresence.config({
-	roduxNetworking = myRoduxNetworking
-}))
+return (LuaSocialLibrariesDeps.NetworkingPresence.config({ roduxNetworking = myRoduxNetworking }))

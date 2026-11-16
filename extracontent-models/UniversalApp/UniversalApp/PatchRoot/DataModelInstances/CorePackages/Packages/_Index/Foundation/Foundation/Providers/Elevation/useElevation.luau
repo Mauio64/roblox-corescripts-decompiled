@@ -1,71 +1,56 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+local React = require(parent.React)
 
 require(Foundation.Enums.ElevationLayer)
 
 local ElevationProvider = require(script.Parent.ElevationProvider)
-
 require(script.Parent.elevation)
 
 local useElevationManager = ElevationProvider.useElevationManager
 local useOwnerToken = ElevationProvider.useOwnerToken
 
-local function useElevation(p1, t1: {[any]: any}) -- line: 20
-	-- upvalues: useElevationManager (copy), useOwnerToken (copy), React (copy)
-	local v10 = useElevationManager()
-	local v11 = useOwnerToken()
-	local v12 = React.useMemo(function() -- line: 25
-		-- upvalues: v11 (copy), p1 (copy), t1 (copy), v10 (copy)
-		local v13 = v11 ~= nil and v11.layer == p1
+local function useElevation(layer, p)
+	local v = useElevationManager()
+	local owner = useOwnerToken()
 
-		if t1.stackAboveOwner then
-			if not v11 then
-				return v10.acquire(p1, {
-					reserve = false
-				})
-			end
+	local v2 = React.useMemo(function()
+		local reserve
 
-			if v13 then
-				return v10.acquire(p1, {
-					reserve = true,
-					owner = v11
-				})
-			end
-
-			local v14 = v11.zIndex + 1
-
-			return {
-				index = -1,
-				layer = p1,
-				zIndex = v14
-			}
+		if owner == nil then
+			reserve = false
+		else
+			reserve = owner.layer == layer
 		end
 
-		return v10.acquire(p1, {
-			reserve = v13
-		})
-	end, {
-		p1,
-		v11,
-		v10,
-		t1.stackAboveOwner
-	})
+		if not p.stackAboveOwner then
+			return v.acquire(layer, { reserve = reserve })
+		end
 
-	React.useEffect(function() -- line: 57
-		-- upvalues: v12 (copy), v10 (copy), p1 (copy)
-		return function() -- line: 58
-			-- upvalues: v12 (copy), v10 (copy), p1 (copy)
-			if v12.index ~= nil and v12.index >= 0 then
-				v10.releaseIfTop(p1, v12.index)
+		if not owner then
+			return v.acquire(layer, { reserve = false })
+		end
+
+		if reserve then
+			return v.acquire(layer, { reserve = true, owner = owner })
+		end
+
+		return {
+			layer = layer,
+			index = -1,
+			zIndex = owner.zIndex + 1
+		}
+	end, { layer, owner, v, p.stackAboveOwner })
+
+	React.useEffect(function()
+		return function()
+			if v2.index ~= nil and v2.index >= 0 then
+				v.releaseIfTop(layer, v2.index)
 			end
 		end
-	end, {
-		p1,
-		v12.index
-	})
+	end, { layer, v2.index })
 
-	return v12
+	return v2
 end
 
 return useElevation

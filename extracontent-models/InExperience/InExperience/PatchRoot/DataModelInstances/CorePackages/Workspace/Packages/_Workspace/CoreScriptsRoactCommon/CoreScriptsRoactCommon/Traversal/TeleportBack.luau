@@ -1,43 +1,48 @@
 local TeleportService = game:GetService("TeleportService")
-local EngineFeature = game:GetEngineFeature("UseTeleportedPlacesBackHistory2")
-local Parent = script:FindFirstAncestor("CoreScriptsRoactCommon").Parent
-local isRunningInStudio = require(Parent.AppCommonLib).isRunningInStudio
-local FFlagUseLocalTraversalHistory = require(script.Parent.Flags).FFlagUseLocalTraversalHistory
-local v6 = game:DefineFastInt("TeleportBackAttemptLimit", 5)
-local v7 = game:DefineFastInt("TeleportBackRetryDelay", 1)
 
-local function TeleportBack(n1: number?) -- line: 17
-	-- upvalues: isRunningInStudio (copy), FFlagUseLocalTraversalHistory (copy), EngineFeature (copy), TeleportService (copy), v7 (copy), v6 (copy)
+local engineFeature = game:GetEngineFeature("UseTeleportedPlacesBackHistory2")
+
+local parent = script:FindFirstAncestor("CoreScriptsRoactCommon").Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+
+local isRunningInStudio = AppCommonLib.isRunningInStudio
+
+local Flags = require(script.Parent.Flags)
+local FFlagUseLocalTraversalHistory = Flags.FFlagUseLocalTraversalHistory
+local defineFastInt = game:DefineFastInt("TeleportBackAttemptLimit", 5)
+local defineFastInt2 = game:DefineFastInt("TeleportBackRetryDelay", 1)
+
+local function TeleportBack(p: number?)
 	if isRunningInStudio() then
 		warn("Teleporting is not supported in Studio")
-
 		return
 	end
 
-	local n2 = 0
-	local ok, result
+	local count = 0
+	local success, result
 
 	repeat
-		ok, result = pcall(function() -- line: 27
-			-- upvalues: FFlagUseLocalTraversalHistory (copy), EngineFeature (copy), n1 (copy), TeleportService (copy)
-			if (FFlagUseLocalTraversalHistory or EngineFeature) and n1 then
-				return TeleportService:TeleportTrustedBackHistory(n1)
+		success, result = pcall(function()
+			if (FFlagUseLocalTraversalHistory or engineFeature) and p then
+				return TeleportService:TeleportTrustedBackHistory(p)
 			end
 
 			return TeleportService:TeleportTrustedBackForth(false)
 		end)
-		n2 += 1
 
-		if not ok then
-			task.wait(v7)
+		count += 1
+
+		if not success then
+			task.wait(defineFastInt2)
 		end
-	until ok or n2 == v6
+	until success or count == defineFastInt
 
-	if not ok then
+	if not success then
 		warn(result)
 	end
 
-	return ok, result
+	return success, result
 end
 
 return TeleportBack

@@ -1,33 +1,65 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
-local GameGetGameInfoStore = require(Parent.DataHydration.GameGetGameInfoStore)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local GameGetGameInfoStore = require(parent.DataHydration.GameGetGameInfoStore)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagMomentsServeEDPVideos = SharedFlags.FFlagMomentsServeEDPVideos
+
 local useSignalState = SignalsReact.useSignalState
-local createComputed = Signals.createComputed
-local t1 = {
-	name = nil,
-	creatorName = nil,
-	isCreatorVerified = false
-}
-local v8 = createComputed(function() -- line: 32
+
+local v = { name = nil, creatorName = nil, isCreatorVerified = false, rootPlaceId = nil }
+local computed = Signals.createComputed(function(): nil
 	return nil
 end)
 
-return function(n1: number?) -- line: 36
-	-- upvalues: GameGetGameInfoStore (copy), v8 (copy), useSignalState (copy), t1 (copy)
-	local v10 = if not n1 or n1 == 0 then nil else tostring(n1)
-	local v11 = if not v10 then v8 else GameGetGameInfoStore(false).getAndFetchGameInfo(v10).data
-	local v12 = useSignalState(v11)
+return function(p: number?)
+	local v2
 
-	if v12 == nil then
-		return t1
+	if p and p ~= 0 then
+		v2 = tostring(p)
 	end
 
-	local creator = v12.creator
+	local v3
 
-	return {
-		name = v12.name,
-		creatorName = if not creator then nil else creator.name,
-		isCreatorVerified = not not creator and creator.hasVerifiedBadge == true
-	}
+	if v2 then
+		v3 = GameGetGameInfoStore(false).getAndFetchGameInfo(v2).data
+	else
+		v3 = computed
+	end
+
+	local v4 = useSignalState(v3)
+
+	if v4 == nil then
+		return v
+	end
+
+	local creator = v4.creator
+	local v5 = { name = v4.name, creatorName = 0, isCreatorVerified = 0, rootPlaceId = 0 }
+	local creatorName
+
+	if creator then
+		creatorName = creator.name
+	end
+
+	v5.creatorName = creatorName
+	local isCreatorVerified
+
+	if creator then
+		isCreatorVerified = creator.hasVerifiedBadge == true
+	else
+		isCreatorVerified = false
+	end
+
+	v5.isCreatorVerified = isCreatorVerified
+	local rootPlaceId
+
+	if FFlagMomentsServeEDPVideos then
+		rootPlaceId = tonumber(v4.rootPlaceId)
+	end
+
+	v5.rootPlaceId = rootPlaceId
+	return v5
 end

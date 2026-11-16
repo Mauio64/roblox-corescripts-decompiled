@@ -1,0 +1,12 @@
+local viewerRelationshipUtils = require("@game/CorePackages/Workspace/Packages/_Workspace/ProfilePlatform/ProfilePlatform/Components/ProfilePlatformPage/viewerRelationshipUtils")
+
+local function getFriendStatusFromProfileResponse(p2)
+	local viewerRelationshipFromProfileResponse = viewerRelationshipUtils.getViewerRelationshipFromProfileResponse(p2)
+	local contextualInformationFromProfileResponse = viewerRelationshipUtils.getContextualInformationFromProfileResponse(p2)
+	return viewerRelationshipUtils.mapViewerRelationshipAndContextToAnalyticsFriendStatus(
+		viewerRelationshipFromProfileResponse,
+		contextualInformationFromProfileResponse
+	)
+end
+
+return getFriendStatusFromProfileResponse

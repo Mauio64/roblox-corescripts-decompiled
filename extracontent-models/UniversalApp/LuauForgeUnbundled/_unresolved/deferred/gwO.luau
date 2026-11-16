@@ -1,0 +1,21 @@
+local CorePackages = game:GetService("CorePackages")
+
+local React = require(CorePackages.Packages.React)
+local Cryo = require(CorePackages.Packages.Cryo)
+
+local accountUnlockDeepLinkPage = require("@luauforge/deferred/gwP").AccountUnlockDeepLinkPage
+
+local module = require("@luauforge/bundled/dHq")
+local module2 = require("@luauforge/bundled/fvl")
+local module3 = require("@luauforge/bundled/gxq")
+
+return function(options)
+	return React.createElement(
+		accountUnlockDeepLinkPage,
+		Cryo.Dictionary.join(options or {}, {
+			ResetNavigationHistory = module,
+			ApiFetchAccessStatus = module3,
+			closeCentralOverlayThunk = module2
+		})
+	)
+end

@@ -1,5 +1,1 @@
-return {
-	enableSchedulerDebugging = false,
-	enableIsInputPending = false,
-	enableProfiling = false
-}
+return { enableSchedulerDebugging = false, enableIsInputPending = false, enableProfiling = false }

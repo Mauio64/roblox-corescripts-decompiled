@@ -1,59 +1,56 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("ExpChat").Parent
 
-return {
-	deriveMicSendButton = function(p1, t1: {[any]: any}) -- line: 56
-		-- upvalues: Foundation (copy)
-		local idleSendIcon = t1.idleSendIcon
-		local idleSendVariant = t1.idleSendVariant
-		local idleSendActivated = t1.idleSendActivated
-		local v8 = t1.idleSendDisabled or false
-		local v9 = false
+local Foundation = require(parent.Foundation)
+local DictationAffordances = {}
 
-		if p1.isRecording then
-			idleSendActivated = p1.onMicTap
-			v8 = false
-		elseif p1.isTranscribing then
-			v8 = true
-		elseif p1.isListening then
-			idleSendIcon = Foundation.Enums.IconName.X
-			idleSendVariant = Foundation.Enums.ButtonVariant.Standard
-			idleSendActivated = p1.dictation.cancel
-			v8 = false
-		elseif t1.hasEmptyInputText and p1.isDictationEligible then
-			if t1.isTextBoxFocused then
-				v8 = true
-			else
-				idleSendIcon = Foundation.Enums.IconName.Microphone
-				idleSendVariant = Foundation.Enums.ButtonVariant.Utility
-				idleSendActivated = p1.onMicTap
-				v8 = false
-				v9 = true
-			end
+function DictationAffordances.deriveMicSendButton(data, data2)
+	local icon = data2.idleSendIcon
+	local variant = data2.idleSendVariant
+	local onActivated = data2.idleSendActivated
+	local isDisabled = data2.idleSendDisabled or false
+	local v = false
+
+	if data.isRecording then
+		onActivated = data.onMicTap
+		isDisabled = false
+	elseif data.isTranscribing then
+		isDisabled = true
+	elseif data.isListening then
+		icon = Foundation.Enums.IconName.X
+		variant = Foundation.Enums.ButtonVariant.Standard
+		onActivated = data.dictation.cancel
+		isDisabled = false
+	elseif data2.hasEmptyInputText and data.isDictationEligible then
+		if data2.isTextBoxFocused then
+			isDisabled = true
+		else
+			icon = Foundation.Enums.IconName.Microphone
+			variant = Foundation.Enums.ButtonVariant.Utility
+			onActivated = data.onMicTap
+			isDisabled = false
+			v = true
 		end
-
-		return {
-			icon = idleSendIcon,
-			variant = idleSendVariant,
-			isDisabled = v8,
-			onActivated = idleSendActivated,
-			useLongPressOverlay = v9 and p1.micGestureHandlers ~= nil
-		}
-	end,
-	deriveBackgroundColors = function(p2, t2: {[any]: any}) -- line: 115
-		if p2.isListening then
-			return {
-				color3 = t2.listeningColor3,
-				baseTransparency = t2.listeningTransparency
-			}
-		end
-
-		return {
-			color3 = t2.defaultColor3,
-			baseTransparency = t2.defaultTransparency
-		}
-	end,
-	shouldPreventFade = function(p3) -- line: 131
-		return p3.isRecording or (p3.isTranscribing or p3.isListening)
 	end
-}
+
+	return {
+		icon = icon,
+		variant = variant,
+		isDisabled = isDisabled,
+		onActivated = onActivated,
+		useLongPressOverlay = v and data.micGestureHandlers ~= nil
+	}
+end
+
+function DictationAffordances.deriveBackgroundColors(p, data)
+	if p.isListening then
+		return { color3 = data.listeningColor3, baseTransparency = data.listeningTransparency }
+	end
+
+	return { color3 = data.defaultColor3, baseTransparency = data.defaultTransparency }
+end
+
+function DictationAffordances.shouldPreventFade(data, flag: boolean)
+	return data.isRecording or data.isTranscribing or data.isListening and not flag
+end
+
+return DictationAffordances

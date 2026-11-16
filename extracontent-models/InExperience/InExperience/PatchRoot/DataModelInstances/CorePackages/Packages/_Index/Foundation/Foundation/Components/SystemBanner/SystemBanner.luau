@@ -1,132 +1,167 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local ReactUtils = require(FoundationParent.ReactUtils)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
+
 local AlertActions = require(Foundation.Components.AlertActions)
 local AlertConstants = require(Foundation.Components.AlertActions.AlertConstants)
-
 require(Foundation.Enums.AlertSeverity)
-
 local AlertVariant = require(Foundation.Enums.AlertVariant)
 local Breakpoint = require(Foundation.Enums.Breakpoint)
-local BuilderIcons = require(FoundationParent.BuilderIcons)
-
+local BuilderIcons = require(parent.BuilderIcons)
 require(Foundation.Enums.ButtonVariant)
-
 local CloseAffordance = require(Foundation.Components.CloseAffordance)
 local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
-local Flags = require(Foundation.Utility.Flags)
 local Icon = require(Foundation.Components.Icon)
 local IconSize = require(Foundation.Enums.IconSize)
 local IconVariant = BuilderIcons.IconVariant
 local InputSize = require(Foundation.Enums.InputSize)
 local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useBreakpoint = require(Foundation.Providers.Responsive.Hooks.useBreakpoint)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
+
 local useSystemBannerVariants = require(script.Parent.useSystemBannerVariants)
+
 local SEVERITY_TO_ICON = AlertConstants.SEVERITY_TO_ICON
-local t1 = {
-	testId = "--foundation-system-banner",
-	variant = AlertVariant.Standard
+
+local v = { variant = AlertVariant.Standard, testId = "--foundation-system-banner" }
+
+local standards = {
+	[AlertVariant.System] = AlertVariant.Standard,
+	[AlertVariant.Feedback] = AlertVariant.Standard
 }
 
-local function SystemBanner(p1, p2) -- line: 57
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useSystemBannerVariants (copy), React (copy), ReactUtils (copy), useBreakpoint (copy), Flags (copy), Breakpoint (copy), AlertActions (copy), View (copy), withCommonProps (copy), PresentationContext (copy), Icon (copy), SEVERITY_TO_ICON (copy), IconSize (copy), IconVariant (copy), Text (copy), CloseAffordance (copy), InputSize (copy), CloseAffordanceVariant (copy)
-	local v30 = withDefaults(p1, t1)
-	local v31 = useTokens()
-	local v32 = useSystemBannerVariants(v31, v30.variant, v30.severity)
-	local v33, v34 = React.useState(nil)
-	local v35 = ReactUtils.useComposedRef(p2, v34)
-	local v36 = useBreakpoint(v33)
-	local v37 = if not Flags.FoundationSystemBannerWrapActionsOnXSmall then v36 == Breakpoint.XSmall or v36 == Breakpoint.Small else v36 == Breakpoint.XSmall
-	local v38 = React.useMemo(function() -- line: 71
-		-- upvalues: React (copy), AlertActions (copy), v30 (copy), v37 (copy), v31 (copy)
+local function SystemBanner(p, p2)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local v4 = useSystemBannerVariants(v3, standards[v2.variant] or v2.variant, v2.severity)
+
+	local state, setState = React.useState(nil)
+	local ref = ReactUtils.useComposedRef(p2, setState)
+
+	local v5 = useBreakpoint(state) == Breakpoint.XSmall
+
+	local actions = React.useMemo(function()
 		return (React.createElement(AlertActions, {
+			actions = v2.actions,
+			testId = `{v2.testId}--actions`,
 			LayoutOrder = 3,
-			actions = v30.actions,
-			testId = `{ v30.testId }--actions`,
 			tag = {
 				["row gap-small auto-xy"] = true,
-				["align-x-left"] = v37,
-				["align-x-right"] = not v37
+				["align-x-left"] = v5,
+				["align-x-right"] = not v5
 			},
-			padding = if not v37 then nil else {
-				top = UDim.new(0, v31.Gap.Small)
-			}
+			padding = v5 and { top = UDim.new(0, v3.Gap.Small) } or nil
 		}))
-	end, {
-		v30.actions,
-		v30.testId,
-		v37,
-		v31.Gap.Small
+	end, { v2.actions, v2.testId, v5, v3.Gap.Small })
+
+	local v6 = React.useMemo(function()
+		return { colorNamespace = v4.container.colorNamespace }
+	end, { v4.container.colorNamespace })
+
+	local createElement = React.createElement
+
+	local v7 = withCommonProps(v2, {
+		tag = {
+			[v4.container.tag] = true,
+			["align-y-center"] = v2.title == "" or v2.description == nil,
+			["align-y-top"] = v2.title ~= "" and v2.description ~= nil
+		},
+		ref = ref
 	})
 
-	return React.createElement(View, withCommonProps(v30, {
-		tag = {
-			[v32.container.tag] = true,
-			["align-y-center"] = v30.title == "" or v30.description == nil,
-			["align-y-top"] = v30.title ~= "" and v30.description ~= nil
-		},
-		ref = v35
-	}), React.createElement(PresentationContext.Provider, {
-		value = {
-			colorNamespace = v32.container.colorNamespace
-		}
-	}, {
+	local createElement2 = React.createElement
+	local provider = PresentationContext.Provider
+
+	local v8 = {
 		Icon = React.createElement(Icon, {
 			LayoutOrder = 1,
-			name = SEVERITY_TO_ICON[v30.severity],
+			name = SEVERITY_TO_ICON[v2.severity],
 			size = IconSize.Large,
 			variant = IconVariant.Filled,
-			style = v32.icon.style,
-			testId = `{ v30.testId }--icon`
+			style = v4.icon.style,
+			testId = `{v2.testId}--icon`
 		}),
-		Content = React.createElement(View, {
+		Content = 0,
+		Actions = 0,
+		Close = 0
+	}
+
+	local createElement3 = React.createElement
+	local v9 = {
+		LayoutOrder = 2,
+		tag = {
+			["fill auto-xy"] = true,
+			col = v5,
+			row = not v5
+		},
+		testId = `{v2.testId}--content`
+	}
+
+	local createElement4 = React.createElement
+	local title
+
+	if v2.title ~= "" then
+		title = React.createElement(Text, {
+			Text = v2.title,
+			textStyle = v4.title.style,
+			tag = v4.title.tag,
+			LayoutOrder = 1,
+			testId = `{v2.testId}--title`
+		})
+	end
+
+	local description
+
+	if v2.description then
+		description = React.createElement(Text, {
+			Text = v2.description,
+			textStyle = v4.description.style,
+			tag = v4.description.tag,
 			LayoutOrder = 2,
-			tag = {
-				["fill auto-xy"] = true,
-				col = v37,
-				row = not v37
-			},
-			testId = `{ v30.testId }--content`
-		}, {
-			Text = React.createElement(View, {
-				LayoutOrder = 2,
-				tag = "col auto-xy"
-			}, {
-				Title = if v30.title == "" then nil else React.createElement(Text, {
-					LayoutOrder = 1,
-					Text = v30.title,
-					textStyle = v32.title.style,
-					tag = v32.title.tag,
-					testId = `{ v30.testId }--title`
-				}),
-				Description = if not v30.description then nil else React.createElement(Text, {
-					LayoutOrder = 2,
-					Text = v30.description,
-					textStyle = v32.description.style,
-					tag = v32.description.tag,
-					testId = `{ v30.testId }--description`
-				}),
-				Actions = if not v37 then nil else v38
-			})
-		}),
-		Actions = if v37 then nil else v38,
-		Close = if v30.onClose == nil then nil else React.createElement(CloseAffordance, {
-			LayoutOrder = 4,
-			onActivated = v30.onClose,
+			testId = `{v2.testId}--description`
+		})
+	end
+
+	local actions2
+
+	if v5 then
+		actions2 = actions
+	end
+
+	v8.Content = createElement3(View, v9, {
+		Text = createElement4(View, { LayoutOrder = 2, tag = "col auto-xy" }, {
+			Title = title,
+			Description = description,
+			Actions = actions2
+		})
+	})
+
+	if v5 then
+		actions = nil
+	end
+
+	v8.Actions = actions
+	local close
+
+	if v2.onClose ~= nil then
+		close = React.createElement(CloseAffordance, {
+			onActivated = v2.onClose,
 			size = InputSize.Small,
 			variant = CloseAffordanceVariant.Utility,
-			testId = `{ v30.testId }--close`
+			LayoutOrder = 4,
+			testId = `{v2.testId}--close`
 		})
-	}))
+	end
+
+	v8.Close = close
+	return createElement(View, v7, createElement2(provider, { value = v6 }, v8))
 end
 
 return React.memo(React.forwardRef(SystemBanner))

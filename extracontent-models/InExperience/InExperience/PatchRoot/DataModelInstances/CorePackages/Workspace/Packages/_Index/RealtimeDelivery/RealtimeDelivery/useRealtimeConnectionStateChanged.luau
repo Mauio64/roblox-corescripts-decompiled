@@ -1,48 +1,47 @@
 local RealtimeDelivery = script:FindFirstAncestor("RealtimeDelivery")
-local RealtimeDeliveryParent = RealtimeDelivery.Parent
-local List = require(RealtimeDeliveryParent.Cryo).List
-local React = require(RealtimeDeliveryParent.React)
-
+local parent = RealtimeDelivery.Parent
+local Cryo = require(parent.Cryo)
+local List = Cryo.List
+local React = require(parent.React)
 require(RealtimeDelivery.RealtimeTypes)
 
 local useRobloxEventReceiver = require(script.Parent.useRobloxEventReceiver)
 local useRealtimeNamespace = require(script.Parent.useRealtimeNamespace)
 
-local function useRealtimeConnectionStateChanged(s1: string, p1: ((...any) -> ...any), t1: {[any]: any}) -- line: 12
-	-- upvalues: useRobloxEventReceiver (copy), React (copy), useRealtimeNamespace (copy), List (copy)
-	local v11 = useRobloxEventReceiver()
-	local v12 = React.useRef(nil)
+local function useRealtimeConnectionStateChanged(p: string, callback, p2)
+	local v = useRobloxEventReceiver()
+	local ref = React.useRef(nil)
 
-	useRealtimeNamespace(s1, function(p2) -- line: 20
-		-- upvalues: v12 (copy)
-		local SequenceNumber = p2.SequenceNumber
+	useRealtimeNamespace(p, function(p3)
+		local sequenceNumber = p3.SequenceNumber
 
-		if SequenceNumber and (v12.current == nil or SequenceNumber > v12.current) then
-			v12.current = SequenceNumber
+		if sequenceNumber and (ref.current == nil or ref.current < sequenceNumber) then
+			ref.current = sequenceNumber
 		end
-	end, List.join({ s1 }, t1))
-	React.useEffect(function() -- line: 29
-		-- upvalues: v11 (copy), s1 (copy), v12 (copy), p1 (copy)
-		local v15 = v11:observeEvent("signalR", function(p3, _, p5) -- line: 32
-			-- upvalues: s1 (copy), v12 (copy), p1 (copy)
-			local v19 = p5[s1]
-			local v20 = v19 ~= nil and (v12.current == nil or v19 ~= v12.current)
+	end, List.join({ p }, p2))
 
-			if v19 then
-				v12.current = v19
+	React.useEffect(function()
+		local v2 = v:observeEvent("signalR", function(p3, _, p4)
+			local current = p4[p]
+			local v2
+
+			if current == nil then
+				v2 = false
+			else
+				v2 = ref.current == nil or ref.current ~= current
 			end
 
-			p1(p3, v20)
+			if current then
+				ref.current = current
+			end
+
+			callback(p3, v2)
 		end)
 
-		return function() -- line: 47
-			-- upvalues: v15 (copy)
-			v15:disconnect()
+		return function()
+			v2:disconnect()
 		end
-	end, List.join({
-		v11,
-		v12.current
-	}, t1))
+	end, List.join({ v, ref.current }, p2))
 end
 
 return useRealtimeConnectionStateChanged

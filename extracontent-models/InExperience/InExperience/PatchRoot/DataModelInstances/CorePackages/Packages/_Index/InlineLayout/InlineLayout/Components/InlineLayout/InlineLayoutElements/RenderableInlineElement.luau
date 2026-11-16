@@ -1,38 +1,43 @@
-local Parent = script:FindFirstAncestor("Components").Parent
-local ParentParent = Parent.Parent
-local React = require(ParentParent.React)
-local Dash = require(ParentParent.Dash)
-local InlineElementType = require(Parent.Utils.InlineElementType)
+local parent = script:FindFirstAncestor("Components").Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+
+local Dash = require(parent2.Dash)
+
+local InlineElementType = require(parent.Utils.InlineElementType)
+
 local join = Dash.join
-local t1 = {}
 
-t1.__index = t1
-t1.__type = InlineElementType
+local RenderableInlineElement = {}
+RenderableInlineElement.__index = RenderableInlineElement
+RenderableInlineElement.__type = InlineElementType
 
-function t1.new(p1, p2, p3) -- line: 44
-	-- upvalues: t1 (copy), Dash (copy)
-	local self = setmetatable({}, t1)
-
-	self.props = p2
-	self.mapProps = p3 or Dash.identity
-	self.Element = p1
-
+function RenderableInlineElement.new(element, props, p)
+	local self = setmetatable({}, RenderableInlineElement)
+	self.props = props
+	self.mapProps = p or Dash.identity
+	self.Element = element
 	return self
 end
-function t1.getWidth(p4) -- line: 52
-	return p4.props.Size.Width.Offset
-end
-function t1.split(p5) -- line: 56
-	-- upvalues: t1 (copy), join (copy)
-	return t1.new(p5.Element, join(p5.props))
-end
-function t1.render(t2: {[any]: any}, s1: string, n1: number) -- line: 60
-	-- upvalues: React (copy), Dash (copy)
-	return React.createElement(t2.Element, t2.mapProps(Dash.assign(t2.props, {
-		id = s1,
-		key = tostring(n1),
-		LayoutOrder = n1
-	})))
+
+function RenderableInlineElement.getWidth(p)
+	return p.props.Size.Width.Offset
 end
 
-return t1
+function RenderableInlineElement.split(p)
+	return RenderableInlineElement.new(p.Element, join(p.props))
+end
+
+function RenderableInlineElement.render(props, id: string, layoutOrder: number)
+	return React.createElement(
+		props.Element,
+		props.mapProps(Dash.assign(props.props, {
+			id = id,
+			key = tostring(layoutOrder),
+			LayoutOrder = layoutOrder
+		}))
+	)
+end
+
+return RenderableInlineElement

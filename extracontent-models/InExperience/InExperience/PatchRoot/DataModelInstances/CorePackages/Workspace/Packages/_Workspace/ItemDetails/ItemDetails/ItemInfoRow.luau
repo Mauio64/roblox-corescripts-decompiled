@@ -1,127 +1,280 @@
-local Parent = script:FindFirstAncestor("ItemDetails").Parent
-local React = require(Parent.React)
-local Focusable = require(Parent.RoactGamepad).Focusable
-local VerifiedBadges = require(Parent.VerifiedBadges)
-local UIBlox = require(Parent.UIBlox)
-local Skeleton = require(Parent.Foundation).Skeleton
+local parent = script:FindFirstAncestor("ItemDetails").Parent
+
+local React = require(parent.React)
+local RoactGamepad = require(parent.RoactGamepad)
+local Focusable = RoactGamepad.Focusable
+local VerifiedBadges = require(parent.VerifiedBadges)
+
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Skeleton = Foundation.Skeleton
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local useStyle = UIBlox.Core.Style.useStyle
 local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
-local v12 = Images["icons/navigation/pushRight_small"] or "LuaApp/icons/GameDetails/navigation/pushRight_small"
+
+local iconsnavigationpushRight_small = Images["icons/navigation/pushRight_small"]
+	or "LuaApp/icons/GameDetails/navigation/pushRight_small"
+
 local vector2 = Vector2.new(14, 14)
-local uDim2 = UDim2.new(0.3, 0, 0.8, 0)
 
-return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 47
-	-- upvalues: useStyle (copy), useSelectionCursor (copy), CursorKind (copy), vector2 (copy), Focusable (copy), React (copy), VerifiedBadges (copy), Skeleton (copy), uDim2 (copy), ImageSetLabel (copy), v12 (copy)
-	local t1LayoutOrder = t1.LayoutOrder
-	local infoName = t1.infoName
-	local infoData = t1.infoData
-	local onActivate = t1.onActivate
-	local hasVerifiedBadge = t1.hasVerifiedBadge
-	local isLoading = t1.isLoading
-	local v23 = useStyle()
-	local Theme = v23.Theme
-	local Font = v23.Font
-	local v26 = useSelectionCursor(CursorKind.RoundedRect)
-	local TextEmphasisColor = Theme.TextEmphasis.Color
-	local v28 = Font.BaseSize * Font.Body.RelativeSize
-	local v29 = -11 - vector2.X
-	local v30 = p1 ~= nil
-	local v31 = not v30 and "ImageButton" or Focusable.ImageButton
-	local v32 = not isLoading and not hasVerifiedBadge
-	local v33 = not isLoading and hasVerifiedBadge
+local udim = UDim2.new(0.3, 0, 0.8, 0)
 
-	return React.createElement(v31, {
+return (React.forwardRef(function(props, ref)
+	local layoutOrder = props.LayoutOrder
+	local infoName = props.infoName
+	local infoData = props.infoData
+	local onActivate = props.onActivate
+	local hasVerifiedBadge = props.hasVerifiedBadge
+	local isLoading = props.isLoading
+
+	local v = useStyle()
+	local theme = v.Theme
+	local font = v.Font
+
+	local v2 = useSelectionCursor(CursorKind.RoundedRect)
+
+	local color = theme.TextEmphasis.Color
+	local v3 = font.BaseSize * font.Body.RelativeSize
+	local v4 = -11 - vector2.X
+	local v5 = ref ~= nil
+	local v6 = not v5 and "ImageButton" or Focusable.ImageButton
+	local infoDataTextLabel = not (isLoading or hasVerifiedBadge)
+	local infoDataWithEmoji = not isLoading and hasVerifiedBadge
+
+	local createElement = React.createElement
+	local onActivatesByActivated = {
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		LayoutOrder = t1LayoutOrder,
-		Size = UDim2.new(1, 0, 0, not t1.hideDivider and 53 or 52),
+		LayoutOrder = layoutOrder,
+		Size = UDim2.new(1, 0, 0, props.hideDivider and 52 or 53),
 		[React.Event.Activated] = onActivate,
-		NextSelectionUp = t1.NextSelectionUp,
-		NextSelectionDown = t1.NextSelectionDown,
-		NextSelectionLeft = t1.NextSelectionLeft,
-		NextSelectionRight = t1.NextSelectionRight,
-		ref = p1,
-		SelectionImageObject = v30 and v26 or nil,
-		Selectable = t1.Selectable
-	}, {
-		Container = React.createElement("Frame", {
+		NextSelectionUp = props.NextSelectionUp,
+		NextSelectionDown = props.NextSelectionDown,
+		NextSelectionLeft = props.NextSelectionLeft,
+		NextSelectionRight = props.NextSelectionRight,
+		ref = ref,
+		SelectionImageObject = v5 and v2 or nil,
+		Selectable = props.Selectable
+	}
+
+	local createElement2 = React.createElement
+	local v7 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, props.hideDivider and 0 or -1)
+	}
+
+	local createElement3 = React.createElement
+	local font3
+
+	if not FoundationFontFaceMigration then
+		font3 = font.Body.Font
+	end
+
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(v.Tokens.Typography.BodyLarge.Font)
+	end
+
+	local v8 = {
+		InfoNameTextLabel = createElement3("TextLabel", {
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, not t1.hideDivider and -1 or 0)
-		}, {
-			InfoNameTextLabel = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				Font = Font.Body.Font,
-				Size = UDim2.new(0.5, 0, 1, 0),
-				Text = infoName,
-				TextColor3 = Theme.TextDefault.Color,
-				TextSize = v28,
-				TextTruncate = Enum.TextTruncate.AtEnd,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Center
-			}),
-			InfoDataWithEmoji = v33 and React.createElement(VerifiedBadges.EmojiWrapper, {
-				emoji = VerifiedBadges.emoji.verified,
-				font = if not onActivate then Font.Body.Font else Font.Header2.Font,
-				anchorPoint = Vector2.new(1, 0),
-				position = UDim2.new(1, not onActivate and 0 or v29, 0, 0),
-				size = UDim2.new(0.5, 0, 1, 0),
-				automaticSize = Enum.AutomaticSize.None,
-				horizontalAlignment = Enum.HorizontalAlignment.Right,
-				verticalAlignment = Enum.VerticalAlignment.Center
-			}, {
-				InfoDataTextLabel = React.createElement("TextLabel", {
-					BackgroundTransparency = 1,
-					Font = onActivate and Font.Header2.Font or Font.Body.Font,
-					Size = UDim2.new(0, 0, 1, 0),
-					Text = infoData,
-					TextColor3 = if not onActivate then Theme.TextDefault.Color else Theme.TextEmphasis.Color,
-					TextSize = v28,
-					TextTruncate = Enum.TextTruncate.AtEnd,
-					TextScaled = t1.TextScaled,
-					AutomaticSize = Enum.AutomaticSize.X,
-					TextXAlignment = Enum.TextXAlignment.Left
-				})
-			}),
-			InfoDataTextLabel = v32 and React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(1, 0),
-				Position = UDim2.new(1, not onActivate and 0 or v29, 0, 0),
-				Font = if not onActivate then Font.Body.Font else Font.Header2.Font,
-				Size = UDim2.new(0.5, 0, 1, 0),
-				Text = infoData,
-				TextColor3 = if not onActivate then Theme.TextDefault.Color else Theme.TextEmphasis.Color,
-				TextSize = v28,
-				TextTruncate = Enum.TextTruncate.AtEnd,
-				TextScaled = t1.TextScaled,
-				TextXAlignment = Enum.TextXAlignment.Right,
-				TextYAlignment = Enum.TextYAlignment.Center
-			}, {
-				TextSizeConstraint = t1.TextScaled and React.createElement("UITextSizeConstraint", {
-					MaxTextSize = v28
-				})
-			}),
-			LoadingShimmer = isLoading and React.createElement(Skeleton, {
-				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.new(1, 0, 0.5, 0),
-				Size = uDim2
-			}),
-			LinkIcon = onActivate and React.createElement(ImageSetLabel, {
-				BorderSizePixel = 0,
-				BackgroundTransparency = 1,
-				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.new(1, 0, 0.5, 0),
-				Size = UDim2.fromOffset(vector2.X, vector2.Y),
-				Image = v12,
-				ImageColor3 = TextEmphasisColor
-			})
+			Font = font3,
+			FontFace = fontFace,
+			Size = UDim2.new(0.5, 0, 1, 0),
+			Text = infoName,
+			TextColor3 = theme.TextDefault.Color,
+			TextSize = v3,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center
 		}),
-		Divider = not t1.hideDivider and React.createElement("Frame", {
+		InfoDataWithEmoji = 0,
+		InfoDataTextLabel = 0,
+		LoadingShimmer = 0,
+		LinkIcon = 0
+	}
+
+	if infoDataWithEmoji then
+		local createElement4 = React.createElement
+		local emojiWrapper = VerifiedBadges.EmojiWrapper
+		local v9 = {
+			emoji = VerifiedBadges.emoji.verified,
+			font = 0,
+			anchorPoint = 0,
+			position = 0,
+			size = 0,
+			automaticSize = 0,
+			horizontalAlignment = 0,
+			verticalAlignment = 0
+		}
+		local font2
+
+		if onActivate then
+			font2 = font.Header2.Font
+		else
+			font2 = font.Body.Font
+		end
+
+		v9.font = font2
+		v9.anchorPoint = Vector2.new(1, 0)
+		v9.position = UDim2.new(1, not onActivate and 0 or v4, 0, 0)
+		v9.size = UDim2.new(0.5, 0, 1, 0)
+		v9.automaticSize = Enum.AutomaticSize.None
+		v9.horizontalAlignment = Enum.HorizontalAlignment.Right
+		v9.verticalAlignment = Enum.VerticalAlignment.Center
+
+		local createElement5 = React.createElement
+		local font4
+
+		if not FoundationFontFaceMigration then
+			font4 = onActivate and font.Header2.Font or font.Body.Font
+		end
+
+		local fontFace2
+
+		if FoundationFontFaceMigration then
+			local v10
+
+			if onActivate then
+				v10 = v.Tokens.Typography.TitleLarge.Font
+			else
+				v10 = v.Tokens.Typography.BodyLarge.Font
+			end
+
+			fontFace2 = normalizeFontFace(v10)
+		end
+
+		local v10 = {
+			BackgroundTransparency = 1,
+			Font = font4,
+			FontFace = fontFace2,
+			Size = UDim2.new(0, 0, 1, 0),
+			Text = infoData,
+			TextColor3 = 0,
+			TextSize = 0,
+			TextTruncate = 0,
+			TextScaled = 0,
+			AutomaticSize = 0,
+			TextXAlignment = 0
+		}
+		local textColor
+
+		if onActivate then
+			textColor = theme.TextEmphasis.Color
+		else
+			textColor = theme.TextDefault.Color
+		end
+
+		v10.TextColor3 = textColor
+		v10.TextSize = v3
+		v10.TextTruncate = Enum.TextTruncate.AtEnd
+		v10.TextScaled = props.TextScaled
+		v10.AutomaticSize = Enum.AutomaticSize.X
+		v10.TextXAlignment = Enum.TextXAlignment.Left
+		infoDataWithEmoji = createElement4(emojiWrapper, v9, {
+			InfoDataTextLabel = createElement5("TextLabel", v10)
+		})
+	end
+
+	v8.InfoDataWithEmoji = infoDataWithEmoji
+
+	if infoDataTextLabel then
+		local createElement4 = React.createElement
+		local v9 = {
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.new(1, not onActivate and 0 or v4, 0, 0),
+			BackgroundTransparency = 1,
+			Font = 0,
+			FontFace = 0,
+			Size = 0,
+			Text = 0,
+			TextColor3 = 0,
+			TextSize = 0,
+			TextTruncate = 0,
+			TextScaled = 0,
+			TextXAlignment = 0,
+			TextYAlignment = 0
+		}
+		local font2
+
+		if not FoundationFontFaceMigration then
+			if onActivate then
+				font2 = font.Header2.Font
+			else
+				font2 = font.Body.Font
+			end
+		end
+
+		v9.Font = font2
+		local fontFace2
+
+		if FoundationFontFaceMigration then
+			local v10
+
+			if onActivate then
+				v10 = v.Tokens.Typography.TitleLarge.Font
+			else
+				v10 = v.Tokens.Typography.BodyLarge.Font
+			end
+
+			fontFace2 = normalizeFontFace(v10)
+		end
+
+		v9.FontFace = fontFace2
+
+		v9.Size = UDim2.new(0.5, 0, 1, 0)
+		v9.Text = infoData
+		local textColor
+
+		if onActivate then
+			textColor = theme.TextEmphasis.Color
+		else
+			textColor = theme.TextDefault.Color
+		end
+
+		v9.TextColor3 = textColor
+		v9.TextSize = v3
+		v9.TextTruncate = Enum.TextTruncate.AtEnd
+		v9.TextScaled = props.TextScaled
+		v9.TextXAlignment = Enum.TextXAlignment.Right
+		v9.TextYAlignment = Enum.TextYAlignment.Center
+		infoDataTextLabel = createElement4("TextLabel", v9, {
+			TextSizeConstraint = props.TextScaled and React.createElement("UITextSizeConstraint", {
+				MaxTextSize = v3
+			})
+		})
+	end
+
+	v8.InfoDataTextLabel = infoDataTextLabel
+
+	v8.LoadingShimmer = isLoading
+		and React.createElement(Skeleton, {
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.new(1, 0, 0.5, 0),
+			Size = udim
+		})
+
+	v8.LinkIcon = onActivate and React.createElement(ImageSetLabel, {
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.new(1, 0, 0.5, 0),
+		Size = UDim2.fromOffset(vector2.X, vector2.Y),
+		Image = iconsnavigationpushRight_small,
+		ImageColor3 = color,
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1
+	})
+	return createElement(v6, onActivatesByActivated, {
+		Container = createElement2("Frame", v7, v8),
+		Divider = not props.hideDivider and React.createElement("Frame", {
+			BackgroundColor3 = theme.Divider.Color,
+			BackgroundTransparency = theme.Divider.Transparency,
 			BorderSizePixel = 0,
-			BackgroundColor3 = Theme.Divider.Color,
-			BackgroundTransparency = Theme.Divider.Transparency,
 			Size = UDim2.new(1, 0, 0, 1),
 			Position = UDim2.new(0, 0, 1, -1)
 		})

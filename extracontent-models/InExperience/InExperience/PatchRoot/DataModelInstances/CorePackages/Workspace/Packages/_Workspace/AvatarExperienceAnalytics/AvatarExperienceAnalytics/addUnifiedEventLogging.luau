@@ -1,47 +1,60 @@
 local CollectionService = game:GetService("CollectionService")
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
-local FFlagAXMISEnableMultiShoppingUnifiedEvents = AvatarExperienceFlags.FFlagAXMISEnableMultiShoppingUnifiedEvents
-local FFlagAXUnifiedImpressionsOnThumbnail = AvatarExperienceFlags.FFlagAXUnifiedImpressionsOnThumbnail
-local t1 = {
-	table = true,
-	string = true,
-	number = true,
-	boolean = true
-}
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
 
-return function(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}?) -- line: 25
-	-- upvalues: CollectionService (copy), UnifiedEventLogConstants (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), FFlagAXUnifiedImpressionsOnThumbnail (copy), t1 (copy)
-	if not t2.current then
+local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
+require(script.Parent.Generated.UnifiedEventTypes)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMISEnableMultiShoppingUnifiedEvents = AvatarExperienceFlags.FFlagAXMISEnableMultiShoppingUnifiedEvents
+local FFlagAXSkipTapDetection = AvatarExperienceFlags.FFlagAXSkipTapDetection
+local FFlagAXUnifiedImpressionsOnThumbnail = AvatarExperienceFlags.FFlagAXUnifiedImpressionsOnThumbnail
+
+local v = { table = true, string = true, number = true, boolean = true }
+
+return function(p, items, data)
+	if not p.current then
 		return
 	end
 
-	CollectionService:AddTag(t2.current, UnifiedEventLogConstants.TAG_NAME)
+	CollectionService:AddTag(p.current, UnifiedEventLogConstants.TAG_NAME)
 
-	if t4 and t4.hasDeferredActions then
-		t2.current:SetAttribute(UnifiedEventLogConstants.HAS_DEFERRED_ACTION, true)
+	if data and data.hasDeferredActions then
+		p.current:SetAttribute(UnifiedEventLogConstants.HAS_DEFERRED_ACTION, true)
 	end
 
-	if FFlagAXMISEnableMultiShoppingUnifiedEvents and t4 and t4.isSelected ~= nil then
-		t2.current:SetAttribute(UnifiedEventLogConstants.IS_SELECTED, t4.isSelected)
+	if FFlagAXMISEnableMultiShoppingUnifiedEvents and data and data.isSelected ~= nil then
+		p.current:SetAttribute(UnifiedEventLogConstants.IS_SELECTED, data.isSelected)
 	end
 
-	if t4 and t4.sessionTagName then
-		t2.current:SetAttribute(UnifiedEventLogConstants.SESSION_TAG_NAME, t4.sessionTagName)
+	if data and data.sessionTagName then
+		p.current:SetAttribute(UnifiedEventLogConstants.SESSION_TAG_NAME, data.sessionTagName)
 	end
 
-	if FFlagAXUnifiedImpressionsOnThumbnail and t4 and t4.skipImpressionDetection then
-		t2.current:SetAttribute(UnifiedEventLogConstants.SKIP_IMPRESSION_DETECTION, true)
+	if FFlagAXUnifiedImpressionsOnThumbnail and data and data.skipImpressionDetection then
+		p.current:SetAttribute(UnifiedEventLogConstants.SKIP_IMPRESSION_DETECTION, true)
 	end
 
-	if t3 then
-		for v11, _ in t3 do
-			if t1[type(t3[v11])] then
-				local v13 = if type(t3[v11]) ~= "table" then t3[v11] else table.concat(t3[v11], ",")
+	if FFlagAXSkipTapDetection then
+		p.current:SetAttribute(
+			UnifiedEventLogConstants.SKIP_TAP_DETECTION,
+			data and data.skipTapDetection and true or nil
+		)
+	end
 
-				t2.current:SetAttribute(UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. v11, v13)
+	if items then
+		for k, _ in items do
+			if not v[type(items[k])] then
+				continue
 			end
+
+			local v2
+
+			if type(items[k]) == "table" then
+				v2 = table.concat(items[k], ",")
+			else
+				v2 = items[k]
+			end
+
+			p.current:SetAttribute(UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. k, v2)
 		end
 	end
 end

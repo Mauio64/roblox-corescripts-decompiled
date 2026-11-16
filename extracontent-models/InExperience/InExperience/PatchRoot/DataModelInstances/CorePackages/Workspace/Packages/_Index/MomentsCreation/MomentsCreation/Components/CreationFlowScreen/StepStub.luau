@@ -1,19 +1,17 @@
-local Parent = script:FindFirstAncestor("MomentsCreation").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("MomentsCreation").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
+local Text = Foundation.Text
 local View = Foundation.View
 
-local function makeStepStub(s1: string) -- line: 19
-	-- upvalues: React (copy), View (copy), FoundationText (copy)
-	local function StepStub(_) -- line: 20
-		-- upvalues: React (copy), View (copy), FoundationText (copy), s1 (copy)
-		return React.createElement(View, {
-			tag = "col align-x-center align-y-center size-full"
-		}, {
-			Label = React.createElement(FoundationText, {
+local function makeStepStub(p: string)
+	local function StepStub(_)
+		return React.createElement(View, { tag = "col align-x-center align-y-center size-full" }, {
+			Label = React.createElement(Text, {
 				tag = "auto-xy text-body-medium text-align-x-center content-default",
-				Text = `{ s1 } placeholder`
+				Text = `{p} placeholder`
 			})
 		})
 	end

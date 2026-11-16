@@ -1,66 +1,201 @@
+local HttpService = game:GetService("HttpService")
+
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Foundation = require(ExpChatParent.Foundation)
-local React = require(ExpChatParent.React)
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local SignalsReact = require(ExpChatParent.SignalsReact)
+local parent = ExpChat.Parent
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local ExpChatShared = require(parent.ExpChatShared)
+local SignalsReact = require(parent.SignalsReact)
+
 local Config = require(ExpChat.Config)
 local Constants = require(ExpChat.PresetChat.Constants)
 local GetPresetChatStore = require(ExpChat.Stores.GetPresetChatStore)
 local GetChatTooltipStore = require(ExpChat.Stores.GetChatTooltipStore)
 local Localization = require(ExpChat.Localization)
 local PresetChatTooltip = require(script.Parent.PresetChatTooltip)
+local hasPresetEmoji = require(script.Parent.hasPresetEmoji)
 local setIsPresetTrayOpen = require(script.Parent.Thunks.setIsPresetTrayOpen)
 local FFlagExpChatUseUnifiedTooltipStore = ExpChatShared.Flags.FFlagExpChatUseUnifiedTooltipStore
+local FFlagExpChatCenterMobilePresetButton = require(ExpChat.Flags.FFlagExpChatCenterMobilePresetButton)
+local FFlagExpChatPresetFullWidthButtonFixes = require(ExpChat.Flags.FFlagExpChatPresetFullWidthButtonFixes)
+local FFlagExpChatPresetEntryPointClickAction = require(ExpChat.Flags.FFlagExpChatPresetEntryPointClickAction)
 
-local function PresetChatButton(t1: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), Localization (copy), GetPresetChatStore (copy), SignalsReact (copy), FFlagExpChatUseUnifiedTooltipStore (copy), GetChatTooltipStore (copy), setIsPresetTrayOpen (copy), ExpChatShared (copy), Constants (copy), Foundation (copy), Config (copy), PresetChatTooltip (copy)
-	local v17 = React.useRef(false)
-	local v18 = Localization.useLocalization({
+local FFlagExpChatPresetChatCircleFaceEmojiEntryPointRolloutEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatCircleFaceEmojiEntryPointRolloutEnabled)
+
+local SocialExperiments = require(parent.SocialExperiments)
+local ExpChatPresetChatEmojiTabExperimentation = SocialExperiments.ExpChatPresetChatEmojiTabExperimentation
+
+local function PresetChatButton(props)
+	local ref = React.useRef(false)
+	local anchorRef
+
+	if FFlagExpChatPresetFullWidthButtonFixes then
+		anchorRef = React.useRef(nil)
+	end
+
+	local ref2
+
+	if FFlagExpChatPresetFullWidthButtonFixes then
+		ref2 = React.useRef(nil)
+	end
+
+	if props.fullWidth then
+		anchorRef = ref2
+	end
+
+	local v = Localization.useLocalization({
 		sendQuickWords = "CoreScripts.TextChat.Action.SendQuickWords"
 	})
-	local v19 = GetPresetChatStore(false)
-	local v20 = SignalsReact.useSignalState(v19.getIsTrayOpen)
-	local v21 = React.useCallback(function() -- line: 34
-		-- upvalues: FFlagExpChatUseUnifiedTooltipStore (copy), GetChatTooltipStore (copy), v17 (copy), setIsPresetTrayOpen (copy), v19 (copy), ExpChatShared (copy), Constants (copy)
-		if FFlagExpChatUseUnifiedTooltipStore then
-			local v23 = GetChatTooltipStore(false)
 
-			if not v17.current then
-				v17.current = true
-				v23.reportImpression("PresetChatTooltip")
+	local presetChatStore = GetPresetChatStore(false)
+	local v2 = SignalsReact.useSignalState(presetChatStore.getIsTrayOpen)
+
+	local v3 = false
+
+	if FFlagExpChatPresetChatCircleFaceEmojiEntryPointRolloutEnabled then
+		local v4 = SignalsReact.useSignalState(presetChatStore.getCategoryGroups)
+		v3 = React.useMemo(function()
+			return hasPresetEmoji(v4)
+		end, { v4 })
+	elseif ExpChatPresetChatEmojiTabExperimentation.isExperimentEnabled then
+		v3 = ExpChatPresetChatEmojiTabExperimentation.getIsEmojiIconEnabled()
+	end
+
+	local onActivated = React.useCallback(function()
+		if FFlagExpChatUseUnifiedTooltipStore then
+			local chatTooltipStore = GetChatTooltipStore(false)
+
+			if not ref.current then
+				ref.current = true
+				chatTooltipStore.reportImpression("PresetChatTooltip")
 			end
 
-			v23.setIsDismissed("PresetChatTooltip", true)
+			chatTooltipStore.setIsDismissed("PresetChatTooltip", true)
 		end
 
-		setIsPresetTrayOpen(v19, not v19.getIsTrayOpen(false))
-		ExpChatShared.Analytics:TelemetryLogEvent(ExpChatShared.Analytics.ExpChatPresetActionConfig, {
+		local isTrayOpen = presetChatStore.getIsTrayOpen(false)
+		setIsPresetTrayOpen(presetChatStore, not isTrayOpen)
+		local analytics = ExpChatShared.Analytics
+		local expChatPresetActionConfig = ExpChatShared.Analytics.ExpChatPresetActionConfig
+		local v4 = {
 			event_type = Constants.Analytics.EventTypes.Click,
-			component = Constants.Analytics.Components.PresetEntryPointButton
-		}, ExpChatShared.Analytics.DefaultStandardizedFields)
-	end, { v19 })
-	local v22 = if not t1.fullWidth then React.createElement(Foundation.IconButton, {
-		isDisabled = false,
-		icon = {
-			name = Config.PresetChat.Icon,
-			variant = if not v20 then Config.PresetChat.IconVariant else Config.PresetChat.IconVariantActive
-		},
-		variant = Foundation.Enums.ButtonVariant.Standard,
-		size = if t1.size == nil then Foundation.Enums.InputSize.Small else t1.size,
-		isCircular = t1.isCircular == nil or t1.isCircular,
-		onActivated = v21
-	}) else React.createElement(Foundation.Button, {
-		fillBehavior = Foundation.Enums.FillBehavior.Fit,
-		onActivated = v21,
-		text = v18.sendQuickWords,
-		variant = Foundation.Enums.ButtonVariant.Standard,
-		width = UDim.new(1, 0)
-	})
+			component = Constants.Analytics.Components.PresetEntryPointButton,
+			extra_json = 0
+		}
+		local extra_json
 
-	return React.createElement(PresetChatTooltip, {
-		targetTextChannel = t1.targetTextChannel
-	}, v22)
+		if FFlagExpChatPresetEntryPointClickAction then
+			local click_action
+
+			if isTrayOpen then
+				click_action = Constants.Analytics.ClickActions.Close
+			else
+				click_action = Constants.Analytics.ClickActions.Open
+			end
+
+			extra_json = HttpService:JSONEncode({ click_action = click_action })
+		end
+
+		v4.extra_json = extra_json
+		analytics:TelemetryLogEvent(expChatPresetActionConfig, v4, ExpChatShared.Analytics.DefaultStandardizedFields)
+	end, { presetChatStore })
+	local v4
+
+	if props.fullWidth then
+		local createElement = React.createElement
+		local button = Foundation.Button
+		local v5 = {
+			fillBehavior = Foundation.Enums.FillBehavior.Fit,
+			onActivated = onActivated,
+			text = v.sendQuickWords,
+			variant = Foundation.Enums.ButtonVariant.Standard,
+			width = UDim.new(1, 0),
+			ref = 0,
+			testId = "--social-exp-chat-button-send-quick-words"
+		}
+		local ref3
+
+		if FFlagExpChatPresetFullWidthButtonFixes then
+			ref3 = anchorRef
+		end
+
+		v5.ref = ref3
+		v4 = createElement(button, v5)
+	else
+		local createElement = React.createElement
+		local iconButton = Foundation.IconButton
+		local name
+
+		if v3 then
+			name = Config.PresetChat.EmojiIcon
+		else
+			name = Config.PresetChat.Icon
+		end
+
+		local variant
+
+		if v2 then
+			variant = Config.PresetChat.IconVariantActive
+		else
+			variant = Config.PresetChat.IconVariant
+		end
+
+		local v5 = {
+			icon = { name = name, variant = variant },
+			variant = Foundation.Enums.ButtonVariant.Standard,
+			size = 0,
+			isCircular = 0,
+			isDisabled = false,
+			onActivated = 0,
+			ref = 0,
+			testId = "--social-exp-chat-iconbutton-quick-words"
+		}
+		local size
+
+		if props.size == nil then
+			size = Foundation.Enums.InputSize.Small
+		else
+			size = props.size
+		end
+
+		v5.size = size
+		v5.isCircular = props.isCircular == nil or props.isCircular
+
+		v5.onActivated = onActivated
+		local ref3
+
+		if FFlagExpChatPresetFullWidthButtonFixes then
+			ref3 = anchorRef
+		end
+
+		v5.ref = ref3
+		v4 = createElement(iconButton, v5)
+	end
+
+	local createElement = React.createElement
+	local v5 = { targetTextChannel = props.targetTextChannel, anchorRef = 0 }
+
+	if not FFlagExpChatPresetFullWidthButtonFixes then
+		anchorRef = nil
+	end
+
+	v5.anchorRef = anchorRef
+	local element = createElement(PresetChatTooltip, v5, v4)
+
+	if FFlagExpChatCenterMobilePresetButton and props.addTopPadding ~= nil then
+		return React.createElement(Foundation.View, {
+			tag = {
+				["size-full-0 auto-y"] = FFlagExpChatPresetFullWidthButtonFixes and props.fullWidth == true,
+				["auto-xy"] = not FFlagExpChatPresetFullWidthButtonFixes or props.fullWidth ~= true
+			},
+			padding = {
+				top = UDim.new(0, props.addTopPadding and 8 or 0),
+				bottom = UDim.new(0, 1)
+			}
+		}, element)
+	end
+
+	return element
 end
 
 return React.memo(PresetChatButton)

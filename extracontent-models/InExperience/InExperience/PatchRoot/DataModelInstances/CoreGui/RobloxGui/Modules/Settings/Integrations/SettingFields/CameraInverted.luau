@@ -1,68 +1,62 @@
 local Settings = script:FindFirstAncestor("Settings")
 local CorePackages = game:GetService("CorePackages")
-local GameSettings = UserSettings().GameSettings
+local gameSettings = UserSettings().GameSettings
+
 local SettingsService = require(CorePackages.Workspace.Packages.SettingsService)
 local ValueChangedSignal = SettingsService.ValueChangedSignal
 local AvailabilitySignal = SettingsService.AvailabilitySignal
 local SettingEnum = SettingsService.SettingEnum
-local LAYOUT_ORDER = require(Settings.Integrations.Constants).GAMESETTINGS.LAYOUT_ORDER
+local Constants = require(Settings.Integrations.Constants)
 
-local function CameraInvertedValue() -- line: 22
-	-- upvalues: ValueChangedSignal (copy), GameSettings (copy)
-	local v14 = ValueChangedSignal.new(GameSettings.CameraYInverted)
+local LAYOUT_ORDER = Constants.GAMESETTINGS.LAYOUT_ORDER
 
-	v14:connect(function(b1: boolean) -- line: 25
-		-- upvalues: GameSettings (copy)
-		if b1 == GameSettings.CameraYInverted then
+local function CameraInvertedValue()
+	local v = ValueChangedSignal.new(gameSettings.CameraYInverted)
+
+	v:connect(function(cameraYInverted: boolean)
+		if gameSettings.CameraYInverted == cameraYInverted then
 			return
 		end
 
-		GameSettings.CameraYInverted = b1
+		gameSettings.CameraYInverted = cameraYInverted
 	end, true)
 
-	return v14
+	return v
 end
-local function CameraInvertedAvailability() -- line: 36
-	-- upvalues: AvailabilitySignal (copy), GameSettings (copy)
-	local v15 = AvailabilitySignal.new(GameSettings.IsUsingCameraYInverted)
 
-	GameSettings.Changed:Connect(function(property) -- line: 39
-		-- upvalues: v15 (copy), GameSettings (copy)
-		if property == "IsUsingCameraYInverted" then
-			v15:set(GameSettings.IsUsingCameraYInverted)
+local function CameraInvertedAvailability() -- 1 equivalent call inferred from this helper
+	local v = AvailabilitySignal.new(gameSettings.IsUsingCameraYInverted)
+
+	gameSettings.Changed:Connect(function(p)
+		if p == "IsUsingCameraYInverted" then
+			v:set(gameSettings.IsUsingCameraYInverted)
 		end
 	end)
 
-	return v15
+	return v
 end
 
-local t1 = {
+local CameraInverted = {
 	id = "camera-inverted",
+	field_type = SettingEnum.Toggle,
 	label = "CoreScripts.InGameMenu.GameSettings.InvertedCamera",
 	alreadyLocalized = false,
-	field_type = SettingEnum.Toggle
+	onChanged = 0,
+	availability = 0,
+	layoutOrder = 0
 }
-local v12 = ValueChangedSignal.new(GameSettings.CameraYInverted)
+local onChanged = ValueChangedSignal.new(gameSettings.CameraYInverted)
 
-v12:connect(function(b2: boolean) -- line: 25
-	-- upvalues: GameSettings (copy)
-	if b2 == GameSettings.CameraYInverted then
+onChanged:connect(function(cameraYInverted: boolean)
+	if gameSettings.CameraYInverted == cameraYInverted then
 		return
 	end
 
-	GameSettings.CameraYInverted = b2
+	gameSettings.CameraYInverted = cameraYInverted
 end, true)
-t1.onChanged = v12
 
-local v13 = AvailabilitySignal.new(GameSettings.IsUsingCameraYInverted)
+CameraInverted.onChanged = onChanged
+CameraInverted.availability = CameraInvertedAvailability() -- inferred equivalent call
+CameraInverted.layoutOrder = LAYOUT_ORDER.CameraInvertedFrame
 
-GameSettings.Changed:Connect(function(property) -- line: 39
-	-- upvalues: v13 (copy), GameSettings (copy)
-	if property == "IsUsingCameraYInverted" then
-		v13:set(GameSettings.IsUsingCameraYInverted)
-	end
-end)
-t1.availability = v13
-t1.layoutOrder = LAYOUT_ORDER.CameraInvertedFrame
-
-return t1
+return CameraInverted

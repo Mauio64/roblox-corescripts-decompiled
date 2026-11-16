@@ -1,3 +1,1 @@
-return {
-	Components = require(script.Components)
-}
+return { Components = require(script.Components) }

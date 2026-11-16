@@ -1,94 +1,90 @@
-local function splitStringWithMarks(p1, p2) -- line: 19
-	if type(p1) ~= "string" or type(p2) ~= "table" then
-		return p1, ""
+local function splitStringWithMarks(value, list)
+	if type(value) ~= "string" or type(list) ~= "table" then
+		return value, ""
 	end
 
-	for _, v in ipairs(p2) do
-		local start, stop = p1:find(v, nil, true)
+	for _, item in ipairs(list) do
+		local v, v2 = value.find(value, item, nil, true)
 
-		if start ~= nil then
-			return p1:sub(1, start - 1), (p1:sub(stop + 1))
+		if v ~= nil then
+			return value.sub(value, 1, v - 1), (value.sub(value, v2 + 1))
 		end
 	end
 
-	return p1, ""
+	return value, ""
 end
-local function findFileNameFromPath(p3) -- line: 37
-	if type(p3) ~= "string" then
-		return ""
+
+local function findFileNameFromPath(value)
+	if type(value) == "string" then
+		return string.match(value, "([^.]*)$")
 	end
 
-	return string.match(p3, "([^.]*)$")
+	return ""
 end
-local function ProcessErrorStack(p4, p5) -- line: 45
-	-- upvalues: splitStringWithMarks (copy)
-	local t1 = {}
-	local t2 = {}
 
-	if not p5 then
-		p5 = 0
+local function ProcessErrorStack(value, value2)
+	local result = {}
+	local result2 = {}
+	local v = value2 or 0
+
+	if type(value) ~= "string" then
+		return result, result2
 	end
 
-	if type(p4) ~= "string" then
-		return t1, t2
-	end
+	for k in value:gmatch("[^\r\n]+") do
+		local v2, v3 = splitStringWithMarks(k, { ", line ", ", Line ", ":" })
+		local v4, v5 = splitStringWithMarks(v3, { " - " })
+		local line, funcName
 
-	for match in p4:gmatch("[^\r\n]+") do
-		local v16, v17 = splitStringWithMarks(match, {
-			", line ",
-			", Line ",
-			":"
-		})
-		local v18, v19 = splitStringWithMarks(v17, { " - " })
+		if v5 == "" and v4 ~= "" then
+			line, funcName = string.match(v4, "^(%d+)%s*(.*)")
 
-		if v19 == "" and v18 ~= "" then
-			local v20, v21 = string.match(v18, "^(%d+)%s*(.*)")
-
-			if v20 then
-				v18 = v20
-
-				if v21 ~= "" then
-					v19 = v21
+			if line then
+				if funcName == "" then
+					funcName = ""
 				end
+			else
+				funcName = ""
+				line = v4
 			end
+		else
+			funcName = v5
+			line = v4
 		end
 
-		if v18 ~= "" and v16 ~= "" then
-			local _, _, v24 = string.find(v16, "Script '(.*)'")
-
-			if v24 ~= nil then
-				v16 = v24
-			end
-
-			local v25 = t2[v16]
-
-			if v25 == nil then
-				p5 += 1
-				v25 = p5
-				t2[v16] = v25
-			end
-
-			if v19 == "" then
-				v19 = if type(v16) == "string" then string.match(v16, "([^.]*)$") else ""
-			end
-
-			table.insert(t1, {
-				line = v18,
-				funcName = v19,
-				sourceCode = tostring(v25)
-			})
+		if not (line ~= "" and v2 ~= "") then
+			continue
 		end
+
+		local _, _, v6 = string.find(v2, "Script '(.*)'")
+
+		if v6 == nil then
+			v6 = v2
+		end
+
+		local v7 = result2[v6]
+
+		if v7 == nil then
+			v += 1
+
+			result2[v6] = v
+			v7 = v
+		end
+
+		if funcName == "" then
+			funcName = type(v6) ~= "string" and "" or string.match(v6, "([^.]*)$")
+		end
+
+		table.insert(result, { line = line, funcName = funcName, sourceCode = tostring(v7) })
 	end
 
-	local t3 = {}
+	local result3 = {}
 
-	for k, v in pairs(t2) do
-		t3[tostring(v)] = {
-			path = k
-		}
+	for k, v2 in pairs(result2) do
+		result3[tostring(v2)] = { path = k }
 	end
 
-	return t1, t3, p5
+	return result, result3, v
 end
 
 return ProcessErrorStack

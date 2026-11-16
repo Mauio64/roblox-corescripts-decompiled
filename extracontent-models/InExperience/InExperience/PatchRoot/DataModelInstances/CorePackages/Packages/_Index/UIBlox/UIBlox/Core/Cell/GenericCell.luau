@@ -1,16 +1,19 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local Roact = require(ParentParentParentParent.Roact)
-local Cryo = require(ParentParentParentParent.Cryo)
-local t = require(ParentParentParentParent.t)
-local GenericTextLabel = require(ParentParent.Text.GenericTextLabel.GenericTextLabel)
-local Interactable = require(ParentParent.Control.Interactable)
-local validateColorInfo = require(ParentParentParent.Core.Style.Validator.validateColorInfo)
-local validateFontInfo = require(ParentParentParent.Core.Style.Validator.validateFontInfo)
-local v11 = Roact.PureComponent:extend("GenericCell")
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
 
-v11.validateProps = t.strictInterface({
+local Roact = require(parent3.Roact)
+local Cryo = require(parent3.Cryo)
+local t = require(parent3.t)
+
+local GenericTextLabel = require(parent.Text.GenericTextLabel.GenericTextLabel)
+local Interactable = require(parent.Control.Interactable)
+local validateColorInfo = require(parent2.Core.Style.Validator.validateColorInfo)
+local validateFontInfo = require(parent2.Core.Style.Validator.validateFontInfo)
+
+local extended = Roact.PureComponent:extend("GenericCell")
+
+extended.validateProps = t.strictInterface({
 	onActivated = t.optional(t.callback),
 	isSelected = t.optional(t.boolean),
 	isDisabled = t.optional(t.boolean),
@@ -34,97 +37,90 @@ v11.validateProps = t.strictInterface({
 	NextSelectionDown = t.optional(t.table),
 	SelectionImageObject = t.optional(t.table)
 })
-v11.defaultProps = {
-	rightContentWidth = 0,
-	leftContentWidth = 0,
-	isDisabled = false
-}
 
-function v11.render(p1) -- line: 84
-	-- upvalues: Roact (copy), Interactable (copy), GenericTextLabel (copy)
-	assert(p1.validateProps(p1.props))
+extended.defaultProps = { rightContentWidth = 0, leftContentWidth = 0, isDisabled = false }
 
-	return Roact.createElement("Frame", {
-		BorderSizePixel = 0,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, {
-		Interactable = Roact.createElement(Interactable, {
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundColor3 = p1.props.colorStyle.Color,
-			BackgroundTransparency = p1.props.colorStyle.Transparency,
-			BorderSizePixel = 0,
-			AutoButtonColor = false,
-			[Roact.Event.Activated] = not p1.props.isDisabled and p1.props.onActivated,
-			[Roact.Ref] = p1.props.controlRef,
-			NextSelectionUp = p1.props.NextSelectionUp,
-			NextSelectionDown = p1.props.NextSelectionDown,
-			NextSelectionLeft = p1.props.NextSelectionLeft,
-			NextSelectionRight = p1.props.NextSelectionRight,
-			SelectionImageObject = p1.props.SelectionImageObject,
-			isDisabled = p1.props.isDisabled,
-			onStateChanged = p1.props.onStateChanged
-		}, {
-			Contents = Roact.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				Size = UDim2.new(1, 0, 1, 0)
-			}, {
-				UIPadding = Roact.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, 24),
-					PaddingRight = UDim.new(0, 24),
-					PaddingTop = UDim.new(0, 12),
-					PaddingBottom = UDim.new(0, 12)
-				}),
-				UIListLayout = Roact.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Horizontal,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}),
-				Frame = Roact.createElement("Frame", {
-					BackgroundTransparency = 1,
-					LayoutOrder = 2,
-					Size = UDim2.new(1, -p1.props.rightContentWidth - p1.props.leftContentWidth, 1, 0)
-				}, {
-					UIListLayout = Roact.createElement("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						FillDirection = Enum.FillDirection.Vertical,
-						VerticalAlignment = Enum.VerticalAlignment.Center
-					}),
-					TitleText = p1.props.titleText and Roact.createElement(GenericTextLabel, {
-						LayoutOrder = 1,
-						Size = UDim2.new(1, 0, 1, 0),
-						colorStyle = p1.props.textStyle,
-						fontStyle = p1.props.fontStyle,
-						Text = p1.props.titleText,
-						TextXAlignment = Enum.TextXAlignment.Left
-					}),
-					SubTitleText = p1.props.subtitleText and Roact.createElement(GenericTextLabel, {
-						LayoutOrder = 2,
-						Size = UDim2.new(1, 0, 1, 0),
-						colorStyle = p1.props.subtitleTextStyle,
-						fontStyle = p1.props.subtitleFontStyle,
-						Text = p1.props.subtitleText,
-						TextXAlignment = Enum.TextXAlignment.Left
-					})
-				}),
-				RightContent = p1.props.renderRightContent and p1.props.renderRightContent(),
-				LeftContent = p1.props.renderLeftContent and p1.props.renderLeftContent()
-			}),
-			Divider = Roact.createElement("Frame", {
+function extended.render(p)
+	assert(p.validateProps(p.props))
+
+	return Roact.createElement(
+		"Frame",
+		{ Size = UDim2.new(1, 0, 1, 0), BorderSizePixel = 0, BackgroundTransparency = 1 },
+		{
+			Interactable = Roact.createElement(Interactable, {
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundColor3 = p.props.colorStyle.Color,
+				BackgroundTransparency = p.props.colorStyle.Transparency,
 				BorderSizePixel = 0,
-				Size = UDim2.new(1, -24, 0, 1),
-				Position = UDim2.new(0, 24, 1, -1),
-				BackgroundColor3 = p1.props.dividerStyle.Color,
-				BackgroundTransparency = p1.props.dividerStyle.Transparency
+				AutoButtonColor = false,
+				[Roact.Event.Activated] = not p.props.isDisabled and p.props.onActivated,
+				[Roact.Ref] = p.props.controlRef,
+				NextSelectionUp = p.props.NextSelectionUp,
+				NextSelectionDown = p.props.NextSelectionDown,
+				NextSelectionLeft = p.props.NextSelectionLeft,
+				NextSelectionRight = p.props.NextSelectionRight,
+				SelectionImageObject = p.props.SelectionImageObject,
+				isDisabled = p.props.isDisabled,
+				onStateChanged = p.props.onStateChanged
+			}, {
+				Contents = Roact.createElement(
+					"Frame",
+					{ BackgroundTransparency = 1, Size = UDim2.new(1, 0, 1, 0), LayoutOrder = 1 },
+					{
+						UIPadding = Roact.createElement("UIPadding", {
+							PaddingLeft = UDim.new(0, 24),
+							PaddingRight = UDim.new(0, 24),
+							PaddingTop = UDim.new(0, 12),
+							PaddingBottom = UDim.new(0, 12)
+						}),
+						UIListLayout = Roact.createElement("UIListLayout", {
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							FillDirection = Enum.FillDirection.Horizontal,
+							VerticalAlignment = Enum.VerticalAlignment.Center
+						}),
+						Frame = Roact.createElement("Frame", {
+							Size = UDim2.new(1, -p.props.rightContentWidth - p.props.leftContentWidth, 1, 0),
+							BackgroundTransparency = 1,
+							LayoutOrder = 2
+						}, {
+							UIListLayout = Roact.createElement("UIListLayout", {
+								SortOrder = Enum.SortOrder.LayoutOrder,
+								FillDirection = Enum.FillDirection.Vertical,
+								VerticalAlignment = Enum.VerticalAlignment.Center
+							}),
+							TitleText = p.props.titleText and Roact.createElement(GenericTextLabel, {
+								Size = UDim2.new(1, 0, 1, 0),
+								colorStyle = p.props.textStyle,
+								fontStyle = p.props.fontStyle,
+								Text = p.props.titleText,
+								LayoutOrder = 1,
+								TextXAlignment = Enum.TextXAlignment.Left
+							}),
+							SubTitleText = p.props.subtitleText and Roact.createElement(GenericTextLabel, {
+								Size = UDim2.new(1, 0, 1, 0),
+								colorStyle = p.props.subtitleTextStyle,
+								fontStyle = p.props.subtitleFontStyle,
+								Text = p.props.subtitleText,
+								LayoutOrder = 2,
+								TextXAlignment = Enum.TextXAlignment.Left
+							})
+						}),
+						RightContent = p.props.renderRightContent and p.props.renderRightContent(),
+						LeftContent = p.props.renderLeftContent and p.props.renderLeftContent()
+					}
+				),
+				Divider = Roact.createElement("Frame", {
+					Size = UDim2.new(1, -24, 0, 1),
+					Position = UDim2.new(0, 24, 1, -1),
+					BorderSizePixel = 0,
+					BackgroundColor3 = p.props.dividerStyle.Color,
+					BackgroundTransparency = p.props.dividerStyle.Transparency
+				})
 			})
-		})
-	})
+		}
+	)
 end
 
-return Roact.forwardRef(function(p2, p3) -- line: 165
-	-- upvalues: Roact (copy), v11 (copy), Cryo (copy)
-	return Roact.createElement(v11, Cryo.Dictionary.join(p2, {
-		controlRef = p3
-	}))
+return Roact.forwardRef(function(p, controlRef)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { controlRef = controlRef }))
 end)

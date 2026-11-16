@@ -1,25 +1,34 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Signals = require(Parent.Signals)
-local SignalsReact = require(Parent.SignalsReact)
+local BuildExperience = script:FindFirstAncestor("BuildExperience")
+local parent = BuildExperience.Parent
 
-local function createPlayButtonStore() -- line: 22
-	-- upvalues: Signals (copy), SignalsReact (copy)
-	local v5, v6 = Signals.createSignal(false)
-	local v7, v8 = Signals.createSignal(nil)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+require(BuildExperience.Chat.chatTypes)
+
+local function createPlayButtonStore()
+	local signal, setIsActive = Signals.createSignal(false)
+	local signal2, setResumeTarget = Signals.createSignal(nil)
+
+	local signal3, setPendingResourceAttachment = Signals.createSignal(nil)
+
+	local function useIsActive()
+		return SignalsReact.useSignalState(signal)
+	end
+
+	local function useResumeTarget()
+		return SignalsReact.useSignalState(signal2)
+	end
 
 	return {
-		getIsActive = v5,
-		useIsActive = function() -- line: 26
-			-- upvalues: SignalsReact (copy), v5 (copy)
-			return SignalsReact.useSignalState(v5)
-		end,
-		setIsActive = v6,
-		getResumeTarget = v7,
-		useResumeTarget = function() -- line: 30
-			-- upvalues: SignalsReact (copy), v7 (copy)
-			return SignalsReact.useSignalState(v7)
-		end,
-		setResumeTarget = v8
+		getIsActive = signal,
+		useIsActive = useIsActive,
+		setIsActive = setIsActive,
+		getResumeTarget = signal2,
+		useResumeTarget = useResumeTarget,
+		setResumeTarget = setResumeTarget,
+		getPendingResourceAttachment = signal3,
+		setPendingResourceAttachment = setPendingResourceAttachment
 	}
 end
 

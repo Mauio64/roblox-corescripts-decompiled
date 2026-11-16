@@ -1,655 +1,723 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Promise = require(BuildExperienceParent.Promise)
-local React = require(BuildExperienceParent.React)
-local Foundation = require(BuildExperienceParent.Foundation)
+local parent = BuildExperience.Parent
+
+local AppComposition = require(parent.AppComposition)
+local Promise = require(parent.Promise)
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
+local useCompositionLayout = AppComposition.useCompositionLayout
+
 local ScrollView = Foundation.ScrollView
 local View = Foundation.View
-local SignalsReact = require(BuildExperienceParent.SignalsReact)
-local getGameMediaStore = require(BuildExperienceParent.DataHydration).Game.getGameMediaStore
-local UniverseConfiguration = require(BuildExperienceParent.DataHydration.UniverseConfiguration)
-local createGalleryCaptureSource = require(BuildExperienceParent.Moments.createGalleryCaptureSource)
+
+local SignalsReact = require(parent.SignalsReact)
+
+local DataHydration = require(parent.DataHydration)
+local getGameMediaStore = DataHydration.Game.getGameMediaStore
+local UniverseConfiguration = require(parent.DataHydration.UniverseConfiguration)
+
+local createGalleryCaptureSource = require(parent.Moments.createGalleryCaptureSource)
+
 local useTokens = Foundation.Hooks.useTokens
 local getGameMediaForUniverse = require(BuildExperience.utils.getGameMediaForUniverse)
 local useMediaUpdater = require(BuildExperience.utils.useMediaUpdater)
+
 local uploadCaptureAsync = require(BuildExperience.utils.uploadCaptureAsync)
 local getThumbnailUrlAsync = require(BuildExperience.utils.getThumbnailUrlAsync)
 local createImageAssetAsync = require(BuildExperience.utils.createImageAssetAsync)
+
 local CaptureSelectionView = require(script.Parent.CaptureSelectionView)
 local FilmstripSlot = require(script.Parent.FilmstripSlot)
 local MediaPreview = require(script.Parent.MediaPreview)
-
 require(script.Parent.types)
 
-local function IconThumbnailsEditor(t1: {[any]: any}) -- line: 47
-	-- upvalues: getGameMediaForUniverse (copy), React (copy), UniverseConfiguration (copy), SignalsReact (copy), useTokens (copy), createGalleryCaptureSource (copy), useMediaUpdater (copy), LocalizationStrings (copy), getGameMediaStore (copy), uploadCaptureAsync (copy), getThumbnailUrlAsync (copy), Promise (copy), createImageAssetAsync (copy), CaptureSelectionView (copy), FilmstripSlot (copy), View (copy), MediaPreview (copy), ScrollView (copy), Foundation (copy)
-	local v24 = getGameMediaForUniverse(t1.universeId)
-	local v25 = React.useMemo(function() -- line: 49
-		-- upvalues: UniverseConfiguration (copy), t1 (copy)
-		return UniverseConfiguration.getUniverseConfigurationStore().getAndFetchSummary(t1.universeId)
-	end, { t1.universeId })
-	local v26 = SignalsReact.useSignalState(v25.data)
-	local v27 = if not v26 then nil else tostring(v26.rootPlaceId)
-	local v28 = useTokens()
-	local v29, v30 = React.useState(v24.icon)
-	local v31, v32 = React.useState(v24.thumbnails)
-	local v33, v34 = React.useState({
-		kind = "icon"
-	})
-	local v35, v36 = React.useState(false)
-	local v37, v38 = React.useState(nil)
-	local v39, v40 = React.useState("editor")
-	local v41, v42 = React.useState(nil)
-	local v43, v44 = React.useState({})
-	local v45 = React.useRef(0)
-	local v46 = React.useRef(false)
-	local v47 = React.useRef(#v24.thumbnails + 1)
-	local v48 = React.useRef(nil)
+local FFlagMediaSelectorErrorLogging = require(BuildExperience.Flags.FFlagMediaSelectorErrorLogging)
 
-	if v48.current == nil then
-		v48.current = createGalleryCaptureSource(nil, nil, { Enum.CaptureType.Screenshot })
+local formatError = require(BuildExperience.utils.formatError)
+local Snackbar = Foundation.Snackbar
+
+local function IconThumbnailsEditor(p)
+	local v = useCompositionLayout()
+	local v2 = useLocalization({
+		captureLibrary = LocalizationStrings.MEDIA_SELECTION_CAPTURE_LIBRARY,
+		delete = LocalizationStrings.MEDIA_SELECTION_DELETE
+	})
+	local v3
+
+	if FFlagMediaSelectorErrorLogging then
+		v3 = useLocalization({ mediaError = "Feature.Moments.Label.Error" })
+	else
+		v3 = nil
 	end
 
-	local v49 = React.useRef(v31)
+	local captureLibrary = v2.captureLibrary
+	local delete = v2.delete
+	local gameMediaForUniverse = getGameMediaForUniverse(p.universeId)
+	local v4 = React.useMemo(function()
+		return UniverseConfiguration.getUniverseConfigurationStore().getAndFetchSummary(p.universeId)
+	end, { p.universeId })
+	local v5 = SignalsReact.useSignalState(v4.data)
+	local rootPlaceId
 
-	v49.current = v31
-	React.useRef(v29).current = v29
+	if v5 then
+		rootPlaceId = tostring(v5.rootPlaceId)
+	else
+		rootPlaceId = nil
+	end
 
-	local v50 = useMediaUpdater()
+	local v6 = useTokens()
+	local state, setState = React.useState(gameMediaForUniverse.icon)
+	local state2, setState2 = React.useState(gameMediaForUniverse.thumbnails)
+	local state3, setState3 = React.useState({ kind = "icon" })
+	local state4, setState4 = React.useState(false)
+	local state5, setState5 = React.useState(nil)
+	local state6, setState6 = React.useState("editor")
+	local state7, setState7 = React.useState(nil)
+	local state8, setState8 = React.useState({})
+	local state9, setState9 = React.useState("")
+	local ref = React.useRef(0)
+	local ref2 = React.useRef(false)
+	local ref3 = React.useRef(#gameMediaForUniverse.thumbnails + 1)
 
-	React.useEffect(function() -- line: 80
-		-- upvalues: v45 (copy), v32 (copy), v24 (copy)
-		if v45.current == 0 then
-			v32(v24.thumbnails)
+	local ref4 = React.useRef(nil)
+
+	if ref4.current == nil then
+		ref4.current = createGalleryCaptureSource(nil, nil, { Enum.CaptureType.Screenshot })
+	end
+
+	local ref5 = React.useRef(state2)
+	ref5.current = state2
+	local useRef = React.useRef(state)
+	useRef.current = state
+
+	local v7 = useMediaUpdater()
+
+	React.useEffect(function()
+		if ref.current ~= 0 then
+			return
 		end
-	end, { v24.thumbnails })
-	React.useEffect(function() -- line: 86
-		-- upvalues: v45 (copy), v30 (copy), v24 (copy)
-		if v45.current == 0 then
-			v30(v24.icon)
+
+		setState2(gameMediaForUniverse.thumbnails)
+	end, { gameMediaForUniverse.thumbnails })
+
+	React.useEffect(function()
+		if ref.current == 0 then
+			setState(gameMediaForUniverse.icon)
 		end
-	end, { v24.icon })
+	end, { gameMediaForUniverse.icon })
 
-	local v51 = React.useMemo(function() -- line: 92
-		-- upvalues: v31 (copy)
-		local t2 = {}
+	local v8 = React.useMemo(function()
+		local result = {}
 
-		for _, v86 in v31 do
-			table.insert(t2, v86)
+		for _, v8 in state2 do
+			table.insert(result, v8)
 		end
 
-		return t2
-	end, { v31 })
-	local v52 = v27 ~= nil
-	local v53 = #v51 < 10 and v52
-	local v54 = React.useCallback(function(s1: string, b1: boolean) -- line: 103
-		-- upvalues: v44 (copy)
-		v44(function(p1) -- line: 104
-			-- upvalues: s1 (copy), b1 (copy)
-			local v115 = table.clone(p1)
+		return result
+	end, { state2 })
+	local v9 = rootPlaceId ~= nil
+	local v10 = #v8 < 10 and v9
+	local id
 
-			v115[s1] = not not b1 or nil
+	if v8[1] then
+		id = v8[1].id
+	else
+		id = nil
+	end
 
-			return v115
+	local v11 = React.useCallback(function(p2: string, flag: boolean)
+		setState8(function(p3)
+			local clone = table.clone(p3)
+			clone[p2] = flag and true or nil
+			return clone
 		end)
 	end, {})
-	local v55 = React.useCallback(function() -- line: 111
-		-- upvalues: v45 (copy)
-		local v89 = v45
 
-		v89.current = v89.current + 1
+	local v12 = React.useCallback(function()
+		ref.current += 1
 	end, {})
-	local v56 = React.useCallback(function() -- line: 115
-		-- upvalues: v45 (copy)
-		v45.current = math.max(0, v45.current - 1)
-	end, {})
-	local v57 = React.useCallback(function(s2: string) -- line: 119
-		-- upvalues: v52 (copy), LocalizationStrings (copy)
-		local t3 = {}
 
-		if v52 then
-			table.insert(t3, {
+	local v13 = React.useCallback(function()
+		ref.current = math.max(0, ref.current - 1)
+	end, {})
+
+	local onClose = React.useCallback(function()
+		setState9("")
+	end, {})
+
+	local v14 = React.useCallback(function(p2: string)
+		local items = {}
+
+		if v9 then
+			table.insert(items, {
 				id = "capture_library",
-				icon = "icons/common/image",
-				text = LocalizationStrings.MEDIA_SELECTION_CAPTURE_LIBRARY
+				text = captureLibrary,
+				icon = "icons/common/image"
 			})
 		end
 
-		if s2 ~= "icon" and s2 ~= "thumbnail_1" and s2 ~= "empty" then
-			table.insert(t3, {
-				id = "delete",
-				icon = "icons/common/trash",
-				text = LocalizationStrings.MEDIA_SELECTION_DELETE
-			})
+		if p2 ~= "icon" and p2 ~= id and p2 ~= "empty" then
+			table.insert(items, { id = "delete", text = delete, icon = "icons/common/trash" })
 		end
 
-		return {{
-			items = t3
-		}}
-	end, { v52 })
-	local v58 = React.useCallback(function(s3: string) -- line: 140
-		-- upvalues: v43 (copy), v46 (copy), v38 (copy), v36 (copy)
-		if v43[s3] or v46.current and s3 ~= "icon" and s3 ~= "empty" then
+		return {
+			{ items = items }
+		}
+	end, { v9, captureLibrary, delete, id })
+
+	local v15 = React.useCallback(function(p2: string)
+		if state8[p2] or ref2.current and p2 ~= "icon" and p2 ~= "empty" then
 			return
 		end
 
-		v38(s3)
-		v36(true)
-	end, { v43 })
-	local v59 = React.useCallback(function(s4: string) -- line: 149
-		-- upvalues: v36 (copy), v46 (copy), v37 (copy), v52 (copy), v42 (copy), v40 (copy), v27 (copy), v43 (copy), v31 (copy), v55 (copy), v54 (copy), v32 (copy), v33 (copy), v34 (copy), v50 (copy), getGameMediaStore (copy), t1 (copy), v56 (copy)
-		v36(false)
+		setState5(p2)
+		setState4(true)
+	end, { state8 })
 
-		if v46.current and (v37 ~= "icon" and v37 ~= "empty") then
+	local onMenuActivated = React.useCallback(function(p2: string)
+		setState4(false)
+
+		if ref2.current and state5 ~= "icon" and state5 ~= "empty" then
 			return
 		end
 
-		if s4 == "capture_library" and v52 then
-			v42(v37)
-			v40("captureSelection")
+		if p2 == "capture_library" and v9 then
+			setState7(state5)
+			setState6("captureSelection")
+		elseif p2 == "delete" then
+			local v16 = state5
 
-			return
-		end
-
-		if s4 == "delete" then
-			local v94 = v37
-
-			if v94 == nil or v27 == nil or v43[v94] then
+			if v16 == nil or rootPlaceId == nil or state8[v16] then
 				return
 			end
 
-			local u95 = nil
-			local v96 = nil
+			local v17 = nil
+			local v18 = nil
 
-			for v97, v98 in v31 do
-				if v94 == v98.id then
-					u95 = v97
-					v96 = v98
-
+			for k, v19 in state2 do
+				if v19.id == v16 then
+					v18 = v19
+					v17 = k
 					break
 				end
 			end
 
-			if u95 == nil or v96 == nil then
+			if v17 == nil or v18 == nil or not v18.assetResourceName then
 				return
 			end
 
-			local v99 = v96
+			local assetResourceName = v18.assetResourceName
+			ref2.current = true
+			v12()
+			v11(v16, true)
+			setState2(function(items)
+				local result = {}
 
-			if not v99.assetResourceName then
-				return
-			end
-
-			local assetResourceName = v99.assetResourceName
-
-			v46.current = true
-			v55()
-			v54(v94, true)
-			v32(function(p2) -- line: 185
-				-- upvalues: v94 (copy)
-				local t4 = {}
-
-				for _, v119 in p2 do
-					if v119.id ~= v94 then
-						table.insert(t4, v119)
+				for _, item in items do
+					if item.id ~= v16 then
+						table.insert(result, item)
 					end
 				end
 
-				return t4
+				return result
 			end)
 
-			if v33.kind == "thumbnail" and v94 == v33.id then
-				v34({
-					kind = "icon"
-				})
+			if state3.kind == "thumbnail" and state3.id == v16 then
+				setState3({ kind = "icon" })
 			end
 
-			v50.removePreview(v27, assetResourceName):andThen(function() -- line: 200
-				-- upvalues: getGameMediaStore (copy), t1 (copy)
-				getGameMediaStore().fetchGameMedia((tostring(t1.universeId)))
-			end):catch(function() -- line: 203
-				-- upvalues: v32 (copy), v94 (copy), u95 (ref), v99 (copy)
-				v32(function(p3) -- line: 204
-					-- upvalues: v94 (copy), u95 (ref), v99 (copy)
-					for _, v135 in p3 do
-						if v135.id == v94 then
-							return p3
+			v7.removePreview(rootPlaceId, assetResourceName):andThen(function()
+				getGameMediaStore().fetchGameMedia((tostring(p.universeId)))
+			end):catch(function(p3)
+				if FFlagMediaSelectorErrorLogging then
+					warn(`[BuildExperience] MediaSelector delete failed: {formatError(p3)}`)
+					setState9(v3.mediaError)
+				end
+
+				setState2(function(items)
+					for _, item in items do
+						if item.id == v16 then
+							return items
 						end
 					end
 
-					local v136 = table.clone(p3)
-
-					table.insert(v136, math.min(u95, #v136 + 1), v99)
-
-					return v136
+					local clone = table.clone(items)
+					table.insert(clone, math.min(v17, #clone + 1), v18)
+					return clone
 				end)
-			end):finally(function() -- line: 215
-				-- upvalues: v46 (copy), v54 (copy), v94 (copy), v56 (copy)
-				v46.current = false
-				v54(v94, false)
-				v56()
+			end):finally(function()
+				ref2.current = false
+				v11(v16, false)
+				v13()
 			end)
 		end
 	end, {
-		v37,
-		v33,
-		v31,
-		v50,
-		v27,
-		v52,
-		v43,
-		v55,
-		v56,
-		v54
+		state5,
+		state3,
+		state2,
+		v7,
+		rootPlaceId,
+		v9,
+		state8,
+		v12,
+		v13,
+		v11,
+		v3,
+		p.universeId
 	})
-	local v60 = React.useCallback(function() -- line: 236
-		-- upvalues: v36 (copy)
-		v36(false)
-	end, {})
-	local v61 = React.useCallback(function() -- line: 240
-		-- upvalues: v34 (copy)
-		v34({
-			kind = "icon"
-		})
-	end, {})
-	local v62 = React.useCallback(function(s5: string) -- line: 244
-		-- upvalues: v34 (copy)
-		v34({
-			kind = "thumbnail",
-			id = s5
-		})
-	end, {})
-	local v63 = React.useCallback(function() -- line: 248
-		-- upvalues: v58 (copy)
-		v58("icon")
-	end, { v58 })
-	local v64 = React.useCallback(function() -- line: 252
-		-- upvalues: v58 (copy)
-		v58("empty")
-	end, { v58 })
-	local v65 = React.useCallback(function(p4) -- line: 256
-		-- upvalues: v58 (copy)
-		v58(p4)
-	end, { v58 })
-	local v66 = React.useCallback(function(p5) -- line: 261
-		-- upvalues: v41 (copy), v27 (copy), v43 (copy), v40 (copy), v42 (copy), v49 (copy), v47 (copy), v55 (copy), v54 (copy), v34 (copy), v32 (copy), uploadCaptureAsync (copy), getThumbnailUrlAsync (copy), Promise (copy), v26 (copy), createImageAssetAsync (copy), v50 (copy), v30 (copy), getGameMediaStore (copy), t1 (copy), v56 (copy)
-		local v104 = v41
 
-		if v104 == nil or (v27 == nil or v43[v104]) then
+	local onMenuClose = React.useCallback(function()
+		setState4(false)
+	end, {})
+
+	local onSelect = React.useCallback(function()
+		setState3({ kind = "icon" })
+	end, {})
+
+	local v16 = React.useCallback(function(id2: string)
+		setState3({ kind = "thumbnail", id = id2 })
+	end, {})
+
+	local onEditPressed = React.useCallback(function()
+		v15("icon")
+	end, { v15 })
+
+	local v17 = React.useCallback(function()
+		v15("empty")
+	end, { v15 })
+
+	local v18 = React.useCallback(function(p2)
+		v15(p2)
+	end, { v15 })
+
+	local onCaptureConfirmed = React.useCallback(function(p2)
+		local v19 = state7
+
+		if v19 == nil or rootPlaceId == nil or state8[v19] then
 			return
 		end
 
-		v40("editor")
-		v42(nil)
+		setState6("editor")
+		setState7(nil)
 
-		local v105 = nil
-		local u106 = nil
+		local v20 = nil
+		local v21 = nil
 
-		if v104 ~= "icon" and v104 ~= "empty" then
-			for v107, v108 in v49.current do
-				if v104 == v108.id then
-					v105 = v107
-					u106 = v108
-
+		if v19 ~= "icon" and v19 ~= "empty" then
+			for k, v22 in ref5.current do
+				if v22.id == v19 then
+					v21 = v22
+					v20 = k
 					break
 				end
 			end
 
-			if v105 == nil or u106 == nil then
-				return
-			end
-
-			if not u106.assetResourceName then
+			if v20 == nil or v21 == nil or not v21.assetResourceName then
 				return
 			end
 		end
 
-		local u109
+		local id2
 
-		if v104 == "empty" then
-			u109 = `thumbnail_pending_{ v47.current }`
-
-			local v110 = v47
-
-			v110.current = v110.current + 1
+		if v19 == "empty" then
+			id2 = `thumbnail_pending_{ref3.current}`
+			ref3.current += 1
 		else
-			u109 = v104
+			id2 = v19
 		end
 
-		v55()
-		v54(u109, true)
+		v12()
+		v11(id2, true)
 
-		if v104 == "icon" then
-			v34({
-				kind = "icon"
-			})
-		elseif v104 == "empty" then
-			v32(function(p6) -- line: 302
-				-- upvalues: u109 (ref)
-				local v121 = table.clone(p6)
+		if v19 == "icon" then
+			setState3({ kind = "icon" })
+		elseif v19 == "empty" then
+			setState2(function(p3)
+				local clone = table.clone(p3)
+				table.insert(clone, { id = id2, mediaType = "image", assetSource = nil })
 
-				table.insert(v121, {
-					mediaType = "image",
-					assetSource = nil,
-					id = u109
-				})
-
-				return v121
+				return clone
 			end)
-			v34({
-				kind = "thumbnail",
-				id = u109
-			})
+
+			setState3({ kind = "thumbnail", id = id2 })
 		else
-			v32(function(p7) -- line: 313
-				-- upvalues: v104 (copy)
-				local v123 = table.clone(p7)
+			setState2(function(p3)
+				local clone = table.clone(p3)
 
-				for v124, v125 in v123 do
-					if v125.id == v104 then
-						v123[v124] = {
-							mediaType = "image",
-							assetSource = nil,
-							id = v125.id
-						}
+				for k, v22 in clone do
+					if v22.id == v19 then
+						clone[k] = { id = v22.id, mediaType = "image", assetSource = nil }
 
-						return v123
+						return clone
 					end
 				end
 
-				return v123
+				return clone
 			end)
 		end
 
-		local v111 = uploadCaptureAsync(p5):andThen(function(p8) -- line: 330
-			-- upvalues: getThumbnailUrlAsync (copy)
-			return getThumbnailUrlAsync(p8.assetId)
-		end):andThen(function(p9) -- line: 333
-			-- upvalues: Promise (copy), v26 (copy), createImageAssetAsync (copy), v104 (copy)
-			if typeof(p9) == "table" and p9.status == "in_review" then
+		local v22 = uploadCaptureAsync(p2):andThen(function(p3)
+			return getThumbnailUrlAsync(p3.assetId)
+		end):andThen(function(p3)
+			if typeof(p3) == "table" and p3.status == "in_review" then
 				return Promise.reject({
 					code = "IN_REVIEW",
 					message = "Capture is under moderation review"
 				})
 			end
 
-			local imageUrl = p9.imageUrl
-			local v129 = if not v26 then nil else {
-				creatorType = v26.creatorType,
-				creatorTargetId = v26.creatorTargetId
-			}
+			local imageUrl = p3.imageUrl
 
-			return createImageAssetAsync(imageUrl, nil, v104 == "icon", v129):andThen(function(p10) -- line: 347
-				-- upvalues: imageUrl (copy)
-				return {
-					imageAssetId = tostring(p10.assetId),
-					displayUrl = imageUrl
-				}
+			local v22 = v5 and {
+				creatorType = v5.creatorType,
+				creatorTargetId = v5.creatorTargetId
+			} or nil
+
+			return createImageAssetAsync(imageUrl, nil, v19 == "icon", v22):andThen(function(p4)
+				return { imageAssetId = tostring(p4.assetId), displayUrl = imageUrl }
 			end)
 		end)
-		local v112 = v111:andThen(function(p11) -- line: 355
-			return p11.imageAssetId
-		end);
 
-		((if v104 ~= "icon" then (if v104 ~= "empty" then v50.replacePreview(v27, v112, u106.assetResourceName) else v50.addPreview(v27, v112)) else v50.setIcon(v27, v112))):andThen(function() -- line: 373
-			-- upvalues: v111 (copy)
-			return v111
-		end):andThen(function(t5: {[any]: any}) -- line: 376
-			-- upvalues: v104 (copy), v30 (copy), v32 (copy), u109 (ref), getGameMediaStore (copy), t1 (copy)
-			if v104 == "icon" then
-				v30(t5.displayUrl)
-			else
-				v32(function(p12) -- line: 380
-					-- upvalues: u109 (ref), t5 (copy)
-					local v139 = table.clone(p12)
-
-					for v140, v141 in v139 do
-						if v141.id == u109 then
-							v139[v140] = {
-								mediaType = "image",
-								id = u109,
-								assetSource = t5.displayUrl,
-								assetResourceName = `assets/{ t5.imageAssetId }`
-							}
-
-							return v139
-						end
-					end
-
-					return v139
-				end)
-			end
-
-			getGameMediaStore().fetchGameMedia((tostring(t1.universeId)))
-		end):catch(function() -- line: 398
-			-- upvalues: v104 (copy), v32 (copy), u109 (ref), v34 (copy), u106 (ref)
-			if v104 == "icon" then
-				return
-			end
-
-			if v104 == "empty" then
-				v32(function(p13) -- line: 402
-					-- upvalues: u109 (ref)
-					local t6 = {}
-
-					for _, v145 in p13 do
-						if v145.id ~= u109 then
-							table.insert(t6, v145)
-						end
-					end
-
-					return t6
-				end)
-				v34(function(p14) -- line: 411
-					-- upvalues: u109 (ref)
-					if p14.kind == "thumbnail" and p14.id == u109 then
-						return {
-							kind = "icon"
-						}
-					end
-
-					return p14
-				end)
-
-				return
-			end
-
-			local v132 = u106
-
-			v32(function(p15) -- line: 418
-				-- upvalues: u109 (ref), v132 (copy)
-				local v148 = table.clone(p15)
-
-				for v149, v150 in v148 do
-					if v150.id == u109 then
-						v148[v149] = v132
-
-						return v148
-					end
-				end
-
-				return v148
-			end)
-		end):finally(function() -- line: 430
-			-- upvalues: v54 (copy), u109 (ref), v56 (copy)
-			v54(u109, false)
-			v56()
+		local v23 = v22:andThen(function(p3)
+			return p3.imageAssetId
 		end)
-	end, {
-		v41,
-		v50,
-		v27,
-		v26,
-		v43,
-		v55,
-		v56,
-		v54
-	})
-	local v67 = React.useCallback(function() -- line: 447
-		-- upvalues: v40 (copy), v42 (copy)
-		v40("editor")
-		v42(nil)
-	end, {})
+		local v24
 
-	React.useEffect(function() -- line: 452
-		-- upvalues: t1 (copy), v39 (copy), v67 (copy)
-		local backHandlerRef = t1.backHandlerRef
-
-		if backHandlerRef then
-			backHandlerRef.current = if v39 ~= "captureSelection" then nil else v67
+		if v19 == "icon" then
+			v24 = v7.setIcon(rootPlaceId, v23)
+		elseif v19 == "empty" then
+			v24 = v7.addPreview(rootPlaceId, v23)
+		else
+			v24 = v7.replacePreview(rootPlaceId, v23, v21.assetResourceName)
 		end
 
-		return function() -- line: 457
-			-- upvalues: backHandlerRef (copy)
+		v24:andThen(function()
+			return v22
+		end):andThen(function(p3)
+			if v19 == "icon" then
+				setState(p3.displayUrl)
+			else
+				local imageAssetId = p3.imageAssetId
+				setState2(function(p4)
+					local clone = table.clone(p4)
+
+					for k, v25 in clone do
+						if v25.id == id2 then
+							clone[k] = {
+								id = imageAssetId,
+								mediaType = "image",
+								assetSource = p3.displayUrl,
+								assetResourceName = `assets/{p3.imageAssetId}`
+							}
+
+							return clone
+						end
+					end
+
+					return clone
+				end)
+
+				setState3(function(p4)
+					if p4.kind == "thumbnail" and p4.id == id2 then
+						return { kind = "thumbnail", id = imageAssetId }
+					end
+
+					return p4
+				end)
+			end
+
+			getGameMediaStore().fetchGameMedia((tostring(p.universeId)))
+		end):catch(function(p3)
+			if FFlagMediaSelectorErrorLogging then
+				warn(`[BuildExperience] MediaSelector upload failed: {formatError(p3)}`)
+				setState9(v3.mediaError)
+			end
+
+			if v19 == "icon" then
+				return
+			end
+
+			if v19 == "empty" then
+				setState2(function(items)
+					local result = {}
+
+					for _, item in items do
+						if item.id ~= id2 then
+							table.insert(result, item)
+						end
+					end
+
+					return result
+				end)
+
+				setState3(function(p4)
+					if p4.kind == "thumbnail" and p4.id == id2 then
+						return { kind = "icon" }
+					end
+
+					return p4
+				end)
+			else
+				local v25 = v21
+				setState2(function(p4)
+					local clone = table.clone(p4)
+
+					for k, v26 in clone do
+						if v26.id == id2 then
+							clone[k] = v25
+							return clone
+						end
+					end
+
+					return clone
+				end)
+			end
+		end):finally(function()
+			v11(id2, false)
+			v13()
+		end)
+	end, {
+		state7,
+		v7,
+		rootPlaceId,
+		v5,
+		state8,
+		v12,
+		v13,
+		v11,
+		v3,
+		p.universeId
+	})
+
+	local v19 = React.useCallback(function()
+		setState6("editor")
+		setState7(nil)
+	end, {})
+
+	React.useEffect(function()
+		local backHandlerRef = p.backHandlerRef
+
+		if backHandlerRef then
+			local current
+
+			if state6 == "captureSelection" then
+				current = v19
+			end
+
+			backHandlerRef.current = current
+		end
+
+		return function()
 			if backHandlerRef then
 				backHandlerRef.current = nil
 			end
 		end
-	end, {
-		v39,
-		v67
-	})
+	end, { state6, v19, p.backHandlerRef })
 
-	local v68 = React.useMemo(function() -- line: 464
-		-- upvalues: v37 (copy), v57 (copy)
-		if not v37 then
-			return {{
-				items = {}
-			}}
+	local menuItems = React.useMemo(function()
+		if state5 then
+			return v14(state5)
 		end
 
-		return v57(v37)
-	end, {
-		v37,
-		v57
-	})
+		return {
+			{ items = {} }
+		}
+	end, { state5, v14 })
 
-	if v39 == "captureSelection" then
+	if state6 == "captureSelection" then
 		return (React.createElement(CaptureSelectionView, {
-			captureSource = v48.current,
-			onCaptureConfirmed = v66
+			captureSource = ref4.current,
+			onCaptureConfirmed = onCaptureConfirmed
 		}))
 	end
 
-	local s6 = nil
-	local v70 = nil
-	local v71 = false
-	local v72 = false
+	local mediaType = nil
+	local assetSource = nil
+	local isIcon = false
+	local isLoading = false
 
-	if v33.kind == "icon" then
-		v71 = true
-		v70 = v29
-		s6 = "image"
-		v72 = v43.icon or false
-	elseif v33.kind == "thumbnail" then
-		for _, v74 in v51 do
-			if v74.id == v33.id then
-				s6 = v74.mediaType
-				v70 = v74.assetSource
-				v72 = v43[v74.id] or false
-
+	if state3.kind == "icon" then
+		isLoading = state8.icon or false
+		assetSource = state
+		mediaType = "image"
+		isIcon = true
+	elseif state3.kind == "thumbnail" then
+		for _, v20 in v8 do
+			if v20.id == state3.id then
+				mediaType = v20.mediaType
+				assetSource = v20.assetSource
+				isLoading = state8[v20.id] or false
 				break
 			end
 		end
 	end
 
-	local t7 = {}
-	local v76 = v35 and v37 == "icon"
-
-	t7.IconSlot = React.createElement(FilmstripSlot, {
+	local children = {}
+	local isMenuOpen = state4 and state5 == "icon"
+	local createElement = React.createElement
+	local v20 = {
 		aspectRatio = "square",
 		mediaType = "image",
+		assetSource = state,
 		isFilled = true,
-		LayoutOrder = 1,
-		assetSource = v29,
-		isSelected = v33.kind == "icon",
-		isLoading = v43.icon or false,
-		isMenuOpen = v76,
-		menuItems = if not v76 then nil else v68,
-		onMenuActivated = v59,
-		onMenuClose = v60,
-		onSelect = v61,
-		onEditPressed = if not v52 then nil else v63
-	})
+		isSelected = state3.kind == "icon",
+		isLoading = state8.icon or false,
+		isMenuOpen = isMenuOpen,
+		menuItems = 0,
+		onMenuActivated = 0,
+		onMenuClose = 0,
+		onSelect = 0,
+		onEditPressed = 0,
+		LayoutOrder = 1
+	}
+	local menuItems2
 
-	for v77, v78 in v51 do
-		local id = v78.id
-		local v80 = v33.kind == "thumbnail" and id == v33.id
-		local v81 = v35 and v37 == id
-
-		t7[`Thumb_{ v77 }`] = React.createElement(FilmstripSlot, {
-			aspectRatio = "wide",
-			isFilled = true,
-			mediaType = v78.mediaType,
-			assetSource = v78.assetSource,
-			isSelected = v80,
-			isLoading = v43[id] or false,
-			isMenuOpen = v81,
-			menuItems = if not v81 then nil else v68,
-			onMenuActivated = v59,
-			onMenuClose = v60,
-			onSelect = function() -- line: 534
-				-- upvalues: v62 (copy), id (copy)
-				v62(id)
-			end,
-			onEditPressed = if not v52 and id == "thumbnail_1" then nil else function() -- line: 538
-				-- upvalues: v65 (copy), id (copy)
-				v65(id)
-			end,
-			LayoutOrder = v77 + 1
-		})
+	if isMenuOpen then
+		menuItems2 = menuItems
 	end
 
-	if v53 then
-		local v82 = v35 and v37 == "empty"
+	v20.menuItems = menuItems2
+	v20.onMenuActivated = onMenuActivated
+	v20.onMenuClose = onMenuClose
+	v20.onSelect = onSelect
 
-		t7.EmptySlot = React.createElement(FilmstripSlot, {
+	if not v9 then
+		onEditPressed = nil
+	end
+
+	v20.onEditPressed = onEditPressed
+	children.IconSlot = createElement(FilmstripSlot, v20)
+
+	for k, v21 in v8 do
+		local id2 = v21.id
+		local isSelected
+
+		if state3.kind == "thumbnail" then
+			isSelected = state3.id == id2
+		else
+			isSelected = false
+		end
+
+		local isMenuOpen2 = state4 and state5 == id2
+		local createElement2 = React.createElement
+		local v22 = {
+			aspectRatio = "wide",
+			mediaType = v21.mediaType,
+			assetSource = v21.assetSource,
+			isFilled = true,
+			isSelected = isSelected,
+			isLoading = state8[id2] or false,
+			isMenuOpen = isMenuOpen2,
+			menuItems = 0,
+			onMenuActivated = 0,
+			onMenuClose = 0,
+			onSelect = 0,
+			onEditPressed = 0,
+			LayoutOrder = 0
+		}
+		local menuItems3
+
+		if isMenuOpen2 then
+			menuItems3 = menuItems
+		end
+
+		v22.menuItems = menuItems3
+		v22.onMenuActivated = onMenuActivated
+		v22.onMenuClose = onMenuClose
+		function v22.onSelect()
+			v16(id2)
+		end
+		v22.onEditPressed = (v9 or id2 ~= id) and function()
+			v18(id2)
+		end or nil
+
+		v22.LayoutOrder = k + 1
+		children[id2] = createElement2(FilmstripSlot, v22)
+	end
+
+	if v10 then
+		local isMenuOpen2 = state4 and state5 == "empty"
+		local createElement2 = React.createElement
+
+		if not isMenuOpen2 then
+			menuItems = nil
+		end
+
+		children.EmptySlot = createElement2(FilmstripSlot, {
 			aspectRatio = "wide",
 			mediaType = nil,
 			assetSource = nil,
 			isFilled = false,
 			isSelected = false,
-			isMenuOpen = v82,
-			menuItems = if not v82 then nil else v68,
-			onMenuActivated = v59,
-			onMenuClose = v60,
-			onSelect = v64,
-			onEmptySlotPressed = v64,
-			LayoutOrder = #v51 + 2
+			isMenuOpen = isMenuOpen2,
+			menuItems = menuItems,
+			onMenuActivated = onMenuActivated,
+			onMenuClose = onMenuClose,
+			onSelect = v17,
+			onEmptySlotPressed = v17,
+			LayoutOrder = #v8 + 2
 		})
 	end
 
-	local v83 = v28.Size.Size_2400 + 2 * v28.Padding.Medium
+	local createElement2 = React.createElement
+	local errorSnackbar
 
-	return React.createElement(View, {
-		tag = "col gap-xlarge size-full"
-	}, {
+	if FFlagMediaSelectorErrorLogging and state9 ~= "" then
+		errorSnackbar = React.createElement(
+			View,
+			{ tag = "row align-x-center size-full-0 auto-y padding-x-large", LayoutOrder = 0 },
+			{
+				Snackbar = React.createElement(Snackbar, {
+					title = state9,
+					onClose = onClose,
+					testId = "MediaSelector.error-snackbar"
+				})
+			}
+		)
+	end
+
+	return createElement2(View, { tag = "col gap-xlarge size-full" }, {
+		ErrorSnackbar = errorSnackbar,
 		Preview = React.createElement(View, {
-			tag = "align-x-center align-y-center fill size-full-0 padding-xlarge",
-			LayoutOrder = 1
+			tag = {
+				["align-x-center align-y-center fill size-full-0"] = true,
+				["composition-content-body padding-y-xxlarge"] = true
+			},
+			LayoutOrder = 1,
+			testId = "MediaSelector.Preview"
 		}, {
 			PreviewContent = React.createElement(MediaPreview, {
-				mediaType = s6,
-				assetSource = v70,
-				isIcon = v71,
-				isLoading = v72
+				mediaType = mediaType,
+				assetSource = assetSource,
+				isIcon = isIcon,
+				isLoading = isLoading
 			})
 		}),
 		Filmstrip = React.createElement(ScrollView, {
+			tag = "size-full-0 auto-y",
+			padding = {
+				top = UDim.new(0, v6.Padding.XXLarge),
+				bottom = UDim.new(0, v6.Padding.XXLarge),
+				left = UDim.new(0, v.margin),
+				right = UDim.new(0, v.margin)
+			},
 			LayoutOrder = 2,
-			Size = UDim2.new(1, 0, 0, v83),
+			testId = "MediaSelector.Filmstrip",
+			layout = {
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, v6.Gap.Medium)
+			},
 			scroll = {
 				AutomaticCanvasSize = Enum.AutomaticSize.X,
 				CanvasSize = UDim2.new(0, 0, 1, 0),
 				ScrollingDirection = Enum.ScrollingDirection.X,
 				scrollBarVisibility = Foundation.Enums.Visibility.None
 			}
-		}, {
-			FilmstripContent = React.createElement(View, {
-				tag = "row gap-medium auto-xy padding-xlarge"
-			}, t7)
-		})
+		}, children)
 	})
 end
 

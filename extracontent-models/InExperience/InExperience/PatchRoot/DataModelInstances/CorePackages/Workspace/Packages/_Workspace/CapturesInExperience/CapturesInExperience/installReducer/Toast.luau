@@ -1,58 +1,39 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Dash = require(ParentParentParent.Dash)
-local Rodux = require(ParentParentParent.Rodux)
-local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
-local ToastDismissed = require(ParentParent.Actions.ToastDismissed)
-local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
-local ToastVanished = require(ParentParent.Actions.ToastVanished)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Types)
+local Dash = require(parent2.Dash)
+local Rodux = require(parent2.Rodux)
 
-local t1 = {
-	IsDismissed = false,
-	ToastConfig = nil,
-	ToastType = CapturesToastType.None
-}
+local CapturesToastType = require(parent.Enums.CapturesToastType)
+local ToastDismissed = require(parent.Actions.ToastDismissed)
+local ToastTriggered = require(parent.Actions.ToastTriggered)
+local ToastVanished = require(parent.Actions.ToastVanished)
+require(parent.Types)
 
-return Rodux.createReducer(t1, {
-	[ToastVanished.name] = function(t2: {[any]: any}, _: {[any]: any}) -- line: 26
-		-- upvalues: CapturesToastType (copy)
-		if t2.ToastType == CapturesToastType.None then
-			return t2
+local v = { IsDismissed = false, ToastType = CapturesToastType.None, ToastConfig = nil }
+
+return Rodux.createReducer(v, {
+	[ToastVanished.name] = function(p, _)
+		if p.ToastType == CapturesToastType.None then
+			return p
 		end
 
-		return {
-			IsDismissed = false,
-			ToastType = CapturesToastType.None
-		}
+		return { IsDismissed = false, ToastType = CapturesToastType.None }
 	end,
-	[ToastDismissed.name] = function(t4: {[any]: any}, _: {[any]: any}) -- line: 37
-		-- upvalues: CapturesToastType (copy), Dash (copy)
-		if t4.IsDismissed then
-			return t4
+	[ToastDismissed.name] = function(p, _)
+		if p.IsDismissed or p.ToastType == CapturesToastType.None then
+			return p
 		end
 
-		if t4.ToastType == CapturesToastType.None then
-			return t4
-		end
-
-		return Dash.join(t4, {
-			IsDismissed = true
-		})
+		return Dash.join(p, { IsDismissed = true })
 	end,
-	[ToastTriggered.name] = function(t6: {[any]: any}, p1) -- line: 51
-		-- upvalues: Dash (copy)
-		local v16 = Dash.shallowEqual(t6.ToastConfig, p1.toastConfig)
+	[ToastTriggered.name] = function(data, p)
+		local shallowEqual = Dash.shallowEqual(data.ToastConfig, p.toastConfig)
 
-		if t6.ToastType == p1.toastType and (not t6.IsDismissed and v16) then
-			return t6
+		if data.ToastType == p.toastType and not data.IsDismissed and shallowEqual then
+			return data
 		end
 
-		return {
-			IsDismissed = false,
-			ToastType = p1.toastType,
-			ToastConfig = p1.toastConfig
-		}
+		return { IsDismissed = false, ToastType = p.toastType, ToastConfig = p.toastConfig }
 	end
 })

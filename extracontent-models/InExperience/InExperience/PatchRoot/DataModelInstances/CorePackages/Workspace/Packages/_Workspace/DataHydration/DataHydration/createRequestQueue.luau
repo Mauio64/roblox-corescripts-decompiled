@@ -1,63 +1,75 @@
-local function createRequestQueue() -- line: 1
-	local t1 = {}
-	local n1 = 1
+local parent = script:FindFirstAncestor("DataHydration").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSduiReleaseSearchResultsPageState = SharedFlags.FFlagSduiReleaseSearchResultsPageState
 
-	return {
-		push = function(s1: string) -- line: 8
-			-- upvalues: t1 (copy), n1 (ref)
-			if t1[s1] == nil then
-				t1[s1] = n1
-				n1 += 1
+local function createRequestQueue()
+	local v = {}
+
+	local v2 = 1
+
+	local function remove(p: string)
+		v[p] = nil
+	end
+
+	local function clear()
+		table.clear(v)
+		v2 = 1
+	end
+
+	local requestQueue = {
+		push = function(p: string)
+			if v[p] == nil then
+				v[p] = v2
+				v2 += 1
 			end
 		end,
-		pop = function(n2: number) -- line: 15
-			-- upvalues: t1 (copy)
-			local t2 = {}
+		pop = function(p: number)
+			local result = {}
 
-			for v7, _ in t1 do
-				table.insert(t2, v7)
+			for k, _ in v do
+				table.insert(result, k)
 			end
 
-			table.sort(t2, function(p1, p2) -- line: 20
-				-- upvalues: t1 (copy)
-				return t1[p1] < t1[p2]
+			table.sort(result, function(a, b): boolean
+				return v[a] < v[b]
 			end)
 
-			if n2 < #t2 then
-				local t3 = {}
-
-				for i = 1, n2 do
-					local v11 = t2[i]
-
-					table.insert(t3, v11)
-					t1[v11] = nil
-				end
-
-				return t3
+			if not (p < #result) then
+				table.clear(v)
+				return result
 			end
 
-			table.clear(t1)
+			local result2 = {}
 
-			return t2
+			for i = 1, p do
+				local v3 = result[i]
+				table.insert(result2, v3)
+				v[v3] = nil
+			end
+
+			return result2
 		end,
-		isEmpty = function() -- line: 38
-			-- upvalues: t1 (copy)
-			for _, _ in t1 do
+		isEmpty = function(): boolean
+			for _, _ in v do
 				return false
 			end
 
 			return true
 		end,
-		hasItem = function(s2: string) -- line: 45
-			-- upvalues: t1 (copy)
-			return t1[s2] ~= nil
+		hasItem = function(p: string): boolean
+			return v[p] ~= nil
 		end,
-		clear = function() -- line: 49
-			-- upvalues: t1 (copy), n1 (ref)
-			table.clear(t1)
-			n1 = 1
-		end
+		remove = 0,
+		clear = 0
 	}
+
+	if not FFlagSduiReleaseSearchResultsPageState then
+		remove = nil
+	end
+
+	requestQueue.remove = remove
+	requestQueue.clear = clear
+	return requestQueue
 end
 
 return createRequestQueue

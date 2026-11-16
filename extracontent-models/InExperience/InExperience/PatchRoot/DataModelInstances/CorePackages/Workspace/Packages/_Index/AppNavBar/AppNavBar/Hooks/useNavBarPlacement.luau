@@ -1,29 +1,29 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local useDeviceOrientation = require(ParentParentParent.RobloxAppHooks).useDeviceOrientation
-local DeviceOrientationMode = require(ParentParentParent.RobloxAppEnums).DeviceOrientationMode
-local UserInputService = require(ParentParentParent.MockableProxyServices).UserInputService
-local Placement = require(ParentParent.Enum.Placement)
-local Mocks = require(ParentParent.Mocks)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local function useNavBarPlacement() -- line: 17
-	-- upvalues: useDeviceOrientation (copy), DeviceOrientationMode (copy), React (copy), UserInputService (copy), Mocks (copy), Placement (copy)
-	local v10 = useDeviceOrientation() == DeviceOrientationMode.Portrait
-	local v11, v12 = React.useState(UserInputService.TouchEnabled)
+local React = require(parent2.React)
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local useDeviceOrientation = RobloxAppHooks.useDeviceOrientation
+local RobloxAppEnums = require(parent2.RobloxAppEnums)
+local DeviceOrientationMode = RobloxAppEnums.DeviceOrientationMode
 
-	React.useEffect(function() -- line: 22
-		-- upvalues: v12 (copy), UserInputService (copy)
-		v12(UserInputService.TouchEnabled)
+local MockableProxyServices = require(parent2.MockableProxyServices)
+local UserInputService = MockableProxyServices.UserInputService
 
-		local connection = UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(function() -- line: 24
-			-- upvalues: v12 (copy), UserInputService (copy)
-			v12(UserInputService.TouchEnabled)
+local Placement = require(parent.Enum.Placement)
+local Mocks = require(parent.Mocks)
+
+local function useNavBarPlacement()
+	local v = useDeviceOrientation() == DeviceOrientationMode.Portrait
+
+	local state, setState = React.useState(UserInputService.TouchEnabled)
+	React.useEffect(function()
+		setState(UserInputService.TouchEnabled)
+		local touchEnabledChangedConnection = UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(function()
+			setState(UserInputService.TouchEnabled)
 		end)
-
-		return function() -- line: 27
-			-- upvalues: connection (copy)
-			connection:Disconnect()
+		return function()
+			touchEnabledChangedConnection:Disconnect()
 		end
 	end, {})
 
@@ -31,11 +31,7 @@ local function useNavBarPlacement() -- line: 17
 		return Mocks.navBarPlacement
 	end
 
-	if v11 and v10 then
-		return Placement.Bottom
-	end
-
-	return Placement.Left
+	return if state and v then Placement.Bottom else Placement.Left
 end
 
 return useNavBarPlacement

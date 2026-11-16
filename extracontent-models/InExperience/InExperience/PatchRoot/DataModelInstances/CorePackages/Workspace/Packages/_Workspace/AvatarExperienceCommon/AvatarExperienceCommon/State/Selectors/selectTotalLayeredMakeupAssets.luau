@@ -1,27 +1,20 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
-local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
-local AvatarExperienceFlags = require(AvatarExperienceCommonParent.AvatarExperienceFlags)
+
 local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
 local selectTryOnItems = require(script.Parent.selectTryOnItems)
 local selectEquippedLayeredMakeupAssets = require(script.Parent.selectEquippedLayeredMakeupAssets)
-local FFlagAXMakeupEquipping = AvatarExperienceFlags.FFlagAXMakeupEquipping
 
-local function selectTotalLayeredMakeupAssets(p1) -- line: 15
-	-- upvalues: FFlagAXMakeupEquipping (copy), selectEquippedLayeredMakeupAssets (copy), selectTryOnItems (copy), isMakeupAssetType (copy)
-	if not FFlagAXMakeupEquipping then
-		return 0
-	end
+local function selectTotalLayeredMakeupAssets(p)
+	local v = #selectEquippedLayeredMakeupAssets(p)
+	local count = 0
 
-	local v10 = #selectEquippedLayeredMakeupAssets(p1)
-	local n1 = 0
-
-	for _, v13 in selectTryOnItems(p1) do
-		if v13.selectedInTryOnManager and v13.itemType and isMakeupAssetType(v13.itemSubType) then
-			n1 += 1
+	for _, v2 in selectTryOnItems(p) do
+		if v2.selectedInTryOnManager and v2.itemType and isMakeupAssetType(v2.itemSubType) then
+			count += 1
 		end
 	end
 
-	return v10 + n1
+	return v + count
 end
 
 return selectTotalLayeredMakeupAssets

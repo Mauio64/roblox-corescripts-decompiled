@@ -1,64 +1,81 @@
-local ParentParent = script.Parent.Parent
-local language = ParentParent.language
-local ParentParentParent = ParentParent.Parent
-local String = require(ParentParentParent.LuauPolyfill).String
+local parent = script.Parent.Parent
+local language = parent.language
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local String = LuauPolyfill.String
+
 local source = require(language.source)
-local sourceSource = source.Source
+local source2 = source.Source
+
 local isSource = source.isSource
-local TokenKind = require(language.tokenKind).TokenKind
+local tokenKind = require(language.tokenKind)
+local tokenKind2 = tokenKind.TokenKind
 local lexer = require(language.lexer)
-local Lexer = lexer.Lexer
+local lexer2 = lexer.Lexer
 local isPunctuatorTokenKind = lexer.isPunctuatorTokenKind
 local blockString = require(language.blockString)
 local dedentBlockStringValue = blockString.dedentBlockStringValue
 local getBlockStringIndentation = blockString.getBlockStringIndentation
 
-local function dedentBlockString(s1: string) -- line: 118
-	-- upvalues: String (copy), dedentBlockStringValue (copy), getBlockStringIndentation (copy)
-	local v27 = String.slice(s1, 4, -3)
-	local v28 = dedentBlockStringValue(v27)
+local dedentBlockString
 
-	if getBlockStringIndentation(v28) > 0 then
-		v28 = "\n" .. v28
+local function stripIgnoredCharacters(p)
+	if not isSource(p) then
+		p = source2.new(p)
 	end
 
-	local v29 = utf8.len(v28)
+	local body = p.body
+	local v = lexer2.new(p)
+	local v2 = ""
+	local v3 = false
 
-	assert(v29 ~= nil, "invalid utf8 detected: " .. v28)
+	while v:advance().kind ~= tokenKind2.EOF do
+		local token = v.token
+		local kind = token.kind
 
-	local v30 = String.slice(v28, v29)
+		local v4 = not isPunctuatorTokenKind(token.kind)
 
-	if v30 == "\"" and String.slice(v28, -4) ~= "\\\"\"\"" or v30 == "\\" then
-		v28 ..= "\n"
-	end
-
-	return "\"\"\"" .. v28 .. "\"\"\""
-end
-
-return {
-	stripIgnoredCharacters = function(p1) -- line: 81
-		-- upvalues: isSource (copy), sourceSource (copy), Lexer (copy), TokenKind (copy), isPunctuatorTokenKind (copy), String (copy), dedentBlockString (ref)
-		local v17 = if not isSource(p1) then sourceSource.new(p1) else p1
-		local body = v17.body
-		local v19 = Lexer.new(v17)
-		local s2 = ""
-		local v21 = false
-
-		while v19:advance().kind ~= TokenKind.EOF do
-			local token = v19.token
-			local kind = token.kind
-			local v24 = not isPunctuatorTokenKind(token.kind)
-
-			if v21 and (v24 or token.kind == TokenKind.SPREAD) then
-				s2 ..= " "
-			end
-
-			local v25 = String.slice(body, token.start, token._end)
-
-			s2 = if kind ~= TokenKind.BLOCK_STRING then s2 .. v25 else s2 .. dedentBlockString(v25)
-			v21 = v24
+		if v3 and (v4 or token.kind == tokenKind2.SPREAD) then
+			v2 ..= " "
 		end
 
-		return s2
+		local slice = String.slice(body, token.start, token._end)
+
+		if kind == tokenKind2.BLOCK_STRING then
+			v2 ..= dedentBlockString(slice)
+		else
+			v2 ..= slice
+		end
+
+		v3 = v4
 	end
-}
+
+	return v2
+end
+
+dedentBlockString = function(slice: string)
+	local v = dedentBlockStringValue((String.slice(slice, 4, -3)))
+
+	if getBlockStringIndentation(v) > 0 then
+		v = "\n" .. v
+	end
+
+	local v2 = utf8.len(v)
+	assert(v2 ~= nil, "invalid utf8 detected: " .. v)
+	local slice2 = String.slice(v, v2)
+	local v3
+
+	if slice2 == "\"" then
+		v3 = String.slice(v, -4) ~= "\\\"\"\""
+	else
+		v3 = false
+	end
+
+	if v3 or slice2 == "\\" then
+		v ..= "\n"
+	end
+
+	return "\"\"\"" .. v .. "\"\"\""
+end
+
+return { stripIgnoredCharacters = stripIgnoredCharacters }

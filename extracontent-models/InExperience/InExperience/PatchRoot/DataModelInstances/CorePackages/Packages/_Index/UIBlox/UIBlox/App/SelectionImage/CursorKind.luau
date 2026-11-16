@@ -1,6 +1,8 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent
 
-return require(ParentParent.enumerate)(script.Name, {
+local enumerate = require(parent.enumerate)
+
+return enumerate(script.Name, {
 	RoundedRect = "RoundedRect",
 	RoundedRectNoInset = "RoundedRectNoInset",
 	RoundedSlot = "RoundedSlot",

@@ -1,6 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent
+
 local SocialService = game:GetService("SocialService")
 
-return require(ParentParent.React).createContext({
-	socialService = SocialService
-})
+local React = require(parent.React)
+
+return React.createContext({ socialService = SocialService })

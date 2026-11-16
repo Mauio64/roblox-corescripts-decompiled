@@ -1,24 +1,26 @@
-local function reduceRight(p1, p2, p3) -- line: 2
-	local v5 = type(p1)
+local function reduceRight(list, callback, p)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+	local typeName2 = type(callback)
+	assert(typeName2 == "function", "expected a function for second argument, got " .. typeName2)
 
-	local v6 = type(p2)
+	local v = #list
+	local v2
 
-	assert(v6 == "function", "expected a function for second argument, got " .. v6)
-
-	local v7 = #p1
-	local v8 = p3
-
-	if v8 == nil then
-		v8 = p1[v7]
+	if p == nil then
+		v2 = list[v]
+	else
+		v2 = p
 	end
 
-	for i = p3 == nil and v7 - 1 or v7, 1, -1 do
-		v8 = p2(v8, p1[i], i)
+	v = p == nil and v - 1 or v
+
+	for i = v, 1, -1 do
+		v2 = callback(v2, list[i], i)
 	end
 
-	return v8
+	return v2
 end
 
 return reduceRight

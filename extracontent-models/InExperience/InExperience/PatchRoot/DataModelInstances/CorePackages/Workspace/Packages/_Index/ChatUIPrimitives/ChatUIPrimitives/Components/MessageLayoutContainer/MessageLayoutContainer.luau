@@ -1,96 +1,121 @@
 local ChatUIPrimitives = script:FindFirstAncestor("ChatUIPrimitives")
-local ChatUIPrimitivesParent = ChatUIPrimitives.Parent
-local React = require(ChatUIPrimitivesParent.React)
-local Signals = require(ChatUIPrimitivesParent.Signals)
-local SignalsReact = require(ChatUIPrimitivesParent.SignalsReact)
-local Foundation = require(ChatUIPrimitivesParent.Foundation)
+local parent = ChatUIPrimitives.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
+local Foundation = require(parent.Foundation)
 local useMessagePool = require(script.Parent.useMessagePool)
 local useMessagesMap = require(script.Parent.useMessagesMap)
 local BottomLockedScrollView = require(script.Parent.BottomLockedScrollView)
 local TextLineEntry = require(script.Parent.TextLineEntry)
 local BubbleEntry = require(script.Parent.BubbleEntry)
-
 require(ChatUIPrimitives.Types)
 
-local function createSlotElementFactory(p1, p2) -- line: 29
-	-- upvalues: React (copy)
-	return function(p3) -- line: 33
-		-- upvalues: React (copy), p1 (copy), p2 (copy)
-		return React.createElement(p1, {
-			getMessageId = p3.getMessageId,
-			getLayoutOrder = p3.getLayoutOrder,
-			getMessagesMap = p2
+local function createSlotElementFactory(p, getMessagesMap, fontFace, selectableRows: boolean?, selectionCursor, isTranslationSettingEnabled: boolean?, getLatestMessageId, onLatestUsernameChanged) -- 1 equivalent call inferred from this helper
+	return function(p2)
+		return React.createElement(p, {
+			getMessageId = p2.getMessageId,
+			getLayoutOrder = p2.getLayoutOrder,
+			getMessagesMap = getMessagesMap,
+			fontFace = fontFace,
+			selectableRows = selectableRows,
+			selectionCursor = selectionCursor,
+			isTranslationSettingEnabled = isTranslationSettingEnabled,
+			getLatestMessageId = getLatestMessageId,
+			reportLatestUsername = onLatestUsernameChanged
 		})
 	end
 end
 
-local v13 = Signals.createSignal({})
-local t1 = {
-	left = UDim.new(0, 8),
-	right = UDim.new(0, 8)
-}
+local signal = Signals.createSignal({})
 
-local function MessageLayoutContainer(t2: {[any]: any}) -- line: 57
-	-- upvalues: v13 (copy), React (copy), Signals (copy), useMessagesMap (copy), BubbleEntry (copy), TextLineEntry (copy), useMessagePool (copy), SignalsReact (copy), Foundation (copy), BottomLockedScrollView (copy), t1 (copy)
-	local v19 = t2.messagesSignal or v13
-	local v20 = React.useMemo(function() -- line: 61
-		-- upvalues: Signals (copy), v19 (copy)
-		return Signals.createComputed(function(p4) -- line: 62
-			-- upvalues: v19 (copy)
-			local t3 = {}
+local v = { left = UDim.new(0, 8), right = UDim.new(0, 8) }
 
-			for _, v34 in (v19(p4)) do
-				t3[#t3 + 1] = v34.messageId
+local function MessageLayoutContainer(props)
+	local messagesSignal = props.messagesSignal or signal
+
+	local messageIdsSignal = React.useMemo(function()
+		return Signals.createComputed(function(p)
+			local v2 = messagesSignal(p)
+			local messageIds = {}
+
+			for _, v3 in v2 do
+				messageIds[#messageIds + 1] = v3.messageId
 			end
 
-			return t3
+			return messageIds
 		end)
-	end, { v19 })
-	local v21 = useMessagesMap(v19)
-	local v22 = if t2.layoutStyle ~= "bubble" then TextLineEntry else BubbleEntry
-	local v23 = React.useMemo(function() -- line: 80
-		-- upvalues: v22 (copy), v21 (copy), React (copy)
-		local v28 = v22
-		local v29 = v21
+	end, { messagesSignal })
 
-		return function(p5) -- line: 33
-			-- upvalues: React (copy), v28 (copy), v29 (copy)
-			return React.createElement(v28, {
-				getMessageId = p5.getMessageId,
-				getLayoutOrder = p5.getLayoutOrder,
-				getMessagesMap = v29
-			})
+	local getLatestMessageId = React.useMemo(function()
+		if props.selectableRows then
+			return Signals.createComputed(function(p)
+				local v2 = messageIdsSignal(p)
+				return v2[#v2]
+			end)
 		end
-	end, {
-		v22,
-		v21
-	})
-	local v24 = useMessagePool({
-		messageIdsSignal = v20,
-		createSlotElement = v23
-	})
-	local v25 = SignalsReact.useSignalState(v24)
-	local v26 = React.useMemo(function() -- line: 95
-		-- upvalues: v25 (copy), React (copy)
-		local v30 = table.clone(v25)
 
-		v30["$layout"] = React.createElement("UIListLayout", {
+		return nil
+	end, { messageIdsSignal, props.selectableRows })
+
+	local getMessagesMap = useMessagesMap(messagesSignal)
+	local v2
+
+	if props.layoutStyle == "bubble" then
+		v2 = BubbleEntry
+	else
+		v2 = TextLineEntry
+	end
+
+	local v3 = useMessagePool({
+		messageIdsSignal = messageIdsSignal,
+		createSlotElement = React.useMemo(function()
+			return createSlotElementFactory( -- inferred equivalent call
+				v2,
+				getMessagesMap,
+				props.fontFace,
+				props.selectableRows,
+				props.selectionCursor,
+				props.isTranslationSettingEnabled,
+				getLatestMessageId,
+				props.onLatestUsernameChanged
+			)
+		end, {
+			v2,
+			getMessagesMap,
+			props.fontFace or false,
+			props.selectableRows or false,
+			props.selectionCursor or false,
+			props.isTranslationSettingEnabled or false,
+			getLatestMessageId,
+			props.onLatestUsernameChanged or false
+		})
+	})
+
+	local v4 = SignalsReact.useSignalState(v3)
+
+	local children = React.useMemo(function()
+		local clone = table.clone(v4)
+		clone["$layout"] = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 2)
 		})
 
-		return v30
-	end, { v25 })
+		return clone
+	end, { v4 })
 
 	return React.createElement(Foundation.View, {
 		tag = "fill padding-y-xsmall",
-		Size = t2.Size or UDim2.fromScale(1, 1)
+		Size = props.Size or UDim2.fromScale(1, 1)
 	}, {
 		scrollView = React.createElement(BottomLockedScrollView, {
 			Size = UDim2.fromScale(1, 1),
-			contentPadding = t2.contentPadding or t1,
-			children = v26,
-			onScroll = t2.onScroll
+			contentPadding = props.contentPadding or v,
+			children = children,
+			onScroll = props.onScroll,
+			selectableRows = props.selectableRows
 		})
 	})
 end

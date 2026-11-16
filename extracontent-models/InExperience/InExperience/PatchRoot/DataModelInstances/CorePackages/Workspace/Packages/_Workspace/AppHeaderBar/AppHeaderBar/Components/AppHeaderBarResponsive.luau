@@ -1,61 +1,125 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local UIBlox = require(ParentParentParent.UIBlox)
-local Cryo = require(ParentParentParent.Cryo)
-local Responsive = require(ParentParentParent.Responsive)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local UIBlox = require(parent2.UIBlox)
+
+local Cryo = require(parent2.Cryo)
+local Responsive = require(parent2.Responsive)
+
 local AppHeaderBarComponent = require(script.Parent.AppHeaderBarComponent)
+
 local useStyle = UIBlox.Core.Style.useStyle
 local useBreakpointXOrLarger = Responsive.useBreakpointXOrLarger
 local usePreferredInput = Responsive.usePreferredInput
 
-require(ParentParent.Types)
+require(parent.Types)
 
-local function AppHeaderBarResponsive(p1) -- line: 20
-	-- upvalues: useBreakpointXOrLarger (copy), Responsive (copy), usePreferredInput (copy), useStyle (copy), React (copy), Cryo (copy), AppHeaderBarComponent (copy)
-	local v13 = useBreakpointXOrLarger(Responsive.Keys.Medium)
-	local v14 = useBreakpointXOrLarger(Responsive.Keys.Large)
-	local v15 = usePreferredInput() == Responsive.Input.Directional
-	local Tokens = useStyle().Tokens
-	local titleFontStyle = p1.titleFontStyle
-	local shouldRenderTitle = p1.shouldRenderTitle
-	local shouldRenderCenter = p1.shouldRenderCenter
-	local isTitleCentered = p1.isTitleCentered
-	local utilitiesGap = p1.utilitiesGap
-	local paddingTop = p1.paddingTop
-	local paddingBottom = p1.paddingBottom
-	local onMedia = p1.onMedia
-	local v25 = React.useMemo(function() -- line: 37
-		-- upvalues: v14 (copy), v15 (copy), Cryo (copy), shouldRenderCenter (copy), paddingTop (copy), Tokens (copy), paddingBottom (copy), onMedia (copy), shouldRenderTitle (copy), v13 (copy), isTitleCentered (copy), titleFontStyle (copy), utilitiesGap (copy)
-		local t1 = {
-			title = if not v14 or not v15 then nil else Cryo.None,
-			renderCenter = if not (not not v14 and not v15) and not shouldRenderCenter then Cryo.None else nil,
-			renderUserInfo = if not v14 then Cryo.None else nil,
-			avatarActionIcon = if not v14 then nil else Cryo.None,
-			searchActionIcon = if not v14 or v15 then nil else Cryo.None,
-			paddingTop = if not v14 or paddingTop then nil else UDim.new(0, Tokens.Size.Size_400),
-			paddingBottom = if not v14 or paddingBottom then nil else UDim.new(0, Tokens.Size.Size_400),
-			onMedia = v14 and (not not v15 and onMedia == nil) or nil
+local function AppHeaderBarResponsive(props)
+	local v = useBreakpointXOrLarger(Responsive.Keys.Medium)
+	local v2 = useBreakpointXOrLarger(Responsive.Keys.Large)
+	local v3 = usePreferredInput() == Responsive.Input.Directional
+	local tokens = useStyle().Tokens
+	local titleFontStyle = props.titleFontStyle
+	local shouldRenderTitle = props.shouldRenderTitle
+	local shouldRenderCenter = props.shouldRenderCenter
+	local isTitleCentered = props.isTitleCentered
+	local utilitiesGap = props.utilitiesGap
+	local paddingTop = props.paddingTop
+	local paddingBottom = props.paddingBottom
+	local onMedia = props.onMedia
+
+	local v4 = React.useMemo(function()
+		local title
+
+		if v2 and v3 then
+			title = Cryo.None
+		end
+
+		local renderCenter
+
+		if not (v2 and not v3 or shouldRenderCenter) then
+			renderCenter = Cryo.None
+		end
+
+		local renderUserInfo
+
+		if not v2 then
+			renderUserInfo = Cryo.None
+		end
+
+		local avatarActionIcon
+
+		if v2 then
+			avatarActionIcon = Cryo.None
+		end
+
+		local searchActionIcon
+
+		if v2 and not v3 then
+			searchActionIcon = Cryo.None
+		end
+
+		local paddingTop2
+
+		if v2 and not paddingTop then
+			paddingTop2 = UDim.new(0, tokens.Size.Size_400)
+		end
+
+		local paddingBottom2
+
+		if v2 and not paddingBottom then
+			paddingBottom2 = UDim.new(0, tokens.Size.Size_400)
+		end
+
+		local v4 = {
+			title = title,
+			renderCenter = renderCenter,
+			renderUserInfo = renderUserInfo,
+			avatarActionIcon = avatarActionIcon,
+			searchActionIcon = searchActionIcon,
+			paddingTop = paddingTop2,
+			paddingBottom = paddingBottom2,
+			onMedia = v2 and v3 and onMedia == nil and true or nil
 		}
 
 		if shouldRenderTitle then
-			t1.title = nil
+			v4.title = nil
 		end
 
-		local v28 = if not v13 or isTitleCentered then Tokens.Typography.HeadingSmall else Tokens.Typography.HeadingLarge
+		local titleFontStyle2
 
-		t1.titleFontStyle = if not titleFontStyle then v28 else nil
+		if v and not isTitleCentered then
+			titleFontStyle2 = tokens.Typography.HeadingLarge
+		else
+			titleFontStyle2 = tokens.Typography.HeadingSmall
+		end
 
-		local v29 = if not v13 then UDim.new(0, Tokens.Size.Size_400) else UDim.new(0, Tokens.Size.Size_600)
+		if titleFontStyle then
+			titleFontStyle2 = nil
+		end
 
-		t1.utilitiesGap = if not utilitiesGap then v29 else nil
+		v4.titleFontStyle = titleFontStyle2
+		local udim
 
-		return t1
+		if v then
+			udim = UDim.new(0, tokens.Size.Size_600)
+		else
+			udim = UDim.new(0, tokens.Size.Size_400)
+		end
+
+		if utilitiesGap then
+			udim = nil
+		end
+
+		v4.utilitiesGap = udim
+
+		return v4
 	end, {
-		v13,
-		v14,
-		v15,
-		Tokens,
+		v,
+		v2,
+		v3,
+		tokens,
 		titleFontStyle,
 		shouldRenderCenter,
 		isTitleCentered,
@@ -64,9 +128,9 @@ local function AppHeaderBarResponsive(p1) -- line: 20
 		paddingBottom,
 		onMedia
 	})
-	local v26 = Cryo.Dictionary.join(p1, v25)
 
-	return React.createElement(AppHeaderBarComponent, v26)
+	local joined = Cryo.Dictionary.join(props, v4)
+	return React.createElement(AppHeaderBarComponent, joined)
 end
 
 return AppHeaderBarResponsive

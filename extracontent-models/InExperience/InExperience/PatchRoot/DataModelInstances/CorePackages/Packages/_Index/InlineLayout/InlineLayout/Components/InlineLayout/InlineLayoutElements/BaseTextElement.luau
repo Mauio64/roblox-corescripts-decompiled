@@ -1,59 +1,66 @@
-local Parent = script:FindFirstAncestor("Components").Parent
-local ParentParent = Parent.Parent
-local React = require(ParentParent.React)
-local Dash = require(ParentParent.Dash)
-local isCli = require(ParentParent.MarkdownCore).Utils.isCli
-local TextSplitBy = require(Parent.Enums.TextSplitBy)
-local SplitText = require(Parent.Utils.SplitText)
+local parent = script:FindFirstAncestor("Components").Parent
+local parent2 = parent.Parent
 
-require(Parent.Types)
+local React = require(parent2.React)
+local Dash = require(parent2.Dash)
 
-local Escape = require(ParentParent.MarkdownCore).Utils.Escape
-local InlineElementType = require(Parent.Utils.InlineElementType)
-local getFontFace = require(Parent.Utils.getFontFace)
+local MarkdownCore = require(parent2.MarkdownCore)
+local isCli = MarkdownCore.Utils.isCli
+local TextSplitBy = require(parent.Enums.TextSplitBy)
+
+local SplitText = require(parent.Utils.SplitText)
+require(parent.Types)
+local MarkdownCore2 = require(parent2.MarkdownCore)
+local Escape = MarkdownCore2.Utils.Escape
+
+local InlineElementType = require(parent.Utils.InlineElementType)
+local getFontFace = require(parent.Utils.getFontFace)
+
 local join = Dash.join
-local t1 = {}
 
-local function formatTextWithEngineTag(s1: string, p1) -- line: 61
-	-- upvalues: Dash (copy)
-	local v20 = Dash.reduce(p1.attributes, function(p2, p3, p4) -- line: 62
-		local v56 = not string.find(p3, "\"") and "\"" or "'"
+local textSet = {}
 
-		return `{ p2 } { p4 }={ v56 }{ p3 }{ v56 }`
+local function formatTextWithEngineTag(p: string, p2)
+	local reduced = Dash.reduce(p2.attributes, function(p3, value, p4)
+		local v = string.find(value, "\"") and "'" or "\""
+		return `{p3} {p4}={v}{value}{v}`
 	end, "")
 
-	return `<{ p1.name }{ v20 }>{ s1 }</{ p1.name }>`
+	return `<{p2.name}{reduced}>{p}</{p2.name}>`
 end
-local function getRichText(s2: string, t2: {[any]: any}) -- line: 70
-	-- upvalues: Escape (copy), Dash (copy)
-	local v23 = Escape.escapeRichFormatting(s2)
 
-	return (Dash.reduce(t2, function(p5, p6) -- line: 72
-		-- upvalues: Dash (copy)
-		local v59 = Dash.reduce(p6.attributes, function(p7, p8, p9) -- line: 62
-			local v70 = not string.find(p8, "\"") and "\"" or "'"
-
-			return `{ p7 } { p9 }={ v70 }{ p8 }{ v70 }`
+local function getRichText(p: string, p2)
+	local escapeRichFormatting = Escape.escapeRichFormatting(p)
+	return (Dash.reduce(p2, function(p3, p4)
+		local reduced = Dash.reduce(p4.attributes, function(p5, value, p6)
+			local v = string.find(value, "\"") and "'" or "\""
+			return `{p5} {p6}={v}{value}{v}`
 		end, "")
 
-		return `<{ p6.name }{ v59 }>{ p5 }</{ p6.name }>`
-	end, v23))
+		return `<{p4.name}{reduced}>{p3}</{p4.name}>`
+	end, escapeRichFormatting))
 end
 
-local t3 = {}
+local BaseTextElement = {}
+BaseTextElement.__index = BaseTextElement
+BaseTextElement.__type = InlineElementType
 
-t3.__index = t3
-t3.__type = InlineElementType
-
-function t3.new(p10: ((...any) -> ...any), p11, p12: ((...any) -> ...any)?) -- line: 82
-	-- upvalues: t3 (copy), Dash (copy), TextSplitBy (copy), Escape (copy)
-	local self = setmetatable({}, t3)
-
-	self.props = p11
-	self.mapProps = p12 or Dash.identity
-	self.Element = p10
+function BaseTextElement.new(element, props, callback)
+	local self = setmetatable({}, BaseTextElement)
+	self.props = props
+	self.mapProps = callback or Dash.identity
+	self.Element = element
 	self.canForceSplit = self.splitBy ~= TextSplitBy.Symbol
-	self.splitBy = if not self.props.SplitBy then TextSplitBy.Word else self.props.SplitBy
+	local splitBy
+
+	if self.props.SplitBy then
+		splitBy = self.props.SplitBy
+	else
+		splitBy = TextSplitBy.Word
+	end
+
+	self.splitBy = splitBy
+
 	self.hasRichText = self.props.EngineTags ~= nil and next(self.props.EngineTags) ~= nil
 
 	if self.hasRichText and self.props.Text then
@@ -64,121 +71,131 @@ function t3.new(p10: ((...any) -> ...any), p11, p12: ((...any) -> ...any)?) -- l
 
 	return self
 end
-function t3._clone(p13, p14) -- line: 116
-	-- upvalues: t3 (copy)
-	return t3.new(p13.Element, p14 or p13.props, p13.mapProps)
+
+function BaseTextElement:_clone(p)
+	return BaseTextElement.new(self.Element, p or self.props, self.mapProps)
 end
 
-local TextService = game:GetService("TextService")
+local v = game:GetService("TextService")
 
 if isCli() then
-	local t4 = {}
-
-	t4.__index = t4
-	TextService = setmetatable({}, t4)
-
-	function t4.GetTextBoundsAsync(_) -- line: 127
-		return {
-			X = 100
-		}
+	local class = {}
+	class.__index = class
+	v = setmetatable({}, class)
+	function class:GetTextBoundsAsync()
+		return { X = 100 }
 	end
 end
 
-function t3.getWidth(p16) -- line: 132
-	return p16:_getWidth(p16.props.Text)
+function BaseTextElement:getWidth()
+	return self:_getWidth(self.props.Text)
 end
-function t3._getWidth(t5: {[any]: any}, s3: string) -- line: 136
-	-- upvalues: getFontFace (copy), Escape (copy), Dash (copy), TextService (ref), t1 (copy)
-	local GetTextBoundsParams = Instance.new("GetTextBoundsParams")
 
-	GetTextBoundsParams.Font = getFontFace(t5.props.fontStyle)
-	GetTextBoundsParams.Size = t5.props.fontStyle.FontSize
-	GetTextBoundsParams.Text = s3
+function BaseTextElement:_getWidth(text: string)
+	local getTextBoundsParams = Instance.new("GetTextBoundsParams")
+	getTextBoundsParams.Font = getFontFace(self.props.fontStyle)
+	getTextBoundsParams.Size = self.props.fontStyle.FontSize
+	getTextBoundsParams.Text = text
 
-	if t5.hasRichText then
-		local EngineTags = t5.props.EngineTags
-		local v36 = Escape.escapeRichFormatting(s3)
-
-		GetTextBoundsParams.Text = Dash.reduce(EngineTags, function(p17, p18) -- line: 72
-			-- upvalues: Dash (copy)
-			local v62 = Dash.reduce(p18.attributes, function(p19, p20, p21) -- line: 62
-				local v74 = not string.find(p20, "\"") and "\"" or "'"
-
-				return `{ p19 } { p21 }={ v74 }{ p20 }{ v74 }`
+	if self.hasRichText then
+		local engineTags = self.props.EngineTags
+		local escapeRichFormatting = Escape.escapeRichFormatting(text)
+		getTextBoundsParams.Text = Dash.reduce(engineTags, function(p, p2)
+			local reduced = Dash.reduce(p2.attributes, function(p3, value, p4)
+				local v2 = string.find(value, "\"") and "'" or "\""
+				return `{p3} {p4}={v2}{value}{v2}`
 			end, "")
 
-			return `<{ p18.name }{ v62 }>{ p17 }</{ p18.name }>`
-		end, v36)
-		GetTextBoundsParams.RichText = true
+			return `<{p2.name}{reduced}>{p}</{p2.name}>`
+		end, escapeRichFormatting)
+		getTextBoundsParams.RichText = true
 	end
 
-	local ok, result = pcall(function() -- line: 148
-		-- upvalues: TextService (ref), GetTextBoundsParams (copy)
-		return TextService:GetTextBoundsAsync(GetTextBoundsParams).X
+	local success, result = pcall(function()
+		return v:GetTextBoundsAsync(getTextBoundsParams).X
 	end)
 
-	if ok then
+	if success then
 		return result
 	end
 
-	if not t1[GetTextBoundsParams.Text] then
-		t1[GetTextBoundsParams.Text] = true
-		warn(`Failed to get width for the { GetTextBoundsParams.Text } in BaseTextElement`)
+	if not textSet[getTextBoundsParams.Text] then
+		textSet[getTextBoundsParams.Text] = true
+		warn(`Failed to get width for the {getTextBoundsParams.Text} in BaseTextElement`)
 	end
 
-	GetTextBoundsParams.RichText = false
-
-	return TextService:GetTextBoundsAsync(GetTextBoundsParams).X
+	getTextBoundsParams.RichText = false
+	return v:GetTextBoundsAsync(getTextBoundsParams).X
 end
-function t3.split(t6: {[any]: any}, n1: number, b1: boolean?) -- line: 166
-	-- upvalues: SplitText (copy), TextSplitBy (copy), join (copy)
-	local v42 = t6.canForceSplit and b1
-	local v43, v44 = SplitText(if not v42 then t6.splitBy else TextSplitBy.Symbol, function(p22) -- line: 168
-		-- upvalues: t6 (copy)
-		return t6:_getWidth(p22)
-	end, t6.props.Text, n1)
-	local v45 = t6:_clone(join(t6.props, {
-		Text = v43
-	}))
 
-	if v44 then
-		return v45, (t6:_clone(join(t6.props, {
-			Text = v44:gsub("^%s*", "")
-		})))
+function BaseTextElement:split(p: number, flag: boolean?)
+	local v2
+
+	if self.canForceSplit and flag then
+		v2 = TextSplitBy.Symbol
+	else
+		v2 = self.splitBy
 	end
 
-	return v45, nil
+	local text, v3 = SplitText(v2, function(p2)
+		return self:_getWidth(p2)
+	end, self.props.Text, p)
+
+	local clone = self:_clone(join(self.props, { Text = text }))
+
+	if v3 then
+		return clone, (self:_clone(join(self.props, { Text = v3:gsub("^%s*", "") })))
+	end
+
+	return clone, nil
 end
-function t3.render(t7: {[any]: any}, p23, n2: number) -- line: 179
-	-- upvalues: Escape (copy), Dash (copy), React (copy), join (copy)
-	local propsText = t7.props.Text
 
-	if t7.hasRichText and (t7.props.Text and t7.props.EngineTags) then
-		local propsText2 = t7.props.Text
-		local EngineTags = t7.props.EngineTags
-		local v52 = Escape.escapeRichFormatting(propsText2)
+function BaseTextElement:trimStart()
+	local text = self.props.Text
 
-		propsText = Dash.reduce(EngineTags, function(p24, p25) -- line: 72
-			-- upvalues: Dash (copy)
-			local v66 = Dash.reduce(p25.attributes, function(p26, p27, p28) -- line: 62
-				local v78 = not string.find(p27, "\"") and "\"" or "'"
+	if text == nil then
+		return self
+	end
 
-				return `{ p26 } { p28 }={ v78 }{ p27 }{ v78 }`
+	local text2 = text:gsub("^%s+", "")
+
+	if text2 == "" then
+		return nil
+	end
+
+	if text2 == text then
+		return self
+	end
+
+	return self:_clone(join(self.props, { Text = text2 }))
+end
+
+function BaseTextElement.render(props, id, layoutOrder: number)
+	local text2 = props.props.Text
+
+	if props.hasRichText and props.props.Text and props.props.EngineTags then
+		local text = props.props.Text
+		local engineTags = props.props.EngineTags
+		local escapeRichFormatting = Escape.escapeRichFormatting(text)
+		text2 = Dash.reduce(engineTags, function(p, p2)
+			local reduced = Dash.reduce(p2.attributes, function(p3, value, p4)
+				local v2 = string.find(value, "\"") and "'" or "\""
+				return `{p3} {p4}={v2}{value}{v2}`
 			end, "")
 
-			return `<{ p25.name }{ v66 }>{ p24 }</{ p25.name }>`
-		end, v52)
+			return `<{p2.name}{reduced}>{p}</{p2.name}>`
+		end, escapeRichFormatting)
 	end
 
-	return React.createElement(t7.Element, t7.mapProps(join(t7.props, {
-		id = p23,
-		Text = propsText,
-		RichText = t7.hasRichText,
+	return React.createElement(props.Element, props.mapProps(join(props.props, {
+		id = id,
+		Text = text2,
+		RichText = props.hasRichText,
 		AutomaticSize = Enum.AutomaticSize.XY,
-		LayoutOrder = n2,
-		key = tostring(n2),
+		LayoutOrder = layoutOrder,
+		key = tostring(layoutOrder),
 		EngineTags = Dash.None
 	})))
 end
 
-return t3
+return BaseTextElement

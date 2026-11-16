@@ -1,10 +1,11 @@
-local scriptParent = script.Parent
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local PreferencesContext = require(scriptParent.PreferencesContext)
-local React = require(Parent.React)
+local parent = script.Parent
+local parent2 = script:FindFirstAncestor("Foundation").Parent
 
-local function usePreferences() -- line: 9
-	-- upvalues: React (copy), PreferencesContext (copy)
+local PreferencesContext = require(parent.PreferencesContext)
+
+local React = require(parent2.React)
+
+local function usePreferences()
 	return (React.useContext(PreferencesContext))
 end
 

@@ -1,68 +1,69 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local Object = require(ParentParent.LuauPolyfill).Object
-local React = require(ParentParent.React)
-local SceneView = require(scriptParent.SceneView)
-local t1 = {
-	keepVisitedScreensMounted = false
-}
-local v7 = React.Component:extend("RobloxSwitchView")
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
 
-function v7.getDerivedStateFromProps(p1, p2) -- line: 16
-	-- upvalues: Object (copy), t1 (copy)
-	local state = p1.navigation.state
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local React = require(parent2.React)
+local SceneView = require(parent.SceneView)
+
+local v = { keepVisitedScreensMounted = false }
+
+local extended = React.Component:extend("RobloxSwitchView")
+
+function extended.getDerivedStateFromProps(data, p)
+	local state = data.navigation.state
 	local key = state.routes[state.index].key
-	local descriptors = p1.descriptors
-	local keepVisitedScreensMounted = Object.assign(table.clone(t1), p1.navigationConfig or {}).keepVisitedScreensMounted
-	local t2 = {
-		[key] = true
-	}
+	local descriptors = data.descriptors
 
-	if keepVisitedScreensMounted and p2.visitedScreenKeys then
-		for v15 in p2.visitedScreenKeys do
-			if descriptors[v15] ~= nil then
-				t2[v15] = true
+	local keepVisitedScreensMounted = Object.assign(table.clone(v), data.navigationConfig or {}).keepVisitedScreensMounted
+
+	local visitedScreenKeys = { [key] = true }
+
+	if keepVisitedScreensMounted and p.visitedScreenKeys then
+		for k in p.visitedScreenKeys do
+			if descriptors[k] ~= nil then
+				visitedScreenKeys[k] = true
 			end
 		end
 	end
 
-	return {
-		visitedScreenKeys = t2
-	}
+	return { visitedScreenKeys = visitedScreenKeys }
 end
-function v7.init(p3) -- line: 44
-	p3.state = {}
+
+function extended:init()
+	self.state = {}
 end
-function v7.render(p4) -- line: 48
-	-- upvalues: React (copy), SceneView (copy)
-	local state = p4.props.navigation.state
-	local screenProps = p4.props.screenProps
-	local descriptors = p4.props.descriptors
-	local visitedScreenKeys = p4.state.visitedScreenKeys
+
+function extended.render(p)
+	local state = p.props.navigation.state
+	local screenProps = p.props.screenProps
+	local descriptors = p.props.descriptors
+	local visitedScreenKeys = p.state.visitedScreenKeys
 	local key = state.routes[state.index].key
-	local t3 = {}
 
-	for v24, v25 in descriptors do
-		local v26 = v24 == key
+	local children = {}
 
-		if visitedScreenKeys[v24] == true then
-			t3["card_" .. v24] = React.createElement("Frame", {
+	for k, descriptor in descriptors do
+		local visible = k == key
+
+		if visitedScreenKeys[k] == true then
+			children["card_" .. k] = React.createElement("Frame", {
+				Size = UDim2.new(1, 0, 1, 0),
 				BackgroundTransparency = 1,
 				ClipsDescendants = false,
 				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 1, 0),
-				Visible = v26
+				Visible = visible
 			}, {
 				Content = React.createElement(SceneView, {
-					component = v25.getComponent(),
-					navigation = v25.navigation,
+					component = descriptor.getComponent(),
+					navigation = descriptor.navigation,
 					screenProps = screenProps
 				})
 			})
 		end
 	end
 
-	return React.createElement("Folder", nil, t3)
+	return React.createElement("Folder", nil, children)
 end
 
-return v7
+return extended

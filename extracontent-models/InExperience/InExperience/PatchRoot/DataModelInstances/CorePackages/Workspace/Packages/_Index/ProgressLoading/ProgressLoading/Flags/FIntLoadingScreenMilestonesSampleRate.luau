@@ -1,0 +1,1 @@
+return game:DefineFastInt("LoadingScreenMilestonesSampleRate2", 1)

@@ -1,62 +1,41 @@
 local Analytics = require(script.Parent.Analytics)
-local t1 = {
-	2,
-	10
-}
-local t2 = {}
-local t3 = {}
 
-local function createDelayedTask(p1, p2, p3) -- line: 11
-	local u10 = false
+local v = { 2, 10 }
+local v2 = {}
 
-	task.delay(p1, function() -- line: 14
-		-- upvalues: u10 (ref), p3 (copy), p2 (copy)
-		if not u10 then
-			p3(p2)
+local function createDelayedTask(duration, i, fn) -- 1 equivalent call inferred from this helper
+	local v3 = false
+
+	task.delay(duration, function()
+		if not v3 then
+			fn(i)
 		end
 	end)
-
-	return function() -- line: 19
-		-- upvalues: u10 (ref)
-		u10 = true
+	return function()
+		v3 = true
 	end
 end
-local function cancelTasks() -- line: 24
-	-- upvalues: t2 (ref)
-	for _, v in ipairs(t2) do
-		if v ~= nil then
-			v()
+
+local function cancelTasks()
+	for _, v3 in ipairs(v2) do
+		if v3 ~= nil then
+			v3()
 		end
 	end
 
-	t2 = {}
+	v2 = {}
 end
 
-function t3.onPageChanged(p4) -- line: 33
-	-- upvalues: cancelTasks (copy), t1 (copy), t2 (ref), Analytics (copy)
-	cancelTasks()
+return {
+	onPageChanged = function(p)
+		cancelTasks()
 
-	for i, v in ipairs(t1) do
-		local v16 = t2
-
-		local function v17(p5) -- line: 39
-			-- upvalues: Analytics (copy), p4 (copy)
-			Analytics.reportPageHeartbeat(p5, p4)
-		end
-
-		local u18 = false
-
-		task.delay(v, function() -- line: 14
-			-- upvalues: u18 (ref), v17 (copy), i (copy)
-			if not u18 then
-				v17(i)
+		for i, v3 in ipairs(v) do
+			local function fn(p2)
+				Analytics.reportPageHeartbeat(p2, p)
 			end
-		end)
-		v16[i] = function() -- line: 19
-			-- upvalues: u18 (ref)
-			u18 = true
+
+			v2[i] = createDelayedTask(v3, i, fn) -- inferred equivalent call
 		end
 	end
-end
-
-return t3
+}

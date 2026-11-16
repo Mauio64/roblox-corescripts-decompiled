@@ -1,7 +1,6 @@
-local t1 = {
-	TranslateGameText = function(_, _, p3) -- line: 2
-		return p3
+local GameLocalization = require(script.GameLocalization)
+return GameLocalization({
+	TranslateGameText = function(_, _, p)
+		return p
 	end
-}
-
-return require(script.GameLocalization)(t1)
+})

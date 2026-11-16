@@ -1,38 +1,30 @@
 local equalObjects = require(script.Parent.Parent.equalObjects)
-
-local function equalsDeepOneWay(p1, p2) -- line: 4
-	-- upvalues: equalsDeepOneWay (copy)
-	if type(p1) == "table" and type(p2) == "table" then
-		for k, v in pairs(p1) do
-			if not equalsDeepOneWay(v, p2[k]) then
+local function equalsDeepOneWay(items, p): boolean
+	if type(items) == "table" and type(p) == "table" then
+		for k, item in pairs(items) do
+			if not equalsDeepOneWay(item, p[k]) then
 				return false
 			end
 		end
-	elseif p1 ~= p2 then
+	elseif items ~= p then
 		return false
 	end
 
 	return true
 end
-local function equalsDeep(...) -- line: 20
-	-- upvalues: equalObjects (copy), equalsDeepOneWay (copy)
+
+local function equalsDeep(...): boolean
 	if equalObjects(...) then
 		return true
 	end
 
-	local v8 = select("#", ...)
+	local v = select("#", ...)
 
-	for i = 1, v8 do
-		local v10 = select(i, ...)
+	for i = 1, v do
+		local v2 = select(i, ...)
 
-		for j = 1, v8 do
-			if j == i then
-				continue
-			end
-
-			local v12 = select(j, ...)
-
-			if not equalsDeepOneWay(v10, v12) then
+		for j = 1, v do
+			if j ~= i and not equalsDeepOneWay(v2, (select(j, ...))) then
 				return false
 			end
 		end

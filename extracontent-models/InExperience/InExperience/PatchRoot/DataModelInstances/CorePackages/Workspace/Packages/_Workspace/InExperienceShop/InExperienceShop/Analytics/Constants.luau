@@ -1,7 +1,3 @@
 return {
-	ShopPageType = {
-		Home = "HOME",
-		Category = "CATEGORY",
-		Search = "SEARCH"
-	}
+	ShopPageType = { Home = "HOME", Category = "CATEGORY", Search = "SEARCH" }
 }

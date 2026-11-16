@@ -1,64 +1,65 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
-local getGameMediaStore = require(Parent.DataHydration).Game.getGameMediaStore
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function useGameMediaForUniverse(n1: number) -- line: 22
-	-- upvalues: React (copy), getGameMediaStore (copy), Signals (copy)
-	local v7, v8 = React.useState(getGameMediaStore().getAndFetchGameMedia((tostring(n1))).data)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
 
-	React.useEffect(function() -- line: 26
-		-- upvalues: Signals (copy), getGameMediaStore (copy), n1 (copy), v8 (copy)
-		local v11 = Signals.createEffect(function(p1) -- line: 27
-			-- upvalues: getGameMediaStore (copy), n1 (copy), v8 (copy)
-			local v18 = getGameMediaStore(p1).getAndFetchGameMedia((tostring(n1)))
+local DataHydration = require(parent.DataHydration)
+local getGameMediaStore = DataHydration.Game.getGameMediaStore
 
-			v8(v18.data(p1))
+local function useGameMediaForUniverse(p: number)
+	local state, setState = React.useState(getGameMediaStore().getAndFetchGameMedia((tostring(p))).data)
+
+	React.useEffect(function()
+		local effect = Signals.createEffect(function(p2)
+			setState(getGameMediaStore(p2).getAndFetchGameMedia((tostring(p))).data(p2))
 		end)
-
-		return function() -- line: 31
-			-- upvalues: v11 (copy)
-			v11()
+		return function()
+			effect()
 		end
-	end, { n1 })
-
-	local v9 = React.useMemo(function() -- line: 36
-		-- upvalues: n1 (copy)
-		return string.format("rbxthumb://type=GameIcon&id=%d&w=512&h=512", n1)
-	end, { n1 })
-	local v10 = React.useMemo(function() -- line: 40
-		-- upvalues: v7 (copy)
-		if not v7 then
-			return {}
-		end
-
-		local t1 = {}
-
-		for v13, v14 in v7 do
-			local s1 = "image"
-			local v16 = nil
-
-			if v14.videoId then
-				s1 = "video"
-				v16 = "rbxassetid://" .. tostring(v14.videoId)
-			elseif v14.imageId then
-				v16 = "rbxassetid://" .. tostring(v14.imageId)
-			end
-
-			table.insert(t1, {
-				id = `thumbnail_{ v13 }`,
-				mediaType = s1,
-				assetSource = v16,
-				assetResourceName = if not v14.imageId then nil else `assets/{ v14.imageId }`
-			})
-		end
-
-		return t1
-	end, { v7 })
+	end, { p })
 
 	return {
-		icon = v9,
-		thumbnails = v10
+		icon = React.useMemo(function()
+			return string.format("rbxthumb://type=GameIcon&id=%d&w=512&h=512", p)
+		end, { p }),
+		thumbnails = React.useMemo(function()
+			if not state then
+				return {}
+			end
+
+			local result = {}
+
+			for _, v in state do
+				local mediaType = "image"
+
+				local videoId = tostring(v.videoId or v.imageId)
+				local assetSource
+
+				if v.videoId then
+					assetSource = "rbxassetid://" .. tostring(v.videoId)
+					mediaType = "video"
+				elseif v.imageId then
+					assetSource = "rbxassetid://" .. tostring(v.imageId)
+				else
+					continue
+				end
+
+				local assetResourceName
+
+				if v.imageId then
+					assetResourceName = `assets/{v.imageId}`
+				end
+
+				table.insert(result, {
+					id = videoId,
+					mediaType = mediaType,
+					assetSource = assetSource,
+					assetResourceName = assetResourceName
+				})
+			end
+
+			return result
+		end, { state })
 	}
 end
 

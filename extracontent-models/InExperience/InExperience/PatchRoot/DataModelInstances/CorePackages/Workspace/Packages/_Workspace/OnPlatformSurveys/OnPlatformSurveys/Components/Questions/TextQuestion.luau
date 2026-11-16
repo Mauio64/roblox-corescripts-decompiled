@@ -1,32 +1,27 @@
 local OnPlatformSurveys = script:FindFirstAncestor("OnPlatformSurveys")
-local OnPlatformSurveysParent = OnPlatformSurveys.Parent
-local Foundation = require(OnPlatformSurveysParent.Foundation)
-local React = require(OnPlatformSurveysParent.React)
+local parent = OnPlatformSurveys.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local TextInput = Foundation.TextInput
 local View = Foundation.View
 
 require(OnPlatformSurveys.Types.InlineSurveyTypes)
 
-local function TextQuestion(t1: {[any]: any}) -- line: 21
-	-- upvalues: React (copy), View (copy), TextInput (copy)
-	local onAnswerChanged = t1.onAnswerChanged
-	local v10 = React.useCallback(function(s1: string) -- line: 23
-		-- upvalues: onAnswerChanged (copy)
-		onAnswerChanged({
-			text = s1
-		})
+local function TextQuestion(props)
+	local onAnswerChanged = props.onAnswerChanged
+	local onChanged = React.useCallback(function(text: string)
+		onAnswerChanged({ text = text })
 	end, { onAnswerChanged })
 
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y",
-		LayoutOrder = t1.layoutOrder
-	}, {
+	return React.createElement(View, { tag = "size-full-0 auto-y", LayoutOrder = props.layoutOrder }, {
 		Input = React.createElement(TextInput, {
+			text = props.answer.text or "",
 			label = "",
-			text = t1.answer.text or "",
 			width = UDim.new(1, 0),
-			isDisabled = t1.isDisabled,
-			onChanged = v10
+			isDisabled = props.isDisabled,
+			onChanged = onChanged
 		})
 	})
 end

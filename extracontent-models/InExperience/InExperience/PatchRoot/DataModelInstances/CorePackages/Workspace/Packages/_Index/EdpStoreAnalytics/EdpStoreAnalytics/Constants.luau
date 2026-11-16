@@ -1,10 +1,7 @@
 return {
 	ExperienceStoreEventName = "experienceStoreProducts",
 	StoreEnums = {
-		LocationType = {
-			Store = "STORE_PAGE",
-			Edp = "EXPERIENCE_DETAILS_PAGE"
-		},
+		LocationType = { Store = "STORE_PAGE", Edp = "EXPERIENCE_DETAILS_PAGE" },
 		ActionType = {
 			Impression = "IMPRESSION",
 			ItemClick = "ITEM_CLICK",

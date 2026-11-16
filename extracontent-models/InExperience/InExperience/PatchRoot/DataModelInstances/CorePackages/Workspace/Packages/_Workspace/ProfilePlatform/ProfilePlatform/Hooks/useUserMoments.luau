@@ -1,114 +1,265 @@
-local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
-local React = require(Parent.React)
-local Cryo = require(Parent.Cryo)
-local SignalsReact = require(Parent.SignalsReact)
-local SharedFlags = require(Parent.SharedFlags)
-local MomentsGetMomentsUserStore = require(Parent.DataHydration.MomentsGetMomentsUserStore)
+local parent = script:FindFirstAncestor("ProfilePlatform").Parent
 
-require(Parent.DataHydration.MomentsStoreTypes)
+local v = nil
+pcall(function()
+	local AppLifecycleObserverService = game:GetService("AppLifecycleObserverService")
+	v = AppLifecycleObserverService
+end)
 
-local GetDeletedMomentsStore = require(Parent.Moments.GetDeletedMomentsStore)
+local React = require(parent.React)
+local Cryo = require(parent.Cryo)
+local SignalsReact = require(parent.SignalsReact)
+local SharedFlags = require(parent.SharedFlags)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+
+local MomentsGetMomentsUserStore = require(parent.DataHydration.MomentsGetMomentsUserStore)
+require(parent.DataHydration.MomentsStoreTypes)
+
+local GetDeletedMomentsStore = require(parent.Moments.GetDeletedMomentsStore)
+
 local FFlagMomentsRemoveDeletedFromProfile = SharedFlags.FFlagMomentsRemoveDeletedFromProfile
+local FFlagMomentsRefreshOwnMomentsAfterPublish = SharedFlags.FFlagMomentsRefreshOwnMomentsAfterPublish
+local FFlagMomentsOptimisticProfilePending = SharedFlags.FFlagMomentsOptimisticProfilePending
+local FFlagMomentsRefreshProfileOnPostStatus = SharedFlags.FFlagMomentsRefreshProfileOnPostStatus
 
-local function useUserMoments(s1: string?) -- line: 29
-	-- upvalues: React (copy), MomentsGetMomentsUserStore (copy), Cryo (copy), FFlagMomentsRemoveDeletedFromProfile (copy), SignalsReact (copy), GetDeletedMomentsStore (copy)
-	local v11, v12 = React.useState({})
-	local v13, v14 = React.useState(nil)
-	local v15, v16 = React.useState(false)
-	local v17, v18 = React.useState(false)
-	local v19, v20 = React.useState(false)
+local function useUserMoments(current: string?, p)
+	local state, setState = React.useState({})
+	local state2, setState2 = React.useState(nil)
+	local state3, setState3 = React.useState(false)
+	local state4, setState4 = React.useState(false)
+	local state5, setState5 = React.useState(false)
+	local ref = React.useRef(nil)
+	local v2
 
-	React.useEffect(function() -- line: 36
-		-- upvalues: s1 (copy), MomentsGetMomentsUserStore (copy), v18 (copy), v12 (copy), v14 (copy), v16 (copy)
-		local v24 = if s1 == nil then nil else tonumber(s1)
+	if FFlagMomentsRefreshProfileOnPostStatus or FFlagMomentsOptimisticProfilePending then
+		v2 = useLocalUserId()
+	end
 
-		if v24 == nil then
+	local v3
+
+	if v2 == nil then
+		v3 = false
+	else
+		v3 = tostring(v2) == current
+	end
+
+	local v4 = not (FFlagMomentsRefreshOwnMomentsAfterPublish or FFlagMomentsRefreshProfileOnPostStatus or FFlagMomentsOptimisticProfilePending)
+		and 0
+		or SignalsReact.useSignalState(MomentsGetMomentsUserStore(false).getUserMomentsVersion)
+
+	local v5 = not FFlagMomentsOptimisticProfilePending and {}
+		or SignalsReact.useSignalState(MomentsGetMomentsUserStore(false).getPendingUserMoments)
+
+	React.useEffect(function()
+		local v6
+
+		if current ~= nil then
+			v6 = tonumber(current)
+		end
+
+		if v6 == nil then
 			return
 		end
 
-		local u25 = false
+		local momentsGetMomentsUserStore = MomentsGetMomentsUserStore(false)
 
-		MomentsGetMomentsUserStore(false).getUserMoments(v24):andThen(function(p1) -- line: 44
-			-- upvalues: u25 (ref), v18 (copy), v12 (copy), v14 (copy), v16 (copy)
-			if not u25 then
-				v18(false)
-				v12(p1.moments)
-				v14(p1.nextCursor)
-				v16(p1.nextCursor ~= nil)
+		if
+			(FFlagMomentsRefreshProfileOnPostStatus or FFlagMomentsOptimisticProfilePending)
+			and ref.current ~= current
+		then
+			ref.current = current
+
+			if v3 then
+				momentsGetMomentsUserStore.evictUserMoments(v6)
 			end
-		end):catch(function() -- line: 52
-			-- upvalues: u25 (ref), v18 (copy)
-			if not u25 then
-				v18(true)
+		end
+
+		local v7 = false
+
+		momentsGetMomentsUserStore.getUserMoments(v6):andThen(function(p2)
+			if not v7 then
+				setState4(false)
+				setState(p2.moments)
+				setState2(p2.nextCursor)
+				setState3(p2.nextCursor ~= nil)
+			end
+		end):catch(function()
+			if not v7 then
+				setState4(true)
 			end
 		end)
-
-		return function() -- line: 57
-			-- upvalues: u25 (ref)
-			u25 = true
+		return function()
+			v7 = true
 		end
-	end, { s1 })
+	end, { current, v4, v3 })
 
-	local v21 = React.useCallback(function() -- line: 62
-		-- upvalues: s1 (copy), v13 (copy), v15 (copy), v19 (copy), v20 (copy), MomentsGetMomentsUserStore (copy), v12 (copy), Cryo (copy), v16 (copy), v14 (copy)
-		local v26 = if s1 == nil then nil else tonumber(s1)
+	if FFlagMomentsRefreshProfileOnPostStatus or FFlagMomentsOptimisticProfilePending then
+		React.useEffect(function()
+			if not v3 then
+				return
+			end
 
-		if v26 == nil or v13 == nil or not v15 or v19 then
+			local v6 = p or v
+
+			if v6 == nil then
+				return
+			end
+
+			local onUnhideConnection = v6.OnUnhide:Connect(function()
+				local v7
+
+				if current ~= nil then
+					v7 = tonumber(current)
+				end
+
+				if v7 ~= nil then
+					MomentsGetMomentsUserStore(false).invalidateUser(v7)
+				end
+			end)
+			return function()
+				onUnhideConnection:Disconnect()
+			end
+		end, { current, p, v3 })
+	end
+
+	local loadMore = React.useCallback(function()
+		local v6
+
+		if current ~= nil then
+			v6 = tonumber(current)
+		end
+
+		if v6 == nil or state2 == nil or not state3 or state5 then
 			return
 		end
 
-		v20(true)
-		MomentsGetMomentsUserStore(false).getUserMoments(v26, v13):andThen(function(p2) -- line: 70
-			-- upvalues: v12 (copy), Cryo (copy), v16 (copy), v13 (copy), v14 (copy)
-			v12(function(p3) -- line: 71
-				-- upvalues: Cryo (copy), p2 (copy)
+		setState5(true)
+		MomentsGetMomentsUserStore(false).getUserMoments(v6, state2):andThen(function(p2)
+			setState(function(p3)
 				return Cryo.List.join(p3, p2.moments)
 			end)
-			v16(p2.nextCursor ~= nil and p2.nextCursor ~= v13)
-			v14(p2.nextCursor)
-		end):catch(function() -- line: 78
-		end):finally(function() -- line: 79
-			-- upvalues: v20 (copy)
-			v20(false)
+
+			setState3(p2.nextCursor ~= nil and p2.nextCursor ~= state2)
+			setState2(p2.nextCursor)
+		end):catch(function() end):finally(function()
+			setState5(false)
 		end)
-	end, {
-		s1,
-		v13,
-		v15,
-		v19
-	})
-	local v22 = v11
+	end, { current, state2, state3, state5 })
+	local v6, moments2
 
-	if FFlagMomentsRemoveDeletedFromProfile then
-		local v23 = SignalsReact.useSignalState(GetDeletedMomentsStore(false).getDeletedIds)
+	if FFlagMomentsRemoveDeletedFromProfile or FFlagMomentsOptimisticProfilePending then
+		v6 = SignalsReact.useSignalState(GetDeletedMomentsStore(false).getDeletedIds)
 
-		v22 = React.useMemo(function() -- line: 94
-			-- upvalues: v23 (copy), v11 (copy)
-			if #v23 == 0 then
-				return v11
+		moments2 = React.useMemo(function()
+			if #v6 == 0 then
+				return state
 			end
 
-			local t1 = {}
+			local result = {}
 
-			for _, v29 in v11 do
-				if not table.find(v23, v29.momentId) then
-					table.insert(t1, v29)
+			for _, v7 in state do
+				if not table.find(v6, v7.momentId) then
+					table.insert(result, v7)
 				end
 			end
 
-			return t1
-		end, {
-			v11,
-			v23
-		})
+			return result
+		end, { state, v6 })
+	else
+		moments2 = state
+		v6 = nil
+	end
+
+	if FFlagMomentsOptimisticProfilePending then
+		local v7
+
+		if current == nil then
+			v7 = nil
+		else
+			v7 = tonumber(current)
+		end
+
+		local state6, setState6 = React.useState({})
+		local v8 = React.useMemo(function()
+			local v8 = v7 == nil and {} or v5[v7] or {}
+
+			local set = {}
+			local momentIdSet = {}
+
+			for _, v9 in state do
+				set[v9.momentId] = true
+				local feedItemId = v9.recommendationMetadata.feedItemId
+
+				if feedItemId ~= nil and feedItemId ~= "" then
+					set[feedItemId] = true
+				end
+			end
+
+			for _, v9 in v8 do
+				local publishedMoment = v9.publishedMoment
+
+				if publishedMoment == nil then
+					continue
+				end
+
+				local feedItemId = publishedMoment.recommendationMetadata.feedItemId
+
+				if not (set[publishedMoment.momentId] or feedItemId ~= nil and set[feedItemId] or v6 ~= nil and table.find(v6, publishedMoment.momentId) ~= nil) then
+					continue
+				end
+
+				momentIdSet[v9.moment.momentId] = true
+			end
+
+			return momentIdSet
+		end, { v7, state, v5, v6 })
+		React.useEffect(function()
+			setState6(function(p2)
+				local clone = table.clone(p2)
+				local flag = false
+
+				for k in v8 do
+					if clone[k] then
+						continue
+					end
+
+					clone[k] = true
+					flag = true
+				end
+
+				return if flag then clone else p2
+			end)
+		end, { v8 })
+		local v9
+
+		if v7 ~= nil then
+			v9 = v5[v7]
+		end
+
+		if v9 ~= nil and #v9 > 0 then
+			local moments = {}
+
+			for _, v10 in v9 do
+				local moment = v10.moment
+
+				if not (v8[moment.momentId] or state6[moment.momentId]) then
+					table.insert(moments, moment)
+				end
+			end
+
+			if #moments > 0 then
+				moments2 = Cryo.List.join(moments, moments2)
+			end
+		end
 	end
 
 	return {
-		moments = v22,
-		hasMore = v15,
-		hasFailed = v17,
-		isLoadingMore = v19,
-		loadMore = v21
+		moments = moments2,
+		hasMore = state3,
+		hasFailed = state4,
+		isLoadingMore = state5,
+		loadMore = loadMore
 	}
 end
 

@@ -1,8 +1,7 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local v2 = require(AppChat.Logger):new(script:GetFullName() .. ":RemoveUserDialogScreen")
+local Logger = require(AppChat.Logger)
 
-v2:setContext({
-	screen = "RemoveUserDialogScreen"
-})
+local v = Logger:new(script:GetFullName() .. ":RemoveUserDialogScreen")
+v:setContext({ screen = "RemoveUserDialogScreen" })
 
-return v2
+return v

@@ -1,22 +1,18 @@
 local GameVotesRodux = script:FindFirstAncestor("GameVotesRodux")
-local GameVotesRoduxParent = GameVotesRodux.Parent
-local Immutable = require(GameVotesRoduxParent.AppCommonLib).Immutable
+local parent = GameVotesRodux.Parent
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
 local SetGameVotes = require(GameVotesRodux.GameVotes.SetGameVotes)
 
-return function(t1: {[any]: any}?, p1) -- line: 15
-	-- upvalues: SetGameVotes (copy), Immutable (copy)
-	local v7 = t1 or {}
+return function(options, data)
+	options = options or {}
+	assert(options, "")
 
-	assert(v7, "")
+	if data.type == SetGameVotes.name then
+		local v = { upVotes = data.upVotes, downVotes = data.downVotes }
 
-	if p1.type == SetGameVotes.name then
-		local t2 = {
-			upVotes = p1.upVotes,
-			downVotes = p1.downVotes
-		}
-
-		v7 = Immutable.Set(v7, p1.universeId, t2)
+		options = Immutable.Set(options, data.universeId, v)
 	end
 
-	return v7
+	return options
 end

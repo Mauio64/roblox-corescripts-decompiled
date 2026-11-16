@@ -1,298 +1,386 @@
 local RunService = game:GetService("RunService")
 local CorePackages = game:GetService("CorePackages")
+
 local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
 local Roact = InGameMenuDependencies.Roact
 local UIBlox = InGameMenuDependencies.UIBlox
 local t = InGameMenuDependencies.t
-local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local withFoundationOrUIBloxStyle = CoreGuiCommon.withFoundationOrUIBloxStyle
 local Foundation = require(CorePackages.Packages.Foundation)
-local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
-local v10 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.withSelectionCursorProvider else Foundation.UNSTABLE.withCursorMigration
-local v11 = if not FFlagCoreUiMigrateUIBloxToFoundation then UIBlox.App.SelectionImage.CursorKind else Foundation.Enums.CursorType
-local ParentParent = script.Parent.Parent.Parent
-local InviteStatus = require(ParentParent.Resources.Constants).InviteStatus
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagCoreUiMigrateUIBloxToFoundation = SharedFlags.FFlagCoreUiMigrateUIBloxToFoundation
+local v
+
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v = Foundation.UNSTABLE.withCursorMigration
+else
+	v = UIBlox.App.SelectionImage.withSelectionCursorProvider
+end
+
+local v2
+
+if FFlagCoreUiMigrateUIBloxToFoundation then
+	v2 = Foundation.Enums.CursorType
+else
+	v2 = UIBlox.App.SelectionImage.CursorKind
+end
+
+local parent = script.Parent.Parent.Parent
+
+local Constants = require(parent.Resources.Constants)
+local InviteStatus = Constants.InviteStatus
+
 local Images = UIBlox.App.ImageSet.Images
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local Icon = Foundation.Icon
 local IconName = Foundation.Enums.IconName
 local IconVariant = Foundation.Enums.IconVariant
 local IconSize = Foundation.Enums.IconSize
-local v20 = Roact.PureComponent:extend("SendInviteButton")
 
-v20.validateProps = t.strictInterface({
+local extended = Roact.PureComponent:extend("SendInviteButton")
+
+extended.validateProps = t.strictInterface({
 	onActivated = t.callback,
 	animationBegun = t.callback,
 	animationEnded = t.callback,
 	userInviteStatus = t.optional(t.string)
 })
 
-local function linearTween(p1, p2, p3) -- line: 47
-	local v27 = (p3 - p2) / 30
-
-	return (p1 - p2 / 30) / v27
-end
-local function isBetweenFrames(p4, p5, p6) -- line: 52
-	return p4 >= p5 / 30 and p4 <= p6 / 30
+local function linearTween(p, p2, p3)
+	local v3 = (p3 - p2) / 30
+	return (p - p2 / 30) / v3
 end
 
-local t1 = {
-	[InviteStatus.Pending] = function(p7, p8) -- line: 57
-		local v33 = math.sin(6.283185307179586 * p7) * 0.375 + 0.375
+local function isBetweenFrames(p, p2, p3): boolean
+	return p2 / 30 <= p and p <= p3 / 30
+end
 
-		p8.sendTransparency(v33)
+local v3 = {
+	[InviteStatus.Pending] = function(p, p2)
+		local v3 = math.sin(6.283185307179586 * p) * 0.375 + 0.375
+		p2.sendTransparency(v3)
 	end,
-	[InviteStatus.Success] = function(p9, p10, p11) -- line: 66
-		if p9 >= 0 and p9 <= 0.13333333333333333 then
-			local v37 = (p9 - 0) / 0.13333333333333333
+	[InviteStatus.Success] = function(p, data, callback)
+		local v3
 
-			p10.sendTransparency(v37)
-			p10.successTransparency(1 - v37)
-
-			local v38 = 0.75 + 0.75 * (1 - v37)
-
-			p10.successSize(v38)
-
-			return
-		end
-
-		if p9 >= 0.13333333333333333 and p9 <= 0.3 then
-			p10.sendTransparency(1)
-			p10.successTransparency(0)
-
-			local v39 = 0.75 + 0.25 * ((p9 - 0.13333333333333333) / 0.16666666666666666)
-
-			p10.successSize(v39)
-
-			return
-		end
-
-		p10.successSize(1)
-		p11()
-	end,
-	[InviteStatus.Failed] = function(p12, p13, p14) -- line: 97
-		if p12 >= 0 and p12 <= 0.06666666666666667 then
-			local v43 = (p12 - 0) / 0.13333333333333333
-
-			p13.sendTransparency(v43)
-		elseif p12 >= 0.06666666666666667 and p12 <= 1.7333333333333334 then
-			p13.sendTransparency(1)
-		elseif p12 >= 1.7333333333333334 and p12 <= 1.9 then
-			local v44 = (p12 - 1.7333333333333334) / 0.16666666666666666
-
-			p13.sendTransparency(1 - v44)
+		if p >= 0 then
+			v3 = p <= 2 / 15
 		else
-			p13.sendTransparency(0)
-			p14()
+			v3 = false
 		end
 
-		if p12 >= 0 and p12 <= 0.13333333333333333 then
-			local v45 = (p12 - 0) / 0.13333333333333333
+		if v3 then
+			local v4 = (p - 0) / (2 / 15)
 
-			p13.failTransparency(1 - v45)
+			data.sendTransparency(v4)
+			data.successTransparency(1 - v4)
 
-			return
+			local v5 = 0.75 + 0.75 * (1 - v4)
+			data.successSize(v5)
+		else
+			local v4
+
+			if p >= 2 / 15 then
+				v4 = p <= 0.3
+			else
+				v4 = false
+			end
+
+			if v4 then
+				data.sendTransparency(1)
+				data.successTransparency(0)
+				local v5 = 0.75 + 0.25 * ((p - 2 / 15) / (1 / 6))
+				data.successSize(v5)
+			else
+				data.successSize(1)
+				callback()
+			end
+		end
+	end,
+	[InviteStatus.Failed] = function(p, data, callback)
+		local v3
+
+		if p >= 0 then
+			v3 = p <= 1 / 15
+		else
+			v3 = false
 		end
 
-		if p12 >= 0.13333333333333333 and p12 <= 1.4 then
-			p13.failTransparency(0)
+		if v3 then
+			local v4 = (p - 0) / (2 / 15)
 
-			local v46 = p12 - 0.13333333333333333
-			local v47 = -0.4 * 2.71828182846 ^ (-v46 * 8) * math.sin(v46 * 40)
+			data.sendTransparency(v4)
+		else
+			local v4
 
-			p13.failPos(v47)
+			if p >= 1 / 15 then
+				v4 = p <= 26 / 15
+			else
+				v4 = false
+			end
 
-			return
+			if v4 then
+				data.sendTransparency(1)
+			else
+				local v5
+
+				if p >= 26 / 15 then
+					v5 = p <= 1.9
+				else
+					v5 = false
+				end
+
+				if v5 then
+					local v6 = (p - 26 / 15) / (1 / 6)
+
+					data.sendTransparency(1 - v6)
+				else
+					data.sendTransparency(0)
+					callback()
+				end
+			end
 		end
 
-		if p12 >= 1.4 and p12 <= 1.5666666666666667 then
-			p13.failPos(0)
+		local v4
 
-			local v48 = (p12 - 1.4) / 0.16666666666666666
-
-			p13.failTransparency(v48)
-
-			return
+		if p >= 0 then
+			v4 = p <= 2 / 15
+		else
+			v4 = false
 		end
 
-		p13.failTransparency(1)
+		if v4 then
+			local v5 = (p - 0) / (2 / 15)
+
+			data.failTransparency(1 - v5)
+		else
+			local v5
+
+			if p >= 2 / 15 then
+				v5 = p <= 1.4
+			else
+				v5 = false
+			end
+
+			if v5 then
+				data.failTransparency(0)
+
+				local v6 = p - 2 / 15
+				local v7 = -0.4 * 2.71828182846 ^ (-v6 * 8) * math.sin(v6 * 40)
+				data.failPos(v7)
+			else
+				local v6
+
+				if p >= 1.4 then
+					v6 = p <= 47 / 30
+				else
+					v6 = false
+				end
+
+				if not v6 then
+					data.failTransparency(1)
+
+					return
+				end
+
+				data.failPos(0)
+				local v7 = (p - 1.4) / (1 / 6)
+
+				data.failTransparency(v7)
+			end
+		end
 	end
 }
 
-function v20.init(p15, p16) -- line: 154
-	-- upvalues: Roact (copy), InviteStatus (copy)
-	local v51, v52 = Roact.createBinding(0)
-	local v53, v54 = Roact.createBinding(1)
-	local v55, v56 = Roact.createBinding(1)
-	local v57, v58 = Roact.createBinding(1)
-	local v59, v60 = Roact.createBinding(0)
+function extended:init(p)
+	local binding, sendTransparency = Roact.createBinding(0)
+	local binding2, successTransparency = Roact.createBinding(1)
+	local binding3, failTransparency = Roact.createBinding(1)
 
-	p15.bindings = {
-		sendTransparency = v51,
-		successTransparency = v53,
-		failTransparency = v55,
-		successSize = v57:map(function(p17) -- line: 166
-			return UDim2.new(p17, 0, p17, 0)
+	local binding4, successSize = Roact.createBinding(1)
+	local binding5, failPos = Roact.createBinding(0)
+
+	self.bindings = {
+		sendTransparency = binding,
+		successTransparency = binding2,
+		failTransparency = binding3,
+		successSize = binding4:map(function(p2)
+			return UDim2.new(p2, 0, p2, 0)
 		end),
-		successScale = v57,
-		failPos = v59:map(function(p18) -- line: 170
-			return UDim2.new(p18, 0, 0, 0)
+		successScale = binding4,
+		failPos = binding5:map(function(p2)
+			return UDim2.new(p2, 0, 0, 0)
 		end)
 	}
-	p15.updateBindings = {
-		sendTransparency = v52,
-		successTransparency = v54,
-		failTransparency = v56,
-		successSize = v58,
-		failPos = v60
+
+	self.updateBindings = {
+		sendTransparency = sendTransparency,
+		successTransparency = successTransparency,
+		failTransparency = failTransparency,
+		successSize = successSize,
+		failPos = failPos
 	}
 
-	if p16.userInviteStatus == InviteStatus.Success then
-		v54(0)
-		v52(1)
+	if p.userInviteStatus == InviteStatus.Success then
+		successTransparency(0)
+		sendTransparency(1)
 	end
 end
-function v20.renderWithSelectionCursor(p19, p20) -- line: 189
-	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), v11 (copy), InviteStatus (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconName (copy), IconVariant (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
-	local props = p19.props
 
-	return withFoundationOrUIBloxStyle(function(p21) -- line: 192
+function extended:renderWithSelectionCursor(callback)
+	local props = self.props
+
+	return withFoundationOrUIBloxStyle(function(p)
 		return {
 			Theme = {
 				IconEmphasis = {
-					Color = p21.Color.Content.Emphasis.Color3,
-					Transparency = p21.Color.Content.Emphasis.Transparency
+					Color = p.Color.Content.Emphasis.Color3,
+					Transparency = p.Color.Content.Emphasis.Transparency
 				}
 			},
-			IconSize = p21.Size.Size_800
+			IconSize = p.Size.Size_800
 		}
-	end, function(p22) -- line: 199
-		-- upvalues: Roact (copy), p20 (copy), v11 (copy), props (copy), InviteStatus (copy), p19 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Icon (copy), IconName (copy), IconVariant (copy), IconSize (copy), ImageSetLabel (copy), Images (copy)
-		return Roact.createElement("TextButton", {
+	end, function(p)
+		local createElement = Roact.createElement
+		local v4 = {
 			Selectable = false,
 			Size = UDim2.new(0, 36, 0, 36),
 			BackgroundTransparency = 1,
 			Text = "",
-			SelectionImageObject = p20(v11.InputFields),
-			[Roact.Event.Activated] = function() -- line: 207
-				-- upvalues: props (copy), InviteStatus (copy), p19 (copy)
-				local v77 = props.userInviteStatus == InviteStatus.Pending
-				local v78 = props.userInviteStatus == InviteStatus.Success
+			SelectionImageObject = callback(v2.InputFields),
+			[Roact.Event.Activated] = function()
+				local v4 = props.userInviteStatus == InviteStatus.Pending
+				local v5 = props.userInviteStatus == InviteStatus.Success
 
-				if not p19.renderSteppedConnection and (not v77 and not v78) then
+				if not (self.renderSteppedConnection or v4 or v5) then
 					props.onActivated()
 				end
 			end
-		}, {
-			SendLabel = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
-				Image = Images["icons/actions/friends/friendInvite"],
-				Size = UDim2.new(1, 0, 1, 0),
-				ImageColor3 = p22.Theme.IconEmphasis.Color,
-				ImageTransparency = p19.bindings.sendTransparency
-			}) else Roact.createElement(Icon, {
+		}
+		local sendLabel
+
+		if FFlagCoreUiMigrateUIBloxToFoundation then
+			sendLabel = Roact.createElement(Icon, {
 				name = IconName.PersonArrowFromBottomRight,
 				variant = IconVariant.Regular,
 				size = IconSize.XXLarge,
-				style = p19.bindings.sendTransparency:map(function(p23) -- line: 220
-					-- upvalues: p22 (copy)
-					return {
-						Color3 = p22.Theme.IconEmphasis.Color,
-						Transparency = p23
-					}
+				style = self.bindings.sendTransparency:map(function(transparency)
+					return { Color3 = p.Theme.IconEmphasis.Color, Transparency = transparency }
 				end)
-			}),
-			SuccessLabel = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
+			})
+		else
+			sendLabel = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = Images["icons/actions/friends/friendInvite"],
+				Size = UDim2.new(1, 0, 1, 0),
+				ImageColor3 = p.Theme.IconEmphasis.Color,
+				ImageTransparency = self.bindings.sendTransparency
+			})
+		end
+
+		local successLabel
+
+		if FFlagCoreUiMigrateUIBloxToFoundation then
+			successLabel = Roact.createElement(Icon, {
+				name = IconName.CheckLarge,
+				variant = IconVariant.Filled,
+				size = self.bindings.successScale:map(function(p2)
+					return p.IconSize * p2
+				end),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				style = self.bindings.successTransparency:map(function(transparency)
+					return { Color3 = p.Theme.IconEmphasis.Color, Transparency = transparency }
+				end)
+			})
+		else
+			successLabel = Roact.createElement(ImageSetLabel, {
 				BackgroundTransparency = 1,
 				Image = Images["icons/status/success"],
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				ImageColor3 = p22.Theme.IconEmphasis.Color,
-				ImageTransparency = p19.bindings.successTransparency,
-				Size = p19.bindings.successSize
-			}) else Roact.createElement(Icon, {
-				name = IconName.CheckLarge,
-				variant = IconVariant.Filled,
-				size = p19.bindings.successScale:map(function(p24) -- line: 236
-					-- upvalues: p22 (copy)
-					return p22.IconSize * p24
-				end),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				style = p19.bindings.successTransparency:map(function(p25) -- line: 241
-					-- upvalues: p22 (copy)
-					return {
-						Color3 = p22.Theme.IconEmphasis.Color,
-						Transparency = p25
-					}
-				end)
-			}),
-			FailLabel = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
-				BackgroundTransparency = 1,
-				Image = Images["icons/status/alert"],
-				Size = UDim2.new(1, 0, 1, 0),
-				ImageColor3 = p22.Theme.IconEmphasis.Color,
-				ImageTransparency = p19.bindings.failTransparency,
-				Position = p19.bindings.failPos
-			}) else Roact.createElement(Icon, {
+				ImageColor3 = p.Theme.IconEmphasis.Color,
+				ImageTransparency = self.bindings.successTransparency,
+				Size = self.bindings.successSize
+			})
+		end
+
+		local failLabel
+
+		if FFlagCoreUiMigrateUIBloxToFoundation then
+			failLabel = Roact.createElement(Icon, {
 				name = IconName.TriangleExclamation,
 				variant = IconVariant.Filled,
 				size = IconSize.XXLarge,
-				style = p19.bindings.failTransparency:map(function(p26) -- line: 260
-					-- upvalues: p22 (copy)
-					return {
-						Color3 = p22.Theme.IconEmphasis.Color,
-						Transparency = p26
-					}
+				style = self.bindings.failTransparency:map(function(transparency)
+					return { Color3 = p.Theme.IconEmphasis.Color, Transparency = transparency }
 				end),
-				Position = p19.bindings.failPos
+				Position = self.bindings.failPos
 			})
+		else
+			failLabel = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = Images["icons/status/alert"],
+				Size = UDim2.new(1, 0, 1, 0),
+				ImageColor3 = p.Theme.IconEmphasis.Color,
+				ImageTransparency = self.bindings.failTransparency,
+				Position = self.bindings.failPos
+			})
+		end
+
+		return createElement("TextButton", v4, {
+			SendLabel = sendLabel,
+			SuccessLabel = successLabel,
+			FailLabel = failLabel
 		})
 	end)
 end
-function v20.render(p27) -- line: 278
-	-- upvalues: v10 (copy)
-	return v10(function(p28) -- line: 279
-		-- upvalues: p27 (copy)
-		return p27:renderWithSelectionCursor(p28)
+
+function extended:render()
+	return v(function(p)
+		return self:renderWithSelectionCursor(p)
 	end)
 end
-function v20.didUpdate(p29, p30) -- line: 284
-	-- upvalues: t1 (copy)
-	if p29.props.userInviteStatus and p29.props.userInviteStatus ~= p30.userInviteStatus then
-		p29:playAnimation(t1[p29.props.userInviteStatus])
-	end
-end
-function v20.didMount(p31) -- line: 290
-	-- upvalues: t1 (copy)
-	if p31.props.userInviteStatus then
-		p31:playAnimation(t1[p31.props.userInviteStatus])
-	end
-end
-function v20.playAnimation(p32, p33) -- line: 296
-	-- upvalues: RunService (copy)
-	p32.animationStartTime = tick()
-	p32.animationFunction = p33
 
-	if not p32.renderSteppedConnection then
-		p32.renderSteppedConnection = RunService.RenderStepped:Connect(function() -- line: 301
-			-- upvalues: p32 (copy)
-			p32.animationFunction(tick() - p32.animationStartTime, p32.updateBindings, function() -- line: 302
-				-- upvalues: p32 (copy)
-				p32:stopAnimation()
+function extended:didUpdate(p)
+	if self.props.userInviteStatus and self.props.userInviteStatus ~= p.userInviteStatus then
+		self:playAnimation(v3[self.props.userInviteStatus])
+	end
+end
+
+function extended:didMount()
+	if self.props.userInviteStatus then
+		self:playAnimation(v3[self.props.userInviteStatus])
+	end
+end
+
+function extended:playAnimation(animationFunction)
+	self.animationStartTime = tick()
+	self.animationFunction = animationFunction
+
+	if not self.renderSteppedConnection then
+		self.renderSteppedConnection = RunService.RenderStepped:Connect(function()
+			self.animationFunction(tick() - self.animationStartTime, self.updateBindings, function()
+				self:stopAnimation()
 			end)
 		end)
-		p32.props.animationBegun()
+		self.props.animationBegun()
 	end
-end
-function v20.stopAnimation(p34) -- line: 310
-	if p34.renderSteppedConnection then
-		p34.renderSteppedConnection:Disconnect()
-		p34.renderSteppedConnection = nil
-		p34.props.animationEnded()
-	end
-end
-function v20.willUnmount(p35) -- line: 318
-	p35:stopAnimation()
 end
 
-return v20
+function extended:stopAnimation()
+	if self.renderSteppedConnection then
+		self.renderSteppedConnection:Disconnect()
+		self.renderSteppedConnection = nil
+		self.props.animationEnded()
+	end
+end
+
+function extended:willUnmount()
+	self:stopAnimation()
+end
+
+return extended

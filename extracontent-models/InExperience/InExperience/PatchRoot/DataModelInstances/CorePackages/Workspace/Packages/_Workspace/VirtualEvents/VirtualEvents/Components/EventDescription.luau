@@ -1,64 +1,78 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local React = require(VirtualEvents.Parent.React)
 local UIBlox = require(VirtualEvents.Parent.UIBlox)
-local Skeleton = require(VirtualEvents.Parent.Foundation).Skeleton
-local useLocalization = require(VirtualEvents.Parent.Localization).Hooks.useLocalization
+local Foundation = require(VirtualEvents.Parent.Foundation)
+local Skeleton = Foundation.Skeleton
+
+local Localization = require(VirtualEvents.Parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
 local ExperienceTileV3 = UIBlox.App.Tile.ExperienceTileV3
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
 local useStyle = UIBlox.Core.Style.useStyle
 local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
-local uDim2 = UDim2.new(0, 150, 0, 210)
 
-local function EventDescription(t1: {[any]: any}) -- line: 28
-	-- upvalues: useStyle (copy), useLocalization (copy), useTextSizeOffset (copy), uDim2 (copy), React (copy), StyledTextLabel (copy), Skeleton (copy), ExperienceTileV3 (copy)
-	local v13 = useStyle()
-	local v14 = useLocalization({
-		header = "Feature.VirtualEvents.DescriptionLabel"
-	})
-	local v15 = useTextSizeOffset()
-	local v16 = uDim2 + UDim2.fromOffset(0, v15 * 2)
+local udim = UDim2.new(0, 150, 0, 210)
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY
-	}, {
+local function EventDescription(props)
+	local v = useStyle()
+	local v2 = useLocalization({ header = "Feature.VirtualEvents.DescriptionLabel" })
+
+	local v3 = useTextSizeOffset()
+	local size = udim + UDim2.fromOffset(0, v3 * 2)
+
+	local createElement = React.createElement
+	local v4 = { AutomaticSize = Enum.AutomaticSize.XY, BackgroundTransparency = 1 }
+
+	local v5 = {
 		Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 32)
 		}),
 		DescriptionHeader = React.createElement(StyledTextLabel, {
 			layoutOrder = 0,
-			text = v14.header,
+			text = v2.header,
 			automaticSize = Enum.AutomaticSize.XY,
-			fontStyle = v13.Font.Header1,
-			colorStyle = v13.Theme.TextEmphasis
+			fontStyle = v.Font.Header1,
+			colorStyle = v.Theme.TextEmphasis
 		}),
-		Description = if not t1.description then React.createElement(Skeleton, {
-			Size = UDim2.new(1, 0, 0, v13.Font.BaseSize)
-		}) else React.createElement(StyledTextLabel, {
+		Description = 0,
+		ExperienceTileWrapper = 0
+	}
+	local description
+
+	if props.description then
+		description = React.createElement(StyledTextLabel, {
 			layoutOrder = 1,
-			text = t1.description,
+			text = props.description,
 			automaticSize = Enum.AutomaticSize.XY,
-			fontStyle = v13.Font.Body,
-			colorStyle = v13.Theme.TextDefault
-		}),
-		ExperienceTileWrapper = React.createElement("Frame", {
-			LayoutOrder = 2,
-			BackgroundTransparency = 1,
-			Size = v16
-		}, {
+			fontStyle = v.Font.Body,
+			colorStyle = v.Theme.TextDefault
+		})
+	else
+		description = React.createElement(Skeleton, {
+			Size = UDim2.new(1, 0, 0, v.Font.BaseSize)
+		})
+	end
+
+	v5.Description = description
+
+	v5.ExperienceTileWrapper = React.createElement(
+		"Frame",
+		{ LayoutOrder = 2, Size = size, BackgroundTransparency = 1 },
+		{
 			ExperienceTile = React.createElement(ExperienceTileV3, {
-				experienceName = t1.experienceName,
-				thumbnail = t1.experienceThumbnail,
-				onActivated = t1.onExperienceTileActivated,
+				experienceName = props.experienceName,
+				thumbnail = props.experienceThumbnail,
+				onActivated = props.onExperienceTileActivated,
 				styleProps = {
-					overlayColors = {
-						Hover = v13.Theme.BackgroundOnHover
-					}
+					overlayColors = { Hover = v.Theme.BackgroundOnHover }
 				}
 			})
-		})
-	})
+		}
+	)
+	return createElement("Frame", v4, v5)
 end
 
 return EventDescription

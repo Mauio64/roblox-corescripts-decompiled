@@ -1,22 +1,22 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local BuilderIcons = require(FoundationParent.BuilderIcons)
+local parent = Foundation.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
+
 local isBuilderIcon = require(Foundation.Utility.isBuilderIcon)
 
-local function getBuilderIconVariant(p1) -- line: 8
-	-- upvalues: isBuilderIcon (copy), BuilderIcons (copy)
-	if not pcall(function() -- line: 9
-		-- upvalues: p1 (copy)
-		return p1.Text
+local function getBuilderIconVariant(p)
+	if not pcall(function()
+		return p.Text
 	end) then
 		return nil
 	end
 
-	if not isBuilderIcon(p1.Text) then
+	if not isBuilderIcon(p.Text) then
 		return nil
 	end
 
-	if p1.FontFace.Weight == Enum.FontWeight.Bold then
+	if p.FontFace.Weight == Enum.FontWeight.Bold then
 		return BuilderIcons.IconVariant.Filled
 	end
 

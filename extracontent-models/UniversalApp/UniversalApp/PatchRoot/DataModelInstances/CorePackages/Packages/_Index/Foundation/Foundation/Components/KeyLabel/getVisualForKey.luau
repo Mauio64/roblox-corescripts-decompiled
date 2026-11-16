@@ -1,31 +1,28 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local UserInputService = require(Foundation.Utility.Wrappers).Services.UserInputService
-local t1 = {}
 
-return function(p1) -- line: 13
-	-- upvalues: t1 (copy), UserInputService (copy)
-	if t1[p1] then
-		return t1[p1]
+local Wrappers = require(Foundation.Utility.Wrappers)
+local UserInputService = Wrappers.Services.UserInputService
+
+local v = {}
+
+return function(p)
+	if v[p] then
+		return v[p]
 	end
 
-	local ImageForKeyCode = UserInputService:GetImageForKeyCode(p1)
+	local imageForKeyCode = UserInputService:GetImageForKeyCode(p)
 
-	if ImageForKeyCode and ImageForKeyCode ~= "" then
-		return {
-			keyVisualType = "Image",
-			size = UDim2.fromScale(0.7, 0.7),
-			key = ImageForKeyCode
-		}
+	if imageForKeyCode and imageForKeyCode ~= "" then
+		return { keyVisualType = "Image", size = UDim2.fromScale(0.7, 0.7), key = imageForKeyCode }
 	end
 
-	local StringForKeyCode = UserInputService:GetStringForKeyCode(p1)
-	local t2 = {
+	local stringForKeyCode = UserInputService:GetStringForKeyCode(p)
+	local v2 = {
 		keyVisualType = "String",
 		size = UDim2.fromScale(0.8, 0.8),
-		key = StringForKeyCode or ""
+		key = stringForKeyCode or ""
 	}
 
-	t1[p1] = t2
-
-	return t2
+	v[p] = v2
+	return v2
 end

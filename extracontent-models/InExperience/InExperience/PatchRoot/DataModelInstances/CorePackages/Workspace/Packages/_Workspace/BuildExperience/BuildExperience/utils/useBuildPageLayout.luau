@@ -1,21 +1,24 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local AppNavBar = require(Parent.AppNavBar)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
-local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local AppNavBar = require(parent.AppNavBar)
+local Foundation = require(parent.Foundation)
+
+local useTokens = Foundation.Hooks.useTokens
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local useNavBarPlacement = AppNavBar.useNavBarPlacement
 
-local function useBuildPageLayout() -- line: 19
-	-- upvalues: useTokens (copy), useNavBarPlacement (copy), useSelector (copy), AppNavBar (copy)
-	local v7 = useTokens()
-	local v8 = useNavBarPlacement()
-	local v9 = useSelector(function(p1) -- line: 22
-		return p1.TabBarVisible
+local function useBuildPageLayout()
+	local tokens = useTokens()
+	local v = useNavBarPlacement()
+	local v2 = useSelector(function(p)
+		return p.TabBarVisible
 	end)
 
 	return {
-		tokens = v7,
-		topBarHeight = 56 * v7.Config.UI.Scale,
-		shouldIncludeBottomBar = v8 == AppNavBar.Placement.Bottom and v9 ~= false
+		tokens = tokens,
+		topBarHeight = 56 * tokens.Config.UI.Scale,
+		shouldIncludeBottomBar = v == AppNavBar.Placement.Bottom and v2 ~= false
 	}
 end
 

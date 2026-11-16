@@ -1,25 +1,26 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Moments").Parent
 
-require(Parent.Signals)
+local React = require(parent.React)
+require(parent.Signals)
+
 require(script.Parent.FeedTypes)
 
-local v3 = React.createContext(nil)
+local context = React.createContext(nil)
+local FeedContext = {}
+FeedContext.FeedContext = context
 
-return {
-	FeedContext = v3,
-	useFeed = function() -- line: 54
-		-- upvalues: React (copy), v3 (copy)
-		local v4 = React.useContext(v3)
+function FeedContext.useFeed()
+	local v = React.useContext(context)
 
-		if v4 == nil then
-			error("useFeed must be used within a Feed")
-		end
-
-		return v4
-	end,
-	useFeedOptional = function() -- line: 66
-		-- upvalues: React (copy), v3 (copy)
-		return React.useContext(v3)
+	if v == nil then
+		error("useFeed must be used within a Feed")
 	end
-}
+
+	return v
+end
+
+function FeedContext.useFeedOptional()
+	return React.useContext(context)
+end
+
+return FeedContext

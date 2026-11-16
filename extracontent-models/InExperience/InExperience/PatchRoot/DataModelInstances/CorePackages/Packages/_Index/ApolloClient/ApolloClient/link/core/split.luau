@@ -1,3 +1,2 @@
-return {
-	split = require(script.Parent.ApolloLink).ApolloLink.split_
-}
+local ApolloLink = require(script.Parent.ApolloLink)
+return { split = ApolloLink.ApolloLink.split_ }

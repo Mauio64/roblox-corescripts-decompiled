@@ -1,42 +1,45 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local Foundation = require(BuildExperienceParent.Foundation)
-local React = require(BuildExperienceParent.React)
+local parent = BuildExperience.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local LocalizationStrings = require(BuildExperience.LocalizationStrings)
+
 local SearchInput = Foundation.SearchInput
 local View = Foundation.View
-local GetSearchQueryStore = require(BuildExperience.Stores.GetSearchQueryStore)
 
+local GetSearchQueryStore = require(BuildExperience.Stores.GetSearchQueryStore)
 require(BuildExperience.Stores.GetSearchQueryStore.createSearchQueryStore)
 
-local function BuildSearchBar(t1: {[any]: any}) -- line: 21
-	-- upvalues: GetSearchQueryStore (copy), React (copy), View (copy), SearchInput (copy), LocalizationStrings (copy)
-	local v11 = t1.store or GetSearchQueryStore()
-	local v12 = v11.useDraftQuery()
-	local v13 = React.useCallback(function(s1: string) -- line: 29
-		-- upvalues: v11 (copy)
-		if s1 == "" then
-			v11.clear()
+local function BuildSearchBar(p)
+	local v = useLocalization({ placeholder = LocalizationStrings.BUILD_SEARCH_PLACEHOLDER })
 
-			return
+	local store = p.store or GetSearchQueryStore()
+	local text = store.useDraftQuery()
+
+	local onChanged = React.useCallback(function(p2: string)
+		if p2 == "" then
+			store.clear()
+		else
+			store.setQuery(p2)
 		end
+	end, { store })
 
-		v11.setQuery(s1)
-	end, { v11 })
-
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y",
-		testId = "build-search-bar",
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		Input = React.createElement(SearchInput, {
-			testId = "build-search-bar-input",
-			text = v12,
-			placeholder = LocalizationStrings.BUILD_SEARCH_PLACEHOLDER,
-			onChanged = v13,
-			width = UDim.new(1, 0)
-		})
-	})
+	return React.createElement(
+		View,
+		{ LayoutOrder = p.LayoutOrder, tag = "size-full-0 auto-y", testId = "build-search-bar" },
+		{
+			Input = React.createElement(SearchInput, {
+				text = text,
+				placeholder = v.placeholder,
+				onChanged = onChanged,
+				width = UDim.new(1, 0),
+				testId = "build-search-bar-input"
+			})
+		}
+	)
 end
 
 return BuildSearchBar

@@ -1,34 +1,36 @@
 local CorePackages = game:GetService("CorePackages")
 local Roact = require(CorePackages.Packages.Roact)
-local v3 = Roact.PureComponent:extend("IconButton")
 
-function v3.render(p1) -- line: 6
-	-- upvalues: Roact (copy)
-	local visible = p1.props.visible
-	local anchorPoint = p1.props.anchorPoint
-	local position = p1.props.position
-	local size = p1.props.size
-	local zIndex = p1.props.zIndex
-	local onClick = p1.props.onClick
-	local v11 = p1.props.iconHorizontalAlignment or Enum.HorizontalAlignment.Center
-	local v12 = p1.props.iconVerticalAlignment or Enum.VerticalAlignment.Center
-	local iconSpritePath = p1.props.iconSpritePath
-	local iconSpriteFrame = p1.props.iconSpriteFrame
-	local v15 = p1.props.horizontalInset or 12
-	local n1 = 0
-	local n2 = 1
+local extended = Roact.PureComponent:extend("IconButton")
 
-	if v11 == Enum.HorizontalAlignment.Center then
-		v15 = 0
-	elseif v11 == Enum.HorizontalAlignment.Left then
-		position = UDim2.new(position.X.Scale, position.X.Offset - v15, position.Y.Scale, position.Y.Offset)
-	elseif v11 == Enum.HorizontalAlignment.Right then
-		position = UDim2.new(position.X.Scale, position.X.Offset + v15, position.Y.Scale, position.Y.Offset)
-		n1 = 1
-		n2 = 0
+function extended.render(p)
+	local visible = p.props.visible
+	local anchorPoint = p.props.anchorPoint
+	local position = p.props.position
+	local size = p.props.size
+	local zIndex = p.props.zIndex
+	local onClick = p.props.onClick
+
+	local iconHorizontalAlignment = p.props.iconHorizontalAlignment or Enum.HorizontalAlignment.Center
+	local iconVerticalAlignment = p.props.iconVerticalAlignment or Enum.VerticalAlignment.Center
+	local iconSpritePath = p.props.iconSpritePath
+	local iconSpriteFrame = p.props.iconSpriteFrame
+
+	local v = p.props.horizontalInset or 12
+	local layoutOrder = 0
+	local layoutOrder2 = 1
+
+	if iconHorizontalAlignment == Enum.HorizontalAlignment.Center then
+		v = 0
+	elseif iconHorizontalAlignment == Enum.HorizontalAlignment.Left then
+		position = UDim2.new(position.X.Scale, position.X.Offset - v, position.Y.Scale, position.Y.Offset)
+	elseif iconHorizontalAlignment == Enum.HorizontalAlignment.Right then
+		position = UDim2.new(position.X.Scale, position.X.Offset + v, position.Y.Scale, position.Y.Offset)
+		layoutOrder = 1
+		layoutOrder2 = 0
 	end
 
-	local uDim2 = UDim2.new(size.X.Scale, size.X.Offset + v15, size.Y.Scale, size.Y.Offset)
+	local udim = UDim2.new(size.X.Scale, size.X.Offset + v, size.Y.Scale, size.Y.Offset)
 
 	return Roact.createElement("ImageButton", {
 		Visible = visible,
@@ -36,20 +38,20 @@ function v3.render(p1) -- line: 6
 		BorderSizePixel = 0,
 		AnchorPoint = anchorPoint,
 		Position = position,
-		Size = uDim2,
+		Size = udim,
 		ZIndex = zIndex,
 		[Roact.Event.Activated] = onClick
 	}, {
 		IconLayout = Roact.createElement("UIListLayout", {
-			HorizontalAlignment = v11,
-			VerticalAlignment = v12,
+			HorizontalAlignment = iconHorizontalAlignment,
+			VerticalAlignment = iconVerticalAlignment,
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}),
 		Offset = Roact.createElement("Frame", {
 			BorderSizePixel = 0,
-			LayoutOrder = n1,
-			Size = UDim2.new(0, v15, 0, 0)
+			LayoutOrder = layoutOrder,
+			Size = UDim2.new(0, v, 0, 0)
 		}),
 		BackIcon = Roact.createElement("ImageLabel", {
 			BackgroundTransparency = 1,
@@ -59,9 +61,9 @@ function v3.render(p1) -- line: 6
 			ImageRectOffset = iconSpriteFrame.offset,
 			ImageRectSize = iconSpriteFrame.size,
 			ZIndex = zIndex,
-			LayoutOrder = n2
+			LayoutOrder = layoutOrder2
 		})
 	})
 end
 
-return v3
+return extended

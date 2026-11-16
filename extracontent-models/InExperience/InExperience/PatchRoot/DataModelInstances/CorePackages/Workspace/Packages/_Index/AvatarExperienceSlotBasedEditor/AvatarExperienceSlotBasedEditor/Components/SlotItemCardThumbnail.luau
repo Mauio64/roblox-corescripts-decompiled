@@ -1,65 +1,120 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+
 local Icon = Foundation.Icon
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
-local ItemCardThumbnail = require(Parent.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail
-local FFlagAXMigrateBuilderIcons = require(Parent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
 
-local function SlotItemCardThumbnail(t1: {[any]: any}) -- line: 37
-	-- upvalues: useTokens (copy), FFlagAXMigrateBuilderIcons (copy), Foundation (copy), React (copy), ItemCardThumbnail (copy), Icon (copy), IconSize (copy)
-	local v11 = useTokens()
-	local v12 = if not t1.icon then Foundation.Enums.IconName.PlusLarge else if not FFlagAXMigrateBuilderIcons then t1.icon else t1.icon.name
-	local v13 = if not FFlagAXMigrateBuilderIcons then nil else if not t1.icon then Foundation.Enums.IconVariant.Regular else t1.icon.variant
+local AvatarExperienceUIKit = require(parent.AvatarExperienceUIKit)
+local ItemCardThumbnail = AvatarExperienceUIKit.ItemCardComponents.ItemCardThumbnail
 
-	if t1.url then
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
+
+local function SlotItemCardThumbnail(props)
+	local v = useTokens()
+	local name
+
+	if props.icon then
+		if FFlagAXMigrateBuilderIcons then
+			name = props.icon.name
+		else
+			name = props.icon
+		end
+	else
+		name = Foundation.Enums.IconName.PlusLarge
+	end
+
+	local variant
+
+	if FFlagAXMigrateBuilderIcons then
+		if props.icon then
+			variant = props.icon.variant
+		else
+			variant = Foundation.Enums.IconVariant.Regular
+		end
+	end
+
+	if props.url then
 		return React.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
-			ZIndex = 3,
-			Size = UDim2.fromScale(1, 1)
+			ZIndex = 3
 		}, {
-			Thumbnail = React.createElement(ItemCardThumbnail, {
-				url = t1.url
-			}),
-			Overlay = t1.enableThumbnailOverlay and React.createElement("Frame", {
-				ZIndex = 2,
-				Size = UDim2.fromScale(1, 1),
-				BackgroundColor3 = v11.Color.Surface.Surface_200.Color3,
-				BackgroundTransparency = v11.Color.Common.Shadow.Transparency
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, v11.Radius.Medium)
-				})
+			Thumbnail = React.createElement(ItemCardThumbnail, { url = props.url }),
+			Overlay = props.enableThumbnailOverlay and React.createElement(
+				"Frame",
+				{
+					Size = UDim2.fromScale(1, 1),
+					BackgroundColor3 = v.Color.Surface.Surface_200.Color3,
+					BackgroundTransparency = v.Color.Common.Shadow.Transparency,
+					ZIndex = 2
+				},
+				{
+					UICorner = React.createElement("UICorner", {
+						CornerRadius = UDim.new(0, v.Radius.Medium)
+					})
+				}
+			)
+		})
+	end
+
+	local createElement = React.createElement
+	local fragment = React.Fragment
+	local addIconFrame
+
+	if props.icon and not props.ignoredUrl then
+		local createElement2 = React.createElement
+		local v2 = {
+			Size = props.iconFrameStyles and props.iconFrameStyles.Size or UDim2.fromOffset(30, 30),
+			Position = 0,
+			BackgroundColor3 = 0,
+			BackgroundTransparency = 0,
+			ZIndex = 2
+		}
+		local position
+
+		if FFlagAXMigrateBuilderIcons then
+			position = UDim2.new(0.5, 4, 0.5, 4)
+		else
+			position = UDim2.new(0.5, 3, 0.5, 3)
+		end
+
+		v2.Position = position
+
+		v2.BackgroundColor3 = v.Color.Surface.Surface_200.Color3
+		v2.BackgroundTransparency = v.Color.Surface.Surface_200.Transparency
+		addIconFrame = createElement2("Frame", v2, {
+			UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+			AddIcon = React.createElement(Icon, {
+				name = not FFlagAXMigrateBuilderIcons and "icons/common/plus_heavy_small" or Foundation.Enums.IconName.PlusLarge,
+				size = props.iconFrameStyles and props.iconFrameStyles.iconSize or IconSize.Small,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5)
 			})
 		})
 	end
 
-	return React.createElement(React.Fragment, nil, {
-		AddIconFrame = if not t1.icon or t1.ignoredUrl then nil else React.createElement("Frame", {
-			ZIndex = 2,
-			Size = t1.iconFrameStyles and t1.iconFrameStyles.Size or UDim2.fromOffset(30, 30),
-			Position = if not FFlagAXMigrateBuilderIcons then UDim2.new(0.5, 3, 0.5, 3) else UDim2.new(0.5, 4, 0.5, 4),
-			BackgroundColor3 = v11.Color.Surface.Surface_200.Color3,
-			BackgroundTransparency = v11.Color.Surface.Surface_200.Transparency
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			}),
-			AddIcon = React.createElement(Icon, {
-				name = not FFlagAXMigrateBuilderIcons and "icons/common/plus_heavy_small" or Foundation.Enums.IconName.PlusLarge,
-				size = t1.iconFrameStyles and t1.iconFrameStyles.iconSize or IconSize.Small,
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromScale(0.5, 0.5)
-			})
-		}),
-		SlotIcon = React.createElement(Icon, {
-			name = v12,
-			variant = v13,
-			size = if not FFlagAXMigrateBuilderIcons then IconSize.Large else v11.Size.Size_800,
+	local createElement2 = React.createElement
+	local size
+
+	if FFlagAXMigrateBuilderIcons then
+		size = v.Size.Size_800
+	else
+		size = IconSize.Large
+	end
+
+	return createElement(fragment, nil, {
+		AddIconFrame = addIconFrame,
+		SlotIcon = createElement2(Icon, {
+			name = name,
+			variant = variant,
+			size = size,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
-			style = v11.Color.Shift.Shift_400
+			style = v.Color.Shift.Shift_400
 		})
 	})
 end

@@ -1,26 +1,30 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 local IXPService = game:GetService("IXPService")
-local useUserExperiment = require(ParentParentParent.RoactAppExperiment).useUserExperiment
-local FStringPVCIAfterSignupLayer = require(ParentParent.Flags.FStringPVCIAfterSignupLayer)
-local FStringPVCIAfterSignupVariantKey = require(ParentParent.Flags.FStringPVCIAfterSignupVariantKey)
 
-local function v7(p1) -- line: 12
-	-- upvalues: FStringPVCIAfterSignupLayer (copy), FStringPVCIAfterSignupVariantKey (copy)
-	return (p1[FStringPVCIAfterSignupLayer] or {})[FStringPVCIAfterSignupVariantKey]
+local RoactAppExperiment = require(parent2.RoactAppExperiment)
+
+local useUserExperiment = RoactAppExperiment.useUserExperiment
+
+local FStringPVCIAfterSignupLayer = require(parent.Flags.FStringPVCIAfterSignupLayer)
+local FStringPVCIAfterSignupVariantKey = require(parent.Flags.FStringPVCIAfterSignupVariantKey)
+
+local function fn(p)
+	return (p[FStringPVCIAfterSignupLayer] or {})[FStringPVCIAfterSignupVariantKey]
 end
 
-return {
-	usePVAndCIAfterSignupVariant = function(t1: {[any]: any}) -- line: 18
-		-- upvalues: useUserExperiment (copy), FStringPVCIAfterSignupLayer (copy), v7 (copy)
-		local v10 = t1 or {
-			isExposureEnabled = false
-		}
+local AfterSignupIXP = {}
 
-		return (useUserExperiment({ FStringPVCIAfterSignupLayer }, v7, v10.isExposureEnabled))
-	end,
-	logExposure = function() -- line: 26
-		-- upvalues: IXPService (copy), FStringPVCIAfterSignupLayer (copy)
-		IXPService:LogUserLayerExposure(FStringPVCIAfterSignupLayer)
-	end
-}
+function AfterSignupIXP.usePVAndCIAfterSignupVariant(p)
+	return (useUserExperiment(
+		{ FStringPVCIAfterSignupLayer },
+		fn,
+		(p or { isExposureEnabled = false }).isExposureEnabled
+	))
+end
+
+function AfterSignupIXP.logExposure()
+	IXPService:LogUserLayerExposure(FStringPVCIAfterSignupLayer)
+end
+
+return AfterSignupIXP

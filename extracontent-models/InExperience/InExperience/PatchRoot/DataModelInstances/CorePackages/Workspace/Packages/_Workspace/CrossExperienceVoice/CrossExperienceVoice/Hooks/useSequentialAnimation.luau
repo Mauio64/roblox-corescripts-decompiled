@@ -1,52 +1,48 @@
 local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
 local dependencies = require(CrossExperienceVoice.dependencies)
-local React = dependencies.React
-local ReactOtter = dependencies.ReactOtter
+
+local react = dependencies.React
+local reactOtter = dependencies.ReactOtter
 
 require(CrossExperienceVoice.Common.Types)
 
-return function(n1: number) -- line: 11
-	-- upvalues: React (copy), ReactOtter (copy)
-	local v6 = React.useRef(nil)
-	local v7, v8 = ReactOtter.useAnimatedBinding(n1, function() -- line: 13
-		-- upvalues: v6 (copy)
-		if v6.current then
-			v6.current()
-			v6.current = nil
+return function(p: number)
+	local ref = react.useRef(nil)
+	local v, v2 = reactOtter.useAnimatedBinding(p, function()
+		if ref.current then
+			ref.current()
+			ref.current = nil
 		end
 	end)
 
-	return v7, (React.useCallback(function(t1: {[any]: any}, p1: ((...any) -> ...any)?) -- line: 20
-		-- upvalues: v6 (copy), v8 (copy), ReactOtter (copy)
-		local function animateStep(p2, p3: ((...any) -> ...any)) -- line: 21
-			-- upvalues: v6 (copy), v8 (copy), ReactOtter (copy)
-			v6.current = p3
-			v8(ReactOtter.ease(p2.value, {
-				duration = p2.durationInMs / 1000,
-				easingStyle = p2.easingStyle
+	return v, (react.useCallback(function(p2, callback)
+		local function animateStep(data, current)
+			ref.current = current
+			v2(reactOtter.ease(data.value, {
+				duration = data.durationInMs / 1000,
+				easingStyle = data.easingStyle
 			}))
 		end
-		local function animateImpl(t2: {[any]: any}, n2: number, p4: ((...any) -> ...any)?) -- line: 29
-			-- upvalues: animateImpl (copy), v6 (copy), v8 (copy), ReactOtter (copy)
-			local v18 = t2[n2]
 
-			if v18 ~= nil then
-				function v6.current() -- line: 32
-					-- upvalues: p4 (copy), n2 (copy), animateImpl (copy), t2 (copy)
-					if p4 then
-						p4(n2)
+		local function animateImpl(p3, p4: number, callback2)
+			local v3 = p3[p4]
+
+			if v3 ~= nil then
+				function ref.current()
+					if callback2 then
+						callback2(p4)
 					end
 
-					animateImpl(t2, n2 + 1, p4)
+					animateImpl(p3, p4 + 1, callback2)
 				end
 
-				v8(ReactOtter.ease(v18.value, {
-					duration = v18.durationInMs / 1000,
-					easingStyle = v18.easingStyle
+				v2(reactOtter.ease(v3.value, {
+					duration = v3.durationInMs / 1000,
+					easingStyle = v3.easingStyle
 				}))
 			end
 		end
 
-		return animateImpl(t1, 1, p1)
+		return animateImpl(p2, 1, callback)
 	end, {}))
 end

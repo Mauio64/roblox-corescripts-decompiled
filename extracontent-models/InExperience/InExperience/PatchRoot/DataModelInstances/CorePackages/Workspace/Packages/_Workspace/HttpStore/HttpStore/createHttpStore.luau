@@ -1,53 +1,49 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local InternalHttpStore = require(scriptParentParent.InternalHttpStore)
+local parent = script.Parent
+local parent2 = parent.Parent
+local InternalHttpStore = require(parent2.InternalHttpStore)
+require(parent2.Signals)
 
-require(scriptParentParent.Signals)
-
-local createErrorStatusHandler = require(scriptParent.Handlers.createErrorStatusHandler)
+local createErrorStatusHandler = require(parent.Handlers.createErrorStatusHandler)
 local GetHttpStore = InternalHttpStore.GetHttpStore
 
-require(scriptParent.Types)
+require(parent.Types)
+local HttpSessionTracker = require(parent.HttpSessionTracker)
 
-local HttpSessionTracker = require(scriptParent.HttpSessionTracker)
-
-local function createHttpStore(p1, p2) -- line: 25
-	-- upvalues: GetHttpStore (copy), HttpSessionTracker (copy), createErrorStatusHandler (copy)
-	local v10 = GetHttpStore(p2)
-	local t1 = {}
+local function createHttpStore(p, p2)
+	local httpStore = GetHttpStore(p2)
+	local v = {}
 
 	return {
-		fetch = function(s1: string, p3) -- line: 30
-			-- upvalues: HttpSessionTracker (copy), t1 (copy), v10 (copy), createErrorStatusHandler (copy), p1 (copy)
-			local v14 = HttpSessionTracker.currentSession()
+		fetch = function(p3: string, p4)
+			local currentSession = HttpSessionTracker.currentSession()
 
-			if t1[v14] == nil then
-				t1[v14] = {}
+			if v[currentSession] == nil then
+				v[currentSession] = {}
 			end
 
-			local v15, v16 = v10.fetch(s1, p3)
-			local v17 = createErrorStatusHandler(p1)(v15)
+			local fetched, cancelRequest = httpStore.fetch(p3, p4)
 
-			t1[v14][s1] = {
-				getFetchSignal = v17,
-				cancelRequest = v16
+			local getFetchSignal = createErrorStatusHandler(p)(fetched)
+
+			v[currentSession][p3] = {
+				getFetchSignal = getFetchSignal,
+				cancelRequest = cancelRequest
 			}
 
-			return v17, v16
+			return getFetchSignal, cancelRequest
 		end,
-		cancelAll = function() -- line: 46
-			-- upvalues: HttpSessionTracker (copy), t1 (copy)
-			local v18 = HttpSessionTracker.currentSession()
+		cancelAll = function()
+			local currentSession = HttpSessionTracker.currentSession()
 
-			if t1[v18] then
-				for _, v20 in t1[v18] do
-					v20.cancelRequest()
+			if v[currentSession] then
+				for _, v2 in v[currentSession] do
+					v2.cancelRequest()
 				end
 			end
 
-			t1[v18] = nil
+			v[currentSession] = nil
 			HttpSessionTracker.cancelAll()
-			t1[HttpSessionTracker.currentSession()] = {}
+			v[HttpSessionTracker.currentSession()] = {}
 		end
 	}
 end

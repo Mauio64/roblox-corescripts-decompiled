@@ -1,263 +1,279 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
-local React = require(PurchasePromptParent.React)
+local parent = PurchasePrompt.Parent
+local React = require(parent.React)
 local useMemo = React.useMemo
 local useEffect = React.useEffect
-local UIBlox = require(PurchasePromptParent.UIBlox)
+
+local UIBlox = require(parent.UIBlox)
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
+
 local LocalizationService = game:GetService("LocalizationService")
-local Localization = require(PurchasePromptParent.Localization)
+local Localization = require(parent.Localization)
 local LocalizationProvider = Localization.LocalizationProvider
-local Localization2 = require(PurchasePromptParent.RobloxAppLocales).Localization
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local localization = RobloxAppLocales.Localization
 local useLocalization = Localization.Hooks.useLocalization
+
 local PromptState = require(PurchasePrompt.Enums.PromptState)
 local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
-local IAPExperience = require(PurchasePromptParent.IAPExperience)
+
+local IAPExperience = require(parent.IAPExperience)
 local formatEconomicRestrictionText = IAPExperience.Utility.formatEconomicRestrictionText
 local addEconomicRestrictionKeysToLocalization = IAPExperience.Utility.addEconomicRestrictionKeysToLocalization
+
 local formatTextWithParams = require(PurchasePrompt.Utils.formatTextWithParams)
 local EconomicRestrictionsCounter = IAPExperience.Counters.EconomicRestrictionsCounter
 local UniversalEconomicRestrictionsCounter = EconomicRestrictionsCounter.UniversalEconomicRestrictionsCounter
 local EconomicRestrictionsSurface = EconomicRestrictionsCounter.EconomicRestrictionsSurface
 local ProductPurchasePromptCounter = IAPExperience.Counters.ProductPurchasePromptCounter.ProductPurchasePromptCounter
-local default = require(PurchasePromptParent.LoggingProtocol).default
-local FFlagEnableUnifiedProductPurchaseFlow = require(PurchasePromptParent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
-local FFlagPurchaseModalTimedOptionExtension = require(PurchasePromptParent.SharedFlags).FFlagPurchaseModalTimedOptionExtension
+local LoggingProtocol = require(parent.LoggingProtocol)
+local default = LoggingProtocol.default
+local SharedFlags = require(parent.SharedFlags)
+local FFlagPurchaseModalTimedOptionExtension = SharedFlags.FFlagPurchaseModalTimedOptionExtension
 local UnifiedPurchaseCompletionModal = IAPExperience.UnifiedPurchaseCompletionModal
 local UnifiedPurchaseCompletionModalV2 = IAPExperience.UnifiedPurchaseCompletionModalV2
-local FFlagFixPurchasingErrorCounter = require(PurchasePrompt.Flags.FFlagFixPurchasingErrorCounter)
-local _ = require(PurchasePromptParent.SharedFlags).FFlagAddCenterDialogForUnifiedPurchaseModal
+require(PurchasePrompt.Flags.FFlagFixPurchasingErrorCounter)
+require(PurchasePrompt.Flags.FFlagAddSurfaceAndProductTypeToPromptCounter)
+local logProductPurchasePromptCounter = require(PurchasePrompt.Utils.logProductPurchasePromptCounter)
+
+local v = require(parent.SharedFlags)
+v = v.FFlagAddCenterDialogForUnifiedPurchaseModal
 local AppContext = require(PurchasePrompt.Utils.AppContext)
-local FFlagAddCenterDialogForUnifiedPurchaseModal = require(PurchasePromptParent.SharedFlags).FFlagAddCenterDialogForUnifiedPurchaseModal
-local FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase = require(PurchasePromptParent.SharedFlags).FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase
 
-local function getPurchaseErrorText(p1, p2) -- line: 62
-	-- upvalues: PurchaseError (copy)
-	if p2 == PurchaseError.CannotGetBalance then
-		return p1.PurchaseErrorCannotGetBalanceText
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagAddCenterDialogForUnifiedPurchaseModal = SharedFlags2.FFlagAddCenterDialogForUnifiedPurchaseModal
+
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase = SharedFlags3.FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagLuaAppsEnablePromptVIPServerPurchase = SharedFlags4.FFlagLuaAppsEnablePromptVIPServerPurchase
+
+local function getPurchaseErrorText(data, purchaseError)
+	if purchaseError == PurchaseError.CannotGetBalance then
+		return data.PurchaseErrorCannotGetBalanceText
 	end
 
-	if p2 == PurchaseError.CannotGetItemPrice then
-		return p1.PurchaseErrorCannotGetItemPriceText
+	if purchaseError == PurchaseError.CannotGetItemPrice then
+		return data.PurchaseErrorCannotGetItemPriceText
 	end
 
-	if p2 == PurchaseError.NotForSale then
-		return p1.PurchaseErrorNotForSaleText
+	if purchaseError == PurchaseError.NotForSale then
+		return data.PurchaseErrorNotForSaleText
 	end
 
-	if p2 == PurchaseError.NotForSaleHere then
-		return p1.PurchaseErrorNotForSaleHereText
+	if purchaseError == PurchaseError.NotForSaleHere then
+		return data.PurchaseErrorNotForSaleHereText
 	end
 
-	if p2 == PurchaseError.AlreadyOwn then
-		return p1.PurchaseErrorAlreadyOwnText
+	if purchaseError == PurchaseError.AlreadyOwn then
+		return data.PurchaseErrorAlreadyOwnText
 	end
 
-	if p2 == PurchaseError.Under13 then
-		return p1.PurchaseErrorUnder13Text
+	if purchaseError == PurchaseError.Under13 then
+		return data.PurchaseErrorUnder13Text
 	end
 
-	if p2 == PurchaseError.Limited then
-		return p1.PurchaseErrorLimitedText
+	if purchaseError == PurchaseError.Limited then
+		return data.PurchaseErrorLimitedText
 	end
 
-	if p2 == PurchaseError.ThirdPartyDisabled then
-		return p1.PurchaseErrorThirdPartyDisabledText
+	if purchaseError == PurchaseError.ThirdPartyDisabled then
+		return data.PurchaseErrorThirdPartyDisabledText
 	end
 
-	if p2 == PurchaseError.NotEnoughRobux then
-		return p1.PurchaseErrorNotEnoughRobuxText
+	if purchaseError == PurchaseError.NotEnoughRobux then
+		return data.PurchaseErrorNotEnoughRobuxText
 	end
 
-	if p2 == PurchaseError.NotEnoughRobuxXbox then
-		return p1.PurchaseErrorNotEnoughRobuxXboxText
+	if purchaseError == PurchaseError.NotEnoughRobuxXbox then
+		return data.PurchaseErrorNotEnoughRobuxXboxText
 	end
 
-	if p2 == PurchaseError.NotEnoughRobuxNoUpsell then
-		return p1.PurchaseErrorNotEnoughRobuxNoUpsellText
+	if purchaseError == PurchaseError.NotEnoughRobuxNoUpsell then
+		return data.PurchaseErrorNotEnoughRobuxNoUpsellText
 	end
 
-	if p2 == PurchaseError.TwoFactorNeeded then
-		return p1.PurchaseErrorTwoFactorNeededText
+	if purchaseError == PurchaseError.TwoFactorNeeded then
+		return data.PurchaseErrorTwoFactorNeededText
 	end
 
-	if p2 == PurchaseError.TwoFactorNeededSettings then
-		return p1.PurchaseErrorTwoFactorNeededSettingsText
+	if purchaseError == PurchaseError.TwoFactorNeededSettings then
+		return data.PurchaseErrorTwoFactorNeededSettingsText
 	end
 
-	if p2 == PurchaseError.UnknownFailure then
-		return p1.PurchaseErrorUnknownFailureText
+	if purchaseError == PurchaseError.UnknownFailure then
+		return data.PurchaseErrorUnknownFailureText
 	end
 
-	if p2 == PurchaseError.UnknownFailureNoItemName then
-		return p1.PurchaseErrorUnknownFailureNoItemNameText
+	if purchaseError == PurchaseError.UnknownFailureNoItemName then
+		return data.PurchaseErrorUnknownFailureNoItemNameText
 	end
 
-	if p2 == PurchaseError.PurchaseDisabled then
-		return p1.PurchaseErrorPurchaseDisabledText
+	if purchaseError == PurchaseError.PurchaseDisabled then
+		return data.PurchaseErrorPurchaseDisabledText
 	end
 
-	if p2 == PurchaseError.InvalidFunds then
-		return p1.PurchaseErrorInvalidFundsText
+	if purchaseError == PurchaseError.InvalidFunds then
+		return data.PurchaseErrorInvalidFundsText
 	end
 
-	if p2 == PurchaseError.InvalidFundsUnknown then
-		return p1.PurchaseErrorInvalidFundsUnknownText
+	if purchaseError == PurchaseError.InvalidFundsUnknown then
+		return data.PurchaseErrorInvalidFundsUnknownText
 	end
 
-	if p2 == PurchaseError.PremiumOnly then
-		return p1.PurchaseErrorPremiumOnlyText
+	if purchaseError == PurchaseError.PremiumOnly then
+		return data.PurchaseErrorPremiumOnlyText
 	end
 
-	return p1.PurchaseErrorUnknownFailureNoItemNameText
+	if FFlagLuaAppsEnablePromptVIPServerPurchase and purchaseError == PurchaseError.VIPServerUnavailable then
+		return data.PurchaseErrorVIPServerUnavailableText
+	end
+
+	if FFlagLuaAppsEnablePromptVIPServerPurchase and purchaseError == PurchaseError.UnsupportedInStudio then
+		return data.PurchaseErrorUnsupportedInStudioText
+	end
+
+	return data.PurchaseErrorUnknownFailureNoItemNameText
 end
-local function getModalContent(p3, t1: {[any]: any}) -- line: 106
-	-- upvalues: PromptState (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), FFlagPurchaseModalTimedOptionExtension (copy), formatTextWithParams (copy), PurchaseError (copy), formatEconomicRestrictionText (copy), FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase (copy), getPurchaseErrorText (copy)
-	local promptState = t1.promptState
-	local purchaseError = t1.purchaseError
-	local isGenericChallengeResponse = t1.isGenericChallengeResponse
-	local productInfo = t1.productInfo
+
+local function getModalContent(data, props)
+	local promptState = props.promptState
+	local purchaseError = props.purchaseError
+	local isGenericChallengeResponse = props.isGenericChallengeResponse
+	local productInfo = props.productInfo
 
 	if promptState == PromptState.PurchaseComplete then
-		if FFlagEnableUnifiedProductPurchaseFlow and t1.useUnifiedPurchaseCompletionModal then
-			if t1.isMultiItem then
-				return {
-					messageText = p3.MultiItemPurchaseCompleteBody,
-					titleText = p3.PurchaseCompleteTitle
-				}
-			end
-
-			if FFlagPurchaseModalTimedOptionExtension and t1.completionMessage then
-				return {
-					messageText = t1.completionMessage,
-					titleText = p3.PurchaseCompleteTitle
-				}
-			end
-
+		if not props.useUnifiedPurchaseCompletionModal then
 			return {
-				messageText = formatTextWithParams(p3.PurchaseCompleteBody, {
-					ITEM_NAME = t1.productInfo.name
+				messageText = formatTextWithParams(data.PurchaseCompleteSucceededText, {
+					ITEM_NAME = props.productInfo.name
 				}),
-				titleText = p3.PurchaseCompleteTitle
+				titleText = data.BuyItemTitle
 			}
 		end
 
+		if props.isMultiItem then
+			return {
+				messageText = data.MultiItemPurchaseCompleteBody,
+				titleText = data.PurchaseCompleteTitle
+			}
+		end
+
+		if FFlagPurchaseModalTimedOptionExtension and props.completionMessage then
+			return { messageText = props.completionMessage, titleText = data.PurchaseCompleteTitle }
+		end
+
 		return {
-			messageText = formatTextWithParams(p3.PurchaseCompleteSucceededText, {
-				ITEM_NAME = t1.productInfo.name
+			messageText = formatTextWithParams(data.PurchaseCompleteBody, {
+				ITEM_NAME = props.productInfo.name
 			}),
-			titleText = p3.BuyItemTitle
+			titleText = data.PurchaseCompleteTitle
 		}
 	end
 
 	if promptState == PromptState.U13PaymentModal then
-		return {
-			messageText = p3.ScaryModalOneText,
-			titleText = p3.BuyItemTitle
-		}
+		return { messageText = data.ScaryModalOneText, titleText = data.BuyItemTitle }
 	end
 
 	if promptState == PromptState.U13MonthlyThreshold1Modal then
-		return {
-			messageText = p3.ScaryModalTwoText,
-			titleText = p3.BuyItemTitle
-		}
+		return { messageText = data.ScaryModalTwoText, titleText = data.BuyItemTitle }
 	end
 
 	if promptState == PromptState.U13MonthlyThreshold2Modal then
-		return {
-			messageText = p3.ScaryModalParentalText,
-			titleText = p3.BuyItemTitle
-		}
+		return { messageText = data.ScaryModalParentalText, titleText = data.BuyItemTitle }
 	end
 
 	if promptState == PromptState.ParentalConsentWarningPaymentModal13To17 then
+		return { messageText = data.ParentalConsentText, titleText = data.BuyItemTitle }
+	end
+
+	if promptState ~= PromptState.Error then
 		return {
-			messageText = p3.ParentalConsentText,
-			titleText = p3.BuyItemTitle
+			messageText = data.PurchaseErrorUnknownFailureNoItemNameText,
+			titleText = data.ErrorTitle
 		}
 	end
 
-	if promptState == PromptState.Error then
-		if purchaseError == PurchaseError.UnknownFailure then
-			return {
-				messageText = formatTextWithParams(p3.PurchaseErrorUnknownFailureText, {
-					ITEM_NAME = productInfo.name
-				}),
-				titleText = p3.ErrorTitle
-			}
-		end
-
-		if purchaseError == PurchaseError.TwoFactorNeededSettings or isGenericChallengeResponse(purchaseError) then
-			return {
-				messageText = p3.Enable2SVLogoutText,
-				titleText = p3.ErrorTitle
-			}
-		end
-
-		if purchaseError == PurchaseError.EconomicRestriction then
-			return {
-				messageText = formatEconomicRestrictionText(p3, {
-					violationType = t1.economicRestrictionError.violationType,
-					timeoutMinutes = t1.economicRestrictionError.timeoutMinutes
-				}, true),
-				titleText = p3.ErrorTitle
-			}
-		end
-
-		if FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase and purchaseError == PurchaseError.PendingProductsLimitExceeded then
-			return {
-				messageText = p3.DevProductPendingProductsLimitExceededMessageText,
-				titleText = p3.DevProductPendingProductsLimitExceededTitleText
-			}
-		end
-
+	if purchaseError == PurchaseError.UnknownFailure then
 		return {
-			messageText = getPurchaseErrorText(p3, purchaseError),
-			titleText = p3.ErrorTitle
+			messageText = formatTextWithParams(data.PurchaseErrorUnknownFailureText, {
+				ITEM_NAME = productInfo.name
+			}),
+			titleText = data.ErrorTitle
+		}
+	end
+
+	if purchaseError == PurchaseError.TwoFactorNeededSettings or isGenericChallengeResponse(purchaseError) then
+		return { messageText = data.Enable2SVLogoutText, titleText = data.ErrorTitle }
+	end
+
+	if purchaseError == PurchaseError.EconomicRestriction then
+		return {
+			messageText = formatEconomicRestrictionText(
+				data,
+				{
+					violationType = props.economicRestrictionError.violationType,
+					timeoutMinutes = props.economicRestrictionError.timeoutMinutes
+				},
+				true
+			),
+			titleText = data.ErrorTitle
+		}
+	end
+
+	if
+		FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase
+		and purchaseError == PurchaseError.PendingProductsLimitExceeded
+	then
+		return {
+			messageText = data.DevProductPendingProductsLimitExceededMessageText,
+			titleText = data.DevProductPendingProductsLimitExceededTitleText
 		}
 	end
 
 	return {
-		messageText = p3.PurchaseErrorUnknownFailureNoItemNameText,
-		titleText = p3.ErrorTitle
+		messageText = getPurchaseErrorText(data, purchaseError),
+		titleText = data.ErrorTitle
 	}
 end
-local function getButtonStackInfo(t2: {[any]: any}, p4) -- line: 202
-	-- upvalues: ButtonType (copy)
-	if t2.includeCancelButton then
+
+local function getButtonStackInfo(props, p)
+	if props.includeCancelButton then
 		return {
 			{
 				props = {
-					onActivated = t2.cancelButtonPressed,
-					text = p4.CancelPurchaseText,
-					inputIcon = if not t2.isGamepadEnabled then nil else "rbxasset://textures/ui/Controls/DesignSystem/ButtonB.png"
+					onActivated = props.cancelButtonPressed,
+					text = p.CancelPurchaseText,
+					inputIcon = props.isGamepadEnabled and "rbxasset://textures/ui/Controls/DesignSystem/ButtonB.png" or nil
 				}
 			},
 			{
 				buttonType = ButtonType.PrimarySystem,
 				props = {
-					onActivated = t2.confirmButtonPressed,
-					text = p4.OkButtonText,
-					inputIcon = if not t2.isGamepadEnabled then nil else "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png"
+					onActivated = props.confirmButtonPressed,
+					text = p.OkButtonText,
+					inputIcon = props.isGamepadEnabled and "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png" or nil
 				}
 			}
 		}
 	end
 
-	return {{
-		buttonType = ButtonType.PrimarySystem,
-		props = {
-			onActivated = t2.confirmButtonPressed,
-			text = p4.OkButtonText,
-			inputIcon = if not t2.isGamepadEnabled then nil else "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png"
+	return {
+		{
+			buttonType = ButtonType.PrimarySystem,
+			props = {
+				onActivated = props.confirmButtonPressed,
+				text = p.OkButtonText,
+				inputIcon = props.isGamepadEnabled and "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png" or nil
+			}
 		}
-	}}
+	}
 end
-local function ProductPurchasePrompt(t3: {[any]: any}) -- line: 237
-	-- upvalues: FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase (copy), addEconomicRestrictionKeysToLocalization (copy), useLocalization (copy), useMemo (copy), getModalContent (copy), useEffect (copy), FFlagFixPurchasingErrorCounter (copy), default (copy), ProductPurchasePromptCounter (copy), PurchaseError (copy), PromptState (copy), UniversalEconomicRestrictionsCounter (copy), EconomicRestrictionsSurface (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), FFlagAddCenterDialogForUnifiedPurchaseModal (copy), AppContext (copy), React (copy), UnifiedPurchaseCompletionModalV2 (copy), UnifiedPurchaseCompletionModal (copy), InteractiveAlert (copy), getButtonStackInfo (copy)
-	local t4 = {
+
+local function ProductPurchasePrompt(props)
+	local v2 = {
 		PurchaseCompleteTitle = "IAPExperience.PurchasePrompt.Title.PurchaseCompleted",
 		PurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseCompleted",
 		PurchaseCompleteSucceededText = "CoreScripts.PurchasePrompt.PurchaseMessage.Succeeded",
@@ -290,84 +306,97 @@ local function ProductPurchasePrompt(t3: {[any]: any}) -- line: 237
 		PurchaseErrorInvalidFundsText = "CoreScripts.PurchasePrompt.PurchaseFailed.InvalidFunds",
 		PurchaseErrorInvalidFundsUnknownText = "CoreScripts.PurchasePrompt.PurchaseFailed.InvalidFunds",
 		PurchaseErrorPremiumOnlyText = "CoreScripts.PurchasePrompt.PurchaseFailed.PremiumOnly",
-		DevProductPendingProductsLimitExceededTitleText = if not FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase then nil else "Purchasing.PurchaseDialog.Heading.PendingDeveloperProductLimitReached",
-		DevProductPendingProductsLimitExceededMessageText = if not FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase then nil else "Purchasing.PurchaseDialog.Message.PendingDeveloperProductLimitReached",
+		PurchaseErrorVIPServerUnavailableText = "Feature.PrivateServers.Description.VipServersNotSupported",
+		PurchaseErrorUnsupportedInStudioText = "Feature.PrivateServers.Description.PrivateServerPurchaseUnavailableInStudio",
+		DevProductPendingProductsLimitExceededTitleText = FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase and "Purchasing.PurchaseDialog.Heading.PendingDeveloperProductLimitReached" or nil,
+		DevProductPendingProductsLimitExceededMessageText = FFlagEnableDevProductPendingProductsLimitExceededInUnifiedPurchase and "Purchasing.PurchaseDialog.Message.PendingDeveloperProductLimitReached" or nil,
 		MultiItemPurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseItemsSuccess"
 	}
 
-	addEconomicRestrictionKeysToLocalization(t4)
+	addEconomicRestrictionKeysToLocalization(v2)
 
-	local v51 = useLocalization(t4)
-	local v52 = useMemo(function() -- line: 283
-		-- upvalues: getModalContent (copy), v51 (copy), t3 (copy)
-		return (getModalContent(v51, t3))
-	end, { t3 })
+	local v3 = useLocalization(v2)
 
-	useEffect(function() -- line: 287
-		-- upvalues: FFlagFixPurchasingErrorCounter (copy), default (copy), ProductPurchasePromptCounter (copy), t3 (copy), PurchaseError (copy), PromptState (copy), UniversalEconomicRestrictionsCounter (copy), EconomicRestrictionsSurface (copy)
-		if FFlagFixPurchasingErrorCounter then
-			default:logRobloxTelemetryCounter(ProductPurchasePromptCounter, 1, {
-				promptState = tostring(t3.promptState),
-				purchaseError = if not PurchaseError.isMember(t3.purchaseError) then tostring(PurchaseError.UnknownFailure) else tostring(t3.purchaseError)
-			})
-		else
-			default:logRobloxTelemetryCounter(ProductPurchasePromptCounter, 1, {
-				promptState = tostring(t3.promptState),
-				purchaseError = t3.promptState ~= PromptState.Error and "" or tostring(t3.purchaseError)
-			})
-		end
+	local v4 = useMemo(function()
+		return getModalContent(v3, props)
+	end, { props })
 
-		if t3.purchaseError == PurchaseError.EconomicRestriction then
+	useEffect(function()
+		logProductPurchasePromptCounter(props.promptState, props.purchaseError, props.surface, props.productType)
+
+		if props.purchaseError == PurchaseError.EconomicRestriction then
 			default:logRobloxTelemetryCounter(UniversalEconomicRestrictionsCounter, 1, {
 				surface = EconomicRestrictionsSurface.InExperience,
-				failureReason = tostring(t3.economicRestrictionError.violationType)
+				failureReason = tostring(props.economicRestrictionError.violationType)
 			})
 		end
-	end, { t3.purchaseError })
+	end, { props.purchaseError })
 
-	if FFlagEnableUnifiedProductPurchaseFlow and t3.useUnifiedPurchaseCompletionModal then
-		if FFlagAddCenterDialogForUnifiedPurchaseModal and AppContext.get() == AppContext.Enum.IN_APP then
-			return React.createElement(UnifiedPurchaseCompletionModalV2, {
-				title = v52.titleText,
-				isError = t3.promptState ~= PromptState.PurchaseComplete,
-				bodyText = v52.messageText,
-				buttons = {
-					onActivated = t3.confirmButtonPressed,
-					text = v51.OkButtonText,
-					onClose = t3.cancelButtonPressed
-				}
-			})
-		end
-
-		return React.createElement(UnifiedPurchaseCompletionModal, {
-			title = v52.titleText,
-			isError = t3.promptState ~= PromptState.PurchaseComplete,
-			bodyText = v52.messageText,
-			buttons = {
-				onActivated = t3.confirmButtonPressed,
-				text = v51.OkButtonText,
-				onClose = t3.cancelButtonPressed
-			}
+	if not props.useUnifiedPurchaseCompletionModal then
+		return React.createElement(InteractiveAlert, {
+			screenSize = props.screenSize,
+			title = v4.titleText,
+			titleIcon = props.titleIcon,
+			bodyText = v4.messageText,
+			buttonStackInfo = { buttons = getButtonStackInfo(props, v3) }
 		})
 	end
 
-	return React.createElement(InteractiveAlert, {
-		screenSize = t3.screenSize,
-		title = v52.titleText,
-		titleIcon = t3.titleIcon,
-		bodyText = v52.messageText,
-		buttonStackInfo = {
-			buttons = getButtonStackInfo(t3, v51)
-		}
+	local onActivated = props.launchAfterPurchaseButtonPressed
+	local enableLaunchAfterPurchase
+
+	if onActivated == nil then
+		enableLaunchAfterPurchase = false
+	else
+		enableLaunchAfterPurchase = props.promptState == PromptState.PurchaseComplete
+	end
+
+	local buttons = { text = v3.OkButtonText, onActivated = 0, onClose = 0, onShown = 0 }
+
+	if onActivated == nil or props.promptState ~= PromptState.PurchaseComplete then
+		onActivated = props.confirmButtonPressed
+	end
+
+	buttons.onActivated = onActivated
+
+	buttons.onClose = props.cancelButtonPressed
+	local onShown
+
+	if enableLaunchAfterPurchase then
+		onShown = props.launchAfterPurchaseButtonShown
+	end
+
+	buttons.onShown = onShown
+
+	if FFlagAddCenterDialogForUnifiedPurchaseModal and AppContext.get() == AppContext.Enum.IN_APP then
+		return React.createElement(UnifiedPurchaseCompletionModalV2, {
+			title = v4.titleText,
+			isError = props.promptState ~= PromptState.PurchaseComplete,
+			bodyText = v4.messageText,
+			buttons = buttons,
+			enableLaunchAfterPurchase = enableLaunchAfterPurchase
+		})
+	end
+
+	return React.createElement(UnifiedPurchaseCompletionModal, {
+		title = v4.titleText,
+		isError = props.promptState ~= PromptState.PurchaseComplete,
+		bodyText = v4.messageText,
+		buttons = buttons,
+		enableLaunchAfterPurchase = enableLaunchAfterPurchase
 	})
 end
-local function ProductPurchasePromptContainer(t5: {[any]: any}) -- line: 344
-	-- upvalues: React (copy), LocalizationProvider (copy), Localization2 (copy), LocalizationService (copy), ProductPurchasePrompt (copy)
-	return React.createElement(LocalizationProvider, {
-		localization = Localization2.new(LocalizationService.RobloxLocaleId)
-	}, {
-		ProductPurchasePrompt = React.createElement(ProductPurchasePrompt, t5)
-	})
+
+local function ProductPurchasePromptContainer(p)
+	return React.createElement(
+		LocalizationProvider,
+		{
+			localization = localization.new(LocalizationService.RobloxLocaleId)
+		},
+		{
+			ProductPurchasePrompt = React.createElement(ProductPurchasePrompt, p)
+		}
+	)
 end
 
 return ProductPurchasePromptContainer

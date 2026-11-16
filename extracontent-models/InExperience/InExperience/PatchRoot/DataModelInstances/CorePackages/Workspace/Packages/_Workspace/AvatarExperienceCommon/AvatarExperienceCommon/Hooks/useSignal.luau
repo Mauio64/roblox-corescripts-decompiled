@@ -1,15 +1,13 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local React = require(Parent.React)
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
 
-local function useSignal(p1, p2: ((...any) -> ...any)?) -- line: 13
-	-- upvalues: React (copy), Signals (copy)
-	local v7, v8 = React.useMemo(function() -- line: 14
-		-- upvalues: Signals (copy), p1 (copy), p2 (copy)
-		return Signals.createSignal(p1, p2)
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+
+local function useSignal(p, callback)
+	local v, v2 = React.useMemo(function()
+		return Signals.createSignal(p, callback)
 	end, {})
-
-	return v7, v8
+	return v, v2
 end
 
 return useSignal

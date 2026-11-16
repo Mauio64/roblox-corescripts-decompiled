@@ -1,100 +1,104 @@
 local Logger = require(script.Parent.Parent.Logger)
 
-local function SimpleTimer(t1: {[any]: any}?) -- line: 23
-	-- upvalues: Logger (copy)
-	local elapsed = nil
-	local elapsed2 = nil
-	local u8 = nil
-	local u9 = nil
-	local v10 = t1 and t1.timeoutThreshold or nil
-	local v11 = t1 and t1.onReachingThreshold or nil
+local function fn(p, p2) -- 1 equivalent call inferred from this helper
+	return (p.UnixTimestampMillis - p2.UnixTimestampMillis) / 1000
+end
+
+local function SimpleTimer(p)
+	local v = nil
+	local now = nil
+	local v2 = nil
+
+	local thread = nil
+	local timeoutThreshold
+
+	if p then
+		timeoutThreshold = p.timeoutThreshold or nil
+	else
+		timeoutThreshold = nil
+	end
+
+	local onReachingThreshold = p and p.onReachingThreshold or nil
+
+	local function fn2() -- 1 equivalent call inferred from this helper
+		if v and now then
+			return now - v
+		end
+
+		return -1
+	end
+
+	local function fn3() -- 2 equivalent calls inferred from this helper
+		if thread then
+			task.cancel(thread)
+		end
+	end
 
 	return {
-		start = function(p1) -- line: 79
-			-- upvalues: elapsed (ref), u8 (ref), v10 (copy), v11 (copy), u9 (ref), Logger (copy)
-			if not elapsed then
-				elapsed = os.clock()
-				u8 = p1 or DateTime.now()
+		start = function(p2)
+			if v then
+				Logger:warning("Timer has been already started")
+			else
+				v = os.clock()
+				v2 = p2 or DateTime.now()
 
-				if p1 then
-					local v15 = u8
-					local dateTime = DateTime.now()
-
-					elapsed = (v15.UnixTimestampMillis - dateTime.UnixTimestampMillis) / 1000
+				if p2 then
+					v = fn(v2, DateTime.now()) -- inferred equivalent call
 				end
 
-				if v10 then
-					if not v11 then
+				if timeoutThreshold then
+					if not onReachingThreshold then
 						return
 					end
 
-					local v17 = v11
+					local v3 = onReachingThreshold
 
-					u9 = task.delay(v10, function() -- line: 73
-						-- upvalues: u9 (ref), v17 (copy)
-						u9 = nil
-						v17()
+					thread = task.delay(timeoutThreshold, function()
+						thread = nil
+						v3()
 					end)
-
-					return
 				end
-			else
-				Logger:warning("Timer has been already started")
 			end
 		end,
-		getStartTimestamp = function() -- line: 106
-			-- upvalues: u8 (ref), Logger (copy)
-			if not u8 then
-				Logger:warning("Timer has not been started yet")
-
-				return nil
+		getStartTimestamp = function()
+			if v2 then
+				return v2
 			end
 
-			return u8
+			Logger:warning("Timer has not been started yet")
+			return nil
 		end,
-		stop = function() -- line: 92
-			-- upvalues: u9 (ref), elapsed (ref), elapsed2 (ref), Logger (copy)
-			if u9 then
-				task.cancel(u9)
-			end
+		stop = function()
+			fn3() -- inferred equivalent call
 
-			if elapsed and not elapsed2 then
-				elapsed2 = os.clock()
-			elseif not elapsed then
-				Logger:warning("Timer has not been started yet")
-			else
+			if v and not now then
+				now = os.clock()
+			elseif v then
 				Logger:warning("Timer has been already stopped")
-			end
-
-			if elapsed and elapsed2 then
-				return elapsed2 - elapsed
-			end
-
-			return -1
-		end,
-		clear = function() -- line: 60
-			-- upvalues: elapsed (ref), elapsed2 (ref), u9 (ref)
-			elapsed = nil
-			elapsed2 = nil
-
-			if u9 then
-				task.cancel(u9)
-			end
-		end,
-		getTime = function() -- line: 40
-			-- upvalues: elapsed (ref), elapsed2 (ref), Logger (copy)
-			local elapsed3 = nil
-
-			if elapsed and not elapsed2 then
-				elapsed3 = os.clock()
-			elseif not elapsed then
-				Logger:warning("Timer has not been started yet")
 			else
-				Logger:warning("Timer has been already stopped")
+				Logger:warning("Timer has not been started yet")
 			end
 
-			if elapsed and elapsed3 then
-				return elapsed3 - elapsed
+			return fn2() -- inferred equivalent call
+		end,
+		clear = function()
+			v = nil
+			now = nil
+			fn3() -- inferred equivalent call
+		end,
+		getTime = function()
+			local now2 = nil
+
+			if v and not now then
+				now2 = os.clock()
+			elseif v then
+				Logger:warning("Timer has been already stopped")
+			else
+				Logger:warning("Timer has not been started yet")
+			end
+
+			if v and now2 then
+				return now2 - v
 			end
 
 			return -1

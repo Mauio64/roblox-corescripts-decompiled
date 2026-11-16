@@ -1,44 +1,43 @@
 local Songbird = script:FindFirstAncestor("Songbird")
+
 local Cryo = require(Songbird.Parent.Cryo)
 local React = require(Songbird.Parent.React)
 local Foundation = require(Songbird.Parent.Foundation)
+
 local useCallback = React.useCallback
-local t1 = {
-	counterType = "Remaining"
-}
 
-local function secondsToHHM(n1: number) -- line: 24
-	local v10 = math.floor(n1 / 3600)
-	local v11 = math.floor(n1 % 3600 / 60)
-	local v12 = n1 % 60
+local v = { counterType = "Remaining" }
 
-	if v10 > 0 then
-		return string.format("%i:%02i:%02i", v10, v11, v12)
+local function secondsToHHM(p: number)
+	local v2 = math.floor(p / 3600)
+	local v3 = math.floor(p % 3600 / 60)
+	local v4 = p % 60
+
+	if v2 > 0 then
+		return string.format("%i:%02i:%02i", v2, v3, v4)
 	end
 
-	return string.format("%i:%02i", v11, v12)
+	return string.format("%i:%02i", v3, v4)
 end
-local function ProgressCountdown(t2: {[any]: any}) -- line: 36
-	-- upvalues: Cryo (copy), t1 (copy), useCallback (copy), secondsToHHM (copy), React (copy), Foundation (copy)
-	local v14 = Cryo.Dictionary.join(t1, t2)
-	local v15 = useCallback(function(n2: number) -- line: 39
-		-- upvalues: v14 (copy), secondsToHHM (copy)
-		if v14.counterType == "Remaining" then
-			local v17 = math.floor(v14.timeLength - n2)
 
-			return "-" .. secondsToHHM(v17)
+local function ProgressCountdown(p)
+	local joined = Cryo.Dictionary.join(v, p)
+
+	local v2 = useCallback(function(p2: number)
+		if joined.counterType == "Remaining" then
+			return "-" .. secondsToHHM(math.floor(joined.timeLength - p2))
 		end
 
-		return secondsToHHM((math.ceil(n2)))
-	end, { v14.timeLength })
+		return secondsToHHM(math.ceil(p2))
+	end, { joined.timeLength })
 
 	return React.createElement(Foundation.Text, {
 		tag = {
 			["auto-xy text-label-medium content-muted"] = true,
-			["align-x-right"] = v14.counterType == "Remaining"
+			["align-x-right"] = joined.counterType == "Remaining"
 		},
-		Text = v14.timePosition:map(v15),
-		LayoutOrder = v14.LayoutOrder
+		Text = joined.timePosition:map(v2),
+		LayoutOrder = joined.LayoutOrder
 	})
 end
 

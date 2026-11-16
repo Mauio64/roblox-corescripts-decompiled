@@ -1,71 +1,87 @@
 local Groups = script:FindFirstAncestor("Groups")
-local GroupsParent = Groups.Parent
-local React = require(GroupsParent.React)
-local useLocalization = require(GroupsParent.Localization).Hooks.useLocalization
-local useNavigation = require(GroupsParent.Navigation).useNavigation
-local Foundation = require(GroupsParent.Foundation)
+local parent = Groups.Parent
+
+local React = require(parent.React)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Button = Foundation.Button
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
-local AppHeaderBar = require(GroupsParent.AppHeaderBar)
+
+local AppHeaderBar = require(parent.AppHeaderBar)
+
 local TextKeys = require(Groups.Common.TextKeys)
 local useGroupsWrapperContext = require(Groups.Contexts.useGroupsWrapperContext)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableGroupOverviewPane = SharedFlags.FFlagEnableGroupOverviewPane
 
-local function GroupsListHeader(t1: {[any]: any}) -- line: 33
-	-- upvalues: useGroupsWrapperContext (copy), useNavigation (copy), useLocalization (copy), TextKeys (copy), React (copy), AppHeaderBar (copy), View (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
-	local v17 = useGroupsWrapperContext()
-	local v18 = useNavigation()
-	local v19 = useLocalization({
-		title = TextKeys.HeadingGroups,
-		seeAll = TextKeys.ActionSeeAll
-	})
-	local v20 = React.useCallback(function() -- line: 42
-		-- upvalues: v18 (copy)
-		v18.goBack()
-	end, { v18 })
-	local v21 = React.useMemo(function() -- line: 46
-		-- upvalues: AppHeaderBar (copy), v20 (copy)
-		return AppHeaderBar.makeBackButton(v20)
-	end, { v20 })
-	local v22 = React.useMemo(function() -- line: 50
-		-- upvalues: v21 (copy), React (copy), View (copy)
-		local v23 = v21()
+local function GroupsListHeader(p)
+	local v = useGroupsWrapperContext()
+	local v2 = useNavigation()
 
-		return React.createElement(View, {
-			tag = "size-0 auto-xy align-x-left",
-			LayoutOrder = 1
-		}, {
-			button = v23
+	local v3 = useLocalization({ title = TextKeys.HeadingGroups, seeAll = TextKeys.ActionSeeAll })
+
+	local useCallback = React.useCallback
+	local function fn()
+		if FFlagEnableGroupOverviewPane and v.navigateTo.previousView then
+			v.navigateTo.previousView()
+		else
+			v2.goBack()
+		end
+	end
+
+	local v4
+
+	if FFlagEnableGroupOverviewPane then
+		v4 = v.navigateTo.previousView
+	end
+
+	local v5 = useCallback(fn, { v4, v2 })
+
+	local v6 = React.useMemo(function()
+		return AppHeaderBar.makeBackButton(v5)
+	end, { v5 })
+
+	local backButton = React.useMemo(function()
+		local button = v6()
+		return React.createElement(View, { tag = "align-x-left size-0 auto-xy", LayoutOrder = 1 }, {
+			button = button
 		})
-	end, { v21 })
+	end, { v6 })
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		LayoutOrder = t1.layoutOrder,
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y
-	}, {
-		LeftSection = React.createElement(View, {
-			tag = "row auto-xy align-y-center gap-small"
-		}, {
-			BackButton = v22,
-			Title = React.createElement(FoundationText, {
-				tag = "text-align-x-left content-default text-heading-medium",
-				LayoutOrder = 2,
-				Text = v19.title
+	return React.createElement(
+		"Frame",
+		{
+			LayoutOrder = p.layoutOrder,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1
+		},
+		{
+			LeftSection = React.createElement(View, { tag = "row align-y-center gap-small auto-xy" }, {
+				BackButton = backButton,
+				Title = React.createElement(Text, {
+					Text = v3.title,
+					tag = "text-heading-medium text-align-x-left content-default",
+					LayoutOrder = 2
+				})
+			}),
+			SeeAllButton = React.createElement(Button, {
+				text = v3.seeAll,
+				variant = ButtonVariant.Text,
+				size = InputSize.Medium,
+				onActivated = v.navigateTo.seeAllGroups,
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.new(1, 0, 0.5, 0)
 			})
-		}),
-		SeeAllButton = React.createElement(Button, {
-			text = v19.seeAll,
-			variant = ButtonVariant.Text,
-			size = InputSize.Medium,
-			onActivated = v17.navigateTo.seeAllGroups,
-			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, 0, 0.5, 0)
-		})
-	})
+		}
+	)
 end
 
 return GroupsListHeader

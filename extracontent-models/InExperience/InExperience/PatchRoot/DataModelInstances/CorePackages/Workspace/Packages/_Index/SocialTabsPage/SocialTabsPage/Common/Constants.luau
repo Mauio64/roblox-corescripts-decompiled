@@ -1,3 +1,1 @@
-return {
-	RODUX_KEY = "SocialTabsPage"
-}
+return { RODUX_KEY = "SocialTabsPage" }

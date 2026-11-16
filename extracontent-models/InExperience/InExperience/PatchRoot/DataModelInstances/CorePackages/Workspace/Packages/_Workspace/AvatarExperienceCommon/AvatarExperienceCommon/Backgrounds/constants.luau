@@ -1,3 +1,1 @@
-return {
-	NO_BACKGROUND_ASSET_ID = 0
-}
+return { NO_BACKGROUND_ASSET_ID = 0 }

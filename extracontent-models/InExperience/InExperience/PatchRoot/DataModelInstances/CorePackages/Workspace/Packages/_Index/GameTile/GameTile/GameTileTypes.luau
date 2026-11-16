@@ -1,7 +1,3 @@
 return {
-	GameTileLayoutType = {
-		Narrow = "Narrow",
-		Wide = "Wide",
-		Event = "Event"
-	}
+	GameTileLayoutType = { Narrow = "Narrow", Wide = "Wide", Event = "Event" }
 }

@@ -1,11 +1,20 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local Rodux = require(AuthCommonParent.Rodux)
+local parent = AuthCommon.Parent
+
+local Rodux = require(parent.Rodux)
+
 local CountryCodeList = require(AuthCommon.Reducers.CountryCodeList)
 
-return function() -- line: 8
-	-- upvalues: Rodux (copy), CountryCodeList (copy)
-	return Rodux.combineReducers({
-		CountryCodeList = CountryCodeList
-	})
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUseSignalsForCountryCodeList = SharedFlags.FFlagUseSignalsForCountryCodeList
+
+return function()
+	local combineReducers = Rodux.combineReducers
+	local countryCodeList
+
+	if not FFlagUseSignalsForCountryCodeList then
+		countryCodeList = CountryCodeList
+	end
+
+	return combineReducers({ CountryCodeList = countryCodeList })
 end

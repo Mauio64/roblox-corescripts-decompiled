@@ -1,33 +1,30 @@
-local ParentParent = script.Parent.Parent.Parent
-local PolicyProvider = require(ParentParent.PolicyProvider)
-local v3 = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
-local v4 = PolicyProvider.withGetPolicyImplementation(v3)
+local parent = script.Parent.Parent.Parent
 
-function v4.Mapper(p1) -- line: 9
+local PolicyProvider = require(parent.PolicyProvider)
+
+local memStorageService = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+local v = PolicyProvider.withGetPolicyImplementation(memStorageService)
+
+function v.Mapper(data)
 	return {
-		eligibleForCapturesFeature = function() -- line: 11
-			-- upvalues: p1 (copy)
-			return p1.EligibleForCapturesFeature or false
+		eligibleForCapturesFeature = function()
+			return data.EligibleForCapturesFeature or false
 		end,
-		eligibleForVideoCapture = function() -- line: 14
-			-- upvalues: p1 (copy)
-			return p1.EligibleForVideoCapture or false
+		eligibleForVideoCapture = function()
+			return data.EligibleForVideoCapture or false
 		end,
-		enableCapturesBulkManagement = function() -- line: 17
-			-- upvalues: p1 (copy)
-			return p1.EnableCapturesBulkManagement or false
+		enableCapturesBulkManagement = function()
+			return data.EnableCapturesBulkManagement or false
 		end,
-		enableShareCaptureCTA = function() -- line: 20
-			-- upvalues: p1 (copy)
-			return p1.EnableShareCaptureCTA or false
+		enableShareCaptureCTA = function()
+			return data.EnableShareCaptureCTA or false
 		end,
-		hasVideoCaptureCapability = function() -- line: 23
-			-- upvalues: p1 (copy)
-			return p1.HasVideoCaptureCapability or false
+		hasVideoCaptureCapability = function()
+			return data.HasVideoCaptureCapability or false
 		end
 	}
 end
 
-v4.PolicyImplementation = v3
+v.PolicyImplementation = memStorageService
 
-return v4
+return v

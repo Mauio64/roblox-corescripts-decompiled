@@ -1,98 +1,95 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local FoundationText = Foundation.Text
+local parent = script:FindFirstAncestor("BuildExperience").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
+local Text = Foundation.Text
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 
-local function hasChildren(p1) -- line: 24
-	if p1 == nil then
+local function hasChildren(children): boolean -- 1 equivalent call inferred from this helper
+	if children == nil then
 		return false
 	end
 
-	if typeof(p1) ~= "table" then
+	if typeof(children) ~= "table" then
 		return true
 	end
 
-	for _, v11 in p1 do
-		if v11 ~= nil then
+	for _, item in children do
+		if item ~= nil then
 			return true
 		end
 	end
 
 	return false
 end
-local function SubagentStatus(t1: {[any]: any}) -- line: 39
-	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationText (copy)
-	local v13 = useTokens()
-	local v14 = t1.testId or "subagent-status"
-	local v15 = t1.isDisabled == true
-	local children = t1.children
-	local v17, g20
 
-	if children == nil then
-		v17 = false
-	elseif typeof(children) ~= "table" then
-		v17 = true
-	else
-		g20 = nil
-		v17 = nil
+local function SubagentStatus(props)
+	local v = useTokens()
+	local testId = props.testId or "subagent-status"
+	local isDisabled = props.isDisabled == true
+	local children = hasChildren(props.children) -- inferred equivalent call
+	local background = v.Color.ActionStandard.Background
+	local foreground = v.Color.ActionStandard.Foreground
 
-		for _, v19 in children do
-			if v19 ~= nil then
-				v17 = true
-				g20 = true
-			end
+	local createElement = React.createElement
+	local v2 = {
+		LayoutOrder = props.layoutOrder,
+		backgroundStyle = background,
+		cursor = {
+			radius = UDim.new(0, v.Radius.Circle),
+			offset = v.Size.Size_200,
+			borderWidth = math.floor(v.Stroke.Thicker)
+		},
+		GroupTransparency = isDisabled and 0.5 or 0,
+		isDisabled = isDisabled,
+		onActivated = props.onActivated,
+		selection = {
+			Selectable = not isDisabled
+		},
+		tag = "row align-x-center align-y-center size-0-800 auto-x radius-circle clip",
+		testId = testId
+	}
 
-			if g20 then
-				break
-			end
-		end
+	local createElement2 = React.createElement
+	local v4 = {
+		LayoutOrder = 1,
+		Text = props.text,
+		padding = 0,
+		tag = "shrink size-0-full auto-x text-label-medium text-truncate-end",
+		textStyle = 0,
+		testId = 0
+	}
+	local padding = { left = UDim.new(0, v.Padding.Medium), right = 0 }
+	local right
 
-		if not g20 then
-			v17 = false
-		end
+	if not children then
+		right = UDim.new(0, v.Padding.Medium)
 	end
 
-	g20 = false
+	padding.right = right
+	v4.padding = padding
 
-	local Background = v13.Color.ActionStandard.Background
-	local Foreground = v13.Color.ActionStandard.Foreground
+	v4.textStyle = foreground
+	v4.testId = `{testId}-text`
+	local v3 = { Text = createElement2(Text, v4), Trailing = 0 }
+	local trailing
 
-	return React.createElement(View, {
-		tag = "row align-x-center align-y-center size-0-800 auto-x radius-circle clip",
-		LayoutOrder = t1.layoutOrder,
-		backgroundStyle = Background,
-		cursor = {
-			radius = UDim.new(0, v13.Radius.Circle),
-			offset = v13.Size.Size_200,
-			borderWidth = math.floor(v13.Stroke.Thicker)
-		},
-		GroupTransparency = not v15 and 0 or 0.5,
-		isDisabled = v15,
-		onActivated = t1.onActivated,
-		selection = {
-			Selectable = not v15
-		},
-		testId = v14
-	}, {
-		Text = React.createElement(FoundationText, {
-			LayoutOrder = 1,
-			tag = "shrink size-0-full auto-x text-label-medium text-truncate-end",
-			Text = t1.text,
-			padding = {
-				left = UDim.new(0, v13.Padding.Medium),
-				right = if not v17 then UDim.new(0, v13.Padding.Medium) else nil
+	if children then
+		trailing = React.createElement(
+			View,
+			{
+				LayoutOrder = 2,
+				tag = "row align-x-center align-y-center auto-xy padding-left-small padding-right-medium",
+				testId = `{testId}-trailing`
 			},
-			textStyle = Foreground,
-			testId = `{ v14 }-text`
-		}),
-		Trailing = if not v17 then nil else React.createElement(View, {
-			LayoutOrder = 2,
-			tag = "row align-x-center align-y-center auto-xy padding-left-small padding-right-medium",
-			testId = `{ v14 }-trailing`
-		}, t1.children)
-	})
+			props.children
+		)
+	end
+
+	v3.Trailing = trailing
+	return createElement(View, v2, v3)
 end
 
 return React.memo(SubagentStatus)

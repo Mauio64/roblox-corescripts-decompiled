@@ -1,69 +1,127 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local React = require(CurrencyTransfersParent.React)
+local parent = CurrencyTransfers.Parent
+
+local React = require(parent.React)
+
 local GetFFlagCurrencyTransferFlowUIImprovementFix = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferFlowUIImprovementFix)
-local Foundation = require(CurrencyTransfersParent.Foundation)
-local FoundationImage = Foundation.Image
+
+local FFlagCurrencyTransferUseProfileFrameThumbnail = require(CurrencyTransfers.Flags.FFlagCurrencyTransferUseProfileFrameThumbnail)
+
+local Foundation = require(parent.Foundation)
+local Image = Foundation.Image
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
-local UserLib = require(CurrencyTransfersParent.UserLib)
+
+local UserLib = require(parent.UserLib)
 local Constants = UserLib.Utils.Constants
 local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+
 local Size100x100 = Enum.ThumbnailSize.Size100x100
 
-local function UserProfileThumbnail(t1: {[any]: any}) -- line: 32
-	-- upvalues: useTokens (copy), Size100x100 (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), React (copy), View (copy), FoundationImage (copy), GetFFlagCurrencyTransferFlowUIImprovementFix (copy), FoundationText (copy)
-	local v16 = useTokens()
+local function UserProfileThumbnail(state)
+	local v = useTokens()
 
-	if not t1.thumbnailSize then
-		t1.thumbnailSize = Size100x100
+	if not state.thumbnailSize then
+		state.thumbnailSize = Size100x100
 	end
 
-	local v17 = if t1.thumbnailSize ~= Enum.ThumbnailSize.Size48x48 then t1.thumbnailSize ~= Enum.ThumbnailSize.Size60x60 and 150 or 60 else 48
-	local v18 = getRbxthumbWithTypeSizeAndOptions(t1.userId, Constants.RbxthumbTypes.AvatarHeadShot, v17, true)
-	local v19 = t1.size or UDim2.fromOffset(80, 80)
+	local v2 = state.thumbnailSize == Enum.ThumbnailSize.Size48x48 and 48
+		or state.thumbnailSize == Enum.ThumbnailSize.Size60x60 and 60
+		or 150
 
-	return React.createElement(View, {
+	local rbxthumbWithTypeSizeAndOptions = getRbxthumbWithTypeSizeAndOptions(
+		state.userId,
+		Constants.RbxthumbTypes.AvatarHeadShot,
+		v2,
+		true,
+		nil,
+		FFlagCurrencyTransferUseProfileFrameThumbnail
+	)
+
+	local size = state.size or UDim2.fromOffset(80, 80)
+
+	local createElement = React.createElement
+	local v3 = {
 		tag = "col gap-xlarge auto-xy align-x-center align-y-center",
-		LayoutOrder = t1.layoutOrder
-	}, {
-		AvatarContainer = React.createElement(View, {
-			tag = "aspect-1-1 position-center-center anchor-center-center",
-			Size = v19
-		}, {
-			AvatarImage = React.createElement(FoundationImage, {
-				tag = "size-full aspect-1-1 radius-circle align-x-center align-y-center",
-				Image = v18,
-				backgroundStyle = v16.Color.Shift.Shift_300
+		LayoutOrder = state.layoutOrder
+	}
+	local v4 = {
+		AvatarContainer = React.createElement(
+			View,
+			{ tag = "aspect-1-1 position-center-center anchor-center-center", Size = size },
+			{
+				AvatarImage = React.createElement(Image, {
+					Image = rbxthumbWithTypeSizeAndOptions,
+					backgroundStyle = v.Color.Shift.Shift_300,
+					tag = "size-full aspect-1-1 radius-circle align-x-center align-y-center"
+				})
+			}
+		),
+		NameContainer = 0,
+		HandleContainer = 0
+	}
+	local nameContainer
+
+	if state.showUsername then
+		local v5
+
+		if GetFFlagCurrencyTransferFlowUIImprovementFix() then
+			v5 = state.username or state.displayName
+		else
+			v5 = state.username
+		end
+
+		if v5 then
+			local createElement2 = React.createElement
+
+			local createElement3 = React.createElement
+			local text
+
+			if GetFFlagCurrencyTransferFlowUIImprovementFix() then
+				text = state.displayName or state.username or ""
+			else
+				text = state.username or ""
+			end
+
+			nameContainer = createElement2(View, { tag = "col auto-y align-x-center" }, {
+				Name = createElement3(Text, {
+					Text = text,
+					tag = "text-title-medium content-emphasis text-align-x-center"
+				})
 			})
-		}),
-		NameContainer = if not t1.showUsername or not if not GetFFlagCurrencyTransferFlowUIImprovementFix() then t1.username else t1.username or t1.displayName then nil else React.createElement(View, {
-			tag = "col auto-y align-x-center"
-		}, {
-			Name = React.createElement(FoundationText, {
-				tag = "text-title-medium content-emphasis text-align-x-center",
-				Text = if not GetFFlagCurrencyTransferFlowUIImprovementFix() then t1.username or "" else t1.displayName or (t1.username or "")
+		end
+	end
+
+	v4.NameContainer = nameContainer
+	local handleContainer
+
+	if GetFFlagCurrencyTransferFlowUIImprovementFix() then
+		if state.displayName and state.username then
+			handleContainer = React.createElement(View, {
+				tag = "col auto-y padding-bottom-medium",
+				LayoutOrder = 3
+			}, {
+				Handle = React.createElement(Text, {
+					Text = "@" .. state.username,
+					tag = "text-label-medium content-emphasis"
+				})
 			})
-		}),
-		HandleContainer = if not GetFFlagCurrencyTransferFlowUIImprovementFix() then if not t1.displayName then nil else React.createElement(View, {
+		end
+	elseif state.displayName then
+		handleContainer = React.createElement(View, {
 			tag = "col auto-y padding-bottom-medium",
 			LayoutOrder = 3
 		}, {
-			Handle = React.createElement(FoundationText, {
-				tag = "text-label-medium content-emphasis",
-				Text = "@" .. t1.displayName
-			})
-		}) else if not t1.displayName or not t1.username then nil else React.createElement(View, {
-			tag = "col auto-y padding-bottom-medium",
-			LayoutOrder = 3
-		}, {
-			Handle = React.createElement(FoundationText, {
-				tag = "text-label-medium content-emphasis",
-				Text = "@" .. t1.username
+			Handle = React.createElement(Text, {
+				Text = "@" .. state.displayName,
+				tag = "text-label-medium content-emphasis"
 			})
 		})
-	})
+	end
+
+	v4.HandleContainer = handleContainer
+	return createElement(View, v3, v4)
 end
 
 return UserProfileThumbnail

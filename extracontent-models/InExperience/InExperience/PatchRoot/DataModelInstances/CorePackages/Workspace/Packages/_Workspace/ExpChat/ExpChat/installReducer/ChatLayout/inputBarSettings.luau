@@ -1,13 +1,18 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Rodux = require(ExpChatParent.Rodux)
-local Dictionary = require(ExpChatParent.llama).Dictionary
+local parent = ExpChat.Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+
 local Config = require(ExpChat.Config)
-local None = require(ExpChatParent.llama).None
+local llama2 = require(parent.llama)
+local none = llama2.None
+
 local Actions = ExpChat.Actions
 local ConfigurationObjectsLoaded = require(Actions.ConfigurationObjectsLoaded)
 local ChatInputBarSettingsChanged = require(Actions.ChatInputBarSettingsChanged)
-local t1 = {
+
+local v = {
 	BackgroundTransparency = Config.ChatInputBarBackgroundTransparency,
 	BackgroundColor3 = Config.ChatInputBarBackgroundColor,
 	TextSize = Config.ChatInputBarTextSize,
@@ -21,23 +26,25 @@ local t1 = {
 	AutocompleteEnabled = Config.ChatInputBarDefaultAutocompleteEnabled
 }
 
-return Rodux.createReducer(t1, {
-	[ConfigurationObjectsLoaded.name] = function(p1, p2) -- line: 28
-		-- upvalues: Dictionary (copy)
-		return Dictionary.join(p1, p2.chatInputBarSettings)
+return Rodux.createReducer(v, {
+	[ConfigurationObjectsLoaded.name] = function(p, p2)
+		return dictionary.join(p, p2.chatInputBarSettings)
 	end,
-	[ChatInputBarSettingsChanged.name] = function(p3, p4) -- line: 32
-		-- upvalues: None (copy), Dictionary (copy)
-		local _ = p4.value
+	[ChatInputBarSettingsChanged.name] = function(p, p2)
+		local _ = p2.value
 
-		if p3[p4.property] == nil and p4.property ~= "TextBox" then
-			return p3
+		if p[p2.property] == nil and p2.property ~= "TextBox" then
+			return p
 		end
 
-		local v16 = if p4.property ~= "TextBox" or p4.value ~= nil then p4.value else None
+		local v2
 
-		return Dictionary.join(p3, {
-			[p4.property] = v16
-		})
+		if p2.property == "TextBox" and p2.value == nil then
+			v2 = none
+		else
+			v2 = p2.value
+		end
+
+		return dictionary.join(p, { [p2.property] = v2 })
 	end
 })

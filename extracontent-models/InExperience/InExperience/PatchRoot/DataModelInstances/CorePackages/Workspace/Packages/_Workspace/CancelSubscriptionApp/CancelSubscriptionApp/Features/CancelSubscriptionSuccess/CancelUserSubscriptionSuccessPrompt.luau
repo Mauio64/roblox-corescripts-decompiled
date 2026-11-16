@@ -1,33 +1,29 @@
-local Parent = script:FindFirstAncestor("CancelSubscriptionApp").Parent
-local React = require(Parent.React)
-local UIBlox = require(Parent.UIBlox)
+local parent = script:FindFirstAncestor("CancelSubscriptionApp").Parent
+local React = require(parent.React)
+local UIBlox = require(parent.UIBlox)
 local Toast = UIBlox.App.Dialog.Toast
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local v6 = UIBlox.App.ImageSet.Images["icons/logo/block"]
-local t1 = {
-	heading = "CoreScripts.CancelUserSubscriptionPrompt.SuccessPrompt.Heading"
-}
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local iconslogoblock = UIBlox.App.ImageSet.Images["icons/logo/block"]
 
-local function CancelUserSubscriptionSuccessPrompt(t2: {[any]: any}) -- line: 17
-	-- upvalues: useLocalization (copy), t1 (copy), React (copy), Toast (copy), v6 (copy)
-	local v10 = useLocalization(t1)
+local v = { heading = "CoreScripts.CancelUserSubscriptionPrompt.SuccessPrompt.Heading" }
 
+local function CancelUserSubscriptionSuccessPrompt(p)
+	local v2 = useLocalization(v)
 	return React.createElement(Toast, {
-		duration = 3,
-		layoutOrder = 1,
-		show = true,
 		toastContent = {
-			swipeUpDismiss = true,
-			toastTitle = v10.heading,
-			iconImage = v6,
-			onAppeared = function() -- line: 23
-			end,
-			onDismissed = t2.onDismissed or function() -- line: 24
-			end
+			toastTitle = v2.heading,
+			iconImage = iconslogoblock,
+			onAppeared = function() end,
+			onDismissed = p.onDismissed or function() end,
+			swipeUpDismiss = true
 		},
 		anchorPoint = Vector2.new(0.5, 0),
+		duration = 3,
+		layoutOrder = 1,
 		position = UDim2.new(0.5, 0, 0, 20),
-		size = UDim2.new(0.5, -24, 0, 0)
+		size = UDim2.new(0.5, -24, 0, 0),
+		show = true
 	})
 end
 

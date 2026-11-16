@@ -1,33 +1,43 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local FriendsLandingParent = FriendsLanding.Parent
+local parent = FriendsLanding.Parent
 local dependencies = require(FriendsLanding.dependencies)
-local React = dependencies.React
-local Roact = dependencies.Roact
-local UIBlox = dependencies.UIBlox
+local react = dependencies.React
+
+local roact = dependencies.Roact
+local uiBlox = dependencies.UIBlox
 local t = dependencies.t
-local withStyle = UIBlox.Style.withStyle
+local withStyle = uiBlox.Style.withStyle
 local withLocalization = dependencies.withLocalization
-local UserProfiles = require(FriendsLandingParent.UserProfiles)
+local UserProfiles = require(parent.UserProfiles)
 local userPresenceText = require(FriendsLanding.Friends.userPresenceText)
 local userPresenceIcon = require(FriendsLanding.Friends.userPresenceIcon)
 local getCorrectUserPresence = require(FriendsLanding.Friends.getCorrectUserPresence)
+
 local memoize = dependencies.memoize
 local createRelevancyInfo = require(script.Parent.createRelevancyInfo)
-local SocialCommon = require(FriendsLandingParent.SocialCommon)
-local ButtonTypes = require(FriendsLandingParent.UserList).Enums.ButtonTypes
-local ButtonVariant = require(FriendsLandingParent.Foundation).Enums.ButtonVariant
-local FriendTileWithTrustedIndicator = require(script.Parent.FriendTileWithTrustedIndicator)
-local FFlagFriendsPageAlwaysOpenPPV = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageAlwaysOpenPPV
-local FFlagFriendsPageUserListEnabled = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageUserListEnabled
-local FFlagFriendsPageViewBtnEnabled = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageViewBtnEnabled
-local FFlagEnableBlackbirdCheck = require(FriendsLandingParent.SharedFlags).FFlagEnableBlackbirdCheck
-local FFlagFriendsPageUnifiedOpenProfileLogic = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageUnifiedOpenProfileLogic
-local v25 = Roact.PureComponent:extend("FriendTile")
 
-v25.validateProps = t.strictInterface({
+local SocialCommon = require(parent.SocialCommon)
+local UserList = require(parent.UserList)
+local ButtonTypes = UserList.Enums.ButtonTypes
+
+local Foundation = require(parent.Foundation)
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local FriendTileWithTrustedIndicator = require(script.Parent.FriendTileWithTrustedIndicator)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFriendsPageUserListEnabled = SharedFlags.FFlagFriendsPageUserListEnabled
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagFriendsPageViewBtnEnabled = SharedFlags2.FFlagFriendsPageViewBtnEnabled
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags3.FFlagEnableBlackbirdCheck
+local FFlagFriendsPageUserListCtaEnabled = require(FriendsLanding.Flags.FFlagFriendsPageUserListCtaEnabled)
+
+local extended = roact.PureComponent:extend("FriendTile")
+
+extended.validateProps = t.strictInterface({
 	user = t.table,
 	index = t.number,
-	openPlayerProfileHandle = t.optional(t.callback),
+	openPlayerProfileHandle = t.callback,
 	pageLoadingTimeReport = t.optional(t.callback),
 	createRow = t.optional(t.callback),
 	selected = t.optional(t.boolean),
@@ -41,164 +51,162 @@ v25.validateProps = t.strictInterface({
 		onActivated = t.optional(t.callback),
 		isSecondary = t.optional(t.boolean),
 		isDisabled = t.optional(t.boolean)
-	}))),
-	openPlayerProfile = t.optional(t.callback),
-	isPlayerContextualMenuEnabled = t.optional(t.boolean)
+	})))
 })
-v25.defaultProps = {
+
+extended.defaultProps = {
+	user = { username = "" },
+	openPlayerProfileHandle = function() end,
 	isLuobu = false,
 	index = 1,
 	buttons = nil,
-	isPlayerContextualMenuEnabled = false,
-	trustedConnection = false,
-	user = {
-		username = ""
-	},
-	openPlayerProfile = function() -- line: 38
-		return function() -- line: 39
-		end
-	end
+	trustedConnection = false
 }
 
-function v25.init(p1) -- line: 84
-	-- upvalues: memoize (copy), createRelevancyInfo (copy), Roact (copy), FFlagFriendsPageAlwaysOpenPPV (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy), FFlagFriendsPageUserListEnabled (copy), SocialCommon (copy)
-	p1.state = {
-		isFirstRender = true
-	}
-	p1.makeRelevancyInfo = memoize(createRelevancyInfo)
-	p1.playerTileRef = Roact.createRef()
-	p1.openPlayerProfile = if not FFlagFriendsPageAlwaysOpenPPV and not FFlagFriendsPageUnifiedOpenProfileLogic then not p1.props.isPlayerContextualMenuEnabled and function(p2, p3) -- line: 95
-		-- upvalues: p1 (copy)
-		local user = p1.props.user
+function extended:init()
+	self.state = { isFirstRender = true }
+	self.makeRelevancyInfo = memoize(createRelevancyInfo)
+	self.playerTileRef = roact.createRef()
 
-		if p2 and p3 then
-			return p1.props.openPlayerProfile(user.id, p1.props.index, user, p2, p3)
+	function self.checkAndSetSelected()
+		local v = self.props.selected and self.props.focusGuiObject and self.playerTileRef:getValue()
+
+		if v then
+			self.props.focusGuiObject(v)
 		end
+	end
 
-		return p1.props.openPlayerProfile(user.id, p1.props.index, user)
-	end or function(_: Vector2?, _: Vector2?) -- line: 91
-		-- upvalues: p1 (copy)
-		local user = p1.props.user
-
-		return p1.props.openPlayerProfile(user)
-	end else nil
-	p1.openPlayerProfileForRelevancyInfo = not FFlagFriendsPageAlwaysOpenPPV and not FFlagFriendsPageUnifiedOpenProfileLogic and function(p4, p5) -- line: 107
-		-- upvalues: p1 (copy)
-		return function() -- line: 108
-			-- upvalues: p1 (copy), p4 (copy), p5 (copy)
-			return p1.openPlayerProfile(p4, p5)
-		end
+	self.getPresenceType = FFlagFriendsPageUserListEnabled and function(value)
+		local v = tostring(value or "")
+		return string.gsub(v, "PresenceType%.", "") or SocialCommon.Enums.PresenceTypes.Offline
 	end or nil
 
-	function p1.checkAndSetSelected() -- line: 113
-		-- upvalues: p1 (copy)
-		if p1.props.selected and p1.props.focusGuiObject then
-			local v44 = p1.playerTileRef:getValue()
-
-			if v44 then
-				p1.props.focusGuiObject(v44)
-			end
-		end
-	end
-
-	p1.getPresenceType = if not FFlagFriendsPageUserListEnabled then nil else function(p6) -- line: 123
-		-- upvalues: SocialCommon (copy)
-		local str = tostring(p6 or "")
-
-		return string.gsub(str, "PresenceType%.", "") or SocialCommon.Enums.PresenceTypes.Offline
-	end
-	p1.openProfilePeekViewHandle = if not FFlagFriendsPageUserListEnabled and not FFlagFriendsPageUnifiedOpenProfileLogic then nil else function() -- line: 130
-		-- upvalues: p1 (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy)
-		return p1.props.openPlayerProfileHandle(p1.props.user.id, p1.props.index, if not FFlagFriendsPageUnifiedOpenProfileLogic then nil else p1.props.user)
+	function self.openProfilePeekViewHandle()
+		return self.props.openPlayerProfileHandle(self.props.user.id, self.props.index, self.props.user)
 	end
 end
-function v25.didMount(p7) -- line: 140
-	if p7.props.pageLoadingTimeReport then
-		p7.props.pageLoadingTimeReport()
+
+function extended.didMount(p)
+	if p.props.pageLoadingTimeReport then
+		p.props.pageLoadingTimeReport()
 	end
 
-	p7.checkAndSetSelected()
+	p.checkAndSetSelected()
 end
-function v25.render(p8) -- line: 148
-	-- upvalues: getCorrectUserPresence (copy), userPresenceText (copy), userPresenceIcon (copy), withStyle (copy), withLocalization (copy), FFlagFriendsPageUserListEnabled (copy), FFlagFriendsPageAlwaysOpenPPV (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy), FFlagFriendsPageViewBtnEnabled (copy), ButtonTypes (copy), ButtonVariant (copy), UserProfiles (copy), React (copy), FriendTileWithTrustedIndicator (copy), FFlagEnableBlackbirdCheck (copy)
-	local user = p8.props.user
-	local v30 = getCorrectUserPresence(user)
-	local v31 = userPresenceText[v30]
-	local v32 = userPresenceIcon[v30]
-	local AbsoluteSize = nil
-	local AbsolutePosition = nil
-	local v35 = p8.playerTileRef:getValue()
 
-	if v35 then
-		AbsoluteSize = v35.AbsoluteSize
-		AbsolutePosition = v35.AbsolutePosition
-	else
-		p8:setState({
-			isFirstRender = false
-		})
+function extended.render(object)
+	local user = object.props.user
+	local correctUserPresence = getCorrectUserPresence(user)
+
+	local presenceText2 = userPresenceText[correctUserPresence]
+	local v = userPresenceIcon[correctUserPresence]
+
+	if not object.playerTileRef:getValue() then
+		object:setState({ isFirstRender = false })
 	end
 
-	return withStyle(function(p9) -- line: 166
-		-- upvalues: withLocalization (copy), v31 (copy), FFlagFriendsPageUserListEnabled (copy), p8 (copy), user (copy), v32 (copy), FFlagFriendsPageAlwaysOpenPPV (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy), AbsoluteSize (ref), AbsolutePosition (ref), v30 (copy), FFlagFriendsPageViewBtnEnabled (copy), ButtonTypes (copy), ButtonVariant (copy), UserProfiles (copy), React (copy), FriendTileWithTrustedIndicator (copy), FFlagEnableBlackbirdCheck (copy)
+	return withStyle(function(p)
 		return withLocalization({
+			presenceText = presenceText2,
 			accountDeletedText = "Feature.Friends.Action.AccountDeleted",
-			trustedText = "Feature.Friends.TrustedConnection.Label.Trusted",
-			presenceText = v31
-		})(function(p10) -- line: 171
-			-- upvalues: FFlagFriendsPageUserListEnabled (copy), p8 (copy), user (copy), v32 (copy), FFlagFriendsPageAlwaysOpenPPV (copy), FFlagFriendsPageUnifiedOpenProfileLogic (copy), AbsoluteSize (ref), AbsolutePosition (ref), p9 (copy), v30 (copy), FFlagFriendsPageViewBtnEnabled (copy), ButtonTypes (copy), ButtonVariant (copy), UserProfiles (copy), React (copy), FriendTileWithTrustedIndicator (copy), FFlagEnableBlackbirdCheck (copy)
-			local v49 = p10.presenceText or nil
-			local accountDeletedText = p10.accountDeletedText
+			trustedText = "Feature.Friends.TrustedConnection.Label.Trusted"
+		})(function(p2)
+			local presenceText = p2.presenceText or nil
+			local accountDeletedText = p2.accountDeletedText
 
 			if FFlagFriendsPageUserListEnabled then
-				local v51 = p8.makeRelevancyInfo(user, v49, v32, if not FFlagFriendsPageAlwaysOpenPPV and not FFlagFriendsPageUnifiedOpenProfileLogic then p8.openPlayerProfileForRelevancyInfo(AbsoluteSize, AbsolutePosition) else nil, p9.Theme, p8.props.index, p8.props.isLuobu, p9.Font, accountDeletedText, true)
+				local relevancyInfo = object.makeRelevancyInfo(
+					user,
+					presenceText,
+					v,
+					nil,
+					p.Theme,
+					object.props.index,
+					object.props.isLuobu,
+					p.Font,
+					accountDeletedText,
+					true
+				)
 
-				return p8.props.createRow({
-					onRowActivated = p8.openProfilePeekViewHandle,
-					contextualInfo = v51 and {
-						text = v51.text,
-						icon = v51.icon
+				local createRow = object.props.createRow
+				local v2 = {
+					onRowActivated = object.openProfilePeekViewHandle,
+					contextualInfo = relevancyInfo and {
+						text = relevancyInfo.text,
+						icon = relevancyInfo.icon
 					},
-					presence = p8.getPresenceType(v30),
-					primaryCta = if not FFlagFriendsPageViewBtnEnabled then nil else {
-						minWidth = 64,
-						maxWidth = 90,
+					presence = object.getPresenceType(correctUserPresence),
+					primaryCta = 0
+				}
+				local primaryCta
+
+				if not FFlagFriendsPageUserListCtaEnabled then
+					primaryCta = FFlagFriendsPageViewBtnEnabled and {
 						type = ButtonTypes.View,
-						onActivated = p8.openProfilePeekViewHandle,
-						variant = ButtonVariant.Standard
-					}
-				})
+						onActivated = object.openProfilePeekViewHandle,
+						variant = ButtonVariant.Standard,
+						minWidth = 64,
+						maxWidth = 90
+					} or nil
+				end
+
+				v2.primaryCta = primaryCta
+				return createRow(v2)
+			else
+				local combinedName, v2
+
+				if object.props.userProfile then
+					combinedName = object.props.userProfile.names.combinedName
+					v2 = UserProfiles.Formatters.formatUsername(object.props.userProfile.names.username)
+					user.isDeleted = object.props.userProfile.isDeleted
+				end
+
+				local title = combinedName or user.displayName
+				local subtitle = v2 or "@" .. user.username
+				local relevancyInfo
+
+				if combinedName then
+					relevancyInfo = object.makeRelevancyInfo(
+						user,
+						presenceText,
+						v,
+						nil,
+						p.Theme,
+						object.props.index,
+						object.props.isLuobu,
+						p.Font,
+						accountDeletedText,
+						true
+					)
+				end
+
+				local isVerified = object.props.userProfile and object.props.userProfile.isVerified
+				local createElement = react.createElement
+				local v3 = {
+					user = user,
+					userPresence = correctUserPresence,
+					title = title,
+					subtitle = subtitle,
+					relevancyInfo = relevancyInfo,
+					index = object.props.index,
+					openPlayerProfile = object.openProfilePeekViewHandle,
+					playerTileRef = object.playerTileRef,
+					buttons = object.props.buttons,
+					isTrustedConnection = object.props.trustedConnection,
+					isVerified = isVerified,
+					isRobloxSubscriber = 0
+				}
+				local isRobloxSubscriber
+
+				if FFlagEnableBlackbirdCheck then
+					isRobloxSubscriber = object.props.isRobloxSubscriber
+				end
+
+				v3.isRobloxSubscriber = isRobloxSubscriber
+				return createElement(FriendTileWithTrustedIndicator, v3)
 			end
-
-			local combinedName = nil
-			local v53 = nil
-
-			if p8.props.userProfile then
-				combinedName = p8.props.userProfile.names.combinedName
-				v53 = UserProfiles.Formatters.formatUsername(p8.props.userProfile.names.username)
-				user.isDeleted = p8.props.userProfile.isDeleted
-			end
-
-			local v54 = combinedName or user.displayName
-			local v55 = v53 or "@" .. user.username
-			local v56 = if combinedName then p8.makeRelevancyInfo(user, v49, v32, if not FFlagFriendsPageAlwaysOpenPPV and not FFlagFriendsPageUnifiedOpenProfileLogic then p8.openPlayerProfileForRelevancyInfo(AbsoluteSize, AbsolutePosition) else nil, p9.Theme, p8.props.index, p8.props.isLuobu, p9.Font, accountDeletedText, true) else nil
-			local v57 = p8.props.userProfile and p8.props.userProfile.isVerified
-
-			return React.createElement(FriendTileWithTrustedIndicator, {
-				user = user,
-				userPresence = v30,
-				title = v54,
-				subtitle = v55,
-				relevancyInfo = v56,
-				index = p8.props.index,
-				openPlayerProfile = if not FFlagFriendsPageUnifiedOpenProfileLogic then if not FFlagFriendsPageAlwaysOpenPPV then p8.openPlayerProfile(AbsoluteSize, AbsolutePosition, v54, v55, v56) else p8.props.openPlayerProfile(user.id, p8.props.index) else p8.openProfilePeekViewHandle,
-				playerTileRef = p8.playerTileRef,
-				buttons = p8.props.buttons,
-				isTrustedConnection = p8.props.trustedConnection,
-				isVerified = v57,
-				isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else p8.props.isRobloxSubscriber
-			})
 		end)
 	end)
 end
 
-return v25
+return extended

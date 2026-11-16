@@ -1,5 +1,4 @@
 local ProductPurchaseSurface = require(script.Enums.ProductPurchaseSurface)
-
 return {
 	Enums = {
 		ProductKind = require(script.Enums.ProductKind),

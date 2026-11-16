@@ -1,8 +1,6 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
+local parent = script:FindFirstAncestor("AppChat").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
-	return {
-		screen = p1.screen,
-		params = p1.params
-	}
+return Rodux.makeActionCreator(script.Name, function(p)
+	return { screen = p.screen, params = p.params }
 end)

@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetSubjectToChinaPolicies", function(p1) -- line: 4
-	return {
-		subjectToChinaPolicies = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetSubjectToChinaPolicies", function(subjectToChinaPolicies)
+	return { subjectToChinaPolicies = subjectToChinaPolicies }
 end)

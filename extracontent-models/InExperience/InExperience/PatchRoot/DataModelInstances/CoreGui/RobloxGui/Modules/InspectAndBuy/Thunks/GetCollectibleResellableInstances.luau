@@ -1,46 +1,42 @@
 local CorePackages = game:GetService("CorePackages")
-local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local Network = require(ParentParent.Services.Network)
-local SetCollectibleResellableInstances = require(ParentParent.Actions.SetCollectibleResellableInstances)
-local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
-local SendCounter = require(ParentParent.Thunks.SendCounter)
-local Constants = require(ParentParent.Constants)
-local t1 = { Network }
-local v11 = createInspectAndBuyKeyMapper("getCollectibleResellableInstances")
+local Http = require(CorePackages.Workspace.Packages.Http)
+local PerformFetch = Http.PerformFetch
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local Network = require(parent.Services.Network)
+local SetCollectibleResellableInstances = require(parent.Actions.SetCollectibleResellableInstances)
+local createInspectAndBuyKeyMapper = require(parent.createInspectAndBuyKeyMapper)
+local SendCounter = require(parent.Thunks.SendCounter)
+local Constants = require(parent.Constants)
 
-local function GetCollectibleResellableInstances(p1, p2) -- line: 17
-	-- upvalues: Thunk (copy), t1 (copy), Network (copy), v11 (copy), PerformFetch (copy), SetCollectibleResellableInstances (copy), SendCounter (copy), Constants (copy)
-	return Thunk.new(script.Name, t1, function(p3, p4) -- line: 18
-		-- upvalues: Network (copy), v11 (copy), p1 (copy), p2 (copy), PerformFetch (copy), SetCollectibleResellableInstances (copy), SendCounter (copy), Constants (copy)
-		local v17 = p4[Network]
-		local v18 = v11(p3:getState().storeId, p1, p2)
+local v = { Network }
 
-		return PerformFetch.Single(v18, function() -- line: 23
-			-- upvalues: v17 (copy), p1 (copy), p2 (copy), p3 (copy), SetCollectibleResellableInstances (copy), SendCounter (copy), Constants (copy)
-			return v17.getCollectibleResellableInstances(p1, p2):andThen(function(p5) -- line: 24
-				-- upvalues: p3 (copy), SetCollectibleResellableInstances (copy), p1 (copy), SendCounter (copy), Constants (copy)
-				local v21 = p5 and p5.itemInstances
+local inspectAndBuyKeyMapper = createInspectAndBuyKeyMapper("getCollectibleResellableInstances")
 
-				if v21 then
-					p3:dispatch(SetCollectibleResellableInstances(p1, v21))
+local function GetCollectibleResellableInstances(p, p2)
+	return Thunk.new(script.Name, v, function(object, p3)
+		local v2 = p3[Network]
+
+		local v3 = inspectAndBuyKeyMapper(object:getState().storeId, p, p2)
+
+		return PerformFetch.Single(v3, function()
+			return v2.getCollectibleResellableInstances(p, p2):andThen(function(p4)
+				local itemInstances = p4 and p4.itemInstances
+
+				if itemInstances then
+					object:dispatch(SetCollectibleResellableInstances(p, itemInstances))
 				end
 
-				if v21 then
-					p3:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstances .. Constants.CounterSuffix.RequestSucceeded))
-
-					return
+				if itemInstances then
+					object:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstances .. Constants.CounterSuffix.RequestSucceeded))
+				else
+					object:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstancesRequestSucceededWithoutResult))
 				end
-
-				p3:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstancesRequestSucceededWithoutResult))
-			end, function(_) -- line: 42
-				-- upvalues: p3 (copy), SendCounter (copy), Constants (copy)
-				p3:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstances .. Constants.CounterSuffix.RequestRejected))
+			end, function(_)
+				object:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstances .. Constants.CounterSuffix.RequestRejected))
 			end)
-		end)(p3):catch(function(_) -- line: 49
-			-- upvalues: p3 (copy), SendCounter (copy), Constants (copy)
-			p3:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstances .. Constants.CounterSuffix.RequestFailed))
+		end)(object):catch(function(_)
+			object:dispatch(SendCounter(Constants.Counters.GetCollectibleResellableInstances .. Constants.CounterSuffix.RequestFailed))
 		end)
 	end)
 end

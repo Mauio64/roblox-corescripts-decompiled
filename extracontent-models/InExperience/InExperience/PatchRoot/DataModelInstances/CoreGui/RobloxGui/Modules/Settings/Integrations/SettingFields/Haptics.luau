@@ -1,40 +1,52 @@
 local Settings = script:FindFirstAncestor("Settings")
 local CorePackages = game:GetService("CorePackages")
-local GameSettings = UserSettings().GameSettings
+local gameSettings = UserSettings().GameSettings
+
 local SettingsService = require(CorePackages.Workspace.Packages.SettingsService)
 local ValueChangedSignal = SettingsService.ValueChangedSignal
 local SettingEnum = SettingsService.SettingEnum
-local LAYOUT_ORDER = require(Settings.Integrations.Constants).GAMESETTINGS.LAYOUT_ORDER
-local t1 = {
-	ON = true,
-	OFF = false
-}
-local t2 = {
-	MAX = 1,
-	MIN = 0
-}
+local Constants = require(Settings.Integrations.Constants)
 
-local function HapticValue() -- line: 29
-	-- upvalues: GameSettings (copy), ValueChangedSignal (copy), t2 (copy), t1 (copy)
-	local v11 = ValueChangedSignal.new(if GameSettings.HapticStrength ~= t2.MIN then t1.ON else t1.OFF)
+local LAYOUT_ORDER = Constants.GAMESETTINGS.LAYOUT_ORDER
+local v = { ON = true, OFF = false }
 
-	v11:connect(function(b1: boolean) -- line: 35
-		-- upvalues: GameSettings (copy), t2 (copy), t1 (copy)
-		if b1 == if GameSettings.HapticStrength ~= t2.MIN then t1.ON else t1.OFF then
+local v2 = { MAX = 1, MIN = 0 }
+
+local function HapticValue()
+	local new = ValueChangedSignal.new
+	local v3
+
+	if gameSettings.HapticStrength == v2.MIN then
+		v3 = v.OFF
+	else
+		v3 = v.ON
+	end
+
+	local v4 = new(v3)
+	v4:connect(function(flag: boolean)
+		local v5
+
+		if gameSettings.HapticStrength == v2.MIN then
+			v5 = v.OFF
+		else
+			v5 = v.ON
+		end
+
+		if v5 == flag then
 			return
 		end
 
-		GameSettings.HapticStrength = b1 ~= true and 0 or 1
+		gameSettings.HapticStrength = flag == true and 1 or 0
 	end)
 
-	return v11
+	return v4
 end
 
 return {
 	id = "haptics",
-	label = "CoreScripts.InGameMenu.GameSettings.Haptics",
-	alreadyLocalized = false,
 	field_type = SettingEnum.Toggle,
+	label = "CoreScripts.InGameMenu.GameSettings.Haptics",
 	layoutOrder = LAYOUT_ORDER.HapticsFrame,
-	onChanged = HapticValue()
+	onChanged = HapticValue(),
+	alreadyLocalized = false
 }

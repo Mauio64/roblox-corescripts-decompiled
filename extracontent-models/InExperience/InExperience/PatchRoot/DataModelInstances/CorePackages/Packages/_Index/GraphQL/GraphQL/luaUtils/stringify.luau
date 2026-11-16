@@ -1,9 +1,9 @@
 local HttpService = game:GetService("HttpService")
-local json = HttpService:JSONEncode((require(script.Parent.null)))
+local null = require(script.Parent.null)
+local jsonEncode = HttpService:JSONEncode(null)
 
-local function stringify(p1) -- line: 5
-	-- upvalues: HttpService (copy), json (copy)
-	return (HttpService:JSONEncode(p1):gsub(json, "null"))
+local function stringify(p)
+	return (HttpService:JSONEncode(p):gsub(jsonEncode, "null"))
 end
 
 return stringify

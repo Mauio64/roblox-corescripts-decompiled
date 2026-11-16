@@ -1,8 +1,7 @@
-local Parent = script:FindFirstAncestor("Groups").Parent
+local parent = script:FindFirstAncestor("Groups").Parent
 local GroupsWrapperContext = require(script.Parent.GroupsWrapperContext)
-local React = require(Parent.React)
+local React = require(parent.React)
 
-return function() -- line: 6
-	-- upvalues: React (copy), GroupsWrapperContext (copy)
+return function()
 	return React.useContext(GroupsWrapperContext)
 end

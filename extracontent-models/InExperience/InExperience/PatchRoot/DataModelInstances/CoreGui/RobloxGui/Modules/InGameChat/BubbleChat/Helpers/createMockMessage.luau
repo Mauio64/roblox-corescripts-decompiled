@@ -1,18 +1,19 @@
 local CorePackages = game:GetService("CorePackages")
-local Cryo = require(CorePackages.Packages.Cryo)
-local n1 = 0
 
-local function createMockMessage(p1) -- line: 7
-	-- upvalues: n1 (ref), Cryo (copy)
-	n1 += 1
+local Cryo = require(CorePackages.Packages.Cryo)
+
+local count = 0
+
+local function createMockMessage(p)
+	count += 1
 
 	return Cryo.Dictionary.join({
 		name = "Foo",
+		id = tostring(count),
 		userId = "1",
 		text = "Hello, World!",
-		id = tostring(n1),
-		timestamp = n1
-	}, p1)
+		timestamp = count
+	}, p)
 end
 
 return createMockMessage

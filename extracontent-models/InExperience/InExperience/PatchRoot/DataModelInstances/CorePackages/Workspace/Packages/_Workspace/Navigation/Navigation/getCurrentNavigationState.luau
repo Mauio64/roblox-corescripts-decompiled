@@ -1,12 +1,10 @@
 require(script.Parent.types)
-
-local function getCurrentNavigationState(p1) -- line: 7
-	-- upvalues: getCurrentNavigationState (copy)
-	if p1.routes and p1.index then
-		return getCurrentNavigationState(p1.routes[p1.index])
+local function getCurrentNavigationState(p)
+	if p.routes and p.index then
+		return getCurrentNavigationState(p.routes[p.index])
 	end
 
-	return p1
+	return p
 end
 
 return getCurrentNavigationState

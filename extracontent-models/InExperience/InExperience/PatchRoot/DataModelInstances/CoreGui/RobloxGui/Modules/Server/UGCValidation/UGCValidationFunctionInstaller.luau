@@ -1,33 +1,27 @@
 local CorePackages = game:GetService("CorePackages")
 local UGCValidationService = game:GetService("UGCValidationService")
 local UGCValidation = require(CorePackages.Packages.UGCValidation)
-local EngineFeature = game:GetEngineFeature("UGCValidationWithContextEntrypointFeature")
-local v5 = game:DefineFastFlag("UGCValidateMigrateSchemaProperties2", false)
-local v6 = game:DefineFastFlag("UGCValidateForwardIECRestrictedUserIds", false)
 
-local function UGCValidationFunction(p1) -- line: 10
-	-- upvalues: EngineFeature (copy), UGCValidation (copy), v5 (copy), v6 (copy)
-	local instances = p1.instances
-	local assetType = p1.assetType
-	local isServer = p1.isServer
-	local fullBodyData = p1.fullBodyData
-	local allowUnreviewedAssets = p1.allowUnreviewedAssets
-	local restrictedUserIds = p1.restrictedUserIds
-	local token = p1.token
-	local universeId = p1.universeId
-	local requireAllFolders = p1.requireAllFolders
-	local t1 = {
-		skipSnapshot = true,
-		skipPhysicsDataReset = true,
-		skipValidateHSR = true
-	}
-	local v22, v23
+local engineFeature = game:GetEngineFeature("UGCValidationWithContextEntrypointFeature")
+local defineFastFlag = game:DefineFastFlag("UGCValidateMigrateSchemaProperties2", false)
+local defineFastFlag2 = game:DefineFastFlag("UGCValidateForwardIECRestrictedUserIds", false)
 
-	if EngineFeature then
-		local t2 = {
-			allowEditableInstances = true,
-			shouldYield = true,
-			validateMeshPartAccessories = true,
+local function UGCValidationFunction(data)
+	local instances = data.instances
+	local assetType = data.assetType
+	local isServer = data.isServer
+	local fullBodyData = data.fullBodyData
+	local allowUnreviewedAssets = data.allowUnreviewedAssets
+	local restrictedUserIds = data.restrictedUserIds
+	local token = data.token
+	local universeId = data.universeId
+	local requireAllFolders = data.requireAllFolders
+
+	local bypassFlags = { skipSnapshot = true, skipPhysicsDataReset = true, skipValidateHSR = true }
+	local v, v2
+
+	if engineFeature then
+		local v3 = {
 			instances = instances,
 			assetTypeEnum = assetType,
 			isServer = isServer,
@@ -35,51 +29,84 @@ local function UGCValidationFunction(p1) -- line: 10
 			restrictedUserIds = restrictedUserIds,
 			token = token,
 			universeId = universeId,
-			requireAllFolders = requireAllFolders,
-			bypassFlags = t1
-		}
-		local t3 = {
 			allowEditableInstances = true,
 			shouldYield = true,
-			validateMeshPartAccessories = false,
+			validateMeshPartAccessories = true,
+			requireAllFolders = requireAllFolders,
+			bypassFlags = bypassFlags
+		}
+
+		local v4 = {
 			fullBodyData = fullBodyData,
 			isServer = isServer,
-			bypassFlags = t1,
-			requireAllFolders = requireAllFolders
+			allowEditableInstances = true,
+			bypassFlags = bypassFlags,
+			shouldYield = true,
+			requireAllFolders = requireAllFolders,
+			validateMeshPartAccessories = false
 		}
 
 		if fullBodyData then
-			v22, v23 = UGCValidation.validateFullBodyWithContext(t3)
+			v, v2 = UGCValidation.validateFullBodyWithContext(v4)
 		else
-			v22, v23 = UGCValidation.validateWithContext(t2)
+			v, v2 = UGCValidation.validateWithContext(v3)
 		end
 	elseif fullBodyData then
-		v22, v23 = UGCValidation.validateFullBody(fullBodyData, isServer, true, t1, true, requireAllFolders)
+		v, v2 = UGCValidation.validateFullBody(fullBodyData, isServer, true, bypassFlags, true, requireAllFolders)
 	else
-		v22, v23 = UGCValidation.validate(instances, assetType, isServer, allowUnreviewedAssets, restrictedUserIds, token, universeId, true, t1, true, true, requireAllFolders)
+		v, v2 = UGCValidation.validate(
+			instances,
+			assetType,
+			isServer,
+			allowUnreviewedAssets,
+			restrictedUserIds,
+			token,
+			universeId,
+			true,
+			bypassFlags,
+			true,
+			true,
+			requireAllFolders
+		)
 	end
 
-	local t4 = {
-		source = not isServer and "InExpClient" or "InExpServer",
+	local v3 = {
+		source = isServer and "InExpServer" or "InExpClient",
 		enforceR15FolderStructure = requireAllFolders or false,
 		skipAssetQualityChecks = UGCValidation.shouldSkipAssetQualityChecks and UGCValidation.shouldSkipAssetQualityChecks() or nil,
-		iecConfigs = if not v5 then nil else {
-			token = token,
-			universeId = universeId,
-			restrictedUserIds = if not v6 then nil else restrictedUserIds
-		}
+		iecConfigs = 0
 	}
-	local v25 = if not fullBodyData then UGCValidation.ValidateAsset(instances, assetType, t4) else UGCValidation.ValidateFinalizedBundle(fullBodyData, Enum.BundleType.BodyParts, t4)
-	local v26, v27 = UGCValidation.combineResultsIntoLegacy(v22, v23, v25)
+	local iecConfigs
 
-	if not v26 then
-		return false, v27
+	if defineFastFlag then
+		iecConfigs = { token = token, universeId = universeId, restrictedUserIds = 0 }
+
+		if not defineFastFlag2 then
+			restrictedUserIds = nil
+		end
+
+		iecConfigs.restrictedUserIds = restrictedUserIds
 	end
 
-	return true, { "Success" }
+	v3.iecConfigs = iecConfigs
+	local v4
+
+	if fullBodyData then
+		v4 = UGCValidation.ValidateFinalizedBundle(fullBodyData, Enum.BundleType.BodyParts, v3)
+	else
+		v4 = UGCValidation.ValidateAsset(instances, assetType, v3)
+	end
+
+	local combineResultsIntoLegacy, v5 = UGCValidation.combineResultsIntoLegacy(v, v2, v4)
+
+	if combineResultsIntoLegacy then
+		return true, { "Success" }
+	end
+
+	return false, v5
 end
-local function Install() -- line: 119
-	-- upvalues: UGCValidationService (copy), UGCValidationFunction (copy)
+
+local function Install()
 	UGCValidationService:RegisterUGCValidationFunction(UGCValidationFunction)
 end
 

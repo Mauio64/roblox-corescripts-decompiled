@@ -1,45 +1,42 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-
+local parent = ProfilePlatform.Parent
 require(ProfilePlatform.Components.CTARow.Types)
 
 local CoreGui = game:GetService("CoreGui")
-local React = require(ProfilePlatformParent.React)
-local Dash = require(ProfilePlatformParent.Dash)
-local Foundation = require(ProfilePlatformParent.Foundation)
-local useIsSpatial = require(ProfilePlatformParent.Responsive).useIsSpatial
+
+local React = require(parent.React)
+local Dash = require(parent.Dash)
+local Foundation = require(parent.Foundation)
+local Responsive = require(parent.Responsive)
+local useIsSpatial = Responsive.useIsSpatial
 local Menu = Foundation.Menu
 local OverlayProvider = Foundation.OverlayProvider
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local InputSize = Foundation.Enums.InputSize
 
-local function getVROverlaySurfaceGui() -- line: 30
-	-- upvalues: CoreGui (copy)
-	local LuaAppScreenGui = CoreGui:FindFirstChild("LuaAppScreenGui")
+local function getVROverlaySurfaceGui() -- 1 equivalent call inferred from this helper
+	local luaAppScreenGui = CoreGui:FindFirstChild("LuaAppScreenGui")
 
-	if LuaAppScreenGui then
-		return (LuaAppScreenGui:FindFirstChild("MainAppScreen_SurfaceGui"))
+	if luaAppScreenGui then
+		return (luaAppScreenGui:FindFirstChild("MainAppScreen_SurfaceGui"))
 	end
 
 	return nil
 end
-local function convertToMenuItems(p1, p2: ((...any) -> ...any)) -- line: 38
-	-- upvalues: Dash (copy)
-	return Dash.map(p1, function(p3) -- line: 42
-		-- upvalues: Dash (copy), p2 (copy)
-		return {
-			items = Dash.map(p3.items, function(p4) -- line: 44
-				-- upvalues: p2 (copy)
-				local displayValue = p4.displayValue
 
+local function convertToMenuItems(menuItems, closeMenu)
+	return Dash.map(menuItems, function(p)
+		return {
+			items = Dash.map(p.items, function(data)
+				local displayValue = data.displayValue
+				local function onActivated()
+					closeMenu()
+					data.onActivated()
+				end
 				return {
-					id = p4.id,
-					onActivated = function() -- line: 46
-						-- upvalues: p2 (copy), p4 (copy)
-						p2()
-						p4.onActivated()
-					end,
-					isDisabled = p4.isDisabled,
+					id = data.id,
+					onActivated = onActivated,
+					isDisabled = data.isDisabled,
 					text = displayValue.text or "",
 					icon = displayValue.icon
 				}
@@ -47,41 +44,29 @@ local function convertToMenuItems(p1, p2: ((...any) -> ...any)) -- line: 38
 		}
 	end)
 end
-local function ContextualMenu(t1: {[any]: any}) -- line: 63
-	-- upvalues: useIsSpatial (copy), React (copy), CoreGui (copy), convertToMenuItems (copy), OverlayProvider (copy), Menu (copy), PopoverAlign (copy), InputSize (copy)
-	local v19 = useIsSpatial()
-	local v20 = React.useMemo(function() -- line: 65
-		-- upvalues: v19 (copy), CoreGui (copy)
-		if v19 then
-			local LuaAppScreenGui = CoreGui:FindFirstChild("LuaAppScreenGui")
 
-			if LuaAppScreenGui then
-				return (LuaAppScreenGui:FindFirstChild("MainAppScreen_SurfaceGui"))
-			end
-
+local function ContextualMenu(props)
+	local v = useIsSpatial()
+	local gui = React.useMemo(function()
+		if not v then
 			return nil
 		end
 
-		return nil
-	end, { v19 })
-	local v21 = React.useMemo(function() -- line: 69
-		-- upvalues: convertToMenuItems (copy), t1 (copy)
-		return convertToMenuItems(t1.menuItems, t1.closeMenu)
-	end, {
-		t1.menuItems,
-		t1.closeMenu
-	})
+		return getVROverlaySurfaceGui() -- inferred equivalent call
+	end, { v })
 
-	return (React.createElement(OverlayProvider, {
-		gui = v20
-	}, {
+	local items = React.useMemo(function()
+		return convertToMenuItems(props.menuItems, props.closeMenu)
+	end, { props.menuItems, props.closeMenu })
+
+	return (React.createElement(OverlayProvider, { gui = gui }, {
 		Menu = React.createElement(Menu, {
-			isOpen = t1.isOpen,
-			align = t1.align or PopoverAlign.End,
-			anchorRef = t1.anchorRef,
-			items = v21,
-			onPressedOutside = t1.closeMenu,
-			ref = t1.menuRef,
+			isOpen = props.isOpen,
+			align = props.align or PopoverAlign.End,
+			anchorRef = props.anchorRef,
+			items = items,
+			onPressedOutside = props.closeMenu,
+			ref = props.menuRef,
 			size = InputSize.Medium
 		})
 	}))

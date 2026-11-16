@@ -1,3 +1,4 @@
-local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent.Parent.Parent
+local enumerate = require(parent.enumerate)
 
-return require(ParentParent.enumerate)(script.Name, { "isEmpty" })
+return enumerate(script.Name, { "isEmpty" })

@@ -1,1 +1,3 @@
-return (require(script.trie))
+local trie = require(script.trie)
+
+return trie

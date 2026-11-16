@@ -1,96 +1,83 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local GuiService = game:GetService("GuiService")
-local AvatarIdentification = require(ParentParentParent.AvatarIdentification).AvatarIdentification
-local Dash = require(ParentParentParent.Dash)
-local getAvatarAssets = require(ParentParent.Utils.getAvatarAssets)
-local v7 = game:DefineFastInt("CaptureMetadataGetAvatarsTimeoutMs", 150)
-local v8 = game:DefineFastInt("CaptureMetadataMaxAvatars", 5)
-local v9 = game:DefineFastInt("CaptureMetadataMinAvatarBoundingBoxPixels", 200)
-local v10 = game:DefineFastInt("CaptureMetadataMinHitRatePercentage", 50)
 
-local function getViewportSize() -- line: 17
-	local CurrentCamera = workspace.CurrentCamera
+local AvatarIdentification = require(parent2.AvatarIdentification)
+local avatarIdentification = AvatarIdentification.AvatarIdentification
+local Dash = require(parent2.Dash)
 
-	if not CurrentCamera then
-		return
+local getAvatarAssets = require(parent.Utils.getAvatarAssets)
+
+local defineFastInt = game:DefineFastInt("CaptureMetadataGetAvatarsTimeoutMs", 150)
+local defineFastInt2 = game:DefineFastInt("CaptureMetadataMaxAvatars", 5)
+
+local defineFastInt3 = game:DefineFastInt("CaptureMetadataMinAvatarBoundingBoxPixels", 200)
+local defineFastInt4 = game:DefineFastInt("CaptureMetadataMinHitRatePercentage", 50)
+
+local function getViewportSize() -- 1 equivalent call inferred from this helper
+	local currentCamera = workspace.CurrentCamera
+
+	if currentCamera then
+		return currentCamera.ViewportSize
 	end
-
-	return CurrentCamera.ViewportSize
 end
 
 local round = math.round
-
-local function vec2ToTable(p1) -- line: 28
-	-- upvalues: round (copy)
-	return {
-		x = round(p1.X),
-		y = round(p1.Y)
-	}
+local function vec2ToTable(p) -- 2 equivalent calls inferred from this helper
+	return { x = round(p.X), y = round(p.Y) }
 end
 
-return function() -- line: 32
-	-- upvalues: v7 (copy), AvatarIdentification (copy), Dash (copy), GuiService (copy), v8 (copy), v10 (copy), v9 (copy), getAvatarAssets (copy), round (copy)
-	local CurrentCamera = workspace.CurrentCamera
-	local v17 = if CurrentCamera then CurrentCamera.ViewportSize else nil
+return function()
+	local viewportSize = getViewportSize() -- inferred equivalent call
 
-	if not v17 then
+	if not viewportSize then
 		return {}
 	end
 
-	local v18 = v7 / 1000
-	local v19 = AvatarIdentification.getVisibleAvatars(true, v18)
-	local v20 = Dash.values(v19)
-	local RawScreenScale = GuiService:GetRawScreenScale()
+	local v = defineFastInt / 1000
+	local visibleAvatars = avatarIdentification.getVisibleAvatars(true, v)
+	local values = Dash.values(visibleAvatars)
 
-	for _, v23 in v20 do
-		v23.boundingBox.min = v23.boundingBox.min * v17 * RawScreenScale
-		v23.boundingBox.max = v23.boundingBox.max * v17 * RawScreenScale
+	local rawScreenScale = GuiService:GetRawScreenScale()
+
+	for _, value in values do
+		value.boundingBox.min = value.boundingBox.min * viewportSize * rawScreenScale
+		value.boundingBox.max = value.boundingBox.max * viewportSize * rawScreenScale
 	end
 
-	table.sort(v20, function(p2, p3) -- line: 50
-		return (p2.boundingBox.max - p2.boundingBox.min).Magnitude > (p3.boundingBox.max - p3.boundingBox.min).Magnitude
+	table.sort(values, function(a, b): boolean
+		return (a.boundingBox.max - a.boundingBox.min).Magnitude > (b.boundingBox.max - b.boundingBox.min).Magnitude
 	end)
+	local count = 0
+	local result = {}
 
-	local n1 = 0
-	local t1 = {}
-
-	for _, v27 in v20 do
-		if n1 >= v8 then
-			return t1
+	for _, value in values do
+		if defineFastInt2 <= count then
+			break
 		end
 
-		n1 += 1
+		count += 1
 
-		if not (v27.hitRate < v10 / 100) then
-			if (v27.boundingBox.max - v27.boundingBox.min).Magnitude < v9 then
-				return t1
-			end
-
-			local player = v27.player
-			local v29 = getAvatarAssets(player.Character)
-			local UserId = player.UserId
-			local t2 = {
-				avatarItems = v29
-			}
-			local t3 = {}
-			local min = v27.boundingBox.min
-
-			t3.min = {
-				x = round(min.X),
-				y = round(min.Y)
-			}
-
-			local max = v27.boundingBox.max
-
-			t3.max = {
-				x = round(max.X),
-				y = round(max.Y)
-			}
-			t2.boundingBox = t3
-			t1[UserId] = t2
+		if value.hitRate < defineFastInt4 / 100 then
+			continue
 		end
+
+		if (value.boundingBox.max - value.boundingBox.min).Magnitude < defineFastInt3 then
+			break
+		end
+
+		local player = value.player
+		local avatarAssets = getAvatarAssets(player.Character)
+		local userId = player.UserId
+		result[userId] = {
+			avatarItems = avatarAssets,
+			boundingBox = {
+				min = vec2ToTable(value.boundingBox.min), -- inferred equivalent call
+				max = vec2ToTable(value.boundingBox.max) -- inferred equivalent call
+			}
+		}
 	end
 
-	return t1
+	return result
 end

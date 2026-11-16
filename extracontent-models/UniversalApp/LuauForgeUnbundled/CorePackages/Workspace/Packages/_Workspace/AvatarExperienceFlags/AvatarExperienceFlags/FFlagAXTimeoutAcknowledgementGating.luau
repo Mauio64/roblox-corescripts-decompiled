@@ -1,0 +1,4 @@
+local FFlagAXUseUFRForTimeoutPromptInApp = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXUseUFRForTimeoutPromptInApp")
+local FFlagAXUseUFRForTimeoutPromptInExperience = require("@game/CorePackages/Workspace/Packages/_Workspace/AvatarExperienceFlags/AvatarExperienceFlags/FFlagAXUseUFRForTimeoutPromptInExperience")
+
+return game:DefineFastFlag("AXTimeoutAcknowledgementGating", false) and FFlagAXUseUFRForTimeoutPromptInApp and FFlagAXUseUFRForTimeoutPromptInExperience

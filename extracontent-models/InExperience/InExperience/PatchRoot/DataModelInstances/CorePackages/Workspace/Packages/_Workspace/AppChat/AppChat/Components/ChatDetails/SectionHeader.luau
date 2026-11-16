@@ -1,44 +1,43 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local RoactFitComponents = require(AppChatParent.LuaSocialLibrariesDeps).RoactFitComponents
-local Cryo = require(AppChatParent.Cryo)
-local React = require(AppChatParent.React)
+local parent = AppChat.Parent
+
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local RoactFitComponents = LuaSocialLibrariesDeps.RoactFitComponents
+
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
 local memo = React.memo
-local TestStyle = require(AppChat.SocialLibraries).Components.TestStyle
-local t1 = {
+
+local SocialLibraries = require(AppChat.SocialLibraries)
+local v = {
 	Text = "Default Title",
 	LayoutOrder = 0,
 	marginTop = 8,
 	marginBottom = 14,
-	style = TestStyle
+	style = SocialLibraries.Components.TestStyle
 }
 
-function SectionHeader(t2: {[any]: any}) -- line: 30
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), RoactFitComponents (copy)
-	local v10 = Cryo.Dictionary.join(t1, t2)
-	local style = v10.style
-	local Theme = style.Theme
-	local styleFont = style.Font
+function SectionHeader(p)
+	local joined = Cryo.Dictionary.join(v, p)
+
+	local style = joined.style
+	local theme = style.Theme
+	local font = style.Font
 
 	return React.createElement(RoactFitComponents.FitFrameVertical, {
 		BackgroundTransparency = 1,
-		LayoutOrder = v10.LayoutOrder,
+		LayoutOrder = joined.LayoutOrder,
 		width = UDim.new(1, 0),
-		margin = {
-			left = 12,
-			right = 0,
-			top = v10.marginTop,
-			bottom = v10.marginBottom
-		}
+		margin = { top = joined.marginTop, left = 12, right = 0, bottom = joined.marginBottom }
 	}, {
 		SectionHeader = React.createElement(RoactFitComponents.FitTextLabel, {
+			width = RoactFitComponents.FitTextLabel.Width.FitToText,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			width = RoactFitComponents.FitTextLabel.Width.FitToText,
-			Text = v10.Text,
-			TextColor3 = Theme.TextDefault.Color,
-			TextSize = styleFont.CaptionHeader.RelativeSize * styleFont.BaseSize,
-			Font = styleFont.CaptionHeader.Font,
+			Text = joined.Text,
+			TextColor3 = theme.TextDefault.Color,
+			TextSize = font.CaptionHeader.RelativeSize * font.BaseSize,
+			Font = font.CaptionHeader.Font,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			AnchorPoint = Vector2.new(0, 1)
 		})

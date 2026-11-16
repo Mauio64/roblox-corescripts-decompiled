@@ -1,44 +1,64 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local React = require(UserListParent.React)
-local useDispatch = require(UserListParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local NavigateDown = require(UserListParent.NavigationRodux).Thunks.NavigateDown
-local FFlagSignalsNavP3Dispatch = require(UserListParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v7 = if not FFlagSignalsNavP3Dispatch then nil else require(UserListParent.RobloxAppNavigation).NavigationCommands
-local AppPage = require(UserListParent.RobloxAppEnums).AppPage
+local parent = UserList.Parent
+
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local SharedFlags = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 local Enums = require(UserList.Common.Enums)
+require(UserList.Common.Types)
 
-local function useEntitySelectionHandler(p1: ((...any) -> ...any)?) -- line: 21
-	-- upvalues: useDispatch (copy), React (copy), AppPage (copy), Enums (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), NavigateDown (copy)
-	local v12 = useDispatch()
+local FFlagUserListRowSelectionOriginSource = require(UserList.Flags.FFlagUserListRowSelectionOriginSource)
 
-	return (React.useCallback(function(s1: string, p2) -- line: 26
-		-- upvalues: p1 (copy), AppPage (copy), Enums (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), v12 (copy), NavigateDown (copy)
-		if p1 then
-			p1(s1, p2)
+local function useEntitySelectionHandler(callback, p)
+	local v = useDispatch()
 
+	return (React.useCallback(function(detail: string, p2)
+		if callback then
+			callback(detail, p2)
 			return
 		end
 
-		local t1 = {
-			name = AppPage.ProfilePlatform,
-			detail = s1,
-			extraProps = {
-				profileType = if p2 ~= Enums.EntityType.Contact then Enums.EntityType.User else Enums.EntityType.Contact
-			}
+		local v2 = { name = AppPage.ProfilePlatform, detail = detail, extraProps = 0 }
+		local profileType
+
+		if p2 == Enums.EntityType.Contact then
+			profileType = Enums.EntityType.Contact
+		else
+			profileType = Enums.EntityType.User
+		end
+
+		local friendshipOriginSourceType
+
+		if FFlagUserListRowSelectionOriginSource and p then
+			friendshipOriginSourceType = p.friendshipOriginSourceType
+		end
+
+		v2.extraProps = {
+			profileType = profileType,
+			friendshipOriginSourceType = friendshipOriginSourceType
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v7.down(v7.fromLegacyPage(t1))
-
-			return
+			navigationCommands.down(navigationCommands.fromLegacyPage(v2))
+		else
+			v(NavigateDown(v2))
 		end
-
-		v12(NavigateDown(t1))
-	end, {
-		p1,
-		v12
-	}))
+	end, { callback, v, p or false }))
 end
 
 return useEntitySelectionHandler

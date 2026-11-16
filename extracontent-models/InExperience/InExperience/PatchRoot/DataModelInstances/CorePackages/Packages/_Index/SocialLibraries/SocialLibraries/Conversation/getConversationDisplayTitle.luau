@@ -1,13 +1,10 @@
-return function(p1) -- line: 1
-	if p1 then
-		local v2 = p1.title or p1.titleForViewer
+return function(p)
+	local title = p and (p.title or p.titleForViewer)
 
-		if v2 then
-			local str = tostring(v2)
-
-			return string.gsub(str, "\n", "")
-		end
+	if not title then
+		return ""
 	end
 
-	return ""
+	local v = tostring(title)
+	return string.gsub(v, "\n", "")
 end

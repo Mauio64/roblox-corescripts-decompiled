@@ -1,36 +1,39 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
-local jest = require(AvatarSwitcherParent.Dev.JestGlobals).jest
-local Signals = require(AvatarSwitcherParent.Signals)
+local parent = AvatarSwitcher.Parent
+
+local JestGlobals = require(parent.Dev.JestGlobals)
+local jest = JestGlobals.jest
+local Signals = require(parent.Signals)
 
 require(AvatarSwitcher.Enums.ExperienceAvatarSupportType)
+
 require(AvatarSwitcher.types)
 
-local function createMockAvatarSwitcherStore() -- line: 54
-	-- upvalues: Signals (copy), jest (copy)
-	local v6, v7 = Signals.createSignal({})
-	local v8, v9 = Signals.createSignal(false)
-	local v10, v11 = Signals.createSignal(nil)
-	local v12, v13 = Signals.createSignal(nil)
-	local v14, v15 = Signals.createSignal(false)
-	local v16, v17 = Signals.createSignal(false)
-	local v18, v19 = Signals.createSignal(false)
-	local v20, v21 = Signals.createSignal(nil)
-	local v22, v23 = Signals.createSignal(nil)
-	local v24, v25 = Signals.createSignal(nil)
+local function createMockAvatarSwitcherStore()
+	local signal, setOutfits = Signals.createSignal({})
+	local signal2, setLastPageReached = Signals.createSignal(false)
+	local signal3, setSelectedOutfitId = Signals.createSignal(nil)
+	local signal4, setSelectedOutfitDetails = Signals.createSignal(nil)
+	local signal5, setRespawnPromptShown = Signals.createSignal(false)
+	local signal6, setIsSwitching = Signals.createSignal(false)
+	local signal7, setIsEmpty = Signals.createSignal(false)
+
+	local signal8, setExperienceAvatarSupportType = Signals.createSignal(nil)
+	local signal9, setExperienceAvatarType = Signals.createSignal(nil)
+	local signal10, setPendingAvatarName = Signals.createSignal(nil)
 
 	return {
 		store = {
-			getOutfits = v6,
-			getLastPageReached = v8,
-			getSelectedOutfitId = v10,
-			getSelectedOutfitDetails = v12,
-			getRespawnPromptShown = v14,
-			getIsSwitching = v16,
-			getIsEmpty = v18,
-			getExperienceAvatarSupportType = v20,
-			getExperienceAvatarType = v22,
-			getPendingAvatarName = v24,
+			getOutfits = signal,
+			getLastPageReached = signal2,
+			getSelectedOutfitId = signal3,
+			getSelectedOutfitDetails = signal4,
+			getRespawnPromptShown = signal5,
+			getIsSwitching = signal6,
+			getIsEmpty = signal7,
+			getExperienceAvatarSupportType = signal8,
+			getExperienceAvatarType = signal9,
+			getPendingAvatarName = signal10,
 			toggleRespawnPrompt = jest.fn(),
 			selectOutfit = jest.fn(),
 			fetchNextOutfitsPage = jest.fn(),
@@ -38,16 +41,16 @@ local function createMockAvatarSwitcherStore() -- line: 54
 			fetchExperienceAvatarSupportType = jest.fn(),
 			clearPendingAvatarName = jest.fn()
 		},
-		setOutfits = v7,
-		setLastPageReached = v9,
-		setSelectedOutfitId = v11,
-		setSelectedOutfitDetails = v13,
-		setRespawnPromptShown = v15,
-		setIsSwitching = v17,
-		setIsEmpty = v19,
-		setExperienceAvatarSupportType = v21,
-		setExperienceAvatarType = v23,
-		setPendingAvatarName = v25
+		setOutfits = setOutfits,
+		setLastPageReached = setLastPageReached,
+		setSelectedOutfitId = setSelectedOutfitId,
+		setSelectedOutfitDetails = setSelectedOutfitDetails,
+		setRespawnPromptShown = setRespawnPromptShown,
+		setIsSwitching = setIsSwitching,
+		setIsEmpty = setIsEmpty,
+		setExperienceAvatarSupportType = setExperienceAvatarSupportType,
+		setExperienceAvatarType = setExperienceAvatarType,
+		setPendingAvatarName = setPendingAvatarName
 	}
 end
 

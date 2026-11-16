@@ -1,161 +1,160 @@
-local Parent = script:FindFirstAncestor("HttpClient").Parent
-local Resources = require(Parent.Resources)
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("HttpClient").Parent
+
+local Resources = require(parent.Resources)
+local Signals = require(parent.Signals)
 
 require(script.Parent.types)
-
 local encoders = require(script.Parent.encoders)
 local analytics = require(script.Parent.analytics)
+local FFlagHttpClientRetryExtensions = require(script.Parent.Flags.FFlagHttpClientRetryExtensions)
+
 local createSignal = Signals.createSignal
 local createResource = Resources.createResource
 
-local function safeDecode(p1, p2) -- line: 18
-	local ok, result, v14, v15 = pcall(p1, p2)
+local function safeDecode(callback, p)
+	local success, result, v, v2 = pcall(callback, p)
 
-	if not ok then
-		return nil, `decode error: { tostring(result) }`, nil
+	if success then
+		return result, v, v2
 	end
 
-	return result, v14, v15
+	return nil, `decode error: {tostring(result)}`, nil
 end
-local function createRequest(p3) -- line: 26
-	-- upvalues: analytics (copy), encoders (copy), createSignal (copy), createResource (copy)
-	local v17 = p3.analytics or analytics.defaultAnalytics
-	local v18 = p3.encode or encoders.encodeJson
-	local v19, v20 = createSignal({
-		status = "pending"
-	})
-	local t1 = {
-		Accept = "application/json"
-	}
 
-	if p3.headers then
-		for v22, v23 in p3.headers do
-			t1[v22] = v23
+local function createRequest(data)
+	local analytics2 = data.analytics or analytics.defaultAnalytics
+	local encode = data.encode or encoders.encodeJson
+
+	local signal, v = createSignal({ status = "pending" })
+
+	local headers = { Accept = "application/json" }
+
+	if data.headers then
+		for k, header in data.headers do
+			headers[k] = header
 		end
 	end
 
-	local u24 = nil
+	local body
 
-	if p3.body ~= nil then
-		local v25, v26 = v18(p3.body)
+	if data.body == nil then
+		body = nil
+	else
+		local v2
+		body, v2 = encode(data.body)
 
-		u24 = v25
-		t1["Content-Type"] = t1["Content-Type"] or v26
+		headers["Content-Type"] = headers["Content-Type"] or v2
 	end
 
-	local v27 = createResource(function(p4) -- line: 47
-		-- upvalues: v20 (copy), v17 (copy), p3 (copy), t1 (copy), u24 (ref)
-		local u29 = false
-		local elapsed = os.clock()
+	return {
+		state = signal,
+		dispose = createResource(function(callback)
+			local flag = false
+			local lastTime = os.clock()
 
-		local function settleFailed(s1: string) -- line: 51
-			-- upvalues: u29 (ref), elapsed (copy), v20 (copy), v17 (copy), p3 (copy)
-			if u29 then
-				return
+			local function settleFailed(p: string)
+				if flag then
+					return
+				end
+
+				flag = true
+				local v2 = (os.clock() - lastTime) * 1000
+				v({ status = "failed", error = `transport error: {p}` })
+				analytics2(data.analyticsKey, data.method, data.url, nil, v2, "failed")
 			end
 
-			u29 = true
+			local function settleResponse(p)
+				if flag then
+					return
+				end
 
-			local v36 = (os.clock() - elapsed) * 1000
+				flag = true
+				local v2 = (os.clock() - lastTime) * 1000
 
-			v20({
-				status = "failed",
-				error = `transport error: { s1 }`
-			})
-			v17(p3.analyticsKey, p3.method, p3.url, nil, v36, "failed")
-		end
-		local function settleResponse(p5) -- line: 61
-			-- upvalues: u29 (ref), elapsed (copy), p3 (copy), v20 (copy), v17 (copy)
-			if u29 then
-				return
-			end
+				if data.statusCodeActions ~= nil then
+					local statusCodeAction = data.statusCodeActions[p.statusCode]
 
-			u29 = true
+					if statusCodeAction ~= nil then
+						for _, callback2 in statusCodeAction do
+							local success, result = pcall(callback2, p)
 
-			local v38 = (os.clock() - elapsed) * 1000
-
-			if p3.statusCodeActions ~= nil then
-				local v39 = p3.statusCodeActions[p5.statusCode]
-
-				if v39 ~= nil then
-					for _, v41 in v39 do
-						local ok, result = pcall(v41, p5)
-
-						if not ok then
-							warn(`[HttpClient] { p3.analyticsKey } status code action threw: { tostring(result) }`)
+							if not success then
+								warn(`[HttpClient] {data.analyticsKey} status code action threw: {tostring(result)}`)
+							end
 						end
 					end
 				end
-			end
 
-			local decode = p3.decode
-			local ok, result, v47, v48 = pcall(decode, p5)
-			local v49
+				local decode = data.decode
+				local success, result, err, errorCode = pcall(decode, p)
 
-			if not ok then
-				v49 = nil
-				v47 = `decode error: { tostring(result) }`
-				v48 = nil
-			else
-				v49 = result
-			end
-
-			local v50 = v47 == nil and "succeeded" or "failed"
-
-			if v47 ~= nil then
-				v20({
-					status = "failed",
-					error = v47,
-					errorCode = v48
-				})
-			else
-				v20({
-					status = "succeeded",
-					result = v49
-				})
-			end
-
-			v17(p3.analyticsKey, p3.method, p3.url, p5, v38, v50)
-		end
-
-		local ok, result = pcall(function() -- line: 92
-			-- upvalues: p3 (copy), t1 (copy), u24 (ref), settleResponse (copy), settleFailed (copy), p4 (copy), u29 (ref)
-			local v51 = p3.networkImpl.request({
-				url = p3.url,
-				method = p3.method,
-				headers = t1,
-				body = u24
-			}, function(p6, p7) -- line: 98
-				-- upvalues: settleResponse (copy), settleFailed (copy)
-				if p6 then
-					settleResponse(p7)
-
-					return
+				if not success then
+					err = `decode error: {tostring(result)}`
+					result = nil
+					errorCode = nil
 				end
 
-				settleFailed((tostring(p7)))
-			end)
+				local v3 = err == nil and "succeeded" or "failed"
+				local response
 
-			p4(function() -- line: 105
-				-- upvalues: u29 (ref), v51 (copy)
-				if u29 then
-					return
+				if FFlagHttpClientRetryExtensions then
+					response = p
 				end
 
-				u29 = true
-				v51()
+				if err == nil then
+					v({ status = "succeeded", result = result, response = response })
+				else
+					v({ status = "failed", error = err, errorCode = errorCode, response = response })
+				end
+
+				analytics2(data.analyticsKey, data.method, data.url, p, v2, v3)
+			end
+
+			local success, result = pcall(function()
+				local request = data.networkImpl.request
+				local v2 = {
+					url = data.url,
+					method = data.method,
+					headers = headers,
+					body = body,
+					onMessage = 0,
+					priority = 0
+				}
+				local onMessage
+
+				if FFlagHttpClientRetryExtensions then
+					onMessage = data.onMessage
+				end
+
+				v2.onMessage = onMessage
+				local priority
+
+				if FFlagHttpClientRetryExtensions then
+					priority = data.priority
+				end
+
+				v2.priority = priority
+				local v3 = request(v2, function(p, p2)
+					if p then
+						settleResponse(p2)
+					else
+						settleFailed(tostring(p2))
+					end
+				end)
+				callback(function()
+					if flag then
+						return
+					end
+
+					flag = true
+					v3()
+				end)
 			end)
+
+			if not success then
+				settleFailed(tostring(result))
+			end
 		end)
-
-		if not ok then
-			settleFailed((tostring(result)))
-		end
-	end)
-
-	return {
-		state = v19,
-		dispose = v27
 	}
 end
 

@@ -1,0 +1,45 @@
+local parent = script:FindFirstAncestor("FriendsHydrationReact").Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local Signals = require(parent.Signals)
+local DataHydration = require(parent.DataHydration)
+
+local v = DataHydration.Friends.FriendsStore.get()
+local DataStatus = DataHydration.DataStatus
+
+local function useGetIsFriendWith(p: string?)
+	local v2 = not p and "" or tostring(p)
+
+	local v3 = React.useMemo(function()
+		if v2 == "" then
+			return nil
+		end
+
+		return v.GetIsFriendWith(v2)
+	end, { v2 })
+
+	local v4 = React.useMemo(function()
+		return Signals.createComputed(function(p2)
+			if v3 then
+				return (v3.data(p2))
+			end
+
+			return nil
+		end)
+	end, { v3 })
+
+	local v5 = React.useMemo(function()
+		return Signals.createComputed(function(p2)
+			if v3 then
+				return (v3.status(p2))
+			end
+
+			return DataStatus.NotReady
+		end)
+	end, { v3 })
+
+	return SignalsReact.useSignalState(v4), (SignalsReact.useSignalState(v5))
+end
+
+return useGetIsFriendWith

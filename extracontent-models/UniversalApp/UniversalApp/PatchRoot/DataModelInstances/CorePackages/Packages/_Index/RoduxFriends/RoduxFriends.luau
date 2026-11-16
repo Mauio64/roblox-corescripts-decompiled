@@ -1,8 +1,9 @@
-local scriptParent = script.Parent
-local llama = require(scriptParent.llama)
-local RoduxNetworking = require(scriptParent.RoduxNetworking)
-local FriendsNetworking = require(scriptParent.FriendsNetworking)
-local NetworkingBlocking = require(scriptParent.NetworkingBlocking)
+local parent = script.Parent
+local llama = require(parent.llama)
+local RoduxNetworking = require(parent.RoduxNetworking)
+local FriendsNetworking = require(parent.FriendsNetworking)
+local NetworkingBlocking = require(parent.NetworkingBlocking)
+
 local FriendsReducer = require(script.Reducers.FriendsReducer)
 local Actions = require(script.Actions)
 local Selectors = require(script.Selectors)
@@ -10,9 +11,8 @@ local Models = require(script.Models)
 local Enums = require(script.Enums)
 
 return {
-	config = function(p1) -- line: 14
-		-- upvalues: llama (copy), FriendsNetworking (copy), RoduxNetworking (copy), NetworkingBlocking (copy), FriendsReducer (copy), Actions (copy), Selectors (copy), Models (copy), Enums (copy)
-		local u12 = llama.Dictionary.join(p1, {
+	config = function(p)
+		local joined = llama.Dictionary.join(p, {
 			friendsNetworking = FriendsNetworking.config({
 				roduxNetworking = RoduxNetworking.mock()
 			}),
@@ -22,12 +22,11 @@ return {
 		})
 
 		return {
-			installReducer = function() -- line: 25
-				-- upvalues: FriendsReducer (copy), u12 (ref)
-				return FriendsReducer(u12)
+			installReducer = function()
+				return FriendsReducer(joined)
 			end,
-			Actions = Actions(u12),
-			Selectors = Selectors(u12),
+			Actions = Actions(joined),
+			Selectors = Selectors(joined),
 			Models = Models,
 			Enums = Enums
 		}

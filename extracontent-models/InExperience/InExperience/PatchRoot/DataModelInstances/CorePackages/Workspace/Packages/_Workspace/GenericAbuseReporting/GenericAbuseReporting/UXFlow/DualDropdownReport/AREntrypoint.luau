@@ -1,80 +1,105 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local React = require(GenericAbuseReportingParent.React)
+local parent = GenericAbuseReporting.Parent
+local React = require(parent.React)
 local AnalyticsProvider = require(GenericAbuseReporting.Analytics.AnalyticsProvider)
-local LayerCollectorProvider = require(GenericAbuseReportingParent.UIBlox).Core.Layout.LayerCollector.LayerCollectorProvider
+local UIBlox = require(parent.UIBlox)
+local LayerCollectorProvider = UIBlox.Core.Layout.LayerCollector.LayerCollectorProvider
 local LocalizationKeysProvider = require(GenericAbuseReporting.LocalizationKeys.LocalizationKeysProvider)
-local FoundationProvider = require(GenericAbuseReportingParent.Foundation).FoundationProvider
+local Foundation = require(parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+
 local DualDropdownReport = require(script.Parent.DualDropdownReport)
 local ReportCompleteDialog = require(GenericAbuseReporting.Dialogs.ReportCompleteDialog)
 local ReportFailedDialog = require(GenericAbuseReporting.Dialogs.ReportFailedDialog)
 
 require(GenericAbuseReporting.Analytics.submitAnalytics)
-
 local useActiveDialog = require(script.Parent.useActiveDialog)
-local _ = {
-	Form = "Form",
-	Complete = "Complete",
-	Error = "Error"
-}
 
-local function AREntrypoint(t1: {[any]: any}) -- line: 52
-	-- upvalues: useActiveDialog (copy), React (copy), LayerCollectorProvider (copy), FoundationProvider (copy), AnalyticsProvider (copy), LocalizationKeysProvider (copy), DualDropdownReport (copy), ReportCompleteDialog (copy), ReportFailedDialog (copy)
-	local v15, v16 = useActiveDialog()
-	local v17 = React.useCallback(function(s1: string, s2: string, s3: string) -- line: 55
-		-- upvalues: t1 (copy), v16 (copy)
-		local v23 = if not t1.onSubmitProps.hasNextSteps then t1.onSubmitProps.onSubmit(s1, s2, s3) else t1.onSubmitProps.onProceedToNextStep(s1, s2, s3)
+local _ = { Form = "Form", Complete = "Complete", Error = "Error" }
 
-		if v23 then
-			v16("Complete")
+local function AREntrypoint(props)
+	local v, v2 = useActiveDialog()
 
-			return v23
+	local v3 = React.useCallback(function(p: string, p2: string, p3: string)
+		local selected
+
+		if props.onSubmitProps.hasNextSteps then
+			selected = props.onSubmitProps.onProceedToNextStep(p, p2, p3)
+		else
+			selected = props.onSubmitProps.onSubmit(p, p2, p3)
 		end
 
-		v16("Error")
+		if selected then
+			v2("Complete")
+			return selected
+		end
 
-		return v23
-	end, { t1.onSubmitProps })
-	local v18 = React.useCallback(function() -- line: 67
-		-- upvalues: v16 (copy)
-		v16("Form")
+		v2("Error")
+
+		return selected
+	end, { props.onSubmitProps })
+
+	local onDismiss = React.useCallback(function()
+		v2("Form")
 	end, {})
-	local v19 = React.useCallback(function() -- line: 71
-		-- upvalues: t1 (copy)
-		if t1.onComplete then
-			t1.onComplete()
-		end
-	end, { t1.onComplete })
 
-	return React.createElement(LayerCollectorProvider, {}, {
-		FoundationProvider = React.createElement(FoundationProvider, {
-			theme = "Dark"
-		}, {
-			analytics = React.createElement(AnalyticsProvider, {
-				onBeforeSubmitAnalytics = t1.onBeforeSubmitAnalytics,
-				onSubmitAnalytics = t1.onSubmitAnalytics
-			}, {
-				localizationKeys = React.createElement(LocalizationKeysProvider, {
-					localizationKeys = t1.localizationKeys
-				}, {
-					submitDialog = v15 == "Form" and React.createElement(DualDropdownReport, {
-						analyticsContext = t1.analyticsContext,
-						reportProblems = t1.reportProblems,
-						reportSurfaces = t1.reportSurfaces,
-						onSubmitProps = if not t1.onSubmitProps.hasNextSteps then {
-							hasNextSteps = t1.onSubmitProps.hasNextSteps,
-							onSubmit = v17
-						} else {
-							hasNextSteps = t1.onSubmitProps.hasNextSteps,
-							onProceedToNextStep = v17
-						},
-						onCloseProps = t1.onCloseProps
+	local onDismiss2 = React.useCallback(function()
+		if props.onComplete then
+			props.onComplete()
+		end
+	end, { props.onComplete })
+
+	local createElement = React.createElement
+	local createElement2 = React.createElement
+
+	local createElement3 = React.createElement
+	local v4 = {
+		onBeforeSubmitAnalytics = props.onBeforeSubmitAnalytics,
+		onSubmitAnalytics = props.onSubmitAnalytics
+	}
+
+	local createElement4 = React.createElement
+	local v5 = { localizationKeys = props.localizationKeys }
+	local submitDialog
+
+	if v == "Form" then
+		local createElement5 = React.createElement
+		local v6 = {
+			analyticsContext = props.analyticsContext,
+			reportProblems = props.reportProblems,
+			reportSurfaces = props.reportSurfaces,
+			onSubmitProps = 0,
+			onCloseProps = 0
+		}
+		local onSubmitProps
+
+		if props.onSubmitProps.hasNextSteps then
+			onSubmitProps = {
+				hasNextSteps = props.onSubmitProps.hasNextSteps,
+				onProceedToNextStep = v3
+			}
+		else
+			onSubmitProps = { hasNextSteps = props.onSubmitProps.hasNextSteps, onSubmit = v3 }
+		end
+
+		v6.onSubmitProps = onSubmitProps
+
+		v6.onCloseProps = props.onCloseProps
+		submitDialog = createElement5(DualDropdownReport, v6)
+	else
+		submitDialog = false
+	end
+
+	return createElement(LayerCollectorProvider, {}, {
+		FoundationProvider = createElement2(FoundationProvider, { colorMode = "Dark" }, {
+			analytics = createElement3(AnalyticsProvider, v4, {
+				localizationKeys = createElement4(LocalizationKeysProvider, v5, {
+					submitDialog = submitDialog,
+					completeDialog = v == "Complete" and React.createElement(ReportCompleteDialog, {
+						onDismiss = onDismiss2
 					}),
-					completeDialog = v15 == "Complete" and React.createElement(ReportCompleteDialog, {
-						onDismiss = v19
-					}),
-					errorDialog = v15 == "Error" and React.createElement(ReportFailedDialog, {
-						onDismiss = v18
+					errorDialog = v == "Error" and React.createElement(ReportFailedDialog, {
+						onDismiss = onDismiss
 					})
 				})
 			})

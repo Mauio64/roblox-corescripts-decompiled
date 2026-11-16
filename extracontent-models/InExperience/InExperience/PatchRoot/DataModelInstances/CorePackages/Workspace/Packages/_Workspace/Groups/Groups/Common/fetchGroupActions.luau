@@ -1,22 +1,22 @@
-local Parent = script:FindFirstAncestor("Groups").Parent
+local parent = script:FindFirstAncestor("Groups").Parent
+
 local HttpService = game:GetService("HttpService")
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
 
-return function(p1, n1: number) -- line: 8
-	-- upvalues: UrlBuilder (copy), HttpService (copy)
-	local v6 = UrlBuilder.fromString("apis:profile-platform-api/v1/profiles/get")
-	local t1 = {
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+
+return function(callback, profileId: number)
+	local v = urlBuilder.fromString("apis:profile-platform-api/v1/profiles/get")
+
+	local jsonEncode = HttpService:JSONEncode({
+		profileId = profileId,
 		profileType = "Community",
-		profileId = n1,
-		components = {{
-			component = "Actions"
-		}}
-	}
-	local json = HttpService:JSONEncode(t1)
+		components = {
+			{ component = "Actions" }
+		}
+	})
 
-	return p1(v6(), "POST", {
-		postBody = json
-	}):andThen(function(p2) -- line: 24
-		return p2.responseBody
+	return callback(v(), "POST", { postBody = jsonEncode }):andThen(function(p)
+		return p.responseBody
 	end)
 end

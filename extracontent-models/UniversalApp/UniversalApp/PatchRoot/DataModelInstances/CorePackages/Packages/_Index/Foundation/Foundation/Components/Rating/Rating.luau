@@ -1,128 +1,165 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local BuilderIcons = require(FoundationParent.BuilderIcons)
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
+local React = require(parent.React)
+
 local ChipSize = require(Foundation.Enums.ChipSize)
 local Divider = require(Foundation.Components.Divider)
 local Icon = require(Foundation.Components.Icon)
 local Orientation = require(Foundation.Enums.Orientation)
 local RatingValue = require(Foundation.Enums.RatingValue)
 local Text = require(Foundation.Components.Text)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useRatingVariants = require(script.Parent.useRatingVariants)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
-local Icon2 = BuilderIcons.Icon
+
+local icon = BuilderIcons.Icon
 local IconVariant = BuilderIcons.IconVariant
-local t1 = {
-	Selectable = true,
-	testId = "--foundation-rating",
+
+local v = {
 	size = ChipSize.Medium,
-	value = RatingValue.None
+	value = RatingValue.None,
+	Selectable = true,
+	testId = "--foundation-rating"
 }
 
-local function Rating(p1, p2) -- line: 41
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useRatingVariants (copy), React (copy), RatingValue (copy), View (copy), withCommonProps (copy), Icon (copy), Icon2 (copy), IconVariant (copy), Text (copy), Divider (copy), Orientation (copy)
-	local v22 = withDefaults(p1, t1)
-	local v23 = useTokens()
-	local v24 = useRatingVariants(v23, v22.size)
-	local v25 = React.useRef(nil)
-	local v26 = React.useRef(nil)
-	local v27 = React.useMemo(function() -- line: 49
-		-- upvalues: v23 (copy)
-		local v30 = math.floor(v23.Stroke.Thicker)
+local function Rating(p, ref3)
+	local v2 = withDefaults(p, v)
+	local v3 = useTokens()
+	local v4 = useRatingVariants(v3, v2.size)
 
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+
+	local cursor = React.useMemo(function()
+		local thicker = math.floor(v3.Stroke.Thicker)
 		return {
-			radius = UDim.new(0, v23.Radius.Circle),
-			offset = v30 * 2,
-			borderWidth = v30
+			radius = UDim.new(0, v3.Radius.Circle),
+			offset = thicker * 2,
+			borderWidth = thicker
 		}
-	end, { v23 })
-	local v28 = v22.value == RatingValue.ThumbUp
-	local v29 = v22.value == RatingValue.ThumbDown
+	end, { v3 })
 
-	return React.createElement(View, withCommonProps(v22, {
-		tag = v24.container.tag,
-		backgroundStyle = v24.container.backgroundStyle,
-		ref = p2
-	}), {
-		ThumbUp = React.createElement(View, {
-			LayoutOrder = 1,
-			tag = v24.thumbUpSegment.tag,
-			ref = v25,
-			onActivated = v22.onThumbUp,
-			cursor = v27,
-			selection = {
-				Selectable = v22.Selectable,
-				NextSelectionUp = v22.NextSelectionUp,
-				NextSelectionDown = v22.NextSelectionDown,
-				NextSelectionLeft = v22.NextSelectionLeft,
-				NextSelectionRight = v26
-			},
-			testId = `{ v22.testId }--thumb-up`
-		}, {
-			Icon = React.createElement(View, {
-				LayoutOrder = 1,
-				tag = v24.thumbUpIcon.tag
-			}, {
-				Icon = React.createElement(Icon, {
-					name = Icon2.ThumbUp,
-					variant = if not v28 then IconVariant.Regular else IconVariant.Filled,
-					size = v24.iconSize,
-					style = v24.text.contentStyle,
-					testId = `{ v22.testId }--thumb-up-icon`
-				})
-			}),
-			Text = React.createElement(Text, {
-				LayoutOrder = 2,
-				Text = v22.text,
-				textStyle = v24.text.contentStyle,
-				tag = v24.text.tag,
-				testId = `{ v22.testId }--text`
-			})
-		}),
-		Divider = React.createElement(View, {
-			LayoutOrder = 2,
-			tag = v24.dividerContainer.tag,
-			testId = `{ v22.testId }--divider`
-		}, {
-			Line = React.createElement(Divider, {
-				orientation = Orientation.Vertical
-			})
-		}),
-		ThumbDown = React.createElement(View, {
-			LayoutOrder = 3,
-			tag = v24.thumbDownSegment.tag,
-			ref = v26,
-			onActivated = v22.onThumbDown,
-			cursor = v27,
-			selection = {
-				Selectable = v22.Selectable,
-				NextSelectionUp = v22.NextSelectionUp,
-				NextSelectionDown = v22.NextSelectionDown,
-				NextSelectionLeft = v25,
-				NextSelectionRight = v22.NextSelectionRight
-			},
-			testId = `{ v22.testId }--thumb-down`
-		}, {
-			Icon = React.createElement(View, {
-				LayoutOrder = 1,
-				tag = v24.thumbDownIcon.tag
-			}, {
-				Icon = React.createElement(Icon, {
-					name = Icon2.ThumbDown,
-					variant = if not v29 then IconVariant.Regular else IconVariant.Filled,
-					size = v24.iconSize,
-					style = v24.text.contentStyle,
-					testId = `{ v22.testId }--thumb-down-icon`
-				})
-			})
-		})
+	local v5 = v2.value == RatingValue.ThumbUp
+	local v6 = v2.value == RatingValue.ThumbDown
+
+	local createElement = React.createElement
+
+	local v7 = withCommonProps(v2, {
+		tag = v4.container.tag,
+		backgroundStyle = v4.container.backgroundStyle,
+		ref = ref3
 	})
+
+	local createElement2 = React.createElement
+	local v8 = {
+		tag = v4.thumbUpSegment.tag,
+		ref = ref,
+		LayoutOrder = 1,
+		onActivated = v2.onThumbUp,
+		cursor = cursor,
+		selection = {
+			Selectable = v2.Selectable,
+			NextSelectionUp = v2.NextSelectionUp,
+			NextSelectionDown = v2.NextSelectionDown,
+			NextSelectionLeft = v2.NextSelectionLeft,
+			NextSelectionRight = ref2
+		},
+		testId = `{v2.testId}--thumb-up`
+	}
+
+	local createElement3 = React.createElement
+	local v9 = { tag = v4.thumbUpIcon.tag, LayoutOrder = 1 }
+
+	local createElement4 = React.createElement
+	local v10 = {
+		name = icon.ThumbUp,
+		variant = 0,
+		size = 0,
+		style = 0,
+		testId = 0
+	}
+	local variant
+
+	if v5 then
+		variant = IconVariant.Filled
+	else
+		variant = IconVariant.Regular
+	end
+
+	v10.variant = variant
+	v10.size = v4.iconSize
+	v10.style = v4.text.contentStyle
+	v10.testId = `{v2.testId}--thumb-up-icon`
+	local children = {
+		ThumbUp = createElement2(View, v8, {
+			Icon = createElement3(View, v9, { Icon = createElement4(Icon, v10) }),
+			Text = React.createElement(Text, {
+				Text = v2.text,
+				textStyle = v4.text.contentStyle,
+				tag = v4.text.tag,
+				LayoutOrder = 2,
+				testId = `{v2.testId}--text`
+			})
+		}),
+		Divider = React.createElement(
+			View,
+			{ tag = v4.dividerContainer.tag, LayoutOrder = 2, testId = `{v2.testId}--divider` },
+			{
+				Line = React.createElement(Divider, { orientation = Orientation.Vertical })
+			}
+		),
+		ThumbDown = 0
+	}
+
+	local createElement5 = React.createElement
+	local v11 = {
+		tag = v4.thumbDownSegment.tag,
+		ref = ref2,
+		LayoutOrder = 3,
+		onActivated = v2.onThumbDown,
+		cursor = cursor,
+		selection = {
+			Selectable = v2.Selectable,
+			NextSelectionUp = v2.NextSelectionUp,
+			NextSelectionDown = v2.NextSelectionDown,
+			NextSelectionLeft = ref,
+			NextSelectionRight = v2.NextSelectionRight
+		},
+		testId = `{v2.testId}--thumb-down`
+	}
+
+	local createElement6 = React.createElement
+	local v12 = { tag = v4.thumbDownIcon.tag, LayoutOrder = 1 }
+
+	local createElement7 = React.createElement
+	local v13 = {
+		name = icon.ThumbDown,
+		variant = 0,
+		size = 0,
+		style = 0,
+		testId = 0
+	}
+	local variant2
+
+	if v6 then
+		variant2 = IconVariant.Filled
+	else
+		variant2 = IconVariant.Regular
+	end
+
+	v13.variant = variant2
+	v13.size = v4.iconSize
+	v13.style = v4.text.contentStyle
+	v13.testId = `{v2.testId}--thumb-down-icon`
+	children.ThumbDown = createElement5(View, v11, {
+		Icon = createElement6(View, v12, { Icon = createElement7(Icon, v13) })
+	})
+	return createElement(View, v7, children)
 end
 
 return React.memo(React.forwardRef(Rating))

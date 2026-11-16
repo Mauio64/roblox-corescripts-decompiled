@@ -1,35 +1,71 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
-local Components = Foundation.Components
+local parent = Foundation.Parent
+local React = require(parent.React)
+local ReactUtils = require(parent.ReactUtils)
 
+local Components = Foundation.Components
 require(Components.Types)
 
+local Flags = require(Foundation.Utility.Flags)
+local getTextBoundsAsync = require(Foundation.Utility.getTextBoundsAsync)
+local normalizeFontFace = require(Foundation.Utility.normalizeFontFace)
 local usePreferences = require(Foundation.Providers.Preferences.usePreferences)
-local TextService = require(Foundation.Utility.Wrappers.Services).TextService
 
-local function useTextSize(s1: string?, p1, vector2: Vector2?) -- line: 14
-	-- upvalues: React (copy), usePreferences (copy), TextService (copy)
-	local v11, v12 = React.useState(nil)
-	local preferredTextSize = usePreferences().preferredTextSize
+local Services = require(Foundation.Utility.Wrappers.Services)
+local TextService = Services.TextService
 
-	React.useEffect(function() -- line: 18
-		-- upvalues: s1 (copy), v12 (copy), TextService (copy), p1 (copy), vector2 (copy)
-		if s1 == nil then
-			v12(nil)
+local function useTextSize(p: string?, p2, vector2: Vector2?)
+	if Flags.FoundationFontFaceMigration then
+		local preferredTextSize = usePreferences().preferredTextSize
+		local fontFace = normalizeFontFace(p2.Font)
+		local fontSize = p2.FontSize
 
-			return
-		end
+		local v = ReactUtils.useAsync(function()
+			if p == nil or fontSize == nil or typeof(fontFace) ~= "Font" then
+				return nil
+			end
 
-		v12(TextService:GetTextSize(s1, p1.FontSize, p1.Font, if not vector2 then Vector2.new(1e999, 1e999) else vector2))
-	end, {
-		s1,
-		p1,
-		vector2,
-		preferredTextSize
-	})
+			local v
 
-	return v11
+			if vector2 then
+				v = vector2.X
+			end
+
+			return getTextBoundsAsync(p, fontFace, fontSize, v)
+		end, { p, p2.Font, fontSize, vector2, preferredTextSize })
+
+		local ref = React.useRef(nil)
+		React.useEffect(function()
+			if v.status == "ok" then
+				ref.current = v.value
+			end
+		end, { v })
+
+		return if v.status == "ok" then v.value else ref.current
+	else
+		local state, setState = React.useState(nil)
+		local v = { p, p2, vector2, usePreferences().preferredTextSize }
+		React.useEffect(function()
+			if p == nil then
+				setState(nil)
+				return
+			end
+
+			local fontSize = p2.FontSize
+			local font = p2.Font
+			local v2
+
+			if vector2 then
+				v2 = vector2
+			else
+				v2 = Vector2.new(1e999, 1e999)
+			end
+
+			setState(TextService:GetTextSize(p, fontSize, font, v2))
+		end, v)
+
+		return state
+	end
 end
 
 return useTextSize

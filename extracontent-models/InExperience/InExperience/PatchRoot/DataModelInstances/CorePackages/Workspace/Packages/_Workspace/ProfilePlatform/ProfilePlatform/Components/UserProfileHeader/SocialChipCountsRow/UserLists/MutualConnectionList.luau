@@ -1,91 +1,154 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
+local parent = ProfilePlatform.Parent
+
 local Constants = require(ProfilePlatform.Common.Constants)
-local React = require(ProfilePlatformParent.React)
-local UserList = require(ProfilePlatformParent.UserList)
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
-local useNavigationProps = require(ProfilePlatformParent.RobloxAppNavigation).useNavigationProps
-local RobloxAppHooks = require(ProfilePlatformParent.RobloxAppHooks)
-local RoactUtils = require(ProfilePlatformParent.RoactUtils)
-local InputUi = require(ProfilePlatformParent.InputUi)
-local NavigateDown = require(ProfilePlatformParent.NavigationRodux).Thunks.NavigateDown
-local AppPage = require(ProfilePlatformParent.RobloxAppEnums).AppPage
+
+local React = require(parent.React)
+local UserList = require(parent.UserList)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+local useNavigationProps = RobloxAppNavigation.useNavigationProps
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local RoactUtils = require(parent.RoactUtils)
+local InputUi = require(parent.InputUi)
+local NavigationRodux = require(parent.NavigationRodux)
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 local Enums = require(ProfilePlatform.Common.Enums)
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
+
 local UserListViewAdaptor = UserList.Components.UserListViewAdaptor
 local useScreenSize = RobloxAppHooks.useScreenSize
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local getSafeAreaSize = InputUi.getSafeAreaSize
 local useProfileCardWidth = require(ProfilePlatform.Hooks.useProfileCardWidth)
-local useProfileCardWidth2 = require(ProfilePlatformParent.ProfilePlatformCommon).Hooks.useProfileCardWidth
+local ProfilePlatformCommon = require(parent.ProfilePlatformCommon)
+local useProfileCardWidth2 = ProfilePlatformCommon.Hooks.useProfileCardWidth
 local useProfileFormFactor = require(ProfilePlatform.Hooks.useProfileFormFactor)
-local FFlagProfilePlatformNewProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
-local FFlagSwitchProfileWidthHookToSocialCommon = require(ProfilePlatformParent.SharedFlags).FFlagSwitchProfileWidthHookToSocialCommon
-local FFlagSignalsNavP3Dispatch = require(ProfilePlatformParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v26 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfilePlatformParent.RobloxAppNavigation).NavigationCommands
-local FFlagMutualConnectionsListPagination = require(ProfilePlatformParent.SharedFlags).FFlagMutualConnectionsListPagination
+local SharedFlags = require(parent.SharedFlags)
+local FFlagProfilePlatformNewProfileHeader = SharedFlags.FFlagProfilePlatformNewProfileHeader
 
-local function MutualConnectionList(_) -- line: 40
-	-- upvalues: useDispatch (copy), useNavigationProps (copy), useScreenSize (copy), useSelector (copy), getSafeAreaSize (copy), FFlagProfilePlatformNewProfileHeader (copy), useProfileFormFactor (copy), Enums (copy), FFlagSwitchProfileWidthHookToSocialCommon (copy), useProfileCardWidth2 (copy), useProfileCardWidth (copy), Constants (copy), FFlagMutualConnectionsListPagination (copy), React (copy), useLocalization (copy), TextKeys (copy), UserListViewAdaptor (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), NavigateDown (copy)
-	local v30 = useDispatch()
-	local v31 = useNavigationProps(function(_, p3) -- line: 42
-		return {
-			mutualFriendIds = p3.mutualFriendIds
-		}
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSwitchProfileWidthHookToSocialCommon = SharedFlags2.FFlagSwitchProfileWidthHookToSocialCommon
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagSignalsNavP3Dispatch = SharedFlags3.FFlagSignalsNavP3Dispatch
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation2 = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation2.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagMutualConnectionsListPagination = SharedFlags4.FFlagMutualConnectionsListPagination
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagEnableSplitPane = SharedFlags5.FFlagEnableSplitPane
+local SplitPane
+
+if FFlagEnableSplitPane then
+	SplitPane = require(parent.SplitPane)
+else
+	SplitPane = nil
+end
+
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+
+local function MutualConnectionList(_)
+	local v = useDispatch()
+	local v2 = useNavigationProps(function(_, p)
+		return { mutualFriendIds = p.mutualFriendIds }
 	end)
-	local v32 = useScreenSize()
-	local v33 = useSelector(function(p4) -- line: 50
-		return p4.GlobalGuiInset
-	end)
-	local v34 = getSafeAreaSize(v32, v33)
-	local v35 = not not FFlagProfilePlatformNewProfileHeader and useProfileFormFactor().formFactor == Enums.ProfileFormFactor.Wide
-	local v36 = ((if not FFlagProfilePlatformNewProfileHeader then math.min(v34.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH) else (if not FFlagSwitchProfileWidthHookToSocialCommon then useProfileCardWidth(v35) else useProfileCardWidth2()))) / v34.X.Offset
-	local t1 = {
-		position = UDim2.fromScale(1, 0),
-		size = UDim2.fromScale(v36, 1),
-		anchorPoint = Vector2.new(1, 0)
-	}
-	local mutualFriendIds = v31.mutualFriendIds
-	local v39 = if not FFlagMutualConnectionsListPagination then nil else mutualFriendIds
-	local v40 = nil
-	local v41 = nil
 
-	if FFlagMutualConnectionsListPagination then
-		local v42, v43 = React.useState(25)
+	local safeAreaSize = getSafeAreaSize(useScreenSize(), (useSelector(function(p)
+		return p.GlobalGuiInset
+	end)))
+	local v3
 
-		React.useEffect(function() -- line: 78
-			-- upvalues: v43 (copy)
-			v43(25)
-		end, { mutualFriendIds })
-		v41 = React.useCallback(function() -- line: 82
-			-- upvalues: v43 (copy), mutualFriendIds (copy)
-			v43(function(n1: number) -- line: 83
-				-- upvalues: mutualFriendIds (copy)
-				return (math.min(n1 + 25, #mutualFriendIds))
-			end)
-		end, { mutualFriendIds })
-		v39 = React.useMemo(function() -- line: 88
-			-- upvalues: v42 (copy), mutualFriendIds (copy)
-			if v42 < #mutualFriendIds then
-				local t2 = {}
-
-				for i = 1, v42 do
-					table.insert(t2, mutualFriendIds[i])
-				end
-
-				return t2
-			end
-
-			return mutualFriendIds
-		end, {
-			mutualFriendIds,
-			v42
-		})
-		v40 = v42 < #mutualFriendIds
+	if FFlagProfilePlatformNewProfileHeader then
+		v3 = useProfileFormFactor().formFactor == Enums.ProfileFormFactor.Wide
+	else
+		v3 = false
 	end
 
-	local v44 = useLocalization({
+	local v4
+
+	if FFlagProfilePlatformNewProfileHeader then
+		if FFlagSwitchProfileWidthHookToSocialCommon then
+			v4 = useProfileCardWidth2()
+		else
+			v4 = useProfileCardWidth(v3)
+		end
+	else
+		v4 = math.min(safeAreaSize.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH)
+	end
+
+	local v5 = v4 / safeAreaSize.X.Offset
+	local v6
+
+	if FFlagEnableSplitPane then
+		local v7 = useSignalState(SplitPane.SplitPaneStore.getStore().getSupportPaneModeIfActive)
+
+		if v7 == nil then
+			v6 = false
+		else
+			v6 = SplitPane.SplitPaneVariant.getProfileSplitPaneEligibility(v7) ~= nil
+		end
+	else
+		v6 = false
+	end
+
+	local wideModePeekViewLayout = {
+		position = UDim2.fromScale(1, 0),
+		size = UDim2.fromScale(FFlagEnableSplitPane and v6 and 1 or v5, 1),
+		anchorPoint = Vector2.new(1, 0)
+	}
+
+	local mutualFriendIds = v2.mutualFriendIds
+	local users
+
+	if FFlagMutualConnectionsListPagination then
+		users = mutualFriendIds
+	end
+
+	local onLoadMore, hasMore
+
+	if FFlagMutualConnectionsListPagination then
+		local state, setState = React.useState(25)
+
+		React.useEffect(function()
+			setState(25)
+		end, { mutualFriendIds })
+
+		onLoadMore = React.useCallback(function()
+			setState(function(p: number)
+				return (math.min(p + 25, #mutualFriendIds))
+			end)
+		end, { mutualFriendIds })
+
+		users = React.useMemo(function()
+			if not (state < #mutualFriendIds) then
+				return mutualFriendIds
+			end
+
+			local result = {}
+
+			for i = 1, state do
+				table.insert(result, mutualFriendIds[i])
+			end
+
+			return result
+		end, { mutualFriendIds, state })
+
+		hasMore = state < #mutualFriendIds
+	end
+
+	local v7 = useLocalization({
 		mutualConnections = {
 			TextKeys.MutualConnectionsTitle,
 			numConnections = #mutualFriendIds
@@ -97,17 +160,28 @@ local function MutualConnectionList(_) -- line: 40
 		return nil
 	end
 
-	local v45 = if #mutualFriendIds ~= 1 then v44.mutualConnections else v44.mutualConnection
+	local title
 
-	return React.createElement(UserListViewAdaptor, {
-		users = if not FFlagMutualConnectionsListPagination then mutualFriendIds else v39,
-		title = v45,
-		wideModePeekViewLayout = t1,
-		onUserSelected = function(p5) -- line: 120
-			-- upvalues: AppPage (copy), Enums (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), v30 (copy), NavigateDown (copy)
-			local t3 = {
+	if #mutualFriendIds == 1 then
+		title = v7.mutualConnection
+	else
+		title = v7.mutualConnections
+	end
+
+	local createElement = React.createElement
+
+	if not FFlagMutualConnectionsListPagination then
+		users = mutualFriendIds
+	end
+
+	local v8 = {
+		users = users,
+		title = title,
+		wideModePeekViewLayout = wideModePeekViewLayout,
+		onUserSelected = function(detail)
+			local v8 = {
 				name = AppPage.ProfilePlatform,
-				detail = p5,
+				detail = detail,
 				extraProps = {
 					profileType = Enums.ProfileTypes.User,
 					source = Enums.Sources.MutualConnectionsList
@@ -115,16 +189,27 @@ local function MutualConnectionList(_) -- line: 40
 			}
 
 			if FFlagSignalsNavP3Dispatch then
-				v26.down(v26.fromLegacyPage(t3))
-
-				return
+				navigationCommands.down(navigationCommands.fromLegacyPage(v8))
+			else
+				v(NavigateDown(v8))
 			end
-
-			v30(NavigateDown(t3))
 		end,
-		hasMore = if not FFlagMutualConnectionsListPagination then nil else v40,
-		onLoadMore = if not FFlagMutualConnectionsListPagination then nil else v41
-	})
+		hasMore = 0,
+		onLoadMore = 0
+	}
+
+	if not FFlagMutualConnectionsListPagination then
+		hasMore = nil
+	end
+
+	v8.hasMore = hasMore
+
+	if not FFlagMutualConnectionsListPagination then
+		onLoadMore = nil
+	end
+
+	v8.onLoadMore = onLoadMore
+	return createElement(UserListViewAdaptor, v8)
 end
 
 return MutualConnectionList

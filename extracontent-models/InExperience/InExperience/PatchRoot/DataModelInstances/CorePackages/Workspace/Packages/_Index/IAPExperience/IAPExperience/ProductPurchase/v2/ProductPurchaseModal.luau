@@ -1,144 +1,192 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
 local TextService = game:GetService("TextService")
-local UIBlox = require(ParentParentParent.UIBlox)
+local Style = require(parent2.Style)
+local GetTextSize = Style.GetTextSize
+
+local UIBlox = require(parent2.UIBlox)
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
-local Foundation = require(ParentParentParent.Foundation)
-local FoundationText = Foundation.Text
+
+local Foundation = require(parent2.Foundation)
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
 local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
-local useDefaultFocusBehavior = require(ParentParentParent.ReactFocusNavigation).useDefaultFocusBehavior
-local ProductDetails = require(ParentParent.Generic.ProductDetails)
+
+local ReactFocusNavigation = require(parent2.ReactFocusNavigation)
+local useDefaultFocusBehavior = ReactFocusNavigation.useDefaultFocusBehavior
+
+local ProductDetails = require(parent.Generic.ProductDetails)
+
 local LocalizationService = game:GetService("LocalizationService")
-local Localization = require(ParentParentParent.AppLocales).Localization
-local Localization2 = require(ParentParentParent.Localization)
+local AppLocales = require(parent2.AppLocales)
+local Localization = AppLocales.Localization
+local Localization2 = require(parent2.Localization)
 local LocalizationProvider = Localization2.LocalizationProvider
 local useLocalization = Localization2.Hooks.useLocalization
-local formatNumber = require(ParentParent.Utility.formatNumber)
-local logger = require(ParentParent.Utility.logger)
-local getAppContext = require(ParentParent.Utility.getAppContext)
-local default = require(ParentParentParent.LoggingProtocol).default
-local PurchaseModalV2ShownCounter = require(ParentParent.Generic.Events.PurchaseModalCounter).PurchaseModalV2ShownCounter
-local FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt = require(ParentParent.Flags.FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt)
 
-local function ProductPurchaseModal(t1: {[any]: any}) -- line: 67
-	-- upvalues: FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt (copy), useDefaultFocusBehavior (copy), React (copy), logger (copy), getAppContext (copy), default (copy), PurchaseModalV2ShownCounter (copy), useLocalization (copy), formatNumber (copy), LocalizationService (copy), useTokens (copy), useTextSizeOffset (copy), TextService (copy), InteractiveAlert (copy), ProductDetails (copy), ButtonType (copy), FoundationText (copy)
-	local v28 = nil
-	local v29 = nil
+local formatNumber = require(parent.Utility.formatNumber)
+local logger = require(parent.Utility.logger)
+local getAppContext = require(parent.Utility.getAppContext)
+
+local LoggingProtocol = require(parent2.LoggingProtocol)
+local default = LoggingProtocol.default
+local PurchaseModalCounter = require(parent.Generic.Events.PurchaseModalCounter)
+local PurchaseModalV2ShownCounter = PurchaseModalCounter.PurchaseModalV2ShownCounter
+
+local FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt = require(parent.Flags.FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt)
+
+local function ProductPurchaseModal(props)
+	local buttonRef, defaultChildRef
 
 	if FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
-		v28, v29 = useDefaultFocusBehavior()
+		buttonRef, defaultChildRef = useDefaultFocusBehavior()
 	end
 
-	React.useEffect(function() -- line: 72
-		-- upvalues: logger (copy), t1 (copy), getAppContext (copy), default (copy), PurchaseModalV2ShownCounter (copy)
+	React.useEffect(function()
 		logger.debug({
 			message = "Purchase Modal V2 Shown",
-			screenHeight = t1.screenSize.Y,
-			screenWidth = t1.screenSize.X,
-			portrait = t1.screenSize.X < t1.screenSize.Y,
+			screenHeight = props.screenSize.Y,
+			screenWidth = props.screenSize.X,
+			portrait = props.screenSize.X < props.screenSize.Y,
 			appContext = getAppContext()
 		})
+
 		default:logRobloxTelemetryCounter(PurchaseModalV2ShownCounter, 1, {
-			screenHeight = t1.screenSize.Y,
-			screenWidth = t1.screenSize.X,
-			portrait = t1.screenSize.X < t1.screenSize.Y,
+			screenHeight = props.screenSize.Y,
+			screenWidth = props.screenSize.X,
+			portrait = props.screenSize.X < props.screenSize.Y,
 			appContext = getAppContext()
 		})
 	end, {})
 
-	local v30 = useLocalization({
+	local v = useLocalization({
 		BuyItem = "IAPExperience.PurchasePrompt.Title.BuyItem",
 		RemainingBalance = "IAPExperience.PurchasePrompt.Text.RemainingBalanceV2"
 	})
-	local v31 = t1.balanceAmount - t1.product.itemRobuxCost
-	local v32 = utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, v31)
-	local v33 = utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, t1.product.itemRobuxCost)
-	local v34 = useTokens()
-	local v35 = useTextSizeOffset()
-	local v36, v37 = React.useState(0)
-	local u38 = v36
-	local u39 = v37
-	local CaptionSmall = v34.Typography.CaptionSmall
-	local u41 = v30.RemainingBalance:gsub("{robux}", v32)
-	local u42 = React.useCallback(function(p1) -- line: 110
-		-- upvalues: u38 (ref), u39 (ref)
-		if u38 ~= p1.AbsoluteSize.X then
-			u39(p1.AbsoluteSize.X)
-		end
-	end, { t1 })
-	local u43 = React.useMemo(function() -- line: 116
-		-- upvalues: CaptionSmall (copy), TextService (copy), u41 (ref), u38 (ref)
-		return CaptionSmall.LineHeight * TextService:GetTextSize(u41, CaptionSmall.FontSize, CaptionSmall.Font, Vector2.new(u38, 1e999)).Y
-	end, {
-		u38,
-		v35,
-		u41
-	})
 
-	return React.createElement(InteractiveAlert, {
-		bottomMargin = 12,
-		defaultChildRef = if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then nil else v29,
-		screenSize = t1.screenSize,
+	local v2 = props.balanceAmount - props.product.itemRobuxCost
+	local v3 = utf8.char(57346) .. " " .. formatNumber(LocalizationService.RobloxLocaleId, v2)
+
+	local text = utf8.char(57346) .. " " .. formatNumber(
+		LocalizationService.RobloxLocaleId,
+		props.product.itemRobuxCost
+	)
+
+	local v4 = useTokens()
+	local v5 = useTextSizeOffset()
+	local state, setState = React.useState(0)
+	local captionSmall = v4.Typography.CaptionSmall
+
+	local text2 = v.RemainingBalance:gsub("{robux}", v3)
+
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		if state ~= p.AbsoluteSize.X then
+			setState(p.AbsoluteSize.X)
+		end
+	end, { props })
+
+	local v6 = React.useMemo(function()
+		local lineHeight = captionSmall.LineHeight
+		local v6
+
+		if FoundationFontFaceMigration then
+			v6 = GetTextSize(text2, captionSmall.FontSize, captionSmall.Font, Vector2.new(state, 1e999), {
+				addTemporaryPadding = false
+			}).Y
+		else
+			v6 = TextService:GetTextSize(text2, captionSmall.FontSize, captionSmall.Font, Vector2.new(state, 1e999)).Y
+		end
+
+		return lineHeight * v6
+	end, { state, v5, text2 })
+
+	local createElement = React.createElement
+
+	if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
+		defaultChildRef = nil
+	end
+
+	local v7 = {
+		defaultChildRef = defaultChildRef,
+		screenSize = props.screenSize,
 		anchorPoint = Vector2.new(0.5, 0.5),
 		position = UDim2.new(0.5, 0, 0.5, 0),
-		title = v30.BuyItem,
-		onCloseClicked = function() -- line: 133
-			-- upvalues: t1 (copy)
-			if not t1.buttons.isDisabled then
-				t1.buttons.cancelActivated()
+		bottomMargin = 12,
+		title = v.BuyItem,
+		onCloseClicked = function()
+			if not props.buttons.isDisabled then
+				props.buttons.cancelActivated()
 			end
 		end,
-		onAbsoluteSizeChanged = u42,
-		middleContent = function() -- line: 139
-			-- upvalues: React (copy), ProductDetails (copy), t1 (copy)
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+		middleContent = function()
 			return React.createElement(ProductDetails, {
 				isPortrait = false,
 				layoutOrder = 1,
-				itemIcon = t1.product.itemIcon,
-				itemName = t1.product.itemName
+				itemIcon = props.product.itemIcon,
+				itemName = props.product.itemName
 			})
 		end,
-		buttonStackInfo = {
-			forcedFillDirection = Enum.FillDirection.Vertical,
-			disableGamepadRefs = not not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt or nil,
-			buttons = {{
-				buttonType = ButtonType.PrimaryContextual,
-				props = {
-					isDisabled = t1.buttons.isDisabled,
-					isDelayedInput = t1.buttons.buyItemIsDelayedInput,
-					enableInputDelayed = t1.buttons.buyItemEnableInputDelayed,
-					onActivated = t1.buttons.buyItemActivated,
-					text = v33,
-					inputIcon = t1.buttons.buyItemControllerIcon,
-					buttonRef = if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then nil else v28
-				}
-			}}
-		},
-		footerContent = function() -- line: 167
-			-- upvalues: t1 (copy), React (copy), FoundationText (copy), u41 (ref), u43 (ref), u42 (ref)
-			if not t1.balanceAmountValid then
-				return React.None
-			end
+		buttonStackInfo = 0,
+		footerContent = 0
+	}
 
-			return React.createElement(FoundationText, {
-				tag = "content-muted text-caption-small align-x-center text-wrap",
-				Text = u41,
-				Size = UDim2.new(1, 0, 0, u43),
-				onAbsoluteSizeChanged = u42
+	local buttonStackInfo = {
+		forcedFillDirection = Enum.FillDirection.Vertical,
+		disableGamepadRefs = FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt and true or nil,
+		buttons = 0
+	}
+
+	local v8 = { buttonType = ButtonType.PrimaryContextual, props = 0 }
+	local props2 = {
+		isDisabled = props.buttons.isDisabled,
+		isDelayedInput = props.buttons.buyItemIsDelayedInput,
+		enableInputDelayed = props.buttons.buyItemEnableInputDelayed,
+		onActivated = props.buttons.buyItemActivated,
+		text = text,
+		inputIcon = props.buttons.buyItemControllerIcon,
+		buttonRef = 0
+	}
+
+	if not FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt then
+		buttonRef = nil
+	end
+
+	props2.buttonRef = buttonRef
+	v8.props = props2
+	buttonStackInfo.buttons = { v8 }
+	v7.buttonStackInfo = buttonStackInfo
+
+	function v7.footerContent()
+		if props.balanceAmountValid then
+			return React.createElement(Text, {
+				Text = text2,
+				Size = UDim2.new(1, 0, 0, v6),
+				onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+				tag = "content-muted text-caption-small align-x-center text-wrap"
 			})
 		end
-	})
+
+		return React.None
+	end
+
+	return createElement(InteractiveAlert, v7)
 end
-local function ProductPurchaseModalContainer(t2: {[any]: any}) -- line: 182
-	-- upvalues: React (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), ProductPurchaseModal (copy)
-	return React.createElement(LocalizationProvider, {
-		localization = Localization.new(LocalizationService.RobloxLocaleId)
-	}, {
-		ProductPurchaseModal = React.createElement(ProductPurchaseModal, t2)
-	})
+
+local function ProductPurchaseModalContainer(p)
+	return React.createElement(
+		LocalizationProvider,
+		{
+			localization = Localization.new(LocalizationService.RobloxLocaleId)
+		},
+		{
+			ProductPurchaseModal = React.createElement(ProductPurchaseModal, p)
+		}
+	)
 end
 
 return ProductPurchaseModalContainer

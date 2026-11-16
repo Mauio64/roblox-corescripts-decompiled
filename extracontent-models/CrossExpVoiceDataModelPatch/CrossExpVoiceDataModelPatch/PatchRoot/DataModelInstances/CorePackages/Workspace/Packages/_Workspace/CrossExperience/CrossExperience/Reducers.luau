@@ -1,23 +1,25 @@
 local CrossExperience = script:FindFirstAncestor("CrossExperience")
-local Rodux = require(CrossExperience.dependencies).Rodux
+local dependencies = require(CrossExperience.dependencies)
+
+local rodux = dependencies.Rodux
+
 local Participants = require(script.Participants)
 local Experience = require(script.Experience)
 
-return function(p1) -- line: 9
-	-- upvalues: Rodux (copy), Participants (copy), Experience (copy)
-	local Participants2 = nil
-	local Experience2 = nil
+return function(p)
+	local experience = nil
+	local participants
 
-	if p1 and p1.Participants then
-		Participants2 = p1.Participants
+	if p and p.Participants then
+		participants = p.Participants
 	end
 
-	if p1 and p1.Experience then
-		Experience2 = p1.Experience
+	if p and p.Experience then
+		experience = p.Experience
 	end
 
-	return Rodux.combineReducers({
-		Participants = Participants(Participants2),
-		Experience = Experience(Experience2)
+	return rodux.combineReducers({
+		Participants = Participants(participants),
+		Experience = Experience(experience)
 	})
 end

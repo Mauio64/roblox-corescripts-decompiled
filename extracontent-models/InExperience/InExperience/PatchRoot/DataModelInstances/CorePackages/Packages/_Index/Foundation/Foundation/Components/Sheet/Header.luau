@@ -1,1 +1,3 @@
-return (require(script.SheetHeader))
+local SheetHeader = require(script.SheetHeader)
+
+return SheetHeader

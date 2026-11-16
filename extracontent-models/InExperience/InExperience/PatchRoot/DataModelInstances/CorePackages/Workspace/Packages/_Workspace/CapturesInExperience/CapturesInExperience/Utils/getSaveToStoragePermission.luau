@@ -1,66 +1,49 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local UserInputService = game:GetService("UserInputService")
-local default = require(ParentParentParent.PermissionsProtocol).PermissionsProtocol.default
-local SaveCaptureToExternalStorage = require(ParentParent.Thunks.SaveCaptureToExternalStorage)
-local SaveCapturesToExternalStorage = require(ParentParent.Thunks.SaveCapturesToExternalStorage)
 
-require(ParentParent.Types)
+local PermissionsProtocol = require(parent2.PermissionsProtocol)
+local default = PermissionsProtocol.PermissionsProtocol.default
 
-return function(p1, p2, p3) -- line: 13
-	-- upvalues: default (copy), UserInputService (copy), SaveCapturesToExternalStorage (copy), SaveCaptureToExternalStorage (copy)
-	default:hasPermissions({ default.Permissions.WRITE_MEDIA_STORAGE }):andThen(function(p4) -- line: 15
-		-- upvalues: default (copy), UserInputService (copy), p2 (copy), p1 (copy), p3 (copy), SaveCapturesToExternalStorage (copy), SaveCaptureToExternalStorage (copy)
-		local v11 = p4.status == default.Status.AUTHORIZED or UserInputService:GetPlatform() == Enum.Platform.OSX
+local SaveCaptureToExternalStorage = require(parent.Thunks.SaveCaptureToExternalStorage)
+local SaveCapturesToExternalStorage = require(parent.Thunks.SaveCapturesToExternalStorage)
 
-		if UserInputService:GetPlatform() == Enum.Platform.Android and not v11 then
-			if not p2 then
+require(parent.Types)
+
+return function(list, callback, callback2): nil
+	default:hasPermissions({ default.Permissions.WRITE_MEDIA_STORAGE }):andThen(function(p)
+		local v = p.status == default.Status.AUTHORIZED or UserInputService:GetPlatform() == Enum.Platform.OSX
+
+		if UserInputService:GetPlatform() == Enum.Platform.Android and not v then
+			if not callback then
 				return
 			end
 
-			assert(p2 ~= nil, "openPermissionModal is not nil")
-			p2()
-
-			return
-		end
-
-		if not v11 then
-			default:requestPermissions({ default.Permissions.WRITE_MEDIA_STORAGE }):andThen(function(p5) -- line: 26
-				-- upvalues: default (copy), p1 (copy), p3 (copy), SaveCapturesToExternalStorage (copy), SaveCaptureToExternalStorage (copy)
-				if p5.status == default.Status.AUTHORIZED or p5.status == default.Status.UNSUPPORTED then
-					if #p1 > 0 then
-						p3(SaveCapturesToExternalStorage(p1))
-
-						return
+			assert(callback ~= nil, "openPermissionModal is not nil")
+			callback()
+		elseif not v then
+			default:requestPermissions({ default.Permissions.WRITE_MEDIA_STORAGE }):andThen(function(p2)
+				if p2.status == default.Status.AUTHORIZED or p2.status == default.Status.UNSUPPORTED then
+					if #list > 0 then
+						callback2(SaveCapturesToExternalStorage(list))
+					else
+						callback2(SaveCaptureToExternalStorage(list))
 					end
-
-					p3(SaveCaptureToExternalStorage(p1))
 				end
-			end):catch(function() -- line: 38
-			end)
-
+			end):catch(function() end)
+		elseif #list > 0 then
+			callback2(SaveCapturesToExternalStorage(list))
+		else
+			callback2(SaveCaptureToExternalStorage(list))
+		end
+	end):catch(function()
+		if not (UserInputService:GetPlatform() == Enum.Platform.Android and callback) then
 			return
 		end
 
-		if #p1 > 0 then
-			p3(SaveCapturesToExternalStorage(p1))
-
-			return
-		end
-
-		p3(SaveCaptureToExternalStorage(p1))
-	end):catch(function() -- line: 49
-		-- upvalues: UserInputService (copy), p2 (copy)
-		if UserInputService:GetPlatform() ~= Enum.Platform.Android then
-			return
-		end
-
-		if not p2 then
-			return
-		end
-
-		assert(p2 ~= nil, "openPermissionModal is not nil")
-		p2()
+		assert(callback ~= nil, "openPermissionModal is not nil")
+		callback()
 	end)
 
 	return nil

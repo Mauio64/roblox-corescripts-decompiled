@@ -1,5 +1,7 @@
-local ParentParent = script:FindFirstAncestor("TiltLoadingScreen").Parent.Parent
+local parent = script:FindFirstAncestor("TiltLoadingScreen").Parent
+local parent2 = parent.Parent
 
-require(ParentParent.React)
+require(parent2.React)
+require(parent.LoadingScreenMilestones.Types)
 
 return nil

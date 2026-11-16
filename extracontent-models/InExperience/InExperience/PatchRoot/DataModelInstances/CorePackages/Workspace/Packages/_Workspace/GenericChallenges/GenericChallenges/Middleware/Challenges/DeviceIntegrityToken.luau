@@ -1,3 +1,1 @@
-return {
-	DeviceIntegrityTokenChallenge = script.DeviceIntegrityTokenChallenge
-}
+return { DeviceIntegrityTokenChallenge = script.DeviceIntegrityTokenChallenge }

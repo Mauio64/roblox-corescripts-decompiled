@@ -1,8 +1,10 @@
 local NavigationContext = require(script.views.NavigationContext)
-local Object = require(script.Parent.LuauPolyfill).Object
+local LuauPolyfill = require(script.Parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
+local createAppContainer = require(script.createAppContainer)
 return {
-	createAppContainer = require(script.createAppContainer).createAppContainer,
+	createAppContainer = createAppContainer.createAppContainer,
 	getNavigation = require(script.getNavigation),
 	Context = NavigationContext,
 	Provider = NavigationContext.Provider,

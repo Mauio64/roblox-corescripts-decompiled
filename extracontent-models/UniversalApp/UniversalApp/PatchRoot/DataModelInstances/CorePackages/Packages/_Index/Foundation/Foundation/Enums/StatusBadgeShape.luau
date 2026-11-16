@@ -1,4 +1,1 @@
-return {
-	Utility = "Utility",
-	Box = "Box"
-}
+return { Utility = "Utility", Box = "Box" }

@@ -1,0 +1,1 @@
+return game:DefineFastFlag("EnableShopExposureLogging2", false)

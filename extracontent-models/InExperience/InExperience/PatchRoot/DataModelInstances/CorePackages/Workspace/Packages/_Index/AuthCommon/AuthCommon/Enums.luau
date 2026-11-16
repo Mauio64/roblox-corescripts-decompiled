@@ -1,7 +1,10 @@
 local InputValidity = require(script.InputValidity)
 
+local Alignment = require(script.Alignment)
+
 return {
 	AccountLinkingAlertType = require(script.AccountLinkingAlertType),
+	Alignment = Alignment,
 	AuthLocalStorageKeys = require(script.AuthLocalStorageKeys),
 	AppLoginCounterNames = require(script.AppLoginCounterNames),
 	AuthMemStorageKeys = require(script.AuthMemStorageKeys),

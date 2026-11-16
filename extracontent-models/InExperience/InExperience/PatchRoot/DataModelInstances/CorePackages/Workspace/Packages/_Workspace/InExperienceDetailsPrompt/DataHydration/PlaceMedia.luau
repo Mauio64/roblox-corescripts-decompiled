@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local PlaceMedia = require(Workspace.DataHydration.DataHydration.PlaceMedia)
 
-return (require(_Workspace.DataHydration.DataHydration.PlaceMedia))
+return PlaceMedia

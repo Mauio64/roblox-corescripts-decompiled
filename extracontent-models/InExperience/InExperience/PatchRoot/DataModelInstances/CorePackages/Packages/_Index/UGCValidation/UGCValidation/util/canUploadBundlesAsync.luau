@@ -1,7 +1,10 @@
 local HttpService = game:GetService("HttpService")
+
 local UGCValidation = script:FindFirstAncestor("UGCValidation")
+
 local APIUtil = require(UGCValidation.util.APIUtil)
-local t1 = {
+
+local v = {
 	[0] = "Unknown",
 	[1] = "InvalidTargetType",
 	[2] = "FailedToFetchPublishingFee",
@@ -89,30 +92,24 @@ local t1 = {
 	[110] = "MissingCicRoleset"
 }
 
-local function canUploadBundlesAsync(n1: number?) -- line: 193
-	-- upvalues: APIUtil (copy), HttpService (copy), t1 (copy)
-	local v7, v8 = APIUtil.requestAndRetryGet(`https://itemconfiguration.{ APIUtil.getBaseDomain() }/v1/collectibles/check-item-upload-access?targetType=1&groupId={ n1 or "" }`)
+local function canUploadBundlesAsync(value: number?)
+	local requestAndRetryGet, message = APIUtil.requestAndRetryGet(`https://itemconfiguration.{APIUtil.getBaseDomain()}/v1/collectibles/check-item-upload-access?targetType=1&groupId={value or ""}`)
 
-	if not v7 then
-		return {
-			type = "error",
-			message = v8
-		}
+	if not requestAndRetryGet then
+		return { type = "error", message = message }
 	end
 
-	local data = HttpService:JSONDecode(v8)
+	local jsonDecode = HttpService:JSONDecode(message)
 
-	if data.isAllowed then
-		return {
-			type = "allowed"
-		}
+	if jsonDecode.isAllowed then
+		return { type = "allowed" }
 	end
 
-	assert(data.isAllowed == false, "Luau")
+	assert(jsonDecode.isAllowed == false, "Luau")
 
 	return {
 		type = "notAllowed",
-		denyReason = t1[data.deniedReason] or data.deniedReason
+		denyReason = v[jsonDecode.deniedReason] or jsonDecode.deniedReason
 	}
 end
 

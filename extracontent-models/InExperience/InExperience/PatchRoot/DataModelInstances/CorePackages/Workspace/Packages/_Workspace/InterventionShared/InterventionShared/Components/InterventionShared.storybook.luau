@@ -1,65 +1,60 @@
-local Parent = script:FindFirstAncestor("InterventionShared").Parent
-local UIBlox = require(Parent.UIBlox)
-local RobloxAppUIBloxConfig = require(Parent.Dev.RobloxAppUIBloxConfig)
+local parent = script:FindFirstAncestor("InterventionShared").Parent
+local UIBlox = require(parent.UIBlox)
+local RobloxAppUIBloxConfig = require(parent.Dev.RobloxAppUIBloxConfig)
 
 UIBlox.init(RobloxAppUIBloxConfig)
 
-local React = require(Parent.React)
-local Roact = require(Parent.Roact)
-local Cryo = require(Parent.Cryo)
-local ProviderContainer = require(Parent.RoactUtils).Components.ProviderContainer
-local StyleProviderWithDefaultTheme = require(Parent.Style).StyleProviderWithDefaultTheme
-local LocalizationProvider = require(Parent.Localization).LocalizationProvider
-local FoundationProvider = require(Parent.Foundation).FoundationProvider
+local React = require(parent.React)
+local Roact = require(parent.Roact)
+local Cryo = require(parent.Cryo)
+
+local RoactUtils = require(parent.RoactUtils)
+local ProviderContainer = RoactUtils.Components.ProviderContainer
+local Style = require(parent.Style)
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local Foundation = require(parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
 local LayerCollectorProvider = UIBlox.Core.Layout.LayerCollector.LayerCollectorProvider
-local Signal = require(Parent.AppCommonLib).Signal
+local AppCommonLib = require(parent.AppCommonLib)
+local Signal = AppCommonLib.Signal
 
-local function MockProviders(p1) -- line: 28
-	-- upvalues: FoundationProvider (copy), StyleProviderWithDefaultTheme (copy), LocalizationProvider (copy), Signal (copy), LayerCollectorProvider (copy), React (copy), ProviderContainer (copy)
-	local t1 = {}
+local function MockProviders(p)
+	local providers = {}
 
-	table.insert(t1, {
-		class = FoundationProvider,
-		props = {}
-	})
-	table.insert(t1, {
+	table.insert(providers, { class = FoundationProvider, props = {} })
+
+	table.insert(providers, {
 		class = StyleProviderWithDefaultTheme,
-		props = {
-			withDarkTheme = true,
-			withUiModeSupport = false
-		}
+		props = { withDarkTheme = true, withUiModeSupport = false }
 	})
-	table.insert(t1, {
+
+	table.insert(providers, {
 		class = LocalizationProvider,
 		props = {
 			localization = {
-				Format = function(_, s1: string) -- line: 48
-					return s1
+				Format = function(_, p2: string)
+					return p2
 				end,
 				changed = Signal.new()
 			}
 		}
 	})
-	table.insert(t1, {
-		class = LayerCollectorProvider,
-		props = {}
-	})
 
-	return React.createElement(ProviderContainer, {
-		providers = t1
-	}, p1.children)
+	table.insert(providers, { class = LayerCollectorProvider, props = {} })
+
+	return React.createElement(ProviderContainer, { providers = providers }, p.children)
 end
 
 return {
 	roact = Roact,
-	mapStory = function(p3) -- line: 68
-		-- upvalues: Roact (copy), MockProviders (copy), Cryo (copy)
-		return function(p4) -- line: 69
-			-- upvalues: Roact (copy), MockProviders (copy), p3 (copy), Cryo (copy)
-			local v20 = p4 and (not not p4.definition and p4.definition.props) or {}
+	mapStory = function(p)
+		return function(p2)
+			local props = p2 and p2.definition and p2.definition.props or {}
 
 			return Roact.createElement(MockProviders, {}, {
-				story = Roact.createElement(p3, Cryo.Dictionary.union(v20, p4))
+				story = Roact.createElement(p, Cryo.Dictionary.union(props, p2))
 			})
 		end
 	end

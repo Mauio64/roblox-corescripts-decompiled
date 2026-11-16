@@ -1,23 +1,17 @@
-local Parent = script:FindFirstAncestor("TextChannelWindow").Parent
-local ChatMute = require(Parent.ChatMute)
+local parent = script:FindFirstAncestor("TextChannelWindow").Parent
+
+local ChatMute = require(parent.ChatMute)
 
 return {
-	aliases = {
-		"/unmute",
-		"/um"
-	},
-	run = function(s1: string, s2: string) -- line: 8
-		-- upvalues: ChatMute (copy)
-		local v5 = string.split(s1, " ")[2]
-		local v6 = ChatMute.resolveUnmuteTarget(v5, s2)
+	aliases = { "/unmute", "/um" },
+	run = function(value: string, p: string)
+		local v = string.split(value, " ")[2]
+		local unmuteTarget = ChatMute.resolveUnmuteTarget(v, p)
 
-		if v6.playerInfo then
-			ChatMute.unmutePlayer(v6.playerInfo)
+		if unmuteTarget.playerInfo then
+			ChatMute.unmutePlayer(unmuteTarget.playerInfo)
 		end
 
-		return {
-			key = v6.key,
-			args = v6.args
-		}
+		return { key = unmuteTarget.key, args = unmuteTarget.args }
 	end
 }

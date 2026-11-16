@@ -1,10 +1,9 @@
-local function includes(p1, p2) -- line: 2
-	local v4 = type(p1)
+local function includes(list, p): boolean
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v4 == "table", "expected a table for first argument, got " .. v4)
-
-	for i = 1, #p1 do
-		if p2 == p1[i] then
+	for i = 1, #list do
+		if list[i] == p then
 			return true
 		end
 	end

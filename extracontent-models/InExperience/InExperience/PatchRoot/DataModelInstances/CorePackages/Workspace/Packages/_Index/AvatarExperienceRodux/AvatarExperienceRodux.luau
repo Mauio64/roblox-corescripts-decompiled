@@ -4,9 +4,11 @@ require(script.Types.AssetInfo)
 require(script.Types.OutfitTryOn)
 require(script.Types.BodyColors)
 require(script.Types.HydratedWidgetData)
+require(script.Types.AXCommonState)
 
 local Constants = require(script.Constants)
 local ReducerUtils = require(script.Utils.ReducerUtils)
+
 local AddAnalyticsMetadata = require(script.Actions.AddAnalyticsMetadata)
 local AddSelectedBundleInfo = require(script.Actions.AddSelectedBundleInfo)
 local AvatarExperienceLoaded = require(script.Actions.AvatarExperienceLoaded)
@@ -22,8 +24,12 @@ local RemoveLookFromTryOn = require(script.Actions.RemoveLookFromTryOn)
 local RemoveLookItemsFromTryOn = require(script.Actions.RemoveLookItemsFromTryOn)
 local RemoveUnselectedItemsFromTryOn = require(script.Actions.RemoveUnselectedItemsFromTryOn)
 local SetAccessoryAdjustments = require(script.Actions.SetAccessoryAdjustments)
+local SetAnimationPreview = require(script.Actions.SetAnimationPreview)
 local SetAvatarSceneRoute = require(script.Actions.SetAvatarSceneRoute)
+local SetBackgroundPreview = require(script.Actions.SetBackgroundPreview)
+local SetSpawnEffectPreview = require(script.Actions.SetSpawnEffectPreview)
 local SetEquippedInTryOnManager = require(script.Actions.SetEquippedInTryOnManager)
+local SetFullView = require(script.Actions.SetFullView)
 local SetItemDetailsPeekViewState = require(script.Actions.SetItemDetailsPeekViewState)
 local SetItemTryOnPeekViewState = require(script.Actions.SetItemTryOnPeekViewState)
 local SetLastToggledLookType = require(script.Actions.SetLastToggledLookType)
@@ -42,6 +48,11 @@ local ToggleTryOn = require(script.Actions.ToggleTryOn)
 local TryOnColorUpdated = require(script.Actions.TryOnColorUpdated)
 local TryOnLooksOutfit = require(script.Actions.TryOnLooksOutfit)
 local TryOnClassicHeadShape = require(script.Actions.TryOnClassicHeadShape)
+local SetSpecialFeaturesFilter = require(script.Actions.SetSpecialFeaturesFilter)
+
+local AvatarExperienceFlags = require(script.Parent.AvatarExperienceFlags)
+local FFlagAXCatalogSpecialFeaturesFilter = AvatarExperienceFlags.FFlagAXCatalogSpecialFeaturesFilter
+
 local CurrentCharacter = require(script.Reducers.CurrentCharacter)
 local AnalyticsMetadata = require(script.Reducers.AnalyticsMetadata)
 local AvatarExperienceLoaded2 = require(script.Reducers.AvatarExperienceLoaded)
@@ -51,6 +62,11 @@ local PlayingSwimAnimation2 = require(script.Reducers.PlayingSwimAnimation)
 local ShouldDelaySaveManager = require(script.Reducers.ShouldDelaySaveManager)
 local CameraButton = require(script.Reducers.CameraButton)
 local ProfileConfiguration = require(script.Reducers.ProfileConfiguration)
+local OutfitTryOn = require(script.Reducers.OutfitTryOn)
+
+if not FFlagAXCatalogSpecialFeaturesFilter then
+	SetSpecialFeaturesFilter = nil
+end
 
 return {
 	Actions = {
@@ -69,8 +85,12 @@ return {
 		RemoveLookItemsFromTryOn = RemoveLookItemsFromTryOn,
 		RemoveUnselectedItemsFromTryOn = RemoveUnselectedItemsFromTryOn,
 		SetAccessoryAdjustments = SetAccessoryAdjustments,
+		SetAnimationPreview = SetAnimationPreview,
 		SetAvatarSceneRoute = SetAvatarSceneRoute,
+		SetBackgroundPreview = SetBackgroundPreview,
+		SetSpawnEffectPreview = SetSpawnEffectPreview,
 		SetEquippedInTryOnManager = SetEquippedInTryOnManager,
+		SetFullView = SetFullView,
 		SetItemDetailsPeekViewState = SetItemDetailsPeekViewState,
 		SetItemTryOnPeekViewState = SetItemTryOnPeekViewState,
 		SetLastToggledLookType = SetLastToggledLookType,
@@ -88,7 +108,8 @@ return {
 		ToggleTryOn = ToggleTryOn,
 		TryOnColorUpdated = TryOnColorUpdated,
 		TryOnClassicHeadShape = TryOnClassicHeadShape,
-		TryOnLooksOutfit = TryOnLooksOutfit
+		TryOnLooksOutfit = TryOnLooksOutfit,
+		SetSpecialFeaturesFilter = SetSpecialFeaturesFilter
 	},
 	Reducers = {
 		CurrentCharacter = CurrentCharacter,
@@ -99,11 +120,10 @@ return {
 		PlayingSwimAnimation = PlayingSwimAnimation2,
 		ShouldDelaySaveManager = ShouldDelaySaveManager,
 		CameraButton = CameraButton,
-		ProfileConfiguration = ProfileConfiguration
+		ProfileConfiguration = ProfileConfiguration,
+		OutfitTryOn = OutfitTryOn
 	},
 	Constants = Constants,
-	Utils = {
-		ReducerUtils = ReducerUtils
-	},
+	Utils = { ReducerUtils = ReducerUtils },
 	["jest.config"] = script["jest.config"]
 }

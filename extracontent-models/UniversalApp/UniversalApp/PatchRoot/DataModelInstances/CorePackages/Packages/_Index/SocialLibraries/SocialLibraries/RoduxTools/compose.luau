@@ -1,23 +1,25 @@
-return function(...) -- line: 4
-	local t1 = { ... }
-	local v2 = #t1
+return function(...)
+	local v = { ... }
+	local count = #v
 
-	if v2 == 0 then
-		return function(p1) -- line: 9
-			return p1
+	if count == 0 then
+		return function(p)
+			return p
 		end
 	end
 
-	local v3 = t1[1]
+	local v2 = v[1]
+	local v3 = v2
 
-	for i = 2, v2 do
-		local v5 = t1[i]
-		local v6 = v3
+	for i = 2, count do
+		local v4 = v[i]
+		local v5 = v3
 
-		function v3(...) -- line: 18
-			-- upvalues: v6 (copy), v5 (copy)
-			return v6(v5(...))
+		v2 = function(...)
+			return v5(v4(...))
 		end
+
+		v3 = v2
 	end
 
 	return v3

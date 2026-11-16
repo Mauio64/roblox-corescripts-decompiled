@@ -1,19 +1,17 @@
 local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
-local Roact = require(FriendsLanding.dependencies).Roact
+local dependencies = require(FriendsLanding.dependencies)
+local roact = dependencies.Roact
 local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
 local FriendsLandingContainer = require(FriendsLanding.Components.FriendsLandingContainer)
-local v5 = Roact.PureComponent:extend("FriendsLandingScreen")
 
-v5.defaultProps = {
-	friends = {}
-}
+local extended = roact.PureComponent:extend("FriendsLandingScreen")
 
-function v5.render(_) -- line: 13
-	-- upvalues: FriendsLandingContext (copy), Roact (copy), FriendsLandingContainer (copy)
-	return FriendsLandingContext.with(function(_) -- line: 14
-		-- upvalues: Roact (copy), FriendsLandingContainer (copy)
-		return Roact.createElement(FriendsLandingContainer, {})
+extended.defaultProps = { friends = {} }
+
+function extended.render(_)
+	return FriendsLandingContext.with(function(_)
+		return roact.createElement(FriendsLandingContainer, {})
 	end)
 end
 
-return v5
+return extended

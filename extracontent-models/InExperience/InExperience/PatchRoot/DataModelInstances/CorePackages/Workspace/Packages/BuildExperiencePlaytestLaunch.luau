@@ -1,0 +1,5 @@
+local Workspace = script.Parent._Workspace
+
+local BuildExperiencePlaytestLaunch = require(Workspace.BuildExperiencePlaytestLaunch.BuildExperiencePlaytestLaunch)
+
+return BuildExperiencePlaytestLaunch

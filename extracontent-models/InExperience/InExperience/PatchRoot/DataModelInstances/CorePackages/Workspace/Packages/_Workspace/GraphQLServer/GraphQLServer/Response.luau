@@ -1,51 +1,46 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
-local Promise = require(Parent.Promise)
-local Error = require(Parent.LuauPolyfill).Error
-local stringify = require(Parent.GraphQL).stringify
-local t1 = {}
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
+local Promise = require(parent.Promise)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Error = LuauPolyfill.Error
 
-t1.__index = t1
+local GraphQL = require(parent.GraphQL)
+local stringify = GraphQL.stringify
 
-function t1.new(p1) -- line: 19
-	-- upvalues: t1 (copy)
-	local t2 = {
-		body = p1
-	}
+local Response = {}
+Response.__index = Response
 
-	setmetatable(t2, t1)
+function Response.new(body)
+	local v = { body = body }
 
-	return t2
+	setmetatable(v, Response)
+	return v
 end
-function t1.text(p2) -- line: 28
-	-- upvalues: Promise (copy), stringify (copy), Error (copy)
-	return Promise.new(function(resolve, reject) -- line: 29
-		-- upvalues: p2 (copy), stringify (copy), Error (copy)
-		local ok, result = pcall(function() -- line: 30
-			-- upvalues: p2 (copy), stringify (copy)
-			if p2.body.errors then
-				for v13, v14 in p2.body.errors do
-					if type(v14) == "table" and v14.name == "GraphQLError" then
-						p2.body.errors[v13] = {
-							message = v14.message,
-							locations = v14.locations,
-							extensions = v14.extensions,
-							path = v14.path
+
+function Response.text(p)
+	return Promise.new(function(callback, callback2)
+		local success, result = pcall(function()
+			if p.body.errors then
+				for k, err in p.body.errors do
+					if type(err) == "table" and err.name == "GraphQLError" then
+						p.body.errors[k] = {
+							message = err.message,
+							locations = err.locations,
+							extensions = err.extensions,
+							path = err.path
 						}
 					end
 				end
 			end
 
-			return stringify(p2.body)
+			return stringify(p.body)
 		end)
 
-		if ok then
-			resolve(result)
-
-			return
+		if success then
+			callback(result)
+		else
+			callback2(Error.new(result))
 		end
-
-		reject(Error.new(result))
 	end)
 end
 
-return t1
+return Response

@@ -1,31 +1,41 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-local React = require(AvatarExperienceInspectAndBuyParent.React)
-local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local parent = AvatarExperienceInspectAndBuy.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local Badge = require(AvatarExperienceInspectAndBuy.Components.Common.Badge)
 local Enums = Foundation.Enums
 
-local function ControlBar(t1: {[any]: any}) -- line: 33
-	-- upvalues: React (copy), Foundation (copy), Badge (copy), Enums (copy)
-	return React.createElement(Foundation.View, {
+local function ControlBar(props)
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v = {
 		tag = "auto-xy row align-x-left align-y-center gap-small",
-		LayoutOrder = t1.LayoutOrder
-	}, {
+		LayoutOrder = props.LayoutOrder
+	}
+	local v2 = {
 		FavoritesBadge = React.createElement(Badge, {
-			LayoutOrder = 1,
 			icon = Enums.IconName.Star,
-			iconVariant = t1.favoritesBadge.iconVariant,
-			text = t1.favoritesBadge.text,
-			onActivated = t1.favoritesBadge.onActivated
+			iconVariant = props.favoritesBadge.iconVariant,
+			text = props.favoritesBadge.text,
+			onActivated = props.favoritesBadge.onActivated,
+			LayoutOrder = 1
 		}),
-		TryOnBadge = if not t1.tryOnBadge then nil else React.createElement(Badge, {
-			LayoutOrder = 2,
+		TryOnBadge = 0
+	}
+	local tryOnBadge
+
+	if props.tryOnBadge then
+		tryOnBadge = React.createElement(Badge, {
 			icon = Enums.IconName.MirrorStanding,
-			iconVariant = t1.tryOnBadge.iconVariant,
-			text = t1.tryOnBadge.text,
-			onActivated = t1.tryOnBadge.onActivated
+			iconVariant = props.tryOnBadge.iconVariant,
+			text = props.tryOnBadge.text,
+			onActivated = props.tryOnBadge.onActivated,
+			LayoutOrder = 2
 		})
-	})
+	end
+
+	v2.TryOnBadge = tryOnBadge
+	return createElement(view, v, v2)
 end
 
 return ControlBar

@@ -1,6 +1,6 @@
 game:DefineFastFlag("OverridePlayerVerifiedBadge", false)
 
-local function getFFlagOverridePlayerVerifiedBadge() -- line: 15
+local function getFFlagOverridePlayerVerifiedBadge()
 	return game:GetFastFlag("OverridePlayerVerifiedBadge")
 end
 

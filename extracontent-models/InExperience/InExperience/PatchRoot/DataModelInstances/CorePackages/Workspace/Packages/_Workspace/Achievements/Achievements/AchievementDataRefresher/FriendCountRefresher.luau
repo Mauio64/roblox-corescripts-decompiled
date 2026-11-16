@@ -1,115 +1,99 @@
 local Achievements = script:FindFirstAncestor("Achievements")
-local AchievementsParent = Achievements.Parent
+local parent = Achievements.Parent
+
 local Logger = require(Achievements.Logger)
+require(parent.Signal)
 
-require(AchievementsParent.Signal)
+local FriendCountRefresher = {}
 
-return {
-	init = function(t1: {[any]: any}, p1, p2) -- line: 25
-		t1.fireFriendCountChanged = p1
-		t1.playersService = p2
-		t1.friendIds = {}
-		t1.friendCount = 0
-	end,
-	start = function(p3) -- line: 32
-		p3.friendIds = p3:_getFriendIds()
+function FriendCountRefresher:init(fireFriendCountChanged, playersService)
+	self.fireFriendCountChanged = fireFriendCountChanged
+	self.playersService = playersService
+	self.friendIds = {}
+	self.friendCount = 0
+end
 
-		for _, player in pairs(p3.playersService:GetPlayers()) do
-			p3:_onPlayerAdded(player)
-		end
+function FriendCountRefresher:start()
+	self.friendIds = self:_getFriendIds()
 
-		p3.playerAdded = p3.playersService.PlayerAdded:Connect(function(player) -- line: 37
-			-- upvalues: p3 (copy)
-			p3:_onPlayerAdded(player)
-		end)
-		p3.playerRemoving = p3.playersService.PlayerRemoving:Connect(function(player) -- line: 40
-			-- upvalues: p3 (copy)
-			p3:_onPlayerRemoving(player)
-		end)
-	end,
-	_getFriendIds = function(p4) -- line: 45
-		-- upvalues: Logger (copy)
-		local function iterPageItems(p5) -- line: 46
-			return coroutine.wrap(function() -- line: 47
-				-- upvalues: p5 (copy)
-				local n1 = 1
-
-				while true do
-					for _, v in ipairs(p5:GetCurrentPage()) do
-						coroutine.yield(v, n1)
-					end
-
-					if p5.IsFinished then
-						break
-					end
-
-					p5:AdvanceToNextPageAsync()
-					n1 += 1
-				end
-			end)
-		end
-
-		local ok, result = pcall(function() -- line: 62
-			-- upvalues: p4 (copy)
-			local t2 = {}
-
-			if p4.playersService.LocalPlayer then
-				local FriendsAsync = p4.playersService:GetFriendsAsync(p4.playersService.LocalPlayer.UserId)
-
-				for v24, _ in coroutine.wrap(function() -- line: 47
-					-- upvalues: FriendsAsync (copy)
-					local n2 = 1
-
-					while true do
-						for _, v in ipairs(FriendsAsync:GetCurrentPage()) do
-							coroutine.yield(v, n2)
-						end
-
-						if FriendsAsync.IsFinished then
-							break
-						end
-
-						FriendsAsync:AdvanceToNextPageAsync()
-						n2 += 1
-					end
-				end) do
-					t2[v24.Id] = true
-				end
-			end
-
-			return t2
-		end)
-
-		if not ok then
-			Logger:warning(result)
-		end
-
-		return ok and result or {}
-	end,
-	_onPlayerAdded = function(t3: {[any]: any}, p6) -- line: 80
-		if t3.friendIds[p6.UserId] then
-			t3.friendCount = t3.friendCount + 1
-			t3.fireFriendCountChanged(t3.friendCount)
-		end
-	end,
-	_onPlayerRemoving = function(t4: {[any]: any}, p7) -- line: 87
-		if t4.friendIds[p7.UserId] then
-			t4.friendCount = t4.friendCount - 1
-			t4.fireFriendCountChanged(t4.friendCount)
-		end
-	end,
-	stop = function(p8) -- line: 94
-		if p8.playerAdded then
-			p8.playerAdded:Disconnect()
-			p8.playerAdded = nil
-		end
-
-		if p8.playerRemoving then
-			p8.playerRemoving:Disconnect()
-			p8.playerRemoving = nil
-		end
-
-		p8.friendIds = {}
-		p8.friendCount = 0
+	for _, v in pairs(self.playersService:GetPlayers()) do
+		self:_onPlayerAdded(v)
 	end
-}
+
+	self.playerAdded = self.playersService.PlayerAdded:Connect(function(player)
+		self:_onPlayerAdded(player)
+	end)
+	self.playerRemoving = self.playersService.PlayerRemoving:Connect(function(player)
+		self:_onPlayerRemoving(player)
+	end)
+end
+
+function FriendCountRefresher:_getFriendIds()
+	local function iterPageItems(friendsAsync) -- 1 equivalent call inferred from this helper
+		return coroutine.wrap(function()
+			local v = 1
+
+			while true do
+				for _, v2 in ipairs(friendsAsync:GetCurrentPage()) do
+					coroutine.yield(v2, v)
+				end
+
+				if friendsAsync.IsFinished then
+					break
+				end
+
+				friendsAsync:AdvanceToNextPageAsync()
+				v += 1
+			end
+		end)
+	end
+
+	local success, result = pcall(function()
+		local idSet = {}
+
+		if self.playersService.LocalPlayer then
+			for k, _ in iterPageItems(self.playersService:GetFriendsAsync(self.playersService.LocalPlayer.UserId)) do -- inferred equivalent call
+				idSet[k.Id] = true
+			end
+		end
+
+		return idSet
+	end)
+
+	if not success then
+		Logger:warning(result)
+	end
+
+	return success and result or {}
+end
+
+function FriendCountRefresher:_onPlayerAdded(p)
+	if self.friendIds[p.UserId] then
+		self.friendCount += 1
+		self.fireFriendCountChanged(self.friendCount)
+	end
+end
+
+function FriendCountRefresher:_onPlayerRemoving(p)
+	if self.friendIds[p.UserId] then
+		self.friendCount -= 1
+		self.fireFriendCountChanged(self.friendCount)
+	end
+end
+
+function FriendCountRefresher:stop()
+	if self.playerAdded then
+		self.playerAdded:Disconnect()
+		self.playerAdded = nil
+	end
+
+	if self.playerRemoving then
+		self.playerRemoving:Disconnect()
+		self.playerRemoving = nil
+	end
+
+	self.friendIds = {}
+	self.friendCount = 0
+end
+
+return FriendCountRefresher

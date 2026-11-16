@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-return require(ParentParent.Rodux).makeActionCreator(script.Name, function(s1: string) -- line: 10
-	return {
-		shareInviteLink = s1
-	}
+local Rodux = require(parent.Rodux)
+
+return Rodux.makeActionCreator(script.Name, function(shareInviteLink: string)
+	return { shareInviteLink = shareInviteLink }
 end)

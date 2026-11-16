@@ -1,43 +1,57 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local DividerVariant = require(Foundation.Enums.DividerVariant)
 local Orientation = require(Foundation.Enums.Orientation)
-
 require(Foundation.Components.Types)
-
 local View = require(Foundation.Components.View)
 local useDividerVariants = require(script.Parent.useDividerVariants)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local withDefaults = require(Foundation.Utility.withDefaults)
-local t1 = {
-	testId = "--foundation-divider",
+
+local v = {
 	variant = DividerVariant.Default,
-	orientation = Orientation.Horizontal
+	orientation = Orientation.Horizontal,
+	testId = "--foundation-divider"
 }
 
-local function Divider(p1, p2) -- line: 29
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useDividerVariants (copy), DividerVariant (copy), Orientation (copy), React (copy), View (copy), withCommonProps (copy)
-	local v15 = withDefaults(p1, t1)
-	local v16 = useTokens()
-	local v17 = useDividerVariants(v16, v15.variant, v15.orientation)
-	local v18 = v15.variant == DividerVariant.Heavy and v15.orientation ~= Orientation.Vertical
+local function Divider(p, ref)
+	local v2 = withDefaults(p, v)
+	local v3 = useDividerVariants(useTokens(), v2.variant, v2.orientation)
+	local v4
 
-	return React.createElement(View, withCommonProps(v15, {
-		tag = v17.container.tag,
-		ref = p2
-	}), {
+	if v2.variant == DividerVariant.Heavy then
+		v4 = v2.orientation ~= Orientation.Vertical
+	else
+		v4 = false
+	end
+
+	local createElement = React.createElement
+
+	local v5 = withCommonProps(v2, { tag = v3.container.tag, ref = ref })
+
+	local v6 = {
 		DividerStroke = React.createElement(View, {
-			Size = v17.stroke.Size,
-			backgroundStyle = v17.stroke.backgroundStyle
+			Size = v3.stroke.Size,
+			backgroundStyle = v3.stroke.backgroundStyle
 		}),
-		DividerLine = if not v18 then nil else React.createElement(View, {
-			tag = v17.line.tag,
-			Position = v17.line.position,
-			backgroundStyle = v17.line.backgroundStyle
+		DividerLine = 0
+	}
+	local dividerLine
+
+	if v4 then
+		dividerLine = React.createElement(View, {
+			tag = v3.line.tag,
+			Position = v3.line.position,
+			backgroundStyle = v3.line.backgroundStyle
 		})
-	})
+	end
+
+	v6.DividerLine = dividerLine
+	return createElement(View, v5, v6)
 end
 
 return React.memo(React.forwardRef(Divider))

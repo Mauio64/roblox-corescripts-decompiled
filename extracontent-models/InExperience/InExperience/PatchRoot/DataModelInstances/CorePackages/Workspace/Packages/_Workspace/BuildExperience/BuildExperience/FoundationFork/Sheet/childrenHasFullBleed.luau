@@ -1,26 +1,22 @@
-local FoundationParent = game:GetService("CorePackages").Packages._Index.Foundation.Foundation.Parent
-local React = require(FoundationParent.React)
+local CorePackages = game:GetService("CorePackages")
+local parent = CorePackages.Packages._Index.Foundation.Foundation.Parent
+
+local React = require(parent.React)
+
 local FullBleed = require(script.Parent.FullBleed)
 
-local function getElementType(p1) -- line: 8
-	if type(p1) ~= "table" then
-		return nil
-	end
-
-	return p1.type
+local function getElementType(p) -- 1 equivalent call inferred from this helper
+	return if type(p) == "table" then p.type else nil
 end
-local function childrenHasFullBleed(p2) -- line: 15
-	-- upvalues: React (copy), FullBleed (copy)
-	local u8 = false
 
-	React.Children.forEach(p2, function(p3) -- line: 17
-		-- upvalues: FullBleed (copy), u8 (ref)
-		if ((if type(p3) == "table" then p3.type else nil)) == FullBleed then
-			u8 = true
+local function childrenHasFullBleed(p)
+	local v = false
+	React.Children.forEach(p, function(p2)
+		if getElementType(p2) == FullBleed then -- inferred equivalent call
+			v = true
 		end
 	end)
-
-	return u8
+	return v
 end
 
 return childrenHasFullBleed

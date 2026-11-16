@@ -1,6 +1,7 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.Signals)
-require(ParentParent.CoreScriptsRoactCommon)
+require(parent.Signals)
+
+require(parent.CoreScriptsRoactCommon)
 
 return nil

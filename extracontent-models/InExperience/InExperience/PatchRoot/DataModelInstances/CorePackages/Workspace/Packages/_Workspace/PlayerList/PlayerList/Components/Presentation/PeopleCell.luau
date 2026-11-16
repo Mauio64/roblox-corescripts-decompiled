@@ -1,33 +1,38 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local React = require(ParentParentParent.React)
-local Foundation = require(ParentParentParent.Foundation)
-local View = Foundation.View
-local FoundationText = Foundation.Text
-local PlayerBadge = require(ParentParent.Components.Presentation.PlayerBadge)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-local function PeopleCell(t1: {[any]: any}) -- line: 22
-	-- upvalues: React (copy), FoundationText (copy), PlayerBadge (copy), View (copy)
-	local v10 = t1.textTag or (not t1.truncate and "auto-xy text-body-small text-align-x-left content-default" or "fill size-0-full text-body-small text-align-x-left content-default text-truncate-end")
-	local t2 = {
-		NameText = React.createElement(FoundationText, {
-			LayoutOrder = 1,
-			Text = t1.displayName,
-			tag = v10
+local React = require(parent2.React)
+local Foundation = require(parent2.Foundation)
+local View = Foundation.View
+local Text = Foundation.Text
+
+local PlayerBadgeGroup = require(parent.Components.Presentation.PlayerBadgeGroup)
+
+local function PeopleCell(props)
+	local textTag = props.textTag
+		or props.truncate and "text-body-small text-align-x-left content-default text-truncate-end shrink auto-xy"
+		or "auto-xy text-body-small text-align-x-left content-default"
+
+	local v = {
+		NameText = React.createElement(Text, {
+			Text = props.displayName,
+			tag = textTag,
+			LayoutOrder = 1
 		})
 	}
 
-	if t1.player then
-		t2.Badge = React.createElement(PlayerBadge, {
-			layoutOrder = 2,
-			player = t1.player
-		})
+	if props.player then
+		v.Badge = React.createElement(PlayerBadgeGroup, { player = props.player, layoutOrder = 2 })
 	end
 
-	return React.createElement(View, {
-		tag = "row align-x-left align-y-center fill gap-xsmall size-0-full clip",
-		LayoutOrder = t1.layoutOrder
-	}, t2)
+	return React.createElement(
+		View,
+		{
+			LayoutOrder = props.layoutOrder,
+			tag = "row align-x-left align-y-center fill size-0-full clip gap-medium"
+		},
+		v
+	)
 end
 
 return React.memo(PeopleCell)

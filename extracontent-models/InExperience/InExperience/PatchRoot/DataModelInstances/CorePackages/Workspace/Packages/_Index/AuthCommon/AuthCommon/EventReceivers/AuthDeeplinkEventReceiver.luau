@@ -1,173 +1,186 @@
 local AuthCommon = script:FindFirstAncestor("AuthCommon")
-local AuthCommonParent = AuthCommon.Parent
-local React = require(AuthCommonParent.React)
-local useRoactService = require(AuthCommonParent.RobloxAppHooks).useRoactService
-local useSelector = require(AuthCommonParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useDispatch = require(AuthCommonParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useAppPolicy = require(AuthCommonParent.UniversalAppPolicy).useAppPolicy
-local useSignalState = require(AuthCommonParent.SignalsReact).useSignalState
-local RoactServiceTags = require(AuthCommonParent.RoactServiceTags)
+local parent = AuthCommon.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local RoactUtils2 = require(parent.RoactUtils)
+local useDispatch = RoactUtils2.Hooks.RoactRodux.useDispatch
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+
+local RoactServiceTags = require(parent.RoactServiceTags)
 local RoactNetworking = RoactServiceTags.RoactNetworking
 local RoactAnalytics = RoactServiceTags.RoactAnalytics
 local AppLinking = RoactServiceTags.AppLinking
 local AppOmniRecommendationsRequest = RoactServiceTags.AppOmniRecommendationsRequest
-local DeepLink = require(AuthCommonParent.DeepLink)
-local LoginStatus = require(AuthCommonParent.RobloxAppEnums).LoginStatus
-local RetrievalStatus = require(AuthCommonParent.Http).Enum.RetrievalStatus
+
+local DeepLink = require(parent.DeepLink)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local LoginStatus = RobloxAppEnums.LoginStatus
+local Http = require(parent.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
+
 local useEffect = React.useEffect
 local useCallback = React.useCallback
 local useState = React.useState
-local SharedFlags = require(AuthCommonParent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableDeepLinkHistoryWithModalAPI = SharedFlags.FFlagEnableDeepLinkHistoryWithModalAPI
 local FFlagUseSignalsForAuthenticationStatus = SharedFlags.FFlagUseSignalsForAuthenticationStatus
-local v23 = if not FFlagUseSignalsForAuthenticationStatus then nil else require(AuthCommonParent.AuthenticationStatus).GetAuthenticationStatusStore
+local getAuthenticationStatusStore
+
+if FFlagUseSignalsForAuthenticationStatus then
+	local AuthenticationStatus = require(parent.AuthenticationStatus)
+	getAuthenticationStatusStore = AuthenticationStatus.GetAuthenticationStatusStore
+else
+	getAuthenticationStatusStore = nil
+end
+
+local FFlagUseSignalsForStartup = SharedFlags.FFlagUseSignalsForStartup
+local getStartupStore
+
+if FFlagUseSignalsForStartup then
+	local StartupStore = require(parent.StartupStore)
+	getStartupStore = StartupStore.GetStartupStore
+else
+	getStartupStore = nil
+end
+
 local PostAuthDeepLinkAvailableSignal = require(script.Parent.PostAuthDeepLinkAvailableSignal)
 local PostAuthPendingLuaUrlAvailableSignal = require(script.Parent.PostAuthPendingLuaUrlAvailableSignal)
 local PreAuthDeepLinkHandler = require(script.Parent.PreAuthDeepLinkHandler)
-local PreAuthDeepLinkUrlStore = require(AuthCommon.Stores).PreAuthDeepLinkUrlStore
+
+local Stores = require(AuthCommon.Stores)
+local PreAuthDeepLinkUrlStore = Stores.PreAuthDeepLinkUrlStore
+
 local FFlagEnablePreAuthDeepLinkHandler = require(AuthCommon.Flags.FFlagEnablePreAuthDeepLinkHandler)
 
-return function(p1) -- line: 41
-	-- upvalues: useRoactService (copy), AppLinking (copy), RoactNetworking (copy), useDispatch (copy), AppOmniRecommendationsRequest (copy), RoactAnalytics (copy), useAppPolicy (copy), useState (copy), FFlagUseSignalsForAuthenticationStatus (copy), useSignalState (copy), v23 (copy), LoginStatus (copy), useSelector (copy), RetrievalStatus (copy), FFlagEnableDeepLinkHistoryWithModalAPI (copy), DeepLink (copy), useCallback (copy), PreAuthDeepLinkUrlStore (copy), PostAuthDeepLinkAvailableSignal (copy), PostAuthPendingLuaUrlAvailableSignal (copy), FFlagEnablePreAuthDeepLinkHandler (copy), PreAuthDeepLinkHandler (copy), useEffect (copy)
-	local v30 = useRoactService(AppLinking)
-	local monoDeps = p1.monoDeps
-	local LaunchApp = monoDeps.LaunchApp
-	local ResetAppState = monoDeps.ResetAppState
-	local v34 = useRoactService(RoactNetworking)
-	local v35 = useDispatch()
-	local v36 = useRoactService(AppOmniRecommendationsRequest)
-	local v37 = useRoactService(RoactAnalytics)
-	local v38 = useAppPolicy(function(p2) -- line: 53
-		return p2
-	end)
-	local t1 = {
-		networking = v34,
-		launchApp = LaunchApp,
-		dispatch = v35,
-		omniRecommendationsRequest = v36,
-		analytics = v37,
-		appPolicy = v38,
-		resetAppState = ResetAppState
-	}
-	local v40, v41 = useState({
-		url = nil,
-		attributionUrl = nil
-	})
-	local v42, v43 = useState({
-		hasPendingUrl = false,
-		attributionUrl = nil,
-		url = nil
-	})
-	local v44 = if not FFlagUseSignalsForAuthenticationStatus then useSelector(function(p3) -- line: 89
-		-- upvalues: LoginStatus (copy)
-		return p3.AuthenticationStatus.status == LoginStatus.LOGGED_OUT
-	end) else useSignalState(v23(false).getStatus) == LoginStatus.LOGGED_OUT
-	local v45 = useSelector(function(p4) -- line: 93
-		-- upvalues: RetrievalStatus (copy)
-		return p4.Startup.AppDataStatus ~= RetrievalStatus.NotStarted
-	end)
-	local u46 = nil
+return function(p): nil
+	local v = useRoactService(AppLinking)
 
-	if FFlagEnableDeepLinkHistoryWithModalAPI then
-		u46 = DeepLink.DeepLinkLuaReceiverStatusStore(false)
+	local monoDeps = p.monoDeps
+	local launchApp = monoDeps.LaunchApp
+	local resetAppState = monoDeps.ResetAppState
+
+	local v2 = {
+		networking = useRoactService(RoactNetworking),
+		launchApp = launchApp,
+		dispatch = useDispatch(),
+		omniRecommendationsRequest = useRoactService(AppOmniRecommendationsRequest),
+		analytics = useRoactService(RoactAnalytics),
+		appPolicy = useAppPolicy(function(p2)
+			return p2
+		end),
+		resetAppState = resetAppState
+	}
+
+	local state, setState = useState({ url = nil, attributionUrl = nil })
+
+	local state2, setState2 = useState({ hasPendingUrl = false, attributionUrl = nil, url = nil })
+	local v3
+
+	if FFlagUseSignalsForAuthenticationStatus then
+		v3 = useSignalState(getAuthenticationStatusStore(false).getStatus) == LoginStatus.LOGGED_OUT
+	else
+		v3 = useSelector(function(p2): boolean
+			return p2.AuthenticationStatus.status == LoginStatus.LOGGED_OUT
+		end)
 	end
 
-	local v47 = useCallback(function() -- line: 102
-		-- upvalues: v30 (copy), v44 (copy), v45 (copy), PreAuthDeepLinkUrlStore (copy), FFlagEnableDeepLinkHistoryWithModalAPI (copy), u46 (ref), DeepLink (copy), v40 (copy), PostAuthDeepLinkAvailableSignal (copy), v41 (copy), v42 (copy), PostAuthPendingLuaUrlAvailableSignal (copy), v43 (copy), FFlagEnablePreAuthDeepLinkHandler (copy), PreAuthDeepLinkHandler (copy), t1 (copy)
-		if not v30 then
+	local v4
+
+	if FFlagUseSignalsForStartup then
+		v4 = useSignalState(getStartupStore(false).getAppLoadingStarted)
+	else
+		v4 = useSelector(function(p2): boolean
+			return p2.Startup.AppDataStatus ~= RetrievalStatus.NotStarted
+		end)
+	end
+
+	local v5
+
+	if FFlagEnableDeepLinkHistoryWithModalAPI then
+		v5 = DeepLink.DeepLinkLuaReceiverStatusStore(false)
+	else
+		v5 = nil
+	end
+
+	local v6 = useCallback(function()
+		if not v then
 			return
 		end
 
-		local v51 = not v44 and v45
+		local v6 = not v3 and v4
 
-		if v51 then
+		if v6 then
 			PreAuthDeepLinkUrlStore.setUrl(nil)
 
 			if FFlagEnableDeepLinkHistoryWithModalAPI then
-				u46.setDeepLinkLuaPostAuthReceiverStatus(DeepLink.DeepLinkLuaPostAuthReceiverStatus.Ready, v40 and v40.url)
+				v5.setDeepLinkLuaPostAuthReceiverStatus(
+					DeepLink.DeepLinkLuaPostAuthReceiverStatus.Ready,
+					state and state.url
+				)
 			end
 
-			if v40 and v40.url then
-				PostAuthDeepLinkAvailableSignal:fire(v40)
-				v41({
-					url = nil,
-					attributionUrl = nil
-				})
+			if state and state.url then
+				PostAuthDeepLinkAvailableSignal:fire(state)
+
+				setState({ url = nil, attributionUrl = nil })
 			end
 
-			if v42 and v42.hasPendingUrl then
-				PostAuthPendingLuaUrlAvailableSignal:fire(v42)
-				v43({
-					hasPendingUrl = false,
-					attributionUrl = nil,
-					url = nil
-				})
+			if state2 and state2.hasPendingUrl then
+				PostAuthPendingLuaUrlAvailableSignal:fire(state2)
+				setState2({ hasPendingUrl = false, attributionUrl = nil, url = nil })
 			end
 		elseif FFlagEnableDeepLinkHistoryWithModalAPI then
-			u46.setDeepLinkLuaPostAuthReceiverStatus(DeepLink.DeepLinkLuaPostAuthReceiverStatus.Disconnected, nil)
+			v5.setDeepLinkLuaPostAuthReceiverStatus(DeepLink.DeepLinkLuaPostAuthReceiverStatus.Disconnected, nil)
 		end
 
-		v30:getAndClearLastPendingURL():andThen(function(t2: {[any]: any}) -- line: 144
-			-- upvalues: v51 (copy), PreAuthDeepLinkUrlStore (copy), v43 (copy), PostAuthPendingLuaUrlAvailableSignal (copy)
-			if not t2 or not t2.hasPendingUrl then
+		v:getAndClearLastPendingURL():andThen(function(p2)
+			if not (p2 and p2.hasPendingUrl) then
 				return
 			end
 
-			if not v51 then
-				PreAuthDeepLinkUrlStore.setUrl(t2.url)
-				v43(t2)
+			if v6 then
+				PostAuthPendingLuaUrlAvailableSignal:fire(p2)
 
 				return
 			end
 
-			PostAuthPendingLuaUrlAvailableSignal:fire(t2)
+			PreAuthDeepLinkUrlStore.setUrl(p2.url)
+			setState2(p2)
 		end)
-		v30:listenForLuaURLs(function(p5, p6) -- line: 161
-			-- upvalues: FFlagEnablePreAuthDeepLinkHandler (copy), PreAuthDeepLinkHandler (copy), t1 (copy), v51 (copy), PreAuthDeepLinkUrlStore (copy), v41 (copy), PostAuthDeepLinkAvailableSignal (copy)
-			if FFlagEnablePreAuthDeepLinkHandler and PreAuthDeepLinkHandler.isPreauthDeeplink(p5) then
-				PreAuthDeepLinkHandler.firePreauthDeeplink(p5, t1)
+
+		v:listenForLuaURLs(function(url, attributionUrl)
+			if FFlagEnablePreAuthDeepLinkHandler and PreAuthDeepLinkHandler.isPreauthDeeplink(url) then
+				PreAuthDeepLinkHandler.firePreauthDeeplink(url, v2)
+				return
+			end
+
+			if v6 then
+				PostAuthDeepLinkAvailableSignal:fire({ url = url, attributionUrl = attributionUrl })
 
 				return
 			end
 
-			if not v51 then
-				PreAuthDeepLinkUrlStore.setUrl(p5)
-
-				local t3 = {
-					url = p5,
-					attributionUrl = p6
-				}
-
-				v41(t3)
-
-				return
-			end
-
-			PostAuthDeepLinkAvailableSignal:fire({
-				url = p5,
-				attributionUrl = p6
-			})
+			PreAuthDeepLinkUrlStore.setUrl(url)
+			setState({ url = url, attributionUrl = attributionUrl })
 		end)
-	end, {
-		v30,
-		v44,
-		v45,
-		PostAuthDeepLinkAvailableSignal,
-		v40,
-		v42
-	})
+	end, { v, v3, v4, PostAuthDeepLinkAvailableSignal, state, state2 })
 
-	useEffect(function() -- line: 194
-		-- upvalues: v47 (copy), v30 (copy)
-		v47()
+	useEffect(function()
+		v6()
 
-		return function() -- line: 198
-			-- upvalues: v30 (copy)
-			if v30 then
-				v30:stopListeningForLuaURLs()
+		return function()
+			if v then
+				v:stopListeningForLuaURLs()
 			end
 		end
-	end, { v47 })
-
+	end, { v6 })
 	return nil
 end

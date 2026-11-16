@@ -1,85 +1,60 @@
 local Immutable = require(script.Parent.Parent.Immutable)
+
 local Actions = script.Parent.Parent.Actions
 local SetLuauHeapState = require(Actions.SetLuauHeapState)
 local SetLuauHeapProfileTarget = require(Actions.SetLuauHeapProfileTarget)
 local SetLuauHeapActiveSnapshot = require(Actions.SetLuauHeapActiveSnapshot)
 local SetLuauHeapCompareSnapshot = require(Actions.SetLuauHeapCompareSnapshot)
-
 require(script.Parent.Parent.Components.LuauHeap.LuauHeapTypes)
 
-local t1 = {
+local v = {
 	isClientView = true,
-	client = {
-		active = 0,
-		compare = 0,
-		snapshots = {}
-	},
-	server = {
-		active = 0,
-		compare = 0,
-		snapshots = {}
-	}
+	client = { snapshots = {}, active = 0, compare = 0 },
+	server = { snapshots = {}, active = 0, compare = 0 }
 }
 
-return function(t2: {[any]: any}?, t3: {[any]: any}) -- line: 33
-	-- upvalues: t1 (copy), SetLuauHeapState (copy), Immutable (copy), SetLuauHeapProfileTarget (copy), SetLuauHeapActiveSnapshot (copy), SetLuauHeapCompareSnapshot (copy)
-	local v10 = t2 or t1
+return function(p, data)
+	local selected = p or v
 
-	if t3.type == SetLuauHeapState.name then
-		local v11 = if not t3.isClientState then {
-			server = t3.sessionState
-		} else {
-			client = t3.sessionState
-		}
+	if data.type == SetLuauHeapState.name then
+		local v2
 
-		return (Immutable.JoinDictionaries(v10, v11))
-	end
-
-	if t3.type == SetLuauHeapProfileTarget.name then
-		return Immutable.JoinDictionaries(v10, {
-			isClientView = t3.isClientView
-		})
-	end
-
-	if t3.type == SetLuauHeapActiveSnapshot.name then
-		if v10.isClientView then
-			local v12 = table.clone(v10.client)
-
-			v12.active = t3.active
-
-			return Immutable.JoinDictionaries(v10, {
-				client = v12
-			})
+		if data.isClientState then
+			v2 = { client = data.sessionState }
+		else
+			v2 = { server = data.sessionState }
 		end
 
-		local v13 = table.clone(v10.server)
-
-		v13.active = t3.active
-
-		return Immutable.JoinDictionaries(v10, {
-			server = v13
-		})
+		return (Immutable.JoinDictionaries(selected, v2))
 	end
 
-	if t3.type == SetLuauHeapCompareSnapshot.name then
-		if v10.isClientView then
-			local v14 = table.clone(v10.client)
+	if data.type == SetLuauHeapProfileTarget.name then
+		return Immutable.JoinDictionaries(selected, { isClientView = data.isClientView })
+	end
 
-			v14.compare = t3.compare
-
-			return Immutable.JoinDictionaries(v10, {
-				client = v14
-			})
+	if data.type == SetLuauHeapActiveSnapshot.name then
+		if selected.isClientView then
+			local clone = table.clone(selected.client)
+			clone.active = data.active
+			return Immutable.JoinDictionaries(selected, { client = clone })
+		else
+			local clone = table.clone(selected.server)
+			clone.active = data.active
+			return Immutable.JoinDictionaries(selected, { server = clone })
+		end
+	else
+		if data.type ~= SetLuauHeapCompareSnapshot.name then
+			return selected
 		end
 
-		local v15 = table.clone(v10.server)
-
-		v15.compare = t3.compare
-
-		return Immutable.JoinDictionaries(v10, {
-			server = v15
-		})
+		if selected.isClientView then
+			local clone = table.clone(selected.client)
+			clone.compare = data.compare
+			return Immutable.JoinDictionaries(selected, { client = clone })
+		else
+			local clone = table.clone(selected.server)
+			clone.compare = data.compare
+			return Immutable.JoinDictionaries(selected, { server = clone })
+		end
 	end
-
-	return v10
 end

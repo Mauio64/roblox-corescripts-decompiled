@@ -1,8 +1,6 @@
-local ParentParent = script.Parent.Parent
-local dependencies = require(ParentParent.dependencies)
-local Roact = dependencies.Roact
-local Dash = dependencies.Dash
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+local roact = dependencies.Roact
+local dash = dependencies.Dash
 
-return Roact.createContext({
-	fireAnalyticsEvent = Dash.noop
-})
+return roact.createContext({ fireAnalyticsEvent = dash.noop })

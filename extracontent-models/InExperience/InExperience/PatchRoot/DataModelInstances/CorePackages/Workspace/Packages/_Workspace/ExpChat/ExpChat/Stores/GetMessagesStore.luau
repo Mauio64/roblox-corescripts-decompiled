@@ -1,12 +1,17 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Signals = require(ExpChatParent.Signals)
+local parent = ExpChat.Parent
+local Signals = require(parent.Signals)
 local createMessagesStore = require(script.createMessagesStore)
+
 local FFlagExpChatUseChatMuteStore = require(ExpChat.Flags.FFlagExpChatUseChatMuteStore)
 
-return Signals.createComputed(function() -- line: 9
-	-- upvalues: FFlagExpChatUseChatMuteStore (copy), ExpChat (copy), createMessagesStore (copy)
-	local v6 = if not FFlagExpChatUseChatMuteStore then nil else require(ExpChat.Stores.GetGlobalMutedUsersStore)(false).getMutedGlobalUserIds
+return Signals.createComputed(function()
+	local getMutedGlobalUserIds
 
-	return createMessagesStore(v6)
+	if FFlagExpChatUseChatMuteStore then
+		local GetGlobalMutedUsersStore = require(ExpChat.Stores.GetGlobalMutedUsersStore)
+		getMutedGlobalUserIds = GetGlobalMutedUsersStore(false).getMutedGlobalUserIds
+	end
+
+	return createMessagesStore(getMutedGlobalUserIds)
 end)

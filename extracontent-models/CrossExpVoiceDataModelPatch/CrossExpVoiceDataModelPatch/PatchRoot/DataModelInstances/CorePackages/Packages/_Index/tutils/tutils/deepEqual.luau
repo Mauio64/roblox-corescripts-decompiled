@@ -1,41 +1,36 @@
-local function deepEqual(p1, p2, p3) -- line: 7
-	-- upvalues: deepEqual (copy)
-	if p1 == p2 then
+local function deepEqual(item, item2, p): boolean
+	if item == item2 then
 		return true
 	end
 
-	local v5 = type(p1)
+	local typeName = type(item)
 
-	if v5 ~= type(p2) then
+	if not (typeName == type(item2) and typeName == "table") then
 		return false
 	end
 
-	if v5 ~= "table" then
-		return false
-	end
+	if not p then
+		local metatable = getmetatable(item)
 
-	if not p3 then
-		local mt = getmetatable(p1)
-
-		if mt and mt.__eq then
-			return p1 == p2
+		if metatable and metatable.__eq then
+			return item == item2
 		end
 	end
 
-	local t1 = {}
+	local set = {}
 
-	for k, v in pairs(p1) do
-		local v10 = p2[k]
+	for k, item3 in pairs(item) do
+		local item4 = item2[k]
 
-		if v10 == nil or not deepEqual(v, v10, p3) then
+		if item4 == nil or not deepEqual(item3, item4, p) then
 			return false
 		end
 
-		t1[k] = true
+		set[k] = true
 	end
 
-	for k, _ in pairs(p2) do
-		if not t1[k] then
+	for k, _ in pairs(item2) do
+		if not set[k] then
 			return false
 		end
 	end

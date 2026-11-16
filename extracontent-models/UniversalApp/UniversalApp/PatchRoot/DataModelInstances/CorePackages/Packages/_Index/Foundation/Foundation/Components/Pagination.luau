@@ -1,1 +1,3 @@
-return (require(script.Pagination))
+local Pagination = require(script.Pagination)
+
+return Pagination

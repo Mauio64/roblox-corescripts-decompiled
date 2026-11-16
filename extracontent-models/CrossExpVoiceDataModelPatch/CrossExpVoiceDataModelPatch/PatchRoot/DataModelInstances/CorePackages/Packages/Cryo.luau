@@ -1,3 +1,5 @@
-local _Index = script.Parent._Index
+local index = script.Parent._Index
 
-return (require(_Index.Cryo.Cryo))
+local Cryo = require(index.Cryo.Cryo)
+
+return Cryo

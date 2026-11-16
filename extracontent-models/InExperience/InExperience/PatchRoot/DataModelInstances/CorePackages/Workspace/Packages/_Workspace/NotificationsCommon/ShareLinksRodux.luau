@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.ShareLinksRodux.ShareLinksRodux))
+local ShareLinksRodux = require(index.ShareLinksRodux.ShareLinksRodux)
+
+return ShareLinksRodux

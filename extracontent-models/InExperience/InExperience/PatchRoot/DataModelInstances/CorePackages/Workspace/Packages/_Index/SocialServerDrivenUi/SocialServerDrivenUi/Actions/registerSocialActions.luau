@@ -1,40 +1,76 @@
 local SocialServerDrivenUi = script:FindFirstAncestor("SocialServerDrivenUi")
-local SocialServerDrivenUiParent = SocialServerDrivenUi.Parent
-local SduiCoreSystem = require(SocialServerDrivenUiParent.SduiCoreSystem)
+local parent = SocialServerDrivenUi.Parent
+local SduiCoreSystem = require(parent.SduiCoreSystem)
 local SduiActionType = SduiCoreSystem.SduiActionType
 local getSduiActionHandlerRegistry = SduiCoreSystem.getSduiActionHandlerRegistry
-local FFlagLuaAppSduiVerificationUpsellActions = require(SocialServerDrivenUiParent.SharedFlags).FFlagLuaAppSduiVerificationUpsellActions
 
-local function registerSocialActions() -- line: 12
-	-- upvalues: SduiActionType (copy), FFlagLuaAppSduiVerificationUpsellActions (copy), SocialServerDrivenUi (copy), getSduiActionHandlerRegistry (copy)
-	local t1 = {
-		[SduiActionType.OpenFacialAgeEstimation] = if FFlagLuaAppSduiVerificationUpsellActions then nil else {
-			lazyHandler = function() -- line: 19
-				-- upvalues: SocialServerDrivenUi (copy)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppSduiVerificationUpsellActions = SharedFlags.FFlagLuaAppSduiVerificationUpsellActions
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSduiRequestFriendshipActionHandler = SharedFlags2.FFlagSduiRequestFriendshipActionHandler
+local SharedFlags3 = require(parent.SharedFlags)
+local FFlagEditProfileFramesEnabled = SharedFlags3.FFlagEditProfileFramesEnabled
+local SharedFlags4 = require(parent.SharedFlags)
+local FFlagAddSDUIEditProfileFramesAction = SharedFlags4.FFlagAddSDUIEditProfileFramesAction
+
+local SharedFlags5 = require(parent.SharedFlags)
+local FFlagAppChatConversationTrustedFriendUpsellBanner = SharedFlags5.FFlagAppChatConversationTrustedFriendUpsellBanner
+
+local SharedFlags6 = require(parent.SharedFlags)
+local FFlagLuaAppExperienceLeaderboardSeeAllEnabled = SharedFlags6.FFlagLuaAppExperienceLeaderboardSeeAllEnabled
+
+local function registerSocialActions()
+	local v = {
+		[SduiActionType.OpenFacialAgeEstimation] = not FFlagLuaAppSduiVerificationUpsellActions and {
+			lazyHandler = function()
 				return require(SocialServerDrivenUi.Actions.SduiOpenFacialAgeEstimationAction)
 			end
-		},
+		} or nil,
 		[SduiActionType.OpenAddConnectionsPage] = {
-			lazyHandler = function() -- line: 25
-				-- upvalues: SocialServerDrivenUi (copy)
+			lazyHandler = function()
 				return require(SocialServerDrivenUi.Actions.SduiOpenAddConnectionsPageAction)
 			end
 		},
 		[SduiActionType.OpenMarketplace] = {
-			lazyHandler = function() -- line: 30
-				-- upvalues: SocialServerDrivenUi (copy)
+			lazyHandler = function()
 				return require(SocialServerDrivenUi.Actions.SduiOpenMarketplaceAction)
 			end
 		},
 		[SduiActionType.HideProfileCompletion] = {
-			lazyHandler = function() -- line: 35
-				-- upvalues: SocialServerDrivenUi (copy)
+			lazyHandler = function()
 				return require(SocialServerDrivenUi.Actions.SduiHideProfileCompletionAction)
 			end
-		}
+		},
+		[SduiActionType.RequestFriendship] = FFlagSduiRequestFriendshipActionHandler and {
+			lazyHandler = function()
+				return require(SocialServerDrivenUi.Actions.SduiRequestFriendshipAction)
+			end,
+			skipUnifiedLogging = true
+		} or nil,
+		[SduiActionType.OpenProfileFramesEditor] = FFlagEditProfileFramesEnabled and FFlagAddSDUIEditProfileFramesAction and {
+			lazyHandler = function()
+				return require(SocialServerDrivenUi.Actions.SduiOpenProfileFramesEditorAction)
+			end
+		} or nil,
+		[SduiActionType.OpenTrustedFriendsUpsellModal] = FFlagAppChatConversationTrustedFriendUpsellBanner and {
+			lazyHandler = function()
+				return require(SocialServerDrivenUi.Actions.SduiOpenTrustedFriendsUpsellModalAction)
+			end
+		} or nil,
+		[SduiActionType.RecordPartyChatConversationUpsellAcknowledgement] = FFlagAppChatConversationTrustedFriendUpsellBanner and {
+			lazyHandler = function()
+				return require(SocialServerDrivenUi.Actions.SduiRecordPartyChatConversationUpsellAcknowledgementAction)
+			end,
+			skipUnifiedLogging = true
+		} or nil,
+		[SduiActionType.OpenExperienceLeaderboardSeeAll] = FFlagLuaAppExperienceLeaderboardSeeAllEnabled and {
+			lazyHandler = function()
+				return require(SocialServerDrivenUi.Actions.SduiOpenExperienceLeaderboardSeeAllAction)
+			end
+		} or nil
 	}
 
-	getSduiActionHandlerRegistry().registerActionHandlerConfigs(t1)
+	getSduiActionHandlerRegistry().registerActionHandlerConfigs(v)
 end
 
 return registerSocialActions

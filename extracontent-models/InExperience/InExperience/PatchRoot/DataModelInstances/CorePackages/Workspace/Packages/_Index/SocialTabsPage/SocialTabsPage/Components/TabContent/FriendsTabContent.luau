@@ -1,106 +1,116 @@
 local SocialTabsPage = script:FindFirstAncestor("SocialTabsPage")
-local SocialTabsPageParent = SocialTabsPage.Parent
-local React = require(SocialTabsPageParent.React)
-local Dash = require(SocialTabsPageParent.Dash)
-local Foundation = require(SocialTabsPageParent.Foundation)
+local parent = SocialTabsPage.Parent
+
+local React = require(parent.React)
+local Dash = require(parent.Dash)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local Loading = Foundation.Loading
-local useLocalization = require(SocialTabsPageParent.Localization).Hooks.useLocalization
-local UserList = require(SocialTabsPageParent.UserList)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local UserList = require(parent.UserList)
 local UserListLayoutAdaptor = UserList.UserListLayoutAdaptor
 local LayoutMode = UserList.Enums.LayoutMode
 local EntityType = UserList.Enums.EntityType
+
 local SocialTabsEmptyState = require(SocialTabsPage.Components.SocialTabsEmptyState)
 local RowDataProvider = require(SocialTabsPage.Components.RowDataProvider)
 local useSocialTabsContext = require(SocialTabsPage.Contexts.useSocialTabsContext)
 local useFriendsList = require(SocialTabsPage.Hooks.useFriendsList)
-local useFetchPresences = require(SocialTabsPage.Hooks.useFetchPresences)
-local useSortedEntitiesByPresence = require(SocialTabsPage.Hooks.useSortedEntitiesByPresence)
 local useUserListCTAs = require(SocialTabsPage.Hooks.useUserListCTAs)
 local useCTAActionHandlers = require(SocialTabsPage.Hooks.useCTAActionHandlers)
+local SocialTabsCtaConfig = require(SocialTabsPage.Common.SocialTabsCtaConfig)
 local TextKeys = require(SocialTabsPage.Common.TextKeys)
-local FFlagSocialTabsPagePresenceSignalsMigration = require(SocialTabsPage.Flags.FFlagSocialTabsPagePresenceSignalsMigration)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUserListCtaIntegrationEnabled = SharedFlags.FFlagUserListCtaIntegrationEnabled
 
-local function FriendsTabContent() -- line: 29
-	-- upvalues: useSocialTabsContext (copy), useFriendsList (copy), useLocalization (copy), TextKeys (copy), React (copy), Dash (copy), EntityType (copy), FFlagSocialTabsPagePresenceSignalsMigration (copy), useFetchPresences (copy), useSortedEntitiesByPresence (copy), useUserListCTAs (copy), useCTAActionHandlers (copy), RowDataProvider (copy), View (copy), Loading (copy), SocialTabsEmptyState (copy), UserListLayoutAdaptor (copy), LayoutMode (copy)
-	local v24 = useSocialTabsContext()
-	local profileId = v24.profileId
-	local title = v24.title
-	local v27 = useFriendsList({
-		targetUserId = profileId
-	})
-	local friends = v27.friends
-	local loading = v27.loading
-	local hasMore = v27.hasMore
-	local fetchMore = v27.fetchMore
-	local v32 = useLocalization({
+local function FriendsTabContent()
+	local v = useSocialTabsContext()
+	local profileId = v.profileId
+	local title = v.title
+
+	local v2 = useFriendsList({ targetUserId = profileId })
+
+	local friends = v2.friends
+	local loading = v2.loading
+	local hasMore = v2.hasMore
+	local fetchMore = v2.fetchMore
+
+	local v3 = useLocalization({
 		emptyText = {
-			TextKeys.NoConnectionYet,
+			TextKeys.NoFriendsYet,
 			name = title or ""
 		}
 	})
-	local v33 = React.useMemo(function() -- line: 49
-		-- upvalues: Dash (copy), friends (copy), EntityType (copy)
-		return Dash.map(friends, function(p1) -- line: 50
-			-- upvalues: EntityType (copy)
-			return {
-				id = tostring(p1.id),
-				type = EntityType.User
-			}
+
+	local entities = React.useMemo(function()
+		return Dash.map(friends, function(p)
+			return { id = tostring(p.id), type = EntityType.User }
 		end)
 	end, { friends })
-	local v34 = React.useMemo(function() -- line: 55
-		-- upvalues: Dash (copy), v33 (copy)
-		return Dash.map(v33, function(p2) -- line: 56
-			return p2.id
-		end)
-	end, { v33 })
 
-	if not FFlagSocialTabsPagePresenceSignalsMigration then
-		useFetchPresences(v34)
+	local v4 = React.useMemo(function()
+		return Dash.map(entities, function(p)
+			return p.id
+		end)
+	end, { entities })
+	local renderRow
+
+	if not FFlagUserListCtaIntegrationEnabled then
+		local v5 = useUserListCTAs(v4)
+		local actionHandlers = useCTAActionHandlers()
+
+		renderRow = React.useCallback(function(createRow, entity, _: number)
+			return React.createElement(RowDataProvider, {
+				createRow = createRow,
+				entity = entity,
+				ctaResult = v5[entity.id],
+				actionHandlers = actionHandlers
+			})
+		end, { v5, actionHandlers })
 	end
 
-	local v35 = useSortedEntitiesByPresence(v33)
-	local v36 = useUserListCTAs(v34)
-	local v37 = useCTAActionHandlers()
-	local v38 = React.useCallback(function(p3, p4, _: number) -- line: 72
-		-- upvalues: React (copy), RowDataProvider (copy), v36 (copy), v37 (copy)
-		return React.createElement(RowDataProvider, {
-			createRow = p3,
-			entity = p4,
-			ctaResult = v36[p4.id],
-			actionHandlers = v37
-		})
-	end, {
-		v36,
-		v37
-	})
-
-	if loading and #v33 == 0 then
-		return React.createElement(View, {
-			tag = "col align-x-center align-y-center size-full"
-		}, {
+	if loading and #entities == 0 then
+		return React.createElement(View, { tag = "col align-x-center align-y-center size-full" }, {
 			LoadingIndicator = React.createElement(Loading)
 		})
 	end
 
-	if not loading and #v33 == 0 then
-		return (React.createElement(SocialTabsEmptyState, {
-			text = v32.emptyText
-		}))
+	if not loading and #entities == 0 then
+		return (React.createElement(SocialTabsEmptyState, { text = v3.emptyText }))
 	end
 
-	return React.createElement(View, {
-		tag = "col size-full padding-x-xlarge"
-	}, {
-		FriendsList = React.createElement(UserListLayoutAdaptor, {
-			isScrollEnabled = true,
-			entities = v35,
-			layoutMode = LayoutMode.Vertical,
-			hasMore = hasMore,
-			onLoadMore = if not hasMore then nil else fetchMore,
-			renderRow = v38
-		})
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+	local v5 = {
+		entities = entities,
+		layoutMode = LayoutMode.Vertical,
+		isScrollEnabled = true,
+		hasMore = hasMore,
+		onLoadMore = 0,
+		renderRow = 0,
+		ctaConfig = 0,
+		rowSelectionConfig = 0
+	}
+
+	if not hasMore then
+		fetchMore = nil
+	end
+
+	v5.onLoadMore = fetchMore
+	v5.renderRow = renderRow
+	local ctaConfig
+
+	if FFlagUserListCtaIntegrationEnabled then
+		ctaConfig = SocialTabsCtaConfig.Friends
+	end
+
+	v5.ctaConfig = ctaConfig
+	v5.rowSelectionConfig = SocialTabsCtaConfig.RowSelection
+	return createElement(View, { tag = "col size-full padding-x-xlarge" }, {
+		FriendsList = createElement2(UserListLayoutAdaptor, v5)
 	})
 end
 

@@ -1,22 +1,26 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
 local Constants = require(AvatarExperienceCommon.Constants)
 
-local function selectDefaultTryOnBodyColors(p1) -- line: 4
-	-- upvalues: Constants (copy)
-	local OutfitTryOn = p1.AvatarExperience.AvatarScene.OutfitTryOn
-	local OutfitInfos = p1.AvatarExperience.AvatarEditor.OutfitInfos
-	local OutfitIdMap = OutfitTryOn.OutfitIdMap
+local function selectDefaultTryOnBodyColors(p)
+	local outfitTryOn = p.AvatarExperience.AvatarScene.OutfitTryOn
+	local outfitInfos = p.AvatarExperience.AvatarEditor.OutfitInfos
+	local outfitIdMap = outfitTryOn.OutfitIdMap
 
-	for _, v9 in OutfitTryOn.TryOnItems do
-		if OutfitIdMap and v9.itemType == "Bundle" and v9.itemSubType == Constants.BODY_BUNDLE_TYPE_ID and v9.receivedBundleInfo then
-			local v10 = OutfitIdMap[v9.itemId]
-			local v11 = if not v10 then nil else OutfitInfos[v10]
+	for _, tryOnItem in outfitTryOn.TryOnItems do
+		if
+			outfitIdMap
+			and tryOnItem.itemType == "Bundle"
+			and tryOnItem.itemSubType == Constants.BODY_BUNDLE_TYPE_ID
+			and tryOnItem.receivedBundleInfo
+		then
+			local outfitId = outfitIdMap[tryOnItem.itemId]
+			local v
 
-			if v11 then
-				return v11.bodyColor3s
+			if outfitId then
+				v = outfitInfos[outfitId]
 			end
 
-			return nil
+			return if v then v.bodyColor3s else nil
 		end
 	end
 

@@ -1,13 +1,13 @@
-local function getInvalidAssetIdsToAssetTypeIdMap(t1: {[any]: any}, t2: {[any]: any}) -- line: 1
-	local t3 = {}
+local function getInvalidAssetIdsToAssetTypeIdMap(items, p)
+	local invalidAssetIdsToAssetTypeIdMap = {}
 
-	for v5, v6 in t1 do
-		if not t2[v5] then
-			t3[v5] = v6
+	for k, item in items do
+		if not p[k] then
+			invalidAssetIdsToAssetTypeIdMap[k] = item
 		end
 	end
 
-	return t3
+	return invalidAssetIdsToAssetTypeIdMap
 end
 
 return getInvalidAssetIdsToAssetTypeIdMap

@@ -1,25 +1,39 @@
 local HttpService = game:GetService("HttpService")
-local SQUAD_URL = require(script.Parent.Parent.SQUAD_URL)
 
+local SQUAD_URL = require(script.Parent.Parent.SQUAD_URL)
 require(script.Parent.Parent.networkingSquadTypes)
 
 local Packages = script:FindFirstAncestor("Packages")
-local FFlagEnableSquadRegroupExperimentation = require(Packages.SharedFlags).FFlagEnableSquadRegroupExperimentation
-local FFlagEnablePrivatePartyStartJoin = require(Packages.SharedFlags).FFlagEnablePrivatePartyStartJoin
+local SharedFlags = require(Packages.SharedFlags)
+local FFlagEnableSquadRegroupExperimentation = SharedFlags.FFlagEnableSquadRegroupExperimentation
+local SharedFlags2 = require(Packages.SharedFlags)
+local FFlagEnablePrivatePartyStartJoin = SharedFlags2.FFlagEnablePrivatePartyStartJoin
 
-return function(p1) -- line: 11
-	-- upvalues: SQUAD_URL (copy), HttpService (copy), FFlagEnableSquadRegroupExperimentation (copy), FFlagEnablePrivatePartyStartJoin (copy)
-	return (p1.roduxNetworking.POST({
-		Name = "CreateExperienceInvite"
-	}, function(p2, p3) -- line: 15
-		-- upvalues: SQUAD_URL (copy), HttpService (copy), FFlagEnableSquadRegroupExperimentation (copy), FFlagEnablePrivatePartyStartJoin (copy)
-		return p2(SQUAD_URL):path("group-up"):path("v1"):path("invite-to-experience"):body({
-			membershipEntityId = p3.membershipEntityId,
-			placeId = p3.placeId,
+return function(p)
+	return (p.roduxNetworking.POST("CreateExperienceInvite", function(callback, data)
+		local path = callback(SQUAD_URL):path("group-up"):path("v1"):path("invite-to-experience")
+		local v = {
+			membershipEntityId = data.membershipEntityId,
+			placeId = data.placeId,
 			requestId = HttpService:GenerateGUID(false),
-			voteIdentifier = p3.voteIdentifier,
-			source = if not FFlagEnableSquadRegroupExperimentation then nil else p3.source,
-			inviteType = if not FFlagEnablePrivatePartyStartJoin then nil else p3.inviteType
-		})
+			voteIdentifier = data.voteIdentifier,
+			source = 0,
+			inviteType = 0
+		}
+		local source
+
+		if FFlagEnableSquadRegroupExperimentation then
+			source = data.source
+		end
+
+		v.source = source
+		local inviteType
+
+		if FFlagEnablePrivatePartyStartJoin then
+			inviteType = data.inviteType
+		end
+
+		v.inviteType = inviteType
+		return path:body(v)
 	end))
 end

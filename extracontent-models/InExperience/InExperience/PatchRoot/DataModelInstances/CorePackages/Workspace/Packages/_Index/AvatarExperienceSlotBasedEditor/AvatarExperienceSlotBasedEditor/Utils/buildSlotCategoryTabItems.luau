@@ -1,27 +1,26 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+require(parent.AvatarExperienceUIKit)
 
-require(Parent.AvatarExperienceUIKit)
 require(script.Parent.Parent.Types)
 require(script.Parent.Parent.Enums.Categories)
 
-local function buildSlotCategoryTabItems(t1: {[any]: any}, t2: {[any]: any}) -- line: 13
-	local t3 = {}
+local function buildSlotCategoryTabItems(items, p)
+	local slotCategoryTabItems = {}
 
-	for v6, v7 in t1 do
-		if not v7.hide then
-			table.insert(t3, {
-				id = v6,
-				text = t2[v7.nameTranslationKey] or v7.nameTranslationKey
+	for k, item in items do
+		if not item.hide then
+			table.insert(slotCategoryTabItems, {
+				id = k,
+				text = p[item.nameTranslationKey] or item.nameTranslationKey
 			})
 		end
 	end
 
-	table.sort(t3, function(p1, p2) -- line: 26
-		-- upvalues: t1 (copy)
-		return t1[p1.id].index < t1[p2.id].index
+	table.sort(slotCategoryTabItems, function(a, b): boolean
+		return items[a.id].index < items[b.id].index
 	end)
 
-	return t3
+	return slotCategoryTabItems
 end
 
 return buildSlotCategoryTabItems

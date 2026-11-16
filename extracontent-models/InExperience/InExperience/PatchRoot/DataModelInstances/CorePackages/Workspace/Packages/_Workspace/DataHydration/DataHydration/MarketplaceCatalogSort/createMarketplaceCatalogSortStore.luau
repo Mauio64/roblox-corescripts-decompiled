@@ -1,137 +1,155 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Promise = require(DataHydrationParent.Promise)
-local Signals = require(DataHydrationParent.Signals)
-local SharedFlags = require(DataHydrationParent.SharedFlags)
+local parent = DataHydration.Parent
+
+local Promise = require(parent.Promise)
+local Signals = require(parent.Signals)
+
+local SharedFlags = require(parent.SharedFlags)
+
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
 require(script.Parent.MarketplaceCatalogSortStoreTypes)
 
 local FFlagMarketplaceCatalogSortTrackLastReceived = SharedFlags.FFlagMarketplaceCatalogSortTrackLastReceived
+local FFlagAXSduiNilEmptyTagId = require(DataHydration.Flags.FFlagAXSduiNilEmptyTagId)
+local FFlagDataHydrationAccountReset = SharedFlags.FFlagDataHydrationAccountReset
 
-local function normalizeCardFooters(t1: {[any]: any}?) -- line: 34
-	if not t1 then
+local function normalizeCardFooters(cardFooters)
+	if not cardFooters then
 		return nil
 	end
 
-	local t2 = table.create(#t1)
+	local result = table.create(#cardFooters)
 
-	for _, v16 in t1 do
-		table.insert(t2, {
-			contentType = v16.contentType or v16.content_type
+	for _, item in cardFooters do
+		table.insert(result, {
+			contentType = item.contentType or item.content_type
 		})
 	end
 
-	return t2
+	return result
 end
-local function normalizeCardStyle(p1) -- line: 47
+
+local function normalizeCardStyle(cardStyle) -- 1 equivalent call inferred from this helper
 	return {
-		thumbnailAspectRatio = p1.thumbnailAspectRatio or p1.thumbnail_aspect_ratio
+		thumbnailAspectRatio = cardStyle.thumbnailAspectRatio or cardStyle.thumbnail_aspect_ratio
 	}
 end
-local function normalizeSort(p2) -- line: 53
-	-- upvalues: normalizeCardFooters (copy)
-	if not p2.cardFooters and not p2.cardStyle then
-		return p2
+
+local function normalizeSort(data) -- 1 equivalent call inferred from this helper
+	if not (data.cardFooters or data.cardStyle) then
+		return data
 	end
 
-	local v19 = table.clone(p2)
+	local clone = table.clone(data)
 
-	if p2.cardFooters then
-		v19.cardFooters = normalizeCardFooters(p2.cardFooters)
+	if data.cardFooters then
+		clone.cardFooters = normalizeCardFooters(data.cardFooters)
 	end
 
-	if p2.cardStyle then
-		local cardStyle = p2.cardStyle
+	if data.cardStyle then
+		clone.cardStyle = normalizeCardStyle(data.cardStyle) -- inferred equivalent call
+	end
 
-		v19.cardStyle = {
-			thumbnailAspectRatio = cardStyle.thumbnailAspectRatio or cardStyle.thumbnail_aspect_ratio
+	return clone
+end
+
+local function clearEmptyTagId(p)
+	if p.tagId ~= "" then
+		return p
+	end
+
+	local clone = table.clone(p)
+	clone.tagId = nil
+	return clone
+end
+
+local function createMarketplaceCatalogSortStore()
+	local cache
+
+	if FFlagAXSduiNilEmptyTagId then
+		cache = createDataCache(nil, nil, {
+			sanitizeItem = clearEmptyTagId,
+			observeLocalUser = not FFlagDataHydrationAccountReset and nil
+		})
+	else
+		cache = createDataCache(nil, nil, FFlagDataHydrationAccountReset and {
+			observeLocalUser = false
+		} or nil)
+	end
+
+	local dataResolver = createDataResolver({
+		cache = cache,
+		fetchFn = function(_)
+			return Promise.resolve({})
+		end,
+		keepCacheOnAccountReset = FFlagDataHydrationAccountReset and true or nil
+	})
+	local getLastReceivedSorts, v
+
+	if FFlagMarketplaceCatalogSortTrackLastReceived then
+		getLastReceivedSorts, v = Signals.createSignal({})
+	else
+		v = nil
+	end
+
+	local function updateMarketplaceCatalogSorts(p)
+		v(p)
+		cache.updateItems(p)
+	end
+
+	local function getNormalizedMarketplaceCatalogSort(p: string)
+		local cachedItem = dataResolver.getCachedItem(p)
+		return {
+			data = function(p2)
+				local data = cachedItem.data(p2)
+
+				if not data then
+					return nil
+				end
+
+				return normalizeSort(data) -- inferred equivalent call
+			end,
+			status = cachedItem.status
 		}
 	end
 
-	return v19
-end
-local function createMarketplaceCatalogSortStore() -- line: 67
-	-- upvalues: createDataCache (copy), createDataResolver (copy), Promise (copy), FFlagMarketplaceCatalogSortTrackLastReceived (copy), Signals (copy), normalizeCardFooters (copy)
-	local v21 = createDataCache()
-	local v22 = createDataResolver({
-		cache = v21,
-		fetchFn = function(_: {[any]: any}) -- line: 71
-			-- upvalues: Promise (copy)
-			return Promise.resolve({})
-		end
-	})
-	local v23 = nil
-	local u24 = nil
-
-	if FFlagMarketplaceCatalogSortTrackLastReceived then
-		local v25
-
-		v23, v25 = Signals.createSignal({})
-		u24 = v25
-	end
-
-	local function updateMarketplaceCatalogSorts(t4: {[any]: any}) -- line: 88
-		-- upvalues: u24 (ref), v21 (copy)
-		u24(t4)
-		v21.updateItems(t4)
-	end
-	local function clear() -- line: 112
-		-- upvalues: u24 (ref), v22 (copy)
-		if u24 then
-			u24({})
+	local function clear()
+		if v then
+			v({})
 		end
 
-		v22.clear()
+		dataResolver.clear()
 	end
 
-	return {
-		getMarketplaceCatalogSort = v22.getCachedItem,
-		getMarketplaceCatalogSorts = v22.getCachedItems,
-		getNormalizedMarketplaceCatalogSort = function(s1: string) -- line: 96
-			-- upvalues: v22 (copy), normalizeCardFooters (copy)
-			local v31 = v22.getCachedItem(s1)
-
-			return {
-				data = function(p3) -- line: 99
-					-- upvalues: v31 (copy), normalizeCardFooters (copy)
-					local v33 = v31.data(p3)
-
-					if v33 then
-						if not v33.cardFooters and not v33.cardStyle then
-							return v33
-						end
-
-						local v34 = table.clone(v33)
-
-						if v33.cardFooters then
-							v34.cardFooters = normalizeCardFooters(v33.cardFooters)
-						end
-
-						if v33.cardStyle then
-							local cardStyle = v33.cardStyle
-
-							v34.cardStyle = {
-								thumbnailAspectRatio = cardStyle.thumbnailAspectRatio or cardStyle.thumbnail_aspect_ratio
-							}
-						end
-
-						return v34
-					end
-
-					return nil
-				end,
-				status = v31.status
-			}
-		end,
-		updateMarketplaceCatalogSorts = if not FFlagMarketplaceCatalogSortTrackLastReceived then v21.updateItems else updateMarketplaceCatalogSorts,
-		updateMarketplaceCatalogSort = v21.updateItem,
-		getLastReceivedSorts = v23,
-		clear = if not FFlagMarketplaceCatalogSortTrackLastReceived then v22.clear else clear,
-		dispose = v22.dispose
+	local marketplaceCatalogSortStore = {
+		getMarketplaceCatalogSort = dataResolver.getCachedItem,
+		getMarketplaceCatalogSorts = dataResolver.getCachedItems,
+		getNormalizedMarketplaceCatalogSort = getNormalizedMarketplaceCatalogSort,
+		updateMarketplaceCatalogSorts = 0,
+		updateMarketplaceCatalogSort = 0,
+		getLastReceivedSorts = 0,
+		clear = 0,
+		dispose = 0
 	}
+
+	if not FFlagMarketplaceCatalogSortTrackLastReceived then
+		updateMarketplaceCatalogSorts = cache.updateItems
+	end
+
+	marketplaceCatalogSortStore.updateMarketplaceCatalogSorts = updateMarketplaceCatalogSorts
+
+	marketplaceCatalogSortStore.updateMarketplaceCatalogSort = cache.updateItem
+	marketplaceCatalogSortStore.getLastReceivedSorts = getLastReceivedSorts
+
+	if not FFlagMarketplaceCatalogSortTrackLastReceived then
+		clear = dataResolver.clear
+	end
+
+	marketplaceCatalogSortStore.clear = clear
+	marketplaceCatalogSortStore.dispose = dataResolver.dispose
+	return marketplaceCatalogSortStore
 end
 
 return createMarketplaceCatalogSortStore

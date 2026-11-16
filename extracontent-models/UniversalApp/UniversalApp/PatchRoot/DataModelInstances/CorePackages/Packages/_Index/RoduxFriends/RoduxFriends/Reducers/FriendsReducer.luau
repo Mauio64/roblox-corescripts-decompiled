@@ -5,39 +5,36 @@ local recommendations = require(script.Parent.Friends.recommendations)
 local friendshipStatus = require(script.Parent.Friends.friendshipStatus)
 local friendsRankByUserId = require(script.Parent.Friends.friendsRankByUserId)
 local contactNamesByUserId = require(script.Parent.Friends.contactNamesByUserId)
-local t1 = {
+
+local v = {
 	countsByUserId = {},
 	byUserId = {},
-	requests = {
-		receivedCount = 0
-	},
+	requests = { receivedCount = 0 },
 	recommendations = {},
 	friendshipStatus = {},
 	friendsRankByUserId = {},
 	contactNamesByUserId = {}
 }
 
-return function(p1) -- line: 21
-	-- upvalues: t1 (copy), byUserId (copy), countsByUserId (copy), requests (copy), recommendations (copy), friendshipStatus (copy), friendsRankByUserId (copy), contactNamesByUserId (copy)
-	return function(p2, p3) -- line: 22
-		-- upvalues: t1 (copy), byUserId (copy), p1 (copy), countsByUserId (copy), requests (copy), recommendations (copy), friendshipStatus (copy), friendsRankByUserId (copy), contactNamesByUserId (copy)
-		local v12 = p2 or t1
-		local v13 = byUserId(p1)
-		local v14 = countsByUserId(p1)
-		local v15 = requests(p1)
-		local v16 = recommendations(p1)
-		local v17 = friendshipStatus(p1)
-		local v18 = friendsRankByUserId(p1)
-		local v19 = contactNamesByUserId(p1)
+return function(p)
+	return function(p2, p3)
+		local v2 = p2 or v
+		local v3 = byUserId(p)
+		local v4 = countsByUserId(p)
+		local v5 = requests(p)
+		local v6 = recommendations(p)
+		local v7 = friendshipStatus(p)
+		local v8 = friendsRankByUserId(p)
+		local v9 = contactNamesByUserId(p)
 
 		return {
-			byUserId = v13(v12.byUserId, p3),
-			countsByUserId = v14(p2, p3),
-			requests = v15(v12.requests, p3),
-			recommendations = v16(v12.recommendations, p3),
-			friendshipStatus = v17(v12.friendshipStatus, p3),
-			friendsRankByUserId = v18(v12.friendsRankByUserId, p3),
-			contactNamesByUserId = v19(v12.contactNamesByUserId, p3)
+			byUserId = v3(v2.byUserId, p3),
+			countsByUserId = v4(p2, p3),
+			requests = v5(v2.requests, p3),
+			recommendations = v6(v2.recommendations, p3),
+			friendshipStatus = v7(v2.friendshipStatus, p3),
+			friendsRankByUserId = v8(v2.friendsRankByUserId, p3),
+			contactNamesByUserId = v9(v2.contactNamesByUserId, p3)
 		}
 	end
 end

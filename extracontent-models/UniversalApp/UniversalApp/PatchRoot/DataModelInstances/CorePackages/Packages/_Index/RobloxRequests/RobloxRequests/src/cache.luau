@@ -1,214 +1,208 @@
 local MessagingService = game:GetService("MessagingService")
 local DataStoreService = game:GetService("DataStoreService")
 local RunService = game:GetService("RunService")
-local json = require(script.Parent.json)
-local v5 = RunService:IsStudio()
 
-local function dlog(...) -- line: 10
+local json = require(script.Parent.json)
+
+local isStudio = RunService:IsStudio()
+
+local function dlog(...)
 	print("[http]", ...)
 end
 
-local t1 = {
-	settings = {},
-	max_size = 1e999,
-	data = {}
-}
+local Cache = {}
 
-function t1.update_settings(p1, p2) -- line: 22
-	-- upvalues: t1 (copy)
-	local v15 = type(p1) == "table" and p1 or { p1 }
-	local n1 = 0
+Cache.settings = {}
+Cache.max_size = 1e999
+Cache.data = {}
 
-	while n1 < #v15 do
-		n1 += 1
+function Cache.update_settings(p, p2)
+	local v = type(p) == "table" and p or { p }
+	local count = 0
 
-		local v17 = v15[n1]
+	while count < #v do
+		count += 1
 
-		if v17:sub(1, 7) == "http://" then
-			v15[n1] = v17:sub(8)
-			v17 = v15[n1]
-		elseif v17:sub(1, 8) == "https://" then
-			v15[n1] = v17:sub(9)
-			v17 = v15[n1]
+		local v2 = v[count]
+
+		if v2:sub(1, 7) == "http://" then
+			v[count] = v2:sub(8)
+			v2 = v[count]
+		elseif v2:sub(1, 8) == "https://" then
+			v[count] = v2:sub(9)
+			v2 = v[count]
 		end
 
-		if v17:sub(1, 2) == "*." then
-			table.insert(v15, v17:sub(3))
+		if v2:sub(1, 2) == "*." then
+			table.insert(v, v2:sub(3))
 		end
 
-		if not v17:find("/") then
-			table.insert(v15, v17 .. "/")
-			table.insert(v15, v17 .. "/*")
+		if v2:find("/") then
+			continue
 		end
+
+		table.insert(v, v2 .. "/")
+		table.insert(v, v2 .. "/*")
 	end
 
-	for _, v in ipairs(v15) do
-		t1.settings[v] = p2
+	for _, v2 in ipairs(v) do
+		Cache.settings[v2] = p2
 
-		if p2.cache_locally == false and not p2.cache_globally then
-			t1.settings[v] = nil
+		if p2.cache_locally ~= false or p2.cache_globally then
+			continue
 		end
+
+		Cache.settings[v2] = nil
 	end
 end
-function t1.cache_locally(p3, p4) -- line: 59
-	-- upvalues: t1 (copy)
-	local v22 = p4 or {}
 
-	v22.cache_globally = false
-	t1.update_settings(p3, v22)
+function Cache.cache_locally(p, options)
+	local v = options or {}
+	v.cache_globally = false
+
+	Cache.update_settings(p, v)
 end
-function t1.cache_globally(p5, p6) -- line: 66
-	-- upvalues: t1 (copy)
-	local v25 = p6 or {}
 
-	v25.cache_globally = true
-	t1.update_settings(p5, v25)
+function Cache.cache_globally(p, options)
+	local v = options or {}
+	v.cache_globally = true
+
+	Cache.update_settings(p, v)
 end
-function t1.should_cache(p7) -- line: 77
-	-- upvalues: t1 (copy)
-	local v27 = p7:split("?")[1]
 
-	for k, _ in pairs(t1.settings) do
-		if v27:match(".*://" .. k:gsub("%*", ".*")) then
+function Cache.should_cache(value)
+	local v = value:split("?")[1]
+
+	for k, _ in pairs(Cache.settings) do
+		if v:match(".*://" .. k:gsub("%*", ".*")) then
 			return k
 		end
 	end
 
 	return false
 end
-function t1.is_cached(p8, p9) -- line: 91
-	-- upvalues: t1 (copy)
-	local v32 = t1.should_cache(p8)
-	local v33 = t1.settings[v32]
 
-	if not v32 then
+function Cache.is_cached(p, p2): boolean
+	local should_cache = Cache.should_cache(p)
+	local setting = Cache.settings[should_cache]
+
+	if not should_cache then
 		return false
 	end
 
-	if t1.data[p9] ~= nil then
-		if v33.expires and tick() - t1.data[p9].timestamp > v33.expires then
+	if Cache.data[p2] == nil then
+		if not Cache.settings[should_cache].cache_globally then
 			return false
 		end
 
-		return true
+		return if Cache.global_cache_index[p2] then true else false
 	end
 
-	if t1.settings[v32].cache_globally then
-		if t1.global_cache_index[p9] then
-			return true
-		end
-
-		return false
-	end
-
-	return false
+	return not (setting.expires and tick() - Cache.data[p2].timestamp > setting.expires)
 end
 
-t1.global_cache_index = {}
+Cache.global_cache_index = {}
+local v = {}
 
-local t2 = {}
-local ok, result = pcall(function() -- line: 127
-	-- upvalues: DataStoreService (copy)
+local success, result = pcall(function()
 	return DataStoreService:GetDataStore("HttpRequestsCache")
 end)
 
-if ok then
-	local ok2, result2 = pcall(function() -- line: 132
-		-- upvalues: result (copy)
+if success then
+	local success2, result2 = pcall(function()
 		return result:GetAsync("index") or {}
 	end)
 
-	if ok2 then
-		t1.global_cache_index = result2
-		t1.global_cache_update_interval = 20
-		coroutine.wrap(function() -- line: 140
-			-- upvalues: t1 (copy), t2 (ref), result (copy), dlog (copy), v5 (copy), MessagingService (copy), json (copy)
-			while wait(t1.global_cache_update_interval) do
-				pcall(function() -- line: 142
-					-- upvalues: t2 (ref), result (copy), dlog (copy), t1 (copy), v5 (copy), MessagingService (copy), json (copy)
-					local n2 = 0
+	if success2 then
+		Cache.global_cache_index = result2
 
-					for k, v in pairs(t2) do
-						result:SetAsync(k, v)
-						n2 += 1
+		Cache.global_cache_update_interval = 20
+
+		coroutine.wrap(function()
+			while wait(Cache.global_cache_update_interval) do
+				pcall(function()
+					local count = 0
+
+					for k, v2 in pairs(v) do
+						result:SetAsync(k, v2)
+						count += 1
 					end
 
-					if n2 > 0 then
-						dlog(("pushing %s requests to global cache index"):format(n2))
+					if count > 0 then
+						dlog(("pushing %s requests to global cache index"):format(count))
 					end
 
-					local t3 = {}
+					local v2 = {}
 
-					result:UpdateAsync("index", function(p10) -- line: 155
-						-- upvalues: t2 (ref), t3 (copy), t1 (copy)
-						local v53 = p10 or {}
+					result:UpdateAsync("index", function(options)
+						local result3 = options or {}
 
-						for k, _ in pairs(t2) do
-							table.insert(t3, k)
-							v53[k] = true
-							t1.global_cache_index[k] = true
+						for k, _ in pairs(v) do
+							table.insert(v2, k)
+
+							result3[k] = true
+							Cache.global_cache_index[k] = true
 						end
 
-						return v53
+						return result3
 					end)
 
-					if not v5 then
-						MessagingService:PublishAsync("RequestsCacheIndex", json.enc(t3))
+					if not isStudio then
+						MessagingService:PublishAsync("RequestsCacheIndex", json.enc(v2))
 					end
 
-					t2 = {}
+					v = {}
 				end)
 			end
 		end)()
 
-		if not v5 then
-			MessagingService:SubscribeAsync("RequestsCacheIndex", function(p11) -- line: 177
-				-- upvalues: json (copy), t1 (copy)
-				local v35 = json.dec(p11.Data)
+		if not isStudio then
+			MessagingService:SubscribeAsync("RequestsCacheIndex", function(p)
+				local dec = json.dec(p.Data)
 
-				for _, v in ipairs(v35) do
-					t1.global_cache_index[v] = true
+				for _, v2 in ipairs(dec) do
+					Cache.global_cache_index[v2] = true
 				end
 			end)
 		end
 	end
 end
 
-function t1.get_expire(p12) -- line: 192
-	-- upvalues: t1 (copy)
-	local v39 = t1.should_cache(p12)
+function Cache.get_expire(p)
+	local should_cache = Cache.should_cache(p)
 
-	return t1.settings[v39].expires or 1e999
+	return Cache.settings[should_cache].expires or 1e999
 end
-function t1.get_cached(p13, p14) -- line: 198
-	-- upvalues: t1 (copy), ok (copy), dlog (copy), result (copy)
-	local v42 = t1.should_cache(p13)
-	local v43 = t1.data[p14]
 
-	if v43 then
-		return v43, "local"
+function Cache.get_cached(p, p2)
+	local should_cache = Cache.should_cache(p)
+
+	local v2 = Cache.data[p2]
+
+	if v2 then
+		return v2, "local"
 	end
 
-	if ok and t1.settings[v42].cache_globally then
-		dlog("accessing datastore cache for", p14)
+	if success and Cache.settings[should_cache].cache_globally then
+		dlog("accessing datastore cache for", p2)
 
-		return result:GetAsync(p14), "global"
-	end
-end
-function t1.update_cache(p15, p16, p17) -- line: 214
-	-- upvalues: t1 (copy), ok (copy), dlog (copy), t2 (ref)
-	print(("[http] %s added to cache"):format(p15))
-	p17.timestamp = tick()
-	t1.data[p16] = p17
-
-	local v47 = t1.should_cache(p15)
-
-	if ok and t1.settings[v47].cache_globally then
-		dlog("queued", p16)
-		t2[p16] = p17
-
-		return
+		return result:GetAsync(p2), "global"
 	end
 end
 
-return t1
+function Cache.update_cache(p, p2, p3)
+	print(("[http] %s added to cache"):format(p))
+
+	p3.timestamp = tick()
+
+	Cache.data[p2] = p3
+
+	local should_cache = Cache.should_cache(p)
+
+	if success and Cache.settings[should_cache].cache_globally then
+		dlog("queued", p2)
+		v[p2] = p3
+	end
+end
+
+return Cache

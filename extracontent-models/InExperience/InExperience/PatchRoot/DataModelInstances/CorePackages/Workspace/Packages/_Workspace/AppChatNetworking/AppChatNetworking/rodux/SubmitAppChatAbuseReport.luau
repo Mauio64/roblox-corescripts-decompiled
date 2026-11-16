@@ -1,7 +1,9 @@
-local Parent = script:FindFirstAncestor("AppChatNetworking").Parent
-local Http = require(Parent.Http)
+local parent = script:FindFirstAncestor("AppChatNetworking").Parent
+local Http = require(parent.Http)
+
 local RoduxNetworking = require(script.Parent.RoduxNetworking)
-local t1 = {
+
+local v = {
 	ABUSE_TYPE_PROFANITY = "ABUSE_CATEGORY_SWEARING",
 	ABUSE_TYPE_PRIVACY_ASKING_FOR_PII = "ABUSE_CATEGORY_PERSONAL_QUESTION",
 	ABUSE_TYPE_HARASSMENT = "ABUSE_CATEGORY_BULLYING",
@@ -13,17 +15,14 @@ local t1 = {
 	ABUSE_TYPE_OTHER = "ABUSE_CATEGORY_OTHER"
 }
 
-return RoduxNetworking.POST(script.Name, function(p1, t2: {[any]: any}) -- line: 22
-	-- upvalues: Http (copy), t1 (copy)
-	return p1(Http.Url.APIS_URL):path("abuse-reporting"):path("v1"):path("abuse-report"):body({
+return RoduxNetworking.POST(script.Name, function(callback, data)
+	return callback(Http.Url.APIS_URL):path("abuse-reporting"):path("v1"):path("abuse-report"):body({
 		abuseVector = "web_chat",
-		targetType = "user",
-		category = t1[t2.reportCategory] or t1.ABUSE_TYPE_OTHER,
-		comment = not (string.len(t2.comment) > 0) and " " or t2.comment,
-		custom = {
-			COMMUNICATION_CHANNEL_ID = t2.conversationId
-		},
-		submitterId = t2.submitterUserId,
-		targetIdStr = t2.reportedUserId
+		category = v[data.reportCategory] or "ABUSE_CATEGORY_OTHER",
+		comment = not (string.len(data.comment) > 0) and " " or data.comment,
+		custom = { COMMUNICATION_CHANNEL_ID = data.conversationId },
+		submitterId = data.submitterUserId,
+		targetIdStr = data.reportedUserId,
+		targetType = "user"
 	})
 end)

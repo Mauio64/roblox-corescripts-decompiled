@@ -1,7 +1,5 @@
-local Parent = script:FindFirstAncestor("AuthCommon").Parent
-
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 11
-	return {
-		countryCodeList = p1
-	}
+local parent = script:FindFirstAncestor("AuthCommon").Parent
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(countryCodeList)
+	return { countryCodeList = countryCodeList }
 end)

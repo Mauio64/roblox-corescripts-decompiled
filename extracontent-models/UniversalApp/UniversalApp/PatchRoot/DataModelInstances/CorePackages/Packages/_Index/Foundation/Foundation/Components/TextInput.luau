@@ -1,1 +1,3 @@
-return (require(script.TextInput))
+local TextInput = require(script.TextInput)
+
+return TextInput

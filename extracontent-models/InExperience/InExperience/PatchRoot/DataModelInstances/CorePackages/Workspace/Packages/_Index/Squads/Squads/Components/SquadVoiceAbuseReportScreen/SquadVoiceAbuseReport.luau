@@ -1,33 +1,23 @@
 local Squads = script:FindFirstAncestor("Squads")
 local HttpService = game:GetService("HttpService")
-local SquadsParent = Squads.Parent
-local AbuseReporting = require(SquadsParent.AbuseReporting)
+
+local parent = Squads.Parent
+local AbuseReporting = require(parent.AbuseReporting)
 
 require(Squads.Common.ModelTypes)
-
 local dependencies = require(Squads.dependencies)
 local Logger = require(Squads.Logger)
-local React = dependencies.React
+
+local react = dependencies.React
 local DefaultTwoStepReportFlow = AbuseReporting.UXFlows.DefaultTwoStepReportFlow
-local NetworkingSquads = dependencies.NetworkingSquads
+local networkingSquads = dependencies.NetworkingSquads
 local useDispatch = dependencies.Hooks.useDispatch
-local t1 = {
-	{
-		localizationKey = "Feature.ReportAbuse.Label.CategoryInappropriate",
-		value = "Swearing"
-	},
-	{
-		localizationKey = "Feature.ReportAbuse.Label.CategoryBullyingV2",
-		value = "Bullying"
-	},
-	{
-		localizationKey = "Feature.ReportAbuse.Label.CategoryTheft",
-		value = "Scamming"
-	},
-	{
-		localizationKey = "Feature.ReportAbuse.Label.CategoryDating",
-		value = "Dating"
-	},
+
+local reportCategories = {
+	{ localizationKey = "Feature.ReportAbuse.Label.CategoryInappropriate", value = "Swearing" },
+	{ localizationKey = "Feature.ReportAbuse.Label.CategoryBullyingV2", value = "Bullying" },
+	{ localizationKey = "Feature.ReportAbuse.Label.CategoryTheft", value = "Scamming" },
+	{ localizationKey = "Feature.ReportAbuse.Label.CategoryDating", value = "Dating" },
 	{
 		localizationKey = "Feature.ReportAbuse.Label.CategoryScamming",
 		value = "Cheating/Exploiting"
@@ -38,50 +28,43 @@ local t1 = {
 	}
 }
 
-local function SquadVoiceAbuseReport(t2: {[any]: any}) -- line: 33
-	-- upvalues: useDispatch (copy), React (copy), Logger (copy), HttpService (copy), NetworkingSquads (copy), DefaultTwoStepReportFlow (copy), t1 (copy)
-	local v14 = useDispatch()
-	local v15 = React.useCallback(function(p1, p2) -- line: 35
-		-- upvalues: Logger (copy), HttpService (copy), t2 (copy), v14 (copy), NetworkingSquads (copy)
-		Logger:info("Submitting abuse report. Reason: {}, Comment: {}, Data: {}", p1, p2, HttpService:JSONEncode(t2.reportData))
+local function SquadVoiceAbuseReport(props)
+	local v = useDispatch()
+	local onSubmit = react.useCallback(function(abuseReason, abuseComment)
+		Logger:info(
+			"Submitting abuse report. Reason: {}, Comment: {}, Data: {}",
+			abuseReason,
+			abuseComment,
+			HttpService:JSONEncode(props.reportData)
+		)
 
-		local v18, v19 = v14(NetworkingSquads.SendSquadVoiceAbuseReport.API({
-			submitterUserId = t2.reportData.submitterUserId,
-			abuserUserId = t2.reportData.abuserUserId,
-			reportBeginTimestampMs = t2.reportData.reportBeginTimestampMs,
-			voiceChannelId = t2.reportData.voiceChannelId,
-			voiceUserIds = t2.reportData.voiceUserIds,
-			voiceUserCount = t2.reportData.voiceUserCount,
-			abuseReason = p1,
-			abuseComment = p2
+		local v2, v3 = v(networkingSquads.SendSquadVoiceAbuseReport.API({
+			submitterUserId = props.reportData.submitterUserId,
+			abuserUserId = props.reportData.abuserUserId,
+			reportBeginTimestampMs = props.reportData.reportBeginTimestampMs,
+			voiceChannelId = props.reportData.voiceChannelId,
+			voiceUserIds = props.reportData.voiceUserIds,
+			voiceUserCount = props.reportData.voiceUserCount,
+			abuseReason = abuseReason,
+			abuseComment = abuseComment
 		})):await()
 
-		if v18 then
-			Logger:info("Abuse report submitted successfully. Response: {}", HttpService:JSONEncode(v19))
-
-			return v18
+		if v2 then
+			Logger:info("Abuse report submitted successfully. Response: {}", HttpService:JSONEncode(v3))
+			return v2
 		end
 
-		Logger:error("Failed to submit abuse report. Response: {}", HttpService:JSONEncode(v19))
+		Logger:error("Failed to submit abuse report. Response: {}", HttpService:JSONEncode(v3))
 
-		return v18
-	end, {
-		t2.reportData,
-		v14
-	})
+		return v2
+	end, { props.reportData, v })
 
-	return React.createElement(DefaultTwoStepReportFlow, {
+	return react.createElement(DefaultTwoStepReportFlow, {
 		analyticsContext = "Squad",
-		onSubmitProps = {
-			hasNextSteps = false,
-			onSubmit = v15
-		},
-		onCloseProps = {
-			hasPreviousSteps = false,
-			onAbandon = t2.onAbandon
-		},
-		onComplete = t2.onComplete,
-		reportCategories = t1
+		onSubmitProps = { hasNextSteps = false, onSubmit = onSubmit },
+		onCloseProps = { hasPreviousSteps = false, onAbandon = props.onAbandon },
+		onComplete = props.onComplete,
+		reportCategories = reportCategories
 	})
 end
 

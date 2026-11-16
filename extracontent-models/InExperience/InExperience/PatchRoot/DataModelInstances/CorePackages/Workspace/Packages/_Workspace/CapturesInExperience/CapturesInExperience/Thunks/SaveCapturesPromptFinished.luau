@@ -1,12 +1,13 @@
-local ParentParent = script.Parent.Parent
-local CaptureService = game:GetService("CaptureService")
-local PromptDismissed = require(ParentParent.Actions.PromptDismissed)
+local parent = script.Parent.Parent
 
-return function(p1, t1: {[any]: any}) -- line: 7
-	-- upvalues: PromptDismissed (copy), CaptureService (copy)
-	return function(p2) -- line: 8
-		-- upvalues: PromptDismissed (copy), p1 (copy), CaptureService (copy), t1 (copy)
-		p2:dispatch(PromptDismissed(p1))
-		CaptureService:OnSavePromptFinished(p1, t1)
+local CaptureService = game:GetService("CaptureService")
+
+local PromptDismissed = require(parent.Actions.PromptDismissed)
+
+return function(p, p2)
+	return function(object)
+		object:dispatch(PromptDismissed(p))
+
+		CaptureService:OnSavePromptFinished(p, p2)
 	end
 end

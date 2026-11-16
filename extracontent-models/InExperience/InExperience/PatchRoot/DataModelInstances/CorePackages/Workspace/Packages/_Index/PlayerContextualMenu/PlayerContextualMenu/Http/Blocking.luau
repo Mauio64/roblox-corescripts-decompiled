@@ -1,15 +1,15 @@
 local PlayerContextualMenu = script:FindFirstAncestor("PlayerContextualMenu")
-local PlayerContextualMenuParent = PlayerContextualMenu.Parent
-local NetworkingBlocking = require(PlayerContextualMenuParent.LuaSocialLibrariesDeps).NetworkingBlocking
-local UserBlockingNetworking = require(PlayerContextualMenuParent.UserBlockingNetworking)
+local parent = PlayerContextualMenu.Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local NetworkingBlocking = LuaSocialLibrariesDeps.NetworkingBlocking
+local UserBlockingNetworking = require(parent.UserBlockingNetworking)
+
 local RoduxNetworking = require(script.Parent.RoduxNetworking)
 
-if require(PlayerContextualMenu.Flags.FFlagUserBlockingApiPlayerContextMenuEnabled) then
-	return (UserBlockingNetworking.config({
-		roduxNetworking = RoduxNetworking
-	}))
+local FFlagUserBlockingApiPlayerContextMenuEnabled = require(PlayerContextualMenu.Flags.FFlagUserBlockingApiPlayerContextMenuEnabled)
+
+if FFlagUserBlockingApiPlayerContextMenuEnabled then
+	return (UserBlockingNetworking.config({ roduxNetworking = RoduxNetworking }))
 end
 
-return (NetworkingBlocking.config({
-	roduxNetworking = RoduxNetworking
-}))
+return (NetworkingBlocking.config({ roduxNetworking = RoduxNetworking }))

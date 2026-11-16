@@ -1,120 +1,106 @@
-local Parent = script:FindFirstAncestor("GameJoinCard").Parent
-local React = require(Parent.React)
-local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
-local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
-local HoldToPlay = require(Parent.HoldToPlay)
-local AppShortcutBarContext = require(Parent.AppShortcutBar).AppShortcutBarContext
+local parent = script:FindFirstAncestor("GameJoinCard").Parent
+
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
+local HoldToPlay = require(parent.HoldToPlay)
+local AppShortcutBar = require(parent.AppShortcutBar)
+local AppShortcutBarContext = AppShortcutBar.AppShortcutBarContext
+
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local ButtonHoldStateEnum = FocusNavigationUtils.ButtonHoldStateEnum
 local useButtonHold = FocusNavigationUtils.useButtonHold
 local Constants = HoldToPlay.Constants
 
-local function GamepadJoinFocusBehavior(t1: {[any]: any}) -- line: 21
-	-- upvalues: ReactFocusNavigation (copy), React (copy), useButtonHold (copy), Constants (copy), AppShortcutBarContext (copy), ButtonHoldStateEnum (copy), FocusNavigationEventNameEnum (copy)
-	local v13 = ReactFocusNavigation.useFocusedGuiObject()
-	local v14 = React.useRef(t1.joinExperience)
+local function GamepadJoinFocusBehavior(data): nil
+	local v = ReactFocusNavigation.useFocusedGuiObject()
 
-	v14.current = t1.joinExperience
+	local ref = React.useRef(data.joinExperience)
+	ref.current = data.joinExperience
 
-	local v15 = useButtonHold(Constants.SIGNAL_HOLD_INTENT_SECONDS, Constants.SIGNAL_HOLD_COMPLETE_SECONDS)
-	local v16 = AppShortcutBarContext.useDispatchButtonHoldStarted()
-	local v17 = AppShortcutBarContext.useDispatchButtonHoldEnded()
-	local v18 = React.useRef(false)
-	local v19 = v15.holdState == ButtonHoldStateEnum.HOLDING or (v15.holdState == ButtonHoldStateEnum.JUST_PRESSED or v15.holdState == ButtonHoldStateEnum.COMPLETED)
+	local v2 = useButtonHold(Constants.SIGNAL_HOLD_INTENT_SECONDS, Constants.SIGNAL_HOLD_COMPLETE_SECONDS)
 
-	React.useEffect(function() -- line: 39
-		-- upvalues: v18 (copy), v19 (copy), v16 (copy), FocusNavigationEventNameEnum (copy), v15 (copy), v17 (copy)
-		if not v18.current and v19 then
-			v18.current = true
-			v16(FocusNavigationEventNameEnum.HoldToJoinFriend, v15.holdProgress)
+	local v3 = AppShortcutBarContext.useDispatchButtonHoldStarted()
+	local v4 = AppShortcutBarContext.useDispatchButtonHoldEnded()
 
+	local ref2 = React.useRef(false)
+	local v5 = v2.holdState == ButtonHoldStateEnum.HOLDING
+		or v2.holdState == ButtonHoldStateEnum.JUST_PRESSED
+		or v2.holdState == ButtonHoldStateEnum.COMPLETED
+
+	React.useEffect(function()
+		if ref2.current or not v5 then
+			if ref2.current and not v5 then
+				v4(FocusNavigationEventNameEnum.HoldToJoinFriend)
+				ref2.current = false
+			end
+		else
+			ref2.current = true
+			v3(FocusNavigationEventNameEnum.HoldToJoinFriend, v2.holdProgress)
+		end
+	end, { v5, v2.holdProgress, v3, v4 })
+
+	local ref3 = React.useRef(false)
+	React.useEffect(function()
+		if v2.holdState ~= ButtonHoldStateEnum.COMPLETED then
+			ref3.current = false
 			return
 		end
 
-		if v18.current and not v19 then
-			v17(FocusNavigationEventNameEnum.HoldToJoinFriend)
-			v18.current = false
-		end
-	end, {
-		v19,
-		v15.holdProgress,
-		v16,
-		v17
-	})
-
-	local v20 = React.useRef(false)
-
-	React.useEffect(function() -- line: 57
-		-- upvalues: v15 (copy), ButtonHoldStateEnum (copy), v20 (copy), v14 (copy)
-		if v15.holdState ~= ButtonHoldStateEnum.COMPLETED then
-			v20.current = false
-
+		if ref3.current then
 			return
 		end
 
-		if v20.current then
-			return
+		ref3.current = true
+		ref.current()
+
+		if v2.cancelHold then
+			v2.cancelHold()
 		end
+	end, { v2.holdState, v2.cancelHold })
 
-		v20.current = true
-		v14.current()
-
-		if v15.cancelHold then
-			v15.cancelHold()
-		end
-	end, {
-		v15.holdState,
-		v15.cancelHold
-	})
-
-	local v21 = React.useMemo(function() -- line: 72
-		-- upvalues: FocusNavigationEventNameEnum (copy)
-		return {
-			[Enum.KeyCode.ButtonA] = FocusNavigationEventNameEnum.HoldToJoinFriend
-		}
+	local v6 = React.useMemo(function()
+		return { [Enum.KeyCode.ButtonA] = FocusNavigationEventNameEnum.HoldToJoinFriend }
 	end, {})
-	local v22 = React.useMemo(function() -- line: 78
-		-- upvalues: FocusNavigationEventNameEnum (copy), v15 (copy)
-		return {
-			[FocusNavigationEventNameEnum.HoldToJoinFriend] = {
-				handler = v15.eventHandler
-			}
-		}
-	end, { v15.eventHandler })
-	local v23 = ReactFocusNavigation.useEventMap(v21)
-	local v24 = ReactFocusNavigation.useEventHandlerMap(v22, v23)
 
-	React.useEffect(function() -- line: 90
-		-- upvalues: v24 (copy), t1 (copy), v13 (copy)
-		if not v24 then
+	local v7 = React.useMemo(function()
+		return {
+			[FocusNavigationEventNameEnum.HoldToJoinFriend] = { handler = v2.eventHandler }
+		}
+	end, { v2.eventHandler })
+
+	local v8 = ReactFocusNavigation.useEventMap(v6)
+
+	local v9 = ReactFocusNavigation.useEventHandlerMap(v7, v8)
+
+	React.useEffect(function()
+		if not v9 then
 			return
 		end
 
-		local current = t1.tileRef.current
-		local v26 = if not t1.cardRef then nil else t1.cardRef.current
-		local v27 = nil
+		local current = data.tileRef.current
+		local current2
 
-		if v13 then
-			local v28 = current and (current == v13 or v13:IsDescendantOf(current))
-			local v29 = v26 and (v26 == v13 or v13:IsDescendantOf(v26))
+		if data.cardRef then
+			current2 = data.cardRef.current
+		end
 
-			if v28 or v29 then
-				v27 = v13
+		local v10 = nil
+
+		if v then
+			local v11 = current and (v == current or v:IsDescendantOf(current))
+			local v12 = current2 and (v == current2 or v:IsDescendantOf(current2))
+
+			if v11 or v12 then
+				v10 = v
 			end
 		end
 
-		v24(v27)
-
-		return function() -- line: 105
-			-- upvalues: v24 (copy)
-			v24(nil)
+		v9(v10)
+		return function()
+			v9(nil)
 		end
-	end, {
-		v24,
-		t1.tileRef,
-		t1.cardRef,
-		v13
-	})
+	end, { v9, data.tileRef, data.cardRef, v })
 
 	return nil
 end

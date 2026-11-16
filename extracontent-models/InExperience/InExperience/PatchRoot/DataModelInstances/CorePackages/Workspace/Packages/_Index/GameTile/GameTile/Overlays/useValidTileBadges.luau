@@ -1,40 +1,37 @@
 local GameTile = script:FindFirstAncestor("GameTile")
-local GameTileParent = GameTile.Parent
-local GameInfosReducer = require(GameTileParent.GameInfosRodux).GameInfosReducer
-local React = require(GameTileParent.React)
-local useSelector = require(GameTileParent.RoactUtils).Hooks.RoactRodux.useSelector
+
+local parent = GameTile.Parent
+local GameInfosRodux = require(parent.GameInfosRodux)
+local GameInfosReducer = GameInfosRodux.GameInfosReducer
+local React = require(parent.React)
+
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
 local getGameTileLayoutData = require(GameTile.getGameTileLayoutData)
 local getValidTileBadges = require(GameTile.Overlays.getValidTileBadges)
-
 require(GameTile.GameTileTypes)
 
-local function useValidTileBadges(s1: string, s2: string?, p1) -- line: 13
-	-- upvalues: useSelector (copy), GameInfosReducer (copy), getGameTileLayoutData (copy), React (copy), getValidTileBadges (copy)
-	local v12 = useSelector(function(p2) -- line: 18
-		-- upvalues: GameInfosReducer (copy), s1 (copy)
-		return p2.Personalization[GameInfosReducer.key][s1]
-	end)
-	local v13 = getGameTileLayoutData(v12, s2)
+local function useValidTileBadges(p: string, p2: string?, p3)
+	local gameTileLayoutData = getGameTileLayoutData(useSelector(function(p4)
+		return p4.Personalization[GameInfosReducer.key][p]
+	end), p2)
 
-	return (React.useMemo(function() -- line: 25
-		-- upvalues: p1 (copy), v13 (copy), getValidTileBadges (copy)
-		local v15 = nil
+	return (React.useMemo(function()
+		local v = nil
 
-		if p1 then
-			v15 = p1
-		elseif v13 and v13.tileBadgesByPosition then
-			v15 = v13.tileBadgesByPosition
+		if p3 then
+			v = p3
+		elseif gameTileLayoutData and gameTileLayoutData.tileBadgesByPosition then
+			v = gameTileLayoutData.tileBadgesByPosition
 		end
 
-		if v15 then
-			return getValidTileBadges(v15)
+		if v then
+			return getValidTileBadges(v)
 		end
 
 		return nil
-	end, {
-		v13,
-		p1
-	}))
+	end, { gameTileLayoutData, p3 }))
 end
 
 return useValidTileBadges

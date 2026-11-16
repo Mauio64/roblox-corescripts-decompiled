@@ -1,36 +1,59 @@
 local CorePackages = game:GetService("CorePackages")
-local ShareGame = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame
-local ReducerDependencies = require(CorePackages.Workspace.Packages.NotificationsCommon).ReducerDependencies
-local PlaceInfosReducer = require(CorePackages.Workspace.Packages.PlaceInfoRodux).Reducers.PlaceInfosReducer
-local UserReducer = require(CorePackages.Workspace.Packages.UserLib).Reducers.UserReducer
-local Friends = require(CorePackages.Workspace.Packages.LegacyFriendsRodux).Reducers.Friends
-local FriendCount = require(CorePackages.Workspace.Packages.LegacyFriendsRodux).Reducers.FriendCount
+
+local CoreGui = game:GetService("CoreGui")
+local ShareGame = CoreGui.RobloxGui.Modules.Settings.Pages.ShareGame
+local NotificationsCommon = require(CorePackages.Workspace.Packages.NotificationsCommon)
+local ReducerDependencies = NotificationsCommon.ReducerDependencies
+
+local PlaceInfoRodux = require(CorePackages.Workspace.Packages.PlaceInfoRodux)
+local PlaceInfosReducer = PlaceInfoRodux.Reducers.PlaceInfosReducer
+local UserLib = require(CorePackages.Workspace.Packages.UserLib)
+local UserReducer = UserLib.Reducers.UserReducer
+local LegacyFriendsRodux = require(CorePackages.Workspace.Packages.LegacyFriendsRodux)
+local Friends = LegacyFriendsRodux.Reducers.Friends
+local LegacyFriendsRodux2 = require(CorePackages.Workspace.Packages.LegacyFriendsRodux)
+local FriendCount = LegacyFriendsRodux2.Reducers.FriendCount
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagRemoveUnusedFriendCountRoduxSlice = SharedFlags.FFlagRemoveUnusedFriendCountRoduxSlice
+
 local ConversationsSearch = require(ShareGame.Reducers.ConversationsSearch)
 local DeviceInfo = require(ShareGame.Reducers.DeviceInfo)
 local Invites = require(ShareGame.Reducers.Invites)
 local GameInfo = require(ShareGame.Reducers.GameInfo)
 local Page = require(ShareGame.Reducers.Page)
 local Toasts = require(ShareGame.Reducers.Toasts)
+
 local ShareLinksRodux = ReducerDependencies.ShareLinksRodux
-local v15 = ReducerDependencies.RoduxNetworking.installReducer()
-local v16 = ShareLinksRodux.installReducer()
+local v = ReducerDependencies.RoduxNetworking.installReducer()
+local v2 = ShareLinksRodux.installReducer()
 
-return function(p1, p2) -- line: 25
-	-- upvalues: ConversationsSearch (copy), DeviceInfo (copy), Invites (copy), Page (copy), PlaceInfosReducer (copy), Toasts (copy), UserReducer (copy), Friends (copy), FriendCount (copy), v16 (copy), GameInfo (copy), v15 (copy)
-	local v19 = p1 or {}
+return function(options, p)
+	local v3 = options or {}
 
-	return {
-		ConversationsSearch = ConversationsSearch(v19.ConversationsSearch, p2),
-		DeviceInfo = DeviceInfo(v19.DeviceInfo, p2),
-		Invites = Invites(v19.Invites, p2),
-		Page = Page(v19.Page, p2),
-		PlaceInfos = PlaceInfosReducer(v19.PlaceInfos, p2),
-		Toasts = Toasts(v19.Toasts, p2),
-		Users = UserReducer(v19.Users, p2),
-		Friends = Friends(v19.Friends, p2),
-		FriendCount = FriendCount(v19.FriendCount, p2),
-		ShareLinks = v16(v19.ShareLinks, p2),
-		GameInfo = GameInfo(v19.GameInfo, p2),
-		NetworkStatus = v15(v19.NetworkStatus, p2)
+	local v4 = {
+		ConversationsSearch = ConversationsSearch(v3.ConversationsSearch, p),
+		DeviceInfo = DeviceInfo(v3.DeviceInfo, p),
+		Invites = Invites(v3.Invites, p),
+		Page = Page(v3.Page, p),
+		PlaceInfos = PlaceInfosReducer(v3.PlaceInfos, p),
+		Toasts = Toasts(v3.Toasts, p),
+		Users = UserReducer(v3.Users, p),
+		Friends = Friends(v3.Friends, p),
+		FriendCount = 0,
+		ShareLinks = 0,
+		GameInfo = 0,
+		NetworkStatus = 0
 	}
+	local friendCount
+
+	if not FFlagRemoveUnusedFriendCountRoduxSlice then
+		friendCount = FriendCount(v3.FriendCount, p)
+	end
+
+	v4.FriendCount = friendCount
+	v4.ShareLinks = v2(v3.ShareLinks, p)
+	v4.GameInfo = GameInfo(v3.GameInfo, p)
+	v4.NetworkStatus = v(v3.NetworkStatus, p)
+	return v4
 end

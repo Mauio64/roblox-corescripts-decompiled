@@ -1,39 +1,42 @@
 local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
-local MomentsCommonParent = MomentsCommon.Parent
-local Foundation = require(MomentsCommonParent.Foundation)
-local React = require(MomentsCommonParent.React)
-local FoundationImage = Foundation.Image
+local parent = MomentsCommon.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
+local Image = Foundation.Image
 local Skeleton = Foundation.Skeleton
 local getRbxThumb = Foundation.Utility.getRbxThumb
+
 local useImageLoadingState = require(MomentsCommon.Hooks.useImageLoadingState)
+
 local MusicThumbnailIconSize = require(MomentsCommon.Enums.MusicThumbnailIconSize)
-local t1 = {
-	[MusicThumbnailIconSize.Small] = 24,
-	[MusicThumbnailIconSize.Large] = 40
-}
-local t2 = {
-	[MusicThumbnailIconSize.Small] = 2,
-	[MusicThumbnailIconSize.Large] = 4
-}
 
-return function(t3: {[any]: any}) -- line: 31
-	-- upvalues: getRbxThumb (copy), Foundation (copy), useImageLoadingState (copy), t1 (copy), React (copy), FoundationImage (copy), t2 (copy), Skeleton (copy)
-	local v13 = getRbxThumb(Foundation.Enums.ThumbnailType.Asset, t3.assetId)
-	local v14 = useImageLoadingState(v13)
-	local v15 = t1[t3.size]
+local v = { [MusicThumbnailIconSize.Small] = 24, [MusicThumbnailIconSize.Large] = 40 }
 
-	return React.createElement(FoundationImage, {
-		BackgroundTransparency = 1,
-		LayoutOrder = 1,
+local v2 = { [MusicThumbnailIconSize.Small] = 2, [MusicThumbnailIconSize.Large] = 4 }
+
+return function(p)
+	local rbxThumb = getRbxThumb(Foundation.Enums.ThumbnailType.Asset, p.assetId)
+	local v3 = useImageLoadingState(rbxThumb)
+	local v4 = v[p.size]
+
+	local createElement = React.createElement
+	local v5 = {
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		cornerRadius = UDim.new(0, t2[t3.size]),
-		Image = v13,
+		BackgroundTransparency = 1,
+		cornerRadius = UDim.new(0, v2[p.size]),
+		Image = rbxThumb,
+		LayoutOrder = 1,
 		Position = UDim2.fromScale(0.5, 0.5),
 		ScaleType = Enum.ScaleType.Fit,
-		Size = UDim2.fromOffset(v15, v15)
-	}, {
-		Skeleton = if v14 then nil else React.createElement(Skeleton, {
-			Size = UDim2.fromScale(1, 1)
-		})
-	})
+		Size = UDim2.fromOffset(v4, v4)
+	}
+	local skeleton
+
+	if not v3 then
+		skeleton = React.createElement(Skeleton, { Size = UDim2.fromScale(1, 1) })
+	end
+
+	return createElement(Image, v5, { Skeleton = skeleton })
 end

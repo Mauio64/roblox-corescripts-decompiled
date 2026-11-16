@@ -1,27 +1,25 @@
-local function flatten(p1) -- line: 2
-	-- upvalues: flatten (copy)
-	local v3 = type(p1)
+local function flatten(list)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+	local result = {}
+	local v = 1
 
-	local t1 = {}
-	local n1 = 1
+	for i = 1, #list do
+		if type(list[i]) == "table" then
+			local v2 = flatten(list[i])
 
-	for i = 1, #p1 do
-		if type(p1[i]) == "table" then
-			local v7 = flatten(p1[i])
-
-			for j = 1, #v7 do
-				t1[n1] = v7[j]
-				n1 += 1
+			for j = 1, #v2 do
+				result[v] = v2[j]
+				v += 1
 			end
 		else
-			t1[n1] = p1[i]
-			n1 += 1
+			result[v] = list[i]
+			v += 1
 		end
 	end
 
-	return t1
+	return result
 end
 
 return flatten

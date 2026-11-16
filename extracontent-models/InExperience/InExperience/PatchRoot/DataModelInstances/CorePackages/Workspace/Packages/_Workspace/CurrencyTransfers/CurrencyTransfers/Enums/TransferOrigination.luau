@@ -1,4 +1,4 @@
-local t1 = {
+local TransferOrigination = {
 	Unknown = "unknown",
 	Profile = "profile",
 	Chat = "chat",
@@ -6,12 +6,12 @@ local t1 = {
 	InExperience = "inExperience"
 }
 
-t1.toEnumInteger = {
-	[t1.Unknown] = 0,
-	[t1.Profile] = 1,
-	[t1.Chat] = 2,
-	[t1.BuyRobux] = 3,
-	[t1.InExperience] = 4
+TransferOrigination.toEnumInteger = {
+	[TransferOrigination.Unknown] = 0,
+	[TransferOrigination.Profile] = 1,
+	[TransferOrigination.Chat] = 2,
+	[TransferOrigination.BuyRobux] = 3,
+	[TransferOrigination.InExperience] = 4
 }
 
-return t1
+return TransferOrigination

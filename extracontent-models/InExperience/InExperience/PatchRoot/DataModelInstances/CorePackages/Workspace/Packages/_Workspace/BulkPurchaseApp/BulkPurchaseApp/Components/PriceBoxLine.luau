@@ -1,60 +1,79 @@
 local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
-local BulkPurchaseAppParent = BulkPurchaseApp.Parent
-local React = require(BulkPurchaseAppParent.React)
-local Foundation = require(BulkPurchaseAppParent.Foundation)
+local parent = BulkPurchaseApp.Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
+
 local PriceBoxLineLayout = require(script.Parent.PriceBoxLineLayout)
 local Price = require(script.Parent.Price)
 local PriceBoxLineVariantEnum = require(BulkPurchaseApp.Enums.PriceBoxLineVariantEnum)
 
-local function PriceBoxLine(t1: {[any]: any}) -- line: 22
-	-- upvalues: useTokens (copy), PriceBoxLineVariantEnum (copy), React (copy), PriceBoxLineLayout (copy), FoundationText (copy), View (copy), Price (copy)
-	local v13 = useTokens()
-	local t2 = {
-		LineHeight = v13.Typography.BodyLarge.LineHeight,
-		FontSize = v13.Typography.BodyLarge.FontSize,
-		Font = if t1.variant ~= PriceBoxLineVariantEnum.Danger then v13.Typography.BodyLarge.Font else v13.Typography.TitleLarge.Font
+local function PriceBoxLine(props)
+	local v = useTokens()
+	local fontStyle = {
+		LineHeight = v.Typography.BodyLarge.LineHeight,
+		FontSize = v.Typography.BodyLarge.FontSize,
+		Font = 0
 	}
-	local Default = v13.Color.Content.Default
+	local font
 
-	if t1.variant == PriceBoxLineVariantEnum.Highlight then
-		Default = v13.Color.Content.Emphasis
-	elseif t1.variant == PriceBoxLineVariantEnum.Danger then
-		Default = v13.Color.System.Alert
+	if props.variant == PriceBoxLineVariantEnum.Danger then
+		font = v.Typography.TitleLarge.Font
+	else
+		font = v.Typography.BodyLarge.Font
 	end
 
-	return React.createElement(PriceBoxLineLayout, {
-		LayoutOrder = t1.LayoutOrder,
-		startSlot = React.createElement(FoundationText, {
-			tag = "auto-xy",
-			fontStyle = t2,
-			textStyle = Default,
-			Text = t1.text
+	fontStyle.Font = font
+
+	local textStyle = v.Color.Content.Default
+
+	if props.variant == PriceBoxLineVariantEnum.Highlight then
+		textStyle = v.Color.Content.Emphasis
+	elseif props.variant == PriceBoxLineVariantEnum.Danger then
+		textStyle = v.Color.System.Alert
+	end
+
+	local createElement = React.createElement
+	local v2 = {
+		LayoutOrder = props.LayoutOrder,
+		startSlot = React.createElement(Text, {
+			fontStyle = fontStyle,
+			textStyle = textStyle,
+			Text = props.text,
+			tag = "auto-xy"
 		}),
-		endSlot = if not t1.originalPrice then React.createElement(Price, {
-			textStyle = Default,
-			fontStyle = t2,
-			amount = t1.amount
-		}) else React.createElement(View, {
-			tag = "row align-y-center gap-small auto-xy"
-		}, {
+		endSlot = 0
+	}
+	local endSlot
+
+	if props.originalPrice then
+		endSlot = React.createElement(View, { tag = "row align-y-center gap-small auto-xy" }, {
 			OriginalPrice = React.createElement(Price, {
+				textStyle = textStyle,
+				fontStyle = fontStyle,
+				amount = props.originalPrice,
 				strikethrough = true,
-				LayoutOrder = 1,
-				textStyle = Default,
-				fontStyle = t2,
-				amount = t1.originalPrice
+				LayoutOrder = 1
 			}),
 			CurrentPrice = React.createElement(Price, {
-				LayoutOrder = 2,
-				textStyle = Default,
-				fontStyle = t2,
-				amount = t1.amount
+				textStyle = textStyle,
+				fontStyle = fontStyle,
+				amount = props.amount,
+				LayoutOrder = 2
 			})
 		})
-	})
+	else
+		endSlot = React.createElement(Price, {
+			textStyle = textStyle,
+			fontStyle = fontStyle,
+			amount = props.amount
+		})
+	end
+
+	v2.endSlot = endSlot
+	return createElement(PriceBoxLineLayout, v2)
 end
 
 return PriceBoxLine

@@ -1,1 +1,3 @@
-return (require(script.SetAliasModalEntryPoint))
+local SetAliasModalEntryPoint = require(script.SetAliasModalEntryPoint)
+
+return SetAliasModalEntryPoint

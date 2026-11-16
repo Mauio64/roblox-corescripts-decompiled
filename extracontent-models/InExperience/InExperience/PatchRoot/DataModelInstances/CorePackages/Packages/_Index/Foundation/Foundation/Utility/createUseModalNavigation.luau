@@ -1,15 +1,14 @@
-local Parent = script:FindFirstAncestor("Foundation").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("Foundation").Parent
 
-local function createUseModalNavigation(p1) -- line: 16
-	-- upvalues: React (copy)
-	return function() -- line: 17
-		-- upvalues: React (copy), p1 (copy)
-		local v5 = React.useContext(p1)
+local React = require(parent.React)
+
+local function createUseModalNavigation(p)
+	return function()
+		local v = React.useContext(p)
 
 		return {
-			closeAffordanceRef = v5.closeAffordanceRef,
-			setContentStartRef = v5.setContentStartRef
+			closeAffordanceRef = v.closeAffordanceRef,
+			setContentStartRef = v.setContentStartRef
 		}
 	end
 end

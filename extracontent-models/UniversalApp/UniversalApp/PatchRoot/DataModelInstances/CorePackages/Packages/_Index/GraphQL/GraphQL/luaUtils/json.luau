@@ -1,116 +1,96 @@
-local t1 = {}
+local Json = {}
 
-local function kind_of(p1) -- line: 5
-	if type(p1) ~= "table" then
-		return (type(p1))
+local function kind_of(list)
+	if type(list) ~= "table" then
+		return (type(list))
 	end
 
-	local n1 = 1
+	local v = 1
 
-	for _ in pairs(p1) do
-		if p1[n1] == nil then
+	for _ in pairs(list) do
+		if list[v] == nil then
 			return "table"
 		end
 
-		n1 += 1
+		v += 1
 	end
 
-	if n1 == 1 then
-		return "table"
-	end
-
-	return "array"
-end
-local function escape_str(s1: string) -- line: 24
-	for i, v in ipairs({
-		"\\",
-		"\"",
-		"/",
-		"\b",
-		"\f",
-		"\n",
-		"\r",
-		"\t"
-	}) do
-		s1 = s1:gsub(v, "\\" .. ({
-			"\\",
-			"\"",
-			"/",
-			"b",
-			"f",
-			"n",
-			"r",
-			"t"
-		})[i])
-	end
-
-	return s1
+	return if v == 1 then "table" else "array"
 end
 
-function t1.stringify(p2, b1: boolean?) -- line: 33
-	-- upvalues: kind_of (copy), t1 (copy), escape_str (copy)
-	local t2 = {}
-	local v13 = kind_of(p2)
+local function escape_str(list: string)
+	local v = { "\\", "\"", "/", "b", "f", "n", "r", "t" }
 
-	if v13 == "array" then
-		if b1 then
+	for i, v2 in ipairs({ "\\", "\"", "/", "\8", "\f", "\n", "\r", "\t" }) do
+		list = list:gsub(v2, "\\" .. v[i])
+	end
+
+	return list
+end
+
+function Json.stringify(list, flag: boolean?)
+	local v = {}
+	local v2 = kind_of(list)
+
+	if v2 == "array" then
+		if flag then
 			error("Can't encode array as key.")
 		end
 
-		t2[#t2 + 1] = "["
+		v[#v + 1] = "["
 
-		for i, v in ipairs(p2) do
+		for i, item in ipairs(list) do
 			if i > 1 then
-				t2[#t2 + 1] = ", "
+				v[#v + 1] = ", "
 			end
 
-			t2[#t2 + 1] = t1.stringify(v)
+			v[#v + 1] = Json.stringify(item)
 		end
 
-		t2[#t2 + 1] = "]"
-	elseif v13 == "table" then
-		if b1 then
+		v[#v + 1] = "]"
+	elseif v2 == "table" then
+		if flag then
 			error("Can't encode table as key.")
 		end
 
-		t2[#t2 + 1] = "{"
+		v[#v + 1] = "{"
 
-		for k, v in pairs(p2) do
-			if #t2 > 1 then
-				t2[#t2 + 1] = ", "
+		for k, item in pairs(list) do
+			if #v > 1 then
+				v[#v + 1] = ", "
 			end
 
-			t2[#t2 + 1] = t1.stringify(k, true)
-			t2[#t2 + 1] = ":"
-			t2[#t2 + 1] = t1.stringify(v)
+			v[#v + 1] = Json.stringify(k, true)
+			v[#v + 1] = ":"
+			v[#v + 1] = Json.stringify(item)
 		end
 
-		t2[#t2 + 1] = "}"
+		v[#v + 1] = "}"
 	else
-		if v13 == "string" then
-			return "\"" .. escape_str(p2) .. "\""
+		if v2 == "string" then
+			return "\"" .. escape_str(list) .. "\""
 		end
 
-		if v13 == "number" then
-			if b1 then
-				return "\"" .. tostring(p2) .. "\""
+		if v2 == "number" then
+			if flag then
+				return "\"" .. tostring(list) .. "\""
 			end
 
-			return (tostring(p2))
+			return (tostring(list))
 		end
 
-		if v13 == "boolean" then
-			return (tostring(p2))
+		if v2 == "boolean" then
+			return (tostring(list))
 		end
 
-		if v13 == "nil" then
+		if v2 == "nil" then
 			return "null"
 		end
 
-		error("Unjsonifiable type: " .. v13 .. ".")
+		error("Unjsonifiable type: " .. v2 .. ".")
 	end
 
-	return table.concat(t2)
+	return table.concat(v)
 end
 
-return t1
+return Json

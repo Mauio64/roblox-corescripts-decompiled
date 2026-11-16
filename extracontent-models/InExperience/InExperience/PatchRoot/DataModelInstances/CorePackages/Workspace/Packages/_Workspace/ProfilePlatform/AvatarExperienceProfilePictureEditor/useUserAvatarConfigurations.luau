@@ -1,0 +1,4 @@
+local index = script.Parent.Parent.Parent.Parent._Index
+local useUserAvatarConfigurations = require(index.AvatarExperienceProfilePictureEditor.AvatarExperienceProfilePictureEditor.Hooks.useUserAvatarConfigurations)
+
+return useUserAvatarConfigurations

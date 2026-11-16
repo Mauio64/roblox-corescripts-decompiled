@@ -1,547 +1,646 @@
 local MessageBusService = game:GetService("MessageBusService")
-local Parent = script:FindFirstAncestor("Components").Parent
-local ParentParent = Parent.Parent
-local React = require(ParentParent.React)
-local Dash = require(ParentParent.Dash)
-local Foundation = require(ParentParent.Foundation)
-local InlineLayout = require(ParentParent.InlineLayout)
-local MarkdownCore = require(ParentParent.MarkdownCore)
+
+local parent = script:FindFirstAncestor("Components").Parent
+local parent2 = parent.Parent
+
+local React = require(parent2.React)
+local Dash = require(parent2.Dash)
+local Foundation = require(parent2.Foundation)
+local InlineLayout = require(parent2.InlineLayout)
+local MarkdownCore = require(parent2.MarkdownCore)
+
 local View = Foundation.View
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local Divider = Foundation.Divider
-local Utils = Parent.Utils
+
+local utils = parent.Utils
+
 local TextElement = InlineLayout.Components.InlineLayoutElements.TextElement
 local SelectableTextElement = InlineLayout.Components.InlineLayoutElements.SelectableTextElement
 local LinkElement = InlineLayout.Components.InlineLayoutElements.LinkElement
 local ImageElement = InlineLayout.Components.InlineLayoutElements.ImageElement
 local HardBreakElement = InlineLayout.Components.InlineLayoutElements.HardBreakElement
-local mergeContexts = require(Utils.mergeContexts)
-local processSoftBreaks = require(Utils.processSoftBreaks)
-local getCodeTextStyles = require(Utils.TextStyle).getCodeTextStyles
-local getBaseTextElementEngineTags = require(Utils.TextStyle).getBaseTextElementEngineTags
+local mergeContexts = require(utils.mergeContexts)
+local processSoftBreaks = require(utils.processSoftBreaks)
+local shouldUseTopPadding = require(utils.shouldUseTopPadding)
+local TextStyle = require(utils.TextStyle)
+local MarkdownTable = require(script.Parent.Parent.NodeRenderers.MarkdownTable)
 local renderInline = require(script.Parent.Parent.NodeRenderers.renderInline)
 local renderTag = require(script.Parent.Parent.NodeRenderers.renderTag)
 local BulletList = MarkdownCore.Components.BulletList
 
-require(Parent.Types)
+local getBaseTextElementEngineTags = TextStyle.getBaseTextElementEngineTags
+local getCodeTextStyles = TextStyle.getCodeTextStyles
+local normalizeStyleFont = TextStyle.normalizeStyleFont
 
+require(parent.Types)
 local Highlighter = MarkdownCore.Utils.Highlighter
-local getNodeTypeConfig = require(Parent.Utils.getNodeTypeConfig)
+local getNodeTypeConfig = require(parent.Utils.getNodeTypeConfig)
 local isInlineElement = InlineLayout.Utils.isInlineElement
+local Flags = MarkdownCore.Flags
+local fFlagMarkdownTables = Flags.FFlagMarkdownTables or Flags.FFlagMarkdownTagFallbacks
+
 local BuilderSans = Enum.Font.BuilderSans
-local uDim2 = UDim2.new(0, 16, 0, 16)
+local udim = UDim2.fromOffset(16, 16)
+
 local Code = Enum.Font.Code
 
-local function v31(s1: string) -- line: 43
-	print(`[Default link callback]: URL [{ s1 }] is clicked`)
+local rbxassetfontsfamiliesBuilderMonojson = Font.new(
+	"rbxasset://fonts/families/BuilderMono.json",
+	Enum.FontWeight.Regular,
+	Enum.FontStyle.Normal
+)
+
+local function fn(p: string)
+	print(`[Default link callback]: URL [{p}] is clicked`)
 end
 
-local t1 = {
-	renderers = {}
-}
+local MarkdownRenderer = { renderers = {} }
 
-local function getFontFace(p1, p2) -- line: 51
-	if p1.fontFace then
-		return p1.fontFace
+local function getFontFace(p, p2)
+	local fontFace = p.fontFace or p.font
+
+	if typeof(fontFace) == "Font" then
+		return fontFace
 	end
 
-	if p1.font then
-		return Font.fromEnum(p1.font)
+	if fontFace then
+		return Font.fromEnum(fontFace)
 	end
 
 	return Font.fromEnum(p2)
 end
-local function shouldUseTopPadding(p3) -- line: 60
-	return p3.offset ~= 0
-end
-local function render(p4, p5) -- line: 65
-	-- upvalues: t1 (copy), getNodeTypeConfig (copy)
-	if not p4 then
+
+local function render(data, p)
+	if not data then
 		return nil
 	end
 
-	local v59 = t1.renderers[p4.name]
+	local v
 
-	if not v59 then
-		warn(`No renderer found for node: { p4.name }`)
+	if fFlagMarkdownTables and p.renderers then
+		v = p.renderers
+	else
+		v = MarkdownRenderer.renderers
+	end
 
+	local v2 = v[data.name]
+
+	if not v2 then
+		warn(`No renderer found for node: {data.name}`)
 		return nil
 	end
 
-	local v60 = v59(p4, p5)
-	local v61 = getNodeTypeConfig(p4)
+	local v3 = v2(data, p)
+	local nodeTypeConfig = getNodeTypeConfig(data)
 
-	if v61 and not v61.validateRenderResult(v60) then
-		warn(`Invalid render result for node: { p4.name } { p4.text } of type: { p4.type }`)
+	if nodeTypeConfig and not nodeTypeConfig.validateRenderResult(v3) then
+		warn(`Invalid render result for node: {data.name} {data.text} of type: {data.type}`)
 	end
 
-	return v60
+	return v3
 end
-local function processChildren(p6, p7) -- line: 85
-	-- upvalues: getNodeTypeConfig (copy), render (copy)
-	local children = p6.children
+
+local function processChildren(data, p)
+	local children = data.children
 
 	if not children then
 		return {}
 	end
 
-	local v65 = getNodeTypeConfig(p6)
-	local v66 = v65 and v65.children or {}
-	local t2 = {}
+	local nodeTypeConfig = getNodeTypeConfig(data)
+	local children2 = nodeTypeConfig and nodeTypeConfig.children or {}
 
-	for _, v69 in children do
-		local type2 = v69.type
+	local result = {}
 
-		if not v66[type2] then
-			warn(`Invalid child node type. Parent node: { p6.name } { p6.text } of type: { p6.type } has invalid child node: { v69.name } { v69.text } of type: { type2 }`)
+	for _, child in children do
+		local kind = child.type
+
+		if not children2[kind] then
+			warn(`Invalid child node type. Parent node: {data.name} {data.text} of type: {data.type} has invalid child node: {child.name} {child.text} of type: {kind}`)
 		end
 
-		local v71 = render(v69, p7)
+		local v = render(child, p)
 
-		if v71 then
-			if #v71 > 0 then
-				for _, v73 in v71 do
-					table.insert(t2, v73)
-				end
+		if not v then
+			continue
+		end
+
+		if #v > 0 then
+			for _, v2 in v do
+				table.insert(result, v2)
+			end
+		else
+			table.insert(result, v)
+		end
+	end
+
+	return result
+end
+
+local function renderRoot(p, p2)
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y col",
+		BorderSizePixel = 0,
+		backgroundStyle = { Transparency = 1 }
+	}, (p2.processChildren(p, p2)))
+end
+
+local function renderHeading(p, p2)
+	local v = math.clamp(
+		(not p.attributes or type(p.attributes.depth) ~= "number") and 1 or p.attributes.depth,
+		1,
+		#p2.headerStyles
+	)
+
+	return React.createElement(View, {
+		key = tostring(p.index),
+		LayoutOrder = p.index,
+		tag = "size-full-0 auto-y"
+	}, {
+		UIPadding = shouldUseTopPadding(p) and React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 20)
+		}),
+		InlineLayout = renderInline(p, mergeContexts(p2, { textStyles = p2.headerStyles[v] }))
+	})
+end
+
+local function renderParagraph(p, p2)
+	return React.createElement(View, {
+		key = tostring(p.index),
+		LayoutOrder = p.index,
+		tag = "size-full-0 auto-y"
+	}, {
+		UIPadding = shouldUseTopPadding(p) and React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 10)
+		}),
+		InlineLayout = renderInline(p, p2)
+	})
+end
+
+local function computeLineNumbers(text: string)
+	local v = #text
+	local v2 = 0
+	local v3 = 1
+	local v4 = {}
+
+	while true do
+		local v5 = v2 <= v and string.find(text, "\n", v2, true)
+
+		if not v5 then
+			break
+		end
+
+		v4[v3] = tostring(v3)
+		v3 += 1
+		v2 = v5 + 1
+	end
+
+	v4[v3] = tostring(v3)
+	return table.concat(v4, "\n")
+end
+
+local function copyToClipboard(text) -- 1 equivalent call inferred from this helper
+	pcall(function()
+		return MessageBusService:Publish(MessageBusService:GetMessageId("ExternalContentSharing", "setClipboardText"), {
+			text = text
+		})
+	end)
+end
+local memoize = Dash.memoize(function(text)
+	return function()
+		copyToClipboard(text) -- inferred equivalent call
+	end
+end)
+
+local function renderCodeBlock(props, props2)
+	local language
+
+	if props.attributes then
+		language = props.attributes.language
+	end
+
+	local text = props.text
+	local text2
+
+	if language == "lua" then
+		text2 = Highlighter.highlight(text, props2.colorScheme)
+	else
+		text2 = text
+	end
+
+	local codeTextStyles = getCodeTextStyles(props2)
+
+	local fontStyle = { FontSize = codeTextStyles.textSize, Font = 0, LineHeight = 0 }
+	local font
+
+	if Flags.FFlagMarkdownAssistantParity then
+		font = codeTextStyles.fontFace or rbxassetfontsfamiliesBuilderMonojson
+	else
+		font = codeTextStyles.fontFace or codeTextStyles.font
+
+		if typeof(font) ~= "Font" then
+			if font then
+				font = Font.fromEnum(font)
 			else
-				table.insert(t2, v71)
+				font = Font.fromEnum(Code)
 			end
 		end
 	end
 
-	return t2
-end
-local function renderRoot(p8, p9) -- line: 117
-	-- upvalues: React (copy), View (copy)
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y col",
-		BorderSizePixel = 0,
-		backgroundStyle = {
-			Transparency = 1
-		}
-	}, (p9.processChildren(p8, p9)))
-end
-local function renderHeading(p10, p11) -- line: 128
-	-- upvalues: React (copy), View (copy), renderInline (copy), mergeContexts (copy)
-	local v78 = math.clamp((not p10.attributes or type(p10.attributes.depth) ~= "number") and 1 or p10.attributes.depth, 1, #p11.headerStyles)
+	fontStyle.Font = font
 
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y",
-		key = tostring(p10.index),
-		LayoutOrder = p10.index
-	}, {
-		UIPadding = p10.offset ~= 0 and React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, 20)
-		}),
-		InlineLayout = renderInline(p10, mergeContexts(p11, {
-			textStyles = p11.headerStyles[v78]
-		}))
-	})
-end
-local function renderParagraph(p12, p13) -- line: 147
-	-- upvalues: React (copy), View (copy), renderInline (copy)
-	return React.createElement(View, {
-		tag = "size-full-0 auto-y",
-		key = tostring(p12.index),
-		LayoutOrder = p12.index
-	}, {
-		UIPadding = p12.offset ~= 0 and React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, 10)
-		}),
-		InlineLayout = renderInline(p12, p13)
-	})
-end
-local function computeLineNumbers(s2: string) -- line: 161
-	local v82 = #s2
-	local t3 = {}
-	local n1 = 1
-	local n2 = 0
-
-	while n2 <= v82 do
-		local v86 = string.find(s2, "\n", n2, true)
-
-		if not v86 then
-			break
-		end
-
-		t3[n1] = tostring(n1)
-		n1 += 1
-		n2 = v86 + 1
-	end
-
-	t3[n1] = tostring(n1)
-
-	return table.concat(t3, "\n")
-end
-local function copyToClipboard(p14) -- line: 180
-	-- upvalues: MessageBusService (copy)
-	pcall(function() -- line: 181
-		-- upvalues: MessageBusService (copy), p14 (copy)
-		local MessageId = MessageBusService:GetMessageId("ExternalContentSharing", "setClipboardText")
-
-		return MessageBusService:Publish(MessageId, {
-			text = p14
-		})
-	end)
-end
-
-local v42 = Dash.memoize(function(p15) -- line: 189
-	-- upvalues: MessageBusService (copy)
-	return function() -- line: 190
-		-- upvalues: p15 (copy), MessageBusService (copy)
-		local v147 = p15
-
-		pcall(function() -- line: 181
-			-- upvalues: MessageBusService (copy), v147 (copy)
-			local MessageId = MessageBusService:GetMessageId("ExternalContentSharing", "setClipboardText")
-
-			return MessageBusService:Publish(MessageId, {
-				text = v147
-			})
-		end)
-	end
-end)
-
-local function renderCodeBlock(p16, p17) -- line: 195
-	-- upvalues: Highlighter (copy), getCodeTextStyles (copy), Code (copy), computeLineNumbers (copy), React (copy), View (copy), Foundation (copy), v42 (copy), FoundationText (copy), Dash (copy)
-	local v91 = if not p16.attributes then nil else p16.attributes.language
-	local text = p16.text
-	local v93 = text
-
-	if v91 == "lua" then
-		v93 = Highlighter.highlight(text, p17.colorScheme)
-	end
-
-	local v94 = getCodeTextStyles(p17)
-	local t4 = {
+	fontStyle.LineHeight = codeTextStyles.lineHeight
+	local v = {
 		TextWrapped = false,
+		fontStyle = fontStyle,
+		TextXAlignment = Enum.TextXAlignment.Left,
 		tag = "auto-xy padding-small align-y-top"
 	}
-	local t5 = {
-		FontSize = v94.textSize
-	}
-	local v97 = Code
 
-	t5.Font = if not v94.fontFace then if not v94.font then Font.fromEnum(v97) else Font.fromEnum(v94.font) else v94.fontFace
-	t5.LineHeight = v94.lineHeight
-	t4.fontStyle = t5
-	t4.TextXAlignment = Enum.TextXAlignment.Left
-
-	local t6 = {
-		RichText = true,
-		ZIndex = 1,
-		Text = v93,
+	local v2 = {
+		Text = text2,
 		textStyle = {
 			Color3 = Highlighter.getTokenColor("iden")
-		}
+		},
+		RichText = true,
+		ZIndex = 1
 	}
-	local t7 = {
-		ZIndex = 0,
-		TextSelectable = true,
+
+	local v3 = {
 		Text = text,
 		textStyle = {
-			Transparency = 0.4,
-			Color3 = Highlighter.getTokenColor("iden")
-		}
+			Color3 = Highlighter.getTokenColor("iden"),
+			Transparency = 0.4
+		},
+		ZIndex = 0,
+		TextSelectable = true
 	}
-	local v100 = p17.codeBackgroundStyles or {}
-	local v101 = v100.backgroundColor3 or Highlighter.getTokenColor("background")
-	local v102 = v100.backgroundTransparency or 0
-	local v103 = nil
-	local v104 = p17.codeSettings and p17.codeSettings.showLineNumbers
 
-	if v104 then
-		v103 = computeLineNumbers(text)
+	local codeBackgroundStyles = props2.codeBackgroundStyles or {}
+	local backgroundColor3 = codeBackgroundStyles.backgroundColor3 or Highlighter.getTokenColor("background")
+	local backgroundTransparency = codeBackgroundStyles.backgroundTransparency or 0
+
+	local showLineNumbers = props2.codeSettings and props2.codeSettings.showLineNumbers
+	local text3
+
+	if showLineNumbers then
+		text3 = computeLineNumbers(text)
 	end
 
-	local v105 = p17.codeSettings and p17.codeSettings.showCopyButton
+	local showCopyButton = props2.codeSettings and props2.codeSettings.showCopyButton
 
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v4 = {
+		key = tostring(props.index),
+		LayoutOrder = props.index,
 		tag = "size-full-0 auto-y col",
-		BorderSizePixel = 0,
-		key = tostring(p16.index),
-		LayoutOrder = p16.index,
-		backgroundStyle = {
-			Transparency = 1
-		}
-	}, {
-		UIPadding = React.createElement("UIPadding", {
-			PaddingTop = if p16.offset == 0 then nil else UDim.new(0, 10),
+		backgroundStyle = { Transparency = 1 },
+		BorderSizePixel = 0
+	}
+
+	local createElement2 = React.createElement
+	local paddingTop
+
+	if shouldUseTopPadding(props) then
+		paddingTop = UDim.new(0, 10)
+	end
+
+	local children = {
+		UIPadding = createElement2("UIPadding", {
+			PaddingTop = paddingTop,
 			PaddingBottom = UDim.new(0, 10)
 		}),
-		TitleBar = if not v105 then nil else React.createElement(Foundation.View, {
-			tag = "size-full-0 auto-y row align-x-right bg-shift-300 radius-small",
-			LayoutOrder = 1
-		}, {
-			CopyToClipboardButton = React.createElement(Foundation.IconButton, {
-				size = Foundation.Enums.InputSize.Small,
-				icon = {
-					name = Foundation.Enums.IconName.TwoStackedSquares
-				},
-				onActivated = v42(text)
-			})
-		}),
-		CodeWrapper = React.createElement(Foundation.View, {
-			LayoutOrder = 2,
-			tag = {
-				["size-full-0 auto-y"] = true,
-				["row align-y-center"] = v104
+		TitleBar = 0,
+		CodeWrapper = 0
+	}
+	local titleBar
+
+	if showCopyButton then
+		titleBar = React.createElement(
+			Foundation.View,
+			{
+				tag = "size-full-0 auto-y row align-x-right bg-shift-300 radius-small",
+				LayoutOrder = 1
+			},
+			{
+				CopyToClipboardButton = React.createElement(Foundation.IconButton, {
+					size = Foundation.Enums.InputSize.Small,
+					icon = { name = Foundation.Enums.IconName.TwoStackedSquares },
+					onActivated = memoize(text)
+				})
 			}
-		}, {
-			LineNumbers = if not v104 then nil else React.createElement(Foundation.Text, {
-				LayoutOrder = 1,
-				tag = "size-0-0 auto-xy text-align-x-right text-align-y-center padding-small bg-shift-100 content-emphasis",
-				Text = v103,
-				fontStyle = t4.fontStyle
-			}),
-			ScrollFrameWrapper = React.createElement(Foundation.View, {
-				tag = "size-full-0 auto-y fill",
-				LayoutOrder = 2,
-				Size = UDim2.fromScale(1, 0)
-			}, {
+		)
+	end
+
+	children.TitleBar = titleBar
+
+	local createElement3 = React.createElement
+	local view = Foundation.View
+	local lineNumbers
+
+	if showLineNumbers then
+		lineNumbers = React.createElement(Foundation.Text, {
+			Text = text3,
+			fontStyle = v.fontStyle,
+			LayoutOrder = 1,
+			tag = "size-0-0 auto-xy text-align-x-right text-align-y-center padding-small bg-shift-100 content-emphasis"
+		})
+	end
+
+	children.CodeWrapper = createElement3(view, {
+		LayoutOrder = 2,
+		tag = { ["size-full-0 auto-y"] = true, ["row align-y-center"] = showLineNumbers }
+	}, {
+		LineNumbers = lineNumbers,
+		ScrollFrameWrapper = React.createElement(
+			Foundation.View,
+			{ tag = "size-full-0 auto-y fill", Size = UDim2.fromScale(1, 0), LayoutOrder = 2 },
+			{
 				ScrollFrame = React.createElement("ScrollingFrame", {
+					BackgroundColor3 = backgroundColor3,
+					BackgroundTransparency = backgroundTransparency,
 					BorderSizePixel = 0,
-					BackgroundColor3 = v101,
-					BackgroundTransparency = v102,
 					ScrollingDirection = Enum.ScrollingDirection.X,
 					Size = UDim2.fromScale(1, 0),
 					AutomaticSize = Enum.AutomaticSize.Y,
 					AutomaticCanvasSize = Enum.AutomaticSize.X
 				}, {
-					HighlightedCode = React.createElement(FoundationText, Dash.join(t4, t6)),
-					SelectableCodeWrapper = React.createElement(Foundation.View, {
-						tag = t4.tag
-					}, {
+					HighlightedCode = React.createElement(Text, Dash.join(v, v2)),
+					SelectableCodeWrapper = React.createElement(Foundation.View, { tag = v.tag }, {
 						SelectableCode = React.createElement("TextBox", {
+							Text = v3.Text,
+							FontFace = v.fontStyle.Font,
+							TextSize = v.fontStyle.FontSize,
+							TextColor3 = v3.textStyle.Color3,
+							TextTransparency = v3.textStyle.Transparency,
 							BackgroundTransparency = 1,
-							TextEditable = false,
-							TextWrapped = false,
-							ClearTextOnFocus = false,
-							Text = t7.Text,
-							FontFace = t4.fontStyle.Font,
-							TextSize = t4.fontStyle.FontSize,
-							TextColor3 = t7.textStyle.Color3,
-							TextTransparency = t7.textStyle.Transparency,
 							TextXAlignment = Enum.TextXAlignment.Left,
 							TextYAlignment = Enum.TextYAlignment.Center,
-							ZIndex = t7.ZIndex,
+							TextEditable = false,
+							ZIndex = v3.ZIndex,
 							Size = UDim2.fromScale(0, 0),
 							AutomaticSize = Enum.AutomaticSize.XY,
-							LineHeight = p17.codeStyles.lineHeight
+							TextWrapped = false,
+							ClearTextOnFocus = false,
+							LineHeight = props2.codeStyles.lineHeight
 						})
 					})
 				})
-			})
-		})
+			}
+		)
 	})
+	return createElement(View, v4, children)
 end
-local function renderList(p18, p19) -- line: 336
-	-- upvalues: React (copy), View (copy), render (copy), Dash (copy), BulletList (copy), BuilderSans (copy)
-	local t8 = {}
-	local v109 = nil
 
-	for i = #p18.children, 1, -1 do
-		local v111 = p18.children[i]
+local function renderList(p, p2)
+	local v = nil
+	local items = {}
 
-		if v111.name == "LIST" then
-			v109 = v111
-		elseif v109 then
-			table.insert(t8, 1, {
-				Prefix = if not v111.attributes then nil else v111.attributes.prefix,
+	for i = #p.children, 1, -1 do
+		local child = p.children[i]
+
+		if child.name == "LIST" then
+			v = child
+		elseif v then
+			local prefix
+
+			if child.attributes then
+				prefix = child.attributes.prefix
+			end
+
+			local children = {
+				Prefix = prefix,
 				Item = React.createElement(View, {
 					tag = "size-full-0 auto-y col",
 					BorderSizePixel = 0,
-					backgroundStyle = {
-						Transparency = 1
-					}
+					backgroundStyle = { Transparency = 1 }
 				}, {
-					Item = render(Dash.join(v111, {
-						index = 1
-					}), p19),
-					List = render(Dash.join(v109, {
-						index = 2
-					}), p19)
+					Item = render(Dash.join(child, { index = 1 }), p2),
+					List = render(Dash.join(v, { index = 2 }), p2)
 				})
-			})
-			v109 = nil
+			}
+			table.insert(items, 1, children)
+			v = nil
 		else
-			table.insert(t8, 1, {
-				Prefix = if not v111.attributes then nil else v111.attributes.prefix,
-				Item = render(v111, p19)
-			})
+			local prefix
+
+			if child.attributes then
+				prefix = child.attributes.prefix
+			end
+
+			local v2 = { Prefix = prefix, Item = render(child, p2) }
+			table.insert(items, 1, v2)
 		end
 	end
 
 	local createElement = React.createElement
-	local v113 = BulletList
-	local t9 = {
+	local v2 = {
+		key = tostring(p.index),
+		LayoutOrder = p.index,
+		Items = items,
 		TextWrapped = true,
-		tag = "size-full-0 auto-y",
-		key = tostring(p18.index),
-		LayoutOrder = p18.index,
-		Items = t8
+		ListStyle = 0,
+		tag = "size-full-0 auto-y"
 	}
-	local t10 = {}
-	local textStyles = p19.textStyles
-	local v117 = BuilderSans
+	local font
 
-	t10.Font = if not textStyles.fontFace then if not textStyles.font then Font.fromEnum(v117) else Font.fromEnum(textStyles.font) else textStyles.fontFace
-	t10.TextColor = if typeof(p19.textStyles.color) ~= "string" then p19.textStyles.color else Color3.fromHex(p19.textStyles.color)
-	t10.TextSize = p19.textStyles.textSize
-	t10.LineHeight = p19.textStyles.textSize
-	t9.ListStyle = t10
+	if Flags.FFlagMarkdownAssistantParity then
+		font = p2.textStyles.fontFace
+	else
+		local textStyles = p2.textStyles
+		font = textStyles.fontFace or textStyles.font
 
-	return createElement(v113, t9, {
-		UIPadding = p18.offset ~= 0 and React.createElement("UIPadding", {
+		if typeof(font) ~= "Font" then
+			if font then
+				font = Font.fromEnum(font)
+			else
+				font = Font.fromEnum(BuilderSans)
+			end
+		end
+	end
+
+	local textColor
+
+	if typeof(p2.textStyles.color) == "string" then
+		textColor = Color3.fromHex(p2.textStyles.color)
+	else
+		textColor = p2.textStyles.color
+	end
+
+	v2.ListStyle = {
+		Font = font,
+		TextColor = textColor,
+		TextSize = p2.textStyles.textSize,
+		LineHeight = p2.textStyles.textSize
+	}
+	return createElement(BulletList, v2, {
+		UIPadding = shouldUseTopPadding(p) and React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, 10)
 		})
 	})
 end
-local function renderListItem(p20, p21) -- line: 403
-	-- upvalues: React (copy), View (copy), renderInline (copy)
+
+local function renderListItem(p, p2)
 	return React.createElement(View, {
-		tag = "size-full-0 auto-y",
-		key = tostring(p20.index),
-		LayoutOrder = p20.index
+		key = tostring(p.index),
+		LayoutOrder = p.index,
+		tag = "size-full-0 auto-y"
 	}, {
-		InlineLayout = renderInline(p20, p21)
+		InlineLayout = renderInline(p, p2)
 	})
 end
-local function renderStyledText(p22, p23) -- line: 413
-	-- upvalues: Dash (copy), mergeContexts (copy)
-	local v122 = if not p22.attributes or not p22.attributes.style then nil else p22.attributes.style
-	local t11 = {}
 
-	if v122 == "BOLD" or v122 == "BOLD_2" then
-		t11.bold = true
-	elseif v122 == "ITALIC" or v122 == "ITALIC_2" then
-		t11.italic = true
-	elseif v122 == "STRIKE" then
-		t11.strike = true
-	elseif v122 == "INLINE_CODE" then
-		local codeStyles = p23.codeStyles
+local function renderStyledText(p, p2)
+	local style
 
-		t11 = Dash.joinDeep(codeStyles, {
-			selectable = true
-		})
+	if p.attributes and p.attributes.style then
+		style = p.attributes.style
 	end
 
-	return (p23.processChildren(p22, mergeContexts(p23, {
-		textStyles = t11
-	})))
-end
-local function renderText(p24, p25) -- line: 429
-	-- upvalues: processSoftBreaks (copy), getBaseTextElementEngineTags (copy), BuilderSans (copy), SelectableTextElement (copy), TextElement (copy)
-	local t12 = {
-		LayoutOrder = p24.index,
-		Text = processSoftBreaks(p24.text),
-		EngineTags = getBaseTextElementEngineTags(p25.textStyles)
-	}
-	local t13 = {}
-	local textStyles = p25.textStyles
-	local v130 = BuilderSans
+	local textStyles = {}
 
-	t13.Font = if not textStyles.fontFace then if not textStyles.font then Font.fromEnum(v130) else Font.fromEnum(textStyles.font) else textStyles.fontFace
-	t13.FontSize = p25.textStyles.textSize
-	t12.fontStyle = t13
-	t12.textStyle = {
-		Color3 = if typeof(p25.textStyles.color) ~= "string" then p25.textStyles.color else Color3.fromHex(p25.textStyles.color),
-		Transparency = p25.textStyles.transparency
-	}
-	t12.viewTags = p25.textStyles.viewTags
-
-	if p25.textStyles.selectable then
-		return SelectableTextElement.new(t12)
+	if style == "BOLD" or style == "BOLD_2" then
+		textStyles.bold = true
+	elseif style == "ITALIC" or style == "ITALIC_2" then
+		textStyles.italic = true
+	elseif style == "UNDERLINE" then
+		textStyles.underline = true
+	elseif style == "STRIKE" then
+		textStyles.strike = true
+	elseif style == "INLINE_CODE" then
+		local codeStyles = p2.codeStyles
+		textStyles = Dash.joinDeep(codeStyles, { selectable = true })
 	end
 
-	return TextElement.new(t12)
+	return (p2.processChildren(p, mergeContexts(p2, { textStyles = textStyles })))
 end
-local function renderHardBreak() -- line: 453
-	-- upvalues: HardBreakElement (copy)
+
+local function renderText(p, p2)
+	local v = {
+		LayoutOrder = p.index,
+		Text = processSoftBreaks(p.text),
+		EngineTags = getBaseTextElementEngineTags(p2.textStyles),
+		fontStyle = 0,
+		textStyle = 0,
+		viewTags = 0,
+		tag = 0
+	}
+	local font
+
+	if Flags.FFlagMarkdownAssistantParity then
+		font = p2.textStyles.fontFace
+	else
+		local textStyles = p2.textStyles
+		font = textStyles.fontFace or textStyles.font
+
+		if typeof(font) ~= "Font" then
+			if font then
+				font = Font.fromEnum(font)
+			else
+				font = Font.fromEnum(BuilderSans)
+			end
+		end
+	end
+
+	v.fontStyle = { Font = font, FontSize = p2.textStyles.textSize }
+	local color
+
+	if typeof(p2.textStyles.color) == "string" then
+		color = Color3.fromHex(p2.textStyles.color)
+	else
+		color = p2.textStyles.color
+	end
+
+	v.textStyle = { Color3 = color, Transparency = p2.textStyles.transparency }
+
+	v.viewTags = p2.textStyles.viewTags
+	local tag
+
+	if Flags.FFlagMarkdownTables then
+		tag = p2.textStyles.textTags
+	end
+
+	v.tag = tag
+
+	if p2.textStyles.selectable then
+		return SelectableTextElement.new(v)
+	end
+
+	return TextElement.new(v)
+end
+
+local function renderHardBreak()
 	return HardBreakElement
 end
-local function renderLink(p26, p27) -- line: 457
-	-- upvalues: mergeContexts (copy), Dash (copy), isInlineElement (copy), HardBreakElement (copy), LinkElement (copy)
-	local v133 = p26.attributes and p26.attributes.url or (p26.url or "")
-	local v134 = p27.processChildren(p26, mergeContexts(p27, {
-		textStyles = {
-			color = p27.linkStyles.linkColor
-		}
+
+local function renderLink(p, data)
+	local url = p.attributes and p.attributes.url or p.url or ""
+	local v = data.processChildren(p, mergeContexts(data, {
+		textStyles = { color = data.linkStyles.linkColor }
 	}))
-	local v135 = Dash.filter(v134, function(p28) -- line: 467
-		-- upvalues: isInlineElement (copy), HardBreakElement (copy)
-		return isInlineElement(p28) and p28 ~= HardBreakElement
+
+	local filtered = Dash.filter(v, function(p2)
+		return isInlineElement(p2) and p2 ~= HardBreakElement
 	end)
 
-	return LinkElement.new(v135, {
-		onActivated = function() -- line: 471
-			-- upvalues: p27 (copy), v133 (copy)
-			p27.linkCallback(v133)
+	return LinkElement.new(filtered, {
+		onActivated = function()
+			data.linkCallback(url)
 		end
 	})
 end
-local function renderThematicBreak(p29) -- line: 477
-	-- upvalues: React (copy), View (copy), Divider (copy)
+
+local function renderThematicBreak(p)
 	return React.createElement(View, {
+		key = tostring(p.index),
 		tag = "size-full-0 auto-y",
-		key = tostring(p29.index),
-		LayoutOrder = p29.index
+		LayoutOrder = p.index
 	}, {
-		UIPadding = p29.offset ~= 0 and React.createElement("UIPadding", {
+		UIPadding = shouldUseTopPadding(p) and React.createElement("UIPadding", {
 			PaddingTop = UDim.new(0, 10)
 		}),
 		Divider = React.createElement(Divider)
 	})
 end
-local function renderBlockquote(p30, p31) -- line: 492
-	-- upvalues: React (copy), View (copy), renderInline (copy), mergeContexts (copy)
+
+local function renderBlockquote(p, p2)
 	return React.createElement(View, {
+		key = tostring(p.index),
+		LayoutOrder = p.index,
 		tag = "size-full-0 auto-y padding-small",
-		key = tostring(p30.index),
-		LayoutOrder = p30.index,
-		backgroundStyle = {
-			Transparency = 1
-		}
+		backgroundStyle = { Transparency = 1 }
 	}, {
 		InlineLayoutWrapper = React.createElement(View, {
-			tag = "size-full-0 auto-y",
-			backgroundStyle = {
-				Transparency = 0.9,
-				Color3 = Color3.fromRGB(163, 162, 165)
-			}
+			backgroundStyle = { Transparency = 0.9, Color3 = Color3.fromRGB(163, 162, 165) },
+			tag = "size-full-0 auto-y"
 		}, {
-			InlineLayout = renderInline(p30, mergeContexts(p31, {
-				textStyles = {
-					italic = true,
-					transparency = 0.5
-				}
+			InlineLayout = renderInline(p, mergeContexts(p2, {
+				textStyles = { italic = true, transparency = 0.5 }
 			}))
 		})
 	})
 end
-local function renderImage(p32, p33) -- line: 516
-	-- upvalues: ImageElement (copy)
-	local v141 = p32.attributes and p32.attributes.url or (p32.url or nil)
 
+local function renderImage(data, p)
+	local url = data.attributes and data.attributes.url or data.url or nil
 	return ImageElement.new({
-		LayoutOrder = p32.index,
-		Image = v141,
-		Size = p33.imageStyles.size,
+		LayoutOrder = data.index,
+		Image = url,
+		Size = p.imageStyles.size,
 		backgroundStyle = {
-			Transparency = p33.imageStyles.backgroundTransparency,
-			Color3 = p33.imageStyles.backgroundColor3
+			Transparency = p.imageStyles.backgroundTransparency,
+			Color3 = p.imageStyles.backgroundColor3
 		},
-		imageStyle = {
-			Transparency = p33.imageStyles.transparency
-		},
-		ScaleType = p33.imageStyles.scaleType,
-		ResampleMode = p33.imageStyles.resampleMode,
-		tag = p33.imageStyles.tags
+		imageStyle = { Transparency = p.imageStyles.transparency },
+		ScaleType = p.imageStyles.scaleType,
+		ResampleMode = p.imageStyles.resampleMode,
+		tag = p.imageStyles.tags
 	})
 end
 
-t1.defaultRenderers = {
-	ROOT = renderRoot,
+MarkdownRenderer.defaultRenderers = {
+	["ROOT"] = renderRoot,
 	HEADING = renderHeading,
 	PARAGRAPH = renderParagraph,
 	CODE_BLOCK = renderCodeBlock,
@@ -558,54 +657,103 @@ t1.defaultRenderers = {
 	LINE_BREAK = renderHardBreak
 }
 
-function t1.render(p34, t14: {[any]: any}) -- line: 561
-	-- upvalues: t1 (copy), Dash (copy), BuilderSans (copy), Code (copy), uDim2 (copy), v31 (copy), processChildren (copy), render (copy)
-	t1.renderers = t14.userRenderers
-
-	local v144 = table.clone(t14.markdownRendererProps or {})
-	local v145 = Dash.joinDeep({
-		isInline = false,
-		textStyles = {
-			textSize = 18,
-			font = BuilderSans
-		},
-		codeStyles = {
-			textSize = 18,
-			lineHeight = 1.111,
-			font = Code
-		},
-		headerStyles = {
-			[1] = {
-				textSize = 54,
-				font = BuilderSans
-			},
-			[2] = {
-				textSize = 45,
-				font = BuilderSans
-			},
-			[3] = {
-				textSize = 36,
-				font = BuilderSans
-			},
-			[4] = {
-				textSize = 27,
-				font = BuilderSans
-			}
-		},
-		imageStyles = {
-			size = uDim2
-		},
-		linkStyles = {
-			linkColor = `#{ t14.tokens.Color.Content.Link.Color3:ToHex() }`
-		},
-		linkCallback = t14.linkCallback or v31,
-		colorScheme = t14.colorScheme,
-		processChildren = processChildren
-	}, v144)
-
-	table.freeze(v145)
-
-	return (render(p34, v145))
+if Flags.FFlagMarkdownTables then
+	MarkdownRenderer.defaultRenderers.TABLE = MarkdownTable.renderTable
+	MarkdownRenderer.defaultRenderers.TABLE_ROW = MarkdownTable.renderTableRow
+	MarkdownRenderer.defaultRenderers.TABLE_HEADER = MarkdownTable.renderTableRow
+	MarkdownRenderer.defaultRenderers.TABLE_CELL = MarkdownTable.renderTableCell
 end
 
-return t1
+if Flags.FFlagMarkdownTagFallbacks then
+	MarkdownRenderer.defaultRenderers.ACTION = renderText
+end
+
+function MarkdownRenderer.render(p, data)
+	MarkdownRenderer.renderers = data.userRenderers
+
+	local clone = table.clone(data.markdownRendererProps or {})
+	local v
+
+	if Flags.FFlagMarkdownAssistantParity then
+		clone.textStyles = normalizeStyleFont(clone.textStyles)
+		clone.codeStyles = normalizeStyleFont(clone.codeStyles)
+
+		if clone.headerStyles then
+			clone.headerStyles = Dash.map(clone.headerStyles, normalizeStyleFont)
+		end
+
+		local bodyMedium = data.tokens.Typography.BodyMedium
+		local fontFace = normalizeStyleFont({ font = bodyMedium.Font }).fontFace
+		local fontSize = bodyMedium.FontSize
+
+		v = {
+			textStyles = { textSize = fontSize, fontFace = fontFace },
+			codeStyles = {
+				textSize = fontSize,
+				fontFace = rbxassetfontsfamiliesBuilderMonojson,
+				lineHeight = 1.111
+			},
+			headerStyles = {
+				{
+					textSize = fontSize * 3,
+					fontFace = fontFace
+				},
+				{
+					textSize = fontSize * 2.5,
+					fontFace = fontFace
+				},
+				{
+					textSize = fontSize * 2,
+					fontFace = fontFace
+				},
+				{
+					textSize = fontSize * 1.5,
+					fontFace = fontFace
+				},
+				{
+					textSize = fontSize * 1.5,
+					fontFace = fontFace
+				},
+				{
+					textSize = fontSize * 1.5,
+					fontFace = fontFace
+				}
+			}
+		}
+	else
+		v = {
+			textStyles = { textSize = 18, font = BuilderSans },
+			codeStyles = { textSize = 18, font = Code, lineHeight = 1.111 },
+			headerStyles = {
+				{ textSize = 54, font = BuilderSans },
+				{ textSize = 45, font = BuilderSans },
+				{ textSize = 36, font = BuilderSans },
+				{ textSize = 27, font = BuilderSans }
+			}
+		}
+	end
+
+	local joinDeep = Dash.joinDeep({
+		textStyles = v.textStyles,
+		codeStyles = v.codeStyles,
+		headerStyles = v.headerStyles,
+		imageStyles = { size = udim },
+		linkStyles = {
+			linkColor = `#{data.tokens.Color.Content.Link.Color3:ToHex()}`
+		},
+		isInline = false,
+		linkCallback = data.linkCallback or fn,
+		colorScheme = data.colorScheme,
+		processChildren = processChildren
+	}, clone)
+
+	if fFlagMarkdownTables then
+		joinDeep.renderers = data.userRenderers
+	end
+
+	table.freeze(joinDeep)
+
+	return render(p, joinDeep)
+end
+
+return MarkdownRenderer

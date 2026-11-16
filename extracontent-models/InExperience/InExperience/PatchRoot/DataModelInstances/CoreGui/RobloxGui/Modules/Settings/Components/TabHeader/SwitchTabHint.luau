@@ -1,69 +1,69 @@
 local CorePackages = game:GetService("CorePackages")
 local UserInputService = game:GetService("UserInputService")
+
 local React = require(CorePackages.Packages.React)
 local ReactUtils = require(CorePackages.Packages.ReactUtils)
 local Foundation = require(CorePackages.Packages.Foundation)
+
 local HelpPage = require(CorePackages.Workspace.Packages.HelpPage)
+
 local useEventConnection = ReactUtils.useEventConnection
 local Icon = Foundation.Icon
 local useTokens = Foundation.Hooks.useTokens
 local HELP_PAGE = HelpPage.Constants.HELP_PAGE
-local FFlagGamepadIconSupportCheck = require(CorePackages.Workspace.Packages.SharedFlags).FFlagGamepadIconSupportCheck
 
-local function getSupportsButton(p1) -- line: 22
-	-- upvalues: FFlagGamepadIconSupportCheck (copy), UserInputService (copy)
-	if not FFlagGamepadIconSupportCheck then
-		return true
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagGamepadIconSupportCheck = SharedFlags.FFlagGamepadIconSupportCheck
+local FFlagLuaSupportMicroGamepadPreferredInput = SharedFlags.FFlagLuaSupportMicroGamepadPreferredInput
+
+local function getSupportsButton(keycode)
+	if FFlagGamepadIconSupportCheck then
+		return UserInputService:GamepadSupports(UserInputService:GetLastInputType(), keycode)
 	end
 
-	return UserInputService:GamepadSupports(UserInputService:GetLastInputType(), p1)
+	return true
 end
-local function isPreferredInputTypeGamepad() -- line: 29
-	-- upvalues: UserInputService (copy)
+
+local function isPreferredInputTypeGamepad() -- 2 equivalent calls inferred from this helper
 	return UserInputService.PreferredInput == Enum.PreferredInput.Gamepad
+		or FFlagLuaSupportMicroGamepadPreferredInput
+		and UserInputService.PreferredInput == Enum.PreferredInput.MicroGamepad
 end
-local function isPlayStationGamepad() -- line: 33
-	-- upvalues: UserInputService (copy)
+
+local function isPlayStationGamepad(): boolean -- 2 equivalent calls inferred from this helper
 	return UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross"
 end
-local function SwitchTabHint(t1: {[any]: any}, p2) -- line: 38
-	-- upvalues: useTokens (copy), React (copy), getSupportsButton (copy), UserInputService (copy), useEventConnection (copy), FFlagGamepadIconSupportCheck (copy), HELP_PAGE (copy), Icon (copy)
-	local v19 = useTokens()
-	local v20, v21 = React.useState(getSupportsButton(t1.keycode))
-	local v22, v23 = React.useState(UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross")
-	local v24, v25 = React.useBinding(UserInputService.PreferredInput == Enum.PreferredInput.Gamepad)
 
-	useEventConnection(UserInputService:GetPropertyChangedSignal("PreferredInput"), function() -- line: 43
-		-- upvalues: v25 (copy), UserInputService (copy), v23 (copy)
-		v25(UserInputService.PreferredInput == Enum.PreferredInput.Gamepad)
-		v23(UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross")
+local function SwitchTabHint(p, ref)
+	local v = useTokens()
+	local state, setState = React.useState(getSupportsButton(p.keycode))
+	local state2, setState2 = React.useState(isPlayStationGamepad()) -- inferred equivalent call
+	local visible, v2 = React.useBinding(isPreferredInputTypeGamepad()) -- inferred equivalent call
+	useEventConnection(UserInputService:GetPropertyChangedSignal("PreferredInput"), function()
+		v2(isPreferredInputTypeGamepad()) -- inferred equivalent call
+		setState2(isPlayStationGamepad()) -- inferred equivalent call
 	end, {})
 
 	if FFlagGamepadIconSupportCheck then
-		useEventConnection(UserInputService.LastInputTypeChanged, function() -- line: 48
-			-- upvalues: v21 (copy), getSupportsButton (copy), t1 (copy)
-			v21(getSupportsButton(t1.keycode))
+		useEventConnection(UserInputService.LastInputTypeChanged, function()
+			setState(getSupportsButton(p.keycode))
 		end, {})
 	end
 
-	local v26 = React.useMemo(function() -- line: 53
-		-- upvalues: v22 (copy), HELP_PAGE (copy), t1 (copy)
-		if v22 then
-			return HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION[t1.keycode]
+	local name = React.useMemo(function()
+		if state2 then
+			return HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION[p.keycode]
 		end
 
-		return HELP_PAGE.GAMEPAD_ICON_MAP_XBOX[t1.keycode]
-	end, {
-		t1.keycode,
-		v22
-	})
+		return HELP_PAGE.GAMEPAD_ICON_MAP_XBOX[p.keycode]
+	end, { p.keycode, state2 })
 
-	if v20 then
+	if state then
 		return (React.createElement(Icon, {
-			name = v26,
-			size = v19.Size.Size_800,
-			Visible = v24,
-			ref = p2
+			name = name,
+			size = v.Size.Size_800,
+			Visible = visible,
+			ref = ref
 		}))
 	end
 

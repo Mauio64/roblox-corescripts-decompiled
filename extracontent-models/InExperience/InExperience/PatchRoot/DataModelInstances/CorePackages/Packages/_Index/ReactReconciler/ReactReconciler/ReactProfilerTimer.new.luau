@@ -1,86 +1,88 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
 require(script.Parent.ReactInternalTypes)
 
-local ReactFeatureFlags = require(ParentParent.Shared).ReactFeatureFlags
+local Shared = require(parent.Shared)
+local ReactFeatureFlags = Shared.ReactFeatureFlags
 local enableProfilerTimer = ReactFeatureFlags.enableProfilerTimer
 local enableProfilerCommitHooks = ReactFeatureFlags.enableProfilerCommitHooks
-local Profiler = require(script.Parent.ReactWorkTags).Profiler
-local unstable_now = require(ParentParent.Scheduler).unstable_now
-local n1 = 0
-local n2 = -1
-local n3 = -1
-local n4 = -1
 
-function getCommitTime() -- line: 43
-	-- upvalues: n1 (ref)
-	return n1
+local ReactWorkTags = require(script.Parent.ReactWorkTags)
+local Profiler = ReactWorkTags.Profiler
+
+local Scheduler = require(parent.Scheduler)
+
+local unstable_now = Scheduler.unstable_now
+
+local commitTime = 0
+local v = -1
+local v2 = -1
+local v3 = -1
+
+function getCommitTime()
+	return commitTime
 end
-function recordCommitTime() -- line: 47
-	-- upvalues: enableProfilerTimer (copy), n1 (ref), unstable_now (copy)
+
+function recordCommitTime()
 	if not enableProfilerTimer then
 		return
 	end
 
-	n1 = unstable_now()
+	commitTime = unstable_now()
 end
-function startProfilerTimer(p1) -- line: 54
-	-- upvalues: enableProfilerTimer (copy), n3 (ref), unstable_now (copy)
+
+function startProfilerTimer(p)
 	if not enableProfilerTimer then
 		return
 	end
 
-	n3 = unstable_now()
+	v2 = unstable_now()
 
-	if p1.actualStartTime ~= nil and p1.actualStartTime < 0 then
-		p1.actualStartTime = unstable_now()
+	if p.actualStartTime ~= nil and p.actualStartTime < 0 then
+		p.actualStartTime = unstable_now()
 	end
 end
-function stopProfilerTimerIfRunning(_) -- line: 67
-	-- upvalues: enableProfilerTimer (copy), n3 (ref)
+
+function stopProfilerTimerIfRunning(_)
 	if not enableProfilerTimer then
 		return
 	end
 
-	n3 = -1
+	v2 = -1
 end
-function stopProfilerTimerIfRunningAndRecordDelta(p3, b1: boolean) -- line: 74
-	-- upvalues: enableProfilerTimer (copy), n3 (ref), unstable_now (copy)
+
+function stopProfilerTimerIfRunningAndRecordDelta(p, flag: boolean)
 	if not enableProfilerTimer then
 		return
 	end
 
-	if n3 >= 0 then
-		local v15 = unstable_now() - n3
+	if v2 >= 0 then
+		local selfBaseDuration = unstable_now() - v2
+		p.actualDuration += selfBaseDuration
 
-		p3.actualDuration = p3.actualDuration + v15
-
-		if b1 then
-			p3.selfBaseDuration = v15
+		if flag then
+			p.selfBaseDuration = selfBaseDuration
 		end
 
-		n3 = -1
+		v2 = -1
 	end
 end
-function recordLayoutEffectDuration(p4) -- line: 92
-	-- upvalues: enableProfilerTimer (copy), enableProfilerCommitHooks (copy), n2 (ref), unstable_now (copy), Profiler (copy)
-	if not enableProfilerTimer or not enableProfilerCommitHooks then
+
+function recordLayoutEffectDuration(p)
+	if not (enableProfilerTimer and enableProfilerCommitHooks) then
 		return
 	end
 
-	if n2 >= 0 then
-		local v17 = unstable_now() - n2
+	if v >= 0 then
+		local v4 = unstable_now() - v
 
-		n2 = -1
+		v = -1
 
-		local return_ = p4.return_
+		local return_ = p.return_
 
 		while return_ ~= nil do
 			if return_.tag == Profiler then
-				local stateNode = return_.stateNode
-
-				stateNode.effectDuration = stateNode.effectDuration + v17
-
+				return_.stateNode.effectDuration += v4
 				return
 			end
 
@@ -88,28 +90,28 @@ function recordLayoutEffectDuration(p4) -- line: 92
 		end
 	end
 end
-function recordPassiveEffectDuration(p5) -- line: 115
-	-- upvalues: enableProfilerTimer (copy), enableProfilerCommitHooks (copy), n4 (ref), unstable_now (copy), Profiler (copy)
-	if not enableProfilerTimer or not enableProfilerCommitHooks then
+
+function recordPassiveEffectDuration(p)
+	if not (enableProfilerTimer and enableProfilerCommitHooks) then
 		return
 	end
 
-	if n4 >= 0 then
-		local v21 = unstable_now() - n4
+	if v3 >= 0 then
+		local v4 = unstable_now() - v3
 
-		n4 = -1
+		v3 = -1
 
-		local return_ = p5.return_
+		local return_ = p.return_
 
 		while return_ ~= nil do
 			if return_.tag == Profiler then
 				local stateNode = return_.stateNode
 
 				if stateNode == nil then
-					return
+					break
 				end
 
-				stateNode.passiveEffectDuration = stateNode.passiveEffectDuration + v21
+				stateNode.passiveEffectDuration += v4
 
 				return
 			end
@@ -118,28 +120,25 @@ function recordPassiveEffectDuration(p5) -- line: 115
 		end
 	end
 end
-function startLayoutEffectTimer() -- line: 143
-	-- upvalues: enableProfilerTimer (copy), enableProfilerCommitHooks (copy), n2 (ref), unstable_now (copy)
-	if not enableProfilerTimer or not enableProfilerCommitHooks then
-		return
+
+function startLayoutEffectTimer()
+	if enableProfilerTimer and enableProfilerCommitHooks then
+		v = unstable_now()
 	end
-
-	n2 = unstable_now()
 end
-function startPassiveEffectTimer() -- line: 150
-	-- upvalues: enableProfilerTimer (copy), enableProfilerCommitHooks (copy), n4 (ref), unstable_now (copy)
-	if not enableProfilerTimer or not enableProfilerCommitHooks then
-		return
+
+function startPassiveEffectTimer()
+	if enableProfilerTimer and enableProfilerCommitHooks then
+		v3 = unstable_now()
 	end
-
-	n4 = unstable_now()
 end
-function transferActualDuration(p6) -- line: 157
-	local child = p6.child
 
-	while child do
-		p6.actualDuration = p6.actualDuration + child.actualDuration
-		child = child.sibling
+function transferActualDuration(state)
+	local v4 = state.child
+
+	while v4 do
+		state.actualDuration += v4.actualDuration
+		v4 = v4.sibling
 	end
 end
 

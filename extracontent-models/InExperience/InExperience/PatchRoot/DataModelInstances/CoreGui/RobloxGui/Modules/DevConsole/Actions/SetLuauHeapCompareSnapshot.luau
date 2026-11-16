@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)(script.Name, function(n1: number) -- line: 4
-	return {
-		compare = n1
-	}
+local Action = require(script.Parent.Parent.Action)
+
+return Action(script.Name, function(compare: number)
+	return { compare = compare }
 end)

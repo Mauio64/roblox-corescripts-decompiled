@@ -1,52 +1,47 @@
 local AppStorageService = game:GetService("AppStorageService")
 local HttpService = game:GetService("HttpService")
-local Parent = script:FindFirstAncestor("PlayWithRewardComponent").Parent
-local SharedFlags = require(Parent.SharedFlags)
-local t = require(Parent.t)
+
+local parent = script:FindFirstAncestor("PlayWithRewardComponent").Parent
+local SharedFlags = require(parent.SharedFlags)
+local t = require(parent.t)
+
 local FFlagPlayWithRewardCoachmarkOverlayFix = SharedFlags.FFlagPlayWithRewardCoachmarkOverlayFix
-local v7 = game:DefineFastFlag("PlayWithRewardCoachmarkWindowResets", false)
-local v8 = game:DefineFastInt("PlayWithRewardCoachmarkMaxImpressions", 3)
-local v9 = game:DefineFastInt("PlayWithRewardCoachmarkMaxImpressions2", 3)
-local v10 = game:DefineFastInt("PlayWithRewardCoachmarkWindowDays", 30)
-local EngineFeature = game:GetEngineFeature("PlayWithRewardCoachmarkStorageKey")
-local v12 = v10 * 86400
-local v13 = t.interface({
+local defineFastFlag = game:DefineFastFlag("PlayWithRewardCoachmarkWindowResets", false)
+local defineFastInt = game:DefineFastInt("PlayWithRewardCoachmarkMaxImpressions", 3)
+local defineFastInt2 = game:DefineFastInt("PlayWithRewardCoachmarkMaxImpressions2", 3)
+local defineFastInt3 = game:DefineFastInt("PlayWithRewardCoachmarkWindowDays", 30)
+local engineFeature = game:GetEngineFeature("PlayWithRewardCoachmarkStorageKey")
+
+local v = defineFastInt3 * 86400
+
+local interface = t.interface({
 	windowStartTime = t.number,
 	impressionCount = t.number,
 	isDismissed = t.boolean
 })
 
-local function getDefaultState() -- line: 49
-	return {
-		windowStartTime = 0,
-		impressionCount = 0,
-		isDismissed = false
-	}
+local function getDefaultState() -- 1 equivalent call inferred from this helper
+	return { windowStartTime = 0, impressionCount = 0, isDismissed = false }
 end
-local function parseState(p1) -- line: 57
-	-- upvalues: v13 (copy)
-	if not v13(p1) then
-		return {
-			windowStartTime = 0,
-			impressionCount = 0,
-			isDismissed = false
-		}
+
+local function parseState(p) -- 2 equivalent calls inferred from this helper
+	if interface(p) then
+		return p
 	end
 
-	return p1
+	return getDefaultState() -- inferred equivalent call
 end
-local function readStateLookup() -- line: 66
-	-- upvalues: EngineFeature (copy), AppStorageService (copy), HttpService (copy)
-	if not EngineFeature then
+
+local function readStateLookup()
+	if not engineFeature then
 		return nil
 	end
 
-	local ok, result = pcall(function() -- line: 71
-		-- upvalues: AppStorageService (copy)
+	local success, result = pcall(function()
 		return AppStorageService:GetItem("PlayWithRewardCoachmark")
 	end)
 
-	if not ok or type(result) ~= "string" then
+	if not success or type(result) ~= "string" then
 		return nil
 	end
 
@@ -54,137 +49,112 @@ local function readStateLookup() -- line: 66
 		return {}
 	end
 
-	local ok2, result2 = pcall(function() -- line: 82
-		-- upvalues: HttpService (copy), result (copy)
+	local success2, result2 = pcall(function()
 		return HttpService:JSONDecode(result)
 	end)
 
-	if not ok2 or type(result2) ~= "table" then
-		return {}
+	if success2 and type(result2) == "table" then
+		return result2
 	end
 
-	return result2
+	return {}
 end
-local function writeStateLookup(t1: {[any]: any}) -- line: 92
-	-- upvalues: HttpService (copy), AppStorageService (copy)
-	local ok, result = pcall(function() -- line: 93
-		-- upvalues: HttpService (copy), t1 (copy)
-		return HttpService:JSONEncode(t1)
+
+local function writeStateLookup(p)
+	local success, result = pcall(function()
+		return HttpService:JSONEncode(p)
 	end)
 
-	if not ok or type(result) ~= "string" then
+	if success and type(result) == "string" then
+		return (pcall(function()
+			AppStorageService:SetItem("PlayWithRewardCoachmark", result)
+			AppStorageService:Flush()
+		end))
+	end
+
+	return false
+end
+
+local function mutateStateLookup(p: number, fn) -- 1 equivalent call inferred from this helper
+	local v2 = readStateLookup()
+
+	if v2 == nil then
 		return false
 	end
 
-	return (pcall(function() -- line: 100
-		-- upvalues: AppStorageService (copy), result (copy)
-		AppStorageService:SetItem("PlayWithRewardCoachmark", result)
-		AppStorageService:Flush()
-	end))
-end
-local function mutateStateLookup(n1: number, p2: ((...any) -> ...any)) -- line: 107
-	-- upvalues: readStateLookup (copy), v13 (copy), writeStateLookup (copy)
-	local v30 = readStateLookup()
+	local v3 = tostring(p)
+	local v4 = fn(parseState(v2[v3])) -- inferred equivalent call
 
-	if v30 == nil then
+	if v4 == nil then
 		return false
 	end
 
-	local str = tostring(n1)
-	local v32 = v30[str]
-	local v33 = p2(if v13(v32) then v32 else {
-		windowStartTime = 0,
-		impressionCount = 0,
-		isDismissed = false
-	})
+	v2[v3] = v4
+	return writeStateLookup(v2)
+end
 
-	if v33 == nil then
+local function hasWindowExpired(p, now: number): boolean -- 1 equivalent call inferred from this helper
+	return p.windowStartTime > 0 and v <= now - p.windowStartTime
+end
+
+local PlayWithRewardCoachmarkStorage = {}
+
+function PlayWithRewardCoachmarkStorage.consumeImpressionIfEligible(p: number)
+	local v2
+
+	if FFlagPlayWithRewardCoachmarkOverlayFix then
+		v2 = defineFastInt2
+	else
+		v2 = defineFastInt
+	end
+
+	if not engineFeature or v2 <= 0 or v <= 0 then
 		return false
 	end
 
-	v30[str] = v33
+	local now = os.time()
+	local v3 = { windowStartTime = now, impressionCount = 1, isDismissed = false }
+	local v4 = readStateLookup()
 
-	return (writeStateLookup(v30))
-end
-local function hasWindowExpired(t2: {[any]: any}, n2: number) -- line: 126
-	-- upvalues: v12 (copy)
-	return t2.windowStartTime > 0 and n2 - t2.windowStartTime >= v12
-end
+	if v4 == nil then
+		return false
+	end
 
-return {
-	consumeImpressionIfEligible = function(n3: number) -- line: 132
-		-- upvalues: FFlagPlayWithRewardCoachmarkOverlayFix (copy), v9 (copy), v8 (copy), EngineFeature (copy), v12 (copy), v7 (copy), readStateLookup (copy), v13 (copy), writeStateLookup (copy)
-		local v37 = if not FFlagPlayWithRewardCoachmarkOverlayFix then v8 else v9
+	local v5 = tostring(p)
+	local state = parseState(v4[v5]) -- inferred equivalent call
 
-		if not EngineFeature or (v37 <= 0 or v12 <= 0) then
-			return false
-		end
-
-		local timestamp = os.time()
-		local t3 = {
-			impressionCount = 1,
-			isDismissed = false,
-			windowStartTime = timestamp
-		}
-		local v40 = readStateLookup()
-
-		if v40 == nil then
-			return false
-		end
-
-		local str = tostring(n3)
-		local v42 = v40[str]
-		local v43 = if v13(v42) then v42 else {
-			windowStartTime = 0,
-			impressionCount = 0,
-			isDismissed = false
-		}
-
-		if v43.windowStartTime == 0 then
-		elseif v43.windowStartTime > 0 and timestamp - v43.windowStartTime >= v12 then
-			t3 = if not v7 then nil else t3
-		elseif v43.isDismissed or v37 <= v43.impressionCount then
-			t3 = nil
+	if state.windowStartTime ~= 0 then
+		if hasWindowExpired(state, now) then -- inferred equivalent call
+			if not defineFastFlag then
+				v3 = nil
+			end
+		elseif state.isDismissed or v2 <= state.impressionCount then
+			v3 = nil
 		else
-			v43.impressionCount = v43.impressionCount + 1
-			t3 = v43
+			state.impressionCount += 1
+			v3 = state
 		end
-
-		if t3 == nil then
-			return false
-		end
-
-		v40[str] = t3
-
-		return (writeStateLookup(v40))
-	end,
-	dismissCurrentWindow = function(n4: number) -- line: 166
-		-- upvalues: readStateLookup (copy), v13 (copy), writeStateLookup (copy)
-		local v45 = readStateLookup()
-
-		if v45 == nil then
-			return
-		end
-
-		local str = tostring(n4)
-		local v47 = v45[str]
-		local v48 = if v13(v47) then v47 else {
-			windowStartTime = 0,
-			impressionCount = 0,
-			isDismissed = false
-		}
-
-		if v48.windowStartTime == 0 or v48.isDismissed then
-			v48 = nil
-		else
-			v48.isDismissed = true
-		end
-
-		if v48 == nil then
-			return
-		end
-
-		v45[str] = v48
-		writeStateLookup(v45)
 	end
-}
+
+	if v3 == nil then
+		return false
+	end
+
+	v4[v5] = v3
+	return writeStateLookup(v4)
+end
+
+function PlayWithRewardCoachmarkStorage.dismissCurrentWindow(p: number)
+	local function fn(state)
+		if state.windowStartTime == 0 or state.isDismissed then
+			return nil
+		end
+
+		state.isDismissed = true
+		return state
+	end
+
+	mutateStateLookup(p, fn) -- inferred equivalent call
+end
+
+return PlayWithRewardCoachmarkStorage

@@ -1,16 +1,11 @@
-local ParentParent = script.Parent.Parent.Parent
-local THUMBNAILS_URL = require(ParentParent.Http).Url.THUMBNAILS_URL
+local parent = script.Parent.Parent.Parent
+local Http = require(parent.Http)
+local THUMBNAILS_URL = Http.Url.THUMBNAILS_URL
 
-return function(t1: {[any]: any}) -- line: 15
-	-- upvalues: THUMBNAILS_URL (copy)
-	return t1.roduxNetworking.POST({
-		Name = "GetThumbnailByAssetId"
-	}, function(p1, t2: {[any]: any}) -- line: 18
-		-- upvalues: THUMBNAILS_URL (copy)
-		return p1(THUMBNAILS_URL):path("v1"):path("batch"):body({{
-			targetId = t2.assetId,
-			type = t2.assetType,
-			size = t2.size
-		}})
+return function(p)
+	return p.roduxNetworking.POST("GetThumbnailByAssetId", function(callback, data)
+		return callback(THUMBNAILS_URL):path("v1"):path("batch"):body({
+			{ targetId = data.assetId, type = data.assetType, size = data.size }
+		})
 	end)
 end

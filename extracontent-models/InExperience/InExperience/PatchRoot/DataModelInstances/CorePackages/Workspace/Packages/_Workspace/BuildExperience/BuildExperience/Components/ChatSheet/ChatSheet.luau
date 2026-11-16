@@ -1,17 +1,16 @@
 local BuildExperience = script:FindFirstAncestor("BuildExperience")
-local BuildExperienceParent = BuildExperience.Parent
-local React = require(BuildExperienceParent.React)
+
+local parent = BuildExperience.Parent
+
+local React = require(parent.React)
 
 require(BuildExperience.Chat.chatTypes)
-
 local ChatSheetView = require(script.Parent.ChatSheetView)
 local useChatSheetViewModel = require(script.Parent.useChatSheetViewModel)
 
-local function ChatSheet(p1) -- line: 14
-	-- upvalues: useChatSheetViewModel (copy), React (copy), ChatSheetView (copy)
-	local v8 = useChatSheetViewModel(p1)
-
-	return React.createElement(ChatSheetView, v8)
+local function ChatSheet(p)
+	local v = useChatSheetViewModel(p)
+	return React.createElement(ChatSheetView, v)
 end
 
 return ChatSheet

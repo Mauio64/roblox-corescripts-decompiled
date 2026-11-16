@@ -1,0 +1,20 @@
+return {
+	Unspecified = "Unspecified",
+	BuyRobuxPage = "BuyRobuxPage",
+	PromptSubscriptionPurchase = "PromptSubscriptionPurchase",
+	RobuxTransferUpsell = "RobuxTransferUpsell",
+	PrivateServerUpsell = "PrivateServerUpsell",
+	UnifiedProductPurchaseModal = "UnifiedProductPurchaseModal",
+	CatalogMultiItemCheckoutPage = "CatalogMultiItemCheckoutPage",
+	BulkPurchasePrompt = "BulkPurchasePrompt",
+	DeepLinkUpsell = "DeepLinkUpsell",
+	HomepageFaeTrialBanner = "HomepageFaeTrialBanner",
+	InGameRobuxUpsell = "InGameRobuxUpsell",
+	SettingsAppThemeUpsell = "SettingsAppThemeUpsell",
+	SettingsAppIconUpsell = "SettingsAppIconUpsell",
+	ProfileFramesUpsell = "ProfileFramesUpsell",
+	AiBackgroundUpsell = "AiBackgroundUpsell",
+	AvatarBackgrounds = "AvatarBackgrounds",
+	GameJoinEarlyAccessUpsell = "GameJoinEarlyAccessUpsell",
+	PlusReferralLandingSheet = "PlusReferralLandingSheet"
+}

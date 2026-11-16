@@ -1,77 +1,69 @@
 local TelemetryService = game:GetService("TelemetryService")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+
 local GamepadMenu = script.Parent.Parent.Components.Presentation.GamepadMenu
-
 require(GamepadMenu.EnumGamepadMenuOptions)
+local engineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
+local defineFastInt = game:DefineFastInt("GamepadMenuActionThrottleHundrethsPercent", 0)
 
-local EngineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
-local v5 = game:DefineFastInt("GamepadMenuActionThrottleHundrethsPercent", 0)
-
-local function mapProp(p1, p2: ((...any) -> ...any)) -- line: 26
-	if p1 ~= nil then
-		return (p2(p1))
+local function mapProp(p, callback)
+	if p == nil then
+		return nil
 	end
 
-	return nil
+	return (callback(p))
 end
 
-local t1 = {}
+local GamepadMenuTelemetry = {}
+GamepadMenuTelemetry.__index = GamepadMenuTelemetry
 
-t1.__index = t1
-
-function t1.new() -- line: 34
-	-- upvalues: t1 (copy)
-	return (setmetatable({}, t1))
+function GamepadMenuTelemetry.new()
+	return (setmetatable({}, GamepadMenuTelemetry))
 end
-function t1.onOptionSelected(t2: {[any]: any}) -- line: 39
-	-- upvalues: v5 (copy), EngineFeature (copy), RbxAnalyticsService (copy), TelemetryService (copy)
-	local t3 = {
-		eventName = "coreui_gamepad_menu_action",
-		description = "Event fired from the client every time GamepadMenu Options are Selected",
-		links = "https://github.rbx.com/Roblox/proto-schemas/pull/5803",
-		backends = { "EventIngest" },
-		throttlingPercentage = v5,
-		lastUpdated = {
-			25,
-			4,
-			30
-		}
+
+function GamepadMenuTelemetry.onOptionSelected(data)
+	local standardizedFields = { "addPlaceId", "addUniverseId", "addSessionInfo" }
+	local customFields = {
+		menu_option_name = data.menuOptionName,
+		used_shortcut = 0,
+		is_toggle_open = 0
 	}
-	local t4 = {
-		"addPlaceId",
-		"addUniverseId",
-		"addSessionInfo"
-	}
-	local t5 = {
-		menu_option_name = t2.menuOptionName
-	}
-	local usedShortcut = t2.usedShortcut
-	local _tostring = tostring
+	local usedShortcut = data.usedShortcut
+	local tostring2 = tostring
+	local used_shortcut
 
-	t5.used_shortcut = if usedShortcut == nil then nil else _tostring(usedShortcut)
+	if usedShortcut ~= nil then
+		used_shortcut = tostring2(usedShortcut)
+	end
 
-	local isToggleOpen = t2.isToggleOpen
-	local _tostring2 = tostring
+	customFields.used_shortcut = used_shortcut
+	local isToggleOpen = data.isToggleOpen
+	local tostring = tostring
+	local is_toggle_open
 
-	t5.is_toggle_open = if isToggleOpen == nil then nil else _tostring2(isToggleOpen)
+	if isToggleOpen ~= nil then
+		is_toggle_open = tostring(isToggleOpen)
+	end
 
-	if EngineFeature then
-		table.insert(t4, "addPlaySessionId")
+	customFields.is_toggle_open = is_toggle_open
+
+	if engineFeature then
+		table.insert(standardizedFields, "addPlaySessionId")
 	else
-		t4 = {
-			"addPlaceId",
-			"addUniverseId",
-			"addSessionInfo"
-		}
-		t5.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+		customFields.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+		standardizedFields = { "addPlaceId", "addUniverseId", "addSessionInfo" }
 	end
 
-	TelemetryService:LogEvent(t3, {
-		standardizedFields = t4,
-		customFields = t5
-	})
+	TelemetryService:LogEvent({
+		eventName = "coreui_gamepad_menu_action",
+		backends = { "EventIngest" },
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 25, 4, 30 },
+		description = "Event fired from the client every time GamepadMenu Options are Selected",
+		links = "https://github.rbx.com/Roblox/proto-schemas/pull/5803"
+	}, { standardizedFields = standardizedFields, customFields = customFields })
 end
 
-t1.default = t1.new()
+GamepadMenuTelemetry.default = GamepadMenuTelemetry.new()
 
-return t1
+return GamepadMenuTelemetry

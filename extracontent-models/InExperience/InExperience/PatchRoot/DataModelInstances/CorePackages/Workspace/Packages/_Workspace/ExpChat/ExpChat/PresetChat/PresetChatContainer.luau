@@ -1,369 +1,381 @@
 local GuiService = game:GetService("GuiService")
-local TextChatService = game:GetService("TextChatService")
 local UserInputService = game:GetService("UserInputService")
+
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
-local Foundation = require(ExpChatParent.Foundation)
-local InputType = require(ExpChatParent.InputType)
-local React = require(ExpChatParent.React)
-local RoactUtils = require(ExpChatParent.RoactUtils)
-local SharedFlags = require(ExpChatParent.SharedFlags)
-local SignalsReact = require(ExpChatParent.SignalsReact)
+local parent = ExpChat.Parent
+local ExpChatShared = require(parent.ExpChatShared)
+local Foundation = require(parent.Foundation)
+local InputType = require(parent.InputType)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local SignalsReact = require(parent.SignalsReact)
+
+local SharedFlags = require(parent.SharedFlags)
+local EngineFeaturePresetChatUseExpressionTrayOptionsEndpoint = SharedFlags.EngineFeaturePresetChatUseExpressionTrayOptionsEndpoint
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
-local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local GetPresetChatStore = require(ExpChat.Stores.GetPresetChatStore)
 local GetMessagesStore = require(ExpChat.Stores.GetMessagesStore)
 local GetTransparencyStore = require(ExpChat.Stores.GetTransparencyStore)
 local Localization = require(ExpChat.Localization)
+local PresetBorderlessGridButton = require(script.Parent.PresetBorderlessGridButton)
 local PresetCooldownProvider = require(script.Parent.PresetCooldownProvider)
 local PresetMessageButton = require(script.Parent.PresetMessageButton)
 local PresetTrayKeyboardSelected = require(ExpChat.Actions.PresetTrayKeyboardSelected)
 local Constants = require(ExpChat.PresetChat.Constants)
 local setIsPresetTrayOpen = require(script.Parent.Thunks.setIsPresetTrayOpen)
-local FFlagExpChatUniverseChatPresetEnabled = require(ExpChat.Flags.FFlagExpChatUniverseChatPresetEnabled)
+local useOnEmojiActivated = require(script.Parent.useOnEmojiActivated)
+local useOnPresetActivated = require(script.Parent.useOnPresetActivated)
 local FFlagExpChatPresetChatGamepadEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatGamepadEnabled)
-local v28 = ExpChatShared.Flags.FIntPresetChatCooldownLuaMs / 1000
-local v29 = ExpChatShared.Logger:new("ExpChat/PresetChat/PresetChatContainer")
+local FFlagExpChatPresetChatTabMemory = require(ExpChat.Flags.FFlagExpChatPresetChatTabMemory)
+local FFlagExpChatPresetTrayDismissAnalytics = require(ExpChat.Flags.FFlagExpChatPresetTrayDismissAnalytics)
 
-local function getRBXGeneralChannel() -- line: 40
-	-- upvalues: TextChatService (copy)
-	local RBXGeneral = TextChatService:FindFirstChild("RBXGeneral", true)
+local FFlagExpChatPresetTrayPresetOnlyDisclaimer = require(ExpChat.Flags.FFlagExpChatPresetTrayPresetOnlyDisclaimer)
 
-	if RBXGeneral and RBXGeneral:IsA("TextChannel") then
-		return RBXGeneral
-	end
+local function PresetChatContainer(props)
+	local v = Foundation.Hooks.useTokens()
+	local presetChatStore = GetPresetChatStore(false)
+	local v2 = useDispatch()
+	local v3 = SignalsReact.useSignalState(presetChatStore.getIsLoading)
+	local v4 = SignalsReact.useSignalState(presetChatStore.getCategoryGroups)
 
-	return nil
-end
-local function PresetChatContainer(t1: {[any]: any}) -- line: 48
-	-- upvalues: Foundation (copy), GetPresetChatStore (copy), useDispatch (copy), SignalsReact (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), useSelector (copy), Localization (copy), React (copy), setIsPresetTrayOpen (copy), PresetTrayKeyboardSelected (copy), ExpChatShared (copy), Constants (copy), FFlagExpChatPresetChatGamepadEnabled (copy), InputType (copy), UserInputService (copy), GuiService (copy), GetTransparencyStore (copy), TextChatService (copy), v28 (copy), FFlagExpChatUniverseChatPresetEnabled (copy), v29 (copy), PresetMessageButton (copy), FoundationText (copy), PresetCooldownProvider (copy)
-	local v34 = Foundation.Hooks.useTokens()
-	local v35 = GetPresetChatStore(false)
-	local v36 = useDispatch()
-	local v37 = SignalsReact.useSignalState(v35.getIsLoading)
-	local v38 = SignalsReact.useSignalState(v35.getCategoryGroups)
-	local v39 = if not FFlagExpChatUseMessagesStore then useSelector(function(p1) -- line: 61
-		return p1.CanLocalUserChat
-	end) else SignalsReact.useSignalState(GetMessagesStore(false).getCanLocalUserChat)
-	local v40 = Localization.useLocalization({
+	local v5 = SignalsReact.useSignalState(GetMessagesStore(false).getCanLocalUserChat)
+
+	local v6 = Localization.useLocalization({
 		footerDescription = "Feature.Chat.PresetChat.Disclaimer"
 	})
-	local v41 = React.useCallback(function() -- line: 70
-		-- upvalues: setIsPresetTrayOpen (copy), v35 (copy)
-		setIsPresetTrayOpen(v35, false)
-	end, { v35 })
-	local v42 = React.useCallback(function() -- line: 74
-		-- upvalues: v41 (copy), v36 (copy), PresetTrayKeyboardSelected (copy), ExpChatShared (copy), Constants (copy)
-		v41()
-		v36(PresetTrayKeyboardSelected())
-		ExpChatShared.Analytics:TelemetryLogEvent(ExpChatShared.Analytics.ExpChatPresetActionConfig, {
-			event_type = Constants.Analytics.EventTypes.Click,
-			component = Constants.Analytics.Components.PresetKeyboardIcon
-		}, ExpChatShared.Analytics.DefaultStandardizedFields)
-	end, {
-		v41,
-		v36
-	})
-	local v43 = React.useRef(nil)
-	local v44 = v38 and (#v38 > 0 and v38[1].categoryGroupId) or ""
-	local v45, v46 = React.useState(v44)
 
-	React.useEffect(function() -- line: 89
-		-- upvalues: v45 (copy), v44 (copy), v46 (copy)
-		if v45 == "" and v44 ~= "" then
-			v46(v44)
+	local closePresetTray = React.useCallback(function()
+		setIsPresetTrayOpen(presetChatStore, false)
+	end, { presetChatStore })
+
+	local onActivated = React.useCallback(function()
+		closePresetTray()
+		v2(PresetTrayKeyboardSelected())
+
+		ExpChatShared.Analytics:TelemetryLogEvent(
+			ExpChatShared.Analytics.ExpChatPresetActionConfig,
+			{
+				event_type = Constants.Analytics.EventTypes.Click,
+				component = Constants.Analytics.Components.PresetKeyboardIcon
+			},
+			ExpChatShared.Analytics.DefaultStandardizedFields
+		)
+	end, { closePresetTray, v2 })
+
+	local ref = React.useRef(nil)
+
+	local categoryGroupId = v4 and #v4 > 0 and v4[1].categoryGroupId or ""
+	local state, setState = React.useState(categoryGroupId)
+
+	if FFlagExpChatPresetChatTabMemory then
+		local v7 = SignalsReact.useSignalState(presetChatStore.getSelectedGroupIndex)
+		local v8 = v4 and v4[v7]
+		state = if v8 then v8.categoryGroupId else categoryGroupId
+	end
+
+	React.useEffect(function()
+		if not FFlagExpChatPresetChatTabMemory and state == "" and categoryGroupId ~= "" then
+			setState(categoryGroupId)
 		end
-	end, {
-		v44,
-		v45
-	})
+	end, { categoryGroupId, state })
+	local v7
 
-	local v47 = if not FFlagExpChatPresetChatGamepadEnabled then nil else SignalsReact.useSignalState(v35.getIsTrayOpen)
-	local v48 = React.useRef(nil)
+	if FFlagExpChatPresetChatGamepadEnabled or FFlagExpChatPresetTrayDismissAnalytics then
+		v7 = SignalsReact.useSignalState(presetChatStore.getIsTrayOpen)
+	else
+		v7 = nil
+	end
 
-	local function isValidSelection(p2) -- line: 100
-		if p2 == nil then
+	React.useEffect(function()
+		if FFlagExpChatPresetTrayDismissAnalytics and v7 and not v3 and state ~= "" then
+			presetChatStore.markGroupViewed(state)
+		end
+	end, { v7, v3, state, presetChatStore })
+
+	local ref2 = React.useRef(nil)
+
+	local function isValidSelection(current) -- 2 equivalent calls inferred from this helper
+		if current == nil then
 			return false
 		end
 
-		local ok, result = pcall(function() -- line: 104
-			-- upvalues: p2 (copy)
-			return p2:IsDescendantOf(game) and p2:FindFirstAncestorOfClass("ScreenGui") ~= nil
+		local success, result = pcall(function()
+			return current:IsDescendantOf(game) and current:FindFirstAncestorOfClass("ScreenGui") ~= nil
 		end)
 
-		return ok and result
+		return success and result
 	end
 
-	React.useEffect(function() -- line: 111
-		-- upvalues: FFlagExpChatPresetChatGamepadEnabled (copy), v47 (copy), v43 (copy), InputType (copy), UserInputService (copy), v48 (copy), GuiService (copy)
-		if FFlagExpChatPresetChatGamepadEnabled and not v47 then
+	local useEffect = React.useEffect
+	local function fn()
+		if FFlagExpChatPresetChatGamepadEnabled and not v7 then
 			return
 		end
 
-		local current = v43.current
+		local current = ref.current
 
-		if current == nil then
+		if not (current ~= nil and InputType.getInputGroup(UserInputService:GetLastInputType()) == InputType.InputTypeConstants.Gamepad) then
 			return
 		end
 
-		if InputType.getInputGroup(UserInputService:GetLastInputType()) ~= InputType.InputTypeConstants.Gamepad then
-			return
-		end
+		if ref2.current == nil then
+			local current2
 
-		if v48.current == nil then
-			v48.current = if not FFlagExpChatPresetChatGamepadEnabled then GuiService.SelectedObject else GuiService.SelectedCoreObject
-		end
-
-		task.defer(function() -- line: 128
-			-- upvalues: current (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy)
-			local v81 = current
-			local v82
-
-			if v81 == nil then
-				v82 = false
+			if FFlagExpChatPresetChatGamepadEnabled then
+				current2 = GuiService.SelectedCoreObject
 			else
-				local ok, result = pcall(function() -- line: 104
-					-- upvalues: v81 (copy)
-					return v81:IsDescendantOf(game) and v81:FindFirstAncestorOfClass("ScreenGui") ~= nil
-				end)
-
-				v82 = ok and result
+				current2 = GuiService.SelectedObject
 			end
 
-			if v82 then
-				pcall(function() -- line: 130
-					-- upvalues: FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy), current (copy)
+			ref2.current = current2
+		end
+
+		task.defer(function()
+			if isValidSelection(current) then -- inferred equivalent call
+				pcall(function()
 					if FFlagExpChatPresetChatGamepadEnabled then
 						GuiService.SelectedCoreObject = current
-
-						return
+					else
+						GuiService.SelectedObject = current
 					end
-
-					GuiService.SelectedObject = current
 				end)
 			end
 		end)
-	end, if not FFlagExpChatPresetChatGamepadEnabled then { v45 } else {
-		v45,
-		v47
-	})
-	React.useEffect(function() -- line: 145
-		-- upvalues: GetTransparencyStore (copy), v48 (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy)
-		local v77 = GetTransparencyStore(false)
+	end
 
-		v77.setContextMenuOpen()
+	local v8
 
-		return function() -- line: 148
-			-- upvalues: v77 (copy), v48 (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy)
-			v77.clearContextMenuOpen()
+	if FFlagExpChatPresetChatGamepadEnabled then
+		v8 = { state, v7 }
+	else
+		v8 = { state }
+	end
 
-			local current = v48.current
+	useEffect(fn, v8)
 
-			pcall(function() -- line: 151
-				-- upvalues: current (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy)
-				local v86 = current
-				local v87
-
-				if v86 == nil then
-					v87 = false
-				else
-					local ok, result = pcall(function() -- line: 104
-						-- upvalues: v86 (copy)
-						return v86:IsDescendantOf(game) and v86:FindFirstAncestorOfClass("ScreenGui") ~= nil
-					end)
-
-					v87 = ok and result
-				end
-
-				if v87 then
+	React.useEffect(function()
+		local transparencyStore = GetTransparencyStore(false)
+		transparencyStore.setContextMenuOpen()
+		return function()
+			transparencyStore.clearContextMenuOpen()
+			local current = ref2.current
+			pcall(function()
+				if isValidSelection(current) then -- inferred equivalent call
 					if FFlagExpChatPresetChatGamepadEnabled then
 						GuiService.SelectedCoreObject = current
-
-						return
+					else
+						GuiService.SelectedObject = current
 					end
-
-					GuiService.SelectedObject = current
-
-					return
-				end
-
-				if FFlagExpChatPresetChatGamepadEnabled then
+				elseif FFlagExpChatPresetChatGamepadEnabled then
 					GuiService.SelectedCoreObject = nil
-
-					return
+				else
+					GuiService.SelectedObject = nil
 				end
-
-				GuiService.SelectedObject = nil
 			end)
-			v48.current = nil
+			ref2.current = nil
 		end
 	end, {})
 
-	local v50 = React.useCallback(function(s1: string) -- line: 170
-		-- upvalues: t1 (copy), TextChatService (copy), v35 (copy), v28 (copy), FFlagExpChatUniverseChatPresetEnabled (copy), v29 (copy), v41 (copy)
-		local textChannel = t1.textChannel
-
-		if textChannel ~= nil and textChannel.Name ~= "RBXGeneral" then
-			local RBXGeneral = TextChatService:FindFirstChild("RBXGeneral", true)
-
-			textChannel = if not RBXGeneral or not RBXGeneral:IsA("TextChannel") then nil else RBXGeneral
-		end
-
-		v35.setPresetCooldownEndsAt(os.clock() + v28)
-
-		if not textChannel then
-			if not FFlagExpChatUniverseChatPresetEnabled then
-				v29:warning("Preset {} activated but no target text channel was provided; skipping send.", s1)
-				v35.setPresetCooldownEndsAt(nil)
-				v41()
-
-				return
-			end
-
-			if not pcall(function() -- line: 192
-				-- upvalues: TextChatService (copy), s1 (copy)
-				TextChatService:SendUniverseChatPresetAsync(s1)
-			end) then
-				v35.setPresetCooldownEndsAt(nil)
-			end
-		elseif not pcall(function() -- line: 199
-			-- upvalues: textChannel (ref), s1 (copy)
-			textChannel:SendPresetAsync(s1)
-		end) then
-			v35.setPresetCooldownEndsAt(nil)
-		end
-
-		v35.incrementPresetClickCount(s1)
-		v41()
-	end, {
-		t1.textChannel,
-		v35,
-		v41
+	local onActivated2 = useOnPresetActivated({
+		textChannel = props.textChannel,
+		closePresetTray = closePresetTray
 	})
 
-	if v37 then
+	local onActivated3 = useOnEmojiActivated({
+		textChannel = props.textChannel,
+		onSendChat = props.onSendChat,
+		onSendGlobalChat = props.onSendGlobalChat,
+		closePresetTray = closePresetTray
+	})
+
+	if v3 then
 		return React.createElement(Foundation.Text, {
 			Text = "Loading presets...",
 			tag = "size-full text-body-medium content-muted"
 		})
 	end
 
-	if not v38 or #v38 == 0 then
+	if not v4 or #v4 == 0 then
 		return nil
 	end
 
-	local v51 = nil
+	local v9 = nil
 
-	for _, v53 in v38 do
-		if v45 == v53.categoryGroupId then
-			v51 = v53
-
+	for _, v10 in v4 do
+		if v10.categoryGroupId == state then
+			v9 = v10
 			break
 		end
 	end
 
-	local t2 = {
-		LineHeight = 1.4,
+	local fontStyle = {
 		Font = Enum.Font.BuilderSansBold,
-		FontSize = v34.FontSize.FontSize_300
+		FontSize = v.FontSize.FontSize_300,
+		LineHeight = 1.4
 	}
-	local t3 = {}
-	local v56 = true
 
-	if v51 then
-		for v57, v58 in v51.categories do
-			local t4 = {}
+	local children = {}
+	local flag = true
+	local v10 = not FFlagExpChatPresetTrayPresetOnlyDisclaimer
 
-			for v60, v61 in v58.messages do
-				t4["Msg_" .. v61.presetId] = React.createElement(PresetMessageButton, {
-					presetId = v61.presetId,
-					text = v61.value,
-					layoutOrder = v60,
-					onActivated = v50,
-					buttonRef = if not v56 then nil else v43
-				})
-				v56 = false
+	if v9 then
+		for k, category in v9.categories do
+			local children2 = {}
+			local v11
+
+			if EngineFeaturePresetChatUseExpressionTrayOptionsEndpoint then
+				v11 = category.contents
+			else
+				v11 = category.messages
 			end
 
-			t3["Category_" .. v58.categoryId] = React.createElement(Foundation.View, {
-				tag = "col gap-small size-full-0 auto-y",
-				LayoutOrder = v57
-			}, {
-				Header = React.createElement(Foundation.Text, {
-					LayoutOrder = 1,
-					tag = "size-full-0 auto-y text-align-x-left content-default",
-					Text = v58.name or v58.categoryId,
-					fontStyle = t2
-				}),
-				Pills = React.createElement(Foundation.View, {
-					LayoutOrder = 2,
-					tag = "size-full-0 auto-y",
-					layout = {
-						Wraps = true,
-						FillDirection = Enum.FillDirection.Horizontal,
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						Padding = UDim.new(0, v34.Padding.Small)
+			for k2, v12 in v11 do
+				v10 = not EngineFeaturePresetChatUseExpressionTrayOptionsEndpoint or v12.kind == "Preset" or v10
+
+				if EngineFeaturePresetChatUseExpressionTrayOptionsEndpoint and v12.kind == "Emoji" then
+					local v13 = "Emoji_" .. v12.emoteId
+					local createElement = React.createElement
+					local v14 = {
+						unicode = v12.unicode,
+						layoutOrder = k2,
+						onActivated = onActivated3,
+						buttonRef = 0
 					}
-				}, t4)
-			})
+					local buttonRef
+
+					if flag then
+						buttonRef = ref
+					end
+
+					v14.buttonRef = buttonRef
+					children2[v13] = createElement(PresetBorderlessGridButton, v14)
+				else
+					local v13 = "Msg_" .. v12.presetId
+					local createElement = React.createElement
+					local v14 = {
+						presetId = v12.presetId,
+						text = 0,
+						layoutOrder = 0,
+						onActivated = 0,
+						buttonRef = 0
+					}
+					local text
+
+					if EngineFeaturePresetChatUseExpressionTrayOptionsEndpoint then
+						text = v12.text
+					else
+						text = v12.value
+					end
+
+					v14.text = text
+					v14.layoutOrder = k2
+					v14.onActivated = onActivated2
+					local buttonRef
+
+					if flag then
+						buttonRef = ref
+					end
+
+					v14.buttonRef = buttonRef
+					children2[v13] = createElement(PresetMessageButton, v14)
+				end
+
+				flag = false
+			end
+
+			children["Category_" .. category.categoryId] = React.createElement(
+				Foundation.View,
+				{ LayoutOrder = k, tag = "col gap-small size-full-0 auto-y" },
+				{
+					Header = React.createElement(Foundation.Text, {
+						LayoutOrder = 1,
+						Text = category.name or category.categoryId,
+						tag = "size-full-0 auto-y text-align-x-left content-default",
+						fontStyle = fontStyle
+					}),
+					Pills = React.createElement(Foundation.View, {
+						LayoutOrder = 2,
+						tag = "size-full-0 auto-y",
+						layout = {
+							FillDirection = Enum.FillDirection.Horizontal,
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							Padding = UDim.new(0, v.Padding.Small),
+							Wraps = true
+						}
+					}, children2)
+				}
+			)
 		end
 
-		t3.Footer = React.createElement(FoundationText, {
-			TextWrapped = true,
-			tag = "size-full-0 auto-y text-body-small text-align-x-left content-muted",
-			LayoutOrder = #v51.categories + 1,
-			Text = v40.footerDescription
-		})
+		if v10 then
+			children.Footer = React.createElement(Text, {
+				LayoutOrder = #v9.categories + 1,
+				Text = v6.footerDescription,
+				TextWrapped = true,
+				tag = "size-full-0 auto-y text-body-small text-align-x-left content-muted"
+			})
+		end
 	end
 
-	local t5 = {
+	local children2 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, v34.Padding.XLarge),
+			Padding = UDim.new(0, v.Padding.XLarge),
 			VerticalAlignment = Enum.VerticalAlignment.Bottom
 		})
 	}
-	local v63 = #v38 > 1
 
-	for v64, v65 in v38 do
-		local categoryGroupId = v65.categoryGroupId
-		local v67 = categoryGroupId == v45
-		local v68 = if not v67 and v63 then v34.Color.Content.Muted else v34.Color.Content.Emphasis
-		local t6 = {
+	local v11 = #v4 > 1
+
+	for k, v12 in v4 do
+		local categoryGroupId2 = v12.categoryGroupId
+		local v13 = categoryGroupId2 == state
+		local textStyle
+
+		if v13 or not v11 then
+			textStyle = v.Color.Content.Emphasis
+		else
+			textStyle = v.Color.Content.Muted
+		end
+
+		local v14 = {
 			AutomaticSize = Enum.AutomaticSize.X,
 			Size = UDim2.new(0, 0, 0, 36),
-			LayoutOrder = v64,
-			Text = v65.name or categoryGroupId,
-			fontStyle = v34.Typography.LabelMedium,
-			textStyle = v68,
+			LayoutOrder = k,
+			Text = v12.name or categoryGroupId2,
+			fontStyle = v.Typography.LabelMedium,
+			textStyle = textStyle,
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextYAlignment = Enum.TextYAlignment.Center
 		}
-		local v70 = if not v67 or not v63 then nil else {
+
+		local v15 = v13 and v11 and {
 			Indicator = React.createElement("Frame", {
-				BorderSizePixel = 0,
 				AnchorPoint = Vector2.new(0.5, 1),
 				Position = UDim2.new(0.5, 0, 1, 0),
 				Size = UDim2.new(1, 0, 0, 2),
-				BackgroundColor3 = v34.Color.Content.Emphasis.Color3
+				BackgroundColor3 = v.Color.Content.Emphasis.Color3,
+				BorderSizePixel = 0
 			})
-		}
+		} or nil
 
-		if v63 then
-			function t6.onActivated() -- line: 319
-				-- upvalues: v46 (copy), categoryGroupId (copy)
-				v46(categoryGroupId)
+		if v11 then
+			function v14.onActivated()
+				if FFlagExpChatPresetChatTabMemory then
+					presetChatStore.setSelectedGroupIndex(k)
+				else
+					setState(categoryGroupId2)
+				end
 			end
 		end
 
-		t5["Tab_" .. categoryGroupId] = React.createElement(FoundationText, t6, v70)
+		children2["Tab_" .. categoryGroupId2] = React.createElement(Text, v14, v15)
 	end
 
-	local t7 = {
+	local v12 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -371,76 +383,89 @@ local function PresetChatContainer(t1: {[any]: any}) -- line: 48
 			HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween
 		}),
 		Padding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, v34.Padding.Large),
-			PaddingRight = UDim.new(0, v34.Padding.Large),
-			PaddingTop = UDim.new(0, v34.Padding.XSmall)
+			PaddingLeft = UDim.new(0, v.Padding.Large),
+			PaddingRight = UDim.new(0, v.Padding.Large),
+			PaddingTop = UDim.new(0, v.Padding.XSmall)
 		}),
-		TabsGroup = React.createElement("Frame", {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.XY,
-			Size = UDim2.fromScale(0, 0)
-		}, t5),
-		KeyboardButton = if not v39 or not t1.shouldShowKeyboardButton then nil else React.createElement(Foundation.IconButton, {
-			LayoutOrder = 2,
-			isCircular = true,
-			isDisabled = false,
-			icon = {
-				name = "keyboard",
-				variant = "Regular"
+		TabsGroup = React.createElement(
+			"Frame",
+			{
+				LayoutOrder = 1,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Size = UDim2.fromScale(0, 0),
+				BackgroundTransparency = 1
 			},
+			children2
+		),
+		KeyboardButton = 0
+	}
+	local keyboardButton
+
+	if v5 and props.shouldShowKeyboardButton then
+		keyboardButton = React.createElement(Foundation.IconButton, {
+			LayoutOrder = 2,
+			icon = { name = "keyboard", variant = "Regular" },
 			variant = Foundation.Enums.ButtonVariant.Utility,
 			size = Foundation.Enums.InputSize.Small,
-			onActivated = v42
+			isCircular = true,
+			isDisabled = false,
+			onActivated = onActivated
 		})
-	}
+	end
 
-	return React.createElement(PresetCooldownProvider, {}, React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1)
-	}, {
-		RootLayout = React.createElement("UIListLayout", {
-			FillDirection = Enum.FillDirection.Vertical,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
-		TabRow = React.createElement("Frame", {
-			LayoutOrder = 1,
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.fromScale(1, 0)
-		}, t7),
-		TabRowBaseline = React.createElement("Frame", {
-			LayoutOrder = 2,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 0, 1),
-			BackgroundColor3 = v34.Color.Stroke.Default.Color3,
-			BackgroundTransparency = v34.Color.Stroke.Default.Transparency
-		}),
-		Scroll = React.createElement(Foundation.ScrollView, {
-			LayoutOrder = 3,
-			tag = "grow size-full-0",
-			scroll = {
-				scrollBarVisibility = Foundation.Enums.ScrollBarVisibility.Always,
-				AutomaticCanvasSize = Enum.AutomaticSize.Y,
-				CanvasSize = UDim2.new(0, 0, 0, 0)
-			}
-		}, {
-			Categories = React.createElement(Foundation.View, {
-				tag = "size-full-0 auto-y",
-				layout = {
-					FillDirection = Enum.FillDirection.Vertical,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, v34.Padding.Large)
+	v12.KeyboardButton = keyboardButton
+
+	return React.createElement(
+		PresetCooldownProvider,
+		{},
+		React.createElement("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, {
+			RootLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			TabRow = React.createElement(
+				"Frame",
+				{
+					LayoutOrder = 1,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.fromScale(1, 0),
+					BackgroundTransparency = 1
 				},
-				padding = {
-					top = UDim.new(0, v34.Padding.Large),
-					bottom = UDim.new(0, v34.Padding.Large),
-					left = UDim.new(0, v34.Padding.Large),
-					right = UDim.new(0, v34.Padding.Large)
+				v12
+			),
+			TabRowBaseline = React.createElement("Frame", {
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, 1),
+				BackgroundColor3 = v.Color.Stroke.Default.Color3,
+				BackgroundTransparency = v.Color.Stroke.Default.Transparency,
+				BorderSizePixel = 0
+			}),
+			Scroll = React.createElement(Foundation.ScrollView, {
+				LayoutOrder = 3,
+				tag = "grow size-full-0",
+				scroll = {
+					scrollBarVisibility = Foundation.Enums.ScrollBarVisibility.Always,
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					CanvasSize = UDim2.new(0, 0, 0, 0)
 				}
-			}, t3)
+			}, {
+				Categories = React.createElement(Foundation.View, {
+					tag = "size-full-0 auto-y",
+					layout = {
+						FillDirection = Enum.FillDirection.Vertical,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, v.Padding.Large)
+					},
+					padding = {
+						top = UDim.new(0, v.Padding.Large),
+						bottom = UDim.new(0, v.Padding.Large),
+						left = UDim.new(0, v.Padding.Large),
+						right = UDim.new(0, v.Padding.Large)
+					}
+				}, children)
+			})
 		})
-	}))
+	)
 end
 
 return React.memo(PresetChatContainer)

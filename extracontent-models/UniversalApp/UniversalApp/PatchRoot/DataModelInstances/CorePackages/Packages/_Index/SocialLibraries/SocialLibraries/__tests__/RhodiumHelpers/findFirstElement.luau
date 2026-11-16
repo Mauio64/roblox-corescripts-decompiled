@@ -1,13 +1,13 @@
 local Packages = script:FindFirstAncestor("Packages")
-local Element = require(Packages.Dev.Rhodium).Element
+local Rhodium = require(Packages.Dev.Rhodium)
+local Element = Rhodium.Element
 local findFirstInstance = require(script.Parent.findFirstInstance)
 
-return function(p1, p2) -- line: 12
-	-- upvalues: findFirstInstance (copy), Element (copy)
-	local v6 = findFirstInstance(p1, p2)
+return function(p, p2)
+	local firstInstance = findFirstInstance(p, p2)
 
-	if v6 then
-		return Element.new("game." .. v6:GetFullName())
+	if firstInstance then
+		return Element.new("game." .. firstInstance:GetFullName())
 	end
 
 	return nil

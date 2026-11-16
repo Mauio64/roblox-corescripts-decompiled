@@ -1,18 +1,12 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
+require(parent.networkingChatTypes)
+local CHAT_URL = require(parent.CHAT_URL)
 
-require(ParentParent.networkingChatTypes)
-
-local CHAT_URL = require(ParentParent.CHAT_URL)
-
-return function(p1) -- line: 6
-	-- upvalues: CHAT_URL (copy)
-	return p1.roduxNetworking.POST({
-		Name = "StartGroupConversation"
-	}, function(p2, p3, p4) -- line: 9
-		-- upvalues: CHAT_URL (copy)
-		return p2(CHAT_URL):path("v2"):path("start-group-conversation"):body({
-			participantUserIds = p3,
-			title = p4
-		}):setStatusIds(p3)
+return function(p)
+	return p.roduxNetworking.POST({ Name = "StartGroupConversation" }, function(callback, participantUserIds, title)
+		return callback(CHAT_URL):path("v2"):path("start-group-conversation"):body({
+			participantUserIds = participantUserIds,
+			title = title
+		}):setStatusIds(participantUserIds)
 	end)
 end

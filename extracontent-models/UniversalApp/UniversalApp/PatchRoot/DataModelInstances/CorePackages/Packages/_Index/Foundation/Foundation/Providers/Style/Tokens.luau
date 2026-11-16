@@ -1,94 +1,85 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local RbxDesignFoundations = require(FoundationParent.RbxDesignFoundations)
+local parent = Foundation.Parent
+require(parent.RbxDesignFoundations)
+
+local ColorMode = require(Foundation.Enums.ColorMode)
+local DeprecatedTokenUtilities = require(script.DeprecatedTokenUtilities)
 local Device = require(Foundation.Enums.Device)
 local Flags = require(Foundation.Utility.Flags)
-local Theme = require(Foundation.Enums.Theme)
+local ThemeName = require(Foundation.Enums.ThemeName)
 local TokenProcessingUtilities = require(script.TokenProcessingUtilities)
-
 require(Foundation.Components.Types)
+local themeGenerators = require(script.themeGenerators)
 
-local function getPlatformScale(p1, n1: number?) -- line: 20
-	-- upvalues: Flags (copy), Device (copy)
+local function getPlatformScale(p, p2: number?) -- 2 equivalent calls inferred from this helper
 	if Flags.FoundationDisableTokenScaling then
 		return 1
 	end
 
-	if n1 == nil then
-		n1 = 1
-	end
+	local v = (math.clamp)(p2 == nil and 1 or p2, 0, 1e999)
 
-	local v14 = math.clamp(n1, 0, 1e999)
-
-	return (p1 ~= Device.Console and 1 or 1.5) * v14
+	return (p == Device.Console and 1.5 or 1) * v
 end
-local function applyTokenOverrides(p2, t1: {[any]: any}) -- line: 35
-	-- upvalues: Flags (copy), TokenProcessingUtilities (copy)
-	if not Flags.FoundationTokenOverrides then
-		return p2
-	end
 
-	for v17, v18 in t1 do
-		local v19 = TokenProcessingUtilities.resolveTokenOverride(p2, v17, v18)
+local function applyTokenOverrides(tokens, items)
+	for k, item in items do
+		local tokenOverride = TokenProcessingUtilities.resolveTokenOverride(tokens, k, item)
 
-		if v19 ~= nil then
-			TokenProcessingUtilities.setTokenValue(p2, v17, v19)
+		if tokenOverride ~= nil then
+			TokenProcessingUtilities.setTokenValue(tokens, k, tokenOverride)
 		end
 	end
 
-	return p2
+	return tokens
 end
-local function getTokens(p3, p4, n2: number?, t2: {[any]: any}?) -- line: 50
-	-- upvalues: RbxDesignFoundations (copy), Device (copy), Flags (copy), Theme (copy), applyTokenOverrides (copy)
-	local Tokens = RbxDesignFoundations.Tokens
-	local v25 = p4 or Device.Desktop
-	local n3
 
-	if Flags.FoundationDisableTokenScaling then
-		n3 = 1
-	else
-		if n2 == nil then
-			n2 = 1
-		end
+local function buildTokens(callback, platformScale: number, p)
+	local v = callback(platformScale)
 
-		local v27 = math.clamp(n2, 0, 1e999)
-
-		n3 = (v25 ~= Device.Console and 1 or 1.5) * v27
-	end
-
-	local v28 = ((if p3 ~= Theme.Dark then Tokens.Light else Tokens.Dark))(n3)
-	local t3 = {
-		Color = v28.Color,
-		Config = v28.Config,
-		DarkMode = v28.DarkMode,
-		Ease = v28.Ease,
-		LightMode = v28.LightMode,
-		Inverse = v28.Inverse,
-		Semantic = v28.Semantic,
-		Size = v28.Size,
-		Padding = v28.Padding,
-		Margin = v28.Margin,
-		Gap = v28.Gap,
-		Gutter = v28.Gutter,
-		Radius = v28.Radius,
-		Stroke = v28.Stroke,
-		LineHeight = v28.LineHeight,
-		FontSize = v28.FontSize,
-		FontWeight = v28.FontWeight,
-		Time = v28.Time,
-		Typography = v28.Typography
+	local tokens = {
+		Color = v.Color,
+		Config = v.Config,
+		DarkMode = v.DarkMode,
+		Ease = v.Ease,
+		LightMode = v.LightMode,
+		Inverse = v.Inverse,
+		Size = v.Size,
+		Padding = v.Padding,
+		Margin = v.Margin,
+		Gap = v.Gap,
+		Gutter = v.Gutter,
+		Radius = v.Radius,
+		Stroke = v.Stroke,
+		LineHeight = v.LineHeight,
+		FontSize = v.FontSize,
+		FontWeight = v.FontWeight,
+		Time = v.Time,
+		Typography = v.Typography
 	}
 
-	if t2 then
-		applyTokenOverrides(t3, t2)
+	if p then
+		applyTokenOverrides(tokens, p)
 	end
 
-	return t3
+	if Flags.FoundationRemoveDeprecatedSemanticTokens then
+		tokens.Semantic = nil
+		return tokens
+	end
+
+	tokens.Semantic = DeprecatedTokenUtilities.getDeprecatedSemanticTokens(tokens, platformScale)
+
+	return tokens
 end
 
-local v11 = getTokens(Theme.Dark, Device.Desktop)
+local function getTokens(p, p2, p3: number?, p4, p5)
+	local platformScale = getPlatformScale(p2 or Device.Desktop, p3) -- inferred equivalent call
 
+	return buildTokens(themeGenerators.getGenerator(p5 or ThemeName.Default, p), platformScale, p4)
+end
+
+local Dark = ColorMode.Dark
+local platformScale = getPlatformScale(Device.Desktop or Device.Desktop) -- inferred equivalent call
 return {
 	getTokens = getTokens,
-	defaultTokens = v11
+	defaultTokens = buildTokens(themeGenerators.getGenerator(ThemeName.Default, Dark), platformScale, nil)
 }

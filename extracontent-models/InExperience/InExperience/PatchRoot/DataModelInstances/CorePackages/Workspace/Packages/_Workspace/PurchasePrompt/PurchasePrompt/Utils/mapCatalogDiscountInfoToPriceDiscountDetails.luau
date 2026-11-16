@@ -1,24 +1,20 @@
-local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
-
-local function mapCatalogDiscountInfoToPriceDiscountDetails(p1) -- line: 4
-	-- upvalues: FFlagPurchasePromptCartPricingEnabled (copy)
-	if type(p1) ~= "table" or (type(p1.discounts) ~= "table" or #p1.discounts == 0) then
+local function mapCatalogDiscountInfoToPriceDiscountDetails(p)
+	if type(p) ~= "table" or type(p.discounts) ~= "table" or #p.discounts == 0 then
 		return nil
 	end
 
-	local t1 = {}
+	local result = {}
 
-	for _, v in ipairs(p1.discounts) do
-		table.insert(t1, {
-			Type = v.discountCampaign or "",
-			AmountInRobux = v.robuxDiscountAmount or 0,
-			Percent = v.robuxDiscountPercentage or 0,
-			LocalizedDiscountAttribution = if not FFlagPurchasePromptCartPricingEnabled then nil else v.localizedDiscountAttribution
+	for _, discount in ipairs(p.discounts) do
+		table.insert(result, {
+			Type = discount.discountCampaign or "",
+			AmountInRobux = discount.robuxDiscountAmount or 0,
+			Percent = discount.robuxDiscountPercentage or 0,
+			LocalizedDiscountAttribution = discount.localizedDiscountAttribution
 		})
 	end
 
-	return t1
+	return result
 end
 
 return mapCatalogDiscountInfoToPriceDiscountDetails

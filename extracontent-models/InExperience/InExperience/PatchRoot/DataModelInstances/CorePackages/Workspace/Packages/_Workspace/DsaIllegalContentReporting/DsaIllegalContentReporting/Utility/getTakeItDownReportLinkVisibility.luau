@@ -1,41 +1,46 @@
-local Parent = script:FindFirstAncestor("DsaIllegalContentReporting").Parent
+local parent = script:FindFirstAncestor("DsaIllegalContentReporting").Parent
 local LocalizationService = game:GetService("LocalizationService")
 local Players = game:GetService("Players")
-local FFlagAddTakeItDownReportLinkToSurfaces = require(Parent.SharedFlags).FFlagAddTakeItDownReportLinkToSurfaces
-local v5 = game:DefineFastString("CountriesWithTakeItDownReport", "US")
-local u6 = false
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAddTakeItDownReportLinkToSurfaces = SharedFlags.FFlagAddTakeItDownReportLinkToSurfaces
+
+local defineFastString = game:DefineFastString("CountriesWithTakeItDownReport", "US")
+
+local v = false
 
 if FFlagAddTakeItDownReportLinkToSurfaces then
-	task.spawn(function() -- line: 18
-		-- upvalues: Players (copy), LocalizationService (copy), v5 (copy), u6 (ref)
-		local LocalPlayer = Players.LocalPlayer
+	task.spawn(function()
+		local localPlayer = Players.LocalPlayer
 
-		while not LocalPlayer do
+		while not localPlayer do
 			Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-			LocalPlayer = Players.LocalPlayer
+			localPlayer = Players.LocalPlayer
 		end
 
-		local ok, result = pcall(LocalizationService.GetCountryRegionForPlayerAsync, LocalizationService, LocalPlayer)
+		local success, countryRegionForPlayerAsync = pcall(
+			LocalizationService.GetCountryRegionForPlayerAsync,
+			LocalizationService,
+			localPlayer
+		)
 
-		if not ok then
+		if not success then
 			return
 		end
 
-		local parts = v5:split(",")
+		local parts = defineFastString:split(",")
 
-		for _, v in ipairs(parts) do
-			if result == v then
-				u6 = true
-
-				return
+		for _, part in ipairs(parts) do
+			if countryRegionForPlayerAsync == part then
+				v = true
+				break
 			end
 		end
 	end)
 end
 
-local function getTakeItDownReportLinkVisibility() -- line: 42
-	-- upvalues: FFlagAddTakeItDownReportLinkToSurfaces (copy), u6 (ref)
-	return FFlagAddTakeItDownReportLinkToSurfaces and u6
+local function getTakeItDownReportLinkVisibility()
+	return FFlagAddTakeItDownReportLinkToSurfaces and v
 end
 
 return getTakeItDownReportLinkVisibility

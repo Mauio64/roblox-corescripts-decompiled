@@ -1,77 +1,95 @@
 local HttpService = game:GetService("HttpService")
 local ContextActionService = game:GetService("ContextActionService")
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local getPartialPageModalMiddleContentWidth = require(ParentParentParent.UIBlox).App.Dialog.Modal.getPartialPageModalMiddleContentWidth
-local PremiumUpsellFlowState = require(scriptParent.PremiumUpsellFlowState)
-local Animator = require(ParentParent.Generic.Animator)
-local Constants = require(ParentParent.Generic.Constants)
-local PurchaseErrorPrompt = require(ParentParent.Generic.PurchaseErrorPrompt)
-local PremiumUpsellPrompt = require(ParentParent.PremiumUpsell.PremiumUpsellPrompt)
-local getModalShownEventData = require(ParentParent.Utility.getModalShownEventData)
-local getUserInputEventData = require(ParentParent.Utility.getUserInputEventData)
-local getEnableCentralOverlayForUpsellPrompt = require(ParentParent.Flags.getEnableCentralOverlayForUpsellPrompt)
-local VerifiedParentalConsentDialog = require(ParentParentParent.VerifiedParentalConsentDialog).VerifiedParentalConsentDialog
-local v17 = game:DefineFastFlag("CompleteFlowInStudioAccept", false)
-local v18 = Roact.Component:extend(script.Name)
 
-function v18.init(p1) -- line: 64
-	-- upvalues: HttpService (copy)
-	p1.state = {
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+
+local UIBlox = require(parent3.UIBlox)
+local getPartialPageModalMiddleContentWidth = UIBlox.App.Dialog.Modal.getPartialPageModalMiddleContentWidth
+
+local PremiumUpsellFlowState = require(parent.PremiumUpsellFlowState)
+
+local Animator = require(parent2.Generic.Animator)
+local Constants = require(parent2.Generic.Constants)
+
+local PurchaseErrorPrompt = require(parent2.Generic.PurchaseErrorPrompt)
+local PremiumUpsellPrompt = require(parent2.PremiumUpsell.PremiumUpsellPrompt)
+
+local getModalShownEventData = require(parent2.Utility.getModalShownEventData)
+local getUserInputEventData = require(parent2.Utility.getUserInputEventData)
+
+local getEnableCentralOverlayForUpsellPrompt = require(parent2.Flags.getEnableCentralOverlayForUpsellPrompt)
+
+local VerifiedParentalConsentDialog = require(parent3.VerifiedParentalConsentDialog)
+local verifiedParentalConsentDialog = VerifiedParentalConsentDialog.VerifiedParentalConsentDialog
+
+local defineFastFlag = game:DefineFastFlag("CompleteFlowInStudioAccept", false)
+
+local extended = Roact.Component:extend(script.Name)
+
+function extended:init()
+	self.state = {
 		analyticId = HttpService:GenerateGUID(false)
 	}
 
-	function p1.closeModal() -- line: 69
-		-- upvalues: p1 (copy)
-		local props = p1.props
-
-		p1:reportUserInput("Cancel")
+	function self.closeModal()
+		local props = self.props
+		self:reportUserInput("Cancel")
 		props.cancelPurchase()
-		p1:closeCentralOverlay()
-		p1:UnbindActions()
-	end
-end
-function v18.didUpdate(t1: {[any]: any}, t2: {[any]: any}, _: {[any]: any}) -- line: 79
-	local props = t1.props
+		self:closeCentralOverlay()
 
-	if t2.purchaseState ~= props.purchaseState then
-		t1:reportModalShown()
-		t1:dispatchCentralOverlayAndRenderModal(props)
+		self:UnbindActions()
 	end
 end
-function v18.UnbindActions(p2) -- line: 88
-	-- upvalues: getEnableCentralOverlayForUpsellPrompt (copy), ContextActionService (copy), Constants (copy)
-	if getEnableCentralOverlayForUpsellPrompt() and p2.props.dispatchCentralOverlay then
+
+function extended:didUpdate(p, _)
+	local props = self.props
+
+	if p.purchaseState ~= props.purchaseState then
+		self:reportModalShown()
+		self:dispatchCentralOverlayAndRenderModal(props)
+	end
+end
+
+function extended:UnbindActions()
+	if getEnableCentralOverlayForUpsellPrompt() and self.props.dispatchCentralOverlay then
 		ContextActionService:UnbindAction(Constants.CLOSE_MODAL_ACTION)
 	end
 end
-function v18.BindCancelAction(p3) -- line: 94
-	-- upvalues: getEnableCentralOverlayForUpsellPrompt (copy), ContextActionService (copy), Constants (copy)
-	if getEnableCentralOverlayForUpsellPrompt() and p3.props.dispatchCentralOverlay then
-		ContextActionService:BindAction(Constants.CLOSE_MODAL_ACTION, p3.closeModal, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape)
+
+function extended:BindCancelAction()
+	if getEnableCentralOverlayForUpsellPrompt() and self.props.dispatchCentralOverlay then
+		ContextActionService:BindAction(
+			Constants.CLOSE_MODAL_ACTION,
+			self.closeModal,
+			false,
+			Enum.KeyCode.ButtonB,
+			Enum.KeyCode.Escape
+		)
 	end
 end
-function v18.closeCentralOverlay(p4) -- line: 110
-	-- upvalues: getEnableCentralOverlayForUpsellPrompt (copy)
-	local props = p4.props
+
+function extended:closeCentralOverlay()
+	local props = self.props
 
 	if getEnableCentralOverlayForUpsellPrompt() and props.dispatchCentralOverlay then
 		props.dispatchCentralOverlay()
 	end
 end
-function v18.constructPremiumUpsellPromptAnimatorObj(p5) -- line: 118
-	-- upvalues: getPartialPageModalMiddleContentWidth (copy), PremiumUpsellFlowState (copy), Roact (copy), PremiumUpsellPrompt (copy), v17 (copy)
-	local props = p5.props
-	local v30 = getPartialPageModalMiddleContentWidth(props.screenSize.X)
+
+function extended:constructPremiumUpsellPromptAnimatorObj()
+	local props = self.props
+
+	local partialPageModalMiddleContentWidth = getPartialPageModalMiddleContentWidth(props.screenSize.X)
 
 	return {
-		shouldAnimate = true,
 		shouldShow = props.purchaseState == PremiumUpsellFlowState.PurchaseModal,
-		animateDown = v30 == 492,
-		renderChildren = function() -- line: 127
-			-- upvalues: Roact (copy), PremiumUpsellPrompt (copy), props (copy), p5 (copy), v17 (copy)
+		shouldAnimate = true,
+		animateDown = partialPageModalMiddleContentWidth == 492,
+		renderChildren = function()
 			return Roact.createElement(PremiumUpsellPrompt, {
 				screenSize = props.screenSize,
 				isCatalog = props.isCatalog,
@@ -79,147 +97,155 @@ function v18.constructPremiumUpsellPromptAnimatorObj(p5) -- line: 118
 				robuxPrice = props.robuxPrice,
 				robuxAmount = props.robuxAmount,
 				acceptControllerIcon = props.acceptControllerIcon,
-				purchasePremiumActivated = function() -- line: 139
-					-- upvalues: p5 (copy), props (copy), v17 (copy)
-					p5:reportUserInput("Subscribe")
+				purchasePremiumActivated = function()
+					self:reportUserInput("Subscribe")
 					props.purchasePremium()
 
-					if v17 and game:GetService("RunService"):IsStudio() then
-						props.flowComplete()
+					if defineFastFlag then
+						local RunService = game:GetService("RunService")
+
+						if RunService:IsStudio() then
+							props.flowComplete()
+						end
 					end
 
-					p5:closeCentralOverlay()
+					self:closeCentralOverlay()
 				end,
-				cancelPurchaseActivated = function() -- line: 147
-					-- upvalues: p5 (copy), props (copy)
-					p5:reportUserInput("Cancel")
+				cancelPurchaseActivated = function()
+					self:reportUserInput("Cancel")
 					props.cancelPurchase()
-					p5:closeCentralOverlay()
+					self:closeCentralOverlay()
 				end
 			})
 		end
 	}
 end
-function v18.constructPurchaseErrorPromptAnimatorObj(p6) -- line: 157
-	-- upvalues: PremiumUpsellFlowState (copy), Roact (copy), PurchaseErrorPrompt (copy)
-	local props = p6.props
+
+function extended:constructPurchaseErrorPromptAnimatorObj()
+	local props = self.props
 
 	return {
-		shouldAnimate = true,
 		shouldShow = props.purchaseState == PremiumUpsellFlowState.Error,
-		renderChildren = function() -- line: 163
-			-- upvalues: Roact (copy), PurchaseErrorPrompt (copy), props (copy), p6 (copy)
+		shouldAnimate = true,
+		renderChildren = function()
 			return Roact.createElement(PurchaseErrorPrompt, {
 				screenSize = props.screenSize,
 				errorType = props.errorType,
 				economicRestrictionError = props.economicRestrictionError,
 				doneControllerIcon = props.acceptControllerIcon,
-				doneActivated = function() -- line: 172
-					-- upvalues: p6 (copy), props (copy)
-					p6:reportUserInput("Done")
+				doneActivated = function()
+					self:reportUserInput("Done")
 					props.flowComplete()
-					p6:closeCentralOverlay()
+					self:closeCentralOverlay()
 				end
 			})
 		end
 	}
 end
-function v18.constructPurchaseVPCPromptAnimatorObj(p7) -- line: 182
-	-- upvalues: PremiumUpsellFlowState (copy), Roact (copy), VerifiedParentalConsentDialog (copy)
-	local props = p7.props
 
-	p7:BindCancelAction()
+function extended:constructPurchaseVPCPromptAnimatorObj()
+	local props = self.props
+
+	self:BindCancelAction()
 
 	return {
-		shouldAnimate = true,
 		shouldShow = props.purchaseState == PremiumUpsellFlowState.PurchaseVPCModal,
-		renderChildren = function() -- line: 190
-			-- upvalues: Roact (copy), VerifiedParentalConsentDialog (copy), props (copy), p7 (copy)
-			return Roact.createElement(VerifiedParentalConsentDialog, {
-				isActionable = false,
+		shouldAnimate = true,
+		renderChildren = function()
+			return Roact.createElement(verifiedParentalConsentDialog, {
 				screenSize = props.screenSize,
+				isActionable = false,
 				modalType = props.purchaseVPCType,
-				onDismiss = function() -- line: 195
-					-- upvalues: p7 (copy), props (copy)
-					p7:reportUserInput("Cancel")
+				onDismiss = function()
+					self:reportUserInput("Cancel")
 					props.cancelPurchase()
-					p7:closeCentralOverlay()
+					self:closeCentralOverlay()
 				end
 			})
 		end
 	}
 end
-function v18.dispatchCentralOverlayAndRenderModal(t4: {[any]: any}, t5: {[any]: any}) -- line: 205
-	-- upvalues: getEnableCentralOverlayForUpsellPrompt (copy), PremiumUpsellFlowState (copy), Constants (copy)
-	if not getEnableCentralOverlayForUpsellPrompt() or not t5.dispatchCentralOverlay then
+
+function extended:dispatchCentralOverlayAndRenderModal(p)
+	if not (getEnableCentralOverlayForUpsellPrompt() and p.dispatchCentralOverlay) then
 		return
 	end
 
-	local purchaseState = t5.purchaseState
+	local purchaseState = p.purchaseState
 
 	if purchaseState == PremiumUpsellFlowState.PurchaseModal then
-		t5.dispatchCentralOverlay(Constants.CENTRAL_OVERLAY_TYPE_ANIMATOR, t4:constructPremiumUpsellPromptAnimatorObj())
+		p.dispatchCentralOverlay(
+			Constants.CENTRAL_OVERLAY_TYPE_ANIMATOR,
+			self:constructPremiumUpsellPromptAnimatorObj()
+		)
 	end
 
 	if purchaseState == PremiumUpsellFlowState.Error then
-		t5.dispatchCentralOverlay(Constants.CENTRAL_OVERLAY_TYPE_ANIMATOR, t4:constructPurchaseErrorPromptAnimatorObj())
+		p.dispatchCentralOverlay(
+			Constants.CENTRAL_OVERLAY_TYPE_ANIMATOR,
+			self:constructPurchaseErrorPromptAnimatorObj()
+		)
 	end
 
 	if purchaseState == PremiumUpsellFlowState.PurchaseVPCModal then
-		t5.dispatchCentralOverlay(Constants.CENTRAL_OVERLAY_TYPE_ANIMATOR, t4:constructPurchaseVPCPromptAnimatorObj())
+		p.dispatchCentralOverlay(Constants.CENTRAL_OVERLAY_TYPE_ANIMATOR, self:constructPurchaseVPCPromptAnimatorObj())
 	end
 end
-function v18.reportModalShown(p8) -- line: 236
-	-- upvalues: getModalShownEventData (copy), PremiumUpsellFlowState (copy), HttpService (copy)
-	local props = p8.props
-	local state = p8.state
 
-	if not p8.props.onAnalyticEvent then
+function extended:reportModalShown()
+	local props = self.props
+	local state = self.state
+
+	if not self.props.onAnalyticEvent then
 		return
 	end
 
-	local v41 = getModalShownEventData(state.analyticId, props.eventPrefix, "PremiumUpsell", PremiumUpsellFlowState.toRawValue(props.purchaseState), HttpService:JSONEncode({
-		universe_id = tostring(game.GameId)
-	}))
+	local modalShownEventData = getModalShownEventData(
+		state.analyticId,
+		props.eventPrefix,
+		"PremiumUpsell",
+		PremiumUpsellFlowState.toRawValue(props.purchaseState),
+		HttpService:JSONEncode({ universe_id = tostring(game.GameId) })
+	)
 
-	props.onAnalyticEvent("UserPurchaseFlow", v41)
+	props.onAnalyticEvent("UserPurchaseFlow", modalShownEventData)
 end
-function v18.reportUserInput(t6: {[any]: any}, s1: string) -- line: 257
-	-- upvalues: getUserInputEventData (copy), PremiumUpsellFlowState (copy), HttpService (copy)
-	local props = t6.props
-	local state = t6.state
 
-	if not t6.props.onAnalyticEvent then
+function extended:reportUserInput(p: string)
+	local props = self.props
+	local state = self.state
+
+	if not self.props.onAnalyticEvent then
 		return
 	end
 
-	local v46 = getUserInputEventData(state.analyticId, props.eventPrefix, "PremiumUpsell", PremiumUpsellFlowState.toRawValue(props.purchaseState), s1, HttpService:JSONEncode({
-		universe_id = tostring(game.GameId)
-	}))
+	local userInputEventData = getUserInputEventData(
+		state.analyticId,
+		props.eventPrefix,
+		"PremiumUpsell",
+		PremiumUpsellFlowState.toRawValue(props.purchaseState),
+		p,
+		HttpService:JSONEncode({ universe_id = tostring(game.GameId) })
+	)
 
-	props.onAnalyticEvent("UserPurchaseFlow", v46)
+	props.onAnalyticEvent("UserPurchaseFlow", userInputEventData)
 end
-function v18.getChildrenElements(p9) -- line: 280
-	-- upvalues: Roact (copy), Animator (copy)
+
+function extended:getChildrenElements()
 	return {
-		PremiumUpsellPromptAnimator = Roact.createElement(Animator, p9:constructPremiumUpsellPromptAnimatorObj()),
-		PurchaseErrorPromptAnimator = Roact.createElement(Animator, p9:constructPurchaseErrorPromptAnimatorObj()),
-		PurchaseVPCPromptAnimator = Roact.createElement(Animator, p9:constructPurchaseVPCPromptAnimatorObj())
+		PremiumUpsellPromptAnimator = Roact.createElement(Animator, self:constructPremiumUpsellPromptAnimatorObj()),
+		PurchaseErrorPromptAnimator = Roact.createElement(Animator, self:constructPurchaseErrorPromptAnimatorObj()),
+		PurchaseVPCPromptAnimator = Roact.createElement(Animator, self:constructPurchaseVPCPromptAnimatorObj())
 	}
 end
-function v18.render(p10) -- line: 288
-	-- upvalues: getEnableCentralOverlayForUpsellPrompt (copy), Roact (copy)
-	local props = p10.props
-	local t7 = {}
 
-	if not getEnableCentralOverlayForUpsellPrompt() or not props.dispatchCentralOverlay then
-		t7 = p10:getChildrenElements()
-	end
+function extended:render()
+	local props = self.props
 
-	return Roact.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 1, 0)
-	}, t7)
+	local v = getEnableCentralOverlayForUpsellPrompt() and props.dispatchCentralOverlay and {}
+		or self:getChildrenElements()
+
+	return Roact.createElement("Frame", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1 }, v)
 end
 
-return v18
+return extended

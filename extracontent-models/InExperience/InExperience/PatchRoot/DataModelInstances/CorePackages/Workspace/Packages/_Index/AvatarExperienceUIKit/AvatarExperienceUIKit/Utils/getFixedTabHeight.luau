@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+require(parent.Foundation)
 
-require(Parent.Foundation)
-
-local function getFixedTabHeight(p1) -- line: 11
-	return p1.Size.Size_800
+local function getFixedTabHeight(p)
+	return p.Size.Size_800
 end
 
 return getFixedTabHeight

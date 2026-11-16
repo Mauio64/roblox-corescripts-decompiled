@@ -1,97 +1,102 @@
-local Parent = script:FindFirstAncestor("CollectionViews").Parent
-local React = require(Parent.React)
-local ReactIs = require(Parent.ReactIs)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("CollectionViews").Parent
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+
+local Foundation = require(parent.Foundation)
 local ControlState = Foundation.Enums.ControlState
 local IconSize = Foundation.Enums.IconSize
 local Icon = Foundation.Icon
 local View = Foundation.View
 local useTokens = Foundation.Hooks.useTokens
 
-local function ScrollButton(t1: {[any]: any}) -- line: 41
-	-- upvalues: useTokens (copy), React (copy), ControlState (copy), View (copy), Icon (copy), IconSize (copy)
-	local v13 = useTokens()
-	local v14 = React.useCallback(function(p1) -- line: 43
-		-- upvalues: ControlState (copy), t1 (copy)
-		if p1 == ControlState.Hover or p1 == ControlState.Pressed then
-			if t1.onScrollButtonEnter then
-				t1.onScrollButtonEnter()
-
-				return
+local function ScrollButton(props)
+	local v = useTokens()
+	local onStateChanged = React.useCallback(function(p)
+		if p == ControlState.Hover or p == ControlState.Pressed then
+			if props.onScrollButtonEnter then
+				props.onScrollButtonEnter()
 			end
-		elseif t1.onScrollButtonLeave then
-			t1.onScrollButtonLeave()
+		elseif props.onScrollButtonLeave then
+			props.onScrollButtonLeave()
 		end
-	end, {
-		t1.onScrollButtonEnter,
-		t1.onScrollButtonLeave
-	})
+	end, { props.onScrollButtonEnter, props.onScrollButtonLeave })
 
 	return React.createElement(View, {
-		tag = "size-1000 radius-circle bg-over-media-100",
-		AnchorPoint = t1.AnchorPoint,
-		Position = t1.Position,
-		Visible = t1.Visible,
-		onStateChanged = v14,
-		onActivated = t1.onActivated
+		AnchorPoint = props.AnchorPoint,
+		Position = props.Position,
+		Visible = props.Visible,
+		onStateChanged = onStateChanged,
+		onActivated = props.onActivated,
+		tag = "size-1000 radius-circle bg-over-media-100"
 	}, {
 		Icon = React.createElement(Icon, {
-			name = t1.icon,
+			name = props.icon,
 			size = IconSize.Large,
-			style = v13.Color.Content.Emphasis,
+			style = v.Color.Content.Emphasis,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5)
 		})
 	})
 end
-local function CarouselScrollButtons(t2: {[any]: any}) -- line: 73
-	-- upvalues: React (copy), ReactIs (copy), ScrollButton (copy)
-	local v16 = t2.buttonOffsetFromEdge or 0
-	local v17, v18 = React.useState(false)
-	local v19 = if not ReactIs.isBinding(t2.leftScrollingEnabled) then v17 and t2.leftScrollingEnabled else t2.leftScrollingEnabled:map(function(b1: boolean) -- line: 81
-		-- upvalues: v17 (copy)
-		return v17 and b1
-	end)
-	local v20 = if not ReactIs.isBinding(t2.rightScrollingEnabled) then v17 and t2.rightScrollingEnabled else t2.rightScrollingEnabled:map(function(b2: boolean) -- line: 92
-		-- upvalues: v17 (copy)
-		return v17 and b2
-	end)
-	local v21 = React.useCallback(function() -- line: 100
-		-- upvalues: v18 (copy)
-		v18(true)
+
+local function CarouselScrollButtons(props)
+	local buttonOffsetFromEdge = props.buttonOffsetFromEdge or 0
+
+	local state, setState = React.useState(false)
+	local visible
+
+	if ReactIs.isBinding(props.leftScrollingEnabled) then
+		visible = props.leftScrollingEnabled:map(function(flag: boolean)
+			return state and flag
+		end)
+	else
+		visible = state and props.leftScrollingEnabled
+	end
+
+	local visible2
+
+	if ReactIs.isBinding(props.rightScrollingEnabled) then
+		visible2 = props.rightScrollingEnabled:map(function(flag: boolean)
+			return state and flag
+		end)
+	else
+		visible2 = state and props.rightScrollingEnabled
+	end
+
+	local v = React.useCallback(function()
+		setState(true)
 	end, {})
-	local v22 = React.useCallback(function() -- line: 103
-		-- upvalues: v18 (copy)
-		v18(false)
+	local v2 = React.useCallback(function()
+		setState(false)
 	end, {})
 
 	return React.createElement("Frame", {
-		AnchorPoint = t2.AnchorPoint,
-		Position = t2.Position,
-		Size = t2.Size,
-		ZIndex = t2.ZIndex or 10,
+		AnchorPoint = props.AnchorPoint,
+		Position = props.Position,
+		Size = props.Size,
+		ZIndex = props.ZIndex or 10,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		[React.Event.MouseEnter] = v21,
-		[React.Event.MouseLeave] = v22
+		[React.Event.MouseEnter] = v,
+		[React.Event.MouseLeave] = v2
 	}, {
 		LeftScrollButton = React.createElement(ScrollButton, {
-			icon = "chevron-large-left",
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, v16, 0.5, 0),
-			Visible = v19,
-			onScrollButtonEnter = t2.onScrollButtonEnter,
-			onScrollButtonLeave = t2.onScrollButtonLeave,
-			onActivated = t2.handleScrollLeft
+			Position = UDim2.new(0, buttonOffsetFromEdge, 0.5, 0),
+			Visible = visible,
+			icon = "chevron-large-left",
+			onScrollButtonEnter = props.onScrollButtonEnter,
+			onScrollButtonLeave = props.onScrollButtonLeave,
+			onActivated = props.handleScrollLeft
 		}),
 		RightScrollButton = React.createElement(ScrollButton, {
-			icon = "chevron-large-right",
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, -v16, 0.5, 0),
-			Visible = v20,
-			onScrollButtonEnter = t2.onScrollButtonEnter,
-			onScrollButtonLeave = t2.onScrollButtonLeave,
-			onActivated = t2.handleScrollRight
+			Position = UDim2.new(1, -buttonOffsetFromEdge, 0.5, 0),
+			Visible = visible2,
+			icon = "chevron-large-right",
+			onScrollButtonEnter = props.onScrollButtonEnter,
+			onScrollButtonLeave = props.onScrollButtonLeave,
+			onActivated = props.handleScrollRight
 		})
 	})
 end

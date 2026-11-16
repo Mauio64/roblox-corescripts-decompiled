@@ -1,7 +1,6 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Dash = require(ParentParent.Dash)
+local parent = script.Parent.Parent.Parent
 
-return React.createContext({
-	fireEvent = Dash.noop
-})
+local React = require(parent.React)
+local Dash = require(parent.Dash)
+
+return React.createContext({ fireEvent = Dash.noop })

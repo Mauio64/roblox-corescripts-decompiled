@@ -1,1 +1,3 @@
-return require(script["AssertionError.global"]).AssertionError
+local AssertionErrorglobal = require(script["AssertionError.global"])
+
+return AssertionErrorglobal.AssertionError

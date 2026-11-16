@@ -1,45 +1,43 @@
 local NavigationRodux = script:FindFirstAncestor("NavigationRodux")
-local NavigationRoduxParent = NavigationRodux.Parent
-local Navigation = require(NavigationRoduxParent.Navigation)
+local parent = NavigationRodux.Parent
+
+local Navigation = require(parent.Navigation)
 local getCurrentRouteState = Navigation.getCurrentRouteState
-local RoactNavigation = require(NavigationRoduxParent.RoactNavigation)
+local RoactNavigation = require(parent.RoactNavigation)
 local Actions = RoactNavigation.Actions
 local StackActions = RoactNavigation.StackActions
-local AppPage = require(NavigationRoduxParent.RobloxAppEnums).AppPage
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
 local Constants = require(NavigationRodux.Constants)
-
 require(NavigationRodux.types)
+local Utils = require(NavigationRodux.Utils)
+local getLegacyRouteFromRoactNavigationState = Utils.getLegacyRouteFromRoactNavigationState
 
-local getLegacyRouteFromRoactNavigationState = require(NavigationRodux.Utils).getLegacyRouteFromRoactNavigationState
 local createMockStackState = Navigation.TestUtils.createMockStackState
 local createMockScreenState = Navigation.TestUtils.createMockScreenState
 
-local function createMockReducerStateFromRouteState(p1) -- line: 28
-	-- upvalues: getLegacyRouteFromRoactNavigationState (copy), getCurrentRouteState (copy)
-	local v18 = getLegacyRouteFromRoactNavigationState(p1)
-
+local function createMockReducerStateFromRouteState(p)
 	return {
+		history = { (getLegacyRouteFromRoactNavigationState(p)) },
+		currentRoute = getCurrentRouteState({ state = p }),
+		roactNavigationState = p,
 		lockNavigationActions = false,
-		backNavigationDisableCounter = 0,
-		history = { v18 },
-		currentRoute = getCurrentRouteState({
-			state = p1
-		}),
-		roactNavigationState = p1
+		backNavigationDisableCounter = 0
 	}
 end
-local function createMockRouteStateFromPages(t1: {[any]: any}) -- line: 41
-	-- upvalues: createMockScreenState (copy), createMockStackState (copy)
-	local t2 = {}
 
-	for _, v22 in t1 do
-		table.insert(t2, createMockScreenState(v22.name, v22))
+local function createMockRouteStateFromPages(items)
+	local v = {}
+
+	for _, item in items do
+		table.insert(v, createMockScreenState(item.name, item))
 	end
 
-	return createMockStackState("StackRouterRoot", t2)
+	return createMockStackState("StackRouterRoot", v)
 end
 
-local t3 = {
+local set = {
 	[AppPage.Home] = true,
 	[AppPage.Games] = true,
 	[AppPage.Moments] = true,
@@ -48,66 +46,57 @@ local t3 = {
 	[AppPage.More] = true
 }
 
-local function navigateToRoute(p2, t4: {[any]: any}) -- line: 67
-	-- upvalues: Actions (copy), t3 (copy), Constants (copy), StackActions (copy)
-	local t5 = {}
+local function navigateToRoute(p, items)
+	local actions = {}
 
-	for _, v31 in t4 do
-		local v32 = if typeof(v31) ~= "string" then v31 else {
-			routeName = v31
-		}
-		local v33 = Actions.navigate(v32)
+	for _, item in items do
+		local v = typeof(item) == "string" and { routeName = item } or item
+		local action = Actions.navigate(v)
 
-		if t3[v32.routeName] then
-			v33 = Actions.navigate({
+		if set[v.routeName] then
+			action = Actions.navigate({
 				routeName = Constants.TempRnSwitchNavigatorName,
-				action = v33,
+				action = action,
 				key = Constants.TempRnSwitchNavigatorName
 			})
 		end
 
-		table.insert(t5, v33)
+		table.insert(actions, action)
 	end
 
-	p2.dispatch(StackActions.reset({
-		index = #t5,
-		actions = t5
+	p.dispatch(StackActions.reset({
+		index = #actions,
+		actions = actions
 	}))
 end
 
-return {
-	createMockReducerStateFromRouteState = createMockReducerStateFromRouteState,
-	createMockRouteStateFromPages = createMockRouteStateFromPages,
-	createMockNavigationState = function(...) -- line: 49
-		-- upvalues: createMockRouteStateFromPages (copy), createMockReducerStateFromRouteState (copy)
-		local t6 = {}
+local TestUtils = {}
+TestUtils.createMockReducerStateFromRouteState = createMockReducerStateFromRouteState
+TestUtils.createMockRouteStateFromPages = createMockRouteStateFromPages
 
-		for _, v25 in { ... } do
-			table.insert(t6, {
-				name = v25
-			})
-		end
+function TestUtils.createMockNavigationState(...)
+	local v = {}
 
-		local v26 = createMockRouteStateFromPages(t6)
+	for _, name in { ... } do
+		table.insert(v, { name = name })
+	end
 
-		return (createMockReducerStateFromRouteState(v26))
-	end,
-	resetNavigation = function(p3, t7: {[any]: any}?) -- line: 87
-		-- upvalues: navigateToRoute (copy)
-		p3.notifyEvents()
+	return createMockReducerStateFromRouteState(createMockRouteStateFromPages(v))
+end
 
-		if t7 == nil or #t7 == 0 then
-			p3.dispatch({
-				type = "RESET_NAVIGATION_FOR_TESTING_ONLY__DO_NOT_USE_IN_PRODUCTION"
-			})
+function TestUtils.resetNavigation(p, list)
+	p.notifyEvents()
 
-			return
-		end
+	if list == nil or #list == 0 then
+		p.dispatch({ type = "RESET_NAVIGATION_FOR_TESTING_ONLY__DO_NOT_USE_IN_PRODUCTION" })
+		return
+	end
 
-		navigateToRoute(p3, t7)
-		p3.notifyEvents()
-	end,
-	createMockStackState = createMockStackState,
-	createMockSwitchState = Navigation.TestUtils.createMockSwitchState,
-	createMockScreenState = createMockScreenState
-}
+	navigateToRoute(p, list)
+	p.notifyEvents()
+end
+
+TestUtils.createMockStackState = createMockStackState
+TestUtils.createMockSwitchState = Navigation.TestUtils.createMockSwitchState
+TestUtils.createMockScreenState = createMockScreenState
+return TestUtils

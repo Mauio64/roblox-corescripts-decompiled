@@ -1,48 +1,35 @@
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local TelemetryService = game:GetService("TelemetryService")
-local v3 = game:DefineFastInt("TopBarToggledThrottleHundredthsPercent", 0)
-local EngineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
-local t1 = {
+
+local defineFastInt = game:DefineFastInt("TopBarToggledThrottleHundredthsPercent", 0)
+
+local engineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
+
+local v = {
 	eventName = "topbar_toggled",
-	description = "Event fired every time TopBar is toggled open/close in UI-less mode",
-	links = "https://github.rbx.com/Roblox/proto-schemas/pull/6270",
 	backends = { "EventIngest" },
-	throttlingPercentage = v3,
-	lastUpdated = {
-		25,
-		6,
-		10
-	}
+	throttlingPercentage = defineFastInt,
+	lastUpdated = { 25, 6, 10 },
+	description = "Event fired every time TopBar is toggled open/close in UI-less mode",
+	links = "https://github.rbx.com/Roblox/proto-schemas/pull/6270"
 }
 
-return function(b1: boolean) -- line: 22
-	-- upvalues: EngineFeature (copy), RbxAnalyticsService (copy), TelemetryService (copy), t1 (copy)
-	local t2, t3
+return function(flag: boolean)
+	local customFields, standardizedFields
 
-	if EngineFeature then
-		t2 = {
-			"addPlaceId",
-			"addUniverseId",
-			"addPlaySessionId",
-			"addSessionInfo"
-		}
-		t3 = {
-			is_toggled_on = tostring(b1)
-		}
+	if engineFeature then
+		customFields = { is_toggled_on = tostring(flag) }
+		standardizedFields = { "addPlaceId", "addUniverseId", "addPlaySessionId", "addSessionInfo" }
 	else
-		t2 = {
-			"addPlaceId",
-			"addUniverseId",
-			"addSessionInfo"
-		}
-		t3 = {
-			is_toggled_on = tostring(b1),
+		customFields = {
+			is_toggled_on = tostring(flag),
 			playsessionid = RbxAnalyticsService:GetPlaySessionId()
 		}
+		standardizedFields = { "addPlaceId", "addUniverseId", "addSessionInfo" }
 	end
 
-	TelemetryService:LogEvent(t1, {
-		standardizedFields = t2,
-		customFields = t3
+	TelemetryService:LogEvent(v, {
+		standardizedFields = standardizedFields,
+		customFields = customFields
 	})
 end

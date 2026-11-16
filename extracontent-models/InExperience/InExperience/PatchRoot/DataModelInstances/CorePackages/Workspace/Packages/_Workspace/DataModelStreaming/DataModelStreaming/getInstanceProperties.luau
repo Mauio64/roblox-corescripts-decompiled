@@ -1,4 +1,4 @@
-local t1 = {
+local v = {
 	GuiBase2d = {
 		"AbsolutePosition",
 		"AbsoluteRotation",
@@ -178,10 +178,7 @@ local t1 = {
 		"SliceScale",
 		"TileSize"
 	},
-	Frame = {
-		"BackgroundTransparency",
-		"Style"
-	},
+	Frame = { "BackgroundTransparency", "Style" },
 	ScrollingFrame = {
 		"AbsoluteCanvasSize",
 		"AbsoluteWindowSize",
@@ -206,148 +203,92 @@ local t1 = {
 		"VerticalScrollBarInset",
 		"VerticalScrollBarPosition"
 	},
-	LayerCollector = {
-		"Enabled",
-		"ResetOnSpawn",
-		"ZIndexBehavior"
-	}
+	LayerCollector = { "Enabled", "ResetOnSpawn", "ZIndexBehavior" }
 }
 
-local function getProperty(p1, s1: string) -- line: 217
-	local ok, result = pcall(function() -- line: 218
-		-- upvalues: p1 (copy), s1 (copy)
-		return p1[s1]
+local function getProperty(instance, p: string)
+	local success, result = pcall(function()
+		return instance[p]
 	end)
 
-	if not ok or result == nil then
+	if not success or result == nil then
 		return nil
 	end
 
-	local function handleInf(n1: number) -- line: 226
-		if n1 == 1e999 then
+	local function handleInf(p2: number) -- 13 equivalent calls inferred from this helper
+		if p2 == 1e999 then
 			return "inf"
-		end
-
-		if n1 == -1e999 then
+		elseif p2 == -1e999 then
 			return "-inf"
 		end
 
-		return n1
+		return p2
 	end
 
 	if typeof(result) == "Vector2" then
-		local t2 = {}
-		local resultX = result.X
-		local v11 = if resultX ~= 1e999 then if resultX ~= -1e999 then resultX else "-inf" else "inf"
-		local resultY = result.Y
-		local v13 = if resultY ~= 1e999 then if resultY ~= -1e999 then resultY else "-inf" else "inf"
+		local v2 = handleInf(result.X) -- inferred equivalent call
+		return { v2, handleInf(result.Y) } -- inferred equivalent call
+	elseif typeof(result) == "Vector3" then
+		local v2 = handleInf(result.X) -- inferred equivalent call
+		local v3 = handleInf(result.Y) -- inferred equivalent call
+		return { v2, v3, handleInf(result.Z) } -- inferred equivalent call
+	else
+		if typeof(result) == "Color3" then
+			return { result.R, result.G, result.B }
+		end
 
-		t2[1] = v11
-		t2[2] = v13
-
-		return t2
+		if typeof(result) == "UDim2" then
+			local v2 = handleInf(result.X.Scale) -- inferred equivalent call
+			local v3 = handleInf(result.X.Offset) -- inferred equivalent call
+			local v4 = handleInf(result.Y.Scale) -- inferred equivalent call
+			return { v2, v3, v4, handleInf(result.Y.Offset) } -- inferred equivalent call
+		elseif typeof(result) == "Rect" then
+			local v2 = handleInf(result.Min.X) -- inferred equivalent call
+			local v3 = handleInf(result.Min.Y) -- inferred equivalent call
+			local v4 = handleInf(result.Max.X) -- inferred equivalent call
+			return { v2, v3, v4, handleInf(result.Max.Y) } -- inferred equivalent call
+		elseif typeof(result) == "number" or typeof(result) == "boolean" then
+			return result
+		else
+			return (tostring(result))
+		end
 	end
-
-	if typeof(result) == "Vector3" then
-		local t3 = {}
-		local resultX = result.X
-		local v16 = if resultX ~= 1e999 then if resultX ~= -1e999 then resultX else "-inf" else "inf"
-		local resultY = result.Y
-		local v18 = if resultY ~= 1e999 then if resultY ~= -1e999 then resultY else "-inf" else "inf"
-		local resultZ = result.Z
-		local v20 = if resultZ ~= 1e999 then if resultZ ~= -1e999 then resultZ else "-inf" else "inf"
-
-		t3[1] = v16
-		t3[2] = v18
-		t3[3] = v20
-
-		return t3
-	end
-
-	if typeof(result) == "Color3" then
-		return {
-			result.R,
-			result.G,
-			result.B
-		}
-	end
-
-	if typeof(result) == "UDim2" then
-		local t4 = {}
-		local XScale = result.X.Scale
-		local v23 = if XScale ~= 1e999 then if XScale ~= -1e999 then XScale else "-inf" else "inf"
-		local XOffset = result.X.Offset
-		local v25 = if XOffset ~= 1e999 then if XOffset ~= -1e999 then XOffset else "-inf" else "inf"
-		local YScale = result.Y.Scale
-		local v27 = if YScale ~= 1e999 then if YScale ~= -1e999 then YScale else "-inf" else "inf"
-		local YOffset = result.Y.Offset
-		local v29 = if YOffset ~= 1e999 then if YOffset ~= -1e999 then YOffset else "-inf" else "inf"
-
-		t4[1] = v23
-		t4[2] = v25
-		t4[3] = v27
-		t4[4] = v29
-
-		return t4
-	end
-
-	if typeof(result) == "Rect" then
-		local t5 = {}
-		local MinX = result.Min.X
-		local v32 = if MinX ~= 1e999 then if MinX ~= -1e999 then MinX else "-inf" else "inf"
-		local MinY = result.Min.Y
-		local v34 = if MinY ~= 1e999 then if MinY ~= -1e999 then MinY else "-inf" else "inf"
-		local MaxX = result.Max.X
-		local v36 = if MaxX ~= 1e999 then if MaxX ~= -1e999 then MaxX else "-inf" else "inf"
-		local MaxY = result.Max.Y
-		local v38 = if MaxY ~= 1e999 then if MaxY ~= -1e999 then MaxY else "-inf" else "inf"
-
-		t5[1] = v32
-		t5[2] = v34
-		t5[3] = v36
-		t5[4] = v38
-
-		return t5
-	end
-
-	if typeof(result) == "number" or typeof(result) == "boolean" then
-		return result
-	end
-
-	return (tostring(result))
 end
-local function getInstanceProperties(p2, t6: {[any]: any}?) -- line: 273
-	-- upvalues: t1 (copy), getProperty (copy)
-	if not p2 then
+
+local function getInstanceProperties(instance, list)
+	if not instance then
 		return {}
 	end
 
-	local t7 = {
-		ClassName = p2.ClassName,
-		Name = p2.Name
-	}
+	local properties = { ClassName = instance.ClassName, Name = instance.Name }
 
-	for v42, v43 in t1 do
-		if p2:IsA(v42) then
-			for _, v45 in v43 do
-				if t6 == nil or table.find(t6, v45) then
-					local v46 = getProperty(p2, v45)
+	for className, v2 in v do
+		if not instance:IsA(className) then
+			continue
+		end
 
-					if v46 ~= nil then
-						t7[v45] = v46
-					end
-				end
+		for _, v3 in v2 do
+			if not (list == nil or table.find(list, v3)) then
+				continue
+			end
+
+			local property = getProperty(instance, v3)
+
+			if property ~= nil then
+				properties[v3] = property
 			end
 		end
 	end
 
-	for _, tag in (p2:GetTags()) do
+	local tags = instance:GetTags()
+
+	for _, tag in tags do
 		if string.sub(tag, 1, 12) == "data-testid=" then
-			t7.TestId = string.sub(tag, 13)
+			properties.TestId = string.sub(tag, 13)
 		end
 	end
 
-	return t7
+	return properties
 end
 
 return getInstanceProperties

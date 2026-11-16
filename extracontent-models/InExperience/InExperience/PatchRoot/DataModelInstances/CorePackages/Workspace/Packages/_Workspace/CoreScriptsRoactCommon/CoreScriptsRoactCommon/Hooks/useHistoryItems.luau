@@ -1,71 +1,78 @@
 local CoreScriptsRoactCommon = script:FindFirstAncestor("CoreScriptsRoactCommon")
-local CoreScriptsRoactCommonParent = CoreScriptsRoactCommon.Parent
-local DataHydration = require(CoreScriptsRoactCommonParent.DataHydration)
-local Signals = require(CoreScriptsRoactCommonParent.Signals)
-local SignalsReact = require(CoreScriptsRoactCommonParent.SignalsReact)
-local React = require(CoreScriptsRoactCommonParent.React)
+local parent = CoreScriptsRoactCommon.Parent
+
+local DataHydration = require(parent.DataHydration)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+local React = require(parent.React)
+
 local Traversal = CoreScriptsRoactCommon.Traversal
-local default = require(Traversal.LocalTraversalHistory).default
+local LocalTraversalHistory = require(Traversal.LocalTraversalHistory)
+local default = LocalTraversalHistory.default
+
 local getGameInfoStore = DataHydration.Game.getGameInfoStore
 local getVotesStore = DataHydration.Game.getVotesStore
 
-local function getNMostRecentUniqueUniverseIds(t1: {[any]: any}, _: number?) -- line: 24
-	local t2 = {}
-	local t3 = {}
+local function getNMostRecentUniqueUniverseIds(items, _: number?)
+	local set = {}
+	local nMostRecentUniqueUniverseIds = {}
 
-	for _, v19 in t1 do
-		if not t3[v19] then
-			t3[v19] = true
-			table.insert(t2, v19)
+	for _, item in items do
+		if set[item] then
+			continue
 		end
+
+		set[item] = true
+		table.insert(nMostRecentUniqueUniverseIds, item)
 	end
 
-	return t2
+	return nMostRecentUniqueUniverseIds
 end
-local function getHistoryInfo(p1, p2) -- line: 37
+
+local function getHistoryInfo(data, p) -- 1 equivalent call inferred from this helper
 	return {
-		name = p1.name,
-		placeId = tonumber(p1.rootPlaceId),
-		universeId = tonumber(p1.universeId),
-		rating = p2.rating
+		name = data.name,
+		placeId = tonumber(data.rootPlaceId),
+		universeId = tonumber(data.universeId),
+		rating = p.rating
 	}
 end
-local function useHistoryItems(n2: number?) -- line: 47
-	-- upvalues: React (copy), Signals (copy), default (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy), SignalsReact (copy)
-	local v23 = n2 or 2
-	local v24 = React.useMemo(function() -- line: 49
-		-- upvalues: Signals (copy), default (copy), v23 (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy)
-		return (Signals.createComputed(function(p3) -- line: 50
-			-- upvalues: default (copy), v23 (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy)
-			local t4 = {}
-			local v27 = default:getUniverseHistorySignal(v23)(p3)
-			local v28 = getNMostRecentUniqueUniverseIds(v27, v23)
-			local v29 = getGameInfoStore(p3).getAndFetchGameInfos(v28)
-			local v30 = getVotesStore(p3).getAndFetchVotes(v28)
 
-			for _, v32 in v28 do
-				local v33 = if not v29[v32] or not v29[v32].data then nil else v29[v32].data(p3)
-				local v34 = if not v30[v32] or not v30[v32].data then nil else v30[v32].data(p3)
+local function useHistoryItems(value: number?)
+	local v = value or 2
+	local v2 = React.useMemo(function()
+		return (Signals.createComputed(function(p)
+			local nMostRecentUniqueUniverseIds = getNMostRecentUniqueUniverseIds(
+				default:getUniverseHistorySignal(v)(p),
+				v
+			)
+			local fetchGameInfos = getGameInfoStore(p).getAndFetchGameInfos(nMostRecentUniqueUniverseIds)
+			local fetchVotes = getVotesStore(p).getAndFetchVotes(nMostRecentUniqueUniverseIds)
+			local result = {}
 
-				if v33 and v34 then
-					table.insert(t4, {
-						name = v33.name,
-						placeId = tonumber(v33.rootPlaceId),
-						universeId = tonumber(v33.universeId),
-						rating = v34.rating
-					})
+			for _, nMostRecentUniqueUniverseId in nMostRecentUniqueUniverseIds do
+				local v2
+
+				if fetchGameInfos[nMostRecentUniqueUniverseId] and fetchGameInfos[nMostRecentUniqueUniverseId].data then
+					v2 = fetchGameInfos[nMostRecentUniqueUniverseId].data(p)
+				end
+
+				local v3
+
+				if fetchVotes[nMostRecentUniqueUniverseId] and fetchVotes[nMostRecentUniqueUniverseId].data then
+					v3 = fetchVotes[nMostRecentUniqueUniverseId].data(p)
+				end
+
+				if v2 and v3 then
+					table.insert(result, getHistoryInfo(v2, v3)) -- inferred equivalent call
 				end
 			end
 
-			return t4
+			return result
 		end))
-	end, {
-		v23,
-		getGameInfoStore,
-		getVotesStore
-	})
+	end, { v, getGameInfoStore, getVotesStore })
 
-	return (SignalsReact.useSignalState(v24))
+	return (SignalsReact.useSignalState(v2))
 end
 
 return useHistoryItems

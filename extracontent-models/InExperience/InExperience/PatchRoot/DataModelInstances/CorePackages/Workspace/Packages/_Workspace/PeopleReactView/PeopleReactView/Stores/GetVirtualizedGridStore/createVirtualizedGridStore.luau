@@ -1,37 +1,38 @@
-local Parent = script:FindFirstAncestor("PeopleReactView").Parent
-local Signals = require(Parent.Signals)
-local FFlagFixVirtualizedGridNumItems = require(Parent.PeopleService).getService("Flags").FFlagFixVirtualizedGridNumItems
-local v4 = game:DefineFastInt("PeoplePageVirtualizedGridBuffer", 200)
+local parent = script:FindFirstAncestor("PeopleReactView").Parent
 
-local function createVirtualizedGridStore() -- line: 28
-	-- upvalues: Signals (copy), v4 (copy), FFlagFixVirtualizedGridNumItems (copy)
-	local v6, v7 = Signals.createSignal(1)
-	local v8, v9 = Signals.createSignal(0)
-	local v10 = Signals.createComputed(function(p1) -- line: 32
-		-- upvalues: v8 (copy), v6 (copy)
-		return v8(p1) - v6(p1) + 1
-	end)
+local Signals = require(parent.Signals)
+
+local PeopleService = require(parent.PeopleService)
+
+local fFlagFixVirtualizedGridNumItems = PeopleService.getService("Flags").FFlagFixVirtualizedGridNumItems
+
+local defineFastInt = game:DefineFastInt("PeoplePageVirtualizedGridBuffer", 200)
+
+local function createVirtualizedGridStore()
+	local signal, v = Signals.createSignal(1)
+	local signal2, v2 = Signals.createSignal(0)
 
 	return {
-		getMinVirtualizedIndex = v6,
-		getMaxVirtualizedIndex = v8,
-		getNumVirtualizedItems = v10,
-		calculateVirtualizedGridLimits = function(n1: number, n2: number, _: number, n4: number, n5: number, n6: number) -- line: 38
-			-- upvalues: v4 (copy), FFlagFixVirtualizedGridNumItems (copy), v7 (copy), v9 (copy)
-			local v18 = math.floor((n1 - v4) / (n4 + n6)) * n5 + 1
+		getMinVirtualizedIndex = signal,
+		getMaxVirtualizedIndex = signal2,
+		getNumVirtualizedItems = Signals.createComputed(function(p)
+			return signal2(p) - signal(p) + 1
+		end),
+		calculateVirtualizedGridLimits = function(p: number, p2: number, _: number, p3: number, p4: number, p5: number)
+			local v3 = math.floor((p - defineFastInt) / (p3 + p5)) * p4 + 1
 
-			if not FFlagFixVirtualizedGridNumItems then
-				v18 = math.max(1, v18)
+			if not fFlagFixVirtualizedGridNumItems then
+				v3 = math.max(1, v3)
 			end
 
-			local v19 = v18 + math.ceil((n2 + 2 * v4) / (n4 + n6)) * n5 - 1
+			local v4 = v3 + math.ceil((p2 + 2 * defineFastInt) / (p3 + p5)) * p4 - 1
 
-			if FFlagFixVirtualizedGridNumItems then
-				v18 = math.max(1, v18)
+			if fFlagFixVirtualizedGridNumItems then
+				v3 = math.max(1, v3)
 			end
 
-			v7(v18)
-			v9(v19)
+			v(v3)
+			v2(v4)
 		end
 	}
 end

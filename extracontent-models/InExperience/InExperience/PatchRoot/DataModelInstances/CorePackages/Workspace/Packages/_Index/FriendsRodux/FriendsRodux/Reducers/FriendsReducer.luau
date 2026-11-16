@@ -6,13 +6,11 @@ local followings = require(script.Parent.Friends.followings)
 local friendshipStatus = require(script.Parent.Friends.friendshipStatus)
 local friendsRankByUserId = require(script.Parent.Friends.friendsRankByUserId)
 local contactNamesByUserId = require(script.Parent.Friends.contactNamesByUserId)
-local t1 = {
+
+local v = {
 	countsByUserId = {},
 	byUserId = {},
-	requests = {
-		receivedCount = 0,
-		newFriendRequestsCount = 0
-	},
+	requests = { receivedCount = 0, newFriendRequestsCount = 0 },
 	recommendations = {},
 	followings = {},
 	friendshipStatus = {},
@@ -20,30 +18,27 @@ local t1 = {
 	contactNamesByUserId = {}
 }
 
-return function(p1) -- line: 24
-	-- upvalues: byUserId (copy), countsByUserId (copy), requests (copy), recommendations (copy), followings (copy), friendshipStatus (copy), friendsRankByUserId (copy), contactNamesByUserId (copy), t1 (copy)
-	local v11 = byUserId(p1)
-	local v12 = countsByUserId(p1)
-	local v13 = requests(p1)
-	local v14 = recommendations(p1)
-	local v15 = followings(p1)
-	local v16 = friendshipStatus(p1)
-	local v17 = friendsRankByUserId(p1)
-	local v18 = contactNamesByUserId(p1)
+return function(p)
+	local v2 = byUserId(p)
+	local v3 = countsByUserId(p)
+	local v4 = requests(p)
+	local v5 = recommendations(p)
+	local v6 = followings(p)
+	local v7 = friendshipStatus(p)
+	local v8 = friendsRankByUserId(p)
+	local v9 = contactNamesByUserId(p)
 
-	return function(p2, p3) -- line: 34
-		-- upvalues: t1 (copy), v11 (copy), v12 (copy), v13 (copy), v14 (copy), v15 (copy), v16 (copy), v17 (copy), v18 (copy)
-		local v21 = p2 or t1
-
+	return function(p2, p3)
+		local v10 = p2 or v
 		return {
-			byUserId = v11(v21.byUserId, p3),
-			countsByUserId = v12(v21.countsByUserId, p3),
-			requests = v13(v21.requests, p3),
-			recommendations = v14(v21.recommendations, p3),
-			followings = v15(v21.followings, p3),
-			friendshipStatus = v16(v21.friendshipStatus, p3),
-			friendsRankByUserId = v17(v21.friendsRankByUserId, p3),
-			contactNamesByUserId = v18(v21.contactNamesByUserId, p3)
+			byUserId = v2(v10.byUserId, p3),
+			countsByUserId = v3(v10.countsByUserId, p3),
+			requests = v4(v10.requests, p3),
+			recommendations = v5(v10.recommendations, p3),
+			followings = v6(v10.followings, p3),
+			friendshipStatus = v7(v10.friendshipStatus, p3),
+			friendsRankByUserId = v8(v10.friendsRankByUserId, p3),
+			contactNamesByUserId = v9(v10.contactNamesByUserId, p3)
 		}
 	end
 end

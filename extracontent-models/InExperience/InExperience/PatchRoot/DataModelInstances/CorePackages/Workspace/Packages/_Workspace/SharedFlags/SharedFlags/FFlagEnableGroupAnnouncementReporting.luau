@@ -1,0 +1,2 @@
+return game:DefineFastFlag("EnableGroupAnnouncementReporting", false)
+	and require(script.Parent.FFlagAbuseReportAttributes)

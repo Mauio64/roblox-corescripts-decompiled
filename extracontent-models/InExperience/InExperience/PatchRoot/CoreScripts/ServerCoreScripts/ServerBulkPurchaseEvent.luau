@@ -4,230 +4,189 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local HttpRbxApiService = game:GetService("HttpRbxApiService")
 local HttpService = game:GetService("HttpService")
-local Url = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Url
-local FFlagAXEnableInspectAndBuyBulkPurchase = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAXEnableInspectAndBuyBulkPurchase
-local FIntBulkPurchaseRequestLimit = require(CorePackages.Workspace.Packages.SharedFlags).FIntBulkPurchaseRequestLimit
-local FIntBulkPurchaseThrottleLimit = require(CorePackages.Workspace.Packages.SharedFlags).FIntBulkPurchaseThrottleLimit
-local FFlagFilterOutShopOnlyItemsOnBulkPurchase = require(CorePackages.Workspace.Packages.SharedFlags).FFlagFilterOutShopOnlyItemsOnBulkPurchase
-local FFlagAXEnableTimedOptionsServerScript = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAXEnableTimedOptionsServerScript
+local CoreScriptsCommon = require(CorePackages.Workspace.Packages.CoreScriptsCommon)
+local Url = CoreScriptsCommon.Url
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagAXEnableInspectAndBuyBulkPurchase = SharedFlags.FFlagAXEnableInspectAndBuyBulkPurchase
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FIntBulkPurchaseRequestLimit = SharedFlags2.FIntBulkPurchaseRequestLimit
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FIntBulkPurchaseThrottleLimit = SharedFlags3.FIntBulkPurchaseThrottleLimit
+
+local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagFilterOutShopOnlyItemsOnBulkPurchase = SharedFlags4.FFlagFilterOutShopOnlyItemsOnBulkPurchase
+
+local SharedFlags5 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagAXEnableTimedOptionsServerScript = SharedFlags5.FFlagAXEnableTimedOptionsServerScript
 
 if FFlagAXEnableInspectAndBuyBulkPurchase then
-	local RemoteEvent = Instance.new("RemoteEvent")
+	local serverSideBulkPurchaseEvent = Instance.new("RemoteEvent")
+	serverSideBulkPurchaseEvent.Name = "ServerSideBulkPurchaseEvent"
+	serverSideBulkPurchaseEvent.Parent = RobloxReplicatedStorage
+	local v = {}
 
-	RemoteEvent.Name = "ServerSideBulkPurchaseEvent"
-	RemoteEvent.Parent = RobloxReplicatedStorage
-
-	local t1 = {}
 	local _ = {
 		MyExperiencesOnly = "MyExperiencesOnly",
 		ExperiencesById = "ExperiencesById",
 		ExperiencesDevApiOnly = "ExperiencesDevApiOnly"
 	}
-	local v16 = if not FFlagFilterOutShopOnlyItemsOnBulkPurchase then nil else {
-		ShopOnly = "ShopOnly"
-	}
-	local _ = {
-		Limited = "Limited",
-		LimitedUnique = "LimitedUnique",
-		Collectible = "Collectible"
-	}
-	local t2 = {
-		Bundle = Enum.MarketplaceProductType.AvatarBundle,
+
+	local v2 = FFlagFilterOutShopOnlyItemsOnBulkPurchase and { ShopOnly = "ShopOnly" } or nil
+
+	local _ = { Limited = "Limited", LimitedUnique = "LimitedUnique", Collectible = "Collectible" }
+
+	local v3 = {
+		["Bundle"] = Enum.MarketplaceProductType.AvatarBundle,
 		Asset = Enum.MarketplaceProductType.AvatarAsset
 	}
 
-	local function getBatchItemDetailsServerSide(p1) -- line: 77
-		-- upvalues: Url (copy), FFlagAXEnableTimedOptionsServerScript (copy), HttpService (copy), HttpRbxApiService (copy)
-		local ok, result = pcall(function() -- line: 78
-			-- upvalues: Url (copy), FFlagAXEnableTimedOptionsServerScript (copy), p1 (copy), HttpService (copy), HttpRbxApiService (copy)
-			local v57 = Url.CATALOG_URL .. "v1/catalog/items/details"
-			local json
+	local function getBatchItemDetailsServerSide(items) -- 1 equivalent call inferred from this helper
+		local success, result = pcall(function()
+			local v4 = Url.CATALOG_URL .. "v1/catalog/items/details"
+			local v5
 
 			if FFlagAXEnableTimedOptionsServerScript then
-				local t3 = {}
+				local items2 = {}
 
-				for _, v60 in p1 do
-					table.insert(t3, {
-						id = v60.id,
-						itemType = v60.itemType
-					})
+				for _, item in items do
+					table.insert(items2, { id = item.id, itemType = item.itemType })
 				end
 
-				json = HttpService:JSONEncode({
-					items = t3
-				})
+				v5 = HttpService:JSONEncode({ items = items2 })
 			else
-				json = HttpService:JSONEncode({
-					items = p1
-				})
+				v5 = HttpService:JSONEncode({ items = items })
 			end
 
-			local v62 = HttpRbxApiService:PostAsyncFullUrl(v57, json, Enum.ThrottlingPriority.Default, Enum.HttpContentType.ApplicationJson)
-
-			return HttpService:JSONDecode(v62)
+			return HttpService:JSONDecode((HttpRbxApiService:PostAsyncFullUrl(
+				v4,
+				v5,
+				Enum.ThrottlingPriority.Default,
+				Enum.HttpContentType.ApplicationJson
+			)))
 		end)
-
-		if ok then
-			return result
-		end
-
-		return nil
+		return if success then result else nil
 	end
-	local function isLimited(p2) -- line: 121
-		local itemRestrictions = p2.itemRestrictions
-		local v30 = itemRestrictions and table.find(itemRestrictions, "Limited")
-		local v31 = itemRestrictions and table.find(itemRestrictions, "LimitedUnique")
-		local v32 = itemRestrictions and table.find(itemRestrictions, "Collectible")
 
-		return v30 ~= nil or (v31 ~= nil or v32 ~= nil)
+	local function isLimited(p): boolean
+		local itemRestrictions = p.itemRestrictions
+		local index = itemRestrictions and table.find(itemRestrictions, "Limited")
+		local index2 = itemRestrictions and table.find(itemRestrictions, "LimitedUnique")
+		local index3 = itemRestrictions and table.find(itemRestrictions, "Collectible")
+		return index ~= nil or index2 ~= nil or index3 ~= nil
 	end
-	local function validatePlayer(p3) -- line: 132
-		if not p3.UserId or p3.UserId <= 0 then
-			return false
-		end
 
-		return true
+	local function validatePlayer(p): boolean -- 1 equivalent call inferred from this helper
+		return if p.UserId and not (p.UserId <= 0) then true else false
 	end
-	local function validateItem(t4: {[any]: any}) -- line: 143
-		if type(t4) ~= "table" or (t4.id == nil or t4.itemType == nil or type(t4.itemType) ~= "number" or type(t4.id) ~= "number" or t4.id == 0) or t4.itemType ~= Enum.AvatarItemType.Asset.Value and t4.itemType ~= Enum.AvatarItemType.Bundle.Value then
-			return false
-		end
 
-		return true
+	local function validateItem(item): boolean
+		return type(item) == "table"
+			and item.id ~= nil
+			and item.itemType ~= nil
+			and type(item.itemType) == "number"
+			and type(item.id) == "number"
+			and item.id ~= 0
+			and (item.itemType == Enum.AvatarItemType.Asset.Value or item.itemType == Enum.AvatarItemType.Bundle.Value)
 	end
-	local function validateIncomingItems(t5: {[any]: any}) -- line: 161
-		-- upvalues: FIntBulkPurchaseRequestLimit (copy), validateItem (copy), FFlagAXEnableTimedOptionsServerScript (copy)
-		local t6 = {}
 
-		if not t5 then
+	local function validateIncomingItems(list)
+		local result = {}
+
+		if not list or type(list) ~= "table" or FIntBulkPurchaseRequestLimit < #list then
 			return nil
 		end
 
-		if type(t5) ~= "table" then
-			return nil
-		end
+		local count = 0
 
-		if #t5 > FIntBulkPurchaseRequestLimit then
-			return nil
-		end
-
-		local n1 = 0
-
-		for _, v39 in t5 do
-			if n1 >= FIntBulkPurchaseRequestLimit then
-				return t6
+		for _, item in list do
+			if FIntBulkPurchaseRequestLimit <= count then
+				break
 			end
 
-			if validateItem(v39) then
-				table.insert(t6, {
-					id = v39.id,
-					itemType = v39.itemType,
-					PurchaseOptions = if not FFlagAXEnableTimedOptionsServerScript then nil else v39.PurchaseOptions
-				})
-				n1 += 1
+			if not validateItem(item) then
+				continue
 			end
+
+			local v4 = { id = item.id, itemType = item.itemType, PurchaseOptions = 0 }
+			local purchaseOptions
+
+			if FFlagAXEnableTimedOptionsServerScript then
+				purchaseOptions = item.PurchaseOptions
+			end
+
+			v4.PurchaseOptions = purchaseOptions
+			table.insert(result, v4)
+
+			count += 1
 		end
 
-		return t6
+		return result
 	end
-	local function isThrottled(p4) -- line: 195
-		-- upvalues: t1 (copy), FIntBulkPurchaseThrottleLimit (copy)
-		local v41 = t1[p4]
 
-		if v41 and v41 > tick() then
+	local function isThrottled(p): boolean -- 1 equivalent call inferred from this helper
+		local v4 = v[p]
+
+		if v4 and tick() < v4 then
 			return true
 		end
 
-		t1[p4] = tick() + FIntBulkPurchaseThrottleLimit
-
+		v[p] = tick() + FIntBulkPurchaseThrottleLimit
 		return false
 	end
 
-	Players.PlayerRemoving:Connect(function(player) -- line: 204
-		-- upvalues: t1 (copy)
-		t1[player] = nil
+	Players.PlayerRemoving:Connect(function(player)
+		v[player] = nil
 	end)
-	RemoteEvent.OnServerEvent:Connect(function(player, t7: {[any]: any}) -- line: 208
-		-- upvalues: t1 (copy), FIntBulkPurchaseThrottleLimit (copy), validateIncomingItems (copy), Url (copy), FFlagAXEnableTimedOptionsServerScript (copy), HttpService (copy), HttpRbxApiService (copy), isLimited (copy), FFlagFilterOutShopOnlyItemsOnBulkPurchase (copy), v16 (copy), t2 (copy), MarketplaceService (copy)
-		if not player.UserId or player.UserId <= 0 then
+
+	serverSideBulkPurchaseEvent.OnServerEvent:Connect(function(p, p2)
+		if not validatePlayer(p) or isThrottled(p) then -- inferred equivalent call
 			return
 		end
 
-		local v45 = t1[player]
-		local v46
+		local items = validateIncomingItems(p2)
 
-		if v45 and v45 > tick() then
-			v46 = true
-		else
-			t1[player] = tick() + FIntBulkPurchaseThrottleLimit
-			v46 = false
-		end
-
-		if v46 then
+		if items == nil or #items == 0 then
 			return
 		end
 
-		local v47 = validateIncomingItems(t7)
-
-		if v47 == nil or #v47 == 0 then
-			return
-		end
-
-		local ok, result = pcall(function() -- line: 78
-			-- upvalues: Url (copy), FFlagAXEnableTimedOptionsServerScript (copy), v47 (copy), HttpService (copy), HttpRbxApiService (copy)
-			local v63 = Url.CATALOG_URL .. "v1/catalog/items/details"
-			local json
-
-			if FFlagAXEnableTimedOptionsServerScript then
-				local t8 = {}
-
-				for _, v66 in v47 do
-					table.insert(t8, {
-						id = v66.id,
-						itemType = v66.itemType
-					})
-				end
-
-				json = HttpService:JSONEncode({
-					items = t8
-				})
-			else
-				json = HttpService:JSONEncode({
-					items = v47
-				})
-			end
-
-			local v68 = HttpRbxApiService:PostAsyncFullUrl(v63, json, Enum.ThrottlingPriority.Default, Enum.HttpContentType.ApplicationJson)
-
-			return HttpService:JSONDecode(v68)
-		end)
-		local v50 = if not ok then nil else result
-		local v51 = if not FFlagAXEnableTimedOptionsServerScript then nil else {}
+		local batchItemDetailsServerSide = getBatchItemDetailsServerSide(items) -- inferred equivalent call
+		local purchaseOptionsById = FFlagAXEnableTimedOptionsServerScript and {} or nil
 
 		if FFlagAXEnableTimedOptionsServerScript then
-			for _, v53 in v47 do
-				if v53.PurchaseOptions and v51 then
-					v51[v53.id] = v53.PurchaseOptions
+			for _, v4 in items do
+				if v4.PurchaseOptions and purchaseOptionsById then
+					purchaseOptionsById[v4.id] = v4.PurchaseOptions
 				end
 			end
 		end
 
-		local t9 = {}
+		local v4 = {}
 
-		if v50 ~= nil then
-			for _, v56 in v50.data do
-				if (v56.saleLocationType ~= "MyExperiencesOnly" and v56.saleLocationType ~= "ExperiencesById" and v56.saleLocationType ~= "ExperiencesDevApiOnly" or v56.unitsAvailableForConsumption == 0 and isLimited(v56)) and (not FFlagFilterOutShopOnlyItemsOnBulkPurchase or not v16 or v56.saleLocationType ~= v16.ShopOnly or v56.unitsAvailableForConsumption == 0 and isLimited(v56)) then
-					table.insert(t9, {
-						Id = tostring(v56.id),
-						Type = t2[v56.itemType],
-						PurchaseOptions = if not FFlagAXEnableTimedOptionsServerScript or (not v51 or not v51[v56.id]) then nil else v51[v56.id]
-					})
+		if batchItemDetailsServerSide ~= nil then
+			for _, v5 in batchItemDetailsServerSide.data do
+				if not (v5.saleLocationType ~= "MyExperiencesOnly" and v5.saleLocationType ~= "ExperiencesById" and v5.saleLocationType ~= "ExperiencesDevApiOnly" or v5.unitsAvailableForConsumption == 0 and isLimited(v5)) then
+					continue
 				end
+
+				if not (not FFlagFilterOutShopOnlyItemsOnBulkPurchase or not v2 or v5.saleLocationType ~= v2.ShopOnly or v5.unitsAvailableForConsumption == 0 and isLimited(v5)) then
+					continue
+				end
+
+				local v6 = { Id = tostring(v5.id), Type = v3[v5.itemType], PurchaseOptions = 0 }
+				local purchaseOptions
+
+				if FFlagAXEnableTimedOptionsServerScript and purchaseOptionsById and purchaseOptionsById[v5.id] then
+					purchaseOptions = purchaseOptionsById[v5.id]
+				end
+
+				v6.PurchaseOptions = purchaseOptions
+				table.insert(v4, v6)
 			end
 		end
 
-		if #t9 > 0 then
-			MarketplaceService:PromptBulkPurchase(player, t9, {})
+		if #v4 > 0 then
+			MarketplaceService:PromptBulkPurchase(p, v4, {})
 		end
 	end)
 end

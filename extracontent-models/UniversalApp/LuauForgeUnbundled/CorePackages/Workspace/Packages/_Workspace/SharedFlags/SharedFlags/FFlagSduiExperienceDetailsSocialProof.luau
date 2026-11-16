@@ -1,0 +1,5 @@
+local FFlagLuaAppDataHydrationConnectionsPlayedStore = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagLuaAppDataHydrationConnectionsPlayedStore")
+local FFlagEnableSocialProofVerticalUserListSheet = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagEnableSocialProofVerticalUserListSheet")
+local FFlagSduiChipAccessoryProps = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagSduiChipAccessoryProps")
+
+return FFlagLuaAppDataHydrationConnectionsPlayedStore and FFlagEnableSocialProofVerticalUserListSheet and FFlagSduiChipAccessoryProps and game:DefineFastFlag("SduiExperienceDetailsSocialProof_3", false)

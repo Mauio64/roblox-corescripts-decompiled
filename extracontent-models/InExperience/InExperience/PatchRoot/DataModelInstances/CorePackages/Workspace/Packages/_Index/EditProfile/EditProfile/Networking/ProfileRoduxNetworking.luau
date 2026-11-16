@@ -1,19 +1,21 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
-local LuaSocialLibrariesDeps = require(EditProfileParent.LuaSocialLibrariesDeps)
-local RoduxNetworking = require(EditProfileParent.RoduxNetworking)
+local parent = EditProfile.Parent
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local RoduxNetworking = require(parent.RoduxNetworking)
 local httpRequest = LuaSocialLibrariesDeps.httpRequest
-local RODUX_KEY = require(EditProfile.Common.Constants).RODUX_KEY
-local v7 = game:DefineFastInt("EditProfileMaxHttpRetries", 5)
-local v8 = httpRequest.config({
-	requestFunction = function(p1, p2, p3) -- line: 11
-		-- upvalues: httpRequest (copy)
-		return httpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+local Constants = require(EditProfile.Common.Constants)
+local RODUX_KEY = Constants.RODUX_KEY
+
+local defineFastInt = game:DefineFastInt("EditProfileMaxHttpRetries", 5)
+
+local config = httpRequest.config({
+	requestFunction = function(p, p2, p3)
+		return httpRequest.requestFunctions.RequestInternal(p, p2, p3)
 	end,
-	maxRetryCount = v7
+	maxRetryCount = defineFastInt
 })
 
 return (RoduxNetworking.config({
 	keyPath = RODUX_KEY .. ".NetworkStatus",
-	networkImpl = v8
+	networkImpl = config
 }))

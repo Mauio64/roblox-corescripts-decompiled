@@ -1,82 +1,88 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Object = LuauPolyfill.Object
-local t1 = {}
 
-require(ParentParentParent.GraphQL)
+local Fragments = {}
+require(parent2.GraphQL)
 
-local invariant = require(ParentParent.jsutils.invariant).invariant
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
 local Error = LuauPolyfill.Error
 
-function t1.getFragmentQueryDocument(p1, s1: string?) -- line: 49
-	-- upvalues: Array (copy), Error (copy), Boolean (copy), invariant (copy), Object (copy)
-	local t2 = {}
-
-	Array.forEach(p1.definitions, function(p2) -- line: 55
-		-- upvalues: Error (copy), Boolean (copy), t2 (copy)
-		if p2.kind == "OperationDefinition" then
-			error(Error.new(("Found a %s operation%s. "):format(tostring(p2.operation), not Boolean.toJSBoolean(p2.name) and "" or (" named '%s'"):format((tostring(p2.name.value)))) .. "No operations are allowed when using a fragment as a query. Only fragments are allowed."))
+function Fragments.getFragmentQueryDocument(p, p2: string?)
+	local data = {}
+	Array.forEach(p.definitions, function(data2)
+		if data2.kind == "OperationDefinition" then
+			error(Error.new(("Found a %s operation%s. "):format(
+				tostring(data2.operation),
+				not Boolean.toJSBoolean(data2.name) and "" or (" named '%s'"):format((tostring(data2.name.value)))
+			) .. "No operations are allowed when using a fragment as a query. Only fragments are allowed."))
 		end
 
-		if p2.kind == "FragmentDefinition" then
-			table.insert(t2, p2)
+		if data2.kind == "FragmentDefinition" then
+			table.insert(data, data2)
 		end
 	end)
 
-	if typeof(s1) == "nil" then
-		invariant(#t2 == 1, string.format("Found %s fragments. `fragmentName` must be provided when there is not exactly 1 fragment.", (tostring(#t2))))
-		s1 = t2[1].name.value
+	if typeof(p2) == "nil" then
+		invariant2(
+			#data == 1,
+			string.format(
+				"Found %s fragments. `fragmentName` must be provided when there is not exactly 1 fragment.",
+				(tostring(#data))
+			)
+		)
+
+		p2 = data[1].name.value
 	end
 
-	return (Object.assign({}, p1, {
-		definitions = Array.concat({}, {{
-			kind = "OperationDefinition",
-			operation = "query",
-			selectionSet = {
-				kind = "SelectionSet",
-				selections = {{
-					kind = "FragmentSpread",
-					name = {
-						kind = "Name",
-						value = s1
+	return (Object.assign({}, p, {
+		definitions = Array.concat({}, {
+			{
+				kind = "OperationDefinition",
+				operation = "query",
+				selectionSet = {
+					kind = "SelectionSet",
+					selections = {
+						{
+							kind = "FragmentSpread",
+							name = { kind = "Name", value = p2 }
+						}
 					}
-				}}
+				}
 			}
-		}}, p1.definitions)
+		}, p.definitions)
 	}))
 end
-function t1.createFragmentMap(p3) -- line: 121
-	-- upvalues: Array (copy)
-	local v14 = if p3 == nil then {} else p3
-	local t3 = {}
 
-	Array.forEach(v14, function(p4) -- line: 124
-		-- upvalues: t3 (copy)
-		t3[p4.name.value] = p4
+function Fragments.createFragmentMap(p)
+	local v = p == nil and {} or p
+	local fragmentMap = {}
+	Array.forEach(v, function(p2)
+		fragmentMap[p2.name.value] = p2
 	end)
-
-	return t3
+	return fragmentMap
 end
-function t1.getFragmentFromSelection(p5, t4: {[any]: any}?) -- line: 131
-	-- upvalues: invariant (copy)
-	local kind = p5.kind
+
+function Fragments.getFragmentFromSelection(p, p2)
+	local kind = p.kind
 
 	if kind == "InlineFragment" then
-		return p5
+		return p
 	end
 
-	if kind == "FragmentSpread" then
-		local v19 = t4 and t4[p5.name.value]
-
-		invariant(v19, ("No fragment named %s."):format(p5.name.value))
-
-		return v19
+	if kind ~= "FragmentSpread" then
+		return nil
 	end
 
-	return nil
+	local selected = p2 and p2[p.name.value]
+
+	invariant2(selected, ("No fragment named %s."):format(p.name.value))
+	return selected
 end
 
-return t1
+return Fragments

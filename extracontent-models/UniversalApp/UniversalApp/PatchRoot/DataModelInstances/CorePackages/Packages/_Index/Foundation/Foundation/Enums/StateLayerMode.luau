@@ -1,6 +1,1 @@
-return {
-	Default = "Default",
-	Inverse = "Inverse",
-	Light = "Light",
-	Dark = "Dark"
-}
+return { Default = "Default", Inverse = "Inverse", Light = "Light", Dark = "Dark" }

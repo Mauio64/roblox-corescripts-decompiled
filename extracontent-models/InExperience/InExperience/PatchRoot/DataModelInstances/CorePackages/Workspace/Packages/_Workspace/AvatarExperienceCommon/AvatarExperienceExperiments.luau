@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.AvatarExperienceExperiments.AvatarExperienceExperiments))
+local AvatarExperienceExperiments = require(index.AvatarExperienceExperiments.AvatarExperienceExperiments)
+
+return AvatarExperienceExperiments

@@ -1,15 +1,16 @@
 local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
-local GameDetailRoduxParent = GameDetailRodux.Parent
-local Immutable = require(GameDetailRoduxParent.AppCommonLib).Immutable
+local parent = GameDetailRodux.Parent
+
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
 local AddGameDetails = require(GameDetailRodux.GameDetails.AddGameDetails)
 
-return function(p1, p2) -- line: 8
-	-- upvalues: AddGameDetails (copy), Immutable (copy)
-	local v7 = p1 or {}
+return function(options, p)
+	local v = options or {}
 
-	if p2.type == AddGameDetails.name then
-		v7 = Immutable.JoinDictionaries(v7, p2.gameDetails)
+	if p.type == AddGameDetails.name then
+		return (Immutable.JoinDictionaries(v, p.gameDetails))
 	end
 
-	return v7
+	return v
 end

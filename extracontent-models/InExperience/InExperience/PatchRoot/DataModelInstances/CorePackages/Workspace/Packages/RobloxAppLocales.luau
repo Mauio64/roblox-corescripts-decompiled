@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.RobloxAppLocales.RobloxAppLocales))
+local RobloxAppLocales = require(Workspace.RobloxAppLocales.RobloxAppLocales)
+
+return RobloxAppLocales

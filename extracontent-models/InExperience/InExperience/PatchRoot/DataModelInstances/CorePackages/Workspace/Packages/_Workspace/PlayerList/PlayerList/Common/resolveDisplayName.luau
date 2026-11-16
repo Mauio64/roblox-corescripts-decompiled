@@ -1,9 +1,9 @@
-local function resolveDisplayName(p1) -- line: 1
-	if p1.DisplayName ~= nil and p1.DisplayName ~= "" then
-		return p1.DisplayName
+local function resolveDisplayName(p)
+	if p.DisplayName == nil or p.DisplayName == "" then
+		return p.Name
 	end
 
-	return p1.Name
+	return p.DisplayName
 end
 
 return resolveDisplayName

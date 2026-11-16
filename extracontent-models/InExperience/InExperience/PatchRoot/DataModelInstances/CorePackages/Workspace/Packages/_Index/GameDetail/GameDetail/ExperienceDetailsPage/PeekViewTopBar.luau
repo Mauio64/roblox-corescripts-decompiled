@@ -1,87 +1,115 @@
-local Parent = script:FindFirstAncestor("GameDetail").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local parent = script:FindFirstAncestor("GameDetail").Parent
+
+local React = require(parent.React)
+
+local Foundation = require(parent.Foundation)
 local View = Foundation.View
 local IconButton = Foundation.IconButton
 local IconName = Foundation.Enums.IconName
 local ButtonSize = Foundation.Enums.ButtonSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local useTokens = Foundation.Hooks.useTokens
-local useDeviceInsets = require(Parent.Responsive).useDeviceInsets
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local NavigationRodux = require(Parent.NavigationRodux)
+
+local Responsive = require(parent.Responsive)
+local useDeviceInsets = Responsive.useDeviceInsets
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local NavigationRodux = require(parent.NavigationRodux)
 local Selectors = NavigationRodux.Selectors
 local NavigateBack = NavigationRodux.Thunks.NavigateBack
-local PeekViewState = require(Parent.PeekView).PeekViewState
-local RoactUtils = require(Parent.RoactUtils)
+local PeekView = require(parent.PeekView)
+local PeekViewState = PeekView.PeekViewState
+
+local RoactUtils = require(parent.RoactUtils)
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local SharedFlags = require(Parent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
 local FFlagSignalsNavP3fGameDetails = SharedFlags.FFlagSignalsNavP3fGameDetails
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
-local v23 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
-local useSignalState = require(Parent.SignalsReact).useSignalState
-local createComputed = require(Parent.Signals).createComputed
-local GetLegacyNavigationStore = require(Parent.NavigationRodux).GetLegacyNavigationStore
+local FFlagFixOverlayTopInsetForDeviceSafeInsets = SharedFlags.FFlagFixOverlayTopInsetForDeviceSafeInsets
+local Display = require(parent.Display)
+local shouldUseDeviceSafeInsets = Display.shouldUseDeviceSafeInsets
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local Signals = require(parent.Signals)
+local createComputed = Signals.createComputed
+local NavigationRodux2 = require(parent.NavigationRodux)
+local GetLegacyNavigationStore = NavigationRodux2.GetLegacyNavigationStore
+
 local ExperienceDetailsPageUtils = require(script.Parent.ExperienceDetailsPageUtils)
 
-local function PeekViewTopBar(t1: {[any]: any}) -- line: 43
-	-- upvalues: useDispatch (copy), useDeviceInsets (copy), useTokens (copy), FFlagSignalsNavP3fGameDetails (copy), React (copy), GetLegacyNavigationStore (copy), createComputed (copy), AppPage (copy), useSignalState (copy), useSelector (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), PeekViewState (copy), ExperienceDetailsPageUtils (copy), FFlagSignalsNavP3Dispatch (copy), v23 (copy), NavigateBack (copy), View (copy), IconButton (copy), IconName (copy), ButtonVariant (copy), ButtonSize (copy)
-	local pageProps = t1.pageProps
-	local onClose = t1.onClose
-	local v32 = useDispatch()
-	local v33 = useDeviceInsets()
-	local v34 = useTokens()
-	local u36
+local function PeekViewTopBar(p)
+	local pageProps = p.pageProps
+	local onClose = p.onClose
+
+	local v = useDispatch()
+	local v2 = useDeviceInsets()
+	local v3 = useTokens()
+	local v4
 
 	if FFlagSignalsNavP3fGameDetails then
-		local v35 = React.useMemo(function() -- line: 53
-			-- upvalues: GetLegacyNavigationStore (copy), createComputed (copy), AppPage (copy)
-			local v40 = GetLegacyNavigationStore(false)
+		v4 = useSignalState((React.useMemo(function()
+			local legacyNavigationStore = GetLegacyNavigationStore(false)
+			return createComputed(function(p2): boolean
+				local currentLegacyRoute = legacyNavigationStore.getCurrentLegacyRoute(p2)
+				local count = 0
 
-			return createComputed(function(p1) -- line: 55
-				-- upvalues: v40 (copy), AppPage (copy)
-				local v47 = v40.getCurrentLegacyRoute(p1)
-				local n1 = 0
+				if not currentLegacyRoute then
+					return false
+				end
 
-				if v47 then
-					for i = 1, #v47 do
-						if v47[i].name ~= AppPage.GameDetail then
-							continue
-						end
+				for i = 1, #currentLegacyRoute do
+					if currentLegacyRoute[i].name ~= AppPage.GameDetail then
+						continue
+					end
 
-						n1 += 1
+					count += 1
 
-						if n1 > 1 then
-							return true
-						end
+					if count > 1 then
+						return true
 					end
 				end
 
 				return false
 			end)
-		end, {})
-
-		u36 = useSignalState(v35)
+		end, {})))
 	else
-		u36 = useSelector(function(p2) -- line: 73
-			-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy), AppPage (copy)
-			local v42 = if not FFlagUseNavigationSelectors then p2.Navigation.history else Selectors.selectLegacyHistory(p2)
-			local v43 = v42 and v42[#v42]
-			local n2 = 0
+		v4 = useSelector(function(p2): boolean
+			local v5
 
-			if v43 then
-				for i = 1, #v43 do
-					if v43[i].name ~= AppPage.GameDetail then
-						continue
-					end
+			if FFlagUseNavigationSelectors then
+				v5 = Selectors.selectLegacyHistory(p2)
+			else
+				v5 = p2.Navigation.history
+			end
 
-					n2 += 1
+			local v6 = v5 and v5[#v5]
+			local count = 0
 
-					if n2 > 1 then
-						return true
-					end
+			if not v6 then
+				return false
+			end
+
+			for i = 1, #v6 do
+				if v6[i].name ~= AppPage.GameDetail then
+					continue
+				end
+
+				count += 1
+
+				if count > 1 then
+					return true
 				end
 			end
 
@@ -89,58 +117,49 @@ local function PeekViewTopBar(t1: {[any]: any}) -- line: 43
 		end)
 	end
 
-	React.useEffect(function() -- line: 93
-		-- upvalues: u36 (ref), v32 (copy), PeekViewState (copy)
-		return function() -- line: 94
-			-- upvalues: u36 (ref), v32 (copy), PeekViewState (copy)
-			if not u36 then
-				v32({
-					type = "SetGameDetailsPeekViewState",
-					viewState = PeekViewState.Closed
-				})
+	React.useEffect(function()
+		return function()
+			if not v4 then
+				v({ type = "SetGameDetailsPeekViewState", viewState = PeekViewState.Closed })
 			end
 		end
-	end, {
-		v32,
-		u36
-	})
+	end, { v, v4 })
 
-	local v37 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(pageProps, "showBackButton")
-	local v38 = if v37 == nil then u36 else v37
-	local v39 = React.useCallback(function() -- line: 108
-		-- upvalues: v38 (copy), FFlagSignalsNavP3Dispatch (copy), v23 (copy), v32 (copy), NavigateBack (copy), onClose (copy)
-		if v38 then
-			if FFlagSignalsNavP3Dispatch then
-				v23.back()
+	local v5 = ExperienceDetailsPageUtils.getFromPropsOrNavigationParams(pageProps, "showBackButton")
 
-				return
-			end
+	if v5 == nil then
+		v5 = v4
+	end
 
-			v32(NavigateBack())
-
-			return
+	local onActivated = React.useCallback(function()
+		if not v5 then
+			onClose()
+		elseif FFlagSignalsNavP3Dispatch then
+			navigationCommands.back()
+		else
+			v(NavigateBack())
 		end
+	end, { v5, v, onClose })
 
-		onClose()
-	end, {
-		v38,
-		v32,
-		onClose
-	})
-
-	return React.createElement(View, {
+	local createElement = React.createElement
+	local v6 = {
 		tag = "row align-y-center size-full",
 		padding = {
-			top = UDim.new(0, v33.top),
-			left = UDim.new(0, v34.Padding.Large)
+			top = UDim.new(0, FFlagFixOverlayTopInsetForDeviceSafeInsets and shouldUseDeviceSafeInsets and 0 or v2.top),
+			left = UDim.new(0, v3.Padding.Large)
 		}
-	}, {
-		NavButton = React.createElement(IconButton, {
-			isCircular = true,
-			icon = if not v38 then IconName.X else IconName.ChevronLargeLeft,
+	}
+
+	local createElement2 = React.createElement
+	local icon = if v5 then IconName.ChevronLargeLeft else IconName.X
+	return createElement(View, v6, {
+		NavButton = createElement2(IconButton, {
+			icon = icon,
 			variant = ButtonVariant.Utility,
 			size = ButtonSize.Medium,
-			onActivated = v39
+			isCircular = true,
+			onActivated = onActivated,
+			testId = "--discovery-edp-iconbutton-peekview-nav"
 		})
 	})
 end

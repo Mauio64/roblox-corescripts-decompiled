@@ -1,20 +1,32 @@
 local HttpService = game:GetService("HttpService")
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Url = require(DataHydrationParent.Http).Url
+local parent = DataHydration.Parent
+
+local Http = require(parent.Http)
+local Url = Http.Url
+
 local Friends = DataHydration.Friends
 local myHttpRequest = require(Friends.Networking.myHttpRequest)
 
-return function(p1, t1: {[any]: any}) -- line: 21
-	-- upvalues: HttpService (copy), Url (copy), myHttpRequest (copy)
-	local v9 = HttpService:UrlEncode(table.concat(t1, ","))
-	local v10 = string.format("%s/users/%s/friends/statuses?userIds=%s", Url.FRIEND_URL, tostring(p1), v9)
+local function isNumericUserId(item: string): boolean -- 1 equivalent call inferred from this helper
+	return string.match(item, "^%d+$") ~= nil
+end
 
-	return myHttpRequest(v10, "GET"):andThen(function(p2) -- line: 25
-		if p2 then
-			return p2.responseBody
+return function(p, items)
+	local v = {}
+
+	for _, item in items do
+		if isNumericUserId(item) then -- inferred equivalent call
+			table.insert(v, item)
 		end
+	end
 
-		return nil
+	local urlEncode = HttpService:UrlEncode(table.concat(v, ","))
+
+	return myHttpRequest(
+		string.format("%s/users/%s/friends/statuses?userIds=%s", Url.FRIEND_URL, tostring(p), urlEncode),
+		"GET"
+	):andThen(function(p2)
+		return if p2 then p2.responseBody else nil
 	end)
 end

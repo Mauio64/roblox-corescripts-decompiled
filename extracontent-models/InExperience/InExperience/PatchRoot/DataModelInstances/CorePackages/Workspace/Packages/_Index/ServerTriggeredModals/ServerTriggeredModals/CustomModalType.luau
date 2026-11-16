@@ -1,3 +1,1 @@
-return {
-	SocialFaceAgeEstimationUpsell = "SocialFaceAgeEstimationUpsell"
-}
+return { SocialFaceAgeEstimationUpsell = "SocialFaceAgeEstimationUpsell" }

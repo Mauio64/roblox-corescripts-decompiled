@@ -1,46 +1,51 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local NotificationCardContext = require(scriptParent.NotificationCardContext)
-local scriptParentParentParent = scriptParentParent.Parent
-local React = require(scriptParentParentParent.React)
+local parent = script.Parent
+local parent2 = parent.Parent
+local NotificationCardContext = require(parent.NotificationCardContext)
 
-require(scriptParentParent.type)
+local parent3 = parent2.Parent
+local React = require(parent3.React)
+require(parent2.type)
+local constants = require(parent2.constants)
 
-local constants = require(scriptParentParent.constants)
-local analyticsService = require(scriptParentParent.analytics.analyticsService)
-local utils = scriptParentParent.utils
+local analyticsService = require(parent2.analytics.analyticsService)
+local utils = parent2.utils
 local toastNotificationHelper = require(utils.toastNotificationHelper)
 
-local function NotificationCardProvider(t1: {[any]: any}) -- line: 23
-	-- upvalues: analyticsService (copy), constants (copy), toastNotificationHelper (copy), React (copy), NotificationCardContext (copy)
-	local EventStream = analyticsService.EventStream
-	local t2 = {
+local function NotificationCardProvider(props)
+	local eventStream = analyticsService.EventStream
+	local cardSize = {
 		thumbnail = constants.CardSizeDefault.thumbnail,
 		cardPadding = constants.Padding.DefaultCardPadding
 	}
 
-	if t1.isCompact then
-		t2.thumbnail = constants.CardSizeCompact.thumbnail
-		t2.cardPadding = constants.Padding.CompactCardPadding
+	if props.isCompact then
+		cardSize.thumbnail = constants.CardSizeCompact.thumbnail
+		cardSize.cardPadding = constants.Padding.CompactCardPadding
 	end
 
-	local v14 = if not t1.isCompact then constants.CardTransparency.Default else constants.CardTransparency.Compact
+	local cardTransparency
 
+	if props.isCompact then
+		cardTransparency = constants.CardTransparency.Compact
+	else
+		cardTransparency = constants.CardTransparency.Default
+	end
+
+	local function fn(p)
+		toastNotificationHelper.fireEvent(eventStream, p)
+	end
 	return React.createElement(NotificationCardContext.Provider, {
 		value = {
-			state = t1.state,
-			cardSize = t2,
-			handleActions = t1.handleActions,
-			sendEvent = function(p1) -- line: 36
-				-- upvalues: toastNotificationHelper (copy), EventStream (copy)
-				toastNotificationHelper.fireEvent(EventStream, p1)
-			end,
-			cardTransparency = v14,
-			notificationReceivedTimestampMs = t1.notificationReceivedTimestampMs,
-			timers = t1.timers,
-			displayTimestampMs = t1.displayTimestampMs
+			state = props.state,
+			cardSize = cardSize,
+			handleActions = props.handleActions,
+			sendEvent = fn,
+			cardTransparency = cardTransparency,
+			notificationReceivedTimestampMs = props.notificationReceivedTimestampMs,
+			timers = props.timers,
+			displayTimestampMs = props.displayTimestampMs
 		}
-	}, t1.children)
+	}, props.children)
 end
 
 return NotificationCardProvider

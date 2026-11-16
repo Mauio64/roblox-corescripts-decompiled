@@ -1,72 +1,72 @@
 local CorePackages = game:GetService("CorePackages")
 local RunService = game:GetService("RunService")
+
 local t = require(CorePackages.Packages.t)
-local v4 = t.strictInterface({
+
+local strictInterface = t.strictInterface({
 	period = t.number,
 	threshold = t.number,
 	processInterval = t.number
 })
-local t1 = {}
 
-t1.__index = t1
+local RateLimiter = {}
+RateLimiter.__index = RateLimiter
 
-function t1.new(p1) -- line: 16
-	-- upvalues: v4 (copy), t1 (copy)
-	assert(v4(p1))
+function RateLimiter.new(data)
+	assert(strictInterface(data))
 
 	return (setmetatable({
+		_period = data.period,
+		_threshold = data.threshold,
+		_processInterval = data.processInterval,
 		_lastProcessed = 0,
-		_period = p1.period,
-		_threshold = p1.threshold,
-		_processInterval = p1.processInterval,
 		_counts = {},
 		_lastOccurrences = {}
-	}, t1))
+	}, RateLimiter))
 end
-function t1.increment(p2, p3, p4) -- line: 29
-	local v10 = p4 or os.clock()
 
-	p2._lastOccurrences[p3] = v10
+function RateLimiter:increment(p, p2)
+	local v = p2 or os.clock()
+	self._lastOccurrences[p] = v
 
-	if p2._counts[p3] == nil then
-		p2._counts[p3] = 1
-
+	if self._counts[p] == nil then
+		self._counts[p] = 1
 		return
 	end
 
-	local _counts = p2._counts
-
-	_counts[p3] = _counts[p3] + 1
+	self._counts[p] += 1
 end
-function t1.isRateLimited(p5, p6) -- line: 40
-	local v14 = p5._counts[p6]
 
-	return v14 ~= nil and v14 > p5._threshold
+function RateLimiter:isRateLimited(p): boolean
+	local count = self._counts[p]
+	return count ~= nil and self._threshold < count
 end
-function t1.startDecrementClock(p7) -- line: 45
-	-- upvalues: RunService (copy)
-	p7._decrementConnection = RunService.Heartbeat:Connect(function() -- line: 46
-		-- upvalues: p7 (copy)
-		p7:stepDecrementClock(os.clock())
+
+function RateLimiter:startDecrementClock()
+	self._decrementConnection = RunService.Heartbeat:Connect(function()
+		self:stepDecrementClock(os.clock())
 	end)
 end
-function t1.stepDecrementClock(p8, p9) -- line: 51
-	if p9 - p8._lastProcessed > p8._processInterval then
-		for k, v in pairs(p8._lastOccurrences) do
-			if p9 - v > p8._period then
-				local _counts = p8._counts
 
-				_counts[k] = _counts[k] - 1
-
-				if p8._counts[k] <= 0 then
-					p8._counts[k] = nil
-					p8._lastOccurrences[k] = nil
-				end
+function RateLimiter:stepDecrementClock(lastProcessed)
+	if lastProcessed - self._lastProcessed > self._processInterval then
+		for k, lastOccurrence in pairs(self._lastOccurrences) do
+			if not (lastProcessed - lastOccurrence > self._period) then
+				continue
 			end
+
+			self._counts[k] -= 1
+
+			if not (self._counts[k] <= 0) then
+				continue
+			end
+
+			self._counts[k] = nil
+			self._lastOccurrences[k] = nil
 		end
 
-		p8._lastProcessed = p9
+		self._lastProcessed = lastProcessed
 	end
 end
 
-return t1
+return RateLimiter

@@ -1,15 +1,15 @@
-local Parent = script:FindFirstAncestor("GameDetailRodux").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("GameDetailRodux").Parent
 
-return function(p1, p2) -- line: 18
-	-- upvalues: Url (copy)
-	assert(type(p2) == "table", "GamesMultigetDetails request expects universeIds to be a table")
+local Http = require(parent.Http)
+local Url = Http.Url
 
-	if #p2 == 0 or #p2 > 100 then
+return function(callback, list)
+	assert(type(list) == "table", "GamesMultigetDetails request expects universeIds to be a table")
+
+	if #list == 0 or #list > 100 then
 		error("GamesMultigetDetails request expects universeIds count between 1-100")
 	end
 
-	local v5 = table.concat(p2, ",")
-
-	return p1(string.format("%sv1/games?universeIds=%s", Url.GAME_URL, v5), "GET")
+	local joined = table.concat(list, ",")
+	return callback(string.format("%sv1/games?universeIds=%s", Url.GAME_URL, joined), "GET")
 end

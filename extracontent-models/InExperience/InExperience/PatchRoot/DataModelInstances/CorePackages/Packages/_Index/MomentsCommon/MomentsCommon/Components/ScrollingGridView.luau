@@ -1,180 +1,189 @@
-local Parent = script:FindFirstAncestor("MomentsCommon").Parent
-local Dash = require(Parent.Dash)
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
+
+local Dash = require(parent.Dash)
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local Button = Foundation.Button
 local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
 local ScrollView = Foundation.ScrollView
 local View = Foundation.View
+
 local useTokens = Foundation.Hooks.useTokens
 
-local function GridItems(t1: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), View (copy)
-	local t2 = {}
+local function GridItems(props)
+	local children = {}
 
-	for v13, v14 in t1.items do
-		t2[v13] = React.createElement(View, {
-			LayoutOrder = v13,
-			Size = UDim2.fromOffset(t1.itemSize.X, t1.itemSize.Y)
-		}, {
-			Content = t1.renderItem(v14, v13)
-		})
+	for k, item in props.items do
+		children[k] = React.createElement(
+			View,
+			{
+				LayoutOrder = k,
+				Size = UDim2.fromOffset(props.itemSize.X, props.itemSize.Y)
+			},
+			{ Content = props.renderItem(item, k) }
+		)
 	end
 
-	return React.createElement(View, {
-		tag = "auto-y size-full-0",
-		AutomaticSize = Enum.AutomaticSize.Y,
-		LayoutOrder = t1.LayoutOrder
-	}, {
-		UIGridLayout = React.createElement("UIGridLayout", {
-			CellPadding = UDim2.fromOffset(t1.itemPadding.X, t1.itemPadding.Y),
-			CellSize = UDim2.fromOffset(t1.itemSize.X, t1.itemSize.Y),
-			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			SortOrder = Enum.SortOrder.LayoutOrder
-		}),
-		Children = React.createElement(React.Fragment, nil, t2)
-	})
+	return React.createElement(
+		View,
+		{
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = props.LayoutOrder,
+			tag = "auto-y size-full-0"
+		},
+		{
+			UIGridLayout = React.createElement("UIGridLayout", {
+				CellPadding = UDim2.fromOffset(props.itemPadding.X, props.itemPadding.Y),
+				CellSize = UDim2.fromOffset(props.itemSize.X, props.itemSize.Y),
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Children = React.createElement(React.Fragment, nil, children)
+		}
+	)
 end
 
-return function(t3: {[any]: any}) -- line: 79
-	-- upvalues: React (copy), useTokens (copy), Dash (copy), View (copy), ScrollView (copy), ScrollBarVisibility (copy), GridItems (copy), Button (copy), Foundation (copy)
-	local v16, v17 = React.useState(Vector2.new(0, 0))
-	local v18, v19 = React.useState(0)
-	local v20 = useTokens()
-	local v21 = React.useCallback(function(p1) -- line: 85
-		-- upvalues: v17 (copy)
-		v17(p1.AbsoluteSize)
-	end, {})
-	local v22 = React.useMemo(function() -- line: 89
-		-- upvalues: v16 (copy), t3 (copy)
-		return (math.clamp(math.floor(v16.X / t3.itemConfig.minItemWidth), 1, t3.itemConfig.maxItemsPerRow))
-	end, {
-		v16,
-		t3.itemConfig
-	})
-	local v23 = React.useMemo(function() -- line: 97
-		-- upvalues: v16 (copy), t3 (copy), v22 (copy)
-		local v30 = v16.X - t3.itemConfig.padding * (v22 - 1)
-		local v31 = math.min(v30 / v22, v30)
-		local v32 = v31 * t3.aspectRatio
+return function(props)
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(0)
 
-		return Vector2.new(math.floor(v31), (math.floor(v32)))
-	end, {
-		v16,
-		v22,
-		t3.aspectRatio,
-		t3.itemConfig
-	})
-	local v24 = React.useMemo(function() -- line: 107
-		-- upvalues: v16 (copy), v23 (copy), v22 (copy), t3 (copy)
-		if v16.Y <= 0 then
+	local v = useTokens()
+
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize)
+	end, {})
+
+	local itemsPerRow = React.useMemo(function()
+		return (math.clamp(math.floor(state.X / props.itemConfig.minItemWidth), 1, props.itemConfig.maxItemsPerRow))
+	end, { state, props.itemConfig })
+
+	local itemSize = React.useMemo(function()
+		local v2 = state.X - props.itemConfig.padding * (itemsPerRow - 1)
+
+		local v3 = math.min(v2 / itemsPerRow, v2)
+		local v4 = v3 * props.aspectRatio
+
+		return Vector2.new(math.floor(v3), (math.floor(v4)))
+	end, { state, itemsPerRow, props.aspectRatio, props.itemConfig })
+
+	local v2 = React.useMemo(function()
+		if state.Y <= 0 then
 			return 0
 		end
 
-		return (math.max(math.floor(v16.Y / v23.Y) * v22, t3.itemConfig.minItemsPerPage))
-	end, {
-		v16,
-		v23,
-		v22,
-		t3.itemConfig
-	})
-	local v25 = v16.X > 0 and v16.Y > 0
-	local v26 = t3.shouldShowShowMoreButton or v18 < #t3.items
+		return (math.max(math.floor(state.Y / itemSize.Y) * itemsPerRow, props.itemConfig.minItemsPerPage))
+	end, { state, itemSize, itemsPerRow, props.itemConfig })
+	local v3
 
-	React.useEffect(function() -- line: 121
-		-- upvalues: v18 (copy), v24 (copy), v19 (copy)
-		if v18 < v24 then
-			v19(v24)
+	if state.X > 0 then
+		v3 = state.Y > 0
+	else
+		v3 = false
+	end
+
+	local shouldShowShowMoreButton = props.shouldShowShowMoreButton or state2 < #props.items
+
+	React.useEffect(function()
+		if state2 < v2 then
+			setState2(v2)
 		end
-	end, {
-		v16,
-		v24,
-		v18
-	})
+	end, { state, v2, state2 })
 
-	local v27 = React.useCallback(function() -- line: 127
-		-- upvalues: v18 (copy), v24 (copy), t3 (copy), v19 (copy)
-		if v18 + v24 > #t3.items and t3.shouldShowShowMoreButton then
-			t3.onShowMoreCallback()
+	local onActivated = React.useCallback(function()
+		if state2 + v2 > #props.items and props.shouldShowShowMoreButton then
+			props.onShowMoreCallback()
 		end
 
-		v19(v18 + v24)
-	end, {
-		v18,
-		v24,
-		t3.items,
-		t3.onShowMoreCallback
-	})
-	local v28 = React.useMemo(function() -- line: 136
-		-- upvalues: v26 (copy), t3 (copy), v18 (copy), Dash (copy)
-		if v26 then
-			local v33 = math.min(#t3.items, v18)
+		setState2(state2 + v2)
+	end, { state2, v2, props.items, props.onShowMoreCallback })
 
-			return Dash.slice(t3.items, 1, v33)
+	local items = React.useMemo(function()
+		if not shouldShowShowMoreButton then
+			return props.items
 		end
 
-		return t3.items
-	end, {
-		t3.items,
-		v26,
-		v18
-	})
+		local v4 = math.min(#props.items, state2)
+		return Dash.slice(props.items, 1, v4)
+	end, { props.items, shouldShowShowMoreButton, state2 })
 
-	if t3.items == nil or #t3.items == 0 then
+	if props.items == nil or #props.items == 0 then
 		return React.createElement(View, {
-			tag = "shrink size-full",
-			onAbsoluteSizeChanged = v21
+			onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+			tag = "shrink size-full"
 		}, {
-			EmptyState = t3.renderEmptyState()
+			EmptyState = props.renderEmptyState()
 		})
 	end
 
-	return React.createElement(View, {
-		tag = "shrink size-full",
-		onAbsoluteSizeChanged = v21
+	local createElement = React.createElement
+
+	local createElement2 = React.createElement
+
+	local createElement3 = React.createElement
+	local v4 = {
+		BorderSizePixel = 0,
+		layout = {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, v.Padding.Large)
+		},
+		LayoutOrder = not props.layoutOrder and 1 or props.layoutOrder,
+		scroll = {
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			CanvasSize = UDim2.fromScale(1, 0),
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			scrollBarVisibility = ScrollBarVisibility.None
+		},
+		tag = "size-full"
+	}
+	local uiPadding
+
+	if props.padding then
+		uiPadding = React.createElement("UIPadding", {
+			PaddingBottom = props.padding.bottom,
+			PaddingTop = props.padding.top,
+			PaddingLeft = props.padding.left,
+			PaddingRight = props.padding.right
+		})
+	end
+
+	local gridView
+
+	if #props.items > 0 and v3 then
+		gridView = React.createElement(GridItems, {
+			itemPadding = Vector2.new(props.itemConfig.padding, props.itemConfig.padding),
+			items = items,
+			itemsPerRow = itemsPerRow,
+			itemSize = itemSize,
+			LayoutOrder = 1,
+			renderItem = props.renderItem
+		})
+	end
+
+	local showMore
+
+	if shouldShowShowMoreButton then
+		showMore = React.createElement(Button, {
+			LayoutOrder = 2,
+			onActivated = onActivated,
+			size = Foundation.Enums.InputSize.Small,
+			text = props.showMoreButtonText
+		})
+	end
+
+	return createElement(View, {
+		onAbsoluteSizeChanged = onAbsoluteSizeChanged,
+		tag = "shrink size-full"
 	}, {
-		GridViewContainer = React.createElement(View, {
-			tag = "size-full"
-		}, {
-			ScrollView = React.createElement(ScrollView, {
-				BorderSizePixel = 0,
-				tag = "size-full",
-				layout = {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Center,
-					VerticalAlignment = Enum.VerticalAlignment.Top,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, v20.Padding.Large)
-				},
-				LayoutOrder = not t3.layoutOrder and 1 or t3.layoutOrder,
-				scroll = {
-					AutomaticCanvasSize = Enum.AutomaticSize.Y,
-					CanvasSize = UDim2.fromScale(1, 0),
-					ScrollingDirection = Enum.ScrollingDirection.Y,
-					scrollBarVisibility = ScrollBarVisibility.None
-				}
-			}, {
-				UIPadding = if not t3.padding then nil else React.createElement("UIPadding", {
-					PaddingBottom = t3.padding.bottom,
-					PaddingTop = t3.padding.top,
-					PaddingLeft = t3.padding.left,
-					PaddingRight = t3.padding.right
-				}),
-				GridView = if not (#t3.items > 0) or not v25 then nil else React.createElement(GridItems, {
-					LayoutOrder = 1,
-					itemPadding = Vector2.new(t3.itemConfig.padding, t3.itemConfig.padding),
-					items = v28,
-					itemsPerRow = v22,
-					itemSize = v23,
-					renderItem = t3.renderItem
-				}),
-				ShowMore = if not v26 then nil else React.createElement(Button, {
-					LayoutOrder = 2,
-					onActivated = v27,
-					size = Foundation.Enums.InputSize.Small,
-					text = t3.showMoreButtonText
-				})
+		GridViewContainer = createElement2(View, { tag = "size-full" }, {
+			ScrollView = createElement3(ScrollView, v4, {
+				UIPadding = uiPadding,
+				GridView = gridView,
+				ShowMore = showMore
 			})
 		})
 	})

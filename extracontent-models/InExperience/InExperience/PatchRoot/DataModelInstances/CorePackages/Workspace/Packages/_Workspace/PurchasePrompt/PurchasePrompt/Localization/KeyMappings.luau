@@ -1,5 +1,6 @@
-local ParentParent = script.Parent.Parent
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local parent = script.Parent.Parent
+
+local PurchaseError = require(parent.Enums.PurchaseError)
 
 return {
 	AssetTypeById = {

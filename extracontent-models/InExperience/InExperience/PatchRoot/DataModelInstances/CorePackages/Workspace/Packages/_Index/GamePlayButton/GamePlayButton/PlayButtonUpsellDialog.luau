@@ -1,99 +1,143 @@
-local Parent = script:FindFirstAncestor("GamePlayButton").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
+local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
+local parent = GamePlayButton.Parent
+
+local PlayButtonUpsellBody = require(GamePlayButton.PlayButtonUpsellBody)
+
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 local Dialog = Foundation.Dialog
 local DialogSize = Foundation.Enums.DialogSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local useTokens = Foundation.Hooks.useTokens
-local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useRoactService = require(Parent.RobloxAppHooks).useRoactService
-local AppLinking = require(Parent.RoactServiceTags).AppLinking
-local CentralOverlay = require(Parent.CentralOverlay)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent.RoactServiceTags)
+local AppLinking = RoactServiceTags.AppLinking
+
+local CentralOverlay = require(parent.CentralOverlay)
 local SetCentralOverlay = CentralOverlay.Actions.SetCentralOverlay
 local CloseCentralOverlay = CentralOverlay.Thunks.CloseCentralOverlay
-local CentralOverlayType = require(Parent.RobloxAppEnums).CentralOverlayType
-local extractAndStyleRichTextLinks = require(Parent.DiscoveryUtils).extractAndStyleRichTextLinks
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local CentralOverlayType = RobloxAppEnums.CentralOverlayType
 
-local function PlayButtonUpsellDialog(t1: {[any]: any}) -- line: 37
-	-- upvalues: useTokens (copy), useDispatch (copy), useRoactService (copy), AppLinking (copy), React (copy), extractAndStyleRichTextLinks (copy), SetCentralOverlay (copy), CentralOverlayType (copy), CloseCentralOverlay (copy), Dialog (copy), DialogSize (copy), ButtonVariant (copy)
-	local v18 = useTokens()
-	local v19 = useDispatch()
-	local v20 = useRoactService(AppLinking)
-	local v21 = React.useMemo(function() -- line: 42
-		-- upvalues: extractAndStyleRichTextLinks (copy), t1 (copy)
-		local v23, v24 = extractAndStyleRichTextLinks(t1.bodyText)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local extractAndStyleRichTextLinks = DiscoveryUtils.extractAndStyleRichTextLinks
 
-		return {
-			link = if not (#v23 > 0) then nil else v23[1],
-			styledText = v24
-		}
-	end, { t1.bodyText })
-	local v22 = React.useCallback(function() -- line: 52
-		-- upvalues: v21 (copy), t1 (copy), v19 (copy), SetCentralOverlay (copy), CentralOverlayType (copy), v20 (copy), CloseCentralOverlay (copy)
-		if not v21.link then
+local FFlagEnablePlayButtonWizardVPCPrologue = require(GamePlayButton.Flags.FFlagEnablePlayButtonWizardVPCPrologue)
+
+local function PlayButtonUpsellDialog(props)
+	local v = useTokens()
+	local v2 = useDispatch()
+	local v3 = useRoactService(AppLinking)
+
+	local v4 = React.useMemo(function()
+		local v4, styledText = extractAndStyleRichTextLinks(props.bodyText)
+		local link
+
+		if #v4 > 0 then
+			link = v4[1]
+		end
+
+		return { link = link, styledText = styledText }
+	end, { props.bodyText })
+
+	local v5 = React.useCallback(function()
+		if not v4.link then
 			return
 		end
 
-		t1.onCloseModal()
-		v19(SetCentralOverlay(CentralOverlayType.LeaveRobloxAlert, {
-			continueFunc = function() -- line: 61
-				-- upvalues: v20 (copy), v21 (copy), v19 (copy), CloseCentralOverlay (copy)
-				v20:openURL(v21.link)
-				v19(CloseCentralOverlay())
+		props.onCloseModal()
+
+		v2(SetCentralOverlay(CentralOverlayType.LeaveRobloxAlert, {
+			continueFunc = function()
+				v3:openURL(v4.link)
+				v2(CloseCentralOverlay())
 			end
 		}))
-	end, {
-		t1.onCloseModal,
-		v21.link,
-		v19,
-		v20
-	})
+	end, { props.onCloseModal, v4.link, v2, v3 })
 
-	return React.createElement(Dialog.Root, {
-		hasBackdrop = false,
-		size = DialogSize.Medium,
-		onClose = t1.onCloseModal
-	}, {
-		Title = React.createElement(Dialog.Title, {
-			LayoutOrder = 1,
-			text = t1.titleText
-		}),
-		Content = React.createElement(Dialog.Content, {
-			LayoutOrder = 2
-		}, {
-			BodyText = React.createElement("TextButton", {
-				AutomaticSize = Enum.AutomaticSize.Y,
-				BackgroundTransparency = 1,
-				RichText = true,
-				Size = UDim2.new(1, 0, 0, 0),
-				Text = v21.styledText,
-				TextSize = v18.Typography.BodyLarge.FontSize,
-				Font = v18.Typography.BodyLarge.Font,
-				TextWrapped = true,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextYAlignment = Enum.TextYAlignment.Center,
-				TextColor3 = v18.Color.Content.Emphasis.Color3,
-				Active = v21.link ~= nil,
-				Selectable = v21.link ~= nil,
-				[React.Event.Activated] = if not v21.link then nil else v22
-			})
-		}),
-		Actions = React.createElement(Dialog.Actions, {
-			LayoutOrder = 3,
-			actions = {
-				{
-					text = t1.cancelButtonText,
-					variant = ButtonVariant.Standard,
-					onActivated = t1.onCancelButtonClick
-				},
-				{
-					text = t1.actionButtonText,
-					variant = ButtonVariant.Emphasis,
-					onActivated = t1.onActionButtonClick
-				}
-			}
+	local createElement = React.createElement
+	local root = Dialog.Root
+	local v6 = { size = DialogSize.Medium, hasBackdrop = false, onClose = props.onCloseModal }
+	local children = {
+		Title = React.createElement(Dialog.Title, { LayoutOrder = 1, text = props.titleText }),
+		Content = 0,
+		Actions = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Dialog.Content
+	local bodyText
+
+	if FFlagEnablePlayButtonWizardVPCPrologue then
+		bodyText = React.createElement(PlayButtonUpsellBody, {
+			bodyText = props.bodyText,
+			onCloseModal = props.onCloseModal
 		})
+	else
+		local createElement3 = React.createElement
+		local v7 = {}
+		v7.AutomaticSize = Enum.AutomaticSize.Y
+		v7.BackgroundTransparency = 1
+		v7.RichText = true
+		v7.Size = UDim2.new(1, 0, 0, 0)
+		v7.Text = v4.styledText
+		v7.TextSize = v.Typography.BodyLarge.FontSize
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = v.Typography.BodyLarge.Font
+		end
+
+		v7.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(v.Typography.BodyLarge.Font)
+		end
+
+		v7.FontFace = fontFace
+
+		v7.TextWrapped = true
+		v7.TextXAlignment = Enum.TextXAlignment.Left
+		v7.TextYAlignment = Enum.TextYAlignment.Center
+		v7.TextColor3 = v.Color.Content.Emphasis.Color3
+		v7.Active = v4.link ~= nil
+		v7.Selectable = v4.link ~= nil
+		local activated = React.Event.Activated
+
+		if not v4.link then
+			v5 = nil
+		end
+
+		v7[activated] = v5
+		bodyText = createElement3("TextButton", v7)
+	end
+
+	children.Content = createElement2(content, { LayoutOrder = 2 }, { BodyText = bodyText })
+
+	children.Actions = React.createElement(Dialog.Actions, {
+		LayoutOrder = 3,
+		actions = {
+			{
+				text = props.cancelButtonText,
+				variant = ButtonVariant.Standard,
+				onActivated = props.onCancelButtonClick
+			},
+			{
+				text = props.actionButtonText,
+				variant = ButtonVariant.Emphasis,
+				onActivated = props.onActionButtonClick
+			}
+		}
 	})
+	return createElement(root, v6, children)
 end
 
 return PlayButtonUpsellDialog

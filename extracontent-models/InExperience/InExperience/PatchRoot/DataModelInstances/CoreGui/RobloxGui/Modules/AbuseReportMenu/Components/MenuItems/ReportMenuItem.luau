@@ -1,108 +1,211 @@
 local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
 local TextService = game:GetService("TextService")
 local CorePackages = game:GetService("CorePackages")
-local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
+local Style = require(CorePackages.Workspace.Packages.Style)
+local AppFonts = Style.AppFonts
 local UIBlox = require(CorePackages.Packages.UIBlox)
+
 local Cryo = require(CorePackages.Packages.Cryo)
 local React = require(CorePackages.Packages.React)
 local useStyle = UIBlox.Core.Style.useStyle
 local Constants = require(AbuseReportMenu.Components.Constants)
 local getMenuItemDimensions = require(AbuseReportMenu.Components.getMenuItemDimensions)
 
-local function DropdownReportMenuItem(p1) -- line: 23
-	-- upvalues: useStyle (copy), getMenuItemDimensions (copy), Constants (copy), React (copy), TextService (copy), AppFonts (copy), Cryo (copy)
-	local v13 = useStyle()
-	local v14 = if p1.label ~= "" and not p1.isRightComponentFullWidth then v13.Tokens.Size.Size_150 else 0
-	local Theme = v13.Theme
-	local v16 = getMenuItemDimensions(p1.menuContainerWidth)
-	local v17 = math.max(p1.menuContainerWidth - Constants.MenuItemDynamicWidthOffset, v16.LeftWidth + v16.RightWidth)
-	local v18, v19 = React.useState(v13.Tokens.Size.Size_1000)
+local function DropdownReportMenuItem(props)
+	local v = useStyle()
+	local v2 = (props.label == "" or props.isRightComponentFullWidth) and 0 or v.Tokens.Size.Size_150
+	local theme = v.Theme
 
-	React.useEffect(function() -- line: 37
-		-- upvalues: v19 (copy), v13 (copy), TextService (copy), p1 (copy), v16 (copy), AppFonts (copy), v17 (copy)
-		v19((math.max(v13.Tokens.Size.Size_1000, TextService:GetTextSize(p1.label, v16.TextSize, AppFonts.default:getMedium(), Vector2.new((if not p1.isSmallPortraitViewport then v16.LeftWidth else v17), 1e999)).Y)))
+	local menuItemDimensions = getMenuItemDimensions(props.menuContainerWidth)
+	local v3 = math.max(
+		props.menuContainerWidth - Constants.MenuItemDynamicWidthOffset,
+		menuItemDimensions.LeftWidth + menuItemDimensions.RightWidth
+	)
+
+	local state, setState = React.useState(v.Tokens.Size.Size_1000)
+	React.useEffect(function()
+		local size_1000 = v.Tokens.Size.Size_1000
+
+		local label = props.label
+		local textSize = menuItemDimensions.TextSize
+		local medium = AppFonts.default:getMedium()
+		local v4
+
+		if props.isSmallPortraitViewport then
+			v4 = v3
+		else
+			v4 = menuItemDimensions.LeftWidth
+		end
+
+		setState((math.max(size_1000, TextService:GetTextSize(label, textSize, medium, Vector2.new(v4, 1e999)).Y)))
 	end, {})
 
-	local t1 = {
-		Layout = React.createElement("UIListLayout", {
-			FillDirection = if not p1.isSmallPortraitViewport then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical,
-			VerticalAlignment = Enum.VerticalAlignment.Center,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = if not p1.isSmallPortraitViewport then UDim.new(0, 0) else UDim.new(0, v14)
-		}),
+	local createElement = React.createElement
+	local fillDirection
+
+	if props.isSmallPortraitViewport then
+		fillDirection = Enum.FillDirection.Vertical
+	else
+		fillDirection = Enum.FillDirection.Horizontal
+	end
+
+	local v4 = {
+		FillDirection = fillDirection,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = 0
+	}
+	local padding
+
+	if props.isSmallPortraitViewport then
+		padding = UDim.new(0, v2)
+	else
+		padding = UDim.new(0, 0)
+	end
+
+	v4.Padding = padding
+	local children = {
+		Layout = createElement("UIListLayout", v4),
 		Padding = React.createElement("UIPadding", {
-			PaddingTop = UDim.new(0, v14),
-			PaddingBottom = UDim.new(0, v14)
+			PaddingTop = UDim.new(0, v2),
+			PaddingBottom = UDim.new(0, v2)
 		})
 	}
-	local v22
+	local v5
 
-	if p1.isRightComponentFullWidth then
-		local v21 = math.max(p1.menuContainerWidth - Constants.MenuItemDynamicWidthOffset, v16.LeftWidth + v16.RightWidth)
+	if props.isRightComponentFullWidth then
+		local v6 = math.max(
+			props.menuContainerWidth - Constants.MenuItemDynamicWidthOffset,
+			menuItemDimensions.LeftWidth + menuItemDimensions.RightWidth
+		)
 
-		v22 = Cryo.Dictionary.join(t1, {
-			RightComponentWrapper = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 3,
-				Size = UDim2.new(0, v21, 0, Constants.MenuItemHeight),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				Layout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}),
-				RightComponent = p1.rightComponent
-			})
+		v5 = Cryo.Dictionary.join(children, {
+			RightComponentWrapper = React.createElement(
+				"Frame",
+				{
+					Size = UDim2.new(0, v6, 0, Constants.MenuItemHeight),
+					BackgroundTransparency = 1,
+					LayoutOrder = 3,
+					AutomaticSize = Enum.AutomaticSize.Y
+				},
+				{
+					Layout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						VerticalAlignment = Enum.VerticalAlignment.Center
+					}),
+					RightComponent = props.rightComponent
+				}
+			)
 		})
 	else
-		local v23 = math.max(0, p1.menuContainerWidth - v16.LeftWidth - v16.RightWidth - Constants.MenuItemDynamicWidthOffset)
+		local v6 = math.max(
+			0,
+			props.menuContainerWidth - menuItemDimensions.LeftWidth - menuItemDimensions.RightWidth - Constants.MenuItemDynamicWidthOffset
+		)
 
-		v22 = Cryo.Dictionary.join(t1, {
-			Label = if p1.label == "" and p1.isSmallPortraitViewport then nil else React.createElement("TextLabel", {
-				LayoutOrder = 1,
-				TextWrapped = true,
-				BackgroundTransparency = 1,
-				Text = p1.label,
+		local join = Cryo.Dictionary.join
+		local label
+
+		if not (props.label == "" and props.isSmallPortraitViewport) then
+			local createElement2 = React.createElement
+			local v7 = {
+				Text = props.label,
 				Font = AppFonts.default:getMedium(),
-				TextColor3 = Theme.TextEmphasis.Color,
-				TextTransparency = Theme.TextEmphasis.Transparency,
-				TextSize = v16.TextSize,
+				LayoutOrder = 1,
+				TextColor3 = theme.TextEmphasis.Color,
+				TextTransparency = theme.TextEmphasis.Transparency,
+				TextSize = menuItemDimensions.TextSize,
+				TextWrapped = true,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Size = if not p1.isSmallPortraitViewport then UDim2.new(0, v16.LeftWidth, 0, v18) else UDim2.new(0, v17, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}),
-			MiddleSpaceHolder = if not p1.isSmallPortraitViewport then React.createElement("Frame", {
+				Size = 0,
+				AutomaticSize = 0,
+				BackgroundTransparency = 1
+			}
+			local size
+
+			if props.isSmallPortraitViewport then
+				size = UDim2.new(0, v3, 0, 0)
+			else
+				size = UDim2.new(0, menuItemDimensions.LeftWidth, 0, state)
+			end
+
+			v7.Size = size
+
+			v7.AutomaticSize = Enum.AutomaticSize.Y
+			label = createElement2("TextLabel", v7)
+		end
+
+		local middleSpaceHolder
+
+		if not props.isSmallPortraitViewport then
+			middleSpaceHolder = React.createElement("Frame", {
+				Size = UDim2.new(0, v6, 0, Constants.MenuItemHeight),
 				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				Size = UDim2.new(0, v23, 0, Constants.MenuItemHeight)
-			}) else nil,
-			RightComponentWrapper = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 3,
-				Size = if not p1.isSmallPortraitViewport then UDim2.new(0, v16.RightWidth, 0, Constants.MenuItemHeight) else UDim2.new(0, v17, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				Layout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-					HorizontalAlignment = if not p1.isSmallPortraitViewport then nil else Enum.HorizontalAlignment.Left
-				}),
-				RightComponent = p1.rightComponent
+				LayoutOrder = 2
+			})
+		end
+
+		local createElement2 = React.createElement
+		local size
+
+		if props.isSmallPortraitViewport then
+			size = UDim2.new(0, v3, 0, 0)
+		else
+			size = UDim2.new(0, menuItemDimensions.RightWidth, 0, Constants.MenuItemHeight)
+		end
+
+		local v7 = {
+			Size = size,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			LayoutOrder = 3
+		}
+
+		local createElement3 = React.createElement
+		local v8 = {
+			FillDirection = Enum.FillDirection.Vertical,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalAlignment = 0
+		}
+		local horizontalAlignment
+
+		if props.isSmallPortraitViewport then
+			horizontalAlignment = Enum.HorizontalAlignment.Left
+		end
+
+		v8.HorizontalAlignment = horizontalAlignment
+		v5 = join(children, {
+			Label = label,
+			MiddleSpaceHolder = middleSpaceHolder,
+			RightComponentWrapper = createElement2("Frame", v7, {
+				Layout = createElement3("UIListLayout", v8),
+				RightComponent = props.rightComponent
 			})
 		})
 	end
 
-	if p1.heightOverride then
-		v18 = p1.heightOverride
+	if props.heightOverride then
+		state = props.heightOverride
 	end
 
-	return React.createElement("Frame", {
+	local createElement2 = React.createElement
+	local v6 = {
+		Size = UDim2.new(1, 0, 0, state),
+		AutomaticSize = 0,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, v18),
-		AutomaticSize = if not p1.isRightComponentFullWidth and not p1.isSmallPortraitViewport then nil else Enum.AutomaticSize.Y,
-		LayoutOrder = p1.layoutOrder
-	}, v22)
+		LayoutOrder = 0
+	}
+	local automaticSize
+
+	if props.isRightComponentFullWidth or props.isSmallPortraitViewport then
+		automaticSize = Enum.AutomaticSize.Y
+	end
+
+	v6.AutomaticSize = automaticSize
+
+	v6.LayoutOrder = props.layoutOrder
+	return createElement2("Frame", v6, v5)
 end
 
 return DropdownReportMenuItem

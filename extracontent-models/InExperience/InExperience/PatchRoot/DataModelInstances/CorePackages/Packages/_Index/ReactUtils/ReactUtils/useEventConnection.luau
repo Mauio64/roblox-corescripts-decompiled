@@ -1,29 +1,31 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(parent.React)
+require(parent.GoodSignal)
 
-local function useEventConnection(p1, p2: ((...any) -> ...any), t1: {[any]: any}?) -- line: 7
-	-- upvalues: React (copy)
-	local v7 = React.useMemo(function() -- line: 8
-		-- upvalues: p2 (copy)
-		return p2
-	end, t1)
+local function useEventConnection(object, callback, p)
+	local v = React.useMemo(function()
+		return callback
+	end, p)
 
-	React.useEffect(function() -- line: 12
-		-- upvalues: p1 (copy), v7 (copy)
-		if p1 == nil then
+	React.useEffect(function()
+		if object == nil then
 			return nil
 		end
 
-		local connection = p1:Connect(v7)
+		if typeof(object) == "RBXScriptSignal" then
+			local connection = object:Connect(v)
 
-		return function() -- line: 19
-			-- upvalues: connection (copy)
+			return function()
+				connection:Disconnect()
+			end
+		end
+
+		local connection = object:Connect(v)
+
+		return function()
 			connection:Disconnect()
 		end
-	end, {
-		p1,
-		v7
-	})
+	end, { object, v })
 end
 
 return useEventConnection

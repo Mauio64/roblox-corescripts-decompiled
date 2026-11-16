@@ -1,25 +1,24 @@
-local function intersect(...) -- line: 2
-	local t1 = {}
-	local v3 = select("#", ...)
-	local v4 = select(1, ...)
+local function intersect(...)
+	local v = select("#", ...)
+	local v2 = select(1, ...)
+	local result = {}
 
-	for k, _ in pairs(v4) do
-		local v7 = true
+	for k, _ in pairs(v2) do
+		local flag = true
 
-		for i = 2, v3 do
+		for i = 2, v do
 			if select(i, ...)[k] == nil then
-				v7 = false
-
+				flag = false
 				break
 			end
 		end
 
-		if v7 then
-			t1[k] = true
+		if flag then
+			result[k] = true
 		end
 	end
 
-	return t1
+	return result
 end
 
 return intersect

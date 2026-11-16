@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local GetFriendsChatRealtimeStore = require(Workspace.FriendsChat.FriendsChat.Stores.GetFriendsChatRealtimeStore)
 
-return (require(_Workspace.FriendsChat.FriendsChat.Stores.GetFriendsChatRealtimeStore))
+return GetFriendsChatRealtimeStore

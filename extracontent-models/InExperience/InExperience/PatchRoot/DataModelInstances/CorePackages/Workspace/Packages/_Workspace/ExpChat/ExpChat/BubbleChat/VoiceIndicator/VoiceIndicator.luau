@@ -1,113 +1,114 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
-local v2 = require(Parent.ExpChatShared).Logger:new("ExpChat/" .. script.Name)
+local parent = script:FindFirstAncestor("ExpChat").Parent
+
+local ExpChatShared = require(parent.ExpChatShared)
+local v = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
+
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
-local UIBlox = require(Parent.UIBlox)
+
+local UIBlox = require(parent.UIBlox)
 local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
+
 local BubbleChat = script:FindFirstAncestor("BubbleChat")
 local getVoiceIndicatorIcon = require(BubbleChat.Helpers.getVoiceIndicatorIcon)
-local Roact = require(Parent.Roact)
-local RoactRodux = require(Parent.RoactRodux)
-local GetFFlagExpChatUseVoiceParticipantsStore = require(Parent.SharedFlags).GetFFlagExpChatUseVoiceParticipantsStore
-local v13 = Roact.PureComponent:extend("VoiceIndicator")
 
-v13.defaultProps = {}
+local Roact = require(parent.Roact)
+local RoactRodux = require(parent.RoactRodux)
 
-function v13.init(p1) -- line: 48
-	-- upvalues: Roact (copy), HttpService (copy), RunService (copy), getVoiceIndicatorIcon (copy)
-	local v16, v17 = Roact.createBinding(0)
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagExpChatUseVoiceParticipantsStore = SharedFlags.GetFFlagExpChatUseVoiceParticipantsStore
 
-	p1.level = v16
-	p1.updateLevel = v17
+local extended = Roact.PureComponent:extend("VoiceIndicator")
 
-	local v18, v19 = Roact.createBinding(p1.props.voiceState)
+extended.defaultProps = {}
 
-	p1.voiceState = v18
-	p1.updateVoiceState = v19
-	p1.renderStepName = HttpService:GenerateGUID()
-	RunService:BindToRenderStep(p1.renderStepName, 1, function() -- line: 55
-		-- upvalues: p1 (copy)
-		p1.updateLevel(math.random())
-	end)
-	p1.levelIcon = Roact.joinBindings({
-		p1.voiceState,
-		p1.level
-	}):map(function(t1: {[any]: any}) -- line: 59
-		-- upvalues: getVoiceIndicatorIcon (copy), p1 (copy)
-		local v33 = t1[1]
-		local v34 = t1[2]
+function extended:init()
+	local binding, updateLevel = Roact.createBinding(0)
+	self.level = binding
+	self.updateLevel = updateLevel
+	local binding2, updateVoiceState = Roact.createBinding(self.props.voiceState)
+	self.voiceState = binding2
+	self.updateVoiceState = updateVoiceState
 
-		return getVoiceIndicatorIcon(p1.props.getIcon, v33, v34, p1.props.iconStyle)
+	self.renderStepName = HttpService:GenerateGUID()
+	RunService:BindToRenderStep(self.renderStepName, 1, function()
+		self.updateLevel(math.random())
 	end)
 
-	function p1.onClicked() -- line: 66
-		-- upvalues: p1 (copy)
-		if p1.props.onClicked and p1.props.userId then
-			p1.props.onClicked(p1.props.userId)
+	self.levelIcon = Roact.joinBindings({ self.voiceState, self.level }):map(function(list)
+		local item = list[1]
+		local item2 = list[2]
+
+		return getVoiceIndicatorIcon(self.props.getIcon, item, item2, self.props.iconStyle)
+	end)
+
+	function self.onClicked()
+		if self.props.onClicked and self.props.userId then
+			self.props.onClicked(self.props.userId)
 		end
 	end
 end
-function v13.renderWithSelectionCursor(p2, p3) -- line: 73
-	-- upvalues: Roact (copy), CursorKind (copy)
-	local v22 = p2.props.voiceState == "Error" or p2.props.voiceState == "Hidden"
 
-	if p2.props.hideOnError and (not p2.props.voiceState or v22) then
+function extended:renderWithSelectionCursor(callback)
+	local v2 = self.props.voiceState == "Error" or self.props.voiceState == "Hidden"
+
+	if self.props.hideOnError and (not self.props.voiceState or v2) then
 		return nil
 	end
 
-	local v23 = p2.props.voiceState ~= "LOCAL_MUTED" and 0 or 0.5
+	local v3 = self.props.voiceState == "LOCAL_MUTED" and 0.5 or 0
+	local imageTransparency
 
-	if p2.props.iconTransparency then
-		local v24 = v23
-
-		v23 = if type(p2.props.iconTransparency) == "number" then 1 - (1 - p2.props.iconTransparency) * (1 - v24) else p2.props.iconTransparency:map(function(p4) -- line: 84
-			-- upvalues: v24 (copy)
-			return 1 - (1 - p4) * (1 - v24)
-		end)
+	if self.props.iconTransparency then
+		if type(self.props.iconTransparency) == "number" then
+			imageTransparency = 1 - (1 - self.props.iconTransparency) * (1 - v3)
+		else
+			imageTransparency = self.props.iconTransparency:map(function(p)
+				return 1 - (1 - p) * (1 - v3)
+			end)
+		end
+	else
+		imageTransparency = v3
 	end
 
 	return Roact.createElement("ImageButton", {
-		Size = p2.props.size or UDim2.fromOffset(28, 28),
+		Size = self.props.size or UDim2.fromOffset(28, 28),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Image = p2.levelIcon,
-		ImageTransparency = v23,
-		SelectionImageObject = p3(CursorKind.RoundedRectNoInset),
-		[Roact.Event.Activated] = p2.onClicked
+		Image = self.levelIcon,
+		ImageTransparency = imageTransparency,
+		SelectionImageObject = callback(CursorKind.RoundedRectNoInset),
+		[Roact.Event.Activated] = self.onClicked
 	})
 end
-function v13.render(p5) -- line: 103
-	-- upvalues: withSelectionCursorProvider (copy)
-	return withSelectionCursorProvider(function(p6) -- line: 104
-		-- upvalues: p5 (copy)
-		return p5:renderWithSelectionCursor(p6)
+
+function extended:render()
+	return withSelectionCursorProvider(function(p)
+		return self:renderWithSelectionCursor(p)
 	end)
 end
-function v13.didUpdate(p7, p8, _) -- line: 109
-	-- upvalues: v2 (copy)
-	v2:trace("Voice state updated to {} for ...{}", p7.props.voiceState, (string.sub(tostring(p7.props.userId), -4)))
 
-	if p8.voiceState ~= p7.props.voiceState then
-		p7.updateVoiceState(p7.props.voiceState)
+function extended.didUpdate(p, p2, _)
+	v:trace("Voice state updated to {} for ...{}", p.props.voiceState, (string.sub(tostring(p.props.userId), -4)))
+
+	if p2.voiceState ~= p.props.voiceState then
+		p.updateVoiceState(p.props.voiceState)
 	end
 end
-function v13.willUnmount(p10) -- line: 121
-	-- upvalues: RunService (copy)
-	pcall(function() -- line: 122
-		-- upvalues: RunService (copy), p10 (copy)
-		RunService:UnbindFromRenderStep(p10.renderStepName)
+
+function extended.willUnmount(p)
+	pcall(function()
+		RunService:UnbindFromRenderStep(p.renderStepName)
 	end)
 end
 
-local function mapStateToProps(p11, p12) -- line: 127
-	return {
-		voiceState = p11.Voice.participants[p12.userId]
-	}
+local function mapStateToProps(p, p2)
+	return { voiceState = p.Voice.participants[p2.userId] }
 end
 
 if GetFFlagExpChatUseVoiceParticipantsStore() then
-	return v13
+	return extended
 end
 
-return RoactRodux.connect(mapStateToProps)(v13)
+return RoactRodux.connect(mapStateToProps)(extended)

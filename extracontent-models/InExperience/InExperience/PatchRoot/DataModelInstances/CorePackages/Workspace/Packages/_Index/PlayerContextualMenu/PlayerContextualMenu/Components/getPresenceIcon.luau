@@ -1,18 +1,20 @@
-local Parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
-local Images = require(Parent.UIBlox).App.ImageSet.Images
+local parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
 
+local UIBlox = require(parent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
 require(script.Parent.Types)
 
-local function getPresenceIcon(p1, t1: {[any]: any}) -- line: 9
-	-- upvalues: Images (copy)
-	if p1 then
-		if p1.status == "InGame" then
-			return Images["icons/menu/games_small"], t1.iconEmphasis
-		end
+local function getPresenceIcon(p, p2)
+	if not p then
+		return nil, nil
+	end
 
-		if p1.status == "Online" or p1.status == "InStudio" then
-			return Images["component_assets/circle_16"], t1.onlinePresence
-		end
+	if p.status == "InGame" then
+		return Images["icons/menu/games_small"], p2.iconEmphasis
+	end
+
+	if p.status == "Online" or p.status == "InStudio" then
+		return Images["component_assets/circle_16"], p2.onlinePresence
 	end
 
 	return nil, nil

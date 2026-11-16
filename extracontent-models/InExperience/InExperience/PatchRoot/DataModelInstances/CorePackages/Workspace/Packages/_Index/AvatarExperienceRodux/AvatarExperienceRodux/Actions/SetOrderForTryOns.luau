@@ -1,10 +1,7 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
-local Rodux = require(Parent.Rodux)
+local parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+local Rodux = require(parent.Rodux)
+require(parent.AvatarExperienceCommon)
 
-require(Parent.AvatarExperienceCommon)
-
-return Rodux.makeActionCreator(script.Name, function(p1) -- line: 20
-	return {
-		itemIdToOrderMap = p1
-	}
+return Rodux.makeActionCreator(script.Name, function(itemIdToOrderMap)
+	return { itemIdToOrderMap = itemIdToOrderMap }
 end)

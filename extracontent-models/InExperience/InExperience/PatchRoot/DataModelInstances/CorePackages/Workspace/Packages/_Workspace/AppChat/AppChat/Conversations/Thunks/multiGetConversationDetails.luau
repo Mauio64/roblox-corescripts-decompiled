@@ -1,41 +1,37 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local AppChatNetworking = require(Parent.AppChatNetworking)
-local Cryo = require(Parent.Cryo)
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("AppChat").Parent
+local AppChatNetworking = require(parent.AppChatNetworking)
+
+local Cryo = require(parent.Cryo)
+local Promise = require(parent.Promise)
+
 local processConversations = require(script.Parent.processConversations)
 
-return function(p1) -- line: 15
-	-- upvalues: Promise (copy), AppChatNetworking (copy), Cryo (copy), processConversations (copy)
-	return function(p2) -- line: 16
-		-- upvalues: p1 (copy), Promise (copy), AppChatNetworking (copy), Cryo (copy), processConversations (copy)
-		if not p1 or #p1 == 0 then
+return function(list)
+	return function(object)
+		if not list or #list == 0 then
 			return Promise.resolve({})
 		end
 
-		local t1 = {}
 		local GET_CONVERSATIONS = AppChatNetworking.Constants.PageSize.GET_CONVERSATIONS
+		local v = {}
 
-		for i = 1, #p1, GET_CONVERSATIONS do
-			local v11 = Cryo.List.getRange(p1, i, i + GET_CONVERSATIONS - 1)
-
-			table.insert(t1, p2:dispatch(AppChatNetworking.rodux.MultiGetConversationDetails.API(v11)))
+		for i = 1, #list, GET_CONVERSATIONS do
+			local range = Cryo.List.getRange(list, i, i + GET_CONVERSATIONS - 1)
+			table.insert(v, object:dispatch(AppChatNetworking.rodux.MultiGetConversationDetails.API(range)))
 		end
 
-		return Promise.all(t1):andThen(function(p3) -- line: 26
-			-- upvalues: Cryo (copy)
-			return Cryo.List.foldLeft(p3, function(p4, p5) -- line: 27
-				-- upvalues: Cryo (copy)
-				local v16 = p5 and (p5.responseBody and p5.responseBody.conversations)
+		return Promise.all(v):andThen(function(p)
+			return Cryo.List.foldLeft(p, function(p2, p3)
+				local conversations = p3 and p3.responseBody and p3.responseBody.conversations
 
-				if not v16 then
-					return p4
+				if conversations then
+					return Cryo.List.join(p2, conversations)
 				end
 
-				return Cryo.List.join(p4, v16)
+				return p2
 			end, {})
-		end):tap(function(p6) -- line: 35
-			-- upvalues: p2 (copy), processConversations (copy)
-			p2:dispatch(processConversations(p6))
+		end):tap(function(p)
+			object:dispatch(processConversations(p))
 		end)
 	end
 end

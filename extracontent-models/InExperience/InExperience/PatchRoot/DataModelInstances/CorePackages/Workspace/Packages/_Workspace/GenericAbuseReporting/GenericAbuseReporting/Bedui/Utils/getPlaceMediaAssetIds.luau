@@ -1,33 +1,34 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local Promise = require(Parent.Promise)
-local Url = require(Parent.Http).Url
-local v4 = game:DefineFastFlag("RemoveDuplicatesPlaceMediaAssets", false)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 
-return function(p1, s1: string) -- line: 9
-	-- upvalues: Url (copy), v4 (copy), Promise (copy)
-	local t1 = {}
-	local t2 = {}
+local Promise = require(parent.Promise)
+local Http = require(parent.Http)
+local Url = Http.Url
 
-	return p1(string.format("%sv2/games/%s/media", Url.GAME_URL, s1), "GET"):andThen(function(p2) -- line: 16
-		-- upvalues: v4 (copy), t2 (copy), t1 (copy)
-		if p2 and (p2.responseBody and p2.responseBody.data) then
+local defineFastFlag = game:DefineFastFlag("RemoveDuplicatesPlaceMediaAssets", false)
+
+return function(callback, p: string)
+	local imageIds = {}
+	local imageIdSet = {}
+	return callback(string.format("%sv2/games/%s/media", Url.GAME_URL, p), "GET"):andThen(function(p2)
+		if p2 and p2.responseBody and p2.responseBody.data then
 			for _, v in ipairs(p2.responseBody.data) do
-				if v.imageId then
-					if v4 then
-						local str = tostring(v.imageId)
+				if not v.imageId then
+					continue
+				end
 
-						if not t2[str] then
-							t2[str] = true
-							table.insert(t1, str)
-						end
-					else
-						table.insert(t1, (tostring(v.imageId)))
+				if defineFastFlag then
+					local imageId = tostring(v.imageId)
+
+					if not imageIdSet[imageId] then
+						imageIdSet[imageId] = true
+						table.insert(imageIds, imageId)
 					end
+				else
+					table.insert(imageIds, (tostring(v.imageId)))
 				end
 			end
 		end
-	end):finally(function() -- line: 33
-		-- upvalues: Promise (copy), t1 (copy)
-		return Promise.resolve(t1)
+	end):finally(function()
+		return Promise.resolve(imageIds)
 	end)
 end

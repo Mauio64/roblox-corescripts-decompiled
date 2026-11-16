@@ -5,7 +5,9 @@ local GuiService = game:GetService("GuiService")
 local VRService = game:GetService("VRService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local Modules = RobloxGui:WaitForChild("Modules")
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/CoreScriptErrorReporter", RobloxGui)
@@ -13,86 +15,140 @@ ScriptContext:AddCoreScriptLocal("CoreScripts/CoreScriptErrorReporter", RobloxGu
 local Roact = require(CorePackages.Packages.Roact)
 local Scheduler = require(CorePackages.Packages.Scheduler)
 local CachedPolicyService = require(CorePackages.Workspace.Packages.CachedPolicyService)
+
 local FFlagUseRoactGlobalConfigInCoreScripts = require(RobloxGui.Modules.Flags.FFlagUseRoactGlobalConfigInCoreScripts)
+
 local GetFFlagScreenshotHudApi = require(RobloxGui.Modules.Flags.GetFFlagScreenshotHudApi)
+
 local GetFFlagEnableNewInviteMenuIXP = require(Modules.Flags.GetFFlagEnableNewInviteMenuIXP)
 local NewInviteMenuExperimentManager = require(Modules.Settings.Pages.ShareGame.NewInviteMenuExperimentManager)
 local GetFFlagEnableSoundSessionTelemetry = require(Modules.Flags.GetFFlagEnableSoundSessionTelemetry)
-local GetFFlagReportAnythingAnnotationIXP = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagReportAnythingAnnotationIXP
-local TrustAndSafetyIXPManager = require(CorePackages.Workspace.Packages.TrustAndSafetyIxp).TrustAndSafetyIXPManager
-local GetCoreScriptsLayers = require(Modules.Experiment.GetCoreScriptsLayers)
-local GetFFlagRtMessaging = require(RobloxGui.Modules.Flags.GetFFlagRtMessaging)
-local v22 = game:DefineFastFlag("AddPublishAssetPrompt6", false)
-local v23 = game:DefineFastFlag("EnablePromptAgeCheckListener", false)
-local isCharacterNameHandlerEnabled = require(CorePackages.Workspace.Packages.SharedFlags).isCharacterNameHandlerEnabled
-local GetFFlagEnableSocialContextToast = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableSocialContextToast
-local GetFFlagEnableAppChatInExperience = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableAppChatInExperience
-local GetFFlagChromeCentralizedConfiguration = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagChromeCentralizedConfiguration
-local GetFFlagEnableCrossExpVoice = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableCrossExpVoice
-local FStringReactSchedulingContext = require(CorePackages.Workspace.Packages.SharedFlags).FStringReactSchedulingContext
-local v30 = game:DefineFastFlag("LuaAppEnableToastNotificationsCoreScripts4", false)
-local v31 = game:DefineFastFlag("DisableLuobuWarningToast", false)
-local GetFFlagVoiceUserAgency3 = require(RobloxGui.Modules.Flags.GetFFlagVoiceUserAgency3)
-local GetFFlagLuaInExperienceCoreScriptsGameInviteUnification = require(RobloxGui.Modules.Flags.GetFFlagLuaInExperienceCoreScriptsGameInviteUnification)
-local v34 = game:DefineFastFlag("EnableSendCameraAccessAnalytics", false)
-local v35 = game:DefineFastFlag("EnableExperienceNotificationPrompts2", false)
-local EngineFeature = game:GetEngineFeature("EnableCancelSubscriptionApp")
-local v37 = game:DefineFastFlag("EnableCancelSubscriptionAppLua", false)
-local EngineFeature2 = game:GetEngineFeature("AudioFocusManagement")
-local v39 = game:DefineFastFlag("EnableExperienceGenericChallengeRenderingOnLoadingScript", false)
-local EngineFeature3 = game:GetEngineFeature("EnableRobloxCommerce")
-local v41 = game:DefineFastFlag("EnableLinkSharingEvent", false)
-local FFlagEnableShareSheet = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableShareSheet
-local EngineFeature4 = game:GetEngineFeature("PlayerFeedbackEnabled")
-local FFlagLuaAppInExperienceDetailsPrompt = require(CorePackages.Workspace.Packages.SharedFlags).FFlagLuaAppInExperienceDetailsPrompt
-local v45 = game:DefineFastFlag("EnableSystemScrim", false)
-local v46 = game:DefineFastFlag("EnableCoreUISystemV2", false)
-local FFlagEnableNewBackpack = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableNewBackpack
-local v48 = game:DefineFastFlag("EnableCorescriptsProfiler", false)
-local v49 = game:DefineFastFlag("CoreScriptsProfilerTelemetryContext", false)
-local v50 = game:DefineFastFlag("SelfieFrontendConsoleDesktop3", false) and game:GetEngineFeature("EnableSelfieQRCode")
-local GetEngineFeatureEnablePromptRobuxTransfer = require(CorePackages.Workspace.Packages.SharedFlags).GetEngineFeatureEnablePromptRobuxTransfer
-local UIBlox = require(CorePackages.Packages.UIBlox)
-local UIBloxInGameConfig = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).UIBloxInGameConfig
 
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagReportAnythingAnnotationIXP = SharedFlags.GetFFlagReportAnythingAnnotationIXP
+local TrustAndSafetyIxp = require(CorePackages.Workspace.Packages.TrustAndSafetyIxp)
+local TrustAndSafetyIXPManager = TrustAndSafetyIxp.TrustAndSafetyIXPManager
+
+local GetCoreScriptsLayers = require(Modules.Experiment.GetCoreScriptsLayers)
+
+local GetFFlagRtMessaging = require(RobloxGui.Modules.Flags.GetFFlagRtMessaging)
+local defineFastFlag = game:DefineFastFlag("AddPublishAssetPrompt6", false)
+local defineFastFlag2 = game:DefineFastFlag("EnablePromptAgeCheckListener", false)
+local SharedFlags2 = require(CorePackages.Workspace.Packages.SharedFlags)
+local isCharacterNameHandlerEnabled = SharedFlags2.isCharacterNameHandlerEnabled
+
+local SharedFlags3 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagEnableSocialContextToast = SharedFlags3.GetFFlagEnableSocialContextToast
+
+local SharedFlags4 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagEnableAppChatInExperience = SharedFlags4.GetFFlagEnableAppChatInExperience
+
+local SharedFlags5 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagChromeCentralizedConfiguration = SharedFlags5.GetFFlagChromeCentralizedConfiguration
+local SharedFlags6 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetFFlagEnableCrossExpVoice = SharedFlags6.GetFFlagEnableCrossExpVoice
+local SharedFlags7 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FStringReactSchedulingContext = SharedFlags7.FStringReactSchedulingContext
+
+local SharedFlags8 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagFriendsCallingClientGate_DEV = SharedFlags8.FFlagFriendsCallingClientGate_DEV
+
+local defineFastFlag3 = game:DefineFastFlag("LuaAppEnableToastNotificationsCoreScripts4", false)
+
+local defineFastFlag4 = game:DefineFastFlag("DisableLuobuWarningToast", false)
+
+local FFlagDebugDisableExperienceChatMain = require(RobloxGui.Modules.Flags.FFlagDebugDisableExperienceChatMain)
+
+local GetFFlagVoiceUserAgency3 = require(RobloxGui.Modules.Flags.GetFFlagVoiceUserAgency3)
+
+local defineFastFlag5 = game:DefineFastFlag("EnableSendCameraAccessAnalytics", false)
+
+local defineFastFlag6 = game:DefineFastFlag("EnableExperienceNotificationPrompts2", false)
+local engineFeature = game:GetEngineFeature("EnableCancelSubscriptionApp")
+local defineFastFlag7 = game:DefineFastFlag("EnableCancelSubscriptionAppLua", false)
+local engineFeature2 = game:GetEngineFeature("AudioFocusManagement")
+
+local defineFastFlag8 = game:DefineFastFlag("EnableExperienceGenericChallengeRenderingOnLoadingScript", false)
+local engineFeature3 = game:GetEngineFeature("EnableRobloxCommerce")
+local defineFastFlag9 = game:DefineFastFlag("EnableLinkSharingEvent", false)
+local SharedFlags9 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableShareSheet = SharedFlags9.FFlagEnableShareSheet
+local engineFeature4 = game:GetEngineFeature("PlayerFeedbackEnabled")
+
+local SharedFlags10 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagLuaAppInExperienceDetailsPrompt = SharedFlags10.FFlagLuaAppInExperienceDetailsPrompt
+local defineFastFlag10 = game:DefineFastFlag("EnableSystemScrim", false)
+local defineFastFlag11 = game:DefineFastFlag("EnableCoreUISystemV2", false)
+local SharedFlags11 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableNewBackpack = SharedFlags11.FFlagEnableNewBackpack
+local defineFastFlag12 = game:DefineFastFlag("EnableCorescriptsProfiler", false)
+local defineFastFlag13 = game:DefineFastFlag("CoreScriptsProfilerTelemetryContext", false)
+local engineFeature5 = game:DefineFastFlag("SelfieFrontendConsoleDesktop3", false)
+	and game:GetEngineFeature("EnableSelfieQRCode")
+
+local SharedFlags12 = require(CorePackages.Workspace.Packages.SharedFlags)
+local GetEngineFeatureEnablePromptRobuxTransfer = SharedFlags12.GetEngineFeatureEnablePromptRobuxTransfer
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local CoreScriptsInitializer = require(CorePackages.Workspace.Packages.CoreScriptsInitializer)
+local UIBloxInGameConfig = CoreScriptsInitializer.UIBloxInGameConfig
 UIBlox.init(UIBloxInGameConfig)
 
-if v46 then
+if defineFastFlag11 then
 	require(CorePackages.Workspace.Packages.System)
 end
 
-local FFlagTopBarRefactor = require(CorePackages.Workspace.Packages.InExperienceTopBar).Flags.FFlagTopBarRefactor
+local InExperienceTopBar = require(CorePackages.Workspace.Packages.InExperienceTopBar)
+local FFlagTopBarRefactor = InExperienceTopBar.Flags.FFlagTopBarRefactor
 
-require(CorePackages.Workspace.Packages.ExperimentCacheManager).ExperimentCacheManager.default:initialize()
-
-if require(CorePackages.Workspace.Packages.SharedFlags).FFlagReactTelemetryEnabled then
-	require(CorePackages.Packages.ReactTelemetry).customFields.context = "in_experience"
-end
+local ExperimentCacheManager = require(CorePackages.Workspace.Packages.ExperimentCacheManager)
+ExperimentCacheManager.ExperimentCacheManager.default:initialize()
 
 if game:DefineFastFlag("LuaAppUseAppHttpStoreInExperience", false) then
-	require(CorePackages.Workspace.Packages.HttpStore).Instance._create({})
+	local HttpStore = require(CorePackages.Workspace.Packages.HttpStore)
+	HttpStore.Instance._create({})
 end
 
-local v55 = require(CorePackages.Workspace.Packages.SharedFlags).GetReactSchedulerIXPConfig()
+local SharedFlags13 = require(CorePackages.Workspace.Packages.SharedFlags)
+local reactSchedulerIXPConfig = SharedFlags13.GetReactSchedulerIXPConfig()
 
-if v55 then
-	Scheduler.unstable_setSchedulerFlags(v55)
+if reactSchedulerIXPConfig then
+	Scheduler.unstable_setSchedulerFlags(reactSchedulerIXPConfig)
 end
 
-if require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableSchedulerFlagOverrides then
-	local v56 = require(CorePackages.Workspace.Packages.SharedFlags).GetSchedulerFlagOverrides.getInExp()
+local SharedFlags14 = require(CorePackages.Workspace.Packages.SharedFlags)
 
-	if v56 then
-		Scheduler.unstable_setSchedulerFlags(v56)
+if SharedFlags14.FFlagEnableSchedulerFlagOverrides then
+	local SharedFlags15 = require(CorePackages.Workspace.Packages.SharedFlags)
+	local v = SharedFlags15.GetSchedulerFlagOverrides.getInExp()
+
+	if v then
+		Scheduler.unstable_setSchedulerFlags(v)
 	end
 end
 
-local FFlagEnableAEGIS2CommsFAEUpsell = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell
+local SharedFlags15 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableAEGIS2CommsFAEUpsell = SharedFlags15.FFlagEnableAEGIS2CommsFAEUpsell
+
+local SharedFlags16 = require(CorePackages.Workspace.Packages.SharedFlags)
+
+if SharedFlags16.FFlagInitializeSduiForInExperience then
+	local initializeSduiForInExperience = require(Modules.ServerDrivenUi.initializeSduiForInExperience)
+	initializeSduiForInExperience()
+end
+
 local LocalPlayer = Players.LocalPlayer
 
 while not LocalPlayer do
 	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 	LocalPlayer = Players.LocalPlayer
+end
+
+local teamCreateUtils = require(CorePackages.Workspace.Packages.BuildExperiencePlaytestLaunch.teamCreateUtils)
+local viewer = teamCreateUtils.isViewer()
+
+if viewer then
+	local mountTeamCreateViewer = require(CorePackages.Workspace.Packages.BuildExperience.mountTeamCreateViewer)
+	mountTeamCreateViewer(game.PlaceId, UserInputService)
 end
 
 if game:GetEngineFeature("SoundServiceControlsDefaultListenerLocation") then
@@ -103,52 +159,60 @@ if GetFFlagEnableAppChatInExperience() then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/AppChatMain", RobloxGui)
 end
 
+if FFlagFriendsCallingClientGate_DEV then
+	ScriptContext:AddCoreScriptLocal("CoreScripts/FriendsCallingMain", RobloxGui)
+end
+
 if GetFFlagEnableCrossExpVoice() then
-	require(CorePackages.Workspace.Packages.CrossExperienceVoice).IXPManager.default:initialize()
+	local CrossExperienceVoice = require(CorePackages.Workspace.Packages.CrossExperienceVoice)
+	CrossExperienceVoice.IXPManager.default:initialize()
 end
 
 require(CorePackages.Workspace.Packages.InExperienceSessionization)
 
-if require(CorePackages.Workspace.Packages.Chrome).Enabled() then
-	local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
 
+if Chrome.Enabled() then
+	local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
 	ExpChat.GlobalFlags.AvatarChatEnabled = false
 	ExpChat.GlobalFlags.ChromeEnabled = true
 end
 
-if require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagJoinWithoutMicPermissions() then
-	require(CorePackages.Workspace.Packages.ExpChat).GlobalFlags.JoinWithoutMicPermissions = true
+local SharedFlags17 = require(CorePackages.Workspace.Packages.SharedFlags)
+
+if SharedFlags17.GetFFlagJoinWithoutMicPermissions() then
+	local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
+	ExpChat.GlobalFlags.JoinWithoutMicPermissions = true
 end
 
-local v60 = game:DefineFastFlag("InExperienceInterventionApp", false)
-local FFlagLuaAppEnableInExperienceDataModelStreamStarter = require(CorePackages.Workspace.Packages.SharedFlags).FFlagLuaAppEnableInExperienceDataModelStreamStarter
+local defineFastFlag14 = game:DefineFastFlag("InExperienceInterventionApp", false)
+
+local SharedFlags18 = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagLuaAppEnableInExperienceDataModelStreamStarter = SharedFlags18.FFlagLuaAppEnableInExperienceDataModelStreamStarter
 
 if FFlagUseRoactGlobalConfigInCoreScripts and RunService:IsStudio() then
-	Roact.setGlobalConfig({
-		propValidation = true,
-		elementTracing = true
-	})
+	Roact.setGlobalConfig({ propValidation = true, elementTracing = true })
 end
 
-local UIBlox2 = require(CorePackages.Packages.InGameMenuDependencies).UIBlox
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local uiBlox = InGameMenuDependencies.UIBlox
 
-if UIBlox2 ~= UIBlox then
-	UIBlox2.init(UIBloxInGameConfig)
+if uiBlox ~= UIBlox then
+	uiBlox.init(UIBloxInGameConfig)
 end
 
-local Folder = Instance.new("Folder")
+local sounds = Instance.new("Folder")
+sounds.Name = "Sounds"
+sounds.Parent = RobloxGui
 
-Folder.Name = "Sounds"
-Folder.Parent = RobloxGui
+local function safeRequire(p) -- 15 equivalent calls inferred from this helper
+	local success, result = pcall(require, p)
 
-local function safeRequire(p1) -- line: 192
-	local ok, result = pcall(require, p1)
-
-	if ok then
+	if success then
 		return result
 	end
 
-	warn("Failure to Start CoreScript module " .. p1.Name .. ".\n" .. result)
+	warn("Failure to Start CoreScript module " .. p.Name .. ".\n" .. result)
 end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/NotificationScript2", RobloxGui)
@@ -158,74 +222,74 @@ if FFlagLuaAppEnableInExperienceDataModelStreamStarter then
 end
 
 if game:GetEngineFeature("ProtocolLaunchPrivateChannelUpdateCheckEngineFeature") then
-	local ChannelUpdatePrompt = Modules.ChannelUpdatePrompt
-	local ok, result = pcall(require, ChannelUpdatePrompt)
-
-	if ok then
-	else
-		warn("Failure to Start CoreScript module " .. ChannelUpdatePrompt.Name .. ".\n" .. result)
-		result = nil
-	end
+	local result = safeRequire(Modules.ChannelUpdatePrompt) -- inferred equivalent call
 
 	if result then
 		result.init()
 	end
 end
 
-if GetFFlagChromeCentralizedConfiguration() then
+if not viewer and GetFFlagChromeCentralizedConfiguration() then
 	coroutine.wrap(safeRequire)(Modules.Chrome.ConfigureChrome)
 end
 
 coroutine.wrap(safeRequire)(Modules.SelfieView)
-coroutine.wrap(safeRequire)(Modules.TopBar)
 
-if require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableSideSheet then
+if not viewer then
+	coroutine.wrap(safeRequire)(Modules.TopBar)
+end
+
+local isSideSheetEnabled = require(CorePackages.Workspace.Packages.InExperienceSideSheetUtils.isSideSheetEnabled)
+
+if not viewer and isSideSheetEnabled then
 	coroutine.wrap(safeRequire)(Modules.InExperienceSideSheet)
 end
 
-if require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableWhatsNew then
+local SharedFlags19 = require(CorePackages.Workspace.Packages.SharedFlags)
+
+if SharedFlags19.FFlagEnableWhatsNew then
 	coroutine.wrap(safeRequire)(Modules.InGameWhatsNew)
 end
 
-if require(CorePackages.Workspace.Packages.SharedFlags).FFlagAppNavMyStatsTab then
-	local v68 = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.BuildExperience)
-	local v69 = v68 and v68.BuildModeLaunch:hasBuildMode()
+local SharedFlags20 = require(CorePackages.Workspace.Packages.SharedFlags)
 
-	if v68 then
-		v68.mountCreatorAgentResumeToastReceiver(v69 == true)
+if SharedFlags20.FFlagAppNavMyStatsTab then
+	local v = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.BuildExperiencePlaytestLaunch.BuildModeLaunch)
+	local v2 = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.BuildExperience)
+	local v3 = v2 and v and v:hasBuildMode()
+
+	if v2 then
+		v2.mountCreatorAgentResumeToastReceiver(v3 == true)
 	end
 
-	if v68 and v69 then
-		game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
-		v68.mountBuildControls()
-		v68.mountChatSheet()
-		v68.mountPublishGameSheet()
+	if v2 and v3 and not viewer then
+		local StarterGui = game:GetService("StarterGui")
+		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
+
+		local SharedFlags21 = require(CorePackages.Workspace.Packages.SharedFlags)
+		local fFlagBuildExperienceInGameCaptureToChat = SharedFlags21.FFlagBuildExperienceInGameCaptureToChat
+		v2.mountChatSheet(fFlagBuildExperienceInGameCaptureToChat and {
+			takeCapture = function(p)
+				local CapturesApp = require(RobloxGui.Modules.Captures.CapturesApp)
+				CapturesApp.takeCapture(p)
+			end
+		} or nil)
 	end
 end
 
-if FFlagTopBarRefactor then
-	local v70 = coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.InExperienceOverlay)
+local v = FFlagTopBarRefactor and coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.InExperienceOverlay)
 
-	if v70 then
-		v70.createOverlay()
-	end
+if v then
+	v.createOverlay()
 end
 
 if game:GetEngineFeature("LuobuModerationStatus") then
-	coroutine.wrap(function() -- line: 263
-		-- upvalues: Modules (copy)
-		local Watermark = Modules.Watermark
-		local ok, result = pcall(require, Watermark)
-
-		if ok then
-			return
-		end
-
-		warn("Failure to Start CoreScript module " .. Watermark.Name .. ".\n" .. result)
+	coroutine.wrap(function()
+		safeRequire(Modules.Watermark) -- inferred equivalent call
 	end)()
 end
 
-if v60 then
+if defineFastFlag14 then
 	coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.InExperienceIntervention)
 end
 
@@ -236,96 +300,75 @@ if game:GetEngineFeature("ProximityPrompts") then
 end
 
 if game:GetEngineFeature("ValidateUGCBodyAPIFeature") then
-	require(Modules.Server.UGCValidation.UGCValidationFunctionInstaller)()
+	local UGCValidationFunctionInstaller = require(Modules.Server.UGCValidation.UGCValidationFunctionInstaller)
+	UGCValidationFunctionInstaller()
 end
 
-coroutine.wrap(function() -- line: 284
-	-- upvalues: ScriptContext (copy), RobloxGui (copy)
+coroutine.wrap(function()
 	ScriptContext:AddCoreScriptLocal("CoreScripts/ScreenTimeInGame", RobloxGui)
 end)()
 
-if not v31 then
-	coroutine.wrap(function() -- line: 289
-		-- upvalues: CachedPolicyService (copy), Modules (copy)
+if not defineFastFlag4 then
+	coroutine.wrap(function()
 		if CachedPolicyService:IsSubjectToChinaPolicies() then
 			if not game:IsLoaded() then
 				game.Loaded:Wait()
 			end
 
-			local LuobuWarningToast = Modules.LuobuWarningToast
-			local ok, result = pcall(require, LuobuWarningToast)
-
-			if ok then
-				return
-			end
-
-			warn("Failure to Start CoreScript module " .. LuobuWarningToast.Name .. ".\n" .. result)
+			safeRequire(Modules.LuobuWarningToast) -- inferred equivalent call
 		end
 	end)()
 end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/PerformanceStatsManagerScript", RobloxGui)
+
 ScriptContext:AddCoreScriptLocal("CoreScripts/PlayerRagdoll", RobloxGui)
+
 coroutine.wrap(safeRequire)(RobloxGui.Modules.ChatSelector)
 coroutine.wrap(safeRequire)(RobloxGui.Modules.PlayerList.PlayerListManager)
 
-local ok, result = pcall(function() -- line: 311
+local success, result = pcall(function()
 	return UserSettings():IsUserFeatureEnabled("UserRoactBubbleChatBeta")
 end)
-local v73 = ok and result
 
-if game:GetEngineFeature("EnableBubbleChatFromChatService") or v73 then
+if game:GetEngineFeature("EnableBubbleChatFromChatService") or success and result then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/PlayerBillboards", RobloxGui)
 end
 
-coroutine.wrap(function() -- line: 322
-	-- upvalues: CorePackages (copy)
-	local PurchasePrompt = CorePackages.Workspace.Packages.PurchasePrompt
-	local ok2, result2 = pcall(require, PurchasePrompt)
-
-	if ok2 then
-	else
-		warn("Failure to Start CoreScript module " .. PurchasePrompt.Name .. ".\n" .. result2)
-		result2 = nil
-	end
+coroutine.wrap(function()
+	local result2 = safeRequire(CorePackages.Workspace.Packages.PurchasePrompt) -- inferred equivalent call
 
 	if result2 then
 		result2.mountPurchasePrompt()
 	end
 end)()
 
-if v22 then
+if defineFastFlag then
 	coroutine.wrap(safeRequire)(Modules.PublishAssetPrompt)
 end
 
 coroutine.wrap(safeRequire)(Modules.ExperienceEvents.ExperienceEventsApp)
 
-if EngineFeature4 then
+if engineFeature4 then
 	coroutine.wrap(safeRequire)(Modules.PlayerFeedback)
 end
 
 coroutine.wrap(safeRequire)(Modules.Groups.GroupsApp)
+
 coroutine.wrap(safeRequire)(Modules.AvatarGeneration.SelfieConsent)
 
-if v50 then
+if engineFeature5 then
 	coroutine.wrap(safeRequire)(Modules.AvatarGeneration.SelfieQr)
 end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/BlockPlayerPrompt", RobloxGui)
 ScriptContext:AddCoreScriptLocal("CoreScripts/FriendPlayerPrompt", RobloxGui)
 
-if v23 then
-	local PromptAgeCheckHandler = Modules.PromptAgeCheckHandler
-	local ok3, result3 = pcall(require, PromptAgeCheckHandler)
+if defineFastFlag2 then
+	local result2 = safeRequire(Modules.PromptAgeCheckHandler) -- inferred equivalent call
 
-	if ok3 then
-	else
-		warn("Failure to Start CoreScript module " .. PromptAgeCheckHandler.Name .. ".\n" .. result3)
-		result3 = nil
-	end
-
-	if result3 then
-		result3.init()
+	if result2 then
+		result2.init()
 	end
 end
 
@@ -338,11 +381,16 @@ else
 end
 
 coroutine.wrap(safeRequire)(RobloxGui.Modules.KeyboardUINavigation)
+
 coroutine.wrap(safeRequire)(RobloxGui.Modules.EmotesMenu.EmotesMenuMaster)
+
 coroutine.wrap(safeRequire)(RobloxGui.Modules.Captures.CapturesApp)
+
 coroutine.wrap(safeRequire)(Modules.AvatarEditorPrompts)
 
-if require(CorePackages.Workspace.Packages.SharedFlags).FFlagVirtualCursorModularization then
+local SharedFlags21 = require(CorePackages.Workspace.Packages.SharedFlags)
+
+if SharedFlags21.FFlagVirtualCursorModularization then
 	coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.VirtualCursorModular)
 else
 	coroutine.wrap(safeRequire)(CorePackages.Workspace.Packages.VirtualCursor)
@@ -350,46 +398,46 @@ end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/VehicleHud", RobloxGui)
 ScriptContext:AddCoreScriptLocal("CoreScripts/InviteToGamePrompt", RobloxGui)
+local v2
 
-if if not game:GetEngineFeature("TouchScreenEnabled") then UserInputService.TouchEnabled else UserInputService.TouchScreenEnabled then
+if game:GetEngineFeature("TouchScreenEnabled") then
+	v2 = UserInputService.TouchScreenEnabled
+else
+	v2 = UserInputService.TouchEnabled
+end
+
+if v2 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/ContextActionTouch", RobloxGui)
+
 	RobloxGui:WaitForChild("ControlFrame")
 	RobloxGui.ControlFrame:WaitForChild("BottomLeftControl")
 	RobloxGui.ControlFrame.BottomLeftControl.Visible = false
 end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/InspectAndBuy", RobloxGui)
-coroutine.wrap(function() -- line: 408
-	-- upvalues: VRService (copy), RobloxGui (copy)
+
+coroutine.wrap(function()
 	if not VRService.VREnabled then
 		VRService:GetPropertyChangedSignal("VREnabled"):Wait()
 	end
 
-	local VRAvatarHeightScaling = RobloxGui.Modules.VR.VRAvatarHeightScaling
-	local ok4, result4 = pcall(require, VRAvatarHeightScaling)
-
-	if not ok4 then
-		warn("Failure to Start CoreScript module " .. VRAvatarHeightScaling.Name .. ".\n" .. result4)
-	end
-
-	local VirtualKeyboard = RobloxGui.Modules.VR.VirtualKeyboard
-	local ok5, result5 = pcall(require, VirtualKeyboard)
-
-	if not ok5 then
-		warn("Failure to Start CoreScript module " .. VirtualKeyboard.Name .. ".\n" .. result5)
-	end
-
-	local UserGui = RobloxGui.Modules.VR.UserGui
-	local ok6, result6 = pcall(require, UserGui)
-
-	if ok6 then
-		return
-	end
-
-	warn("Failure to Start CoreScript module " .. UserGui.Name .. ".\n" .. result6)
+	safeRequire(RobloxGui.Modules.VR.VRAvatarHeightScaling) -- inferred equivalent call
+	safeRequire(RobloxGui.Modules.VR.VirtualKeyboard) -- inferred equivalent call
+	safeRequire(RobloxGui.Modules.VR.UserGui) -- inferred equivalent call
 end)()
+
 coroutine.wrap(safeRequire)(RobloxGui.Modules.VR.VRAvatarGestures.VRAvatarGesturesClient)
+
 ScriptContext:AddCoreScriptLocal("CoreScripts/NetworkPause", RobloxGui)
+
+local SharedFlags22 = require(CorePackages.Workspace.Packages.SharedFlags)
+
+if
+	game:GetEngineFeature("GameplayPopOverlay")
+	and (SharedFlags22.FFlagEnableGameplayPopLatencyOverlay or SharedFlags22.FFlagEnableGameplayPopLatencyOverlayForAdmins)
+then
+	ScriptContext:AddCoreScriptLocal("CoreScripts/GameplayPopOverlay", RobloxGui)
+end
 
 if GetFFlagScreenshotHudApi() and not CachedPolicyService:IsSubjectToChinaPolicies() then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/ScreenshotHud", RobloxGui)
@@ -401,9 +449,9 @@ if game:GetEngineFeature("VoiceChatSupported") then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/VoiceDefaultChannel", RobloxGui)
 end
 
-coroutine.wrap(function() -- line: 431
-	-- upvalues: CorePackages (copy), LocalPlayer (ref), GetCoreScriptsLayers (copy), GetFFlagEnableNewInviteMenuIXP (copy), NewInviteMenuExperimentManager (copy), GetFFlagReportAnythingAnnotationIXP (copy), TrustAndSafetyIXPManager (copy)
-	require(CorePackages.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper:InitializeAsync(LocalPlayer.UserId, GetCoreScriptsLayers())
+coroutine.wrap(function()
+	local IxpServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper)
+	IxpServiceWrapper.IXPServiceWrapper:InitializeAsync(LocalPlayer.UserId, GetCoreScriptsLayers())
 
 	if GetFFlagEnableNewInviteMenuIXP() then
 		NewInviteMenuExperimentManager.default:initialize()
@@ -413,10 +461,14 @@ coroutine.wrap(function() -- line: 431
 		TrustAndSafetyIXPManager.default:initialize()
 	end
 end)()
-ScriptContext:AddCoreScriptLocal("CoreScripts/ExperienceChatMain", RobloxGui)
+
+if not FFlagDebugDisableExperienceChatMain then
+	ScriptContext:AddCoreScriptLocal("CoreScripts/ExperienceChatMain", RobloxGui)
+end
+
 ScriptContext:AddCoreScriptLocal("CoreScripts/ChatEmoteUsage", script.Parent)
 
-if v30 then
+if defineFastFlag3 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/ToastNotificationGUI", script.Parent)
 end
 
@@ -429,83 +481,45 @@ if game:GetEngineFeature("FacialAnimationStreaming2") then
 end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/AvatarMood", script.Parent)
+
 ScriptContext:AddCoreScriptLocal("CoreScripts/PortalTeleportGUI", RobloxGui)
-coroutine.wrap(function() -- line: 464
-	-- upvalues: CorePackages (copy)
-	local AdsEudsa = CorePackages.Workspace.Packages.AdsEudsa
-	local ok7, result7 = pcall(require, AdsEudsa)
 
-	if ok7 then
-	else
-		warn("Failure to Start CoreScript module " .. AdsEudsa.Name .. ".\n" .. result7)
-		result7 = nil
-	end
+coroutine.wrap(function()
+	local result2 = safeRequire(CorePackages.Workspace.Packages.AdsEudsa) -- inferred equivalent call
 
-	if result7 and result7.starterScript then
-		result7.starterScript()
+	if result2 and result2.starterScript then
+		result2.starterScript()
 	end
 end)()
 
 if game:GetEngineFeature("EnableAdGuiInteractivityControlRefactor") then
-	coroutine.wrap(function() -- line: 473
-		-- upvalues: CorePackages (copy)
-		local AdGuiInteractivity = CorePackages.Workspace.Packages.AdGuiInteractivity
-		local ok8, result8 = pcall(require, AdGuiInteractivity)
+	coroutine.wrap(function()
+		local result2 = safeRequire(CorePackages.Workspace.Packages.AdGuiInteractivity) -- inferred equivalent call
 
-		if ok8 then
-		else
-			warn("Failure to Start CoreScript module " .. AdGuiInteractivity.Name .. ".\n" .. result8)
-			result8 = nil
-		end
-
-		if result8 and result8.starterScript then
-			result8.starterScript()
+		if result2 and result2.starterScript then
+			result2.starterScript()
 		end
 	end)()
 end
 
-coroutine.wrap(function() -- line: 481
-	-- upvalues: CorePackages (copy)
-	local EnhancedVideo = CorePackages.Workspace.Packages.EnhancedVideo
-	local ok9, result9 = pcall(require, EnhancedVideo)
+coroutine.wrap(function()
+	local result2 = safeRequire(CorePackages.Workspace.Packages.EnhancedVideo) -- inferred equivalent call
 
-	if ok9 then
-	else
-		warn("Failure to Start CoreScript module " .. EnhancedVideo.Name .. ".\n" .. result9)
-		result9 = nil
-	end
-
-	if result9 and result9.starterScript then
-		result9.starterScript()
+	if result2 and result2.starterScript then
+		result2.starterScript()
 	end
 end)()
-coroutine.wrap(function() -- line: 489
-	-- upvalues: CorePackages (copy)
-	local InExperienceClickout = CorePackages.Workspace.Packages.InExperienceClickout
-	local ok10, result10 = pcall(require, InExperienceClickout)
 
-	if ok10 then
-	else
-		warn("Failure to Start CoreScript module " .. InExperienceClickout.Name .. ".\n" .. result10)
-		result10 = nil
-	end
+coroutine.wrap(function()
+	local result2 = safeRequire(CorePackages.Workspace.Packages.InExperienceClickout) -- inferred equivalent call
 
-	if result10 and result10.starterScript then
-		result10.starterScript()
+	if result2 and result2.starterScript then
+		result2.starterScript()
 	end
 end)()
 
 if game:GetEngineFeature("EnableLuaAdPlayer") then
-	local AdPlayer = CorePackages.Workspace.Packages.AdPlayer
-	local ok11, result11 = pcall(require, AdPlayer)
-
-	if ok11 then
-	else
-		warn("Failure to Start CoreScript module " .. AdPlayer.Name .. ".\n" .. result11)
-		result11 = nil
-	end
-
-	result11.init()
+	safeRequire(CorePackages.Workspace.Packages.AdPlayer).init() -- inferred equivalent call
 end
 
 if game:GetEngineFeature("EnableVoiceAttention") then
@@ -527,27 +541,30 @@ if GetFFlagVoiceUserAgency3() then
 end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/CoreScriptsGlobalEffects", script.Parent)
-require(CorePackages.Workspace.Packages.SoundManager).SoundManager.init()
+
+local SoundManager = require(CorePackages.Workspace.Packages.SoundManager)
+SoundManager.SoundManager.init()
 
 if GetFFlagEnableSocialContextToast() then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/SocialContextToast", RobloxGui)
 end
 
-if GetFFlagLuaInExperienceCoreScriptsGameInviteUnification() then
-	ScriptContext:AddCoreScriptLocal("CoreScripts/GameInviteModalGUI", script.Parent)
-end
+ScriptContext:AddCoreScriptLocal("CoreScripts/GameInviteModalGUI", script.Parent)
 
-if v35 then
+if defineFastFlag6 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/ExperienceNotifications", script.Parent)
 end
 
-require(CorePackages.Workspace.Packages.Achievements).InExpAchievementManager.new():startUp()
+local Achievements = require(CorePackages.Workspace.Packages.Achievements)
+Achievements.InExpAchievementManager.new():startUp()
 
-if require(RobloxGui.Modules.Common.Flags.GetFFlagPlayerViewRemoteEnabled)() then
+local GetFFlagPlayerViewRemoteEnabled = require(RobloxGui.Modules.Common.Flags.GetFFlagPlayerViewRemoteEnabled)
+
+if GetFFlagPlayerViewRemoteEnabled() then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/PlayerView", RobloxGui)
 end
 
-if v34 then
+if defineFastFlag5 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/SendCameraAccessAnalytics", RobloxGui)
 end
 
@@ -557,25 +574,25 @@ if GetEngineFeatureEnablePromptRobuxTransfer() then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/InExperienceTransferApp", RobloxGui)
 end
 
-if EngineFeature2 then
+if engineFeature2 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/ExperienceAudioFocusBinder", RobloxGui)
 end
 
-if EngineFeature and v37 then
+if engineFeature and defineFastFlag7 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/CancelSubscriptionApp", RobloxGui)
 end
 
-if EngineFeature3 then
+if engineFeature3 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/CommercePurchaseApp", RobloxGui)
 end
 
-if v45 then
+if defineFastFlag10 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/SystemScrim", RobloxGui)
 end
 
 ScriptContext:AddCoreScriptLocal("CoreScripts/CoreGuiEnableAnalytics", RobloxGui)
 
-if v41 then
+if defineFastFlag9 then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/OpenShareSheetWithLink", RobloxGui)
 end
 
@@ -587,34 +604,32 @@ if FFlagLuaAppInExperienceDetailsPrompt then
 	ScriptContext:AddCoreScriptLocal("CoreScripts/InExperienceDetailsPrompt", RobloxGui)
 end
 
-if not v39 then
-	coroutine.wrap(function() -- line: 590
-		-- upvalues: CorePackages (copy)
-		require(CorePackages.Workspace.Packages.GenericChallenges).Middleware.InitExperienceChallengeInterceptor()
+if not defineFastFlag8 then
+	coroutine.wrap(function()
+		local GenericChallenges = require(CorePackages.Workspace.Packages.GenericChallenges)
+		GenericChallenges.Middleware.InitExperienceChallengeInterceptor()
 	end)()
 end
 
 local ReactPerfTracker = require(Modules.Common.ReactPerfTracker)
 
 if ReactPerfTracker then
-	local v81 = ReactPerfTracker.new()
+	local v3 = ReactPerfTracker.new()
 
-	task.delay(5, function() -- line: 601
-		-- upvalues: v81 (copy)
-		v81:start()
+	task.delay(5, function()
+		v3:start()
 	end)
 end
 
-local v82 = game:DefineFastInt("ReactSchedulingTrackerStartUpDelayMs", 5000) / 1000
+local v3 = game:DefineFastInt("ReactSchedulingTrackerStartUpDelayMs", 5000) / 1000
+
 local ReactSchedulingTracker = require(Modules.Common.ReactSchedulingTracker)
 
-task.delay(v82, function() -- line: 611
-	-- upvalues: ReactSchedulingTracker (copy)
+task.delay(v3, function()
 	ReactSchedulingTracker:start()
 end)
 
 local Memory = require(CorePackages.Workspace.Packages.Memory)
-
 Memory.start(true, FStringReactSchedulingContext, Memory.MemoryScope.InExperience)
 
 if game:GetEngineFeature("RecordingServicePlaybackApiLua") then
@@ -622,52 +637,31 @@ if game:GetEngineFeature("RecordingServicePlaybackApiLua") then
 end
 
 if FFlagEnableAEGIS2CommsFAEUpsell then
-	coroutine.wrap(function() -- line: 623
-		-- upvalues: CorePackages (copy)
-		local SocialUpsell = CorePackages.Workspace.Packages.SocialUpsell
-		local ok12, result12 = pcall(require, SocialUpsell)
+	coroutine.wrap(function()
+		local result2 = safeRequire(CorePackages.Workspace.Packages.SocialUpsell) -- inferred equivalent call
 
-		if ok12 then
-		else
-			warn("Failure to Start CoreScript module " .. SocialUpsell.Name .. ".\n" .. result12)
-			result12 = nil
-		end
-
-		if result12 then
-			result12.Overlay.initializeInExpOverlay()
+		if result2 then
+			result2.Overlay.initializeInExpOverlay()
 		end
 	end)()
 end
 
-coroutine.wrap(function() -- line: 631
-	-- upvalues: CorePackages (copy), GuiService (copy)
-	local Display = CorePackages.Workspace.Packages.Display
-	local ok13, result13 = pcall(require, Display)
-
-	if ok13 then
-	else
-		warn("Failure to Start CoreScript module " .. Display.Name .. ".\n" .. result13)
-		result13 = nil
-	end
-
-	local v126 = result13
-
-	GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(function() -- line: 633
-		-- upvalues: v126 (copy), GuiService (copy)
-		v126.GetDisplayStore().setTopBarHeight(GuiService.TopbarInset.Height)
+coroutine.wrap(function()
+	local result2 = safeRequire(CorePackages.Workspace.Packages.Display) -- inferred equivalent call
+	GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(function()
+		result2.GetDisplayStore().setTopBarHeight(GuiService.TopbarInset.Height)
 	end)
 end)()
 
-if v48 then
-	local CoreScriptsProfilerTelemetry = require(CorePackages.Workspace.Packages.CoreScriptsProfiler).CoreScriptsProfilerTelemetry
+if defineFastFlag12 then
+	local CoreScriptsProfiler = require(CorePackages.Workspace.Packages.CoreScriptsProfiler)
+	local coreScriptsProfilerTelemetry = CoreScriptsProfiler.CoreScriptsProfilerTelemetry
 
-	if CoreScriptsProfilerTelemetry then
-		local v86 = nil
-
-		if v49 then
-			v86 = FStringReactSchedulingContext
+	if coreScriptsProfilerTelemetry then
+		if not defineFastFlag13 then
+			FStringReactSchedulingContext = nil
 		end
 
-		CoreScriptsProfilerTelemetry(v86):start()
+		coreScriptsProfilerTelemetry(FStringReactSchedulingContext):start()
 	end
 end

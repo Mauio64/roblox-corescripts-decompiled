@@ -1,12 +1,8 @@
-local ParentParent = script.Parent.Parent
-local API_URL = require(ParentParent.API_URL)
+local parent = script.Parent.Parent
+local API_URL = require(parent.API_URL)
 
-return function(t1: {[any]: any}) -- line: 14
-	-- upvalues: API_URL (copy)
-	return t1.roduxNetworking.POST({
-		Name = "AddReaction"
-	}, function(p1, t2: {[any]: any}) -- line: 17
-		-- upvalues: API_URL (copy)
-		return p1(API_URL):path("posts-api"):path("v1"):path("content-posts"):path("addReaction"):body(t2)
+return function(p)
+	return p.roduxNetworking.POST("AddReaction", function(callback, p2)
+		return callback(API_URL):path("posts-api"):path("v1"):path("content-posts"):path("addReaction"):body(p2)
 	end)
 end

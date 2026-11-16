@@ -1,43 +1,40 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Roact = require(Parent.Roact)
+local parent = script:FindFirstAncestor("AppChat").Parent
+
+local Roact = require(parent.Roact)
+
 local RemoveUserDialogContainer = require(script.Parent.RemoveUserDialogContainer)
 local Logger = require(script.Parent.Logger)
-local v5 = Roact.PureComponent:extend("RemoveUserDialog")
 
-v5.defaultProps = {
-	navigation = nil
-}
+local extended = Roact.PureComponent:extend("RemoveUserDialog")
+extended.defaultProps = { navigation = nil }
 
-function v5.init(p1) -- line: 14
-	function p1.onRemoveUserDialogClose() -- line: 15
-		-- upvalues: p1 (copy)
-		p1.props.navigation.goBack()
+function extended:init()
+	function self.onRemoveUserDialogClose()
+		self.props.navigation.goBack()
 	end
 end
-function v5.render(p2) -- line: 20
-	-- upvalues: Logger (copy), Roact (copy), RemoveUserDialogContainer (copy)
-	local navigation = p2.props.navigation
 
+function extended.render(p)
+	local navigation = p.props.navigation
 	assert(type(navigation) ~= "nil", "RemoveUserDialog should be wrapped with Roact Navigation")
 
-	local v9 = navigation.getParam("conversationId", nil)
-	local v10 = navigation.getParam("participantId", nil)
+	local param = navigation.getParam("conversationId", nil)
+	local param2 = navigation.getParam("participantId", nil)
 
-	if v9 == nil or v10 == nil then
-		Logger:warning("ConversationId and participantId are required to open {screen}")
-
-		return nil
+	if param ~= nil and param2 ~= nil then
+		return Roact.createElement(RemoveUserDialogContainer, {
+			conversationId = param,
+			participantId = param2,
+			onModalClose = p.onRemoveUserDialogClose
+		})
 	end
 
-	return Roact.createElement(RemoveUserDialogContainer, {
-		conversationId = v9,
-		participantId = v10,
-		onModalClose = p2.onRemoveUserDialogClose
-	})
+	Logger:warning("ConversationId and participantId are required to open {screen}")
+	return nil
 end
-function v5.didMount(_) -- line: 38
-	-- upvalues: Logger (copy)
+
+function extended.didMount(_)
 	Logger:info("{screen} mounted")
 end
 
-return v5
+return extended

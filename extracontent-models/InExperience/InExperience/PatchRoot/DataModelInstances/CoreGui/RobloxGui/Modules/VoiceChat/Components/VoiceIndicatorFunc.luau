@@ -4,253 +4,171 @@ local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local Roact = require(CorePackages.Packages.Roact)
 local React = require(CorePackages.Packages.React)
 local ReactIs = require(CorePackages.Packages.ReactIs)
+
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
 local CursorKind = UIBlox.App.SelectionImage.CursorKind
+
 local useVoiceState = require(RobloxGui.Modules.VoiceChat.Hooks.useVoiceState)
 local Constants = require(RobloxGui.Modules.VoiceChat.Constants)
-local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
-local v16 = game:DefineFastFlag("VoiceIndicatorPerformanceOptimizationsV2", false)
-local v17 = game:DefineFastInt("MicTalkingUpdateFrequency", 3)
-local uDim2 = UDim2.fromOffset(28, 28)
+local VoiceChatServiceManager = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager)
+local default = VoiceChatServiceManager.default
+local defineFastInt = game:DefineFastInt("MicTalkingUpdateFrequency", 3)
 
-local function useJoinBinding(p1, p2) -- line: 32
-	-- upvalues: React (copy), Roact (copy)
-	return React.useMemo(function() -- line: 33
-		-- upvalues: Roact (copy), p1 (copy), p2 (copy)
-		return Roact.joinBindings({
-			p1,
-			p2
-		})
-	end, {
-		p1,
-		p2
-	})
+local udim = UDim2.fromOffset(28, 28)
+
+local function useJoinBinding(p, p2) -- 1 equivalent call inferred from this helper
+	return React.useMemo(function()
+		return Roact.joinBindings({ p, p2 })
+	end, { p, p2 })
 end
-local function mapLevelToIcon(p3, p4) -- line: 38
-	-- upvalues: Constants (copy), default (copy)
-	return function(p5) -- line: 40
-		-- upvalues: Constants (copy), default (copy), p3 (copy), p4 (copy)
-		local v52 = p5[1]
-		local v53 = p5[2]
 
-		if v52 == Constants.VOICE_STATE.MUTED or v52 == Constants.VOICE_STATE.LOCAL_MUTED then
-			return default:GetIcon("Muted", p3)
+local function mapLevelToIcon(iconStyle, showConnectingShimmer) -- 1 equivalent call inferred from this helper
+	return function(list)
+		local item = list[1]
+		local item2 = list[2]
+
+		if item == Constants.VOICE_STATE.MUTED or item == Constants.VOICE_STATE.LOCAL_MUTED then
+			return default:GetIcon("Muted", iconStyle)
 		end
 
-		if v52 == Constants.VOICE_STATE.CONNECTING or v52 == Constants.VOICE_STATE.HIDDEN then
-			if p4 and p3 == "MicLight" then
+		if item == Constants.VOICE_STATE.CONNECTING or item == Constants.VOICE_STATE.HIDDEN then
+			if showConnectingShimmer and iconStyle == "MicLight" then
 				return default:GetIcon("Connecting", "MicDark")
 			end
 
-			return default:GetIcon("Connecting", p3)
+			return default:GetIcon("Connecting", iconStyle)
 		end
 
-		if v52 == Constants.VOICE_STATE.INACTIVE then
-			return default:GetIcon("Unmuted0", p3)
+		if item == Constants.VOICE_STATE.INACTIVE then
+			return default:GetIcon("Unmuted0", iconStyle)
 		end
 
-		if v52 == Constants.VOICE_STATE.TALKING then
-			local v54 = math.floor(0.5 + 5 * v53) * 20
-
-			return default:GetIcon("Unmuted" .. tostring(v54), p3)
+		if item == Constants.VOICE_STATE.TALKING then
+			return default:GetIcon("Unmuted" .. tostring(math.floor(0.5 + 5 * item2) * 20), iconStyle)
 		end
 
-		return default:GetIcon("Error", p3)
+		return default:GetIcon("Error", iconStyle)
 	end
 end
 
-local t1 = {
-	[Constants.VOICE_STATE.ERROR] = true,
-	[Constants.VOICE_STATE.HIDDEN] = true
-}
+local set = { [Constants.VOICE_STATE.ERROR] = true, [Constants.VOICE_STATE.HIDDEN] = true }
 
-local function GenerateGUID() -- line: 67
-	-- upvalues: HttpService (copy)
+local function GenerateGUID()
 	return HttpService:GenerateGUID()
 end
-local function createTweenShimmeringEffect(p6) -- line: 83
-	-- upvalues: TweenService (copy)
+
+local function createTweenShimmeringEffect(ref)
 	local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Circular, Enum.EasingDirection.Out, -1)
-	local t2 = {
-		Offset = Vector2.new(1, 0)
-	}
-
-	return (TweenService:Create(p6:getValue(), tweenInfo, t2))
+	local v = { Offset = Vector2.new(1, 0) }
+	return (TweenService:Create(ref:getValue(), tweenInfo, v))
 end
-local function VoiceIndicator(t3: {[any]: any}) -- line: 91
-	-- upvalues: useVoiceState (copy), React (copy), Roact (copy), GenerateGUID (copy), Constants (copy), createTweenShimmeringEffect (copy), v16 (copy), RunService (copy), v17 (copy), t1 (copy), ReactIs (copy), default (copy), useSelectionCursor (copy), CursorKind (copy), uDim2 (copy)
-	local v33 = useVoiceState(t3.userId, t3.disable or false)
-	local v34, v35 = React.useBinding(0)
-	local v36 = t3.selectable == nil or t3.selectable
-	local v37, v38 = React.useBinding(v33)
-	local v39 = React.useMemo(function() -- line: 33
-		-- upvalues: Roact (copy), v37 (copy), v34 (copy)
-		return Roact.joinBindings({
-			v37,
-			v34
-		})
-	end, {
-		v37,
-		v34
-	})
-	local v40 = React.useRef(GenerateGUID()).current or ""
 
-	v38(v33)
+local function VoiceIndicator(props)
+	local v = useVoiceState(props.userId, props.disable or false)
+	local v2, v3 = React.useBinding(0)
+	local selectable = props.selectable == nil or props.selectable
+	local v4, v5 = React.useBinding(v)
+	local v6 = useJoinBinding(v4, v2) -- inferred equivalent call
+	local current = React.useRef(GenerateGUID()).current or ""
+	v5(v)
 
-	local v41 = v33 == Constants.VOICE_STATE.TALKING
-	local v42 = v33 == Constants.VOICE_STATE.CONNECTING
-	local v43 = t3.showConnectingShimmer == true
-	local v44 = React.useRef(nil)
+	local enabled = v == Constants.VOICE_STATE.CONNECTING
+	local showConnectingShimmer = props.showConnectingShimmer == true
+	local ref = React.useRef(nil)
 
-	React.useEffect(function() -- line: 105
-		-- upvalues: v43 (copy), v42 (copy), v44 (copy), createTweenShimmeringEffect (copy)
-		if v43 and (v42 and v44.current) then
-			local v55 = createTweenShimmeringEffect(v44)
+	React.useEffect(function()
+		if showConnectingShimmer and enabled and ref.current then
+			local tweenShimmeringEffect = createTweenShimmeringEffect(ref)
+			tweenShimmeringEffect:Play()
 
-			v55:Play()
-
-			return function() -- line: 110
-				-- upvalues: v55 (copy)
-				v55:Cancel()
+			return function()
+				tweenShimmeringEffect:Cancel()
 			end
 		end
 
-		return function() -- line: 114
+		return function() end
+	end, { enabled, showConnectingShimmer })
+
+	local ref2 = React.useRef(false)
+	ref2.current = v == Constants.VOICE_STATE.TALKING
+
+	React.useEffect(function()
+		local count = 0
+
+		RunService:BindToRenderStep(current, 1, function()
+			if not ref2.current then
+				return
+			end
+
+			count += 1
+
+			if defineFastInt <= count then
+				count = 0
+				v3(math.random())
+			end
+		end)
+
+		return function()
+			RunService:UnbindFromRenderStep(current)
 		end
-	end, {
-		v42,
-		v43
-	})
+	end, { current })
 
-	if v16 then
-		local v45 = React.useRef(false)
+	local visible = (not props.hideOnError or v and not set[v]) and true or false
+	local v7 = v == Constants.VOICE_STATE.LOCAL_MUTED and 0.5 or 0
+	local imageTransparency
 
-		v45.current = v33 == Constants.VOICE_STATE.TALKING
-		React.useEffect(function() -- line: 121
-			-- upvalues: RunService (copy), v40 (copy), v45 (copy), v17 (copy), v35 (copy)
-			local n1 = 0
-
-			RunService:BindToRenderStep(v40, 1, function() -- line: 124
-				-- upvalues: v45 (copy), n1 (ref), v17 (copy), v35 (copy)
-				if not v45.current then
-					return
-				end
-
-				n1 += 1
-
-				if n1 >= v17 then
-					n1 = 0
-					v35(math.random())
-				end
+	if props.iconTransparency then
+		if ReactIs.isBinding(props.iconTransparency) then
+			imageTransparency = props.iconTransparency:map(function(p)
+				return 1 - (1 - p) * (1 - v7)
 			end)
-
-			return function() -- line: 136
-				-- upvalues: RunService (copy), v40 (copy)
-				RunService:UnbindFromRenderStep(v40)
-			end
-		end, { v40 })
+		else
+			imageTransparency = 1 - (1 - props.iconTransparency) * (1 - v7)
+		end
 	else
-		React.useEffect(function() -- line: 141
-			-- upvalues: v41 (copy), RunService (copy), v40 (copy), v35 (copy)
-			if v41 then
-				RunService:BindToRenderStep(v40, 1, function() -- line: 143
-					-- upvalues: v35 (copy)
-					v35(math.random())
-				end)
-			end
-
-			return function() -- line: 147
-				-- upvalues: v41 (copy), RunService (copy), v40 (copy)
-				if v41 then
-					RunService:UnbindFromRenderStep(v40)
-				end
-			end
-		end, {
-			v41,
-			v40
-		})
+		imageTransparency = v7
 	end
 
-	local v46 = t3.hideOnError and (not v33 or t1[v33])
-	local v47 = v33 ~= Constants.VOICE_STATE.LOCAL_MUTED and 0 or 0.5
+	local image = React.useMemo(function()
+		return v6:map(mapLevelToIcon(props.iconStyle, showConnectingShimmer)) -- inferred equivalent call
+	end, { props.iconStyle, showConnectingShimmer })
 
-	if t3.iconTransparency then
-		local v48 = v47
+	local selectionImageObject = useSelectionCursor(CursorKind.RoundedRectNoInset)
 
-		v47 = if not ReactIs.isBinding(t3.iconTransparency) then 1 - (1 - t3.iconTransparency) * (1 - v48) else t3.iconTransparency:map(function(p7) -- line: 161
-			-- upvalues: v48 (copy)
-			return 1 - (1 - p7) * (1 - v48)
-		end)
-	end
-
-	local v49 = React.useMemo(function() -- line: 169
-		-- upvalues: v39 (copy), t3 (copy), v43 (copy), Constants (copy), default (copy)
-		local v58 = v39
-		local iconStyle = t3.iconStyle
-		local v60 = v43
-
-		return v58:map(function(p8) -- line: 40
-			-- upvalues: Constants (copy), default (copy), iconStyle (copy), v60 (copy)
-			local v62 = p8[1]
-			local v63 = p8[2]
-
-			if v62 == Constants.VOICE_STATE.MUTED or v62 == Constants.VOICE_STATE.LOCAL_MUTED then
-				return default:GetIcon("Muted", iconStyle)
-			end
-
-			if v62 == Constants.VOICE_STATE.CONNECTING or v62 == Constants.VOICE_STATE.HIDDEN then
-				if v60 and iconStyle == "MicLight" then
-					return default:GetIcon("Connecting", "MicDark")
-				end
-
-				return default:GetIcon("Connecting", iconStyle)
-			end
-
-			if v62 == Constants.VOICE_STATE.INACTIVE then
-				return default:GetIcon("Unmuted0", iconStyle)
-			end
-
-			if v62 == Constants.VOICE_STATE.TALKING then
-				local v64 = math.floor(0.5 + 5 * v63) * 20
-
-				return default:GetIcon("Unmuted" .. tostring(v64), iconStyle)
-			end
-
-			return default:GetIcon("Error", iconStyle)
-		end)
-	end, {
-		t3.iconStyle,
-		v43
-	})
-	local v50 = useSelectionCursor(CursorKind.RoundedRectNoInset)
-
-	return Roact.createElement("ImageButton", {
-		Size = t3.size or uDim2,
+	local createElement = Roact.createElement
+	local onClickedsByActivated = {
+		Size = props.size or udim,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Image = v49,
-		ImageTransparency = v47,
-		Selectable = v36,
-		SelectionImageObject = v50,
-		Visible = not v46,
-		[Roact.Event.Activated] = t3.onClicked
-	}, {
-		ShimmerGradient = if not v43 then nil else Roact.createElement("UIGradient", {
+		Image = image,
+		ImageTransparency = imageTransparency,
+		Selectable = selectable,
+		SelectionImageObject = selectionImageObject,
+		Visible = visible,
+		[Roact.Event.Activated] = props.onClicked
+	}
+	local shimmerGradient
+
+	if showConnectingShimmer then
+		shimmerGradient = Roact.createElement("UIGradient", {
 			Color = ColorSequence.new({
 				ColorSequenceKeypoint.new(0, Color3.new(0.6, 0.6, 0.6)),
 				ColorSequenceKeypoint.new(0.5, Color3.new(0.8, 0.8, 0.8)),
 				ColorSequenceKeypoint.new(1, Color3.new(0.6, 0.6, 0.6))
 			}),
-			Enabled = v42,
+			Enabled = enabled,
 			Rotation = -45,
 			Offset = Vector2.new(-1, 0),
-			[Roact.Ref] = v44
+			[Roact.Ref] = ref
 		})
-	})
+	end
+
+	return createElement("ImageButton", onClickedsByActivated, { ShimmerGradient = shimmerGradient })
 end
 
 return VoiceIndicator

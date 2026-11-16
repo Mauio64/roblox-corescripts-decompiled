@@ -1,12 +1,8 @@
-local Parent = script:FindFirstAncestor("GameFilters").Parent
-local makeActionCreator = require(Parent.Rodux).makeActionCreator
+local parent = script:FindFirstAncestor("GameFilters").Parent
+local Rodux = require(parent.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
+require(parent.DiscoveryTypes)
 
-require(Parent.DiscoveryTypes)
-
-return makeActionCreator(script.Name, function(s1: string, t1: {[any]: any}, n1: number) -- line: 9
-	return {
-		groupId = s1,
-		filters = t1,
-		updatedTimestamp = n1
-	}
+return makeActionCreator(script.Name, function(groupId: string, filters, updatedTimestamp: number)
+	return { groupId = groupId, filters = filters, updatedTimestamp = updatedTimestamp }
 end)

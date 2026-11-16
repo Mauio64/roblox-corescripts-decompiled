@@ -1,3 +1,1 @@
-return {
-	inspect = require(script.inspect)
-}
+return { inspect = require(script.inspect) }

@@ -1,93 +1,78 @@
-local Parent = script:FindFirstAncestor("ApolloLocalState").Parent
+local parent = script:FindFirstAncestor("ApolloLocalState").Parent
 
-require(Parent.ApolloClient)
+require(parent.ApolloClient)
+local Cryo = require(parent.Cryo)
 
-local Cryo = require(Parent.Cryo)
 local mergeListsWithoutDuplicates = require(script.Parent.utils.mergeListsWithoutDuplicates)
 
 return {
 	fields = {
 		omniFeedItem = {},
 		profilesInsightsByUserIds = {
-			read = function(_, _, p3) -- line: 12
-				local t1 = {}
+			read = function(_, _, object)
+				local result = {}
 
-				for _, v in pairs(p3.args.userIds) do
-					local v10 = p3:toReference({
+				for _, userId in pairs(object.args.userIds) do
+					local reference = object:toReference({
 						__typename = "ProfileInsights",
-						targetUserId = v
+						targetUserId = userId
 					})
 
-					table.insert(t1, v10)
+					table.insert(result, reference)
 
-					if not p3:canRead(v10) then
+					if not object:canRead(reference) then
 						return nil
 					end
 				end
 
-				return t1
+				return result
 			end
 		},
 		userProfiles = {
-			read = function(_, _, p6) -- line: 34
-				local t2 = {}
+			read = function(_, _, object)
+				local result = {}
 
-				for _, v16 in p6.args.userIds do
-					local v17 = p6:toReference({
-						__typename = "UserProfile",
-						id = v16
-					})
+				for _, userId in object.args.userIds do
+					local reference = object:toReference({ __typename = "UserProfile", id = userId })
 
-					table.insert(t2, v17)
+					table.insert(result, reference)
 
-					if not p6:canRead(v17) then
+					if not object:canRead(reference) then
 						return nil
 					end
 				end
 
-				return t2
+				return result
 			end
 		},
 		allFriendsByUserId = {
-			keyArgs = {
-				"userId",
-				"sort"
-			},
-			merge = function(_, p8, p9) -- line: 57
-				-- upvalues: mergeListsWithoutDuplicates (copy), Cryo (copy)
-				if not p8 then
-					return p9
+			keyArgs = { "userId", "sort" },
+			merge = function(_, p, p2)
+				if not p then
+					return p2
 				end
 
-				if p8.nextCursor == p9.curCursor then
-					local v21 = mergeListsWithoutDuplicates(p8 and p8.friends, p9 and p9.friends, "__ref")
-
-					return Cryo.Dictionary.join(p9, {
-						friends = v21
-					})
+				if p.nextCursor ~= p2.curCursor then
+					return p
 				end
 
-				return p8
+				local friends = mergeListsWithoutDuplicates(p and p.friends, p2 and p2.friends, "__ref")
+
+				return Cryo.Dictionary.join(p2, { friends = friends })
 			end
 		},
 		onlineFriendsByUserId = {
-			keyArgs = {
-				"userId",
-				"sort"
-			},
-			read = function(_, p11, p12) -- line: 80
-				-- upvalues: Cryo (copy)
-				if not p11 then
-					return p11
+			keyArgs = { "userId", "sort" },
+			read = function(_, p, object)
+				if p then
+					return (Cryo.List.filter(p, function(p2)
+						local field = object:readField("userPresenceType", (object:readField("presence", p2)))
+
+						return field and field ~= "Offline"
+					end))
 				end
 
-				return (Cryo.List.filter(p11, function(p13) -- line: 85
-					-- upvalues: p12 (copy)
-					local v26 = p12:readField("presence", p13)
-					local v27 = p12:readField("userPresenceType", v26)
-
-					return v27 and v27 ~= "Offline"
-				end))
+				return p
 			end
 		}
 	}

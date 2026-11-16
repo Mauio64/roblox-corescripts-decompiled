@@ -1,130 +1,292 @@
-local Parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
-local React = require(Parent.React)
-local Foundation = require(Parent.Foundation)
-local Cryo = require(Parent.Cryo)
-local EmojiList = require(Parent.EmojiList)
+local parent = script:FindFirstAncestor("ChatUIPrimitives").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local Cryo = require(parent.Cryo)
+local EmojiList = require(parent.EmojiList)
+
 local Trie = require(script.Parent.Trie)
 
-local function buildUnifiedTrie(t1: {[any]: any}?, b1: boolean?) -- line: 20
-	-- upvalues: Trie (copy), Cryo (copy), EmojiList (copy)
-	local v10 = Trie.new()
+local function buildUnifiedTrie(items, flag: boolean?)
+	local unifiedTrie = Trie.new()
 
-	if t1 then
-		for _, v12 in t1 do
-			v10:insert(v12:lower())
+	if items then
+		for _, item in items do
+			unifiedTrie:insert(item:lower())
 		end
 	end
 
-	if b1 then
-		for _, v14 in Cryo.Dictionary.keys(EmojiList) do
-			v10:insert(":" .. v14)
+	if flag then
+		for _, v in Cryo.Dictionary.keys(EmojiList) do
+			unifiedTrie:insert(":" .. v)
 		end
 	end
 
-	return v10
+	return unifiedTrie
 end
 
-return {
-	buildTrie = buildUnifiedTrie,
-	matchTrigger = function(s1: string, n1: number) -- line: 41
-		if n1 < 2 then
+local function buildEmojiArray()
+	local emojiArray = {}
+
+	for _, v in Cryo.Dictionary.keys(EmojiList) do
+		table.insert(emojiArray, ":" .. v)
+	end
+
+	table.sort(emojiArray)
+	return emojiArray
+end
+
+local emojiStructure = nil
+
+local function searchSortedArray(emoji, value: string, compareEmojiPopularity)
+	local lower = value:lower()
+	local v = #lower
+
+	local v2 = #emoji + 1
+	local v3 = 1
+
+	while v3 < v2 do
+		local v4 = (v3 + v2) // 2
+
+		if emoji[v4] < lower then
+			v3 = v4 + 1
+		else
+			v2 = v4
+		end
+	end
+
+	local sortedArray = {}
+
+	for i = v3, #emoji do
+		local item = emoji[i]
+
+		if string.sub(item, 1, v) ~= lower then
+			break
+		end
+
+		table.insert(sortedArray, item)
+	end
+
+	if compareEmojiPopularity then
+		table.sort(sortedArray, compareEmojiPopularity)
+	end
+
+	return sortedArray
+end
+
+local function compareEmojiPopularity(value: string, value2: string): boolean
+	local popularity = EmojiList[string.sub(value, 2)].popularity
+	local popularity2 = EmojiList[string.sub(value2, 2)].popularity
+
+	if popularity == popularity2 then
+		return value < value2
+	end
+
+	return popularity < popularity2
+end
+
+local InternalProviders = {}
+InternalProviders.buildTrie = buildUnifiedTrie
+InternalProviders.buildEmojiArray = buildEmojiArray
+
+function InternalProviders.buildCommandTrie(items)
+	local commandTrie = Trie.new()
+
+	for _, item in items do
+		commandTrie:insert(item:lower())
+	end
+
+	return commandTrie
+end
+
+function InternalProviders.getEmojiStructure()
+	if not emojiStructure then
+		emojiStructure = buildEmojiArray()
+	end
+
+	return emojiStructure
+end
+
+function InternalProviders.matchTrigger(value: string, p: number)
+	if p < 2 then
+		return nil
+	end
+
+	local replaceStart = 1
+
+	for i = p - 1, 1, -1 do
+		local v = string.sub(value, i, i)
+
+		if v == " " or v == "\n" then
+			replaceStart = i + 1
+			break
+		end
+	end
+
+	local v = string.sub(value, replaceStart, replaceStart)
+
+	if v == "/" then
+		if replaceStart == 1 then
+			return {
+				query = string.sub(value, 1, p - 1),
+				replaceStart = 1,
+				replaceFinish = p - 1
+			}
+		end
+
+		return nil
+	elseif v == ":" then
+		if p - replaceStart < 3 then
 			return nil
 		end
 
-		local n2 = 1
+		return {
+			query = string.sub(value, replaceStart, p - 1),
+			replaceStart = replaceStart,
+			replaceFinish = p - 1
+		}
+	else
+		local v2 = nil
 
-		for i = n1 - 1, 1, -1 do
-			local v19 = string.sub(s1, i, i)
-
-			if v19 == " " or v19 == "\n" then
-				n2 = i + 1
-
+		for i = p - 1, replaceStart, -1 do
+			if string.sub(value, i, i) == ":" then
+				v2 = i
 				break
 			end
 		end
 
-		local v20 = string.sub(s1, n2, n2)
-
-		if v20 == "/" then
-			if n2 ~= 1 then
-				return nil
-			end
-		else
-			if v20 ~= ":" then
-				return nil
-			end
-
-			if n1 - n2 < 3 then
-				return nil
-			end
+		if not v2 or p - v2 < 3 then
+			return nil
 		end
 
+		replaceStart = v2
 		return {
-			query = string.sub(s1, n2, n1 - 1),
-			replaceStart = n2,
-			replaceFinish = n1 - 1
+			query = string.sub(value, replaceStart, p - 1),
+			replaceStart = replaceStart,
+			replaceFinish = p - 1
 		}
-	end,
-	search = function(p1, s2: string) -- line: 75
-		-- upvalues: EmojiList (copy)
-		local v23 = p1:autocomplete(s2:lower())
+	end
+end
 
-		table.sort(v23, function(s3: string, s4: string) -- line: 77
-			-- upvalues: EmojiList (copy)
-			local v31 = string.sub(s3, 1, 1) == ":"
-			local v32 = string.sub(s4, 1, 1) == ":"
+function InternalProviders.matchColonCompletion(value: string, p: number)
+	if p - 1 < 3 or string.sub(value, p - 1, p - 1) ~= ":" then
+		return nil
+	end
 
-			if v31 and v32 then
-				local popularity = EmojiList[string.sub(s3, 2)].popularity
-				local popularity2 = EmojiList[string.sub(s4, 2)].popularity
+	local v = string.sub(value, 1, p - 1)
+	local replaceStart, _, v2 = string.find(v, ":([^:%s]+):$")
 
-				if popularity == popularity2 then
-					return s3 < s4
-				end
+	if not v2 then
+		return nil
+	end
 
-				return popularity < popularity2
+	local emoji = EmojiList[string.lower(v2)]
+
+	if emoji then
+		return {
+			replacement = emoji.base,
+			replaceStart = replaceStart,
+			replaceFinish = p - 1
+		}
+	end
+
+	return nil
+end
+
+function InternalProviders.search(object, value: string)
+	local autocomplete = object:autocomplete(value:lower())
+	table.sort(autocomplete, function(a: string, b: string): boolean
+		local v = string.sub(a, 1, 1) == ":"
+		local v2 = string.sub(b, 1, 1) == ":"
+
+		if not (v and v2) then
+			return a < b
+		end
+
+		local popularity = EmojiList[string.sub(a, 2)].popularity
+		local popularity2 = EmojiList[string.sub(b, 2)].popularity
+
+		if popularity == popularity2 then
+			return a < b
+		end
+
+		return popularity < popularity2
+	end)
+
+	return autocomplete
+end
+
+InternalProviders.searchSortedArray = searchSortedArray
+
+function InternalProviders.searchStructures(p, value: string)
+	if string.sub(value, 1, 1) == ":" then
+		if p.emoji then
+			return searchSortedArray(p.emoji, value, compareEmojiPopularity)
+		end
+
+		return {}
+	else
+		if not p.command then
+			return {}
+		end
+
+		local autocomplete = p.command:autocomplete(value:lower())
+		table.sort(autocomplete, function(a: string, b: string): boolean
+			local v = string.sub(a, 1, 1) == ":"
+			local v2 = string.sub(b, 1, 1) == ":"
+
+			if not (v and v2) then
+				return a < b
 			end
 
-			return s3 < s4
+			local popularity = EmojiList[string.sub(a, 2)].popularity
+			local popularity2 = EmojiList[string.sub(b, 2)].popularity
+
+			if popularity == popularity2 then
+				return a < b
+			end
+
+			return popularity < popularity2
 		end)
 
-		return v23
-	end,
-	formatReplacement = function(s5: string) -- line: 94
-		-- upvalues: EmojiList (copy)
-		if string.sub(s5, 1, 1) == ":" then
-			return EmojiList[string.sub(s5, 2)].base
-		end
+		return autocomplete
+	end
+end
 
-		return s5
-	end,
-	renderEntry = function(s6: string, _: boolean) -- line: 101
-		-- upvalues: EmojiList (copy), React (copy), Foundation (copy)
-		if string.sub(s6, 1, 1) == ":" then
-			local v27 = string.sub(s6, 2)
-			local v28 = EmojiList[v27]
+function InternalProviders.formatReplacement(value: string)
+	if string.sub(value, 1, 1) == ":" then
+		return EmojiList[string.sub(value, 2)].base
+	end
 
-			return React.createElement(Foundation.View, {
-				tag = "row align-y-center gap-large",
-				Size = UDim2.fromScale(1, 1)
-			}, {
-				glyph = React.createElement(Foundation.Text, {
-					tag = "auto-xy text-body-medium content-emphasis",
-					LayoutOrder = 1,
-					Text = not v28 and "" or v28.base
-				}),
-				name = React.createElement(Foundation.Text, {
-					tag = "auto-xy text-body-medium content-emphasis",
-					LayoutOrder = 2,
-					Text = v27
-				})
-			})
-		end
+	return value
+end
 
+function InternalProviders.renderEntry(text: string, _: boolean)
+	if string.sub(text, 1, 1) ~= ":" then
 		return React.createElement(Foundation.Text, {
 			tag = "text-body-medium text-align-x-left content-emphasis",
-			Text = s6,
+			Text = text,
 			Size = UDim2.fromScale(1, 1)
 		})
 	end
-}
+
+	local text2 = string.sub(text, 2)
+	local emoji = EmojiList[text2]
+	return React.createElement(
+		Foundation.View,
+		{ tag = "row align-y-center gap-large", Size = UDim2.fromScale(1, 1) },
+		{
+			glyph = React.createElement(Foundation.Text, {
+				tag = "auto-xy text-body-medium content-emphasis",
+				Text = not emoji and "" or emoji.base,
+				LayoutOrder = 1
+			}),
+			name = React.createElement(Foundation.Text, {
+				tag = "auto-xy text-body-medium content-emphasis",
+				Text = text2,
+				LayoutOrder = 2
+			})
+		}
+	)
+end
+
+return InternalProviders

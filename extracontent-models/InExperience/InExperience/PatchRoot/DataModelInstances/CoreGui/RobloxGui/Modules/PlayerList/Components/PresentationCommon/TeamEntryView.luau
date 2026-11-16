@@ -1,251 +1,348 @@
 local CorePackages = game:GetService("CorePackages")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local React = require(CorePackages.Packages.React)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-
 require(CorePackages.Workspace.Packages.LeaderboardStore)
+local Foundation = require(CorePackages.Packages.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local useTokens = Foundation.Hooks.useTokens
 
 local useLayoutValues = PlayerList.Common.useLayoutValues
 local useStyle = UIBlox.Core.Style.useStyle
+
 local EntryFrameView = PlayerList.Presentation.EntryFrameView
-local StatEntryContainer = require(ParentParentParent.Components.Container.StatEntryContainer)
-local FFlagPlayerListFixLeaderstatsStacking = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking
+local StatEntryContainer = require(parent2.Components.Container.StatEntryContainer)
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagPlayerListFixLeaderstatsStacking = SharedFlags.FFlagPlayerListFixLeaderstatsStacking
+local foundationFontFaceMigration = SharedFlags.FFlagFontFacePlayerList
+	and Foundation.Utility.Flags.FoundationFontFaceMigration
 local FFlagEnableMobilePlayerListOnConsole = PlayerList.Flags.FFlagEnableMobilePlayerListOnConsole
-local CellExtender = require(ParentParent.Presentation.CellExtender)
 
-local function TeamEntryView(t1: {[any]: any}) -- line: 54
-	-- upvalues: useLayoutValues (copy), useStyle (copy), FFlagEnableMobilePlayerListOnConsole (copy), React (copy), FFlagPlayerListFixLeaderstatsStacking (copy), SignalsReact (copy), StatEntryContainer (copy), EntryFrameView (copy), CellExtender (copy)
-	local v17 = useLayoutValues()
-	local v18 = useStyle()
-	local v19 = t1.isSmallTouchDevice or false
-	local v20 = t1.isDirectionalPreferred or false
-	local TextEmphasis = v18.Theme.TextEmphasis
-	local v22 = if not FFlagEnableMobilePlayerListOnConsole then v18.Font.CaptionHeader.RelativeSize * v18.Font.BaseSize else v17.TeamNameTextSize
-	local CaptionHeaderFont = v18.Font.CaptionHeader.Font
+local CellExtender = require(parent.Presentation.CellExtender)
 
-	if v20 then
-		TextEmphasis = v17.DefaultTextStyle
-		v22 = v17.PlayerNameTextSize
-		CaptionHeaderFont = v17.TeamEntryFont
+local function TeamEntryView(props)
+	local v = useLayoutValues()
+	local v2 = useStyle()
+	local v3
+
+	if foundationFontFaceMigration then
+		v3 = useTokens()
 	end
 
-	local v24 = React.useMemo(function() -- line: 75
-		-- upvalues: v19 (copy), v18 (copy), t1 (copy), v20 (copy), v17 (copy)
-		if v19 then
-			local Settings = v18.Settings
+	local isSmallTouchDevice = props.isSmallTouchDevice or false
+	local isDirectionalPreferred = props.isDirectionalPreferred or false
 
+	local textStyle = v2.Theme.TextEmphasis
+	local textSize
+
+	if FFlagEnableMobilePlayerListOnConsole then
+		textSize = v.TeamNameTextSize
+	else
+		textSize = v2.Font.CaptionHeader.RelativeSize * v2.Font.BaseSize
+	end
+
+	local fontFace
+
+	if foundationFontFaceMigration then
+		fontFace = normalizeFontFace(v3.Typography.CaptionLarge.Font)
+	else
+		fontFace = v2.Font.CaptionHeader.Font
+	end
+
+	if isDirectionalPreferred then
+		textStyle = v.DefaultTextStyle
+		textSize = v.PlayerNameTextSize
+
+		if foundationFontFaceMigration then
+			fontFace = normalizeFontFace(v.TeamEntryFont)
+		else
+			fontFace = v.TeamEntryFont
+		end
+	end
+
+	local backgroundStyle = React.useMemo(function()
+		if isSmallTouchDevice then
+			local settings = v2.Settings
 			return {
-				Color = t1.teamColor,
-				Transparency = Settings.PreferredTransparency * 0.5
+				Color = props.teamColor,
+				Transparency = settings.PreferredTransparency * 0.5
 			}
 		end
 
-		if v20 then
+		if isDirectionalPreferred then
 			return {
-				Color = t1.teamColor,
-				Transparency = not v17.BackgroundStyle and 0 or v17.BackgroundStyle.Default.Transparency
+				Color = props.teamColor,
+				Transparency = not v.BackgroundStyle and 0 or v.BackgroundStyle.Default.Transparency
 			}
 		end
 
 		return {
-			Color = t1.teamColor,
-			Transparency = v17.TeamEntryBackgroundTransparency * v18.Settings.PreferredTransparency
+			Color = props.teamColor,
+			Transparency = v.TeamEntryBackgroundTransparency * v2.Settings.PreferredTransparency
 		}
-	end, {
-		v19,
-		v20,
-		t1.teamColor,
-		v18,
-		v17
-	})
-	local t2 = {
-		Transparency = 1,
-		Color = Color3.new(1, 1, 1)
-	}
-	local MaxLeaderstats = v17.MaxLeaderstats
-	local v27 = if not FFlagPlayerListFixLeaderstatsStacking then nil else SignalsReact.useSignalState(t1.gameStats.getAllData)
+	end, { isSmallTouchDevice, isDirectionalPreferred, props.teamColor, v2, v })
 
-	if v19 then
-		local t3 = {
-			UIListLayout = React.createElement("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				FillDirection = Enum.FillDirection.Horizontal,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}),
-			NameFrame = React.createElement("TextLabel", {
-				LayoutOrder = 0,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0, v17.PlayerNameSizeXMobile, 1, 0),
-				TextXAlignment = Enum.TextXAlignment.Left,
-				Font = CaptionHeaderFont,
-				TextSize = v22,
-				TextColor3 = TextEmphasis.Color,
-				TextStrokeTransparency = TextEmphasis.StrokeTransparency,
-				TextStrokeColor3 = TextEmphasis.StrokeColor,
-				Text = t1.teamName,
-				TextTruncate = Enum.TextTruncate.AtEnd
-			}, {
-				UIPadding = React.createElement("UIPadding", {
-					PaddingLeft = UDim.new(0, v17.TeamEntryTextPaddingMobile)
-				})
-			})
+	local overlayStyle = { Color = Color3.new(1, 1, 1), Transparency = 1 }
+
+	local maxLeaderstats = v.MaxLeaderstats
+	local v4
+
+	if FFlagPlayerListFixLeaderstatsStacking then
+		v4 = SignalsReact.useSignalState(props.gameStats.getAllData)
+	end
+
+	if isSmallTouchDevice then
+		local children = {}
+
+		children.UIListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		})
+
+		local createElement = React.createElement
+		local v5 = {
+			Size = UDim2.new(0, v.PlayerNameSizeXMobile, 1, 0),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			LayoutOrder = 0,
+			TextColor3 = 0,
+			TextStrokeTransparency = 0,
+			TextStrokeColor3 = 0,
+			BackgroundTransparency = 1,
+			Text = 0,
+			TextTruncate = 0
 		}
+		local font
+
+		if not foundationFontFaceMigration then
+			font = fontFace
+		end
+
+		v5.Font = font
+
+		if not foundationFontFaceMigration then
+			fontFace = nil
+		end
+
+		v5.FontFace = fontFace
+		v5.TextSize = textSize
+
+		v5.TextColor3 = textStyle.Color
+		v5.TextStrokeTransparency = textStyle.StrokeTransparency
+		v5.TextStrokeColor3 = textStyle.StrokeColor
+
+		v5.Text = props.teamName
+		v5.TextTruncate = Enum.TextTruncate.AtEnd
+		children.NameFrame = createElement("TextLabel", v5, {
+			UIPadding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v.TeamEntryTextPaddingMobile)
+			})
+		})
 
 		if FFlagPlayerListFixLeaderstatsStacking then
-			for v29, v30 in v27 do
-				if not (MaxLeaderstats < v30.order(false)) then
-					local v31 = t1.teamStats.getData(v29, false)
-
-					t3["GameStat_" .. v29] = React.createElement(StatEntryContainer, {
-						isTeamEntry = true,
-						showStatTitle = false,
-						statName = v29,
-						stat = v31,
-						textStyle = TextEmphasis
-					})
+			for k, v6 in v4 do
+				if maxLeaderstats < v6.order(false) then
+					continue
 				end
+
+				local data = props.teamStats.getData(k, false)
+				children["GameStat_" .. k] = React.createElement(StatEntryContainer, {
+					statName = k,
+					stat = data,
+					isTeamEntry = true,
+					showStatTitle = false,
+					textStyle = textStyle
+				})
 			end
-		elseif t1.gameStatsCount and t1.teamStatsCount and t1.gameStatsCount > 0 and t1.teamStatsCount >= 0 then
-			t1.gameStats.iterateData(function(p1, p2) -- line: 159
-				-- upvalues: MaxLeaderstats (copy), t1 (copy), t3 (copy), React (copy), StatEntryContainer (copy), TextEmphasis (ref)
-				if p2.order(false) > MaxLeaderstats then
+		elseif
+			props.gameStatsCount
+			and props.teamStatsCount
+			and props.gameStatsCount > 0
+			and props.teamStatsCount >= 0
+		then
+			props.gameStats.iterateData(function(statName, p)
+				if maxLeaderstats < p.order(false) then
 					return
 				end
 
-				local v40 = t1.teamStats.getData(p1, false)
-
-				t3["GameStat_" .. p1] = React.createElement(StatEntryContainer, {
+				local data = props.teamStats.getData(statName, false)
+				children["GameStat_" .. statName] = React.createElement(StatEntryContainer, {
+					statName = statName,
+					stat = data,
 					isTeamEntry = true,
 					showStatTitle = false,
-					statName = p1,
-					stat = v40,
-					textStyle = TextEmphasis
+					textStyle = textStyle
 				})
 			end, false)
 		end
 
 		return React.createElement("Frame", {
+			LayoutOrder = props.layoutOrder,
+			Size = props.size,
+			BackgroundColor3 = backgroundStyle.Color,
+			BackgroundTransparency = backgroundStyle.Transparency,
 			BorderSizePixel = 0,
-			GroupTransparency = nil,
-			LayoutOrder = t1.layoutOrder,
-			Size = t1.size,
-			BackgroundColor3 = v24.Color,
-			BackgroundTransparency = v24.Transparency
-		}, t3)
-	end
+			GroupTransparency = nil
+		}, children)
+	else
+		local children = {}
+		local padding
 
-	local t4 = {}
-	local uDim = nil
+		if isDirectionalPreferred then
+			padding = UDim.new(0, v.PlayerEntryPadding)
+		end
 
-	if v20 then
-		uDim = UDim.new(0, v17.PlayerEntryPadding)
-	end
-
-	t4.UIListLayout = React.createElement("UIListLayout", {
-		SortOrder = Enum.SortOrder.LayoutOrder,
-		FillDirection = Enum.FillDirection.Horizontal,
-		VerticalAlignment = Enum.VerticalAlignment.Center,
-		Padding = uDim
-	})
-	t4.NameFrame = React.createElement("Frame", {
-		LayoutOrder = 0,
-		BackgroundTransparency = 1,
-		Size = UDim2.new(0, t1.entrySizeX, 0, v17.TeamEntrySizeY)
-	}, {
-		Shadow = React.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			Image = v17.ShadowImage,
-			Position = UDim2.new(0, -v17.ShadowSize, 0, 0),
-			Size = UDim2.new(1, v17.ShadowSize * 2, 1, v17.ShadowSize),
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = v17.ShadowSliceRect,
-			Visible = v20
-		}),
-		BGFrame = React.createElement(EntryFrameView, {
-			isTeamFrame = true,
-			doubleOverlay = false,
-			size = UDim2.new(0, t1.entrySizeX, 0, v17.TeamEntrySizeY),
-			backgroundStyle = v24,
-			overlayStyle = t2
-		}, {
-			TeamName = React.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				Position = UDim2.new(0, 0, 0, 0),
-				Size = UDim2.new(1, 0, 1, 0),
-				TextXAlignment = Enum.TextXAlignment.Left,
-				Font = CaptionHeaderFont,
-				TextSize = v22,
-				TextColor3 = TextEmphasis.Color,
-				TextStrokeTransparency = TextEmphasis.StrokeTransparency,
-				TextStrokeColor3 = TextEmphasis.StrokeColor,
-				Text = t1.teamName,
-				TextTruncate = Enum.TextTruncate.AtEnd
-			}, { React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v17.TeamEntryTextPadding)
-			}) })
+		children.UIListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = padding
 		})
-	})
 
-	if FFlagPlayerListFixLeaderstatsStacking then
-		for v34, v35 in v27 do
-			if not (MaxLeaderstats < v35.order(false)) then
-				local v36 = t1.teamStats.getData(v34, false)
+		local createElement = React.createElement
+		local v5 = {
+			LayoutOrder = 0,
+			Size = UDim2.new(0, props.entrySizeX, 0, v.TeamEntrySizeY),
+			BackgroundTransparency = 1
+		}
 
-				t4["GameStat_" .. v34] = React.createElement(StatEntryContainer, {
+		local v6 = {
+			Shadow = React.createElement("ImageLabel", {
+				BackgroundTransparency = 1,
+				Image = v.ShadowImage,
+				Position = UDim2.new(0, -v.ShadowSize, 0, 0),
+				Size = UDim2.new(1, v.ShadowSize * 2, 1, v.ShadowSize),
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = v.ShadowSliceRect,
+				Visible = isDirectionalPreferred
+			}),
+			BGFrame = 0
+		}
+
+		local createElement2 = React.createElement
+		local v7 = {
+			size = UDim2.new(0, props.entrySizeX, 0, v.TeamEntrySizeY),
+			isTeamFrame = true,
+			backgroundStyle = backgroundStyle,
+			overlayStyle = overlayStyle,
+			doubleOverlay = false
+		}
+
+		local createElement3 = React.createElement
+		local v8 = {
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Font = 0,
+			FontFace = 0,
+			TextSize = 0,
+			TextColor3 = 0,
+			TextStrokeTransparency = 0,
+			TextStrokeColor3 = 0,
+			BackgroundTransparency = 1,
+			Text = 0,
+			TextTruncate = 0
+		}
+		local font
+
+		if not foundationFontFaceMigration then
+			font = fontFace
+		end
+
+		v8.Font = font
+
+		if not foundationFontFaceMigration then
+			fontFace = nil
+		end
+
+		v8.FontFace = fontFace
+		v8.TextSize = textSize
+		v8.TextColor3 = textStyle.Color
+		v8.TextStrokeTransparency = textStyle.StrokeTransparency
+		v8.TextStrokeColor3 = textStyle.StrokeColor
+
+		v8.Text = props.teamName
+		v8.TextTruncate = Enum.TextTruncate.AtEnd
+		v6.BGFrame = createElement2(EntryFrameView, v7, {
+			TeamName = createElement3("TextLabel", v8, {
+				React.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, v.TeamEntryTextPadding)
+				})
+			})
+		})
+		children.NameFrame = createElement("Frame", v5, v6)
+
+		if FFlagPlayerListFixLeaderstatsStacking then
+			for k, v9 in v4 do
+				if maxLeaderstats < v9.order(false) then
+					continue
+				end
+
+				local data = props.teamStats.getData(k, false)
+				children["GameStat_" .. k] = React.createElement(StatEntryContainer, {
+					statName = k,
+					stat = data,
 					isTeamEntry = true,
 					showStatTitle = false,
+					backgroundStyle = backgroundStyle,
+					overlayStyle = overlayStyle,
 					doubleOverlay = false,
-					statName = v34,
-					stat = v36,
-					backgroundStyle = v24,
-					overlayStyle = t2,
-					textStyle = TextEmphasis
+					textStyle = textStyle
 				})
 			end
+		elseif
+			props.gameStatsCount
+			and props.teamStatsCount
+			and props.gameStatsCount > 0
+			and props.teamStatsCount >= 0
+		then
+			props.gameStats.iterateData(function(statName, p)
+				if maxLeaderstats < p.order(false) then
+					return
+				end
+
+				local data = props.teamStats.getData(statName, false)
+				children["GameStat_" .. statName] = React.createElement(StatEntryContainer, {
+					statName = statName,
+					stat = data,
+					isTeamEntry = true,
+					showStatTitle = false,
+					backgroundStyle = backgroundStyle,
+					overlayStyle = overlayStyle,
+					doubleOverlay = false,
+					textStyle = textStyle
+				})
+			end, false)
 		end
-	elseif t1.gameStatsCount and t1.teamStatsCount and t1.gameStatsCount > 0 and t1.teamStatsCount >= 0 then
-		t1.gameStats.iterateData(function(p3, p4) -- line: 264
-			-- upvalues: MaxLeaderstats (copy), t1 (copy), t4 (copy), React (copy), StatEntryContainer (copy), v24 (copy), t2 (copy), TextEmphasis (ref)
-			if p4.order(false) > MaxLeaderstats then
-				return
-			end
 
-			local v43 = t1.teamStats.getData(p3, false)
-
-			t4["GameStat_" .. p3] = React.createElement(StatEntryContainer, {
-				isTeamEntry = true,
-				showStatTitle = false,
-				doubleOverlay = false,
-				statName = p3,
-				stat = v43,
-				backgroundStyle = v24,
-				overlayStyle = t2,
-				textStyle = TextEmphasis
+		if not isDirectionalPreferred then
+			children.BackgroundExtender = React.createElement(CellExtender, {
+				layoutOrder = 100,
+				size = UDim2.new(0, v.ExtraContainerPadding, 1, 0),
+				backgroundStyle = backgroundStyle,
+				overlayStyle = overlayStyle,
+				doubleOverlay = false
 			})
-		end, false)
-	end
+		end
 
-	if not v20 then
-		t4.BackgroundExtender = React.createElement(CellExtender, {
-			layoutOrder = 100,
-			doubleOverlay = false,
-			size = UDim2.new(0, v17.ExtraContainerPadding, 1, 0),
-			backgroundStyle = v24,
-			overlayStyle = t2
-		})
+		return React.createElement("Frame", {
+			Size = props.size,
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = props.layoutOrder,
+			GroupTransparency = nil
+		}, children)
 	end
-
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		GroupTransparency = nil,
-		Size = t1.size,
-		BackgroundColor3 = Color3.new(1, 1, 1),
-		LayoutOrder = t1.layoutOrder
-	}, t4)
 end
 
 return React.memo(TeamEntryView)

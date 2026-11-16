@@ -1,4 +1,1 @@
-return {
-	Regular = "Regular",
-	Filled = "Filled"
-}
+return { Regular = "Regular", Filled = "Filled" }

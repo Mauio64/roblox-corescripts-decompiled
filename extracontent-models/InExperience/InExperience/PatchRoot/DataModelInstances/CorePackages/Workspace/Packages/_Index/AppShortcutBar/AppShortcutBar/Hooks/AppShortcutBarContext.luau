@@ -1,63 +1,53 @@
 local AppShortcutBar = script:FindFirstAncestor("AppShortcutBar")
-local AppShortcutBarParent = AppShortcutBar.Parent
-local React = require(AppShortcutBarParent.React)
+local parent = AppShortcutBar.Parent
 
-require(AppShortcutBarParent.FocusNavigationUtils)
+local React = require(parent.React)
+require(parent.FocusNavigationUtils)
 
-local v4 = require(AppShortcutBar.Stores.GetButtonHoldStore)(false)
-local t1 = {
+local GetButtonHoldStore = require(AppShortcutBar.Stores.GetButtonHoldStore)
+local buttonHoldStore = GetButtonHoldStore(false)
+
+local appShortcutBarStateActionEnum = {
 	ButtonHoldStarted = "ButtonHoldStarted",
 	ButtonHoldEnded = "ButtonHoldEnded"
 }
-local t6 = {
-	[t1.ButtonHoldStarted] = function(t2: {[any]: any}, t3: {[any]: any}) -- line: 38
-		local v12 = table.clone(t2)
 
-		v12.heldProgress[t3.eventName] = t3.progress
-
-		return v12
+local v = {
+	[appShortcutBarStateActionEnum.ButtonHoldStarted] = function(p, p2)
+		local clone = table.clone(p)
+		clone.heldProgress[p2.eventName] = p2.progress
+		return clone
 	end,
-	[t1.ButtonHoldEnded] = function(t4: {[any]: any}, t5: {[any]: any}) -- line: 43
-		local v15 = table.clone(t4)
-
-		v15.heldProgress[t5.eventName] = nil
-
-		return v15
+	[appShortcutBarStateActionEnum.ButtonHoldEnded] = function(p, p2)
+		local clone = table.clone(p)
+		clone.heldProgress[p2.eventName] = nil
+		return clone
 	end
 }
 
-local function registryReducer(t7: {[any]: any}, p1) -- line: 50
-	-- upvalues: t6 (copy)
-	local v18 = t6[p1.type]
+local function registryReducer(p, p2)
+	local v2 = v[p2.type]
 
-	if v18 then
-		return v18(t7, p1.payload)
+	if v2 then
+		return v2(p, p2.payload)
 	end
 
-	error("Unknown action: " .. p1.type)
+	error("Unknown action: " .. p2.type)
 end
 
-local v8 = React.createContext(nil)
-
-local function AppShortcutBarStateProvider(t8: {[any]: any}) -- line: 60
-	-- upvalues: React (copy), registryReducer (copy), v8 (copy)
-	local v20, v21 = React.useReducer(registryReducer, {
-		heldProgress = {}
-	})
-
-	return React.createElement(v8.Provider, {
-		value = {
-			state = v20,
-			dispatch = v21
-		}
-	}, t8.children)
+local context = React.createContext(nil)
+local function AppShortcutBarStateProvider(p)
+	local state, dispatch = React.useReducer(registryReducer, { heldProgress = {} })
+	return React.createElement(context.Provider, {
+		value = { state = state, dispatch = dispatch }
+	}, p.children)
 end
 
 return {
-	Context = v8,
+	Context = context,
 	Provider = AppShortcutBarStateProvider,
-	useDispatchButtonHoldStarted = v4.useDispatchButtonHoldStarted,
-	useDispatchButtonHoldEnded = v4.useDispatchButtonHoldEnded,
-	useHeldProgressByEvent = v4.useHeldProgressByEvent,
-	AppShortcutBarStateActionEnum = t1
+	useDispatchButtonHoldStarted = buttonHoldStore.useDispatchButtonHoldStarted,
+	useDispatchButtonHoldEnded = buttonHoldStore.useDispatchButtonHoldEnded,
+	useHeldProgressByEvent = buttonHoldStore.useHeldProgressByEvent,
+	AppShortcutBarStateActionEnum = appShortcutBarStateActionEnum
 }

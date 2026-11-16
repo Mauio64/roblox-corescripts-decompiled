@@ -1,0 +1,17 @@
+require(script.Parent.ViewRecycler)
+require(script.ReactAdapter.ItemHooks)
+local ReactRoblox = require(script.Parent.ReactRoblox)
+require(script.ReactAdapter.RecyclableViewReadiness)
+require(script.ReactAdapter.RecyclableViewSwitch)
+require(script.ReactAdapter.RecyclingScope)
+require(script.ReactAdapter.RecyclingViewport)
+require(script.ReactAdapter.VirtualList)
+require(script.ReactAdapter.createPinnedItem)
+local createReactAdapter = require(script.ReactAdapter.Private.createReactAdapter)
+require(script.ReactAdapter.createRecyclableComponent)
+require(script.ReactAdapter.createRecyclableView)
+require(script.ReactAdapter.createVirtualList)
+
+require(script.ReactAdapter.useRectPlacement)
+
+return createReactAdapter({ createPortal = ReactRoblox.createPortal })

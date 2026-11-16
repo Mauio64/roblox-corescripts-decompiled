@@ -1,15 +1,17 @@
-local function removeValue(p1, p2) -- line: 4
-	local t1 = {}
-	local n1 = 1
+local function removeValue(list, p)
+	local result = {}
+	local v = 1
 
-	for i = 1, #p1 do
-		if p2 ~= p1[i] then
-			t1[n1] = p1[i]
-			n1 += 1
+	for i = 1, #list do
+		if list[i] == p then
+			continue
 		end
+
+		result[v] = list[i]
+		v += 1
 	end
 
-	return t1
+	return result
 end
 
 return removeValue

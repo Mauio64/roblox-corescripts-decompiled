@@ -1,11 +1,20 @@
-return function(p1, s1: string) -- line: 19
-	for _, v in ipairs(s1:split(".")) do
-		if not p1[v] then
+local AppChat = script:FindFirstAncestor("AppChat")
+
+local FFlagAppChatGetDeepValuePreserveFalse = require(AppChat.Flags.FFlagAppChatGetDeepValuePreserveFalse)
+local getDeepValue2 = require(script.Parent.getDeepValue2)
+
+if FFlagAppChatGetDeepValuePreserveFalse then
+	return getDeepValue2
+end
+
+return function(p, value: string)
+	for _, v in ipairs(value:split(".")) do
+		if not p[v] then
 			return nil
 		end
 
-		p1 = p1[v]
+		p = p[v]
 	end
 
-	return p1
+	return p
 end

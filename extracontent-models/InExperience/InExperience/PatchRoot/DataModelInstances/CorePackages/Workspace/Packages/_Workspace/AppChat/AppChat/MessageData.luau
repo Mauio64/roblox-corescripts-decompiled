@@ -1,3 +1,1 @@
-return {
-	Types = require(script.Types)
-}
+return { Types = require(script.Types) }

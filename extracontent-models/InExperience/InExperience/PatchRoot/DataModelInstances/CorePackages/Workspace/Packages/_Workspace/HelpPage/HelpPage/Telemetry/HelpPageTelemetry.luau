@@ -1,27 +1,23 @@
 local TelemetryService = game:GetService("TelemetryService")
 local StandardFieldEnum = require(script.Parent.StandardFieldEnum)
-local v3 = game:DefineFastInt("HelpPageThrottleHundredthsPercent", 0)
-local t1 = {}
 
-t1.__index = t1
+local defineFastInt = game:DefineFastInt("HelpPageThrottleHundredthsPercent", 0)
 
-function t1.new() -- line: 35
-	-- upvalues: t1 (copy)
-	return (setmetatable({}, t1))
+local HelpPageTelemetry = {}
+HelpPageTelemetry.__index = HelpPageTelemetry
+
+function HelpPageTelemetry.new()
+	return (setmetatable({}, HelpPageTelemetry))
 end
 
-t1.telemetryConfigs = {
+HelpPageTelemetry.telemetryConfigs = {
 	helpPageInteraction = {
 		eventConfig = {
 			eventName = "ingame_menu_action",
-			description = "[[Event to track input type and screen orientation for the help page.]]",
 			backends = { "EventIngest" },
-			throttlingPercentage = v3,
-			lastUpdated = {
-				2025,
-				8,
-				25
-			}
+			throttlingPercentage = defineFastInt,
+			lastUpdated = { 2025, 8, 25 },
+			description = "[[Event to track input type and screen orientation for the help page.]]"
 		},
 		standardizedFields = {
 			StandardFieldEnum.addUniverseId,
@@ -32,18 +28,13 @@ t1.telemetryConfigs = {
 	}
 }
 
-function t1.logHelpPageInteraction(_: {[any]: any}, s1: string, t3: {[any]: any}) -- line: 59
-	-- upvalues: t1 (copy), TelemetryService (copy)
-	local eventConfig = t1.telemetryConfigs.helpPageInteraction.eventConfig
-	local standardizedFields = t1.telemetryConfigs.helpPageInteraction.standardizedFields
-
-	TelemetryService:LogEvent(eventConfig, {
-		eventContext = s1,
-		standardizedFields = standardizedFields,
-		customFields = t3
+function HelpPageTelemetry.logHelpPageInteraction(_, eventContext: string, customFields)
+	TelemetryService:LogEvent(HelpPageTelemetry.telemetryConfigs.helpPageInteraction.eventConfig, {
+		eventContext = eventContext,
+		standardizedFields = HelpPageTelemetry.telemetryConfigs.helpPageInteraction.standardizedFields,
+		customFields = customFields
 	})
 end
 
-t1.default = t1.new()
-
-return t1
+HelpPageTelemetry.default = HelpPageTelemetry.new()
+return HelpPageTelemetry

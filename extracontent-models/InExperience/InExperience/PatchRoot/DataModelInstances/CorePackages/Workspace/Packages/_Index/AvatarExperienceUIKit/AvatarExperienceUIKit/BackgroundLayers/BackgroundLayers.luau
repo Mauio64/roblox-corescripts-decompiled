@@ -1,43 +1,55 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
-local React = require(Parent.React)
-local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(parent.React)
+
 local BackgroundGradient = require(script.Parent.BackgroundGradient)
 local BackgroundImage = require(script.Parent.BackgroundImage)
-local FFlagAXHeroWidget = AvatarExperienceFlags.FFlagAXHeroWidget
 
-local function BackgroundLayers(t1: {[any]: any}) -- line: 40
-	-- upvalues: React (copy), BackgroundGradient (copy), BackgroundImage (copy), FFlagAXHeroWidget (copy)
-	local t2 = {}
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXBackgroundImageOnLoaded = AvatarExperienceFlags.FFlagAXBackgroundImageOnLoaded
 
-	for v10, v11 in t1.backgroundLayers do
-		local v12 = (t1.ZIndex or 0) - (#t1.backgroundLayers - v10)
+local function BackgroundLayers(props)
+	local children = {}
 
-		if v11.type == "GradientBackground" then
-			t2[`GradientBackground_{ v10 }`] = React.createElement(BackgroundGradient, {
-				colorSequence = v11.colorSequence,
-				cornerRadius = t1.cornerRadius,
-				offset = v11.offset,
-				rotation = v11.rotation,
-				transparency = v11.transparency,
-				ZIndex = v12,
-				tag = v11.tag
+	for k, backgroundLayer in props.backgroundLayers do
+		local zIndex = (props.ZIndex or 0) - (#props.backgroundLayers - k)
+
+		if backgroundLayer.type == "GradientBackground" then
+			children[`GradientBackground_{k}`] = React.createElement(BackgroundGradient, {
+				colorSequence = backgroundLayer.colorSequence,
+				cornerRadius = props.cornerRadius,
+				offset = backgroundLayer.offset,
+				rotation = backgroundLayer.rotation,
+				transparency = backgroundLayer.transparency,
+				ZIndex = zIndex,
+				tag = backgroundLayer.tag
 			})
-		elseif v11.type == "ImageBackground" then
-			t2[`ImageBackground_{ v10 }`] = React.createElement(BackgroundImage, {
-				anchorPoint = v11.anchorPoint,
-				color = v11.color,
-				cornerRadius = t1.cornerRadius,
-				position = v11.position,
-				resourceIdentifier = v11.resourceIdentifier,
-				transparency = v11.transparency,
-				ZIndex = v12,
-				tag = v11.tag,
-				scaleType = if not FFlagAXHeroWidget then nil else t1.imageScaleType
-			})
+		elseif backgroundLayer.type == "ImageBackground" then
+			local formatted = `ImageBackground_{k}`
+			local createElement = React.createElement
+			local v = {
+				anchorPoint = backgroundLayer.anchorPoint,
+				color = backgroundLayer.color,
+				cornerRadius = props.cornerRadius,
+				position = backgroundLayer.position,
+				resourceIdentifier = backgroundLayer.resourceIdentifier,
+				transparency = backgroundLayer.transparency,
+				ZIndex = zIndex,
+				tag = backgroundLayer.tag,
+				scaleType = props.imageScaleType,
+				onLoaded = 0
+			}
+			local onLoaded
+
+			if FFlagAXBackgroundImageOnLoaded then
+				onLoaded = props.onImageLoaded
+			end
+
+			v.onLoaded = onLoaded
+			children[formatted] = createElement(BackgroundImage, v)
 		end
 	end
 
-	return React.createElement(React.Fragment, nil, t2)
+	return React.createElement(React.Fragment, nil, children)
 end
 
 return BackgroundLayers

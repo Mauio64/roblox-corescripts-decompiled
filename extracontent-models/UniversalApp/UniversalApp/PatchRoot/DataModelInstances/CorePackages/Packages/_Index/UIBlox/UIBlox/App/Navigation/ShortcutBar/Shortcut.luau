@@ -1,64 +1,79 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local UIBloxConfig = require(ParentParentParent.UIBloxConfig)
-local React = require(ParentParentParentParent.React)
-local Object = require(ParentParentParentParent.LuauPolyfill).Object
-local Foundation = require(ParentParentParentParent.Foundation)
-local useStyle = require(ParentParentParent.Core.Style.useStyle)
-local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
-local IconSize = require(ParentParent.ImageSet.Enum.IconSize)
-local getIconSize = require(ParentParent.ImageSet.getIconSize)
-local GenericTextLabel = require(ParentParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local KeyLabel = require(ParentParent.Menu.KeyLabel.KeyLabel)
-local ProgressIconAnimated = require(script.Parent.ProgressIconAnimated)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local UIBloxConfig = require(parent2.UIBloxConfig)
 
+local React = require(parent3.React)
+local LuauPolyfill = require(parent3.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local Foundation = require(parent3.Foundation)
+
+local useStyle = require(parent2.Core.Style.useStyle)
+local ImageSetComponent = require(parent2.Core.ImageSet.ImageSetComponent)
+
+local IconSize = require(parent.ImageSet.Enum.IconSize)
+local getIconSize = require(parent.ImageSet.getIconSize)
+local GenericTextLabel = require(parent2.Core.Text.GenericTextLabel.GenericTextLabel)
+local KeyLabel = require(parent.Menu.KeyLabel.KeyLabel)
+
+local ProgressIconAnimated = require(script.Parent.ProgressIconAnimated)
 require(script.Parent.Types)
 
-local t1 = {
+local v = {
 	iconLabelGap = 6,
 	actionTextSpacingLeading = 12,
 	size = UDim2.fromOffset(0, 0),
 	automaticSize = Enum.AutomaticSize.XY
 }
-local t2 = {
+
+local v2 = {
 	hasProgress = false,
 	animationTriggerTime = 0.3,
 	animationKeyHoldingTime = 1.5,
 	animationCoolDownTime = 0.75
 }
 
-local function renderIcon(t3: {[any]: any}, p1) -- line: 43
-	-- upvalues: Foundation (copy), UIBloxConfig (copy), getIconSize (copy), IconSize (copy), React (copy), KeyLabel (copy), ImageSetComponent (copy), ProgressIconAnimated (copy)
-	local layoutOrder = t3.layoutOrder
-	local itemProps = t3.itemProps
-	local v23 = Foundation.Hooks.useTokens()
-	local v24 = if not UIBloxConfig.useTokenizedShortcutBar then getIconSize(IconSize.Medium) else v23.Size.Size_600
+local function renderIcon(p, p2)
+	local layoutOrder = p.layoutOrder
+	local itemProps = p.itemProps
+	local v3 = Foundation.Hooks.useTokens()
+	local v4
+
+	if UIBloxConfig.useTokenizedShortcutBar then
+		v4 = v3.Size.Size_600
+	else
+		v4 = getIconSize(IconSize.Medium)
+	end
+
 	local hasProgress = itemProps.hasProgress
-	local v26 = nil
+	local v5
 
 	if hasProgress then
-		v26 = itemProps
+		v5 = itemProps
 	end
 
 	local icon = itemProps.icon
-	local AutomaticSizeX = nil
-	local v29 = typeof(icon) == "EnumItem"
-	local v30 = typeof(icon) == "table" and #icon > 0
 
-	if v29 or v30 then
-		AutomaticSizeX = Enum.AutomaticSize.X
+	local x = nil
+	local v6 = typeof(icon) == "EnumItem"
+	local v7
+
+	if typeof(icon) == "table" then
+		v7 = #icon > 0
+	else
+		v7 = false
 	end
 
-	local v31
+	if v6 or v7 then
+		x = Enum.AutomaticSize.X
+	end
 
-	if v29 then
-		v31 = React.createElement(KeyLabel, {
-			iconThemeKey = "IconEmphasis",
-			keyCode = icon
-		})
-	elseif v30 then
-		local t4 = {
+	local image
+
+	if v6 then
+		image = React.createElement(KeyLabel, { keyCode = icon, iconThemeKey = "IconEmphasis" })
+	elseif v7 then
+		local children = {
 			Layout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
@@ -66,97 +81,171 @@ local function renderIcon(t3: {[any]: any}, p1) -- line: 43
 			})
 		}
 
-		for v33, v34 in icon do
-			t4["KeyLabel" .. v33] = React.createElement(KeyLabel, {
-				iconThemeKey = "IconEmphasis",
-				keyCode = v34,
-				LayoutOrder = v33
+		for k, item in icon do
+			children["KeyLabel" .. k] = React.createElement(KeyLabel, {
+				keyCode = item,
+				LayoutOrder = k,
+				iconThemeKey = "IconEmphasis"
 			})
 		end
 
-		v31 = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(0, 0),
-			AutomaticSize = Enum.AutomaticSize.XY
-		}, t4)
+		image = React.createElement(
+			"Frame",
+			{
+				Size = UDim2.fromScale(0, 0),
+				AutomaticSize = Enum.AutomaticSize.XY,
+				BackgroundTransparency = 1
+			},
+			children
+		)
 	else
-		v31 = React.createElement(ImageSetComponent.Label, {
-			BackgroundTransparency = 1,
+		image = React.createElement(ImageSetComponent.Label, {
 			Size = UDim2.fromScale(1, 1),
 			Image = icon,
-			ImageColor3 = p1.Theme.TextEmphasis.Color,
-			ImageTransparency = p1.Theme.TextEmphasis.Transparency
+			ImageColor3 = p2.Theme.TextEmphasis.Color,
+			ImageTransparency = p2.Theme.TextEmphasis.Transparency,
+			BackgroundTransparency = 1
 		})
 	end
 
-	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		BackgroundTransparency = 1,
+	local createElement = React.createElement
+	local v8 = {
 		LayoutOrder = layoutOrder,
-		Size = UDim2.fromOffset(v24, v24),
-		AutomaticSize = AutomaticSizeX
-	}, {
-		ProgressIcon = if not hasProgress then nil else React.createElement(ProgressIconAnimated, v26),
-		Image = if not hasProgress then v31 else nil
-	})
-end
-local function Shortcut(p2) -- line: 119
-	-- upvalues: Object (copy), t1 (copy), t2 (copy), useStyle (copy), Foundation (copy), React (copy), UIBloxConfig (copy), GenericTextLabel (copy), renderIcon (copy)
-	local v36 = Object.assign({}, t1, p2)
-	local v37 = Object.assign({}, t2, v36.publicProps)
-	local v38 = useStyle()
-	local v39 = Foundation.Hooks.useTokens()
-	local index = v36.index
-
-	return React.createElement("Frame", {
+		Size = UDim2.fromOffset(v4, v4),
+		AutomaticSize = x,
 		BorderSizePixel = 0,
-		BackgroundTransparency = 1,
-		LayoutOrder = index,
-		Size = if not UIBloxConfig.enableShortcutCustomization then UDim2.fromOffset(0, 0) else v36.size,
-		AutomaticSize = if not UIBloxConfig.enableShortcutCustomization then Enum.AutomaticSize.XY else v36.automaticSize
-	}, {
+		BackgroundTransparency = 1
+	}
+	local progressIcon
+
+	if hasProgress then
+		progressIcon = React.createElement(ProgressIconAnimated, v5)
+	end
+
+	if hasProgress then
+		image = nil
+	end
+
+	return createElement("Frame", v8, { ProgressIcon = progressIcon, Image = image })
+end
+
+local function Shortcut(p)
+	local v3 = Object.assign({}, v, p)
+	local itemProps = Object.assign({}, v2, v3.publicProps)
+
+	local v4 = useStyle()
+	local v5 = Foundation.Hooks.useTokens()
+	local index = v3.index
+
+	local createElement = React.createElement
+	local size
+
+	if UIBloxConfig.enableShortcutCustomization then
+		size = v3.size
+	else
+		size = UDim2.fromOffset(0, 0)
+	end
+
+	local automaticSize
+
+	if UIBloxConfig.enableShortcutCustomization then
+		automaticSize = v3.automaticSize
+	else
+		automaticSize = Enum.AutomaticSize.XY
+	end
+
+	local v6 = {
 		UIListLayout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, v36.iconLabelGap)
+			Padding = UDim.new(0, v3.iconLabelGap)
 		}),
-		ActionText = if not v37.actionText then nil else React.createElement("Frame", {
+		ActionText = 0,
+		Icon = 0,
+		LabelText = 0
+	}
+	local actionText
+
+	if itemProps.actionText then
+		actionText = React.createElement("Frame", {
 			LayoutOrder = 1,
+			Size = UDim2.fromOffset(0, 0),
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
-			Size = UDim2.fromOffset(0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY
 		}, {
 			Padding = React.createElement("UIPadding", {
-				PaddingLeft = UDim.new(0, v36.actionTextSpacingLeading)
+				PaddingLeft = UDim.new(0, v3.actionTextSpacingLeading)
 			}),
 			Label = React.createElement(GenericTextLabel, {
-				BackgroundTransparency = 1,
 				Size = UDim2.fromOffset(0, 0),
 				AutomaticSize = Enum.AutomaticSize.XY,
-				Text = v37.actionText,
-				colorStyle = v38.Theme.TextEmphasis,
-				fontStyle = v38.Font.SubHeader1
+				Text = itemProps.actionText,
+				colorStyle = v4.Theme.TextEmphasis,
+				fontStyle = v4.Font.SubHeader1,
+				BackgroundTransparency = 1
 			})
-		}),
-		Icon = if not UIBloxConfig.enableShortcutCustomization or not v36.renderIcon then renderIcon({
-			layoutOrder = 2,
-			itemProps = v37
-		}, v38) else v36.renderIcon({
-			layoutOrder = 2
-		}),
-		LabelText = React.createElement(GenericTextLabel, {
-			LayoutOrder = 3,
-			BackgroundTransparency = 1,
-			Size = UDim2.fromOffset(0, 0),
-			AutomaticSize = Enum.AutomaticSize.XY,
-			Text = v37.text,
-			TextSize = if not UIBloxConfig.enableShortcutCustomization or not v36.labelTextSize then if not UIBloxConfig.useTokenizedShortcutBar then nil else v39.FontSize.FontSize_50 else v36.labelTextSize,
-			colorStyle = if not UIBloxConfig.enableShortcutCustomization or not v36.labelColorStyle then v38.Theme.TextEmphasis else v36.labelColorStyle,
-			fontStyle = if not UIBloxConfig.enableShortcutCustomization or not v36.labelFontStyle then v38.Font.SubHeader1 else v36.labelFontStyle
 		})
-	})
+	end
+
+	v6.ActionText = actionText
+	local icon
+
+	if UIBloxConfig.enableShortcutCustomization and v3.renderIcon then
+		icon = v3.renderIcon({ layoutOrder = 2 })
+	else
+		icon = renderIcon({ layoutOrder = 2, itemProps = itemProps }, v4)
+	end
+
+	v6.Icon = icon
+
+	local createElement2 = React.createElement
+	local v7 = {
+		LayoutOrder = 3,
+		Size = UDim2.fromOffset(0, 0),
+		AutomaticSize = Enum.AutomaticSize.XY,
+		Text = itemProps.text,
+		TextSize = 0,
+		colorStyle = 0,
+		fontStyle = 0,
+		BackgroundTransparency = 1
+	}
+	local textSize
+
+	if UIBloxConfig.enableShortcutCustomization and v3.labelTextSize then
+		textSize = v3.labelTextSize
+	elseif UIBloxConfig.useTokenizedShortcutBar then
+		textSize = v5.FontSize.FontSize_50
+	end
+
+	v7.TextSize = textSize
+	local colorStyle
+
+	if UIBloxConfig.enableShortcutCustomization and v3.labelColorStyle then
+		colorStyle = v3.labelColorStyle
+	else
+		colorStyle = v4.Theme.TextEmphasis
+	end
+
+	v7.colorStyle = colorStyle
+	local fontStyle
+
+	if UIBloxConfig.enableShortcutCustomization and v3.labelFontStyle then
+		fontStyle = v3.labelFontStyle
+	else
+		fontStyle = v4.Font.SubHeader1
+	end
+
+	v7.fontStyle = fontStyle
+	v6.LabelText = createElement2(GenericTextLabel, v7)
+	return createElement("Frame", {
+		LayoutOrder = index,
+		Size = size,
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		AutomaticSize = automaticSize
+	}, v6)
 end
 
 return Shortcut

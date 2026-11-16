@@ -1,27 +1,21 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Signals = require(ParentParentParent.Signals)
-local HttpSessionTracker = require(ParentParent.HttpSessionTracker)
+local parent = script.Parent.Parent
 
-require(ParentParentParent.InternalHttpStore)
+local parent2 = parent.Parent
 
-local function createCancelRequestHandler(n1: number) -- line: 11
-	-- upvalues: Signals (copy), HttpSessionTracker (copy)
-	return function(p1) -- line: 12
-		-- upvalues: Signals (copy), n1 (copy), HttpSessionTracker (copy)
-		return Signals.createComputed(function(p2) -- line: 13
-			-- upvalues: p1 (copy), n1 (copy), HttpSessionTracker (copy)
-			local v9 = p1(p2)
+local Signals = require(parent2.Signals)
+local HttpSessionTracker = require(parent.HttpSessionTracker)
+require(parent2.InternalHttpStore)
 
-			if n1 ~= HttpSessionTracker.currentSession() then
-				return {
-					status = "Failed",
-					cancelled = true,
-					config = v9.config
-				}
+local function createCancelRequestHandler(p: number)
+	return function(callback)
+		return Signals.createComputed(function(p2)
+			local v = callback(p2)
+
+			if p == HttpSessionTracker.currentSession() then
+				return v
 			end
 
-			return v9
+			return { status = "Failed", config = v.config, cancelled = true }
 		end)
 	end
 end

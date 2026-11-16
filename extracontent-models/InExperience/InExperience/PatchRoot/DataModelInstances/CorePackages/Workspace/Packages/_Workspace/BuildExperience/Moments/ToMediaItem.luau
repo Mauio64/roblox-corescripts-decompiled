@@ -1,3 +1,4 @@
-local _Index = script.Parent.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent.Parent._Index
+local toMediaItem = require(index.Moments.Moments.Components.Feed.Media.toMediaItem)
 
-return require(_Index.Moments.Moments.Components.Feed.Media.toMediaItem)
+return toMediaItem

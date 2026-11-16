@@ -1,9 +1,10 @@
-local Parent = script:FindFirstAncestor("MomentsCommon").Parent
-local useAssetFetchStatus = require(Parent.RoactUtils).Hooks.useAssetFetchStatus
+local parent = script:FindFirstAncestor("MomentsCommon").Parent
 
-local function useImageLoadingState(s1: string?) -- line: 21
-	-- upvalues: useAssetFetchStatus (copy)
-	return useAssetFetchStatus(s1) == Enum.AssetFetchStatus.Success
+local RoactUtils = require(parent.RoactUtils)
+local useAssetFetchStatus = RoactUtils.Hooks.useAssetFetchStatus
+
+local function useImageLoadingState(p: string?): boolean
+	return useAssetFetchStatus(p) == Enum.AssetFetchStatus.Success
 end
 
 return useImageLoadingState

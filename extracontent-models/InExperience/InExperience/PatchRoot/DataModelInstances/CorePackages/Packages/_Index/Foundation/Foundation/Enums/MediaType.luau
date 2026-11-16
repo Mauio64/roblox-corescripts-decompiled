@@ -1,1 +1,3 @@
-return (require(script.Parent.ThumbnailType))
+local ThumbnailType = require(script.Parent.ThumbnailType)
+
+return ThumbnailType

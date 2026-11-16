@@ -1,48 +1,45 @@
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
-local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
-local default = require(Parent.LoggingProtocol).default
-local Dash = require(Parent.Dash)
-local isSpatial = require(Parent.AppCommonLib).isSpatial
 
-local function getAXCounterV2Metadata(t1: {[any]: any}?) -- line: 15
-	-- upvalues: UserInputService (copy), isSpatial (copy), RunService (copy), HttpService (copy), Dash (copy)
-	local Platform = UserInputService:GetPlatform()
+local parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
 
-	if isSpatial() then
-		Platform = "VR"
-	end
+local LoggingProtocol = require(parent.LoggingProtocol)
+local default = LoggingProtocol.default
+local Dash = require(parent.Dash)
 
-	local t2 = {
+local AppCommonLib = require(parent.AppCommonLib)
+local isSpatial = AppCommonLib.isSpatial
+
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXUnifiedEventCounters = AvatarExperienceFlags.FFlagAXUnifiedEventCounters
+
+local function getAXCounterV2Metadata(items)
+	local platform = UserInputService:GetPlatform()
+	local platform2 = isSpatial() and "VR" or platform
+
+	local v = {
 		AppVersion = RunService:GetRobloxVersion(),
 		UserAgent = HttpService:GetUserAgent(),
 		CoreScriptVersion = RunService:GetCoreScriptVersion(),
-		Platform = Platform
+		Platform = platform2
 	}
 
-	if t1 and next(t1) ~= nil then
-		t2 = Dash.assign({}, t2, t1)
+	if items and next(items) ~= nil then
+		return (Dash.assign({}, v, items))
 	end
 
-	return t2
+	return v
 end
-local function sendAXCounterV2(s1: string, t3: {[any]: any}?) -- line: 35
-	-- upvalues: default (copy), getAXCounterV2Metadata (copy)
-	local t4 = {
-		description = "Counter to track various Avatar Experience events.",
-		links = "",
-		eventName = "AvatarExperience_" .. s1,
-		backends = { default.TelemetryBackends.Counter },
-		lastUpdated = {
-			2025,
-			10,
-			30
-		}
-	}
-	local v16 = getAXCounterV2Metadata(t3)
 
-	default:logRobloxTelemetryCounter(t4, 1, v16)
+local function sendAXCounterV2(p: string, p2, p3: number?)
+	default:logRobloxTelemetryCounter({
+		eventName = "AvatarExperience_" .. p,
+		backends = { default.TelemetryBackends.Counter },
+		lastUpdated = { 2025, 10, 30 },
+		description = "Counter to track various Avatar Experience events.",
+		links = ""
+	}, FFlagAXUnifiedEventCounters and p3 or 1, getAXCounterV2Metadata(p2))
 end
 
 return sendAXCounterV2

@@ -1,67 +1,66 @@
-local ParentParent = script.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local Rodux = require(ParentParent.Rodux)
-local RoactRodux = require(ParentParent.RoactRodux)
-local RoactServices = require(ParentParent.RoactServices).RoactServices
-local LocalizationProvider = require(ParentParent.Localization).LocalizationProvider
-local Localization = require(ParentParent.RobloxAppLocales).Localization
-local Foundation = require(ParentParent.Foundation)
+local parent = script.Parent.Parent.Parent
+
+local React = require(parent.React)
+
+local Rodux = require(parent.Rodux)
+local RoactRodux = require(parent.RoactRodux)
+local RoactServices = require(parent.RoactServices)
+local roactServices = RoactServices.RoactServices
+local Localization = require(parent.Localization)
+local LocalizationProvider = Localization.LocalizationProvider
+local RobloxAppLocales = require(parent.RobloxAppLocales)
+local localization = RobloxAppLocales.Localization
+
+local Foundation = require(parent.Foundation)
 local FoundationProvider = Foundation.FoundationProvider
-local AppStyleProvider = require(ParentParent.Style).AppStyleProvider
-local Constants = require(ParentParent.Style).Constants
-local t1 = {
-	themeName = Constants.ThemeName.Dark,
+local ColorMode = Foundation.Enums.ColorMode
+
+local Style = require(parent.Style)
+local AppStyleProvider = Style.AppStyleProvider
+local Style2 = require(parent.Style)
+local Constants = Style2.Constants
+
+local style = {
+	themeName = ColorMode.Dark,
 	fontName = Constants.FontName.Gotham,
 	Tokens = {
-		Global = {
-			Size_350 = 28,
-			Size_500 = 40
-		}
+		Global = { Size_350 = 28, Size_500 = 40 }
 	}
 }
-local t2 = {
+
+local v = {
 	ScreenSize = Vector2.new(500, 500),
 	SetAlias = {
 		Aliases = {
-			byUserId = {
-				["1"] = "foo"
-			}
+			byUserId = { ["1"] = "foo" }
 		}
 	}
 }
 
-local function v14(p1, p2) -- line: 42
-	-- upvalues: Rodux (copy)
-	local v18 = p2 or function(p3) -- line: 43
-		return p3
-	end
-
-	return Rodux.Store.new(v18, p1 or {}, { Rodux.thunkMiddleware })
+local function fn(options, p)
+	return Rodux.Store.new(p or function(p2)
+		return p2
+	end, options or {}, { Rodux.thunkMiddleware })
 end
 
-local v15 = Localization.new("en-us")
+local enus = localization.new("en-us")
 
 return {
-	mockServices = function(p4) -- line: 52
-		-- upvalues: React (copy), RoactRodux (copy), v14 (copy), t2 (copy), FoundationProvider (copy), Foundation (copy), AppStyleProvider (copy), t1 (copy), LocalizationProvider (copy), v15 (copy), RoactServices (copy)
-		local t3 = {
-			storeProvider = React.createElement(RoactRodux.StoreProvider, {
-				store = v14(t2)
-			}, {
+	mockServices = function(p)
+		local v2 = {
+			storeProvider = React.createElement(RoactRodux.StoreProvider, { store = fn(v) }, {
 				foundationProvider = React.createElement(FoundationProvider, {
-					theme = Foundation.Enums.Theme.Dark
+					colorMode = ColorMode.Dark
 				}, {
-					styleProvider = React.createElement(AppStyleProvider, {
-						style = t1
-					}, {
+					styleProvider = React.createElement(AppStyleProvider, { style = style }, {
 						localizationProvider = React.createElement(LocalizationProvider, {
-							localization = v15
-						}, p4)
+							localization = enus
+						}, p)
 					})
 				})
 			})
 		}
 
-		return (React.createElement(RoactServices.ServiceProvider, {}, t3))
+		return (React.createElement(roactServices.ServiceProvider, {}, v2))
 	end
 }

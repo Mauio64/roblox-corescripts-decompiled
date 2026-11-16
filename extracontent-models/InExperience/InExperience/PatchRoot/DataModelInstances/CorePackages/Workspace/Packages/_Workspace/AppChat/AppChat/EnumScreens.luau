@@ -16,7 +16,6 @@ return {
 	SquadVoiceReportAbuse = "SquadVoiceReportAbuse",
 	AddFriends = "AddFriends",
 	AppChatReportAbuse = "AppChatReportAbuse",
-	AppChatTrustedContactsModal = "AppChatTrustedContactsModal",
 	BlockingModal = "BlockingModal",
 	CreateUnfilteredChatPartialModal = "CreateUnfilteredChatPartialModal",
 	LearnMorePartialModal = "LearnMorePartialModal",
@@ -24,12 +23,12 @@ return {
 	TrustedConnectionsUpsell = "TrustedConnectionsUpsell",
 	GroupOSADialog = "GroupOSADialog",
 	GameDetail = "GameDetail",
+	MomentsImmersive = "MomentsImmersive",
 	Notifications = "Notifications",
 	PrivacySettings = "PrivacySettings",
 	ReportAbuse = "ReportAbuse",
 	ViewUserProfile = "ViewUserProfile",
 	Groups = "Groups",
-	UnfilteredThreadsLearnMore = "UnfilteredThreadsLearnMore",
 	FriendsLanding = "FriendsLanding",
 	Home = "Home"
 }

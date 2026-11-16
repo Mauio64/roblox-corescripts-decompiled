@@ -1,33 +1,34 @@
 local Immutable = require(script.Parent.Parent.Immutable)
+
 local ClientScriptsUpdateSearchFilter = require(script.Parent.Parent.Actions.ClientScriptsUpdateSearchFilter)
 local ServerScriptsUpdateSearchFilter = require(script.Parent.Parent.Actions.ServerScriptsUpdateSearchFilter)
 
-return function(t1: {[any]: any}?, t2: {[any]: any}) -- line: 13
-	-- upvalues: ClientScriptsUpdateSearchFilter (copy), Immutable (copy), ServerScriptsUpdateSearchFilter (copy)
-	local v6 = t1 or {
-		clientSearchTerm = "",
-		serverSearchTerm = "",
-		clientTypeFilters = {},
-		serverTypeFilters = {}
+return function(p, data)
+	local selected = p
+		or {
+			clientSearchTerm = "",
+			clientTypeFilters = {},
+			serverSearchTerm = "",
+			serverTypeFilters = {}
+		}
+
+	if data.type == ClientScriptsUpdateSearchFilter.name then
+		local v = {
+			clientSearchTerm = data.searchTerm,
+			clientTypeFilters = Immutable.JoinDictionaries(selected.clientTypeFilters, data.filterTypes)
+		}
+
+		return (Immutable.JoinDictionaries(selected, v))
+	end
+
+	if data.type ~= ServerScriptsUpdateSearchFilter.name then
+		return selected
+	end
+
+	local v = {
+		serverSearchTerm = data.searchTerm,
+		serverTypeFilters = Immutable.JoinDictionaries(selected.serverTypeFilters, data.filterTypes)
 	}
 
-	if t2.type == ClientScriptsUpdateSearchFilter.name then
-		local t3 = {
-			clientSearchTerm = t2.searchTerm,
-			clientTypeFilters = Immutable.JoinDictionaries(v6.clientTypeFilters, t2.filterTypes)
-		}
-
-		return (Immutable.JoinDictionaries(v6, t3))
-	end
-
-	if t2.type == ServerScriptsUpdateSearchFilter.name then
-		local t4 = {
-			serverSearchTerm = t2.searchTerm,
-			serverTypeFilters = Immutable.JoinDictionaries(v6.serverTypeFilters, t2.filterTypes)
-		}
-
-		return (Immutable.JoinDictionaries(v6, t4))
-	end
-
-	return v6
+	return (Immutable.JoinDictionaries(selected, v))
 end

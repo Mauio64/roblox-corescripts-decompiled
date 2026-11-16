@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerListEnabled", function(p1) -- line: 5
-	return {
-		isEnabled = p1
-	}
+local ActionCreator = require(script.Parent.Parent.ActionCreator)
+
+return ActionCreator("SetPlayerListEnabled", function(isEnabled)
+	return { isEnabled = isEnabled }
 end)

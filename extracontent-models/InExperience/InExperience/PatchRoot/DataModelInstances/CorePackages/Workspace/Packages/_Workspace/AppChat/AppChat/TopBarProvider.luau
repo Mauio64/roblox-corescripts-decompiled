@@ -1,39 +1,31 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local SignalsReact = require(AppChatParent.SignalsReact)
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
-local TopBarContext = require(AppChat.TopBarContext)
 
-local function TopBarFromStore(p1) -- line: 15
-	-- upvalues: GetTopBarStore (copy), SignalsReact (copy), React (copy)
-	local screenName = p1.screenName
-	local render = p1.render
-	local v11 = GetTopBarStore(false)
-	local v12 = v11.getScreenTopBar(screenName)
-	local v13 = SignalsReact.useSignalState(v12)
+local function TopBarFromStore(p)
+	local screenName = p.screenName
+	local render = p.render
 
-	return render((React.useMemo(function() -- line: 23
-		-- upvalues: screenName (copy), v13 (copy), v11 (copy)
+	local topBarStore = GetTopBarStore(false)
+	local screenTopBar = topBarStore.getScreenTopBar(screenName)
+	local v = SignalsReact.useSignalState(screenTopBar)
+
+	return render((React.useMemo(function()
 		return {
-			getScreenTopBar = function(s1: string) -- line: 25
-				-- upvalues: screenName (copy), v13 (copy), v11 (copy)
-				if s1 == screenName then
-					return v13
+			getScreenTopBar = function(p2: string)
+				if p2 == screenName then
+					return v
 				end
 
-				return v11.getScreenTopBar(s1)(false)
+				return topBarStore.getScreenTopBar(p2)(false)
 			end,
-			setScreenTopBar = v11.setScreenTopBar
+			setScreenTopBar = topBarStore.setScreenTopBar
 		}
-	end, {
-		screenName,
-		v13
-	})))
+	end, { screenName, v, topBarStore.getScreenTopBar, topBarStore.setScreenTopBar })))
 end
 
-if require(AppChat.Flags.FFlagAppChatTopBarSignalsStore) then
-	return TopBarFromStore
-end
-
-return TopBarContext.Consumer
+return TopBarFromStore

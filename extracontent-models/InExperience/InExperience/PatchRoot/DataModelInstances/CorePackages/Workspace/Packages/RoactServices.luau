@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.RoactServices.RoactServices))
+local RoactServices = require(Workspace.RoactServices.RoactServices)
+
+return RoactServices

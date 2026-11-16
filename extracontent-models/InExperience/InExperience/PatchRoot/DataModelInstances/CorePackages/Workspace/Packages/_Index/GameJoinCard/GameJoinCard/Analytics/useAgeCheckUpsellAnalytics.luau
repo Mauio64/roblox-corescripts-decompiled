@@ -1,37 +1,74 @@
-local Parent = script:FindFirstAncestor("GameJoinCard").Parent
-local React = require(Parent.React)
-local dependencyArray = require(Parent.RoactUtils).Hooks.dependencyArray
-local GameJoinCardButtonAction = require(script.Parent.AnalyticsConstants).GameJoinCardButtonAction
+local parent = script:FindFirstAncestor("GameJoinCard").Parent
+
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local dependencyArray = RoactUtils.Hooks.dependencyArray
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagGameJoinCardAnalyticsCardId = SharedFlags.FFlagGameJoinCardAnalyticsCardId
+
+local AnalyticsConstants = require(script.Parent.AnalyticsConstants)
+local GameJoinCardButtonAction = AnalyticsConstants.GameJoinCardButtonAction
 local useGameJoinCardAnalytics = require(script.Parent.useGameJoinCardAnalytics)
+local UseAgeCheckUpsellAnalytics = {}
 
-return {
-	useAgeCheckCompletionLogger = function(s1: string) -- line: 45
-		-- upvalues: React (copy), useGameJoinCardAnalytics (copy)
-		local v7 = if s1 == "" then nil else s1
-
-		return React.useCallback(function(p1) -- line: 49
-			-- upvalues: useGameJoinCardAnalytics (copy), v7 (copy)
-			useGameJoinCardAnalytics.logJoinCardAgeCheckVerificationOutcome({
-				universeId = v7,
-				outcome = p1
-			})
-		end, { v7 })
-	end,
-	useAgeCheckPressLogger = function(t1: {[any]: any}) -- line: 57
-		-- upvalues: React (copy), useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), dependencyArray (copy)
-		local userId = t1.userId
-		local absolutePosition = t1.absolutePosition
-		local joinAgeCheckUpsellFlow = t1.joinAgeCheckUpsellFlow
-		local v12 = if t1.universeId == "" then nil else t1.universeId
-
-		return React.useCallback(function() -- line: 63
-			-- upvalues: useGameJoinCardAnalytics (copy), GameJoinCardButtonAction (copy), userId (copy), v12 (copy), absolutePosition (copy), joinAgeCheckUpsellFlow (copy)
-			useGameJoinCardAnalytics.logGameJoinCardButtonEvent(GameJoinCardButtonAction.AgeCheckUnlock, {
-				friendId = userId,
-				universeId = v12,
-				absolutePosition = absolutePosition
-			})
-			joinAgeCheckUpsellFlow()
-		end, dependencyArray(userId, v12, absolutePosition, joinAgeCheckUpsellFlow))
+function UseAgeCheckUpsellAnalytics.useAgeCheckCompletionLogger(universeId: string)
+	if universeId == "" then
+		universeId = nil
 	end
-}
+
+	return React.useCallback(function(outcome)
+		useGameJoinCardAnalytics.logJoinCardAgeCheckVerificationOutcome({
+			universeId = universeId,
+			outcome = outcome
+		})
+	end, { universeId })
+end
+
+function UseAgeCheckUpsellAnalytics.useAgeCheckPressLogger(data)
+	local userId = data.userId
+	local absolutePosition = data.absolutePosition
+	local joinGameCardId = data.joinGameCardId
+	local joinAgeCheckUpsellFlow = data.joinAgeCheckUpsellFlow
+	local universeId
+
+	if data.universeId == "" then
+		universeId = nil
+	else
+		universeId = data.universeId
+	end
+
+	local useCallback = React.useCallback
+	local function fn()
+		local logGameJoinCardButtonEvent = useGameJoinCardAnalytics.logGameJoinCardButtonEvent
+		local ageCheckUnlock = GameJoinCardButtonAction.AgeCheckUnlock
+		local v = {
+			friendId = userId,
+			universeId = universeId,
+			absolutePosition = absolutePosition,
+			joinGameCardId = nil
+		}
+		local joinGameCardId2
+
+		if FFlagGameJoinCardAnalyticsCardId then
+			joinGameCardId2 = joinGameCardId
+		end
+
+		v.joinGameCardId = joinGameCardId2
+		logGameJoinCardButtonEvent(ageCheckUnlock, v)
+
+		joinAgeCheckUpsellFlow()
+	end
+
+	local v
+
+	if FFlagGameJoinCardAnalyticsCardId then
+		v = dependencyArray(userId, universeId, absolutePosition, joinGameCardId, joinAgeCheckUpsellFlow)
+	else
+		v = dependencyArray(userId, universeId, absolutePosition, joinAgeCheckUpsellFlow)
+	end
+
+	return useCallback(fn, v)
+end
+
+return UseAgeCheckUpsellAnalytics

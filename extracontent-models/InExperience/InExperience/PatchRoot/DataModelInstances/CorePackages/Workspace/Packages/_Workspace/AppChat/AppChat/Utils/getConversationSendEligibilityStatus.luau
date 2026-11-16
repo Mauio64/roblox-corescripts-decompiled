@@ -1,54 +1,97 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local DataHydration = require(AppChatParent.DataHydration)
+local parent = AppChat.Parent
 
-require(AppChatParent.Signals)
+local DataHydration = require(parent.DataHydration)
+require(parent.Signals)
 
 local ConversationChannels = require(AppChat.Models.ConversationChannels)
-
 require(AppChat.Stores.GetChatModerationStatusDataHydration)
 require(AppChat.Stores.GetConversationStore)
-
 local useIsUserPending = require(AppChat.Hooks.useIsUserPending)
+local getEffectiveChatTimeoutDetails = require(AppChat.Utils.getEffectiveChatTimeoutDetails)
+local getUserSendEligibilityStatus = require(AppChat.Utils.getUserSendEligibilityStatus)
+local toTimeoutEntry = require(AppChat.Utils.toTimeoutEntry)
 
-local function isActiveTimeout(p1, s1: string?, n1: number) -- line: 31
-	-- upvalues: ConversationChannels (copy)
-	return p1 ~= nil and (p1.status == "active" and (n1 < p1.endTimestamp and s1 ~= ConversationChannels.ModerationType.TrustedComms))
+local FFlagAppChatEnforceTimeoutsOnUnfilteredChat = require(AppChat.Flags.FFlagAppChatEnforceTimeoutsOnUnfilteredChat)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagShareSheetFriendsSort = SharedFlags2.FFlagShareSheetFriendsSort
+
+local function isActiveTimeout(data, p: string?, p2: number)
+	local v
+
+	if data == nil or data.status ~= "active" then
+		v = false
+	else
+		v = p2 < data.endTimestamp or FFlagAppChatReactiveFeatureRestrictions and data.requiresAcknowledgement == true
+	end
+
+	if FFlagAppChatEnforceTimeoutsOnUnfilteredChat then
+		return v
+	end
+
+	return v and p ~= ConversationChannels.ModerationType.TrustedComms
 end
-local function isConversationPending(p2) -- line: 42
-	-- upvalues: ConversationChannels (copy), useIsUserPending (copy)
-	return p2.participantPendingStatus == ConversationChannels.UserPendingStatus.Pending or useIsUserPending(p2)
+
+local fn = FFlagShareSheetFriendsSort and function(p, _, p2)
+	return getEffectiveChatTimeoutDetails(nil, toTimeoutEntry(p), nil, p2).isTimedOut
+end or isActiveTimeout
+
+local function isConversationPending(conversation) -- 1 equivalent call inferred from this helper
+	return conversation.participantPendingStatus == ConversationChannels.UserPendingStatus.Pending
+		or useIsUserPending(conversation)
 end
-local function getConversationSendEligibilityStatus(t1: {[any]: any}) -- line: 47
-	-- upvalues: ConversationChannels (copy), useIsUserPending (copy), DataHydration (copy)
-	local conversation = t1.conversation
 
-	if not t1.isAvailable then
+local function getConversationSendEligibilityStatus(data)
+	local conversation = data.conversation
+
+	if
+		not data.isAvailable
+		or not data.isGroupChatEnabled and conversation.conversationType == "MultiUserConversation"
+		or isConversationPending(conversation) -- inferred equivalent call
+	then
 		return "ineligible"
 	end
 
-	if not t1.isGroupChatEnabled and conversation.conversationType == "MultiUserConversation" then
-		return "ineligible"
-	end
+	if FFlagShareSheetFriendsSort then
+		local userSendEligibilityStatus = getUserSendEligibilityStatus({
+			currentTimestamp = data.currentTimestamp,
+			isAvailable = data.isAvailable,
+			scope = data.scope
+		})
 
-	if conversation.participantPendingStatus == ConversationChannels.UserPendingStatus.Pending or useIsUserPending(conversation) then
-		return "ineligible"
-	end
+		if userSendEligibilityStatus ~= "eligible" then
+			return userSendEligibilityStatus
+		end
+	else
+		local userStatus = data.timeoutStore.getUserStatus()
+		local status = userStatus.status(data.scope)
 
-	local v15 = t1.timeoutStore.getUserStatus()
-	local v16 = v15.status(t1.scope)
+		if status == DataHydration.DataStatus.NotReady then
+			return "loading"
+		end
 
-	if v16 == DataHydration.DataStatus.NotReady then
-		return "loading"
-	end
+		if status ~= DataHydration.DataStatus.Failed then
+			local data2 = userStatus.data(data.scope)
+			local moderationType = conversation.moderationType
+			local currentTimestamp = data.currentTimestamp
+			local v
 
-	if v16 ~= DataHydration.DataStatus.Failed then
-		local v17 = v15.data(t1.scope)
-		local moderationType = conversation.moderationType
-		local currentTimestamp = t1.currentTimestamp
+			if data2 == nil or data2.status ~= "active" then
+				v = false
+			else
+				v = currentTimestamp < data2.endTimestamp
+					or FFlagAppChatReactiveFeatureRestrictions and data2.requiresAcknowledgement == true
+			end
 
-		if v17 ~= nil and (v17.status == "active" and (currentTimestamp < v17.endTimestamp and moderationType ~= ConversationChannels.ModerationType.TrustedComms)) then
-			return "ineligible"
+			if not FFlagAppChatEnforceTimeoutsOnUnfilteredChat and v then
+				v = moderationType ~= ConversationChannels.ModerationType.TrustedComms
+			end
+
+			if v then
+				return "ineligible"
+			end
 		end
 	end
 
@@ -56,24 +99,21 @@ local function getConversationSendEligibilityStatus(t1: {[any]: any}) -- line: 4
 		return "eligible"
 	end
 
-	local v20 = t1.timeoutStore.getConversationStatus(conversation.id)
-	local v21 = v20.status(t1.scope)
+	local conversationStatus = data.timeoutStore.getConversationStatus(conversation.id)
+	local status = conversationStatus.status(data.scope)
 
-	if not t1.allowConversationStatusLoading and v21 == DataHydration.DataStatus.NotReady then
+	if not data.allowConversationStatusLoading and status == DataHydration.DataStatus.NotReady then
 		return "loading"
 	end
 
-	if v21 ~= DataHydration.DataStatus.Failed then
-		local v22 = v20.data(t1.scope)
-		local moderationType = conversation.moderationType
-		local currentTimestamp = t1.currentTimestamp
-
-		if v22 ~= nil and (v22.status == "active" and (currentTimestamp < v22.endTimestamp and moderationType ~= ConversationChannels.ModerationType.TrustedComms)) then
-			return "ineligible"
-		end
+	if
+		status == DataHydration.DataStatus.Failed
+		or not fn(conversationStatus.data(data.scope), conversation.moderationType, data.currentTimestamp)
+	then
+		return "eligible"
 	end
 
-	return "eligible"
+	return "ineligible"
 end
 
 return getConversationSendEligibilityStatus

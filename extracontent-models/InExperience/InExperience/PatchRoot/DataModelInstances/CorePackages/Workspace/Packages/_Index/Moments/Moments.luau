@@ -7,6 +7,9 @@ local MomentsFeedSurface = require(script.Components.MomentsFeedSurface)
 local MomentsBackHeader = require(script.Components.MomentsBackHeader)
 local MomentsHostShell = require(script.Components.MomentsHostShell)
 local MomentsImmersivePresentation = require(script.Components.MomentsImmersivePresentation)
+local reportMoment = require(script.Moderation.reportMoment)
+local reportEdpVideo = require(script.Moderation.reportEdpVideo)
+require(script.MomentsHostContext)
 
 return {
 	["jest.config"] = script["jest.config"],
@@ -24,5 +27,7 @@ return {
 	MomentsFeedSurface = MomentsFeedSurface,
 	MomentsBackHeader = MomentsBackHeader,
 	MomentsHostShell = MomentsHostShell,
-	MomentsImmersivePresentation = MomentsImmersivePresentation
+	MomentsImmersivePresentation = MomentsImmersivePresentation,
+	reportMoment = reportMoment,
+	reportEdpVideo = reportEdpVideo
 }

@@ -1,56 +1,52 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.LuauPolyfill)
+require(parent.LuauPolyfill)
 
-local Headers = require(script.Parent.Headers).Headers
-local Body = require(script.Parent.Body).Body
-local self = setmetatable({}, {
-	__index = Body
-})
+local Headers = require(script.Parent.Headers)
+local headers = Headers.Headers
 
-self.__index = self
+local Body = require(script.Parent.Body)
+local body = Body.Body
 
-function self.new(p1, t1: {[any]: any}?) -- line: 44
-	-- upvalues: Body (copy), self (copy), Headers (copy)
-	local v7 = t1 or {}
-	local v8 = setmetatable(Body.new(p1), self)
+local object = setmetatable({}, { __index = body })
+object.__index = object
 
-	v8.status = v7.status or 200
-	v8.statusText = v7.statusText or ""
-	v8.headers = Headers.new(v7.headers or {})
-	v8.headers.guard = "response"
-	v8.type = "text"
-	v8.url = ""
-	v8.redirected = false
-	v8.ok = v8.status >= 200 and v8.status < 300
+function object.new(p, options)
+	local v = options or {}
+	local self = setmetatable(body.new(p), object)
 
-	return v8
+	self.status = v.status or 200
+	self.statusText = v.statusText or ""
+	self.headers = headers.new(v.headers or {})
+	self.headers.guard = "response"
+	self.type = "text"
+	self.url = ""
+	self.redirected = false
+	self.ok = self.status >= 200 and self.status < 300
+	return self
 end
-function self.error() -- line: 59
-	-- upvalues: self (copy)
-	local v9 = self.new(nil, {
-		status = 0
-	})
 
-	v9.type = "error"
+function object.error()
+	local v = object.new(nil, { status = 0 })
 
-	return v9
+	v.type = "error"
+	return v
 end
-function self.redirect(_: string, _: number?) -- line: 67
+
+function object.redirect(_: string, _: number?)
 	error("Response.redirect not implemented")
 end
-function self.STATIC_json(_, _: {[any]: any}) -- line: 75
+
+function object.STATIC_json(_, _)
 	error("Response.json static method not implemented")
 end
-function self.clone(p3) -- line: 79
-	-- upvalues: self (copy)
-	return self.new(p3.body, {
-		status = p3.status,
-		statusText = p3.statusText,
-		headers = p3.headers.headerList
+
+function object.clone(data)
+	return object.new(data.body, {
+		status = data.status,
+		statusText = data.statusText,
+		headers = data.headers.headerList
 	})
 end
 
-return {
-	Response = self
-}
+return { Response = object }

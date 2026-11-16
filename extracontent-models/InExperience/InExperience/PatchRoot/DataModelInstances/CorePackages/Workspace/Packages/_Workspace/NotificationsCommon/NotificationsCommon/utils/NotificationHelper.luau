@@ -1,51 +1,28 @@
 local UserInputService = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
+
 local NotificationsCommon = script:FindFirstAncestor("NotificationsCommon")
-local NotificationsCommonParent = NotificationsCommon.Parent
-local Cryo = require(NotificationsCommonParent.Cryo)
-local type = require(NotificationsCommon.type)
+local parent = NotificationsCommon.Parent
+local Cryo = require(parent.Cryo)
+
+local kind = require(NotificationsCommon.type)
 local constants = require(NotificationsCommon.constants)
-local v8 = game:DefineFastFlag("FFlagLuaAppFixToastNotificationClosePosition", false)
 
-return {
-	calculateToastPosition = function(b1: boolean, b2: boolean, n1: number) -- line: 67
-		-- upvalues: v8 (copy), GuiService (copy)
-		local n2 = 60
+local defineFastFlag = game:DefineFastFlag("FFlagLuaAppFixToastNotificationClosePosition", false)
+local NotificationHelper = {}
 
-		if v8 and GuiService then
-			n2 = GuiService:GetGuiInset().Y + 20
-		end
+function NotificationHelper.calculateToastPosition(flag: boolean, flag2: boolean, positionYOffset: number)
+	local v = not (defineFastFlag and GuiService) and 60 or GuiService:GetGuiInset().Y + 20
 
-		if b1 then
-			if b2 then
-				return {
-					positionX = 1,
-					positionXOffset = -20,
-					positionY = 0,
-					anchorX = 1,
-					anchorY = 0,
-					positionYOffset = n1
-				}
-			end
-
-			return {
-				positionX = 0.5,
-				positionXOffset = 0,
-				positionY = 0,
-				anchorX = 0.5,
-				anchorY = 0,
-				positionYOffset = n1
-			}
-		end
-
-		if b2 then
+	if flag then
+		if flag2 then
 			return {
 				positionX = 1,
-				positionXOffset = 20,
+				positionXOffset = -20,
 				positionY = 0,
-				anchorX = 0,
-				anchorY = 0,
-				positionYOffset = n1
+				positionYOffset = positionYOffset,
+				anchorX = 1,
+				anchorY = 0
 			}
 		end
 
@@ -53,83 +30,92 @@ return {
 			positionX = 0.5,
 			positionXOffset = 0,
 			positionY = 0,
+			positionYOffset = positionYOffset,
 			anchorX = 0.5,
-			anchorY = 1,
-			positionYOffset = not v8 and -50 or n2 * -1
+			anchorY = 0
 		}
-	end,
-	getDeviceOrientation = function(vector2: Vector2) -- line: 22
-		-- upvalues: type (copy)
-		if vector2.X > vector2.Y then
-			return type.DeviceOrientationEnum.Landscape
-		end
-
-		return type.DeviceOrientationEnum.Portrait
-	end,
-	getNotificationSize = function(b3: boolean, n3: number) -- line: 28
-		-- upvalues: constants (copy)
-		if n3 < constants.FullWidthDeviceThreshold then
-			return UDim2.new(0, n3 - 24, 0, 0)
-		end
-
-		if b3 then
-			if n3 < constants.CompactCardThreashold then
-				return UDim2.new(0, constants.InExperienceToastWidth, 0, 0)
-			end
-
-			return UDim2.new(0, constants.InAppToastWidth, 0, 0)
-		end
-
-		return UDim2.new(0, constants.InAppToastWidth, 0, 0)
-	end,
-	marshalStreamNotificationData = function(p1, _: number?) -- line: 42
-		local t1 = {
-			currentState = p1.content.currentState,
-			notificationType = p1.content.notificationType,
-			id = p1.id
+	elseif flag2 then
+		return {
+			positionX = 1,
+			positionXOffset = 20,
+			positionY = 0,
+			positionYOffset = positionYOffset,
+			anchorX = 0,
+			anchorY = 0
 		}
-
-		if p1.content.states then
-			local v15 = p1.content.states[p1.content.currentState]
-
-			t1.state = {
-				layoutKey = v15.layoutKey,
-				name = v15.name,
-				visualItems = v15.visualItems
-			}
-		end
-
-		return t1
-	end,
-	isToastToRight = function(p2) -- line: 63
-		-- upvalues: type (copy)
-		if p2 == type.DeviceOrientationEnum.Landscape then
-			return true
-		end
-
-		return false
-	end,
-	isDesktopDevice = function() -- line: 141
-		-- upvalues: UserInputService (copy)
-		local None = Enum.Platform.None
-
-		pcall(function() -- line: 143
-			-- upvalues: None (ref), UserInputService (copy)
-			None = UserInputService:GetPlatform()
-		end)
-
-		return None == Enum.Platform.Windows or (None == Enum.Platform.OSX or None == Enum.Platform.UWP)
-	end,
-	fireEvent = function(p3, s1: string, s2: string, t2: {[any]: any}?) -- line: 121
-		-- upvalues: constants (copy), Cryo (copy)
-		local t3 = {
-			streamContext = "InApp"
+	else
+		return {
+			positionX = 0.5,
+			positionXOffset = 0,
+			positionY = 0,
+			positionYOffset = not defineFastFlag and -50 or v * -1,
+			anchorX = 0.5,
+			anchorY = 1
 		}
-
-		if s2 == nil or s2 == "" then
-			s2 = constants.NotificationsClientEventNameDefault
-		end
-
-		p3.sendEventDeferred(s1, s2, Cryo.Dictionary.join(t2, t3))
 	end
-}
+end
+
+function NotificationHelper.getDeviceOrientation(vector2: Vector2)
+	if vector2.X > vector2.Y then
+		return kind.DeviceOrientationEnum.Landscape
+	end
+
+	return kind.DeviceOrientationEnum.Portrait
+end
+
+function NotificationHelper.getNotificationSize(flag: boolean, p: number)
+	if p < constants.FullWidthDeviceThreshold then
+		return UDim2.new(0, p - 24, 0, 0)
+	end
+
+	if not flag then
+		return UDim2.new(0, constants.InAppToastWidth, 0, 0)
+	end
+
+	if p < constants.CompactCardThreashold then
+		return UDim2.new(0, constants.InExperienceToastWidth, 0, 0)
+	end
+
+	return UDim2.new(0, constants.InAppToastWidth, 0, 0)
+end
+
+function NotificationHelper.marshalStreamNotificationData(p, _: number?)
+	local v = {
+		currentState = p.content.currentState,
+		notificationType = p.content.notificationType,
+		id = p.id
+	}
+
+	if p.content.states then
+		local state = p.content.states[p.content.currentState]
+		v.state = {
+			layoutKey = state.layoutKey,
+			name = state.name,
+			visualItems = state.visualItems
+		}
+	end
+
+	return v
+end
+
+function NotificationHelper.isToastToRight(p): boolean
+	return p == kind.DeviceOrientationEnum.Landscape
+end
+
+function NotificationHelper.isDesktopDevice(): boolean
+	local v = Enum.Platform.None
+	pcall(function()
+		v = UserInputService:GetPlatform()
+	end)
+	return v == Enum.Platform.Windows or v == Enum.Platform.OSX or v == Enum.Platform.UWP
+end
+
+function NotificationHelper.fireEvent(p, p2: string, p3: string, p4)
+	if p3 == nil or p3 == "" then
+		p3 = constants.NotificationsClientEventNameDefault
+	end
+
+	p.sendEventDeferred(p2, p3, Cryo.Dictionary.join(p4, { streamContext = "InApp" }))
+end
+
+return NotificationHelper

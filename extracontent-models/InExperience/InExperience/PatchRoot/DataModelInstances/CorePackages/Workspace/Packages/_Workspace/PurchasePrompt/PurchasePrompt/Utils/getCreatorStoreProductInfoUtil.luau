@@ -1,8 +1,5 @@
 return {
-	fromProduct = function(p1) -- line: 8
-		return {
-			basePrice = p1.basePrice,
-			purchasable = p1.purchasable
-		}
+	fromProduct = function(p)
+		return { ["basePrice"] = p.basePrice, purchasable = p.purchasable }
 	end
 }

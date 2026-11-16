@@ -1,1 +1,3 @@
-return require(script.DisplayBackground)
+local DisplayBackground = require(script.DisplayBackground)
+
+return DisplayBackground

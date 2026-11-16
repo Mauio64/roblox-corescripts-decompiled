@@ -1,136 +1,159 @@
 local UserList = script:FindFirstAncestor("UserList")
-local UserListParent = UserList.Parent
-local Foundation = require(UserListParent.Foundation)
-local Enums = require(UserList.Common.Enums)
+local parent = UserList.Parent
 
+local Foundation = require(parent.Foundation)
+local Enums = require(UserList.Common.Enums)
 require(UserList.Common.Types)
 
-local IconName = Foundation.Enums.IconName
-local ButtonTypes = Enums.ButtonTypes
-local t1 = {
-	AddFriend = {
-		buttonType = ButtonTypes.Add,
-		handlerKey = ButtonTypes.Add
-	},
-	AcceptFriendRequest = {
-		supportsDismiss = true,
-		buttonType = ButtonTypes.Accept,
-		handlerKey = ButtonTypes.Accept
-	},
-	PendingFriendRequest = {
-		isDisabled = true,
-		buttonType = ButtonTypes.Pending
-	},
-	CannotAddFriend = {
-		isDisabled = true,
-		buttonType = ButtonTypes.Add
-	},
-	Chat = {
-		buttonType = ButtonTypes.Chat,
-		handlerKey = ButtonTypes.Chat
-	},
-	JoinExperience = {
-		buttonType = ButtonTypes.Join
-	}
-}
+local FFlagUserListChatCtaStandardVariant = require(UserList.Flags.FFlagUserListChatCtaStandardVariant)
+local FFlagUserListCanonicalCtaAnalytics = require(UserList.Flags.FFlagUserListCanonicalCtaAnalytics)
 
-local function v8() -- line: 41
+local IconName = Foundation.Enums.IconName
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local ButtonTypes = Enums.ButtonTypes
+
+local v = {
+	AddFriend = { buttonType = ButtonTypes.Add, handlerKey = ButtonTypes.Add },
+	AcceptFriendRequest = {
+		buttonType = ButtonTypes.Accept,
+		handlerKey = ButtonTypes.Accept,
+		supportsDismiss = true
+	},
+	PendingFriendRequest = { buttonType = ButtonTypes.Pending, isDisabled = true },
+	CannotAddFriend = { buttonType = ButtonTypes.Add, isDisabled = true },
+	Chat = 0,
+	JoinExperience = 0
+}
+local chat = { buttonType = ButtonTypes.Chat, handlerKey = ButtonTypes.Chat, variant = 0 }
+local variant
+
+if FFlagUserListChatCtaStandardVariant then
+	variant = ButtonVariant.Standard
 end
-local function isSupported(t2: {[any]: any}?, s1: string) -- line: 43
-	if not t2 then
+
+chat.variant = variant
+v.Chat = chat
+
+v.JoinExperience = { buttonType = ButtonTypes.Join }
+
+local function fn() end
+
+local function isSupported(supportedActions, kind: string): boolean -- 1 equivalent call inferred from this helper
+	if not supportedActions then
 		return true
 	end
 
-	for _, v14 in t2 do
-		if v14 == s1 then
+	for _, item in supportedActions do
+		if item == kind then
 			return true
 		end
 	end
 
 	return false
 end
-local function mapServerActionsToRowCta(p1, p2, s2: string, p3) -- line: 55
-	-- upvalues: t1 (copy), v8 (copy), ButtonTypes (copy), IconName (copy)
-	if not p1 or not p1.buttons then
-		return {
-			primaryCta = nil,
-			secondaryCta = nil
-		}
+
+local function mapServerActionsToRowCta(p, p2, p3: string, data, p4: number?)
+	if not (p and p.buttons) then
+		return { primaryCta = nil, secondaryCta = nil }
 	end
 
-	local v19 = if not p3 then nil else p3.supportedActions
-	local g27 = nil
-	local v24 = nil
+	local supportedActions
 
-	for _, v21 in p1.buttons do
-		local v22 = t1[v21.type]
+	if data then
+		supportedActions = data.supportedActions
+	end
 
-		if not v22 then
-			continue
-		end
+	for _, button in p.buttons do
+		local v2 = v[button.type]
 
-		local type = v21.type
+		if v2 and isSupported(supportedActions, button.type) then -- inferred equivalent call
+			local v3
 
-		if not v19 then
-			v24 = true
-		else
-			for _, v26 in v19 do
-				if v26 == type then
-					v24 = true
-					g27 = true
-				end
-
-				if g27 then
-					break
-				end
+			if v2.handlerKey then
+				v3 = p2[v2.handlerKey]
 			end
 
-			if not g27 then
-				v24 = false
-			end
-		end
-
-		g27 = false
-
-		if v24 then
-			local v28 = if not v22.handlerKey then nil else p2[v22.handlerKey]
-			local t3 = {
-				type = v22.buttonType,
-				onActivated = if not v28 then v8 else function() -- line: 74
-					-- upvalues: v28 (copy), s2 (copy)
-					v28(s2)
-				end,
-				isDisabled = v22.isDisabled,
-				disabledReason = v21.disabledReason,
-				minWidth = if not p3 then nil else p3.primaryCtaMinWidth,
-				maxWidth = if not p3 then nil else p3.primaryCtaMaxWidth
+			local primaryCta = {
+				type = v2.buttonType,
+				onActivated = 0,
+				isDisabled = 0,
+				disabledReason = 0,
+				variant = 0,
+				minWidth = 0,
+				maxWidth = 0
 			}
-			local t4 = nil
+			local onActivated
 
-			if v22.supportsDismiss and p3 and p3.showDismissForRequests then
-				local v31 = p2[ButtonTypes.Dismiss]
+			if v3 then
+				local v4 = v3
 
-				t4 = {
-					type = ButtonTypes.Dismiss,
-					icon = IconName.X,
-					onActivated = if not v31 then v8 else function() -- line: 91
-						-- upvalues: v31 (copy), s2 (copy)
-						v31(s2)
+				onActivated = function()
+					local v5
+
+					if FFlagUserListCanonicalCtaAnalytics then
+						v5 = p4
 					end
-				}
+
+					v4(p3, v5)
+				end
+			else
+				onActivated = fn
 			end
 
-			return {
-				primaryCta = t3,
-				secondaryCta = t4
-			}
+			primaryCta.onActivated = onActivated
+
+			primaryCta.isDisabled = v2.isDisabled
+			primaryCta.disabledReason = button.disabledReason
+			local variant2
+
+			if FFlagUserListChatCtaStandardVariant then
+				variant2 = v2.variant
+			end
+
+			primaryCta.variant = variant2
+			local minWidth
+
+			if data then
+				minWidth = data.primaryCtaMinWidth
+			end
+
+			primaryCta.minWidth = minWidth
+			local maxWidth
+
+			if data then
+				maxWidth = data.primaryCtaMaxWidth
+			end
+
+			primaryCta.maxWidth = maxWidth
+			local secondaryCta
+
+			if v2.supportsDismiss and data and data.showDismissForRequests then
+				local v4 = p2[ButtonTypes.Dismiss]
+				secondaryCta = { type = ButtonTypes.Dismiss, icon = IconName.X, onActivated = 0 }
+				local onActivated2
+
+				if v4 then
+					onActivated2 = function()
+						local v5
+
+						if FFlagUserListCanonicalCtaAnalytics then
+							v5 = p4
+						end
+
+						v4(p3, v5)
+					end
+				else
+					onActivated2 = fn
+				end
+
+				secondaryCta.onActivated = onActivated2
+			end
+
+			return { primaryCta = primaryCta, secondaryCta = secondaryCta }
 		end
 	end
 
-	return {
-		primaryCta = nil,
-		secondaryCta = nil
-	}
+	return { primaryCta = nil, secondaryCta = nil }
 end
 
 return mapServerActionsToRowCta

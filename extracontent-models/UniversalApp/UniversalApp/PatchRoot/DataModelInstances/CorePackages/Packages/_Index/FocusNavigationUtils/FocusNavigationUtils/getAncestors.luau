@@ -1,12 +1,12 @@
-local function getAncestors(p1) -- line: 1
-	local t1 = { p1 }
+local function getAncestors(p)
+	local parents = { p }
 
-	while p1.Parent do
-		table.insert(t1, p1.Parent)
-		p1 = p1.Parent
+	while p.Parent do
+		table.insert(parents, p.Parent)
+		p = p.Parent
 	end
 
-	return t1
+	return parents
 end
 
 return getAncestors

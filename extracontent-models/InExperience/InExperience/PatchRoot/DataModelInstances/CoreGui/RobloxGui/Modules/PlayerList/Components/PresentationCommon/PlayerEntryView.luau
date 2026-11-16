@@ -1,131 +1,141 @@
 local CorePackages = game:GetService("CorePackages")
 local Players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
+
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+
 local Cryo = require(CorePackages.Packages.Cryo)
 local React = require(CorePackages.Packages.React)
 local Signals = require(CorePackages.Packages.Signals)
 local SignalsReact = require(CorePackages.Packages.SignalsReact)
 local UIBlox = require(CorePackages.Packages.UIBlox)
-local InExperienceCapabilities = require(CorePackages.Workspace.Packages.InExperienceCapabilities).InExperienceCapabilities
+
+local InExperienceCapabilities = require(CorePackages.Workspace.Packages.InExperienceCapabilities)
+local inExperienceCapabilities = InExperienceCapabilities.InExperienceCapabilities
 local ReactFocusNavigation = require(CorePackages.Packages.ReactFocusNavigation)
 local SharedFlags = CorePackages.Workspace.Packages.SharedFlags
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-
 require(CorePackages.Workspace.Packages.LeaderboardStore)
 require(CorePackages.Workspace.Packages.PlayerIconInfoStore)
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local Enabled = Chrome.Enabled
 
-local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
 local useLayoutValues = PlayerList.Common.useLayoutValues
 local useStyle = UIBlox.Core.Style.useStyle
 local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
+
 local Foundation = require(CorePackages.Packages.Foundation)
 local ControlState = Foundation.Enums.ControlState
 local View = Foundation.View
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local useTokens = Foundation.Hooks.useTokens
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local EntryFrameView = PlayerList.Presentation.EntryFrameView
-local StatEntryContainer = require(scriptParentParentParent.Components.Container.StatEntryContainer)
-local CellExtender = require(scriptParentParent.Presentation.CellExtender)
-local PlayerIcon = require(scriptParent.PlayerIcon)
-local PlayerNameTag = require(scriptParentParent.Presentation.PlayerNameTag)
+local StatEntryContainer = require(parent3.Components.Container.StatEntryContainer)
+
+local CellExtender = require(parent2.Presentation.CellExtender)
+local PlayerIcon = require(parent.PlayerIcon)
+local PlayerNameTag = require(parent2.Presentation.PlayerNameTag)
+
 local Constants = PlayerList.Common.Constants
-local GetFFlagGateLeaderboardPlayerDropdownViaGUAC = require(SharedFlags).GetFFlagGateLeaderboardPlayerDropdownViaGUAC
+
+local module = require(SharedFlags)
+local getFFlagGateLeaderboardPlayerDropdownViaGUAC = module.GetFFlagGateLeaderboardPlayerDropdownViaGUAC
 local FFlagAddNewPlayerListFocusNav = PlayerList.Flags.FFlagAddNewPlayerListFocusNav
 local FFlagAddNewPlayerListMobileFocusNav = PlayerList.Flags.FFlagAddNewPlayerListMobileFocusNav
 local FFlagRemoveNewPlayerListOverlay = PlayerList.Flags.FFlagRemoveNewPlayerListOverlay
 local FFlagEnableMobilePlayerListOnConsole = PlayerList.Flags.FFlagEnableMobilePlayerListOnConsole
-local FFlagPlayerListFixLeaderstatsStacking = require(SharedFlags).FFlagPlayerListFixLeaderstatsStacking
+local module2 = require(SharedFlags)
+local fFlagPlayerListFixLeaderstatsStacking = module2.FFlagPlayerListFixLeaderstatsStacking
 local FFlagPlayerListUseFocusNavHook = PlayerList.Flags.FFlagPlayerListUseFocusNavHook
-local t1 = {
-	Transparency = 1,
-	Color = Color3.new(1, 1, 1)
-}
 
-local function IconAndName(t2: {[any]: any}) -- line: 118
-	-- upvalues: React (copy), PlayerIcon (copy), PlayerNameTag (copy)
+local v = { Transparency = 1, Color = Color3.new(1, 1, 1) }
+
+local function IconAndName(props)
 	return React.createElement(React.Fragment, {}, {
 		Layout = React.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
-			Padding = UDim.new(0, t2.layoutValues.InitalPlayerEntryPadding)
+			Padding = UDim.new(0, props.layoutValues.InitalPlayerEntryPadding)
 		}),
 		InitalPadding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, t2.layoutValues.InitalPlayerEntryPadding)
+			PaddingLeft = UDim.new(0, props.layoutValues.InitalPlayerEntryPadding)
 		}),
 		PlayerIcon = React.createElement(PlayerIcon, {
-			layoutOrder = 1,
-			player = t2.player,
-			playerIconInfo = t2.playerIconInfo,
-			playerRelationship = t2.playerRelationship
+			player = props.player,
+			playerIconInfo = props.playerIconInfo,
+			playerRelationship = props.playerRelationship,
+			layoutOrder = 1
 		}),
 		PlayerName = React.createElement(PlayerNameTag, {
-			layoutOrder = 3,
-			player = t2.player,
-			isTitleEntry = t2.titlePlayerEntry,
-			isHovered = t2.isHovered,
-			textStyle = t2.textStyle,
-			textFont = t2.playerNameFont
+			player = props.player,
+			isTitleEntry = props.titlePlayerEntry,
+			isHovered = props.isHovered,
+			textStyle = props.textStyle,
+			textFont = props.playerNameFont,
+			layoutOrder = 3
 		})
 	})
 end
 
-local u38 = React.memo(IconAndName)
+local memo = React.memo(IconAndName)
 
-local function PlayerEntryChildren(t3: {[any]: any}) -- line: 173
-	-- upvalues: React (copy), u38 (ref), EntryFrameView (copy), FFlagRemoveNewPlayerListOverlay (copy), FFlagPlayerListFixLeaderstatsStacking (copy), SignalsReact (copy), Signals (copy), StatEntryContainer (copy), Cryo (copy), CellExtender (copy)
-	local v44 = t3.isSmallTouchDevice or false
-	local v45 = t3.isDirectionalPreferred or false
-	local layoutValues = t3.layoutValues
-	local textStyle = t3.textStyle
-	local playerNameFont = t3.playerNameFont
-	local isHovered = t3.isHovered
-	local backgroundStyle = t3.backgroundStyle
-	local overlayStyle = t3.overlayStyle
-	local isPressed = t3.isPressed
-	local gameStats = t3.gameStats
-	local playerStats = t3.playerStats
-	local gameStatsCount = t3.gameStatsCount
-	local playerStatsCount = t3.playerStatsCount
-	local t4 = {}
-	local t5 = {
+local function PlayerEntryChildren(props)
+	local isSmallTouchDevice = props.isSmallTouchDevice or false
+	local isDirectionalPreferred = props.isDirectionalPreferred or false
+	local layoutValues = props.layoutValues
+	local textStyle = props.textStyle
+	local playerNameFont = props.playerNameFont
+	local isHovered = props.isHovered
+	local backgroundStyle = props.backgroundStyle
+	local overlayStyle = props.overlayStyle
+	local isPressed = props.isPressed
+	local gameStats = props.gameStats
+	local playerStats = props.playerStats
+	local gameStatsCount = props.gameStatsCount
+	local playerStatsCount = props.playerStatsCount
+
+	local children = {}
+
+	local v2 = {
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		FillDirection = Enum.FillDirection.Horizontal,
 		VerticalAlignment = Enum.VerticalAlignment.Center
 	}
 
-	if v45 then
-		t5.Padding = UDim.new(0, layoutValues.PlayerEntryPadding)
+	if isDirectionalPreferred then
+		v2.Padding = UDim.new(0, layoutValues.PlayerEntryPadding)
 	end
 
-	t4.Layout = React.createElement("UIListLayout", t5)
+	children.Layout = React.createElement("UIListLayout", v2)
 
-	local v59 = React.createElement(u38, {
-		player = t3.player,
-		playerIconInfo = t3.playerIconInfo,
-		playerRelationship = t3.playerRelationship,
-		titlePlayerEntry = t3.titlePlayerEntry,
+	local element = React.createElement(memo, {
+		player = props.player,
+		playerIconInfo = props.playerIconInfo,
+		playerRelationship = props.playerRelationship,
+		titlePlayerEntry = props.titlePlayerEntry,
 		isHovered = isHovered,
 		textStyle = textStyle,
 		playerNameFont = playerNameFont,
 		layoutValues = layoutValues
 	})
-	local t6 = {
-		LayoutOrder = 0,
-		BackgroundTransparency = 1
-	}
 
-	if v44 then
-		t6.Size = UDim2.new(0, layoutValues.PlayerNameSizeXMobile, 0, layoutValues.PlayerEntrySizeY)
+	local v3 = { LayoutOrder = 0, BackgroundTransparency = 1 }
+
+	if isSmallTouchDevice then
+		v3.Size = UDim2.new(0, layoutValues.PlayerNameSizeXMobile, 0, layoutValues.PlayerEntrySizeY)
 	else
-		t6.Size = UDim2.new(0, t3.entrySizeX, 0, layoutValues.PlayerEntrySizeY)
+		v3.Size = UDim2.new(0, props.entrySizeX, 0, layoutValues.PlayerEntrySizeY)
 	end
 
-	t4.NameFrame = React.createElement("Frame", t6, v59)
+	children.NameFrame = React.createElement("Frame", v3, element)
 
-	if v45 then
-		t4.NameFrame = React.createElement("Frame", t6, {
+	if isDirectionalPreferred then
+		children.NameFrame = React.createElement("Frame", v3, {
 			Shadow = React.createElement("ImageLabel", {
 				BackgroundTransparency = 1,
 				Image = layoutValues.ShadowImage,
@@ -133,574 +143,687 @@ local function PlayerEntryChildren(t3: {[any]: any}) -- line: 173
 				Size = UDim2.new(1, layoutValues.ShadowSize * 2, 1, layoutValues.ShadowSize),
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = layoutValues.ShadowSliceRect,
-				Visible = v45
+				Visible = isDirectionalPreferred
 			}),
-			BackgroundFrame = React.createElement(EntryFrameView, t3.backgroundFrameProps, v59)
+			BackgroundFrame = React.createElement(EntryFrameView, props.backgroundFrameProps, element)
 		})
 	end
 
-	local MaxLeaderstats = layoutValues.MaxLeaderstats
-	local t7 = {
+	local maxLeaderstats = layoutValues.MaxLeaderstats
+	local v4 = {
 		isTeamEntry = false,
-		showStatTitle = t3.titlePlayerEntry and v45,
+		showStatTitle = props.titlePlayerEntry and isDirectionalPreferred,
 		textStyle = textStyle
 	}
 
-	if v45 then
-		t7.backgroundStyle = backgroundStyle
+	if isDirectionalPreferred then
+		v4.backgroundStyle = backgroundStyle
 
 		if not FFlagRemoveNewPlayerListOverlay then
-			t7.overlayStyle = overlayStyle
-			t7.doubleOverlay = isPressed
+			v4.overlayStyle = overlayStyle
+			v4.doubleOverlay = isPressed
 		end
 	end
 
-	if FFlagPlayerListFixLeaderstatsStacking then
-		local v63 = SignalsReact.useSignalState(Signals.createComputed(function(p1) -- line: 265
-			-- upvalues: gameStats (copy)
+	if fFlagPlayerListFixLeaderstatsStacking then
+		local v5 = SignalsReact.useSignalState(Signals.createComputed(function(p)
 			if gameStats then
-				return (gameStats.getAllData(p1))
+				return (gameStats.getAllData(p))
 			end
 
 			return {}
 		end))
-		local v64 = SignalsReact.useSignalState(Signals.createComputed(function(p2) -- line: 269
-			-- upvalues: playerStats (copy)
+
+		local v6 = SignalsReact.useSignalState(Signals.createComputed(function(p)
 			if playerStats then
-				return (playerStats.getAllData(p2))
+				return (playerStats.getAllData(p))
 			end
 
 			return {}
 		end))
 
-		for v65, v66 in v63 do
-			if not (MaxLeaderstats < v66.order(false)) then
-				t4["GameStat_" .. v65] = React.createElement(StatEntryContainer, Cryo.Dictionary.join(t7, {
-					statName = v65,
-					stat = v64[v65]
-				}))
+		for k, v7 in v5 do
+			if not (maxLeaderstats < v7.order(false)) then
+				children["GameStat_" .. k] = React.createElement(
+					StatEntryContainer,
+					Cryo.Dictionary.join(v4, { statName = k, stat = v6[k] })
+				)
 			end
 		end
-	elseif gameStats and gameStatsCount and gameStatsCount > 0 and playerStats and playerStatsCount and playerStatsCount >= 0 then
-		gameStats.iterateData(function(p3, p4) -- line: 288
-			-- upvalues: MaxLeaderstats (copy), playerStats (copy), t4 (copy), React (copy), StatEntryContainer (copy), Cryo (copy), t7 (copy)
-			if p4.order(false) > MaxLeaderstats then
+	elseif
+		gameStats
+		and gameStatsCount
+		and gameStatsCount > 0
+		and playerStats
+		and playerStatsCount
+		and playerStatsCount >= 0
+	then
+		gameStats.iterateData(function(statName, p)
+			if maxLeaderstats < p.order(false) then
 				return
 			end
 
-			local v105 = playerStats.getData(p3, false)
-
-			t4["GameStat_" .. p3] = React.createElement(StatEntryContainer, Cryo.Dictionary.join(t7, {
-				statName = p3,
-				stat = v105
-			}))
+			local data = playerStats.getData(statName, false)
+			children["GameStat_" .. statName] = React.createElement(
+				StatEntryContainer,
+				Cryo.Dictionary.join(v4, { statName = statName, stat = data })
+			)
 		end, false)
 	end
 
-	if not FFlagRemoveNewPlayerListOverlay and not v44 and not v45 then
-		t4.BackgroundExtender = React.createElement(CellExtender, {
+	if not (FFlagRemoveNewPlayerListOverlay or isSmallTouchDevice or isDirectionalPreferred) then
+		children.BackgroundExtender = React.createElement(CellExtender, {
 			layoutOrder = 100,
 			size = UDim2.new(0, layoutValues.ExtraContainerPadding, 1, 0),
-			backgroundStyle = {
-				Transparency = 1,
-				Color = Color3.new(1, 1, 1)
-			},
-			overlayStyle = {
-				Transparency = 1,
-				Color = Color3.new(1, 1, 1)
-			},
+			backgroundStyle = { Color = Color3.new(1, 1, 1), Transparency = 1 },
+			overlayStyle = { Color = Color3.new(1, 1, 1), Transparency = 1 },
 			doubleOverlay = isPressed
 		})
 	end
 
-	return React.createElement(React.Fragment, {}, t4)
+	return React.createElement(React.Fragment, {}, children)
 end
 
-local u40 = React.memo(PlayerEntryChildren)
+local memo2 = React.memo(PlayerEntryChildren)
 
-local function PlayerEntryView(t8: {[any]: any}) -- line: 328
-	-- upvalues: FFlagPlayerListFixLeaderstatsStacking (copy), SignalsReact (copy), Signals (copy), React (copy), FFlagPlayerListUseFocusNavHook (copy), useFocusGuiObject (copy), Enabled (copy), useLayoutValues (copy), useStyle (copy), Players (copy), Constants (copy), GetFFlagGateLeaderboardPlayerDropdownViaGUAC (copy), InExperienceCapabilities (copy), ControlState (copy), t1 (copy), FFlagEnableMobilePlayerListOnConsole (copy), FFlagRemoveNewPlayerListOverlay (copy), FFlagAddNewPlayerListFocusNav (copy), GuiService (copy), FFlagAddNewPlayerListMobileFocusNav (copy), View (copy), u40 (ref), EntryFrameView (copy), Cryo (copy)
-	local v68 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(t8.playerData.stats.getCount) else nil
-	local v69 = SignalsReact.useSignalBinding(Signals.createComputed(function(p5) -- line: 332
-		-- upvalues: t8 (copy)
-		return t8.playerData.order(p5) * 2 - 1
+local function PlayerEntryView(props)
+	local playerStatsCount
+
+	if fFlagPlayerListFixLeaderstatsStacking then
+		playerStatsCount = nil
+	else
+		playerStatsCount = SignalsReact.useSignalState(props.playerData.stats.getCount)
+	end
+
+	local v2 = SignalsReact.useSignalBinding(Signals.createComputed(function(p)
+		return props.playerData.order(p) * 2 - 1
 	end))
-	local v70 = React.useMemo(function() -- line: 336
-		-- upvalues: t8 (copy), v69 (copy)
-		if t8.layoutOrder then
-			return t8.layoutOrder
-		end
 
-		return v69
-	end, {
-		t8.layoutOrder,
-		v69
-	})
-	local v71 = React.useMemo(function() -- line: 340
-		-- upvalues: t8 (copy)
-		if t8.playerData.order(false) == 1 then
-			return t8.firstPlayerRef
+	local layoutOrder = React.useMemo(function()
+		return if props.layoutOrder then props.layoutOrder else v2
+	end, { props.layoutOrder, v2 })
+
+	local firstPlayerRef = React.useMemo(function()
+		if props.playerData.order(false) == 1 then
+			return props.firstPlayerRef
 		end
 
 		return nil
-	end, {
-		t8.playerData.order,
-		t8.firstPlayerRef
-	})
-	local v72, v73 = React.useState(false)
-	local v74, v75 = React.useState(false)
-	local v76 = React.useRef(nil)
-	local v77 = if FFlagPlayerListUseFocusNavHook then nil else React.useRef(nil)
-	local v78 = useFocusGuiObject()
-	local v79 = Enabled()
-	local v80 = useLayoutValues()
-	local v81 = useStyle()
-	local v82 = if not t8.size then UDim2.new(1, v80.EntryXOffset, 0, v80.PlayerEntrySizeY) else t8.size
-	local isSmallTouchDevice = t8.isSmallTouchDevice
-	local IsTenFoot = v80.IsTenFoot
-	local v85 = t8.player == Players.LocalPlayer
-	local v86 = React.useCallback(function() -- line: 362
-		-- upvalues: t8 (copy), FFlagPlayerListUseFocusNavHook (copy), Constants (copy), GetFFlagGateLeaderboardPlayerDropdownViaGUAC (copy), InExperienceCapabilities (copy), v76 (copy)
-		if not t8.openDropdown or not t8.closeDropdown then
+	end, { props.playerData.order, props.firstPlayerRef })
+
+	local state, setState = React.useState(false)
+	local state2, setState2 = React.useState(false)
+
+	local ref = React.useRef(nil)
+	local ref2
+
+	if FFlagPlayerListUseFocusNavHook then
+		ref2 = nil
+	else
+		ref2 = React.useRef(nil)
+	end
+
+	local v3 = useFocusGuiObject()
+
+	local enabled = Enabled()
+	local layoutValues = useLayoutValues()
+	local v4 = useStyle()
+	local v5
+
+	if FoundationFontFaceMigration then
+		v5 = useTokens()
+	else
+		v5 = nil
+	end
+
+	local size
+
+	if props.size then
+		size = props.size
+	else
+		size = UDim2.new(1, layoutValues.EntryXOffset, 0, layoutValues.PlayerEntrySizeY)
+	end
+
+	local isSmallTouchDevice = props.isSmallTouchDevice
+	local isTenFoot = layoutValues.IsTenFoot
+	local v6 = props.player == Players.LocalPlayer
+
+	local onActivated = React.useCallback(function()
+		if not (props.openDropdown and props.closeDropdown) then
 			return
 		end
 
-		if t8.dropdownOpen and t8.selectedPlayer == t8.player then
-			t8.closeDropdown()
-
+		if props.dropdownOpen and props.selectedPlayer == props.player then
+			props.closeDropdown()
 			return
 		end
 
-		if FFlagPlayerListUseFocusNavHook and t8.setSelectedPlayerId then
-			if t8.titlePlayerEntry then
-				t8.setSelectedPlayerId(Constants.SELECTED_TITLE_PLAYER_ID)
+		if FFlagPlayerListUseFocusNavHook and props.setSelectedPlayerId then
+			if props.titlePlayerEntry then
+				props.setSelectedPlayerId(Constants.SELECTED_TITLE_PLAYER_ID)
 			else
-				t8.setSelectedPlayerId(t8.player.UserId)
+				props.setSelectedPlayerId(props.player.UserId)
 			end
 		end
 
-		if GetFFlagGateLeaderboardPlayerDropdownViaGUAC() then
-			if InExperienceCapabilities.canViewPlayerDropdownInLeaderboard then
-				t8.openDropdown(t8.player)
+		if getFFlagGateLeaderboardPlayerDropdownViaGUAC() then
+			if inExperienceCapabilities.canViewPlayerDropdownInLeaderboard then
+				props.openDropdown(props.player)
 
-				if v76.current then
-					local vector2 = Vector2.new(v76.current.AbsolutePosition.Y, v76.current.AbsoluteSize.Y)
+				if ref.current then
+					local vector2 = Vector2.new(ref.current.AbsolutePosition.Y, ref.current.AbsoluteSize.Y)
 
-					if t8.setDropDownPlayerDimensionY then
-						t8.setDropDownPlayerDimensionY(vector2)
-
-						return
+					if props.setDropDownPlayerDimensionY then
+						props.setDropDownPlayerDimensionY(vector2)
 					end
 				end
 			end
 		else
-			t8.openDropdown(t8.player)
+			props.openDropdown(props.player)
 
-			if v76.current then
-				local vector2 = Vector2.new(v76.current.AbsolutePosition.Y, v76.current.AbsoluteSize.Y)
+			if ref.current then
+				local vector2 = Vector2.new(ref.current.AbsolutePosition.Y, ref.current.AbsoluteSize.Y)
 
-				if t8.setDropDownPlayerDimensionY then
-					t8.setDropDownPlayerDimensionY(vector2)
+				if props.setDropDownPlayerDimensionY then
+					props.setDropDownPlayerDimensionY(vector2)
 				end
 			end
 		end
 	end, {
-		t8.dropdownOpen,
-		t8.selectedPlayer,
-		t8.player,
-		t8.openDropdown,
-		t8.closeDropdown,
-		t8.setDropDownPlayerDimensionY,
-		t8.titlePlayerEntry,
-		t8.setSelectedPlayerId,
-		v76.current
+		props.dropdownOpen,
+		props.selectedPlayer,
+		props.player,
+		props.openDropdown,
+		props.closeDropdown,
+		props.setDropDownPlayerDimensionY,
+		props.titlePlayerEntry,
+		props.setSelectedPlayerId,
+		ref.current
 	})
-	local v87 = React.useCallback(function(p6) -- line: 403
-		-- upvalues: ControlState (copy), v75 (copy), v73 (copy)
-		if p6 == ControlState.Pressed or p6 == ControlState.SelectedPressed then
-			v75(true)
 
-			return
-		end
-
-		if p6 == ControlState.Hover or p6 == ControlState.Selected then
-			v73(true)
-
-			return
-		end
-
-		if p6 == ControlState.Default then
-			v73(false)
-			v75(false)
+	local onStateChanged = React.useCallback(function(p)
+		if p == ControlState.Pressed or p == ControlState.SelectedPressed then
+			setState2(true)
+		elseif p == ControlState.Hover or p == ControlState.Selected then
+			setState(true)
+		elseif p == ControlState.Default then
+			setState(false)
+			setState2(false)
 		end
 	end, {})
-	local v88 = React.useMemo(function() -- line: 414
-		-- upvalues: v79 (copy), v81 (copy)
-		local v110 = if not v79 then v81.Theme.BackgroundContrast.Color else v81.Theme.BackgroundUIContrast.Color
 
-		return {
-			Transparency = 1,
-			Color = v110
-		}
-	end, {
-		v79,
-		IsTenFoot
-	})
-	local v89 = React.useMemo(function() -- line: 424
-		-- upvalues: v80 (copy)
-		return {
-			Transparency = 0.8,
-			Color = v80.RowHoverColor
-		}
-	end, { v80 })
-	local v90 = React.useMemo(function() -- line: 431
-		-- upvalues: v80 (copy)
-		return {
-			Transparency = 0.8,
-			Color = v80.RowDefaultColor
-		}
-	end, { v80 })
-	local v91 = React.useCallback(function() -- line: 439
-		-- upvalues: isSmallTouchDevice (copy), v72 (copy), v74 (copy), v89 (copy), v90 (copy), IsTenFoot (copy), v88 (copy), t8 (copy), v80 (copy)
+	local v7 = React.useMemo(function()
+		local color
+
+		if enabled then
+			color = v4.Theme.BackgroundUIContrast.Color
+		else
+			color = v4.Theme.BackgroundContrast.Color
+		end
+
+		return { Color = color, Transparency = 1 }
+	end, { enabled, isTenFoot })
+
+	local v8 = React.useMemo(function()
+		return { Color = layoutValues.RowHoverColor, Transparency = 0.8 }
+	end, { layoutValues })
+
+	local v9 = React.useMemo(function()
+		return { Color = layoutValues.RowDefaultColor, Transparency = 0.8 }
+	end, { layoutValues })
+
+	local v10 = React.useCallback(function()
 		if isSmallTouchDevice then
-			return (v72 or v74) and v89 or v90
+			return (state or state2) and v8 or v9
 		end
 
-		if not IsTenFoot then
-			return v88
+		if not isTenFoot then
+			return v7
 		end
 
-		local v111 = t8.dropdownOpen and t8.selectedPlayer == t8.player
-		local v112 = v72
+		local v10 = props.dropdownOpen and props.selectedPlayer == props.player
+		local isHovered = state
 
-		if t8.titlePlayerEntry and v80.BackgroundStyle then
-			if v112 and v80.BackgroundStyle.HoveredTitle then
-				return v80.BackgroundStyle.HoveredTitle
+		if props.titlePlayerEntry and layoutValues.BackgroundStyle then
+			if isHovered and layoutValues.BackgroundStyle.HoveredTitle then
+				return layoutValues.BackgroundStyle.HoveredTitle
 			end
 
-			if v80.BackgroundStyle.Title then
-				return v80.BackgroundStyle.Title
+			if layoutValues.BackgroundStyle.Title then
+				return layoutValues.BackgroundStyle.Title
 			end
 		end
 
-		if v111 and v80.BackgroundStyle and v80.BackgroundStyle.Selected then
-			return v80.BackgroundStyle.Selected or v80.BackgroundStyle.Default
+		if v10 and layoutValues.BackgroundStyle and layoutValues.BackgroundStyle.Selected then
+			return layoutValues.BackgroundStyle.Selected or layoutValues.BackgroundStyle.Default
 		end
 
-		if v112 and v80.BackgroundStyle and v80.BackgroundStyle.Hovered then
-			return v80.BackgroundStyle.Hovered
+		if isHovered and layoutValues.BackgroundStyle and layoutValues.BackgroundStyle.Hovered then
+			return layoutValues.BackgroundStyle.Hovered
 		end
 
-		if v80.BackgroundStyle and v80.BackgroundStyle.Default then
-			return v80.BackgroundStyle.Default
+		if layoutValues.BackgroundStyle and layoutValues.BackgroundStyle.Default then
+			return layoutValues.BackgroundStyle.Default
 		end
 
-		return v88
+		return v7
 	end, {
-		v88,
+		v7,
 		isSmallTouchDevice,
-		t8.dropdownOpen,
-		t8.selectedPlayer,
-		t8.player,
-		t8.titlePlayerEntry,
-		v72,
-		v74
+		props.dropdownOpen,
+		props.selectedPlayer,
+		props.player,
+		props.titlePlayerEntry,
+		state,
+		state2
 	})
-	local v92 = React.useCallback(function() -- line: 484
-		-- upvalues: IsTenFoot (copy), v72 (copy), v80 (copy), v85 (copy), v81 (copy)
-		if IsTenFoot then
-			if v72 then
-				return v80.HoveredTextStyle, v80.PlayerNameTextSize
+
+	local v11 = React.useCallback(function()
+		if isTenFoot then
+			if state then
+				return layoutValues.HoveredTextStyle, layoutValues.PlayerNameTextSize
 			end
 
-			return v80.DefaultTextStyle, v80.PlayerNameTextSize
+			return layoutValues.DefaultTextStyle, layoutValues.PlayerNameTextSize
+		elseif v6 then
+			return v4.Theme.TextEmphasis, layoutValues.PlayerNameTextSize
+		else
+			return v4.Theme.TextDefault, layoutValues.PlayerNameTextSize
+		end
+	end, { state, v6, isTenFoot, layoutValues, v4 })
+
+	local v12 = React.useCallback(function()
+		if isTenFoot then
+			return v
 		end
 
-		if v85 then
-			return v81.Theme.TextEmphasis, v80.PlayerNameTextSize
+		local v12 = props.dropdownOpen and props.selectedPlayer == props.player
+
+		if state2 or v12 then
+			return v4.Theme.BackgroundOnPress
 		end
 
-		return v81.Theme.TextDefault, v80.PlayerNameTextSize
-	end, {
-		v72,
-		v85,
-		IsTenFoot,
-		v80,
-		v81
-	})
-	local v93 = React.useCallback(function() -- line: 505
-		-- upvalues: IsTenFoot (copy), t8 (copy), v74 (copy), v81 (copy), v72 (copy), t1 (copy)
-		if not IsTenFoot then
-			local v113 = t8.dropdownOpen and t8.selectedPlayer == t8.player
+		return if state then v4.Theme.BackgroundOnHover else v
+	end, { state, state2, props.dropdownOpen, props.selectedPlayer, props.player, v4, isTenFoot })
 
-			if v74 then
-				return v81.Theme.BackgroundOnPress
-			end
-
-			if v113 then
-				return v81.Theme.BackgroundOnPress
-			end
-
-			if v72 then
-				return v81.Theme.BackgroundOnHover
-			end
-		end
-
-		return t1
-	end, {
-		v72,
-		v74,
-		t8.dropdownOpen,
-		t8.selectedPlayer,
-		t8.player,
-		v81,
-		IsTenFoot
-	})
-	local v94 = React.useMemo(function() -- line: 528
-		-- upvalues: isSmallTouchDevice (copy), v85 (copy), v81 (copy), FFlagEnableMobilePlayerListOnConsole (copy), v80 (copy), IsTenFoot (copy), t8 (copy)
+	local playerNameFont = React.useMemo(function()
 		if isSmallTouchDevice then
-			if v85 then
-				return {
-					Font = v81.Font.CaptionHeader.Font,
-					Size = if not FFlagEnableMobilePlayerListOnConsole then v81.Font.CaptionHeader.RelativeSize * v81.Font.BaseSize else v80.PlayerNameTextSize,
-					MinSize = if not FFlagEnableMobilePlayerListOnConsole then v81.Font.Footer.RelativeMinSize * v81.Font.BaseSize else v80.PlayerNameTextSize
+			if v6 then
+				local v13 = {
+					Font = v4.Font.CaptionHeader.Font,
+					FontFace = 0,
+					Size = 0,
+					MinSize = 0
 				}
+				local fontFace
+
+				if FoundationFontFaceMigration then
+					fontFace = normalizeFontFace(v5.Typography.CaptionMedium.Font)
+				end
+
+				v13.FontFace = fontFace
+				local size2
+
+				if FFlagEnableMobilePlayerListOnConsole then
+					size2 = layoutValues.PlayerNameTextSize
+				else
+					size2 = v4.Font.CaptionHeader.RelativeSize * v4.Font.BaseSize
+				end
+
+				v13.Size = size2
+				local minSize
+
+				if FFlagEnableMobilePlayerListOnConsole then
+					minSize = layoutValues.PlayerNameTextSize
+				else
+					minSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
+				end
+
+				v13.MinSize = minSize
+				return v13
+			else
+				local v13 = { Font = v4.Font.CaptionBody.Font, FontFace = 0, Size = 0, MinSize = 0 }
+				local fontFace
+
+				if FoundationFontFaceMigration then
+					fontFace = normalizeFontFace(v5.Typography.BodySmall.Font)
+				end
+
+				v13.FontFace = fontFace
+				local size2
+
+				if FFlagEnableMobilePlayerListOnConsole then
+					size2 = layoutValues.PlayerNameTextSize
+				else
+					size2 = v4.Font.CaptionBody.RelativeSize * v4.Font.BaseSize
+				end
+
+				v13.Size = size2
+				local minSize
+
+				if FFlagEnableMobilePlayerListOnConsole then
+					minSize = layoutValues.PlayerNameTextSize
+				else
+					minSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
+				end
+
+				v13.MinSize = minSize
+				return v13
+			end
+		elseif isTenFoot then
+			if props.titlePlayerEntry then
+				local v13 = {
+					Font = layoutValues.TitlePlayerEntryFont,
+					FontFace = 0,
+					Size = 0,
+					MinSize = 0
+				}
+				local fontFace
+
+				if FoundationFontFaceMigration then
+					fontFace = normalizeFontFace(layoutValues.TitlePlayerEntryFont)
+				end
+
+				v13.FontFace = fontFace
+				v13.Size = layoutValues.PlayerNameTextSize
+				v13.MinSize = layoutValues.PlayerNameTextSize
+				return v13
+			else
+				local v13 = {
+					Font = layoutValues.PlayerEntryFont,
+					FontFace = 0,
+					Size = 0,
+					MinSize = 0
+				}
+				local fontFace
+
+				if FoundationFontFaceMigration then
+					fontFace = normalizeFontFace(layoutValues.PlayerEntryFont)
+				end
+
+				v13.FontFace = fontFace
+				v13.Size = layoutValues.PlayerNameTextSize
+				v13.MinSize = layoutValues.PlayerNameTextSize
+				return v13
+			end
+		elseif v6 then
+			local v13 = { Font = v4.Font.CaptionHeader.Font, FontFace = 0, Size = 0, MinSize = 0 }
+			local fontFace
+
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(v5.Typography.CaptionMedium.Font)
 			end
 
-			return {
-				Font = v81.Font.CaptionBody.Font,
-				Size = if not FFlagEnableMobilePlayerListOnConsole then v81.Font.CaptionBody.RelativeSize * v81.Font.BaseSize else v80.PlayerNameTextSize,
-				MinSize = if not FFlagEnableMobilePlayerListOnConsole then v81.Font.Footer.RelativeMinSize * v81.Font.BaseSize else v80.PlayerNameTextSize
-			}
-		end
+			v13.FontFace = fontFace
+			v13.Size = v4.Font.CaptionHeader.RelativeSize * v4.Font.BaseSize
+			v13.MinSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
+			return v13
+		else
+			local v13 = { Font = v4.Font.CaptionBody.Font, FontFace = 0, Size = 0, MinSize = 0 }
+			local fontFace
 
-		if IsTenFoot then
-			if t8.titlePlayerEntry then
-				return {
-					Font = v80.TitlePlayerEntryFont,
-					Size = v80.PlayerNameTextSize,
-					MinSize = v80.PlayerNameTextSize
-				}
+			if FoundationFontFaceMigration then
+				fontFace = normalizeFontFace(v5.Typography.BodySmall.Font)
 			end
 
-			return {
-				Font = v80.PlayerEntryFont,
-				Size = v80.PlayerNameTextSize,
-				MinSize = v80.PlayerNameTextSize
-			}
+			v13.FontFace = fontFace
+			v13.Size = v4.Font.CaptionBody.RelativeSize * v4.Font.BaseSize
+			v13.MinSize = v4.Font.Footer.RelativeMinSize * v4.Font.BaseSize
+			return v13
 		end
+	end, { isSmallTouchDevice, isTenFoot, v6, v4, layoutValues, v5 })
 
-		if v85 then
-			return {
-				Font = v81.Font.CaptionHeader.Font,
-				Size = v81.Font.CaptionHeader.RelativeSize * v81.Font.BaseSize,
-				MinSize = v81.Font.Footer.RelativeMinSize * v81.Font.BaseSize
-			}
-		end
+	local backgroundStyle = v10()
+	local textStyle = v11()
+	local v13
 
-		return {
-			Font = v81.Font.CaptionBody.Font,
-			Size = v81.Font.CaptionBody.RelativeSize * v81.Font.BaseSize,
-			MinSize = v81.Font.Footer.RelativeMinSize * v81.Font.BaseSize
-		}
-	end, {
-		isSmallTouchDevice,
-		IsTenFoot,
-		v85,
-		v81,
-		v80
-	})
-	local v95 = v91()
-	local v96 = v92()
-	local u97 = nil
-
-	if not FFlagRemoveNewPlayerListOverlay then
-		u97 = v93()
+	if FFlagRemoveNewPlayerListOverlay then
+		v13 = nil
+	else
+		v13 = v12()
 	end
 
-	local v98 = React.useMemo(function() -- line: 581
-		-- upvalues: t8 (copy), v80 (copy), v95 (copy), FFlagRemoveNewPlayerListOverlay (copy), u97 (ref), v74 (copy), v71 (copy), FFlagPlayerListUseFocusNavHook (copy), FFlagAddNewPlayerListFocusNav (copy), v77 (copy), v86 (copy), v87 (copy)
-		return {
+	local backgroundFrameProps = React.useMemo(function()
+		local v14 = {
+			size = UDim2.new(0, props.entrySizeX, 0, layoutValues.PlayerEntrySizeY),
 			isTeamFrame = false,
-			size = UDim2.new(0, t8.entrySizeX, 0, v80.PlayerEntrySizeY),
-			backgroundStyle = v95,
-			overlayStyle = if not FFlagRemoveNewPlayerListOverlay then u97 else nil,
-			doubleOverlay = if not FFlagRemoveNewPlayerListOverlay then v74 else nil,
-			firstPlayerRef = v71,
-			ref = if FFlagPlayerListUseFocusNavHook or not FFlagAddNewPlayerListFocusNav then nil else v77,
-			onActivated = v86,
-			onStateChanged = v87
+			backgroundStyle = backgroundStyle,
+			overlayStyle = 0,
+			doubleOverlay = 0,
+			firstPlayerRef = 0,
+			ref = 0,
+			onActivated = 0,
+			onStateChanged = 0
 		}
+		local overlayStyle
+
+		if not FFlagRemoveNewPlayerListOverlay then
+			overlayStyle = v13
+		end
+
+		v14.overlayStyle = overlayStyle
+		local doubleOverlay
+
+		if not FFlagRemoveNewPlayerListOverlay then
+			doubleOverlay = state2
+		end
+
+		v14.doubleOverlay = doubleOverlay
+		v14.firstPlayerRef = firstPlayerRef
+		local ref3
+
+		if not (FFlagPlayerListUseFocusNavHook or not FFlagAddNewPlayerListFocusNav) then
+			ref3 = ref2
+		end
+
+		v14.ref = ref3
+
+		v14.onActivated = onActivated
+		v14.onStateChanged = onStateChanged
+		return v14
 	end, {
-		t8.entrySizeX,
-		v80.PlayerEntrySizeY,
-		v95,
-		u97,
-		v74,
-		v77,
-		v86,
-		v87
+		props.entrySizeX,
+		layoutValues.PlayerEntrySizeY,
+		backgroundStyle,
+		v13,
+		state2,
+		ref2,
+		onActivated,
+		onStateChanged
 	})
-	local v99 = React.useMemo(function() -- line: 605
-		-- upvalues: isSmallTouchDevice (copy), IsTenFoot (copy), v80 (copy), v96 (copy), v94 (copy), v72 (copy), v95 (copy), FFlagRemoveNewPlayerListOverlay (copy), u97 (ref), v74 (copy), t8 (copy), v68 (copy), v98 (copy)
-		return {
+
+	local v14 = React.useMemo(function()
+		local v14 = {
 			isSmallTouchDevice = isSmallTouchDevice,
-			isDirectionalPreferred = IsTenFoot,
-			layoutValues = v80,
-			textStyle = v96,
-			playerNameFont = v94,
-			isHovered = v72,
-			backgroundStyle = v95,
-			overlayStyle = if not FFlagRemoveNewPlayerListOverlay then u97 else nil,
-			isPressed = if not FFlagRemoveNewPlayerListOverlay then v74 else nil,
-			player = t8.player,
-			playerIconInfo = t8.playerIconInfo,
-			playerRelationship = t8.playerRelationship,
-			titlePlayerEntry = t8.titlePlayerEntry,
-			entrySizeX = t8.entrySizeX,
-			gameStats = t8.gameStats,
-			playerStats = t8.playerData.stats,
-			playerStatsCount = v68,
-			gameStatsCount = t8.gameStatsCount,
-			backgroundFrameProps = v98
+			isDirectionalPreferred = isTenFoot,
+			layoutValues = layoutValues,
+			textStyle = textStyle,
+			playerNameFont = playerNameFont,
+			isHovered = state,
+			backgroundStyle = backgroundStyle,
+			overlayStyle = nil,
+			isPressed = nil,
+			player = 0,
+			playerIconInfo = 0,
+			playerRelationship = 0,
+			titlePlayerEntry = 0,
+			entrySizeX = 0,
+			gameStats = 0,
+			playerStats = 0,
+			playerStatsCount = 0,
+			gameStatsCount = 0,
+			backgroundFrameProps = 0
 		}
+		local overlayStyle
+
+		if not FFlagRemoveNewPlayerListOverlay then
+			overlayStyle = v13
+		end
+
+		v14.overlayStyle = overlayStyle
+		local isPressed
+
+		if not FFlagRemoveNewPlayerListOverlay then
+			isPressed = state2
+		end
+
+		v14.isPressed = isPressed
+		v14.player = props.player
+		v14.playerIconInfo = props.playerIconInfo
+		v14.playerRelationship = props.playerRelationship
+		v14.titlePlayerEntry = props.titlePlayerEntry
+		v14.entrySizeX = props.entrySizeX
+		v14.gameStats = props.gameStats
+		v14.playerStats = props.playerData.stats
+		v14.playerStatsCount = playerStatsCount
+		v14.gameStatsCount = props.gameStatsCount
+		v14.backgroundFrameProps = backgroundFrameProps
+		return v14
 	end, {
 		isSmallTouchDevice,
-		IsTenFoot,
-		v80,
-		v96,
-		v94,
-		v72,
-		v95,
-		u97,
-		v74,
-		t8.player,
-		t8.playerIconInfo,
-		t8.playerRelationship,
-		t8.titlePlayerEntry,
-		t8.entrySizeX,
-		t8.playerData.stats,
-		t8.gameStats,
-		v68,
-		t8.gameStatsCount,
-		v98
+		isTenFoot,
+		layoutValues,
+		textStyle,
+		playerNameFont,
+		state,
+		backgroundStyle,
+		v13,
+		state2,
+		props.player,
+		props.playerIconInfo,
+		props.playerRelationship,
+		props.titlePlayerEntry,
+		props.entrySizeX,
+		props.playerData.stats,
+		props.gameStats,
+		playerStatsCount,
+		props.gameStatsCount,
+		backgroundFrameProps
 	})
 
 	if not FFlagPlayerListUseFocusNavHook then
-		React.useEffect(function() -- line: 650
-			-- upvalues: FFlagAddNewPlayerListFocusNav (copy), v77 (copy), t8 (copy), GuiService (copy), v78 (copy)
-			local connection = nil
-			local connection2 = nil
+		React.useEffect(function()
+			local selectionLostConnection = nil
+			local destroyingConnection = nil
 
-			if FFlagAddNewPlayerListFocusNav and (v77.current and t8.prevFocusedEntry and t8.destroyedFocusedPlayerId) then
-				local current = v77.current
+			if
+				FFlagAddNewPlayerListFocusNav
+				and ref2.current
+				and props.prevFocusedEntry
+				and props.destroyedFocusedPlayerId
+			then
+				local current = ref2.current
 
-				connection = v77.current.SelectionLost:Connect(function() -- line: 658
-					-- upvalues: t8 (copy), current (copy)
-					t8.prevFocusedEntry.current = current
+				selectionLostConnection = ref2.current.SelectionLost:Connect(function()
+					props.prevFocusedEntry.current = current
 				end)
-				connection2 = v77.current.Destroying:Connect(function() -- line: 663
-					-- upvalues: connection (ref), GuiService (copy), current (copy), t8 (copy), v78 (copy), connection2 (ref)
-					connection:Disconnect()
+
+				destroyingConnection = ref2.current.Destroying:Connect(function()
+					selectionLostConnection:Disconnect()
 
 					if GuiService.SelectedCoreObject == current then
-						t8.destroyedFocusedPlayerId.current = t8.player.UserId
-						v78(nil)
+						props.destroyedFocusedPlayerId.current = props.player.UserId
+						v3(nil)
 					end
 
-					connection2:Disconnect()
+					destroyingConnection:Disconnect()
 				end)
 			end
 
-			return function() -- line: 677
-				-- upvalues: connection (ref)
-				if connection then
-					connection:Disconnect()
+			return function()
+				if selectionLostConnection then
+					selectionLostConnection:Disconnect()
 				end
 			end
 		end, {
-			v78,
-			t8.player,
-			t8.prevFocusedEntry,
-			t8.destroyedFocusedPlayerId,
-			v77.current
+			v3,
+			props.player,
+			props.prevFocusedEntry,
+			props.destroyedFocusedPlayerId,
+			ref2.current
 		})
 	end
 
 	if FFlagPlayerListUseFocusNavHook then
-		React.useEffect(function() -- line: 686
-			-- upvalues: t8 (copy)
-			return function() -- line: 687
-				-- upvalues: t8 (copy)
-				if t8.unregisterPlayerInstance then
-					t8.unregisterPlayerInstance(t8.player.UserId)
+		React.useEffect(function()
+			return function()
+				if props.unregisterPlayerInstance then
+					props.unregisterPlayerInstance(props.player.UserId)
 				end
 			end
-		end, {
-			t8.unregisterPlayerInstance,
-			t8.player
-		})
+		end, { props.unregisterPlayerInstance, props.player })
 	end
 
-	local v100 = React.useCallback(function(p7) -- line: 695
-		-- upvalues: FFlagPlayerListUseFocusNavHook (copy), t8 (copy), FFlagAddNewPlayerListMobileFocusNav (copy), v77 (copy), v76 (copy)
-		if FFlagPlayerListUseFocusNavHook and t8.registerPlayerInstance then
-			t8.registerPlayerInstance(t8.player.UserId, p7, t8.playerData.order)
+	local ref3 = React.useCallback(function(current)
+		if FFlagPlayerListUseFocusNavHook and props.registerPlayerInstance then
+			props.registerPlayerInstance(props.player.UserId, current, props.playerData.order)
 		end
 
-		if not FFlagPlayerListUseFocusNavHook and FFlagAddNewPlayerListMobileFocusNav then
-			v77.current = p7
-
-			return
+		if FFlagPlayerListUseFocusNavHook or not FFlagAddNewPlayerListMobileFocusNav then
+			ref.current = current
+		else
+			ref2.current = current
 		end
-
-		v76.current = p7
-	end, {
-		t8.player,
-		t8.playerData,
-		t8.registerPlayerInstance
-	})
+	end, { props.player, props.playerData, props.registerPlayerInstance })
 
 	if isSmallTouchDevice then
 		return React.createElement(View, {
+			Size = size,
+			BackgroundColor3 = backgroundStyle.Color,
+			BackgroundTransparency = backgroundStyle.Transparency,
 			AutoButtonColor = false,
 			BorderSizePixel = 0,
 			Image = "",
-			Size = v82,
-			BackgroundColor3 = v95.Color,
-			BackgroundTransparency = v95.Transparency,
-			LayoutOrder = v70,
-			ref = v100,
-			onActivated = v86,
-			onStateChanged = v87
+			LayoutOrder = layoutOrder,
+			ref = ref3,
+			onActivated = onActivated,
+			onStateChanged = onStateChanged
 		}, {
-			ChildrenFrame = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1),
-				Position = UDim2.new(0, 0, 0, 0)
-			}, React.createElement(u40, v99))
+			ChildrenFrame = React.createElement(
+				"Frame",
+				{
+					Size = UDim2.fromScale(1, 1),
+					Position = UDim2.new(0, 0, 0, 0),
+					BackgroundTransparency = 1
+				},
+				React.createElement(memo2, v14)
+			)
 		})
 	end
 
-	if IsTenFoot then
-		return React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = v82,
-			LayoutOrder = v70,
-			ref = if not FFlagPlayerListUseFocusNavHook then v76 else v100
-		}, React.createElement(u40, v99))
-	end
+	if isTenFoot then
+		local createElement = React.createElement
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = v82,
-		LayoutOrder = v70,
-		ref = if not FFlagPlayerListUseFocusNavHook then v76 else v100
-	}, {
-		PlayerEntryContentFrame = React.createElement(EntryFrameView, Cryo.Dictionary.join(v98, {
-			size = UDim2.new(1, 0, 0, v80.PlayerEntrySizeY)
-		}), React.createElement(u40, v99))
-	})
+		if not FFlagPlayerListUseFocusNavHook then
+			ref3 = ref
+		end
+
+		return createElement(
+			"Frame",
+			{ Size = size, BackgroundTransparency = 1, LayoutOrder = layoutOrder, ref = ref3 },
+			React.createElement(memo2, v14)
+		)
+	else
+		local createElement = React.createElement
+
+		if not FFlagPlayerListUseFocusNavHook then
+			ref3 = ref
+		end
+
+		return createElement(
+			"Frame",
+			{ Size = size, BackgroundTransparency = 1, LayoutOrder = layoutOrder, ref = ref3 },
+			{
+				PlayerEntryContentFrame = React.createElement(
+					EntryFrameView,
+					Cryo.Dictionary.join(backgroundFrameProps, {
+						size = UDim2.new(1, 0, 0, layoutValues.PlayerEntrySizeY)
+					}),
+					React.createElement(memo2, v14)
+				)
+			}
+		)
+	end
 end
 
 return React.memo(PlayerEntryView)

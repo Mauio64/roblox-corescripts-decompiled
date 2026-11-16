@@ -1,12 +1,10 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-
-require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+require(parent.React)
 
 local usePropertiesBase = require(script.Parent.usePropertiesBase)
 
-local function useProperties(p1, p2, ...) -- line: 33
-	-- upvalues: usePropertiesBase (copy)
-	return usePropertiesBase(p1, p2, false, ...)
+local function useProperties(p, p2, ...)
+	return usePropertiesBase(p, p2, false, ...)
 end
 
 return useProperties

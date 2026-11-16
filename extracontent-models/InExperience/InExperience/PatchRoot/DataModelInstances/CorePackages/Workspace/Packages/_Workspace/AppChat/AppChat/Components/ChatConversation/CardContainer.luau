@@ -1,69 +1,123 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local Foundation = require(AppChatParent.Foundation)
-local React = require(AppChatParent.React)
-local SocialCards = require(AppChatParent.SocialCards)
-local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
+local parent = AppChat.Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local SocialCards = require(parent.SocialCards)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
-local useChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext).useChatPlacementContext
+local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+local useChatPlacementContext = ChatPlacementContext.useChatPlacementContext
+
 local Cards = SocialCards.Cards
-local UserTile = require(AppChatParent.UserTile).UserTile
-local LayoutMode = require(AppChatParent.UserTile).LayoutMode
-local UserPresence = require(AppChatParent.Foundation).Enums.UserPresence
+
+local UserTile = require(parent.UserTile)
+local userTile = UserTile.UserTile
+local UserTile2 = require(parent.UserTile)
+local LayoutMode = UserTile2.LayoutMode
+local Foundation2 = require(parent.Foundation)
+local UserPresence = Foundation2.Enums.UserPresence
+
 local useTokens = Foundation.Hooks.useTokens
 
-local function CardContainer(t1: {[any]: any}) -- line: 28
-	-- upvalues: useLocalUserId (copy), useTokens (copy), useChatPagePadding (copy), useChatPlacementContext (copy), React (copy), Foundation (copy), UserTile (copy), LayoutMode (copy), UserPresence (copy), Cards (copy)
-	local v16 = useLocalUserId()
-	local v17 = tostring(v16) == t1.senderTargetId
-	local v18 = useTokens()
-	local v19 = useChatPagePadding()
-	local v20 = useChatPlacementContext()
-	local v21 = React.useMemo(function() -- line: 35
-		-- upvalues: v18 (copy)
-		return Vector2.new(v18.Size.Size_700, v18.Size.Size_700)
-	end, { v18 })
-	local Size_200 = v18.Size.Size_200
-	local v23 = if t1.senderTargetId then if not v17 then Enum.HorizontalAlignment.Left else Enum.HorizontalAlignment.Right else Enum.HorizontalAlignment.Center
+local function CardContainer(props)
+	local v = useLocalUserId()
+	local v2 = tostring(v) == props.senderTargetId
+	local v3 = useTokens()
+	local v4 = useChatPagePadding()
+	local v5 = useChatPlacementContext()
 
-	return React.createElement(Foundation.View, {
+	local v6 = React.useMemo(function()
+		return Vector2.new(v3.Size.Size_700, v3.Size.Size_700)
+	end, { v3 })
+
+	local size_200 = v3.Size.Size_200
+	local horizontalAlignment
+
+	if props.senderTargetId then
+		if v2 then
+			horizontalAlignment = Enum.HorizontalAlignment.Right
+		else
+			horizontalAlignment = Enum.HorizontalAlignment.Left
+		end
+	else
+		horizontalAlignment = Enum.HorizontalAlignment.Center
+	end
+
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v7 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.fromScale(1, 0),
-		testId = t1.testId,
+		testId = props.testId,
 		layout = {
 			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = v23,
-			Padding = UDim.new(0, Size_200),
+			HorizontalAlignment = horizontalAlignment,
+			Padding = UDim.new(0, size_200),
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Bottom
 		},
 		padding = {
-			left = UDim.new(0, v19.left),
-			right = UDim.new(0, v19.right),
-			top = UDim.new(0, v18.Padding.XSmall)
+			left = UDim.new(0, v4.left),
+			right = UDim.new(0, v4.right),
+			top = UDim.new(0, v3.Padding.XSmall)
 		}
-	}, {
-		Avatar = if not t1.senderTargetId or v16 == t1.senderTargetId then nil else React.createElement(Foundation.View, {
-			Size = UDim2.new(0, v21.X, 0, v21.Y),
-			LayoutOrder = not v17 and 1 or 2
-		}, { React.createElement(UserTile, {
-			userId = t1.senderTargetId,
-			layoutMode = LayoutMode.compact,
-			userPresenceType = UserPresence.None
-		}) }),
-		Cards = if not t1.cards then nil else React.createElement(Foundation.View, {
+	}
+	local avatar
+
+	if props.senderTargetId and props.senderTargetId ~= v then
+		avatar = React.createElement(Foundation.View, {
+			Size = UDim2.new(0, v6.X, 0, v6.Y),
+			LayoutOrder = v2 and 2 or 1
+		}, { React.createElement(userTile, {
+				userId = props.senderTargetId,
+				layoutMode = LayoutMode.compact,
+				userPresenceType = UserPresence.None
+			}) })
+	end
+
+	local cards
+
+	if props.cards then
+		local createElement2 = React.createElement
+		local view2 = Foundation.View
+		local v8 = {
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.new(1, not t1.senderTargetId and 0 or -(v21.X + Size_200), 0, 0),
-			LayoutOrder = not v17 and 2 or 1
-		}, React.createElement(Cards, {
-			analyticsInfo = {
-				moduleLocation = v20.chatPlacement
-			},
-			anchorPoint = if not v17 then Vector2.new(0, 0) else Vector2.new(1, 0),
-			position = if not v17 then UDim2.fromScale(0, 0) else UDim2.fromScale(1, 0),
-			cards = t1.cards
-		}))
-	})
+			Size = UDim2.new(1, not props.senderTargetId and 0 or -(v6.X + size_200), 0, 0),
+			LayoutOrder = v2 and 1 or 2
+		}
+
+		local createElement3 = React.createElement
+		local v9 = {
+			analyticsInfo = { moduleLocation = v5.chatPlacement },
+			anchorPoint = 0,
+			position = 0,
+			cards = 0
+		}
+		local anchorPoint
+
+		if v2 then
+			anchorPoint = Vector2.new(1, 0)
+		else
+			anchorPoint = Vector2.new(0, 0)
+		end
+
+		v9.anchorPoint = anchorPoint
+		local position
+
+		if v2 then
+			position = UDim2.fromScale(1, 0)
+		else
+			position = UDim2.fromScale(0, 0)
+		end
+
+		v9.position = position
+		v9.cards = props.cards
+		cards = createElement2(view2, v8, createElement3(Cards, v9))
+	end
+
+	return createElement(view, v7, { Avatar = avatar, Cards = cards })
 end
 
 return CardContainer

@@ -1,10 +1,14 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local MessageBus = require(scriptParentParent.MessageBus).MessageBus
-local t = require(scriptParentParent.t)
-local WebViewEventType = require(scriptParent.Enums.WebViewEventType)
-local t1 = {
-	mid = MessageBus.getMessageId("Game", "openSurvey"),
+local parent = script.Parent
+local parent2 = parent.Parent
+
+local MessageBus = require(parent2.MessageBus)
+local messageBus = MessageBus.MessageBus
+local t = require(parent2.t)
+
+local WebViewEventType = require(parent.Enums.WebViewEventType)
+
+local v = {
+	mid = messageBus.getMessageId("Game", "openSurvey"),
 	validateParams = t.strictInterface({
 		eventType = t.valueOf(WebViewEventType),
 		customProps = t.optional(t.table)
@@ -12,13 +16,8 @@ local t1 = {
 }
 
 return {
-	publishSurveyEvent = function(p1) -- line: 30
-		-- upvalues: MessageBus (copy), t1 (copy)
-		local t2 = {
-			eventType = p1
-		}
-
-		MessageBus.publish(t1, t2)
+	publishSurveyEvent = function(eventType)
+		messageBus.publish(v, { eventType = eventType })
 	end,
-	OPEN_SURVEY_EVENT_DESCRIPTOR = t1
+	OPEN_SURVEY_EVENT_DESCRIPTOR = v
 }

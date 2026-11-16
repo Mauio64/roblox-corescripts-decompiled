@@ -1,46 +1,38 @@
 local ContentProvider = game:GetService("ContentProvider")
-local Parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
+local React = require(parent.React)
 
-local function useImageLoadingState(s1: string?) -- line: 6
-	-- upvalues: React (copy), ContentProvider (copy)
-	local v6, v7 = React.useState(false)
+local function useImageLoadingState(p: string?)
+	local state, setState = React.useState(false)
 
-	React.useEffect(function() -- line: 9
-		-- upvalues: s1 (copy), v7 (copy), ContentProvider (copy)
-		if not s1 or s1 == "" then
-			v7(false)
-
+	React.useEffect(function()
+		if not p or p == "" then
+			setState(false)
 			return
 		end
 
-		if ContentProvider:GetAssetFetchStatus(s1) == Enum.AssetFetchStatus.Success then
-			v7(true)
-
+		if ContentProvider:GetAssetFetchStatus(p) == Enum.AssetFetchStatus.Success then
+			setState(true)
 			return
 		end
 
-		v7(false)
+		setState(false)
+		local v = true
 
-		local u8 = true
-
-		task.spawn(function() -- line: 24
-			-- upvalues: ContentProvider (copy), s1 (copy), u8 (ref), v7 (copy)
-			ContentProvider:PreloadAsync({ s1 }, function(p1, p2) -- line: 25
-				-- upvalues: u8 (ref), s1 (copy), v7 (copy)
-				if u8 and (p1 == s1 and p2 == Enum.AssetFetchStatus.Success) then
-					v7(true)
+		task.spawn(function()
+			ContentProvider:PreloadAsync({ p }, function(p2, p3)
+				if v and p2 == p and p3 == Enum.AssetFetchStatus.Success then
+					setState(true)
 				end
 			end)
 		end)
 
-		return function() -- line: 34
-			-- upvalues: u8 (ref)
-			u8 = false
+		return function()
+			v = false
 		end
-	end, { s1 })
+	end, { p })
 
-	return v6
+	return state
 end
 
 return useImageLoadingState

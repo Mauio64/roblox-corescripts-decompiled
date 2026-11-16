@@ -1,183 +1,213 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local Cryo = require(scriptParentParent.Cryo)
-local Signals = require(scriptParentParent.Signals)
-local createSignalMap = require(scriptParentParent.CoreScriptsRoactCommon).Utilities.createSignalMap
-local createPersonStore = require(scriptParent.createPersonStore)
-local PeopleUtility = require(scriptParent.PeopleUtility)
-local GetFFlagPeoplePageEnablePersonSignalStore = require(scriptParent.Flags).GetFFlagPeoplePageEnablePersonSignalStore
+local parent = script.Parent
+local parent2 = parent.Parent
 
-local function createPeopleListStore(p1) -- line: 36
-	-- upvalues: GetFFlagPeoplePageEnablePersonSignalStore (copy), createSignalMap (copy), PeopleUtility (copy), Signals (copy), Cryo (copy), createPersonStore (copy)
-	local v11 = p1 or game:GetService("Players")
-	local players = v11:GetPlayers()
-	local v13 = if not GetFFlagPeoplePageEnablePersonSignalStore() then nil else {}
-	local v14 = if not GetFFlagPeoplePageEnablePersonSignalStore() then nil else createSignalMap()
-	local u15 = PeopleUtility.sortPeople(players)
-	local v16, v17 = Signals.createSignal(u15)
-	local v18, v19 = Signals.createSignal({})
-	local t1 = {}
-	local t2 = {}
-	local u22 = Cryo.List.map(u15, function(p2) -- line: 62
+local Cryo = require(parent2.Cryo)
+local Signals = require(parent2.Signals)
+
+local CoreScriptsRoactCommon = require(parent2.CoreScriptsRoactCommon)
+local createSignalMap = CoreScriptsRoactCommon.Utilities.createSignalMap
+
+local createPersonStore = require(parent.createPersonStore)
+local PeopleUtility = require(parent.PeopleUtility)
+
+local Flags = require(parent.Flags)
+local GetFFlagPeoplePageEnablePersonSignalStore = Flags.GetFFlagPeoplePageEnablePersonSignalStore
+
+local function createPeopleListStore(p)
+	local v = p or game:GetService("Players")
+
+	local players = v:GetPlayers()
+
+	local v2 = GetFFlagPeoplePageEnablePersonSignalStore() and {} or nil
+	local v3
+
+	if GetFFlagPeoplePageEnablePersonSignalStore() then
+		v3 = createSignalMap()
+	else
+		v3 = nil
+	end
+
+	local v4 = PeopleUtility.sortPeople(players)
+
+	local signal, v5 = Signals.createSignal(v4)
+	local signal2, v6 = Signals.createSignal({})
+
+	local joined = {}
+	local joined2 = {}
+
+	local mapped = Cryo.List.map(v4, function(p2)
 		return p2.UserId
 	end)
 
-	local function fetchProfiles(t3: {[any]: any}) -- line: 67
-		-- upvalues: t1 (ref), PeopleUtility (copy), Cryo (copy), v19 (copy)
-		local t4 = {}
+	local function fetchProfiles(items)
+		local v7 = {}
 
-		for _, v34 in t3 do
-			local str = tostring(v34)
+		for _, item in items do
+			local v8 = tostring(item)
 
-			if not t1[str] then
-				table.insert(t4, str)
+			if not joined[v8] then
+				table.insert(v7, v8)
 			end
 		end
 
-		if #t4 > 0 then
-			local v36 = PeopleUtility.getInExperienceCombinedName(t4)
+		if #v7 > 0 then
+			local v8 = PeopleUtility.getInExperienceCombinedName(v7)
 
-			t1 = Cryo.Dictionary.join(t1, v36)
-			v19(t1)
+			joined = Cryo.Dictionary.join(joined, v8)
+
+			v6(joined)
 		end
 	end
-	local function fetchPlatformData(t5: {[any]: any}) -- line: 90
-		-- upvalues: t2 (ref), PeopleUtility (copy), Cryo (copy)
-		local t6 = {}
 
-		for _, v40 in t5 do
-			local str = tostring(v40)
+	local function fetchPlatformData(items)
+		local v7 = {}
 
-			if not t2[str] then
-				table.insert(t6, str)
+		for _, item in items do
+			local v8 = tostring(item)
+
+			if not joined2[v8] then
+				table.insert(v7, v8)
 			end
 		end
 
-		if #t6 > 0 then
-			local v42 = PeopleUtility.getPlatformData(t6)
+		if #v7 > 0 then
+			local platformData = PeopleUtility.getPlatformData(v7)
 
-			t2 = Cryo.Dictionary.join(t2, v42)
+			joined2 = Cryo.Dictionary.join(joined2, platformData)
 		end
 	end
 
-	local v25 = if not GetFFlagPeoplePageEnablePersonSignalStore() then nil else function(p3) -- line: 112
-		-- upvalues: v13 (copy), createPersonStore (copy), v14 (copy), PeopleUtility (copy)
-		if v13[p3.UserId] then
+	local fn = GetFFlagPeoplePageEnablePersonSignalStore() and function(p2)
+		if v2[p2.UserId] then
 			return
 		end
 
-		local v44 = createPersonStore(p3)
+		local personStore = createPersonStore(p2)
+		v2[p2.UserId] = personStore
 
-		v13[p3.UserId] = v44
-		v14.setData(p3.UserId, {
-			getPerson = v44.getPerson,
-			getOrder = v44.getOrder
-		}, false)
-		PeopleUtility.sortPersonStores(v13)
-	end
+		v3.setData(p2.UserId, { getPerson = personStore.getPerson, getOrder = personStore.getOrder }, false)
 
-	local function addPerson(p4) -- line: 130
-		-- upvalues: GetFFlagPeoplePageEnablePersonSignalStore (copy), v25 (copy), u15 (ref), PeopleUtility (copy), Cryo (copy), v17 (copy), u22 (ref), fetchProfiles (copy), fetchPlatformData (copy)
+		PeopleUtility.sortPersonStores(v2)
+	end or nil
+
+	local function addPerson(p2)
 		if GetFFlagPeoplePageEnablePersonSignalStore() then
-			v25(p4)
+			fn(p2)
 		end
 
-		local n1 = 1
+		local v7 = 1
 
-		for v47, v48 in u15 do
-			if PeopleUtility.comparePeople(p4, v48) then
-				n1 = v47
-
+		for k, v8 in v4 do
+			if PeopleUtility.comparePeople(p2, v8) then
+				v7 = k
 				break
 			end
 
-			n1 = v47 + 1
+			v7 = k + 1
 		end
 
-		u15 = if not (n1 > #u15) then if not GetFFlagPeoplePageEnablePersonSignalStore() or n1 ~= 1 then Cryo.List.join(Cryo.List.getRange(u15, 1, n1 - 1), { p4 }, Cryo.List.getRange(u15, n1, #u15)) else Cryo.List.join({ p4 }, u15) else Cryo.List.join(u15, { p4 })
-		v17(u15)
-		u22 = Cryo.List.join(u22, { p4.UserId })
-		fetchProfiles({ p4.UserId })
-		fetchPlatformData({ p4.UserId })
+		local joined3
+
+		if #v4 < v7 then
+			joined3 = Cryo.List.join(v4, { p2 })
+		elseif GetFFlagPeoplePageEnablePersonSignalStore() and v7 == 1 then
+			joined3 = Cryo.List.join({ p2 }, v4)
+		else
+			joined3 = Cryo.List.join(Cryo.List.getRange(v4, 1, v7 - 1), { p2 }, Cryo.List.getRange(v4, v7, #v4))
+		end
+
+		v4 = joined3
+		v5(v4)
+
+		mapped = Cryo.List.join(mapped, { p2.UserId })
+
+		fetchProfiles({ p2.UserId })
+		fetchPlatformData({ p2.UserId })
 	end
-	local function removePerson(p5) -- line: 171
-		-- upvalues: GetFFlagPeoplePageEnablePersonSignalStore (copy), v13 (copy), v14 (copy), Cryo (copy), u15 (ref), v17 (copy), u22 (ref), t1 (ref), t2 (ref), v19 (copy)
-		if GetFFlagPeoplePageEnablePersonSignalStore() and v13[p5.UserId] then
-			v13[p5.UserId] = nil
-			v14.removeData(p5.UserId, false)
+
+	local function removePerson(p2)
+		if GetFFlagPeoplePageEnablePersonSignalStore() and v2[p2.UserId] then
+			v2[p2.UserId] = nil
+			v3.removeData(p2.UserId, false)
 		end
 
-		local v50 = Cryo.List.filter(u15, function(p6) -- line: 180
-			-- upvalues: p5 (copy)
-			return p6 ~= p5
+		local filtered = Cryo.List.filter(v4, function(p3): boolean
+			return p3 ~= p2
 		end)
 
-		if #v50 == #u15 then
+		if #filtered == #v4 then
 			return
 		end
 
-		u15 = v50
-		v17(u15)
+		v4 = filtered
+		v5(v4)
 
-		local UserId = p5.UserId
-
-		u22 = Cryo.List.filter(u22, function(n2: number) -- line: 195
-			-- upvalues: UserId (copy)
-			return n2 ~= UserId
+		local userId = p2.UserId
+		mapped = Cryo.List.filter(mapped, function(p3: number): boolean
+			return p3 ~= userId
 		end)
 
-		local str = tostring(UserId)
-
-		t1[str] = nil
-		t2[str] = nil
-		v19(t1)
+		local v7 = tostring(userId)
+		joined[v7] = nil
+		joined2[v7] = nil
+		v6(joined)
 	end
 
-	fetchProfiles(u22)
-	fetchPlatformData(u22)
-	v11.PlayerAdded:Connect(addPerson)
-	v11.PlayerRemoving:Connect(removePerson)
+	local function getProfile(p2: number)
+		local v7 = tostring(p2)
+
+		if not joined[v7] then
+			fetchProfiles({ p2 })
+		end
+
+		return joined[v7]
+	end
+
+	local function getPlatformName(p2: number)
+		local v7 = tostring(p2)
+
+		if not joined2[v7] then
+			fetchPlatformData({ p2 })
+		end
+
+		return joined2[v7].platformName
+	end
+
+	local function getPlatformProfileId(p2: number)
+		local v7 = tostring(p2)
+
+		if not joined2[v7] then
+			fetchPlatformData({ p2 })
+		end
+
+		return joined2[v7].platformProfileId
+	end
+
+	fetchProfiles(mapped)
+	fetchPlatformData(mapped)
+
+	v.PlayerAdded:Connect(addPerson)
+	v.PlayerRemoving:Connect(removePerson)
 
 	if GetFFlagPeoplePageEnablePersonSignalStore() then
-		for _, player in v11:GetPlayers() do
-			v25(player)
+		for _, v7 in v:GetPlayers() do
+			fn(v7)
 		end
+	end
+
+	local peopleSignalMap
+
+	if GetFFlagPeoplePageEnablePersonSignalStore() then
+		peopleSignalMap = v3
 	end
 
 	return {
-		people = v16,
-		peopleSignalMap = if not GetFFlagPeoplePageEnablePersonSignalStore() then nil else v14,
-		peopleProfiles = v18,
-		getProfile = function(n3: number) -- line: 207
-			-- upvalues: t1 (ref), fetchProfiles (copy)
-			local str = tostring(n3)
-
-			if not t1[str] then
-				fetchProfiles({ n3 })
-			end
-
-			return t1[str]
-		end,
-		getPlatformName = function(n4: number) -- line: 219
-			-- upvalues: t2 (ref), fetchPlatformData (copy)
-			local str = tostring(n4)
-
-			if not t2[str] then
-				fetchPlatformData({ n4 })
-			end
-
-			return t2[str].platformName
-		end,
-		getPlatformProfileId = function(n5: number) -- line: 231
-			-- upvalues: t2 (ref), fetchPlatformData (copy)
-			local str = tostring(n5)
-
-			if not t2[str] then
-				fetchPlatformData({ n5 })
-			end
-
-			return t2[str].platformProfileId
-		end
+		people = signal,
+		peopleSignalMap = peopleSignalMap,
+		peopleProfiles = signal2,
+		getProfile = getProfile,
+		getPlatformName = getPlatformName,
+		getPlatformProfileId = getPlatformProfileId
 	}
 end
 
@@ -185,4 +215,4 @@ if GetFFlagPeoplePageEnablePersonSignalStore() then
 	return createPeopleListStore
 end
 
-return (createPeopleListStore())
+return createPeopleListStore()

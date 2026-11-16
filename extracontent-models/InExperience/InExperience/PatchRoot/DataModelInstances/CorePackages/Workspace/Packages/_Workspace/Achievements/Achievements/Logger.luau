@@ -1,3 +1,3 @@
-local ParentParent = script.Parent.Parent
-
-return (require(ParentParent.Lumberyak).Logger.new(nil, "Achievement"))
+local parent = script.Parent.Parent
+local Lumberyak = require(parent.Lumberyak)
+return (Lumberyak.Logger.new(nil, "Achievement"))

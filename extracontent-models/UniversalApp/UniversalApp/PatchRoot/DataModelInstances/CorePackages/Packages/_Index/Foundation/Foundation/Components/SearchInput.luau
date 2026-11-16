@@ -1,1 +1,3 @@
-return (require(script.SearchInput))
+local SearchInput = require(script.SearchInput)
+
+return SearchInput

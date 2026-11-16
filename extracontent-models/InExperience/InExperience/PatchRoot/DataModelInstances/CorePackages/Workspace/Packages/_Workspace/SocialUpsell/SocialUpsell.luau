@@ -1,21 +1,17 @@
 local Components = require(script.Components)
-
 require(script.Types)
-
 local Thunks = require(script.Thunks)
-local Enum = require(script.Enum)
+local Enum2 = require(script.Enum)
 
-return {
-	InAppSocialUpsellOverlayWrapper = require(script.Components).InAppSocialUpsellOverlayWrapper,
+local Components2 = require(script.Components)
+local SocialUpsell = {
+	["InAppSocialUpsellOverlayWrapper"] = Components2.InAppSocialUpsellOverlayWrapper,
 	UpsellBanner = Components.UpsellBanner,
 	UpsellOverlay = Components.UpsellOverlay,
 	SocialUpsellEventReceiver = Components.SocialUpsellEventReceiver,
 	Analytics = {
 		SocialUpsellAnalytics = require(script.Analytics.SocialUpsellAnalytics),
 		Enum = require(script.Analytics.Enum)
-	},
-	Flags = {
-		FFlagAddAEGIS2Analytics = require(script.Flag.FFlagAddAEGIS2Analytics)
 	},
 	Enum = require(script.Enum),
 	Utils = {
@@ -27,13 +23,18 @@ return {
 		GetAgeVerifiedChangedSignal = require(script.Signals.GetAgeVerifiedChangedSignal)
 	},
 	Thunks = Thunks,
-	Enums = Enum,
+	Enums = Enum2,
 	Hooks = require(script.Hooks),
-	Constants = require(script.Constants),
-	Overlay = {
-		initializeInExpOverlay = require(script.Utils.initializeInExpOverlay),
-		getOverlayStore = require(script.Store.getOverlayStore),
-		OverlayTypes = require(script.Constants).OVERLAY_TYPES
-	},
-	["jest.config"] = script["jest.config"]
+	Constants = require(script.Constants)
 }
+local overlay = {
+	initializeInExpOverlay = require(script.Utils.initializeInExpOverlay),
+	getOverlayStore = require(script.Store.getOverlayStore),
+	OverlayTypes = 0
+}
+local Constants = require(script.Constants)
+overlay.OverlayTypes = Constants.OVERLAY_TYPES
+SocialUpsell.Overlay = overlay
+
+SocialUpsell["jest.config"] = script["jest.config"]
+return SocialUpsell

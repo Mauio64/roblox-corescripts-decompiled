@@ -1,3 +1,3 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-
-return (require(AppChat.Logger):new(script.Name))
+local Logger = require(AppChat.Logger)
+return (Logger:new(script.Name))

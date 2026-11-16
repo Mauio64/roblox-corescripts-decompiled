@@ -2,18 +2,19 @@ local CorePackages = game:GetService("CorePackages")
 local CoreGui = game:GetService("CoreGui")
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 local Packages = CorePackages.Packages
-local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local useLocalization = Localization.Hooks.useLocalization
 local React = require(Packages.React)
 local RoactUtils = require(CorePackages.Workspace.Packages.RoactUtils)
-local useAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy).useAppPolicy
+local UniversalAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local LuauPolyfill = require(Packages.LuauPolyfill)
 local setTimeout = LuauPolyfill.setTimeout
 local clearTimeout = LuauPolyfill.clearTimeout
-
 require(script.Parent.Parent.Parent.Chrome.ChromeShared.Service.WindowSizeSignal)
-
 local useWindowSizeIsLarge = require(script.Parent.Parent.Parent.Chrome.ChromeShared.Hooks.useWindowSizeIsLarge)
+
 local UIBlox = require(Packages.UIBlox)
 local Interactable = UIBlox.Core.Control.Interactable
 local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
@@ -23,6 +24,7 @@ local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
 local ControlState = UIBlox.Core.Control.Enum.ControlState
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+
 local CameraStatusIcon = require(script.Parent.CameraStatusIcon)
 local CameraStatusDot = require(script.Parent.CameraStatusDot)
 local SizingUtils = require(script.Parent.Parent.Utils.SizingUtils)
@@ -35,274 +37,297 @@ local useTooltipDismissal = require(script.Parent.Parent.Hooks.useTooltipDismiss
 local useScreenSize = require(CoreGui.RobloxGui.Modules.Common.Hooks.useScreenSize)
 local Constants = require(script.Parent.Parent.Parent.Chrome.ChromeShared.Unibar.Constants)
 local Chrome = script.Parent.Parent.Parent.Chrome
-local v35 = if not require(CorePackages.Workspace.Packages.Chrome).Enabled() then nil else require(Chrome.Service)
-local UnibarStyle = require(CorePackages.Workspace.Packages.Chrome).UnibarStyle
-local FFlagTokenizeUnibarConstantsWithStyleProvider = require(Chrome.ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider
-local FFlagTopBarSignalizeScreenSize = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize
-local v39 = game:DefineFastFlag("ReactDevtoolsFixTopbar", true)
-local v40 = require(RobloxGui.Modules.SelfView.Analytics).new()
-local v41 = Images["icons/actions/previewShrink"]
-local v42 = Images["icons/actions/previewExpand"]
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local Service
+
+if Chrome2.Enabled() then
+	Service = require(Chrome.Service)
+else
+	Service = nil
+end
+
+local Chrome3 = require(CorePackages.Workspace.Packages.Chrome)
+local UnibarStyle = Chrome3.UnibarStyle
+
+local Flags = require(Chrome.ChromeShared.Flags)
+local FFlagTokenizeUnibarConstantsWithStyleProvider = Flags.FFlagTokenizeUnibarConstantsWithStyleProvider
+
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeScreenSize = CoreGuiCommon.Flags.FFlagTopBarSignalizeScreenSize
+local defineFastFlag = game:DefineFastFlag("ReactDevtoolsFixTopbar", true)
+
+local Analytics = require(RobloxGui.Modules.SelfView.Analytics)
+local v = Analytics.new()
+
+local iconsactionspreviewShrink = Images["icons/actions/previewShrink"]
+local iconsactionspreviewExpand = Images["icons/actions/previewExpand"]
+
 local FaceClone = require(script.Parent.FaceClone)
 
-local function Window(t1: {[any]: any}) -- line: 78
-	-- upvalues: useStyle (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), useAppPolicy (copy), useLocalization (copy), useCameraOn (copy), useTrackerMessage (copy), useWindowSizeIsLarge (copy), useScreenSize (copy), FFlagTopBarSignalizeScreenSize (copy), SizingUtils (copy), useSelector (copy), React (copy), useLocalPlayer (copy), FaceChatUtils (copy), useTooltipDismissal (copy), clearTimeout (copy), setTimeout (copy), ModelUtils (copy), v40 (copy), FaceClone (copy), ControlState (copy), Interactable (copy), CameraStatusIcon (copy), v35 (copy), ImageSetLabel (copy), v41 (copy), v42 (copy), StyledTextLabel (copy), v39 (copy), withTooltip (copy), CoreGui (copy), TooltipOrientation (copy), CameraStatusDot (copy)
-	local id = t1.id
-	local v47 = useStyle()
-	local Theme = v47.Theme
-	local Font = v47.Font
-	local v50 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.CLOSE_BUTTON_FRAME else UnibarStyle.use().CLOSE_BUTTON_FRAME
-	local v51 = useAppPolicy(function(p1) -- line: 93
-		return p1.getShowUpdatedCameraPath()
-	end)
-	local v52 = useLocalization({
-		robloxPermissionErrorHeader = "CoreScripts.TopBar.RobloxPermissionErrorHeader",
-		dynamicAvatarMissingErrorHeader = "CoreScripts.TopBar.DynamicAvatarMissingErrorHeader",
-		dynamicAvatarMissingErrorBody = "CoreScripts.TopBar.DynamicAvatarMissingErrorBody",
-		robloxPermissionErrorBody = not v51 and "CoreScripts.TopBar.RobloxPermissionErrorBody" or "CoreScripts.TopBar.RobloxPermissionErrorBodyTwo"
-	})
-	local v53 = useCameraOn()
-	local v54 = useTrackerMessage()
-	local v55 = useWindowSizeIsLarge(t1.windowSize)
-	local v56 = useScreenSize()
-	local v57 = if not FFlagTopBarSignalizeScreenSize then useSelector(function(p2) -- line: 114
-		-- upvalues: SizingUtils (copy), v55 (copy)
-		return SizingUtils.getSize(p2.displayOptions.screenSize, v55)
-	end) else SizingUtils.getSize(v56, v55)
+local function Window(p)
+	local id = p.id
+	local v2 = useStyle()
 
-	React.useEffect(function() -- line: 117
-		-- upvalues: t1 (copy), v57 (copy)
-		t1.windowSize:requestSize(v57.X, v57.Y)
-	end, { v57 })
+	local theme = v2.Theme
+	local font = v2.Font
+	local CLOSE_BUTTON_FRAME
 
-	local v58 = useLocalPlayer()
-	local v59 = React.useMemo(function() -- line: 123
-		-- upvalues: FaceChatUtils (copy)
-		return FaceChatUtils.getPermissions().userCamEligible and FaceChatUtils.getPermissions().placeCamEnabled
-	end)
-	local v60, v61, v62, v63 = useTooltipDismissal(2000)
-	local v64, v65 = React.useState(true)
-	local v66, v67 = React.useState(false)
-	local v68, v69 = React.useState(false)
-	local v70, v71 = React.useState(false)
-	local v72 = React.useRef(nil)
-
-	local function v73() -- line: 136
-		-- upvalues: v72 (copy), clearTimeout (copy), v65 (copy), setTimeout (copy)
-		if v72.current then
-			clearTimeout(v72.current)
-		end
-
-		v65(true)
-		v72.current = setTimeout(function() -- line: 141
-			-- upvalues: v65 (copy)
-			v65(false)
-		end, 2000)
+	if FFlagTokenizeUnibarConstantsWithStyleProvider then
+		CLOSE_BUTTON_FRAME = UnibarStyle.use().CLOSE_BUTTON_FRAME
+	else
+		CLOSE_BUTTON_FRAME = Constants.CLOSE_BUTTON_FRAME
 	end
 
-	React.useEffect(function() -- line: 145
-		-- upvalues: v72 (copy), clearTimeout (copy), v65 (copy), setTimeout (copy)
-		if v72.current then
-			clearTimeout(v72.current)
+	local v3 = useLocalization({
+		robloxPermissionErrorHeader = "CoreScripts.TopBar.RobloxPermissionErrorHeader",
+		robloxPermissionErrorBody = useAppPolicy(function(p2)
+			return p2.getShowUpdatedCameraPath()
+		end) and "CoreScripts.TopBar.RobloxPermissionErrorBodyTwo" or "CoreScripts.TopBar.RobloxPermissionErrorBody",
+		dynamicAvatarMissingErrorHeader = "CoreScripts.TopBar.DynamicAvatarMissingErrorHeader",
+		dynamicAvatarMissingErrorBody = "CoreScripts.TopBar.DynamicAvatarMissingErrorBody"
+	})
+
+	local v4 = useCameraOn()
+	local v5 = useTrackerMessage()
+
+	local v6 = useWindowSizeIsLarge(p.windowSize)
+
+	local v7 = useScreenSize()
+	local v8
+
+	if FFlagTopBarSignalizeScreenSize then
+		v8 = SizingUtils.getSize(v7, v6)
+	else
+		v8 = useSelector(function(p2)
+			return SizingUtils.getSize(p2.displayOptions.screenSize, v6)
+		end)
+	end
+
+	React.useEffect(function()
+		p.windowSize:requestSize(v8.X, v8.Y)
+	end, { v8 })
+
+	local v9 = useLocalPlayer()
+
+	local v10 = React.useMemo(function()
+		return FaceChatUtils.getPermissions().userCamEligible and FaceChatUtils.getPermissions().placeCamEnabled
+	end)
+
+	local headerText, bodyText, active, v11 = useTooltipDismissal(2000)
+
+	local state, setState = React.useState(true)
+	local state2, setState2 = React.useState(false)
+	local state3, setState3 = React.useState(false)
+	local state4, setState4 = React.useState(false)
+	local ref = React.useRef(nil)
+	local function fn() -- 3 equivalent calls inferred from this helper
+		if ref.current then
+			clearTimeout(ref.current)
 		end
 
-		v65(true)
-		v72.current = setTimeout(function() -- line: 141
-			-- upvalues: v65 (copy)
-			v65(false)
+		setState(true)
+		ref.current = setTimeout(function()
+			setState(false)
 		end, 2000)
-
-		return function() -- line: 148
-			-- upvalues: v72 (copy), clearTimeout (copy)
-			if v72.current then
-				clearTimeout(v72.current)
+	end
+	React.useEffect(function()
+		fn() -- inferred equivalent call
+		return function()
+			if ref.current then
+				clearTimeout(ref.current)
 			end
 		end
-	end, { v72 })
+	end, { ref })
 
-	local function v74(p3) -- line: 155
-		-- upvalues: v72 (copy), clearTimeout (copy), v65 (copy), setTimeout (copy), FaceChatUtils (copy), v63 (copy), v52 (copy), v58 (copy), ModelUtils (copy), v40 (copy)
-		if v72.current then
-			clearTimeout(v72.current)
-		end
+	local function fn2(p2)
+		fn() -- inferred equivalent call
 
-		v65(true)
-		v72.current = setTimeout(function() -- line: 141
-			-- upvalues: v65 (copy)
-			v65(false)
-		end, 2000)
-
-		if not FaceChatUtils.getPermissions().userCamEnabled and not p3 then
-			v63(v52.robloxPermissionErrorHeader, v52.robloxPermissionErrorBody)
-
+		if not (FaceChatUtils.getPermissions().userCamEnabled or p2) then
+			v11(v3.robloxPermissionErrorHeader, v3.robloxPermissionErrorBody)
 			return
 		end
 
-		if v58.Character and not ModelUtils.hasDynamicHead(v58.Character) and not FaceChatUtils.isCameraOn() and not p3 then
-			v63(v52.dynamicAvatarMissingErrorHeader, v52.dynamicAvatarMissingErrorBody)
+		if v9.Character and not (ModelUtils.hasDynamicHead(v9.Character) or FaceChatUtils.isCameraOn() or p2) then
+			v11(v3.dynamicAvatarMissingErrorHeader, v3.dynamicAvatarMissingErrorBody)
 		end
 
-		v40:setLastCtx("SelfView")
+		v:setLastCtx("SelfView")
 		FaceChatUtils.toggleVideoAnimation()
 	end
 
-	local v75 = React.useCallback(function() -- line: 173
-		-- upvalues: v74 (copy)
-		v74(false)
-	end, {
-		FaceChatUtils,
-		ModelUtils,
-		v52,
-		v58
-	})
-	local v76 = React.useCallback(function() -- line: 177
-		-- upvalues: v72 (copy), clearTimeout (copy), v65 (copy), setTimeout (copy)
-		if v72.current then
-			clearTimeout(v72.current)
-		end
+	local v12 = React.useCallback(function()
+		fn2(false)
+	end, { FaceChatUtils, ModelUtils, v3, v9 })
 
-		v65(true)
-		v72.current = setTimeout(function() -- line: 141
-			-- upvalues: v65 (copy)
-			v65(false)
-		end, 2000)
-	end, {
-		v73,
-		v64,
-		t1.windowSize
-	})
-	local v77 = React.useRef(nil)
+	local v13 = React.useCallback(function()
+		fn() -- inferred equivalent call
+	end, { fn, state, p.windowSize })
 
-	React.useEffect(function() -- line: 182
-		-- upvalues: FaceClone (copy), v58 (copy), v77 (copy)
+	local ref2 = React.useRef(nil)
+	React.useEffect(function()
 		if _G.__TESTEZ_RUNNING_TEST__ then
 			return
 		end
 
-		local v85 = FaceClone(v58, v77.current)
+		local faceClone = FaceClone(v9, ref2.current)
 
-		return function() -- line: 193
-			-- upvalues: v85 (copy)
-			if v85 then
-				v85()
+		return function()
+			if faceClone then
+				faceClone()
 			end
 		end
-	end, {
-		v58,
-		v77
-	})
+	end, { v9, ref2 })
 
-	local v78 = React.useCallback(function(_, p5) -- line: 200
-		-- upvalues: v69 (copy), ControlState (copy)
-		v69(p5 == ControlState.Hover)
-	end, { v69 })
-	local v79 = React.useCallback(function(_, p7) -- line: 204
-		-- upvalues: v67 (copy), ControlState (copy)
-		v67(p7 == ControlState.Hover)
-	end, { v67 })
-	local v80 = React.useCallback(function(_, p9) -- line: 208
-		-- upvalues: v71 (copy), ControlState (copy)
-		v71(p9 == ControlState.Hover)
-	end, { v71 })
-	local v81 = React.useCallback(function(p10) -- line: 212
-		-- upvalues: React (copy), Interactable (copy), v68 (copy), FaceChatUtils (copy), v47 (copy), v78 (copy), v75 (copy), CameraStatusIcon (copy)
-		return React.createElement(Interactable, {
-			Size = UDim2.fromOffset(36, 36),
-			BackgroundColor3 = if not v68 or not FaceChatUtils.getPermissions().userCamEnabled then v47.Theme.BackgroundUIContrast.Color else v47.Theme.BackgroundOnHover.Color,
-			BackgroundTransparency = v47.Theme.Overlay.Transparency,
-			onStateChanged = v78,
-			Position = UDim2.fromScale(0.5, 0.5),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			[React.Change.AbsoluteSize] = p10,
-			[React.Change.AbsolutePosition] = p10,
-			[React.Event.Activated] = v75
-		}, {
-			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			}),
+	local onStateChanged = React.useCallback(function(_, p2)
+		setState3(p2 == ControlState.Hover)
+	end, { setState3 })
+
+	local onStateChanged2 = React.useCallback(function(_, p2)
+		setState2(p2 == ControlState.Hover)
+	end, { setState2 })
+
+	local onStateChanged3 = React.useCallback(function(_, p2)
+		setState4(p2 == ControlState.Hover)
+	end, { setState4 })
+
+	local v14 = React.useCallback(function(p2)
+		local createElement = React.createElement
+		local v14 = {
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			Size = UDim2.fromOffset(36, 36)
+		}
+		local backgroundColor
+
+		if state3 and FaceChatUtils.getPermissions().userCamEnabled then
+			backgroundColor = v2.Theme.BackgroundOnHover.Color
+		else
+			backgroundColor = v2.Theme.BackgroundUIContrast.Color
+		end
+
+		v14.BackgroundColor3 = backgroundColor
+
+		v14.BackgroundTransparency = v2.Theme.Overlay.Transparency
+		v14.onStateChanged = onStateChanged
+		v14.Position = UDim2.fromScale(0.5, 0.5)
+		v14.AnchorPoint = Vector2.new(0.5, 0.5)
+		v14[React.Change.AbsoluteSize] = p2
+		v14[React.Change.AbsolutePosition] = p2
+		v14[React.Event.Activated] = v12
+		return createElement(Interactable, v14, {
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
 			CameraStatusIcon = React.createElement(CameraStatusIcon, {
 				iconSize = UDim2.fromOffset(28, 28),
 				transparency = FaceChatUtils.getPermissions().userCamEnabled and 0 or 0.5
 			})
 		})
-	end, {
-		v78,
-		v75
-	})
+	end, { onStateChanged, v12 })
 
-	return React.createElement("Frame", {
+	local createElement = React.createElement
+	local v15 = {
 		Name = "SelfieViewFrame",
 		Active = true,
 		Size = UDim2.fromScale(1, 1),
-		BackgroundColor3 = v47.Theme.BackgroundUIDefault.Color,
+		BackgroundColor3 = v2.Theme.BackgroundUIDefault.Color,
 		BackgroundTransparency = 0,
-		[React.Event.MouseEnter] = v73,
-		[React.Event.MouseMoved] = v73,
-		ref = v77
-	}, {}, {
-		CloseButtonWrapper = v64 and React.createElement("Frame", {
-			ZIndex = 2,
-			BackgroundTransparency = 1,
-			Size = v50
-		}, {
+		[React.Event.MouseEnter] = fn,
+		[React.Event.MouseMoved] = fn,
+		ref = ref2
+	}
+	local closeButtonWrapper
+
+	if state then
+		local createElement2 = React.createElement
+
+		local v16 = {
 			CloseButtonLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center
 			}),
-			CloseButtonInteractable = React.createElement(Interactable, {
-				Size = UDim2.fromOffset(36, 36),
-				BackgroundColor3 = if not v66 then v47.Theme.BackgroundUIContrast.Color else v47.Theme.BackgroundOnHover.Color,
-				BackgroundTransparency = 0.8,
-				onStateChanged = v79,
-				[React.Event.Activated] = if not v35 then nil else function() -- line: 267
-					-- upvalues: v35 (copy), id (copy)
-					v35:toggleWindow(id)
-				end
-			}, {
-				Corner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(1, 0)
+			CloseButtonInteractable = 0
+		}
+
+		local createElement3 = React.createElement
+		local v17 = {
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			Size = UDim2.fromOffset(36, 36)
+		}
+		local backgroundColor
+
+		if state2 then
+			backgroundColor = v2.Theme.BackgroundOnHover.Color
+		else
+			backgroundColor = v2.Theme.BackgroundUIContrast.Color
+		end
+
+		v17.BackgroundColor3 = backgroundColor
+
+		v17.BackgroundTransparency = 0.8
+		v17.onStateChanged = onStateChanged2
+		v17[React.Event.Activated] = Service and function()
+			Service:toggleWindow(id)
+		end or nil
+		v16.CloseButtonInteractable = createElement3(Interactable, v17, {
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+			Fragment = React.createElement(React.Fragment, nil, {
+				React.createElement("Frame", {
+					Name = "X1",
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Size = UDim2.new(0, 16, 0, 2),
+					BorderSizePixel = 0,
+					BackgroundColor3 = v2.Theme.IconEmphasis.Color,
+					BackgroundTransparency = 0,
+					Rotation = 45
+				}, {
+					Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
 				}),
-				Fragment = React.createElement(React.Fragment, nil, {
-					React.createElement("Frame", {
-						Name = "X1",
-						BorderSizePixel = 0,
-						BackgroundTransparency = 0,
-						Rotation = 45,
-						Position = UDim2.new(0.5, 0, 0.5, 0),
-						AnchorPoint = Vector2.new(0.5, 0.5),
-						Size = UDim2.new(0, 16, 0, 2),
-						BackgroundColor3 = v47.Theme.IconEmphasis.Color
-					}, {
-						Corner = React.createElement("UICorner", {
-							CornerRadius = UDim.new(1, 0)
-						})
-					}),
-					(React.createElement("Frame", {
-						Name = "X2",
-						BorderSizePixel = 0,
-						BackgroundTransparency = 0,
-						Rotation = -45,
-						Position = UDim2.new(0.5, 0, 0.5, 0),
-						AnchorPoint = Vector2.new(0.5, 0.5),
-						Size = UDim2.new(0, 16, 0, 2),
-						BackgroundColor3 = v47.Theme.IconEmphasis.Color
-					}, {
-						Corner = React.createElement("UICorner", {
-							CornerRadius = UDim.new(1, 0)
-						})
-					}))
-				})
+				(React.createElement("Frame", {
+					Name = "X2",
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Size = UDim2.new(0, 16, 0, 2),
+					BorderSizePixel = 0,
+					BackgroundColor3 = v2.Theme.IconEmphasis.Color,
+					BackgroundTransparency = 0,
+					Rotation = -45
+				}, {
+					Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
+				}))
 			})
-		}),
-		ExpandButtonWrapper = if not v64 then nil else React.createElement("Frame", {
+		})
+		closeButtonWrapper = createElement2(
+			"Frame",
+			{ ZIndex = 2, BackgroundTransparency = 1, Size = CLOSE_BUTTON_FRAME },
+			v16
+		)
+	else
+		closeButtonWrapper = state
+	end
+
+	local expandButtonWrapper
+
+	if state then
+		local createElement2 = React.createElement
+		local v16 = {
 			ZIndex = 2,
 			BackgroundTransparency = 1,
-			Size = v50,
+			Size = CLOSE_BUTTON_FRAME,
 			AnchorPoint = Vector2.new(1, 0),
 			Position = UDim2.new(1, 0, 0, 0)
-		}, {
+		}
+		local v17 = {
 			ExpandButtonLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -315,41 +340,76 @@ local function Window(t1: {[any]: any}) -- line: 78
 				PaddingRight = UDim.new(0, 4),
 				PaddingBottom = UDim.new(0, 4)
 			}),
-			ExpandButtonInteractable = React.createElement(Interactable, {
-				Size = UDim2.fromOffset(36, 36),
-				BackgroundColor3 = if not v70 then v47.Theme.BackgroundUIContrast.Color else v47.Theme.BackgroundOnHover.Color,
-				BackgroundTransparency = 0.8,
-				onStateChanged = v80,
-				[React.Event.Activated] = if not v35 then nil else function() -- line: 337
-					-- upvalues: t1 (copy)
-					t1.windowSize:toggleIsLarge()
-				end
-			}, {
-				Corner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(1, 0)
-				}),
-				ExpandImage = React.createElement(ImageSetLabel, {
-					BackgroundTransparency = 1,
-					AnchorPoint = Vector2.new(0.5, 0.5),
-					Size = UDim2.fromOffset(28, 28),
-					Position = UDim2.new(0.5, 0, 0.5, 0),
-					Image = if not v55 then v42 else v41,
-					ImageColor3 = Theme.TextEmphasis.Color,
-					ImageTransparency = Theme.TextEmphasis.Transparency
-				})
-			})
-		}),
-		Corners = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, 8)
-		}),
+			ExpandButtonInteractable = 0
+		}
+
+		local createElement3 = React.createElement
+		local v18 = {
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			["Size"] = nil,
+			Size = UDim2.fromOffset(36, 36)
+		}
+		local backgroundColor
+
+		if state4 then
+			backgroundColor = v2.Theme.BackgroundOnHover.Color
+		else
+			backgroundColor = v2.Theme.BackgroundUIContrast.Color
+		end
+
+		v18.BackgroundColor3 = backgroundColor
+
+		v18.BackgroundTransparency = 0.8
+		v18.onStateChanged = onStateChanged3
+		v18[React.Event.Activated] = Service and function()
+			p.windowSize:toggleIsLarge()
+		end or nil
+
+		local v19 = {
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(1, 0) }),
+			ExpandImage = 0
+		}
+
+		local createElement4 = React.createElement
+		local v20 = {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(28, 28),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Image = 0,
+			ImageColor3 = 0,
+			ImageTransparency = 0
+		}
+		local image
+
+		if v6 then
+			image = iconsactionspreviewShrink
+		else
+			image = iconsactionspreviewExpand
+		end
+
+		v20.Image = image
+		v20.ImageColor3 = theme.TextEmphasis.Color
+		v20.ImageTransparency = theme.TextEmphasis.Transparency
+		v19.ExpandImage = createElement4(ImageSetLabel, v20)
+		v17.ExpandButtonInteractable = createElement3(Interactable, v18, v19)
+		expandButtonWrapper = createElement2("Frame", v16, v17)
+	end
+
+	local children = {
+		CloseButtonWrapper = closeButtonWrapper,
+		ExpandButtonWrapper = expandButtonWrapper,
+		Corners = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) }),
 		ControlMessage = React.createElement("Frame", {
-			ZIndex = 2,
-			BorderSizePixel = 0,
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = UDim2.new(0.5, 0, 1, -44),
-			BackgroundColor3 = Theme.BackgroundUIDefault.Color,
+			BackgroundColor3 = theme.BackgroundUIDefault.Color,
 			AutomaticSize = Enum.AutomaticSize.XY,
-			Visible = v54.visible
+			ZIndex = 2,
+			BorderSizePixel = 0,
+			Visible = v5.visible
 		}, {
 			Corners = React.createElement("UICorner", {}),
 			UIPadding = React.createElement("UIPadding", {
@@ -362,65 +422,77 @@ local function Window(t1: {[any]: any}) -- line: 78
 				FillDirection = Enum.FillDirection.Vertical
 			}),
 			Line1 = React.createElement(StyledTextLabel, {
-				layoutOrder = 1,
-				text = v54.text,
-				fontStyle = Font.Footer,
-				colorStyle = Theme.TextDefault,
+				text = v5.text,
+				fontStyle = font.Footer,
+				colorStyle = theme.TextDefault,
 				textXAlignment = Enum.TextXAlignment.Center,
+				layoutOrder = 1,
 				size = UDim2.fromOffset(46, 36),
-				TextWrapped = not v39 or nil,
-				textWrapped = not not v39 or nil
+				TextWrapped = not defineFastFlag or nil,
+				textWrapped = defineFastFlag and true or nil
 			}),
 			Line2 = React.createElement(StyledTextLabel, {
-				layoutOrder = 2,
-				text = v54.status,
-				fontStyle = Font.Footer,
-				colorStyle = Theme.ContextualPrimaryContent,
+				text = v5.status,
+				fontStyle = font.Footer,
+				colorStyle = theme.ContextualPrimaryContent,
 				textXAlignment = Enum.TextXAlignment.Center,
+				layoutOrder = 2,
 				size = UDim2.fromOffset(46, 12),
 				automaticSize = Enum.AutomaticSize.Y
 			})
 		}),
-		IconFrame = v64 and (not not v59 and React.createElement("Frame", {
+		IconFrame = state and v10 and React.createElement("Frame", {
 			BackgroundTransparency = 1,
-			ZIndex = 2,
-			Size = v50,
+			Size = CLOSE_BUTTON_FRAME,
 			Position = UDim2.fromScale(0.5, 1),
-			AnchorPoint = Vector2.new(0.5, 1)
+			AnchorPoint = Vector2.new(0.5, 1),
+			ZIndex = 2
 		}, {
-			Tooltip = withTooltip({
-				headerText = v60,
-				bodyText = v61,
-				textXAlignment = Enum.TextXAlignment.Left
-			}, {
-				DisplayOrder = 101,
-				guiTarget = CoreGui,
-				active = v62,
-				preferredOrientation = TooltipOrientation.Bottom
-			}, v81),
+			Tooltip = withTooltip(
+				{
+					headerText = headerText,
+					bodyText = bodyText,
+					textXAlignment = Enum.TextXAlignment.Left
+				},
+				{
+					guiTarget = CoreGui,
+					active = active,
+					DisplayOrder = 101,
+					preferredOrientation = TooltipOrientation.Bottom
+				},
+				v14
+			),
 			Hover = React.createElement("Frame", {
 				Size = UDim2.fromOffset(32, 32),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
-				BackgroundTransparency = v47.Theme.BackgroundOnHover.Transparency,
-				BackgroundColor3 = v47.Theme.BackgroundOnHover.Color
+				BackgroundTransparency = v2.Theme.BackgroundOnHover.Transparency,
+				BackgroundColor3 = v2.Theme.BackgroundOnHover.Color
 			}, {
-				Corner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, 8)
-				})
+				Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) })
 			})
-		})) or nil,
-		CameraStatusDot = if not v53 then nil else React.createElement(CameraStatusDot, {
-			ZIndex = 2,
+		}) or nil,
+		CameraStatusDot = 0,
+		Interactable = 0
+	}
+	local cameraStatusDot
+
+	if v4 then
+		cameraStatusDot = React.createElement(CameraStatusDot, {
 			Position = UDim2.new(1, -12, 1, -12),
+			ZIndex = 2,
 			Size = UDim2.fromOffset(8, 8)
-		}),
-		Interactable = React.createElement(Interactable, {
-			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
-			[React.Event.Activated] = v76
 		})
+	end
+
+	children.CameraStatusDot = cameraStatusDot
+
+	children.Interactable = React.createElement(Interactable, {
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		[React.Event.Activated] = v13
 	})
+	return createElement("Frame", v15, {}, children)
 end
 
 return Window

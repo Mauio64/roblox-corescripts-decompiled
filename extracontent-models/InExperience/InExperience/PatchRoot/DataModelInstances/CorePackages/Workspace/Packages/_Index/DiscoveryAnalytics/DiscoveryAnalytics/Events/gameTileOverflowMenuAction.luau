@@ -1,45 +1,63 @@
 local TelemetryService = game:GetService("TelemetryService")
-local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
-local t = require(Parent.t)
-local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
-local v5 = game:DefineFastInt("GameTileOverflowMenuActionThrottleHundrethsPercent", 0)
-local FFlagLuaAppFixExplicitFeedbackTelemetry = require(Parent.SharedFlags).FFlagLuaAppFixExplicitFeedbackTelemetry
-local v7 = t.strictInterface({
-	ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t.string else nil,
+local parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+
+local t = require(parent.t)
+local DiscoveryUtils = require(parent.DiscoveryUtils)
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local defineFastInt = game:DefineFastInt("GameTileOverflowMenuActionThrottleHundrethsPercent", 0)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local FFlagLuaAppGameTileDirectActionTelemetry = SharedFlags.FFlagLuaAppGameTileDirectActionTelemetry
+local FFlagSduiGameTileDirectAction = SharedFlags.FFlagSduiGameTileDirectAction
+
+local strictInterface = t.strictInterface
+local v = {
 	universeId = t.string,
 	sortId = t.optional(t.string),
 	actionType = t.string,
 	menuItem = t.optional(t.string),
-	availableMenuItems = t.optional(t.string)
-})
+	availableMenuItems = t.optional(t.string),
+	contentType = 0,
+	isDirectAction = 0
+}
+local contentType
 
-return function(p1, s1: string) -- line: 22
-	-- upvalues: FFlagLuaAppFixExplicitFeedbackTelemetry (copy), DiscoveryEventErrorLogger (copy), v7 (copy), v5 (copy), TelemetryService (copy)
-	if FFlagLuaAppFixExplicitFeedbackTelemetry and not s1 then
+if FFlagLuaAppEnableHomepageOneByTwoTile then
+	contentType = t.optional(t.string)
+end
+
+v.contentType = contentType
+local isDirectAction
+
+if FFlagLuaAppGameTileDirectActionTelemetry or FFlagSduiGameTileDirectAction then
+	isDirectAction = t.optional(t.boolean)
+end
+
+v.isDirectAction = isDirectAction
+local v2 = strictInterface(v)
+
+return function(customFields, eventContext: string)
+	if not eventContext then
 		DiscoveryEventErrorLogger.reportError("GameTileOverflowMenuActionInvalidInterface", "event is missing context")
 	end
 
-	local v10, v11 = v7(p1)
+	local v3, v4 = v2(customFields)
 
-	if not v10 then
-		DiscoveryEventErrorLogger.reportError("GameTileOverflowMenuActionInvalidInterface", v11)
+	if not v3 then
+		DiscoveryEventErrorLogger.reportError("GameTileOverflowMenuActionInvalidInterface", v4)
 	end
 
-	local t1 = {
+	TelemetryService:LogEvent({
 		eventName = "gameTileOverflowMenuAction",
-		description = "User has taken an action with the Game Tile Overflow Menu",
 		backends = { "EventIngest" },
-		throttlingPercentage = v5,
-		lastUpdated = {
-			25,
-			10,
-			15
-		}
-	}
-
-	TelemetryService:LogEvent(t1, {
-		eventContext = if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else s1,
+		throttlingPercentage = defineFastInt,
+		lastUpdated = { 26, 9, 23 },
+		description = "User has taken an action with the Game Tile Overflow Menu"
+	}, {
+		eventContext = eventContext,
 		standardizedFields = { "addSessionInfo" },
-		customFields = p1
+		customFields = customFields
 	})
 end

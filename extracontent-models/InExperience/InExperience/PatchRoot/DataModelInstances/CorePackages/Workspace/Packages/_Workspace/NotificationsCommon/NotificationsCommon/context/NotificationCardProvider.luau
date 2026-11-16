@@ -1,38 +1,42 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local NotificationCardContext = require(scriptParent.NotificationCardContext)
-local scriptParentParentParent = scriptParentParent.Parent
-local React = require(scriptParentParentParent.React)
+local parent = script.Parent
+local parent2 = parent.Parent
+local NotificationCardContext = require(parent.NotificationCardContext)
 
-require(scriptParentParent.type)
+local parent3 = parent2.Parent
+local React = require(parent3.React)
+require(parent2.type)
+local constants = require(parent2.constants)
 
-local constants = require(scriptParentParent.constants)
-
-local function NotificationCardProvider(t1: {[any]: any}) -- line: 24
-	-- upvalues: constants (copy), React (copy), NotificationCardContext (copy)
-	local t2 = {
+local function NotificationCardProvider(props)
+	local cardSize = {
 		thumbnail = constants.CardSizeDefault.thumbnail,
 		cardPadding = constants.Padding.DefaultCardPadding
 	}
 
-	if t1.isCompact then
-		t2.thumbnail = constants.CardSizeCompact.thumbnail
-		t2.cardPadding = constants.Padding.CompactCardPadding
+	if props.isCompact then
+		cardSize.thumbnail = constants.CardSizeCompact.thumbnail
+		cardSize.cardPadding = constants.Padding.CompactCardPadding
 	end
 
-	local v10 = if not t1.isCompact then constants.CardTransparency.Default else constants.CardTransparency.Compact
+	local cardTransparency
+
+	if props.isCompact then
+		cardTransparency = constants.CardTransparency.Compact
+	else
+		cardTransparency = constants.CardTransparency.Default
+	end
 
 	return React.createElement(NotificationCardContext.Provider, {
 		value = {
-			notificationPayload = t1.notificationPayload,
-			state = t1.state,
-			cardSize = t2,
-			handleActions = t1.handleActions,
-			openMetaActions = t1.openMetaActions,
-			readOnly = t1.readOnly,
-			cardTransparency = v10
+			notificationPayload = props.notificationPayload,
+			state = props.state,
+			cardSize = cardSize,
+			handleActions = props.handleActions,
+			openMetaActions = props.openMetaActions,
+			readOnly = props.readOnly,
+			cardTransparency = cardTransparency
 		}
-	}, t1.children)
+	}, props.children)
 end
 
 return NotificationCardProvider

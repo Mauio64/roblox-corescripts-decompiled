@@ -1,175 +1,240 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local DataHydration = require(AppChatParent.DataHydration)
-local v5 = require(AppChat.Logger):new(script.Name)
+local parent = AppChat.Parent
+
+local Players = game:GetService("Players")
+
+local AppChatNetworking = require(parent.AppChatNetworking)
+local DataHydration = require(parent.DataHydration)
+require(parent.LuauPolyfill)
+local Promise = require(parent.Promise)
+
+local Logger = require(AppChat.Logger)
+local v = Logger:new(script.Name)
 local getResponseBody = require(AppChat.Stores.Ingestion.getResponseBody)
 local serializeChatTimeoutRange = require(AppChat.Utils.serializeChatTimeoutRange)
-local t1 = {
-	status = "none"
-}
 
-local function toTimeoutStatus(p1) -- line: 38
-	-- upvalues: serializeChatTimeoutRange (copy)
-	local v15 = serializeChatTimeoutRange(p1)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagAppChatReactiveFeatureRestrictions = SharedFlags.FFlagAppChatReactiveFeatureRestrictions
 
+local v2 = { status = "none" }
+
+local function getLocalPlayerUserId() -- 2 equivalent calls inferred from this helper
+	local userId
+
+	if Players.LocalPlayer then
+		userId = Players.LocalPlayer.UserId
+	end
+
+	if userId == nil or not (userId > 0) then
+		return nil
+	end
+
+	return userId
+end
+
+local function toTimeoutStatus(p) -- 2 equivalent calls inferred from this helper
+	local v3 = serializeChatTimeoutRange(p)
 	return {
 		status = "active",
-		endTimestamp = v15.endTimestamp,
-		decisionEventId = p1.decision_event_id,
-		duration = v15.duration or 0
+		endTimestamp = v3.endTimestamp,
+		decisionEventId = p.decision_event_id,
+		duration = v3.duration or 0,
+		requiresAcknowledgement = v3.requiresAcknowledgement
 	}
 end
-local function mapResponseToStatuses(p2, t2: {[any]: any}) -- line: 48
-	-- upvalues: getResponseBody (copy), serializeChatTimeoutRange (copy), t1 (copy)
-	local v18 = getResponseBody(p2)
-	local t3
 
-	if t2.includeUser then
-		if v18 and v18.user_timeout_range then
-			local user_timeout_range = v18.user_timeout_range
-			local v20 = serializeChatTimeoutRange(user_timeout_range)
+local function mapResponseToStatuses(p, p2)
+	local responseBody = getResponseBody(p)
+	local v3
 
-			t3 = {
-				status = "active",
-				endTimestamp = v20.endTimestamp,
-				decisionEventId = user_timeout_range.decision_event_id,
-				duration = v20.duration or 0
-			}
+	if p2.includeUser then
+		if responseBody and responseBody.user_timeout_range then
+			v3 = toTimeoutStatus(responseBody.user_timeout_range) -- inferred equivalent call
 		else
-			t3 = t1
+			v3 = v2
 		end
-	else
-		t3 = nil
 	end
 
-	local t4 = {}
-	local t5 = {}
+	local conversationIdSet = {}
+	local result = {}
 
-	for _, v25 in t2.conversationIds do
-		t5[v25] = true
-		t4[v25] = t1
+	for _, conversationId in p2.conversationIds do
+		conversationIdSet[conversationId] = true
+		result[conversationId] = v2
 	end
 
-	if v18 and v18.conversation_timeout_ranges then
-		for _, v27 in v18.conversation_timeout_ranges do
-			if t5[v27.id] then
-				local id = v27.id
-				local timeout_range = v27.timeout_range
-				local v30 = serializeChatTimeoutRange(timeout_range)
-
-				t4[id] = {
-					status = "active",
-					endTimestamp = v30.endTimestamp,
-					decisionEventId = timeout_range.decision_event_id,
-					duration = v30.duration or 0
-				}
+	if responseBody and responseBody.conversation_timeout_ranges then
+		for _, conversation_timeout_range in responseBody.conversation_timeout_ranges do
+			if not conversationIdSet[conversation_timeout_range.id] then
+				continue
 			end
+
+			local id = conversation_timeout_range.id
+			result[id] = toTimeoutStatus(conversation_timeout_range.timeout_range) -- inferred equivalent call
 		end
 	end
 
-	return t3, t4
+	return v3, result
 end
-local function createChatModerationStatusDataHydrationStore() -- line: 78
-	-- upvalues: DataHydration (copy), v5 (copy), AppChatNetworking (copy), mapResponseToStatuses (copy), t1 (copy)
-	local v31 = DataHydration.createDataCache()
-	local v32 = DataHydration.createDataCache()
-	local v33 = DataHydration.createDataResolver({
+
+local function createChatModerationStatusDataHydrationStore()
+	local dataCache = DataHydration.createDataCache()
+	local dataCache2 = DataHydration.createDataCache()
+
+	local count = 0
+	local v3 = nil
+	local v4 = {}
+
+	local dataResolver = DataHydration.createDataResolver({
+		cache = dataCache,
 		supportsMultiGet = false,
 		queueProcessDelaySec = 0,
 		replaceItems = true,
-		cache = v31,
-		logError = function(p3) -- line: 87
-			-- upvalues: v5 (copy)
-			v5:warning(`Failed to fetch local-user chat moderation status: { tostring(p3) }`)
+		logError = function(p)
+			v:warning(`Failed to fetch local-user chat moderation status: {tostring(p)}`)
 		end,
-		fetchFn = function() -- line: 90
-			-- upvalues: AppChatNetworking (copy), mapResponseToStatuses (copy)
-			return AppChatNetworking.http.GetChatModerationStatuses(nil, nil):andThen(function(p4) -- line: 91
-				-- upvalues: mapResponseToStatuses (copy)
-				return (mapResponseToStatuses(p4, {
-					includeUser = true,
-					conversationIds = {}
-				}))
+		fetchFn = function()
+			return AppChatNetworking.http.GetChatModerationStatuses(nil, nil):andThen(function(p)
+				return (mapResponseToStatuses(p, { includeUser = true, conversationIds = {} }))
 			end)
 		end
 	})
-	local v34 = DataHydration.createDataResolver({
+
+	local dataResolver2 = DataHydration.createDataResolver({
+		cache = dataCache2,
 		queueProcessDelaySec = 0,
 		replaceItems = true,
-		cache = v32,
-		logError = function(p5) -- line: 105
-			-- upvalues: v5 (copy)
-			v5:warning(`Failed to fetch conversation chat moderation status: { tostring(p5) }`)
+		logError = function(p)
+			v:warning(`Failed to fetch conversation chat moderation status: {tostring(p)}`)
 		end,
-		fetchFn = function(p6) -- line: 108
-			-- upvalues: AppChatNetworking (copy), mapResponseToStatuses (copy)
-			local t6 = {}
+		fetchFn = function(items)
+			local conversationIds = {}
 
-			for v42 in p6 do
-				table.insert(t6, v42)
+			for k in items do
+				table.insert(conversationIds, k)
 			end
 
-			return AppChatNetworking.http.GetChatModerationStatuses(nil, t6):andThen(function(p7) -- line: 114
-				-- upvalues: mapResponseToStatuses (copy), t6 (copy)
-				local _, v52 = mapResponseToStatuses(p7, {
+			return AppChatNetworking.http.GetChatModerationStatuses(nil, conversationIds):andThen(function(p)
+				local _, v5 = mapResponseToStatuses(p, {
 					includeUser = false,
-					conversationIds = t6
+					conversationIds = conversationIds
 				})
 
-				return v52
+				return v5
 			end)
 		end
 	})
 
+	local function ingestResponse(p, p2) -- 1 equivalent call inferred from this helper
+		local v5, v6 = mapResponseToStatuses(p, p2)
+
+		if v5 then
+			dataCache.replaceItem("__local_user__", v5)
+		end
+
+		if next(v6) then
+			dataCache2.replaceItems(v6)
+		end
+	end
+
+	local function releaseRefreshOwnership(p: number, items) -- 2 equivalent calls inferred from this helper
+		if v3 == p then
+			v3 = nil
+		end
+
+		for _, item in items do
+			if v4[item] == p then
+				v4[item] = nil
+			end
+		end
+	end
+
 	return {
-		getUserStatus = function() -- line: 135
-			-- upvalues: v33 (copy)
-			return v33.getAndFetchItem("__local_user__")
+		getUserStatus = function()
+			return dataResolver.getAndFetchItem("__local_user__")
 		end,
-		getConversationStatus = function(s1: string) -- line: 138
-			-- upvalues: v34 (copy)
-			return v34.getAndFetchItem(s1)
+		getCachedUserStatus = function()
+			return dataCache.getItem("__local_user__")
 		end,
-		ingestResponse = function(p8, t7: {[any]: any}) -- line: 124
-			-- upvalues: mapResponseToStatuses (copy), v31 (copy), v32 (copy)
-			local v45, v46 = mapResponseToStatuses(p8, t7)
+		getConversationStatus = function(p: string)
+			return dataResolver2.getAndFetchItem(p)
+		end,
+		getCachedConversationStatus = function(p: string)
+			return dataCache2.getItem(p)
+		end,
+		ingestResponse = ingestResponse,
+		refreshStatuses = function(p)
+			count += 1
+			v3 = count
 
-			if v45 then
-				v31.replaceItem("__local_user__", v45)
+			local v5 = count
+			local localPlayerUserId = getLocalPlayerUserId() -- inferred equivalent call
+			local v6 = not p and {} or table.clone(p)
+
+			for _, v7 in v6 do
+				v4[v7] = v5
 			end
 
-			if next(v46) then
-				v32.replaceItems(v46)
+			local v7 = AppChatNetworking.http.GetChatModerationStatuses(nil, p):andThen(function(p2)
+				if localPlayerUserId ~= getLocalPlayerUserId() then -- inferred equivalent call
+					return p2
+				end
+
+				local conversationIds = {}
+
+				for _, v7 in v6 do
+					if v4[v7] == v5 then
+						table.insert(conversationIds, v7)
+					end
+				end
+
+				ingestResponse(p2, { -- inferred equivalent call
+					includeUser = v3 == v5,
+					conversationIds = conversationIds
+				})
+
+				return p2
+			end)
+
+			local function onSuccess(p2)
+				releaseRefreshOwnership(v5, v6) -- inferred equivalent call
+				return p2
 			end
+
+			local function onFailure(p2)
+				releaseRefreshOwnership(v5, v6) -- inferred equivalent call
+				return Promise.reject(p2)
+			end
+
+			return v7:andThen(onSuccess, onFailure)
 		end,
-		setConversationStatusNone = function(s2: string) -- line: 142
-			-- upvalues: v32 (copy), t1 (copy)
-			v32.replaceItem(s2, t1)
+		setConversationStatusNone = function(p: string)
+			dataCache2.replaceItem(p, v2)
 		end,
-		clear = function() -- line: 145
-			-- upvalues: v33 (copy), v34 (copy)
-			v33.clear()
-			v34.clear()
+		clear = function()
+			if FFlagAppChatReactiveFeatureRestrictions then
+				v3 = nil
+				table.clear(v4)
+			end
+
+			dataResolver.clear()
+			dataResolver2.clear()
 		end
 	}
 end
 
-local u12 = nil
+local v3 = nil
 
-local function GetChatModerationStatusDataHydration(_) -- line: 154
-	-- upvalues: u12 (ref), createChatModerationStatusDataHydrationStore (copy)
-	local v36 = u12
+local function GetChatModerationStatusDataHydration(_)
+	local v4 = v3
 
-	if v36 ~= nil then
-		return v36
+	if v4 ~= nil then
+		return v4
 	end
 
-	local v37 = createChatModerationStatusDataHydrationStore()
-
-	u12 = v37
-
-	return v37
+	local chatModerationStatusDataHydrationStore = createChatModerationStatusDataHydrationStore()
+	v3 = chatModerationStatusDataHydrationStore
+	return chatModerationStatusDataHydrationStore
 end
 
 return GetChatModerationStatusDataHydration

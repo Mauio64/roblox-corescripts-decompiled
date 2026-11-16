@@ -1,13 +1,11 @@
-local function composeRefs(...) -- line: 4
-	local t1 = { ... }
-
-	return function(p1) -- line: 6
-		-- upvalues: t1 (copy)
-		for _, v5 in t1 do
-			if type(v5) == "function" then
-				v5(p1)
-			elseif type(v5) == "table" then
-				v5.current = p1
+local function composeRefs(...)
+	local v = { ... }
+	return function(current)
+		for _, v2 in v do
+			if type(v2) == "function" then
+				v2(current)
+			elseif type(v2) == "table" then
+				v2.current = current
 			end
 		end
 	end

@@ -1,37 +1,57 @@
 local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
-local InExperienceInterventionParent = InExperienceIntervention.Parent
-local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
+local parent = InExperienceIntervention.Parent
 
+local InterventionShared = require(parent.InterventionShared)
+local Constants = InterventionShared.Utils.Constants
+
+local InterventionShared2 = require(parent.InterventionShared)
+local experienceChatInterventionShownSignal = InterventionShared2.Signals.experienceChatInterventionShownSignal
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatDictationStopOnSafetyIntervention = SharedFlags.FFlagExpChatDictationStopOnSafetyIntervention
 require(InExperienceIntervention.Utils.Types)
-
 local InExperienceInterventionAnalytics = require(InExperienceIntervention.InExperienceInterventionAnalytics)
+local ChatToastNudgeConfig = {}
+ChatToastNudgeConfig.configName = "ChatToastNudge"
 
-return {
-	configName = "ChatToastNudge",
-	shouldTriggerVisualTreatment = function(p1) -- line: 10
-		-- upvalues: Constants (copy)
-		return p1.type == Constants.NotificationDialogType.ChatNudge and (p1.modalType == Constants.NotificationModalType.Toast and p1.abuseVector == Constants.AbuseVectorType.ExperienceChat)
-	end,
-	shouldTriggerBehavioralTreatment = function(_) -- line: 15
-		return false
-	end,
-	shouldTriggerEventReceived = function(p3) -- line: 18
-		-- upvalues: Constants (copy)
-		return p3.type == Constants.NotificationDialogType.ChatNudge and (p3.modalType == Constants.NotificationModalType.Toast and p3.abuseVector == Constants.AbuseVectorType.ExperienceChat)
-	end,
-	onTriggerVisualTreatment = function(p4, p5) -- line: 23
-		-- upvalues: Constants (copy)
-		p4({
-			isShown = true,
-			type = Constants.UIStateActions.ToggleNotificationDialog,
-			treatmentType = Constants.TreatmentType.ChatNudgeToast,
-			detail = p5
-		})
-	end,
-	onTriggerBehavioralTreatment = function(_) -- line: 31
-	end,
-	onTriggerEventReceived = function(p7) -- line: 32
-		-- upvalues: InExperienceInterventionAnalytics (copy)
-		InExperienceInterventionAnalytics.sendAnalyticsEvent(InExperienceInterventionAnalytics.Constants.EventTypes.ToastMessageReceived, InExperienceInterventionAnalytics.Constants.InterventionTypes.Nudge, DateTime.now().UnixTimestampMillis, p7.decisionEventId, p7.evidence, p7.timeoutDurationSeconds)
+function ChatToastNudgeConfig.shouldTriggerVisualTreatment(data): boolean
+	return data.type == Constants.NotificationDialogType.ChatNudge
+		and data.modalType == Constants.NotificationModalType.Toast
+		and data.abuseVector == Constants.AbuseVectorType.ExperienceChat
+end
+
+function ChatToastNudgeConfig.shouldTriggerBehavioralTreatment(_): boolean
+	return false
+end
+
+function ChatToastNudgeConfig.shouldTriggerEventReceived(data): boolean
+	return data.type == Constants.NotificationDialogType.ChatNudge
+		and data.modalType == Constants.NotificationModalType.Toast
+		and data.abuseVector == Constants.AbuseVectorType.ExperienceChat
+end
+
+function ChatToastNudgeConfig.onTriggerVisualTreatment(callback, detail)
+	callback({
+		type = Constants.UIStateActions.ToggleNotificationDialog,
+		treatmentType = Constants.TreatmentType.ChatNudgeToast,
+		isShown = true,
+		detail = detail
+	})
+
+	if FFlagExpChatDictationStopOnSafetyIntervention then
+		experienceChatInterventionShownSignal:fire()
 	end
-}
+end
+function ChatToastNudgeConfig.onTriggerBehavioralTreatment(_) end
+function ChatToastNudgeConfig.onTriggerEventReceived(data)
+	InExperienceInterventionAnalytics.sendAnalyticsEvent(
+		InExperienceInterventionAnalytics.Constants.EventTypes.ToastMessageReceived,
+		InExperienceInterventionAnalytics.Constants.InterventionTypes.Nudge,
+		DateTime.now().UnixTimestampMillis,
+		data.decisionEventId,
+		data.evidence,
+		data.timeoutDurationSeconds
+	)
+end
+
+return ChatToastNudgeConfig

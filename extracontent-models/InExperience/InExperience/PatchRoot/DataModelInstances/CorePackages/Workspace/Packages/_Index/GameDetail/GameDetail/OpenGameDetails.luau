@@ -1,113 +1,162 @@
 local GameDetail = script:FindFirstAncestor("GameDetail")
 local SetGameDetailsPeekViewState = require(GameDetail.PeekView.SetGameDetailsPeekViewState)
 local UseGameDetailsPeekView = require(GameDetail.PeekView.UseGameDetailsPeekView)
-local GameDetailParent = GameDetail.Parent
-local Cryo = require(GameDetailParent.Cryo)
-local AppPage = require(GameDetailParent.RobloxAppEnums).AppPage
-local FormFactor = require(GameDetailParent.FormFactor).Enums.FormFactor
-local PeekViewState = require(GameDetailParent.PeekView).PeekViewState
-local NavigationRodux = require(GameDetailParent.NavigationRodux)
+
+local parent = GameDetail.Parent
+local Cryo = require(parent.Cryo)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+local FormFactor = require(parent.FormFactor)
+local formFactor = FormFactor.Enums.FormFactor
+local PeekView = require(parent.PeekView)
+local PeekViewState = PeekView.PeekViewState
+local NavigationRodux = require(parent.NavigationRodux)
 local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local Selectors = NavigationRodux.Selectors
-local SharedFlags = require(GameDetailParent.SharedFlags)
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagSignalsNavP2NavigationPrimitives = SharedFlags.FFlagSignalsNavP2NavigationPrimitives
 local FFlagSignalsNavP3fGameDetails = SharedFlags.FFlagSignalsNavP3fGameDetails
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
-local RobloxAppNavigation = require(GameDetailParent.RobloxAppNavigation)
-local v17 = if not FFlagSignalsNavP3Dispatch then nil else RobloxAppNavigation.NavigationCommands
-local v18 = if not FFlagSignalsNavP3fGameDetails then nil else RobloxAppNavigation.AppNavigationRegistry
-local FFlagUseNavigationSelectors = require(GameDetailParent.SharedFlags).FFlagUseNavigationSelectors
-local FFlagLuaAppSduiEdpEnabled = require(GameDetailParent.SharedFlags).FFlagLuaAppSduiEdpEnabled
-local FFlagSduiEdpPrefetchPlayability = require(GameDetailParent.SharedFlags).FFlagSduiEdpPrefetchPlayability
-local SduiSurfaceLoadTimeTracker = require(GameDetailParent.SduiSharedUtilities).SduiSurfaceLoadTimeTracker
-local DeviceType = require(GameDetailParent.RobloxAppEnums).DeviceType
-local FetchGamePlayButtonData = require(GameDetailParent.GamePlayButton).FetchGamePlayButtonData
+local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
+local FFlagLuaAppSduiEdpEnabled = SharedFlags.FFlagLuaAppSduiEdpEnabled
+local FFlagFixSduiEdpTtiPeekCategory = SharedFlags.FFlagFixSduiEdpTtiPeekCategory
+local FFlagFixSduiEdpTtiColdStart = SharedFlags.FFlagFixSduiEdpTtiColdStart
+local FFlagEDPTTIParityDefinitions = SharedFlags.FFlagEDPTTIParityDefinitions
+local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+local appNavigationRegistry
+
+if FFlagSignalsNavP3fGameDetails then
+	appNavigationRegistry = RobloxAppNavigation.AppNavigationRegistry
+else
+	appNavigationRegistry = nil
+end
+
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+local SduiSurfaceLoadTimeTracker = SduiSharedUtilities.SduiSurfaceLoadTimeTracker
+local RobloxAppEnums2 = require(parent.RobloxAppEnums)
+local DeviceType = RobloxAppEnums2.DeviceType
+local GamePlayButton = require(parent.GamePlayButton)
+local FetchGamePlayButtonData = GamePlayButton.FetchGamePlayButtonData
+local Display = require(parent.Display)
+local Responsive = require(parent.Responsive)
+
 local fetchExperienceDetailsPage = require(script.Parent.ExperienceDetailsPage.fetchExperienceDetailsPage)
 local getExperienceDetailsPageKey = require(script.Parent.ExperienceDetailsPage.getExperienceDetailsPageKey)
-local GameDetailTelemetry = require(GameDetailParent.GameDetailTelemetry)
+local createExperienceDetailsPageTimer = require(script.Parent.ExperienceDetailsPage.createExperienceDetailsPageTimer)
+
+local GameDetailTelemetry = require(parent.GameDetailTelemetry)
 local EDPTTIManager = GameDetailTelemetry.EDPTTIManager
 local FFlagEDPTTITrackingEnabled = GameDetailTelemetry.FFlagEDPTTITrackingEnabled
 local EDPTTIConstants = GameDetailTelemetry.EDPTTIConstants
 
-return function(p1, p2, t1: {[any]: any}?, p3) -- line: 44
-	-- upvalues: FFlagSignalsNavP3fGameDetails (copy), v18 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), FFlagEDPTTITrackingEnabled (copy), EDPTTIManager (copy), EDPTTIConstants (copy), FFlagLuaAppSduiEdpEnabled (copy), DeviceType (copy), SduiSurfaceLoadTimeTracker (copy), getExperienceDetailsPageKey (copy), Cryo (copy), FFlagSduiEdpPrefetchPlayability (copy), FetchGamePlayButtonData (copy), fetchExperienceDetailsPage (copy), FormFactor (copy), UseGameDetailsPeekView (copy), AppPage (copy), PeekViewState (copy), SetGameDetailsPeekViewState (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), FFlagSignalsNavP2NavigationPrimitives (copy), NavigateDown (copy)
-	return function(p4) -- line: 45
-		-- upvalues: FFlagSignalsNavP3fGameDetails (copy), v18 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), FFlagEDPTTITrackingEnabled (copy), EDPTTIManager (copy), EDPTTIConstants (copy), FFlagLuaAppSduiEdpEnabled (copy), DeviceType (copy), SduiSurfaceLoadTimeTracker (copy), getExperienceDetailsPageKey (copy), p1 (copy), t1 (ref), Cryo (copy), FFlagSduiEdpPrefetchPlayability (copy), p3 (copy), FetchGamePlayButtonData (copy), fetchExperienceDetailsPage (copy), FormFactor (copy), UseGameDetailsPeekView (copy), AppPage (copy), PeekViewState (copy), SetGameDetailsPeekViewState (copy), p2 (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), FFlagSignalsNavP2NavigationPrimitives (copy), NavigateDown (copy)
-		local v37 = p4:getState()
-		local FormFactor2 = v37.FormFactor
-		local viewState = v37.GameDetailsPeekView.viewState
+return function(p, p2, extraProps, p3)
+	return function(object)
+		local state = object:getState()
+		local formFactor2 = state.FormFactor
+		local viewState = state.GameDetailsPeekView.viewState
 
 		if FFlagSignalsNavP3fGameDetails then
-			if v18.get().getIsNavigating() then
+			if appNavigationRegistry.get().getIsNavigating() then
 				return
 			end
 		elseif FFlagUseNavigationSelectors then
-			if Selectors.selectNavigationLocked(v37) then
+			if Selectors.selectNavigationLocked(state) then
 				return
 			end
-		elseif v37.Navigation.lockNavigationActions then
+		elseif state.Navigation.lockNavigationActions then
 			return
 		end
 
-		if FFlagEDPTTITrackingEnabled then
-			EDPTTIManager.startTracking(EDPTTIConstants.EDP_ENTRY_PATH.GAME_DETAIL_OPEN_GAME_DETAILS)
+		if FFlagEDPTTITrackingEnabled and not (FFlagFixSduiEdpTtiColdStart and FFlagLuaAppSduiEdpEnabled) then
+			if FFlagEDPTTIParityDefinitions then
+				EDPTTIManager.restartTracking(EDPTTIConstants.EDP_ENTRY_PATH.GAME_DETAIL_OPEN_GAME_DETAILS)
+			else
+				EDPTTIManager.startTracking(EDPTTIConstants.EDP_ENTRY_PATH.GAME_DETAIL_OPEN_GAME_DETAILS)
+			end
 		end
 
 		if FFlagLuaAppSduiEdpEnabled then
-			local v40 = if v37.DeviceType ~= DeviceType.Phone then EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE else EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
-			local v41 = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(getExperienceDetailsPageKey((tostring(p1))), {
-				manualSurfaceReady = true,
-				eventName = EDPTTIConstants.EDP_TTI_EVENT_NAME,
-				metadata = {
-					page = EDPTTIConstants.EDP_ENTRY_PATH.GAME_DETAIL_OPEN_GAME_DETAILS,
-					category = v40
-				}
-			})
+			local category
 
-			t1 = Cryo.Dictionary.join(t1 or {}, {
-				pageTimer = v41
-			})
+			if FFlagFixSduiEdpTtiPeekCategory then
+				local viewportSize = Display.GetDisplayStore(false).getViewportSize(false)
+				local preferredInputType = Responsive.GetInputModeStore(false).getPreferredInputType(false)
 
-			if FFlagSduiEdpPrefetchPlayability and p3 ~= nil then
-				p4:dispatch(FetchGamePlayButtonData.Fetch(p3, (tostring(p1))))
+				if Responsive.getIsCompactTouch(viewportSize, preferredInputType) then
+					category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
+				else
+					category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE
+				end
+			elseif state.DeviceType == DeviceType.Phone then
+				category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_PEEK_VIEW
+			else
+				category = EDPTTIConstants.EDP_IMPLEMENTATION.SDUI_FULL_PAGE
 			end
 
-			fetchExperienceDetailsPage(tostring(p1), v41)
-		end
+			local pageTimer
 
-		local t2
-
-		if FormFactor2 == FormFactor.COMPACT and UseGameDetailsPeekView() then
-			t2 = {
-				name = AppPage.GameDetail,
-				detail = tostring(p1),
-				extraProps = t1
-			}
-
-			if viewState == PeekViewState.Full or viewState == PeekViewState.Extended or t1 and t1.mountAsFullView then
-				t2 = Cryo.Dictionary.join(t2, {
-					extraProps = Cryo.Dictionary.join(t2.extraProps or {}, {
-						mountAsFullView = true
-					})
+			if FFlagEDPTTIParityDefinitions then
+				pageTimer = createExperienceDetailsPageTimer(getExperienceDetailsPageKey((tostring(p))), {
+					page = EDPTTIConstants.EDP_ENTRY_PATH.GAME_DETAIL_OPEN_GAME_DETAILS,
+					category = category
 				})
 			else
-				p4:dispatch(SetGameDetailsPeekViewState(PeekViewState.Closed))
+				pageTimer = SduiSurfaceLoadTimeTracker.createLoadTimerWithSurfaceLoadTime(
+					getExperienceDetailsPageKey((tostring(p))),
+					{
+						eventName = EDPTTIConstants.EDP_TTI_EVENT_NAME,
+						metadata = {
+							page = EDPTTIConstants.EDP_ENTRY_PATH.GAME_DETAIL_OPEN_GAME_DETAILS,
+							category = category
+						},
+						manualSurfaceReady = true
+					}
+				)
+			end
+
+			extraProps = Cryo.Dictionary.join(extraProps or {}, { pageTimer = pageTimer })
+
+			if p3 ~= nil then
+				object:dispatch(FetchGamePlayButtonData.Fetch(p3, (tostring(p))))
+			end
+
+			fetchExperienceDetailsPage(tostring(p), pageTimer)
+		end
+
+		local v
+
+		if formFactor2 == formFactor.COMPACT and UseGameDetailsPeekView() then
+			v = { name = AppPage.GameDetail, detail = tostring(p), extraProps = extraProps }
+
+			if
+				viewState == PeekViewState.Full
+				or viewState == PeekViewState.Extended
+				or extraProps and extraProps.mountAsFullView
+			then
+				v = Cryo.Dictionary.join(v, {
+					extraProps = Cryo.Dictionary.join(v.extraProps or {}, { mountAsFullView = true })
+				})
+			else
+				object:dispatch(SetGameDetailsPeekViewState(PeekViewState.Closed))
 				p2.clearAppScreens({ AppPage.GameDetail })
 			end
 		else
-			t2 = {
-				name = AppPage.ExperienceDetail,
-				detail = tostring(p1),
-				extraProps = t1
-			}
+			v = { name = AppPage.ExperienceDetail, detail = tostring(p), extraProps = extraProps }
 		end
 
 		if FFlagSignalsNavP3Dispatch then
-			v17.down(v17.fromLegacyPage(t2), FFlagSignalsNavP2NavigationPrimitives or nil)
-
-			return
+			navigationCommands.down(navigationCommands.fromLegacyPage(v), FFlagSignalsNavP2NavigationPrimitives or nil)
+		else
+			object:dispatch(NavigateDown(v, FFlagSignalsNavP2NavigationPrimitives or nil))
 		end
-
-		p4:dispatch(NavigateDown(t2, FFlagSignalsNavP2NavigationPrimitives or nil))
 	end
 end

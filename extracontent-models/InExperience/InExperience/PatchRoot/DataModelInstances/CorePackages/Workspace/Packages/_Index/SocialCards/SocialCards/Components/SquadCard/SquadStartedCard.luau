@@ -1,125 +1,183 @@
-local Parent = script:FindFirstAncestor("SocialCards").Parent
-local Foundation = require(Parent.Foundation)
-local getStandardSizeAvatarHeadShotRbxthumb = require(Parent.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb
-local ImagePile = require(Parent.AppBlox).ImagePile
-local React = require(Parent.React)
-local useNavigation = require(Parent.Navigation).useNavigation
-local useLocalization = require(Parent.Localization).Hooks.useLocalization
-local useTokens = Foundation.Hooks.useTokens
-local SquadJoinButton = require(Parent.Squads.SquadJoinButton)
-local SquadComponentAccessWrapper = require(Parent.Squads.SquadComponentAccessWrapper)
-local SquadButtonSourceEnum = require(Parent.Squads.Enums).SquadButtonSourceEnum
+local parent = script:FindFirstAncestor("SocialCards").Parent
 
-local function SquadStartedCard(t1: {[any]: any}) -- line: 23
-	-- upvalues: useNavigation (copy), useTokens (copy), useLocalization (copy), React (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), ImagePile (copy), Foundation (copy), SquadComponentAccessWrapper (copy), SquadJoinButton (copy), SquadButtonSourceEnum (copy)
-	local v14 = useNavigation()
-	local v15 = useTokens()
-	local v16 = useLocalization({
-		onePersonActive = "Feature.Squads.Description.OnePersonActive",
-		partyStarted = "Feature.Squads.Label.PartyStartedText",
+local Foundation = require(parent.Foundation)
+local UserLib = require(parent.UserLib)
+local getStandardSizeAvatarHeadShotRbxthumb = UserLib.Utils.getStandardSizeAvatarHeadShotRbxthumb
+local AppBlox = require(parent.AppBlox)
+local ImagePile = AppBlox.ImagePile
+local React = require(parent.React)
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+
+local useTokens = Foundation.Hooks.useTokens
+
+local SquadJoinButton = require(parent.Squads.SquadJoinButton)
+local SquadComponentAccessWrapper = require(parent.Squads.SquadComponentAccessWrapper)
+local Enums = require(parent.Squads.Enums)
+local SquadButtonSourceEnum = Enums.SquadButtonSourceEnum
+
+local function SquadStartedCard(props)
+	local v = useNavigation()
+	local v2 = useTokens()
+	local v3 = useLocalization({
 		manyPeopleActive = {
 			"Feature.Squads.Description.ManyPeopleActive",
-			userCount = #t1.participantUserIds
-		}
+			userCount = #props.participantUserIds
+		},
+		onePersonActive = "Feature.Squads.Description.OnePersonActive",
+		partyStarted = "Feature.Squads.Label.PartyStartedText"
 	})
-	local v17 = React.useCallback(function(p1) -- line: 32
-		-- upvalues: getStandardSizeAvatarHeadShotRbxthumb (copy), v15 (copy), React (copy), ImagePile (copy)
-		local t2 = {}
 
-		for _, v in ipairs(p1) do
-			table.insert(t2, {
-				Image = getStandardSizeAvatarHeadShotRbxthumb((tostring(v))),
-				BackgroundColor3 = v15.Color.Surface.Surface_200.Color3:lerp(v15.Color.ActionStandard.Background.Color3, 1 - v15.Color.ActionStandard.Background.Transparency)
+	local v4 = React.useCallback(function(list)
+		local images = {}
+
+		for _, item in ipairs(list) do
+			table.insert(images, {
+				Image = getStandardSizeAvatarHeadShotRbxthumb((tostring(item))),
+				BackgroundColor3 = v2.Color.Surface.Surface_200.Color3:lerp(
+					v2.Color.ActionStandard.Background.Color3,
+					1 - v2.Color.ActionStandard.Background.Transparency
+				)
 			})
 		end
 
-		return React.createElement(ImagePile, {
-			images = t2,
-			imageBorderColor = if v15.Config.Theme.IsUIBlox ~= "true" then v15.Color.Surface.Surface_200.Color3 else v15.Color.Shift.Shift_200.Color3
-		})
+		local createElement = React.createElement
+		local imageBorderColor
+
+		if v2.Config.Theme.IsUIBlox == "true" then
+			imageBorderColor = v2.Color.Shift.Shift_200.Color3
+		else
+			imageBorderColor = v2.Color.Surface.Surface_200.Color3
+		end
+
+		return createElement(ImagePile, { images = images, imageBorderColor = imageBorderColor })
 	end, {})
 
-	return React.createElement(Foundation.View, {
-		tag = "bg-shift-200 radius-large",
+	local createElement = React.createElement
+	local view = Foundation.View
+	local v5 = {
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.fromScale(1, 0),
 		layout = {
 			FillDirection = Enum.FillDirection.Vertical,
-			Padding = UDim.new(0, v15.Gap.Small),
+			Padding = UDim.new(0, v2.Gap.Small),
 			SortOrder = Enum.SortOrder.LayoutOrder
 		},
 		padding = {
-			bottom = UDim.new(0, v15.Padding.Medium),
-			left = UDim.new(0, v15.Padding.Large),
-			right = UDim.new(0, v15.Padding.Large),
-			top = UDim.new(0, v15.Padding.Medium)
+			bottom = UDim.new(0, v2.Padding.Medium),
+			left = UDim.new(0, v2.Padding.Large),
+			right = UDim.new(0, v2.Padding.Large),
+			top = UDim.new(0, v2.Padding.Medium)
 		},
-		selection = {
-			Selectable = true
-		}
-	}, {
-		InfoContainer = React.createElement(Foundation.View, {
+		selection = { Selectable = true },
+		tag = "bg-shift-200 radius-large"
+	}
+
+	local createElement2 = React.createElement
+	local view2 = Foundation.View
+	local v6 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.fromScale(1, 0),
+		layout = {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, v2.Gap.Large),
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		},
+		LayoutOrder = 1
+	}
+	local thumbnail
+
+	if #props.participantUserIds > 0 then
+		thumbnail = React.createElement(
+			Foundation.View,
+			{
+				Size = UDim2.fromOffset(v2.Size.Size_1000, v2.Size.Size_1000),
+				LayoutOrder = 1
+			},
+			{ v4(props.participantUserIds) }
+		)
+	end
+
+	local createElement3 = React.createElement
+	local view3 = Foundation.View
+	local v7 = { AutomaticSize = Enum.AutomaticSize.Y, Size = 0, layout = 0, LayoutOrder = 2 }
+	local size
+
+	if #props.participantUserIds > 0 then
+		size = UDim2.new(1, -v2.Size.Size_1000 - v2.Padding.Large, 0, 0)
+	else
+		size = UDim2.fromScale(1, 0)
+	end
+
+	v7.Size = size
+
+	v7.layout = {
+		FillDirection = Enum.FillDirection.Vertical,
+		Padding = UDim.new(0, v2.Gap.XSmall),
+		SortOrder = Enum.SortOrder.LayoutOrder
+	}
+
+	local v8 = {
+		Title = React.createElement(Foundation.Text, {
+			AutomaticSize = Enum.AutomaticSize.XY,
+			backgroundStyle = v2.Color.None,
+			fontStyle = v2.Typography.TitleMedium,
 			LayoutOrder = 1,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.fromScale(1, 0),
-			layout = {
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, v15.Gap.Large),
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}
-		}, {
-			Thumbnail = if not (#t1.participantUserIds > 0) then nil else React.createElement(Foundation.View, {
-				LayoutOrder = 1,
-				Size = UDim2.fromOffset(v15.Size.Size_1000, v15.Size.Size_1000)
-			}, { v17(t1.participantUserIds) }),
-			TextContainer = React.createElement(Foundation.View, {
-				LayoutOrder = 2,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = if not (#t1.participantUserIds > 0) then UDim2.fromScale(1, 0) else UDim2.new(1, -v15.Size.Size_1000 - v15.Padding.Large, 0, 0),
-				layout = {
-					FillDirection = Enum.FillDirection.Vertical,
-					Padding = UDim.new(0, v15.Gap.XSmall),
-					SortOrder = Enum.SortOrder.LayoutOrder
-				}
-			}, {
-				Title = React.createElement(Foundation.Text, {
-					LayoutOrder = 1,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					backgroundStyle = v15.Color.None,
-					fontStyle = v15.Typography.TitleMedium,
-					Text = v16.partyStarted,
-					textStyle = v15.Color.Content.Emphasis,
-					TextTruncate = Enum.TextTruncate.AtEnd
-				}),
-				Status = React.createElement(Foundation.Text, {
-					LayoutOrder = 2,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					backgroundStyle = v15.Color.None,
-					fontStyle = v15.Typography.LabelSmall,
-					Text = if #t1.participantUserIds ~= 1 then v16.manyPeopleActive else v16.onePersonActive,
-					textStyle = v15.Color.Content.Muted,
-					TextTruncate = Enum.TextTruncate.AtEnd
-				})
-			})
+			Text = v3.partyStarted,
+			textStyle = v2.Color.Content.Emphasis,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}),
+		Status = 0
+	}
+
+	local createElement4 = React.createElement
+	local text = Foundation.Text
+	local v9 = {
+		AutomaticSize = Enum.AutomaticSize.XY,
+		backgroundStyle = v2.Color.None,
+		fontStyle = v2.Typography.LabelSmall,
+		LayoutOrder = 2,
+		Text = 0,
+		textStyle = 0,
+		TextTruncate = 0
+	}
+	local text2
+
+	if #props.participantUserIds == 1 then
+		text2 = v3.onePersonActive
+	else
+		text2 = v3.manyPeopleActive
+	end
+
+	v9.Text = text2
+
+	v9.textStyle = v2.Color.Content.Muted
+	v9.TextTruncate = Enum.TextTruncate.AtEnd
+	v8.Status = createElement4(text, v9)
+	return createElement(view, v5, {
+		InfoContainer = createElement2(view2, v6, {
+			Thumbnail = thumbnail,
+			TextContainer = createElement3(view3, v7, v8)
 		}),
 		ActionButton = React.createElement(SquadComponentAccessWrapper, {
-			parentChannelId = t1.conversationId
-		}, { React.createElement(SquadJoinButton, {
-			isFullWidth = true,
-			isInCard = true,
-			layoutOrder = 3,
-			shouldAnimate = false,
-			conversationId = t1.conversationId,
-			onActivated = function() -- line: 133
-				-- upvalues: v14 (copy), t1 (copy)
-				v14.navigate("SquadLobby", {
-					conversationId = t1.conversationId
-				})
-			end,
-			squadButtonSource = SquadButtonSourceEnum.PartyStartedCard,
-			squadLocation = t1.squadLocation
-		}) })
+			parentChannelId = props.conversationId
+		}, {
+			React.createElement(SquadJoinButton, {
+				conversationId = props.conversationId,
+				isFullWidth = true,
+				isInCard = true,
+				layoutOrder = 3,
+				onActivated = function()
+					v.navigate("SquadLobby", { conversationId = props.conversationId })
+				end,
+				shouldAnimate = false,
+				squadButtonSource = SquadButtonSourceEnum.PartyStartedCard,
+				squadLocation = props.squadLocation
+			})
+		})
 	})
 end
 

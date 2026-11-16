@@ -1,41 +1,36 @@
-local ParentParent = script.Parent.Parent
-local inspect = require(ParentParent.jsutils.inspect).inspect
-local invariant = require(ParentParent.jsutils.invariant).invariant
-local language = ParentParent.language
-
+local parent = script.Parent.Parent
+local inspect = require(parent.jsutils.inspect)
+local inspect2 = inspect.inspect
+local invariant = require(parent.jsutils.invariant)
+local invariant2 = invariant.invariant
+local language = parent.language
 require(language.ast)
 
-local Kind = require(ParentParent.language.kinds).Kind
-local definition = require(ParentParent.type.definition)
-local GraphQLList = definition.GraphQLList
-local GraphQLNonNull = definition.GraphQLNonNull
-local type = ParentParent.type
+local kinds = require(parent.language.kinds)
+local kind = kinds.Kind
+local definition = require(parent.type.definition)
+local graphQLList = definition.GraphQLList
+local graphQLNonNull = definition.GraphQLNonNull
 
-require(type.schema)
-
-local function typeFromAST(p1, p2) -- line: 33
-	-- upvalues: Kind (copy), typeFromAST (copy), GraphQLList (copy), GraphQLNonNull (copy), invariant (copy), inspect (copy)
-	if p2.kind == Kind.LIST_TYPE then
-		local v13 = typeFromAST(p1, p2.type)
-
-		return v13 and GraphQLList.new(v13)
+local kind2 = parent.type
+require(kind2.schema)
+local function typeFromAST(object, kind3)
+	if kind3.kind == kind.LIST_TYPE then
+		local v = typeFromAST(object, kind3.type)
+		return v and graphQLList.new(v)
 	end
 
-	if p2.kind == Kind.NON_NULL_TYPE then
-		local v14 = typeFromAST(p1, p2.type)
-
-		return v14 and GraphQLNonNull.new(v14)
+	if kind3.kind == kind.NON_NULL_TYPE then
+		local v = typeFromAST(object, kind3.type)
+		return v and graphQLNonNull.new(v)
 	end
 
-	if p2.kind == Kind.NAMED_TYPE then
-		return p1:getType(p2.name.value)
+	if kind3.kind == kind.NAMED_TYPE then
+		return object:getType(kind3.name.value)
 	end
 
-	invariant(false, "Unexpected type node: " .. inspect(p2))
-
+	invariant2(false, "Unexpected type node: " .. inspect2(kind3))
 	return nil
 end
 
-return {
-	typeFromAST = typeFromAST
-}
+return { typeFromAST = typeFromAST }

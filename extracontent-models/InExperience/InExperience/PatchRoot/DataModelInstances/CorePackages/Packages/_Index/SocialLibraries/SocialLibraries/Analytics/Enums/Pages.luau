@@ -1,5 +1,3 @@
-local ParentParent = script.Parent.Parent.Parent
-
-return require(ParentParent.dependencies).enumerate(script.Name, {
-	PlayerProfile = "playerProfile"
-})
+local parent = script.Parent.Parent.Parent
+local dependencies = require(parent.dependencies)
+return dependencies.enumerate(script.Name, { PlayerProfile = "playerProfile" })

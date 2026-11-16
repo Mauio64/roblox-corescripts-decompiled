@@ -1,20 +1,22 @@
-local ParentParent = script.Parent.Parent
-local Cryo = require(ParentParent.Cryo)
-local Roact = require(ParentParent.Roact)
+local parent = script.Parent.Parent
+
+local Cryo = require(parent.Cryo)
+local Roact = require(parent.Roact)
+
 local FitFrameOnAxis = require(script.Parent.FitFrameOnAxis)
 local isRoact17 = require(script.Parent.isRoact17)
 
-return Roact.forwardRef(function(p1, p2) -- line: 10
-	-- upvalues: isRoact17 (copy), Roact (copy), Cryo (copy), FitFrameOnAxis (copy)
-	local v8 = p1 or {}
-	local width = v8.width
-	local v10 = if not isRoact17() then Roact.Ref else "forwardedRef"
-	local v11 = Cryo.Dictionary.join(v8, {
+return Roact.forwardRef(function(options, p)
+	local v = options or {}
+	local width = v.width
+
+	local v2 = isRoact17() and "forwardedRef" or Roact.Ref
+	local joined = Cryo.Dictionary.join(v, {
 		axis = FitFrameOnAxis.Axis.Vertical,
 		minimumSize = UDim2.new(width, UDim.new(0, 0)),
-		[v10] = p2,
+		[v2] = p,
 		width = Cryo.None
 	})
 
-	return Roact.createElement(FitFrameOnAxis, v11)
+	return Roact.createElement(FitFrameOnAxis, joined)
 end)

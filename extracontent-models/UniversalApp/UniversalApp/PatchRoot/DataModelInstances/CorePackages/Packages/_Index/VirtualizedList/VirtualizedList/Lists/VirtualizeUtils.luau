@@ -1,153 +1,169 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Error = require(ParentParentParent.LuauPolyfill).Error
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Error = LuauPolyfill.Error
+
 local HttpService = game:GetService("HttpService")
-local t1 = {}
-local invariant = require(ParentParent.jsUtils.invariant)
 
-local function elementsThatOverlapOffsets(p1, n1: number, p2: ((...any) -> ...any)) -- line: 26
-	-- upvalues: invariant (copy), HttpService (copy)
-	local t2 = {}
-	local n2 = 0
+local invariant = require(parent.jsUtils.invariant)
 
-	for i = 1, n1 do
-		local v14 = p2(i)
-		local v15 = v14.offset + v14.length
+local function elementsThatOverlapOffsets(list, p: number, callback)
+	local result = {}
+	local count = 0
 
-		for j = 1, #p1 do
-			if t2[j] ~= nil or not (v15 >= p1[j]) then
+	for i = 1, p do
+		local v = callback(i)
+		local v2 = v.offset + v.length
+
+		for j = 1, #list do
+			if not (result[j] == nil and list[j] <= v2) then
 				continue
 			end
 
-			t2[j] = i
-			n2 += 1
+			result[j] = i
+			count += 1
 
-			if j == #p1 then
-				if n2 ~= #p1 then
-					invariant(n2 == #p1, "bad offsets input, should be in increasing order: %s", HttpService:JSONEncode(p1))
+			if j == #list then
+				if count ~= #list then
+					invariant(
+						count == #list,
+						"bad offsets input, should be in increasing order: %s",
+						HttpService:JSONEncode(list)
+					)
 				end
 
-				return t2
+				return result
 			end
 		end
 	end
 
-	return t2
+	return result
 end
 
-t1.elementsThatOverlapOffsets = elementsThatOverlapOffsets
+local VirtualizeUtils = {}
+VirtualizeUtils.elementsThatOverlapOffsets = elementsThatOverlapOffsets
 
-function t1.newRangeCount(p3, p4) -- line: 65
-	return p4.last - p4.first + 1 - math.max(0, math.min(p4.last, p3.last) + 1 - math.max(p4.first, p3.first))
+local function newRangeCount(p, p2) -- 1 equivalent call inferred from this helper
+	return p2.last - p2.first + 1 - math.max(0, math.min(p2.last, p.last) + 1 - math.max(p2.first, p.first))
 end
-function t1.computeWindowedRenderLimits(p5, p6: ((...any) -> ...any), n3: number, n4: number, t3: {[any]: any}, p7: ((...any) -> ...any), p8) -- line: 82
-	-- upvalues: elementsThatOverlapOffsets (copy), Error (copy), HttpService (copy)
-	local v26 = p6(p5)
 
-	if v26 == 0 then
-		return t3
+VirtualizeUtils.newRangeCount = newRangeCount
+
+function VirtualizeUtils.computeWindowedRenderLimits(p, callback, p2: number, p3: number, p4, callback2, data)
+	local v = callback(p)
+
+	if v == 0 then
+		return p4
 	end
 
-	local offset = p8.offset
-	local velocity = p8.velocity
-	local visibleLength = p8.visibleLength
-	local v30 = math.max(0, offset)
-	local v31 = v30 + visibleLength
-	local v32 = (n4 - 1) * visibleLength
-	local v33 = if not (velocity > 1) then not (velocity < -1) and "none" or "before" else "after"
-	local v34 = math.max(0, v30 - 0.5 * v32)
-	local v35 = math.max(0, v31 + 0.5 * v32)
+	local offset = data.offset
+	local velocity = data.velocity
+	local visibleLength = data.visibleLength
 
-	if v34 > p7(v26).offset then
+	local v2 = math.max(0, offset)
+	local v3 = v2 + visibleLength
+	local v4 = (p3 - 1) * visibleLength
+
+	local v5 = velocity > 1 and "after" or velocity < -1 and "before" or "none"
+	local v6 = math.max(0, v2 - 0.5 * v4)
+	local v7 = math.max(0, v3 + 0.5 * v4)
+
+	if callback2(v).offset < v6 then
 		return {
-			first = math.max(1, v26 - n3),
-			last = v26
+			first = math.max(1, v - p2),
+			last = v
 		}
 	end
 
-	local v36, v37, v38, v39 = table.unpack(elementsThatOverlapOffsets({
-		v34,
-		v30,
-		v31,
-		v35
-	}, v26, p7), 1, 4)
+	local v8, first, last, overscanLast = table.unpack(
+		elementsThatOverlapOffsets({ v6, v2, v3, v7 }, v, callback2),
+		1,
+		4
+	)
 
-	if v36 == nil then
-		v36 = 1
+	local overscanFirst = v8 == nil and 1 or v8
+
+	if first == nil then
+		first = math.max(1, overscanFirst)
 	end
 
-	if v37 == nil then
-		v37 = math.max(1, v36)
+	if overscanLast == nil then
+		overscanLast = v
 	end
 
-	if v39 == nil then
-		v39 = v26
+	if last == nil then
+		last = math.min(overscanLast, first + p2 - 1)
 	end
 
-	if v38 == nil then
-		v38 = math.min(v39, v37 + n3 - 1)
-	end
+	local visible = { first = first, last = last }
+	local rangeCount = newRangeCount(p4, visible) -- inferred equivalent call
 
-	local t4 = {
-		first = v37,
-		last = v38
-	}
-	local v41 = t4.last - t4.first + 1 - math.max(0, math.min(t4.last, t3.last) + 1 - math.max(t4.first, t3.first))
+	while not (first <= overscanFirst and overscanLast <= last) do
+		local v9 = p2 <= rangeCount
+		local v10 = first <= p4.first or p4.last < first
+		local v11
 
-	while not (v37 <= v36) or not (v39 <= v38) do
-		local v42 = n3 <= v41
-		local v43 = v37 <= t3.first or v37 > t3.last
-		local v44 = v36 < v37 and (not v42 or not v43)
-		local v45 = v38 >= t3.last or v38 < t3.first
-		local v46 = v38 < v39 and (not v42 or not v45)
+		if overscanFirst < first then
+			v11 = not (v9 and v10)
+		else
+			v11 = false
+		end
 
-		if v42 and not v44 and not v46 then
+		local v12 = p4.last <= last or last < p4.first
+		local v13
+
+		if last < overscanLast then
+			v13 = not (v9 and v12)
+		else
+			v13 = false
+		end
+
+		if v9 and not (v11 or v13) then
 			break
 		end
 
-		if v44 and (v33 ~= "after" or not v46 or not v45) then
-			if v43 then
-				v41 += 1
+		if v11 and (v5 ~= "after" or not (v13 and v12)) then
+			if v10 then
+				rangeCount += 1
 			end
 
-			v37 -= 1
+			first -= 1
 		end
 
-		if v46 and (v33 ~= "before" or not v44 or not v43) then
-			if v45 then
-				v41 += 1
-			end
-
-			v38 += 1
+		if not (v13 and (v5 ~= "before" or not (v11 and v10))) then
+			continue
 		end
+
+		if v12 then
+			rangeCount += 1
+		end
+
+		last += 1
 	end
 
-	if not (v37 <= v38) or not (v37 >= 1) or not (v38 <= v26) or not (v36 <= v37) or not (v38 <= v39) or not (v37 <= t4.first) or not (v38 >= t4.last) then
+	if not (first <= last and first >= 1 and last <= v and overscanFirst <= first and last <= overscanLast and first <= visible.first and visible.last <= last) then
 		error(Error.new("Bad window calculation " .. HttpService:JSONEncode({
-			first = v37,
-			last = v38,
-			itemCount = v26,
-			overscanFirst = v36,
-			overscanLast = v39,
-			visible = t4
+			first = first,
+			last = last,
+			itemCount = v,
+			overscanFirst = overscanFirst,
+			overscanLast = overscanLast,
+			visible = visible
 		})))
 	end
 
-	return {
-		first = v37,
-		last = v38
-	}
-end
-function t1.keyExtractor(p9, n5: number) -- line: 204
-	if typeof(p9) == "table" and p9.key ~= nil then
-		return p9.key
-	end
-
-	if typeof(p9) == "table" and p9.id ~= nil then
-		return p9.id
-	end
-
-	return (tostring(n5))
+	return { first = first, last = last }
 end
 
-return t1
+function VirtualizeUtils.keyExtractor(p, p2: number)
+	if typeof(p) == "table" and p.key ~= nil then
+		return p.key
+	end
+
+	if typeof(p) == "table" and p.id ~= nil then
+		return p.id
+	end
+
+	return (tostring(p2))
+end
+return VirtualizeUtils

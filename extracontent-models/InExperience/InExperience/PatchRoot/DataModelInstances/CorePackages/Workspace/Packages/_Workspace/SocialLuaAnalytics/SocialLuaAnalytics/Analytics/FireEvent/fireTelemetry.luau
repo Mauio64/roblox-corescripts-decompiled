@@ -1,168 +1,172 @@
 local SocialLuaAnalytics = script:FindFirstAncestor("SocialLuaAnalytics")
-local SocialLuaAnalyticsParent = SocialLuaAnalytics.Parent
-local Cryo = require(SocialLuaAnalyticsParent.Cryo)
-local Dash = require(SocialLuaAnalyticsParent.Dash)
+local parent = SocialLuaAnalytics.Parent
+local Cryo = require(parent.Cryo)
+local Dash = require(parent.Dash)
 local SupportedTelemetryBackends = require(SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends)
 
 require(SocialLuaAnalytics.Analytics.Enums.Contexts)
 require(script.Parent.Parent.Types)
 
-local TelemetryService = nil
-
-local function getDefaultTelemetryService() -- line: 14
-	-- upvalues: TelemetryService (ref)
-	if TelemetryService == nil then
-		TelemetryService = game:GetService("TelemetryService")
+local defaultTelemetryService = nil
+local function getDefaultTelemetryService() -- 1 equivalent call inferred from this helper
+	if defaultTelemetryService == nil then
+		local TelemetryService = game:GetService("TelemetryService")
+		defaultTelemetryService = TelemetryService
 	end
 
-	return TelemetryService
+	return defaultTelemetryService
 end
 
-return function(t1: {[any]: any}) -- line: 43
-	-- upvalues: Cryo (copy), Dash (copy), TelemetryService (ref), SupportedTelemetryBackends (copy)
-	return function(p1, p2, t2: {[any]: any}?, p3) -- line: 65
-		-- upvalues: t1 (copy), Cryo (copy), Dash (copy), TelemetryService (ref), SupportedTelemetryBackends (copy)
-		local defaults = t1.eventList.defaults
-		local v22 = t1.eventList[p1]
-		local v23 = t1.shouldUseTelemetryService == true
-		local v24 = not v23 and "LoggingProtocol" or "TelemetryService"
-		local loggerImpl = t1.loggerImpl
+return function(data)
+	return function(p, p2, options, p3)
+		local defaults = data.eventList.defaults
+		local event = data.eventList[p]
+		local shouldUseTelemetryService = data.shouldUseTelemetryService == true
+		local telemetryPipeline = shouldUseTelemetryService and "TelemetryService" or "LoggingProtocol"
+		local loggerImpl = data.loggerImpl
 
-		local function v26(p4, p5, p6, p7) -- line: 22
-			-- upvalues: loggerImpl (copy), Cryo (copy), v24 (copy), Dash (copy)
+		local function fn(p4, value, options2, ctx)
 			if loggerImpl then
-				local v42 = if type(p5) ~= "string" and type(p5) ~= "number" then p5 else {
-					value = p5
-				}
-				local v43 = Cryo.Dictionary.join(p4, v42 or {}, p6 or {})
+				local v = (type(value) == "string" or type(value) == "number") and { value = value } or value
 
-				if p7 then
-					v43.ctx = p7
+				local joined = Cryo.Dictionary.join(p4, v or {}, options2 or {})
+
+				if ctx then
+					joined.ctx = ctx
 				end
 
-				v43.telemetryPipeline = v24
-				loggerImpl:info(Dash.pretty(v43))
+				joined.telemetryPipeline = telemetryPipeline
+
+				loggerImpl:info(Dash.pretty(joined))
 			end
 		end
 
-		local telemetryServiceImpl
+		local v
 
-		if v23 then
-			telemetryServiceImpl = t1.telemetryServiceImpl
-
-			if not telemetryServiceImpl then
-				if TelemetryService == nil then
-					TelemetryService = game:GetService("TelemetryService")
-				end
-
-				telemetryServiceImpl = TelemetryService
-			end
-		else
-			telemetryServiceImpl = nil
+		if shouldUseTelemetryService then
+			v = data.telemetryServiceImpl or getDefaultTelemetryService() -- inferred equivalent call
 		end
 
-		for _, v29 in v22.backendsList do
-			local v30 = v29.incrementValue or 1
-			local v31 = if not v29.overrideName then p1 else v29.overrideName(p2)
-			local v32 = v29.throttlingThousandths or (v22.throttlingThousandths or defaults.throttlingThousandths)
-			local t3 = {
-				eventName = v31,
-				backends = { v29.type },
-				throttlingPercentage = math.clamp(v32, 0, 10000),
-				lastUpdated = v22.lastUpdated,
-				description = v22.description,
-				links = v22.links or defaults.links
-			}
-			local t4 = {}
+		for _, backend in event.backendsList do
+			local incrementValue = backend.incrementValue or 1
+			local eventName
 
-			if t1.getInfoForAllEvents then
-				local v35 = t1.getInfoForAllEvents()
-
-				t4 = Cryo.Dictionary.join(t4, v35)
-			end
-
-			if v29.format then
-				assert(v29.dynamicCustomFields == nil, "Cannot use dynamicCustomFields with format")
-				assert(v29.staticCustomFields == nil, "Cannot use staticCustomFields with format")
-				t4 = v29.format(p2, t2 or {})
+			if backend.overrideName then
+				eventName = backend.overrideName(p2)
 			else
-				if v29.dynamicCustomFields and p2 then
-					for v36, v37 in v29.dynamicCustomFields do
-						if p2[v36] then
-							t4[v36] = v37(p2[v36])
+				eventName = p
+			end
+
+			local throttlingThousandths = backend.throttlingThousandths
+				or event.throttlingThousandths
+				or defaults.throttlingThousandths
+
+			local v2 = {
+				eventName = eventName,
+				backends = { backend.type },
+				throttlingPercentage = math.clamp(throttlingThousandths, 0, 10000),
+				lastUpdated = event.lastUpdated,
+				description = event.description,
+				links = event.links or defaults.links
+			}
+
+			local customFields = {}
+
+			if data.getInfoForAllEvents then
+				local infoForAllEvents = data.getInfoForAllEvents()
+				customFields = Cryo.Dictionary.join(customFields, infoForAllEvents)
+			end
+
+			if backend.format then
+				assert(backend.dynamicCustomFields == nil, "Cannot use dynamicCustomFields with format")
+				assert(backend.staticCustomFields == nil, "Cannot use staticCustomFields with format")
+				customFields = backend.format(p2, options or {})
+			else
+				if backend.dynamicCustomFields and p2 then
+					for k, dynamicCustomField in backend.dynamicCustomFields do
+						if p2[k] then
+							customFields[k] = dynamicCustomField(p2[k])
 						end
 					end
 				end
 
-				if v29.staticCustomFields then
-					t4 = Cryo.Dictionary.join(t4, v29.staticCustomFields)
+				if backend.staticCustomFields then
+					customFields = Cryo.Dictionary.join(customFields, backend.staticCustomFields)
 				end
 			end
 
-			if v29.type ~= SupportedTelemetryBackends.Points then
-				if v29.type ~= SupportedTelemetryBackends.RobloxTelemetryStat then
-					if v29.type == SupportedTelemetryBackends.RobloxTelemetryCounter then
-						if v23 then
-							telemetryServiceImpl:LogCounter(t3, {
-								standardizedFields = v29.standardizedFields,
-								customFields = t4
-							}, v30)
-						else
-							t1.telemetryImpl:logRobloxTelemetryCounter(t3, v30, t4)
-						end
-
-						v26(t3, v30, t4)
-					elseif v29.type == SupportedTelemetryBackends.EventIngest then
-						if v23 then
-							telemetryServiceImpl:LogEvent(t3, {
-								eventContext = p3 or t4.eventContext,
-								standardizedFields = v29.standardizedFields,
-								customFields = t4
-							})
-						else
-							t1.telemetryImpl:logRobloxTelemetryEvent(t3, v29.standardizedFields, t4, p3 or t4.eventContext)
-						end
-
-						v26(t3, p2, t4, p3 or t4.eventContext)
-					end
-
-					continue
-				end
-
-				if not p2 or not p2.statValue then
-					t3.backends = { SupportedTelemetryBackends.RobloxTelemetryCounter }
-					t3.eventName = p1 .. "MissingStatValue"
-
-					if v23 then
-						telemetryServiceImpl:LogCounter(t3, {
-							standardizedFields = v29.standardizedFields,
-							customFields = t4
-						}, v30)
+			if backend.type == SupportedTelemetryBackends.Points then
+				data.telemetryImpl:logRobloxTelemetryEvent(v2, backend.standardizedFields, customFields)
+				fn(v2, backend.standardizedFields, customFields)
+			elseif backend.type == SupportedTelemetryBackends.RobloxTelemetryStat then
+				if p2 and p2.statValue then
+					if shouldUseTelemetryService then
+						v:LogStat(
+							v2,
+							{
+								standardizedFields = backend.standardizedFields,
+								customFields = customFields
+							},
+							p2.statValue
+						)
 					else
-						t1.telemetryImpl:logRobloxTelemetryCounter(t3, v30, t4)
+						data.telemetryImpl:logRobloxTelemetryStat(v2, p2.statValue, customFields)
 					end
 
-					v26(t3, v30, t4)
-
-					return
-				end
-
-				if v23 then
-					telemetryServiceImpl:LogStat(t3, {
-						standardizedFields = v29.standardizedFields,
-						customFields = t4
-					}, p2.statValue)
+					fn(v2, p2.statValue, customFields)
 				else
-					t1.telemetryImpl:logRobloxTelemetryStat(t3, p2.statValue, t4)
+					v2.backends = { SupportedTelemetryBackends.RobloxTelemetryCounter }
+					v2.eventName = p .. "MissingStatValue"
+
+					if shouldUseTelemetryService then
+						v:LogCounter(
+							v2,
+							{
+								standardizedFields = backend.standardizedFields,
+								customFields = customFields
+							},
+							incrementValue
+						)
+					else
+						data.telemetryImpl:logRobloxTelemetryCounter(v2, incrementValue, customFields)
+					end
+
+					fn(v2, incrementValue, customFields)
+					break
+				end
+			elseif backend.type == SupportedTelemetryBackends.RobloxTelemetryCounter then
+				if shouldUseTelemetryService then
+					v:LogCounter(
+						v2,
+						{
+							standardizedFields = backend.standardizedFields,
+							customFields = customFields
+						},
+						incrementValue
+					)
+				else
+					data.telemetryImpl:logRobloxTelemetryCounter(v2, incrementValue, customFields)
 				end
 
-				v26(t3, p2.statValue, t4)
+				fn(v2, incrementValue, customFields)
+			elseif backend.type == SupportedTelemetryBackends.EventIngest then
+				if shouldUseTelemetryService then
+					v:LogEvent(v2, {
+						eventContext = p3 or customFields.eventContext,
+						standardizedFields = backend.standardizedFields,
+						customFields = customFields
+					})
+				else
+					data.telemetryImpl:logRobloxTelemetryEvent(
+						v2,
+						backend.standardizedFields,
+						customFields,
+						p3 or customFields.eventContext
+					)
+				end
 
-				continue
+				fn(v2, p2, customFields, p3 or customFields.eventContext)
 			end
-
-			t1.telemetryImpl:logRobloxTelemetryEvent(t3, v29.standardizedFields, t4)
-			v26(t3, v29.standardizedFields, t4)
 		end
 	end
 end

@@ -1,157 +1,142 @@
 local SocialCards = script:FindFirstAncestor("SocialCards")
-local SocialCardsParent = SocialCards.Parent
-local Cryo = require(SocialCardsParent.Cryo)
-local Foundation = require(SocialCardsParent.Foundation)
-local Http = require(SocialCardsParent.Http)
-local LuauPolyfill = require(SocialCardsParent.LuauPolyfill)
-local React = require(SocialCardsParent.React)
-local SquadExternalContractProvider = require(SocialCardsParent.SquadsCore.SquadExternalContractProvider)
-local useCurrentSquadSelector = require(SocialCardsParent.RoduxSquads).Hooks.useCurrentSquadSelector
-local useDispatch = require(SocialCardsParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useLocalUserId = require(SocialCardsParent.RobloxAppHooks).useLocalUserId
-local useNavigationFocus = require(SocialCardsParent.Navigation).useNavigationFocus
-local NetworkingSquads = require(SocialCardsParent.SquadsCore.Http).NetworkingSquads
+local parent = SocialCards.Parent
+
+local Cryo = require(parent.Cryo)
+
+local Foundation = require(parent.Foundation)
+local Http = require(parent.Http)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local React = require(parent.React)
+local SquadExternalContractProvider = require(parent.SquadsCore.SquadExternalContractProvider)
+local RoduxSquads = require(parent.RoduxSquads)
+local useCurrentSquadSelector = RoduxSquads.Hooks.useCurrentSquadSelector
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local Navigation = require(parent.Navigation)
+local useNavigationFocus = Navigation.useNavigationFocus
+
+local Http2 = require(parent.SquadsCore.Http)
+local NetworkingSquads = Http2.NetworkingSquads
 local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
 local SquadViewFlags = SquadExternalContractProvider.SquadViewFlags
+
 local clearInterval = LuauPolyfill.clearInterval
 local setInterval = LuauPolyfill.setInterval
+
 local SquadStartedCard = require(SocialCards.Components.SquadCard.SquadStartedCard)
 local SquadEndedCard = require(SocialCards.Components.SquadCard.SquadEndedCard)
 
-local function SquadCard(t1: {[any]: any}) -- line: 35
-	-- upvalues: useDispatch (copy), useLocalUserId (copy), React (copy), SquadExternalContractContext (copy), useCurrentSquadSelector (copy), Cryo (copy), useNavigationFocus (copy), SquadViewFlags (copy), NetworkingSquads (copy), Http (copy), setInterval (copy), clearInterval (copy), SquadStartedCard (copy), SquadEndedCard (copy), Foundation (copy)
-	local v22 = useDispatch()
-	local v23 = useLocalUserId()
-	local v24 = React.useContext(SquadExternalContractContext)
-	local v25 = useCurrentSquadSelector()
-	local v26 = not not v25 and v25.squadId == t1.group_up_id
-	local v27 = React.useCallback(function(t2: {[any]: any}) -- line: 48
-		-- upvalues: v26 (copy), v25 (copy), Cryo (copy), v23 (copy)
-		if v26 then
-			local t3 = {}
+local function SquadCard(props)
+	local v = useDispatch()
+	local v2 = useLocalUserId()
 
-			for _, v in ipairs(v25.members) do
-				table.insert(t3, v.userId)
+	local v3 = React.useContext(SquadExternalContractContext)
+	local v4 = useCurrentSquadSelector()
+	local v5
+
+	if v4 then
+		v5 = v4.squadId == props.group_up_id
+	else
+		v5 = false
+	end
+
+	local v6 = React.useCallback(function(p)
+		if not v5 then
+			return Cryo.List.filter(p, function(p2: number): boolean
+				return tostring(p2) ~= v2
+			end)
+		end
+
+		local userIds = {}
+
+		for _, member in ipairs(v4.members) do
+			table.insert(userIds, member.userId)
+		end
+
+		return userIds
+	end, { v5, v4, v2 })
+
+	local state, setState = React.useState(props.is_alive)
+	local state2, setState2 = React.useState(v6(props.participant_user_ids))
+
+	local v7 = useNavigationFocus()
+	local v8 = v5 and v7
+	React.useEffect(function()
+		if v8 then
+			v3.updateSquadViewFlags(SquadViewFlags.SquadSystemMessage, true)
+		end
+
+		return function()
+			if v8 then
+				v3.updateSquadViewFlags(SquadViewFlags.SquadSystemMessage, false)
 			end
-
-			return t3
 		end
+	end, { v3.updateSquadViewFlags, v8 })
 
-		return Cryo.List.filter(t2, function(n1: number) -- line: 56
-			-- upvalues: v23 (copy)
-			return tostring(n1) ~= v23
-		end)
-	end, {
-		v26,
-		v25,
-		v23
-	})
-	local v28, v29 = React.useState(t1.is_alive)
-	local v30, v31 = React.useState(v27(t1.participant_user_ids))
-	local v32 = useNavigationFocus()
-	local v33 = v26 and v32
+	React.useEffect(function()
+		setState2(v6(props.participant_user_ids))
+	end, { setState2, props.participant_user_ids, v6 })
 
-	React.useEffect(function() -- line: 68
-		-- upvalues: v33 (copy), v24 (copy), SquadViewFlags (copy)
-		if v33 then
-			v24.updateSquadViewFlags(SquadViewFlags.SquadSystemMessage, true)
-		end
+	local v9 = React.useCallback(function(squadId: string)
+		v(NetworkingSquads.GetSquadFromSquadId.API({ squadId = squadId })):andThen(function(p)
+			if p and p.responseBody and p.responseBody.groupUp and p.responseBody.groupUp.members then
+				local userIds = {}
 
-		return function() -- line: 72
-			-- upvalues: v33 (copy), v24 (copy), SquadViewFlags (copy)
-			if v33 then
-				v24.updateSquadViewFlags(SquadViewFlags.SquadSystemMessage, false)
-			end
-		end
-	end, {
-		v24.updateSquadViewFlags,
-		v33
-	})
-	React.useEffect(function() -- line: 79
-		-- upvalues: v31 (copy), v27 (copy), t1 (copy)
-		v31(v27(t1.participant_user_ids))
-	end, {
-		v31,
-		t1.participant_user_ids,
-		v27
-	})
-
-	local v34 = React.useCallback(function(s1: string) -- line: 84
-		-- upvalues: v22 (copy), NetworkingSquads (copy), v31 (copy), Http (copy), v29 (copy)
-		v22(NetworkingSquads.GetSquadFromSquadId.API({
-			squadId = s1
-		})):andThen(function(p1) -- line: 86
-			-- upvalues: v31 (copy)
-			if p1 and (p1.responseBody and p1.responseBody.groupUp and p1.responseBody.groupUp.members) then
-				local t4 = {}
-
-				for _, v in ipairs(p1.responseBody.groupUp.members) do
-					table.insert(t4, v.userId)
+				for _, member in ipairs(p.responseBody.groupUp.members) do
+					table.insert(userIds, member.userId)
 				end
 
-				v31(t4)
+				setState2(userIds)
 			end
-		end):catch(function(p2) -- line: 100
-			-- upvalues: Http (copy), v29 (copy)
-			if p2.StatusCode == Http.StatusCodes.NOT_FOUND then
-				v29(false)
-
-				return
+		end):catch(function(p)
+			if p.StatusCode == Http.StatusCodes.NOT_FOUND then
+				setState(false)
+			else
+				warn("Unsupported error type")
 			end
-
-			warn("Unsupported error type")
 		end)
-	end, { v22 })
+	end, { v })
 
-	React.useEffect(function() -- line: 109
-		-- upvalues: v28 (copy), v26 (copy), setInterval (copy), v34 (copy), t1 (copy), clearInterval (copy)
-		local u41 = nil
+	React.useEffect(function()
+		local v10
 
-		if v28 and not v26 then
-			u41 = setInterval(function() -- line: 113
-				-- upvalues: v34 (copy), t1 (copy)
-				v34(t1.group_up_id)
+		if state and not v5 then
+			v10 = setInterval(function()
+				v9(props.group_up_id)
 			end, 10000)
+		else
+			v10 = nil
 		end
 
-		return function() -- line: 118
-			-- upvalues: u41 (ref), clearInterval (copy)
-			if u41 then
-				clearInterval(u41)
+		return function()
+			if v10 then
+				clearInterval(v10)
 			end
 		end
-	end, {
-		v34,
-		v28,
-		v26,
-		t1.group_up_id
-	})
+	end, { v9, state, v5, props.group_up_id })
 
-	local v35 = React.useMemo(function() -- line: 125
-		-- upvalues: v28 (copy), React (copy), SquadStartedCard (copy), t1 (copy), v30 (copy), SquadEndedCard (copy)
-		if v28 then
+	local v10 = React.useMemo(function()
+		if state then
 			return (React.createElement(SquadStartedCard, {
-				conversationId = t1.conversation_id,
-				participantUserIds = v30,
-				squadLocation = t1.moduleLocation
+				conversationId = props.conversation_id,
+				participantUserIds = state2,
+				squadLocation = props.moduleLocation
 			}))
 		end
 
 		return (React.createElement(SquadEndedCard, {
-			conversationId = t1.conversation_id,
-			squadLocation = t1.moduleLocation
+			conversationId = props.conversation_id,
+			squadLocation = props.moduleLocation
 		}))
-	end, {
-		v28,
-		v30,
-		t1.conversation_id,
-		t1.group_up_id
-	})
+	end, { state, state2, props.conversation_id, props.group_up_id })
 
-	return React.createElement(Foundation.View, {
-		AutomaticSize = Enum.AutomaticSize.Y,
-		Size = UDim2.new(0, 280, 0, 0)
-	}, v35)
+	return React.createElement(
+		Foundation.View,
+		{ AutomaticSize = Enum.AutomaticSize.Y, Size = UDim2.new(0, 280, 0, 0) },
+		v10
+	)
 end
 
 return SquadCard

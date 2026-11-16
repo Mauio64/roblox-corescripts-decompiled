@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("ExpChat").Parent
+local parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(parent.Rodux)
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(b1: boolean) -- line: 10
-	return {
-		enabled = b1
-	}
+return Rodux.makeActionCreator(script.Name, function(enabled: boolean)
+	return { enabled = enabled }
 end)

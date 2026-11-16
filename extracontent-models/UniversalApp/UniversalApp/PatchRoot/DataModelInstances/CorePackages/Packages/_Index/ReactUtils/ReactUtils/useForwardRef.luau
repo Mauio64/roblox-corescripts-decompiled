@@ -1,29 +1,27 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(parent.React)
 
-local function useForwardRef(p1, p2: ((...any) -> ...any)) -- line: 29
-	-- upvalues: React (copy)
-	local v6 = React.useRef(nil)
-	local v7 = React.useRef(nil)
-	local v8 = React.useCallback(function(p3) -- line: 33
-		-- upvalues: v7 (copy), v6 (copy), p2 (copy)
-		if v7.current then
-			v7.current()
-			v7.current = nil
+local function useForwardRef(p, callback)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+
+	local v = React.useCallback(function(current)
+		if ref2.current then
+			ref2.current()
+			ref2.current = nil
 		end
 
-		if p3 then
-			v6.current = p3
-			v7.current = p2(p3)
+		if current then
+			ref.current = current
+			ref2.current = callback(current)
 		end
-	end, { p2 })
+	end, { callback })
 
-	React.useImperativeHandle(p1, function() -- line: 44
-		-- upvalues: v6 (copy)
-		return v6.current
+	React.useImperativeHandle(p, function()
+		return ref.current
 	end)
 
-	return v8
+	return v
 end
 
 return useForwardRef

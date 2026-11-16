@@ -1,41 +1,43 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
 local console = LuauPolyfill.console
 local Array = LuauPolyfill.Array
+
 local ReactSharedInternals = require(script.Parent.ReactSharedInternals)
-local printWarning = nil
-local t1 = {
-	warn = function(p1, ...) -- line: 26
-		-- upvalues: ReactGlobals (copy), printWarning (ref)
+
+local printWarning
+
+local ConsoleWithStackDev = {
+	warn = function(p, ...)
 		if ReactGlobals.__DEV__ then
-			printWarning("warn", p1, { ... })
+			printWarning("warn", p, { ... })
 		end
 	end,
-	error = function(p2, ...) -- line: 31
-		-- upvalues: ReactGlobals (copy), printWarning (ref)
+	error = function(p, ...)
 		if ReactGlobals.__DEV__ then
-			printWarning("error", p2, { ... })
+			printWarning("error", p, { ... })
 		end
 	end
 }
 
-function printWarning(p3, p4, p5) -- line: 37
-	-- upvalues: ReactGlobals (copy), ReactSharedInternals (copy), Array (copy), console (copy)
+printWarning = function(p, p2, stackAddendums)
 	if ReactGlobals.__DEV__ then
-		local v14 = ReactSharedInternals.ReactDebugCurrentFrame.getStackAddendum()
+		local stackAddendum = ReactSharedInternals.ReactDebugCurrentFrame.getStackAddendum()
 
-		if v14 ~= "" then
-			p4 ..= "%s"
-			p5 = Array.slice(p5, 1)
-			table.insert(p5, v14)
+		if stackAddendum ~= "" then
+			p2 ..= "%s"
+
+			stackAddendums = Array.slice(stackAddendums, 1)
+			table.insert(stackAddendums, stackAddendum)
 		end
 
-		local v15 = Array.map(p5, tostring)
+		local mapped = Array.map(stackAddendums, tostring)
 
-		table.insert(v15, 1, "Warning: " .. p4)
-		console[p3](unpack(v15))
+		table.insert(mapped, 1, "Warning: " .. p2)
+
+		console[p](unpack(mapped))
 	end
 end
 
-return t1
+return ConsoleWithStackDev

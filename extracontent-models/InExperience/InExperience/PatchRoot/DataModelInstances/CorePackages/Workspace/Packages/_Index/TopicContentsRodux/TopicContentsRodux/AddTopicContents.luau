@@ -1,12 +1,8 @@
-local Parent = script:FindFirstAncestor("TopicContentsRodux").Parent
-local makeActionCreator = require(Parent.Rodux).makeActionCreator
+local parent = script:FindFirstAncestor("TopicContentsRodux").Parent
+local Rodux = require(parent.Rodux)
+local makeActionCreator = Rodux.makeActionCreator
+require(parent.DiscoveryTypes)
 
-require(Parent.DiscoveryTypes)
-
-return makeActionCreator(script.Name, function(s1: string, p1, b1: boolean?) -- line: 8
-	return {
-		topicKey = s1,
-		topicContents = p1,
-		isAppend = b1
-	}
+return makeActionCreator(script.Name, function(topicKey: string, topicContents, isAppend: boolean?)
+	return { topicKey = topicKey, topicContents = topicContents, isAppend = isAppend }
 end)

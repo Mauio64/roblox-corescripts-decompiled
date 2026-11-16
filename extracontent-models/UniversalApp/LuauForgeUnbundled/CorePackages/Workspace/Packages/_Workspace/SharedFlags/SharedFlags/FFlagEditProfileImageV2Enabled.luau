@@ -1,0 +1,11 @@
+local FFlagVirtualizedFeedFooterWrapperProp = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagVirtualizedFeedFooterWrapperProp")
+local FFlagEditProfileImageR15UpgradePrompt = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagEditProfileImageR15UpgradePrompt")
+local FFlagAppBloxConfirmationDialogFocusNav = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagAppBloxConfirmationDialogFocusNav")
+local FFlagEditProfileImageV2ConsoleEnabled = require("@game/CorePackages/Workspace/Packages/_Workspace/SharedFlags/SharedFlags/FFlagEditProfileImageV2ConsoleEnabled")
+
+local defineFastFlag = game:DefineFastFlag("EditProfileImageV2Enabled7", false)
+
+local engineFeature = game:GetEngineFeature("AvatarEditorServiceApplyProfileConfigurationEnabled")
+	and game:GetEngineFeature("ThumbnailCustomizationsInProfileConfigurationEnabled")
+
+return (defineFastFlag or FFlagEditProfileImageV2ConsoleEnabled and FFlagAppBloxConfirmationDialogFocusNav) and engineFeature and FFlagVirtualizedFeedFooterWrapperProp and FFlagEditProfileImageR15UpgradePrompt

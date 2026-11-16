@@ -1,52 +1,40 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local React = require(AppChatParent.React)
-local Signals = require(AppChatParent.Signals)
-local SignalsReact = require(AppChatParent.SignalsReact)
+local parent = AppChat.Parent
+
+local React = require(parent.React)
+local Signals = require(parent.Signals)
+local SignalsReact = require(parent.SignalsReact)
+
 local GetConversationListStore = require(AppChat.Stores.GetConversationListStore)
-local t1 = {
-	oldestConversationIsFetched = false,
-	isFetchingConversations = false
-}
 
-local function useConversationList(b1: boolean?) -- line: 21
-	-- upvalues: GetConversationListStore (copy), React (copy), Signals (copy), t1 (copy), SignalsReact (copy)
-	local v10 = GetConversationListStore(false)
-	local v11 = b1 ~= false
-	local v12 = React.useMemo(function() -- line: 25
-		-- upvalues: Signals (copy), v11 (copy), v10 (copy)
-		return Signals.createComputed(function(p1) -- line: 26
-			-- upvalues: v11 (copy), v10 (copy)
-			if not v11 then
-				return {}
+local v = { oldestConversationIsFetched = false, isFetchingConversations = false }
+
+local function useConversationList(flag: boolean?)
+	local conversationListStore = GetConversationListStore(false)
+	local v2 = flag ~= false
+	local v3 = React.useMemo(function()
+		return Signals.createComputed(function(p)
+			if v2 then
+				return conversationListStore.getConversations(p)
 			end
 
-			return v10.getConversations(p1)
+			return {}
 		end)
-	end, {
-		v10,
-		v11
-	})
-	local v13 = React.useMemo(function() -- line: 35
-		-- upvalues: Signals (copy), v11 (copy), t1 (copy), v10 (copy)
-		return Signals.createComputed(function(p2) -- line: 36
-			-- upvalues: v11 (copy), t1 (copy), v10 (copy)
-			if not v11 then
-				return t1
+	end, { conversationListStore, v2 })
+
+	local v4 = React.useMemo(function()
+		return Signals.createComputed(function(p)
+			if v2 then
+				return conversationListStore.getListStatus(p)
 			end
 
-			return v10.getListStatus(p2)
+			return v
 		end)
-	end, {
-		v10,
-		v11
-	})
-	local v14 = SignalsReact.useSignalState(v12)
-	local v15 = SignalsReact.useSignalState(v13)
+	end, { conversationListStore, v2 })
 
 	return {
-		items = v14,
-		listStatus = v15
+		items = SignalsReact.useSignalState(v3),
+		listStatus = SignalsReact.useSignalState(v4)
 	}
 end
 

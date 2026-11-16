@@ -1,20 +1,22 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local ApolloClient = require(VirtualEvents.Parent.ApolloClient)
-
 require(VirtualEvents.Parent.GraphQLServer)
-
 local Cryo = require(VirtualEvents.Parent.Cryo)
 local React = require(VirtualEvents.Parent.React)
 local UIBlox = require(VirtualEvents.Parent.UIBlox)
-local useDeviceType = require(VirtualEvents.Parent.RobloxAppHooks).useDeviceType
-
+local RobloxAppHooks = require(VirtualEvents.Parent.RobloxAppHooks)
+local useDeviceType = RobloxAppHooks.useDeviceType
 require(VirtualEvents.Parent.RobloxAppEnums)
-
-local useRoactService = require(VirtualEvents.Parent.RobloxAppHooks).useRoactService
-local RoactNetworking = require(VirtualEvents.Parent.RoactServiceTags).RoactNetworking
+local RobloxAppHooks2 = require(VirtualEvents.Parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks2.useRoactService
+local RoactServiceTags = require(VirtualEvents.Parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
 local Responsive = require(VirtualEvents.Parent.Responsive)
 local ReactFocusNavigation = require(VirtualEvents.Parent.ReactFocusNavigation)
-local useCloseWithBackButton = require(VirtualEvents.Parent.AppBlox).useCloseWithBackButton
+local AppBlox = require(VirtualEvents.Parent.AppBlox)
+local useCloseWithBackButton = AppBlox.useCloseWithBackButton
+
 local getEventTimerStatus = require(VirtualEvents.Common.getEventTimerStatus)
 local getGalleryItems = require(VirtualEvents.Common.getGalleryItems)
 local fetchEventThumbnailList = require(VirtualEvents.Common.fetchEventThumbnailList)
@@ -25,270 +27,277 @@ local EventDescription = require(VirtualEvents.Components.EventDescription)
 local EventHostedBy = require(VirtualEvents.Components.EventHostedBy)
 local Attendance = require(VirtualEvents.Components.Attendance)
 local requests = require(VirtualEvents.requests)
-
 require(VirtualEvents.Parent.VirtualEventsState)
 
 local FFlagLuaAppLimitEventThumbnailToOne = require(VirtualEvents.Flags.FFlagLuaAppLimitEventThumbnailToOne)
+
 local useMutation = ApolloClient.useMutation
-local AppBlox = require(VirtualEvents.Parent.AppBlox)
-local DetailsPageTemplate = AppBlox.DetailsPageTemplate
-local ContentPosition = AppBlox.ContentPosition
-local MediaGalleryPreview = AppBlox.MediaGalleryPreview
-local calcMediaGallerySizesFromWidth = AppBlox.calcMediaGallerySizesFromWidth
+
+local AppBlox2 = require(VirtualEvents.Parent.AppBlox)
+local DetailsPageTemplate = AppBlox2.DetailsPageTemplate
+local ContentPosition = AppBlox2.ContentPosition
+local MediaGalleryPreview = AppBlox2.MediaGalleryPreview
+local calcMediaGallerySizesFromWidth = AppBlox2.calcMediaGallerySizesFromWidth
 local ListTable = UIBlox.App.Table.ListTable
+local function fn() end
 
-local function v30() -- line: 40
-end
+local v = { onClose = fn, onJoinEvent = fn, onShare = fn }
 
-local t1 = {
-	onClose = v30,
-	onJoinEvent = v30,
-	onShare = v30
-}
+local function EventDetailsPage(p)
+	local joined = Cryo.Dictionary.join(v, p)
 
-local function EventDetailsPage(p1) -- line: 71
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), useDeviceType (copy), useRoactService (copy), RoactNetworking (copy), FFlagLuaAppLimitEventThumbnailToOne (copy), fetchEventThumbnail (copy), getGalleryItems (copy), fetchEventThumbnailList (copy), useMutation (copy), requests (copy), getEventTimerStatus (copy), calcMediaGallerySizesFromWidth (copy), Responsive (copy), ReactFocusNavigation (copy), useCloseWithBackButton (copy), useActionBarProps (copy), ContentPosition (copy), Attendance (copy), MediaGalleryPreview (copy), EventDescription (copy), ListTable (copy), EventHostedBy (copy), DetailsPageTemplate (copy), EventTimer (copy)
-	local v34 = Cryo.Dictionary.join(t1, p1)
-	local media = p1.virtualEvent.media
-	local experienceDetails = p1.virtualEvent.experienceDetails
-	local v37, v38 = React.useState(0)
-	local v39 = useDeviceType()
-	local v40, v41 = React.useState({})
-	local v42 = if not v40[1] then nil else v40[1].imageId
-	local v43 = useRoactService(RoactNetworking)
+	local media = p.virtualEvent.media
+	local experienceDetails = p.virtualEvent.experienceDetails
 
-	React.useEffect(function() -- line: 86
-		-- upvalues: FFlagLuaAppLimitEventThumbnailToOne (copy), fetchEventThumbnail (copy), v43 (copy), p1 (copy), v41 (copy), getGalleryItems (copy), media (copy), fetchEventThumbnailList (copy)
+	local state, setState = React.useState(0)
+
+	local deviceType = useDeviceType()
+
+	local state2, setState2 = React.useState({})
+	local imageId
+
+	if state2[1] then
+		imageId = state2[1].imageId
+	end
+
+	local v2 = useRoactService(RoactNetworking)
+
+	React.useEffect(function()
 		if FFlagLuaAppLimitEventThumbnailToOne then
-			fetchEventThumbnail(v43, p1.virtualEvent.id):andThen(function(p2) -- line: 88
-				-- upvalues: v41 (copy), getGalleryItems (copy), media (copy)
-				local t2 = {}
+			fetchEventThumbnail(v2, p.virtualEvent.id):andThen(function(imageId2)
+				local v3 = {}
 
-				if p2 then
-					table.insert(t2, {
-						isYouTubeVideo = false,
-						imageId = p2
-					})
+				if imageId2 then
+					table.insert(v3, { imageId = imageId2, isYouTubeVideo = false })
 				end
 
-				if #t2 > 0 then
-					v41(t2)
-
-					return
+				if #v3 > 0 then
+					setState2(v3)
+				else
+					setState2(getGalleryItems(media))
 				end
-
-				v41(getGalleryItems(media))
-			end, function() -- line: 105
-				-- upvalues: v41 (copy), getGalleryItems (copy), media (copy)
-				v41(getGalleryItems(media))
+			end, function()
+				setState2(getGalleryItems(media))
 			end)
+		else
+			fetchEventThumbnailList(v2, p.virtualEvent.id):andThen(function(items)
+				local v3 = {}
 
-			return
-		end
-
-		fetchEventThumbnailList(v43, p1.virtualEvent.id):andThen(function(p3) -- line: 109
-			-- upvalues: v41 (copy), getGalleryItems (copy), media (copy)
-			local t3 = {}
-
-			if p3 then
-				for _, v74 in p3 do
-					if v74.mediaId then
-						table.insert(t3, {
-							isYouTubeVideo = false,
-							imageId = "rbxassetid://" .. v74.mediaId
-						})
+				if items then
+					for _, item in items do
+						if item.mediaId then
+							table.insert(v3, {
+								imageId = "rbxassetid://" .. item.mediaId,
+								isYouTubeVideo = false
+							})
+						end
 					end
 				end
-			end
 
-			if #t3 > 0 then
-				v41(t3)
+				if #v3 > 0 then
+					setState2(v3)
+				else
+					setState2(getGalleryItems(media))
+				end
+			end, function()
+				setState2(getGalleryItems(media))
+			end)
+		end
+	end, { p.virtualEvent.id, media })
 
-				return
-			end
+	local v3 = useMutation(requests.UPDATE_RSVP_STATUS, {
+		variables = { virtualEventId = p.virtualEvent.id },
+		update = function(_, object, p2)
+			local virtualEvent = p2.data.virtualEventRsvp.virtualEvent
 
-			v41(getGalleryItems(media))
-		end, function() -- line: 130
-			-- upvalues: v41 (copy), getGalleryItems (copy), media (copy)
-			v41(getGalleryItems(media))
-		end)
-	end, {
-		p1.virtualEvent.id,
-		media
-	})
-
-	local v44 = useMutation(requests.UPDATE_RSVP_STATUS, {
-		variables = {
-			virtualEventId = p1.virtualEvent.id
-		},
-		update = function(_, p5, p6) -- line: 140
-			-- upvalues: Cryo (copy)
-			local virtualEvent = p6.data.virtualEventRsvp.virtualEvent
-
-			p5:modify({
-				id = p5:identify(virtualEvent),
+			object:modify({
+				id = object:identify(virtualEvent),
 				fields = {
-					rsvpCounters = function(_, t4: {[any]: any}) -- line: 146
-						-- upvalues: virtualEvent (copy), Cryo (copy)
-						local v77 = virtualEvent.userRsvpStatus ~= "going" and -1 or 1
-
-						return Cryo.Dictionary.join(t4, {
-							going = t4.going + v77
+					rsvpCounters = function(_, p3)
+						local v3 = virtualEvent.userRsvpStatus == "going" and 1 or -1
+						return Cryo.Dictionary.join(p3, {
+							going = p3.going + v3
 						})
 					end
 				}
 			})
 		end
 	})
-	local v45 = React.useMemo(function() -- line: 157
-		-- upvalues: getEventTimerStatus (copy), v34 (copy)
-		return getEventTimerStatus(v34.virtualEvent, v34.currentTime)
-	end, {
-		v34.virtualEvent,
-		v34.currentTime
-	})
-	local v46 = React.useCallback(function(p8) -- line: 161
-		-- upvalues: calcMediaGallerySizesFromWidth (copy), v37 (copy), v38 (copy)
-		local AbsoluteSizeX = p8.AbsoluteSize.X
-		local YOffset = calcMediaGallerySizesFromWidth(AbsoluteSizeX, 5).contentSize.Y.Offset
 
-		if YOffset ~= v37 then
-			v38(YOffset)
+	local v4 = React.useMemo(function()
+		return getEventTimerStatus(joined.virtualEvent, joined.currentTime)
+	end, { joined.virtualEvent, joined.currentTime })
+
+	local v5 = React.useCallback(function(p2)
+		local offset = calcMediaGallerySizesFromWidth(p2.AbsoluteSize.X, 5).contentSize.Y.Offset
+
+		if offset ~= state then
+			setState(offset)
 		end
-	end, { v37 })
-	local v47 = React.useCallback(function() -- line: 170
-		-- upvalues: v34 (copy), v44 (copy)
-		local v67 = v34.virtualEvent.userRsvpStatus == "going" and "notGoing" or "going"
+	end, { state })
 
-		v44[1]({
-			variables = {
-				rsvpStatus = v67
-			}
-		}):andThen(function(p9) -- line: 184
-			-- upvalues: v34 (copy)
-			if v34.onRsvpChanged then
-				v34.onRsvpChanged(p9.data.virtualEventRsvp.virtualEvent.userRsvpStatus, p9.data.virtualEventRsvp.shouldSeeNotificationsUpsellModal)
+	local onRsvpChanged = React.useCallback(function()
+		local rsvpStatus = joined.virtualEvent.userRsvpStatus == "going" and "notGoing" or "going"
+
+		v3[1]({
+			variables = { rsvpStatus = rsvpStatus }
+		}):andThen(function(p2)
+			if joined.onRsvpChanged then
+				joined.onRsvpChanged(
+					p2.data.virtualEventRsvp.virtualEvent.userRsvpStatus,
+					p2.data.virtualEventRsvp.shouldSeeNotificationsUpsellModal
+				)
 			end
 		end)
-	end, { v34.virtualEvent })
-	local v48 = React.useRef(nil)
+	end, { joined.virtualEvent })
 
-	v48.current = Responsive.usePreferredInput()
+	local ref = React.useRef(nil)
+	ref.current = Responsive.usePreferredInput()
 
-	local v49 = v48.current == Responsive.Input.Directional
-	local v50, v51 = ReactFocusNavigation.useMostRecentOrDefaultFocusBehavior()
-	local v52 = useCloseWithBackButton(v51, p1.onClose)
-	local v53 = ReactFocusNavigation.useFocusGuiObject()
-	local v54, v55 = React.useState(nil)
-	local v56 = React.useCallback(function(p10) -- line: 210
-		-- upvalues: v55 (copy), v50 (copy)
-		v55(p10)
+	local disableStickyActionBar = ref.current == Responsive.Input.Directional
 
-		if typeof(v50) == "function" then
-			v50(p10)
+	local v6, v7 = ReactFocusNavigation.useMostRecentOrDefaultFocusBehavior()
+	local containerRef = useCloseWithBackButton(v7, p.onClose)
+
+	local v8 = ReactFocusNavigation.useFocusGuiObject()
+
+	local state3, setState3 = React.useState(nil)
+
+	local v9 = React.useCallback(function(p2)
+		setState3(p2)
+
+		if typeof(v6) == "function" then
+			v6(p2)
 		end
-	end, { v50 })
+	end, { v6 })
 
-	React.useEffect(function() -- line: 219
-		-- upvalues: v54 (copy), v48 (copy), Responsive (copy), v53 (copy)
-		if v54 and v48.current == Responsive.Input.Directional then
-			v53(v54)
+	React.useEffect(function()
+		if state3 and ref.current == Responsive.Input.Directional then
+			v8(state3)
 		end
-	end, {
-		v54,
-		v53
-	})
+	end, { state3, v8 })
 
-	local v57 = useActionBarProps(v34.virtualEvent, v45, {
-		onClose = v34.onClose,
-		onJoinEvent = v34.onJoinEvent,
-		onShare = v34.onShare,
-		onRsvpChanged = v47
-	}, v56)
-	local v58 = React.useMemo(function() -- line: 232
-		-- upvalues: v57 (copy)
-		return v57.button or #v57.icons > 0
-	end, { v57 })
-	local t5 = {
-		Attendance = if v45 == "Elapsed" then nil else {
+	local v10 = useActionBarProps(
+		joined.virtualEvent,
+		v4,
+		{
+			onClose = joined.onClose,
+			onJoinEvent = joined.onJoinEvent,
+			onShare = joined.onShare,
+			onRsvpChanged = onRsvpChanged
+		},
+		v9
+	)
+
+	local v11 = React.useMemo(function()
+		return v10.button or #v10.icons > 0
+	end, { v10 })
+
+	local v12 = {
+		Attendance = v4 ~= "Elapsed" and {
 			portraitLayoutOrder = 1,
-			landscapeLayoutOrder = 1,
 			landscapePosition = ContentPosition.Left,
-			renderComponent = function() -- line: 242
-				-- upvalues: React (copy), Attendance (copy), v34 (copy), v45 (copy)
+			landscapeLayoutOrder = 1,
+			renderComponent = function()
 				return React.createElement(Attendance, {
-					virtualEvent = v34.virtualEvent,
-					eventStatus = v45
+					virtualEvent = joined.virtualEvent,
+					eventStatus = v4
 				})
 			end
-		},
+		} or nil,
 		MediaGallery = {
 			portraitLayoutOrder = 2,
-			landscapeLayoutOrder = 1,
 			landscapePosition = ContentPosition.Right,
-			renderComponent = function() -- line: 254
-				-- upvalues: React (copy), v37 (copy), v46 (copy), MediaGalleryPreview (copy), v40 (copy)
-				return React.createElement("Frame", {
-					Size = UDim2.new(1, 0, 0, v37),
-					BackgroundTransparency = 1,
-					[React.Change.AbsoluteSize] = v46
-				}, {
-					Gallery = React.createElement(MediaGalleryPreview, {
-						numberOfThumbnails = 5,
-						items = v40
-					})
-				})
+			landscapeLayoutOrder = 1,
+			renderComponent = function()
+				return React.createElement(
+					"Frame",
+					{
+						Size = UDim2.new(1, 0, 0, state),
+						BackgroundTransparency = 1,
+						[React.Change.AbsoluteSize] = v5
+					},
+					{
+						Gallery = React.createElement(MediaGalleryPreview, {
+							items = state2,
+							numberOfThumbnails = 5
+						})
+					}
+				)
 			end
 		},
 		Description = {
 			portraitLayoutOrder = 3,
-			landscapeLayoutOrder = 2,
 			landscapePosition = ContentPosition.Left,
-			renderComponent = function() -- line: 271
-				-- upvalues: React (copy), EventDescription (copy), v34 (copy), experienceDetails (copy)
-				return React.createElement(EventDescription, {
-					description = v34.virtualEvent.description,
-					experienceName = if not experienceDetails then nil else experienceDetails.name,
-					experienceThumbnail = ("rbxthumb://type=GameIcon&id=%s&w=150&h=150"):format(v34.virtualEvent.universeId),
-					onExperienceTileActivated = v34.onExperienceTileActivated
-				})
+			landscapeLayoutOrder = 2,
+			renderComponent = function()
+				local createElement = React.createElement
+				local v12 = {
+					description = joined.virtualEvent.description,
+					experienceName = 0,
+					experienceThumbnail = 0,
+					onExperienceTileActivated = 0
+				}
+				local experienceName
+
+				if experienceDetails then
+					experienceName = experienceDetails.name
+				end
+
+				v12.experienceName = experienceName
+				v12.experienceThumbnail = ("rbxthumb://type=GameIcon&id=%s&w=150&h=150"):format(joined.virtualEvent.universeId)
+				v12.onExperienceTileActivated = joined.onExperienceTileActivated
+				return createElement(EventDescription, v12)
 			end
 		},
-		EventInfo = if not v34.virtualEvent.host then nil else {
+		EventInfo = joined.virtualEvent.host and {
 			portraitLayoutOrder = 4,
-			landscapeLayoutOrder = 2,
 			landscapePosition = ContentPosition.Right,
-			renderComponent = function() -- line: 285
-				-- upvalues: React (copy), ListTable (copy), EventHostedBy (copy), v34 (copy)
+			landscapeLayoutOrder = 2,
+			renderComponent = function()
 				return React.createElement(ListTable, {
 					cells = { React.createElement(EventHostedBy, {
-						host = v34.virtualEvent.host,
-						onActivated = v34.onHostActivated
-					}) }
+							host = joined.virtualEvent.host,
+							onActivated = joined.onHostActivated
+						}) }
 				})
 			end
-		}
+		} or nil
 	}
 
-	return React.createElement(DetailsPageTemplate, {
-		deviceType = v39,
-		titleText = if p1.virtualEvent.eventStatus ~= "moderated" then v34.virtualEvent.title else "[CONTENT MODERATED]",
-		thumbnailImageUrl = v42,
+	local createElement = React.createElement
+	local v13 = {
+		deviceType = deviceType,
+		titleText = p.virtualEvent.eventStatus == "moderated" and "[CONTENT MODERATED]" or joined.virtualEvent.title,
+		thumbnailImageUrl = imageId,
 		thumbnailAspectRatio = Vector2.new(16, 9),
-		renderInfoContent = function() -- line: 306
-			-- upvalues: React (copy), EventTimer (copy), v34 (copy), v45 (copy)
+		renderInfoContent = function()
 			return React.createElement(EventTimer, {
-				virtualEvent = v34.virtualEvent,
-				status = v45,
-				currentTime = v34.currentTime
+				virtualEvent = joined.virtualEvent,
+				status = v4,
+				currentTime = joined.currentTime
 			})
 		end,
-		actionBarProps = if not v58 then nil else v57,
-		componentList = if p1.virtualEvent.eventStatus == "cancelled" or p1.virtualEvent.eventStatus == "moderated" then {} else t5,
-		onClose = v34.onClose,
-		disableStickyActionBar = v49,
-		containerRef = v52
-	})
+		actionBarProps = 0,
+		componentList = 0,
+		onClose = 0,
+		disableStickyActionBar = 0,
+		containerRef = 0
+	}
+	local actionBarProps
+
+	if v11 then
+		actionBarProps = v10
+	end
+
+	v13.actionBarProps = actionBarProps
+	v13.componentList = (p.virtualEvent.eventStatus == "cancelled" or p.virtualEvent.eventStatus == "moderated")
+		and {}
+		or v12
+	v13.onClose = joined.onClose
+	v13.disableStickyActionBar = disableStickyActionBar
+	v13.containerRef = containerRef
+	return createElement(DetailsPageTemplate, v13)
 end
 
 return EventDetailsPage

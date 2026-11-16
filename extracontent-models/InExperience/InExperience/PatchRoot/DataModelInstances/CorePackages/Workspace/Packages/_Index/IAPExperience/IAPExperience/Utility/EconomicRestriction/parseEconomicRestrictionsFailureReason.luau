@@ -1,9 +1,9 @@
-local function parseEconomicRestrictionsFailureReason(p1) -- line: 3
-	if not p1 then
-		return nil
+local function parseEconomicRestrictionsFailureReason(data)
+	if data then
+		return data.FailureReason or data.failureReason or data.violationType
 	end
 
-	return p1.FailureReason or (p1.failureReason or p1.violationType)
+	return nil
 end
 
 return parseEconomicRestrictionsFailureReason

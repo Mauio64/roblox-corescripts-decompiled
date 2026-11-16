@@ -1,38 +1,51 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local CentralOverlay = require(Parent.CentralOverlay)
-local Cryo = require(Parent.Cryo)
-local Foundation = require(Parent.Foundation)
-local Localization = require(Parent.Localization)
-local NavigationRodux = require(Parent.NavigationRodux)
-local React = require(Parent.React)
-local RoactUtils = require(Parent.RoactUtils)
-local RobloxAppEnums = require(Parent.RobloxAppEnums)
-local SharedFlags = require(Parent.SharedFlags)
-local UniversalAppPolicy = require(Parent.UniversalAppPolicy)
-local UrlBuilder = require(Parent.UrlBuilder)
+local parent = script:FindFirstAncestor("AppBlox").Parent
+
+local CentralOverlay = require(parent.CentralOverlay)
+local Cryo = require(parent.Cryo)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local NavigationRodux = require(parent.NavigationRodux)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local SharedFlags = require(parent.SharedFlags)
+local UniversalAppPolicy = require(parent.UniversalAppPolicy)
+local UrlBuilder = require(parent.UrlBuilder)
+
 local CloseCentralOverlay = CentralOverlay.Thunks.CloseCentralOverlay
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Checkbox = Foundation.Checkbox
 local Dialog = Foundation.Dialog
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
 local useLocalization = Localization.Hooks.useLocalization
 local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
-local v22 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local navigationCommands
+
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local AppPage = RobloxAppEnums.AppPage
 local useAppPolicy = UniversalAppPolicy.useAppPolicy
-local UrlBuilder2 = UrlBuilder.UrlBuilder
+local urlBuilder = UrlBuilder.UrlBuilder
+
 local FFlagLuaAppMakeDisclaimerOptInForFeedbackForm = SharedFlags.FFlagLuaAppMakeDisclaimerOptInForFeedbackForm
 local FFlagLuaAppNotInterestedFeedbackFormTelemetry = SharedFlags.FFlagLuaAppNotInterestedFeedbackFormTelemetry
-local v29 = game:DefineFastFlag("LuaAppCheckboxFeedbackFormTitleTextWrapping", false)
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 
-local function CheckboxFeedbackFormModal(t1: {[any]: any}) -- line: 57
-	-- upvalues: useDispatch (copy), useTokens (copy), useLocalization (copy), React (copy), CloseCentralOverlay (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), Cryo (copy), Checkbox (copy), useAppPolicy (copy), AppPage (copy), UrlBuilder2 (copy), FFlagSignalsNavP3Dispatch (copy), v22 (copy), NavigateDown (copy), Dialog (copy), FoundationText (copy), v29 (copy), ButtonVariant (copy), FFlagLuaAppMakeDisclaimerOptInForFeedbackForm (copy)
-	local v32 = useDispatch()
-	local v33 = useTokens()
-	local v34 = useLocalization({
+local defineFastFlag = game:DefineFastFlag("LuaAppCheckboxFeedbackFormTitleTextWrapping", false)
+
+local function CheckboxFeedbackFormModal(props)
+	local v = useDispatch()
+	local v2 = useTokens()
+	local v3 = useLocalization({
 		submitText = "CommonUI.Controls.Action.Submit",
 		otherPlaceholderText = "Feature.GameDetails.Label.TellUsMorePlaceholder",
 		termsOfUseText = {
@@ -41,242 +54,280 @@ local function CheckboxFeedbackFormModal(t1: {[any]: any}) -- line: 57
 			underlineEnd = "</u>"
 		}
 	})
-	local v35 = React.useCallback(function(b1: boolean?) -- line: 70
-		-- upvalues: v32 (copy), CloseCentralOverlay (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), t1 (copy)
-		v32(CloseCentralOverlay())
 
-		if FFlagLuaAppNotInterestedFeedbackFormTelemetry and t1.onClose then
-			t1.onClose(b1)
+	local v4 = React.useCallback(function(flag: boolean?)
+		v(CloseCentralOverlay())
+
+		if FFlagLuaAppNotInterestedFeedbackFormTelemetry and props.onClose then
+			props.onClose(flag)
 		end
-	end, {
-		v32,
-		t1.onClose
-	})
-	local v36, v37 = React.useState({})
-	local v38 = React.useMemo(function() -- line: 79
-		-- upvalues: Cryo (copy), t1 (copy), React (copy), Checkbox (copy), v36 (copy), v37 (copy)
-		return Cryo.List.map(t1.checkboxItems, function(t2: {[any]: any}, n1: number) -- line: 80
-			-- upvalues: React (copy), Checkbox (copy), v36 (copy), v37 (copy)
-			local id = t2.id
+	end, { v, props.onClose })
 
+	local state, setState = React.useState({})
+
+	local v5 = React.useMemo(function()
+		return Cryo.List.map(props.checkboxItems, function(p, layoutOrder: number)
+			local id = p.id
 			return React.createElement(Checkbox, {
-				label = t2.text,
-				isChecked = not not v36[id],
-				LayoutOrder = n1,
-				onActivated = function() -- line: 86
-					-- upvalues: v36 (copy), id (copy), v37 (copy)
-					local v61 = table.clone(v36)
+				label = p.text,
+				isChecked = state[id] and true or false,
+				LayoutOrder = layoutOrder,
+				onActivated = function()
+					local clone = table.clone(state)
 
-					if v61[id] then
-						v61[id] = false
-						v37(v61)
-
-						return
+					if clone[id] then
+						clone[id] = false
+					else
+						clone[id] = true
 					end
 
-					v61[id] = true
-					v37(v61)
+					setState(clone)
 				end
 			})
 		end)
-	end, {
-		t1.checkboxItems,
-		v36
-	})
-	local v39, v40 = React.useMemo(function() -- line: 100
-		-- upvalues: t1 (copy), v36 (copy)
-		local v51 = false
-		local v52 = false
+	end, { props.checkboxItems, state })
 
-		for _, v54 in t1.checkboxItems do
-			if v36[v54.id] then
-				if v54.triggersOtherTextbox then
-					v52 = true
-				else
-					v51 = true
-				end
+	local v6, v7 = React.useMemo(function()
+		local v6 = false
+		local v7 = false
+
+		for _, checkboxItem in props.checkboxItems do
+			if not state[checkboxItem.id] then
+				continue
+			end
+
+			if checkboxItem.triggersOtherTextbox then
+				v7 = true
+			else
+				v6 = true
 			end
 		end
 
-		return v51, v52
-	end, {
-		t1.checkboxItems,
-		v36
-	})
-	local v41 = React.useRef("")
-	local v42, v43 = React.useState(false)
-	local v44 = if not v40 or v42 then v39 and true or not not v40 and not not v42 else false
-	local v45 = React.useCallback(function(p1) -- line: 122
-		-- upvalues: v41 (copy), v43 (copy)
-		if not p1 then
+		return v6, v7
+	end, { props.checkboxItems, state })
+
+	local ref = React.useRef("")
+	local state2, setState2 = React.useState(false)
+	local v8
+
+	if v7 and not state2 then
+		v8 = false
+	else
+		v8 = (v6 or v7 and state2) and true or false
+	end
+
+	local v9 = React.useCallback(function(p)
+		if not p then
 			return
 		end
 
-		if p1.Text:len() > 500 then
-			p1.Text = p1.Text:sub(1, 500)
+		if p.Text:len() > 500 then
+			p.Text = p.Text:sub(1, 500)
 		end
 
-		v41.current = p1.Text
-		v43(p1.Text:len() >= 10)
+		ref.current = p.Text
+		setState2(p.Text:len() >= 10)
 	end, {})
-	local v46 = React.useCallback(function() -- line: 133
-		-- upvalues: v44 (copy), v35 (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy), t1 (copy), v36 (copy), v41 (copy)
-		if not v44 then
+
+	local onActivated = React.useCallback(function()
+		if not v8 then
 			return
 		end
 
-		v35(not not FFlagLuaAppNotInterestedFeedbackFormTelemetry or nil)
-		t1.onSubmit(v36, v41.current)
-	end, {
-		v44,
-		t1.onSubmit,
-		v36,
-		v35
-	})
-	local v47 = useAppPolicy(function(p2) -- line: 141
-		return p2.getWebViewSupport()
+		v4(FFlagLuaAppNotInterestedFeedbackFormTelemetry and true or nil)
+		props.onSubmit(state, ref.current)
+	end, { v8, props.onSubmit, state, v4 })
+
+	local v10 = useAppPolicy(function(p)
+		return p.getWebViewSupport()
 	end)
-	local v48 = React.useCallback(function() -- line: 146
-		-- upvalues: AppPage (copy), UrlBuilder2 (copy), FFlagSignalsNavP3Dispatch (copy), v22 (copy), v32 (copy), NavigateDown (copy), v35 (copy), FFlagLuaAppNotInterestedFeedbackFormTelemetry (copy)
-		local t3 = {
+
+	local v11 = React.useCallback(function()
+		local v11 = {
 			name = AppPage.GenericWebPage,
-			detail = UrlBuilder2.static.about.terms(),
-			extraProps = {
-				title = ""
-			}
+			detail = urlBuilder.static.about.terms(),
+			extraProps = { title = "" }
 		}
 
 		if FFlagSignalsNavP3Dispatch then
-			v22.down(v22.fromLegacyPage(t3), nil)
+			navigationCommands.down(navigationCommands.fromLegacyPage(v11), nil)
 		else
-			v32(NavigateDown(t3, nil))
+			v(NavigateDown(v11, nil))
 		end
 
-		v35(not FFlagLuaAppNotInterestedFeedbackFormTelemetry and nil)
-	end, {
-		v32,
-		v35
-	})
-	local v49 = if not FFlagLuaAppNotInterestedFeedbackFormTelemetry then nil else React.useCallback(function() -- line: 168
-		-- upvalues: v35 (copy)
-		v35(false)
-	end, { v35 })
+		v4(not FFlagLuaAppNotInterestedFeedbackFormTelemetry and nil)
+	end, { v, v4 })
+	local onClose
 
-	return React.createElement(Dialog.Root, {
-		hasBackdrop = true,
-		onClose = if not FFlagLuaAppNotInterestedFeedbackFormTelemetry then v35 else v49
-	}, {
-		DialogTitle = if not t1.dialogTitle then nil else React.createElement(Dialog.Title, {
-			text = t1.dialogTitle
-		}),
-		DialogText = React.createElement(Dialog.Text, {
-			LayoutOrder = 2,
-			Text = t1.dialogText
-		}),
-		DialogContent = React.createElement(Dialog.Content, {
-			LayoutOrder = 3
-		}, {
-			CheckboxListWrapper = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				LayoutOrder = 1,
+	if FFlagLuaAppNotInterestedFeedbackFormTelemetry then
+		onClose = React.useCallback(function()
+			v4(false)
+		end, { v4 })
+	end
+
+	local createElement = React.createElement
+	local root = Dialog.Root
+
+	if not FFlagLuaAppNotInterestedFeedbackFormTelemetry then
+		onClose = v4
+	end
+
+	local dialogTitle
+
+	if props.dialogTitle then
+		dialogTitle = React.createElement(Dialog.Title, { text = props.dialogTitle })
+	end
+
+	local children = {
+		DialogTitle = dialogTitle,
+		DialogText = React.createElement(Dialog.Text, { Text = props.dialogText, LayoutOrder = 2 }),
+		DialogContent = 0,
+		DialogActions = 0,
+		DisclaimerText = 0
+	}
+
+	local createElement2 = React.createElement
+	local content = Dialog.Content
+
+	local v12 = {
+		CheckboxListWrapper = React.createElement("Frame", {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 1,
+			Size = UDim2.fromScale(1, 0)
+		}, Cryo.Dictionary.union(v5, {
+			Title = React.createElement(Text, {
 				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.fromScale(1, 0)
-			}, Cryo.Dictionary.union(v38, {
-				Title = React.createElement(FoundationText, {
-					LayoutOrder = 0,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					fontStyle = v33.Typography.TitleLarge,
-					Size = UDim2.fromScale(1, 0),
-					Text = t1.checkboxListTitle,
-					TextWrapped = not not v29 or nil,
-					TextXAlignment = Enum.TextXAlignment.Left
-				}),
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Vertical,
-					HorizontalAlignment = Enum.HorizontalAlignment.Left,
-					Padding = UDim.new(0, v33.Padding.Medium),
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Top
-				})
-			})),
-			OtherTextBoxContainer = if not v40 then nil else React.createElement("Frame", {
-				BorderSizePixel = 0,
-				LayoutOrder = 2,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				BackgroundColor3 = v33.Color.Shift.Shift_200.Color3,
-				BackgroundTransparency = v33.Color.Shift.Shift_200.Transparency,
-				Size = UDim2.fromScale(1, 0)
-			}, {
-				InputBox = React.createElement("TextBox", {
-					AutomaticSize = Enum.AutomaticSize.Y,
-					BackgroundTransparency = 1,
-					ClearTextOnFocus = false,
-					Font = v33.Typography.CaptionMedium.Font,
-					LineHeight = v33.LineHeight.LineHeight_140,
-					MultiLine = true,
-					PlaceholderColor3 = v33.Color.Content.Muted.Color3,
-					PlaceholderText = v34.otherPlaceholderText,
-					Size = UDim2.new(1, 0, 0, v33.Size.Size_1000),
-					Text = v41.current,
-					TextColor3 = v33.Color.Content.Default.Color3,
-					TextSize = v33.Typography.CaptionMedium.FontSize,
-					TextTransparency = v33.Color.Content.Default.Transparency,
-					TextTruncate = Enum.TextTruncate.SplitWord,
-					TextWrapped = true,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextYAlignment = Enum.TextYAlignment.Top,
-					[React.Change.Text] = v45
-				}, {
-					UISizeConstraint = React.createElement("UISizeConstraint", {
-						MaxSize = Vector2.new(1e999, v33.Size.Size_3000)
-					})
-				}),
-				UIPadding = React.createElement("UIPadding", {
-					PaddingBottom = UDim.new(0, v33.Padding.Small),
-					PaddingLeft = UDim.new(0, v33.Padding.Small),
-					PaddingRight = UDim.new(0, v33.Padding.Small),
-					PaddingTop = UDim.new(0, v33.Padding.Small)
-				}),
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, v33.Radius.Medium)
-				})
+				fontStyle = v2.Typography.TitleLarge,
+				LayoutOrder = 0,
+				Size = UDim2.fromScale(1, 0),
+				Text = props.checkboxListTitle,
+				TextWrapped = defineFastFlag and true or nil,
+				TextXAlignment = Enum.TextXAlignment.Left
 			}),
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				Padding = UDim.new(0, v33.Padding.XLarge),
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				Padding = UDim.new(0, v2.Padding.Medium),
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Top
 			})
-		}),
-		DialogActions = React.createElement(Dialog.Actions, {
-			LayoutOrder = 4,
-			actions = {{
-				isDisabled = not v44,
-				onActivated = v46,
-				text = v34.submitText,
+		})),
+		OtherTextBoxContainer = 0,
+		UIListLayout = 0
+	}
+	local otherTextBoxContainer
+
+	if v7 then
+		local createElement3 = React.createElement
+		local v13 = {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundColor3 = v2.Color.Shift.Shift_200.Color3,
+			BackgroundTransparency = v2.Color.Shift.Shift_200.Transparency,
+			BorderSizePixel = 0,
+			LayoutOrder = 2,
+			Size = UDim2.fromScale(1, 0)
+		}
+
+		local createElement4 = React.createElement
+		local v14 = {}
+		v14.AutomaticSize = Enum.AutomaticSize.Y
+		v14.BackgroundTransparency = 1
+		v14.ClearTextOnFocus = false
+		local font
+
+		if not FoundationFontFaceMigration then
+			font = v2.Typography.CaptionMedium.Font
+		end
+
+		v14.Font = font
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(v2.Typography.CaptionMedium.Font)
+		end
+
+		v14.FontFace = fontFace
+
+		v14.LineHeight = v2.LineHeight.LineHeight_140
+		v14.MultiLine = true
+		v14.PlaceholderColor3 = v2.Color.Content.Muted.Color3
+		v14.PlaceholderText = v3.otherPlaceholderText
+		v14.Size = UDim2.new(1, 0, 0, v2.Size.Size_1000)
+		v14.Text = ref.current
+		v14.TextColor3 = v2.Color.Content.Default.Color3
+		v14.TextSize = v2.Typography.CaptionMedium.FontSize
+		v14.TextTransparency = v2.Color.Content.Default.Transparency
+		v14.TextTruncate = Enum.TextTruncate.SplitWord
+		v14.TextWrapped = true
+		v14.TextXAlignment = Enum.TextXAlignment.Left
+		v14.TextYAlignment = Enum.TextYAlignment.Top
+		v14[React.Change.Text] = v9
+		otherTextBoxContainer = createElement3("Frame", v13, {
+			InputBox = createElement4("TextBox", v14, {
+				UISizeConstraint = React.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(1e999, v2.Size.Size_3000)
+				})
+			}),
+			UIPadding = React.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0, v2.Padding.Small),
+				PaddingLeft = UDim.new(0, v2.Padding.Small),
+				PaddingRight = UDim.new(0, v2.Padding.Small),
+				PaddingTop = UDim.new(0, v2.Padding.Small)
+			}),
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, v2.Radius.Medium)
+			})
+		})
+	end
+
+	v12.OtherTextBoxContainer = otherTextBoxContainer
+
+	v12.UIListLayout = React.createElement("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		Padding = UDim.new(0, v2.Padding.XLarge),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		VerticalAlignment = Enum.VerticalAlignment.Top
+	})
+	children.DialogContent = createElement2(content, { LayoutOrder = 3 }, v12)
+
+	children.DialogActions = React.createElement(Dialog.Actions, {
+		actions = {
+			{
+				isDisabled = not v8,
+				onActivated = onActivated,
+				text = v3.submitText,
 				variant = ButtonVariant.Standard
-			}}
-		}),
-		DisclaimerText = if FFlagLuaAppMakeDisclaimerOptInForFeedbackForm and not t1.showTermsOfUseDisclaimer or not v47 then nil else React.createElement("TextButton", {
+			}
+		},
+		LayoutOrder = 4
+	})
+	local disclaimerText
+
+	if not (FFlagLuaAppMakeDisclaimerOptInForFeedbackForm and not props.showTermsOfUseDisclaimer or not v10) then
+		disclaimerText = React.createElement("TextButton", {
 			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
 			Font = Enum.Font.BuilderSansMedium,
 			LayoutOrder = 5,
-			LineHeight = v33.LineHeight.LineHeight_140,
+			LineHeight = v2.LineHeight.LineHeight_140,
 			RichText = true,
 			Size = UDim2.fromScale(1, 0),
-			Text = v34.termsOfUseText,
-			TextColor3 = v33.Color.Content.Muted.Color3,
-			TextSize = v33.FontSize.FontSize_300,
-			TextTransparency = v33.Color.Content.Muted.Transparency,
+			Text = v3.termsOfUseText,
+			TextColor3 = v2.Color.Content.Muted.Color3,
+			TextSize = v2.FontSize.FontSize_300,
+			TextTransparency = v2.Color.Content.Muted.Transparency,
 			TextWrapped = true,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
-			[React.Event.Activated] = v48
+			[React.Event.Activated] = v11
 		})
-	})
+	end
+
+	children.DisclaimerText = disclaimerText
+	return createElement(root, { onClose = onClose, hasBackdrop = true }, children)
 end
 
 return React.memo(CheckboxFeedbackFormModal)

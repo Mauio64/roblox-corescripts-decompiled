@@ -1,56 +1,75 @@
-local ParentParent = script.Parent.Parent.Parent
-local inspect = require(ParentParent.jsutils.inspect).inspect
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
-local isCompositeType = require(ParentParent.type.definition).isCompositeType
-local utilities = ParentParent.utilities
-local typeFromAST = require(utilities.typeFromAST).typeFromAST
-local doTypesOverlap = require(utilities.typeComparators).doTypesOverlap
-local t1 = {}
-local getFragmentType = nil
+local parent = script.Parent.Parent.Parent
+local inspect = require(parent.jsutils.inspect)
+local inspect2 = inspect.inspect
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
+local definition = require(parent.type.definition)
+local isCompositeType = definition.isCompositeType
+local utilities = parent.utilities
+local typeFromAST = require(utilities.typeFromAST)
+local typeFromAST2 = typeFromAST.typeFromAST
+local typeComparators = require(utilities.typeComparators)
+local doTypesOverlap = typeComparators.doTypesOverlap
 
-function t1.PossibleFragmentSpreadsRule(p1) -- line: 31
-	-- upvalues: isCompositeType (copy), doTypesOverlap (copy), inspect (copy), GraphQLError (copy), getFragmentType (ref)
-	return {
-		InlineFragment = function(_, p3) -- line: 33
-			-- upvalues: p1 (copy), isCompositeType (copy), doTypesOverlap (copy), inspect (copy), GraphQLError (copy)
-			local v17 = p1:getType()
-			local v18 = p1:getParentType()
+local getFragmentType
+local PossibleFragmentSpreadsRule = {
+	PossibleFragmentSpreadsRule = function(object)
+		return {
+			InlineFragment = function(_, p)
+				local kind = object:getType()
+				local parentType = object:getParentType()
 
-			if isCompositeType(v17) and (isCompositeType(v18) and not doTypesOverlap(p1:getSchema(), v17, v18)) then
-				local v19 = inspect(v18)
-				local v20 = inspect(v17)
+				if
+					isCompositeType(kind)
+					and isCompositeType(parentType)
+					and not doTypesOverlap(object:getSchema(), kind, parentType)
+				then
+					local v = inspect2(parentType)
+					local v2 = inspect2(kind)
 
-				p1:reportError(GraphQLError.new(("Fragment cannot be spread here as objects of type \"%s\" can never be of type \"%s\"."):format(v19, v20), p3))
+					object:reportError(graphQLError.new(
+						("Fragment cannot be spread here as objects of type \"%s\" can never be of type \"%s\"."):format(
+							v,
+							v2
+						),
+						p
+					))
+				end
+			end,
+			FragmentSpread = function(_, p)
+				local value = p.name.value
+				local v = getFragmentType(object, value)
+				local parentType = object:getParentType()
+
+				if v and parentType and not doTypesOverlap(object:getSchema(), v, parentType) then
+					local v2 = inspect2(parentType)
+					local v3 = inspect2(v)
+					object:reportError(graphQLError.new(
+						("Fragment \"%s\" cannot be spread here as objects of type \"%s\" can never be of type \"%s\"."):format(
+							value,
+							v2,
+							v3
+						),
+						p
+					))
+				end
 			end
-		end,
-		FragmentSpread = function(_, p5) -- line: 54
-			-- upvalues: getFragmentType (ref), p1 (copy), doTypesOverlap (copy), inspect (copy), GraphQLError (copy)
-			local value = p5.name.value
-			local v24 = getFragmentType(p1, value)
-			local v25 = p1:getParentType()
+		}
+	end
+}
 
-			if v24 and (v25 and not doTypesOverlap(p1:getSchema(), v24, v25)) then
-				local v26 = inspect(v25)
-				local v27 = inspect(v24)
+getFragmentType = function(object, value: string)
+	local fragment = object:getFragment(value)
 
-				p1:reportError(GraphQLError.new(("Fragment \"%s\" cannot be spread here as objects of type \"%s\" can never be of type \"%s\"."):format(value, v26, v27), p5))
-			end
-		end
-	}
-end
-function getFragmentType(p6, s1: string) -- line: 78
-	-- upvalues: typeFromAST (copy), isCompositeType (copy)
-	local v13 = p6:getFragment(s1)
+	if fragment then
+		local v = typeFromAST2(object:getSchema(), fragment.typeCondition)
 
-	if v13 then
-		local v14 = typeFromAST(p6:getSchema(), v13.typeCondition)
-
-		if isCompositeType(v14) then
-			return v14
+		if isCompositeType(v) then
+			return v
 		end
 	end
 
 	return nil
 end
 
-return t1
+return PossibleFragmentSpreadsRule

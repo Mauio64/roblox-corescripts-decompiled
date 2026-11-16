@@ -1,59 +1,45 @@
 local PlayerContextualMenu = script:FindFirstAncestor("PlayerContextualMenu")
-local PlayerContextualMenuParent = PlayerContextualMenu.Parent
-local Dash = require(PlayerContextualMenuParent.Dash)
-local Roact = require(PlayerContextualMenuParent.Dev.Roact)
-local SocialTestHelpers = require(PlayerContextualMenuParent.Dev.SocialTestHelpers)
-local UIBlox = require(PlayerContextualMenuParent.UIBlox)
-local RobloxAppUIBloxConfig = require(PlayerContextualMenuParent.Dev.RobloxAppUIBloxConfig)
+
+local parent = PlayerContextualMenu.Parent
+
+local Dash = require(parent.Dash)
+local Roact = require(parent.Dev.Roact)
+local SocialTestHelpers = require(parent.Dev.SocialTestHelpers)
+local UIBlox = require(parent.UIBlox)
+
+local RobloxAppUIBloxConfig = require(parent.Dev.RobloxAppUIBloxConfig)
+
 local mockLocale = SocialTestHelpers.StoryHelpers.mockLocale
 
 UIBlox.init(RobloxAppUIBloxConfig)
 
 local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
 
-Roact.setGlobalConfig({
-	elementTracing = true
-})
+Roact.setGlobalConfig({ elementTracing = true })
 
-local t1 = {
-	Default = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Light = {
-		themeName = "Light",
-		fontName = "Gotham"
-	},
-	Dark = {
-		themeName = "Dark",
-		fontName = "Gotham"
-	}
-}
-local t2 = {
-	language = "en-us"
+local v = {
+	Default = { themeName = "Light", fontName = "Gotham" },
+	Light = { themeName = "Light", fontName = "Gotham" },
+	Dark = { themeName = "Dark", fontName = "Gotham" }
 }
 
-return {
-	name = "PlayerContextualMenu",
-	storyRoot = PlayerContextualMenu,
-	roact = Roact,
-	mapDefinition = function(p1) -- line: 47
-		-- upvalues: Dash (copy), t2 (copy)
-		local v13 = Dash.join(t2, p1.controls)
+local v2 = { language = "en-us" }
+local Storybook = {}
+Storybook.name = "PlayerContextualMenu"
+Storybook.storyRoot = PlayerContextualMenu
+Storybook.roact = Roact
 
-		return Dash.join(p1, {
-			controls = v13
-		})
-	end,
-	mapStory = function(p2) -- line: 51
-		-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy)
-		return function(p3) -- line: 52
-			-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy), p2 (copy)
-			return Roact.createElement(AppStyleProvider, {
-				style = p3 and t1[p3.theme] or t1.Default
-			}, {
-				Child = mockLocale(p2, p3)
-			})
-		end
+function Storybook.mapDefinition(p)
+	local joined = Dash.join(v2, p.controls)
+	return Dash.join(p, { controls = joined })
+end
+
+function Storybook.mapStory(p)
+	return function(p2)
+		return Roact.createElement(AppStyleProvider, {
+			style = p2 and v[p2.theme] or v.Default
+		}, { Child = mockLocale(p, p2) })
 	end
-}
+end
+
+return Storybook

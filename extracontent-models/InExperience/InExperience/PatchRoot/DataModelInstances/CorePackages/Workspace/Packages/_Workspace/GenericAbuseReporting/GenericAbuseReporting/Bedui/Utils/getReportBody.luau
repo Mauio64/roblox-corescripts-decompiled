@@ -1,41 +1,46 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
-local GenericAbuseReportingParent = GenericAbuseReporting.Parent
-local Dash = require(GenericAbuseReportingParent.Dash)
+local parent = GenericAbuseReporting.Parent
+
+local Dash = require(parent.Dash)
 
 require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
-
 local AbuseCategory = require(GenericAbuseReporting.Enums.AbuseCategory)
-
 require(GenericAbuseReporting.Enums.AbuseVector)
 
-return function(t1: {[any]: any}) -- line: 28
-	-- upvalues: Dash (copy), AbuseCategory (copy)
-	local t2 = {}
+return function(data)
+	local v = {}
 
-	Dash.forEach(t1.additionalReportTags or {}, function(p1) -- line: 38
-		-- upvalues: t2 (copy)
-		if not p1.tagKey or (p1.tagKey == "" or not p1.tagValue or p1.tagValue == "") then
+	Dash.forEach(data.additionalReportTags or {}, function(p)
+		if not p.tagKey or p.tagKey == "" or not p.tagValue or p.tagValue == "" then
 			return
 		end
 
-		if t2[p1.tagKey] ~= nil then
-			local v8 = t2[p1.tagKey]
-
-			t2[p1.tagKey] = v8 .. "," .. p1.tagValue
+		if v[p.tagKey] == nil then
+			v[p.tagKey] = p.tagValue
 
 			return
 		end
 
-		t2[p1.tagKey] = p1.tagValue
+		local v2 = v[p.tagKey]
+		v[p.tagKey] = v2 .. "," .. p.tagValue
 	end)
 
-	return {
-		abuseVector = t1.abuseVector,
-		category = t1.formData.abuse_category or AbuseCategory.ABUSE_CATEGORY_INVALID,
-		comment = t1.formData.free_comment or "",
-		submitterId = t1.localPlayerUserId,
-		targetIdStr = t1.targetIdStr,
-		targetType = t1.abuseVector,
-		custom = if next(t2) == nil then nil else t2
+	local v2 = {
+		abuseVector = data.abuseVector,
+		category = data.formData.abuse_category or AbuseCategory.ABUSE_CATEGORY_INVALID,
+		comment = data.formData.free_comment or "",
+		submitterId = data.localPlayerUserId,
+		targetIdStr = data.targetIdStr,
+		targetType = data.abuseVector,
+		custom = 0
 	}
+	local custom
+
+	if next(v) ~= nil then
+		custom = v
+	end
+
+	v2.custom = custom
+
+	return v2
 end

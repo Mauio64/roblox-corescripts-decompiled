@@ -1,14 +1,12 @@
-local Parent = script:FindFirstAncestor("ReactUtils").Parent
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(parent.React)
 
-local function ContextStack(t1: {[any]: any}) -- line: 12
-	-- upvalues: React (copy)
-	local children = t1.children
+local function ContextStack(p)
+	local children = p.children
 
-	for i = #t1.providers, 1, -1 do
-		local v7 = t1.providers[i]
-
-		children = React.cloneElement(v7, nil, children)
+	for i = #p.providers, 1, -1 do
+		local provider = p.providers[i]
+		children = React.cloneElement(provider, nil, children)
 	end
 
 	return children

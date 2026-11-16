@@ -1,28 +1,40 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
 local Profile = DataHydration.Profile
-local DataHydrationParent = DataHydration.Parent
-local Url = require(DataHydrationParent.Http).Url
-local UrlBuilder = require(DataHydrationParent.UrlBuilder).UrlBuilder
+local parent = DataHydration.Parent
+
+local Http = require(parent.Http)
+local Url = Http.Url
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
 local myHttpRequest = require(Profile.Networking.myHttpRequest)
-local v7 = UrlBuilder.new({
-	path = "profile-platform-api/v1/profiles/batch/get",
-	base = Url.APIS_URL
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagJoinabilityCTARefactor = SharedFlags.FFlagJoinabilityCTARefactor
+
+local v = urlBuilder.new({
+	base = Url.APIS_URL,
+	path = "profile-platform-api/v1/profiles/batch/get"
 })()
 
-return function(t1: {[any]: any}) -- line: 15
-	-- upvalues: myHttpRequest (copy), v7 (copy)
-	local t2 = {
-		profileType = "User",
-		excludeContextualActions = true,
-		profileIds = t1,
-		components = {{
-			component = "Actions"
-		}}
-	}
+local v2 = {
+	{ component = "Actions", excludeContextualActions = true }
+}
 
-	return myHttpRequest(v7, "POST", {
-		postBody = t2
-	}):catch(function(p1) -- line: 26
-		error(p1)
+return function(profileIds, p)
+	return myHttpRequest(v, "POST", {
+		postBody = FFlagJoinabilityCTARefactor and {
+			profileType = "User",
+			profileIds = profileIds,
+			components = p or v2
+		} or {
+			profileType = "User",
+			profileIds = profileIds,
+			components = {
+				{ component = "Actions" }
+			},
+			excludeContextualActions = true
+		}
+	}):catch(function(message)
+		error(message)
 	end)
 end

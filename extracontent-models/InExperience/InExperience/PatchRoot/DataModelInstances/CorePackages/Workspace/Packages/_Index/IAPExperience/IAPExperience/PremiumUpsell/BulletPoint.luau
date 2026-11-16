@@ -1,51 +1,98 @@
 local TextService = game:GetService("TextService")
-local ParentParent = script.Parent.Parent.Parent
-local UIBlox = require(ParentParent.UIBlox)
-local Roact = require(ParentParent.Roact)
+
+local parent = script.Parent.Parent.Parent
+
+local UIBlox = require(parent.UIBlox)
+local Roact = require(parent.Roact)
+local Foundation = require(parent.Foundation)
+local Style = require(parent.Style)
+local GetTextSize = Style.GetTextSize
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
+
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local withStyle = UIBlox.Style.withStyle
 local IconSize = UIBlox.App.Constant.IconSize
-local v9 = IconSize.Small + 16
 
-return function(t1: {[any]: any}) -- line: 24
-	-- upvalues: withStyle (copy), TextService (copy), v9 (copy), Roact (copy), ImageSetLabel (copy), IconSize (copy), Images (copy)
-	return withStyle(function(p1) -- line: 25
-		-- upvalues: t1 (copy), TextService (copy), v9 (copy), Roact (copy), ImageSetLabel (copy), IconSize (copy), Images (copy)
-		local Theme = p1.Theme
-		local p1Font = p1.Font
-		local text = t1.text
-		local v15 = p1Font.Body.RelativeSize * p1Font.BaseSize
-		local BodyFont = p1Font.Body.Font
-		local v17 = if text == nil then Vector2.new(0, 0) else TextService:GetTextSize(text, v15, BodyFont, Vector2.new(t1.width - v9, 10000))
+local v = IconSize.Small + 16
 
-		return Roact.createElement("Frame", {
+return function(data)
+	return withStyle(function(props)
+		local theme = props.Theme
+		local font = props.Font
+
+		local text = data.text
+		local textSize = font.Body.RelativeSize * font.BaseSize
+		local font2 = font.Body.Font
+		local v2
+
+		if text == nil then
+			v2 = Vector2.new(0, 0)
+		elseif FoundationFontFaceMigration then
+			v2 = GetTextSize(
+				text,
+				textSize,
+				props.Tokens.Typography.BodyLarge.Font,
+				Vector2.new(data.width - v, 10000),
+				{ addTemporaryPadding = false }
+			)
+		else
+			v2 = TextService:GetTextSize(text, textSize, font2, Vector2.new(data.width - v, 10000))
+		end
+
+		local createElement = Roact.createElement
+		local v3 = {
+			Size = UDim2.new(1, 0, 0, v2.Y),
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0, v17.Y),
-			LayoutOrder = t1.layoutOrder
-		}, {
+			LayoutOrder = data.layoutOrder
+		}
+		local v4 = {
 			Bullet = Roact.createElement(ImageSetLabel, {
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 2, 0, 2),
 				Size = UDim2.new(0, IconSize.Small, 0, IconSize.Small),
 				ScaleType = Enum.ScaleType.Stretch,
 				Image = Images["icons/status/success_small"],
-				ImageColor3 = Theme.IconDefault.Color,
-				ImageTransparency = Theme.IconDefault.Transparency
+				ImageColor3 = theme.IconDefault.Color,
+				ImageTransparency = theme.IconDefault.Transparency
 			}),
-			Text = Roact.createElement("TextLabel", {
-				BackgroundTransparency = 1,
-				TextWrapped = true,
-				Position = UDim2.new(0, v9, 0, 0),
-				Size = UDim2.new(1, -v9, 0, v17.Y),
-				Text = text,
-				TextSize = v15,
-				TextColor3 = Theme.TextDefault.Color,
-				TextTransparency = Theme.TextDefault.Transparency,
-				Font = BodyFont,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				LayoutOrder = t1.layoutOrder
-			})
-		})
+			Text = 0
+		}
+
+		local createElement2 = Roact.createElement
+		local v5 = {
+			Position = UDim2.new(0, v, 0, 0),
+			Size = UDim2.new(1, -v, 0, v2.Y),
+			BackgroundTransparency = 1,
+			Text = text,
+			TextSize = textSize,
+			TextColor3 = theme.TextDefault.Color,
+			TextTransparency = theme.TextDefault.Transparency,
+			Font = 0,
+			FontFace = 0,
+			TextXAlignment = 0,
+			TextWrapped = true,
+			LayoutOrder = 0
+		}
+
+		if FoundationFontFaceMigration then
+			font2 = nil
+		end
+
+		v5.Font = font2
+		local fontFace
+
+		if FoundationFontFaceMigration then
+			fontFace = normalizeFontFace(props.Tokens.Typography.BodyLarge.Font)
+		end
+
+		v5.FontFace = fontFace
+
+		v5.TextXAlignment = Enum.TextXAlignment.Left
+
+		v5.LayoutOrder = data.layoutOrder
+		v4.Text = createElement2("TextLabel", v5)
+		return createElement("Frame", v3, v4)
 	end)
 end

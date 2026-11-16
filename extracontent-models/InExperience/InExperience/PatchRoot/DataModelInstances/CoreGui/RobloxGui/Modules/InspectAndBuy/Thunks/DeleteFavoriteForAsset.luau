@@ -1,56 +1,47 @@
 local CorePackages = game:GetService("CorePackages")
 local Promise = require(CorePackages.Packages.Promise)
-local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
-local ParentParent = script.Parent.Parent
-local Thunk = require(ParentParent.Thunk)
-local Network = require(ParentParent.Services.Network)
-local Analytics = require(ParentParent.Services.Analytics)
-local SetFavoriteAsset = require(ParentParent.Actions.SetFavoriteAsset)
-local SetAssets = require(ParentParent.Actions.SetAssets)
-local AssetInfo = require(ParentParent.Models.AssetInfo)
-local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
-local SendCounter = require(ParentParent.Thunks.SendCounter)
-local Constants = require(ParentParent.Constants)
-local t1 = {
-	Network,
-	Analytics
-}
-local v15 = createInspectAndBuyKeyMapper("deleteFavoriteForAsset")
+local Http = require(CorePackages.Workspace.Packages.Http)
+local PerformFetch = Http.PerformFetch
+local parent = script.Parent.Parent
+local Thunk = require(parent.Thunk)
+local Network = require(parent.Services.Network)
+local Analytics = require(parent.Services.Analytics)
+local SetFavoriteAsset = require(parent.Actions.SetFavoriteAsset)
+local SetAssets = require(parent.Actions.SetAssets)
+local AssetInfo = require(parent.Models.AssetInfo)
+local createInspectAndBuyKeyMapper = require(parent.createInspectAndBuyKeyMapper)
+local SendCounter = require(parent.Thunks.SendCounter)
+local Constants = require(parent.Constants)
 
-local function DeleteFavoriteForAsset(p1) -- line: 26
-	-- upvalues: Thunk (copy), t1 (copy), Network (copy), Analytics (copy), v15 (copy), PerformFetch (copy), SetFavoriteAsset (copy), AssetInfo (copy), SetAssets (copy), SendCounter (copy), Constants (copy), Promise (copy)
-	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 27
-		-- upvalues: Network (copy), Analytics (copy), v15 (copy), p1 (copy), PerformFetch (copy), SetFavoriteAsset (copy), AssetInfo (copy), SetAssets (copy), SendCounter (copy), Constants (copy), Promise (copy)
-		local v20 = p3[Network]
-		local v21 = p3[Analytics]
-		local v22 = v15(p2:getState().storeId, p1)
+local v = { Network, Analytics }
 
-		return PerformFetch.Single(v22, function(_) -- line: 33
-			-- upvalues: v20 (copy), p1 (copy), p2 (copy), SetFavoriteAsset (copy), AssetInfo (copy), SetAssets (copy), v21 (copy), SendCounter (copy), Constants (copy), Promise (copy)
-			return v20.deleteFavoriteForAsset(p1):andThen(function() -- line: 34
-				-- upvalues: p2 (copy), SetFavoriteAsset (copy), p1 (copy), AssetInfo (copy), SetAssets (copy), v21 (copy), SendCounter (copy), Constants (copy), Promise (copy)
-				p2:dispatch(SetFavoriteAsset(p1, false))
+local inspectAndBuyKeyMapper = createInspectAndBuyKeyMapper("deleteFavoriteForAsset")
 
-				local numFavorites = p2:getState().assets[p1].numFavorites
-				local v27 = AssetInfo.fromGetAssetFavoriteCount(p1, numFavorites - 1)
+local function DeleteFavoriteForAsset(p)
+	return Thunk.new(script.Name, v, function(object, p2)
+		local v2 = p2[Network]
+		local v3 = p2[Analytics]
 
-				p2:dispatch(SetAssets({ v27 }))
-				v21.reportFavoriteItem("Asset", p1, false, true, "", numFavorites - 1)
-				p2:dispatch(SendCounter(Constants.Counters.DeleteFavoriteForAsset .. Constants.CounterSuffix.RequestSucceeded))
+		local v4 = inspectAndBuyKeyMapper(object:getState().storeId, p)
+
+		return PerformFetch.Single(v4, function(_)
+			return v2.deleteFavoriteForAsset(p):andThen(function()
+				object:dispatch(SetFavoriteAsset(p, false))
+				local numFavorites = object:getState().assets[p].numFavorites
+				object:dispatch(SetAssets({ (AssetInfo.fromGetAssetFavoriteCount(p, numFavorites - 1)) }))
+				v3.reportFavoriteItem("Asset", p, false, true, "", numFavorites - 1)
+				object:dispatch(SendCounter(Constants.Counters.DeleteFavoriteForAsset .. Constants.CounterSuffix.RequestSucceeded))
 
 				return Promise.resolve()
-			end, function(p5) -- line: 45
-				-- upvalues: p2 (copy), SendCounter (copy), Constants (copy), Promise (copy)
-				p2:dispatch(SendCounter(Constants.Counters.DeleteFavoriteForAsset .. Constants.CounterSuffix.RequestRejected))
+			end, function(p3)
+				object:dispatch(SendCounter(Constants.Counters.DeleteFavoriteForAsset .. Constants.CounterSuffix.RequestRejected))
 
-				return Promise.reject((tostring(p5.StatusMessage)))
+				return Promise.reject((tostring(p3.StatusMessage)))
 			end)
-		end)(p2):catch(function(p6) -- line: 51
-			-- upvalues: p2 (copy), p1 (copy), v21 (copy), SendCounter (copy), Constants (copy)
-			local numFavorites = p2:getState().assets[p1].numFavorites
-
-			v21.reportFavoriteItem("Asset", p1, false, false, p6, numFavorites)
-			p2:dispatch(SendCounter(Constants.Counters.DeleteFavoriteForAsset .. Constants.CounterSuffix.RequestFailed))
+		end)(object):catch(function(p3)
+			local numFavorites = object:getState().assets[p].numFavorites
+			v3.reportFavoriteItem("Asset", p, false, false, p3, numFavorites)
+			object:dispatch(SendCounter(Constants.Counters.DeleteFavoriteForAsset .. Constants.CounterSuffix.RequestFailed))
 		end)
 	end)
 end

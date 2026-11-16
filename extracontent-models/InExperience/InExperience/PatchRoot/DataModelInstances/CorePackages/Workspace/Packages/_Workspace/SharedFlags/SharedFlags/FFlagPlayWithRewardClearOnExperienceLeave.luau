@@ -1,0 +1,2 @@
+local FFlagEnablePlayWithRewardComponent = require(script.Parent.FFlagEnablePlayWithRewardComponent)
+return FFlagEnablePlayWithRewardComponent and game:DefineFastFlag("PlayWithRewardClearOnExperienceLeave", false)

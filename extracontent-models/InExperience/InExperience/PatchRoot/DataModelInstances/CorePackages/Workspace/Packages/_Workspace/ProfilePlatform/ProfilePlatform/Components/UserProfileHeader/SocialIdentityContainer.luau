@@ -1,69 +1,81 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
 local AppStorageService = game:GetService("AppStorageService")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
-local useEffectOnce = require(ProfilePlatformParent.RoactUtils).Hooks.useEffectOnce
-local Cryo = require(ProfilePlatformParent.Cryo)
-local DataHydration = require(ProfilePlatformParent.DataHydration)
-local useSignalState = require(ProfilePlatformParent.SignalsReact).useSignalState
-local Signals = require(ProfilePlatformParent.Signals)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+
+local RoactUtils = require(parent.RoactUtils)
+local useEffectOnce = RoactUtils.Hooks.useEffectOnce
+local Cryo = require(parent.Cryo)
+
+local DataHydration = require(parent.DataHydration)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local Signals = require(parent.Signals)
+
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 local SocialIdentity = require(ProfilePlatform.Components.UserProfileHeader.SocialIdentity)
-local FFlagEnableBlackbirdCheck = require(ProfilePlatformParent.SharedFlags).FFlagEnableBlackbirdCheck
-local useIsRobloxSubscriber = require(ProfilePlatformParent.UserProfiles).Hooks.useIsRobloxSubscriber
-local v15 = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+local UserProfiles = require(parent.UserProfiles)
+local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
 
-local function SocialIdentityContainer(t1: {[any]: any}) -- line: 45
-	-- upvalues: useProfileWrapperContext (copy), useLocalUserId (copy), AppStorageService (copy), React (copy), useEffectOnce (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), Signals (copy), v15 (copy), useSignalState (copy), SocialIdentity (copy), Cryo (copy)
+local v = DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+
+local function SocialIdentityContainer(p)
 	local profileId = useProfileWrapperContext().profileId
-	local v19 = profileId == useLocalUserId()
-	local v20 = not v19 and "NamesProfileTooltip" or "NamesDisplayNameTooltipImpressionCount"
-	local v21 = tonumber(AppStorageService:GetItem(v20)) or 0
-	local v22 = React.useRef(v21)
-	local v23 = React.useCallback(function(n1: number) -- line: 58
-		-- upvalues: AppStorageService (copy), v20 (copy)
-		AppStorageService:SetItem(v20, (tostring(n1 or 0)))
+	local isLocalUser = profileId == useLocalUserId()
+	local v2 = isLocalUser and "NamesDisplayNameTooltipImpressionCount" or "NamesProfileTooltip"
+	local item = tonumber(AppStorageService:GetItem(v2)) or 0
+	local ref = React.useRef(item)
+
+	local v3 = React.useCallback(function(value: number)
+		AppStorageService:SetItem(v2, (tostring(value or 0)))
 		AppStorageService:Flush()
 	end)
-	local v24 = React.useCallback(function() -- line: 63
-		-- upvalues: v22 (copy), v23 (copy)
-		v22.current = 3
-		v23(3)
+
+	local dismissTooltip = React.useCallback(function()
+		ref.current = 3
+		v3(3)
 	end)
 
-	useEffectOnce(function() -- line: 68
-		-- upvalues: v22 (copy), v23 (copy)
-		if v22.current then
-			v23(v22.current + 1)
+	useEffectOnce(function()
+		if ref.current then
+			v3(ref.current + 1)
 		end
 	end, false)
-
-	local v25 = nil
+	local isRobloxSubscriber
 
 	if FFlagEnableBlackbirdCheck then
-		v25 = useIsRobloxSubscriber(profileId or nil)
+		isRobloxSubscriber = useIsRobloxSubscriber(profileId or nil)
 	end
 
-	local v26 = React.useMemo(function() -- line: 80
-		-- upvalues: Signals (copy), profileId (copy), v15 (copy)
-		return Signals.createComputed(function(p1) -- line: 81
-			-- upvalues: profileId (copy), v15 (copy)
+	local isTrustedConnection = useSignalState((React.useMemo(function()
+		return Signals.createComputed(function(p2)
 			if profileId and profileId ~= "" then
-				return (v15.getIsTrustedConnection(profileId).data(p1))
+				return (v.getIsTrustedConnection(profileId).data(p2))
 			end
 
 			return nil
 		end)
-	end, { profileId })
-	local v27 = useSignalState(v26)
+	end, { profileId })))
 
-	return React.createElement(SocialIdentity, (Cryo.Dictionary.union(t1, {
+	local createElement = React.createElement
+
+	local union = Cryo.Dictionary.union
+
+	if not FFlagEnableBlackbirdCheck then
+		isRobloxSubscriber = nil
+	end
+
+	return createElement(SocialIdentity, (union(p, {
+		isLocalUser = isLocalUser,
 		isTooltipActive = false,
-		isLocalUser = v19,
-		dismissTooltip = v24,
-		isTrustedConnection = v27,
-		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v25
+		dismissTooltip = dismissTooltip,
+		isTrustedConnection = isTrustedConnection,
+		isRobloxSubscriber = isRobloxSubscriber
 	})))
 end
 

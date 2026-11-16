@@ -1,1 +1,3 @@
-return (require(script.SquadTopBanner))
+local SquadTopBanner = require(script.SquadTopBanner)
+
+return SquadTopBanner

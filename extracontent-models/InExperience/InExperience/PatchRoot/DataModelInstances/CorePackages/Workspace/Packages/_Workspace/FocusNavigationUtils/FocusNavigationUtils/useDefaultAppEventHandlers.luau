@@ -1,150 +1,150 @@
 local FocusNavigationUtils = script:FindFirstAncestor("FocusNavigationUtils")
-local FocusNavigationUtilsParent = FocusNavigationUtils.Parent
-local React = require(FocusNavigationUtilsParent.React)
-local ReactFocusNavigation = require(FocusNavigationUtilsParent.ReactFocusNavigation)
-local InputHandlers = require(FocusNavigationUtilsParent.InputHandlers)
-local useNavigation = require(FocusNavigationUtilsParent.Navigation).useNavigation
-local useSelector = require(FocusNavigationUtilsParent.RoactUtils).Hooks.RoactRodux.useSelector
-local canGoBack = require(FocusNavigationUtilsParent.Navigation).canGoBack
+local parent = FocusNavigationUtils.Parent
+local React = require(parent.React)
+local ReactFocusNavigation = require(parent.ReactFocusNavigation)
+local InputHandlers = require(parent.InputHandlers)
+local Navigation = require(parent.Navigation)
+local useNavigation = Navigation.useNavigation
+local SharedFlags = require(parent.SharedFlags)
+local FFlagFixDoubleBackNav = SharedFlags.FFlagFixDoubleBackNav
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local Navigation2 = require(parent.Navigation)
+local canGoBack = Navigation2.canGoBack
 local FocusNavigationEventNameEnum = require(FocusNavigationUtils.FocusNavigationEventNameEnum)
-local useFocusRegistryEntry = require(FocusNavigationUtils.FocusNavigableSurfaceRegistry).useFocusRegistryEntry
+local FocusNavigableSurfaceRegistry = require(FocusNavigationUtils.FocusNavigableSurfaceRegistry)
+local useFocusRegistryEntry = FocusNavigableSurfaceRegistry.useFocusRegistryEntry
 local FocusNavigableSurfaceIdentifierEnum = require(FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum)
 local useDescendantHasFocus = require(FocusNavigationUtils.useDescendantHasFocus)
-local useRegistryEntry = require(FocusNavigationUtils.FocusNavigableSurfaceRegistry).useRegistryEntry
+local FocusNavigableSurfaceRegistry2 = require(FocusNavigationUtils.FocusNavigableSurfaceRegistry)
+local useRegistryEntry = FocusNavigableSurfaceRegistry2.useRegistryEntry
 
-local function getScrollableAncestor(p1) -- line: 21
-	if p1 == nil then
+local function getScrollableAncestor(scrollingFrame) -- 1 equivalent call inferred from this helper
+	if scrollingFrame == nil then
 		return nil
 	end
 
-	if p1:IsA("ScrollingFrame") then
-		return p1
+	if scrollingFrame:IsA("ScrollingFrame") then
+		return scrollingFrame
 	end
 
-	return p1:FindFirstAncestorWhichIsA("ScrollingFrame")
+	return scrollingFrame:FindFirstAncestorWhichIsA("ScrollingFrame")
 end
-local function scrollTo(p2, n1: number) -- line: 32
-	if p2 ~= nil then
-		local v19 = p2.AbsoluteCanvasSize.Y - p2.AbsoluteWindowSize.Y
 
-		if n1 > 0 and p2.CanvasPosition.Y >= v19 - 350 then
-			p2.CanvasPosition = Vector2.new(0, v19)
+local function scrollTo(state, p: number)
+	if state ~= nil then
+		local v = state.AbsoluteCanvasSize.Y - state.AbsoluteWindowSize.Y
 
-			return
+		if p > 0 then
+			local y = state.CanvasPosition.Y
+
+			if v - 350 <= y then
+				state.CanvasPosition = Vector2.new(0, v)
+				return
+			end
 		end
 
-		if n1 < 0 and p2.CanvasPosition.Y <= 350 then
-			p2.CanvasPosition = Vector2.new(0, 0)
-
-			return
+		if p < 0 and state.CanvasPosition.Y <= 350 then
+			state.CanvasPosition = Vector2.new(0, 0)
+		else
+			state.CanvasPosition += Vector2.new(0, p)
 		end
-
-		p2.CanvasPosition = p2.CanvasPosition + Vector2.new(0, n1)
 	end
 end
 
-function useDefaultAppEventHandlers() -- line: 51
-	-- upvalues: useNavigation (copy), useRegistryEntry (copy), FocusNavigableSurfaceIdentifierEnum (copy), useFocusRegistryEntry (copy), useDescendantHasFocus (copy), useSelector (copy), ReactFocusNavigation (copy), React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), canGoBack (copy)
-	local v20 = useNavigation()
-	local v21 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.SearchBar)
-	local v22 = useFocusRegistryEntry(FocusNavigableSurfaceIdentifierEnum.SearchBar)
-	local v23 = useFocusRegistryEntry(FocusNavigableSurfaceIdentifierEnum.NavBar)
-	local v24 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.NavBar)
-	local v25 = useDescendantHasFocus(v24)
-	local v26 = useSelector(function(p3) -- line: 58
-		return p3.TabBarVisible
+function useDefaultAppEventHandlers()
+	local v = useNavigation()
+	local textBox = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.SearchBar)
+	local v2 = useFocusRegistryEntry(FocusNavigableSurfaceIdentifierEnum.SearchBar)
+	local v3 = useFocusRegistryEntry(FocusNavigableSurfaceIdentifierEnum.NavBar)
+	local v4 = useDescendantHasFocus((useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.NavBar)))
+	local v5 = useSelector(function(p)
+		return p.TabBarVisible
 	end)
-	local v27 = ReactFocusNavigation.useFocusedGuiObject()
-	local v28 = if v27 ~= nil then if not v27:IsA("ScrollingFrame") then v27:FindFirstAncestorWhichIsA("ScrollingFrame") else v27 else nil
-	local v29 = v28 ~= nil
 
-	return (React.useMemo(function() -- line: 66
-		-- upvalues: v25 (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), canGoBack (copy), v20 (copy), v26 (copy), v23 (copy), v22 (copy), v21 (copy), v29 (copy), v28 (copy)
-		local t1 = {}
+	local scrollableAncestor = getScrollableAncestor(ReactFocusNavigation.useFocusedGuiObject()) -- inferred equivalent call
+	local v6 = scrollableAncestor ~= nil
+	return (React.useMemo(function()
+		local v7 = {}
 
-		if not v25 then
-			t1[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(_) -- line: 71
-					-- upvalues: canGoBack (copy), v20 (copy), v26 (copy), v23 (copy)
-					if canGoBack(v20) then
-						v20.goBack(false)
-
+		if not v4 then
+			v7[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(function(p)
+					if canGoBack(v) then
+						v.goBack(false)
+					elseif v5 then
+						v3()
+					else
 						return
 					end
 
-					if v26 then
-						v23()
+					if FFlagFixDoubleBackNav then
+						p.cancelled = true
 					end
 				end)
 			}
 		end
 
-		if v22 and v21 ~= nil then
-			t1[FocusNavigationEventNameEnum.Search] = {
-				handler = InputHandlers.onRelease(function(_) -- line: 83
-					-- upvalues: v22 (copy), v21 (copy)
-					v22()
+		if v2 and textBox ~= nil then
+			v7[FocusNavigationEventNameEnum.Search] = {
+				handler = InputHandlers.onRelease(function(_)
+					v2()
 
-					if v21 ~= nil then
-						local v34 = if not v21:IsA("TextBox") then v21:FindFirstChildWhichIsA("TextBox", true) else v21
+					if textBox ~= nil then
+						local v8
 
-						if v34 then
-							v34:CaptureFocus()
+						if textBox:IsA("TextBox") then
+							v8 = textBox
+						else
+							v8 = textBox:FindFirstChildWhichIsA("TextBox", true)
+						end
+
+						if v8 then
+							v8:CaptureFocus()
 						end
 					end
 				end)
 			}
 		end
 
-		if v29 then
-			t1[FocusNavigationEventNameEnum.ScrollDown] = {
-				handler = InputHandlers.onRelease(function(_) -- line: 100
-					-- upvalues: v28 (copy)
-					local v36 = v28
+		if v6 then
+			v7[FocusNavigationEventNameEnum.ScrollDown] = {
+				handler = InputHandlers.onRelease(function(_)
+					local v8 = scrollableAncestor
 
-					if v36 ~= nil then
-						local v37 = v36.AbsoluteCanvasSize.Y - v36.AbsoluteWindowSize.Y
+					if v8 ~= nil then
+						local v9 = v8.AbsoluteCanvasSize.Y - v8.AbsoluteWindowSize.Y
 
-						if v36.CanvasPosition.Y >= v37 - 350 then
-							v36.CanvasPosition = Vector2.new(0, v37)
+						local y = v8.CanvasPosition.Y
 
-							return
+						if v9 - 350 <= y then
+							v8.CanvasPosition = Vector2.new(0, v9)
+						else
+							v8.CanvasPosition += Vector2.new(0, 300)
 						end
-
-						v36.CanvasPosition = v36.CanvasPosition + Vector2.new(0, 300)
 					end
 				end)
 			}
-			t1[FocusNavigationEventNameEnum.ScrollUp] = {
-				handler = InputHandlers.onRelease(function(_) -- line: 105
-					-- upvalues: v28 (copy)
-					local v39 = v28
 
-					if v39 ~= nil then
-						local _ = v39.AbsoluteCanvasSize.Y - v39.AbsoluteWindowSize.Y
+			v7[FocusNavigationEventNameEnum.ScrollUp] = {
+				handler = InputHandlers.onRelease(function(_)
+					local v8 = scrollableAncestor
 
-						if v39.CanvasPosition.Y <= 350 then
-							v39.CanvasPosition = Vector2.new(0, 0)
+					if v8 ~= nil then
+						local _ = v8.AbsoluteCanvasSize.Y - v8.AbsoluteWindowSize.Y
 
-							return
+						if v8.CanvasPosition.Y <= 350 then
+							v8.CanvasPosition = Vector2.new(0, 0)
+						else
+							v8.CanvasPosition += Vector2.new(0, -300)
 						end
-
-						v39.CanvasPosition = v39.CanvasPosition + Vector2.new(0, -300)
 					end
 				end)
 			}
 		end
 
-		return t1
-	end, {
-		v20,
-		v21,
-		v22,
-		v23,
-		v25,
-		v26,
-		v29
-	}))
+		return v7
+	end, { v, textBox, v2, v3, v4, v5, v6 }))
 end
 
 return useDefaultAppEventHandlers

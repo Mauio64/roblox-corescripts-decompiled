@@ -1,24 +1,26 @@
 local Chat = game:GetService("Chat")
 local Players = game:GetService("Players")
-local scriptParent = script.Parent
-local Util = require(scriptParent:WaitForChild("Util"))
-local ChatLocalization = nil
 
-pcall(function() -- line: 13
-	-- upvalues: ChatLocalization (ref), Chat (copy)
-	ChatLocalization = require(Chat.ClientChatModules.ChatLocalization)
+local parent = script.Parent
+local Util = require(parent:WaitForChild("Util"))
+
+local v = nil
+pcall(function()
+	local ChatLocalization = require(Chat.ClientChatModules.ChatLocalization)
+	v = ChatLocalization
 end)
 
-if ChatLocalization == nil then
-	ChatLocalization = {
-		Get = function(_, _, p3) -- line: 14
-			return p3
+if v == nil then
+	v = {
+		Get = function(self, _, p)
+			return p
 		end
 	}
 end
 
 local LocalPlayer = Players.LocalPlayer
-local t1 = {
+
+local v2 = {
 	wave = true,
 	point = true,
 	dance = true,
@@ -27,6 +29,7 @@ local t1 = {
 	laugh = true,
 	cheer = true
 }
+
 local _ = {
 	NotSupported = "InGame.Chat.Response.EmotesNotSupported",
 	R15Only = "InGame.Chat.Response.EmotesWrongAvatarType",
@@ -35,7 +38,8 @@ local _ = {
 	TemporarilyUnavailable = "InGame.Chat.Response.EmotesTemporarilyUnavailable",
 	AnimationPlaying = "InGame.Chat.ErrorMessageAnimationPlaying"
 }
-local t2 = {
+
+local v3 = {
 	["InGame.Chat.Response.EmotesNotSupported"] = "You can't use Emotes here.",
 	["InGame.Chat.Response.EmotesWrongAvatarType"] = "Only R15 avatars can use Emotes.",
 	["InGame.Chat.ErrorMessageSwitchToR15"] = "Switch to your R15 avatar to play Emote.",
@@ -43,182 +47,120 @@ local t2 = {
 	["InGame.Chat.Response.EmotesTemporarilyUnavailable"] = "You can't use Emotes right now.",
 	["InGame.Chat.ErrorMessageAnimationPlaying"] = "You cannot play Emotes during this action."
 }
-local color3 = Color3.fromRGB(245, 50, 50)
 
-local function getEmoteName(p4) -- line: 48
-	if string.sub(p4, 1, 3) == "/e " then
-		return (string.sub(p4, 4))
+local color = Color3.fromRGB(245, 50, 50)
+
+local function getEmoteName(value) -- 1 equivalent call inferred from this helper
+	if string.sub(value, 1, 3) == "/e " then
+		return (string.sub(value, 4))
 	end
 
-	if string.sub(p4, 1, 7) == "/emote " then
-		return (string.sub(p4, 8))
+	if string.sub(value, 1, 7) == "/emote " then
+		return (string.sub(value, 8))
 	end
 
 	return nil
 end
-local function sendErrorMessage(p5, p6) -- line: 58
-	-- upvalues: ChatLocalization (ref), t2 (copy), color3 (copy), Util (copy)
-	local v20 = ChatLocalization:Get(p6, t2[p6])
-	local t3 = {
-		ChatColor = color3
-	}
 
-	Util:SendSystemMessageToSelf(v20, p5, t3)
+local function sendErrorMessage(currentChannel, p) -- 9 equivalent calls inferred from this helper
+	Util:SendSystemMessageToSelf(v:Get(p, v3[p]), currentChannel, { ChatColor = color })
 end
-local function ProcessMessage(p7, p8, _) -- line: 67
-	-- upvalues: t1 (copy), LocalPlayer (copy), ChatLocalization (ref), t2 (copy), color3 (copy), Util (copy)
-	local v25 = if string.sub(p7, 1, 3) ~= "/e " then if string.sub(p7, 1, 7) ~= "/emote " then nil else string.sub(p7, 8) else string.sub(p7, 4)
 
-	if not v25 then
+local function ProcessMessage(value, object, _): boolean
+	local emoteName = getEmoteName(value) -- inferred equivalent call
+
+	if not emoteName then
 		return false
 	end
 
-	if t1[v25] then
+	if v2[emoteName] then
 		return true
 	end
 
-	local CurrentChannel = p8:GetCurrentChannel()
+	local currentChannel = object:GetCurrentChannel()
 
-	if not CurrentChannel then
+	if not currentChannel then
 		return true
 	end
 
-	local Character = LocalPlayer.Character
+	local character = LocalPlayer.Character
 
-	if not Character then
-		local v28 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
-		local t4 = {
-			ChatColor = color3
-		}
-
-		Util:SendSystemMessageToSelf(v28, CurrentChannel, t4)
-
+	if not character then
+		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
 		return true
 	end
 
-	local Animate = Character:FindFirstChild("Animate")
+	local animate = character:FindFirstChild("Animate")
 
-	if not Animate then
-		local v31 = ChatLocalization:Get("InGame.Chat.Response.EmotesNotSupported", t2["InGame.Chat.Response.EmotesNotSupported"])
-		local t5 = {
-			ChatColor = color3
-		}
-
-		Util:SendSystemMessageToSelf(v31, CurrentChannel, t5)
-
+	if not animate then
+		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
 		return true
 	end
 
-	if not Animate:FindFirstChild("PlayEmote") then
-		local v33 = ChatLocalization:Get("InGame.Chat.Response.EmotesNotSupported", t2["InGame.Chat.Response.EmotesNotSupported"])
-		local t6 = {
-			ChatColor = color3
-		}
-
-		Util:SendSystemMessageToSelf(v33, CurrentChannel, t6)
-
+	if not animate:FindFirstChild("PlayEmote") then
+		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
 		return true
 	end
 
-	local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-	if not Humanoid then
-		local v36 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
-		local t7 = {
-			ChatColor = color3
-		}
-
-		Util:SendSystemMessageToSelf(v36, CurrentChannel, t7)
-
+	if not humanoid then
+		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
 		return true
 	end
 
-	if Humanoid.RigType ~= Enum.HumanoidRigType.R15 then
-		local v38 = ChatLocalization:Get("InGame.Chat.Response.EmotesWrongAvatarType", t2["InGame.Chat.Response.EmotesWrongAvatarType"])
-		local t8 = {
-			ChatColor = color3
-		}
-
-		Util:SendSystemMessageToSelf(v38, CurrentChannel, t8)
-
+	if humanoid.RigType ~= Enum.HumanoidRigType.R15 then
+		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesWrongAvatarType") -- inferred equivalent call
 		return true
 	end
 
-	local HumanoidDescription = Humanoid:FindFirstChildOfClass("HumanoidDescription")
+	local humanoidDescription = humanoid:FindFirstChildOfClass("HumanoidDescription")
 
-	if not HumanoidDescription then
-		local v41 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
-		local t9 = {
-			ChatColor = color3
-		}
-
-		Util:SendSystemMessageToSelf(v41, CurrentChannel, t9)
-
+	if not humanoidDescription then
+		sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
 		return true
 	end
 
-	local t10 = {}
-	local Emotes = HumanoidDescription:GetEmotes()
+	local emotes = humanoidDescription:GetEmotes()
+	local v4 = {}
 
-	for k, _ in pairs(Emotes) do
-		t10[string.lower(k)] = k
+	for k, _ in pairs(emotes) do
+		v4[string.lower(k)] = k
 	end
 
-	local num = tonumber(v25)
+	local v5 = tonumber(emoteName)
 
-	if num then
-		local EquippedEmotes = HumanoidDescription:GetEquippedEmotes()
+	if v5 then
+		local equippedEmotes = humanoidDescription:GetEquippedEmotes()
 
-		for _, v in pairs(EquippedEmotes) do
-			if num == v.Slot then
-				v25 = v.Name
+		for _, equippedEmote in pairs(equippedEmotes) do
+			if equippedEmote.Slot == v5 then
+				emoteName = equippedEmote.Name
 			end
 		end
 	end
 
-	local u51 = t10[string.lower(v25)]
+	local v6 = v4[string.lower(emoteName)]
 
-	if not u51 then
-		local v52 = ChatLocalization:Get("InGame.Chat.Response.EmoteNotAvailable", t2["InGame.Chat.Response.EmoteNotAvailable"])
-		local t11 = {
-			ChatColor = color3
-		}
+	if v6 then
+		spawn(function()
+			local success, result = pcall(function()
+				return humanoid:PlayEmote(v6)
+			end)
 
-		Util:SendSystemMessageToSelf(v52, CurrentChannel, t11)
+			if success then
+				if not result then
+					sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesTemporarilyUnavailable") -- inferred equivalent call
+				end
+			else
+				sendErrorMessage(currentChannel, "InGame.Chat.Response.EmotesNotSupported") -- inferred equivalent call
+			end
+		end)
 
 		return true
 	end
 
-	spawn(function() -- line: 143
-		-- upvalues: Humanoid (copy), u51 (ref), CurrentChannel (copy), ChatLocalization (ref), t2 (copy), color3 (copy), Util (copy)
-		local ok, result = pcall(function() -- line: 144
-			-- upvalues: Humanoid (copy), u51 (ref)
-			return Humanoid:PlayEmote(u51)
-		end)
-
-		if not ok then
-			local v56 = CurrentChannel
-			local v57 = ChatLocalization:Get("InGame.Chat.Response.EmotesNotSupported", t2["InGame.Chat.Response.EmotesNotSupported"])
-			local t12 = {
-				ChatColor = color3
-			}
-
-			Util:SendSystemMessageToSelf(v57, v56, t12)
-
-			return
-		end
-
-		if not result then
-			local v59 = CurrentChannel
-			local v60 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
-			local t13 = {
-				ChatColor = color3
-			}
-
-			Util:SendSystemMessageToSelf(v60, v59, t13)
-		end
-	end)
-
+	sendErrorMessage(currentChannel, "InGame.Chat.Response.EmoteNotAvailable") -- inferred equivalent call
 	return true
 end
 

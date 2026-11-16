@@ -1,23 +1,23 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
+
+local React = require(parent.React)
+
 local Text = require(Foundation.Components.Text)
 
 require(Foundation.Components.Types)
-
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 
-local function HintText(p1, p2) -- line: 20
-	-- upvalues: React (copy), Text (copy), withCommonProps (copy)
-	return React.createElement(Text, withCommonProps(p1, {
-		Text = p1.text,
+local function HintText(props, ref)
+	return React.createElement(Text, withCommonProps(props, {
+		Text = props.text,
 		tag = {
 			["size-full-0 auto-y text-caption-small text-align-x-left text-align-y-top text-wrap"] = true,
-			["content-action-alert"] = p1.hasError,
-			["content-muted"] = p1.isDisabled and not p1.hasError,
-			["content-default"] = not p1.isDisabled and not p1.hasError
+			["content-action-alert"] = props.hasError,
+			["content-muted"] = props.isDisabled and not props.hasError,
+			["content-default"] = not (props.isDisabled or props.hasError)
 		},
-		ref = p2
+		ref = ref
 	}))
 end
 

@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local GetChatModerationStatusDataHydration = require(Workspace.AppChat.AppChat.Stores.GetChatModerationStatusDataHydration)
 
-return (require(_Workspace.AppChat.AppChat.Stores.GetChatModerationStatusDataHydration))
+return GetChatModerationStatusDataHydration

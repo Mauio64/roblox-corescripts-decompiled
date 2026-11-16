@@ -1,222 +1,216 @@
-local ParentParent = script.Parent.Parent.Parent
-local Cryo = require(ParentParent.Parent.Cryo)
-local Constants = require(ParentParent.Constants)
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local Cryo = require(parent.Parent.Cryo)
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local valueToString = require(ParentParent.util.valueToString)
-local getFFlagUGCValidationEyebrowEyelashSupport = require(ParentParent.flags.getFFlagUGCValidationEyebrowEyelashSupport)
-local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
-local t1 = {
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local valueToString = require(parent.util.valueToString)
+
+local PropertyRequirementsValid = {
 	categories = {
 		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
 		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH,
 		ValidationEnums.UploadCategory.RIGID_ACCESSORY,
 		ValidationEnums.UploadCategory.MAKEUP
 	},
-	requiredData = {
-		ValidationEnums.SharedDataMember.rootInstance,
-		ValidationEnums.SharedDataMember.uploadEnum
-	},
-	fflag = getFFlagUGCValidateMigrateSchemaProperties,
+	requiredData = { ValidationEnums.SharedDataMember.rootInstance, ValidationEnums.SharedDataMember.uploadEnum },
 	expectedFailures = {}
 }
 
-local function comparitorMethodImpl(n1: number, n2: number, s1: string) -- line: 32
-	-- upvalues: Constants (copy)
-	if s1 == Constants.COMPARISON_METHODS.SMALLER then
-		return n1 < n2
+local function comparitorMethodImpl(p: number, p2: number, p3: string)
+	if p3 == Constants.COMPARISON_METHODS.SMALLER then
+		return p < p2
 	end
 
-	if s1 == Constants.COMPARISON_METHODS.SMALLER_EQ then
-		return n1 <= n2
+	if p3 == Constants.COMPARISON_METHODS.SMALLER_EQ then
+		return p <= p2
 	end
 
-	if s1 == Constants.COMPARISON_METHODS.FUZZY_EQ then
-		return math.abs(n1 - n2) <= 1E-05
+	if p3 == Constants.COMPARISON_METHODS.FUZZY_EQ then
+		return math.abs(p - p2) <= 0.00001
 	end
 
-	if s1 == Constants.COMPARISON_METHODS.EXACT_EQ then
-		return n1 == n2
+	if p3 == Constants.COMPARISON_METHODS.EXACT_EQ then
+		return p == p2
 	end
 
-	if s1 == Constants.COMPARISON_METHODS.GREATER_EQ then
-		return n2 <= n1
+	if p3 == Constants.COMPARISON_METHODS.GREATER_EQ then
+		return p2 <= p
 	end
 
-	if s1 == Constants.COMPARISON_METHODS.GREATER then
-		return n2 < n1
+	if p3 == Constants.COMPARISON_METHODS.GREATER then
+		return p2 < p
 	end
 
-	error("Invalid comparitor method: " .. s1)
+	error("Invalid comparitor method: " .. p3)
 end
-local function doesPropertyMatchExpectations(p1, p2, s2: string) -- line: 50
-	-- upvalues: Cryo (copy), getFFlagUGCValidationEyebrowEyelashSupport (copy), Constants (copy), doesPropertyMatchExpectations (copy), comparitorMethodImpl (copy)
-	if p2 == Cryo.None then
-		return p1 == nil
+
+local function doesPropertyMatchExpectations(data, value, p: string)
+	if value == Cryo.None then
+		return data == nil
 	end
 
-	if getFFlagUGCValidationEyebrowEyelashSupport() and typeof(p2) == "table" and s2 == Constants.COMPARISON_METHODS.FOUND_IN then
-		local v20 = false
+	if typeof(value) == "table" and p == Constants.COMPARISON_METHODS.FOUND_IN then
+		local v = false
 
-		for _, v22 in p2 do
-			v20 = v20 or doesPropertyMatchExpectations(p1, v22, Constants.COMPARISON_METHODS.EXACT_EQ)
+		for _, item in value do
+			v = v or doesPropertyMatchExpectations(data, item, Constants.COMPARISON_METHODS.EXACT_EQ)
 		end
 
-		return v20
+		return v
 	end
 
-	if typeof(p1) ~= typeof(p2) then
+	if typeof(data) ~= typeof(value) then
 		return false
 	end
 
-	if typeof(p2) == "number" then
-		return comparitorMethodImpl(p1, p2, s2)
+	if typeof(value) == "number" then
+		return comparitorMethodImpl(data, value, p)
 	end
 
-	if typeof(p2) == "Vector3" then
-		return comparitorMethodImpl(p1.X, p2.X, s2) and (comparitorMethodImpl(p1.Y, p2.Y, s2) and comparitorMethodImpl(p1.Z, p2.Z, s2))
+	if typeof(value) == "Vector3" then
+		return comparitorMethodImpl(data.X, value.X, p)
+			and comparitorMethodImpl(data.Y, value.Y, p)
+			and comparitorMethodImpl(data.Z, value.Z, p)
 	end
 
-	if typeof(p2) == "Color3" then
-		return comparitorMethodImpl(p1.R, p2.R, s2) and (comparitorMethodImpl(p1.G, p2.G, s2) and comparitorMethodImpl(p1.B, p2.B, s2))
+	if typeof(value) == "Color3" then
+		return comparitorMethodImpl(data.R, value.R, p)
+			and comparitorMethodImpl(data.G, value.G, p)
+			and comparitorMethodImpl(data.B, value.B, p)
 	end
 
-	return p1 == p2
+	return data == value
 end
-local function extractSubProperty(s3: string, p3) -- line: 84
-	if typeof(p3) == "CFrame" and s3 == "PositionMagnitude" then
-		return true, p3.Position.Magnitude
+
+local function extractSubProperty(p: string, cframe)
+	if typeof(cframe) == "CFrame" and p == "PositionMagnitude" then
+		return true, cframe.Position.Magnitude
 	end
 
-	if typeof(p3) == "CFrame" and s3 == "Orientation" then
-		return true, (Vector3.new(p3:ToOrientation()))
+	if typeof(cframe) == "CFrame" and p == "Orientation" then
+		return true, (Vector3.new(cframe:ToOrientation()))
 	end
 
-	if typeof(p3) == "CFrame" and s3 == "Position" then
-		return true, p3.Position
+	if typeof(cframe) == "CFrame" and p == "Position" then
+		return true, cframe.Position
 	end
 
 	return false
 end
-local function getAllActiveTestsOnProperty(p4, s4: string, p5, p6) -- line: 96
-	-- upvalues: Constants (copy), getAllActiveTestsOnProperty (copy)
-	if typeof(p6) ~= "table" then
-		return {{
-			s4,
-			p5,
-			p6,
-			Constants.COMPARISON_METHODS.FUZZY_EQ
-		}}
+
+local function getAllActiveTestsOnProperty(assetType, k: string, result, items)
+	if typeof(items) ~= "table" then
+		return {
+			{ k, result, items, Constants.COMPARISON_METHODS.FUZZY_EQ }
+		}
 	end
 
-	for v29, v30 in p6 do
-		if v29 ~= Constants.INCLUSION_METHODS.INCLUSION_LIST then
-			if v29 ~= Constants.INCLUSION_METHODS.EXCLUSION_LIST or table.find(v30, p4) == nil then
+	for k2, list in items do
+		if k2 == Constants.INCLUSION_METHODS.INCLUSION_LIST then
+			if table.find(list, assetType) == nil then
+				return {}
+			end
+		elseif k2 == Constants.INCLUSION_METHODS.EXCLUSION_LIST and table.find(list, assetType) ~= nil then
+			return {}
+		end
+	end
+
+	local result2 = {}
+
+	for _, v in Constants.COMPARISON_METHODS do
+		if items[v] ~= nil then
+			table.insert(result2, { k, result, items[v], v })
+		end
+	end
+
+	local v = 1
+
+	while items[v] ~= nil do
+		local v2 = getAllActiveTestsOnProperty(assetType, k, result, items[v])
+		table.move(v2, 1, #v2, #result2 + 1, result2)
+
+		v += 1
+	end
+
+	for k2, item in items do
+		local v2, flag
+
+		if typeof(result) == "CFrame" and k2 == "PositionMagnitude" then
+			v2 = result.Position.Magnitude
+			flag = true
+		elseif typeof(result) == "CFrame" and k2 == "Orientation" then
+			v2 = Vector3.new(result:ToOrientation())
+			flag = true
+		elseif typeof(result) == "CFrame" and k2 == "Position" then
+			v2 = result.Position
+			flag = true
+		else
+			flag = false
+		end
+
+		if not flag then
+			continue
+		end
+
+		local v3 = getAllActiveTestsOnProperty(assetType, k2, v2, item)
+
+		for _, v4 in v3 do
+			v4[1] = k .. "." .. v4[1]
+			table.insert(result2, v4)
+		end
+	end
+
+	return result2
+end
+
+function PropertyRequirementsValid.run(object, p)
+	local rootInstance = p.rootInstance
+	local assetType = p.uploadEnum.assetType
+
+	local descendants = rootInstance:GetDescendants()
+	table.insert(descendants, rootInstance)
+
+	for _, descendant in descendants do
+		for className, v in Constants.PROPERTIES do
+			if not descendant:IsA(className) then
 				continue
 			end
 
-			return {}
-		end
+			for k, v2 in v do
+				local v3 = k
+				local success, result = pcall(function()
+					return descendant[v3]
+				end)
 
-		if table.find(v30, p4) == nil then
-			return {}
-		end
-	end
+				if success then
+					local allActiveTestsOnProperty = getAllActiveTestsOnProperty(assetType, k, result, v2)
 
-	local t2 = {}
+					for _, list in allActiveTestsOnProperty do
+						local propertyName, v4, v5, comparisonMethod = table.unpack(list)
 
-	for _, v33 in Constants.COMPARISON_METHODS do
-		if p6[v33] ~= nil then
-			table.insert(t2, {
-				s4,
-				p5,
-				p6[v33],
-				v33
-			})
-		end
-	end
-
-	local n3 = 1
-
-	while p6[n3] ~= nil do
-		local v35 = getAllActiveTestsOnProperty(p4, s4, p5, p6[n3])
-
-		table.move(v35, 1, #v35, #t2 + 1, t2)
-		n3 += 1
-	end
-
-	for v36, v37 in p6 do
-		local v38, Magnitude
-
-		if typeof(p5) == "CFrame" and v36 == "PositionMagnitude" then
-			v38 = true
-			Magnitude = p5.Position.Magnitude
-		elseif typeof(p5) == "CFrame" and v36 == "Orientation" then
-			v38 = true
-			Magnitude = Vector3.new(p5:ToOrientation())
-		elseif typeof(p5) == "CFrame" and v36 == "Position" then
-			v38 = true
-			Magnitude = p5.Position
-		else
-			v38 = false
-			Magnitude = nil
-		end
-
-		if v38 then
-			for _, v41 in (getAllActiveTestsOnProperty(p4, v36, Magnitude, v37)) do
-				v41[1] = s4 .. "." .. v41[1]
-				table.insert(t2, v41)
-			end
-		end
-	end
-
-	return t2
-end
-
-function t1.run(p7, p8) -- line: 149
-	-- upvalues: Constants (copy), ErrorSourceStrings (copy), getAllActiveTestsOnProperty (copy), doesPropertyMatchExpectations (copy), valueToString (copy)
-	local rootInstance = p8.rootInstance
-	local assetType = p8.uploadEnum.assetType
-	local descendants = rootInstance:GetDescendants()
-
-	table.insert(descendants, rootInstance)
-
-	for _, v48 in descendants do
-		for v49, v50 in Constants.PROPERTIES do
-			if v48:IsA(v49) then
-				for v51, v52 in v50 do
-					local ok, result = pcall(function() -- line: 160
-						-- upvalues: v48 (copy), v51 (copy)
-						return v48[v51]
-					end)
-
-					if not ok then
-						p7:fail(ErrorSourceStrings.Keys.PropertyNotFound, {
-							PropertyName = v51,
-							InstancePath = v48:GetFullName()
-						})
-					else
-						for _, v56 in (getAllActiveTestsOnProperty(assetType, v51, result, v52)) do
-							local v57, v58, v59, v60 = table.unpack(v56)
-
-							if not doesPropertyMatchExpectations(v58, v59, v60) then
-								p7:fail(ErrorSourceStrings.Keys.PropertyValueInvalid, {
-									PropertyName = v57,
-									InstancePath = v48:GetFullName(),
-									ComparisonMethod = v60,
-									ExpectedValue = valueToString(v59)
-								})
-							end
+						if not doesPropertyMatchExpectations(v4, v5, comparisonMethod) then
+							object:fail(ErrorSourceStrings.Keys.PropertyValueInvalid, {
+								PropertyName = propertyName,
+								InstancePath = descendant:GetFullName(),
+								ComparisonMethod = comparisonMethod,
+								ExpectedValue = valueToString(v5)
+							})
 						end
 					end
+				else
+					object:fail(ErrorSourceStrings.Keys.PropertyNotFound, {
+						PropertyName = k,
+						InstancePath = descendant:GetFullName()
+					})
 				end
 			end
 		end
 	end
 end
 
-return t1
+return PropertyRequirementsValid

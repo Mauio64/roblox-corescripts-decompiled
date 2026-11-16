@@ -1,103 +1,99 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local Foundation = require(ProfilePlatformParent.Foundation)
+local parent = ProfilePlatform.Parent
 
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
 require(ProfilePlatform.Common.Types)
 
 local Chip = Foundation.Chip
 local View = Foundation.View
-local uDim2 = UDim2.new(1, 0, 0, 32)
 
-function ChipGroup(t1: {[any]: any}) -- line: 24
-	-- upvalues: React (copy), Chip (copy), uDim2 (copy), View (copy)
-	local v9 = React.useRef(nil)
-	local v10 = React.useRef(nil)
-	local v11, v12 = React.useState(0)
-	local v13, v14 = React.useState(0)
-	local v15, v16 = React.useState(false)
+local udim = UDim2.new(1, 0, 0, 32)
 
-	React.useEffect(function() -- line: 31
-		-- upvalues: t1 (copy), v16 (copy), v11 (copy), v13 (copy)
-		if t1.scrollingEnabledOverride ~= nil then
-			v16(t1.scrollingEnabledOverride)
+function ChipGroup(props)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local state, setState = React.useState(0)
+	local state2, setState2 = React.useState(0)
+	local state3, setState3 = React.useState(false)
 
-			return
+	React.useEffect(function()
+		if props.scrollingEnabledOverride == nil then
+			setState3(state2 < state)
+		else
+			setState3(props.scrollingEnabledOverride)
 		end
+	end, { state, state2, props.scrollingEnabledOverride })
 
-		v16(v11 > v13)
-	end, {
-		v11,
-		v13,
-		t1.scrollingEnabledOverride
-	})
-
-	if #t1.chips == 0 then
+	if #props.chips == 0 then
 		return nil
 	end
 
-	local v17 = React.useMemo(function() -- line: 43
-		-- upvalues: t1 (copy), React (copy), Chip (copy)
-		local t2 = {}
+	local v = React.useMemo(function()
+		local children = {}
 
-		for i, v in ipairs(t1.chips) do
-			local text = v.text
+		for i, chip in ipairs(props.chips) do
+			local text = chip.text
 
-			if v.count then
-				text = `{ v.count } { v.text }`
+			if chip.count then
+				text = `{chip.count} {chip.text}`
 			end
 
-			local t3 = {
-				isChecked = false,
+			local v = {
 				text = text,
-				onActivated = v.onActivated,
-				isDisabled = v.isDisabled or false,
-				LayoutOrder = v.layoutOrder or i,
-				size = v.size or "Medium",
-				leading = v.leading,
-				trailing = v.trailing
+				onActivated = chip.onActivated,
+				isDisabled = chip.isDisabled or false,
+				isChecked = false,
+				LayoutOrder = chip.layoutOrder or i,
+				size = chip.size or "Medium",
+				leading = chip.leading,
+				trailing = chip.trailing
 			}
 
-			t2[i] = React.createElement(Chip, t3)
+			children[i] = React.createElement(Chip, v)
 		end
 
-		return t2
-	end, { t1.chips })
-	local v18 = React.useCallback(function(p1) -- line: 68
-		-- upvalues: v14 (copy)
-		v14(p1.AbsoluteSize.X)
+		return children
+	end, { props.chips })
+
+	local v2 = React.useCallback(function(p)
+		setState2(p.AbsoluteSize.X)
 	end, {})
-	local v19 = React.useCallback(function(p2) -- line: 72
-		-- upvalues: v12 (copy)
-		v12(p2.AbsoluteSize.X)
+
+	local onAbsoluteSizeChanged = React.useCallback(function(p)
+		setState(p.AbsoluteSize.X)
 	end, {})
 
 	return React.createElement("Frame", {
 		BackgroundTransparency = 1,
-		LayoutOrder = t1.layoutOrder,
-		Size = t1.size or uDim2
+		LayoutOrder = props.layoutOrder,
+		Size = props.size or udim
 	}, {
 		DynamicScrollingFrame = React.createElement("ScrollingFrame", {
-			ref = v9,
+			ref = ref,
 			AutomaticCanvasSize = Enum.AutomaticSize.X,
 			BackgroundTransparency = 1,
-			CanvasSize = t1.size or uDim2,
+			CanvasSize = props.size or udim,
 			ClipsDescendants = false,
 			ElasticBehavior = Enum.ElasticBehavior.Always,
 			ScrollBarThickness = 0,
 			ScrollingDirection = Enum.ScrollingDirection.X,
-			ScrollingEnabled = v15,
+			ScrollingEnabled = state3,
 			Selectable = false,
-			Size = t1.size or uDim2,
+			Size = props.size or udim,
 			ZIndex = 1,
-			[React.Change.AbsoluteSize] = v18
+			[React.Change.AbsoluteSize] = v2
 		}, {
-			ChipRow = React.createElement(View, {
-				tag = "row gap-small auto-y size-full-0",
-				ref = v10,
-				AutomaticSize = Enum.AutomaticSize.X,
-				onAbsoluteSizeChanged = v19
-			}, table.unpack(v17))
+			ChipRow = React.createElement(
+				View,
+				{
+					ref = ref2,
+					tag = "row gap-small auto-y size-full-0",
+					AutomaticSize = Enum.AutomaticSize.X,
+					onAbsoluteSizeChanged = onAbsoluteSizeChanged
+				},
+				table.unpack(v)
+			)
 		})
 	})
 end

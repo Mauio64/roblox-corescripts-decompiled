@@ -1,15 +1,15 @@
-local function add(p1, ...) -- line: 2
-	local t1 = {}
+local function add(items, ...)
+	local result = {}
 
-	for k, _ in pairs(p1) do
-		t1[k] = true
+	for k, _ in pairs(items) do
+		result[k] = true
 	end
 
 	for i = 1, select("#", ...) do
-		t1[select(i, ...)] = true
+		result[select(i, ...)] = true
 	end
 
-	return t1
+	return result
 end
 
 return add

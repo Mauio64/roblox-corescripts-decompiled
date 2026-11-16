@@ -1,35 +1,37 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local useRoactService = require(ParentParentParent.RobloxAppHooks).useRoactService
-local RoactNetworking = require(ParentParentParent.RoactServiceTags).RoactNetworking
-local React = require(ParentParentParent.React)
-local ReactUtils = require(ParentParentParent.ReactUtils)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local RobloxAppHooks = require(parent2.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
+local RoactServiceTags = require(parent2.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+
+local React = require(parent2.React)
+local ReactUtils = require(parent2.ReactUtils)
+
 local useContext = React.useContext
 local useEventConnection = ReactUtils.useEventConnection
-local fetchEventDetails = require(ParentParent.Common.fetchEventDetails)
-local ServiceOverrideContext = require(ParentParent.Components.CoreUI.ServiceOverrideContext)
 
-return function(t1: {[any]: any}) -- line: 26
-	-- upvalues: useRoactService (copy), RoactNetworking (copy), useContext (copy), ServiceOverrideContext (copy), React (copy), fetchEventDetails (copy), useEventConnection (copy)
-	local v12 = useRoactService(RoactNetworking)
+local fetchEventDetails = require(parent.Common.fetchEventDetails)
+
+local ServiceOverrideContext = require(parent.Components.CoreUI.ServiceOverrideContext)
+
+return function(p)
+	local v = useRoactService(RoactNetworking)
+
 	local socialService = useContext(ServiceOverrideContext).socialService
-	local v14 = React.useCallback(function(s1: string) -- line: 33
-		-- upvalues: fetchEventDetails (copy), v12 (copy), t1 (copy), socialService (copy)
-		fetchEventDetails(v12, s1):andThen(function(p1) -- line: 34
-			-- upvalues: t1 (copy), s1 (copy)
-			t1.openRsvpPrompt(s1, p1)
-		end, function(p2) -- line: 36
-			-- upvalues: socialService (copy), s1 (copy), t1 (copy)
-			socialService:PromptRsvpToEventCompleted(s1, false, Enum.RsvpStatus.None)
-			warn("Error fetching event details: ", p2)
-			t1.closePrompt()
-		end)
-	end, {
-		t1.openRsvpPrompt,
-		v12
-	})
 
-	useEventConnection(socialService.ShowPromptRsvpToEvent, v14)
+	local v2 = React.useCallback(function(p2: string)
+		fetchEventDetails(v, p2):andThen(function(p3)
+			p.openRsvpPrompt(p2, p3)
+		end, function(p3)
+			socialService:PromptRsvpToEventCompleted(p2, false, Enum.RsvpStatus.None)
+			warn("Error fetching event details: ", p3)
+			p.closePrompt()
+		end)
+	end, { p.openRsvpPrompt, v })
+
+	useEventConnection(socialService.ShowPromptRsvpToEvent, v2)
 
 	return React.createElement(React.Fragment, {}, {})
 end

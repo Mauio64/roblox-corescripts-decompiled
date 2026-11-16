@@ -1,215 +1,227 @@
-local Players = game:GetService("Players")
-local ParentParent = script.Parent.Parent
-local Constants = require(ParentParent.Constants)
-local AssetCalculator = require(ParentParent.util.AssetCalculator)
-local CurveAnimationHierarchyUtils = require(ParentParent.util.CurveAnimationHierarchyUtils)
-local flags = ParentParent.flags
-local getFFlagUGCValidateDuplicatesInAnimation = require(flags.getFFlagUGCValidateDuplicatesInAnimation)
+local parent = script.Parent.Parent
+
+local Constants = require(parent.Constants)
+local AssetCalculator = require(parent.util.AssetCalculator)
+local CurveAnimationHierarchyUtils = require(parent.util.CurveAnimationHierarchyUtils)
+local RigBuilder = require(parent.util.RigBuilder)
+
+local flags = parent.flags
 local getFIntUGCValidateMaxAnimationFPS = require(flags.getFIntUGCValidateMaxAnimationFPS)
-local getFFlagUGCValidateCurveAnimFinalFrameBug = require(flags.getFFlagUGCValidateCurveAnimFinalFrameBug)
-local t1 = {}
+
 local FaceControlsName = CurveAnimationHierarchyUtils.FaceControlsName
 
-local function createDefaultCharacter(b1: boolean) -- line: 23
-	-- upvalues: Players (copy)
-	local v17 = if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then game.Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15) else Players:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
+local function hasFloatCurveKeys(instance)
+	local x = instance:FindFirstChild("X")
+	local y = instance:FindFirstChild("Y")
+	local z = instance:FindFirstChild("Z")
+	local v
 
-	for _, descendant in v17:GetDescendants() do
-		if descendant:IsA("Decal") then
-			descendant.Transparency = 1
-		elseif descendant:IsA("MeshPart") then
-			descendant.Transparency = 1
-			descendant.CanCollide = false
-		elseif descendant:IsA("Motor6D") and b1 then
-			descendant:Destroy()
-		end
+	if x then
+		v = x:IsA("FloatCurve") and #x:GetKeys() > 0
+	else
+		v = false
 	end
 
-	return v17
+	if v then
+		return v
+	end
+
+	if y then
+		v = y:IsA("FloatCurve") and #y:GetKeys() > 0
+	else
+		v = false
+	end
+
+	if v then
+		return v
+	end
+
+	if not z then
+		v = false
+		return false
+	end
+
+	v = z:IsA("FloatCurve")
+	return v and #z:GetKeys() > 0
 end
-local function hasFloatCurveKeys(p1) -- line: 53
-	local X = p1:FindFirstChild("X")
-	local Y = p1:FindFirstChild("Y")
-	local Z = p1:FindFirstChild("Z")
-	local v24 = not not X and (X:IsA("FloatCurve") and #X:GetKeys() > 0)
 
-	if not v24 then
-		v24 = not not Y and (Y:IsA("FloatCurve") and #Y:GetKeys() > 0)
+local function hasPositionKeys(vector3Curve)
+	if not vector3Curve then
+		return false
+	end
 
-		if not v24 then
-			if Z then
-				v24 = Z:IsA("FloatCurve")
+	if vector3Curve:IsA("Vector3Curve") then
+		return hasFloatCurveKeys(vector3Curve)
+	end
 
-				if v24 then
-					return #Z:GetKeys() > 0
+	return false
+end
+
+local function hasRotationKeys(eulerRotationCurve)
+	if not eulerRotationCurve then
+		return false
+	end
+
+	if eulerRotationCurve:IsA("EulerRotationCurve") then
+		return hasFloatCurveKeys(eulerRotationCurve)
+	end
+
+	return false
+end
+
+return {
+	calculateAnimFramesAtOrigin = function(p)
+		local v = 1 / getFIntUGCValidateMaxAnimationFPS()
+
+		local function getCurveTracks()
+			local bodyPartFolderRoot = CurveAnimationHierarchyUtils.getBodyPartFolderRoot(p)
+			assert(
+				bodyPartFolderRoot,
+				"CurveAnimation must have one and only one body part Folder child or HumanoidRootPart child."
+			)
+
+			local descendants = bodyPartFolderRoot:GetDescendants()
+			table.insert(descendants, bodyPartFolderRoot)
+			local curveTracks = {}
+
+			for _, folder in descendants do
+				if not (folder:IsA("Folder") and CurveAnimationHierarchyUtils.getBodyPartToParentMap()[folder.Name]) then
+					continue
 				end
-			else
-				v24 = false
-			end
-		end
-	end
 
-	return v24
-end
-local function hasPositionKeys(p2) -- line: 63
-	-- upvalues: hasFloatCurveKeys (copy)
-	if not p2 then
-		return false
-	end
+				local position = folder:FindFirstChild("Position")
+				local rotation = folder:FindFirstChild("Rotation")
+				local name = folder.Name
+				local v2
 
-	if not p2:IsA("Vector3Curve") then
-		return false
-	end
+				if position and position:IsA("Vector3Curve") then
+					v2 = hasFloatCurveKeys(position)
+				else
+					v2 = false
+				end
 
-	return (hasFloatCurveKeys(p2))
-end
-local function hasRotationKeys(p3) -- line: 74
-	-- upvalues: hasFloatCurveKeys (copy)
-	if not p3 then
-		return false
-	end
+				if not v2 then
+					position = nil
+				end
 
-	if not p3:IsA("EulerRotationCurve") then
-		return false
-	end
+				local v3
 
-	return (hasFloatCurveKeys(p3))
-end
+				if rotation and rotation:IsA("EulerRotationCurve") then
+					v3 = hasFloatCurveKeys(rotation)
+				else
+					v3 = false
+				end
 
-function t1.calculateAnimFramesAtOrigin(p4) -- line: 85
-	-- upvalues: getFIntUGCValidateMaxAnimationFPS (copy), getFFlagUGCValidateDuplicatesInAnimation (copy), CurveAnimationHierarchyUtils (copy), hasFloatCurveKeys (copy), Constants (copy), FaceControlsName (copy), createDefaultCharacter (copy), AssetCalculator (copy), getFFlagUGCValidateCurveAnimFinalFrameBug (copy)
-	local v28 = 1 / getFIntUGCValidateMaxAnimationFPS()
+				if not v3 then
+					rotation = nil
+				end
 
-	local function getCurveTracks() -- line: 92
-		-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), CurveAnimationHierarchyUtils (copy), p4 (copy), hasFloatCurveKeys (copy), Constants (copy), FaceControlsName (copy)
-		local t2 = {}
-		local descendants
+				local faceControls
 
-		if getFFlagUGCValidateDuplicatesInAnimation() then
-			local v47 = CurveAnimationHierarchyUtils.getBodyPartFolderRoot(p4)
+				if folder.Name == Constants.NAMED_R15_BODY_PARTS.Head then
+					faceControls = folder:FindFirstChild(FaceControlsName)
+				end
 
-			assert(v47, "CurveAnimation must have one and only one body part Folder child or HumanoidRootPart child.")
-			descendants = v47:GetDescendants()
-			table.insert(descendants, v47)
-		else
-			descendants = p4:GetDescendants()
-		end
-
-		for _, v50 in descendants do
-			if v50:IsA("Folder") and CurveAnimationHierarchyUtils.getBodyPartToParentMap()[v50.Name] then
-				local Position = v50:FindFirstChild("Position")
-				local Rotation = v50:FindFirstChild("Rotation")
-
-				t2[v50.Name] = {
-					pos = if not if Position then if Position:IsA("Vector3Curve") then hasFloatCurveKeys(Position) else false else false then nil else Position,
-					rot = if not if Rotation then if Rotation:IsA("EulerRotationCurve") then hasFloatCurveKeys(Rotation) else false else false then nil else Rotation,
-					faceControls = if v50.Name ~= Constants.NAMED_R15_BODY_PARTS.Head then nil else v50:FindFirstChild(FaceControlsName)
-				}
-			end
-		end
-
-		return t2
-	end
-	local function calculateCurveAnimLength(p5) -- line: 125
-		local n1 = -1
-
-		local function getMaxTimeFromFloatCurveChildren(p6) -- line: 128
-			-- upvalues: n1 (ref)
-			if not p6 then
-				return
+				curveTracks[name] = { pos = position, rot = rotation, faceControls = faceControls }
 			end
 
-			for _, child in p6:GetChildren() do
-				if child:IsA("FloatCurve") then
-					for _, v76 in child:GetKeys() do
-						n1 = math.max(n1, v76.Time)
+			return curveTracks
+		end
+
+		local function calculateCurveAnimLength(curveTracks)
+			local maxTime = -1
+
+			local function getMaxTimeFromFloatCurveChildren(instance)
+				if not instance then
+					return
+				end
+
+				for _, floatCurve in instance:GetChildren() do
+					if not floatCurve:IsA("FloatCurve") then
+						continue
+					end
+
+					for _, v2 in floatCurve:GetKeys() do
+						maxTime = math.max(maxTime, v2.Time)
 					end
 				end
 			end
+
+			for _, item in curveTracks do
+				getMaxTimeFromFloatCurveChildren(item.pos)
+				getMaxTimeFromFloatCurveChildren(item.rot)
+				getMaxTimeFromFloatCurveChildren(item.faceControls)
+			end
+
+			return maxTime
 		end
 
-		for _, v57 in p5 do
-			getMaxTimeFromFloatCurveChildren(v57.pos)
-			getMaxTimeFromFloatCurveChildren(v57.rot)
-			getMaxTimeFromFloatCurveChildren(v57.faceControls)
+		local function calculateTransformsAtTime(p2: number, curveTracks)
+			local transformsAtTime = {}
+
+			for k, item in curveTracks do
+				local v2 = not item.pos and Vector3.new(0, 0, 0) or Vector3.new(unpack(item.pos:GetValueAtTime(p2)))
+				local v3
+
+				if item.rot then
+					v3 = item.rot:GetRotationAtTime(p2)
+				else
+					v3 = CFrame.new()
+				end
+
+				transformsAtTime[k] = v3 + v2
+			end
+
+			return transformsAtTime
 		end
 
-		return n1
-	end
-	local function calculateTransformsAtTime(n2: number, p7) -- line: 151
-		local t3 = {}
+		local function calculatePositionMagnitudeResultsAtTime(p2: number, curveTracks)
+			local magnitudes = {}
 
-		for v61, v62 in p7 do
-			local v63 = if not v62.pos then Vector3.new(0, 0, 0) else Vector3.new(unpack(v62.pos:GetValueAtTime(n2)))
+			for k, item in curveTracks do
+				if item.pos then
+					magnitudes[k] = Vector3.new(unpack(item.pos:GetValueAtTime(p2))).Magnitude
+				end
+			end
 
-			t3[v61] = ((if not v62.rot then CFrame.new() else v62.rot:GetRotationAtTime(n2))) + v63
+			return magnitudes
 		end
 
-		return t3
-	end
-	local function calculatePositionMagnitudeResultsAtTime(n3: number, p8) -- line: 161
-		local t4 = {}
+		local defaultCharacter = RigBuilder.createDefaultCharacter(false)
+		local childrenByName = {}
 
-		for v67, v68 in p8 do
-			if v68.pos then
-				t4[v67] = Vector3.new(unpack(v68.pos:GetValueAtTime(n3))).Magnitude
+		for _, child in defaultCharacter:GetChildren() do
+			if CurveAnimationHierarchyUtils.isBodyPartFolderNameValid(child.Name) then
+				childrenByName[child.Name] = child
 			end
 		end
 
-		return t4
-	end
+		local curveTracks = getCurveTracks()
+		local v2 = calculateCurveAnimLength(curveTracks)
 
-	local v33 = createDefaultCharacter(false)
-	local t5 = {}
+		local v3 = {}
+		local v4 = {}
 
-	for _, child in v33:GetChildren() do
-		if CurveAnimationHierarchyUtils.isBodyPartFolderNameValid(child.Name) then
-			t5[child.Name] = child
-		end
-	end
+		local function addData(p2: number) -- 2 equivalent calls inferred from this helper
+			local v5 = calculateTransformsAtTime(p2, curveTracks)
 
-	local v37 = getCurveTracks()
-	local v38 = calculateCurveAnimLength(v37)
-	local t6 = {}
-	local t7 = {}
+			table.insert(v3, (AssetCalculator.calculateAllTransformsForFullBody(childrenByName, v5)))
 
-	local function addData(n4: number) -- line: 187
-		-- upvalues: calculateTransformsAtTime (copy), v37 (copy), AssetCalculator (copy), t5 (copy), t6 (copy), t7 (copy), calculatePositionMagnitudeResultsAtTime (copy)
-		local v70 = calculateTransformsAtTime(n4, v37)
-		local v71 = AssetCalculator.calculateAllTransformsForFullBody(t5, v70)
-
-		table.insert(t6, v71)
-		table.insert(t7, (calculatePositionMagnitudeResultsAtTime(n4, v37)))
-	end
-
-	local n5 = 0
-
-	while n5 <= v38 do
-		if getFFlagUGCValidateCurveAnimFinalFrameBug() then
-			local v43 = calculateTransformsAtTime(n5, v37)
-
-			table.insert(t6, (AssetCalculator.calculateAllTransformsForFullBody(t5, v43)))
-			table.insert(t7, (calculatePositionMagnitudeResultsAtTime(n5, v37)))
-		else
-			local v44 = calculateTransformsAtTime(n5, v37)
-
-			table.insert(t6, (AssetCalculator.calculateAllTransformsForFullBody(t5, v44)))
-			table.insert(t7, (calculatePositionMagnitudeResultsAtTime(n5, v37)))
+			table.insert(v4, calculatePositionMagnitudeResultsAtTime(p2, curveTracks))
 		end
 
-		n5 += v28
+		local total = 0
+
+		while total <= v2 do
+			addData(total) -- inferred equivalent call
+			total += v
+		end
+
+		if v2 >= 0 then
+			addData(v2) -- inferred equivalent call
+		end
+
+		defaultCharacter:Destroy()
+		return v3, v2, v4, curveTracks
 	end
-
-	if getFFlagUGCValidateCurveAnimFinalFrameBug() and v38 >= 0 then
-		local v45 = calculateTransformsAtTime(v38, v37)
-
-		table.insert(t6, (AssetCalculator.calculateAllTransformsForFullBody(t5, v45)))
-		table.insert(t7, (calculatePositionMagnitudeResultsAtTime(v38, v37)))
-	end
-
-	v33:Destroy()
-
-	return t6, v38, t7, v37
-end
-
-return t1
+}

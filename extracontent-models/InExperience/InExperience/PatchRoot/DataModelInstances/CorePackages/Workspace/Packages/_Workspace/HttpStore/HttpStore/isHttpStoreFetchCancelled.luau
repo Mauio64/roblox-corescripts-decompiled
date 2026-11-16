@@ -1,17 +1,18 @@
-local ParentParent = script.Parent.Parent
-local HttpResponseStatus = require(ParentParent.InternalHttpStore).HttpResponseStatus
+local parent = script.Parent.Parent
+local InternalHttpStore = require(parent.InternalHttpStore)
 
-local function isHttpStoreFetchCancelled(p1) -- line: 9
-	-- upvalues: HttpResponseStatus (copy)
-	if p1.status ~= HttpResponseStatus.Failed then
+local HttpResponseStatus = InternalHttpStore.HttpResponseStatus
+
+local function isHttpStoreFetchCancelled(data): boolean
+	if data.status ~= HttpResponseStatus.Failed then
 		return false
 	end
 
-	if p1.cancelled == true then
+	if data.cancelled == true then
 		return true
 	end
 
-	local response = p1.response
+	local response = data.response
 
 	if response and response.HttpError == Enum.HttpError.Aborted then
 		return true

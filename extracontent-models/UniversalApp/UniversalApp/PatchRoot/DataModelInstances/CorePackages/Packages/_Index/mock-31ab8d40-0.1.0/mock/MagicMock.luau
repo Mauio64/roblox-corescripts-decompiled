@@ -1,89 +1,74 @@
 local symbols = require(script.Parent.symbols)
 local Spy = require(script.Parent.Spy)
-local t1 = {}
-local t3 = {
-	__index = function(p1, p2) -- line: 7
-		-- upvalues: symbols (copy), t1 (copy)
-		local mt = getmetatable(p1)
-		local v8 = mt[symbols.Children][p2]
 
-		if v8 == nil then
-			local v9 = t1.new()
+local MagicMock = {}
+local v = {
+	__index = function(p, p2)
+		local metatable = getmetatable(p)
+		local v = metatable[symbols.Children][p2]
 
-			mt[symbols.Children][p2] = v9
-
-			return v9
+		if v == nil then
+			local v2 = MagicMock.new()
+			metatable[symbols.Children][p2] = v2
+			return v2
+		else
+			return if v ~= symbols.None then v else nil
 		end
-
-		if v8 == symbols.None then
-			return nil
-		end
-
-		return v8
 	end,
-	__newindex = function(p3, p4, p5) -- line: 22
-		-- upvalues: Spy (copy), symbols (copy)
-		local mt = getmetatable(p3)
+	__newindex = function(p, p2, callback)
+		local metatable = getmetatable(p)
 
-		if type(p5) == "function" then
-			local v14
-
-			v14, p5 = Spy.new(p5)
-		elseif p5 == nil then
-			p5 = symbols.None
+		if type(callback) == "function" then
+			local _
+			_, callback = Spy.new(callback)
+		elseif callback == nil then
+			callback = symbols.None
 		end
 
-		if p4 == symbols.ReturnValue then
-			mt[symbols.ReturnValue] = {
-				p5,
+		if p2 == symbols.ReturnValue then
+			metatable[symbols.ReturnValue] = {
+				callback,
 				n = 1
 			}
-
-			return
+		else
+			metatable[symbols.Children][p2] = callback
 		end
-
-		mt[symbols.Children][p4] = p5
 	end,
-	__call = function(p6, ...) -- line: 39
-		-- upvalues: symbols (copy), t1 (copy)
-		local mt = getmetatable(p6)
-		local t2 = {
+	__call = function(p, ...)
+		local metatable = getmetatable(p)
+		local v = {
 			args = table.pack(...),
-			result = mt[symbols.ReturnValue]
+			result = metatable[symbols.ReturnValue]
 		}
 
-		if t2.result == nil then
-			t2.result = {
-				t1.new(),
+		if v.result == nil then
+			v.result = {
+				MagicMock.new(),
 				n = 1
 			}
-			mt[symbols.ReturnValue] = t2.result
-		elseif t2.result == symbols.None then
-			t2.result = {
-				n = 1
-			}
+			metatable[symbols.ReturnValue] = v.result
+		elseif v.result == symbols.None then
+			v.result = { n = 1 }
 		end
 
-		table.insert(mt[symbols.Calls], t2)
-
-		return table.unpack(t2.result)
+		table.insert(metatable[symbols.Calls], v)
+		return table.unpack(v.result)
 	end
 }
 
-function t1.new(p7) -- line: 60
-	-- upvalues: symbols (copy), t3 (copy)
-	local t4 = {
+function MagicMock.new(p)
+	local class = {
 		[symbols.Calls] = {},
 		[symbols.Children] = {},
-		[symbols.Lock] = p7,
+		[symbols.Lock] = p,
 		[symbols.ReturnValue] = nil
 	}
 
-	for k, v in pairs(t3) do
-		t4[k] = v
+	for k, v2 in pairs(v) do
+		class[k] = v2
 	end
 
-	return (setmetatable({}, t4))
+	return (setmetatable({}, class))
 end
 
-return t1
+return MagicMock

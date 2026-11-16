@@ -1,16 +1,18 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local Rodux = require(ExpChatParent.Rodux)
-local Dictionary = require(ExpChatParent.llama).Dictionary
-local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local parent = ExpChat.Parent
+local Rodux = require(parent.Rodux)
+local llama = require(parent.llama)
+local dictionary = llama.Dictionary
+local ExpChatShared = require(parent.ExpChatShared)
+
 local Actions = ExpChat.Actions
 local AdorneeAdded = require(Actions.AdorneeAdded)
 local PlayerRemoved = ExpChatShared.Actions.PlayerRemoved
 local HumanoidDied = require(Actions.HumanoidDied)
 
-local function findFirstChildByNameAndClass(p1, s1: string, s2: string) -- line: 16
-	for _, child in ipairs(p1:GetChildren()) do
-		if s1 == child.Name and child:IsA(s2) then
+local function findFirstChildByNameAndClass(instance, p: string, className: string)
+	for _, child in ipairs(instance:GetChildren()) do
+		if child.Name == p and child:IsA(className) then
 			return child
 		end
 	end
@@ -19,30 +21,26 @@ local function findFirstChildByNameAndClass(p1, s1: string, s2: string) -- line:
 end
 
 return Rodux.createReducer({}, {
-	[AdorneeAdded.name] = function(t1: {[any]: any}, p2) -- line: 27
-		-- upvalues: findFirstChildByNameAndClass (copy), Dictionary (copy)
-		local v18 = findFirstChildByNameAndClass(p2.character, "Head", "BasePart")
-		local v19 = if p2.humanoid.Health ~= 0 then p2.character else v18
+	[AdorneeAdded.name] = function(p, data)
+		local v = findFirstChildByNameAndClass(data.character, "Head", "BasePart")
 
-		return Dictionary.join(t1, {
-			[p2.userId] = v19
-		})
-	end,
-	[HumanoidDied.name] = function(t2: {[any]: any}, p3) -- line: 36
-		-- upvalues: findFirstChildByNameAndClass (copy), Dictionary (copy)
-		local v22 = t2[p3.userId]
-		local v23 = nil
-
-		if v22 then
-			v23 = findFirstChildByNameAndClass(v22, "Head", "BasePart") or v22
+		if data.humanoid.Health ~= 0 then
+			v = data.character
 		end
 
-		return Dictionary.join(t2, {
-			[p3.userId] = v23
-		})
+		return dictionary.join(p, { [data.userId] = v })
 	end,
-	[PlayerRemoved.name] = function(t3: {[any]: any}, p4) -- line: 48
-		-- upvalues: Dictionary (copy)
-		return Dictionary.removeKey(t3, p4.userId)
+	[HumanoidDied.name] = function(p, p2)
+		local v = p[p2.userId]
+		local v2
+
+		if v then
+			v2 = findFirstChildByNameAndClass(v, "Head", "BasePart") or v
+		end
+
+		return dictionary.join(p, { [p2.userId] = v2 })
+	end,
+	[PlayerRemoved.name] = function(p, p2)
+		return dictionary.removeKey(p, p2.userId)
 	end
 })

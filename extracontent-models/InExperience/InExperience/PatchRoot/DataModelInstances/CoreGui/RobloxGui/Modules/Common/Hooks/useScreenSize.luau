@@ -1,59 +1,48 @@
 local CorePackages = game:GetService("CorePackages")
 local React = require(CorePackages.Packages.React)
 
-return function() -- line: 4
-	-- upvalues: React (copy)
-	local connection = nil
-	local u4 = nil
-	local v5, v6 = React.useState(Vector2.new(0, 0))
+return function()
+	local currentCameraChangedConnection = nil
+	local viewportSizeChangedConnection = nil
+	local state, setState = React.useState(Vector2.new(0, 0))
 
-	local function v7() -- line: 9
-		-- upvalues: v6 (copy)
-		local CurrentCamera = workspace.CurrentCamera
+	local function fn() -- 1 equivalent call inferred from this helper
+		local currentCamera = workspace.CurrentCamera
 
-		if CurrentCamera then
-			v6(Vector2.new(CurrentCamera.ViewportSize.X, CurrentCamera.ViewportSize.Y))
+		if currentCamera then
+			setState(Vector2.new(currentCamera.ViewportSize.X, currentCamera.ViewportSize.Y))
 		end
 	end
-	local function v8() -- line: 16
-		-- upvalues: u4 (ref), v7 (copy)
-		local CurrentCamera = workspace.CurrentCamera
 
-		if u4 then
-			pcall(function() -- line: 20
-				-- upvalues: u4 (ref)
-				u4:Disconnect()
+	local function fn2()
+		local currentCamera = workspace.CurrentCamera
+
+		if viewportSizeChangedConnection then
+			pcall(function()
+				viewportSizeChangedConnection:Disconnect()
 			end)
-			u4 = nil
+			viewportSizeChangedConnection = nil
 		end
 
-		if CurrentCamera then
-			u4 = CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(v7)
+		if currentCamera then
+			viewportSizeChangedConnection = currentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(fn)
 		end
 	end
 
-	React.useEffect(function() -- line: 31
-		-- upvalues: connection (ref), v8 (copy), v6 (copy), u4 (ref)
-		connection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(v8)
-		v8()
-
-		local CurrentCamera = workspace.CurrentCamera
-
-		if CurrentCamera then
-			v6(Vector2.new(CurrentCamera.ViewportSize.X, CurrentCamera.ViewportSize.Y))
-		end
-
-		return function() -- line: 36
-			-- upvalues: connection (ref), u4 (ref)
-			if connection then
-				connection:Disconnect()
+	React.useEffect(function()
+		currentCameraChangedConnection = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(fn2)
+		fn2()
+		fn() -- inferred equivalent call
+		return function()
+			if currentCameraChangedConnection then
+				currentCameraChangedConnection:Disconnect()
 			end
 
-			if u4 then
-				u4:Disconnect()
+			if viewportSizeChangedConnection then
+				viewportSizeChangedConnection:Disconnect()
 			end
 		end
 	end, {})
 
-	return v5
+	return state
 end

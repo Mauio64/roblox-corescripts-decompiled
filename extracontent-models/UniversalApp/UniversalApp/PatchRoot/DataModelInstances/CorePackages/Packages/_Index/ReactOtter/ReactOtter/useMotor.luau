@@ -1,62 +1,61 @@
-local ParentParent = script.Parent.Parent
-local React = require(ParentParent.React)
-local Otter = require(ParentParent.Otter)
+local parent = script.Parent.Parent
+local React = require(parent.React)
+local Otter = require(parent.Otter)
 
-local function useMotor(p1, p2, p3) -- line: 13
-	-- upvalues: React (copy), Otter (copy)
-	local v8 = React.useRef(nil)
-	local v9 = React.useRef(nil)
+local function useMotor(value, p, p2)
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
 
-	if not v8.current then
-		local u10 = if typeof(p1) ~= "number" then Otter.createGroupMotor(p1) else Otter.createSingleMotor(p1)
+	if not ref.current then
+		local current
 
-		function v9.current(p4) -- line: 26
-			-- upvalues: u10 (ref)
-			u10:setGoal(p4)
+		if typeof(value) == "number" then
+			current = Otter.createSingleMotor(value)
+		else
+			current = Otter.createGroupMotor(value)
 		end
 
-		v8.current = u10
+		function ref2.current(p3)
+			current:setGoal(p3)
+		end
+		ref.current = current
 	end
 
-	React.useEffect(function() -- line: 34
-		-- upvalues: v8 (copy), p3 (copy), p2 (copy)
-		local u12 = nil
-		local u13 = nil
+	React.useEffect(function()
+		local v = nil
+		local v2
 
-		if v8.current then
-			if p3 then
-				u12 = v8.current:onComplete(p3)
+		if ref.current then
+			if p2 then
+				v = ref.current:onComplete(p2)
 			end
 
-			u13 = v8.current:onStep(p2)
+			v2 = ref.current:onStep(p)
+		else
+			v2 = nil
 		end
 
-		return function() -- line: 43
-			-- upvalues: u12 (ref), u13 (ref)
-			if u12 then
-				u12()
+		return function()
+			if v then
+				v()
 			end
 
-			if u13 then
-				u13()
+			if v2 then
+				v2()
 			end
 		end
-	end, {
-		p2,
-		p3
-	})
-	React.useEffect(function() -- line: 54
-		-- upvalues: v8 (copy)
-		return function() -- line: 55
-			-- upvalues: v8 (copy)
-			if v8.current then
-				v8.current:destroy()
-				v8.current = nil
-			end
-		end
-	end, { v8.current })
+	end, { p, p2 })
 
-	return v9.current
+	React.useEffect(function()
+		return function()
+			if ref.current then
+				ref.current:destroy()
+				ref.current = nil
+			end
+		end
+	end, { ref.current })
+
+	return ref2.current
 end
 
 return useMotor

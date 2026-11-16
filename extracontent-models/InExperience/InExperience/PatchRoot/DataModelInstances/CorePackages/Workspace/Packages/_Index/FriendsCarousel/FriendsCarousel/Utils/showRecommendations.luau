@@ -1,12 +1,12 @@
-local ParentParent = script.Parent.Parent
-local isSubjectTo10ftPolicies = require(ParentParent.dependencies).isSubjectTo10ftPolicies
-local getFIntShowFriendRecommendationsLimit = require(ParentParent.Flags.getFIntShowFriendRecommendationsLimit)
+local parent = script.Parent.Parent
+local dependencies = require(parent.dependencies)
+local isSubjectTo10ftPolicies = dependencies.isSubjectTo10ftPolicies
+local getFIntShowFriendRecommendationsLimit = require(parent.Flags.getFIntShowFriendRecommendationsLimit)
 
-return function(n1: number) -- line: 6
-	-- upvalues: isSubjectTo10ftPolicies (copy), getFIntShowFriendRecommendationsLimit (copy)
+return function(p: number): boolean
 	if isSubjectTo10ftPolicies() then
 		return true
 	end
 
-	return n1 <= getFIntShowFriendRecommendationsLimit()
+	return p <= getFIntShowFriendRecommendationsLimit()
 end

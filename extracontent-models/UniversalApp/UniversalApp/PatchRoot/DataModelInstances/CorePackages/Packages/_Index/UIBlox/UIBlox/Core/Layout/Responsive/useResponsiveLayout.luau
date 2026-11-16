@@ -1,16 +1,16 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent.Parent.Parent
-local React = require(ParentParent.React)
-local ResponsiveLayoutContext = require(scriptParent.ResponsiveLayoutContext)
-local ResponsiveLayoutConfigReader = require(scriptParent.ResponsiveLayoutConfigReader)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent.Parent.Parent
 
-return function(s1: string, s2: string?) -- line: 19
-	-- upvalues: React (copy), ResponsiveLayoutContext (copy), ResponsiveLayoutConfigReader (copy)
-	local v8 = React.useContext(ResponsiveLayoutContext)
+local React = require(parent2.React)
 
+local ResponsiveLayoutContext = require(parent.ResponsiveLayoutContext)
+local ResponsiveLayoutConfigReader = require(parent.ResponsiveLayoutConfigReader)
+
+return function(p: string, p2: string?)
+	local v = React.useContext(ResponsiveLayoutContext)
 	return ResponsiveLayoutConfigReader.getValue({
-		config = v8.config,
-		breakpoint = v8.breakpoint,
-		kind = s2 or v8.kind
-	}, s1)
+		config = v.config,
+		breakpoint = v.breakpoint,
+		kind = p2 or v.kind
+	}, p)
 end

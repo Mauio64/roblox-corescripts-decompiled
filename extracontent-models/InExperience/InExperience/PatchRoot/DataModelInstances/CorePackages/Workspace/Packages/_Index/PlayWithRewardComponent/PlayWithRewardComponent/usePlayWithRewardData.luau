@@ -1,46 +1,63 @@
 local AdService = game:GetService("AdService")
+local ExperienceService = game:GetService("ExperienceService")
+
 local PlayWithRewardComponent = script:FindFirstAncestor("PlayWithRewardComponent")
 local FetchPlayWithRewardState = require(PlayWithRewardComponent.FetchPlayWithRewardState)
 local shouldRenderPlayWithRewardBanner = require(PlayWithRewardComponent.shouldRenderPlayWithRewardBanner)
-local PlayWithRewardComponentParent = PlayWithRewardComponent.Parent
-local PlayWithRewardState = require(PlayWithRewardComponentParent.PlayWithRewardState)
-local React = require(PlayWithRewardComponentParent.React)
-local RoactUtils = require(PlayWithRewardComponentParent.RoactUtils)
+
+local parent = PlayWithRewardComponent.Parent
+local PlayWithRewardState = require(parent.PlayWithRewardState)
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local SharedFlags = require(parent.SharedFlags)
+
+local FFlagPlayWithRewardClearOnExperienceLeave = SharedFlags.FFlagPlayWithRewardClearOnExperienceLeave
 local SetPlayWithRewardState = PlayWithRewardState.SetPlayWithRewardState
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 
-local function usePlayWithRewardData(t1: {[any]: any}) -- line: 27
-	-- upvalues: useSelector (copy), useDispatch (copy), React (copy), FetchPlayWithRewardState (copy), AdService (copy), SetPlayWithRewardState (copy), shouldRenderPlayWithRewardBanner (copy)
-	local universeId = t1.universeId
-	local shouldFetch = t1.shouldFetch
-	local v16 = useSelector(function(p1) -- line: 31
-		-- upvalues: universeId (copy)
-		if p1.PlayWithRewardState and p1.PlayWithRewardState.universeId == universeId then
-			return p1.PlayWithRewardState
+local function usePlayWithRewardData(data)
+	local universeId = data.universeId
+	local shouldFetch = data.shouldFetch
+
+	local playWithRewardData = useSelector(function(p)
+		if p.PlayWithRewardState and p.PlayWithRewardState.universeId == universeId then
+			return p.PlayWithRewardState
 		end
 
 		return nil
 	end)
-	local v17 = useSelector(function(p2) -- line: 37
-		return p2.LocalUserId
+
+	local v = useSelector(function(p)
+		return p.LocalUserId
 	end)
-	local v18 = useDispatch()
-	local onFetchDispatched = t1.onFetchDispatched
 
-	React.useEffect(function() -- line: 43
-		-- upvalues: shouldFetch (copy), v17 (copy), v16 (copy), universeId (copy), onFetchDispatched (copy), v18 (copy), FetchPlayWithRewardState (copy), AdService (copy)
-		if not shouldFetch then
+	local v2 = useDispatch()
+	local ref
+
+	if FFlagPlayWithRewardClearOnExperienceLeave then
+		ref = React.useRef(false)
+	else
+		ref = nil
+	end
+
+	local onFetchDispatched = data.onFetchDispatched
+	React.useEffect(function()
+		if FFlagPlayWithRewardClearOnExperienceLeave then
+			if shouldFetch or ref.current then
+				if ref.current then
+					ref.current = false
+				end
+			else
+				return
+			end
+		elseif not shouldFetch then
 			return
 		end
 
-		local num = tonumber(v17)
+		local v3 = tonumber(v)
 
-		if not num then
-			return
-		end
-
-		if v16 and v16.universeId == universeId then
+		if not v3 or playWithRewardData and playWithRewardData.universeId == universeId then
 			return
 		end
 
@@ -48,38 +65,42 @@ local function usePlayWithRewardData(t1: {[any]: any}) -- line: 27
 			onFetchDispatched()
 		end
 
-		v18(FetchPlayWithRewardState(AdService, universeId, num)):catch(function() -- line: 57
-		end)
-	end, {
-		shouldFetch,
-		universeId,
-		v17,
-		v16,
-		v18,
-		onFetchDispatched
-	})
-	React.useEffect(function() -- line: 60
-		-- upvalues: v18 (copy), SetPlayWithRewardState (copy)
-		return function() -- line: 61
-			-- upvalues: v18 (copy), SetPlayWithRewardState (copy)
-			v18(SetPlayWithRewardState("", "", false, nil))
+		v2(FetchPlayWithRewardState(AdService, universeId, v3)):catch(function() end)
+	end, { shouldFetch, universeId, v, playWithRewardData, v2, onFetchDispatched })
+
+	React.useEffect(function()
+		local connection
+
+		if FFlagPlayWithRewardClearOnExperienceLeave then
+			connection = ExperienceService:RegisterForExperienceLeave(function()
+				ref.current = true
+				v2(SetPlayWithRewardState("", "", false, nil))
+			end)
+		else
+			connection = nil
 		end
-	end, { v18 })
 
-	local v20 = false
+		return function()
+			v2(SetPlayWithRewardState("", "", false, nil))
 
-	if v16 then
-		local flowId = v16.flowId
-		local universeId2 = v16.universeId
-		local adData = v16.adData
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { v2 })
+	local showPlayWithReward
 
-		v20 = flowId ~= "" and v16.isAdDataExpected or shouldRenderPlayWithRewardBanner(universeId, flowId, universeId2, adData)
+	if playWithRewardData then
+		local flowId = playWithRewardData.flowId
+		local universeId2 = playWithRewardData.universeId
+		local adData = playWithRewardData.adData
+		showPlayWithReward = flowId ~= "" and playWithRewardData.isAdDataExpected
+			or shouldRenderPlayWithRewardBanner(universeId, flowId, universeId2, adData)
+	else
+		showPlayWithReward = false
 	end
 
-	return {
-		playWithRewardData = v16,
-		showPlayWithReward = v20
-	}
+	return { playWithRewardData = playWithRewardData, showPlayWithReward = showPlayWithReward }
 end
 
 return usePlayWithRewardData

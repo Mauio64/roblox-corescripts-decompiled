@@ -1,102 +1,163 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
-local Foundation = require(Parent.Foundation)
-local Responsive = require(Parent.Responsive)
+local parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+local Foundation = require(parent.Foundation)
+local Responsive = require(parent.Responsive)
 local IconSize = Foundation.Enums.IconSize
 local useTokens = Foundation.Hooks.useTokens
-local FFlagAXMigrateBuilderIcons = require(Parent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
 
-local function getItemWidth(n1: number, n2: number, n3: number) -- line: 23
-	return (math.floor((n1 - (n2 - 1) * n3) / n2))
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
+
+local function getItemWidth(x: number, visibleItemCount: number, itemGap: number) -- 1 equivalent call inferred from this helper
+	return (math.floor((x - (visibleItemCount - 1) * itemGap) / visibleItemCount))
 end
-local function getItemCardWidthParameters(n4: number, s1: string, s2: string) -- line: 29
-	-- upvalues: Responsive (copy)
-	if s1 == Responsive.BreakpointConfig.Enum.Medium or s2 == Responsive.BreakpointConfig.Enum.Portrait then
-		return {
-			visibleItemCount = 6,
-			itemGap = n4
-		}
+
+local function getItemCardWidthParameters(small: number, p: string, p2: string) -- 1 equivalent call inferred from this helper
+	if p == Responsive.BreakpointConfig.Enum.Medium or p2 == Responsive.BreakpointConfig.Enum.Portrait then
+		return { visibleItemCount = 6, itemGap = small }
 	end
 
 	return nil
 end
 
-return function(vector2: Vector2?) -- line: 50
-	-- upvalues: useTokens (copy), Responsive (copy), IconSize (copy), FFlagAXMigrateBuilderIcons (copy)
-	local v16 = useTokens()
-	local v17 = Responsive.useResponsive()
-	local v18 = Responsive.useOrientation()
-	local Small = v16.Gap.Small
-	local Size_1600 = v16.Size.Size_1600
-	local Size_2100 = v16.Size.Size_2100
-	local Medium = v16.Padding.Medium
-	local Size_1000 = v16.Size.Size_1000
-	local v24 = v18 == Responsive.BreakpointConfig.Enum.Portrait
-	local v25 = ((if not v24 then v16.Typography.CaptionMedium else v16.Typography.CaptionSmall)).FontSize + v16.Gap.Small
-	local v26 = if v18 ~= Responsive.BreakpointConfig.Enum.Portrait then Size_2100 else Size_1600
-	local v27 = v26 + v25 + Medium * 2
-	local v28 = v27 + Size_1000
-	local t1 = {
-		text = {
-			Size = UDim2.fromScale(1, 0),
-			fontStyle = v16.Typography.CaptionMedium
-		}
+return function(vector2: Vector2?)
+	local v = useTokens()
+	local v2 = Responsive.useResponsive()
+	local v3 = Responsive.useOrientation()
+	local small = v.Gap.Small
+	local size_1600 = v.Size.Size_1600
+	local size_2100 = v.Size.Size_2100
+
+	local medium = v.Padding.Medium
+	local size_1000 = v.Size.Size_1000
+	local v4 = v3 == Responsive.BreakpointConfig.Enum.Portrait
+	local v5
+
+	if v4 then
+		v5 = v.Typography.CaptionSmall
+	else
+		v5 = v.Typography.CaptionMedium
+	end
+
+	local v6 = v5.FontSize + v.Gap.Small
+	local v7
+
+	if v3 == Responsive.BreakpointConfig.Enum.Portrait then
+		v7 = size_1600
+	else
+		v7 = size_2100
+	end
+
+	local slotCardTotalHeight = v7 + v6 + medium * 2
+	local navigationFrameHeight = slotCardTotalHeight + size_1000
+
+	local clearAllButtonStyles = {
+		text = { Size = UDim2.fromScale(1, 0), fontStyle = v.Typography.CaptionMedium }
 	}
-	local t2 = {
-		iconFrameStyles = if not v24 then {
-			Size = UDim2.fromOffset(if not FFlagAXMigrateBuilderIcons then v16.Size.Size_800 else v16.Size.Size_600, if not FFlagAXMigrateBuilderIcons then v16.Size.Size_800 else v16.Size.Size_600),
-			iconSize = IconSize.Small
-		} else {
-			Size = UDim2.fromOffset(v16.Size.Size_500, v16.Size.Size_500),
+	local iconFrameStyles
+
+	if v4 then
+		iconFrameStyles = {
+			Size = UDim2.fromOffset(v.Size.Size_500, v.Size.Size_500),
 			iconSize = IconSize.XSmall
 		}
-	}
-	local t3 = {
-		buttonPadding = v16.Padding.Medium,
-		contentPadding = UDim.new(0, v16.Padding.Medium)
+	else
+		iconFrameStyles = { Size = 0, iconSize = 0 }
+		local v8
+
+		if FFlagAXMigrateBuilderIcons then
+			v8 = v.Size.Size_600
+		else
+			v8 = v.Size.Size_800
+		end
+
+		local v9
+
+		if FFlagAXMigrateBuilderIcons then
+			v9 = v.Size.Size_600
+		else
+			v9 = v.Size.Size_800
+		end
+
+		iconFrameStyles.Size = UDim2.fromOffset(v8, v9)
+
+		iconFrameStyles.iconSize = IconSize.Small
+	end
+
+	local slotItemCardThumbnailStyles = { iconFrameStyles = iconFrameStyles }
+
+	local scrollingFramePadding = {
+		buttonPadding = v.Padding.Medium,
+		contentPadding = UDim.new(0, v.Padding.Medium)
 	}
 
 	if vector2 ~= nil then
-		local vector2X = vector2.X
-		local v33 = if v17 ~= Responsive.BreakpointConfig.Enum.Medium and v18 ~= Responsive.BreakpointConfig.Enum.Portrait then nil else {
-			visibleItemCount = 6,
-			itemGap = Small
-		}
+		local x = vector2.X
+		local itemCardWidthParameters = getItemCardWidthParameters(small, v2, v3) -- inferred equivalent call
 
-		if v33 then
-			local visibleItemCount = v33.visibleItemCount
-			local itemGap = v33.itemGap
+		if itemCardWidthParameters then
+			v7 = math.min(
+				math.max(
+					getItemWidth(x, itemCardWidthParameters.visibleItemCount, itemCardWidthParameters.itemGap), -- inferred equivalent call
+					size_1600
+				),
+				size_2100
+			)
 
-			v26 = math.min(math.max(math.floor((vector2X - (visibleItemCount - 1) * itemGap) / visibleItemCount), Size_1600), Size_2100)
+			if size_1600 <= v7 and v7 < size_2100 then
+				local iconFrameStyles2
 
-			if Size_1600 <= v26 and v26 < Size_2100 then
-				t2.iconFrameStyles = if not v24 then {
-					Size = UDim2.fromOffset(if not FFlagAXMigrateBuilderIcons then v16.Size.Size_800 else v16.Size.Size_600, if not FFlagAXMigrateBuilderIcons then v16.Size.Size_800 else v16.Size.Size_600),
-					iconSize = IconSize.Small
-				} else {
-					Size = UDim2.fromOffset(v16.Size.Size_500, v16.Size.Size_500),
-					iconSize = IconSize.XSmall
+				if v4 then
+					iconFrameStyles2 = {
+						Size = UDim2.fromOffset(v.Size.Size_500, v.Size.Size_500),
+						iconSize = IconSize.XSmall
+					}
+				else
+					iconFrameStyles2 = { Size = 0, iconSize = 0 }
+					local v8
+
+					if FFlagAXMigrateBuilderIcons then
+						v8 = v.Size.Size_600
+					else
+						v8 = v.Size.Size_800
+					end
+
+					local v9
+
+					if FFlagAXMigrateBuilderIcons then
+						v9 = v.Size.Size_600
+					else
+						v9 = v.Size.Size_800
+					end
+
+					iconFrameStyles2.Size = UDim2.fromOffset(v8, v9)
+
+					iconFrameStyles2.iconSize = IconSize.Small
+				end
+
+				slotItemCardThumbnailStyles.iconFrameStyles = iconFrameStyles2
+
+				scrollingFramePadding = {
+					buttonPadding = v.Padding.Small,
+					contentPadding = UDim.new(0, v.Padding.Small)
 				}
-				t3 = {
-					buttonPadding = v16.Padding.Small,
-					contentPadding = UDim.new(0, v16.Padding.Small)
-				}
-				t1.text.Size = UDim2.fromScale(0.8, 0)
-				t1.text.fontStyle = v16.Typography.CaptionSmall
+
+				clearAllButtonStyles.text.Size = UDim2.fromScale(0.8, 0)
+				clearAllButtonStyles.text.fontStyle = v.Typography.CaptionSmall
 			end
 
-			v27 = v26 + v25 + Medium * 2
-			v28 = v27 + Size_1000
+			slotCardTotalHeight = v7 + v6 + medium * 2
+			navigationFrameHeight = slotCardTotalHeight + size_1000
 		end
 	end
 
 	return {
-		navHeight = Size_1000,
-		itemCardSize = UDim2.fromOffset(v26, v26),
-		clearAllButtonStyles = t1,
-		navigationFrameHeight = v28,
-		slotItemCardThumbnailStyles = t2,
-		scrollingFramePadding = t3,
-		enableSnapToSelectedSlot = v18 == Responsive.BreakpointConfig.Enum.Landscape,
-		slotCardTotalHeight = v27
+		navHeight = size_1000,
+		itemCardSize = UDim2.fromOffset(v7, v7),
+		clearAllButtonStyles = clearAllButtonStyles,
+		navigationFrameHeight = navigationFrameHeight,
+		slotItemCardThumbnailStyles = slotItemCardThumbnailStyles,
+		scrollingFramePadding = scrollingFramePadding,
+		enableSnapToSelectedSlot = v3 == Responsive.BreakpointConfig.Enum.Landscape,
+		slotCardTotalHeight = slotCardTotalHeight
 	}
 end

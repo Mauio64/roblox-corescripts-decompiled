@@ -1,33 +1,41 @@
-local ParentParent = script.Parent.Parent
-local invariant = require(ParentParent.utils.invariant)
-local isValidScreenComponent = require(ParentParent.utils.isValidScreenComponent)
+local parent = script.Parent.Parent
+local invariant = require(parent.utils.invariant)
+local isValidScreenComponent = require(parent.utils.isValidScreenComponent)
 
-local function getScreenComponent(p1) -- line: 6
-	if not p1 then
+local function getScreenComponent(item) -- 1 equivalent call inferred from this helper
+	if not item then
 		return nil
 	end
 
-	if type(p1) == "table" and p1.screen then
-		return p1.screen
+	if type(item) == "table" and item.screen then
+		return item.screen
 	end
 
-	return p1
+	return item
 end
 
-return function(p2) -- line: 36
-	-- upvalues: invariant (copy), isValidScreenComponent (copy)
-	invariant(next(p2) ~= nil, "Please specify at least one route when configuring a navigator.")
+return function(items)
+	invariant(next(items) ~= nil, "Please specify at least one route when configuring a navigator.")
 
-	for v7, v8 in p2 do
-		local v9 = if v8 then if type(v8) ~= "table" or not v8.screen then v8 else v8.screen else nil
-		local v10 = type(v8) == "table"
+	for k, item in items do
+		local screenComponent = getScreenComponent(item) -- inferred equivalent call
+		local v = type(item) == "table"
+		invariant(
+			isValidScreenComponent(screenComponent) or v and type(item.getScreen) == "function",
+			"The component for route '%s' must be a Roact component or table with 'getScreen'. For example:\n\nlocal MyScreen = require(script.Parent.MyScreen)\n...\n%s = MyScreen,\n}\n\nYou can also use a navigator:\n\nlocal MyNavigator = require(script.Parent.MyNavigator)\n...\n%s = MyNavigator,\n}",
+			k,
+			k,
+			k
+		)
 
-		invariant(isValidScreenComponent(v9) or v10 and type(v8.getScreen) == "function", "The component for route '%s' must be a Roact component or table with 'getScreen'. For example:\n\nlocal MyScreen = require(script.Parent.MyScreen)\n...\n%s = MyScreen,\n}\n\nYou can also use a navigator:\n\nlocal MyNavigator = require(script.Parent.MyNavigator)\n...\n%s = MyNavigator,\n}", v7, v7, v7)
-
-		if v10 then
-			invariant(v8.screen == nil or v8.getScreen == nil, "Route '%s' should declare a screen or a getScreen, not both.", v7)
+		if v then
+			invariant(
+				item.screen == nil or item.getScreen == nil,
+				"Route '%s' should declare a screen or a getScreen, not both.",
+				k
+			)
 		end
 	end
 
-	return p2
+	return items
 end

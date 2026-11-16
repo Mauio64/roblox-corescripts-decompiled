@@ -8,9 +8,9 @@ return {
 		ready = 7,
 		error = 8
 	},
-	isNetworkRequestInFlight = function(n1: number?) -- line: 65
-		if n1 then
-			return n1 < 7
+	isNetworkRequestInFlight = function(p: number?): boolean
+		if p then
+			return p < 7
 		end
 
 		return false

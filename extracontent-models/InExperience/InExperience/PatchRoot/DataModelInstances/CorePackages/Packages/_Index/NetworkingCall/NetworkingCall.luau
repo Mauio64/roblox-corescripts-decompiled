@@ -1,7 +1,4 @@
-local createRequestThunks = require(script.createRequestThunks)
-local networkingCallTypes = require(script.networkingCallTypes)
-
 return {
-	config = createRequestThunks,
-	networkingCallTypes = networkingCallTypes
+	config = require(script.createRequestThunks),
+	networkingCallTypes = require(script.networkingCallTypes)
 }

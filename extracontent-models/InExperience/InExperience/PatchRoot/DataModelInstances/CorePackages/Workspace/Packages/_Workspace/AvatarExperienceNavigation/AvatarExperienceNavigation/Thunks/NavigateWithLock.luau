@@ -1,36 +1,46 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local NavigationRodux = require(Parent.NavigationRodux)
+local parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
+
+local ArgCheck = require(parent.ArgCheck)
+local NavigationRodux = require(parent.NavigationRodux)
 local ApplySetNavigationLocked = NavigationRodux.Actions.ApplySetNavigationLocked
 local Selectors = NavigationRodux.Selectors
-local SharedFlags = require(Parent.SharedFlags)
+local SharedFlags = require(parent.SharedFlags)
 local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
 local FFlagSignalsNavP2NavigationPrimitives = SharedFlags.FFlagSignalsNavP2NavigationPrimitives
-local v9 = if not FFlagSignalsNavP2NavigationPrimitives then nil else require(Parent.RobloxAppNavigation).AppNavigationRegistry
+local appNavigationRegistry
 
-return function(p1) -- line: 25
-	-- upvalues: ArgCheck (copy), FFlagSignalsNavP2NavigationPrimitives (copy), v9 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), ApplySetNavigationLocked (copy)
-	ArgCheck.isType(p1, "function", "navigationCallback")
+if FFlagSignalsNavP2NavigationPrimitives then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	appNavigationRegistry = RobloxAppNavigation.AppNavigationRegistry
+else
+	appNavigationRegistry = nil
+end
 
-	return function(p2) -- line: 27
-		-- upvalues: FFlagSignalsNavP2NavigationPrimitives (copy), v9 (copy), p1 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), ApplySetNavigationLocked (copy)
+return function(callback)
+	ArgCheck.isType(callback, "function", "navigationCallback")
+	return function(object)
 		if FFlagSignalsNavP2NavigationPrimitives then
-			if v9.get().getIsNavigating(false) then
+			if appNavigationRegistry.get().getIsNavigating(false) then
 				return
 			end
 
-			p1()
+			callback()
+		else
+			local state = object:getState()
+			local v
 
-			return
+			if FFlagUseNavigationSelectors then
+				v = Selectors.selectNavigationLocked(state)
+			else
+				v = state.Navigation.lockNavigationActions
+			end
+
+			if v then
+				return
+			end
+
+			object:dispatch(ApplySetNavigationLocked(true))
+			callback()
 		end
-
-		local v12 = p2:getState()
-
-		if if not FFlagUseNavigationSelectors then v12.Navigation.lockNavigationActions else Selectors.selectNavigationLocked(v12) then
-			return
-		end
-
-		p2:dispatch(ApplySetNavigationLocked(true))
-		p1()
 	end
 end

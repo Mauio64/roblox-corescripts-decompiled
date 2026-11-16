@@ -1,1 +1,3 @@
-return (require(script.EditSocialLinksModalContainer))
+local EditSocialLinksModalContainer = require(script.EditSocialLinksModalContainer)
+
+return EditSocialLinksModalContainer

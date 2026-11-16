@@ -1,124 +1,120 @@
 local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
-local InGameAssetReportingParent = InGameAssetReporting.Parent
-local React = require(InGameAssetReportingParent.React)
-local ReactOtter = require(InGameAssetReportingParent.ReactOtter)
-local UIBlox = require(InGameAssetReportingParent.UIBlox)
-local withLocalization = require(InGameAssetReportingParent.Localization).withLocalization
+local parent = InGameAssetReporting.Parent
+
+local React = require(parent.React)
+local ReactOtter = require(parent.ReactOtter)
+local UIBlox = require(parent.UIBlox)
+local Localization = require(parent.Localization)
+local withLocalization = Localization.withLocalization
+
 local Constants = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants)
+
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
+
 local IpErrorCodes = Constants.IpErrorCodes
-local t1 = {
+
+local v = {
 	titleKey = "Feature.ReportAbuse.Heading.IpNoReportableContent",
 	descriptionKey = "Feature.ReportAbuse.Description.IpNoReportableContent",
 	showReportExperience = true
 }
-local t2 = {
+
+local v2 = {
 	titleKey = "InGame.CommonUI.Title.Error",
 	descriptionKey = "Feature.ReportAbuse.Description.IpGenericError",
 	showReportExperience = false
 }
-local t3 = {
-	[IpErrorCodes.ClientNoAssetsExtracted] = t1,
-	[IpErrorCodes.NoEligibleContents] = t1,
-	[IpErrorCodes.Unknown] = t2
-}
-local t4 = {
-	stiffness = 400,
-	damping = 40,
-	mass = 1
+
+local v3 = {
+	[IpErrorCodes.ClientNoAssetsExtracted] = v,
+	[IpErrorCodes.NoEligibleContents] = v,
+	[IpErrorCodes.Unknown] = v2
 }
 
-local function InGameAssetIPInfringementErrorModal(t5: {[any]: any}) -- line: 49
-	-- upvalues: React (copy), ReactOtter (copy), t4 (copy), t3 (copy), t2 (copy), withLocalization (copy), ButtonType (copy), InteractiveAlert (copy)
-	local v17, v18 = React.useState(true)
-	local v19, v20 = ReactOtter.useAnimatedBinding(1, function() -- line: 52
-		-- upvalues: v17 (copy), t5 (copy)
-		if not v17 then
-			t5.onBack()
+local v4 = { stiffness = 400, damping = 40, mass = 1 }
+
+local function InGameAssetIPInfringementErrorModal(data)
+	local state, setState = React.useState(true)
+
+	local v5, v6 = ReactOtter.useAnimatedBinding(1, function()
+		if not state then
+			data.onBack()
 		end
 	end)
-	local v21 = React.useMemo(function() -- line: 59
-		-- upvalues: v17 (copy)
-		if v17 then
-			return 0
-		end
 
-		return 1
-	end, { v17 })
+	local v7 = React.useMemo(function(): number
+		return if state then 0 else 1
+	end, { state })
 
-	React.useEffect(function() -- line: 63
-		-- upvalues: v20 (copy), ReactOtter (copy), v21 (copy), t4 (copy)
-		v20(ReactOtter.spring(v21, t4))
-	end, { v21 })
+	React.useEffect(function()
+		v6(ReactOtter.spring(v7, v4))
+	end, { v7 })
 
-	local v22 = React.useCallback(function() -- line: 67
-		-- upvalues: v18 (copy)
-		v18(false)
-	end, { v18 })
-	local v23 = if not t5.errorCode or not t3[t5.errorCode] then t2 else t3[t5.errorCode]
+	local onActivated = React.useCallback(function()
+		setState(false)
+	end, { setState })
+	local v8
+
+	if data.errorCode and v3[data.errorCode] then
+		v8 = v3[data.errorCode]
+	else
+		v8 = v2
+	end
 
 	return withLocalization({
 		errorBack = "Feature.ReportAbuse.Action.ErrorModalGoBack",
 		reportExperience = "Feature.ReportAbuse.Action.IpReportExperience",
-		title = v23.titleKey,
-		description = v23.descriptionKey
-	})(function(p1) -- line: 80
-		-- upvalues: v23 (copy), t5 (copy), ButtonType (copy), v22 (copy), React (copy), v19 (copy), InteractiveAlert (copy)
-		local t6 = {}
+		title = v8.titleKey,
+		description = v8.descriptionKey
+	})(function(props)
+		local buttons = {}
 
-		if v23.showReportExperience and t5.onReportExperience then
-			table.insert(t6, {
+		if v8.showReportExperience and data.onReportExperience then
+			table.insert(buttons, {
 				buttonType = ButtonType.PrimarySystem,
 				props = {
-					onActivated = t5.onReportExperience,
-					text = p1.reportExperience,
-					isLoading = t5.isReportExperienceLoading,
-					isDisabled = t5.isReportExperienceLoading
+					onActivated = data.onReportExperience,
+					text = props.reportExperience,
+					isLoading = data.isReportExperienceLoading,
+					isDisabled = data.isReportExperienceLoading
 				}
 			})
-			table.insert(t6, {
+
+			table.insert(buttons, {
 				buttonType = ButtonType.Secondary,
-				props = {
-					onActivated = v22,
-					text = p1.errorBack
-				}
+				props = { onActivated = onActivated, text = props.errorBack }
 			})
 		else
-			table.insert(t6, {
+			table.insert(buttons, {
 				buttonType = ButtonType.PrimarySystem,
-				props = {
-					onActivated = v22,
-					text = p1.errorBack
-				}
+				props = { onActivated = onActivated, text = props.errorBack }
 			})
 		end
 
 		return React.createElement("TextButton", {
 			AutoButtonColor = false,
 			BorderSizePixel = 0,
-			BackgroundTransparency = v19:map(function(n1: number) -- line: 113
-				return n1 + 0.3
+			BackgroundTransparency = v5:map(function(p: number)
+				return p + 0.3
 			end),
 			BackgroundColor3 = Color3.fromHex("#000000"),
 			Size = UDim2.new(1, 0, 1, 0),
 			Text = "",
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			[React.Event.Activated] = v22,
+			[React.Event.Activated] = onActivated,
 			ZIndex = 10
 		}, {
 			Alert = React.createElement(InteractiveAlert, {
-				screenSize = t5.screenSize,
-				title = p1.title,
-				bodyText = p1.description,
+				screenSize = data.screenSize,
+				title = props.title,
+				bodyText = props.description,
 				anchorPoint = Vector2.new(0.5, 0.5),
-				position = v19:map(function(p2) -- line: 129
-					return UDim2.new(0.5, 0, 0.5, 0):Lerp(UDim2.new(0.5, 0, -0.5, 0), p2)
+				position = v5:map(function(p)
+					return UDim2.new(0.5, 0, 0.5, 0):Lerp(UDim2.new(0.5, 0, -0.5, 0), p)
 				end),
-				buttonStackInfo = {
-					buttons = t6
-				}
+				buttonStackInfo = { buttons = buttons }
 			})
 		})
 	end)

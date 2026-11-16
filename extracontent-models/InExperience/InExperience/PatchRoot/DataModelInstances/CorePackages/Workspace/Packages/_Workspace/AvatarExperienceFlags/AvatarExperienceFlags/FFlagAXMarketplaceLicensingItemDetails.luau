@@ -1,0 +1,3 @@
+local FFlagAXMarketplaceLicensing = require(script.Parent.FFlagAXMarketplaceLicensing)
+
+return game:DefineFastFlag("AXMarketplaceLicensingItemDetails3", false) and FFlagAXMarketplaceLicensing

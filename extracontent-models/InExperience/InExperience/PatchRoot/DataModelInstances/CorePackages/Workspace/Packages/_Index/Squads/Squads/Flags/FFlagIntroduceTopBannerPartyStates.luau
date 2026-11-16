@@ -1,3 +1,5 @@
 local Squads = script:FindFirstAncestor("Squads")
 
-return require(Squads.dependencies).SocialExperiments.SquadCoordinationUIChangesExperimentation.getPartyCoordinationUiChangesEnabled()
+local dependencies = require(Squads.dependencies)
+
+return dependencies.SocialExperiments.SquadCoordinationUIChangesExperimentation.getPartyCoordinationUiChangesEnabled()

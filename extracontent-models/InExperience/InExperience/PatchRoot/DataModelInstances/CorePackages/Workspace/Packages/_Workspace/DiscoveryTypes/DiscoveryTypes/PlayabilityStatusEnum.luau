@@ -26,5 +26,8 @@ return {
 	ContextualPlayabilityExperienceBlockedParentalControls = "ContextualPlayabilityExperienceBlockedParentalControls",
 	ContextualPlayabilityAgeCheckRequired = "ContextualPlayabilityAgeCheckRequired",
 	ContextualPlayabilityRequireParentApproval = "ContextualPlayabilityRequireParentApproval",
-	ContextualPlayabilityCoreGated = "ContextualPlayabilityCoreGated"
+	ContextualPlayabilityPlaytestDisabled = "ContextualPlayabilityPlaytestDisabled",
+	ContextualPlayabilityTrustedFriendRequired = "ContextualPlayabilityTrustedFriendRequired",
+	ContextualPlayabilityCoreGated = "ContextualPlayabilityCoreGated",
+	PlusSubscriptionRequired = "PlusSubscriptionRequired"
 }

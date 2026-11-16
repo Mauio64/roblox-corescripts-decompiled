@@ -1,16 +1,12 @@
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local createDataCache = require(DataHydration.createDataCache)
 
+local createDataCache = require(DataHydration.createDataCache)
 require(DataHydration.DataHydrationTypes)
 
-local function createSongInfoStore() -- line: 14
-	-- upvalues: createDataCache (copy)
-	local v4 = createDataCache()
+local function createSongInfoStore()
+	local dataCache = createDataCache()
 
-	return {
-		getSongInfo = v4.getItem,
-		updateSongs = v4.updateItems
-	}
+	return { getSongInfo = dataCache.getItem, updateSongs = dataCache.updateItems }
 end
 
 return createSongInfoStore

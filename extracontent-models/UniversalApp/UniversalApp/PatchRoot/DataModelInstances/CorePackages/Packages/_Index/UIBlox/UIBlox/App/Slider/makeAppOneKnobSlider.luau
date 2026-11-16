@@ -1,36 +1,32 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local scriptParentParentParentParent = scriptParentParentParent.Parent
-local Roact = require(scriptParentParentParentParent.Roact)
-local Cryo = require(scriptParentParentParentParent.Cryo)
-local t = require(scriptParentParentParentParent.t)
-local makeAppSlider = require(scriptParent.makeAppSlider)
-local SliderTextInput = require(scriptParent.SliderTextInput)
-local withStyle = require(scriptParentParentParent.Core.Style.withStyle)
-local validateStyle = require(scriptParentParent.Style.Validator.validateStyle)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
 
-local function wrapStyleAndRef(p1) -- line: 15
-	-- upvalues: Roact (copy), withStyle (copy), Cryo (copy)
-	return Roact.forwardRef(function(p2, p3) -- line: 16
-		-- upvalues: withStyle (copy), Cryo (copy), Roact (copy), p1 (copy)
-		return withStyle(function(p4) -- line: 17
-			-- upvalues: Cryo (copy), p2 (copy), p3 (copy), Roact (copy), p1 (copy)
-			local v24 = Cryo.Dictionary.join(p2, {
-				style = p4,
-				forwardedRef = p3
-			})
+local Roact = require(parent4.Roact)
+local Cryo = require(parent4.Cryo)
+local t = require(parent4.t)
 
-			return Roact.createElement(p1, v24)
+local makeAppSlider = require(parent.makeAppSlider)
+local SliderTextInput = require(parent.SliderTextInput)
+local withStyle = require(parent3.Core.Style.withStyle)
+local validateStyle = require(parent2.Style.Validator.validateStyle)
+
+local function wrapStyleAndRef(extended)
+	return Roact.forwardRef(function(p, forwardedRef)
+		return withStyle(function(style)
+			local joined = Cryo.Dictionary.join(p, { style = style, forwardedRef = forwardedRef })
+
+			return Roact.createElement(extended, joined)
 		end)
 	end)
 end
-local function makeAppOneKnobSlider(p5) -- line: 28
-	-- upvalues: Roact (copy), makeAppSlider (copy), t (copy), validateStyle (copy), SliderTextInput (copy), wrapStyleAndRef (copy)
-	local v16 = Roact.PureComponent:extend("OneKnobAppSliderFor" .. p5)
-	local v17 = makeAppSlider(p5, false)
 
-	v16.validateProps = t.strictInterface({
+local function makeAppOneKnobSlider(p)
+	local extended = Roact.PureComponent:extend("OneKnobAppSliderFor" .. p)
+	local appSlider = makeAppSlider(p, false)
+
+	extended.validateProps = t.strictInterface({
 		value = t.number,
 		min = t.number,
 		max = t.number,
@@ -56,16 +52,13 @@ local function makeAppOneKnobSlider(p5) -- line: 28
 		style = validateStyle,
 		containerRef = t.optional(t.table)
 	})
-	v16.defaultProps = {
-		stepInterval = 1,
-		textInputEnabled = false,
-		width = UDim.new(1, 0)
-	}
 
-	function v16.render(p6) -- line: 86
-		-- upvalues: Roact (copy), v17 (copy), SliderTextInput (copy)
-		local props = p6.props
-		local t1 = {
+	extended.defaultProps = { stepInterval = 1, width = UDim.new(1, 0), textInputEnabled = false }
+
+	function extended.render(p2)
+		local props = p2.props
+
+		local v = {
 			value = props.value,
 			min = props.min,
 			max = props.max,
@@ -87,39 +80,37 @@ local function makeAppOneKnobSlider(p5) -- line: 28
 			containerRef = props.containerRef
 		}
 
-		if not props.textInputEnabled then
-			t1.width = props.width
-			t1.position = props.position
-			t1.anchorPoint = props.anchorPoint
-			t1.layoutOrder = props.layoutOrder
-
-			return Roact.createElement(v17, t1)
+		if props.textInputEnabled then
+			v.width = UDim.new(1, -68)
+			return Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(props.width.Scale, props.width.Offset, 0, 44),
+				AnchorPoint = props.anchorPoint,
+				LayoutOrder = props.layoutOrder,
+				Position = props.position
+			}, {
+				Slider = Roact.createElement(appSlider, v),
+				TextInput = Roact.createElement(SliderTextInput, {
+					position = UDim2.new(1, 0, 0.5, 0),
+					anchorPoint = Vector2.new(1, 0.5),
+					value = props.value,
+					min = props.min,
+					max = props.max,
+					disabled = props.isDisabled,
+					stepInterval = props.stepInterval,
+					onValueChanged = props.onValueChanged
+				})
+			})
 		end
 
-		t1.width = UDim.new(1, -68)
-
-		return Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.new(props.width.Scale, props.width.Offset, 0, 44),
-			AnchorPoint = props.anchorPoint,
-			LayoutOrder = props.layoutOrder,
-			Position = props.position
-		}, {
-			Slider = Roact.createElement(v17, t1),
-			TextInput = Roact.createElement(SliderTextInput, {
-				position = UDim2.new(1, 0, 0.5, 0),
-				anchorPoint = Vector2.new(1, 0.5),
-				value = props.value,
-				min = props.min,
-				max = props.max,
-				disabled = props.isDisabled,
-				stepInterval = props.stepInterval,
-				onValueChanged = props.onValueChanged
-			})
-		})
+		v.width = props.width
+		v.position = props.position
+		v.anchorPoint = props.anchorPoint
+		v.layoutOrder = props.layoutOrder
+		return Roact.createElement(appSlider, v)
 	end
 
-	return wrapStyleAndRef(v16)
+	return wrapStyleAndRef(extended)
 end
 
 return makeAppOneKnobSlider

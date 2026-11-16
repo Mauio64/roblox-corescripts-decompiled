@@ -1,5 +1,5 @@
-local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+local parent = script:FindFirstAncestor("GraphQLServer").Parent
 
-require(Parent.LuauPolyfill)
+require(parent.LuauPolyfill)
 
 return {}

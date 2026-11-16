@@ -1,126 +1,130 @@
 local HttpService = game:GetService("HttpService")
-local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-local Cryo = require(DataHydrationParent.Cryo)
 
-require(DataHydrationParent.HttpClient)
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local parent = DataHydration.Parent
+
+local Cryo = require(parent.Cryo)
+require(parent.HttpClient)
 
 local createDataCache = require(DataHydration.createDataCache)
 local createDataResolver = require(DataHydration.createDataResolver)
-
 require(DataHydration.DataHydrationTypes)
 
 local fetchUniverseSearch = require(script.Parent.fetchUniverseSearch)
-
 require(script.Parent.UniverseSearchStoreTypes)
 
-local function paramsKey(p1) -- line: 29
-	-- upvalues: HttpService (copy)
-	return HttpService:JSONEncode(p1)
+local function paramsKey(p) -- 4 equivalent calls inferred from this helper
+	return HttpService:JSONEncode(p)
 end
-local function createUniverseSearchStore(t1: {[any]: any}?) -- line: 33
-	-- upvalues: Cryo (copy), createDataCache (copy), createDataResolver (copy), fetchUniverseSearch (copy), HttpService (copy)
-	local v12 = t1 or {}
-	local t2 = {}
-	local t3 = {}
 
-	local function applyItemPatches(p2) -- line: 39
-		-- upvalues: t3 (ref), Cryo (copy)
-		local data = p2.data
+local function createUniverseSearchStore(options)
+	local v = options or {}
 
-		if data == nil or next(t3) == nil then
-			return p2
+	local v2 = {}
+	local v3 = {}
+	local values = {}
+
+	local function applyItemPatches(data)
+		local data2 = data.data
+
+		if data2 == nil or next(values) == nil then
+			return data
 		end
 
-		local v20 = false
-		local t4 = table.create(#data)
+		local values2 = table.create(#data2)
+		local flag = false
 
-		for v22, v23 in data do
-			local v24 = t3[v23.id]
+		for k, v4 in data2 do
+			local v5 = values[v4.id]
 
-			if v24 ~= nil then
-				v20 = true
-				t4[v22] = Cryo.Dictionary.join(v23, v24)
+			if v5 == nil then
+				values2[k] = v4
 			else
-				t4[v22] = v23
+				values2[k] = Cryo.Dictionary.join(v4, v5)
+				flag = true
 			end
 		end
 
-		if not v20 then
-			return p2
+		if flag then
+			return Cryo.Dictionary.join(data, { data = values2 })
 		end
 
-		return Cryo.Dictionary.join(p2, {
-			data = t4
-		})
+		return data
 	end
 
-	local v16 = createDataCache()
-	local v17 = createDataResolver({
+	local dataCache = createDataCache()
+	local dataResolver = createDataResolver({
+		cache = dataCache,
 		supportsMultiGet = false,
-		cache = v16,
-		fetchFn = function(s1: string, _) -- line: 70
-			-- upvalues: t2 (ref), fetchUniverseSearch (copy), v12 (copy), applyItemPatches (copy)
-			local v27 = t2[s1]
-
-			return fetchUniverseSearch(v27, {
-				network = v12.network,
-				baseUrl = v12.baseUrl
-			}):andThen(applyItemPatches)
+		fetchFn = function(p: string, _)
+			return fetchUniverseSearch(v2[p], { network = v.network, baseUrl = v.baseUrl }):andThen(applyItemPatches)
 		end
 	})
 
 	return {
-		getSearch = function(p4) -- line: 79
-			-- upvalues: HttpService (copy), t2 (ref), v17 (copy)
-			local json = HttpService:JSONEncode(p4)
-
-			t2[json] = p4
-
-			return v17.getCachedItem(json)
+		getSearch = function(p)
+			local v4 = paramsKey(p) -- inferred equivalent call
+			v2[v4] = p
+			return dataResolver.getCachedItem(v4)
 		end,
-		fetchSearch = function(p5) -- line: 85
-			-- upvalues: HttpService (copy), t2 (ref), v17 (copy)
-			local json = HttpService:JSONEncode(p5)
-
-			t2[json] = p5
-
-			return v17.fetchItem(json)
+		fetchSearch = function(p)
+			local v4 = paramsKey(p) -- inferred equivalent call
+			v2[v4] = p
+			return dataResolver.fetchItem(v4)
 		end,
-		getAndFetchSearch = function(p6) -- line: 91
-			-- upvalues: HttpService (copy), t2 (ref), v17 (copy)
-			local json = HttpService:JSONEncode(p6)
+		refreshSearch = function(p)
+			local v4 = paramsKey(p) -- inferred equivalent call
+			v2[v4] = p
+			local v5 = (v3[v4] or 0) + 1
+			v3[v4] = v5
+			dataCache.resetFailedItem(v4)
 
-			t2[json] = p6
+			return fetchUniverseSearch(p, { network = v.network, baseUrl = v.baseUrl }):andThen(applyItemPatches):andThen(function(p2)
+				if v3[v4] == v5 then
+					dataCache.replaceItem(v4, p2)
+				end
 
-			return v17.getAndFetchItem(json)
+				return p2
+			end):catch(function(message)
+				if v3[v4] == v5 then
+					dataCache.markItemsAsFailed({ v4 })
+				end
+
+				error(message)
+			end)
 		end,
-		updateSearchItem = function(n1: number, t5: {[any]: any}) -- line: 99
-			-- upvalues: t3 (ref), Cryo (copy), t2 (ref), v17 (copy), applyItemPatches (copy), v16 (copy)
-			t3[n1] = Cryo.Dictionary.join(t3[n1] or {}, t5)
+		getAndFetchSearch = function(p)
+			local v4 = paramsKey(p) -- inferred equivalent call
+			v2[v4] = p
+			return dataResolver.getAndFetchItem(v4)
+		end,
+		updateSearchItem = function(p: number, p2)
+			values[p] = Cryo.Dictionary.join(values[p] or {}, p2)
 
-			for v36 in t2 do
-				local v37 = v17.getCachedItem(v36).data(false)
+			for k in v2 do
+				local data = dataResolver.getCachedItem(k).data(false)
 
-				if v37 ~= nil then
-					local v38 = applyItemPatches(v37)
+				if data == nil then
+					continue
+				end
 
-					if v38 ~= v37 then
-						v16.updateItem(v36, v38)
-					end
+				local v4 = applyItemPatches(data)
+
+				if v4 ~= data then
+					dataCache.updateItem(k, v4)
 				end
 			end
 		end,
-		invalidateAll = function() -- line: 116
-			-- upvalues: t2 (ref), v17 (copy)
-			t2 = {}
-			v17.clear()
+		invalidateAll = function()
+			v2 = {}
+			v3 = {}
+			dataResolver.clear()
 		end,
-		dispose = function() -- line: 121
-			-- upvalues: t2 (ref), t3 (ref), v17 (copy)
-			t2 = {}
-			t3 = {}
-			v17.dispose()
+		dispose = function()
+			v2 = {}
+			v3 = {}
+			values = {}
+			dataResolver.dispose()
 		end
 	}
 end

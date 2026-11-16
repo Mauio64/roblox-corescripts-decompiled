@@ -1,27 +1,22 @@
-local ParentParent = script.Parent.Parent
-local Roact = require(ParentParent.Parent.Roact)
-local AppStyleProvider = require(ParentParent.App.Style.AppStyleProvider)
-local FoundationProvider = require(ParentParent.Parent.Foundation).FoundationProvider
+local parent = script.Parent.Parent
+local Roact = require(parent.Parent.Roact)
 
-require(ParentParent.App.Style.StyleTypes)
+local AppStyleProvider = require(parent.App.Style.AppStyleProvider)
+local Foundation = require(parent.Parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
 
-return function(p1, p2) -- line: 11
-	-- upvalues: Roact (copy), FoundationProvider (copy), AppStyleProvider (copy)
+require(parent.App.Style.StyleTypes)
+
+return function(p, settings)
 	return Roact.createElement(FoundationProvider, {
 		theme = "Dark",
-		preferences = if not p2 then nil else {
-			reducedMotion = p2.reducedMotion,
-			preferredTransparency = p2.preferredTransparency
-		}
+		preferences = settings and {
+			reducedMotion = settings.reducedMotion,
+			preferredTransparency = settings.preferredTransparency
+		} or nil
 	}, Roact.createElement(AppStyleProvider, {
-		style = {
-			themeName = "Dark",
-			fontName = "Gotham",
-			settings = p2
-		}
+		style = { themeName = "Dark", fontName = "Gotham", settings = settings }
 	}, {
-		Content = Roact.createElement("Frame", {
-			Size = UDim2.new(1, 0, 1, 0)
-		}, p1)
+		Content = Roact.createElement("Frame", { Size = UDim2.new(1, 0, 1, 0) }, p)
 	}))
 end

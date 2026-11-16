@@ -1,56 +1,55 @@
-local Parent = script:FindFirstAncestor("ProgressLoading").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
+local parent = script:FindFirstAncestor("ProgressLoading").Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+
 local ProgressLoadingAssets = require(script.Parent.ProgressLoadingAssets)
 local ProgressLoadingTelemetry = require(script.Parent.ProgressLoadingTelemetry)
 local GetDeferredAssetStore = require(script.Parent.Stores.GetDeferredAssetStore)
 local Constants = require(script.Parent.Constants)
 
-local function getIsLoadingAssets(p1) -- line: 14
-	-- upvalues: GetDeferredAssetStore (copy)
-	local v11 = GetDeferredAssetStore(p1)
+local function getIsLoadingAssets(p): boolean
+	local deferredAssetStore = GetDeferredAssetStore(p)
 
-	if v11 then
-		return v11.getDownloadStatus(p1) == Enum.PrefetchDownloadStatus.InProgress
+	if deferredAssetStore then
+		return deferredAssetStore.getDownloadStatus(p) == Enum.PrefetchDownloadStatus.InProgress
 	end
 
 	return false
 end
-local function ProgressLoadingAssetsScreenGui(t1: {[any]: any}) -- line: 28
-	-- upvalues: SignalsReact (copy), getIsLoadingAssets (copy), React (copy), ProgressLoadingTelemetry (copy), Constants (copy), ProgressLoadingAssets (copy)
-	local v13 = SignalsReact.useSignalState(getIsLoadingAssets)
-	local v14, v15 = React.useState(v13)
 
-	React.useEffect(function() -- line: 32
-		-- upvalues: v13 (copy), ProgressLoadingTelemetry (copy), v15 (copy)
-		if v13 then
+local function ProgressLoadingAssetsScreenGui(p)
+	local isVisible = SignalsReact.useSignalState(getIsLoadingAssets)
+	local state, setState = React.useState(isVisible)
+
+	React.useEffect(function()
+		if isVisible then
 			ProgressLoadingTelemetry.logLoadingAssetsActivated()
-			v15(true)
+			setState(true)
 		end
-	end, { v13 })
+	end, { isVisible })
 
-	local v16 = React.useCallback(function() -- line: 39
-		-- upvalues: ProgressLoadingTelemetry (copy), v15 (copy)
+	local onHideComplete = React.useCallback(function()
 		ProgressLoadingTelemetry.logLoadingAssetsDeactivated()
-		v15(false)
+		setState(false)
 	end, {})
 
-	if not v14 then
-		return nil
+	if state then
+		return React.createElement("ScreenGui", {
+			Enabled = true,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			DisplayOrder = p.displayOrder or Constants.DISPLAY_ORDER,
+			ScreenInsets = Enum.ScreenInsets.None,
+			ClipToDeviceSafeArea = false
+		}, {
+			ProgressLoadingAssets = React.createElement(ProgressLoadingAssets, {
+				isVisible = isVisible,
+				onHideComplete = onHideComplete
+			})
+		})
 	end
 
-	return React.createElement("ScreenGui", {
-		Enabled = true,
-		ClipToDeviceSafeArea = false,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-		DisplayOrder = t1.displayOrder or Constants.DISPLAY_ORDER,
-		ScreenInsets = Enum.ScreenInsets.None
-	}, {
-		ProgressLoadingAssets = React.createElement(ProgressLoadingAssets, {
-			isVisible = v13,
-			onHideComplete = v16
-		})
-	})
+	return nil
 end
 
 return React.memo(ProgressLoadingAssetsScreenGui)

@@ -1,26 +1,33 @@
 local App = script:FindFirstAncestor("App")
-local AppParent = App.Parent
-local Core = AppParent.Core
-local AppParentParent = AppParent.Parent
-local t = require(AppParentParent.t)
-local Roact = require(AppParentParent.Roact)
-local React = require(AppParentParent.React)
-local Cryo = require(AppParentParent.Cryo)
-local Interactable = require(Core.Control.Interactable)
-local ControlState = require(Core.Control.Enum.ControlState)
-local getContentStyle = require(Core.Button.getContentStyle)
-local GetTextSize = require(Core.Text.GetTextSize)
-local CleanRichTextTags = require(Core.Text.CleanRichTextTags)
-local isReactTagProp = require(AppParent.Utility.isReactTagProp)
-local CursorKind = require(App.SelectionImage.CursorKind)
-local validateColorInfo = require(Core.Style.Validator.validateColorInfo)
-local withStyle = require(Core.Style.withStyle)
-local GenericTextLabel = require(Core.Text.GenericTextLabel.GenericTextLabel)
-local useCursor = require(AppParent.App.SelectionCursor.useCursor)
-local uDim = UDim.new(0, 8)
-local v21 = Roact.PureComponent:extend("TextButton")
+local parent = App.Parent
+local core = parent.Core
+local parent2 = parent.Parent
 
-v21.validateProps = t.strictInterface({
+local t = require(parent2.t)
+local Roact = require(parent2.Roact)
+local React = require(parent2.React)
+local Cryo = require(parent2.Cryo)
+
+local Interactable = require(core.Control.Interactable)
+
+local ControlState = require(core.Control.Enum.ControlState)
+local getContentStyle = require(core.Button.getContentStyle)
+local GetTextSize = require(core.Text.GetTextSize)
+local CleanRichTextTags = require(core.Text.CleanRichTextTags)
+local isReactTagProp = require(parent.Utility.isReactTagProp)
+local CursorKind = require(App.SelectionImage.CursorKind)
+
+local validateColorInfo = require(core.Style.Validator.validateColorInfo)
+local withStyle = require(core.Style.withStyle)
+local GenericTextLabel = require(core.Text.GenericTextLabel.GenericTextLabel)
+
+local useCursor = require(parent.App.SelectionCursor.useCursor)
+
+local udim = UDim.new(0, 8)
+
+local extended = Roact.PureComponent:extend("TextButton")
+
+extended.validateProps = t.strictInterface({
 	[React.Tag] = isReactTagProp,
 	onStateChanged = t.optional(t.callback),
 	isDisabled = t.optional(t.boolean),
@@ -44,8 +51,12 @@ v21.validateProps = t.strictInterface({
 	debugGetTextSize = t.optional(t.callback),
 	debugControlState = t.optional(ControlState.isEnumValue)
 })
-v21.defaultProps = {
+
+extended.defaultProps = {
+	anchorPoint = Vector2.new(0, 0),
 	layoutOrder = 0,
+	position = UDim2.new(0, 0, 0, 0),
+	size = UDim2.fromScale(0, 0),
 	text = "",
 	verticalPadding = 11,
 	horizontalPadding = 8,
@@ -57,112 +68,118 @@ v21.defaultProps = {
 	richText = false,
 	isDisabled = false,
 	userInteractionEnabled = true,
-	debugControlState = nil,
-	anchorPoint = Vector2.new(0, 0),
-	position = UDim2.new(0, 0, 0, 0),
-	size = UDim2.fromScale(0, 0),
-	debugGetTextSize = GetTextSize
+	debugGetTextSize = GetTextSize,
+	debugControlState = nil
 }
 
-function v21.init(p1) -- line: 107
-	-- upvalues: ControlState (copy)
-	p1:setState({
-		controlState = ControlState.Initialize
-	})
+function extended:init()
+	self:setState({ controlState = ControlState.Initialize })
 
-	function p1.onStateChanged(p2, p3) -- line: 112
-		-- upvalues: p1 (copy)
-		p1:setState({
-			controlState = p3
-		})
+	function self.onStateChanged(p, controlState)
+		self:setState({ controlState = controlState })
 
-		if p1.props.onStateChanged then
-			p1.props.onStateChanged(p2, p3)
+		if self.props.onStateChanged then
+			self.props.onStateChanged(p, controlState)
 		end
 	end
 end
-function v21.render(p4) -- line: 122
-	-- upvalues: withStyle (copy)
-	return withStyle(function(p5) -- line: 123
-		-- upvalues: p4 (copy)
-		return p4:renderWithProviders(p5, nil, nil)
+
+function extended:render()
+	return withStyle(function(p)
+		return self:renderWithProviders(p, nil, nil)
 	end)
 end
-function v21.renderWithProviders(p6, p7, p8, p9) -- line: 128
-	-- upvalues: ControlState (copy), getContentStyle (copy), CleanRichTextTags (copy), Roact (copy), Interactable (copy), React (copy), uDim (copy), CursorKind (copy), GenericTextLabel (copy)
-	local v30 = p6.props.debugControlState or p6.state.controlState
-	local t1 = {
-		[ControlState.Default] = p6.props.colorStyleDefault,
-		[ControlState.Hover] = p6.props.colorStyleHover
-	}
-	local v32 = getContentStyle(t1, v30, p7)
-	local v33 = p7.Font[p6.props.fontStyle]
-	local v34 = v33.RelativeSize * p7.Font.BaseSize
-	local X = p6.props.debugGetTextSize(p6.props.richText and CleanRichTextTags(p6.props.text) or p6.props.text, v34, v33.Font, Vector2.new(10000, 0)).X
-	local v36 = if not p6.props.showBackground then {
-		Color = nil,
-		Transparency = 1
-	} else p6.props.backgroundColor or p7.Theme.UIMuted
-	local verticalPadding = p6.props.verticalPadding
-	local horizontalPadding = p6.props.horizontalPadding
-	local BackgroundOnHover = p7.Theme.BackgroundOnHover
 
-	if p6.props.hoverBackgroundEnabled and v30 == ControlState.Hover then
-		v36 = if not v36.Color then BackgroundOnHover else {
-			Color = v36.Color:Lerp(BackgroundOnHover.Color, 1 - BackgroundOnHover.Transparency),
-			Transparency = v36.Transparency
-		}
+function extended:renderWithProviders(p, callback, callback2)
+	local debugControlState = self.props.debugControlState or self.state.controlState
+
+	local contentStyle = getContentStyle(
+		{
+			[ControlState.Default] = self.props.colorStyleDefault,
+			[ControlState.Hover] = self.props.colorStyleHover
+		},
+		debugControlState,
+		p
+	)
+	local fontStyle = p.Font[self.props.fontStyle]
+
+	local v = fontStyle.RelativeSize * p.Font.BaseSize
+	local x = self.props.debugGetTextSize(
+		self.props.richText and CleanRichTextTags(self.props.text) or self.props.text,
+		v,
+		fontStyle.Font,
+		Vector2.new(10000, 0)
+	).X
+
+	local v2 = not self.props.showBackground and { Color = nil, Transparency = 1 }
+		or self.props.backgroundColor
+		or p.Theme.UIMuted
+
+	local verticalPadding = self.props.verticalPadding
+	local horizontalPadding = self.props.horizontalPadding
+
+	local backgroundOnHover = p.Theme.BackgroundOnHover
+
+	if self.props.hoverBackgroundEnabled and debugControlState == ControlState.Hover then
+		v2 = v2.Color and {
+			Color = v2.Color:Lerp(backgroundOnHover.Color, 1 - backgroundOnHover.Transparency),
+			Transparency = v2.Transparency
+		} or backgroundOnHover
 	end
 
-	return Roact.createElement(Interactable, {
-		[React.Tag] = p6.props[React.Tag],
-		AnchorPoint = p6.props.anchorPoint,
-		LayoutOrder = p6.props.layoutOrder,
-		Position = p6.props.position,
-		Size = p6.props.size,
-		isDisabled = p6.props.isDisabled,
-		onStateChanged = p6.onStateChanged,
-		userInteractionEnabled = p6.props.userInteractionEnabled,
-		BackgroundColor3 = v36.Color,
-		BackgroundTransparency = v36.Transparency,
-		AutoButtonColor = false,
-		SelectionImageObject = if not p9 then p8 and p8(CursorKind.RoundedRectNoInset) else p9(uDim),
-		[Roact.Event.Activated] = p6.props.onActivated
-	}, {
-		corner = Roact.createElement("UICorner", {
-			CornerRadius = uDim
-		}),
+	local createElement = Roact.createElement
+	local v3 = {
+		[React.Tag] = self.props[React.Tag],
+		AnchorPoint = self.props.anchorPoint,
+		LayoutOrder = self.props.layoutOrder,
+		Position = self.props.position,
+		Size = self.props.size,
+		isDisabled = self.props.isDisabled,
+		onStateChanged = self.onStateChanged,
+		userInteractionEnabled = self.props.userInteractionEnabled,
+		BackgroundColor3 = v2.Color,
+		BackgroundTransparency = v2.Transparency,
+		AutoButtonColor = false
+	}
+	local selectionImageObject
+
+	if callback2 then
+		selectionImageObject = callback2(udim)
+	else
+		selectionImageObject = callback and callback(CursorKind.RoundedRectNoInset)
+	end
+
+	v3.SelectionImageObject = selectionImageObject
+
+	v3[Roact.Event.Activated] = self.props.onActivated
+	return createElement(Interactable, v3, {
+		corner = Roact.createElement("UICorner", { CornerRadius = udim }),
 		sizeConstraint = Roact.createElement("UISizeConstraint", {
-			MinSize = Vector2.new(X + horizontalPadding * 2, v34 + verticalPadding * 2)
+			MinSize = Vector2.new(x + horizontalPadding * 2, v + verticalPadding * 2)
 		}),
 		textLabel = Roact.createElement(GenericTextLabel, {
-			BackgroundTransparency = 1,
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
-			Text = p6.props.text,
-			fontStyle = v33,
-			colorStyle = v32,
-			RichText = p6.props.richText
+			BackgroundTransparency = 1,
+			Text = self.props.text,
+			fontStyle = fontStyle,
+			colorStyle = contentStyle,
+			RichText = self.props.richText
 		})
 	})
 end
 
-local function TextButtonFunctionalWrapper(p10) -- line: 203
-	-- upvalues: useCursor (copy), uDim (copy), Roact (copy), v21 (copy), Cryo (copy)
-	local v41 = useCursor(uDim)
-
-	return Roact.createElement(v21, Cryo.Dictionary.join(p10, {
-		cursor = v41
-	}))
+local function TextButtonFunctionalWrapper(p)
+	local cursor = useCursor(udim)
+	return Roact.createElement(extended, Cryo.Dictionary.join(p, { cursor = cursor }))
 end
 
-local v23 = Roact.PureComponent:extend("TextButtonOuterWrapper")
+local extended2 = Roact.PureComponent:extend("TextButtonOuterWrapper")
 
-v23.validateProps = v21.validateProps
+extended2.validateProps = extended.validateProps
 
-function v23.render(p11) -- line: 217
-	-- upvalues: Roact (copy), TextButtonFunctionalWrapper (copy)
-	return Roact.createElement(TextButtonFunctionalWrapper, p11.props)
+function extended2.render(p)
+	return Roact.createElement(TextButtonFunctionalWrapper, p.props)
 end
 
-return v23
+return extended2

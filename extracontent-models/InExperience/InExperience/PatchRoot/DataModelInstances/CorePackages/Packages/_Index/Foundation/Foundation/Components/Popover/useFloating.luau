@@ -1,226 +1,203 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local Flags = require(Foundation.Utility.Flags)
+local parent = Foundation.Parent
 
 require(Foundation.Enums.PopoverAlign)
 require(Foundation.Enums.PopoverSide)
-
-local React = require(FoundationParent.React)
+local React = require(parent.React)
 local positioning = require(script.Parent.positioning)
 
 require(Foundation.Components.Types)
 
-local function useConnectSignals(p1, t1: {[any]: any}, p2) -- line: 27
-	-- upvalues: React (copy)
-	local v11 = React.useRef({})
+local function useConnectSignals(instance, items, ref)
+	local ref2 = React.useRef({})
 
-	React.useLayoutEffect(function() -- line: 34
-		-- upvalues: p1 (copy), t1 (copy), v11 (copy), p2 (copy)
-		if p1 ~= nil then
-			for _, v36 in t1 do
-				local v37 = if typeof(p1) ~= "Instance" then p1:GetPropertyChangedSignal(v36) else p1:GetPropertyChangedSignal(v36)
+	React.useLayoutEffect(function()
+		if instance ~= nil then
+			for _, propertyName in items do
+				if typeof(instance) == "Instance" then
+				end
 
-				v11.current[v36] = v37:Connect(if type(p2) ~= "table" then p2 else function() -- line: 43
-					-- upvalues: p2 (copy)
-					p2.current()
-				end)
+				local propertyChangedSignal = instance:GetPropertyChangedSignal(propertyName)
+
+				local current = ref2.current
+				local v
+
+				if type(ref) == "table" then
+					v = function()
+						ref.current()
+					end
+				else
+					v = ref
+				end
+
+				current[propertyName] = propertyChangedSignal:Connect(v)
 			end
 		end
 
-		return function() -- line: 51
-			-- upvalues: v11 (copy)
-			for _, v66 in v11.current do
-				v66:Disconnect()
+		return function()
+			for _, connection in ref2.current do
+				connection:Disconnect()
 			end
 		end
-	end, {
-		p1,
-		p2
-	})
+	end, { instance, ref })
 end
-local function useFloating(b1: boolean, p3, p4, p5, p6, p7, n1: number?) -- line: 59
-	-- upvalues: React (copy), Flags (copy), positioning (copy), useConnectSignals (copy)
-	local v19, v20 = React.useBinding(Vector2.new())
-	local v21, v22 = React.useBinding(true)
-	local v23, v24 = React.useBinding(UDim2.new())
-	local v25, v26 = React.useBinding(Vector2.new())
-	local v27, v28 = React.useBinding(Vector2.new())
-	local v29, v30 = React.useBinding(Vector2.new(0, 0))
-	local v31 = React.useRef(function() -- line: 74
-	end)
-	local v32 = if not Flags.FoundationPopoverClipAwareVisibility then nil else React.useRef({})
-	local v33 = if not Flags.FoundationPopoverClipAwareVisibility then nil else React.useRef(false)
-	local v34 = React.useCallback(function() -- line: 82
-		-- upvalues: b1 (copy), p3 (copy), p4 (copy), p5 (copy), v22 (copy), positioning (copy), Flags (copy), v32 (copy), p6 (copy), p7 (copy), n1 (copy), v24 (copy), v26 (copy), v28 (copy), v20 (copy), v30 (copy)
-		if not b1 or (not p3 or not p4 or not p5) then
-			v22(false)
 
+local function useFloating(flag: boolean, guiObject, p, p2, p3, p4, value: number?)
+	local v, v2 = React.useBinding(Vector2.new())
+	local v3, v4 = React.useBinding(true)
+	local v5, v6 = React.useBinding(UDim2.new())
+	local v7, v8 = React.useBinding(Vector2.new())
+	local v9, v10 = React.useBinding(Vector2.new())
+	local v11, v12 = React.useBinding(Vector2.new(0, 0))
+	local ref = React.useRef(function() end)
+	local ref2 = React.useRef({})
+	local ref3 = React.useRef(false)
+
+	local v13 = React.useCallback(function()
+		if not (flag and guiObject and p and p2) then
+			v4(false)
 			return
 		end
 
-		local AbsolutePosition = p3.AbsolutePosition
-		local AbsoluteSize = p3.AbsoluteSize
-		local AbsoluteSize2 = p4.AbsoluteSize
-		local AbsoluteSize3 = p5.AbsoluteSize
-		local AbsolutePosition2 = p5.AbsolutePosition
-		local rect = Rect.new(AbsolutePosition, AbsolutePosition + AbsoluteSize)
-		local rect2 = Rect.new(AbsolutePosition2, AbsolutePosition2 + AbsoluteSize3)
+		local absolutePosition = guiObject.AbsolutePosition
+		local absoluteSize = guiObject.AbsoluteSize
+
+		local absoluteSize2 = p.AbsoluteSize
+
+		local absoluteSize3 = p2.AbsoluteSize
+		local absolutePosition2 = p2.AbsolutePosition
+		local rect = Rect.new(absolutePosition, absolutePosition + absoluteSize)
+		local rect2 = Rect.new(absolutePosition2, absolutePosition2 + absoluteSize3)
 
 		if not positioning.isOnScreen(rect, rect2) then
-			v22(false)
-
+			v4(false)
 			return
 		end
 
-		if Flags.FoundationPopoverClipAwareVisibility then
-			local v45 = nil
+		local v13 = nil
 
-			for _, v47 in v32.current do
-				local rect3 = Rect.new(v47.AbsolutePosition, v47.AbsolutePosition + v47.AbsoluteSize)
+		for _, v14 in ref2.current do
+			local rect3 = Rect.new(v14.AbsolutePosition, v14.AbsolutePosition + v14.AbsoluteSize)
 
-				v45 = if v45 ~= nil then Rect.new(Vector2.new(math.max(v45.Min.X, rect3.Min.X), (math.max(v45.Min.Y, rect3.Min.Y))), Vector2.new(math.min(v45.Max.X, rect3.Max.X), (math.min(v45.Max.Y, rect3.Max.Y)))) else rect3
-			end
-
-			if v45 and not positioning.isOnScreen(rect, v45) then
-				v22(false)
-
-				return
+			if v13 == nil then
+				v13 = rect3
+			else
+				v13 = Rect.new(
+					Vector2.new(math.max(v13.Min.X, rect3.Min.X), (math.max(v13.Min.Y, rect3.Min.Y))),
+					Vector2.new(math.min(v13.Max.X, rect3.Max.X), (math.min(v13.Max.Y, rect3.Max.Y)))
+				)
 			end
 		end
 
-		local v49 = if type(p6) ~= "table" then p6 else p6.position
-		local v50 = type(p6) ~= "table" and 0 or p6.offset
-		local v51 = p7
-		local n2 = 0
-
-		if type(p7) == "table" then
-			v51 = p7.position
-			n2 = p7.offset
+		if v13 and not positioning.isOnScreen(rect, v13) then
+			v4(false)
+			return
 		end
 
-		local v53 = n1 or 0
-		local v54 = positioning.calculatePopoverBounds(v49, v50, n2, v53, AbsoluteSize2)
-		local v55 = positioning.calculateSide(v49, rect, rect2, v54)
-		local v56, v57, v58 = positioning.calculatePositions(v55, v50, v51, n2, rect, rect2, v53, AbsoluteSize2)
+		local v14 = if type(p3) == "table" then p3.position else p3
+		local v15 = type(p3) ~= "table" and 0 or p3.offset
+		local v16 = p4
+		local v17
 
-		v24(UDim2.fromOffset(AbsoluteSize2.X, AbsoluteSize2.Y))
-		v26(AbsoluteSize3)
-		v28(v57 + v56)
-		v20(v56)
-		v30(v58)
-		v22(true)
-
-		local _ = p4.AbsolutePosition
-	end, {
-		b1,
-		p3,
-		p4,
-		p5,
-		p6,
-		p7,
-		n1
-	})
-
-	if Flags.FoundationPopoverClipAwareVisibility then
-		function v31.current() -- line: 175
-			-- upvalues: v33 (copy), v34 (copy)
-			if v33.current then
-				return
-			end
-
-			v33.current = true
-			task.defer(function() -- line: 180
-				-- upvalues: v33 (copy), v34 (copy)
-				v33.current = false
-				v34()
-			end)
+		if type(p4) == "table" then
+			v16 = p4.position
+			v17 = p4.offset
+		else
+			v17 = 0
 		end
-	else
-		v31.current = v34
+
+		local v18 = value or 0
+
+		local popoverBounds = positioning.calculatePopoverBounds(v14, v15, v17, v18, absoluteSize2)
+
+		local side = positioning.calculateSide(v14, rect, rect2, popoverBounds)
+
+		local positions, v19, v20 = positioning.calculatePositions(side, v15, v16, v17, rect, rect2, v18, absoluteSize2)
+
+		v6(UDim2.fromOffset(absoluteSize2.X, absoluteSize2.Y))
+		v8(absoluteSize3)
+		v10(v19 + positions)
+		v2(positions)
+		v12(v20)
+		v4(true)
+
+		local _absolutePosition = p.AbsolutePosition
+	end, { flag, guiObject, p, p2, p3, p4, value })
+
+	function ref.current()
+		if ref3.current then
+			return
+		end
+
+		ref3.current = true
+		task.defer(function()
+			ref3.current = false
+			v13()
+		end)
 	end
+	useConnectSignals(guiObject, { "AbsolutePosition", "AbsoluteSize" }, ref)
+	useConnectSignals(p, { "AbsoluteSize" }, ref)
+	useConnectSignals(p2, { "AbsoluteSize" }, ref)
+	React.useLayoutEffect(function()
+		if not flag or (typeof(guiObject) ~= "Instance" or not guiObject:IsA("GuiObject")) then
+			return
+		end
 
-	useConnectSignals(p3, {
-		"AbsolutePosition",
-		"AbsoluteSize"
-	}, v31)
-	useConnectSignals(p4, { "AbsoluteSize" }, v31)
-	useConnectSignals(p5, { "AbsoluteSize" }, v31)
+		local v14 = guiObject
+		local v15 = ref2
+		local connections = {}
 
-	if Flags.FoundationPopoverClipAwareVisibility then
-		React.useLayoutEffect(function() -- line: 195
-			-- upvalues: b1 (copy), p3 (copy), v32 (copy), v31 (copy)
-			if not b1 then
-				return
-			end
-
-			if typeof(p3) ~= "Instance" or not p3:IsA("GuiObject") then
-				return
-			end
-
-			local v60 = p3
-			local v61 = v32
-			local t2 = {}
-
-			local function rebuild() -- line: 206
-				-- upvalues: t2 (copy), v60 (copy), v31 (copy), v61 (copy)
-				for _, v68 in t2 do
-					v68:Disconnect()
-				end
-
-				table.clear(t2)
-
-				local t3 = {}
-				local Parent = v60.Parent
-
-				while Parent and Parent:IsA("GuiObject") do
-					if Parent.ClipsDescendants then
-						table.insert(t3, Parent)
-						table.insert(t2, Parent:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 220
-							-- upvalues: v31 (copy)
-							v31.current()
-						end))
-						table.insert(t2, Parent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 226
-							-- upvalues: v31 (copy)
-							v31.current()
-						end))
-					end
-
-					Parent = Parent.Parent
-				end
-
-				v61.current = t3
-
-				if #t3 > 0 then
-					v31.current()
-				end
-			end
-
-			rebuild()
-
-			local connection = v60.AncestryChanged:Connect(rebuild)
-
-			return function() -- line: 244
-				-- upvalues: connection (copy), t2 (copy), v61 (copy)
+		local function rebuild()
+			for _, connection in connections do
 				connection:Disconnect()
+			end
 
-				for _, v72 in t2 do
-					v72:Disconnect()
+			table.clear(connections)
+
+			local parent2 = v14.Parent
+			local parents = {}
+
+			while parent2 and parent2:IsA("GuiObject") do
+				if parent2.ClipsDescendants then
+					table.insert(parents, parent2)
+					table.insert(connections, parent2:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+						ref.current()
+					end))
+
+					table.insert(connections, parent2:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+						ref.current()
+					end))
 				end
 
-				v61.current = {}
+				parent2 = parent2.Parent
 			end
-		end, {
-			p3,
-			b1
-		})
-	end
 
-	React.useLayoutEffect(function() -- line: 254
-		-- upvalues: v34 (copy)
-		v34()
-	end, { v34 })
+			v15.current = parents
 
-	return v19, v21, v23, v27, v25, v29
+			if #parents > 0 then
+				ref.current()
+			end
+		end
+
+		rebuild()
+		local ancestryChangedConnection = v14.AncestryChanged:Connect(rebuild)
+
+		return function()
+			ancestryChangedConnection:Disconnect()
+
+			for _, connection in connections do
+				connection:Disconnect()
+			end
+
+			v15.current = {}
+		end
+	end, { guiObject, flag })
+
+	React.useLayoutEffect(function()
+		v13()
+	end, { v13 })
+
+	return v, v3, v5, v9, v7, v11
 end
 
 return useFloating

@@ -1,738 +1,877 @@
 local Players = game:GetService("Players")
 local DataHydration = script:FindFirstAncestor("DataHydration")
-local DataHydrationParent = DataHydration.Parent
-
+local parent = DataHydration.Parent
 require(DataHydration.DataHydrationTypes)
-
-local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
+local DataHydrationUtils = require(DataHydration.DataHydrationUtils)
+local getLocalPlayerUserId = DataHydrationUtils.getLocalPlayerUserId
+local observeLocalPlayerUserId = DataHydrationUtils.observeLocalPlayerUserId
 local createRequestQueue = require(DataHydration.createRequestQueue)
 local createMutationLayer = require(DataHydration.createMutationLayer)
-local Promise = require(DataHydrationParent.Promise)
-local SharedFlags = require(DataHydrationParent.SharedFlags)
-local FFlagLuaAppDataHydrationDataResolverOnClear = SharedFlags.FFlagLuaAppDataHydrationDataResolverOnClear
-local FFlagSduiChartsSupport = SharedFlags.FFlagSduiChartsSupport
-local FFlagLuaAppDataHydrationOptimisticMutationLayer = SharedFlags.FFlagLuaAppDataHydrationOptimisticMutationLayer
-local v12 = game:DefineFastInt("LuaAppDataHydrationDefaultBatchSize", 50)
-local v13 = game:DefineFastInt("LuaAppDataHydrationQueueProcessDelaySec", 1)
-local v14 = game:DefineFastInt("LuaAppDataHydrationDefaultRequestTimeoutSec", 30)
+local Promise = require(parent.Promise)
+local Signals = require(parent.Signals)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagDataHydrationAccountReset = SharedFlags.FFlagDataHydrationAccountReset
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSduiReleaseSearchResultsPageState = SharedFlags2.FFlagSduiReleaseSearchResultsPageState
+local FFlagBuildExperienceMonetizationMultiKind = require(DataHydration.Flags.FFlagBuildExperienceMonetizationMultiKind)
 
-local function createDataResolver(t1: {[any]: any}) -- line: 27
-	-- upvalues: v12 (copy), v13 (copy), v14 (copy), createRequestQueue (copy), getLocalPlayerUserId (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), createMutationLayer (copy), Promise (copy), FFlagSduiChartsSupport (copy), FFlagLuaAppDataHydrationDataResolverOnClear (copy), Players (copy)
-	local v17 = t1.supportsMultiGet == nil or t1.supportsMultiGet
-	local u18 = t1.requestBatchSize or v12
+local defineFastInt = game:DefineFastInt("LuaAppDataHydrationDefaultBatchSize", 50)
+local defineFastInt2 = game:DefineFastInt("LuaAppDataHydrationQueueProcessDelaySec", 1)
 
-	if not v17 and not t1.requestBatchSize then
-		u18 = 1
+local defineFastInt3 = game:DefineFastInt("LuaAppDataHydrationDefaultRequestTimeoutSec", 30)
+
+local function createDataResolver(data)
+	local v = data.supportsMultiGet == nil or data.supportsMultiGet
+	local requestBatchSize = data.requestBatchSize or defineFastInt
+	local v2 = not (v or data.requestBatchSize) and 1 or requestBatchSize
+
+	local queueProcessDelaySec = data.queueProcessDelaySec or defineFastInt2
+	local v3 = not (v or data.queueProcessDelaySec) and 0 or queueProcessDelaySec
+
+	local requestTimeoutSec = data.requestTimeoutSec or defineFastInt3
+	local cache = data.cache
+	local requestQueue = createRequestQueue()
+
+	local v4 = {}
+
+	local v5 = {}
+	local thread = nil
+	local v6 = getLocalPlayerUserId()
+
+	local v7 = nil
+	local v8 = nil
+	local v9, v10
+
+	if FFlagDataHydrationAccountReset then
+		v9, v10 = Signals.createSignal(0)
+	else
+		v9 = nil
+		v10 = nil
 	end
 
-	local u19 = t1.queueProcessDelaySec or v13
-
-	if not v17 and not t1.queueProcessDelaySec then
-		u19 = 0
+	if FFlagBuildExperienceMonetizationMultiKind then
+		v7, v8 = Signals.createSignal(0)
 	end
 
-	local v20 = t1.requestTimeoutSec or v14
-	local cache = t1.cache
-	local v22 = createRequestQueue()
-	local t2 = {}
-	local u24 = nil
-	local u25 = getLocalPlayerUserId()
-	local u26 = nil
+	local v11
 
-	if FFlagLuaAppDataHydrationOptimisticMutationLayer and t1.supportsMutations then
-		u26 = createMutationLayer()
+	if data.supportsMutations then
+		v11 = createMutationLayer()
+	else
+		v11 = nil
 	end
 
-	local function FORCE_FETCH() -- line: 65
+	local function FORCE_FETCH(): boolean
 		return true
 	end
-	local function logError(p1) -- line: 69
-		-- upvalues: t1 (copy)
-		if t1.logError then
-			t1.logError(p1)
+
+	local function logError(p) -- 1 equivalent call inferred from this helper
+		if data.logError then
+			data.logError(p)
 		end
 	end
-	local function handleFailure(s1: string, t3: {[any]: any}, n1: number?) -- line: 76
-		-- upvalues: u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-		if n1 ~= u25 then
+
+	local function isCurrentRequest(p: number?, p2: number?): boolean
+		return p2 == v9(false) and p == getLocalPlayerUserId()
+	end
+
+	local function snapshotEpochs(items) -- 4 equivalent calls inferred from this helper
+		local result = {}
+
+		for _, item in items do
+			result[item] = v5[item] or 0
+		end
+
+		return result
+	end
+
+	local function filterCurrentIds(items, p)
+		local result = {}
+
+		for _, item in items do
+			if p[item] == (v5[item] or 0) then
+				table.insert(result, item)
+			end
+		end
+
+		return result
+	end
+
+	local function handleFailure(p: string, p2, p3: number?, p4: number?, p5)
+		if FFlagDataHydrationAccountReset then
+			local v12
+
+			if p4 == v9(false) then
+				v12 = p3 == getLocalPlayerUserId()
+			else
+				v12 = false
+			end
+
+			if not v12 then
+				return
+			end
+		elseif p3 ~= v6 then
 			return
 		end
 
-		if t1.logError then
-			t1.logError(s1)
-		end
+		local v12 = filterCurrentIds(p2, p5)
 
-		for _, v42 in t3 do
-			t2[v42] = nil
-		end
-
-		cache.markItemsAsFailed(t3)
-
-		if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-			u26.drainCommitted(t3, cache.updateItem)
-		end
-	end
-	local function handleSuccess(t4: {[any]: any}, t5: {[any]: any}, n2: number?) -- line: 93
-		-- upvalues: u25 (ref), t2 (ref), t1 (copy), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-		if n2 ~= u25 then
+		if #v12 == 0 then
 			return
 		end
 
-		for v46, _ in t4 do
-			t2[v46] = nil
+		logError(p) -- inferred equivalent call
+
+		for _, v13 in v12 do
+			v4[v13] = nil
 		end
 
-		if t1.replaceItems then
-			cache.replaceItems(t4)
+		cache.markItemsAsFailed(v12)
+
+		if v11 then
+			v11.drainCommitted(v12, cache.updateItem)
+		end
+	end
+
+	local function handleSuccess(items, p, p2: number?, p3: number?, p4)
+		if FFlagDataHydrationAccountReset then
+			local v12
+
+			if p3 == v9(false) then
+				v12 = p2 == getLocalPlayerUserId()
+			else
+				v12 = false
+			end
+
+			if not v12 then
+				return
+			end
+		elseif p2 ~= v6 then
+			return
+		end
+
+		local v12 = filterCurrentIds(p, p4)
+		local v13 = {}
+
+		for k, item in items do
+			if p4[k] == nil or p4[k] == (v5[k] or 0) then
+				v13[k] = item
+			end
+		end
+
+		for k, _ in v13 do
+			v4[k] = nil
+		end
+
+		if data.replaceItems then
+			cache.replaceItems(v13)
 		else
-			cache.updateItems(t4)
+			cache.updateItems(v13)
 		end
 
-		local t6 = {}
+		local v14 = {}
 
-		if FFlagLuaAppDataHydrationOptimisticMutationLayer then
-			for _, v50 in t5 do
-				if t4[v50] == nil then
-					if u26 and u26.isCommitted(v50) then
-						t2[v50] = nil
-					else
-						table.insert(t6, v50)
-					end
-				end
+		for _, v15 in v12 do
+			if v13[v15] ~= nil then
+				continue
 			end
 
-			if u26 then
-				u26.drainCommitted(t5, cache.updateItem)
-			end
-		else
-			for _, v52 in t5 do
-				if t4[v52] == nil then
-					table.insert(t6, v52)
-				end
+			if v11 and v11.isCommitted(v15) then
+				v4[v15] = nil
+			else
+				table.insert(v14, v15)
 			end
 		end
 
-		if #t6 > 0 then
-			if n2 ~= u25 then
+		if v11 then
+			v11.drainCommitted(v12, cache.updateItem)
+		end
+
+		if #v14 > 0 then
+			handleFailure("Items missing in response", v14, p2, p3, p4)
+		end
+	end
+
+	local function scheduleFetch()
+		if thread ~= nil or requestQueue.isEmpty() then
+			return
+		end
+
+		thread = task.delay(v3, function()
+			local v12 = v6
+			local v13
+
+			if FFlagDataHydrationAccountReset then
+				v13 = v9(false)
+			else
+				v13 = nil
+			end
+
+			thread = nil
+
+			if requestQueue.isEmpty() then
 				return
 			end
 
-			if t1.logError then
-				t1.logError("Items missing in response")
+			local v14 = requestQueue.pop(v2)
+
+			for _, v15 in v14 do
+				v4[v15] = true
 			end
 
-			for _, v54 in t6 do
-				t2[v54] = nil
-			end
+			local result2 = snapshotEpochs(v14) -- inferred equivalent call
+			local items = cache.getItems(v14)
 
-			cache.markItemsAsFailed(t6)
+			local flag = false
 
-			if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-				u26.drainCommitted(t6, cache.updateItem)
-			end
-		end
-	end
-	local function scheduleFetch() -- line: 138
-		-- upvalues: u24 (ref), v22 (copy), u19 (ref), u25 (ref), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-		if u24 ~= nil or v22.isEmpty() then
-			return
-		end
-
-		u24 = task.delay(u19, function() -- line: 144
-			-- upvalues: u25 (ref), u24 (ref), v22 (copy), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-			local v98 = u25
-
-			u24 = nil
-
-			if v22.isEmpty() then
-				return
-			end
-
-			local v99 = v22.pop(u18)
-
-			for _, v101 in v99 do
-				t2[v101] = true
-			end
-
-			local v102 = cache.getItems(v99)
-			local thread = task.delay(v20, function() -- line: 159
-				-- upvalues: v20 (copy), v99 (copy), v98 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-				local v128 = `No fetch response after { v20 } sec`
-				local v129 = v99
-
-				if v98 ~= u25 then
-					return
+			local thread2 = task.delay(requestTimeoutSec, function()
+				if data.ignoreResponsesAfterTimeout then
+					flag = true
 				end
 
-				if t1.logError then
-					t1.logError(v128)
-				end
-
-				for _, v131 in v129 do
-					t2[v131] = nil
-				end
-
-				cache.markItemsAsFailed(v129)
-
-				if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-					u26.drainCommitted(v129, cache.updateItem)
-				end
+				handleFailure(`No fetch response after {requestTimeoutSec} sec`, v14, v12, v13, result2)
 			end)
-			local ok, result = pcall(function() -- line: 163
-				-- upvalues: v17 (copy), v99 (copy), v102 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v98 (copy), thread (copy), u25 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-				if not v17 then
-					local t7 = {}
 
-					for _, v134 in v99 do
-						local v135 = v102[v134]
-
-						table.insert(t7, t1.fetchFn(v134, v135))
-					end
-
-					Promise.all(t7):andThen(function(p2) -- line: 172
-						-- upvalues: v99 (copy), handleSuccess (copy), v98 (copy), thread (copy)
-						local t8 = {}
-
-						for v154, v155 in v99 do
-							t8[v155] = p2[v154]
+			local success, result = pcall(function()
+				if v then
+					data.fetchFn(items):andThen(function(p)
+						if flag then
+							return
 						end
 
-						handleSuccess(t8, v99, v98)
-						task.cancel(thread)
-					end):catch(function(p3) -- line: 180
-						-- upvalues: v99 (copy), v98 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
-						local v157 = v99
-
-						if v98 == u25 then
-							if t1.logError then
-								t1.logError(p3)
-							end
-
-							for _, v159 in v157 do
-								t2[v159] = nil
-							end
-
-							cache.markItemsAsFailed(v157)
-
-							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-								u26.drainCommitted(v157, cache.updateItem)
-							end
+						handleSuccess(p, v14, v12, v13, result2)
+						task.cancel(thread2)
+					end):catch(function(p)
+						if flag then
+							return
 						end
 
-						task.cancel(thread)
+						handleFailure(p, v14, v12, v13, result2)
+						task.cancel(thread2)
 					end)
 
 					return
 				end
 
-				t1.fetchFn(v102):andThen(function(t9: {[any]: any}) -- line: 186
-					-- upvalues: handleSuccess (copy), v99 (copy), v98 (copy), thread (copy)
-					handleSuccess(t9, v99, v98)
-					task.cancel(thread)
-				end):catch(function(p4) -- line: 190
-					-- upvalues: v99 (copy), v98 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
-					local v162 = v99
+				local v15 = {}
 
-					if v98 == u25 then
-						if t1.logError then
-							t1.logError(p4)
-						end
+				for _, v16 in v14 do
+					local item = items[v16]
+					table.insert(v15, data.fetchFn(v16, item))
+				end
 
-						for _, v164 in v162 do
-							t2[v164] = nil
-						end
-
-						cache.markItemsAsFailed(v162)
-
-						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-							u26.drainCommitted(v162, cache.updateItem)
-						end
+				Promise.all(v15):andThen(function(p)
+					if flag then
+						return
 					end
 
-					task.cancel(thread)
+					local v16 = {}
+
+					for k, v17 in v14 do
+						v16[v17] = p[k]
+					end
+
+					handleSuccess(v16, v14, v12, v13, result2)
+					task.cancel(thread2)
+				end):catch(function(p)
+					if flag then
+						return
+					end
+
+					handleFailure(p, v14, v12, v13, result2)
+					task.cancel(thread2)
 				end)
 			end)
 
-			if not ok then
-				if v98 == u25 then
-					if t1.logError then
-						t1.logError(result)
-					end
-
-					for _, v107 in v99 do
-						t2[v107] = nil
-					end
-
-					cache.markItemsAsFailed(v99)
-
-					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-						u26.drainCommitted(v99, cache.updateItem)
-					end
-				end
-
-				task.cancel(thread)
+			if not success then
+				handleFailure(result, v14, v12, v13, result2)
+				task.cancel(thread2)
 			end
 
 			scheduleFetch()
 		end)
 	end
-	local function getAndFetchItems(t10: {[any]: any}, p5: ((...any) -> ...any)?) -- line: 216
-		-- upvalues: cache (copy), v22 (copy), t2 (ref), u24 (ref), u19 (ref), u25 (ref), u18 (ref), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-		local v58, v59 = cache.getItems(t10, p5)
-		local t11 = {}
-		local t12 = {}
 
-		for v62, v63 in v58 do
-			t11[v62] = v63
-
-			if v59[v62] and (not v22.hasItem(v62) and t2[v62] == nil) then
-				v22.push(v62)
-				table.insert(t12, v62)
-			end
+	local function isRequestInQueueOrInFlight(p: string): boolean -- 1 equivalent call inferred from this helper
+		if requestQueue.hasItem(p) then
+			return true
 		end
 
-		if #t12 > 0 then
-			cache.resetFailedItems(t12)
-		end
+		return v4[p] ~= nil
+	end
 
-		if not v22.isEmpty() and u24 == nil then
-			if v22.isEmpty() then
-				return t11
+	local function getAndFetchItems(p, callback, p2: number?)
+		local items, v12 = cache.getItems(p, callback, p2)
+		local fetchItems = {}
+		local v13 = {}
+
+		for k, item in items do
+			fetchItems[k] = item
+
+			if not v12[k] or requestQueue.hasItem(k) or v4[k] ~= nil then
+				continue
 			end
 
-			u24 = task.delay(u19, function() -- line: 144
-				-- upvalues: u25 (ref), u24 (ref), v22 (copy), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-				local v108 = u25
+			requestQueue.push(k)
+			table.insert(v13, k)
+		end
 
-				u24 = nil
+		if #v13 > 0 then
+			cache.resetFailedItems(v13)
+		end
 
-				if v22.isEmpty() then
+		if not requestQueue.isEmpty() and thread == nil then
+			if requestQueue.isEmpty() then
+				return fetchItems
+			end
+
+			thread = task.delay(v3, function()
+				local v14 = v6
+				local v15
+
+				if FFlagDataHydrationAccountReset then
+					v15 = v9(false)
+				else
+					v15 = nil
+				end
+
+				thread = nil
+
+				if requestQueue.isEmpty() then
 					return
 				end
 
-				local v109 = v22.pop(u18)
+				local v16 = requestQueue.pop(v2)
 
-				for _, v111 in v109 do
-					t2[v111] = true
+				for _, v17 in v16 do
+					v4[v17] = true
 				end
 
-				local v112 = cache.getItems(v109)
-				local thread = task.delay(v20, function() -- line: 159
-					-- upvalues: v20 (copy), v109 (copy), v108 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-					local v136 = `No fetch response after { v20 } sec`
-					local v137 = v109
+				local result2 = snapshotEpochs(v16) -- inferred equivalent call
+				local items2 = cache.getItems(v16)
 
-					if v108 ~= u25 then
-						return
+				local flag = false
+
+				local thread2 = task.delay(requestTimeoutSec, function()
+					if data.ignoreResponsesAfterTimeout then
+						flag = true
 					end
 
-					if t1.logError then
-						t1.logError(v136)
-					end
-
-					for _, v139 in v137 do
-						t2[v139] = nil
-					end
-
-					cache.markItemsAsFailed(v137)
-
-					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-						u26.drainCommitted(v137, cache.updateItem)
-					end
+					handleFailure(`No fetch response after {requestTimeoutSec} sec`, v16, v14, v15, result2)
 				end)
-				local ok, result = pcall(function() -- line: 163
-					-- upvalues: v17 (copy), v109 (copy), v112 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v108 (copy), thread (copy), u25 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-					if not v17 then
-						local t13 = {}
 
-						for _, v142 in v109 do
-							local v143 = v112[v142]
-
-							table.insert(t13, t1.fetchFn(v142, v143))
-						end
-
-						Promise.all(t13):andThen(function(p6) -- line: 172
-							-- upvalues: v109 (copy), handleSuccess (copy), v108 (copy), thread (copy)
-							local t14 = {}
-
-							for v167, v168 in v109 do
-								t14[v168] = p6[v167]
+				local success, result = pcall(function()
+					if v then
+						data.fetchFn(items2):andThen(function(p3)
+							if flag then
+								return
 							end
 
-							handleSuccess(t14, v109, v108)
-							task.cancel(thread)
-						end):catch(function(p7) -- line: 180
-							-- upvalues: v109 (copy), v108 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
-							local v170 = v109
-
-							if v108 == u25 then
-								if t1.logError then
-									t1.logError(p7)
-								end
-
-								for _, v172 in v170 do
-									t2[v172] = nil
-								end
-
-								cache.markItemsAsFailed(v170)
-
-								if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-									u26.drainCommitted(v170, cache.updateItem)
-								end
+							handleSuccess(p3, v16, v14, v15, result2)
+							task.cancel(thread2)
+						end):catch(function(p3)
+							if flag then
+								return
 							end
 
-							task.cancel(thread)
+							handleFailure(p3, v16, v14, v15, result2)
+							task.cancel(thread2)
 						end)
 
 						return
 					end
 
-					t1.fetchFn(v112):andThen(function(t15: {[any]: any}) -- line: 186
-						-- upvalues: handleSuccess (copy), v109 (copy), v108 (copy), thread (copy)
-						handleSuccess(t15, v109, v108)
-						task.cancel(thread)
-					end):catch(function(p8) -- line: 190
-						-- upvalues: v109 (copy), v108 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
-						local v175 = v109
+					local v17 = {}
 
-						if v108 == u25 then
-							if t1.logError then
-								t1.logError(p8)
-							end
+					for _, v18 in v16 do
+						local item = items2[v18]
+						table.insert(v17, data.fetchFn(v18, item))
+					end
 
-							for _, v177 in v175 do
-								t2[v177] = nil
-							end
-
-							cache.markItemsAsFailed(v175)
-
-							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-								u26.drainCommitted(v175, cache.updateItem)
-							end
+					Promise.all(v17):andThen(function(p3)
+						if flag then
+							return
 						end
 
-						task.cancel(thread)
+						local v18 = {}
+
+						for k, v19 in v16 do
+							v18[v19] = p3[k]
+						end
+
+						handleSuccess(v18, v16, v14, v15, result2)
+						task.cancel(thread2)
+					end):catch(function(p3)
+						if flag then
+							return
+						end
+
+						handleFailure(p3, v16, v14, v15, result2)
+						task.cancel(thread2)
 					end)
 				end)
 
-				if not ok then
-					if v108 == u25 then
-						if t1.logError then
-							t1.logError(result)
-						end
-
-						for _, v117 in v109 do
-							t2[v117] = nil
-						end
-
-						cache.markItemsAsFailed(v109)
-
-						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-							u26.drainCommitted(v109, cache.updateItem)
-						end
-					end
-
-					task.cancel(thread)
+				if not success then
+					handleFailure(result, v16, v14, v15, result2)
+					task.cancel(thread2)
 				end
 
 				scheduleFetch()
 			end)
 		end
 
-		return t11
+		return fetchItems
 	end
-	local function getAndFetchItem(s2: string, p9: ((...any) -> ...any)?) -- line: 238
-		-- upvalues: cache (copy), v22 (copy), t2 (ref), u24 (ref), u19 (ref), u25 (ref), u18 (ref), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy), FFlagSduiChartsSupport (copy)
-		local v66, v67 = cache.getItem(s2, p9)
 
-		if v67 and (not v22.hasItem(s2) and t2[s2] == nil) then
-			cache.resetFailedItem(s2)
-			v22.push(s2)
+	local function getAndFetchItem(p: string, callback, p2: number?)
+		local item, v12 = cache.getItem(p, callback, p2)
+
+		if v12 and not requestQueue.hasItem(p) and v4[p] == nil then
+			cache.resetFailedItem(p)
+			requestQueue.push(p)
 		end
 
-		if not v22.isEmpty() and u24 == nil and not v22.isEmpty() then
-			u24 = task.delay(u19, function() -- line: 144
-				-- upvalues: u25 (ref), u24 (ref), v22 (copy), u18 (ref), t2 (ref), cache (copy), v20 (copy), t1 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), v17 (copy), Promise (copy), handleSuccess (copy), scheduleFetch (copy)
-				local v118 = u25
+		if not requestQueue.isEmpty() and thread == nil then
+			if requestQueue.isEmpty() then
+				return item, v12
+			end
 
-				u24 = nil
+			thread = task.delay(v3, function()
+				local v13 = v6
+				local v14
 
-				if v22.isEmpty() then
+				if FFlagDataHydrationAccountReset then
+					v14 = v9(false)
+				else
+					v14 = nil
+				end
+
+				thread = nil
+
+				if requestQueue.isEmpty() then
 					return
 				end
 
-				local v119 = v22.pop(u18)
+				local v15 = requestQueue.pop(v2)
 
-				for _, v121 in v119 do
-					t2[v121] = true
+				for _, v16 in v15 do
+					v4[v16] = true
 				end
 
-				local v122 = cache.getItems(v119)
-				local thread = task.delay(v20, function() -- line: 159
-					-- upvalues: v20 (copy), v119 (copy), v118 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-					local v144 = `No fetch response after { v20 } sec`
-					local v145 = v119
+				local result2 = snapshotEpochs(v15) -- inferred equivalent call
+				local items = cache.getItems(v15)
 
-					if v118 ~= u25 then
-						return
+				local flag = false
+
+				local thread2 = task.delay(requestTimeoutSec, function()
+					if data.ignoreResponsesAfterTimeout then
+						flag = true
 					end
 
-					if t1.logError then
-						t1.logError(v144)
-					end
-
-					for _, v147 in v145 do
-						t2[v147] = nil
-					end
-
-					cache.markItemsAsFailed(v145)
-
-					if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-						u26.drainCommitted(v145, cache.updateItem)
-					end
+					handleFailure(`No fetch response after {requestTimeoutSec} sec`, v15, v13, v14, result2)
 				end)
-				local ok, result = pcall(function() -- line: 163
-					-- upvalues: v17 (copy), v119 (copy), v122 (copy), t1 (copy), Promise (copy), handleSuccess (copy), v118 (copy), thread (copy), u25 (ref), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref)
-					if not v17 then
-						local t16 = {}
 
-						for _, v150 in v119 do
-							local v151 = v122[v150]
-
-							table.insert(t16, t1.fetchFn(v150, v151))
-						end
-
-						Promise.all(t16):andThen(function(p10) -- line: 172
-							-- upvalues: v119 (copy), handleSuccess (copy), v118 (copy), thread (copy)
-							local t17 = {}
-
-							for v180, v181 in v119 do
-								t17[v181] = p10[v180]
+				local success, result = pcall(function()
+					if v then
+						data.fetchFn(items):andThen(function(p3)
+							if flag then
+								return
 							end
 
-							handleSuccess(t17, v119, v118)
-							task.cancel(thread)
-						end):catch(function(p11) -- line: 180
-							-- upvalues: v119 (copy), v118 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
-							local v183 = v119
-
-							if v118 == u25 then
-								if t1.logError then
-									t1.logError(p11)
-								end
-
-								for _, v185 in v183 do
-									t2[v185] = nil
-								end
-
-								cache.markItemsAsFailed(v183)
-
-								if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-									u26.drainCommitted(v183, cache.updateItem)
-								end
+							handleSuccess(p3, v15, v13, v14, result2)
+							task.cancel(thread2)
+						end):catch(function(p3)
+							if flag then
+								return
 							end
 
-							task.cancel(thread)
+							handleFailure(p3, v15, v13, v14, result2)
+							task.cancel(thread2)
 						end)
 
 						return
 					end
 
-					t1.fetchFn(v122):andThen(function(t18: {[any]: any}) -- line: 186
-						-- upvalues: handleSuccess (copy), v119 (copy), v118 (copy), thread (copy)
-						handleSuccess(t18, v119, v118)
-						task.cancel(thread)
-					end):catch(function(p12) -- line: 190
-						-- upvalues: v119 (copy), v118 (copy), u25 (ref), t1 (copy), t2 (ref), cache (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), thread (copy)
-						local v188 = v119
+					local v16 = {}
 
-						if v118 == u25 then
-							if t1.logError then
-								t1.logError(p12)
-							end
+					for _, v17 in v15 do
+						local item2 = items[v17]
+						table.insert(v16, data.fetchFn(v17, item2))
+					end
 
-							for _, v190 in v188 do
-								t2[v190] = nil
-							end
-
-							cache.markItemsAsFailed(v188)
-
-							if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-								u26.drainCommitted(v188, cache.updateItem)
-							end
+					Promise.all(v16):andThen(function(p3)
+						if flag then
+							return
 						end
 
-						task.cancel(thread)
+						local v17 = {}
+
+						for k, v18 in v15 do
+							v17[v18] = p3[k]
+						end
+
+						handleSuccess(v17, v15, v13, v14, result2)
+						task.cancel(thread2)
+					end):catch(function(p3)
+						if flag then
+							return
+						end
+
+						handleFailure(p3, v15, v13, v14, result2)
+						task.cancel(thread2)
 					end)
 				end)
 
-				if not ok then
-					if v118 == u25 then
-						if t1.logError then
-							t1.logError(result)
-						end
-
-						for _, v127 in v119 do
-							t2[v127] = nil
-						end
-
-						cache.markItemsAsFailed(v119)
-
-						if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-							u26.drainCommitted(v119, cache.updateItem)
-						end
-					end
-
-					task.cancel(thread)
+				if not success then
+					handleFailure(result, v15, v13, v14, result2)
+					task.cancel(thread2)
 				end
 
 				scheduleFetch()
 			end)
 		end
 
-		if FFlagSduiChartsSupport then
-			return v66, v67
-		end
-
-		return v66, nil
-	end
-	local function clear() -- line: 271
-		-- upvalues: u24 (ref), t2 (ref), cache (copy), v22 (copy), FFlagLuaAppDataHydrationOptimisticMutationLayer (copy), u26 (ref), FFlagLuaAppDataHydrationDataResolverOnClear (copy), t1 (copy)
-		if u24 then
-			task.cancel(u24)
-			u24 = nil
-		end
-
-		t2 = {}
-		cache.clear()
-		v22.clear()
-
-		if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-			u26.clearAll()
-		end
-
-		if FFlagLuaAppDataHydrationDataResolverOnClear and t1.onClear then
-			t1.onClear()
-		end
+		return item, v12
 	end
 
-	local connection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function() -- line: 288
-		-- upvalues: getLocalPlayerUserId (copy), u25 (ref), clear (copy)
-		local v74 = getLocalPlayerUserId()
+	local function getCachedItem(p: string) -- 1 equivalent call inferred from this helper
+		return cache.getItem(p)
+	end
 
-		if v74 ~= u25 then
-			u25 = v74
-			clear()
+	local function getCachedItems(p) -- 1 equivalent call inferred from this helper
+		return cache.getItems(p)
+	end
+
+	local function fetchItem(p: string, callback)
+		return getAndFetchItem(p, callback or FORCE_FETCH)
+	end
+
+	local function fetchItems(p, callback)
+		return getAndFetchItems(p, callback or FORCE_FETCH)
+	end
+
+	local function refetchItem(p: string)
+		v5[p] = (v5[p] or 0) + 1
+		v4[p] = nil
+		cache.resetFailedItem(p)
+
+		if not requestQueue.hasItem(p) then
+			requestQueue.push(p)
 		end
-	end)
-	local t21 = {
+
+		if thread == nil and not requestQueue.isEmpty() then
+			thread = task.delay(v3, function()
+				local v12 = v6
+				local v13
+
+				if FFlagDataHydrationAccountReset then
+					v13 = v9(false)
+				else
+					v13 = nil
+				end
+
+				thread = nil
+
+				if requestQueue.isEmpty() then
+					return
+				end
+
+				local v14 = requestQueue.pop(v2)
+
+				for _, v15 in v14 do
+					v4[v15] = true
+				end
+
+				local result2 = snapshotEpochs(v14) -- inferred equivalent call
+				local items = cache.getItems(v14)
+
+				local flag = false
+
+				local thread2 = task.delay(requestTimeoutSec, function()
+					if data.ignoreResponsesAfterTimeout then
+						flag = true
+					end
+
+					handleFailure(`No fetch response after {requestTimeoutSec} sec`, v14, v12, v13, result2)
+				end)
+
+				local success, result = pcall(function()
+					if v then
+						data.fetchFn(items):andThen(function(p2)
+							if flag then
+								return
+							end
+
+							handleSuccess(p2, v14, v12, v13, result2)
+							task.cancel(thread2)
+						end):catch(function(p2)
+							if flag then
+								return
+							end
+
+							handleFailure(p2, v14, v12, v13, result2)
+							task.cancel(thread2)
+						end)
+
+						return
+					end
+
+					local v15 = {}
+
+					for _, v16 in v14 do
+						local item = items[v16]
+						table.insert(v15, data.fetchFn(v16, item))
+					end
+
+					Promise.all(v15):andThen(function(p2)
+						if flag then
+							return
+						end
+
+						local v16 = {}
+
+						for k, v17 in v14 do
+							v16[v17] = p2[k]
+						end
+
+						handleSuccess(v16, v14, v12, v13, result2)
+						task.cancel(thread2)
+					end):catch(function(p2)
+						if flag then
+							return
+						end
+
+						handleFailure(p2, v14, v12, v13, result2)
+						task.cancel(thread2)
+					end)
+				end)
+
+				if not success then
+					handleFailure(result, v14, v12, v13, result2)
+					task.cancel(thread2)
+				end
+
+				scheduleFetch()
+			end)
+		end
+
+		return cache.getItem(p)
+	end
+
+	local function releaseItem(p: string)
+		requestQueue.remove(p)
+
+		if v4[p] then
+			v4[p] = nil
+
+			v5[p] = (v5[p] or 0) + 1
+		end
+
+		if cache.removeItem then
+			cache.removeItem(p)
+		end
+	end
+
+	local function clearResolverState(flag: boolean)
+		if FFlagDataHydrationAccountReset then
+			v10(v9(false) + 1)
+		end
+
+		if thread then
+			task.cancel(thread)
+			thread = nil
+		end
+
+		v4 = {}
+
+		if FFlagDataHydrationAccountReset then
+			requestQueue.clear()
+
+			if v11 then
+				v11.clearAll()
+			end
+
+			if data.onBeforeClear then
+				data.onBeforeClear()
+			end
+
+			if not flag then
+				cache.clear()
+			end
+
+			if data.onClear then
+				data.onClear()
+			end
+		else
+			cache.clear()
+			requestQueue.clear()
+
+			if v11 then
+				v11.clearAll()
+			end
+
+			if data.onClear then
+				data.onClear()
+			end
+		end
+	end
+
+	local function clear() -- 2 equivalent calls inferred from this helper
+		clearResolverState(false)
+	end
+
+	local localPlayerChangedConnection = nil
+	local v12 = nil
+
+	if FFlagDataHydrationAccountReset then
+		v12 = observeLocalPlayerUserId(function(p)
+			v6 = p
+			clearResolverState(data.keepCacheOnAccountReset == true)
+
+			if FFlagBuildExperienceMonetizationMultiKind then
+				v8(v7(false) + 1)
+			end
+		end)
+	else
+		localPlayerChangedConnection = Players:GetPropertyChangedSignal("LocalPlayer"):Connect(function()
+			local localPlayerUserId = getLocalPlayerUserId()
+
+			if localPlayerUserId ~= v6 then
+				v6 = localPlayerUserId
+				clear() -- inferred equivalent call
+
+				if FFlagBuildExperienceMonetizationMultiKind then
+					v8(v7(false) + 1)
+				end
+			end
+		end)
+	end
+
+	local function dispose()
+		if v12 then
+			v12()
+			v12 = nil
+		end
+
+		if localPlayerChangedConnection then
+			localPlayerChangedConnection:Disconnect()
+			localPlayerChangedConnection = nil
+		end
+
+		if FFlagDataHydrationAccountReset then
+			clear() -- inferred equivalent call
+		end
+
+		cache.dispose()
+	end
+
+	local dataResolver = {
 		getAndFetchItems = getAndFetchItems,
 		getAndFetchItem = getAndFetchItem,
-		getCachedItem = function(s3: string) -- line: 255
-			-- upvalues: cache (copy)
-			return cache.getItem(s3)
-		end,
-		getCachedItems = function(t19: {[any]: any}) -- line: 259
-			-- upvalues: cache (copy)
-			return cache.getItems(t19)
-		end,
-		fetchItem = function(s4: string, p13: ((...any) -> ...any)?) -- line: 263
-			-- upvalues: getAndFetchItem (copy), FORCE_FETCH (copy)
-			return getAndFetchItem(s4, p13 or FORCE_FETCH)
-		end,
-		fetchItems = function(t20: {[any]: any}, p14: ((...any) -> ...any)?) -- line: 267
-			-- upvalues: getAndFetchItems (copy), FORCE_FETCH (copy)
-			return (getAndFetchItems(t20, p14 or FORCE_FETCH))
-		end,
-		isRequestInQueueOrInFlight = function(s5: string) -- line: 206
-			-- upvalues: v22 (copy), t2 (ref)
-			if v22.hasItem(s5) then
-				return true
-			end
-
-			if t2[s5] ~= nil then
-				return true
-			end
-
-			return false
-		end,
-		dispose = function() -- line: 296
-			-- upvalues: connection (ref), cache (copy)
-			if connection then
-				connection:Disconnect()
-				connection = nil
-			end
-
-			cache.dispose()
-		end,
-		clear = clear
+		getCachedItem = getCachedItem,
+		getCachedItems = getCachedItems,
+		fetchItem = fetchItem,
+		fetchItems = fetchItems,
+		refetchItem = refetchItem,
+		isRequestInQueueOrInFlight = isRequestInQueueOrInFlight,
+		releaseItem = nil,
+		dispose = nil,
+		clear = nil,
+		getAccountGeneration = nil,
+		getAccountResetGeneration = nil,
+		isCurrentRequest = nil
 	}
 
-	if FFlagLuaAppDataHydrationOptimisticMutationLayer and u26 then
-		function t21.getOptimisticCachedItem(s6: string) -- line: 322
-			-- upvalues: cache (copy), u26 (ref)
-			local v76, v77 = cache.getItem(s6)
-
-			return u26.getMergedResult(s6, v76), v77
-		end
-		function t21.getOptimisticCachedItems(t22: {[any]: any}) -- line: 327
-			-- upvalues: cache (copy), u26 (ref)
-			local v79, v80 = cache.getItems(t22)
-			local t23 = {}
-
-			for v82, v83 in v79 do
-				t23[v82] = u26.getMergedResult(v82, v83)
-			end
-
-			return t23, v80
-		end
-		function t21.getOptimisticAndFetchItem(s7: string, p15: ((...any) -> ...any)?) -- line: 337
-			-- upvalues: getAndFetchItem (copy), FFlagSduiChartsSupport (copy), u26 (ref)
-			local v86, v87 = getAndFetchItem(s7, p15)
-
-			if FFlagSduiChartsSupport then
-				return u26.getMergedResult(s7, v86), v87
-			end
-
-			return u26.getMergedResult(s7, v86), nil
-		end
-		function t21.getOptimisticAndFetchItems(t24: {[any]: any}, p16: ((...any) -> ...any)?) -- line: 345
-			-- upvalues: getAndFetchItems (copy), u26 (ref)
-			local t25 = {}
-
-			for v91, v92 in (getAndFetchItems(t24, p16)) do
-				t25[v91] = u26.getMergedResult(v91, v92)
-			end
-
-			return t25
-		end
-		function t21.setMutation(s8: string, p17) -- line: 355
-			-- upvalues: u26 (ref)
-			u26.set(s8, p17)
-		end
-		function t21.clearMutation(s9: string) -- line: 360
-			-- upvalues: u26 (ref)
-			u26.clear(s9)
-		end
-		function t21.commitMutation(s10: string) -- line: 365
-			-- upvalues: v22 (copy), t2 (ref), u26 (ref), cache (copy)
-			if not not v22.hasItem(s10) or t2[s10] ~= nil then
-				u26.markCommitted(s10)
-
-				return
-			end
-
-			local v97 = u26.get(s10)
-
-			if v97 ~= nil then
-				cache.updateItem(s10, v97)
-			end
-
-			u26.clear(s10)
-		end
+	if not FFlagSduiReleaseSearchResultsPageState then
+		releaseItem = nil
 	end
 
-	return t21
+	dataResolver.releaseItem = releaseItem
+	dataResolver.dispose = dispose
+	dataResolver.clear = clear
+	local getAccountGeneration
+
+	if FFlagDataHydrationAccountReset then
+		getAccountGeneration = v9
+	end
+
+	dataResolver.getAccountGeneration = getAccountGeneration
+	local getAccountResetGeneration
+
+	if FFlagBuildExperienceMonetizationMultiKind then
+		getAccountResetGeneration = v7
+	end
+
+	dataResolver.getAccountResetGeneration = getAccountResetGeneration
+
+	if not FFlagDataHydrationAccountReset then
+		isCurrentRequest = nil
+	end
+
+	dataResolver.isCurrentRequest = isCurrentRequest
+
+	if not v11 then
+		return dataResolver
+	end
+
+	function dataResolver.getOptimisticCachedItem(p: string)
+		local cachedItem, v13 = getCachedItem(p) -- inferred equivalent call
+
+		return v11.getMergedResult(p, cachedItem), v13
+	end
+
+	function dataResolver.getOptimisticCachedItems(p)
+		local cachedItems, v13 = getCachedItems(p) -- inferred equivalent call
+
+		local result = {}
+
+		for k, cachedItem in cachedItems do
+			result[k] = v11.getMergedResult(k, cachedItem)
+		end
+
+		return result, v13
+	end
+
+	function dataResolver.getOptimisticAndFetchItem(p: string, callback, p2: number?)
+		local fetchItem2, v13 = getAndFetchItem(p, callback, p2)
+		return v11.getMergedResult(p, fetchItem2), v13
+	end
+
+	function dataResolver.getOptimisticAndFetchItems(p, callback, p2: number?)
+		local fetchItems2 = getAndFetchItems(p, callback, p2)
+		local result = {}
+
+		for k, fetchItem2 in fetchItems2 do
+			result[k] = v11.getMergedResult(k, fetchItem2)
+		end
+
+		return result
+	end
+
+	function dataResolver.setMutation(p: string, p2)
+		v11.set(p, p2)
+	end
+
+	function dataResolver.clearMutation(p: string)
+		v11.clear(p)
+	end
+
+	function dataResolver.commitMutation(p: string)
+		if isRequestInQueueOrInFlight(p) then -- inferred equivalent call
+			v11.markCommitted(p)
+			return
+		end
+
+		local v13 = v11.get(p)
+
+		if v13 ~= nil then
+			cache.updateItem(p, v13)
+		end
+
+		v11.clear(p)
+	end
+
+	return dataResolver
 end
 
 return createDataResolver

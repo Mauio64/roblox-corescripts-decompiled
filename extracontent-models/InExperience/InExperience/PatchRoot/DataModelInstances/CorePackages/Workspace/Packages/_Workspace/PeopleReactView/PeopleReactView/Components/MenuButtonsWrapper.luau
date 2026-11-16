@@ -1,51 +1,51 @@
-local MenuButtons = game:GetService("CoreGui"):WaitForChild("RobloxGui"):WaitForChild("Modules"):WaitForChild("Settings"):WaitForChild("Components"):WaitForChild("MenuButtons")
-local Parent = script:FindFirstAncestor("PeopleReactView").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
-local PeopleService = require(Parent.PeopleService)
-local SignalsReact = require(Parent.SignalsReact)
-local View = Foundation.View
-local useSignalState = SignalsReact.useSignalState
-local MenuButtons2 = require(MenuButtons:WaitForChild("MenuButtons"))
+local CoreGui = game:GetService("CoreGui")
+local menuButtons = CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules"):WaitForChild("Settings"):WaitForChild("Components"):WaitForChild("MenuButtons")
 
-return function() -- line: 27
-	-- upvalues: React (copy), PeopleService (copy), useSignalState (copy), View (copy), MenuButtons2 (copy)
-	local v10 = React.useMemo(function() -- line: 28
-		-- upvalues: PeopleService (copy)
+local parent = script:FindFirstAncestor("PeopleReactView").Parent
+
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+local PeopleService = require(parent.PeopleService)
+local SignalsReact = require(parent.SignalsReact)
+
+local View = Foundation.View
+
+local useSignalState = SignalsReact.useSignalState
+
+local MenuButtons = require(menuButtons:WaitForChild("MenuButtons"))
+
+return function()
+	local v = React.useMemo(function()
 		return PeopleService.getService("SettingsHubService")
 	end, {})
-	local v11 = useSignalState(v10.showMenuButtonsContainer)
-	local v12 = React.useMemo(function() -- line: 34
-		-- upvalues: v10 (copy)
-		local v13 = v10.hubRef()
 
-		if v13 then
-			return v13:GetExperienceControlStore()
+	local v2 = useSignalState(v.showMenuButtonsContainer)
+
+	local v3 = React.useMemo(function()
+		local hubRef = v.hubRef()
+
+		if hubRef then
+			return hubRef:GetExperienceControlStore()
 		end
 
 		return nil
 	end, {})
 
-	if not v12 or not v11 then
-		return nil
+	if v3 and v2 then
+		return React.createElement(View, { LayoutOrder = -1, tag = "size-full-1000" }, {
+			MenuButtonsContainer = React.createElement(MenuButtons, {
+				onLeaveGame = v3.onLeaveGame,
+				onRespawn = v3.onRespawn,
+				onResume = v3.onResume,
+				setAddMenuKeyBindings = function() end,
+				setRemoveMenuKeyBindings = function() end,
+				getVisibility = function(): boolean
+					return true
+				end,
+				getCanRespawn = v3.getCanRespawn
+			})
+		})
 	end
 
-	return React.createElement(View, {
-		LayoutOrder = -1,
-		tag = "size-full-1000"
-	}, {
-		MenuButtonsContainer = React.createElement(MenuButtons2, {
-			onLeaveGame = v12.onLeaveGame,
-			onRespawn = v12.onRespawn,
-			onResume = v12.onResume,
-			setAddMenuKeyBindings = function() -- line: 54
-			end,
-			setRemoveMenuKeyBindings = function() -- line: 55
-			end,
-			getVisibility = function() -- line: 56
-				return true
-			end,
-			getCanRespawn = v12.getCanRespawn
-		})
-	})
+	return nil
 end

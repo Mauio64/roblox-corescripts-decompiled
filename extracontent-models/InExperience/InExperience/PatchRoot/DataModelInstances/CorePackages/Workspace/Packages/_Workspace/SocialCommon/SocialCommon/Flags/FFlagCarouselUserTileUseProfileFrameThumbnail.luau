@@ -1,4 +1,5 @@
-local Parent = script:FindFirstAncestor("SocialCommon").Parent
-local GetFFlagProfileFrameThumbnailEnabled = require(Parent.SharedFlags).GetFFlagProfileFrameThumbnailEnabled
+local parent = script:FindFirstAncestor("SocialCommon").Parent
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagProfileFrameThumbnailEnabled = SharedFlags.GetFFlagProfileFrameThumbnailEnabled
 
 return game:DefineFastFlag("CarouselUserTileUseProfileFrameThumbnail", false) and GetFFlagProfileFrameThumbnailEnabled()

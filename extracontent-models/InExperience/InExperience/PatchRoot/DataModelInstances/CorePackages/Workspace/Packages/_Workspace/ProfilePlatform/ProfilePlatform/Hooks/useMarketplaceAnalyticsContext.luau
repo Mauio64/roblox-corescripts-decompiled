@@ -1,25 +1,28 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+
 local Enums = require(ProfilePlatform.Common.Enums)
-local AppPage = require(ProfilePlatformParent.RobloxAppEnums).AppPage
-local Contexts = require(ProfilePlatformParent.SocialLuaAnalytics).Analytics.Enums.Contexts
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local Contexts = SocialLuaAnalytics.Analytics.Enums.Contexts
+
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 
-return function() -- line: 13
-	-- upvalues: useProfileWrapperContext (copy), React (copy), Enums (copy), Contexts (copy), AppPage (copy)
-	local v8 = useProfileWrapperContext()
+return function()
+	local v = useProfileWrapperContext()
 
-	return React.useMemo(function() -- line: 16
-		-- upvalues: v8 (copy), Enums (copy), Contexts (copy), AppPage (copy)
-		if v8.profileType == Enums.ProfileTypes.Community then
+	return React.useMemo(function()
+		if v.profileType == Enums.ProfileTypes.Community then
 			return Contexts.CommunityProfile
 		end
 
-		if v8.profileType == Enums.ProfileTypes.User then
+		if v.profileType == Enums.ProfileTypes.User then
 			return Contexts.PlayerProfile
 		end
 
 		return AppPage.ProfilePlatform
-	end, { v8.profileType })
+	end, { v.profileType })
 end

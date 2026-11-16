@@ -1,9 +1,8 @@
-local Parent = script:FindFirstAncestor("ContactImporter").Parent
-local ImpressionCacheImpl = require(Parent.SocialCommon).Utils.ImpressionCacheImpl
-local EngineFeature = game:GetEngineFeature("RegisterContactsSyncWarningImpressionsCountKey")
+local parent = script:FindFirstAncestor("ContactImporter").Parent
 
-return (ImpressionCacheImpl({
+local SocialCommon = require(parent.SocialCommon)
+return (SocialCommon.Utils.ImpressionCacheImpl({
 	appStorageKey = "ContactsSyncWarningImpressionsCount",
-	dismissedValue = -1,
-	isKeyAvailableInEngine = EngineFeature
+	isKeyAvailableInEngine = game:GetEngineFeature("RegisterContactsSyncWarningImpressionsCountKey"),
+	dismissedValue = -1
 }))

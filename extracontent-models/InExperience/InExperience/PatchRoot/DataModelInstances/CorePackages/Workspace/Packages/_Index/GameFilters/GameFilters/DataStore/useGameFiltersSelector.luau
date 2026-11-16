@@ -1,16 +1,15 @@
 local GameFilters = script:FindFirstAncestor("GameFilters")
-local GameFiltersParent = GameFilters.Parent
 
-require(GameFiltersParent.DiscoveryTypes)
+local parent = GameFilters.Parent
+require(parent.DiscoveryTypes)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local useSelector = require(GameFiltersParent.RoactUtils).Hooks.RoactRodux.useSelector
 local GameFiltersReducer = require(GameFilters.DataStore.GameFiltersReducer)
 
-local function useGameFiltersSelector(s1: string) -- line: 9
-	-- upvalues: useSelector (copy), GameFiltersReducer (copy)
-	return (useSelector(function(p1) -- line: 10
-		-- upvalues: GameFiltersReducer (copy), s1 (copy)
-		return p1.Personalization[GameFiltersReducer.key][s1]
+local function useGameFiltersSelector(p: string)
+	return (useSelector(function(p2)
+		return p2.Personalization[GameFiltersReducer.key][p]
 	end))
 end
 

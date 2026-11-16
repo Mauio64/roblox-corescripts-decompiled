@@ -1,47 +1,43 @@
-local t1 = {}
-local t2 = {}
+local ObjectPool = {}
 
-t2.__index = t2
+local class = {}
+class.__index = class
 
-function t2.GetInstance(p1, p2) -- line: 14
-	if p1.InstancePoolsByClass[p2] == nil then
-		p1.InstancePoolsByClass[p2] = {}
+function class.GetInstance(p, className)
+	if p.InstancePoolsByClass[className] == nil then
+		p.InstancePoolsByClass[className] = {}
 	end
 
-	local v5 = #p1.InstancePoolsByClass[p2]
+	local count = #p.InstancePoolsByClass[className]
 
-	if v5 > 0 then
-		local v6 = p1.InstancePoolsByClass[p2][v5]
-
-		table.remove(p1.InstancePoolsByClass[p2])
-
-		return v6
+	if count > 0 then
+		local v = p.InstancePoolsByClass[className][count]
+		table.remove(p.InstancePoolsByClass[className])
+		return v
 	end
 
-	return Instance.new(p2)
-end
-function t2.ReturnInstance(p3, p4) -- line: 27
-	if p3.InstancePoolsByClass[p4.ClassName] == nil then
-		p3.InstancePoolsByClass[p4.ClassName] = {}
-	end
-
-	if #p3.InstancePoolsByClass[p4.ClassName] < p3.PoolSizePerType then
-		table.insert(p3.InstancePoolsByClass[p4.ClassName], p4)
-
-		return
-	end
-
-	p4:Destroy()
-end
-function t1.new(p5) -- line: 41
-	-- upvalues: t2 (copy)
-	local self = setmetatable({}, t2)
-
-	self.InstancePoolsByClass = {}
-	self.Name = "ObjectPool"
-	self.PoolSizePerType = p5
-
-	return self
+	return Instance.new(className)
 end
 
-return t1
+function class.ReturnInstance(p, instance)
+	if p.InstancePoolsByClass[instance.ClassName] == nil then
+		p.InstancePoolsByClass[instance.ClassName] = {}
+	end
+
+	if #p.InstancePoolsByClass[instance.ClassName] < p.PoolSizePerType then
+		table.insert(p.InstancePoolsByClass[instance.ClassName], instance)
+	else
+		instance:Destroy()
+	end
+end
+
+function ObjectPool.new(poolSizePerType)
+	local objectPool = setmetatable({}, class)
+	objectPool.InstancePoolsByClass = {}
+	objectPool.Name = "ObjectPool"
+	objectPool.PoolSizePerType = poolSizePerType
+
+	return objectPool
+end
+
+return ObjectPool

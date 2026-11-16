@@ -1,4 +1,4 @@
-local function equalObjects(...) -- line: 2
+local function equalObjects(...): boolean
 	for i = 1, select("#", ...) - 1 do
 		if select(i, ...) ~= select(i + 1, ...) then
 			return false

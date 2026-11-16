@@ -1,122 +1,142 @@
 local ExpChat = script:FindFirstAncestor("ExpChat")
-local ExpChatParent = ExpChat.Parent
-local React = require(ExpChatParent.React)
+local parent = ExpChat.Parent
+
+local React = require(parent.React)
+
+local FFlagExpChatComposerInputBarFigmaParity = require(ExpChat.Flags.FFlagExpChatComposerInputBarFigmaParity)
+
 local Localization = require(ExpChat.Localization)
 
 require(script.Parent.useDictationInputBar)
 
-local function lerp(n1: number, n2: number, n3: number) -- line: 26
-	return n1 + (n2 - n1) * n3
+local function lerp(p: number, p2: number, p3: number) -- 4 equivalent calls inferred from this helper
+	return p + (p2 - p) * p3
 end
-local function useDictationTextArea(p1, t1: {[any]: any}) -- line: 40
-	-- upvalues: Localization (copy), React (copy)
-	local v12 = Localization.useLocalization({
+
+local function useDictationTextArea(data, p)
+	local v = Localization.useLocalization({
 		transcribingText = "CoreScripts.TextChat.ChatWindow.Transcribing"
 	})
-	local v13 = (not v12.transcribingText or v12.transcribingText == "") and "Transcribing..." or v12.transcribingText
-	local v14 = if not p1 then nil else p1.dictation.bindings.isAudioActive
-	local v15 = if not p1 then nil else p1.chatInputBarSettings
-	local v16 = if not p1 then nil else p1.state
-	local v17 = not not p1 and p1.isTranscribing
-	local v18 = not t1.showPlaceholderText and 0 or 0.5
-	local v19 = React.useMemo(function() -- line: 60
-		-- upvalues: v14 (copy), t1 (copy), v18 (copy), React (copy)
-		if v14 == nil then
-			return t1.transparencyValue:map(function(n4: number) -- line: 62
-				-- upvalues: v18 (copy)
-				local v28 = v18
 
-				return v28 + (1 - v28) * n4
+	local text = (not v.transcribingText or v.transcribingText == "") and "Transcribing..." or v.transcribingText
+	local isAudioActive
+
+	if data then
+		isAudioActive = data.dictation.bindings.isAudioActive
+	else
+		isAudioActive = nil
+	end
+
+	local chatInputBarSettings
+
+	if data then
+		chatInputBarSettings = data.chatInputBarSettings
+	end
+
+	local state
+
+	if data then
+		state = data.state
+	end
+
+	local v2
+
+	if data then
+		v2 = data.isTranscribing
+	else
+		v2 = false
+	end
+
+	local v3 = p.showPlaceholderText and not FFlagExpChatComposerInputBarFigmaParity and 0.5 or 0
+
+	local textTransparency = React.useMemo(function()
+		if isAudioActive == nil then
+			return p.transparencyValue:map(function(p2: number)
+				return lerp(v3, 1, p2) -- inferred equivalent call
 			end)
 		end
 
-		return React.joinBindings({
-			fade = t1.transparencyValue,
-			hide = v14
-		}):map(function(p2) -- line: 69
-			-- upvalues: v18 (copy)
-			local v30 = if not p2.hide then v18 else 1
-			local fade = p2.fade
-
-			return v30 + (1 - v30) * fade
+		return React.joinBindings({ fade = p.transparencyValue, hide = isAudioActive }):map(function(p2)
+			return lerp(p2.hide and 1 or v3, 1, p2.fade) -- inferred equivalent call
 		end)
-	end, {
-		t1.transparencyValue,
-		v14,
-		v18
-	})
-	local v20 = not v15 and 0 or v15.TextStrokeTransparency
-	local v21 = React.useMemo(function() -- line: 76
-		-- upvalues: v14 (copy), t1 (copy), v20 (copy), React (copy)
-		if v14 == nil then
-			return t1.transparencyValue:map(function(n5: number) -- line: 78
-				-- upvalues: v20 (copy)
-				local v33 = v20
+	end, { p.transparencyValue, isAudioActive, v3 })
 
-				return v33 + (1 - v33) * n5
+	local v4 = not chatInputBarSettings and 0 or chatInputBarSettings.TextStrokeTransparency
+	local textStrokeTransparency = React.useMemo(function()
+		if isAudioActive == nil then
+			return p.transparencyValue:map(function(p2: number)
+				return lerp(v4, 1, p2) -- inferred equivalent call
 			end)
 		end
 
-		return React.joinBindings({
-			fade = t1.transparencyValue,
-			hide = v14
-		}):map(function(p3) -- line: 85
-			-- upvalues: v20 (copy)
-			local v35 = if not p3.hide then v20 else 1
-			local fade = p3.fade
-
-			return v35 + (1 - v35) * fade
+		return React.joinBindings({ fade = p.transparencyValue, hide = isAudioActive }):map(function(p2)
+			return lerp(p2.hide and 1 or v4, 1, p2.fade) -- inferred equivalent call
 		end)
-	end, {
-		t1.transparencyValue,
-		v14,
-		v20
-	})
-	local v22 = if not p1 then nil else p1.customTextBoxRef
-	local v23 = if not p1 then nil else p1.textBoxRef
-	local v24 = if not v15 then nil else v15.PlaceholderColor3
-	local v25 = if not v15 then nil else v15.TextColor3
+	end, { p.transparencyValue, isAudioActive, v4 })
+	local customTextBoxRef
 
-	React.useEffect(function() -- line: 99
-		-- upvalues: v22 (copy), v23 (copy), v17 (copy), v13 (copy), v24 (copy), v25 (copy)
-		if v22 == nil or v23 == nil then
+	if data then
+		customTextBoxRef = data.customTextBoxRef
+	else
+		customTextBoxRef = nil
+	end
+
+	local textBoxRef
+
+	if data then
+		textBoxRef = data.textBoxRef
+	else
+		textBoxRef = nil
+	end
+
+	local placeholderColor3
+
+	if chatInputBarSettings then
+		placeholderColor3 = chatInputBarSettings.PlaceholderColor3
+	else
+		placeholderColor3 = nil
+	end
+
+	local textColor3
+
+	if chatInputBarSettings then
+		textColor3 = chatInputBarSettings.TextColor3
+	else
+		textColor3 = nil
+	end
+
+	React.useEffect(function()
+		if customTextBoxRef == nil or textBoxRef == nil then
 			return
 		end
 
-		local v26 = if not v22.current then v23.current else v22.current
+		local current
 
-		if v26 == nil then
+		if customTextBoxRef.current then
+			current = customTextBoxRef.current
+		else
+			current = textBoxRef.current
+		end
+
+		if current == nil then
 			return
 		end
 
-		if v17 then
-			v26.Text = v13
-			v26.TextEditable = false
-			v26.TextColor3 = v24
+		if v2 then
+			current.Text = text
+			current.TextEditable = false
+			current.TextColor3 = placeholderColor3
+		else
+			current.TextEditable = true
+			current.TextColor3 = textColor3
 
-			return
+			if current.Text == text then
+				current.Text = ""
+			end
 		end
+	end, { state, v2, text, customTextBoxRef, textBoxRef, placeholderColor3, textColor3 })
 
-		v26.TextEditable = true
-		v26.TextColor3 = v25
-
-		if v26.Text == v13 then
-			v26.Text = ""
-		end
-	end, {
-		v16,
-		v17,
-		v13,
-		v22,
-		v23,
-		v24,
-		v25
-	})
-
-	return {
-		textTransparency = v19,
-		textStrokeTransparency = v21
-	}
+	return { textTransparency = textTransparency, textStrokeTransparency = textStrokeTransparency }
 end
 
 return useDictationTextArea

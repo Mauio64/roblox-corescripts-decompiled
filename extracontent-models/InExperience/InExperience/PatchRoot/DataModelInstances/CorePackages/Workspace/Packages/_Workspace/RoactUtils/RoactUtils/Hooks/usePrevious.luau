@@ -1,23 +1,21 @@
-local Parent = script:FindFirstAncestor("RoactUtils").Parent
-local GetFFlagMigrateRoactUtilsToReactUtils = require(Parent.SharedFlags).GetFFlagMigrateRoactUtilsToReactUtils
-local ReactUtils = require(Parent.ReactUtils)
+local parent = script:FindFirstAncestor("RoactUtils").Parent
+
+local SharedFlags = require(parent.SharedFlags)
+local GetFFlagMigrateRoactUtilsToReactUtils = SharedFlags.GetFFlagMigrateRoactUtilsToReactUtils
+local ReactUtils = require(parent.ReactUtils)
 
 if GetFFlagMigrateRoactUtilsToReactUtils() then
 	return ReactUtils.usePrevious
 end
 
-local React = require(Parent.React)
+local React = require(parent.React)
 
-local function usePrevious(p1) -- line: 16
-	-- upvalues: React (copy)
-	local v7 = React.useRef(nil)
-
-	React.useEffect(function() -- line: 18
-		-- upvalues: v7 (copy), p1 (copy)
-		v7.current = p1
+local function usePrevious(current)
+	local ref = React.useRef(nil)
+	React.useEffect(function()
+		ref.current = current
 	end)
-
-	return v7.current
+	return ref.current
 end
 
 return usePrevious

@@ -1,16 +1,16 @@
-local function getGearAssetIdFromEquippedAssets(t1: {[any]: any}) -- line: 1
-	local num = nil
-	local v4 = t1[tostring(Enum.AssetType.Gear.Value)]
+local function getGearAssetIdFromEquippedAssets(p)
+	local gearAssetId = nil
+	local v = p[tostring(Enum.AssetType.Gear.Value)]
 
-	if v4 then
-		local v5, _ = next(v4)
+	if v then
+		local v2, _ = next(v)
 
-		if v5 then
-			num = tonumber(v5)
+		if v2 then
+			gearAssetId = tonumber(v2)
 		end
 	end
 
-	return num
+	return gearAssetId
 end
 
 return getGearAssetIdFromEquippedAssets

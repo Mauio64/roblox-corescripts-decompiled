@@ -1,24 +1,29 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
 local myRoduxNetworking = require(ProfilePlatform.Networking.myRoduxNetworking)
-local ProfilePlatformParent = ProfilePlatform.Parent
-local Http = require(ProfilePlatformParent.Http)
-
+local parent = ProfilePlatform.Parent
+local Http = require(parent.Http)
 require(ProfilePlatform.Common.Enums)
 
 local FFlagProfilePlatformEnableLazyLoadingComponents = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableLazyLoadingComponents)
+require(parent.SocialCommon)
 
-require(ProfilePlatformParent.SocialCommon)
 require(ProfilePlatform.Types.Component)
 
-return myRoduxNetworking.POST({
-	Name = "GetProfile"
-}, function(p1, t1: {[any]: any}) -- line: 27
-	-- upvalues: Http (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy)
-	return p1(Http.Url.APIS_URL .. "profile-platform-api"):path("v1"):path("profiles"):path("get"):body({
-		profileType = t1.profileType,
-		profileId = t1.profileId,
-		components = t1.components,
-		includeComponentOrdering = t1.includeComponentOrdering,
-		onlyEssentialComponents = if not FFlagProfilePlatformEnableLazyLoadingComponents then nil else t1.onlyEssentialComponents
-	})
+return myRoduxNetworking.POST("GetProfile", function(callback, data)
+	local path = callback(Http.Url.APIS_URL .. "profile-platform-api"):path("v1"):path("profiles"):path("get")
+	local v = {
+		profileType = data.profileType,
+		profileId = data.profileId,
+		components = data.components,
+		includeComponentOrdering = data.includeComponentOrdering,
+		onlyEssentialComponents = 0
+	}
+	local onlyEssentialComponents
+
+	if FFlagProfilePlatformEnableLazyLoadingComponents then
+		onlyEssentialComponents = data.onlyEssentialComponents
+	end
+
+	v.onlyEssentialComponents = onlyEssentialComponents
+	return path:body(v)
 end)

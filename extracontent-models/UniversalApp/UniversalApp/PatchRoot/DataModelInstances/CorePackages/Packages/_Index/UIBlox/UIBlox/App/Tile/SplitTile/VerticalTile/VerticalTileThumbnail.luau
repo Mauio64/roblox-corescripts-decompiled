@@ -1,61 +1,114 @@
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParent2 = ParentParent.Parent.Parent
-local React = require(ParentParent2.React)
-local LoadableImage = require(ParentParent.Loading.LoadableImage)
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent.Parent
 
-require(ParentParent.Style.StyleTypes)
+local React = require(parent2.React)
 
-local uDim = UDim.new(0, 8)
+local LoadableImage = require(parent.Loading.LoadableImage)
+require(parent.Style.StyleTypes)
 
-local function VerticalTileThumbnail(t1: {[any]: any}) -- line: 27
-	-- upvalues: uDim (copy), React (copy), LoadableImage (copy)
-	local aspectRatio = t1.aspectRatio
-	local isTopRounded = t1.isTopRounded
-	local isBottomRounded = t1.isBottomRounded
-	local thumbnail = t1.thumbnail
-	local border = t1.border
-	local v13 = isTopRounded and isBottomRounded
-	local v14 = not v13 and (isTopRounded or isBottomRounded)
-	local v15 = if border == nil then uDim else border.CornerRadius
+local udim = UDim.new(0, 8)
 
-	return React.createElement("Frame", {
+local function VerticalTileThumbnail(props)
+	local aspectRatio = props.aspectRatio
+	local isTopRounded = props.isTopRounded
+	local isBottomRounded = props.isBottomRounded
+	local thumbnail = props.thumbnail
+	local border = props.border
+
+	local v = isTopRounded and isBottomRounded
+	local v2 = not v and (isTopRounded or isBottomRounded)
+	local cornerRadius
+
+	if border == nil then
+		cornerRadius = udim
+	else
+		cornerRadius = border.CornerRadius
+	end
+
+	local createElement = React.createElement
+	local size
+
+	if aspectRatio then
+		size = UDim2.new(1, 0, aspectRatio, 0)
+	else
+		size = UDim2.new(1, 0, 1, 0)
+	end
+
+	local sizeConstraint
+
+	if aspectRatio then
+		sizeConstraint = Enum.SizeConstraint.RelativeXX
+	end
+
+	local createElement2 = React.createElement
+	local v3 = {
+		Position = UDim2.fromScale(0, 0),
+		Size = UDim2.fromScale(1, v2 and 0.5 or 1),
+		ClipsDescendants = true,
+		BackgroundTransparency = 1
+	}
+
+	local createElement3 = React.createElement
+	local v4 = {
 		BackgroundTransparency = 1,
-		Size = if not aspectRatio then UDim2.new(1, 0, 1, 0) else UDim2.new(1, 0, aspectRatio, 0),
-		SizeConstraint = if not aspectRatio then nil else Enum.SizeConstraint.RelativeXX
-	}, {
-		TopFrame = React.createElement("Frame", {
-			ClipsDescendants = true,
-			BackgroundTransparency = 1,
-			Position = UDim2.fromScale(0, 0),
-			Size = UDim2.fromScale(1, v14 and 0.5 or 1)
-		}, {
-			TopImage = React.createElement(LoadableImage, {
-				BackgroundTransparency = 1,
-				showFailedStateWhenLoadingFailed = true,
-				useShimmerAnimationWhileLoading = true,
-				Image = thumbnail,
-				Position = UDim2.fromScale(0, 0),
-				Size = UDim2.fromScale(1, v14 and 2 or 1),
-				cornerRadius = if not v13 and not isTopRounded then nil else v15
-			})
+		Image = thumbnail,
+		Position = UDim2.fromScale(0, 0),
+		Size = UDim2.fromScale(1, v2 and 2 or 1),
+		cornerRadius = 0,
+		showFailedStateWhenLoadingFailed = true,
+		useShimmerAnimationWhileLoading = true
+	}
+	local cornerRadius2
+
+	if v or isTopRounded then
+		cornerRadius2 = cornerRadius
+	end
+
+	v4.cornerRadius = cornerRadius2
+	local v5 = {
+		TopFrame = createElement2("Frame", v3, {
+			TopImage = createElement3(LoadableImage, v4)
 		}),
-		BottomFrame = if not v14 then nil else React.createElement("Frame", {
-			ClipsDescendants = true,
-			BackgroundTransparency = 1,
+		BottomFrame = 0
+	}
+	local bottomFrame
+
+	if v2 then
+		local createElement4 = React.createElement
+		local v6 = {
 			Position = UDim2.fromScale(0, 0.5),
-			Size = UDim2.fromScale(1, 0.5)
-		}, {
-			BottomImage = React.createElement(LoadableImage, {
-				BackgroundTransparency = 1,
-				showFailedStateWhenLoadingFailed = true,
-				useShimmerAnimationWhileLoading = true,
-				Image = thumbnail,
-				Position = UDim2.fromScale(0, -1),
-				Size = UDim2.fromScale(1, 2),
-				cornerRadius = if not v13 and not isBottomRounded then nil else v15
-			})
+			Size = UDim2.fromScale(1, 0.5),
+			ClipsDescendants = true,
+			BackgroundTransparency = 1
+		}
+
+		local createElement5 = React.createElement
+		local v7 = {
+			BackgroundTransparency = 1,
+			Image = thumbnail,
+			Position = UDim2.fromScale(0, -1),
+			Size = UDim2.fromScale(1, 2),
+			cornerRadius = 0,
+			showFailedStateWhenLoadingFailed = true,
+			useShimmerAnimationWhileLoading = true
+		}
+
+		if not (v or isBottomRounded) then
+			cornerRadius = nil
+		end
+
+		v7.cornerRadius = cornerRadius
+		bottomFrame = createElement4("Frame", v6, {
+			BottomImage = createElement5(LoadableImage, v7)
 		})
-	})
+	end
+
+	v5.BottomFrame = bottomFrame
+	return createElement("Frame", {
+		Size = size,
+		SizeConstraint = sizeConstraint,
+		BackgroundTransparency = 1
+	}, v5)
 end
 
 return VerticalTileThumbnail

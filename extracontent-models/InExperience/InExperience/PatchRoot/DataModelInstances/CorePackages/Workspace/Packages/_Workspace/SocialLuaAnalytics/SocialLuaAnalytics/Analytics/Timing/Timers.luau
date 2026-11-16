@@ -2,110 +2,86 @@ local HttpService = game:GetService("HttpService")
 local SimpleTimer = require(script.Parent.SimpleTimer)
 local Logger = require(script.Parent.Parent.Logger)
 
-local function Timers(p1) -- line: 16
-	-- upvalues: Logger (copy), HttpService (copy), SimpleTimer (copy)
-	local t1 = {}
+local function Timers(p)
+	local v = {}
 
-	local function v7(s1: string?) -- line: 38
-		-- upvalues: HttpService (copy), t1 (copy), SimpleTimer (copy), p1 (copy), Logger (copy)
-		local v12 = s1 or HttpService:GenerateGUID(false)
-
-		if t1[v12] then
-			Logger:warning("(Start) Timer with this key already exists: " .. tostring(v12))
-
-			return v12
-		end
-
-		local v13 = t1
-		local v14 = SimpleTimer
-		local t2 = {
-			timeoutThreshold = p1 and p1.timeoutThreshold or nil
-		}
-		local g18 = nil
-		local v17 = nil
-
-		if p1 then
-			local onReachingThreshold = p1.onReachingThreshold
-
-			v17 = if not onReachingThreshold then nil else function() -- line: 31
-				-- upvalues: v12 (copy), t1 (copy), Logger (copy), onReachingThreshold (copy)
-				local v27 = v12
-
-				if not t1[v27] then
-					Logger:warning("(Clear) Timer with this key doesn't exist: " .. tostring(v27))
-				else
-					t1[v27].clear()
-					t1[v27] = nil
-				end
-
+	local function fn(p2: string, onReachingThreshold) -- 1 equivalent call inferred from this helper
+		if onReachingThreshold then
+			return function()
+				fn3(p2) -- inferred equivalent call
 				onReachingThreshold()
 			end
-
-			if v17 then
-				g18 = true
-			end
 		end
 
-		if not g18 then
-			v17 = nil
+		return nil
+	end
+
+	local function fn2(p2: string?)
+		local selected = p2 or HttpService:GenerateGUID(false)
+
+		if v[selected] then
+			Logger:warning("(Start) Timer with this key already exists: " .. tostring(selected))
+
+			return selected
 		end
 
-		g18 = false
-		t2.onReachingThreshold = v17
-		v13[v12] = v14(t2)
+		local v2 = {
+			timeoutThreshold = p and p.timeoutThreshold or nil,
+			onReachingThreshold = 0
+		}
+		local onReachingThreshold
 
-		return v12
+		if p then
+			onReachingThreshold = fn(selected, p.onReachingThreshold) -- inferred equivalent call
+		end
+
+		v2.onReachingThreshold = onReachingThreshold
+		v[selected] = SimpleTimer(v2)
+		return selected
+	end
+
+	local function fn3(p2: string) -- 2 equivalent calls inferred from this helper
+		if not v[p2] then
+			Logger:warning("(Clear) Timer with this key doesn't exist: " .. tostring(p2))
+			return
+		end
+
+		v[p2].clear()
+		v[p2] = nil
 	end
 
 	return {
-		start = function(s2: string?, p2) -- line: 52
-			-- upvalues: v7 (copy), t1 (copy)
-			local v21 = v7(s2)
+		start = function(p2: string?, p3)
+			local v2 = fn2(p2)
+			v[v2].start(p3)
 
-			t1[v21].start(p2)
-
-			return v21
+			return v2
 		end,
-		stop = function(s3: string) -- line: 59
-			-- upvalues: t1 (copy), Logger (copy)
-			if not t1[s3] then
-				Logger:warning("(Stop) Timer with this key doesn't exist: " .. tostring(s3))
-
+		stop = function(p2: string)
+			if not v[p2] then
+				Logger:warning("(Stop) Timer with this key doesn't exist: " .. tostring(p2))
 				return -1
 			end
 
-			local v23 = t1[s3].stop()
-
-			if not t1[s3] then
-				Logger:warning("(Clear) Timer with this key doesn't exist: " .. tostring(s3))
-
-				return v23
-			end
-
-			t1[s3].clear()
-			t1[s3] = nil
-
-			return v23
+			local v2 = v[p2].stop()
+			fn3(p2) -- inferred equivalent call
+			return v2
 		end,
-		getTime = function(s4: string) -- line: 71
-			-- upvalues: t1 (copy), Logger (copy)
-			if not t1[s4] then
-				Logger:warning("(getTime) Timer with this key doesn't exist: " .. tostring(s4))
-
-				return -1
+		getTime = function(p2: string)
+			if v[p2] then
+				return v[p2].getTime()
 			end
 
-			return t1[s4].getTime()
+			Logger:warning("(getTime) Timer with this key doesn't exist: " .. tostring(p2))
+			return -1
 		end,
-		getStartTimestamp = function(s5: string) -- line: 80
-			-- upvalues: t1 (copy), Logger (copy)
-			if not t1[s5] then
-				Logger:warning("(startTimeStamp) Timer with this key doesn't exist: " .. tostring(s5))
-
-				return nil
+		getStartTimestamp = function(p2: string)
+			if v[p2] then
+				return v[p2].getStartTimestamp()
 			end
 
-			return t1[s5].getStartTimestamp()
+			Logger:warning("(startTimeStamp) Timer with this key doesn't exist: " .. tostring(p2))
+			return nil
 		end
 	}
 end

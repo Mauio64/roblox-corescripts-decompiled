@@ -1,11 +1,12 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local React = require(Parent.React)
-local v3 = React.createContext(0)
+local parent = script:FindFirstAncestor("Moments").Parent
+
+local React = require(parent.React)
+
+local context = React.createContext(0)
 
 return {
-	Context = v3,
-	useMomentOverlayInset = function() -- line: 19
-		-- upvalues: React (copy), v3 (copy)
-		return React.useContext(v3)
+	Context = context,
+	useMomentOverlayInset = function()
+		return React.useContext(context)
 	end
 }

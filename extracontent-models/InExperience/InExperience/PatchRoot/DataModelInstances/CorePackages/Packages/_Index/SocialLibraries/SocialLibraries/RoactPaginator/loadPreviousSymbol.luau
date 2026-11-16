@@ -1,3 +1,3 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
-
-return require(SocialLibraries.dependencies).Symbol.named("loadPrevious")
+local dependencies = require(SocialLibraries.dependencies)
+return dependencies.Symbol.named("loadPrevious")

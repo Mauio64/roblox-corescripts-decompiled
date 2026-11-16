@@ -1,4 +1,4 @@
-local t1 = {
+local FailureReason = {
 	Invalid = "Invalid",
 	InvalidInput = "InvalidInput",
 	TransferNotFound = "TransferNotFound",
@@ -20,43 +20,43 @@ local t1 = {
 	TransferAmountExceedsMaximum = "TransferAmountExceedsMaximum",
 	TransferAmountExceedsNonSecuredMaximum = "TransferAmountExceedsNonSecuredMaximum"
 }
-local t2 = {
-	[0] = t1.Invalid,
-	[1] = t1.InvalidInput,
-	[2] = t1.TransferNotFound,
-	[3] = t1.Unauthorized,
-	[4] = t1.InternalError,
-	[5] = t1.TransferDailyLimitExceeded,
-	[6] = t1.TransferMonthlyLimitExceeded,
-	[7] = t1.InsufficientFunds,
-	[8] = t1.UserNotAllowed,
-	[9] = t1.TransferExpired,
-	[10] = t1.TooManyRequests,
-	[11] = t1.TransferAlreadyProcessed,
-	[12] = t1.InvalidTransferState,
-	[13] = t1.AmpRecourseAvailable,
-	[14] = t1.TransferDisabledForUser,
-	[15] = t1.ReceiverNotAllowed,
-	[16] = t1.TransferAmountBelowMinimum,
-	[17] = t1.TransferAmountExceedsMaximum,
-	[18] = t1.TransferAmountExceedsNonSecuredMaximum,
-	[19] = t1.ReceiveLimitExceeded
+
+local v = {
+	[0] = FailureReason.Invalid,
+	[1] = FailureReason.InvalidInput,
+	[2] = FailureReason.TransferNotFound,
+	[3] = FailureReason.Unauthorized,
+	[4] = FailureReason.InternalError,
+	[5] = FailureReason.TransferDailyLimitExceeded,
+	[6] = FailureReason.TransferMonthlyLimitExceeded,
+	[7] = FailureReason.InsufficientFunds,
+	[8] = FailureReason.UserNotAllowed,
+	[9] = FailureReason.TransferExpired,
+	[10] = FailureReason.TooManyRequests,
+	[11] = FailureReason.TransferAlreadyProcessed,
+	[12] = FailureReason.InvalidTransferState,
+	[13] = FailureReason.AmpRecourseAvailable,
+	[14] = FailureReason.TransferDisabledForUser,
+	[15] = FailureReason.ReceiverNotAllowed,
+	[16] = FailureReason.TransferAmountBelowMinimum,
+	[17] = FailureReason.TransferAmountExceedsMaximum,
+	[18] = FailureReason.TransferAmountExceedsNonSecuredMaximum,
+	[19] = FailureReason.ReceiveLimitExceeded
 }
 
-function t1.fromValue(p1) -- line: 71
-	-- upvalues: t2 (copy), t1 (copy)
-	if p1 == nil then
+function FailureReason.fromValue(value)
+	if value == nil then
 		return nil
 	end
 
-	if type(p1) == "number" then
-		return t2[p1]
+	if type(value) == "number" then
+		return v[value]
 	end
 
-	if type(p1) == "string" then
-		for _, v in pairs(t1) do
-			if v == p1 then
-				return p1
+	if type(value) == "string" then
+		for _, v2 in pairs(FailureReason) do
+			if v2 == value then
+				return value
 			end
 		end
 	end
@@ -64,4 +64,4 @@ function t1.fromValue(p1) -- line: 71
 	return nil
 end
 
-return t1
+return FailureReason

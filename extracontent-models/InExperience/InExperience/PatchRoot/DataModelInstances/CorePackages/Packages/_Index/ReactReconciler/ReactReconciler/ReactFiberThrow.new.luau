@@ -1,7 +1,10 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local Object = require(ParentParent.LuauPolyfill).Object
-local console = require(ParentParent.Shared).console
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+
+local Shared = require(parent.Shared)
+local console = Shared.console
 
 require(script.Parent.ReactInternalTypes)
 
@@ -9,17 +12,21 @@ local ReactFiberLane = require(script.Parent.ReactFiberLane)
 
 require(script.Parent.ReactCapturedValue)
 
-local lib = require(script.Parent["ReactUpdateQueue.new"])
+local ReactUpdateQueuenew = require(script.Parent["ReactUpdateQueue.new"])
 
-require(ParentParent.Shared)
+require(parent.Shared)
 
-local lib2 = require(script.Parent["ReactFiberSuspenseContext.new"])
-local getComponentName = require(ParentParent.Shared).getComponentName
+local ReactFiberSuspenseContextnew = require(script.Parent["ReactFiberSuspenseContext.new"])
+
+local Shared2 = require(parent.Shared)
+local getComponentName = Shared2.getComponentName
+
 local ReactWorkTags = require(script.Parent.ReactWorkTags)
 local ClassComponent = ReactWorkTags.ClassComponent
 local HostRoot = ReactWorkTags.HostRoot
 local SuspenseComponent = ReactWorkTags.SuspenseComponent
 local IncompleteClassComponent = ReactWorkTags.IncompleteClassComponent
+
 local ReactFiberFlags = require(script.Parent.ReactFiberFlags)
 local DidCapture = ReactFiberFlags.DidCapture
 local Incomplete = ReactFiberFlags.Incomplete
@@ -27,298 +34,290 @@ local NoFlags = ReactFiberFlags.NoFlags
 local ShouldCapture = ReactFiberFlags.ShouldCapture
 local LifecycleEffectMask = ReactFiberFlags.LifecycleEffectMask
 local ForceUpdateForLegacySuspense = ReactFiberFlags.ForceUpdateForLegacySuspense
-local shouldCaptureSuspense = require(script.Parent["ReactFiberSuspenseComponent.new"]).shouldCaptureSuspense
+
+local ReactFiberSuspenseComponentnew = require(script.Parent["ReactFiberSuspenseComponent.new"])
+local shouldCaptureSuspense = ReactFiberSuspenseComponentnew.shouldCaptureSuspense
 local ReactTypeOfMode = require(script.Parent.ReactTypeOfMode)
 local NoMode = ReactTypeOfMode.NoMode
 local BlockingMode = ReactTypeOfMode.BlockingMode
 local DebugTracingMode = ReactTypeOfMode.DebugTracingMode
-local ReactFeatureFlags = require(ParentParent.Shared).ReactFeatureFlags
+local Shared3 = require(parent.Shared)
+local ReactFeatureFlags = Shared3.ReactFeatureFlags
 local enableDebugTracing = ReactFeatureFlags.enableDebugTracing
 local enableSchedulingProfiler = ReactFeatureFlags.enableSchedulingProfiler
-local createCapturedValue = require(script.Parent.ReactCapturedValue).createCapturedValue
-local enqueueCapturedUpdate = lib.enqueueCapturedUpdate
-local createUpdate = lib.createUpdate
-local CaptureUpdate = lib.CaptureUpdate
-local ForceUpdate = lib.ForceUpdate
-local enqueueUpdate = lib.enqueueUpdate
-local markFailedErrorBoundaryForHotReloading = require(script.Parent["ReactFiberHotReloading.new"]).markFailedErrorBoundaryForHotReloading
-local hasSuspenseContext = lib2.hasSuspenseContext
-local InvisibleParentSuspenseContext = lib2.InvisibleParentSuspenseContext
-local suspenseStackCursor = lib2.suspenseStackCursor
-local lib3 = nil
+local ReactCapturedValue = require(script.Parent.ReactCapturedValue)
+local createCapturedValue = ReactCapturedValue.createCapturedValue
+
+local enqueueCapturedUpdate = ReactUpdateQueuenew.enqueueCapturedUpdate
+local createUpdate = ReactUpdateQueuenew.createUpdate
+local CaptureUpdate = ReactUpdateQueuenew.CaptureUpdate
+local ForceUpdate = ReactUpdateQueuenew.ForceUpdate
+local enqueueUpdate = ReactUpdateQueuenew.enqueueUpdate
+local ReactFiberHotReloadingnew = require(script.Parent["ReactFiberHotReloading.new"])
+local markFailedErrorBoundaryForHotReloading = ReactFiberHotReloadingnew.markFailedErrorBoundaryForHotReloading
+
+local hasSuspenseContext = ReactFiberSuspenseContextnew.hasSuspenseContext
+
+local InvisibleParentSuspenseContext = ReactFiberSuspenseContextnew.InvisibleParentSuspenseContext
+local suspenseStackCursor = ReactFiberSuspenseContextnew.suspenseStackCursor
+
+local v = nil
 local markLegacyErrorBoundaryAsFailed = nil
 local isAlreadyFailedLegacyErrorBoundary = nil
 local pingSuspendedRoot = nil
 
-local function v43(...) -- line: 89
-	-- upvalues: markLegacyErrorBoundaryAsFailed (ref), lib3 (ref)
+local function fn(...)
 	if not markLegacyErrorBoundaryAsFailed then
-		lib3 = require(script.Parent["ReactFiberWorkLoop.new"])
-		markLegacyErrorBoundaryAsFailed = lib3.markLegacyErrorBoundaryAsFailed
+		local ReactFiberWorkLoopnew = require(script.Parent["ReactFiberWorkLoop.new"])
+		v = ReactFiberWorkLoopnew
+		markLegacyErrorBoundaryAsFailed = v.markLegacyErrorBoundaryAsFailed
 	end
 
 	return markLegacyErrorBoundaryAsFailed(...)
 end
-local function v44(...) -- line: 104
-	-- upvalues: lib3 (ref), pingSuspendedRoot (ref)
-	if lib3 == nil then
-		lib3 = require(script.Parent["ReactFiberWorkLoop.new"])
+
+local function fn2(...)
+	if v == nil then
+		local ReactFiberWorkLoopnew = require(script.Parent["ReactFiberWorkLoop.new"])
+		v = ReactFiberWorkLoopnew
 	end
 
-	pingSuspendedRoot = lib3.pingSuspendedRoot
-
+	pingSuspendedRoot = v.pingSuspendedRoot
 	return pingSuspendedRoot(...)
 end
-local function v45(...) -- line: 111
-	-- upvalues: lib3 (ref), isAlreadyFailedLegacyErrorBoundary (ref)
-	if lib3 == nil then
-		lib3 = require(script.Parent["ReactFiberWorkLoop.new"])
+
+local function fn3(...)
+	if v == nil then
+		local ReactFiberWorkLoopnew = require(script.Parent["ReactFiberWorkLoop.new"])
+		v = ReactFiberWorkLoopnew
 	end
 
-	isAlreadyFailedLegacyErrorBoundary = lib3.isAlreadyFailedLegacyErrorBoundary
-
+	isAlreadyFailedLegacyErrorBoundary = v.isAlreadyFailedLegacyErrorBoundary
 	return isAlreadyFailedLegacyErrorBoundary(...)
 end
 
-local logCapturedError = require(script.Parent.ReactFiberErrorLogger).logCapturedError
-local logComponentSuspended = require(script.Parent.DebugTracing).logComponentSuspended
-local markComponentSuspended = require(script.Parent.SchedulingProfiler).markComponentSuspended
+local ReactFiberErrorLogger = require(script.Parent.ReactFiberErrorLogger)
+local logCapturedError = ReactFiberErrorLogger.logCapturedError
+local DebugTracing = require(script.Parent.DebugTracing)
+local logComponentSuspended = DebugTracing.logComponentSuspended
+
+local SchedulingProfiler = require(script.Parent.SchedulingProfiler)
+local markComponentSuspended = SchedulingProfiler.markComponentSuspended
+
 local SyncLane = ReactFiberLane.SyncLane
 local NoTimestamp = ReactFiberLane.NoTimestamp
 local includesSomeLane = ReactFiberLane.includesSomeLane
 local mergeLanes = ReactFiberLane.mergeLanes
 local pickArbitraryLane = ReactFiberLane.pickArbitraryLane
 
-function createRootErrorUpdate(p1, p2, p3, p4) -- line: 133
-	-- upvalues: createUpdate (copy), NoTimestamp (copy), CaptureUpdate (copy), Object (copy), logCapturedError (copy)
-	local v59 = createUpdate(NoTimestamp, p3)
+function createRootErrorUpdate(p, p2, p3, callback)
+	local update = createUpdate(NoTimestamp, p3)
 
-	v59.tag = CaptureUpdate
-	v59.payload = {
-		element = Object.None
-	}
+	update.tag = CaptureUpdate
 
+	update.payload = { element = Object.None }
 	local value = p2.value
-
-	function v59.callback() -- line: 147
-		-- upvalues: p4 (copy), value (copy), logCapturedError (copy), p1 (copy), p2 (copy)
-		if p4 ~= nil then
-			p4(value)
+	function update.callback()
+		if callback ~= nil then
+			callback(value)
 		end
 
-		logCapturedError(p1, p2)
+		logCapturedError(p, p2)
 	end
-
-	return v59
+	return update
 end
-function createClassErrorUpdate(p5, p6, p7) -- line: 156
-	-- upvalues: createUpdate (copy), NoTimestamp (copy), CaptureUpdate (copy), logCapturedError (copy), ReactGlobals (copy), markFailedErrorBoundaryForHotReloading (copy), v43 (copy), includesSomeLane (copy), SyncLane (copy), console (copy), getComponentName (copy)
-	local v64 = createUpdate(NoTimestamp, p7)
 
-	v64.tag = CaptureUpdate
-
-	local getDerivedStateFromError = p5.type.getDerivedStateFromError
+function createClassErrorUpdate(data, p, p2)
+	local update = createUpdate(NoTimestamp, p2)
+	update.tag = CaptureUpdate
+	local getDerivedStateFromError = data.type.getDerivedStateFromError
 
 	if typeof(getDerivedStateFromError) == "function" then
-		local value = p6.value
-
-		function v64.payload() -- line: 166
-			-- upvalues: logCapturedError (copy), p5 (copy), p6 (copy), getDerivedStateFromError (copy), value (copy)
-			logCapturedError(p5, p6)
-
+		local value = p.value
+		function update.payload()
+			logCapturedError(data, p)
 			return getDerivedStateFromError(value)
 		end
 	end
 
-	local stateNode = p5.stateNode
+	local stateNode = data.stateNode
 
 	if stateNode ~= nil and typeof(stateNode.componentDidCatch) == "function" then
-		function v64.callback() -- line: 174
-			-- upvalues: ReactGlobals (copy), markFailedErrorBoundaryForHotReloading (copy), p5 (copy), getDerivedStateFromError (copy), v43 (copy), stateNode (copy), logCapturedError (copy), p6 (copy), includesSomeLane (copy), SyncLane (copy), console (copy), getComponentName (copy)
+		function update.callback()
 			if ReactGlobals.__DEV__ then
-				markFailedErrorBoundaryForHotReloading(p5)
+				markFailedErrorBoundaryForHotReloading(data)
 			end
 
 			if typeof(getDerivedStateFromError) ~= "function" then
-				v43(stateNode)
-				logCapturedError(p5, p6)
+				fn(stateNode)
+
+				logCapturedError(data, p)
 			end
 
-			local value = p6.value
-			local stack = p6.stack
-
-			stateNode:componentDidCatch(value, {
-				componentStack = stack or ""
+			stateNode:componentDidCatch(p.value, {
+				componentStack = p.stack or ""
 			})
 
-			if ReactGlobals.__DEV__ and typeof(getDerivedStateFromError) ~= "function" and not includesSomeLane(p5.lanes, SyncLane) then
-				console.error("%s: Error boundaries should implement getDerivedStateFromError(). In that method, return a state update to display an error message or fallback UI.", getComponentName(p5.type) or "Unknown")
+			if
+				ReactGlobals.__DEV__
+				and typeof(getDerivedStateFromError) ~= "function"
+				and not includesSomeLane(data.lanes, SyncLane)
+			then
+				console.error(
+					"%s: Error boundaries should implement getDerivedStateFromError(). In that method, return a state update to display an error message or fallback UI.",
+					getComponentName(data.type) or "Unknown"
+				)
 			end
 		end
 
-		return v64
+		return update
 	end
 
 	if ReactGlobals.__DEV__ then
-		function v64.callback() -- line: 212
-			-- upvalues: markFailedErrorBoundaryForHotReloading (copy), p5 (copy)
-			markFailedErrorBoundaryForHotReloading(p5)
+		function update.callback()
+			markFailedErrorBoundaryForHotReloading(data)
 		end
 	end
 
-	return v64
+	return update
 end
 
-local function attachPingListener(p8, p9, p10) -- line: 219
-	-- upvalues: v44 (copy)
-	local pingCache = p8.pingCache
-	local t1
+local function attachPingListener(p, object, lanes)
+	local pingCache = p.pingCache
+	local v2
 
 	if pingCache == nil then
-		t1 = {}
-		p8.pingCache = {
-			[p9] = t1
-		}
+		v2 = {}
+		p.pingCache = { [object] = v2 }
 
-		local _ = p8.pingCache
+		local _pingCache = p.pingCache
 	else
-		t1 = pingCache[p9]
+		v2 = pingCache[object]
 
-		if t1 == nil then
-			t1 = {}
-			pingCache[p9] = t1
+		if v2 == nil then
+			v2 = {}
+			pingCache[object] = v2
 		end
 	end
 
-	if not t1[p10] then
-		t1[p10] = true
-
-		local function v74() -- line: 247
-			-- upvalues: v44 (copy), p8 (copy), p9 (copy), p10 (copy)
-			return v44(p8, p9, p10)
+	if not v2[lanes] then
+		v2[lanes] = true
+		local function fn4()
+			return fn2(p, object, lanes)
 		end
 
-		p9:andThen(v74, v74)
+		object:andThen(fn4, fn4)
 	end
 end
 
-function throwException(p11, p12, p13, p14, p15, p16, p17) -- line: 254
-	-- upvalues: Incomplete (copy), ReactGlobals (copy), enableDebugTracing (copy), DebugTracingMode (copy), getComponentName (copy), logComponentSuspended (copy), enableSchedulingProfiler (copy), markComponentSuspended (copy), BlockingMode (copy), NoMode (copy), hasSuspenseContext (copy), suspenseStackCursor (copy), InvisibleParentSuspenseContext (copy), SuspenseComponent (copy), shouldCaptureSuspense (copy), DidCapture (copy), ForceUpdateForLegacySuspense (copy), LifecycleEffectMask (copy), ClassComponent (copy), IncompleteClassComponent (copy), createUpdate (copy), NoTimestamp (copy), SyncLane (copy), ForceUpdate (copy), enqueueUpdate (copy), mergeLanes (copy), attachPingListener (copy), ShouldCapture (copy), createCapturedValue (copy), HostRoot (copy), pickArbitraryLane (copy), enqueueCapturedUpdate (copy), NoFlags (copy), v45 (copy)
-	p13.flags = bit32.bor(p13.flags, Incomplete)
+function throwException(p, state, state2, p2, lanes, p3, callback)
+	state2.flags = bit32.bor(state2.flags, Incomplete)
 
-	if p14 ~= nil and (typeof(p14) == "table" and typeof(p14.andThen) == "function") then
-		if ReactGlobals.__DEV__ and enableDebugTracing and bit32.band(p13.mode, DebugTracingMode) ~= 0 then
-			local v82 = getComponentName(p13.type) or "Unknown"
-
-			logComponentSuspended(v82, p14)
+	if p2 ~= nil and typeof(p2) == "table" and typeof(p2.andThen) == "function" then
+		if ReactGlobals.__DEV__ and enableDebugTracing and bit32.band(state2.mode, DebugTracingMode) ~= 0 then
+			logComponentSuspended(getComponentName(state2.type) or "Unknown", p2)
 		end
 
 		if enableSchedulingProfiler then
-			markComponentSuspended(p13, p14)
+			markComponentSuspended(state2, p2)
 		end
 
-		if bit32.band(p13.mode, BlockingMode) == NoMode then
-			local alternate = p13.alternate
+		if bit32.band(state2.mode, BlockingMode) == NoMode then
+			local alternate = state2.alternate
 
 			if alternate then
-				p13.updateQueue = alternate.updateQueue
-				p13.memoizedState = alternate.memoizedState
-				p13.lanes = alternate.lanes
+				state2.updateQueue = alternate.updateQueue
+				state2.memoizedState = alternate.memoizedState
+				state2.lanes = alternate.lanes
 			else
-				p13.updateQueue = nil
-				p13.memoizedState = nil
+				state2.updateQueue = nil
+				state2.memoizedState = nil
 			end
 		end
 
-		local v84 = hasSuspenseContext(suspenseStackCursor.current, InvisibleParentSuspenseContext)
-		local v85 = p12
+		local suspenseContext = hasSuspenseContext(suspenseStackCursor.current, InvisibleParentSuspenseContext)
+		local v2 = state
 
 		repeat
-			if v85.tag == SuspenseComponent and shouldCaptureSuspense(v85, v84) then
-				local updateQueue = v85.updateQueue
+			if v2.tag == SuspenseComponent and shouldCaptureSuspense(v2, suspenseContext) then
+				local updateQueue = v2.updateQueue
 
 				if updateQueue == nil then
-					v85.updateQueue = {
-						[p14] = true
-					}
+					v2.updateQueue = { [p2] = true }
 				else
-					updateQueue[p14] = true
+					updateQueue[p2] = true
 				end
 
-				if bit32.band(v85.mode, BlockingMode) == NoMode then
-					v85.flags = bit32.bor(v85.flags, DidCapture)
-					p13.flags = bit32.bor(p13.flags, ForceUpdateForLegacySuspense)
-					p13.flags = bit32.band(p13.flags, (bit32.bnot((bit32.bor(LifecycleEffectMask, Incomplete)))))
+				if bit32.band(v2.mode, BlockingMode) == NoMode then
+					v2.flags = bit32.bor(v2.flags, DidCapture)
+					state2.flags = bit32.bor(state2.flags, ForceUpdateForLegacySuspense)
 
-					if p13.tag == ClassComponent then
-						if p13.alternate == nil then
-							p13.tag = IncompleteClassComponent
+					state2.flags = bit32.band(state2.flags, (bit32.bnot((bit32.bor(LifecycleEffectMask, Incomplete)))))
+
+					if state2.tag == ClassComponent then
+						if state2.alternate == nil then
+							state2.tag = IncompleteClassComponent
 						else
-							local v87 = createUpdate(NoTimestamp, SyncLane)
-
-							v87.tag = ForceUpdate
-							enqueueUpdate(p13, v87)
+							local update = createUpdate(NoTimestamp, SyncLane)
+							update.tag = ForceUpdate
+							enqueueUpdate(state2, update)
 						end
 					end
 
-					p13.lanes = mergeLanes(p13.lanes, SyncLane)
+					state2.lanes = mergeLanes(state2.lanes, SyncLane)
+				else
+					attachPingListener(p, p2, lanes)
 
-					return
+					v2.flags = bit32.bor(v2.flags, ShouldCapture)
+					v2.lanes = lanes
 				end
 
-				attachPingListener(p11, p14, p15)
-				v85.flags = bit32.bor(v85.flags, ShouldCapture)
-				v85.lanes = p15
-
 				return
 			end
 
-			v85 = v85.return_
-		until v85 == nil
+			v2 = v2.return_
+		until v2 == nil
 
-		p14 = (getComponentName(p13.type) or "A React component") .. " suspended while rendering, but no fallback UI was specified.\n" .. "\n" .. "Add a <Suspense fallback=...> component higher in the tree to " .. "provide a loading indicator or placeholder to display."
+		p2 = (getComponentName(state2.type) or "A React component") .. [[
+ suspended while rendering, but no fallback UI was specified.
+
+Add a <Suspense fallback=...> component higher in the tree to provide a loading indicator or placeholder to display.]]
 	end
 
-	p17()
+	callback()
 
-	local v88 = createCapturedValue(p14, p13)
+	local capturedValue = createCapturedValue(p2, state2)
 
-	repeat
-		if p12.tag == HostRoot then
-			p12.flags = bit32.bor(p12.flags, ShouldCapture)
+	while state.tag ~= HostRoot do
+		if state.tag == ClassComponent then
+			local kind = state.type
+			local stateNode = state.stateNode
 
-			local v89 = pickArbitraryLane(p15)
+			if
+				bit32.band(state.flags, DidCapture) == NoFlags
+				and (typeof(kind.getDerivedStateFromError) == "function" or stateNode ~= nil and typeof(stateNode.componentDidCatch) == "function" and not fn3(stateNode))
+			then
+				state.flags = bit32.bor(state.flags, ShouldCapture)
+				local v2 = pickArbitraryLane(lanes)
+				state.lanes = mergeLanes(state.lanes, v2)
 
-			p12.lanes = mergeLanes(p12.lanes, v89)
-
-			local v90 = createRootErrorUpdate(p12, v88, v89, p16)
-
-			enqueueCapturedUpdate(p12, v90)
-
-			return
-		end
-
-		if p12.tag == ClassComponent then
-			local type = p12.type
-			local stateNode = p12.stateNode
-
-			if bit32.band(p12.flags, DidCapture) == NoFlags and (typeof(type.getDerivedStateFromError) == "function" or stateNode ~= nil and typeof(stateNode.componentDidCatch) == "function" and not v45(stateNode)) then
-				p12.flags = bit32.bor(p12.flags, ShouldCapture)
-
-				local v93 = pickArbitraryLane(p15)
-
-				p12.lanes = mergeLanes(p12.lanes, v93)
-
-				local v94 = createClassErrorUpdate(p12, v88, v93)
-
-				enqueueCapturedUpdate(p12, v94)
-
+				enqueueCapturedUpdate(state, (createClassErrorUpdate(state, capturedValue, v2)))
 				return
 			end
 		end
 
-		p12 = p12.return_
-	until p12 == nil
+		state = state.return_
+
+		if state == nil then
+			return
+		end
+	end
+
+	state.flags = bit32.bor(state.flags, ShouldCapture)
+	local v2 = pickArbitraryLane(lanes)
+	state.lanes = mergeLanes(state.lanes, v2)
+
+	enqueueCapturedUpdate(state, (createRootErrorUpdate(state, capturedValue, v2, p3)))
 end
 
 return {

@@ -1,8 +1,5 @@
-local UniversalShareSheet = require(script.UniversalShareSheet)
-local UniversalShareSheetHost = require(script.Components.UniversalShareSheet.UniversalShareSheetHost)
-
 return {
-	UniversalShareSheet = UniversalShareSheet,
-	UniversalShareSheetHost = UniversalShareSheetHost,
+	UniversalShareSheet = require(script.UniversalShareSheet),
+	UniversalShareSheetHost = require(script.Components.UniversalShareSheet.UniversalShareSheetHost),
 	["jest.config"] = script["jest.config"]
 }

@@ -1,55 +1,71 @@
 local Markdown = script:FindFirstAncestor("Markdown")
-local MarkdownParent = Markdown.Parent
-local Dash = require(MarkdownParent.Dash)
-
+local parent = Markdown.Parent
+local Dash = require(parent.Dash)
 require(Markdown.Types)
-require(MarkdownParent.InlineLayout)
+require(parent.InlineLayout)
+local MarkdownCore = require(parent.MarkdownCore)
+local InlineEngineTag = MarkdownCore.Enums.InlineEngineTag
+local TextStyle = {}
 
-local InlineEngineTag = require(MarkdownParent.MarkdownCore).Enums.InlineEngineTag
+function TextStyle.getCodeTextStyles(p)
+	return Dash.joinDeep(p.textStyles, p.codeStyles)
+end
 
-return {
-	getCodeTextStyles = function(p1) -- line: 8
-		-- upvalues: Dash (copy)
-		return Dash.joinDeep(p1.textStyles, p1.codeStyles)
-	end,
-	getBaseTextElementEngineTags = function(p2) -- line: 12
-		-- upvalues: InlineEngineTag (copy)
-		if not p2 then
-			return nil
-		end
-
-		local t1 = {}
-
-		if p2.bold then
-			table.insert(t1, {
-				name = InlineEngineTag.BOLD,
-				attributes = {}
-			})
-		end
-
-		if p2.italic then
-			table.insert(t1, {
-				name = InlineEngineTag.ITALIC,
-				attributes = {}
-			})
-		end
-
-		if p2.strike then
-			table.insert(t1, {
-				name = InlineEngineTag.STRIKE,
-				attributes = {}
-			})
-		end
-
-		if p2.color then
-			table.insert(t1, {
-				name = InlineEngineTag.FONT,
-				attributes = {
-					color = p2.color
-				}
-			})
-		end
-
-		return t1
+function TextStyle.getBaseTextElementEngineTags(data)
+	if not data then
+		return nil
 	end
-}
+
+	local v = {}
+
+	if data.bold then
+		table.insert(v, { name = InlineEngineTag.BOLD, attributes = {} })
+	end
+
+	if data.italic then
+		table.insert(v, { name = InlineEngineTag.ITALIC, attributes = {} })
+	end
+
+	if data.strike then
+		table.insert(v, { name = InlineEngineTag.STRIKE, attributes = {} })
+	end
+
+	if data.color then
+		table.insert(v, {
+			name = InlineEngineTag.FONT,
+			attributes = { color = data.color }
+		})
+	end
+
+	if data.underline then
+		table.insert(v, { name = InlineEngineTag.UNDERLINE, attributes = {} })
+	end
+
+	return v
+end
+
+function TextStyle.normalizeStyleFont(p)
+	if not p then
+		return p
+	end
+
+	local omit = Dash.omit(p, { "font" })
+
+	if omit.fontFace ~= nil or p.font == nil then
+		return omit
+	end
+
+	local fontFace
+
+	if typeof(p.font) == "Font" then
+		fontFace = p.font
+	else
+		fontFace = Font.fromEnum(p.font)
+	end
+
+	omit.fontFace = fontFace
+
+	return omit
+end
+
+return TextStyle

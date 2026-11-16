@@ -2,5 +2,6 @@ return {
 	SingleItem = "SingleItem",
 	Experience = "Experience",
 	MultiItem = "MultiItem",
-	DeveloperSubscription = "DeveloperSubscription"
+	DeveloperSubscription = "DeveloperSubscription",
+	VIPServer = "VIPServer"
 }

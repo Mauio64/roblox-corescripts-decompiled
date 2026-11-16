@@ -1,5 +1,1 @@
-return {
-	Play = "Play",
-	Follow = "Follow",
-	Following = "Following"
-}
+return { Play = "Play", Follow = "Follow", Following = "Following" }

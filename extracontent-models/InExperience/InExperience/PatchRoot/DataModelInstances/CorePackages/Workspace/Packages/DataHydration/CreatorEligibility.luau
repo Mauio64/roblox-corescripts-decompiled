@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local CreatorEligibility = require(Workspace.DataHydration.DataHydration.CreatorEligibility)
 
-return (require(_Workspace.DataHydration.DataHydration.CreatorEligibility))
+return CreatorEligibility

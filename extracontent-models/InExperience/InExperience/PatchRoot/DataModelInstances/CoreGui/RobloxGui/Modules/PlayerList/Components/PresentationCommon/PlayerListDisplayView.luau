@@ -1,534 +1,830 @@
 local CorePackages = game:GetService("CorePackages")
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = game:GetService("Players").LocalPlayer
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
 local React = require(CorePackages.Packages.React)
-
 require(CorePackages.Packages.Signals)
-
 local UIBlox = require(CorePackages.Packages.UIBlox)
 local Otter = require(CorePackages.Packages.Otter)
 local ReactFocusNavigation = require(CorePackages.Packages.ReactFocusNavigation)
-
 require(CorePackages.Workspace.Packages.LeaderboardStore)
-
 local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
-local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
+local Chrome = require(CorePackages.Workspace.Packages.Chrome)
+local Enabled = Chrome.Enabled
+
 local useLayoutValues = PlayerList.Common.useLayoutValues
 local usePlayerListFocusNavigation = PlayerList.Hooks.usePlayerListFocusNavigation
+
 local useStyle = UIBlox.Core.Style.useStyle
 local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
 local useFocusedGuiObject = ReactFocusNavigation.useFocusedGuiObject
+
 local IconButton = UIBlox.App.Button.IconButton
 local IconSize = UIBlox.App.ImageSet.Enum.IconSize
-local v20 = UIBlox.App.ImageSet.getIconSize(IconSize.Small)
+local iconSize = UIBlox.App.ImageSet.getIconSize(IconSize.Small)
+
 local Images = UIBlox.App.ImageSet.Images
-local PlayerEntryContainer = require(ParentParentParent.Components.Container.PlayerEntryContainer)
-local TeamListContainer = require(ParentParentParent.Components.Container.TeamListContainer)
-local TitleBarContainer = require(ParentParentParent.Components.Container.TitleBarContainer)
-local PlayerDropDown = require(ParentParent.Presentation.PlayerDropDown)
-local FFlagPlayerListFixMobileScrolling = require(ParentParentParent.Flags.FFlagPlayerListFixMobileScrolling)
-local v27 = game:DefineFastFlag("DisablePlayerListDisplayCloseBtn", false)
+
+local PlayerEntryContainer = require(parent2.Components.Container.PlayerEntryContainer)
+local TeamListContainer = require(parent2.Components.Container.TeamListContainer)
+local TitleBarContainer = require(parent2.Components.Container.TitleBarContainer)
+
+local PlayerDropDown = require(parent.Presentation.PlayerDropDown)
+
+local FFlagPlayerListFixMobileScrolling = require(parent2.Flags.FFlagPlayerListFixMobileScrolling)
+local defineFastFlag = game:DefineFastFlag("DisablePlayerListDisplayCloseBtn", false)
 local FFlagAddNewPlayerListFocusNav = PlayerList.Flags.FFlagAddNewPlayerListFocusNav
 local FFlagAddNewPlayerListMobileFocusNav = PlayerList.Flags.FFlagAddNewPlayerListMobileFocusNav
 local FFlagPlayerListUseFocusNavHook = PlayerList.Flags.FFlagPlayerListUseFocusNavHook
-local v31 = Enabled() and not v27
-local t1 = {
-	dampingRatio = 1,
-	frequency = 4
-}
+local FFlagPlayerListTwoTabsOnLegacy = PlayerList.Flags.FFlagPlayerListTwoTabsOnLegacy
+local LegacyTwoTabsBody = PlayerList.Presentation.LegacyTwoTabsBody
 
-local function PlayerListDisplayView(t2: {[any]: any}) -- line: 88
-	-- upvalues: useLayoutValues (copy), useStyle (copy), useFocusGuiObject (copy), FFlagPlayerListUseFocusNavHook (copy), useFocusedGuiObject (copy), usePlayerListFocusNavigation (copy), React (copy), Otter (copy), t1 (copy), FFlagAddNewPlayerListFocusNav (copy), GuiService (copy), UserInputService (copy), FFlagAddNewPlayerListMobileFocusNav (copy), LocalPlayer (copy), PlayerEntryContainer (copy), TitleBarContainer (copy), TeamListContainer (copy), FFlagPlayerListFixMobileScrolling (copy), Enabled (copy), v31 (copy), v20 (copy), IconButton (copy), IconSize (copy), Images (copy), PlayerDropDown (copy)
-	local v35 = useLayoutValues()
-	local v36 = useStyle()
-	local v37 = useFocusGuiObject()
-	local v38 = if FFlagPlayerListUseFocusNavHook then nil else useFocusedGuiObject()
-	local v39 = if not FFlagPlayerListUseFocusNavHook then nil else usePlayerListFocusNavigation()
-	local v40 = React.useRef(nil)
-	local v41 = React.useRef(nil)
-	local v42 = if FFlagPlayerListUseFocusNavHook then nil else React.useRef(nil)
-	local v43 = if FFlagPlayerListUseFocusNavHook then nil else React.useRef(nil)
-	local v44 = React.useRef(Otter.createSingleMotor(0))
-	local v45, v46 = React.useState(Vector2.new(0, 0))
-	local v47, v48 = React.useState(100)
-	local v49, v50 = React.useState(0)
-	local v51, v52 = React.useState(true)
-	local v53, v54 = React.useState(Vector2.new(0, 0))
-	local v55, v56 = React.useState(0)
-	local v57, v58 = React.useState(0)
-	local v59, v60 = React.useState(0)
-	local v61, v62 = React.useState(nil)
-	local v63, v64 = React.createBinding(0)
-	local v65, v66 = React.createBinding(0)
-	local v67, v68 = React.createBinding(0)
-	local v69 = React.joinBindings({
-		v63,
-		v65,
-		v67
-	}):map(function(t3: {[any]: any}) -- line: 125
-		local v85 = t3[1]
-		local v86 = t3[2]
+local v = Enabled() and not defineFastFlag
 
-		return v86 + (t3[3] - v86) * v85
+local v2 = { dampingRatio = 1, frequency = 4 }
+
+local function PlayerListDisplayView(props)
+	local v3 = useLayoutValues()
+	local v4 = useStyle()
+	local backgroundTransparency = (v3.OverrideBackgroundTransparency or 0) * v4.Settings.PreferredTransparency
+
+	local v5 = useFocusGuiObject()
+	local v6
+
+	if FFlagPlayerListUseFocusNavHook then
+		v6 = nil
+	else
+		v6 = useFocusedGuiObject()
+	end
+
+	local v7
+
+	if FFlagPlayerListUseFocusNavHook then
+		v7 = usePlayerListFocusNavigation()
+	else
+		v7 = nil
+	end
+
+	local ref = React.useRef(nil)
+	local ref2 = React.useRef(nil)
+	local ref3
+
+	if FFlagPlayerListUseFocusNavHook then
+		ref3 = nil
+	else
+		ref3 = React.useRef(nil)
+	end
+
+	local ref4
+
+	if FFlagPlayerListUseFocusNavHook then
+		ref4 = nil
+	else
+		ref4 = React.useRef(nil)
+	end
+
+	local ref5 = React.useRef(Otter.createSingleMotor(0))
+
+	local state, setState = React.useState(Vector2.new(0, 0))
+	local state2, setState2 = React.useState(100)
+	local state3, setState3 = React.useState(0)
+	local state4, setState4 = React.useState(true)
+
+	local state5, setState5 = React.useState(Vector2.new(0, 0))
+
+	local state6, setState6 = React.useState(0)
+	local state7, setState7 = React.useState(0)
+
+	local state8, setState8 = React.useState(0)
+	local state9, setState9 = React.useState(nil)
+
+	local binding, v8 = React.createBinding(0)
+	local binding2, v9 = React.createBinding(0)
+	local binding3, v10 = React.createBinding(0)
+	local mapped = React.joinBindings({ binding, binding2, binding3 }):map(function(list)
+		local item = list[1]
+		local item2 = list[2]
+		return item2 + (list[3] - item2) * item
 	end)
-	local v70 = React.useCallback(function(p1) -- line: 133
-		-- upvalues: v58 (copy)
-		v58(p1.AbsoluteSize.Y)
+
+	local v11 = React.useCallback(function(p)
+		setState7(p.AbsoluteSize.Y)
 	end, {})
-	local v71 = React.useCallback(function(p2) -- line: 137
-		-- upvalues: v48 (copy)
-		v48(p2.AbsoluteSize.Y)
+
+	local v12 = React.useCallback(function(p)
+		setState2(p.AbsoluteSize.Y)
 	end, {})
-	local v72 = React.useCallback(function(p3) -- line: 141
-		-- upvalues: v46 (copy)
-		v46(p3.CanvasPosition)
+
+	local v13 = React.useCallback(function(p)
+		setState(p.CanvasPosition)
 	end, {})
-	local v73 = React.useCallback(function(p4) -- line: 145
-		-- upvalues: v50 (copy)
-		v50(p4.AbsolutePosition.Y)
+
+	local v14 = React.useCallback(function(p)
+		setState3(p.AbsolutePosition.Y)
 	end, {})
-	local v74 = React.useCallback(function() -- line: 149
-		-- upvalues: t2 (copy)
-		if not t2.isSmallTouchDevice then
+
+	local v15 = React.useCallback(function()
+		if not props.isSmallTouchDevice then
 			return false
 		end
 
-		local v91 = not not t2.teamList and (t2.teamList.getCount(false) > 0 or false)
-		local v92 = t2.gameStatsCount > 0 or false
+		local v15 = props.teamList and props.teamList.getCount(false) > 0 and true or false
+		local v16 = props.gameStatsCount > 0
 
-		return v91 or v92
-	end, {
-		t2.gameStatsCount,
-		t2.isSmallTouchDevice,
-		t2.teamList
-	})
+		return v15 or v16
+	end, { props.gameStatsCount, props.isSmallTouchDevice, props.teamList })
 
-	React.useEffect(function() -- line: 160
-		-- upvalues: v44 (copy), v64 (copy), v52 (copy)
-		v44.current:onStep(v64)
-		v44.current:onComplete(function(p5) -- line: 162
-			-- upvalues: v52 (copy)
-			if p5 == 0 then
-				v52(true)
+	React.useEffect(function()
+		ref5.current:onStep(v8)
+		ref5.current:onComplete(function(p)
+			if p == 0 then
+				setState4(true)
 			end
 		end)
-	end, {})
-	React.useEffect(function() -- line: 169
-		-- upvalues: t2 (copy), v52 (copy), v44 (copy), Otter (copy), t1 (copy)
-		if t2.isSmallTouchDevice then
-			v52(not t2.isMinimized)
+	end, { v8 })
 
+	React.useEffect(function()
+		if props.isSmallTouchDevice then
+			setState4(not props.isMinimized)
 			return
 		end
 
-		if v44.current then
-			v44.current:setGoal(Otter.spring(not t2.isMinimized and 0 or 1, t1))
+		if ref5.current then
+			ref5.current:setGoal(Otter.spring(props.isMinimized and 1 or 0, v2))
 		end
 
-		if t2.isMinimized then
-			v52(false)
+		if props.isMinimized then
+			setState4(false)
 		end
-	end, {
-		t2.isSmallTouchDevice,
-		t2.isMinimized,
-		v44.current
-	})
-	React.useEffect(function() -- line: 184
-		-- upvalues: v47 (copy), t2 (copy), v35 (copy), v57 (copy), v56 (copy)
-		local v93 = v47 - 8
+	end, { props.isSmallTouchDevice, props.isMinimized, ref5.current })
 
-		if t2.gameStatsCount > 0 then
-			v93 -= v35.TitleBarSizeY or 0
+	React.useEffect(function()
+		local v16 = state2 - 8
+
+		if props.gameStatsCount > 0 then
+			v16 -= v3.TitleBarSizeY or 0
 		end
 
-		local v94 = math.min(v57, v93)
+		setState6((math.min(state7, v16)))
+	end, { state2, state7, props.gameStatsCount, v3.TitleBarSizeY })
 
-		v56(v94)
-	end, {
-		v47,
-		v57,
-		t2.gameStatsCount,
-		v35.TitleBarSizeY
-	})
-	React.useEffect(function() -- line: 195
-		-- upvalues: v53 (copy), v40 (copy), t2 (copy), v60 (copy), v62 (copy)
-		local X = v53.X
-		local Y = v53.Y
-		local current = v40.current
+	React.useEffect(function()
+		local x = state5.X
+		local y = state5.Y
 
-		if t2.isSmallTouchDevice or not current then
-			v60(X)
-			v62(nil)
+		local current = ref.current
 
-			return
+		if props.isSmallTouchDevice or not current then
+			setState8(x)
+			setState9(nil)
+		else
+			local v16 = x - current.AbsolutePosition.Y
+
+			if v16 + y >= current.AbsoluteSize.Y then
+				local v17 = v16 + y - current.AbsoluteSize.Y
+				setState8(v16 - v17)
+				setState9(Vector2.new(0, current.CanvasPosition.Y + v17))
+			else
+				setState8(v16)
+				setState9(nil)
+			end
 		end
-
-		local v98 = X - current.AbsolutePosition.Y
-
-		if v98 + Y >= current.AbsoluteSize.Y then
-			local v99 = v98 + Y - current.AbsoluteSize.Y
-
-			v60(v98 - v99)
-			v62(Vector2.new(0, current.CanvasPosition.Y + v99))
-
-			return
-		end
-
-		v60(v98)
-		v62(nil)
-	end, {
-		v53,
-		t2.isSmallTouchDevice,
-		v40.current
-	})
+	end, { state5, props.isSmallTouchDevice, ref.current })
 
 	if not FFlagPlayerListUseFocusNavHook then
-		React.useEffect(function() -- line: 218
-			-- upvalues: FFlagAddNewPlayerListFocusNav (copy), t2 (copy), GuiService (copy), v41 (copy), UserInputService (copy), v40 (copy)
+		React.useEffect(function()
 			if not FFlagAddNewPlayerListFocusNav then
-				if t2.isVisible then
-					if t2.isDirectionalPreferred and t2.isUsingGamepad then
-						GuiService.SelectedCoreObject = v41.current
+				if props.isVisible then
+					if props.isDirectionalPreferred and props.isUsingGamepad then
+						GuiService.SelectedCoreObject = ref2.current
 						UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
 					end
 
-					if v40.current and not t2.isSmallTouchDevice then
-						v40.current.SelectionGroup = true
-						v40.current.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
-						v40.current.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
-						v40.current.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
-						v40.current.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
-
-						return
+					if ref.current and not props.isSmallTouchDevice then
+						ref.current.SelectionGroup = true
+						ref.current.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+						ref.current.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
+						ref.current.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
+						ref.current.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
 					end
 				else
-					if t2.isDirectionalPreferred and t2.isUsingGamepad then
+					if props.isDirectionalPreferred and props.isUsingGamepad then
 						UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
 					end
 
-					if v40.current and GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(v40.current) then
+					if
+						ref.current
+						and GuiService.SelectedCoreObject
+						and GuiService.SelectedCoreObject:IsDescendantOf(ref.current)
+					then
 						GuiService.SelectedCoreObject = nil
 					end
 
-					if v40.current and not t2.isSmallTouchDevice then
-						v40.current.SelectionGroup = false
+					if ref.current and not props.isSmallTouchDevice then
+						ref.current.SelectionGroup = false
 					end
 				end
 			end
 		end, {
-			t2.isVisible,
-			t2.isSmallTouchDevice,
-			t2.isDirectionalPreferred,
-			t2.isUsingGamepad,
-			v41.current,
-			v40.current
+			props.isVisible,
+			props.isSmallTouchDevice,
+			props.isDirectionalPreferred,
+			props.isUsingGamepad,
+			ref2.current,
+			ref.current
 		})
-		React.useEffect(function() -- line: 250
-			-- upvalues: FFlagAddNewPlayerListFocusNav (copy), t2 (copy), v40 (copy), v37 (copy), UserInputService (copy)
-			if FFlagAddNewPlayerListFocusNav and (t2.isVisible and v40.current) then
-				if t2.isDirectionalPreferred and t2.isUsingGamepad then
-					v37(nil)
-					v37(v40.current)
+
+		React.useEffect(function()
+			if FFlagAddNewPlayerListFocusNav and props.isVisible and ref.current then
+				if props.isDirectionalPreferred and props.isUsingGamepad then
+					v5(nil)
+					v5(ref.current)
 					UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
 				end
 
-				if not t2.isSmallTouchDevice then
-					v40.current.SelectionGroup = true
-					v40.current.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
-					v40.current.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
-					v40.current.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
-					v40.current.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+				if not props.isSmallTouchDevice then
+					ref.current.SelectionGroup = true
+					ref.current.SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+					ref.current.SelectionBehaviorDown = Enum.SelectionBehavior.Stop
+					ref.current.SelectionBehaviorLeft = Enum.SelectionBehavior.Stop
+					ref.current.SelectionBehaviorRight = Enum.SelectionBehavior.Stop
 				end
 			end
 		end, {
-			v37,
-			t2.isVisible,
-			t2.isSmallTouchDevice,
-			t2.isDirectionalPreferred,
-			t2.isUsingGamepad,
-			v40.current
+			v5,
+			props.isVisible,
+			props.isSmallTouchDevice,
+			props.isDirectionalPreferred,
+			props.isUsingGamepad,
+			ref.current
 		})
-		React.useEffect(function() -- line: 270
-			-- upvalues: FFlagAddNewPlayerListMobileFocusNav (copy), t2 (copy), v40 (copy), LocalPlayer (copy), v37 (copy)
-			if FFlagAddNewPlayerListMobileFocusNav and (t2.isVisible and t2.isSmallTouchDevice and t2.isUsingGamepad and v40.current) then
-				local v100 = false
 
-				if t2.dropDownPlayer and not t2.dropDownVisible then
-					local v101 = if not LocalPlayer or t2.dropDownPlayer.UserId ~= LocalPlayer.UserId then v40.current:FindFirstChild("PlayerEntry_" .. t2.dropDownPlayer.UserId, true) else v40.current:FindFirstChild("TitlePlayer", true)
+		React.useEffect(function()
+			if
+				FFlagAddNewPlayerListMobileFocusNav
+				and props.isVisible
+				and props.isSmallTouchDevice
+				and props.isUsingGamepad
+				and ref.current
+			then
+				local v16 = false
 
-					if v101 and v101:IsA("GuiObject") then
-						v37(v101)
-						v100 = true
+				if props.dropDownPlayer and not props.dropDownVisible then
+					local guiObject
+
+					if LocalPlayer and props.dropDownPlayer.UserId == LocalPlayer.UserId then
+						guiObject = ref.current:FindFirstChild("TitlePlayer", true)
+					else
+						guiObject = ref.current:FindFirstChild("PlayerEntry_" .. props.dropDownPlayer.UserId, true)
+					end
+
+					if guiObject and guiObject:IsA("GuiObject") then
+						v5(guiObject)
+						v16 = true
 					end
 				end
 
-				if not v100 then
-					v37(nil)
-					v37(v40.current)
+				if not v16 then
+					v5(nil)
+					v5(ref.current)
 				end
 			end
 		end, {
-			v37,
-			t2.isVisible,
-			t2.dropDownVisible,
-			t2.dropDownPlayer,
-			t2.isSmallTouchDevice,
-			t2.isUsingGamepad,
-			v40.current
+			v5,
+			props.isVisible,
+			props.dropDownVisible,
+			props.dropDownPlayer,
+			props.isSmallTouchDevice,
+			props.isUsingGamepad,
+			ref.current
 		})
-		React.useEffect(function() -- line: 296
-			-- upvalues: FFlagAddNewPlayerListFocusNav (copy), t2 (copy), v40 (copy), FFlagAddNewPlayerListMobileFocusNav (copy), UserInputService (copy), v38 (copy), v37 (copy)
-			if FFlagAddNewPlayerListFocusNav and (not t2.isVisible and v40.current) then
-				if (FFlagAddNewPlayerListMobileFocusNav and t2.isSmallTouchDevice or t2.isDirectionalPreferred) and t2.isUsingGamepad then
+
+		React.useEffect(function()
+			if FFlagAddNewPlayerListFocusNav and not props.isVisible and ref.current then
+				if
+					(FFlagAddNewPlayerListMobileFocusNav and props.isSmallTouchDevice or props.isDirectionalPreferred)
+					and props.isUsingGamepad
+				then
 					UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
 				end
 
-				if v38 and v38:IsDescendantOf(v40.current) then
-					v37(nil)
+				if v6 and v6:IsDescendantOf(ref.current) then
+					v5(nil)
 				end
 
-				if FFlagAddNewPlayerListMobileFocusNav or not t2.isSmallTouchDevice then
-					v40.current.SelectionGroup = false
+				if FFlagAddNewPlayerListMobileFocusNav or not props.isSmallTouchDevice then
+					ref.current.SelectionGroup = false
 				end
 			end
 		end, {
-			v38,
-			v37,
-			t2.isVisible,
-			t2.isSmallTouchDevice,
-			t2.isDirectionalPreferred,
-			t2.isUsingGamepad,
-			v40.current
+			v6,
+			v5,
+			props.isVisible,
+			props.isSmallTouchDevice,
+			props.isDirectionalPreferred,
+			props.isUsingGamepad,
+			ref.current
 		})
-		React.useEffect(function() -- line: 312
-			-- upvalues: FFlagAddNewPlayerListFocusNav (copy), t2 (copy), v38 (copy), v43 (copy), v40 (copy), v37 (copy), v42 (copy)
-			if FFlagAddNewPlayerListFocusNav and (t2.isVisible and not v38 and v43.current and v40.current) then
-				local v102 = v40.current:FindFirstChild("PlayerEntry_" .. v43.current, true)
 
-				if v102 and v102:IsA("GuiObject") then
-					v37(v102)
-				elseif v42.current and v42.current:IsDescendantOf(v40.current) then
-					v37(v42.current)
+		React.useEffect(function()
+			if FFlagAddNewPlayerListFocusNav and props.isVisible and not v6 and ref4.current and ref.current then
+				local guiObject = ref.current:FindFirstChild("PlayerEntry_" .. ref4.current, true)
+
+				if guiObject and guiObject:IsA("GuiObject") then
+					v5(guiObject)
+				elseif ref3.current and ref3.current:IsDescendantOf(ref.current) then
+					v5(ref3.current)
 				else
-					v37(v40.current)
+					v5(ref.current)
 				end
 
-				v43.current = nil
+				ref4.current = nil
 			end
-		end, {
-			v38,
-			v37,
-			t2.isVisible,
-			v42.current,
-			v43.current,
-			v40.current
-		})
+		end, { v6, v5, props.isVisible, ref3.current, ref4.current, ref.current })
 	end
 
 	if FFlagPlayerListUseFocusNavHook then
-		React.useEffect(function() -- line: 334
-			-- upvalues: t2 (copy), v39 (copy)
-			if t2.isVisible and (t2.isSmallTouchDevice and t2.isUsingGamepad and not t2.dropDownVisible) then
-				v39.getFocus()
+		React.useEffect(function()
+			if props.isVisible and props.isSmallTouchDevice and props.isUsingGamepad and not props.dropDownVisible then
+				v7.getFocus()
 			end
 		end, {
-			v39,
-			t2.isVisible,
-			t2.isSmallTouchDevice,
-			t2.isUsingGamepad,
-			t2.dropDownVisible
+			v7,
+			props.isVisible,
+			props.isSmallTouchDevice,
+			props.isUsingGamepad,
+			props.dropDownVisible
 		})
-		React.useEffect(function() -- line: 341
-			-- upvalues: t2 (copy), v40 (copy), GuiService (copy), v39 (copy)
-			if not t2.isVisible then
-				local v103 = v40.current and (GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(v40.current))
 
-				v39.cleanup(v103)
+		React.useEffect(function()
+			if not props.isVisible then
+				local v16 = ref.current
+					and GuiService.SelectedCoreObject
+					and GuiService.SelectedCoreObject:IsDescendantOf(ref.current)
+				v7.cleanup(v16)
 			end
-		end, {
-			v39,
-			t2.isVisible
-		})
+		end, { v7, props.isVisible })
 	end
 
-	local v75 = if not FFlagPlayerListUseFocusNavHook then nil else React.useCallback(function(_: number, p6, _) -- line: 351
-		-- upvalues: v39 (copy)
-		v39.setTitlePlayerInstance(p6)
-	end, { v39 })
-	local v76 = if not FFlagPlayerListUseFocusNavHook then nil else React.useCallback(function(_: number) -- line: 357
-		-- upvalues: v39 (copy)
-		v39.setTitlePlayerInstance(nil)
-	end, { v39 })
-	local t4 = {
-		UIListLayout = React.createElement("UIListLayout", {
-			SortOrder = Enum.SortOrder.LayoutOrder,
-			FillDirection = Enum.FillDirection.Vertical,
-			VerticalAlignment = Enum.VerticalAlignment.Top,
-			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			Padding = if not t2.isDirectionalPreferred then nil else UDim.new(0, v35.EntryPadding)
-		})
-	}
+	local registerPlayerInstance
 
-	if LocalPlayer and t2.isSmallTouchDevice and v74() then
-		t4.TitlePlayer = React.createElement(PlayerEntryContainer, {
+	if FFlagPlayerListUseFocusNavHook then
+		registerPlayerInstance = React.useCallback(function(_: number, p, _)
+			v7.setTitlePlayerInstance(p)
+		end, { v7 })
+	end
+
+	local unregisterPlayerInstance
+
+	if FFlagPlayerListUseFocusNavHook then
+		unregisterPlayerInstance = React.useCallback(function(_: number)
+			v7.setTitlePlayerInstance(nil)
+		end, { v7 })
+	end
+
+	local children = {}
+
+	local createElement = React.createElement
+	local v16 = {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		FillDirection = Enum.FillDirection.Vertical,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		Padding = 0
+	}
+	local padding
+
+	if props.isDirectionalPreferred then
+		padding = UDim.new(0, v3.EntryPadding)
+	end
+
+	v16.Padding = padding
+	children.UIListLayout = createElement("UIListLayout", v16)
+
+	if LocalPlayer and props.isSmallTouchDevice and v15() then
+		local createElement2 = React.createElement
+		local v17 = {
+			entrySizeX = props.entrySizeX,
 			layoutOrder = -3,
 			titlePlayerEntry = true,
-			entrySizeX = t2.entrySizeX,
 			player = LocalPlayer,
-			playerIconInfo = t2.playerIconInfo[LocalPlayer.UserId] or {
-				isPlaceOwner = false
-			},
-			playerRelationship = t2.playerRelationship[LocalPlayer.UserId] or {
+			playerIconInfo = props.playerIconInfo[LocalPlayer.UserId] or { isPlaceOwner = false },
+			playerRelationship = props.playerRelationship[LocalPlayer.UserId] or {
 				isBlocked = false,
+				friendStatus = Enum.FriendStatus.NotFriend,
 				isFollowing = false,
-				isFollower = false,
-				friendStatus = Enum.FriendStatus.NotFriend
+				isFollower = false
 			},
-			setDropDownPlayerDimensionY = v54,
-			registerPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else v75,
-			unregisterPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else v76,
-			setSelectedPlayerId = if not FFlagPlayerListUseFocusNavHook then nil else v39.setSelectedPlayerId
-		})
-		t4.BottomDiv = React.createElement("Frame", {
-			BackgroundTransparency = 0.8,
-			LayoutOrder = -2,
+			setDropDownPlayerDimensionY = setState5,
+			registerPlayerInstance = 0,
+			unregisterPlayerInstance = 0,
+			setSelectedPlayerId = 0
+		}
+
+		if not FFlagPlayerListUseFocusNavHook then
+			registerPlayerInstance = nil
+		end
+
+		v17.registerPlayerInstance = registerPlayerInstance
+
+		if not FFlagPlayerListUseFocusNavHook then
+			unregisterPlayerInstance = nil
+		end
+
+		v17.unregisterPlayerInstance = unregisterPlayerInstance
+		local setSelectedPlayerId
+
+		if FFlagPlayerListUseFocusNavHook then
+			setSelectedPlayerId = v7.setSelectedPlayerId
+		end
+
+		v17.setSelectedPlayerId = setSelectedPlayerId
+		children.TitlePlayer = createElement2(PlayerEntryContainer, v17)
+
+		children.BottomDiv = React.createElement("Frame", {
 			Size = UDim2.new(1, 0, 0, 1),
 			Position = UDim2.new(0, 0, 0, 0),
 			AnchorPoint = Vector2.new(0, 0),
-			BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+			BackgroundTransparency = 0.8,
+			LayoutOrder = -2
 		})
 	end
 
-	if t2.isSmallTouchDevice then
-		t4.TitleBar = React.createElement(TitleBarContainer, {
+	if props.isSmallTouchDevice then
+		children.TitleBar = React.createElement(TitleBarContainer, {
+			size = UDim2.new(1, 0, 0, v3.TitleBarSizeY),
+			entrySizeX = props.entrySizeX,
 			layoutOrder = -1,
-			isSmallTouchDevice = true,
-			size = UDim2.new(1, 0, 0, v35.TitleBarSizeY),
-			entrySizeX = t2.entrySizeX,
-			contentsVisible = v51
+			contentsVisible = state4,
+			isSmallTouchDevice = true
 		})
 	end
 
-	if t2.teamListCount > 0 then
-		local n3 = 1e999
+	if props.teamListCount > 0 then
+		local v17 = 1e999
+		props.teamList.iterateData(function(teamId, teamData)
+			local v18
 
-		t2.teamList.iterateData(function(p8, p9) -- line: 412
-			-- upvalues: FFlagAddNewPlayerListFocusNav (copy), n3 (ref), t4 (copy), React (copy), TeamListContainer (copy), t2 (copy), FFlagPlayerListUseFocusNavHook (copy), v41 (copy), v54 (copy), v42 (copy), v43 (copy), v39 (copy)
-			local v110 = false
-
-			if not FFlagAddNewPlayerListFocusNav and (p9.order(false) <= n3 and p9.players.getCount(false) > 0) then
-				n3 = p9.order(false)
-				v110 = true
+			if
+				FFlagAddNewPlayerListFocusNav
+				or not (teamData.order(false) <= v17 and teamData.players.getCount(false) > 0)
+			then
+				v18 = false
+			else
+				v17 = teamData.order(false)
+				v18 = true
 			end
 
-			t4["TeamList_" .. tostring(p8)] = React.createElement(TeamListContainer, {
-				entrySizeX = t2.entrySizeX,
-				teamId = if not FFlagPlayerListUseFocusNavHook then nil else p8,
-				teamData = p9,
-				playerIconInfos = t2.playerIconInfo,
-				playerRelationships = t2.playerRelationship,
-				firstPlayerRef = if FFlagAddNewPlayerListFocusNav or not v110 then nil else v41,
-				setDropDownPlayerDimensionY = v54,
-				prevFocusedEntry = if FFlagPlayerListUseFocusNavHook or not FFlagAddNewPlayerListFocusNav then nil else v42,
-				destroyedFocusedPlayerId = if FFlagPlayerListUseFocusNavHook or not FFlagAddNewPlayerListFocusNav then nil else v43,
-				registerTeamInstance = if not FFlagPlayerListUseFocusNavHook then nil else v39.registerTeamInstance,
-				unregisterTeamInstance = if not FFlagPlayerListUseFocusNavHook then nil else v39.unregisterTeamInstance,
-				setSelectedPlayerId = if not FFlagPlayerListUseFocusNavHook then nil else v39.setSelectedPlayerId,
-				isSmallTouchDevice = t2.isSmallTouchDevice,
-				isDirectionalPreferred = t2.isDirectionalPreferred
-			})
+			local v19 = "TeamList_" .. tostring(teamId)
+			local createElement2 = React.createElement
+			local v20 = {
+				entrySizeX = props.entrySizeX,
+				teamId = 0,
+				teamData = 0,
+				playerIconInfos = 0,
+				playerRelationships = 0,
+				firstPlayerRef = 0,
+				setDropDownPlayerDimensionY = 0,
+				prevFocusedEntry = 0,
+				destroyedFocusedPlayerId = 0,
+				registerTeamInstance = 0,
+				unregisterTeamInstance = 0,
+				setSelectedPlayerId = 0,
+				isSmallTouchDevice = 0,
+				isDirectionalPreferred = 0
+			}
+
+			if not FFlagPlayerListUseFocusNavHook then
+				teamId = nil
+			end
+
+			v20.teamId = teamId
+			v20.teamData = teamData
+			v20.playerIconInfos = props.playerIconInfo
+			v20.playerRelationships = props.playerRelationship
+			local firstPlayerRef
+
+			if not (FFlagAddNewPlayerListFocusNav or not v18) then
+				firstPlayerRef = ref2
+			end
+
+			v20.firstPlayerRef = firstPlayerRef
+
+			v20.setDropDownPlayerDimensionY = setState5
+			local prevFocusedEntry
+
+			if not (FFlagPlayerListUseFocusNavHook or not FFlagAddNewPlayerListFocusNav) then
+				prevFocusedEntry = ref3
+			end
+
+			v20.prevFocusedEntry = prevFocusedEntry
+			local destroyedFocusedPlayerId
+
+			if not (FFlagPlayerListUseFocusNavHook or not FFlagAddNewPlayerListFocusNav) then
+				destroyedFocusedPlayerId = ref4
+			end
+
+			v20.destroyedFocusedPlayerId = destroyedFocusedPlayerId
+			local registerTeamInstance
+
+			if FFlagPlayerListUseFocusNavHook then
+				registerTeamInstance = v7.registerTeamInstance
+			end
+
+			v20.registerTeamInstance = registerTeamInstance
+			local unregisterTeamInstance
+
+			if FFlagPlayerListUseFocusNavHook then
+				unregisterTeamInstance = v7.unregisterTeamInstance
+			end
+
+			v20.unregisterTeamInstance = unregisterTeamInstance
+			local setSelectedPlayerId
+
+			if FFlagPlayerListUseFocusNavHook then
+				setSelectedPlayerId = v7.setSelectedPlayerId
+			end
+
+			v20.setSelectedPlayerId = setSelectedPlayerId
+
+			v20.isSmallTouchDevice = props.isSmallTouchDevice
+			v20.isDirectionalPreferred = props.isDirectionalPreferred
+			children[v19] = createElement2(TeamListContainer, v20)
 		end, false)
 	end
 
-	if t2.isSmallTouchDevice then
-		local v79 = true
+	if props.isSmallTouchDevice then
+		local scrollingEnabled = FFlagPlayerListFixMobileScrolling and true or not props.dropDownVisible
 
-		if not FFlagPlayerListFixMobileScrolling then
-			v79 = not t2.dropDownVisible
-		end
-
-		return React.createElement("ScrollingFrame", {
-			Active = FFlagPlayerListFixMobileScrolling,
+		local createElement2 = React.createElement
+		local v17 = {
+			["Active"] = FFlagPlayerListFixMobileScrolling,
 			Size = UDim2.fromScale(1, 1),
 			CanvasSize = UDim2.new(0, 0, 0, 0),
 			AutomaticCanvasSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
-			ScrollBarImageColor3 = v35.ScrollImageColor,
-			ScrollBarImageTransparency = v35.ScrollImageTransparency,
+			ScrollBarImageColor3 = v3.ScrollImageColor,
+			ScrollBarImageTransparency = v3.ScrollImageTransparency,
 			BorderSizePixel = 0,
-			ScrollBarThickness = v35.ScrollBarSizeMobile,
+			ScrollBarThickness = v3.ScrollBarSizeMobile,
 			VerticalScrollBarInset = Enum.ScrollBarInset.None,
 			HorizontalScrollBarInset = Enum.ScrollBarInset.None,
 			ClipsDescendants = true,
-			ScrollingEnabled = v79,
+			ScrollingEnabled = scrollingEnabled,
 			ElasticBehavior = Enum.ElasticBehavior.Never,
 			Selectable = false,
 			ScrollingDirection = Enum.ScrollingDirection.Y,
-			SelectionGroup = not not FFlagAddNewPlayerListMobileFocusNav or nil,
-			SelectionBehaviorUp = if not FFlagAddNewPlayerListMobileFocusNav then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorDown = if not FFlagAddNewPlayerListMobileFocusNav then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorLeft = if not FFlagAddNewPlayerListMobileFocusNav then nil else Enum.SelectionBehavior.Stop,
-			SelectionBehaviorRight = if not FFlagAddNewPlayerListMobileFocusNav then nil else Enum.SelectionBehavior.Stop,
-			ref = if not FFlagAddNewPlayerListMobileFocusNav then nil else v40,
-			[React.Change.CanvasPosition] = v72,
-			[React.Change.AbsoluteSize] = v71
-		}, t4)
-	end
+			SelectionGroup = FFlagAddNewPlayerListMobileFocusNav and true or nil
+		}
+		local selectionBehaviorUp
 
-	if t2.isDirectionalPreferred then
-		return React.createElement("Frame", {
-			Position = v35.PlayerScrollListPosition,
-			Size = v35.PlayerScrollListSize,
+		if FFlagAddNewPlayerListMobileFocusNav then
+			selectionBehaviorUp = Enum.SelectionBehavior.Stop
+		end
+
+		v17.SelectionBehaviorUp = selectionBehaviorUp
+		local selectionBehaviorDown
+
+		if FFlagAddNewPlayerListMobileFocusNav then
+			selectionBehaviorDown = Enum.SelectionBehavior.Stop
+		end
+
+		v17.SelectionBehaviorDown = selectionBehaviorDown
+		local selectionBehaviorLeft
+
+		if FFlagAddNewPlayerListMobileFocusNav then
+			selectionBehaviorLeft = Enum.SelectionBehavior.Stop
+		end
+
+		v17.SelectionBehaviorLeft = selectionBehaviorLeft
+		local selectionBehaviorRight
+
+		if FFlagAddNewPlayerListMobileFocusNav then
+			selectionBehaviorRight = Enum.SelectionBehavior.Stop
+		end
+
+		v17.SelectionBehaviorRight = selectionBehaviorRight
+		local ref6
+
+		if FFlagAddNewPlayerListMobileFocusNav then
+			ref6 = ref
+		end
+
+		v17.ref = ref6
+
+		v17[React.Change.CanvasPosition] = v13
+		v17[React.Change.AbsoluteSize] = v12
+		local element = createElement2("ScrollingFrame", v17, children)
+
+		if not FFlagPlayerListTwoTabsOnLegacy then
+			return element
+		end
+
+		local backgroundColor
+
+		if Enabled() then
+			backgroundColor = v4.Theme.BackgroundUIContrast.Color
+		else
+			backgroundColor = v4.Theme.BackgroundContrast.Color
+		end
+
+		return React.createElement(
+			"Frame",
+			{ Size = v3.PlayerScrollListSizeTwoTabsOnLegacy, BackgroundTransparency = 1 },
+			{
+				TwoTabsBody = React.createElement(LegacyTwoTabsBody, {
+					serverBody = element,
+					isVisible = props.isVisible,
+					isDirectionalPreferred = props.isDirectionalPreferred,
+					backgroundColor = backgroundColor,
+					backgroundTransparency = backgroundTransparency
+				})
+			}
+		)
+	elseif props.isDirectionalPreferred then
+		local createElement2 = React.createElement
+		local v17 = {
+			["Size"] = UDim2.new(1, 0, 1, 0),
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
-			[React.Change.AbsoluteSize] = v71
-		}, {
-			TenFootScrollingFrame = React.createElement("ScrollingFrame", {
-				Size = UDim2.new(1, 0, 1, 0),
-				CanvasSize = UDim2.new(0, 0, 0, 0),
-				AutomaticCanvasSize = Enum.AutomaticSize.Y,
-				BackgroundTransparency = 1,
-				ScrollBarImageColor3 = v35.ScrollImageColor,
-				ScrollBarImageTransparency = v35.ScrollImageTransparency,
-				BorderSizePixel = 0,
-				ScrollBarThickness = 6,
-				VerticalScrollBarInset = Enum.ScrollBarInset.Always,
-				ClipsDescendants = true,
-				ScrollingEnabled = not t2.dropDownVisible,
-				Selectable = false,
-				CanvasPosition = t2.dropDownVisible and v61 or v45,
-				ref = v40,
-				[React.Change.CanvasPosition] = v72
-			}, t4)
+			ScrollBarImageColor3 = v3.ScrollImageColor,
+			ScrollBarImageTransparency = v3.ScrollImageTransparency,
+			BorderSizePixel = 0,
+			ScrollBarThickness = 6,
+			VerticalScrollBarInset = Enum.ScrollBarInset.Always,
+			ClipsDescendants = true,
+			ScrollingEnabled = not props.dropDownVisible,
+			Selectable = false
+		}
+
+		state = props.dropDownVisible and state9 or state
+		v17.CanvasPosition = state
+		v17.ref = ref
+
+		v17[React.Change.CanvasPosition] = v13
+		local element = createElement2("ScrollingFrame", v17, children)
+
+		local createElement3 = React.createElement
+		local v18 = {
+			Position = v3.PlayerScrollListPosition,
+			Size = v3.PlayerScrollListSize,
+			BackgroundTransparency = 1,
+			[React.Change.AbsoluteSize] = v12
+		}
+		local tenFootScrollingFrame
+
+		if not FFlagPlayerListTwoTabsOnLegacy then
+			tenFootScrollingFrame = element
+		end
+
+		local twoTabsBody
+
+		if FFlagPlayerListTwoTabsOnLegacy then
+			local createElement4 = React.createElement
+
+			local v19 = {
+				serverBody = element,
+				isVisible = props.isVisible,
+				isDirectionalPreferred = props.isDirectionalPreferred,
+				backgroundColor = 0,
+				backgroundTransparency = 0
+			}
+			local backgroundColor
+
+			if Enabled() then
+				backgroundColor = v4.Theme.BackgroundUIContrast.Color
+			else
+				backgroundColor = v4.Theme.BackgroundContrast.Color
+			end
+
+			v19.backgroundColor = backgroundColor
+
+			v19.backgroundTransparency = backgroundTransparency
+			twoTabsBody = createElement4(LegacyTwoTabsBody, v19)
+		end
+
+		return createElement3("Frame", v18, {
+			TenFootScrollingFrame = tenFootScrollingFrame,
+			TwoTabsBody = twoTabsBody
 		})
-	end
+	else
+		local fadedBackgroundScaleDelta = v3.FadedBackgroundScaleDelta or 0
+		local scrollBarOffset = v3.ScrollBarOffset or 0
+		local scrollBarSize = v3.ScrollBarSize or 0
+		local color
 
-	local v80 = v35.FadedBackgroundScaleDelta or 0
-	local v81 = v35.ScrollBarOffset or 0
-	local v82 = v35.ScrollBarSize or 0
-	local v83 = if not Enabled() then v36.Theme.BackgroundContrast.Color else v36.Theme.BackgroundUIContrast.Color
+		if Enabled() then
+			color = v4.Theme.BackgroundUIContrast.Color
+		else
+			color = v4.Theme.BackgroundContrast.Color
+		end
 
-	v66(v35.OverrideBackgroundTransparency * v36.Settings.PreferredTransparency)
-	v68(v35.FadedBackgroundTransparency or 0)
+		v9(backgroundTransparency)
+		v10(v3.FadedBackgroundTransparency or 0)
 
-	return React.createElement("Frame", {
-		Position = v35.PlayerScrollListPosition,
-		Size = v35.PlayerScrollListSize,
-		BackgroundTransparency = 1,
-		[React.Change.AbsoluteSize] = v71
-	}, {
-		SizeOffsetFrame = React.createElement("Frame", {
+		local createElement2 = React.createElement
+		local v17 = {
+			LayoutOrder = 3,
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 0, state6),
+			BackgroundColor3 = color,
+			BackgroundTransparency = mapped,
+			BorderSizePixel = 0,
+			[React.Change.AbsolutePosition] = v14
+		}
+		local playerDropDown
+
+		if state4 then
+			playerDropDown = React.createElement(PlayerDropDown, {
+				contentsVisible = state4,
+				selectedPlayer = props.dropDownPlayer,
+				positionY = state8,
+				minPositionBoundY = -state3 + v3.DropDownScreenSidePadding,
+				maxPositionBoundY = props.screenSizeY - state3 - v3.DropDownScreenSidePadding
+			})
+		end
+
+		local createElement3 = React.createElement
+		local v18 = {
+			Visible = state4,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			ClipsDescendants = true
+		}
+
+		local createElement4 = React.createElement
+		local v19 = {
+			["Size"] = UDim2.new(1, -scrollBarOffset, 0, state6),
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			ScrollBarImageColor3 = v3.ScrollImageColor,
+			ScrollBarImageTransparency = v3.ScrollImageTransparency,
+			BorderSizePixel = 0,
+			ScrollBarThickness = v3.ScrollBarSize,
+			VerticalScrollBarInset = Enum.ScrollBarInset.Always,
+			ClipsDescendants = false,
+			ScrollingEnabled = not props.dropDownVisible,
+			Selectable = false
+		}
+
+		state = props.dropDownVisible and state9 or state
+		v19.CanvasPosition = state
+		v19.ref = ref
+
+		v19[React.Change.CanvasPosition] = v13
+		local element = createElement2("Frame", v17, {
+			PlayerDropDown = playerDropDown,
+			ScrollingFrameClippingFrame = createElement3("Frame", v18, {
+				ScrollingFrame = createElement4("ScrollingFrame", v19, {
+					OffsetUndoFrame = React.createElement("Frame", {
+						Size = UDim2.new(1, scrollBarOffset + scrollBarSize, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y,
+						BackgroundTransparency = 1,
+						[React.Change.AbsoluteSize] = v11
+					}, children)
+				})
+			})
+		})
+		local titleBar
+
+		if props.gameStatsCount > 0 then
+			titleBar = React.createElement(TitleBarContainer, {
+				size = UDim2.new(1, 0, 0, v3.TitleBarSizeY),
+				entrySizeX = props.entrySizeX,
+				layoutOrder = 2,
+				contentsVisible = state4,
+				showBackground = true,
+				backgroundTransparency = mapped
+			})
+		end
+
+		local createElement5 = React.createElement
+		local v20 = {
+			Position = v3.PlayerScrollListPosition,
+			Size = v3.PlayerScrollListSize,
+			BackgroundTransparency = 1,
+			[React.Change.AbsoluteSize] = v12
+		}
+
+		local createElement6 = React.createElement
+		local v21 = {
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5)
-		}, {
+		}
+		local v22 = {
 			UIScale = React.createElement("UIScale", {
-				Scale = v63:map(function(p10) -- line: 531
-					-- upvalues: v80 (copy)
-					return 1 - v80 * p10
+				Scale = binding:map(function(p)
+					return 1 - fadedBackgroundScaleDelta * p
 				end)
 			}),
 			UIListLayout = React.createElement("UIListLayout", {
@@ -537,121 +833,126 @@ local function PlayerListDisplayView(t2: {[any]: any}) -- line: 88
 				VerticalAlignment = Enum.VerticalAlignment.Top,
 				HorizontalAlignment = Enum.HorizontalAlignment.Left
 			}),
-			TopRoundedRect = if v31 then React.createElement("Frame", {
+			TopRoundedRect = 0,
+			TitleBar = 0,
+			ScrollingFrameContainer = 0,
+			TwoTabsBody = 0,
+			BottomRoundedRect = 0
+		}
+		local topRoundedRect
+
+		if v then
+			topRoundedRect = React.createElement("Frame", {
 				LayoutOrder = 1,
 				ClipsDescendants = true,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, v20 + 2)
+				Size = UDim2.new(1, 0, 0, iconSize + 2),
+				BackgroundTransparency = 1
 			}, {
 				DismissIconFrame = React.createElement("Frame", {
-					Size = UDim2.new(1, 0, 0, (v20 + 2) * 2),
-					BackgroundColor3 = v83,
-					BackgroundTransparency = v69
+					Size = UDim2.new(1, 0, 0, (iconSize + 2) * 2),
+					BackgroundColor3 = color,
+					BackgroundTransparency = mapped
 				}, {
 					DismissButton = React.createElement(IconButton, {
 						position = UDim2.new(0, 1, 0, 1),
 						iconSize = IconSize.Small,
 						icon = Images["icons/navigation/close"],
-						onActivated = t2.dismissPlayerList
+						onActivated = props.dismissPlayerList
 					}),
-					UICorner = React.createElement("UICorner", {
-						CornerRadius = UDim.new(0, 7)
-					})
+					UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 7) })
 				})
-			}) else React.createElement("ImageLabel", {
+			})
+		else
+			topRoundedRect = React.createElement("ImageLabel", {
 				LayoutOrder = 1,
 				BackgroundTransparency = 1,
 				Image = "rbxasset://textures/ui/TopRoundedRect8px.png",
-				SliceScale = 0.5,
-				ImageColor3 = v83,
-				ImageTransparency = v69,
+				ImageColor3 = color,
+				ImageTransparency = mapped,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(8, 8, 24, 18),
+				SliceScale = 0.5,
 				Size = UDim2.new(1, 0, 0, 4)
-			}),
-			TitleBar = t2.gameStatsCount > 0 and React.createElement(TitleBarContainer, {
-				layoutOrder = 2,
-				showBackground = true,
-				size = UDim2.new(1, 0, 0, v35.TitleBarSizeY),
-				entrySizeX = t2.entrySizeX,
-				contentsVisible = v51,
-				backgroundTransparency = v69
-			}),
-			ScrollingFrameContainer = React.createElement("Frame", {
-				LayoutOrder = 3,
-				Position = UDim2.new(0, 0, 0, 0),
-				Size = UDim2.new(1, 0, 0, v55),
-				BackgroundColor3 = v83,
-				BackgroundTransparency = v69,
-				BorderSizePixel = 0,
-				[React.Change.AbsolutePosition] = v73
-			}, {
-				PlayerDropDown = if not v51 then nil else React.createElement(PlayerDropDown, {
-					contentsVisible = v51,
-					selectedPlayer = t2.dropDownPlayer,
-					positionY = v59,
-					minPositionBoundY = -v49 + v35.DropDownScreenSidePadding,
-					maxPositionBoundY = t2.screenSizeY - v49 - v35.DropDownScreenSidePadding
-				}),
-				ScrollingFrameClippingFrame = React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					ClipsDescendants = true,
-					Visible = v51,
-					Size = UDim2.new(1, 0, 1, 0)
-				}, {
-					ScrollingFrame = React.createElement("ScrollingFrame", {
-						Size = UDim2.new(1, -v81, 0, v55),
-						CanvasSize = UDim2.new(0, 0, 0, 0),
-						AutomaticCanvasSize = Enum.AutomaticSize.Y,
-						BackgroundTransparency = 1,
-						ScrollBarImageColor3 = v35.ScrollImageColor,
-						ScrollBarImageTransparency = v35.ScrollImageTransparency,
-						BorderSizePixel = 0,
-						ScrollBarThickness = v35.ScrollBarSize,
-						VerticalScrollBarInset = Enum.ScrollBarInset.Always,
-						ClipsDescendants = false,
-						ScrollingEnabled = not t2.dropDownVisible,
-						Selectable = false,
-						CanvasPosition = t2.dropDownVisible and v61 or v45,
-						ref = v40,
-						[React.Change.CanvasPosition] = v72
-					}, {
-						OffsetUndoFrame = React.createElement("Frame", {
-							Size = UDim2.new(1, v81 + v82, 0, 0),
-							AutomaticSize = Enum.AutomaticSize.Y,
-							BackgroundTransparency = 1,
-							[React.Change.AbsoluteSize] = v70
-						}, t4)
-					})
+			})
+		end
+
+		v22.TopRoundedRect = topRoundedRect
+		local titleBar2
+
+		if not FFlagPlayerListTwoTabsOnLegacy then
+			if props.gameStatsCount > 0 then
+				titleBar2 = React.createElement(TitleBarContainer, {
+					size = UDim2.new(1, 0, 0, v3.TitleBarSizeY),
+					entrySizeX = props.entrySizeX,
+					layoutOrder = 2,
+					contentsVisible = state4,
+					showBackground = true,
+					backgroundTransparency = mapped
 				})
-			}),
-			BottomRoundedRect = if v31 then React.createElement("Frame", {
+			else
+				titleBar2 = false
+			end
+		end
+
+		v22.TitleBar = titleBar2
+		local scrollingFrameContainer
+
+		if not FFlagPlayerListTwoTabsOnLegacy then
+			scrollingFrameContainer = element
+		end
+
+		v22.ScrollingFrameContainer = scrollingFrameContainer
+		local twoTabsBody
+
+		if FFlagPlayerListTwoTabsOnLegacy then
+			twoTabsBody = React.createElement(LegacyTwoTabsBody, {
+				titleBar = titleBar,
+				serverBody = element,
+				isVisible = props.isVisible,
+				isDirectionalPreferred = props.isDirectionalPreferred,
+				layoutOrder = 2,
+				platformBodyHeight = state6 + (props.gameStatsCount > 0 and v3.TitleBarSizeY or 0),
+				backgroundColor = color,
+				backgroundTransparency = mapped
+			})
+		end
+
+		v22.TwoTabsBody = twoTabsBody
+		local bottomRoundedRect
+
+		if v then
+			bottomRoundedRect = React.createElement("Frame", {
 				LayoutOrder = 4,
 				ClipsDescendants = true,
+				Size = UDim2.new(1, 0, 0, 7),
 				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Size = UDim2.new(1, 0, 0, 7)
+				BorderSizePixel = 0
 			}, { React.createElement("Frame", {
-				BorderSizePixel = 0,
-				Position = UDim2.new(0, 0, 0, -8),
-				Size = UDim2.new(1, 0, 0, 14),
-				BackgroundColor3 = v83,
-				BackgroundTransparency = v69
-			}, { React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, 7)
-			}) }) }) else React.createElement("ImageLabel", {
+					Position = UDim2.new(0, 0, 0, -8),
+					Size = UDim2.new(1, 0, 0, 14),
+					BackgroundColor3 = color,
+					BackgroundTransparency = mapped,
+					BorderSizePixel = 0
+				}, { React.createElement("UICorner", { CornerRadius = UDim.new(0, 7) }) }) })
+		else
+			bottomRoundedRect = React.createElement("ImageLabel", {
 				LayoutOrder = 4,
 				BackgroundTransparency = 1,
 				Image = "rbxasset://textures/ui/BottomRoundedRect8px.png",
-				SliceScale = 0.5,
-				ImageColor3 = v83,
-				ImageTransparency = v69,
+				ImageColor3 = color,
+				ImageTransparency = mapped,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(8, 8, 24, 16),
+				SliceScale = 0.5,
 				Size = UDim2.new(1, 0, 0, 4)
 			})
+		end
+
+		v22.BottomRoundedRect = bottomRoundedRect
+		return createElement5("Frame", v20, {
+			SizeOffsetFrame = createElement6("Frame", v21, v22)
 		})
-	})
+	end
 end
 
 return React.memo(PlayerListDisplayView)

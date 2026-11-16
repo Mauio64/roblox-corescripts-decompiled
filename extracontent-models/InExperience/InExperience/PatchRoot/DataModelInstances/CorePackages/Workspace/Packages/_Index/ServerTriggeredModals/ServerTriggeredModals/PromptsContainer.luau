@@ -1,40 +1,56 @@
 local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
-local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
-local React = require(ServerTriggeredModalsParent.React)
-local SduiFeatureEntryPoint = require(ServerTriggeredModalsParent.SduiSharedUtilities).SduiFeatureEntryPoint
+local parent = ServerTriggeredModals.Parent
+
+local React = require(parent.React)
+local SduiSharedUtilities = require(parent.SduiSharedUtilities)
+
+local SduiFeatureEntryPoint = SduiSharedUtilities.SduiFeatureEntryPoint
+
 local Logger = require(ServerTriggeredModals.Logger)
 local reportPromptImpression = require(ServerTriggeredModals.reportPromptImpression)
-local sendModalImpressionEvent = require(ServerTriggeredModalsParent.ServerTriggeredModalImpressions).sendModalImpressionEvent
-local SharedFlags = require(ServerTriggeredModalsParent.SharedFlags)
+local ServerTriggeredModalImpressions = require(parent.ServerTriggeredModalImpressions)
+local sendModalImpressionEvent = ServerTriggeredModalImpressions.sendModalImpressionEvent
+
+local SharedFlags = require(parent.SharedFlags)
 local FFlagEnableHomepagePromptsForModalsAndBanners = SharedFlags.FFlagEnableHomepagePromptsForModalsAndBanners
 local FFlagPromptsHandlerEnabled = SharedFlags.FFlagPromptsHandlerEnabled
+local FFlagPromptsActionEventLogging = require(ServerTriggeredModals.Flags.FFlagPromptsActionEventLogging)
 
-local function PromptsContainer(t1: {[any]: any}) -- line: 46
-	-- upvalues: React (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy), SduiFeatureEntryPoint (copy), FFlagEnableHomepagePromptsForModalsAndBanners (copy), FFlagPromptsHandlerEnabled (copy)
-	local modalId = t1.modalId
-	local modalType = t1.modalType
+local function PromptsContainer(props)
+	local modalId = props.modalId
+	local modalType = props.modalType
 
-	React.useEffect(function() -- line: 50
-		-- upvalues: modalId (copy), modalType (copy), reportPromptImpression (copy), Logger (copy), sendModalImpressionEvent (copy)
+	React.useEffect(function()
 		if modalId and modalType then
-			reportPromptImpression(modalType, modalId):catch(function() -- line: 52
-				-- upvalues: Logger (copy)
+			reportPromptImpression(modalType, modalId):catch(function()
 				Logger:warning("Failed to report prompt impression")
 			end)
 			sendModalImpressionEvent(modalId, modalType)
 		end
-	end, {
-		modalId,
-		modalType
-	})
+	end, { modalId, modalType })
 
-	return React.createElement(SduiFeatureEntryPoint, {
+	local createElement = React.createElement
+	local v = {
+		configKey = props.configKey,
+		identifier = 0,
+		appPage = 0,
+		additionalAnalyticsData = 0,
 		shouldDisplayLoading = false,
-		shouldDisplayError = false,
-		configKey = t1.configKey,
-		identifier = if not FFlagEnableHomepagePromptsForModalsAndBanners and not FFlagPromptsHandlerEnabled then nil else t1.modalId,
-		appPage = t1.appPage
-	})
+		shouldDisplayError = false
+	}
+	local identifier
+
+	if FFlagEnableHomepagePromptsForModalsAndBanners or FFlagPromptsHandlerEnabled then
+		identifier = props.modalId
+	end
+
+	v.identifier = identifier
+
+	v.appPage = props.appPage
+	v.additionalAnalyticsData = FFlagPromptsActionEventLogging and {
+		promptInstanceId = modalId or nil
+	} or nil
+	return createElement(SduiFeatureEntryPoint, v)
 end
 
 return React.memo(PromptsContainer)

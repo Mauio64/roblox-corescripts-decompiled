@@ -1,14 +1,13 @@
 local insert = table.insert
 
-local function keys(t1: {[any]: any}) -- line: 12
-	-- upvalues: insert (copy)
-	local t2 = {}
+local function keys(items)
+	local result = {}
 
-	for v5, _ in t1 do
-		insert(t2, v5)
+	for k, _ in items do
+		insert(result, k)
 	end
 
-	return t2
+	return result
 end
 
 return keys

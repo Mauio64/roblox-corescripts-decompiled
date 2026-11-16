@@ -1,8 +1,7 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local UserProfileSettingsNetworking = require(ProfilePlatformParent.UserProfileSettingsNetworking)
+local parent = ProfilePlatform.Parent
+
+local UserProfileSettingsNetworking = require(parent.UserProfileSettingsNetworking)
 local myRoduxNetworking = require(ProfilePlatform.Networking.myRoduxNetworking)
 
-return (UserProfileSettingsNetworking.config({
-	roduxNetworking = myRoduxNetworking
-}))
+return (UserProfileSettingsNetworking.config({ roduxNetworking = myRoduxNetworking }))

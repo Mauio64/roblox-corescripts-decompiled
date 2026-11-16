@@ -1,843 +1,1032 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local Object = require(ParentParent.LuauPolyfill).Object
-local __DEV__ = ReactGlobals.__DEV__
-local console = require(ParentParent.Shared).console
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
 
+local __DEV__ = ReactGlobals.__DEV__
+
+local Shared = require(parent.Shared)
+local console = Shared.console
 require(script.Parent.ReactInternalTypes)
 
 local ReactFiberLane = require(script.Parent.ReactFiberLane)
-local lib = require(script.Parent["ReactUpdateQueue.new"])
 
-require(ParentParent.Shared)
+local ReactUpdateQueuenew = require(script.Parent["ReactUpdateQueue.new"])
 
-local React = require(ParentParent.React)
+require(parent.Shared)
+
+local React = require(parent.React)
+
 local ReactFiberFlags = require(script.Parent.ReactFiberFlags)
 local Update = ReactFiberFlags.Update
 local Snapshot = ReactFiberFlags.Snapshot
 local MountLayoutDev = ReactFiberFlags.MountLayoutDev
-local ReactFeatureFlags = require(ParentParent.Shared).ReactFeatureFlags
+
+local Shared2 = require(parent.Shared)
+local ReactFeatureFlags = Shared2.ReactFeatureFlags
+
 local debugRenderPhaseSideEffectsForStrictMode = ReactFeatureFlags.debugRenderPhaseSideEffectsForStrictMode
 local disableLegacyContext = ReactFeatureFlags.disableLegacyContext
 local enableDebugTracing = ReactFeatureFlags.enableDebugTracing
 local enableSchedulingProfiler = ReactFeatureFlags.enableSchedulingProfiler
 local warnAboutDeprecatedLifecycles = ReactFeatureFlags.warnAboutDeprecatedLifecycles
 local enableDoubleInvokingEffects = ReactFeatureFlags.enableDoubleInvokingEffects
-local lib2 = require(script.Parent["ReactStrictModeWarnings.new"])
-local isMounted = require(script.Parent.ReactFiberTreeReflection).isMounted
-local ReactInstanceMap = require(ParentParent.Shared).ReactInstanceMap
+local enableAllocationTrims = ReactFeatureFlags.enableAllocationTrims
+
+local ReactStrictModeWarningsnew = require(script.Parent["ReactStrictModeWarnings.new"])
+local ReactFiberTreeReflection = require(script.Parent.ReactFiberTreeReflection)
+local isMounted = ReactFiberTreeReflection.isMounted
+local Shared3 = require(parent.Shared)
+local ReactInstanceMap = Shared3.ReactInstanceMap
 local get = ReactInstanceMap.get
 local set = ReactInstanceMap.set
-local shallowEqual = require(ParentParent.Shared).shallowEqual
-local getComponentName = require(ParentParent.Shared).getComponentName
-local UninitializedState = require(ParentParent.Shared).UninitializedState
-local describeError = require(ParentParent.Shared).describeError
-local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local Shared4 = require(parent.Shared)
+local shallowEqual = Shared4.shallowEqual
+local Shared5 = require(parent.Shared)
+local getComponentName = Shared5.getComponentName
+local Shared6 = require(parent.Shared)
+local UninitializedState = Shared6.UninitializedState
+local Shared7 = require(parent.Shared)
+local describeError = Shared7.describeError
+
+local Shared8 = require(parent.Shared)
+local ReactSymbols = Shared8.ReactSymbols
 local REACT_CONTEXT_TYPE = ReactSymbols.REACT_CONTEXT_TYPE
 local REACT_PROVIDER_TYPE = ReactSymbols.REACT_PROVIDER_TYPE
-local resolveDefaultProps = require(script.Parent["ReactFiberLazyComponent.new"]).resolveDefaultProps
+
+local ReactFiberLazyComponentnew = require(script.Parent["ReactFiberLazyComponent.new"])
+local resolveDefaultProps = ReactFiberLazyComponentnew.resolveDefaultProps
 local ReactTypeOfMode = require(script.Parent.ReactTypeOfMode)
 local DebugTracingMode = ReactTypeOfMode.DebugTracingMode
 local StrictMode = ReactTypeOfMode.StrictMode
-local enqueueUpdate = lib.enqueueUpdate
-local processUpdateQueue = lib.processUpdateQueue
-local checkHasForceUpdateAfterProcessing = lib.checkHasForceUpdateAfterProcessing
-local resetHasForceUpdateBeforeProcessing = lib.resetHasForceUpdateBeforeProcessing
-local createUpdate = lib.createUpdate
-local ReplaceState = lib.ReplaceState
-local ForceUpdate = lib.ForceUpdate
-local initializeUpdateQueue = lib.initializeUpdateQueue
-local cloneUpdateQueue = lib.cloneUpdateQueue
+
+local enqueueUpdate = ReactUpdateQueuenew.enqueueUpdate
+local processUpdateQueue = ReactUpdateQueuenew.processUpdateQueue
+
+local checkHasForceUpdateAfterProcessing = ReactUpdateQueuenew.checkHasForceUpdateAfterProcessing
+
+local resetHasForceUpdateBeforeProcessing = ReactUpdateQueuenew.resetHasForceUpdateBeforeProcessing
+local createUpdate = ReactUpdateQueuenew.createUpdate
+local ReplaceState = ReactUpdateQueuenew.ReplaceState
+local ForceUpdate = ReactUpdateQueuenew.ForceUpdate
+local initializeUpdateQueue = ReactUpdateQueuenew.initializeUpdateQueue
+local cloneUpdateQueue = ReactUpdateQueuenew.cloneUpdateQueue
 local NoLanes = ReactFiberLane.NoLanes
-local lib3 = require(script.Parent["ReactFiberContext.new"])
-local cacheContext = lib3.cacheContext
-local getMaskedContext = lib3.getMaskedContext
-local getUnmaskedContext = lib3.getUnmaskedContext
-local hasContextChanged = lib3.hasContextChanged
-local emptyContextObject = lib3.emptyContextObject
-local readContext = require(script.Parent["ReactFiberNewContext.new"]).readContext
+
+local ReactFiberContextnew = require(script.Parent["ReactFiberContext.new"])
+local cacheContext = ReactFiberContextnew.cacheContext
+local getMaskedContext = ReactFiberContextnew.getMaskedContext
+local getUnmaskedContext = ReactFiberContextnew.getUnmaskedContext
+local hasContextChanged = ReactFiberContextnew.hasContextChanged
+local emptyContextObject = ReactFiberContextnew.emptyContextObject
+
+local ReactFiberNewContextnew = require(script.Parent["ReactFiberNewContext.new"])
+local readContext = ReactFiberNewContextnew.readContext
+
 local DebugTracing = require(script.Parent.DebugTracing)
 local logForceUpdateScheduled = DebugTracing.logForceUpdateScheduled
 local logStateUpdateScheduled = DebugTracing.logStateUpdateScheduled
-local ConsolePatchingDev = require(ParentParent.Shared).ConsolePatchingDev
+
+local Shared9 = require(parent.Shared)
+local ConsolePatchingDev = Shared9.ConsolePatchingDev
 local disableLogs = ConsolePatchingDev.disableLogs
 local reenableLogs = ConsolePatchingDev.reenableLogs
+
 local SchedulingProfiler = require(script.Parent.SchedulingProfiler)
 local markForceUpdateScheduled = SchedulingProfiler.markForceUpdateScheduled
 local markStateUpdateScheduled = SchedulingProfiler.markStateUpdateScheduled
-local t1 = {}
+
+local reactInternalInstance = {}
+
 local __refs = React.Component:extend("").__refs
-local t2 = nil
-local t3 = nil
-local t4 = nil
-local t5 = nil
-local warnOnUndefinedDerivedState = nil
-local warnOnInvalidCallback = nil
-local t6 = nil
-local t7 = nil
-local t8 = nil
+local warnOnInvalidCallback, warnOnUndefinedDerivedState, dataSet, dataSet2, dataSet3, set2, set3, set4, set5
 
 if __DEV__ then
-	t2 = {}
-	t3 = {}
-	t4 = {}
-	t5 = {}
-	t6 = {}
-	t7 = {}
-	t8 = {}
+	local set6 = {}
 
-	local t9 = {}
-
-	function warnOnInvalidCallback(p1, s1: string) -- line: 140
-		-- upvalues: t9 (copy), console (copy)
-		if p1 == nil or type(p1) == "function" then
+	warnOnInvalidCallback = function(callback, p: string)
+		if callback == nil or type(callback) == "function" then
 			return
 		end
 
-		local v82 = s1 .. "_" .. tostring(p1)
+		local v = p .. "_" .. tostring(callback)
 
-		if not t9[v82] then
-			t9[v82] = true
-			console.error("%s(...): Expected the last optional `callback` argument to be a function. Instead received: %s.", s1, (tostring(p1)))
+		if not set6[v] then
+			set6[v] = true
+			console.error(
+				"%s(...): Expected the last optional `callback` argument to be a function. Instead received: %s.",
+				p,
+				(tostring(callback))
+			)
 		end
 	end
-	function warnOnUndefinedDerivedState(_, _) -- line: 156
-	end
+
+	warnOnUndefinedDerivedState = function(_, _) end
+
+	dataSet = {}
+	dataSet2 = {}
+
+	dataSet3 = {}
+	set2 = {}
+
+	set3 = {}
+	set4 = {}
+
+	set5 = {}
+else
+	warnOnUndefinedDerivedState = nil
+	warnOnInvalidCallback = nil
+	dataSet = nil
+	dataSet2 = nil
+	dataSet3 = nil
+	set2 = nil
+	set3 = nil
+	set4 = nil
+	set5 = nil
 end
 
-local function applyDerivedStateFromProps(p4, p5, p6: ((...any) -> ...any), p7) -- line: 199
-	-- upvalues: __DEV__ (copy), debugRenderPhaseSideEffectsForStrictMode (copy), StrictMode (copy), disableLogs (copy), describeError (copy), reenableLogs (copy), warnOnUndefinedDerivedState (ref), Object (copy), NoLanes (copy)
-	local memoizedState = p4.memoizedState
+local function applyDerivedStateFromProps(state, p, getDerivedStateFromProps, p2)
+	local v = state.memoizedState
 
-	if __DEV__ and (debugRenderPhaseSideEffectsForStrictMode and bit32.band(p4.mode, StrictMode) ~= 0) then
+	if __DEV__ and debugRenderPhaseSideEffectsForStrictMode and bit32.band(state.mode, StrictMode) ~= 0 then
 		disableLogs()
 
-		local ok, result = xpcall(p6, describeError, p7, memoizedState)
+		local success, result = xpcall(getDerivedStateFromProps, describeError, p2, v)
 
 		reenableLogs()
 
-		if not ok then
+		if not success then
 			error(result)
 		end
 	end
 
-	local v92 = p6(p7, memoizedState)
+	local v2 = getDerivedStateFromProps(p2, v)
 
 	if __DEV__ then
-		warnOnUndefinedDerivedState(p5, v92)
+		warnOnUndefinedDerivedState(p, v2)
 	end
 
-	local v93 = if v92 ~= nil then Object.assign({}, memoizedState, v92) else memoizedState
+	if enableAllocationTrims then
+		if v2 ~= nil then
+			if type(v) == "table" and getmetatable(v) == nil then
+				v = Object.assign(table.clone(v), v2)
+			else
+				v = Object.assign({}, v, v2)
+			end
+		end
+	elseif v2 ~= nil then
+		v = Object.assign({}, v, v2)
+	end
 
-	p4.memoizedState = v93
+	state.memoizedState = v
 
-	if p4.lanes == NoLanes then
-		p4.updateQueue.baseState = v93
+	if state.lanes == NoLanes then
+		state.updateQueue.baseState = v
 	end
 end
 
-local t10 = nil
+local classComponentUpdater = nil
+local function initializeClassComponentUpdater()
+	local ReactFiberWorkLoopnew = require(script.Parent["ReactFiberWorkLoop.new"])
+	local requestEventTime = ReactFiberWorkLoopnew.requestEventTime
+	local requestUpdateLane = ReactFiberWorkLoopnew.requestUpdateLane
+	local scheduleUpdateOnFiber = ReactFiberWorkLoopnew.scheduleUpdateOnFiber
 
-local function initializeClassComponentUpdater() -- line: 247
-	-- upvalues: t10 (ref), isMounted (copy), get (copy), createUpdate (copy), __DEV__ (copy), warnOnInvalidCallback (ref), enqueueUpdate (copy), enableDebugTracing (copy), DebugTracingMode (copy), getComponentName (copy), logStateUpdateScheduled (copy), enableSchedulingProfiler (copy), markStateUpdateScheduled (copy), ReplaceState (copy), ForceUpdate (copy), logForceUpdateScheduled (copy), markForceUpdateScheduled (copy)
-	local lib4 = require(script.Parent["ReactFiberWorkLoop.new"])
-	local requestEventTime = lib4.requestEventTime
-	local requestUpdateLane = lib4.requestUpdateLane
-	local scheduleUpdateOnFiber = lib4.scheduleUpdateOnFiber
-
-	t10 = {
+	classComponentUpdater = {
 		isMounted = isMounted,
-		enqueueSetState = function(p8, p9, p10: ((...any) -> ...any)?) -- line: 255
-			-- upvalues: get (copy), requestEventTime (copy), requestUpdateLane (copy), createUpdate (copy), __DEV__ (copy), warnOnInvalidCallback (ref), enqueueUpdate (copy), scheduleUpdateOnFiber (copy), enableDebugTracing (copy), DebugTracingMode (copy), getComponentName (copy), logStateUpdateScheduled (copy), enableSchedulingProfiler (copy), markStateUpdateScheduled (copy)
-			local v198 = get(p8)
-			local v199 = requestEventTime()
-			local v200 = requestUpdateLane(v198)
-			local v201 = createUpdate(v199, v200, p9, p10)
+		enqueueSetState = function(p, p2, callback)
+			local v = get(p)
+			local v2 = requestEventTime()
+			local v3 = requestUpdateLane(v)
 
-			if p10 ~= nil and __DEV__ then
-				warnOnInvalidCallback(p10, "setState")
+			local update = createUpdate(v2, v3, p2, callback)
+
+			if callback ~= nil and __DEV__ then
+				warnOnInvalidCallback(callback, "setState")
 			end
 
-			enqueueUpdate(v198, v201)
-			scheduleUpdateOnFiber(v198, v200, v199)
+			enqueueUpdate(v, update)
+			scheduleUpdateOnFiber(v, v3, v2)
 
-			if __DEV__ and enableDebugTracing and bit32.band(v198.mode, DebugTracingMode) ~= 0 then
-				local v202 = getComponentName(v198.type) or "Unknown"
-
-				logStateUpdateScheduled(v202, v200, p9)
+			if __DEV__ and enableDebugTracing and bit32.band(v.mode, DebugTracingMode) ~= 0 then
+				logStateUpdateScheduled(getComponentName(v.type) or "Unknown", v3, p2)
 			end
 
 			if enableSchedulingProfiler then
-				markStateUpdateScheduled(v198, v200)
+				markStateUpdateScheduled(v, v3)
 			end
 		end,
-		enqueueReplaceState = function(p11, p12, p13) -- line: 285
-			-- upvalues: get (copy), requestEventTime (copy), requestUpdateLane (copy), createUpdate (copy), ReplaceState (copy), __DEV__ (copy), warnOnInvalidCallback (ref), enqueueUpdate (copy), scheduleUpdateOnFiber (copy), enableDebugTracing (copy), DebugTracingMode (copy), getComponentName (copy), logStateUpdateScheduled (copy), enableSchedulingProfiler (copy), markStateUpdateScheduled (copy)
-			local v206 = get(p11)
-			local v207 = requestEventTime()
-			local v208 = requestUpdateLane(v206)
-			local v209 = createUpdate(v207, v208, p12, p13)
+		enqueueReplaceState = function(p, p2, p3)
+			local v = get(p)
+			local v2 = requestEventTime()
+			local v3 = requestUpdateLane(v)
 
-			v209.tag = ReplaceState
+			local update = createUpdate(v2, v3, p2, p3)
+			update.tag = ReplaceState
 
-			if p13 ~= nil and __DEV__ then
-				warnOnInvalidCallback(p13, "replaceState")
+			if p3 ~= nil and __DEV__ then
+				warnOnInvalidCallback(p3, "replaceState")
 			end
 
-			enqueueUpdate(v206, v209)
-			scheduleUpdateOnFiber(v206, v208, v207)
+			enqueueUpdate(v, update)
+			scheduleUpdateOnFiber(v, v3, v2)
 
-			if __DEV__ and enableDebugTracing and bit32.band(v206.mode, DebugTracingMode) ~= 0 then
-				local v210 = getComponentName(v206.type) or "Unknown"
-
-				logStateUpdateScheduled(v210, v208, p12)
+			if __DEV__ and enableDebugTracing and bit32.band(v.mode, DebugTracingMode) ~= 0 then
+				logStateUpdateScheduled(getComponentName(v.type) or "Unknown", v3, p2)
 			end
 
 			if enableSchedulingProfiler then
-				markStateUpdateScheduled(v206, v208)
+				markStateUpdateScheduled(v, v3)
 			end
 		end,
-		enqueueForceUpdate = function(p14, p15) -- line: 317
-			-- upvalues: get (copy), requestEventTime (copy), requestUpdateLane (copy), createUpdate (copy), ForceUpdate (copy), __DEV__ (copy), warnOnInvalidCallback (ref), enqueueUpdate (copy), scheduleUpdateOnFiber (copy), enableDebugTracing (copy), DebugTracingMode (copy), getComponentName (copy), logForceUpdateScheduled (copy), enableSchedulingProfiler (copy), markForceUpdateScheduled (copy)
-			local v213 = get(p14)
-			local v214 = requestEventTime()
-			local v215 = requestUpdateLane(v213)
-			local v216 = createUpdate(v214, v215, nil, p15)
+		enqueueForceUpdate = function(p, p2)
+			local v = get(p)
+			local v2 = requestEventTime()
+			local v3 = requestUpdateLane(v)
 
-			v216.tag = ForceUpdate
+			local update = createUpdate(v2, v3, nil, p2)
+			update.tag = ForceUpdate
 
-			if p15 ~= nil and __DEV__ then
-				warnOnInvalidCallback(p15, "forceUpdate")
+			if p2 ~= nil and __DEV__ then
+				warnOnInvalidCallback(p2, "forceUpdate")
 			end
 
-			enqueueUpdate(v213, v216)
-			scheduleUpdateOnFiber(v213, v215, v214)
+			enqueueUpdate(v, update)
+			scheduleUpdateOnFiber(v, v3, v2)
 
-			if __DEV__ and enableDebugTracing and bit32.band(v213.mode, DebugTracingMode) ~= 0 then
-				local v217 = getComponentName(v213.type) or "Unknown"
-
-				logForceUpdateScheduled(v217, v215)
+			if __DEV__ and enableDebugTracing and bit32.band(v.mode, DebugTracingMode) ~= 0 then
+				logForceUpdateScheduled(getComponentName(v.type) or "Unknown", v3)
 			end
 
 			if enableSchedulingProfiler then
-				markForceUpdateScheduled(v213, v215)
+				markForceUpdateScheduled(v, v3)
 			end
 		end
 	}
 end
-local function getClassComponentUpdater() -- line: 351
-	-- upvalues: t10 (ref), initializeClassComponentUpdater (copy)
-	if t10 == nil then
+
+local function getClassComponentUpdater() -- 3 equivalent calls inferred from this helper
+	if classComponentUpdater == nil then
 		initializeClassComponentUpdater()
 	end
 
-	return t10
+	return classComponentUpdater
 end
 
-function checkShouldComponentUpdate(p16, p17, p18, p19, p20, p21, p22) -- line: 358
-	-- upvalues: __DEV__ (copy), debugRenderPhaseSideEffectsForStrictMode (copy), StrictMode (copy), disableLogs (copy), describeError (copy), reenableLogs (copy), console (copy), getComponentName (copy), shallowEqual (copy)
-	local stateNode = p16.stateNode
+function checkShouldComponentUpdate(p, p2, p3, p4, p5, p6, p7)
+	local stateNode = p.stateNode
 
-	if stateNode.shouldComponentUpdate ~= nil and type(stateNode.shouldComponentUpdate) == "function" then
-		if __DEV__ and debugRenderPhaseSideEffectsForStrictMode and bit32.band(p16.mode, StrictMode) ~= 0 then
+	if stateNode.shouldComponentUpdate == nil or type(stateNode.shouldComponentUpdate) ~= "function" then
+		if type(p2) == "table" and p2.isPureReactComponent then
+			return not (shallowEqual(p3, p4) and shallowEqual(p5, p6))
+		end
+
+		return true
+	else
+		if __DEV__ and debugRenderPhaseSideEffectsForStrictMode and bit32.band(p.mode, StrictMode) ~= 0 then
 			disableLogs()
 
-			local ok, result = xpcall(stateNode.shouldComponentUpdate, describeError, stateNode, p19, p21, p22)
+			local success, result = xpcall(stateNode.shouldComponentUpdate, describeError, stateNode, p4, p6, p7)
 
 			reenableLogs()
 
-			if not ok then
+			if not success then
 				error(result)
 			end
 		end
 
-		local v108 = stateNode:shouldComponentUpdate(p19, p21, p22)
+		local shouldComponentUpdate = stateNode:shouldComponentUpdate(p4, p6, p7)
 
-		if __DEV__ and v108 == nil then
-			console.error("%s.shouldComponentUpdate(): Returned nil instead of a boolean value. Make sure to return true or false.", getComponentName(p17) or "Component")
+		if __DEV__ and shouldComponentUpdate == nil then
+			console.error(
+				"%s.shouldComponentUpdate(): Returned nil instead of a boolean value. Make sure to return true or false.",
+				getComponentName(p2) or "Component"
+			)
 		end
 
-		return v108
+		return shouldComponentUpdate
 	end
-
-	if type(p17) == "table" and p17.isPureReactComponent then
-		return not shallowEqual(p18, p19) or not shallowEqual(p20, p21)
-	end
-
-	return true
 end
 
-local function checkClassInstance(p23, p24, p25) -- line: 423
-	-- upvalues: __DEV__ (copy), getComponentName (copy), console (copy), disableLegacyContext (copy), t7 (ref), t4 (ref)
-	local stateNode = p23.stateNode
+local function checkClassInstance(state, data, props)
+	local stateNode = state.stateNode
 
 	if __DEV__ then
-		local v113 = getComponentName(p24) or "Component"
+		local v = getComponentName(data) or "Component"
 
 		if not stateNode.render then
-			if type(p24.render) == "function" then
-				console.error("%s(...): No `render` method found on the returned component instance: did you accidentally return an object from the constructor?", v113)
+			if type(data.render) == "function" then
+				console.error(
+					"%s(...): No `render` method found on the returned component instance: did you accidentally return an object from the constructor?",
+					v
+				)
 			else
-				console.error("%s(...): No `render` method found on the returned component instance: you may have forgotten to define `render`.", v113)
+				console.error(
+					"%s(...): No `render` method found on the returned component instance: you may have forgotten to define `render`.",
+					v
+				)
 			end
 		end
 
-		if stateNode.getInitialState and not stateNode.getInitialState.isReactClassApproved and not stateNode.state then
-			console.error("getInitialState was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Did you mean to define a state property instead?", v113)
+		if stateNode.getInitialState and not (stateNode.getInitialState.isReactClassApproved or stateNode.state) then
+			console.error(
+				"getInitialState was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Did you mean to define a state property instead?",
+				v
+			)
 		end
 
 		if stateNode.getDefaultProps and not stateNode.getDefaultProps.isReactClassApproved then
-			console.error("getDefaultProps was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Use a static property to define defaultProps instead.", v113)
+			console.error(
+				"getDefaultProps was defined on %s, a plain JavaScript class. This is only supported for classes created using React.createClass. Use a static property to define defaultProps instead.",
+				v
+			)
 		end
 
-		if stateNode.propTypes and not p24.propTypes then
-			console.error("propTypes was defined as an instance property on %s. Use a static property to define propTypes instead.", v113)
+		if stateNode.propTypes and not data.propTypes then
+			console.error(
+				"propTypes was defined as an instance property on %s. Use a static property to define propTypes instead.",
+				v
+			)
 		end
 
-		if stateNode.contextType and not p24.contextType then
-			console.error("contextType was defined as an instance property on %s. Use a static property to define contextType instead.", v113)
+		if stateNode.contextType and not data.contextType then
+			console.error(
+				"contextType was defined as an instance property on %s. Use a static property to define contextType instead.",
+				v
+			)
 		end
 
 		if disableLegacyContext then
-			if p24.childContextTypes then
-				console.error("%s uses the legacy childContextTypes API which is no longer supported. Use React.createContext() instead.", v113)
+			if data.childContextTypes then
+				console.error(
+					"%s uses the legacy childContextTypes API which is no longer supported. Use React.createContext() instead.",
+					v
+				)
 			end
 
-			if p24.contextTypes then
-				console.error("%s uses the legacy contextTypes API which is no longer supported. Use React.createContext() with static contextType instead.", v113)
+			if data.contextTypes then
+				console.error(
+					"%s uses the legacy contextTypes API which is no longer supported. Use React.createContext() with static contextType instead.",
+					v
+				)
 			end
 		else
-			if stateNode.contextTypes and not p24.contextTypes then
-				console.error("contextTypes was defined as an instance property on %s. Use a static property to define contextTypes instead.", v113)
+			if stateNode.contextTypes and not data.contextTypes then
+				console.error(
+					"contextTypes was defined as an instance property on %s. Use a static property to define contextTypes instead.",
+					v
+				)
 			end
 
-			if type(p24) == "table" and p24.contextType and p24.contextTypes and not t7[p24] then
-				t7[p24] = true
-				console.error("%s declares both contextTypes and contextType static properties. The legacy contextTypes property will be ignored.", v113)
+			if type(data) == "table" and data.contextType and data.contextTypes and not dataSet[data] then
+				dataSet[data] = true
+				console.error(
+					"%s declares both contextTypes and contextType static properties. The legacy contextTypes property will be ignored.",
+					v
+				)
 			end
 		end
 
 		if type(stateNode.componentShouldUpdate) == "function" then
-			console.error("%s has a method called componentShouldUpdate(). Did you mean shouldComponentUpdate()? The name is phrased as a question because the function is expected to return a value.", v113)
+			console.error(
+				"%s has a method called componentShouldUpdate(). Did you mean shouldComponentUpdate()? The name is phrased as a question because the function is expected to return a value.",
+				v
+			)
 		end
 
-		if type(p24) == "table" and p24.isPureReactComponent and stateNode.shouldComponentUpdate ~= nil then
-			console.error("%s has a method called shouldComponentUpdate(). shouldComponentUpdate should not be used when extending React.PureComponent. Please extend React.Component if shouldComponentUpdate is used.", getComponentName(p24) or "A pure component")
+		if type(data) == "table" and data.isPureReactComponent and stateNode.shouldComponentUpdate ~= nil then
+			console.error(
+				"%s has a method called shouldComponentUpdate(). shouldComponentUpdate should not be used when extending React.PureComponent. Please extend React.Component if shouldComponentUpdate is used.",
+				getComponentName(data) or "A pure component"
+			)
 		end
 
 		if type(stateNode.componentDidUnmount) == "function" then
-			console.error("%s has a method called componentDidUnmount(). But there is no such lifecycle method. Did you mean componentWillUnmount()?", v113)
+			console.error(
+				"%s has a method called componentDidUnmount(). But there is no such lifecycle method. Did you mean componentWillUnmount()?",
+				v
+			)
 		end
 
 		if type(stateNode.componentDidReceiveProps) == "function" then
-			console.error("%s has a method called componentDidReceiveProps(). But there is no such lifecycle method. If you meant to update the state in response to changing props, use componentWillReceiveProps(). If you meant to fetch data or run side-effects or mutations after React has updated the UI, use componentDidUpdate().", v113)
+			console.error(
+				"%s has a method called componentDidReceiveProps(). But there is no such lifecycle method. If you meant to update the state in response to changing props, use componentWillReceiveProps(). If you meant to fetch data or run side-effects or mutations after React has updated the UI, use componentDidUpdate().",
+				v
+			)
 		end
 
 		if type(stateNode.componentWillRecieveProps) == "function" then
-			console.error("%s has a method called componentWillRecieveProps(). Did you mean componentWillReceiveProps()?", v113)
+			console.error(
+				"%s has a method called componentWillRecieveProps(). Did you mean componentWillReceiveProps()?",
+				v
+			)
 		end
 
 		if type(stateNode.UNSAFE_componentWillRecieveProps) == "function" then
-			console.error("%s has a method called UNSAFE_componentWillRecieveProps(). Did you mean UNSAFE_componentWillReceiveProps()?", v113)
+			console.error(
+				"%s has a method called UNSAFE_componentWillRecieveProps(). Did you mean UNSAFE_componentWillReceiveProps()?",
+				v
+			)
 		end
 
-		local v114 = p25 ~= stateNode.props
+		local v2 = stateNode.props ~= props
 
-		if stateNode.props ~= nil and v114 then
-			console.error("%s(...): When calling super() in `%s`, make sure to pass up the same props that your component's constructor was passed.", v113, v113)
+		if stateNode.props ~= nil and v2 then
+			console.error(
+				"%s(...): When calling super() in `%s`, make sure to pass up the same props that your component's constructor was passed.",
+				v,
+				v
+			)
 		end
 
 		if rawget(stateNode, "defaultProps") then
-			console.error("Setting defaultProps as an instance property on %s is not supported and will be ignored. Instead, define defaultProps as a static property on %s.", v113, v113)
+			console.error(
+				"Setting defaultProps as an instance property on %s is not supported and will be ignored. Instead, define defaultProps as a static property on %s.",
+				v,
+				v
+			)
 		end
 
-		if type(stateNode.getSnapshotBeforeUpdate) == "function" and type(stateNode.componentDidUpdate) ~= "function" and not t4[p24] then
-			t4[p24] = true
-			console.error("%s: getSnapshotBeforeUpdate() should be used with componentDidUpdate(). This component defines getSnapshotBeforeUpdate() only.", getComponentName(p24))
+		if
+			type(stateNode.getSnapshotBeforeUpdate) == "function"
+			and type(stateNode.componentDidUpdate) ~= "function"
+			and not dataSet2[data]
+		then
+			dataSet2[data] = true
+			console.error(
+				"%s: getSnapshotBeforeUpdate() should be used with componentDidUpdate(). This component defines getSnapshotBeforeUpdate() only.",
+				getComponentName(data)
+			)
 		end
 
-		local state = stateNode.state
+		local state2 = stateNode.state
 
-		if state ~= nil and type(state) ~= "table" then
-			console.error("%s.state: must be set to an object or nil", v113)
+		if state2 ~= nil and type(state2) ~= "table" then
+			console.error("%s.state: must be set to an object or nil", v)
 		end
 
-		if type(p24) == "table" and type(stateNode.getChildContext) == "function" and type(p24.childContextTypes) ~= "table" then
-			console.error("%s.getChildContext(): childContextTypes must be defined in order to use getChildContext().", v113)
+		if
+			type(data) == "table"
+			and type(stateNode.getChildContext) == "function"
+			and type(data.childContextTypes) ~= "table"
+		then
+			console.error(
+				"%s.getChildContext(): childContextTypes must be defined in order to use getChildContext().",
+				v
+			)
 		end
 	end
 end
-local function callComponentWillMount(p26, p27) -- line: 881
-	-- upvalues: __DEV__ (copy), console (copy), getComponentName (copy), t10 (ref), initializeClassComponentUpdater (copy)
-	local state = p27.state
 
-	if p27.componentWillMount ~= nil and type(p27.componentWillMount) == "function" then
-		p27:componentWillMount()
-	end
+local function adoptClassInstance(state, stateNode) -- 1 equivalent call inferred from this helper
+	stateNode.__updater = getClassComponentUpdater() -- inferred equivalent call
+	state.stateNode = stateNode
 
-	if p27.UNSAFE_componentWillMount ~= nil and type(p27.UNSAFE_componentWillMount) == "function" then
-		p27:UNSAFE_componentWillMount()
-	end
+	set(stateNode, state)
 
-	if state ~= p27.state then
-		if __DEV__ then
-			console.error("%s.componentWillMount(): Assigning directly to this.state is deprecated (except inside a component's constructor). Use setState instead.", getComponentName(p26.type) or "Component")
-		end
-
-		if t10 == nil then
-			initializeClassComponentUpdater()
-		end
-
-		t10.enqueueReplaceState(p27, p27.state)
+	if __DEV__ then
+		stateNode._reactInternalInstance = reactInternalInstance
 	end
 end
 
-function callComponentWillReceiveProps(p28, p29, p30, p31) -- line: 913
-	-- upvalues: __DEV__ (copy), getComponentName (copy), t2 (ref), console (copy), t10 (ref), initializeClassComponentUpdater (copy)
-	local state = p29.state
+local function constructClassInstance(state, data, p)
+	local v = false
+	local v2 = emptyContextObject
+	local v3 = emptyContextObject
+	local contextType = data.contextType
 
-	if p29.componentWillReceiveProps ~= nil and type(p29.componentWillReceiveProps) == "function" then
-		p29:componentWillReceiveProps(p30, p31)
+	if __DEV__ and data.contextType ~= nil then
+		local v4
+
+		if contextType == nil then
+			v4 = true
+		elseif contextType["$$typeof"] == REACT_CONTEXT_TYPE then
+			v4 = contextType._context == nil
+		else
+			v4 = false
+		end
+
+		if not (v4 or dataSet3[data]) then
+			dataSet3[data] = true
+
+			local v5 = ""
+			local v6
+
+			if contextType == nil then
+				v6 = " However, it is set to nil. This can be caused by a typo or by mixing up named and default imports. This can also happen due to a circular dependency, so try moving the createContext() call to a separate file."
+			elseif type(contextType) == "table" then
+				if contextType["$$typeof"] == REACT_PROVIDER_TYPE then
+					v6 = " Did you accidentally pass the Context.Provider instead?"
+				elseif contextType._context == nil then
+					local v7 = v5 .. " However, it is set to an object with keys {"
+
+					for k, _ in contextType do
+						v7 ..= k .. ", "
+					end
+
+					v6 = v7 .. "}."
+				else
+					v6 = " Did you accidentally pass the Context.Consumer instead?"
+				end
+			else
+				v6 = " However, it is set to a " .. type(contextType) .. "."
+			end
+
+			console.error(
+				"%s defines an invalid contextType. contextType should point to the Context object returned by React.createContext().%s",
+				getComponentName(data) or "Component",
+				v6
+			)
+		end
 	end
 
-	if p29.UNSAFE_componentWillReceiveProps ~= nil and type(p29.UNSAFE_componentWillReceiveProps) == "function" then
-		p29:UNSAFE_componentWillReceiveProps(p30, p31)
+	if contextType == nil or type(contextType) ~= "table" then
+		if not disableLegacyContext then
+			v2 = getUnmaskedContext(state, data, true)
+			v = data.contextTypes ~= nil
+
+			v3 = v and getMaskedContext(state, v2) or emptyContextObject
+		end
+	else
+		v3 = readContext(contextType)
 	end
 
-	if state ~= p29.state then
-		if __DEV__ then
-			local v150 = getComponentName(p28.type) or "Component"
+	if __DEV__ and debugRenderPhaseSideEffectsForStrictMode and bit32.band(state.mode, StrictMode) ~= 0 then
+		disableLogs()
 
-			if not t2[v150] then
-				t2[v150] = true
-				console.error("%s.componentWillReceiveProps(): Assigning directly to this.state is deprecated (except inside a component's constructor). Use setState instead.", v150)
+		local success, result = xpcall(data.__ctor, describeError, p, v3)
+
+		reenableLogs()
+
+		if not success then
+			error(result)
+		end
+	end
+
+	local __ctor = data.__ctor(p, v3)
+
+	state.memoizedState = __ctor.state
+	local memoizedState = state.memoizedState
+	adoptClassInstance(state, __ctor) -- inferred equivalent call
+
+	if __DEV__ then
+		if type(data.getDerivedStateFromProps) == "function" and memoizedState == UninitializedState then
+			local v4 = getComponentName(data) or "Component"
+
+			if not set2[v4] then
+				set2[v4] = true
+
+				console.error(
+					"`%s` uses `getDerivedStateFromProps` but its initial state has not been initialized. This is not recommended. Instead, define the initial state by passing an object to `self:setState` in the `init` method of `%s`. This ensures that `getDerivedStateFromProps` arguments have a consistent shape.",
+					v4,
+					v4
+				)
 			end
 		end
 
-		if t10 == nil then
-			initializeClassComponentUpdater()
+		if type(data.getDerivedStateFromProps) == "function" or type(__ctor.getSnapshotBeforeUpdate) == "function" then
+			local v4 = type(__ctor.componentWillMount) == "function" and "componentWillMount"
+				or type(__ctor.UNSAFE_componentWillMount) == "function" and "UNSAFE_componentWillMount"
+				or nil
+
+			local v5 = type(__ctor.componentWillReceiveProps) == "function" and "componentWillReceiveProps"
+				or type(__ctor.UNSAFE_componentWillReceiveProps) == "function" and "UNSAFE_componentWillReceiveProps"
+				or nil
+
+			local v6 = type(__ctor.componentWillUpdate) == "function" and "componentWillUpdate"
+				or type(__ctor.UNSAFE_componentWillUpdate) == "function" and "UNSAFE_componentWillUpdate"
+				or nil
+
+			if v4 ~= nil or v5 ~= nil or v6 ~= nil then
+				local v7 = getComponentName(data) or "Component"
+
+				local v8 = type(data.getDerivedStateFromProps) == "function" and "getDerivedStateFromProps()"
+					or "getSnapshotBeforeUpdate()"
+
+				local v9 = v4 == nil and "" or "\n  " .. tostring(v4)
+
+				local v10 = v5 == nil and "" or "\n  " .. tostring(v5)
+
+				local v11 = v6 == nil and "" or "\n  " .. tostring(v6)
+
+				if not set3[v7] then
+					set3[v7] = true
+					console.error(
+						"Unsafe legacy lifecycles will not be called for components using new component APIs.\n\n%s uses %s but also contains the following legacy lifecycles:%s%s%s\n\nThe above lifecycles should be removed. Learn more about this warning here:\nhttps://reactjs.org/link/unsafe-component-lifecycles",
+						v7,
+						v8,
+						v9,
+						v10,
+						v11
+					)
+				end
+			end
+		end
+	end
+
+	if v then
+		cacheContext(state, v2, v3)
+	end
+
+	return __ctor
+end
+
+local function callComponentWillMount(state, stateNode)
+	local state2 = stateNode.state
+
+	if stateNode.componentWillMount ~= nil and type(stateNode.componentWillMount) == "function" then
+		stateNode:componentWillMount()
+	end
+
+	if stateNode.UNSAFE_componentWillMount ~= nil and type(stateNode.UNSAFE_componentWillMount) == "function" then
+		stateNode:UNSAFE_componentWillMount()
+	end
+
+	if state2 ~= stateNode.state then
+		if __DEV__ then
+			console.error(
+				"%s.componentWillMount(): Assigning directly to this.state is deprecated (except inside a component's constructor). Use setState instead.",
+				getComponentName(state.type) or "Component"
+			)
 		end
 
-		t10.enqueueReplaceState(p29, p29.state)
+		getClassComponentUpdater().enqueueReplaceState(stateNode, stateNode.state) -- inferred equivalent call
 	end
 end
-function resumeMountClassInstance(p32, p33, p34, p35) -- line: 1059
-	-- upvalues: emptyContextObject (copy), readContext (copy), disableLegacyContext (copy), getUnmaskedContext (copy), getMaskedContext (copy), resetHasForceUpdateBeforeProcessing (copy), processUpdateQueue (copy), hasContextChanged (copy), checkHasForceUpdateAfterProcessing (copy), __DEV__ (copy), enableDoubleInvokingEffects (copy), MountLayoutDev (copy), Update (copy), applyDerivedStateFromProps (copy)
-	local stateNode = p32.stateNode
-	local memoizedProps = p32.memoizedProps
 
+function callComponentWillReceiveProps(p, object, p2, p3)
+	local state = object.state
+
+	if object.componentWillReceiveProps ~= nil and type(object.componentWillReceiveProps) == "function" then
+		object:componentWillReceiveProps(p2, p3)
+	end
+
+	if
+		object.UNSAFE_componentWillReceiveProps ~= nil
+		and type(object.UNSAFE_componentWillReceiveProps) == "function"
+	then
+		object:UNSAFE_componentWillReceiveProps(p2, p3)
+	end
+
+	if object.state ~= state then
+		if __DEV__ then
+			local v = getComponentName(p.type) or "Component"
+
+			if not set4[v] then
+				set4[v] = true
+				console.error(
+					"%s.componentWillReceiveProps(): Assigning directly to this.state is deprecated (except inside a component's constructor). Use setState instead.",
+					v
+				)
+			end
+		end
+
+		getClassComponentUpdater().enqueueReplaceState(object, object.state) -- inferred equivalent call
+	end
+end
+
+function resumeMountClassInstance(state, p, p2, p3)
+	local stateNode = state.stateNode
+
+	local memoizedProps = state.memoizedProps
 	stateNode.props = memoizedProps
 
 	local context = stateNode.context
-	local contextType = p33.contextType
-	local v169 = emptyContextObject
+	local contextType = p.contextType
+	local context2 = emptyContextObject
 
-	if contextType ~= nil and type(contextType) == "table" then
-		v169 = readContext(contextType)
-	elseif not disableLegacyContext then
-		local v170 = getUnmaskedContext(p32, p33, true)
-
-		v169 = getMaskedContext(p32, v170)
+	if contextType == nil or type(contextType) ~= "table" then
+		if not disableLegacyContext then
+			context2 = getMaskedContext(state, (getUnmaskedContext(state, p, true)))
+		end
+	else
+		context2 = readContext(contextType)
 	end
 
-	local getDerivedStateFromProps = p33.getDerivedStateFromProps
-	local v172 = type(getDerivedStateFromProps) == "function" or type(stateNode.getSnapshotBeforeUpdate) == "function"
+	local getDerivedStateFromProps = p.getDerivedStateFromProps
+	local v = type(getDerivedStateFromProps) == "function" or type(stateNode.getSnapshotBeforeUpdate) == "function"
 
-	if not v172 and (type(stateNode.UNSAFE_componentWillReceiveProps) == "function" or type(stateNode.componentWillReceiveProps) == "function") and (memoizedProps ~= p34 or context ~= v169) then
-		callComponentWillReceiveProps(p32, stateNode, p34, v169)
+	if
+		not v
+		and (type(stateNode.UNSAFE_componentWillReceiveProps) == "function" or type(stateNode.componentWillReceiveProps) == "function")
+		and (memoizedProps ~= p2 or context ~= context2)
+	then
+		callComponentWillReceiveProps(state, stateNode, p2, context2)
 	end
 
 	resetHasForceUpdateBeforeProcessing()
 
-	local memoizedState = p32.memoizedState
-
+	local memoizedState = state.memoizedState
 	stateNode.state = memoizedState
-	processUpdateQueue(p32, p34, stateNode, p35)
 
-	local memoizedState2 = p32.memoizedState
+	processUpdateQueue(state, p2, stateNode, p3)
+	local memoizedState2 = state.memoizedState
 
-	if memoizedProps == p34 and memoizedState == memoizedState2 and not hasContextChanged() and not checkHasForceUpdateAfterProcessing() then
+	if
+		memoizedProps == p2
+		and memoizedState == memoizedState2
+		and not (hasContextChanged() or checkHasForceUpdateAfterProcessing())
+	then
 		if type(stateNode.componentDidMount) == "function" then
 			if __DEV__ and enableDoubleInvokingEffects then
-				p32.flags = bit32.bor(p32.flags, MountLayoutDev, Update)
+				state.flags = bit32.bor(state.flags, MountLayoutDev, Update)
 			else
-				p32.flags = bit32.bor(p32.flags, Update)
+				state.flags = bit32.bor(state.flags, Update)
 			end
 		end
 
 		return false
+	else
+		if getDerivedStateFromProps ~= nil and type(getDerivedStateFromProps) == "function" then
+			applyDerivedStateFromProps(state, p, getDerivedStateFromProps, p2)
+
+			memoizedState2 = state.memoizedState
+		end
+
+		local v2 = checkHasForceUpdateAfterProcessing()
+			or checkShouldComponentUpdate(state, p, memoizedProps, p2, memoizedState, memoizedState2, context2)
+
+		if v2 then
+			if
+				not v
+				and (type(stateNode.UNSAFE_componentWillMount) == "function" or type(stateNode.componentWillMount) == "function")
+			then
+				if type(stateNode.componentWillMount) == "function" then
+					stateNode:componentWillMount()
+				end
+
+				if type(stateNode.UNSAFE_componentWillMount) == "function" then
+					stateNode:UNSAFE_componentWillMount()
+				end
+			end
+
+			if type(stateNode.componentDidMount) == "function" then
+				if __DEV__ and enableDoubleInvokingEffects then
+					state.flags = bit32.bor(state.flags, MountLayoutDev, Update)
+				else
+					state.flags = bit32.bor(state.flags, Update)
+				end
+			end
+		else
+			if type(stateNode.componentDidMount) == "function" then
+				if __DEV__ and enableDoubleInvokingEffects then
+					state.flags = bit32.bor(state.flags, MountLayoutDev, Update)
+				else
+					state.flags = bit32.bor(state.flags, Update)
+				end
+			end
+
+			state.memoizedProps = p2
+			state.memoizedState = memoizedState2
+		end
+
+		stateNode.props = p2
+		stateNode.state = memoizedState2
+		stateNode.context = context2
+
+		return v2
+	end
+end
+
+local New = {}
+New.adoptClassInstance = adoptClassInstance
+New.constructClassInstance = constructClassInstance
+
+function New.mountClassInstance(state, p, props, p2)
+	if __DEV__ then
+		checkClassInstance(state, p, props)
+	end
+
+	local stateNode = state.stateNode
+	stateNode.props = props
+	stateNode.state = state.memoizedState
+
+	stateNode.__refs = __refs
+
+	initializeUpdateQueue(state)
+	local contextType
+
+	if type(p) == "table" then
+		contextType = p.contextType
+	end
+
+	if contextType == nil or type(contextType) ~= "table" then
+		if disableLegacyContext then
+			stateNode.context = emptyContextObject
+		else
+			stateNode.context = getMaskedContext(state, (getUnmaskedContext(state, p, true)))
+		end
+	else
+		stateNode.context = readContext(contextType)
+	end
+
+	if __DEV__ then
+		if stateNode.state == props then
+			local v = getComponentName(p) or "Component"
+
+			if not set5[v] then
+				set5[v] = true
+				console.error(
+					"%s: It is not recommended to assign props directly to state because updates to props won't be reflected in state. In most cases, it is better to use props directly.",
+					v
+				)
+			end
+		end
+
+		if bit32.band(state.mode, StrictMode) ~= 0 then
+			ReactStrictModeWarningsnew.recordLegacyContextWarning(state, stateNode)
+		end
+
+		if warnAboutDeprecatedLifecycles then
+			ReactStrictModeWarningsnew.recordUnsafeLifecycleWarnings(state, stateNode)
+		end
+	end
+
+	processUpdateQueue(state, props, stateNode, p2)
+	stateNode.state = state.memoizedState
+
+	local typeName = type(p)
+	local getDerivedStateFromProps
+
+	if type(p) == "table" then
+		getDerivedStateFromProps = p.getDerivedStateFromProps
 	end
 
 	if getDerivedStateFromProps ~= nil and type(getDerivedStateFromProps) == "function" then
-		applyDerivedStateFromProps(p32, p33, getDerivedStateFromProps, p34)
-		memoizedState2 = p32.memoizedState
+		applyDerivedStateFromProps(state, p, getDerivedStateFromProps, props)
+
+		stateNode.state = state.memoizedState
 	end
 
-	local v175 = checkHasForceUpdateAfterProcessing() or checkShouldComponentUpdate(p32, p33, memoizedProps, p34, memoizedState, memoizedState2, v169)
+	if
+		typeName == "table"
+		and type(p.getDerivedStateFromProps) ~= "function"
+		and type(stateNode.getSnapshotBeforeUpdate) ~= "function"
+		and (type(stateNode.UNSAFE_componentWillMount) == "function" or type(stateNode.componentWillMount) == "function")
+	then
+		callComponentWillMount(state, stateNode)
 
-	if v175 then
-		if not v172 and (type(stateNode.UNSAFE_componentWillMount) == "function" or type(stateNode.componentWillMount) == "function") then
-			if type(stateNode.componentWillMount) == "function" then
-				stateNode:componentWillMount()
-			end
-
-			if type(stateNode.UNSAFE_componentWillMount) == "function" then
-				stateNode:UNSAFE_componentWillMount()
-			end
-		end
-
-		if type(stateNode.componentDidMount) == "function" then
-			if __DEV__ and enableDoubleInvokingEffects then
-				p32.flags = bit32.bor(p32.flags, MountLayoutDev, Update)
-			else
-				p32.flags = bit32.bor(p32.flags, Update)
-			end
-		end
-	else
-		if type(stateNode.componentDidMount) == "function" then
-			if __DEV__ and enableDoubleInvokingEffects then
-				p32.flags = bit32.bor(p32.flags, MountLayoutDev, Update)
-			else
-				p32.flags = bit32.bor(p32.flags, Update)
-			end
-		end
-
-		p32.memoizedProps = p34
-		p32.memoizedState = memoizedState2
+		processUpdateQueue(state, props, stateNode, p2)
+		stateNode.state = state.memoizedState
 	end
 
-	stateNode.props = p34
-	stateNode.state = memoizedState2
-	stateNode.context = v169
-
-	return v175
+	if type(stateNode.componentDidMount) == "function" then
+		if __DEV__ and enableDoubleInvokingEffects then
+			state.flags = bit32.bor(state.flags, (bit32.bor(MountLayoutDev, Update)))
+		else
+			state.flags = bit32.bor(state.flags, Update)
+		end
+	end
 end
 
-return {
-	adoptClassInstance = function(p36, p37) -- line: 657
-		-- upvalues: t10 (ref), initializeClassComponentUpdater (copy), set (copy), __DEV__ (copy), t1 (copy)
-		if t10 == nil then
-			initializeClassComponentUpdater()
-		end
+New.resumeMountClassInstance = resumeMountClassInstance
 
-		p37.__updater = t10
-		p36.stateNode = p37
-		set(p37, p36)
+function New.updateClassInstance(p, state, p2, p3, p4)
+	local stateNode = state.stateNode
 
-		if __DEV__ then
-			p37._reactInternalInstance = t1
-		end
-	end,
-	constructClassInstance = function(p38, p39, p40) -- line: 668
-		-- upvalues: emptyContextObject (copy), __DEV__ (copy), REACT_CONTEXT_TYPE (copy), t8 (ref), REACT_PROVIDER_TYPE (copy), console (copy), getComponentName (copy), readContext (copy), disableLegacyContext (copy), getUnmaskedContext (copy), getMaskedContext (copy), debugRenderPhaseSideEffectsForStrictMode (copy), StrictMode (copy), disableLogs (copy), describeError (copy), reenableLogs (copy), t10 (ref), initializeClassComponentUpdater (copy), set (copy), t1 (copy), UninitializedState (copy), t3 (ref), t5 (ref), cacheContext (copy)
-		local v121 = false
-		local v122 = emptyContextObject
-		local v123 = emptyContextObject
-		local contextType = p39.contextType
+	cloneUpdateQueue(p, state)
 
-		if __DEV__ and (p39.contextType ~= nil and (contextType ~= nil and (contextType["$$typeof"] ~= REACT_CONTEXT_TYPE or contextType._context ~= nil)) and not t8[p39]) then
-			t8[p39] = true
+	local memoizedProps = state.memoizedProps
+	local props
 
-			local s2
+	if state.type == state.elementType then
+		props = memoizedProps
+	else
+		props = resolveDefaultProps(state.type, memoizedProps)
+	end
 
-			if contextType == nil then
-				s2 = " However, it is set to nil. This can be caused by a typo or by mixing up named and default imports. This can also happen due to a circular dependency, so try moving the createContext() call to a separate file."
-			elseif type(contextType) ~= "table" then
-				s2 = " However, it is set to a " .. type(contextType) .. "."
-			elseif contextType["$$typeof"] == REACT_PROVIDER_TYPE then
-				s2 = " Did you accidentally pass the Context.Provider instead?"
-			elseif contextType._context ~= nil then
-				s2 = " Did you accidentally pass the Context.Consumer instead?"
-			else
-				local v126 = "" .. " However, it is set to an object with keys {"
+	stateNode.props = props
+	local pendingProps = state.pendingProps
 
-				for v127, _ in contextType do
-					v126 ..= v127 .. ", "
-				end
+	local context = stateNode.context
+	local contextType, getDerivedStateFromProps
 
-				s2 = v126 .. "}."
-			end
+	if type(p2) == "table" then
+		contextType = p2.contextType
+		getDerivedStateFromProps = p2.getDerivedStateFromProps
+	end
 
-			console.error("%s defines an invalid contextType. contextType should point to the Context object returned by React.createContext().%s", getComponentName(p39) or "Component", s2)
-		end
+	local context2 = emptyContextObject
 
-		if contextType ~= nil and type(contextType) == "table" then
-			v123 = readContext(contextType)
-		elseif not disableLegacyContext then
-			v122 = getUnmaskedContext(p38, p39, true)
-			v121 = p39.contextTypes ~= nil
-			v123 = v121 and getMaskedContext(p38, v122) or emptyContextObject
-		end
+	if type(contextType) == "table" then
+		context2 = readContext(contextType)
+	elseif not disableLegacyContext then
+		context2 = getMaskedContext(state, (getUnmaskedContext(state, p2, true)))
+	end
 
-		if __DEV__ and debugRenderPhaseSideEffectsForStrictMode and bit32.band(p38.mode, StrictMode) ~= 0 then
-			disableLogs()
+	local v
 
-			local ok, result = xpcall(p39.__ctor, describeError, p40, v123)
-
-			reenableLogs()
-
-			if not ok then
-				error(result)
-			end
-		end
-
-		local v131 = p39.__ctor(p40, v123)
-
-		p38.memoizedState = v131.state
-
-		local memoizedState = p38.memoizedState
-
-		if t10 == nil then
-			initializeClassComponentUpdater()
-		end
-
-		v131.__updater = t10
-		p38.stateNode = v131
-		set(v131, p38)
-
-		if __DEV__ then
-			v131._reactInternalInstance = t1
-		end
-
-		if __DEV__ then
-			if type(p39.getDerivedStateFromProps) == "function" and memoizedState == UninitializedState then
-				local v133 = getComponentName(p39) or "Component"
-
-				if not t3[v133] then
-					t3[v133] = true
-					console.error("`%s` uses `getDerivedStateFromProps` but its initial state has not been initialized. This is not recommended. Instead, define the initial state by passing an object to `self:setState` in the `init` method of `%s`. This ensures that `getDerivedStateFromProps` arguments have a consistent shape.", v133, v133)
-				end
-			end
-
-			if type(p39.getDerivedStateFromProps) == "function" or type(v131.getSnapshotBeforeUpdate) == "function" then
-				local s3 = nil
-				local s4 = nil
-				local s5 = nil
-
-				if type(v131.componentWillMount) == "function" then
-					s3 = "componentWillMount"
-				elseif type(v131.UNSAFE_componentWillMount) == "function" then
-					s3 = "UNSAFE_componentWillMount"
-				end
-
-				if type(v131.componentWillReceiveProps) == "function" then
-					s4 = "componentWillReceiveProps"
-				elseif type(v131.UNSAFE_componentWillReceiveProps) == "function" then
-					s4 = "UNSAFE_componentWillReceiveProps"
-				end
-
-				if type(v131.componentWillUpdate) == "function" then
-					s5 = "componentWillUpdate"
-				elseif type(v131.UNSAFE_componentWillUpdate) == "function" then
-					s5 = "UNSAFE_componentWillUpdate"
-				end
-
-				if s3 ~= nil or s4 ~= nil or s5 ~= nil then
-					local v137 = getComponentName(p39) or "Component"
-					local v138 = type(p39.getDerivedStateFromProps) ~= "function" and "getSnapshotBeforeUpdate()" or "getDerivedStateFromProps()"
-					local v139 = s3 == nil and "" or "\n  " .. tostring(s3)
-					local v140 = s4 == nil and "" or "\n  " .. tostring(s4)
-					local v141 = s5 == nil and "" or "\n  " .. tostring(s5)
-
-					if not t5[v137] then
-						t5[v137] = true
-						console.error("Unsafe legacy lifecycles will not be called for components using new component APIs.\n\n%s uses %s but also contains the following legacy lifecycles:%s%s%s\n\nThe above lifecycles should be removed. Learn more about this warning here:\nhttps://reactjs.org/link/unsafe-component-lifecycles", v137, v138, v139, v140, v141)
-					end
-				end
-			end
-		end
-
-		if v121 then
-			cacheContext(p38, v122, v123)
-		end
-
-		return v131
-	end,
-	mountClassInstance = function(p41, p42, p43, p44) -- line: 948
-		-- upvalues: __DEV__ (copy), checkClassInstance (copy), __refs (copy), initializeUpdateQueue (copy), readContext (copy), disableLegacyContext (copy), emptyContextObject (copy), getUnmaskedContext (copy), getMaskedContext (copy), getComponentName (copy), t6 (ref), console (copy), StrictMode (copy), lib2 (copy), warnAboutDeprecatedLifecycles (copy), processUpdateQueue (copy), applyDerivedStateFromProps (copy), callComponentWillMount (copy), enableDoubleInvokingEffects (copy), MountLayoutDev (copy), Update (copy)
-		if __DEV__ then
-			checkClassInstance(p41, p42, p43)
-		end
-
-		local stateNode = p41.stateNode
-
-		stateNode.props = p43
-		stateNode.state = p41.memoizedState
-		stateNode.__refs = __refs
-		initializeUpdateQueue(p41)
-
-		local contextType = nil
-
-		if type(p42) == "table" then
-			contextType = p42.contextType
-		end
-
-		if contextType ~= nil and type(contextType) == "table" then
-			stateNode.context = readContext(contextType)
-		elseif disableLegacyContext then
-			stateNode.context = emptyContextObject
+	if getDerivedStateFromProps == nil or type(getDerivedStateFromProps) ~= "function" then
+		if stateNode.getSnapshotBeforeUpdate == nil then
+			v = false
 		else
-			local v157 = getUnmaskedContext(p41, p42, true)
+			v = type(stateNode.getSnapshotBeforeUpdate) == "function"
+		end
+	else
+		v = true
+	end
 
-			stateNode.context = getMaskedContext(p41, v157)
+	if
+		not v
+		and (stateNode.UNSAFE_componentWillReceiveProps ~= nil and type(stateNode.UNSAFE_componentWillReceiveProps) == "function" or stateNode.componentWillReceiveProps ~= nil and type(stateNode.componentWillReceiveProps) == "function")
+		and (memoizedProps ~= pendingProps or context ~= context2)
+	then
+		callComponentWillReceiveProps(state, stateNode, p3, context2)
+	end
+
+	resetHasForceUpdateBeforeProcessing()
+
+	local memoizedState = state.memoizedState
+	stateNode.state = memoizedState
+	local _state = stateNode.state
+	processUpdateQueue(state, p3, stateNode, p4)
+	local memoizedState2 = state.memoizedState
+
+	if
+		memoizedProps == pendingProps
+		and memoizedState == memoizedState2
+		and not (hasContextChanged() or checkHasForceUpdateAfterProcessing())
+	then
+		if
+			stateNode.componentDidUpdate ~= nil
+			and type(stateNode.componentDidUpdate) == "function"
+			and (memoizedProps ~= p.memoizedProps or memoizedState ~= p.memoizedState)
+		then
+			state.flags = bit32.bor(state.flags, Update)
 		end
 
-		if __DEV__ then
-			if p43 == stateNode.state then
-				local v158 = getComponentName(p42) or "Component"
-
-				if not t6[v158] then
-					t6[v158] = true
-					console.error("%s: It is not recommended to assign props directly to state because updates to props won't be reflected in state. In most cases, it is better to use props directly.", v158)
-				end
-			end
-
-			if bit32.band(p41.mode, StrictMode) ~= 0 then
-				lib2.recordLegacyContextWarning(p41, stateNode)
-			end
-
-			if warnAboutDeprecatedLifecycles then
-				lib2.recordUnsafeLifecycleWarnings(p41, stateNode)
-			end
+		if
+			stateNode.getSnapshotBeforeUpdate ~= nil
+			and type(stateNode.getSnapshotBeforeUpdate) == "function"
+			and (memoizedProps ~= p.memoizedProps or memoizedState ~= p.memoizedState)
+		then
+			state.flags = bit32.bor(state.flags, Snapshot)
 		end
 
-		processUpdateQueue(p41, p43, stateNode, p44)
-		stateNode.state = p41.memoizedState
-
-		local v159 = type(p42)
-		local getDerivedStateFromProps = nil
-
-		if type(p42) == "table" then
-			getDerivedStateFromProps = p42.getDerivedStateFromProps
-		end
-
+		return false
+	else
 		if getDerivedStateFromProps ~= nil and type(getDerivedStateFromProps) == "function" then
-			applyDerivedStateFromProps(p41, p42, getDerivedStateFromProps, p43)
-			stateNode.state = p41.memoizedState
+			applyDerivedStateFromProps(state, p2, getDerivedStateFromProps, p3)
+
+			memoizedState2 = state.memoizedState
 		end
 
-		if v159 == "table" and type(p42.getDerivedStateFromProps) ~= "function" and type(stateNode.getSnapshotBeforeUpdate) ~= "function" and (type(stateNode.UNSAFE_componentWillMount) == "function" or type(stateNode.componentWillMount) == "function") then
-			callComponentWillMount(p41, stateNode)
-			processUpdateQueue(p41, p43, stateNode, p44)
-			stateNode.state = p41.memoizedState
-		end
+		local v2 = checkHasForceUpdateAfterProcessing()
+			or checkShouldComponentUpdate(state, p2, props, p3, memoizedState, memoizedState2, context2)
 
-		if type(stateNode.componentDidMount) == "function" then
-			if __DEV__ and enableDoubleInvokingEffects then
-				p41.flags = bit32.bor(p41.flags, (bit32.bor(MountLayoutDev, Update)))
-
-				return
-			end
-
-			p41.flags = bit32.bor(p41.flags, Update)
-		end
-	end,
-	resumeMountClassInstance = resumeMountClassInstance,
-	updateClassInstance = function(p45, p46, p47, p48, p49) -- line: 1207
-		-- upvalues: cloneUpdateQueue (copy), resolveDefaultProps (copy), emptyContextObject (copy), readContext (copy), disableLegacyContext (copy), getUnmaskedContext (copy), getMaskedContext (copy), resetHasForceUpdateBeforeProcessing (copy), processUpdateQueue (copy), hasContextChanged (copy), checkHasForceUpdateAfterProcessing (copy), Update (copy), Snapshot (copy), applyDerivedStateFromProps (copy)
-		local stateNode = p46.stateNode
-
-		cloneUpdateQueue(p45, p46)
-
-		local memoizedProps = p46.memoizedProps
-		local v183 = if p46.type ~= p46.elementType then resolveDefaultProps(p46.type, memoizedProps) else memoizedProps
-
-		stateNode.props = v183
-
-		local pendingProps = p46.pendingProps
-		local context = stateNode.context
-		local contextType = nil
-		local getDerivedStateFromProps = nil
-
-		if type(p47) == "table" then
-			contextType = p47.contextType
-			getDerivedStateFromProps = p47.getDerivedStateFromProps
-		end
-
-		local v188 = emptyContextObject
-
-		if type(contextType) == "table" then
-			v188 = readContext(contextType)
-		elseif not disableLegacyContext then
-			local v189 = getUnmaskedContext(p46, p47, true)
-
-			v188 = getMaskedContext(p46, v189)
-		end
-
-		local v190 = getDerivedStateFromProps ~= nil and type(getDerivedStateFromProps) == "function" or stateNode.getSnapshotBeforeUpdate ~= nil and type(stateNode.getSnapshotBeforeUpdate) == "function"
-
-		if not v190 and ((stateNode.UNSAFE_componentWillReceiveProps ~= nil and type(stateNode.UNSAFE_componentWillReceiveProps) == "function" or stateNode.componentWillReceiveProps ~= nil and type(stateNode.componentWillReceiveProps) == "function") and (memoizedProps ~= pendingProps or context ~= v188)) then
-			callComponentWillReceiveProps(p46, stateNode, p48, v188)
-		end
-
-		resetHasForceUpdateBeforeProcessing()
-
-		local memoizedState = p46.memoizedState
-
-		stateNode.state = memoizedState
-
-		local _ = stateNode.state
-
-		processUpdateQueue(p46, p48, stateNode, p49)
-
-		local memoizedState3 = p46.memoizedState
-
-		if memoizedProps == pendingProps and memoizedState == memoizedState3 and not hasContextChanged() and not checkHasForceUpdateAfterProcessing() then
-			if stateNode.componentDidUpdate ~= nil and type(stateNode.componentDidUpdate) == "function" and (memoizedProps ~= p45.memoizedProps or memoizedState ~= p45.memoizedState) then
-				p46.flags = bit32.bor(p46.flags, Update)
-			end
-
-			if stateNode.getSnapshotBeforeUpdate ~= nil and type(stateNode.getSnapshotBeforeUpdate) == "function" and (memoizedProps ~= p45.memoizedProps or memoizedState ~= p45.memoizedState) then
-				p46.flags = bit32.bor(p46.flags, Snapshot)
-			end
-
-			return false
-		end
-
-		if getDerivedStateFromProps ~= nil and type(getDerivedStateFromProps) == "function" then
-			applyDerivedStateFromProps(p46, p47, getDerivedStateFromProps, p48)
-			memoizedState3 = p46.memoizedState
-		end
-
-		local v194 = checkHasForceUpdateAfterProcessing() or checkShouldComponentUpdate(p46, p47, v183, p48, memoizedState, memoizedState3, v188)
-
-		if v194 then
-			if not v190 and (stateNode.UNSAFE_componentWillUpdate ~= nil and type(stateNode.UNSAFE_componentWillUpdate) == "function" or stateNode.componentWillUpdate ~= nil and type(stateNode.componentWillUpdate) == "function") then
+		if v2 then
+			if
+				not v
+				and (stateNode.UNSAFE_componentWillUpdate ~= nil and type(stateNode.UNSAFE_componentWillUpdate) == "function" or stateNode.componentWillUpdate ~= nil and type(stateNode.componentWillUpdate) == "function")
+			then
 				if stateNode.componentWillUpdate ~= nil and type(stateNode.componentWillUpdate) == "function" then
-					stateNode:componentWillUpdate(p48, memoizedState3, v188)
+					stateNode:componentWillUpdate(p3, memoizedState2, context2)
 				end
 
-				if stateNode.UNSAFE_componentWillUpdate ~= nil and type(stateNode.UNSAFE_componentWillUpdate) == "function" then
-					stateNode:UNSAFE_componentWillUpdate(p48, memoizedState3, v188)
+				if
+					stateNode.UNSAFE_componentWillUpdate ~= nil
+					and type(stateNode.UNSAFE_componentWillUpdate) == "function"
+				then
+					stateNode:UNSAFE_componentWillUpdate(p3, memoizedState2, context2)
 				end
 			end
 
 			if stateNode.componentDidUpdate ~= nil and type(stateNode.componentDidUpdate) == "function" then
-				p46.flags = bit32.bor(p46.flags, Update)
+				state.flags = bit32.bor(state.flags, Update)
 			end
 
 			if stateNode.getSnapshotBeforeUpdate ~= nil and type(stateNode.getSnapshotBeforeUpdate) == "function" then
-				p46.flags = bit32.bor(p46.flags, Snapshot)
+				state.flags = bit32.bor(state.flags, Snapshot)
 			end
 		else
-			if stateNode.componentDidUpdate ~= nil and type(stateNode.componentDidUpdate) == "function" and (memoizedProps ~= p45.memoizedProps or memoizedState ~= p45.memoizedState) then
-				p46.flags = bit32.bor(p46.flags, Update)
+			if
+				stateNode.componentDidUpdate ~= nil
+				and type(stateNode.componentDidUpdate) == "function"
+				and (memoizedProps ~= p.memoizedProps or memoizedState ~= p.memoizedState)
+			then
+				state.flags = bit32.bor(state.flags, Update)
 			end
 
-			if stateNode.getSnapshotBeforeUpdate ~= nil and type(stateNode.getSnapshotBeforeUpdate) == "function" and (memoizedProps ~= p45.memoizedProps or memoizedState ~= p45.memoizedState) then
-				p46.flags = bit32.bor(p46.flags, Snapshot)
+			if
+				stateNode.getSnapshotBeforeUpdate ~= nil
+				and type(stateNode.getSnapshotBeforeUpdate) == "function"
+				and (memoizedProps ~= p.memoizedProps or memoizedState ~= p.memoizedState)
+			then
+				state.flags = bit32.bor(state.flags, Snapshot)
 			end
 
-			p46.memoizedProps = p48
-			p46.memoizedState = memoizedState3
+			state.memoizedProps = p3
+			state.memoizedState = memoizedState2
 		end
 
-		stateNode.props = p48
-		stateNode.state = memoizedState3
-		stateNode.context = v188
+		stateNode.props = p3
+		stateNode.state = memoizedState2
+		stateNode.context = context2
 
-		return v194
-	end,
-	applyDerivedStateFromProps = applyDerivedStateFromProps,
-	emptyRefsObject = __refs
-}
+		return v2
+	end
+end
+
+New.applyDerivedStateFromProps = applyDerivedStateFromProps
+New.emptyRefsObject = __refs
+return New

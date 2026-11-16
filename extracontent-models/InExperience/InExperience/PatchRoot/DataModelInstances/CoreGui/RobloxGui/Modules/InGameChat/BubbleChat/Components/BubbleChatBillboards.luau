@@ -1,97 +1,92 @@
 local CoreGui = game:GetService("CoreGui")
 local CorePackages = game:GetService("CorePackages")
-
 game:GetService("Players")
-
 local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local Roact = require(CorePackages.Packages.Roact)
 local RoactRodux = require(CorePackages.Packages.RoactRodux)
 local t = require(CorePackages.Packages.t)
 local Cryo = require(CorePackages.Packages.Cryo)
-local Constants = require(script.Parent.Parent.Constants)
-local v9 = require(script.Parent.Parent.Logger)(script.Name)
-local BubbleChatBillboard = require(script.Parent.BubbleChatBillboard)
-local GetFFlagBubbleVoiceIndicatorSetting = require(RobloxGui.Modules.Flags.GetFFlagBubbleVoiceIndicatorSetting)
-local v12 = Roact.Component:extend("ChatBillboards")
 
-v12.validateProps = t.strictInterface({
+local Constants = require(script.Parent.Parent.Constants)
+local Logger = require(script.Parent.Parent.Logger)
+local logger = Logger(script.Name)
+
+local BubbleChatBillboard = require(script.Parent.BubbleChatBillboard)
+
+local GetFFlagBubbleVoiceIndicatorSetting = require(RobloxGui.Modules.Flags.GetFFlagBubbleVoiceIndicatorSetting)
+
+local extended = Roact.Component:extend("ChatBillboards")
+
+extended.validateProps = t.strictInterface({
 	userMessages = t.map(t.string, t.array(t.string)),
 	bubbleChatEnabled = t.boolean,
 	voiceEnabled = t.boolean,
 	participants = t.map(t.string, t.string)
 })
 
-function v12.getDerivedStateFromProps(p1, p2) -- line: 33
-	-- upvalues: Cryo (copy)
+function extended.getDerivedStateFromProps(p, p2)
 	return {
-		userMessages = Cryo.Dictionary.join(p2.userMessages or {}, p1.userMessages)
+		userMessages = Cryo.Dictionary.join(p2.userMessages or {}, p.userMessages)
 	}
 end
-function v12.init(p3) -- line: 42
-	-- upvalues: v9 (copy), Cryo (copy)
-	v9:debug("Initializing")
-	p3:setState({
-		userMessages = {}
-	})
 
-	function p3.onBillboardFadeOut(p4) -- line: 48
-		-- upvalues: p3 (copy), Cryo (copy)
-		p3:setState({
-			userMessages = Cryo.Dictionary.join(p3.state.userMessages, {
-				[p4] = Cryo.None
-			})
+function extended:init()
+	logger:debug("Initializing")
+	self:setState({ userMessages = {} })
+
+	function self.onBillboardFadeOut(p)
+		self:setState({
+			userMessages = Cryo.Dictionary.join(self.state.userMessages, { [p] = Cryo.None })
 		})
 	end
 end
-function v12.render(p5) -- line: 55
-	-- upvalues: Constants (copy), v9 (copy), Roact (copy), BubbleChatBillboard (copy)
-	if not p5.props.voiceEnabled and not p5.props.bubbleChatEnabled then
+
+function extended.render(props)
+	if not (props.props.voiceEnabled or props.props.bubbleChatEnabled) then
 		return
 	end
 
-	local t1 = {}
+	local v = {}
 
-	for k, _ in pairs(p5.state.userMessages) do
-		t1[k] = false
+	for k, _ in pairs(props.state.userMessages) do
+		v[k] = false
 	end
 
-	for k, v in pairs(p5.props.participants) do
-		if v ~= Constants.VOICE_STATE.HIDDEN then
-			t1[k] = true
+	for k, participant in pairs(props.props.participants) do
+		if participant ~= Constants.VOICE_STATE.HIDDEN then
+			v[k] = true
 		end
 	end
 
-	local t2 = {}
+	local children = {}
 
-	for k, v in pairs(t1) do
-		v9:trace("Rendering billboard for ...{}", (string.sub(tostring(k), -4)))
-		t2["BubbleChat_" .. k] = Roact.createElement(BubbleChatBillboard, {
+	for k, v2 in pairs(v) do
+		logger:trace("Rendering billboard for ...{}", (string.sub(tostring(k), -4)))
+		children["BubbleChat_" .. k] = Roact.createElement(BubbleChatBillboard, {
 			userId = k,
-			onFadeOut = p5.onBillboardFadeOut,
-			voiceEnabled = p5.props.voiceEnabled and v,
-			bubbleChatEnabled = p5.props.bubbleChatEnabled
+			onFadeOut = props.onBillboardFadeOut,
+			voiceEnabled = props.props.voiceEnabled and v2,
+			bubbleChatEnabled = props.props.bubbleChatEnabled
 		})
 	end
 
-	return Roact.createElement("ScreenGui", {
-		ResetOnSpawn = false
-	}, t2)
+	return Roact.createElement("ScreenGui", { ResetOnSpawn = false }, children)
 end
 
-local function mapStateToProps(p6) -- line: 93
-	-- upvalues: GetFFlagBubbleVoiceIndicatorSetting (copy)
-	local voiceEnabled = p6.components.voiceEnabled
+local function mapStateToProps(data)
+	local voiceEnabled = data.components.voiceEnabled
 
 	if GetFFlagBubbleVoiceIndicatorSetting() then
-		voiceEnabled = p6.components.voiceEnabled and p6.chatSettings.Voice.ShowIndicator
+		voiceEnabled = data.components.voiceEnabled and data.chatSettings.Voice.ShowIndicator
 	end
 
 	return {
-		userMessages = p6.userMessages,
+		userMessages = data.userMessages,
 		voiceEnabled = voiceEnabled,
-		bubbleChatEnabled = p6.components.bubbleChatEnabled,
-		participants = p6.voiceState
+		bubbleChatEnabled = data.components.bubbleChatEnabled,
+		participants = data.voiceState
 	}
 end
 
-return RoactRodux.connect(mapStateToProps)(v12)
+return RoactRodux.connect(mapStateToProps)(extended)

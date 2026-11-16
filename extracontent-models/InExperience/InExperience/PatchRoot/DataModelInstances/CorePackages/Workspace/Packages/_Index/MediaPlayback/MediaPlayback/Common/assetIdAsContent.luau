@@ -1,9 +1,9 @@
-local function assetIdAsContent(p1) -- line: 1
-	if typeof(p1) == "string" and p1:find("^.+://") then
-		return p1
+local function assetIdAsContent(value)
+	if typeof(value) == "string" and value:find("^.+://") then
+		return value
 	end
 
-	return `rbxassetid://{ p1 }`
+	return `rbxassetid://{value}`
 end
 
 return assetIdAsContent

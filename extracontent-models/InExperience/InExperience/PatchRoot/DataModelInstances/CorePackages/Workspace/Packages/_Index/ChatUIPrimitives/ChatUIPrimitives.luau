@@ -1,10 +1,11 @@
 require(script.Types)
-
 local useMessagePool = require(script.Components.MessageLayoutContainer.useMessagePool)
 
 return {
 	ChatInputBarView = require(script.Components.ChatInputBar.ChatInputBarView),
+	chatTabNavigationSignal = require(script.chatTabNavigationSignal),
 	["jest.config"] = script["jest.config"],
+	["jest.bench.config"] = script["jest.bench.config"],
 	MessageLayoutContainer = require(script.Components.MessageLayoutContainer.MessageLayoutContainer),
 	useMessagePool = useMessagePool,
 	Utils = {
@@ -16,15 +17,25 @@ return {
 	Hooks = {
 		useStableSignal = require(script.Hooks.useStableSignal),
 		usePropSignal = require(script.Hooks.usePropSignal),
-		useFinishChatWindowMessageRenderIntervals = require(script.Hooks.useFinishChatWindowMessageRenderIntervals)
+		useFinishChatWindowMessageRenderIntervals = require(script.Hooks.useFinishChatWindowMessageRenderIntervals),
+		useFocusInputBar = require(script.Hooks.useFocusInputBar),
+		useInputBarTabNavigation = require(script.Hooks.useInputBarTabNavigation),
+		useInExperienceLocalization = require(script.Hooks.useInExperienceLocalization),
+		useLastInputGroup = require(script.Hooks.useLastInputGroup),
+		useDismissOnEscapeOrMenu = require(script.Hooks.useDismissOnEscapeOrMenu),
+		restoreSelectionIfStranded = require(script.Hooks.restoreSelectionIfStranded)
 	},
 	Telemetry = {
 		ExpChatPerfTracker = require(script.Telemetry.ExpChatPerfTracker),
 		TextChannelWindowPerfTracker = require(script.Telemetry.TextChannelWindowPerfTracker)
 	},
 	Flags = {
-		FFlagExpChatScrollPerfTracking = require(script.Flags.FFlagExpChatScrollPerfTracking),
 		FFlagExpChatAddressFrame0Flash = require(script.Flags.FFlagExpChatAddressFrame0Flash),
-		FFlagExpChatPerfTrackerTabName = require(script.Flags.FFlagExpChatPerfTrackerTabName)
+		FFlagExpChatExpressionPillSelectableOnCooldown = require(script.Flags.FFlagExpChatExpressionPillSelectableOnCooldown),
+		FFlagExpChatExpressionTrayReducedMotion = require(script.Flags.FFlagExpChatExpressionTrayReducedMotion),
+		FFlagExpChatHidePlaceholderUnderOverlay = require(script.Flags.FFlagExpChatHidePlaceholderUnderOverlay),
+		FFlagExpChatMessageListScrollParity = require(script.Flags.FFlagExpChatMessageListScrollParity),
+		FFlagExpChatPerfTrackerTabName = require(script.Flags.FFlagExpChatPerfTrackerTabName),
+		FFlagTCWTranslationSupport = require(script.Flags.FFlagTCWTranslationSupport)
 	}
 }

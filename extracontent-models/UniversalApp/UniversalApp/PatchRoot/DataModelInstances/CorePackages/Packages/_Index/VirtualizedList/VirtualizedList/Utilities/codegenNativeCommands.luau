@@ -1,23 +1,20 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
+require(parent.LuauPolyfill)
 
-require(ParentParent.LuauPolyfill)
-
-local function v2(...) -- line: 18
+local function fn(...)
 	error("Not implemented. Dependencies used upstream aren't implemented")
 end
 
 return {
-	default = function(p1) -- line: 31
-		-- upvalues: v2 (copy)
-		local t1 = {}
+	default = function(p)
+		local result = {}
 
-		for _, v in ipairs(p1.supportedCommands) do
-			t1[v] = function(p2, ...) -- line: 35
-				-- upvalues: v2 (copy), v (copy)
-				v2(p2, v, ...)
+		for _, supportedCommand in ipairs(p.supportedCommands) do
+			result[supportedCommand] = function(p2, ...)
+				fn(p2, supportedCommand, ...)
 			end
 		end
 
-		return t1
+		return result
 	end
 }

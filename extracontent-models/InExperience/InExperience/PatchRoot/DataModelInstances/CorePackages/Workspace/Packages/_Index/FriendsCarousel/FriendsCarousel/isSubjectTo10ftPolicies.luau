@@ -1,10 +1,11 @@
-local v1 = game:DefineFastFlag("FriendCarouselHas10ftPolicies", false)
-local GuiService = game:GetService("GuiService")
+local defineFastFlag = game:DefineFastFlag("FriendCarouselHas10ftPolicies", false)
 
-return function() -- line: 4
-	-- upvalues: v1 (copy), GuiService (copy)
-	if v1 then
-		return GuiService:IsTenFootInterface()
+local FriendsCarousel = script:FindFirstAncestor("FriendsCarousel")
+local AppCommonLib = require(FriendsCarousel.Parent.AppCommonLib)
+local isTenFootInterface = AppCommonLib.isTenFootInterface
+return function()
+	if defineFastFlag then
+		return isTenFootInterface()
 	end
 
 	return false

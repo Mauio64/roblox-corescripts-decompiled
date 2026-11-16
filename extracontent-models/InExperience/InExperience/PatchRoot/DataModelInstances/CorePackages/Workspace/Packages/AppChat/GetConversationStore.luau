@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent._Workspace
+local GetConversationStore = require(Workspace.AppChat.AppChat.Stores.GetConversationStore)
 
-return (require(_Workspace.AppChat.AppChat.Stores.GetConversationStore))
+return GetConversationStore

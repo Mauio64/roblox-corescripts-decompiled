@@ -1,16 +1,17 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
-local Constants = require(ParentParent.Constants)
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local getFIntUGCValidateTriangleLimitTolerance = require(ParentParent.flags.getFIntUGCValidateTriangleLimitTolerance)
-local t1 = {
-	fflag = require(ParentParent.flags.getFFlagUGCValidateMigrateMeshGeometry),
+local Constants = require(parent.Constants)
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+
+local getFIntUGCValidateTriangleLimitTolerance = require(parent.flags.getFIntUGCValidateTriangleLimitTolerance)
+local TriangleCountBounded = {
 	categories = {
 		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH,
 		ValidationEnums.UploadCategory.RIGID_ACCESSORY,
 		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 		ValidationEnums.UploadCategory.DYNAMIC_HEAD
@@ -19,55 +20,54 @@ local t1 = {
 	expectedFailures = {}
 }
 
-local function runAccessoryCheck(p1, p2) -- line: 25
-	-- upvalues: Constants (copy), UGCValidationService (copy), ErrorSourceStrings (copy)
+local function runAccessoryCheck(object, p)
 	local MAX_HAT_TRIANGLES = Constants.MAX_HAT_TRIANGLES
 
-	for v13, v14 in p2.renderMeshesData do
-		local EditableMeshTriCount = UGCValidationService:GetEditableMeshTriCount(v14.editable)
+	for k, v in p.renderMeshesData do
+		local editableMeshTriCount = UGCValidationService:GetEditableMeshTriCount(v.editable)
 
-		if MAX_HAT_TRIANGLES < EditableMeshTriCount then
-			p1:fail(ErrorSourceStrings.Keys.MeshGeometry_TriangleCountExceeded, {
-				meshName = v13,
-				triangleCount = tostring(EditableMeshTriCount),
+		if MAX_HAT_TRIANGLES < editableMeshTriCount then
+			object:fail(ErrorSourceStrings.Keys.MeshGeometry_TriangleCountExceeded, {
+				meshName = k,
+				triangleCount = tostring(editableMeshTriCount),
 				maxTriangles = tostring(MAX_HAT_TRIANGLES)
 			})
 		end
 	end
 end
-local function runBodyPartCheck(p3, p4) -- line: 41
-	-- upvalues: Constants (copy), UGCValidationService (copy), getFIntUGCValidateTriangleLimitTolerance (copy), ErrorSourceStrings (copy)
-	local assetTypeName = p4.uploadEnum.assetType.Name
-	local v19 = Constants.ASSET_RENDER_MESH_MAX_TRIANGLES[assetTypeName]
 
-	if not v19 then
+local function runBodyPartCheck(object, p)
+	local name = p.uploadEnum.assetType.Name
+	local v = Constants.ASSET_RENDER_MESH_MAX_TRIANGLES[name]
+
+	if not v then
 		return
 	end
 
-	local n1 = 0
+	local total = 0
 
-	for _, v22 in p4.renderMeshesData do
-		n1 += UGCValidationService:GetEditableMeshTriCount(v22.editable)
+	for _, v2 in p.renderMeshesData do
+		total += UGCValidationService:GetEditableMeshTriCount(v2.editable)
 	end
 
-	if n1 > v19 + v19 * (getFIntUGCValidateTriangleLimitTolerance() / 100) then
-		p3:fail(ErrorSourceStrings.Keys.MeshGeometry_TotalTriangleCountExceeded, {
-			triangleCount = tostring(n1),
-			assetTypeName = assetTypeName,
-			maxTriangles = tostring(v19)
+	if v + v * (getFIntUGCValidateTriangleLimitTolerance() / 100) < total then
+		object:fail(ErrorSourceStrings.Keys.MeshGeometry_TotalTriangleCountExceeded, {
+			triangleCount = tostring(total),
+			assetTypeName = name,
+			maxTriangles = tostring(v)
 		})
 	end
 end
 
-function t1.run(p5, p6) -- line: 67
-	-- upvalues: ValidationEnums (copy), runBodyPartCheck (copy), runAccessoryCheck (copy)
-	if p6.uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS or p6.uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD then
-		runBodyPartCheck(p5, p6)
-
-		return
+function TriangleCountBounded.run(p, p2)
+	if
+		p2.uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS
+		or p2.uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD
+	then
+		runBodyPartCheck(p, p2)
+	else
+		runAccessoryCheck(p, p2)
 	end
-
-	runAccessoryCheck(p5, p6)
 end
 
-return t1
+return TriangleCountBounded

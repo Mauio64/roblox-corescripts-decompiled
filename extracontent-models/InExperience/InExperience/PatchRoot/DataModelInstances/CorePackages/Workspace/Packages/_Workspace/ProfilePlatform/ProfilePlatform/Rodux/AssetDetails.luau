@@ -1,24 +1,24 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local Rodux = require(ProfilePlatformParent.Rodux)
-local Cryo = require(ProfilePlatformParent.Cryo)
+local parent = ProfilePlatform.Parent
+local Rodux = require(parent.Rodux)
+local Cryo = require(parent.Cryo)
 local NetworkingCatalog = require(ProfilePlatform.Networking.NetworkingCatalog)
 local AssetInfo = require(ProfilePlatform.Common.AssetInfo)
 local Enums = require(ProfilePlatform.Common.Enums)
 
 return Rodux.createReducer({}, {
-	[NetworkingCatalog.GetItemAndBundleDetails.Succeeded.name] = function(p1, p2) -- line: 23
-		-- upvalues: Enums (copy), AssetInfo (copy), Cryo (copy)
-		local t1 = {}
+	[NetworkingCatalog.GetItemAndBundleDetails.Succeeded.name] = function(p, p2)
+		local v = {}
 
-		for _, v12 in p2.responseBody.data do
-			if v12.itemType == Enums.ItemTypes.Asset then
-				local v13 = AssetInfo.fromAsset(v12)
-
-				t1[v13.id] = v13
+		for _, v2 in p2.responseBody.data do
+			if v2.itemType ~= Enums.ItemTypes.Asset then
+				continue
 			end
+
+			local v3 = AssetInfo.fromAsset(v2)
+			v[v3.id] = v3
 		end
 
-		return Cryo.Dictionary.union(p1, t1)
+		return Cryo.Dictionary.union(p, v)
 	end
 })

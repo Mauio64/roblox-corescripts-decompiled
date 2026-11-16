@@ -1,244 +1,258 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local AppChatNetworking = require(AppChatParent.AppChatNetworking)
-local Http = require(AppChatParent.Http)
+local parent = AppChat.Parent
 
-require(AppChatParent.LuauPolyfill)
-
-local Promise = require(AppChatParent.Promise)
-local React = require(AppChatParent.React)
+local AppChatNetworking = require(parent.AppChatNetworking)
+local Http = require(parent.Http)
+require(parent.LuauPolyfill)
+local Promise = require(parent.Promise)
+local React = require(parent.React)
 local RetrievalStatus = Http.Enum.RetrievalStatus
 local StatusCodes = Http.StatusCodes
-local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local RoactUtils = require(parent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local RoactUtils2 = require(parent.RoactUtils)
+local useSelector = RoactUtils2.Hooks.RoactRodux.useSelector
 local NavigateIntoChat = require(AppChat.Actions.NavigateIntoChat)
 local NavigateIntoChat2 = require(AppChat.Conversations.Thunks.NavigateIntoChat)
 local ReceivedConversation = require(AppChat.Conversations.Actions.ReceivedConversation)
 local SendTextMessage = require(AppChat.Conversations.Thunks.SendTextMessage)
+local createConversation = require(AppChat.Conversations.Thunks.createConversation)
 local createConversationFromFriendPlaceholder = require(AppChat.Conversations.createConversationFromFriendPlaceholder)
 local EnumScreens = require(AppChat.EnumScreens)
 local GetChatModerationStatusDataHydration = require(AppChat.Stores.GetChatModerationStatusDataHydration)
-
 require(AppChat.Stores.GetConversationStore)
-
 local getConversationSendEligibilityStatus = require(AppChat.Utils.getConversationSendEligibilityStatus)
-local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
+local getUserSendEligibilityStatus = require(AppChat.Utils.getUserSendEligibilityStatus)
 local navigateWithOsaGate = require(AppChat.Utils.navigateWithOsaGate)
 local useAppPolicy = require(AppChat.Hooks.useAppPolicy)
 local useIsChatEnabled = require(AppChat.Hooks.useIsChatEnabled)
 local useIsChatUserMessagesEnabled = require(AppChat.Hooks.useIsChatUserMessagesEnabled)
+local useChatSettingsRetrievalStatus = require(AppChat.Hooks.useChatSettingsRetrievalStatus)
 local useIsGroupChatEnabled = require(AppChat.Hooks.useIsGroupChatEnabled)
-local isNavigationAvailable = require(AppChatParent.RobloxAppNavigation).isNavigationAvailable
-local FFlagAppChatNilGuardReceivedChatResponse = require(AppChat.Flags.FFlagAppChatNilGuardReceivedChatResponse)
-local FFlagAppChatRenameGuacPolicyEnabled = require(AppChatParent.SharedFlags).FFlagAppChatRenameGuacPolicyEnabled
-local _ = {
-	Success = "success",
-	Failure = "failure",
-	Declined = "declined"
-}
+local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+local isNavigationAvailable = RobloxAppNavigation.isNavigationAvailable
+local SharedFlags = require(parent.SharedFlags)
+local FFlagShareSheetFriendsSort = SharedFlags.FFlagShareSheetFriendsSort
 
-local function makeSendResult(s1: string, s2: string?) -- line: 59
-	return {
-		conversationId = s2,
-		status = s1
-	}
+local _ = { Success = "success", Failure = "failure", Declined = "declined" }
+
+local function makeSendResult(status: string, id: string?) -- 17 equivalent calls inferred from this helper
+	return { conversationId = id, status = status }
 end
-local function isSuccessfulResponse(p1) -- line: 66
-	-- upvalues: StatusCodes (copy), AppChatNetworking (copy)
-	local v35 = p1 and (p1.responseCode == StatusCodes.OK and (p1.responseBody and (p1.responseBody.messages and p1.responseBody.messages[1])))
-	local v36 = v35 and v35.status
 
-	return v35 ~= nil and (v36 == nil or (v36 == "" or v36 == AppChatNetworking.Constants.ResponseStatus.SUCCESS))
-end
-local function useExternalChatMessageSender(b1: boolean) -- line: 77
-	-- upvalues: useDispatch (copy), GetChatModerationStatusDataHydration (copy), useAppPolicy (copy), FFlagAppChatRenameGuacPolicyEnabled (copy), useSelector (copy), getDeepValue2 (copy), useIsChatEnabled (copy), useIsChatUserMessagesEnabled (copy), useIsGroupChatEnabled (copy), RetrievalStatus (copy), FFlagAppChatNilGuardReceivedChatResponse (copy), React (copy), getConversationSendEligibilityStatus (copy), Promise (copy), createConversationFromFriendPlaceholder (copy), ReceivedConversation (copy), SendTextMessage (copy), StatusCodes (copy), AppChatNetworking (copy), navigateWithOsaGate (copy), NavigateIntoChat2 (copy), NavigateIntoChat (copy), EnumScreens (copy), isNavigationAvailable (copy)
-	local v38 = useDispatch()
-	local v39 = GetChatModerationStatusDataHydration()
-	local v40 = useAppPolicy(function(p2) -- line: 80
-		return p2.getCanUsePlatformChat()
-	end)
-	local v41 = useAppPolicy(function(p3) -- line: 83
-		-- upvalues: FFlagAppChatRenameGuacPolicyEnabled (copy)
-		return not FFlagAppChatRenameGuacPolicyEnabled or p3.getCanSeeChatTerminology()
-	end)
-	local v42 = useSelector(function(p4) -- line: 86
-		-- upvalues: getDeepValue2 (copy)
-		return getDeepValue2(p4, "ChatAppReducer.ChatSettings.retrievalStatus")
-	end)
-	local v43 = useSelector(function(p5) -- line: 89
-		return tonumber(p5.LocalUserId) or 0
-	end)
-	local v44 = useSelector(function(p6) -- line: 92
-		return p6.Navigation ~= nil
-	end)
-	local v45 = useIsChatEnabled()
-	local v46 = useIsChatUserMessagesEnabled()
-	local v47 = useIsGroupChatEnabled()
-	local v48 = v42 ~= RetrievalStatus.Done
-	local v49 = not v48 and (v40 and (v41 and (v45 and (v46 and (FFlagAppChatNilGuardReceivedChatResponse or not b1)))))
-	local v50 = React.useCallback(function(p7, b2: boolean) -- line: 108
-		-- upvalues: getConversationSendEligibilityStatus (copy), v49 (copy), v47 (copy), v39 (copy)
-		return getConversationSendEligibilityStatus({
-			scope = false,
-			allowConversationStatusLoading = b2,
-			conversation = p7,
-			currentTimestamp = DateTime.now().UnixTimestamp,
-			isAvailable = v49,
-			isGroupChatEnabled = v47,
-			timeoutStore = v39
-		})
-	end, {
-		v49,
-		v47,
-		v39
-	})
-	local v51 = React.useCallback(function(p8) -- line: 121
-		-- upvalues: v50 (copy)
-		return v50(p8, false) == "eligible"
-	end, { v50 })
-	local v52 = React.useCallback(function(p9, s3: string) -- line: 126
-		-- upvalues: v51 (copy), Promise (copy), createConversationFromFriendPlaceholder (copy), v43 (copy), v50 (copy), v38 (copy), ReceivedConversation (copy), SendTextMessage (copy), StatusCodes (copy), AppChatNetworking (copy), navigateWithOsaGate (copy)
-		if not v51(p9) then
-			return Promise.resolve({
-				conversationId = nil,
-				status = "failure"
-			})
-		end
-
-		local v65 = p9.source == "friends"
-		local v66
-
-		if v65 then
-			v66 = createConversationFromFriendPlaceholder(p9, v43)
-
-			if v66 == nil then
-				return Promise.resolve({
-					conversationId = nil,
-					status = "failure"
-				})
-			end
+local function isSuccessfulResponse(data): boolean -- 2 equivalent calls inferred from this helper
+	if data then
+		if data.responseCode == StatusCodes.OK then
+			data = data.responseBody and data.responseBody.messages and data.responseBody.messages[1]
 		else
-			v66 = Promise.resolve(p9)
+			data = false
 		end
+	end
 
-		return v66:andThen(function(p10) -- line: 143
-			-- upvalues: v50 (copy), v65 (copy), v38 (copy), ReceivedConversation (copy), Promise (copy), SendTextMessage (copy), s3 (copy), StatusCodes (copy), AppChatNetworking (copy), navigateWithOsaGate (copy)
-			local v69 = p10 and p10.id
+	local status = data and data.status
 
-			if p10 == nil or (v69 == nil or v69 == "" or p10.source == "friends" or v50(p10, v65) ~= "eligible") then
-				return {
-					conversationId = nil,
-					status = "failure"
-				}
+	return data ~= nil
+		and (status == nil or status == "" or status == AppChatNetworking.Constants.ResponseStatus.SUCCESS)
+end
+
+local function useExternalChatMessageSender(flag: boolean)
+	local dispatch = useDispatch()
+	local timeoutStore = GetChatModerationStatusDataHydration()
+	local v = useAppPolicy(function(p)
+		return p.getCanUsePlatformChat()
+	end)
+
+	local v2 = useAppPolicy(function(p)
+		return p.getCanSeeChatTerminology()
+	end)
+
+	local v3 = useChatSettingsRetrievalStatus()
+	local v4 = useSelector(function(p)
+		return tonumber(p.LocalUserId) or 0
+	end)
+
+	local v5 = useSelector(function(p): boolean
+		return p.Navigation ~= nil
+	end)
+
+	local v6 = useIsChatEnabled()
+	local v7 = useIsChatUserMessagesEnabled()
+	local isGroupChatEnabled = useIsGroupChatEnabled()
+
+	local isLoading = v3 ~= RetrievalStatus.Done
+	local isAvailable = not isLoading and v and v2 and v6 and v7
+	local v8 = React.useCallback(function(conversation, allowConversationStatusLoading: boolean)
+		return getConversationSendEligibilityStatus({
+			allowConversationStatusLoading = allowConversationStatusLoading,
+			conversation = conversation,
+			currentTimestamp = DateTime.now().UnixTimestamp,
+			isAvailable = isAvailable,
+			isGroupChatEnabled = isGroupChatEnabled,
+			scope = false,
+			timeoutStore = timeoutStore
+		})
+	end, { isAvailable, isGroupChatEnabled, timeoutStore })
+
+	local canSendToConversation = React.useCallback(function(p): boolean
+		return v8(p, false) == "eligible"
+	end, { v8 })
+
+	local canSendToUser = React.useCallback(function(_: string): boolean
+		return getUserSendEligibilityStatus({
+			currentTimestamp = DateTime.now().UnixTimestamp,
+			isAvailable = isAvailable,
+			scope = false
+		}) == "eligible"
+	end, { isAvailable })
+
+	local v9 = React.useCallback(function(object, flag2: boolean, p: string)
+		return object:andThen(function(p2)
+			local id = p2 and p2.id
+
+			if p2 == nil or id == nil or id == "" or p2.source == "friends" or v8(p2, flag2) ~= "eligible" then
+				return makeSendResult("failure") -- inferred equivalent call
 			end
 
-			if v65 then
-				v38(ReceivedConversation(p10))
+			if flag2 then
+				dispatch(ReceivedConversation(p2))
 			end
 
-			return Promise.new(function(resolve) -- line: 159
-				-- upvalues: v38 (copy), SendTextMessage (copy), v69 (copy), s3 (copy), StatusCodes (copy), AppChatNetworking (copy), navigateWithOsaGate (copy)
-				local function sendMessage() -- line: 160
-					-- upvalues: v38 (copy), SendTextMessage (copy), v69 (copy), s3 (copy), resolve (copy), StatusCodes (copy), AppChatNetworking (copy)
-					v38(SendTextMessage(v69, s3, nil)):andThen(function(p11) -- line: 161
-						-- upvalues: resolve (copy), StatusCodes (copy), AppChatNetworking (copy), v69 (copy)
-						local v73 = resolve
-						local v74 = p11 and (p11.responseCode == StatusCodes.OK and (p11.responseBody and (p11.responseBody.messages and p11.responseBody.messages[1])))
-						local v75 = v74 and v74.status
-						local t1
-
-						if v74 ~= nil and (v75 == nil or (v75 == "" or v75 == AppChatNetworking.Constants.ResponseStatus.SUCCESS)) then
-							local v76 = v69
-
-							t1 = {
-								status = "success",
-								conversationId = v76
-							}
-						else
-							t1 = {
-								conversationId = nil,
-								status = "failure"
-							}
-						end
-
-						v73(t1)
-					end, function() -- line: 167
-						-- upvalues: resolve (copy)
-						resolve({
-							conversationId = nil,
-							status = "failure"
-						})
+			return Promise.new(function(callback)
+				local function sendMessage()
+					dispatch(SendTextMessage(id, p, nil)):andThen(function(data)
+						callback(isSuccessfulResponse(data) and makeSendResult("success", id) or makeSendResult("failure")) -- inferred equivalent call
+					end, function()
+						callback(makeSendResult("failure")) -- inferred equivalent call
 					end)
 				end
 
 				navigateWithOsaGate({
-					conversationId = v69,
-					dispatch = v38,
-					onAccepted = function() -- line: 175
-						-- upvalues: sendMessage (copy)
+					conversationId = id,
+					dispatch = dispatch,
+					onAccepted = function()
 						sendMessage()
 					end,
-					onDeclined = function() -- line: 178
-						-- upvalues: resolve (copy)
-						resolve({
-							conversationId = nil,
-							status = "declined"
-						})
+					onDeclined = function()
+						callback(makeSendResult("declined")) -- inferred equivalent call
 					end,
-					onError = function() -- line: 181
-						-- upvalues: resolve (copy)
-						resolve({
-							conversationId = nil,
-							status = "failure"
-						})
+					onError = function()
+						callback(makeSendResult("failure")) -- inferred equivalent call
 					end
 				})
 			end)
-		end):catch(function() -- line: 187
-			return {
-				conversationId = nil,
-				status = "failure"
-			}
+		end):catch(function()
+			return makeSendResult("failure") -- inferred equivalent call
 		end)
-	end, {
-		v51,
-		v38,
-		v50,
-		v43
-	})
-	local v53 = React.useCallback(function(s4: string?) -- line: 193
-		-- upvalues: v38 (copy), NavigateIntoChat2 (copy), NavigateIntoChat (copy), EnumScreens (copy)
-		v38(NavigateIntoChat2({
-			conversationId = s4
-		}, true))
+	end, { dispatch, v8 })
 
-		if s4 == nil then
-			v38(NavigateIntoChat({
-				screen = EnumScreens.ChatLanding,
-				params = {}
-			}))
+	local sendToConversation = React.useCallback(function(p, p2: string)
+		if not canSendToConversation(p) then
+			return Promise.resolve(makeSendResult("failure")) -- inferred equivalent call
 		end
-	end, { v38 })
-	local v54 = not b1 and (isNavigationAvailable() or v44)
 
-	return React.useMemo(function() -- line: 206
-		-- upvalues: v49 (copy), v47 (copy), v48 (copy), v51 (copy), v54 (copy), v53 (copy), v52 (copy)
-		return {
-			isAvailable = v49,
-			isGroupChatEnabled = v47,
-			isLoading = v48,
-			canSendToConversation = v51,
-			navigateToChat = if not v54 then nil else v53,
-			sendToConversation = v52
+		local v10 = p.source == "friends"
+		local v11
+
+		if v10 then
+			v11 = createConversationFromFriendPlaceholder(p, v4)
+
+			if v11 == nil then
+				return Promise.resolve(makeSendResult("failure")) -- inferred equivalent call
+			end
+		else
+			v11 = Promise.resolve(p)
+		end
+
+		if FFlagShareSheetFriendsSort then
+			return v9(v11, v10, p2)
+		end
+
+		return v11:andThen(function(p3)
+			local id = p3 and p3.id
+
+			if p3 == nil or id == nil or id == "" or p3.source == "friends" or v8(p3, v10) ~= "eligible" then
+				return makeSendResult("failure") -- inferred equivalent call
+			end
+
+			if v10 then
+				dispatch(ReceivedConversation(p3))
+			end
+
+			return Promise.new(function(callback)
+				local function sendMessage()
+					dispatch(SendTextMessage(id, p2, nil)):andThen(function(data)
+						callback(isSuccessfulResponse(data) and makeSendResult("success", id) or makeSendResult("failure")) -- inferred equivalent call
+					end, function()
+						callback(makeSendResult("failure")) -- inferred equivalent call
+					end)
+				end
+
+				navigateWithOsaGate({
+					conversationId = id,
+					dispatch = dispatch,
+					onAccepted = function()
+						sendMessage()
+					end,
+					onDeclined = function()
+						callback(makeSendResult("declined")) -- inferred equivalent call
+					end,
+					onError = function()
+						callback(makeSendResult("failure")) -- inferred equivalent call
+					end
+				})
+			end)
+		end):catch(function()
+			return makeSendResult("failure") -- inferred equivalent call
+		end)
+	end, { canSendToConversation, dispatch, v8, v4, v9 })
+
+	local sendToUser = React.useCallback(function(p: string, p2: string)
+		if canSendToUser(p) then
+			return v9(dispatch(createConversation("one_to_one", { p })), true, p2)
+		end
+
+		return Promise.resolve(makeSendResult("failure")) -- inferred equivalent call
+	end, { canSendToUser, dispatch, v9 })
+	local v10 = React.useCallback(function(conversationId: string?)
+		dispatch(NavigateIntoChat2({ conversationId = conversationId }, true))
+
+		if conversationId == nil then
+			dispatch(NavigateIntoChat({ screen = EnumScreens.ChatLanding, params = {} }))
+		end
+	end, { dispatch })
+	local v11 = not flag and (isNavigationAvailable() or v5)
+
+	return React.useMemo(function()
+		local v12 = {
+			isAvailable = isAvailable,
+			isGroupChatEnabled = isGroupChatEnabled,
+			isLoading = isLoading,
+			canSendToConversation = canSendToConversation,
+			canSendToUser = canSendToUser,
+			navigateToChat = nil,
+			sendToConversation = nil,
+			sendToUser = nil
 		}
+		local navigateToChat
+
+		if v11 then
+			navigateToChat = v10
+		end
+
+		v12.navigateToChat = navigateToChat
+		v12.sendToConversation = sendToConversation
+		v12.sendToUser = sendToUser
+		return v12
 	end, {
-		v49,
-		v47,
-		v48,
-		v51,
-		v53,
-		v54,
-		v52
+		isAvailable,
+		isGroupChatEnabled,
+		isLoading,
+		canSendToConversation,
+		canSendToUser,
+		v10,
+		v11,
+		sendToConversation,
+		sendToUser
 	})
 end
 

@@ -1,15 +1,12 @@
 local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
-local CurrencyTransfersParent = CurrencyTransfers.Parent
-local SharedFlags = require(CurrencyTransfersParent.SharedFlags)
+local parent = CurrencyTransfers.Parent
+local SharedFlags = require(parent.SharedFlags)
 
 require(CurrencyTransfers.Stores.createTransferStore)
-
 local acceptTransferRequest = require(CurrencyTransfers.NetworkRequests.acceptTransferRequest)
 local PromptState = require(CurrencyTransfers.Enums.PromptState)
-
 require(CurrencyTransfers.Models.AcceptTransferModel)
 require(CurrencyTransfers.Models.ErrorTransferModel)
-
 local FailureReason = require(CurrencyTransfers.Enums.FailureReason)
 local handleReceiveSuccess = require(CurrencyTransfers.Actions.Receive.handleReceiveSuccess)
 local handleReceiveError = require(CurrencyTransfers.Actions.Receive.handleReceiveError)
@@ -20,85 +17,83 @@ local RobuxTransferFlowEventName = require(CurrencyTransfers.Enums.RobuxTransfer
 local logCurrencyTransferCounter = require(CurrencyTransfers.Utils.logCurrencyTransferCounter)
 local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransferFlowEvent)
 
-local function acceptTransfer(p1) -- line: 25
-	-- upvalues: logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), handleReceiveError (copy), PromptState (copy), acceptTransferRequest (copy), handleReceiveSuccess (copy), FailureReason (copy), handleReceiveBlock (copy), TransferRetryOrigin (copy)
-	local v17 = p1.getNetworkImpl()
-	local setPromptState = p1.setPromptState
-	local setRobuxTransfer = p1.setRobuxTransfer
-	local setIsAlreadyAccepted = p1.setIsAlreadyAccepted
-	local v21 = p1.getTransferRequestId(false)
+local function acceptTransfer(data)
+	local networkImpl = data.getNetworkImpl()
+	local setPromptState = data.setPromptState
+	local setRobuxTransfer = data.setRobuxTransfer
+	local setIsAlreadyAccepted = data.setIsAlreadyAccepted
 
-	if not v21 then
-		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
+	local transferRequestId = data.getTransferRequestId(false)
+
+	if transferRequestId then
+		setPromptState(PromptState.ReceiveRequested)
+
+		logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferAcceptAttemptedCounter)
 
 		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-			logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.accept_failed)
+			logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.accept_attempted)
 		end
 
-		handleReceiveError(p1, nil)
+		return acceptTransferRequest({ transferRequestId = transferRequestId }, nil, networkImpl):andThen(function(p)
+			setPromptState(PromptState.ReceiveStarted)
 
-		return
-	end
+			if p and p.robuxTransfer then
+				setRobuxTransfer(p.robuxTransfer)
+				setIsAlreadyAccepted(p.isAlreadyAccepted == true)
 
-	setPromptState(PromptState.ReceiveRequested)
+				logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferAcceptSucceededCounter)
 
-	local t1 = {
-		transferRequestId = v21
-	}
+				if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+					logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.accept_succeeded)
+				end
 
-	logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptAttemptedCounter)
+				if SharedFlags.FFlagSduiOpenIncomingTransferUpsellAction then
+					data.triggerOnPromptDismissCommitted()
+				end
 
-	if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-		logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.accept_attempted)
-	end
+				handleReceiveSuccess(data)
+			else
+				logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
 
-	return acceptTransferRequest(t1, nil, v17):andThen(function(p2) -- line: 54
-		-- upvalues: setPromptState (copy), PromptState (copy), setRobuxTransfer (copy), setIsAlreadyAccepted (copy), logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), handleReceiveSuccess (copy), handleReceiveError (copy)
-		setPromptState(PromptState.ReceiveStarted)
+				if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+					logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.accept_failed)
+				end
 
-		if p2 and p2.robuxTransfer then
-			setRobuxTransfer(p2.robuxTransfer)
-			setIsAlreadyAccepted(p2.isAlreadyAccepted == true)
-			logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptSucceededCounter)
+				handleReceiveError(data, nil)
+			end
+		end):catch(function(data2)
+			logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
 
 			if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-				logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.accept_succeeded)
+				logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.accept_failed)
 			end
 
-			handleReceiveSuccess(p1)
-
-			return
-		end
-
-		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
-
-		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-			logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.accept_failed)
-		end
-
-		handleReceiveError(p1, nil)
-	end):catch(function(p3) -- line: 76
-		-- upvalues: logCurrencyTransferCounter (copy), p1 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), FailureReason (copy), handleReceiveBlock (copy), TransferRetryOrigin (copy), handleReceiveError (copy)
-		logCurrencyTransferCounter(p1, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
-
-		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
-			logRobuxTransferFlowEvent(p1, RobuxTransferFlowEventName.accept_failed)
-		end
-
-		if typeof(p3) == "table" and p3.errorMessage then
-			if p3.failureReason == FailureReason.AmpRecourseAvailable and p3.ampRecourseActions and p3.ampFeatureCheck then
-				handleReceiveBlock(p1, p3.ampRecourseActions, p3.ampFeatureCheck, TransferRetryOrigin.AcceptTransfer)
-
-				return
+			if typeof(data2) ~= "table" or not data2.errorMessage then
+				handleReceiveError(data, nil)
+			elseif
+				data2.failureReason == FailureReason.AmpRecourseAvailable
+				and data2.ampRecourseActions
+				and data2.ampFeatureCheck
+			then
+				handleReceiveBlock(
+					data,
+					data2.ampRecourseActions,
+					data2.ampFeatureCheck,
+					TransferRetryOrigin.AcceptTransfer
+				)
+			else
+				handleReceiveError(data, data2)
 			end
+		end)
+	end
 
-			handleReceiveError(p1, p3)
+	logCurrencyTransferCounter(data, CurrencyTransferTelemetry.CurrencyTransferAcceptFailedCounter)
 
-			return
-		end
+	if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+		logRobuxTransferFlowEvent(data, RobuxTransferFlowEventName.accept_failed)
+	end
 
-		handleReceiveError(p1, nil)
-	end)
+	handleReceiveError(data, nil)
 end
 
 return acceptTransfer

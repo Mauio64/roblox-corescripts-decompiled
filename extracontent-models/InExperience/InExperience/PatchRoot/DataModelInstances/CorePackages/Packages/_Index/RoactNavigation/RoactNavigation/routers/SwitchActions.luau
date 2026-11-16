@@ -1,28 +1,26 @@
-local ParentParent = script.Parent.Parent.Parent
-local Object = require(ParentParent.LuauPolyfill).Object
-local v3 = require(script.Parent.Parent.NavigationSymbol)("JUMP_TO")
-local t1 = {
-	JumpTo = v3
-}
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local NavigationSymbol = require(script.Parent.Parent.NavigationSymbol)
 
-setmetatable(t1, {
-	__index = function(_, p2) -- line: 16
-		error(("%q is not a valid member of SwitchActions"):format((tostring(p2))), 2)
+local jumpTo = NavigationSymbol("JUMP_TO")
+
+local SwitchActions = { JumpTo = jumpTo }
+
+setmetatable(SwitchActions, {
+	__index = function(_, p)
+		error(("%q is not a valid member of SwitchActions"):format((tostring(p))), 2)
 	end
 })
 
-function t1.jumpTo(p3) -- line: 22
-	-- upvalues: v3 (copy), Object (copy)
-	local t2 = {
-		preserveFocus = true,
-		type = v3
-	}
+function SwitchActions.jumpTo(p)
+	local v = { type = jumpTo, preserveFocus = true }
 
-	if p3 then
-		return (Object.assign(t2, p3))
+	if p then
+		return (Object.assign(v, p))
 	end
 
-	return t2
+	return v
 end
 
-return t1
+return SwitchActions

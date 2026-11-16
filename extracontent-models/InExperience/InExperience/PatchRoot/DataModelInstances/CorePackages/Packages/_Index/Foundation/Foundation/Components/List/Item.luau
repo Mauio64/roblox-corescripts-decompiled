@@ -1,1 +1,3 @@
-return (require(script.ListItem))
+local ListItem = require(script.ListItem)
+
+return ListItem

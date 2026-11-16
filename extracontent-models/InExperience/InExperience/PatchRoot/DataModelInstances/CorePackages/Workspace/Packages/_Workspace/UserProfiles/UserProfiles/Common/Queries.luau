@@ -1,10 +1,12 @@
-local Parent = script:FindFirstAncestor("UserProfiles").Parent
-local queries = require(Parent.ApolloLocalState).queries
+local parent = script:FindFirstAncestor("UserProfiles").Parent
+local ApolloLocalState = require(parent.ApolloLocalState)
+local queries = ApolloLocalState.queries
 
 return {
 	userProfilesCombinedNameByUserIds = queries.userProfilesCombinedNameByUserIds,
 	userProfilesCombinedNameAndAliasByUserIds = queries.userProfilesCombinedNameAndAliasByUserIds,
 	userProfilesCombinedNameAndUsernameByUserIds = queries.userProfilesCombinedNameAndUsernameByUserIds,
+	userProfilesBasicNamesByUserIds = queries.userProfilesBasicNamesByUserIds,
 	userProfilesAllNamesByUserIds = queries.userProfilesAllNamesByUserIds,
 	userProfilesDisplayNameAndUsernameByUserIds = queries.userProfilesDisplayNameAndUsernameByUserIds,
 	userProfilesDisplayUserPlatformNamesByUserIds = queries.userProfilesDisplayUserPlatformNamesByUserIds,

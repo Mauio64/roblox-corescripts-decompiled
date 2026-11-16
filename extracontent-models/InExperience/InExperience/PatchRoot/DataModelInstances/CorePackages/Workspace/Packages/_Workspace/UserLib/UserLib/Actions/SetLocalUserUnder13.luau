@@ -1,7 +1,6 @@
-local Parent = script:FindFirstAncestor("UserLib").Parent
+local parent = script:FindFirstAncestor("UserLib").Parent
 
-return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 6
-	return {
-		isUnder13 = p1
-	}
+local Rodux = require(parent.Rodux)
+return Rodux.makeActionCreator(script.Name, function(isUnder)
+	return { isUnder13 = isUnder }
 end)

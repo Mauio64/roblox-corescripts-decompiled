@@ -1,15 +1,15 @@
-local function subtract(p1, ...) -- line: 2
-	local t1 = {}
+local function subtract(items, ...)
+	local result = {}
 
-	for k, _ in pairs(p1) do
-		t1[k] = true
+	for k, _ in pairs(items) do
+		result[k] = true
 	end
 
 	for i = 1, select("#", ...) do
-		t1[select(i, ...)] = nil
+		result[select(i, ...)] = nil
 	end
 
-	return t1
+	return result
 end
 
 return subtract

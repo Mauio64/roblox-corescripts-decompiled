@@ -1,34 +1,32 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local LuauPolyfill = require(parent2.LuauPolyfill)
 local Error = LuauPolyfill.Error
 local Array = LuauPolyfill.Array
+
 local HttpService = game:GetService("HttpService")
-local t1 = {}
-local InvariantError = require(ParentParent.jsutils.invariant).InvariantError
 
-function t1.serializeFetchParameter(p1, s1: string, b1: boolean?) -- line: 27
-	-- upvalues: Array (copy), HttpService (copy), InvariantError (copy), Error (copy)
-	local s2 = nil
-	local ok, result = pcall(function() -- line: 29
-		-- upvalues: Array (copy), p1 (copy), b1 (copy), s2 (ref), HttpService (copy)
-		if Array.isArray(p1) and (#p1 == 0 and b1) then
-			s2 = "{}"
+local invariant = require(parent.jsutils.invariant)
+local invariantError = invariant.InvariantError
+return {
+	serializeFetchParameter = function(list, p: string, flag: boolean?)
+		local v = nil
+		local success, result = pcall(function()
+			if Array.isArray(list) and #list == 0 and flag then
+				v = "{}"
+			else
+				v = HttpService:JSONEncode(list)
+			end
+		end)
 
-			return
+		if not success then
+			local v2 = invariantError.new(("Network request failed. %s is not serializable: %s"):format(p, result))
+
+			v2.parseError = Error.new(result)
+			error(v2)
 		end
 
-		s2 = HttpService:JSONEncode(p1)
-	end)
-
-	if not ok then
-		local v15 = InvariantError.new(("Network request failed. %s is not serializable: %s"):format(s1, result))
-
-		v15.parseError = Error.new(result)
-		error(v15)
+		return v
 	end
-
-	return s2
-end
-
-return t1
+}

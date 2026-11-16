@@ -1,3 +1,4 @@
-local _Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local Workspace = script.Parent.Parent.Parent.Parent._Workspace
+local SocialChipCountsRowContainer = require(Workspace.ProfilePlatform.ProfilePlatform.Components.UserProfileHeader.SocialChipCountsRow.SocialChipCountsRowContainer)
 
-return (require(_Workspace.ProfilePlatform.ProfilePlatform.Components.UserProfileHeader.SocialChipCountsRow.SocialChipCountsRowContainer))
+return SocialChipCountsRowContainer

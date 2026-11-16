@@ -1,5 +1,11 @@
-return {
-	OperationData = require(script.OperationData).OperationData,
-	MutationData = require(script.MutationData).MutationData,
-	QueryData = require(script.QueryData).QueryData
-}
+local OperationData = require(script.OperationData)
+local Data = {}
+
+Data.OperationData = OperationData.OperationData
+local MutationData = require(script.MutationData)
+Data.MutationData = MutationData.MutationData
+
+local QueryData = require(script.QueryData)
+Data.QueryData = QueryData.QueryData
+
+return Data

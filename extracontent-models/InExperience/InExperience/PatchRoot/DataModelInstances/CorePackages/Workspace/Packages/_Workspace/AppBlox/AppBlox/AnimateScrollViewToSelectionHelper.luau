@@ -1,59 +1,81 @@
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 local GamepadService = game:GetService("GamepadService")
+local GuiService = game:GetService("GuiService")
 local TweenService = game:GetService("TweenService")
 
-function AnimateScrollViewToSelectionHelper(p1, n1: number, p2: ((...any) -> ...any)?) -- line: 5
-	-- upvalues: GamepadService (copy), UserGameSettings (copy), TweenService (copy)
-	local t1 = {}
-	local u8 = nil
+local AppBlox = script:FindFirstAncestor("AppBlox")
+local parent = AppBlox.Parent
+local CenterOnFocusScroll = require(AppBlox.CenterOnFocusScroll)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppMediaGalleryGamepadSupport = SharedFlags.FFlagLuaAppMediaGalleryGamepadSupport
+local defineFastFlag = game:DefineFastFlag("AnimateScrollViewIgnoreStaleSelection", false)
 
-	if not p1 then
-		return t1
+function AnimateScrollViewToSelectionHelper(instance, duration: number, callback, flag: boolean?)
+	local connections = {}
+	local v = nil
+
+	if not instance then
+		return connections
 	end
 
-	local AbsolutePositionY = p1.AbsolutePosition.Y
-	local AbsoluteWindowSizeY = p1.AbsoluteWindowSize.Y
+	local y = instance.AbsolutePosition.Y
+	local y2 = instance.AbsoluteWindowSize.Y
+	table.insert(connections, instance:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+		y = instance.AbsolutePosition.Y
+	end))
 
-	table.insert(t1, p1:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 21
-		-- upvalues: AbsolutePositionY (ref), p1 (copy)
-		AbsolutePositionY = p1.AbsolutePosition.Y
+	table.insert(connections, instance:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function()
+		y2 = instance.AbsoluteWindowSize.Y
 	end))
-	table.insert(t1, p1:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() -- line: 27
-		-- upvalues: AbsoluteWindowSizeY (ref), p1 (copy)
-		AbsoluteWindowSizeY = p1.AbsoluteWindowSize.Y
-	end))
-	table.insert(t1, p1.SelectionChanged:Connect(function(_, _, p5) -- line: 33
-		-- upvalues: p1 (copy), GamepadService (copy), u8 (ref), AbsoluteWindowSizeY (ref), AbsolutePositionY (ref), UserGameSettings (copy), p2 (copy), TweenService (copy), n1 (copy)
-		if not p5 or (not p5:IsDescendantOf(p1) or GamepadService.GamepadCursorEnabled) then
+
+	table.insert(connections, instance.SelectionChanged:Connect(function(_, _, instance2)
+		if
+			not instance2
+			or not instance2:IsDescendantOf(instance)
+			or GamepadService.GamepadCursorEnabled
+			or defineFastFlag and instance2 ~= GuiService.SelectedCoreObject and instance2 ~= GuiService.SelectedObject
+		then
 			return
 		end
 
-		if u8 then
-			u8:Cancel()
-			u8 = nil
+		if v then
+			v:Cancel()
+			v = nil
 		end
 
-		local AbsoluteSizeY = p5.AbsoluteSize.Y
-		local v15 = p5.AbsolutePosition.Y - (AbsoluteWindowSizeY * 0.5 - AbsoluteSizeY * 0.5 + AbsolutePositionY)
-		local CanvasPosition = p1.CanvasPosition
-		local vector2 = Vector2.new(CanvasPosition.X, CanvasPosition.Y + v15)
+		local y3 = instance2.AbsoluteSize.Y
+		local y4 = instance2.AbsolutePosition.Y
+		local canvasPosition = instance.CanvasPosition
+		local vector2
 
-		if UserGameSettings.ReducedMotion or p2 and p2() then
-			p1.CanvasPosition = vector2
+		if FFlagLuaAppMediaGalleryGamepadSupport and flag then
+			local revealOnlyCanvasY = CenterOnFocusScroll.getRevealOnlyCanvasY(y4, y3, canvasPosition, y, y2)
 
+			if revealOnlyCanvasY == nil then
+				return
+			end
+
+			vector2 = Vector2.new(canvasPosition.X, revealOnlyCanvasY)
+		else
+			local v2 = y4 - (y2 * 0.5 - y3 * 0.5 + y)
+			vector2 = Vector2.new(canvasPosition.X, canvasPosition.Y + v2)
+		end
+
+		if UserGameSettings.ReducedMotion or callback and callback() then
+			instance.CanvasPosition = vector2
 			return
 		end
 
-		u8 = TweenService:Create(p1, TweenInfo.new(n1, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
+		v = TweenService:Create(instance, TweenInfo.new(duration, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
 			CanvasPosition = vector2
 		})
 
-		if u8 then
-			u8:Play()
+		if v then
+			v:Play()
 		end
 	end))
 
-	return t1, u8
+	return connections, v
 end
 
 return AnimateScrollViewToSelectionHelper

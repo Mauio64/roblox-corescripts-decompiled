@@ -1,20 +1,28 @@
-local ParentParent = script.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Roact = require(ParentParentParent.Roact)
-local t = require(ParentParentParent.t)
-local withStyle = require(ParentParent.Core.Style.withStyle)
-local GetTextSize = require(ParentParent.Core.Text.GetTextSize)
-local GenericTextLabel = require(ParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
-local Images = require(ParentParent.App.ImageSet.Images)
-local ImageSetComponent = require(ParentParent.Core.ImageSet.ImageSetComponent)
+local parent = script.Parent.Parent.Parent
+local parent2 = parent.Parent
+
+local Roact = require(parent2.Roact)
+local t = require(parent2.t)
+
+local withStyle = require(parent.Core.Style.withStyle)
+local GetTextSize = require(parent.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent.Core.Text.GetFontFromFontStyle)
+
+local GenericTextLabel = require(parent.Core.Text.GenericTextLabel.GenericTextLabel)
+
+local Images = require(parent.App.ImageSet.Images)
+local ImageSetComponent = require(parent.Core.ImageSet.ImageSetComponent)
 local BadgeStates = require(script.Parent.Enum.BadgeStates)
 local BadgeVariant = require(script.Parent.Enum.BadgeVariant)
-local divideTransparency = require(ParentParent.Utility.divideTransparency)
-local v13 = Images["component_assets/circle_25"]
-local v14 = Images["component_assets/circle_21"]
-local v15 = Roact.PureComponent:extend("Badge")
 
-v15.validateProps = t.strictInterface({
+local divideTransparency = require(parent.Utility.divideTransparency)
+
+local component_assetscircle_25 = Images["component_assets/circle_25"]
+local component_assetscircle_21 = Images["component_assets/circle_21"]
+
+local extended = Roact.PureComponent:extend("Badge")
+
+extended.validateProps = t.strictInterface({
 	position = t.optional(t.UDim2),
 	anchorPoint = t.optional(t.Vector2),
 	disabled = t.optional(t.boolean),
@@ -23,75 +31,74 @@ v15.validateProps = t.strictInterface({
 	badgeVariant = t.optional(BadgeVariant.isEnumValue),
 	layoutOrder = t.optional(t.integer)
 })
-v15.defaultProps = {
-	disabled = false,
-	hasShadow = false,
+
+extended.defaultProps = {
 	position = UDim2.new(0, 0, 0, 0),
 	anchorPoint = Vector2.new(0, 0),
+	disabled = false,
+	hasShadow = false,
 	badgeVariant = BadgeVariant.Default
 }
 
-function v15.render(p1) -- line: 65
-	-- upvalues: withStyle (copy), t (copy), BadgeStates (copy), GetTextSize (copy), BadgeVariant (copy), Roact (copy), ImageSetComponent (copy), Images (copy), divideTransparency (copy), v13 (copy), v14 (copy), GenericTextLabel (copy)
-	return withStyle(function(p2) -- line: 66
-		-- upvalues: p1 (copy), t (copy), BadgeStates (copy), GetTextSize (copy), BadgeVariant (copy), Roact (copy), ImageSetComponent (copy), Images (copy), divideTransparency (copy), v13 (copy), v14 (copy), GenericTextLabel (copy)
-		local Theme = p2.Theme
-		local p2Font = p2.Font
-		local str = tostring(p1.props.value)
+function extended.render(p)
+	return withStyle(function(props)
+		local theme = props.Theme
+		local font = props.Font
 
-		if t.number(p1.props.value) and p1.props.value > 99 then
-			str = "99+"
-		elseif t.string(p1.props.value) and utf8.len(utf8.nfcnormalize(p1.props.value)) > 4 then
-			local v21 = utf8.offset(p1.props.value, 4) - 1
+		local v = tostring(p.props.value)
 
-			str = string.sub(p1.props.value, 1, v21) .. "..."
+		if t.number(p.props.value) and p.props.value > 99 then
+			v = "99+"
+		elseif t.string(p.props.value) and utf8.len(utf8.nfcnormalize(p.props.value)) > 4 then
+			local v2 = utf8.offset(p.props.value, 4) - 1
+			v = string.sub(p.props.value, 1, v2) .. "..."
 		end
 
-		if p1.props.value == BadgeStates.isEmpty then
-			str = ""
+		local text = p.props.value == BadgeStates.isEmpty and "" or v
+
+		local baseSize = props.Font.BaseSize
+		local v2 = GetTextSize(
+			text,
+			font.CaptionBody.RelativeSize * baseSize,
+			GetFontFromFontStyle(font.CaptionBody),
+			Vector2.new(10000, 10000)
+		).X + 10 + 4
+		local v3 = v2 < 24 and 24 or v2
+		local v4
+
+		if p.props.value == BadgeStates.isEmpty then
+			v3 = 12
+			v4 = 12
+		else
+			v4 = 24
 		end
 
-		local BaseSize = p2.Font.BaseSize
-		local v23 = p2Font.CaptionBody.RelativeSize * BaseSize
-		local v24 = GetTextSize(str, v23, p2Font.CaptionBody.Font, Vector2.new(10000, 10000)).X + 10 + 4
-
-		if v24 < 24 then
-			v24 = 24
-		end
-
-		local n1 = 24
-
-		if p1.props.value == BadgeStates.isEmpty then
-			v24 = 12
-			n1 = 12
-		end
-
-		local Badge = p2.Tokens.Semantic.Color.Common.Badge
-		local t1 = {
-			Color = p2.Tokens.Semantic.Color.Common.BadgeContent.Color3,
-			Transparency = p2.Tokens.Semantic.Color.Common.BadgeContent.Transparency
+		local v5 = props.Tokens.Color.System.Contrast
+		local colorStyle = {
+			Color = props.Tokens.Inverse.Content.Emphasis.Color3,
+			Transparency = props.Tokens.Inverse.Content.Emphasis.Transparency
 		}
 
-		if p1.props.badgeVariant == BadgeVariant.Alert then
-			Badge = p2.Tokens.Semantic.Color.Common.Alert
-			t1 = {
-				Color = p2.Tokens.Global.Color.White.Color3,
-				Transparency = p2.Tokens.Semantic.Color.Common.BadgeContent.Transparency
+		if p.props.badgeVariant == BadgeVariant.Alert then
+			v5 = props.Tokens.Color.System.Alert
+			colorStyle = {
+				Color = props.Tokens.Color.Extended.White.White_100.Color3,
+				Transparency = props.Tokens.Inverse.Content.Emphasis.Transparency
 			}
 		end
 
 		return Roact.createElement("Frame", {
+			Position = p.props.position,
+			AnchorPoint = p.props.anchorPoint,
 			BackgroundTransparency = 1,
-			Position = p1.props.position,
-			AnchorPoint = p1.props.anchorPoint,
-			Size = UDim2.fromOffset(v24, n1),
-			LayoutOrder = p1.props.layoutOrder
+			Size = UDim2.fromOffset(v3, v4),
+			LayoutOrder = p.props.layoutOrder
 		}, {
-			Shadow = p1.props.hasShadow and Roact.createElement(ImageSetComponent.Label, {
+			Shadow = p.props.hasShadow and Roact.createElement(ImageSetComponent.Label, {
 				ZIndex = 1,
-				BackgroundTransparency = 1,
 				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
+				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 12, 1, 12),
 				Image = Images["component_assets/dropshadow_25"],
 				ScaleType = Enum.ScaleType.Slice,
@@ -101,9 +108,12 @@ function v15.render(p1) -- line: 65
 				ZIndex = 2,
 				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1),
-				ImageColor3 = Theme.BackgroundDefault.Color,
-				ImageTransparency = divideTransparency(Theme.BackgroundDefault.Transparency, not p1.props.disabled and 1 or 2),
-				Image = v13,
+				ImageColor3 = theme.BackgroundDefault.Color,
+				ImageTransparency = divideTransparency(
+					theme.BackgroundDefault.Transparency,
+					p.props.disabled and 2 or 1
+				),
+				Image = component_assetscircle_25,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(14, 14, 15, 15)
 			}),
@@ -113,17 +123,17 @@ function v15.render(p1) -- line: 65
 				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Size = UDim2.new(1, -4, 1, -4),
-				ImageColor3 = Badge.Color3,
-				ImageTransparency = divideTransparency(Badge.Transparency, not p1.props.disabled and 1 or 2),
-				Image = v14,
+				ImageColor3 = v5.Color3,
+				ImageTransparency = divideTransparency(v5.Transparency, p.props.disabled and 2 or 1),
+				Image = component_assetscircle_21,
 				ScaleType = Enum.ScaleType.Slice,
 				SliceCenter = Rect.new(12, 12, 13, 13)
 			}, {
 				TextLabel = Roact.createElement(GenericTextLabel, {
+					fontStyle = font.CaptionBody,
+					colorStyle = colorStyle,
 					BackgroundTransparency = 1,
-					fontStyle = p2Font.CaptionBody,
-					colorStyle = t1,
-					Text = str,
+					Text = text,
 					Position = UDim2.fromScale(0.5, 0.5),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Size = UDim2.fromScale(1, 1),
@@ -135,4 +145,4 @@ function v15.render(p1) -- line: 65
 	end)
 end
 
-return v15
+return extended

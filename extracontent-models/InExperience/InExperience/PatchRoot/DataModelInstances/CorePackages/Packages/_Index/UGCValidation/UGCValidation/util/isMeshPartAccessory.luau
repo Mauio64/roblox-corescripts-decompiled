@@ -1,8 +1,8 @@
-local function isMeshPartAccessory(p1) -- line: 1
-	if p1:IsA("Accessory") then
-		local Handle = p1:FindFirstChild("Handle")
+local function isMeshPartAccessory(accessory): boolean
+	if accessory:IsA("Accessory") then
+		local handle = accessory:FindFirstChild("Handle")
 
-		if Handle and Handle:IsA("MeshPart") then
+		if handle and handle:IsA("MeshPart") then
 			return true
 		end
 	end

@@ -1,53 +1,51 @@
 local VirtualInputManager = game:GetService("VirtualInputManager")
 
-local function clickGuiObject(p1) -- line: 7
-	-- upvalues: VirtualInputManager (copy)
-	local ScreenGui = p1:FindFirstAncestorOfClass("ScreenGui")
-	local v5 = ScreenGui or Instance.new("ScreenGui")
-	local v6 = ScreenGui == nil
-	local v7 = nil
+local function clickGuiObject(instance)
+	local screenGui = instance:FindFirstAncestorOfClass("ScreenGui")
+	local parent = screenGui or Instance.new("ScreenGui")
+	local v = screenGui == nil
+	local v2
 
-	if v6 then
-		v5.Parent = game:GetService("CoreGui")
-		v7 = p1
+	if v then
+		parent.Parent = game:GetService("CoreGui")
+		v2 = instance
 
-		while v7.Parent ~= nil and v7.Parent.Parent ~= game do
-			v7 = v7.Parent
+		while v2.Parent ~= nil and v2.Parent.Parent ~= game do
+			v2 = v2.Parent
 		end
 
-		v7.Parent = v5
+		v2.Parent = parent
 	end
 
 	VirtualInputManager:WaitForInputEventsProcessed()
+	local absolutePosition = instance.AbsolutePosition
+	local absoluteSize = instance.AbsoluteSize
+	local v3 = absolutePosition.X + absoluteSize.X / 2
+	local v4 = absolutePosition.Y + absoluteSize.Y / 2
 
-	local AbsolutePosition = p1.AbsolutePosition
-	local AbsoluteSize = p1.AbsoluteSize
-	local v10 = AbsolutePosition.X + AbsoluteSize.X / 2
-	local v11 = AbsolutePosition.Y + AbsoluteSize.Y / 2
-	local u12 = false
-	local connection = p1.Activated:Connect(function() -- line: 30
-		-- upvalues: u12 (ref)
-		u12 = true
+	local v5 = false
+	local activatedConnection = instance.Activated:Connect(function()
+		v5 = true
 	end)
 
-	VirtualInputManager:SendMouseButtonEvent(v10, v11, 0, true, nil, 1)
-	VirtualInputManager:SendMouseButtonEvent(v10, v11, 0, false, nil, 1)
+	VirtualInputManager:SendMouseButtonEvent(v3, v4, 0, true, nil, 1)
+	VirtualInputManager:SendMouseButtonEvent(v3, v4, 0, false, nil, 1)
 	VirtualInputManager:WaitForInputEventsProcessed()
 
-	if not u12 then
-		VirtualInputManager:SendTouchEvent(1, 0, v10, v11)
-		VirtualInputManager:SendTouchEvent(1, 2, v10, v11)
+	if not v5 then
+		VirtualInputManager:SendTouchEvent(1, 0, v3, v4)
+		VirtualInputManager:SendTouchEvent(1, 2, v3, v4)
 		VirtualInputManager:WaitForInputEventsProcessed()
 	end
 
-	connection:Disconnect()
+	activatedConnection:Disconnect()
 
-	if v6 then
-		if v7 then
-			v7.Parent = nil
+	if v then
+		if v2 then
+			v2.Parent = nil
 		end
 
-		v5:Destroy()
+		parent:Destroy()
 	end
 end
 

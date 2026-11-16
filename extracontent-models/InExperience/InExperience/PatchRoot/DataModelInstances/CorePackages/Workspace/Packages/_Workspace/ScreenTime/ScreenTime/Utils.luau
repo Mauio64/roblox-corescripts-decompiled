@@ -1,35 +1,29 @@
-local Parent = script:FindFirstAncestor("ScreenTime").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local Logging = require(Parent.AppCommonLib).Logging
+local parent = script:FindFirstAncestor("ScreenTime").Parent
+local ArgCheck = require(parent.ArgCheck)
+local AppCommonLib = require(parent.AppCommonLib)
+local Logging = AppCommonLib.Logging
 
-return {
-	globalGetter = nil,
-	globalSetter = nil,
-	new = function(p1, p2) -- line: 30
-		-- upvalues: ArgCheck (copy)
-		ArgCheck.isType(p2.globalGetter, "function", "globalGetter")
-		ArgCheck.isType(p2.globalSetter, "function", "globalSetter")
+local Utils = { globalGetter = nil, globalSetter = nil }
 
-		local t1 = {
-			globalGetter = p2.globalGetter,
-			globalSetter = p2.globalSetter
-		}
+function Utils:new(p)
+	ArgCheck.isType(p.globalGetter, "function", "globalGetter")
+	ArgCheck.isType(p.globalSetter, "function", "globalSetter")
+	local v = { globalGetter = p.globalGetter, globalSetter = p.globalSetter }
 
-		setmetatable(t1, p1)
-		p1.__index = p1
+	setmetatable(v, self)
+	self.__index = self
+	return v
+end
 
-		return t1
-	end,
-	isLockedOut = function(p3) -- line: 45
-		-- upvalues: ArgCheck (copy)
-		ArgCheck.isType(p3.globalGetter, "function", "globalGetter")
+function Utils.isLockedOut(p): boolean
+	ArgCheck.isType(p.globalGetter, "function", "globalGetter")
+	return p.globalGetter("ScreenTime.lockedOut") == "true"
+end
 
-		return p3.globalGetter("ScreenTime.lockedOut") == "true"
-	end,
-	setLockedOut = function(p4) -- line: 54
-		-- upvalues: Logging (copy), ArgCheck (copy)
-		Logging.warn("Utils setLockedOut")
-		ArgCheck.isType(p4.globalSetter, "function", "globalSetter")
-		p4.globalSetter("ScreenTime.lockedOut", "true")
-	end
-}
+function Utils.setLockedOut(p)
+	Logging.warn("Utils setLockedOut")
+	ArgCheck.isType(p.globalSetter, "function", "globalSetter")
+	p.globalSetter("ScreenTime.lockedOut", "true")
+end
+
+return Utils

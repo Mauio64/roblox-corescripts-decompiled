@@ -1,1 +1,3 @@
-return require(script.Parent.FFlagLuaAppLogGameAttributionError) and game:DefineFastFlag("LuaAppGameDetailsAttributionFix2", false)
+local FFlagLuaAppLogGameAttributionError = require(script.Parent.FFlagLuaAppLogGameAttributionError)
+
+return FFlagLuaAppLogGameAttributionError and game:DefineFastFlag("LuaAppGameDetailsAttributionFix2", false)

@@ -1,29 +1,37 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local ParentParentParentParent = ParentParentParent.Parent
-local RoactGamepad = require(ParentParentParentParent.RoactGamepad)
-local React = require(ParentParentParentParent.React)
-local Cryo = require(ParentParentParentParent.Cryo)
-local t = require(ParentParentParentParent.t)
-local withStyle = require(ParentParentParent.Core.Style.withStyle)
-local validateFontInfo = require(ParentParentParent.Core.Style.Validator.validateFontInfo)
-local validateTypographyInfo = require(ParentParentParent.Core.Style.Validator.validateTypographyInfo)
-local GetTextSize = require(ParentParentParent.Core.Text.GetTextSize)
-local GetWrappedTextWithIcon = require(ParentParentParent.Core.Text.GetWrappedTextWithIcon)
-local withTextSizeOffset = require(ParentParentParent.Core.Style.withTextSizeOffset)
-local CursorKind = require(ParentParent.SelectionImage.CursorKind)
-local withSelectionCursorProvider = require(ParentParent.SelectionImage.withSelectionCursorProvider)
-local useCursor = require(ParentParentParent.App.SelectionCursor.useCursor)
-local TileName = require(scriptParent.TileName)
-local TileThumbnail = require(scriptParent.TileThumbnail)
-local TileBanner = require(scriptParent.TileBanner)
-local StyledTextLabel = require(ParentParent.Text.StyledTextLabel)
-local Images = require(ParentParentParent.App.ImageSet.Images)
-local Interactable = require(ParentParentParent.Core.Control.Interactable)
-local uDim = UDim.new(0, 10)
-local v25 = React.PureComponent:extend("Tile")
-local v26 = t.strictInterface({
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+local parent3 = parent2.Parent
+local parent4 = parent3.Parent
+
+local RoactGamepad = require(parent4.RoactGamepad)
+
+local React = require(parent4.React)
+local Cryo = require(parent4.Cryo)
+local t = require(parent4.t)
+local withStyle = require(parent3.Core.Style.withStyle)
+local validateFontInfo = require(parent3.Core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(parent3.Core.Style.Validator.validateTypographyInfo)
+local GetTextSize = require(parent3.Core.Text.GetTextSize)
+local GetFontFromFontStyle = require(parent3.Core.Text.GetFontFromFontStyle)
+local GetWrappedTextWithIcon = require(parent3.Core.Text.GetWrappedTextWithIcon)
+local withTextSizeOffset = require(parent3.Core.Style.withTextSizeOffset)
+
+local CursorKind = require(parent2.SelectionImage.CursorKind)
+local withSelectionCursorProvider = require(parent2.SelectionImage.withSelectionCursorProvider)
+local useCursor = require(parent3.App.SelectionCursor.useCursor)
+
+local TileName = require(parent.TileName)
+local TileThumbnail = require(parent.TileThumbnail)
+local TileBanner = require(parent.TileBanner)
+local StyledTextLabel = require(parent2.Text.StyledTextLabel)
+local Images = require(parent3.App.ImageSet.Images)
+local Interactable = require(parent3.Core.Control.Interactable)
+
+local udim = UDim.new(0, 10)
+
+local extended = React.PureComponent:extend("Tile")
+
+local v = t.strictInterface({
 	footer = t.optional(t.table),
 	name = t.optional(t.string),
 	nameTextColor = t.optional(t.Color3),
@@ -75,16 +83,17 @@ local v26 = t.strictInterface({
 	isRoactGamepadEnabled = t.optional(t.boolean)
 })
 
-local function tileBannerUseValidator(p1) -- line: 175
-	if p1.bannerText and p1.footer then
+local function tileBannerUseValidator(p)
+	if p.bannerText and p.footer then
 		return false, "A custom footer and bannerText can't be used together"
 	end
 
 	return true
 end
 
-v25.validateProps = t.intersection(v26, tileBannerUseValidator)
-v25.defaultProps = {
+extended.validateProps = t.intersection(v, tileBannerUseValidator)
+
+extended.defaultProps = {
 	titleTextLineCount = 2,
 	innerPadding = 8,
 	titleTopPadding = 0,
@@ -97,182 +106,269 @@ v25.defaultProps = {
 	Selectable = false,
 	isCircular = false,
 	horizontalAlignment = nil,
+	thumbnailFrameSize = UDim2.new(1, 0, 1, 0),
 	titleRichText = false,
-	isRoactGamepadEnabled = true,
-	thumbnailFrameSize = UDim2.new(1, 0, 1, 0)
+	isRoactGamepadEnabled = true
 }
 
-function v25.init(p2) -- line: 203
-	p2.state = {
-		tileWidth = 0,
-		tileHeight = 0
-	}
+function extended:init()
+	self.state = { tileWidth = 0, tileHeight = 0 }
 
-	function p2.onAbsoluteSizeChange(p3) -- line: 209
-		-- upvalues: p2 (copy)
-		local AbsoluteSizeX = p3.AbsoluteSize.X
-		local AbsoluteSizeY = p3.AbsoluteSize.Y
-
-		p2:setState({
-			tileWidth = AbsoluteSizeX,
-			tileHeight = AbsoluteSizeY
-		})
+	function self.onAbsoluteSizeChange(p)
+		self:setState({ tileWidth = p.AbsoluteSize.X, tileHeight = p.AbsoluteSize.Y })
 	end
 end
-function v25.render(p4) -- line: 219
-	-- upvalues: withTextSizeOffset (copy), withStyle (copy), withSelectionCursorProvider (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), React (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), TileThumbnail (copy), uDim (copy), TileName (copy), StyledTextLabel (copy), TileBanner (copy)
-	local footer = p4.props.footer
-	local name = p4.props.name
-	local subtitle = p4.props.subtitle
-	local hasVerifiedBadge = p4.props.hasVerifiedBadge
-	local titleTextLineCount = p4.props.titleTextLineCount
-	local innerPadding = p4.props.innerPadding
-	local titleTopPadding = p4.props.titleTopPadding
-	local subtitleTopPadding = p4.props.subtitleTopPadding
-	local footerTopPadding = p4.props.footerTopPadding
-	local onActivated = p4.props.onActivated
-	local thumbnail = p4.props.thumbnail
-	local thumbnailSize = p4.props.thumbnailSize
-	local thumbnailFrameSize = p4.props.thumbnailFrameSize
-	local thumbnailColor = p4.props.thumbnailColor
-	local thumbnailTransparency = p4.props.thumbnailTransparency
-	local bannerText = p4.props.bannerText
-	local hasRoundedCorners = p4.props.hasRoundedCorners
-	local isSelected = p4.props.isSelected
-	local multiSelect = p4.props.multiSelect
-	local isDisabled = p4.props.isDisabled
-	local titleIcon = p4.props.titleIcon
-	local thumbnailOverlayComponents = p4.props.thumbnailOverlayComponents
-	local backgroundImage = p4.props.backgroundImage
-	local useMaxTitleHeight = p4.props.useMaxTitleHeight
-	local addSubtitleSpace = p4.props.addSubtitleSpace
-	local horizontalAlignment = p4.props.horizontalAlignment
 
-	return withTextSizeOffset(function(p5) -- line: 247
-		-- upvalues: withStyle (copy), withSelectionCursorProvider (copy), p4 (copy), titleTextLineCount (copy), innerPadding (copy), titleTopPadding (copy), addSubtitleSpace (copy), useMaxTitleHeight (copy), name (copy), titleIcon (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), subtitle (copy), footer (copy), bannerText (copy), React (copy), isDisabled (copy), onActivated (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), horizontalAlignment (copy), thumbnailFrameSize (copy), TileThumbnail (copy), thumbnail (copy), hasRoundedCorners (copy), uDim (copy), isSelected (copy), multiSelect (copy), thumbnailOverlayComponents (copy), thumbnailSize (copy), thumbnailColor (copy), thumbnailTransparency (copy), backgroundImage (copy), subtitleTopPadding (copy), TileName (copy), hasVerifiedBadge (copy), StyledTextLabel (copy), footerTopPadding (copy), TileBanner (copy)
-		return withStyle(function(p6) -- line: 248
-			-- upvalues: withSelectionCursorProvider (copy), p4 (copy), titleTextLineCount (copy), p5 (copy), innerPadding (copy), titleTopPadding (copy), addSubtitleSpace (copy), useMaxTitleHeight (copy), name (copy), titleIcon (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), subtitle (copy), footer (copy), bannerText (copy), React (copy), isDisabled (copy), onActivated (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), horizontalAlignment (copy), thumbnailFrameSize (copy), TileThumbnail (copy), thumbnail (copy), hasRoundedCorners (copy), uDim (copy), isSelected (copy), multiSelect (copy), thumbnailOverlayComponents (copy), thumbnailSize (copy), thumbnailColor (copy), thumbnailTransparency (copy), backgroundImage (copy), subtitleTopPadding (copy), TileName (copy), hasVerifiedBadge (copy), StyledTextLabel (copy), footerTopPadding (copy), TileBanner (copy)
-			return withSelectionCursorProvider(function(p7) -- line: 249
-				-- upvalues: p6 (copy), p4 (copy), titleTextLineCount (copy), p5 (copy), innerPadding (copy), titleTopPadding (copy), addSubtitleSpace (copy), useMaxTitleHeight (copy), name (copy), titleIcon (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), subtitle (copy), footer (copy), bannerText (copy), React (copy), isDisabled (copy), onActivated (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), horizontalAlignment (copy), thumbnailFrameSize (copy), TileThumbnail (copy), thumbnail (copy), hasRoundedCorners (copy), uDim (copy), isSelected (copy), multiSelect (copy), thumbnailOverlayComponents (copy), thumbnailSize (copy), thumbnailColor (copy), thumbnailTransparency (copy), backgroundImage (copy), subtitleTopPadding (copy), TileName (copy), hasVerifiedBadge (copy), StyledTextLabel (copy), footerTopPadding (copy), TileBanner (copy)
-				local p6Font = p6.Font
-				local Theme = p6.Theme
-				local tileHeight = p4.state.tileHeight
-				local tileWidth = p4.state.tileWidth
-				local v73 = p4.props.titleFontStyle or p6Font.Header2
-				local titleRichText = p4.props.titleRichText
-				local v75 = p4.props.subtitleFontStyle or p6Font.CaptionHeader
-				local v76 = if not v73.RelativeSize then v73.FontSize else p6Font.BaseSize * v73.RelativeSize
-				local v77 = if not v75.RelativeSize then v75.FontSize else p6Font.BaseSize * v75.RelativeSize
+function extended.render(data)
+	local footer = data.props.footer
+	local name = data.props.name
+	local subtitle = data.props.subtitle
+	local hasVerifiedBadge = data.props.hasVerifiedBadge
+	local titleTextLineCount = data.props.titleTextLineCount
+	local innerPadding = data.props.innerPadding
+	local titleTopPadding = data.props.titleTopPadding
+	local subtitleTopPadding = data.props.subtitleTopPadding
+	local footerTopPadding = data.props.footerTopPadding
+	local onActivated = data.props.onActivated
+	local thumbnail = data.props.thumbnail
+	local thumbnailSize = data.props.thumbnailSize
+	local thumbnailFrameSize = data.props.thumbnailFrameSize
+	local thumbnailColor = data.props.thumbnailColor
+	local thumbnailTransparency = data.props.thumbnailTransparency
+	local bannerText = data.props.bannerText
+	local hasRoundedCorners = data.props.hasRoundedCorners
+	local isSelected = data.props.isSelected
+	local multiSelect = data.props.multiSelect
+	local isDisabled = data.props.isDisabled
+	local titleIcon = data.props.titleIcon
+	local thumbnailOverlayComponents = data.props.thumbnailOverlayComponents
+	local backgroundImage = data.props.backgroundImage
+	local useMaxTitleHeight = data.props.useMaxTitleHeight
+	local addSubtitleSpace = data.props.addSubtitleSpace
+	local horizontalAlignment = data.props.horizontalAlignment
 
-				math.ceil(v76 * titleTextLineCount)
+	return withTextSizeOffset(function(p)
+		return withStyle(function(p2)
+			return withSelectionCursorProvider(function(callback)
+				local font = p2.Font
+				local theme = p2.Theme
 
-				local v78 = math.ceil((v76 + p5) * titleTextLineCount)
-				local v79 = tileHeight - tileWidth / (p4.props.thumbnailAspectRatio or 1) - innerPadding - v78 - innerPadding - titleTopPadding
+				local tileHeight = data.state.tileHeight
+				local tileWidth = data.state.tileWidth
 
+				local titleFontStyle = data.props.titleFontStyle or font.Header2
+				local titleRichText = data.props.titleRichText
+				local subtitleFontStyle = data.props.subtitleFontStyle or font.CaptionHeader
+				local v2
+
+				if titleFontStyle.RelativeSize then
+					v2 = font.BaseSize * titleFontStyle.RelativeSize
+				else
+					v2 = titleFontStyle.FontSize
+				end
+
+				local v3
+
+				if subtitleFontStyle.RelativeSize then
+					v3 = font.BaseSize * subtitleFontStyle.RelativeSize
+				else
+					v3 = subtitleFontStyle.FontSize
+				end
+
+				math.ceil(v2 * titleTextLineCount)
+				local maxHeight = math.ceil((v2 + p) * titleTextLineCount)
+
+				local v4 = tileHeight - tileWidth / (data.props.thumbnailAspectRatio or 1) - innerPadding - maxHeight - innerPadding - titleTopPadding
 				Vector2.new(0, 0)
-
-				local n1 = 0
+				local v5 = 0
 				local vector2
 
 				if addSubtitleSpace then
-					vector2 = Vector2.new(0, v78)
-					n1 = math.ceil(v77) + p5
-					v79 -= n1
+					vector2 = Vector2.new(0, maxHeight)
+					v5 = math.ceil(v3) + p
+					v4 -= v5
 				else
 					if useMaxTitleHeight then
-						vector2 = Vector2.new(0, v78)
+						vector2 = Vector2.new(0, maxHeight)
 					else
-						local v82 = name or ""
-						local Font = v73.Font
+						local v6 = name or ""
+
+						local fontFromFontStyle = GetFontFromFontStyle(titleFontStyle)
 
 						if titleIcon then
-							local v84 = titleIcon.ImageRectSize.X / Images.ImagesResolutionScale
-
-							v82 = GetWrappedTextWithIcon(v82, v76, Font, v84, 4)
+							v6 = GetWrappedTextWithIcon(
+								v6,
+								v2,
+								fontFromFontStyle,
+								titleIcon.ImageRectSize.X / Images.ImagesResolutionScale,
+								4
+							)
 						end
 
-						local v85 = GetTextSize(v82, v76, Font, Vector2.new(tileWidth, v78))
+						local textSize = GetTextSize(v6, v2, fontFromFontStyle, Vector2.new(tileWidth, maxHeight))
 
-						vector2 = Vector2.new(v85.X, (math.min(v85.Y, v78)))
+						vector2 = Vector2.new(textSize.X, (math.min(textSize.Y, maxHeight)))
 					end
 
 					if subtitle ~= nil and subtitle ~= "" then
-						n1 = math.ceil(v77) + p5
-						v79 -= n1
+						v5 = math.ceil(v3) + p
+						v4 -= v5
 					end
 				end
 
-				local v86 = math.max(0, v79)
-				local v87 = footer ~= nil or bannerText ~= nil
-				local renderTileInset = p4.props.renderTileInset
-				local uDim2 = UDim2.new(1, 0, 0, vector2.Y + n1 + titleTopPadding)
-				local v90 = nil
+				local v6 = math.max(0, v4)
+				local v7 = footer ~= nil or bannerText ~= nil
+				local renderTileInset = data.props.renderTileInset
 
-				if p4.props.nameOverThumbnail then
-					uDim2 = UDim2.new(0, tileWidth - 10, 0, -(vector2.Y + 20))
-					v90 = React.createElement("UIPadding", {
+				local udim2 = UDim2.new(1, 0, 0, vector2.Y + v5 + titleTopPadding)
+				local nameOverThumbnailPadding
+
+				if data.props.nameOverThumbnail then
+					udim2 = UDim2.new(0, tileWidth - 10, 0, -(vector2.Y + 20))
+					nameOverThumbnailPadding = React.createElement("UIPadding", {
 						PaddingLeft = UDim.new(0, 10)
 					})
 				end
 
-				local v91 = p4.props.inputBindings or (not isDisabled and (not not onActivated and {
-					Activate = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, onActivated)
-				}) or nil)
+				local inputBindings = data.props.inputBindings
+					or not isDisabled
+					and onActivated
+					and ({
+						Activate = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, onActivated)
+					} or nil)
+					or nil
 
-				return React.createElement(Interactable, {
-					Size = UDim2.new(1, 0, 1, 0),
+				local createElement = React.createElement
+				local v8 = {}
+				v8.Size = UDim2.new(1, 0, 1, 0)
+				v8.BackgroundTransparency = 1
+				v8.Selectable = data.props.Selectable
+				local activated = React.Event.Activated
+				local v9
+
+				if not isDisabled then
+					v9 = onActivated
+				end
+
+				v8[activated] = v9
+				v8[React.Change.AbsoluteSize] = data.onAbsoluteSizeChange
+				v8.ref = data.props.textButtonRef
+				local selectionImageObject
+
+				if data.props.cursor then
+					selectionImageObject = data.props.cursor
+				else
+					selectionImageObject = callback(CursorKind.RoundedRect)
+				end
+
+				v8.SelectionImageObject = selectionImageObject
+
+				local createElement2 = React.createElement
+				local v10 = {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, innerPadding),
+					HorizontalAlignment = 0
+				}
+				local horizontalAlignment2
+
+				if not data.props.nameOverThumbnail then
+					horizontalAlignment2 = horizontalAlignment
+				end
+
+				v10.HorizontalAlignment = horizontalAlignment2
+				local children = {
+					UIListLayout = createElement2("UIListLayout", v10),
+					Thumbnail = 0,
+					TitleArea = 0,
+					FooterContainer = 0
+				}
+
+				local createElement3 = React.createElement
+				local v11 = not data.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame
+				local v12 = {
+					Size = thumbnailFrameSize,
+					SizeConstraint = Enum.SizeConstraint.RelativeXX,
 					BackgroundTransparency = 1,
-					Selectable = p4.props.Selectable,
-					[React.Event.Activated] = if not isDisabled then onActivated else nil,
-					[React.Change.AbsoluteSize] = p4.onAbsoluteSizeChange,
-					ref = p4.props.textButtonRef,
-					SelectionImageObject = if not p4.props.cursor then p7(CursorKind.RoundedRect) else p4.props.cursor
-				}, {
-					UIListLayout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Vertical,
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						Padding = UDim.new(0, innerPadding),
-						HorizontalAlignment = if p4.props.nameOverThumbnail then nil else horizontalAlignment
-					}),
-					Thumbnail = React.createElement(not p4.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame, {
-						Size = thumbnailFrameSize,
-						SizeConstraint = Enum.SizeConstraint.RelativeXX,
-						BackgroundTransparency = 1,
-						LayoutOrder = 1,
-						NextSelectionLeft = p4.props.NextSelectionLeft,
-						NextSelectionRight = p4.props.NextSelectionRight,
-						NextSelectionUp = p4.props.NextSelectionUp,
-						NextSelectionDown = p4.props.NextSelectionDown,
-						ref = p4.props.thumbnailRef,
-						[React.Tag] = p4.props[React.Tag],
-						SelectionImageObject = if not p4.props.cursor then p7(CursorKind.RoundedRectNoInset) else p4.props.cursor,
-						inputBindings = if not p4.props.isRoactGamepadEnabled then nil else v91
-					}, {
-						Image = React.createElement(TileThumbnail, {
-							Image = thumbnail,
-							hasRoundedCorners = hasRoundedCorners,
-							cornerRadius = if not p4.props.isCircular then uDim else UDim.new(0.5, 0),
-							isSelected = isSelected,
-							multiSelect = multiSelect,
-							overlayComponents = thumbnailOverlayComponents,
-							imageSize = thumbnailSize,
-							imageColor = thumbnailColor,
-							imageTransparency = thumbnailTransparency,
-							backgroundImage = backgroundImage,
-							scaleType = p4.props.thumbnailScaleType,
-							onThumbnailLoaded = p4.props.onThumbnailLoaded
-						}),
-						TileInset = renderTileInset and renderTileInset() or nil,
-						UIAspectRatioConstraint = if p4.props.thumbnailAspectRatio == nil then nil else React.createElement("UIAspectRatioConstraint", {
-							AspectRatio = p4.props.thumbnailAspectRatio,
-							AspectType = Enum.AspectType.ScaleWithParentSize
-						})
-					}),
-					TitleArea = React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 2,
-						Size = uDim2
-					}, {
+					LayoutOrder = 1,
+					NextSelectionLeft = data.props.NextSelectionLeft,
+					NextSelectionRight = data.props.NextSelectionRight,
+					NextSelectionUp = data.props.NextSelectionUp,
+					NextSelectionDown = data.props.NextSelectionDown,
+					ref = data.props.thumbnailRef,
+					[React.Tag] = data.props[React.Tag]
+				}
+				local selectionImageObject2
+
+				if data.props.cursor then
+					selectionImageObject2 = data.props.cursor
+				else
+					selectionImageObject2 = callback(CursorKind.RoundedRectNoInset)
+				end
+
+				v12.SelectionImageObject = selectionImageObject2
+
+				if not data.props.isRoactGamepadEnabled then
+					inputBindings = nil
+				end
+
+				v12.inputBindings = inputBindings
+
+				local createElement4 = React.createElement
+				local v13 = {
+					Image = thumbnail,
+					hasRoundedCorners = hasRoundedCorners,
+					cornerRadius = 0,
+					isSelected = 0,
+					multiSelect = 0,
+					overlayComponents = 0,
+					imageSize = 0,
+					imageColor = 0,
+					imageTransparency = 0,
+					backgroundImage = 0,
+					scaleType = 0,
+					onThumbnailLoaded = 0
+				}
+				local cornerRadius
+
+				if data.props.isCircular then
+					cornerRadius = UDim.new(0.5, 0)
+				else
+					cornerRadius = udim
+				end
+
+				v13.cornerRadius = cornerRadius
+
+				v13.isSelected = isSelected
+				v13.multiSelect = multiSelect
+				v13.overlayComponents = thumbnailOverlayComponents
+				v13.imageSize = thumbnailSize
+				v13.imageColor = thumbnailColor
+				v13.imageTransparency = thumbnailTransparency
+				v13.backgroundImage = backgroundImage
+				v13.scaleType = data.props.thumbnailScaleType
+				v13.onThumbnailLoaded = data.props.onThumbnailLoaded
+				local v14 = {
+					Image = createElement4(TileThumbnail, v13),
+					TileInset = renderTileInset and renderTileInset() or nil,
+					UIAspectRatioConstraint = 0
+				}
+				local uiAspectRatioConstraint
+
+				if data.props.thumbnailAspectRatio ~= nil then
+					uiAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+						AspectRatio = data.props.thumbnailAspectRatio,
+						AspectType = Enum.AspectType.ScaleWithParentSize
+					})
+				end
+
+				v14.UIAspectRatioConstraint = uiAspectRatioConstraint
+				children.Thumbnail = createElement3(v11, v12, v14)
+
+				children.TitleArea = React.createElement(
+					"Frame",
+					{ Size = udim2, BackgroundTransparency = 1, LayoutOrder = 2 },
+					{
 						TitleTopPadding = React.createElement("UIPadding", {
 							PaddingTop = UDim.new(0, titleTopPadding)
 						}),
@@ -282,67 +378,68 @@ function v25.render(p4) -- line: 219
 							Padding = UDim.new(0, subtitleTopPadding),
 							HorizontalAlignment = horizontalAlignment
 						}),
-						NameOverThumbnailPadding = v90,
-						Name = titleTextLineCount > 0 and (tileWidth > 0 and React.createElement(TileName, {
-							LayoutOrder = 1,
+						NameOverThumbnailPadding = nameOverThumbnailPadding,
+						Name = titleTextLineCount > 0 and tileWidth > 0 and React.createElement(TileName, {
 							titleIcon = titleIcon,
 							name = name,
-							nameTextColor = p4.props.nameTextColor,
-							nameTextTransparency = p4.props.nameTextTransparency,
+							nameTextColor = data.props.nameTextColor,
+							nameTextTransparency = data.props.nameTextTransparency,
 							hasVerifiedBadge = hasVerifiedBadge,
-							maxHeight = v78,
+							maxHeight = maxHeight,
 							maxWidth = tileWidth,
+							LayoutOrder = 1,
 							useMaxHeight = useMaxTitleHeight,
-							titleFontStyle = v73,
+							titleFontStyle = titleFontStyle,
 							richText = titleRichText,
 							horizontalAlignment = horizontalAlignment
-						})),
-						Subtitle = subtitle ~= "" and (subtitle ~= nil and React.createElement(StyledTextLabel, {
-							layoutOrder = 2,
-							fluidSizing = false,
-							richText = false,
-							lineHeight = 1,
-							size = UDim2.new(0, 0, 0, n1),
+						}),
+						Subtitle = subtitle ~= "" and subtitle ~= nil and React.createElement(StyledTextLabel, {
+							size = UDim2.new(0, 0, 0, v5),
 							automaticSize = Enum.AutomaticSize.X,
 							text = subtitle,
-							colorStyle = Theme.TextDefault,
-							fontStyle = v75,
-							openTypeFeatures = p4.props.openTypeFeatures,
-							textTruncate = Enum.TextTruncate.AtEnd
-						}))
-					}),
-					FooterContainer = v87 and React.createElement("Frame", {
-						BackgroundTransparency = 1,
-						LayoutOrder = 3,
-						Size = UDim2.new(1, 0, 0, v86)
-					}, {
-						FooterTopPadding = React.createElement("UIPadding", {
-							PaddingTop = UDim.new(0, footerTopPadding)
-						}),
-						Banner = bannerText and React.createElement(TileBanner, {
-							bannerText = bannerText
-						}),
-						Footer = not bannerText and footer
-					})
-				})
+							colorStyle = theme.TextDefault,
+							fontStyle = subtitleFontStyle,
+							openTypeFeatures = data.props.openTypeFeatures,
+							layoutOrder = 2,
+							fluidSizing = false,
+							textTruncate = Enum.TextTruncate.AtEnd,
+							richText = false,
+							lineHeight = 1
+						})
+					}
+				)
+
+				children.FooterContainer = v7
+					and React.createElement(
+						"Frame",
+						{
+							Size = UDim2.new(1, 0, 0, v6),
+							BackgroundTransparency = 1,
+							LayoutOrder = 3
+						},
+						{
+							FooterTopPadding = React.createElement("UIPadding", {
+								PaddingTop = UDim.new(0, footerTopPadding)
+							}),
+							Banner = bannerText and React.createElement(TileBanner, {
+								bannerText = bannerText
+							}),
+							Footer = not bannerText and footer
+						}
+					)
+				return createElement(Interactable, v8, children)
 			end)
 		end)
 	end)
 end
 
-local function v28(p8) -- line: 463
-	-- upvalues: useCursor (copy), uDim (copy), Cryo (copy), React (copy), v25 (copy)
-	local v59 = useCursor(uDim)
-	local v60 = Cryo.Dictionary.join({
-		cursor = v59
-	}, p8)
+local function fn(p)
+	local cursor = useCursor(udim)
+	local joined = Cryo.Dictionary.join({ cursor = cursor }, p)
 
-	return React.createElement(v25, v60)
+	return React.createElement(extended, joined)
 end
 
-return React.forwardRef(function(p9, p10) -- line: 471
-	-- upvalues: React (copy), v28 (copy), Cryo (copy)
-	return React.createElement(v28, Cryo.Dictionary.join(p9, {
-		thumbnailRef = p10
-	}))
+return React.forwardRef(function(p, thumbnailRef)
+	return React.createElement(fn, Cryo.Dictionary.join(p, { thumbnailRef = thumbnailRef }))
 end)

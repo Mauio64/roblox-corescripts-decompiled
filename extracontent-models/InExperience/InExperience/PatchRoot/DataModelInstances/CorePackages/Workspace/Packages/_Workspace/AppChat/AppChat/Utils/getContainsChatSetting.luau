@@ -1,7 +1,7 @@
-return function(t1: {[any]: any}?) -- line: 1
-	if not t1 then
-		return false
+return function(list): boolean
+	if list then
+		return (table.find(list, "WhoCanChatWithMeInApp") or table.find(list, "WhoCanGroupChatWithMeInApp") or table.find(list, "WhoCanOneOnOnePartyWithMe") or table.find(list, "WhoCanGroupPartyWithMe")) ~= nil
 	end
 
-	return (table.find(t1, "WhoCanChatWithMeInApp") or (table.find(t1, "WhoCanGroupChatWithMeInApp") or (table.find(t1, "WhoCanOneOnOnePartyWithMe") or table.find(t1, "WhoCanGroupPartyWithMe")))) ~= nil
+	return false
 end

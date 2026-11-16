@@ -1,12 +1,14 @@
 local GuiService = game:GetService("GuiService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
+
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
-local React = require(AvatarExperienceInspectAndBuyParent.React)
-local useSelector = require(AvatarExperienceInspectAndBuyParent.RoactUtils).Hooks.RoactRodux.useSelector
-local FocusNavigationUtils = require(AvatarExperienceInspectAndBuyParent.FocusNavigationUtils)
-local FFlagAXFixIaBTimedOptionsPopoverFocus = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags).FFlagAXFixIaBTimedOptionsPopoverFocus
+local parent = AvatarExperienceInspectAndBuy.Parent
+
+local React = require(parent.React)
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local FocusNavigationUtils = require(parent.FocusNavigationUtils)
 
 require(AvatarExperienceInspectAndBuy.Types)
 
@@ -19,107 +21,88 @@ local useAutoFocus = FocusNavigationUtils.useAutoFocus
 local useDescendantHasFocus = FocusNavigationUtils.useDescendantHasFocus
 local useLastInputMode = FocusNavigationUtils.useLastInputMode
 
-local function selectItemBeingPurchased(p1) -- line: 56
-	return p1.itemBeingPurchased
+local function selectItemBeingPurchased(p)
+	return p.itemBeingPurchased
 end
-local function useInspectAndBuyFocusNavigation() -- line: 60
-	-- upvalues: React (copy), useSelector (copy), selectItemBeingPurchased (copy), useRegisterFocusNavigableSurface (copy), useDeRegisterFocusNavigableSurface (copy), useAutoFocus (copy), useDescendantHasFocus (copy), useLastInputMode (copy), FFlagAXFixIaBTimedOptionsPopoverFocus (copy), useRegistryEntry (copy), FocusNavigableSurfaceIdentifierEnum (copy), MarketplaceService (copy), Players (copy), GuiService (copy)
-	local v21, v22 = React.useState(nil)
-	local v23, v24 = React.useState(false)
-	local v25 = useSelector(selectItemBeingPurchased)
-	local v26 = v25 and v25.itemId ~= nil
-	local v27 = useRegisterFocusNavigableSurface()
-	local v28 = useDeRegisterFocusNavigableSurface()
-	local v29 = useAutoFocus({ v21 }, 0.1)
-	local v30 = useDescendantHasFocus(v21)
-	local v31 = useLastInputMode() == "Focus"
-	local v32 = v26 or v23
-	local v33 = nil
 
-	if FFlagAXFixIaBTimedOptionsPopoverFocus then
-		local v34 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.PopUp) ~= nil
-		local v35 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.ContextualMenu) ~= nil
-		local v36 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.ModerationOverlay) ~= nil
+local function useInspectAndBuyFocusNavigation()
+	local state, setState = React.useState(nil)
+	local state2, setState2 = React.useState(false)
 
-		v33 = v34 or (v35 or v36)
-	end
+	local v = useSelector(selectItemBeingPurchased)
+	local v2 = v and v.itemId ~= nil
 
-	React.useEffect(function() -- line: 98
-		-- upvalues: MarketplaceService (copy), Players (copy), v24 (copy)
-		local connection = MarketplaceService.PromptBulkPurchaseRequested:Connect(function(p2) -- line: 99
-			-- upvalues: Players (copy), v24 (copy)
-			if p2 == Players.LocalPlayer then
-				v24(true)
+	local v3 = useRegisterFocusNavigableSurface()
+	local v4 = useDeRegisterFocusNavigableSurface()
+	local v5 = useAutoFocus({ state }, 0.1)
+	local v6 = useDescendantHasFocus(state)
+	local v7 = useLastInputMode() == "Focus"
+
+	local v8 = v2 or state2
+
+	local v9 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.PopUp) ~= nil
+	local v10 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.ContextualMenu) ~= nil
+	local v11 = useRegistryEntry(FocusNavigableSurfaceIdentifierEnum.ModerationOverlay) ~= nil
+
+	React.useEffect(function()
+		local promptBulkPurchaseRequestedConnection = MarketplaceService.PromptBulkPurchaseRequested:Connect(function(p)
+			if p == Players.LocalPlayer then
+				setState2(true)
 			end
 		end)
-		local connection2 = MarketplaceService.PromptBulkPurchaseFinished:Connect(function(p3) -- line: 104
-			-- upvalues: Players (copy), v24 (copy)
-			if p3 == Players.LocalPlayer then
-				v24(false)
+		local promptBulkPurchaseFinishedConnection = MarketplaceService.PromptBulkPurchaseFinished:Connect(function(p)
+			if p == Players.LocalPlayer then
+				setState2(false)
 			end
 		end)
 
-		return function() -- line: 110
-			-- upvalues: connection (copy), connection2 (copy)
-			connection:Disconnect()
-			connection2:Disconnect()
+		return function()
+			promptBulkPurchaseRequestedConnection:Disconnect()
+			promptBulkPurchaseFinishedConnection:Disconnect()
 		end
 	end, {})
-	React.useEffect(function() -- line: 117
-		-- upvalues: v32 (copy), v28 (copy), FocusNavigableSurfaceIdentifierEnum (copy), v21 (copy), GuiService (copy), v27 (copy)
-		if v32 then
-			v28(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v21)
-			GuiService:RemoveSelectionGroup("InspectAndBuyApp")
 
-			return function() -- line: 123
-			end
+	React.useEffect(function()
+		if v8 then
+			v4(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, state)
+			GuiService:RemoveSelectionGroup("InspectAndBuyApp")
+			return function() end
 		end
 
-		if v21 then
-			v27(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v21)
-			GuiService:AddSelectionParent("InspectAndBuyApp", v21)
+		if state then
+			v3(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, state)
+			GuiService:AddSelectionParent("InspectAndBuyApp", state)
 		else
-			v28(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v21)
+			v4(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, state)
 			GuiService:RemoveSelectionGroup("InspectAndBuyApp")
 			GuiService.SelectedCoreObject = nil
 		end
 
-		return function() -- line: 135
-			-- upvalues: v28 (copy), FocusNavigableSurfaceIdentifierEnum (copy), v21 (copy), GuiService (copy)
-			v28(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v21)
+		return function()
+			v4(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, state)
 			GuiService:RemoveSelectionGroup("InspectAndBuyApp")
 			GuiService.SelectedCoreObject = nil
 		end
-	end, {
-		v21,
-		v32,
-		v28,
-		v27
-	})
+	end, { state, v8, v4, v3 })
+	local v12 = v7 and state and not (v6 or v8 or v9 or v10 or v11)
+	React.useEffect(function()
+		local v13
 
-	local v37 = v31 and (v21 and (not v30 and (not v32 and not v33)))
-
-	React.useEffect(function() -- line: 149
-		-- upvalues: v37 (copy), v29 (copy)
-		local u40 = nil
-
-		if v37 then
-			u40 = v29()
+		if v12 then
+			v13 = v5()
+		else
+			v13 = nil
 		end
 
-		return function() -- line: 154
-			-- upvalues: u40 (ref)
-			if u40 then
-				u40.cancel()
+		return function()
+			if v13 then
+				v13.cancel()
 			end
 		end
-	end, {
-		v37,
-		v29
-	})
+	end, { v12, v5 })
 
 	return {
-		setFocusRef = v22,
+		setFocusRef = setState,
 		focusNavigationProps = {
 			SelectionGroup = true,
 			SelectionBehaviorDown = Enum.SelectionBehavior.Stop,

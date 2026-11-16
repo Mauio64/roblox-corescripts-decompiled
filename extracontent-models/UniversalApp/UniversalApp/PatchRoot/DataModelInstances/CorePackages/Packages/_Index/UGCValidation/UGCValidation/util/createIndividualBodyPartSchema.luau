@@ -1,109 +1,104 @@
-local ParentParent = script.Parent.Parent
+local parent = script.Parent.Parent
 
-require(ParentParent.util.Types)
+require(parent.util.Types)
 
-local Constants = require(ParentParent.Constants)
-local R15plusUtils = require(ParentParent.util.R15plusUtils)
-local flags = ParentParent.flags
+local Constants = require(parent.Constants)
+local R15plusUtils = require(parent.util.R15plusUtils)
+local flags = parent.flags
 local getFFlagUGCValidationEnforceHRDUpload = require(flags.getFFlagUGCValidationEnforceHRDUpload)
-local t1 = {
-	LeftHand = "LeftHand",
-	RightHand = "RightHand"
-}
+local v = { LeftHand = "LeftHand", RightHand = "RightHand" }
 
-local function createIndividualBodyPartSchema(p1, s1: string, _) -- line: 14
-	-- upvalues: Constants (copy), R15plusUtils (copy), getFFlagUGCValidationEnforceHRDUpload (copy), t1 (copy)
-	local v11 = Constants.ASSET_TYPE_INFO[p1].subParts[s1]
-	local t2 = {
+local function createIndividualBodyPartSchema(p, p2: string, _)
+	local subPart = Constants.ASSET_TYPE_INFO[p].subParts[p2]
+
+	local individualBodyPartSchema = {
 		ClassName = "MeshPart",
-		Name = { s1 },
+		Name = { p2 },
 		_children = {
 			{
-				ClassName = "StringValue",
-				Name = { "AvatarPartScaleType" }
+				Name = { "AvatarPartScaleType" },
+				ClassName = "StringValue"
 			},
 			{
-				ClassName = "WrapTarget",
-				Name = {
-					s1,
-					s1 .. "WrapTarget",
-					"WrapTarget"
-				}
+				Name = { p2, p2 .. "WrapTarget", "WrapTarget" },
+				ClassName = "WrapTarget"
 			},
 			{
+				Name = { "SurfaceAppearance" },
 				ClassName = "SurfaceAppearance",
-				_optional = true,
-				Name = { "SurfaceAppearance" }
+				_optional = true
 			}
 		}
 	}
 
-	table.insert(t2._children, {
-		ClassName = "Attachment",
-		Name = { v11.rigAttachmentToParent.name }
+	table.insert(individualBodyPartSchema._children, {
+		Name = { subPart.rigAttachmentToParent.name },
+		ClassName = "Attachment"
 	})
 
-	for k in pairs(v11.otherAttachments) do
-		table.insert(t2._children, {
-			ClassName = "Attachment",
-			Name = { k }
+	for k in pairs(subPart.otherAttachments) do
+		table.insert(individualBodyPartSchema._children, {
+			Name = { k },
+			ClassName = "Attachment"
 		})
 	end
 
-	if R15plusUtils.checkFlagEnabledForAllowHrd() then
-		table.insert(t2._children, {
-			ClassName = "HumanoidRigDescription",
-			Name = { "HumanoidRigDescription" },
-			_optional = not getFFlagUGCValidationEnforceHRDUpload()
+	if not R15plusUtils.checkFlagEnabledForAllowHrd() then
+		return individualBodyPartSchema
+	end
+
+	table.insert(individualBodyPartSchema._children, {
+		Name = { "HumanoidRigDescription" },
+		ClassName = "HumanoidRigDescription",
+		_optional = not getFFlagUGCValidationEnforceHRDUpload()
+	})
+
+	if v[p2] ~= nil then
+		local formatted = `{v[p2]}Description`
+		table.insert(individualBodyPartSchema._children, {
+			Name = { "DigitsRigDescription", formatted },
+			ClassName = "DigitsRigDescription",
+			_optional = true
 		})
+	end
 
-		if t1[s1] ~= nil then
-			local v14 = `{ t1[s1] }Description`
+	local avatarBoneSchema = R15plusUtils.getAvatarBoneSchema(p2)
+	local nameWhitelistOfClassInSchema = R15plusUtils.getNameWhitelistOfClassInSchema(avatarBoneSchema, "Attachment")
 
-			table.insert(t2._children, {
-				ClassName = "DigitsRigDescription",
+	for _, v2 in individualBodyPartSchema._children do
+		if v2.ClassName == "Attachment" and nameWhitelistOfClassInSchema[v2.Name[1]] then
+			v2._optional = true
+		end
+
+		if not string.find(v2.Name[1], "ShoulderRigAttachment") then
+			continue
+		end
+
+		if v2._children == nil then
+			v2._children = {}
+		end
+
+		table.insert(v2._children, {
+			Name = { R15plusUtils.JointRotationName },
+			ClassName = "Attachment",
+			_optional = true
+		})
+	end
+
+	local nameWhitelistOfClassInSchema2 = R15plusUtils.getNameWhitelistOfClassInSchema(avatarBoneSchema, "Bone")
+
+	for k, v2 in nameWhitelistOfClassInSchema2 do
+		if v2 then
+			table.insert(individualBodyPartSchema._children, {
+				Name = { k },
+				ClassName = "Bone",
 				_optional = true,
-				Name = {
-					"DigitsRigDescription",
-					v14
-				}
+				_ignoreDescendants = true
 			})
 		end
-
-		local v15 = R15plusUtils.getAvatarBoneSchema(s1)
-		local v16 = R15plusUtils.getNameWhitelistOfClassInSchema(v15, "Attachment")
-
-		for _, v18 in t2._children do
-			if v18.ClassName == "Attachment" and v16[v18.Name[1]] then
-				v18._optional = true
-			end
-
-			if string.find(v18.Name[1], "ShoulderRigAttachment") then
-				if v18._children == nil then
-					v18._children = {}
-				end
-
-				table.insert(v18._children, {
-					ClassName = "Attachment",
-					_optional = true,
-					Name = { R15plusUtils.JointRotationName }
-				})
-			end
-		end
-
-		for v19, v20 in (R15plusUtils.getNameWhitelistOfClassInSchema(v15, "Bone")) do
-			if v20 then
-				table.insert(t2._children, {
-					ClassName = "Bone",
-					_optional = true,
-					_ignoreDescendants = true,
-					Name = { v19 }
-				})
-			end
-		end
 	end
 
-	return t2
+	return individualBodyPartSchema
 end
 
 return createIndividualBodyPartSchema

@@ -1,86 +1,111 @@
 local UGCValidationService = game:GetService("UGCValidationService")
-local ParentParent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
+local parent = script.Parent.Parent.Parent
 
-local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
-local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
-local TexturePackUtils = require(ParentParent.util.TexturePackUtils)
-local getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality = require(ParentParent.flags.getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality)
-local getFFlagUGCValidateTexturePack = require(ParentParent.flags.getFFlagUGCValidateTexturePack)
-local getFFlagUGCValidateTexturePackOnRCCOnly = require(ParentParent.flags.getFFlagUGCValidateTexturePackOnRCCOnly)
-local t1 = {
-	Publish = true,
-	Backend = true,
-	InExpServer = true,
-	Internal = true
-}
-local t2 = {
-	InExpServer = true,
-	InExpClient = true
-}
+require(parent.util.Types)
+local ValidationEnums = require(parent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(parent.validationSystem.ErrorSourceStrings)
+local TexturePackUtils = require(parent.util.TexturePackUtils)
+
+local getFFlagUGCValidateTexturePack = require(parent.flags.getFFlagUGCValidateTexturePack)
+local getFFlagUGCValidateTexturePackOnRCCOnly = require(parent.flags.getFFlagUGCValidateTexturePackOnRCCOnly)
+local getFFlagUGCValidationAllowFullVaas = require(parent.flags.getFFlagUGCValidationAllowFullVaas)
+
+local v = { Publish = true, Backend = true, InExpServer = true, Internal = true }
+
+local v2 = { InExpServer = true, InExpClient = true }
 
 return {
-	fflag = getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality,
 	categories = {
 		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
 		ValidationEnums.UploadCategory.DYNAMIC_HEAD,
 		ValidationEnums.UploadCategory.LAYERED_CLOTHING,
+		ValidationEnums.UploadCategory.EYEBROW_EYELASH,
 		ValidationEnums.UploadCategory.RIGID_ACCESSORY
 	},
 	requiredData = {},
 	expectedFailures = {},
-	run = function(p1, p2) -- line: 51
-		-- upvalues: getFFlagUGCValidateTexturePack (copy), t2 (copy), t1 (copy), ValidationEnums (copy), getFFlagUGCValidateTexturePackOnRCCOnly (copy), TexturePackUtils (copy), ErrorSourceStrings (copy), UGCValidationService (copy)
+	run = function(object, data)
 		if not getFFlagUGCValidateTexturePack() then
 			return
 		end
 
-		local rootInstance = p2.rootInstance
-		local source = p2.consumerConfig.source
+		local rootInstance = data.rootInstance
+		local consumerConfig = data.consumerConfig
 
-		if t2[source] == true then
+		if v2[consumerConfig.source] == true then
 			return
 		end
 
-		local v15 = t1[source] == true
-		local uploadCategory = p2.uploadCategory
-		local v17 = uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS or uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD
+		local v3
+
+		if getFFlagUGCValidationAllowFullVaas() and consumerConfig.isVaaS then
+			v3 = consumerConfig.validationEnv == ValidationEnums.ValidationEnv.Backend
+		else
+			v3 = v[consumerConfig.source] == true
+		end
+
+		local uploadCategory = data.uploadCategory
+		local v4 = uploadCategory == ValidationEnums.UploadCategory.TORSO_AND_LIMBS
+			or uploadCategory == ValidationEnums.UploadCategory.DYNAMIC_HEAD
 
 		if getFFlagUGCValidateTexturePackOnRCCOnly() then
-			if v15 then
-				for _, v19 in (TexturePackUtils.findSurfaceAppearancesMissingTexturePacks(rootInstance, v17)) do
-					p1:fail(ErrorSourceStrings.Keys.TexturePackInvalidURL, {
-						SurfaceAppearanceName = v19:GetFullName()
-					}, v19)
+			if v3 then
+				local surfaceAppearancesMissingTexturePacks = TexturePackUtils.findSurfaceAppearancesMissingTexturePacks(
+					rootInstance,
+					v4
+				)
+
+				for _, surfaceAppearancesMissingTexturePack in surfaceAppearancesMissingTexturePacks do
+					object:fail(
+						ErrorSourceStrings.Keys.TexturePackInvalidURL,
+						{
+							SurfaceAppearanceName = surfaceAppearancesMissingTexturePack:GetFullName()
+						},
+						surfaceAppearancesMissingTexturePack
+					)
 				end
 			end
 		else
-			for _, v21 in (TexturePackUtils.findSurfaceAppearancesMissingTexturePacks(rootInstance, v17)) do
-				p1:fail(ErrorSourceStrings.Keys.TexturePackInvalidURL, {
-					SurfaceAppearanceName = v21:GetFullName()
-				}, v21)
+			local surfaceAppearancesMissingTexturePacks = TexturePackUtils.findSurfaceAppearancesMissingTexturePacks(
+				rootInstance,
+				v4
+			)
+
+			for _, surfaceAppearancesMissingTexturePack in surfaceAppearancesMissingTexturePacks do
+				object:fail(
+					ErrorSourceStrings.Keys.TexturePackInvalidURL,
+					{
+						SurfaceAppearanceName = surfaceAppearancesMissingTexturePack:GetFullName()
+					},
+					surfaceAppearancesMissingTexturePack
+				)
 			end
 		end
 
-		for _, v23 in TexturePackUtils.findSurfaceAppearancesWithTexturePacks(rootInstance) do
-			local ok, result = pcall(function() -- line: 91
-				-- upvalues: UGCValidationService (copy), v23 (copy)
-				return UGCValidationService:DoesSurfaceAppearanceMatchTexturePackAsync(v23)
+		for _, v5 in TexturePackUtils.findSurfaceAppearancesWithTexturePacks(rootInstance) do
+			local success, result = pcall(function()
+				return UGCValidationService:DoesSurfaceAppearanceMatchTexturePackAsync(v5)
 			end)
 
-			if not ok then
-				if v15 then
-					p1:forceError(`Failed to download TexturePack for SurfaceAppearance '{ v23:GetFullName() }'.`)
+			if success then
+				if not result then
+					object:fail(
+						ErrorSourceStrings.Keys.TexturePack_Mismatch,
+						{ SurfaceAppearanceName = v5:GetFullName() },
+						v5
+					)
+				end
+			else
+				if v3 then
+					object:forceError(`Failed to download TexturePack for SurfaceAppearance '{v5:GetFullName()}'.`)
 				end
 
-				p1:fail(ErrorSourceStrings.Keys.TexturePack_DownloadFailed, {
-					SurfaceAppearanceName = v23:GetFullName()
-				}, v23)
-			elseif not result then
-				p1:fail(ErrorSourceStrings.Keys.TexturePack_Mismatch, {
-					SurfaceAppearanceName = v23:GetFullName()
-				}, v23)
+				object:fail(
+					ErrorSourceStrings.Keys.TexturePack_DownloadFailed,
+					{ SurfaceAppearanceName = v5:GetFullName() },
+					v5
+				)
 			end
 		end
 	end

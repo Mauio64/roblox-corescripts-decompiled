@@ -1,48 +1,44 @@
 local __DEV__ = _G.__DEV__
 
-local function instanceof(p1, p2) -- line: 20
-	-- upvalues: __DEV__ (copy)
+local function instanceof(p, p2): boolean
 	if __DEV__ then
 		assert(typeof(p2) == "table", "Received a non-table as the second argument for instanceof")
 	end
 
-	if typeof(p1) ~= "table" then
+	if typeof(p) ~= "table" then
 		return false
 	end
 
-	local ok, result = pcall(function() -- line: 29
-		-- upvalues: p2 (copy), p1 (ref)
-		return p2.new ~= nil and p1.new == p2.new
+	local success, result = pcall(function(): boolean
+		return p2.new ~= nil and p.new == p2.new
 	end)
 
-	if ok and result then
+	if success and result then
 		return true
 	end
 
-	local t1 = {
-		[p1] = true
-	}
+	local v = { [p] = true }
 
-	while p1 and typeof(p1) == "table" do
-		p1 = getmetatable(p1)
+	while p and typeof(p) == "table" do
+		p = getmetatable(p)
 
-		if typeof(p1) == "table" then
-			p1 = p1.__index
+		if typeof(p) == "table" then
+			p = p.__index
 
-			if p2 == p1 then
+			if p == p2 then
 				return true
 			end
 		end
 
-		if typeof(p1) ~= "table" then
+		if typeof(p) ~= "table" then
 			continue
 		end
 
-		if t1[p1] then
+		if v[p] then
 			return false
 		end
 
-		t1[p1] = true
+		v[p] = true
 	end
 
 	return false

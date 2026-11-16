@@ -1,39 +1,51 @@
-local Parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
-local AppPage = require(Parent.RobloxAppEnums).AppPage
-local SduiCoreSystem = require(Parent.SduiCoreSystem)
-local SocialUpsell = require(Parent.SocialUpsell)
+local parent = script:FindFirstAncestor("SocialServerDrivenUi").Parent
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
+
+local SduiCoreSystem = require(parent.SduiCoreSystem)
+local SocialUpsell = require(parent.SocialUpsell)
+
 local startFacialAgeEstimation = SocialUpsell.Thunks.startFacialAgeEstimation
 local SocialUpsellType = SocialUpsell.Enums.SocialUpsellType
 local UpsellEntrySurfaceType = SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType
+
 local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
 local SduiActionType = SduiCoreSystem.SduiActionType
 
-return function(p1, _, p3, _) -- line: 19
-	-- upvalues: SduiErrorType (copy), SduiActionType (copy), AppPage (copy), SocialUpsellType (copy), UpsellEntrySurfaceType (copy), startFacialAgeEstimation (copy)
-	local v14 = p1 and p1.actionParams or nil
+return function(p, _, p2, _)
+	local actionParams = p and p.actionParams or nil
 
-	if v14 == nil then
-		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
-			message = "Missing actionParams",
-			name = SduiActionType.OpenFacialAgeEstimation
-		}, p3.appPage)
-
+	if actionParams == nil then
+		p2.dependencies.logger.reportError(
+			SduiErrorType.InvalidActionParams,
+			{ name = SduiActionType.OpenFacialAgeEstimation, message = "Missing actionParams" },
+			p2.appPage
+		)
 		return
 	end
 
-	assert(v14, "actionParams must exist")
-
-	local source = v14.source
+	assert(actionParams, "actionParams must exist")
+	local source = actionParams.source
 
 	if source == nil then
-		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
-			message = "Missing actionParam: source",
-			propName = "source",
-			name = SduiActionType.OpenFacialAgeEstimation
-		}, p3.appPage)
+		p2.dependencies.logger.reportError(
+			SduiErrorType.InvalidActionParams,
+			{
+				name = SduiActionType.OpenFacialAgeEstimation,
+				message = "Missing actionParam: source",
+				propName = "source"
+			},
+			p2.appPage
+		)
 	end
 
-	local v16 = if source ~= AppPage.ProfilePlatform then SocialUpsellType.FacialAgeEstimation .. UpsellEntrySurfaceType.Unknown else SocialUpsellType.FacialAgeEstimation .. UpsellEntrySurfaceType.ProfileCompletion
+	local v
 
-	p3.dependencies.dispatch(startFacialAgeEstimation(v16, nil, nil, source, false))
+	if source == AppPage.ProfilePlatform then
+		v = SocialUpsellType.FacialAgeEstimation .. UpsellEntrySurfaceType.ProfileCompletion
+	else
+		v = SocialUpsellType.FacialAgeEstimation .. UpsellEntrySurfaceType.Unknown
+	end
+
+	p2.dependencies.dispatch(startFacialAgeEstimation(v, nil, nil, source, false))
 end

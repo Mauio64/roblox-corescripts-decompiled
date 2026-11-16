@@ -1,34 +1,42 @@
-local ParentParent = script.Parent.Parent
-local devAssert = require(ParentParent.jsutils.devAssert).devAssert
-local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local parent = script.Parent.Parent
+local devAssert = require(parent.jsutils.devAssert)
+local devAssert2 = devAssert.devAssert
+local GraphQLError = require(parent.error.GraphQLError)
+local graphQLError = GraphQLError.GraphQLError
 
-local function isValidNameError(s1: string) -- line: 34
-	-- upvalues: devAssert (copy), GraphQLError (copy)
-	devAssert(type(s1) == "string", "Expected name to be a string.")
+local isValidNameError
 
-	if string.len(s1) > 1 and s1:sub(1, 1) == "_" and s1:sub(2, 2) == "_" then
-		return GraphQLError.new("Name \"" .. s1 .. "\" must not begin with \"__\", which is reserved by GraphQL introspection.")
+local function assertValidName(p: string)
+	local v = isValidNameError(p)
+
+	if v then
+		error(v)
 	end
 
-	local start, stop = string.find(s1, "[_%a][_%a%d]*")
-
-	if start ~= 1 or stop ~= string.len(s1) then
-		return GraphQLError.new("Names must match [_%a][_%a%d]* but \"" .. s1 .. "\" does not.")
-	end
-
-	return nil
+	return p
 end
 
-return {
-	assertValidName = function(s2: string) -- line: 23
-		-- upvalues: isValidNameError (ref)
-		local v6 = isValidNameError(s2)
+isValidNameError = function(value: string)
+	devAssert2(type(value) == "string", "Expected name to be a string.")
 
-		if v6 then
-			error(v6)
-		end
+	if string.len(value) > 1 and value:sub(1, 1) == "_" and value:sub(2, 2) == "_" then
+		return graphQLError.new("Name \"" .. value .. "\" must not begin with \"__\", which is reserved by GraphQL introspection.")
+	end
 
-		return s2
-	end,
-	isValidNameError = isValidNameError
-}
+	local v, v2 = string.find(value, "[_%a][_%a%d]*")
+	local v3
+
+	if v == 1 then
+		v3 = string.len(value) == v2
+	else
+		v3 = false
+	end
+
+	if v3 then
+		return nil
+	end
+
+	return graphQLError.new("Names must match [_%a][_%a%d]* but \"" .. value .. "\" does not.")
+end
+
+return { assertValidName = assertValidName, isValidNameError = isValidNameError }

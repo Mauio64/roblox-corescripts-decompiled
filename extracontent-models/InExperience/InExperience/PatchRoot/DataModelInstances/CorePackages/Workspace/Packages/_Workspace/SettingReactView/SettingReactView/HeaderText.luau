@@ -1,14 +1,15 @@
-local ParentParent = script.Parent.Parent
-local Foundation = require(ParentParent.Foundation)
-local React = require(ParentParent.React)
-local FoundationText = Foundation.Text
+local parent = script.Parent.Parent
 
-local function HeaderText(t1: {[any]: any}) -- line: 15
-	-- upvalues: React (copy), FoundationText (copy)
-	return React.createElement(FoundationText, {
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
+local Text = Foundation.Text
+
+local function HeaderText(p)
+	return React.createElement(Text, {
 		tag = "auto-xy content-emphasis text-heading-small",
-		testId = "settings-header-text",
-		Text = t1.text
+		Text = p.text,
+		testId = "settings-header-text"
 	})
 end
 

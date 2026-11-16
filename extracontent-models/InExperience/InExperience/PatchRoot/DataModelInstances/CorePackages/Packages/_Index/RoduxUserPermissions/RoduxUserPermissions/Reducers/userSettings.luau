@@ -1,31 +1,25 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+local Rodux = require(parent2.Rodux)
+require(parent.Types.ReducerTypes)
 
-require(ParentParent.Types.ReducerTypes)
+local v = { canUploadContacts = nil }
 
-local t1 = {
-	canUploadContacts = nil
-}
+return function(p)
+	local networkingUserSettings = p.networkingUserSettings
 
-return function(p1) -- line: 10
-	-- upvalues: Rodux (copy), t1 (copy)
-	local networkingUserSettings = p1.networkingUserSettings
-
-	return Rodux.createReducer(t1, {
-		[networkingUserSettings.GetUserSettings.Succeeded.name] = function(_, p3) -- line: 14
+	return Rodux.createReducer(v, {
+		[networkingUserSettings.GetUserSettings.Succeeded.name] = function(_, p2)
 			return {
-				canUploadContacts = p3.responseBody and p3.responseBody.canUploadContacts
+				canUploadContacts = p2.responseBody and p2.responseBody.canUploadContacts
 			}
 		end,
-		[networkingUserSettings.UpdateUserSettings.Succeeded.name] = function(p4, p5) -- line: 22
-			if p5.postBody and p5.postBody.canUploadContacts ~= nil then
-				return {
-					canUploadContacts = p5.postBody.canUploadContacts
-				}
+		[networkingUserSettings.UpdateUserSettings.Succeeded.name] = function(p2, p3)
+			if p3.postBody and p3.postBody.canUploadContacts ~= nil then
+				return { canUploadContacts = p3.postBody.canUploadContacts }
 			end
 
-			return p4
+			return p2
 		end
 	})
 end

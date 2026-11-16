@@ -1,162 +1,251 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local GuiService = game:GetService("GuiService")
-local Signals = require(ParentParentParent.Signals)
-local resolveDisplayName = require(ParentParent.Common.resolveDisplayName)
-local getHeadshotThumbnail = require(ParentParent.Common.getHeadshotThumbnail)
-local v7, v8 = Signals.createSignal(nil)
-local u9 = v8
-local v10, v11 = Signals.createSignal(nil)
-local u12 = v10
-local u13 = v11
-local u14 = nil
-local u15 = nil
-local u16 = false
-local n1 = 0
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-local function fallbackMenuData(p1, vector2: Vector2?) -- line: 102
-	-- upvalues: GuiService (copy), n1 (ref), u13 (ref), u9 (ref), u15 (ref), resolveDisplayName (copy), getHeadshotThumbnail (copy)
-	local t1 = {}
+local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
+local Signals = require(parent2.Signals)
+local resolveDisplayName = require(parent.Common.resolveDisplayName)
+local getHeadshotThumbnail = require(parent.Common.getHeadshotThumbnail)
+require(script.Parent.PlayerListContextMenuTelemetryAction)
+
+local contextMenuTelemetry = nil
+local function getContextMenuTelemetry() -- 3 equivalent calls inferred from this helper
+	if contextMenuTelemetry == nil then
+		local PlayerListContextMenuTelemetry = require(script.Parent.PlayerListContextMenuTelemetry)
+		contextMenuTelemetry = PlayerListContextMenuTelemetry
+	end
+
+	return contextMenuTelemetry
+end
+
+local signal, v = Signals.createSignal(nil)
+
+local signal2, v2 = Signals.createSignal(nil)
+
+local v3 = {}
+local count = 0
+
+local function consumeOnceGroup(onceGroup: string) -- 2 equivalent calls inferred from this helper
+	count += 1
+	local v4 = count
+	v3[onceGroup] = v4
+	task.delay(5, function()
+		if v3[onceGroup] == v4 then
+			v3[onceGroup] = nil
+		end
+	end)
+end
+
+local function setMenuData(p)
+	local v4
+
+	if p == nil then
+		v4 = false
+	else
+		v4 = signal(false) == nil
+	end
+
+	v2(nil)
+	table.clear(v3)
+	v(p)
+
+	if v4 then
+		getContextMenuTelemetry().logAction("menu_open", p.telemetry) -- inferred equivalent call
+	end
+end
+
+local v4 = nil
+local v5 = nil
+local v6 = false
+
+local count2 = 0
+
+local function closeContextMenu()
+	local v7 = signal(false)
+	count2 += 1
+	v2(nil)
+
+	if v7 == nil then
+		return
+	end
+
+	getContextMenuTelemetry().logAction("menu_close", v7.telemetry) -- inferred equivalent call
+	v2(nil)
+	table.clear(v3)
+	v(nil)
+
+	if v5 then
+		v5()
+	end
+end
+
+local function setOnDismiss(callback)
+	v5 = callback
+end
+
+local function setSuppressNextDismissRestore(flag: boolean)
+	v6 = flag
+end
+
+local function takeSuppressNextDismissRestore()
+	local v7 = v6
+	v6 = false
+	return v7
+end
+
+local function setMenuDataIfCurrent(p, p2: number): boolean
+	if p2 ~= count2 then
+		return false
+	end
+
+	setMenuData(p)
+	return true
+end
+
+local function buildMenuHeader(p) -- 1 equivalent call inferred from this helper
+	return {
+		displayName = resolveDisplayName(p),
+		username = `@{p.Name}`,
+		thumbnail = getHeadshotThumbnail(p.UserId)
+	}
+end
+
+local function fallbackMenuData(player, anchorPosition: Vector2?)
+	local items = {}
 
 	if GuiService:GetInspectMenuEnabled() then
-		table.insert(t1, {
+		table.insert(items, {
 			key = "examine",
 			label = "Examine avatar",
-			onActivated = function() -- line: 108
-				-- upvalues: GuiService (copy), p1 (copy), n1 (ref), u13 (ref), u9 (ref), u15 (ref)
-				GuiService:InspectPlayerFromUserIdWithCtx(p1.UserId, "leaderBoard")
-				n1 += 1
-				u13(nil)
-				u9(nil)
-				u13(nil)
-
-				if u15 then
-					u15()
-				end
+			telemetryAction = "avatar_examine",
+			onActivated = function()
+				GuiService:InspectPlayerFromUserIdWithCtx(player.UserId, "leaderBoard")
+				closeContextMenu()
 			end
 		})
 	end
 
+	local localPlayer = Players.LocalPlayer
 	return {
-		player = p1,
-		header = {
-			displayName = resolveDisplayName(p1),
-			username = `@{ p1.Name }`,
-			thumbnail = getHeadshotThumbnail(p1.UserId)
-		},
-		items = t1,
-		anchorPosition = vector2
+		player = player,
+		header = buildMenuHeader(player), -- inferred equivalent call
+		items = items,
+		anchorPosition = anchorPosition,
+		telemetry = {
+			isSelf = localPlayer ~= nil and player == localPlayer
+		}
 	}
 end
 
-return {
-	getMenuData = v7,
-	setMenuData = function(p2) -- line: 49
-		-- upvalues: u13 (ref), u9 (ref)
-		u13(nil)
-		u9(p2)
-	end,
-	setMenuDataIfCurrent = function(p3, n2: number) -- line: 86
-		-- upvalues: n1 (ref), u13 (ref), u9 (ref)
-		if n2 ~= n1 then
-			return false
-		end
+local function openContextMenu(player, anchorPosition: Vector2?, p) -- 1 equivalent call inferred from this helper
+	count2 += 1
 
-		u13(nil)
-		u9(p3)
+	v2(nil)
 
-		return true
-	end,
-	openContextMenu = function(p4, vector2: Vector2?) -- line: 125
-		-- upvalues: n1 (ref), u13 (ref), u14 (ref), fallbackMenuData (copy), u9 (ref)
-		n1 += 1
-		u13(nil)
+	if v4 then
+		v4(player, anchorPosition, count2, p)
+	else
+		setMenuData(fallbackMenuData(player, anchorPosition))
+	end
+end
 
-		if u14 then
-			u14(p4, vector2, n1)
+local v7 = nil
+local v8 = nil
 
-			return
-		end
+local function getAnchorRow()
+	local v9 = signal(false)
+	return if not (v9 == nil or v9.player ~= v8) then v7 else nil
+end
 
-		local v31 = fallbackMenuData(p4, vector2)
+local function toggleContextMenu(p, vector2: Vector2?, p2)
+	local v9 = signal(false)
 
-		u13(nil)
-		u9(v31)
-	end,
-	closeContextMenu = function() -- line: 63
-		-- upvalues: n1 (ref), u13 (ref), u9 (ref), u15 (ref)
-		n1 += 1
-		u13(nil)
-		u9(nil)
-		u13(nil)
+	if v9 ~= nil and v9.player == p then
+		closeContextMenu()
+		return
+	end
 
-		if u15 then
-			u15()
-		end
-	end,
-	setContextMenuOpener = function(p5: ((...any) -> ...any)?) -- line: 138
-		-- upvalues: u14 (ref)
-		u14 = p5
-	end,
-	setOnDismiss = function(p6: ((...any) -> ...any)?) -- line: 72
-		-- upvalues: u15 (ref)
-		u15 = p6
-	end,
-	setSuppressNextDismissRestore = function(b1: boolean) -- line: 76
-		-- upvalues: u16 (ref)
-		u16 = b1
-	end,
-	takeSuppressNextDismissRestore = function() -- line: 80
-		-- upvalues: u16 (ref)
-		local v22 = u16
+	v8 = p
+	v7 = p2
+	openContextMenu(p, vector2) -- inferred equivalent call
+end
 
-		u16 = false
+local function setContextMenuOpener(callback)
+	v4 = callback
+end
 
-		return v22
-	end,
-	buildMenuHeader = function(p7) -- line: 94
-		-- upvalues: resolveDisplayName (copy), getHeadshotThumbnail (copy)
-		return {
-			displayName = resolveDisplayName(p7),
-			username = `@{ p7.Name }`,
-			thumbnail = getHeadshotThumbnail(p7.UserId)
-		}
-	end,
-	reset = function() -- line: 142
-		-- upvalues: n1 (ref), u13 (ref), u9 (ref), u14 (ref), u15 (ref), u16 (ref)
-		n1 += 1
-		u13(nil)
-		u9(nil)
-		u13(nil)
-		u14 = nil
-		u15 = nil
-		u16 = false
-	end,
-	getPendingConfirmKey = u12,
-	activateMenuItem = function(t2: {[any]: any}) -- line: 151
-		-- upvalues: u12 (ref), u13 (ref)
-		if t2.requiresConfirm then
-			if u12() == t2.key then
-				u13(nil)
+local function reset()
+	count2 += 1
+	v2(nil)
+	table.clear(v3)
+	v(nil)
 
-				if t2.onActivated then
-					t2.onActivated()
+	v2(nil)
+	v4 = nil
+	v5 = nil
+	v6 = false
+	v7 = nil
+	v8 = nil
+end
 
-					return
-				end
-			else
-				u13(t2.key)
+local function logItemActivated(data) -- 2 equivalent calls inferred from this helper
+	if data.telemetryAction ~= nil then
+		local v9 = signal(false)
+		getContextMenuTelemetry().logAction(data.telemetryAction, v9 and v9.telemetry) -- inferred equivalent call
+	end
+end
+
+local function activateMenuItem(data)
+	if data.onceGroup ~= nil and v3[data.onceGroup] ~= nil then
+		return
+	end
+
+	if data.requiresConfirm then
+		if signal2() == data.key then
+			if data.onceGroup ~= nil then
+				consumeOnceGroup(data.onceGroup) -- inferred equivalent call
 			end
 
-			return
+			v2(nil)
+			logItemActivated(data) -- inferred equivalent call
+
+			if data.onActivated then
+				data.onActivated()
+			end
+		else
+			v2(data.key)
+		end
+	else
+		if signal2() ~= nil then
+			v2(nil)
 		end
 
-		if u12() ~= nil then
-			u13(nil)
+		if data.onceGroup ~= nil then
+			consumeOnceGroup(data.onceGroup) -- inferred equivalent call
 		end
 
-		if t2.onActivated then
-			t2.onActivated()
+		logItemActivated(data) -- inferred equivalent call
+
+		if data.onActivated then
+			data.onActivated()
 		end
 	end
+end
+
+return {
+	getMenuData = signal,
+	setMenuData = setMenuData,
+	setMenuDataIfCurrent = setMenuDataIfCurrent,
+	openContextMenu = openContextMenu,
+	toggleContextMenu = toggleContextMenu,
+	getAnchorRow = getAnchorRow,
+	closeContextMenu = closeContextMenu,
+	setContextMenuOpener = setContextMenuOpener,
+	setOnDismiss = setOnDismiss,
+	setSuppressNextDismissRestore = setSuppressNextDismissRestore,
+	takeSuppressNextDismissRestore = takeSuppressNextDismissRestore,
+	buildMenuHeader = buildMenuHeader,
+	reset = reset,
+	getPendingConfirmKey = signal2,
+	activateMenuItem = activateMenuItem
 }

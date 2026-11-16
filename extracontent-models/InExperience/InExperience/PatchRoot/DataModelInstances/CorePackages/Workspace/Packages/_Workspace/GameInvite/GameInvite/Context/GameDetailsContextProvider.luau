@@ -1,20 +1,18 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local GameDetailsContext = require(scriptParent.GameDetailsContext)
-local React = require(scriptParentParentParent.React)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+local GameDetailsContext = require(parent.GameDetailsContext)
+local React = require(parent3.React)
+require(parent2.gameInviteModalType)
 
-require(scriptParentParent.gameInviteModalType)
-
-return function(t1: {[any]: any}) -- line: 17
-	-- upvalues: React (copy), GameDetailsContext (copy)
+return function(props)
 	return React.createElement(GameDetailsContext.Provider, {
 		value = {
-			gameDetails = t1.gameDetails or {},
-			serverType = t1.serverType or "",
-			promptMessage = t1.promptMessage or "",
-			trigger = t1.trigger or "",
-			isCoreScript = t1.isCoreScript or false
+			gameDetails = props.gameDetails or {},
+			serverType = props.serverType or "",
+			promptMessage = props.promptMessage or "",
+			trigger = props.trigger or "",
+			isCoreScript = props.isCoreScript or false
 		}
-	}, t1.children)
+	}, props.children)
 end

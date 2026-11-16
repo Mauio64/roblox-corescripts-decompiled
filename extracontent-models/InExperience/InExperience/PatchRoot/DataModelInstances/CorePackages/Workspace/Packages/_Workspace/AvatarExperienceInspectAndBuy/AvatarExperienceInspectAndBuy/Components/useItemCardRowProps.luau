@@ -1,182 +1,196 @@
 local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
-local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local parent = AvatarExperienceInspectAndBuy.Parent
 local SessionService = game:GetService("SessionService")
-local useTokens = require(AvatarExperienceInspectAndBuyParent.Foundation).Hooks.useTokens
-local Localization = require(AvatarExperienceInspectAndBuyParent.Localization)
-local AXCommon = require(AvatarExperienceInspectAndBuyParent.AXCommon)
-local ItemTypeEnum = AXCommon.Enums.ItemTypeEnum
-local ItemCardThumbnail = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail
-local WearTimeSelectedOptionInList = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceTimedOptions).WearTimeSelectedOptionInList
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local Localization = require(parent.Localization)
+local AXCommon = require(parent.AXCommon)
+local AvatarExperienceModel = require(parent.AvatarExperienceModel)
+local ItemTypeEnum = AvatarExperienceModel.Enums.ItemTypeEnum
+local AvatarExperienceUIKit = require(parent.AvatarExperienceUIKit)
+local ItemCardThumbnail = AvatarExperienceUIKit.ItemCardComponents.ItemCardThumbnail
+local AvatarExperienceTimedOptions = require(parent.AvatarExperienceTimedOptions)
+local WearTimeSelectedOptionInList = AvatarExperienceTimedOptions.WearTimeSelectedOptionInList
 local useLocalization = Localization.Hooks.useLocalization
-local React = require(AvatarExperienceInspectAndBuyParent.React)
+local React = require(parent.React)
 local useConvertedItemData = require(AvatarExperienceInspectAndBuy.Hooks.useConvertedItemData)
-
 require(AvatarExperienceInspectAndBuy.Types)
-
 local Constants = require(AvatarExperienceInspectAndBuy.Constants)
 local AssetLocalizationKeys = Constants.AssetLocalizationKeys
 local BundleLocalizationKeys = Constants.BundleLocalizationKeys
 local PriceStatusLocalizationKeys = Constants.PriceStatusLocalizationKeys
-local AvatarExperienceAnalytics = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceAnalytics)
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
 local addUnifiedEventLogging = AvatarExperienceAnalytics.addUnifiedEventLogging
 local UnifiedEventLogEnums = AvatarExperienceAnalytics.UnifiedEventLogEnums
-local UnifiedLoggingSurface = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceNavigation).Enums.UnifiedLoggingSurface
-
+local AvatarExperienceNavigation = require(parent.AvatarExperienceNavigation)
+local UnifiedLoggingSurface = AvatarExperienceNavigation.Enums.UnifiedLoggingSurface
 require(AvatarExperienceInspectAndBuy.Enums.ViewType)
-
 local PriceStatus = require(AvatarExperienceInspectAndBuy.Enums.PriceStatus)
-local RetrievalStatus = require(AvatarExperienceInspectAndBuyParent.Http).Enum.RetrievalStatus
+local Http = require(parent.Http)
+local RetrievalStatus = Http.Enum.RetrievalStatus
 local getItemThumbnailUrl = require(AvatarExperienceInspectAndBuy.Utils.getItemThumbnailUrl)
 local getCatalogCardItemType = require(AvatarExperienceInspectAndBuy.Utils.getCatalogCardItemType)
 local getPriceLineContent = require(AvatarExperienceInspectAndBuy.Utils.getPriceLineContent)
-local getPriceInRobux = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils).getPriceInRobux
+local itemDetailsUtils = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils)
+local getPriceInRobux = itemDetailsUtils.getPriceInRobux
 local getPriceStatus = require(AvatarExperienceInspectAndBuy.Utils.getPriceStatus)
-local Cryo = require(AvatarExperienceInspectAndBuyParent.Cryo)
-local useSignalState = require(AvatarExperienceInspectAndBuyParent.SignalsReact).useSignalState
-local useItemSelectionStore = require(AvatarExperienceInspectAndBuy.Contexts.ItemSelectionStoreContext).useItemSelectionStore
+local Cryo = require(parent.Cryo)
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local ItemSelectionStoreContext = require(AvatarExperienceInspectAndBuy.Contexts.ItemSelectionStoreContext)
+local useItemSelectionStore = ItemSelectionStoreContext.useItemSelectionStore
 
-require(AvatarExperienceInspectAndBuy.Stores.createItemSelectionStore)
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAXMarketplaceLicensingItemCards = AvatarExperienceFlags.FFlagAXMarketplaceLicensingItemCards
 
-local FFlagAXEnableIaBTimedOptionsBulkPurchase = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags).FFlagAXEnableIaBTimedOptionsBulkPurchase
 local CatalogItemCardStatusIconTypeEnum = AXCommon.Components.CatalogItemCard.CatalogItemCardStatusIconTypeEnum
 
-return function(p1, n1: number, _, p3: ((...any) -> ...any), n2: number) -- line: 54
-	-- upvalues: useTokens (copy), useConvertedItemData (copy), ItemTypeEnum (copy), BundleLocalizationKeys (copy), AssetLocalizationKeys (copy), Cryo (copy), PriceStatusLocalizationKeys (copy), useLocalization (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), useItemSelectionStore (copy), useSignalState (copy), React (copy), getPriceStatus (copy), PriceStatus (copy), getPriceInRobux (copy), getItemThumbnailUrl (copy), getCatalogCardItemType (copy), CatalogItemCardStatusIconTypeEnum (copy), RetrievalStatus (copy), getPriceLineContent (copy), addUnifiedEventLogging (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), SessionService (copy), ItemCardThumbnail (copy), WearTimeSelectedOptionInList (copy)
-	local v38 = useTokens()
-	local v39, v40 = useConvertedItemData(p1)
-	local v41 = if p1.itemType ~= ItemTypeEnum.Bundle then AssetLocalizationKeys else BundleLocalizationKeys
-	local v42 = Cryo.Dictionary.join(v41, PriceStatusLocalizationKeys)
-	local v43 = useLocalization(v42)
-	local v44 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useItemSelectionStore()
-	local v45 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useSignalState(v44.getItemData(p1.id))
-	local v46 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else React.useMemo(function() -- line: 76
-		-- upvalues: getPriceStatus (copy), v39 (copy), PriceStatus (copy)
-		return getPriceStatus(v39) == PriceStatus.Owned
-	end, { v39 })
+return function(p, layoutOrder: number, _, callback, p2: number)
+	local v = useTokens()
+	local v2, v3 = useConvertedItemData(p)
+	local v4
 
-	if FFlagAXEnableIaBTimedOptionsBulkPurchase then
-		React.useEffect(function() -- line: 86
-			-- upvalues: v39 (copy), getPriceInRobux (copy), getPriceStatus (copy), v44 (copy), p1 (copy)
-			if not v39 or not v39.timedOptions then
-				return
-			end
-
-			local v58 = getPriceInRobux(v39, getPriceStatus(v39)) or 0
-			local v59 = table.clone(v39.timedOptions)
-
-			table.insert(v59, {
-				days = 0,
-				selected = true,
-				price = v58
-			})
-			v44.setItemData(p1.id, {
-				timedOptions = v59
-			})
-		end, {
-			v39,
-			p1.id,
-			v44
-		})
+	if p.itemType == ItemTypeEnum.Bundle then
+		v4 = BundleLocalizationKeys
+	else
+		v4 = AssetLocalizationKeys
 	end
 
-	local v47 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else React.useCallback(function(n3: number, n4: number?) -- line: 107
-		-- upvalues: v45 (copy), v44 (copy), p1 (copy)
-		if not v45 or not v45.timedOptions then
+	local v5 = useLocalization((Cryo.Dictionary.join(v4, PriceStatusLocalizationKeys)))
+
+	local v6 = useItemSelectionStore()
+	local v7 = useSignalState(v6.getItemData(p.id))
+
+	local isOwned = React.useMemo(function(): boolean
+		return getPriceStatus(v2) == PriceStatus.Owned
+	end, { v2 })
+
+	React.useEffect(function()
+		if not (v2 and v2.timedOptions) then
 			return
 		end
 
-		local t1 = {}
+		local price = getPriceInRobux(v2, getPriceStatus(v2)) or 0
+		local clone = table.clone(v2.timedOptions)
+		table.insert(clone, { days = 0, price = price, selected = true })
 
-		for _, v64 in v45.timedOptions do
-			table.insert(t1, {
-				days = v64.days,
-				price = v64.price,
-				selected = n3 == v64.price and (n4 == nil or n4 == v64.days)
-			})
+		v6.setItemData(p.id, { timedOptions = clone })
+	end, { v2, p.id, v6 })
+
+	local onTimedOptionPriceChanged = React.useCallback(function(p3: number, p4: number?)
+		if not (v7 and v7.timedOptions) then
+			return
 		end
 
-		v44.setItemData(p1.id, {
-			timedOptions = t1
-		})
-	end, {
-		p1.id,
-		v45,
-		v44
-	})
-	local v48 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v45 and v45.timedOptions or nil
-	local v49 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else React.useMemo(function() -- line: 134
-		-- upvalues: v48 (copy)
-		if not v48 then
+		local timedOptions = {}
+
+		for _, timedOption in v7.timedOptions do
+			local v8 = {
+				days = timedOption.days,
+				price = timedOption.price,
+				selected = timedOption.price == p3 and (p4 == nil or timedOption.days == p4)
+			}
+			table.insert(timedOptions, v8)
+		end
+
+		v6.setItemData(p.id, { timedOptions = timedOptions })
+	end, { p.id, v7, v6 })
+
+	local timedOptions = v7 and v7.timedOptions or nil
+
+	local selectedTimedOptionPrice = React.useMemo(function()
+		if not timedOptions then
 			return nil
 		end
 
-		for _, v66 in v48 do
-			if v66.selected then
-				return v66.price
+		for _, timedOption in timedOptions do
+			if timedOption.selected then
+				return timedOption.price
 			end
 		end
 
 		return nil
-	end, { v48 })
+	end, { timedOptions })
 
-	if not v39 then
+	if not v2 then
 		return {}
 	end
 
-	local v50 = getItemThumbnailUrl(p1)
-	local v51 = v43[v39.itemSubType]
-	local v52 = getCatalogCardItemType(v39.itemRestrictions)
-	local v53 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase or (not v39.timedOptions or v46) then nil else {
-		type = "icon",
-		iconType = CatalogItemCardStatusIconTypeEnum.Durable
-	}
-	local v54 = if v40 ~= RetrievalStatus.Done then nil else getPriceLineContent(v39, v38, v43)
-	local v55 = if not v39.creator then nil else {
-		name = v39.creator.creatorName or "",
-		verified = v39.creator.creatorHasVerifiedBadge
-	}
-	local v56 = React.useRef(nil)
+	local itemThumbnailUrl = getItemThumbnailUrl(p)
+	local itemSubType = v5[v2.itemSubType]
+	local catalogCardItemType = getCatalogCardItemType(v2.itemRestrictions)
+	local itemStatus = v2.timedOptions
+		and not isOwned
+		and { type = "icon", iconType = CatalogItemCardStatusIconTypeEnum.Durable }
+		or nil
+	local priceLineContent
 
-	React.useEffect(function() -- line: 171
-		-- upvalues: addUnifiedEventLogging (copy), v56 (copy), UnifiedEventLogEnums (copy), UnifiedLoggingSurface (copy), p1 (copy), SessionService (copy)
-		addUnifiedEventLogging(v56, {
+	if v3 == RetrievalStatus.Done then
+		priceLineContent = getPriceLineContent(v2, v, v5)
+	end
+
+	local creator = v2.creator and {
+		name = v2.creator.creatorName or "",
+		verified = v2.creator.creatorHasVerifiedBadge
+	} or nil
+
+	local ref = React.useRef(nil)
+	React.useEffect(function()
+		addUnifiedEventLogging(ref, {
 			action = UnifiedEventLogEnums.MarketplaceUnifiedAction.UI_ELEMENT_CLICK,
 			surface = UnifiedLoggingSurface.IN_EXPERIENCE_INSPECT_BUY,
-			elementName = "CLICK_INSPECTBUY_ITEM_" .. p1.id
+			elementName = "CLICK_INSPECTBUY_ITEM_" .. p.id
 		}, {
 			sessionTagName = SessionService:GetSessionTag("level2a")
 		})
-	end, { p1.id })
+	end, { p.id })
 
-	local v57 = React.useCallback(function() -- line: 181
-		-- upvalues: p3 (copy), p1 (copy)
-		p3(p1)
-	end, {
-		p3,
-		p1
-	})
+	local onActivated = React.useCallback(function()
+		callback(p)
+	end, { callback, p })
 
-	return {
-		title = v39.name,
-		presentationSlot = React.createElement(ItemCardThumbnail, {
-			url = v50
-		}),
-		itemSubType = v51,
-		itemType = v52,
-		creator = v55,
-		priceLineContent = v54,
-		LayoutOrder = n1,
-		Size = UDim2.fromOffset(n2, 0),
-		headerSize = UDim2.fromOffset(n2, n2),
-		footerAutomaticSize = Enum.AutomaticSize.XY,
-		AutomaticSize = Enum.AutomaticSize.XY,
-		onActivated = v57,
-		ref = v56,
-		itemStatus = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v53,
-		isOwned = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v46,
-		timedOptions = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v48,
-		onTimedOptionPriceChanged = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v47,
-		selectedTimedOptionPrice = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v49,
-		wearTimeSelectedOptionInList = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else WearTimeSelectedOptionInList
+	local v8 = {
+		title = v2.name,
+		presentationSlot = React.createElement(ItemCardThumbnail, { url = itemThumbnailUrl }),
+		itemSubType = itemSubType,
+		itemType = catalogCardItemType,
+		creator = creator,
+		itemLicensingInfo = 0,
+		priceLineContent = 0,
+		LayoutOrder = 0,
+		Size = 0,
+		headerSize = 0,
+		footerAutomaticSize = 0,
+		AutomaticSize = 0,
+		onActivated = 0,
+		ref = 0,
+		itemStatus = 0,
+		isOwned = 0,
+		timedOptions = 0,
+		onTimedOptionPriceChanged = 0,
+		selectedTimedOptionPrice = 0,
+		wearTimeSelectedOptionInList = 0
 	}
+	local itemLicensingInfo
+
+	if FFlagAXMarketplaceLicensingItemCards then
+		itemLicensingInfo = v2.itemLicensingInfo
+	end
+
+	v8.itemLicensingInfo = itemLicensingInfo
+	v8.priceLineContent = priceLineContent
+	v8.LayoutOrder = layoutOrder
+	v8.Size = UDim2.fromOffset(p2, 0)
+	v8.headerSize = UDim2.fromOffset(p2, p2)
+	v8.footerAutomaticSize = Enum.AutomaticSize.XY
+	v8.AutomaticSize = Enum.AutomaticSize.XY
+	v8.onActivated = onActivated
+	v8.ref = ref
+	v8.itemStatus = itemStatus
+	v8.isOwned = isOwned
+	v8.timedOptions = timedOptions
+	v8.onTimedOptionPriceChanged = onTimedOptionPriceChanged
+	v8.selectedTimedOptionPrice = selectedTimedOptionPrice
+	v8.wearTimeSelectedOptionInList = WearTimeSelectedOptionInList
+	return v8
 end

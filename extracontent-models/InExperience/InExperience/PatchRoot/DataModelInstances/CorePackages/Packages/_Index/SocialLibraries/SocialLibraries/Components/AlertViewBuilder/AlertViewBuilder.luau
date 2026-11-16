@@ -1,215 +1,353 @@
 local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
 local dependencies = require(SocialLibraries.dependencies)
-local Roact = dependencies.Roact
-local Cryo = dependencies.Cryo
-local UIBlox = dependencies.UIBlox
-local dependenciesText = dependencies.Text
+local roact = dependencies.Roact
+local cryo = dependencies.Cryo
+local uiBlox = dependencies.UIBlox
+local text = dependencies.Text
+local foundationFontFaceMigration = dependencies.Foundation.Utility.Flags.FoundationFontFaceMigration
+local getTextBoundsAsync = dependencies.Foundation.Utility.getTextBoundsAsync
 local Components = SocialLibraries.Components
 local AlertViewLabel = require(Components.AlertView.AlertViewLabel)
 local AlertViewTextbox = require(Components.AlertView.AlertViewTextbox)
 local AlertViewSoakArea = require(Components.AlertView.AlertViewSoakArea)
 local FitFrameVertical = require(script.Parent.Parent.FitFrameVertical)
-local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
-local v13 = Roact.Component:extend("AlertViewBuilder")
+local interactiveAlert = uiBlox.App.Dialog.Alert.InteractiveAlert
 
-v13.defaultProps = {
+local extended = roact.Component:extend("AlertViewBuilder")
+
+extended.defaultProps = {
 	bodyText = "",
-	displayTextbox = false,
-	title = "",
-	childComponentWidth = 220,
-	soakAreaTransparency = 0.5,
-	inputLengthExceeded = nil,
 	buttons = {},
 	textboxes = {},
-	onActivated = function() -- line: 68
-	end,
-	onModalClose = function() -- line: 69
-	end,
-	onModalStayOpen = function() -- line: 70
-	end,
-	onModalOpen = function() -- line: 71
-	end,
+	displayTextbox = false,
+	onActivated = function() end,
+	onModalClose = function() end,
+	onModalStayOpen = function() end,
+	onModalOpen = function() end,
+	title = "",
+	childComponentWidth = 220,
 	screenSize = Vector2.new(0, 0),
-	soakAreaColor3 = Color3.fromRGB(255, 0, 255)
+	soakAreaColor3 = Color3.fromRGB(255, 0, 255),
+	soakAreaTransparency = 0.5,
+	inputLengthExceeded = nil
 }
 
-function v13.init(p1) -- line: 83
-	-- upvalues: Roact (copy), dependenciesText (copy)
-	local n1 = 0
+function extended:init()
+	self.refs = {}
+	local count = 0
 
-	p1.refs = {}
-
-	for k, _ in pairs(p1.props.textboxes) do
-		p1.refs[k] = Roact.createRef()
-		n1 += 1
+	for k, _ in pairs(self.props.textboxes) do
+		self.refs[k] = roact.createRef()
+		count += 1
 	end
 
-	p1.state = {
-		numTextboxes = n1
-	}
+	self.state = { numTextboxes = count }
 
-	function p1.calcTextboxTextHeight(p2, p3) -- line: 93
-		-- upvalues: dependenciesText (copy), p1 (copy)
-		local v41 = p2.Font.Body.RelativeSize * p2.Font.BaseSize
-		local BodyFont = p2.Font.Body.Font
-		local n2 = 0
+	if foundationFontFaceMigration then
+		self.isMounted = false
+		self.textMeasurements = {}
 
-		if p3 and p3 ~= "" then
-			n2 = dependenciesText.GetTextHeight(p3, BodyFont, v41, p1.props.childComponentWidth)
+		function self.flushTextMeasurements()
+			for k, textMeasurement in self.textMeasurements do
+				if self.props.textboxes[k] then
+					for k2, v in textMeasurement do
+						if v.height ~= nil or v.inFlight then
+							continue
+						end
+
+						v.inFlight = true
+						local v2 = v
+						local v3 = k2
+						task.spawn(function()
+							local textBoundsAsync = getTextBoundsAsync(v2.text, v2.font, v2.fontSize, v2.width)
+
+							v2.inFlight = false
+
+							local textMeasurement2 = self.textMeasurements[k]
+
+							if
+								textBoundsAsync
+								and self.isMounted
+								and textMeasurement2
+								and textMeasurement2[v3] == v2
+							then
+								v2.height = textBoundsAsync.Y
+								self:setState(function(p)
+									return {
+										textMeasurementVersion = (p.textMeasurementVersion or 0) + 1
+									}
+								end)
+							end
+						end)
+					end
+				else
+					self.textMeasurements[k] = nil
+				end
+			end
 		end
 
-		return n2
+		function self.scheduleTextMeasurementFlush()
+			if self.textMeasurementFlushScheduled then
+				return
+			end
+
+			self.textMeasurementFlushScheduled = true
+			task.defer(function()
+				self.textMeasurementFlushScheduled = false
+
+				if self.isMounted then
+					self.flushTextMeasurements()
+				end
+			end)
+		end
+	end
+
+	self.calcTextboxTextHeight = foundationFontFaceMigration and function(p, text2: string?, p2: string, p3: string)
+		if text2 and text2 ~= "" then
+			local fontSize = p.Font.Body.RelativeSize * p.Font.BaseSize
+			local font = p.Font.Body.Font
+			local childComponentWidth = self.props.childComponentWidth
+			local v = self.textMeasurements[p2]
+
+			if not v then
+				v = {}
+				self.textMeasurements[p2] = v
+			end
+
+			local v2 = v[p3]
+
+			if
+				v2
+				and v2.text == text2
+				and v2.font == font
+				and v2.fontSize == fontSize
+				and v2.width == childComponentWidth
+			then
+				if v2.height == nil then
+					return fontSize
+				end
+
+				return v2.height
+			end
+
+			v[p3] = {
+				text = text2,
+				font = font,
+				fontSize = fontSize,
+				width = childComponentWidth,
+				inFlight = false
+			}
+
+			self.scheduleTextMeasurementFlush()
+			return fontSize
+		else
+			local textMeasurement = self.textMeasurements[p2]
+
+			if textMeasurement then
+				textMeasurement[p3] = nil
+			end
+
+			return 0
+		end
+	end or function(p, p2: string?)
+		local v = p.Font.Body.RelativeSize * p.Font.BaseSize
+		local font = p.Font.Body.Font
+
+		return (not p2 or p2 == "") and 0 or text.GetTextHeight(p2, font, v, self.props.childComponentWidth)
 	end
 end
-function v13.didMount(p4) -- line: 105
-	if type(p4.props.onModalOpen) == "function" then
-		p4.props.onModalOpen()
+
+function extended:didMount()
+	if foundationFontFaceMigration then
+		self.isMounted = true
+		self.flushTextMeasurements()
+	end
+
+	if type(self.props.onModalOpen) == "function" then
+		self.props.onModalOpen()
 	end
 end
-function v13.reset(p5) -- line: 111
-	for _, v in pairs(p5.refs) do
-		if v.current then
-			v.current.Text = ""
+
+function extended.didUpdate(p)
+	if foundationFontFaceMigration then
+		p.flushTextMeasurements()
+	end
+end
+
+function extended:willUnmount()
+	if foundationFontFaceMigration then
+		self.isMounted = false
+	end
+end
+
+function extended:reset()
+	for _, ref in pairs(self.refs) do
+		if ref.current then
+			ref.current.Text = ""
 		end
 	end
 end
-function v13.makeButtonTable(p6) -- line: 119
-	-- upvalues: Cryo (copy)
-	local t1 = {
-		buttons = {}
-	}
 
-	for i, v in ipairs(p6.props.buttons) do
-		table.insert(t1.buttons, {})
+function extended:makeButtonTable()
+	local buttonTable = { buttons = {} }
 
-		local v26 = Cryo.Dictionary.join(v, {
-			props = Cryo.Dictionary.join(v.props, {
+	for i, button in ipairs(self.props.buttons) do
+		table.insert(buttonTable.buttons, {})
+		local joined = cryo.Dictionary.join(button, {
+			props = cryo.Dictionary.join(button.props, {
 				layoutOrder = i,
-				onActivated = function() -- line: 128
-					-- upvalues: p6 (copy), v (copy)
-					p6.props.onActivated()
+				onActivated = function()
+					self.props.onActivated()
+					local texts = {}
 
-					local t2 = {}
-
-					for k, v2 in pairs(p6.refs) do
-						t2[k] = v2.current and v2.current.Text or ""
+					for k, ref in pairs(self.refs) do
+						texts[k] = ref.current and ref.current.Text or ""
 					end
 
-					if not v.props.onActivated(t2) then
-						p6:reset()
-						p6:setState({
-							displayingModal = false
-						})
-						p6.props.onModalClose()
+					if button.props.onActivated(texts) then
+						self.props.onModalStayOpen()
 
 						return
 					end
 
-					p6.props.onModalStayOpen()
+					self:reset()
+					self:setState({ displayingModal = false })
+
+					self.props.onModalClose()
 				end
 			})
 		})
 
-		t1.buttons[i] = v26
+		buttonTable.buttons[i] = joined
 	end
 
-	return t1
+	return buttonTable
 end
-function v13.makeTextboxList(p7, p8) -- line: 153
-	-- upvalues: Roact (copy), FitFrameVertical (copy), AlertViewTextbox (copy), AlertViewLabel (copy)
-	local t3 = {}
-	local TextDefaultColor = p8.Theme.TextDefault.Color
 
-	if p7.props.inputLengthExceeded then
-		TextDefaultColor = p8.Theme.Alert.Color
+function extended:makeTextboxList(p)
+	local children = {}
+
+	local color = p.Theme.TextDefault.Color
+
+	if self.props.inputLengthExceeded then
+		color = p.Theme.Alert.Color
 	end
 
-	for k, v in pairs(p7.props.textboxes) do
-		local v33 = p7.calcTextboxTextHeight(p8, v.belowText)
-		local v34 = p7.calcTextboxTextHeight(p8, v.warningText)
+	for k, textbox in pairs(self.props.textboxes) do
+		local calcTextboxTextHeight = self.calcTextboxTextHeight(p, textbox.belowText, k, "belowText")
+		local calcTextboxTextHeight2 = self.calcTextboxTextHeight(p, textbox.warningText, k, "warningText")
 
-		t3[k] = Roact.createElement(FitFrameVertical, {
+		local createElement = roact.createElement
+		local v = {
+			width = UDim.new(1, 0),
 			BorderSizePixel = 0,
 			BackgroundTransparency = 1,
-			width = UDim.new(1, 0),
-			LayoutOrder = v.LayoutOrder
-		}, {
-			[k] = Roact.createElement(AlertViewTextbox, {
-				onTextChanged = v.onTextChanged,
-				PlaceholderText = v.PlaceholderText,
-				Text = v.Text,
+			LayoutOrder = textbox.LayoutOrder
+		}
+		local children2 = {
+			[k] = roact.createElement(AlertViewTextbox, {
+				onTextChanged = textbox.onTextChanged,
+				PlaceholderText = textbox.PlaceholderText,
+				Text = textbox.Text,
 				LayoutOrder = 1,
-				[Roact.Ref] = p7.refs[k]
-			}),
-			[k .. " Below Text"] = v.belowText and (v.belowText ~= "" and Roact.createElement(AlertViewLabel, {
+				[roact.Ref] = self.refs[k]
+			})
+		}
+
+		local v2 = k .. " Below Text"
+		local v3
+
+		if textbox.belowText and textbox.belowText ~= "" then
+			v3 = roact.createElement(AlertViewLabel, {
 				BackgroundTransparency = 1,
+				Text = textbox.belowText,
 				LayoutOrder = 2,
-				Text = v.belowText,
-				TextXAlignment = v.belowTextAlignment or Enum.TextXAlignment.Left,
-				Size = UDim2.new(1, 0, 0, v33),
-				TextColor3 = TextDefaultColor
-			})) or nil,
-			[k .. " Warning Text"] = v.warningText and (v.warningText ~= "" and Roact.createElement(AlertViewLabel, {
+				TextXAlignment = textbox.belowTextAlignment or Enum.TextXAlignment.Left,
+				Size = UDim2.new(1, 0, 0, calcTextboxTextHeight),
+				TextColor3 = color
+			}) or nil
+		end
+
+		children2[v2] = v3
+
+		local v4 = k .. " Warning Text"
+		local v5
+
+		if textbox.warningText and textbox.warningText ~= "" then
+			v5 = roact.createElement(AlertViewLabel, {
 				BackgroundTransparency = 1,
+				Text = textbox.warningText,
 				LayoutOrder = 3,
-				Text = v.warningText,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Size = UDim2.new(1, 0, 0, v34),
-				TextColor3 = p8.Theme.Alert.Color
-			})) or nil
-		})
+				Size = UDim2.new(1, 0, 0, calcTextboxTextHeight2),
+				TextColor3 = p.Theme.Alert.Color
+			}) or nil
+		end
+
+		children2[v4] = v5
+		children[k] = createElement(FitFrameVertical, v, children2)
 	end
 
-	return t3
+	return children
 end
-function v13.makeMiddleContent(p9, p10) -- line: 206
-	-- upvalues: Roact (copy), FitFrameVertical (copy)
-	local v37 = p9:makeTextboxList(p10)
 
-	if p9.state.numTextboxes == 0 then
+function extended:makeMiddleContent(p)
+	local textboxList = self:makeTextboxList(p)
+
+	if self.state.numTextboxes == 0 then
 		return nil
 	end
 
-	return function() -- line: 215
-		-- upvalues: Roact (copy), FitFrameVertical (copy), v37 (copy)
-		return Roact.createElement(FitFrameVertical, {
-			BorderSizePixel = 0,
-			BackgroundTransparency = 1,
-			width = UDim.new(1, 0)
-		}, {
-			Textboxes = Roact.createElement(FitFrameVertical, {
-				BorderSizePixel = 0,
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				width = UDim.new(1, 0)
-			}, v37)
-		})
+	return function()
+		return roact.createElement(
+			FitFrameVertical,
+			{ width = UDim.new(1, 0), BorderSizePixel = 0, BackgroundTransparency = 1 },
+			{
+				Textboxes = roact.createElement(
+					FitFrameVertical,
+					{
+						width = UDim.new(1, 0),
+						BorderSizePixel = 0,
+						BackgroundTransparency = 1,
+						LayoutOrder = 1
+					},
+					textboxList
+				)
+			}
+		)
 	end
 end
-function v13.render(p11) -- line: 231
-	-- upvalues: UIBlox (copy), Roact (copy), AlertViewSoakArea (copy), InteractiveAlert (copy)
-	assert(p11.props.displayTextbox or not p11.props.mandatoryInput)
 
-	return UIBlox.Style.withStyle(function(p12) -- line: 234
-		-- upvalues: p11 (copy), Roact (copy), AlertViewSoakArea (copy), InteractiveAlert (copy)
-		local v48 = p11:makeButtonTable()
-		local v49 = p11:makeMiddleContent(p12)
-		local v50 = p11.props.bodyText ~= "" and p11.props.bodyText or nil
+function extended:render()
+	assert(self.props.displayTextbox or not self.props.mandatoryInput)
 
-		return Roact.createElement(AlertViewSoakArea, {
-			BackgroundColor3 = p11.props.soakAreaColor3,
-			BackgroundTransparency = p11.props.soakAreaTransparency,
-			Visible = p11.state.displayingModal
-		}, {
-			alertView = Roact.createElement(InteractiveAlert, {
-				title = p11.props.title,
-				bodyText = v50,
-				middleContent = v49,
-				buttonStackInfo = v48,
-				screenSize = p11.props.screenSize
-			})
-		})
+	return uiBlox.Style.withStyle(function(p)
+		local buttonTable = self:makeButtonTable()
+		local middleContent = self:makeMiddleContent(p)
+		local bodyText
+
+		if self.props.bodyText ~= "" then
+			bodyText = self.props.bodyText or nil
+		end
+
+		return roact.createElement(
+			AlertViewSoakArea,
+			{
+				BackgroundColor3 = self.props.soakAreaColor3,
+				BackgroundTransparency = self.props.soakAreaTransparency,
+				Visible = self.state.displayingModal
+			},
+			{
+				alertView = roact.createElement(interactiveAlert, {
+					title = self.props.title,
+					bodyText = bodyText,
+					middleContent = middleContent,
+					buttonStackInfo = buttonTable,
+					screenSize = self.props.screenSize
+				})
+			}
+		)
 	end)
 end
 
-return v13
+return extended

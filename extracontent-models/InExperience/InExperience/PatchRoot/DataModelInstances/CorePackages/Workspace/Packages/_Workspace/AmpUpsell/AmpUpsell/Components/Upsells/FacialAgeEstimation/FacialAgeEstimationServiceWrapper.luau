@@ -1,52 +1,46 @@
-local Parent = script:FindFirstAncestor("AmpUpsell").Parent
-local Promise = require(Parent.Promise)
-local EngineFeature = game:GetEngineFeature("FacialAgeEstimationServiceAvailable")
-local v4 = if not EngineFeature then nil else game:GetService("FacialAgeEstimationService")
+local parent = script:FindFirstAncestor("AmpUpsell").Parent
 
-return {
-	isAvailable = function() -- line: 13
-		-- upvalues: EngineFeature (copy), v4 (copy)
-		return EngineFeature and v4:IsAvailable()
-	end,
-	startFlow = function(s1: string, s2: string?) -- line: 16
-		-- upvalues: Promise (copy), v4 (copy)
-		return Promise.new(function(resolve, reject) -- line: 17
-			-- upvalues: v4 (copy), s1 (copy), s2 (copy)
-			local ok, result = pcall(function() -- line: 18
-				-- upvalues: v4 (copy), s1 (copy), s2 (copy)
-				return v4:InquiryAsync({
-					inquiryId = s1,
-					sessionToken = s2
-				})
-			end)
+local Promise = require(parent.Promise)
 
-			if not ok then
-				reject(result)
+local engineFeature = game:GetEngineFeature("FacialAgeEstimationServiceAvailable")
+local FacialAgeEstimationService
 
-				return
-			end
+if engineFeature then
+	FacialAgeEstimationService = game:GetService("FacialAgeEstimationService")
+else
+	FacialAgeEstimationService = nil
+end
 
-			local resultType = result.resultType
+local FacialAgeEstimationServiceWrapper = {}
 
-			if resultType == Enum.FacialAgeEstimationResultType.Complete then
-				resolve(s1)
+function FacialAgeEstimationServiceWrapper.isAvailable()
+	return engineFeature and FacialAgeEstimationService:IsAvailable()
+end
 
-				return
-			end
-
-			if resultType == Enum.FacialAgeEstimationResultType.Cancel then
-				reject({
-					resultType = resultType
-				})
-
-				return
-			end
-
-			if resultType == Enum.FacialAgeEstimationResultType.Error then
-				reject({
-					resultType = resultType
-				})
-			end
+function FacialAgeEstimationServiceWrapper.startFlow(inquiryId: string, sessionToken: string?)
+	return Promise.new(function(callback, callback2)
+		local success, result = pcall(function()
+			return FacialAgeEstimationService:InquiryAsync({
+				inquiryId = inquiryId,
+				sessionToken = sessionToken
+			})
 		end)
-	end
-}
+
+		if not success then
+			callback2(result)
+			return
+		end
+
+		local resultType = result.resultType
+
+		if resultType == Enum.FacialAgeEstimationResultType.Complete then
+			callback(inquiryId)
+		elseif resultType == Enum.FacialAgeEstimationResultType.Cancel then
+			callback2({ resultType = resultType })
+		elseif resultType == Enum.FacialAgeEstimationResultType.Error then
+			callback2({ resultType = resultType })
+		end
+	end)
+end
+
+return FacialAgeEstimationServiceWrapper

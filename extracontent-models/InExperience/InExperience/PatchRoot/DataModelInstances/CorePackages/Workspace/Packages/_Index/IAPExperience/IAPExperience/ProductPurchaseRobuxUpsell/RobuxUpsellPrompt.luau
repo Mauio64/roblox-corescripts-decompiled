@@ -1,435 +1,685 @@
-local scriptParent = script.Parent
-local scriptParentParent = scriptParent.Parent
-local scriptParentParentParent = scriptParentParent.Parent
-local Roact = require(scriptParentParentParent.Roact)
-local FitFrameVertical = require(scriptParentParentParent.RoactFitComponents).FitFrameVertical
-local Colors = require(scriptParentParentParent.Style).Colors
-local UIBlox = require(scriptParentParentParent.UIBlox)
+local parent = script.Parent
+local parent2 = parent.Parent
+local parent3 = parent2.Parent
+
+local Roact = require(parent3.Roact)
+
+local RoactFitComponents = require(parent3.RoactFitComponents)
+local FitFrameVertical = RoactFitComponents.FitFrameVertical
+
+local Style = require(parent3.Style)
+local Colors = Style.Colors
+
+local UIBlox = require(parent3.UIBlox)
+local Foundation = require(parent3.Foundation)
+local normalizeFontFace = Foundation.Utility.normalizeFontFace
+local FoundationFontFaceMigration = Foundation.Utility.Flags.FoundationFontFaceMigration
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local withStyle = UIBlox.Core.Style.withStyle
-local FFlagLowCogsBannerInfoIcon = require(scriptParentParent.Flags.FFlagLowCogsBannerInfoIcon)
-local InfoIconWithTooltip = require(scriptParentParent.Generic.InfoIconWithTooltip)
-local MultiTextLocalizer = require(scriptParentParent.Locale.MultiTextLocalizer)
+
+local FFlagLowCogsBannerInfoIcon = require(parent2.Flags.FFlagLowCogsBannerInfoIcon)
+local InfoIconWithTooltip = require(parent2.Generic.InfoIconWithTooltip)
+
+local MultiTextLocalizer = require(parent2.Locale.MultiTextLocalizer)
 local LocalizationService = game:GetService("LocalizationService")
-local Localization = require(scriptParentParentParent.AppLocales).Localization
-local LocalizationProvider = require(scriptParentParentParent.Localization).LocalizationProvider
-local withLocalization = require(scriptParentParentParent.Localization).withLocalization
-local _ = require(scriptParentParentParent.IXPServiceWrapper).IXPServiceWrapper
-local SharedFlags = require(scriptParentParentParent.SharedFlags)
-local default = require(scriptParentParentParent.LoggingProtocol).default
-local LegacyUpsellCounter = require(scriptParentParent.Generic.Events.LegacyUpsellCounter)
-local logger = require(scriptParentParent.Utility.logger)
-local FFlagMobilePopularItemBadgingExperimentEnabled = require(scriptParentParent.Flags.FFlagMobilePopularItemBadgingExperimentEnabled)
+local AppLocales = require(parent3.AppLocales)
+local Localization = AppLocales.Localization
+local Localization2 = require(parent3.Localization)
+local LocalizationProvider = Localization2.LocalizationProvider
+local Localization3 = require(parent3.Localization)
+local withLocalization = Localization3.withLocalization
 
-require(scriptParentParent.Flags.GetFStringMobilePopularItemBadgingLayer)
+local v = require(parent3.IXPServiceWrapper)
+v = v.IXPServiceWrapper
+local SharedFlags = require(parent3.SharedFlags)
 
-local ProductDetails = require(scriptParent.ProductDetails)
-local ProductDetailsNew = require(scriptParent.ProductDetailsNew)
-local Constants = require(scriptParentParent.Generic.Constants)
-local getEnableCondenseRobuxUpsell = require(scriptParentParent.Flags.getEnableCondenseRobuxUpsell)
-local FFlagIntroduceMetricsLegacyUpsell = require(scriptParentParent.Flags.FFlagIntroduceMetricsLegacyUpsell)
-local v29 = Roact.Component:extend(script.Name)
+local LoggingProtocol = require(parent3.LoggingProtocol)
+local default = LoggingProtocol.default
+local LegacyUpsellCounter = require(parent2.Generic.Events.LegacyUpsellCounter)
+local logger = require(parent2.Utility.logger)
 
-v29.defaultProps = {
+local FFlagMobilePopularItemBadgingExperimentEnabled = require(parent2.Flags.FFlagMobilePopularItemBadgingExperimentEnabled)
+require(parent2.Flags.GetFStringMobilePopularItemBadgingLayer)
+
+local ProductDetails = require(parent.ProductDetails)
+local ProductDetailsNew = require(parent.ProductDetailsNew)
+
+local Constants = require(parent2.Generic.Constants)
+local getEnableCondenseRobuxUpsell = require(parent2.Flags.getEnableCondenseRobuxUpsell)
+
+local FFlagIntroduceMetricsLegacyUpsell = require(parent2.Flags.FFlagIntroduceMetricsLegacyUpsell)
+
+local extended = Roact.Component:extend(script.Name)
+
+extended.defaultProps = {
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.new(0.5, 0, 0.5, 0),
 	isLoading = false,
 	isDisabled = false,
 	isDelayedInput = false,
 	isQuest = false,
 	enableInputDelayed = false,
 	inputDelaySec = 3,
-	isVng = false,
-	anchorPoint = Vector2.new(0.5, 0.5),
-	position = UDim2.new(0.5, 0, 0.5, 0)
+	isVng = false
 }
 
-function v29.init(p1) -- line: 107
-	-- upvalues: Roact (copy), getEnableCondenseRobuxUpsell (copy), Constants (copy)
-	p1.contentRef = Roact.createRef()
-	p1.state = {
-		isCondensed = false,
+function extended:init()
+	self.contentRef = Roact.createRef()
+	self.state = {
 		contentSize = Vector2.new(0, 0),
-		footerSize = Vector2.new(0, 0)
+		footerSize = Vector2.new(0, 0),
+		isCondensed = false
 	}
 
-	function p1.validateCondensedCondition(p2) -- line: 115
-		-- upvalues: getEnableCondenseRobuxUpsell (copy), Constants (copy), p1 (copy)
+	function self.validateCondensedCondition(p)
 		if not getEnableCondenseRobuxUpsell() then
 			return
 		end
 
-		local v52 = p2.AbsoluteSize.Y + Constants.MODAL_HEIGHT_WITHOUT_CONTENT + Constants.MODAL_NORMAL_SECTION_PADDING * 2 + Constants.MODAL_NORMAL_BUTTON_HEIGHT * 2
+		local v2 = p.AbsoluteSize.Y + Constants.MODAL_HEIGHT_WITHOUT_CONTENT + Constants.MODAL_NORMAL_SECTION_PADDING * 2 + Constants.MODAL_NORMAL_BUTTON_HEIGHT * 2
 
-		if p1.state.isCondensed then
-			p1:setState({
-				isCondensed = p1.props.screenSize.Y < v52 + (Constants.MODAL_NORMAL_CONTENT_PADDING - Constants.MODAL_CONDENSED_CONTENT_PADDING) * 6 + (Constants.MODAL_NORMAL_BUTTON_MARGIN - Constants.MODAL_CONDENSED_BUTTON_MARGIN) + (Constants.NORMAL_ICON_SIZE - Constants.CONDENSED_ICON_SIZE)
+		if self.state.isCondensed then
+			self:setState({
+				isCondensed = self.props.screenSize.Y < v2 + (Constants.MODAL_NORMAL_CONTENT_PADDING - Constants.MODAL_CONDENSED_CONTENT_PADDING) * 6 + (Constants.MODAL_NORMAL_BUTTON_MARGIN - Constants.MODAL_CONDENSED_BUTTON_MARGIN) + (Constants.NORMAL_ICON_SIZE - Constants.CONDENSED_ICON_SIZE)
 			})
-
-			return
+		else
+			self:setState({
+				isCondensed = self.props.screenSize.Y < v2 + Constants.MODAL_NORMAL_BUTTON_MARGIN
+			})
 		end
-
-		p1:setState({
-			isCondensed = p1.props.screenSize.Y < v52 + Constants.MODAL_NORMAL_BUTTON_MARGIN
-		})
 	end
-	function p1.changeContentSize(p3) -- line: 143
-		-- upvalues: p1 (copy)
-		p1.validateCondensedCondition(p3)
 
-		if p1.state.contentSize ~= p3.AbsoluteSize then
-			p1:setState({
-				contentSize = p3.AbsoluteSize
-			})
+	function self.changeContentSize(p)
+		self.validateCondensedCondition(p)
+
+		if self.state.contentSize ~= p.AbsoluteSize then
+			self:setState({ contentSize = p.AbsoluteSize })
 		end
 	end
 end
-function v29.didMount(_) -- line: 153
-	-- upvalues: FFlagIntroduceMetricsLegacyUpsell (copy), logger (copy), default (copy), LegacyUpsellCounter (copy)
+
+function extended.didMount(_)
 	if FFlagIntroduceMetricsLegacyUpsell then
-		logger.debug({
-			message = "Legacy Upsell Modal Shown"
-		})
+		logger.debug({ message = "Legacy Upsell Modal Shown" })
+
 		default:logRobloxTelemetryCounter(LegacyUpsellCounter.LegacyUpsellShownCounter, 1, {})
 	end
 end
-function v29.render(p5) -- line: 162
-	-- upvalues: SharedFlags (copy), Roact (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), FFlagMobilePopularItemBadgingExperimentEnabled (copy), MultiTextLocalizer (copy)
-	local v33 = not p5.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL"
+
+function extended:render()
+	local v2 = self.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL"
+		or "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL"
 
 	if SharedFlags.FFlagLowCogsBannerExperiment then
-		return Roact.createElement(LocalizationProvider, {
-			localization = Localization.new(LocalizationService.RobloxLocaleId)
-		}, {
-			Alert = p5:renderNewAlert()
-		})
+		return Roact.createElement(
+			LocalizationProvider,
+			{
+				localization = Localization.new(LocalizationService.RobloxLocaleId)
+			},
+			{ Alert = self:renderNewAlert() }
+		)
 	end
 
 	if FFlagMobilePopularItemBadgingExperimentEnabled then
-		return Roact.createElement(LocalizationProvider, {
-			localization = Localization.new(LocalizationService.RobloxLocaleId)
-		}, {
-			Alert = p5:renderAlertNewProductDetails()
-		})
+		return Roact.createElement(
+			LocalizationProvider,
+			{
+				localization = Localization.new(LocalizationService.RobloxLocaleId)
+			},
+			{
+				Alert = self:renderAlertNewProductDetails()
+			}
+		)
 	end
 
 	return Roact.createElement(MultiTextLocalizer, {
 		keys = {
-			InsufficientRobuxTitle = {
-				key = "IAPExperience.RobuxUpsell.Title.InsufficientRobux"
-			},
-			AdditionalRobux = {
-				key = "IAPExperience.RobuxUpsell.Text.AdditionalRobux"
-			},
-			WouldYouBuy = {
-				key = "IAPExperience.RobuxUpsell.Text.WouldYouBuy"
-			},
-			DisclosurePayment = {
-				key = "IAPExperience.RobuxUpsell.Text.DisclosurePayment"
-			},
-			DisclosureTermsURL = {
-				key = v33
-			},
-			TermsOfUse = {
-				key = "IAPExperience.RobuxUpsell.Text.TermsOfUse"
-			},
-			BuyRobuxButton = {
-				key = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem"
-			},
-			ButtonCancel = {
-				key = "IAPExperience.RobuxUpsell.Action.Cancel"
-			},
-			LoadingText = {
-				key = "IAPExperience.RobuxUpsell.Text.Loading"
-			},
+			InsufficientRobuxTitle = { key = "IAPExperience.RobuxUpsell.Title.InsufficientRobux" },
+			AdditionalRobux = { key = "IAPExperience.RobuxUpsell.Text.AdditionalRobux" },
+			WouldYouBuy = { key = "IAPExperience.RobuxUpsell.Text.WouldYouBuy" },
+			DisclosurePayment = { key = "IAPExperience.RobuxUpsell.Text.DisclosurePayment" },
+			DisclosureTermsURL = { key = v2 },
+			TermsOfUse = { key = "IAPExperience.RobuxUpsell.Text.TermsOfUse" },
+			BuyRobuxButton = { key = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem" },
+			ButtonCancel = { key = "IAPExperience.RobuxUpsell.Action.Cancel" },
+			LoadingText = { key = "IAPExperience.RobuxUpsell.Text.Loading" },
 			PurchaseNotAvialableForQuest = {
 				key = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet"
 			}
 		},
-		render = function(t1: {[any]: any}) -- line: 220
-			-- upvalues: p5 (copy)
-			return p5:renderAlert(t1)
+		render = function(p)
+			return self:renderAlert(p)
 		end
 	})
 end
-function v29.renderAlert(t2: {[any]: any}, t3: {[any]: any}) -- line: 226
-	-- upvalues: withStyle (copy), getEnableCondenseRobuxUpsell (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), ProductDetails (copy), ButtonType (copy)
-	local props = t2.props
-	local state = t2.state
 
-	return withStyle(function(p6) -- line: 230
-		-- upvalues: getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), t3 (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), t2 (copy), ProductDetails (copy), ButtonType (copy)
-		local Theme = p6.Theme
-		local p6Font = p6.Font
-		local u58 = p6Font.BaseSize * p6Font.Body.RelativeSize
+function extended:renderAlert(data)
+	local props = self.props
+	local state = self.state
 
-		if getEnableCondenseRobuxUpsell() then
-			u58 = state.isCondensed and u58 * 0.9 or u58
-		end
+	return withStyle(function(props2)
+		local theme = props2.Theme
+		local font = props2.Font
+		local textSize = font.BaseSize * font.Body.RelativeSize
+		textSize = getEnableCondenseRobuxUpsell() and state.isCondensed and textSize * 0.9 or textSize
 
-		local v59 = props.itemRobuxCost - props.balanceAmount
-		local v60 = t3.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v59))
-		local color3 = Color3.new(math.round(Theme.TextEmphasis.Color.R * 255), math.round(Theme.TextEmphasis.Color.G * 255), (math.round(Theme.TextEmphasis.Color.B * 255)))
-		local v62 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(color3), utf8.char(57346), (tostring(props.robuxPurchaseAmount)))
-		local v63 = t3.WouldYouBuy:gsub("{robux}", v62)
-		local parts = string.split(t3.DisclosureTermsURL, "{termsofuse}")
-		local TermsOfUse = t3.TermsOfUse
+		local v2 = props.itemRobuxCost - props.balanceAmount
+		local v3 = data.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v2))
+
+		local color = Color3.new(
+			math.round(theme.TextEmphasis.Color.R * 255),
+			math.round(theme.TextEmphasis.Color.G * 255),
+			(math.round(theme.TextEmphasis.Color.B * 255))
+		)
+
+		local v4 = string.format(
+			"<font color=\"rgb(%s)\">%s%s</font>",
+			tostring(color),
+			utf8.char(57346),
+			(tostring(props.robuxPurchaseAmount))
+		)
+
+		local v5 = data.WouldYouBuy:gsub("{robux}", v4)
+
+		local v6 = string.split(data.DisclosureTermsURL, "{termsofuse}")
+
+		local text = data.TermsOfUse
 
 		if props.termsOfUseActivated then
-			TermsOfUse = "<u>" .. TermsOfUse .. "</u>"
+			text = "<u>" .. text .. "</u>"
 		end
 
-		return Roact.createElement(InteractiveAlert, {
+		local createElement = Roact.createElement
+		local v7 = {
 			screenSize = props.screenSize,
 			position = props.position,
 			anchorPoint = props.anchorPoint,
-			title = t3.InsufficientRobuxTitle,
-			middleContent = function() -- line: 266
-				-- upvalues: Roact (copy), FitFrameVertical (copy), getEnableCondenseRobuxUpsell (copy), state (copy), Constants (copy), t2 (copy), ProductDetails (copy), props (copy), Theme (copy), p6Font (copy), v60 (copy), v63 (copy), u58 (ref), t3 (copy), parts (copy), TermsOfUse (ref)
-				return Roact.createElement(FitFrameVertical, {
+			title = data.InsufficientRobuxTitle,
+			middleContent = function()
+				local createElement2 = Roact.createElement
+				local v7 = {
+					BackgroundTransparency = 1,
+					["width"] = UDim.new(1, 0),
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Enum.VerticalAlignment.Center
+				}
+				local contentPadding
+
+				if getEnableCondenseRobuxUpsell() then
+					contentPadding = UDim.new(
+						0,
+						state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING
+					)
+				else
+					contentPadding = UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING)
+				end
+
+				v7.contentPadding = contentPadding
+
+				v7[Roact.Ref] = self.contentRef
+				v7[Roact.Change.AbsoluteSize] = self.changeContentSize
+
+				local createElement3 = Roact.createElement
+				local v8 = {
+					layoutOrder = 1,
+					model = props.model,
+					itemIcon = props.itemIcon,
+					itemName = props.itemName,
+					itemRobuxCost = props.itemRobuxCost,
+					itemIconWidth = 0,
+					itemIconHeight = 0
+				}
+				local itemIconWidth
+
+				if getEnableCondenseRobuxUpsell() then
+					itemIconWidth = state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+				end
+
+				v8.itemIconWidth = itemIconWidth
+				local itemIconHeight
+
+				if getEnableCondenseRobuxUpsell() then
+					itemIconHeight = state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+				end
+
+				v8.itemIconHeight = itemIconHeight
+				local children = {
+					ProductDetails = createElement3(ProductDetails, v8),
+					Underline = Roact.createElement("Frame", {
+						LayoutOrder = 2,
+						BorderSizePixel = 0,
+						BackgroundColor3 = theme.Divider.Color,
+						BackgroundTransparency = theme.Divider.Transparency,
+						Size = UDim2.new(1, 0, 0, 1)
+					}),
+					AdditionalBuyText = 0,
+					Underline2 = 0,
+					DisclosureFrame = 0
+				}
+
+				local createElement4 = Roact.createElement
+				local v9 = {
+					LayoutOrder = 3,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, self.state.contentSize.X, 0, 0),
+					RichText = true,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextWrapped = true,
+					Font = 0,
+					FontFace = 0,
+					Text = 0,
+					TextSize = 0,
+					TextColor3 = 0,
+					TextTransparency = 0
+				}
+				local font2
+
+				if not FoundationFontFaceMigration then
+					font2 = font.Body.Font
+				end
+
+				v9.Font = font2
+				local fontFace
+
+				if FoundationFontFaceMigration then
+					fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+				end
+
+				v9.FontFace = fontFace
+				local text2
+
+				if self.props.isQuest then
+					text2 = v3
+				else
+					text2 = v3 .. " " .. v5
+				end
+
+				v9.Text = text2
+				v9.TextSize = textSize
+				v9.TextColor3 = theme.TextDefault.Color
+				v9.TextTransparency = theme.TextDefault.Transparency
+				children.AdditionalBuyText = createElement4("TextLabel", v9)
+
+				children.Underline2 = Roact.createElement("Frame", {
+					LayoutOrder = 4,
+					BorderSizePixel = 0,
+					BackgroundColor3 = theme.Divider.Color,
+					BackgroundTransparency = theme.Divider.Transparency,
+					Size = UDim2.new(1, 0, 0, 1)
+				})
+
+				local createElement5 = Roact.createElement
+				local v10 = {
+					LayoutOrder = 5,
 					BackgroundTransparency = 1,
 					width = UDim.new(1, 0),
 					FillDirection = Enum.FillDirection.Vertical,
 					HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
-					contentPadding = if not getEnableCondenseRobuxUpsell() then UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING),
-					[Roact.Ref] = t2.contentRef,
-					[Roact.Change.AbsoluteSize] = t2.changeContentSize
-				}, {
-					ProductDetails = Roact.createElement(ProductDetails, {
-						layoutOrder = 1,
-						model = props.model,
-						itemIcon = props.itemIcon,
-						itemName = props.itemName,
-						itemRobuxCost = props.itemRobuxCost,
-						itemIconWidth = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil,
-						itemIconHeight = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
-					}),
-					Underline = Roact.createElement("Frame", {
+					contentPadding = UDim.new(0, 1)
+				}
+
+				local createElement6 = Roact.createElement
+				local v11 = {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Font = 0,
+					FontFace = 0,
+					Text = 0,
+					TextSize = 0,
+					TextColor3 = 0,
+					TextTransparency = 0,
+					TextWrapped = true
+				}
+				local font3
+
+				if not FoundationFontFaceMigration then
+					font3 = font.Body.Font
+				end
+
+				v11.Font = font3
+				local fontFace2
+
+				if FoundationFontFaceMigration then
+					fontFace2 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+				end
+
+				v11.FontFace = fontFace2
+				local text3
+
+				if self.props.isQuest then
+					text3 = data.PurchaseNotAvailableOnHeadSet
+				else
+					text3 = data.DisclosurePayment
+				end
+
+				v11.Text = text3
+
+				v11.TextSize = textSize
+				v11.TextColor3 = theme.TextDefault.Color
+				v11.TextTransparency = theme.TextDefault.Transparency
+				local v12 = {
+					DisclosurePayment = createElement6("TextLabel", v11),
+					DisclosureTermsFrame = 0
+				}
+				local disclosureTermsFrame
+
+				if not self.props.isQuest then
+					local createElement7 = Roact.createElement
+					local v13 = {
 						LayoutOrder = 2,
-						BorderSizePixel = 0,
-						BackgroundColor3 = Theme.Divider.Color,
-						BackgroundTransparency = Theme.Divider.Transparency,
-						Size = UDim2.new(1, 0, 0, 1)
-					}),
-					AdditionalBuyText = Roact.createElement("TextLabel", {
-						LayoutOrder = 3,
-						BackgroundTransparency = 1,
-						RichText = true,
-						TextWrapped = true,
-						Size = UDim2.new(0, t2.state.contentSize.X, 0, 0),
-						AutomaticSize = Enum.AutomaticSize.Y,
-						Font = p6Font.Body.Font,
-						Text = if not t2.props.isQuest then v60 .. " " .. v63 else v60,
-						TextSize = u58,
-						TextColor3 = Theme.TextDefault.Color,
-						TextTransparency = Theme.TextDefault.Transparency
-					}),
-					Underline2 = Roact.createElement("Frame", {
-						LayoutOrder = 4,
-						BorderSizePixel = 0,
-						BackgroundColor3 = Theme.Divider.Color,
-						BackgroundTransparency = Theme.Divider.Transparency,
-						Size = UDim2.new(1, 0, 0, 1)
-					}),
-					DisclosureFrame = Roact.createElement(FitFrameVertical, {
-						LayoutOrder = 5,
 						BackgroundTransparency = 1,
 						width = UDim.new(1, 0),
-						FillDirection = Enum.FillDirection.Vertical,
+						FillDirection = Enum.FillDirection.Horizontal,
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
 						VerticalAlignment = Enum.VerticalAlignment.Center,
 						contentPadding = UDim.new(0, 1)
-					}, {
-						DisclosurePayment = Roact.createElement("TextLabel", {
-							LayoutOrder = 1,
-							BackgroundTransparency = 1,
-							TextWrapped = true,
-							AutomaticSize = Enum.AutomaticSize.XY,
-							Font = p6Font.Body.Font,
-							Text = if not t2.props.isQuest then t3.DisclosurePayment else t3.PurchaseNotAvailableOnHeadSet,
-							TextSize = u58,
-							TextColor3 = Theme.TextDefault.Color,
-							TextTransparency = Theme.TextDefault.Transparency
-						}),
-						DisclosureTermsFrame = if not t2.props.isQuest then Roact.createElement(FitFrameVertical, {
-							LayoutOrder = 2,
-							BackgroundTransparency = 1,
-							width = UDim.new(1, 0),
-							FillDirection = Enum.FillDirection.Horizontal,
-							HorizontalAlignment = Enum.HorizontalAlignment.Center,
-							VerticalAlignment = Enum.VerticalAlignment.Center,
-							contentPadding = UDim.new(0, 1)
-						}, {
-							BeforeDisclosureText = Roact.createElement("TextLabel", {
-								LayoutOrder = 0,
-								BackgroundTransparency = 1,
-								AutomaticSize = Enum.AutomaticSize.XY,
-								Font = p6Font.Body.Font,
-								Text = parts[1],
-								TextSize = u58,
-								TextColor3 = Theme.TextDefault.Color,
-								TextTransparency = Theme.TextDefault.Transparency
-							}),
-							TermsOfUse = Roact.createElement("TextButton", {
-								LayoutOrder = 1,
-								BackgroundTransparency = 1,
-								RichText = true,
-								AutomaticSize = Enum.AutomaticSize.XY,
-								Font = p6Font.Body.Font,
-								Text = TermsOfUse,
-								TextSize = u58,
-								TextColor3 = Theme.TextDefault.Color,
-								TextTransparency = Theme.TextDefault.Transparency,
-								Selectable = props.termsOfUseActivated ~= nil,
-								[Roact.Event.Activated] = props.termsOfUseActivated
-							}),
-							AfterDisclosureText = Roact.createElement("TextLabel", {
-								LayoutOrder = 2,
-								BackgroundTransparency = 1,
-								AutomaticSize = Enum.AutomaticSize.XY,
-								Font = p6Font.Body.Font,
-								Text = parts[2],
-								TextSize = u58,
-								TextColor3 = Theme.TextDefault.Color,
-								TextTransparency = Theme.TextDefault.Transparency
-							})
-						}) else nil
-					})
-				})
-			end,
-			buttonStackInfo = {
-				forcedFillDirection = Enum.FillDirection.Vertical,
-				marginBetween = if not getEnableCondenseRobuxUpsell() then Constants.MODAL_NORMAL_BUTTON_MARGIN else state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN or Constants.MODAL_NORMAL_BUTTON_MARGIN,
-				buttons = if not t2.props.isQuest then {
-					{
-						props = {
-							isDisabled = props.isDisabled,
-							onActivated = props.cancelPurchaseActivated,
-							text = t3.ButtonCancel,
-							inputIcon = props.cancelControllerIcon
-						}
-					},
-					{
-						buttonType = ButtonType.PrimarySystem,
-						props = {
-							isLoading = props.isLoading,
-							isDisabled = props.isDisabled,
-							isDelayedInput = props.isDelayedInput,
-							enableInputDelayed = props.enableInputDelayed,
-							delayInputSeconds = props.inputDelaySec,
-							onActivated = props.buyItemActivated,
-							text = if not props.enableInputDelayed then t3.BuyRobuxButton else t3.LoadingText,
-							inputIcon = props.buyItemControllerIcon
-						}
 					}
-				} else {{
+
+					local createElement8 = Roact.createElement
+					local v14 = {
+						LayoutOrder = 0,
+						BackgroundTransparency = 1,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						Font = 0,
+						FontFace = 0,
+						Text = 0,
+						TextSize = 0,
+						TextColor3 = 0,
+						TextTransparency = 0
+					}
+					local font4
+
+					if not FoundationFontFaceMigration then
+						font4 = font.Body.Font
+					end
+
+					v14.Font = font4
+					local fontFace3
+
+					if FoundationFontFaceMigration then
+						fontFace3 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+					end
+
+					v14.FontFace = fontFace3
+
+					v14.Text = v6[1]
+					v14.TextSize = textSize
+					v14.TextColor3 = theme.TextDefault.Color
+					v14.TextTransparency = theme.TextDefault.Transparency
+					local children2 = {
+						BeforeDisclosureText = createElement8("TextLabel", v14),
+						TermsOfUse = 0,
+						AfterDisclosureText = 0
+					}
+
+					local createElement9 = Roact.createElement
+					local termsOfUseActivatedsByActivated = {}
+					termsOfUseActivatedsByActivated.LayoutOrder = 1
+					termsOfUseActivatedsByActivated.BackgroundTransparency = 1
+					termsOfUseActivatedsByActivated.RichText = true
+					termsOfUseActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.XY
+					local font5
+
+					if not FoundationFontFaceMigration then
+						font5 = font.Body.Font
+					end
+
+					termsOfUseActivatedsByActivated.Font = font5
+					local fontFace4
+
+					if FoundationFontFaceMigration then
+						fontFace4 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+					end
+
+					termsOfUseActivatedsByActivated.FontFace = fontFace4
+
+					termsOfUseActivatedsByActivated.Text = text
+					termsOfUseActivatedsByActivated.TextSize = textSize
+					termsOfUseActivatedsByActivated.TextColor3 = theme.TextDefault.Color
+					termsOfUseActivatedsByActivated.TextTransparency = theme.TextDefault.Transparency
+					termsOfUseActivatedsByActivated.Selectable = props.termsOfUseActivated ~= nil
+
+					termsOfUseActivatedsByActivated[Roact.Event.Activated] = props.termsOfUseActivated
+					children2.TermsOfUse = createElement9("TextButton", termsOfUseActivatedsByActivated)
+
+					local createElement10 = Roact.createElement
+					local v15 = {
+						LayoutOrder = 2,
+						BackgroundTransparency = 1,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						Font = 0,
+						FontFace = 0,
+						Text = 0,
+						TextSize = 0,
+						TextColor3 = 0,
+						TextTransparency = 0
+					}
+					local font6
+
+					if not FoundationFontFaceMigration then
+						font6 = font.Body.Font
+					end
+
+					v15.Font = font6
+					local fontFace5
+
+					if FoundationFontFaceMigration then
+						fontFace5 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+					end
+
+					v15.FontFace = fontFace5
+
+					v15.Text = v6[2]
+					v15.TextSize = textSize
+					v15.TextColor3 = theme.TextDefault.Color
+					v15.TextTransparency = theme.TextDefault.Transparency
+					children2.AfterDisclosureText = createElement10("TextLabel", v15)
+					disclosureTermsFrame = createElement7(FitFrameVertical, v13, children2)
+				end
+
+				v12.DisclosureTermsFrame = disclosureTermsFrame
+				children.DisclosureFrame = createElement5(FitFrameVertical, v10, v12)
+				return createElement2(FitFrameVertical, v7, children)
+			end,
+			buttonStackInfo = 0
+		}
+
+		local buttonStackInfo = {
+			forcedFillDirection = Enum.FillDirection.Vertical,
+			marginBetween = 0,
+			buttons = 0
+		}
+		local marginBetween
+
+		if getEnableCondenseRobuxUpsell() then
+			marginBetween = state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN
+				or Constants.MODAL_NORMAL_BUTTON_MARGIN
+		else
+			marginBetween = Constants.MODAL_NORMAL_BUTTON_MARGIN
+		end
+
+		buttonStackInfo.marginBetween = marginBetween
+		local buttons
+
+		if self.props.isQuest then
+			buttons = {
+				{
 					props = {
 						isDisabled = props.isDisabled,
 						onActivated = props.cancelPurchaseActivated,
-						text = t3.ButtonCancel,
+						text = data.ButtonCancel,
 						inputIcon = props.cancelControllerIcon
 					}
-				}}
+				}
 			}
-		})
+		else
+			buttons = { nil, nil }
+			local v8 = {
+				props = {
+					isDisabled = props.isDisabled,
+					onActivated = props.cancelPurchaseActivated,
+					text = data.ButtonCancel,
+					inputIcon = props.cancelControllerIcon
+				}
+			}
+
+			local v9 = { buttonType = ButtonType.PrimarySystem, props = 0 }
+			local props3 = {
+				isLoading = props.isLoading,
+				isDisabled = props.isDisabled,
+				isDelayedInput = props.isDelayedInput,
+				enableInputDelayed = props.enableInputDelayed,
+				delayInputSeconds = props.inputDelaySec,
+				onActivated = props.buyItemActivated,
+				text = 0,
+				inputIcon = 0
+			}
+			local text2
+
+			if props.enableInputDelayed then
+				text2 = data.LoadingText
+			else
+				text2 = data.BuyRobuxButton
+			end
+
+			props3.text = text2
+			props3.inputIcon = props.buyItemControllerIcon
+			v9.props = props3
+			buttons[1], buttons[2] = v8, v9
+		end
+
+		buttonStackInfo.buttons = buttons
+		v7.buttonStackInfo = buttonStackInfo
+		return createElement(InteractiveAlert, v7)
 	end)
 end
-function v29.renderAlertNewProductDetails(t4: {[any]: any}, _: {[any]: any}) -- line: 450
-	-- upvalues: withLocalization (copy), withStyle (copy), getEnableCondenseRobuxUpsell (copy), Constants (copy), Roact (copy), ProductDetailsNew (copy), ProductDetails (copy), InteractiveAlert (copy), FitFrameVertical (copy), ButtonType (copy)
-	local props = t4.props
-	local state = t4.state
 
+function extended:renderAlertNewProductDetails(_)
+	local props = self.props
+	local state = self.state
 	return withLocalization({
 		InsufficientRobuxTitle = "IAPExperience.RobuxUpsell.Title.InsufficientRobux",
 		AdditionalRobux = "IAPExperience.RobuxUpsell.Text.AdditionalRobux",
 		WouldYouBuy = "IAPExperience.RobuxUpsell.Text.WouldYouBuy",
 		DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment",
+		DisclosureTermsURL = self.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL",
 		TermsOfUse = "IAPExperience.RobuxUpsell.Text.TermsOfUse",
 		BuyRobuxButton = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem",
 		ButtonCancel = "IAPExperience.RobuxUpsell.Action.Cancel",
 		LoadingText = "IAPExperience.RobuxUpsell.Text.Loading",
 		PurchaseNotAvialableForQuest = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet",
 		NeedMoreRobux = "IAPExperience.RobuxUpsell.Text.NeedMoreRobux",
-		BadgeText = "IAPExperience.RobuxUpsell.Text.PopularItem",
-		DisclosureTermsURL = not t4.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL"
-	})(function(t6: {[any]: any}) -- line: 468
-		-- upvalues: withStyle (copy), getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), Constants (copy), Roact (copy), ProductDetailsNew (copy), ProductDetails (copy), InteractiveAlert (copy), FitFrameVertical (copy), t4 (copy), ButtonType (copy)
-		return withStyle(function(p7) -- line: 469
-			-- upvalues: getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), t6 (copy), Constants (copy), Roact (copy), ProductDetailsNew (copy), ProductDetails (copy), InteractiveAlert (copy), FitFrameVertical (copy), t4 (copy), ButtonType (copy)
-			local Theme = p7.Theme
-			local p7Font = p7.Font
-			local u71 = p7Font.BaseSize * p7Font.Body.RelativeSize
+		BadgeText = "IAPExperience.RobuxUpsell.Text.PopularItem"
+	})(function(data)
+		return withStyle(function(props2)
+			local theme = props2.Theme
+			local font = props2.Font
 
-			if getEnableCondenseRobuxUpsell() then
-				u71 = state.isCondensed and u71 * 0.9 or u71
-			end
+			local textSize = font.BaseSize * font.Body.RelativeSize
+			textSize = getEnableCondenseRobuxUpsell() and state.isCondensed and textSize * 0.9 or textSize
 
-			local v72 = props.itemRobuxCost - props.balanceAmount
-			local v73 = t6.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v72))
-			local color3 = Color3.new(math.round(Theme.TextEmphasis.Color.R * 255), math.round(Theme.TextEmphasis.Color.G * 255), (math.round(Theme.TextEmphasis.Color.B * 255)))
-			local v75 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(color3), utf8.char(57346), (tostring(props.robuxPurchaseAmount)))
-			local v76 = t6.WouldYouBuy:gsub("{robux}", v75)
-			local parts = string.split(t6.DisclosureTermsURL, "{termsofuse}")
-			local TermsOfUse = t6.TermsOfUse
+			local v2 = props.itemRobuxCost - props.balanceAmount
+
+			local v3 = data.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v2))
+
+			local color = Color3.new(
+				math.round(theme.TextEmphasis.Color.R * 255),
+				math.round(theme.TextEmphasis.Color.G * 255),
+				(math.round(theme.TextEmphasis.Color.B * 255))
+			)
+
+			local v4 = string.format(
+				"<font color=\"rgb(%s)\">%s%s</font>",
+				tostring(color),
+				utf8.char(57346),
+				(tostring(props.robuxPurchaseAmount))
+			)
+
+			local v5 = data.WouldYouBuy:gsub("{robux}", v4)
+
+			local v6 = string.split(data.DisclosureTermsURL, "{termsofuse}")
+
+			local text = data.TermsOfUse
 
 			if props.termsOfUseActivated then
-				TermsOfUse = "<u>" .. TermsOfUse .. "</u>"
+				text = "<u>" .. text .. "</u>"
 			end
 
-			local v79 = if not game.GameId then nil else tostring(game.GameId)
-			local v80 = if not props.itemProductId then nil else tostring(props.itemProductId)
-			local t7 = {
+			local gameId
+
+			if game.GameId then
+				gameId = tostring(game.GameId)
+			end
+
+			local v7
+
+			if props.itemProductId then
+				v7 = tostring(props.itemProductId)
+			end
+
+			local v8 = {
 				layoutOrder = 1,
 				model = props.model,
 				itemIcon = props.itemIcon,
 				itemName = props.itemName,
 				itemRobuxCost = props.itemRobuxCost,
-				itemIconWidth = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil,
-				itemIconHeight = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+				itemIconWidth = 0,
+				itemIconHeight = 0
 			}
-			local v82 = false
-			local n1 = 0
+			local itemIconWidth
 
-			if v79 then
-				if not v80 then
-				end
+			if getEnableCondenseRobuxUpsell() then
+				itemIconWidth = state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
 			end
 
-			local u85
+			v8.itemIconWidth = itemIconWidth
+			local itemIconHeight
 
-			if v82 and n1 ~= 0 then
-				local v84 = table.clone(t7)
-
-				v84.isPopularItem = v82
-				v84.catalogSize = nil
-				v84.salesRank = nil
-				v84.badgeText = t6.BadgeText
-				v84.universeId = v79
-				v84.itemProductId = v80
-				v84.userVariant = n1
-				u85 = Roact.createElement(ProductDetailsNew, v84)
-			else
-				u85 = Roact.createElement(ProductDetails, t7)
+			if getEnableCondenseRobuxUpsell() then
+				itemIconHeight = state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
 			end
 
-			return Roact.createElement(InteractiveAlert, {
+			v8.itemIconHeight = itemIconHeight
+			v7 = gameId and v7 or v7
+			local productDetails
+			productDetails = Roact.createElement(ProductDetails, v8)
+
+			local createElement = Roact.createElement
+			local v9 = {
 				screenSize = props.screenSize,
 				position = props.position,
 				anchorPoint = props.anchorPoint,
-				title = t6.NeedMoreRobux,
-				middleContent = function() -- line: 570
-					-- upvalues: Roact (copy), FitFrameVertical (copy), getEnableCondenseRobuxUpsell (copy), state (copy), Constants (copy), t4 (copy), u85 (ref), Theme (copy), p7Font (copy), v73 (copy), v76 (copy), u71 (ref), t6 (copy), parts (copy), TermsOfUse (ref), props (copy)
-					return Roact.createElement(FitFrameVertical, {
+				title = data.NeedMoreRobux,
+				middleContent = function()
+					local createElement2 = Roact.createElement
+					local v9 = {
 						BackgroundTransparency = 1,
-						width = UDim.new(1, 0),
+						["width"] = UDim.new(1, 0),
 						FillDirection = Enum.FillDirection.Vertical,
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						contentPadding = if not getEnableCondenseRobuxUpsell() then UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING),
-						[Roact.Ref] = t4.contentRef,
-						[Roact.Change.AbsoluteSize] = t4.changeContentSize
-					}, {
-						ProductDetails = u85,
+						VerticalAlignment = Enum.VerticalAlignment.Center
+					}
+					local contentPadding
+
+					if getEnableCondenseRobuxUpsell() then
+						contentPadding = UDim.new(
+							0,
+							state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING
+						)
+					else
+						contentPadding = UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING)
+					end
+
+					v9.contentPadding = contentPadding
+
+					v9[Roact.Ref] = self.contentRef
+					v9[Roact.Change.AbsoluteSize] = self.changeContentSize
+					local children = {
+						ProductDetails = productDetails,
 						SimulateMargin = Roact.createElement("Frame", {
 							BackgroundTransparency = 1,
 							LayoutOrder = 2,
@@ -438,144 +688,327 @@ function v29.renderAlertNewProductDetails(t4: {[any]: any}, _: {[any]: any}) -- 
 						Underline = Roact.createElement("Frame", {
 							LayoutOrder = 2,
 							BorderSizePixel = 0,
-							BackgroundColor3 = Theme.Divider.Color,
-							BackgroundTransparency = Theme.Divider.Transparency,
+							BackgroundColor3 = theme.Divider.Color,
+							BackgroundTransparency = theme.Divider.Transparency,
 							Size = UDim2.new(1, 0, 0, 1)
 						}),
-						AdditionalBuyText = Roact.createElement("TextLabel", {
-							LayoutOrder = 3,
-							BackgroundTransparency = 1,
-							RichText = true,
-							TextWrapped = true,
-							Size = UDim2.new(0, t4.state.contentSize.X, 0, 0),
-							AutomaticSize = Enum.AutomaticSize.Y,
-							Font = p7Font.Body.Font,
-							Text = if not t4.props.isQuest then v73 .. " " .. v76 else v73,
-							TextSize = u71,
-							TextColor3 = Theme.TextDefault.Color,
-							TextTransparency = Theme.TextDefault.Transparency
-						}),
-						Underline2 = Roact.createElement("Frame", {
-							LayoutOrder = 4,
-							BorderSizePixel = 0,
-							BackgroundColor3 = Theme.Divider.Color,
-							BackgroundTransparency = Theme.Divider.Transparency,
-							Size = UDim2.new(1, 0, 0, 1)
-						}),
-						DisclosureFrame = Roact.createElement(FitFrameVertical, {
-							LayoutOrder = 5,
+						AdditionalBuyText = 0,
+						Underline2 = 0,
+						DisclosureFrame = 0
+					}
+
+					local createElement3 = Roact.createElement
+					local v10 = {
+						LayoutOrder = 3,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(0, self.state.contentSize.X, 0, 0),
+						RichText = true,
+						AutomaticSize = Enum.AutomaticSize.Y,
+						TextWrapped = true,
+						Font = 0,
+						FontFace = 0,
+						Text = 0,
+						TextSize = 0,
+						TextColor3 = 0,
+						TextTransparency = 0
+					}
+					local font2
+
+					if not FoundationFontFaceMigration then
+						font2 = font.Body.Font
+					end
+
+					v10.Font = font2
+					local fontFace
+
+					if FoundationFontFaceMigration then
+						fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+					end
+
+					v10.FontFace = fontFace
+					local text2
+
+					if self.props.isQuest then
+						text2 = v3
+					else
+						text2 = v3 .. " " .. v5
+					end
+
+					v10.Text = text2
+
+					v10.TextSize = textSize
+					v10.TextColor3 = theme.TextDefault.Color
+					v10.TextTransparency = theme.TextDefault.Transparency
+					children.AdditionalBuyText = createElement3("TextLabel", v10)
+
+					children.Underline2 = Roact.createElement("Frame", {
+						LayoutOrder = 4,
+						BorderSizePixel = 0,
+						BackgroundColor3 = theme.Divider.Color,
+						BackgroundTransparency = theme.Divider.Transparency,
+						Size = UDim2.new(1, 0, 0, 1)
+					})
+
+					local createElement4 = Roact.createElement
+					local v11 = {
+						LayoutOrder = 5,
+						BackgroundTransparency = 1,
+						width = UDim.new(1, 0),
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						contentPadding = UDim.new(0, 1)
+					}
+
+					local createElement5 = Roact.createElement
+					local v12 = {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						Font = 0,
+						FontFace = 0,
+						Text = 0,
+						TextSize = 0,
+						TextColor3 = 0,
+						TextTransparency = 0,
+						TextWrapped = true
+					}
+					local font3
+
+					if not FoundationFontFaceMigration then
+						font3 = font.Body.Font
+					end
+
+					v12.Font = font3
+					local fontFace2
+
+					if FoundationFontFaceMigration then
+						fontFace2 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+					end
+
+					v12.FontFace = fontFace2
+					local text3
+
+					if self.props.isQuest then
+						text3 = data.PurchaseNotAvailableOnHeadSet
+					else
+						text3 = data.DisclosurePayment
+					end
+
+					v12.Text = text3
+
+					v12.TextSize = textSize
+					v12.TextColor3 = theme.TextDefault.Color
+					v12.TextTransparency = theme.TextDefault.Transparency
+					local v13 = {
+						DisclosurePayment = createElement5("TextLabel", v12),
+						DisclosureTermsFrame = 0
+					}
+					local disclosureTermsFrame
+
+					if not self.props.isQuest then
+						local createElement6 = Roact.createElement
+						local v14 = {
+							LayoutOrder = 2,
 							BackgroundTransparency = 1,
 							width = UDim.new(1, 0),
-							FillDirection = Enum.FillDirection.Vertical,
+							FillDirection = Enum.FillDirection.Horizontal,
 							HorizontalAlignment = Enum.HorizontalAlignment.Center,
 							VerticalAlignment = Enum.VerticalAlignment.Center,
 							contentPadding = UDim.new(0, 1)
-						}, {
-							DisclosurePayment = Roact.createElement("TextLabel", {
-								LayoutOrder = 1,
-								BackgroundTransparency = 1,
-								TextWrapped = true,
-								AutomaticSize = Enum.AutomaticSize.XY,
-								Font = p7Font.Body.Font,
-								Text = if not t4.props.isQuest then t6.DisclosurePayment else t6.PurchaseNotAvailableOnHeadSet,
-								TextSize = u71,
-								TextColor3 = Theme.TextDefault.Color,
-								TextTransparency = Theme.TextDefault.Transparency
-							}),
-							DisclosureTermsFrame = if not t4.props.isQuest then Roact.createElement(FitFrameVertical, {
-								LayoutOrder = 2,
-								BackgroundTransparency = 1,
-								width = UDim.new(1, 0),
-								FillDirection = Enum.FillDirection.Horizontal,
-								HorizontalAlignment = Enum.HorizontalAlignment.Center,
-								VerticalAlignment = Enum.VerticalAlignment.Center,
-								contentPadding = UDim.new(0, 1)
-							}, {
-								BeforeDisclosureText = Roact.createElement("TextLabel", {
-									LayoutOrder = 0,
-									BackgroundTransparency = 1,
-									AutomaticSize = Enum.AutomaticSize.XY,
-									Font = p7Font.Body.Font,
-									Text = parts[1],
-									TextSize = u71,
-									TextColor3 = Theme.TextDefault.Color,
-									TextTransparency = Theme.TextDefault.Transparency
-								}),
-								TermsOfUse = Roact.createElement("TextButton", {
-									LayoutOrder = 1,
-									BackgroundTransparency = 1,
-									RichText = true,
-									AutomaticSize = Enum.AutomaticSize.XY,
-									Font = p7Font.Body.Font,
-									Text = TermsOfUse,
-									TextSize = u71,
-									TextColor3 = Theme.TextDefault.Color,
-									TextTransparency = Theme.TextDefault.Transparency,
-									Selectable = props.termsOfUseActivated ~= nil,
-									[Roact.Event.Activated] = props.termsOfUseActivated
-								}),
-								AfterDisclosureText = Roact.createElement("TextLabel", {
-									LayoutOrder = 2,
-									BackgroundTransparency = 1,
-									AutomaticSize = Enum.AutomaticSize.XY,
-									Font = p7Font.Body.Font,
-									Text = parts[2],
-									TextSize = u71,
-									TextColor3 = Theme.TextDefault.Color,
-									TextTransparency = Theme.TextDefault.Transparency
-								})
-							}) else nil
-						})
-					})
-				end,
-				buttonStackInfo = {
-					forcedFillDirection = Enum.FillDirection.Vertical,
-					marginBetween = if not getEnableCondenseRobuxUpsell() then Constants.MODAL_NORMAL_BUTTON_MARGIN else state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN or Constants.MODAL_NORMAL_BUTTON_MARGIN,
-					buttons = if not t4.props.isQuest then {
-						{
-							props = {
-								isDisabled = props.isDisabled,
-								onActivated = props.cancelPurchaseActivated,
-								text = t6.ButtonCancel,
-								inputIcon = props.cancelControllerIcon
-							}
-						},
-						{
-							buttonType = ButtonType.PrimarySystem,
-							props = {
-								isLoading = props.isLoading,
-								isDisabled = props.isDisabled,
-								isDelayedInput = props.isDelayedInput,
-								enableInputDelayed = props.enableInputDelayed,
-								delayInputSeconds = props.inputDelaySec,
-								onActivated = props.buyItemActivated,
-								text = if not props.enableInputDelayed then t6.BuyRobuxButton else t6.LoadingText,
-								inputIcon = props.buyItemControllerIcon
-							}
 						}
-					} else {{
+
+						local createElement7 = Roact.createElement
+						local v15 = {
+							LayoutOrder = 0,
+							BackgroundTransparency = 1,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							Font = 0,
+							FontFace = 0,
+							Text = 0,
+							TextSize = 0,
+							TextColor3 = 0,
+							TextTransparency = 0
+						}
+						local font4
+
+						if not FoundationFontFaceMigration then
+							font4 = font.Body.Font
+						end
+
+						v15.Font = font4
+						local fontFace3
+
+						if FoundationFontFaceMigration then
+							fontFace3 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+						end
+
+						v15.FontFace = fontFace3
+
+						v15.Text = v6[1]
+						v15.TextSize = textSize
+						v15.TextColor3 = theme.TextDefault.Color
+						v15.TextTransparency = theme.TextDefault.Transparency
+						local children2 = {
+							BeforeDisclosureText = createElement7("TextLabel", v15),
+							TermsOfUse = 0,
+							AfterDisclosureText = 0
+						}
+
+						local createElement8 = Roact.createElement
+						local termsOfUseActivatedsByActivated = {}
+						termsOfUseActivatedsByActivated.LayoutOrder = 1
+						termsOfUseActivatedsByActivated.BackgroundTransparency = 1
+						termsOfUseActivatedsByActivated.RichText = true
+						termsOfUseActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.XY
+						local font5
+
+						if not FoundationFontFaceMigration then
+							font5 = font.Body.Font
+						end
+
+						termsOfUseActivatedsByActivated.Font = font5
+						local fontFace4
+
+						if FoundationFontFaceMigration then
+							fontFace4 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+						end
+
+						termsOfUseActivatedsByActivated.FontFace = fontFace4
+
+						termsOfUseActivatedsByActivated.Text = text
+						termsOfUseActivatedsByActivated.TextSize = textSize
+						termsOfUseActivatedsByActivated.TextColor3 = theme.TextDefault.Color
+						termsOfUseActivatedsByActivated.TextTransparency = theme.TextDefault.Transparency
+						termsOfUseActivatedsByActivated.Selectable = props.termsOfUseActivated ~= nil
+
+						termsOfUseActivatedsByActivated[Roact.Event.Activated] = props.termsOfUseActivated
+						children2.TermsOfUse = createElement8("TextButton", termsOfUseActivatedsByActivated)
+
+						local createElement9 = Roact.createElement
+						local v16 = {
+							LayoutOrder = 2,
+							BackgroundTransparency = 1,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							Font = 0,
+							FontFace = 0,
+							Text = 0,
+							TextSize = 0,
+							TextColor3 = 0,
+							TextTransparency = 0
+						}
+						local font6
+
+						if not FoundationFontFaceMigration then
+							font6 = font.Body.Font
+						end
+
+						v16.Font = font6
+						local fontFace5
+
+						if FoundationFontFaceMigration then
+							fontFace5 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+						end
+
+						v16.FontFace = fontFace5
+
+						v16.Text = v6[2]
+						v16.TextSize = textSize
+						v16.TextColor3 = theme.TextDefault.Color
+						v16.TextTransparency = theme.TextDefault.Transparency
+						children2.AfterDisclosureText = createElement9("TextLabel", v16)
+						disclosureTermsFrame = createElement6(FitFrameVertical, v14, children2)
+					end
+
+					v13.DisclosureTermsFrame = disclosureTermsFrame
+					children.DisclosureFrame = createElement4(FitFrameVertical, v11, v13)
+					return createElement2(FitFrameVertical, v9, children)
+				end,
+				buttonStackInfo = 0
+			}
+
+			local buttonStackInfo = {
+				forcedFillDirection = Enum.FillDirection.Vertical,
+				marginBetween = 0,
+				buttons = 0
+			}
+			local marginBetween
+
+			if getEnableCondenseRobuxUpsell() then
+				marginBetween = state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN
+					or Constants.MODAL_NORMAL_BUTTON_MARGIN
+			else
+				marginBetween = Constants.MODAL_NORMAL_BUTTON_MARGIN
+			end
+
+			buttonStackInfo.marginBetween = marginBetween
+			local buttons
+
+			if self.props.isQuest then
+				buttons = {
+					{
 						props = {
 							isDisabled = props.isDisabled,
 							onActivated = props.cancelPurchaseActivated,
-							text = t6.ButtonCancel,
+							text = data.ButtonCancel,
 							inputIcon = props.cancelControllerIcon
 						}
-					}}
+					}
 				}
-			})
+			else
+				buttons = { nil, nil }
+				local v10 = {
+					props = {
+						isDisabled = props.isDisabled,
+						onActivated = props.cancelPurchaseActivated,
+						text = data.ButtonCancel,
+						inputIcon = props.cancelControllerIcon
+					}
+				}
+
+				local v11 = { buttonType = ButtonType.PrimarySystem, props = 0 }
+				local props3 = {
+					isLoading = props.isLoading,
+					isDisabled = props.isDisabled,
+					isDelayedInput = props.isDelayedInput,
+					enableInputDelayed = props.enableInputDelayed,
+					delayInputSeconds = props.inputDelaySec,
+					onActivated = props.buyItemActivated,
+					text = 0,
+					inputIcon = 0
+				}
+				local text2
+
+				if props.enableInputDelayed then
+					text2 = data.LoadingText
+				else
+					text2 = data.BuyRobuxButton
+				end
+
+				props3.text = text2
+
+				props3.inputIcon = props.buyItemControllerIcon
+				v11.props = props3
+				buttons[1], buttons[2] = v10, v11
+			end
+
+			buttonStackInfo.buttons = buttons
+			v9.buttonStackInfo = buttonStackInfo
+			return createElement(InteractiveAlert, v9)
 		end)
 	end)
 end
-function v29.renderNewAlert(p8) -- line: 752
-	-- upvalues: withLocalization (copy), withStyle (copy), getEnableCondenseRobuxUpsell (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), ProductDetails (copy), ButtonType (copy)
-	local props = p8.props
-	local state = p8.state
+
+function extended:renderNewAlert()
+	local props = self.props
+	local state = self.state
 
 	return withLocalization({
 		InsufficientRobuxTitle = "IAPExperience.RobuxUpsell.Title.InsufficientRobux",
 		AdditionalRobux = "IAPExperience.RobuxUpsell.Text.AdditionalRobux",
 		WouldYouBuy = "IAPExperience.RobuxUpsell.Text.WouldYouBuy",
 		DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment",
+		DisclosureTermsURL = self.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL",
 		TermsOfUse = "IAPExperience.RobuxUpsell.Text.TermsOfUse",
 		BuyRobuxButton = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem",
 		ButtonCancel = "IAPExperience.RobuxUpsell.Action.Cancel",
@@ -583,275 +1016,530 @@ function v29.renderNewAlert(p8) -- line: 752
 		PurchaseNotAvialableForQuest = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet",
 		NeedMoreRobux = "IAPExperience.RobuxUpsell.Text.NeedMoreRobux",
 		BonusBannerV1 = "IAPExperience.RobuxUpsell.Text.BonusBannerV1",
-		BonusBannerInfo = "IAPExperience.RobuxUpsell.Text.BonusBannerInfo",
-		DisclosureTermsURL = not p8.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL"
-	})(function(t8: {[any]: any}) -- line: 772
-		-- upvalues: withStyle (copy), getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), p8 (copy), ProductDetails (copy), ButtonType (copy)
-		return withStyle(function(p9) -- line: 773
-			-- upvalues: getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), t8 (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), p8 (copy), ProductDetails (copy), ButtonType (copy)
-			local Theme = p9.Theme
-			local p9Font = p9.Font
-			local u89 = p9Font.BaseSize * p9Font.Body.RelativeSize
+		BonusBannerInfo = "IAPExperience.RobuxUpsell.Text.BonusBannerInfo"
+	})(function(data)
+		return withStyle(function(props2)
+			local theme = props2.Theme
+			local font = props2.Font
+			local textSize = font.BaseSize * font.Body.RelativeSize
+			textSize = getEnableCondenseRobuxUpsell() and state.isCondensed and textSize * 0.9 or textSize
 
-			if getEnableCondenseRobuxUpsell() then
-				u89 = state.isCondensed and u89 * 0.9 or u89
-			end
+			local textSize2 = font.BaseSize * font.Footer.RelativeSize
+			local v2 = props.itemRobuxCost - props.balanceAmount
 
-			local v90 = p9Font.BaseSize * p9Font.Footer.RelativeSize
-			local v91 = props.itemRobuxCost - props.balanceAmount
-			local v92 = t8.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v91))
-			local color3 = Color3.new(math.round(Theme.TextEmphasis.Color.R * 255), math.round(Theme.TextEmphasis.Color.G * 255), (math.round(Theme.TextEmphasis.Color.B * 255)))
-			local v94 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(color3), utf8.char(57346), (tostring(props.robuxPurchaseAmount)))
-			local u95 = t8.WouldYouBuy:gsub("{robux}", v94)
-			local parts = string.split(t8.DisclosureTermsURL, "{termsofuse}")
-			local TermsOfUse = t8.TermsOfUse
+			local v3 = data.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v2))
+
+			local color = Color3.new(
+				math.round(theme.TextEmphasis.Color.R * 255),
+				math.round(theme.TextEmphasis.Color.G * 255),
+				(math.round(theme.TextEmphasis.Color.B * 255))
+			)
+
+			local v4 = string.format(
+				"<font color=\"rgb(%s)\">%s%s</font>",
+				tostring(color),
+				utf8.char(57346),
+				(tostring(props.robuxPurchaseAmount))
+			)
+
+			local v5 = data.WouldYouBuy:gsub("{robux}", v4)
+
+			local v6 = string.split(data.DisclosureTermsURL, "{termsofuse}")
+
+			local text = data.TermsOfUse
 
 			if props.termsOfUseActivated then
-				TermsOfUse = "<u>" .. TermsOfUse .. "</u>"
+				text = "<u>" .. text .. "</u>"
 			end
 
-			local s1 = ""
+			local v7
 
-			if props.robuxPurchaseAmountBeforeBonus ~= nil then
-				local str = tostring(props.robuxPurchaseAmountBeforeBonus)
-				local str2 = tostring(props.robuxPurchaseAmount)
-				local v101 = utf8.char(57346) .. "<s>" .. str .. "</s>" .. utf8.char(57346) .. str2
+			if props.robuxPurchaseAmountBeforeBonus == nil then
+				v7 = ""
+			else
+				local robuxPurchaseAmountBeforeBonus = tostring(props.robuxPurchaseAmountBeforeBonus)
+				local robuxPurchaseAmount = tostring(props.robuxPurchaseAmount)
+				local v8 = utf8.char(57346) .. "<s>" .. robuxPurchaseAmountBeforeBonus .. "</s>" .. utf8.char(57346) .. robuxPurchaseAmount
+				v5 = data.WouldYouBuy:gsub("{robux}", v8)
 
-				u95 = t8.WouldYouBuy:gsub("{robux}", v101)
-
-				local v102 = props.robuxPurchaseAmount - props.robuxPurchaseAmountBeforeBonus
-				local v103 = utf8.char(57346) .. tostring(v102)
-
-				s1 = t8.BonusBannerV1:gsub("{robux}", v103)
+				local v9 = props.robuxPurchaseAmount - props.robuxPurchaseAmountBeforeBonus
+				local v10 = utf8.char(57346) .. tostring(v9)
+				v7 = data.BonusBannerV1:gsub("{robux}", v10)
 			end
 
-			return Roact.createElement(InteractiveAlert, {
+			local createElement = Roact.createElement
+			local v8 = {
 				screenSize = props.screenSize,
 				position = props.position,
 				anchorPoint = props.anchorPoint,
-				title = t8.NeedMoreRobux,
-				middleContent = function() -- line: 830
-					-- upvalues: Roact (copy), FitFrameVertical (copy), getEnableCondenseRobuxUpsell (copy), state (copy), Constants (copy), p8 (copy), ProductDetails (copy), props (copy), Theme (copy), p9Font (copy), v92 (copy), u95 (ref), u89 (ref), t8 (copy), v90 (copy), parts (copy), TermsOfUse (ref)
-					return Roact.createElement(FitFrameVertical, {
+				title = data.NeedMoreRobux,
+				middleContent = function()
+					local createElement2 = Roact.createElement
+					local v8 = {
+						["BackgroundTransparency"] = nil,
+						["BackgroundTransparency"] = nil,
+						["BackgroundTransparency"] = nil,
 						BackgroundTransparency = 1,
 						BackgroundColor3 = Color3.fromRGB(0, 255, 0),
 						width = UDim.new(1, 0),
 						FillDirection = Enum.FillDirection.Vertical,
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
-						VerticalAlignment = Enum.VerticalAlignment.Center,
-						contentPadding = if not getEnableCondenseRobuxUpsell() then UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING),
-						[Roact.Ref] = p8.contentRef,
-						[Roact.Change.AbsoluteSize] = p8.changeContentSize
-					}, {
-						ProductDetails = Roact.createElement(ProductDetails, {
-							layoutOrder = 1,
-							model = props.model,
-							itemIcon = props.itemIcon,
-							itemName = props.itemName,
-							itemRobuxCost = props.itemRobuxCost,
-							itemIconWidth = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil,
-							itemIconHeight = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
-						}),
+						VerticalAlignment = Enum.VerticalAlignment.Center
+					}
+					local contentPadding
+
+					if getEnableCondenseRobuxUpsell() then
+						contentPadding = UDim.new(
+							0,
+							state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING
+						)
+					else
+						contentPadding = UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING)
+					end
+
+					v8.contentPadding = contentPadding
+
+					v8[Roact.Ref] = self.contentRef
+					v8[Roact.Change.AbsoluteSize] = self.changeContentSize
+
+					local createElement3 = Roact.createElement
+					local v9 = {
+						layoutOrder = 1,
+						model = props.model,
+						itemIcon = props.itemIcon,
+						itemName = props.itemName,
+						itemRobuxCost = props.itemRobuxCost,
+						itemIconWidth = 0,
+						itemIconHeight = 0
+					}
+					local itemIconWidth
+
+					if getEnableCondenseRobuxUpsell() then
+						itemIconWidth = state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+					end
+
+					v9.itemIconWidth = itemIconWidth
+					local itemIconHeight
+
+					if getEnableCondenseRobuxUpsell() then
+						itemIconHeight = state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+					end
+
+					v9.itemIconHeight = itemIconHeight
+					local children = {
+						ProductDetails = createElement3(ProductDetails, v9),
 						Underline = Roact.createElement("Frame", {
 							LayoutOrder = 2,
 							BorderSizePixel = 0,
-							BackgroundColor3 = Theme.Divider.Color,
-							BackgroundTransparency = Theme.Divider.Transparency,
+							BackgroundColor3 = theme.Divider.Color,
+							BackgroundTransparency = theme.Divider.Transparency,
 							Size = UDim2.new(1, 0, 0, 1)
 						}),
-						AdditionalBuyText = Roact.createElement("TextLabel", {
-							LayoutOrder = 3,
-							BackgroundTransparency = 1,
-							RichText = true,
-							TextWrapped = true,
-							Size = UDim2.new(0, p8.state.contentSize.X, 0, 0),
-							AutomaticSize = Enum.AutomaticSize.Y,
-							Font = p9Font.Body.Font,
-							Text = if not p8.props.isQuest then v92 .. " " .. u95 else v92,
-							TextSize = u89,
-							TextColor3 = Theme.TextDefault.Color,
-							TextTransparency = Theme.TextDefault.Transparency
-						}),
-						Underline2 = Roact.createElement("Frame", {
-							LayoutOrder = 4,
-							BorderSizePixel = 0,
-							BackgroundColor3 = Theme.Divider.Color,
-							BackgroundTransparency = Theme.Divider.Transparency,
-							Size = UDim2.new(1, 0, 0, 1)
-						}),
-						DisclosureFrame = Roact.createElement(FitFrameVertical, {
-							LayoutOrder = 5,
+						AdditionalBuyText = 0,
+						Underline2 = 0,
+						DisclosureFrame = 0
+					}
+
+					local createElement4 = Roact.createElement
+					local v10 = {
+						LayoutOrder = 3,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(0, self.state.contentSize.X, 0, 0),
+						RichText = true,
+						AutomaticSize = Enum.AutomaticSize.Y,
+						TextWrapped = true,
+						Font = 0,
+						FontFace = 0,
+						Text = 0,
+						TextSize = 0,
+						TextColor3 = 0,
+						TextTransparency = 0
+					}
+					local font2
+
+					if not FoundationFontFaceMigration then
+						font2 = font.Body.Font
+					end
+
+					v10.Font = font2
+					local fontFace
+
+					if FoundationFontFaceMigration then
+						fontFace = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+					end
+
+					v10.FontFace = fontFace
+					local text2
+
+					if self.props.isQuest then
+						text2 = v3
+					else
+						text2 = v3 .. " " .. v5
+					end
+
+					v10.Text = text2
+
+					v10.TextSize = textSize
+					v10.TextColor3 = theme.TextDefault.Color
+					v10.TextTransparency = theme.TextDefault.Transparency
+					children.AdditionalBuyText = createElement4("TextLabel", v10)
+
+					children.Underline2 = Roact.createElement("Frame", {
+						LayoutOrder = 4,
+						BorderSizePixel = 0,
+						BackgroundColor3 = theme.Divider.Color,
+						BackgroundTransparency = theme.Divider.Transparency,
+						Size = UDim2.new(1, 0, 0, 1)
+					})
+
+					local createElement5 = Roact.createElement
+					local v11 = {
+						LayoutOrder = 5,
+						BackgroundTransparency = 1,
+						width = UDim.new(1, 0),
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						contentPadding = UDim.new(0, 1)
+					}
+
+					local createElement6 = Roact.createElement
+					local v12 = {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						Font = 0,
+						FontFace = 0,
+						Text = 0,
+						TextSize = 0,
+						TextColor3 = 0,
+						TextTransparency = 0,
+						TextWrapped = true
+					}
+					local font3
+
+					if not FoundationFontFaceMigration then
+						font3 = font.Body.Font
+					end
+
+					v12.Font = font3
+					local fontFace2
+
+					if FoundationFontFaceMigration then
+						fontFace2 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+					end
+
+					v12.FontFace = fontFace2
+					local text3
+
+					if self.props.isQuest then
+						text3 = data.PurchaseNotAvailableOnHeadSet
+					else
+						text3 = data.DisclosurePayment
+					end
+
+					v12.Text = text3
+
+					v12.TextSize = textSize2
+					v12.TextColor3 = theme.TextDefault.Color
+					v12.TextTransparency = theme.TextDefault.Transparency
+					local v13 = {
+						DisclosurePayment = createElement6("TextLabel", v12),
+						DisclosureTermsFrame = 0
+					}
+					local disclosureTermsFrame
+
+					if not self.props.isQuest then
+						local createElement7 = Roact.createElement
+						local v14 = {
+							LayoutOrder = 2,
 							BackgroundTransparency = 1,
 							width = UDim.new(1, 0),
-							FillDirection = Enum.FillDirection.Vertical,
+							FillDirection = Enum.FillDirection.Horizontal,
 							HorizontalAlignment = Enum.HorizontalAlignment.Center,
 							VerticalAlignment = Enum.VerticalAlignment.Center,
 							contentPadding = UDim.new(0, 1)
-						}, {
-							DisclosurePayment = Roact.createElement("TextLabel", {
-								LayoutOrder = 1,
-								BackgroundTransparency = 1,
-								TextWrapped = true,
-								AutomaticSize = Enum.AutomaticSize.XY,
-								Font = p9Font.Body.Font,
-								Text = if not p8.props.isQuest then t8.DisclosurePayment else t8.PurchaseNotAvailableOnHeadSet,
-								TextSize = v90,
-								TextColor3 = Theme.TextDefault.Color,
-								TextTransparency = Theme.TextDefault.Transparency
-							}),
-							DisclosureTermsFrame = if not p8.props.isQuest then Roact.createElement(FitFrameVertical, {
-								LayoutOrder = 2,
-								BackgroundTransparency = 1,
-								width = UDim.new(1, 0),
-								FillDirection = Enum.FillDirection.Horizontal,
-								HorizontalAlignment = Enum.HorizontalAlignment.Center,
-								VerticalAlignment = Enum.VerticalAlignment.Center,
-								contentPadding = UDim.new(0, 1)
-							}, {
-								BeforeDisclosureText = Roact.createElement("TextLabel", {
-									LayoutOrder = 0,
-									BackgroundTransparency = 1,
-									AutomaticSize = Enum.AutomaticSize.XY,
-									Font = p9Font.Body.Font,
-									Text = parts[1],
-									TextSize = v90,
-									TextColor3 = Theme.TextDefault.Color,
-									TextTransparency = Theme.TextDefault.Transparency
-								}),
-								TermsOfUse = Roact.createElement("TextButton", {
-									LayoutOrder = 1,
-									BackgroundTransparency = 1,
-									RichText = true,
-									AutomaticSize = Enum.AutomaticSize.XY,
-									Font = p9Font.Body.Font,
-									Text = TermsOfUse,
-									TextSize = v90,
-									TextColor3 = Theme.TextDefault.Color,
-									TextTransparency = Theme.TextDefault.Transparency,
-									Selectable = props.termsOfUseActivated ~= nil,
-									[Roact.Event.Activated] = props.termsOfUseActivated
-								}),
-								AfterDisclosureText = Roact.createElement("TextLabel", {
-									LayoutOrder = 2,
-									BackgroundTransparency = 1,
-									AutomaticSize = Enum.AutomaticSize.XY,
-									Font = p9Font.Body.Font,
-									Text = parts[2],
-									TextSize = v90,
-									TextColor3 = Theme.TextDefault.Color,
-									TextTransparency = Theme.TextDefault.Transparency
-								})
-							}) else nil
-						})
-					})
-				end,
-				buttonStackInfo = {
-					forcedFillDirection = Enum.FillDirection.Vertical,
-					marginBetween = if not getEnableCondenseRobuxUpsell() then Constants.MODAL_NORMAL_BUTTON_MARGIN else state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN or Constants.MODAL_NORMAL_BUTTON_MARGIN,
-					buttons = if not p8.props.isQuest then {
-						{
-							props = {
-								isDisabled = props.isDisabled,
-								onActivated = props.cancelPurchaseActivated,
-								text = t8.ButtonCancel,
-								inputIcon = props.cancelControllerIcon
-							}
-						},
-						{
-							buttonType = ButtonType.PrimarySystem,
-							props = {
-								isLoading = props.isLoading,
-								isDisabled = props.isDisabled,
-								isDelayedInput = props.isDelayedInput,
-								enableInputDelayed = props.enableInputDelayed,
-								delayInputSeconds = props.inputDelaySec,
-								onActivated = props.buyItemActivated,
-								text = if not props.enableInputDelayed then t8.BuyRobuxButton else t8.LoadingText,
-								inputIcon = props.buyItemControllerIcon
-							}
 						}
-					} else {{
+
+						local createElement8 = Roact.createElement
+						local v15 = {
+							LayoutOrder = 0,
+							BackgroundTransparency = 1,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							Font = 0,
+							FontFace = 0,
+							Text = 0,
+							TextSize = 0,
+							TextColor3 = 0,
+							TextTransparency = 0
+						}
+						local font4
+
+						if not FoundationFontFaceMigration then
+							font4 = font.Body.Font
+						end
+
+						v15.Font = font4
+						local fontFace3
+
+						if FoundationFontFaceMigration then
+							fontFace3 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+						end
+
+						v15.FontFace = fontFace3
+
+						v15.Text = v6[1]
+						v15.TextSize = textSize2
+						v15.TextColor3 = theme.TextDefault.Color
+						v15.TextTransparency = theme.TextDefault.Transparency
+						local children2 = {
+							BeforeDisclosureText = createElement8("TextLabel", v15),
+							TermsOfUse = 0,
+							AfterDisclosureText = 0
+						}
+
+						local createElement9 = Roact.createElement
+						local termsOfUseActivatedsByActivated = {}
+						termsOfUseActivatedsByActivated.LayoutOrder = 1
+						termsOfUseActivatedsByActivated.BackgroundTransparency = 1
+						termsOfUseActivatedsByActivated.RichText = true
+						termsOfUseActivatedsByActivated.AutomaticSize = Enum.AutomaticSize.XY
+						local font5
+
+						if not FoundationFontFaceMigration then
+							font5 = font.Body.Font
+						end
+
+						termsOfUseActivatedsByActivated.Font = font5
+						local fontFace4
+
+						if FoundationFontFaceMigration then
+							fontFace4 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+						end
+
+						termsOfUseActivatedsByActivated.FontFace = fontFace4
+
+						termsOfUseActivatedsByActivated.Text = text
+						termsOfUseActivatedsByActivated.TextSize = textSize2
+						termsOfUseActivatedsByActivated.TextColor3 = theme.TextDefault.Color
+						termsOfUseActivatedsByActivated.TextTransparency = theme.TextDefault.Transparency
+						termsOfUseActivatedsByActivated.Selectable = props.termsOfUseActivated ~= nil
+
+						termsOfUseActivatedsByActivated[Roact.Event.Activated] = props.termsOfUseActivated
+						children2.TermsOfUse = createElement9("TextButton", termsOfUseActivatedsByActivated)
+
+						local createElement10 = Roact.createElement
+						local v16 = {
+							LayoutOrder = 2,
+							BackgroundTransparency = 1,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							Font = 0,
+							FontFace = 0,
+							Text = 0,
+							TextSize = 0,
+							TextColor3 = 0,
+							TextTransparency = 0
+						}
+						local font6
+
+						if not FoundationFontFaceMigration then
+							font6 = font.Body.Font
+						end
+
+						v16.Font = font6
+						local fontFace5
+
+						if FoundationFontFaceMigration then
+							fontFace5 = normalizeFontFace(props2.Tokens.Typography.BodyLarge.Font)
+						end
+
+						v16.FontFace = fontFace5
+
+						v16.Text = v6[2]
+						v16.TextSize = textSize2
+						v16.TextColor3 = theme.TextDefault.Color
+						v16.TextTransparency = theme.TextDefault.Transparency
+						children2.AfterDisclosureText = createElement10("TextLabel", v16)
+						disclosureTermsFrame = createElement7(FitFrameVertical, v14, children2)
+					end
+
+					v13.DisclosureTermsFrame = disclosureTermsFrame
+					children.DisclosureFrame = createElement5(FitFrameVertical, v11, v13)
+					return createElement2(FitFrameVertical, v8, children)
+				end,
+				buttonStackInfo = 0,
+				footerContent = 0
+			}
+
+			local buttonStackInfo = {
+				forcedFillDirection = Enum.FillDirection.Vertical,
+				marginBetween = 0,
+				buttons = 0
+			}
+			local marginBetween
+
+			if getEnableCondenseRobuxUpsell() then
+				marginBetween = state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN
+					or Constants.MODAL_NORMAL_BUTTON_MARGIN
+			else
+				marginBetween = Constants.MODAL_NORMAL_BUTTON_MARGIN
+			end
+
+			buttonStackInfo.marginBetween = marginBetween
+			local buttons
+
+			if self.props.isQuest then
+				buttons = {
+					{
 						props = {
 							isDisabled = props.isDisabled,
 							onActivated = props.cancelPurchaseActivated,
-							text = t8.ButtonCancel,
+							text = data.ButtonCancel,
 							inputIcon = props.cancelControllerIcon
 						}
-					}}
-				},
-				footerContent = function() -- line: 1007
-					-- upvalues: p8 (copy), p9 (copy), s1 (ref), t8 (copy)
-					return p8:renderFooterExperiment(p9, s1, t8.BonusBannerInfo)
+					}
+				}
+			else
+				buttons = { nil, nil }
+				local v9 = {
+					props = {
+						isDisabled = props.isDisabled,
+						onActivated = props.cancelPurchaseActivated,
+						text = data.ButtonCancel,
+						inputIcon = props.cancelControllerIcon
+					}
+				}
+
+				local v10 = { buttonType = ButtonType.PrimarySystem, props = 0 }
+				local props3 = {
+					isLoading = props.isLoading,
+					isDisabled = props.isDisabled,
+					isDelayedInput = props.isDelayedInput,
+					enableInputDelayed = props.enableInputDelayed,
+					delayInputSeconds = props.inputDelaySec,
+					onActivated = props.buyItemActivated,
+					text = 0,
+					inputIcon = 0
+				}
+				local text2
+
+				if props.enableInputDelayed then
+					text2 = data.LoadingText
+				else
+					text2 = data.BuyRobuxButton
 				end
-			})
+
+				props3.text = text2
+
+				props3.inputIcon = props.buyItemControllerIcon
+				v10.props = props3
+				buttons[1], buttons[2] = v9, v10
+			end
+
+			buttonStackInfo.buttons = buttons
+			v8.buttonStackInfo = buttonStackInfo
+
+			function v8.footerContent()
+				return self:renderFooterExperiment(props2, v7, data.BonusBannerInfo)
+			end
+
+			return createElement(InteractiveAlert, v8)
 		end)
 	end)
 end
-function v29.renderFooterExperiment(p10, p11, p12, p13) -- line: 1015
-	-- upvalues: Colors (copy), Roact (copy), FitFrameVertical (copy), FFlagLowCogsBannerInfoIcon (copy), InfoIconWithTooltip (copy)
-	local p11Font = p11.Font
-	local Flint = Colors.Flint
 
-	if p12 == "" then
+function extended:renderFooterExperiment(p, text, text2)
+	local font = p.Font
+	local flint = Colors.Flint
+
+	if text == "" then
 		return nil
 	end
 
-	return Roact.createElement(FitFrameVertical, {
+	local createElement = Roact.createElement
+	local v2 = {
 		BackgroundTransparency = 1,
 		width = UDim.new(1, 0),
-		margin = {
-			top = 0,
-			bottom = -24,
-			left = -24,
-			right = -24
-		},
-		[Roact.Ref] = p10.footerRef,
-		[Roact.Change.AbsoluteSize] = p10.changeFooterSize
-	}, {
-		Banner = Roact.createElement("ImageLabel", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
-			Image = "rbxasset://textures/ui/BottomRoundedRect8px.png",
-			ImageColor3 = Color3.fromRGB(239, 215, 140),
-			Size = UDim2.new(1, 0, 0, 40),
-			ScaleType = Enum.ScaleType.Slice,
-			SliceCenter = Rect.new(8, 0, 24, 16),
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, {
-			BannerContent = Roact.createElement(FitFrameVertical, {
-				LayoutOrder = 2,
-				BackgroundTransparency = 1,
-				width = UDim.new(1, 0),
-				margin = {
-					top = 12,
-					bottom = 0,
-					left = 0,
-					right = 0
-				},
-				FillDirection = Enum.FillDirection.Horizontal,
-				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				VerticalAlignment = Enum.VerticalAlignment.Center
-			}, {
-				BonusBefore = Roact.createElement("TextLabel", {
-					LayoutOrder = 1,
-					BackgroundTransparency = 1,
-					RichText = true,
-					TextWrapped = true,
-					AutomaticSize = Enum.AutomaticSize.XY,
-					Font = p11Font.Footer.Font,
-					Text = p12,
-					TextSize = p11Font.BaseSize * p11Font.Footer.RelativeSize,
-					TextColor3 = Flint
-				}),
-				InfoIcon = if not FFlagLowCogsBannerInfoIcon then nil else InfoIconWithTooltip({
-					layoutOrder = 2,
-					text = p13,
-					color = Flint,
-					eventActivated = p10.bonusBannerInfoIconStateChange
-				})
-			})
+		margin = { top = 0, bottom = -24, left = -24, right = -24 },
+		[Roact.Ref] = self.footerRef,
+		[Roact.Change.AbsoluteSize] = self.changeFooterSize
+	}
+
+	local createElement2 = Roact.createElement
+	local v3 = {
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Image = "rbxasset://textures/ui/BottomRoundedRect8px.png",
+		ImageColor3 = Color3.fromRGB(239, 215, 140),
+		Size = UDim2.new(1, 0, 0, 40),
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(8, 0, 24, 16),
+		AutomaticSize = Enum.AutomaticSize.Y
+	}
+
+	local createElement3 = Roact.createElement
+	local v4 = {
+		LayoutOrder = 2,
+		BackgroundTransparency = 1,
+		width = UDim.new(1, 0),
+		margin = { top = 12, bottom = 0, left = 0, right = 0 },
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center
+	}
+
+	local createElement4 = Roact.createElement
+	local v5 = {
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		RichText = true,
+		Font = 0,
+		FontFace = 0,
+		Text = 0,
+		TextSize = 0,
+		TextColor3 = 0,
+		TextWrapped = true
+	}
+	local font2
+
+	if not FoundationFontFaceMigration then
+		font2 = font.Footer.Font
+	end
+
+	v5.Font = font2
+	local fontFace
+
+	if FoundationFontFaceMigration then
+		fontFace = normalizeFontFace(p.Tokens.Typography.CaptionSmall.Font)
+	end
+
+	v5.FontFace = fontFace
+
+	v5.Text = text
+	v5.TextSize = font.BaseSize * font.Footer.RelativeSize
+	v5.TextColor3 = flint
+	local v6 = {
+		BonusBefore = createElement4("TextLabel", v5),
+		InfoIcon = 0
+	}
+	local infoIcon
+
+	if FFlagLowCogsBannerInfoIcon then
+		infoIcon = InfoIconWithTooltip({
+			text = text2,
+			layoutOrder = 2,
+			color = flint,
+			eventActivated = self.bonusBannerInfoIconStateChange
+		})
+	end
+
+	v6.InfoIcon = infoIcon
+	return createElement(FitFrameVertical, v2, {
+		Banner = createElement2("ImageLabel", v3, {
+			BannerContent = createElement3(FitFrameVertical, v4, v6)
 		})
 	})
 end
 
-return v29
+return extended

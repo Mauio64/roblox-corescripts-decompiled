@@ -1,31 +1,28 @@
-local ParentParent = script.Parent.Parent.Parent
+local parent = script.Parent.Parent.Parent
 
-require(ParentParent.util.Types)
-
-local CurveAnimationFrameCalculator = require(ParentParent.util.CurveAnimationFrameCalculator)
+require(parent.util.Types)
+local CurveAnimationFrameCalculator = require(parent.util.CurveAnimationFrameCalculator)
 
 return {
-	getData = function(p1) -- line: 14
-		-- upvalues: CurveAnimationFrameCalculator (copy)
-		if #p1 == 0 then
+	getData = function(list)
+		if #list == 0 then
 			return nil
 		end
 
-		local v4 = p1[1]
-		local ok, result, v7, v8, v9 = pcall(function() -- line: 22
-			-- upvalues: CurveAnimationFrameCalculator (copy), v4 (copy)
-			return CurveAnimationFrameCalculator.calculateAnimFramesAtOrigin(v4)
+		local item = list[1]
+		local success, result, animLength, positionMagnitudeFrames, tracks = pcall(function()
+			return CurveAnimationFrameCalculator.calculateAnimFramesAtOrigin(item)
 		end)
 
-		if not ok then
-			return nil
+		if success then
+			return {
+				animFrames = result,
+				animLength = animLength,
+				positionMagnitudeFrames = positionMagnitudeFrames,
+				tracks = tracks
+			}
 		end
 
-		return {
-			animFrames = result,
-			animLength = v7,
-			positionMagnitudeFrames = v8,
-			tracks = v9
-		}
+		return nil
 	end
 }

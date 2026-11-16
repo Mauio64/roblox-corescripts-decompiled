@@ -1,135 +1,166 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
-local ProfilePlatformParent = ProfilePlatform.Parent
-local React = require(ProfilePlatformParent.React)
-local RoactUtils = require(ProfilePlatformParent.RoactUtils)
-local AppPage = require(ProfilePlatformParent.RobloxAppEnums).AppPage
+local parent = ProfilePlatform.Parent
+local React = require(parent.React)
+
+local RoactUtils = require(parent.RoactUtils)
+local RobloxAppEnums = require(parent.RobloxAppEnums)
+local AppPage = RobloxAppEnums.AppPage
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
-local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
-local NavigationRodux = require(ProfilePlatformParent.NavigationRodux)
+local Localization = require(parent.Localization)
+local useLocalization = Localization.Hooks.useLocalization
+local NavigationRodux = require(parent.NavigationRodux)
 local NavigateDown = NavigationRodux.Thunks.NavigateDown
 local NavigateDownToViewUserProfile = NavigationRodux.Thunks.NavigateDownToViewUserProfile
-local UrlBuilder = require(ProfilePlatformParent.UrlBuilder).UrlBuilder
-local UrlBase = require(ProfilePlatformParent.UrlBuilder).UrlBase
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+local UrlBuilder2 = require(parent.UrlBuilder)
+local UrlBase = UrlBuilder2.UrlBase
+
 local Constants = require(ProfilePlatform.Common.Constants)
-local UIBlox = require(ProfilePlatformParent.UIBlox)
+local UIBlox = require(parent.UIBlox)
 local HorizontalPageMargin = UIBlox.App.Container.HorizontalPageMargin
 local Button = UIBlox.App.Button.Button
 local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local Enums = require(ProfilePlatform.Common.Enums)
+
 local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
 local useProfileAnalyticsContext = require(ProfilePlatform.Contexts.useProfileAnalyticsContext)
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local TextKeys = require(ProfilePlatform.Common.TextKeys)
-local FFlagProfilePlatformUpdateUXForNonSocialCommunities = require(ProfilePlatform.Flags.FFlagProfilePlatformUpdateUXForNonSocialCommunities)
-local FFlagSignalsNavP3Dispatch = require(ProfilePlatformParent.SharedFlags).FFlagSignalsNavP3Dispatch
-local v26 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfilePlatformParent.RobloxAppNavigation).NavigationCommands
+local makeViewGroupPage = require(ProfilePlatform.Utils.makeViewGroupPage)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagEnableGroupOverviewPane = SharedFlags.FFlagEnableGroupOverviewPane
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local navigationCommands
 
-function ViewFullProfile(p1) -- line: 38
-	-- upvalues: FFlagProfilePlatformUpdateUXForNonSocialCommunities (copy), useProfileJsonComponent (copy), Enums (copy), useProfileWrapperContext (copy), useProfileAnalyticsContext (copy), useDispatch (copy), useLocalization (copy), TextKeys (copy), React (copy), EventNames (copy), NavigateDownToViewUserProfile (copy), UrlBuilder (copy), UrlBase (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), NavigateDown (copy), HorizontalPageMargin (copy), Constants (copy), Button (copy), ButtonType (copy)
-	local v28 = if not FFlagProfilePlatformUpdateUXForNonSocialCommunities then nil else useProfileJsonComponent(Enums.Components.ViewFullProfile) or {}
-	local v29 = useProfileWrapperContext()
-	local profileId = v29.profileId
-	local profileType = v29.profileType
-	local v32 = useProfileAnalyticsContext()
-	local v33 = useDispatch()
-	local v34 = useLocalization({
+if FFlagSignalsNavP3Dispatch then
+	local RobloxAppNavigation = require(parent.RobloxAppNavigation)
+	navigationCommands = RobloxAppNavigation.NavigationCommands
+else
+	navigationCommands = nil
+end
+
+function ViewFullProfile(p)
+	local v = useProfileJsonComponent(Enums.Components.ViewFullProfile) or {}
+	local v2 = useProfileWrapperContext()
+	local profileId = v2.profileId
+	local profileType = v2.profileType
+	local v3 = useProfileAnalyticsContext()
+
+	local v4 = useDispatch()
+	local v5 = useLocalization({
 		viewFullProfileLabel = TextKeys.ViewFullProfile,
 		viewCommunityLabel = TextKeys.ViewCommunity
 	})
-	local v35 = React.useMemo(function() -- line: 52
-		-- upvalues: profileType (copy), Enums (copy), v34 (copy), FFlagProfilePlatformUpdateUXForNonSocialCommunities (copy), v28 (copy)
-		if profileType == Enums.ProfileTypes.User then
-			return v34.viewFullProfileLabel
+
+	local useMemo = React.useMemo
+	local function fn()
+		if not (profileType ~= Enums.ProfileTypes.User and profileType == Enums.ProfileTypes.Community and v.type ~= Enums.ViewFullProfileTypes.Profile) then
+			return v5.viewFullProfileLabel
 		end
 
-		if profileType == Enums.ProfileTypes.Community then
-			if not FFlagProfilePlatformUpdateUXForNonSocialCommunities then
-				return v34.viewCommunityLabel
-			end
-
-			if v28.type == Enums.ViewFullProfileTypes.Profile then
-				return v34.viewFullProfileLabel
-			end
-
-			if v28.type == Enums.ViewFullProfileTypes.Community then
-				return v34.viewCommunityLabel
-			end
+		if v.type == Enums.ViewFullProfileTypes.Community then
+			return v5.viewCommunityLabel
 		end
 
-		return v34.viewFullProfileLabel
-	end, { v34 })
-	local v36 = React.useCallback(function() -- line: 74
-		-- upvalues: v32 (copy), EventNames (copy), v29 (copy), Enums (copy), profileType (copy), v33 (copy), NavigateDownToViewUserProfile (copy), profileId (copy), v28 (copy), UrlBuilder (copy), UrlBase (copy), AppPage (copy), FFlagProfilePlatformUpdateUXForNonSocialCommunities (copy), TextKeys (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), NavigateDown (copy)
-		v32.fireAnalyticsEvent(EventNames.ViewPlayerProfileButton, {
-			absolutePosition = v29.sourceInfo.homepageCarouselAbsolutePosition,
-			isHomePageCarousel = v29.sourceInfo.source == Enums.Sources.HomepageFriendsCarousel,
-			source = v29.sourceInfo.source,
-			isRecommendation = v29.sourceInfo.isRecommendation,
-			recommendationContextType = v29.sourceInfo.recommendationContextType,
-			recommendationRank = v29.sourceInfo.recommendationRank,
-			recommendationSessionId = v29.sourceInfo.recommendationSessionId
+		return v5.viewFullProfileLabel
+	end
+
+	local v6
+
+	if FFlagEnableGroupOverviewPane then
+		v6 = profileType
+	end
+
+	local v7
+
+	if FFlagEnableGroupOverviewPane then
+		v7 = v.type
+	end
+
+	local text = useMemo(fn, { v5, v6, v7 })
+
+	local useCallback = React.useCallback
+	local function fn2()
+		v3.fireAnalyticsEvent(EventNames.ViewPlayerProfileButton, {
+			absolutePosition = v2.sourceInfo.homepageCarouselAbsolutePosition,
+			isHomePageCarousel = v2.sourceInfo.source == Enums.Sources.HomepageFriendsCarousel,
+			source = v2.sourceInfo.source,
+			isRecommendation = v2.sourceInfo.isRecommendation,
+			recommendationContextType = v2.sourceInfo.recommendationContextType,
+			recommendationRank = v2.sourceInfo.recommendationRank,
+			recommendationSessionId = v2.sourceInfo.recommendationSessionId
 		})
 
 		if profileType == Enums.ProfileTypes.User then
-			v33(NavigateDownToViewUserProfile(profileId))
+			v4(NavigateDownToViewUserProfile(profileId))
+		elseif profileType == Enums.ProfileTypes.Community then
+			local v8
 
-			return
-		end
-
-		if profileType == Enums.ProfileTypes.Community then
-			local v37 = if v28.type ~= Enums.ViewFullProfileTypes.Profile then UrlBuilder.user.group({
-				groupId = profileId
-			}) else UrlBuilder.new({
-				base = UrlBase.WWW,
-				path = `profiles/{ profileId }`
-			})()
-			local t1 = {
-				name = AppPage.GenericWebPage,
-				detail = v37,
-				extraProps = {
-					titleKey = if not FFlagProfilePlatformUpdateUXForNonSocialCommunities or v28.type ~= Enums.ViewFullProfileTypes.Profile then TextKeys.Community else TextKeys.Profile
+			if v.type == Enums.ViewFullProfileTypes.Profile then
+				v8 = {
+					name = AppPage.GenericWebPage,
+					detail = urlBuilder.new({ base = UrlBase.WWW, path = `profiles/{profileId}` })(),
+					extraProps = { titleKey = TextKeys.Profile }
 				}
-			}
+			else
+				v8 = makeViewGroupPage(profileId)
+			end
 
 			if FFlagSignalsNavP3Dispatch then
-				v26.down(v26.fromLegacyPage(t1))
-
-				return
+				navigationCommands.down(navigationCommands.fromLegacyPage(v8))
+			else
+				v4(NavigateDown(v8))
 			end
-
-			v33(NavigateDown(t1))
 		end
-	end, {
-		v33,
-		profileId,
-		v32,
-		v29
-	})
+	end
 
-	return React.createElement(HorizontalPageMargin, {
-		backgroundTransparency = 1,
-		useAutomaticSizing = true,
-		size = UDim2.fromScale(1, 0),
-		layoutOrder = p1.layoutOrder
-	}, {
-		ViewFullProfileFrame = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			LayoutOrder = p1.layoutOrder
-		}, {
-			UIPadding = React.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, Constants.ADDITIONAL_PADDING)
-			}),
-			ViewFullProfile = React.createElement(Button, {
-				buttonType = ButtonType.Secondary,
-				size = UDim2.new(1, 0, 0, Constants.CTA_BUTTON_HEIGHT),
-				onActivated = v36,
-				text = v35
-			})
-		})
-	})
+	local v8
+
+	if FFlagEnableGroupOverviewPane then
+		v8 = profileType
+	end
+
+	local v9
+
+	if FFlagEnableGroupOverviewPane then
+		v9 = v.type
+	end
+
+	local onActivated = useCallback(fn2, { v4, profileId, v3, v2, v8, v9 })
+
+	return React.createElement(
+		HorizontalPageMargin,
+		{
+			size = UDim2.fromScale(1, 0),
+			backgroundTransparency = 1,
+			layoutOrder = p.layoutOrder,
+			useAutomaticSizing = true
+		},
+		{
+			ViewFullProfileFrame = React.createElement(
+				"Frame",
+				{
+					Size = UDim2.fromScale(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					LayoutOrder = p.layoutOrder
+				},
+				{
+					UIPadding = React.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, Constants.ADDITIONAL_PADDING)
+					}),
+					ViewFullProfile = React.createElement(Button, {
+						buttonType = ButtonType.Secondary,
+						size = UDim2.new(1, 0, 0, Constants.CTA_BUTTON_HEIGHT),
+						onActivated = onActivated,
+						text = text
+					})
+				}
+			)
+		}
+	)
 end
 
 return ViewFullProfile

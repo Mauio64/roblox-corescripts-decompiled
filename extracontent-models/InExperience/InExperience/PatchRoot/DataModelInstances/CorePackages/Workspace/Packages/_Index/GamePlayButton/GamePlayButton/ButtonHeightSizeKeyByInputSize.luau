@@ -1,5 +1,7 @@
-local Parent = script:FindFirstAncestor("GamePlayButton").Parent
-local InputSize = require(Parent.Foundation).Enums.InputSize
+local parent = script:FindFirstAncestor("GamePlayButton").Parent
+
+local Foundation = require(parent.Foundation)
+local InputSize = Foundation.Enums.InputSize
 
 return {
 	[InputSize.XSmall] = "Size_600",

@@ -3,122 +3,124 @@ local MomentsCommon = script:FindFirstAncestor("MomentsCommon")
 require(MomentsCommon.Media.MediaTypes)
 require(MomentsCommon.Media.mediaNodeRegistry)
 
-local function toAssetUri(p1) -- line: 76
-	if typeof(p1) == "string" and string.find(p1, "://") ~= nil then
-		return p1
+local function toAssetUri(assetId) -- 1 equivalent call inferred from this helper
+	if typeof(assetId) == "string" and string.find(assetId, "://") ~= nil then
+		return assetId
 	end
 
-	return `rbxassetid://{ p1 }`
+	return `rbxassetid://{assetId}`
 end
-local function createMusicNode(p2, p3) -- line: 83
-	local parent = p2.parent
 
+local function createMusicNode(data, p)
+	local parent = data.parent
 	assert(parent ~= nil, "createMusicNode: spec.parent (the item media folder) is required")
 
-	local assetId = p2.assetId
-	local v9 = if typeof(assetId) ~= "string" or string.find(assetId, "://") == nil then `rbxassetid://{ assetId }` else assetId
-	local v10 = Content.fromUri(v9)
-	local v11 = p2.startTime or 0
-	local trimmedLen = p2.trimmedLen
-	local t1 = {
-		startTime = v11,
-		endTime = if trimmedLen == nil then nil else v11 + trimmedLen
-	}
-	local v14 = p2.volume or 1
-	local AudioPlayer = Instance.new("AudioPlayer")
+	local content = Content.fromUri(toAssetUri(data.assetId)) -- inferred equivalent call
+	local startTime = data.startTime or 0
+	local trimmedLen = data.trimmedLen
+	local region = { startTime = startTime, endTime = 0 }
+	local endTime
 
-	AudioPlayer.Name = `Music_{ p2.id }`
-	AudioPlayer.AudioContent = v10
-	AudioPlayer.PlaybackSpeed = 0
-	AudioPlayer.TimePosition = v11
-	AudioPlayer.Parent = parent
+	if trimmedLen ~= nil then
+		endTime = startTime + trimmedLen
+	end
 
-	local u16 = false
+	region.endTime = endTime
+
+	local volume = data.volume or 1
+
+	local audioPlayer = Instance.new("AudioPlayer")
+	audioPlayer.Name = `Music_{data.id}`
+
+	audioPlayer.AudioContent = content
+
+	audioPlayer.PlaybackSpeed = 0
+	audioPlayer.TimePosition = startTime
+	audioPlayer.Parent = parent
+
+	local flag = false
+
+	local function download()
+		if flag then
+			return
+		end
+
+		p.contentProvider:PreloadAsync({ content.Uri })
+	end
+
+	local function play()
+		if flag then
+			return
+		end
+
+		audioPlayer.PlaybackSpeed = 1
+
+		if not audioPlayer.IsPlaying then
+			audioPlayer:Play()
+		end
+	end
+
+	local function pause()
+		if flag then
+			return
+		end
+
+		audioPlayer.PlaybackSpeed = 0
+	end
+
+	local function seek(p2: number)
+		if flag then
+			return
+		end
+
+		local timePosition = startTime + p2
+		local timeLength = audioPlayer.TimeLength
+
+		if timeLength > 0 then
+			timePosition = math.clamp(timePosition, 0, timeLength)
+		end
+
+		audioPlayer.TimePosition = timePosition
+	end
+
+	local function realignToRegionStart()
+		if flag then
+			return
+		end
+
+		audioPlayer.TimePosition = startTime
+	end
+
+	local function dispose()
+		if flag then
+			return
+		end
+
+		flag = true
+		audioPlayer:Destroy()
+	end
 
 	return {
+		id = data.id,
 		kind = "music",
+		assets = function()
+			return { content }
+		end,
+		download = download,
 		usesDecoder = false,
-		id = p2.id,
-		assets = function() -- line: 109
-			-- upvalues: v10 (copy)
-			return { v10 }
+		getAudioSource = function()
+			return audioPlayer
 		end,
-		download = function() -- line: 113
-			-- upvalues: u16 (ref), p3 (copy), v10 (copy)
-			if u16 then
-				return
-			end
-
-			p3.contentProvider:PreloadAsync({ v10.Uri })
+		audioStem = { stemId = data.id, defaultVolume = volume },
+		play = play,
+		pause = pause,
+		seek = seek,
+		realignToRegionStart = realignToRegionStart,
+		getRegion = function()
+			return region
 		end,
-		getAudioSource = function() -- line: 123
-			-- upvalues: AudioPlayer (copy)
-			return AudioPlayer
-		end,
-		audioStem = {
-			stemId = p2.id,
-			defaultVolume = v14
-		},
-		play = function() -- line: 127
-			-- upvalues: u16 (ref), AudioPlayer (copy)
-			if u16 then
-				return
-			end
-
-			AudioPlayer.PlaybackSpeed = 1
-
-			if not AudioPlayer.IsPlaying then
-				AudioPlayer:Play()
-			end
-		end,
-		pause = function() -- line: 137
-			-- upvalues: u16 (ref), AudioPlayer (copy)
-			if u16 then
-				return
-			end
-
-			AudioPlayer.PlaybackSpeed = 0
-		end,
-		seek = function(n1: number) -- line: 146
-			-- upvalues: u16 (ref), v11 (copy), AudioPlayer (copy)
-			if u16 then
-				return
-			end
-
-			local v18 = v11 + n1
-			local TimeLength = AudioPlayer.TimeLength
-
-			if TimeLength > 0 then
-				v18 = math.clamp(v18, 0, TimeLength)
-			end
-
-			AudioPlayer.TimePosition = v18
-		end,
-		realignToRegionStart = function() -- line: 158
-			-- upvalues: u16 (ref), AudioPlayer (copy), v11 (copy)
-			if u16 then
-				return
-			end
-
-			AudioPlayer.TimePosition = v11
-		end,
-		getRegion = function() -- line: 165
-			-- upvalues: t1 (copy)
-			return t1
-		end,
-		dispose = function() -- line: 169
-			-- upvalues: u16 (ref), AudioPlayer (copy)
-			if u16 then
-				return
-			end
-
-			u16 = true
-			AudioPlayer:Destroy()
-		end
+		dispose = dispose
 	}
 end
 
-return {
-	kind = "music",
-	create = createMusicNode
-}
+return { kind = "music", create = createMusicNode }

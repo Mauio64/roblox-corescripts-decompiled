@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.ExpChatDebug.ExpChatDebug))
+local ExpChatDebug = require(Workspace.ExpChatDebug.ExpChatDebug)
+
+return ExpChatDebug

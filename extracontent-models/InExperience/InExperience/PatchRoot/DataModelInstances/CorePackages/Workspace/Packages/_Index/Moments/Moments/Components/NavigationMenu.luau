@@ -1,95 +1,85 @@
-local Parent = script:FindFirstAncestor("Moments").Parent
-local BuilderIcons = require(Parent.BuilderIcons)
-local Foundation = require(Parent.Foundation)
-local Localization = require(Parent.Localization)
-local MomentsCommon = require(Parent.MomentsCommon)
-local React = require(Parent.React)
+local Moments = script:FindFirstAncestor("Moments")
+local parent = Moments.Parent
+
+local BuilderIcons = require(parent.BuilderIcons)
+local Foundation = require(parent.Foundation)
+local Localization = require(parent.Localization)
+local MomentsCommon = require(parent.MomentsCommon)
+local React = require(parent.React)
+
+local FFlagMomentsFollowingFeed = require(Moments.Flags.FFlagMomentsFollowingFeed)
+local useTrendingFeedLabel = require(Moments.Hooks.useTrendingFeedLabel)
+
 local ThreeDotsHorizontal = BuilderIcons.Icon.ThreeDotsHorizontal
+
 local IconButton = Foundation.IconButton
 local Menu = Foundation.Menu
+
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local InputSize = Foundation.Enums.InputSize
+
 local useLocalization = Localization.Hooks.useLocalization
 local useToggleState = MomentsCommon.Hooks.useToggleState
-local t1 = {
+
+local v = {
 	trending = "Feature.Moments.Label.FeedTrending",
 	myMoments = "Feature.Moments.Label.FeedMyMoments"
 }
 
-local function NavigationMenu(t2: {[any]: any}) -- line: 43
-	-- upvalues: useLocalization (copy), t1 (copy), useToggleState (copy), React (copy), IconButton (copy), ThreeDotsHorizontal (copy), ButtonVariant (copy), InputSize (copy), Menu (copy), Foundation (copy)
-	local v17 = useLocalization(t1)
-	local v18 = useToggleState()
-	local v19 = React.useCallback(function() -- line: 50
-		-- upvalues: v18 (copy)
-		if v18.enabled then
-			v18.disable()
+local function NavigationMenu(props)
+	local v2 = useLocalization(v)
+	local text = v2.trending
 
-			return
+	if FFlagMomentsFollowingFeed then
+		text = useTrendingFeedLabel()
+	end
+
+	local v3 = useToggleState()
+
+	local onActivated = React.useCallback(function()
+		if v3.enabled then
+			v3.disable()
+		else
+			v3.enable()
 		end
+	end, { v3.enabled, v3.enable, v3.disable })
 
-		v18.enable()
-	end, {
-		v18.enabled,
-		v18.enable,
-		v18.disable
-	})
-	local v20 = React.useCallback(function() -- line: 58
-		-- upvalues: v18 (copy), t2 (copy)
-		v18.disable()
-		t2.onNavigateToTrending()
-	end, {
-		v18.disable,
-		t2.onNavigateToTrending
-	})
-	local v21 = React.useCallback(function() -- line: 63
-		-- upvalues: v18 (copy), t2 (copy)
-		v18.disable()
-		t2.onNavigateToMyMoments()
-	end, {
-		v18.disable,
-		t2.onNavigateToMyMoments
-	})
-	local v22 = React.useMemo(function() -- line: 68
-		-- upvalues: v17 (copy), v20 (copy), v21 (copy)
+	local onActivated2 = React.useCallback(function()
+		v3.disable()
+		props.onNavigateToTrending()
+	end, { v3.disable, props.onNavigateToTrending })
+
+	local onActivated3 = React.useCallback(function()
+		v3.disable()
+		props.onNavigateToMyMoments()
+	end, { v3.disable, props.onNavigateToMyMoments })
+
+	local items = React.useMemo(function()
 		return {
-			{
-				id = "trending",
-				text = v17.trending,
-				onActivated = v20
-			},
-			{
-				id = "myMoments",
-				text = v17.myMoments,
-				onActivated = v21
-			}
+			{ id = "trending", text = text, onActivated = onActivated2 },
+			{ id = "myMoments", text = v2.myMoments, onActivated = onActivated3 }
 		}
-	end, {
-		v20,
-		v21,
-		v17
-	})
-	local v23 = React.createElement(IconButton, {
+	end, { onActivated2, onActivated3, v2, text })
+
+	local element = React.createElement(IconButton, {
+		LayoutOrder = props.layoutOrder,
+		icon = ThreeDotsHorizontal,
+		onActivated = onActivated,
+		variant = props.buttonVariant or ButtonVariant.OverMedia,
+		size = InputSize.Medium,
 		isCircular = true,
 		Selectable = true,
-		LayoutOrder = t2.layoutOrder,
-		icon = ThreeDotsHorizontal,
-		onActivated = v19,
-		variant = t2.buttonVariant or ButtonVariant.OverMedia,
-		size = InputSize.Medium,
-		testId = t2.buttonTestId or "--moments-navigation-menu-button"
+		testId = props.buttonTestId or "--moments-navigation-menu-button"
 	})
 
 	return React.createElement(Menu, {
 		align = Foundation.Enums.PopoverAlign.End,
-		isOpen = v18.enabled,
-		items = v22,
-		LayoutOrder = t2.layoutOrder,
-		onPressedOutside = v18.disable,
+		isOpen = v3.enabled,
+		items = items,
+		LayoutOrder = props.layoutOrder,
+		onPressedOutside = v3.disable,
 		side = Foundation.Enums.PopoverSide.Bottom
-	}, {
-		MoreMenuButton = v23
-	})
+	}, { MoreMenuButton = element })
 end
 
 return NavigationMenu

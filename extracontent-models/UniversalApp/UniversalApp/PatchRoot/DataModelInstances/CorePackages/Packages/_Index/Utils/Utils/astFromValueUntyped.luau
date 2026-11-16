@@ -1,140 +1,105 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
-local t1 = {}
-local Kind = require(ParentParent.GraphQL).Kind
+
+local GraphQL = require(parent.GraphQL)
+local Kind = GraphQL.Kind
+
 local Error = LuauPolyfill.Error
 local Number = LuauPolyfill.Number
 local Object = LuauPolyfill.Object
-local LuauRegExp = require(ParentParent.LuauRegExp)
-local u11 = nil
 
-local function isFinite(p1) -- line: 31
-	-- upvalues: Number (copy)
-	local ok, result = pcall(function() -- line: 32
-		-- upvalues: p1 (copy), Number (copy)
-		local num = tonumber(p1)
+local LuauRegExp = require(parent.LuauRegExp)
 
-		if Number.isNaN(num) or num == 1e999 or num == -1e999 then
-			return false
-		end
+local v = nil
 
-		return true
+local function isFinite(p)
+	local success, result = pcall(function(): boolean
+		local v2 = tonumber(p)
+
+		return not Number.isNaN(v2) and v2 ~= 1e999 and v2 ~= -1e999
 	end)
-
-	if not ok then
-		return false
-	end
-
-	return result
+	return if success then result else false
 end
-local function astFromValueUntyped(p2) -- line: 61
-	-- upvalues: Object (copy), Kind (copy), Boolean (copy), Array (copy), astFromValueUntyped (copy), Number (copy), u11 (ref), Error (copy)
-	if p2 == Object.None then
-		return {
-			kind = Kind.NULL
-		}
+
+local function astFromValueUntyped(value)
+	if value == Object.None then
+		return { kind = Kind.NULL }
 	end
 
-	if p2 == nil then
+	if value == nil then
 		return nil
 	end
 
-	if Boolean.toJSBoolean(Array.isArray(p2)) then
-		local t2 = {}
+	if Boolean.toJSBoolean(Array.isArray(value)) then
+		local values = {}
 
-		for _, v20 in p2 do
-			local v21 = astFromValueUntyped(v20)
+		for _, item in value do
+			local v2 = astFromValueUntyped(item)
 
-			if v21 ~= nil then
-				table.insert(t2, v21)
+			if v2 ~= nil then
+				table.insert(values, v2)
 			end
 		end
 
-		return {
-			kind = Kind.LIST,
-			values = t2
-		}
-	end
+		return { kind = Kind.LIST, values = values }
+	elseif typeof(value) == "table" then
+		local fields = {}
 
-	if typeof(p2) == "table" then
-		local t3 = {}
+		for k in value do
+			local v2 = astFromValueUntyped(value[tostring(k)])
 
-		for v23 in p2 do
-			local v24 = p2[tostring(v23)]
-			local v25 = astFromValueUntyped(v24)
-
-			if Boolean.toJSBoolean(v25) then
-				table.insert(t3, {
+			if Boolean.toJSBoolean(v2) then
+				table.insert(fields, {
 					kind = Kind.OBJECT_FIELD,
-					name = {
-						kind = Kind.NAME,
-						value = v23
-					},
-					value = v25
+					name = { kind = Kind.NAME, value = k },
+					value = v2
 				})
 			end
 		end
 
-		return {
-			kind = Kind.OBJECT,
-			fields = t3
-		}
-	end
-
-	if typeof(p2) == "boolean" then
-		return {
-			kind = Kind.BOOLEAN,
-			value = p2
-		}
-	end
-
-	local toJSBoolean = Boolean.toJSBoolean
-	local v27 = false
-
-	if typeof(p2) == "number" then
-		local ok, result = pcall(function() -- line: 32
-			-- upvalues: p2 (copy), Number (copy)
-			local num = tonumber(p2)
-
-			if Number.isNaN(num) or num == 1e999 or num == -1e999 then
-				return false
-			end
-
-			return true
-		end)
-
-		v27 = if ok then result else false
-	end
-
-	if toJSBoolean(v27) then
-		local str = tostring(p2)
-
-		if Boolean.toJSBoolean(u11:test(str)) then
-			return {
-				kind = Kind.INT,
-				value = str
-			}
+		return { kind = Kind.OBJECT, fields = fields }
+	else
+		if typeof(value) == "boolean" then
+			return { kind = Kind.BOOLEAN, value = value }
 		end
 
-		return {
-			kind = Kind.FLOAT,
-			value = str
-		}
-	end
+		local toJSBoolean = Boolean.toJSBoolean
+		local result
 
-	if typeof(p2) == "string" then
-		return {
-			kind = Kind.STRING,
-			value = p2
-		}
-	end
+		if typeof(value) == "number" then
+			local success
+			success, result = pcall(function(): boolean
+				local v2 = tonumber(value)
 
-	error(Error.new(("Cannot convert value to AST: %s."):format((tostring(p2)))))
+				return not Number.isNaN(v2) and v2 ~= 1e999 and v2 ~= -1e999
+			end)
+
+			if not success then
+				result = false
+			end
+		else
+			result = false
+		end
+
+		if toJSBoolean(result) then
+			local v2 = tostring(value)
+
+			if Boolean.toJSBoolean(v:test(v2)) then
+				return { kind = Kind.INT, value = v2 }
+			end
+
+			return { kind = Kind.FLOAT, value = v2 }
+		end
+
+		if typeof(value) == "string" then
+			return { kind = Kind.STRING, value = value }
+		end
+
+		error(Error.new(("Cannot convert value to AST: %s."):format((tostring(value)))))
+	end
 end
 
-t1.astFromValueUntyped = astFromValueUntyped
-u11 = LuauRegExp("^-?(?:0|[1-9][0-9]*)$")
-
-return t1
+v = LuauRegExp("^-?(?:0|[1-9][0-9]*)$")
+return { astFromValueUntyped = astFromValueUntyped }

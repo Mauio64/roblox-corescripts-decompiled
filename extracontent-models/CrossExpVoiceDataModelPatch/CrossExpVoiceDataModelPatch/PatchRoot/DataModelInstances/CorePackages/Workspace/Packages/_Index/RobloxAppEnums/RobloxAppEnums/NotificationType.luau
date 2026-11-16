@@ -1,6 +1,8 @@
 local GuiService = game:GetService("GuiService")
-local ok, result = pcall(GuiService.GetNotificationTypeList, GuiService)
-local t1 = {
+
+local success, notificationTypeList = pcall(GuiService.GetNotificationTypeList, GuiService)
+
+return success and notificationTypeList or {
 	VIEW_PROFILE = 0,
 	REPORT_ABUSE = 1,
 	VIEW_GAME_DETAILS = 2,
@@ -42,5 +44,3 @@ local t1 = {
 	GAME_STREAMING_STATUS_CHANGED = 43,
 	POST_PURCHASE = 44
 }
-
-return ok and result or t1

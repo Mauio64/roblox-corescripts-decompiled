@@ -1,3 +1,4 @@
 local CorePackages = game:GetService("CorePackages")
 
-return (require(CorePackages.Workspace.Packages.RobloxApolloClient).initializeApolloClient({}))
+local RobloxApolloClient = require(CorePackages.Workspace.Packages.RobloxApolloClient)
+return (RobloxApolloClient.initializeApolloClient({}))

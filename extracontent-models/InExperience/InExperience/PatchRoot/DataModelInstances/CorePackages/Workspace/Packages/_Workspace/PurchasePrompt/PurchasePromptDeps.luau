@@ -1,3 +1,5 @@
-local _Index = script.Parent.Parent.Parent._Index
+local index = script.Parent.Parent.Parent._Index
 
-return (require(_Index.PurchasePromptDeps.PurchasePromptDeps))
+local PurchasePromptDeps = require(index.PurchasePromptDeps.PurchasePromptDeps)
+
+return PurchasePromptDeps

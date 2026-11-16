@@ -1,8 +1,11 @@
-local ParentParent = script.Parent.Parent
-local ItemType = require(ParentParent.Enums.ItemType)
-local PurchaseError = require(ParentParent.Enums.PurchaseError)
-local Symbol = require(ParentParent.Symbols.Symbol)
+local parent = script.Parent.Parent
+
+local ItemType = require(parent.Enums.ItemType)
+local PurchaseError = require(parent.Enums.PurchaseError)
+local Symbol = require(parent.Symbols.Symbol)
+
 local KeyMappings = require(script.Parent.KeyMappings)
+
 local _ = {
 	["en-us"] = ",",
 	["en-gb"] = ",",
@@ -23,56 +26,58 @@ local _ = {
 	["th-th"] = ",",
 	["tr-tr"] = "."
 }
-local v7 = Symbol.named("FormattedParam")
 
-local function isFormattedParam(p1) -- line: 44
-	-- upvalues: v7 (copy)
-	return typeof(p1) == "table" and p1[v7] == true
-end
-local function createFormattedParam(p2) -- line: 48
-	-- upvalues: v7 (copy)
-	return {
-		[v7] = true,
-		format = p2
-	}
-end
-local function getLocalizedString(p3, p4) -- line: 58
-	local translations = p3.translations
-	local fallbackTranslations = p3.fallbackTranslations
+local named = Symbol.named("FormattedParam")
 
-	if fallbackTranslations ~= nil and translations[p4] == nil then
-		return fallbackTranslations[p4]
+local function isFormattedParam(p): boolean
+	return typeof(p) == "table" and p[named] == true
+end
+
+local function createFormattedParam(format)
+	return { [named] = true, format = format }
+end
+
+local function getLocalizedString(p, p2)
+	local translations = p.translations
+	local fallbackTranslations = p.fallbackTranslations
+
+	if fallbackTranslations == nil or translations[p2] ~= nil then
+		return translations[p2]
 	end
 
-	return translations[p4]
+	return fallbackTranslations[p2]
 end
-local function addGroupDelimiters(p5, p6) -- line: 81
-	local v20 = string.format("%%1%s%%2", p6)
+
+local function addGroupDelimiters(value, p)
+	local v = string.format("%%1%s%%2", p)
 
 	repeat
-		local count
+		local v2
+		value, v2 = string.gsub(value, "^(-?%d+)(%d%d%d)", v)
+	until v2 == 0
 
-		p5, count = string.gsub(p5, "^(-?%d+)(%d%d%d)", v20)
-	until count == 0
-
-	return p5
+	return value
 end
 
-return {
-	getKeyFromItemType = function(p7) -- line: 98
-		-- upvalues: ItemType (copy), KeyMappings (copy)
-		assert(ItemType.isMember(p7) or (typeof(p7) == "number" or typeof(p7) == "string"), "provided item type " .. tostring(p7) .. " must be a number, string, or ItemType enum")
+local LocalizationService = {}
 
-		if p7 == ItemType.Bundle then
-			return "CoreScripts.PurchasePrompt.ItemType.Bundle"
-		end
+function LocalizationService.getKeyFromItemType(value)
+	assert(
+		ItemType.isMember(value) or typeof(value) == "number" or typeof(value) == "string",
+		"provided item type " .. tostring(value) .. " must be a number, string, or ItemType enum"
+	)
 
-		return KeyMappings.AssetTypeById[tostring(p7)]
-	end,
-	getErrorKey = function(p8) -- line: 122
-		-- upvalues: PurchaseError (copy), KeyMappings (copy)
-		assert(PurchaseError.isMember(p8), "provided value " .. tostring(p8) .. " is not a member of PurchaseError enum")
-
-		return KeyMappings.PurchaseErrorKey[p8]
+	if value == ItemType.Bundle then
+		return "CoreScripts.PurchasePrompt.ItemType.Bundle"
 	end
-}
+
+	return KeyMappings.AssetTypeById[tostring(value)]
+end
+
+function LocalizationService.getErrorKey(p)
+	assert(PurchaseError.isMember(p), "provided value " .. tostring(p) .. " is not a member of PurchaseError enum")
+
+	return KeyMappings.PurchaseErrorKey[p]
+end
+
+return LocalizationService

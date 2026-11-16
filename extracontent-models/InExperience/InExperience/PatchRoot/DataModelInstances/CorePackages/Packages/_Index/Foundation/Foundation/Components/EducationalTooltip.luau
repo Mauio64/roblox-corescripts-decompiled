@@ -1,1 +1,3 @@
-return (require(script.EducationalTooltip))
+local EducationalTooltip = require(script.EducationalTooltip)
+
+return EducationalTooltip

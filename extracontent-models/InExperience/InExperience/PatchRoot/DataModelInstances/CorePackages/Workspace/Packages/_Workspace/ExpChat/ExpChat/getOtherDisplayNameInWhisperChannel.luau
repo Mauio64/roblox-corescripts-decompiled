@@ -1,17 +1,15 @@
 local Players = game:GetService("Players")
 
-local function getOtherDisplayNameInWhisperChannel(p1, p2) -- line: 3
-	-- upvalues: Players (copy)
-	for _, child in ipairs(p1:GetChildren()) do
-		if not child:IsA("TextSource") then
+local function getOtherDisplayNameInWhisperChannel(instance, p)
+	for _, textSource in ipairs(instance:GetChildren()) do
+		if not textSource:IsA("TextSource") then
 			continue
 		end
 
-		local UserId = child.UserId
-		local PlayerByUserId = Players:GetPlayerByUserId(UserId)
+		local playerByUserId = Players:GetPlayerByUserId(textSource.UserId)
 
-		if PlayerByUserId and PlayerByUserId ~= p2 then
-			return PlayerByUserId.DisplayName
+		if playerByUserId and playerByUserId ~= p then
+			return playerByUserId.DisplayName
 		end
 	end
 

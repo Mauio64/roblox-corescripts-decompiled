@@ -1,11 +1,8 @@
-local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local FFlagExpChatEnableFriendsTab = require(AppChatParent.SharedFlags).FFlagExpChatEnableFriendsTab
-local getFFlagAppChatRequestedRoute = require(AppChat.Flags.getFFlagAppChatRequestedRoute)
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-game:DefineFastFlag("AppChatEnableRootedNavigation2", false)
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 
-return function() -- line: 9
-	-- upvalues: FFlagExpChatEnableFriendsTab (copy), getFFlagAppChatRequestedRoute (copy)
-	return game:GetFastFlag("AppChatEnableRootedNavigation2") and (FFlagExpChatEnableFriendsTab and getFFlagAppChatRequestedRoute())
+return function()
+	return FFlagExpChatEnableFriendsTab
 end

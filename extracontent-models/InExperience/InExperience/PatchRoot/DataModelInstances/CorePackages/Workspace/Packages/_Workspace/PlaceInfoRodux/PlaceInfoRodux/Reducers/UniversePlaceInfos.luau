@@ -1,20 +1,24 @@
 local PlaceInfoRodux = script:FindFirstAncestor("PlaceInfoRodux")
-local PlaceInfoRoduxParent = PlaceInfoRodux.Parent
-local Immutable = require(PlaceInfoRoduxParent.AppCommonLib).Immutable
-local ReceivedPlacesInfos = require(PlaceInfoRodux.Actions).ReceivedPlacesInfos
-local ConvertUniverseIdToString = require(PlaceInfoRoduxParent.SharedFlags).ConvertUniverseIdToString
+local parent = PlaceInfoRodux.Parent
 
-return function(p1, p2) -- line: 9
-	-- upvalues: ReceivedPlacesInfos (copy), ConvertUniverseIdToString (copy), Immutable (copy)
-	local v8 = p1 or {}
+local AppCommonLib = require(parent.AppCommonLib)
+local Immutable = AppCommonLib.Immutable
+local Actions = require(PlaceInfoRodux.Actions)
+local ReceivedPlacesInfos = Actions.ReceivedPlacesInfos
 
-	if p2.type == ReceivedPlacesInfos.name then
-		for _, v in pairs(p2.placesInfos) do
-			local v11 = ConvertUniverseIdToString(v.universeId)
+local SharedFlags = require(parent.SharedFlags)
+local ConvertUniverseIdToString = SharedFlags.ConvertUniverseIdToString
 
-			v8 = Immutable.Set(v8, v11, v)
+return function(options, p)
+	local v = options or {}
+
+	if p.type == ReceivedPlacesInfos.name then
+		for _, placesInfo in pairs(p.placesInfos) do
+			local convertUniverseIdToString = ConvertUniverseIdToString(placesInfo.universeId)
+
+			v = Immutable.Set(v, convertUniverseIdToString, placesInfo)
 		end
 	end
 
-	return v8
+	return v
 end

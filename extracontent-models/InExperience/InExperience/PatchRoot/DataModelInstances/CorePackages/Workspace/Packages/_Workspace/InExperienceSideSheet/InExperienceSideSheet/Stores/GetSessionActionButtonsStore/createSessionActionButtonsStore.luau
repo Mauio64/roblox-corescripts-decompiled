@@ -1,16 +1,32 @@
 local UserInputService = game:GetService("UserInputService")
 local InExperienceSideSheet = script:FindFirstAncestor("InExperienceSideSheet")
-local InExperienceSideSheetParent = InExperienceSideSheet.Parent
-local Signals = require(InExperienceSideSheetParent.Signals)
-local Responsive = require(InExperienceSideSheetParent.Responsive)
+
+local parent = InExperienceSideSheet.Parent
+
+local Signals = require(parent.Signals)
+
+local Responsive = require(parent.Responsive)
 local GetInputModeStore = Responsive.GetInputModeStore
 local Input = Responsive.Input
-local IconName = require(InExperienceSideSheetParent.Foundation).Enums.IconName
+
+local Foundation = require(parent.Foundation)
+local IconName = Foundation.Enums.IconName
+
 local Enums = require(InExperienceSideSheet.Common.Enums)
 local Constants = require(InExperienceSideSheet.Common.Constants)
-local FFlagDebugEnablePioneerUX = require(InExperienceSideSheetParent.SharedFlags).FFlagDebugEnablePioneerUX
+require(InExperienceSideSheet.Common.Types)
+
+local PioneerUtils = require(parent.PioneerUtils)
+local isPioneerLaunch = PioneerUtils.isPioneerLaunch
+
+local SwitchServer = require(parent.SwitchServer)
+local GetSwitchServerStore = SwitchServer.GetSwitchServerStore
+
 local GetActionBindingsStore = require(InExperienceSideSheet.Stores.GetActionBindingsStore)
-local t1 = {
+
+local ButtonWidth = Enums.ButtonWidth
+
+local v = {
 	["rbxasset://textures/ui/Controls/DefaultController/ButtonX@2x.png"] = IconName.XboxX,
 	["rbxasset://textures/ui/Controls/DefaultController/ButtonY@2x.png"] = IconName.XboxY,
 	["rbxasset://textures/ui/Controls/XboxController/ButtonX@2x.png"] = IconName.XboxX,
@@ -19,89 +35,128 @@ local t1 = {
 	["rbxasset://textures/ui/Controls/PlayStationController/ButtonTriangle@2x.png"] = IconName.PsTriagle
 }
 
-local function createSessionActionButtonsStore() -- line: 49
-	-- upvalues: GetActionBindingsStore (copy), Signals (copy), FFlagDebugEnablePioneerUX (copy), Constants (copy), Enums (copy), GetInputModeStore (copy), Input (copy), UserInputService (copy), t1 (copy)
-	local sessionActionBindings = GetActionBindingsStore().sessionActionBindings
-	local v16, v17 = Signals.createSignal(nil)
-	local v18, v19 = Signals.createSignal(nil)
-	local t2 = {
-		{
-			name = "LeaveButton",
-			keyboardIcon = "icons/controls/keys/key_l",
-			isEmphasis = true,
-			label = not FFlagDebugEnablePioneerUX and "CoreScripts.InGameMenu.LeaveGame" or Constants.LocalizationKeys.LogoutButton,
-			gamepadKeyCode = Enum.KeyCode.ButtonX,
-			getShortcutIcon = v16,
-			setShortcutIcon = v17,
-			getOnActivated = sessionActionBindings[Enums.ActionBinding.Leave].getOnActivated,
-			getIsEnabled = sessionActionBindings[Enums.ActionBinding.Leave].getIsEnabled
-		},
-		{
-			name = "RespawnButton",
-			label = "CoreScripts.InGameMenu.QuickActions.Respawn",
-			keyboardIcon = "icons/controls/keys/key_r",
-			isEmphasis = false,
-			gamepadKeyCode = Enum.KeyCode.ButtonY,
-			getShortcutIcon = v18,
-			setShortcutIcon = v19,
-			getOnActivated = sessionActionBindings[Enums.ActionBinding.Respawn].getOnActivated,
-			getIsEnabled = sessionActionBindings[Enums.ActionBinding.Respawn].getIsEnabled
-		}
-	}
-	local connection = nil
-	local v22 = Signals.createEffect(function(p1) -- line: 84
-		-- upvalues: GetInputModeStore (copy), connection (ref), Input (copy), t2 (copy), UserInputService (copy), t1 (copy)
-		local v24 = GetInputModeStore(p1).getLastInputType(p1)
+local function getIsSwitchServerButtonHidden(p): boolean
+	return not GetSwitchServerStore(p).shouldEnableSwitchServer(p)
+end
 
-		if connection then
-			connection:Disconnect()
+local function createRespawnButtonConfig(sessionActionBindings, signal, setShortcutIcon)
+	return {
+		name = "RespawnButton",
+		label = "CoreScripts.InGameMenu.QuickActions.Respawn",
+		keyboardIcon = IconName.SquareTextR,
+		gamepadKeyCode = Enum.KeyCode.ButtonY,
+		getShortcutIcon = signal,
+		setShortcutIcon = setShortcutIcon,
+		getOnActivated = sessionActionBindings[Enums.ActionBinding.Respawn].getOnActivated,
+		getIsEnabled = sessionActionBindings[Enums.ActionBinding.Respawn].getIsEnabled,
+		width = ButtonWidth.Full
+	}
+end
+
+local function createLeaveButtonConfig(sessionActionBindings, signal, setShortcutIcon, pioneerLaunch: boolean)
+	local leaveButtonConfig = {
+		name = "LeaveButton",
+		label = not pioneerLaunch and "CoreScripts.InGameMenu.LeaveGame" or Constants.LocalizationKeys.QuitButton,
+		keyboardIcon = IconName.SquareTextL,
+		gamepadKeyCode = Enum.KeyCode.ButtonX,
+		getShortcutIcon = signal,
+		setShortcutIcon = setShortcutIcon,
+		getOnActivated = sessionActionBindings[Enums.ActionBinding.Leave].getOnActivated,
+		getIsEnabled = sessionActionBindings[Enums.ActionBinding.Leave].getIsEnabled,
+		width = 0
+	}
+	local width
+
+	if pioneerLaunch then
+		width = ButtonWidth.Half
+	else
+		width = ButtonWidth.Full
+	end
+
+	leaveButtonConfig.width = width
+	return leaveButtonConfig
+end
+
+local function createSwitchServerButtonConfig(sessionActionBindings) -- 1 equivalent call inferred from this helper
+	return {
+		name = Constants.SessionActionButtonNames.SwitchServer,
+		label = "CoreScripts.InGameMenu.PeoplePage.SwitchServer",
+		getOnActivated = sessionActionBindings[Enums.ActionBinding.SwitchServer].getOnActivated,
+		getIsEnabled = sessionActionBindings[Enums.ActionBinding.SwitchServer].getIsEnabled,
+		getIsHidden = getIsSwitchServerButtonHidden,
+		width = ButtonWidth.Half
+	}
+end
+
+local function createSessionActionButtonsStore()
+	local sessionActionBindings = GetActionBindingsStore().sessionActionBindings
+	local pioneerLaunch = isPioneerLaunch()
+
+	local signal, setShortcutIcon = Signals.createSignal(nil)
+	local signal2, setShortcutIcon2 = Signals.createSignal(nil)
+
+	local sessionActionButtonConfigs = { createRespawnButtonConfig(sessionActionBindings, signal2, setShortcutIcon2) }
+
+	if pioneerLaunch then
+		table.insert(sessionActionButtonConfigs, createSwitchServerButtonConfig(sessionActionBindings)) -- inferred equivalent call
+	end
+
+	table.insert(
+		sessionActionButtonConfigs,
+		createLeaveButtonConfig(sessionActionBindings, signal, setShortcutIcon, pioneerLaunch)
+	)
+
+	local gamepadConnectedConnection = nil
+	local effect = Signals.createEffect(function(p)
+		local lastInputType = GetInputModeStore(p).getLastInputType(p)
+
+		if gamepadConnectedConnection then
+			gamepadConnectedConnection:Disconnect()
 		end
 
-		if v24 == Input.Directional then
-			local function setGamepadIcons() -- line: 92
-				-- upvalues: t2 (copy), UserInputService (copy), t1 (copy)
-				for _, v31 in t2 do
-					local ImageForKeyCode = UserInputService:GetImageForKeyCode(v31.gamepadKeyCode)
+		if lastInputType == Input.Directional then
+			local function setGamepadIcons()
+				for _, v2 in sessionActionButtonConfigs do
+					if not (v2.setShortcutIcon and v2.gamepadKeyCode) then
+						continue
+					end
 
-					v31.setShortcutIcon(t1[ImageForKeyCode])
+					local imageForKeyCode = UserInputService:GetImageForKeyCode(v2.gamepadKeyCode)
+					v2.setShortcutIcon(v[imageForKeyCode])
 				end
 			end
 
-			connection = UserInputService.GamepadConnected:Connect(function(_) -- line: 101
-				-- upvalues: setGamepadIcons (copy)
+			gamepadConnectedConnection = UserInputService.GamepadConnected:Connect(function(_)
 				setGamepadIcons()
 			end)
+
 			setGamepadIcons()
-
-			return
-		end
-
-		if v24 == Input.Pointer then
-			for _, v27 in t2 do
-				v27.setShortcutIcon(v27.keyboardIcon)
+		elseif lastInputType == Input.Pointer then
+			for _, v2 in sessionActionButtonConfigs do
+				if v2.keyboardIcon and v2.setShortcutIcon then
+					v2.setShortcutIcon(v2.keyboardIcon)
+				end
 			end
-
-			return
-		end
-
-		for _, v29 in t2 do
-			v29.setShortcutIcon(nil)
+		else
+			for _, v2 in sessionActionButtonConfigs do
+				if v2.setShortcutIcon then
+					v2.setShortcutIcon(nil)
+				end
+			end
 		end
 	end)
 
-	return {
-		sessionActionButtonConfigs = t2,
-		cleanUp = function() -- line: 117
-			-- upvalues: connection (ref), v22 (copy)
-			if connection then
-				connection:Disconnect()
-			end
-
-			if v22 then
-				v22()
-			end
+	local function cleanUp()
+		if gamepadConnectedConnection then
+			gamepadConnectedConnection:Disconnect()
 		end
-	}
+
+		if effect then
+			effect()
+		end
+	end
+
+	return { sessionActionButtonConfigs = sessionActionButtonConfigs, cleanUp = cleanUp }
 end
 
 return createSessionActionButtonsStore

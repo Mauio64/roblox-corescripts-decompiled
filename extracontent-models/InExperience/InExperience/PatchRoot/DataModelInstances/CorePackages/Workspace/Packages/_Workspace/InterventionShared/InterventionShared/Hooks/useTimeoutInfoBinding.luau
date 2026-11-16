@@ -1,75 +1,72 @@
 local InterventionShared = script:FindFirstAncestor("InterventionShared")
-local InterventionSharedParent = InterventionShared.Parent
+local parent = InterventionShared.Parent
+
 local RunService = game:GetService("RunService")
-local React = require(InterventionSharedParent.React)
+
+local React = require(parent.React)
 local useBinding = React.useBinding
 local useEffect = React.useEffect
+
 local determineChatTimeoutInfo = require(InterventionShared.Utils.determineChatTimeoutInfo)
 
-local function useTimeoutInfoBinding(s1: string?, n1: number?) -- line: 24
-	-- upvalues: useBinding (copy), useEffect (copy), determineChatTimeoutInfo (copy), RunService (copy)
-	local v11, v12 = useBinding("")
-	local v13, v14 = useBinding("")
-	local v15 = if not s1 or s1 == "" then nil else DateTime.fromIsoDate(s1)
+local function useTimeoutInfoBinding(p: string?, p2: number?)
+	local heading, v = useBinding("")
+	local description, v2 = useBinding("")
+	local dateTime
 
-	useEffect(function() -- line: 30
-		-- upvalues: determineChatTimeoutInfo (copy), v15 (copy), n1 (copy), v12 (copy), v14 (copy)
-		local _, v17, v18 = determineChatTimeoutInfo(v15, n1)
+	if p and p ~= "" then
+		dateTime = DateTime.fromIsoDate(p)
+	else
+		dateTime = nil
+	end
 
-		v12(v17)
-		v14(v18)
-	end, {
-		v15,
-		n1
-	})
-	useEffect(function() -- line: 36
-		-- upvalues: v15 (copy), RunService (copy), determineChatTimeoutInfo (copy), n1 (copy), v12 (copy), v14 (copy)
-		local connection = nil
+	useEffect(function()
+		local _, v3, v4 = determineChatTimeoutInfo(dateTime, p2)
+		v(v3)
+		v2(v4)
+	end, { dateTime, p2 })
 
-		if v15 == nil then
+	useEffect(function()
+		local heartbeatConnection = nil
+
+		if dateTime == nil then
 			return
 		end
 
-		local dateTime = DateTime.now()
+		local now = DateTime.now()
 
-		if v15.UnixTimestamp - dateTime.UnixTimestamp <= 0 then
+		if dateTime.UnixTimestamp - now.UnixTimestamp <= 0 then
 			return
 		end
 
-		local n2 = 0
+		local v3 = 0
 
-		connection = RunService.Heartbeat:Connect(function() -- line: 52
-			-- upvalues: n2 (ref), determineChatTimeoutInfo (copy), v15 (copy), n1 (copy), v12 (copy), v14 (copy), connection (ref)
-			local elapsed = os.clock()
+		heartbeatConnection = RunService.Heartbeat:Connect(function()
+			local now2 = os.clock()
 
-			if elapsed - n2 < 1 then
+			if now2 - v3 < 1 then
 				return
 			end
 
-			n2 = elapsed
+			v3 = now2
 
-			local v23, v24, v25 = determineChatTimeoutInfo(v15, n1)
+			local v4, v5, v6 = determineChatTimeoutInfo(dateTime, p2)
+			v(v5)
+			v2(v6)
 
-			v12(v24)
-			v14(v25)
-
-			if v23 <= 0 and connection then
-				connection:Disconnect()
+			if v4 <= 0 and heartbeatConnection then
+				heartbeatConnection:Disconnect()
 			end
 		end)
 
-		return function() -- line: 72
-			-- upvalues: connection (ref)
-			if connection then
-				connection:Disconnect()
+		return function()
+			if heartbeatConnection then
+				heartbeatConnection:Disconnect()
 			end
 		end
-	end, { v15 })
+	end, { dateTime })
 
-	return {
-		heading = v11,
-		description = v13
-	}
+	return { heading = heading, description = description }
 end
 
 return useTimeoutInfoBinding

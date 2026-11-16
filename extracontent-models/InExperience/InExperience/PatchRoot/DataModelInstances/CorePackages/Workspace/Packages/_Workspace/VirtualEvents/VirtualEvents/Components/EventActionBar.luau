@@ -1,135 +1,169 @@
 local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
 local React = require(VirtualEvents.Parent.React)
 local Foundation = require(VirtualEvents.Parent.Foundation)
 local UIBlox = require(VirtualEvents.Parent.UIBlox)
 local GamePlayButton = require(VirtualEvents.Parent.GamePlayButton)
-local RoactNetworking = require(VirtualEvents.Parent.RoactServiceTags).RoactNetworking
-local useRoactService = require(VirtualEvents.Parent.RobloxAppHooks).useRoactService
-
+local RoactServiceTags = require(VirtualEvents.Parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+local RobloxAppHooks = require(VirtualEvents.Parent.RobloxAppHooks)
+local useRoactService = RobloxAppHooks.useRoactService
 require(VirtualEvents.Parent.VirtualEventsState)
-
 local useExperienceSubtitle = require(VirtualEvents.Hooks.useExperienceSubtitle)
+
 local View = Foundation.View
 local Button = Foundation.Button
 local ButtonSize = Foundation.Enums.ButtonSize
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
-local FoundationText = Foundation.Text
+local Text = Foundation.Text
 local useTokens = Foundation.Hooks.useTokens
+
 local Images = UIBlox.App.ImageSet.Images
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+
 local usePlayButtonState = GamePlayButton.usePlayButtonState
 local PlayButtonStates = GamePlayButton.PlayButtonStates
 
-local function EventActionBar(t1: {[any]: any}) -- line: 43
-	-- upvalues: useTokens (copy), useExperienceSubtitle (copy), useRoactService (copy), RoactNetworking (copy), usePlayButtonState (copy), PlayButtonStates (copy), React (copy), FoundationText (copy), View (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy), ButtonSize (copy), ImageSetLabel (copy), Images (copy)
-	local v22 = useTokens()
-	local v23 = if not t1.universeId then nil else useExperienceSubtitle(t1.universeId)
-	local v24 = useRoactService(RoactNetworking)
-	local v25 = usePlayButtonState(v24, t1.universeId or "")
-	local v26 = v25.playButtonState == PlayButtonStates.Playable or v25.playButtonState == PlayButtonStates.PlayableWithParty
+local function EventActionBar(props)
+	local v = useTokens()
+	local text
 
-	return React.createElement("Frame", {
+	if props.universeId then
+		text = useExperienceSubtitle(props.universeId)
+	end
+
+	local v2 = usePlayButtonState(useRoactService(RoactNetworking), props.universeId or "")
+	local v3 = v2.playButtonState == PlayButtonStates.Playable
+		or v2.playButtonState == PlayButtonStates.PlayableWithParty
+
+	local createElement = React.createElement
+	local v4 = {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y
-	}, {
+	}
+	local v5 = {
 		Layout = React.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 16)
 		}),
-		UpperContainer = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 1,
-			Size = UDim2.new(1, 0, 0, 40)
-		}, {
-			Layout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Horizontal,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 12)
-			}),
-			ExperienceThumbnail = React.createElement("ImageButton", {
-				Active = true,
-				Size = UDim2.fromOffset(40, 40),
-				BorderSizePixel = 0,
-				Image = ("rbxthumb://type=GameIcon&id=%s&w=150&h=150"):format(t1.universeId),
-				[React.Event.Activated] = t1.onExperienceTileActivated
-			}, {
-				UICorner = React.createElement("UICorner", {
-					CornerRadius = UDim.new(0, 8)
-				})
-			}),
-			EventInfo = React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 2,
-				Size = UDim2.new(1, -52, 1, 0)
-			}, {
-				Layout = React.createElement("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					FillDirection = Enum.FillDirection.Vertical
-				}),
-				ExperienceName = React.createElement(FoundationText, {
-					LayoutOrder = 1,
-					TextWrapped = false,
-					Size = UDim2.fromScale(1, not v23 and 1 or 0.5),
-					Text = t1.experienceName,
-					textStyle = v22.Color.Content.Emphasis,
-					fontStyle = v22.Typography.TitleLarge,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextTruncate = Enum.TextTruncate.SplitWord
-				}),
-				ExperienceSubtitle = if not v23 then nil else React.createElement(FoundationText, {
-					LayoutOrder = 2,
-					TextWrapped = false,
-					Size = UDim2.fromScale(1, 0.5),
-					Text = v23,
-					textStyle = v22.Color.Content.Default,
-					fontStyle = v22.Typography.BodyLarge,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextTruncate = Enum.TextTruncate.None
-				})
-			})
+		UpperContainer = 0,
+		LowerContianer = 0
+	}
+
+	local createElement2 = React.createElement
+	local v6 = { Size = UDim2.new(1, 0, 0, 40), BackgroundTransparency = 1, LayoutOrder = 1 }
+
+	local children = {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 12)
 		}),
-		LowerContianer = if not t1.ctaProps.button then nil else React.createElement(View, {
+		ExperienceThumbnail = React.createElement("ImageButton", {
+			Active = true,
+			Size = UDim2.fromOffset(40, 40),
+			BorderSizePixel = 0,
+			Image = ("rbxthumb://type=GameIcon&id=%s&w=150&h=150"):format(props.universeId),
+			[React.Event.Activated] = props.onExperienceTileActivated
+		}, {
+			UICorner = React.createElement("UICorner", { CornerRadius = UDim.new(0, 8) })
+		}),
+		EventInfo = 0
+	}
+
+	local createElement3 = React.createElement
+	local v7 = { Size = UDim2.new(1, -52, 1, 0), BackgroundTransparency = 1, LayoutOrder = 2 }
+
+	local v8 = {
+		Layout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical
+		}),
+		ExperienceName = React.createElement(Text, {
+			LayoutOrder = 1,
+			Size = UDim2.fromScale(1, text and 0.5 or 1),
+			Text = props.experienceName,
+			textStyle = v.Color.Content.Emphasis,
+			fontStyle = v.Typography.TitleLarge,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextTruncate = Enum.TextTruncate.SplitWord,
+			TextWrapped = false
+		}),
+		ExperienceSubtitle = 0
+	}
+	local experienceSubtitle
+
+	if text then
+		experienceSubtitle = React.createElement(Text, {
+			LayoutOrder = 2,
+			Size = UDim2.fromScale(1, 0.5),
+			Text = text,
+			textStyle = v.Color.Content.Default,
+			fontStyle = v.Typography.BodyLarge,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextTruncate = Enum.TextTruncate.None,
+			TextWrapped = false
+		})
+	end
+
+	v8.ExperienceSubtitle = experienceSubtitle
+	children.EventInfo = createElement3("Frame", v7, v8)
+	v5.UpperContainer = createElement2("Frame", v6, children)
+	local lowerContianer
+
+	if props.ctaProps.button then
+		local createElement4 = React.createElement
+		local v9 = {
 			LayoutOrder = 2,
 			size = UDim2.new(1, 0, 0, 40),
-			tag = {
-				["row gap-small wrap auto-y size-full-0"] = true,
-				["fill-x"] = true
-			}
-		}, {
+			tag = { ["row gap-small wrap auto-y size-full-0"] = true, ["fill-x"] = true }
+		}
+
+		local v10 = {
 			CTAButton = React.createElement(Button, {
-				text = t1.ctaProps.button.text,
-				variant = ButtonVariant[t1.ctaProps.button.variant],
-				onActivated = not v26 and function() -- line: 132
-				end or t1.ctaProps.button.onActivated,
+				text = props.ctaProps.button.text,
+				variant = ButtonVariant[props.ctaProps.button.variant],
+				onActivated = not v3 and function() end or props.ctaProps.button.onActivated,
 				fillBehavior = FillBehavior.Fill,
 				size = ButtonSize.Medium,
-				isDisabled = not v26
+				isDisabled = not v3
 			}),
-			ShareButtonWrapper = if not t1.ctaProps.icon then nil else React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.fromOffset(40, 40)
-			}, {
-				ShareButton = React.createElement(Button, {
-					variant = ButtonVariant.Standard,
-					onActivated = not v26 and function() -- line: 144
-					end or t1.ctaProps.icon.onActivated,
-					fillBehavior = FillBehavior.Fill,
-					size = ButtonSize.Medium,
-					isDisabled = not v26
-				}),
-				ShareIcon = React.createElement(ImageSetLabel, {
-					ZIndex = 2,
-					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(32, 32),
-					Image = Images[t1.ctaProps.icon.icon],
-					Position = UDim2.fromOffset(4, 4)
-				})
-			})
-		})
-	})
+			ShareButtonWrapper = 0
+		}
+		local shareButtonWrapper
+
+		if props.ctaProps.icon then
+			shareButtonWrapper = React.createElement(
+				"Frame",
+				{ Size = UDim2.fromOffset(40, 40), BackgroundTransparency = 1 },
+				{
+					ShareButton = React.createElement(Button, {
+						variant = ButtonVariant.Standard,
+						onActivated = not v3 and function() end or props.ctaProps.icon.onActivated,
+						fillBehavior = FillBehavior.Fill,
+						size = ButtonSize.Medium,
+						isDisabled = not v3
+					}),
+					ShareIcon = React.createElement(ImageSetLabel, {
+						ZIndex = 2,
+						Size = UDim2.fromOffset(32, 32),
+						Image = Images[props.ctaProps.icon.icon],
+						BackgroundTransparency = 1,
+						Position = UDim2.fromOffset(4, 4)
+					})
+				}
+			)
+		end
+
+		v10.ShareButtonWrapper = shareButtonWrapper
+		lowerContianer = createElement4(View, v9, v10)
+	end
+
+	v5.LowerContianer = lowerContianer
+	return createElement("Frame", v4, v5)
 end
 
 return EventActionBar

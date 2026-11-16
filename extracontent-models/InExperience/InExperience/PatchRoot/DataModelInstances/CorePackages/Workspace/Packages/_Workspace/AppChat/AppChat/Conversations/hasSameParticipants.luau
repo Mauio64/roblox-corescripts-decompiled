@@ -1,14 +1,15 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local llama = require(Parent.LuaSocialLibrariesDeps).llama
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-return function(p1) -- line: 6
-	-- upvalues: llama (copy)
-	if #p1.existing ~= #p1.new then
+local LuaSocialLibrariesDeps = require(parent.LuaSocialLibrariesDeps)
+local llama = LuaSocialLibrariesDeps.llama
+
+return function(p)
+	if #p.existing ~= #p.new then
 		return false
 	end
 
-	local v4 = llama.List.sort(p1.existing)
-	local v5 = llama.List.sort(p1.new)
+	local sorted = llama.List.sort(p.existing)
+	local sorted2 = llama.List.sort(p.new)
 
-	return llama.List.equals(v4, v5)
+	return llama.List.equals(sorted, sorted2)
 end

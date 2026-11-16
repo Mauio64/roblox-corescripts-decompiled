@@ -1,10 +1,15 @@
-local t1 = {
-	DEV = require(script.DEV).default
-}
-local removeTemporaryGlobals = require(script.graphql).removeTemporaryGlobals
+local DEV = require(script.DEV)
+local Globals = {}
 
-t1.removeTemporaryGlobals = removeTemporaryGlobals
-t1.NULL = require(script.null).NULL
+Globals.DEV = DEV.default
+
+local graphql = require(script.graphql)
+local removeTemporaryGlobals = graphql.removeTemporaryGlobals
+Globals.removeTemporaryGlobals = removeTemporaryGlobals
+
+local null = require(script.null)
+Globals.NULL = null.NULL
+
 removeTemporaryGlobals()
 
-return t1
+return Globals

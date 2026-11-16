@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("UiShellEvents").Parent
-
-return (require(Parent.Loggers).Logger:new("UiShellEvents"))
+local parent = script:FindFirstAncestor("UiShellEvents").Parent
+local Loggers = require(parent.Loggers)
+local logger = Loggers.Logger
+return (logger.new(logger, "UiShellEvents"))

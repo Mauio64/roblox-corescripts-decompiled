@@ -1,5 +1,5 @@
-local function isFoundationImage(s1: string?) -- line: 1
-	return s1 ~= nil and (s1 ~= "" and s1:match("^%w+://.*$") == nil)
+local function isFoundationImage(value: string?): boolean
+	return value ~= nil and value ~= "" and value:match("^%w+://.*$") == nil
 end
 
 return isFoundationImage

@@ -20,20 +20,20 @@ return {
 		SquadLobbyPageUASessionInfo = "squadLobbyPageUASessionInfo",
 		SquadLobbyPageInExpSessionInfo = "squadLobbyPageInExpSessionInfo",
 		ProfilePlatformPage = "ProfilePlatformPage",
-		AddFriendsPage = "AddFriendsPage"
+		AddFriendsPage = "AddFriendsPage",
+		GamePlayFromInstantPlay = "gamePlayFromInstantPlay"
 	},
 	Tag = {
-		Level1 = {
-			Default = "LoggedIn",
-			LoggedOut = "LoggedOut"
-		},
+		Level1 = { Default = "LoggedIn", LoggedOut = "LoggedOut" },
 		Level2a = {
 			Home = "Home",
 			Games = "Games",
+			Campaign = "Campaign",
 			AvatarExperienceRoot = "AvatarExperienceRoot",
 			Chat = "Chat",
 			Moments = "Moments",
 			MomentsImmersive = "Moments",
+			Build = "Build",
 			More = "More",
 			Landing = "Landing",
 			Startup = "Startup",
@@ -88,13 +88,27 @@ return {
 			ExperienceGuidelinesExplained = "ExperienceGuidelinesExplained",
 			PassesPage = "PassesPage",
 			MomentsFeed = "MomentsFeed",
-			MomentsImmersive = "MomentsFeed"
+			MomentsImmersive = "MomentsFeed",
+			BuildHome = "BuildGameList",
+			BuildChat = "BuildChat",
+			BuildPublish = "BuildGamePublish",
+			BuildSettings = "BuildGameSettings",
+			BuildAudience = "BuildGameAudience",
+			BuildPlaytestInviteManagement = "BuildGamePlaytesters",
+			BuildTitleDescription = "BuildGameTitleDescription",
+			BuildVersionTitleDescription = "BuildGameVersionDetails",
+			BuildMediaSelection = "BuildGameIconThumbnails",
+			BuildAgents = "BuildTasks",
+			BuildAgentDetails = "BuildTaskDetails",
+			BuildCreatorCredit = "BuildUsage",
+			BuildMonetization = "BuildGameEarnRobux",
+			BuildStats = "BuildGameStats",
+			BuildGetUsers = "BuildGameGetUsers",
+			BuildSearch = "BuildGameSearch"
 		}
 	},
 	Metadata = {
-		User = {
-			UserId = "userId"
-		},
+		User = { UserId = "userId" },
 		OmniSearch = {
 			OmniSearchUuid = "omniSearchUuid",
 			SearchKeyword = "searchKeyword",
@@ -102,28 +116,18 @@ return {
 			SearchTabUuid = "searchTabUuid",
 			SearchSourceEvent = "searchSourceEvent"
 		},
-		HomePageSessionInfo = {
-			RequestId = "requestId",
-			OmniSessionId = "omniSessionId"
-		},
+		HomePageSessionInfo = { RequestId = "requestId", OmniSessionId = "omniSessionId" },
 		GamePlay = {
 			GamePlaySession = "_gamePlaySession",
 			DeleteOnGameLeave = "_deleteOnGameLeave"
 		},
-		DiscoverPage = {
-			DiscoverSessionId = "discoverSessionId"
-		},
-		SearchLandingPage = {
-			SearchLandingPageSessionId = "searchLandingPageSessionId"
-		},
-		SquadLobbyPage = {
-			ExperiencePickerUuid = "experiencePickerUuid"
-		},
-		ProfilePlatformPage = {
-			ProfileSessionId = "profileSessionId"
-		},
+		DiscoverPage = { DiscoverSessionId = "discoverSessionId" },
+		SearchLandingPage = { SearchLandingPageSessionId = "searchLandingPageSessionId" },
+		SquadLobbyPage = { ExperiencePickerUuid = "experiencePickerUuid" },
+		ProfilePlatformPage = { ProfileSessionId = "profileSessionId" },
 		AddFriendsPage = {
-			AddFriendsSessionId = "addFriendsSessionId"
+			AddFriendsSessionId = "addFriendsSessionId",
+			PymkSessionId = "pymkSessionId"
 		}
 	}
 }

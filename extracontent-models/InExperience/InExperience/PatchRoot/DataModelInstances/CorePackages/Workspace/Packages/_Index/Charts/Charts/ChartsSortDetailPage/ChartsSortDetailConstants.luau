@@ -1,3 +1,1 @@
-return {
-	SurfaceLoadTimeEventName = "ChartsSortDetail_SurfaceLoadTime"
-}
+return { SurfaceLoadTimeEventName = "ChartsSortDetail_SurfaceLoadTime" }

@@ -1,531 +1,307 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local FoundationCloudAssets = require(FoundationParent.FoundationCloudAssets)
-local FoundationImages = require(FoundationParent.FoundationImages)
-local React = require(FoundationParent.React)
-local ReactIs = require(FoundationParent.ReactIs)
+local parent = Foundation.Parent
+
+local FoundationCloudAssets = require(parent.FoundationCloudAssets)
+local FoundationImages = require(parent.FoundationImages)
+local React = require(parent.React)
+local ReactIs = require(parent.ReactIs)
+
 local useOnLoaded = require(script.Parent.useOnLoaded)
+
 local Assets = FoundationCloudAssets.Assets
 local Interactable = require(Foundation.Components.Interactable)
 local Images = FoundationImages.Images
 local IconImages_DEPRECATED = FoundationImages.IconImages_DEPRECATED
+
 local getScaledSlice = require(script.Parent.ImageSet.getScaledSlice)
 local isCloudAsset = require(script.Parent.CloudAsset.isCloudAsset)
 local isFoundationImage = require(script.Parent.ImageSet.isFoundationImage)
-local Flags = require(Foundation.Utility.Flags)
+
 local GuiObjectChildren = require(Foundation.Utility.GuiObjectChildren)
-
 require(Foundation.Components.Types)
-
 local indexBindable = require(Foundation.Utility.indexBindable)
 local useDefaultTags = require(Foundation.Utility.useDefaultTags)
 local withDefaults = require(Foundation.Utility.withDefaults)
 local withGuiObjectProps = require(Foundation.Utility.withGuiObjectProps)
+
 local useStyleTags = require(Foundation.Providers.Style.useStyleTags)
-local t1 = {
-	AutoLocalize = false,
-	AutoButtonColor = false,
-	BorderSizePixel = 0,
-	isDisabled = false
-}
 
-local function getAspectRatio(vector2: Vector2) -- line: 62
-	return vector2.X / vector2.Y
+local v = { AutoLocalize = false, AutoButtonColor = false, BorderSizePixel = 0, isDisabled = false }
+
+local function getAspectRatio(size: Vector2) -- 2 equivalent calls inferred from this helper
+	return size.X / size.Y
 end
 
-local v24 = _G.__DEV__ == true
+local DEV__ = _G.__DEV__ == true
 
-local function getFoundationImageAsset(s1: string) -- line: 68
-	-- upvalues: IconImages_DEPRECATED (copy), v24 (copy), Images (copy)
-	local v30 = IconImages_DEPRECATED[s1]
+local function getFoundationImageAsset(p: string) -- 5 equivalent calls inferred from this helper
+	local v2 = IconImages_DEPRECATED[p]
 
-	if v30 then
-		return v30
+	if v2 then
+		return v2
 	end
 
-	if v24 then
-		return Images[s1]
+	if DEV__ then
+		return Images[p]
 	end
 
-	return (rawget(Images, s1))
+	return (rawget(Images, p))
 end
-local function shouldUseFoundationSlice(s2: string) -- line: 84
-	-- upvalues: isFoundationImage (copy), isCloudAsset (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy)
-	if not isFoundationImage(s2) then
-		return false
-	end
 
-	local v32 = isCloudAsset(s2)
-
-	if not v32 then
-		local v33 = IconImages_DEPRECATED[s2]
-
-		v32 = ((if not v33 then (if not v24 then rawget(Images, s2) else Images[s2]) else v33)) ~= nil
-	end
-
-	return v32
+local function shouldUseFoundationSlice(p: string)
+	return not not isFoundationImage(p) and (isCloudAsset(p) or getFoundationImageAsset(p) ~= nil) -- inferred equivalent call
 end
-local function Image(p1, p2) -- line: 95
-	-- upvalues: withDefaults (copy), t1 (copy), React (copy), ReactIs (copy), isCloudAsset (copy), isFoundationImage (copy), Assets (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), getScaledSlice (copy), useDefaultTags (copy), useStyleTags (copy), useOnLoaded (copy), Flags (copy), withGuiObjectProps (copy), indexBindable (copy), Interactable (copy), GuiObjectChildren (copy)
-	local v36 = withDefaults(p1, t1)
-	local v37 = v36.onStateChanged ~= nil or (v36.onActivated ~= nil or v36.onSecondaryActivated ~= nil)
-	local aspectRatio = v36.aspectRatio
-	local v39, v40 = React.useState(false)
 
-	React.useEffect(function() -- line: 103
-		-- upvalues: ReactIs (copy), v36 (copy), v40 (copy), isCloudAsset (copy), React (copy)
-		if not ReactIs.isBinding(v36.Image) then
+local function Image(p, ref)
+	local v2 = withDefaults(p, v)
+
+	local v3 = v2.onStateChanged ~= nil or v2.onActivated ~= nil or v2.onSecondaryActivated ~= nil
+
+	local aspectRatio = v2.aspectRatio
+
+	local state, setState = React.useState(false)
+	React.useEffect(function()
+		if not ReactIs.isBinding(v2.Image) then
 			return
 		end
 
-		local Image2 = v36.Image
+		local image = v2.Image
+		setState(isCloudAsset(image:getValue()))
 
-		v40(isCloudAsset(Image2:getValue()))
-
-		local v61 = React.__subscribeToBinding(Image2, function(s3: string) -- line: 111
-			-- upvalues: v40 (copy), isCloudAsset (copy)
-			v40(isCloudAsset(s3))
+		local __subscribeToBinding = React.__subscribeToBinding(image, function(p2: string)
+			setState(isCloudAsset(p2))
 		end)
 
-		return function() -- line: 115
-			-- upvalues: v61 (copy)
-			v61()
+		return function()
+			__subscribeToBinding()
 		end
-	end, {
-		v36.Image,
-		aspectRatio
-	})
+	end, { v2.Image, aspectRatio })
 
-	local v41, v42, v43, v44 = React.useMemo(function() -- line: 121
-		-- upvalues: v36 (copy), aspectRatio (copy), ReactIs (copy), isFoundationImage (copy), isCloudAsset (copy), Assets (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), v39 (copy)
-		local Image3 = v36.Image
-		local v63 = if not v36.imageRect then nil else v36.imageRect.offset
-		local v64 = if not v36.imageRect then nil else v36.imageRect.size
-		local v65 = aspectRatio
+	local image2, imageRectOffset, imageRectSize, aspectRatio2 = React.useMemo(function()
+		local image = v2.Image
+		local v4
 
-		if ReactIs.isBinding(v36.Image) then
-			local function getImageBindingValue(p3) -- line: 132
-				-- upvalues: v36 (copy), isFoundationImage (copy), isCloudAsset (copy), Assets (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), aspectRatio (copy)
-				return v36.Image:map(function(s4: string) -- line: 133
-					-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), p3 (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), aspectRatio (copy), v36 (copy)
-					if isFoundationImage(s4) then
-						if isCloudAsset(s4) then
-							local v107 = Assets[s4]
+		if v2.imageRect then
+			v4 = v2.imageRect.offset
+		end
 
-							if p3 == "Image" then
-								return v107.assetId
+		local v5
+
+		if v2.imageRect then
+			v5 = v2.imageRect.size
+		end
+
+		local v6 = aspectRatio
+
+		if ReactIs.isBinding(v2.Image) then
+			local function getImageBindingValue(p2) -- 4 equivalent calls inferred from this helper
+				return v2.Image:map(function(p3: string)
+					if isFoundationImage(p3) then
+						if isCloudAsset(p3) then
+							local asset = Assets[p3]
+
+							if p2 == "Image" then
+								return asset.assetId
 							end
 
-							if p3 == "AspectRatio" then
-								local size = v107.size
-
-								return size.X / size.Y
+							if p2 ~= "AspectRatio" then
+								return nil
 							end
 
-							return nil
+							return getAspectRatio(asset.size) -- inferred equivalent call
+						else
+							local foundationImageAsset = getFoundationImageAsset(p3) -- inferred equivalent call
+
+							if p2 == "AspectRatio" then
+								return aspectRatio
+							end
+
+							if foundationImageAsset then
+								return foundationImageAsset[p2]
+							end
+
+							return if p2 == "Image" then p3 else nil
+						end
+					else
+						if p2 == "Image" then
+							return p3
 						end
 
-						local v109 = IconImages_DEPRECATED[s4]
-						local v110 = if not v109 then if not v24 then rawget(Images, s4) else Images[s4] else v109
-
-						if p3 == "AspectRatio" then
-							return aspectRatio
+						if p2 == "ImageRectOffset" and v2.imageRect then
+							return v2.imageRect.offset
 						end
 
-						if v110 then
-							return v110[p3]
-						end
-
-						if p3 == "Image" then
-							return s4
+						if p2 == "ImageRectSize" and v2.imageRect then
+							return v2.imageRect.size
 						end
 
 						return nil
 					end
-
-					if p3 == "Image" then
-						return s4
-					end
-
-					if p3 == "ImageRectOffset" and v36.imageRect then
-						return v36.imageRect.offset
-					end
-
-					if p3 == "ImageRectSize" and v36.imageRect then
-						return v36.imageRect.size
-					end
-
-					return nil
 				end)
 			end
 
-			local v68
+			local v7
 
-			if v39 then
-				local s5 = "AspectRatio"
-
-				v68 = v36.Image:map(function(s6: string) -- line: 133
-					-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s5 (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), aspectRatio (copy), v36 (copy)
-					if isFoundationImage(s6) then
-						if isCloudAsset(s6) then
-							local v86 = Assets[s6]
-
-							if s5 == "Image" then
-								return v86.assetId
-							end
-
-							if s5 == "AspectRatio" then
-								local size = v86.size
-
-								return size.X / size.Y
-							end
-
-							return nil
-						end
-
-						local v88 = IconImages_DEPRECATED[s6]
-						local v89 = if not v88 then if not v24 then rawget(Images, s6) else Images[s6] else v88
-
-						if s5 == "AspectRatio" then
-							return aspectRatio
-						end
-
-						if v89 then
-							return v89[s5]
-						end
-
-						if s5 == "Image" then
-							return s6
-						end
-
-						return nil
-					end
-
-					if s5 == "Image" then
-						return s6
-					end
-
-					if s5 == "ImageRectOffset" and v36.imageRect then
-						return v36.imageRect.offset
-					end
-
-					if s5 == "ImageRectSize" and v36.imageRect then
-						return v36.imageRect.size
-					end
-
-					return nil
-				end)
+			if state then
+				v7 = getImageBindingValue("AspectRatio") -- inferred equivalent call
 			else
-				v68 = aspectRatio
+				v7 = aspectRatio
 			end
 
-			local s7 = "Image"
-			local s8 = "ImageRectOffset"
-			local s9 = "ImageRectSize"
-
-			return v36.Image:map(function(s10: string) -- line: 133
-				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s7 (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), aspectRatio (copy), v36 (copy)
-				if isFoundationImage(s10) then
-					if isCloudAsset(s10) then
-						local v91 = Assets[s10]
-
-						if s7 == "Image" then
-							return v91.assetId
-						end
-
-						if s7 == "AspectRatio" then
-							local size = v91.size
-
-							return size.X / size.Y
-						end
-
-						return nil
-					end
-
-					local v93 = IconImages_DEPRECATED[s10]
-					local v94 = if not v93 then if not v24 then rawget(Images, s10) else Images[s10] else v93
-
-					if s7 == "AspectRatio" then
-						return aspectRatio
-					end
-
-					if v94 then
-						return v94[s7]
-					end
-
-					if s7 == "Image" then
-						return s10
-					end
-
-					return nil
-				end
-
-				if s7 == "Image" then
-					return s10
-				end
-
-				if s7 == "ImageRectOffset" and v36.imageRect then
-					return v36.imageRect.offset
-				end
-
-				if s7 == "ImageRectSize" and v36.imageRect then
-					return v36.imageRect.size
-				end
-
-				return nil
-			end), v36.Image:map(function(s11: string) -- line: 133
-				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s8 (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), aspectRatio (copy), v36 (copy)
-				if isFoundationImage(s11) then
-					if isCloudAsset(s11) then
-						local v96 = Assets[s11]
-
-						if s8 == "Image" then
-							return v96.assetId
-						end
-
-						if s8 == "AspectRatio" then
-							local size = v96.size
-
-							return size.X / size.Y
-						end
-
-						return nil
-					end
-
-					local v98 = IconImages_DEPRECATED[s11]
-					local v99 = if not v98 then if not v24 then rawget(Images, s11) else Images[s11] else v98
-
-					if s8 == "AspectRatio" then
-						return aspectRatio
-					end
-
-					if v99 then
-						return v99[s8]
-					end
-
-					if s8 == "Image" then
-						return s11
-					end
-
-					return nil
-				end
-
-				if s8 == "Image" then
-					return s11
-				end
-
-				if s8 == "ImageRectOffset" and v36.imageRect then
-					return v36.imageRect.offset
-				end
-
-				if s8 == "ImageRectSize" and v36.imageRect then
-					return v36.imageRect.size
-				end
-
-				return nil
-			end), v36.Image:map(function(s12: string) -- line: 133
-				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s9 (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), aspectRatio (copy), v36 (copy)
-				if isFoundationImage(s12) then
-					if isCloudAsset(s12) then
-						local v101 = Assets[s12]
-
-						if s9 == "Image" then
-							return v101.assetId
-						end
-
-						if s9 == "AspectRatio" then
-							local size = v101.size
-
-							return size.X / size.Y
-						end
-
-						return nil
-					end
-
-					local v103 = IconImages_DEPRECATED[s12]
-					local v104 = if not v103 then if not v24 then rawget(Images, s12) else Images[s12] else v103
-
-					if s9 == "AspectRatio" then
-						return aspectRatio
-					end
-
-					if v104 then
-						return v104[s9]
-					end
-
-					if s9 == "Image" then
-						return s12
-					end
-
-					return nil
-				end
-
-				if s9 == "Image" then
-					return s12
-				end
-
-				if s9 == "ImageRectOffset" and v36.imageRect then
-					return v36.imageRect.offset
-				end
-
-				if s9 == "ImageRectSize" and v36.imageRect then
-					return v36.imageRect.size
-				end
-
-				return nil
-			end), v68
+			return
+				getImageBindingValue("Image"), -- inferred equivalent call
+				getImageBindingValue("ImageRectOffset"), -- inferred equivalent call
+				getImageBindingValue("ImageRectSize"), -- inferred equivalent call
+				v7
 		end
 
-		if typeof(v36.Image) == "string" and isFoundationImage(v36.Image) then
-			if isCloudAsset(v36.Image) then
-				local v72 = Assets[v36.Image]
-				local assetId = v72.assetId
-				local size = v72.size
-
-				return assetId, v63, v64, size.X / size.Y
-			end
-
-			local Image4 = v36.Image
-			local v76 = IconImages_DEPRECATED[Image4]
-			local v77 = if not v76 then if not v24 then rawget(Images, Image4) else Images[Image4] else v76
-
-			if v77 then
-				Image3 = v77.Image
-				v63 = v77.ImageRectOffset
-				v64 = v77.ImageRectSize
-			end
+		if typeof(v2.Image) ~= "string" or not isFoundationImage(v2.Image) then
+			return image, v4, v5, v6
 		end
 
-		return Image3, v63, v64, v65
-	end, {
-		v36.Image,
-		v36.imageRect,
-		v39,
-		aspectRatio,
-		Images
-	})
-	local v45 = nil
-	local v46 = nil
-	local ScaleType = v36.ScaleType
+		if isCloudAsset(v2.Image) then
+			local asset = Assets[v2.Image]
+			return asset.assetId, v4, v5, getAspectRatio(asset.size) -- inferred equivalent call
+		else
+			local foundationImageAsset = getFoundationImageAsset(v2.Image) -- inferred equivalent call
 
-	if v36.slice then
-		if ReactIs.isBinding(v36.Image) then
-			local v48 = v36.Image:map(function(s13: string) -- line: 198
-				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), IconImages_DEPRECATED (copy), v24 (copy), Images (copy), getScaledSlice (copy), v36 (copy)
-				local v79
+			if foundationImageAsset then
+				image = foundationImageAsset.Image
+				v4 = foundationImageAsset.ImageRectOffset
+				v5 = foundationImageAsset.ImageRectSize
+			end
 
-				if not isFoundationImage(s13) then
-					v79 = false
+			return image, v4, v5, v6
+		end
+	end, { v2.Image, v2.imageRect, state, aspectRatio, Images })
+
+	local sliceCenter = nil
+	local sliceScale = nil
+	local scaleType = v2.ScaleType
+
+	if v2.slice then
+		if ReactIs.isBinding(v2.Image) then
+			local mapped = v2.Image:map(function(p2: string)
+				local v4
+
+				if isFoundationImage(p2) then
+					v4 = isCloudAsset(p2) or getFoundationImageAsset(p2) ~= nil -- inferred equivalent call
 				else
-					v79 = isCloudAsset(s13)
-
-					if not v79 then
-						local v80 = IconImages_DEPRECATED[s13]
-
-						v79 = ((if not v80 then (if not v24 then rawget(Images, s13) else Images[s13]) else v80)) ~= nil
-					end
+					v4 = false
 				end
 
-				if v79 then
-					return getScaledSlice(v36.slice.center, v36.slice.scale)
+				if v4 then
+					return getScaledSlice(v2.slice.center, v2.slice.scale)
 				end
 
-				return v36.slice
+				return v2.slice
 			end)
 
-			v45 = v48:map(function(p4) -- line: 205
-				return p4.center
+			sliceCenter = mapped:map(function(p2)
+				return p2.center
 			end)
-			v46 = v48:map(function(p5) -- line: 208
-				return p5.scale
-			end)
-		elseif typeof(v36.Image) == "string" then
-			local Image5 = v36.Image
-			local v50
 
-			if not isFoundationImage(Image5) then
-				v50 = false
+			sliceScale = mapped:map(function(p2)
+				return p2.scale
+			end)
+		elseif typeof(v2.Image) == "string" then
+			local image = v2.Image
+			local v4
+
+			if isFoundationImage(image) then
+				v4 = isCloudAsset(image) or getFoundationImageAsset(image) ~= nil -- inferred equivalent call
 			else
-				v50 = isCloudAsset(Image5)
-
-				if not v50 then
-					local v51 = IconImages_DEPRECATED[Image5]
-
-					v50 = ((if not v51 then (if not v24 then rawget(Images, Image5) else Images[Image5]) else v51)) ~= nil
-				end
+				v4 = false
 			end
 
-			if v50 then
-				local v52 = getScaledSlice(v36.slice.center, v36.slice.scale)
-
-				v45 = v52.center
-				v46 = v52.scale
+			if v4 then
+				local scaledSlice = getScaledSlice(v2.slice.center, v2.slice.scale)
+				sliceCenter = scaledSlice.center
+				sliceScale = scaledSlice.scale
 			else
-				v45 = v36.slice.center
-				v46 = v36.slice.scale
+				sliceCenter = v2.slice.center
+				sliceScale = v2.slice.scale
 			end
 		end
 
-		ScaleType = Enum.ScaleType.Slice
+		scaleType = Enum.ScaleType.Slice
 	end
 
-	v36.aspectRatio = v44
+	v2.aspectRatio = aspectRatio2
 
-	local v53 = v36.backgroundStyle == nil and "gui-object-defaults" or "gui-object-defaults x-default-transparency"
-	local v54 = useDefaultTags(v36.tag, v53)
-	local v55 = useStyleTags(v54)
+	local v4 = v2.backgroundStyle == nil and "gui-object-defaults" or "gui-object-defaults x-default-transparency"
 
-	useOnLoaded(v41, v36.onLoaded)
+	local v5 = useStyleTags((useDefaultTags(v2.tag, v4)))
+	useOnLoaded(image2, v2.onLoaded)
 
-	local v56 = if not Flags.FoundationImageContentSupport then nil else React.useMemo(function() -- line: 232
-		-- upvalues: ReactIs (copy), v36 (copy)
-		if ReactIs.isBinding(v36.ImageContent) then
-			return v36.ImageContent:map(function(p6) -- line: 235
-				if typeof(p6) == "string" then
-					return Content.fromUri(p6)
+	local imageContent = React.useMemo(function()
+		if ReactIs.isBinding(v2.ImageContent) then
+			return v2.ImageContent:map(function(value)
+				if typeof(value) == "string" then
+					return Content.fromUri(value)
 				end
 
-				return p6
+				return value
 			end)
 		end
 
-		if typeof(v36.ImageContent) == "string" then
-			return Content.fromUri(v36.ImageContent)
+		if typeof(v2.ImageContent) == "string" then
+			return Content.fromUri(v2.ImageContent)
 		end
 
-		return v36.ImageContent
-	end, { v36.ImageContent })
-	local v57 = not v37 and "ImageLabel" or "ImageButton"
-	local v58 = withGuiObjectProps(v36, {
-		AutoButtonColor = if v57 ~= "ImageButton" then nil else v36.AutoButtonColor,
-		Image = v41,
-		ImageContent = v56,
-		ImageColor3 = if not v36.imageStyle then nil else indexBindable(v36.imageStyle, "Color3"),
-		ImageTransparency = if not v36.imageStyle then nil else indexBindable(v36.imageStyle, "Transparency"),
-		ImageRectOffset = v42,
-		ImageRectSize = v43,
-		ResampleMode = v36.ResampleMode,
-		ScaleType = ScaleType,
-		SliceCenter = v45,
-		SliceScale = v46,
-		TileSize = v36.TileSize,
-		ref = p2,
-		[React.Tag] = v55
+		return v2.ImageContent
+	end, { v2.ImageContent })
+	local component = v3 and "ImageButton" or "ImageLabel"
+	local autoButtonColor
+
+	if component == "ImageButton" then
+		autoButtonColor = v2.AutoButtonColor
+	end
+
+	local imageColor
+
+	if v2.imageStyle then
+		imageColor = indexBindable(v2.imageStyle, "Color3")
+	end
+
+	local imageTransparency
+
+	if v2.imageStyle then
+		imageTransparency = indexBindable(v2.imageStyle, "Transparency")
+	end
+
+	local v6 = withGuiObjectProps(v2, {
+		AutoButtonColor = autoButtonColor,
+		Image = image2,
+		ImageContent = imageContent,
+		ImageColor3 = imageColor,
+		ImageTransparency = imageTransparency,
+		ImageRectOffset = imageRectOffset,
+		ImageRectSize = imageRectSize,
+		ResampleMode = v2.ResampleMode,
+		ScaleType = scaleType,
+		SliceCenter = sliceCenter,
+		SliceScale = sliceScale,
+		TileSize = v2.TileSize,
+		ref = ref,
+		[React.Tag] = v5
 	})
-	local v59 = v57
+	local v7
 
-	if v37 then
-		v59 = Interactable
-		v58.component = v57
-		v58.onActivated = v36.onActivated
-		v58.onSecondaryActivated = v36.onSecondaryActivated
-		v58.onStateChanged = v36.onStateChanged
-		v58.stateLayer = v36.stateLayer
-		v58.isDisabled = v36.isDisabled
-		v58.cursor = v36.cursor
+	if v3 then
+		v7 = Interactable
+		v6.component = component
+		v6.onActivated = v2.onActivated
+		v6.onSecondaryActivated = v2.onSecondaryActivated
+		v6.onStateChanged = v2.onStateChanged
+		v6.stateLayer = v2.stateLayer
+		v6.isDisabled = v2.isDisabled
+		v6.cursor = v2.cursor
+	else
+		v7 = component
 	end
 
-	return React.createElement(v59, v58, GuiObjectChildren(v36))
+	return React.createElement(v7, v6, GuiObjectChildren(v2))
 end
 
 return React.memo(React.forwardRef(Image))

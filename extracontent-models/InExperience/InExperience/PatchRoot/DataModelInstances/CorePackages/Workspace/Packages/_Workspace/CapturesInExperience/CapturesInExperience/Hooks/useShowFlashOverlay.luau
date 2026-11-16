@@ -1,50 +1,53 @@
 local AppStorageService = game:GetService("AppStorageService")
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local RoactUtils = require(ParentParentParent.RoactUtils)
-local Constants = require(ParentParent.Constants)
+
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
+
+local RoactUtils = require(parent2.RoactUtils)
+
+local Constants = require(parent.Constants)
+
 local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-local function v7() -- line: 19
-	-- upvalues: AppStorageService (copy), Constants (copy)
-	pcall(function() -- line: 20
-		-- upvalues: AppStorageService (copy), Constants (copy)
-		AppStorageService:SetItem(Constants.LastFlashOccurrenceTsLocalStorageKey, (tostring(DateTime.now().UnixTimestampMillis)))
+local function fn()
+	pcall(function()
+		AppStorageService:SetItem(
+			Constants.LastFlashOccurrenceTsLocalStorageKey,
+			(tostring(DateTime.now().UnixTimestampMillis))
+		)
+
 		AppStorageService:Flush()
 	end)
 end
 
-return function(p1) -- line: 29
-	-- upvalues: AppStorageService (copy), useSelector (copy), Constants (copy), v7 (copy)
-	local v9 = p1 or AppStorageService
+return function(p)
+	local v = p or AppStorageService
 
-	if not useSelector(function(p2) -- line: 32
-		-- upvalues: Constants (copy)
+	if not useSelector(function(p2)
 		return p2[Constants.RoduxKey].IsOverlayFlashActive
 	end) then
-		return false, v7
+		return false, fn
 	end
 
-	local ok, result = pcall(function() -- line: 40
-		-- upvalues: v9 (copy), Constants (copy)
-		return v9:GetItem(Constants.LastFlashOccurrenceTsLocalStorageKey)
+	local success, result = pcall(function()
+		return v:GetItem(Constants.LastFlashOccurrenceTsLocalStorageKey)
 	end)
 
-	if not ok then
-		return false, v7
+	if not success then
+		return false, fn
 	end
 
-	local num = tonumber(result)
+	local v2 = tonumber(result)
 
-	if num == nil then
-		return false, v7
+	if v2 == nil then
+		return false, fn
 	end
 
-	assert(num ~= nil, "lastFlashOccurrenceTs cannot be nil")
+	assert(v2 ~= nil, "lastFlashOccurrenceTs cannot be nil")
 
-	if DateTime.now().UnixTimestampMillis - num < 500 then
-		return false, v7
+	if DateTime.now().UnixTimestampMillis - v2 < 500 then
+		return false, fn
 	end
 
-	return true, v7
+	return true, fn
 end

@@ -1,0 +1,5 @@
+local UIBlox = require(script.Parent.UIBlox)
+local FFlagUIBloxAddNavigationTabTooltipAndTruncation = UIBlox.FFlagUIBloxAddNavigationTabTooltipAndTruncation
+
+return game:DefineFastFlag("EnableNavRailTooltipAndTruncation", false)
+	and FFlagUIBloxAddNavigationTabTooltipAndTruncation

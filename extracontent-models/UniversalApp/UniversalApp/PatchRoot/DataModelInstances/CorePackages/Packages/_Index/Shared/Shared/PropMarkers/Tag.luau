@@ -1,1 +1,3 @@
-return (require(script.Parent.Parent["Symbol.roblox"]).named("RobloxTag"))
+local Symbolroblox = require(script.Parent.Parent["Symbol.roblox"])
+
+return (Symbolroblox.named("RobloxTag"))

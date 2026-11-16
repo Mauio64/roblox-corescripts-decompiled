@@ -1,6 +1,7 @@
-return function(p1, p2, p3) -- line: 5
-	assert(type(p2) == "number", "Expected beatInterval to be a number")
-	p1:setRBXEventStream(string.format("%s%d", "heartbeat", p2), "pageHeartbeat", {
-		url = p3
+return function(object, value, url)
+	assert(type(value) == "number", "Expected beatInterval to be a number")
+
+	object:setRBXEventStream(string.format("%s%d", "heartbeat", value), "pageHeartbeat", {
+		url = url
 	})
 end

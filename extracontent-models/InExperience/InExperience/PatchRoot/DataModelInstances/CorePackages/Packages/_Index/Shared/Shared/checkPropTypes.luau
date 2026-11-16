@@ -1,106 +1,110 @@
-local ParentParent = script.Parent.Parent
-local ReactGlobals = require(ParentParent.ReactGlobals)
-local Error = require(ParentParent.LuauPolyfill).Error
+local parent = script.Parent.Parent
+local ReactGlobals = require(parent.ReactGlobals)
+local LuauPolyfill = require(parent.LuauPolyfill)
+local Error = LuauPolyfill.Error
+
 local console = require(script.Parent.console)
-local t1 = {}
-local describeUnknownElementTypeFrameInDEV = require(script.Parent.ReactComponentStackFrame).describeUnknownElementTypeFrameInDEV
+
+local messageSet = {}
+
+local ReactComponentStackFrame = require(script.Parent.ReactComponentStackFrame)
+
+local describeUnknownElementTypeFrameInDEV = ReactComponentStackFrame.describeUnknownElementTypeFrameInDEV
+
 local ReactSharedInternals = require(script.Parent.ReactSharedInternals)
-local describeError = require(script.Parent["ErrorHandling.roblox"]).describeError
+
+local ErrorHandlingroblox = require(script.Parent["ErrorHandling.roblox"])
+local describeError = ErrorHandlingroblox.describeError
+
 local ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame
 
-local function setCurrentlyValidatingElement(p1) -- line: 34
-	-- upvalues: ReactGlobals (copy), describeUnknownElementTypeFrameInDEV (copy), ReactDebugCurrentFrame (copy)
+local function setCurrentlyValidatingElement(data) -- 4 equivalent calls inferred from this helper
 	if ReactGlobals.__DEV__ then
-		if p1 then
-			local _owner = p1._owner
-			local v14 = describeUnknownElementTypeFrameInDEV(p1.type, p1._source, if _owner == nil then nil else _owner.type)
+		if data then
+			local owner = data._owner
 
-			ReactDebugCurrentFrame.setExtraStackFrame(v14)
+			local kind = data.type
+			local source = data._source
+			local v
 
-			return
+			if owner ~= nil then
+				v = owner.type
+			end
+
+			local v2 = describeUnknownElementTypeFrameInDEV(kind, source, v)
+
+			ReactDebugCurrentFrame.setExtraStackFrame(v2)
+		else
+			ReactDebugCurrentFrame.setExtraStackFrame(nil)
 		end
-
-		ReactDebugCurrentFrame.setExtraStackFrame(nil)
 	end
 end
-local function checkPropTypes(p2, p3: ((...any) -> ...any)?, p4, s1: string, s2: string?, p5) -- line: 51
-	-- upvalues: ReactGlobals (copy), console (copy), Error (copy), describeError (copy), describeUnknownElementTypeFrameInDEV (copy), ReactDebugCurrentFrame (copy), t1 (copy)
+
+local function checkPropTypes(items, callback, p, p2: string, value: string?, data)
 	if ReactGlobals.__DEV__ or ReactGlobals.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ then
-		if p2 and p3 then
-			console.warn("You've defined both propTypes and validateProps on " .. (s2 or "a component"))
+		if items and callback then
+			console.warn("You've defined both propTypes and validateProps on " .. (value or "a component"))
 		end
 
-		if p3 then
-			if typeof(p3) ~= "function" then
-				console.error(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(typeof(p3), s2 or ""))
-			else
-				local v21, v22 = p3(p4)
+		if callback then
+			if typeof(callback) == "function" then
+				local v, v2 = callback(p)
 
-				if not v21 then
-					local v23 = v22 or "<Validator function did not supply a message>"
-					local v24 = string.format("validateProps failed on a %s type in %s: %s", s1, s2 or "<UNKNOWN Component>", (tostring(v23)))
+				if not v then
+					local v3 = string.format(
+						"validateProps failed on a %s type in %s: %s",
+						p2,
+						value or "<UNKNOWN Component>",
+						(tostring(v2 or "<Validator function did not supply a message>"))
+					)
 
-					error(v24)
+					error(v3)
 				end
+			else
+				console.error(("validateProps must be a function, but it is a %s.\nCheck the definition of the component %q."):format(
+					typeof(callback),
+					value or ""
+				))
 			end
 		end
 
-		if p2 then
-			assert(typeof(p2) == "table", "propTypes needs to be a table")
+		if items then
+			assert(typeof(items) == "table", "propTypes needs to be a table")
 
-			for v25, _ in p2 do
-				local _, result = xpcall(function() -- line: 118
-					-- upvalues: p2 (copy), v25 (copy), Error (copy), s2 (copy), s1 (copy), p4 (copy)
-					if typeof(p2[v25]) ~= "function" then
-						local v34 = Error.new((s2 or "React class") .. ": " .. s1 .. " type `" .. v25 .. "` is invalid; " .. "it must be a function, usually from the `prop-types` package, but received `" .. typeof(p2[v25]) .. "`." .. "This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.")
+			for k, _ in items do
+				local _, result = xpcall(function()
+					if typeof(items[k]) ~= "function" then
+						local v = Error.new((value or "React class") .. ": " .. p2 .. " type `" .. k .. "` is invalid; " .. "it must be a function, usually from the `prop-types` package, but received `" .. typeof(items[k]) .. "`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.")
 
-						v34.name = "Invariant Violation"
-						error(v34)
+						v.name = "Invariant Violation"
+						error(v)
 					end
 
-					return p2[v25](p4, v25, s2, s1, nil, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED")
+					return items[k](p, k, value, p2, nil, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED")
 				end, describeError)
-				local v29 = typeof(result) == "table"
 
-				if result ~= nil and not v29 then
-					if ReactGlobals.__DEV__ then
-						if p5 then
-							local _owner = p5._owner
-							local v31 = describeUnknownElementTypeFrameInDEV(p5.type, p5._source, if _owner == nil then nil else _owner.type)
+				local v = typeof(result) == "table"
 
-							ReactDebugCurrentFrame.setExtraStackFrame(v31)
-						else
-							ReactDebugCurrentFrame.setExtraStackFrame(nil)
-						end
-					end
-
-					console.error(string.format("%s: type specification of %s `%s` is invalid; the type checker function must return `nil` or an `Error` but returned a %s. You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument).", s2 or "React class", s1, v25, (typeof(result))))
-
-					if ReactGlobals.__DEV__ then
-						ReactDebugCurrentFrame.setExtraStackFrame(nil)
-					end
+				if result ~= nil and not v then
+					setCurrentlyValidatingElement(data) -- inferred equivalent call
+					console.error(string.format(
+						"%s: type specification of %s `%s` is invalid; the type checker function must return `nil` or an `Error` but returned a %s. You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument).",
+						value or "React class",
+						p2,
+						k,
+						(typeof(result))
+					))
+					setCurrentlyValidatingElement() -- inferred equivalent call
 				end
 
-				if v29 and t1[result.message] == nil then
-					t1[tostring(result.message)] = true
-
-					if ReactGlobals.__DEV__ then
-						if p5 then
-							local _owner = p5._owner
-							local v33 = describeUnknownElementTypeFrameInDEV(p5.type, p5._source, if _owner == nil then nil else _owner.type)
-
-							ReactDebugCurrentFrame.setExtraStackFrame(v33)
-						else
-							ReactDebugCurrentFrame.setExtraStackFrame(nil)
-						end
-					end
-
-					console.warn(string.format("Failed %s type: %s", s1, (tostring(result.message))))
-
-					if ReactGlobals.__DEV__ then
-						ReactDebugCurrentFrame.setExtraStackFrame(nil)
-					end
+				if not (v and messageSet[result.message] == nil) then
+					continue
 				end
+
+				messageSet[tostring(result.message)] = true
+				setCurrentlyValidatingElement(data) -- inferred equivalent call
+				console.warn(string.format("Failed %s type: %s", p2, (tostring(result.message))))
+				setCurrentlyValidatingElement() -- inferred equivalent call
 			end
 		end
 	end

@@ -1,43 +1,49 @@
 local CorePackages = game:GetService("CorePackages")
-local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
 local Rodux = require(CorePackages.Packages.Rodux)
 local Cryo = require(CorePackages.Packages.Cryo)
-local ParentParent = script.Parent.Parent
 
-if require(ParentParent.Flags.FFlagTopBarDeprecateCoreGuiRodux) then
+local parent = script.Parent.Parent
+
+local FFlagTopBarDeprecateCoreGuiRodux = require(parent.Flags.FFlagTopBarDeprecateCoreGuiRodux)
+
+if FFlagTopBarDeprecateCoreGuiRodux then
 	return nil
 end
 
-local Actions = ParentParent.Actions
-local UpdateCoreGuiEnabled = require(Actions.UpdateCoreGuiEnabled)
-local v8 = if not require(RobloxGui.Modules.Flags.FFlagMountCoreGuiBackpack) then {
-	[Enum.CoreGuiType.PlayerList] = true,
-	[Enum.CoreGuiType.Health] = true,
-	[Enum.CoreGuiType.Backpack] = true,
-	[Enum.CoreGuiType.Chat] = true,
-	[Enum.CoreGuiType.EmotesMenu] = true
-} else {
-	[Enum.CoreGuiType.PlayerList] = true,
-	[Enum.CoreGuiType.Health] = true,
-	[Enum.CoreGuiType.Chat] = true,
-	[Enum.CoreGuiType.EmotesMenu] = true
-}
+local actions = parent.Actions
+local UpdateCoreGuiEnabled = require(actions.UpdateCoreGuiEnabled)
+local FFlagMountCoreGuiBackpack = require(RobloxGui.Modules.Flags.FFlagMountCoreGuiBackpack)
+local set
 
-return (Rodux.createReducer(v8, {
-	[UpdateCoreGuiEnabled.name] = function(p1, p2) -- line: 41
-		-- upvalues: Cryo (copy)
-		if p2.coreGuiType == Enum.CoreGuiType.All then
-			local t1 = {}
+if FFlagMountCoreGuiBackpack then
+	set = {}
+	set[Enum.CoreGuiType.PlayerList] = true
+	set[Enum.CoreGuiType.Health] = true
+else
+	set = {}
+	set[Enum.CoreGuiType.PlayerList] = true
+	set[Enum.CoreGuiType.Health] = true
+	set[Enum.CoreGuiType.Backpack] = true
+end
 
-			for k, _ in pairs(p1) do
-				t1[k] = p2.enabled
+set[Enum.CoreGuiType.Chat] = true
+set[Enum.CoreGuiType.EmotesMenu] = true
+
+return (Rodux.createReducer(set, {
+	[UpdateCoreGuiEnabled.name] = function(items, p)
+		if p.coreGuiType == Enum.CoreGuiType.All then
+			local enableds = {}
+
+			for k, _ in pairs(items) do
+				enableds[k] = p.enabled
 			end
 
-			return t1
+			return enableds
 		end
 
-		return Cryo.Dictionary.join(p1, {
-			[p2.coreGuiType] = p2.enabled
-		})
+		return Cryo.Dictionary.join(items, { [p.coreGuiType] = p.enabled })
 	end
 }))

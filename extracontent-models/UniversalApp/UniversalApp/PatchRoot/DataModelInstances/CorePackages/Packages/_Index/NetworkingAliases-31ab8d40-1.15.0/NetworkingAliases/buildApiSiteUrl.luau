@@ -1,28 +1,24 @@
 local ContentProvider = game:GetService("ContentProvider")
 
-local function parseBaseUrlInformation() -- line: 7
-	-- upvalues: ContentProvider (copy)
-	local BaseUrl = ContentProvider.BaseUrl
+local function parseBaseUrlInformation()
+	local v = ContentProvider.BaseUrl
 
-	if BaseUrl:sub(#BaseUrl) ~= "/" then
-		BaseUrl ..= "/"
+	if v:sub(#v) ~= "/" then
+		v ..= "/"
 	end
 
-	local _, stop = BaseUrl:find("://")
+	local _, v2 = v:find("://")
+	assert(type(v2) == "number", "Expected schemeEnd to be a number")
 
-	assert(type(stop) == "number", "Expected schemeEnd to be a number")
+	local v3, v4 = v:find("%.", v2 + 1)
+	assert(type(v3) == "number", "Expected prefixIndex to be a number")
+	assert(type(v4) == "number", "Expected prefixEnd to be a number")
 
-	local start, stop2 = BaseUrl:find("%.", stop + 1)
-
-	assert(type(start) == "number", "Expected prefixIndex to be a number")
-	assert(type(stop2) == "number", "Expected prefixEnd to be a number")
-
-	return BaseUrl, BaseUrl:sub(stop + 1, start - 1), (BaseUrl:sub(stop2 + 1))
+	return v, v:sub(v2 + 1, v3 - 1), (v:sub(v4 + 1))
 end
 
-local _, _, v5 = parseBaseUrlInformation()
+local _, _, v = parseBaseUrlInformation()
 
-return function(s1: string) -- line: 36
-	-- upvalues: v5 (copy)
-	return string.format("https://%s.%s", s1, v5)
+return function(p: string)
+	return string.format("https://%s.%s", p, v)
 end

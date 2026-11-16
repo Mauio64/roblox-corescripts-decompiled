@@ -1,11 +1,22 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Signals = require(Parent.Signals)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Signals = require(parent.Signals)
+
 local createProfileCTAStore = require(script.Parent.createProfileCTAStore)
-local v4 = Signals.createComputed(createProfileCTAStore)
+
+local SharedFlags = require(parent.SharedFlags)
+local v
+
+if SharedFlags.FFlagJoinabilityCTARefactor then
+	v = Signals.createComputed(function()
+		return createProfileCTAStore()
+	end)
+else
+	v = Signals.createComputed(createProfileCTAStore)
+end
 
 return {
-	get = function() -- line: 11
-		-- upvalues: v4 (copy)
-		return v4(false)
+	get = function()
+		return v(false)
 	end
 }

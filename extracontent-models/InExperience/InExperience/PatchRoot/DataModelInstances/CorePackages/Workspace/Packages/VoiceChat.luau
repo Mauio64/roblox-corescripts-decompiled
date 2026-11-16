@@ -1,3 +1,5 @@
-local _Workspace = script.Parent._Workspace
+local Workspace = script.Parent._Workspace
 
-return (require(_Workspace.VoiceChat.VoiceChat))
+local VoiceChat = require(Workspace.VoiceChat.VoiceChat)
+
+return VoiceChat

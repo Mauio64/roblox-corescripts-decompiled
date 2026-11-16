@@ -1,43 +1,34 @@
-return function(p1, p2, p3) -- line: 16
-	local t1 = {}
-
-	t1.__index = t1
-
-	function t1.__tostring(p4) -- line: 19
-		-- upvalues: p1 (copy)
-		return getmetatable(p1).__tostring(p4)
+return function(p, p2, callback)
+	local class = {}
+	class.__index = class
+	function class.__tostring(p3)
+		return getmetatable(p).__tostring(p3)
 	end
 
-	local t2 = {}
+	local class2 = {}
 
-	function t1.new(...) -- line: 25
-		-- upvalues: p3 (copy), t1 (copy)
-		local t3 = {}
-
-		p3(t3, ...)
-
-		return (setmetatable(t3, t1))
+	function class.new(...)
+		local v = {}
+		callback(v, ...)
+		return (setmetatable(v, class))
 	end
 
-	if typeof((getmetatable(p1))) == "table" and getmetatable(p1).__call then
-		function t2.__call(_, ...) -- line: 32
-			-- upvalues: t1 (copy)
-			return t1.new(...)
+	if typeof((getmetatable(p))) == "table" and getmetatable(p).__call then
+		function class2.__call(_, ...)
+			return class.new(...)
 		end
 	end
 
-	t2.__index = p1
-
-	function t2.__tostring(p6) -- line: 38
-		-- upvalues: t1 (copy), p2 (copy), p1 (copy)
-		if p6 == t1 then
+	class2.__index = p
+	function class2.__tostring(p3)
+		if p3 == class then
 			return (tostring(p2))
 		end
 
-		return getmetatable(p1).__tostring(p6)
+		return getmetatable(p).__tostring(p3)
 	end
 
-	setmetatable(t1, t2)
+	setmetatable(class, class2)
 
-	return t1
+	return class
 end

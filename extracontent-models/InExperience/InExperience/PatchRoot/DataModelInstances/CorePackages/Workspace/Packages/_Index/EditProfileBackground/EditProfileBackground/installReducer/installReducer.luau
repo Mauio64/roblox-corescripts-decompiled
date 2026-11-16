@@ -1,10 +1,9 @@
 local EditProfileBackground = script:FindFirstAncestor("EditProfileBackground")
-local EditProfileBackgroundParent = EditProfileBackground.Parent
-local Rodux = require(EditProfileBackgroundParent.Rodux)
+local parent = EditProfileBackground.Parent
+local Rodux = require(parent.Rodux)
 local ProfileRoduxNetworking = require(EditProfileBackground.Networking.ProfileRoduxNetworking)
 
-return function() -- line: 6
-	-- upvalues: Rodux (copy), ProfileRoduxNetworking (copy)
+return function()
 	return Rodux.combineReducers({
 		NetworkStatus = ProfileRoduxNetworking.installReducer()
 	})

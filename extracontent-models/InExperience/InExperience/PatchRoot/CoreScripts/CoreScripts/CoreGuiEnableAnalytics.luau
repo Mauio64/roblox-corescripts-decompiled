@@ -1,45 +1,45 @@
 local StarterGui = game:GetService("StarterGui")
 local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
 local CorePackages = game:GetService("CorePackages")
-local EventStream = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventStream
-local t1 = {}
 
-t1.__index = t1
+local Analytics = require(CorePackages.Workspace.Packages.Analytics)
+local EventStream = Analytics.AnalyticsReporters.EventStream
 
-function t1.new() -- line: 19
-	-- upvalues: EventStream (copy), RbxAnalyticsService (copy), StarterGui (copy), t1 (copy)
-	local t2 = {
-		evenStream = EventStream.new(RbxAnalyticsService),
-		playSessionStart = os.clock()
-	}
+local CoreGuiEnableAnalytics = {}
+CoreGuiEnableAnalytics.__index = CoreGuiEnableAnalytics
 
-	function t2.sendCoreGuiAnalytic(p1, b1: boolean) -- line: 25
-		-- upvalues: t2 (copy), RbxAnalyticsService (copy)
-		local v10 = math.round((os.clock() - t2.playSessionStart) * 1000)
-		local t3 = {
+function CoreGuiEnableAnalytics.new()
+	local v = {}
+	v.evenStream = EventStream.new(RbxAnalyticsService)
+	v.playSessionStart = os.clock()
+
+	function v.sendCoreGuiAnalytic(p, flag: boolean)
+		local v2 = math.round((os.clock() - v.playSessionStart) * 1000)
+
+		local v3 = {
 			placeid = tostring(game.PlaceId),
 			universeid = tostring(game.GameId),
-			type = tostring(p1.Name),
-			enabled = tostring(b1),
+			type = tostring(p.Name),
+			enabled = tostring(flag),
 			sessionid = RbxAnalyticsService:GetSessionId(),
-			playSessionDurationMs = tostring(v10)
+			playSessionDurationMs = tostring(v2)
 		}
 
-		t2.evenStream:sendEventDeferred("core_gui_type", "core_gui_type", t3)
+		v.evenStream:sendEventDeferred("core_gui_type", "core_gui_type", v3)
 	end
 
-	t2.signalConnection = StarterGui.CoreGuiChangedSignal:Connect(function(p2, b2: boolean) -- line: 42
-		-- upvalues: t2 (copy)
-		t2.sendCoreGuiAnalytic(p2, b2)
+	v.signalConnection = StarterGui.CoreGuiChangedSignal:Connect(function(p, flag: boolean)
+		v.sendCoreGuiAnalytic(p, flag)
 	end)
-	setmetatable(t2, t1)
 
-	return t2
-end
-function t1.DisconnectSignal(p3) -- line: 50
-	p3.signalConnection:Disconnect()
+	setmetatable(v, CoreGuiEnableAnalytics)
+	return v
 end
 
-t1.new()
+function CoreGuiEnableAnalytics.DisconnectSignal(p)
+	p.signalConnection:Disconnect()
+end
 
-return t1
+CoreGuiEnableAnalytics.new()
+
+return CoreGuiEnableAnalytics

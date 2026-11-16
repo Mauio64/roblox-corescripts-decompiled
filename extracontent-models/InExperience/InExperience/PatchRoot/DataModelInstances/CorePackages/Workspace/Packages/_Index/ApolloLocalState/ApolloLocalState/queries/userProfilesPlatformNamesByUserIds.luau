@@ -1,3 +1,4 @@
-local Parent = script:FindFirstAncestor("ApolloLocalState").Parent
+local parent = script:FindFirstAncestor("ApolloLocalState").Parent
 
-return (require(Parent.ApolloClient).gql(require(script.Parent.schema.UserProfilesPlatformNamesByUserIds)))
+local ApolloClient = require(parent.ApolloClient)
+return (ApolloClient.gql(require(script.Parent.schema.UserProfilesPlatformNamesByUserIds)))

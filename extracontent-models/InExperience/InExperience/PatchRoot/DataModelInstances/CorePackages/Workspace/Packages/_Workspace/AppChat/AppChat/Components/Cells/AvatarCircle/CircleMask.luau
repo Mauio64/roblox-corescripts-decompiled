@@ -1,40 +1,41 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Foundation = require(Parent.Foundation)
-local React = require(Parent.React)
+local parent = script:FindFirstAncestor("AppChat").Parent
+local Foundation = require(parent.Foundation)
+local React = require(parent.React)
+
 local useCursor = Foundation.Hooks.useCursor
-local t1 = {
+
+local v = {
 	Size36x36 = "rbxasset://textures/ui/LuaChat/graphic/gr-profile-border-36x36.png",
 	Size48x48 = "rbxasset://textures/ui/LuaChat/graphic/gr-profile-border-48x48.png"
 }
 
-local function CircleMask(t2: {[any]: any}) -- line: 28
-	-- upvalues: t1 (copy), useCursor (copy), React (copy)
-	local v8 = t1[t2.overlaySize or "Size36x36"]
-	local v9 = useCursor()
+local function CircleMask(props)
+	local image = v[props.overlaySize or "Size36x36"]
+	local selectionImageObject = useCursor()
 
 	return React.createElement("ImageButton", {
 		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = t2.circleInteriorBackgroundColor3,
-		BackgroundTransparency = t2.circleInteriorBackgroundTransparency,
+		BackgroundColor3 = props.circleInteriorBackgroundColor3,
+		BackgroundTransparency = props.circleInteriorBackgroundTransparency,
 		BorderSizePixel = 0,
 		Image = "",
-		SelectionImageObject = v9,
+		SelectionImageObject = selectionImageObject,
 		AutoButtonColor = false,
 		ClipsDescendants = true,
-		[React.Event.Activated] = t2.onActivated,
-		Selectable = t2.selectable,
-		LayoutOrder = t2.LayoutOrder
+		[React.Event.Activated] = props.onActivated,
+		Selectable = props.selectable,
+		LayoutOrder = props.LayoutOrder
 	}, {
 		imageMask = React.createElement("ImageLabel", {
+			Image = image,
+			ImageColor3 = props.circleColor3,
+			ImageTransparency = props.circleTransparency,
+			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			ZIndex = 2,
-			Image = v8,
-			ImageColor3 = t2.circleColor3,
-			ImageTransparency = t2.circleTransparency,
-			Size = UDim2.fromScale(1, 1)
-		}, t2.renderAboveMask)
-	}, t2.children)
+			ZIndex = 2
+		}, props.renderAboveMask)
+	}, props.children)
 end
 
 return CircleMask

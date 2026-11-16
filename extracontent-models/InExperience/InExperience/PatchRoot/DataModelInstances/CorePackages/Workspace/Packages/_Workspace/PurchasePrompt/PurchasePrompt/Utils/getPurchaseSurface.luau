@@ -1,12 +1,12 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
-local PurchasePromptParent = PurchasePrompt.Parent
+local parent = PurchasePrompt.Parent
 local AppContext = require(PurchasePrompt.Utils.AppContext)
-local ProductPurchaseSurface = require(PurchasePromptParent.PurchasePromptLite).Enums.ProductPurchaseSurface
+local PurchasePromptLite = require(parent.PurchasePromptLite)
+local ProductPurchaseSurface = PurchasePromptLite.Enums.ProductPurchaseSurface
 
-local function getPurchaseSurface(p1) -- line: 6
-	-- upvalues: AppContext (copy), ProductPurchaseSurface (copy)
-	if p1 and p1.surface then
-		return p1.surface
+local function getPurchaseSurface(p)
+	if p and p.surface then
+		return p.surface
 	end
 
 	if AppContext.get() == AppContext.Enum.IN_EXPERIENCE then

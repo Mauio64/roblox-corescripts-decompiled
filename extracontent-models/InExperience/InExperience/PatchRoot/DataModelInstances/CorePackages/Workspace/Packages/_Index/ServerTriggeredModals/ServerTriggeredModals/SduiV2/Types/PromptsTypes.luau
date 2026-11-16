@@ -1,6 +1,6 @@
-local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
+local parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
 
 require(script.Parent.Parent.PromptsEntryPoint)
-require(Parent.SduiSharedUtilities)
+require(parent.SduiSharedUtilities)
 
 return {}

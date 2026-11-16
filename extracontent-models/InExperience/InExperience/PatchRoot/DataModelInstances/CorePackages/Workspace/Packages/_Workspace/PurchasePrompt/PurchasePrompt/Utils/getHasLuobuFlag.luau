@@ -1,7 +1,7 @@
-local ParentParent = script.Parent.Parent
-local GetFFlagEnableLuobuInGameUpsell = require(ParentParent.Flags.GetFFlagEnableLuobuInGameUpsell)
+local parent = script.Parent.Parent
 
-return function() -- line: 5
-	-- upvalues: GetFFlagEnableLuobuInGameUpsell (copy)
+local GetFFlagEnableLuobuInGameUpsell = require(parent.Flags.GetFFlagEnableLuobuInGameUpsell)
+
+return function()
 	return GetFFlagEnableLuobuInGameUpsell()
 end

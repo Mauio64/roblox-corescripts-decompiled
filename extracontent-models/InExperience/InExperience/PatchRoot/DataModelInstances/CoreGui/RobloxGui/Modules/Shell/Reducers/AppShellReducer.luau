@@ -1,13 +1,10 @@
 game:GetService("CorePackages")
 
-local scriptParent = script.Parent
-local ScreenList = require(scriptParent.ScreenList)
+local parent = script.Parent
+local ScreenList = require(parent.ScreenList)
 
-return function(p1, p2) -- line: 8
-	-- upvalues: ScreenList (copy)
-	local v5 = p1 or {}
-
+return function(options, p)
 	return {
-		ScreenList = ScreenList(v5.ScreenList, p2)
+		ScreenList = ScreenList((options or {}).ScreenList, p)
 	}
 end

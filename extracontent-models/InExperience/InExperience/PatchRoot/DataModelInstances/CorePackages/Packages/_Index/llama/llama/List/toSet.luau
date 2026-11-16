@@ -1,15 +1,14 @@
-local function toSet(p1) -- line: 2
-	local v3 = type(p1)
+local function toSet(list)
+	local typeName = type(list)
+	assert(typeName == "table", "expected a table for first argument, got " .. typeName)
 
-	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+	local set = {}
 
-	local t1 = {}
-
-	for i = 1, #p1 do
-		t1[p1[i]] = true
+	for i = 1, #list do
+		set[list[i]] = true
 	end
 
-	return t1
+	return set
 end
 
 return toSet

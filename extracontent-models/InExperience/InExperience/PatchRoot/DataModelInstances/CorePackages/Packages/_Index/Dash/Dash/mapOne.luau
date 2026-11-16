@@ -1,9 +1,11 @@
-local function mapOne(t1: {[any]: any}, p1: ((...any) -> ...any)?) -- line: 14
-	for v4, v5 in t1 do
-		local v6 = if not p1 then v5 else p1(v5, v4)
+local function mapOne(items, callback)
+	for k, item in items do
+		if callback then
+			item = callback(item, k)
+		end
 
-		if v6 ~= nil then
-			return v6
+		if item ~= nil then
+			return item
 		end
 	end
 

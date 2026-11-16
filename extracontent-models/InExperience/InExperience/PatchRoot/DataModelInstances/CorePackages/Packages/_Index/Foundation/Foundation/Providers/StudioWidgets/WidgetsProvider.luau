@@ -1,57 +1,69 @@
 local Foundation = script:FindFirstAncestor("Foundation")
-local FoundationParent = Foundation.Parent
-local React = require(FoundationParent.React)
+local parent = Foundation.Parent
 
+local React = require(parent.React)
+
+local Flags = require(Foundation.Utility.Flags)
 require(Foundation.Utility.Plugin.StudioUri)
-
 local usePlugin = require(Foundation.Providers.Plugin.usePlugin)
+
 local WidgetManager = require(script.Parent.WidgetManager)
 local WidgetsContext = require(script.Parent.WidgetsContext)
 
 require(script.Parent.Types)
 
-local function WidgetsProvider(t1: {[any]: any}) -- line: 21
-	-- upvalues: usePlugin (copy), React (copy), WidgetManager (copy), WidgetsContext (copy)
-	local v9 = usePlugin()
+local function WidgetsProvider(p)
+	local v = usePlugin()
 
-	if v9 == nil then
+	if v == nil then
 		error("WidgetsProvider must be used within a Plugin context")
 	end
 
-	local v10 = React.useMemo(function() -- line: 27
-		-- upvalues: WidgetManager (copy), v9 (copy)
-		return WidgetManager.new(v9:GetPluginComponent("Widgets"))
-	end, { v9 })
+	local v2 = React.useMemo(function()
+		return WidgetManager.new(v:GetPluginComponent("Widgets"))
+	end, { v })
 
-	React.useEffect(function() -- line: 31
-		-- upvalues: v10 (copy)
-		return function() -- line: 32
-			-- upvalues: v10 (copy)
-			v10:destroy()
+	React.useEffect(function()
+		return function()
+			v2:destroy()
 		end
-	end, { v10 })
+	end, { v2 })
 
-	local v11 = React.useCallback(function(p1, p2) -- line: 37
-		-- upvalues: v10 (copy)
-		v10:register(p1, p2)
-	end, { v10 })
-	local v12 = React.useCallback(function(p3, p4) -- line: 41
-		-- upvalues: v10 (copy)
-		v10:deregister(p3, p4)
-	end, { v10 })
-	local v13 = React.useCallback(function() -- line: 45
-		-- upvalues: v10 (copy)
-		return v10:nextId()
-	end, { v10 })
-	local t2 = {
-		register = v11,
-		deregister = v12,
-		nextId = v13
-	}
+	local register = React.useCallback(function(p2, p3)
+		v2:register(p2, p3)
+	end, { v2 })
 
-	return React.createElement(WidgetsContext.Provider, {
-		value = t2
-	}, t1.children)
+	local deregister = React.useCallback(function(p2, p3)
+		v2:deregister(p2, p3)
+	end, { v2 })
+	local v3
+
+	if Flags.FoundationPopoverPluginAnchorRefresh then
+		v3 = React.useCallback(function(p2)
+			return v2:refreshAsync(p2)
+		end, { v2 })
+	else
+		v3 = nil
+	end
+
+	local nextId = React.useCallback(function()
+		return v2:nextId()
+	end, { v2 })
+
+	local v4 = React.useMemo(function()
+		local v4 = { register = register, deregister = deregister, refreshAsync = 0, nextId = 0 }
+		local refreshAsync
+
+		if Flags.FoundationPopoverPluginAnchorRefresh then
+			refreshAsync = v3
+		end
+
+		v4.refreshAsync = refreshAsync
+		v4.nextId = nextId
+		return v4
+	end, { register, deregister, v3, nextId })
+
+	return React.createElement(WidgetsContext.Provider, { value = v4 }, p.children)
 end
 
 return WidgetsProvider

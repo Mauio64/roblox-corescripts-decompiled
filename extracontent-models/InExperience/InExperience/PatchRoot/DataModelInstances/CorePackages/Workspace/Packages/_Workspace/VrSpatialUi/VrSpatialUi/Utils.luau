@@ -1,5 +1,5 @@
 return {
-	rescaleCFramePosition = function(cFrame: CFrame, n1: number) -- line: 1
-		return cFrame.Rotation + cFrame.Position * n1
+	rescaleCFramePosition = function(cframe: CFrame, p: number)
+		return cframe.Rotation + cframe.Position * p
 	end
 }

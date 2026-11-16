@@ -1,15 +1,26 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
-local FFlagUseNavigationSelectors = require(Parent.SharedFlags).FFlagUseNavigationSelectors
-local FFlagSignalsNavP3gAvatarExperience = require(Parent.SharedFlags).FFlagSignalsNavP3gAvatarExperience
-local Selectors = require(Parent.NavigationRodux).Selectors
-local GetLegacyNavigationStore = require(Parent.NavigationRodux).GetLegacyNavigationStore
+local parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local SharedFlags = require(parent.SharedFlags)
+local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
+local SharedFlags2 = require(parent.SharedFlags)
+local FFlagSignalsNavP3gAvatarExperience = SharedFlags2.FFlagSignalsNavP3gAvatarExperience
+local NavigationRodux = require(parent.NavigationRodux)
+local Selectors = NavigationRodux.Selectors
+local NavigationRodux2 = require(parent.NavigationRodux)
+local GetLegacyNavigationStore = NavigationRodux2.GetLegacyNavigationStore
 
-local function selectCurrentAvatarRoute(p1) -- line: 8
-	-- upvalues: FFlagSignalsNavP3gAvatarExperience (copy), GetLegacyNavigationStore (copy), FFlagUseNavigationSelectors (copy), Selectors (copy)
-	local v8 = if not FFlagSignalsNavP3gAvatarExperience then if not FFlagUseNavigationSelectors then p1.Navigation and p1.Navigation.currentRoute else p1.Navigation and Selectors.selectCurrentRoactNavigationRoute(p1) else GetLegacyNavigationStore(false).getCurrentRoute(false)
-	local v9 = v8 and (v8.params and v8.params.fromAvatarRoute)
+local function selectCurrentAvatarRoute(p)
+	local v
 
-	return v9 and v9.current
+	if FFlagSignalsNavP3gAvatarExperience then
+		v = GetLegacyNavigationStore(false).getCurrentRoute(false)
+	elseif FFlagUseNavigationSelectors then
+		v = p.Navigation and Selectors.selectCurrentRoactNavigationRoute(p)
+	else
+		v = p.Navigation and p.Navigation.currentRoute
+	end
+
+	local fromAvatarRoute = v and v.params and v.params.fromAvatarRoute
+	return fromAvatarRoute and fromAvatarRoute.current
 end
 
 return selectCurrentAvatarRoute

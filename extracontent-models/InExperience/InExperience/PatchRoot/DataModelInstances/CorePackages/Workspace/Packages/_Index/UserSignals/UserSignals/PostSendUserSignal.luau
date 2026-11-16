@@ -1,33 +1,50 @@
 local HttpService = game:GetService("HttpService")
 local SessionService = game:GetService("SessionService")
-local UserSignals = script:FindFirstAncestor("UserSignals")
-local UserSignalsParent = UserSignals.Parent
-local SessionType = require(UserSignalsParent.RobloxAppSessionization).SessionType
-local Http = require(UserSignalsParent.Http)
 
-require(UserSignalsParent.RobloxAppEnums)
+local UserSignals = script:FindFirstAncestor("UserSignals")
+local parent = UserSignals.Parent
+
+local RobloxAppSessionization = require(parent.RobloxAppSessionization)
+local SessionType = RobloxAppSessionization.SessionType
+
+local Http = require(parent.Http)
+require(parent.RobloxAppEnums)
 
 local Url = Http.Url
-
 require(UserSignals.UserSignalTypes)
 
-local FFlagLuaAppAddSessionIdToUserSignals = require(UserSignalsParent.SharedFlags).FFlagLuaAppAddSessionIdToUserSignals
+local SharedFlags = require(parent.SharedFlags)
+local FFlagLuaAppAddSessionIdToUserSignals = SharedFlags.FFlagLuaAppAddSessionIdToUserSignals
 
-return function(p1, t1: {[any]: any}, t2: {[any]: any}, p2, p3) -- line: 82
-	-- upvalues: FFlagLuaAppAddSessionIdToUserSignals (copy), SessionService (copy), SessionType (copy), Url (copy), HttpService (copy)
-	local v14 = if not FFlagLuaAppAddSessionIdToUserSignals then nil else SessionService:GetMetadata(SessionType.StructuralIdentifier.HomePageSessionInfo, SessionType.Metadata.HomePageSessionInfo.OmniSessionId)
-	local str = tostring(DateTime.now().UnixTimestampMillis)
+return function(callback, signalValue, signalEntity, signalValueType, signalType)
+	local metadata
 
-	return p1(string.format("%suser-signal-http-gateway/v1/user-signal/ingest", Url.APIS_URL), "POST", {
+	if FFlagLuaAppAddSessionIdToUserSignals then
+		metadata = SessionService:GetMetadata(
+			SessionType.StructuralIdentifier.HomePageSessionInfo,
+			SessionType.Metadata.HomePageSessionInfo.OmniSessionId
+		)
+	end
+
+	local unixTimestampMillis = tostring(DateTime.now().UnixTimestampMillis)
+	local v = string.format("%suser-signal-http-gateway/v1/user-signal/ingest", Url.APIS_URL)
+
+	if not FFlagLuaAppAddSessionIdToUserSignals then
+		metadata = nil
+	end
+
+	return callback(v, "POST", {
 		postBody = HttpService:JSONEncode({
-			userSignalEvents = {{
-				signalValue = t1,
-				timestampMs = str,
-				signalValueType = p2,
-				signalEntity = t2,
-				signalType = p3,
-				omniSessionId = if not FFlagLuaAppAddSessionIdToUserSignals then nil else v14
-			}}
+			userSignalEvents = {
+				{
+					signalValue = signalValue,
+					timestampMs = unixTimestampMillis,
+					signalValueType = signalValueType,
+					signalEntity = signalEntity,
+					signalType = signalType,
+					omniSessionId = metadata
+				}
+			}
 		})
 	})
 end

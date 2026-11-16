@@ -1,86 +1,140 @@
-local Parent = script:FindFirstAncestor("AppBlox").Parent
-local Roact = require(Parent.Roact)
-local RoactRodux = require(Parent.RoactRodux)
-local getSafeAreaSize = require(Parent.InputUi).getSafeAreaSize
-local IsVRAppBuild = require(Parent.AppCommonLib).IsVRAppBuild
-local Constants = require(Parent.AppSystemBar).Constants
-local v7 = Roact.PureComponent:extend("FullscreenPageWithSafeArea")
-local useSignalState = require(Parent.SignalsReact).useSignalState
-local Display = require(Parent.Display)
-local Cryo = require(Parent.Cryo)
-local FFlagExtendScrollingFramesBySafeInsets = require(Parent.SharedFlags).FFlagExtendScrollingFramesBySafeInsets
+local parent = script:FindFirstAncestor("AppBlox").Parent
 
-function v7.render(p1) -- line: 18
-	-- upvalues: Roact (copy), FFlagExtendScrollingFramesBySafeInsets (copy), getSafeAreaSize (copy), IsVRAppBuild (copy), Constants (copy)
-	local statusBarHeight = p1.props.statusBarHeight
-	local screenSize = p1.props.screenSize
-	local globalGuiInset = p1.props.globalGuiInset
-	local propsBackgroundColor3 = p1.props.BackgroundColor3
-	local propsBackgroundTransparency = p1.props.BackgroundTransparency
-	local includeStatusBar = p1.props.includeStatusBar
-	local includeBottomBar = p1.props.includeBottomBar
-	local renderFullscreenBackground = p1.props.renderFullscreenBackground
-	local v23 = p1.props[Roact.Children]
-	local buttonRef = p1.props.buttonRef
-	local v25 = if not FFlagExtendScrollingFramesBySafeInsets then nil else p1.props.deviceSafePadding
+local Roact = require(parent.Roact)
+local RoactRodux = require(parent.RoactRodux)
+
+local InputUi = require(parent.InputUi)
+local getSafeAreaSize = InputUi.getSafeAreaSize
+local AppCommonLib = require(parent.AppCommonLib)
+local IsVRAppBuild = AppCommonLib.IsVRAppBuild
+local AppSystemBar = require(parent.AppSystemBar)
+local Constants = AppSystemBar.Constants
+
+local extended = Roact.PureComponent:extend("FullscreenPageWithSafeArea")
+local SignalsReact = require(parent.SignalsReact)
+local useSignalState = SignalsReact.useSignalState
+local Display = require(parent.Display)
+local Cryo = require(parent.Cryo)
+
+local SharedFlags = require(parent.SharedFlags)
+local FFlagExtendScrollingFramesBySafeInsets = SharedFlags.FFlagExtendScrollingFramesBySafeInsets
+
+function extended.render(p)
+	local statusBarHeight = p.props.statusBarHeight
+	local screenSize = p.props.screenSize
+	local globalGuiInset = p.props.globalGuiInset
+
+	local backgroundColor3 = p.props.BackgroundColor3
+	local backgroundTransparency = p.props.BackgroundTransparency
+	local includeStatusBar = p.props.includeStatusBar
+	local includeBottomBar = p.props.includeBottomBar
+	local renderFullscreenBackground = p.props.renderFullscreenBackground
+	local v = p.props[Roact.Children]
+	local buttonRef = p.props.buttonRef
+	local deviceSafePadding
+
+	if FFlagExtendScrollingFramesBySafeInsets then
+		deviceSafePadding = p.props.deviceSafePadding
+	end
 
 	if screenSize.X == 0 or screenSize.Y == 0 then
 		return nil
 	end
 
-	local v26 = getSafeAreaSize(screenSize, globalGuiInset)
-	local v27 = globalGuiInset.top + (FFlagExtendScrollingFramesBySafeInsets and v25.top or 0)
-	local v28 = p1.props.useFullScalePage or IsVRAppBuild()
+	local size = getSafeAreaSize(screenSize, globalGuiInset)
+	local v2 = globalGuiInset.top + (FFlagExtendScrollingFramesBySafeInsets and deviceSafePadding.top or 0)
+
+	local useFullScalePage = p.props.useFullScalePage or IsVRAppBuild()
 
 	if includeStatusBar then
-		v26 = UDim2.new(0, v26.X.Offset, 0, v26.Y.Offset - statusBarHeight)
-		v27 += statusBarHeight
+		size = UDim2.new(0, size.X.Offset, 0, size.Y.Offset - statusBarHeight)
+		v2 += statusBarHeight
 	end
 
 	if includeBottomBar then
-		v26 = UDim2.new(0, v26.X.Offset, 0, v26.Y.Offset - Constants.BOTTOM_BAR_SIZE)
+		size = UDim2.new(0, size.X.Offset, 0, size.Y.Offset - Constants.BOTTOM_BAR_SIZE)
 	end
 
-	return Roact.createElement("Frame", {
-		Position = if not v28 then UDim2.new(0, -globalGuiInset.left - (FFlagExtendScrollingFramesBySafeInsets and v25.left or 0), 0, -globalGuiInset.top - (FFlagExtendScrollingFramesBySafeInsets and v25.top or 0)) else UDim2.new(0, 0, 0, 0),
-		Size = if not v28 then UDim2.new(0, screenSize.X, 0, screenSize.Y) else UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = propsBackgroundColor3,
-		BackgroundTransparency = propsBackgroundTransparency,
+	local createElement = Roact.createElement
+	local position
+
+	if useFullScalePage then
+		position = UDim2.new(0, 0, 0, 0)
+	else
+		position = UDim2.new(
+			0,
+			-globalGuiInset.left - (FFlagExtendScrollingFramesBySafeInsets and deviceSafePadding.left or 0),
+			0,
+			-globalGuiInset.top - (FFlagExtendScrollingFramesBySafeInsets and deviceSafePadding.top or 0)
+		)
+	end
+
+	local size2
+
+	if useFullScalePage then
+		size2 = UDim2.new(1, 0, 1, 0)
+	else
+		size2 = UDim2.new(0, screenSize.X, 0, screenSize.Y)
+	end
+
+	local buttonRefsByRef = {
+		Position = position,
+		Size = size2,
+		BackgroundColor3 = backgroundColor3,
+		BackgroundTransparency = backgroundTransparency,
 		Active = true,
 		BorderSizePixel = 0,
 		ClipsDescendants = not FFlagExtendScrollingFramesBySafeInsets,
 		[Roact.Ref] = buttonRef
-	}, {
-		Background = renderFullscreenBackground and renderFullscreenBackground(v27),
-		SafeAreaFrame = Roact.createElement("Frame", {
-			BackgroundTransparency = 1,
-			Position = if not v28 then UDim2.new(0, globalGuiInset.left + (FFlagExtendScrollingFramesBySafeInsets and v25.left or 0), 0, v27) else UDim2.new(0, 0, 0, 0),
-			Size = if not v28 then v26 else UDim2.new(1, 0, 1, 0),
-			ZIndex = not renderFullscreenBackground and 1 or 2
-		}, v23)
-	})
-end
-
-local v12 = RoactRodux.connect(function(p2, _) -- line: 87
-	return {
-		statusBarHeight = p2.TopBar.statusBarHeight,
-		screenSize = p2.ScreenSize,
-		globalGuiInset = p2.GlobalGuiInset
 	}
-end)(v7)
+	local v3 = {
+		Background = renderFullscreenBackground and renderFullscreenBackground(v2),
+		SafeAreaFrame = 0
+	}
+	local createElement2 = Roact.createElement
+	local position2
 
-if FFlagExtendScrollingFramesBySafeInsets then
-	local function FullscreenPageWithSafeAreaFunctional(p4) -- line: 96
-		-- upvalues: useSignalState (copy), Display (copy), Cryo (copy), Roact (copy), v12 (copy)
-		local v32 = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
-		local v33 = Cryo.Dictionary.join(p4, {
-			deviceSafePadding = v32
-		})
-
-		return Roact.createElement(v12, v33)
+	if useFullScalePage then
+		position2 = UDim2.new(0, 0, 0, 0)
+	else
+		position2 = UDim2.new(
+			0,
+			globalGuiInset.left + (FFlagExtendScrollingFramesBySafeInsets and deviceSafePadding.left or 0),
+			0,
+			v2
+		)
 	end
 
-	return FullscreenPageWithSafeAreaFunctional
+	if useFullScalePage then
+		size = UDim2.new(1, 0, 1, 0)
+	end
+
+	v3.SafeAreaFrame = createElement2("Frame", {
+		Position = position2,
+		Size = size,
+		BackgroundTransparency = 1,
+		ZIndex = renderFullscreenBackground and 2 or 1
+	}, v)
+	return createElement("Frame", buttonRefsByRef, v3)
 end
 
-return v12
+local v = RoactRodux.connect(function(data, _)
+	return {
+		statusBarHeight = data.TopBar.statusBarHeight,
+		screenSize = data.ScreenSize,
+		globalGuiInset = data.GlobalGuiInset
+	}
+end)(extended)
+
+if not FFlagExtendScrollingFramesBySafeInsets then
+	return v
+end
+
+local function FullscreenPageWithSafeAreaFunctional(p)
+	local deviceSafePadding = useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
+	local joined = Cryo.Dictionary.join(p, { deviceSafePadding = deviceSafePadding })
+
+	return Roact.createElement(v, joined)
+end
+
+return FullscreenPageWithSafeAreaFunctional

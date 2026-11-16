@@ -1,22 +1,47 @@
 local Squads = script:FindFirstAncestor("Squads")
+
 local dependencies = require(Squads.dependencies)
-local SquadsParent = Squads.Parent
-local CrossExperienceVoice = require(SquadsParent.CrossExperienceVoice)
-local UIBlox = require(SquadsParent.UIBlox)
-local UserProfiles = require(SquadsParent.UserProfiles)
-local getStandardSizeAvatarHeadShotRbxthumb = require(SquadsParent.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb
-local useLocalUserId = require(SquadsParent.RobloxAppHooks).useLocalUserId
-local BuilderIcons = require(SquadsParent.BuilderIcons)
-local Hooks = require(SquadsParent.SquadsCore.Hooks)
-local PresenceType = dependencies.RoduxPresence.Enums.PresenceType
-local Foundation = dependencies.Foundation
-local React = dependencies.React
-local SharedFlags = dependencies.SharedFlags
+
+local parent = Squads.Parent
+local CrossExperienceVoice = require(parent.CrossExperienceVoice)
+local UIBlox = require(parent.UIBlox)
+local UserProfiles = require(parent.UserProfiles)
+local UserLib = require(parent.UserLib)
+local getStandardSizeAvatarHeadShotRbxthumb = UserLib.Utils.getStandardSizeAvatarHeadShotRbxthumb
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local BuilderIcons = require(parent.BuilderIcons)
+local Hooks = require(parent.SquadsCore.Hooks)
+
+local presenceType = dependencies.RoduxPresence.Enums.PresenceType
+local foundation = dependencies.Foundation
+local react = dependencies.React
+local sharedFlags = dependencies.SharedFlags
+
 local useLocalization = dependencies.Hooks.useLocalization
 local useSelector = dependencies.Hooks.useSelector
-local FFlagSquadsPresenceStoreMigration = require(SquadsParent.SquadsCore.Flags).FFlagSquadsPresenceStoreMigration
-local v18 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.FriendsCommon).Hooks.useGetPresenceByUserId
-local v19 = if not FFlagSquadsPresenceStoreMigration then nil else require(SquadsParent.DataHydration).Presence.PresenceEnums.PresenceType
+
+local Flags = require(parent.SquadsCore.Flags)
+local FFlagSquadsPresenceStoreMigration = Flags.FFlagSquadsPresenceStoreMigration
+local FFlagSquadsEnableFoundationTestIds = require(Squads.Flags.FFlagSquadsEnableFoundationTestIds)
+local useGetPresenceByUserId
+
+if FFlagSquadsPresenceStoreMigration then
+	local FriendsCommon = require(parent.FriendsCommon)
+	useGetPresenceByUserId = FriendsCommon.Hooks.useGetPresenceByUserId
+else
+	useGetPresenceByUserId = nil
+end
+
+local presenceType2
+
+if FFlagSquadsPresenceStoreMigration then
+	local DataHydration = require(parent.DataHydration)
+	presenceType2 = DataHydration.Presence.PresenceEnums.PresenceType
+else
+	presenceType2 = nil
+end
+
 local useParticipant = CrossExperienceVoice.Hooks.useParticipant
 local useIsVoiceConnected = CrossExperienceVoice.Hooks.useIsVoiceConnected
 local useIsActiveParticipant = CrossExperienceVoice.Hooks.useIsActiveParticipant
@@ -26,480 +51,815 @@ local useIsVoiceConnecting = CrossExperienceVoice.Hooks.useIsVoiceConnecting
 local useIsMicPermissionsError = CrossExperienceVoice.Hooks.useIsMicPermissionsError
 local useIsParticipantInOtherAudioContext = CrossExperienceVoice.Hooks.useIsParticipantInOtherAudioContext
 local useIsParticipantMutedLocally = CrossExperienceVoice.Hooks.useIsParticipantMutedLocally
-local useTokens = Foundation.Hooks.useTokens
+local useTokens = foundation.Hooks.useTokens
 local useSquadUserDropdownMenuButtons = require(Squads.Hooks.useSquadUserDropdownMenuButtons)
+
 local useIsLocalPlayerPartyVoiceEligible = Hooks.useIsLocalPlayerPartyVoiceEligible
 local useIsUserPartyVoiceEligible = Hooks.useIsUserPartyVoiceEligible
 local useIsCurrentSquadPartyVoiceEligible = Hooks.useIsCurrentSquadPartyVoiceEligible
-local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
-local FFlagEnableSquadUserCardHoverFix = SharedFlags.FFlagEnableSquadUserCardHoverFix
-local IconSize = Foundation.Enums.IconSize
+
+local getFFlagEnableCrossExpVoice = sharedFlags.GetFFlagEnableCrossExpVoice
+local iconSize = foundation.Enums.IconSize
+local stateLayerAffordance = foundation.Enums.StateLayerAffordance
+
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 
 require(Squads.Common.ModelTypes)
-
 local SquadUserPartyStatus = require(Squads.Enums.SquadUserPartyStatus)
-local v39 = game:DefineFastInt("PartyVoiceActivityIndicatorDebounceMs", 100)
-local v40 = game:DefineFastInt("PartyVoiceActivityIndicatorAnimationMs", 100)
-local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
-local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+
+local SquadLobbyUserOverflowMenuContainer = require(Squads.Components.SquadLobby.SquadLobbyUserOverflowMenu.SquadLobbyUserOverflowMenuContainer)
+
+local defineFastInt = game:DefineFastInt("PartyVoiceActivityIndicatorDebounceMs", 100)
+local defineFastInt2 = game:DefineFastInt("PartyVoiceActivityIndicatorAnimationMs", 100)
+
+local fFlagEnablePartyVoiceChangersInLua = sharedFlags.FFlagEnablePartyVoiceChangersInLua
+local fFlagEnableBlackbirdCheck = sharedFlags.FFlagEnableBlackbirdCheck
+local FFlagSquadMemberJoinDialogAndOverflowMenu = require(Squads.Flags.FFlagSquadMemberJoinDialogAndOverflowMenu)
 local useIsRobloxSubscriber = UserProfiles.Hooks.useIsRobloxSubscriber
 
-return function(t1: {[any]: any}) -- line: 84
-	-- upvalues: useLocalization (copy), useTokens (copy), useAnimatedTransparency (copy), v40 (copy), useIsRobloxSubscriber (copy), FFlagEnableBlackbirdCheck (copy), UserProfiles (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), React (copy), FFlagSquadsPresenceStoreMigration (copy), v18 (copy), useSelector (copy), v19 (copy), PresenceType (copy), useLocalUserId (copy), GetFFlagEnableCrossExpVoice (copy), useIsVoiceConnected (copy), useIsMicPermissionsError (copy), useParticipant (copy), useIsVoiceConnecting (copy), useIsActiveParticipant (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsUserPartyVoiceEligible (copy), useIsCurrentSquadPartyVoiceEligible (copy), useIsParticipantMutedLocally (copy), useIsParticipantMuted (copy), useIsParticipantInOtherAudioContext (copy), FFlagEnablePartyVoiceChangersInLua (copy), CrossExperienceVoice (copy), v39 (copy), SquadUserPartyStatus (copy), Foundation (copy), IconSize (copy), BuilderIcons (copy), FFlagEnableSquadUserCardHoverFix (copy), useSquadUserDropdownMenuButtons (copy), ImageSetLabel (copy)
-	local v45 = useLocalization({
+return function(props)
+	local v = useLocalization({
 		connectingText = "Feature.Squads.Label.Connecting",
 		inExperiencePresenceText = "Common.Presence.Label.InExperience",
 		invitedText = "Feature.Squads.Description.Invited",
 		noResponseText = "Feature.Squads.Description.NoResponse",
 		onlinePresenceText = "Common.Presence.Label.Online"
 	})
-	local v46 = useTokens()
-	local v47, v48 = useAnimatedTransparency(1, v40, Enum.EasingStyle.Cubic)
-	local v49 = useIsRobloxSubscriber(if not FFlagEnableBlackbirdCheck then nil else tostring(t1.user.userId))
-	local v50 = UserProfiles.Hooks.useUserProfilesFetch({
-		userIds = { (tostring(t1.user.userId)) },
+
+	local v2 = useTokens()
+
+	local transparency, v3 = useAnimatedTransparency(1, defineFastInt2, Enum.EasingStyle.Cubic)
+	local v4
+
+	if fFlagEnableBlackbirdCheck then
+		v4 = tostring(props.user.userId)
+	end
+
+	local v5 = useIsRobloxSubscriber(v4)
+
+	local v6 = UserProfiles.Hooks.useUserProfilesFetch({
+		userIds = { (tostring(props.user.userId)) },
 		query = UserProfiles.Queries.userProfilesCombinedNameByUserIds
 	})
-	local s1 = ""
 
-	if v50.data then
-		s1 = UserProfiles.Selectors.getCombinedNameFromId(v50.data, t1.user.userId)
-	end
+	local text2 = not v6.data and "" or UserProfiles.Selectors.getCombinedNameFromId(v6.data, props.user.userId)
 
-	local v52 = getStandardSizeAvatarHeadShotRbxthumb((tostring(t1.user.userId)))
-	local v53 = React.useCallback(function(p1) -- line: 111
-		-- upvalues: t1 (copy)
-		return p1.Squad.Presence.byUserId[tostring(t1.user.userId)]
-	end, { t1.user.userId })
-	local v54 = if not FFlagSquadsPresenceStoreMigration then useSelector(v53) else v18((tostring(t1.user.userId)))
-	local v55 = v54 and v54.userPresenceType == if not FFlagSquadsPresenceStoreMigration then PresenceType.InGame else v19.InGame
-	local u57
+	local standardSizeAvatarHeadShotRbxthumb = getStandardSizeAvatarHeadShotRbxthumb((tostring(props.user.userId)))
+	local formatted = `--social-squad-lobby-user-card-{props.user.userId}`
 
-	if v55 then
-		local v56 = if not FFlagSquadsPresenceStoreMigration then v54.lastLocation else v54 and v54.lastLocation
+	local v7 = react.useCallback(function(p)
+		return p.Squad.Presence.byUserId[tostring(props.user.userId)]
+	end, { props.user.userId })
+	local v8
 
-		u57 = if not v56 or v56 == "" then v45.inExperiencePresenceText else v56
+	if FFlagSquadsPresenceStoreMigration then
+		v8 = useGetPresenceByUserId((tostring(props.user.userId)))
 	else
-		u57 = v45.onlinePresenceText
+		v8 = useSelector(v7)
 	end
 
-	local isConnecting = t1.isConnecting
-	local v59 = tonumber(useLocalUserId()) or 0
-	local v60 = v59 == t1.user.userId
-	local u61 = false
-	local u62 = false
-	local u63 = false
-	local u64 = false
-	local u65 = false
-	local u66 = false
-	local u67 = false
+	local v9
 
-	if GetFFlagEnableCrossExpVoice() then
-		local v68 = useIsVoiceConnected()
-		local v69 = useIsMicPermissionsError()
-		local v70 = useParticipant(t1.user.userId)
+	if v8 then
+		local userPresenceType = v8.userPresenceType
+		local v10
 
-		u65 = useIsVoiceConnecting() and v60
-		u61 = useIsActiveParticipant(t1.user.userId)
+		if FFlagSquadsPresenceStoreMigration then
+			v10 = presenceType2.InGame
+		else
+			v10 = presenceType.InGame
+		end
 
-		local v71 = useIsLocalPlayerPartyVoiceEligible()
-		local v72 = useIsUserPartyVoiceEligible(t1.user.userId)
-		local v73 = useIsCurrentSquadPartyVoiceEligible() == true
-		local v74 = useIsParticipantMutedLocally(t1.user.userId) == true
-
-		u66 = v72 and (v73 and (not v60 and v74))
-		u64 = useIsParticipantMuted(t1.user.userId) and not u66
-
-		local v75 = useIsParticipantInOtherAudioContext(v59, t1.user.userId) == true
-
-		u62 = v73 and (v71 and (v72 and (not v68 or (not v70 or (v75 or v69)))))
-		u63 = v73 and (v71 and not v72)
-		u67 = not not FFlagEnablePartyVoiceChangersInLua and (not not v70 and v70.isVoiceChangerActive)
+		v9 = userPresenceType == v10
+	else
+		v9 = v8
 	end
 
-	local v76 = React.useMemo(function() -- line: 186
-		-- upvalues: CrossExperienceVoice (copy), v48 (copy), v39 (copy)
-		return CrossExperienceVoice.Utils.debounce(function(n1: number) -- line: 187
-			-- upvalues: v48 (copy)
-			v48(n1)
-		end, v39)
+	local v10
+
+	if v9 then
+		if FFlagSquadsPresenceStoreMigration then
+			v10 = v8 and v8.lastLocation
+		else
+			v10 = v8.lastLocation
+		end
+
+		if not v10 or v10 == "" then
+			v10 = v.inExperiencePresenceText
+		end
+	else
+		v10 = v.onlinePresenceText
+	end
+
+	local isConnecting = props.isConnecting
+	local v11 = tonumber(useLocalUserId()) or 0
+	local v12 = v11 == props.user.userId
+	local v13, v14, v15, v16, v17, v18, v19
+
+	if getFFlagEnableCrossExpVoice() then
+		local v20 = useIsVoiceConnected()
+		local v21 = useIsMicPermissionsError()
+		local v22 = useParticipant(props.user.userId)
+		v13 = useIsVoiceConnecting() and v12
+		v14 = useIsActiveParticipant(props.user.userId)
+		local v23 = useIsLocalPlayerPartyVoiceEligible()
+		local v24 = useIsUserPartyVoiceEligible(props.user.userId)
+		local v25 = useIsCurrentSquadPartyVoiceEligible() == true
+		local v26 = useIsParticipantMutedLocally(props.user.userId) == true
+
+		v15 = v24 and v25 and not v12 and v26
+		v16 = useIsParticipantMuted(props.user.userId) and not v15
+		local v27 = useIsParticipantInOtherAudioContext(v11, props.user.userId) == true
+
+		v17 = v25 and v23 and v24 and (not v20 or not v22 or v27 or v21)
+
+		v18 = v25 and v23 and not v24
+
+		if fFlagEnablePartyVoiceChangersInLua and v22 then
+			v19 = v22.isVoiceChangerActive
+		else
+			v19 = false
+		end
+	else
+		v14 = false
+		v13 = false
+		v15 = false
+		v16 = false
+		v17 = false
+		v18 = false
+		v19 = false
+	end
+
+	local v20 = react.useMemo(function()
+		return CrossExperienceVoice.Utils.debounce(function(p: number)
+			v3(p)
+		end, defineFastInt)
 	end, {})
 
-	React.useEffect(function() -- line: 192
-		-- upvalues: GetFFlagEnableCrossExpVoice (copy), u61 (ref), v76 (copy), v48 (copy)
-		if GetFFlagEnableCrossExpVoice() then
-			if u61 then
-				v76.cancel()
-				v48(0)
+	react.useEffect(function()
+		if getFFlagEnableCrossExpVoice() then
+			if v14 then
+				v20.cancel()
+				v3(0)
+			else
+				v20.call(1)
+			end
+		end
+	end, { v14 })
 
-				return
+	local text3 = react.useMemo(function()
+		if props.user.partyStatus == SquadUserPartyStatus.NoResponse then
+			return v.noResponseText
+		end
+
+		if props.user.partyStatus == SquadUserPartyStatus.Invited then
+			return v.invitedText
+		end
+
+		return if isConnecting or v13 then v.connectingText else v10
+	end, {
+		props.user and props.user.partyStatus,
+		v10,
+		isConnecting,
+		v13,
+		v.noResponse,
+		v.invitedText,
+		v.connectingText
+	})
+
+	local presenceIcon = react.useMemo(function()
+		if props.user.partyStatus == SquadUserPartyStatus.Invited then
+			local createElement = react.createElement
+			local view = foundation.View
+			local createElement2 = react.createElement
+			local loading = foundation.Loading
+			local v21 = {
+				LayoutOrder = 1,
+				size = iconSize.Small,
+				Padding = v2.Padding.XSmall,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--loading`
 			end
 
-			v76.call(1)
-		end
-	end, { u61 })
-
-	local v77 = React.useMemo(function() -- line: 204
-		-- upvalues: t1 (copy), SquadUserPartyStatus (copy), v45 (copy), isConnecting (copy), u65 (ref), u57 (ref)
-		if t1.user.partyStatus == SquadUserPartyStatus.NoResponse then
-			return v45.noResponseText
-		end
-
-		if t1.user.partyStatus == SquadUserPartyStatus.Invited then
-			return v45.invitedText
-		end
-
-		if isConnecting or u65 then
-			return v45.connectingText
-		end
-
-		return u57
-	end, {
-		t1.user and t1.user.partyStatus,
-		u57,
-		isConnecting,
-		u65,
-		v45.noResponse,
-		v45.invitedText,
-		v45.connectingText
-	})
-	local v78 = React.useMemo(function() -- line: 226
-		-- upvalues: t1 (copy), SquadUserPartyStatus (copy), React (copy), Foundation (copy), IconSize (copy), v46 (copy), isConnecting (copy), u65 (ref), v55 (copy)
-		if t1.user.partyStatus == SquadUserPartyStatus.Invited then
-			return React.createElement(Foundation.View, {
-				tag = "auto-xy"
-			}, {
-				LoadingIcon = React.createElement(Foundation.Loading, {
-					LayoutOrder = 1,
-					size = IconSize.Small,
-					Padding = v46.Padding.XSmall
-				})
+			v21.testId = testId
+			return createElement(view, { tag = "auto-xy" }, {
+				LoadingIcon = createElement2(loading, v21)
 			})
 		end
 
-		if t1.user.partyStatus == SquadUserPartyStatus.NoResponse then
+		if props.user.partyStatus == SquadUserPartyStatus.NoResponse then
 			return nil
 		end
 
-		if isConnecting or u65 then
-			return React.createElement(Foundation.View, {
-				tag = "auto-xy"
-			}, {
-				LoadingIcon = React.createElement(Foundation.Loading, {
-					LayoutOrder = 1,
-					size = IconSize.Small,
-					Padding = v46.Padding.XSmall
-				})
-			})
-		end
+		if isConnecting or v13 then
+			local createElement = react.createElement
+			local view = foundation.View
+			local createElement2 = react.createElement
+			local loading = foundation.Loading
+			local v21 = {
+				LayoutOrder = 1,
+				size = iconSize.Small,
+				Padding = v2.Padding.XSmall,
+				testId = 0
+			}
+			local testId
 
-		if v55 then
-			return React.createElement(Foundation.Icon, {
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--loading`
+			end
+
+			v21.testId = testId
+			return createElement(view, { tag = "auto-xy" }, {
+				LoadingIcon = createElement2(loading, v21)
+			})
+		else
+			if not v9 then
+				return nil
+			end
+
+			local createElement = react.createElement
+			local icon = foundation.Icon
+			local v21 = {
 				LayoutOrder = 1,
 				name = "icons/common/play",
-				size = IconSize.Small,
-				style = v46.Color.Content.Emphasis
-			})
-		end
+				size = iconSize.Small,
+				style = v2.Color.Content.Emphasis,
+				testId = 0
+			}
+			local testId
 
-		return nil
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--in-game-icon`
+			end
+
+			v21.testId = testId
+			return createElement(icon, v21)
+		end
 	end, {
-		t1.user and t1.user.partyStatus,
+		props.user and props.user.partyStatus,
 		isConnecting,
-		u65,
-		v55
+		v13,
+		v9,
+		formatted
 	})
-	local v79 = React.useMemo(function() -- line: 258
-		-- upvalues: s1 (ref), React (copy), v46 (copy), t1 (copy), Foundation (copy), IconSize (copy), u66 (ref), u64 (ref), u62 (ref), u63 (ref), FFlagEnablePartyVoiceChangersInLua (copy), u67 (ref), BuilderIcons (copy), FFlagEnableBlackbirdCheck (copy), v49 (copy)
-		if s1 ~= "" then
-			return (React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-				AutomaticSize = Enum.AutomaticSize.Y,
-				Size = UDim2.fromScale(1, 0)
-			}, {
-				UIListLayout = React.createElement("UIListLayout", {
-					FillDirection = Enum.FillDirection.Horizontal,
-					Padding = UDim.new(0, v46.Gap.XSmall + 2),
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Center
-				}),
-				BlockedIcon = if not t1.isBlocked then nil else React.createElement(Foundation.Icon, {
-					LayoutOrder = 1,
-					name = "icons/status/unavailable_small",
-					size = IconSize.Small,
-					style = v46.Color.Extended.Red.Red_800
-				}),
-				MutedLocallyIcon = if not u66 then nil else React.createElement(Foundation.Icon, {
-					LayoutOrder = 2,
-					name = "icons/controls/voice/microphone_off_small_dark",
-					size = IconSize.Small,
-					style = v46.Color.Extended.Red.Red_800
-				}),
-				MutedIcon = if not u64 then nil else React.createElement(Foundation.Icon, {
-					LayoutOrder = 3,
-					name = "icons/controls/microphoneMute_small",
-					size = IconSize.Small,
-					style = v46.Color.Content.Emphasis
-				}),
-				NotVoiceParticipantIcon = if not u62 then nil else React.createElement(Foundation.Icon, {
-					LayoutOrder = 4,
-					name = "icons/controls/headphoneDeafen_small",
-					size = IconSize.Small,
-					style = v46.Color.Content.Emphasis
-				}),
-				NotEligibleVoiceParticipant = if not u63 then nil else React.createElement(Foundation.Icon, {
-					LayoutOrder = 5,
-					name = "icons/controls/headphoneDeafen_small",
-					size = IconSize.Small,
-					style = v46.Color.System.Warning
-				}),
-				VoiceChangerActiveIcon = if not FFlagEnablePartyVoiceChangersInLua or not u67 then nil else React.createElement(Foundation.Icon, {
-					LayoutOrder = 6,
-					size = IconSize.Small,
-					name = BuilderIcons.Icon.DiamondSimplified,
-					style = v46.Color.Content.Emphasis
-				}),
-				NameTextLabel = if FFlagEnableBlackbirdCheck then nil else React.createElement(Foundation.Text, {
-					TextWrapped = false,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					backgroundStyle = v46.Color.None,
-					colorstyle = v46.Color.Content.Emphasis,
-					fontStyle = v46.Typography.TitleMedium,
-					LayoutOrder = not FFlagEnablePartyVoiceChangersInLua and 6 or 7,
-					Text = s1,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextYAlignment = Enum.TextYAlignment.Center,
-					TextTruncate = Enum.TextTruncate.AtEnd
-				}, {
-					UIFlexItem = React.createElement("UIFlexItem", {
-						FlexMode = Enum.UIFlexMode.Fill
-					})
-				}),
-				NameAndBadge = if not FFlagEnableBlackbirdCheck then nil else React.createElement("Frame", {
-					BackgroundTransparency = 1,
-					AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.fromScale(0, 0),
-					LayoutOrder = not FFlagEnablePartyVoiceChangersInLua and 6 or 7
-				}, {
-					Layout = React.createElement("UIListLayout", {
-						FillDirection = Enum.FillDirection.Horizontal,
-						Padding = UDim.new(0, v46.Gap.XSmall),
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						VerticalAlignment = Enum.VerticalAlignment.Center
-					}),
-					FlexFill = React.createElement("UIFlexItem", {
-						FlexMode = Enum.UIFlexMode.Fill
-					}),
-					NameText = React.createElement(Foundation.Text, {
-						LayoutOrder = 1,
-						TextWrapped = false,
-						AutomaticSize = Enum.AutomaticSize.XY,
-						backgroundStyle = v46.Color.None,
-						colorstyle = v46.Color.Content.Emphasis,
-						fontStyle = v46.Typography.TitleMedium,
-						Text = s1,
-						TextXAlignment = Enum.TextXAlignment.Left,
-						TextYAlignment = Enum.TextYAlignment.Center,
-						TextTruncate = Enum.TextTruncate.AtEnd
-					}, {
-						UIFlexItem = React.createElement("UIFlexItem", {
-							FlexMode = Enum.UIFlexMode.Shrink
-						})
-					}),
-					SubscriptionBadge = if not v49 then nil else React.createElement(Foundation.Icon, {
-						LayoutOrder = 2,
-						size = IconSize.Small,
-						name = Foundation.Enums.IconName.RobloxPlus,
-						style = v46.Color.Content.Emphasis
-					})
-				})
-			}))
+
+	local useMemo = react.useMemo
+	local function fn()
+		if text2 == "" then
+			return nil
 		end
 
-		return nil
-	end, {
-		s1,
-		u64,
-		u66,
-		t1.isBlocked,
-		v46,
-		u62,
-		u63,
-		if not FFlagEnablePartyVoiceChangersInLua then nil else u67,
-		if not FFlagEnableBlackbirdCheck then nil else v49
-	})
-	local v80 = React.useMemo(function() -- line: 394
-		-- upvalues: React (copy), v46 (copy), v78 (copy), Foundation (copy), v77 (copy)
-		return React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			LayoutOrder = 2,
+		local createElement = react.createElement
+		local v21 = {
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Size = UDim2.fromScale(1, 0)
-		}, {
-			UIListLayout = React.createElement("UIListLayout", {
+			Size = UDim2.fromScale(1, 0),
+			BackgroundTransparency = 1,
+			LayoutOrder = 1
+		}
+
+		local v22 = {
+			UIListLayout = react.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, v46.Gap.XSmall),
+				Padding = UDim.new(0, v2.Gap.XSmall + 2),
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center
 			}),
-			PresenceIcon = v78,
-			PresenceTextLabel = React.createElement(Foundation.Text, {
+			BlockedIcon = 0,
+			MutedLocallyIcon = 0,
+			MutedIcon = 0,
+			NotVoiceParticipantIcon = 0,
+			NotEligibleVoiceParticipant = 0,
+			VoiceChangerActiveIcon = 0,
+			NameTextLabel = 0,
+			NameAndBadge = 0
+		}
+		local blockedIcon
+
+		if props.isBlocked then
+			local createElement2 = react.createElement
+			local icon = foundation.Icon
+			local v23 = {
+				LayoutOrder = 1,
+				name = "icons/status/unavailable_small",
+				size = iconSize.Small,
+				style = v2.Color.Extended.Red.Red_800,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--blocked-icon`
+			end
+
+			v23.testId = testId
+			blockedIcon = createElement2(icon, v23)
+		end
+
+		v22.BlockedIcon = blockedIcon
+		local mutedLocallyIcon
+
+		if v15 then
+			local createElement2 = react.createElement
+			local icon = foundation.Icon
+			local v23 = {
 				LayoutOrder = 2,
-				TextWrapped = false,
+				name = "icons/controls/voice/microphone_off_small_dark",
+				size = iconSize.Small,
+				style = v2.Color.Extended.Red.Red_800,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--muted-locally-icon`
+			end
+
+			v23.testId = testId
+			mutedLocallyIcon = createElement2(icon, v23)
+		end
+
+		v22.MutedLocallyIcon = mutedLocallyIcon
+		local mutedIcon
+
+		if v16 then
+			local createElement2 = react.createElement
+			local icon = foundation.Icon
+			local v23 = {
+				LayoutOrder = 3,
+				name = "icons/controls/microphoneMute_small",
+				size = iconSize.Small,
+				style = v2.Color.Content.Emphasis,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--muted-icon`
+			end
+
+			v23.testId = testId
+			mutedIcon = createElement2(icon, v23)
+		end
+
+		v22.MutedIcon = mutedIcon
+		local notVoiceParticipantIcon
+
+		if v17 then
+			local createElement2 = react.createElement
+			local icon = foundation.Icon
+			local v23 = {
+				LayoutOrder = 4,
+				name = "icons/controls/headphoneDeafen_small",
+				size = iconSize.Small,
+				style = v2.Color.Content.Emphasis,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--not-voice-participant-icon`
+			end
+
+			v23.testId = testId
+			notVoiceParticipantIcon = createElement2(icon, v23)
+		end
+
+		v22.NotVoiceParticipantIcon = notVoiceParticipantIcon
+		local notEligibleVoiceParticipant
+
+		if v18 then
+			local createElement2 = react.createElement
+			local icon = foundation.Icon
+			local v23 = {
+				LayoutOrder = 5,
+				name = "icons/controls/headphoneDeafen_small",
+				size = iconSize.Small,
+				style = v2.Color.System.Warning,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--not-eligible-voice-participant-icon`
+			end
+
+			v23.testId = testId
+			notEligibleVoiceParticipant = createElement2(icon, v23)
+		end
+
+		v22.NotEligibleVoiceParticipant = notEligibleVoiceParticipant
+		local voiceChangerActiveIcon
+
+		if fFlagEnablePartyVoiceChangersInLua and v19 then
+			local createElement2 = react.createElement
+			local icon = foundation.Icon
+			local v23 = {
+				LayoutOrder = 6,
+				size = iconSize.Small,
+				name = BuilderIcons.Icon.DiamondSimplified,
+				style = v2.Color.Content.Emphasis,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--voice-changer-icon`
+			end
+
+			v23.testId = testId
+			voiceChangerActiveIcon = createElement2(icon, v23)
+		end
+
+		v22.VoiceChangerActiveIcon = voiceChangerActiveIcon
+		local nameTextLabel
+
+		if not fFlagEnableBlackbirdCheck then
+			local createElement2 = react.createElement
+			local text = foundation.Text
+			local v23 = {
 				AutomaticSize = Enum.AutomaticSize.Y,
-				backgroundStyle = v46.Color.None,
-				colorstyle = v46.Color.Content.Default,
-				fontStyle = v46.Typography.BodyMedium,
-				Text = v77,
+				backgroundStyle = v2.Color.None,
+				colorstyle = v2.Color.Content.Emphasis,
+				fontStyle = v2.Typography.TitleMedium,
+				LayoutOrder = fFlagEnablePartyVoiceChangersInLua and 7 or 6,
+				Text = text2,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextYAlignment = Enum.TextYAlignment.Center,
-				TextTruncate = Enum.TextTruncate.AtEnd
-			}, {
-				UIFlexItem = React.createElement("UIFlexItem", {
-					FlexMode = Enum.UIFlexMode.Fill
-				})
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextWrapped = false,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--name`
+			end
+
+			v23.testId = testId
+			nameTextLabel = createElement2(text, v23, {
+				UIFlexItem = react.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
 			})
-		})
-	end, {
-		isConnecting,
-		u65,
-		v55,
-		v45.connectingText,
-		u57,
-		v46,
-		v78,
-		v77
-	})
-	local v82
+		end
 
-	if FFlagEnableSquadUserCardHoverFix then
-		local v81 = #useSquadUserDropdownMenuButtons(t1.user.userId, t1.isInExperience) < 1
+		v22.NameTextLabel = nameTextLabel
+		local nameAndBadge
 
-		v82 = not v60 and not v81
-	else
-		v82 = not v60
+		if fFlagEnableBlackbirdCheck then
+			local createElement2 = react.createElement
+			local v23 = {
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.fromScale(0, 0),
+				BackgroundTransparency = 1,
+				LayoutOrder = fFlagEnablePartyVoiceChangersInLua and 7 or 6
+			}
+
+			local v24 = {
+				Layout = react.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					Padding = UDim.new(0, v2.Gap.XSmall),
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					VerticalAlignment = Enum.VerticalAlignment.Center
+				}),
+				FlexFill = react.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill }),
+				NameText = 0,
+				SubscriptionBadge = 0
+			}
+
+			local createElement3 = react.createElement
+			local text = foundation.Text
+			local v25 = {
+				AutomaticSize = Enum.AutomaticSize.XY,
+				backgroundStyle = v2.Color.None,
+				colorstyle = v2.Color.Content.Emphasis,
+				fontStyle = v2.Typography.TitleMedium,
+				LayoutOrder = 1,
+				Text = text2,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextWrapped = false,
+				testId = 0
+			}
+			local testId
+
+			if FFlagSquadsEnableFoundationTestIds then
+				testId = `{formatted}--name`
+			end
+
+			v25.testId = testId
+			v24.NameText = createElement3(text, v25, {
+				UIFlexItem = react.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Shrink })
+			})
+			local subscriptionBadge
+
+			if v5 then
+				local createElement4 = react.createElement
+				local icon = foundation.Icon
+				local v26 = {
+					LayoutOrder = 2,
+					size = iconSize.Small,
+					name = foundation.Enums.IconName.RobloxPlus,
+					style = v2.Color.Content.Emphasis,
+					testId = 0
+				}
+				local testId2
+
+				if FFlagSquadsEnableFoundationTestIds then
+					testId2 = `{formatted}--subscription-badge`
+				end
+
+				v26.testId = testId2
+				subscriptionBadge = createElement4(icon, v26)
+			end
+
+			v24.SubscriptionBadge = subscriptionBadge
+			nameAndBadge = createElement2("Frame", v23, v24)
+		end
+
+		v22.NameAndBadge = nameAndBadge
+		return (createElement("Frame", v21, v22))
 	end
 
-	local v83 = React.useCallback(function() -- line: 447
-		-- upvalues: t1 (copy)
-		if t1.onActivated then
-			t1.onActivated((tostring(t1.user.userId)))
-		end
-	end, {
-		t1.onActivated,
-		t1.user.userId
+	local isBlocked = props.isBlocked
+	local v21
+
+	if fFlagEnablePartyVoiceChangersInLua then
+		v21 = v19
+	end
+
+	local v22
+
+	if fFlagEnableBlackbirdCheck then
+		v22 = v5
+	end
+
+	local name = useMemo(fn, {
+		text2,
+		v16,
+		v15,
+		isBlocked,
+		v2,
+		v17,
+		v18,
+		v21,
+		v22,
+		formatted
 	})
 
-	return React.createElement(Foundation.View, {
-		LayoutOrder = t1.layoutOrder,
-		Size = t1.size,
-		backgroundStyle = v46.Color.Surface.Surface_200,
-		cornerRadius = UDim.new(0, v46.Radius.Medium),
-		isDisabled = isConnecting or (u65 or (t1.user.partyStatus == SquadUserPartyStatus.Invited or t1.user.partyStatus == SquadUserPartyStatus.NoResponse)),
-		onActivated = if not t1.onActivated or not v82 then nil else v83
-	}, {
-		AvatarImage = React.createElement(ImageSetLabel, {
-			ZIndex = 0,
+	local presence = react.useMemo(function()
+		local createElement = react.createElement
+		local v23 = {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.fromScale(1, 0),
+			BackgroundTransparency = 1,
+			LayoutOrder = 2
+		}
+
+		local v24 = {
+			UIListLayout = react.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, v2.Gap.XSmall),
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			PresenceIcon = presenceIcon,
+			PresenceTextLabel = 0
+		}
+
+		local createElement2 = react.createElement
+		local text = foundation.Text
+		local v25 = {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			backgroundStyle = v2.Color.None,
+			colorstyle = v2.Color.Content.Default,
+			fontStyle = v2.Typography.BodyMedium,
+			LayoutOrder = 2,
+			Text = text3,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextWrapped = false,
+			testId = 0
+		}
+		local testId
+
+		if FFlagSquadsEnableFoundationTestIds then
+			testId = `{formatted}--presence`
+		end
+
+		v25.testId = testId
+		v24.PresenceTextLabel = createElement2(text, v25, {
+			UIFlexItem = react.createElement("UIFlexItem", { FlexMode = Enum.UIFlexMode.Fill })
+		})
+		return createElement("Frame", v23, v24)
+	end, {
+		isConnecting,
+		v13,
+		v9,
+		v.connectingText,
+		v10,
+		v2,
+		presenceIcon,
+		text3,
+		formatted
+	})
+
+	local v23 = useSquadUserDropdownMenuButtons(props.user.userId, props.isInExperience)
+	local v24 = #v23 < 1
+	local v25, v26
+
+	if FFlagSquadMemberJoinDialogAndOverflowMenu then
+		v25 = not v12
+		v26 = not (table.find(v23, "JoinButton") == nil)
+	else
+		v26 = false
+		v25 = not (v12 or v24)
+	end
+
+	local openSquadVoiceAbuseReport = props.openSquadVoiceAbuseReport
+
+	local isDisabled = isConnecting
+		or v13
+		or props.user.partyStatus == SquadUserPartyStatus.Invited
+		or props.user.partyStatus == SquadUserPartyStatus.NoResponse
+
+	local onActivated = react.useCallback(function()
+		if FFlagSquadMemberJoinDialogAndOverflowMenu and not v26 then
+			return
+		end
+
+		if props.onActivated then
+			props.onActivated((tostring(props.user.userId)))
+		end
+	end, { props.onActivated, props.user.userId, v26 })
+
+	local createElement = react.createElement
+	local view = foundation.View
+	local v27 = {
+		LayoutOrder = props.layoutOrder,
+		Size = props.size,
+		backgroundStyle = v2.Color.Surface.Surface_200,
+		cornerRadius = UDim.new(0, v2.Radius.Medium),
+		isDisabled = isDisabled,
+		onActivated = 0,
+		stateLayer = 0,
+		testId = 0
+	}
+
+	if not (props.onActivated and v25) then
+		onActivated = nil
+	end
+
+	v27.onActivated = onActivated
+	v27.stateLayer = FFlagSquadMemberJoinDialogAndOverflowMenu
+		and not v26
+		and { affordance = stateLayerAffordance.None }
+		or nil
+	local testId
+
+	if FFlagSquadsEnableFoundationTestIds then
+		testId = formatted
+	end
+
+	v27.testId = testId
+	local children = {
+		AvatarImage = react.createElement(ImageSetLabel, {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = UDim2.fromScale(0.5, 0.5),
 			Size = UDim2.fromOffset(96, 96),
-			BackgroundColor3 = v46.Color.Shift.Shift_300.Color3,
-			BackgroundTransparency = v46.Color.Shift.Shift_300.Transparency,
-			Image = v52
+			BackgroundColor3 = v2.Color.Shift.Shift_300.Color3,
+			BackgroundTransparency = v2.Color.Shift.Shift_300.Transparency,
+			Image = standardSizeAvatarHeadShotRbxthumb,
+			ZIndex = 0
 		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(1, 0)
-			})
+			UICorner = react.createElement("UICorner", { CornerRadius = UDim.new(1, 0) })
 		}),
-		GradientFrame = React.createElement("Frame", {
-			ZIndex = 1,
+		GradientFrame = react.createElement("Frame", {
 			Size = UDim2.fromScale(1, 0.5),
 			Position = UDim2.fromScale(0, 1),
 			AnchorPoint = Vector2.new(0, 1),
-			BackgroundColor3 = v46.Color.Surface.Surface_100.Color3,
-			BackgroundTransparency = v46.Color.Surface.Surface_100.Transparency
+			BackgroundColor3 = v2.Color.Surface.Surface_100.Color3,
+			BackgroundTransparency = v2.Color.Surface.Surface_100.Transparency,
+			ZIndex = 1
 		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, v46.Radius.Medium)
+			UICorner = react.createElement("UICorner", {
+				CornerRadius = UDim.new(0, v2.Radius.Medium)
 			}),
-			UIGradient = React.createElement("UIGradient", {
+			UIGradient = react.createElement("UIGradient", {
 				Rotation = 90,
-				Transparency = NumberSequence.new({
-					NumberSequenceKeypoint.new(0, 1),
-					NumberSequenceKeypoint.new(1, 0)
-				})
+				Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(1, 0) })
 			}, {})
 		}),
-		InactiveOverlay = if not isConnecting and (not u62 and (not u65 and (t1.user.partyStatus ~= SquadUserPartyStatus.Invited and t1.user.partyStatus ~= SquadUserPartyStatus.NoResponse))) then nil else React.createElement(Foundation.View, {
-			tag = "size-full radius-medium",
-			backgroundStyle = {
-				Transparency = 0.25,
-				Color3 = v46.Color.Surface.Surface_100.Color3
-			}
-		}, {}),
-		TextContainer = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 2,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			AnchorPoint = Vector2.new(0, 1),
-			Position = UDim2.fromScale(0, 1),
-			Size = UDim2.fromScale(1, 0)
-		}, {
-			UIListLayout = React.createElement("UIListLayout", {
-				FillDirection = Enum.FillDirection.Vertical,
-				HorizontalAlignment = Enum.HorizontalAlignment.Left,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				VerticalAlignment = Enum.VerticalAlignment.Bottom
-			}),
-			UIPadding = React.createElement("UIPadding", {
-				PaddingBottom = UDim.new(0, v46.Padding.Medium),
-				PaddingLeft = UDim.new(0, v46.Padding.Medium),
-				PaddingRight = UDim.new(0, v46.Padding.Medium),
-				PaddingTop = UDim.new(0, v46.Padding.Medium)
-			}),
-			Name = v79,
-			Presence = if t1.isBlocked then nil else v80
-		}),
-		ActiveBorder = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 4,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(1, -8, 1, -8)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, v46.Radius.Medium - 4)
-			}),
-			UIStroke = React.createElement("UIStroke", {
-				Thickness = 4,
-				Color = v46.Color.Extended.Green.Green_800.Color3,
-				Transparency = v47
-			})
-		}),
-		DefaultBorder = React.createElement("Frame", {
-			BackgroundTransparency = 1,
-			ZIndex = 3,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(1, -2, 1, -2)
-		}, {
-			UICorner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0, v46.Radius.Medium - 1)
-			}),
-			UIStroke = React.createElement("UIStroke", {
-				Thickness = 1,
-				Color = v46.Color.Stroke.Default.Color3,
-				Transparency = v47:map(function(p2) -- line: 571
-					-- upvalues: v46 (copy)
-					if p2 < 0.9 then
-						return 1
-					end
+		InactiveOverlay = 0,
+		TextContainer = 0,
+		OverflowMenu = 0,
+		ActiveBorder = 0,
+		DefaultBorder = 0
+	}
+	local inactiveOverlay
 
-					return v46.Color.Stroke.Default.Transparency
-				end)
-			})
+	if
+		isConnecting
+		or v17
+		or v13
+		or props.user.partyStatus == SquadUserPartyStatus.Invited
+		or props.user.partyStatus == SquadUserPartyStatus.NoResponse
+	then
+		inactiveOverlay = react.createElement(foundation.View, {
+			tag = "size-full radius-medium",
+			backgroundStyle = { Color3 = v2.Color.Surface.Surface_100.Color3, Transparency = 0.25 }
+		}, {})
+	end
+
+	children.InactiveOverlay = inactiveOverlay
+
+	local createElement2 = react.createElement
+	local v28 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1),
+		Size = UDim2.fromScale(1, 0),
+		BackgroundTransparency = 1,
+		ZIndex = 2
+	}
+
+	local v29 = {
+		UIListLayout = react.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Bottom
+		}),
+		UIPadding = react.createElement("UIPadding", {
+			PaddingBottom = UDim.new(0, v2.Padding.Medium),
+			PaddingLeft = UDim.new(0, v2.Padding.Medium),
+			PaddingRight = UDim.new(0, v2.Padding.Medium),
+			PaddingTop = UDim.new(0, v2.Padding.Medium)
+		}),
+		Name = name,
+		Presence = 0
+	}
+
+	if props.isBlocked then
+		presence = nil
+	end
+
+	v29.Presence = presence
+	children.TextContainer = createElement2("Frame", v28, v29)
+	local overflowMenu
+
+	if FFlagSquadMemberJoinDialogAndOverflowMenu and not v12 and not isDisabled and openSquadVoiceAbuseReport then
+		overflowMenu = react.createElement(SquadLobbyUserOverflowMenuContainer, {
+			userId = tostring(props.user.userId),
+			isInExperience = props.isInExperience,
+			openSquadVoiceAbuseReport = openSquadVoiceAbuseReport
+		})
+	end
+
+	children.OverflowMenu = overflowMenu
+
+	children.ActiveBorder = react.createElement("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(1, -8, 1, -8),
+		BackgroundTransparency = 1,
+		ZIndex = 4
+	}, {
+		UICorner = react.createElement("UICorner", {
+			CornerRadius = UDim.new(0, v2.Radius.Medium - 4)
+		}),
+		UIStroke = react.createElement("UIStroke", {
+			Thickness = 4,
+			Color = v2.Color.Extended.Green.Green_800.Color3,
+			Transparency = transparency
 		})
 	})
+
+	children.DefaultBorder = react.createElement("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(1, -2, 1, -2),
+		BackgroundTransparency = 1,
+		ZIndex = 3
+	}, {
+		UICorner = react.createElement("UICorner", {
+			CornerRadius = UDim.new(0, v2.Radius.Medium - 1)
+		}),
+		UIStroke = react.createElement("UIStroke", {
+			Thickness = 1,
+			Color = v2.Color.Stroke.Default.Color3,
+			Transparency = transparency:map(function(p)
+				if p < 0.9 then
+					return 1
+				end
+
+				return v2.Color.Stroke.Default.Transparency
+			end)
+		})
+	})
+	return createElement(view, v27, children)
 end

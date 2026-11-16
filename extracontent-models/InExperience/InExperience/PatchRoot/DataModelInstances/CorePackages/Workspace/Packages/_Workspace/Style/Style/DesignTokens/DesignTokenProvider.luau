@@ -1,46 +1,37 @@
-local Parent = script:FindFirstAncestor("Style").Parent
-local ArgCheck = require(Parent.ArgCheck)
-local Cryo = require(Parent.Cryo)
-local React = require(Parent.React)
-local RobloxAppHooks = require(Parent.RobloxAppHooks)
-
-require(Parent.RobloxAppEnums)
-
+local parent = script:FindFirstAncestor("Style").Parent
+local ArgCheck = require(parent.ArgCheck)
+local Cryo = require(parent.Cryo)
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+require(parent.RobloxAppEnums)
 local useUiModeInfo = RobloxAppHooks.useUiModeInfo
-local Context = require(Parent.UIBlox).Style.Context
+local UIBlox = require(parent.UIBlox)
+local Context = UIBlox.Style.Context
 local DesignTokenContext = require(script.Parent.DesignTokenContext)
 
-local function DesignTokenProvider(t1: {[any]: any}) -- line: 27
-	-- upvalues: React (copy), Context (copy), useUiModeInfo (copy), Cryo (copy), ArgCheck (copy), DesignTokenContext (copy)
-	local v11 = React.useContext(Context)
-	local v12 = useUiModeInfo()
-	local u13 = t1.uiModeInfo or v12
-	local tokenMappers = t1.tokenMappers
-	local v15 = Cryo.Dictionary.keys(tokenMappers)
-	local Tokens = v11.style.Tokens
+local function DesignTokenProvider(props)
+	local v = React.useContext(Context)
+	local v2 = useUiModeInfo()
+	local uiModeInfo = props.uiModeInfo or v2
 
-	ArgCheck.assert(Tokens, "Design Tokens not found, ensure AppStyleProvider has been configured correctly.")
+	local tokenMappers = props.tokenMappers
+	local keys = Cryo.Dictionary.keys(tokenMappers)
+	local tokens = v.style.Tokens
 
-	if not Tokens.LuaApps then
-		Tokens = Cryo.Dictionary.join(Tokens, {
-			LuaApps = {}
-		})
+	ArgCheck.assert(tokens, "Design Tokens not found, ensure AppStyleProvider has been configured correctly.")
+
+	if not tokens.LuaApps then
+		tokens = Cryo.Dictionary.join(tokens, { LuaApps = {} })
 	end
 
-	Tokens = Cryo.List.foldLeft(v15, function(p1, p2) -- line: 42
-		-- upvalues: tokenMappers (copy), u13 (ref), Tokens (ref), Cryo (copy)
-		local v19 = table.clone(p1.LuaApps)
+	tokens = Cryo.List.foldLeft(keys, function(p, p2)
+		local clone = table.clone(p.LuaApps)
+		clone[p2] = tokenMappers[p2](uiModeInfo, tokens)
 
-		v19[p2] = tokenMappers[p2](u13, Tokens)
+		return Cryo.Dictionary.join(p, { LuaApps = clone })
+	end, tokens)
 
-		return Cryo.Dictionary.join(p1, {
-			LuaApps = v19
-		})
-	end, Tokens)
-
-	return React.createElement(DesignTokenContext.Provider, {
-		value = Tokens
-	}, t1.children)
+	return React.createElement(DesignTokenContext.Provider, { value = tokens }, props.children)
 end
 
 return DesignTokenProvider

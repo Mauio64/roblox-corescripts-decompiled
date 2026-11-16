@@ -1,34 +1,28 @@
 local AvatarEditorService = game:GetService("AvatarEditorService")
-local Parent = script:FindFirstAncestor("AvatarExperienceSave").Parent
-local Promise = require(Parent.Promise)
+local parent = script:FindFirstAncestor("AvatarExperienceSave").Parent
 
-require(Parent.LuauPolyfill)
+local Promise = require(parent.Promise)
+require(parent.LuauPolyfill)
 
-local function saveAvatar(p1, p2, t1: {[any]: any}, n1: number?) -- line: 28
-	-- upvalues: Promise (copy), AvatarEditorService (copy)
-	return Promise.new(function(resolve, reject) -- line: 34
-		-- upvalues: AvatarEditorService (copy), p1 (copy), p2 (copy), t1 (copy), n1 (copy)
-		local v11 = AvatarEditorService:NoPromptSaveAvatar(p1, p2, t1, n1)
+local function saveAvatar(p, p2, p3, p4: number?)
+	return Promise.new(function(callback, callback2)
+		local v = AvatarEditorService:NoPromptSaveAvatar(p, p2, p3, p4)
 
-		while not v11 do
+		while not v do
 			AvatarEditorService.PromptSaveAvatarCompleted:Wait()
-			v11 = AvatarEditorService:NoPromptSaveAvatar(p1, p2, t1, n1)
+			v = AvatarEditorService:NoPromptSaveAvatar(p, p2, p3, p4)
 		end
 
-		local v12, v13 = AvatarEditorService.PromptSaveAvatarCompleted:Wait()
+		local avatarPromptResult, humanoidDescriptionWithValidAssets = AvatarEditorService.PromptSaveAvatarCompleted:Wait()
 
-		if v12 == Enum.AvatarPromptResult.Success then
-			resolve({
-				avatarPromptResult = v12,
-				humanoidDescriptionWithValidAssets = v13
+		if avatarPromptResult == Enum.AvatarPromptResult.Success then
+			callback({
+				avatarPromptResult = avatarPromptResult,
+				humanoidDescriptionWithValidAssets = humanoidDescriptionWithValidAssets
 			})
-
-			return
+		else
+			callback2({ avatarPromptResult = avatarPromptResult })
 		end
-
-		reject({
-			avatarPromptResult = v12
-		})
 	end)
 end
 

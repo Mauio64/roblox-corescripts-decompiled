@@ -1,12 +1,11 @@
-local Parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
-local Rodux = require(Parent.Rodux)
+local parent = script:FindFirstAncestor("AvatarExperienceRodux").Parent
+local Rodux = require(parent.Rodux)
+require(parent.AvatarExperienceModel)
 
-require(Parent.AvatarExperienceCommon)
-
-return Rodux.makeActionCreator(script.Name, function(s1: string, n1: number?, p1) -- line: 13
+return Rodux.makeActionCreator(script.Name, function(itemId: string, selectedTimedOptionIndex: number?, itemType)
 	return {
-		itemId = s1,
-		selectedTimedOptionIndex = n1,
-		itemType = p1
+		itemId = itemId,
+		selectedTimedOptionIndex = selectedTimedOptionIndex,
+		itemType = itemType
 	}
 end)

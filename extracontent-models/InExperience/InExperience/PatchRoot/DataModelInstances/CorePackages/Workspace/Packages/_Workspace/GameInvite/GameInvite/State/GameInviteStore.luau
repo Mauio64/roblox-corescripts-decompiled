@@ -1,6 +1,7 @@
-local scriptParent = script.Parent
-local ParentParent = scriptParent.Parent.Parent
-local Rodux = require(ParentParent.Rodux)
-local GameInviteReducer = require(scriptParent.Reducers.GameInviteReducer)
+local parent = script.Parent
+local parent2 = parent.Parent.Parent
+
+local Rodux = require(parent2.Rodux)
+local GameInviteReducer = require(parent.Reducers.GameInviteReducer)
 
 return Rodux.Store.new(GameInviteReducer, nil, { Rodux.thunkMiddleware })

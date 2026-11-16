@@ -1,26 +1,26 @@
-local Parent = script:FindFirstAncestor("AdPlayer").Parent
-local React = require(Parent.React)
-local useTokens = require(Parent.Foundation).Hooks.useTokens
+local parent = script:FindFirstAncestor("AdPlayer").Parent
+local React = require(parent.React)
+local Foundation = require(parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
 
-local function LinearProgressComponent(t1: {[any]: any}) -- line: 16
-	-- upvalues: useTokens (copy), React (copy)
-	local v6 = useTokens()
+local function LinearProgressComponent(props)
+	local v = useTokens()
 
 	return React.createElement("Frame", {
-		BorderSizePixel = 0,
-		Position = t1.Position,
-		AnchorPoint = t1.AnchorPoint,
-		Size = t1.Size,
-		ZIndex = t1.ZIndex,
-		BackgroundColor3 = v6.Color.Extended.White.White_30.Color3,
-		BackgroundTransparency = v6.Color.Extended.White.White_30.Transparency
+		Position = props.Position,
+		AnchorPoint = props.AnchorPoint,
+		Size = props.Size,
+		ZIndex = props.ZIndex,
+		BackgroundColor3 = v.Color.Extended.White.White_30.Color3,
+		BackgroundTransparency = v.Color.Extended.White.White_30.Transparency,
+		BorderSizePixel = 0
 	}, {
 		progressFill = React.createElement("Frame", {
 			BorderSizePixel = 0,
-			Size = t1.alpha:map(function(p1) -- line: 31
-				return UDim2.fromScale(p1, 1)
+			Size = props.alpha:map(function(p)
+				return UDim2.fromScale(p, 1)
 			end),
-			BackgroundColor3 = v6.Color.Extended.White.White_100.Color3
+			BackgroundColor3 = v.Color.Extended.White.White_100.Color3
 		})
 	})
 end

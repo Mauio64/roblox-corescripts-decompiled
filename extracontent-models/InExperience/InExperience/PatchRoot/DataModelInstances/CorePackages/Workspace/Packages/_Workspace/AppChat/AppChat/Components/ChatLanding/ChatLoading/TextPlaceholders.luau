@@ -1,23 +1,22 @@
-local Parent = script:FindFirstAncestor("AppChat").Parent
-local Roact = require(Parent.Roact)
-local withStyle = require(Parent.UIBlox).Style.withStyle
-local Skeleton = require(Parent.Foundation).Skeleton
-local v5 = Roact.PureComponent:extend("TextPlaceholders")
+local parent = script:FindFirstAncestor("AppChat").Parent
 
-v5.defaultProps = {
-	LayoutOrder = 0,
-	avatarSize = 60,
-	avatarCellWidth = 60
-}
+local Roact = require(parent.Roact)
+local UIBlox = require(parent.UIBlox)
+local withStyle = UIBlox.Style.withStyle
 
-function v5.render(p1) -- line: 18
-	-- upvalues: withStyle (copy), Roact (copy), Skeleton (copy)
-	return withStyle(function(_) -- line: 19
-		-- upvalues: Roact (copy), p1 (copy), Skeleton (copy)
+local Foundation = require(parent.Foundation)
+local Skeleton = Foundation.Skeleton
+
+local extended = Roact.PureComponent:extend("TextPlaceholders")
+
+extended.defaultProps = { LayoutOrder = 0, avatarSize = 60, avatarCellWidth = 60 }
+
+function extended.render(p)
+	return withStyle(function(_)
 		return Roact.createElement("Frame", {
+			Size = UDim2.new(1, -p.props.avatarCellWidth, 1, 0),
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -p1.props.avatarCellWidth, 1, 0),
-			LayoutOrder = p1.props.LayoutOrder
+			LayoutOrder = p.props.LayoutOrder
 		}, {
 			Padding = Roact.createElement("UIPadding", {
 				PaddingTop = UDim.new(0, 12),
@@ -33,8 +32,8 @@ function v5.render(p1) -- line: 18
 			}),
 			spacer = Roact.createElement("Frame", {
 				LayoutOrder = 2,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, 7)
+				Size = UDim2.new(1, 0, 0, 7),
+				BackgroundTransparency = 1
 			}),
 			bottomRectangle = Roact.createElement(Skeleton, {
 				LayoutOrder = 3,
@@ -44,4 +43,4 @@ function v5.render(p1) -- line: 18
 	end)
 end
 
-return v5
+return extended

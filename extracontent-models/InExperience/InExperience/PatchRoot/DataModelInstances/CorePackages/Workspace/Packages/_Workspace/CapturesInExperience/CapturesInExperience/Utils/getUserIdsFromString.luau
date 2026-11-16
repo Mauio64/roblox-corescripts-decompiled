@@ -1,13 +1,15 @@
-local function getUserIdsFromString(s1: string) -- line: 1
-	local t1 = {}
+local function getUserIdsFromString(value: string)
+	local v = string.split(value, ",")
 
-	for _, v5 in (string.split(s1, ",")) do
-		if tonumber(v5) then
-			t1[v5] = true
+	local userIds = {}
+
+	for _, v2 in v do
+		if tonumber(v2) then
+			userIds[v2] = true
 		end
 	end
 
-	return t1
+	return userIds
 end
 
 return getUserIdsFromString

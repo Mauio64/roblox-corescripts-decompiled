@@ -1,64 +1,54 @@
-local ParentParent = script.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Object = LuauPolyfill.Object
-local t1 = {}
-local Kind = require(ParentParent.GraphQL).Kind
-local astFromType = require(script.Parent.astFromType).astFromType
 
-function t1.updateArgument(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}, s1: string, s2: string, p1, p2) -- line: 22
-	-- upvalues: Kind (copy), astFromType (copy), Array (copy), Object (copy)
-	t2[tostring(s1)] = {
+local GraphQL = require(parent.GraphQL)
+
+local Kind = GraphQL.Kind
+
+local astFromType = require(script.Parent.astFromType)
+local astFromType2 = astFromType.astFromType
+local UpdateArgument = {}
+
+function UpdateArgument:updateArgument(p, p2, p3: string, p4: string, p5, p6)
+	self[tostring(p3)] = {
 		kind = Kind.ARGUMENT,
-		name = {
-			kind = Kind.NAME,
-			value = s1
-		},
+		name = { kind = Kind.NAME, value = p3 },
 		value = {
 			kind = Kind.VARIABLE,
-			name = {
-				kind = Kind.NAME,
-				value = s2
-			}
+			name = { kind = Kind.NAME, value = p4 }
 		}
 	}
-	t3[tostring(s2)] = {
+
+	p[tostring(p4)] = {
 		kind = Kind.VARIABLE_DEFINITION,
 		variable = {
 			kind = Kind.VARIABLE,
-			name = {
-				kind = Kind.NAME,
-				value = s2
-			}
+			name = { kind = Kind.NAME, value = p4 }
 		},
-		type = astFromType(p1)
+		type = astFromType2(p5)
 	}
 
-	if p2 ~= nil then
-		t4[tostring(s2)] = p2
-
-		return
-	end
-
-	if Array.indexOf(Object.keys(t4), (tostring(s2))) ~= -1 then
-		t4[tostring(s2)] = nil
+	if p6 ~= nil then
+		p2[tostring(p4)] = p6
+	elseif Array.indexOf(Object.keys(p2), (tostring(p4))) ~= -1 then
+		p2[tostring(p4)] = nil
 	end
 end
-function t1.createVariableNameGenerator(t5: {[any]: any}) -- line: 55
-	-- upvalues: Array (copy), Object (copy)
-	local n1 = 0
 
-	return function(s3: string) -- line: 59
-		-- upvalues: n1 (ref), Array (copy), Object (copy), t5 (copy)
-		local v18
+function UpdateArgument.createVariableNameGenerator(p)
+	local count = 0
+	return function(p2: string)
+		local v
 
 		repeat
-			v18 = ("_v%s_%s"):format(tostring(n1), s3)
-			n1 += 1
-		until Array.indexOf(Object.keys(t5), (tostring(v18))) == -1
+			v = ("_v%s_%s"):format(tostring(count), p2)
+			count += 1
+		until Array.indexOf(Object.keys(p), (tostring(v))) == -1
 
-		return v18
+		return v
 	end
 end
 
-return t1
+return UpdateArgument

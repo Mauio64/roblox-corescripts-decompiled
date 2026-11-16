@@ -1,4 +1,5 @@
 local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+
 local AbuseCategory = require(GenericAbuseReporting.Enums.AbuseCategory)
 
 return {

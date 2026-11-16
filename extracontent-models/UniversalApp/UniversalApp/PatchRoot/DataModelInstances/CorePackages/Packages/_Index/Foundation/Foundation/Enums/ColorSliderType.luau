@@ -1,4 +1,1 @@
-return {
-	Hue = "Hue",
-	Alpha = "Alpha"
-}
+return { Hue = "Hue", Alpha = "Alpha" }

@@ -1,16 +1,15 @@
-local function populateDictionaryFromIds(p1, p2) -- line: 5
-	-- upvalues: populateDictionaryFromIds (copy)
-	local t1 = {}
+local function populateDictionaryFromIds(item, p)
+	local result = {}
 
-	for k, v in pairs(p1) do
-		if type(v) == "table" then
-			t1[k] = populateDictionaryFromIds(v, p2)
+	for k, item2 in pairs(item) do
+		if type(item2) == "table" then
+			result[k] = populateDictionaryFromIds(item2, p)
 		else
-			t1[k] = p2[v]
+			result[k] = p[item2]
 		end
 	end
 
-	return t1
+	return result
 end
 
 return populateDictionaryFromIds

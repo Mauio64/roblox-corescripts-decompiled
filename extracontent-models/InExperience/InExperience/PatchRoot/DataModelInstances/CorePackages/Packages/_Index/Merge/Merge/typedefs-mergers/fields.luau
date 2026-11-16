@@ -1,136 +1,173 @@
-local ParentParent = script.Parent.Parent.Parent
-local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local parent = script.Parent.Parent.Parent
+local LuauPolyfill = require(parent.LuauPolyfill)
 local Array = LuauPolyfill.Array
 local Boolean = LuauPolyfill.Boolean
 local Error = LuauPolyfill.Error
-local t1 = {}
+
+local Fields = {}
 
 require(script.Parent["merge-typedefs_types"])
-require(ParentParent.GraphQL)
+
+require(parent.GraphQL)
 
 local utils = require(script.Parent.utils)
+
 local extractType = utils.extractType
 local isWrappingTypeNode = utils.isWrappingTypeNode
 local isListTypeNode = utils.isListTypeNode
 local isNonNullTypeNode = utils.isNonNullTypeNode
 local printTypeNode = utils.printTypeNode
-local mergeDirectives = require(script.Parent.directives).mergeDirectives
-local compareNodes = require(ParentParent.Utils).compareNodes
-local mergeArguments = require(script.Parent.arguments).mergeArguments
-local preventConflicts = nil
-local safeChangeForFieldType = nil
 
-local function fieldAlreadyExists(p1, p2, p3) -- line: 48
-	-- upvalues: Array (copy), Boolean (copy), extractType (copy), Error (copy)
-	local v22 = Array.find(p1, function(p4) -- line: 51
-		-- upvalues: p2 (copy)
-		return p4.name.value == p2.name.value
+local directives = require(script.Parent.directives)
+local mergeDirectives = directives.mergeDirectives
+local Utils = require(parent.Utils)
+local compareNodes = Utils.compareNodes
+local arguments = require(script.Parent.arguments)
+local mergeArguments = arguments.mergeArguments
+
+local preventConflicts
+local safeChangeForFieldType
+
+local function fieldAlreadyExists(joined, item, data)
+	local v = Array.find(joined, function(p): boolean
+		return p.name.value == item.name.value
 	end)
 
-	if v22 and (not p3 or not Boolean.toJSBoolean(p3.ignoreFieldConflicts)) then
-		local v23 = extractType(v22.type)
-		local v24 = extractType(p2.type)
+	if v and not (data and Boolean.toJSBoolean(data.ignoreFieldConflicts)) then
+		local v2 = extractType(v.type)
+		local v3 = extractType(item.type)
 
-		if v23.name.value ~= v24.name.value then
-			error(Error.new(("Field \"%s\" already defined with a different type. Declared as \"%s\", but you tried to override with \"%s\""):format(tostring(p2.name.value), tostring(v23.name.value), (tostring(v24.name.value)))))
+		if v2.name.value ~= v3.name.value then
+			error(Error.new(("Field \"%s\" already defined with a different type. Declared as \"%s\", but you tried to override with \"%s\""):format(
+				tostring(item.name.value),
+				tostring(v2.name.value),
+				(tostring(v3.name.value))
+			)))
 		end
 	end
 
-	return not not Boolean.toJSBoolean(v22)
+	return Boolean.toJSBoolean(v) and true or false
 end
 
-function t1.mergeFields(t2: {[any]: any}, p5, p6, p7) -- line: 83
-	-- upvalues: Array (copy), Boolean (copy), fieldAlreadyExists (copy), preventConflicts (ref), isNonNullTypeNode (copy), mergeArguments (copy), mergeDirectives (copy), compareNodes (copy)
-	local t3 = {}
+function Fields.mergeFields(p, items, p2, data)
+	local joined = {}
 
-	if p6 ~= nil then
-		t3 = Array.concat(t3, p6)
+	if p2 ~= nil then
+		joined = Array.concat(joined, p2)
 	end
 
-	if p5 ~= nil then
-		for _, v31 in p5 do
-			if Boolean.toJSBoolean((fieldAlreadyExists(t3, v31, p7))) then
-				local v32 = Array.find(t3, function(p8) -- line: 115
-					-- upvalues: v31 (copy)
-					return p8.name.value == v31.name.value
+	if items ~= nil then
+		for _, item in items do
+			if Boolean.toJSBoolean(fieldAlreadyExists(joined, item, data)) then
+				local v = Array.find(joined, function(p3): boolean
+					return p3.name.value == item.name.value
 				end)
 
-				if not p7 or not Boolean.toJSBoolean(p7.ignoreFieldConflicts) then
-					if p7 and Boolean.toJSBoolean(p7.throwOnConflict) then
-						preventConflicts(t2, v32, v31, false)
+				if not (data and Boolean.toJSBoolean(data.ignoreFieldConflicts)) then
+					if data and Boolean.toJSBoolean(data.throwOnConflict) then
+						preventConflicts(p, v, item, false)
 					else
-						preventConflicts(t2, v32, v31, true)
+						preventConflicts(p, v, item, true)
 					end
 
 					local toJSBoolean = Boolean.toJSBoolean
-					local v34 = isNonNullTypeNode(v31.type)
+					local v2 = isNonNullTypeNode(item.type)
 
-					if toJSBoolean(if not Boolean.toJSBoolean(v34) then v34 else not Boolean.toJSBoolean(isNonNullTypeNode(v32.type))) then
-						v32.type = v31.type
+					if Boolean.toJSBoolean(v2) then
+						v2 = not Boolean.toJSBoolean(isNonNullTypeNode(v.type))
+					end
+
+					if toJSBoolean(v2) then
+						v.type = item.type
 					end
 				end
 
-				v32.arguments = mergeArguments(if not Boolean.toJSBoolean(v31.arguments) then {} else v31.arguments, if not Boolean.toJSBoolean(v32.arguments) then {} else v32.arguments, p7)
-				v32.directives = mergeDirectives(v31.directives, v32.directives, p7)
-				v32.description = if not Boolean.toJSBoolean(v31.description) then v32.description else v31.description
+				v.arguments = mergeArguments(
+					not Boolean.toJSBoolean(item.arguments) and {} or item.arguments,
+					not Boolean.toJSBoolean(v.arguments) and {} or v.arguments,
+					data
+				)
+
+				v.directives = mergeDirectives(item.directives, v.directives, data)
+				local description
+
+				if Boolean.toJSBoolean(item.description) then
+					description = item.description
+				else
+					description = v.description
+				end
+
+				v.description = description
 			else
-				table.insert(t3, v31)
+				table.insert(joined, item)
 			end
 		end
 	end
 
-	if p7 and Boolean.toJSBoolean(p7.sort) then
-		Array.sort(t3, compareNodes)
+	if data and Boolean.toJSBoolean(data.sort) then
+		Array.sort(joined, compareNodes)
 	end
 
-	if p7 and p7.exclusions then
-		local exclusions = p7.exclusions
-
-		return Array.filter(t3, function(p9) -- line: 183
-			-- upvalues: Boolean (copy), Array (copy), exclusions (copy), t2 (copy)
-			return not Boolean.toJSBoolean(Array.includes(exclusions, ("%s.%s"):format(tostring(t2.name.value), (tostring(p9.name.value)))))
+	if data and data.exclusions then
+		local exclusions = data.exclusions
+		return Array.filter(joined, function(p3): boolean
+			return not Boolean.toJSBoolean(Array.includes(
+				exclusions,
+				("%s.%s"):format(tostring(p.name.value), (tostring(p3.name.value)))
+			))
 		end)
 	end
 
-	return t3
+	return joined
 end
-function preventConflicts(t4: {[any]: any}, p10, p11, b1: boolean?) -- line: 194
-	-- upvalues: printTypeNode (copy), Boolean (copy), safeChangeForFieldType (ref), Error (copy)
-	local v40 = b1 ~= nil and b1
-	local v41 = printTypeNode(p10.type)
-	local v42 = printTypeNode(p11.type)
 
-	if v41 ~= v42 and not Boolean.toJSBoolean(safeChangeForFieldType(p10.type, p11.type, v40)) then
-		error(Error.new(("Field '%s.%s' changed type from '%s' to '%s'"):format(tostring(t4.name.value), tostring(p10.name.value), tostring(v41), (tostring(v42)))))
+preventConflicts = function(p, p2, item, flag: boolean?)
+	if flag == nil then
+		flag = false
+	end
+
+	local v = printTypeNode(p2.type)
+	local v2 = printTypeNode(item.type)
+
+	if v ~= v2 and not Boolean.toJSBoolean(safeChangeForFieldType(p2.type, item.type, flag)) then
+		error(Error.new(("Field '%s.%s' changed type from '%s' to '%s'"):format(
+			tostring(p.name.value),
+			tostring(p2.name.value),
+			tostring(v),
+			(tostring(v2))
+		)))
 	end
 end
-function safeChangeForFieldType(p12, p13, b2: boolean?) -- line: 223
-	-- upvalues: Boolean (copy), isWrappingTypeNode (copy), isNonNullTypeNode (copy), safeChangeForFieldType (ref), isListTypeNode (copy)
-	local v46 = b2 ~= nil and b2
 
-	if not Boolean.toJSBoolean(isWrappingTypeNode(p12)) and not Boolean.toJSBoolean(isWrappingTypeNode(p13)) then
-		if typeof(p12) == "table" and #p12 == 0 and typeof(p13) == "table" and #p13 == 0 then
-			return true
+safeChangeForFieldType = function(kind, kind2, flag: boolean?)
+	if flag == nil then
+		flag = false
+	end
+
+	if Boolean.toJSBoolean(isWrappingTypeNode(kind)) or Boolean.toJSBoolean(isWrappingTypeNode(kind2)) then
+		if Boolean.toJSBoolean(isNonNullTypeNode(kind2)) then
+			if Boolean.toJSBoolean(isNonNullTypeNode(kind)) then
+				kind = kind.type
+			end
+
+			return safeChangeForFieldType(kind, kind2.type)
 		end
 
-		return tostring(p12) == tostring(p13)
+		if Boolean.toJSBoolean(isNonNullTypeNode(kind)) then
+			return safeChangeForFieldType(kind2, kind, flag)
+		end
+
+		if Boolean.toJSBoolean(isListTypeNode(kind)) then
+			return isListTypeNode(kind2) and safeChangeForFieldType(kind.type, kind2.type)
+				or isNonNullTypeNode(kind2) and safeChangeForFieldType(kind, kind2.type)
+		end
+
+		return false
+	elseif typeof(kind) == "table" and #kind == 0 and typeof(kind2) == "table" and #kind2 == 0 then
+		return true
+	else
+		return tostring(kind) == tostring(kind2)
 	end
-
-	if Boolean.toJSBoolean(isNonNullTypeNode(p13)) then
-		local v47 = if not Boolean.toJSBoolean(isNonNullTypeNode(p12)) then p12 else p12.type
-
-		return safeChangeForFieldType(v47, p13.type)
-	end
-
-	if Boolean.toJSBoolean(isNonNullTypeNode(p12)) then
-		return safeChangeForFieldType(p13, p12, v46)
-	end
-
-	if Boolean.toJSBoolean(isListTypeNode(p12)) then
-		return isListTypeNode(p13) and safeChangeForFieldType(p12.type, p13.type) or isNonNullTypeNode(p13) and safeChangeForFieldType(p12, p13.type)
-	end
-
-	return false
 end
 
-return t1
+return Fields

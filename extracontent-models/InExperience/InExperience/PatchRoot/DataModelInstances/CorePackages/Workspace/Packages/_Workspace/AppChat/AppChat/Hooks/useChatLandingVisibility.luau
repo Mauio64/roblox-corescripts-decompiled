@@ -1,45 +1,46 @@
 local AppChat = script:FindFirstAncestor("AppChat")
-local AppChatParent = AppChat.Parent
-local SharedFlags = require(AppChatParent.SharedFlags)
+local parent = AppChat.Parent
+
+local SharedFlags = require(parent.SharedFlags)
 local GetFFlagEnableAppChatInExperience = SharedFlags.GetFFlagEnableAppChatInExperience
+
 local useAppPolicy = require(AppChat.Hooks.useAppPolicy)
 local useIsChatEnabled = require(AppChat.Hooks.useIsChatEnabled)
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
 local getFFlagHideNotificationIconForVR = require(AppChat.Flags.getFFlagHideNotificationIconForVR)
 local FFlagAppChatRemoveNotifications = SharedFlags.FFlagAppChatRemoveNotifications
-local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
 
-local function useChatLandingVisibility() -- line: 24
-	-- upvalues: useIsInExperience (copy), useIsChatEnabled (copy), useAppPolicy (copy), getFFlagHideNotificationIconForVR (copy), useSelector (copy), FFlagAppChatRemoveNotifications (copy), GetFFlagEnableAppChatInExperience (copy)
-	local v12 = useIsInExperience()
-	local v13 = useIsChatEnabled()
-	local v14 = useAppPolicy(function(p1) -- line: 28
-		return p1.getChatHeaderSearch()
-	end)
-	local v15 = useAppPolicy(function(p2) -- line: 31
-		return p2.getChatHeaderCreateChatGroup()
-	end)
-	local v16 = useAppPolicy(function(p3) -- line: 34
-		-- upvalues: getFFlagHideNotificationIconForVR (copy)
-		return p3.getChatHeaderNotifications() and (not getFFlagHideNotificationIconForVR() or p3.getWebViewSupport())
-	end)
-	local v17 = useSelector(function(p4) -- line: 39
-		local NotificationBadgeCounts = p4.NotificationBadgeCounts
+local RoactUtils = require(parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
 
-		return NotificationBadgeCounts and NotificationBadgeCounts.TopBarNotificationIcon or 0
+local function useChatLandingVisibility()
+	local showSearchRow = useIsInExperience()
+	local v = useIsChatEnabled()
+
+	local v2 = useAppPolicy(function(p)
+		return p.getChatHeaderSearch()
 	end)
-	local v18 = v14 and (not v12 and v13)
-	local v19 = v15 and v13
-	local v20 = not v12 and (v16 and not FFlagAppChatRemoveNotifications)
-	local v21 = v12 and GetFFlagEnableAppChatInExperience()
+
+	local v3 = useAppPolicy(function(p)
+		return p.getChatHeaderCreateChatGroup()
+	end)
+
+	local v4 = useAppPolicy(function(p)
+		return p.getChatHeaderNotifications() and (not getFFlagHideNotificationIconForVR() or p.getWebViewSupport())
+	end)
+
+	local notificationCount = useSelector(function(p)
+		local notificationBadgeCounts = p.NotificationBadgeCounts
+		return notificationBadgeCounts and notificationBadgeCounts.TopBarNotificationIcon or 0
+	end)
 
 	return {
-		topBarShowSearch = v18,
-		topBarShowCreateChatGroup = v19,
-		topBarShowNotifications = v20,
-		topBarShowSnoozeNotifications = v21,
-		showSearchRow = v12,
-		notificationCount = v17
+		topBarShowSearch = v2 and not showSearchRow and v,
+		topBarShowCreateChatGroup = v3 and v,
+		topBarShowNotifications = not showSearchRow and v4 and not FFlagAppChatRemoveNotifications,
+		topBarShowSnoozeNotifications = showSearchRow and GetFFlagEnableAppChatInExperience(),
+		showSearchRow = showSearchRow,
+		notificationCount = notificationCount
 	}
 end
 

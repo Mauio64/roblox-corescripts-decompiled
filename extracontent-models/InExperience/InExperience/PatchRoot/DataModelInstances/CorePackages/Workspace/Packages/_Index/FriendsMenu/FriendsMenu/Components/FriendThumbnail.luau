@@ -1,116 +1,127 @@
 local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
-local FriendsMenuParent = FriendsMenu.Parent
-local React = require(FriendsMenuParent.React)
-local getRbxthumbWithTypeSizeAndOptions = require(FriendsMenuParent.UserLib).Utils.getRbxthumbWithTypeSizeAndOptions
-local UserLib = require(FriendsMenuParent.UserLib)
-local FFlagFriendsMenuUseProfileFrameThumbnail = require(FriendsMenu.Flags.FFlagFriendsMenuUseProfileFrameThumbnail)
-local UIBlox = require(FriendsMenuParent.UIBlox)
-local Foundation = require(FriendsMenuParent.Foundation)
-local EnumsRadius = Foundation.Enums.Radius
-local Skeleton = Foundation.Skeleton
-local UserModel = require(FriendsMenuParent.UserLib).Models.UserModel
+local parent = FriendsMenu.Parent
 
+local React = require(parent.React)
+local UserLib = require(parent.UserLib)
+local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+local UserLib2 = require(parent.UserLib)
+local FFlagFriendsMenuUseProfileFrameThumbnail = require(FriendsMenu.Flags.FFlagFriendsMenuUseProfileFrameThumbnail)
+local UIBlox = require(parent.UIBlox)
+local Foundation = require(parent.Foundation)
+local Radius = Foundation.Enums.Radius
+local Skeleton = Foundation.Skeleton
+
+local UserLib3 = require(parent.UserLib)
+local UserModel = UserLib3.Models.UserModel
 require(FriendsMenu.friendsMenuModalType)
 
 local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
 local IconSize = UIBlox.App.Constant.IconSize
 local Images = UIBlox.App.ImageSet.Images
 local useStyle = UIBlox.Core.Style.useStyle
-local Constants = UserLib.Utils.Constants
+
+local Constants = UserLib2.Utils.Constants
+
 local Size150x150 = Constants.RbxThumbnailSizes.Size150x150
 local AvatarHeadShot = Constants.RbxthumbTypes.AvatarHeadShot
-local t1 = {
+
+local v = {
 	[UserModel.PresenceType.ONLINE] = {
 		Image = "component_assets/circle_16",
 		Color = Color3.fromRGB(0, 180, 109),
 		Size = UDim2.new(0, 12, 0, 12)
 	},
-	[UserModel.PresenceType.IN_GAME] = {
-		Image = "icons/menu/games_small"
-	},
-	[UserModel.PresenceType.IN_STUDIO] = {
-		Image = "icons/logo/studiologo_small"
-	}
+	[UserModel.PresenceType.IN_GAME] = { Image = "icons/menu/games_small" },
+	[UserModel.PresenceType.IN_STUDIO] = { Image = "icons/logo/studiologo_small" }
 }
 
-return function(t2: {[any]: any}) -- line: 56
-	-- upvalues: useStyle (copy), React (copy), Constants (copy), Size150x150 (copy), getRbxthumbWithTypeSizeAndOptions (copy), AvatarHeadShot (copy), FFlagFriendsMenuUseProfileFrameThumbnail (copy), UserModel (copy), t1 (copy), Skeleton (copy), EnumsRadius (copy), ImageSetLabel (copy), Images (copy), IconSize (copy)
-	local friend = t2.friend
-
+return function(props)
+	local friend = props.friend
 	assert(friend, "friend should be non-nil. Silence type checker.")
+	local v2 = useStyle()
 
-	local v22 = useStyle()
-	local v23 = React.useMemo(function() -- line: 61
-		-- upvalues: friend (copy), Constants (copy), Size150x150 (copy), getRbxthumbWithTypeSizeAndOptions (copy), AvatarHeadShot (copy), FFlagFriendsMenuUseProfileFrameThumbnail (copy)
-		local v26 = nil
+	local image = React.useMemo(function()
+		local v3
 
 		if friend then
-			local v27 = Constants.RbxThumbnailSizeToNumberSize[Size150x150]
-
-			v26 = getRbxthumbWithTypeSizeAndOptions(friend.id, AvatarHeadShot, v27, nil, nil, FFlagFriendsMenuUseProfileFrameThumbnail)
+			local v4 = Constants.RbxThumbnailSizeToNumberSize[Size150x150]
+			v3 = getRbxthumbWithTypeSizeAndOptions(
+				friend.id,
+				AvatarHeadShot,
+				v4,
+				nil,
+				nil,
+				FFlagFriendsMenuUseProfileFrameThumbnail
+			)
 		end
 
-		if not v26 then
-			v26 = "rbxasset://textures/ui/LuaApp/graphic/ph-avatar-portrait.png"
-		end
-
-		return v26
+		return v3 or "rbxasset://textures/ui/LuaApp/graphic/ph-avatar-portrait.png"
 	end, { friend })
-	local PlayerBackgroundDefault = v22.Theme.PlayerBackgroundDefault
-	local v25 = if friend.presence == UserModel.PresenceType.OFFLINE then nil else t1[UserModel.PresenceType.ONLINE]
 
-	return React.createElement("Frame", {
-		BackgroundTransparency = 1,
-		Size = t2.size,
-		Position = t2.position,
-		AnchorPoint = t2.anchorPoint
-	}, {
-		Background = PlayerBackgroundDefault and React.createElement("Frame", {
-			Size = t2.size,
-			Position = t2.position,
-			AnchorPoint = t2.anchorPoint,
-			BackgroundColor3 = v22.Theme.UIDefault.Color,
-			BackgroundTransparency = v22.Theme.UIDefault.Transparency
+	local playerBackgroundDefault = v2.Theme.PlayerBackgroundDefault
+	local v3
+
+	if friend.presence ~= UserModel.PresenceType.OFFLINE then
+		v3 = v[UserModel.PresenceType.ONLINE]
+	end
+
+	local createElement = React.createElement
+	local v4 = {
+		Size = props.size,
+		Position = props.position,
+		AnchorPoint = props.anchorPoint,
+		BackgroundTransparency = 1
+	}
+
+	local v5 = {
+		Background = playerBackgroundDefault and React.createElement("Frame", {
+			Size = props.size,
+			Position = props.position,
+			AnchorPoint = props.anchorPoint,
+			BackgroundColor3 = v2.Theme.UIDefault.Color,
+			BackgroundTransparency = v2.Theme.UIDefault.Transparency
 		}, {
-			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0.5, 0)
-			})
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0.5, 0) })
 		}),
-		Thumbnail = t2.isFetchingFriends and React.createElement(Skeleton, {
+		Thumbnail = props.isFetchingFriends and React.createElement(Skeleton, {
 			Size = UDim2.new(1, 0, 1, 0),
-			radius = EnumsRadius.Circle
+			radius = Radius.Circle
 		}) or React.createElement(ImageSetLabel, {
+			Size = props.size,
+			Position = props.position,
+			AnchorPoint = props.anchorPoint,
+			Image = image,
 			BorderSizePixel = 0,
-			Size = t2.size,
-			Position = t2.position,
-			AnchorPoint = t2.anchorPoint,
-			Image = v23,
-			BackgroundColor3 = v22 and v22.Theme.UIDefault.Color,
-			BackgroundTransparency = if not PlayerBackgroundDefault then v22.Theme.UIDefault.Transparency else 1
+			BackgroundColor3 = v2 and v2.Theme.UIDefault.Color,
+			BackgroundTransparency = playerBackgroundDefault and 1 or v2.Theme.UIDefault.Transparency
 		}, {
-			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0.5, 0)
-			})
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0.5, 0) })
 		}),
-		PresenceIcon = v25 and (not t2.isFetchingFriends and React.createElement(ImageSetLabel, {
+		PresenceIcon = 0
+	}
+	local presenceIcon
+
+	if v3 and not props.isFetchingFriends then
+		presenceIcon = React.createElement(ImageSetLabel, {
+			Image = Images[v3.Image],
 			BackgroundTransparency = 0,
-			ZIndex = 2,
-			Image = Images[v25.Image],
-			BackgroundColor3 = t2.isHoverRow and v22.Theme.BackgroundOnHover.Color or v22.Theme.BackgroundDefault.Color,
-			ImageColor3 = v25.Color,
+			BackgroundColor3 = props.isHoverRow and v2.Theme.BackgroundOnHover.Color or v2.Theme.BackgroundDefault.Color,
+			ImageColor3 = v3.Color,
 			Position = UDim2.new(1, -1, 1, -1),
 			AnchorPoint = Vector2.new(1, 1),
-			Size = v25.Size or UDim2.new(0, IconSize.Small, 0, IconSize.Small)
+			Size = v3.Size or UDim2.new(0, IconSize.Small, 0, IconSize.Small),
+			ZIndex = 2
 		}, {
 			Border = React.createElement("UIStroke", {
-				Thickness = 3,
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-				Color = v22.Theme.BackgroundDefault.Color,
-				Transparency = v22.Theme.BackgroundDefault.Transparency
+				Color = v2.Theme.BackgroundDefault.Color,
+				Transparency = v2.Theme.BackgroundDefault.Transparency,
+				Thickness = 3
 			}),
-			Corner = React.createElement("UICorner", {
-				CornerRadius = UDim.new(0.5, 0)
-			})
-		})) or nil
-	})
+			Corner = React.createElement("UICorner", { CornerRadius = UDim.new(0.5, 0) })
+		}) or nil
+	end
+
+	v5.PresenceIcon = presenceIcon
+	return createElement("Frame", v4, v5)
 end

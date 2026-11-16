@@ -1,27 +1,25 @@
-local Parent = script:FindFirstAncestor("DataHydration").Parent
-local Http = require(Parent.Http)
-local HttpRequest = require(Parent.HttpRequest)
+local parent = script:FindFirstAncestor("DataHydration").Parent
+
+local Http = require(parent.Http)
+local HttpRequest = require(parent.HttpRequest)
 local HttpService = game:GetService("HttpService")
-local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local UrlBuilder = require(parent.UrlBuilder)
+local urlBuilder = UrlBuilder.UrlBuilder
+
 local Url = Http.Url
 
-local function requestUserVoteUpdate(s1: string, b1: boolean?) -- line: 13
-	-- upvalues: UrlBuilder (copy), Url (copy), HttpRequest (copy), HttpService (copy)
-	local v10 = UrlBuilder.new({
-		path = "v1/games/{universeId}/user-votes",
-		base = Url.GAME_URL
-	})({
-		universeId = s1
+local function requestUserVoteUpdate(universeId: string, flag: boolean?)
+	local v = urlBuilder.new({ base = Url.GAME_URL, path = "v1/games/{universeId}/user-votes" })({
+		universeId = universeId
 	})
 
 	return HttpRequest.config({
-		requestFunction = function(s2: string, s3: string, p1) -- line: 22
-			-- upvalues: HttpRequest (copy)
-			return HttpRequest.requestFunctions.RequestInternal(s2, s3, p1)
+		requestFunction = function(p: string, p2: string, p3)
+			return HttpRequest.requestFunctions.RequestInternal(p, p2, p3)
 		end
-	})(v10, "PATCH", {
+	})(v, "PATCH", {
 		postBody = HttpService:JSONEncode({
-			vote = if b1 ~= nil then b1 else "null"
+			vote = flag == nil and "null" or flag
 		})
 	})
 end

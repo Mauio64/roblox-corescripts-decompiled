@@ -1,39 +1,34 @@
-local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
-local React = require(Parent.React)
-local v3 = React.createContext(nil)
+local parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
 
-return {
-	LoaderContext = v3,
-	LoaderProvider = function(t1: {[any]: any}) -- line: 44
-		-- upvalues: React (copy), v3 (copy)
-		local v5 = React.useRef({})
-		local v6 = React.useRef(t1.loaders)
+local React = require(parent.React)
 
-		v6.current = t1.loaders
-		React.useEffect(function() -- line: 49
-			-- upvalues: t1 (copy), v5 (copy)
-			if not t1.open then
-				v5.current = {}
-			end
-		end, { t1.open })
+local context = React.createContext(nil)
+local LoaderContext = {}
+LoaderContext.LoaderContext = context
 
-		local current = React.useRef({
-			registryRef = v6,
-			cacheRef = v5
-		}).current
+function LoaderContext.LoaderProvider(props)
+	local ref = React.useRef({})
+	local ref2 = React.useRef(props.loaders)
+	ref2.current = props.loaders
 
-		return React.createElement(v3.Provider, {
-			value = current
-		}, t1.children)
-	end,
-	useLoaderContext = function() -- line: 64
-		-- upvalues: React (copy), v3 (copy)
-		local v8 = React.useContext(v3)
-
-		if not v8 then
-			error("useLoaderContext must be used within a <LoaderProvider>")
+	React.useEffect(function()
+		if not props.open then
+			ref.current = {}
 		end
+	end, { props.open })
 
-		return v8
+	local current = React.useRef({ registryRef = ref2, cacheRef = ref }).current
+	return React.createElement(context.Provider, { value = current }, props.children)
+end
+
+function LoaderContext.useLoaderContext()
+	local v = React.useContext(context)
+
+	if not v then
+		error("useLoaderContext must be used within a <LoaderProvider>")
 	end
-}
+
+	return v
+end
+
+return LoaderContext

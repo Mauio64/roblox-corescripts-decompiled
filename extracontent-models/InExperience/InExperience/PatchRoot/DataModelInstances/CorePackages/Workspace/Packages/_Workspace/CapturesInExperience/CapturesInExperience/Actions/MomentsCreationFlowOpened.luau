@@ -1,12 +1,10 @@
-local ParentParent = script.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Rodux = require(ParentParentParent.Rodux)
+local parent = script.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParent.Types)
+local Rodux = require(parent2.Rodux)
 
-return Rodux.makeActionCreator(script.Name, function(p1, s1: string) -- line: 14
-	return {
-		capture = p1,
-		sessionId = s1
-	}
+require(parent.Types)
+
+return Rodux.makeActionCreator(script.Name, function(capture, sessionId: string)
+	return { capture = capture, sessionId = sessionId }
 end)

@@ -1,5 +1,1 @@
-return {
-	Unknown = "Unknown",
-	Male = "Male",
-	Female = "Female"
-}
+return { Unknown = "Unknown", Male = "Male", Female = "Female" }

@@ -1,29 +1,24 @@
-local t1 = {}
-local ParentParent = script.Parent.Parent.Parent.Parent
-local ParentParentParent = ParentParent.Parent
-local Error = require(ParentParentParent.LuauPolyfill).Error
+local parent = script.Parent.Parent.Parent.Parent
+local parent2 = parent.Parent
 
-require(ParentParentParent.GraphQL)
-require(ParentParent.utilities.graphql.types)
+local LuauPolyfill = require(parent2.LuauPolyfill)
+local Error = LuauPolyfill.Error
 
-local self = setmetatable({}, {
-	__index = Error
-})
+require(parent2.GraphQL)
 
-self.__index = self
+require(parent.utilities.graphql.types)
 
-function self.new(s1: string, p1, p2, t2: {[any]: any}?) -- line: 62
-	-- upvalues: Error (copy), self (copy)
-	local v10 = Error.new(s1)
+local object = setmetatable({}, { __index = Error })
+object.__index = object
 
-	v10.message = s1
-	v10.path = p1
-	v10.query = p2
-	v10.variables = t2
+function object.new(message: string, path, query, variables)
+	local v = Error.new(message)
+	v.message = message
+	v.path = path
+	v.query = query
+	v.variables = variables
 
-	return (setmetatable(v10, self))
+	return (setmetatable(v, object))
 end
 
-t1.MissingFieldError = self
-
-return t1
+return { MissingFieldError = object }

@@ -1,194 +1,236 @@
-local ParentParent = script.Parent.Parent
-local getComponentName = require(ParentParent.Shared).getComponentName
+local parent = script.Parent.Parent
+local Shared = require(parent.Shared)
+local getComponentName = Shared.getComponentName
 local ReactWorkTags = require(script.Parent.ReactWorkTags)
 
 require(script.Parent.ReactInternalTypes)
 
-local ok, result = pcall(function() -- line: 29
+local success, result = pcall(function()
 	return game:DefineFastInt("ReactMicroprofilerLevel5", 0)
 end)
+local v = not success and 0 or result
 
-if not ok then
-	result = 0
-end
+function noop(...) end
 
-function noop(...) -- line: 43
-end
+local flag = false
+local v2 = nil
 
-local u6 = false
-local u7 = nil
-local n1 = 0
+local v3 = 0
 
-if result >= 5 then
-	game:GetService("RunService").Heartbeat:Connect(function() -- line: 52
-		-- upvalues: n1 (ref)
-		n1 = 0
+if v >= 5 then
+	local RunService = game:GetService("RunService")
+	RunService.Heartbeat:Connect(function()
+		v3 = 0
 	end)
 end
 
-local v9 = if not (result >= 5) then {
-	profilebegin = noop,
-	profileend = noop
-} else {
-	profilebegin = function(...) -- line: 59
-		-- upvalues: n1 (ref)
-		debug.profilebegin(...)
-		n1 += 1
-	end,
-	profileend = function() -- line: 63
-		-- upvalues: n1 (ref)
-		if n1 > 0 then
-			debug.profileend()
-			n1 -= 1
-		end
-	end
-}
+local v4
 
-function startTimerSampling(p1: ((...any) -> ...any)) -- line: 75
-	-- upvalues: u6 (ref), u7 (ref)
-	if u6 then
+if v >= 5 then
+	v4 = {
+		profilebegin = function(...)
+			debug.profilebegin(...)
+			v3 += 1
+		end,
+		profileend = function()
+			if v3 > 0 then
+				debug.profileend()
+				v3 -= 1
+			end
+		end
+	}
+else
+	v4 = { profilebegin = noop, profileend = noop }
+end
+
+function startTimerSampling(callback)
+	if flag then
 		warn("RobloxReactProfiling Timer Sampling already running.")
 	end
 
-	u6 = true
-	u7 = p1
+	flag = true
+	v2 = callback
 end
-function endTimerSampling() -- line: 83
-	-- upvalues: u6 (ref), u7 (ref)
-	u6 = false
-	u7 = nil
+
+function endTimerSampling()
+	flag = false
+	v2 = nil
 end
-function getFirstStringKey(t1: {[any]: any}) -- line: 88
-	for v12, _ in t1 do
-		if type(v12) == "string" then
-			return v12
+
+function getFirstStringKey(items)
+	for k, _ in items do
+		if type(k) == "string" then
+			return k
 		end
 	end
 
 	return nil
 end
-function startTimer(t2: {[any]: any}) -- line: 97
-	-- upvalues: u6 (ref)
-	if u6 then
-		t2.startTime = os.clock()
+
+function startTimer(p)
+	if flag then
+		p.startTime = os.clock()
 	end
 end
-function endTimer(t3: {[any]: any}) -- line: 102
-	-- upvalues: u6 (ref), u7 (ref)
-	if u6 then
-		t3.endTime = os.clock()
+function endTimer(p)
+	if flag then
+		p.endTime = os.clock()
 
-		if u7 then
-			u7(t3)
+		if v2 then
+			v2(p)
 		end
 	end
 end
-function profileRootBeforeUnitOfWork(p2) -- line: 111
-	-- upvalues: v9 (copy)
-	local current = p2.current
-	local v18 = nil
+
+function profileRootBeforeUnitOfWork(p)
+	local current = p.current
+	local id = nil
 
 	if current then
 		if current.memoizedProps then
-			v18 = getFirstStringKey(current.memoizedProps)
+			id = getFirstStringKey(current.memoizedProps)
 		end
 
-		if v18 == nil and current.stateNode and current.stateNode.containerInfo then
-			v18 = current.stateNode.containerInfo.Name
+		if id == nil and current.stateNode and current.stateNode.containerInfo then
+			id = current.stateNode.containerInfo.Name
 		end
 	end
 
-	if v18 == "Folder" and current.child then
+	if id == "Folder" and current.child then
 		local child = current.child
-		local v20 = nil
+		local v5
 
 		if child.memoizedProps then
-			v20 = getFirstStringKey(child.memoizedProps)
+			v5 = getFirstStringKey(child.memoizedProps)
 		end
 
-		if v20 == nil and child.stateNode and child.stateNode.containerInfo then
-			v20 = child.stateNode.containerInfo.Name
+		if v5 == nil and child.stateNode and child.stateNode.containerInfo then
+			v5 = child.stateNode.containerInfo.Name
 		end
 
-		if v20 ~= nil then
-			v18 = v20
-		end
-	end
-
-	if v18 ~= nil then
-		local t4 = {
-			startTime = 0,
-			endTime = 0,
-			id = v18
-		}
-
-		startTimer(t4)
-		v9.profilebegin(v18)
-
-		return t4
-	end
-
-	return nil
-end
-function profileRootAfterYielding(t5: {[any]: any}?) -- line: 165
-	-- upvalues: v9 (copy)
-	if t5 then
-		endTimer(t5)
-		v9.profileend()
-	end
-end
-function profileUnitOfWorkBefore(p3) -- line: 172
-	-- upvalues: getComponentName (copy), ReactWorkTags (copy), v9 (copy)
-	local v24 = getComponentName(p3.type)
-
-	if p3.key then
-		v24 = tostring(p3.key) .. "=" .. (v24 or "?")
-	end
-
-	local v25 = nil
-
-	if p3.stateNode and (p3.tag == ReactWorkTags.HostComponent or p3.tag == ReactWorkTags.HostText) then
-		local LayerCollector = p3.stateNode:FindFirstAncestorWhichIsA("LayerCollector")
-
-		if LayerCollector then
-			v25 = "[" .. LayerCollector:GetFullName() .. "] "
+		if v5 ~= nil then
+			id = v5
 		end
 	end
 
-	if v25 then
-		v24 = v25 .. " : " .. (v24 or "?")
+	if id == nil then
+		return nil
 	end
 
-	if v24 ~= nil then
-		v9.profilebegin(v24)
+	local v5 = { id = id, startTime = 0, endTime = 0 }
 
-		return true
+	startTimer(v5)
+	v4.profilebegin(id)
+	return v5
+end
+
+function profileRootAfterYielding(p)
+	if p then
+		endTimer(p)
+		v4.profileend()
+	end
+end
+
+function profileUnitOfWorkBefore(data): boolean
+	local v5 = getComponentName(data.type)
+
+	if data.key then
+		v5 = tostring(data.key) .. "=" .. (v5 or "?")
 	end
 
-	return false
-end
-function profileUnitOfWorkAfter(b1: boolean) -- line: 205
-	-- upvalues: v9 (copy)
-	if b1 then
-		v9.profileend()
+	local v6 = nil
+
+	if data.stateNode and (data.tag == ReactWorkTags.HostComponent or data.tag == ReactWorkTags.HostText) then
+		local layerCollector = data.stateNode:FindFirstAncestorWhichIsA("LayerCollector")
+
+		if layerCollector then
+			v6 = "[" .. layerCollector:GetFullName() .. "] "
+		end
 	end
-end
-function profileCommitBefore() -- line: 211
-	-- upvalues: v9 (copy)
-	v9.profilebegin("Commit")
-end
-function profileCommitAfter() -- line: 214
-	-- upvalues: v9 (copy)
-	v9.profileend()
+
+	if v6 then
+		v5 = v6 .. " : " .. (v5 or "?")
+	end
+
+	if v5 == nil then
+		return false
+	end
+
+	v4.profilebegin(v5)
+	return true
 end
 
-return {
+function profileUnitOfWorkAfter(flag2: boolean)
+	if flag2 then
+		v4.profileend()
+	end
+end
+
+function profileCommitBefore()
+	v4.profilebegin("Commit")
+end
+function profileCommitAfter()
+	v4.profileend()
+end
+
+local RobloxReactProfiling = {
 	startTimerSampling = startTimerSampling,
 	endTimerSampling = endTimerSampling,
-	profileRootBeforeUnitOfWork = if not (result >= 1) then noop else profileRootBeforeUnitOfWork,
-	profileRootAfterYielding = if not (result >= 1) then noop else profileRootAfterYielding,
-	profileUnitOfWorkBefore = if not (result >= 10) then noop else profileUnitOfWorkBefore,
-	profileUnitOfWorkAfter = if not (result >= 10) then noop else profileUnitOfWorkAfter,
-	profileCommitBefore = if not (result >= 5) then noop else profileCommitBefore,
-	profileCommitAfter = if not (result >= 5) then noop else profileCommitAfter
+	profileRootBeforeUnitOfWork = 0,
+	profileRootAfterYielding = 0,
+	enableUnitOfWorkProfiling = 0,
+	profileUnitOfWorkBefore = 0,
+	profileUnitOfWorkAfter = 0,
+	profileCommitBefore = 0,
+	profileCommitAfter = 0
 }
+local profileRootBeforeUnitOfWork2
+
+if v >= 1 then
+	profileRootBeforeUnitOfWork2 = profileRootBeforeUnitOfWork
+else
+	profileRootBeforeUnitOfWork2 = noop
+end
+
+RobloxReactProfiling.profileRootBeforeUnitOfWork = profileRootBeforeUnitOfWork2
+local profileRootAfterYielding2
+
+if v >= 1 then
+	profileRootAfterYielding2 = profileRootAfterYielding
+else
+	profileRootAfterYielding2 = noop
+end
+
+RobloxReactProfiling.profileRootAfterYielding = profileRootAfterYielding2
+
+RobloxReactProfiling.enableUnitOfWorkProfiling = v >= 10
+local profileUnitOfWorkBefore2
+
+if v >= 10 then
+	profileUnitOfWorkBefore2 = profileUnitOfWorkBefore
+else
+	profileUnitOfWorkBefore2 = noop
+end
+
+RobloxReactProfiling.profileUnitOfWorkBefore = profileUnitOfWorkBefore2
+local profileUnitOfWorkAfter2
+
+if v >= 10 then
+	profileUnitOfWorkAfter2 = profileUnitOfWorkAfter
+else
+	profileUnitOfWorkAfter2 = noop
+end
+
+RobloxReactProfiling.profileUnitOfWorkAfter = profileUnitOfWorkAfter2
+local profileCommitBefore2
+
+if v >= 5 then
+	profileCommitBefore2 = profileCommitBefore
+else
+	profileCommitBefore2 = noop
+end
+
+RobloxReactProfiling.profileCommitBefore = profileCommitBefore2
+local profileCommitAfter2 = if v >= 5 then profileCommitAfter else noop
+RobloxReactProfiling.profileCommitAfter = profileCommitAfter2
+return RobloxReactProfiling

@@ -1,76 +1,74 @@
 local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
-local AvatarSwitcherParent = AvatarSwitcher.Parent
-local React = require(AvatarSwitcherParent.React)
-local SignalsReact = require(AvatarSwitcherParent.SignalsReact)
-local useEventConnection = require(AvatarSwitcherParent.ReactUtils).useEventConnection
-local sendAXCounterV2 = require(AvatarSwitcherParent.AvatarExperienceAnalytics).sendAXCounterV2
+local parent = AvatarSwitcher.Parent
+
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
+local ReactUtils = require(parent.ReactUtils)
+local useEventConnection = ReactUtils.useEventConnection
+local AvatarExperienceAnalytics = require(parent.AvatarExperienceAnalytics)
+local sendAXCounterV2 = AvatarExperienceAnalytics.sendAXCounterV2
+
 local RespawnChoiceDialog = require(AvatarSwitcher.Components.Modals.RespawnChoiceDialog)
 local RespawnLaterDialog = require(AvatarSwitcher.Components.Modals.RespawnLaterDialog)
 local getAvatarSwitcherStore = require(AvatarSwitcher.Stores.getAvatarSwitcherStore)
 local respawnAvatar = require(AvatarSwitcher.Utils.respawnAvatar)
 local Constants = require(AvatarSwitcher.Constants)
-local FFlagAvatarSwitcherCounters = require(AvatarSwitcherParent.AvatarExperienceFlags).FFlagAvatarSwitcherCounters
 
-local function RespawnDialogContainer(t1: {[any]: any}) -- line: 31
-	-- upvalues: SignalsReact (copy), getAvatarSwitcherStore (copy), React (copy), useEventConnection (copy), FFlagAvatarSwitcherCounters (copy), sendAXCounterV2 (copy), Constants (copy), respawnAvatar (copy), RespawnChoiceDialog (copy), RespawnLaterDialog (copy)
-	local v15 = SignalsReact.useSignalState(getAvatarSwitcherStore)
-	local v16 = SignalsReact.useSignalState(v15.getRespawnPromptShown)
-	local v17, v18 = React.useState(function() -- line: 35
-		-- upvalues: t1 (copy)
-		local v22, _ = t1.getRespawnBehaviour()
+local AvatarExperienceFlags = require(parent.AvatarExperienceFlags)
+local FFlagAvatarSwitcherCounters = AvatarExperienceFlags.FFlagAvatarSwitcherCounters
 
-		return v22
+local function RespawnDialogContainer(props)
+	local v = SignalsReact.useSignalState(getAvatarSwitcherStore)
+	local v2 = SignalsReact.useSignalState(v.getRespawnPromptShown)
+
+	local state, setState = React.useState(function()
+		local respawnBehaviour, _ = props.getRespawnBehaviour()
+		return respawnBehaviour
 	end)
 
-	useEventConnection(t1.respawnBehaviorChangedEvent.Event, v18, {})
+	useEventConnection(props.respawnBehaviorChangedEvent.Event, setState, {})
 
-	local v19 = React.useCallback(function() -- line: 42
-		-- upvalues: v15 (copy), t1 (copy), FFlagAvatarSwitcherCounters (copy), sendAXCounterV2 (copy), Constants (copy), respawnAvatar (copy)
-		v15.toggleRespawnPrompt(false)
-		t1.toggleWindow()
+	local onConfirm = React.useCallback(function()
+		v.toggleRespawnPrompt(false)
+		props.toggleWindow()
 
 		if FFlagAvatarSwitcherCounters then
 			sendAXCounterV2(Constants.Counters.ConfirmRespawn)
 		end
 
-		v15.switchAvatar()
-		respawnAvatar(t1.getRespawnBehaviour)
-	end, {
-		t1.getRespawnBehaviour,
-		t1.toggleWindow
-	})
-	local v20 = React.useCallback(function() -- line: 53
-		-- upvalues: v15 (copy), t1 (copy), FFlagAvatarSwitcherCounters (copy), sendAXCounterV2 (copy), Constants (copy), v17 (copy)
-		v15.toggleRespawnPrompt(false)
-		t1.toggleWindow()
+		v.switchAvatar()
+		respawnAvatar(props.getRespawnBehaviour)
+	end, { props.getRespawnBehaviour, props.toggleWindow })
+
+	local onDefer = React.useCallback(function()
+		v.toggleRespawnPrompt(false)
+		props.toggleWindow()
 
 		if FFlagAvatarSwitcherCounters then
-			sendAXCounterV2(Constants.Counters.DeferRespawn, {
-				respawnEnabled = tostring(v17)
-			})
+			sendAXCounterV2(Constants.Counters.DeferRespawn, { respawnEnabled = tostring(state) })
 		end
 
-		v15.switchAvatar()
-	end, { t1.toggleWindow })
-	local v21 = React.useCallback(function() -- line: 63
-		-- upvalues: FFlagAvatarSwitcherCounters (copy), sendAXCounterV2 (copy), Constants (copy), v15 (copy)
+		v.switchAvatar()
+	end, { props.toggleWindow })
+
+	local onClose = React.useCallback(function()
 		if FFlagAvatarSwitcherCounters then
 			sendAXCounterV2(Constants.Counters.CancelSwitchAvatar)
 		end
 
-		v15.toggleRespawnPrompt(false)
+		v.toggleRespawnPrompt(false)
 	end, {})
 
 	return React.createElement(React.Fragment, nil, {
-		RespawnChoiceDialog = v16 and (v17 and React.createElement(RespawnChoiceDialog, {
-			onConfirm = v19,
-			onDefer = v20,
-			onClose = v21
-		})),
-		RespawnLaterDialog = v16 and (not v17 and React.createElement(RespawnLaterDialog, {
-			onDefer = v20,
-			onClose = v21
-		}))
+		RespawnChoiceDialog = v2 and state and React.createElement(RespawnChoiceDialog, {
+			onConfirm = onConfirm,
+			onDefer = onDefer,
+			onClose = onClose
+		}),
+		RespawnLaterDialog = v2 and not state and React.createElement(RespawnLaterDialog, {
+			onDefer = onDefer,
+			onClose = onClose
+		})
 	})
 end
 

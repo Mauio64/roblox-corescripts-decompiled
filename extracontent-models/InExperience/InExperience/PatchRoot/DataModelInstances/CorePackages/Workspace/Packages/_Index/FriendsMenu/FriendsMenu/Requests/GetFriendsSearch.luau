@@ -1,13 +1,10 @@
-local Parent = script:FindFirstAncestor("FriendsMenu").Parent
-local Url = require(Parent.Http).Url
+local parent = script:FindFirstAncestor("FriendsMenu").Parent
 
-return function(p1, s1: string, s2: string, n1: number?, s3: string?) -- line: 6
-	-- upvalues: Url (copy)
-	local v8 = Url:makeQueryString({
-		query = s2,
-		cursor = s3,
-		limit = n1
-	})
+local Http = require(parent.Http)
+local Url = Http.Url
 
-	return p1(string.format("%s/users/%s/friends/search?%s", Url.FRIEND_URL, s1, v8), "GET")
+return function(callback, p: string, query: string, limit: number?, cursor: string?)
+	local queryString = Url:makeQueryString({ query = query, cursor = cursor, limit = limit })
+
+	return callback(string.format("%s/users/%s/friends/search?%s", Url.FRIEND_URL, p, queryString), "GET")
 end

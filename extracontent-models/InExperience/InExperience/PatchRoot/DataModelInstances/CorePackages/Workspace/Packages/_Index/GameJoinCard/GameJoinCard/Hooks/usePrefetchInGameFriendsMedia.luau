@@ -1,53 +1,53 @@
 local GameJoinCard = script:FindFirstAncestor("GameJoinCard")
-local GameJoinCardParent = GameJoinCard.Parent
-local React = require(GameJoinCardParent.React)
+local parent = GameJoinCard.Parent
+
+local React = require(parent.React)
+
 local prefetchGameJoinCardMedia = require(GameJoinCard.prefetchGameJoinCardMedia)
 
-local function usePrefetchInGameFriendsMedia(t1: {[any]: any}?) -- line: 21
-	-- upvalues: React (copy), prefetchGameJoinCardMedia (copy)
-	local v7 = React.useMemo(function() -- line: 24
-		-- upvalues: t1 (copy)
-		if not t1 then
+local function usePrefetchInGameFriendsMedia(items)
+	local v = React.useMemo(function()
+		if not items then
 			return ""
 		end
 
-		local t2 = {}
-		local t3 = {}
+		local universeIdSet = {}
+		local universeIds = {}
 
-		for _, v11 in t1 do
-			local presence = v11.presence
+		for _, item in items do
+			local presence = item.presence
 
-			if presence and presence.userPresenceType == "InGame" then
-				local str = tostring(presence.universeId or "")
-
-				if str ~= "" and not t2[str] then
-					t2[str] = true
-					table.insert(t3, str)
-				end
+			if not (presence and presence.userPresenceType == "InGame") then
+				continue
 			end
+
+			local universeId = tostring(presence.universeId or "")
+
+			if universeId == "" or universeIdSet[universeId] then
+				continue
+			end
+
+			universeIdSet[universeId] = true
+			table.insert(universeIds, universeId)
 		end
 
-		table.sort(t3)
+		table.sort(universeIds)
+		return table.concat(universeIds, ",")
+	end, { items })
 
-		return table.concat(t3, ",")
-	end, { t1 })
-
-	React.useEffect(function() -- line: 45
-		-- upvalues: v7 (copy), prefetchGameJoinCardMedia (copy)
-		if v7 == "" then
+	React.useEffect(function()
+		if v == "" then
 			return
 		end
 
-		local t4 = {}
+		local v2 = {}
 
-		for _, v16 in string.split(v7, ",") do
-			table.insert(t4, {
-				universeId = v16
-			})
+		for _, universeId in string.split(v, ",") do
+			table.insert(v2, { universeId = universeId })
 		end
 
-		prefetchGameJoinCardMedia(t4)
-	end, { v7 })
+		prefetchGameJoinCardMedia(v2)
+	end, { v })
 end
 
 return usePrefetchInGameFriendsMedia

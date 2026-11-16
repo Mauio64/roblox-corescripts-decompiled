@@ -1,49 +1,32 @@
 return {
 	name = "user_profile",
 	version = 2,
-	attributes = {
-		isUkRegionUser = false,
-		isEuRegionUser = false
-	},
+	attributes = { isUkRegionUser = false, isEuRegionUser = false },
 	resources = {
 		surfaces = {
 			type = "listItem",
 			value = {
 				{
 					id = "username",
-					label = {
-						["$translate"] = "Label.UsernameDisplayNameDescription"
-					}
+					label = { ["$translate"] = "Label.UsernameDisplayNameDescription" }
 				},
 				{
 					id = "avatar",
-					label = {
-						["$translate"] = "Label.AvatarClothesOrAccessories"
-					}
+					label = { ["$translate"] = "Label.AvatarClothesOrAccessories" }
 				},
 				{
 					id = "textChat",
-					label = {
-						["$translate"] = "Label.TextChat"
-					},
-					meta = {
-						showTextChatEducation = true
-					}
+					label = { ["$translate"] = "Label.TextChat" },
+					meta = { showTextChatEducation = true }
 				},
 				{
 					id = "voiceChat",
-					label = {
-						["$translate"] = "Label.VoiceChat"
-					},
-					meta = {
-						showVoiceEducation = true
-					}
+					label = { ["$translate"] = "Label.VoiceChat" },
+					meta = { showVoiceEducation = true }
 				},
 				{
 					id = "inGameBehavior",
-					label = {
-						["$translate"] = "Label.InGameBehavior"
-					}
+					label = { ["$translate"] = "Label.InGameBehavior" }
 				}
 			}
 		},
@@ -52,12 +35,8 @@ return {
 			value = {
 				{
 					id = "bullying",
-					label = {
-						["$translate"] = "Label.Bullying"
-					},
-					description = {
-						["$translate"] = "Label.BullyingDescription"
-					},
+					label = { ["$translate"] = "Label.Bullying" },
+					description = { ["$translate"] = "Label.BullyingDescription" },
 					meta = {
 						informationHeading = "More about romantic words and behavior",
 						informationHref = "https://www.roblox.com/help/article/2033664"
@@ -65,48 +44,28 @@ return {
 				},
 				{
 					id = "cheating",
-					label = {
-						["$translate"] = "Label.Cheating"
-					},
-					description = {
-						["$translate"] = "Label.CheatingDescription"
-					}
+					label = { ["$translate"] = "Label.Cheating" },
+					description = { ["$translate"] = "Label.CheatingDescription" }
 				},
 				{
 					id = "swearing",
-					label = {
-						["$translate"] = "Label.Swearing"
-					},
-					description = {
-						["$translate"] = "Label.SwearingDescription"
-					}
+					label = { ["$translate"] = "Label.Swearing" },
+					description = { ["$translate"] = "Label.SwearingDescription" }
 				},
 				{
 					id = "scamming",
-					label = {
-						["$translate"] = "Label.Scamming"
-					},
-					description = {
-						["$translate"] = "Label.ScammingDescription"
-					}
+					label = { ["$translate"] = "Label.Scamming" },
+					description = { ["$translate"] = "Label.ScammingDescription" }
 				},
 				{
 					id = "personalInfo",
-					label = {
-						["$translate"] = "Label.PersonalInformation"
-					},
-					description = {
-						["$translate"] = "Label.PersonalInformationDescription"
-					}
+					label = { ["$translate"] = "Label.PersonalInformation" },
+					description = { ["$translate"] = "Label.PersonalInformationDescription" }
 				},
 				{
 					id = "romantic",
-					label = {
-						["$translate"] = "Label.RomanticWordsAndActions"
-					},
-					description = {
-						["$translate"] = "Label.RomanticWordsAndActionsDescription"
-					},
+					label = { ["$translate"] = "Label.RomanticWordsAndActions" },
+					description = { ["$translate"] = "Label.RomanticWordsAndActionsDescription" },
 					meta = {
 						disclosureInfo = "Dynamic disclosure info",
 						informationHeading = "More about romantic words and behavior",
@@ -115,65 +74,39 @@ return {
 				},
 				{
 					id = "extremeViolence",
-					label = {
-						["$translate"] = "Label.ExtremeViolence"
-					},
-					description = {
-						["$translate"] = "Label.ExtremeViolenceDescription"
-					}
+					label = { ["$translate"] = "Label.ExtremeViolence" },
+					description = { ["$translate"] = "Label.ExtremeViolenceDescription" }
 				},
 				{
 					id = "spam",
-					label = {
-						["$translate"] = "Label.Spam"
-					},
-					description = {
-						["$translate"] = "Label.SpamDescription"
-					}
+					label = { ["$translate"] = "Label.Spam" },
+					description = { ["$translate"] = "Label.SpamDescription" }
 				},
 				{
 					id = "links",
-					label = {
-						["$translate"] = "Label.LinksToOtherSites"
-					},
-					description = {
-						["$translate"] = "Label.LinksToOtherSitesDescription"
-					}
+					label = { ["$translate"] = "Label.LinksToOtherSites" },
+					description = { ["$translate"] = "Label.LinksToOtherSitesDescription" }
 				},
 				{
 					id = "dangerousSharing",
-					label = {
-						["$translate"] = "Label.DangerousSharing"
-					},
-					description = {
-						["$translate"] = "Label.DangerousSharingDescription"
-					}
+					label = { ["$translate"] = "Label.DangerousSharing" },
+					description = { ["$translate"] = "Label.DangerousSharingDescription" }
 				},
 				{
 					id = "realLife",
-					label = {
-						["$translate"] = "Label.RealLifeSituations"
-					},
-					description = {
-						["$translate"] = "Label.RealLifeSituationsDescription"
-					}
+					label = { ["$translate"] = "Label.RealLifeSituations" },
+					description = { ["$translate"] = "Label.RealLifeSituationsDescription" }
 				}
 			}
 		}
 	},
 	display = {
-		title = {
-			["$translate"] = "Title.ReportAPerson"
-		},
-		closeButtonLabel = {
-			["$translate"] = "Action.Close"
-		},
+		title = { ["$translate"] = "Title.ReportAPerson" },
+		closeButtonLabel = { ["$translate"] = "Action.Close" },
 		titleDisclosure = {
 			["$switch"] = {
 				{
-					condition = {
-						["$attribute"] = "isUkRegionUser"
-					},
+					condition = { ["$attribute"] = "isUkRegionUser" },
 					value = {
 						tooltipTitle = "UK Online Safety Act",
 						tooltipText = "Roblox may take action after we review your report but we will not share your information with any user you report. Reporting doesn't block the user or thing you reported. If you want to limit your interactions with a user, you can block them.",
@@ -181,9 +114,7 @@ return {
 					}
 				},
 				{
-					condition = {
-						["$attribute"] = "isEuRegionUser"
-					},
+					condition = { ["$attribute"] = "isEuRegionUser" },
 					value = {
 						tooltipTitle = "EU Digital Services Act",
 						tooltipText = "Roblox may take action after we review your report but we will not share your information with any user you report. Reporting doesn't block the user or thing you reported. If you want to limit your interactions with a user, you can block them.",
@@ -204,39 +135,23 @@ return {
 	nodes = {
 		root = {
 			type = "list",
+			title = { ["$translate"] = "Label.WhatPartOfTheirProfile" },
+			eyebrow = { ["$translate"] = "Title.ReportAPerson" },
+			items = { ["$resource"] = "surfaces" },
 			storeAs = "selectedSurface",
 			required = true,
-			title = {
-				["$translate"] = "Label.WhatPartOfTheirProfile"
-			},
-			eyebrow = {
-				["$translate"] = "Title.ReportAPerson"
-			},
-			items = {
-				["$resource"] = "surfaces"
-			},
-			nextButtonText = {
-				["$translate"] = "Action.Continue"
-			},
-			errorText = {
-				["$translate"] = "Description.GeneralError"
-			},
-			retryButtonText = {
-				["$translate"] = "Action.Retry"
-			},
+			nextButtonText = { ["$translate"] = "Action.Continue" },
+			errorText = { ["$translate"] = "Description.GeneralError" },
+			retryButtonText = { ["$translate"] = "Action.Retry" },
 			next = {
 				["$switch"] = {
 					{
-						value = "voiceEducation",
-						condition = {
-							["$store"] = "selectedSurface.meta.showVoiceEducation"
-						}
+						condition = { ["$store"] = "selectedSurface.meta.showVoiceEducation" },
+						value = "voiceEducation"
 					},
 					{
-						value = "textChatEducation",
-						condition = {
-							["$store"] = "selectedSurface.meta.showTextChatEducation"
-						}
+						condition = { ["$store"] = "selectedSurface.meta.showTextChatEducation" },
+						value = "textChatEducation"
 					},
 					"abuseType"
 				}
@@ -244,137 +159,65 @@ return {
 		},
 		abuseType = {
 			type = "list",
+			title = { ["$translate"] = "Label.WhatWasTheIssue" },
+			eyebrow = { ["$translate"] = "Title.ReportAPerson" },
+			items = { ["$resource"] = "abuseTypes" },
 			storeAs = "selectedAbuseType",
 			required = true,
-			next = "summary",
-			title = {
-				["$translate"] = "Label.WhatWasTheIssue"
-			},
-			eyebrow = {
-				["$translate"] = "Title.ReportAPerson"
-			},
-			items = {
-				["$resource"] = "abuseTypes"
-			},
-			nextButtonText = {
-				["$translate"] = "Action.Continue"
-			},
-			errorText = {
-				["$translate"] = "Description.GeneralError"
-			},
-			retryButtonText = {
-				["$translate"] = "Action.Retry"
-			}
+			nextButtonText = { ["$translate"] = "Action.Continue" },
+			errorText = { ["$translate"] = "Description.GeneralError" },
+			retryButtonText = { ["$translate"] = "Action.Retry" },
+			next = "summary"
 		},
 		voiceEducation = {
 			type = "paragraph",
-			next = "abuseType",
-			title = {
-				["$translate"] = "Label.ReportVoiceChatInGame"
-			},
-			eyebrow = {
-				["$translate"] = "Title.ReportAPerson"
-			},
-			paragraph = {
-				["$translate"] = "Label.ReportVoiceChatText"
-			},
-			nextButtonText = {
-				["$translate"] = "Action.Continue"
-			}
+			title = { ["$translate"] = "Label.ReportVoiceChatInGame" },
+			eyebrow = { ["$translate"] = "Title.ReportAPerson" },
+			paragraph = { ["$translate"] = "Label.ReportVoiceChatText" },
+			nextButtonText = { ["$translate"] = "Action.Continue" },
+			next = "abuseType"
 		},
 		textChatEducation = {
 			type = "paragraph",
-			next = "abuseType",
-			title = {
-				["$translate"] = "Label.ReportTextChatInGame"
-			},
-			eyebrow = {
-				["$translate"] = "Title.ReportAPerson"
-			},
-			paragraph = {
-				["$translate"] = "Label.ReportTextChatText"
-			},
-			nextButtonText = {
-				["$translate"] = "Action.Continue"
-			}
+			title = { ["$translate"] = "Label.ReportTextChatInGame" },
+			eyebrow = { ["$translate"] = "Title.ReportAPerson" },
+			paragraph = { ["$translate"] = "Label.ReportTextChatText" },
+			nextButtonText = { ["$translate"] = "Action.Continue" },
+			next = "abuseType"
 		},
 		summary = {
 			type = "comment",
+			title = { ["$translate"] = "Label.DoYouWantToExplainWhatHappened" },
+			eyebrow = { ["$translate"] = "Title.ReportAPerson" },
 			storeAs = "comment",
+			textAreaLabel = { ["$translate"] = "Label.AddingDetailsGivesUsMoreEvidenceToReview" },
+			placeholder = { ["$translate"] = "Label.TellUsInYourOwnWords" },
+			optionalLabel = { ["$translate"] = "Label.Optional" },
+			nextButtonText = { ["$translate"] = "Action.Send" },
 			maxLength = 1000,
-			next = "confirmation",
-			title = {
-				["$translate"] = "Label.DoYouWantToExplainWhatHappened"
-			},
-			eyebrow = {
-				["$translate"] = "Title.ReportAPerson"
-			},
-			textAreaLabel = {
-				["$translate"] = "Label.AddingDetailsGivesUsMoreEvidenceToReview"
-			},
-			placeholder = {
-				["$translate"] = "Label.TellUsInYourOwnWords"
-			},
-			optionalLabel = {
-				["$translate"] = "Label.Optional"
-			},
-			nextButtonText = {
-				["$translate"] = "Action.Send"
-			},
-			helperText = {
-				["$translate"] = "Label.CharacterCountWithLimit"
-			}
+			helperText = { ["$translate"] = "Label.CharacterCountWithLimit" },
+			next = "confirmation"
 		},
 		confirmation = {
 			type = "confirmation",
-			title = {
-				["$translate"] = "Label.WeReceivedYourReport"
-			},
-			eyebrow = {
-				["$translate"] = "Title.ReportAPerson"
-			},
-			message = {
-				["$translate"] = "Label.WeWillUseThisToKeepRobloxSafeForYouAndEveryone"
-			},
-			blockToggleLabel = {
-				["$translate"] = "Label.BlockThisPerson"
-			},
-			blockToggleDescription = {
-				["$translate"] = "Label.YouWonTSeeThemAnymore"
-			},
-			viewInformationButtonText = {
-				["$translate"] = "Label.ViewInformation"
-			},
-			informationHeading = {
-				["$store"] = "selectedAbuseType.meta.informationHeading"
-			},
-			informationHref = {
-				["$store"] = "selectedAbuseType.meta.informationHref"
-			},
-			nextButtonText = {
-				["$translate"] = "Action.Close"
-			},
-			next = {
-				type = "close"
-			}
+			title = { ["$translate"] = "Label.WeReceivedYourReport" },
+			eyebrow = { ["$translate"] = "Title.ReportAPerson" },
+			message = { ["$translate"] = "Label.WeWillUseThisToKeepRobloxSafeForYouAndEveryone" },
+			blockToggleLabel = { ["$translate"] = "Label.BlockThisPerson" },
+			blockToggleDescription = { ["$translate"] = "Label.YouWonTSeeThemAnymore" },
+			viewInformationButtonText = { ["$translate"] = "Label.ViewInformation" },
+			informationHeading = { ["$store"] = "selectedAbuseType.meta.informationHeading" },
+			informationHref = { ["$store"] = "selectedAbuseType.meta.informationHref" },
+			nextButtonText = { ["$translate"] = "Action.Close" },
+			next = { type = "close" }
 		},
 		generalError = {
 			type = "paragraph",
-			title = {
-				["$translate"] = "Label.SomethingWentWrong"
-			},
-			eyebrow = {
-				["$translate"] = "Title.ReportAPerson"
-			},
-			paragraph = {
-				["$translate"] = "Label.ErrorSubmittingReport"
-			},
-			nextButtonText = {
-				["$translate"] = "Action.Close"
-			},
-			next = {
-				type = "close"
-			}
+			title = { ["$translate"] = "Label.SomethingWentWrong" },
+			eyebrow = { ["$translate"] = "Title.ReportAPerson" },
+			paragraph = { ["$translate"] = "Label.ErrorSubmittingReport" },
+			nextButtonText = { ["$translate"] = "Action.Close" },
+			next = { type = "close" }
 		}
 	},
 	translations = {

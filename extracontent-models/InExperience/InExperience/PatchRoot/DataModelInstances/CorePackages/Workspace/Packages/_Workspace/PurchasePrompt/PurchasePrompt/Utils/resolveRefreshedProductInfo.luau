@@ -1,56 +1,52 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
 local mapCatalogDiscountInfoToPriceDiscountDetails = require(PurchasePrompt.Utils.mapCatalogDiscountInfoToPriceDiscountDetails)
 
-local function resolveRefreshedProductInfo(p1, p2, s1: string?, n1: number?) -- line: 11
-	-- upvalues: mapCatalogDiscountInfoToPriceDiscountDetails (copy)
-	if s1 and s1 ~= "" then
-		local price = nil
+local function resolveRefreshedProductInfo(data, p, p2: string?, p3: number?)
+	if p2 and p2 ~= "" then
+		local v = nil
 
-		if p2 ~= nil and p2.data ~= nil then
-			for _, v in ipairs(p2.data) do
-				if s1 == v.collectibleItemInstanceId then
-					price = v.price
-
+		if p ~= nil and p.data ~= nil then
+			for _, v2 in ipairs(p.data) do
+				if v2.collectibleItemInstanceId == p2 then
+					v = v2.price
 					break
 				end
 			end
 		end
 
-		if price == nil and p1 ~= nil then
-			price = p1.lowestResalePrice
+		if v == nil and data ~= nil then
+			v = data.lowestResalePrice
 		end
 
-		if price then
+		if v then
 			return {
+				refreshedExpectedPrice = v,
+				PriceInRobux = v,
 				UserBasePriceInRobux = nil,
-				PriceDiscountDetails = nil,
-				refreshedExpectedPrice = price,
-				PriceInRobux = price
+				PriceDiscountDetails = nil
 			}
 		end
-	elseif n1 and n1 ~= 0 then
-		if p1 ~= nil and p1.timedOptions then
-			for _, v in ipairs(p1.timedOptions) do
-				if n1 == v.days then
-					local price = v.price
+	elseif p3 and p3 ~= 0 then
+		if data ~= nil and data.timedOptions then
+			for _, timedOption in ipairs(data.timedOptions) do
+				if timedOption.days == p3 then
+					local userBasePriceInRobux = timedOption.price
 
-					if v.discountInformation and v.discountInformation.originalPrice then
-						price = v.discountInformation.originalPrice
+					if timedOption.discountInformation and timedOption.discountInformation.originalPrice then
+						userBasePriceInRobux = timedOption.discountInformation.originalPrice
 					end
 
 					return {
-						refreshedExpectedPrice = v.price,
-						PriceInRobux = v.price,
-						UserBasePriceInRobux = price,
-						PriceDiscountDetails = mapCatalogDiscountInfoToPriceDiscountDetails(v.discountInformation)
+						refreshedExpectedPrice = timedOption.price,
+						PriceInRobux = timedOption.price,
+						UserBasePriceInRobux = userBasePriceInRobux,
+						PriceDiscountDetails = mapCatalogDiscountInfoToPriceDiscountDetails(timedOption.discountInformation)
 					}
 				end
 			end
 		end
-	elseif p1 ~= nil then
-		return {
-			refreshedExpectedPrice = p1.price
-		}
+	elseif data ~= nil then
+		return { refreshedExpectedPrice = data.price }
 	end
 
 	return nil

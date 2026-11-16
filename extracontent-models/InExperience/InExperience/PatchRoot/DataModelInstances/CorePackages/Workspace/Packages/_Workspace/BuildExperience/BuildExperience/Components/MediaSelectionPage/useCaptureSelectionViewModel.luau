@@ -1,42 +1,33 @@
-local Parent = script:FindFirstAncestor("BuildExperience").Parent
-local React = require(Parent.React)
-local SignalsReact = require(Parent.SignalsReact)
+local parent = script:FindFirstAncestor("BuildExperience").Parent
 
-local function useCaptureSelectionViewModel(t1: {[any]: any}) -- line: 22
-	-- upvalues: SignalsReact (copy), React (copy)
-	local v6 = SignalsReact.useSignalState(t1.captureSource.getCaptures)
-	local v7 = SignalsReact.useSignalState(t1.captureSource.getIsFinished)
-	local v8, v9 = React.useState(nil)
-	local v10 = React.useMemo(function() -- line: 27
-		-- upvalues: v8 (copy)
-		if v8 ~= nil and typeof(v8) == "Object" then
-			return Content.fromObject(v8)
-		end
+local React = require(parent.React)
+local SignalsReact = require(parent.SignalsReact)
 
-		return nil
-	end, { v8 })
-	local v11 = React.useCallback(function(p1) -- line: 34
-		-- upvalues: v9 (copy)
-		v9(p1)
-	end, {})
-	local v12 = React.useCallback(function() -- line: 38
-		-- upvalues: v8 (copy), t1 (copy)
-		if v8 ~= nil then
-			t1.onCaptureConfirmed(v8)
-		end
-	end, {
-		v8,
-		t1.onCaptureConfirmed
-	})
+local function useCaptureSelectionViewModel(p)
+	local captures = SignalsReact.useSignalState(p.captureSource.getCaptures)
+	local isFinished = SignalsReact.useSignalState(p.captureSource.getIsFinished)
+	local state, setState = React.useState(nil)
 
 	return {
-		captures = v6,
-		selectedCapture = v8,
-		previewContent = v10,
-		isFinished = v7,
-		onCaptureSelected = v11,
-		onConfirm = v12,
-		onShowMore = t1.captureSource.fetchMore
+		captures = captures,
+		selectedCapture = state,
+		previewContent = React.useMemo(function()
+			if state == nil or typeof(state) ~= "Object" then
+				return nil
+			end
+
+			return Content.fromObject(state)
+		end, { state }),
+		isFinished = isFinished,
+		onCaptureSelected = React.useCallback(function(p2)
+			setState(p2)
+		end, {}),
+		onConfirm = React.useCallback(function()
+			if state ~= nil then
+				p.onCaptureConfirmed(state)
+			end
+		end, { state, p.onCaptureConfirmed }),
+		onShowMore = p.captureSource.fetchMore
 	}
 end
 

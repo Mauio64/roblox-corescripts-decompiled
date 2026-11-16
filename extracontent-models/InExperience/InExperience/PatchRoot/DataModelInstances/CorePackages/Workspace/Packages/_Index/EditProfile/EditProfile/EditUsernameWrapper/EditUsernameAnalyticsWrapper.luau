@@ -1,28 +1,29 @@
 local EditProfile = script:FindFirstAncestor("EditProfile")
-local EditProfileParent = EditProfile.Parent
-local React = require(EditProfileParent.React)
-local useLocalUserId = require(EditProfileParent.RobloxAppHooks).useLocalUserId
+local parent = EditProfile.Parent
+local React = require(parent.React)
+local RobloxAppHooks = require(parent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
 local EditProfileIXP = require(EditProfile.Flags.EditProfileIXP)
+
 local Analytics = require(EditProfile.Analytics)
-local DefaultAnalyticsService = require(EditProfileParent.SocialLuaAnalytics).Analytics.DefaultAnalyticsService
+local SocialLuaAnalytics = require(parent.SocialLuaAnalytics)
+local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+
 local EditUsernameWrapper = require(script.Parent.EditUsernameWrapper)
 
-return function(p1) -- line: 13
-	-- upvalues: useLocalUserId (copy), EditProfileIXP (copy), React (copy), Analytics (copy), DefaultAnalyticsService (copy), EditUsernameWrapper (copy)
-	local v10 = useLocalUserId()
+return function(p)
+	local uid = useLocalUserId()
 
 	if EditProfileIXP.useIsExperimentEnabled() then
 		return React.createElement(Analytics.Context.Provider, {
 			value = {
 				fireAnalyticsEvent = Analytics.setupFireAnalyticsEvents({
 					analytics = DefaultAnalyticsService,
-					infoForAllEvents = {
-						uid = v10
-					}
+					infoForAllEvents = { uid = uid }
 				})
 			}
-		}, { React.createElement(EditUsernameWrapper, p1) })
+		}, { React.createElement(EditUsernameWrapper, p) })
 	end
 
-	return React.createElement(EditUsernameWrapper, p1)
+	return React.createElement(EditUsernameWrapper, p)
 end
